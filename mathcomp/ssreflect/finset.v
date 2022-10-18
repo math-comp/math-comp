@@ -750,6 +750,9 @@ Proof. by rewrite (eq_sym A) eqEcard sub0set cards0 leqn0. Qed.
 Lemma set0Pn A : reflect (exists x, x \in A) (A != set0).
 Proof. by rewrite -cards_eq0; apply: existsP. Qed.
 
+Lemma set0_existsF A : (A == set0) = ~~ [exists x, x \in A].
+Proof. by rewrite -(sameP (set0Pn _) existsP) negbK.  Qed.
+
 Lemma card_gt0 A : (0 < #|A|) = (A != set0).
 Proof. by rewrite lt0n cards_eq0. Qed.
 
@@ -762,10 +765,10 @@ Proof. by rewrite cardsE card1. Qed.
 Lemma cardsUI A B : #|A :|: B| + #|A :&: B| = #|A| + #|B|.
 Proof. by rewrite !cardsE cardUI. Qed.
 
-Lemma cardsU A B : #|A :|: B| = (#|A| + #|B| - #|A :&: B|)%N.
+Lemma cardsU A B : #|A :|: B| = #|A| + #|B| - #|A :&: B|.
 Proof. by rewrite -cardsUI addnK. Qed.
 
-Lemma cardsI A B : #|A :&: B| = (#|A| + #|B| - #|A :|: B|)%N.
+Lemma cardsI A B : #|A :&: B| = #|A| + #|B| - #|A :|: B|.
 Proof. by rewrite -cardsUI addKn. Qed.
 
 Lemma cardsT : #|[set: T]| = #|T|.
@@ -774,7 +777,7 @@ Proof. by rewrite cardsE. Qed.
 Lemma cardsID B A : #|A :&: B| + #|A :\: B| = #|A|.
 Proof. by rewrite !cardsE cardID. Qed.
 
-Lemma cardsD A B : #|A :\: B| = (#|A| - #|A :&: B|)%N.
+Lemma cardsD A B : #|A :\: B| = #|A| - #|A :&: B|.
 Proof. by rewrite -(cardsID B A) addKn. Qed.
 
 Lemma cardsC A : #|A| + #|~: A| = #|T|.
@@ -867,7 +870,7 @@ Arguments setIidPl {A B}.
 Lemma setIidPr A B : reflect (A :&: B = B) (B \subset A).
 Proof. by rewrite setIC; apply: setIidPl. Qed.
 
-Lemma cardsDS A B : B \subset A -> #|A :\: B| = (#|A| - #|B|)%N.
+Lemma cardsDS A B : B \subset A -> #|A :\: B| = #|A| - #|B|.
 Proof. by rewrite cardsD => /setIidPr->. Qed.
 
 Lemma setUidPl A B : reflect (A :|: B = A) (B \subset A).
@@ -940,8 +943,18 @@ Proof. by rewrite -subset0 subDset setU0. Qed.
 Lemma setI_eq0 A B : (A :&: B == set0) = [disjoint A & B].
 Proof. by rewrite disjoints_subset -setD_eq0 setDE setCK. Qed.
 
+Lemma subset_eq0 B A : (A \subset B) && (A \subset ~: B) = (A == set0).
+Proof. by rewrite -subsetI setICr subset0. Qed.
+
 Lemma disjoint_setI0 A B : [disjoint A & B] -> A :&: B = set0.
 Proof. by rewrite -setI_eq0; move/eqP. Qed.
+
+Lemma subsetC_disjoint A B : [disjoint A & B] ->
+  forall C, C != set0 -> C \subset A -> ~~ (C \subset B).
+Proof.
+move=> dAB C + CA; apply: contra_neqN => CB.
+by apply/eqP; rewrite -subset0 -(disjoint_setI0 dAB) subsetI CA CB.
+Qed.
 
 Lemma disjoints1 A x : [disjoint [set x] & A] = (x \notin A).
 Proof. by rewrite (@eq_disjoint1 _ x) // => y; rewrite !inE. Qed.
@@ -1252,7 +1265,7 @@ Proof. by move=> Dx Dx2; apply/imset2P; exists x x2. Qed.
 
 Lemma mem_imset2 (D : {pred aT}) (D2 : aT -> {pred aT2}) x x2 :
     injective2 f2 ->
-  f2 x x2 \in imset2 f2 (mem D) (fun x1 => mem (D2 x1)) = 
+  f2 x x2 \in imset2 f2 (mem D) (fun x1 => mem (D2 x1)) =
     ((x \in D) && (x2 \in D2 x)).
 Proof.
 move=> inj2_f; apply/imset2P/andP => [|[xD xD2]]; last by exists x x2.
@@ -1397,10 +1410,40 @@ Arguments imsetP {aT rT f D y}.
 Arguments imset2P {aT aT2 rT f2 D1 D2 y}.
 Arguments imset_disjoint {aT rT f A B}.
 
+Section unset1.
+Variable (I : finType).
+Implicit Types (i : I) (A : {set I}).
+
+Lemma pick_set1 i0 : [pick x in [set i0]] = Some i0.
+Proof. by case: pickP => [i /[!inE]/eqP-> | /(_ i0)/[!(inE, eqxx)]]. Qed.
+
+Definition unset1 A : option I := if #|A| == 1 then [pick x in A] else None.
+
+Lemma set1K : pcancel set1 unset1.
+Proof. by move=> i; rewrite /unset1 cards1 eqxx pick_set1. Qed.
+
+Lemma omap_unset1K A : #|A| = 1 -> omap set1 (unset1 A) = Some A.
+Proof. by move=> /eqP/cards1P[i ->]; rewrite set1K. Qed.
+
+Lemma unset10 : unset1 set0 = None. Proof. by rewrite /unset1 cards0. Qed.
+
+Lemma unset1N1 A : #|A| != 1 -> unset1 A = None.
+Proof. by move=> AN1; rewrite /unset1 ifN. Qed.
+
+Lemma unset1K : ocancel unset1 set1.
+Proof.
+move=> A; rewrite /unset1.
+by case: ifPn => // /cards1P[i ->]/=; rewrite pick_set1.
+Qed.
+
+End unset1.
+Arguments unset1 {I}.
+
 Section BigOps.
 
 Variables (R : Type) (idx : R).
 Variables (op : Monoid.law idx) (aop : Monoid.com_law idx).
+Variables (times : Monoid.mul_law idx) (plus : Monoid.add_law idx times).
 Variables I J : finType.
 Implicit Type A B : {set I}.
 Implicit Type h : I -> J.
@@ -1465,6 +1508,42 @@ Lemma partition_big_imset h (A : {pred I}) F :
   \big[aop/idx]_(i in A) F i =
      \big[aop/idx]_(j in h @: A) \big[aop/idx]_(i in A | h i == j) F i.
 Proof. by apply: partition_big => i Ai; apply/imsetP; exists i. Qed.
+
+Lemma big_cards1 (f : {set I} -> R) :
+  \big[aop/idx]_(A : {set I} | #|A| == 1) f A
+  = \big[aop/idx]_(i : I) f [set i].
+Proof.
+rewrite (reindex_omap set1 unset1) => [|A /cards1P[i ->] /[!set1K]//].
+by apply: eq_bigl => i; rewrite set1K cards1 !eqxx.
+Qed.
+
+(* Too specific ? *)
+Lemma big_setI_distrl (P : pred {set I}) (h : {set I} -> {set I}) f g :
+  \big[plus/idx]_(A : {set I} | P (h A)) times (g A) (f (h A))
+  = \big[plus/idx]_(B : {set I} | P B)
+      times (\big[plus/idx]_(A : {set I} | h A == B) g A) (f B).
+Proof.
+under [RHS]eq_bigr do rewrite big_distrl /=.
+rewrite [LHS](partition_big h P) => //; apply: eq_bigr => B PB.
+apply: eq_big => [A|A /andP[_ /eqP->] //].
+by rewrite andbC; case: eqVneq=> // ->.
+Qed.
+
+(* TODO: remove? *)
+Lemma big_partitionS (f : {set I} -> I -> R) :
+  \big[aop/idx]_(A : {set I}) (\big[aop/idx]_(i in A) f A i)
+  = \big[aop/idx]_(i : I) \big[aop/idx]_(A : {set I} | i \in A) f A i.
+Proof. by rewrite (exchange_big_dep xpredT). Qed.
+
+(* Backport to ssrfun? *)
+Definition xpair {T1 T2} (x : T1 * T2) := (x.2, x.1).
+
+(* TODO: swap equalities sides and rename ? *)
+Lemma big_memS (f : {set I} -> R) (P : pred {set I}):
+  \big[aop/idx]_(i : I) \big[aop/idx]_(A : {set I} | P A && (i \in A)) f A
+  = \big[aop/idx]_(A | P A) \big[aop/idx]_(w in A) f A.
+Proof. by rewrite !pair_big_dep (reindex xpair)//=; exists xpair; case. Qed.
+
 
 End BigOps.
 
@@ -2019,7 +2098,7 @@ have inj_f : {in A &, injective (pblock P)}.
 rewrite -(card_in_imset inj_f); apply: subset_leq_card.
 apply/subsetP => ? /imsetP[x xA ->].
 rewrite !inE pblock_mem ?covP ?subAD ?andbT //.
-by apply: contraTneq AB0 => <-; apply/set0Pn; exists x; rewrite inE APx ?andbT. 
+by apply: contraTneq AB0 => <-; apply/set0Pn; exists x; rewrite inE APx ?andbT.
 Qed.
 
 Section BigOps.
@@ -2523,3 +2602,97 @@ End SetFixpoint.
 Notation mem_imset_eq := mem_imset (only parsing).
 #[deprecated(since="mathcomp 1.13.0", note="Use mem_imset2 instead.")]
 Notation mem_imset2_eq := mem_imset2 (only parsing).
+
+Section FProd.
+
+Variables (I : finType) (T_ : I -> finType).
+
+Lemma card_fprod : #|fprod T_| = \prod_(i : I) #|T_ i|.
+Proof.
+rewrite card_sub (card_family (tagged_with T_)) foldrE big_image/=.
+apply: eq_bigr => i _/=; rewrite -card_sig; apply/esym.
+exact: bij_eq_card (tag_with_bij T_ i).
+Qed.
+
+Definition fprod_pick : 0 < #|fprod T_| -> forall i : I, T_ i.
+Proof.
+by rewrite card_fprod => /[swap] i /gt0_prodn/(_ i isT) /card_gt0P/sigW[].
+Qed.
+
+Lemma etaggedE (a : fprod T_) (i : I) (e : tag (fprod_fun a i) = i) :
+  etagged e = a i.
+Proof. by case: a e => //= f fP e; congr etagged; apply: eq_irrelevance. Qed.
+
+Definition ftagged (T_gt0 : 0 < #|fprod T_|)
+  (f : {ffun I -> {i : I & T_ i}}) (i : I) :=
+    @untag I T_ (T_ i) (fprod_pick T_gt0 i) i id (f i).
+
+Lemma ftaggedE t T_gt0 i : ftagged T_gt0 (fprod_fun t) i = t i.
+Proof. by rewrite /ftagged untagE ?tag_fprod_fun// => e; rewrite etaggedE. Qed.
+
+End FProd.
+
+Section BigTag.
+Variables (R : Type) (idx : R) (op : Monoid.com_law idx).
+Variables (I : finType) (T_ : I -> finType).
+
+Lemma big_tag_cond  (Q_ : forall i, {pred T_ i})
+      (P_ : forall i : I, T_ i -> R) (i : I) :
+  \big[op/idx]_(j in Q_ i) P_ i j =
+  \big[op/idx]_(j in tagged_with T_ i | untag true (Q_ i) j)
+     untag idx (P_ i) j.
+Proof.
+rewrite (big_sub_cond (tagged_with T_ i)).
+rewrite (reindex (tag_with i)); last exact/onW_bij/tag_with_bij.
+by apply: eq_big => [x|x Qix]; rewrite ?untagE.
+Qed.
+
+(* No link with `fprod`, it's weird to introduce it *)
+(* Note that the new version `big_tag_cond` not depend on `T_gt0` *)
+Lemma big_tag_cond_old (T_gt0 : 0 < #|fprod T_|)
+    (Q_ : forall i, {pred T_ i}) (P_ : forall i : I, T_ i -> R) (i : I) :
+  \big[op/idx]_(j in Q_ i) P_ i j =
+  \big[op/idx]_(j in tagged_with T_ i | Q_ i (untag (fprod_pick T_gt0 i) id j))
+    untag idx (P_ i) j.
+Proof.
+rewrite big_tag_cond; apply: eq_bigl => t /[!inE].
+by case: eqVneq => // tag_t; rewrite ?untagE.
+Qed.
+
+Lemma big_tag (P_ : forall i : I, T_ i -> R) (i : I) :
+  \big[op/idx]_(j : T_ i) P_ i j =
+  \big[op/idx]_(j in tagged_with T_ i) untag idx (P_ i) j.
+Proof. by rewrite big_tag_cond; under eq_bigl do rewrite untag_cst ?andbT. Qed.
+
+End BigTag.
+
+Arguments big_tag_cond [R idx op I T_] _ _ _.
+Arguments big_tag_cond_old [R idx op I T_] _ _ _ _.
+Arguments big_tag [R idx op I T_] _ _.
+
+Section BigFProd.
+  Variables (R : Type) (zero one : R) (times : R -> R -> R).
+  Variables (plus : Monoid.add_law zero times).
+  Variables (I : finType) (T_ : I -> finType).
+  Variables (P_ : forall i : I, {ffun T_ i -> R}).
+  Let T := fprod T_.
+
+  Lemma big_fprod_dep (Q : {pred {ffun I -> {i : I &  (T_ i)}}}) :
+    \big[plus/zero]_(t : T | Q (fprod_fun t)) \big[times/one]_(i : I) P_ i (t i) =
+    \big[plus/zero]_(g in family (tagged_with T_) | Q g)
+     \big[times/one]_(i : I) (untag zero (P_ i) (g i)).
+  Proof.
+  rewrite (reindex (@of_family_tagged_with _ T_)); last first.
+    exact/onW_bij/of_family_tagged_with_bij.
+  rewrite [in RHS]big_sub_cond; apply/esym/eq_bigr => -[/= f fP] Qf.
+  apply: eq_bigr => i _; rewrite /fprod_type_of_fprod/=.
+  by case: (f i) ('forall_eqP _ _) => //= j t; case: _ /; rewrite untagE.
+  Qed.
+
+  Lemma big_fprod :
+    \big[plus/zero]_(t : T) \big[times/one]_(i in I) P_ i (t i) =
+    \big[plus/zero]_(g in family (tagged_with T_))
+     \big[times/one]_(i : I) (untag zero (P_ i) (g i)).
+  Proof. by rewrite (big_fprod_dep predT) big_mkcondr. Qed.
+
+End BigFProd.

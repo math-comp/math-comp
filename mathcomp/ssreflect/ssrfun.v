@@ -61,3 +61,6 @@ Proof.
 move=> fK hK c /=; rewrite -[RHS]hK/=; case hcE : (h c) => [b|]//=.
 by rewrite -[b in RHS]fK; case: (f b) => //=; have := hK c; rewrite hcE.
 Qed.
+
+Lemma taggedK T P (s : {x : T & P x}) : Tagged P (tagged s) = s.
+Proof. by case: s. Qed.
