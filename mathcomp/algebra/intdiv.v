@@ -208,7 +208,7 @@ Qed.
 
 Lemma ltz_ceil m d : d > 0 -> m < ((m %/ d)%Z + 1) * d.
 Proof.
-by case: d => // d d_gt0; rewrite mulrDl mul1r -ltrBrD ltz_mod ?gt_eqF.
+by case: d => // d d_gt0; rewrite mulrDl mul1r -ltrBlDl ltz_mod ?gt_eqF.
 Qed.
 
 Lemma ltz_divLR m n d : d > 0 -> ((m %/ d)%Z < n) = (m < n * d).

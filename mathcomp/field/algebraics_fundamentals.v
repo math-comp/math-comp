@@ -133,7 +133,7 @@ have x_gt0 k: 0 < x ^+ k by rewrite exprn_gt0 // lt_def nz_x.
 move: lb_x; rewrite polySpred ?monic_neq0 // !big_ord_recr coef_map /=.
 rewrite -lead_coefE (monicP mon_p) natrD rmorph1 mul1r => lb_x.
 case: _.-1 (lb_x) => [|n]; first by rewrite !big_ord0 !add0r ltr01.
-rewrite -ltrBrD add0r -(ler_pmul2r (x_gt0 n)) -exprS.
+rewrite -ltrBlDl add0r -(ler_pmul2r (x_gt0 n)) -exprS.
 apply: lt_le_trans; rewrite mulrDl mul1r ltr_spaddr // -sumrN.
 rewrite natr_sum mulr_suml ler_sum // => j _.
 rewrite coef_map /= fmorph_eq_rat (le_trans (real_ler_norm _)) //.
@@ -197,8 +197,8 @@ have ub_y: `|y * a%:~R| < N%:R.
   by rewrite ler_pmul // (le_trans _ (ler_norm n)) ?ltW ?ub_n.
 apply/mapP; exists m.
   rewrite mem_iota /= add0n -addnn -ltr_Qnat Dm natrD.
-  by rewrite (le_lt_trans (ler_norm_add _ _)) // normr_nat ltrD2r.
-rewrite Dm ger0_norm ?addrK ?mulfK ?intr_eq0 // -lerBrD sub0r.
+  by rewrite (le_lt_trans (ler_norm_add _ _)) // normr_nat ltrD2.
+rewrite Dm ger0_norm ?addrK ?mulfK ?intr_eq0 // -lerBlDl sub0r.
 by rewrite (le_trans (ler_norm _)) ?normrN ?ltW.
 Qed.
 
@@ -507,7 +507,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
       exists (Num.max 1 M) => [|s /ubM vM]; first by rewrite lt_maxr ltr01.
       by rewrite le_maxr orbC vM.
     exists (h2 / M) => [|a xn_a]; first by rewrite divr_gt0 ?invr_gt0 ?ltr0n.
-    rewrite ltr_pdivr_mulr // -(ltrD2 h2) -mulr2n -mulr_natl divff //.
+    rewrite ltr_pdivr_mulr // -(ltrD2l h2) -mulr2n -mulr_natl divff //.
     rewrite -normr1 -(hornerC 1 a) -[1%:P]r_pq_1 hornerD.
     rewrite ?(le_lt_trans (ler_norm_add _ _)) ?ltr_leD ?ub_rp //.
     by rewrite mulrC hornerM normrM ler_wpmul2l ?ubM.
@@ -572,8 +572,8 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     pose f := d * e * h2; apply/posP; exists (maxn N (maxn m n)), f => [|k].
       by rewrite !mulr_gt0 ?invr_gt0 ?ltr0n.
    rewrite !geq_max => /and3P[/ab_le/ub_rp{}ub_rp le_mk le_nk].
-    rewrite -(ltD2r f) -mulr2n -mulr_natr divfK // /nlim /lim Dqvw.
-    rewrite rmorphD hornerD /= -addrA -ltrBrD ler_ltD //.
+    rewrite -(ltrD2r f) -mulr2n -mulr_natr divfK // /nlim /lim Dqvw.
+    rewrite rmorphD hornerD /= -addrA -ltrBlDl ler_ltD //.
       by rewrite rmorphM hornerM ler_pmul ?ltW ?v_gtd ?w_gte.
     rewrite -ltr_pdivr_mull ?mulr_gt0 // (le_lt_trans _ ub_rp) //.
     by rewrite -scalerAl hornerZ -rmorphM mulrN -normrN ler_norm.

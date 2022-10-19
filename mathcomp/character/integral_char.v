@@ -689,9 +689,9 @@ Proof.
 move=> chi1gt1; apply/exists_eq_inP; apply: contraFT (lt_geF chi1gt1).
 move=> /exists_inPn-nz_chi.
 rewrite -(norm_Cnat (Cnat_irr1 i)) -(@expr_le1 _ 2)//.
-rewrite -(leD2r (#|G|%:R * '['chi_i])) {1}cfnorm_irr mulr1.
+rewrite -(lerD2r (#|G|%:R * '['chi_i])) {1}cfnorm_irr mulr1.
 rewrite (cfnormE (cfun_onG _)) mulVKf ?neq0CG // (big_setD1 1%g) //=.
-rewrite addrCA lerD2 (cardsD1 1%g) group1 mulrS lerD2.
+rewrite addrCA lerD2l (cardsD1 1%g) group1 mulrS lerD2l.
 rewrite -sumr_const !(partition_big_imset (fun s => <[s]>)) /=.
 apply: ler_sum => _ /imsetP[g /setD1P[ntg Gg] ->].
 have sgG: <[g]> \subset G by rewrite cycle_subG.

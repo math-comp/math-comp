@@ -964,7 +964,7 @@ have part_c: {in calA, forall s (chi := 'Ind[G] 'chi_s),
     rewrite irr_consttE -(canLR (addKr _) DchiT) addrC cfdotBl cfdot_irr.
     by rewrite mulrb ifN_eqC ?subr0.
   rewrite -(cfResRes chi sHT sTG) DchiT Dphi !rmorphD !cfdotDl /=.
-  rewrite -ltrBrD subrr ltr_paddr ?lt_def //;
+  rewrite -ltrBDl subrr ltr_paddr ?lt_def //;
     rewrite Cnat_ge0 ?Cnat_cfdot_char ?cfRes_char ?irr_char //.
   by rewrite andbT -irr_consttE -constt_Ind_Res.
 do [split=> //; try by move=> s /AtoB_P[]] => [s1 s2 As1 As2 | r].

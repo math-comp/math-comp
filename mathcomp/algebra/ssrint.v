@@ -509,16 +509,16 @@ Definition ltez_natE := (ltez_nat, lteNz_nat, ltezN_nat, le0z_nat, lez0_nat).
 Lemma gtz0_ge1 x : (0 < x) = (1 <= x). Proof. by case: (intP x). Qed.
 
 Lemma lez_add1r x y : (1 + x <= y) = (x < y).
-Proof. by rewrite -subr_gt0 gtz0_ge1 lteBDr. Qed.
+Proof. by rewrite -subr_gt0 gtz0_ge1 lterBDr. Qed.
 
 Lemma lez_addr1 x y : (x + 1 <= y) = (x < y).
 Proof. by rewrite addrC lez_add1r. Qed.
 
 Lemma ltz_add1r x y : (x < 1 + y) = (x <= y).
-Proof. by rewrite -lez_add1r lerD2. Qed.
+Proof. by rewrite -lez_add1r lerD2l. Qed.
 
 Lemma ltz_addr1 x y : (x < y + 1) = (x <= y).
-Proof. by rewrite -lez_addr1 leD2r. Qed.
+Proof. by rewrite -lez_addr1 lerD2r. Qed.
 
 End intOrderedTheory.
 

@@ -49,19 +49,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_opp2` -> `lerN2`
   + `ltr_opp2` -> `ltrN2`
   + `lter_opp2` -> `lterN2`
-  + `ler_oppr` -> `lerN`
-  + `ltr_oppr` -> `ltrN`
-  + `lter_oppr` -> `lterN`
-  + `ler_oppl` -> `leNr`
-  + `ltr_oppl` -> `ltNr`
-  + `lter_oppl` -> `lteNr`
+  + `ler_oppr` -> `lerNr`
+  + `ltr_oppr` -> `ltrNr`
+  + `lter_oppr` -> `lterNr`
+  + `ler_oppl` -> `lerNl`
+  + `ltr_oppl` -> `ltrNl`
+  + `lter_oppl` -> `lterNl`
   + `lteif_opp2` -> `lteifN2`
-  + `ler_add2l` -> `lerD2`
-  + `ler_add2r` -> `leD2r`
-  + `ltr_add2l` -> `ltrD2`
+  + `ler_add2l` -> `lerD2l`
+  + `ler_add2r` -> `lerD2r`
+  + `ltr_add2l` -> `ltrD2l`
   + `ltr_add2r` -> `ltD2r`
-  + `ler_add2` -> `lerD2r`
-  + `ltr_add2` -> `ltrD2r`
+  + `ler_add2` -> `lerD2`
+  + `ltr_add2` -> `ltrD2`
   + `lter_add2` -> `lterD2r`
   + `ler_add` -> `lerD`
   + `ler_lt_add` -> `ler_ltD`
@@ -71,21 +71,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_lt_sub` -> `ler_ltB`
   + `ltr_le_sub` -> `ltr_leB`
   + `ltr_sub` -> `ltrB`
-  + `ler_subl_addr` -> `lerBDr`
-  + `ltr_subl_addr` -> `ltrBDr`
-  + `ler_subr_addr` -> `leBrDr`
-  + `ltr_subr_addr` -> `ltBrDr`
-  + `ler_sub_addr` -> `leBDr`
-  + `ltr_sub_addr` -> `ltBDr`
-  + `lter_sub_addr` -> `lteBDr`
-  + `ler_subl_addl` -> `lerBrD`
-  + `ltr_subl_addl` -> `ltrBrD`
-  + `ler_subr_addl` -> `leBrrd`
-  + `ltr_subr_addl` -> `ltBrrD`
-  + `ler_sub_addl` -> `leBrD`
-  + `ltr_sub_addl` -> `ltBrD`
-  + `lter_sub_addl` -> `lteBrD`
-
+  + `ler_subl_addr` -> `lerBlDr`
+  + `ltr_subl_addr` -> `ltrBlDr`
+  + `ler_subr_addr` -> `lerBrDr`
+  + `ltr_subr_addr` -> `ltrBrDr`
+  + `ler_sub_addr` -> `lerBDr`
+  + `ltr_sub_addr` -> `ltrBDr`
+  + `lter_sub_addr` -> `lterBDr`
+  + `ler_subl_addl` -> `lerBlDl`
+  + `ltr_subl_addl` -> `ltrBlDl`
+  + `ler_subr_addl` -> `lerBrDl`
+  + `ltr_subr_addl` -> `ltrBrDl`
+  + `ler_sub_addl` -> `lerBDl`
+  + `ltr_sub_addl` -> `ltrBDl`
+  + `lter_sub_addl` -> `lterBDl`
   + `ler_addl` -> `lerDl`
   + `ltr_addl` -> `ltrDl`
   + `ler_addr` -> `lerDr`
