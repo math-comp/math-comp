@@ -1740,7 +1740,7 @@ wlog le_m31 : m1 m3 / (m3 <= m1)%R.
 rewrite ger0_norm ?subr_ge0 // orb_idl => [|/andP[le_m12 le_m23]]; last first.
   by have /eqP->: m2 == m3; rewrite ?lexx // eq_le le_m23 (le_trans le_m31).
 rewrite -{1}(subrK m2 m1) -addrA -subr_ge0 andbC -[X in X && _]subr_ge0.
-by apply: leif_add; apply/real_leif_norm/num_real.
+by apply: leifD; apply/real_leif_norm/num_real.
 Qed.
 
 Lemma leqif_add_dist n1 n2 n3 :

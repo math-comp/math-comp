@@ -103,11 +103,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `lteif_subl_addl` -> `lteifBlDl`
   + `lteif_subr_addl` -> `lteifBrDl`
   + `lteif_sub_addl` -> `lteifBDl`
-
   + `lez_add1r` -> `lez1D`
   + `lez_addr1` -> `lezD1`
   + `ltz_add1r` -> `ltz1D`
   + `ltz_addr1` -> `ltzD1`
+  + `ler_norm_add` -> `ler_normD`
+  + `ler_norm_sub` -> `ler_normB`
+  + `leif_add` -> `leifD`
+  + `gtr_opp` -> `gtrN`
 
 ### Removed
 

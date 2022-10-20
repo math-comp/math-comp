@@ -1170,7 +1170,7 @@ Section NormedZmodule.
 Variables (R : numDomainType) (V : normedZmodType R).
 Implicit Types (l : R) (x y : V).
 
-Lemma ler_norm_add x y : `|x + y| <= `|x| + `|y|.
+Lemma ler_normD x y : `|x + y| <= `|x| + `|y|.
 Proof. by case: V x y => ? [? []]. Qed.
 
 Lemma normr0_eq0 x : `|x| = 0 -> x = 0.
@@ -1370,8 +1370,8 @@ Implicit Types (V : normedZmodType R) (x y z t : R).
 
 (* Lemmas from the signature (reexported from internals). *)
 
-Definition ler_norm_add V (x y : V) : `|x + y| <= `|x| + `|y| :=
-  ler_norm_add x y.
+Definition ler_normD V (x y : V) : `|x + y| <= `|x| + `|y| :=
+  ler_normD x y.
 Definition addr_gt0 x y : 0 < x -> 0 < y -> 0 < x + y := @addr_gt0 R x y.
 Definition normr0_eq0 V (x : V) : `|x| = 0 -> x = 0 := @normr0_eq0 R V x.
 Definition ger_leVge x y : 0 <= x -> 0 <= y -> (x <= y) || (y <= x) :=
@@ -1492,7 +1492,7 @@ Lemma normr_id v : `| `|v| | = `|v|.
 Proof.
 have nz2: 2 != 0 :> R by rewrite pnatr_eq0.
 apply: (mulfI nz2); rewrite -{1}normr_nat -normrM mulr_natl mulr2n ger0_norm //.
-by rewrite -{2}normrN -normr0 -(subrr v) ler_norm_add.
+by rewrite -{2}normrN -normr0 -(subrr v) ler_normD.
 Qed.
 
 Lemma normr_ge0 v : 0 <= `|v|. Proof. by rewrite ger0_def normr_id. Qed.
@@ -1614,7 +1614,7 @@ Lemma oppr_le0 x : (- x <= 0) = (0 <= x). Proof. by rewrite lerNl oppr0. Qed.
 
 Lemma oppr_lt0 x : (- x < 0) = (0 < x). Proof. by rewrite ltrNl oppr0. Qed.
 
-Lemma gtr_opp x : 0 < x -> - x < x.
+Lemma gtrN x : 0 < x -> - x < x.
 Proof. by move=> n0; rewrite -subr_lt0 -opprD oppr_lt0 addr_gt0. Qed.
 
 Definition oppr_lte0 := (oppr_le0, oppr_lt0).
@@ -2943,18 +2943,18 @@ Lemma ler_norm_sum I r (G : I -> V) (P : pred I):
   `|\sum_(i <- r | P i) G i| <= \sum_(i <- r | P i) `|G i|.
 Proof.
 elim/big_rec2: _ => [|i y x _]; first by rewrite normr0.
-by rewrite -(lerD2l `|G i|); apply: le_trans; apply: ler_norm_add.
+by rewrite -(lerD2l `|G i|); apply: le_trans; apply: ler_normD.
 Qed.
 
-Lemma ler_norm_sub v w : `|v - w| <= `|v| + `|w|.
-Proof. by rewrite (le_trans (ler_norm_add _ _)) ?normrN. Qed.
+Lemma ler_normB v w : `|v - w| <= `|v| + `|w|.
+Proof. by rewrite (le_trans (ler_normD _ _)) ?normrN. Qed.
 
 Lemma ler_dist_add u v w : `|v - w| <= `|v - u| + `|u - w|.
-Proof. by rewrite (le_trans _ (ler_norm_add _ _)) // addrA addrNK. Qed.
+Proof. by rewrite (le_trans _ (ler_normD _ _)) // addrA addrNK. Qed.
 
 Lemma ler_sub_norm_add v w : `|v| - `|w| <= `|v + w|.
 Proof.
-by rewrite -{1}[v](addrK w) lterBDl (le_trans (ler_norm_add _ _))// addrC normrN.
+by rewrite -{1}[v](addrK w) lterBDl (le_trans (ler_normD _ _))// addrC normrN.
 Qed.
 
 Lemma ler_sub_dist v w : `|v| - `|w| <= `|v - w|.
@@ -3284,7 +3284,7 @@ Proof. by rewrite /leif !eq_le lerBlDr lerBrDr. Qed.
 Lemma leif_subRL x y z C : (x <= y - z ?= iff C) = (x + z <= y ?= iff C).
 Proof. by rewrite -leif_subLR opprK. Qed.
 
-Lemma leif_add x1 y1 C1 x2 y2 C2 :
+Lemma leifD x1 y1 C1 x2 y2 C2 :
     x1 <= y1 ?= iff C1 -> x2 <= y2 ?= iff C2 ->
   x1 + x2 <= y1 + y2 ?= iff C1 && C2.
 Proof.
@@ -3298,7 +3298,7 @@ Lemma leif_sum (I : finType) (P C : pred I) (E1 E2 : I -> R) :
 Proof.
 move=> leE12; rewrite -big_andE.
 elim/big_rec3: _ => [|i Ci m2 m1 /leE12]; first by rewrite /leif lexx eqxx.
-exact: leif_add.
+exact: leifD.
 Qed.
 
 Lemma leif_0_sum (I : finType) (P C : pred I) (E : I -> R) :
@@ -3552,7 +3552,6 @@ Notation ltr_add2r := ltrD2r.
 Notation ltr_add2 := ltrD2.
 #[deprecated(since="mathcomp 1.16.0", note="Use lterD2 instead.")]
 Notation lter_add2 := lterD2.
-
 #[deprecated(since="mathcomp 1.16.0", note="Use lerD instead.")]
 Notation ler_add := lerD.
 #[deprecated(since="mathcomp 1.16.0", note="Use ler_ltD instead.")]
@@ -3573,7 +3572,6 @@ Notation ltr_sub := ltrB.
 Notation ler_subl_addr := lerBlDr.
 #[deprecated(since="mathcomp 1.16.0", note="Use lerBrDr instead.")]
 Notation ler_subr_addr := lerBrDr.
-
 #[deprecated(since="mathcomp 1.16.0", note="Use lerBDr instead.")]
 Notation ler_sub_addr := lerBDr.
 #[deprecated(since="mathcomp 1.16.0", note="Use ltrBlDr instead.")]
@@ -3634,6 +3632,10 @@ Notation lteif_subl_addl := lteifBlDl.
 Notation lteif_subr_addl := lteifBrDl.
 #[deprecated(since="mathcomp 1.16.0", note="Use lteifBDl instead.")]
 Notation lteif_sub_addl := lteifBDl.
+#[deprecated(since="mathcomp 1.16.0", note="Use leifD instead.")]
+Notation leif_add := leifD.
+#[deprecated(since="mathcomp 1.16.0", note="Use gtrN instead.")]
+Notation gtr_opp := gtrN.
 
 #[global] Hint Resolve lerN2 ltrN2 real0 real1 normr_real : core.
 Arguments ler_sqr {R} [x y].
@@ -5205,8 +5207,8 @@ have [Qj | /nandP[/negP[]// | /negbNE/eqP->]] := boolP (Q j); last first.
   by rewrite mulrC divfK.
 have: `|F i + F j| = `|F i| + `|F j|.
   do [rewrite !(bigD1 j Qj) /=; set z := \sum_(k | _) `|_|] in norm_sumF.
-  apply/eqP; rewrite eq_le ler_norm_add -(lerD2r z) -addrA -norm_sumF addrA.
-  by rewrite (le_trans (ler_norm_add _ _)) // lerD2l ler_norm_sum.
+  apply/eqP; rewrite eq_le ler_normD -(lerD2r z) -addrA -norm_sumF addrA.
+  by rewrite (le_trans (ler_normD _ _)) // lerD2l ler_norm_sum.
 by case/normC_add_eq=> k _ [/(canLR (mulKf nzFi)) <-]; rewrite -(mulrC (F i)).
 Qed.
 
@@ -5383,6 +5385,10 @@ Coercion normedZmodMixin : numMixin >-> normed_mixin_of.
 Coercion numDomainMixin : numMixin >-> mixin_of.
 Definition NumDomainOfIdomain (T : idomainType) (m : of_ T) :=
   NumDomainType (POrderType ring_display T m) m.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_normD instead.")]
+Notation ler_norm_add := ler_normD.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_normB instead.")]
+Notation ler_norm_sub := ler_normB.
 End Exports.
 
 End NumMixin.

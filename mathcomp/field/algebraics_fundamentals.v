@@ -197,7 +197,7 @@ have ub_y: `|y * a%:~R| < N%:R.
   by rewrite ler_pmul // (le_trans _ (ler_norm n)) ?ltW ?ub_n.
 apply/mapP; exists m.
   rewrite mem_iota /= add0n -addnn -ltr_Qnat Dm natrD.
-  by rewrite (le_lt_trans (ler_norm_add _ _)) // normr_nat ltrD2.
+  by rewrite (le_lt_trans (ler_normD _ _)) // normr_nat ltrD2.
 rewrite Dm ger0_norm ?addrK ?mulfK ?intr_eq0 // -lerBlDl sub0r.
 by rewrite (le_trans (ler_norm _)) ?normrN ?ltW.
 Qed.
@@ -509,7 +509,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     exists (h2 / M) => [|a xn_a]; first by rewrite divr_gt0 ?invr_gt0 ?ltr0n.
     rewrite ltr_pdivr_mulr // -(ltrD2l h2) -mulr2n -mulr_natl divff //.
     rewrite -normr1 -(hornerC 1 a) -[1%:P]r_pq_1 hornerD.
-    rewrite ?(le_lt_trans (ler_norm_add _ _)) ?ltr_leD ?ub_rp //.
+    rewrite ?(le_lt_trans (ler_normD _ _)) ?ltr_leD ?ub_rp //.
     by rewrite mulrC hornerM normrM ler_wpmul2l ?ubM.
   have ab_le m n: (m <= n)%N -> (ab_ n).2 \in Iab_ m.
     move/subnKC=> <-; move: {n}(n - m)%N => n; rewrite /ab_.
