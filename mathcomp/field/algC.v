@@ -654,7 +654,7 @@ Definition algC_algebraic x := Algebraics.Implementation.algebraic x.
 Lemma Creal0 : 0 \is Creal. Proof. exact: rpred0. Qed.
 Lemma Creal1 : 1 \is Creal. Proof. exact: rpred1. Qed.
 (* Trivial cannot resolve a general real0 hint. *)
-Hint Resolve Creal0 Creal1 : core. 
+Hint Resolve Creal0 Creal1 : core.
 
 Lemma algCrect x : x = 'Re x + 'i * 'Im x.
 Proof. by rewrite [LHS]Crect. Qed.
@@ -674,7 +674,7 @@ Proof. by rewrite /floorC => Rx; case: (floorC_subproof x) => //= m; apply. Qed.
 
 Lemma floorC_def x m : m%:~R <= x < (m + 1)%:~R -> floorC x = m.
 Proof.
-case/andP=> lemx ltxm1; apply/eqP; rewrite eq_le -!ltz_addr1.
+case/andP=> lemx ltxm1; apply/eqP; rewrite eq_le -!ltzD1.
 have /floorC_itv/andP[lefx ltxf1]: x \is Creal.
   by rewrite -[x](subrK m%:~R) rpredD ?realz ?ler_sub_real.
 by rewrite -!(ltr_int [numFieldType of algC]) 2?(@le_lt_trans _ _ x).
@@ -682,7 +682,7 @@ Qed.
 
 Lemma intCK : cancel intr floorC.
 Proof.
-by move=> m; apply: floorC_def; rewrite ler_int ltr_int ltz_addr1 lexx.
+by move=> m; apply: floorC_def; rewrite ler_int ltr_int ltzD1 lexx.
 Qed.
 
 Lemma floorCK : {in Cint, cancel floorC intr}. Proof. by move=> z /eqP. Qed.
@@ -768,7 +768,7 @@ Lemma truncC_itv x : 0 <= x -> (truncC x)%:R <= x < (truncC x).+1%:R.
 Proof.
 move=> x_ge0; have /andP[lemx ltxm1] := floorC_itv (ger0_real x_ge0).
 rewrite /truncC x_ge0 -addn1 !pmulrn PoszD gez0_abs ?lemx //.
-by rewrite -ltz_addr1 -(ltr_int [numFieldType of algC]) (le_lt_trans x_ge0).
+by rewrite -ltzD1 -(ltr_int [numFieldType of algC]) (le_lt_trans x_ge0).
 Qed.
 
 Lemma truncC_def x n : n%:R <= x < n.+1%:R -> truncC x = n.

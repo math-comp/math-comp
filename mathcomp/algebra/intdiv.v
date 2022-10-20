@@ -174,7 +174,7 @@ Proof. by have [-> // | d_nz] := eqVneq; rewrite -{1}[d]mul1r mulzK. Qed.
 Lemma ltz_pmod m d : d > 0 -> (m %% d)%Z < d.
 Proof.
 case: m d => n [] // d d_gt0; first by rewrite modz_nat ltz_nat ltn_pmod.
-by rewrite modNz_nat // -lez_addr1 addrAC subrK gerDl oppr_le0.
+by rewrite modNz_nat // -lezD1 addrAC subrK gerDl oppr_le0.
 Qed.
 
 Lemma ltz_mod m d : d != 0 -> (m %% d)%Z < `|d|.
@@ -214,7 +214,7 @@ Qed.
 Lemma ltz_divLR m n d : d > 0 -> ((m %/ d)%Z < n) = (m < n * d).
 Proof.
 move=> d_gt0; apply/idP/idP.
-  by rewrite -[_ < n]lez_addr1 -(ler_pmul2r d_gt0); exact/lt_le_trans/ltz_ceil.
+  by rewrite -[_ < n]lezD1 -(ler_pmul2r d_gt0); exact/lt_le_trans/ltz_ceil.
 by rewrite -(ltr_pmul2r d_gt0 _ n); apply/le_lt_trans/lez_floor; rewrite gt_eqF.
 Qed.
 

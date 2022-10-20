@@ -508,19 +508,27 @@ Definition ltez_natE := (ltez_nat, lteNz_nat, ltezN_nat, le0z_nat, lez0_nat).
 
 Lemma gtz0_ge1 x : (0 < x) = (1 <= x). Proof. by case: (intP x). Qed.
 
-Lemma lez_add1r x y : (1 + x <= y) = (x < y).
+Lemma lez1D x y : (1 + x <= y) = (x < y).
 Proof. by rewrite -subr_gt0 gtz0_ge1 lterBDr. Qed.
 
-Lemma lez_addr1 x y : (x + 1 <= y) = (x < y).
-Proof. by rewrite addrC lez_add1r. Qed.
+Lemma lezD1 x y : (x + 1 <= y) = (x < y).
+Proof. by rewrite addrC lez1D. Qed.
 
-Lemma ltz_add1r x y : (x < 1 + y) = (x <= y).
-Proof. by rewrite -lez_add1r lerD2l. Qed.
+Lemma ltz1D x y : (x < 1 + y) = (x <= y).
+Proof. by rewrite -lez1D lerD2l. Qed.
 
-Lemma ltz_addr1 x y : (x < y + 1) = (x <= y).
-Proof. by rewrite -lez_addr1 lerD2r. Qed.
+Lemma ltzD1 x y : (x < y + 1) = (x <= y).
+Proof. by rewrite -lezD1 lerD2r. Qed.
 
 End intOrderedTheory.
+#[deprecated(since="mathcomp 1.16.0", note="Use lez1D instead.")]
+Notation lez_add1r := lez1D.
+#[deprecated(since="mathcomp 1.16.0", note="Use lezD1 instead.")]
+Notation lez_addr1 := lezD1.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltz1D instead.")]
+Notation ltz_add1r := ltz1D.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltzD1 instead.")]
+Notation ltz_addr1 := ltzD1.
 
 Bind Scope ring_scope with int.
 
