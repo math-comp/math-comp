@@ -1226,6 +1226,16 @@ elim: r =>// i r ih; rewrite big_cons rem_cons inE =>/predU1P[-> /[!eqxx]//|zr].
 by case: eqP => [-> //|]; rewrite ih// big_cons; case: ifPn; case: ifPn.
 Qed.
 
+Lemma big_undup_AC (I : eqType) (r : seq I) (P : pred I) F :
+    idempotent op ->
+  \big[op/x]_(i <- undup r | P i) F i = \big[op/x]_(i <- r | P i) F i.
+Proof.
+move=> opxx; rewrite -!(big_filter _ _ _ P) filter_undup.
+elim: {P r}(filter P r) => //= i r IHr.
+case: ifP => [r_i | _]; rewrite !big_cons {}IHr //.
+by rewrite (big_rem_AC _ _ r_i) opA opxx.
+Qed.
+
 Lemma perm_big_AC (I : eqType) r1 r2 (P : pred I) F :
     perm_eq r1 r2 ->
   \big[op/x]_(i <- r1 | P i) F i = \big[op/x]_(i <- r2 | P i) F i.
@@ -1841,12 +1851,7 @@ Qed.
 Lemma big_undup (I : eqType) (r : seq I) (P : pred I) F :
     idempotent *%M ->
   \big[*%M/1]_(i <- undup r | P i) F i = \big[*%M/1]_(i <- r | P i) F i.
-Proof.
-move=> idM; rewrite -!(big_filter _ _ _ P) filter_undup.
-elim: {P r}(filter P r) => //= i r IHr.
-case: ifP => [r_i | _]; rewrite !big_cons {}IHr //.
-by rewrite (big_rem _ _ r_i) mulmA idM.
-Qed.
+Proof. apply: big_undup_AC; [exact: mulmA|exact: mulmC]. Qed.
 
 Lemma eq_big_idem (I : eqType) (r1 r2 : seq I) (P : pred I) F :
     idempotent *%M -> r1 =i r2 ->
