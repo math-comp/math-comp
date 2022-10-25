@@ -116,7 +116,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `lteif_0oppr` -> `lteif0Nr`
   + `lteif_oppr0` -> `lteifNr0`
   + `lter_oppE` -> `lterNE`
-  + `lteif_oppE` -> `lteifNE`
   + `ler_dist_add` -> `ler_distD`
 
 ### Removed

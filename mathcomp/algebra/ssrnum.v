@@ -3378,7 +3378,7 @@ Proof. by case: C; rewrite /= (oppr_le0, oppr_lt0). Qed.
 Lemma lteifN2 C : {mono -%R : x y /~ x < y ?<= if C :> R}.
 Proof. by case: C => ? ?; rewrite /= lterN2. Qed.
 
-Definition lteifNE := (lteif0Nr, lteifNr0, lteifN2).
+Definition lteif_oppE := (lteif0Nr, lteifNr0, lteifN2).
 
 Lemma lteifD2l C x : {mono +%R x : y z / y < z ?<= if C}.
 Proof. by case: C => ? ?; rewrite /= lterD2. Qed.
@@ -3646,8 +3646,6 @@ Notation lteif_0oppr := lteif0Nr.
 Notation lteif_oppr0 := lteifNr0.
 #[deprecated(since="mathcomp 1.16.0", note="Use lterNE instead.")]
 Notation lter_oppE := lterNE.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteifNE instead.")]
-Notation lteif_oppE := lteifNE.
 #[deprecated(since="mathcomp 1.16.0", note="Use ler_distD instead.")]
 Notation ler_dist_add := ler_distD.
 
