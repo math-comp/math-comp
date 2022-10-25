@@ -723,7 +723,7 @@ Lemma oppr_itv ba bb (xa xb x : R) :
   (- x \in Interval (BSide ba xa) (BSide bb xb)) =
   (x \in Interval (BSide (~~ bb) (- xb)) (BSide (~~ ba) (- xa))).
 Proof.
-by rewrite !itv_boundlr /<=%O /= !implybF negbK andbC lteif_oppl lteif_oppr.
+by rewrite !itv_boundlr /<=%O /= !implybF negbK andbC lteifNl lteifNr.
 Qed.
 
 Lemma oppr_itvoo (a b x : R) : (- x \in `]a, b[) = (x \in `](- b), (- a)[).

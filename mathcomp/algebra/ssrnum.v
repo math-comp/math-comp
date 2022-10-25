@@ -1619,7 +1619,7 @@ Proof. by move=> n0; rewrite -subr_lt0 -opprD oppr_lt0 addr_gt0. Qed.
 
 Definition oppr_lte0 := (oppr_le0, oppr_lt0).
 Definition oppr_cp0 := (oppr_gte0, oppr_lte0).
-Definition lter_oppE := (oppr_cp0, lterN2).
+Definition lterNE := (oppr_cp0, lterN2).
 
 Lemma ge0_cp x : 0 <= x -> (- x <= 0) * (- x <= x).
 Proof. by move=> hx; rewrite oppr_cp0 hx (@le_trans _ _ 0) ?oppr_cp0. Qed.
@@ -2099,12 +2099,12 @@ Proof. by move=> x_ge0 y z leyz; rewrite ![_ * x]mulrC ler_wpmul2l. Qed.
 
 Lemma ler_wnmul2l x : x <= 0 -> {homo *%R x : y z /~ y <= z}.
 Proof.
-by move=> x_le0 y z leyz; rewrite -![x * _]mulrNN ler_wpmul2l ?lter_oppE.
+by move=> x_le0 y z leyz; rewrite -![x * _]mulrNN ler_wpmul2l ?lterNE.
 Qed.
 
 Lemma ler_wnmul2r x : x <= 0 -> {homo *%R^~ x : y z /~ y <= z}.
 Proof.
-by move=> x_le0 y z leyz; rewrite -![_ * x]mulrNN ler_wpmul2r ?lter_oppE.
+by move=> x_le0 y z leyz; rewrite -![_ * x]mulrNN ler_wpmul2r ?lterNE.
 Qed.
 
 (* Binary forms, for backchaining. *)
@@ -2303,16 +2303,16 @@ Proof. by move=> x_gt0; rewrite mulrC pmulr_rle0. Qed.
 
 (* x negative and y right *)
 Lemma nmulr_rgt0 x y : x < 0 -> (0 < x * y) = (y < 0).
-Proof. by move=> x_lt0; rewrite -mulrNN pmulr_rgt0 lter_oppE. Qed.
+Proof. by move=> x_lt0; rewrite -mulrNN pmulr_rgt0 lterNE. Qed.
 
 Lemma nmulr_rge0 x y : x < 0 -> (0 <= x * y) = (y <= 0).
-Proof. by move=> x_lt0; rewrite -mulrNN pmulr_rge0 lter_oppE. Qed.
+Proof. by move=> x_lt0; rewrite -mulrNN pmulr_rge0 lterNE. Qed.
 
 Lemma nmulr_rlt0 x y : x < 0 -> (x * y < 0) = (0 < y).
-Proof. by move=> x_lt0; rewrite -mulrNN pmulr_rlt0 lter_oppE. Qed.
+Proof. by move=> x_lt0; rewrite -mulrNN pmulr_rlt0 lterNE. Qed.
 
 Lemma nmulr_rle0 x y : x < 0 -> (x * y <= 0) = (0 <= y).
-Proof. by move=> x_lt0; rewrite -mulrNN pmulr_rle0 lter_oppE. Qed.
+Proof. by move=> x_lt0; rewrite -mulrNN pmulr_rle0 lterNE. Qed.
 
 (* x negative and y left *)
 Lemma nmulr_lgt0 x y : x < 0 -> (0 < y * x) = (y < 0).
@@ -2665,7 +2665,7 @@ Proof. by move=> xgt1; apply: (leW_mono (ler_eexpn2l _)). Qed.
 
 Definition lter_eexpn2l := (ler_eexpn2l, ltr_eexpn2l).
 
-Lemma ltr_expn2r n x y : 0 <= x -> x < y ->  x ^+ n < y ^+ n = (n != 0%N).
+Lemma ltr_expn2r n x y : 0 <= x -> x < y -> x ^+ n < y ^+ n = (n != 0%N).
 Proof.
 move=> xge0 xlty; case: n; first by rewrite ltxx.
 elim=> [|n IHn]; rewrite ?[_ ^+ _.+2]exprS //.
@@ -2949,7 +2949,7 @@ Qed.
 Lemma ler_normB v w : `|v - w| <= `|v| + `|w|.
 Proof. by rewrite (le_trans (ler_normD _ _)) ?normrN. Qed.
 
-Lemma ler_dist_add u v w : `|v - w| <= `|v - u| + `|u - w|.
+Lemma ler_distD u v w : `|v - w| <= `|v - u| + `|u - w|.
 Proof. by rewrite (le_trans _ (ler_normD _ _)) // addrA addrNK. Qed.
 
 Lemma ler_sub_norm_add v w : `|v| - `|w| <= `|v + w|.
@@ -3363,22 +3363,22 @@ Definition subr_lteif0 := (subr_lteifr0, subr_lteif0r).
 Lemma lteif01 C : 0 < 1 ?<= if C :> R.
 Proof. by case: C; rewrite /= lter01. Qed.
 
-Lemma lteif_oppl C x y : - x < y ?<= if C = (- y < x ?<= if C).
+Lemma lteifNl C x y : - x < y ?<= if C = (- y < x ?<= if C).
 Proof. by case: C; rewrite /= lterNl. Qed.
 
-Lemma lteif_oppr C x y : x < - y ?<= if C = (y < - x ?<= if C).
+Lemma lteifNr C x y : x < - y ?<= if C = (y < - x ?<= if C).
 Proof. by case: C; rewrite /= lterNr. Qed.
 
-Lemma lteif_0oppr C x : 0 < - x ?<= if C = (x < 0 ?<= if C).
+Lemma lteif0Nr C x : 0 < - x ?<= if C = (x < 0 ?<= if C).
 Proof. by case: C; rewrite /= (oppr_ge0, oppr_gt0). Qed.
 
-Lemma lteif_oppr0 C x : - x < 0 ?<= if C = (0 < x ?<= if C).
+Lemma lteifNr0 C x : - x < 0 ?<= if C = (0 < x ?<= if C).
 Proof. by case: C; rewrite /= (oppr_le0, oppr_lt0). Qed.
 
 Lemma lteifN2 C : {mono -%R : x y /~ x < y ?<= if C :> R}.
 Proof. by case: C => ? ?; rewrite /= lterN2. Qed.
 
-Definition lteif_oppE := (lteif_0oppr, lteif_oppr0, lteifN2).
+Definition lteifNE := (lteif0Nr, lteifNr0, lteifN2).
 
 Lemma lteifD2l C x : {mono +%R x : y z / y < z ?<= if C}.
 Proof. by case: C => ? ?; rewrite /= lterD2. Qed.
@@ -3636,6 +3636,20 @@ Notation lteif_sub_addl := lteifBDl.
 Notation leif_add := leifD.
 #[deprecated(since="mathcomp 1.16.0", note="Use gtrN instead.")]
 Notation gtr_opp := gtrN.
+#[deprecated(since="mathcomp 1.16.0", note="Use lteifNl instead.")]
+Notation lteif_oppl := lteifNl.
+#[deprecated(since="mathcomp 1.16.0", note="Use lteifNr instead.")]
+Notation lteif_oppr := lteifNr.
+#[deprecated(since="mathcomp 1.16.0", note="Use lteif0Nr instead.")]
+Notation lteif_0oppr := lteif0Nr.
+#[deprecated(since="mathcomp 1.16.0", note="Use lteifNr0 instead.")]
+Notation lteif_oppr0 := lteifNr0.
+#[deprecated(since="mathcomp 1.16.0", note="Use lterNE instead.")]
+Notation lter_oppE := lterNE.
+#[deprecated(since="mathcomp 1.16.0", note="Use lteifNE instead.")]
+Notation lteif_oppE := lteifNE.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_distD instead.")]
+Notation ler_dist_add := ler_distD.
 
 #[global] Hint Resolve lerN2 ltrN2 real0 real1 normr_real : core.
 Arguments ler_sqr {R} [x y].

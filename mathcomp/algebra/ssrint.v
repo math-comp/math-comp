@@ -1726,7 +1726,7 @@ by rewrite -(eqn_add2r n2) distnEl ?subnK.
 Qed.
 
 Lemma leq_add_dist  m1 m2 m3 : `|m1 - m3| <= `|m1 - m2| + `|m2 - m3|.
-Proof. by rewrite -lez_nat PoszD !abszE ler_dist_add. Qed.
+Proof. by rewrite -lez_nat PoszD !abszE ler_distD. Qed.
 
 (* Most of this proof generalizes to all real-ordered rings. *)
 Lemma leqif_add_distz m1 m2 m3 :
