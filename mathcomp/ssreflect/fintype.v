@@ -1748,7 +1748,7 @@ Notation "[ 'arg' 'max_' ( i > i0 'in' A ) F ]" :=
 
 Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
   (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'max_' ( i  >  i0 ) F ]") : nat_scope.
+   format "[ 'arg'  'max_' ( i  >  i0 )  F ]") : nat_scope.
 
 (**********************************************************************)
 (*                                                                    *)
