@@ -632,11 +632,11 @@ suffices /eqP/normC_sub_eq[t n1t [Dq Dz]]:
   by rewrite Dz n1z mul1r -(eqr_pmuln2r q_gt0) Dq normr_nat mulr_natl.
 pose aq d : algC := (cyclotomic (z ^+ (n %/ d)) d).[q%:R].
 suffices: `|aq n| <= (q - 1)%:R.
-  rewrite eq_le ler_sub_dist andbT n1z normr_nat natrB //; apply: le_trans.
+  rewrite eq_le lerB_dist andbT n1z normr_nat natrB //; apply: le_trans.
   rewrite {}/aq horner_prod divnn n_gt0 expr1 normr_prod.
   rewrite (bigD1 (Ordinal n_gt1)) ?coprime1n //= !hornerE ler_pemulr //.
   elim/big_ind: _ => // [|d _]; first exact: mulr_ege1.
-  rewrite !hornerE; apply: le_trans (ler_sub_dist _ _).
+  rewrite !hornerE; apply: le_trans (lerB_dist _ _).
   by rewrite normr_nat normrX n1z expr1n lerBDl (leC_nat 2).
 have Zaq d: d %| n -> aq d \in Cint.
   move/(dvdn_prim_root z_prim)=> zd_prim.

@@ -1792,14 +1792,14 @@ Proof. exact/big_real/min_real. Qed.
 Lemma real_neqr_lt : {in real &, forall x y, (x != y) = (x < y) || (y < x)}.
 Proof. by move=> * /=; case: real_ltgtP. Qed.
 
-Lemma ler_sub_real x y : x <= y -> y - x \is real.
+Lemma lerB_real x y : x <= y -> y - x \is real.
 Proof. by move=> le_xy; rewrite ger0_real // subr_ge0. Qed.
 
-Lemma ger_sub_real x y : x <= y -> x - y \is real.
+Lemma gerB_real x y : x <= y -> x - y \is real.
 Proof. by move=> le_xy; rewrite ler0_real // subr_le0. Qed.
 
 Lemma ler_real y x : x <= y -> (x \is real) = (y \is real).
-Proof. by move=> le_xy; rewrite -(addrNK x y) rpredDl ?ler_sub_real. Qed.
+Proof. by move=> le_xy; rewrite -(addrNK x y) rpredDl ?lerB_real. Qed.
 
 Lemma ger_real x y : y <= x -> (x \is real) = (y \is real).
 Proof. by move=> le_yx; rewrite -(ler_real le_yx). Qed.
@@ -2109,14 +2109,14 @@ Qed.
 
 (* Binary forms, for backchaining. *)
 
-Lemma ler_pmul x1 y1 x2 y2 :
+Lemma lerpM x1 y1 x2 y2 :
   0 <= x1 -> 0 <= x2 -> x1 <= y1 -> x2 <= y2 -> x1 * x2 <= y1 * y2.
 Proof.
 move=> x1ge0 x2ge0 le_xy1 le_xy2; have y1ge0 := le_trans x1ge0 le_xy1.
 exact: le_trans (ler_wpmul2r x2ge0 le_xy1) (ler_wpmul2l y1ge0 le_xy2).
 Qed.
 
-Lemma ltr_pmul x1 y1 x2 y2 :
+Lemma ltrpM x1 y1 x2 y2 :
   0 <= x1 -> 0 <= x2 -> x1 < y1 -> x2 < y2 -> x1 * x2 < y1 * y2.
 Proof.
 move=> x1ge0 x2ge0 lt_xy1 lt_xy2; have y1gt0 := le_lt_trans x1ge0 lt_xy1.
@@ -2370,7 +2370,7 @@ Lemma ler_prod I r (P : pred I) (E1 E2 : I -> R) :
 Proof.
 move=> leE12; elim/(big_load (fun x => 0 <= x)): _.
 elim/big_rec2: _ => // i x2 x1 /leE12/andP[le0Ei leEi12] [x1ge0 le_x12].
-by rewrite mulr_ge0 // ler_pmul.
+by rewrite mulr_ge0 // lerpM.
 Qed.
 
 Lemma ltr_prod I r (P : pred I) (E1 E2 : I -> R) :
@@ -2665,7 +2665,7 @@ Proof. by move=> xgt1; apply: (leW_mono (ler_eexpn2l _)). Qed.
 
 Definition lter_eexpn2l := (ler_eexpn2l, ltr_eexpn2l).
 
-Lemma ltr_expn2r n x y : 0 <= x -> x < y -> x ^+ n < y ^+ n = (n != 0%N).
+Lemma ltrX2r n x y : 0 <= x -> x < y -> x ^+ n < y ^+ n = (n != 0%N).
 Proof.
 move=> xge0 xlty; case: n; first by rewrite ltxx.
 elim=> [|n IHn]; rewrite ?[_ ^+ _.+2]exprS //.
@@ -2674,17 +2674,17 @@ rewrite (@le_lt_trans _ _ (x * y ^+ n.+1)) ?ler_wpmul2l ?ltr_pmul2r ?IHn //.
 by rewrite exprn_gt0 // (le_lt_trans xge0).
 Qed.
 
-Lemma ler_expn2r n : {in nneg & , {homo ((@GRing.exp R)^~ n) : x y / x <= y}}.
+Lemma lerX2r n : {in nneg & , {homo ((@GRing.exp R)^~ n) : x y / x <= y}}.
 Proof.
 move=> x y /= x0 y0 xy; elim: n => [|n IHn]; rewrite !(expr0, exprS) //.
 by rewrite (@le_trans _ _ (x * y ^+ n)) ?ler_wpmul2l ?ler_wpmul2r ?exprn_ge0.
 Qed.
 
-Definition lter_expn2r := (ler_expn2r, ltr_expn2r).
+Definition lterX2r := (lerX2r, ltrX2r).
 
 Lemma ltr_wpexpn2r n :
   (0 < n)%N -> {in nneg & , {homo ((@GRing.exp R)^~ n) : x y / x < y}}.
-Proof. by move=> ngt0 x y /= x0 y0 hxy; rewrite ltr_expn2r // -lt0n. Qed.
+Proof. by move=> ngt0 x y /= x0 y0 hxy; rewrite ltrX2r // -lt0n. Qed.
 
 Lemma ler_pexpn2r n :
   (0 < n)%N -> {in nneg & , {mono ((@GRing.exp R)^~ n) : x y / x <= y}}.
@@ -2754,7 +2754,7 @@ Proof. exact: ler_pexpn2r. Qed.
 Lemma ltr_sqr : {in nneg &, {mono (fun x => x ^+ 2) : x y / x < y}}.
 Proof. exact: ltr_pexpn2r. Qed.
 
-Lemma ler_pinv :
+Lemma lerpV2 :
   {in [pred x in GRing.unit | 0 < x] &, {mono (@GRing.inv R) : x y /~ x <= y}}.
 Proof.
 move=> x y /andP [ux hx] /andP [uy hy] /=.
@@ -2762,7 +2762,7 @@ rewrite -(ler_pmul2l hx) -(ler_pmul2r hy).
 by rewrite !(divrr, mulrVK) ?unitf_gt0 // mul1r.
 Qed.
 
-Lemma ler_ninv :
+Lemma lernV2 :
   {in [pred x in GRing.unit | x < 0] &, {mono (@GRing.inv R) : x y /~ x <= y}}.
 Proof.
 move=> x y /andP [ux hx] /andP [uy hy] /=.
@@ -2770,22 +2770,22 @@ rewrite -(ler_nmul2l hx) -(ler_nmul2r hy).
 by rewrite !(divrr, mulrVK) ?unitf_lt0 // mul1r.
 Qed.
 
-Lemma ltr_pinv :
+Lemma ltrpV2 :
   {in [pred x in GRing.unit | 0 < x] &, {mono (@GRing.inv R) : x y /~ x < y}}.
-Proof. exact: leW_nmono_in ler_pinv. Qed.
+Proof. exact: leW_nmono_in lerpV2. Qed.
 
-Lemma ltr_ninv :
+Lemma ltrnV2 :
   {in [pred x in GRing.unit | x < 0] &, {mono (@GRing.inv R) : x y /~ x < y}}.
-Proof. exact: leW_nmono_in ler_ninv. Qed.
+Proof. exact: leW_nmono_in lernV2. Qed.
 
 Lemma invr_gt1 x : x \is a GRing.unit -> 0 < x -> (1 < x^-1) = (x < 1).
 Proof.
-by move=> Ux xgt0; rewrite -{1}[1]invr1 ltr_pinv ?inE ?unitr1 ?ltr01 ?Ux.
+by move=> Ux xgt0; rewrite -{1}[1]invr1 ltrpV2 ?inE ?unitr1 ?ltr01 ?Ux.
 Qed.
 
 Lemma invr_ge1 x : x \is a GRing.unit -> 0 < x -> (1 <= x^-1) = (x <= 1).
 Proof.
-by move=> Ux xgt0; rewrite -{1}[1]invr1 ler_pinv ?inE ?unitr1 ?ltr01 // Ux.
+by move=> Ux xgt0; rewrite -{1}[1]invr1 lerpV2 ?inE ?unitr1 ?ltr01 // Ux.
 Qed.
 
 Definition invr_gte1 := (invr_ge1, invr_gt1).
@@ -2952,21 +2952,21 @@ Proof. by rewrite (le_trans (ler_normD _ _)) ?normrN. Qed.
 Lemma ler_distD u v w : `|v - w| <= `|v - u| + `|u - w|.
 Proof. by rewrite (le_trans _ (ler_normD _ _)) // addrA addrNK. Qed.
 
-Lemma ler_sub_norm_add v w : `|v| - `|w| <= `|v + w|.
+Lemma lerB_normD v w : `|v| - `|w| <= `|v + w|.
 Proof.
 by rewrite -{1}[v](addrK w) lterBDl (le_trans (ler_normD _ _))// addrC normrN.
 Qed.
 
-Lemma ler_sub_dist v w : `|v| - `|w| <= `|v - w|.
-Proof. by rewrite -[`|w|]normrN ler_sub_norm_add. Qed.
+Lemma lerB_dist v w : `|v| - `|w| <= `|v - w|.
+Proof. by rewrite -[`|w|]normrN lerB_normD. Qed.
 
 Lemma ler_dist_dist v w : `| `|v| - `|w| | <= `|v - w|.
 Proof.
-have [||_|_] // := @real_leP `|v| `|w|; last by rewrite ler_sub_dist.
-by rewrite distrC ler_sub_dist.
+have [||_|_] // := @real_leP `|v| `|w|; last by rewrite lerB_dist.
+by rewrite distrC lerB_dist.
 Qed.
 
-Lemma ler_dist_norm_add v w : `| `|v| - `|w| | <= `|v + w|.
+Lemma ler_dist_normD v w : `| `|v| - `|w| | <= `|v + w|.
 Proof. by rewrite -[w]opprK normrN ler_dist_dist. Qed.
 
 Lemma ler_nnorml v x : x < 0 -> `|v| <= x = false.
@@ -3512,7 +3512,7 @@ Lemma poly_disk_bound p b : {ub | forall x, `|x| <= b -> `|p.[x]| <= ub}.
 Proof.
 exists (\sum_(j < size p) `|p`_j| * b ^+ j) => x le_x_b.
 rewrite horner_coef (le_trans (ler_norm_sum _ _ _)) ?ler_sum // => j _.
-rewrite normrM normrX ler_wpmul2l ?ler_expn2r ?unfold_in //.
+rewrite normrM normrX ler_wpmul2l ?lerX2r ?unfold_in //.
 exact: le_trans (normr_ge0 x) le_x_b.
 Qed.
 
@@ -3648,6 +3648,34 @@ Notation lteif_oppr0 := lteifNr0.
 Notation lter_oppE := lterNE.
 #[deprecated(since="mathcomp 1.16.0", note="Use ler_distD instead.")]
 Notation ler_dist_add := ler_distD.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_dist_normD instead.")]
+Notation ler_dist_norm_add := ler_dist_normD.
+#[deprecated(since="mathcomp 1.16.0", note="Use lerB_normD instead.")]
+Notation ler_sub_norm_add := lerB_normD.
+#[deprecated(since="mathcomp 1.16.0", note="Use lerB_dist instead.")]
+Notation ler_sub_dist := lerB_dist.
+#[deprecated(since="mathcomp 1.16.0", note="Use lerB_real instead.")]
+Notation ler_sub_real := lerB_real.
+#[deprecated(since="mathcomp 1.16.0", note="Use gerB_real instead.")]
+Notation ger_sub_real := gerB_real.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltrX2r instead.")]
+Notation ltr_expn2r := ltrX2r.
+#[deprecated(since="mathcomp 1.16.0", note="Use lerX2r instead.")]
+Notation ler_expn2r := lerX2r.
+#[deprecated(since="mathcomp 1.16.0", note="Use lterX2r instead.")]
+Notation lter_expn2r := lterX2r.
+#[deprecated(since="mathcomp 1.16.0", note="Use lerpM instead.")]
+Notation ler_pmul := lerpM.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltrpM instead.")]
+Notation ltr_pmul := ltrpM.
+#[deprecated(since="mathcomp 1.16.0", note="Use lerpV2 instead.")]
+Notation ler_pinv := lerpV2.
+#[deprecated(since="mathcomp 1.16.0", note="Use lernV2 instead.")]
+Notation ler_ninv := lernV2.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltrpV2 instead.")]
+Notation ltr_pinv := ltrpV2.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltrnV2 instead.")]
+Notation ltr_ninv := ltrnV2.
 
 #[global] Hint Resolve lerN2 ltrN2 real0 real1 normr_real : core.
 Arguments ler_sqr {R} [x y].
@@ -3763,10 +3791,10 @@ Lemma unitf_lt0 x : x < 0 -> x \is a GRing.unit.
 Proof. by move=> hx; rewrite unitfE lt_eqF. Qed.
 
 Lemma lef_pinv : {in pos &, {mono (@GRing.inv F) : x y /~ x <= y}}.
-Proof. by move=> x y hx hy /=; rewrite ler_pinv ?inE ?unitf_gt0. Qed.
+Proof. by move=> x y hx hy /=; rewrite lerpV2 ?inE ?unitf_gt0. Qed.
 
 Lemma lef_ninv : {in neg &, {mono (@GRing.inv F) : x y /~ x <= y}}.
-Proof. by move=> x y hx hy /=; rewrite ler_ninv ?inE ?unitf_lt0. Qed.
+Proof. by move=> x y hx hy /=; rewrite lernV2 ?inE ?unitf_lt0. Qed.
 
 Lemma ltf_pinv : {in pos &, {mono (@GRing.inv F) : x y /~ x < y}}.
 Proof. exact: leW_nmono_in lef_pinv. Qed.

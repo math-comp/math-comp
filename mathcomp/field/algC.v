@@ -676,7 +676,7 @@ Lemma floorC_def x m : m%:~R <= x < (m + 1)%:~R -> floorC x = m.
 Proof.
 case/andP=> lemx ltxm1; apply/eqP; rewrite eq_le -!ltzD1.
 have /floorC_itv/andP[lefx ltxf1]: x \is Creal.
-  by rewrite -[x](subrK m%:~R) rpredD ?realz ?ler_sub_real.
+  by rewrite -[x](subrK m%:~R) rpredD ?realz ?lerB_real.
 by rewrite -!(ltr_int [numFieldType of algC]) 2?(@le_lt_trans _ _ x).
 Qed.
 

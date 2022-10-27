@@ -103,10 +103,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `lteif_subl_addl` -> `lteifBlDl`
   + `lteif_subr_addl` -> `lteifBrDl`
   + `lteif_sub_addl` -> `lteifBDl`
-  + `lez_add1r` -> `lez1D`
-  + `lez_addr1` -> `lezD1`
-  + `ltz_add1r` -> `ltz1D`
-  + `ltz_addr1` -> `ltzD1`
   + `ler_norm_add` -> `ler_normD`
   + `ler_norm_sub` -> `ler_normB`
   + `leif_add` -> `leifD`
@@ -117,6 +113,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `lteif_oppr0` -> `lteifNr0`
   + `lter_oppE` -> `lterNE`
   + `ler_dist_add` -> `ler_distD`
+  + `ler_dist_norm_add` -> `ler_dist_normD`
+  + `ler_sub_norm_add` -> `lerB_normD`
+  + `ler_sub_dist` -> `lerB_dist`
+  + `ler_sub_real` -> `lerB_real`
+  + `ger_sub_real` -> `gerB_real`
+  + `ltr_expn2r` -> `ltrX2r`
+  + `ler_expn2r` -> `lerX2r`
+  + `lter_expn2r` -> `lterX2r`
+  + `ler_pmul` -> `lerpM`
+  + `ltr_pmul` -> `ltrpM`
+  + `ler_pinv` -> `lerpV2`
+  + `ler_ninv` -> `lernV2`
+  + `ltr_pinv` -> `ltrpV2`
+  + `ltr_ninv` -> `ltrnV2`
+- in `ssrint.v`:
+  + `leq_add_dist` -> `leqD_dist`
+  + `lez_add1r` -> `lez1D`
+  + `lez_addr1` -> `lezD1`
+  + `ltz_add1r` -> `ltz1D`
+  + `ltz_addr1` -> `ltzD1`
 
 ### Removed
 

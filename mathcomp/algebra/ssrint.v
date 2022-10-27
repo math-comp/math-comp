@@ -1364,11 +1364,11 @@ Lemma ltr_eexpz2l x (x1 : 1 < x) : {mono (exprz x) : x y / x < y}.
 Proof. exact: (leW_mono (ler_eexpz2l _)). Qed.
 
 Lemma ler_wpexpz2r n (hn : 0 <= n) :
-{in >= 0 & , {homo ((@exprz R)^~ n) : x y / x <= y}}.
-Proof. by case: n hn=> // n _; apply: ler_expn2r. Qed.
+  {in >= 0 & , {homo (@exprz R)^~ n : x y / x <= y}}.
+Proof. by case: n hn=> // n _; exact: lerX2r. Qed.
 
 Lemma ler_wnexpz2r n (hn : n <= 0) :
-{in > 0 & , {homo ((@exprz R)^~ n) : x y /~ x <= y}}.
+  {in > 0 & , {homo (@exprz R)^~ n : x y /~ x <= y}}.
 Proof.
 move=> x y /= hx hy hxy; rewrite -lef_pinv ?[_ \in _]exprz_gt0 //.
 by rewrite !invr_expz ler_wpexpz2r ?[_ \in _]ltW // oppr_cp0.
@@ -1725,7 +1725,7 @@ case: ltnP => [lt_n12 | le_n21].
 by rewrite -(eqn_add2r n2) distnEl ?subnK.
 Qed.
 
-Lemma leq_add_dist  m1 m2 m3 : `|m1 - m3| <= `|m1 - m2| + `|m2 - m3|.
+Lemma leqD_dist  m1 m2 m3 : `|m1 - m3| <= `|m1 - m2| + `|m2 - m3|.
 Proof. by rewrite -lez_nat PoszD !abszE ler_distD. Qed.
 
 (* Most of this proof generalizes to all real-ordered rings. *)
@@ -1759,6 +1759,9 @@ Qed.
 End Distn.
 
 End IntDist.
+
+#[deprecated(since="mathcomp 1.16.0", note="Use leqD_dist instead.")]
+Notation leq_add_dist := leqD_dist.
 
 Section NormInt.
 
