@@ -975,7 +975,7 @@ Proof.
 rewrite -(mono_in_leif ler_sqr) ?rpredD ?qualifE ?sqrtC_ge0 ?cfnorm_ge0 //.
 rewrite andbC sqrrD !sqrtCK addrAC cfnormD (mono_leif (lerD2l _)).
 rewrite -mulr_natr -[_ + _](divfK (negbT (eqC_nat 2 0))) -/('Re _).
-rewrite (mono_leif (ler_pmul2r _)) ?ltr0n //.
+rewrite (mono_leif (lerpM2r _)) ?ltr0n //.
 have:= leif_trans (leif_Re_Creal '[phi, psi]) (cfCauchySchwarz_sqrt phi psi).
 congr (_ <= _ ?= iff _); first by rewrite ReE.
 apply: andb_id2r; rewrite free_cons span_seq1 seq1_free -negb_or negbK orbC /=.

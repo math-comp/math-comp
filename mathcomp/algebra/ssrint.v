@@ -1287,7 +1287,7 @@ Proof.
 move=> [] m [] n; rewrite ?NegzE -!topredE /= ?oppr_cp0 ?ltz_nat // => _ _.
 rewrite lerN2 lez_nat -?invr_expz=> hmn; have := x0.
 rewrite le0r=> /predU1P [->|lx0]; first by rewrite !exp0rz invr0.
-by rewrite lef_pinv -?topredE /= ?exprz_gt0 // ler_wiexpn2l.
+by rewrite lefpV2 -?topredE /= ?exprz_gt0 // ler_wiexpn2l.
 Qed.
 
 Fact ler_wpeexpz2l x (x1 : 1 <= x) :
@@ -1301,7 +1301,7 @@ Fact ler_wneexpz2l x (x1 : 1 <= x) :
   {in <= 0 &, {homo (exprz x) : x y / x <= y}}.
 Proof.
 move=> m n hm hn /= hmn.
-rewrite -lef_pinv -?topredE /= ?exprz_gt0 ?(lt_le_trans ltr01) //.
+rewrite -lefpV2 -?topredE /= ?exprz_gt0 ?(lt_le_trans ltr01) //.
 by rewrite !invr_expz ler_wpeexpz2l ?lerN2 -?topredE //= oppr_cp0.
 Qed.
 
@@ -1370,7 +1370,7 @@ Proof. by case: n hn=> // n _; exact: lerX2r. Qed.
 Lemma ler_wnexpz2r n (hn : n <= 0) :
   {in > 0 & , {homo (@exprz R)^~ n : x y /~ x <= y}}.
 Proof.
-move=> x y /= hx hy hxy; rewrite -lef_pinv ?[_ \in _]exprz_gt0 //.
+move=> x y /= hx hy hxy; rewrite -lefpV2 ?[_ \in _]exprz_gt0 //.
 by rewrite !invr_expz ler_wpexpz2r ?[_ \in _]ltW // oppr_cp0.
 Qed.
 

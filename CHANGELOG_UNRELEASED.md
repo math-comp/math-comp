@@ -127,6 +127,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_ninv` -> `lernV2`
   + `ltr_pinv` -> `ltrpV2`
   + `ltr_ninv` -> `ltrnV2`
+  + `ler_pmul2l` -> `lerpM2l`
+  + `ltr_pmul2l` -> `ltrpM2l`
+  + `lter_pmul2l` -> `lterpM2l`
+  + `ler_pmul2r` -> `lerpM2r`
+  + `ltr_pmul2r` -> `ltrpM2r`
+  + `lter_pmul2r` -> `lterpM2r`
+  + `ler_nmul2l` -> `lernM2l`
+  + `ltr_nmul2l` -> `ltrnM2l`
+  + `lter_nmul2l` -> `lternM2l`
+  + `ler_nmul2r` -> `lernM2r`
+  + `ltr_nmul2r` -> `ltrnM2r`
+  + `lter_nmul2r` -> `lternM2r`
+  + `lef_pinv` -> `lefpV2`
+  + `lef_ninv` -> `lefnV2`
+  + `ltf_pinv` -> `ltfpV2`
+  + `ltf_ninv` -> `ltfnV2`
+  + `ltef_pinv` -> `ltefpV2`
+  + `ltef_ninv` -> `ltefnV2`
 - in `ssrint.v`:
   + `leq_add_dist` -> `leqD_dist`
   + `lez_add1r` -> `lez1D`

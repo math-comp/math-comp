@@ -133,7 +133,7 @@ have x_gt0 k: 0 < x ^+ k by rewrite exprn_gt0 // lt_def nz_x.
 move: lb_x; rewrite polySpred ?monic_neq0 // !big_ord_recr coef_map /=.
 rewrite -lead_coefE (monicP mon_p) natrD rmorph1 mul1r => lb_x.
 case: _.-1 (lb_x) => [|n]; first by rewrite !big_ord0 !add0r ltr01.
-rewrite -ltrBlDl add0r -(ler_pmul2r (x_gt0 n)) -exprS.
+rewrite -ltrBlDl add0r -(lerpM2r (x_gt0 n)) -exprS.
 apply: lt_le_trans; rewrite mulrDl mul1r ltr_spaddr // -sumrN.
 rewrite natr_sum mulr_suml ler_sum // => j _.
 rewrite coef_map /= fmorph_eq_rat (le_trans (real_ler_norm _)) //.
@@ -408,7 +408,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     have [q0_le0 | q0_gt0] := lerP ((q ^ QxR).[0]) 0.
       by apply: (IHp q) => //; exists u; rewrite ?Dy.
     have r0_le0: (r ^ QxR).[0] <= 0.
-      by rewrite -(ler_pmul2r q0_gt0) mul0r -hornerM -rmorphM -Dp.
+      by rewrite -(lerpM2r q0_gt0) mul0r -hornerM -rmorphM -Dp.
     apply: (IHd r mon_r) => // [w rw0|].
       by rewrite s_p // Dp rmorphM rootM rw0.
     apply: leq_trans le_p_d; rewrite Dp size_Mmonic ?monic_neq0 // addnC.
