@@ -96,6 +96,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `pair_bigA_idem`, `exchange_big_dep_idem`, `exchange_big_idem`,
     `exchange_big_dep_nat_idem`, `exchange_big_nat_idem`,
     `big_undup_AC`
+- in `matrix.v`
+  + definition `Vandrmonde`
+  + lemma `det_Vandermonde`
 
 ### Changed
 
