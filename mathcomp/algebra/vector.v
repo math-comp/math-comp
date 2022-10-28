@@ -1471,6 +1471,15 @@ Proof.
 by rewrite !span_def big_map limg_sum; apply: eq_bigr => x _; rewrite limg_line.
 Qed.
 
+Lemma subset_limgP f U (r : seq rT) :
+  {subset r <= (f @: U)%VS} <-> (exists2 a, all (mem U) a & r = map f a).
+Proof.
+split => [|[{}r /allP/= rE ->] _ /mapP[x xr ->]]; last by rewrite memv_img ?rE.
+move=> /(_ _ _)/memv_imgP/sig2_eqW-/(all_sig_cond (0 : aT))[f' f'P].
+exists (map f' r); first by apply/allP => _ /mapP [x /f'P[? ?] ->].
+by symmetry; rewrite -map_comp; apply: map_id_in => x /f'P[].
+Qed.
+
 Lemma lfunPn f g : reflect (exists u, f u != g u) (f != g).
 Proof.
 apply: (iffP idP) => [f'g|[x]]; last by apply: contraNneq => /lfunP->.
@@ -1550,6 +1559,14 @@ Qed.
 
 Lemma lker0_compVf f : lker f == 0%VS -> (f^-1 \o f = \1)%VF.
 Proof. by move/lker0_lfunK=> fK; apply/lfunP=> u; rewrite !lfunE /= fK. Qed.
+
+Lemma lker0_img_cap f U V : lker f == 0%VS ->
+  (f @: (U :&: V) = f @: U :&: f @: V)%VS.
+Proof.
+move=> kf0; apply/eqP; rewrite eqEsubv limg_cap/=; apply/subvP => x.
+rewrite memv_cap => /andP[/memv_imgP[u uU ->]] /memv_imgP[v vV].
+by move=> /(lker0P _ kf0) eq_uv; rewrite memv_img// memv_cap uU eq_uv vV.
+Qed.
 
 End LinearImage.
 
@@ -1900,6 +1917,9 @@ by apply: rpred_sum => j _; rewrite rpredZ ?vbasis_mem ?memt_nth.
 Qed.
 
 HB.instance Definition _ := Lmodule_hasFinDim.Build K subvs_of subvs_vect_iso.
+
+Lemma SubvsE x (xU : x \in U) : Subvs xU = vsproj x.
+Proof. by apply/val_inj; rewrite /= vsprojK. Qed.
 
 End SubVector.
 Prenex Implicits vsval vsproj vsvalK.

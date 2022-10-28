@@ -466,6 +466,13 @@ Qed.
 Lemma Qnat_dvd (m d : nat) : (d %| m)%N -> (m%:R / d%:R : rat) \is a Num.nat.
 Proof. by move=> h; rewrite natrEint divr_ge0 ?ler0n // !pmulrn Qint_dvdz. Qed.
 
+Lemma dvdz_charf (R : ringType) p : p \in [char R] ->
+  forall n : int, (p %| n)%Z = (n%:~R == 0 :> R).
+Proof.
+move=> charRp [] n; rewrite [LHS](dvdn_charf charRp)//.
+by rewrite NegzE abszN rmorphN// oppr_eq0.
+Qed.
+
 (* Greatest common divisor *)
 
 Lemma gcdzz m : gcdz m m = `|m|%:Z. Proof. by rewrite /gcdz gcdnn. Qed.
@@ -1103,4 +1110,51 @@ rewrite -defS -2!mulmxA; have ->: T *m pinvmx T = 1%:M.
   have uT: row_free T by rewrite /row_free -eqST.
   by apply: (row_free_inj uT); rewrite mul1mx mulmxKpV.
 by move=> i; rewrite mulmx1 -map_mxM 2!mxE denq_int mxE.
+Qed.
+
+Lemma eisenstein (p : nat) (q : {poly int}) : prime p -> (size q != 1)%N ->
+  (~~ (p %| lead_coef q))%Z -> (~~ ((p : int) ^+ 2 %| q`_0))%Z ->
+  (forall i, (i < (size q).-1)%N -> p %| q`_i)%Z ->
+  irreducible_poly (map_poly (intr : int -> rat) q).
+Proof.
+move=> p_prime qN1 Ndvd_pql Ndvd_pq0 dvd_pq.
+have qN0 : q != 0 by rewrite -lead_coef_eq0; apply: contraNneq Ndvd_pql => ->.
+split.
+   rewrite size_map_poly_id0 ?intr_eq0 ?lead_coef_eq0//.
+   by rewrite ltn_neqAle eq_sym qN1 size_poly_gt0.
+move=> f' +/dvdpP_rat_int[f [d dN0 feq]]; rewrite {f'}feq size_scale// => fN1.
+move=> /= [g q_eq]; rewrite q_eq (eqp_trans (eqp_scale _ _))//.
+have fN0 : f != 0 by apply: contra_neq qN0; rewrite q_eq => ->; rewrite mul0r.
+have gN0 : g != 0 by apply: contra_neq qN0; rewrite q_eq => ->; rewrite mulr0.
+rewrite size_map_poly_id0 ?intr_eq0 ?lead_coef_eq0// in fN1.
+have [/eqP/size_poly1P[c cN0 ->]|gN1] := eqVneq (size g) 1%N.
+  by rewrite mulrC mul_polyC map_polyZ/= eqp_sym eqp_scale// intr_eq0.
+have c_neq0 : (lead_coef q)%:~R != 0 :> 'F_p
+   by rewrite -(dvdz_charf (char_Fp _)).
+have : map_poly (intr : int -> 'F_p) q = (lead_coef q)%:~R *: 'X^(size q).-1.
+  apply/val_inj/(@eq_from_nth _ 0) => [|i]; rewrite size_map_poly_id0//.
+    by rewrite size_scale// size_polyXn -polySpred.
+  move=> i_small; rewrite coef_poly i_small coefZ coefXn lead_coefE.
+  move: i_small; rewrite polySpred// ltnS/=.
+  case: ltngtP => // [i_lt|->]; rewrite (mulr1, mulr0)//= => _.
+  by apply/eqP; rewrite -(dvdz_charf (char_Fp _))// dvd_pq.
+rewrite [in LHS]q_eq rmorphM/=.
+set c := (X in X *: _); set n := (_.-1).
+set pf := map_poly _ f; set pg := map_poly _ g => pfMpg.
+have dvdXn (r : {poly _}) : size r != 1%N -> r %| c *: 'X^n -> r`_0 = 0.
+  move=> rN1; rewrite (eqp_dvdr _ (eqp_scale _ _))//.
+  rewrite -['X]subr0; move=> /dvdp_expXsubCP[k lekn]; rewrite subr0.
+  move=> /eqpP[u /andP[u1N0 u2N0]]; have [->|k_gt0] := posnP k.
+    move=> /(congr1 (size \o val))/eqP.
+    by rewrite /= !size_scale// size_polyXn (negPf rN1).
+  move=> /(congr1 (fun p : {poly _} => p`_0))/eqP.
+  by rewrite !coefZ coefXn ltn_eqF// mulr0 mulf_eq0 (negPf u1N0) => /eqP.
+suff : ((p : int) ^+ 2 %| q`_0)%Z by rewrite (negPf Ndvd_pq0).
+have := c_neq0; rewrite q_eq coefM big_ord1.
+rewrite lead_coefM rmorphM mulf_eq0 negb_or => /andP[lpfN0 qfN0].
+have pfN1 : size pf != 1%N by rewrite size_map_poly_id0.
+have pgN1 : size pg != 1%N by rewrite size_map_poly_id0.
+have /(dvdXn _ pgN1) /eqP : pg %| c *: 'X^n by rewrite -pfMpg dvdp_mull.
+have /(dvdXn _ pfN1) /eqP : pf %| c *: 'X^n by rewrite -pfMpg dvdp_mulr.
+by rewrite !coef_map// -!(dvdz_charf (char_Fp _))//; apply: dvdz_mul.
 Qed.

@@ -182,6 +182,7 @@ HB.instance Definition _ := GRing.Algebra.copy 'End(aT)
 Lemma lfun_mulE f g u : (f * g) u = g (f u). Proof. exact: lfunE. Qed.
 Lemma lfun_compE f g : (g \o f)%VF = f * g. Proof. by []. Qed.
 
+
 End FalgLfun.
 
 Section InvLfun.
@@ -306,6 +307,25 @@ rewrite [prodv]unlock; apply/span_subvP=> _ /allpairsP[[u v] /= [Uu Vv ->]].
 by rewrite sUVW ?vbasis_mem.
 Qed.
 
+Lemma memv_mulP {U V} {w} :
+  reflect (exists n (us vs : n.-tuple aT),
+             [/\ all (mem U) us, all (mem V) vs &
+                 w = \sum_(i < n) tnth us i * tnth vs i])
+          (w \in (U * V)%VS).
+Proof.
+apply: (iffP idP) => [|[b [us [vs [usU vsV ->]]]]]; last first.
+  by rewrite rpred_sum// => i _; rewrite memv_mul//; apply/all_tnthP.
+rewrite unlock span_def big_tuple => /memv_sumP[/= w_ w_mem ->].
+have wP_ i : exists2 uv, (uv.1 \in U) && (uv.2 \in V) & w_ i = uv.1 * uv.2.
+  have /vlineP[k ->] := w_mem i isT; set UV := (X in tnth X _).
+  have /allpairsP[[u v] [uP vP ->]] := mem_tnth i UV.
+  by exists (k *: u, v); rewrite /= ?rpredZ ?vbasis_mem// scalerAl.
+pose d := (\dim U * \dim V)%N; pose uv i := (projT1 (sig2_eqW (wP_ i))).
+exists d, [tuple (uv i).1 | i < _], [tuple (uv i).2 | i < _]; rewrite /uv.
+split; do ?by apply/allP => _/mapP[i _ ->]; case: sig2_eqW => /= ? /andP[].
+by apply: eq_bigr => i; rewrite !tnth_map/= tnth_ord_tuple; case: sig2_eqW.
+Qed.
+
 Lemma prodv_line u v : (<[u]> * <[v]> = <[u * v]>)%VS.
 Proof.
 apply: subv_anti; rewrite -memvE memv_mul ?memv_line // andbT.
@@ -401,6 +421,32 @@ Qed.
 
 HB.instance Definition _ := Monoid.isLaw.Build {vspace aT} 1%VS prodv
   prodvA prod1v prodv1.
+
+Lemma big_prodv_seqP (I : eqType) (r : seq I) (P : {pred I}) {U}
+    {V : I -> {vspace aT}} {W} : uniq r ->
+  reflect (forall u (v : I -> aT), u \in U ->
+          (forall i, P i -> v i \in V i) ->
+          \big[*%R/u]_(i <- r | P i) v i \in W)
+    (\big[prodv/U]_(i <- r | P i) V i <= W)%VS.
+Proof.
+elim/last_ind: r => [|r i IHr] //= in U W * => [_|].
+  apply: (iffP idP) => [+ v u uP vP|]; rewrite !big_nil; first by move/subvP->.
+  move=> WP; apply/subvP => u /(WP _ (fun=> 0)); rewrite big_nil; apply.
+  by move=> i; rewrite mem0v.
+rewrite rcons_uniq => /andP[iNr r_uniq].
+apply: (iffP idP) => [+ u v uU vV|WP]; rewrite !big_rcons_op.
+  by move=> /IHr; apply => //; case: ifP => Pi//; rewrite memv_mul// vV.
+case: ifP => Pi; last first.
+  by apply/IHr => // u v uU vV; have := WP _  _ uU vV; rewrite big_rcons_op Pi.
+apply/IHr => //w v /memv_mulP[n [vs [us [/allP/= vsP /allP/= usP ->]]]] vV.
+rewrite big_change_idx/= mulr_sumr rpred_sum// => j _; rewrite -big_change_idx.
+have := WP (tnth us j) (fun k : I => if k == i then tnth vs j else v k).
+rewrite big_rcons_op Pi eqxx big_seq_cond.
+under eq_bigr => k /andP[kr]
+   do [rewrite ifN; last by apply: contraNneq iNr => <-].
+rewrite -big_seq_cond; apply; first by rewrite usP ?mem_tnth.
+by move=> k Pk; case: eqP => [->|]; rewrite ?vV ?vsP ?mem_tnth.
+Qed.
 
 Definition expv U n := iterop n.+1.-1 prodv U 1%VS.
 Local Notation "A ^+ n" := (expv A n) : vspace_scope.
@@ -938,6 +984,17 @@ Proof. by move=> sUV; rewrite agenvS ?addvS. Qed.
 Lemma adjoin_seqSr U rs1 rs2 :
   {subset rs1 <= rs2} -> (<<U & rs1>> <= <<U & rs2>>)%VS.
 Proof. by move/sub_span=> s_rs12; rewrite agenvS ?addvS. Qed.
+
+Lemma adjoin_cat U rs1 rs2 : (<<U & rs1 ++ rs2>> = <<<<U & rs1>> & rs2>>)%VS.
+Proof.
+elim: rs1 => /= [|? ? IHr] in U *; last by rewrite !adjoin_cons IHr.
+by rewrite adjoin_nil agenv_add_id.
+Qed.
+
+Lemma eq_adjoin U rs1 rs2 : rs1 =i rs2 -> (<<U & rs1>> = <<U & rs2>>)%VS.
+Proof.
+by move=> ers; apply/eqP; rewrite eqEsubv !adjoin_seqSr// => x; rewrite ers.
+Qed.
 
 End Closure.
 

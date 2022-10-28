@@ -5,7 +5,7 @@ From mathcomp Require Import div fintype finfun bigop finset prime binomial.
 From mathcomp Require Import fingroup morphism perm automorphism quotient.
 From mathcomp Require Import action commutator gproduct gfunctor ssralg.
 From mathcomp Require Import countalg finalg zmodp cyclic pgroup center gseries.
-From mathcomp Require Import nilpotent sylow abelian finmodule.
+From mathcomp Require Import nilpotent alt sylow abelian finmodule.
 
 (******************************************************************************)
 (*   This file establishes basic properties of several important classes of   *)
@@ -1643,3 +1643,13 @@ Qed.
 End SCN.
 
 Arguments SCN_P {gT G A}.
+
+Lemma unsolvable_Alt (T : finType) : 4 < #|T| -> ~~ solvable 'Alt_T.
+Proof.
+move=> /[dup] /(leq_trans _) T5 /simple_Alt5/simple_sol_prime/even_prime/predU1P.
+move=> /contra->//; rewrite negb_or -[#|_|](@mulKn _ 2)// card_Alt ?T5//.
+by rewrite gtn_eqF ?leq_divRL ?(@leq_fact 3) -?dvdn2 ?dvdn_divRL ?dvdn_fact ?T5.
+Qed.
+
+Lemma unsolvable_SymF (T : finType) : 4 < #|T| -> ~~ solvable 'Sym_T.
+Proof. by rewrite (series_sol (Alt_normal T)) => /unsolvable_Alt/negPf->. Qed.
