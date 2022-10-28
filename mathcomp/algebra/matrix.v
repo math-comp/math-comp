@@ -4582,263 +4582,36 @@ Proof.
 by rewrite !mxblockEv mul_mxdiag_mxcol; under eq_mxcol do rewrite mul_mxrow.
 Qed.
 
-(******************************************************************************)
-(********************** Vandermonde Matrices **********************************)
-(******************************************************************************)
+Definition Vandermonde (R : ringType) (m n : nat) (a : 'rV[R]_n) :=
+  \matrix_(i < m, j < n) a 0 j ^+ i.
 
-Import Order.POrderTheory.
-Declare Scope vec_ext_scope.
-Local Notation "u '``_' i" :=
-  (u ord0 i) (at level 3, i at level 2, left associativity, format "u '``_' i").
-
-Open Scope vec_ext_scope.
-
-Definition vander (n : nat) (R : ringType) (a : 'rV[R]_n) (r : nat) :=
-  \matrix_(i < r, j < n) (a``_j) ^+ i.
-
-Section vandermonde.
-Variable (R : comRingType).
-
-Let eq_inord_inj n (x y : nat) :
-  @inord n x = inord y -> x <= n -> y <= n ->  x = y.
+Lemma det_Vandermonde (R : comRingType) (n : nat) (a : 'rV[R]_n) :
+  \det (Vandermonde n a) = \prod_(i < n) \prod_(j < n | i < j) (a 0 j - a 0 i).
 Proof.
-move=> eqord lexn leyn; rewrite -(inordK lexn) -(inordK leyn).
-by rewrite eqord.
+set V := @Vandermonde R.
+elim: n => [|n IHn] in a *; first by rewrite det_mx00 big1// => -[] [].
+pose b : 'rV_n := \row_i a 0 (lift 0 i).
+pose C : 'M_n := diag_mx (\row_(i < n) (b 0 i - a 0 0)).
+pose D : 'M_n.+1 := 1 - a 0 0 *: \matrix_(i, j) (i == j.+1 :> nat)%:R. 
+have detD : \det D = 1.
+  rewrite det_trig ?big_ord_recl ?mxE ?mulr0 ?subr0 ?eqxx.
+    by rewrite ?big1 ?mulr1// => i; rewrite !mxE eqxx ltn_eqF// mulr0 subr0.
+  by apply/is_trig_mxP => *; rewrite !mxE ![_ == _]ltn_eqF ?mulr0 ?subr0 ?leqW.
+suff: D * V _ _ a = block_mx 1 (const_mx 1) 0 (V _ _ b *m C) :> 'M_(1 + n).
+  move=> /(congr1 determinant); rewrite detM detD mul1r => ->.
+  rewrite det_ublock det1 mul1r det_mulmx IHn big_ord_recl mulrC; congr (_ * _).
+    rewrite big_mkcond big_ord_recl/= mul1r det_diag.
+    by under eq_bigr do rewrite !mxE.
+  apply: eq_bigr => i _; under eq_bigr do rewrite !mxE.
+  by rewrite big_mkcond [RHS]big_mkcond big_ord_recl/= mul1r.
+rewrite mulrBl mul1r -scalerAl; apply/matrixP => i j; rewrite !mxE.
+under eq_bigr do rewrite !mxE; case: splitP => [{i}_ -> /[!ord1]|{}i ->].
+  rewrite !expr0 big1; last by move=> ?; rewrite mul0r.
+  by rewrite ?mulr0 ?subr0 ?mxE; case: splitP => k; rewrite ?ord1 mxE//.
+under eq_bigr do rewrite eqSS mulr_natl mulrb eq_sym.
+rewrite -big_mkcond/= big_ord1_eq exprS ifT// ?leqW// -mulrBl !mxE/=.
+case: split_ordP => [{j}_ -> /[!ord1]|{}j ->]; rewrite ?lshift0 ?rshift1 ?mxE.
+   by rewrite ?subrr ?mul0r//.
+under eq_bigr do rewrite !mxE mulrnAr mulrb.
+by rewrite -big_mkcond big_pred1_eq /= mulrC.
 Qed.
-
-Let inord0 n : @inord n 0%nat = 0%R.
-Proof. by apply/val_inj => /=; rewrite inordK. Qed.
-
-Let inord0_inv n (x :nat) : x <= n -> @inord n x = 0%R -> x = 0%nat.
-Proof. by rewrite -(inord0 n)=> xn einord; exact/(@eq_inord_inj n). Qed.
-
-Let row_row' n (M : 'M[R]_n.+1) (k : 'I_n.+1) (i: 'I_n) :
-  row i (row' k M) = row (lift k i) M.
-Proof. by apply rowP => j; rewrite !mxE. Qed.
-
-Let det_mlinear_rec n (f : 'I_n.+1 -> 'I_n.+1 -> R) (g : 'I_n.+1 -> R) k :
-  k <= n.+1 ->
-  \det (\matrix_(j, i) (f i j * g j)) =
-  (\prod_(l < k) g (inord l)) *
-    \det (\matrix_(j, i) (f i j * if j >= k then g j else 1)).
-Proof.
-elim: k => [_|k IH]; first by rewrite big_ord0 mul1r.
-rewrite ltnS => kn.
-rewrite IH; last by rewrite ltnW.
-rewrite big_ord_recr /= -mulrA; congr (_ * _).
-rewrite (@determinant_multilinear _ _ _
-           (\matrix_(j, i) (f i j * (if k < j then g j else 1)))
-           (\matrix_(j, i) (f i j * (if k <= j then g j else 1)))
-           (inord k) (g (inord k)) 0); last 3 first.
-- rewrite scale0r addr0.
-  apply/rowP => j.
-  rewrite !mxE mulrCA; congr (_ * _).
-  by rewrite inordK // leqnn ltnn mulr1.
-- apply/matrixP => i j; rewrite !mxE.
-  case: ifPn => [H1|].
-    by case: ifPn => //; rewrite (ltnW H1).
-  case: ifPn => //; rewrite -ltnNge ltnS => H1 H2.
-  rewrite mulr1.
-  have /eqP abs : k = lift (inord k) i by apply/eqP; rewrite eqn_leq H1 H2.
-  exfalso.
-  move/eqP : abs; apply/eqP.
-  apply: contra (@neq_lift _ (inord k) i) => /eqP {1}->.
-  by apply/eqP/val_inj; rewrite inord_val.
-- by apply/matrixP => i j; rewrite !mxE.
-- by rewrite mul0r addr0 -det_tr.
-Qed.
-
-Let det_mlinear n (f : 'I_n -> 'I_n -> R) (g : 'I_n -> R) :
-  \det (\matrix_(i, j) (f i j * g j)) =
-    \prod_(i < n) g i * \det (\matrix_(i, j) (f i j)).
-Proof.
-case: n => [|n] in f g *; first by rewrite big_ord0 mul1r !det_mx00.
-rewrite -det_tr (_ : _^T = \matrix_(j, i) (f i j * g j)); last first.
-  by apply/matrixP => i j; rewrite !mxE.
-rewrite (@det_mlinear_rec _ _ _ n.+1) //; congr (_ * _).
-  by under eq_bigr do rewrite inord_val.
-rewrite -det_tr; congr (\det _).
-by apply/matrixP => i j; rewrite !mxE ltnNge -ltnS ltn_ord /= mulr1.
-Qed.
-
-Let lc n (a : R) (r0 r1 : 'rV[R]_n) := r0 - a *: r1.
-
-Let mat_lc n cst (M : 'M[R]_n.+1) (k : 'I_n.+1) :=
-  if k == 0 then M else
-    \matrix_(i < n.+1) if i == k then
-                         lc cst (row i M) (row (inord i.-1) M)
-                       else
-                         row i M.
-
-Let vander_k n (a : 'rV[R]_n.+1) (M : 'M_n.+1) (k : nat) :=
-  foldl (fun acc x => mat_lc (a``_ord0) acc (inord x)) M
-    (rev (iota (n.+1 - k) k)).
-
-Let vander_k_step n (a : 'rV[R]_n.+1) :
-  forall i, i <= n ->
-  forall M,
-    vander_k a M i.+1 = mat_lc (a``_ord0) (vander_k a M i) (inord (n - i)).
-Proof.
-move => i lein M. rewrite {1}/vander_k /=.
-by rewrite rev_cons foldl_rcons /vander_k subSS subSn.
-Qed.
-
-Let vander_k_rec n (a : 'rV[R]_n.+1) k : k <= n.+1 ->
-  forall i, i <= n ->
-  forall M,
-  row (inord i) (vander_k a M k) =
-  if i == O then
-    row 0 M
-  else if n.+1 - k <= i <= n then
-    lc (a``_ord0) (row (inord i) M) (row (inord i.-1) M)
-  else
-    row (inord i) M.
-Proof.
-elim: k => [n0 i ni M|k IH kn].
-  case: ifPn => [/eqP ->|n0']; last by rewrite subn0 ni andbT ltnNge ni.
-  by rewrite /vander_k /= inord0.
-move: (kn) => /ltnW kn' i ni M. rewrite ltnS in kn.
-rewrite vander_k_step // /mat_lc subSS ni andbT.
-case: ifPn => [/eqP nk | nk].
-  apply inord0_inv in nk; last exact/leq_subr.
-  move: nk => /eqP. rewrite subn_eq0 => nk.
-  have eqnk : n = k by apply/eqP; rewrite eqn_leq kn nk.
-  case: ifPn => [/eqP -> | i0]; first by rewrite IH.
-  rewrite IH // (negbTE i0).
-  rewrite ni andbT [in (n.+1 - _)%N]eqnk subSnn lt0n i0.
-  by rewrite [in (_ - k)%N]eqnk subnn.
-case : ifPn => [/eqP -> | i0].
-  by rewrite rowK eq_sym {1}(inord_val 0) (negbTE nk) IH.
-rewrite rowK. case: ifPn => [/eqP | ink].
-  move=> /eq_inord_inj /(_ ni (leq_subr _ _)) ink.
-  rewrite -ink leqnn IH // (negbTE i0) ni andbT ifF; last first.
-    by rewrite subSn // ink //; exact/ltnn.
-  rewrite IH //; last exact: leq_trans (leq_pred _) (leq_ord _).
-  rewrite inordK; last by rewrite ltnS.
-  case: ifPn => [/eqP -> | i1]; first by rewrite (inord_val 0).
-  rewrite (leq_trans (leq_pred _) ni) andbT.
-  by rewrite subSn// -[in _ < i.-1]ink ltn_predRL leq_gtF.
-case: ifPn => [ lenki | nnki].
-  rewrite IH// (negbTE i0) ni andbT subSn// ltn_neqAle lenki andbT ifT//.
-  by apply: contra ink => /eqP ->.
-by rewrite IH // (negbTE i0) ni andbT subSn// ltn_neqAle (negbTE nnki) andbF.
-Qed.
-
-Let vander_last n (a : 'rV[R]_n.+1) :=
-  \matrix_(i < n.+1, j < n.+1)
-   if i == 0 then 1
-   else if j == 0 then 0
-        else (a``_j) ^+ i - a``_0 * (a``_j) ^+ i.-1.
-
-Let vander_lastE n (a : 'rV[R]_n.+1) :
-  vander_last a = vander_k a (vander a n.+1) n.
-Proof.
-apply/row_matrixP => i.
-rewrite -(inord_val i) vander_k_rec //; last exact/leq_ord.
-case: ifPn => [/eqP ->| i0]; first by apply/rowP => j; rewrite !mxE inord0.
-rewrite subSn // subnn leq_ord lt0n i0 /= /vander_last /lc.
-apply/rowP => j; rewrite !mxE inord_val// ifF; last exact/negbTE.
-rewrite inordK; last exact: leq_trans (leq_pred _) (leq_ord _).
-by case: ifP => [/eqP ->|//]; rewrite -exprS prednK ?lt0n// subrr.
-Qed.
-
-Let vander_k_max n (a : 'rV[R]_n.+1) (M : 'M[R]_n.+1) :
-  vander_k a M n.+1 = vander_k a M n.
-Proof. by rewrite vander_k_step // subnn inord0. Qed.
-
-Let det_mat_lc n cst (M : 'M_n.+1) k : \det (mat_lc cst M k) = \det M.
-Proof.
-rewrite /mat_lc; case: ifPn => // k0.
-pose N :=
-  \matrix_i
-    if (i == inord k.-1) || (i == inord k) then row (inord k.-1) M else row i M.
-rewrite (@determinant_multilinear _ _ _ M N k 1 (- cst)).
-- rewrite (@determinant_alternate R n.+1 N (inord k.-1) (inord k))//.
-  + by rewrite mul1r mulr0 addr0.
-  + by rewrite lt_eqF// ltEord/= inord_val inordK// prednK// ?lt0n// ltnW.
-  + by move=> i; rewrite !mxE /= !eqxx /= orbT.
-- by rewrite !rowK /lc inord_val eqxx orbT scale1r scaleNr.
-- by apply /row_matrixP => i; rewrite !row_row' rowK lift_eqF.
-- apply /row_matrixP => i; rewrite !row_row' !rowK inord_val lift_eqF orbF.
-  by case: ifPn => [/eqP <-|].
-Qed.
-
-Let det_vander_k_rec n (a : 'rV[R]_n.+1) (k : nat) (M : 'M[R]_n.+1) :
-  k < n.+1 ->
-  \det (vander_k a M k) = \det (vander_k a M k.-1).
-Proof.
-by case: k =>// k /[1!ltnS] ?; rewrite vander_k_step ?det_mat_lc// ltnW.
-Qed.
-
-Let det_vander_k n (a : 'rV[R]_n.+1) (k : nat) (M : 'M[R]_n.+1) :
-  k <= n.+1 -> \det (vander_k a M k) = \det (vander_k a M k.-1).
-Proof.
-rewrite leq_eqVlt => /predU1P[->|];
-  by [rewrite vander_k_max | apply det_vander_k_rec].
-Qed.
-
-Let det_vander_k_vander n (a : 'rV[R]_n.+1) (k : nat) : k <= n.+1 ->
-  \det (vander_k a (vander a n.+1) k) = \det (vander a n.+1).
-Proof.
-by elim: k => // k IH /[!ltnS] kn; rewrite det_vander_k // IH // ltnW.
-Qed.
-
-Let det_vander_rec n (a : 'rV[R]_n.+1) : \det (vander a n.+1) =
-  \det (vander (\row_(i < n) a``_(inord i.+1)) n) *
-    \prod_(1 <= j < n.+1) (a``_(inord j) - a``_0).
-Proof.
-transitivity (\det (vander_last a));
-  first by rewrite vander_lastE /= det_vander_k_vander.
-rewrite /vander_last (expand_det_col _ ord0) /= (bigD1 ord0) //=.
-rewrite [X in _ + X = _](_ : _ = 0) ?addr0; last first.
-  by rewrite big1// => i i0; rewrite !mxE (negbTE i0) /= mul0r.
-rewrite mxE /= mul1r /cofactor expr0 mul1r.
-transitivity
-  (\det (\matrix_(i < n, j < n)
-           ((\row_(i < n) a``_(inord i.+1))``_j ^+ i.+1 -
-              a``_0 * (\row_(i < n) a``_(inord i.+1))``_j ^+ i))).
-  congr (\det _).
-  apply/matrixP => i j; rewrite !mxE.
-  do 2 rewrite eq_sym (negbTE (neq_lift _ _)).
-  rewrite !lift0 /=; congr (a ``_ _ ^+ _ - _ * a ``_ _ ^+ _);
-    by apply/val_inj; rewrite -lift0 inord_val.
-transitivity
-  (\det (\matrix_(i < n, j < n)
-           ((\row_(i < n) a``_(inord i.+1))``_j ^+ i *
-              ((\row_(i < n) a``_(inord i.+1))``_j - a``_0)))).
-  congr (\det _).
-  apply/matrixP => i j; by rewrite !mxE exprS -mulrBl mulrC.
-transitivity
-  ((\prod_(j < n) (a``_(inord j.+1) - a``_0))
-   * \det (\matrix_(i < n, j < n) ((\row_(i < n) a``_(inord i.+1))``_j ^+ i))).
-  rewrite det_mlinear; congr (_ * _).
-  by apply/eq_bigr => j _; rewrite mxE.
-rewrite mulrC; congr (_ * _).
-rewrite (big_addn 0 n.+1 1) subn1 /= big_mkord; apply/eq_bigr => i _.
-by rewrite addn1.
-Qed.
-
-Lemma det_vander n (a : 'rV[R]_n.+1) : \det (vander a n.+1) =
-  \prod_(i < n.+1) (\prod_(j < n.+1 | i < j) (a``_j - a``_i)).
-Proof.
-elim: n a => [a|n IH a].
-  rewrite (mx11_scalar (vander a _)) det_scalar1 mxE expr0 big_ord_recr /=.
-  by rewrite big_ord0 mul1r (eq_bigl (xpred0)) ?big_pred0 // => i; rewrite ord1.
-rewrite det_vander_rec IH.
-rewrite (eq_bigr (fun i : 'I_n.+1 => \prod_(1 <= j < n.+2 | i < j.-1)
-    (a``_(inord j) - a``_(inord i.+1)))); last first.
-  move=> i _; rewrite (big_addn O n.+2 1) subn1 /= big_mkord.
-  apply/eq_big; first by move=> ?; rewrite addn1.
-  by move=> *; rewrite 2!mxE addn1.
-rewrite [in RHS]big_ord_recl [in RHS]mulrC; congr (_ * _); last first.
-  rewrite [in RHS]big_mkcond /= [in RHS]big_ord_recl ltnn mul1r big_add1.
-  rewrite big_mkord; apply/eq_bigr => i _; congr (a ``_ _ - _).
-  by apply/val_inj => /=; rewrite inordK // ltnS.
-apply eq_bigr => i _.
-rewrite [in RHS]big_mkcond /= [in RHS]big_ord_recl ltn0 mul1r big_add1.
-rewrite big_mkord [in LHS]big_mkcond /=; apply eq_bigr => j _; rewrite /bump.
-rewrite 2!leq0n 2!add1n ltnS; case: ifPn => // ij.
-by congr (a ``_ _ - a ``_ _); apply val_inj => /=; rewrite inordK // ltnS.
-Qed.
-
-End vandermonde.
