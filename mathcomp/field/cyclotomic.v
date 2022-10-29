@@ -250,7 +250,7 @@ have [zk gzk0]: exists zk, root (pZtoC g) zk.
   by exists rg`_0; rewrite Dg root_prod_XsubC mem_nth.
 have [k cokn Dzk]: exists2 k, coprime k n & zk = z ^+ k.
   have: root pz zk by rewrite -Dpz -Dfg rmorphM rootM gzk0 orbT.
-  rewrite -[pz](big_image _ _ _ (fun r => 'X - r%:P)) root_prod_XsubC.
+  rewrite -[pz](big_image _ _ _ _ (fun r => 'X - r%:P)) root_prod_XsubC.
   by case/imageP=> k; exists k.
 have co_fg (R : idomainType): n%:R != 0 :> R -> @coprimep R (intrp f) (intrp g).
   move=> nz_n; have: separable_poly (intrp ('X^n - 1) : {poly R}).

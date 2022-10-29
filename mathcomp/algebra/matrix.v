@@ -1579,7 +1579,7 @@ Lemma map2_mxC {opm : Monoid.com_law idm} :
 Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE Monoid.mulmC. Qed.
 
 HB.instance Definition _ {opm : Monoid.com_law idm} :=
-  Monoid.isCommutativeLaw.Build 'M_(m, n) (@map2_mx _ _ _ opm _ _) map2_mxC.
+  SemiGroup.isCommutativeLaw.Build 'M_(m, n) (@map2_mx _ _ _ opm _ _) map2_mxC.
 
 Lemma map2_0mx {opm : Monoid.mul_law idm} :
   left_zero (const_mx idm) (@map2_mx _ _ _ opm m n).

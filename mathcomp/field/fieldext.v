@@ -124,7 +124,7 @@ move=> U V; without loss suffices subC: U V / (U * V <= V * U)%VS.
 by apply/prodvP=> x y Ux Vy; rewrite mulrC memv_mul.
 Qed.
 HB.instance Definition _ :=
-  Monoid.isCommutativeLaw.Build {vspace L} (@prodv _ L) prodvC.
+  SemiGroup.isCommutativeLaw.Build {vspace L} (@prodv _ L) prodvC.
 
 Lemma prodvCA : left_commutative (@prodv F0 L).
 Proof. exact: Monoid.mulmCA. Qed.

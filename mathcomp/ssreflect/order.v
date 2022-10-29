@@ -3274,6 +3274,9 @@ Proof. by move=> x y z; apply: comparable_max_minr. Qed.
 Lemma min_maxr : right_distributive (min : T -> T -> T) max.
 Proof. by move=> x y z; apply: comparable_min_maxr. Qed.
 
+HB.instance Definition _ := SemiGroup.isComLaw.Build T max maxA maxC.
+HB.instance Definition _ := SemiGroup.isComLaw.Build T min minA minC.
+
 Lemma leIx x y z : (meet y z <= x) = (y <= x) || (z <= x).
 Proof. by rewrite meetEtotal le_minl. Qed.
 
@@ -3346,29 +3349,29 @@ Implicit Types (P : pred I) (F : I -> T).
 
 Lemma bigmin_mkcond P F : \big[min/x]_(i <- r | P i) F i =
   \big[min/x]_(i <- r) (if P i then F i else x).
-Proof. rewrite big_mkcond_idem ?minxx//; [exact: minA|exact: minC]. Qed.
+Proof. by rewrite big_mkcond_idem //= minxx. Qed.
 
 Lemma bigmax_mkcond P F :
   \big[max/x]_(i <- r | P i) F i = \big[max/x]_(i <- r) if P i then F i else x.
-Proof. by rewrite big_mkcond_idem ?maxxx//; [exact: maxA|exact: maxC]. Qed.
+Proof. by rewrite big_mkcond_idem //= maxxx. Qed.
 
 Lemma bigmin_split P F1 F2 :
   \big[min/x]_(i <- r | P i) (min (F1 i) (F2 i)) =
     min (\big[min/x]_(i <- r | P i) F1 i) (\big[min/x]_(i <- r | P i) F2 i).
-Proof. rewrite big_split_idem ?minxx//; [exact: minA|exact: minC]. Qed.
+Proof. by rewrite big_split_idem //= minxx. Qed.
 
 Lemma bigmax_split P F1 F2 :
   \big[max/x]_(i <- r | P i) (max (F1 i) (F2 i)) =
     max (\big[max/x]_(i <- r | P i) F1 i) (\big[max/x]_(i <- r | P i) F2 i).
-Proof. by rewrite big_split_idem ?maxxx//; [exact: maxA|exact: maxC]. Qed.
+Proof. by rewrite big_split_idem //= maxxx. Qed.
 
 Lemma bigmin_idl P F :
   \big[min/x]_(i <- r | P i) F i = min x (\big[min/x]_(i <- r | P i) F i).
-Proof. rewrite minC big_id_idem ?minxx//; exact: minA. Qed.
+Proof. by rewrite minC big_id_idem //= minxx. Qed.
 
 Lemma bigmax_idl P F :
   \big[max/x]_(i <- r | P i) F i = max x (\big[max/x]_(i <- r | P i) F i).
-Proof. by rewrite maxC big_id_idem ?maxxx//; exact: maxA. Qed.
+Proof. by rewrite maxC big_id_idem //= maxxx. Qed.
 
 Lemma bigmin_idr P F :
   \big[min/x]_(i <- r | P i) F i = min (\big[min/x]_(i <- r | P i) F i) x.
@@ -3381,12 +3384,12 @@ Proof. by rewrite [LHS]bigmax_idl maxC. Qed.
 Lemma bigminID a P F : \big[min/x]_(i <- r | P i) F i =
   min (\big[min/x]_(i <- r | P i && a i) F i)
       (\big[min/x]_(i <- r | P i && ~~ a i) F i).
-Proof. by rewrite (bigID_idem minA minC _ _ a) ?minxx. Qed.
+Proof. by rewrite (bigID_idem _ _ a) //= minxx. Qed.
 
 Lemma bigmaxID a P F : \big[max/x]_(i <- r | P i) F i =
   max (\big[max/x]_(i <- r | P i && a i) F i)
       (\big[max/x]_(i <- r | P i && ~~ a i) F i).
-Proof. by rewrite (bigID_idem maxA maxC _ _ a) ?maxxx. Qed.
+Proof. by rewrite (bigID_idem _ _ a) //= maxxx. Qed.
 
 End bigminmax_Type.
 
@@ -3396,98 +3399,98 @@ Let le_maxr_id (x y : T) : x <= max x y. Proof. by rewrite le_maxr lexx. Qed.
 Lemma sub_bigmin [x0] I r (P P' : {pred I}) (F : I -> T) :
     (forall i, P' i -> P i) ->
   \big[min/x0]_(i <- r | P i) F i <= \big[min/x0]_(i <- r | P' i) F i.
-Proof. exact: (sub_le_big minA minC ge_refl). Qed.
+Proof. exact: (sub_le_big ge_refl). Qed.
 
 Lemma sub_bigmax [x0] I r (P P' : {pred I}) (F : I -> T) :
     (forall i, P i -> P' i) ->
   \big[max/x0]_(i <- r | P i) F i <= \big[max/x0]_(i <- r | P' i) F i.
-Proof. exact: (sub_le_big maxA maxC). Qed.
+Proof. exact: sub_le_big. Qed.
 
 Lemma sub_bigmin_seq [x0] (I : eqType) r r' P (F : I -> T) : {subset r' <= r} ->
   \big[min/x0]_(i <- r | P i) F i <= \big[min/x0]_(i <- r' | P i) F i.
-Proof. exact: (idem_sub_le_big minA minC ge_refl _ minxx). Qed.
+Proof. exact: (idem_sub_le_big ge_refl _ minxx). Qed.
 
 Lemma sub_bigmax_seq [x0] (I : eqType) r r' P (F : I -> T) : {subset r <= r'} ->
   \big[max/x0]_(i <- r | P i) F i <= \big[max/x0]_(i <- r' | P i) F i.
-Proof. exact: (idem_sub_le_big maxA maxC _ _ maxxx). Qed.
+Proof. exact: (idem_sub_le_big _ _ maxxx). Qed.
 
 Lemma sub_bigmin_cond [x0] (I : eqType) r r' P P' (F : I -> T) :
     {subset [seq i <- r | P i] <= [seq i <- r' | P' i]} ->
   \big[min/x0]_(i <- r' | P' i) F i <= \big[min/x0]_(i <- r | P i) F i.
-Proof. exact: (idem_sub_le_big_cond minA minC ge_refl _ minxx). Qed.
+Proof. exact: (idem_sub_le_big_cond ge_refl _ minxx). Qed.
 
 Lemma sub_bigmax_cond [x0] (I : eqType) r r' P P' (F : I -> T) :
     {subset [seq i <- r | P i] <= [seq i <- r' | P' i]} ->
   \big[max/x0]_(i <- r | P i) F i <= \big[max/x0]_(i <- r' | P' i) F i.
-Proof. exact: (idem_sub_le_big_cond maxA maxC _ _ maxxx). Qed.
+Proof. exact: (idem_sub_le_big_cond _ _ maxxx). Qed.
 
 Lemma sub_in_bigmin [x0] [I : eqType] (r : seq I) (P P' : {pred I}) F :
     {in r, forall i, P' i -> P i} ->
   \big[min/x0]_(i <- r | P i) F i <= \big[min/x0]_(i <- r | P' i) F i.
-Proof. exact: (sub_in_le_big minA minC ge_refl). Qed.
+Proof. exact: (sub_in_le_big ge_refl). Qed.
 
 Lemma sub_in_bigmax [x0] [I : eqType] (r : seq I) (P P' : {pred I}) F :
     {in r, forall i, P i -> P' i} ->
   \big[max/x0]_(i <- r | P i) F i <= \big[max/x0]_(i <- r | P' i) F i.
-Proof. exact: (sub_in_le_big maxA maxC). Qed.
+Proof. exact: sub_in_le_big. Qed.
 
 Lemma le_bigmin_nat [x0] n m n' m' P (F : nat -> T) :
     (n <= n')%N -> (m' <= m)%N ->
   \big[min/x0]_(n <= i < m | P i) F i <= \big[min/x0]_(n' <= i < m' | P i) F i.
-Proof. exact: (le_big_nat minA minC ge_refl). Qed.
+Proof. exact: (le_big_nat ge_refl). Qed.
 
 Lemma le_bigmax_nat [x0] n m n' m' P (F : nat -> T) :
     (n' <= n)%N -> (m <= m')%N ->
   \big[max/x0]_(n <= i < m | P i) F i <= \big[max/x0]_(n' <= i < m' | P i) F i.
-Proof. exact: (le_big_nat maxA maxC). Qed.
+Proof. exact: le_big_nat. Qed.
 
 Lemma le_bigmin_nat_cond [x0] n m n' m' (P P' : pred nat) (F : nat -> T) :
     (n <= n')%N -> (m' <= m)%N -> (forall i, (n' <= i < m')%N -> P' i -> P i) ->
   \big[min/x0]_(n <= i < m | P i) F i <= \big[min/x0]_(n' <= i < m' | P' i) F i.
-Proof. exact: (le_big_nat_cond minA minC ge_refl). Qed.
+Proof. exact: (le_big_nat_cond ge_refl). Qed.
 
 Lemma le_bigmax_nat_cond [x0] n m n' m' (P P' : {pred nat}) (F : nat -> T) :
     (n' <= n)%N -> (m <= m')%N -> (forall i, (n <= i < m)%N -> P i -> P' i) ->
   \big[max/x0]_(n <= i < m | P i) F i <= \big[max/x0]_(n' <= i < m' | P' i) F i.
-Proof. exact: (le_big_nat_cond maxA maxC). Qed.
+Proof. exact: le_big_nat_cond. Qed.
 
 Lemma le_bigmin_ord [x0] n m (P : pred nat) (F : nat -> T) : (m <= n)%N ->
   \big[min/x0]_(i < n | P i) F i <= \big[min/x0]_(i < m | P i) F i.
-Proof. exact: (le_big_ord minA minC ge_refl). Qed.
+Proof. exact: (le_big_ord ge_refl). Qed.
 
 Lemma le_bigmax_ord [x0] n m (P : {pred nat}) (F : nat -> T) : (n <= m)%N ->
   \big[max/x0]_(i < n | P i) F i <= \big[max/x0]_(i < m | P i) F i.
-Proof. exact: (le_big_ord maxA maxC). Qed.
+Proof. exact: le_big_ord. Qed.
 
 Lemma le_bigmin_ord_cond [x0] n m (P P' : pred nat) (F : nat -> T) :
     (m <= n)%N -> (forall i : 'I_m, P' i -> P i) ->
   \big[min/x0]_(i < n | P i) F i <= \big[min/x0]_(i < m | P' i) F i.
-Proof. exact: (le_big_ord_cond minA minC ge_refl). Qed.
+Proof. exact: (le_big_ord_cond ge_refl). Qed.
 
 Lemma le_bigmax_ord_cond [x0] n m (P P' : {pred nat}) (F : nat -> T) :
     (n <= m)%N -> (forall i : 'I_n, P i -> P' i) ->
   \big[max/x0]_(i < n | P i) F i <= \big[max/x0]_(i < m | P' i) F i.
-Proof. exact: (le_big_ord_cond maxA maxC). Qed.
+Proof. exact: le_big_ord_cond. Qed.
 
 Lemma subset_bigmin [x0] [I : finType] [A A' P : {pred I}] (F : I -> T) :
     A' \subset A ->
   \big[min/x0]_(i in A | P i) F i <= \big[min/x0]_(i in A' | P i) F i.
-Proof. exact: (subset_le_big minA minC ge_refl). Qed.
+Proof. exact: (subset_le_big ge_refl). Qed.
 
 Lemma subset_bigmax [x0] [I : finType] (A A' P : {pred I}) (F : I -> T) :
     A \subset A' ->
   \big[max/x0]_(i in A | P i) F i <= \big[max/x0]_(i in A' | P i) F i.
-Proof. exact: (subset_le_big maxA maxC). Qed.
+Proof. exact: subset_le_big. Qed.
 
 Lemma subset_bigmin_cond [x0] (I : finType) (A A' P P' : {pred I}) (F : I -> T) :
     [set i in A' | P' i]  \subset [set i in A | P i] ->
   \big[min/x0]_(i in A | P i) F i <= \big[min/x0]_(i in A' | P' i) F i.
-Proof. exact: (subset_le_big_cond minA minC ge_refl). Qed.
+Proof. exact: (subset_le_big_cond ge_refl). Qed.
 
 Lemma subset_bigmax_cond [x0] (I : finType) (A A' P P' : {pred I}) (F : I -> T) :
     [set i in A | P i]  \subset [set i in A' | P' i] ->
   \big[max/x0]_(i in A | P i) F i <= \big[max/x0]_(i in A' | P' i) F i.
-Proof. exact: (subset_le_big_cond maxA maxC). Qed.
+Proof. exact: subset_le_big_cond. Qed.
 
 Section bigminmax_finType.
 Variable (I : finType) (x : T).
@@ -3495,11 +3498,11 @@ Implicit Types (P : pred I) (F : I -> T).
 
 Lemma bigminD1 j P F : P j ->
   \big[min/x]_(i | P i) F i = min (F j) (\big[min/x]_(i | P i && (i != j)) F i).
-Proof. by move/(bigD1_AC minA minC) ->. Qed.
+Proof. by move/(bigD1 _) ->. Qed.
 
 Lemma bigmaxD1 j P F : P j ->
   \big[max/x]_(i | P i) F i = max (F j) (\big[max/x]_(i | P i && (i != j)) F i).
-Proof. by move/(bigD1_AC maxA maxC) ->. Qed.
+Proof. by move/(bigD1 _) ->. Qed.
 
 Lemma bigmin_le_cond j P F : P j -> \big[min/x]_(i | P i) F i <= F j.
 Proof.

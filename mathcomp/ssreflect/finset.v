@@ -1371,8 +1371,7 @@ Arguments imset_disjoint {aT rT f A B}.
 
 Section BigOpsSemiGroup.
 
-Variables (R : Type) (op : R -> R -> R).
-Hypotheses (opA : associative op) (opC : commutative op).
+Variables (R : Type) (op : SemiGroup.com_law R).
 
 Variable (le : rel R).
 Hypotheses (le_refl : reflexive le) (le_incr : forall x y, le x (op x y)).
