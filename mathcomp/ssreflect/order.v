@@ -3252,6 +3252,9 @@ Proof. by move=> x y z; apply: comparable_max_minr. Qed.
 Lemma min_maxr : right_distributive (min : T -> T -> T) max.
 Proof. by move=> x y z; apply: comparable_min_maxr. Qed.
 
+HB.instance Definition _ := SemiGroup.isComLaw.Build T max maxA maxC.
+HB.instance Definition _ := SemiGroup.isComLaw.Build T min minA minC.
+
 Lemma leIx x y z : (meet y z <= x) = (y <= x) || (z <= x).
 Proof. by rewrite meetEtotal le_minl. Qed.
 
