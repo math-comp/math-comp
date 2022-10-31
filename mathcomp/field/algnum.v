@@ -719,7 +719,9 @@ Proof. by rewrite /eqAmod -opprB rpredN. Qed.
 
 Lemma eqAmod_trans e y x z :
   (x == y %[mod e] -> y == z %[mod e] -> x == z %[mod e])%A.
-Proof. by move=> Exy Eyz; rewrite /eqAmod -[x](subrK y) -addrA rpredD. Qed.
+Proof.
+by move=> Exy Eyz; rewrite /eqAmod -[x](subrK y) -[_ - z]addrA rpredD.
+Qed.
 
 Lemma eqAmod_transl e x y z :
   (x == y %[mod e])%A -> (x == z %[mod e])%A = (y == z %[mod e])%A.

@@ -760,7 +760,124 @@ Module Import GRing.
 
 Import Monoid.Theory.
 
-HB.mixin Record isZmodule V := {
+HB.mixin Record isZsemimodule V := {
+  zero : V;
+  add : V -> V -> V;
+  addrA : associative add;
+  addrC : commutative add;
+  add0r : left_id zero add;
+}.
+
+#[short(type="zsemimodType")]
+HB.structure Definition Zsemimodule := {V of isZsemimodule V & Choice V}.
+
+Module ZsemimodExports.
+Bind Scope ring_scope with Zsemimodule.sort.
+Notation "[ 'zsemimodType' 'of' T 'for' cT ]" := (@Zsemimodule.clone T cT)
+  (at level 0, format "[ 'zsemimodType'  'of'  T  'for'  cT ]") : form_scope.
+Notation "[ 'zsemimodType' 'of' T ]" :=  (@Zsemimodule.clone T _)
+  (at level 0, format "[ 'zsemimodType'  'of'  T ]") : form_scope.
+End ZsemimodExports.
+HB.export ZsemimodExports.
+
+Local Notation "0" := (@zero _) : ring_scope.
+Local Notation "+%R" := (@add _) : fun_scope.
+Local Notation "x + y" := (add x y) : ring_scope.
+
+Definition natmul V x n := nosimpl iterop _ n +%R x (@zero V).
+
+Local Notation "x *+ n" := (natmul x n) : ring_scope.
+
+Local Notation "\sum_ ( i <- r | P ) F" := (\big[+%R/0]_(i <- r | P) F).
+Local Notation "\sum_ ( m <= i < n ) F" := (\big[+%R/0]_(m <= i < n) F).
+Local Notation "\sum_ ( i < n ) F" := (\big[+%R/0]_(i < n) F).
+Local Notation "\sum_ ( i 'in' A ) F" := (\big[+%R/0]_(i in A) F).
+
+Local Notation "s `_ i" := (nth 0 s i) : ring_scope.
+
+Section ZsemimoduleTheory.
+
+Variable V : zsemimodType.
+Implicit Types x y : V.
+
+Lemma addr0 : @right_id V V 0 +%R.
+Proof. by move=> x; rewrite addrC add0r. Qed.
+
+#[export]
+HB.instance Definition _ := Monoid.isComLaw.Build V 0 +%R addrA addrC add0r.
+
+Lemma addrCA : @left_commutative V V +%R. Proof. exact: mulmCA. Qed.
+Lemma addrAC : @right_commutative V V +%R. Proof. exact: mulmAC. Qed.
+Lemma addrACA : @interchange V +%R +%R. Proof. exact: mulmACA. Qed.
+
+Lemma mulr0n x : x *+ 0 = 0. Proof. by []. Qed.
+Lemma mulr1n x : x *+ 1 = x. Proof. by []. Qed.
+Lemma mulr2n x : x *+ 2 = x + x. Proof. by []. Qed.
+
+Lemma mulrS x n : x *+ n.+1 = x + x *+ n.
+Proof. by case: n => //=; rewrite addr0. Qed.
+
+Lemma mulrSr x n : x *+ n.+1 = x *+ n + x.
+Proof. by rewrite addrC mulrS. Qed.
+
+Lemma mulrb x (b : bool) : x *+ b = (if b then x else 0).
+Proof. by case: b. Qed.
+
+Lemma mul0rn n : 0 *+ n = 0 :> V.
+Proof. by elim: n => // n IHn; rewrite mulrS add0r. Qed.
+
+Lemma mulrnDl n : {morph (fun x => x *+ n) : x y / x + y}.
+Proof.
+move=> x y; elim: n => [|n IHn]; rewrite ?addr0 // !mulrS.
+by rewrite addrCA -!addrA -IHn -addrCA.
+Qed.
+
+Lemma mulrnDr x m n : x *+ (m + n) = x *+ m + x *+ n.
+Proof.
+elim: m => [|m IHm]; first by rewrite add0r.
+by rewrite !mulrS IHm addrA.
+Qed.
+
+Lemma mulrnA x m n : x *+ (m * n) = x *+ m *+ n.
+Proof.
+by rewrite mulnC; elim: n => //= n IHn; rewrite mulrS mulrnDr IHn.
+Qed.
+
+Lemma mulrnAC x m n : x *+ m *+ n = x *+ n *+ m.
+Proof. by rewrite -!mulrnA mulnC. Qed.
+
+Lemma iter_addr n x y : iter n (+%R x) y = x *+ n + y.
+Proof. by elim: n => [|n ih]; rewrite ?add0r //= ih mulrS addrA. Qed.
+
+Lemma iter_addr_0 n x : iter n (+%R x) 0 = x *+ n.
+Proof. by rewrite iter_addr addr0. Qed.
+
+Lemma sumrMnl I r P (F : I -> V) n :
+  \sum_(i <- r | P i) F i *+ n = (\sum_(i <- r | P i) F i) *+ n.
+Proof. by rewrite (big_morph _ (mulrnDl n) (mul0rn _)). Qed.
+
+Lemma sumrMnr x I r P (F : I -> nat) :
+  \sum_(i <- r | P i) x *+ F i = x *+ (\sum_(i <- r | P i) F i).
+Proof. by rewrite (big_morph _ (mulrnDr x) (erefl _)). Qed.
+
+Lemma sumr_const (I : finType) (A : pred I) x : \sum_(i in A) x = x *+ #|A|.
+Proof. by rewrite big_const -iteropE. Qed.
+
+Lemma sumr_const_nat m n x : \sum_(n <= i < m) x = x *+ (m - n).
+Proof. by rewrite big_const_nat iter_addr_0. Qed.
+
+End ZsemimoduleTheory.
+
+HB.mixin Record Zsemimodule_isZmodule V of Zsemimodule V := {
+  opp : V -> V;
+  addNr : left_inverse zero opp add
+}.
+
+#[short(type="zmodType")]
+HB.structure Definition Zmodule :=
+  {V of Zsemimodule_isZmodule V & Zsemimodule V}.
+
+HB.factory Record isZmodule V of Choice V := {
   zero : V;
   opp : V -> V;
   add : V -> V -> V;
@@ -770,56 +887,38 @@ HB.mixin Record isZmodule V := {
   addNr : left_inverse zero opp add
 }.
 
-#[short(type="zmodType")]
-HB.structure Definition Zmodule := {V of isZmodule V & Choice V}.
+HB.builders Context V of isZmodule V.
+
+HB.instance Definition _ := isZsemimodule.Build V addrA addrC add0r.
+HB.instance Definition _ := Zsemimodule_isZmodule.Build V addNr.
+
+HB.end.
 
 Module ZmodExports.
 Bind Scope ring_scope with Zmodule.sort.
 #[deprecated(since="mathcomp 2.0.0", note="use GRing.isZmodule.Build instead")]
 Notation ZmodMixin V := (isZmodule.Build V).
-Notation "[ 'zmodType' 'of' T 'for' cT ]" := (@Zmodule.clone T%type cT)
+Notation "[ 'zmodType' 'of' T 'for' cT ]" := (@Zmodule.clone T cT)
   (at level 0, format "[ 'zmodType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'zmodType' 'of' T ]" :=  (@Zmodule.clone T%type _)
+Notation "[ 'zmodType' 'of' T ]" :=  (@Zmodule.clone T _)
   (at level 0, format "[ 'zmodType'  'of'  T ]") : form_scope.
 End ZmodExports.
 HB.export ZmodExports.
 
-Local Notation "0" := (@zero _) : ring_scope.
 Local Notation "-%R" := (@opp _) : ring_scope.
 Local Notation "- x" := (opp x) : ring_scope.
-Local Notation "+%R" := (@add _) : fun_scope.
-Local Notation "x + y" := (add x y) : ring_scope.
 Local Notation "x - y" := (x + - y) : ring_scope.
 
-Definition natmul V x n := nosimpl iterop _ n +%R x (@zero V).
-
-Local Notation "x *+ n" := (natmul x n) : ring_scope.
 Local Notation "x *- n" := (- (x *+ n)) : ring_scope.
-
-Local Notation "\sum_ ( i <- r | P ) F" := (\big[+%R/0]_(i <- r | P) F).
-Local Notation "\sum_ ( m <= i < n ) F" := (\big[+%R/0]_(m <= i < n) F).
-Local Notation "\sum_ ( i < n ) F" := (\big[+%R/0]_(i < n) F).
-Local Notation "\sum_ ( i 'in' A ) F" := (\big[+%R/0]_(i in A) F).
-
-Local Notation "s `_ i" := (nth 0 s i) : ring_scope.
 
 Section ZmoduleTheory.
 
 Variable V : zmodType.
 Implicit Types x y : V.
 
-Lemma addr0 : @right_id V V 0 +%R.
-Proof. by move=> x; rewrite addrC add0r. Qed.
 Lemma addrN : @right_inverse V V V 0 -%R +%R.
 Proof. by move=> x; rewrite addrC addNr. Qed.
 Definition subrr := addrN.
-
-#[export]
-HB.instance Definition _ := Monoid.isComLaw.Build V 0 +%R addrA addrC add0r.
-
-Lemma addrCA : @left_commutative V V +%R. Proof. exact: mulmCA. Qed.
-Lemma addrAC : @right_commutative V V +%R. Proof. exact: mulmAC. Qed.
-Lemma addrACA : @interchange V +%R +%R. Proof. exact: mulmACA. Qed.
 
 Lemma addKr : @left_loop V V -%R +%R.
 Proof. by move=> x y; rewrite addrA addNr add0r. Qed.
@@ -884,36 +983,8 @@ Proof. exact: can_eq opprK x y. Qed.
 Lemma eqr_oppLR x y : (- x == y) = (x == - y).
 Proof. exact: inv_eq opprK x y. Qed.
 
-Lemma mulr0n x : x *+ 0 = 0. Proof. by []. Qed.
-Lemma mulr1n x : x *+ 1 = x. Proof. by []. Qed.
-Lemma mulr2n x : x *+ 2 = x + x. Proof. by []. Qed.
-
-Lemma mulrS x n : x *+ n.+1 = x + x *+ n.
-Proof. by case: n => //=; rewrite addr0. Qed.
-
-Lemma mulrSr x n : x *+ n.+1 = x *+ n + x.
-Proof. by rewrite addrC mulrS. Qed.
-
-Lemma mulrb x (b : bool) : x *+ b = (if b then x else 0).
-Proof. by case: b. Qed.
-
-Lemma mul0rn n : 0 *+ n = 0 :> V.
-Proof. by elim: n => // n IHn; rewrite mulrS add0r. Qed.
-
 Lemma mulNrn x n : (- x) *+ n = x *- n.
 Proof. by elim: n => [|n IHn]; rewrite ?oppr0 // !mulrS opprD IHn. Qed.
-
-Lemma mulrnDl n : {morph (fun x => x *+ n) : x y / x + y}.
-Proof.
-move=> x y; elim: n => [|n IHn]; rewrite ?addr0 // !mulrS.
-by rewrite addrCA -!addrA -IHn -addrCA.
-Qed.
-
-Lemma mulrnDr x m n : x *+ (m + n) = x *+ m + x *+ n.
-Proof.
-elim: m => [|m IHm]; first by rewrite add0r.
-by rewrite !mulrS IHm addrA.
-Qed.
 
 Lemma mulrnBl n : {morph (fun x => x *+ n) : x y / x - y}.
 Proof.
@@ -927,20 +998,6 @@ elim: m n => [|m IHm] [|n le_n_m]; rewrite ?subr0 // {}IHm //.
 by rewrite mulrSr mulrS opprD addrA addrK.
 Qed.
 
-Lemma mulrnA x m n : x *+ (m * n) = x *+ m *+ n.
-Proof.
-by rewrite mulnC; elim: n => //= n IHn; rewrite mulrS mulrnDr IHn.
-Qed.
-
-Lemma mulrnAC x m n : x *+ m *+ n = x *+ n *+ m.
-Proof. by rewrite -!mulrnA mulnC. Qed.
-
-Lemma iter_addr n x y : iter n (+%R x) y = x *+ n + y.
-Proof. by elim: n => [|n ih]; rewrite ?add0r //= ih mulrS addrA. Qed.
-
-Lemma iter_addr_0 n x : iter n (+%R x) 0 = x *+ n.
-Proof. by rewrite iter_addr addr0. Qed.
-
 Lemma sumrN I r P (F : I -> V) :
   (\sum_(i <- r | P i) - F i = - (\sum_(i <- r | P i) F i)).
 Proof. by rewrite (big_morph _ opprD oppr0). Qed.
@@ -949,20 +1006,6 @@ Lemma sumrB I r (P : pred I) (F1 F2 : I -> V) :
   \sum_(i <- r | P i) (F1 i - F2 i)
      = \sum_(i <- r | P i) F1 i - \sum_(i <- r | P i) F2 i.
 Proof. by rewrite -sumrN -big_split /=. Qed.
-
-Lemma sumrMnl I r P (F : I -> V) n :
-  \sum_(i <- r | P i) F i *+ n = (\sum_(i <- r | P i) F i) *+ n.
-Proof. by rewrite (big_morph _ (mulrnDl n) (mul0rn _)). Qed.
-
-Lemma sumrMnr x I r P (F : I -> nat) :
-  \sum_(i <- r | P i) x *+ F i = x *+ (\sum_(i <- r | P i) F i).
-Proof. by rewrite (big_morph _ (mulrnDr x) (erefl _)). Qed.
-
-Lemma sumr_const (I : finType) (A : pred I) x : \sum_(i in A) x = x *+ #|A|.
-Proof. by rewrite big_const -iteropE. Qed.
-
-Lemma sumr_const_nat m n x : \sum_(n <= i < m) x = x *+ (m - n).
-Proof. by rewrite big_const_nat iter_addr_0. Qed.
 
 Lemma telescope_sumr n m (f : nat -> V) : n <= m ->
   \sum_(n <= k < m) (f k.+1 - f k) = f m - f n.
@@ -1155,7 +1198,7 @@ Proof. exact: mulrnBr. Qed.
 Definition natr_sum := big_morph (natmul 1) natrD (mulr0n 1).
 
 Lemma natrM m n : (m * n)%:R = m%:R * n%:R :> R.
-Proof. by rewrite mulrnA -mulr_natr. Qed.
+Proof. by rewrite mulrnA mulr_natr. Qed.
 
 Lemma expr0 x : x ^+ 0 = 1. Proof. by []. Qed.
 Lemma expr1 x : x ^+ 1 = x. Proof. by []. Qed.

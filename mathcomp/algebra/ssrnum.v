@@ -3064,7 +3064,7 @@ have [||ltyx]// := comparable_leP.
   rewrite (@comparabler_trans _ (y + 1))// /Order.comparable ?lexye ?ltr01//.
   by rewrite ler_addl ler01 orbT.
 have /midf_lt [_] := ltyx; rewrite le_gtF//.
-rewrite -(@addrK _ y y) addrAC -addrA 2!mulrDl -splitr lexye//.
+rewrite -(@addrK _ y y) (addrAC _ _ x) -addrA 2!mulrDl -splitr lexye//.
 by rewrite divr_gt0// ?ltr0n// subr_gt0.
 Qed.
 
