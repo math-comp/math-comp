@@ -288,12 +288,12 @@ elim: n c qq r k Pk e => [|n Pn] c qq r k Pk e; rewrite sizeTP.
   case ltrq : (_ < _); first by rewrite /= ltrq /= -Pk.
   rewrite lead_coefTP => [|a p]; rewrite Pk.
     rewrite ?(eval_mulpT,eval_amulXnT,eval_sumpT,eval_opppT) //=.
-    by rewrite ltrq //= mul_polyC ?(mul0r,add0r).
+    by rewrite ltrq //= !mul_polyC ?(mul0r,add0r,scale0r).
   by symmetry; rewrite Pk ?(eval_mulpT,eval_amulXnT,eval_sumpT, eval_opppT).
 case ltrq : (_<_); first by rewrite /= ltrq Pk.
 rewrite lead_coefTP.
   rewrite Pn ?(eval_mulpT,eval_amulXnT,eval_sumpT,eval_opppT) //=.
-  by rewrite ltrq //= mul_polyC ?(mul0r,add0r).
+  by rewrite ltrq //= !mul_polyC ?(mul0r,add0r,scale0r).
 rewrite -/redivp_rec_loopT => x e'.
 rewrite Pn; last by move=> *; rewrite Pk.
 symmetry; rewrite Pn; last by move=> *; rewrite Pk.

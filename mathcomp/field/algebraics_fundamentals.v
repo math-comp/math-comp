@@ -684,7 +684,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     by apply: (fmorph_inj (ofQ t)); rewrite rmorphX rmorphN1 Dit.
   have dimCn: \dim_Rn Cn = 2%N.
     rewrite -adjoin_degreeE adjoin_degree_aimg.
-    by apply: succn_inj; rewrite -size_minPoly minp_i.
+    by apply: succn_inj; rewrite -size_minPoly minp_i szX2_1.
   have /sQ_inQ[u_z Dz] := t_z; pose Rz := <<Cn; u_z>>%AS.
   have{p lepd pz0} le_Rz_d: (\dim_Cn Rz < d)%N.
     rewrite -ltnS -adjoin_degreeE -size_minPoly (leq_trans _ lepd) // !ltnS.

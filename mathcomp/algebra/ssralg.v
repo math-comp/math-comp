@@ -1049,7 +1049,7 @@ Arguments opprK {V}.
 Arguments oppr_inj {V} [x1 x2].
 Arguments telescope_sumr_eq {V n m} f u.
 
-HB.mixin Record Zmodule_isRing R of Zmodule R := {
+HB.mixin Record Zsemimodule_isSemiRing R of Zsemimodule R := {
   one : R;
   mul : R -> R -> R;
   mulrA : associative mul;
@@ -1057,53 +1057,54 @@ HB.mixin Record Zmodule_isRing R of Zmodule R := {
   mulr1 : right_id one mul;
   mulrDl : left_distributive mul +%R;
   mulrDr : right_distributive mul +%R;
+  mul0r : left_zero zero mul;
+  mulr0 : right_zero zero mul;
   oner_neq0 : one != 0
 }.
 
-HB.factory Record isRing R of Choice R := {
+#[short(type="semiRingType")]
+HB.structure Definition SemiRing :=
+  { R of Zsemimodule_isSemiRing R & Zsemimodule R }.
+
+HB.factory Record isSemiRing R of Choice R := {
   zero : R;
-  opp : R -> R;
   add : R -> R -> R;
   one : R;
   mul : R -> R -> R;
   addrA : associative add;
   addrC : commutative add;
   add0r : left_id zero add;
-  addNr : left_inverse zero opp add;
   mulrA : associative mul;
   mul1r : left_id one mul;
   mulr1 : right_id one mul;
   mulrDl : left_distributive mul add;
   mulrDr : right_distributive mul add;
+  mul0r : left_zero zero mul;
+  mulr0 : right_zero zero mul;
   oner_neq0 : one != zero
 }.
-HB.builders Context R of isRing R.
-  HB.instance Definition _ := @isZmodule.Build R
-    zero opp add addrA addrC add0r addNr.
-  HB.instance Definition _ := @Zmodule_isRing.Build R
-    one mul mulrA mul1r mulr1 mulrDl mulrDr oner_neq0.
+HB.builders Context R of isSemiRing R.
+  HB.instance Definition _ := @isZsemimodule.Build R
+    zero add addrA addrC add0r.
+  HB.instance Definition _ := @Zsemimodule_isSemiRing.Build R
+    one mul mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0 oner_neq0.
 HB.end.
 
-#[short(type="ringType")]
-HB.structure Definition Ring := { R of isRing R & Choice R }.
-
-Module RingExports.
-Bind Scope ring_scope with Ring.sort.
-Notation "[ 'ringType' 'of' T 'for' cT ]" := (Ring.clone T%type cT)
-  (at level 0, format "[ 'ringType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'ringType' 'of' T ]" := (Ring.clone T%type _)
-  (at level 0, format "[ 'ringType'  'of'  T ]") : form_scope.
-End RingExports.
-HB.export RingExports.
+Module SemiRingExports.
+Bind Scope ring_scope with SemiRing.sort.
+Notation "[ 'semiRingType' 'of' T 'for' cT ]" := (SemiRing.clone T cT)
+  (at level 0, format "[ 'semiRingType'  'of'  T  'for'  cT ]") : form_scope.
+Notation "[ 'semiRingType' 'of' T ]" := (SemiRing.clone T _)
+  (at level 0, format "[ 'semiRingType'  'of'  T ]") : form_scope.
+End SemiRingExports.
+HB.export SemiRingExports.
 
 Definition exp R x n := nosimpl iterop _ n (@mul R) x (@one R).
-Notation sign R b := (exp (- @one R) (nat_of_bool b)) (only parsing).
 Definition comm R x y := @mul R x y = mul y x.
 Definition lreg R x := injective (@mul R x).
 Definition rreg R x := injective ((@mul R)^~ x).
 
 Local Notation "1" := (@one _) : ring_scope.
-Local Notation "- 1" := (- (1)) : ring_scope.
 Local Notation "n %:R" := (1 *+ n) : ring_scope.
 Local Notation "*%R" := (@mul _) : fun_scope.
 Local Notation "x * y" := (mul x y) : ring_scope.
@@ -1117,7 +1118,7 @@ Local Notation "\prod_ ( m <= i < n ) F" := (\big[*%R/1%R]_(m <= i < n) F%R).
 (* The ``field'' characteristic; the definition, and many of the theorems,   *)
 (* has to apply to rings as well; indeed, we need the Frobenius automorphism *)
 (* results for a non commutative ring in the proof of Gorenstein 2.6.3.      *)
-Definition char (R : ringType) of phant R : nat_pred :=
+Definition char (R : semiRingType) of phant R : nat_pred :=
   [pred p | prime p & p%:R == 0 :> R].
 
 Local Notation "[ 'char' R ]" := (char (Phant R)) : ring_scope.
@@ -1126,31 +1127,12 @@ Local Notation "[ 'char' R ]" := (char (Phant R)) : ring_scope.
 Definition converse R : Type := R.
 Local Notation "R ^c" := (converse R) (at level 2, format "R ^c") : type_scope.
 
-Section RingTheory.
+Section SemiRingTheory.
 
-Variable R : ringType.
+Variable R : semiRingType.
 Implicit Types x y : R.
 
 Lemma oner_eq0 : (1 == 0 :> R) = false. Proof. exact: negbTE oner_neq0. Qed.
-
-Lemma mul0r : @left_zero R R 0 *%R.
-Proof.
-by move=> x; apply: (addIr (1 * x)); rewrite -mulrDl !add0r mul1r.
-Qed.
-Lemma mulr0 : @right_zero R R 0 *%R.
-Proof.
-by move=> x; apply: (addIr (x * 1)); rewrite -mulrDr !add0r mulr1.
-Qed.
-Lemma mulrN x y : x * (- y) = - (x * y).
-Proof. by apply: (addrI (x * y)); rewrite -mulrDr !subrr mulr0. Qed.
-Lemma mulNr x y : (- x) * y = - (x * y).
-Proof. by apply: (addrI (x * y)); rewrite -mulrDl !subrr mul0r. Qed.
-Lemma mulrNN x y : (- x) * (- y) = x * y.
-Proof. by rewrite mulrN mulNr opprK. Qed.
-Lemma mulN1r x : -1 * x = - x.
-Proof. by rewrite mulNr mul1r. Qed.
-Lemma mulrN1 x : x * -1 = - x.
-Proof. by rewrite mulrN mulr1. Qed.
 
 #[export]
 HB.instance Definition _ := Monoid.isLaw.Build R 1 *%R mulrA mul1r mulr1.
@@ -1166,12 +1148,6 @@ Proof. exact: big_distrl. Qed.
 Lemma mulr_sumr I r P (F : I -> R) x :
   x * (\sum_(i <- r | P i) F i) = \sum_(i <- r | P i) x * F i.
 Proof. exact: big_distrr. Qed.
-
-Lemma mulrBl x y z : (y - z) * x = y * x - z * x.
-Proof. by rewrite mulrDl mulNr. Qed.
-
-Lemma mulrBr x y z : x * (y - z) = x * y - x * z.
-Proof. by rewrite mulrDr mulrN. Qed.
 
 Lemma mulrnAl x y n : (x *+ n) * y = (x * y) *+ n.
 Proof. by elim: n => [|n IHn]; rewrite ?mul0r // !mulrS mulrDl IHn. Qed.
@@ -1191,9 +1167,6 @@ Proof. exact: mulrnDr. Qed.
 Lemma natr1 n : n%:R + 1 = n.+1%:R :> R. Proof. by rewrite mulrSr. Qed.
 
 Lemma nat1r n : 1 + n%:R = n.+1%:R :> R. Proof. by rewrite mulrS. Qed.
-
-Lemma natrB m n : n <= m -> (m - n)%:R = m%:R - n%:R :> R.
-Proof. exact: mulrnBr. Qed.
 
 Definition natr_sum := big_morph (natmul 1) natrD (mulr0n 1).
 
@@ -1232,17 +1205,8 @@ Proof. by rewrite /comm mulr0 mul0r. Qed.
 Lemma commr1 x : comm x 1.
 Proof. by rewrite /comm mulr1 mul1r. Qed.
 
-Lemma commrN x y : comm x y -> comm x (- y).
-Proof. by move=> com_xy; rewrite /comm mulrN com_xy mulNr. Qed.
-
-Lemma commrN1 x : comm x (-1).
-Proof. exact/commrN/commr1. Qed.
-
 Lemma commrD x y z : comm x y -> comm x z -> comm x (y + z).
 Proof. by rewrite /comm mulrDl mulrDr => -> ->. Qed.
-
-Lemma commrB x y z : comm x y -> comm x z -> comm x (y - z).
-Proof. by move=> com_xy com_xz; apply: commrD => //; apply: commrN. Qed.
 
 Lemma commr_sum (I : Type) (s : seq I) (P : pred I) (F : I -> R) x :
   (forall i, P i -> comm x (F i)) -> comm x (\sum_(i <- s | P i) F i).
@@ -1279,9 +1243,6 @@ move=> com_xy; elim: n => /= [|n IHn]; first by rewrite mulr1.
 by rewrite !exprS IHn !mulrA; congr (_ * _); rewrite -!mulrA -commrX.
 Qed.
 
-Lemma commr_sign x n : comm x ((-1) ^+ n).
-Proof. exact: (commrX n (commrN1 x)). Qed.
-
 Lemma exprMn_n x m n : (x *+ m) ^+ n = x ^+ n *+ (m ^ n) :> R.
 Proof.
 elim: n => [|n IHn]; first by rewrite mulr1n.
@@ -1312,45 +1273,6 @@ Qed.
 Lemma natrX n k : (n ^ k)%:R = n%:R ^+ k :> R.
 Proof. by rewrite exprMn_n expr1n. Qed.
 
-Lemma signr_odd n : (-1) ^+ (odd n) = (-1) ^+ n :> R.
-Proof.
-elim: n => //= n IHn; rewrite exprS -{}IHn.
-by case/odd: n; rewrite !mulN1r ?opprK.
-Qed.
-
-Lemma signr_eq0 n : ((-1) ^+ n == 0 :> R) = false.
-Proof. by rewrite -signr_odd; case: odd; rewrite ?oppr_eq0 oner_eq0. Qed.
-
-Lemma mulr_sign (b : bool) x : (-1) ^+ b * x = (if b then - x else x).
-Proof. by case: b; rewrite ?mulNr mul1r. Qed.
-
-Lemma signr_addb b1 b2 : (-1) ^+ (b1 (+) b2) = (-1) ^+ b1 * (-1) ^+ b2 :> R.
-Proof. by rewrite mulr_sign; case: b1 b2 => [] []; rewrite ?opprK. Qed.
-
-Lemma signrE (b : bool) : (-1) ^+ b = 1 - b.*2%:R :> R.
-Proof. by case: b; rewrite ?subr0 // opprD addNKr. Qed.
-
-Lemma signrN b : (-1) ^+ (~~ b) = - (-1) ^+ b :> R.
-Proof. by case: b; rewrite ?opprK. Qed.
-
-Lemma mulr_signM (b1 b2 : bool) x1 x2 :
-  ((-1) ^+ b1 * x1) * ((-1) ^+ b2 * x2) = (-1) ^+ (b1 (+) b2) * (x1 * x2).
-Proof.
-by rewrite signr_addb -!mulrA; congr (_ * _); rewrite !mulrA commr_sign.
-Qed.
-
-Lemma exprNn x n : (- x) ^+ n = (-1) ^+ n * x ^+ n :> R.
-Proof. by rewrite -mulN1r exprMn_comm // /comm mulN1r mulrN mulr1. Qed.
-
-Lemma sqrrN x : (- x) ^+ 2 = x ^+ 2.
-Proof. exact: mulrNN. Qed.
-
-Lemma sqrr_sign n : ((-1) ^+ n) ^+ 2 = 1 :> R.
-Proof. by rewrite exprAC sqrrN !expr1n. Qed.
-
-Lemma signrMK n : @involutive R ( *%R ((-1) ^+ n)).
-Proof. by move=> x; rewrite mulrA -expr2 sqrr_sign mul1r. Qed.
-
 Lemma lastr_eq0 (s : seq R) x : x != 0 -> (last x s == 0) = (last 1 s == 0).
 Proof. by case: s => [|y s] /negPf // ->; rewrite oner_eq0. Qed.
 
@@ -1359,15 +1281,6 @@ Proof. by move=> reg_x; rewrite -{1}(mulr0 x) (inj_eq reg_x). Qed.
 
 Lemma lreg_neq0 x : lreg x -> x != 0.
 Proof. by move=> reg_x; rewrite -[x]mulr1 mulrI_eq0 ?oner_eq0. Qed.
-
-Lemma mulrI0_lreg x : (forall y, x * y = 0 -> y = 0) -> lreg x.
-Proof.
-move=> reg_x y z eq_xy_xz; apply/eqP; rewrite -subr_eq0 [y - z]reg_x //.
-by rewrite mulrBr eq_xy_xz subrr.
-Qed.
-
-Lemma lregN x : lreg x -> lreg (- x).
-Proof. by move=> reg_x y z; rewrite !mulNr => /oppr_inj/reg_x. Qed.
 
 Lemma lreg1 : lreg (1 : R).
 Proof. by move=> x y; rewrite !mul1r. Qed.
@@ -1386,8 +1299,6 @@ Proof.
 by move=> reg_x; elim: n => [|n]; [apply: lreg1 | rewrite exprS; apply: lregM].
 Qed.
 
-Lemma lreg_sign n : lreg ((-1) ^+ n : R). Proof. exact/lregX/lregN/lreg1. Qed.
-
 Lemma iter_mulr n x y : iter n ( *%R x) y = x ^+ n * y.
 Proof. by elim: n => [|n ih]; rewrite ?expr0 ?mul1r //= ih exprS -mulrA. Qed.
 
@@ -1403,13 +1314,6 @@ Proof. by rewrite big_const_nat -iteropE. Qed.
 Lemma prodrXr x I r P (F : I -> nat) :
   \prod_(i <- r | P i) x ^+ F i = x ^+ (\sum_(i <- r | P i) F i).
 Proof. by rewrite (big_morph _ (exprD _) (erefl _)). Qed.
-
-Lemma prodrN (I : finType) (A : pred I) (F : I -> R) :
-  \prod_(i in A) - F i = (- 1) ^+ #|A| * \prod_(i in A) F i.
-Proof.
-rewrite -sum1_card; elim/big_rec3: _ => [|i x n _ _ ->]; first by rewrite mulr1.
-by rewrite exprS !mulrA mulN1r !mulNr commrX //; apply: commrN1.
-Qed.
 
 Lemma prodrMn (I : Type) (s : seq I) (P : pred I) (F : I -> R) (g : I -> nat) :
   \prod_(i <- s | P i) (F i *+ g i) =
@@ -1437,34 +1341,9 @@ apply: eq_bigr => i _; rewrite !mulrnAr !mulrA -exprS -subSn ?(valP i) //.
 by rewrite subSS (commrX _ (commr_sym cxy)) -mulrA -exprS -mulrnDr.
 Qed.
 
-Lemma exprBn_comm x y n (cxy : comm x y) :
-  (x - y) ^+ n =
-    \sum_(i < n.+1) ((-1) ^+ i * x ^+ (n - i) * y ^+ i) *+ 'C(n, i).
-Proof.
-rewrite exprDn_comm; last exact: commrN.
-by apply: eq_bigr => i _; congr (_ *+ _); rewrite -commr_sign -mulrA -exprNn.
-Qed.
-
-Lemma subrXX_comm x y n (cxy : comm x y) :
-  x ^+ n - y ^+ n = (x - y) * (\sum_(i < n) x ^+ (n.-1 - i) * y ^+ i).
-Proof.
-case: n => [|n]; first by rewrite big_ord0 mulr0 subrr.
-rewrite mulrBl !big_distrr big_ord_recl big_ord_recr /= subnn mulr1 mul1r.
-rewrite subn0 -!exprS opprD -!addrA; congr (_ + _); rewrite addrA -sumrB.
-rewrite big1 ?add0r // => i _; rewrite !mulrA -exprS -subSn ?(valP i) //.
-by rewrite subSS (commrX _ (commr_sym cxy)) -mulrA -exprS subrr.
-Qed.
-
 Lemma exprD1n x n : (x + 1) ^+ n = \sum_(i < n.+1) x ^+ i *+ 'C(n, i).
 Proof.
 rewrite addrC (exprDn_comm n (commr_sym (commr1 x))).
-by apply: eq_bigr => i _; rewrite expr1n mul1r.
-Qed.
-
-Lemma subrX1 x n : x ^+ n - 1 = (x - 1) * (\sum_(i < n) x ^+ i).
-Proof.
-rewrite -!(opprB 1) mulNr -{1}(expr1n n).
-rewrite (subrXX_comm _ (commr_sym (commr1 x))); congr (- (_ * _)).
 by apply: eq_bigr => i _; rewrite expr1n mul1r.
 Qed.
 
@@ -1473,12 +1352,6 @@ Proof.
 rewrite exprD1n !big_ord_recr big_ord0 /= add0r.
 by rewrite addrC addrA addrAC.
 Qed.
-
-Lemma sqrrB1 x : (x - 1) ^+ 2 = x ^+ 2 - x *+ 2 + 1.
-Proof. by rewrite -sqrrN opprB addrC sqrrD1 sqrrN mulNrn. Qed.
-
-Lemma subr_sqr_1 x : x ^+ 2 - 1 = (x - 1) * (x + 1).
-Proof. by rewrite subrX1 !big_ord_recr big_ord0 /= addrAC add0r. Qed.
 
 Definition Frobenius_aut p of p \in [char R] := fun x => x ^+ p.
 
@@ -1548,10 +1421,217 @@ Proof. exact: exprMn_comm. Qed.
 Lemma Frobenius_autX x n : (x ^+ n)^f = x^f ^+ n.
 Proof. by rewrite !fE -!exprM mulnC. Qed.
 
+End FrobeniusAutomorphism.
+
+Section Char2.
+
+Hypothesis charR2 : 2 \in [char R].
+
+Lemma addrr_char2 x : x + x = 0. Proof. by rewrite -mulr2n mulrn_char. Qed.
+
+End Char2.
+
+End SemiRingTheory.
+
+#[short(type="ringType")]
+HB.structure Definition Ring := { R of SemiRing R & Zmodule R }.
+
+HB.factory Record Zmodule_isRing R of Zmodule R := {
+  one : R;
+  mul : R -> R -> R;
+  mulrA : associative mul;
+  mul1r : left_id one mul;
+  mulr1 : right_id one mul;
+  mulrDl : left_distributive mul +%R;
+  mulrDr : right_distributive mul +%R;
+  oner_neq0 : one != 0
+}.
+HB.builders Context R of Zmodule_isRing R.
+  Local Notation "1" := one.
+  Local Notation "x * y" := (mul x y).
+  Lemma mul0r : @left_zero R R 0 mul.
+  Proof. by move=> x; apply: (addIr (1 * x)); rewrite -mulrDl !add0r mul1r. Qed.
+  Lemma mulr0 : @right_zero R R 0 mul.
+  Proof. by move=> x; apply: (addIr (x * 1)); rewrite -mulrDr !add0r mulr1. Qed.
+  HB.instance Definition _ := Zsemimodule_isSemiRing.Build R
+    mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0 oner_neq0.
+HB.end.
+
+HB.factory Record isRing R of Choice R := {
+  zero : R;
+  opp : R -> R;
+  add : R -> R -> R;
+  one : R;
+  mul : R -> R -> R;
+  addrA : associative add;
+  addrC : commutative add;
+  add0r : left_id zero add;
+  addNr : left_inverse zero opp add;
+  mulrA : associative mul;
+  mul1r : left_id one mul;
+  mulr1 : right_id one mul;
+  mulrDl : left_distributive mul add;
+  mulrDr : right_distributive mul add;
+  oner_neq0 : one != zero
+}.
+HB.builders Context R of isRing R.
+  HB.instance Definition _ := @isZmodule.Build R
+    zero opp add addrA addrC add0r addNr.
+  HB.instance Definition _ := @Zmodule_isRing.Build R
+    one mul mulrA mul1r mulr1 mulrDl mulrDr oner_neq0.
+HB.end.
+
+Module RingExports.
+Bind Scope ring_scope with Ring.sort.
+Notation "[ 'ringType' 'of' T 'for' cT ]" := (Ring.clone T cT)
+  (at level 0, format "[ 'ringType'  'of'  T  'for'  cT ]") : form_scope.
+Notation "[ 'ringType' 'of' T ]" := (Ring.clone T _)
+  (at level 0, format "[ 'ringType'  'of'  T ]") : form_scope.
+End RingExports.
+HB.export RingExports.
+
+Notation sign R b := (exp (- @one R) (nat_of_bool b)) (only parsing).
+
+Local Notation "- 1" := (- (1)) : ring_scope.
+
+Section RingTheory.
+
+Variable R : ringType.
+Implicit Types x y : R.
+
+Lemma mulrN x y : x * (- y) = - (x * y).
+Proof. by apply: (addrI (x * y)); rewrite -mulrDr !subrr mulr0. Qed.
+Lemma mulNr x y : (- x) * y = - (x * y).
+Proof. by apply: (addrI (x * y)); rewrite -mulrDl !subrr mul0r. Qed.
+Lemma mulrNN x y : (- x) * (- y) = x * y.
+Proof. by rewrite mulrN mulNr opprK. Qed.
+Lemma mulN1r x : -1 * x = - x.
+Proof. by rewrite mulNr mul1r. Qed.
+Lemma mulrN1 x : x * -1 = - x.
+Proof. by rewrite mulrN mulr1. Qed.
+
+Lemma mulrBl x y z : (y - z) * x = y * x - z * x.
+Proof. by rewrite mulrDl mulNr. Qed.
+
+Lemma mulrBr x y z : x * (y - z) = x * y - x * z.
+Proof. by rewrite mulrDr mulrN. Qed.
+
+Lemma natrB m n : n <= m -> (m - n)%:R = m%:R - n%:R :> R.
+Proof. exact: mulrnBr. Qed.
+
+Lemma commrN x y : comm x y -> comm x (- y).
+Proof. by move=> com_xy; rewrite /comm mulrN com_xy mulNr. Qed.
+
+Lemma commrN1 x : comm x (-1).
+Proof. exact/commrN/commr1. Qed.
+
+Lemma commrB x y z : comm x y -> comm x z -> comm x (y - z).
+Proof. by move=> com_xy com_xz; apply: commrD => //; apply: commrN. Qed.
+
+Lemma commr_sign x n : comm x ((-1) ^+ n).
+Proof. exact: (commrX n (commrN1 x)). Qed.
+
+Lemma signr_odd n : (-1) ^+ (odd n) = (-1) ^+ n :> R.
+Proof.
+elim: n => //= n IHn; rewrite exprS -{}IHn.
+by case/odd: n; rewrite !mulN1r ?opprK.
+Qed.
+
+Lemma signr_eq0 n : ((-1) ^+ n == 0 :> R) = false.
+Proof. by rewrite -signr_odd; case: odd; rewrite ?oppr_eq0 oner_eq0. Qed.
+
+Lemma mulr_sign (b : bool) x : (-1) ^+ b * x = (if b then - x else x).
+Proof. by case: b; rewrite ?mulNr mul1r. Qed.
+
+Lemma signr_addb b1 b2 : (-1) ^+ (b1 (+) b2) = (-1) ^+ b1 * (-1) ^+ b2 :> R.
+Proof. by rewrite mulr_sign; case: b1 b2 => [] []; rewrite ?opprK. Qed.
+
+Lemma signrE (b : bool) : (-1) ^+ b = 1 - b.*2%:R :> R.
+Proof. by case: b; rewrite ?subr0 // opprD addNKr. Qed.
+
+Lemma signrN b : (-1) ^+ (~~ b) = - (-1) ^+ b :> R.
+Proof. by case: b; rewrite ?opprK. Qed.
+
+Lemma mulr_signM (b1 b2 : bool) x1 x2 :
+  ((-1) ^+ b1 * x1) * ((-1) ^+ b2 * x2) = (-1) ^+ (b1 (+) b2) * (x1 * x2).
+Proof.
+by rewrite signr_addb -!mulrA; congr (_ * _); rewrite !mulrA commr_sign.
+Qed.
+
+Lemma exprNn x n : (- x) ^+ n = (-1) ^+ n * x ^+ n :> R.
+Proof. by rewrite -mulN1r exprMn_comm // /comm mulN1r mulrN mulr1. Qed.
+
+Lemma sqrrN x : (- x) ^+ 2 = x ^+ 2.
+Proof. exact: mulrNN. Qed.
+
+Lemma sqrr_sign n : ((-1) ^+ n) ^+ 2 = 1 :> R.
+Proof. by rewrite exprAC sqrrN !expr1n. Qed.
+
+Lemma signrMK n : @involutive R ( *%R ((-1) ^+ n)).
+Proof. by move=> x; rewrite mulrA -expr2 sqrr_sign mul1r. Qed.
+
+Lemma mulrI0_lreg x : (forall y, x * y = 0 -> y = 0) -> lreg x.
+Proof.
+move=> reg_x y z eq_xy_xz; apply/eqP; rewrite -subr_eq0 [y - z]reg_x //.
+by rewrite mulrBr eq_xy_xz subrr.
+Qed.
+
+Lemma lregN x : lreg x -> lreg (- x).
+Proof. by move=> reg_x y z; rewrite !mulNr => /oppr_inj/reg_x. Qed.
+
+Lemma lreg_sign n : lreg ((-1) ^+ n : R). Proof. exact/lregX/lregN/lreg1. Qed.
+
+Lemma prodrN (I : finType) (A : pred I) (F : I -> R) :
+  \prod_(i in A) - F i = (- 1) ^+ #|A| * \prod_(i in A) F i.
+Proof.
+rewrite -sum1_card; elim/big_rec3: _ => [|i x n _ _ ->]; first by rewrite mulr1.
+by rewrite exprS !mulrA mulN1r !mulNr commrX //; apply: commrN1.
+Qed.
+
+Lemma exprBn_comm x y n (cxy : comm x y) :
+  (x - y) ^+ n =
+    \sum_(i < n.+1) ((-1) ^+ i * x ^+ (n - i) * y ^+ i) *+ 'C(n, i).
+Proof.
+rewrite exprDn_comm; last exact: commrN.
+by apply: eq_bigr => i _; congr (_ *+ _); rewrite -commr_sign -mulrA -exprNn.
+Qed.
+
+Lemma subrXX_comm x y n (cxy : comm x y) :
+  x ^+ n - y ^+ n = (x - y) * (\sum_(i < n) x ^+ (n.-1 - i) * y ^+ i).
+Proof.
+case: n => [|n]; first by rewrite big_ord0 mulr0 subrr.
+rewrite mulrBl !big_distrr big_ord_recl big_ord_recr /= subnn mulr1 mul1r.
+rewrite subn0 -!exprS opprD -!addrA; congr (_ + _); rewrite addrA -sumrB.
+rewrite big1 ?add0r // => i _; rewrite !mulrA -exprS -subSn ?(valP i) //.
+by rewrite subSS (commrX _ (commr_sym cxy)) -mulrA -exprS subrr.
+Qed.
+
+Lemma subrX1 x n : x ^+ n - 1 = (x - 1) * (\sum_(i < n) x ^+ i).
+Proof.
+rewrite -!(opprB 1) mulNr -{1}(expr1n _ n).
+rewrite (subrXX_comm _ (commr_sym (commr1 x))); congr (- (_ * _)).
+by apply: eq_bigr => i _; rewrite expr1n mul1r.
+Qed.
+
+Lemma sqrrB1 x : (x - 1) ^+ 2 = x ^+ 2 - x *+ 2 + 1.
+Proof. by rewrite -sqrrN opprB addrC sqrrD1 sqrrN mulNrn. Qed.
+
+Lemma subr_sqr_1 x : x ^+ 2 - 1 = (x - 1) * (x + 1).
+Proof. by rewrite subrX1 !big_ord_recr big_ord0 /= addrAC add0r. Qed.
+
+Section FrobeniusAutomorphism.
+
+Variable p : nat.
+Hypothesis charFp : p \in [char R].
+
+Hint Resolve charf_prime : core.
+
+Local Notation "x ^f" := (Frobenius_aut charFp x).
+
 Lemma Frobenius_autN x : (- x)^f = - x^f.
 Proof.
 apply/eqP; rewrite -subr_eq0 opprK addrC.
-by rewrite -(Frobenius_autD_comm (commrN _)) // subrr Frobenius_aut0.
+by rewrite -(Frobenius_autD_comm _ (commrN _)) // subrr Frobenius_aut0.
 Qed.
 
 Lemma Frobenius_autB_comm x y : comm x y -> (x - y)^f = x^f - y^f.
@@ -1573,8 +1653,6 @@ Qed.
 Section Char2.
 
 Hypothesis charR2 : 2 \in [char R].
-
-Lemma addrr_char2 x : x + x = 0. Proof. by rewrite -mulr2n mulrn_char. Qed.
 
 Lemma oppr_char2 x : - x = x.
 Proof. by apply/esym/eqP; rewrite -addr_eq0 addrr_char2. Qed.
@@ -1626,6 +1704,26 @@ End ClosedPredicates.
 
 End RingTheory.
 
+Module ConverseZsemimodExports.
+Section RightRegular.
+
+Variable R : semiRingType.
+Implicit Types x y : R.
+
+HB.instance Definition _ := Zsemimodule.copy R^c R.
+
+HB.instance Definition _ :=
+  let mul' x y := y * x in
+  let mulrA' x y z := esym (mulrA z y x) in
+  let mulrDl' x y z := mulrDr z x y in
+  let mulrDr' x y z := mulrDl y z x in
+  Zsemimodule_isSemiRing.Build R^c
+    mulrA' mulr1 mul1r mulrDl' mulrDr' mulr0 mul0r oner_neq0.
+
+End RightRegular.
+End ConverseZsemimodExports.
+HB.export ConverseZsemimodExports.
+
 Module ConverseZmodExports.
 Section RightRegular.
 
@@ -1634,34 +1732,21 @@ Implicit Types x y : R.
 
 HB.instance Definition _ := Zmodule.copy R^c R.
 
-HB.instance Definition _ :=
-  let mul' x y := y * x in
-  let mulrA' x y z := esym (mulrA z y x) in
-  let mulrDl' x y z := mulrDr z x y in
-  let mulrDr' x y z := mulrDl y z x in
-  Zmodule_isRing.Build R^c mulrA' mulr1 mul1r mulrDl' mulrDr' oner_neq0.
-
 End RightRegular.
 End ConverseZmodExports.
 HB.export ConverseZmodExports.
 
-Section RightRegular.
+Section SemiRightRegular.
 
-Variable R : ringType.
+Variable R : semiRingType.
 Implicit Types x y : R.
-Let Rc := [the ringType of R^c].
+Let Rc := [the semiRingType of R^c].
 
 Lemma mulIr_eq0 x y : rreg x -> (y * x == 0) = (y == 0).
 Proof. exact: (@mulrI_eq0 Rc). Qed.
 
-Lemma mulIr0_rreg x : (forall y, y * x = 0 -> y = 0) -> rreg x.
-Proof. exact: (@mulrI0_lreg Rc). Qed.
-
 Lemma rreg_neq0 x : rreg x -> x != 0.
 Proof. exact: (@lreg_neq0 Rc). Qed.
-
-Lemma rregN x : rreg x -> rreg (- x).
-Proof. exact: (@lregN Rc). Qed.
 
 Lemma rreg1 : rreg (1 : R).
 Proof. exact: (@lreg1 Rc). Qed.
@@ -1674,6 +1759,20 @@ Proof. by elim: n => // n IHn; rewrite exprS exprSr IHn. Qed.
 
 Lemma rregX x n : rreg x -> rreg (x ^+ n).
 Proof. by move/(@lregX Rc x n); rewrite revrX. Qed.
+
+End SemiRightRegular.
+
+Section RightRegular.
+
+Variable R : ringType.
+Implicit Types x y : R.
+Let Rc := [the ringType of R^c].
+
+Lemma mulIr0_rreg x : (forall y, y * x = 0 -> y = 0) -> rreg x.
+Proof. exact: (@mulrI0_lreg Rc). Qed.
+
+Lemma rregN x : rreg x -> rreg (- x).
+Proof. exact: (@lregN Rc). Qed.
 
 End RightRegular.
 
@@ -2500,11 +2599,82 @@ Proof. by rewrite linearZ rmorph1. Qed.
 
 End LRMorphismTheory.
 
-HB.mixin Record Ring_hasCommutativeMul R of Ring R := {
+HB.mixin Record SemiRing_hasCommutativeMul R of SemiRing R := {
+  mulrC : commutative (@mul [the semiRingType of R])
+}.
+#[short(type="comSemiRingType")]
+HB.structure Definition ComSemiRing :=
+  {R of SemiRing R & SemiRing_hasCommutativeMul R}.
+
+Module ComSemiRingExports.
+Bind Scope ring_scope with ComSemiRing.sort.
+Notation "[ 'comSemiRingType' 'of' T 'for' cT ]" := (ComSemiRing.clone T cT)
+  (at level 0, format "[ 'comSemiRingType'  'of'  T  'for'  cT ]") : form_scope.
+Notation "[ 'comSemiRingType' 'of' T ]" := (ComSemiRing.clone T _)
+  (at level 0, format "[ 'comSemiRingType'  'of'  T ]") : form_scope.
+End ComSemiRingExports.
+HB.export ComSemiRingExports.
+
+HB.factory Record Zsemimodule_isComSemiRing R of Zsemimodule R := {
+  one : R;
+  mul : R -> R -> R;
+  mulrA : associative mul;
+  mulrC : commutative mul;
+  mul1r : left_id one mul;
+  mulrDl : left_distributive mul add;
+  mul0r : left_zero zero mul;
+  oner_neq0 : one != zero
+}.
+HB.builders Context R of Zsemimodule_isComSemiRing R.
+  Definition mulr1 := Monoid.mulC_id mulrC mul1r.
+  Definition mulrDr := Monoid.mulC_dist mulrC mulrDl.
+  Lemma mulr0 : right_zero zero mul.
+  Proof. by move=> x; rewrite mulrC mul0r. Qed.
+  HB.instance Definition _ := Zsemimodule_isSemiRing.Build R
+    mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0 oner_neq0.
+  HB.instance Definition _ := SemiRing_hasCommutativeMul.Build R mulrC.
+HB.end.
+
+Section ComSemiRingTheory.
+
+Variable R : comSemiRingType.
+Implicit Types x y : R.
+
+#[export]
+HB.instance Definition _ := SemiGroup.isCommutativeLaw.Build R *%R mulrC.
+Lemma mulrCA : @left_commutative R R *%R. Proof. exact: mulmCA. Qed.
+Lemma mulrAC : @right_commutative R R *%R. Proof. exact: mulmAC. Qed.
+Lemma mulrACA : @interchange R *%R *%R. Proof. exact: mulmACA. Qed.
+
+Lemma exprMn n : {morph (fun x => x ^+ n) : x y / x * y}.
+Proof. by move=> x y; exact/exprMn_comm/mulrC. Qed.
+
+Lemma prodrXl n I r (P : pred I) (F : I -> R) :
+  \prod_(i <- r | P i) F i ^+ n = (\prod_(i <- r | P i) F i) ^+ n.
+Proof. by rewrite (big_morph _ (exprMn n) (expr1n _ n)). Qed.
+
+Lemma prodr_undup_exp_count (I : eqType) r (P : pred I) (F : I -> R) :
+  \prod_(i <- undup r | P i) F i ^+ count_mem i r = \prod_(i <- r | P i) F i.
+Proof. exact: big_undup_iterop_count.  Qed.
+
+Lemma exprDn x y n :
+  (x + y) ^+ n = \sum_(i < n.+1) (x ^+ (n - i) * y ^+ i) *+ 'C(n, i).
+Proof. by rewrite exprDn_comm //; apply: mulrC. Qed.
+
+Lemma sqrrD x y : (x + y) ^+ 2 = x ^+ 2 + x * y *+ 2 + y ^+ 2.
+Proof. by rewrite exprDn !big_ord_recr big_ord0 /= add0r mulr1 mul1r. Qed.
+
+End ComSemiRingTheory.
+
+#[short(type="comRingType")]
+HB.structure Definition ComRing := {R of Ring R & ComSemiRing R}.
+
+HB.factory Record Ring_hasCommutativeMul R of Ring R := {
   mulrC : commutative (@mul [the ringType of R])
 }.
-#[short(type="comRingType")]
-HB.structure Definition ComRing := {R of Ring R & Ring_hasCommutativeMul R}.
+HB.builders Context R of Ring_hasCommutativeMul R.
+HB.instance Definition _ := SemiRing_hasCommutativeMul.Build R mulrC.
+HB.end.
 
 HB.factory Record Zmodule_isComRing R of Zmodule R := {
   one : R;
@@ -2537,27 +2707,6 @@ Section ComRingTheory.
 Variable R : comRingType.
 Implicit Types x y : R.
 
-#[export]
-HB.instance Definition _ := SemiGroup.isCommutativeLaw.Build R *%R mulrC.
-Lemma mulrCA : @left_commutative R R *%R. Proof. exact: mulmCA. Qed.
-Lemma mulrAC : @right_commutative R R *%R. Proof. exact: mulmAC. Qed.
-Lemma mulrACA : @interchange R *%R *%R. Proof. exact: mulmACA. Qed.
-
-Lemma exprMn n : {morph (fun x => x ^+ n) : x y / x * y}.
-Proof. by move=> x y; exact/exprMn_comm/mulrC. Qed.
-
-Lemma prodrXl n I r (P : pred I) (F : I -> R) :
-  \prod_(i <- r | P i) F i ^+ n = (\prod_(i <- r | P i) F i) ^+ n.
-Proof. by rewrite (big_morph _ (exprMn n) (expr1n _ n)). Qed.
-
-Lemma prodr_undup_exp_count (I : eqType) r (P : pred I) (F : I -> R) :
-  \prod_(i <- undup r | P i) F i ^+ count_mem i r = \prod_(i <- r | P i) F i.
-Proof. exact: big_undup_iterop_count.  Qed.
-
-Lemma exprDn x y n :
-  (x + y) ^+ n = \sum_(i < n.+1) (x ^+ (n - i) * y ^+ i) *+ 'C(n, i).
-Proof. by rewrite exprDn_comm //; apply: mulrC. Qed.
-
 Lemma exprBn x y n :
   (x - y) ^+ n =
      \sum_(i < n.+1) ((-1) ^+ i * x ^+ (n - i) * y ^+ i) *+ 'C(n, i).
@@ -2566,9 +2715,6 @@ Proof. by rewrite exprBn_comm //; apply: mulrC. Qed.
 Lemma subrXX x y n :
   x ^+ n - y ^+ n = (x - y) * (\sum_(i < n) x ^+ (n.-1 - i) * y ^+ i).
 Proof. by rewrite -subrXX_comm //; apply: mulrC. Qed.
-
-Lemma sqrrD x y : (x + y) ^+ 2 = x ^+ 2 + x * y *+ 2 + y ^+ 2.
-Proof. by rewrite exprDn !big_ord_recr big_ord0 /= add0r mulr1 mul1r. Qed.
 
 Lemma sqrrB x y : (x - y) ^+ 2 = x ^+ 2 - x * y *+ 2 + y ^+ 2.
 Proof. by rewrite sqrrD mulrN mulNrn sqrrN. Qed.
@@ -2679,11 +2825,11 @@ HB.export ComAlgExports.
 Section AlgebraTheory.
 Variables (R : comRingType) (A : algType R).
 #[export]
-HB.instance Definition converse_ : Ring_hasCommutativeMul R^c :=
-  Ring_hasCommutativeMul.Build R^c (fun _ _ => mulrC _ _).
+HB.instance Definition converse_ : SemiRing_hasCommutativeMul R^c :=
+  SemiRing_hasCommutativeMul.Build R^c (fun _ _ => mulrC _ _).
 #[export]
-HB.instance Definition regular_comRingType : Ring_hasCommutativeMul R^o :=
-  ComRing.on R^o.
+HB.instance Definition regular_comSemiRingType :
+  SemiRing_hasCommutativeMul R^o := ComSemiRing.on R^o.
 #[export]
 HB.instance Definition regular_comAlgType : Lalgebra_isComAlgebra R R^o :=
   Lalgebra_isComAlgebra.Build R R^o.
@@ -5415,8 +5561,8 @@ Definition mulrDl := @mulrDl.
 Definition mulrDr := @mulrDr.
 Definition oner_neq0 := @oner_neq0.
 Definition oner_eq0 := oner_eq0.
-Definition mul0r := mul0r.
-Definition mulr0 := mulr0.
+Definition mul0r := @mul0r.
+Definition mulr0 := @mulr0.
 Definition mulrN := mulrN.
 Definition mulNr := mulNr.
 Definition mulrNN := mulrNN.
@@ -5980,14 +6126,12 @@ Notation "''exists' ''X_' i , f" := (Exists i f) : term_scope.
 Notation "''forall' ''X_' i , f" := (Forall i f) : term_scope.
 
 (* Lifting Structure from the codomain of finfuns. *)
-Section FinFunZmod.
+Section FinFunZsemimod.
 
-Variable (aT : finType) (rT : zmodType).
+Variable (aT : finType) (rT : zsemimodType).
 Implicit Types f g : {ffun aT -> rT}.
 
-
 Definition ffun_zero := [ffun a : aT => (0 : rT)].
-Definition ffun_opp f := [ffun a => - f a].
 Definition ffun_add f g := [ffun a => f a + g a].
 
 Fact ffun_addA : associative ffun_add.
@@ -5996,12 +6140,10 @@ Fact ffun_addC : commutative ffun_add.
 Proof. by move=> f1 f2; apply/ffunP=> a; rewrite !ffunE addrC. Qed.
 Fact ffun_add0 : left_id ffun_zero ffun_add.
 Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE add0r. Qed.
-Fact ffun_addN : left_inverse ffun_zero ffun_opp ffun_add.
-Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE addNr. Qed.
 
 #[export]
-HB.instance Definition _  := isZmodule.Build {ffun aT -> rT}
-  ffun_addA ffun_addC ffun_add0 ffun_addN.
+HB.instance Definition _  := isZsemimodule.Build {ffun aT -> rT}
+  ffun_addA ffun_addC ffun_add0.
 
 Section Sum.
 
@@ -6019,14 +6161,30 @@ End Sum.
 Lemma ffunMnE f n x : (f *+ n) x = f x *+ n.
 Proof. by rewrite -[n]card_ord -!sumr_const sum_ffunE. Qed.
 
+End FinFunZsemimod.
+
+Section FinFunZmod.
+
+Variable (aT : finType) (rT : zmodType).
+Implicit Types f g : {ffun aT -> rT}.
+
+Definition ffun_opp f := [ffun a => - f a].
+
+Fact ffun_addN : left_inverse (@ffun_zero _ _) ffun_opp (@ffun_add _ _).
+Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE addNr. Qed.
+
+#[export]
+HB.instance Definition _  := Zsemimodule_isZmodule.Build {ffun aT -> rT}
+  ffun_addN.
+
 End FinFunZmod.
 
-Section FinFunRing.
+Section FinFunSemiRing.
 
 (* As rings require 1 != 0 in order to lift a ring structure over finfuns     *)
 (* we need evidence that the domain is non-empty.                             *)
 
-Variable (aT : finType) (R : ringType) (a : aT).
+Variable (aT : finType) (R : semiRingType) (a : aT).
 
 Definition ffun_one : {ffun aT -> R} := [ffun => 1].
 Definition ffun_mul (f g : {ffun aT -> R}) := [ffun x => f x * g x].
@@ -6041,16 +6199,39 @@ Fact ffun_mul_addl :  left_distributive ffun_mul (@ffun_add _ _).
 Proof. by move=> f1 f2 f3; apply/ffunP=> i; rewrite !ffunE mulrDl. Qed.
 Fact ffun_mul_addr :  right_distributive ffun_mul (@ffun_add _ _).
 Proof. by move=> f1 f2 f3; apply/ffunP=> i; rewrite !ffunE mulrDr. Qed.
+Fact ffun_mul_0l :  left_zero (@ffun_zero _ _) ffun_mul.
+Proof. by move=> f; apply/ffunP=> i; rewrite !ffunE mul0r. Qed.
+Fact ffun_mul_0r :  right_zero (@ffun_zero _ _) ffun_mul.
+Proof. by move=> f; apply/ffunP=> i; rewrite !ffunE mulr0. Qed.
 Fact ffun1_nonzero : ffun_one != 0.
 Proof. by apply/eqP => /ffunP/(_ a)/eqP; rewrite !ffunE oner_eq0. Qed.
 
+(* TODO_HB uncomment once ffun_ring below is fixed
 #[export]
+HB.instance Definition _ := Zsemimodule_isSemiRing.Build {ffun aT -> R}
+  ffun_mulA ffun_mul_1l ffun_mul_1r ffun_mul_addl ffun_mul_addr
+  ffun_mul_0l ffun_mul_0r ffun1_nonzero.
+Definition ffun_semiring := ([the semiRingType of {ffun aT -> R}] : Type).
+*)
+
+End FinFunSemiRing.
+
+Section FinFunRing.
+
+(* As rings require 1 != 0 in order to lift a ring structure over finfuns     *)
+(* we need evidence that the domain is non-empty.                             *)
+
+Variable (aT : finType) (R : ringType) (a : aT).
+
+(* TODO_HB: doesn't work in combination with ffun_semiring above *)
 HB.instance Definition _ := Zmodule_isRing.Build {ffun aT -> R}
-  ffun_mulA ffun_mul_1l ffun_mul_1r ffun_mul_addl ffun_mul_addr ffun1_nonzero.
+  (@ffun_mulA _ _) (@ffun_mul_1l _ _) (@ffun_mul_1r _ _)
+  (@ffun_mul_addl _ _) (@ffun_mul_addr _ _) (@ffun1_nonzero _ _ a).
 Definition ffun_ring := ([the ringType of {ffun aT -> R}] : Type).
 
 End FinFunRing.
 
+(* TODO_HB do FinFunComSemiRing once above is fixed *)
 Section FinFunComRing.
 
 Variable (aT : finType) (R : comRingType) (a : aT).
@@ -6058,9 +6239,11 @@ Variable (aT : finType) (R : comRingType) (a : aT).
 Fact ffun_mulC : commutative (@ffun_mul aT R).
 Proof. by move=> f1 f2; apply/ffunP=> i; rewrite !ffunE mulrC. Qed.
 
+(* TODO_HB
 #[export]
 HB.instance Definition _ :=
   Ring_hasCommutativeMul.Build (ffun_ring _ a) ffun_mulC.
+*)
 
 End FinFunComRing.
 

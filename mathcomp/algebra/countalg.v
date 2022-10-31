@@ -36,6 +36,14 @@ Module CountRing.
 
 Import GRing.Theory.
 
+#[short(type="countZsemimodType")]
+HB.structure Definition Zsemimodule := {M of GRing.Zsemimodule M & Countable M}.
+Module ZsemimoduleExports.
+Notation "[ 'countZsemimodType' 'of' T ]" := (Zsemimodule.clone T _)
+  (at level 0, format "[ 'countZsemimodType'  'of'  T ]") : form_scope.
+End ZsemimoduleExports.
+HB.export ZsemimoduleExports.
+
 #[short(type="countZmodType")]
 HB.structure Definition Zmodule := {M of GRing.Zmodule M & Countable M}.
 Module ZmoduleExports.
@@ -43,6 +51,16 @@ Notation "[ 'countZmodType' 'of' T ]" := (Zmodule.clone T%type _)
   (at level 0, format "[ 'countZmodType'  'of'  T ]") : form_scope.
 End ZmoduleExports.
 HB.export ZmoduleExports.
+
+#[short(type="countSemiRingType")]
+HB.structure Definition SemiRing := {R of GRing.SemiRing R & Countable R}.
+
+Module SemiRingExports.
+Notation "[ 'countSemiRingType' 'of' T ]" :=
+  (SemiRing.clone T _) (* NB: was (do_pack pack T) *)
+      (at level 0, format "[ 'countSemiRingType'  'of'  T ]") : form_scope.
+End SemiRingExports.
+HB.export SemiRingExports.
 
 #[short(type="countRingType")]
 HB.structure Definition Ring := {R of GRing.Ring R & Countable R}.
@@ -53,6 +71,15 @@ Notation "[ 'countRingType' 'of' T ]" :=
       (at level 0, format "[ 'countRingType'  'of'  T ]") : form_scope.
 End RingExports.
 HB.export RingExports.
+
+#[short(type="countComSemiRingType")]
+HB.structure Definition ComSemiRing := {R of GRing.ComSemiRing R & Countable R}.
+
+Module ComSemiRingExports.
+Notation "[ 'countComSemiRingType' 'of' T ]" := (ComSemiRing.clone T _)
+  (at level 0, format "[ 'countComSemiRingType'  'of'  T ]") : form_scope.
+End ComSemiRingExports.
+HB.export ComSemiRingExports.
 
 #[short(type="countComRingType")]
 HB.structure Definition ComRing := {R of GRing.ComRing R & Countable R}.
@@ -121,7 +148,11 @@ End ClosedFieldExports.
 HB.export ClosedFieldExports.
 
 #[export]
+HB.instance Definition _ (R : countZsemimodType) := Zsemimodule.on R^o.
+#[export]
 HB.instance Definition _ (R : countZmodType) := Zmodule.on R^o.
+#[export]
+HB.instance Definition _ (R : countSemiRingType) := SemiRing.on R^o.
 #[export]
 HB.instance Definition _ (R : countRingType) := Ring.on R^o.
 

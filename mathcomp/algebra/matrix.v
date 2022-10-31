@@ -3365,7 +3365,7 @@ rewrite (bigID (fun f : F => injectiveb f)) /= addrC big1 ?add0r => [|f Uf].
     by exists in_Sn => /= f Uf; first apply: val_inj; apply: insubdK.
   apply: eq_big => /= [s | s _]; rewrite ?(valP s) // big_distrr /=.
   rewrite (reindex_inj (mulgI s)); apply: eq_bigr => t _ /=.
-  rewrite big_split /= mulrA mulrCA mulrA mulrCA mulrA.
+  rewrite big_split /= [in LHS]mulrA mulrCA mulrA mulrCA mulrA.
   rewrite -signr_addb odd_permM !pvalE; congr (_ * _); symmetry.
   by rewrite (reindex_perm s); apply: eq_bigr => i; rewrite permM.
 transitivity (\det (\matrix_(i, j) B (f i) j) * \prod_i A i (f i)).

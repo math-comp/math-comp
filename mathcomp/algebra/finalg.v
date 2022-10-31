@@ -42,6 +42,15 @@ Module FinRing.
 
 Import GRing.Theory.
 
+#[short(type="finZsemimodType")]
+HB.structure Definition Zsemimodule := {M of GRing.Zsemimodule M & Finite M}.
+
+Module ZsemimoduleExports.
+Notation "[ 'finZsemimodType' 'of' T ]" := (Zsemimodule.clone T _)
+  (at level 0, format "[ 'finZsemimodType'  'of'  T ]") : form_scope.
+End ZsemimoduleExports.
+HB.export ZsemimoduleExports.
+
 #[short(type="finZmodType")]
 HB.structure Definition Zmodule := {M of GRing.Zmodule M & Finite M}.
 
@@ -54,6 +63,15 @@ Notation "[ 'finGroupMixin' 'of' R 'for' +%R ]" :=
 End ZmoduleExports.
 HB.export ZmoduleExports.
 
+#[short(type="finSemiRingType")]
+HB.structure Definition SemiRing := {R of GRing.SemiRing R & Finite R}.
+
+Module SemiRingExports.
+Notation "[ 'finSemiRingType' 'of' T ]" := (SemiRing.clone T _)
+  (at level 0, format "[ 'finSemiRingType'  'of'  T ]") : form_scope.
+End SemiRingExports.
+HB.export SemiRingExports.
+
 #[short(type="finRingType")]
 HB.structure Definition Ring := {R of GRing.Ring R & Finite R}.
 
@@ -62,6 +80,15 @@ Notation "[ 'finRingType' 'of' T ]" := (Ring.clone T%type _)
   (at level 0, format "[ 'finRingType'  'of'  T ]") : form_scope.
 End RingExports.
 HB.export RingExports.
+
+#[short(type="finComSemiRingType")]
+HB.structure Definition ComSemiRing := {R of GRing.ComSemiRing R & Finite R}.
+
+Module ComSemiRingExports.
+Notation "[ 'finComSemiRingType' 'of' T ]" := (ComSemiRing.clone T _)
+  (at level 0, format "[ 'finComSemiRingType'  'of'  T ]") : form_scope.
+End ComSemiRingExports.
+HB.export ComSemiRingExports.
 
 #[short(type="finComRingType")]
 HB.structure Definition ComRing := {R of GRing.ComRing R & Finite R}.
