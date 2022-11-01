@@ -145,6 +145,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ltf_ninv` -> `ltfnV2`
   + `ltef_pinv` -> `ltefpV2`
   + `ltef_ninv` -> `ltefnV2`
+  + `minr_pmulr` -> `minrpMr`
+  + `maxr_pmulr` -> `maxrpMr`
+  + `minr_pmull` -> `minrpMl`
+  + `maxr_pmull` -> `maxrpMl`
+  + `ltr_wpexpn2r` -> `ltrwpX2r`
+  + `ler_pexpn2r` -> `lerpX2r`
+  + `ltr_pexpn2r` -> `ltrpX2r`
+  + `lter_pexpn2r` -> `lterpX2r`
+  + `ger_pmull` -> `gerpMl`
+  + `gtr_pmull` -> gtrpMl
+  + `ger_pmulr` -> `gerpMr`
+  + `gtr_pmulr` -> `gtrpMr`
+  + `ler_pmull` -> `lerpMl`
+  + `ltr_pmull` -> `ltrpMl`
+  + `ler_pmulr` -> `lerpMr`
+  + `ltr_pmulr` -> `ltrpMr`
+  + `ger_nmull` -> `gernMl`
+  + `gtr_nmull` -> `gtrnMl`
+  + `ger_nmulr` -> `gernMr`
+  + `gtr_nmulr` -> `gtrnMr`
+  + `ler_nmull` -> `lernMl`
+  + `ltr_nmull` -> `ltrnMl`
+  + `ler_nmulr` -> `lernMr`
+  + `ltr_nmulr` -> `ltrnMr`
+  + `leif_pmul` -> `leifpM`
+  + `leif_nmul` -> `leifnM`
 - in `ssrint.v`:
   + `leq_add_dist` -> `leqD_dist`
   + `lez_add1r` -> `lez1D`
