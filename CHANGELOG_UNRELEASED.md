@@ -154,7 +154,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ltr_pexpn2r` -> `ltrpX2r`
   + `lter_pexpn2r` -> `lterpX2r`
   + `ger_pmull` -> `gerpMl`
-  + `gtr_pmull` -> gtrpMl
+  + `gtr_pmull` -> `gtrpMl`
   + `ger_pmulr` -> `gerpMr`
   + `gtr_pmulr` -> `gtrpMr`
   + `ler_pmull` -> `lerpMl`
@@ -171,6 +171,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ltr_nmulr` -> `ltrnMr`
   + `leif_pmul` -> `leifpM`
   + `leif_nmul` -> `leifnM`
+  + `eqr_expn2` -> `eqrX2`
+  + `real_maxr_nmulr` -> `real_maxrnMr`
+  + `real_minr_nmulr` -> `real_minrnMr`
+  + `real_minr_nmull` -> `real_minrnMl`
+  + `real_maxr_nmull` -> `real_maxrnMl`
+  + `real_ltr_distl_addr` -> `real_ltr_distlDr`
+  + `real_ler_distl_addr` -> `real_ler_distlDr`
+  + `real_ltr_distlC_addr` -> `real_ltr_distlCDr`
+  + `real_ler_distlC_addr` -> `real_ler_distlCDr`
+  + `real_ltr_distl_subl` -> `real_ltr_distlBl`
+  + `real_ler_distl_subl` -> `real_ler_distlBl`
+  + `real_ltr_distlC_subl` -> `real_ltr_distlCBl`
+  + `real_ler_distlC_subl` -> `real_ler_distlCBl`
+  + `ltr_distl_addr` -> `ltr_distlDr`
+  + `ler_distl_addr` -> `ler_distlDr`
+  + `ltr_distlC_addr` -> `ltr_distlCDr`
+  + `ler_distlC_addr` -> `ler_distlCDr`
+  + `ltr_distl_subl` -> `ltr_distlBl`
+  + `ler_distl_subl` -> `ler_distlBl`
+  + `ltr_distlC_subl` -> `ltr_distlCBl`
+  + `ler_distlC_subl` -> `ler_distlCBl`
+  + `maxr_nmulr` -> `maxrnMr`
+  + `minr_nmulr` -> `minrnMr`
+  + `minr_nmull` -> `minrnMl`
+  + `maxr_nmull` -> `maxrnMl`
 - in `ssrint.v`:
   + `leq_add_dist` -> `leqD_dist`
   + `lez_add1r` -> `lez1D`

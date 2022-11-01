@@ -2736,7 +2736,7 @@ Proof. by move=> ngt0 xge0; rewrite !eq_le expr_le1 // expr_ge1. Qed.
 Lemma pexprn_eq1 x n : 0 <= x -> (x ^+ n == 1) = (n == 0%N) || (x == 1).
 Proof. by case: n => [|n] xge0; rewrite ?eqxx // pexpr_eq1 ?gtn_eqF. Qed.
 
-Lemma eqr_expn2 n x y :
+Lemma eqrX2 n x y :
   (0 < n)%N -> 0 <= x -> 0 <= y -> (x ^+ n == y ^+ n) = (x == y).
 Proof. by move=> ngt0 xge0 yge0; rewrite (inj_in_eq (pexpIrn _)). Qed.
 
@@ -2850,14 +2850,14 @@ have [|x_gt0||->]// := comparableP x; last by rewrite !mul0r maxxx.
 by rewrite !(fun_if, if_arg) lterpM2l//; case: (y < z).
 Qed.
 
-Lemma real_maxr_nmulr x y z : x <= 0 -> y \is real -> z \is real ->
+Lemma real_maxrnMr x y z : x <= 0 -> y \is real -> z \is real ->
   x * max y z = min (x * y) (x * z).
 Proof.
 move=> x0 yr zr; rewrite -[_ * _]opprK -mulrN real_oppr_max// -mulNr.
 by rewrite minrpMr ?oppr_ge0// !(mulNr, mulrN, opprK).
 Qed.
 
-Lemma real_minr_nmulr x y z :  x <= 0 -> y \is real -> z \is real ->
+Lemma real_minrnMr x y z :  x <= 0 -> y \is real -> z \is real ->
   x * min y z = max (x * y) (x * z).
 Proof.
 move=> x0 yr zr; rewrite -[_ * _]opprK -mulrN real_oppr_min// -mulNr.
@@ -2870,13 +2870,13 @@ Proof. by move=> *; rewrite mulrC minrpMr // ![_ * x]mulrC. Qed.
 Lemma maxrpMl x y z : 0 <= x -> max y z * x = max (y * x) (z * x).
 Proof. by move=> *; rewrite mulrC maxrpMr // ![_ * x]mulrC. Qed.
 
-Lemma real_minr_nmull x y z : x <= 0 -> y \is real -> z \is real ->
+Lemma real_minrnMl x y z : x <= 0 -> y \is real -> z \is real ->
   min y z * x = max (y * x) (z * x).
-Proof. by move=> *; rewrite mulrC real_minr_nmulr // ![_ * x]mulrC. Qed.
+Proof. by move=> *; rewrite mulrC real_minrnMr // ![_ * x]mulrC. Qed.
 
-Lemma real_maxr_nmull x y z : x <= 0 -> y \is real -> z \is real ->
+Lemma real_maxrnMl x y z : x <= 0 -> y \is real -> z \is real ->
   max y z * x = min (y * x) (z * x).
-Proof. by move=> *; rewrite mulrC real_maxr_nmulr // ![_ * x]mulrC. Qed.
+Proof. by move=> *; rewrite mulrC real_maxrnMr // ![_ * x]mulrC. Qed.
 
 Lemma real_maxrN x : x \is real -> max x (- x) = `|x|.
 Proof.
@@ -3068,29 +3068,29 @@ Proof. by move=> Rxy; rewrite real_lter_norml // !lterBDl. Qed.
 
 Definition real_lter_distl := (real_ler_distl, real_ltr_distl).
 
-Lemma real_ltr_distl_addr x y e : x - y \is real -> `|x - y| < e -> x < y + e.
+Lemma real_ltr_distlDr x y e : x - y \is real -> `|x - y| < e -> x < y + e.
 Proof. by move=> ?; rewrite real_ltr_distl // => /andP[]. Qed.
 
-Lemma real_ler_distl_addr x y e : x - y \is real -> `|x - y| <= e -> x <= y + e.
+Lemma real_ler_distlDr x y e : x - y \is real -> `|x - y| <= e -> x <= y + e.
 Proof. by move=> ?; rewrite real_ler_distl // => /andP[]. Qed.
 
-Lemma real_ltr_distlC_addr x y e : x - y \is real -> `|x - y| < e -> y < x + e.
-Proof. by rewrite realBC (distrC x) => ? /real_ltr_distl_addr; apply. Qed.
+Lemma real_ltr_distlCDr x y e : x - y \is real -> `|x - y| < e -> y < x + e.
+Proof. by rewrite realBC (distrC x) => ? /real_ltr_distlDr; apply. Qed.
 
-Lemma real_ler_distlC_addr x y e : x - y \is real -> `|x - y| <= e -> y <= x + e.
-Proof. by rewrite realBC distrC => ? /real_ler_distl_addr; apply. Qed.
+Lemma real_ler_distlCDr x y e : x - y \is real -> `|x - y| <= e -> y <= x + e.
+Proof. by rewrite realBC distrC => ? /real_ler_distlDr; apply. Qed.
 
-Lemma real_ltr_distl_subl x y e : x - y \is real -> `|x - y| < e -> x - e < y.
-Proof. by move/real_ltr_distl_addr; rewrite ltrBlDr; apply. Qed.
+Lemma real_ltr_distlBl x y e : x - y \is real -> `|x - y| < e -> x - e < y.
+Proof. by move/real_ltr_distlDr; rewrite ltrBlDr; apply. Qed.
 
-Lemma real_ler_distl_subl x y e : x - y \is real -> `|x - y| <= e -> x - e <= y.
-Proof. by move/real_ler_distl_addr; rewrite lerBlDr; apply. Qed.
+Lemma real_ler_distlBl x y e : x - y \is real -> `|x - y| <= e -> x - e <= y.
+Proof. by move/real_ler_distlDr; rewrite lerBlDr; apply. Qed.
 
-Lemma real_ltr_distlC_subl x y e : x - y \is real -> `|x - y| < e -> y - e < x.
-Proof. by rewrite realBC distrC => ? /real_ltr_distl_subl; apply. Qed.
+Lemma real_ltr_distlCBl x y e : x - y \is real -> `|x - y| < e -> y - e < x.
+Proof. by rewrite realBC distrC => ? /real_ltr_distlBl; apply. Qed.
 
-Lemma real_ler_distlC_subl x y e : x - y \is real -> `|x - y| <= e -> y - e <= x.
-Proof. by rewrite realBC distrC => ? /real_ler_distl_subl; apply. Qed.
+Lemma real_ler_distlCBl x y e : x - y \is real -> `|x - y| <= e -> y - e <= x.
+Proof. by rewrite realBC distrC => ? /real_ler_distlBl; apply. Qed.
 
 (* GG: pointless duplication }-( *)
 Lemma eqr_norm_id x : (`|x| == x) = (0 <= x). Proof. by rewrite ger0_def. Qed.
@@ -3748,6 +3748,32 @@ Notation ltr_nmulr := ltrnMr.
 Notation leif_pmul := leifpM.
 #[deprecated(since="mathcomp 1.16.0", note="Use leifnM instead.")]
 Notation leif_nmul := leifnM.
+#[deprecated(since="mathcomp 1.16.0", note="Use eqrX2 instead.")]
+Notation eqr_expn2 := eqrX2.
+#[deprecated(since="mathcomp 1.16.0", note="Use real_maxrnMr instead.")]
+Notation real_maxr_nmulr := real_maxrnMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use real_minrnMr instead.")]
+Notation real_minr_nmulr := real_minrnMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use real_minrnMl instead.")]
+Notation real_minr_nmull := real_minrnMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use real_maxrnMl instead.")]
+Notation real_maxr_nmull := real_maxrnMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use real_ltr_distlDr instead.")]
+Notation real_ltr_distl_addr := real_ltr_distlDr.
+#[deprecated(since="mathcomp 1.16.0", note="Use real_ler_distlDr instead.")]
+Notation real_ler_distl_addr := real_ler_distlDr.
+#[deprecated(since="mathcomp 1.16.0", note="Use real_ltr_distlCDr instead.")]
+Notation real_ltr_distlC_addr := real_ltr_distlCDr.
+#[deprecated(since="mathcomp 1.16.0", note="Use real_ler_distlCDr instead.")]
+Notation real_ler_distlC_addr := real_ler_distlCDr.
+#[deprecated(since="mathcomp 1.16.0", note="Use real_ltr_distlBl instead.")]
+Notation real_ltr_distl_subl := real_ltr_distlBl.
+#[deprecated(since="mathcomp 1.16.0", note="Use real_ler_distlBl instead.")]
+Notation real_ler_distl_subl := real_ler_distlBl.
+#[deprecated(since="mathcomp 1.16.0", note="Use real_ltr_distlCBl instead.")]
+Notation real_ltr_distlC_subl := real_ltr_distlCBl.
+#[deprecated(since="mathcomp 1.16.0", note="Use real_ler_distlCBl instead.")]
+Notation real_ler_distlC_subl := real_ler_distlCBl.
 
 #[global] Hint Resolve lerN2 ltrN2 real0 real1 normr_real : core.
 Arguments ler_sqr {R} [x y].
@@ -4354,29 +4380,29 @@ Proof. by rewrite distrC ler_distl. Qed.
 
 Definition lter_distlC := (ler_distlC, ltr_distlC).
 
-Lemma ltr_distl_addr x y e : `|x - y| < e -> x < y + e.
-Proof. exact: real_ltr_distl_addr. Qed.
+Lemma ltr_distlDr x y e : `|x - y| < e -> x < y + e.
+Proof. exact: real_ltr_distlDr. Qed.
 
-Lemma ler_distl_addr x y e : `|x - y| <= e -> x <= y + e.
-Proof. exact: real_ler_distl_addr. Qed.
+Lemma ler_distlDr x y e : `|x - y| <= e -> x <= y + e.
+Proof. exact: real_ler_distlDr. Qed.
 
-Lemma ltr_distlC_addr x y e : `|x - y| < e -> y < x + e.
-Proof. exact: real_ltr_distlC_addr. Qed.
+Lemma ltr_distlCDr x y e : `|x - y| < e -> y < x + e.
+Proof. exact: real_ltr_distlCDr. Qed.
 
-Lemma ler_distlC_addr x y e : `|x - y| <= e -> y <= x + e.
-Proof. exact: real_ler_distlC_addr. Qed.
+Lemma ler_distlCDr x y e : `|x - y| <= e -> y <= x + e.
+Proof. exact: real_ler_distlCDr. Qed.
 
-Lemma ltr_distl_subl x y e : `|x - y| < e -> x - e < y.
-Proof. exact: real_ltr_distl_subl. Qed.
+Lemma ltr_distlBl x y e : `|x - y| < e -> x - e < y.
+Proof. exact: real_ltr_distlBl. Qed.
 
-Lemma ler_distl_subl x y e : `|x - y| <= e -> x - e <= y.
-Proof. exact: real_ler_distl_subl. Qed.
+Lemma ler_distlBl x y e : `|x - y| <= e -> x - e <= y.
+Proof. exact: real_ler_distlBl. Qed.
 
-Lemma ltr_distlC_subl x y e : `|x - y| < e -> y - e < x.
-Proof. exact: real_ltr_distlC_subl. Qed.
+Lemma ltr_distlCBl x y e : `|x - y| < e -> y - e < x.
+Proof. exact: real_ltr_distlCBl. Qed.
 
-Lemma ler_distlC_subr x y e : `|x - y| <= e -> y - e <= x.
-Proof. exact: real_ler_distlC_subl. Qed.
+Lemma ler_distlCBl x y e : `|x - y| <= e -> y - e <= x.
+Proof. exact: real_ler_distlCBl. Qed.
 
 Lemma exprn_even_ge0 n x : ~~ odd n -> 0 <= x ^+ n.
 Proof. by move=> even_n; rewrite real_exprn_even_ge0 ?num_real. Qed.
@@ -4450,17 +4476,17 @@ Proof. by move=> x y z; apply: real_addr_maxl. Qed.
 Lemma addr_maxr : @right_distributive R R +%R max.
 Proof. by move=> x y z; apply: real_addr_maxr. Qed.
 
-Lemma minr_nmulr x y z : x <= 0 -> x * min y z = max (x * y) (x * z).
-Proof. by move=> x_le0; apply: real_minr_nmulr. Qed.
+Lemma minrnMr x y z : x <= 0 -> x * min y z = max (x * y) (x * z).
+Proof. by move=> x_le0; apply: real_minrnMr. Qed.
 
-Lemma maxr_nmulr x y z : x <= 0 -> x * max y z = min (x * y) (x * z).
-Proof. by move=> x_le0; apply: real_maxr_nmulr. Qed.
+Lemma maxrnMr x y z : x <= 0 -> x * max y z = min (x * y) (x * z).
+Proof. by move=> x_le0; apply: real_maxrnMr. Qed.
 
-Lemma minr_nmull x y z : x <= 0 -> min y z * x = max (y * x) (z * x).
-Proof. by move=> x_le0; apply: real_minr_nmull. Qed.
+Lemma minrnMl x y z : x <= 0 -> min y z * x = max (y * x) (z * x).
+Proof. by move=> x_le0; apply: real_minrnMl. Qed.
 
-Lemma maxr_nmull x y z : x <= 0 -> max y z * x = min (y * x) (z * x).
-Proof. by move=> x_le0; apply: real_maxr_nmull. Qed.
+Lemma maxrnMl x y z : x <= 0 -> max y z * x = min (y * x) (z * x).
+Proof. by move=> x_le0; apply: real_maxrnMl. Qed.
 
 Lemma maxrN x : max x (- x) = `|x|.   Proof. exact: real_maxrN. Qed.
 Lemma maxNr x : max (- x) x = `|x|.   Proof. exact: real_maxNr. Qed.
@@ -5152,19 +5178,19 @@ Proof. by move/ler_rootC/leW_mono_in. Qed.
 Lemma exprCK n x : (0 < n)%N -> 0 <= x -> n.-root (x ^+ n) = x.
 Proof.
 move=> n_gt0 x_ge0; apply/eqP.
-by rewrite -(eqr_expn2 n_gt0) ?rootC_ge0 ?exprn_ge0 ?rootCK.
+by rewrite -(eqrX2 n_gt0) ?rootC_ge0 ?exprn_ge0 ?rootCK.
 Qed.
 
 Lemma norm_rootC n x : `|n.-root x| = n.-root `|x|.
 Proof.
 have [-> | n_gt0] := posnP n; first by rewrite !root0C normr0.
-by apply/eqP; rewrite -(eqr_expn2 n_gt0) ?rootC_ge0 // -normrX !rootCK.
+by apply/eqP; rewrite -(eqrX2 n_gt0) ?rootC_ge0 // -normrX !rootCK.
 Qed.
 
 Lemma rootCX n x k : (n > 0)%N -> 0 <= x -> n.-root (x ^+ k) = n.-root x ^+ k.
 Proof.
 move=> n_gt0 x_ge0; apply/eqP.
-by rewrite -(eqr_expn2 n_gt0) ?(exprn_ge0, rootC_ge0) // 1?exprAC !rootCK.
+by rewrite -(eqrX2 n_gt0) ?(exprn_ge0, rootC_ge0) // 1?exprAC !rootCK.
 Qed.
 
 Lemma rootC1 n : (n > 0)%N -> n.-root 1 = 1.
@@ -5179,7 +5205,7 @@ Lemma rootCV n x : 0 <= x -> n.-root x^-1 = (n.-root x)^-1.
 Proof.
 move=> x_ge0; have [->|n_gt0] := posnP n; first by rewrite !root0C invr0.
 apply/eqP.
-by rewrite -(eqr_expn2 n_gt0) ?(invr_ge0, rootC_ge0) // !exprVn !rootCK.
+by rewrite -(eqrX2 n_gt0) ?(invr_ge0, rootC_ge0) // !exprVn !rootCK.
 Qed.
 
 Lemma rootC_eq1 n x : (n > 0)%N -> (n.-root x == 1) = (x == 1).
@@ -5209,7 +5235,7 @@ have nx_gt0: 0 < n.-root x by rewrite rootC_gt0.
 have Rnx: n.-root x \is real by rewrite ger0_real ?ltW.
 apply: eqC_semipolar; last 1 first; try apply/eqP.
 - by rewrite ImMl // !(Im_rootC_ge0, mulr_ge0, rootC_ge0).
-- by rewrite -(eqr_expn2 n_gt0) // -!normrX exprMn !rootCK.
+- by rewrite -(eqrX2 n_gt0) // -!normrX exprMn !rootCK.
 rewrite eq_le; apply/andP; split; last first.
   rewrite rootC_Re_max ?exprMn ?rootCK ?ImMl //.
   by rewrite mulr_ge0 ?Im_rootC_ge0 ?ltW.
@@ -5395,6 +5421,29 @@ Arguments sqrCK_P {C x}.
   solve [apply: Creal_Im] : core.
 
 End Theory.
+Notation ltr_distl_addr := ltr_distlDr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlDr instead.")]
+Notation ler_distl_addr := ler_distlDr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltr_distlCDr instead.")]
+Notation ltr_distlC_addr := ltr_distlCDr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlCDr instead.")]
+Notation ler_distlC_addr := ler_distlCDr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltr_distlBl instead.")]
+Notation ltr_distl_subl := ltr_distlBl.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlBl instead.")]
+Notation ler_distl_subl := ler_distlBl.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltr_distlCBl instead.")]
+Notation ltr_distlC_subl := ltr_distlCBl.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlCBl instead.")]
+Notation ler_distlC_subl := ler_distlCBl.
+#[deprecated(since="mathcomp 1.16.0", note="Use real_maxrnMr instead.")]
+Notation maxr_nmulr := maxrnMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use minrnMr instead.")]
+Notation minr_nmulr := minrnMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use minrnMl instead.")]
+Notation minr_nmull := minrnMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use maxrnMl instead.")]
+Notation maxr_nmull := maxrnMl.
 
 (*************)
 (* FACTORIES *)
