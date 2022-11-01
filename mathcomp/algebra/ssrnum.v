@@ -3708,9 +3708,10 @@ Notation maxr_pmull := maxrpMl.
 Notation ltr_wpexpn2r := ltrwpX2r.
 #[deprecated(since="mathcomp 1.16.0", note="Use lerpX2r instead.")]
 Notation ler_pexpn2r := lerpX2r.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltrpX2r instead.")]
+Notation ltr_pexpn2r := ltrpX2r.
 #[deprecated(since="mathcomp 1.16.0", note="Use lterpX2r instead.")]
 Notation lter_pexpn2r := lterpX2r.
-
 #[deprecated(since="mathcomp 1.16.0", note="Use gerpMl instead.")]
 Notation ger_pmull := gerpMl.
 #[deprecated(since="mathcomp 1.16.0", note="Use gtrpMl instead.")]
