@@ -929,7 +929,7 @@ Lemma Cint_ler_sqr x : x \in Cint -> x <= x ^+ 2.
 Proof.
 move=> Zx; have [-> | nz_x] := eqVneq x 0; first by rewrite expr0n.
 apply: le_trans (_ : `|x| <= _); first by rewrite real_ler_norm ?Creal_Cint.
-by rewrite -Cint_normK // ler_eexpr // norm_Cint_ge1.
+by rewrite -Cint_normK // lereXr // norm_Cint_ge1.
 Qed.
 
 (* Integer divisibility. *)

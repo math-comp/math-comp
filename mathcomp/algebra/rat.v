@@ -801,7 +801,7 @@ Proof. by rewrite normrEsign denq_mulr_sign. Qed.
 Fact rat_archimedean : Num.archimedean_axiom [numDomainType of rat].
 Proof.
 move=> x; exists `|numq x|.+1; rewrite mulrS ltr_spaddl //.
-rewrite pmulrn abszE intr_norm numqE normrM ler_pemulr //.
+rewrite pmulrn abszE intr_norm numqE normrM lerpeMr //.
 by rewrite -intr_norm ler1n absz_gt0 denq_eq0.
 Qed.
 

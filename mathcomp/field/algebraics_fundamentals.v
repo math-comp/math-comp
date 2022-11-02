@@ -141,7 +141,7 @@ rewrite coef_map /= fmorph_eq_rat (le_trans (real_ler_norm _)) //.
 rewrite normrN normrM lerpM //.
   rewrite normf_div -!intr_norm -!abszE ler_pimulr ?ler0n //.
   by rewrite invf_le1 ?ler1n ?ltr0n absz_gt0.
-rewrite normrX ger0_norm ?(ltrW x_gt0) // ler_weexpn2l ?leq_ord //.
+rewrite normrX ger0_norm ?(ltrW x_gt0) // lerweX2l ?leq_ord //.
 by rewrite (le_trans _ lb_x) // natr1 ler1n.
 Qed.
 
@@ -510,7 +510,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     rewrite ltr_pdivr_mulr // -(ltrD2l h2) -mulr2n -mulr_natl divff //.
     rewrite -normr1 -(hornerC 1 a) -[1%:P]r_pq_1 hornerD.
     rewrite ?(le_lt_trans (ler_normD _ _)) ?ltr_leD ?ub_rp //.
-    by rewrite mulrC hornerM normrM ler_wpmul2l ?ubM.
+    by rewrite mulrC hornerM normrM lerwpM2l ?ubM.
   have ab_le m n: (m <= n)%N -> (ab_ n).2 \in Iab_ m.
     move/subnKC=> <-; move: {n}(n - m)%N => n; rewrite /ab_.
     have /(findP m)[/(findP n)[[_ _]]] := xab0.
@@ -536,7 +536,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     case: (find _ _ _) => c d /= le_cd [/= le_ac le_db] _ /(_ c)/implyP.
     rewrite inE lexx le_cd hornerM hornerC normrM le_gtF //.
     rewrite ger0_norm ?divr_ge0 ?invr_ge0 ?ler0n ?(ltW e_gt0) // mulrAC.
-    rewrite ler_pdivl_mulr // ler_wpmul2l ?invr_ge0 ?ler0n // ltW // v_gte //=.
+    rewrite ler_pdivl_mulr // lerwpM2l ?invr_ge0 ?ler0n // ltW // v_gte //=.
     by rewrite inE -/b (le_trans le_a) //= (le_trans le_cd).
   pose lim_pos m v := exists2 e, e > 0 & forall n, (m <= n)%N -> e < nlim v n.
   have posP v: reflect (exists m, lim_pos m v) (lt 0 v).

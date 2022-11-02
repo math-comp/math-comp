@@ -173,7 +173,7 @@ Lemma add0z : left_id 0 addz. Proof. by move=> [] [|]. Qed.
 
 Lemma oppzK : involutive oppz. Proof. by do 2?case. Qed.
 
-Lemma oppz_add : {morph oppz : m n / m + n}.
+Lemma oppzD : {morph oppz : m n / m + n}.
 Proof.
 by move=> [[|n]|n] [[|m]|m] /=; rewrite ?addn0 ?subn0 ?addnS //;
   rewrite !NegzE !ltnS !subSS; case: ltngtP => [?|?|->];
@@ -185,7 +185,7 @@ Proof. by case: (intP n)=> // n' /= _; rewrite ?(subn1, addn0). Qed.
 
 Lemma subSz1 (n : int) : 1 + n - 1 = n.
 Proof.
-by apply: (inv_inj oppzK); rewrite addzC !oppz_add oppzK [_ - n]addzC add1Pz.
+by apply: (inv_inj oppzK); rewrite addzC !oppzD oppzK [_ - n]addzC add1Pz.
 Qed.
 
 Lemma addSnz (m : nat) (n : int) : (m.+1%N) + n = 1 + (m + n).
@@ -200,20 +200,20 @@ Lemma addSz (m n : int) : (1 + m) + n = 1 + (m + n).
 Proof.
 case: m => [] m; first by rewrite -PoszD add1n addSnz.
 rewrite !NegzE; apply: (inv_inj oppzK).
-rewrite !oppz_add !oppzK addSnz [-1%:Z + _]addzC addSnz add1Pz.
+rewrite !oppzD !oppzK addSnz [-1%:Z + _]addzC addSnz add1Pz.
 by rewrite [-1%:Z + _]addzC subSz1.
 Qed.
 
 Lemma addPz (m n : int) : (m - 1) + n = (m + n) - 1.
 Proof.
-by apply: (inv_inj oppzK); rewrite !oppz_add oppzK [_ + 1]addzC addSz addzC.
+by apply: (inv_inj oppzK); rewrite !oppzD oppzK [_ + 1]addzC addSz addzC.
 Qed.
 
 Lemma addzA : associative addz.
 Proof.
 elim=> [|m ihm|m ihm] n p; first by rewrite !add0z.
   by rewrite -add1n PoszD !addSz ihm.
-by rewrite -add1n addnC PoszD oppz_add !addPz ihm.
+by rewrite -add1n addnC PoszD oppzD !addPz ihm.
 Qed.
 
 Lemma addNz : left_inverse (0:int) oppz addz. Proof. by do 3?elim. Qed.
@@ -257,7 +257,7 @@ Variant int_spec (x : int) : int -> Type :=
 Lemma intP x : int_spec x x.
 Proof. by move: x=> [] [] *; rewrite ?NegzE; constructor. Qed.
 
-Definition oppz_add := (@opprD [zmodType of int]).
+Definition oppzD := (@opprD [zmodType of int]).
 
 Lemma subzn (m n : nat) : (n <= m)%N -> m%:Z - n%:Z = (m - n)%N.
 Proof.
@@ -270,6 +270,8 @@ Lemma subzSS (m n : nat) : m.+1%:Z - n.+1%:Z = m%:Z - n%:Z.
 Proof. by elim: n m=> [|n ihn] m //; rewrite !subzn. Qed.
 
 End intZmoduleTheory.
+#[deprecated(since="mathcomp 1.16.0", note="Use oppzD instead.")]
+Notation oppz_add := oppzD.
 
 Module intRing.
 Section intRing.
@@ -1278,7 +1280,7 @@ Lemma ler_wpiexpz2l x (x0 : 0 <= x) (x1 : x <= 1) :
   {in >= 0 &, {homo (exprz x) : x y /~ x <= y}}.
 Proof.
 move=> [] m [] n; rewrite -!topredE /= ?oppr_cp0 ?ltz_nat // => _ _.
-by rewrite lez_nat -?exprnP=> /ler_wiexpn2l; apply.
+by rewrite lez_nat -?exprnP => /lerwiX2l; apply.
 Qed.
 
 Lemma ler_wniexpz2l x (x0 : 0 <= x) (x1 : x <= 1) :
@@ -1287,14 +1289,14 @@ Proof.
 move=> [] m [] n; rewrite ?NegzE -!topredE /= ?oppr_cp0 ?ltz_nat // => _ _.
 rewrite lerN2 lez_nat -?invr_expz=> hmn; have := x0.
 rewrite le0r=> /predU1P [->|lx0]; first by rewrite !exp0rz invr0.
-by rewrite lefpV2 -?topredE /= ?exprz_gt0 // ler_wiexpn2l.
+by rewrite lefpV2 -?topredE /= ?exprz_gt0 // lerwiX2l.
 Qed.
 
 Fact ler_wpeexpz2l x (x1 : 1 <= x) :
   {in >= 0 &, {homo (exprz x) : x y / x <= y}}.
 Proof.
 move=> [] m [] n; rewrite -!topredE /= ?oppr_cp0 ?ltz_nat // => _ _.
-by rewrite lez_nat -?exprnP=> /ler_weexpn2l; apply.
+by rewrite lez_nat -?exprnP=> /lerweX2l; apply.
 Qed.
 
 Fact ler_wneexpz2l x (x1 : 1 <= x) :

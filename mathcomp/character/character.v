@@ -1622,7 +1622,7 @@ rewrite cfkerEirr inE /= -(inj_eq (mulfI Ci)).
 have:= (normC_sum_upper _ Kx) i; rewrite !cfunE => -> // {Ci}i _.
 have chi_i_ge0: 0 <= '[chi, 'chi_i].
   by rewrite Cnat_ge0 ?Cnat_cfdot_char_irr.
-by rewrite !cfunE normrM (normr_idP _) ?ler_wpmul2l ?char1_ge_norm ?irr_char.
+by rewrite !cfunE normrM (normr_idP _) ?lerwpM2l ?char1_ge_norm ?irr_char.
 Qed.
 
 Lemma TI_cfker_irr : \bigcap_i cfker 'chi[G]_i = [1].

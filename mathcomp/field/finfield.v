@@ -634,7 +634,7 @@ pose aq d : algC := (cyclotomic (z ^+ (n %/ d)) d).[q%:R].
 suffices: `|aq n| <= (q - 1)%:R.
   rewrite eq_le lerB_dist andbT n1z normr_nat natrB //; apply: le_trans.
   rewrite {}/aq horner_prod divnn n_gt0 expr1 normr_prod.
-  rewrite (bigD1 (Ordinal n_gt1)) ?coprime1n //= !hornerE ler_pemulr //.
+  rewrite (bigD1 (Ordinal n_gt1)) ?coprime1n //= !hornerE lerpeMr //.
   elim/big_ind: _ => // [|d _]; first exact: mulr_ege1.
   rewrite !hornerE; apply: le_trans (lerB_dist _ _).
   by rewrite normr_nat normrX n1z expr1n lerBDl (leC_nat 2).

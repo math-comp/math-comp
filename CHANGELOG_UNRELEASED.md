@@ -196,12 +196,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `minr_nmulr` -> `minrnMr`
   + `minr_nmull` -> `minrnMl`
   + `maxr_nmull` -> `maxrnMl`
+  + `ler_iexpn2l` -> `leriX2l`
+  + `ltr_iexpn2l` -> `ltriX2l`
+  + `lter_iexpn2l` -> `lteriX2l`
+  + `ler_eexpn2l` -> `lereX2l`
+  + `ltr_eexpn2l` -> `ltreX2l`
+  + `lter_eexpn2l` -> `ltereX2l`
+  + `ler_wpmul2l` -> `lerwpM2l`
+  + `ler_wpmul2r` -> `lerwpM2r`
+  + `ler_wnmul2l` -> `lerwnM2l`
+  + `ler_wnmul2r` -> `lerwnM2r`
+  + `ler_pemull` -> `lerpeMl`
+  + `ler_nemull` -> `lerneMl`
+  + `ler_pemulr` -> `lerpeMr`
+  + `ler_nemulr` -> `lerneMr`
+  + `ler_iexpr` -> `leriXr`
+  + `ltr_iexpr` -> `ltriXr`
+  + `lter_iexpr` -> `lteriXr`
+  + `ler_eexpr` -> `lereXr`
+  + `ltr_eexpr` -> `ltreXr`
+  + `lter_eexpr` -> `ltereXr`
+  + `lter_expr` -> `lterXr`
+  + `ler_wiexpn2l` -> `lerwiX2l`
+  + `ler_weexpn2l` -> `lerweX2l`
+  + `lteif_pmul2l` -> `lteifpM2l`
+  + `lteif_pmul2r` -> `lteifpM2r`
+  + `lteif_nmul2l` -> `lteifnM2l`
+  + `lteif_nmul2r` -> `lteifnM2r`
 - in `ssrint.v`:
   + `leq_add_dist` -> `leqD_dist`
   + `lez_add1r` -> `lez1D`
   + `lez_addr1` -> `lezD1`
   + `ltz_add1r` -> `ltz1D`
   + `ltz_addr1` -> `ltzD1`
+  + `oppz_add` -> `oppzD`
 
 ### Removed
 
