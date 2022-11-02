@@ -2471,23 +2471,23 @@ Proof. by move=> hy hx; rewrite -{1}[y]mulr1 lerwpM2l. Qed.
 Lemma lerneMr x y : y <= 0 -> 1 <= x -> y * x <= y.
 Proof. by move=> hy hx; rewrite -{2}[y]mulr1 lerwnM2l. Qed.
 
-Lemma ler_pimull x y : 0 <= y -> x <= 1 -> x * y <= y.
+Lemma lerpiMl x y : 0 <= y -> x <= 1 -> x * y <= y.
 Proof. by move=> hy hx; rewrite -{2}[y]mul1r lerwpM2r. Qed.
 
-Lemma ler_nimull x y : y <= 0 -> x <= 1 -> y <= x * y.
+Lemma lerniMl x y : y <= 0 -> x <= 1 -> y <= x * y.
 Proof. by move=> hy hx; rewrite -{1}[y]mul1r lerwnM2r. Qed.
 
-Lemma ler_pimulr x y : 0 <= y -> x <= 1 -> y * x <= y.
+Lemma lerpiMr x y : 0 <= y -> x <= 1 -> y * x <= y.
 Proof. by move=> hy hx; rewrite -{2}[y]mulr1 lerwpM2l. Qed.
 
-Lemma ler_nimulr x y : y <= 0 -> x <= 1 -> y <= y * x.
+Lemma lerniMr x y : y <= 0 -> x <= 1 -> y <= y * x.
 Proof. by move=> hx hy; rewrite -{1}[y]mulr1 lerwnM2l. Qed.
 
 Lemma mulr_ile1 x y : 0 <= x -> 0 <= y -> x <= 1 -> y <= 1 -> x * y <= 1.
-Proof. by move=> *; rewrite (@le_trans _ _ y) ?ler_pimull. Qed.
+Proof. by move=> *; rewrite (@le_trans _ _ y) ?lerpiMl. Qed.
 
 Lemma mulr_ilt1 x y : 0 <= x -> 0 <= y -> x < 1 -> y < 1 -> x * y < 1.
-Proof. by move=> *; rewrite (@le_lt_trans _ _ y) ?ler_pimull // ltW. Qed.
+Proof. by move=> *; rewrite (@le_lt_trans _ _ y) ?lerpiMl // ltW. Qed.
 
 Definition mulr_ilte1 := (mulr_ile1, mulr_ilt1).
 
@@ -2576,7 +2576,7 @@ Definition exprn_egte1 := (exprn_ege1, exprn_egt1).
 Definition exprn_cp1 := (exprn_ilte1, exprn_egte1).
 
 Lemma leriXr x n : (0 < n)%N -> 0 <= x -> x <= 1 -> x ^+ n <= x.
-Proof. by case: n => n // *; rewrite exprS ler_pimulr // exprn_ile1. Qed.
+Proof. by case: n => n // *; rewrite exprS lerpiMr // exprn_ile1. Qed.
 
 Lemma ltriXr x n : 0 < x -> x < 1 -> (x ^+ n < x) = (1 < n)%N.
 Proof.
@@ -2605,7 +2605,7 @@ Lemma lerwiX2l x :
   0 <= x -> x <= 1 -> {homo GRing.exp x : m n / (n <= m)%N >-> m <= n}.
 Proof.
 move=> xge0 xle1 m n /= hmn.
-by rewrite -(subnK hmn) exprD ler_pimull ?(exprn_ge0, exprn_ile1).
+by rewrite -(subnK hmn) exprD lerpiMl ?(exprn_ge0, exprn_ile1).
 Qed.
 
 Lemma lerweX2l x : 1 <= x -> {homo GRing.exp x : m n / (m <= n)%N >-> m <= n}.
@@ -2664,7 +2664,7 @@ Proof.
 move=> xge0 xlty; case: n; first by rewrite ltxx.
 elim=> [|n IHn]; rewrite ?[_ ^+ _.+2]exprS //.
 rewrite (@le_lt_trans _ _ (x * y ^+ n.+1)) ?lerwpM2l ?ltrpM2r ?IHn //.
-  by rewrite ltW // ihn.
+  by rewrite ltW.
 by rewrite exprn_gt0 // (le_lt_trans xge0).
 Qed.
 
@@ -3822,6 +3822,14 @@ Notation lteif_pmul2r := lteifpM2r.
 Notation lteif_nmul2l := lteifnM2l.
 #[deprecated(since="mathcomp 1.16.0", note="Use lteifnM2r instead.")]
 Notation lteif_nmul2r := lteifnM2r.
+#[deprecated(since="mathcomp 1.16.0", note="Use lerpiMl instead.")]
+Notation ler_pimull := lerpiMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use lerniMl instead.")]
+Notation ler_nimull := lerniMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use lerpiMr instead.")]
+Notation ler_pimulr := lerpiMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use lerniMr instead.")]
+Notation ler_nimulr := lerniMr.
 
 #[global] Hint Resolve lerN2 ltrN2 real0 real1 normr_real : core.
 Arguments ler_sqr {R} [x y].
@@ -5469,29 +5477,6 @@ Arguments sqrCK_P {C x}.
   solve [apply: Creal_Im] : core.
 
 End Theory.
-Notation ltr_distl_addr := ltr_distlDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlDr instead.")]
-Notation ler_distl_addr := ler_distlDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_distlCDr instead.")]
-Notation ltr_distlC_addr := ltr_distlCDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlCDr instead.")]
-Notation ler_distlC_addr := ler_distlCDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_distlBl instead.")]
-Notation ltr_distl_subl := ltr_distlBl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlBl instead.")]
-Notation ler_distl_subl := ler_distlBl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_distlCBl instead.")]
-Notation ltr_distlC_subl := ltr_distlCBl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlCBl instead.")]
-Notation ler_distlC_subl := ler_distlCBl.
-#[deprecated(since="mathcomp 1.16.0", note="Use real_maxrnMr instead.")]
-Notation maxr_nmulr := maxrnMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use minrnMr instead.")]
-Notation minr_nmulr := minrnMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use minrnMl instead.")]
-Notation minr_nmull := minrnMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use maxrnMl instead.")]
-Notation maxr_nmull := maxrnMl.
 
 (*************)
 (* FACTORIES *)
@@ -5611,6 +5596,29 @@ Definition NumDomainOfIdomain (T : idomainType) (m : of_ T) :=
 Notation ler_norm_add := ler_normD.
 #[deprecated(since="mathcomp 1.16.0", note="Use ler_normB instead.")]
 Notation ler_norm_sub := ler_normB.
+Notation ltr_distl_addr := ltr_distlDr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlDr instead.")]
+Notation ler_distl_addr := ler_distlDr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltr_distlCDr instead.")]
+Notation ltr_distlC_addr := ltr_distlCDr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlCDr instead.")]
+Notation ler_distlC_addr := ler_distlCDr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltr_distlBl instead.")]
+Notation ltr_distl_subl := ltr_distlBl.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlBl instead.")]
+Notation ler_distl_subl := ler_distlBl.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltr_distlCBl instead.")]
+Notation ltr_distlC_subl := ltr_distlCBl.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlCBl instead.")]
+Notation ler_distlC_subl := ler_distlCBl.
+#[deprecated(since="mathcomp 1.16.0", note="Use real_maxrnMr instead.")]
+Notation maxr_nmulr := maxrnMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use minrnMr instead.")]
+Notation minr_nmulr := minrnMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use minrnMl instead.")]
+Notation minr_nmull := minrnMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use maxrnMl instead.")]
+Notation maxr_nmull := maxrnMl.
 End Exports.
 
 End NumMixin.

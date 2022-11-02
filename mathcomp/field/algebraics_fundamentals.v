@@ -139,7 +139,7 @@ rewrite natr_sum mulr_suml ler_sum // => j _.
 rewrite coef_map /= fmorph_eq_rat (le_trans (real_ler_norm _)) //.
   by rewrite rpredN rpredM ?rpred_rat ?rpredX // ger0_real.
 rewrite normrN normrM lerpM //.
-  rewrite normf_div -!intr_norm -!abszE ler_pimulr ?ler0n //.
+  rewrite normf_div -!intr_norm -!abszE lerpiMr ?ler0n //.
   by rewrite invf_le1 ?ler1n ?ltr0n absz_gt0.
 rewrite normrX ger0_norm ?(ltrW x_gt0) // lerweX2l ?leq_ord //.
 by rewrite (le_trans _ lb_x) // natr1 ler1n.

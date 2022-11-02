@@ -223,6 +223,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `lteif_pmul2r` -> `lteifpM2r`
   + `lteif_nmul2l` -> `lteifnM2l`
   + `lteif_nmul2r` -> `lteifnM2r`
+  + `ler_pimull` -> `lerpiMl`
+  + `ler_nimull` -> `lerniMl`
+  + `ler_pimulr` -> `lerpiMr`
+  + `ler_nimulr` -> `lerniMr`
 - in `ssrint.v`:
   + `leq_add_dist` -> `leqD_dist`
   + `lez_add1r` -> `lez1D`
@@ -230,6 +234,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ltz_add1r` -> `ltz1D`
   + `ltz_addr1` -> `ltzD1`
   + `oppz_add` -> `oppzD`
+  + `ler_wpiexpz2l` -> `lerwpiXz2l`
+  + `ler_wniexpz2l` -> `lerwniXz2l`
+  + `ler_wpeexpz2l` -> `lerwpeXz2l`
+  + `ler_wneexpz2l` -> `lerwneXz2l`
+  + `ler_weexpz2l` -> `lerweXz2l`
+  + `ler_piexpz2l` -> `lerpiXz2l`
+  + `ltr_piexpz2l` -> `ltrpiXz2l`
+  + `ler_niexpz2l` -> `lerniXz2l`
+  + `ltr_niexpz2l` -> `ltrniXz2l`
+  + `ler_eexpz2l` -> `lereXz2l`
+  + `ltr_eexpz2l` -> `ltreXz2l`
+  + `ler_wpexpz2r` -> `lerwpXz2r`
+  + `ler_wnexpz2r` -> `lerwnXz2r`
 
 ### Removed
 
