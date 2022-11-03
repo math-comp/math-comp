@@ -51,6 +51,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `big_ord1_eq`, `big_ord1_cond_eq`, `big_nat1_eq`,
     `big_nat1_cond_eq`
 
+- in `eqtype.v`
+  + lemmas `existsb` and `exists_inb`
+
 - in `seq.v`
   + lemma `if_nth`
 
