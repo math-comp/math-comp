@@ -289,13 +289,19 @@ Definition prodv :=
 Canonical prodv_unlockable := [unlockable fun prodv].
 Local Notation "A * B" := (prodv A B) : vspace_scope.
 
+Lemma prodvEbasis U V : (U * V =
+  \sum_(i < \dim U) \sum_(j < \dim V) <[(vbasis U)`_i * (vbasis V)`_j]>)%VS.
+Proof.
+rewrite [prodv]unlock span_def/= big_allpairs_dep/=.
+under eq_bigr do rewrite (big_nth 0) big_mkord size_tuple.
+by rewrite (big_nth 0) big_mkord size_tuple.
+Qed.
+
 Lemma memv_mul U V : {in U & V, forall u v, u * v \in (U * V)%VS}.
 Proof.
-move=> u v /coord_vbasis-> /coord_vbasis->.
-rewrite mulr_suml; apply: memv_suml => i _.
-rewrite mulr_sumr; apply: memv_suml => j _.
-rewrite -scalerAl -scalerAr !memvZ // [prodv]unlock memv_span //.
-by apply/allpairsP; exists ((vbasis U)`_i, (vbasis V)`_j); rewrite !memt_nth.
+move=> u v /coord_vbasis-> /coord_vbasis->; rewrite prodvEbasis mulr_suml.
+rewrite memv_sumr// => i _; rewrite -scalerAl rpredZ// mulr_sumr.
+by rewrite memv_sumr// => j _; rewrite -scalerAr rpredZ// memv_line.
 Qed.
 
 Lemma prodvP {U V W} :
@@ -303,33 +309,14 @@ Lemma prodvP {U V W} :
 Proof.
 apply: (iffP idP) => [sUVW u v Uu Vv | sUVW].
   by rewrite (subvP sUVW) ?memv_mul.
-rewrite [prodv]unlock; apply/span_subvP=> _ /allpairsP[[u v] /= [Uu Vv ->]].
-by rewrite sUVW ?vbasis_mem.
-Qed.
-
-Lemma memv_mulP {U V} {w} :
-  reflect (exists n (us vs : n.-tuple aT),
-             [/\ all (mem U) us, all (mem V) vs &
-                 w = \sum_(i < n) tnth us i * tnth vs i])
-          (w \in (U * V)%VS).
-Proof.
-apply: (iffP idP) => [|[b [us [vs [usU vsV ->]]]]]; last first.
-  by rewrite rpred_sum// => i _; rewrite memv_mul//; apply/all_tnthP.
-rewrite unlock span_def big_tuple => /memv_sumP[/= w_ w_mem ->].
-have wP_ i : exists2 uv, (uv.1 \in U) && (uv.2 \in V) & w_ i = uv.1 * uv.2.
-  have /vlineP[k ->] := w_mem i isT; set UV := (X in tnth X _).
-  have /allpairsP[[u v] [uP vP ->]] := mem_tnth i UV.
-  by exists (k *: u, v); rewrite /= ?rpredZ ?vbasis_mem// scalerAl.
-pose d := (\dim U * \dim V)%N; pose uv i := (projT1 (sig2_eqW (wP_ i))).
-exists d, [tuple (uv i).1 | i < _], [tuple (uv i).2 | i < _]; rewrite /uv.
-split; do ?by apply/allP => _/mapP[i _ ->]; case: sig2_eqW => /= ? /andP[].
-by apply: eq_bigr => i; rewrite !tnth_map/= tnth_ord_tuple; case: sig2_eqW.
+rewrite prodvEbasis pair_big; apply/subv_sumP => -[/= i j] _.
+by apply: sUVW; rewrite ?vbasis_mem ?mem_nth ?size_tuple.
 Qed.
 
 Lemma prodv_line u v : (<[u]> * <[v]> = <[u * v]>)%VS.
 Proof.
 apply: subv_anti; rewrite -memvE memv_mul ?memv_line // andbT.
-apply/prodvP=> _ _ /vlineP[a ->] /vlineP[b ->].
+apply/prodvP => _ _ /vlineP[a ->] /vlineP[b ->].
 by rewrite -scalerAr -scalerAl !memvZ ?memv_line.
 Qed.
 
@@ -422,30 +409,35 @@ Qed.
 HB.instance Definition _ := Monoid.isLaw.Build {vspace aT} 1%VS prodv
   prodvA prod1v prodv1.
 
-Lemma big_prodv_seqP (I : eqType) (r : seq I) (P : {pred I}) {U}
-    {V : I -> {vspace aT}} {W} : uniq r ->
-  reflect (forall u (v : I -> aT), u \in U ->
-          (forall i, P i -> v i \in V i) ->
-          \big[*%R/u]_(i <- r | P i) v i \in W)
-    (\big[prodv/U]_(i <- r | P i) V i <= W)%VS.
+Lemma prodv_spanl u vs : (<[u]> * <<vs>> = \sum_(i < size vs) <[u * vs`_i]>)%VS.
 Proof.
-elim/last_ind: r => [|r i IHr] //= in U W * => [_|].
-  apply: (iffP idP) => [+ v u uP vP|]; rewrite !big_nil; first by move/subvP->.
-  move=> WP; apply/subvP => u /(WP _ (fun=> 0)); rewrite big_nil; apply.
-  by move=> i; rewrite mem0v.
-rewrite rcons_uniq => /andP[iNr r_uniq].
-apply: (iffP idP) => [+ u v uU vV|WP]; rewrite !big_rcons_op.
-  by move=> /IHr; apply => //; case: ifP => Pi//; rewrite memv_mul// vV.
-case: ifP => Pi; last first.
-  by apply/IHr => // u v uU vV; have := WP _  _ uU vV; rewrite big_rcons_op Pi.
-apply/IHr => //w v /memv_mulP[n [vs [us [/allP/= vsP /allP/= usP ->]]]] vV.
-rewrite big_change_idx/= mulr_sumr rpred_sum// => j _; rewrite -big_change_idx.
-have := WP (tnth us j) (fun k : I => if k == i then tnth vs j else v k).
-rewrite big_rcons_op Pi eqxx big_seq_cond.
-under eq_bigr => k /andP[kr]
-   do [rewrite ifN; last by apply: contraNneq iNr => <-].
-rewrite -big_seq_cond; apply; first by rewrite usP ?mem_tnth.
-by move=> k Pk; case: eqP => [->|]; rewrite ?vV ?vsP ?mem_tnth.
+rewrite span_def (big_nth 0) big_mkord big_distrr/=.
+by apply: eq_bigr => i _; rewrite prodv_line.
+Qed.
+
+Lemma prodv_spanr us v : (<<us>> * <[v]> = \sum_(i < size us) <[us`_i * v]>)%VS.
+Proof.
+rewrite span_def (big_nth 0) big_mkord big_distrl/=.
+by apply: eq_bigr => i _; rewrite prodv_line.
+Qed.
+
+Lemma prodv_span us vs :
+  (<<us>> * <<vs>> = \sum_(i < size us) \sum_(j < size vs) <[us`_i * vs`_j]>)%VS.
+Proof.
+rewrite span_def (big_nth 0) big_mkord big_distrl/=.
+by apply: eq_bigr => i _; rewrite prodv_spanl.
+Qed.
+
+Lemma big_prodv_line (I : finType) (P : {pred I}) (v : I -> aT) :
+  (\big[prodv/1%VS]_(i | P i) <[v i]> = <[\prod_(i | P i) v i]>)%VS.
+Proof. by elim/big_rec2: _ => //= ? ? ? ? ->; rewrite prodv_line. Qed.
+
+Lemma memv_prod (I : finType) (P : {pred I}) (V : I -> {vspace aT}) w :
+  (forall i, P i -> w i \in V i) ->
+  \prod_(i | P i) w i \in \big[prodv/1%VS]_(i | P i) V i.
+Proof.
+move=> vV; elim/big_rec2: _ => //=; rewrite ?memv_line// => j U u Pj uU.
+by apply: memv_mul=> //; apply: vV.
 Qed.
 
 Definition expv U n := iterop n.+1.-1 prodv U 1%VS.
@@ -714,11 +706,68 @@ rewrite -(span_basis (vbasisP U)) limg_span !span_def big_distrl /= big_map.
 by apply: eq_bigr => u; rewrite prodv_line lfunE.
 Qed.
 
+Lemma limg_amull U v : (amull v @: U = <[v]> * U)%VS.
+Proof.
+rewrite -(span_basis (vbasisP U)) limg_span !span_def big_distrr /= big_map.
+by apply: eq_bigr => u; rewrite prodv_line lfunE.
+Qed.
+
 Lemma memv_cosetP {U v w} :
-  reflect (exists2 u, u\in U & w = u * v) (w \in U * <[v]>)%VS.
+  reflect (exists2 u, u \in U & w = u * v) (w \in U * <[v]>)%VS.
 Proof.
 rewrite -limg_amulr.
 by apply: (iffP memv_imgP) => [] [u] Uu ->; exists u; rewrite ?lfunE.
+Qed.
+
+Lemma memv_cosetPl {U v w} :
+  reflect (exists2 u, u \in U & w = v * u) (w \in (<[v]> * U)%VS).
+Proof.
+rewrite -limg_amull.
+by apply: (iffP memv_imgP) => [] [u] Uu ->; exists u; rewrite ?lfunE.
+Qed.
+
+Lemma memv_mulP {U V} {w} :
+  reflect (exists n (us vs : n.-tuple aT),
+             [/\ all (mem U) us, all (mem V) vs &
+                 w = \sum_(i < n) tnth us i * tnth vs i])
+          (w \in U * V)%VS.
+Proof.
+apply: (iffP idP) => [|[n [us [vs [/allP/= usU /allP/= vsV ->]]]]]; last first.
+  by rewrite rpred_sum => // i _; rewrite memv_mul// (usU, vsV) ?mem_tnth.
+rewrite -{1}(span_basis (vbasisP U)) span_def big_distrl/= big_tuple.
+move=> /memv_sumP[/= {}w /(_ _ isT)/memv_cosetPl/sig2_eqW-/all_sig2[v vV wE] ->].
+exists _, (vbasis U), [tuple v i | i < _].
+split; first by apply/allP=> x /vbasis_mem.
+  by apply/allP=> _/imageP[i iU ->]/=; exact: vV.
+by apply: eq_bigr => i _; rewrite wE tnth_map tnth_ord_tuple.
+Qed.
+
+Lemma big_prodvE (I : finType) (P : {pred I}) (V : I -> {vspace aT}) :
+  \big[@prodv _ _ /1%VS]_(i | P i) V i =
+   (\sum_(f in pffun_on (Ordinal (adim_gt0 _)) P (xpredT : {pred 'I_(\dim {:aT})}))
+     <[\prod_(i | P i) (vbasis (V i))`_(f i)]>)%VS.
+Proof.
+under [X in (X = _)%VS]eq_bigr do rewrite -[V _](span_basis (vbasisP _))
+                                  span_def (big_nth 0) big_mkord size_tuple.
+under [X in (_ = X)%VS]eq_bigr => i do rewrite -big_prodv_line.
+pose F i j := <[(vbasis (V i))`_j]>%VS.
+rewrite -(big_distr_big _ _ _ (fun i (j : 'I__) => F i j)).
+apply: eq_bigr => // i _.
+  rewrite (big_ord_widen (\dim {: aT}) (F i))//= ?dimvS ?subvf//.
+rewrite big_mkcond/=; apply: eq_bigr => j _; case: ltnP => ? //.
+by rewrite /F//= nth_default//= size_tuple.
+Qed.
+
+Lemma big_prodvP (I : finType) (P : {pred I}) (V : I -> {vspace aT}) (W : {vspace aT}) :
+  reflect (forall (v : I -> aT),
+      (forall i, P i -> v i \in V i) -> \prod_(i | P i) v i \in W)
+    (\big[@prodv _ _/1%VS]_(i | P i) V i <= W)%VS.
+Proof.
+apply: (iffP idP) => [/subvP + v vV|WP] => [->//|]; first by rewrite memv_prod.
+rewrite big_prodvE; apply/subv_sumP => /= f _; rewrite -memvE WP// => i Pi.
+case: (ltnP (f i) (\dim (V i))) => ? //.
+  by rewrite vbasis_mem ?mem_nth// ?size_tuple.
+by rewrite nth_default ?mem0v ?size_tuple.
 Qed.
 
 Lemma dim_cosetv_unit V u : u \is a GRing.unit -> \dim (V * <[u]>) = \dim V.
@@ -1002,7 +1051,7 @@ Notation "<< U >>" := (agenv_aspace U) : aspace_scope.
 Notation "<< U & vs >>" := (agenv (U + <<vs>>)) : vspace_scope.
 Notation "<< U ; x >>" := (agenv (U + <[x]>)) : vspace_scope.
 Notation "<< U & vs >>" := << U + <<vs>> >>%AS : aspace_scope.
-Notation "<< U ; x >>" := << U + <[x]> >>%AS : aspace_scope. 
+Notation "<< U ; x >>" := << U + <[x]> >>%AS : aspace_scope.
 
 Section SubFalgType.
 

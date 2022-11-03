@@ -343,23 +343,6 @@ Proof. by move/field_module_dimS/divnK. Qed.
 Lemma dim_sup_field F E : (F <= E)%VS -> \dim E = (\dim_F E * \dim F)%N.
 Proof. by move/field_dimS/divnK. Qed.
 
-Lemma big_prod_subfield_seqP (I : eqType) (r : seq I) (P : {pred I})
-   (U : I -> {vspace L}) (W : {subfield L}) : uniq r ->
-  reflect (forall u : I -> L, (forall i, P i -> u i \in U i) ->
-                               \prod_(i <- r | P i) u i \in W)
-          (\big[@prodv _ _/1%VS]_(i <- r | P i) U i <= W)%VS.
-Proof.
-move=> /big_prodv_seqP/iffP; apply => // [WP u uU|WP u v uU vV].
-  by apply: WP; rewrite ?mem1v.
-by rewrite big_change_idx/= memvM ?WP//; apply/subvP: uU; rewrite sub1v.
-Qed.
-
-Lemma big_prod_subfieldP (I : finType) (D : {pred I})
-   (U : I -> {vspace L}) (W : {subfield L}) :
-  reflect (forall u : I -> L, (forall i, D i -> u i \in U i) ->
-                               \prod_(i in D) u i \in W)
-          (\big[@prodv _ _/1%VS]_(i in D) U i <= W)%VS.
-Proof. by apply/big_prod_subfield_seqP/index_enum_uniq. Qed.
 
 Lemma field_module_semisimple F M (m := \dim_F M) :
     (F * M <= M)%VS ->
@@ -1521,65 +1504,66 @@ Qed.
 (*Coq 8.3 processes this shorter proof correctly, but then crashes on Qed.
   In Coq 8.4 Qed takes about 18s.
   In Coq 8.7, everything seems to be all right *)
-(* Lemma Xirredp_FAdjoin' (F : fieldType) (p : {poly F}) : *)
-(*     irreducible_poly p -> *)
-(*   {L : fieldExtType F & \dim {: L} = (size p).-1 & *)
-(*     {z | root (map_poly (in_alg L) p) z & <<1; z>>%VS = fullv}}. *)
-(* Proof. *)
-(* case=> p_gt1 irr_p; set n := (size p).-1; pose vL := [vectType F of 'rV_n]. *)
-(* have Dn: n.+1 = size p := ltn_predK p_gt1. *)
-(* have nz_p: p != 0 by rewrite -size_poly_eq0 -Dn. *)
-(* pose toL q : vL := poly_rV (q %% p). *)
-(* have toL_K q : rVpoly (toL q) = q %% p. *)
-(*   by rewrite poly_rV_K // -ltnS Dn ?ltn_modp -?Dn. *)
-(* pose mul (x y : vL) : vL := toL (rVpoly x * rVpoly y). *)
-(* pose L1 : vL := poly_rV 1. *)
-(* have L1K: rVpoly L1 = 1 by rewrite poly_rV_K // size_poly1 -ltnS Dn. *)
-(* have mulC: commutative mul by rewrite /mul => x y; rewrite mulrC. *)
-(* have mulA: associative mul. *)
-(*   by move=> x y z; rewrite -!(mulC z) /mul !toL_K /toL !modp_mul mulrCA. *)
-(* have mul1: left_id L1 mul. *)
-(*   move=> x; rewrite /mul L1K mul1r /toL modp_small ?rVpolyK // -Dn ltnS. *)
-(*   by rewrite size_poly. *)
-(* have mulD: left_distributive mul +%R. *)
-(*   move=> x y z; apply: canLR rVpolyK _. *)
-(*   by rewrite !raddfD mulrDl /= !toL_K /toL modpD. *)
-(* have nzL1: L1 != 0 by rewrite -(can_eq rVpolyK) L1K raddf0 oner_eq0. *)
-(* pose mulM := GRing.Zmodule_isComRing.Build vL mulA mulC mul1 mulD nzL1. *)
-(* pose rL := ComRingType vL mulM. *)
-(* have mulZlM : GRing.Lmodule_isLalgebra F rL. *)
-(*   constructor => a x y; apply: canRL rVpolyK _. *)
-(*   by rewrite !linearZ /= toL_K -scalerAl modpZl. *)
-(* pose laL := LalgType F rL mulZlM. *)
-(* have mulZrM : GRing.Lalgebra_isAlgebra F laL. *)
-(*   by constructor => a x y; rewrite !(mulrC x) scalerAl. *)
-(* pose aL := AlgType F laL mulZrM. *)
-(* pose uLM := Algebra_isFalgebra.Build F aL. *)
-(* pose cuL := ComUnitRingType uLM _. *)
-(* have unitM : GRing.ComUnitRing_isField cuL. *)
-(*   constructor => x nz_x; apply/unitrP; set q := rVpoly x. *)
-(*   have nz_q: q != 0 by rewrite -(can_eq rVpolyK) raddf0 in nz_x. *)
-(*   have /Bezout_eq1_coprimepP[u upq1]: coprimep p q. *)
-(*     have /contraR := irr_p _ _ (dvdp_gcdl p q); apply. *)
-(*     have: size (gcdp p q) <= size q by apply: leq_gcdpr. *)
-(*     rewrite leqNgt; apply: contra; move/eqp_size ->. *)
-(*     by rewrite (polySpred nz_p) ltnS size_poly. *)
-(*   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC. *)
-(*   congr (poly_rV _); rewrite toL_K modp_mul mulrC (canRL (addKr _) upq1). *)
-(*   by rewrite -mulNr modp_addl_mul_small ?size_poly1. *)
-(* pose feL := FieldExtType _ unitM _. *)
-(* exists feL; first by rewrite dimvf; apply: mul1n. *)
-(* pose z : vL := toL 'X; set iota := in_alg _. *)
-(* have q_z q: rVpoly (map_poly iota q).[z] = q %% p. *)
-(*   elim/poly_ind: q => [|a q IHq]. *)
-(*     by rewrite map_poly0 horner0 linear0 mod0p. *)
-(*   rewrite rmorphD rmorphM /= map_polyX map_polyC hornerMXaddC linearD /=. *)
-(*   rewrite linearZ /= L1K alg_polyC modpD; congr (_ + _); last first. *)
-(*     by rewrite modp_small // size_polyC; case: (~~ _) => //; apply: ltnW. *)
-(*   by rewrite !toL_K IHq mulrC modp_mul mulrC modp_mul. *)
-(* exists z; first by rewrite /root -(can_eq rVpolyK) q_z modpp linear0. *)
-(* apply/vspaceP=> x; rewrite memvf; apply/Fadjoin_polyP. *)
-(* exists (map_poly iota (rVpoly x)). *)
-(*   by apply/polyOverP=> i; rewrite coef_map memvZ ?mem1v. *)
-(* by apply/(can_inj rVpolyK); rewrite q_z modp_small // -Dn ltnS size_poly. *)
-(* Qed. *)
+
+Lemma Xirredp_FAdjoin' (F : fieldType) (p : {poly F}) :
+    irreducible_poly p ->
+  {L : fieldExtType F & Vector.dim L = (size p).-1 &
+    {z | root (map_poly (in_alg L) p) z & <<1; z>>%VS = fullv}}.
+Proof.
+case=> p_gt1 irr_p; set n := (size p).-1; pose vL := [vectType F of 'rV_n].
+have Dn: n.+1 = size p := ltn_predK p_gt1.
+have nz_p: p != 0 by rewrite -size_poly_eq0 -Dn.
+pose toL q : vL := poly_rV (q %% p).
+have toL_K q : rVpoly (toL q) = q %% p.
+  by rewrite poly_rV_K // -ltnS Dn ?ltn_modp -?Dn.
+pose mul (x y : vL) : vL := toL (rVpoly x * rVpoly y).
+pose L1 : vL := poly_rV 1.
+have L1K: rVpoly L1 = 1 by rewrite poly_rV_K // size_poly1 -ltnS Dn.
+have mulC: commutative mul by rewrite /mul => x y; rewrite mulrC.
+have mulA: associative mul.
+  by move=> x y z; rewrite -!(mulC z) /mul !toL_K /toL !modp_mul mulrCA.
+have mul1: left_id L1 mul.
+  move=> x; rewrite /mul L1K mul1r /toL modp_small ?rVpolyK // -Dn ltnS.
+  by rewrite size_poly.
+have mulD: left_distributive mul +%R.
+  move=> x y z; apply: canLR rVpolyK _.
+  by rewrite !raddfD mulrDl /= !toL_K /toL modpD.
+have nzL1: L1 != 0 by rewrite -(can_eq rVpolyK) L1K raddf0 oner_eq0.
+pose mulM := ComRingMixin mulA mulC mul1 mulD nzL1.
+pose rL := ComRingType (RingType vL mulM) mulC.
+have mulZl: GRing.Lalgebra.axiom mul.
+  move=> a x y; apply: canRL rVpolyK _.
+  by rewrite !linearZ /= toL_K -scalerAl modpZl.
+have mulZr: @GRing.Algebra.axiom _ (LalgType F rL mulZl).
+  by move=> a x y; rewrite !(mulrC x) scalerAl.
+pose aL := AlgType F _ mulZr; pose urL := FalgUnitRingType aL.
+pose uaL := [unitAlgType F of AlgType F urL mulZr].
+pose faL := [FalgType F of uaL].
+have unitE: GRing.Field.mixin_of urL.
+  move=> x nz_x; apply/unitrP; set q := rVpoly x.
+  have nz_q: q != 0 by rewrite -(can_eq rVpolyK) raddf0 in nz_x.
+  have /Bezout_eq1_coprimepP[u upq1]: coprimep p q.
+    have /contraR := irr_p _ _ (dvdp_gcdl p q); apply.
+    have: size (gcdp p q) <= size q by apply: leq_gcdpr.
+    rewrite leqNgt; apply: contra; move/eqp_size ->.
+    by rewrite (polySpred nz_p) ltnS size_poly.
+  suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC.
+  congr (poly_rV _); rewrite toL_K modp_mul mulrC (canRL (addKr _) upq1).
+  by rewrite -mulNr modp_addl_mul_small ?size_poly1.
+pose ucrL := [comUnitRingType of ComRingType urL mulC].
+pose fL := FieldType (IdomainType ucrL (GRing.Field.IdomainMixin unitE)) unitE.
+exists [fieldExtType F of faL for fL]; first exact: mul1n.
+pose z : vL := toL 'X; set iota := in_alg _.
+have q_z q: rVpoly (map_poly iota q).[z] = q %% p.
+  elim/poly_ind: q => [|a q IHq].
+    by rewrite map_poly0 horner0 linear0 mod0p.
+  rewrite rmorphD rmorphM /= map_polyX map_polyC hornerMXaddC linearD /=.
+  rewrite linearZ /= L1K alg_polyC modpD; congr (_ + _); last first.
+    by rewrite modp_small // size_polyC; case: (~~ _) => //; apply: ltnW.
+  by rewrite !toL_K IHq mulrC modp_mul mulrC modp_mul.
+exists z; first by rewrite /root -(can_eq rVpolyK) q_z modpp linear0.
+apply/vspaceP=> x; rewrite memvf; apply/Fadjoin_polyP.
+exists (map_poly iota (rVpoly x)).
+  by apply/polyOverP=> i; rewrite coef_map memvZ ?mem1v.
+by apply/(can_inj rVpolyK); rewrite q_z modp_small // -Dn ltnS size_poly.
+Qed.
