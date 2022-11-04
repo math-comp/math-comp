@@ -984,12 +984,18 @@ Proof. exact: (forall_inPP _ (fun=> eqP)). Qed.
 Lemma existsP P : reflect (exists x, P x) [exists x, P x].
 Proof. exact: 'exists_idP. Qed.
 
+Lemma existsb P (x : T) : P x -> [exists x, P x].
+Proof. by move=> Px; apply/existsP; exists x. Qed.
+
 Lemma exists_eqP f1 f2 :
   reflect (exists x, f1 x = f2 x) [exists x, f1 x == f2 x].
 Proof. exact: 'exists_eqP. Qed.
 
 Lemma exists_inP D P : reflect (exists2 x, D x & P x) [exists (x | D x), P x].
 Proof. by apply: (iffP 'exists_andP) => [[x []] | [x]]; exists x. Qed.
+
+Lemma exists_inb D P (x : T) : D x -> P x -> [exists (x | D x), P x].
+Proof. by move=> Dx Px; apply/exists_inP; exists x. Qed.
 
 Lemma exists_inPP D P PP : (forall x, reflect (PP x) (P x)) ->
   reflect (exists2 x, D x & PP x) [exists (x | D x), P x].
@@ -1054,8 +1060,10 @@ Arguments eqfunP {T rT f1 f2}.
 Arguments forall_inP {T D P}.
 Arguments eqfun_inP {T rT D f1 f2}.
 Arguments existsP {T P}.
+Arguments existsb {T P}.
 Arguments exists_eqP {T rT f1 f2}.
 Arguments exists_inP {T D P}.
+Arguments exists_inb {T D P}.
 Arguments exists_eq_inP {T rT D f1 f2}.
 Arguments existsPn {T P}.
 Arguments exists_inPn {T D P}.
