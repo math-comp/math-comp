@@ -227,6 +227,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_nimull` -> `lerniMl`
   + `ler_pimulr` -> `lerpiMr`
   + `ler_nimulr` -> `lerniMr`
+  + `real_oppr_max` -> `realNr_max`
+  + `real_oppr_min` -> `realNr_min`
+  + `real_addr_minl` -> `realDr_minl`
+  + `real_addr_minr` -> `realDr_minr`
+  + `real_addr_maxl` -> `realDr_maxl`
+  + `real_addr_maxr` -> `realDr_maxr`
 - in `ssrint.v`:
   + `leq_add_dist` -> `leqD_dist`
   + `lez_add1r` -> `lez1D`
@@ -247,6 +253,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ltr_eexpz2l` -> `ltreXz2l`
   + `ler_wpexpz2r` -> `lerwpXz2r`
   + `ler_wnexpz2r` -> `lerwnXz2r`
+  + `leqif_add_distz` -> `leqifD_distz`
+  + `leqif_add_dist` -> `leqifD_dist`
 
 ### Removed
 

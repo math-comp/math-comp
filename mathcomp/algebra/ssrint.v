@@ -1757,7 +1757,7 @@ Lemma leqD_dist  m1 m2 m3 : `|m1 - m3| <= `|m1 - m2| + `|m2 - m3|.
 Proof. by rewrite -lez_nat PoszD !abszE ler_distD. Qed.
 
 (* Most of this proof generalizes to all real-ordered rings. *)
-Lemma leqif_add_distz m1 m2 m3 :
+Lemma leqifD_distz m1 m2 m3 :
   `|m1 - m3| <= `|m1 - m2| + `|m2 - m3|
              ?= iff (m1 <= m2 <= m3)%R || (m3 <= m2 <= m1)%R.
 Proof.
@@ -1771,10 +1771,10 @@ rewrite -{1}(subrK m2 m1) -addrA -subr_ge0 andbC -[X in X && _]subr_ge0.
 by apply: leifD; apply/real_leif_norm/num_real.
 Qed.
 
-Lemma leqif_add_dist n1 n2 n3 :
+Lemma leqifD_dist n1 n2 n3 :
   `|n1 - n3| <= `|n1 - n2| + `|n2 - n3|
              ?= iff (n1 <= n2 <= n3) || (n3 <= n2 <= n1).
-Proof. exact: leqif_add_distz. Qed.
+Proof. exact: leqifD_distz. Qed.
 
 Lemma sqrn_dist n1 n2 : `|n1 - n2| ^ 2 + 2 * (n1 * n2) = n1 ^ 2 + n2 ^ 2.
 Proof.
@@ -1790,6 +1790,10 @@ End IntDist.
 
 #[deprecated(since="mathcomp 1.16.0", note="Use leqD_dist instead.")]
 Notation leq_add_dist := leqD_dist.
+#[deprecated(since="mathcomp 1.16.0", note="Use leqifD_distz instead.")]
+Notation leqif_add_distz := leqifD_distz.
+#[deprecated(since="mathcomp 1.16.0", note="Use leqifD_dist instead.")]
+Notation leqif_add_dist := leqifD_dist.
 
 Section NormInt.
 
