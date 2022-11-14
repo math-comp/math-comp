@@ -2804,33 +2804,33 @@ Proof. by rewrite -[x + y]addr_min_max addrK. Qed.
 Lemma maxr_to_min x y : max x y = x + y - min x y.
 Proof. by rewrite -[x + y]addr_max_min addrK. Qed.
 
-Lemma realNr_max : {in real &, {morph -%R : x y / max x y >-> min x y : R}}.
+Lemma real_oppr_max : {in real &, {morph -%R : x y / max x y >-> min x y : R}}.
 Proof.
 by move=> x y xr yr; rewrite !(fun_if, if_arg) ltrN2; case: real_ltgtP => // ->.
 Qed.
 
-Lemma realNr_min : {in real &, {morph -%R : x y / min x y >-> max x y : R}}.
+Lemma real_oppr_min : {in real &, {morph -%R : x y / min x y >-> max x y : R}}.
 Proof.
-by move=> x y xr yr; rewrite -[RHS]opprK realNr_max ?realN// !opprK.
+by move=> x y xr yr; rewrite -[RHS]opprK real_oppr_max ?realN// !opprK.
 Qed.
 
-Lemma realDr_minl : {in real & real & real, @left_distributive R R +%R min}.
-Proof.
-by move=> x y z xr yr zr; case: (@real_leP (_ + _)); rewrite ?realD//;
-   rewrite lterD2; case: real_leP.
-Qed.
-
-Lemma realDr_minr : {in real & real & real, @right_distributive R R +%R min}.
-Proof. by move=> x y z xr yr zr; rewrite !(addrC x) realDr_minl. Qed.
-
-Lemma realDr_maxl : {in real & real & real, @left_distributive R R +%R max}.
+Lemma real_addr_minl : {in real & real & real, @left_distributive R R +%R min}.
 Proof.
 by move=> x y z xr yr zr; case: (@real_leP (_ + _)); rewrite ?realD//;
    rewrite lterD2; case: real_leP.
 Qed.
 
-Lemma realDr_maxr : {in real & real & real, @right_distributive R R +%R max}.
-Proof. by move=> x y z xr yr zr; rewrite !(addrC x) realDr_maxl. Qed.
+Lemma real_addr_minr : {in real & real & real, @right_distributive R R +%R min}.
+Proof. by move=> x y z xr yr zr; rewrite !(addrC x) real_addr_minl. Qed.
+
+Lemma real_addr_maxl : {in real & real & real, @left_distributive R R +%R max}.
+Proof.
+by move=> x y z xr yr zr; case: (@real_leP (_ + _)); rewrite ?realD//;
+   rewrite lterD2; case: real_leP.
+Qed.
+
+Lemma real_addr_maxr : {in real & real & real, @right_distributive R R +%R max}.
+Proof. by move=> x y z xr yr zr; rewrite !(addrC x) real_addr_maxl. Qed.
 
 Lemma minrpMr x y z : 0 <= x -> x * min y z = min (x * y) (x * z).
 Proof.
@@ -2847,14 +2847,14 @@ Qed.
 Lemma real_maxrnMr x y z : x <= 0 -> y \is real -> z \is real ->
   x * max y z = min (x * y) (x * z).
 Proof.
-move=> x0 yr zr; rewrite -[_ * _]opprK -mulrN realNr_max// -mulNr.
+move=> x0 yr zr; rewrite -[_ * _]opprK -mulrN real_oppr_max// -mulNr.
 by rewrite minrpMr ?oppr_ge0// !(mulNr, mulrN, opprK).
 Qed.
 
 Lemma real_minrnMr x y z :  x <= 0 -> y \is real -> z \is real ->
   x * min y z = max (x * y) (x * z).
 Proof.
-move=> x0 yr zr; rewrite -[_ * _]opprK -mulrN realNr_min// -mulNr.
+move=> x0 yr zr; rewrite -[_ * _]opprK -mulrN real_oppr_min// -mulNr.
 by rewrite maxrpMr ?oppr_ge0// !(mulNr, mulrN, opprK).
 Qed.
 
@@ -2886,12 +2886,12 @@ Qed.
 
 Lemma real_minrN x : x \is real -> min x (- x) = - `|x|.
 Proof.
-by move=> x_real; rewrite -[LHS]opprK realNr_min ?opprK ?real_maxNr ?realN.
+by move=> x_real; rewrite -[LHS]opprK real_oppr_min ?opprK ?real_maxNr ?realN.
 Qed.
 
 Lemma real_minNr x : x \is real ->  min (- x) x = - `|x|.
 Proof.
-by move=> x_real; rewrite -[LHS]opprK realNr_min ?opprK ?real_maxrN ?realN.
+by move=> x_real; rewrite -[LHS]opprK real_oppr_min ?opprK ?real_maxrN ?realN.
 Qed.
 
 Section RealDomainArgExtremum.
@@ -3830,18 +3830,6 @@ Notation ler_nimull := lerniMl.
 Notation ler_pimulr := lerpiMr.
 #[deprecated(since="mathcomp 1.16.0", note="Use lerniMr instead.")]
 Notation ler_nimulr := lerniMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use real_oppr_maxrealNr_max instead.")]
-Notation real_oppr_max := realNr_max.
-#[deprecated(since="mathcomp 1.16.0", note="Use realNr_min instead.")]
-Notation real_oppr_min := realNr_min.
-#[deprecated(since="mathcomp 1.16.0", note="Use realDr_minl instead.")]
-Notation real_addr_minl := realDr_minl.
-#[deprecated(since="mathcomp 1.16.0", note="Use realDr_minr instead.")]
-Notation real_addr_minr := realDr_minr.
-#[deprecated(since="mathcomp 1.16.0", note="Use realDr_maxl instead.")]
-Notation real_addr_maxl := realDr_maxl.
-#[deprecated(since="mathcomp 1.16.0", note="Use realDr_maxr instead.")]
-Notation real_addr_maxr := realDr_maxr.
 
 #[global] Hint Resolve lerN2 ltrN2 real0 real1 normr_real : core.
 Arguments ler_sqr {R} [x y].
@@ -4076,35 +4064,35 @@ Proof. by rewrite -mulr2n -mulr_natr mulfVK //= pnatr_eq0. Qed.
 
 (* lteif *)
 
-Lemma lteif_pdivl_mulr C z x y :
+Lemma lteif_pdivlMr C z x y :
   0 < z -> x < y / z ?<= if C = (x * z < y ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_pdivl_mulr. Qed.
 
-Lemma lteif_pdivr_mulr C z x y :
+Lemma lteif_pdivrMr C z x y :
   0 < z -> y / z < x ?<= if C = (y < x * z ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_pdivr_mulr. Qed.
 
-Lemma lteif_pdivl_mull C z x y :
+Lemma lteif_pdivlMl C z x y :
   0 < z -> x < z^-1 * y ?<= if C = (z * x < y ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_pdivl_mull. Qed.
 
-Lemma lteif_pdivr_mull C z x y :
+Lemma lteif_pdivrMl C z x y :
   0 < z -> z^-1 * y < x ?<= if C = (y < z * x ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_pdivr_mull. Qed.
 
-Lemma lteif_ndivl_mulr C z x y :
+Lemma lteif_ndivlMr C z x y :
   z < 0 -> x < y / z ?<= if C = (y < x * z ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_ndivl_mulr. Qed.
 
-Lemma lteif_ndivr_mulr C z x y :
+Lemma lteif_ndivrMr C z x y :
   z < 0 -> y / z < x ?<= if C = (x * z < y ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_ndivr_mulr. Qed.
 
-Lemma lteif_ndivl_mull C z x y :
+Lemma lteif_ndivlMl C z x y :
   z < 0 -> x < z^-1 * y ?<= if C = (y < z * x ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_ndivl_mull. Qed.
 
-Lemma lteif_ndivr_mull C z x y :
+Lemma lteif_ndivrMl C z x y :
   z < 0 -> z^-1 * y < x ?<= if C = (z * x < y ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_ndivr_mull. Qed.
 
@@ -4229,6 +4217,22 @@ Notation ltf_ninv := ltfnV2.
 Notation ltef_pinv := ltefpV2.
 #[deprecated(since="mathcomp 1.16.0", note="Use ltefnV2 instead.")]
 Notation ltef_ninv := ltefnV2.
+#[deprecated(since="mathcomp 1.16.0", note="Use lteif_pdivlMr instead.")]
+Notation lteif_pdivl_mulr := lteif_pdivlMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use lteif_pdivrMr instead.")]
+Notation lteif_pdivr_mulr := lteif_pdivrMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use lteif_pdivlMl instead.")]
+Notation lteif_pdivl_mull := lteif_pdivlMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use lteif_pdivrMl instead.")]
+Notation lteif_pdivr_mull := lteif_pdivrMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use lteif_ndivlMr instead.")]
+Notation lteif_ndivl_mulr := lteif_ndivlMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use lteif_ndivrMr instead.")]
+Notation lteif_ndivr_mulr := lteif_ndivrMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use lteif_ndivlMl instead.")]
+Notation lteif_ndivl_mull := lteif_ndivlMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use lteif_ndivrMl instead.")]
+Notation lteif_ndivr_mull := lteif_ndivrMl.
 
 Section RealDomainTheory.
 
@@ -4527,22 +4531,22 @@ Proof. exact: real_leif_AGM2_scaled. Qed.
 Section MinMax.
 
 Lemma oppr_max : {morph -%R : x y / max x y >-> min x y : R}.
-Proof. by move=> x y; apply: realNr_max. Qed.
+Proof. by move=> x y; apply: real_oppr_max. Qed.
 
 Lemma oppr_min : {morph -%R : x y / min x y >-> max x y : R}.
-Proof. by move=> x y; apply: realNr_min. Qed.
+Proof. by move=> x y; apply: real_oppr_min. Qed.
 
 Lemma addr_minl : @left_distributive R R +%R min.
-Proof. by move=> x y z; apply: realDr_minl. Qed.
+Proof. by move=> x y z; apply: real_addr_minl. Qed.
 
 Lemma addr_minr : @right_distributive R R +%R min.
-Proof. by move=> x y z; apply: realDr_minr. Qed.
+Proof. by move=> x y z; apply: real_addr_minr. Qed.
 
 Lemma addr_maxl : @left_distributive R R +%R max.
-Proof. by move=> x y z; apply: realDr_maxl. Qed.
+Proof. by move=> x y z; apply: real_addr_maxl. Qed.
 
 Lemma addr_maxr : @right_distributive R R +%R max.
-Proof. by move=> x y z; apply: realDr_maxr. Qed.
+Proof. by move=> x y z; apply: real_addr_maxr. Qed.
 
 Lemma minrnMr x y z : x <= 0 -> x * min y z = max (x * y) (x * z).
 Proof. by move=> x_le0; apply: real_minrnMr. Qed.

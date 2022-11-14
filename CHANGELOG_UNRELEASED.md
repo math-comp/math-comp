@@ -227,12 +227,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_nimull` -> `lerniMl`
   + `ler_pimulr` -> `lerpiMr`
   + `ler_nimulr` -> `lerniMr`
-  + `real_oppr_max` -> `realNr_max`
-  + `real_oppr_min` -> `realNr_min`
-  + `real_addr_minl` -> `realDr_minl`
-  + `real_addr_minr` -> `realDr_minr`
-  + `real_addr_maxl` -> `realDr_maxl`
-  + `real_addr_maxr` -> `realDr_maxr`
+  + `lteif_pdivl_mulr` -> `lteif_pdivlMr`
+  + `lteif_pdivr_mulr` -> `lteif_pdivrMr`
+  + `lteif_pdivl_mull` -> `lteif_pdivlMl`
+  + `lteif_pdivr_mull` -> `lteif_pdivrMl`
+  + `lteif_ndivl_mulr` -> `lteif_ndivlMr`
+  + `lteif_ndivr_mulr` -> `lteif_ndivrMr`
+  + `lteif_ndivl_mull` -> `lteif_ndivlMl`
+  + `lteif_ndivr_mull` -> `lteif_ndivrMl`
 - in `ssrint.v`:
   + `leq_add_dist` -> `leqD_dist`
   + `lez_add1r` -> `lez1D`
