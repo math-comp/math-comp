@@ -235,6 +235,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `lteif_ndivr_mulr` -> `lteif_ndivrMr`
   + `lteif_ndivl_mull` -> `lteif_ndivlMl`
   + `lteif_ndivr_mull` -> `lteif_ndivrMl`
+  + `ler_addgt0Pr` -> `lerDgt0Pr`
+  + `ler_addgt0Pl` -> `lerDgt0Pl`
+  + `ler_pdivl_mulr` -> `ler_pdivlMr`
+  + `ltr_pdivl_mulr` -> `ltr_pdivlMr`
+  + `lter_pdivl_mulr` -> `lter_pdivlMr`
+  + `ler_pdivr_mulr` -> `ler_pdivrMr`
+  + `ltr_pdivr_mulr` -> `ltr_pdivrMr`
+  + `lter_pdivr_mulr` -> `lter_pdivrMr`
+  + `ler_pdivl_mull` -> `ler_pdivlMl`
+  + `ltr_pdivl_mull` -> `ltr_pdivlMl`
+  + `lter_pdivl_mull` -> `lter_pdivlMl`
+  + `ler_pdivr_mull` -> `ler_pdivrMl`
+  + `ltr_pdivr_mull` -> `ltr_pdivrMl`
+  + `lter_pdivr_mull` -> `lter_pdivrMl`
+  + `ler_ndivl_mulr` -> `ler_ndivlMr`
+  + `ltr_ndivl_mulr` -> `ltr_ndivlMr`
+  + `lter_ndivl_mulr` -> `lter_ndivlMr`
+  + `ler_ndivr_mulr` -> `ler_ndivrMr`
+  + `ltr_ndivr_mulr` -> `ltr_ndivrMr`
+  + `lter_ndivr_mulr` -> `lter_ndivrMr`
+  + `ler_ndivl_mull` -> `ler_ndivlMl`
+  + `ltr_ndivl_mull` -> `ltr_ndivlMl`
+  + `lter_ndivl_mull` -> `lter_ndivlMl`
+  + `ler_ndivr_mull` -> `ler_ndivrMl`
+  + `ltr_ndivr_mull` -> `ltr_ndivrMl`
+  + `lter_ndivr_mull` -> `lter_ndivrMl`
 - in `ssrint.v`:
   + `leq_add_dist` -> `leqD_dist`
   + `lez_add1r` -> `lez1D`

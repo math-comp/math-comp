@@ -3977,69 +3977,69 @@ Definition invf_lte1 := (invf_le1, invf_lt1).
 Definition invf_cp1 := (invf_gte1, invf_lte1).
 
 (* These lemma are all combinations of mono(LR|RL) with ler_[pn]mul2[rl]. *)
-Lemma ler_pdivl_mulr z x y : 0 < z -> (x <= y / z) = (x * z <= y).
+Lemma ler_pdivlMr z x y : 0 < z -> (x <= y / z) = (x * z <= y).
 Proof. by move=> z_gt0; rewrite -(@lerpM2r _ z _ x) ?mulfVK ?gt_eqF. Qed.
 
-Lemma ltr_pdivl_mulr z x y : 0 < z -> (x < y / z) = (x * z < y).
+Lemma ltr_pdivlMr z x y : 0 < z -> (x < y / z) = (x * z < y).
 Proof. by move=> z_gt0; rewrite -(@ltrpM2r _ z _ x) ?mulfVK ?gt_eqF. Qed.
 
-Definition lter_pdivl_mulr := (ler_pdivl_mulr, ltr_pdivl_mulr).
+Definition lter_pdivlMr := (ler_pdivlMr, ltr_pdivlMr).
 
-Lemma ler_pdivr_mulr z x y : 0 < z -> (y / z <= x) = (y <= x * z).
+Lemma ler_pdivrMr z x y : 0 < z -> (y / z <= x) = (y <= x * z).
 Proof. by move=> z_gt0; rewrite -(@lerpM2r _ z) ?mulfVK ?gt_eqF. Qed.
 
-Lemma ltr_pdivr_mulr z x y : 0 < z -> (y / z < x) = (y < x * z).
+Lemma ltr_pdivrMr z x y : 0 < z -> (y / z < x) = (y < x * z).
 Proof. by move=> z_gt0; rewrite -(@ltrpM2r _ z) ?mulfVK ?gt_eqF. Qed.
 
-Definition lter_pdivr_mulr := (ler_pdivr_mulr, ltr_pdivr_mulr).
+Definition lter_pdivrMr := (ler_pdivrMr, ltr_pdivrMr).
 
-Lemma ler_pdivl_mull z x y : 0 < z -> (x <= z^-1 * y) = (z * x <= y).
-Proof. by move=> z_gt0; rewrite mulrC ler_pdivl_mulr ?[z * _]mulrC. Qed.
+Lemma ler_pdivlMl z x y : 0 < z -> (x <= z^-1 * y) = (z * x <= y).
+Proof. by move=> z_gt0; rewrite mulrC ler_pdivlMr ?[z * _]mulrC. Qed.
 
-Lemma ltr_pdivl_mull z x y : 0 < z -> (x < z^-1 * y) = (z * x < y).
-Proof. by move=> z_gt0; rewrite mulrC ltr_pdivl_mulr ?[z * _]mulrC. Qed.
+Lemma ltr_pdivlMl z x y : 0 < z -> (x < z^-1 * y) = (z * x < y).
+Proof. by move=> z_gt0; rewrite mulrC ltr_pdivlMr ?[z * _]mulrC. Qed.
 
-Definition lter_pdivl_mull := (ler_pdivl_mull, ltr_pdivl_mull).
+Definition lter_pdivlMl := (ler_pdivlMl, ltr_pdivlMl).
 
-Lemma ler_pdivr_mull z x y : 0 < z -> (z^-1 * y <= x) = (y <= z * x).
-Proof. by move=> z_gt0; rewrite mulrC ler_pdivr_mulr ?[z * _]mulrC. Qed.
+Lemma ler_pdivrMl z x y : 0 < z -> (z^-1 * y <= x) = (y <= z * x).
+Proof. by move=> z_gt0; rewrite mulrC ler_pdivrMr ?[z * _]mulrC. Qed.
 
-Lemma ltr_pdivr_mull z x y : 0 < z -> (z^-1 * y < x) = (y < z * x).
-Proof. by move=> z_gt0; rewrite mulrC ltr_pdivr_mulr ?[z * _]mulrC. Qed.
+Lemma ltr_pdivrMl z x y : 0 < z -> (z^-1 * y < x) = (y < z * x).
+Proof. by move=> z_gt0; rewrite mulrC ltr_pdivrMr ?[z * _]mulrC. Qed.
 
-Definition lter_pdivr_mull := (ler_pdivr_mull, ltr_pdivr_mull).
+Definition lter_pdivrMl := (ler_pdivrMl, ltr_pdivrMl).
 
-Lemma ler_ndivl_mulr z x y : z < 0 -> (x <= y / z) = (y <= x * z).
+Lemma ler_ndivlMr z x y : z < 0 -> (x <= y / z) = (y <= x * z).
 Proof. by move=> z_lt0; rewrite -(@lernM2r _ z) ?mulfVK  ?lt_eqF. Qed.
 
-Lemma ltr_ndivl_mulr z x y : z < 0 -> (x < y / z) = (y < x * z).
+Lemma ltr_ndivlMr z x y : z < 0 -> (x < y / z) = (y < x * z).
 Proof. by move=> z_lt0; rewrite -(@ltrnM2r _ z) ?mulfVK ?lt_eqF. Qed.
 
-Definition lter_ndivl_mulr := (ler_ndivl_mulr, ltr_ndivl_mulr).
+Definition lter_ndivlMr := (ler_ndivlMr, ltr_ndivlMr).
 
-Lemma ler_ndivr_mulr z x y : z < 0 -> (y / z <= x) = (x * z <= y).
+Lemma ler_ndivrMr z x y : z < 0 -> (y / z <= x) = (x * z <= y).
 Proof. by move=> z_lt0; rewrite -(@lernM2r _ z) ?mulfVK ?lt_eqF. Qed.
 
-Lemma ltr_ndivr_mulr z x y : z < 0 -> (y / z < x) = (x * z < y).
+Lemma ltr_ndivrMr z x y : z < 0 -> (y / z < x) = (x * z < y).
 Proof. by move=> z_lt0; rewrite -(@ltrnM2r _ z) ?mulfVK ?lt_eqF. Qed.
 
-Definition lter_ndivr_mulr := (ler_ndivr_mulr, ltr_ndivr_mulr).
+Definition lter_ndivrMr := (ler_ndivrMr, ltr_ndivrMr).
 
-Lemma ler_ndivl_mull z x y : z < 0 -> (x <= z^-1 * y) = (y <= z * x).
-Proof. by move=> z_lt0; rewrite mulrC ler_ndivl_mulr ?[z * _]mulrC. Qed.
+Lemma ler_ndivlMl z x y : z < 0 -> (x <= z^-1 * y) = (y <= z * x).
+Proof. by move=> z_lt0; rewrite mulrC ler_ndivlMr ?[z * _]mulrC. Qed.
 
-Lemma ltr_ndivl_mull z x y : z < 0 -> (x < z^-1 * y) = (y < z * x).
-Proof. by move=> z_lt0; rewrite mulrC ltr_ndivl_mulr ?[z * _]mulrC. Qed.
+Lemma ltr_ndivlMl z x y : z < 0 -> (x < z^-1 * y) = (y < z * x).
+Proof. by move=> z_lt0; rewrite mulrC ltr_ndivlMr ?[z * _]mulrC. Qed.
 
-Definition lter_ndivl_mull := (ler_ndivl_mull, ltr_ndivl_mull).
+Definition lter_ndivlMl := (ler_ndivlMl, ltr_ndivlMl).
 
-Lemma ler_ndivr_mull z x y : z < 0 -> (z^-1 * y <= x) = (z * x <= y).
-Proof. by move=> z_lt0; rewrite mulrC ler_ndivr_mulr ?[z * _]mulrC. Qed.
+Lemma ler_ndivrMl z x y : z < 0 -> (z^-1 * y <= x) = (z * x <= y).
+Proof. by move=> z_lt0; rewrite mulrC ler_ndivrMr ?[z * _]mulrC. Qed.
 
-Lemma ltr_ndivr_mull z x y : z < 0 -> (z^-1 * y < x) = (z * x < y).
-Proof. by move=> z_lt0; rewrite mulrC ltr_ndivr_mulr ?[z * _]mulrC. Qed.
+Lemma ltr_ndivrMl z x y : z < 0 -> (z^-1 * y < x) = (z * x < y).
+Proof. by move=> z_lt0; rewrite mulrC ltr_ndivrMr ?[z * _]mulrC. Qed.
 
-Definition lter_ndivr_mull := (ler_ndivr_mull, ltr_ndivr_mull).
+Definition lter_ndivrMl := (ler_ndivrMl, ltr_ndivrMl).
 
 Lemma natf_div m d : (d %| m)%N -> (m %/ d)%:R = m%:R / d%:R :> F.
 Proof. by apply: char0_natf_div; apply: (@char_num F). Qed.
@@ -4066,35 +4066,35 @@ Proof. by rewrite -mulr2n -mulr_natr mulfVK //= pnatr_eq0. Qed.
 
 Lemma lteif_pdivlMr C z x y :
   0 < z -> x < y / z ?<= if C = (x * z < y ?<= if C).
-Proof. by case: C => ? /=; rewrite lter_pdivl_mulr. Qed.
+Proof. by case: C => ? /=; rewrite lter_pdivlMr. Qed.
 
 Lemma lteif_pdivrMr C z x y :
   0 < z -> y / z < x ?<= if C = (y < x * z ?<= if C).
-Proof. by case: C => ? /=; rewrite lter_pdivr_mulr. Qed.
+Proof. by case: C => ? /=; rewrite lter_pdivrMr. Qed.
 
 Lemma lteif_pdivlMl C z x y :
   0 < z -> x < z^-1 * y ?<= if C = (z * x < y ?<= if C).
-Proof. by case: C => ? /=; rewrite lter_pdivl_mull. Qed.
+Proof. by case: C => ? /=; rewrite lter_pdivlMl. Qed.
 
 Lemma lteif_pdivrMl C z x y :
   0 < z -> z^-1 * y < x ?<= if C = (y < z * x ?<= if C).
-Proof. by case: C => ? /=; rewrite lter_pdivr_mull. Qed.
+Proof. by case: C => ? /=; rewrite lter_pdivrMl. Qed.
 
 Lemma lteif_ndivlMr C z x y :
   z < 0 -> x < y / z ?<= if C = (y < x * z ?<= if C).
-Proof. by case: C => ? /=; rewrite lter_ndivl_mulr. Qed.
+Proof. by case: C => ? /=; rewrite lter_ndivlMr. Qed.
 
 Lemma lteif_ndivrMr C z x y :
   z < 0 -> y / z < x ?<= if C = (x * z < y ?<= if C).
-Proof. by case: C => ? /=; rewrite lter_ndivr_mulr. Qed.
+Proof. by case: C => ? /=; rewrite lter_ndivrMr. Qed.
 
 Lemma lteif_ndivlMl C z x y :
   z < 0 -> x < z^-1 * y ?<= if C = (y < z * x ?<= if C).
-Proof. by case: C => ? /=; rewrite lter_ndivl_mull. Qed.
+Proof. by case: C => ? /=; rewrite lter_ndivlMl. Qed.
 
 Lemma lteif_ndivrMl C z x y :
   z < 0 -> z^-1 * y < x ?<= if C = (z * x < y ?<= if C).
-Proof. by case: C => ? /=; rewrite lter_ndivr_mull. Qed.
+Proof. by case: C => ? /=; rewrite lter_ndivrMl. Qed.
 
 (* Interval midpoint. *)
 
@@ -4102,19 +4102,19 @@ Local Notation mid x y := ((x + y) / 2).
 
 Lemma midf_le x y : x <= y -> (x <= mid x y) * (mid x y <= y).
 Proof.
-move=> lexy; rewrite ler_pdivl_mulr ?ler_pdivr_mulr ?ltr0Sn //.
+move=> lexy; rewrite ler_pdivlMr ?ler_pdivrMr ?ltr0Sn //.
 by rewrite !mulrDr !mulr1 !lerD2.
 Qed.
 
 Lemma midf_lt x y : x < y -> (x < mid x y) * (mid x y < y).
 Proof.
-move=> ltxy; rewrite ltr_pdivl_mulr ?ltr_pdivr_mulr ?ltr0Sn //.
+move=> ltxy; rewrite ltr_pdivlMr ?ltr_pdivrMr ?ltr0Sn //.
 by rewrite !mulrDr !mulr1 !ltrD2.
 Qed.
 
 Definition midf_lte := (midf_le, midf_lt).
 
-Lemma ler_addgt0Pr x y : reflect (forall e, e > 0 -> x <= y + e) (x <= y).
+Lemma lerDgt0Pr x y : reflect (forall e, e > 0 -> x <= y + e) (x <= y).
 Proof.
 apply/(iffP idP)=> [lexy e e_gt0 | lexye]; first by rewrite ler_paddr// ltW.
 have [||ltyx]// := comparable_leP.
@@ -4125,20 +4125,20 @@ rewrite -(@addrK _ y y) addrAC -addrA 2!mulrDl -splitr lexye//.
 by rewrite divr_gt0// ?ltr0n// subr_gt0.
 Qed.
 
-Lemma ler_addgt0Pl x y : reflect (forall e, e > 0 -> x <= e + y) (x <= y).
+Lemma lerDgt0Pl x y : reflect (forall e, e > 0 -> x <= e + y) (x <= y).
 Proof.
-by apply/(equivP (ler_addgt0Pr x y)); split=> lexy e /lexy; rewrite addrC.
+by apply/(equivP (lerDgt0Pr x y)); split=> lexy e /lexy; rewrite addrC.
 Qed.
 
 Lemma lt_le a b : (forall x, x < a -> x < b) -> a <= b.
 Proof.
-move=> ab; apply/ler_addgt0Pr => e e_gt0; rewrite -lerBDr ltW//.
+move=> ab; apply/lerDgt0Pr => e e_gt0; rewrite -lerBDr ltW//.
 by rewrite ab// ltrBlDr ltrDl.
 Qed.
 
 Lemma gt_ge a b : (forall x, b < x -> a < x) -> a <= b.
 Proof.
-by move=> ab; apply/ler_addgt0Pr => e e_gt0; rewrite ltW// ab// ltrDl.
+by move=> ab; apply/lerDgt0Pr => e e_gt0; rewrite ltW// ab// ltrDl.
 Qed.
 
 (* The AGM, unscaled but without the nth root. *)
@@ -4193,7 +4193,7 @@ have nz_x: x != 0 by rewrite -normr_gt0 (lt_le_trans ltr01).
 rewrite {}Dp // mulf_neq0 ?expf_neq0 // subr_eq0 eq_sym.
 have: (b / `|a|) < `|x| by rewrite (lt_trans _ lb_x) // ltr_spaddr ?ltr01.
 apply: contraTneq => /(canRL (divfK nz_x))Dax.
-rewrite ltr_pdivr_mulr ?normr_gt0 ?lead_coef_eq0 // mulrC -normrM -{}Dax.
+rewrite ltr_pdivrMr ?normr_gt0 ?lead_coef_eq0 // mulrC -normrM -{}Dax.
 by rewrite le_gtF // ub_q // normfV invf_le1 ?normr_gt0.
 Qed.
 
@@ -4233,6 +4233,58 @@ Notation lteif_ndivr_mulr := lteif_ndivrMr.
 Notation lteif_ndivl_mull := lteif_ndivlMl.
 #[deprecated(since="mathcomp 1.16.0", note="Use lteif_ndivrMl instead.")]
 Notation lteif_ndivr_mull := lteif_ndivrMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use lerDgt0Pr instead.")]
+Notation ler_addgt0Pr := lerDgt0Pr.
+#[deprecated(since="mathcomp 1.16.0", note="Use lerDgt0Pl instead.")]
+Notation ler_addgt0Pl := lerDgt0Pl.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_pdivlMr instead.")]
+Notation ler_pdivl_mulr := ler_pdivlMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltr_pdivlMr instead.")]
+Notation ltr_pdivl_mulr := ltr_pdivlMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use lter_pdivlMr instead.")]
+Notation lter_pdivl_mulr := lter_pdivlMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_pdivrMr instead.")]
+Notation ler_pdivr_mulr := ler_pdivrMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltr_pdivrMr instead.")]
+Notation ltr_pdivr_mulr := ltr_pdivrMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use lter_pdivrMr instead.")]
+Notation lter_pdivr_mulr := lter_pdivrMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_pdivlMl instead.")]
+Notation ler_pdivl_mull := ler_pdivlMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltr_pdivlMl instead.")]
+Notation ltr_pdivl_mull := ltr_pdivlMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use lter_pdivlMl instead.")]
+Notation lter_pdivl_mull := lter_pdivlMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_pdivrMl instead.")]
+Notation ler_pdivr_mull := ler_pdivrMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltr_pdivrMl instead.")]
+Notation ltr_pdivr_mull := ltr_pdivrMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use lter_pdivrMl instead.")]
+Notation lter_pdivr_mull := lter_pdivrMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_ndivlMr instead.")]
+Notation ler_ndivl_mulr := ler_ndivlMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltr_ndivlMr instead.")]
+Notation ltr_ndivl_mulr := ltr_ndivlMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use lter_ndivlMr instead.")]
+Notation lter_ndivl_mulr := lter_ndivlMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_ndivrMr instead.")]
+Notation ler_ndivr_mulr := ler_ndivrMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltr_ndivrMr instead.")]
+Notation ltr_ndivr_mulr := ltr_ndivrMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use lter_ndivrMr instead.")]
+Notation lter_ndivr_mulr := lter_ndivrMr.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_ndivlMl instead.")]
+Notation ler_ndivl_mull := ler_ndivlMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltr_ndivlMl instead.")]
+Notation ltr_ndivl_mull := ltr_ndivlMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use lter_ndivlMl instead.")]
+Notation lter_ndivl_mull := lter_ndivlMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use ler_ndivrMl instead.")]
+Notation ler_ndivr_mull := ler_ndivrMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use ltr_ndivrMl instead.")]
+Notation ltr_ndivr_mull := ltr_ndivrMl.
+#[deprecated(since="mathcomp 1.16.0", note="Use lter_ndivrMl instead.")]
+Notation lter_ndivr_mull := lter_ndivrMl.
 
 Section RealDomainTheory.
 

@@ -676,7 +676,7 @@ have{pi1 Zpi1} pi2_ge1: 1 <= pi2.
     by rewrite (big_morph Num.norm (@normrM _) (@normr1 _)) -prodrXl.
   by rewrite Cint_normK // sqr_Cint_ge1 //; apply/prodf_neq0.
 have Sgt0: (#|S| > 0)%N by rewrite (cardD1 g) [g \in S]Sg.
-rewrite -mulr_natr -ler_pdivl_mulr ?ltr0n //.
+rewrite -mulr_natr -ler_pdivlMr ?ltr0n //.
 have n2chi_ge0 s: s \in S -> 0 <= `|chi s| ^+ 2 by rewrite exprn_ge0.
 rewrite -(expr_ge1 Sgt0); last by rewrite divr_ge0 ?ler0n ?sumr_ge0.
 by rewrite (le_trans pi2_ge1) // leif_AGM.

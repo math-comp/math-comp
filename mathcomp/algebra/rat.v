@@ -949,8 +949,8 @@ Canonical ratr_rmorphism := RMorphism ratr_is_rmorphism.
 Lemma ler_rat : {mono (@ratr F) : x y / x <= y}.
 Proof.
 move=> x y /=; case: (ratP x) => nx dx cndx; case: (ratP y) => ny dy cndy.
-rewrite !fmorph_div /= !ratr_int !ler_pdivl_mulr ?ltr0z //.
-by rewrite ![_ / _ * _]mulrAC !ler_pdivr_mulr ?ltr0z // -!rmorphM /= !ler_int.
+rewrite !fmorph_div /= !ratr_int !ler_pdivlMr ?ltr0z //.
+by rewrite ![_ / _ * _]mulrAC !ler_pdivrMr ?ltr0z // -!rmorphM /= !ler_int.
 Qed.
 
 Lemma ltr_rat : {mono (@ratr F) : x y / x < y}.

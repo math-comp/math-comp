@@ -463,9 +463,9 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     suffices lb1 a2 b2 (ab1 := (a1, b1)) (ab2 := (a2, b2)) :
       xup q ab2 /\ sub_itv ab2 ab1 -> q.[b2] - q.[a2] <= Mdq * wid ab1.
     + apply: le_lt_trans (_ : Mu * Mdq * wid (a1, b1) < h2); last first.
-        rewrite {}Dab1 mulrA ltr_pdivr_mulr ?ltr0n ?expn_gt0 //.
+        rewrite {}Dab1 mulrA ltr_pdivrMr ?ltr0n ?expn_gt0 //.
         rewrite (lt_le_trans (archi_boundP _)) ?mulr_ge0 ?ltr_nat // -/n.
-        rewrite ler_pdivl_mull ?ltr0n // -natrM ler_nat.
+        rewrite ler_pdivlMl ?ltr0n // -natrM ler_nat.
         by case: n => // n; rewrite expnS leq_pmul2l // ltn_expl.
       rewrite -mulrA hornerM normrM lerpM //.
       have [/ltW qc_le0 | qc_ge0] := ltrP q.[c] 0.
@@ -507,7 +507,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
       exists (Num.max 1 M) => [|s /ubM vM]; first by rewrite lt_maxr ltr01.
       by rewrite le_maxr orbC vM.
     exists (h2 / M) => [|a xn_a]; first by rewrite divr_gt0 ?invr_gt0 ?ltr0n.
-    rewrite ltr_pdivr_mulr // -(ltrD2l h2) -mulr2n -mulr_natl divff //.
+    rewrite ltr_pdivrMr // -(ltrD2l h2) -mulr2n -mulr_natl divff //.
     rewrite -normr1 -(hornerC 1 a) -[1%:P]r_pq_1 hornerD.
     rewrite ?(le_lt_trans (ler_normD _ _)) ?ltr_leD ?ub_rp //.
     by rewrite mulrC hornerM normrM lerwpM2l ?ubM.
@@ -536,7 +536,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     case: (find _ _ _) => c d /= le_cd [/= le_ac le_db] _ /(_ c)/implyP.
     rewrite inE lexx le_cd hornerM hornerC normrM le_gtF //.
     rewrite ger0_norm ?divr_ge0 ?invr_ge0 ?ler0n ?(ltW e_gt0) // mulrAC.
-    rewrite ler_pdivl_mulr // lerwpM2l ?invr_ge0 ?ler0n // ltW // v_gte //=.
+    rewrite ler_pdivlMr // lerwpM2l ?invr_ge0 ?ler0n // ltW // v_gte //=.
     by rewrite inE -/b (le_trans le_a) //= (le_trans le_cd).
   pose lim_pos m v := exists2 e, e > 0 & forall n, (m <= n)%N -> e < nlim v n.
   have posP v: reflect (exists m, lim_pos m v) (lt 0 v).
@@ -575,7 +575,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     rewrite -(ltrD2r f) -mulr2n -mulr_natr divfK // /nlim /lim Dqvw.
     rewrite rmorphD hornerD /= -addrA -ltrBlDl ler_ltD //.
       by rewrite rmorphM hornerM lerpM ?ltW ?v_gtd ?w_gte.
-    rewrite -ltr_pdivr_mull ?mulr_gt0 // (le_lt_trans _ ub_rp) //.
+    rewrite -ltr_pdivrMl ?mulr_gt0 // (le_lt_trans _ ub_rp) //.
     by rewrite -scalerAl hornerZ -rmorphM mulrN -normrN ler_norm.
   pose le v w := (v == w) || lt v w.
   pose abs v := if le 0 v then v else - v.
