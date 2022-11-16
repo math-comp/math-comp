@@ -128,7 +128,7 @@ End ZModQuotient.
 
 Module ZModQuotientExports.
 Notation "[ 'zmodQuotType' z , o & a 'of' Q ]" :=
-  (@ZmodQuotient.clone _ _ z o a Q _)
+  (@ZmodQuotient.clone _ _ z o%function a%function Q%type _)
   (at level 0, format "[ 'zmodQuotType'  z ,  o  &  a  'of'  Q ]") : form_scope.
 End ZModQuotientExports.
 HB.export ZModQuotientExports.
@@ -177,7 +177,7 @@ Canonical pi_mul_quot_morph rqT := PiMorph2 (@pi_mulr _ _ _ _ _ _ _ rqT).
 End ringQuotient.
 Module RingQuotientExports.
 Notation "[ 'ringQuotType' o & m 'of' Q ]" :=
-  (@RingQuotient.clone _ _ _ _ _ o m Q _)
+  (@RingQuotient.clone _ _ _ _ _ o m%function Q%type _)
   (at level 0, format "[ 'ringQuotType'  o  &  m  'of'  Q ]") : form_scope.
 End RingQuotientExports.
 HB.export RingQuotientExports.
@@ -222,7 +222,7 @@ End UnitRingQuot.
 
 Module UnitRingQuotientExports.
 Notation "[ 'unitRingQuotType' u & i 'of' Q ]" :=
-  (@UnitRingQuotient.clone _ _ _ _ _ _ _ u i Q _)
+  (@UnitRingQuotient.clone _ _ _ _ _ _ _ u i%function Q%type _)
   (at level 0, format "[ 'unitRingQuotType'  u  &  i  'of'  Q ]") : form_scope.
 End UnitRingQuotientExports.
 HB.export UnitRingQuotientExports.

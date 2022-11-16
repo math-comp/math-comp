@@ -92,9 +92,9 @@ HB.structure Definition FieldExt (R : ringType) := {T of Falgebra R T &
 
 Module FieldExtExports.
 Bind Scope ring_scope with FieldExt.sort.
-Notation "[ 'fieldExtType' F 'of' L ]" := (FieldExt.clone F L _)
+Notation "[ 'fieldExtType' F 'of' L ]" := (FieldExt.clone F L%type _)
   (at level 0, format "[ 'fieldExtType'  F  'of'  L ]") : form_scope.
-Notation "[ 'fieldExtType' F 'of' L 'for' K ]" := (FieldExt.clone F L K)
+Notation "[ 'fieldExtType' F 'of' L 'for' K ]" := (FieldExt.clone F L%type K)
   (at level 0, format "[ 'fieldExtType'  F  'of'  L  'for'  K ]") : form_scope.
 Notation "{ 'subfield' L }" := (@aspace_of _ _ (Phant L))
   (* NB: was (@aspace_of _ (FalgType _) (Phant L)) *)

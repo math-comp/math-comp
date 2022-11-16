@@ -370,11 +370,11 @@ HB.structure Definition SplittingField F :=
 Module SplittingFieldExports.
 Bind Scope ring_scope with SplittingField.sort.
 Notation "[ 'splittingFieldType' F 'of' L 'for' K ]" :=
-  (SplittingField.clone F L K)
+  (SplittingField.clone F L%type K)
   (at level 0, format "[ 'splittingFieldType'  F  'of'  L  'for'  K ]")
   : form_scope.
 Notation "[ 'splittingFieldType' F 'of' L ]" :=
-  [splittingFieldType F of L for _]
+  [splittingFieldType F of L%type for _]
   (at level 0, format "[ 'splittingFieldType'  F  'of'  L ]") : form_scope.
 End SplittingFieldExports.
 HB.export SplittingFieldExports.

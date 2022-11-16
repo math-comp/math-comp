@@ -39,7 +39,7 @@ Import GRing.Theory.
 #[short(type="countZmodType")]
 HB.structure Definition Zmodule := {M of GRing.Zmodule M & Countable M}.
 Module ZmoduleExports.
-Notation "[ 'countZmodType' 'of' T ]" := (Zmodule.clone T _)
+Notation "[ 'countZmodType' 'of' T ]" := (Zmodule.clone T%type _)
   (at level 0, format "[ 'countZmodType'  'of'  T ]") : form_scope.
 End ZmoduleExports.
 HB.export ZmoduleExports.
@@ -49,7 +49,7 @@ HB.structure Definition Ring := {R of GRing.Ring R & Countable R}.
 
 Module RingExports.
 Notation "[ 'countRingType' 'of' T ]" :=
-  (Ring.clone T _) (* NB: was (do_pack pack T) *)
+  (Ring.clone T%type _) (* NB: was (do_pack pack T) *)
       (at level 0, format "[ 'countRingType'  'of'  T ]") : form_scope.
 End RingExports.
 HB.export RingExports.
@@ -58,7 +58,7 @@ HB.export RingExports.
 HB.structure Definition ComRing := {R of GRing.ComRing R & Countable R}.
 
 Module ComRingExports.
-Notation "[ 'countComRingType' 'of' T ]" := (ComRing.clone T _)
+Notation "[ 'countComRingType' 'of' T ]" := (ComRing.clone T%type _)
   (at level 0, format "[ 'countComRingType'  'of'  T ]") : form_scope.
 End ComRingExports.
 HB.export ComRingExports.
@@ -68,7 +68,7 @@ HB.structure Definition UnitRing := {R of GRing.UnitRing R & Countable R}.
 
 Module UnitRingExports.
 Notation countUnitRingType := UnitRing.type.
-Notation "[ 'countUnitRingType' 'of' T ]" := (UnitRing.clone T _) 
+Notation "[ 'countUnitRingType' 'of' T ]" := (UnitRing.clone T%type _)
   (at level 0, format "[ 'countUnitRingType'  'of'  T ]") : form_scope.
 End UnitRingExports.
 HB.export UnitRingExports.
@@ -77,7 +77,7 @@ HB.export UnitRingExports.
 HB.structure Definition ComUnitRing := {R of GRing.ComUnitRing R & Countable R}.
 
 Module ComUnitRingExports.
-Notation "[ 'countComUnitRingType' 'of' T ]" := (ComUnitRing.clone T _)
+Notation "[ 'countComUnitRingType' 'of' T ]" := (ComUnitRing.clone T%type _)
   (at level 0, format "[ 'countComUnitRingType'  'of'  T ]") : form_scope.
 End ComUnitRingExports.
 HB.export ComUnitRingExports.
@@ -87,7 +87,7 @@ HB.structure Definition IntegralDomain :=
   {R of GRing.IntegralDomain R & Countable R}.
 
 Module IntegralDomainExports.
-Notation "[ 'countIdomainType' 'of' T ]" := (IntegralDomain.clone T _) 
+Notation "[ 'countIdomainType' 'of' T ]" := (IntegralDomain.clone T%type _)
   (at level 0, format "[ 'countIdomainType'  'of'  T ]") : form_scope.
 End IntegralDomainExports.
 HB.export IntegralDomainExports.
@@ -96,7 +96,7 @@ HB.export IntegralDomainExports.
 HB.structure Definition Field := {R of GRing.Field R & Countable R}.
 
 Module FieldExports.
-Notation "[ 'countFieldType' 'of' T ]" := (Field.clone T _) (*(do_pack pack T)*)
+Notation "[ 'countFieldType' 'of' T ]" := (Field.clone T%type _) (*(do_pack pack T)*)
   (at level 0, format "[ 'countFieldType'  'of'  T ]") : form_scope.
 End FieldExports.
 HB.export FieldExports.
@@ -106,7 +106,7 @@ HB.structure Definition DecidableField :=
   {R of GRing.DecidableField R & Countable R}.
 
 Module DecidableFieldExports.
-Notation "[ 'countDecFieldType' 'of' T ]" := (DecidableField.clone T _) 
+Notation "[ 'countDecFieldType' 'of' T ]" := (DecidableField.clone T%type _)
   (at level 0, format "[ 'countDecFieldType'  'of'  T ]") : form_scope.
 End DecidableFieldExports.
 HB.export DecidableFieldExports.
@@ -115,7 +115,7 @@ HB.export DecidableFieldExports.
 HB.structure Definition ClosedField := {R of GRing.ClosedField R & Countable R}.
 
 Module ClosedFieldExports.
-Notation "[ 'countClosedFieldType' 'of' T ]" := (ClosedField.clone T _) 
+Notation "[ 'countClosedFieldType' 'of' T ]" := (ClosedField.clone T%type _)
   (at level 0, format "[ 'countClosedFieldType'  'of'  T ]") : form_scope.
 End ClosedFieldExports.
 HB.export ClosedFieldExports.

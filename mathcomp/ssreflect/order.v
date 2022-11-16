@@ -1109,16 +1109,16 @@ HB.end.
 
 Module POrderExports.
 Arguments le_trans {d s} [_ _ _].
-Notation "[ 'porderType' 'of' T 'for' cT ]" := (POrder.clone _ T cT)
+Notation "[ 'porderType' 'of' T 'for' cT ]" := (POrder.clone _ T%type cT)
   (at level 0, format "[ 'porderType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'porderType' 'of' T 'for' cT 'with' disp ]" :=
-  (POrder.clone disp T cT)
+  (POrder.clone disp T%type cT)
   (at level 0, format "[ 'porderType'  'of'  T  'for'  cT  'with'  disp ]") :
   form_scope.
-Notation "[ 'porderType' 'of' T ]" := [porderType of T for _]
+Notation "[ 'porderType' 'of' T ]" := [porderType of T%type for _]
   (at level 0, format "[ 'porderType'  'of'  T ]") : form_scope.
 Notation "[ 'porderType' 'of' T 'with' disp ]" :=
-  [porderType of T for _ with disp]
+  [porderType of T%type for _ with disp]
   (at level 0, format "[ 'porderType'  'of'  T  'with' disp ]") : form_scope.
 End POrderExports.
 HB.export POrderExports.
@@ -1346,16 +1346,16 @@ HB.structure Definition Lattice d :=
   { T of POrder_isLattice d T & POrder d T }.
 
 Module LatticeExports.
-Notation "[ 'latticeType' 'of' T 'for' cT ]" := (Lattice.clone _ T cT)
+Notation "[ 'latticeType' 'of' T 'for' cT ]" := (Lattice.clone _ T%type cT)
   (at level 0, format "[ 'latticeType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'latticeType' 'of' T 'for' cT 'with' disp ]" :=
-  (Lattice.clone disp T cT)
+  (Lattice.clone disp T%type cT)
   (at level 0, format "[ 'latticeType'  'of'  T  'for'  cT  'with'  disp ]") :
   form_scope.
-Notation "[ 'latticeType' 'of' T ]" := [latticeType of T for _]
+Notation "[ 'latticeType' 'of' T ]" := [latticeType of T%type for _]
   (at level 0, format "[ 'latticeType'  'of'  T ]") : form_scope.
 Notation "[ 'latticeType' 'of' T 'with' disp ]" :=
-  [latticeType of T for _ with disp]
+  [latticeType of T%type for _ with disp]
   (at level 0, format "[ 'latticeType'  'of'  T  'with' disp ]") : form_scope.
 End LatticeExports.
 HB.export LatticeExports.
@@ -1417,9 +1417,9 @@ HB.mixin Record hasBottom d (T : Type) of POrder d T := {
 HB.structure Definition BLattice d := { T of hasBottom d T & Lattice d T }.
 
 Module BLatticeExports.
-Notation "[ 'bLatticeType' 'of' T 'for' cT ]" := (BLattice.clone _ T cT)
+Notation "[ 'bLatticeType' 'of' T 'for' cT ]" := (BLattice.clone _ T%type cT)
   (at level 0, format "[ 'bLatticeType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'bLatticeType' 'of' T ]" := [bLatticeType of T for _]
+Notation "[ 'bLatticeType' 'of' T ]" := [bLatticeType of T%type for _]
   (at level 0, format "[ 'bLatticeType'  'of'  T ]") : form_scope.
 (* Notation "[ 'bLatticeType' 'of' T 'for' cT 'with' disp ]" := *)
 (*   (@clone_with T _ cT disp _ id) *)
@@ -1532,7 +1532,7 @@ HB.structure Definition BDistrLattice d :=
   { T of hasBottom d T & DistrLattice d T}.
 
 Module BDistrLatticeExports.
-Notation "[ 'bDistrLatticeType' 'of' T ]" := (BDistrLattice.clone _ T _)
+Notation "[ 'bDistrLatticeType' 'of' T ]" := (BDistrLattice.clone _ T%type _)
   (at level 0, format "[ 'bDistrLatticeType'  'of'  T ]") : form_scope.
 End BDistrLatticeExports.
 HB.export BDistrLatticeExports.
@@ -1542,7 +1542,7 @@ HB.structure Definition TBDistrLattice d :=
   { T of TBLattice d T & BDistrLattice d T }.
 
 Module TBDistrLatticeExports.
-Notation "[ 'tbDistrLatticeType' 'of' T ]" := (TBDistrLattice.clone _ T _)
+Notation "[ 'tbDistrLatticeType' 'of' T ]" := (TBDistrLattice.clone _ T%type _)
   (at level 0, format "[ 'tbDistrLatticeType'  'of'  T ]") : form_scope.
 End TBDistrLatticeExports.
 HB.export TBDistrLatticeExports.
@@ -1559,11 +1559,11 @@ HB.structure Definition CBDistrLattice d :=
   { T of hasSub d T & BDistrLattice d T }.
 
 Module CBDistrLatticeExports.
-(*Notation "[ 'cbDistrLatticeType' 'of' T 'for' cT ]" := (@CBDistrLattice.clone _ T cT)
+(*Notation "[ 'cbDistrLatticeType' 'of' T 'for' cT ]" := (@CBDistrLattice.clone _ T%type cT)
   (at level 0, format "[ 'cbDistrLatticeType'  'of'  T  'for'  cT ]") :
   form_scope.
 Notation "[ 'cbDistrLatticeType' 'of' T 'for' cT 'with' disp ]" :=
-  (@CBDistrLattice.clone disp T cT)
+  (@CBDistrLattice.clone disp T%type cT)
   (at level 0,
    format "[ 'cbDistrLatticeType'  'of'  T  'for'  cT  'with'  disp ]") :
   form_scope.
@@ -1649,7 +1649,7 @@ HB.export TotalExports.
 HB.structure Definition FinPOrder d := { T of Finite T & POrder d T }.
 
 Module FinPOrderExports.
-Notation "[ 'finPOrderType' 'of' T ]" := (FinPOrder.clone _ T _ )
+Notation "[ 'finPOrderType' 'of' T ]" := (FinPOrder.clone _ T%type _ )
   (at level 0, format "[ 'finPOrderType'  'of'  T ]") : form_scope.
 End FinPOrderExports.
 HB.export FinPOrderExports.
@@ -1658,7 +1658,7 @@ HB.export FinPOrderExports.
 HB.structure Definition FinLattice d := { T of Finite T & TBLattice d T }.
 
 Module FinLatticeExports.
-Notation "[ 'finLatticeType' 'of' T ]" := (FinLattice.clone _ T _ )
+Notation "[ 'finLatticeType' 'of' T ]" := (FinLattice.clone _ T%type _ )
   (at level 0, format "[ 'finLatticeType'  'of'  T ]") : form_scope.
 End FinLatticeExports.
 HB.export FinLatticeExports.
@@ -1668,7 +1668,7 @@ HB.structure Definition FinDistrLattice d :=
   { T of Finite T & TBDistrLattice d T }.
 
 Module FinDistrLatticeExports.
-Notation "[ 'finDistrLatticeType' 'of' T ]" := (FinDistrLattice.clone _ T _ )
+Notation "[ 'finDistrLatticeType' 'of' T ]" := (FinDistrLattice.clone _ T%type _ )
   (at level 0, format "[ 'finDistrLatticeType'  'of'  T ]") : form_scope.
 End FinDistrLatticeExports.
 HB.export FinDistrLatticeExports.
@@ -1678,7 +1678,7 @@ HB.structure Definition FinCDistrLattice d :=
   { T of Finite T & CTBDistrLattice d T }.
 
 Module FinCDistrLatticeExports.
-Notation "[ 'finCDistrLatticeType' 'of' T ]" := (FinCDistrLattice.clone _ T _ )
+Notation "[ 'finCDistrLatticeType' 'of' T ]" := (FinCDistrLattice.clone _ T%type _ )
   (at level 0, format "[ 'finCDistrLatticeType'  'of'  T ]") : form_scope.
 End FinCDistrLatticeExports.
 HB.export FinCDistrLatticeExports.
@@ -1689,7 +1689,7 @@ HB.structure Definition FinTotal d :=
   { T of Total d T & FinDistrLattice d T }.
 
 Module FinTotalExports.
-Notation "[ 'finOrderType' 'of' T ]" := (FinTotal.clone _ T _ )
+Notation "[ 'finOrderType' 'of' T ]" := (FinTotal.clone _ T%type _ )
   (at level 0, format "[ 'finOrderType'  'of'  T ]") : form_scope.
 End FinTotalExports.
 HB.export FinTotalExports.
