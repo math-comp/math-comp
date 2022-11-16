@@ -136,9 +136,9 @@ HB.end.
 
 Module FalgebraExports.
 Bind Scope ring_scope with sort.
-Notation "[ 'FalgType' F 'of' L ]" := (Falgebra.clone F L _)
+Notation "[ 'FalgType' F 'of' L ]" := (Falgebra.clone F L%type _)
   (at level 0, format "[ 'FalgType'  F  'of'  L ]") : form_scope.
-Notation "[ 'FalgType' F 'of' L 'for' L' ]" := (Falgebra.clone F L L')
+Notation "[ 'FalgType' F 'of' L 'for' L' ]" := (Falgebra.clone F L%type L')
   (at level 0, format "[ 'FalgType'  F  'of'  L  'for'  L' ]") : form_scope.
 Notation FalgUnitRingType T := (Algebra_isFalgebra.Build _ T).
 End FalgebraExports.

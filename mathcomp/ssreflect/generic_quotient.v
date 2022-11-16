@@ -161,7 +161,7 @@ Canonical mpi_unlock := Unlockable mpi.unlock.
 Canonical pi_unlock := Unlockable pi.unlock.
 Canonical repr_unlock := Unlockable repr.unlock.
 
-Notation "[ 'quotType' 'of' Q ]" := (Quotient.clone _ Q _)
+Notation "[ 'quotType' 'of' Q ]" := (Quotient.clone _ Q%type _)
  (at level 0, format "[ 'quotType'  'of'  Q ]") : form_scope.
 
 Arguments repr {T qT} x.
@@ -302,7 +302,7 @@ HB.structure Definition EqQuotient T eq_quot_op :=
 Canonical pi_eq_quot_mono T eq_quot_op eqT :=
   PiMono2 (@pi_eq_quot T eq_quot_op eqT).
 
-Notation "[ 'eqQuotType' e 'of' Q ]" := (EqQuotient.clone _ e Q _)
+Notation "[ 'eqQuotType' e 'of' Q ]" := (EqQuotient.clone _ e Q%type _)
  (at level 0, format "[ 'eqQuotType'  e  'of'  Q ]") : form_scope.
 
 (**************************************************************************)

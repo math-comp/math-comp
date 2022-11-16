@@ -137,9 +137,9 @@ End OtherDefs.
 
 Module Import VectorExports.
 Bind Scope ring_scope with Vector.sort.
-Notation "[ 'vectType' R 'of' T 'for' cT ]" := (@Vector.clone [the ringType of R] T cT)
+Notation "[ 'vectType' R 'of' T 'for' cT ]" := (@Vector.clone [the ringType of R] T%type cT)
   (at level 0, format "[ 'vectType'  R  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'vectType' R 'of' T ]" := [vectType R of T for _]
+Notation "[ 'vectType' R 'of' T ]" := [vectType R of T%type for _]
   (at level 0, format "[ 'vectType'  R  'of'  T ]") : form_scope.
 
 Notation "{ 'vspace' vT }" := (space (Phant vT)) : type_scope.

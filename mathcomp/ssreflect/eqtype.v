@@ -130,11 +130,11 @@ HB.mixin Record hasDecEq T := { eq_op : rel T; eqP : eq_axiom eq_op }.
 #[mathcomp(axiom="eq_axiom"), short(type="eqType")]
 HB.structure Definition Equality := { T of hasDecEq T }.
 
-Notation "[ 'hasDecEq' 'of' T ]" := (Equality.on T)
+Notation "[ 'hasDecEq' 'of' T ]" := (Equality.on T%type)
   (at level 0, format "[ 'hasDecEq'  'of'  T ]") : form_scope.
-Notation "[ 'eqType' 'of' T 'for' C ]" := (Equality.clone T C)
+Notation "[ 'eqType' 'of' T 'for' C ]" := (Equality.clone T%type C)
   (at level 0, format "[ 'eqType'  'of'  T  'for'  C ]") : form_scope.
-Notation "[ 'eqType' 'of' T ]" := (Equality.clone T _)
+Notation "[ 'eqType' 'of' T ]" := (Equality.clone T%type _)
   (at level 0, format "[ 'eqType'  'of'  T ]") : form_scope.
 
 (* eqE is a generic lemma that can be used to fold back recursive comparisons *)

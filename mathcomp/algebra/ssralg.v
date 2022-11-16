@@ -777,9 +777,9 @@ Module ZmodExports.
 Bind Scope ring_scope with Zmodule.sort.
 #[deprecated(since="mathcomp 2.0.0", note="use GRing.isZmodule.Build instead")]
 Notation ZmodMixin V := (isZmodule.Build V).
-Notation "[ 'zmodType' 'of' T 'for' cT ]" := (@Zmodule.clone T cT)
+Notation "[ 'zmodType' 'of' T 'for' cT ]" := (@Zmodule.clone T%type cT)
   (at level 0, format "[ 'zmodType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'zmodType' 'of' T ]" :=  (@Zmodule.clone T _)
+Notation "[ 'zmodType' 'of' T ]" :=  (@Zmodule.clone T%type _)
   (at level 0, format "[ 'zmodType'  'of'  T ]") : form_scope.
 End ZmodExports.
 HB.export ZmodExports.
@@ -1046,9 +1046,9 @@ HB.structure Definition Ring := { R of isRing R & Choice R }.
 
 Module RingExports.
 Bind Scope ring_scope with Ring.sort.
-Notation "[ 'ringType' 'of' T 'for' cT ]" := (Ring.clone T cT)
+Notation "[ 'ringType' 'of' T 'for' cT ]" := (Ring.clone T%type cT)
   (at level 0, format "[ 'ringType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'ringType' 'of' T ]" := (Ring.clone T _)
+Notation "[ 'ringType' 'of' T ]" := (Ring.clone T%type _)
   (at level 0, format "[ 'ringType'  'of'  T ]") : form_scope.
 End RingExports.
 HB.export RingExports.
@@ -1648,9 +1648,9 @@ HB.structure Definition Lmodule (R : ringType) :=
 Module LmodExports.
 Bind Scope ring_scope with Lmodule.sort.
 Notation "[ 'lmodType' R 'of' T 'for' cT ]" :=
-  (@Lmodule.clone [the ringType of R] T cT)
+  (@Lmodule.clone [the ringType of R] T%type cT)
   (at level 0, format "[ 'lmodType'  R  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'lmodType' R 'of' T ]" := [lmodType R of T for _]
+Notation "[ 'lmodType' R 'of' T ]" := [lmodType R of T%type for _]
   (at level 0, format "[ 'lmodType'  R  'of'  T ]") : form_scope.
 End LmodExports.
 HB.export LmodExports.
@@ -1751,9 +1751,9 @@ HB.structure Definition Lalgebra R :=
 Module LalgExports.
 Bind Scope ring_scope with Lalgebra.sort.
 Notation "[ 'lalgType' R 'of' T 'for' cT ]" :=
-  (Lalgebra.clone [the ringType of R] T cT)
+  (Lalgebra.clone [the ringType of R] T%type cT)
   (at level 0, format "[ 'lalgType'  R  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'lalgType' R 'of' T ]" := [lalgType R of T for _]
+Notation "[ 'lalgType' R 'of' T ]" := [lalgType R of T%type for _]
   (at level 0, format "[ 'lalgType'  R  'of'  T ]") : form_scope.
 End LalgExports.
 HB.export LalgExports.
@@ -1829,7 +1829,7 @@ End Additive.
 Notation "{ 'additive' U -> V }" := (Additive.type U%type V%type) : type_scope.
 Notation "[ 'additive' 'of' f 'as' g ]" := (Additive.clone _ _ f%function g)
   (at level 0, format "[ 'additive'  'of'  f  'as'  g ]") : form_scope.
-Notation "[ 'additive' 'of' f ]" := (Additive.clone _ _ f _)
+Notation "[ 'additive' 'of' f ]" := (Additive.clone _ _ f%function _)
   (at level 0, format "[ 'additive'  'of'  f ]") : form_scope.
 End AdditiveExports.
 HB.export AdditiveExports.
@@ -2039,7 +2039,7 @@ Notation "{ 'rmorphism' U -> V }" := (RMorphism.type U%type V%type)
   : type_scope.
 Notation "[ 'rmorphism' 'of' f 'as' g ]" := (RMorphism.clone _ _ f%function g)
   (at level 0, format "[ 'rmorphism'  'of'  f  'as'  g ]") : form_scope.
-Notation "[ 'rmorphism' 'of' f ]" := (RMorphism.clone _ _ f _)
+Notation "[ 'rmorphism' 'of' f ]" := (RMorphism.clone _ _ f%function _)
   (at level 0, format "[ 'rmorphism'  'of'  f ]") : form_scope.
 End RMorphismExports.
 HB.export RMorphismExports.
@@ -2251,7 +2251,7 @@ Notation "{ 'scalar' U }" := {linear U -> _ | *%R}
   (at level 0, format "{ 'scalar'  U }") : type_scope.
 Notation "[ 'linear' 'of' f 'as' g ]" := (Linear.clone _ _ _ _ f%function g)
   (at level 0, format "[ 'linear'  'of'  f  'as'  g ]") : form_scope.
-Notation "[ 'linear' 'of' f ]" := (Linear.clone _ _ _ _ f _)
+Notation "[ 'linear' 'of' f ]" := (Linear.clone _ _ _ _ f%function _)
   (at level 0, format "[ 'linear'  'of'  f ]") : form_scope.
 (* Support for right-to-left rewriting with the generic linearZ rule. *)
 Identity Coercion lineratype_id : Linear.type >-> Linear.type_.
@@ -2482,9 +2482,9 @@ HB.end.
 
 Module ComRingExports.
 Bind Scope ring_scope with ComRing.sort.
-Notation "[ 'comRingType' 'of' T 'for' cT ]" := (ComRing.clone T cT)
+Notation "[ 'comRingType' 'of' T 'for' cT ]" := (ComRing.clone T%type cT)
   (at level 0, format "[ 'comRingType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'comRingType' 'of' T ]" := (ComRing.clone T _)
+Notation "[ 'comRingType' 'of' T ]" := (ComRing.clone T%type _)
   (at level 0, format "[ 'comRingType'  'of'  T ]") : form_scope.
 End ComRingExports.
 HB.export ComRingExports.
@@ -2603,10 +2603,10 @@ HB.structure Definition Algebra (R : ringType) :=
 Module AlgExports.
 Bind Scope ring_scope with Algebra.sort.
 Notation "[ 'algType' R 'of' T 'for' cT ]" :=
-  (Algebra.clone [the ringType of R] T cT)
+  (Algebra.clone [the ringType of R] T%type cT)
   (at level 0, format "[ 'algType'  R  'of'  T  'for'  cT ]")
   : form_scope.
-Notation "[ 'algType' R 'of' T ]" := [algType R of T for _]
+Notation "[ 'algType' R 'of' T ]" := [algType R of T%type for _]
   (at level 0, format "[ 'algType'  R  'of'  T ]") : form_scope.
 End AlgExports.
 HB.export AlgExports.
@@ -2628,7 +2628,7 @@ HB.structure Definition ComAlgebra R := {V of ComRing V & Algebra R V}.
 Module ComAlgExports.
 Bind Scope ring_scope with ComAlgebra.sort.
 Notation "[ 'comAlgType' R 'of' T ]" :=
-    (ComAlgebra.clone [the ringType of R] T _)
+    (ComAlgebra.clone [the ringType of R] T%type _)
   (at level 0, format "[ 'comAlgType'  R  'of'  T ]") : form_scope.
 End ComAlgExports.
 HB.export ComAlgExports.
@@ -2705,9 +2705,9 @@ HB.structure Definition UnitRing := {R of Ring_hasMulInverse R & Ring R}.
 
 Module UnitRingExports.
 Bind Scope ring_scope with UnitRing.sort.
-Notation "[ 'unitRingType' 'of' T 'for' cT ]" := (UnitRing.clone T cT)
+Notation "[ 'unitRingType' 'of' T 'for' cT ]" := (UnitRing.clone T%type cT)
   (at level 0, format "[ 'unitRingType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'unitRingType' 'of' T ]" := (UnitRing.clone T _)
+Notation "[ 'unitRingType' 'of' T ]" := (UnitRing.clone T%type _)
   (at level 0, format "[ 'unitRingType'  'of'  T ]") : form_scope.
 End UnitRingExports.
 HB.export UnitRingExports.
@@ -2991,7 +2991,7 @@ HB.structure Definition ComUnitRing := {R of ComRing R & UnitRing R}.
 
 Module ComUnitRingExports.
 Bind Scope ring_scope with ComUnitRing.sort.
-Notation "[ 'comUnitRingType' 'of' T ]" := (ComUnitRing.clone T _)
+Notation "[ 'comUnitRingType' 'of' T ]" := (ComUnitRing.clone T%type _)
   (at level 0, format "[ 'comUnitRingType'  'of'  T ]") : form_scope.
 End ComUnitRingExports.
 HB.export ComUnitRingExports.
@@ -3023,7 +3023,7 @@ HB.structure Definition UnitAlgebra R := {V of Algebra R V & UnitRing V}.
 Module UnitAlgebraExports.
 Bind Scope ring_scope with UnitAlgebra.sort.
 Notation "[ 'unitAlgType' R 'of' T ]" :=
-  (UnitAlgebra.clone [the ringType of R] T _)
+  (UnitAlgebra.clone [the ringType of R] T%type _)
   (at level 0, format "[ 'unitAlgType'  R  'of'  T ]") : form_scope.
 End UnitAlgebraExports.
 HB.export UnitAlgebraExports.
@@ -3034,7 +3034,7 @@ HB.structure Definition ComUnitAlgebra R := {V of ComAlgebra R V & UnitRing V}.
 Module ComUnitAlgebraExports.
 Bind Scope ring_scope with UnitAlgebra.sort.
 Notation "[ 'comUnitAlgType' R 'of' T ]" :=
-  (ComUnitAlgebra.clone [the ringType of R] T _)
+  (ComUnitAlgebra.clone [the ringType of R] T%type _)
   (at level 0, format "[ 'comUnitAlgType'  R  'of'  T ]") : form_scope.
 End ComUnitAlgebraExports.
 HB.export ComUnitAlgebraExports.
@@ -3814,9 +3814,9 @@ HB.structure Definition IntegralDomain :=
   {R of ComUnitRing_isIntegral R & ComUnitRing R}.
 
 Module IntegralDomainExports.
-Notation "[ 'idomainType' 'of' T 'for' cT ]" := (IntegralDomain.clone T cT)
+Notation "[ 'idomainType' 'of' T 'for' cT ]" := (IntegralDomain.clone T%type cT)
   (at level 0, format "[ 'idomainType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'idomainType' 'of' T ]" := (IntegralDomain.clone T _)
+Notation "[ 'idomainType' 'of' T ]" := (IntegralDomain.clone T%type _)
   (at level 0, format "[ 'idomainType'  'of'  T ]") : form_scope.
 End IntegralDomainExports.
 HB.export IntegralDomainExports.
@@ -3958,9 +3958,9 @@ HB.mixin Record UnitRing_isField R of UnitRing R := {
 HB.structure Definition Field := { R of IntegralDomain R & UnitRing_isField R }.
 
 Module FieldExports.
-Notation "[ 'fieldType' 'of' T 'for' cT ]" := (Field.clone T cT)
+Notation "[ 'fieldType' 'of' T 'for' cT ]" := (Field.clone T%type cT)
   (at level 0, format "[ 'fieldType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'fieldType' 'of' T ]" := (Field.clone T _)
+Notation "[ 'fieldType' 'of' T ]" := (Field.clone T%type _)
   (at level 0, format "[ 'fieldType'  'of'  T ]") : form_scope.
 End FieldExports.
 HB.export FieldExports.
@@ -4193,9 +4193,9 @@ HB.mixin Record Field_isDec R of UnitRing R := {
 HB.structure Definition DecidableField := { F of Field F & Field_isDec F }.
 
 Module DecFieldExports.
-Notation "[ 'decFieldType' 'of' T 'for' cT ]" := (DecidableField.clone T cT)
+Notation "[ 'decFieldType' 'of' T 'for' cT ]" := (DecidableField.clone T%type cT)
   (at level 0, format "[ 'decFieldType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'decFieldType' 'of' T ]" := (DecidableField.clone T _)
+Notation "[ 'decFieldType' 'of' T ]" := (DecidableField.clone T%type _)
   (at level 0, format "[ 'decFieldType'  'of'  T ]") : form_scope.
 End DecFieldExports.
 HB.export DecFieldExports.
@@ -4391,9 +4391,9 @@ HB.structure Definition ClosedField :=
   { F of DecidableField F & DecField_isAlgClosed F }.
 
 Module ClosedFieldExports.
-Notation "[ 'closedFieldType' 'of' T 'for' cT ]" := (ClosedField.clone T cT)
+Notation "[ 'closedFieldType' 'of' T 'for' cT ]" := (ClosedField.clone T%type cT)
   (at level 0, format "[ 'closedFieldType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'closedFieldType' 'of' T ]" := (ClosedField.clone T _)
+Notation "[ 'closedFieldType' 'of' T ]" := (ClosedField.clone T%type _)
   (at level 0, format "[ 'closedFieldType'  'of'  T ]") : form_scope.
 End ClosedFieldExports.
 HB.export ClosedFieldExports.

@@ -233,9 +233,9 @@ End CanonicalFinType.
 
 Notation FinMixin x := (Finite.EnumMixin x).
 Notation UniqFinMixin := Finite.UniqMixin.
-Notation "[ 'finType' 'of' T 'for' cT ]" := (Finite.clone T cT)
+Notation "[ 'finType' 'of' T 'for' cT ]" := (Finite.clone T%type cT)
   (at level 0, format "[ 'finType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'finType' 'of' T ]" := (Finite.clone T _)
+Notation "[ 'finType' 'of' T ]" := (Finite.clone T%type _)
   (at level 0, format "[ 'finType'  'of'  T ]") : form_scope.
 
 (* Workaround for the silly syntactic uniformity restriction on coercions;    *)
@@ -1417,7 +1417,7 @@ Qed.
 
 End SubFinType.
 
-Notation "[ 'subFinType' 'of' T ]" := (SubFinite.clone _ _ T _)
+Notation "[ 'subFinType' 'of' T ]" := (SubFinite.clone _ _ T%type _)
   (at level 0, format "[ 'subFinType'  'of'  T ]") : form_scope.
 
 HB.factory Record SubCountable_isFinite (T : finType) P (sT : Type)
