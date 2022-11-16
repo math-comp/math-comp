@@ -1795,6 +1795,7 @@ HB.structure Definition Additive (U V : zmodType) := {f of isAdditive U V f}.
 Module AdditiveExports.
 Module Additive.
 Definition map (U V : zmodType) (phUV : phant (U -> V)) := Additive.type U V.
+Definition apply (U V : zmodType) (phUV : phant (U -> V)) := @Additive.sort U V.
 End Additive.
 Notation "{ 'additive' fUV }" := (Additive.map (Phant fUV%type))
   (at level 0, format "{ 'additive'  fUV }") : type_scope.
@@ -2001,6 +2002,7 @@ HB.structure Definition RMorphism (R S : ringType) :=
 Module RMorphismExports.
 Module RMorphism.
 Definition map (R S : ringType) (phRS : phant (R -> S)) := RMorphism.type R S.
+Definition apply (R S : ringType) (phRS : phant (R -> S)) := @RMorphism.sort R S.
 End RMorphism.
 Notation "{ 'rmorphism' fRS }" := (RMorphism.map (Phant fRS%type))
   (at level 0, format "{ 'rmorphism'  fRS }") : type_scope.
@@ -2198,6 +2200,7 @@ Module Linear.
 Section Linear.
 Variables (R : ringType) (U : lmodType R) (V : zmodType) (s : R -> V -> V).
 Definition map (phUV : phant (U -> V)) := Linear.type U s.
+Definition apply (phUV : phant (U -> V)) := @Linear.sort R U V s.
 (* Support for right-to-left rewriting with the generic linearZ rule. *)
 Local Notation mapUV := (Linear.type U s).
 Definition map_class := mapUV.
@@ -2394,6 +2397,8 @@ Module LRMorphismExports.
 Module LRMorphism.
 Definition map (R : ringType) (A : lalgType R) (B : ringType) (s : R -> B -> B)
   (phAB : phant (A -> B)) := LRMorphism.type A s.
+Definition apply (R : ringType) (A : lalgType R) (B : ringType) (s : R -> B -> B)
+  (phAB : phant (A -> B)) := @LRMorphism.sort R A B s.
 End LRMorphism.
 Notation "{ 'lrmorphism' fAB | s }" := (LRMorphism.map s (Phant fAB%type))
   (at level 0, format "{ 'lrmorphism'  fAB  |  s }") : type_scope.
