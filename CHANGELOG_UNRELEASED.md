@@ -97,6 +97,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `exchange_big_dep_nat_idem`, `exchange_big_nat_idem`,
     `big_undup_AC`
 
+- in `ssralg.v`
+  + lemmas `divrN`, `divrNN`
+
 ### Changed
 
 - in `poly.v`:
