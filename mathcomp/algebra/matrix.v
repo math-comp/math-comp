@@ -172,6 +172,13 @@ From mathcomp Require Import div prime binomial ssralg finalg zmodp countalg.
 (* - The determinant is a multilinear alternate form.                         *)
 (* - The Laplace determinant expansion formulas: expand_det_[row|col].        *)
 (* - The Cramer rule : mul_mx_adj & mul_adj_mx.                               *)
+(* Vandermonde m a == the 'M[R]_(m, n) Vandermonde matrix, given a : 'rV_n    *)
+(*                    /         1          ...           1              \     *)
+(*                    |      (a 0 0)       ...      (a 0 (n - 1))       |     *)
+(*                    |    (a 0 0 ^+ 2)    ...    (a 0 (n - 1) ^+ 2)    |     *)
+(*                    |        ...                      ...             |     *)
+(*                    \ (a 0 0 ^+ (m - 1)) ... (a 0 (n - 1) ^+ (m - 1)) /     *)
+(*                 := \matrix_(i < m, j < n) a 0 j ^+ i.                      *)
 (* Finally, as an example of the use of block products, we program and prove  *)
 (* the correctness of a classical linear algebra algorithm:                   *)
 (*   cormen_lup A == the triangular decomposition (L, U, P) of a nontrivial   *)
@@ -4580,4 +4587,38 @@ Lemma mul_mxdiag_mxblock {R : ringType} {p q : nat}
   \mxdiag_j D_ j *m \mxblock_(i, j) B_ i j = \mxblock_(i, j) (D_ i *m B_ i j).
 Proof.
 by rewrite !mxblockEv mul_mxdiag_mxcol; under eq_mxcol do rewrite mul_mxrow.
+Qed.
+
+Definition Vandermonde (R : ringType) (m n : nat) (a : 'rV[R]_n) :=
+  \matrix_(i < m, j < n) a 0 j ^+ i.
+
+Lemma det_Vandermonde (R : comRingType) (n : nat) (a : 'rV[R]_n) :
+  \det (Vandermonde n a) = \prod_(i < n) \prod_(j < n | i < j) (a 0 j - a 0 i).
+Proof.
+set V := @Vandermonde R.
+elim: n => [|n IHn] in a *; first by rewrite det_mx00 big1// => -[] [].
+pose b : 'rV_n := \row_i a 0 (lift 0 i).
+pose C : 'M_n := diag_mx (\row_(i < n) (b 0 i - a 0 0)).
+pose D : 'M_n.+1 := 1 - a 0 0 *: \matrix_(i, j) (i == j.+1 :> nat)%:R. 
+have detD : \det D = 1.
+  rewrite det_trig ?big_ord_recl ?mxE ?mulr0 ?subr0 ?eqxx.
+    by rewrite ?big1 ?mulr1// => i; rewrite !mxE eqxx ltn_eqF// mulr0 subr0.
+  by apply/is_trig_mxP => *; rewrite !mxE ![_ == _]ltn_eqF ?mulr0 ?subr0 ?leqW.
+suff: D * V _ _ a = block_mx 1 (const_mx 1) 0 (V _ _ b *m C) :> 'M_(1 + n).
+  move=> /(congr1 determinant); rewrite detM detD mul1r => ->.
+  rewrite det_ublock det1 mul1r det_mulmx IHn big_ord_recl mulrC; congr (_ * _).
+    rewrite big_mkcond big_ord_recl/= mul1r det_diag.
+    by under eq_bigr do rewrite !mxE.
+  apply: eq_bigr => i _; under eq_bigr do rewrite !mxE.
+  by rewrite big_mkcond [RHS]big_mkcond big_ord_recl/= mul1r.
+rewrite mulrBl mul1r -scalerAl; apply/matrixP => i j; rewrite !mxE.
+under eq_bigr do rewrite !mxE; case: splitP => [{i}_ -> /[!ord1]|{}i ->].
+  rewrite !expr0 big1; last by move=> ?; rewrite mul0r.
+  by rewrite ?mulr0 ?subr0 ?mxE; case: splitP => k; rewrite ?ord1 mxE//.
+under eq_bigr do rewrite eqSS mulr_natl mulrb eq_sym.
+rewrite -big_mkcond/= big_ord1_eq exprS ifT// ?leqW// -mulrBl !mxE/=.
+case: split_ordP => [{j}_ -> /[!ord1]|{}j ->]; rewrite ?lshift0 ?rshift1 ?mxE.
+   by rewrite ?subrr ?mul0r//.
+under eq_bigr do rewrite !mxE mulrnAr mulrb.
+by rewrite -big_mkcond big_pred1_eq /= mulrC.
 Qed.
