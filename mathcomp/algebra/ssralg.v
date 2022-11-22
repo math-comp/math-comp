@@ -3969,6 +3969,12 @@ have [Ux | U'x] := boolP (x \is a unit); last by rewrite !invr_out ?unitrN.
 by rewrite -mulN1r invrM ?unitrN1 // invrN1 mulrN1.
 Qed.
 
+Lemma divrNN x y : (- x) / (- y) = x / y.
+Proof. by rewrite invrN mulrNN. Qed.
+
+Lemma divrN x y : x / (- y) = - (x / y).
+Proof. by rewrite invrN mulrN. Qed.
+
 Lemma invr_signM n x : ((-1) ^+ n * x)^-1 = (-1) ^+ n * x^-1.
 Proof. by rewrite -signr_odd !mulr_sign; case: ifP => // _; rewrite invrN. Qed.
 

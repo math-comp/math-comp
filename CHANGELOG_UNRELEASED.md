@@ -100,6 +100,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + definition `Vandrmonde`
   + lemma `det_Vandermonde`
 
+- in `ssralg.v`
+  + lemmas `divrN`, `divrNN`
+
 ### Changed
 
 - in `poly.v`:
