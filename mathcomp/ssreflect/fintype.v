@@ -1363,7 +1363,7 @@ Proof. by rewrite !cardT !enumT [in LHS]unlock /= !size_map. Qed.
 
 End OptionFinType.
 
-Section TransferFinType.
+Section TransferFinTypeFromCount.
 
 Variables (eT : countType) (fT : finType) (f : eT -> fT).
 
@@ -1376,6 +1376,18 @@ Qed.
 Definition PcanFinMixin g fK := FinMixin (@pcan_enumP g fK).
 
 Definition CanFinMixin g (fK : cancel f g) := PcanFinMixin (can_pcan fK).
+
+End TransferFinTypeFromCount.
+
+Section TransferFinType.
+
+Variables (eT : Type) (fT : finType) (f : eT -> fT).
+
+HB.instance Definition _ g (fK : cancel f g) : isFinite (can_type fK) :=
+  CanFinMixin (fK : cancel (f : can_type fK -> fT) _).
+
+HB.instance Definition _ g (fK : pcancel f g) : isFinite (pcan_type fK) :=
+  PcanFinMixin (fK : pcancel (f : pcan_type fK -> fT) _).
 
 End TransferFinType.
 
