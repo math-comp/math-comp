@@ -2384,6 +2384,36 @@ Qed.
 
 Lemma sumnE r : sumn r = \sum_(i <- r) i. Proof. exact: foldrE. Qed.
 
+Lemma sumn_nconsE s n0 n : sumn (ncons n n0 s) = n * n0 + sumn s.
+Proof.
+rewrite sumnE (big_nth n0) size_ncons /=.
+elim: n => [/=|n IH]; first by rewrite !add0n sumnE [RHS](big_nth n0).
+by rewrite addSn big_nat_recl // nth_ncons /= -addn1 IH addnA -mulSn addn1.
+Qed.
+
+Lemma sumn_set_nthE s n0 n m :
+  let m' := m + (size s <= n) * (nth n0 s n + (n - size s) * n0) in 
+  sumn (set_nth n0 s n m)  = sumn s + m' - nth n0 s n.
+Proof.
+rewrite set_nthE !sumnE /= [in RHS]leqNgt.
+case: ifP => [ltns|_] /=.
+- rewrite big_cat big_cons /= mul0n addn0.  
+  rewrite (big_nth n0) [X in m + X](big_nth n0) [in RHS](big_nth n0). 
+  rewrite big_nat size_take size_drop ltns.  
+  under eq_bigr => ? /andP [_ ltis] do rewrite nth_take //. 
+  under [X in m + X]eq_bigr => ? _ do rewrite nth_drop. 
+  rewrite -big_nat addnC -addnA [in RHS]addnC -addnBA //;
+    last by rewrite (bigD1_seq n) ?leq_addr ?mem_index_iota /index_iota ?subn0 ?ltns ?iota_uniq.                    congr addn; rewrite [in RHS](@big_cat_nat _ _ _ n) //=; last by rewrite ltnW.  
+  rewrite addnC -addnBA //; last by rewrite big_ltn // leq_addr.
+  congr addn; rewrite -{3}(add0n n) [in RHS]big_addn subnS.
+  under eq_bigr do rewrite addSnnS addnC.
+  rewrite -(@big_add1 _ _ _ _ _ predT (fun i => _ _ _ (i + n))).
+  by rewrite [in RHS]big_ltn //= ?subn_gt0 // addnC -addnBA ?subnn ?addn0 ?add0n.
+- rewrite mul1n big_cat //= -addnBA; last by rewrite addnC -addnA leq_addr.
+  congr addn; rewrite -sumnE sumn_nconsE /= addn0.
+  by rewrite -addnBA ?leq_addr // [nth _ _ _ + _]addnC -addnBA // subnn addn0 addnC.
+Qed.
+
 Lemma card_bseq n (T : finType) : #|{bseq n of T}| = \sum_(i < n.+1) #|T| ^ i.
 Proof.
 rewrite (bij_eq_card bseq_tagged_tuple_bij) card_tagged sumnE big_map big_enum.
