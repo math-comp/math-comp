@@ -975,6 +975,37 @@ move=> a Ea; apply: canRL (lker0_lfunK (AEnd_lker0 _)) _.
 by rewrite -galM // mulVg gal_id.
 Qed.
 
+
+Lemma galois_subW E F : galois E F -> (E <= F)%VS. Proof. by case/andP. Qed.
+
+Lemma galois_normalW E F : galois E F -> (normalField E F)%VS.
+Proof. by case/and3P. Qed.
+
+Lemma galois_separableW E F : galois E F -> (separable E F)%VS.
+Proof. by case/and3P. Qed.
+
+Lemma normalField_refl E : normalField E E.
+Proof.
+apply/forallP => /= u; apply/implyP; rewrite in_set.
+by move=> /andP[/andP[_ /fixedSpace_limg->]].
+Qed.
+Hint Resolve normalField_refl : core.
+
+Lemma galois_refl E : galois E E.
+Proof. by rewrite /galois subvv separable_refl normalField_refl. Qed.
+
+Lemma gal1 K (g : gal_of K) : g \in 'Gal(K / 1%VS)%g.
+Proof. by rewrite gal_kHom ?sub1v// k1HomE ahomWin. Qed.
+
+Lemma Fadjoin_sub E x y : x \in <<E; y>>%VS -> (<<E; x>> <= <<E; y>>)%VS.
+Proof. by move=> xEy; apply/FadjoinP; rewrite subv_adjoin. Qed.
+
+Lemma galvv E : ('Gal(E / E) = 1)%g.
+Proof.
+apply/trivgP/subsetP=> u uG; rewrite inE.
+by apply/gal_eqP => x xE; rewrite gal_id (fixed_gal _ uG).
+Qed.
+
 (* Standard mathematical notation for 'Gal(E / K) puts the larger field first.*)
 Definition galoisG V U := gal V @* <<kAEnd (U :&: V) V>>.
 Local Notation "''Gal' ( V / U )" := (galoisG V U) : group_scope.
