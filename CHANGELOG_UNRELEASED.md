@@ -49,7 +49,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `bigop.v`
   + lemmas `big_ord1_eq`, `big_ord1_cond_eq`, `big_nat1_eq`,
-    `big_nat1_cond_eq`
+    `big_nat1_cond_eq`, `sumn_set_nthE`, `sumn_nconsE`
 
 - in `eqtype.v`
   + lemmas `existsb` and `exists_inb`
