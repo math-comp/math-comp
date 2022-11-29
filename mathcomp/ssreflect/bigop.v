@@ -2403,7 +2403,8 @@ case: ifP => [ltns|_] /=.
   under eq_bigr => ? /andP [_ ltis] do rewrite nth_take //. 
   under [X in m + X]eq_bigr => ? _ do rewrite nth_drop. 
   rewrite -big_nat addnC -addnA [in RHS]addnC -addnBA //;
-    last by rewrite (bigD1_seq n) ?leq_addr ?mem_index_iota /index_iota ?subn0 ?ltns ?iota_uniq.                    congr addn; rewrite [in RHS](@big_cat_nat _ _ _ n) //=; last by rewrite ltnW.  
+    last by rewrite (bigD1_seq n) ?leq_addr ?mem_index_iota /index_iota ?subn0 ?ltns ?iota_uniq.                    
+  congr addn; rewrite [in RHS](@big_cat_nat _ _ _ n) //=; last by rewrite ltnW.  
   rewrite addnC -addnBA //; last by rewrite big_ltn // leq_addr.
   congr addn; rewrite -{3}(add0n n) [in RHS]big_addn subnS.
   under eq_bigr do rewrite addSnnS addnC.
