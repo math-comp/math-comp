@@ -345,7 +345,6 @@ Qed.
 
 End EqTuple.
 
-(* TODO: try to factor this into a single instance *)
 HB.instance Definition tuple_hasChoice n (T : choiceType) :=
   [hasChoice of n.-tuple T by <:].
 HB.instance Definition tuple_isCountable n (T : countType) :=
