@@ -2411,7 +2411,7 @@ case: ifP => [ltns|_] /=.
   rewrite -(@big_add1 _ _ _ _ _ predT (fun i => _ _ _ (i + n))).
   by rewrite [in RHS]big_ltn //= ?subn_gt0 // addnC -addnBA ?subnn ?addn0 ?add0n.
 - rewrite mul1n big_cat //= -addnBA; last by rewrite addnC -addnA leq_addr.
-  congr addn; rewrite -sumnE sumn_nconsE /= addn0.
+  congr addn; rewrite -sumnE sumn_nconsE /= addn0. 
   by rewrite -addnBA ?leq_addr // [nth _ _ _ + _]addnC -addnBA // subnn addn0 addnC.
 Qed.
 
