@@ -3006,8 +3006,11 @@ End FoldRightComp.
 
 Definition sumn := foldr addn 0.
 
+Lemma sumn_ncons x n s : sumn (ncons n x s) = x * n + sumn s.
+Proof. by rewrite mulnC; elim: n => //= n ->; rewrite addnA. Qed.
+
 Lemma sumn_nseq x n : sumn (nseq n x) = x * n.
-Proof. by rewrite mulnC; elim: n => //= n ->. Qed.
+Proof. by rewrite sumn_ncons addn0. Qed.
 
 Lemma sumn_cat s1 s2 : sumn (s1 ++ s2) = sumn s1 + sumn s2.
 Proof. by elim: s1 => //= x s1 ->; rewrite addnA. Qed.
@@ -3033,6 +3036,31 @@ Lemma natnseq0P s : reflect (s = nseq (size s) 0) (sumn s == 0).
 Proof.
 apply: (iffP idP) => [|->]; last by rewrite sumn_nseq.
 by elim: s => //= x s IHs; rewrite addn_eq0 => /andP[/eqP-> /IHs <-].
+Qed.
+
+Lemma sumn_set_nth s x0 n x :
+  sumn (set_nth x0 s n x) =
+    sumn s + x - (nth x0 s n) * (n < size s) + x0 * (n - size s).
+Proof.
+rewrite set_nthE; case: ltnP => [nlts|nges]; last first.
+  by rewrite sumn_cat sumn_ncons /= addn0 muln0 subn0 addnAC addnA.
+have -> : n - size s = 0 by apply/eqP; rewrite subn_eq0 ltnW.
+rewrite -[in sumn s](cat_take_drop n s) [drop n s](drop_nth x0)//.
+by rewrite !sumn_cat /= muln1 muln0 addn0 addnAC !addnA [in RHS]addnAC addnK.
+Qed.
+
+Lemma sumn_set_nth_ltn s x0 n x : n < size s ->
+  sumn (set_nth x0 s n x) = sumn s + x - nth x0 s n.
+Proof.
+move=> nlts; rewrite sumn_set_nth nlts muln1.
+have -> : n - size s = 0 by apply/eqP; rewrite subn_eq0 ltnW.
+by rewrite muln0 addn0.
+Qed.
+
+Lemma sumn_set_nth0 s n x : sumn (set_nth 0 s n x) = sumn s + x - nth 0 s n.
+Proof.
+rewrite sumn_set_nth mul0n addn0.
+by case: ltnP => [_|nges]; rewrite ?muln1// nth_default.
 Qed.
 
 Section FoldLeft.

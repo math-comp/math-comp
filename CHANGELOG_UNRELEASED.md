@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `bigop.v`
   + lemma `big_if`
 
+- in `seq.v`
+  + lemmas `sumn_ncons`, `sumn_set_nth`, `sumn_set_nth_ltn`,
+    `sumn_set_nth0`
+
 - in `finset.v`
   + lemma `bigA_distr`
 
