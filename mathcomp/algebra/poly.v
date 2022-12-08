@@ -697,6 +697,9 @@ Canonical polynomial_lalgType :=
 Lemma mul_polyC a p : a%:P * p = a *: p.
 Proof. by rewrite -scale_polyE. Qed.
 
+Lemma polyCZ a b : a *: b%:P = (a*b)%:P.
+Proof. by rewrite -mul_polyC polyCM. Qed.
+
 Lemma alg_polyC a : a%:A = a%:P :> {poly R}.
 Proof. by rewrite -mul_polyC mulr1. Qed.
 
