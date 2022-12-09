@@ -36,7 +36,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `coef_drop_poly`, `drop_poly_eq0`, `sum_drop_poly`, `drop_polyD`,
     `drop_polyZ`, `drop_poly_is_linear`, `drop_poly_sum`,
     `drop_poly0l`, `drop_poly0r`, `drop_polyMXn`, `drop_polyMXn_id`,
-    `drop_polyDMXn`, `poly_take_drop`, `eqp_take_drop`
+    `drop_polyDMXn`, `poly_take_drop`, `eqp_take_drop`, `scale_polyC`
   + canonical instances `even_poly_additive`, `even_poly_linear`,
     `odd_poly_additive`, `odd_poly_linear`, `take_poly_additive`,
     `take_poly_linear`, `drop_poly_additive`, `drop_poly_linear`
