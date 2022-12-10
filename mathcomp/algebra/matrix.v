@@ -1540,6 +1540,44 @@ Proof. by move=> fr M M'; rewrite map2_mx_right_in// =>i j; rewrite fr. Qed.
 
 End Map2Eq.
 
+Section MatrixLaws.
+
+Context {T : Type} {m n : nat} {idm : T}.
+
+Lemma map2_mxA {opm : Monoid.law idm} : associative (@map2_mx _ _ _ opm m n).
+Proof. by move=> A B C; apply/matrixP=> i j; rewrite !mxE Monoid.mulmA. Qed.
+
+Lemma map2_1mx {opm : Monoid.law idm} : left_id (const_mx idm) (@map2_mx _ _ _ opm m n).
+Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE Monoid.mul1m. Qed.
+
+Lemma map2_mx1 {opm : Monoid.law idm} : right_id (const_mx idm) (@map2_mx _ _ _ opm m n).
+Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE Monoid.mulm1. Qed.
+
+Canonical map2_mx_monoid {opm : Monoid.law idm} := Monoid.Law (map2_mxA (opm:=opm)) map2_1mx map2_mx1.
+
+Lemma map2_mxC {opm : Monoid.com_law idm} : commutative (@map2_mx _ _ _ opm m n).
+Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE Monoid.mulmC. Qed.
+
+Canonical map2_mx_comoid {opm : Monoid.com_law idm} := Monoid.ComLaw (map2_mxC (opm:=opm)).
+
+Lemma map2_0mx {opm : Monoid.mul_law idm} : left_zero (const_mx idm) (@map2_mx _ _ _ opm m n).
+Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE Monoid.mul0m. Qed.
+
+Lemma map2_mx0 {opm : Monoid.mul_law idm} : right_zero (const_mx idm) (@map2_mx _ _ _ opm m n).
+Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE Monoid.mulm0. Qed.
+
+Canonical map2_mx_muloid {opm : Monoid.mul_law idm} := Monoid.MulLaw (map2_0mx (opm:=opm)) map2_mx0.
+
+Lemma map2_mxDl {mul : T -> T -> T} {add : Monoid.add_law idm mul} : left_distributive (@map2_mx _ _ _ mul m n) (@map2_mx _ _ _ add m n).
+Proof. by move=> A B C; apply/matrixP=> i j; rewrite !mxE Monoid.mulmDl. Qed.
+
+Lemma map2_mxDr {mul : T -> T -> T} {add : Monoid.add_law idm mul} : right_distributive (@map2_mx _ _ _ mul m n) (@map2_mx _ _ _ add m n).
+Proof. by move=> A B C; apply/matrixP=> i j; rewrite !mxE Monoid.mulmDr. Qed.
+
+Canonical map2_mx_addoid {mul : T -> T -> T} {add : Monoid.add_law idm mul} := Monoid.AddLaw (map2_mxDl (add:=add)) map2_mxDr.
+
+End MatrixLaws.
+
 (*****************************************************************************)
 (********************* Matrix Zmodule (additive) structure *******************)
 (*****************************************************************************)
