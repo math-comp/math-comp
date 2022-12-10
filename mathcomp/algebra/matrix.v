@@ -1397,6 +1397,150 @@ Arguments map_mx_id_in {R m n} [f M].
 Arguments map_mx_id {R m n} [f].
 
 (*****************************************************************************)
+(********************* Matrix lifted laws *******************)
+(*****************************************************************************)
+
+Section Map2Matrix.
+Context {R S T : Type} (f : R -> S -> T).
+
+Fact map2_mx_key : unit. Proof. by []. Qed.
+Definition map2_mx m n (A : 'M_(m, n)) (B : 'M_(m, n)) := \matrix[map2_mx_key]_(i, j) f (A i j) (B i j).
+
+Section OneMatrix.
+
+Variables (m n : nat) (A : 'M[R]_(m, n)) (B : 'M[S]_(m, n)).
+
+Lemma map2_trmx : (map2_mx A B)^T = map2_mx A^T B^T.
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_const_mx a b : map2_mx (const_mx a) (const_mx b) = const_mx (f a b) :> 'M_(m, n).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_row i : map2_mx (row i A) (row i B) = row i (map2_mx A B).
+Proof. by apply/rowP=> j; rewrite !mxE. Qed.
+
+Lemma map2_col j : map2_mx (col j A) (col j B) = col j (map2_mx A B).
+Proof. by apply/colP=> i; rewrite !mxE. Qed.
+
+Lemma map2_row' i0 : map2_mx (row' i0 A) (row' i0 B) = row' i0 (map2_mx A B).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_col' j0 : map2_mx (col' j0 A) (col' j0 B) = col' j0 (map2_mx A B).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_mxsub m' n' g h : map2_mx (@mxsub _ _ _  m' n' g h A) (@mxsub _ _ _  m' n' g h B) = mxsub g h (map2_mx A B).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_row_perm s : map2_mx (row_perm s A) (row_perm s B) = row_perm s (map2_mx A B).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_col_perm s : map2_mx (col_perm s A) (col_perm s B) = col_perm s (map2_mx A B).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_xrow i1 i2 : map2_mx (xrow i1 i2 A) (xrow i1 i2 B) = xrow i1 i2 (map2_mx A B).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_xcol j1 j2 : map2_mx (xcol j1 j2 A) (xcol j1 j2 B) = xcol j1 j2 (map2_mx A B).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_castmx m' n' c : map2_mx (castmx c A) (castmx c B) = castmx c (map2_mx A B) :> 'M_(m', n').
+Proof. by apply/matrixP=> i j; rewrite !(castmxE, mxE). Qed.
+
+Lemma map2_conform_mx m' n' (A' : 'M_(m', n')) (B' : 'M_(m', n')) :
+  map2_mx (conform_mx A' A) (conform_mx B' B) = conform_mx (map2_mx A' B') (map2_mx A B).
+Proof.
+move: A' B'; have [[<- <-] A' B'|] := eqVneq (m, n) (m', n').
+  by rewrite !conform_mx_id.
+by rewrite negb_and => neq_mn A' B'; rewrite !nonconform_mx.
+Qed.
+
+Lemma map2_mxvec : map2_mx (mxvec A) (mxvec B) = mxvec (map2_mx A B).
+Proof. by apply/rowP=> i; rewrite !(castmxE, mxE). Qed.
+
+Lemma map2_vec_mx (v : 'rV_(m * n)) (w : 'rV_(m * n)) : map2_mx (vec_mx v) (vec_mx w) = vec_mx (map2_mx v w).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+End OneMatrix.
+
+Section Block.
+
+Variables m1 m2 n1 n2 : nat.
+Variables (Aul : 'M[R]_(m1, n1)) (Aur : 'M[R]_(m1, n2)).
+Variables (Adl : 'M[R]_(m2, n1)) (Adr : 'M[R]_(m2, n2)).
+Variables (Bh : 'M[R]_(m1, n1 + n2)) (Bv : 'M[R]_(m1 + m2, n1)).
+Variable B : 'M[R]_(m1 + m2, n1 + n2).
+Variables (A'ul : 'M[S]_(m1, n1)) (A'ur : 'M[S]_(m1, n2)).
+Variables (A'dl : 'M[S]_(m2, n1)) (A'dr : 'M[S]_(m2, n2)).
+Variables (B'h : 'M[S]_(m1, n1 + n2)) (B'v : 'M[S]_(m1 + m2, n1)).
+Variable B' : 'M[S]_(m1 + m2, n1 + n2).
+
+Lemma map2_row_mx : map2_mx (row_mx Aul Aur) (row_mx A'ul A'ur) = row_mx (map2_mx Aul A'ul) (map2_mx Aur A'ur).
+Proof. by apply/matrixP=> i j; do 2![rewrite !mxE //; case: split => ?]. Qed.
+
+Lemma map2_col_mx : map2_mx (col_mx Aul Adl) (col_mx A'ul A'dl) = col_mx (map2_mx Aul A'ul) (map2_mx Adl A'dl).
+Proof. by apply/matrixP=> i j; do 2![rewrite !mxE //; case: split => ?]. Qed.
+
+Lemma map2_block_mx :
+  map2_mx (block_mx Aul Aur Adl Adr) (block_mx A'ul A'ur A'dl A'dr) = block_mx (map2_mx Aul A'ul) (map2_mx Aur A'ur) (map2_mx Adl A'dl) (map2_mx Adr A'dr).
+Proof. by apply/matrixP=> i j; do 3![rewrite !mxE //; case: split => ?]. Qed.
+
+Lemma map2_lsubmx : map2_mx (lsubmx Bh) (lsubmx B'h) = lsubmx (map2_mx Bh B'h).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_rsubmx : map2_mx (rsubmx Bh) (rsubmx B'h) = rsubmx (map2_mx Bh B'h).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_usubmx : map2_mx (usubmx Bv) (usubmx B'v) = usubmx (map2_mx Bv B'v).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_dsubmx : map2_mx (dsubmx Bv) (dsubmx B'v) = dsubmx (map2_mx Bv B'v).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_ulsubmx : map2_mx (ulsubmx B) (ulsubmx B') = ulsubmx (map2_mx B B').
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_ursubmx : map2_mx (ursubmx B) (ursubmx B') = ursubmx (map2_mx B B').
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_dlsubmx : map2_mx (dlsubmx B) (dlsubmx B') = dlsubmx (map2_mx B B').
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_drsubmx : map2_mx (drsubmx B) (drsubmx B') = drsubmx (map2_mx B B').
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+End Block.
+
+End Map2Matrix.
+
+Section Map2Eq.
+
+Context {R S T : Type} {m n : nat}.
+
+Lemma eq_in_map2_mx (f g : R -> S -> T) (M : 'M[R]_(m, n)) (M' : 'M[S]_(m, n)) :
+  (forall i j, f (M i j) (M' i j) = g (M i j) (M' i j)) -> map2_mx f M M' = map2_mx g M M'.
+Proof. by move=> fg; apply/matrixP => i j; rewrite !mxE. Qed.
+
+Lemma eq_map2_mx (f g : R -> S -> T) : f =2 g ->
+  @map2_mx _ _ _ f m n =2 @map2_mx _ _ _ g m n.
+Proof. by move=> eq_fg M M'; apply/eq_in_map2_mx. Qed.
+
+Lemma map2_mx_left_in (f : R -> R -> R) (M : 'M_(m, n)) (M' : 'M_(m, n)) :
+  (forall i j, f (M i j) (M' i j) = M i j) -> map2_mx f M M' = M.
+Proof. by move=> fM; apply/matrixP => i j; rewrite !mxE. Qed.
+
+Lemma map2_mx_left (f : R -> R -> R) : f =1 (fun x _ => x) -> forall (M : 'M_(m, n)) (M' : 'M_(m, n)), map2_mx f M M' = M.
+Proof. by move=> fl M M'; rewrite map2_mx_left_in// =>i j; rewrite fl. Qed.
+
+Lemma map2_mx_right_in (f : R -> R -> R) (M : 'M_(m, n)) (M' : 'M_(m, n)) :
+  (forall i j, f (M i j) (M' i j) = M' i j) -> map2_mx f M M' = M'.
+Proof. by move=> fM; apply/matrixP => i j; rewrite !mxE. Qed.
+
+Lemma map2_mx_right (f : R -> R -> R) : f =1 (fun _ x => x) -> forall (M : 'M_(m, n)) (M' : 'M_(m, n)), map2_mx f M M' = M'.
+Proof. by move=> fr M M'; rewrite map2_mx_right_in// =>i j; rewrite fr. Qed.
+
+End Map2Eq.
+
+(*****************************************************************************)
 (********************* Matrix Zmodule (additive) structure *******************)
 (*****************************************************************************)
 
@@ -1998,6 +2142,7 @@ Section ScalarMx.
 
 Variable n : nat.
 
+(*TODO: undergeneralize to monoid *)
 Fact scalar_mx_key : unit. Proof. by []. Qed.
 Definition scalar_mx x : 'M[R]_n :=
   \matrix[scalar_mx_key]_(i , j) (x *+ (i == j)).
@@ -2563,7 +2708,7 @@ Arguments mulmxr {_ _ _} B A /.
 Section Trace.
 
 Variable n : nat.
-
+(*TODO: undergeneralize to monoid *)
 Definition mxtrace (A : 'M[R]_n) := \sum_i A i i.
 Local Notation "'\tr' A" := (mxtrace A) : ring_scope.
 
