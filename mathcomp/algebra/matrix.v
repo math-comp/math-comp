@@ -1593,20 +1593,15 @@ Implicit Types A B : 'M[V]_(m, n).
 
 Fact oppmx_key : unit. Proof. by []. Qed.
 Fact addmx_key : unit. Proof. by []. Qed.
-Definition oppmx A := \matrix[oppmx_key]_(i, j) (- A i j).
-Definition addmx A B := \matrix[addmx_key]_(i, j) (A i j + B i j).
+Definition oppmx := @map_mx V V -%R m n.
+Definition addmx := @map2_mx V V V +%R m n.
 (* In principle, diag_mx and scalar_mx could be defined here, but since they *)
 (* only make sense with the graded ring operations, we defer them to the     *)
 (* next section.                                                             *)
 
-Lemma addmxA : associative addmx.
-Proof. by move=> A B C; apply/matrixP=> i j; rewrite !mxE addrA. Qed.
-
-Lemma addmxC : commutative addmx.
-Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE addrC. Qed.
-
-Lemma add0mx : left_id (const_mx 0) addmx.
-Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE add0r. Qed.
+Definition addmxA : associative addmx := map2_mxA.
+Definition addmxC : commutative addmx := map2_mxC.
+Definition add0mx : left_id (const_mx 0) addmx := map2_1mx.
 
 Lemma addNmx : left_inverse (const_mx 0) oppmx addmx.
 Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE addNr. Qed.
