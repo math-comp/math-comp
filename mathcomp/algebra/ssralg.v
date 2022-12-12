@@ -883,6 +883,13 @@ move=> nm; rewrite (telescope_big (fun i j => f j - f i)).
 by move=> k /andP[nk km]/=; rewrite addrC subrKA.
 Qed.
 
+Lemma telescope_sumr_eq n m (f u : nat -> V) : n <= m ->
+    (forall k, (n <= k < m)%N -> u k = f k.+1 - f k) ->
+  \sum_(n <= k < m) u k = f m - f n.
+Proof.
+by move=> ? uE; under eq_big_nat do rewrite uE //=; exact: telescope_sumr.
+Qed.
+
 Section ClosedPredicates.
 
 Variable S : {pred V}.
@@ -908,6 +915,7 @@ Arguments addrI {V} y [x1 x2].
 Arguments addIr {V} x [x1 x2].
 Arguments opprK {V}.
 Arguments oppr_inj {V} [x1 x2].
+Arguments telescope_sumr_eq {V n m} f u.
 
 Module Ring.
 
@@ -3026,6 +3034,14 @@ move=> Uf ltnm; rewrite (telescope_big (fun i j => f i / f j)) ?ltnm//.
 by move=> k ltnkm /=; rewrite mulrA divrK// Uf.
 Qed.
 
+Lemma telescope_prodr_eq n m (f u : nat -> R) : n < m ->
+    (forall k, n < k < m -> f k \is a unit) ->
+    (forall k, (n <= k < m)%N -> u k = f k / f k.+1) ->
+  \prod_(n <= k < m) u k = f n / f m.
+Proof.
+by move=> ? ? uE; under eq_big_nat do rewrite uE //=; exact: telescope_prodr.
+Qed.
+
 Lemma commrV x y : comm x y -> comm x y^-1.
 Proof.
 have [Uy cxy | /invr_out-> //] := boolP (y \in unit).
@@ -3199,6 +3215,7 @@ End UnitRingTheory.
 
 Arguments invrK {R}.
 Arguments invr_inj {R} [x1 x2].
+Arguments telescope_prodr_eq {R n m} f u.
 
 Section UnitRingMorphism.
 
@@ -4970,6 +4987,14 @@ move=> nz_f ltnm; apply: invr_inj; rewrite prodf_div !invf_div -prodf_div.
 by apply: telescope_prodr => // k /nz_f; rewrite unitfE.
 Qed.
 
+Lemma telescope_prodf_eq n m (f u : nat -> F) :
+    (forall k, n < k < m -> f k != 0) -> n < m ->
+    (forall k, n <= k < m -> u k = f k.+1 / f k) ->
+  \prod_(n <= k < m) u k = f m / f n.
+Proof.
+by move=> ? ? uE; under eq_big_nat do rewrite uE //=; exact: telescope_prodf.
+Qed.
+
 Lemma addf_div x1 y1 x2 y2 :
   y1 != 0 -> y2 != 0 -> x1 / y1 + x2 / y2 = (x1 * y2 + x2 * y1) / (y1 * y2).
 Proof. by move=> nzy1 nzy2; rewrite invfM mulrDl !mulrA mulrAC !mulfK. Qed.
@@ -5098,6 +5123,7 @@ End Predicates.
 End FieldTheory.
 
 Arguments fmorph_inj {F R} f [x1 x2].
+Arguments telescope_prodf_eq {F n m} f u.
 
 Module DecidableField.
 
@@ -5682,6 +5708,8 @@ Definition sumrMnr := sumrMnr.
 Definition sumr_const := sumr_const.
 Definition sumr_const_nat := sumr_const_nat.
 Definition telescope_sumr := telescope_sumr.
+Definition telescope_sumr_eq := @telescope_sumr_eq.
+Arguments telescope_sumr_eq {V n m} f u.
 Definition mulr0n := mulr0n.
 Definition mulr1n := mulr1n.
 Definition mulr2n := mulr2n.
@@ -5854,6 +5882,8 @@ Definition mulIr := mulIr.
 Definition divrI := divrI.
 Definition divIr := divIr.
 Definition telescope_prodr := telescope_prodr.
+Definition telescope_prodr_eq := @telescope_prodr_eq.
+Arguments telescope_prodr_eq {R n m} f u.
 Definition commrV := commrV.
 Definition unitrE := unitrE.
 Definition invrK := @invrK.
@@ -5970,6 +6000,8 @@ Definition expfB := expfB.
 Definition prodfV := prodfV.
 Definition prodf_div := prodf_div.
 Definition telescope_prodf := telescope_prodf.
+Definition telescope_prodf_eq := @telescope_prodf_eq.
+Arguments telescope_prodf_eq {F n m} f u.
 Definition addf_div := addf_div.
 Definition mulf_div := mulf_div.
 Definition eqr_div := eqr_div.

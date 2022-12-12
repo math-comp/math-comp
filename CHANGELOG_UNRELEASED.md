@@ -17,7 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `prefix_path`, `prefix_sorted`, `infix_sorted`, `suffix_sorted` 
 
 - in `ssralg.v`
-  + lemmas `natr1`, `nat1r`
+  + lemmas `natr1`, `nat1r`, `telescope_sumr_eq`, `telescope_prodr_eq`, `telescope_prodf_eq`
 
 - in `poly.v`
   + definitions `even_poly`, `odd_poly`, `take_poly`, `drop_poly`
