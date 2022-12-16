@@ -125,6 +125,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `bigop.v`
   + lemma `subset_le_big_cond`
 
+- in `order.v`
+  + lemmas `bigmax_le`, `bigmax_lt`, `lt_bigmin`, `le_bigmin`,
+    `bigmin_mkcond`, `bigmax_mkcond`, `bigmin_split`, `bigmax_split`,
+    `bigmin_idl`, `bigmax_idl`, `bigmin_idr`, `bigmax_idr`,
+    `bigminID`, `bigmaxID`, `sub_bigmin`, `sub_bigmax`,
+    `sub_bigmin_seq`, `sub_bigmax_seq`, `sub_bigmin_cond`,
+    `sub_bigmax_cond`, `sub_in_bigmin`, `sub_in_bigmax`,
+    `le_bigmin_nat`, `le_bigmax_nat`, `le_bigmin_nat_cond`,
+    `le_bigmax_cond`, `le_bigmin_ord`, `le_bigmax_ord`,
+    `le_bigmin_ord_cond`, `le_bigmax_ord_cond`, `subset_bigmin`,
+    `subset_bigmax`, `subset_bigmin_cond`, `subset_bigmax_cond`,
+    `bigminD1`, `bigmaxD1`, `bigmin_le_cond`, `le_bigmax_cond`,
+    `bigmin_le`, `le_bigmax`, `bigmin_inf`, `bigmax_sup`,
+    `bigmin_geP`, `bigmax_leP`, `bigmin_gtP`, `bigmax_ltP`,
+    `bigmin_eq_arg`, `bigmax_eq_arg`, `eq_bigmin`, `eq_bigmax`,
+    `le_bigmin2`, `le_bigmax2`
+
 ### Changed
 
 - in `poly.v`:
