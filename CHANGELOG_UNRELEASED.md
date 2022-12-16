@@ -107,6 +107,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + definition `oAC`
   + lemmas `oACE`, `some_big_AC_mk_monoid`, `big_AC_mk_monoid`
   + canonical instances `oAC_law` and `oAC_com_law`
+  + lemmas `sub_le_big`, `sub_le_big_seq`, `sub_le_big_seq_cond`,
+    `uniq_sub_le_big`, `uniq_sub_le_big_cond`, `idem_sub_le_big`,
+    `idem_sub_le_big_cond`, `sub_in_le_big`, `le_big_ord`, `subset_le_big`,
+    `le_big_nat_cond`, `le_big_nat`, `le_big_ord_cond`
+
+- in `bigop.v`
+  + lemma `subset_le_big_cond`
 
 ### Changed
 

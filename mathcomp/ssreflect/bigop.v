@@ -2185,6 +2185,119 @@ Arguments big_nat_recr [R idx op].
 Arguments big_pmap [R idx op J I] h [r].
 Arguments telescope_big [R idx op] f [n m].
 
+Section IncreasingSemiGroup.
+
+Variables (R : Type) (op : R -> R -> R).
+Hypotheses (opA : associative op) (opC : commutative op).
+Variable le : rel R.
+Hypothesis le_refl : reflexive le.
+Hypothesis op_incr : forall x y, le x (op x y).
+Context [x : R].
+
+Lemma sub_le_big I [s] (P P' : {pred I}) (F : I -> R) :
+    (forall i, P i -> P' i) ->
+  le (\big[op/x]_(i <- s | P i) F i) (\big[op/x]_(i <- s | P' i) F i).
+Proof.
+move=> PP'; rewrite !(big_AC_mk_monoid opA opC) (bigID P P') /=.
+under [in X in le _ X]eq_bigl do rewrite (andb_idl (PP' _)).
+case: (bigop _ _ _) (bigop _ _ _) => [y|] [z|]//=.
+  by rewrite -opA [op y x]opC opA op_incr.
+by rewrite opC op_incr.
+Qed.
+
+Lemma sub_le_big_seq (I : eqType) s s' P (F : I -> R) :
+    (forall i, count_mem i s <= count_mem i s')%N ->
+  le (\big[op/x]_(i <- s | P i) F i) (\big[op/x]_(i <- s' | P i) F i).
+Proof.
+rewrite !(big_AC_mk_monoid opA opC) => /count_subseqP[_ /subseqP[m sm ->]].
+move/(perm_big _)->; rewrite big_mask big_tnth.
+by rewrite -!(big_AC_mk_monoid opA opC) sub_le_big // => j /andP[].
+Qed.
+
+Lemma sub_le_big_seq_cond (I : eqType) s s' P P' (F : I -> R) :
+    (forall i, count_mem i (filter P s) <= count_mem i (filter P' s'))%N ->
+  le (\big[op/x]_(i <- s | P i) F i) (\big[op/x]_(i <- s' | P' i) F i).
+Proof. by  move=> /(sub_le_big_seq xpredT F); rewrite !big_filter. Qed.
+
+Lemma uniq_sub_le_big (I : eqType) s s' P (F : I -> R) : uniq s -> uniq s' ->
+    {subset s <= s'} ->
+  le (\big[op/x]_(i <- s | P i) F i) (\big[op/x]_(i <- s' | P i) F i).
+Proof.
+move=> us us' ss'; rewrite sub_le_big_seq => // i; rewrite !count_uniq_mem//.
+by have /implyP := ss' i; case: (_ \in s) (_ \in s') => [] [].
+Qed.
+
+Lemma uniq_sub_le_big_cond (I : eqType) s s' P P' (F : I -> R) :
+    uniq (filter P s) -> uniq (filter P' s') ->
+    {subset [seq i <- s | P i] <= [seq i <- s' | P' i]} ->
+  le (\big[op/x]_(i <- s | P i) F i) (\big[op/x]_(i <- s' | P' i) F i).
+Proof. by move=> u v /(uniq_sub_le_big xpredT F u v); rewrite !big_filter. Qed.
+
+Section Id.
+
+Hypothesis opK : idempotent op.
+
+Lemma idem_sub_le_big (I : eqType) s s' P (F : I -> R) :
+    {subset s <= s'} ->
+  le (\big[op/x]_(i <- s | P i) F i) (\big[op/x]_(i <- s' | P i) F i).
+Proof.
+move=> ss'; rewrite -big_undup_AC// -[X in le _ X]big_undup_AC//.
+by rewrite uniq_sub_le_big ?undup_uniq// => i; rewrite !mem_undup; apply: ss'.
+Qed.
+
+Lemma idem_sub_le_big_cond (I : eqType) s s' P P' (F : I -> R) :
+  {subset [seq i <- s | P i] <= [seq i <- s' | P' i]} ->
+  le (\big[op/x]_(i <- s | P i) F i) (\big[op/x]_(i <- s' | P' i) F i).
+Proof. by  move=> /(idem_sub_le_big xpredT F); rewrite !big_filter. Qed.
+
+End Id.
+
+Lemma sub_in_le_big [I : eqType] (s : seq I) (P P' : {pred I}) (F : I -> R) :
+    {in s, forall i, P i -> P' i} ->
+  le (\big[op/x]_(i <- s | P i) F i) (\big[op/x]_(i <- s | P' i) F i).
+Proof.
+move=> PP'; apply: sub_le_big_seq_cond => i; rewrite leq_count_subseq//.
+rewrite subseq_filter filter_subseq andbT; apply/allP => j.
+by rewrite !mem_filter => /andP[/PP'/[apply]->].
+Qed.
+
+Lemma le_big_ord n m [P : {pred nat}] [F : nat -> R] : (n <= m)%N ->
+  le (\big[op/x]_(i < n | P i) F i) (\big[op/x]_(i < m | P i) F i).
+Proof.
+by move=> nm; rewrite (big_ord_widen_cond m)// sub_le_big => //= ? /andP[].
+Qed.
+
+Lemma subset_le_big [I : finType] [A A' P : {pred I}] (F : I -> R) :
+    A \subset A' ->
+  le (\big[op/x]_(i in A | P i) F i) (\big[op/x]_(i in A' | P i) F i).
+Proof.
+move=> AA'; apply: sub_le_big => y /andP[yA yP]; apply/andP; split => //.
+exact: subsetP yA.
+Qed.
+
+Lemma le_big_nat_cond n m n' m' (P P' : {pred nat}) (F : nat -> R) :
+    (n' <= n)%N -> (m <= m')%N -> (forall i, (n <= i < m)%N -> P i -> P' i) ->
+  le (\big[op/x]_(n <= i < m | P i) F i) (\big[op/x]_(n' <= i < m' | P' i) F i).
+Proof.
+move=> len'n lemm' PP'i; rewrite uniq_sub_le_big_cond ?filter_uniq ?iota_uniq//.
+move=> i; rewrite !mem_filter !mem_index_iota => /and3P[Pi ni im].
+by rewrite PP'i ?ni//= (leq_trans _ ni)// (leq_trans im).
+Qed.
+
+Lemma le_big_nat n m n' m' [P] [F : nat -> R] : (n' <= n)%N -> (m <= m')%N ->
+  le (\big[op/x]_(n <= i < m | P i) F i) (\big[op/x]_(n' <= i < m' | P i) F i).
+Proof. by move=> len'n lemm'; rewrite le_big_nat_cond. Qed.
+
+Lemma le_big_ord_cond n m (P P' : {pred nat}) (F : nat -> R) :
+    (n <= m)%N -> (forall i : 'I_n, P i -> P' i) ->
+  le (\big[op/x]_(i < n | P i) F i) (\big[op/x]_(i < m | P' i) F i).
+Proof.
+move=> nm PP'; rewrite -!big_mkord le_big_nat_cond//= => i ni.
+by have := PP' (Ordinal ni).
+Qed.
+
+End IncreasingSemiGroup.
+
 Section EqSupport.
 
 Variables (R : eqType) (idx : R).

@@ -1397,6 +1397,25 @@ Arguments imsetP {aT rT f D y}.
 Arguments imset2P {aT aT2 rT f2 D1 D2 y}.
 Arguments imset_disjoint {aT rT f A B}.
 
+Section BigOpsSemiGroup.
+
+Variables (R : Type) (op : R -> R -> R).
+Hypotheses (opA : associative op) (opC : commutative op).
+
+Variable (le : rel R).
+Hypotheses (le_refl : reflexive le) (le_incr : forall x y, le x (op x y)).
+
+Context [x : R].
+
+Lemma subset_le_big_cond (I : finType) (A A' P P' : {pred I}) (F : I -> R) :
+    [set i in A | P i]  \subset [set i in A' | P' i] ->
+  le (\big[op/x]_(i in A | P i) F i) (\big[op/x]_(i in A' | P' i) F i).
+Proof.
+by move=> /subsetP AP; apply: sub_le_big => // i; have /[!inE] := AP i.
+Qed.
+
+End BigOpsSemiGroup.
+
 Section BigOps.
 
 Variables (R : Type) (idx : R).
