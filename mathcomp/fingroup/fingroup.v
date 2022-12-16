@@ -198,7 +198,7 @@ Module FinGroup.
 (* We split the group axiomatisation in two. We define a  *)
 (* class of "base groups", which are basically monoids    *)
 (* with an involutive antimorphism, from which we derive  *)
-(* the class of groups proper. This allows use to reuse   *)
+(* the class of groups proper. This allows us to reuse    *)
 (* much of the group notation and algebraic axioms for    *)
 (* group subsets, by defining a base group class on them. *)
 (*   We use class/mixins here rather than telescopes to   *)
