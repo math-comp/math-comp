@@ -113,6 +113,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssralg.v`
   + lemmas `divrN`, `divrNN`
 
+- in `bigop.v`
+  + definition `oAC`
+  + lemmas `oACE`, `some_big_AC_mk_monoid`, `big_AC_mk_monoid`
+  + canonical instances `oAC_law` and `oAC_com_law`
+
 ### Changed
 
 - in `poly.v`:

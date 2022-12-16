@@ -83,6 +83,8 @@ From mathcomp Require Import div fintype tuple finfun.
 (*      Monoid.Theory == submodule containing basic generic algebra lemmas    *)
 (*                       for operators satisfying the Monoid interfaces.      *)
 (*       Monoid.simpm == generic monoid simplification rewrite multirule.     *)
+(*             oAC op == convert an AC operator op : T -> T -> T to a         *)
+(*                       Monoid.com_law on option T                           *)
 (* Monoid structures are predeclared for many basic operators: (_ && _)%B,    *)
 (* (_ || _)%B, (_ (+) _)%B (exclusive or) , (_ + _)%N, (_ * _)%N, maxn,       *)
 (* gcdn, lcmn and (_ ++ _)%SEQ (list concatenation).                          *)
@@ -785,6 +787,46 @@ Arguments big_rec [R] K [idx op] _ [I r P F].
 Arguments big_ind [R] K [idx op] _ _ [I r P F].
 Arguments eq_big_op [R] K [idx op] op' _ _ _ [I].
 Arguments big_endo [R] f [idx op] _ _ [I].
+
+Section oAC.
+
+Variables (T : Type) (op : T -> T -> T).
+
+Definition AC_subdef of associative op & commutative op :=
+  fun x => oapp (fun y => Some (oapp (op^~ y) y x)) x.
+Definition oAC := nosimpl AC_subdef.
+
+Hypothesis (opA : associative op) (opC : commutative op).
+
+Local Notation oop := (oAC opA opC).
+
+Lemma oACE x y : oop (Some x) (Some y) = some (op x y). Proof. by []. Qed.
+
+Lemma oopA_subdef : associative oop.
+Proof. by move=> [x|] [y|] [z|]//; rewrite /oAC/= opA. Qed.
+
+Lemma oopx1_subdef : left_id None oop. Proof. by case. Qed.
+Lemma oop1x_subdef : right_id None oop. Proof. by []. Qed.
+
+Lemma oopC_subdef : commutative oop.
+Proof. by move=> [x|] [y|]//; rewrite /oAC/= opC. Qed.
+
+Canonical oAC_law := Monoid.Law oopA_subdef oopx1_subdef oop1x_subdef.
+Canonical oAC_com_law := Monoid.ComLaw oopC_subdef.
+
+Context [x : T].
+
+Lemma some_big_AC_mk_monoid [I : Type] r P (F : I -> T) :
+  Some (\big[op/x]_(i <- r | P i) F i) =
+    oop (\big[oop/None]_(i <- r | P i) Some (F i)) (Some x).
+Proof. by elim/big_rec2 : _ => //= i [y|] _ Pi [] -> //=; rewrite opA. Qed.
+
+Lemma big_AC_mk_monoid [I : Type] r P (F : I -> T) :
+  \big[op/x]_(i <- r | P i) F i =
+    odflt x (oop (\big[oop/None]_(i <- r | P i) Some (F i)) (Some x)).
+Proof. by apply: Some_inj; rewrite some_big_AC_mk_monoid. Qed.
+
+End oAC.
 
 Section Extensionality.
 
