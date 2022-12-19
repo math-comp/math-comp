@@ -97,8 +97,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `exchange_big_dep_nat_idem`, `exchange_big_nat_idem`,
     `big_undup_AC`
 - in `matrix.v`
-  + definition `Vandrmonde`
-  + lemma `det_Vandermonde`
+  + definitions `Vandrmonde`, `map2_mx`
+  + lemma `det_Vandermonde`, `map2_trmx`, `map2_const_mx`, `map2_row`,
+	 `map2_col`, `map2_row'`, `map2_col'`, `map2_mxsub`, `map2_row_perm`,
+	 `map2_col_perm`, `map2_xrow`, `map2_xcol`, `map2_castmx`,
+	 `map2_conform_mx`, `map2_mxvec`, `map2_vec_mx`, `map2_row_mx`,
+	 `map2_col_mx`, `map2_block_mx`, `map2_lsubmx`, `map2_rsubmx`,
+	 `map2_usubmx`, `map2_dsubmx`, `map2_ulsubmx`, `map2_ursubmx`,
+	 `map2_dlsubmx`, `map2_drsubmx`, `eq_in_map2_mx`, `eq_map2_mx`,
+	 `map2_mx_left_in`, `map2_mx_left`, `map2_mx_right_in`, `map2_mx_right`,
+	 `map2_mxA`, `map2_1mx`, `map2_mx1`, `map2_mxC`, `map2_0mx`, `map2_mx0`,
+	 `map2_mxDl`, `map2_mxDr`, `diag_mx_is_additive`, `mxtrace_is_additive`
+
 
 - in `ssralg.v`
   + lemmas `divrN`, `divrNN`
@@ -110,6 +120,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `poly.v`:
   + made hornerE preserve powers
+
+- in `matrix.v`:
+  + updated `oppmx`, `addmx`, `addmxA`, `addmxC`, `add0mx`
+  + moved to an earlier section of the file `diag_mx`, 
+    `tr_diag_mx`, `diag_mx_row`, `diag_mxP`, `diag_mx_is_diag`, 
+    `diag_mx_is_trig`, `scalar_mx`, `diag_const_mx`, `tr_scalar_mx`, 
+    `scalar_mx_is_additive`, `is_scalar_mx`, `is_scalar_mxP`, 
+    `scalar_mx_is_scalar`, `mx0_is_scalar`, `scalar_mx_is_diag`, 
+    `is_scalar_mx_is_diag`, `scalar_mx_is_trig`, `is_scalar_mx_is_trig`, 
+    `mx11_scalar`, `scalar_mx_block`, `mxtrace`, `mxtrace_tr`, `mxtrace0`, 
+    `mxtraceD`, `mxtrace_diag`, `mxtrace_scalar`, `trace_mx11`, 
+    `mxtrace_block`
 
 ### Renamed
 
