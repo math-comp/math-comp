@@ -36,7 +36,7 @@ From mathcomp Require Import div prime binomial ssralg finalg zmodp countalg.
 (*     map_mx f A == the pointwise image of A by f, i.e., the matrix Af       *)
 (*                   congruent to A with Af i j = f (A i j) for all i and j.  *)
 (*     map2_mx f A B == the pointwise image of A and B by f, i.e., the matrix *)
-(*                     ABf congruent to A with Af i j = f (A i j) for all i   *)
+(*                     ABf congruent to A with ABf i j = f (A i j) for all i  *)
 (*                     and j.                                                 *)
 (*            A^T == the matrix transpose of A.                               *)
 (*        row i A == the i'th row of A (this is a row vector).                *)
