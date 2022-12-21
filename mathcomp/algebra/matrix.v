@@ -1550,7 +1550,7 @@ Lemma map2_mx_left_in (f : R -> R -> R) (M : 'M_(m, n)) (M' : 'M_(m, n)) :
   (forall i j, f (M i j) (M' i j) = M i j) -> map2_mx f M M' = M.
 Proof. by move=> fM; apply/matrixP => i j; rewrite !mxE. Qed.
 
-Lemma map2_mx_left (f : R -> R -> R) : f =1 (fun x _ => x) ->
+Lemma map2_mx_left (f : R -> R -> R) : f =2 (fun x _ => x) ->
   forall (M : 'M_(m, n)) (M' : 'M_(m, n)), map2_mx f M M' = M.
 Proof. by move=> fl M M'; rewrite map2_mx_left_in// =>i j; rewrite fl. Qed.
 
@@ -1558,7 +1558,7 @@ Lemma map2_mx_right_in (f : R -> R -> R) (M : 'M_(m, n)) (M' : 'M_(m, n)) :
   (forall i j, f (M i j) (M' i j) = M' i j) -> map2_mx f M M' = M'.
 Proof. by move=> fM; apply/matrixP => i j; rewrite !mxE. Qed.
 
-Lemma map2_mx_right (f : R -> R -> R) : f =1 (fun _ x => x) ->
+Lemma map2_mx_right (f : R -> R -> R) : f =2 (fun _ x => x) ->
   forall (M : 'M_(m, n)) (M' : 'M_(m, n)), map2_mx f M M' = M'.
 Proof. by move=> fr M M'; rewrite map2_mx_right_in// =>i j; rewrite fr. Qed.
 
