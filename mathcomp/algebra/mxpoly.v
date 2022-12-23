@@ -1761,7 +1761,7 @@ Lemma diagonalizable_for_mxminpoly {n} {P A : 'M[F]_n.+1}
 Proof.
 rewrite /rs => pu /(diagonalizable_forLR pu)[d {A rs}->].
 rewrite mxminpoly_uconj ?unitmx_inv// mxminpoly_diag.
-by rewrite (@eq_map _ _ _ (d 0))// => i; rewrite conjmxVK// mxE eqxx.
+by rewrite [in X in _ = X](@eq_map _ _ _ (d 0))// => i; rewrite conjmxVK// mxE eqxx.
 Qed.
 
 End Simmxity.

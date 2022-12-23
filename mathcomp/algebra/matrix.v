@@ -34,6 +34,9 @@ From mathcomp Require Import div prime binomial ssralg finalg zmodp countalg.
 (*                   should be determined by context).                        *)
 (*     map_mx f A == the pointwise image of A by f, i.e., the matrix Af       *)
 (*                   congruent to A with Af i j = f (A i j) for all i and j.  *)
+(*     map2_mx f A B == the pointwise image of A and B by f, i.e., the matrix *)
+(*                     ABf congruent to A with ABf i j = f (A i j) for all i  *)
+(*                     and j.                                                 *)
 (*            A^T == the matrix transpose of A.                               *)
 (*        row i A == the i'th row of A (this is a row vector).                *)
 (*        col j A == the j'th column of A (a column vector).                  *)
@@ -1397,6 +1400,219 @@ Arguments map_mx_id_in {R m n} [f M].
 Arguments map_mx_id {R m n} [f].
 
 (*****************************************************************************)
+(********************* Matrix lifted laws *******************)
+(*****************************************************************************)
+
+Section Map2Matrix.
+Context {R S T : Type} (f : R -> S -> T).
+
+Fact map2_mx_key : unit. Proof. by []. Qed.
+Definition map2_mx m n (A : 'M_(m, n)) (B : 'M_(m, n)) :=
+  \matrix[map2_mx_key]_(i, j) f (A i j) (B i j).
+
+Section OneMatrix.
+
+Variables (m n : nat) (A : 'M[R]_(m, n)) (B : 'M[S]_(m, n)).
+
+Lemma map2_trmx : (map2_mx A B)^T = map2_mx A^T B^T.
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_const_mx a b :
+  map2_mx (const_mx a) (const_mx b) = const_mx (f a b) :> 'M_(m, n).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_row i : map2_mx (row i A) (row i B) = row i (map2_mx A B).
+Proof. by apply/rowP=> j; rewrite !mxE. Qed.
+
+Lemma map2_col j : map2_mx (col j A) (col j B) = col j (map2_mx A B).
+Proof. by apply/colP=> i; rewrite !mxE. Qed.
+
+Lemma map2_row' i0 : map2_mx (row' i0 A) (row' i0 B) = row' i0 (map2_mx A B).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_col' j0 : map2_mx (col' j0 A) (col' j0 B) = col' j0 (map2_mx A B).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_mxsub m' n' g h :
+  map2_mx (@mxsub _ _ _  m' n' g h A) (@mxsub _ _ _  m' n' g h B) =
+  mxsub g h (map2_mx A B).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_row_perm s :
+  map2_mx (row_perm s A) (row_perm s B) = row_perm s (map2_mx A B).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_col_perm s :
+  map2_mx (col_perm s A) (col_perm s B) = col_perm s (map2_mx A B).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_xrow i1 i2 :
+  map2_mx (xrow i1 i2 A) (xrow i1 i2 B) = xrow i1 i2 (map2_mx A B).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_xcol j1 j2 :
+  map2_mx (xcol j1 j2 A) (xcol j1 j2 B) = xcol j1 j2 (map2_mx A B).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_castmx m' n' c :
+  map2_mx (castmx c A) (castmx c B) = castmx c (map2_mx A B) :> 'M_(m', n').
+Proof. by apply/matrixP=> i j; rewrite !(castmxE, mxE). Qed.
+
+Lemma map2_conform_mx m' n' (A' : 'M_(m', n')) (B' : 'M_(m', n')) :
+  map2_mx (conform_mx A' A) (conform_mx B' B) =
+  conform_mx (map2_mx A' B') (map2_mx A B).
+Proof.
+move: A' B'; have [[<- <-] A' B'|] := eqVneq (m, n) (m', n').
+  by rewrite !conform_mx_id.
+by rewrite negb_and => neq_mn A' B'; rewrite !nonconform_mx.
+Qed.
+
+Lemma map2_mxvec : map2_mx (mxvec A) (mxvec B) = mxvec (map2_mx A B).
+Proof. by apply/rowP=> i; rewrite !(castmxE, mxE). Qed.
+
+Lemma map2_vec_mx (v : 'rV_(m * n)) (w : 'rV_(m * n)) :
+  map2_mx (vec_mx v) (vec_mx w) = vec_mx (map2_mx v w).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+End OneMatrix.
+
+Section Block.
+
+Variables m1 m2 n1 n2 : nat.
+Variables (Aul : 'M[R]_(m1, n1)) (Aur : 'M[R]_(m1, n2)).
+Variables (Adl : 'M[R]_(m2, n1)) (Adr : 'M[R]_(m2, n2)).
+Variables (Bh : 'M[R]_(m1, n1 + n2)) (Bv : 'M[R]_(m1 + m2, n1)).
+Variable B : 'M[R]_(m1 + m2, n1 + n2).
+Variables (A'ul : 'M[S]_(m1, n1)) (A'ur : 'M[S]_(m1, n2)).
+Variables (A'dl : 'M[S]_(m2, n1)) (A'dr : 'M[S]_(m2, n2)).
+Variables (B'h : 'M[S]_(m1, n1 + n2)) (B'v : 'M[S]_(m1 + m2, n1)).
+Variable B' : 'M[S]_(m1 + m2, n1 + n2).
+
+Lemma map2_row_mx :
+  map2_mx (row_mx Aul Aur) (row_mx A'ul A'ur) =
+  row_mx (map2_mx Aul A'ul) (map2_mx Aur A'ur).
+Proof. by apply/matrixP=> i j; do 2![rewrite !mxE //; case: split => ?]. Qed.
+
+Lemma map2_col_mx :
+  map2_mx (col_mx Aul Adl) (col_mx A'ul A'dl) =
+  col_mx (map2_mx Aul A'ul) (map2_mx Adl A'dl).
+Proof. by apply/matrixP=> i j; do 2![rewrite !mxE //; case: split => ?]. Qed.
+
+Lemma map2_block_mx :
+  map2_mx (block_mx Aul Aur Adl Adr) (block_mx A'ul A'ur A'dl A'dr) =
+  block_mx
+   (map2_mx Aul A'ul) (map2_mx Aur A'ur) (map2_mx Adl A'dl) (map2_mx Adr A'dr).
+Proof. by apply/matrixP=> i j; do 3![rewrite !mxE //; case: split => ?]. Qed.
+
+Lemma map2_lsubmx : map2_mx (lsubmx Bh) (lsubmx B'h) = lsubmx (map2_mx Bh B'h).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_rsubmx : map2_mx (rsubmx Bh) (rsubmx B'h) = rsubmx (map2_mx Bh B'h).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_usubmx : map2_mx (usubmx Bv) (usubmx B'v) = usubmx (map2_mx Bv B'v).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_dsubmx : map2_mx (dsubmx Bv) (dsubmx B'v) = dsubmx (map2_mx Bv B'v).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_ulsubmx : map2_mx (ulsubmx B) (ulsubmx B') = ulsubmx (map2_mx B B').
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_ursubmx : map2_mx (ursubmx B) (ursubmx B') = ursubmx (map2_mx B B').
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_dlsubmx : map2_mx (dlsubmx B) (dlsubmx B') = dlsubmx (map2_mx B B').
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma map2_drsubmx : map2_mx (drsubmx B) (drsubmx B') = drsubmx (map2_mx B B').
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+End Block.
+
+End Map2Matrix.
+
+Section Map2Eq.
+
+Context {R S T : Type} {m n : nat}.
+
+Lemma eq_in_map2_mx (f g : R -> S -> T) (M : 'M[R]_(m, n)) (M' : 'M[S]_(m, n)) :
+  (forall i j, f (M i j) (M' i j) = g (M i j) (M' i j)) ->
+  map2_mx f M M' = map2_mx g M M'.
+Proof. by move=> fg; apply/matrixP => i j; rewrite !mxE. Qed.
+
+Lemma eq_map2_mx (f g : R -> S -> T) : f =2 g ->
+  @map2_mx _ _ _ f m n =2 @map2_mx _ _ _ g m n.
+Proof. by move=> eq_fg M M'; apply/eq_in_map2_mx. Qed.
+
+Lemma map2_mx_left_in (f : R -> R -> R) (M : 'M_(m, n)) (M' : 'M_(m, n)) :
+  (forall i j, f (M i j) (M' i j) = M i j) -> map2_mx f M M' = M.
+Proof. by move=> fM; apply/matrixP => i j; rewrite !mxE. Qed.
+
+Lemma map2_mx_left (f : R -> R -> R) : f =2 (fun x _ => x) ->
+  forall (M : 'M_(m, n)) (M' : 'M_(m, n)), map2_mx f M M' = M.
+Proof. by move=> fl M M'; rewrite map2_mx_left_in// =>i j; rewrite fl. Qed.
+
+Lemma map2_mx_right_in (f : R -> R -> R) (M : 'M_(m, n)) (M' : 'M_(m, n)) :
+  (forall i j, f (M i j) (M' i j) = M' i j) -> map2_mx f M M' = M'.
+Proof. by move=> fM; apply/matrixP => i j; rewrite !mxE. Qed.
+
+Lemma map2_mx_right (f : R -> R -> R) : f =2 (fun _ x => x) ->
+  forall (M : 'M_(m, n)) (M' : 'M_(m, n)), map2_mx f M M' = M'.
+Proof. by move=> fr M M'; rewrite map2_mx_right_in// =>i j; rewrite fr. Qed.
+
+End Map2Eq.
+
+Section MatrixLaws.
+
+Context {T : Type} {m n : nat} {idm : T}.
+
+Lemma map2_mxA {opm : Monoid.law idm} : associative (@map2_mx _ _ _ opm m n).
+Proof. by move=> A B C; apply/matrixP=> i j; rewrite !mxE Monoid.mulmA. Qed.
+
+Lemma map2_1mx {opm : Monoid.law idm} :
+  left_id (const_mx idm) (@map2_mx _ _ _ opm m n).
+Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE Monoid.mul1m. Qed.
+
+Lemma map2_mx1 {opm : Monoid.law idm} :
+  right_id (const_mx idm) (@map2_mx _ _ _ opm m n).
+Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE Monoid.mulm1. Qed.
+
+Canonical map2_mx_monoid {opm : Monoid.law idm} :=
+  Monoid.Law (map2_mxA (opm:=opm)) map2_1mx map2_mx1.
+
+Lemma map2_mxC {opm : Monoid.com_law idm} :
+  commutative (@map2_mx _ _ _ opm m n).
+Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE Monoid.mulmC. Qed.
+
+Canonical map2_mx_comoid {opm : Monoid.com_law idm} :=
+  Monoid.ComLaw (map2_mxC (opm:=opm)).
+
+Lemma map2_0mx {opm : Monoid.mul_law idm} :
+  left_zero (const_mx idm) (@map2_mx _ _ _ opm m n).
+Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE Monoid.mul0m. Qed.
+
+Lemma map2_mx0 {opm : Monoid.mul_law idm} :
+  right_zero (const_mx idm) (@map2_mx _ _ _ opm m n).
+Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE Monoid.mulm0. Qed.
+
+Canonical map2_mx_muloid {opm : Monoid.mul_law idm} :=
+  Monoid.MulLaw (map2_0mx (opm:=opm)) map2_mx0.
+
+Lemma map2_mxDl {mul : T -> T -> T} {add : Monoid.add_law idm mul} :
+  left_distributive (@map2_mx _ _ _ mul m n) (@map2_mx _ _ _ add m n).
+Proof. by move=> A B C; apply/matrixP=> i j; rewrite !mxE Monoid.mulmDl. Qed.
+
+Lemma map2_mxDr {mul : T -> T -> T} {add : Monoid.add_law idm mul} :
+  right_distributive (@map2_mx _ _ _ mul m n) (@map2_mx _ _ _ add m n).
+Proof. by move=> A B C; apply/matrixP=> i j; rewrite !mxE Monoid.mulmDr. Qed.
+
+Canonical map2_mx_addoid {mul : T -> T -> T} {add : Monoid.add_law idm mul} :=
+  Monoid.AddLaw (map2_mxDl (add:=add)) map2_mxDr.
+
+End MatrixLaws.
+
+(*****************************************************************************)
 (********************* Matrix Zmodule (additive) structure *******************)
 (*****************************************************************************)
 
@@ -1411,20 +1627,12 @@ Implicit Types A B : 'M[V]_(m, n).
 
 Fact oppmx_key : unit. Proof. by []. Qed.
 Fact addmx_key : unit. Proof. by []. Qed.
-Definition oppmx A := \matrix[oppmx_key]_(i, j) (- A i j).
-Definition addmx A B := \matrix[addmx_key]_(i, j) (A i j + B i j).
-(* In principle, diag_mx and scalar_mx could be defined here, but since they *)
-(* only make sense with the graded ring operations, we defer them to the     *)
-(* next section.                                                             *)
+Definition oppmx := @map_mx V V -%R m n.
+Definition addmx := @map2_mx V V V +%R m n.
 
-Lemma addmxA : associative addmx.
-Proof. by move=> A B C; apply/matrixP=> i j; rewrite !mxE addrA. Qed.
-
-Lemma addmxC : commutative addmx.
-Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE addrC. Qed.
-
-Lemma add0mx : left_id (const_mx 0) addmx.
-Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE add0r. Qed.
+Definition addmxA : associative addmx := map2_mxA.
+Definition addmxC : commutative addmx := map2_mxC.
+Definition add0mx : left_id (const_mx 0) addmx := map2_1mx.
 
 Lemma addNmx : left_inverse (const_mx 0) oppmx addmx.
 Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE addNr. Qed.
@@ -1612,7 +1820,8 @@ Proof. by apply: (iffP 'forall_'forall_implyP) => /(_ _ _ _)/eqP. Qed.
 
 Lemma is_diag_mx_is_trig m n (A : 'M[V]_(m, n)) : is_diag_mx A -> is_trig_mx A.
 Proof.
-by move=> /is_diag_mxP A_eq0; apply/is_trig_mxP=> i j lt_ij; rewrite A_eq0// ltn_eqF.
+by move=> /is_diag_mxP A_eq0; apply/is_trig_mxP=> i j lt_ij;
+   rewrite A_eq0// ltn_eqF.
 Qed.
 
 Lemma mx0_is_trig m n : is_trig_mx (0 : 'M[V]_(m, n)).
@@ -1754,12 +1963,156 @@ rewrite is_diag_block_mx => // /and4P[/eqP-> /eqP-> _ Adiag].
 exact: PS (PA _).
 Qed.
 
+(* Diagonal matrices *)
+
+Fact diag_mx_key : unit. Proof. by []. Qed.
+Definition diag_mx n (d : 'rV[V]_n) :=
+  \matrix[diag_mx_key]_(i, j) (d 0 i *+ (i == j)).
+
+Lemma tr_diag_mx n (d : 'rV_n) : (diag_mx d)^T = diag_mx d.
+Proof. by apply/matrixP=> i j /[!mxE]; case: eqVneq => // ->. Qed.
+
+Lemma diag_mx_is_additive n : additive (@diag_mx n).
+Proof.
+by move=>A B; apply/matrixP=>i j; rewrite !mxE mulrnBl.
+Qed.
+Canonical diag_mx_additive n := Additive (@diag_mx_is_additive n).
+
+Lemma diag_mx_row m n (l : 'rV_n) (r : 'rV_m) :
+  diag_mx (row_mx l r) = block_mx (diag_mx l) 0 0 (diag_mx r).
+Proof.
+apply/matrixP => i j.
+by do ?[rewrite !mxE; case: split_ordP => ? ->]; rewrite mxE eq_shift.
+Qed.
+
+Lemma diag_mxP n (A : 'M[V]_n) :
+  reflect (exists d : 'rV_n, A = diag_mx d) (is_diag_mx A).
+Proof.
+apply: (iffP (is_diag_mxP A)) => [Adiag|[d ->] i j neq_ij]; last first.
+  by rewrite !mxE -val_eqE (negPf neq_ij).
+exists (\row_i A i i); apply/matrixP => i j; rewrite !mxE.
+by case: (altP (i =P j)) => [->|/Adiag->].
+Qed.
+
+Lemma diag_mx_is_diag n (r : 'rV[V]_n) : is_diag_mx (diag_mx r).
+Proof. by apply/diag_mxP; exists r. Qed.
+
+Lemma diag_mx_is_trig n (r : 'rV[V]_n) : is_trig_mx (diag_mx r).
+Proof. exact/is_diag_mx_is_trig/diag_mx_is_diag. Qed.
+
+(* Scalar matrix : a diagonal matrix with a constant on the diagonal *)
+Section ScalarMx.
+
+Variable n : nat.
+
+Fact scalar_mx_key : unit. Proof. by []. Qed.
+Definition scalar_mx x : 'M[V]_n :=
+  \matrix[scalar_mx_key]_(i , j) (x *+ (i == j)).
+Notation "x %:M" := (scalar_mx x) : ring_scope.
+
+Lemma diag_const_mx a : diag_mx (const_mx a) = a%:M :> 'M_n.
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma tr_scalar_mx a : (a%:M)^T = a%:M.
+Proof. by apply/matrixP=> i j; rewrite !mxE eq_sym. Qed.
+
+Lemma scalar_mx_is_additive : additive scalar_mx.
+Proof. by move=> a b; rewrite -!diag_const_mx !raddfB. Qed.
+Canonical scalar_mx_additive := Additive scalar_mx_is_additive.
+
+Definition is_scalar_mx (A : 'M[V]_n) :=
+  if insub 0%N is Some i then A == (A i i)%:M else true.
+
+Lemma is_scalar_mxP A : reflect (exists a, A = a%:M) (is_scalar_mx A).
+Proof.
+rewrite /is_scalar_mx; case: insubP => [i _ _ | ].
+  by apply: (iffP eqP) => [|[a ->]]; [exists (A i i) | rewrite mxE eqxx].
+rewrite -eqn0Ngt => /eqP n0; left; exists 0.
+by rewrite raddf0; rewrite n0 in A *; rewrite [A]flatmx0.
+Qed.
+
+Lemma scalar_mx_is_scalar a : is_scalar_mx a%:M.
+Proof. by apply/is_scalar_mxP; exists a. Qed.
+
+Lemma mx0_is_scalar : is_scalar_mx 0.
+Proof. by apply/is_scalar_mxP; exists 0; rewrite raddf0. Qed.
+
+Lemma scalar_mx_is_diag a : is_diag_mx (a%:M).
+Proof. by rewrite -diag_const_mx diag_mx_is_diag. Qed.
+
+Lemma is_scalar_mx_is_diag A : is_scalar_mx A -> is_diag_mx A.
+Proof. by move=> /is_scalar_mxP[a ->]; apply: scalar_mx_is_diag. Qed.
+
+Lemma scalar_mx_is_trig a : is_trig_mx (a%:M).
+Proof. by rewrite is_diag_mx_is_trig// scalar_mx_is_diag. Qed.
+
+Lemma is_scalar_mx_is_trig A : is_scalar_mx A -> is_trig_mx A.
+Proof. by move=> /is_scalar_mx_is_diag /is_diag_mx_is_trig. Qed.
+
+End ScalarMx.
+
+Notation "x %:M" := (scalar_mx _ x) : ring_scope.
+
+Lemma mx11_scalar (A : 'M_1) : A = (A 0 0)%:M.
+Proof. by apply/rowP=> j; rewrite ord1 mxE. Qed.
+
+Lemma scalar_mx_block n1 n2 a : a%:M = block_mx a%:M 0 0 a%:M :> 'M_(n1 + n2).
+Proof.
+apply/matrixP=> i j; rewrite !mxE.
+by do 2![case: split_ordP => ? ->; rewrite !mxE]; rewrite ?eq_shift.
+Qed.
+
+(* The trace. *)
+Section Trace.
+
+Variable n : nat.
+(*TODO: undergeneralize to monoid *)
+Definition mxtrace (A : 'M[V]_n) := \sum_i A i i.
+Local Notation "'\tr' A" := (mxtrace A) : ring_scope.
+
+Lemma mxtrace_tr A : \tr A^T = \tr A.
+Proof. by apply: eq_bigr=> i _; rewrite mxE. Qed.
+
+Lemma mxtrace_is_additive : additive mxtrace.
+Proof.
+move=>A B; rewrite -sumrN -big_split /=.
+by apply: eq_bigr=> i _; rewrite !mxE.
+Qed.
+Canonical mxtrace_additive := Additive mxtrace_is_additive.
+
+Lemma mxtrace0 : \tr 0 = 0. Proof. exact: raddf0. Qed.
+Lemma mxtraceD A B : \tr (A + B) = \tr A + \tr B. Proof. exact: raddfD. Qed.
+
+Lemma mxtrace_diag D : \tr (diag_mx D) = \sum_j D 0 j.
+Proof. by apply: eq_bigr => j _; rewrite mxE eqxx. Qed.
+
+Lemma mxtrace_scalar a : \tr a%:M = a *+ n.
+Proof.
+rewrite -diag_const_mx mxtrace_diag; under eq_bigr do rewrite mxE.
+by rewrite sumr_const card_ord.
+Qed.
+
+End Trace.
+Local Notation "'\tr' A" := (mxtrace A) : ring_scope.
+
+Lemma trace_mx11 (A : 'M_1) : \tr A = A 0 0.
+Proof. by rewrite {1}[A]mx11_scalar mxtrace_scalar. Qed.
+
+Lemma mxtrace_block n1 n2 (Aul : 'M_n1) Aur Adl (Adr : 'M_n2) :
+  \tr (block_mx Aul Aur Adl Adr) = \tr Aul + \tr Adr.
+Proof.
+rewrite /(\tr _) big_split_ord /=.
+by congr (_ + _); under eq_bigr do rewrite (block_mxEul, block_mxEdr).
+Qed.
+
 End MatrixZmodule.
 
 Arguments is_diag_mx {V m n}.
 Arguments is_diag_mxP {V m n A}.
 Arguments is_trig_mx {V m n}.
 Arguments is_trig_mxP {V m n A}.
+Arguments scalar_mx {V n}.
+Arguments is_scalar_mxP {V n A}.
 
 Section FinZmodMatrix.
 Variables (V : finZmodType) (m n : nat).
@@ -1946,18 +2299,10 @@ Proof. by rewrite scale_col_mx !scale_row_mx. Qed.
 
 (* Diagonal matrices *)
 
-Fact diag_mx_key : unit. Proof. by []. Qed.
-Definition diag_mx n (d : 'rV[R]_n) :=
-  \matrix[diag_mx_key]_(i, j) (d 0 i *+ (i == j)).
-
-Lemma tr_diag_mx n (d : 'rV_n) : (diag_mx d)^T = diag_mx d.
-Proof. by apply/matrixP=> i j /[!mxE]; case: eqVneq => // ->. Qed.
-
-Lemma diag_mx_is_linear n : linear (@diag_mx n).
+Lemma diag_mx_is_linear n : linear (@diag_mx R n).
 Proof.
 by move=> a A B; apply/matrixP=> i j; rewrite !mxE mulrnAr mulrnDl.
 Qed.
-Canonical diag_mx_additive n := Additive (@diag_mx_is_linear n).
 Canonical diag_mx_linear n := Linear (@diag_mx_is_linear n).
 
 Lemma diag_mx_sum_delta n (d : 'rV_n) :
@@ -1971,111 +2316,31 @@ Lemma row_diag_mx n (d : 'rV_n) i :
   row i (diag_mx d) = d 0 i *: delta_mx 0 i.
 Proof. by apply/rowP => j; rewrite !mxE eqxx eq_sym mulr_natr. Qed.
 
-Lemma diag_mx_row m n (l : 'rV_n) (r : 'rV_m) :
-  diag_mx (row_mx l r) = block_mx (diag_mx l) 0 0 (diag_mx r).
-Proof.
-apply/matrixP => i j.
-by do ?[rewrite !mxE; case: split_ordP => ? ->]; rewrite mxE eq_shift.
-Qed.
+(* Scalar matrix *)
 
-Lemma diag_mxP n (A : 'M[R]_n) :
-  reflect (exists d : 'rV_n, A = diag_mx d) (is_diag_mx A).
-Proof.
-apply: (iffP is_diag_mxP) => [Adiag|[d ->] i j neq_ij]; last first.
-  by rewrite !mxE -val_eqE (negPf neq_ij).
-exists (\row_i A i i); apply/matrixP => i j; rewrite !mxE.
-by case: (altP (i =P j)) => [->|/Adiag->].
-Qed.
-
-Lemma diag_mx_is_diag n (r : 'rV[R]_n) : is_diag_mx (diag_mx r).
-Proof. by apply/diag_mxP; exists r. Qed.
-
-Lemma diag_mx_is_trig n (r : 'rV[R]_n) : is_trig_mx (diag_mx r).
-Proof. exact/is_diag_mx_is_trig/diag_mx_is_diag. Qed.
-
-(* Scalar matrix : a diagonal matrix with a constant on the diagonal *)
-Section ScalarMx.
-
-Variable n : nat.
-
-Fact scalar_mx_key : unit. Proof. by []. Qed.
-Definition scalar_mx x : 'M[R]_n :=
-  \matrix[scalar_mx_key]_(i , j) (x *+ (i == j)).
 Notation "x %:M" := (scalar_mx x) : ring_scope.
 
-Lemma diag_const_mx a : diag_mx (const_mx a) = a%:M :> 'M_n.
-Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+Lemma trmx1 n : (1%:M)^T = 1%:M :> 'M[R]_n. Proof. exact: tr_scalar_mx. Qed.
 
-Lemma tr_scalar_mx a : (a%:M)^T = a%:M.
-Proof. by apply/matrixP=> i j; rewrite !mxE eq_sym. Qed.
-
-Lemma trmx1 : (1%:M)^T = 1%:M. Proof. exact: tr_scalar_mx. Qed.
-
-Lemma scalar_mx_is_additive : additive scalar_mx.
-Proof. by move=> a b; rewrite -!diag_const_mx !raddfB. Qed.
-Canonical scalar_mx_additive := Additive scalar_mx_is_additive.
-
-Lemma scale_scalar_mx a1 a2 : a1 *: a2%:M = (a1 * a2)%:M :> 'M_n.
+Lemma scale_scalar_mx n a1 a2 : a1 *: a2%:M = (a1 * a2)%:M :> 'M_n.
 Proof. by apply/matrixP=> i j; rewrite !mxE mulrnAr. Qed.
 
-Lemma scalemx1 a : a *: 1%:M = a%:M.
+Lemma scalemx1 n a : a *: 1%:M = a%:M :> 'M_n.
 Proof. by rewrite scale_scalar_mx mulr1. Qed.
 
-Lemma scalar_mx_sum_delta a : a%:M = \sum_i a *: delta_mx i i.
+Lemma scalar_mx_sum_delta n a : a%:M = \sum_i a *: delta_mx i i :> 'M_n.
 Proof.
 by rewrite -diag_const_mx diag_mx_sum_delta; under eq_bigr do rewrite mxE.
 Qed.
 
-Lemma mx1_sum_delta : 1%:M = \sum_i delta_mx i i.
+Lemma mx1_sum_delta n : 1%:M = \sum_i delta_mx i i :> 'M_n.
 Proof. by rewrite [1%:M]scalar_mx_sum_delta -scaler_sumr scale1r. Qed.
 
-Lemma row1 i : row i 1%:M = delta_mx 0 i.
+Lemma row1 n i : row i (1%:M : 'M_n) = delta_mx 0 i.
 Proof. by apply/rowP=> j; rewrite !mxE eq_sym. Qed.
 
-Lemma col1 i : col i 1%:M = delta_mx i 0.
+Lemma col1 n i : col i (1%:M : 'M_n) = delta_mx i 0.
 Proof. by apply/colP => j; rewrite !mxE eqxx andbT. Qed.
-
-Definition is_scalar_mx (A : 'M[R]_n) :=
-  if insub 0%N is Some i then A == (A i i)%:M else true.
-
-Lemma is_scalar_mxP A : reflect (exists a, A = a%:M) (is_scalar_mx A).
-Proof.
-rewrite /is_scalar_mx; case: insubP => [i _ _ | ].
-  by apply: (iffP eqP) => [|[a ->]]; [exists (A i i) | rewrite mxE eqxx].
-rewrite -eqn0Ngt => /eqP n0; left; exists 0.
-by rewrite raddf0; rewrite n0 in A *; rewrite [A]flatmx0.
-Qed.
-
-Lemma scalar_mx_is_scalar a : is_scalar_mx a%:M.
-Proof. by apply/is_scalar_mxP; exists a. Qed.
-
-Lemma mx0_is_scalar : is_scalar_mx 0.
-Proof. by apply/is_scalar_mxP; exists 0; rewrite raddf0. Qed.
-
-Lemma scalar_mx_is_diag a : is_diag_mx (a%:M).
-Proof. by rewrite -diag_const_mx diag_mx_is_diag. Qed.
-
-Lemma is_scalar_mx_is_diag A : is_scalar_mx A -> is_diag_mx A.
-Proof. by move=> /is_scalar_mxP[a ->]; apply: scalar_mx_is_diag. Qed.
-
-Lemma scalar_mx_is_trig a : is_trig_mx (a%:M).
-Proof. by rewrite is_diag_mx_is_trig// scalar_mx_is_diag. Qed.
-
-Lemma is_scalar_mx_is_trig A : is_scalar_mx A -> is_trig_mx A.
-Proof. by move=> /is_scalar_mx_is_diag /is_diag_mx_is_trig. Qed.
-
-End ScalarMx.
-
-Notation "x %:M" := (scalar_mx _ x) : ring_scope.
-
-Lemma mx11_scalar (A : 'M_1) : A = (A 0 0)%:M.
-Proof. by apply/rowP=> j; rewrite ord1 mxE. Qed.
-
-Lemma scalar_mx_block n1 n2 a : a%:M = block_mx a%:M 0 0 a%:M :> 'M_(n1 + n2).
-Proof.
-apply/matrixP=> i j; rewrite !mxE.
-by do 2![case: split_ordP => ? ->; rewrite !mxE]; rewrite ?eq_shift.
-Qed.
 
 (* Matrix multiplication using bigops. *)
 Fact mulmx_key : unit. Proof. by []. Qed.
@@ -2262,7 +2527,7 @@ Proof. by rewrite mul_col_perm tpermV. Qed.
 
 (* Permutation matrix *)
 
-Definition perm_mx n s : 'M_n := row_perm s 1%:M.
+Definition perm_mx n s : 'M_n := row_perm s (1%:M : 'M[R]_n).
 
 Definition tperm_mx n i1 i2 : 'M_n := perm_mx (tperm i1 i2).
 
@@ -2559,52 +2824,27 @@ Canonical lin_mulmxr_linear := Linear lin_mulmxr_is_linear.
 End Mulmxr.
 Arguments mulmxr {_ _ _} B A /.
 
-(* The trace. *)
+(* The trace *)
+
 Section Trace.
 
 Variable n : nat.
-
-Definition mxtrace (A : 'M[R]_n) := \sum_i A i i.
 Local Notation "'\tr' A" := (mxtrace A) : ring_scope.
 
-Lemma mxtrace_tr A : \tr A^T = \tr A.
-Proof. by apply: eq_bigr=> i _; rewrite mxE. Qed.
-
-Lemma mxtrace_is_scalar : scalar mxtrace.
+Lemma mxtrace_is_scalar : scalar (@mxtrace R n).
 Proof.
 move=> a A B; rewrite mulr_sumr -big_split /=.
 by apply: eq_bigr=> i _; rewrite !mxE.
 Qed.
-Canonical mxtrace_additive := Additive mxtrace_is_scalar.
+
 Canonical mxtrace_linear := Linear mxtrace_is_scalar.
 
-Lemma mxtrace0 : \tr 0 = 0. Proof. exact: raddf0. Qed.
-Lemma mxtraceD A B : \tr (A + B) = \tr A + \tr B. Proof. exact: raddfD. Qed.
-Lemma mxtraceZ a A : \tr (a *: A) = a * \tr A. Proof. exact: scalarZ. Qed.
+Lemma mxtraceZ a (A : 'M_n) : \tr (a *: A) = a * \tr A.
+Proof. exact: scalarZ. Qed.
 
-Lemma mxtrace_diag D : \tr (diag_mx D) = \sum_j D 0 j.
-Proof. by apply: eq_bigr => j _; rewrite mxE eqxx. Qed.
-
-Lemma mxtrace_scalar a : \tr a%:M = a *+ n.
-Proof.
-rewrite -diag_const_mx mxtrace_diag; under eq_bigr do rewrite mxE.
-by rewrite sumr_const card_ord.
-Qed.
-
-Lemma mxtrace1 : \tr 1%:M = n%:R. Proof. exact: mxtrace_scalar. Qed.
+Lemma mxtrace1 : \tr (1%:M : 'M[R]_n) = n%:R. Proof. exact: mxtrace_scalar. Qed.
 
 End Trace.
-Local Notation "'\tr' A" := (mxtrace A) : ring_scope.
-
-Lemma trace_mx11 (A : 'M_1) : \tr A = A 0 0.
-Proof. by rewrite {1}[A]mx11_scalar mxtrace_scalar. Qed.
-
-Lemma mxtrace_block n1 n2 (Aul : 'M_n1) Aur Adl (Adr : 'M_n2) :
-  \tr (block_mx Aul Aur Adl Adr) = \tr Aul + \tr Adr.
-Proof.
-rewrite /(\tr _) big_split_ord /=.
-by congr (_ + _); under eq_bigr do rewrite (block_mxEul, block_mxEdr).
-Qed.
 
 (* The matrix ring structure requires a strutural condition (dimension of the *)
 (* form n.+1) to satisfy the nontriviality condition we have imposed.         *)
@@ -2613,7 +2853,7 @@ Section MatrixRing.
 Variable n' : nat.
 Local Notation n := n'.+1.
 
-Lemma matrix_nonzero1 : 1%:M != 0 :> 'M_n.
+Lemma matrix_nonzero1 : 1%:M != 0 :> 'M[R]_n.
 Proof. by apply/eqP=> /matrixP/(_ 0 0)/eqP; rewrite !mxE oner_eq0. Qed.
 
 Definition matrix_ringMixin :=
@@ -2626,7 +2866,7 @@ Canonical matrix_lAlgType := Eval hnf in LalgType R 'M[R]_n (@scalemxAl n n n).
 Lemma mulmxE : mulmx = *%R. Proof. by []. Qed.
 Lemma idmxE : 1%:M = 1 :> 'M_n. Proof. by []. Qed.
 
-Lemma scalar_mx_is_multiplicative : multiplicative (@scalar_mx n).
+Lemma scalar_mx_is_multiplicative : multiplicative (@scalar_mx R n).
 Proof. by split=> //; apply: scalar_mxM. Qed.
 Canonical scalar_mx_rmorphism := AddRMorphism scalar_mx_is_multiplicative.
 
@@ -2700,7 +2940,6 @@ Definition adjugate n (A : 'M_n) := \matrix[adjugate_key]_(i, j) cofactor A j i.
 End MatrixAlgebra.
 
 Arguments delta_mx {R m n}.
-Arguments scalar_mx {R n}.
 Arguments perm_mx {R n}.
 Arguments tperm_mx {R n}.
 Arguments pid_mx {R m n}.
@@ -2709,7 +2948,6 @@ Arguments lin_mulmxr {R m n p}.
 Prenex Implicits diag_mx is_scalar_mx.
 Prenex Implicits mulmx mxtrace determinant cofactor adjugate.
 
-Arguments is_scalar_mxP {R n A}.
 Arguments mul_delta_mx {R m n p}.
 
 #[global] Hint Extern 0 (is_true (is_diag_mx (scalar_mx _))) =>
@@ -4207,7 +4445,8 @@ Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
 Lemma mxcol_const m a : \mxcol_j (const_mx a : 'M[V]_(p_ j, m)) = const_mx a.
 Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
 
-Lemma mxcol_sum (I : finType) m (C_ : forall j i, 'M[V]_(p_ i, m)) (P : {pred I}):
+Lemma mxcol_sum
+  (I : finType) m (C_ : forall j i, 'M[V]_(p_ i, m)) (P : {pred I}):
   \mxcol_i (\sum_(j | P j) C_ j i) = \sum_(j | P j) \mxcol_i (C_ j i).
 Proof.
 apply/matrixP => i j; rewrite !(mxE, summxE).
