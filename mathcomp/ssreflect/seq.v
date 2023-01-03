@@ -3866,6 +3866,31 @@ apply/eq_in_map; apply/eq_in_map: x s_x; apply/eq_from_flatten_shape => //.
 by rewrite /shape -!map_comp; apply/eq_map=> x /=; rewrite !size_map.
 Qed.
 
+Lemma perm_allpairs_dep f s1 t1 s2 t2 :
+    perm_eq s1 s2 -> {in s1, forall x, perm_eq (t1 x) (t2 x)} ->
+  perm_eq [seq f x y | x <- s1, y <- t1 x] [seq f x y | x <- s2, y <- t2 x].
+Proof.
+elim: s1 s2 t1 t2 => [s2 t1 t2 |a s1 IH s2 t1 t2 perm_s2 perm_t1].
+  by rewrite perm_sym => /perm_nilP->.
+have mem_a : a \in s2 by rewrite -(perm_mem perm_s2) inE eqxx.
+rewrite -[s2](cat_take_drop (index a s2)).
+rewrite allpairs_cat (drop_nth a) ?index_mem //= nth_index //=.
+rewrite perm_sym perm_catC -catA perm_cat //; last first.
+  rewrite perm_catC -allpairs_cat.
+  rewrite -remE perm_sym IH // => [|x xI]; last first.
+    by apply: perm_t1; rewrite inE xI orbT.
+  by rewrite -(perm_cons a) (perm_trans perm_s2 (perm_to_rem _)).
+have /perm_t1 : a \in a :: s1  by rewrite inE eqxx.
+rewrite perm_sym; elim: (t2 a) (t1 a) => /= [s4|b s3 IH1 s4 perm_s4].
+  by rewrite perm_sym => /perm_nilP->.
+have mem_b : b \in s4 by rewrite -(perm_mem perm_s4) inE eqxx.
+rewrite -[s4](cat_take_drop (index b s4)).
+rewrite map_cat /= (drop_nth b) ?index_mem //= nth_index //=.
+rewrite perm_sym perm_catC /= perm_cons // perm_catC -map_cat.
+rewrite -remE perm_sym IH1 // -(perm_cons b).
+by apply: perm_trans perm_s4 (perm_to_rem _).
+Qed.
+
 Lemma mem_allpairs_dep f s1 t1 s2 t2 :
     s1 =i s2 -> {in s1, forall x, t1 x =i t2 x} ->
   [seq f x y | x <- s1, y <- t1 x] =i [seq f x y | x <- s2, y <- t2 x].
@@ -3976,6 +4001,11 @@ Proof.
 split=> [eq_f | /eq_in_allpairs_dep-eq_f x y /eq_f/(_ y)//].
 by apply/eq_in_allpairs_dep=> x /eq_f.
 Qed.
+
+Lemma perm_allpairs f s1 t1 s2 t2 :
+    perm_eq s1 s2 -> perm_eq t1 t2 ->
+  perm_eq [seq f x y | x <- s1, y <- t1] [seq f x y | x <- s2, y <- t2].
+Proof. by move=> perm_s perm_t; apply: perm_allpairs_dep. Qed.
 
 Lemma mem_allpairs f s1 t1 s2 t2 :
     s1 =i s2 -> t1 =i t2 ->
