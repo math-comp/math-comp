@@ -1282,8 +1282,6 @@ Proof.
 case: m n => // m n _; elim: n m => // n ih [|m] ?; last by rewrite ltn_mul ?ih.
 by rewrite -[_.+1]muln1 leq_mul ?fact_gt0.
 Qed.
-#[deprecated(since="mathcomp 1.13.0", note="Use ltn_fact instead")]
-Notation fact_smonotone := ltn_fact.
 
 (* Parity and bits. *)
 

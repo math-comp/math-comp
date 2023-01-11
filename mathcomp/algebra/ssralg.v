@@ -6138,9 +6138,6 @@ Definition linearE :=
 Notation null_fun V := (null_fun V) (only parsing).
 Notation in_alg A := (in_alg_loc A).
 
-#[deprecated(since="mathcomp 1.13.0", note="Use prodrMn instead.")]
-Notation prodr_natmul := prodrMn (only parsing).
-
 End Theory.
 
 Notation in_alg A := (in_alg_loc A).

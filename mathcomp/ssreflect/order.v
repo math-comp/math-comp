@@ -4392,17 +4392,6 @@ Qed.
 
 End BLatticeTheory.
 
-#[deprecated(since="mathcomp 1.13.0", note="Use joins_sup_seq instead.")]
-Notation join_sup_seq := joins_sup_seq.
-#[deprecated(since="mathcomp 1.13.0", note="Use joins_min_seq instead.")]
-Notation join_min_seq := joins_min_seq.
-#[deprecated(since="mathcomp 1.13.0", note="Use joins_sup instead.")]
-Notation join_sup := joins_sup.
-#[deprecated(since="mathcomp 1.13.0", note="Use joins_min instead.")]
-Notation join_min := joins_min.
-#[deprecated(since="mathcomp 1.13.0", note="Use joins_seq instead.")]
-Notation join_seq := joins_seq.
-
 End BLatticeTheory.
 
 Module Import DualTBLattice.
@@ -4505,13 +4494,6 @@ Lemma meets_seq I (r : seq I) (F : I -> L) :
 Proof. exact: (@joins_seq _ [tbLatticeType of L^d]). Qed.
 
 End TBLatticeTheory.
-
-#[deprecated(since="mathcomp 1.13.0", note="Use meets_inf_seq instead.")]
-Notation meet_inf_seq := meets_inf_seq.
-#[deprecated(since="mathcomp 1.13.0", note="Use meets_max_seq instead.")]
-Notation meet_max_seq := meets_max_seq.
-#[deprecated(since="mathcomp 1.13.0", note="Use meets_seq instead.")]
-Notation meet_seq := meets_seq.
 
 End TBLatticeTheory.
 

@@ -2521,6 +2521,3 @@ Lemma biggcdn_inf (I : finType) i0 (P : pred I) F m :
   P i0 -> F i0 %| m -> \big[gcdn/0]_(i | P i) F i %| m.
 Proof. by move=> Pi0; apply: dvdn_trans; rewrite (bigD1 i0) ?dvdn_gcdl. Qed.
 Arguments biggcdn_inf [I] i0 [P F m].
-
-#[deprecated(since="mathcomp 1.13.0", note="Use big_rmcond instead.")]
-Notation big_uncond := big_rmcond (only parsing).

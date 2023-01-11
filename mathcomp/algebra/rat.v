@@ -617,8 +617,6 @@ Qed.
 Lemma divq_eq_deprecated (nx dx ny dy : rat) :
   dx != 0 -> dy != 0 -> (nx / dx == ny / dy) = (nx * dy == ny * dx).
 Proof. exact: eqr_div. Qed.
-#[deprecated(since="mathcomp 1.13.0", note="Use eqr_div instead.")]
-Notation divq_eq := divq_eq_deprecated (only parsing).
 
 Variant rat_spec (* (x : rat) *) : rat -> int -> int -> Type :=
   Rat_spec (n : int) (d : nat)  & coprime `|n| d.+1

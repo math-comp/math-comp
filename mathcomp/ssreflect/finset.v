@@ -2518,8 +2518,3 @@ Qed.
 End Greatest.
 
 End SetFixpoint.
-
-#[deprecated(since="mathcomp 1.13.0", note="Use mem_imset instead.")]
-Notation mem_imset_eq := mem_imset (only parsing).
-#[deprecated(since="mathcomp 1.13.0", note="Use mem_imset2 instead.")]
-Notation mem_imset2_eq := mem_imset2 (only parsing).
