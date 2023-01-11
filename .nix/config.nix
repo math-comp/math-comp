@@ -52,6 +52,12 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq-elpi.override.version = "coq-master";
       hierarchy-builder.override.version = "coq-master";
     };
+    "coq-8.17".coqPackages = common-bundles // {
+      coq.override.version = "8.17";
+      coqeal.job = false;
+      mathcomp-classical.job = false;
+      mathcomp-analysis.job = false;
+    };
     "coq-8.16".coqPackages = common-bundles // {
       coq.override.version = "8.16";
     };
