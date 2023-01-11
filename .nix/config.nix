@@ -38,6 +38,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "mathcomp-abel" "multinomials" "mathcomp-real-closed" "coqeal"
       "fourcolor" "odd-order" "gaia" "deriving" "mathcomp-zify"
       "extructures" "mathcomp-classical" "mathcomp-analysis" "reglang"
+      "graph-theory" "coquelicot"
     ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
@@ -57,6 +58,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       coqeal.job = false;
       mathcomp-classical.job = false;
       mathcomp-analysis.job = false;
+      graph-theory.job = false;
     };
     "coq-8.16".coqPackages = common-bundles // {
       coq.override.version = "8.16";
@@ -71,6 +73,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq.override.version = "8.13";
       mathcomp-classical.job = false;
       mathcomp-analysis.job = false;
+      graph-theory.job = false;
     };
   };
 }
