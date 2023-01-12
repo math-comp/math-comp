@@ -2075,11 +2075,7 @@ by rewrite ltnS mulnC leq_mul // -{2}(subnKC (valP i)) leq_addr.
 Qed.
 
 Lemma comp_Xn_poly p n : 'X^n \Po p = p ^+ n.
-Proof.
-apply/polyP => i; rewrite coef_comp_poly size_polyXn.
-rewrite (bigD1 (Ordinal (leqnn n.+1))) //= coefXn eqxx big1 ?addr0 ?mul1r //.
-by move=> j /eqP/val_eqP/= jDn; rewrite coefXn (negPf jDn) mul0r.
-Qed.
+Proof. by rewrite /(_ \Po p) map_polyXn hornerXn. Qed.
 
 Lemma coef_comp_poly_Xn p n i : 0 < n ->
   (p \Po 'X^n)`_i = if n %| i then p`_(i %/ n) else 0.
