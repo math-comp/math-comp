@@ -137,6 +137,40 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Removed
 
+- in `matrix.v`:
+  + notation `card_matrix` (deprecated in 1.13.0)
+
+- in `rat.v`:
+  + notation `divq_eq` (deprecated in 1.13.0)
+
+- in `ssralg.v`:
+  + notation `prodr_natmul` (deprecated in 1.13.0)
+
+- in `bigop.v`:
+  + notation `big_uncond` (deprecated in 1.13.0)
+
+- in `finset.v`:
+  + notations `mem_imset_eq` and `mem_imset2_eq` (deprecated in 1.13.0)
+
+- in `order.v`:
+  + notations `join_sup_seq`, `join_min_seq`, `join_sup`, `join_min`,
+    `join_seq`, `meet_inf_seq`, `meet_max_seq`, `meet_seq` (deprecated
+    in 1.13.0)
+
+- in `path.v`:
+  + notations `sup_path_in`, `sub_cycle_in`, `sub_sorted_in`,
+    `eq_path_in`, `eq_cycle_in` (deprecated in 1.13.0)
+
+- in `seq.v`:
+  + notation `iota_add` (deprecated in 1.13.0)
+
+- in `ssreflect.v`:
+  + module `Deprecation` (deprecated in 1.13.0)
+  + notatin `deprecate` (deprecated in 1.13.0)
+
+- in `ssrnat.v`:
+  + notatin `fact_smonotone` (deprecated in 1.13.0)
+
 ### Infrastructure
 
 ### Misc

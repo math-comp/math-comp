@@ -4607,7 +4607,3 @@ Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" :=
   (all_iff P0 (@cons Prop P1 (.. (@cons Prop Pn nil) ..))) : form_scope.
 
 Ltac tfae := do !apply: AllIffConj.
-
-(* Temporary backward compatibility. *)
-#[deprecated(since="mathcomp 1.13.0", note="Use iotaD instead.")]
-Notation iota_add := iotaD (only parsing).

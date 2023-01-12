@@ -373,9 +373,6 @@ Canonical matrix_subFinType (R : finType) m n :=
 Lemma card_mx (F : finType) m n : (#|{: 'M[F]_(m, n)}| = #|F| ^ (m * n))%N.
 Proof. by rewrite card_sub card_ffun card_prod !card_ord. Qed.
 
-#[deprecated(since="mathcomp 1.13.0", note="Use card_mx instead.")]
-Notation card_matrix := card_mx.
-
 (*****************************************************************************)
 (****** Matrix structural operations (transpose, permutation, blocks) ********)
 (*****************************************************************************)

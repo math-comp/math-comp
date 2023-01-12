@@ -1774,14 +1774,3 @@ Qed.
 End CycleArc.
 
 Prenex Implicits arc.
-
-#[deprecated(since="mathcomp 1.13.0", note="Use sub_in_path instead.")]
-Notation sub_path_in := sub_in_path (only parsing).
-#[deprecated(since="mathcomp 1.13.0", note="Use sub_in_cycle instead.")]
-Notation sub_cycle_in := sub_in_cycle (only parsing).
-#[deprecated(since="mathcomp 1.13.0", note="Use sub_in_sorted instead.")]
-Notation sub_sorted_in := sub_in_sorted (only parsing).
-#[deprecated(since="mathcomp 1.13.0", note="Use eq_in_path instead.")]
-Notation eq_path_in := eq_in_path (only parsing).
-#[deprecated(since="mathcomp 1.13.0", note="Use eq_in_cycle instead.")]
-Notation eq_cycle_in := eq_in_cycle (only parsing).
