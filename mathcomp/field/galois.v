@@ -518,7 +518,7 @@ have /kHom_lrmorphism fjM := kHomSl (sub1v _) homLfj.
 pose fjmM := GRing.isMultiplicative.Build _ _ _ fjM.
 pose fjRM : GRing.RMorphism.type _ _ := HB.pack (fun_of_lfun fj) fjmM.
 rewrite -[fj _](horner_map fjRM) (kHom_poly_id homLfj) //=.
-by rewrite lfunE /= Dfz -fi_z lker0_lfunK.
+by rewrite (@lfunE _ _ L) /= Dfz -fi_z lker0_lfunK.
 Qed.
 
 Lemma splitting_field_normal K x :
@@ -695,7 +695,8 @@ Proof.
 apply/subsetP=> x; rewrite -groupV 2!in_set => /andP[_ /eqP ExE].
 apply/subsetP=> _ /imsetP[y homEy ->]; rewrite !in_set !kAutfE in homEy *.
 apply/kAHomP=> u Eu; have idEy := kAHomP homEy; rewrite -ExE in idEy.
-by rewrite !lfunE /= lfunE /= idEy ?memv_img // lker0_lfunVK ?AEnd_lker0.
+rewrite !(@lfunE _ _ L) /= (@lfunE _ _ L) /= idEy ?memv_img //.
+by rewrite lker0_lfunVK ?AEnd_lker0.
 Qed.
 
 Lemma mem_kAut_coset K E (g : 'AEnd(L)) :
@@ -713,7 +714,7 @@ have [Nf Ng] := (subsetP (coset_norm x) f x_f, subsetP (coset_norm y) g y_g).
 rewrite (sameP eqP (rcoset_kercosetP Nf Ng)) mem_rcoset inE kAutfE.
 apply: (iffP kAHomP) => idEfg u Eu.
   by rewrite -(mulgKV g f) lfunE /= idEfg.
-by rewrite lfunE /= idEfg // lker0_lfunK ?AEnd_lker0.
+by rewrite (@lfunE _ _ L) /= idEfg // lker0_lfunK ?AEnd_lker0.
 Qed.
 
 End AEnd_FinGroup.
@@ -909,7 +910,7 @@ wlog suffices IHx: x K sKE / 'Gal(E / K) :^ x \subset 'Gal(E / x @: K).
   apply/eqP; rewrite eqEsubset IHx // -sub_conjgV (subset_trans (IHx _ _ _)) //.
     by apply/subvP=> _ /memv_imgP[a Ka ->]; rewrite memv_gal ?(subvP sKE).
   rewrite -limg_comp (etrans (eq_in_limg _) (lim1g _)) // => a /(subvP sKE)Ka.
-  by rewrite !lfunE /= -galM // mulgV gal_id.
+  by rewrite !(@lfunE _ _ L) /= -galM // mulgV gal_id.
 apply/subsetP=> _ /imsetP[y galEy ->]; rewrite gal_cap gal_kHom ?capvSr //=.
 apply/kAHomP=> _ /memv_capP[/memv_imgP[a Ka ->] _]; have Ea := subvP sKE a Ka.
 by rewrite -galM // -conjgC galM // (fixed_gal sKE galEy).
