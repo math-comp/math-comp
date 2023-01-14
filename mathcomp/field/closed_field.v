@@ -631,12 +631,12 @@ case g0: (\big[(@rgcdp F)/0%:P]_(j <- map (eval_poly e \o abstrX i) ps) j == 0).
   apply/holds_conj; rewrite //= -root_biggcd.
   by rewrite (eqp_root (aux _ _ _ )) (eqP g0) root0.
 apply: (iffP (closed_rootP F_closed _)) => -[x Px]; exists x; move: Px => //=.
-  rewrite (eqp_root (eqp_rgdco_gdco _ _)) root_gdco ?g0 //.
+  rewrite (eqp_root (@eqp_rgdco_gdco F _ _)) root_gdco ?g0 //.
   rewrite -(eqp_root (aux _ _ _ )) root_biggcd  abstrX_bigmul eval_bigmul.
   rewrite -bigmap_id root_bigmul; case/andP=> psr qsr.
   do 2?constructor; first by apply/holds_conj.
   by apply/holds_conjn.
-rewrite (eqp_root (eqp_rgdco_gdco _ _)) root_gdco ?g0 // -(eqp_root (aux _ _ _)).
+rewrite (eqp_root(@eqp_rgdco_gdco F _ _)) root_gdco?g0// -(eqp_root(aux _ _ _)).
 rewrite root_biggcd abstrX_bigmul eval_bigmul -bigmap_id.
 rewrite root_bigmul=> [[] // [hps hqs]]; apply/andP.
 constructor; first by apply/holds_conj.
