@@ -188,7 +188,8 @@ HB.instance Definition _ := FieldExt.on ffT.
 Lemma ffT_splitting_subproof :
   SplittingField.axiom [the fieldExtType _ of ffT].
 Proof.
-exists ('X^#|ffT| - 'X); first by rewrite rpredB 1?rpredX ?polyOverX.
+exists ('X^#|ffT| - 'X).
+  by rewrite (@rpredB [zmodType of {poly fT}]) 1?rpredX ?polyOverX.
 exists (enum ffT); first by rewrite big_enum finField_genPoly eqpxx.
 by apply/vspaceP=> x; rewrite memvf seqv_sub_adjoin ?mem_enum.
 Qed.
