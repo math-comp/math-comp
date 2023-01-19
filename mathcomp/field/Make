@@ -9,6 +9,7 @@ fieldext.v
 finfield.v
 galois.v
 separable.v
+qfpoly.v
 
 -R . mathcomp.field
 

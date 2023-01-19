@@ -669,6 +669,16 @@ HB.instance Definition _ := GRing.isMultiplicative.Build R {poly R} (@polyC R)
 
 Lemma polyC_exp n : {morph (@polyC R) : c / c ^+ n}. Proof. exact: rmorphXn. Qed.
 
+Lemma polyC_natr n : n%:R%:P = n%:R :> {poly R}.
+Proof. by rewrite rmorph_nat. Qed.
+
+Lemma char_poly : [char {poly R}] =i [char R].
+Proof.
+move=> p; rewrite !inE; congr (_ && _).
+apply/eqP/eqP=> [/(congr1 val) /=|]; last by rewrite -polyC_natr => ->.
+by rewrite polyseq0 -polyC_natr polyseqC; case: eqP.
+Qed.
+
 Lemma size_Msign p n : size ((-1) ^+ n * p) = size p.
 Proof.
 by rewrite -signr_odd; case: (odd n); rewrite ?mul1r // mulN1r size_opp.

@@ -451,11 +451,18 @@ HB.reexport.
   note="Use finIdomainType (not available in mathcomp 2.0.0).")]
 Notation finIntegralDomainType := finIdomainType.
 
+Lemma card_finRing_gt1 (R : finRingType) : 1 < #|R|.
+Proof. by rewrite (cardD1 0) (cardD1 1) !inE GRing.oner_neq0. Qed.
+
 Notation "{ 'unit' R }" := (unit_of (Phant R))
   (at level 0, format "{ 'unit'  R }") : type_scope.
 Prenex Implicits FinRing.uval.
 Notation "''U'" := (unit_action _) (at level 8) : action_scope.
 Notation "''U'" := (unit_groupAction _) (at level 8) : groupAction_scope.
+
+Lemma card_finField_unit (F : finFieldType) : #|[set: {unit F}]| = #|F|.-1.
+by rewrite -(cardC1 0) cardsT card_sub; apply: eq_card => x; rewrite GRing.unitfE.
+Qed.
 
 (* Finite Algebraic structure for bool *)
 

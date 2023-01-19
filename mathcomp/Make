@@ -11,6 +11,7 @@ algebra/mxpoly.v
 algebra/polydiv.v
 algebra/poly.v
 algebra/polyXY.v
+algebra/qpoly.v
 algebra/rat.v
 algebra/ring_quotient.v
 algebra/ssralg.v
@@ -37,6 +38,7 @@ field/falgebra.v
 field/fieldext.v
 field/finfield.v
 field/galois.v
+field/qfpoly.v
 field/separable.v
 fingroup/action.v
 fingroup/all_fingroup.v

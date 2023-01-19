@@ -11,6 +11,7 @@ mxpoly.v
 polydiv.v
 poly.v
 polyXY.v
+qpoly.v
 rat.v
 ring_quotient.v
 ssralg.v
