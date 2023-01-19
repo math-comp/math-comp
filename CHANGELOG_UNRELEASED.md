@@ -47,10 +47,60 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `cyclic.v`
   + added lemma `units_Zp_cyclic`
+- in `finalg.v`
+  + lemmas `card_finRing_gt1`, `card_finField_unit` 
+
+- in `poly.v`
+  + lemmas `polyC_natr`, `char_poly`
+
+- in `polydiv.v`
+  + lemmas `rmodp_id`, `rmodpN`, `rmodpB`, `rmodpZ`, `rmodp_sum`,
+    `rmodp_mulml`, `rmodpX`, `rmodp_compr`
+
+- in `qpoly.v`
+  + new file of `algebra` that defines the algebras `R[X]/<p>` and their theory.
+  + definitions `{poly_n R}`, `'nX^m`, `x.-lagrange`, `x.lagrange_n`,
+    `{poly %/ p }`, `'qX`, `irreducibleb`, `mk_monic, in_qpoly`
+  + lemmas `size_npoly`, `npolyP`, `coef_npolyp` `big_coef_npoly`,
+  `npolypK`, `coefn_sum` `npoly_enum_uniq`, `mem_npoly_enum`, 
+  `card_npoly` `irreducibleP`, `dim_polyn` , `npolyXE`, `nth_npolyX`,
+  `npolyX_free`, `npolyX_full`, `npolyX_coords`, `coord npolyX`,
+  `npolyX_gen`, `lagrangeE`, `nth_lagrange`, `size_lagrange_`, `size_lagrange`,
+  `lagrange_sample`, `lagrange_free`, `lagrange_full`, `lagrange_coords`,
+  `lagrange_gen`, `monic_mk_monic`, `size_mk_monic_gt1`, `size_mk_monic_gt0`,
+  `mk_monic_neq0`, `size_mk_monic`, `poly_of_size_mod`, `in_qpoly0`, 
+  `in_qpolyD`, `in_qpolyZ`, `card_monic_qpoly`, `in_qpoly1`, `in_qpolyM`, 
+  `in_qpoly_small`, `qpolyC_proof`, `qpolyCE`, `qpolyC0`, 
+  `qpoly_mul1z`, `qpoly_mulz1`, `qpoly_nontrivial`, `qpolyXE`, `mk_monic_X`, 
+  `mk_monic_Xn`, `card_qpoly`, `qpoly_mulC`, `qpoly_mulA`, `qpoly_mul_addr`, 
+  `qpoly_mul_addl`, `poly_of_qpoly_sum`, `poly_of_qpolyD`, `qpolyC_natr`, 
+  `char_qpoly`, `poly_of_qpolyM`, `poly_of_qpolyX`, `qpolyCN`, 
+  `qpolyC`, `qpolyCD`, `qpolyCM`, `qpolyC_is_rmorphism`, 
+  `poly_of_qpolyZ`, `qpoly_mulVz`, `qpoly_mulzV`, `qpoly_intro_unit`,
+  `qpoly_inv_out`, `irreducible_poly_coprime`
+   
+in `qfpoly.v`
+  + new file of `field` that extends the algebras R[X]/<p> defined in `qpoly`
+    with the field when p is irreducible
+  + definitions `monic_irreducible_poly`, `{poly' %/ p with mi}`, 
+    `primitive_poly`, `qlogp`, `plogp`
+  + lemmas `mk_monicE`,  `coprimep_unit`, `qpoly_mulVp`, `qpoly_inv0`,
+  `qpoly_inv`, `in_qpoly_comp_horner`, `map_poly_div_inj`, 
+  `map_fpoly_div_inj`, `card_qfpoly`, `card_qfpoly_gt1`, `primitive_polyP`, 
+  `primitive_poly_in_qpoly_eq0`, `card_primitive_qpoly`, 
+  `primitive_mi`, `qX_neq0` `qX_in_unit`, `dvdp_order`, `gX_order`, `gX_all`, 
+  `qlogp_lt`, `qlogp_qX`, `qX_order_card`, `qX_order_dvd`, `qlogp0`, `qlogp1`, 
+  `qlogp_eq0`, `qlogpD`, 
+  `qX_exp_neq0`, `qX_exp_inj`, `powX_eq_mod`, `qX_expK`, `plogp_lt`, 
+  `plogp_X`, `plogp0`, `plogp1`, `plogp_div_eq0`, `plogpD`
+   
 
 ### Changed
 
 ### Renamed
+
+- in `polydiv.v`
+  + `modp_mod` -> `modp_id`
 
 ### Removed
 

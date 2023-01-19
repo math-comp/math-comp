@@ -5,6 +5,7 @@ Require Export countalg.
 Require Export poly.
 Require Export polydiv.
 Require Export polyXY.
+Require Export qpoly.
 Require Export ssrint.
 Require Export rat.
 Require Export intdiv.
