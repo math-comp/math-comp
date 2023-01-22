@@ -331,7 +331,7 @@ have QtoQ z x: x \in sQ z -> {Qxz : 'AHom(Q x, Q z) | morph_ofQ x z Qxz}.
     by exists (linfun_ahom (LRMorphism QxzM)) => u; rewrite lfunE QxzE.
   split=> [u v|]; first by apply: (canLR (ofQ_K z)); rewrite !rmorphB !QxzE.
   by split=> [u v|]; apply: (canLR (ofQ_K z)); rewrite ?rmorph1 ?rmorphM ?QxzE.
-pose sQs z s := all (mem (sQ z)) s.
+pose sQs z s := all [in sQ z] s.
 have inQsK z s: sQs z s -> map (ofQ z) (map (inQ z) s) = s.
   by rewrite -map_comp => /allP/(_ _ _)/inQ_K; apply: map_id_in.
 have inQpK z p: p \is a polyOver (sQ z) -> (p ^ inQ z) ^ ofQ z = p.

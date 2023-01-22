@@ -204,7 +204,7 @@ Lemma homGrp_trans rT gT (H : {set rT}) (G : {group gT}) p :
   H \homg G -> G \homg Grp p -> H \homg Grp p.
 Proof.
 case/homgP=> h <-{H}; rewrite /hom; move: {p}(p _) => p.
-have evalG e t: all (mem G) e -> eval (map h e) t = h (eval e t).
+have evalG e t: all [in G] e -> eval (map h e) t = h (eval e t).
   move=> Ge; apply: (@proj2 (eval e t \in G)); elim: t => /=.
   - move=> i; case: (leqP (size e) i) => [le_e_i | lt_i_e].
       by rewrite !nth_default ?size_map ?morph1.
@@ -217,14 +217,14 @@ have evalG e t: all (mem G) e -> eval (map h e) t = h (eval e t).
   by move=> t1 [Gt1 ->] t2 [Gt2 ->]; rewrite groupR ?morphR.
 have and_relE xT x1 x2 r: @and_rel xT x1 x2 r = (x1 == x2) && r :> bool.
   by case: r => //=; rewrite andbT.
-have rsatG e f: all (mem G) e -> rel e f NoRel -> rel (map h e) f NoRel.
+have rsatG e f: all [in G] e -> rel e f NoRel -> rel (map h e) f NoRel.
   move=> Ge; have: NoRel -> NoRel by []; move: NoRel {2 4}NoRel.
   elim: f => [x1 x2 | f1 IH1 f2 IH2] r hr IHr; last by apply: IH1; apply: IH2.
   by rewrite !and_relE !evalG //; case/andP; move/eqP->; rewrite eqxx.
 set s := env1; set vT := gT : finType in s *.
 set s' := env1; set vT' := rT : finType in s' *.
 have (v): let: Env A e := s v in
-  A \subset G -> all (mem G) e /\ exists v', s' v' = Env (h @* A) (map h e).
+  A \subset G -> all [in G] e /\ exists v', s' v' = Env (h @* A) (map h e).
 - rewrite /= cycle_subG andbT => Gv; rewrite morphim_cycle //.
   by split; last exists (h v).
 elim: p 1%N vT vT' s s' => /= [p IHp | f] n vT vT' s s' Gs.

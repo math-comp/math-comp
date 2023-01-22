@@ -16,6 +16,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `path.v` 
   + lemmas `prefix_path`, `prefix_sorted`, `infix_sorted`, `suffix_sorted` 
 
+- in `ssrbool.v`
+  + notation `[in A]`
+
+- in `seq.v`
+  + lemmas `allT`, `all_mapT`, `inj_in_map`, and `mapK_in`.
+
 - in `ssralg.v`
   + lemmas `natr1`, `nat1r`, `telescope_sumr_eq`, `telescope_prodr_eq`, `telescope_prodf_eq`
 
@@ -108,7 +114,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 	 `map2_mx_left_in`, `map2_mx_left`, `map2_mx_right_in`, `map2_mx_right`,
 	 `map2_mxA`, `map2_1mx`, `map2_mx1`, `map2_mxC`, `map2_0mx`, `map2_mx0`,
 	 `map2_mxDl`, `map2_mxDr`, `diag_mx_is_additive`, `mxtrace_is_additive`
-
+- in `finset.v`
+  + lemmas `set_nil`, `set_seq1`
 
 - in `ssralg.v`
   + lemmas `divrN`, `divrNN`
@@ -146,6 +153,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `poly.v`:
   + generalize `eq_poly`
+- in `ssrbool.v`, `eqtype.v`, `seq.v`, `path.v`, `fintype.v`, `fingraph.v`,
+  `prime.v`, `binomial.v`, `fingraph.v`, `bigop.v`, `ssralg.v`, `ssrnum.v`,
+  `poly.v`, `mxpoly.v`, `action.v`, `perm.v`, `presentation.v`, `abelian.v`,
+  `cyclic.v`, `frobenius.v`, `maximal.v`, `primitive_action.v`, `alt.v`,
+  `burnside_app.v`, `mxrepresentation.v`, `mxabelian.v`, `character.v`,
+  `inertia.v`, `integral_char.v`, `separable.v`, `galois.v`,
+  `algebraics_fundamental.v`, changed `mem XXX` and `[mem XXX]` to `[in XX]`.
+- Regressions: now redundanrt instances of `inE` rewriting `mem A x` to
+  `x \in A` must be deleted or made optional, as `[in A] x` directly
+  beta-reduces to `x \in A`.
 
 - in `poly.v`:
   + made hornerE preserve powers
@@ -162,7 +179,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `mxtraceD`, `mxtrace_diag`, `mxtrace_scalar`, `trace_mx11`, 
     `mxtrace_block`
 
+- in `seq.v`:
+  + changed names of implicit arguments of `map_id`, `eq_map`,
+    `map_comp`, `mapK`, `eq_in_map`
+
 ### Renamed
+
+- in `eqtype.v` and `gseries.v`, renamed `rel_of_simpl_rel` to `rel_of_simpl`,
+  the actual name used in the coq `ssr.ssrbool.v` file.
 
 ### Removed
 
@@ -199,6 +223,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `ssrnat.v`:
   + notatin `fact_smonotone` (deprecated in 1.13.0)
+
+- in `ssrbool.v`, removed outdated `Coq 8.10` compatibility code.
 
 ### Infrastructure
 

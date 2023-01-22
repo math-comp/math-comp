@@ -3475,7 +3475,7 @@ Lemma leif_AGM_scaled (I : finType) (A : {pred I}) (E : I -> R) (n := #|A|) :
 Proof.
 have [m leAm] := ubnP #|A|; elim: m => // m IHm in A leAm E n * => Ege0.
 apply/leifP; case: ifPn => [/forall_inP-Econstant | Enonconstant].
-  have [i /= Ai | A0] := pickP (mem A); last by rewrite [n]eq_card0 ?big_pred0.
+  have [i /= Ai | A0] := pickP [in A]; last by rewrite [n]eq_card0 ?big_pred0.
   have /eqfun_inP-E_i := Econstant i Ai; rewrite -(eq_bigr _ E_i) sumr_const.
   by rewrite exprMn_n prodrMn_const -(eq_bigr _ E_i) prodr_const.
 set mu := \sum_(i in A) E i; pose En i := E i *+ n.

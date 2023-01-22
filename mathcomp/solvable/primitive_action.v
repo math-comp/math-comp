@@ -207,7 +207,7 @@ Lemma dtuple_on_add_D1 n x (t : n.-tuple sT) :
      = (x \in S) && (t \in n.-dtuple(S :\ x)).
 Proof.
 rewrite dtuple_on_add !inE (andbCA (~~ _)); do 2!congr (_ && _).
-rewrite -!(eq_subset (in_set (mem t))) setDE setIC subsetI; congr (_ && _).
+rewrite -!(eq_subset (in_set [in t])) setDE setIC subsetI; congr (_ && _).
 by rewrite -setCS setCK sub1set !inE.
 Qed.
 

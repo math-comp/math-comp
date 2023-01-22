@@ -412,9 +412,9 @@ Arguments pred2P {T T2 x y z u}.
 Arguments predD1P {T x y b}.
 Prenex Implicits pred1 pred2 pred3 pred4 predU1 predC1 predD1.
 
-Notation "[ 'predU1' x & A ]" := (predU1 x [mem A])
+Notation "[ 'predU1' x & A ]" := (predU1 x [in A])
   (at level 0, format "[ 'predU1'  x  &  A ]") : fun_scope.
-Notation "[ 'predD1' A & x ]" := (predD1 [mem A] x)
+Notation "[ 'predD1' A & x ]" := (predD1 [in A] x)
   (at level 0, format "[ 'predD1'  A  &  x ]") : fun_scope.
 
 (* Lemmas for reflected equality and functions.   *)
@@ -843,7 +843,7 @@ Arguments pair_eqP {T1 T2}.
 Definition predX T1 T2 (p1 : pred T1) (p2 : pred T2) :=
   [pred z | p1 z.1 & p2 z.2].
 
-Notation "[ 'predX' A1 & A2 ]" := (predX [mem A1] [mem A2])
+Notation "[ 'predX' A1 & A2 ]" := (predX [in A1] [in A2])
   (at level 0, format "[ 'predX'  A1  &  A2 ]") : fun_scope.
 
 Section OptionEqType.

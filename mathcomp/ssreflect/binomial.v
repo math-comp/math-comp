@@ -457,7 +457,7 @@ have inc_A (A : {set 'I_n}) : sorted ltn (map val (enum A)).
   rewrite -(eq_filter (mem_map val_inj _)) -filter_map.
   by rewrite (sorted_filter ltn_trans) // unlock val_ord_enum iota_ltn_sorted.
 rewrite -!sum1dep_card (reindex_onto f_t f_A) /= => [|A]; last first.
-  by move/eqP=> cardAm; apply/setP=> x; rewrite inE -(mem_enum (mem A)) -val_fA.
+  by move/eqP=> cardAm; apply/setP=> x; rewrite inE -(mem_enum A) -val_fA.
 apply: eq_bigl => t.
 apply/idP/idP => [inc_t|/andP [/eqP t_m /eqP <-]]; last by rewrite val_fA.
 have ft_m: #|f_t t| = m.

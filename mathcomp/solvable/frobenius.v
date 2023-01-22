@@ -724,7 +724,7 @@ rewrite -(partnC p n_gt0) Gauss_dvd ?coprime_partC //; apply/andP; split.
 rewrite -sum1_card (partition_big_imset (fun x => x.`_p ^: G)) /=.
 apply: dvdn_sum => _ /imsetP[x /setIP[Gx Ax] ->].
 set y := x.`_p; have oy: #[y] = (n`_p * p)%N by rewrite order_constt pA.
-rewrite (partition_big (fun x => x.`_p) (mem (y ^: G))) /= => [|z]; last first.
+rewrite (partition_big (fun x => x.`_p) [in y ^: G]) /= => [|z]; last first.
   by case/andP=> _ /eqP <-; rewrite /= class_refl.
 pose G' := ('C_G[y] / <[y]>)%G; pose n' := gcdn #|G'| n`_p^'.
 have n'_gt0: 0 < n' by rewrite gcdn_gt0 cardG_gt0.

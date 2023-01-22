@@ -298,7 +298,7 @@ Lemma kHom_extends K E f p U :
   {g | kHom K U g & {in E, f =1 g}}.
 Proof.
 move=> sKE homEf Kp /sig2_eqW[rs Dp <-{U}].
-set r := rs; have rs_r: all (mem rs) r by apply/allP.
+set r := rs; have rs_r: all [in rs] r by apply/allP.
 elim: r rs_r => [_|z r IHr /=/andP[rs_z rs_r]] /= in E f sKE homEf *.
   by exists f; rewrite ?Fadjoin_nil.
 set Ez := <<E; z>>%AS; pose fpEz := map_poly f (minPoly E z).
@@ -509,7 +509,7 @@ suffices [kAutL in_kAutL] : {kAutL : seq 'AEnd(L) | forall f, isAutL kAutL f}.
   by exists kAutL => f; rewrite -in_kAutL k1AHom.
 have [p Kp /sig2_eqW[rs Dp defL]] := splittingPoly.
 do [rewrite {}/isAutL -(erefl (asval 1)); set r := rs; set E := 1%AS] in defL *.
-have [sKE rs_r]: (1 <= E)%VS /\ all (mem rs) r by split; last apply/allP.
+have [sKE rs_r]: (1 <= E)%VS /\ all [in rs] r by split; last apply/allP.
 elim: r rs_r => [_|z r IHr /=/andP[rs_z rs_r]] /= in (E) sKE defL *.
   rewrite Fadjoin_nil in defL; exists [tuple \1%AF] => f; rewrite defL inE.
   apply/idP/eqP=> [/kAHomP f1 | ->]; last exact: kHom1.
@@ -648,7 +648,7 @@ have Df1 u: inLz (f1 u) = f (inLz u).
   rewrite !comp_lfunE limg_lfunVK //= -[limg _]/(asval imL).
   have [r def_pz defLz] := splitLpz; set r1 := r.
   have: inLz u \in <<1 & r1>>%VS by rewrite defLz.
-  have: all (mem r) r1 by apply/allP.
+  have: all [in r] r1 by apply/allP.
   elim/last_ind: r1 {u}(inLz u) => [|r1 y IHr1] u.
     by rewrite Fadjoin_nil => _ Fu; rewrite fFid // (subvP (sub1v _)).
   rewrite all_rcons adjoin_rcons => /andP[rr1 ry] /Fadjoin_polyP[pu r1pu ->].
@@ -1118,7 +1118,7 @@ Qed.
 
 Lemma normalFieldP K E :
   reflect {in E, forall a, exists2 r,
-            all (mem E) r & minPoly K a = \prod_(b <- r) ('X - b%:P)}
+            all [in E] r & minPoly K a = \prod_(b <- r) ('X - b%:P)}
           (normalField K E).
 Proof.
 apply: (iffP eqfun_inP) => [nKE a Ea | nKE x]; last first.
@@ -1166,7 +1166,7 @@ move=> sKE; apply: (iffP idP) => [nKE| [p Kp [rs Dp defE]]]; last first.
   rewrite -!root_prod_XsubC -!(eqp_root Dp) in rs_a *.
   by apply: kHom_root_id homKg Kp _ rs_a; rewrite ?subvf ?memvf.
 pose splitK a r := minPoly K a = \prod_(b <- r) ('X - b%:P).
-have{nKE} rK_ a: {r | a \in E -> all (mem E) r /\ splitK a r}.
+have{nKE} rK_ a: {r | a \in E -> all [in E] r /\ splitK a r}.
   case Ea: (a \in E); last by exists [::].
   by have /sig2_eqW[r] := normalFieldP _ _ nKE a Ea; exists r.
 have sXE := basis_mem (vbasisP E); set X : seq L := vbasis E in sXE.
@@ -1393,7 +1393,7 @@ have [x1 | ntx] := eqVneq x 1%g.
   by rewrite -{1}normEa1 /galNorm DgalE x1 cycle1 big_set1 !gal_id divr1.
 pose c_ y := \prod_(i < invm (injm_Zpm x) y) (x ^+ i)%g a.
 have nz_c1: c_ 1%g != 0 by rewrite /c_ morph1 big_ord0 oner_neq0.
-have [d] := @gal_independent_contra _ (mem 'Gal(E / K)) _ _ (group1 _) nz_c1.
+have [d] := @gal_independent_contra _ [in 'Gal(E / K)] _ _ (group1 _) nz_c1.
 set b := \sum_(y in _) _ => Ed nz_b; exists b.
   split=> //; apply: rpred_sum => y galEy.
   by apply: rpredM; first apply: rpred_prod => i _; apply: memv_gal.

@@ -2066,7 +2066,7 @@ Proof.
 set D := codom _; have Df: dprod_Iirr _ \in D := codom_f dprod_Iirr _.
 have: 'chi_k 1%g ^+ 2 != 0 by rewrite mulf_neq0 ?irr1_neq0.
 apply: contraR => notDk; move/eqP: (irr_sum_square G).
-rewrite (bigID (mem D)) (reindex _ (bij_on_codom dprod_Iirr_inj (0, 0))) /=.
+rewrite (bigID [in D]) (reindex _ (bij_on_codom dprod_Iirr_inj (0, 0))) /=.
 have ->: #|G|%:R = \sum_i \sum_j 'chi_(dprod_Iirr (i, j)) 1%g ^+ 2.
   rewrite -(dprod_card KxH) natrM.
   do 2![rewrite -irr_sum_square (mulr_suml, mulr_sumr); apply: eq_bigr => ? _].

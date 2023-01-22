@@ -892,7 +892,7 @@ pose K' := <<K & s>>%VS.
 have sepKs: all (separable_element K) s.
   by rewrite all_map /f; apply/allP=> i _ /=; case: ex_minnP => m /andP[].
 have [x sepKx defKx]: {x | x \in E /\ separable_element K x & K' = <<K; x>>%VS}.
-  have: all (mem E) s.
+  have: all [in E] s.
     rewrite all_map; apply/allP=> i; rewrite mem_iota => ltis /=.
     by rewrite rpredX // vbasis_mem // memt_nth.
   rewrite {}/K'; elim/last_ind: s sepKs => [|s t IHs].

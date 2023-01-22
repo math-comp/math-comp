@@ -210,6 +210,10 @@ Notation "[ 'set' x 'in' A | P & Q ]" := [set x in A | P && Q]
 Notation "[ 'set' x : T 'in' A | P & Q ]" := [set x : T in A | P && Q]
   (at level 0, x at level 99, only parsing) : set_scope.
 
+(* Set spanned by a sequence. *)
+Notation "[ 'set' :: s ]" := (finset [in pred_of_seq s])
+  (at level 0, format "[ 'set' ::  s ]") : set_scope.
+
 (* This lets us use set and subtypes of set, like group or coset_of, both as  *)
 (* collective predicates and as arguments of the \pi(_) notation.             *)
 Coercion pred_of_set: set_type >-> fin_pred_sort.
@@ -351,12 +355,12 @@ Proof. by rewrite -!proper0 => sAB /proper_sub_trans->. Qed.
 
 Lemma set_0Vmem A : (A = set0) + {x : T | x \in A}.
 Proof.
-case: (pickP (mem A)) => [x Ax | A0]; [by right; exists x | left].
+case: (pickP [in A]) => [x Ax | A0]; [by right; exists x | left].
 by apply/setP=> x; rewrite inE; apply: A0.
 Qed.
 
-Lemma set_enum A : [set x | x \in enum A] = A.
-Proof. by apply/setP => x; rewrite inE mem_enum. Qed.
+Lemma set_enum A : [set:: enum A] = A.
+Proof. by apply/setP=> x; rewrite inE mem_enum. Qed.
 
 Lemma enum_set0 : enum set0 = [::] :> seq T.
 Proof. by rewrite (eq_enum (in_set _)) enum0. Qed.
@@ -398,7 +402,12 @@ Proof. by rewrite !inE; apply: predU1P. Qed.
 Lemma in_setU1 x a B : (x \in a |: B) = (x == a) || (x \in B).
 Proof. by rewrite !inE. Qed.
 
-Lemma set_cons a s : [set x in a :: s] = a |: [set x in s].
+Lemma set_nil : [set:: nil] = @set0 T. Proof. by rewrite -enum_set0 set_enum. Qed.
+
+Lemma set_seq1 a : [set:: [:: a]] = [set a].
+Proof. by rewrite -enum_set1 set_enum. Qed.
+
+Lemma set_cons a s : [set:: a :: s] = a |: [set:: s].
 Proof. by apply/setP=> x; rewrite !inE. Qed.
 
 Lemma setU11 x B : x \in x |: B.
@@ -548,7 +557,6 @@ Lemma set0I A : set0 :&: A = set0.
 Proof. by apply/setP => x; rewrite !inE andFb. Qed.
 
 Lemma setI0 A : A :&: set0 = set0.
-
 Proof. by rewrite setIC set0I. Qed.
 
 Lemma setIA A B C : A :&: (B :&: C) = A :&: B :&: C.
@@ -1066,8 +1074,7 @@ Local Notation imset_def :=
   (fun (aT rT : finType) f mD => [set y in @image_mem aT rT f mD]).
 Local Notation imset2_def :=
   (fun (aT1 aT2 rT : finType) f (D1 : mem_pred aT1) (D2 : _ -> mem_pred aT2) =>
-     [set y in @image_mem _ rT (uncurry f)
-                           (mem [pred u | D1 u.1 & D2 u.1 u.2])]).
+     [set y : rT in [seq uncurry f u | u in [pred u | D1 u.1 & D2 u.1 u.2]]]).
 
 Module Type ImsetSig.
 Parameter imset : forall aT rT : finType,
@@ -1234,26 +1241,26 @@ Qed.
 Lemma imset_inj : injective f -> injective (fun A : {set aT} => f @: A).
 Proof.
 move=> inj_f A B => /setP E; apply/setP => x.
-by rewrite -(mem_imset (mem A) x inj_f) E mem_imset.
+by rewrite -(mem_imset A x inj_f) E mem_imset.
 Qed.
 
 Lemma imset_disjoint (A B : {pred aT}) :
   injective f -> [disjoint f @: A & f @: B] = [disjoint A & B].
 Proof.
 move=> inj_f; apply/pred0Pn/pred0Pn => /= [[_ /andP[/imsetP[x xA ->]] xB]|].
-  by exists x; rewrite xA -(mem_imset (mem B) x inj_f).
+  by exists x; rewrite xA -(mem_imset B x inj_f).
 by move=> [x /andP[xA xB]]; exists (f x); rewrite !mem_imset ?xA.
 Qed.
 
 Lemma imset2_f (D : {pred aT}) (D2 : aT -> {pred aT2}) x x2 :
     x \in D -> x2 \in D2 x ->
-  f2 x x2 \in imset2 f2 (mem D) (fun x1 => mem (D2 x1)).
+  f2 x x2 \in [set f2 y y2 | y in D, y2 in D2 y].
 Proof. by move=> Dx Dx2; apply/imset2P; exists x x2. Qed.
 
 Lemma mem_imset2 (D : {pred aT}) (D2 : aT -> {pred aT2}) x x2 :
     injective2 f2 ->
-  f2 x x2 \in imset2 f2 (mem D) (fun x1 => mem (D2 x1)) = 
-    ((x \in D) && (x2 \in D2 x)).
+  (f2 x x2 \in [set f2 y y2 | y in D, y2 in D2 y])
+    = (x \in D) && (x2 \in D2 x).
 Proof.
 move=> inj2_f; apply/imset2P/andP => [|[xD xD2]]; last by exists x x2.
 by move => [x' x2' xD xD2 eq_f2]; case: (inj2_f _ _ _ _ eq_f2) => -> ->.
@@ -1441,7 +1448,7 @@ Lemma big_setID A B F :
      aop (\big[aop/idx]_(i in A :&: B) F i)
          (\big[aop/idx]_(i in A :\: B) F i).
 Proof.
-rewrite (bigID (mem B)) setDE.
+rewrite (bigID [in B]) setDE.
 by congr (aop _ _); apply: eq_bigl => i; rewrite !inE.
 Qed.
 
@@ -1860,8 +1867,7 @@ Proof. by rewrite /trivIset cover1 big_set1. Qed.
 Lemma trivIsetP P :
   reflect {in P &, forall A B, A != B -> [disjoint A & B]} (trivIset P).
 Proof.
-have->: P = [set x in enum (mem P)] by apply/setP=> x; rewrite inE mem_enum.
-elim: {P}(enum _) (enum_uniq (mem P)) => [_ | A e IHe] /=.
+rewrite -[P]set_enum; elim: {P}(enum _) (enum_uniq P) => [_ | A e IHe] /=.
   by rewrite /trivIset /cover !big_set0 cards0; left=> A; rewrite inE.
 case/andP; rewrite set_cons -(in_set (fun B => B \in e)) => PA {}/IHe.
 move: {e}[set x in e] PA => P PA IHP.
@@ -2050,7 +2056,7 @@ Let rhs P E := \big[op/idx]_(A in P) \big[op/idx]_(x in A) E x.
 Lemma big_trivIset_cond P (K : pred T) (E : T -> R) :
   trivIset P -> \big[op/idx]_(x in cover P | K x) E x = rhs_cond P K E.
 Proof.
-move=> tiP; rewrite (partition_big (pblock P) (mem P)) -/op => /= [|x].
+move=> tiP; rewrite (partition_big (pblock P) [in P]) -/op => /= [|x].
   apply: eq_bigr => A PA; apply: eq_bigl => x; rewrite andbAC; congr (_ && _).
   rewrite -mem_pblock; apply/andP/idP=> [[Px /eqP <- //] | Ax].
   by rewrite (def_pblock tiP PA Ax).

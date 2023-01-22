@@ -40,7 +40,7 @@ Local Open Scope ring_scope.
 Lemma group_num_field_exists (gT : finGroupType) (G : {group gT}) :
   {Qn : splittingFieldType rat & galois 1 {:Qn} &
     {QnC : {rmorphism Qn -> algC}
-         & forall nuQn : argumentType (mem ('Gal({:Qn}%VS / 1%VS))),
+         & forall nuQn : argumentType [in 'Gal({:Qn} / 1)],
               {nu : {rmorphism algC -> algC} |
                  {morph QnC: a / nuQn a >-> nu a}}
          & {w : Qn & #|G|.-primitive_root w /\ <<1; w>>%VS = fullv
@@ -133,7 +133,7 @@ transitivity (\sum_(x in zi ^: G) \sum_(y in zj ^: G) aG (x * y)%g).
 pose h2 xy : gT := (xy.1 * xy.2)%g.
 pose h1 xy := enum_rank_in (classes1 G) (h2 xy ^: G).
 rewrite pair_big (partition_big h1 xpredT) //=; apply: eq_bigr => k _.
-rewrite (partition_big h2 (mem (enum_val k))) /= => [|[x y]]; last first.
+rewrite (partition_big h2 [in enum_val k]) /= => [|[x y]]; last first.
   case/andP=> /andP[/= /sKG Gx /sKG Gy] /eqP <-.
   by rewrite enum_rankK_in ?class_refl ?mem_classes ?groupM ?Gx ?Gy.
 rewrite scaler_sumr; apply: eq_bigr => g Kk_g; rewrite scaler_nat.
@@ -539,7 +539,7 @@ have [j ->]: exists j, 'chi_i = 'Res 'chi[G]_j.
   rewrite card_Iirr_abelian ?(abelianS sHG) //.
   rewrite -(eqn_pmul2r (indexg_gt0 G H)) Lagrange //; apply/eqP.
   rewrite -sum_nat_const -card_Iirr_abelian // -sum1_card.
-  rewrite (partition_big rH (mem (codom rH))) /=; last exact: image_f.
+  rewrite (partition_big rH [in codom rH]) /=; last exact: image_f.
   have nsHG: H <| G by rewrite -sub_abelian_normal.
   apply: eq_bigr => _ /codomP[i ->]; rewrite -card_quotient ?normal_norm //.
   rewrite -card_Iirr_abelian ?quotient_abelian //.
