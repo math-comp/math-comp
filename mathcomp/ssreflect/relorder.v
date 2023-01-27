@@ -33,11 +33,11 @@ Reserved Notation "A `|` B" (at level 52, left associativity).
 Reserved Notation "A `\` B" (at level 50, left associativity).
 Reserved Notation "~` A" (at level 35, right associativity).
 
-Definition dual_rel (T : Type) (r : rel T) := fun y x => r x y.
-Definition dual_bottom (T : Type) (top : T) := top.
-Definition dual_top (T : Type) (bottom : T) := bottom.
-Definition dual_meet (T : Type) (join : T -> T -> T) := join.
-Definition dual_join (T : Type) (meet : T -> T -> T) := meet.
+Definition rdual_rel (T : Type) (r : rel T) := fun y x => r x y.
+Definition rdual_bottom (T : Type) (top : T) := top.
+Definition rdual_top (T : Type) (bottom : T) := bottom.
+Definition rdual_meet (T : Type) (join : T -> T -> T) := join.
+Definition rdual_join (T : Type) (meet : T -> T -> T) := meet.
 
 Module RelOrder.
 
@@ -56,11 +56,11 @@ Variable T : eqType.
 Set Primitive Projections.
 
 Record mixin_of (le lt : rel T) := Mixin {
-  lt_def : forall x y, lt x y = (y != x) && le x y;
+  rlt_def : forall x y, lt x y = (y != x) && le x y;
   dlt_def : forall x y, lt y x = (y != x) && le y x;
-  lexx : reflexive le;
-  le_anti : forall x y, le x y -> le y x -> x = y;
-  le_trans : transitive le;
+  rlexx : reflexive le;
+  rle_anti : forall x y, le x y -> le y x -> x = y;
+  rle_trans : transitive le;
 }.
 
 Notation class_of := mixin_of (only parsing).
@@ -105,13 +105,13 @@ Module Import DualPOrder.
 
 Canonical dual_pOrder (T : eqType) (ord : {pOrder T}) :=
   POrder
-    (dual_rel (le ord)) (dual_rel (lt ord))
+    (rdual_rel (le ord)) (rdual_rel (lt ord))
     (let mixin := POrder.class ord in
      @POrder.Mixin
-       T (dual_rel (le ord)) (dual_rel (lt ord))
-       (POrder.dlt_def mixin) (POrder.lt_def mixin) (POrder.lexx mixin)
-       (fun x y yx xy => POrder.le_anti mixin xy yx)
-       (fun y x z xy yz => POrder.le_trans mixin yz xy)).
+       T (rdual_rel (le ord)) (rdual_rel (lt ord))
+       (POrder.dlt_def mixin) (POrder.rlt_def mixin) (POrder.rlexx mixin)
+       (fun x y yx xy => POrder.rle_anti mixin xy yx)
+       (fun y x z xy yz => POrder.rle_trans mixin yz xy)).
 
 End DualPOrder.
 
@@ -323,9 +323,9 @@ Variable T : eqType.
 Set Primitive Projections.
 
 Record mixin_of (ord : {pOrder T}) (meet : T -> T -> T) := Mixin {
-  meetC : commutative meet;
-  meetA : associative meet;
-  leEmeet : forall x y, (le ord x y) = (meet x y == x);
+  rmeetC : commutative meet;
+  rmeetA : associative meet;
+  rleEmeet : forall x y, (le ord x y) = (meet x y == x);
 }.
 
 Record class_of (le lt : rel T) (meet : T -> T -> T) := Class {
@@ -1372,8 +1372,8 @@ Variable T : eqType.
 Set Primitive Projections.
 
 Record mixin_of (ord : {lattice T}) := Mixin {
-  meetUl : left_distributive (meet ord) (join ord);
-  joinIl : left_distributive (join ord) (meet ord);
+  rmeetUl : left_distributive (meet ord) (join ord);
+  rjoinIl : left_distributive (join ord) (meet ord);
 }.
 
 Record class_of (le lt : rel T) (meet join : T -> T -> T) := Class {
@@ -2223,24 +2223,24 @@ Local Notation lt := (lt ord).
 Local Notation "x <= y" := (le x y).
 Local Notation "x < y" := (lt x y).
 
-Definition comparable : rel T := fun x y => (x <= y) || (y <= x).
+Definition rcomparable : rel T := fun x y => (x <= y) || (y <= x).
 
-Local Notation "x >< y" := (~~ (comparable x y)).
+Local Notation "x >< y" := (~~ (rcomparable x y)).
 
-Definition ge : simpl_rel T := [rel x y | y <= x].
-Definition gt : simpl_rel T := [rel x y | y < x].
+Definition rge : simpl_rel T := [rel x y | y <= x].
+Definition rgt : simpl_rel T := [rel x y | y < x].
 
-Definition leif x y C : Prop := ((x <= y) * ((x == y) = C))%type.
+Definition rleif x y C : Prop := ((x <= y) * ((x == y) = C))%type.
 
-Definition le_of_leif x y C (le_xy : leif x y C) : x <= y := le_xy.1.
+Definition rle_of_leif x y C (le_xy : rleif x y C) : x <= y := le_xy.1.
 
-Definition lteif x y C := if C then x <= y else x < y.
+Definition rlteif x y C := if C then x <= y else x < y.
 
-Definition min x y := if x < y then x else y.
-Definition max x y := if x < y then y else x.
+Definition rmin x y := if x < y then x else y.
+Definition rmax x y := if x < y then y else x.
 
-Definition arg_min {I : finType} := @extremum T I le.
-Definition arg_max {I : finType} := @extremum T I ge.
+Definition rarg_min {I : finType} := @extremum T I le.
+Definition rarg_max {I : finType} := @extremum T I rge.
 
 End POrderDef.
 
@@ -2251,7 +2251,7 @@ Implicit Types (x y : T).
 
 Local Notation "x <= y" := (le ord x y).
 Local Notation "x < y" := (lt ord x y).
-Local Notation "x >< y" := (~~ (comparable ord x y)).
+Local Notation "x >< y" := (~~ (rcomparable ord x y)).
 Local Notation "x `&` y" := (meet ord x y).
 Local Notation "x `|` y" := (join ord x y).
 
@@ -2341,20 +2341,20 @@ Notation "x <=_ r0 y <_ r1 z" := ((x <=_r0 y) && (y <_r1 z))
   (at level 65, y, z at next level, r0 at level 2, r1 at level 2, format "x  <=_ r0  y  <_ r1  z").
 Notation "x <_ r0 y <=_ r1 z" := ((x <_r0 y) && (y <=_r1 z))
   (at level 70, r0 at level 2, r1 at level 2, format "x  <_ r0  y  <=_ r1  z").
-Notation "x >=<_ r y" := (comparable r x y)
+Notation "x >=<_ r y" := (rcomparable r x y)
   (at level 70, r at level 2, no associativity, format "x  >=<_ r  y").
-Notation "x ><_ r y" := (~~ comparable r x y)
+Notation "x ><_ r y" := (~~ rcomparable r x y)
   (at level 70, r at level 2, no associativity, format "x  ><_ r  y").
 Notation ">=<_ r y" :=
   [pred x | x >=<_r y] (at level 80, r at level 2, format ">=<_ r  y").
 Notation "><_ r y" :=
   [pred x | x ><_r y] (at level 80, r at level 2, format "><_ r  y").
 
-Notation "x <=_ r y ?= 'iff' C" := (leif r x y C)
+Notation "x <=_ r y ?= 'iff' C" := (rleif r x y C)
   (at level 70, C at level 1, r at level 2,
    format "x '[hv'  <=_ r '/'  y  ?=  'iff'  C ']'").
 
-Notation "x <_ r y ?<= 'if' C" := (lteif r x y C)
+Notation "x <_ r y ?<= 'if' C" := (rlteif r x y C)
   (at level 71, C at level 1, r at level 1, y at next level,
    format "x '[hv'  <_ r '/'  y  ?<=  'if'  C ']'").
 
@@ -2370,12 +2370,12 @@ Variable T : eqType.
 Canonical dual_pOrder (ord : {pOrder T}) := dual_pOrder ord.
 
 Canonical dual_bPOrder (ord : {tPOrder T}) :=
-  BPOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_bottom (top ord))
+  BPOrder (rdual_rel <=:ord) (rdual_rel <:ord) (rdual_bottom (top ord))
           (TPOrder.mixin (TPOrder.class ord) :
              BPOrder.mixin_of (dual_pOrder ord) _).
 
 Canonical dual_tPOrder (ord : {bPOrder T}) :=
-  TPOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_top (bottom ord))
+  TPOrder (rdual_rel <=:ord) (rdual_rel <:ord) (rdual_top (bottom ord))
           (BPOrder.mixin (BPOrder.class ord) :
              TPOrder.mixin_of (dual_pOrder ord) _).
 
@@ -2383,74 +2383,74 @@ Canonical dual_tPOrder (ord : {bPOrder T}) :=
 (* operators from existing instances, or should operators other than [le] be  *)
 (* specified (e.g., TBOrder le lt bottom top) to synthesize proper            *)
 (* unification hints anyway? Clone notations have the same issue.             *)
-Canonical dual_tbPOrder (ord : {tbPOrder T}) := [tbPOrder of dual_rel <=:ord].
+Canonical dual_tbPOrder (ord : {tbPOrder T}) := [tbPOrder of rdual_rel <=:ord].
 
 Canonical dual_meetOrder (ord : {joinOrder T}) :=
-  MeetOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_meet (join ord))
+  MeetOrder (rdual_rel <=:ord) (rdual_rel <:ord) (rdual_meet (join ord))
             (Join.mixin (Join.class ord)).
 
 Canonical dual_bMeetOrder (ord : {tJoinOrder T}) :=
-  [bMeetOrder of dual_rel <=:ord].
+  [bMeetOrder of rdual_rel <=:ord].
 
 Canonical dual_tMeetOrder (ord : {bJoinOrder T}) :=
-  [tMeetOrder of dual_rel <=:ord].
+  [tMeetOrder of rdual_rel <=:ord].
 
 Canonical dual_tbMeetOrder (ord : {tbJoinOrder T}) :=
-  [tbMeetOrder of dual_rel <=:ord].
+  [tbMeetOrder of rdual_rel <=:ord].
 
 Canonical dual_joinOrder (ord : {meetOrder T}) :=
-  JoinOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_join (meet ord))
+  JoinOrder (rdual_rel <=:ord) (rdual_rel <:ord) (rdual_join (meet ord))
             (Meet.mixin (Meet.class ord) : Join.mixin_of (dual_pOrder ord) _).
 
 Canonical dual_bJoinOrder (ord : {tMeetOrder T}) :=
-  [bJoinOrder of dual_rel <=:ord].
+  [bJoinOrder of rdual_rel <=:ord].
 
 Canonical dual_tJoinOrder (ord : {bMeetOrder T}) :=
-  [tJoinOrder of dual_rel <=:ord].
+  [tJoinOrder of rdual_rel <=:ord].
 
 Canonical dual_tbJoinOrder (ord : {tbMeetOrder T}) :=
-  [tbJoinOrder of dual_rel <=:ord].
+  [tbJoinOrder of rdual_rel <=:ord].
 
-Canonical dual_lattice (ord : {lattice T}) := [lattice of dual_rel <=:ord].
+Canonical dual_lattice (ord : {lattice T}) := [lattice of rdual_rel <=:ord].
 
-Canonical dual_bLattice (ord : {tLattice T}) := [bLattice of dual_rel <=:ord].
+Canonical dual_bLattice (ord : {tLattice T}) := [bLattice of rdual_rel <=:ord].
 
-Canonical dual_tLattice (ord : {bLattice T}) := [tLattice of dual_rel <=:ord].
+Canonical dual_tLattice (ord : {bLattice T}) := [tLattice of rdual_rel <=:ord].
 
 Canonical dual_tbLattice (ord : {tbLattice T}) :=
-  [tbLattice of dual_rel <=:ord].
+  [tbLattice of rdual_rel <=:ord].
 
 Canonical dual_distrLattice (ord : {distrLattice T}) :=
   DistrLattice
-    (dual_rel <=:ord) (dual_rel <:ord)
-    (dual_meet (join ord)) (dual_join (meet ord))
+    (rdual_rel <=:ord) (rdual_rel <:ord)
+    (rdual_meet (join ord)) (rdual_join (meet ord))
     (let mixin := DistrLattice.mixin (DistrLattice.class ord) in
      @DistrLattice.Mixin _ (dual_lattice ord)
-       (DistrLattice.joinIl mixin) (DistrLattice.meetUl mixin)).
+       (DistrLattice.rjoinIl mixin) (DistrLattice.rmeetUl mixin)).
 
 Canonical dual_bDistrLattice (ord : {tDistrLattice T}) :=
-  [bDistrLattice of dual_rel <=:ord].
+  [bDistrLattice of rdual_rel <=:ord].
 
 Canonical dual_tDistrLattice (ord : {bDistrLattice T}) :=
-  [tDistrLattice of dual_rel <=:ord].
+  [tDistrLattice of rdual_rel <=:ord].
 
 Canonical dual_tbDistrLattice (ord : {tbDistrLattice T}) :=
-  [tbDistrLattice of dual_rel <=:ord].
+  [tbDistrLattice of rdual_rel <=:ord].
 
 Canonical dual_totalOrder (ord : {totalOrder T}) :=
   TotalOrder
-    (dual_rel <=:ord) (dual_rel <:ord)
-    (dual_meet (join ord)) (dual_join (meet ord))
+    (rdual_rel <=:ord) (rdual_rel <:ord)
+    (rdual_meet (join ord)) (rdual_join (meet ord))
     (fun x y => Total.mixin (Total.class ord) y x).
 
 Canonical dual_bTotalOrder (ord : {tTotalOrder T}) :=
-  [bTotalOrder of dual_rel <=:ord].
+  [bTotalOrder of rdual_rel <=:ord].
 
 Canonical dual_tTotalOrder (ord : {bTotalOrder T}) :=
-  [tTotalOrder of dual_rel <=:ord].
+  [tTotalOrder of rdual_rel <=:ord].
 
 Canonical dual_tbTotalOrder (ord : {tbTotalOrder T}) :=
-  [tbTotalOrder of dual_rel <=:ord].
+  [tbTotalOrder of rdual_rel <=:ord].
 
 End DualOrder.
 
@@ -2498,19 +2498,19 @@ Implicit Types (x y : T) (s : seq T).
 
 Local Notation le := (le ord).
 Local Notation lt := (lt ord).
-Local Notation ge := (ge ord).
-Local Notation gt := (gt ord).
-Local Notation comparable := (comparable ord).
-Local Notation leif := (leif ord).
-Local Notation lteif := (lteif ord).
-Local Notation min := (min ord).
-Local Notation max := (max ord).
+Local Notation rge := (rge ord).
+Local Notation rgt := (rgt ord).
+Local Notation rcomparable := (rcomparable ord).
+Local Notation rleif := (rleif ord).
+Local Notation rlteif := (rlteif ord).
+Local Notation rmin := (rmin ord).
+Local Notation rmax := (rmax ord).
 Local Notation le_xor_gt := (le_xor_gt le lt).
 Local Notation lt_xor_ge := (lt_xor_ge le lt).
 Local Notation compare := (compare lt).
-Local Notation incompare := (incompare lt comparable).
-Local Notation arg_min := (arg_min ord).
-Local Notation arg_max := (arg_max ord).
+Local Notation incompare := (incompare lt rcomparable).
+Local Notation rarg_min := (rarg_min ord).
+Local Notation rarg_max := (rarg_max ord).
 
 Local Notation "x <= y" := (x <=_ord y).
 Local Notation "x < y" := (x <_ord y).
@@ -2521,652 +2521,652 @@ Local Notation "x < y < z"   := ((x < y) && (y < z)).
 Local Notation "x < y <= z"  := ((x < y) && (y <= z)).
 Local Notation "x <= y < z"  := ((x <= y) && (y < z)).
 
-Local Notation ">=<%O" := comparable.
+Local Notation ">=<%O" := rcomparable.
 Local Notation ">=< y" := (>=<_ord y).
 Local Notation "x >=< y" := (x >=<_ord y).
 Local Notation "x >< y" := (x ><_ord y).
 
-Local Notation "x <= y ?= 'iff' C" := (leif x y C).
-Local Notation "x < y ?<= 'if' C" := (lteif x y C).
+Local Notation "x <= y ?= 'iff' C" := (rleif x y C).
+Local Notation "x < y ?<= 'if' C" := (rlteif x y C).
 
-Lemma geE x y : ge x y = (y <= x). Proof. by []. Qed.
-Lemma gtE x y : gt x y = (y < x). Proof. by []. Qed.
+Lemma rgeE x y : rge x y = (y <= x). Proof. by []. Qed.
+Lemma rgtE x y : rgt x y = (y < x). Proof. by []. Qed.
 
-Lemma lexx : reflexive le.
+Lemma rlexx : reflexive le.
 Proof. by case: ord => ? ? []. Qed.
-Hint Resolve lexx : core.
-Hint Extern 0 (is_true (_ <=__ _)) => exact: lexx : core.
+Hint Resolve rlexx : core.
+Hint Extern 0 (is_true (_ <=__ _)) => exact: rlexx : core.
 
-Definition le_refl : reflexive le := lexx.
-Definition ge_refl : reflexive ge := lexx.
+Definition rle_refl : reflexive le := rlexx.
+Definition rge_refl : reflexive rge := rlexx.
 
-Lemma le_anti : antisymmetric le.
+Lemma rle_anti : antisymmetric le.
 Proof. by case: ord => le lt [] ? ? ? ha ? x y /andP []; exact: ha. Qed.
 
-Lemma ge_anti : antisymmetric ge.
-Proof. by move=> x y /le_anti. Qed.
+Lemma rge_anti : antisymmetric rge.
+Proof. by move=> x y /rle_anti. Qed.
 
-Lemma le_trans : transitive le.
+Lemma rle_trans : transitive le.
 Proof. by case: ord => ? ? []. Qed.
 
-Lemma ge_trans : transitive ge.
-Proof. by move=> ? ? ? ? /le_trans; apply. Qed.
+Lemma rge_trans : transitive rge.
+Proof. by move=> ? ? ? ? /rle_trans; apply. Qed.
 
-Lemma lt_def x y : (x < y) = (y != x) && (x <= y).
+Lemma rlt_def x y : (x < y) = (y != x) && (x <= y).
 Proof. by case: ord => ? ? []. Qed.
 
-Lemma lt_neqAle x y : (x < y) = (x != y) && (x <= y).
-Proof. by rewrite lt_def eq_sym. Qed.
+Lemma rlt_neqAle x y : (x < y) = (x != y) && (x <= y).
+Proof. by rewrite rlt_def eq_sym. Qed.
 
-Lemma ltxx x : x < x = false.
-Proof. by rewrite lt_def eqxx. Qed.
+Lemma rltxx x : x < x = false.
+Proof. by rewrite rlt_def eqxx. Qed.
 
-Definition lt_irreflexive : irreflexive lt := ltxx.
-Hint Resolve lt_irreflexive : core.
+Definition rlt_irreflexive : irreflexive lt := rltxx.
+Hint Resolve rlt_irreflexive : core.
 
-Definition ltexx := (lexx, ltxx).
+Definition rltexx := (rlexx, rltxx).
 
-Lemma le_eqVlt x y : (x <= y) = (x == y) || (x < y).
-Proof. by rewrite lt_neqAle; case: eqP => //= ->; rewrite lexx. Qed.
+Lemma rle_eqVlt x y : (x <= y) = (x == y) || (x < y).
+Proof. by rewrite rlt_neqAle; case: eqP => //= ->; rewrite rlexx. Qed.
 
-Lemma lt_eqF x y : x < y -> x == y = false.
-Proof. by rewrite lt_neqAle => /andP [/negbTE->]. Qed.
+Lemma rlt_eqF x y : x < y -> x == y = false.
+Proof. by rewrite rlt_neqAle => /andP [/negbTE->]. Qed.
 
-Lemma gt_eqF x y : y < x -> x == y = false.
-Proof. by apply: contraTF => /eqP ->; rewrite ltxx. Qed.
+Lemma rgt_eqF x y : y < x -> x == y = false.
+Proof. by apply: contraTF => /eqP ->; rewrite rltxx. Qed.
 
-Lemma eq_le x y : (x == y) = (x <= y <= x).
-Proof. by apply/eqP/idP => [->|/le_anti]; rewrite ?lexx. Qed.
+Lemma req_le x y : (x == y) = (x <= y <= x).
+Proof. by apply/eqP/idP => [->|/rle_anti]; rewrite ?rlexx. Qed.
 
-Lemma ltW x y : x < y -> x <= y.
-Proof. by rewrite le_eqVlt orbC => ->. Qed.
+Lemma rltW x y : x < y -> x <= y.
+Proof. by rewrite rle_eqVlt orbC => ->. Qed.
 
-Lemma lt_le_trans y x z : x < y -> y <= z -> x < z.
+Lemma rlt_le_trans y x z : x < y -> y <= z -> x < z.
 Proof.
-rewrite !lt_neqAle => /andP [nexy lexy leyz]; rewrite (le_trans lexy) // andbT.
-by apply: contraNneq nexy => eqxz; rewrite eqxz eq_le leyz andbT in lexy *.
+rewrite !rlt_neqAle => /andP [nexy lexy leyz]; rewrite (rle_trans lexy) // andbT.
+by apply: contraNneq nexy => eqxz; rewrite eqxz req_le leyz andbT in lexy *.
 Qed.
 
-Lemma lt_trans : transitive lt.
-Proof. by move=> y x z le1 /ltW le2; apply/(@lt_le_trans y). Qed.
+Lemma rlt_trans : transitive lt.
+Proof. by move=> y x z le1 /rltW le2; apply/(@rlt_le_trans y). Qed.
 
-Lemma le_lt_trans y x z : x <= y -> y < z -> x < z.
-Proof. by rewrite le_eqVlt => /orP [/eqP ->|/lt_trans t /t]. Qed.
+Lemma rle_lt_trans y x z : x <= y -> y < z -> x < z.
+Proof. by rewrite rle_eqVlt => /orP [/eqP ->|/rlt_trans t /t]. Qed.
 
-Lemma lt_nsym x y : x < y -> y < x -> False.
-Proof. by move=> xy /(lt_trans xy); rewrite ltxx. Qed.
+Lemma rlt_nsym x y : x < y -> y < x -> False.
+Proof. by move=> xy /(rlt_trans xy); rewrite rltxx. Qed.
 
-Lemma lt_asym x y : x < y < x = false.
-Proof. by apply/negP => /andP []; apply: lt_nsym. Qed.
+Lemma rlt_asym x y : x < y < x = false.
+Proof. by apply/negP => /andP []; apply: rlt_nsym. Qed.
 
-Lemma le_gtF x y : x <= y -> y < x = false.
+Lemma rle_gtF x y : x <= y -> y < x = false.
 Proof.
-by move=> le_xy; apply/negP => /lt_le_trans /(_ le_xy); rewrite ltxx.
+by move=> le_xy; apply/negP => /rlt_le_trans /(_ le_xy); rewrite rltxx.
 Qed.
 
-Lemma lt_geF x y : (x < y) -> y <= x = false.
+Lemma rlt_geF x y : (x < y) -> y <= x = false.
 Proof.
-by move=> le_xy; apply/negP => /le_lt_trans /(_ le_xy); rewrite ltxx.
+by move=> le_xy; apply/negP => /rle_lt_trans /(_ le_xy); rewrite rltxx.
 Qed.
 
-Definition lt_gtF x y hxy := le_gtF (@ltW x y hxy).
+Definition rlt_gtF x y hxy := rle_gtF (@rltW x y hxy).
 
-Lemma lt_leAnge x y : (x < y) = (x <= y) && ~~ (y <= x).
+Lemma rlt_leAnge x y : (x < y) = (x <= y) && ~~ (y <= x).
 Proof.
-apply/idP/idP => [ltxy|/andP[lexy Nleyx]]; first by rewrite ltW // lt_geF.
-by rewrite lt_neqAle lexy andbT; apply: contraNneq Nleyx => ->.
+apply/idP/idP => [ltxy|/andP[lexy Nleyx]]; first by rewrite rltW // rlt_geF.
+by rewrite rlt_neqAle lexy andbT; apply: contraNneq Nleyx => ->.
 Qed.
 
-Lemma lt_le_asym x y : x < y <= x = false.
-Proof. by rewrite lt_neqAle -andbA -eq_le eq_sym andNb. Qed.
+Lemma rlt_le_asym x y : x < y <= x = false.
+Proof. by rewrite rlt_neqAle -andbA -req_le eq_sym andNb. Qed.
 
-Lemma le_lt_asym x y : x <= y < x = false.
-Proof. by rewrite andbC lt_le_asym. Qed.
+Lemma rle_lt_asym x y : x <= y < x = false.
+Proof. by rewrite andbC rlt_le_asym. Qed.
 
-Definition lte_anti := (=^~ eq_le, lt_asym, lt_le_asym, le_lt_asym).
+Definition rlte_anti := (=^~ req_le, rlt_asym, rlt_le_asym, rle_lt_asym).
 
-Lemma lt_sorted_uniq_le s : sorted lt s = uniq s && sorted le s.
+Lemma rlt_sorted_uniq_le s : sorted lt s = uniq s && sorted le s.
 Proof.
-rewrite (sorted_pairwise le_trans) (sorted_pairwise lt_trans) uniq_pairwise.
-by rewrite -pairwise_relI; apply/eq_pairwise => ? ?; rewrite lt_neqAle.
+rewrite (sorted_pairwise rle_trans) (sorted_pairwise rlt_trans) uniq_pairwise.
+by rewrite -pairwise_relI; apply/eq_pairwise => ? ?; rewrite rlt_neqAle.
 Qed.
 
-Lemma lt_sorted_eq s1 s2 : sorted lt s1 -> sorted lt s2 -> s1 =i s2 -> s1 = s2.
-Proof. by apply: irr_sorted_eq => //; apply: lt_trans. Qed.
+Lemma rlt_sorted_eq s1 s2 : sorted lt s1 -> sorted lt s2 -> s1 =i s2 -> s1 = s2.
+Proof. by apply: irr_sorted_eq => //; apply: rlt_trans. Qed.
 
-Lemma le_sorted_eq s1 s2 :
+Lemma rle_sorted_eq s1 s2 :
   sorted le s1 -> sorted le s2 -> perm_eq s1 s2 -> s1 = s2.
-Proof. exact/sorted_eq/le_anti/le_trans. Qed.
+Proof. exact/sorted_eq/rle_anti/rle_trans. Qed.
 
-Lemma sort_le_id s : sorted le s -> sort le s = s.
-Proof. exact/sorted_sort/le_trans. Qed.
+Lemma rsort_le_id s : sorted le s -> sort le s = s.
+Proof. exact/sorted_sort/rle_trans. Qed.
 
-Lemma le_sorted_ltn_nth (x0 : T) (s : seq T) : sorted <=:ord s ->
+Lemma rle_sorted_ltn_nth (x0 : T) (s : seq T) : sorted <=:ord s ->
  {in [pred n | (n < size s)%N] &,
     {homo nth x0 s : i j / (i < j)%N >-> i <= j}}.
-Proof. exact/sorted_ltn_nth/le_trans. Qed.
+Proof. exact/sorted_ltn_nth/rle_trans. Qed.
 
-Lemma le_sorted_leq_nth (x0 : T) (s : seq T) : sorted <=:ord s ->
+Lemma rle_sorted_leq_nth (x0 : T) (s : seq T) : sorted <=:ord s ->
   {in [pred n | (n < size s)%N] &,
     {homo nth x0 s : i j / (i <= j)%N >-> i <= j}}.
-Proof. exact: (sorted_leq_nth le_trans le_refl). Qed.
+Proof. exact: (sorted_leq_nth rle_trans rle_refl). Qed.
 
-Lemma lt_sorted_leq_nth (x0 : T) (s : seq T) : sorted <:ord s ->
+Lemma rlt_sorted_leq_nth (x0 : T) (s : seq T) : sorted <:ord s ->
   {in [pred n | (n < size s)%N] &,
     {mono nth x0 s : i j / (i <= j)%N >-> i <= j}}.
 Proof.
-rewrite lt_sorted_uniq_le => /andP[s_uniq le_s].
-apply: (total_homo_mono_in _ _ ltn_neqAle lt_neqAle le_anti leq_total) => //.
-move=> i j ilt jlt ltij; rewrite lt_neqAle le_sorted_leq_nth// 1?ltnW//.
+rewrite rlt_sorted_uniq_le => /andP[s_uniq le_s].
+apply: (total_homo_mono_in _ _ ltn_neqAle rlt_neqAle rle_anti leq_total) => //.
+move=> i j ilt jlt ltij; rewrite rlt_neqAle rle_sorted_leq_nth// 1?ltnW//.
 by rewrite nth_uniq// ltn_eqF.
 Qed.
 
-Lemma lt_sorted_ltn_nth (x0 : T) (s : seq T) : sorted <:ord s ->
+Lemma rlt_sorted_ltn_nth (x0 : T) (s : seq T) : sorted <:ord s ->
   {in [pred n | (n < size s)%N] &,
     {mono nth x0 s : i j / (i < j)%N >-> i < j}}.
 Proof.
-move=> ss; have := lt_sorted_leq_nth x0 ss.
-exact: (anti_mono_in _ ltn_neqAle lt_neqAle anti_leq).
+move=> ss; have := rlt_sorted_leq_nth x0 ss.
+exact: (anti_mono_in _ ltn_neqAle rlt_neqAle anti_leq).
 Qed.
 
-Lemma filter_lt_nth x0 s i : sorted <:ord s -> (i < size s)%N ->
+Lemma rfilter_lt_nth x0 s i : sorted <:ord s -> (i < size s)%N ->
   [seq x <- s | x < nth x0 s i] = take i s.
 Proof.
 move=> ss i_lt/=; rewrite -[X in filter _ X](mkseq_nth x0) filter_map.
 under eq_in_filter => j do
-  [rewrite ?mem_iota => j_s /=; rewrite lt_sorted_ltn_nth//].
+  [rewrite ?mem_iota => j_s /=; rewrite rlt_sorted_ltn_nth//].
 by rewrite (filter_iota_ltn 0) ?map_nth_iota0 // ltnW.
 Qed.
 
-Lemma count_lt_nth x0 s i : sorted <:ord s -> (i < size s)%N ->
+Lemma rcount_lt_nth x0 s i : sorted <:ord s -> (i < size s)%N ->
   count (fun y => y < nth x0 s i) s = i.
 Proof.
-by move=> ss i_lt; rewrite -size_filter/= filter_lt_nth// size_take i_lt.
+by move=> ss i_lt; rewrite -size_filter/= rfilter_lt_nth// size_take i_lt.
 Qed.
 
-Lemma filter_le_nth x0 s i : sorted <:ord s -> (i < size s)%N ->
+Lemma rfilter_le_nth x0 s i : sorted <:ord s -> (i < size s)%N ->
   [seq x <- s | x <= nth x0 s i] = take i.+1 s.
 Proof.
 move=> ss i_lt/=; rewrite -[X in filter _ X](mkseq_nth x0) filter_map.
 under eq_in_filter => j do
-  [rewrite ?mem_iota => j_s /=; rewrite lt_sorted_leq_nth//].
+  [rewrite ?mem_iota => j_s /=; rewrite rlt_sorted_leq_nth//].
 by rewrite (filter_iota_leq 0)// map_nth_iota0.
 Qed.
 
-Lemma count_le_nth x0 s i : sorted <:ord s -> (i < size s)%N ->
+Lemma rcount_le_nth x0 s i : sorted <:ord s -> (i < size s)%N ->
   count (le^~ (nth x0 s i)) s = i.+1.
 Proof.
-by move=> ss i_lt; rewrite -size_filter/= filter_le_nth// size_takel.
+by move=> ss i_lt; rewrite -size_filter/= rfilter_le_nth// size_takel.
 Qed.
 
-Lemma count_lt_le_mem x s : (count (lt^~ x) s < count (le^~ x) s)%N = (x \in s).
+Lemma rcount_lt_le_mem x s : (count (lt^~ x) s < count (le^~ x) s)%N = (x \in s).
 Proof.
 have := count_predUI (pred1 x) (lt^~ x) s.
 have -> : count (predI (pred1 x) (lt^~ x)) s = 0%N.
   rewrite (@eq_count _ _ pred0) ?count_pred0 // => y /=.
-  by rewrite lt_def; case: eqP => //= ->; rewrite eqxx.
+  by rewrite rlt_def; case: eqP => //= ->; rewrite eqxx.
 have /eq_count->: predU (pred1 x) (lt^~ x) =1 le^~ x.
-  by move=> y /=; rewrite le_eqVlt.
+  by move=> y /=; rewrite rle_eqVlt.
 by rewrite addn0 => ->; rewrite -add1n leq_add2r -has_count has_pred1.
 Qed.
 
-Lemma sorted_filter_lt x s :
+Lemma rsorted_filter_lt x s :
   sorted <=:ord s -> [seq y <- s | y < x] = take (count (lt^~ x) s) s.
 Proof.
-elim: s => [//|y s IHs]/=; rewrite (path_sortedE le_trans) => /andP[le_y_s ss].
+elim: s => [//|y s IHs]/=; rewrite (path_sortedE rle_trans) => /andP[le_y_s ss].
 case: ifP => [|ltyxF]; rewrite IHs//.
 rewrite (@eq_in_count _ _ pred0) ?count_pred0/= ?take0// => z.
-by move=> /(allP le_y_s) yz; apply: contraFF ltyxF; apply: le_lt_trans.
+by move=> /(allP le_y_s) yz; apply: contraFF ltyxF; apply: rle_lt_trans.
 Qed.
 
-Lemma sorted_filter_le x s :
+Lemma rsorted_filter_le x s :
   sorted <=:ord s -> [seq y <- s | y <= x] = take (count (le^~ x) s) s.
 Proof.
-elim: s => [//|y s IHs]/=; rewrite (path_sortedE le_trans) => /andP[le_y_s ss].
+elim: s => [//|y s IHs]/=; rewrite (path_sortedE rle_trans) => /andP[le_y_s ss].
 case: ifP => [|leyxF]; rewrite IHs//.
 rewrite (@eq_in_count _ _ pred0) ?count_pred0/= ?take0// => z.
-by move=> /(allP le_y_s) yz; apply: contraFF leyxF; apply: le_trans.
+by move=> /(allP le_y_s) yz; apply: contraFF leyxF; apply: rle_trans.
 Qed.
 
-Lemma nth_count_le x x0 s i : sorted <=:ord s ->
+Lemma rnth_count_le x x0 s i : sorted <=:ord s ->
   (i < count (le^~ x) s)%N -> nth x0 s i <= x.
 Proof.
-move=> ss iltc; rewrite -(nth_take _ iltc) -sorted_filter_le //.
+move=> ss iltc; rewrite -(nth_take _ iltc) -rsorted_filter_le //.
 by apply/(all_nthP _ (filter_all (le^~ x) _)); rewrite size_filter.
 Qed.
 
-Lemma nth_count_lt x x0 s i : sorted <=:ord s ->
+Lemma rnth_count_lt x x0 s i : sorted <=:ord s ->
   (i < count (lt^~ x) s)%N -> nth x0 s i < x.
 Proof.
-move=> ss iltc; rewrite -(nth_take _ iltc) -sorted_filter_lt //.
+move=> ss iltc; rewrite -(nth_take _ iltc) -rsorted_filter_lt //.
 by apply/(all_nthP _ (filter_all (lt^~ x) _)); rewrite size_filter.
 Qed.
 
-Lemma comparable_leNgt x y : x >=< y -> (x <= y) = ~~ (y < x).
+Lemma rcomparable_leNgt x y : x >=< y -> (x <= y) = ~~ (y < x).
 Proof.
-move=> c_xy; apply/idP/idP => [/le_gtF/negP/negP//|]; rewrite lt_neqAle.
+move=> c_xy; apply/idP/idP => [/rle_gtF/negP/negP//|]; rewrite rlt_neqAle.
 by move: c_xy => /orP [] -> //; rewrite andbT negbK => /eqP ->.
 Qed.
 
-Lemma comparable_ltNge x y : x >=< y -> (x < y) = ~~ (y <= x).
+Lemma rcomparable_ltNge x y : x >=< y -> (x < y) = ~~ (y <= x).
 Proof.
-move=> c_xy; apply/idP/idP => [/lt_geF/negP/negP//|].
-by rewrite lt_neqAle eq_le; move: c_xy => /orP [] -> //; rewrite andbT.
+move=> c_xy; apply/idP/idP => [/rlt_geF/negP/negP//|].
+by rewrite rlt_neqAle req_le; move: c_xy => /orP [] -> //; rewrite andbT.
 Qed.
 
-Lemma comparable_ltgtP x y : x >=< y ->
-  compare x y (min y x) (min x y) (max y x) (max x y)
+Lemma rcomparable_ltgtP x y : x >=< y ->
+  compare x y (rmin y x) (rmin x y) (rmax y x) (rmax x y)
   (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
 Proof.
-rewrite /min /max /comparable !le_eqVlt [y == x]eq_sym.
+rewrite /rmin /rmax /rcomparable !rle_eqVlt [y == x]eq_sym.
 have := (eqVneq x y, (boolP (x < y), boolP (y < x))).
-move=> [[->//|neq_xy /=] [[] xy [] //=]] ; do ?by rewrite ?ltxx; constructor.
-  by rewrite ltxx in xy.
-by rewrite le_gtF // ltW.
+move=> [[->//|neq_xy /=] [[] xy [] //=]] ; do ?by rewrite ?rltxx; constructor.
+  by rewrite rltxx in xy.
+by rewrite rle_gtF // rltW.
 Qed.
 
-Lemma comparable_leP x y : x >=< y ->
-  le_xor_gt x y (min y x) (min x y) (max y x) (max x y) (x <= y) (y < x).
-Proof. by case/comparable_ltgtP=> [?|?|->]; constructor; rewrite // ltW. Qed.
+Lemma rcomparable_leP x y : x >=< y ->
+  le_xor_gt x y (rmin y x) (rmin x y) (rmax y x) (rmax x y) (x <= y) (y < x).
+Proof. by case/rcomparable_ltgtP=> [?|?|->]; constructor; rewrite // rltW. Qed.
 
-Lemma comparable_ltP x y : x >=< y ->
-  lt_xor_ge x y (min y x) (min x y) (max y x) (max x y) (y <= x) (x < y).
-Proof. by case/comparable_ltgtP=> [?|?|->]; constructor; rewrite // ltW. Qed.
+Lemma rcomparable_ltP x y : x >=< y ->
+  lt_xor_ge x y (rmin y x) (rmin x y) (rmax y x) (rmax x y) (y <= x) (x < y).
+Proof. by case/rcomparable_ltgtP=> [?|?|->]; constructor; rewrite // rltW. Qed.
 
-Lemma comparable_sym x y : (y >=< x) = (x >=< y).
-Proof. by rewrite /comparable orbC. Qed.
+Lemma rcomparable_sym x y : (y >=< x) = (x >=< y).
+Proof. by rewrite /rcomparable orbC. Qed.
 
-Lemma comparablexx x : x >=< x.
-Proof. by rewrite /comparable lexx. Qed.
+Lemma rcomparablexx x : x >=< x.
+Proof. by rewrite /rcomparable rlexx. Qed.
 
-Lemma incomparable_eqF x y : (x >< y) -> (x == y) = false.
-Proof. by apply: contraNF => /eqP ->; rewrite comparablexx. Qed.
+Lemma rincomparable_eqF x y : (x >< y) -> (x == y) = false.
+Proof. by apply: contraNF => /eqP ->; rewrite rcomparablexx. Qed.
 
-Lemma incomparable_leF x y : (x >< y) -> (x <= y) = false.
-Proof. by apply: contraNF; rewrite /comparable => ->. Qed.
+Lemma rincomparable_leF x y : (x >< y) -> (x <= y) = false.
+Proof. by apply: contraNF; rewrite /rcomparable => ->. Qed.
 
-Lemma incomparable_ltF x y : (x >< y) -> (x < y) = false.
-Proof. by rewrite lt_neqAle => /incomparable_leF ->; rewrite andbF. Qed.
+Lemma rincomparable_ltF x y : (x >< y) -> (x < y) = false.
+Proof. by rewrite rlt_neqAle => /rincomparable_leF ->; rewrite andbF. Qed.
 
-Lemma comparableP x y : incompare x y
-  (min y x) (min x y) (max y x) (max x y)
+Lemma rcomparableP x y : incompare x y
+  (rmin y x) (rmin x y) (rmax y x) (rmax x y)
   (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y) (y >=< x) (x >=< y).
 Proof.
-rewrite ![y >=< _]comparable_sym; have [c_xy|i_xy] := boolP (x >=< y).
-  by case: (comparable_ltgtP c_xy) => ?; constructor.
-by rewrite /min /max ?incomparable_eqF ?incomparable_leF;
-   rewrite ?incomparable_ltF// 1?comparable_sym //; constructor.
+rewrite ![y >=< _]rcomparable_sym; have [c_xy|i_xy] := boolP (x >=< y).
+  by case: (rcomparable_ltgtP c_xy) => ?; constructor.
+by rewrite /rmin /rmax ?rincomparable_eqF ?rincomparable_leF;
+   rewrite ?rincomparable_ltF// 1?rcomparable_sym //; constructor.
 Qed.
 
-Lemma le_comparable (x y : T) : x <= y -> x >=< y.
-Proof. by case: comparableP. Qed.
+Lemma rle_comparable (x y : T) : x <= y -> x >=< y.
+Proof. by case: rcomparableP. Qed.
 
-Lemma lt_comparable (x y : T) : x < y -> x >=< y.
-Proof. by case: comparableP. Qed.
+Lemma rlt_comparable (x y : T) : x < y -> x >=< y.
+Proof. by case: rcomparableP. Qed.
 
-Lemma ge_comparable (x y : T) : y <= x -> x >=< y.
-Proof. by case: comparableP. Qed.
+Lemma rge_comparable (x y : T) : y <= x -> x >=< y.
+Proof. by case: rcomparableP. Qed.
 
-Lemma gt_comparable (x y : T) : y < x -> x >=< y.
-Proof. by case: comparableP. Qed.
+Lemma rgt_comparable (x y : T) : y < x -> x >=< y.
+Proof. by case: rcomparableP. Qed.
 
-(* leif *)
+(* rleif *)
 
-Lemma leifP x y C : reflect (x <= y ?= iff C) (if C then x == y else x < y).
+Lemma rleifP x y C : reflect (x <= y ?= iff C) (if C then x == y else x < y).
 Proof.
-rewrite /leif le_eqVlt; apply: (iffP idP)=> [|[]].
-  by case: C => [/eqP->|lxy]; rewrite ?eqxx // lxy lt_eqF.
-by case/orP=> [/eqP->|lxy] <-; rewrite ?eqxx // lt_eqF.
+rewrite /rleif rle_eqVlt; apply: (iffP idP)=> [|[]].
+  by case: C => [/eqP->|lxy]; rewrite ?eqxx // lxy rlt_eqF.
+by case/orP=> [/eqP->|lxy] <-; rewrite ?eqxx // rlt_eqF.
 Qed.
 
-Lemma leif_refl x C : reflect (x <= x ?= iff C) C.
+Lemma rleif_refl x C : reflect (x <= x ?= iff C) C.
 Proof. by apply: (iffP idP) => [-> | <-] //; split; rewrite ?eqxx. Qed.
 
-Lemma leif_trans x1 x2 x3 C12 C23 :
+Lemma rleif_trans x1 x2 x3 C12 C23 :
   x1 <= x2 ?= iff C12 -> x2 <= x3 ?= iff C23 -> x1 <= x3 ?= iff C12 && C23.
 Proof.
-move=> ltx12 ltx23; apply/leifP; rewrite -ltx12.
+move=> ltx12 ltx23; apply/rleifP; rewrite -ltx12.
 case eqx12: (x1 == x2).
-  by rewrite (eqP eqx12) lt_neqAle !ltx23 andbT; case C23.
-by rewrite (@lt_le_trans x2) ?ltx23 // lt_neqAle eqx12 ltx12.
+  by rewrite (eqP eqx12) rlt_neqAle !ltx23 andbT; case C23.
+by rewrite (@rlt_le_trans x2) ?ltx23 // rlt_neqAle eqx12 ltx12.
 Qed.
 
-Lemma leif_le x y : x <= y -> x <= y ?= iff (x >= y).
-Proof. by move=> lexy; split=> //; rewrite eq_le lexy. Qed.
+Lemma rleif_le x y : x <= y -> x <= y ?= iff (x >= y).
+Proof. by move=> lexy; split=> //; rewrite req_le lexy. Qed.
 
-Lemma leif_eq x y : x <= y -> x <= y ?= iff (x == y).
+Lemma rleif_eq x y : x <= y -> x <= y ?= iff (x == y).
 Proof. by []. Qed.
 
-Lemma ge_leif x y C : x <= y ?= iff C -> (y <= x) = C.
-Proof. by case=> le_xy; rewrite eq_le le_xy. Qed.
+Lemma rge_leif x y C : x <= y ?= iff C -> (y <= x) = C.
+Proof. by case=> le_xy; rewrite req_le le_xy. Qed.
 
-Lemma lt_leif x y C : x <= y ?= iff C -> (x < y) = ~~ C.
-Proof. by move=> le_xy; rewrite lt_neqAle !le_xy andbT. Qed.
+Lemma rlt_leif x y C : x <= y ?= iff C -> (x < y) = ~~ C.
+Proof. by move=> le_xy; rewrite rlt_neqAle !le_xy andbT. Qed.
 
-Lemma ltNleif x y C : x <= y ?= iff ~~ C -> (x < y) = C.
-Proof. by move/lt_leif; rewrite negbK. Qed.
+Lemma rltNleif x y C : x <= y ?= iff ~~ C -> (x < y) = C.
+Proof. by move/rlt_leif; rewrite negbK. Qed.
 
-Lemma eq_leif x y C : x <= y ?= iff C -> (x == y) = C.
-Proof. by move/leifP; case: C comparableP => [] []. Qed.
+Lemma req_leif x y C : x <= y ?= iff C -> (x == y) = C.
+Proof. by move/rleifP; case: C rcomparableP => [] []. Qed.
 
-Lemma eqTleif x y C : x <= y ?= iff C -> C -> x = y.
-Proof. by move=> /eq_leif<-/eqP. Qed.
+Lemma reqTleif x y C : x <= y ?= iff C -> C -> x = y.
+Proof. by move=> /req_leif<-/eqP. Qed.
 
-(* lteif *)
+(* rlteif *)
 
-Lemma lteif_trans x y z C1 C2 :
+Lemma rlteif_trans x y z C1 C2 :
   x < y ?<= if C1 -> y < z ?<= if C2 -> x < z ?<= if C1 && C2.
 Proof.
 case: C1 C2 => [][];
-  [exact: le_trans | exact: le_lt_trans | exact: lt_le_trans | exact: lt_trans].
+  [exact: rle_trans | exact: rle_lt_trans | exact: rlt_le_trans | exact: rlt_trans].
 Qed.
 
-Lemma lteif_anti C1 C2 x y :
+Lemma rlteif_anti C1 C2 x y :
   (x < y ?<= if C1) && (y < x ?<= if C2) = C1 && C2 && (x == y).
-Proof. by case: C1 C2 => [][]; rewrite lte_anti. Qed.
+Proof. by case: C1 C2 => [][]; rewrite rlte_anti. Qed.
 
-Lemma lteifxx x C : (x < x ?<= if C) = C.
-Proof. by case: C; rewrite /= ltexx. Qed.
+Lemma rlteifxx x C : (x < x ?<= if C) = C.
+Proof. by case: C; rewrite /= rltexx. Qed.
 
-Lemma lteifNF x y C : y < x ?<= if ~~ C -> x < y ?<= if C = false.
-Proof. by case: C => [/lt_geF|/le_gtF]. Qed.
+Lemma rlteifNF x y C : y < x ?<= if ~~ C -> x < y ?<= if C = false.
+Proof. by case: C => [/rlt_geF|/rle_gtF]. Qed.
 
-Lemma lteifS x y C : x < y -> x < y ?<= if C.
-Proof. by case: C => //= /ltW. Qed.
+Lemma rlteifS x y C : x < y -> x < y ?<= if C.
+Proof. by case: C => //= /rltW. Qed.
 
-Lemma lteifT x y : x < y ?<= if true = (x <= y). Proof. by []. Qed.
+Lemma rlteifT x y : x < y ?<= if true = (x <= y). Proof. by []. Qed.
 
-Lemma lteifF x y : x < y ?<= if false = (x < y). Proof. by []. Qed.
+Lemma rlteifF x y : x < y ?<= if false = (x < y). Proof. by []. Qed.
 
-Lemma lteif_orb x y : {morph lteif x y : p q / p || q}.
-Proof. by case=> [][] /=; case: comparableP. Qed.
+Lemma rlteif_orb x y : {morph rlteif x y : p q / p || q}.
+Proof. by case=> [][] /=; case: rcomparableP. Qed.
 
-Lemma lteif_andb x y : {morph lteif x y : p q / p && q}.
-Proof. by case=> [][] /=; case: comparableP. Qed.
+Lemma rlteif_andb x y : {morph rlteif x y : p q / p && q}.
+Proof. by case=> [][] /=; case: rcomparableP. Qed.
 
-Lemma lteif_imply C1 C2 x y : C1 ==> C2 -> x < y ?<= if C1 -> x < y ?<= if C2.
-Proof. by case: C1 C2 => [][] //= _ /ltW. Qed.
+Lemma rlteif_imply C1 C2 x y : C1 ==> C2 -> x < y ?<= if C1 -> x < y ?<= if C2.
+Proof. by case: C1 C2 => [][] //= _ /rltW. Qed.
 
-Lemma lteifW C x y : x < y ?<= if C -> x <= y.
-Proof. by case: C => // /ltW. Qed.
+Lemma rlteifW C x y : x < y ?<= if C -> x <= y.
+Proof. by case: C => // /rltW. Qed.
 
-Lemma ltrW_lteif C x y : x < y -> x < y ?<= if C.
-Proof. by case: C => // /ltW. Qed.
+Lemma rltrW_lteif C x y : x < y -> x < y ?<= if C.
+Proof. by case: C => // /rltW. Qed.
 
-Lemma lteifN C x y : x < y ?<= if ~~ C -> ~~ (y < x ?<= if C).
-Proof. by case: C => /=; case: comparableP. Qed.
+Lemma rlteifN C x y : x < y ?<= if ~~ C -> ~~ (y < x ?<= if C).
+Proof. by case: C => /=; case: rcomparableP. Qed.
 
-(* min and max *)
+(* rmin and rmax *)
 
-Lemma minElt x y : min x y = if x < y then x else y. Proof. by []. Qed.
-Lemma maxElt x y : max x y = if x < y then y else x. Proof. by []. Qed.
+Lemma rminElt x y : rmin x y = if x < y then x else y. Proof. by []. Qed.
+Lemma rmaxElt x y : rmax x y = if x < y then y else x. Proof. by []. Qed.
 
-Lemma minEle x y : min x y = if x <= y then x else y.
-Proof. by case: comparableP. Qed.
+Lemma rminEle x y : rmin x y = if x <= y then x else y.
+Proof. by case: rcomparableP. Qed.
 
-Lemma maxEle x y : max x y = if x <= y then y else x.
-Proof. by case: comparableP. Qed.
+Lemma rmaxEle x y : rmax x y = if x <= y then y else x.
+Proof. by case: rcomparableP. Qed.
 
-Lemma comparable_minEgt x y : x >=< y -> min x y = if x > y then y else x.
-Proof. by case: comparableP. Qed.
-Lemma comparable_maxEgt x y : x >=< y -> max x y = if x > y then x else y.
-Proof. by case: comparableP. Qed.
-Lemma comparable_minEge x y : x >=< y -> min x y = if x >= y then y else x.
-Proof. by case: comparableP. Qed.
-Lemma comparable_maxEge x y : x >=< y -> max x y = if x >= y then x else y.
-Proof. by case: comparableP. Qed.
+Lemma rcomparable_minEgt x y : x >=< y -> rmin x y = if x > y then y else x.
+Proof. by case: rcomparableP. Qed.
+Lemma rcomparable_maxEgt x y : x >=< y -> rmax x y = if x > y then x else y.
+Proof. by case: rcomparableP. Qed.
+Lemma rcomparable_minEge x y : x >=< y -> rmin x y = if x >= y then y else x.
+Proof. by case: rcomparableP. Qed.
+Lemma rcomparable_maxEge x y : x >=< y -> rmax x y = if x >= y then x else y.
+Proof. by case: rcomparableP. Qed.
 
-Lemma min_l x y : x <= y -> min x y = x. Proof. by case: comparableP. Qed.
-Lemma min_r x y : y <= x -> min x y = y. Proof. by case: comparableP. Qed.
-Lemma max_l x y : y <= x -> max x y = x. Proof. by case: comparableP. Qed.
-Lemma max_r x y : x <= y -> max x y = y. Proof. by case: comparableP. Qed.
+Lemma rmin_l x y : x <= y -> rmin x y = x. Proof. by case: rcomparableP. Qed.
+Lemma rmin_r x y : y <= x -> rmin x y = y. Proof. by case: rcomparableP. Qed.
+Lemma rmax_l x y : y <= x -> rmax x y = x. Proof. by case: rcomparableP. Qed.
+Lemma rmax_r x y : x <= y -> rmax x y = y. Proof. by case: rcomparableP. Qed.
 
-Lemma minxx : idempotent (min : T -> T -> T).
-Proof. by rewrite /min => x; rewrite ltxx. Qed.
+Lemma rminxx : idempotent (rmin : T -> T -> T).
+Proof. by rewrite /rmin => x; rewrite rltxx. Qed.
 
-Lemma maxxx : idempotent (max : T -> T -> T).
-Proof. by rewrite /max => x; rewrite ltxx. Qed.
+Lemma rmaxxx : idempotent (rmax : T -> T -> T).
+Proof. by rewrite /rmax => x; rewrite rltxx. Qed.
 
-Lemma eq_minl x y : (min x y == x) = (x <= y).
-Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP. Qed.
+Lemma req_minl x y : (rmin x y == x) = (x <= y).
+Proof. by rewrite !(fun_if, if_arg) eqxx; case: rcomparableP. Qed.
 
-Lemma eq_maxr x y : (max x y == y) = (x <= y).
-Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP. Qed.
+Lemma req_maxr x y : (rmax x y == y) = (x <= y).
+Proof. by rewrite !(fun_if, if_arg) eqxx; case: rcomparableP. Qed.
 
-Lemma min_idPl x y : reflect (min x y = x) (x <= y).
-Proof. by apply: (iffP idP); rewrite (rwP eqP) eq_minl. Qed.
+Lemma rmin_idPl x y : reflect (rmin x y = x) (x <= y).
+Proof. by apply: (iffP idP); rewrite (rwP eqP) req_minl. Qed.
 
-Lemma max_idPr x y : reflect (max x y = y) (x <= y).
-Proof. by apply: (iffP idP); rewrite (rwP eqP) eq_maxr. Qed.
+Lemma rmax_idPr x y : reflect (rmax x y = y) (x <= y).
+Proof. by apply: (iffP idP); rewrite (rwP eqP) req_maxr. Qed.
 
-Lemma min_minKx x y : min (min x y) y = min x y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
+Lemma rmin_minKx x y : rmin (rmin x y) y = rmin x y.
+Proof. by rewrite !(fun_if, if_arg) rltxx/=; case: rcomparableP. Qed.
 
-Lemma min_minxK x y : min x (min x y) = min x y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
+Lemma rmin_minxK x y : rmin x (rmin x y) = rmin x y.
+Proof. by rewrite !(fun_if, if_arg) rltxx/=; case: rcomparableP. Qed.
 
-Lemma max_maxKx x y : max (max x y) y = max x y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
+Lemma rmax_maxKx x y : rmax (rmax x y) y = rmax x y.
+Proof. by rewrite !(fun_if, if_arg) rltxx/=; case: rcomparableP. Qed.
 
-Lemma max_maxxK x y : max x (max x y) = max x y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
+Lemma rmax_maxxK x y : rmax x (rmax x y) = rmax x y.
+Proof. by rewrite !(fun_if, if_arg) rltxx/=; case: rcomparableP. Qed.
 
-Lemma comparable_minl z : {in >=< z &, forall x y, min x y >=< z}.
-Proof. by move=> x y cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
+Lemma rcomparable_minl z : {in >=< z &, forall x y, rmin x y >=< z}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /rmin; case: ifP. Qed.
 
-Lemma comparable_minr z : {in >=<%O z &, forall x y, z >=< min x y}.
-Proof. by move=> x y cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
+Lemma rcomparable_minr z : {in >=<%O z &, forall x y, z >=< rmin x y}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /rmin; case: ifP. Qed.
 
-Lemma comparable_maxl z : {in >=< z &, forall x y, max x y >=< z}.
-Proof. by move=> x y cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
+Lemma rcomparable_maxl z : {in >=< z &, forall x y, rmax x y >=< z}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /rmax; case: ifP. Qed.
 
-Lemma comparable_maxr z : {in >=<%O z &, forall x y, z >=< max x y}.
-Proof. by move=> x y cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
+Lemma rcomparable_maxr z : {in >=<%O z &, forall x y, z >=< rmax x y}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /rmax; case: ifP. Qed.
 
 Section Comparable2.
 Variables (z x y : T) (cmp_xy : x >=< y).
 
-Lemma comparable_minC : min x y = min y x.
-Proof. by case: comparableP cmp_xy. Qed.
+Lemma rcomparable_minC : rmin x y = rmin y x.
+Proof. by case: rcomparableP cmp_xy. Qed.
 
-Lemma comparable_maxC : max x y = max y x.
-Proof. by case: comparableP cmp_xy. Qed.
+Lemma rcomparable_maxC : rmax x y = rmax y x.
+Proof. by case: rcomparableP cmp_xy. Qed.
 
-Lemma comparable_eq_minr : (min x y == y) = (y <= x).
-Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP cmp_xy. Qed.
+Lemma rcomparable_eq_minr : (rmin x y == y) = (y <= x).
+Proof. by rewrite !(fun_if, if_arg) eqxx; case: rcomparableP cmp_xy. Qed.
 
-Lemma comparable_eq_maxl : (max x y == x) = (y <= x).
-Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP cmp_xy. Qed.
+Lemma rcomparable_eq_maxl : (rmax x y == x) = (y <= x).
+Proof. by rewrite !(fun_if, if_arg) eqxx; case: rcomparableP cmp_xy. Qed.
 
-Lemma comparable_min_idPr : reflect (min x y = y) (y <= x).
-Proof. by apply: (iffP idP); rewrite (rwP eqP) comparable_eq_minr. Qed.
+Lemma rcomparable_min_idPr : reflect (rmin x y = y) (y <= x).
+Proof. by apply: (iffP idP); rewrite (rwP eqP) rcomparable_eq_minr. Qed.
 
-Lemma comparable_max_idPl : reflect (max x y = x) (y <= x).
-Proof. by apply: (iffP idP); rewrite (rwP eqP) comparable_eq_maxl. Qed.
+Lemma rcomparable_max_idPl : reflect (rmax x y = x) (y <= x).
+Proof. by apply: (iffP idP); rewrite (rwP eqP) rcomparable_eq_maxl. Qed.
 
-Lemma comparable_le_minr : (z <= min x y) = (z <= x) && (z <= y).
+Lemma rcomparable_le_minr : (z <= rmin x y) = (z <= x) && (z <= y).
 Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; last rewrite andbC;
-  by case: (comparableP z) => // [/lt_trans xlt/xlt|->] /ltW.
+case: rcomparableP cmp_xy => // [||<-//]; rewrite ?andbb//; last rewrite andbC;
+  by case: (rcomparableP z) => // [/rlt_trans xlt/xlt|->] /rltW.
 Qed.
 
-Lemma comparable_le_minl : (min x y <= z) = (x <= z) || (y <= z).
+Lemma rcomparable_le_minl : (rmin x y <= z) = (x <= z) || (y <= z).
 Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; last rewrite orbC;
-  by move=> xy _; apply/idP/idP => [->|/orP[]]//; apply/le_trans/ltW.
+case: rcomparableP cmp_xy => // [||<-//]; rewrite ?orbb//; last rewrite orbC;
+  by move=> xy _; apply/idP/idP => [->|/orP[]]//; apply/rle_trans/rltW.
 Qed.
 
-Lemma comparable_lt_minr : (z < min x y) = (z < x) && (z < y).
+Lemma rcomparable_lt_minr : (z < rmin x y) = (z < x) && (z < y).
 Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; last rewrite andbC;
-  by case: (comparableP z) => // /lt_trans xlt/xlt.
+case: rcomparableP cmp_xy => // [||<-//]; rewrite ?andbb//; last rewrite andbC;
+  by case: (rcomparableP z) => // /rlt_trans xlt/xlt.
 Qed.
 
-Lemma comparable_lt_minl : (min x y < z) = (x < z) || (y < z).
+Lemma rcomparable_lt_minl : (rmin x y < z) = (x < z) || (y < z).
 Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; last rewrite orbC;
-  by move=> xy _; apply/idP/idP => [->|/orP[]]//; apply/lt_trans.
+case: rcomparableP cmp_xy => // [||<-//]; rewrite ?orbb//; last rewrite orbC;
+  by move=> xy _; apply/idP/idP => [->|/orP[]]//; apply/rlt_trans.
 Qed.
 
-Lemma comparable_le_maxr : (z <= max x y) = (z <= x) || (z <= y).
+Lemma rcomparable_le_maxr : (z <= rmax x y) = (z <= x) || (z <= y).
 Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; first rewrite orbC;
-  by move=> xy _; apply/idP/idP => [->|/orP[]]// /le_trans->//; apply/ltW.
+case: rcomparableP cmp_xy => // [||<-//]; rewrite ?orbb//; first rewrite orbC;
+  by move=> xy _; apply/idP/idP => [->|/orP[]]// /rle_trans->//; apply/rltW.
 Qed.
 
-Lemma comparable_le_maxl : (max x y <= z) = (x <= z) && (y <= z).
+Lemma rcomparable_le_maxl : (rmax x y <= z) = (x <= z) && (y <= z).
 Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; first rewrite andbC;
-  by case: (comparableP z) => // [ylt /lt_trans /(_ _)/ltW|->/ltW]->.
+case: rcomparableP cmp_xy => // [||<-//]; rewrite ?andbb//; first rewrite andbC;
+  by case: (rcomparableP z) => // [ylt /rlt_trans /(_ _)/rltW|->/rltW]->.
 Qed.
 
-Lemma comparable_lt_maxr : (z < max x y) = (z < x) || (z < y).
+Lemma rcomparable_lt_maxr : (z < rmax x y) = (z < x) || (z < y).
 Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; first rewrite orbC;
-  by move=> xy _; apply/idP/idP => [->|/orP[]]// /lt_trans->.
+case: rcomparableP cmp_xy => // [||<-//]; rewrite ?orbb//; first rewrite orbC;
+  by move=> xy _; apply/idP/idP => [->|/orP[]]// /rlt_trans->.
 Qed.
 
-Lemma comparable_lt_maxl : (max x y < z) = (x < z) && (y < z).
+Lemma rcomparable_lt_maxl : (rmax x y < z) = (x < z) && (y < z).
 Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; first rewrite andbC;
-by case: (comparableP z) => // ylt /lt_trans->.
+case: rcomparableP cmp_xy => // [||<-//]; rewrite ?andbb//; first rewrite andbC;
+by case: (rcomparableP z) => // ylt /rlt_trans->.
 Qed.
 
-Lemma comparable_minxK : max (min x y) y = y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
+Lemma rcomparable_minxK : rmax (rmin x y) y = y.
+Proof. by rewrite !(fun_if, if_arg) rltxx/=; case: rcomparableP cmp_xy. Qed.
 
-Lemma comparable_minKx : max x (min x y) = x.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
+Lemma rcomparable_minKx : rmax x (rmin x y) = x.
+Proof. by rewrite !(fun_if, if_arg) rltxx/=; case: rcomparableP cmp_xy. Qed.
 
-Lemma comparable_maxxK : min (max x y) y = y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
+Lemma rcomparable_maxxK : rmin (rmax x y) y = y.
+Proof. by rewrite !(fun_if, if_arg) rltxx/=; case: rcomparableP cmp_xy. Qed.
 
-Lemma comparable_maxKx : min x (max x y) = x.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
+Lemma rcomparable_maxKx : rmin x (rmax x y) = x.
+Proof. by rewrite !(fun_if, if_arg) rltxx/=; case: rcomparableP cmp_xy. Qed.
 
-Lemma comparable_lteifNE C : x >=< y -> x < y ?<= if ~~ C = ~~ (y < x ?<= if C).
-Proof. by case: C => /=; case: comparableP. Qed.
+Lemma rcomparable_lteifNE C : x >=< y -> x < y ?<= if ~~ C = ~~ (y < x ?<= if C).
+Proof. by case: C => /=; case: rcomparableP. Qed.
 
-Lemma comparable_lteif_minr C :
-  (z < min x y ?<= if C) = (z < x ?<= if C) && (z < y ?<= if C).
-Proof. by case: C; rewrite /= (comparable_le_minr, comparable_lt_minr). Qed.
+Lemma rcomparable_lteif_minr C :
+  (z < rmin x y ?<= if C) = (z < x ?<= if C) && (z < y ?<= if C).
+Proof. by case: C; rewrite /= (rcomparable_le_minr, rcomparable_lt_minr). Qed.
 
-Lemma comparable_lteif_minl C :
-  (min x y < z ?<= if C) = (x < z ?<= if C) || (y < z ?<= if C).
-Proof. by case: C; rewrite /= (comparable_le_minl, comparable_lt_minl). Qed.
+Lemma rcomparable_lteif_minl C :
+  (rmin x y < z ?<= if C) = (x < z ?<= if C) || (y < z ?<= if C).
+Proof. by case: C; rewrite /= (rcomparable_le_minl, rcomparable_lt_minl). Qed.
 
-Lemma comparable_lteif_maxr C :
-  (z < max x y ?<= if C) = (z < x ?<= if C) || (z < y ?<= if C).
-Proof. by case: C; rewrite /= (comparable_le_maxr, comparable_lt_maxr). Qed.
+Lemma rcomparable_lteif_maxr C :
+  (z < rmax x y ?<= if C) = (z < x ?<= if C) || (z < y ?<= if C).
+Proof. by case: C; rewrite /= (rcomparable_le_maxr, rcomparable_lt_maxr). Qed.
 
-Lemma comparable_lteif_maxl C :
-  (max x y < z ?<= if C) = (x < z ?<= if C) && (y < z ?<= if C).
-Proof. by case: C; rewrite /= (comparable_le_maxl, comparable_lt_maxl). Qed.
+Lemma rcomparable_lteif_maxl C :
+  (rmax x y < z ?<= if C) = (x < z ?<= if C) && (y < z ?<= if C).
+Proof. by case: C; rewrite /= (rcomparable_le_maxl, rcomparable_lt_maxl). Qed.
 
 End Comparable2.
 
 Section Comparable3.
 Variables (x y z : T) (cmp_xy : x >=< y) (cmp_xz : x >=< z) (cmp_yz : y >=< z).
-Let P := comparableP.
+Let P := rcomparableP.
 
-Lemma comparable_minA : min x (min y z) = min (min x y) z.
+Lemma rcomparable_minA : rmin x (rmin y z) = rmin (rmin x y) z.
 Proof.
 move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/=.
 move: (P x y) (P x z) (P y z) => [xy|xy|xy|<-] [xz|xz|xz|<-]// []//= yz.
-- by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
-- by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
-- by have := lt_trans xy xz; rewrite yz ltxx.
+- by have := rlt_trans xy (rlt_trans yz xz); rewrite rltxx.
+- by have := rlt_trans xy (rlt_trans xz yz); rewrite rltxx.
+- by have := rlt_trans xy xz; rewrite yz rltxx.
 Qed.
 
-Lemma comparable_maxA : max x (max y z) = max (max x y) z.
+Lemma rcomparable_maxA : rmax x (rmax y z) = rmax (rmax x y) z.
 Proof.
 move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/=.
 move: (P x y) (P x z) (P y z) => [xy|xy|xy|<-] [xz|xz|xz|<-]// []//= yz.
-- by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
-- by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
-- by have := lt_trans xy xz; rewrite yz ltxx.
+- by have := rlt_trans xy (rlt_trans yz xz); rewrite rltxx.
+- by have := rlt_trans xy (rlt_trans xz yz); rewrite rltxx.
+- by have := rlt_trans xy xz; rewrite yz rltxx.
 Qed.
 
-Lemma comparable_max_minl : max (min x y) z = min (max x z) (max y z).
+Lemma rcomparable_max_minl : rmax (rmin x y) z = rmin (rmax x z) (rmax y z).
 Proof.
 move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/=.
 move: (P x y) (P x z) (P y z).
-move=> [xy|xy|xy|<-] [xz|xz|xz|<-] [yz|yz|yz|//->]//= _; rewrite ?ltxx//.
-- by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
-- by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
+move=> [xy|xy|xy|<-] [xz|xz|xz|<-] [yz|yz|yz|//->]//= _; rewrite ?rltxx//.
+- by have := rlt_trans xy (rlt_trans yz xz); rewrite rltxx.
+- by have := rlt_trans xy (rlt_trans xz yz); rewrite rltxx.
 Qed.
 
-Lemma comparable_min_maxl : min (max x y) z = max (min x z) (min y z).
+Lemma rcomparable_min_maxl : rmin (rmax x y) z = rmax (rmin x z) (rmin y z).
 Proof.
 move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/=.
 move: (P x y) (P x z) (P y z).
-move=> [xy|xy|xy|<-] [xz|xz|xz|<-] []yz//= _; rewrite ?ltxx//.
-- by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
-- by have := lt_trans xy yz; rewrite ltxx.
-- by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
-- by have := lt_trans xy xz; rewrite yz ltxx.
+move=> [xy|xy|xy|<-] [xz|xz|xz|<-] []yz//= _; rewrite ?rltxx//.
+- by have := rlt_trans xy (rlt_trans yz xz); rewrite rltxx.
+- by have := rlt_trans xy yz; rewrite rltxx.
+- by have := rlt_trans xy (rlt_trans xz yz); rewrite rltxx.
+- by have := rlt_trans xy xz; rewrite yz rltxx.
 Qed.
 
 End Comparable3.
 
-Lemma comparable_minAC x y z : x >=< y -> x >=< z -> y >=< z ->
-  min (min x y) z = min (min x z) y.
+Lemma rcomparable_minAC x y z : x >=< y -> x >=< z -> y >=< z ->
+  rmin (rmin x y) z = rmin (rmin x z) y.
 Proof.
-move=> xy xz yz; rewrite -comparable_minA// [min y z]comparable_minC//.
-by rewrite comparable_minA// 1?comparable_sym.
+move=> xy xz yz; rewrite -rcomparable_minA// [rmin y z]rcomparable_minC//.
+by rewrite rcomparable_minA// 1?rcomparable_sym.
 Qed.
 
-Lemma comparable_maxAC x y z : x >=< y -> x >=< z -> y >=< z ->
-  max (max x y) z = max (max x z) y.
+Lemma rcomparable_maxAC x y z : x >=< y -> x >=< z -> y >=< z ->
+  rmax (rmax x y) z = rmax (rmax x z) y.
 Proof.
-move=> xy xz yz; rewrite -comparable_maxA// [max y z]comparable_maxC//.
-by rewrite comparable_maxA// 1?comparable_sym.
+move=> xy xz yz; rewrite -rcomparable_maxA// [rmax y z]rcomparable_maxC//.
+by rewrite rcomparable_maxA// 1?rcomparable_sym.
 Qed.
 
-Lemma comparable_minCA x y z : x >=< y -> x >=< z -> y >=< z ->
-  min x (min y z) = min y (min x z).
+Lemma rcomparable_minCA x y z : x >=< y -> x >=< z -> y >=< z ->
+  rmin x (rmin y z) = rmin y (rmin x z).
 Proof.
-move=> xy xz yz; rewrite comparable_minA// [min x y]comparable_minC//.
-by rewrite -comparable_minA// 1?comparable_sym.
+move=> xy xz yz; rewrite rcomparable_minA// [rmin x y]rcomparable_minC//.
+by rewrite -rcomparable_minA// 1?rcomparable_sym.
 Qed.
 
-Lemma comparable_maxCA x y z : x >=< y -> x >=< z -> y >=< z ->
-  max x (max y z) = max y (max x z).
+Lemma rcomparable_maxCA x y z : x >=< y -> x >=< z -> y >=< z ->
+  rmax x (rmax y z) = rmax y (rmax x z).
 Proof.
-move=> xy xz yz; rewrite comparable_maxA// [max x y]comparable_maxC//.
-by rewrite -comparable_maxA// 1?comparable_sym.
+move=> xy xz yz; rewrite rcomparable_maxA// [rmax x y]rcomparable_maxC//.
+by rewrite -rcomparable_maxA// 1?rcomparable_sym.
 Qed.
 
-Lemma comparable_minACA x y z t :
+Lemma rcomparable_minACA x y z t :
     x >=< y -> x >=< z -> x >=< t -> y >=< z -> y >=< t -> z >=< t ->
-  min (min x y) (min z t) = min (min x z) (min y t).
+  rmin (rmin x y) (rmin z t) = rmin (rmin x z) (rmin y t).
 Proof.
-move=> xy xz xt yz yt zt; rewrite comparable_minA// ?comparable_minl//.
-rewrite [min _ z]comparable_minAC// -comparable_minA// ?comparable_minl//.
-by rewrite inE comparable_sym.
+move=> xy xz xt yz yt zt; rewrite rcomparable_minA// ?rcomparable_minl//.
+rewrite [rmin _ z]rcomparable_minAC// -rcomparable_minA// ?rcomparable_minl//.
+by rewrite inE rcomparable_sym.
 Qed.
 
-Lemma comparable_maxACA x y z t :
+Lemma rcomparable_maxACA x y z t :
     x >=< y -> x >=< z -> x >=< t -> y >=< z -> y >=< t -> z >=< t ->
-  max (max x y) (max z t) = max (max x z) (max y t).
+  rmax (rmax x y) (rmax z t) = rmax (rmax x z) (rmax y t).
 Proof.
-move=> xy xz xt yz yt zt; rewrite comparable_maxA// ?comparable_maxl//.
-rewrite [max _ z]comparable_maxAC// -comparable_maxA// ?comparable_maxl//.
-by rewrite inE comparable_sym.
+move=> xy xz xt yz yt zt; rewrite rcomparable_maxA// ?rcomparable_maxl//.
+rewrite [rmax _ z]rcomparable_maxAC// -rcomparable_maxA// ?rcomparable_maxl//.
+by rewrite inE rcomparable_sym.
 Qed.
 
-Lemma comparable_max_minr x y z : x >=< y -> x >=< z -> y >=< z ->
-  max x (min y z) = min (max x y) (max x z).
+Lemma rcomparable_max_minr x y z : x >=< y -> x >=< z -> y >=< z ->
+  rmax x (rmin y z) = rmin (rmax x y) (rmax x z).
 Proof.
-move=> xy xz yz; rewrite ![max x _]comparable_maxC// ?comparable_minr//.
-by rewrite comparable_max_minl// 1?comparable_sym.
+move=> xy xz yz; rewrite ![rmax x _]rcomparable_maxC// ?rcomparable_minr//.
+by rewrite rcomparable_max_minl// 1?rcomparable_sym.
 Qed.
 
-Lemma comparable_min_maxr x y z : x >=< y -> x >=< z -> y >=< z ->
-  min x (max y z) = max (min x y) (min x z).
+Lemma rcomparable_min_maxr x y z : x >=< y -> x >=< z -> y >=< z ->
+  rmin x (rmax y z) = rmax (rmin x y) (rmin x z).
 Proof.
-move=> xy xz yz; rewrite ![min x _]comparable_minC// ?comparable_maxr//.
-by rewrite comparable_min_maxl// 1?comparable_sym.
+move=> xy xz yz; rewrite ![rmin x _]rcomparable_minC// ?rcomparable_maxr//.
+by rewrite rcomparable_min_maxl// 1?rcomparable_sym.
 Qed.
 
 Section ArgExtremum.
@@ -3174,14 +3174,14 @@ Section ArgExtremum.
 Context (I : finType) (i0 : I) (P : {pred I}) (F : I -> T) (Pi0 : P i0).
 Hypothesis F_comparable : {in P &, forall i j, F i >=< F j}.
 
-Lemma comparable_arg_minP : extremum_spec le P F (arg_min i0 P F).
+Lemma rcomparable_arg_minP : extremum_spec le P F (rarg_min i0 P F).
 Proof.
-by apply: extremum_inP => // [x _|y x z _ _ _]; [apply: lexx|apply: le_trans].
+by apply: extremum_inP => // [x _|y x z _ _ _]; [apply: rlexx|apply: rle_trans].
 Qed.
 
-Lemma comparable_arg_maxP : extremum_spec ge P F (arg_max i0 P F).
+Lemma rcomparable_arg_maxP : extremum_spec rge P F (rarg_max i0 P F).
 Proof.
-apply: extremum_inP => // [x _|y x z _ _ _|]; [exact: lexx|exact: ge_trans|].
+apply: extremum_inP => // [x _|y x z _ _ _|]; [exact: rlexx|exact: rge_trans|].
 by move=> x y xP yP; rewrite orbC [_ || _]F_comparable.
 Qed.
 
@@ -3189,31 +3189,31 @@ End ArgExtremum.
 
 (* monotonicity *)
 
-Lemma mono_in_leif (A : {pred T}) (f : T -> T) C :
+Lemma rmono_in_leif (A : {pred T}) (f : T -> T) C :
    {in A &, {mono f : x y / x <= y}} ->
   {in A &, forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C)}.
-Proof. by move=> mf x y Ax Ay; rewrite /leif !eq_le !mf. Qed.
+Proof. by move=> mf x y Ax Ay; rewrite /rleif !req_le !mf. Qed.
 
-Lemma mono_leif (f : T -> T) C :
+Lemma rmono_leif (f : T -> T) C :
     {mono f : x y / x <= y} ->
   forall x y, (f x <= f y ?= iff C) = (x <= y ?= iff C).
-Proof. by move=> mf x y; rewrite /leif !eq_le !mf. Qed.
+Proof. by move=> mf x y; rewrite /rleif !req_le !mf. Qed.
 
-Lemma nmono_in_leif (A : {pred T}) (f : T -> T) C :
+Lemma rnmono_in_leif (A : {pred T}) (f : T -> T) C :
     {in A &, {mono f : x y /~ x <= y}} ->
   {in A &, forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C)}.
-Proof. by move=> mf x y Ax Ay; rewrite /leif !eq_le !mf. Qed.
+Proof. by move=> mf x y Ax Ay; rewrite /rleif !req_le !mf. Qed.
 
-Lemma nmono_leif (f : T -> T) C : {mono f : x y /~ x <= y} ->
+Lemma rnmono_leif (f : T -> T) C : {mono f : x y /~ x <= y} ->
   forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C).
-Proof. by move=> mf x y; rewrite /leif !eq_le !mf. Qed.
+Proof. by move=> mf x y; rewrite /rleif !req_le !mf. Qed.
 
-Lemma comparable_bigl x x0 op I (P : pred I) F (s : seq I) :
+Lemma rcomparable_bigl x x0 op I (P : pred I) F (s : seq I) :
   {in >=< x &, forall y z, op y z >=< x} -> x0 >=< x ->
   {in P, forall i, F i >=< x} -> \big[op/x0]_(i <- s | P i) F i >=< x.
 Proof. by move=> *; elim/big_ind : _. Qed.
 
-Lemma comparable_bigr x x0 op I (P : pred I) F (s : seq I) :
+Lemma rcomparable_bigr x x0 op I (P : pred I) F (s : seq I) :
   {in >=<%O x &, forall y z, x >=< op y z} -> x >=< x0 ->
   {in P, forall i, x >=< F i} -> x >=< \big[op/x0]_(i <- s | P i) F i.
 Proof. by move=> *; elim/big_ind : _. Qed.
@@ -3229,103 +3229,103 @@ Local Notation "x <= y" := (x <=_ord1 y).
 Local Notation "x < y" := (x <_ord1 y).
 Local Notation "x >=< y" := (x >=<_ord1 y).
 
-Lemma comparable_contraTle b x y : x >=< y -> (y < x -> ~~ b) -> (b -> x <= y).
-Proof. by case: comparableP; case: b. Qed.
+Lemma rcomparable_contraTle b x y : x >=< y -> (y < x -> ~~ b) -> (b -> x <= y).
+Proof. by case: rcomparableP; case: b. Qed.
 
-Lemma comparable_contraTlt b x y : x >=< y -> (y <= x -> ~~ b) -> (b -> x < y).
-Proof. by case: comparableP; case: b. Qed.
+Lemma rcomparable_contraTlt b x y : x >=< y -> (y <= x -> ~~ b) -> (b -> x < y).
+Proof. by case: rcomparableP; case: b. Qed.
 
-Lemma comparable_contraPle P x y : x >=< y -> (y < x -> ~ P) -> (P -> x <= y).
-Proof. by case: comparableP => // _ _ /(_ isT). Qed.
+Lemma rcomparable_contraPle P x y : x >=< y -> (y < x -> ~ P) -> (P -> x <= y).
+Proof. by case: rcomparableP => // _ _ /(_ isT). Qed.
 
-Lemma comparable_contraPlt P x y : x >=< y -> (y <= x -> ~ P) -> (P -> x < y).
-Proof. by case: comparableP => // _ _ /(_ isT). Qed.
+Lemma rcomparable_contraPlt P x y : x >=< y -> (y <= x -> ~ P) -> (P -> x < y).
+Proof. by case: rcomparableP => // _ _ /(_ isT). Qed.
 
-Lemma comparable_contraNle b x y : x >=< y -> (y < x -> b) -> (~~ b -> x <= y).
-Proof. by case: comparableP; case: b. Qed.
+Lemma rcomparable_contraNle b x y : x >=< y -> (y < x -> b) -> (~~ b -> x <= y).
+Proof. by case: rcomparableP; case: b. Qed.
 
-Lemma comparable_contraNlt b x y : x >=< y -> (y <= x -> b) -> (~~ b -> x < y).
-Proof. by case: comparableP; case: b. Qed.
+Lemma rcomparable_contraNlt b x y : x >=< y -> (y <= x -> b) -> (~~ b -> x < y).
+Proof. by case: rcomparableP; case: b. Qed.
 
-Lemma comparable_contra_not_le P x y : x >=< y -> (y < x -> P) -> (~ P -> x <= y).
-Proof. by case: comparableP => // _ _ /(_ isT). Qed.
+Lemma rcomparable_contra_not_le P x y : x >=< y -> (y < x -> P) -> (~ P -> x <= y).
+Proof. by case: rcomparableP => // _ _ /(_ isT). Qed.
 
-Lemma comparable_contra_not_lt P x y : x >=< y -> (y <= x -> P) -> (~ P -> x < y).
-Proof. by case: comparableP => // _ _ /(_ isT). Qed.
+Lemma rcomparable_contra_not_lt P x y : x >=< y -> (y <= x -> P) -> (~ P -> x < y).
+Proof. by case: rcomparableP => // _ _ /(_ isT). Qed.
 
-Lemma comparable_contraFle b x y : x >=< y -> (y < x -> b) -> (b = false -> x <= y).
-Proof. by case: comparableP; case: b => // _ _ /implyP. Qed.
+Lemma rcomparable_contraFle b x y : x >=< y -> (y < x -> b) -> (b = false -> x <= y).
+Proof. by case: rcomparableP; case: b => // _ _ /implyP. Qed.
 
-Lemma comparable_contraFlt b x y : x >=< y -> (y <= x -> b) -> (b = false -> x < y).
-Proof. by case: comparableP; case: b => // _ _ /implyP. Qed.
+Lemma rcomparable_contraFlt b x y : x >=< y -> (y <= x -> b) -> (b = false -> x < y).
+Proof. by case: rcomparableP; case: b => // _ _ /implyP. Qed.
 
-Lemma contra_leT b x y : (~~ b -> x < y) -> (y <= x -> b).
-Proof. by case: comparableP; case: b. Qed.
+Lemma rcontra_leT b x y : (~~ b -> x < y) -> (y <= x -> b).
+Proof. by case: rcomparableP; case: b. Qed.
 
-Lemma contra_ltT b x y : (~~ b -> x <= y) -> (y < x -> b).
-Proof. by case: comparableP; case: b. Qed.
+Lemma rcontra_ltT b x y : (~~ b -> x <= y) -> (y < x -> b).
+Proof. by case: rcomparableP; case: b. Qed.
 
-Lemma contra_leN b x y : (b -> x < y) -> (y <= x -> ~~ b).
-Proof. by case: comparableP; case: b. Qed.
+Lemma rcontra_leN b x y : (b -> x < y) -> (y <= x -> ~~ b).
+Proof. by case: rcomparableP; case: b. Qed.
 
-Lemma contra_ltN b x y : (b -> x <= y) -> (y < x -> ~~ b).
-Proof. by case: comparableP; case: b. Qed.
+Lemma rcontra_ltN b x y : (b -> x <= y) -> (y < x -> ~~ b).
+Proof. by case: rcomparableP; case: b. Qed.
 
-Lemma contra_le_not P x y : (P -> x < y) -> (y <= x -> ~ P).
-Proof. by case: comparableP => // _ PF _ /PF. Qed.
+Lemma rcontra_le_not P x y : (P -> x < y) -> (y <= x -> ~ P).
+Proof. by case: rcomparableP => // _ PF _ /PF. Qed.
 
-Lemma contra_lt_not P x y : (P -> x <= y) -> (y < x -> ~ P).
-Proof. by case: comparableP => // _ PF _ /PF. Qed.
+Lemma rcontra_lt_not P x y : (P -> x <= y) -> (y < x -> ~ P).
+Proof. by case: rcomparableP => // _ PF _ /PF. Qed.
 
-Lemma contra_leF b x y : (b -> x < y) -> (y <= x -> b = false).
-Proof. by case: comparableP; case: b => // _ /implyP. Qed.
+Lemma rcontra_leF b x y : (b -> x < y) -> (y <= x -> b = false).
+Proof. by case: rcomparableP; case: b => // _ /implyP. Qed.
 
-Lemma contra_ltF b x y : (b -> x <= y) -> (y < x -> b = false).
-Proof. by case: comparableP; case: b => // _ /implyP. Qed.
+Lemma rcontra_ltF b x y : (b -> x <= y) -> (y < x -> b = false).
+Proof. by case: rcomparableP; case: b => // _ /implyP. Qed.
 
-Lemma comparable_contra_leq_le m n x y : x >=< y ->
+Lemma rcomparable_contra_leq_le m n x y : x >=< y ->
   (y < x -> (n < m)%N) -> ((m <= n)%N -> x <= y).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Proof. by case: rcomparableP; case: ltngtP. Qed.
 
-Lemma comparable_contra_leq_lt m n x y : x >=< y ->
+Lemma rcomparable_contra_leq_lt m n x y : x >=< y ->
   (y <= x -> (n < m)%N) -> ((m <= n)%N -> x < y).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Proof. by case: rcomparableP; case: ltngtP. Qed.
 
-Lemma comparable_contra_ltn_le m n x y : x >=< y ->
+Lemma rcomparable_contra_ltn_le m n x y : x >=< y ->
   (y < x -> (n <= m)%N) -> ((m < n)%N -> x <= y).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Proof. by case: rcomparableP; case: ltngtP. Qed.
 
-Lemma comparable_contra_ltn_lt m n x y : x >=< y ->
+Lemma rcomparable_contra_ltn_lt m n x y : x >=< y ->
   (y <= x -> (n <= m)%N) -> ((m < n)%N -> x < y).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Proof. by case: rcomparableP; case: ltngtP. Qed.
 
-Lemma contra_le_leq x y m n : ((n < m)%N -> y < x) -> (x <= y -> (m <= n)%N).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Lemma rcontra_le_leq x y m n : ((n < m)%N -> y < x) -> (x <= y -> (m <= n)%N).
+Proof. by case: rcomparableP; case: ltngtP. Qed.
 
-Lemma contra_le_ltn x y m n : ((n <= m)%N -> y < x) -> (x <= y -> (m < n)%N).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Lemma rcontra_le_ltn x y m n : ((n <= m)%N -> y < x) -> (x <= y -> (m < n)%N).
+Proof. by case: rcomparableP; case: ltngtP. Qed.
 
-Lemma contra_lt_leq x y m n : ((n < m)%N -> y <= x) -> (x < y -> (m <= n)%N).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Lemma rcontra_lt_leq x y m n : ((n < m)%N -> y <= x) -> (x < y -> (m <= n)%N).
+Proof. by case: rcomparableP; case: ltngtP. Qed.
 
-Lemma contra_lt_ltn x y m n : ((n <= m)%N -> y <= x) -> (x < y -> (m < n)%N).
-Proof. by case: comparableP; case: ltngtP. Qed.
+Lemma rcontra_lt_ltn x y m n : ((n <= m)%N -> y <= x) -> (x < y -> (m < n)%N).
+Proof. by case: rcomparableP; case: ltngtP. Qed.
 
-Lemma comparable_contra_le x y z t : z >=<_ord2 t ->
+Lemma rcomparable_contra_le x y z t : z >=<_ord2 t ->
   (t <_ord2 z -> y < x) -> (x <= y -> z <=_ord2 t).
-Proof. by do 2![case: comparableP => //= ?]. Qed.
+Proof. by do 2![case: rcomparableP => //= ?]. Qed.
 
-Lemma comparable_contra_le_lt x y z t : z >=<_ord2 t ->
+Lemma rcomparable_contra_le_lt x y z t : z >=<_ord2 t ->
   (t <=_ord2 z -> y < x) -> (x <= y -> z <_ord2 t).
-Proof. by do 2![case: comparableP => //= ?]. Qed.
+Proof. by do 2![case: rcomparableP => //= ?]. Qed.
 
-Lemma comparable_contra_lt_le x y z t : z >=<_ord2 t ->
+Lemma rcomparable_contra_lt_le x y z t : z >=<_ord2 t ->
   (t <_ord2 z -> y <= x) -> (x < y -> z <=_ord2 t).
-Proof. by do 2![case: comparableP => //= ?]. Qed.
+Proof. by do 2![case: rcomparableP => //= ?]. Qed.
 
-Lemma comparable_contra_lt x y z t : z >=<_ord2 t ->
+Lemma rcomparable_contra_lt x y z t : z >=<_ord2 t ->
  (t <=_ord2 z -> y <= x) -> (x < y -> z <_ord2 t).
-Proof. by do 2![case: comparableP => //= ?]. Qed.
+Proof. by do 2![case: rcomparableP => //= ?]. Qed.
 
 End ContraTheory.
 
@@ -3335,82 +3335,82 @@ Context {T T' : eqType} {ord : {pOrder T}} {ord' : {pOrder T'}}.
 Implicit Types (m n p : nat) (x y z : T) (u v w : T').
 Variables (D D' : {pred T}) (f : T -> T').
 
-Let leT_refl := @lexx _ ord.
-Let leT'_refl := @lexx _ ord'.
-Let ltT_neqAle := @lt_neqAle _ ord.
-Let ltT'_neqAle := @lt_neqAle _ ord'.
-Let ltT_def := @lt_def _ ord.
-Let leT_anti := @le_anti _ ord.
+Let leT_refl := @rlexx _ ord.
+Let leT'_refl := @rlexx _ ord'.
+Let ltT_neqAle := @rlt_neqAle _ ord.
+Let ltT'_neqAle := @rlt_neqAle _ ord'.
+Let ltT_def := @rlt_def _ ord.
+Let leT_anti := @rle_anti _ ord.
 
-Let ge_antiT : antisymmetric (ge ord).
-Proof. by move=> ? ? /le_anti. Qed.
+Let ge_antiT : antisymmetric (rge ord).
+Proof. by move=> ? ? /rle_anti. Qed.
 
-Lemma ltW_homo : {homo f : x y / x <_ord y >-> x <_ord' y} ->
+Lemma rltW_homo : {homo f : x y / x <_ord y >-> x <_ord' y} ->
                  {homo f : x y / x <=_ord y >-> x <=_ord' y}.
 Proof. exact: homoW. Qed.
 
-Lemma ltW_nhomo : {homo f : x y / y <_ord x >-> x <_ord' y} ->
+Lemma rltW_nhomo : {homo f : x y / y <_ord x >-> x <_ord' y} ->
                   {homo f : x y / y <=_ord x >-> x <=_ord' y}.
 Proof. exact: homoW. Qed.
 
-Lemma inj_homo_lt :
+Lemma rinj_homo_lt :
   injective f -> {homo f : x y / x <=_ord y >-> x <=_ord' y} ->
   {homo f : x y / x <_ord y >-> x <_ord' y}.
 Proof. exact: inj_homo. Qed.
 
-Lemma inj_nhomo_lt :
+Lemma rinj_nhomo_lt :
   injective f -> {homo f : x y / y <=_ord x >-> x <=_ord' y} ->
   {homo f : x y / y <_ord x >-> x <_ord' y}.
 Proof. exact: inj_homo. Qed.
 
-Lemma inc_inj : {mono f : x y / x <=_ord y >-> x <=_ord' y} -> injective f.
+Lemma rinc_inj : {mono f : x y / x <=_ord y >-> x <=_ord' y} -> injective f.
 Proof. exact: mono_inj. Qed.
 
-Lemma dec_inj : {mono f : x y / y <=_ord x >-> x <=_ord' y} -> injective f.
+Lemma rdec_inj : {mono f : x y / y <=_ord x >-> x <=_ord' y} -> injective f.
 Proof. exact: mono_inj. Qed.
 
-Lemma leW_mono : {mono f : x y / x <=_ord y >-> x <=_ord' y} ->
+Lemma rleW_mono : {mono f : x y / x <=_ord y >-> x <=_ord' y} ->
                  {mono f : x y / x <_ord y >-> x <_ord' y}.
 Proof. exact: anti_mono. Qed.
 
-Lemma leW_nmono : {mono f : x y / y <=_ord x >-> x <=_ord' y} ->
+Lemma rleW_nmono : {mono f : x y / y <=_ord x >-> x <=_ord' y} ->
                   {mono f : x y / y <_ord x >-> x <_ord' y}.
 Proof. exact: anti_mono. Qed.
 
 (* Monotony in D D' *)
-Lemma ltW_homo_in : {in D & D', {homo f : x y / x <_ord y >-> x <_ord' y}} ->
+Lemma rltW_homo_in : {in D & D', {homo f : x y / x <_ord y >-> x <_ord' y}} ->
                     {in D & D', {homo f : x y / x <=_ord y >-> x <=_ord' y}}.
 Proof. exact: homoW_in. Qed.
 
-Lemma ltW_nhomo_in : {in D & D', {homo f : x y / y <_ord x >-> x <_ord' y}} ->
+Lemma rltW_nhomo_in : {in D & D', {homo f : x y / y <_ord x >-> x <_ord' y}} ->
                      {in D & D', {homo f : x y / y <=_ord x >-> x <=_ord' y}}.
 Proof. exact: homoW_in. Qed.
 
-Lemma inj_homo_lt_in :
+Lemma rinj_homo_lt_in :
   {in D & D', injective f} ->
   {in D & D', {homo f : x y / x <=_ord y >-> x <=_ord' y}} ->
   {in D & D', {homo f : x y / x <_ord y >-> x <_ord' y}}.
 Proof. exact: inj_homo_in. Qed.
 
-Lemma inj_nhomo_lt_in :
+Lemma rinj_nhomo_lt_in :
   {in D & D', injective f} ->
   {in D & D', {homo f : x y / y <=_ord x >-> x <=_ord' y}} ->
   {in D & D', {homo f : x y / y <_ord x >-> x <_ord' y}}.
 Proof. exact: inj_homo_in. Qed.
 
-Lemma inc_inj_in : {in D &, {mono f : x y / x <=_ord y >-> x <=_ord' y}} ->
+Lemma rinc_inj_in : {in D &, {mono f : x y / x <=_ord y >-> x <=_ord' y}} ->
                    {in D &, injective f}.
 Proof. exact: mono_inj_in. Qed.
 
-Lemma dec_inj_in : {in D &, {mono f : x y / y <=_ord x >-> x <=_ord' y}} ->
+Lemma rdec_inj_in : {in D &, {mono f : x y / y <=_ord x >-> x <=_ord' y}} ->
                    {in D &, injective f}.
 Proof. exact: mono_inj_in. Qed.
 
-Lemma leW_mono_in : {in D &, {mono f : x y / x <=_ord y >-> x <=_ord' y}} ->
+Lemma rleW_mono_in : {in D &, {mono f : x y / x <=_ord y >-> x <=_ord' y}} ->
                     {in D &, {mono f : x y / x <_ord y >-> x <_ord' y}}.
 Proof. exact: anti_mono_in. Qed.
 
-Lemma leW_nmono_in : {in D &, {mono f : x y / y <=_ord x >-> x <=_ord' y}} ->
+Lemma rleW_nmono_in : {in D &, {mono f : x y / y <=_ord x >-> x <=_ord' y}} ->
                      {in D &, {mono f : x y / y <_ord x >-> x <_ord' y}}.
 Proof. exact: anti_mono_in. Qed.
 
@@ -3418,19 +3418,19 @@ End POrderMonotonyTheory.
 
 End POrderTheory.
 
-#[global] Hint Extern 0 (is_true (le _ _ _)) => apply: lexx : core.
-#[global] Hint Resolve lexx ltxx lt_irreflexive ltW lt_eqF : core.
+#[global] Hint Extern 0 (is_true (le _ _ _)) => apply: rlexx : core.
+#[global] Hint Resolve rlexx rltxx rlt_irreflexive rltW rlt_eqF : core.
 
-Arguments leifP {T ord x y C}.
-Arguments leif_refl {T ord x C}.
-Arguments mono_in_leif [T ord A f C].
-Arguments nmono_in_leif [T ord A f C].
-Arguments mono_leif [T ord f C].
-Arguments nmono_leif [T ord f C].
-Arguments min_idPl {T ord x y}.
-Arguments max_idPr {T ord x y}.
-Arguments comparable_min_idPr {T ord x y _}.
-Arguments comparable_max_idPl {T ord x y _}.
+Arguments rleifP {T ord x y C}.
+Arguments rleif_refl {T ord x C}.
+Arguments rmono_in_leif [T ord A f C].
+Arguments rnmono_in_leif [T ord A f C].
+Arguments rmono_leif [T ord f C].
+Arguments rnmono_leif [T ord f C].
+Arguments rmin_idPl {T ord x y}.
+Arguments rmax_idPr {T ord x y}.
+Arguments rcomparable_min_idPr {T ord x y _}.
+Arguments rcomparable_max_idPl {T ord x y _}.
 
 Module Import BPOrderTheory.
 Section BPOrderTheory.
@@ -3441,23 +3441,23 @@ Local Notation "x <= y" := (x <=_ord y).
 Local Notation "x < y" := (x <_ord y).
 Local Notation "0" := (bottom ord).
 
-Lemma le0x x : 0 <= x. Proof. by case: ord => ? ? ? []. Qed.
+Lemma rle0x x : 0 <= x. Proof. by case: ord => ? ? ? []. Qed.
 
-Lemma lex0 x : (x <= 0) = (x == 0).
-Proof. by rewrite le_eqVlt (le_gtF (le0x _)) orbF. Qed.
+Lemma rlex0 x : (x <= 0) = (x == 0).
+Proof. by rewrite rle_eqVlt (rle_gtF (rle0x _)) orbF. Qed.
 
-Lemma ltx0 x : (x < 0) = false.
-Proof. by rewrite lt_neqAle lex0 andNb. Qed.
+Lemma rltx0 x : (x < 0) = false.
+Proof. by rewrite rlt_neqAle rlex0 andNb. Qed.
 
-Lemma lt0x x : (0 < x) = (x != 0).
-Proof. by rewrite lt_neqAle le0x andbT eq_sym. Qed.
+Lemma rlt0x x : (0 < x) = (x != 0).
+Proof. by rewrite rlt_neqAle rle0x andbT eq_sym. Qed.
 
 Variant eq0_xor_gt0 x : bool -> bool -> Set :=
     Eq0NotPOs : x = 0 -> eq0_xor_gt0 x true false
   | POsNotEq0 : 0 < x -> eq0_xor_gt0 x false true.
 
-Lemma posxP x : eq0_xor_gt0 x (x == 0) (0 < x).
-Proof. by rewrite lt0x; have [] := eqVneq; constructor; rewrite ?lt0x. Qed.
+Lemma rposxP x : eq0_xor_gt0 x (x == 0) (0 < x).
+Proof. by rewrite rlt0x; have [] := eqVneq; constructor; rewrite ?rlt0x. Qed.
 
 End BPOrderTheory.
 End BPOrderTheory.
@@ -3465,23 +3465,23 @@ End BPOrderTheory.
 Module Import TPOrderTheory.
 Section TPOrderTheory.
 Context {T : eqType} {ord : {tPOrder T}}.
-Let ord_dual := [bPOrder of dual_rel <=:ord].
+Let ord_dual := [bPOrder of rdual_rel <=:ord].
 Implicit Types (x y : T).
 
 Local Notation "x <= y" := (x <=_ord y).
 Local Notation "x < y" := (x <_ord y).
 Local Notation "1" := (top ord).
 
-Lemma lex1 (x : T) : x <= 1. Proof. exact: (@le0x _ ord_dual). Qed.
-Lemma le1x x : (1 <= x) = (x == 1). Proof. exact: (@lex0 _ ord_dual). Qed.
-Lemma lt1x x : (1 < x) = false. Proof. exact: (@ltx0 _ ord_dual). Qed.
-Lemma ltx1 x : (x < 1) = (x != 1). Proof. exact: (@lt0x _ ord_dual). Qed.
+Lemma rlex1 (x : T) : x <= 1. Proof. exact: (@rle0x _ ord_dual). Qed.
+Lemma rle1x x : (1 <= x) = (x == 1). Proof. exact: (@rlex0 _ ord_dual). Qed.
+Lemma rlt1x x : (1 < x) = false. Proof. exact: (@rltx0 _ ord_dual). Qed.
+Lemma rltx1 x : (x < 1) = (x != 1). Proof. exact: (@rlt0x _ ord_dual). Qed.
 
 End TPOrderTheory.
 End TPOrderTheory.
 
-#[global] Hint Extern 0 (is_true (le _ (bottom _) _)) => apply: le0x : core.
-#[global] Hint Extern 0 (is_true (le _ _ (top _))) => apply: lex1 : core.
+#[global] Hint Extern 0 (is_true (le _ (bottom _) _)) => apply: rle0x : core.
+#[global] Hint Extern 0 (is_true (le _ _ (top _))) => apply: rlex1 : core.
 
 Module Import MeetTheory.
 Section MeetTheory.
@@ -3493,80 +3493,80 @@ Local Notation meet := (meet ord).
 Local Notation "x <= y" := (x <=_ord y).
 Local Notation "x `&` y" := (meet x y).
 
-Lemma meetC : commutative meet. Proof. by case: ord => ? ? ? [? []]. Qed.
-Lemma meetA : associative meet. Proof. by case: ord => ? ? ? [? []]. Qed.
-Lemma leEmeet x y : (x <= y) = (x `&` y == x).
+Lemma rmeetC : commutative meet. Proof. by case: ord => ? ? ? [? []]. Qed.
+Lemma rmeetA : associative meet. Proof. by case: ord => ? ? ? [? []]. Qed.
+Lemma rleEmeet x y : (x <= y) = (x `&` y == x).
 Proof. by case: ord => ? ? ? [? []]. Qed.
 
-Lemma meetxx : idempotent meet.
-Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
-Lemma meetAC : right_commutative meet.
-Proof. by move=> x y z; rewrite -!meetA [X in _ `&` X]meetC. Qed.
-Lemma meetCA : left_commutative meet.
-Proof. by move=> x y z; rewrite !meetA [X in X `&` _]meetC. Qed.
-Lemma meetACA : interchange meet meet.
-Proof. by move=> x y z t; rewrite !meetA [X in X `&` _]meetAC. Qed.
+Lemma rmeetxx : idempotent meet.
+Proof. by move=> x; apply/eqP; rewrite -rleEmeet. Qed.
+Lemma rmeetAC : right_commutative meet.
+Proof. by move=> x y z; rewrite -!rmeetA [X in _ `&` X]rmeetC. Qed.
+Lemma rmeetCA : left_commutative meet.
+Proof. by move=> x y z; rewrite !rmeetA [X in X `&` _]rmeetC. Qed.
+Lemma rmeetACA : interchange meet meet.
+Proof. by move=> x y z t; rewrite !rmeetA [X in X `&` _]rmeetAC. Qed.
 
-Lemma meetKI y x : x `&` (x `&` y) = x `&` y.
-Proof. by rewrite meetA meetxx. Qed.
-Lemma meetIK y x : (x `&` y) `&` y = x `&` y.
-Proof. by rewrite -meetA meetxx. Qed.
-Lemma meetKIC y x : x `&` (y `&` x) = x `&` y.
-Proof. by rewrite meetC meetIK meetC. Qed.
-Lemma meetIKC y x : y `&` x `&` y = x `&` y.
-Proof. by rewrite meetAC meetC meetxx. Qed.
+Lemma rmeetKI y x : x `&` (x `&` y) = x `&` y.
+Proof. by rewrite rmeetA rmeetxx. Qed.
+Lemma rmeetIK y x : (x `&` y) `&` y = x `&` y.
+Proof. by rewrite -rmeetA rmeetxx. Qed.
+Lemma rmeetKIC y x : x `&` (y `&` x) = x `&` y.
+Proof. by rewrite rmeetC rmeetIK rmeetC. Qed.
+Lemma rmeetIKC y x : y `&` x `&` y = x `&` y.
+Proof. by rewrite rmeetAC rmeetC rmeetxx. Qed.
 
 (* interaction with order *)
 
-Lemma lexI x y z : (x <= y `&` z) = (x <= y) && (x <= z).
+Lemma rlexI x y z : (x <= y `&` z) = (x <= y) && (x <= z).
 Proof.
-rewrite !leEmeet; apply/eqP/andP => [<-|[/eqP<- /eqP<-]].
-  by rewrite meetA meetIK eqxx -meetA meetACA meetxx meetAC eqxx.
-by rewrite -[X in X `&` _]meetA meetIK meetA.
+rewrite !rleEmeet; apply/eqP/andP => [<-|[/eqP<- /eqP<-]].
+  by rewrite rmeetA rmeetIK eqxx -rmeetA rmeetACA rmeetxx rmeetAC eqxx.
+by rewrite -[X in X `&` _]rmeetA rmeetIK rmeetA.
 Qed.
 
-Lemma leIxl x y z : y <= x -> y `&` z <= x.
-Proof. by rewrite !leEmeet meetAC => /eqP ->. Qed.
+Lemma rleIxl x y z : y <= x -> y `&` z <= x.
+Proof. by rewrite !rleEmeet rmeetAC => /eqP ->. Qed.
 
-Lemma leIxr x y z : z <= x -> y `&` z <= x.
-Proof. by rewrite !leEmeet -meetA => /eqP ->. Qed.
+Lemma rleIxr x y z : z <= x -> y `&` z <= x.
+Proof. by rewrite !rleEmeet -rmeetA => /eqP ->. Qed.
 
-Lemma leIx2 x y z : (y <= x) || (z <= x) -> y `&` z <= x.
-Proof. by case/orP => [/leIxl|/leIxr]. Qed.
+Lemma rleIx2 x y z : (y <= x) || (z <= x) -> y `&` z <= x.
+Proof. by case/orP => [/rleIxl|/rleIxr]. Qed.
 
-Lemma leIr x y : y `&` x <= x.
-Proof. by rewrite leIx2 ?lexx ?orbT. Qed.
+Lemma rleIr x y : y `&` x <= x.
+Proof. by rewrite rleIx2 ?rlexx ?orbT. Qed.
 
-Lemma leIl x y : x `&` y <= x.
-Proof. by rewrite leIx2 ?lexx ?orbT. Qed.
+Lemma rleIl x y : x `&` y <= x.
+Proof. by rewrite rleIx2 ?rlexx ?orbT. Qed.
 
-Lemma meet_idPl {x y} : reflect (x `&` y = x) (x <= y).
-Proof. by rewrite leEmeet; apply/eqP. Qed.
-Lemma meet_idPr {x y} : reflect (y `&` x = x) (x <= y).
-Proof. by rewrite meetC; apply/meet_idPl. Qed.
+Lemma rmeet_idPl {x y} : reflect (x `&` y = x) (x <= y).
+Proof. by rewrite rleEmeet; apply/eqP. Qed.
+Lemma rmeet_idPr {x y} : reflect (y `&` x = x) (x <= y).
+Proof. by rewrite rmeetC; apply/rmeet_idPl. Qed.
 
-Lemma meet_l x y : x <= y -> x `&` y = x. Proof. exact/meet_idPl. Qed.
-Lemma meet_r x y : y <= x -> x `&` y = y. Proof. exact/meet_idPr. Qed.
+Lemma rmeet_l x y : x <= y -> x `&` y = x. Proof. exact/rmeet_idPl. Qed.
+Lemma rmeet_r x y : y <= x -> x `&` y = y. Proof. exact/rmeet_idPr. Qed.
 
-Lemma leIidl x y : (x <= x `&` y) = (x <= y).
-Proof. by rewrite !leEmeet meetKI. Qed.
-Lemma leIidr x y : (x <= y `&` x) = (x <= y).
-Proof. by rewrite !leEmeet meetKIC. Qed.
+Lemma rleIidl x y : (x <= x `&` y) = (x <= y).
+Proof. by rewrite !rleEmeet rmeetKI. Qed.
+Lemma rleIidr x y : (x <= y `&` x) = (x <= y).
+Proof. by rewrite !rleEmeet rmeetKIC. Qed.
 
-Lemma eq_meetl x y : (x `&` y == x) = (x <= y).
-Proof. by apply/esym/leEmeet. Qed.
+Lemma req_meetl x y : (x `&` y == x) = (x <= y).
+Proof. by apply/esym/rleEmeet. Qed.
 
-Lemma eq_meetr x y : (x `&` y == y) = (y <= x).
-Proof. by rewrite meetC eq_meetl. Qed.
+Lemma req_meetr x y : (x `&` y == y) = (y <= x).
+Proof. by rewrite rmeetC req_meetl. Qed.
 
-Lemma leI2 x y z t : x <= z -> y <= t -> x `&` y <= z `&` t.
-Proof. by move=> xz yt; rewrite lexI !leIx2 ?xz ?yt ?orbT //. Qed.
+Lemma rleI2 x y z t : x <= z -> y <= t -> x `&` y <= z `&` t.
+Proof. by move=> xz yt; rewrite rlexI !rleIx2 ?xz ?yt ?orbT //. Qed.
 
 End MeetTheory.
 End MeetTheory.
 
-Arguments meet_idPl {L ord x y}.
-Arguments meet_idPr {L ord x y}.
+Arguments rmeet_idPl {L ord x y}.
+Arguments rmeet_idPr {L ord x y}.
 
 Module Import BMeetTheory.
 Section BMeetTheory.
@@ -3575,10 +3575,10 @@ Context {L : eqType} {ord : {bMeetOrder L}}.
 Local Notation meet := (meet ord).
 Local Notation "0" := (bottom ord).
 
-Lemma meet0x : left_zero 0 meet. Proof. by move=> x; apply/meet_idPl. Qed.
-Lemma meetx0 : right_zero 0 meet. Proof. by move=> x; apply/meet_idPr. Qed.
+Lemma rmeet0x : left_zero 0 meet. Proof. by move=> x; apply/rmeet_idPl. Qed.
+Lemma rmeetx0 : right_zero 0 meet. Proof. by move=> x; apply/rmeet_idPr. Qed.
 
-Canonical meet_muloid := Monoid.MulLaw meet0x meetx0.
+Canonical meet_muloid := Monoid.MulLaw rmeet0x rmeetx0.
 
 End BMeetTheory.
 End BMeetTheory.
@@ -3594,65 +3594,65 @@ Local Notation "x <= y" := (x <=_ord y).
 Local Notation "x `&` y" := (meet x y).
 Local Notation "1" := (top ord).
 
-Lemma meetx1 : right_id 1 meet. Proof. by move=> x; apply/meet_idPl. Qed.
-Lemma meet1x : left_id 1 meet. Proof. by move=> x; apply/meet_idPr. Qed.
+Lemma rmeetx1 : right_id 1 meet. Proof. by move=> x; apply/rmeet_idPl. Qed.
+Lemma rmeet1x : left_id 1 meet. Proof. by move=> x; apply/rmeet_idPr. Qed.
 
-Lemma meet_eq1 x y : (x `&` y == 1) = (x == 1) && (y == 1).
-Proof. by rewrite !(@eq_le _ ord) !lex1 lexI. Qed.
+Lemma rmeet_eq1 x y : (x `&` y == 1) = (x == 1) && (y == 1).
+Proof. by rewrite !(@req_le _ ord) !rlex1 rlexI. Qed.
 
-Canonical meet_monoid := Monoid.Law meetA meet1x meetx1.
-Canonical meet_comoid := Monoid.ComLaw meetC.
+Canonical meet_monoid := Monoid.Law rmeetA rmeet1x rmeetx1.
+Canonical meet_comoid := Monoid.ComLaw rmeetC.
 
-Lemma meets_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
+Lemma rmeets_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> \big[meet/1]_(i <- r | P i) F i <= F x.
-Proof. by move=> xr Px; rewrite (big_rem x) ?Px //= leIl. Qed.
+Proof. by move=> xr Px; rewrite (big_rem x) ?Px //= rleIl. Qed.
 
-Lemma meets_max_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (u : L) :
+Lemma rmeets_max_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (u : L) :
   x \in r -> P x -> F x <= u -> \big[meet/1]_(x <- r | P x) F x <= u.
-Proof. by move=> ? ?; apply/le_trans/meets_inf_seq. Qed.
+Proof. by move=> ? ?; apply/rle_trans/rmeets_inf_seq. Qed.
 
-Lemma meets_inf I (j : I) (P : {pred I}) (F : I -> L) :
+Lemma rmeets_inf I (j : I) (P : {pred I}) (F : I -> L) :
    P j -> \big[meet/1]_(i | P i) F i <= F j.
-Proof. exact: meets_inf_seq. Qed.
+Proof. exact: rmeets_inf_seq. Qed.
 
-Lemma meets_max I (j : I) (u : L) (P : {pred I}) (F : I -> L) :
+Lemma rmeets_max I (j : I) (u : L) (P : {pred I}) (F : I -> L) :
    P j -> F j <= u -> \big[meet/1]_(i | P i) F i <= u.
-Proof. exact: meets_max_seq. Qed.
+Proof. exact: rmeets_max_seq. Qed.
 
-Lemma meets_ge J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
+Lemma rmeets_ge J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
   (forall x : J, P x -> u <= F x) -> u <= \big[meet/1]_(x <- r | P x) F x.
-Proof. by move=> leFm; elim/big_rec: _ => // i x Px xu; rewrite lexI leFm. Qed.
+Proof. by move=> leFm; elim/big_rec: _ => // i x Px xu; rewrite rlexI leFm. Qed.
 
-Lemma meetsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (l : L) :
+Lemma rmeetsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (l : L) :
   reflect (forall x : T, x \in r -> P x -> l <= F x)
           (l <= \big[meet/1]_(x <- r | P x) F x).
 Proof.
 apply: (iffP idP) => leFm => [x xr Px|].
-  exact/(le_trans leFm)/meets_inf_seq.
-by rewrite big_seq_cond meets_ge // => x /andP[/leFm].
+  exact/(rle_trans leFm)/rmeets_inf_seq.
+by rewrite big_seq_cond rmeets_ge // => x /andP[/leFm].
 Qed.
 
-Lemma meetsP I (l : L) (P : {pred I}) (F : I -> L) :
+Lemma rmeetsP I (l : L) (P : {pred I}) (F : I -> L) :
    reflect (forall i : I, P i -> l <= F i) (l <= \big[meet/1]_(i | P i) F i).
-Proof. by apply: (iffP (meetsP_seq _ _ _ _)) => H ? ?; apply: H. Qed.
+Proof. by apply: (iffP (rmeetsP_seq _ _ _ _)) => H ? ?; apply: H. Qed.
 
-Lemma le_meets I (A B : {set I}) (F : I -> L) :
+Lemma rle_meets I (A B : {set I}) (F : I -> L) :
    A \subset B -> \big[meet/1]_(i in B) F i <= \big[meet/1]_(i in A) F i.
-Proof. by move=> /subsetP AB; apply/meetsP => i iA; apply/meets_inf/AB. Qed.
+Proof. by move=> /subsetP AB; apply/rmeetsP => i iA; apply/rmeets_inf/AB. Qed.
 
-Lemma meets_setU I (A B : {set I}) (F : I -> L) :
+Lemma rmeets_setU I (A B : {set I}) (F : I -> L) :
   \big[meet/1]_(i in (A :|: B)) F i =
   \big[meet/1]_(i in A) F i `&` \big[meet/1]_(i in B) F i.
 Proof.
 rewrite -!big_enum; have /= <- := @big_cat _ _ meet_comoid.
-apply/eq_big_idem; first exact: meetxx.
+apply/eq_big_idem; first exact: rmeetxx.
 by move=> ?; rewrite mem_cat !mem_enum inE.
 Qed.
 
-Lemma meets_seq I (r : seq I) (F : I -> L) :
+Lemma rmeets_seq I (r : seq I) (F : I -> L) :
   \big[meet/1]_(i <- r) F i = \big[meet/1]_(i in r) F i.
 Proof.
-by rewrite -big_enum; apply/eq_big_idem => ?; rewrite /= ?meetxx ?mem_enum.
+by rewrite -big_enum; apply/eq_big_idem => ?; rewrite /= ?rmeetxx ?mem_enum.
 Qed.
 
 End TMeetTheory.
@@ -3661,7 +3661,7 @@ End TMeetTheory.
 Module Import JoinTheory.
 Section JoinTheory.
 Context {L : eqType} {ord : {joinOrder L}}.
-Let ord_dual := [meetOrder of dual_rel <=:ord].
+Let ord_dual := [meetOrder of rdual_rel <=:ord].
 Implicit Types (x y : L).
 
 Local Notation join := (join ord).
@@ -3669,70 +3669,70 @@ Local Notation join := (join ord).
 Local Notation "x <= y" := (x <=_ord y).
 Local Notation "x `|` y" := (join x y).
 
-Lemma joinC : commutative join. Proof. exact: (@meetC _ ord_dual). Qed.
-Lemma joinA : associative join. Proof. exact: (@meetA _ ord_dual). Qed.
-Lemma leEjoin x y : (x <= y) = (x `|` y == y).
-Proof. by rewrite joinC; apply: (@leEmeet _ ord_dual). Qed.
+Lemma rjoinC : commutative join. Proof. exact: (@rmeetC _ ord_dual). Qed.
+Lemma rjoinA : associative join. Proof. exact: (@rmeetA _ ord_dual). Qed.
+Lemma rleEjoin x y : (x <= y) = (x `|` y == y).
+Proof. by rewrite rjoinC; apply: (@rleEmeet _ ord_dual). Qed.
 
-Lemma joinxx : idempotent join. Proof. exact: (@meetxx _ ord_dual). Qed.
-Lemma joinAC : right_commutative join. Proof. exact: (@meetAC _ ord_dual). Qed.
-Lemma joinCA : left_commutative join. Proof. exact: (@meetCA _ ord_dual). Qed.
-Lemma joinACA : interchange join join.
-Proof. exact: (@meetACA _ ord_dual). Qed.
+Lemma rjoinxx : idempotent join. Proof. exact: (@rmeetxx _ ord_dual). Qed.
+Lemma rjoinAC : right_commutative join. Proof. exact: (@rmeetAC _ ord_dual). Qed.
+Lemma rjoinCA : left_commutative join. Proof. exact: (@rmeetCA _ ord_dual). Qed.
+Lemma rjoinACA : interchange join join.
+Proof. exact: (@rmeetACA _ ord_dual). Qed.
 
-Lemma joinKU y x : x `|` (x `|` y) = x `|` y.
-Proof. exact: (@meetKI _ ord_dual). Qed.
-Lemma joinUK y x : (x `|` y) `|` y = x `|` y.
-Proof. exact: (@meetIK _ ord_dual). Qed.
-Lemma joinKUC y x : x `|` (y `|` x) = x `|` y.
-Proof. exact: (@meetKIC _ ord_dual). Qed.
-Lemma joinUKC y x : y `|` x `|` y = x `|` y.
-Proof. exact: (@meetIKC _ ord_dual). Qed.
+Lemma rjoinKU y x : x `|` (x `|` y) = x `|` y.
+Proof. exact: (@rmeetKI _ ord_dual). Qed.
+Lemma rjoinUK y x : (x `|` y) `|` y = x `|` y.
+Proof. exact: (@rmeetIK _ ord_dual). Qed.
+Lemma rjoinKUC y x : x `|` (y `|` x) = x `|` y.
+Proof. exact: (@rmeetKIC _ ord_dual). Qed.
+Lemma rjoinUKC y x : y `|` x `|` y = x `|` y.
+Proof. exact: (@rmeetIKC _ ord_dual). Qed.
 
 (* interaction with order *)
-Lemma leUx x y z : (x `|` y <= z) = (x <= z) && (y <= z).
-Proof. exact: (@lexI _ ord_dual). Qed.
-Lemma lexUl x y z : x <= y -> x <= y `|` z.
-Proof. exact: (@leIxl _ ord_dual). Qed.
-Lemma lexUr x y z : x <= z -> x <= y `|` z.
-Proof. exact: (@leIxr _ ord_dual). Qed.
-Lemma lexU2 x y z : (x <= y) || (x <= z) -> x <= y `|` z.
-Proof. exact: (@leIx2 _ ord_dual). Qed.
+Lemma rleUx x y z : (x `|` y <= z) = (x <= z) && (y <= z).
+Proof. exact: (@rlexI _ ord_dual). Qed.
+Lemma rlexUl x y z : x <= y -> x <= y `|` z.
+Proof. exact: (@rleIxl _ ord_dual). Qed.
+Lemma rlexUr x y z : x <= z -> x <= y `|` z.
+Proof. exact: (@rleIxr _ ord_dual). Qed.
+Lemma rlexU2 x y z : (x <= y) || (x <= z) -> x <= y `|` z.
+Proof. exact: (@rleIx2 _ ord_dual). Qed.
 
-Lemma leUr x y : x <= y `|` x. Proof. exact: (@leIr _ ord_dual). Qed.
-Lemma leUl x y : x <= x `|` y. Proof. exact: (@leIl _ ord_dual). Qed.
+Lemma rleUr x y : x <= y `|` x. Proof. exact: (@rleIr _ ord_dual). Qed.
+Lemma rleUl x y : x <= x `|` y. Proof. exact: (@rleIl _ ord_dual). Qed.
 
-Lemma join_idPl {x y} : reflect (y `|` x = y) (x <= y).
-Proof. exact: (@meet_idPl _ ord_dual). Qed.
-Lemma join_idPr {x y} : reflect (x `|` y = y) (x <= y).
-Proof. exact: (@meet_idPr _ ord_dual). Qed.
+Lemma rjoin_idPl {x y} : reflect (y `|` x = y) (x <= y).
+Proof. exact: (@rmeet_idPl _ ord_dual). Qed.
+Lemma rjoin_idPr {x y} : reflect (x `|` y = y) (x <= y).
+Proof. exact: (@rmeet_idPr _ ord_dual). Qed.
 
-Lemma join_l x y : y <= x -> x `|` y = x. Proof. exact/join_idPl. Qed.
-Lemma join_r x y : x <= y -> x `|` y = y. Proof. exact/join_idPr. Qed.
+Lemma rjoin_l x y : y <= x -> x `|` y = x. Proof. exact/rjoin_idPl. Qed.
+Lemma rjoin_r x y : x <= y -> x `|` y = y. Proof. exact/rjoin_idPr. Qed.
 
-Lemma leUidl x y : (x `|` y <= y) = (x <= y).
-Proof. exact: (@leIidr _ ord_dual). Qed.
-Lemma leUidr x y : (y `|` x <= y) = (x <= y).
-Proof. exact: (@leIidl _ ord_dual). Qed.
+Lemma rleUidl x y : (x `|` y <= y) = (x <= y).
+Proof. exact: (@rleIidr _ ord_dual). Qed.
+Lemma rleUidr x y : (y `|` x <= y) = (x <= y).
+Proof. exact: (@rleIidl _ ord_dual). Qed.
 
-Lemma eq_joinl x y : (x `|` y == x) = (y <= x).
-Proof. exact: (@eq_meetl _ ord_dual). Qed.
-Lemma eq_joinr x y : (x `|` y == y) = (x <= y).
-Proof. exact: (@eq_meetr _ ord_dual). Qed.
+Lemma req_joinl x y : (x `|` y == x) = (y <= x).
+Proof. exact: (@req_meetl _ ord_dual). Qed.
+Lemma req_joinr x y : (x `|` y == y) = (x <= y).
+Proof. exact: (@req_meetr _ ord_dual). Qed.
 
-Lemma leU2 x y z t : x <= z -> y <= t -> x `|` y <= z `|` t.
-Proof. exact: (@leI2 _ ord_dual). Qed.
+Lemma rleU2 x y z t : x <= z -> y <= t -> x `|` y <= z `|` t.
+Proof. exact: (@rleI2 _ ord_dual). Qed.
 
 End JoinTheory.
 End JoinTheory.
 
-Arguments join_idPl {L ord x y}.
-Arguments join_idPr {L ord x y}.
+Arguments rjoin_idPl {L ord x y}.
+Arguments rjoin_idPr {L ord x y}.
 
 Module Import BJoinTheory.
 Section BJoinTheory.
 Context {L : eqType} {ord : {bJoinOrder L}}.
-Let ord_dual := [tMeetOrder of dual_rel <=:ord].
+Let ord_dual := [tMeetOrder of rdual_rel <=:ord].
 Implicit Types (I : finType) (T : eqType) (x y : L).
 
 Local Notation join := (join ord).
@@ -3741,56 +3741,56 @@ Local Notation "x <= y" := (x <=_ord y).
 Local Notation "x `|` y" := (join x y).
 Local Notation "0" := (bottom ord).
 
-Lemma joinx0 : right_id 0 join. Proof. exact: (@meetx1 _ ord_dual). Qed.
-Lemma join0x : left_id 0 join. Proof. exact: (@meet1x _ ord_dual). Qed.
+Lemma rjoinx0 : right_id 0 join. Proof. exact: (@rmeetx1 _ ord_dual). Qed.
+Lemma rjoin0x : left_id 0 join. Proof. exact: (@rmeet1x _ ord_dual). Qed.
 
-Lemma join_eq0 x y : (x `|` y == 0) = (x == 0) && (y == 0).
-Proof. exact: (@meet_eq1 _ ord_dual). Qed.
+Lemma rjoin_eq0 x y : (x `|` y == 0) = (x == 0) && (y == 0).
+Proof. exact: (@rmeet_eq1 _ ord_dual). Qed.
 
-Canonical join_monoid := Monoid.Law joinA join0x joinx0.
-Canonical join_comoid := Monoid.ComLaw joinC.
+Canonical join_monoid := Monoid.Law rjoinA rjoin0x rjoinx0.
+Canonical join_comoid := Monoid.ComLaw rjoinC.
 
-Lemma joins_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
+Lemma rjoins_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> F x <= \big[join/0]_(i <- r | P i) F i.
-Proof. exact: (@meets_inf_seq _ ord_dual). Qed.
+Proof. exact: (@rmeets_inf_seq _ ord_dual). Qed.
 
-Lemma joins_min_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (l : L) :
+Lemma rjoins_min_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (l : L) :
   x \in r -> P x -> l <= F x -> l <= \big[join/0]_(x <- r | P x) F x.
-Proof. exact: (@meets_max_seq _ ord_dual). Qed.
+Proof. exact: (@rmeets_max_seq _ ord_dual). Qed.
 
-Lemma joins_sup I (j : I) (P : {pred I}) (F : I -> L) :
+Lemma rjoins_sup I (j : I) (P : {pred I}) (F : I -> L) :
   P j -> F j <= \big[join/0]_(i | P i) F i.
-Proof. exact: (@meets_inf _ ord_dual). Qed.
+Proof. exact: (@rmeets_inf _ ord_dual). Qed.
 
-Lemma joins_min I (j : I) (l : L) (P : {pred I}) (F : I -> L) :
+Lemma rjoins_min I (j : I) (l : L) (P : {pred I}) (F : I -> L) :
   P j -> l <= F j -> l <= \big[join/0]_(i | P i) F i.
-Proof. exact: (@meets_max _ ord_dual). Qed.
+Proof. exact: (@rmeets_max _ ord_dual). Qed.
 
-Lemma joins_le J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
+Lemma rjoins_le J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
   (forall x : J, P x -> F x <= u) -> \big[join/0]_(x <- r | P x) F x <= u.
-Proof. exact: (@meets_ge _ ord_dual). Qed.
+Proof. exact: (@rmeets_ge _ ord_dual). Qed.
 
-Lemma joinsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (u : L) :
+Lemma rjoinsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (u : L) :
   reflect (forall x : T, x \in r -> P x -> F x <= u)
           (\big[join/0]_(x <- r | P x) F x <= u).
-Proof. exact: (@meetsP_seq _ ord_dual). Qed.
+Proof. exact: (@rmeetsP_seq _ ord_dual). Qed.
 
-Lemma joinsP I (u : L) (P : {pred I}) (F : I -> L) :
+Lemma rjoinsP I (u : L) (P : {pred I}) (F : I -> L) :
   reflect (forall i : I, P i -> F i <= u) (\big[join/0]_(i | P i) F i <= u).
-Proof. exact: (@meetsP _ ord_dual). Qed.
+Proof. exact: (@rmeetsP _ ord_dual). Qed.
 
-Lemma le_joins I (A B : {set I}) (F : I -> L) :
+Lemma rle_joins I (A B : {set I}) (F : I -> L) :
   A \subset B -> \big[join/0]_(i in A) F i <= \big[join/0]_(i in B) F i.
-Proof. exact: (@le_meets _ ord_dual). Qed.
+Proof. exact: (@rle_meets _ ord_dual). Qed.
 
-Lemma joins_setU I (A B : {set I}) (F : I -> L) :
+Lemma rjoins_setU I (A B : {set I}) (F : I -> L) :
   \big[join/0]_(i in (A :|: B)) F i =
   \big[join/0]_(i in A) F i `|` \big[join/0]_(i in B) F i.
-Proof. exact: (@meets_setU _ ord_dual). Qed.
+Proof. exact: (@rmeets_setU _ ord_dual). Qed.
 
-Lemma joins_seq I (r : seq I) (F : I -> L) :
+Lemma rjoins_seq I (r : seq I) (F : I -> L) :
   \big[join/0]_(i <- r) F i = \big[join/0]_(i in r) F i.
-Proof. exact: (@meets_seq _ ord_dual). Qed.
+Proof. exact: (@rmeets_seq _ ord_dual). Qed.
 
 End BJoinTheory.
 End BJoinTheory.
@@ -3798,15 +3798,15 @@ End BJoinTheory.
 Module Import TJoinTheory.
 Section TJoinTheory.
 Context {L : eqType} {ord : {tJoinOrder L}}.
-Let ord_dual := [bMeetOrder of dual_rel <=:ord].
+Let ord_dual := [bMeetOrder of rdual_rel <=:ord].
 
 Local Notation join := (join ord).
 Local Notation "1" := (top ord).
 
-Lemma joinx1 : right_zero 1 join. Proof. exact: (@meetx0 _ ord_dual). Qed.
-Lemma join1x : left_zero 1 join. Proof. exact: (@meet0x _ ord_dual). Qed.
+Lemma rjoinx1 : right_zero 1 join. Proof. exact: (@rmeetx0 _ ord_dual). Qed.
+Lemma rjoin1x : left_zero 1 join. Proof. exact: (@rmeet0x _ ord_dual). Qed.
 
-Canonical join_muloid := Monoid.MulLaw join1x joinx1.
+Canonical join_muloid := Monoid.MulLaw rjoin1x rjoinx1.
 
 End TJoinTheory.
 End TJoinTheory.
@@ -3818,66 +3818,66 @@ Implicit Types (x y : L).
 
 Local Notation le := (le ord).
 Local Notation lt := (lt ord).
-Local Notation comparable := (comparable ord).
-Local Notation min := (min ord).
-Local Notation max := (max ord).
+Local Notation rcomparable := (rcomparable ord).
+Local Notation rmin := (rmin ord).
+Local Notation rmax := (rmax ord).
 Local Notation meet := (meet ord).
 Local Notation join := (join ord).
 Local Notation lel_xor_gt := (lel_xor_gt le lt).
 Local Notation ltl_xor_ge := (ltl_xor_ge le lt).
 Local Notation comparel := (comparel lt).
-Local Notation incomparel := (incomparel lt comparable meet join).
+Local Notation incomparel := (incomparel lt rcomparable meet join).
 
 Local Notation "x <= y" := (x <=_ord y).
 Local Notation "x < y" := (x <_ord y).
 Local Notation "x >= y" := (x >=_ord y) (only parsing).
 Local Notation "x > y" := (x >_ord y) (only parsing).
-Local Notation "x >=< y" := (comparable x y).
+Local Notation "x >=< y" := (rcomparable x y).
 Local Notation "x `&` y" := (meet x y).
 Local Notation "x `|` y" := (join x y).
 
-Lemma meetUK x y : (x `&` y) `|` y = y.
-Proof. by apply/eqP; rewrite eq_joinr -eq_meetl meetIK. Qed.
+Lemma rmeetUK x y : (x `&` y) `|` y = y.
+Proof. by apply/eqP; rewrite req_joinr -req_meetl rmeetIK. Qed.
 
-Lemma meetUKC x y : (y `&` x) `|` y = y. Proof. by rewrite meetC meetUK. Qed.
-Lemma meetKUC y x : x `|` (y `&` x) = x. Proof. by rewrite joinC meetUK. Qed.
-Lemma meetKU y x : x `|` (x `&` y) = x. Proof. by rewrite meetC meetKUC. Qed.
+Lemma rmeetUKC x y : (y `&` x) `|` y = y. Proof. by rewrite rmeetC rmeetUK. Qed.
+Lemma rmeetKUC y x : x `|` (y `&` x) = x. Proof. by rewrite rjoinC rmeetUK. Qed.
+Lemma rmeetKU y x : x `|` (x `&` y) = x. Proof. by rewrite rmeetC rmeetKUC. Qed.
 
-Lemma joinIK x y : (x `|` y) `&` y = y.
-Proof. by apply/eqP; rewrite eq_meetr -eq_joinl joinUK. Qed.
+Lemma rjoinIK x y : (x `|` y) `&` y = y.
+Proof. by apply/eqP; rewrite req_meetr -req_joinl rjoinUK. Qed.
 
-Lemma joinIKC x y : (y `|` x) `&` y = y. Proof. by rewrite joinC joinIK. Qed.
-Lemma joinKIC y x : x `&` (y `|` x) = x. Proof. by rewrite meetC joinIK. Qed.
-Lemma joinKI y x : x `&` (x `|` y) = x. Proof. by rewrite joinC joinKIC. Qed.
+Lemma rjoinIKC x y : (y `|` x) `&` y = y. Proof. by rewrite rjoinC rjoinIK. Qed.
+Lemma rjoinKIC y x : x `&` (y `|` x) = x. Proof. by rewrite rmeetC rjoinIK. Qed.
+Lemma rjoinKI y x : x `&` (x `|` y) = x. Proof. by rewrite rjoinC rjoinKIC. Qed.
 
 (* comparison predicates *)
 
-Lemma lcomparableP x y : incomparel x y
-  (min y x) (min x y) (max y x) (max x y)
+Lemma rlcomparableP x y : incomparel x y
+  (rmin y x) (rmin x y) (rmax y x) (rmax x y)
   (y `&` x) (x `&` y) (y `|` x) (x `|` y)
   (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y) (y >=< x) (x >=< y).
 Proof.
-by case: (comparableP x) => [hxy|hxy|hxy|->]; do 1?have hxy' := ltW hxy;
-   rewrite ?(meetxx, joinxx);
-   rewrite ?(meet_l hxy', meet_r hxy', join_l hxy', join_r hxy');
+by case: (rcomparableP x) => [hxy|hxy|hxy|->]; do 1?have hxy' := rltW hxy;
+   rewrite ?(rmeetxx, rjoinxx);
+   rewrite ?(rmeet_l hxy', rmeet_r hxy', rjoin_l hxy', rjoin_r hxy');
    constructor.
 Qed.
 
-Lemma lcomparable_ltgtP x y : x >=< y ->
-  comparel x y (min y x) (min x y) (max y x) (max x y)
+Lemma rlcomparable_ltgtP x y : x >=< y ->
+  comparel x y (rmin y x) (rmin x y) (rmax y x) (rmax x y)
                (y `&` x) (x `&` y) (y `|` x) (x `|` y)
                (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
-Proof. by case: (lcomparableP x) => // *; constructor. Qed.
+Proof. by case: (rlcomparableP x) => // *; constructor. Qed.
 
-Lemma lcomparable_leP x y : x >=< y ->
-  lel_xor_gt x y (min y x) (min x y) (max y x) (max x y)
+Lemma rlcomparable_leP x y : x >=< y ->
+  lel_xor_gt x y (rmin y x) (rmin x y) (rmax y x) (rmax x y)
                  (y `&` x) (x `&` y) (y `|` x) (x `|` y) (x <= y) (y < x).
-Proof. by case/lcomparable_ltgtP => [/ltW xy|xy|->]; constructor. Qed.
+Proof. by case/rlcomparable_ltgtP => [/rltW xy|xy|->]; constructor. Qed.
 
-Lemma lcomparable_ltP x y : x >=< y ->
-  ltl_xor_ge x y (min y x) (min x y) (max y x) (max x y)
+Lemma rlcomparable_ltP x y : x >=< y ->
+  ltl_xor_ge x y (rmin y x) (rmin x y) (rmax y x) (rmax x y)
                  (y `&` x) (x `&` y) (y `|` x) (x `|` y) (y <= x) (x < y).
-Proof. by case/lcomparable_ltgtP => [xy|/ltW xy|->]; constructor. Qed.
+Proof. by case/rlcomparable_ltgtP => [xy|/rltW xy|->]; constructor. Qed.
 
 End LatticeTheory.
 End LatticeTheory.
@@ -3893,17 +3893,17 @@ Local Notation join := (join ord).
 Local Notation "x `&` y" := (meet x y).
 Local Notation "x `|` y" := (join x y).
 
-Lemma meetUl : left_distributive meet join.
+Lemma rmeetUl : left_distributive meet join.
 Proof. by case: ord => ? ? ? ? [? []]. Qed.
 
-Lemma joinIl : left_distributive join meet.
+Lemma rjoinIl : left_distributive join meet.
 Proof. by case: ord => ? ? ? ? [? []]. Qed.
 
-Lemma meetUr : right_distributive meet join.
-Proof. by move=> x y z; rewrite ![x `&` _]meetC meetUl. Qed.
+Lemma rmeetUr : right_distributive meet join.
+Proof. by move=> x y z; rewrite ![x `&` _]rmeetC rmeetUl. Qed.
 
-Lemma joinIr : right_distributive join meet.
-Proof. by move=> x y z; rewrite ![x `|` _]joinC joinIl. Qed.
+Lemma rjoinIr : right_distributive join meet.
+Proof. by move=> x y z; rewrite ![x `|` _]rjoinC rjoinIl. Qed.
 
 End DistrLatticeTheory.
 End DistrLatticeTheory.
@@ -3922,41 +3922,41 @@ Local Notation "x `|` y" := (join x y).
 Local Notation "0" := (bottom ord).
 (* Distributive lattice theory with 0 *)
 
-Canonical join_addoid := Monoid.AddLaw (@meetUl _ ord) (@meetUr _ _).
+Canonical join_addoid := Monoid.AddLaw (@rmeetUl _ ord) (@rmeetUr _ _).
 
-Lemma leU2l_le y t x z : x `&` t = 0 -> x `|` y <= z `|` t -> x <= z.
+Lemma rleU2l_le y t x z : x `&` t = 0 -> x `|` y <= z `|` t -> x <= z.
 Proof.
-by move=> xIt0 /(leI2 (lexx x)); rewrite joinKI meetUr xIt0 joinx0 leIidl.
+by move=> xIt0 /(rleI2 (rlexx x)); rewrite rjoinKI rmeetUr xIt0 rjoinx0 rleIidl.
 Qed.
 
-Lemma leU2r_le y t x z : x `&` t = 0 -> y `|` x <= t `|` z -> x <= z.
-Proof. by rewrite joinC [_ `|` z]joinC => /leU2l_le H /H. Qed.
+Lemma rleU2r_le y t x z : x `&` t = 0 -> y `|` x <= t `|` z -> x <= z.
+Proof. by rewrite rjoinC [_ `|` z]rjoinC => /rleU2l_le H /H. Qed.
 
-Lemma disjoint_lexUl z x y : x `&` z = 0 -> (x <= y `|` z) = (x <= y).
+Lemma rdisjoint_lexUl z x y : x `&` z = 0 -> (x <= y `|` z) = (x <= y).
 Proof.
-move=> xz0; apply/idP/idP=> xy; last by rewrite lexU2 ?xy.
-by apply: (@leU2l_le x z); rewrite ?joinxx.
+move=> xz0; apply/idP/idP=> xy; last by rewrite rlexU2 ?xy.
+by apply: (@rleU2l_le x z); rewrite ?rjoinxx.
 Qed.
 
-Lemma disjoint_lexUr z x y : x `&` z = 0 -> (x <= z `|` y) = (x <= y).
-Proof. by move=> xz0; rewrite joinC; rewrite disjoint_lexUl. Qed.
+Lemma rdisjoint_lexUr z x y : x `&` z = 0 -> (x <= z `|` y) = (x <= y).
+Proof. by move=> xz0; rewrite rjoinC; rewrite rdisjoint_lexUl. Qed.
 
-Lemma leU2E x y z t : x `&` t = 0 -> y `&` z = 0 ->
+Lemma rleU2E x y z t : x `&` t = 0 -> y `&` z = 0 ->
   (x `|` y <= z `|` t) = (x <= z) && (y <= t).
 Proof.
-move=> dxt dyz; apply/idP/andP; last by case=> ? ?; exact: leU2.
-by move=> lexyzt; rewrite (leU2l_le _ lexyzt) // (leU2r_le _ lexyzt).
+move=> dxt dyz; apply/idP/andP; last by case=> ? ?; exact: rleU2.
+by move=> lexyzt; rewrite (rleU2l_le _ lexyzt) // (rleU2r_le _ lexyzt).
 Qed.
 
-Lemma joins_disjoint I (d : L) (P : {pred I}) (F : I -> L) :
+Lemma rjoins_disjoint I (d : L) (P : {pred I}) (F : I -> L) :
    (forall i : I, P i -> d `&` F i = 0) -> d `&` \big[join/0]_(i | P i) F i = 0.
 Proof.
 move=> d_Fi_disj; have : \big[andb/true]_(i | P i) (d `&` F i == 0).
   rewrite big_all_cond; apply/allP => i _ /=.
   by apply/implyP => /d_Fi_disj ->.
-elim/big_rec2: _ => [|i y]; first by rewrite meetx0.
+elim/big_rec2: _ => [|i y]; first by rewrite rmeetx0.
 case; rewrite (andbF, andbT) // => Pi /(_ isT) dy /eqP dFi.
-by rewrite meetUr dy dFi joinxx.
+by rewrite rmeetUr dy dFi rjoinxx.
 Qed.
 
 End BDistrLatticeTheory.
@@ -3965,7 +3965,7 @@ End BDistrLatticeTheory.
 Module Import TDistrLatticeTheory.
 Section TDistrLatticeTheory.
 Context {L : eqType} {ord : {tDistrLattice L}}.
-Let ord_dual := [bDistrLattice of dual_rel <=:ord].
+Let ord_dual := [bDistrLattice of rdual_rel <=:ord].
 Implicit Types (I : finType) (T : eqType) (x y z : L).
 
 Local Notation meet := (meet ord).
@@ -3977,27 +3977,27 @@ Local Notation "x `|` y" := (join x y).
 Local Notation "1" := (top ord).
 (* Distributive lattice theory with 1 *)
 
-Canonical meet_addoid := Monoid.AddLaw (@joinIl _ ord) (@joinIr _ _).
+Canonical meet_addoid := Monoid.AddLaw (@rjoinIl _ ord) (@rjoinIr _ _).
 
-Lemma leI2l_le y t x z : y `|` z = 1 -> x `&` y <= z `&` t -> x <= z.
-Proof. rewrite joinC; exact: (@leU2l_le _ ord_dual). Qed.
+Lemma rleI2l_le y t x z : y `|` z = 1 -> x `&` y <= z `&` t -> x <= z.
+Proof. rewrite rjoinC; exact: (@rleU2l_le _ ord_dual). Qed.
 
-Lemma leI2r_le y t x z : y `|` z = 1 -> y `&` x <= t `&` z -> x <= z.
-Proof. rewrite joinC; exact: (@leU2r_le _ ord_dual). Qed.
+Lemma rleI2r_le y t x z : y `|` z = 1 -> y `&` x <= t `&` z -> x <= z.
+Proof. rewrite rjoinC; exact: (@rleU2r_le _ ord_dual). Qed.
 
-Lemma cover_leIxl z x y : z `|` y = 1 -> (x `&` z <= y) = (x <= y).
-Proof. rewrite joinC; exact: (@disjoint_lexUl _ ord_dual). Qed.
+Lemma rcover_leIxl z x y : z `|` y = 1 -> (x `&` z <= y) = (x <= y).
+Proof. rewrite rjoinC; exact: (@rdisjoint_lexUl _ ord_dual). Qed.
 
-Lemma cover_leIxr z x y : z `|` y = 1 -> (z `&` x <= y) = (x <= y).
-Proof. rewrite joinC; exact: (@disjoint_lexUr _ ord_dual). Qed.
+Lemma rcover_leIxr z x y : z `|` y = 1 -> (z `&` x <= y) = (x <= y).
+Proof. rewrite rjoinC; exact: (@rdisjoint_lexUr _ ord_dual). Qed.
 
-Lemma leI2E x y z t : x `|` t = 1 -> y `|` z = 1 ->
+Lemma rleI2E x y z t : x `|` t = 1 -> y `|` z = 1 ->
   (x `&` y <= z `&` t) = (x <= z) && (y <= t).
-Proof. by move=> ? ?; apply: (@leU2E _ ord_dual); rewrite meetC. Qed.
+Proof. by move=> ? ?; apply: (@rleU2E _ ord_dual); rewrite rmeetC. Qed.
 
-Lemma meets_total I (d : L) (P : {pred I}) (F : I -> L) :
+Lemma rmeets_total I (d : L) (P : {pred I}) (F : I -> L) :
    (forall i : I, P i -> d `|` F i = 1) -> d `|` \big[meet/1]_(i | P i) F i = 1.
-Proof. exact: (@joins_disjoint _ ord_dual). Qed.
+Proof. exact: (@rjoins_disjoint _ ord_dual). Qed.
 
 End TDistrLatticeTheory.
 End TDistrLatticeTheory.
@@ -4009,289 +4009,289 @@ Implicit Types (x y z t : T) (s : seq T).
 
 Local Notation le := (le ord).
 Local Notation lt := (lt ord).
-Local Notation ge := (ge ord).
-Local Notation min := (min ord).
-Local Notation max := (max ord).
-Local Notation arg_min := (arg_min ord).
-Local Notation arg_max := (arg_max ord).
+Local Notation rge := (rge ord).
+Local Notation rmin := (rmin ord).
+Local Notation rmax := (rmax ord).
+Local Notation rarg_min := (rarg_min ord).
+Local Notation rarg_max := (rarg_max ord).
 
 Local Notation "x <= y" := (x <=_ord y).
 Local Notation "x < y" := (x <_ord y).
 Local Notation "x >= y" := (x >=_ord y) (only parsing).
 Local Notation "x > y" := (x >_ord y) (only parsing).
-Local Notation "x >=< y" := (comparable ord x y).
-Local Notation "x < y ?<= 'if' C" := (lteif ord x y C).
+Local Notation "x >=< y" := (rcomparable ord x y).
+Local Notation "x < y ?<= 'if' C" := (rlteif ord x y C).
 Local Notation "x `&` y" := (meet ord x y).
 Local Notation "x `|` y" := (join ord x y).
 
 Lemma le_total : total le. Proof. by case: ord => ? ? ? ? []. Qed.
 Hint Resolve le_total : core.
 
-Lemma ge_total : total ge. Proof. by move=> ? ?; apply: le_total. Qed.
-Hint Resolve ge_total : core.
+Lemma rge_total : total rge. Proof. by move=> ? ?; apply: le_total. Qed.
+Hint Resolve rge_total : core.
 
-Lemma comparableT x y : x >=< y. Proof. exact: le_total. Qed.
-Hint Resolve comparableT : core.
+Lemma rcomparableT x y : x >=< y. Proof. exact: le_total. Qed.
+Hint Resolve rcomparableT : core.
 
-Lemma leNgt x y : (x <= y) = ~~ (y < x). Proof. exact: comparable_leNgt. Qed.
+Lemma rleNgt x y : (x <= y) = ~~ (y < x). Proof. exact: rcomparable_leNgt. Qed.
 
-Lemma ltNge x y : (x < y) = ~~ (y <= x). Proof. exact: comparable_ltNge. Qed.
+Lemma rltNge x y : (x < y) = ~~ (y <= x). Proof. exact: rcomparable_ltNge. Qed.
 
-Definition ltgtP x y := LatticeTheory.lcomparable_ltgtP (comparableT x y).
-Definition leP x y := LatticeTheory.lcomparable_leP (comparableT x y).
-Definition ltP x y := LatticeTheory.lcomparable_ltP (comparableT x y).
+Definition rltgtP x y := LatticeTheory.rlcomparable_ltgtP (rcomparableT x y).
+Definition rleP x y := LatticeTheory.rlcomparable_leP (rcomparableT x y).
+Definition rltP x y := LatticeTheory.rlcomparable_ltP (rcomparableT x y).
 
-Lemma wlog_le P :
+Lemma rwlog_le P :
      (forall x y, P y x -> P x y) -> (forall x y, x <= y -> P x y) ->
    forall x y, P x y.
-Proof. by move=> sP hP x y; case: (leP x y) => [| /ltW] /hP // /sP. Qed.
+Proof. by move=> sP hP x y; case: (rleP x y) => [| /rltW] /hP // /sP. Qed.
 
-Lemma wlog_lt P :
+Lemma rwlog_lt P :
     (forall x, P x x) ->
     (forall x y, (P y x -> P x y)) -> (forall x y, x < y -> P x y) ->
   forall x y, P x y.
-Proof. by move=> rP sP hP x y; case: (ltgtP x y) => [||->] // /hP // /sP. Qed.
+Proof. by move=> rP sP hP x y; case: (rltgtP x y) => [||->] // /hP // /sP. Qed.
 
-Lemma neq_lt x y : (x != y) = (x < y) || (y < x). Proof. by case: ltgtP. Qed.
+Lemma rneq_lt x y : (x != y) = (x < y) || (y < x). Proof. by case: rltgtP. Qed.
 
-Lemma lt_total x y : x != y -> (x < y) || (y < x). Proof. by case: ltgtP. Qed.
+Lemma rlt_total x y : x != y -> (x < y) || (y < x). Proof. by case: rltgtP. Qed.
 
-Lemma eq_leLR x y z t :
+Lemma req_leLR x y z t :
   (x <= y -> z <= t) -> (y < x -> t < z) -> (x <= y) = (z <= t).
-Proof. by rewrite !ltNge => ? /contraTT ?; apply/idP/idP. Qed.
+Proof. by rewrite !rltNge => ? /contraTT ?; apply/idP/idP. Qed.
 
-Lemma eq_leRL x y z t :
+Lemma req_leRL x y z t :
   (x <= y -> z <= t) -> (y < x -> t < z) -> (z <= t) = (x <= y).
-Proof. by move=> *; symmetry; apply: eq_leLR. Qed.
+Proof. by move=> *; symmetry; apply: req_leLR. Qed.
 
-Lemma eq_ltLR x y z t :
+Lemma req_ltLR x y z t :
   (x < y -> z < t) -> (y <= x -> t <= z) -> (x < y) = (z < t).
-Proof. by rewrite !leNgt => ? /contraTT ?; apply/idP/idP. Qed.
+Proof. by rewrite !rleNgt => ? /contraTT ?; apply/idP/idP. Qed.
 
-Lemma eq_ltRL x y z t :
+Lemma req_ltRL x y z t :
   (x < y -> z < t) -> (y <= x -> t <= z) -> (z < t) = (x < y).
-Proof. by move=> *; symmetry; apply: eq_ltLR. Qed.
+Proof. by move=> *; symmetry; apply: req_ltLR. Qed.
 
-Lemma sort_le_sorted s : sorted le (sort le s).
+Lemma rsort_le_sorted s : sorted le (sort le s).
 Proof. exact: sort_sorted. Qed.
-Hint Resolve sort_le_sorted : core.
+Hint Resolve rsort_le_sorted : core.
 
-Lemma sort_lt_sorted s : sorted lt (sort le s) = uniq s.
-Proof. by rewrite lt_sorted_uniq_le sort_uniq sort_le_sorted andbT. Qed.
+Lemma rsort_lt_sorted s : sorted lt (sort le s) = uniq s.
+Proof. by rewrite rlt_sorted_uniq_le sort_uniq rsort_le_sorted andbT. Qed.
 
-Lemma count_le_gt x s :
+Lemma rcount_le_gt x s :
   count (fun y => y <= x) s = size s - count (fun y => y > x) s.
 Proof.
 rewrite -(count_predC (fun y => y > x)) addKn.
-by apply: eq_count => y; rewrite /= leNgt.
+by apply: eq_count => y; rewrite /= rleNgt.
 Qed.
 
-Lemma count_lt_ge x s :
+Lemma rcount_lt_ge x s :
   count (fun y => y < x) s = size s - count (fun y => y >= x) s.
 Proof.
 rewrite -(count_predC (fun y => y >= x)) addKn.
-by apply: eq_count => y; rewrite /= ltNge.
+by apply: eq_count => y; rewrite /= rltNge.
 Qed.
 
-Lemma sorted_filter_gt x s :
+Lemma rsorted_filter_gt x s :
   sorted <=:ord s -> [seq y <- s | x < y] = drop (count (le^~ x) s) s.
 Proof.
-move=> s_sorted; rewrite count_le_gt -[LHS]revK -filter_rev.
-rewrite (@sorted_filter_lt _ [totalOrder of dual_rel <=:ord]).
+move=> s_sorted; rewrite rcount_le_gt -[LHS]revK -filter_rev.
+rewrite (@rsorted_filter_lt _ [totalOrder of rdual_rel <=:ord]).
   by rewrite take_rev revK count_rev.
 by rewrite rev_sorted.
 Qed.
 
-Lemma sorted_filter_ge x s :
+Lemma rsorted_filter_ge x s :
   sorted <=:ord s -> [seq y <- s | x <= y] = drop (count (lt^~ x) s) s.
 Proof.
-move=> s_sorted; rewrite count_lt_ge -[LHS]revK -filter_rev.
-rewrite (@sorted_filter_le _ [totalOrder of dual_rel <=:ord]).
+move=> s_sorted; rewrite rcount_lt_ge -[LHS]revK -filter_rev.
+rewrite (@rsorted_filter_le _ [totalOrder of rdual_rel <=:ord]).
   by rewrite take_rev revK count_rev.
 by rewrite rev_sorted.
 Qed.
 
-Lemma nth_count_ge x x0 s i : sorted <=:ord s ->
+Lemma rnth_count_ge x x0 s i : sorted <=:ord s ->
   (count (lt^~ x) s <= i < size s)%N -> x <= nth x0 s i.
 Proof.
-move=> ss /andP[ige ilt]; rewrite -(subnKC ige) -nth_drop -sorted_filter_ge //.
+move=> ss /andP[ige ilt]; rewrite -(subnKC ige) -nth_drop -rsorted_filter_ge //.
 apply/(all_nthP _ (filter_all _ _)).
-by rewrite size_filter ltn_subLR // count_lt_ge subnK // count_size.
+by rewrite size_filter ltn_subLR // rcount_lt_ge subnK // count_size.
 Qed.
 
-Lemma nth_count_gt x x0 s i : sorted <=:ord s ->
+Lemma rnth_count_gt x x0 s i : sorted <=:ord s ->
   (count (le^~ x) s <= i < size s)%N -> x < nth x0 s i.
 Proof.
-move=> ss /andP[ige ilt]; rewrite -(subnKC ige) -nth_drop -sorted_filter_gt //.
+move=> ss /andP[ige ilt]; rewrite -(subnKC ige) -nth_drop -rsorted_filter_gt //.
 apply/(all_nthP _ (filter_all _ _)).
-by rewrite size_filter ltn_subLR // count_le_gt subnK // count_size.
+by rewrite size_filter ltn_subLR // rcount_le_gt subnK // count_size.
 Qed.
 
-Lemma nth_count_eq x x0 s i : sorted <=:ord s ->
+Lemma rnth_count_eq x x0 s i : sorted <=:ord s ->
   (count (lt^~ x) s <= i < count (le^~ x) s)%N -> nth x0 s i = x.
 Proof.
-move=> ss /andP[ige ilt]; apply/(@le_anti _ ord).
-by rewrite nth_count_le// nth_count_ge// ige (leq_trans ilt (count_size _ _)).
+move=> ss /andP[ige ilt]; apply/(@rle_anti _ ord).
+by rewrite rnth_count_le// rnth_count_ge// ige (leq_trans ilt (count_size _ _)).
 Qed.
 
-(* max and min is join and meet *)
+(* rmax and rmin is join and meet *)
 
-Lemma meetEtotal x y : x `&` y = min x y. Proof. by case: leP. Qed.
-Lemma joinEtotal x y : x `|` y = max x y. Proof. by case: leP. Qed.
+Lemma rmeetEtotal x y : x `&` y = rmin x y. Proof. by case: rleP. Qed.
+Lemma rjoinEtotal x y : x `|` y = rmax x y. Proof. by case: rleP. Qed.
 
-(* max and min theory *)
+(* rmax and rmin theory *)
 
-Lemma minEgt x y : min x y = if x > y then y else x. Proof. by case: ltP. Qed.
-Lemma maxEgt x y : max x y = if x > y then x else y. Proof. by case: ltP. Qed.
-Lemma minEge x y : min x y = if x >= y then y else x. Proof. by case: leP. Qed.
-Lemma maxEge x y : max x y = if x >= y then x else y. Proof. by case: leP. Qed.
+Lemma rminEgt x y : rmin x y = if x > y then y else x. Proof. by case: rltP. Qed.
+Lemma rmaxEgt x y : rmax x y = if x > y then x else y. Proof. by case: rltP. Qed.
+Lemma rminEge x y : rmin x y = if x >= y then y else x. Proof. by case: rleP. Qed.
+Lemma rmaxEge x y : rmax x y = if x >= y then x else y. Proof. by case: rleP. Qed.
 
-Lemma minC : commutative min. Proof. by move=> x y; apply: comparable_minC. Qed.
+Lemma rminC : commutative rmin. Proof. by move=> x y; apply: rcomparable_minC. Qed.
 
-Lemma maxC : commutative max. Proof. by move=> x y; apply: comparable_maxC. Qed.
+Lemma rmaxC : commutative rmax. Proof. by move=> x y; apply: rcomparable_maxC. Qed.
 
-Lemma minA : associative min.
-Proof. by move=> x y z; apply: comparable_minA. Qed.
+Lemma rminA : associative rmin.
+Proof. by move=> x y z; apply: rcomparable_minA. Qed.
 
-Lemma maxA : associative max.
-Proof. by move=> x y z; apply: comparable_maxA. Qed.
+Lemma rmaxA : associative rmax.
+Proof. by move=> x y z; apply: rcomparable_maxA. Qed.
 
-Lemma minAC : right_commutative min.
-Proof. by move=> x y z; apply: comparable_minAC. Qed.
+Lemma rminAC : right_commutative rmin.
+Proof. by move=> x y z; apply: rcomparable_minAC. Qed.
 
-Lemma maxAC : right_commutative max.
-Proof. by move=> x y z; apply: comparable_maxAC. Qed.
+Lemma rmaxAC : right_commutative rmax.
+Proof. by move=> x y z; apply: rcomparable_maxAC. Qed.
 
-Lemma minCA : left_commutative min.
-Proof. by move=> x y z; apply: comparable_minCA. Qed.
+Lemma rminCA : left_commutative rmin.
+Proof. by move=> x y z; apply: rcomparable_minCA. Qed.
 
-Lemma maxCA : left_commutative max.
-Proof. by move=> x y z; apply: comparable_maxCA. Qed.
+Lemma rmaxCA : left_commutative rmax.
+Proof. by move=> x y z; apply: rcomparable_maxCA. Qed.
 
-Lemma minACA : interchange min min.
-Proof. by move=> x y z t; apply: comparable_minACA. Qed.
+Lemma rminACA : interchange rmin rmin.
+Proof. by move=> x y z t; apply: rcomparable_minACA. Qed.
 
-Lemma maxACA : interchange max max.
-Proof. by move=> x y z t; apply: comparable_maxACA. Qed.
+Lemma rmaxACA : interchange rmax rmax.
+Proof. by move=> x y z t; apply: rcomparable_maxACA. Qed.
 
-Lemma eq_minr x y : (min x y == y) = (y <= x).
-Proof. exact: comparable_eq_minr. Qed.
+Lemma req_minr x y : (rmin x y == y) = (y <= x).
+Proof. exact: rcomparable_eq_minr. Qed.
 
-Lemma eq_maxl x y : (max x y == x) = (y <= x).
-Proof. exact: comparable_eq_maxl. Qed.
+Lemma req_maxl x y : (rmax x y == x) = (y <= x).
+Proof. exact: rcomparable_eq_maxl. Qed.
 
-Lemma min_idPr x y : reflect (min x y = y) (y <= x).
-Proof. exact: comparable_min_idPr. Qed.
+Lemma rmin_idPr x y : reflect (rmin x y = y) (y <= x).
+Proof. exact: rcomparable_min_idPr. Qed.
 
-Lemma max_idPl x y : reflect (max x y = x) (y <= x).
-Proof. exact: comparable_max_idPl. Qed.
+Lemma rmax_idPl x y : reflect (rmax x y = x) (y <= x).
+Proof. exact: rcomparable_max_idPl. Qed.
 
-Lemma le_minr z x y : (z <= min x y) = (z <= x) && (z <= y).
-Proof. exact: comparable_le_minr. Qed.
+Lemma rle_minr z x y : (z <= rmin x y) = (z <= x) && (z <= y).
+Proof. exact: rcomparable_le_minr. Qed.
 
-Lemma le_minl z x y : (min x y <= z) = (x <= z) || (y <= z).
-Proof. exact: comparable_le_minl. Qed.
+Lemma rle_minl z x y : (rmin x y <= z) = (x <= z) || (y <= z).
+Proof. exact: rcomparable_le_minl. Qed.
 
-Lemma lt_minr z x y : (z < min x y) = (z < x) && (z < y).
-Proof. exact: comparable_lt_minr. Qed.
+Lemma rlt_minr z x y : (z < rmin x y) = (z < x) && (z < y).
+Proof. exact: rcomparable_lt_minr. Qed.
 
-Lemma lt_minl z x y : (min x y < z) = (x < z) || (y < z).
-Proof. exact: comparable_lt_minl. Qed.
+Lemma rlt_minl z x y : (rmin x y < z) = (x < z) || (y < z).
+Proof. exact: rcomparable_lt_minl. Qed.
 
-Lemma le_maxr z x y : (z <= max x y) = (z <= x) || (z <= y).
-Proof. exact: comparable_le_maxr. Qed.
+Lemma rle_maxr z x y : (z <= rmax x y) = (z <= x) || (z <= y).
+Proof. exact: rcomparable_le_maxr. Qed.
 
-Lemma le_maxl z x y : (max x y <= z) = (x <= z) && (y <= z).
-Proof. exact: comparable_le_maxl. Qed.
+Lemma rle_maxl z x y : (rmax x y <= z) = (x <= z) && (y <= z).
+Proof. exact: rcomparable_le_maxl. Qed.
 
-Lemma lt_maxr z x y : (z < max x y) = (z < x) || (z < y).
-Proof. exact: comparable_lt_maxr. Qed.
+Lemma rlt_maxr z x y : (z < rmax x y) = (z < x) || (z < y).
+Proof. exact: rcomparable_lt_maxr. Qed.
 
-Lemma lt_maxl z x y : (max x y < z) = (x < z) && (y < z).
-Proof. exact: comparable_lt_maxl. Qed.
+Lemma rlt_maxl z x y : (rmax x y < z) = (x < z) && (y < z).
+Proof. exact: rcomparable_lt_maxl. Qed.
 
-Lemma minxK x y : max (min x y) y = y. Proof. exact: comparable_minxK. Qed.
-Lemma minKx x y : max x (min x y) = x. Proof. exact: comparable_minKx. Qed.
-Lemma maxxK x y : min (max x y) y = y. Proof. exact: comparable_maxxK. Qed.
-Lemma maxKx x y : min x (max x y) = x. Proof. exact: comparable_maxKx. Qed.
+Lemma rminxK x y : rmax (rmin x y) y = y. Proof. exact: rcomparable_minxK. Qed.
+Lemma rminKx x y : rmax x (rmin x y) = x. Proof. exact: rcomparable_minKx. Qed.
+Lemma rmaxxK x y : rmin (rmax x y) y = y. Proof. exact: rcomparable_maxxK. Qed.
+Lemma rmaxKx x y : rmin x (rmax x y) = x. Proof. exact: rcomparable_maxKx. Qed.
 
-Lemma max_minl : left_distributive max min.
-Proof. by move=> x y z; apply: comparable_max_minl. Qed.
+Lemma rmax_minl : left_distributive rmax rmin.
+Proof. by move=> x y z; apply: rcomparable_max_minl. Qed.
 
-Lemma min_maxl : left_distributive min max.
-Proof. by move=> x y z; apply: comparable_min_maxl. Qed.
+Lemma rmin_maxl : left_distributive rmin rmax.
+Proof. by move=> x y z; apply: rcomparable_min_maxl. Qed.
 
-Lemma max_minr : right_distributive max min.
-Proof. by move=> x y z; apply: comparable_max_minr. Qed.
+Lemma rmax_minr : right_distributive rmax rmin.
+Proof. by move=> x y z; apply: rcomparable_max_minr. Qed.
 
-Lemma min_maxr : right_distributive min max.
-Proof. by move=> x y z; apply: comparable_min_maxr. Qed.
+Lemma rmin_maxr : right_distributive rmin rmax.
+Proof. by move=> x y z; apply: rcomparable_min_maxr. Qed.
 
-Lemma leIx x y z : (y `&` z <= x) = (y <= x) || (z <= x).
-Proof. by rewrite meetEtotal le_minl. Qed.
+Lemma rleIx x y z : (y `&` z <= x) = (y <= x) || (z <= x).
+Proof. by rewrite rmeetEtotal rle_minl. Qed.
 
-Lemma lexU x y z : (x <= y `|` z) = (x <= y) || (x <= z).
-Proof. by rewrite joinEtotal le_maxr. Qed.
+Lemma rlexU x y z : (x <= y `|` z) = (x <= y) || (x <= z).
+Proof. by rewrite rjoinEtotal rle_maxr. Qed.
 
-Lemma ltxI x y z : (x < y `&` z) = (x < y) && (x < z).
-Proof. by rewrite !ltNge leIx negb_or. Qed.
+Lemma rltxI x y z : (x < y `&` z) = (x < y) && (x < z).
+Proof. by rewrite !rltNge rleIx negb_or. Qed.
 
-Lemma ltIx x y z : (y `&` z < x) = (y < x) || (z < x).
-Proof. by rewrite !ltNge lexI negb_and. Qed.
+Lemma rltIx x y z : (y `&` z < x) = (y < x) || (z < x).
+Proof. by rewrite !rltNge rlexI negb_and. Qed.
 
-Lemma ltxU x y z : (x < y `|` z) = (x < y) || (x < z).
-Proof. by rewrite !ltNge leUx negb_and. Qed.
+Lemma rltxU x y z : (x < y `|` z) = (x < y) || (x < z).
+Proof. by rewrite !rltNge rleUx negb_and. Qed.
 
-Lemma ltUx x y z : (y `|` z < x) = (y < x) && (z < x).
-Proof. by rewrite !ltNge lexU negb_or. Qed.
+Lemma rltUx x y z : (y `|` z < x) = (y < x) && (z < x).
+Proof. by rewrite !rltNge rlexU negb_or. Qed.
 
-Definition ltexI := (@lexI _ ord, ltxI).
-Definition lteIx := (leIx, ltIx).
-Definition ltexU := (lexU, ltxU).
-Definition lteUx := (@leUx _ ord, ltUx).
+Definition rltexI := (@rlexI _ ord, rltxI).
+Definition rlteIx := (rleIx, rltIx).
+Definition rltexU := (rlexU, rltxU).
+Definition rlteUx := (@rleUx _ ord, rltUx).
 
-(* lteif *)
+(* rlteif *)
 
-Lemma lteifNE x y C : x < y ?<= if ~~ C = ~~ (y < x ?<= if C).
-Proof. by case: C => /=; case: leP. Qed.
+Lemma rlteifNE x y C : x < y ?<= if ~~ C = ~~ (y < x ?<= if C).
+Proof. by case: C => /=; case: rleP. Qed.
 
-Lemma lteif_minr z x y C :
-  (z < min x y ?<= if C) = (z < x ?<= if C) && (z < y ?<= if C).
-Proof. by case: C; rewrite /= (le_minr, lt_minr). Qed.
+Lemma rlteif_minr z x y C :
+  (z < rmin x y ?<= if C) = (z < x ?<= if C) && (z < y ?<= if C).
+Proof. by case: C; rewrite /= (rle_minr, rlt_minr). Qed.
 
-Lemma lteif_minl z x y C :
-  (min x y < z ?<= if C) = (x < z ?<= if C) || (y < z ?<= if C).
-Proof. by case: C; rewrite /= (le_minl, lt_minl). Qed.
+Lemma rlteif_minl z x y C :
+  (rmin x y < z ?<= if C) = (x < z ?<= if C) || (y < z ?<= if C).
+Proof. by case: C; rewrite /= (rle_minl, rlt_minl). Qed.
 
-Lemma lteif_maxr z x y C :
-  (z < max x y ?<= if C) = (z < x ?<= if C) || (z < y ?<= if C).
-Proof. by case: C; rewrite /= (le_maxr, lt_maxr). Qed.
+Lemma rlteif_maxr z x y C :
+  (z < rmax x y ?<= if C) = (z < x ?<= if C) || (z < y ?<= if C).
+Proof. by case: C; rewrite /= (rle_maxr, rlt_maxr). Qed.
 
-Lemma lteif_maxl z x y C :
-  (max x y < z ?<= if C) = (x < z ?<= if C) && (y < z ?<= if C).
-Proof. by case: C; rewrite /= (le_maxl, lt_maxl). Qed.
+Lemma rlteif_maxl z x y C :
+  (rmax x y < z ?<= if C) = (x < z ?<= if C) && (y < z ?<= if C).
+Proof. by case: C; rewrite /= (rle_maxl, rlt_maxl). Qed.
 
 Section ArgExtremum.
 
 Context (I : finType) (i0 : I) (P : {pred I}) (F : I -> T) (Pi0 : P i0).
 
-Lemma arg_minP: extremum_spec le P F (arg_min i0 P F).
-Proof. by apply: extremumP => //; apply: le_trans. Qed.
+Lemma arg_minP: extremum_spec le P F (rarg_min i0 P F).
+Proof. by apply: extremumP => //; apply: rle_trans. Qed.
 
-Lemma arg_maxP: extremum_spec ge P F (arg_max i0 P F).
-Proof. by apply: extremumP => //; [apply: ge_refl | apply: ge_trans]. Qed.
+Lemma arg_maxP: extremum_spec rge P F (rarg_max i0 P F).
+Proof. by apply: extremumP => //; [apply: rge_refl | apply: rge_trans]. Qed.
 
 End ArgExtremum.
 
 End TotalTheory.
 
 #[global] Hint Resolve le_total : core.
-#[global] Hint Resolve ge_total : core.
-#[global] Hint Resolve comparableT : core.
-#[global] Hint Resolve sort_le_sorted : core.
+#[global] Hint Resolve rge_total : core.
+#[global] Hint Resolve rcomparableT : core.
+#[global] Hint Resolve rsort_le_sorted : core.
 
-Arguments min_idPr {T ord x y}.
-Arguments max_idPl {T ord x y}.
+Arguments rmin_idPr {T ord x y}.
+Arguments rmax_idPl {T ord x y}.
 
 (* contra lemmas *)
 
@@ -4303,59 +4303,59 @@ Implicit Types (x y : T1) (z t : T2) (b : bool) (m n : nat) (P : Prop).
 Local Notation "x <= y" := (x <=_ord2 y).
 Local Notation "x < y" := (x <_ord2 y).
 
-Lemma contraTle b z t : (t < z -> ~~ b) -> (b -> z <= t).
-Proof. exact: comparable_contraTle. Qed.
+Lemma rcontraTle b z t : (t < z -> ~~ b) -> (b -> z <= t).
+Proof. exact: rcomparable_contraTle. Qed.
 
-Lemma contraTlt b z t : (t <= z -> ~~ b) -> (b -> z < t).
-Proof. exact: comparable_contraTlt. Qed.
+Lemma rcontraTlt b z t : (t <= z -> ~~ b) -> (b -> z < t).
+Proof. exact: rcomparable_contraTlt. Qed.
 
-Lemma contraPle P z t : (t < z -> ~ P) -> (P -> z <= t).
-Proof. exact: comparable_contraPle. Qed.
+Lemma rcontraPle P z t : (t < z -> ~ P) -> (P -> z <= t).
+Proof. exact: rcomparable_contraPle. Qed.
 
-Lemma contraPlt P z t : (t <= z -> ~ P) -> (P -> z < t).
-Proof. exact: comparable_contraPlt. Qed.
+Lemma rcontraPlt P z t : (t <= z -> ~ P) -> (P -> z < t).
+Proof. exact: rcomparable_contraPlt. Qed.
 
-Lemma contraNle b z t : (t < z -> b) -> (~~ b -> z <= t).
-Proof. exact: comparable_contraNle. Qed.
+Lemma rcontraNle b z t : (t < z -> b) -> (~~ b -> z <= t).
+Proof. exact: rcomparable_contraNle. Qed.
 
-Lemma contraNlt b z t : (t <= z -> b) -> (~~ b -> z < t).
-Proof. exact: comparable_contraNlt. Qed.
+Lemma rcontraNlt b z t : (t <= z -> b) -> (~~ b -> z < t).
+Proof. exact: rcomparable_contraNlt. Qed.
 
-Lemma contra_not_le P z t : (t < z -> P) -> (~ P -> z <= t).
-Proof. exact: comparable_contra_not_le. Qed.
+Lemma rcontra_not_le P z t : (t < z -> P) -> (~ P -> z <= t).
+Proof. exact: rcomparable_contra_not_le. Qed.
 
-Lemma contra_not_lt P z t : (t <= z -> P) -> (~ P -> z < t).
-Proof. exact: comparable_contra_not_lt. Qed.
+Lemma rcontra_not_lt P z t : (t <= z -> P) -> (~ P -> z < t).
+Proof. exact: rcomparable_contra_not_lt. Qed.
 
-Lemma contraFle b z t : (t < z -> b) -> (b = false -> z <= t).
-Proof. exact: comparable_contraFle. Qed.
+Lemma rcontraFle b z t : (t < z -> b) -> (b = false -> z <= t).
+Proof. exact: rcomparable_contraFle. Qed.
 
-Lemma contraFlt b z t : (t <= z -> b) -> (b = false -> z < t).
-Proof. exact: comparable_contraFlt. Qed.
+Lemma rcontraFlt b z t : (t <= z -> b) -> (b = false -> z < t).
+Proof. exact: rcomparable_contraFlt. Qed.
 
-Lemma contra_leq_le m n z t : (t < z -> (n < m)%N) -> ((m <= n)%N -> z <= t).
-Proof. exact: comparable_contra_leq_le. Qed.
+Lemma rcontra_leq_le m n z t : (t < z -> (n < m)%N) -> ((m <= n)%N -> z <= t).
+Proof. exact: rcomparable_contra_leq_le. Qed.
 
-Lemma contra_leq_lt m n z t : (t <= z -> (n < m)%N) -> ((m <= n)%N -> z < t).
-Proof. exact: comparable_contra_leq_lt. Qed.
+Lemma rcontra_leq_lt m n z t : (t <= z -> (n < m)%N) -> ((m <= n)%N -> z < t).
+Proof. exact: rcomparable_contra_leq_lt. Qed.
 
-Lemma contra_ltn_le m n z t : (t < z -> (n <= m)%N) -> ((m < n)%N -> z <= t).
-Proof. exact: comparable_contra_ltn_le. Qed.
+Lemma rcontra_ltn_le m n z t : (t < z -> (n <= m)%N) -> ((m < n)%N -> z <= t).
+Proof. exact: rcomparable_contra_ltn_le. Qed.
 
-Lemma contra_ltn_lt m n z t : (t <= z -> (n <= m)%N) -> ((m < n)%N -> z < t).
-Proof. exact: comparable_contra_ltn_lt. Qed.
+Lemma rcontra_ltn_lt m n z t : (t <= z -> (n <= m)%N) -> ((m < n)%N -> z < t).
+Proof. exact: rcomparable_contra_ltn_lt. Qed.
 
-Lemma contra_le x y z t : (t < z -> y <_ord1 x) -> (x <=_ord1 y -> z <= t).
-Proof. exact: comparable_contra_le. Qed.
+Lemma rcontra_le x y z t : (t < z -> y <_ord1 x) -> (x <=_ord1 y -> z <= t).
+Proof. exact: rcomparable_contra_le. Qed.
 
-Lemma contra_le_lt x y z t : (t <= z -> y <_ord1 x) -> (x <=_ord1 y -> z < t).
-Proof. exact: comparable_contra_le_lt. Qed.
+Lemma rcontra_le_lt x y z t : (t <= z -> y <_ord1 x) -> (x <=_ord1 y -> z < t).
+Proof. exact: rcomparable_contra_le_lt. Qed.
 
-Lemma contra_lt_le x y z t : (t < z -> y <=_ord1 x) -> (x <_ord1 y -> z <= t).
-Proof. exact: comparable_contra_lt_le. Qed.
+Lemma rcontra_lt_le x y z t : (t < z -> y <=_ord1 x) -> (x <_ord1 y -> z <= t).
+Proof. exact: rcomparable_contra_lt_le. Qed.
 
-Lemma contra_lt x y z t : (t <= z -> y <=_ord1 x) -> (x <_ord1 y -> z < t).
-Proof. exact: comparable_contra_lt. Qed.
+Lemma rcontra_lt x y z t : (t <= z -> y <=_ord1 x) -> (x <_ord1 y -> z < t).
+Proof. exact: rcomparable_contra_lt. Qed.
 
 End ContraTheory.
 
@@ -4364,25 +4364,25 @@ Section TotalMonotonyTheory.
 Context {T T' : eqType} {ord : {totalOrder T}} {ord' : {pOrder T'}}.
 Variables (D : {pred T}) (f : T -> T').
 
-Let leT'_anti   := @le_anti _ ord'.
-Let ltT_neqAle  := @lt_neqAle _ ord.
-Let ltT'_neqAle := @lt_neqAle _ ord'.
-Let ltT_def     := @lt_def _ ord.
+Let leT'_anti   := @rle_anti _ ord'.
+Let ltT_neqAle  := @rlt_neqAle _ ord.
+Let ltT'_neqAle := @rlt_neqAle _ ord'.
+Let ltT_def     := @rlt_def _ ord.
 Let leT_total   := @le_total _ ord.
 
-Lemma le_mono : {homo f : x y / x <_ord y >-> x <_ord' y} ->
+Lemma rle_mono : {homo f : x y / x <_ord y >-> x <_ord' y} ->
                 {mono f : x y / x <=_ord y >-> x <=_ord' y}.
 Proof. exact: total_homo_mono. Qed.
 
-Lemma le_nmono : {homo f : x y / y <_ord x >-> x <_ord' y} ->
+Lemma rle_nmono : {homo f : x y / y <_ord x >-> x <_ord' y} ->
                  {mono f : x y / y <=_ord x >-> x <=_ord' y}.
 Proof. exact: total_homo_mono. Qed.
 
-Lemma le_mono_in : {in D &, {homo f : x y / x <_ord y >-> x <_ord' y}} ->
+Lemma rle_mono_in : {in D &, {homo f : x y / x <_ord y >-> x <_ord' y}} ->
                    {in D &, {mono f : x y / x <=_ord y >-> x <=_ord' y}}.
 Proof. exact: total_homo_mono_in. Qed.
 
-Lemma le_nmono_in : {in D &, {homo f : x y / y <_ord x >-> x <_ord' y}} ->
+Lemma rle_nmono_in : {in D &, {homo f : x y / y <_ord x >-> x <_ord' y}} ->
                     {in D &, {mono f : x y / y <=_ord x >->  x <=_ord' y}}.
 Proof. exact: total_homo_mono_in. Qed.
 
@@ -4401,22 +4401,22 @@ Variable (T : eqType).
 Record of_ := Build {
   le       : rel T;
   lt       : rel T;
-  lt_def   : forall x y, lt x y = (y != x) && (le x y);
-  lexx     : reflexive     le;
-  le_anti  : antisymmetric le;
-  le_trans : transitive    le;
+  rlt_def   : forall x y, lt x y = (y != x) && (le x y);
+  rlexx     : reflexive     le;
+  rle_anti  : antisymmetric le;
+  rle_trans : transitive    le;
 }.
 
 Variable (m : of_).
 
-Lemma lt_def' (x y : T) : lt m y x = (y != x) && le m y x.
-Proof. by rewrite (lt_def m) eq_sym. Qed.
+Lemma rlt_def' (x y : T) : lt m y x = (y != x) && le m y x.
+Proof. by rewrite (rlt_def m) eq_sym. Qed.
 
-Lemma le_anti' x y : le m x y -> le m y x -> x = y.
-Proof. by move=> xy yx; apply/(@le_anti m)/andP. Qed.
+Lemma rle_anti' x y : le m x y -> le m y x -> x = y.
+Proof. by move=> xy yx; apply/(@rle_anti m)/andP. Qed.
 
 Definition porderMixin :=
-  POrder.Mixin (lt_def m) lt_def' (lexx m) le_anti' (@le_trans m).
+  POrder.Mixin (rlt_def m) rlt_def' (rlexx m) rle_anti' (@rle_trans m).
 
 End LePOrderMixin.
 
@@ -4435,10 +4435,10 @@ Variable (T : eqType) (ord : {pOrder T}).
 
 Record of_ := Build {
   bottom : T;
-  le0x : forall x, bottom <=_ord x;
+  rle0x : forall x, bottom <=_ord x;
 }.
 
-Definition bPOrderMixin (m : of_) : BPOrder.mixin_of ord (bottom m) := le0x m.
+Definition bPOrderMixin (m : of_) : BPOrder.mixin_of ord (bottom m) := rle0x m.
 
 End BottomRelMixin.
 
@@ -4457,10 +4457,10 @@ Variable (T : eqType) (ord : {pOrder T}).
 
 Record of_ := Build {
   top : T;
-  lex1 : forall x, x <=_ord top;
+  rlex1 : forall x, x <=_ord top;
 }.
 
-Definition tPOrderMixin (m : of_) : TPOrder.mixin_of ord (top m) := lex1 m.
+Definition tPOrderMixin (m : of_) : TPOrder.mixin_of ord (top m) := rlex1 m.
 
 End TopRelMixin.
 
@@ -4479,13 +4479,13 @@ Variable (T : eqType) (ord : {pOrder T}).
 
 Record of_ := Build {
   meet : T -> T -> T;
-  meetC   : commutative meet;
-  meetA   : associative meet;
-  leEmeet : forall x y, (x <=_ord y) = (meet x y == x);
+  rmeetC   : commutative meet;
+  rmeetA   : associative meet;
+  rleEmeet : forall x y, (x <=_ord y) = (meet x y == x);
 }.
 
 Definition meetMixin (m : of_) : Meet.mixin_of ord (meet m) :=
-  Meet.Mixin (meetC m) (meetA m) (leEmeet m).
+  Meet.Mixin (rmeetC m) (rmeetA m) (rleEmeet m).
 
 End MeetRelMixin.
 
@@ -4504,13 +4504,13 @@ Variable (T : eqType) (ord : {pOrder T}).
 
 Record of_ := Build {
   join : T -> T -> T;
-  joinC   : commutative join;
-  joinA   : associative join;
-  leEjoin : forall x y, (y <=_ord x) = (join x y == x);
+  rjoinC   : commutative join;
+  rjoinA   : associative join;
+  rleEjoin : forall x y, (y <=_ord x) = (join x y == x);
 }.
 
 Definition joinMixin (m : of_) : Join.mixin_of ord (join m) :=
-  @Meet.Mixin _ (dual_pOrder ord) _ (joinC m) (joinA m) (leEjoin m).
+  @Meet.Mixin _ (dual_pOrder ord) _ (rjoinC m) (rjoinA m) (rleEjoin m).
 
 End JoinRelMixin.
 
@@ -4527,17 +4527,17 @@ Module DistrLatticeRelMixin.
 Section DistrLatticeRelMixin.
 Variable (T : eqType) (ord : {lattice T}).
 
-Record of_ := Build { meetUl : left_distributive (meet ord) (join ord) }.
+Record of_ := Build { rmeetUl : left_distributive (meet ord) (join ord) }.
 
 Variable (m : of_).
 
-Lemma meetUr : right_distributive (meet ord) (join ord).
-Proof. by move=> x y z; rewrite ![meet _ x _]meetC meetUl. Qed.
+Lemma rmeetUr : right_distributive (meet ord) (join ord).
+Proof. by move=> x y z; rewrite ![meet _ x _]rmeetC rmeetUl. Qed.
 
-Lemma joinIl : left_distributive (join ord) (meet ord).
-Proof. by move=> x y z; rewrite meetUr joinIK meetUl // -joinA meetUKC. Qed.
+Lemma rjoinIl : left_distributive (join ord) (meet ord).
+Proof. by move=> x y z; rewrite rmeetUr rjoinIK rmeetUl // -rjoinA rmeetUKC. Qed.
 
-Definition distrLatticeMixin := DistrLattice.Mixin (meetUl m) joinIl.
+Definition distrLatticeMixin := DistrLattice.Mixin (rmeetUl m) rjoinIl.
 
 End DistrLatticeRelMixin.
 
@@ -4557,27 +4557,27 @@ Variable (T : eqType) (ord : {pOrder T}).
 Record of_ := Build {
   meet : T -> T -> T;
   join : T -> T -> T;
-  meetC : commutative meet;
-  joinC : commutative join;
-  meetA : associative meet;
-  joinA : associative join;
-  joinKI : forall y x, meet x (join x y) = x;
-  meetKU : forall y x, join x (meet x y) = x;
-  leEmeet : forall x y, (x <=_ord y) = (meet x y == x);
+  rmeetC : commutative meet;
+  rjoinC : commutative join;
+  rmeetA : associative meet;
+  rjoinA : associative join;
+  rjoinKI : forall y x, meet x (join x y) = x;
+  rmeetKU : forall y x, join x (meet x y) = x;
+  rleEmeet : forall x y, (x <=_ord y) = (meet x y == x);
 }.
 
 Variable (m : of_).
 
-Definition meetMixin := MeetRelMixin (meetC m) (meetA m) (leEmeet m).
+Definition meetMixin := MeetRelMixin (rmeetC m) (rmeetA m) (rleEmeet m).
 
-Lemma leEjoin x y : (y <=_ord x) = (join m x y == x).
+Lemma rleEjoin x y : (y <=_ord x) = (join m x y == x).
 Proof.
-rewrite (leEmeet m); apply/eqP/eqP => <-.
-  by rewrite meetC // meetKU.
-by rewrite joinC // joinKI.
+rewrite (rleEmeet m); apply/eqP/eqP => <-.
+  by rewrite rmeetC // rmeetKU.
+by rewrite rjoinC // rjoinKI.
 Qed.
 
-Definition joinMixin := JoinRelMixin (joinC m) (joinA m) leEjoin.
+Definition joinMixin := JoinRelMixin (rjoinC m) (rjoinA m) rleEjoin.
 
 End LatticePOrderRelMixin.
 
@@ -4600,24 +4600,24 @@ Variable (T : eqType) (ord : {pOrder T}).
 Record of_ := Build {
   meet : T -> T -> T;
   join : T -> T -> T;
-  meetC : commutative meet;
-  joinC : commutative join;
-  meetA : associative meet;
-  joinA : associative join;
-  joinKI : forall y x, meet x (join x y) = x;
-  meetKU : forall y x, join x (meet x y) = x;
-  leEmeet : forall x y, (x <=_ord y) = (meet x y == x);
-  meetUl : left_distributive meet join;
+  rmeetC : commutative meet;
+  rjoinC : commutative join;
+  rmeetA : associative meet;
+  rjoinA : associative join;
+  rjoinKI : forall y x, meet x (join x y) = x;
+  rmeetKU : forall y x, join x (meet x y) = x;
+  rleEmeet : forall x y, (x <=_ord y) = (meet x y == x);
+  rmeetUl : left_distributive meet join;
 }.
 
 Variable (m : of_).
 
 Definition latticeMixin : latticePOrderRelMixin ord :=
   LatticePOrderRelMixin
-    (meetC m) (joinC m) (meetA m) (joinA m) (joinKI m) (meetKU m) (leEmeet m).
+    (rmeetC m) (rjoinC m) (rmeetA m) (rjoinA m) (rjoinKI m) (rmeetKU m) (rleEmeet m).
 
 Definition distrLatticeMixin :=
-  @DistrLatticeRelMixin _ (LatticeOfPOrder latticeMixin) (meetUl m).
+  @DistrLatticeRelMixin _ (LatticeOfPOrder latticeMixin) (rmeetUl m).
 
 End DistrLatticePOrderRelMixin.
 
@@ -4639,19 +4639,19 @@ Definition of_ := total <=:ord.
 Variable (m : of_).
 Implicit Types (x y z : T).
 
-Let comparableT x y : x >=<_ord y := m x y.
+Let rcomparableT x y : x >=<_ord y := m x y.
 
-Fact meetUl : left_distributive (meet ord) (join ord).
+Fact rmeetUl : left_distributive (meet ord) (join ord).
 Proof.
-pose leP x y := lcomparable_leP (comparableT x y).
-move=> x y z; case: (leP x z); case: (leP y z); case: (leP x y);
-  case: (leP x z); case: (leP y z); case: (leP x y) => //= xy yz xz _ _ _;
-  rewrite ?joinxx //.
-- by move: (le_lt_trans xz (lt_trans yz xy)); rewrite ltxx.
-- by move: (lt_le_trans xz (le_trans xy yz)); rewrite ltxx.
+pose rleP x y := rlcomparable_leP (rcomparableT x y).
+move=> x y z; case: (rleP x z); case: (rleP y z); case: (rleP x y);
+  case: (rleP x z); case: (rleP y z); case: (rleP x y) => //= xy yz xz _ _ _;
+  rewrite ?rjoinxx //.
+- by move: (rle_lt_trans xz (rlt_trans yz xy)); rewrite rltxx.
+- by move: (rlt_le_trans xz (rle_trans xy yz)); rewrite rltxx.
 Qed.
 
-Definition distrLatticeMixin := DistrLatticeRelMixin meetUl.
+Definition distrLatticeMixin := DistrLatticeRelMixin rmeetUl.
 
 Definition totalMixin : Total.mixin_of ord := m.
 
@@ -4676,23 +4676,23 @@ Definition of_ := total <=:ord.
 Variable (m : of_).
 Implicit Types (x y z : T).
 
-Let meet := min ord.
-Let join := max ord.
+Let meet := rmin ord.
+Let join := rmax ord.
 
-Let comparableT x y : x >=<_ord y := m x y.
+Let rcomparableT x y : x >=<_ord y := m x y.
 
-Fact meetC : commutative meet. Proof. by move=> *; apply: comparable_minC. Qed.
-Fact joinC : commutative join. Proof. by move=> *; apply: comparable_maxC. Qed.
-Fact meetA : associative meet. Proof. by move=> *; apply: comparable_minA. Qed.
-Fact joinA : associative join. Proof. by move=> *; apply: comparable_maxA. Qed.
-Fact joinKI y x : meet x (join x y) = x. Proof. exact: comparable_maxKx. Qed.
-Fact meetKU y x : join x (meet x y) = x. Proof. exact: comparable_minKx. Qed.
+Fact rmeetC : commutative meet. Proof. by move=> *; apply: rcomparable_minC. Qed.
+Fact rjoinC : commutative join. Proof. by move=> *; apply: rcomparable_maxC. Qed.
+Fact rmeetA : associative meet. Proof. by move=> *; apply: rcomparable_minA. Qed.
+Fact rjoinA : associative join. Proof. by move=> *; apply: rcomparable_maxA. Qed.
+Fact rjoinKI y x : meet x (join x y) = x. Proof. exact: rcomparable_maxKx. Qed.
+Fact rmeetKU y x : join x (meet x y) = x. Proof. exact: rcomparable_minKx. Qed.
 
-Fact leEmeet x y : (x <=_ord y) = (meet x y == x).
-Proof. by rewrite eq_minl. Qed.
+Fact rleEmeet x y : (x <=_ord y) = (meet x y == x).
+Proof. by rewrite req_minl. Qed.
 
 Definition latticeMixin : latticePOrderRelMixin ord :=
-  LatticePOrderRelMixin meetC joinC meetA joinA joinKI meetKU leEmeet.
+  LatticePOrderRelMixin rmeetC rjoinC rmeetA rjoinA rjoinKI rmeetKU rleEmeet.
 
 Definition totalMixin : totalLatticeRelMixin (LatticeOfPOrder latticeMixin) :=
   m.
@@ -4763,35 +4763,35 @@ Variable (T : eqType).
 Record of_ := Build {
   le       : rel T;
   lt       : rel T;
-  le_def   : forall x y, le x y = (x == y) || lt x y;
+  rle_def   : forall x y, le x y = (x == y) || lt x y;
   lt_irr   : irreflexive lt;
-  lt_trans : transitive lt;
+  rlt_trans : transitive lt;
 }.
 
 Variable (m : of_).
 
-Fact lt_asym x y : (lt m x y && lt m y x) = false.
-Proof. by apply/negP => /andP [] xy /(lt_trans xy); rewrite (lt_irr m x). Qed.
+Fact rlt_asym x y : (lt m x y && lt m y x) = false.
+Proof. by apply/negP => /andP [] xy /(rlt_trans xy); rewrite (lt_irr m x). Qed.
 
-Fact lt_def x y : lt m x y = (y != x) && le m x y.
-Proof. by rewrite le_def //; case: eqVneq => //= ->; rewrite lt_irr. Qed.
+Fact rlt_def x y : lt m x y = (y != x) && le m x y.
+Proof. by rewrite rle_def //; case: eqVneq => //= ->; rewrite lt_irr. Qed.
 
-Fact le_refl : reflexive (le m).
-Proof. by move=> ?; rewrite le_def // eqxx. Qed.
+Fact rle_refl : reflexive (le m).
+Proof. by move=> ?; rewrite rle_def // eqxx. Qed.
 
-Fact le_anti : antisymmetric (le m).
+Fact rle_anti : antisymmetric (le m).
 Proof.
-by move=> ? ?; rewrite !le_def // eq_sym -orb_andr lt_asym; case: eqP.
+by move=> ? ?; rewrite !rle_def // eq_sym -orb_andr rlt_asym; case: eqP.
 Qed.
 
-Fact le_trans : transitive (le m).
+Fact rle_trans : transitive (le m).
 Proof.
-by move=> y x z; rewrite !le_def // => /predU1P [-> //|ltxy] /predU1P [<-|ltyz];
-  rewrite ?ltxy ?(lt_trans ltxy ltyz) ?orbT.
+by move=> y x z; rewrite !rle_def // => /predU1P [-> //|ltxy] /predU1P [<-|ltyz];
+  rewrite ?ltxy ?(rlt_trans ltxy ltyz) ?orbT.
 Qed.
 
 Definition porderMixin : lePOrderMixin T :=
-  LePOrderMixin lt_def le_refl le_anti le_trans.
+  LePOrderMixin rlt_def rle_refl rle_anti rle_trans.
 
 End LtPOrderMixin.
 
@@ -4813,39 +4813,39 @@ Record of_ := Build {
   lt : rel T;
   meet : T -> T -> T;
   join : T -> T -> T;
-  le_def : forall x y : T, le x y = (meet x y == x);
-  lt_def : forall x y : T, lt x y = (y != x) && le x y;
-  meetC : commutative meet;
-  joinC : commutative join;
-  meetA : associative meet;
-  joinA : associative join;
-  joinKI : forall y x : T, meet x (join x y) = x;
-  meetKU : forall y x : T, join x (meet x y) = x;
-  meetxx : idempotent meet;
+  rle_def : forall x y : T, le x y = (meet x y == x);
+  rlt_def : forall x y : T, lt x y = (y != x) && le x y;
+  rmeetC : commutative meet;
+  rjoinC : commutative join;
+  rmeetA : associative meet;
+  rjoinA : associative join;
+  rjoinKI : forall y x : T, meet x (join x y) = x;
+  rmeetKU : forall y x : T, join x (meet x y) = x;
+  rmeetxx : idempotent meet;
 }.
 
 Variable (m : of_).
 
-Fact le_refl : reflexive (le m).
-Proof. by move=> x; rewrite le_def ?meetxx. Qed.
+Fact rle_refl : reflexive (le m).
+Proof. by move=> x; rewrite rle_def ?rmeetxx. Qed.
 
-Fact le_anti : antisymmetric (le m).
-Proof. by move=> x y; rewrite !le_def // meetC // => /andP [] /eqP -> /eqP. Qed.
+Fact rle_anti : antisymmetric (le m).
+Proof. by move=> x y; rewrite !rle_def // rmeetC // => /andP [] /eqP -> /eqP. Qed.
 
-Fact le_trans : transitive (le m).
+Fact rle_trans : transitive (le m).
 Proof.
-move=> y x z; rewrite !le_def // => /eqP lexy /eqP leyz; apply/eqP.
-by rewrite -[in LHS]lexy -meetA // leyz.
+move=> y x z; rewrite !rle_def // => /eqP lexy /eqP leyz; apply/eqP.
+by rewrite -[in LHS]lexy -rmeetA // leyz.
 Qed.
 
 Definition porderMixin : lePOrderMixin T :=
-  LePOrderMixin (lt_def m) le_refl le_anti le_trans.
+  LePOrderMixin (rlt_def m) rle_refl rle_anti rle_trans.
 
 Definition latticeMixin :
   latticePOrderRelMixin (POrder (le m) (lt m) porderMixin) :=
   @LatticePOrderRelMixin
     _ (POrder (le m) (lt m) porderMixin) (meet m) (join m)
-    (meetC m) (joinC m) (meetA m) (joinA m) (joinKI m) (meetKU m) (le_def m).
+    (rmeetC m) (rjoinC m) (rmeetA m) (rjoinA m) (rjoinKI m) (rmeetKU m) (rle_def m).
 
 End MeetJoinMixin.
 
@@ -4868,28 +4868,28 @@ Record of_ := Build {
   lt : rel T;
   meet : T -> T -> T;
   join : T -> T -> T;
-  le_def : forall x y : T, le x y = (meet x y == x);
-  lt_def : forall x y : T, lt x y = (y != x) && le x y;
-  meetC : commutative meet;
-  joinC : commutative join;
-  meetA : associative meet;
-  joinA : associative join;
-  joinKI : forall y x : T, meet x (join x y) = x;
-  meetKU : forall y x : T, join x (meet x y) = x;
-  meetUl : left_distributive meet join;
-  meetxx : idempotent meet;
+  rle_def : forall x y : T, le x y = (meet x y == x);
+  rlt_def : forall x y : T, lt x y = (y != x) && le x y;
+  rmeetC : commutative meet;
+  rjoinC : commutative join;
+  rmeetA : associative meet;
+  rjoinA : associative join;
+  rjoinKI : forall y x : T, meet x (join x y) = x;
+  rmeetKU : forall y x : T, join x (meet x y) = x;
+  rmeetUl : left_distributive meet join;
+  rmeetxx : idempotent meet;
 }.
 
 Variable (m : of_).
 
 Definition latticeMixin : meetJoinMixin T :=
-  MeetJoinMixin (le_def m) (lt_def m) (meetC m) (joinC m) (meetA m) (joinA m)
-                (joinKI m) (meetKU m) (meetxx m).
+  MeetJoinMixin (rle_def m) (rlt_def m) (rmeetC m) (rjoinC m) (rmeetA m) (rjoinA m)
+                (rjoinKI m) (rmeetKU m) (rmeetxx m).
 
 Let le_lattice := LatticeOfPOrder latticeMixin.
 
 Definition distrLatticeMixin : distrLatticeRelMixin le_lattice :=
-  @DistrLatticeRelMixin _ le_lattice (meetUl m).
+  @DistrLatticeRelMixin _ le_lattice (rmeetUl m).
 
 End DistrMeetJoinMixin.
 
@@ -4912,21 +4912,21 @@ Record of_ := Build {
   lt : rel T;
   meet : T -> T -> T;
   join : T -> T -> T;
-  lt_def : forall x y, lt x y = (y != x) && le x y;
+  rlt_def : forall x y, lt x y = (y != x) && le x y;
   meet_def : forall x y, meet x y = if lt x y then x else y;
   join_def : forall x y, join x y = if lt x y then y else x;
-  le_anti : antisymmetric le;
-  le_trans : transitive le;
+  rle_anti : antisymmetric le;
+  rle_trans : transitive le;
   le_total : total le;
 }.
 
 Variables (m : of_).
 
-Fact le_refl : reflexive (le m).
+Fact rle_refl : reflexive (le m).
 Proof. by move=> x; case: (le m x x) (le_total m x x). Qed.
 
 Definition porderMixin :=
-  LePOrderMixin (lt_def m) le_refl (@le_anti m) (@le_trans m).
+  LePOrderMixin (rlt_def m) rle_refl (@rle_anti m) (@rle_trans m).
 
 Let le_order :=
   OrderOfLattice
@@ -4935,33 +4935,33 @@ Let le_order :=
 Let meetE x y : meet m x y = RelOrder.meet le_order x y := meet_def m x y.
 Let joinE x y : join m x y = RelOrder.join le_order x y := join_def m x y.
 
-Fact meetC : commutative (meet m).
-Proof. by move=> *; rewrite !meetE meetC. Qed.
+Fact rmeetC : commutative (meet m).
+Proof. by move=> *; rewrite !meetE rmeetC. Qed.
 
-Fact joinC : commutative (join m).
-Proof. by move=> *; rewrite !joinE joinC. Qed.
+Fact rjoinC : commutative (join m).
+Proof. by move=> *; rewrite !joinE rjoinC. Qed.
 
-Fact meetA : associative (meet m).
-Proof. by move=> *; rewrite !meetE meetA. Qed.
+Fact rmeetA : associative (meet m).
+Proof. by move=> *; rewrite !meetE rmeetA. Qed.
 
-Fact joinA : associative (join m).
-Proof. by move=> *; rewrite !joinE joinA. Qed.
+Fact rjoinA : associative (join m).
+Proof. by move=> *; rewrite !joinE rjoinA. Qed.
 
-Fact joinKI y x : meet m x (join m x y) = x.
-Proof. by rewrite meetE joinE joinKI. Qed.
+Fact rjoinKI y x : meet m x (join m x y) = x.
+Proof. by rewrite meetE joinE rjoinKI. Qed.
 
-Fact meetKU y x : join m x (meet m x y) = x.
-Proof. by rewrite meetE joinE meetKU. Qed.
+Fact rmeetKU y x : join m x (meet m x y) = x.
+Proof. by rewrite meetE joinE rmeetKU. Qed.
 
-Fact meetxx : idempotent (meet m).
-Proof. by move=> *; rewrite meetE meetxx. Qed.
+Fact rmeetxx : idempotent (meet m).
+Proof. by move=> *; rewrite meetE rmeetxx. Qed.
 
-Fact le_def x y : le m x y = (meet m x y == x).
-Proof. by rewrite meetE eq_meetl. Qed.
+Fact rle_def x y : le m x y = (meet m x y == x).
+Proof. by rewrite meetE req_meetl. Qed.
 
 Definition latticeMixin : meetJoinMixin T :=
   MeetJoinMixin
-    le_def (lt_def m) meetC joinC meetA joinA joinKI meetKU meetxx.
+    rle_def (rlt_def m) rmeetC rjoinC rmeetA rjoinA rjoinKI rmeetKU rmeetxx.
 
 Definition totalMixin : totalLatticeRelMixin (LatticeOfPOrder latticeMixin) :=
   le_total m.
@@ -4987,44 +4987,44 @@ Record of_ := Build {
   lt : rel T;
   meet : T -> T -> T;
   join : T -> T -> T;
-  le_def   : forall x y, le x y = (x == y) || lt x y;
+  rle_def   : forall x y, le x y = (x == y) || lt x y;
   meet_def : forall x y, meet x y = if lt x y then x else y;
   join_def : forall x y, join x y = if lt x y then y else x;
   lt_irr   : irreflexive lt;
-  lt_trans : transitive lt;
-  lt_total : forall x y, x != y -> lt x y || lt y x;
+  rlt_trans : transitive lt;
+  rlt_total : forall x y, x != y -> lt x y || lt y x;
 }.
 
 Variables (m : of_).
 
-Fact lt_def x y : lt m x y = (y != x) && le m x y.
-Proof. by rewrite le_def //; case: eqVneq => //= ->; rewrite lt_irr. Qed.
+Fact rlt_def x y : lt m x y = (y != x) && le m x y.
+Proof. by rewrite rle_def //; case: eqVneq => //= ->; rewrite lt_irr. Qed.
 
-Fact meet_def_le x y : meet m x y = if lt m x y then x else y.
-Proof. by rewrite meet_def // lt_def; case: eqP. Qed.
+Fact rmeet_def_le x y : meet m x y = if lt m x y then x else y.
+Proof. by rewrite meet_def // rlt_def; case: eqP. Qed.
 
-Fact join_def_le x y : join m x y = if lt m x y then y else x.
-Proof. by rewrite join_def // lt_def; case: eqP. Qed.
+Fact rjoin_def_le x y : join m x y = if lt m x y then y else x.
+Proof. by rewrite join_def // rlt_def; case: eqP. Qed.
 
-Fact le_anti : antisymmetric (le m).
+Fact rle_anti : antisymmetric (le m).
 Proof.
-move=> x y; rewrite !le_def //.
-by case: eqVneq => //= _ /andP [] hxy /(lt_trans hxy); rewrite lt_irr.
+move=> x y; rewrite !rle_def //.
+by case: eqVneq => //= _ /andP [] hxy /(rlt_trans hxy); rewrite lt_irr.
 Qed.
 
-Fact le_trans : transitive (le m).
+Fact rle_trans : transitive (le m).
 Proof.
-move=> y x z; rewrite !le_def //; case: eqVneq => [->|_] //=.
-by case: eqVneq => [-> ->|_ hxy /(lt_trans hxy) ->]; rewrite orbT.
+move=> y x z; rewrite !rle_def //; case: eqVneq => [->|_] //=.
+by case: eqVneq => [-> ->|_ hxy /(rlt_trans hxy) ->]; rewrite orbT.
 Qed.
 
 Fact le_total : total (le m).
 Proof.
-by move=> x y; rewrite !le_def //; case: eqVneq => //=; exact: lt_total.
+by move=> x y; rewrite !rle_def //; case: eqVneq => //=; exact: rlt_total.
 Qed.
 
 Definition orderMixin : leOrderMixin T :=
-  LeOrderMixin lt_def meet_def_le join_def_le le_anti le_trans le_total.
+  LeOrderMixin rlt_def rmeet_def_le rjoin_def_le rle_anti rle_trans le_total.
 
 End LtOrderMixin.
 
@@ -5043,10 +5043,10 @@ Import LtOrderMixin.Exports.
 
 Module NatOrder.
 
-Lemma ltn_def x y : (x < y)%N = (y != x)%N && (x <= y)%N.
+Lemma rltn_def x y : (x < y)%N = (y != x)%N && (x <= y)%N.
 Proof. by case: ltngtP. Qed.
 
-Definition nat_pOrderMixin := LePOrderMixin ltn_def leqnn anti_leq leq_trans.
+Definition nat_pOrderMixin := LePOrderMixin rltn_def leqnn anti_leq leq_trans.
 
 Local Canonical nat_pOrder := POrder leq ltn nat_pOrderMixin.
 (* BUG, TODO: the packager [BPOrder] can infer the [pOrder] instance only     *)
