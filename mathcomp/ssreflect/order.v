@@ -12441,9 +12441,6 @@ Export LexiSyntax.
 End Syntax.
 
 Module LTheory.
-Export POCoercions.
-Export DualOrder.
-
 Export POrderTheory.
 Export BPOrderTheory.
 Export TPOrderTheory.
@@ -12564,6 +12561,9 @@ Export Order.TotalMeetSemilatticeMixin.Exports.
 Export Order.TotalJoinSemilatticeMixin.Exports.
 Export Order.CanMixin.Exports.
 Export Order.SubOrder.Exports.
+
+Export Order.POCoercions.
+Export Order.DualOrder.
 
 Export Order.NatOrder.Exports.
 Export Order.NatMonotonyTheory.
