@@ -101,8 +101,8 @@ Notation "`] a , '+oo' [" := (Interval (BRight a) +oo)
 Notation "`] -oo , '+oo' [" := (Interval -oo +oo)
   (at level 0, format "`] -oo ,  '+oo' [") : ring_scope.
 
-Fact itv_bound_display (disp : unit) : unit. Proof. exact. Qed.
-Fact interval_display (disp : unit) : unit. Proof. exact. Qed.
+Fact itv_bound_display (disp : Order.disp_t) : Order.disp_t. Proof. exact. Qed.
+Fact interval_display (disp : Order.disp_t) : Order.disp_t. Proof. exact. Qed.
 
 Section IntervalEq.
 
@@ -184,7 +184,7 @@ Export IntervalChoice.Exports.
 
 Section IntervalPOrder.
 
-Variable (disp : unit) (T : porderType disp).
+Variable (disp : Order.disp_t) (T : porderType disp).
 Implicit Types (x y z : T) (b bl br : itv_bound T) (i : interval T).
 
 Definition le_bound b1 b2 :=
@@ -498,7 +498,7 @@ End IntervalPOrder.
 
 Section IntervalLattice.
 
-Variable (disp : unit) (T : latticeType disp).
+Variable (disp : Order.disp_t) (T : latticeType disp).
 Implicit Types (x y z : T) (b bl br : itv_bound T) (i : interval T).
 
 Definition bound_meet bl br : itv_bound T :=
@@ -649,7 +649,7 @@ End IntervalLattice.
 
 Section IntervalTotal.
 
-Variable (disp : unit) (T : orderType disp).
+Variable (disp : Order.disp_t) (T : orderType disp).
 Implicit Types (a b c : itv_bound T) (x y z : T) (i : interval T).
 
 Lemma itv_bound_totalMixin : totalLatticeMixin [latticeType of itv_bound T].

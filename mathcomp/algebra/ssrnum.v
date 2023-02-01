@@ -134,7 +134,7 @@ Local Open Scope order_scope.
 Local Open Scope ring_scope.
 Import Order.TTheory GRing.Theory.
 
-Fact ring_display : unit. Proof. exact: tt. Qed.
+Fact ring_display : Order.disp_t. Proof. exact: {| Order.d1 := tt; Order.d2 := tt |}. Qed.
 
 Module Num.
 
@@ -716,13 +716,13 @@ Section ClassDef.
 Set Primitive Projections.
 Record class_of R := Class {
   base   : NumDomain.class_of R;
-  mmixin : Order.MeetSemilattice.mixin_of (Order.POrder.Pack tt base);
-  jmixin : Order.JoinSemilattice.mixin_of (Order.POrder.Pack tt base);
+  mmixin : Order.MeetSemilattice.mixin_of (Order.POrder.Pack Order.disp_tt base);
+  jmixin : Order.JoinSemilattice.mixin_of (Order.POrder.Pack Order.disp_tt base);
   lmixin : RelOrder.DistrLattice.mixin_of
              (Order.Lattice.Pack
-                tt (@Order.Lattice.Class
+                Order.disp_tt (@Order.Lattice.Class
                       _ (Order.MeetSemilattice.Class mmixin) jmixin));
-  tmixin : RelOrder.Total.mixin_of (Order.POrder.Pack tt base);
+  tmixin : RelOrder.Total.mixin_of (Order.POrder.Pack Order.disp_tt base);
 }.
 Unset Primitive Projections.
 Local Coercion base : class_of >-> NumDomain.class_of.
@@ -932,13 +932,13 @@ Section ClassDef.
 Set Primitive Projections.
 Record class_of R := Class {
   base  : NumField.class_of R;
-  mmixin : Order.MeetSemilattice.mixin_of (Order.POrder.Pack tt base);
-  jmixin : Order.JoinSemilattice.mixin_of (Order.POrder.Pack tt base);
+  mmixin : Order.MeetSemilattice.mixin_of (Order.POrder.Pack Order.disp_tt base);
+  jmixin : Order.JoinSemilattice.mixin_of (Order.POrder.Pack Order.disp_tt base);
   lmixin : RelOrder.DistrLattice.mixin_of
              (Order.Lattice.Pack
-                tt (@Order.Lattice.Class
+                Order.disp_tt (@Order.Lattice.Class
                       _ (Order.MeetSemilattice.Class mmixin) jmixin));
-  tmixin : RelOrder.Total.mixin_of (Order.POrder.Pack tt base);
+  tmixin : RelOrder.Total.mixin_of (Order.POrder.Pack Order.disp_tt base);
 }.
 Unset Primitive Projections.
 Local Coercion base : class_of >-> NumField.class_of.
