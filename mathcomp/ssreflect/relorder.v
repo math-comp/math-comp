@@ -33,11 +33,11 @@ Reserved Notation "A `|` B" (at level 52, left associativity).
 Reserved Notation "A `\` B" (at level 50, left associativity).
 Reserved Notation "~` A" (at level 35, right associativity).
 
-Definition rdual_rel (T : Type) (r : rel T) := fun y x => r x y.
-Definition rdual_bottom (T : Type) (top : T) := top.
-Definition rdual_top (T : Type) (bottom : T) := bottom.
-Definition rdual_meet (T : Type) (join : T -> T -> T) := join.
-Definition rdual_join (T : Type) (meet : T -> T -> T) := meet.
+Definition dual_rel (T : Type) (r : rel T) := fun y x => r x y.
+Definition dual_bottom (T : Type) (top : T) := top.
+Definition dual_top (T : Type) (bottom : T) := bottom.
+Definition dual_meet (T : Type) (join : T -> T -> T) := join.
+Definition dual_join (T : Type) (meet : T -> T -> T) := meet.
 
 Module RelOrder.
 
@@ -56,11 +56,14 @@ Variable T : eqType.
 Set Primitive Projections.
 
 Record mixin_of (le lt : rel T) := Mixin {
-  rlt_def : forall x y, lt x y = (y != x) && le x y;
+  lt_def : forall x y, lt x y = (y != x) && le x y;
   dlt_def : forall x y, lt y x = (y != x) && le y x;
-  rlexx : reflexive le;
-  rle_anti : forall x y, le x y -> le y x -> x = y;
-  rle_trans : transitive le;
+  lexx : reflexive le;
+  dlexx : reflexive (dual_rel le);
+  le_anti : antisymmetric le;
+  dle_anti : antisymmetric (dual_rel le);
+  le_trans : transitive le;
+  dle_trans : transitive (dual_rel le);
 }.
 
 Notation class_of := mixin_of (only parsing).
@@ -98,6 +101,7 @@ Import POrder.Exports.
 
 Notation le := POrder.le.
 Notation lt := POrder.lt.
+
 Arguments le {T phT} ord x y : rename, simpl never.
 Arguments lt {T phT} ord x y : rename, simpl never.
 
@@ -105,13 +109,14 @@ Module Import DualPOrder.
 
 Canonical dual_pOrder (T : eqType) (ord : {pOrder T}) :=
   POrder
-    (rdual_rel (le ord)) (rdual_rel (lt ord))
+    (dual_rel (le ord)) (dual_rel (lt ord))
     (let mixin := POrder.class ord in
      @POrder.Mixin
-       T (rdual_rel (le ord)) (rdual_rel (lt ord))
-       (POrder.dlt_def mixin) (POrder.rlt_def mixin) (POrder.rlexx mixin)
-       (fun x y yx xy => POrder.rle_anti mixin xy yx)
-       (fun y x z xy yz => POrder.rle_trans mixin yz xy)).
+       T (dual_rel (le ord)) (dual_rel (lt ord))
+       (POrder.dlt_def mixin) (POrder.lt_def mixin)
+       (POrder.dlexx mixin) (POrder.lexx mixin)
+       (POrder.dle_anti mixin) (POrder.le_anti mixin)
+       (POrder.dle_trans mixin) (POrder.le_trans mixin)).
 
 End DualPOrder.
 
@@ -323,9 +328,9 @@ Variable T : eqType.
 Set Primitive Projections.
 
 Record mixin_of (ord : {pOrder T}) (meet : T -> T -> T) := Mixin {
-  rmeetC : commutative meet;
-  rmeetA : associative meet;
-  rleEmeet : forall x y, (le ord x y) = (meet x y == x);
+  meetC : commutative meet;
+  meetA : associative meet;
+  leEmeet : forall x y, (le ord x y) = (meet x y == x);
 }.
 
 Record class_of (le lt : rel T) (meet : T -> T -> T) := Class {
@@ -1372,8 +1377,8 @@ Variable T : eqType.
 Set Primitive Projections.
 
 Record mixin_of (ord : {lattice T}) := Mixin {
-  rmeetUl : left_distributive (meet ord) (join ord);
-  rjoinIl : left_distributive (join ord) (meet ord);
+  meetUl : left_distributive (meet ord) (join ord);
+  joinIl : left_distributive (join ord) (meet ord);
 }.
 
 Record class_of (le lt : rel T) (meet join : T -> T -> T) := Class {
@@ -2370,12 +2375,12 @@ Variable T : eqType.
 Canonical dual_pOrder (ord : {pOrder T}) := dual_pOrder ord.
 
 Canonical dual_bPOrder (ord : {tPOrder T}) :=
-  BPOrder (rdual_rel <=:ord) (rdual_rel <:ord) (rdual_bottom (top ord))
+  BPOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_bottom (top ord))
           (TPOrder.mixin (TPOrder.class ord) :
              BPOrder.mixin_of (dual_pOrder ord) _).
 
 Canonical dual_tPOrder (ord : {bPOrder T}) :=
-  TPOrder (rdual_rel <=:ord) (rdual_rel <:ord) (rdual_top (bottom ord))
+  TPOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_top (bottom ord))
           (BPOrder.mixin (BPOrder.class ord) :
              TPOrder.mixin_of (dual_pOrder ord) _).
 
@@ -2383,74 +2388,74 @@ Canonical dual_tPOrder (ord : {bPOrder T}) :=
 (* operators from existing instances, or should operators other than [le] be  *)
 (* specified (e.g., TBOrder le lt bottom top) to synthesize proper            *)
 (* unification hints anyway? Clone notations have the same issue.             *)
-Canonical dual_tbPOrder (ord : {tbPOrder T}) := [tbPOrder of rdual_rel <=:ord].
+Canonical dual_tbPOrder (ord : {tbPOrder T}) := [tbPOrder of dual_rel <=:ord].
 
 Canonical dual_meetOrder (ord : {joinOrder T}) :=
-  MeetOrder (rdual_rel <=:ord) (rdual_rel <:ord) (rdual_meet (join ord))
+  MeetOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_meet (join ord))
             (Join.mixin (Join.class ord)).
 
 Canonical dual_bMeetOrder (ord : {tJoinOrder T}) :=
-  [bMeetOrder of rdual_rel <=:ord].
+  [bMeetOrder of dual_rel <=:ord].
 
 Canonical dual_tMeetOrder (ord : {bJoinOrder T}) :=
-  [tMeetOrder of rdual_rel <=:ord].
+  [tMeetOrder of dual_rel <=:ord].
 
 Canonical dual_tbMeetOrder (ord : {tbJoinOrder T}) :=
-  [tbMeetOrder of rdual_rel <=:ord].
+  [tbMeetOrder of dual_rel <=:ord].
 
 Canonical dual_joinOrder (ord : {meetOrder T}) :=
-  JoinOrder (rdual_rel <=:ord) (rdual_rel <:ord) (rdual_join (meet ord))
+  JoinOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_join (meet ord))
             (Meet.mixin (Meet.class ord) : Join.mixin_of (dual_pOrder ord) _).
 
 Canonical dual_bJoinOrder (ord : {tMeetOrder T}) :=
-  [bJoinOrder of rdual_rel <=:ord].
+  [bJoinOrder of dual_rel <=:ord].
 
 Canonical dual_tJoinOrder (ord : {bMeetOrder T}) :=
-  [tJoinOrder of rdual_rel <=:ord].
+  [tJoinOrder of dual_rel <=:ord].
 
 Canonical dual_tbJoinOrder (ord : {tbMeetOrder T}) :=
-  [tbJoinOrder of rdual_rel <=:ord].
+  [tbJoinOrder of dual_rel <=:ord].
 
-Canonical dual_lattice (ord : {lattice T}) := [lattice of rdual_rel <=:ord].
+Canonical dual_lattice (ord : {lattice T}) := [lattice of dual_rel <=:ord].
 
-Canonical dual_bLattice (ord : {tLattice T}) := [bLattice of rdual_rel <=:ord].
+Canonical dual_bLattice (ord : {tLattice T}) := [bLattice of dual_rel <=:ord].
 
-Canonical dual_tLattice (ord : {bLattice T}) := [tLattice of rdual_rel <=:ord].
+Canonical dual_tLattice (ord : {bLattice T}) := [tLattice of dual_rel <=:ord].
 
 Canonical dual_tbLattice (ord : {tbLattice T}) :=
-  [tbLattice of rdual_rel <=:ord].
+  [tbLattice of dual_rel <=:ord].
 
 Canonical dual_distrLattice (ord : {distrLattice T}) :=
   DistrLattice
-    (rdual_rel <=:ord) (rdual_rel <:ord)
-    (rdual_meet (join ord)) (rdual_join (meet ord))
+    (dual_rel <=:ord) (dual_rel <:ord)
+    (dual_meet (join ord)) (dual_join (meet ord))
     (let mixin := DistrLattice.mixin (DistrLattice.class ord) in
      @DistrLattice.Mixin _ (dual_lattice ord)
-       (DistrLattice.rjoinIl mixin) (DistrLattice.rmeetUl mixin)).
+       (DistrLattice.joinIl mixin) (DistrLattice.meetUl mixin)).
 
 Canonical dual_bDistrLattice (ord : {tDistrLattice T}) :=
-  [bDistrLattice of rdual_rel <=:ord].
+  [bDistrLattice of dual_rel <=:ord].
 
 Canonical dual_tDistrLattice (ord : {bDistrLattice T}) :=
-  [tDistrLattice of rdual_rel <=:ord].
+  [tDistrLattice of dual_rel <=:ord].
 
 Canonical dual_tbDistrLattice (ord : {tbDistrLattice T}) :=
-  [tbDistrLattice of rdual_rel <=:ord].
+  [tbDistrLattice of dual_rel <=:ord].
 
 Canonical dual_totalOrder (ord : {totalOrder T}) :=
   TotalOrder
-    (rdual_rel <=:ord) (rdual_rel <:ord)
-    (rdual_meet (join ord)) (rdual_join (meet ord))
+    (dual_rel <=:ord) (dual_rel <:ord)
+    (dual_meet (join ord)) (dual_join (meet ord))
     (fun x y => Total.mixin (Total.class ord) y x).
 
 Canonical dual_bTotalOrder (ord : {tTotalOrder T}) :=
-  [bTotalOrder of rdual_rel <=:ord].
+  [bTotalOrder of dual_rel <=:ord].
 
 Canonical dual_tTotalOrder (ord : {bTotalOrder T}) :=
-  [tTotalOrder of rdual_rel <=:ord].
+  [tTotalOrder of dual_rel <=:ord].
 
 Canonical dual_tbTotalOrder (ord : {tbTotalOrder T}) :=
-  [tbTotalOrder of rdual_rel <=:ord].
+  [tbTotalOrder of dual_rel <=:ord].
 
 End DualOrder.
 
@@ -2541,7 +2546,7 @@ Definition rle_refl : reflexive le := rlexx.
 Definition rge_refl : reflexive rge := rlexx.
 
 Lemma rle_anti : antisymmetric le.
-Proof. by case: ord => le lt [] ? ? ? ha ? x y /andP []; exact: ha. Qed.
+Proof. by case: ord => le lt []. Qed.
 
 Lemma rge_anti : antisymmetric rge.
 Proof. by move=> x y /rle_anti. Qed.
@@ -3465,7 +3470,7 @@ End BPOrderTheory.
 Module Import TPOrderTheory.
 Section TPOrderTheory.
 Context {T : eqType} {ord : {tPOrder T}}.
-Let ord_dual := [bPOrder of rdual_rel <=:ord].
+Let ord_dual := [bPOrder of dual_rel <=:ord].
 Implicit Types (x y : T).
 
 Local Notation "x <= y" := (x <=_ord y).
@@ -3661,7 +3666,7 @@ End TMeetTheory.
 Module Import JoinTheory.
 Section JoinTheory.
 Context {L : eqType} {ord : {joinOrder L}}.
-Let ord_dual := [meetOrder of rdual_rel <=:ord].
+Let ord_dual := [meetOrder of dual_rel <=:ord].
 Implicit Types (x y : L).
 
 Local Notation join := (join ord).
@@ -3732,7 +3737,7 @@ Arguments rjoin_idPr {L ord x y}.
 Module Import BJoinTheory.
 Section BJoinTheory.
 Context {L : eqType} {ord : {bJoinOrder L}}.
-Let ord_dual := [tMeetOrder of rdual_rel <=:ord].
+Let ord_dual := [tMeetOrder of dual_rel <=:ord].
 Implicit Types (I : finType) (T : eqType) (x y : L).
 
 Local Notation join := (join ord).
@@ -3798,7 +3803,7 @@ End BJoinTheory.
 Module Import TJoinTheory.
 Section TJoinTheory.
 Context {L : eqType} {ord : {tJoinOrder L}}.
-Let ord_dual := [bMeetOrder of rdual_rel <=:ord].
+Let ord_dual := [bMeetOrder of dual_rel <=:ord].
 
 Local Notation join := (join ord).
 Local Notation "1" := (top ord).
@@ -3965,7 +3970,7 @@ End BDistrLatticeTheory.
 Module Import TDistrLatticeTheory.
 Section TDistrLatticeTheory.
 Context {L : eqType} {ord : {tDistrLattice L}}.
-Let ord_dual := [bDistrLattice of rdual_rel <=:ord].
+Let ord_dual := [bDistrLattice of dual_rel <=:ord].
 Implicit Types (I : finType) (T : eqType) (x y z : L).
 
 Local Notation meet := (meet ord).
@@ -4097,7 +4102,7 @@ Lemma rsorted_filter_gt x s :
   sorted <=:ord s -> [seq y <- s | x < y] = drop (count (le^~ x) s) s.
 Proof.
 move=> s_sorted; rewrite rcount_le_gt -[LHS]revK -filter_rev.
-rewrite (@rsorted_filter_lt _ [totalOrder of rdual_rel <=:ord]).
+rewrite (@rsorted_filter_lt _ [totalOrder of dual_rel <=:ord]).
   by rewrite take_rev revK count_rev.
 by rewrite rev_sorted.
 Qed.
@@ -4106,7 +4111,7 @@ Lemma rsorted_filter_ge x s :
   sorted <=:ord s -> [seq y <- s | x <= y] = drop (count (lt^~ x) s) s.
 Proof.
 move=> s_sorted; rewrite rcount_lt_ge -[LHS]revK -filter_rev.
-rewrite (@rsorted_filter_le _ [totalOrder of rdual_rel <=:ord]).
+rewrite (@rsorted_filter_le _ [totalOrder of dual_rel <=:ord]).
   by rewrite take_rev revK count_rev.
 by rewrite rev_sorted.
 Qed.
@@ -4401,22 +4406,23 @@ Variable (T : eqType).
 Record of_ := Build {
   le       : rel T;
   lt       : rel T;
-  rlt_def   : forall x y, lt x y = (y != x) && (le x y);
-  rlexx     : reflexive     le;
-  rle_anti  : antisymmetric le;
-  rle_trans : transitive    le;
+  lt_def   : forall x y, lt x y = (y != x) && (le x y);
+  lexx     : reflexive     le;
+  le_anti  : antisymmetric le;
+  le_trans : transitive    le;
 }.
 
 Variable (m : of_).
 
-Lemma rlt_def' (x y : T) : lt m y x = (y != x) && le m y x.
-Proof. by rewrite (rlt_def m) eq_sym. Qed.
+Fact lt_def' (x y : T) : lt m y x = (y != x) && le m y x.
+Proof. by rewrite (lt_def m) eq_sym. Qed.
 
-Lemma rle_anti' x y : le m x y -> le m y x -> x = y.
-Proof. by move=> xy yx; apply/(@rle_anti m)/andP. Qed.
+Fact le_anti' : antisymmetric (dual_rel (le m)).
+Proof. by move=> x y; rewrite andbC => /le_anti. Qed.
 
 Definition porderMixin :=
-  POrder.Mixin (rlt_def m) rlt_def' (rlexx m) rle_anti' (@rle_trans m).
+  POrder.Mixin (lt_def m) lt_def' (lexx m) (lexx m) (@le_anti m) le_anti'
+    (@le_trans m) (fun x y z lexy leyz => le_trans leyz lexy).
 
 End LePOrderMixin.
 
@@ -4435,10 +4441,10 @@ Variable (T : eqType) (ord : {pOrder T}).
 
 Record of_ := Build {
   bottom : T;
-  rle0x : forall x, bottom <=_ord x;
+  le0x : forall x, bottom <=_ord x;
 }.
 
-Definition bPOrderMixin (m : of_) : BPOrder.mixin_of ord (bottom m) := rle0x m.
+Definition bPOrderMixin (m : of_) : BPOrder.mixin_of ord (bottom m) := le0x m.
 
 End BottomRelMixin.
 
@@ -4457,10 +4463,10 @@ Variable (T : eqType) (ord : {pOrder T}).
 
 Record of_ := Build {
   top : T;
-  rlex1 : forall x, x <=_ord top;
+  lex1 : forall x, x <=_ord top;
 }.
 
-Definition tPOrderMixin (m : of_) : TPOrder.mixin_of ord (top m) := rlex1 m.
+Definition tPOrderMixin (m : of_) : TPOrder.mixin_of ord (top m) := lex1 m.
 
 End TopRelMixin.
 
@@ -4479,13 +4485,13 @@ Variable (T : eqType) (ord : {pOrder T}).
 
 Record of_ := Build {
   meet : T -> T -> T;
-  rmeetC   : commutative meet;
-  rmeetA   : associative meet;
-  rleEmeet : forall x y, (x <=_ord y) = (meet x y == x);
+  meetC   : commutative meet;
+  meetA   : associative meet;
+  leEmeet : forall x y, (x <=_ord y) = (meet x y == x);
 }.
 
 Definition meetMixin (m : of_) : Meet.mixin_of ord (meet m) :=
-  Meet.Mixin (rmeetC m) (rmeetA m) (rleEmeet m).
+  Meet.Mixin (meetC m) (meetA m) (leEmeet m).
 
 End MeetRelMixin.
 
@@ -4504,13 +4510,13 @@ Variable (T : eqType) (ord : {pOrder T}).
 
 Record of_ := Build {
   join : T -> T -> T;
-  rjoinC   : commutative join;
-  rjoinA   : associative join;
-  rleEjoin : forall x y, (y <=_ord x) = (join x y == x);
+  joinC   : commutative join;
+  joinA   : associative join;
+  leEjoin : forall x y, (y <=_ord x) = (join x y == x);
 }.
 
 Definition joinMixin (m : of_) : Join.mixin_of ord (join m) :=
-  @Meet.Mixin _ (dual_pOrder ord) _ (rjoinC m) (rjoinA m) (rleEjoin m).
+  @Meet.Mixin _ (dual_pOrder ord) _ (joinC m) (joinA m) (leEjoin m).
 
 End JoinRelMixin.
 
@@ -4527,17 +4533,17 @@ Module DistrLatticeRelMixin.
 Section DistrLatticeRelMixin.
 Variable (T : eqType) (ord : {lattice T}).
 
-Record of_ := Build { rmeetUl : left_distributive (meet ord) (join ord) }.
+Record of_ := Build { meetUl : left_distributive (meet ord) (join ord) }.
 
 Variable (m : of_).
 
-Lemma rmeetUr : right_distributive (meet ord) (join ord).
-Proof. by move=> x y z; rewrite ![meet _ x _]rmeetC rmeetUl. Qed.
+Fact meetUr : right_distributive (meet ord) (join ord).
+Proof. by move=> x y z; rewrite ![meet _ x _]rmeetC meetUl. Qed.
 
-Lemma rjoinIl : left_distributive (join ord) (meet ord).
-Proof. by move=> x y z; rewrite rmeetUr rjoinIK rmeetUl // -rjoinA rmeetUKC. Qed.
+Fact joinIl : left_distributive (join ord) (meet ord).
+Proof. by move=> x y z; rewrite meetUr rjoinIK meetUl // -rjoinA rmeetUKC. Qed.
 
-Definition distrLatticeMixin := DistrLattice.Mixin (rmeetUl m) rjoinIl.
+Definition distrLatticeMixin := DistrLattice.Mixin (meetUl m) joinIl.
 
 End DistrLatticeRelMixin.
 
@@ -4557,27 +4563,27 @@ Variable (T : eqType) (ord : {pOrder T}).
 Record of_ := Build {
   meet : T -> T -> T;
   join : T -> T -> T;
-  rmeetC : commutative meet;
-  rjoinC : commutative join;
-  rmeetA : associative meet;
-  rjoinA : associative join;
-  rjoinKI : forall y x, meet x (join x y) = x;
-  rmeetKU : forall y x, join x (meet x y) = x;
-  rleEmeet : forall x y, (x <=_ord y) = (meet x y == x);
+  meetC : commutative meet;
+  joinC : commutative join;
+  meetA : associative meet;
+  joinA : associative join;
+  joinKI : forall y x, meet x (join x y) = x;
+  meetKU : forall y x, join x (meet x y) = x;
+  leEmeet : forall x y, (x <=_ord y) = (meet x y == x);
 }.
 
 Variable (m : of_).
 
-Definition meetMixin := MeetRelMixin (rmeetC m) (rmeetA m) (rleEmeet m).
+Definition meetMixin := MeetRelMixin (meetC m) (meetA m) (leEmeet m).
 
-Lemma rleEjoin x y : (y <=_ord x) = (join m x y == x).
+Fact leEjoin x y : (y <=_ord x) = (join m x y == x).
 Proof.
-rewrite (rleEmeet m); apply/eqP/eqP => <-.
-  by rewrite rmeetC // rmeetKU.
-by rewrite rjoinC // rjoinKI.
+rewrite (leEmeet m); apply/eqP/eqP => <-.
+  by rewrite meetC // meetKU.
+by rewrite joinC // joinKI.
 Qed.
 
-Definition joinMixin := JoinRelMixin (rjoinC m) (rjoinA m) rleEjoin.
+Definition joinMixin := JoinRelMixin (joinC m) (joinA m) leEjoin.
 
 End LatticePOrderRelMixin.
 
@@ -4600,24 +4606,24 @@ Variable (T : eqType) (ord : {pOrder T}).
 Record of_ := Build {
   meet : T -> T -> T;
   join : T -> T -> T;
-  rmeetC : commutative meet;
-  rjoinC : commutative join;
-  rmeetA : associative meet;
-  rjoinA : associative join;
-  rjoinKI : forall y x, meet x (join x y) = x;
-  rmeetKU : forall y x, join x (meet x y) = x;
-  rleEmeet : forall x y, (x <=_ord y) = (meet x y == x);
-  rmeetUl : left_distributive meet join;
+  meetC : commutative meet;
+  joinC : commutative join;
+  meetA : associative meet;
+  joinA : associative join;
+  joinKI : forall y x, meet x (join x y) = x;
+  meetKU : forall y x, join x (meet x y) = x;
+  leEmeet : forall x y, (x <=_ord y) = (meet x y == x);
+  meetUl : left_distributive meet join;
 }.
 
 Variable (m : of_).
 
 Definition latticeMixin : latticePOrderRelMixin ord :=
   LatticePOrderRelMixin
-    (rmeetC m) (rjoinC m) (rmeetA m) (rjoinA m) (rjoinKI m) (rmeetKU m) (rleEmeet m).
+    (meetC m) (joinC m) (meetA m) (joinA m) (joinKI m) (meetKU m) (leEmeet m).
 
 Definition distrLatticeMixin :=
-  @DistrLatticeRelMixin _ (LatticeOfPOrder latticeMixin) (rmeetUl m).
+  @DistrLatticeRelMixin _ (LatticeOfPOrder latticeMixin) (meetUl m).
 
 End DistrLatticePOrderRelMixin.
 
@@ -4639,19 +4645,19 @@ Definition of_ := total <=:ord.
 Variable (m : of_).
 Implicit Types (x y z : T).
 
-Let rcomparableT x y : x >=<_ord y := m x y.
+Let comparableT x y : x >=<_ord y := m x y.
 
-Fact rmeetUl : left_distributive (meet ord) (join ord).
+Fact meetUl : left_distributive (meet ord) (join ord).
 Proof.
-pose rleP x y := rlcomparable_leP (rcomparableT x y).
-move=> x y z; case: (rleP x z); case: (rleP y z); case: (rleP x y);
-  case: (rleP x z); case: (rleP y z); case: (rleP x y) => //= xy yz xz _ _ _;
+pose leP x y := rlcomparable_leP (comparableT x y).
+move=> x y z; case: (leP x z); case: (leP y z); case: (leP x y);
+  case: (leP x z); case: (leP y z); case: (leP x y) => //= xy yz xz _ _ _;
   rewrite ?rjoinxx //.
 - by move: (rle_lt_trans xz (rlt_trans yz xy)); rewrite rltxx.
 - by move: (rlt_le_trans xz (rle_trans xy yz)); rewrite rltxx.
 Qed.
 
-Definition distrLatticeMixin := DistrLatticeRelMixin rmeetUl.
+Definition distrLatticeMixin := DistrLatticeRelMixin meetUl.
 
 Definition totalMixin : Total.mixin_of ord := m.
 
@@ -4679,20 +4685,20 @@ Implicit Types (x y z : T).
 Let meet := rmin ord.
 Let join := rmax ord.
 
-Let rcomparableT x y : x >=<_ord y := m x y.
+Let comparableT x y : x >=<_ord y := m x y.
 
-Fact rmeetC : commutative meet. Proof. by move=> *; apply: rcomparable_minC. Qed.
-Fact rjoinC : commutative join. Proof. by move=> *; apply: rcomparable_maxC. Qed.
-Fact rmeetA : associative meet. Proof. by move=> *; apply: rcomparable_minA. Qed.
-Fact rjoinA : associative join. Proof. by move=> *; apply: rcomparable_maxA. Qed.
-Fact rjoinKI y x : meet x (join x y) = x. Proof. exact: rcomparable_maxKx. Qed.
-Fact rmeetKU y x : join x (meet x y) = x. Proof. exact: rcomparable_minKx. Qed.
+Fact meetC : commutative meet. Proof. by move=> *; apply: rcomparable_minC. Qed.
+Fact joinC : commutative join. Proof. by move=> *; apply: rcomparable_maxC. Qed.
+Fact meetA : associative meet. Proof. by move=> *; apply: rcomparable_minA. Qed.
+Fact joinA : associative join. Proof. by move=> *; apply: rcomparable_maxA. Qed.
+Fact joinKI y x : meet x (join x y) = x. Proof. exact: rcomparable_maxKx. Qed.
+Fact meetKU y x : join x (meet x y) = x. Proof. exact: rcomparable_minKx. Qed.
 
-Fact rleEmeet x y : (x <=_ord y) = (meet x y == x).
+Fact leEmeet x y : (x <=_ord y) = (meet x y == x).
 Proof. by rewrite req_minl. Qed.
 
 Definition latticeMixin : latticePOrderRelMixin ord :=
-  LatticePOrderRelMixin rmeetC rjoinC rmeetA rjoinA rjoinKI rmeetKU rleEmeet.
+  LatticePOrderRelMixin meetC joinC meetA joinA joinKI meetKU leEmeet.
 
 Definition totalMixin : totalLatticeRelMixin (LatticeOfPOrder latticeMixin) :=
   m.
@@ -4763,35 +4769,35 @@ Variable (T : eqType).
 Record of_ := Build {
   le       : rel T;
   lt       : rel T;
-  rle_def   : forall x y, le x y = (x == y) || lt x y;
+  le_def   : forall x y, le x y = (x == y) || lt x y;
   lt_irr   : irreflexive lt;
-  rlt_trans : transitive lt;
+  lt_trans : transitive lt;
 }.
 
 Variable (m : of_).
 
-Fact rlt_asym x y : (lt m x y && lt m y x) = false.
-Proof. by apply/negP => /andP [] xy /(rlt_trans xy); rewrite (lt_irr m x). Qed.
+Fact lt_asym x y : (lt m x y && lt m y x) = false.
+Proof. by apply/negP => /andP [] xy /(lt_trans xy); rewrite (lt_irr m x). Qed.
 
-Fact rlt_def x y : lt m x y = (y != x) && le m x y.
-Proof. by rewrite rle_def //; case: eqVneq => //= ->; rewrite lt_irr. Qed.
+Fact lt_def x y : lt m x y = (y != x) && le m x y.
+Proof. by rewrite le_def //; case: eqVneq => //= ->; rewrite lt_irr. Qed.
 
-Fact rle_refl : reflexive (le m).
-Proof. by move=> ?; rewrite rle_def // eqxx. Qed.
+Fact le_refl : reflexive (le m).
+Proof. by move=> ?; rewrite le_def // eqxx. Qed.
 
-Fact rle_anti : antisymmetric (le m).
+Fact le_anti : antisymmetric (le m).
 Proof.
-by move=> ? ?; rewrite !rle_def // eq_sym -orb_andr rlt_asym; case: eqP.
+by move=> ? ?; rewrite !le_def // eq_sym -orb_andr lt_asym; case: eqP.
 Qed.
 
-Fact rle_trans : transitive (le m).
+Fact le_trans : transitive (le m).
 Proof.
-by move=> y x z; rewrite !rle_def // => /predU1P [-> //|ltxy] /predU1P [<-|ltyz];
-  rewrite ?ltxy ?(rlt_trans ltxy ltyz) ?orbT.
+by move=> y x z; rewrite !le_def // => /predU1P [-> //|ltxy] /predU1P [<-|ltyz];
+  rewrite ?ltxy ?(lt_trans ltxy ltyz) ?orbT.
 Qed.
 
 Definition porderMixin : lePOrderMixin T :=
-  LePOrderMixin rlt_def rle_refl rle_anti rle_trans.
+  LePOrderMixin lt_def le_refl le_anti le_trans.
 
 End LtPOrderMixin.
 
@@ -4813,39 +4819,39 @@ Record of_ := Build {
   lt : rel T;
   meet : T -> T -> T;
   join : T -> T -> T;
-  rle_def : forall x y : T, le x y = (meet x y == x);
-  rlt_def : forall x y : T, lt x y = (y != x) && le x y;
-  rmeetC : commutative meet;
-  rjoinC : commutative join;
-  rmeetA : associative meet;
-  rjoinA : associative join;
-  rjoinKI : forall y x : T, meet x (join x y) = x;
-  rmeetKU : forall y x : T, join x (meet x y) = x;
-  rmeetxx : idempotent meet;
+  le_def : forall x y : T, le x y = (meet x y == x);
+  lt_def : forall x y : T, lt x y = (y != x) && le x y;
+  meetC : commutative meet;
+  joinC : commutative join;
+  meetA : associative meet;
+  joinA : associative join;
+  joinKI : forall y x : T, meet x (join x y) = x;
+  meetKU : forall y x : T, join x (meet x y) = x;
+  meetxx : idempotent meet;
 }.
 
 Variable (m : of_).
 
-Fact rle_refl : reflexive (le m).
-Proof. by move=> x; rewrite rle_def ?rmeetxx. Qed.
+Fact le_refl : reflexive (le m).
+Proof. by move=> x; rewrite le_def ?meetxx. Qed.
 
-Fact rle_anti : antisymmetric (le m).
-Proof. by move=> x y; rewrite !rle_def // rmeetC // => /andP [] /eqP -> /eqP. Qed.
+Fact le_anti : antisymmetric (le m).
+Proof. by move=> x y; rewrite !le_def // meetC // => /andP [] /eqP -> /eqP. Qed.
 
-Fact rle_trans : transitive (le m).
+Fact le_trans : transitive (le m).
 Proof.
-move=> y x z; rewrite !rle_def // => /eqP lexy /eqP leyz; apply/eqP.
-by rewrite -[in LHS]lexy -rmeetA // leyz.
+move=> y x z; rewrite !le_def // => /eqP lexy /eqP leyz; apply/eqP.
+by rewrite -[in LHS]lexy -meetA // leyz.
 Qed.
 
 Definition porderMixin : lePOrderMixin T :=
-  LePOrderMixin (rlt_def m) rle_refl rle_anti rle_trans.
+  LePOrderMixin (lt_def m) le_refl le_anti le_trans.
 
 Definition latticeMixin :
   latticePOrderRelMixin (POrder (le m) (lt m) porderMixin) :=
   @LatticePOrderRelMixin
     _ (POrder (le m) (lt m) porderMixin) (meet m) (join m)
-    (rmeetC m) (rjoinC m) (rmeetA m) (rjoinA m) (rjoinKI m) (rmeetKU m) (rle_def m).
+    (meetC m) (joinC m) (meetA m) (joinA m) (joinKI m) (meetKU m) (le_def m).
 
 End MeetJoinMixin.
 
@@ -4868,28 +4874,28 @@ Record of_ := Build {
   lt : rel T;
   meet : T -> T -> T;
   join : T -> T -> T;
-  rle_def : forall x y : T, le x y = (meet x y == x);
-  rlt_def : forall x y : T, lt x y = (y != x) && le x y;
-  rmeetC : commutative meet;
-  rjoinC : commutative join;
-  rmeetA : associative meet;
-  rjoinA : associative join;
-  rjoinKI : forall y x : T, meet x (join x y) = x;
-  rmeetKU : forall y x : T, join x (meet x y) = x;
-  rmeetUl : left_distributive meet join;
-  rmeetxx : idempotent meet;
+  le_def : forall x y : T, le x y = (meet x y == x);
+  lt_def : forall x y : T, lt x y = (y != x) && le x y;
+  meetC : commutative meet;
+  joinC : commutative join;
+  meetA : associative meet;
+  joinA : associative join;
+  joinKI : forall y x : T, meet x (join x y) = x;
+  meetKU : forall y x : T, join x (meet x y) = x;
+  meetUl : left_distributive meet join;
+  meetxx : idempotent meet;
 }.
 
 Variable (m : of_).
 
 Definition latticeMixin : meetJoinMixin T :=
-  MeetJoinMixin (rle_def m) (rlt_def m) (rmeetC m) (rjoinC m) (rmeetA m) (rjoinA m)
-                (rjoinKI m) (rmeetKU m) (rmeetxx m).
+  MeetJoinMixin (le_def m) (lt_def m) (meetC m) (joinC m) (meetA m) (joinA m)
+                (joinKI m) (meetKU m) (meetxx m).
 
 Let le_lattice := LatticeOfPOrder latticeMixin.
 
 Definition distrLatticeMixin : distrLatticeRelMixin le_lattice :=
-  @DistrLatticeRelMixin _ le_lattice (rmeetUl m).
+  @DistrLatticeRelMixin _ le_lattice (meetUl m).
 
 End DistrMeetJoinMixin.
 
@@ -4912,21 +4918,21 @@ Record of_ := Build {
   lt : rel T;
   meet : T -> T -> T;
   join : T -> T -> T;
-  rlt_def : forall x y, lt x y = (y != x) && le x y;
+  lt_def : forall x y, lt x y = (y != x) && le x y;
   meet_def : forall x y, meet x y = if lt x y then x else y;
   join_def : forall x y, join x y = if lt x y then y else x;
-  rle_anti : antisymmetric le;
-  rle_trans : transitive le;
+  le_anti : antisymmetric le;
+  le_trans : transitive le;
   le_total : total le;
 }.
 
 Variables (m : of_).
 
-Fact rle_refl : reflexive (le m).
+Fact le_refl : reflexive (le m).
 Proof. by move=> x; case: (le m x x) (le_total m x x). Qed.
 
 Definition porderMixin :=
-  LePOrderMixin (rlt_def m) rle_refl (@rle_anti m) (@rle_trans m).
+  LePOrderMixin (lt_def m) le_refl (@le_anti m) (@le_trans m).
 
 Let le_order :=
   OrderOfLattice
@@ -4935,33 +4941,33 @@ Let le_order :=
 Let meetE x y : meet m x y = RelOrder.meet le_order x y := meet_def m x y.
 Let joinE x y : join m x y = RelOrder.join le_order x y := join_def m x y.
 
-Fact rmeetC : commutative (meet m).
+Fact meetC : commutative (meet m).
 Proof. by move=> *; rewrite !meetE rmeetC. Qed.
 
-Fact rjoinC : commutative (join m).
+Fact joinC : commutative (join m).
 Proof. by move=> *; rewrite !joinE rjoinC. Qed.
 
-Fact rmeetA : associative (meet m).
+Fact meetA : associative (meet m).
 Proof. by move=> *; rewrite !meetE rmeetA. Qed.
 
-Fact rjoinA : associative (join m).
+Fact joinA : associative (join m).
 Proof. by move=> *; rewrite !joinE rjoinA. Qed.
 
-Fact rjoinKI y x : meet m x (join m x y) = x.
+Fact joinKI y x : meet m x (join m x y) = x.
 Proof. by rewrite meetE joinE rjoinKI. Qed.
 
-Fact rmeetKU y x : join m x (meet m x y) = x.
+Fact meetKU y x : join m x (meet m x y) = x.
 Proof. by rewrite meetE joinE rmeetKU. Qed.
 
-Fact rmeetxx : idempotent (meet m).
+Fact meetxx : idempotent (meet m).
 Proof. by move=> *; rewrite meetE rmeetxx. Qed.
 
-Fact rle_def x y : le m x y = (meet m x y == x).
+Fact le_def x y : le m x y = (meet m x y == x).
 Proof. by rewrite meetE req_meetl. Qed.
 
 Definition latticeMixin : meetJoinMixin T :=
   MeetJoinMixin
-    rle_def (rlt_def m) rmeetC rjoinC rmeetA rjoinA rjoinKI rmeetKU rmeetxx.
+    le_def (lt_def m) meetC joinC meetA joinA joinKI meetKU meetxx.
 
 Definition totalMixin : totalLatticeRelMixin (LatticeOfPOrder latticeMixin) :=
   le_total m.
@@ -4987,44 +4993,44 @@ Record of_ := Build {
   lt : rel T;
   meet : T -> T -> T;
   join : T -> T -> T;
-  rle_def   : forall x y, le x y = (x == y) || lt x y;
+  le_def   : forall x y, le x y = (x == y) || lt x y;
   meet_def : forall x y, meet x y = if lt x y then x else y;
   join_def : forall x y, join x y = if lt x y then y else x;
   lt_irr   : irreflexive lt;
-  rlt_trans : transitive lt;
-  rlt_total : forall x y, x != y -> lt x y || lt y x;
+  lt_trans : transitive lt;
+  lt_total : forall x y, x != y -> lt x y || lt y x;
 }.
 
 Variables (m : of_).
 
-Fact rlt_def x y : lt m x y = (y != x) && le m x y.
-Proof. by rewrite rle_def //; case: eqVneq => //= ->; rewrite lt_irr. Qed.
+Fact lt_def x y : lt m x y = (y != x) && le m x y.
+Proof. by rewrite le_def //; case: eqVneq => //= ->; rewrite lt_irr. Qed.
 
-Fact rmeet_def_le x y : meet m x y = if lt m x y then x else y.
+Fact meet_def_le x y : meet m x y = if lt m x y then x else y.
 Proof. by rewrite meet_def // rlt_def; case: eqP. Qed.
 
-Fact rjoin_def_le x y : join m x y = if lt m x y then y else x.
+Fact join_def_le x y : join m x y = if lt m x y then y else x.
 Proof. by rewrite join_def // rlt_def; case: eqP. Qed.
 
-Fact rle_anti : antisymmetric (le m).
+Fact le_anti : antisymmetric (le m).
 Proof.
-move=> x y; rewrite !rle_def //.
-by case: eqVneq => //= _ /andP [] hxy /(rlt_trans hxy); rewrite lt_irr.
+move=> x y; rewrite !le_def //.
+by case: eqVneq => //= _ /andP [] hxy /(lt_trans hxy); rewrite lt_irr.
 Qed.
 
-Fact rle_trans : transitive (le m).
+Fact le_trans : transitive (le m).
 Proof.
-move=> y x z; rewrite !rle_def //; case: eqVneq => [->|_] //=.
-by case: eqVneq => [-> ->|_ hxy /(rlt_trans hxy) ->]; rewrite orbT.
+move=> y x z; rewrite !le_def //; case: eqVneq => [->|_] //=.
+by case: eqVneq => [-> ->|_ hxy /(lt_trans hxy) ->]; rewrite orbT.
 Qed.
 
 Fact le_total : total (le m).
 Proof.
-by move=> x y; rewrite !rle_def //; case: eqVneq => //=; exact: rlt_total.
+by move=> x y; rewrite !le_def //; case: eqVneq => //=; exact: lt_total.
 Qed.
 
 Definition orderMixin : leOrderMixin T :=
-  LeOrderMixin rlt_def rmeet_def_le rjoin_def_le rle_anti rle_trans le_total.
+  LeOrderMixin lt_def meet_def_le join_def_le le_anti le_trans le_total.
 
 End LtOrderMixin.
 
@@ -5043,10 +5049,10 @@ Import LtOrderMixin.Exports.
 
 Module NatOrder.
 
-Lemma rltn_def x y : (x < y)%N = (y != x)%N && (x <= y)%N.
+Fact ltn_def x y : (x < y)%N = (y != x)%N && (x <= y)%N.
 Proof. by case: ltngtP. Qed.
 
-Definition nat_pOrderMixin := LePOrderMixin rltn_def leqnn anti_leq leq_trans.
+Definition nat_pOrderMixin := LePOrderMixin ltn_def leqnn anti_leq leq_trans.
 
 Local Canonical nat_pOrder := POrder leq ltn nat_pOrderMixin.
 (* BUG, TODO: the packager [BPOrder] can infer the [pOrder] instance only     *)

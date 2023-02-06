@@ -9648,18 +9648,24 @@ End BoolOrder.
 (* Definition of prod_display. *)
 (*******************************)
 
-Fact prod_display : disp_t. Proof. by []. Qed.
+Fact prod_display_unit (_ _ : unit) : unit. Proof. exact tt. Qed.
+
+Definition prod_display (displ dispr : disp_t) : disp_t :=
+  Disp (prod_display_unit (d1 displ) (d1 dispr))
+    (prod_display_unit (d2 displ) (d2 dispr)).
+
+Fact seqprod_display (disp : disp_t) : disp_t. Proof. exact: disp. Qed.
 
 Module Import ProdSyntax.
 
-Notation "<=^p%O" := (@le prod_display _) : fun_scope.
-Notation ">=^p%O" := (@ge prod_display _)  : fun_scope.
-Notation ">=^p%O" := (@ge prod_display _)  : fun_scope.
-Notation "<^p%O" := (@lt prod_display _) : fun_scope.
-Notation ">^p%O" := (@gt prod_display _) : fun_scope.
-Notation "<?=^p%O" := (@leif prod_display _) : fun_scope.
-Notation ">=<^p%O" := (@comparable prod_display _) : fun_scope.
-Notation "><^p%O" := (fun x y => ~~ (@comparable prod_display _ x y)) :
+Notation "<=^p%O" := (@le (prod_display _ _) _) : fun_scope.
+Notation ">=^p%O" := (@ge (prod_display _ _) _)  : fun_scope.
+Notation ">=^p%O" := (@ge (prod_display _ _) _)  : fun_scope.
+Notation "<^p%O" := (@lt (prod_display _ _) _) : fun_scope.
+Notation ">^p%O" := (@gt (prod_display _ _) _) : fun_scope.
+Notation "<?=^p%O" := (@leif (prod_display _ _) _) : fun_scope.
+Notation ">=<^p%O" := (@comparable (prod_display _ _) _) : fun_scope.
+Notation "><^p%O" := (fun x y => ~~ (@comparable (prod_display _ _) _ x y)) :
   fun_scope.
 
 Notation "<=^p y" := (>=^p%O y) : order_scope.
@@ -9701,10 +9707,10 @@ Notation "x ><^p y" := (~~ (><^p%O x y)) : order_scope.
 
 (* The following Local Notations are here to define the \join^p_ and \meet^p_ *)
 (* notations later. Do not remove them.                                       *)
-Local Notation "0" := (@bottom prod_display _).
-Local Notation "1" := (@top prod_display _).
-Local Notation meet := (@meet prod_display _).
-Local Notation join := (@join prod_display _).
+Local Notation "0" := (@bottom (prod_display _ _) _).
+Local Notation "1" := (@top (prod_display _ _) _).
+Local Notation meet := (@meet (prod_display _ _) _).
+Local Notation join := (@join (prod_display _ _) _).
 
 Notation "x `&^p` y" :=  (meet x y) : order_scope.
 Notation "x `|^p` y" := (join x y) : order_scope.
@@ -9834,27 +9840,38 @@ Section ProdOrder.
 
 Definition type (disp : disp_t) (T T' : Type) := (T * T')%type.
 
-Context {disp1 disp2 disp3 : disp_t}.
+Section Basis.
+Context {disp : disp_t}.
 
-Local Notation "T * T'" := (type disp3 T T') : type_scope.
+Local Notation "T * T'" := (type disp T T') : type_scope.
 
 Canonical eqType (T T' : eqType) := Eval hnf in [eqType of T * T'].
 Canonical choiceType (T T' : choiceType) := Eval hnf in [choiceType of T * T'].
 Canonical countType (T T' : countType) := Eval hnf in [countType of T * T'].
 Canonical finType (T T' : finType) := Eval hnf in [finType of T * T'].
 
-Section POrder.
-Variable (T : porderType disp1) (T' : porderType disp2).
-Implicit Types (x y : T * T').
+End Basis.
 
-Definition le x y := (x.1 <= y.1) && (x.2 <= y.2).
+Section POrder.
+Context (typeT1 : Type) (classT1 : POrder.class_of typeT1).
+Context (typeT2 : Type) (classT2 : POrder.class_of typeT2).
+Let T1 := @POrder.Pack disp_tt typeT1 classT1.
+Let T2 := @POrder.Pack disp_tt typeT2 classT2.
+Local Notation "T1 * T2" := (type disp_tt T1 T2) : type_scope.
+Implicit Types (x y : T1 * T2).
+
+Let le x y := (x.1 <= y.1) && (x.2 <= y.2).
+
+Let lt x y := (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
+
+Fact lt_def x y : lt x y = (y != x) && le x y.
+Proof. by rewrite /lt /le eqE negb_and !lt_def andb_orl andbCA -andbA. Qed.
 
 Fact refl : reflexive le. Proof. by move=> ?; rewrite /le !lexx. Qed.
 
 Fact anti : antisymmetric le.
 Proof.
-case=> [? ?] [? ?].
-by rewrite andbAC andbA andbAC -andbA => /= /andP [] /le_anti -> /le_anti ->.
+by move=> [? ?] [? ?]; rewrite andbACA => /andP [] /= /le_anti -> /le_anti ->.
 Qed.
 
 Fact trans : transitive le.
@@ -9863,56 +9880,105 @@ rewrite /le => y x z /andP [] hxy ? /andP [] /(le_trans hxy) ->.
 by apply: le_trans.
 Qed.
 
-Definition porderMixin := LePOrderMixin (rrefl _) refl anti trans.
-Canonical porderType := POrderType disp3 (T * T') porderMixin.
+End POrder.
+
+Section POrder.
+Context (disp1 disp2 disp3 : disp_t).
+Context (T1 : porderType disp1) (T2 : porderType disp2).
+Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
+Implicit Types (x y : T1 * T2).
+
+Let classT1 := POrder.class T1.
+Let classT1d := POrder.class [porderType of T1^d].
+Let classT2 := POrder.class T2.
+Let classT2d := POrder.class [porderType of T2^d].
+
+Definition le x y := (x.1 <= y.1) && (x.2 <= y.2).
+
+Definition lt x y := (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
+
+Definition porderMixin :=
+  @RelOrder.POrder.Mixin
+    _ le lt
+    (@lt_def T1 classT1 T2 classT2) (@lt_def T1 classT1d T2 classT2d)
+    (@refl T1 classT1 T2 classT2) (@refl T1 classT1d T2 classT2d)
+    (@anti T1 classT1 T2 classT2) (@anti T1 classT1d T2 classT2d)
+    (@trans T1 classT1 T2 classT2) (@trans T1 classT1d T2 classT2d).
+Canonical porderType := POrderType disp3 (T1 * T2) porderMixin.
 
 Lemma leEprod x y : (x <= y) = (x.1 <= y.1) && (x.2 <= y.2). Proof. by []. Qed.
 
 Lemma ltEprod x y : (x < y) = [&& x != y, x.1 <= y.1 & x.2 <= y.2].
 Proof. by rewrite lt_neqAle. Qed.
 
-Lemma le_pair (x1 y1 : T) (x2 y2 : T') :
-  (x1, x2) <= (y1, y2) :> T * T' = (x1 <= y1) && (x2 <= y2).
+Lemma le_pair (x1 y1 : T1) (x2 y2 : T2) :
+  (x1, x2) <= (y1, y2) :> T1 * T2 = (x1 <= y1) && (x2 <= y2).
 Proof. by []. Qed.
 
-Lemma lt_pair (x1 y1 : T) (x2 y2 : T') : (x1, x2) < (y1, y2) :> T * T' =
+Lemma lt_pair (x1 y1 : T1) (x2 y2 : T2) : (x1, x2) < (y1, y2) :> T1 * T2 =
   [&& (x1 != y1) || (x2 != y2), x1 <= y1 & x2 <= y2].
 Proof. by rewrite ltEprod negb_and. Qed.
 
 End POrder.
 
 Section BPOrder.
-Variable (T : bPOrderType disp1) (T' : bPOrderType disp2).
+Context (typeT1 : Type) (classT1 : BPOrder.class_of typeT1).
+Context (typeT2 : Type) (classT2 : BPOrder.class_of typeT2).
+Let T1 := @BPOrder.Pack disp_tt typeT1 classT1.
+Let T2 := @BPOrder.Pack disp_tt typeT2 classT2.
+Local Notation "T1 * T2" := (type disp_tt T1 T2) : type_scope.
 
-Fact le0x (x : T * T') : (0, 0) <= x :> T * T'.
+Fact le0x (x : T1 * T2) : (0, 0) <= x :> T1 * T2.
 Proof. by rewrite leEprod !le0x. Qed.
 
-Canonical bPOrderType := BPOrderType (T * T') (BottomMixin le0x).
+End BPOrder.
 
-Lemma botEprod : 0 = (0, 0) :> T * T'. Proof. by []. Qed.
+Section BPOrder.
+Context (disp1 disp2 disp3 : disp_t).
+Context (T1 : bPOrderType disp1) (T2 : bPOrderType disp2).
+Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
+Implicit Types (x y : T1 * T2).
+
+Let le0x (x : T1 * T2) : (0, 0) <= x :> T1 * T2 :=
+      @le0x T1 (BPOrder.class T1) T2 (BPOrder.class T2) x.
+
+Canonical bPOrderType := BPOrderType (T1 * T2) (BottomMixin le0x).
+
+Lemma botEprod : 0 = (0, 0) :> T1 * T2. Proof. by []. Qed.
 
 End BPOrder.
 
 Section TPOrder.
-Variable (T : tPOrderType disp1) (T' : tPOrderType disp2).
+Context (disp1 disp2 disp3 : disp_t).
+Context (T1 : tPOrderType disp1) (T2 : tPOrderType disp2).
+Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
+Implicit Types (x y : T1 * T2).
 
-Fact lex1 (x : T * T') : x <= (1, 1).
-Proof. by rewrite leEprod !lex1. Qed.
+Let classT1d := BPOrder.class [bPOrderType of T1^d].
+Let classT2d := BPOrder.class [bPOrderType of T2^d].
 
-Canonical tPOrderType := TPOrderType (T * T') (TopMixin lex1).
+Let lex1 (x : T1 * T2) : x <= (1, 1) :> T1 * T2 :=
+      @le0x T1 classT1d T2 classT2d x.
 
-Lemma topEprod : 1 = (1, 1) :> T * T'. Proof. by []. Qed.
+Canonical tPOrderType := TPOrderType (T1 * T2) (TopMixin lex1).
+
+Lemma topEprod : 1 = (1, 1) :> T1 * T2. Proof. by []. Qed.
 
 End TPOrder.
 
-Canonical tbPOrderType (T : tbPOrderType disp1) (T' : tbPOrderType disp2) :=
-  [tbPOrderType of T * T'].
+Canonical tbPOrderType (disp1 disp2 disp3 : disp_t)
+  (T : tbPOrderType disp1) (T' : tbPOrderType disp2) :=
+  [tbPOrderType of type disp3 T T'].
 
 Section MeetSemilattice.
-Variable (T : meetSemilatticeType disp1) (T' : meetSemilatticeType disp2).
-Implicit Types (x y : T * T').
+Context (typeT1 : Type) (classT1 : MeetSemilattice.class_of typeT1).
+Context (typeT2 : Type) (classT2 : MeetSemilattice.class_of typeT2).
+Let T1 := @MeetSemilattice.Pack disp_tt typeT1 classT1.
+Let T2 := @MeetSemilattice.Pack disp_tt typeT2 classT2.
+Local Notation "T1 * T2" := (type disp_tt T1 T2) : type_scope.
+Implicit Types (x y : T1 * T2).
 
-Definition meet x y := (x.1 `&` y.1, x.2 `&` y.2).
+Let meet x y := (x.1 `&` y.1, x.2 `&` y.2).
 
 Fact meetC : commutative meet.
 Proof. by move=> ? ?; congr pair; rewrite meetC. Qed.
@@ -9923,94 +9989,134 @@ Proof. by move=> ? ? ?; congr pair; rewrite meetA. Qed.
 Fact leEmeet x y : (x <= y) = (meet x y == x).
 Proof. by rewrite eqE /= -!leEmeet. Qed.
 
-Definition meetMixin := MeetMixin meetC meetA leEmeet.
-Canonical meetSemilatticeType := MeetSemilatticeType (T * T') meetMixin.
+End MeetSemilattice.
+
+Section MeetSemilattice.
+Context (disp1 disp2 disp3 : disp_t).
+Context (T1 : meetSemilatticeType disp1) (T2 : meetSemilatticeType disp2).
+Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
+Implicit Types (x y : T1 * T2).
+
+Let classT1 := MeetSemilattice.class T1.
+Let classT2 := MeetSemilattice.class T2.
+
+Definition meet x y := (x.1 `&` y.1, x.2 `&` y.2).
+
+Definition meetMixin :=
+  @MeetMixin _ _ meet (@meetC T1 classT1 T2 classT2)
+    (@meetA T1 classT1 T2 classT2) (@leEmeet T1 classT1 T2 classT2).
+Canonical meetSemilatticeType := MeetSemilatticeType (T1 * T2) meetMixin.
 
 Lemma meetEprod x y : x `&` y = (x.1 `&` y.1, x.2 `&` y.2). Proof. by []. Qed.
 
 End MeetSemilattice.
 
-Canonical bMeetSemilatticeType
+Canonical bMeetSemilatticeType (disp1 disp2 disp3 : disp_t)
           (T : bMeetSemilatticeType disp1) (T' : bMeetSemilatticeType disp2) :=
-  [bMeetSemilatticeType of T * T'].
-Canonical tMeetSemilatticeType
+  [bMeetSemilatticeType of type disp3 T T'].
+Canonical tMeetSemilatticeType (disp1 disp2 disp3 : disp_t)
           (T : tMeetSemilatticeType disp1) (T' : tMeetSemilatticeType disp2) :=
-  [tMeetSemilatticeType of T * T'].
-Canonical tbMeetSemilatticeType
+  [tMeetSemilatticeType of type disp3 T T'].
+Canonical tbMeetSemilatticeType (disp1 disp2 disp3 : disp_t)
           (T : tbMeetSemilatticeType disp1)
           (T' : tbMeetSemilatticeType disp2) :=
-  [tbMeetSemilatticeType of T * T'].
+  [tbMeetSemilatticeType of type disp3 T T'].
 
 Section JoinSemilattice.
-Variable (T : joinSemilatticeType disp1) (T' : joinSemilatticeType disp2).
-Implicit Types (x y : T * T').
+Context (disp1 disp2 disp3 : disp_t).
+Context (T1 : joinSemilatticeType disp1) (T2 : joinSemilatticeType disp2).
+Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
+Implicit Types (x y : T1 * T2).
+
+Let classT1d := MeetSemilattice.class [meetSemilatticeType of T1^d].
+Let classT2d := MeetSemilattice.class [meetSemilatticeType of T2^d].
 
 Definition join x y := (x.1 `|` y.1, x.2 `|` y.2).
 
-Fact joinC : commutative join.
-Proof. by move=> ? ?; congr pair; rewrite joinC. Qed.
-
-Fact joinA : associative join.
-Proof. by move=> ? ? ?; congr pair; rewrite joinA. Qed.
-
-Fact leEjoin x y : (y <= x) = (join x y == x).
-Proof. by rewrite eqE /= !eq_joinl. Qed.
-
-Definition joinMixin := JoinMixin joinC joinA leEjoin.
-Canonical joinSemilatticeType := JoinSemilatticeType (T * T') joinMixin.
+Definition joinMixin :=
+  @JoinMixin _ _ join (@meetC T1 classT1d T2 classT2d)
+    (@meetA T1 classT1d T2 classT2d) (@leEmeet T1 classT1d T2 classT2d).
+Canonical joinSemilatticeType := JoinSemilatticeType (T1 * T2) joinMixin.
 
 Lemma joinEprod x y : x `|` y = (x.1 `|` y.1, x.2 `|` y.2). Proof. by []. Qed.
 
 End JoinSemilattice.
 
-Canonical bJoinSemilatticeType
-          (T : bJoinSemilatticeType disp1) (T' : bJoinSemilatticeType disp2) :=
-  [bJoinSemilatticeType of T * T'].
-Canonical tJoinSemilatticeType
-          (T : tJoinSemilatticeType disp1) (T' : tJoinSemilatticeType disp2) :=
-  [tJoinSemilatticeType of T * T'].
-Canonical tbJoinSemilatticeType
-          (T : tbJoinSemilatticeType disp1)
-          (T' : tbJoinSemilatticeType disp2) :=
-  [tbJoinSemilatticeType of T * T'].
+Canonical bJoinSemilatticeType (disp1 disp2 disp3 : disp_t)
+  (T : bJoinSemilatticeType disp1) (T' : bJoinSemilatticeType disp2) :=
+  [bJoinSemilatticeType of type disp3 T T'].
+Canonical tJoinSemilatticeType (disp1 disp2 disp3 : disp_t)
+  (T : tJoinSemilatticeType disp1) (T' : tJoinSemilatticeType disp2) :=
+  [tJoinSemilatticeType of type disp3 T T'].
+Canonical tbJoinSemilatticeType (disp1 disp2 disp3 : disp_t)
+  (T : tbJoinSemilatticeType disp1) (T' : tbJoinSemilatticeType disp2) :=
+  [tbJoinSemilatticeType of type disp3 T T'].
 
-Canonical latticeType (T : latticeType disp1) (T' : latticeType disp2) :=
-  [latticeType of T * T'].
-Canonical bLatticeType (T : bLatticeType disp1) (T' : bLatticeType disp2) :=
-  [bLatticeType of T * T'].
-Canonical tLatticeType (T : tLatticeType disp1) (T' : tLatticeType disp2) :=
-  [tLatticeType of T * T'].
-Canonical tbLatticeType (T : tbLatticeType disp1) (T' : tbLatticeType disp2) :=
-  [tbLatticeType of T * T'].
+Canonical latticeType (disp1 disp2 disp3 : disp_t)
+  (T : latticeType disp1) (T' : latticeType disp2) :=
+  [latticeType of type disp3 T T'].
+Canonical bLatticeType (disp1 disp2 disp3 : disp_t)
+  (T : bLatticeType disp1) (T' : bLatticeType disp2) :=
+  [bLatticeType of type disp3 T T'].
+Canonical tLatticeType (disp1 disp2 disp3 : disp_t)
+  (T : tLatticeType disp1) (T' : tLatticeType disp2) :=
+  [tLatticeType of type disp3 T T'].
+Canonical tbLatticeType (disp1 disp2 disp3 : disp_t)
+  (T : tbLatticeType disp1) (T' : tbLatticeType disp2) :=
+  [tbLatticeType of type disp3 T T'].
 
 Section DistrLattice.
-Variable (T : distrLatticeType disp1) (T' : distrLatticeType disp2).
+Context (typeT1 : Type) (classT1 : DistrLattice.class_of typeT1).
+Context (typeT2 : Type) (classT2 : DistrLattice.class_of typeT2).
+Let T1 := @DistrLattice.Pack disp_tt typeT1 classT1.
+Let T2 := @DistrLattice.Pack disp_tt typeT2 classT2.
+Local Notation "T1 * T2" := (type disp_tt T1 T2) : type_scope.
 
-Fact meetUl : left_distributive (@meet T T') (@join T T').
+Fact meetUl : left_distributive
+                (@Order.meet _ [latticeType of T1 * T2])
+                (@Order.join _ [latticeType of T1 * T2]).
 Proof. by move=> ? ? ?; congr pair; rewrite meetUl. Qed.
-
-Definition distrLatticeMixin := DistrLatticeMixin meetUl.
-Canonical distrLatticeType := DistrLatticeType (T * T') distrLatticeMixin.
 
 End DistrLattice.
 
-Canonical bDistrLatticeType
-          (T : bDistrLatticeType disp1) (T' : bDistrLatticeType disp2) :=
-  [bDistrLatticeType of T * T'].
-Canonical tDistrLatticeType
-          (T : tDistrLatticeType disp1) (T' : tDistrLatticeType disp2) :=
-  [tDistrLatticeType of T * T'].
-Canonical tbDistrLatticeType
-          (T : tbDistrLatticeType disp1) (T' : tbDistrLatticeType disp2) :=
-  [tbDistrLatticeType of T * T'].
+Section DistrLattice.
+Context (disp1 disp2 disp3 : disp_t).
+Context (T1 : distrLatticeType disp1) (T2 : distrLatticeType disp2).
+Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
+Implicit Types (x y : T1 * T2).
+
+Let classT1 := DistrLattice.class T1.
+Let classT1d := DistrLattice.class [distrLatticeType of T1^d].
+Let classT2 := DistrLattice.class T2.
+Let classT2d := DistrLattice.class [distrLatticeType of T2^d].
+
+Definition distrLatticeMixin :=
+  RelOrder.DistrLattice.Mixin (ord := latticeType disp3 T1 T2)
+    (@meetUl T1 classT1 T2 classT2) (@meetUl T1 classT1d T2 classT2d).
+Canonical distrLatticeType := DistrLatticeType (T1 * T2) distrLatticeMixin.
+
+End DistrLattice.
+
+Canonical bDistrLatticeType (disp1 disp2 disp3 : disp_t)
+  (T : bDistrLatticeType disp1) (T' : bDistrLatticeType disp2) :=
+  [bDistrLatticeType of type disp3 T T'].
+Canonical tDistrLatticeType (disp1 disp2 disp3 : disp_t)
+  (T : tDistrLatticeType disp1) (T' : tDistrLatticeType disp2) :=
+  [tDistrLatticeType of type disp3 T T'].
+Canonical tbDistrLatticeType (disp1 disp2 disp3 : disp_t)
+  (T : tbDistrLatticeType disp1) (T' : tbDistrLatticeType disp2) :=
+  [tbDistrLatticeType of type disp3 T T'].
 
 Section CBDistrLattice.
-Variable (T : cbDistrLatticeType disp1) (T' : cbDistrLatticeType disp2).
+Context (disp1 disp2 disp3 : disp_t).
+Context (T : cbDistrLatticeType disp1) (T' : cbDistrLatticeType disp2).
+Local Notation "T * T'" := (type disp3 T T') : type_scope.
 Implicit Types (x y : T * T').
 
 Definition sub x y := (x.1 `\` y.1, x.2 `\` y.2).
 
-Lemma subKI x y : y `&` sub x y = 0. Proof. by congr pair; rewrite subKI. Qed.
+Lemma subKI x y : y `&` sub x y = 0.
+Proof. by congr pair; rewrite subKI. Qed.
 
 Lemma joinIB x y : x `&` y `|` sub x y = x.
 Proof. by case: x => ? ?; congr pair; rewrite joinIB. Qed.
@@ -10023,7 +10129,9 @@ Lemma subEprod x y : x `\` y = (x.1 `\` y.1, x.2 `\` y.2). Proof. by []. Qed.
 End CBDistrLattice.
 
 Section CTBDistrLattice.
-Variable (T : ctbDistrLatticeType disp1) (T' : ctbDistrLatticeType disp2).
+Context (disp1 disp2 disp3 : disp_t).
+Context (T : ctbDistrLatticeType disp1) (T' : ctbDistrLatticeType disp2).
+Local Notation "T * T'" := (type disp3 T T') : type_scope.
 Implicit Types (x y : T * T').
 
 Definition compl x : T * T' := (~` x.1, ~` x.2).
@@ -10038,44 +10146,57 @@ Lemma complEprod x : ~` x = (~` x.1, ~` x.2). Proof. by []. Qed.
 
 End CTBDistrLattice.
 
-Canonical finPOrderType (T : finPOrderType disp1)
-  (T' : finPOrderType disp2) := [finPOrderType of T * T'].
+Canonical finPOrderType (disp1 disp2 disp3 : disp_t)
+  (T : finPOrderType disp1) (T' : finPOrderType disp2) :=
+  [finPOrderType of type disp3 T T'].
 
-Canonical finBPOrderType (T : finBPOrderType disp1)
-  (T' : finBPOrderType disp2) := [finBPOrderType of T * T'].
+Canonical finBPOrderType (disp1 disp2 disp3 : disp_t)
+  (T : finBPOrderType disp1) (T' : finBPOrderType disp2) :=
+  [finBPOrderType of type disp3 T T'].
 
-Canonical finTPOrderType (T : finTPOrderType disp1)
-  (T' : finTPOrderType disp2) := [finTPOrderType of T * T'].
+Canonical finTPOrderType (disp1 disp2 disp3 : disp_t)
+  (T : finTPOrderType disp1) (T' : finTPOrderType disp2) :=
+  [finTPOrderType of type disp3 T T'].
 
-Canonical finTBPOrderType (T : finTBPOrderType disp1)
-  (T' : finTBPOrderType disp2) := [finTBPOrderType of T * T'].
+Canonical finTBPOrderType (disp1 disp2 disp3 : disp_t)
+  (T : finTBPOrderType disp1) (T' : finTBPOrderType disp2) :=
+  [finTBPOrderType of type disp3 T T'].
 
-Canonical finMeetSemilatticeType (T : finMeetSemilatticeType disp1)
-  (T' : finMeetSemilatticeType disp2) := [finMeetSemilatticeType of T * T'].
+Canonical finMeetSemilatticeType (disp1 disp2 disp3 : disp_t)
+  (T : finMeetSemilatticeType disp1) (T' : finMeetSemilatticeType disp2) :=
+  [finMeetSemilatticeType of type disp3 T T'].
 
-Canonical finBMeetSemilatticeType (T : finBMeetSemilatticeType disp1)
-  (T' : finBMeetSemilatticeType disp2) := [finBMeetSemilatticeType of T * T'].
+Canonical finBMeetSemilatticeType (disp1 disp2 disp3 : disp_t)
+  (T : finBMeetSemilatticeType disp1) (T' : finBMeetSemilatticeType disp2) :=
+  [finBMeetSemilatticeType of type disp3 T T'].
 
-Canonical finJoinSemilatticeType (T : finJoinSemilatticeType disp1)
-  (T' : finJoinSemilatticeType disp2) := [finJoinSemilatticeType of T * T'].
+Canonical finJoinSemilatticeType (disp1 disp2 disp3 : disp_t)
+  (T : finJoinSemilatticeType disp1) (T' : finJoinSemilatticeType disp2) :=
+  [finJoinSemilatticeType of type disp3 T T'].
 
-Canonical finTJoinSemilatticeType (T : finTJoinSemilatticeType disp1)
-  (T' : finTJoinSemilatticeType disp2) := [finTJoinSemilatticeType of T * T'].
+Canonical finTJoinSemilatticeType (disp1 disp2 disp3 : disp_t)
+  (T : finTJoinSemilatticeType disp1) (T' : finTJoinSemilatticeType disp2) :=
+  [finTJoinSemilatticeType of type disp3 T T'].
 
-Canonical finLatticeType (T : finLatticeType disp1)
-  (T' : finLatticeType disp2) := [finLatticeType of T * T'].
+Canonical finLatticeType (disp1 disp2 disp3 : disp_t)
+  (T : finLatticeType disp1) (T' : finLatticeType disp2) :=
+  [finLatticeType of type disp3 T T'].
 
-Canonical finTBLatticeType (T : finTBLatticeType disp1)
-  (T' : finTBLatticeType disp2) := [finTBLatticeType of T * T'].
+Canonical finTBLatticeType (disp1 disp2 disp3 : disp_t)
+  (T : finTBLatticeType disp1) (T' : finTBLatticeType disp2) :=
+  [finTBLatticeType of type disp3 T T'].
 
-Canonical finDistrLatticeType (T : finDistrLatticeType disp1)
-  (T' : finDistrLatticeType disp2) := [finDistrLatticeType of T * T'].
+Canonical finDistrLatticeType (disp1 disp2 disp3 : disp_t)
+  (T : finDistrLatticeType disp1) (T' : finDistrLatticeType disp2) :=
+  [finDistrLatticeType of type disp3 T T'].
 
-Canonical finTBDistrLatticeType (T : finTBDistrLatticeType disp1)
-  (T' : finTBDistrLatticeType disp2) := [finTBDistrLatticeType of T * T'].
+Canonical finTBDistrLatticeType (disp1 disp2 disp3 : disp_t)
+  (T : finTBDistrLatticeType disp1) (T' : finTBDistrLatticeType disp2) :=
+  [finTBDistrLatticeType of type disp3 T T'].
 
-Canonical finCTBDistrLatticeType (T : finCTBDistrLatticeType disp1)
-  (T' : finCTBDistrLatticeType disp2) := [finCTBDistrLatticeType of T * T'].
+Canonical finCTBDistrLatticeType (disp1 disp2 disp3 : disp_t)
+  (T : finCTBDistrLatticeType disp1) (T' : finCTBDistrLatticeType disp2) :=
+  [finCTBDistrLatticeType of type disp3 T T'].
 
 End ProdOrder.
 
@@ -10083,7 +10204,7 @@ Module Exports.
 
 Notation "T *prod[ d ] T'" := (type d T T')
   (at level 70, d at next level, format "T  *prod[ d ]  T'") : type_scope.
-Notation "T *p T'" := (type prod_display T T')
+Notation "T *p T'" := (ProdOrder.type _ T T')
   (at level 70, format "T  *p  T'") : type_scope.
 
 Canonical eqType.
@@ -10142,6 +10263,9 @@ Import ProdOrder.Exports.
 Module DefaultProdOrder.
 Section DefaultProdOrder.
 Context {disp1 disp2 : disp_t}.
+
+Local Notation "T *p T'" := (T *prod[prod_display disp1 disp2] T')
+  (at level 70, format "T  *p  T'") : type_scope.
 
 Canonical prod_porderType (T : porderType disp1) (T' : porderType disp2) :=
   [porderType of T * T' for [porderType of T *p T']].
@@ -10941,7 +11065,6 @@ End SeqProdOrder.
 Module Exports.
 
 Notation seqprod_with := type.
-Notation seqprod := (type prod_display).
 
 Canonical eqType.
 Canonical choiceType.
@@ -10973,6 +11096,8 @@ Import SeqProdOrder.Exports.
 Module DefaultSeqProdOrder.
 Section DefaultSeqProdOrder.
 Context {disp : disp_t}.
+
+Notation seqprod T := (seqprod_with (seqprod_display disp) T).
 
 Canonical seqprod_porderType (T : porderType disp) :=
   [porderType of seq T for [porderType of seqprod T]].
@@ -11505,7 +11630,7 @@ Module Exports.
 Notation "n .-tupleprod[ disp ]" := (type disp n)
   (at level 2, disp at next level, format "n .-tupleprod[ disp ]") :
   type_scope.
-Notation "n .-tupleprod" := (n.-tupleprod[prod_display])
+Notation "n .-tupleprod" := (n.-tupleprod[_])
   (at level 2, format "n .-tupleprod") : type_scope.
 
 Canonical eqType.
@@ -11569,6 +11694,9 @@ Import TupleProdOrder.Exports.
 Module DefaultTupleProdOrder.
 Section DefaultTupleProdOrder.
 Context {disp : disp_t}.
+
+Local Notation "n .-tupleprod" := (n.-tupleprod[seqprod_display disp])
+  (at level 2, format "n .-tupleprod") : type_scope.
 
 Canonical tprod_porderType n (T : porderType disp) :=
   [porderType of n.-tuple T for [porderType of n.-tupleprod T]].

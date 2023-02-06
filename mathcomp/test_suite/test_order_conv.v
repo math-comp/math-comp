@@ -81,7 +81,7 @@ Let eq_dual_dual_tbTotalOrder (ord : {tbTotalOrder T}) :
 End relorder.
 
 Section order.
-Variable (disp : unit).
+Variable (disp : Order.disp_t).
 
 Let eq_dual_dual_porderType (T : porderType disp) :
   Order.POrder.class T = Order.POrder.class [porderType of T^d^d] := erefl.
@@ -228,3 +228,80 @@ Let eq_dual_dual_finTBOrderType (T : finTBOrderType disp) :
   erefl.
 
 End order.
+
+Section prod_order.
+Variable (disp1 disp2 : Order.disp_t).
+
+Import DefaultProdOrder.
+
+Let eq_dual_prod_porderType (T : porderType disp1) (T' : porderType disp2) :
+  [porderType of (T * T')^d] = [porderType of T^d * T'^d] := erefl.
+Let eq_dual_prod_bPOrderType (T : bPOrderType disp1) (T' : bPOrderType disp2) :
+  [tPOrderType of (T * T')^d] = [tPOrderType of T^d * T'^d] := erefl.
+Let eq_dual_prod_tPOrderType (T : tPOrderType disp1) (T' : tPOrderType disp2) :
+  [bPOrderType of (T * T')^d] = [bPOrderType of T^d * T'^d] := erefl.
+Let eq_dual_prod_tbPOrderType
+  (T : tbPOrderType disp1) (T' : tbPOrderType disp2) :
+  [tbPOrderType of (T * T')^d] = [tbPOrderType of T^d * T'^d] := erefl.
+Let eq_dual_prod_meetSemilatticeType
+  (T : meetSemilatticeType disp1) (T' : meetSemilatticeType disp2) :
+  [joinSemilatticeType of (T * T')^d] = [joinSemilatticeType of T^d * T'^d] :=
+      erefl.
+Let eq_dual_prod_bMeetSemilatticeType
+  (T : bMeetSemilatticeType disp1) (T' : bMeetSemilatticeType disp2) :
+  [tJoinSemilatticeType of (T * T')^d] = [tJoinSemilatticeType of T^d * T'^d] :=
+      erefl.
+Let eq_dual_prod_tMeetSemilatticeType
+  (T : tMeetSemilatticeType disp1) (T' : tMeetSemilatticeType disp2) :
+  [bJoinSemilatticeType of (T * T')^d] = [bJoinSemilatticeType of T^d * T'^d] :=
+      erefl.
+Let eq_dual_prod_tbMeetSemilatticeType
+  (T : tbMeetSemilatticeType disp1) (T' : tbMeetSemilatticeType disp2) :
+  [tbJoinSemilatticeType of (T * T')^d] =
+    [tbJoinSemilatticeType of T^d * T'^d] :=
+      erefl.
+Let eq_dual_prod_joinSemilatticeType
+  (T : joinSemilatticeType disp1) (T' : joinSemilatticeType disp2) :
+  [meetSemilatticeType of (T * T')^d] = [meetSemilatticeType of T^d * T'^d] :=
+      erefl.
+Let eq_dual_prod_bJoinSemilatticeType
+  (T : bJoinSemilatticeType disp1) (T' : bJoinSemilatticeType disp2) :
+  [tMeetSemilatticeType of (T * T')^d] = [tMeetSemilatticeType of T^d * T'^d] :=
+      erefl.
+Let eq_dual_prod_tJoinSemilatticeType
+  (T : tJoinSemilatticeType disp1) (T' : tJoinSemilatticeType disp2) :
+  [bMeetSemilatticeType of (T * T')^d] = [bMeetSemilatticeType of T^d * T'^d] :=
+      erefl.
+Let eq_dual_prod_tbJoinSemilatticeType
+  (T : tbJoinSemilatticeType disp1) (T' : tbJoinSemilatticeType disp2) :
+  [tbMeetSemilatticeType of (T * T')^d] =
+    [tbMeetSemilatticeType of T^d * T'^d] :=
+      erefl.
+Let eq_dual_prod_latticeType (T : latticeType disp1) (T' : latticeType disp2) :
+  [latticeType of (T * T')^d] = [latticeType of T^d * T'^d] := erefl.
+Let eq_dual_prod_bLatticeType
+  (T : bLatticeType disp1) (T' : bLatticeType disp2) :
+  [tLatticeType of (T * T')^d] = [tLatticeType of T^d * T'^d] := erefl.
+Let eq_dual_prod_tLatticeType
+  (T : tLatticeType disp1) (T' : tLatticeType disp2) :
+  [bLatticeType of (T * T')^d] = [bLatticeType of T^d * T'^d] := erefl.
+Let eq_dual_prod_tbLatticeType
+  (T : tbLatticeType disp1) (T' : tbLatticeType disp2) :
+  [tbLatticeType of (T * T')^d] = [tbLatticeType of T^d * T'^d] := erefl.
+Let eq_dual_prod_distrLatticeType
+  (T : distrLatticeType disp1) (T' : distrLatticeType disp2) :
+  [distrLatticeType of (T * T')^d] = [distrLatticeType of T^d * T'^d] := erefl.
+Let eq_dual_prod_bDistrLatticeType
+  (T : bDistrLatticeType disp1) (T' : bDistrLatticeType disp2) :
+  [tDistrLatticeType of (T * T')^d] = [tDistrLatticeType of T^d * T'^d] :=
+      erefl.
+Let eq_dual_prod_tDistrLatticeType
+  (T : tDistrLatticeType disp1) (T' : tDistrLatticeType disp2) :
+  [bDistrLatticeType of (T * T')^d] = [bDistrLatticeType of T^d * T'^d] :=
+      erefl.
+Let eq_dual_prod_tbDistrLatticeType
+  (T : tbDistrLatticeType disp1) (T' : tbDistrLatticeType disp2) :
+  [tbDistrLatticeType of (T * T')^d] = [tbDistrLatticeType of T^d * T'^d] :=
+      erefl.
+
+End prod_order.
