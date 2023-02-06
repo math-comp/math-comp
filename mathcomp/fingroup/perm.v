@@ -297,6 +297,11 @@ Proof. by set t := tperm x y; rewrite -{2}(mulgK t t) -mulgA tpermKg. Qed.
 Lemma tperm2 x y : tperm x y * tperm x y = 1.
 Proof. by rewrite -{1}tpermV mulVg. Qed.
 
+Lemma tperm_on x y : perm_on [set x; y] (tperm x y).
+Proof.
+by apply/subsetP => z /[!inE]; case: tpermP => [->|->|]; rewrite eqxx // orbT.
+Qed.
+
 Lemma card_perm A : #|perm_on A| = (#|A|)`!.
 Proof.
 pose ffA := {ffun {x | x \in A} -> T}.
