@@ -1946,6 +1946,16 @@ Lemma bigID I r (a P : pred I) F :
 Proof. apply: bigID_idem; [exact: mulmA|exact: mulmC|exact: mul1m]. Qed.
 Arguments bigID [I r].
 
+Lemma big_if I r (P Q : pred I) F G :
+  \big[*%M/1]_(i <- r | P i) (if Q i then F i else G i) =
+    \big[*%M/1]_(i <- r | P i && Q i) F i *
+    \big[*%M/1]_(i <- r | P i && ~~ Q i) G i.
+Proof.
+rewrite (bigID Q); congr (_ * _); apply: eq_bigr => i /andP[_].
+  by move=> ->.
+by move=> /negPf ->.
+Qed.
+
 Lemma bigU (I : finType) (A B : pred I) F :
     [disjoint A & B] ->
   \big[*%M/1]_(i in [predU A & B]) F i =

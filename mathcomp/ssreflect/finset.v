@@ -1494,6 +1494,25 @@ Proof. by apply: partition_big => i Ai; apply/imsetP; exists i. Qed.
 
 End BigOps.
 
+Lemma bigA_distr (R : Type) (zero one : R) (mul : Monoid.mul_law zero)
+  (add : Monoid.add_law zero mul) (I : finType) (F G : I -> R) :
+  \big[mul/one]_i add (F i) (G i) =
+  \big[add/zero]_(J in {set I}) \big[mul/one]_i (if i \in J then F i else G i).
+Proof.
+under eq_bigr => i _ do rewrite -(big_bool _ (fun b => if b then F i else G i)).
+rewrite bigA_distr_bigA.
+set f := fun J : {set I} => val J.
+transitivity (\big[add/zero]_(f0 in (imset f (mem setT)))
+                \big[mul/one]_i (if f0 i then F i else G i)).
+  suff <-: setT = imset f (mem setT) by apply: congr_big=>// i; rewrite in_setT.
+  apply/esym/eqP; rewrite -subTset; apply/subsetP => b _.
+  by apply/imsetP; exists (FinSet b).
+rewrite big_imset; last by case=> g; case=> h _ _; rewrite /f => /= ->.
+apply: congr_big => //; case=> g; first exact: in_setT.
+move=> _; apply: eq_bigr => i _; congr (if _ then _ else _).
+by rewrite SetDef.pred_of_setE.
+Qed.
+
 Arguments big_setID [R idx aop I A].
 Arguments big_setD1 [R idx aop I] a [A F].
 Arguments big_setU1 [R idx aop I] a [A F].
