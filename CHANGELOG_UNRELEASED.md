@@ -13,6 +13,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `perm.v`
   + lemmas `perm_on_id`, `perm_onC`, `tperm_on`
 
+- in `bigop.v`
+  + lemma `big_if`
+
+- in `finset.v`
+  + lemma `bigA_distr`
+
+- in `poly.v`
+  + lemmas `coef_prod_XsubC`, `coefPn_prod_XsubC`, `coef0_prod_XsubC`
+
 ### Changed
 
 ### Renamed
