@@ -731,6 +731,9 @@ Reserved Notation "a \o* f" (at level 40).
 Reserved Notation "a \*: f" (at level 40).
 Reserved Notation "f \* g" (at level 40, left associativity).
 
+Reserved Notation "'{' 'semi_additive' U '->' V '}'"
+  (at level 0, U at level 98, V at level 99,
+   format "{ 'semi_additive'  U  ->  V }").
 Reserved Notation "'{' 'additive' U '->' V '}'"
   (at level 0, U at level 98, V at level 99,
    format "{ 'additive'  U  ->  V }").
@@ -1951,15 +1954,59 @@ End LalgebraTheory.
 
 (* Morphism hierarchy. *)
 
+Definition semi_additive (U V : zsemimodType) (f : U -> V) : Prop :=
+  (f 0 = 0) * {morph f : x y / x + y}.
+
+HB.mixin Record isSemiAdditive (U V : zsemimodType) (apply : U -> V) := {
+  semi_additive_subproof : semi_additive apply;
+}.
+
+#[infer(U,V),mathcomp(axiom="semi_additive")]
+HB.structure Definition SemiAdditive (U V : zsemimodType) :=
+  {f of isSemiAdditive U V f}.
+
+HB.mixin Record SemiAdditive_isAdditive (U V : zmodType) (apply : U -> V) := {
+  opp_subproof : {morph apply : x / - x}
+}.
+
 Definition additive (U V : zmodType) (f : U -> V) :=
   {morph f : x y / x - y}.
 
-HB.mixin Record isAdditive (U V : zmodType) (apply : U -> V) := {
+#[infer(U,V),mathcomp(axiom="additive")]
+HB.structure Definition Additive (U V : zmodType) :=
+  {f of isSemiAdditive U V f & SemiAdditive_isAdditive U V f}.
+
+HB.factory Record isAdditive (U V : zmodType) (apply : U -> V) := {
   additive_subproof : additive apply;
 }.
 
-#[infer(U,V),mathcomp(axiom="additive")]
-HB.structure Definition Additive (U V : zmodType) := {f of isAdditive U V f}.
+HB.builders Context U V apply of isAdditive U V apply.
+Local Lemma raddf0 : apply 0 = 0.
+Proof. by rewrite -[0]subr0 additive_subproof subrr. Qed.
+
+Local Lemma raddfN : {morph apply : x / - x}.
+Proof. by move=> x /=; rewrite -sub0r additive_subproof raddf0 sub0r. Qed.
+
+Local Lemma raddfD : {morph apply : x y / x + y}.
+Proof. by move=> x y; rewrite -[y]opprK additive_subproof -raddfN. Qed.
+
+HB.instance Definition _ := isSemiAdditive.Build U V apply (conj raddf0 raddfD).
+
+HB.instance Definition _ := SemiAdditive_isAdditive.Build U V apply raddfN.
+
+HB.end.
+
+Module SemiAdditiveExports.
+Notation "{ 'semi_additive' U -> V }" :=
+  (SemiAdditive.type U%type V%type) : type_scope.
+Notation "[ 'semi_additive' 'of' f 'as' g ]" :=
+  (SemiAdditive.clone _ _ f%function g)
+  (at level 0, format "[ 'semi_additive'  'of'  f  'as'  g ]") : form_scope.
+Notation "[ 'semi_additive' 'of' f ]" :=
+  (SemiAdditive.clone _ _ f%function _)
+  (at level 0, format "[ 'semi_additive'  'of'  f ]") : form_scope.
+End SemiAdditiveExports.
+HB.export SemiAdditiveExports.
 
 Module AdditiveExports.
 Module Additive.
@@ -1977,22 +2024,25 @@ End AdditiveExports.
 HB.export AdditiveExports.
 
 (* Lifted additive operations. *)
-Section LiftedZmod.
-Variables (U : Type) (V : zmodType).
+Section LiftedZsemimod.
+Variables (U : Type) (V : zsemimodType).
 Definition null_fun_head (phV : phant V) of U : V := let: Phant := phV in 0.
 Definition add_fun (f g : U -> V) x := f x + g x.
+End LiftedZsemimod.
+Section LiftedZmod.
+Variables (U : Type) (V : zmodType).
 Definition sub_fun (f g : U -> V) x := f x - g x.
 Definition opp_fun (f : U -> V) x := - f x.
 End LiftedZmod.
 
 (* Lifted multiplication. *)
-Section LiftedRing.
-Variables (R : ringType) (T : Type).
+Section LiftedSemiRing.
+Variables (R : semiRingType) (T : Type).
 Implicit Type f : T -> R.
 Definition mull_fun a f x := a * f x.
 Definition mulr_fun a f x := f x * a.
 Definition mul_fun f g x := f x * g x.
-End LiftedRing.
+End LiftedSemiRing.
 
 (* Lifted linear operations. *)
 Section LiftedScale.
@@ -2023,38 +2073,116 @@ Arguments mulr_fun {_ _} a f _ /.
 Arguments scale_fun {_ _ _} a f _ /.
 Arguments mul_fun {_ _} f g _ /.
 
+Section SemiAdditiveTheory.
+
+Section Properties.
+
+Variables (U V : zsemimodType) (k : unit) (f : {semi_additive U -> V}).
+
+Lemma raddf0 : f 0 = 0.
+Proof. exact: semi_additive_subproof.1. Qed.
+
+Lemma raddf_eq0 x : injective f -> (f x == 0) = (x == 0).
+Proof. by move=> /inj_eq <-; rewrite raddf0. Qed.
+
+Lemma raddfD : {morph f : x y / x + y}.
+Proof. exact: semi_additive_subproof.2. Qed.
+
+Lemma raddfMn n : {morph f : x / x *+ n}.
+Proof. by elim: n => [|n IHn] x /=; rewrite ?raddf0 // !mulrS raddfD IHn. Qed.
+
+Lemma raddf_sum I r (P : pred I) E :
+  f (\sum_(i <- r | P i) E i) = \sum_(i <- r | P i) f (E i).
+Proof. exact: (big_morph f raddfD raddf0). Qed.
+
+Lemma can2_semi_additive f' : cancel f f' -> cancel f' f -> semi_additive f'.
+Proof.
+move=> fK f'K.
+by split=> [|x y]; apply: (canLR fK); rewrite ?raddf0// raddfD !f'K.
+Qed.
+
+End Properties.
+
+Section SemiRingProperties.
+
+Variables (R S : semiRingType) (f : {semi_additive R -> S}).
+
+Lemma raddfMnat n x : f (n%:R * x) = n%:R * f x.
+Proof. by rewrite !mulr_natl raddfMn. Qed.
+
+End SemiRingProperties.
+
+Section AddFun.
+
+Variables (U V W : zsemimodType).
+Variables (f g : {semi_additive V -> W}) (h : {semi_additive U -> V}).
+
+Fact idfun_is_semi_additive : semi_additive (@idfun U).
+Proof. by []. Qed.
+#[export]
+HB.instance Definition _ := isSemiAdditive.Build U U idfun
+  idfun_is_semi_additive.
+
+Fact comp_is_semi_additive : semi_additive (f \o h).
+Proof. by split=> [|x y]; rewrite /= ?raddf0// !raddfD. Qed.
+#[export]
+HB.instance Definition _ := isSemiAdditive.Build U W (f \o h)
+  comp_is_semi_additive.
+
+Fact null_fun_is_semi_additive : semi_additive (\0 : U -> V).
+Proof. by split=> // x y /=; rewrite addr0. Qed.
+#[export]
+HB.instance Definition _ := isSemiAdditive.Build U V \0
+  null_fun_is_semi_additive.
+
+Fact add_fun_is_semi_additive : semi_additive (f \+ g).
+Proof.
+by split=> [|x y]; rewrite /= ?raddf0 ?addr0// !raddfD addrCA -!addrA addrCA.
+Qed.
+#[export]
+HB.instance Definition _ := isSemiAdditive.Build V W (f \+ g)
+  add_fun_is_semi_additive.
+
+End AddFun.
+
+Section MulFun.
+
+Variables (R : semiRingType) (U : zsemimodType).
+Variables (a : R) (f : {semi_additive U -> R}).
+
+Fact mull_fun_is_semi_additive : semi_additive (a \*o f).
+Proof. by split=> [|x y]; rewrite /= ?raddf0 ?mulr0// raddfD mulrDr. Qed.
+#[export]
+HB.instance Definition _ := isSemiAdditive.Build U R (a \*o f)
+  mull_fun_is_semi_additive.
+
+Fact mulr_fun_is_semi_additive : semi_additive (a \o* f).
+Proof. by split=> [|x y]; rewrite /= ?raddf0 ?mul0r// raddfD mulrDl. Qed.
+#[export]
+HB.instance Definition _ := isSemiAdditive.Build U R (a \o* f)
+  mulr_fun_is_semi_additive.
+
+End MulFun.
+
+End SemiAdditiveTheory.
+
 Section AdditiveTheory.
 
 Section Properties.
 
 Variables (U V : zmodType) (k : unit) (f : {additive U -> V}).
 
-Lemma raddfB : {morph f : x y / x - y}. Proof. exact: additive_subproof. Qed.
+Lemma raddfN : {morph f : x / - x}.
+Proof. exact: opp_subproof. Qed.
 
-Lemma raddf0 : f 0 = 0.
-Proof. by rewrite -[0]subr0 raddfB subrr. Qed.
-
-Lemma raddf_eq0 x : injective f -> (f x == 0) = (x == 0).
-Proof. by move=> /inj_eq <-; rewrite raddf0. Qed.
+Lemma raddfB : {morph f : x y / x - y}.
+Proof. by move=> x y; rewrite raddfD -raddfN. Qed.
 
 Lemma raddf_inj : (forall x, f x = 0 -> x = 0) -> injective f.
 Proof. by move=> fI x y eqxy; apply/subr0_eq/fI; rewrite raddfB eqxy subrr. Qed.
 
-Lemma raddfN : {morph f : x / - x}.
-Proof. by move=> x /=; rewrite -sub0r raddfB raddf0 sub0r. Qed.
-
-Lemma raddfD : {morph f : x y / x + y}.
-Proof. by move=> x y; rewrite -[y]opprK raddfB -raddfN. Qed.
-
-Lemma raddfMn n : {morph f : x / x *+ n}.
-Proof. by elim: n => [|n IHn] x /=; rewrite ?raddf0 // !mulrS raddfD IHn. Qed.
-
 Lemma raddfMNn n : {morph f : x / x *- n}.
 Proof. by move=> x /=; rewrite raddfN raddfMn. Qed.
-
-Lemma raddf_sum I r (P : pred I) E :
-  f (\sum_(i <- r | P i) E i) = \sum_(i <- r | P i) f (E i).
-Proof. exact: (big_morph f raddfD raddf0). Qed.
 
 Lemma can2_additive f' : cancel f f' -> cancel f' f -> additive f'.
 Proof. by move=> fK f'K x y /=; apply: (canLR fK); rewrite raddfB !f'K. Qed.
@@ -2064,9 +2192,6 @@ End Properties.
 Section RingProperties.
 
 Variables (R S : ringType) (f : {additive R -> S}).
-
-Lemma raddfMnat n x : f (n%:R * x) = n%:R * f x.
-Proof. by rewrite !mulr_natl raddfMn. Qed.
 
 Lemma raddfMsign n x : f ((-1) ^+ n * x) = (-1) ^+ n * f x.
 Proof. by rewrite !(mulr_sign, =^~ signr_odd) (fun_if f) raddfN. Qed.
@@ -5852,6 +5977,7 @@ Definition solP {F n f} := @solP F n f.
 Definition eq_sol := eq_sol.
 Definition size_sol := size_sol.
 Definition solve_monicpoly := @solve_monicpoly.
+Definition semi_additive := semi_additive.
 Definition additive := additive.
 Definition raddf0 := raddf0.
 Definition raddf_eq0 := raddf_eq0.
@@ -5864,6 +5990,7 @@ Definition raddfMn := raddfMn.
 Definition raddfMNn := raddfMNn.
 Definition raddfMnat := raddfMnat.
 Definition raddfMsign := raddfMsign.
+Definition can2_semi_additive := can2_semi_additive.
 Definition can2_additive := can2_additive.
 Definition multiplicative := multiplicative.
 Definition rmorph0 := rmorph0.

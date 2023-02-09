@@ -439,10 +439,13 @@ rewrite -(fmorph_root conjL) conjL_K map_poly_id // => _ /(nthP 0)[j _ <-].
 by rewrite coef_map fmorph_rat.
 Qed.
 
-Fact conj_is_additive : additive (fun u => LtoC (conj_subproof u)).
+Fact conj_is_semi_additive : semi_additive (fun u => LtoC (conj_subproof u)).
 Proof.
-by move=> u v; apply: CtoL_inj; rewrite LtoC_K 3!{1}rmorphB /= !LtoC_K.
+by split=> [|u v]; apply: CtoL_inj; rewrite LtoC_K ?raddf0// !rmorphD/= !LtoC_K.
 Qed.
+
+Fact conj_is_additive : {morph (fun u => LtoC (conj_subproof u)) : x / - x}.
+Proof. by move=> u; apply: CtoL_inj; rewrite LtoC_K !raddfN /= LtoC_K. Qed.
 
 Fact conj_is_multiplicative : multiplicative (fun u => LtoC (conj_subproof u)).
 Proof.
@@ -453,7 +456,8 @@ Qed.
 Definition conj : {rmorphism type -> type} :=
   GRing.RMorphism.Pack
     (GRing.RMorphism.Class
-       (GRing.isAdditive.Build _ _ _ conj_is_additive)
+       (GRing.isSemiAdditive.Build _ _ _ conj_is_semi_additive)
+       (GRing.SemiAdditive_isAdditive.Build _ _ _ conj_is_additive)
        (GRing.isMultiplicative.Build _ _ _ conj_is_multiplicative)).
 
 Lemma conjK : involutive conj.

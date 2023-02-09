@@ -608,7 +608,7 @@ have some_realC: realC.
     pose faM := GRing.isAdditive.Build _ _ _ fA.
     pose fmM := GRing.isMultiplicative.Build _ _ _ fM.
     pose fRM : GRing.RMorphism.type _ _ := HB.pack f faM fmM.
-    by exists 0, [archiFieldType of rat], fRM.
+    by exists 0, [archiFieldType of rat]; exact: fRM.
   have /Fadjoin1_polyP/sig_eqW[q]: x \in <<1; 0>>%VS by rewrite -sQof2 rmorph0.
   by exists q.[0]; rewrite -horner_map rmorph0.
 pose fix xR n : realC :=
