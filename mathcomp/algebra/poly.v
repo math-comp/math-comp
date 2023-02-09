@@ -129,7 +129,7 @@ Local Notation simp := Monoid.simpm.
 
 Section Polynomial.
 
-Variable R : ringType.
+Variable R : semiRingType.
 
 (* Defines a polynomial as a sequence with <> 0 last element *)
 Record polynomial := Polynomial {polyseq :> seq R; _ : last 1 polyseq != 0}.
@@ -160,9 +160,9 @@ Arguments poly_inj {R} [p1%R p2%R] : rename.
 Arguments coefp {R} i%N / p%R.
 Notation "{ 'poly' T }" := (poly_of (Phant T)) : type_scope.
 
-Section PolynomialTheory.
+Section SemiPolynomialTheory.
 
-Variable R : ringType.
+Variable R : semiRingType.
 Implicit Types (a b c x y z : R) (p q r d : {poly R}).
 
 Definition lead_coef p := p`_(size p).-1.
@@ -290,27 +290,16 @@ Proof.
 by apply/polyP=> i; rewrite coef_poly; case: ltnP => // /(nth_default 0)->.
 Qed.
 
-(* Zmodule structure for polynomial *)
+(* Zsemimodule structure for polynomial *)
 Definition add_poly_def p q := \poly_(i < maxn (size p) (size q)) (p`_i + q`_i).
 Fact add_poly_key : unit. Proof. by []. Qed.
 Definition add_poly := locked_with add_poly_key add_poly_def.
 Canonical add_poly_unlockable := [unlockable fun add_poly].
 
-Definition opp_poly_def p := \poly_(i < size p) - p`_i.
-Fact opp_poly_key : unit. Proof. by []. Qed.
-Definition opp_poly := locked_with opp_poly_key opp_poly_def.
-Canonical opp_poly_unlockable := [unlockable fun opp_poly].
-
 Fact coef_add_poly p q i : (add_poly p q)`_i = p`_i + q`_i.
 Proof.
 rewrite unlock coef_poly; case: leqP => //.
 by rewrite geq_max => /andP[le_p_i le_q_i]; rewrite !nth_default ?add0r.
-Qed.
-
-Fact coef_opp_poly p i : (opp_poly p)`_i = - p`_i.
-Proof.
-rewrite unlock coef_poly /=.
-by case: leqP => // le_p_i; rewrite nth_default ?oppr0.
 Qed.
 
 Fact add_polyA : associative add_poly.
@@ -324,15 +313,9 @@ Proof.
 by move=> p; apply/polyP=> i; rewrite coef_add_poly coefC if_same add0r.
 Qed.
 
-Fact add_polyN : left_inverse 0%:P opp_poly add_poly.
-Proof.
-move=> p; apply/polyP=> i.
-by rewrite coef_add_poly coef_opp_poly coefC if_same addNr.
-Qed.
-
-HB.instance Definition _ := GRing.isZmodule.Build (polynomial R)
-  add_polyA add_polyC add_poly0 add_polyN.
-HB.instance Definition _ := GRing.Zmodule.on {poly R}.
+HB.instance Definition _ := GRing.isZsemimodule.Build (polynomial R)
+  add_polyA add_polyC add_poly0.
+HB.instance Definition _ := GRing.Zsemimodule.on {poly R}.
 
 (* Properties of the zero polynomial *)
 Lemma polyC0 : 0%:P = 0 :> {poly R}. Proof. by []. Qed.
@@ -405,45 +388,8 @@ Qed.
 Lemma coefD p q i : (p + q)`_i = p`_i + q`_i.
 Proof. exact: coef_add_poly. Qed.
 
-Lemma coefN p i : (- p)`_i = - p`_i.
-Proof. exact: coef_opp_poly. Qed.
-
-Lemma coefB p q i : (p - q)`_i = p`_i - q`_i.
-Proof. by rewrite coefD coefN. Qed.
-
-HB.instance Definition _ i := GRing.isAdditive.Build {poly R} R (coefp i)
-  (fun p => (coefB p)^~ i).
-
-Lemma coefMn p n i : (p *+ n)`_i = p`_i *+ n.
-Proof. exact: (raddfMn [additive of coefp i]). Qed.
-
-Lemma coefMNn p n i : (p *- n)`_i = p`_i *- n.
-Proof. by rewrite coefN coefMn. Qed.
-
-Lemma coef_sum I (r : seq I) (P : pred I) (F : I -> {poly R}) k :
-  (\sum_(i <- r | P i) F i)`_k = \sum_(i <- r | P i) (F i)`_k.
-Proof. exact: (raddf_sum [additive of coefp k]). Qed.
-
 Lemma polyCD : {morph polyC : a b / a + b}.
 Proof. by move=> a b; apply/polyP=> [[|i]]; rewrite coefD !coefC ?addr0. Qed.
-
-Lemma polyCN : {morph polyC : c / - c}.
-Proof. by move=> c; apply/polyP=> [[|i]]; rewrite coefN !coefC ?oppr0. Qed.
-
-Lemma polyCB : {morph polyC : a b / a - b}.
-Proof. by move=> a b; rewrite polyCD polyCN. Qed.
-
-HB.instance Definition _ := GRing.isAdditive.Build R {poly R} polyC polyCB.
-
-Lemma polyCMn n : {morph polyC : c / c *+ n}. Proof. exact: raddfMn. Qed.
-
-Lemma size_opp p : size (- p) = size p.
-Proof.
-by apply/eqP; rewrite eqn_leq -{3}(opprK p) -[-%R]/opp_poly unlock !size_poly.
-Qed.
-
-Lemma lead_coefN p : lead_coef (- p) = - lead_coef p.
-Proof. by rewrite /lead_coef size_opp coefN. Qed.
 
 Lemma size_add p q : size (p + q) <= maxn (size p) (size q).
 Proof. by rewrite -[+%R]/add_poly unlock; apply: size_poly. Qed.
@@ -470,7 +416,7 @@ Qed.
 Lemma lead_coefDr p q : size q > size p -> lead_coef (p + q) = lead_coef q.
 Proof. by move/lead_coefDl<-; rewrite addrC. Qed.
 
-(* Polynomial ring structure. *)
+(* Polynomial semiring structure. *)
 
 Definition mul_poly_def p q :=
   \poly_(i < (size p + size q).-1) (\sum_(j < i.+1) p`_j * q`_(i - j)).
@@ -534,12 +480,25 @@ move=> p q r; apply/polyP=> i; rewrite coefD !coef_mul_poly -big_split.
 by apply: eq_bigr => j _; rewrite coefD mulrDr.
 Qed.
 
+Fact mul_0poly : left_zero 0%:P mul_poly.
+Proof.
+move=> p; apply/polyP => i; rewrite coef_mul_poly big_ord_recl subn0.
+by rewrite big1 => [|j _]; rewrite coefC !simp // coefC; case: ifP.
+Qed.
+
+Fact mul_poly0 : right_zero 0%:P mul_poly.
+Proof.
+move=> p; apply/polyP => i; rewrite coef_mul_poly_rev big_ord_recl subn0.
+by rewrite big1 => [|j _]; rewrite coefC !simp // coefC; case: ifP.
+Qed.
+
 Fact poly1_neq0 : 1%:P != 0 :> {poly R}.
 Proof. by rewrite polyC_eq0 oner_neq0. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_isRing.Build (polynomial R)
-  mul_polyA mul_1poly mul_poly1 mul_polyDl mul_polyDr poly1_neq0.
-HB.instance Definition _ := GRing.Ring.on {poly R}.
+HB.instance Definition _ := GRing.Zsemimodule_isSemiRing.Build (polynomial R)
+  mul_polyA mul_1poly mul_poly1 mul_polyDl mul_polyDr mul_0poly mul_poly0
+  poly1_neq0.
+HB.instance Definition _ := GRing.SemiRing.on {poly R}.
 
 Lemma polyC1 : 1%:P = 1 :> {poly R}. Proof. by []. Qed.
 
@@ -616,13 +575,6 @@ Qed.
 Lemma polyCM : {morph polyC : a b / a * b}.
 Proof. by move=> a b; apply/polyP=> [[|i]]; rewrite coefCM !coefC ?simp. Qed.
 
-Fact polyC_multiplicative : multiplicative polyC.
-Proof. by split; first apply: polyCM. Qed.
-HB.instance Definition _ := GRing.isMultiplicative.Build R {poly R} polyC
-  polyC_multiplicative.
-
-Lemma polyC_exp n : {morph polyC : c / c ^+ n}. Proof. exact: rmorphX. Qed.
-
 Lemma size_exp_leq p n : size (p ^+ n) <= ((size p).-1 * n).+1.
 Proof.
 elim: n => [|n IHn]; first by rewrite size_poly1.
@@ -630,6 +582,90 @@ have [-> | nzp] := poly0Vpos p; first by rewrite exprS mul0r size_poly0.
 rewrite exprS (leq_trans (size_mul_leq _ _)) //.
 by rewrite -{1}(prednK nzp) mulnS -addnS leq_add2l.
 Qed.
+
+End SemiPolynomialTheory.
+
+Section PolynomialTheory.
+
+Variable R : ringType.
+Implicit Types (a b c x y z : R) (p q r d : {poly R}).
+
+Local Notation "c %:P" := (polyC c).
+
+Local Notation "\poly_ ( i < n ) E" := (poly n (fun i : nat => E)).
+
+(* Zmodule structure for polynomial *)
+Definition opp_poly_def p := \poly_(i < size p) - p`_i.
+Fact opp_poly_key : unit. Proof. by []. Qed.
+Definition opp_poly := locked_with opp_poly_key opp_poly_def.
+Canonical opp_poly_unlockable := [unlockable fun opp_poly].
+
+Fact coef_opp_poly p i : (opp_poly p)`_i = - p`_i.
+Proof.
+rewrite unlock coef_poly /=.
+by case: leqP => // le_p_i; rewrite nth_default ?oppr0.
+Qed.
+
+Fact add_polyN : left_inverse 0%:P opp_poly (@add_poly _).
+Proof.
+move=> p; apply/polyP=> i.
+by rewrite coef_add_poly coef_opp_poly coefC if_same addNr.
+Qed.
+
+HB.instance Definition _ := GRing.Zsemimodule_isZmodule.Build (polynomial R)
+  add_polyN.
+HB.instance Definition _ := GRing.Zmodule.on {poly R}.
+
+(* Size, leading coef, morphism properties of coef *)
+
+Lemma coefN p i : (- p)`_i = - p`_i.
+Proof. exact: coef_opp_poly. Qed.
+
+Lemma coefB p q i : (p - q)`_i = p`_i - q`_i.
+Proof. by rewrite coefD coefN. Qed.
+
+HB.instance Definition _ i :=
+  GRing.isAdditive.Build [the zmodType of {poly R}] R (coefp i)
+    (fun p => (coefB p)^~ i).
+
+Lemma coefMn p n i : (p *+ n)`_i = p`_i *+ n.
+Proof. exact: (raddfMn [additive of coefp i]). Qed.
+
+Lemma coefMNn p n i : (p *- n)`_i = p`_i *- n.
+Proof. by rewrite coefN coefMn. Qed.
+
+Lemma coef_sum I (r : seq I) (P : pred I) (F : I -> {poly R}) k :
+  (\sum_(i <- r | P i) F i)`_k = \sum_(i <- r | P i) (F i)`_k.
+Proof. exact: (raddf_sum [additive of coefp k]). Qed.
+
+Lemma polyCN : {morph (@polyC R) : c / - c}.
+Proof. by move=> c; apply/polyP=> [[|i]]; rewrite coefN !coefC ?oppr0. Qed.
+
+Lemma polyCB : {morph (@polyC R) : a b / a - b}.
+Proof. by move=> a b; rewrite polyCD polyCN. Qed.
+
+HB.instance Definition _ :=
+  GRing.isAdditive.Build R [the zmodType of {poly R}] (@polyC _) polyCB.
+
+Lemma polyCMn n : {morph (@polyC R) : c / c *+ n}. Proof. exact: raddfMn. Qed.
+
+Lemma size_opp p : size (- p) = size p.
+Proof.
+by apply/eqP; rewrite eqn_leq -{3}(opprK p) -[-%R]/opp_poly unlock !size_poly.
+Qed.
+
+Lemma lead_coefN p : lead_coef (- p) = - lead_coef p.
+Proof. by rewrite /lead_coef size_opp coefN. Qed.
+
+(* Polynomial ring structure. *)
+
+Fact polyC_multiplicative : multiplicative (@polyC R).
+Proof. by split; first apply: polyCM. Qed.
+HB.instance Definition _ :=
+  GRing.isMultiplicative.Build R [the ringType of {poly R}] (@polyC R)
+    polyC_multiplicative.
+
+Lemma polyC_exp n : {morph (@polyC R) : c / c ^+ n}. Proof. exact: rmorphX. Qed.
 
 Lemma size_Msign p n : size ((-1) ^+ n * p) = size p.
 Proof.
@@ -702,7 +738,7 @@ HB.instance Definition _ i :=
 HB.instance Definition _ := GRing.Linear.on (coefp 0).
 
 (* The indeterminate, at last! *)
-Definition polyX_def := Poly [:: 0; 1].
+Definition polyX_def := @Poly R [:: 0; 1].
 Fact polyX_key : unit. Proof. by []. Qed.
 Definition polyX : {poly R} := locked_with polyX_key polyX_def.
 Canonical polyX_unlockable := [unlockable of polyX].
@@ -1055,7 +1091,7 @@ Qed.
 
 Lemma hornerD p q x : (p + q).[x] = p.[x] + q.[x].
 Proof.
-rewrite -[+%R]/add_poly unlock horner_poly; set m := maxn _ _.
+rewrite -[+%R]/(@add_poly R) unlock horner_poly; set m := maxn _ _.
 rewrite !(@horner_coef_wide m) ?leq_max ?leqnn ?orbT // -big_split /=.
 by apply: eq_bigr => i _; rewrite -mulrDl.
 Qed.
@@ -1710,7 +1746,7 @@ by rewrite horner0 simp.
 Qed.
 
 Lemma eq_poly n E1 E2 : (forall i, i < n -> E1 i = E2 i) ->
-  poly n E1 = poly n E2.
+  poly n E1 = poly n E2 :> {poly R}.
 Proof. by move=> E; rewrite !poly_def; apply: eq_bigr => i _; rewrite E. Qed.
 
 End PolynomialTheory.
@@ -2841,7 +2877,7 @@ by rewrite rmorphB /= eqfpq subrr.
 Qed.
 
 Lemma map_monic p : (p^f \is monic) = (p \is monic).
-Proof. by rewrite monicE lead_coef_map fmorph_eq1. Qed.
+Proof. by rewrite [in LHS]monicE lead_coef_map fmorph_eq1. Qed.
 
 Lemma map_poly_com p x : comm_poly p^f (f x).
 Proof. exact: map_comm_poly (mulrC x _). Qed.
