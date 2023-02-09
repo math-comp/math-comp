@@ -9853,11 +9853,8 @@ Canonical finType (T T' : finType) := Eval hnf in [finType of T * T'].
 End Basis.
 
 Section POrder.
-Context (typeT1 : Type) (classT1 : POrder.class_of typeT1).
-Context (typeT2 : Type) (classT2 : POrder.class_of typeT2).
-Let T1 := @POrder.Pack disp_tt typeT1 classT1.
-Let T2 := @POrder.Pack disp_tt typeT2 classT2.
-Local Notation "T1 * T2" := (type disp_tt T1 T2) : type_scope.
+Context (disp1 disp2 : disp_t).
+Context (T1 : porderType disp1) (T2 : porderType disp2).
 Implicit Types (x y : T1 * T2).
 
 Let le x y := (x.1 <= y.1) && (x.2 <= y.2).
@@ -9888,10 +9885,10 @@ Context (T1 : porderType disp1) (T2 : porderType disp2).
 Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 Implicit Types (x y : T1 * T2).
 
-Let classT1 := POrder.class T1.
-Let classT1d := POrder.class [porderType of T1^d].
-Let classT2 := POrder.class T2.
-Let classT2d := POrder.class [porderType of T2^d].
+Let T1' := Eval hnf in [porderType of T1].
+Let T1d := Eval hnf in [porderType of T1^d].
+Let T2' := Eval hnf in [porderType of T2].
+Let T2d := Eval hnf in [porderType of T2^d].
 
 Definition le x y := (x.1 <= y.1) && (x.2 <= y.2).
 
@@ -9900,10 +9897,10 @@ Definition lt x y := (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
 Definition porderMixin :=
   @RelOrder.POrder.Mixin
     _ le lt
-    (@lt_def T1 classT1 T2 classT2) (@lt_def T1 classT1d T2 classT2d)
-    (@refl T1 classT1 T2 classT2) (@refl T1 classT1d T2 classT2d)
-    (@anti T1 classT1 T2 classT2) (@anti T1 classT1d T2 classT2d)
-    (@trans T1 classT1 T2 classT2) (@trans T1 classT1d T2 classT2d).
+    (@lt_def _ _ T1' T2') (@lt_def _ _ T1d T2d)
+    (@refl _ _ T1' T2') (@refl _ _ T1d T2d)
+    (@anti _ _ T1' T2') (@anti _ _ T1d T2d)
+    (@trans _ _ T1' T2') (@trans _ _ T1d T2d).
 Canonical porderType := POrderType disp3 (T1 * T2) porderMixin.
 
 Lemma leEprod x y : (x <= y) = (x.1 <= y.1) && (x.2 <= y.2). Proof. by []. Qed.
@@ -9922,10 +9919,8 @@ Proof. by rewrite ltEprod negb_and. Qed.
 End POrder.
 
 Section BPOrder.
-Context (typeT1 : Type) (classT1 : BPOrder.class_of typeT1).
-Context (typeT2 : Type) (classT2 : BPOrder.class_of typeT2).
-Let T1 := @BPOrder.Pack disp_tt typeT1 classT1.
-Let T2 := @BPOrder.Pack disp_tt typeT2 classT2.
+Context (disp1 disp2 : disp_t).
+Context (T1 : bPOrderType disp1) (T2 : bPOrderType disp2).
 Local Notation "T1 * T2" := (type disp_tt T1 T2) : type_scope.
 
 Fact le0x (x : T1 * T2) : (0, 0) <= x :> T1 * T2.
@@ -9939,8 +9934,9 @@ Context (T1 : bPOrderType disp1) (T2 : bPOrderType disp2).
 Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 Implicit Types (x y : T1 * T2).
 
-Let le0x (x : T1 * T2) : (0, 0) <= x :> T1 * T2 :=
-      @le0x T1 (BPOrder.class T1) T2 (BPOrder.class T2) x.
+Let T1' := Eval hnf in [bPOrderType of T1].
+Let T2' := Eval hnf in [bPOrderType of T2].
+Let le0x (x : T1 * T2) : (0, 0) <= x :> T1 * T2 := @le0x _ _ T1' T2' x.
 
 Canonical bPOrderType := BPOrderType (T1 * T2) (BottomMixin le0x).
 
@@ -9954,11 +9950,9 @@ Context (T1 : tPOrderType disp1) (T2 : tPOrderType disp2).
 Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 Implicit Types (x y : T1 * T2).
 
-Let classT1d := BPOrder.class [bPOrderType of T1^d].
-Let classT2d := BPOrder.class [bPOrderType of T2^d].
-
-Let lex1 (x : T1 * T2) : x <= (1, 1) :> T1 * T2 :=
-      @le0x T1 classT1d T2 classT2d x.
+Let T1d := Eval hnf in [bPOrderType of T1^d].
+Let T2d := Eval hnf in [bPOrderType of T2^d].
+Let lex1 (x : T1 * T2) : x <= (1, 1) :> T1 * T2 := @le0x _ _ T1d T2d x.
 
 Canonical tPOrderType := TPOrderType (T1 * T2) (TopMixin lex1).
 
@@ -9971,10 +9965,8 @@ Canonical tbPOrderType (disp1 disp2 disp3 : disp_t)
   [tbPOrderType of type disp3 T T'].
 
 Section MeetSemilattice.
-Context (typeT1 : Type) (classT1 : MeetSemilattice.class_of typeT1).
-Context (typeT2 : Type) (classT2 : MeetSemilattice.class_of typeT2).
-Let T1 := @MeetSemilattice.Pack disp_tt typeT1 classT1.
-Let T2 := @MeetSemilattice.Pack disp_tt typeT2 classT2.
+Context (disp1 disp2 : disp_t).
+Context (T1 : meetSemilatticeType disp1) (T2 : meetSemilatticeType disp2).
 Local Notation "T1 * T2" := (type disp_tt T1 T2) : type_scope.
 Implicit Types (x y : T1 * T2).
 
@@ -9997,14 +9989,14 @@ Context (T1 : meetSemilatticeType disp1) (T2 : meetSemilatticeType disp2).
 Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 Implicit Types (x y : T1 * T2).
 
-Let classT1 := MeetSemilattice.class T1.
-Let classT2 := MeetSemilattice.class T2.
+Let T1' := Eval hnf in [meetSemilatticeType of T1].
+Let T2' := Eval hnf in [meetSemilatticeType of T2].
 
 Definition meet x y := (x.1 `&` y.1, x.2 `&` y.2).
 
 Definition meetMixin :=
-  @MeetMixin _ _ meet (@meetC T1 classT1 T2 classT2)
-    (@meetA T1 classT1 T2 classT2) (@leEmeet T1 classT1 T2 classT2).
+  @MeetMixin _ _ meet
+    (@meetC _ _ T1' T2') (@meetA _ _ T1' T2') (@leEmeet _ _ T1' T2').
 Canonical meetSemilatticeType := MeetSemilatticeType (T1 * T2) meetMixin.
 
 Lemma meetEprod x y : x `&` y = (x.1 `&` y.1, x.2 `&` y.2). Proof. by []. Qed.
@@ -10028,14 +10020,14 @@ Context (T1 : joinSemilatticeType disp1) (T2 : joinSemilatticeType disp2).
 Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 Implicit Types (x y : T1 * T2).
 
-Let classT1d := MeetSemilattice.class [meetSemilatticeType of T1^d].
-Let classT2d := MeetSemilattice.class [meetSemilatticeType of T2^d].
+Let T1d := Eval hnf in [meetSemilatticeType of T1^d].
+Let T2d := Eval hnf in [meetSemilatticeType of T2^d].
 
 Definition join x y := (x.1 `|` y.1, x.2 `|` y.2).
 
 Definition joinMixin :=
-  @JoinMixin _ _ join (@meetC T1 classT1d T2 classT2d)
-    (@meetA T1 classT1d T2 classT2d) (@leEmeet T1 classT1d T2 classT2d).
+  @JoinMixin _ _ join
+    (@meetC _ _ T1d T2d) (@meetA _ _ T1d T2d) (@leEmeet _ _ T1d T2d).
 Canonical joinSemilatticeType := JoinSemilatticeType (T1 * T2) joinMixin.
 
 Lemma joinEprod x y : x `|` y = (x.1 `|` y.1, x.2 `|` y.2). Proof. by []. Qed.
@@ -10066,10 +10058,8 @@ Canonical tbLatticeType (disp1 disp2 disp3 : disp_t)
   [tbLatticeType of type disp3 T T'].
 
 Section DistrLattice.
-Context (typeT1 : Type) (classT1 : DistrLattice.class_of typeT1).
-Context (typeT2 : Type) (classT2 : DistrLattice.class_of typeT2).
-Let T1 := @DistrLattice.Pack disp_tt typeT1 classT1.
-Let T2 := @DistrLattice.Pack disp_tt typeT2 classT2.
+Context (disp1 disp2 : disp_t).
+Context (T1 : distrLatticeType disp1) (T2 : distrLatticeType disp2).
 Local Notation "T1 * T2" := (type disp_tt T1 T2) : type_scope.
 
 Fact meetUl : left_distributive
@@ -10085,14 +10075,13 @@ Context (T1 : distrLatticeType disp1) (T2 : distrLatticeType disp2).
 Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 Implicit Types (x y : T1 * T2).
 
-Let classT1 := DistrLattice.class T1.
-Let classT1d := DistrLattice.class [distrLatticeType of T1^d].
-Let classT2 := DistrLattice.class T2.
-Let classT2d := DistrLattice.class [distrLatticeType of T2^d].
+Let T1' := Eval hnf in [distrLatticeType of T1].
+Let T1d := Eval hnf in [distrLatticeType of T1^d].
+Let T2' := Eval hnf in [distrLatticeType of T2].
+Let T2d := Eval hnf in [distrLatticeType of T2^d].
 
 Definition distrLatticeMixin :=
-  RelOrder.DistrLattice.Mixin (ord := latticeType disp3 T1 T2)
-    (@meetUl T1 classT1 T2 classT2) (@meetUl T1 classT1d T2 classT2d).
+  RelOrder.DistrLattice.Mixin (@meetUl _ _ T1' T2') (@meetUl _ _ T1d T2d).
 Canonical distrLatticeType := DistrLatticeType (T1 * T2) distrLatticeMixin.
 
 End DistrLattice.
