@@ -706,26 +706,6 @@ Arguments innew {T nT}.
 Lemma innew_val T nT : cancel val (@innew T nT).
 Proof. by move=> u; apply: val_inj; apply: SubK. Qed.
 
-(* Prenex Implicits and renaming. *)
-Notation "@ 'sval'" := (@proj1_sig) (at level 10, format "@ 'sval'").
-Notation sval := (@proj1_sig _ _).
-
-Section SigProj.
-
-Variables (T : Type) (P Q : T -> Prop).
-
-Lemma svalP : forall u : sig P, P (sval u). Proof. by case. Qed.
-
-Definition s2val (u : sig2 P Q) := let: exist2 x _ _ := u in x.
-
-Lemma s2valP u : P (s2val u). Proof. by case: u. Qed.
-
-Lemma s2valP' u : Q (s2val u). Proof. by case: u. Qed.
-
-End SigProj.
-
-Prenex Implicits svalP s2val s2valP s2valP'.
-
 Canonical sig_subType T (P : pred T) : subType [eta P] :=
   Eval hnf in [subType for @sval T [eta [eta P]]].
 
