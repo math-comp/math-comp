@@ -707,8 +707,8 @@ Lemma innew_val T nT : cancel val (@innew T nT).
 Proof. by move=> u; apply: val_inj; apply: SubK. Qed.
 
 (* Prenex Implicits and renaming. *)
-Notation sval := (@proj1_sig _ _).
 Notation "@ 'sval'" := (@proj1_sig) (at level 10, format "@ 'sval'").
+Notation sval := (@proj1_sig _ _).
 
 Section SigProj.
 
