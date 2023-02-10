@@ -61,3 +61,11 @@ Proof.
 move=> fK hK c /=; rewrite -[RHS]hK/=; case hcE : (h c) => [b|]//=.
 by rewrite -[b in RHS]fK; case: (f b) => //=; have := hK c; rewrite hcE.
 Qed.
+
+(*******************)
+(* v8.18 additions *)
+(*******************)
+
+(* this change of order has also been PRed to Coq PR 17249 *)
+Notation "@ 'sval'" := (@proj1_sig) (at level 10, format "@ 'sval'").
+Notation sval := (@proj1_sig _ _).
