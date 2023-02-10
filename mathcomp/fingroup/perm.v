@@ -226,6 +226,31 @@ move=> Su; rewrite -preim_permV; apply/setP=> x.
 by rewrite !inE -(perm_closed _ Su) permKV.
 Qed.
 
+Lemma perm_on_id u S : perm_on S u -> #|S| <= 1 -> u = 1%g.
+Proof.
+rewrite leq_eqVlt ltnS leqn0 => pSu S10; apply/permP => t; rewrite perm1.
+case/orP : S10; last first.
+  by move/eqP/cards0_eq => S0; apply: (out_perm pSu); rewrite S0 inE.
+move=> /cards1P[x Sx].
+have [-> | ntx] := eqVneq t x; last by apply: (out_perm pSu); rewrite Sx inE.
+by apply/eqP; have := perm_closed x pSu; rewrite Sx !inE => ->.
+Qed.
+
+Lemma perm_onC (S1 S2 : {set T}) (u1 u2 : {perm T}) :
+    perm_on S1 u1 -> perm_on S2 u2 ->
+    [disjoint S1 & S2] ->
+  commute u1 u2.
+Proof.
+move=> pS1 pS2 S12; apply/permP => t; rewrite !permM.
+case/boolP : (t \in S1) => tS1.
+  have /[!disjoint_subset] /subsetP {}S12 := S12.
+  by rewrite !(out_perm pS2) //; apply: S12; rewrite // perm_closed.
+case/boolP : (t \in S2) => tS2.
+  have /[1!disjoint_sym] /[!disjoint_subset] /subsetP {}S12 := S12.
+  by rewrite !(out_perm pS1) //; apply: S12; rewrite // perm_closed.
+by rewrite (out_perm pS1) // (out_perm pS2) // (out_perm pS1).
+Qed.
+
 Lemma imset_perm1 (S : {set T}) : [set (1 : {perm T}) x | x in S] = S.
 Proof. apply: im_perm_on; exact: perm_on1. Qed.
 
@@ -271,6 +296,11 @@ Proof. by set t := tperm x y; rewrite -{2}(mulgK t t) -mulgA tpermKg. Qed.
 
 Lemma tperm2 x y : tperm x y * tperm x y = 1.
 Proof. by rewrite -{1}tpermV mulVg. Qed.
+
+Lemma tperm_on x y : perm_on [set x; y] (tperm x y).
+Proof.
+by apply/subsetP => z /[!inE]; case: tpermP => [->|->|]; rewrite eqxx // orbT.
+Qed.
 
 Lemma card_perm A : #|perm_on A| = (#|A|)`!.
 Proof.
