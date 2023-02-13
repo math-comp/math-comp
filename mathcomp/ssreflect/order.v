@@ -1202,12 +1202,10 @@ Section POrderDef.
 
 Variables (disp : disp_t) (T : porderType disp).
 
-Let ord := POrder _ _ (POrder.class T).
-
-Definition le : rel T := RelOrder.le ord.
+Definition le : rel T := POrder.le (POrder.class T).
 Local Notation "x <= y" := (le x y) : order_scope.
 
-Definition lt : rel T := RelOrder.lt ord.
+Definition lt : rel T := POrder.lt (POrder.class T).
 Local Notation "x < y" := (lt x y) : order_scope.
 
 Definition comparable : rel T := fun (x y : T) => (x <= y) || (y <= x).
@@ -1412,7 +1410,7 @@ Set Primitive Projections.
 
 Record mixin_of (T : eqType) (ord : {pOrder T}) := Mixin {
   bottom : T;
-  rel_mixin : RelOrder.BPOrder.mixin_of ord bottom;
+  rel_mixin : RelOrder.BPOrder.mixin_of (<=:ord) bottom;
 }.
 
 Record class_of (T : Type) := Class {
@@ -1425,7 +1423,7 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> POrder.class_of.
 
 Definition rel_class T (c : class_of T) :=
-  RelOrder.BPOrder.Class (rel_mixin (mixin c)).
+  RelOrder.BPOrder.Class c (rel_mixin (mixin c)).
 
 Structure type (disp : disp_t) := Pack { sort; _ : class_of sort }.
 
@@ -1483,7 +1481,7 @@ Set Primitive Projections.
 
 Record mixin_of (T : eqType) (ord : {pOrder T}) := Mixin {
   top : T;
-  rel_mixin : RelOrder.TPOrder.mixin_of ord top;
+  rel_mixin : RelOrder.TPOrder.mixin_of (<=:ord) top;
 }.
 
 Record class_of (T : Type) := Class {
@@ -1496,7 +1494,7 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> POrder.class_of.
 
 Definition rel_class T (c : class_of T) :=
-  RelOrder.TPOrder.Class (rel_mixin (mixin c)).
+  RelOrder.TPOrder.Class c (rel_mixin (mixin c)).
 
 Structure type (disp : disp_t) := Pack { sort; _ : class_of sort }.
 
@@ -1613,10 +1611,10 @@ End TBPOrder.
 Import TBPOrder.Exports.
 
 Definition bottom (disp : disp_t) (T : bPOrderType disp) : T :=
-  RelOrder.bottom (BPOrder le lt _ (BPOrder.class T)).
+  BPOrder.bottom (BPOrder.mixin (BPOrder.class T)).
 
 Definition top (disp : disp_t) (T : tPOrderType disp) : T :=
-  RelOrder.top (TPOrder le lt _ (TPOrder.class T)).
+  TPOrder.top (TPOrder.mixin (TPOrder.class T)).
 
 Arguments bottom {disp T}.
 Arguments top {disp T}.
@@ -1638,7 +1636,7 @@ Set Primitive Projections.
 
 Record mixin_of (T : eqType) (ord : {pOrder T}) := Mixin {
   meet : T -> T -> T;
-  rel_mixin : RelOrder.Meet.mixin_of ord meet;
+  rel_mixin : RelOrder.Meet.mixin_of (<=:ord) meet;
 }.
 
 Record class_of (T : Type) := Class {
@@ -1651,7 +1649,7 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> POrder.class_of.
 
 Definition rel_class T (c : class_of T) :=
-  RelOrder.Meet.Class (rel_mixin (mixin c)).
+  RelOrder.Meet.Class c (rel_mixin (mixin c)).
 
 Structure type (disp : disp_t) := Pack { sort; _ : class_of sort }.
 
@@ -1937,7 +1935,7 @@ Set Primitive Projections.
 
 Record mixin_of (T : eqType) (ord : {pOrder T}) := Mixin {
   join : T -> T -> T;
-  rel_mixin : RelOrder.Join.mixin_of ord join;
+  rel_mixin : RelOrder.Join.mixin_of (<=:ord) join;
 }.
 
 Record class_of (T : Type) := Class {
@@ -1950,7 +1948,7 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> POrder.class_of.
 
 Definition rel_class T (c : class_of T) :=
-  RelOrder.Join.Class (rel_mixin (mixin c)).
+  RelOrder.Join.Class c (rel_mixin (mixin c)).
 
 Structure type (disp : disp_t) := Pack { sort; _ : class_of sort }.
 
@@ -2657,10 +2655,10 @@ End TBLattice.
 Import TBLattice.Exports.
 
 Definition meet (disp : disp_t) (T : meetSemilatticeType disp) : T -> T -> T :=
-  RelOrder.meet (MeetOrder _ _ _ (MeetSemilattice.class T)).
+  MeetSemilattice.meet (MeetSemilattice.mixin (MeetSemilattice.class T)).
 
 Definition join (disp : disp_t) (T : joinSemilatticeType disp) : T -> T -> T :=
-  RelOrder.join (JoinOrder _ _ _ (JoinSemilattice.class T)).
+  JoinSemilattice.join (JoinSemilattice.mixin (JoinSemilattice.class T)).
 
 Arguments meet {disp T}.
 Arguments join {disp T}.
@@ -2796,7 +2794,9 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : Lattice.class_of T;
-  mixin : RelOrder.DistrLattice.mixin_of (RelOrder.Lattice.Pack _ base);
+  mixin : RelOrder.DistrLattice.mixin_of
+            (MeetSemilattice.meet (MeetSemilattice.mixin base))
+            (JoinSemilattice.join (JoinSemilattice.mixin base));
 }.
 
 Unset Primitive Projections.
@@ -2804,7 +2804,7 @@ Unset Primitive Projections.
 Local Coercion base : class_of >-> Lattice.class_of.
 
 Definition rel_class T (c : class_of T) :=
-  RelOrder.DistrLattice.Class (mixin c).
+  RelOrder.DistrLattice.Class c (mixin c).
 
 Structure type (disp : disp_t) := Pack { sort; _ : class_of sort }.
 
@@ -3508,7 +3508,7 @@ Set Primitive Projections.
 
 Record class_of (T : Type) := Class {
   base  : DistrLattice.class_of T;
-  mixin : RelOrder.Total.mixin_of (RelOrder.DistrLattice.Pack _ base);
+  mixin : RelOrder.Total.mixin_of (POrder.le base);
 }.
 
 Unset Primitive Projections.

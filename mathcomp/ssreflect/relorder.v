@@ -68,13 +68,13 @@ Record mixin_of (le lt : rel T) := Mixin {
 
 Notation class_of := mixin_of (only parsing).
 
+Unset Primitive Projections.
+
 Structure order (phT : phant T) := Pack {
   le : rel T;
   lt : rel T;
   class : class_of le lt;
 }.
-
-Unset Primitive Projections.
 
 Variable (phT : phant T) (ord : order phT) (leT ltT : rel T).
 
@@ -126,15 +126,17 @@ Section ClassDef.
 
 Variable T : eqType.
 
-Definition mixin_of (ord : {pOrder T}) (bottom : T) :=
-  forall x, le ord bottom x.
+Definition mixin_of (le : rel T) (bottom : T) :=
+  forall x, le bottom x.
 
 Set Primitive Projections.
 
 Record class_of (le lt : rel T) (bottom : T) := Class {
   base : POrder.class_of le lt;
-  mixin : mixin_of (POrder.Pack _ base) bottom;
+  mixin : mixin_of le bottom;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -142,8 +144,6 @@ Structure order (phT : phant T) := Pack {
   bottom : T;
   class : class_of le lt bottom;
 }.
-
-Unset Primitive Projections.
 
 Local Coercion base : class_of >-> POrder.class_of.
 
@@ -157,11 +157,11 @@ Variable (leT ltT : rel T) (bottomT : T).
 
 Definition clone c of phant_id cls c := @Pack phT leT ltT bottomT (unkeyed c).
 
-Definition pack (b0 : POrder.class_of leT ltT)
-                (m0 : mixin_of (POrder.Pack _ b0) bottomT) :=
-  fun (b : POrder.class_of leT ltT)            & phant_id b0 b =>
-  fun (m : mixin_of (POrder.Pack _ b) bottomT) & phant_id m0 m =>
-  @Pack phT leT ltT bottomT (unkeyed (Class m)).
+Definition pack :=
+  fun (bord : POrder.order phT) (b : POrder.class_of leT ltT)
+      & phant_id (POrder.class bord) b =>
+  fun (m : mixin_of leT bottomT) =>
+  @Pack phT leT ltT bottomT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -170,10 +170,11 @@ Coercion base : class_of >-> POrder.class_of.
 Coercion mixin : class_of >-> mixin_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Notation "{ 'bPOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'bPOrder'  T }").
 Notation BPOrder le lt bottom mixin :=
-  (@pack _ (Phant _) le lt bottom _ mixin _ id _ id).
+  (@pack _ (Phant _) le lt bottom _ _ id mixin).
 Notation "[ 'bPOrder' 'of' le ]" :=
   (@clone _ (Phant _) _ le (unkeyed _) (unkeyed _) _ id)
   (at level 0, format "[ 'bPOrder'  'of'  le ]").
@@ -191,14 +192,16 @@ Section ClassDef.
 
 Variable T : eqType.
 
-Definition mixin_of (ord : {pOrder T}) (top : T) := forall x, le ord x top.
+Definition mixin_of (le : rel T) (top : T) := forall x, le x top.
 
 Set Primitive Projections.
 
 Record class_of (le lt : rel T) (top : T) := Class {
   base : POrder.class_of le lt;
-  mixin : mixin_of (POrder.Pack _ base) top;
+  mixin : mixin_of le top;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -206,8 +209,6 @@ Structure order (phT : phant T) := Pack {
   top : T;
   class : class_of le lt top;
 }.
-
-Unset Primitive Projections.
 
 Local Coercion base : class_of >-> POrder.class_of.
 
@@ -221,11 +222,10 @@ Variable (leT ltT : rel T) (topT : T).
 
 Definition clone c of phant_id cls c := @Pack phT leT ltT topT (unkeyed c).
 
-Definition pack (b0 : POrder.class_of leT ltT)
-                (m0 : mixin_of (POrder.Pack _ b0) topT) :=
-  fun (b : POrder.class_of leT ltT)         & phant_id b0 b =>
-  fun (m : mixin_of (POrder.Pack _ b) topT) & phant_id m0 m =>
-  @Pack phT leT ltT topT (unkeyed (Class m)).
+Definition pack :=
+  fun (bord : POrder.order phT) (b : POrder.class_of leT ltT)
+      & phant_id (POrder.class bord) b =>
+  fun (m : mixin_of leT topT) => @Pack phT leT ltT topT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -234,10 +234,12 @@ Coercion base : class_of >-> POrder.class_of.
 Coercion mixin : class_of >-> mixin_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
+
 Notation "{ 'tPOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'tPOrder'  T }").
 Notation TPOrder le lt top mixin :=
-  (@pack _ (Phant _) le lt top _ mixin _ id _ id).
+  (@pack _ (Phant _) le lt top _ _ id mixin).
 Notation "[ 'tPOrder' 'of' le ]" :=
   (@clone _ (Phant _) _ le (unkeyed _) (unkeyed _) _ id)
   (at level 0, format "[ 'tPOrder'  'of'  le ]").
@@ -259,8 +261,10 @@ Set Primitive Projections.
 
 Record class_of (le lt : rel T) (bottom top : T) := Class {
   base : BPOrder.class_of le lt bottom;
-  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
+  mixin : TPOrder.mixin_of le top;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -270,11 +274,9 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt bottom top;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> BPOrder.class_of.
 Local Coercion base2 le lt bottom top (c : class_of le lt bottom top) :
-  TPOrder.class_of le lt top := TPOrder.Class (mixin c).
+  TPOrder.class_of le lt top := TPOrder.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -294,8 +296,8 @@ Definition pack :=
   fun (bord : BPOrder.order phT) (b : BPOrder.class_of leT ltT bottomT)
       & phant_id (BPOrder.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT bottomT topT (unkeyed (Class (base := b) m)).
+      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
+  @Pack phT leT ltT bottomT topT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -304,11 +306,15 @@ Coercion base : class_of >-> BPOrder.class_of.
 Coercion base2 : class_of >-> TPOrder.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion bPOrder : order >-> BPOrder.order.
 Canonical bPOrder.
+Arguments bPOrder {T phT} !ord.
 Coercion tPOrder : order >-> TPOrder.order.
 Canonical tPOrder.
+Arguments tPOrder {T phT} !ord.
 Canonical bP_tPOrder.
+Arguments bP_tPOrder {T phT} !ord.
 Notation "{ 'tbPOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'tbPOrder'  T }").
 Notation "[ 'tbPOrder' 'of' le ]" :=
@@ -327,16 +333,18 @@ Variable T : eqType.
 
 Set Primitive Projections.
 
-Record mixin_of (ord : {pOrder T}) (meet : T -> T -> T) := Mixin {
+Record mixin_of (le : rel T) (meet : T -> T -> T) := Mixin {
   meetC : commutative meet;
   meetA : associative meet;
-  leEmeet : forall x y, (le ord x y) = (meet x y == x);
+  leEmeet : forall x y, (le x y) = (meet x y == x);
 }.
 
 Record class_of (le lt : rel T) (meet : T -> T -> T) := Class {
   base : POrder.class_of le lt;
-  mixin : mixin_of (POrder.Pack _ base) meet;
+  mixin : mixin_of le meet;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -344,8 +352,6 @@ Structure order (phT : phant T) := Pack {
   meet : T -> T -> T;
   class : class_of le lt meet;
 }.
-
-Unset Primitive Projections.
 
 Local Coercion base : class_of >-> POrder.class_of.
 
@@ -359,11 +365,11 @@ Variable (leT ltT : rel T) (meetT : T -> T -> T).
 
 Definition clone c of phant_id cls c := @Pack phT leT ltT meetT (unkeyed c).
 
-Definition pack (b0 : POrder.class_of leT ltT)
-                (m0 : mixin_of (POrder.Pack _ b0) meetT) :=
-  fun (b : POrder.class_of leT ltT)          & phant_id b0 b =>
-  fun (m : mixin_of (POrder.Pack _ b) meetT) & phant_id m0 m =>
-  @Pack phT leT ltT meetT (unkeyed (Class m)).
+Definition pack :=
+  fun (bord : POrder.order phT) (b : POrder.class_of leT ltT)
+      & phant_id (POrder.class bord) b =>
+  fun (m : mixin_of leT meetT) =>
+  @Pack phT leT ltT meetT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -372,10 +378,11 @@ Coercion base : class_of >-> POrder.class_of.
 Coercion mixin : class_of >-> mixin_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Notation "{ 'meetOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'meetOrder'  T }").
 Notation MeetOrder le lt meet mixin :=
-  (@pack _ (Phant _) le lt meet _ mixin _ id _ id).
+  (@pack _ (Phant _) le lt meet _ _ id mixin).
 Notation "[ 'meetOrder' 'of' le ]" :=
   (@clone _ (Phant _) _ le (unkeyed _) (unkeyed _) _ id)
   (at level 0, format "[ 'meetOrder'  'of'  le ]").
@@ -397,8 +404,10 @@ Set Primitive Projections.
 
 Record class_of (le lt : rel T) (meet : T -> T -> T) (bottom : T) := Class {
   base : Meet.class_of le lt meet;
-  mixin : BPOrder.mixin_of (POrder.Pack _ base) bottom;
+  mixin : BPOrder.mixin_of le bottom;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -408,11 +417,9 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt meet bottom;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> Meet.class_of.
 Local Coercion base2 le lt meet bottom (c : class_of le lt meet bottom) :
-  BPOrder.class_of le lt bottom := BPOrder.Class (mixin c).
+  BPOrder.class_of le lt bottom := BPOrder.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -431,8 +438,8 @@ Definition pack :=
   fun (bord : Meet.order phT) (b : Meet.class_of leT ltT meetT)
       & phant_id (Meet.class bord) b =>
   fun (mord : BPOrder.order phT) m
-      & phant_id (BPOrder.class mord) (BPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT meetT bottomT (unkeyed (Class (base := b) m)).
+      & phant_id (BPOrder.class mord) (BPOrder.Class b m) =>
+  @Pack phT leT ltT meetT bottomT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -441,11 +448,15 @@ Coercion base : class_of >-> Meet.class_of.
 Coercion base2 : class_of >-> BPOrder.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion bPOrder : order >-> BPOrder.order.
 Canonical bPOrder.
+Arguments bPOrder {T phT} !ord.
 Coercion meetOrder : order >-> Meet.order.
 Canonical meetOrder.
+Arguments meetOrder {T phT} !ord.
 Canonical bP_meetOrder.
+Arguments bP_meetOrder {T phT} !ord.
 Notation "{ 'bMeetOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'bMeetOrder'  T }").
 Notation "[ 'bMeetOrder' 'of' le ]" :=
@@ -466,8 +477,10 @@ Set Primitive Projections.
 
 Record class_of (le lt : rel T) (meet : T -> T -> T) (top : T) := Class {
   base : Meet.class_of le lt meet;
-  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
+  mixin : TPOrder.mixin_of le top;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -477,11 +490,9 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt meet top;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> Meet.class_of.
 Local Coercion base2 le lt meet top (c : class_of le lt meet top) :
-  TPOrder.class_of le lt top := TPOrder.Class (mixin c).
+  TPOrder.class_of le lt top := TPOrder.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -500,8 +511,8 @@ Definition pack :=
   fun (bord : Meet.order phT) (b : Meet.class_of leT ltT meetT)
       & phant_id (Meet.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT meetT topT (unkeyed (Class (base := b) m)).
+      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
+  @Pack phT leT ltT meetT topT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -510,11 +521,15 @@ Coercion base : class_of >-> Meet.class_of.
 Coercion base2 : class_of >-> TPOrder.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion tPOrder : order >-> TPOrder.order.
 Canonical tPOrder.
+Arguments tPOrder {T phT} !ord.
 Coercion meetOrder : order >-> Meet.order.
 Canonical meetOrder.
+Arguments meetOrder {T phT} !ord.
 Canonical tP_meetOrder.
+Arguments tP_meetOrder {T phT} !ord.
 Notation "{ 'tMeetOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'tMeetOrder'  T }").
 Notation "[ 'tMeetOrder' 'of' le ]" :=
@@ -535,8 +550,10 @@ Set Primitive Projections.
 
 Record class_of (le lt : rel T) (meet : T -> T -> T) (bottom top : T) := Class {
   base : BMeet.class_of le lt meet bottom;
-  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
+  mixin : TPOrder.mixin_of le top;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -547,15 +564,13 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt meet bottom top;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> BMeet.class_of.
 Local Coercion base2 le lt meet bottom top
                      (c : class_of le lt meet bottom top) :
-  TMeet.class_of le lt meet top := TMeet.Class (mixin c).
+  TMeet.class_of le lt meet top := TMeet.Class c (mixin c).
 Local Coercion base3 le lt meet bottom top
                      (c : class_of le lt meet bottom top) :
-  TBPOrder.class_of le lt bottom top := TBPOrder.Class (base := c) (mixin c).
+  TBPOrder.class_of le lt bottom top := TBPOrder.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -596,8 +611,8 @@ Definition pack :=
   fun (bord : BMeet.order phT) (b : BMeet.class_of leT ltT meetT bottomT)
       & phant_id (BMeet.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT meetT bottomT topT (unkeyed (Class (base := b) m)).
+      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
+  @Pack phT leT ltT meetT bottomT topT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -607,24 +622,37 @@ Coercion base2 : class_of >-> TMeet.class_of.
 Coercion base3 : class_of >-> TBPOrder.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion bPOrder : order >-> BPOrder.order.
 Canonical bPOrder.
+Arguments bPOrder {T phT} !ord.
 Coercion tPOrder : order >-> TPOrder.order.
 Canonical tPOrder.
+Arguments tPOrder {T phT} !ord.
 Coercion tbPOrder : order >-> TBPOrder.order.
 Canonical tbPOrder.
+Arguments tbPOrder {T phT} !ord.
 Coercion meetOrder : order >-> Meet.order.
 Canonical meetOrder.
+Arguments meetOrder {T phT} !ord.
 Coercion bMeetOrder : order >-> BMeet.order.
 Canonical bMeetOrder.
+Arguments bMeetOrder {T phT} !ord.
 Coercion tMeetOrder : order >-> TMeet.order.
 Canonical tMeetOrder.
+Arguments tMeetOrder {T phT} !ord.
 Canonical bP_tMeetOrder.
+Arguments bP_tMeetOrder {T phT} !ord.
 Canonical tP_bMeetOrder.
+Arguments tP_bMeetOrder {T phT} !ord.
 Canonical tbP_meetOrder.
+Arguments tbP_meetOrder {T phT} !ord.
 Canonical tbP_bMeetOrder.
+Arguments tbP_bMeetOrder {T phT} !ord.
 Canonical tbP_tMeetOrder.
+Arguments tbP_tMeetOrder {T phT} !ord.
 Canonical bMeet_tMeetOrder.
+Arguments bMeet_tMeetOrder {T phT} !ord.
 Notation "{ 'tbMeetOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'tbMeetOrder'  T }").
 Notation "[ 'tbMeetOrder' 'of' le ]" :=
@@ -642,14 +670,16 @@ Section ClassDef.
 
 Variable T : eqType.
 
-Definition mixin_of (ord : {pOrder T}) := Meet.mixin_of (dual_pOrder ord).
+Definition mixin_of (le : rel T) := Meet.mixin_of (dual_rel le).
 
 Set Primitive Projections.
 
 Record class_of (le lt : rel T) (join : T -> T -> T) := Class {
   base : POrder.class_of le lt;
-  mixin : mixin_of (POrder.Pack _ base) join;
+  mixin : mixin_of le join;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -657,8 +687,6 @@ Structure order (phT : phant T) := Pack {
   join : T -> T -> T;
   class : class_of le lt join;
 }.
-
-Unset Primitive Projections.
 
 Local Coercion base : class_of >-> POrder.class_of.
 
@@ -672,11 +700,10 @@ Variable (leT ltT : rel T) (joinT : T -> T -> T).
 
 Definition clone c of phant_id cls c := @Pack phT leT ltT joinT (unkeyed c).
 
-Definition pack (b0 : POrder.class_of leT ltT)
-                (m0 : mixin_of (POrder.Pack _ b0) joinT) :=
-  fun (b : POrder.class_of leT ltT)          & phant_id b0 b =>
-  fun (m : mixin_of (POrder.Pack _ b) joinT) & phant_id m0 m =>
-  @Pack phT leT ltT joinT (unkeyed (Class m)).
+Definition pack :=
+  fun (bord : POrder.order phT) (b : POrder.class_of leT ltT)
+      & phant_id (POrder.class bord) b =>
+  fun (m : mixin_of leT joinT) => @Pack phT leT ltT joinT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -685,10 +712,11 @@ Coercion base : class_of >-> POrder.class_of.
 Coercion mixin : class_of >-> mixin_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Notation "{ 'joinOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'joinOrder'  T }").
 Notation JoinOrder le lt join mixin :=
-  (@pack _ (Phant _) le lt join _ mixin _ id _ id).
+  (@pack _ (Phant _) le lt join _ _ id mixin).
 Notation "[ 'joinOrder' 'of' le ]" :=
   (@clone _ (Phant _) _ le (unkeyed _) (unkeyed _) _ id)
   (at level 0, format "[ 'joinOrder'  'of'  le ]").
@@ -710,8 +738,10 @@ Set Primitive Projections.
 
 Record class_of (le lt : rel T) (join : T -> T -> T) (bottom : T) := Class {
   base : Join.class_of le lt join;
-  mixin : BPOrder.mixin_of (POrder.Pack _ base) bottom;
+  mixin : BPOrder.mixin_of le bottom;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -721,11 +751,9 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt join bottom;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> Join.class_of.
 Local Coercion base2 le lt join bottom (c : class_of le lt join bottom) :
-  BPOrder.class_of le lt bottom := BPOrder.Class (mixin c).
+  BPOrder.class_of le lt bottom := BPOrder.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -744,8 +772,8 @@ Definition pack :=
   fun (bord : Join.order phT) (b : Join.class_of leT ltT joinT)
       & phant_id (Join.class bord) b =>
   fun (mord : BPOrder.order phT) m
-      & phant_id (BPOrder.class mord) (BPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT joinT bottomT (unkeyed (Class (base := b) m)).
+      & phant_id (BPOrder.class mord) (BPOrder.Class b m) =>
+  @Pack phT leT ltT joinT bottomT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -754,11 +782,15 @@ Coercion base : class_of >-> Join.class_of.
 Coercion base2 : class_of >-> BPOrder.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion bPOrder : order >-> BPOrder.order.
 Canonical bPOrder.
+Arguments bPOrder {T phT} !ord.
 Coercion joinOrder : order >-> Join.order.
 Canonical joinOrder.
+Arguments joinOrder {T phT} !ord.
 Canonical bP_joinOrder.
+Arguments bP_joinOrder {T phT} !ord.
 Notation "{ 'bJoinOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'bJoinOrder'  T }").
 Notation "[ 'bJoinOrder' 'of' le ]" :=
@@ -779,8 +811,10 @@ Set Primitive Projections.
 
 Record class_of (le lt : rel T) (join : T -> T -> T) (top : T) := Class {
   base : Join.class_of le lt join;
-  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
+  mixin : TPOrder.mixin_of le top;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -790,11 +824,9 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt join top;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> Join.class_of.
 Local Coercion base2 le lt join top (c : class_of le lt join top) :
-  TPOrder.class_of le lt top := TPOrder.Class (mixin c).
+  TPOrder.class_of le lt top := TPOrder.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -813,8 +845,8 @@ Definition pack :=
   fun (bord : Join.order phT) (b : Join.class_of leT ltT joinT)
       & phant_id (Join.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT joinT topT (unkeyed (Class (base := b) m)).
+      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
+  @Pack phT leT ltT joinT topT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -823,11 +855,15 @@ Coercion base : class_of >-> Join.class_of.
 Coercion base2 : class_of >-> TPOrder.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion tPOrder : order >-> TPOrder.order.
 Canonical tPOrder.
+Arguments tPOrder {T phT} !ord.
 Coercion joinOrder : order >-> Join.order.
 Canonical joinOrder.
+Arguments joinOrder {T phT} !ord.
 Canonical tP_joinOrder.
+Arguments tP_joinOrder {T phT} !ord.
 Notation "{ 'tJoinOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'tJoinOrder'  T }").
 Notation "[ 'tJoinOrder' 'of' le ]" :=
@@ -848,8 +884,10 @@ Set Primitive Projections.
 
 Record class_of (le lt : rel T) (join : T -> T -> T) (bottom top : T) := Class {
   base : BJoin.class_of le lt join bottom;
-  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
+  mixin : TPOrder.mixin_of le top;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -860,15 +898,13 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt join bottom top;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> BJoin.class_of.
 Local Coercion base2 le lt join bottom top
                      (c : class_of le lt join bottom top) :
-  TJoin.class_of le lt join top := TJoin.Class (mixin c).
+  TJoin.class_of le lt join top := TJoin.Class c (mixin c).
 Local Coercion base3 le lt join bottom top
                      (c : class_of le lt join bottom top) :
-  TBPOrder.class_of le lt bottom top := TBPOrder.Class (base := c) (mixin c).
+  TBPOrder.class_of le lt bottom top := TBPOrder.Class c (mixin c).
 
 Variable (phT : phant T).
 Variable (ord : order phT).
@@ -910,8 +946,8 @@ Definition pack :=
   fun (bord : BJoin.order phT) (b : BJoin.class_of leT ltT joinT bottomT)
       & phant_id (BJoin.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT joinT bottomT topT (unkeyed (Class (base := b) m)).
+      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
+  @Pack phT leT ltT joinT bottomT topT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -921,24 +957,37 @@ Coercion base2 : class_of >-> TJoin.class_of.
 Coercion base3 : class_of >-> TBPOrder.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion bPOrder : order >-> BPOrder.order.
 Canonical bPOrder.
+Arguments bPOrder {T phT} !ord.
 Coercion tPOrder : order >-> TPOrder.order.
 Canonical tPOrder.
+Arguments tPOrder {T phT} !ord.
 Coercion tbPOrder : order >-> TBPOrder.order.
 Canonical tbPOrder.
+Arguments tbPOrder {T phT} !ord.
 Coercion joinOrder : order >-> Join.order.
 Canonical joinOrder.
+Arguments joinOrder {T phT} !ord.
 Coercion bJoinOrder : order >-> BJoin.order.
 Canonical bJoinOrder.
+Arguments bJoinOrder {T phT} !ord.
 Coercion tJoinOrder : order >-> TJoin.order.
 Canonical tJoinOrder.
+Arguments tJoinOrder {T phT} !ord.
 Canonical bP_tJoinOrder.
+Arguments bP_tJoinOrder {T phT} !ord.
 Canonical tP_bJoinOrder.
+Arguments tP_bJoinOrder {T phT} !ord.
 Canonical tbP_joinOrder.
+Arguments tbP_joinOrder {T phT} !ord.
 Canonical tbP_bJoinOrder.
+Arguments tbP_bJoinOrder {T phT} !ord.
 Canonical tbP_tJoinOrder.
+Arguments tbP_tJoinOrder {T phT} !ord.
 Canonical bJoin_tJoinOrder.
+Arguments bJoin_tJoinOrder {T phT} !ord.
 Notation "{ 'tbJoinOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'tbJoinOrder'  T }").
 Notation "[ 'tbJoinOrder' 'of' le ]" :=
@@ -960,8 +1009,10 @@ Set Primitive Projections.
 
 Record class_of (le lt : rel T) (meet join : T -> T -> T) := Class {
   base : Meet.class_of le lt meet;
-  mixin : Join.mixin_of (POrder.Pack _ base) join;
+  mixin : Join.mixin_of le join;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -971,11 +1022,9 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt meet join;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> Meet.class_of.
 Local Coercion base2 le lt meet join (c : class_of le lt meet join) :
-  Join.class_of le lt join := Join.Class (mixin c).
+  Join.class_of le lt join := Join.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -994,8 +1043,8 @@ Definition pack :=
   fun (bord : Meet.order phT) (b : Meet.class_of leT ltT meetT)
       & phant_id (Meet.class bord) b =>
   fun (mord : Join.order phT) m
-      & phant_id (Join.class mord) (Join.Class (base := b) m) =>
-  @Pack phT leT ltT meetT joinT (unkeyed (Class (base := b) m)).
+      & phant_id (Join.class mord) (Join.Class b m) =>
+  @Pack phT leT ltT meetT joinT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -1004,11 +1053,15 @@ Coercion base : class_of >-> Meet.class_of.
 Coercion base2 : class_of >-> Join.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion meetOrder : order >-> Meet.order.
 Canonical meetOrder.
+Arguments meetOrder {T phT} !ord.
 Coercion joinOrder : order >-> Join.order.
 Canonical joinOrder.
+Arguments joinOrder {T phT} !ord.
 Canonical meet_joinOrder.
+Arguments meet_joinOrder {T phT} !ord.
 Notation "{ 'lattice' T }" := (order (Phant T))
   (at level 0, format "{ 'lattice'  T }").
 Notation "[ 'lattice' 'of' le ]" :=
@@ -1030,8 +1083,10 @@ Set Primitive Projections.
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (bottom : T) :=
   Class {
   base : Lattice.class_of le lt meet join;
-  mixin : BPOrder.mixin_of (POrder.Pack _ base) bottom;
+  mixin : BPOrder.mixin_of le bottom;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -1042,15 +1097,13 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt meet join bottom;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> Lattice.class_of.
 Local Coercion base2 le lt meet join bottom
                      (c : class_of le lt meet join bottom) :
-  BMeet.class_of le lt meet bottom := BMeet.Class (mixin c).
+  BMeet.class_of le lt meet bottom := BMeet.Class c (mixin c).
 Local Coercion base3 le lt meet join bottom
                      (c : class_of le lt meet join bottom) :
-  BJoin.class_of le lt join bottom := BJoin.Class (base := c) (mixin c).
+  BJoin.class_of le lt join bottom := BJoin.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -1091,8 +1144,8 @@ Definition pack :=
   fun (bord : Lattice.order phT) (b : Lattice.class_of leT ltT meetT joinT)
       & phant_id (Lattice.class bord) b =>
   fun (mord : BPOrder.order phT) m
-      & phant_id (BPOrder.class mord) (BPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT meetT joinT bottomT (unkeyed (Class (base := b) m)).
+      & phant_id (BPOrder.class mord) (BPOrder.Class b m) =>
+  @Pack phT leT ltT meetT joinT bottomT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -1102,24 +1155,37 @@ Coercion base2 : class_of >-> BMeet.class_of.
 Coercion base3 : class_of >-> BJoin.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion bPOrder : order >-> BPOrder.order.
 Canonical bPOrder.
+Arguments bPOrder {T phT} !ord.
 Coercion meetOrder : order >-> Meet.order.
 Canonical meetOrder.
+Arguments meetOrder {T phT} !ord.
 Coercion bMeetOrder : order >-> BMeet.order.
 Canonical bMeetOrder.
+Arguments bMeetOrder {T phT} !ord.
 Coercion joinOrder : order >-> Join.order.
 Canonical joinOrder.
+Arguments joinOrder {T phT} !ord.
 Coercion bJoinOrder : order >-> BJoin.order.
 Canonical bJoinOrder.
+Arguments bJoinOrder {T phT} !ord.
 Coercion lattice : order >-> Lattice.order.
 Canonical lattice.
+Arguments lattice {T phT} !ord.
 Canonical meet_bJoinOrder.
+Arguments meet_bJoinOrder {T phT} !ord.
 Canonical join_bMeetOrder.
+Arguments join_bMeetOrder {T phT} !ord.
 Canonical bMeet_bJoinOrder.
+Arguments bMeet_bJoinOrder {T phT} !ord.
 Canonical lattice_bPOrder.
+Arguments lattice_bPOrder {T phT} !ord.
 Canonical lattice_bMeetOrder.
+Arguments lattice_bMeetOrder {T phT} !ord.
 Canonical lattice_bJoinOrder.
+Arguments lattice_bJoinOrder {T phT} !ord.
 
 Notation "{ 'bLattice' T }" := (order (Phant T))
   (at level 0, format "{ 'bLattice'  T }").
@@ -1142,8 +1208,10 @@ Set Primitive Projections.
 
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (top : T) := Class {
   base : Lattice.class_of le lt meet join;
-  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
+  mixin : TPOrder.mixin_of le top;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -1154,13 +1222,11 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt meet join top;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> Lattice.class_of.
 Local Coercion base2 le lt meet join top (c : class_of le lt meet join top) :
-  TMeet.class_of le lt meet top := TMeet.Class (mixin c).
+  TMeet.class_of le lt meet top := TMeet.Class c (mixin c).
 Local Coercion base3 le lt meet join top (c : class_of le lt meet join top) :
-  TJoin.class_of le lt join top := TJoin.Class (base := c) (mixin c).
+  TJoin.class_of le lt join top := TJoin.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -1201,8 +1267,8 @@ Definition pack :=
   fun (bord : Lattice.order phT) (b : Lattice.class_of leT ltT meetT joinT)
       & phant_id (Lattice.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT meetT joinT topT (unkeyed (Class (base := b) m)).
+      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
+  @Pack phT leT ltT meetT joinT topT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -1212,24 +1278,37 @@ Coercion base2 : class_of >-> TMeet.class_of.
 Coercion base3 : class_of >-> TJoin.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion tPOrder : order >-> TPOrder.order.
 Canonical tPOrder.
+Arguments tPOrder {T phT} !ord.
 Coercion meetOrder : order >-> Meet.order.
 Canonical meetOrder.
+Arguments meetOrder {T phT} !ord.
 Coercion tMeetOrder : order >-> TMeet.order.
 Canonical tMeetOrder.
+Arguments tMeetOrder {T phT} !ord.
 Coercion joinOrder : order >-> Join.order.
 Canonical joinOrder.
+Arguments joinOrder {T phT} !ord.
 Coercion tJoinOrder : order >-> TJoin.order.
 Canonical tJoinOrder.
+Arguments tJoinOrder {T phT} !ord.
 Coercion lattice : order >-> Lattice.order.
 Canonical lattice.
+Arguments lattice {T phT} !ord.
 Canonical meet_tJoinOrder.
+Arguments meet_tJoinOrder {T phT} !ord.
 Canonical join_tMeetOrder.
+Arguments join_tMeetOrder {T phT} !ord.
 Canonical tMeet_tJoinOrder.
+Arguments tMeet_tJoinOrder {T phT} !ord.
 Canonical lattice_tPOrder.
+Arguments lattice_tPOrder {T phT} !ord.
 Canonical lattice_tMeetOrder.
+Arguments lattice_tMeetOrder {T phT} !ord.
 Canonical lattice_tJoinOrder.
+Arguments lattice_tJoinOrder {T phT} !ord.
 Notation "{ 'tLattice' T }" := (order (Phant T))
   (at level 0, format "{ 'tLattice'  T }").
 Notation "[ 'tLattice' 'of' le ]" :=
@@ -1252,8 +1331,10 @@ Set Primitive Projections.
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (bottom top : T) :=
   Class {
   base : BLattice.class_of le lt meet join bottom;
-  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
+  mixin : TPOrder.mixin_of le top;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -1265,18 +1346,16 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt meet join bottom top;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> BLattice.class_of.
 Local Coercion base2 le lt meet join bottom top
       (c : class_of le lt meet join bottom top) :
-  TLattice.class_of le lt meet join top := TLattice.Class (mixin c).
+  TLattice.class_of le lt meet join top := TLattice.Class c (mixin c).
 Local Coercion base3 le lt meet join bottom top
       (c : class_of le lt meet join bottom top) :
-  TBMeet.class_of le lt meet bottom top := TBMeet.Class (base := c) (mixin c).
+  TBMeet.class_of le lt meet bottom top := TBMeet.Class c (mixin c).
 Local Coercion base4 le lt meet join bottom top
       (c : class_of le lt meet join bottom top) :
-  TBJoin.class_of le lt join bottom top := TBJoin.Class (base := c) (mixin c).
+  TBJoin.class_of le lt join bottom top := TBJoin.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -1317,8 +1396,8 @@ Definition pack :=
       (b : BLattice.class_of leT ltT meetT joinT bottomT)
       & phant_id (BLattice.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT meetT joinT bottomT topT (unkeyed (Class (base := b) m)).
+      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
+  @Pack phT leT ltT meetT joinT bottomT topT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -1329,34 +1408,49 @@ Coercion base3 : class_of >-> TBMeet.class_of.
 Coercion base4 : class_of >-> TBJoin.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion bPOrder : order >-> BPOrder.order.
 Canonical bPOrder.
+Arguments bPOrder {T phT} !ord.
 Coercion tPOrder : order >-> TPOrder.order.
 Canonical tPOrder.
+Arguments tPOrder {T phT} !ord.
 Coercion tbPOrder : order >-> TBPOrder.order.
 Canonical tbPOrder.
+Arguments tbPOrder {T phT} !ord.
 Coercion meetOrder : order >-> Meet.order.
 Canonical meetOrder.
+Arguments meetOrder {T phT} !ord.
 Coercion bMeetOrder : order >-> BMeet.order.
 Canonical bMeetOrder.
+Arguments bMeetOrder {T phT} !ord.
 Coercion tMeetOrder : order >-> TMeet.order.
 Canonical tMeetOrder.
+Arguments tMeetOrder {T phT} !ord.
 Coercion tbMeetOrder : order >-> TBMeet.order.
 Canonical tbMeetOrder.
+Arguments tbMeetOrder {T phT} !ord.
 Coercion joinOrder : order >-> Join.order.
 Canonical joinOrder.
+Arguments joinOrder {T phT} !ord.
 Coercion bJoinOrder : order >-> BJoin.order.
 Canonical bJoinOrder.
+Arguments bJoinOrder {T phT} !ord.
 Coercion tJoinOrder : order >-> TJoin.order.
 Canonical tJoinOrder.
+Arguments tJoinOrder {T phT} !ord.
 Coercion tbJoinOrder : order >-> TBJoin.order.
 Canonical tbJoinOrder.
+Arguments tbJoinOrder {T phT} !ord.
 Coercion lattice : order >-> Lattice.order.
 Canonical lattice.
+Arguments lattice {T phT} !ord.
 Coercion bLattice : order >-> BLattice.order.
 Canonical bLattice.
+Arguments bLattice {T phT} !ord.
 Coercion tLattice : order >-> TLattice.order.
 Canonical tLattice.
+Arguments tLattice {T phT} !ord.
 Notation "{ 'tbLattice' T }" := (order (Phant T))
   (at level 0, format "{ 'tbLattice'  T }").
 Notation "[ 'tbLattice' 'of' le ]" :=
@@ -1376,15 +1470,17 @@ Variable T : eqType.
 
 Set Primitive Projections.
 
-Record mixin_of (ord : {lattice T}) := Mixin {
-  meetUl : left_distributive (meet ord) (join ord);
-  joinIl : left_distributive (join ord) (meet ord);
+Record mixin_of (meet join : T -> T -> T) := Mixin {
+  meetUl : left_distributive meet join;
+  joinIl : left_distributive join meet;
 }.
 
 Record class_of (le lt : rel T) (meet join : T -> T -> T) := Class {
   base : Lattice.class_of le lt meet join;
-  mixin : mixin_of (Lattice.Pack _ base);
+  mixin : mixin_of meet join;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -1393,8 +1489,6 @@ Structure order (phT : phant T) := Pack {
   join : T -> T -> T;
   class : class_of le lt meet join;
 }.
-
-Unset Primitive Projections.
 
 Local Coercion base : class_of >-> Lattice.class_of.
 
@@ -1413,11 +1507,11 @@ Variable (leT ltT : rel T) (meetT joinT : T -> T -> T).
 Definition clone c of phant_id cls c :=
   @Pack phT leT ltT meetT joinT (unkeyed c).
 
-Definition pack (b0 : Lattice.class_of leT ltT meetT joinT)
-                (m0 : mixin_of (Lattice.Pack _ b0)) :=
-  fun (b : Lattice.class_of leT ltT meetT joinT) & phant_id b0 b =>
-  fun (m : mixin_of (Lattice.Pack _ b))          & phant_id m0 m =>
-  @Pack phT leT ltT meetT joinT (unkeyed (Class m)).
+Definition pack :=
+  fun (bord : Lattice.order phT) (b : Lattice.class_of leT ltT meetT joinT)
+      & phant_id (Lattice.class bord) b =>
+  fun (m : mixin_of meetT joinT) =>
+    @Pack phT leT ltT meetT joinT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -1426,16 +1520,20 @@ Coercion base : class_of >-> Lattice.class_of.
 Coercion mixin : class_of >-> mixin_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion meetOrder : order >-> Meet.order.
 Canonical meetOrder.
+Arguments meetOrder {T phT} !ord.
 Coercion joinOrder : order >-> Join.order.
 Canonical joinOrder.
+Arguments joinOrder {T phT} !ord.
 Coercion lattice : order >-> Lattice.order.
 Canonical lattice.
+Arguments lattice {T phT} !ord.
 Notation "{ 'distrLattice' T }" := (order (Phant T))
   (at level 0, format "{ 'distrLattice'  T }").
 Notation DistrLattice le lt meet join mixin :=
-  (@pack _ (Phant _) le lt meet join _ mixin _ id _ id).
+  (@pack _ (Phant _) le lt meet join _ _ id mixin).
 Notation "[ 'distrLattice' 'of' le ]" :=
   (@clone _ (Phant _) _ le (unkeyed _) (unkeyed _) (unkeyed _) _ id)
   (at level 0, format "[ 'distrLattice'  'of'  le ]").
@@ -1455,8 +1553,10 @@ Set Primitive Projections.
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (bottom : T) :=
   Class {
   base : DistrLattice.class_of le lt meet join;
-  mixin : BPOrder.mixin_of (Lattice.Pack _ base) bottom;
+  mixin : BPOrder.mixin_of le bottom;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -1467,12 +1567,10 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt meet join bottom;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> DistrLattice.class_of.
 Local Coercion base2 le lt meet join bottom
                      (c : class_of le lt meet join bottom) :
-  BLattice.class_of le lt meet join bottom := BLattice.Class (mixin c).
+  BLattice.class_of le lt meet join bottom := BLattice.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -1501,8 +1599,8 @@ Definition pack :=
       (b : DistrLattice.class_of leT ltT meetT joinT)
       & phant_id (DistrLattice.class bord) b =>
   fun (mord : BPOrder.order phT) m
-      & phant_id (BPOrder.class mord) (BPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT meetT joinT bottomT (unkeyed (Class (base := b) m)).
+      & phant_id (BPOrder.class mord) (BPOrder.Class b m) =>
+  @Pack phT leT ltT meetT joinT bottomT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -1511,22 +1609,31 @@ Coercion base : class_of >-> DistrLattice.class_of.
 Coercion base2 : class_of >-> BLattice.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion bPOrder : order >-> BPOrder.order.
 Canonical bPOrder.
+Arguments bPOrder {T phT} !ord.
 Coercion meetOrder : order >-> Meet.order.
 Canonical meetOrder.
+Arguments meetOrder {T phT} !ord.
 Coercion bMeetOrder : order >-> BMeet.order.
 Canonical bMeetOrder.
+Arguments bMeetOrder {T phT} !ord.
 Coercion joinOrder : order >-> Join.order.
 Canonical joinOrder.
+Arguments joinOrder {T phT} !ord.
 Coercion bJoinOrder : order >-> BJoin.order.
 Canonical bJoinOrder.
+Arguments bJoinOrder {T phT} !ord.
 Coercion lattice : order >-> Lattice.order.
 Canonical lattice.
+Arguments lattice {T phT} !ord.
 Coercion bLattice : order >-> BLattice.order.
 Canonical bLattice.
+Arguments bLattice {T phT} !ord.
 Coercion distrLattice : order >-> DistrLattice.order.
 Canonical distrLattice.
+Arguments distrLattice {T phT} !ord.
 Notation "{ 'bDistrLattice' T }" := (order (Phant T))
   (at level 0, format "{ 'bDistrLattice'  T }").
 Notation "[ 'bDistrLattice' 'of' le ]" :=
@@ -1549,8 +1656,10 @@ Set Primitive Projections.
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (top : T) :=
   Class {
   base : DistrLattice.class_of le lt meet join;
-  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
+  mixin : TPOrder.mixin_of le top;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -1561,11 +1670,9 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt meet join top;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> DistrLattice.class_of.
 Local Coercion base2 le lt meet join top (c : class_of le lt meet join top) :
-  TLattice.class_of le lt meet join top := TLattice.Class (mixin c).
+  TLattice.class_of le lt meet join top := TLattice.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -1593,8 +1700,8 @@ Definition pack :=
       (b : DistrLattice.class_of leT ltT meetT joinT)
       & phant_id (DistrLattice.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT meetT joinT topT (unkeyed (Class (base := b) m)).
+      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
+  @Pack phT leT ltT meetT joinT topT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -1603,22 +1710,31 @@ Coercion base : class_of >-> DistrLattice.class_of.
 Coercion base2 : class_of >-> TLattice.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion tPOrder : order >-> TPOrder.order.
 Canonical tPOrder.
+Arguments tPOrder {T phT} !ord.
 Coercion meetOrder : order >-> Meet.order.
 Canonical meetOrder.
+Arguments meetOrder {T phT} !ord.
 Coercion tMeetOrder : order >-> TMeet.order.
 Canonical tMeetOrder.
+Arguments tMeetOrder {T phT} !ord.
 Coercion joinOrder : order >-> Join.order.
 Canonical joinOrder.
+Arguments joinOrder {T phT} !ord.
 Coercion tJoinOrder : order >-> TJoin.order.
 Canonical tJoinOrder.
+Arguments tJoinOrder {T phT} !ord.
 Coercion lattice : order >-> Lattice.order.
 Canonical lattice.
+Arguments lattice {T phT} !ord.
 Coercion tLattice : order >-> TLattice.order.
 Canonical tLattice.
+Arguments tLattice {T phT} !ord.
 Coercion distrLattice : order >-> DistrLattice.order.
 Canonical distrLattice.
+Arguments distrLattice {T phT} !ord.
 Notation "{ 'tDistrLattice' T }" := (order (Phant T))
   (at level 0, format "{ 'tDistrLattice'  T }").
 Notation "[ 'tDistrLattice' 'of' le ]" :=
@@ -1641,8 +1757,10 @@ Set Primitive Projections.
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (bottom top : T) :=
   Class {
   base : BDistrLattice.class_of le lt meet join bottom;
-  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
+  mixin : TPOrder.mixin_of le top;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -1654,17 +1772,15 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt meet join bottom top;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> BDistrLattice.class_of.
 Local Coercion base2 le lt meet join bottom top
       (c : class_of le lt meet join bottom top) :
   TDistrLattice.class_of le lt meet join top :=
-  TDistrLattice.Class (mixin c).
+  TDistrLattice.Class c (mixin c).
 Local Coercion base3 le lt meet join bottom top
       (c : class_of le lt meet join bottom top) :
   TBLattice.class_of le lt meet join bottom top :=
-  TBLattice.Class (base := c) (mixin c).
+  TBLattice.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -1715,8 +1831,8 @@ Definition pack :=
       (b : BDistrLattice.class_of leT ltT meetT joinT bottomT)
       & phant_id (BDistrLattice.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT meetT joinT bottomT topT (unkeyed (Class (base := b) m)).
+      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
+  @Pack phT leT ltT meetT joinT bottomT topT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -1726,42 +1842,61 @@ Coercion base2 : class_of >-> TDistrLattice.class_of.
 Coercion base3 : class_of >-> TBLattice.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion bPOrder : order >-> BPOrder.order.
 Canonical bPOrder.
+Arguments bPOrder {T phT} !ord.
 Coercion tPOrder : order >-> TPOrder.order.
 Canonical tPOrder.
+Arguments tPOrder {T phT} !ord.
 Coercion tbPOrder : order >-> TBPOrder.order.
 Canonical tbPOrder.
+Arguments tbPOrder {T phT} !ord.
 Coercion meetOrder : order >-> Meet.order.
 Canonical meetOrder.
+Arguments meetOrder {T phT} !ord.
 Coercion bMeetOrder : order >-> BMeet.order.
 Canonical bMeetOrder.
+Arguments bMeetOrder {T phT} !ord.
 Coercion tMeetOrder : order >-> TMeet.order.
 Canonical tMeetOrder.
+Arguments tMeetOrder {T phT} !ord.
 Coercion tbMeetOrder : order >-> TBMeet.order.
 Canonical tbMeetOrder.
+Arguments tbMeetOrder {T phT} !ord.
 Coercion joinOrder : order >-> Join.order.
 Canonical joinOrder.
+Arguments joinOrder {T phT} !ord.
 Coercion bJoinOrder : order >-> BJoin.order.
 Canonical bJoinOrder.
+Arguments bJoinOrder {T phT} !ord.
 Coercion tJoinOrder : order >-> TJoin.order.
 Canonical tJoinOrder.
+Arguments tJoinOrder {T phT} !ord.
 Coercion tbJoinOrder : order >-> TBJoin.order.
 Canonical tbJoinOrder.
+Arguments tbJoinOrder {T phT} !ord.
 Coercion lattice : order >-> Lattice.order.
 Canonical lattice.
+Arguments lattice {T phT} !ord.
 Coercion bLattice : order >-> BLattice.order.
 Canonical bLattice.
+Arguments bLattice {T phT} !ord.
 Coercion tLattice : order >-> TLattice.order.
 Canonical tLattice.
+Arguments tLattice {T phT} !ord.
 Coercion tbLattice : order >-> TBLattice.order.
 Canonical tbLattice.
+Arguments tbLattice {T phT} !ord.
 Coercion distrLattice : order >-> DistrLattice.order.
 Canonical distrLattice.
+Arguments distrLattice {T phT} !ord.
 Coercion bDistrLattice : order >-> BDistrLattice.order.
 Canonical bDistrLattice.
+Arguments bDistrLattice {T phT} !ord.
 Coercion tDistrLattice : order >-> TDistrLattice.order.
 Canonical tDistrLattice.
+Arguments tDistrLattice {T phT} !ord.
 Notation "{ 'tbDistrLattice' T }" := (order (Phant T))
   (at level 0, format "{ 'tbDistrLattice'  T }").
 Notation "[ 'tbDistrLattice' 'of' le ]" :=
@@ -1779,16 +1914,18 @@ Section ClassDef.
 
 Variable T : eqType.
 
-Definition mixin_of (ord : {pOrder T}) := total (le ord).
+Definition mixin_of (le : rel T) := total le.
 
-Definition le_total ord (m : mixin_of ord) : total (le ord) := m.
+Definition le_total le (m : mixin_of le) : total le := m.
 
 Set Primitive Projections.
 
 Record class_of (le lt : rel T) (meet join : T -> T -> T) := Class {
   base : DistrLattice.class_of le lt meet join;
-  mixin : mixin_of (POrder.Pack _ base);
+  mixin : mixin_of le;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -1797,8 +1934,6 @@ Structure order (phT : phant T) := Pack {
   join : T -> T -> T;
   class : class_of le lt meet join;
 }.
-
-Unset Primitive Projections.
 
 Local Coercion base : class_of >-> DistrLattice.class_of.
 
@@ -1819,11 +1954,11 @@ Variable (leT ltT : rel T) (meetT joinT : T -> T -> T).
 Definition clone c of phant_id cls c :=
   @Pack phT leT ltT meetT joinT (unkeyed c).
 
-Definition pack (m0 : total leT) :=
-  fun (bord : DistrLattice.order phT) b
-        & phant_id (DistrLattice.class bord) b =>
-  fun m & phant_id m0 m =>
-  @Pack phT leT ltT meetT joinT (unkeyed (@Class leT ltT meetT joinT b m)).
+Definition pack :=
+  fun (bord : DistrLattice.order phT)
+      (b : DistrLattice.class_of leT ltT meetT joinT)
+      & phant_id (DistrLattice.class bord) b =>
+  fun (m : total leT) => @Pack phT leT ltT meetT joinT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -1833,18 +1968,23 @@ Coercion mixin : class_of >-> mixin_of.
 Coercion le_total : mixin_of >-> total.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion meetOrder : order >-> Meet.order.
 Canonical meetOrder.
+Arguments meetOrder {T phT} !ord.
 Coercion joinOrder : order >-> Join.order.
 Canonical joinOrder.
+Arguments joinOrder {T phT} !ord.
 Coercion lattice : order >-> Lattice.order.
 Canonical lattice.
+Arguments lattice {T phT} !ord.
 Coercion distrLattice : order >-> DistrLattice.order.
 Canonical distrLattice.
+Arguments distrLattice {T phT} !ord.
 Notation "{ 'totalOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'totalOrder'  T }").
 Notation TotalOrder le lt meet join mixin :=
-  (@pack _ (Phant _) le lt meet join mixin _ _ id _ id).
+  (@pack _ (Phant _) le lt meet join _ _ id mixin).
 Notation "[ 'totalOrder' 'of' le ]" :=
   (@clone _ (Phant _) _ le (unkeyed _) (unkeyed _) (unkeyed _) _ id)
   (at level 0, format "[ 'totalOrder'  'of'  le ]").
@@ -1864,8 +2004,10 @@ Set Primitive Projections.
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (bottom : T) :=
   Class {
   base : Total.class_of le lt meet join;
-  mixin : BPOrder.mixin_of (POrder.Pack _ base) bottom;
+  mixin : BPOrder.mixin_of le bottom;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -1876,13 +2018,11 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt meet join bottom;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> Total.class_of.
 Local Coercion base2 le lt meet join bottom
                      (c : class_of le lt meet join bottom) :
   BDistrLattice.class_of le lt meet join bottom :=
-  BDistrLattice.Class (mixin c).
+  BDistrLattice.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -1915,8 +2055,8 @@ Definition pack :=
   fun (bord : Total.order phT) (b : Total.class_of leT ltT meetT joinT)
       & phant_id (Total.class bord) b =>
   fun (mord : BPOrder.order phT) m
-      & phant_id (BPOrder.class mord) (BPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT meetT joinT bottomT (unkeyed (Class (base := b) m)).
+      & phant_id (BPOrder.class mord) (BPOrder.Class b m) =>
+  @Pack phT leT ltT meetT joinT bottomT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -1925,26 +2065,37 @@ Coercion base : class_of >-> Total.class_of.
 Coercion base2 : class_of >-> BDistrLattice.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion bPOrder : order >-> BPOrder.order.
 Canonical bPOrder.
+Arguments bPOrder {T phT} !ord.
 Coercion meetOrder : order >-> Meet.order.
 Canonical meetOrder.
+Arguments meetOrder {T phT} !ord.
 Coercion bMeetOrder : order >-> BMeet.order.
 Canonical bMeetOrder.
+Arguments bMeetOrder {T phT} !ord.
 Coercion joinOrder : order >-> Join.order.
 Canonical joinOrder.
+Arguments joinOrder {T phT} !ord.
 Coercion bJoinOrder : order >-> BJoin.order.
 Canonical bJoinOrder.
+Arguments bJoinOrder {T phT} !ord.
 Coercion lattice : order >-> Lattice.order.
 Canonical lattice.
+Arguments lattice {T phT} !ord.
 Coercion bLattice : order >-> BLattice.order.
 Canonical bLattice.
+Arguments bLattice {T phT} !ord.
 Coercion distrLattice : order >-> DistrLattice.order.
 Canonical distrLattice.
+Arguments distrLattice {T phT} !ord.
 Coercion bDistrLattice : order >-> BDistrLattice.order.
 Canonical bDistrLattice.
+Arguments bDistrLattice {T phT} !ord.
 Coercion totalOrder : order >-> Total.order.
 Canonical totalOrder.
+Arguments totalOrder {T phT} !ord.
 Notation "{ 'bTotalOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'bTotalOrder'  T }").
 Notation "[ 'bTotalOrder' 'of' le ]" :=
@@ -1967,8 +2118,10 @@ Set Primitive Projections.
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (top : T) :=
   Class {
   base : Total.class_of le lt meet join;
-  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
+  mixin : TPOrder.mixin_of le top;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -1979,12 +2132,10 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt meet join top;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> Total.class_of.
 Local Coercion base2 le lt meet join top (c : class_of le lt meet join top) :
   TDistrLattice.class_of le lt meet join top :=
-  TDistrLattice.Class (mixin c).
+  TDistrLattice.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -2016,8 +2167,8 @@ Definition pack :=
   fun (bord : Total.order phT) (b : Total.class_of leT ltT meetT joinT)
       & phant_id (Total.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT meetT joinT topT (unkeyed (Class (base := b) m)).
+      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
+  @Pack phT leT ltT meetT joinT topT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -2026,26 +2177,37 @@ Coercion base : class_of >-> Total.class_of.
 Coercion base2 : class_of >-> TDistrLattice.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion tPOrder : order >-> TPOrder.order.
 Canonical tPOrder.
+Arguments tPOrder {T phT} !ord.
 Coercion meetOrder : order >-> Meet.order.
 Canonical meetOrder.
+Arguments meetOrder {T phT} !ord.
 Coercion tMeetOrder : order >-> TMeet.order.
 Canonical tMeetOrder.
+Arguments tMeetOrder {T phT} !ord.
 Coercion joinOrder : order >-> Join.order.
 Canonical joinOrder.
+Arguments joinOrder {T phT} !ord.
 Coercion tJoinOrder : order >-> TJoin.order.
 Canonical tJoinOrder.
+Arguments tJoinOrder {T phT} !ord.
 Coercion lattice : order >-> Lattice.order.
 Canonical lattice.
+Arguments lattice {T phT} !ord.
 Coercion tLattice : order >-> TLattice.order.
 Canonical tLattice.
+Arguments tLattice {T phT} !ord.
 Coercion distrLattice : order >-> DistrLattice.order.
 Canonical distrLattice.
+Arguments distrLattice {T phT} !ord.
 Coercion tDistrLattice : order >-> TDistrLattice.order.
 Canonical tDistrLattice.
+Arguments tDistrLattice {T phT} !ord.
 Coercion totalOrder : order >-> Total.order.
 Canonical totalOrder.
+Arguments totalOrder {T phT} !ord.
 Notation "{ 'tTotalOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'tTotalOrder'  T }").
 Notation "[ 'tTotalOrder' 'of' le ]" :=
@@ -2068,8 +2230,10 @@ Set Primitive Projections.
 Record class_of (le lt : rel T) (meet join : T -> T -> T) (bottom top : T) :=
   Class {
   base : BTotal.class_of le lt meet join bottom;
-  mixin : TPOrder.mixin_of (POrder.Pack _ base) top;
+  mixin : TPOrder.mixin_of le top;
 }.
+
+Unset Primitive Projections.
 
 Structure order (phT : phant T) := Pack {
   le : rel T;
@@ -2081,16 +2245,14 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt meet join bottom top;
 }.
 
-Unset Primitive Projections.
-
 Local Coercion base : class_of >-> BTotal.class_of.
 Local Coercion base2 le lt meet join bottom top
       (c : class_of le lt meet join bottom top) :
-  TTotal.class_of le lt meet join top := TTotal.Class (mixin c).
+  TTotal.class_of le lt meet join top := TTotal.Class c (mixin c).
 Local Coercion base3 le lt meet join bottom top
       (c : class_of le lt meet join bottom top) :
   TBDistrLattice.class_of le lt meet join bottom top :=
-  TBDistrLattice.Class (base := c) (mixin c).
+  TBDistrLattice.Class c (mixin c).
 
 Variable (phT : phant T) (ord : order phT).
 
@@ -2150,8 +2312,8 @@ Definition pack :=
       (b : BTotal.class_of leT ltT meetT joinT bottomT)
       & phant_id (BTotal.class bord) b =>
   fun (mord : TPOrder.order phT) m
-      & phant_id (TPOrder.class mord) (TPOrder.Class (base := b) m) =>
-  @Pack phT leT ltT meetT joinT bottomT topT (unkeyed (Class (base := b) m)).
+      & phant_id (TPOrder.class mord) (TPOrder.Class b m) =>
+  @Pack phT leT ltT meetT joinT bottomT topT (unkeyed (Class b m)).
 
 End ClassDef.
 
@@ -2161,50 +2323,73 @@ Coercion base2 : class_of >-> TTotal.class_of.
 Coercion base3 : class_of >-> TBDistrLattice.class_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
+Arguments pOrder {T phT} !ord.
 Coercion bPOrder : order >-> BPOrder.order.
 Canonical bPOrder.
+Arguments bPOrder {T phT} !ord.
 Coercion tPOrder : order >-> TPOrder.order.
 Canonical tPOrder.
+Arguments tPOrder {T phT} !ord.
 Coercion tbPOrder : order >-> TBPOrder.order.
 Canonical tbPOrder.
+Arguments tbPOrder {T phT} !ord.
 Coercion meetOrder : order >-> Meet.order.
 Canonical meetOrder.
+Arguments meetOrder {T phT} !ord.
 Coercion bMeetOrder : order >-> BMeet.order.
 Canonical bMeetOrder.
+Arguments bMeetOrder {T phT} !ord.
 Coercion tMeetOrder : order >-> TMeet.order.
 Canonical tMeetOrder.
+Arguments tMeetOrder {T phT} !ord.
 Coercion tbMeetOrder : order >-> TBMeet.order.
 Canonical tbMeetOrder.
+Arguments tbMeetOrder {T phT} !ord.
 Coercion joinOrder : order >-> Join.order.
 Canonical joinOrder.
+Arguments joinOrder {T phT} !ord.
 Coercion bJoinOrder : order >-> BJoin.order.
 Canonical bJoinOrder.
+Arguments bJoinOrder {T phT} !ord.
 Coercion tJoinOrder : order >-> TJoin.order.
 Canonical tJoinOrder.
+Arguments tJoinOrder {T phT} !ord.
 Coercion tbJoinOrder : order >-> TBJoin.order.
 Canonical tbJoinOrder.
+Arguments tbJoinOrder {T phT} !ord.
 Coercion lattice : order >-> Lattice.order.
 Canonical lattice.
+Arguments lattice {T phT} !ord.
 Coercion bLattice : order >-> BLattice.order.
 Canonical bLattice.
+Arguments bLattice {T phT} !ord.
 Coercion tLattice : order >-> TLattice.order.
 Canonical tLattice.
+Arguments tLattice {T phT} !ord.
 Coercion tbLattice : order >-> TBLattice.order.
 Canonical tbLattice.
+Arguments tbLattice {T phT} !ord.
 Coercion distrLattice : order >-> DistrLattice.order.
 Canonical distrLattice.
+Arguments distrLattice {T phT} !ord.
 Coercion bDistrLattice : order >-> BDistrLattice.order.
 Canonical bDistrLattice.
+Arguments bDistrLattice {T phT} !ord.
 Coercion tDistrLattice : order >-> TDistrLattice.order.
 Canonical tDistrLattice.
+Arguments tDistrLattice {T phT} !ord.
 Coercion tbDistrLattice : order >-> TBDistrLattice.order.
 Canonical tbDistrLattice.
+Arguments tbDistrLattice {T phT} !ord.
 Coercion totalOrder : order >-> Total.order.
 Canonical totalOrder.
+Arguments totalOrder {T phT} !ord.
 Coercion bTotalOrder : order >-> BTotal.order.
 Canonical bTotalOrder.
+Arguments bTotalOrder {T phT} !ord.
 Coercion tTotalOrder : order >-> TTotal.order.
 Canonical tTotalOrder.
+Arguments tTotalOrder {T phT} !ord.
 Notation "{ 'tbTotalOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'tbTotalOrder'  T }").
 Notation "[ 'tbTotalOrder' 'of' le ]" :=
@@ -2377,12 +2562,12 @@ Canonical dual_pOrder (ord : {pOrder T}) := dual_pOrder ord.
 Canonical dual_bPOrder (ord : {tPOrder T}) :=
   BPOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_bottom (top ord))
           (TPOrder.mixin (TPOrder.class ord) :
-             BPOrder.mixin_of (dual_pOrder ord) _).
+             BPOrder.mixin_of (dual_rel <=:ord) _).
 
 Canonical dual_tPOrder (ord : {bPOrder T}) :=
   TPOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_top (bottom ord))
           (BPOrder.mixin (BPOrder.class ord) :
-             TPOrder.mixin_of (dual_pOrder ord) _).
+             TPOrder.mixin_of (dual_rel <=:ord) _).
 
 (* BUG, TODO: can we design better packagers to infer head symbols of         *)
 (* operators from existing instances, or should operators other than [le] be  *)
@@ -2405,7 +2590,7 @@ Canonical dual_tbMeetOrder (ord : {tbJoinOrder T}) :=
 
 Canonical dual_joinOrder (ord : {meetOrder T}) :=
   JoinOrder (dual_rel <=:ord) (dual_rel <:ord) (dual_join (meet ord))
-            (Meet.mixin (Meet.class ord) : Join.mixin_of (dual_pOrder ord) _).
+            (Meet.mixin (Meet.class ord) : Join.mixin_of (dual_rel <=:ord) _).
 
 Canonical dual_bJoinOrder (ord : {tMeetOrder T}) :=
   [bJoinOrder of dual_rel <=:ord].
@@ -2430,7 +2615,7 @@ Canonical dual_distrLattice (ord : {distrLattice T}) :=
     (dual_rel <=:ord) (dual_rel <:ord)
     (dual_meet (join ord)) (dual_join (meet ord))
     (let mixin := DistrLattice.mixin (DistrLattice.class ord) in
-     @DistrLattice.Mixin _ (dual_lattice ord)
+     @DistrLattice.Mixin _ (join ord) (meet ord)
        (DistrLattice.joinIl mixin) (DistrLattice.meetUl mixin)).
 
 Canonical dual_bDistrLattice (ord : {tDistrLattice T}) :=
@@ -4444,7 +4629,8 @@ Record of_ := Build {
   le0x : forall x, bottom <=_ord x;
 }.
 
-Definition bPOrderMixin (m : of_) : BPOrder.mixin_of ord (bottom m) := le0x m.
+Definition bPOrderMixin (m : of_) : BPOrder.mixin_of (<=:ord) (bottom m) :=
+  le0x m.
 
 End BottomRelMixin.
 
@@ -4466,7 +4652,7 @@ Record of_ := Build {
   lex1 : forall x, x <=_ord top;
 }.
 
-Definition tPOrderMixin (m : of_) : TPOrder.mixin_of ord (top m) := lex1 m.
+Definition tPOrderMixin (m : of_) : TPOrder.mixin_of (<=:ord) (top m) := lex1 m.
 
 End TopRelMixin.
 
@@ -4490,7 +4676,7 @@ Record of_ := Build {
   leEmeet : forall x y, (x <=_ord y) = (meet x y == x);
 }.
 
-Definition meetMixin (m : of_) : Meet.mixin_of ord (meet m) :=
+Definition meetMixin (m : of_) : Meet.mixin_of (<=:ord) (meet m) :=
   Meet.Mixin (meetC m) (meetA m) (leEmeet m).
 
 End MeetRelMixin.
@@ -4515,8 +4701,8 @@ Record of_ := Build {
   leEjoin : forall x y, (y <=_ord x) = (join x y == x);
 }.
 
-Definition joinMixin (m : of_) : Join.mixin_of ord (join m) :=
-  @Meet.Mixin _ (dual_pOrder ord) _ (joinC m) (joinA m) (leEjoin m).
+Definition joinMixin (m : of_) : Join.mixin_of (<=:ord) (join m) :=
+  @Meet.Mixin _ (dual_rel <=:ord) _ (joinC m) (joinA m) (leEjoin m).
 
 End JoinRelMixin.
 
@@ -4659,7 +4845,7 @@ Qed.
 
 Definition distrLatticeMixin := DistrLatticeRelMixin meetUl.
 
-Definition totalMixin : Total.mixin_of ord := m.
+Definition totalMixin : Total.mixin_of (<=:ord) := m.
 
 End TotalLatticeRelMixin.
 

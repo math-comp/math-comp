@@ -719,15 +719,18 @@ Record class_of R := Class {
   mmixin : Order.MeetSemilattice.mixin_of (Order.POrder.Pack Order.disp_tt base);
   jmixin : Order.JoinSemilattice.mixin_of (Order.POrder.Pack Order.disp_tt base);
   lmixin : RelOrder.DistrLattice.mixin_of
-             (Order.Lattice.Pack
-                Order.disp_tt (@Order.Lattice.Class
-                      _ (Order.MeetSemilattice.Class mmixin) jmixin));
-  tmixin : RelOrder.Total.mixin_of (Order.POrder.Pack Order.disp_tt base);
+             (Order.MeetSemilattice.meet mmixin)
+             (Order.JoinSemilattice.join jmixin);
+  tmixin : RelOrder.Total.mixin_of (Order.POrder.le base);
 }.
 Unset Primitive Projections.
 Local Coercion base : class_of >-> NumDomain.class_of.
 Local Coercion base2 T (c : class_of T) : Order.Total.class_of T :=
-  @Order.Total.Class _ (@Order.DistrLattice.Class _ _ (lmixin c)) (@tmixin _ c).
+  @Order.Total.Class _
+    (@Order.DistrLattice.Class _
+       (@Order.Lattice.Class _
+          (@Order.MeetSemilattice.Class _ _
+             (mmixin c)) (jmixin c)) (lmixin c)) (@tmixin _ c).
 
 Structure type := Pack {sort; _ : class_of sort}.
 Local Coercion sort : type >-> Sortclass.
@@ -935,10 +938,9 @@ Record class_of R := Class {
   mmixin : Order.MeetSemilattice.mixin_of (Order.POrder.Pack Order.disp_tt base);
   jmixin : Order.JoinSemilattice.mixin_of (Order.POrder.Pack Order.disp_tt base);
   lmixin : RelOrder.DistrLattice.mixin_of
-             (Order.Lattice.Pack
-                Order.disp_tt (@Order.Lattice.Class
-                      _ (Order.MeetSemilattice.Class mmixin) jmixin));
-  tmixin : RelOrder.Total.mixin_of (Order.POrder.Pack Order.disp_tt base);
+             (Order.MeetSemilattice.meet mmixin)
+             (Order.JoinSemilattice.join jmixin);
+  tmixin : RelOrder.Total.mixin_of (Order.POrder.le base);
 }.
 Unset Primitive Projections.
 Local Coercion base : class_of >-> NumField.class_of.
