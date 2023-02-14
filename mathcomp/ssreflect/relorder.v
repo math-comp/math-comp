@@ -76,6 +76,10 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt;
 }.
 
+(* Aliases of the projections for the [rosimpl] tactic. *)
+Definition le_ := Eval hnf in le.
+Definition lt_ := Eval hnf in lt.
+
 Variable (phT : phant T) (ord : order phT) (leT ltT : rel T).
 
 Let cls := unkeyed (class ord).
@@ -87,6 +91,10 @@ End ClassDef.
 Notation class_of := mixin_of (only parsing).
 
 Module Exports.
+Arguments le {T phT} ord x y : rename, simpl never.
+Arguments lt {T phT} ord x y : rename, simpl never.
+Arguments le_ {T phT} !ord / x y : rename.
+Arguments lt_ {T phT} !ord / x y : rename.
 Notation "{ 'pOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'pOrder'  T }").
 Notation POrder le lt mixin := (@Pack _ (Phant _) le lt (unkeyed mixin)).
@@ -101,9 +109,6 @@ Import POrder.Exports.
 
 Notation le := POrder.le.
 Notation lt := POrder.lt.
-
-Arguments le {T phT} ord x y : rename, simpl never.
-Arguments lt {T phT} ord x y : rename, simpl never.
 
 Module Import DualPOrder.
 
@@ -145,6 +150,9 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt bottom;
 }.
 
+(* Alias of the [bottom] projection for the [rosimpl] tactic. *)
+Definition bottom_ := Eval hnf in bottom.
+
 Local Coercion base : class_of >-> POrder.class_of.
 
 Variable (phT : phant T) (ord : order phT).
@@ -166,6 +174,8 @@ Definition pack :=
 End ClassDef.
 
 Module Exports.
+Arguments bottom {T phT} ord : rename, simpl never.
+Arguments bottom_ {T phT} !ord / : rename.
 Coercion base : class_of >-> POrder.class_of.
 Coercion mixin : class_of >-> mixin_of.
 Coercion pOrder : order >-> POrder.order.
@@ -184,7 +194,6 @@ End BPOrder.
 Import BPOrder.Exports.
 
 Notation bottom := BPOrder.bottom.
-Arguments bottom {T phT} ord : rename, simpl never.
 
 Module TPOrder.
 
@@ -210,6 +219,9 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt top;
 }.
 
+(* Alias of the [top] projection for the [rosimpl] tactic. *)
+Definition top_ := Eval hnf in top.
+
 Local Coercion base : class_of >-> POrder.class_of.
 
 Variable (phT : phant T) (ord : order phT).
@@ -230,12 +242,13 @@ Definition pack :=
 End ClassDef.
 
 Module Exports.
+Arguments top {T phT} ord : rename, simpl never.
+Arguments top_ {T phT} !ord / : rename.
 Coercion base : class_of >-> POrder.class_of.
 Coercion mixin : class_of >-> mixin_of.
 Coercion pOrder : order >-> POrder.order.
 Canonical pOrder.
 Arguments pOrder {T phT} !ord.
-
 Notation "{ 'tPOrder' T }" := (order (Phant T))
   (at level 0, format "{ 'tPOrder'  T }").
 Notation TPOrder le lt top mixin :=
@@ -249,7 +262,6 @@ End TPOrder.
 Import TPOrder.Exports.
 
 Notation top := TPOrder.top.
-Arguments top {T phT} ord : rename, simpl never.
 
 Module TBPOrder.
 
@@ -353,6 +365,9 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt meet;
 }.
 
+(* Alias of the [meet] projection for the [rosimpl] tactic. *)
+Definition meet_ := Eval hnf in meet.
+
 Local Coercion base : class_of >-> POrder.class_of.
 
 Variable (phT : phant T) (ord : order phT).
@@ -374,6 +389,8 @@ Definition pack :=
 End ClassDef.
 
 Module Exports.
+Arguments meet {T phT} ord x y : rename, simpl never.
+Arguments meet_ {T phT} !ord / x y : rename.
 Coercion base : class_of >-> POrder.class_of.
 Coercion mixin : class_of >-> mixin_of.
 Coercion pOrder : order >-> POrder.order.
@@ -392,7 +409,6 @@ End Meet.
 Import Meet.Exports.
 
 Notation meet := Meet.meet.
-Arguments meet {T phT} ord x y : rename, simpl never.
 
 Module BMeet.
 
@@ -688,6 +704,9 @@ Structure order (phT : phant T) := Pack {
   class : class_of le lt join;
 }.
 
+(* Alias of the [join] projection for the [rosimpl] tactic. *)
+Definition join_ := Eval hnf in join.
+
 Local Coercion base : class_of >-> POrder.class_of.
 
 Variable (phT : phant T) (ord : order phT).
@@ -708,6 +727,8 @@ Definition pack :=
 End ClassDef.
 
 Module Exports.
+Arguments join {T phT} ord x y : rename, simpl never.
+Arguments join_ {T phT} !ord / x y : rename.
 Coercion base : class_of >-> POrder.class_of.
 Coercion mixin : class_of >-> mixin_of.
 Coercion pOrder : order >-> POrder.order.
@@ -726,7 +747,6 @@ End Join.
 Import Join.Exports.
 
 Notation join := Join.join.
-Arguments join {T phT} ord x y : rename, simpl never.
 
 Module BJoin.
 
@@ -1186,7 +1206,6 @@ Canonical lattice_bMeetOrder.
 Arguments lattice_bMeetOrder {T phT} !ord.
 Canonical lattice_bJoinOrder.
 Arguments lattice_bJoinOrder {T phT} !ord.
-
 Notation "{ 'bLattice' T }" := (order (Phant T))
   (at level 0, format "{ 'bLattice'  T }").
 Notation "[ 'bLattice' 'of' le ]" :=
@@ -2680,6 +2699,38 @@ Import DualOrder.Exports.
 (**********)
 (* THEORY *)
 (**********)
+
+Module Tactics.
+
+Ltac rosimpl :=
+  let oapp := fresh "oapp" in
+  let norm op op_ :=
+    try (change op with op_;
+         do !(set oapp := op_ _ _ _; cbn in oapp; subst oapp);
+         change op_ with op)
+  in
+  norm (@POrder.le) (@POrder.le_);
+  norm (@POrder.lt) (@POrder.lt_);
+  norm (@BPOrder.bottom) (@BPOrder.bottom_);
+  norm (@TPOrder.top) (@TPOrder.top_);
+  norm (@Meet.meet) (@Meet.meet_);
+  norm (@Join.join) (@Join.join_).
+
+Tactic Notation "rosimpl" "in" ssrclauses(c) :=
+  let oapp := fresh "oapp" in
+  let norm op op_ :=
+    try (change op with op_ in c;
+         do !(set oapp := op_ _ _ _ in c; cbn in oapp; subst oapp);
+         change op_ with op in c)
+  in
+  norm (@POrder.le) (@POrder.le_);
+  norm (@POrder.lt) (@POrder.lt_);
+  norm (@BPOrder.bottom) (@BPOrder.bottom_);
+  norm (@TPOrder.top) (@TPOrder.top_);
+  norm (@Meet.meet) (@Meet.meet_);
+  norm (@Join.join) (@Join.join_).
+
+End Tactics.
 
 Module Import POrderTheory.
 Section POrderTheory.
@@ -5265,6 +5316,7 @@ End NatOrder.
 (* ================================================================== *)
 
 Module Theory.
+Export RelOrder.Tactics.
 Export RelOrder.POrderTheory.
 Export RelOrder.BPOrderTheory.
 Export RelOrder.TPOrderTheory.
