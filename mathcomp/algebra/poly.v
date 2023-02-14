@@ -1,7 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop div ssralg countalg binomial tuple.
+From mathcomp Require Import fintype bigop finset tuple.
+From mathcomp Require Import div ssralg countalg binomial.
 
 (******************************************************************************)
 (* This file provides a library for univariate polynomials over ring          *)
@@ -2379,6 +2380,62 @@ Canonical poly_algType := Eval hnf in CommAlgType R {poly R}.
 Canonical polynomial_algType :=
   Eval hnf in [algType R of polynomial R for poly_algType].
 Canonical poly_comAlgType := Eval hnf in [comAlgType R of {poly R}].
+
+Lemma coef_prod_XsubC (ps : seq R) (n : nat) :
+  (n <= size ps)%N ->
+  (\prod_(p <- ps) ('X - p%:P))`_n =
+  (-1) ^+ (size ps - n)%N *
+    \sum_(I in {set 'I_(size ps)} | #|I| == (size ps - n)%N)
+        \prod_(i in I) ps`_i.
+Proof.
+move=> nle.
+under eq_bigr => i _ do rewrite addrC -raddfN/=.
+rewrite -{1}(in_tupleE ps) -(map_tnth_enum (_ ps)) big_map.
+rewrite enumT bigA_distr /= coef_sum.
+transitivity (\sum_(I in {set 'I_(size ps)}) if #|I| == (size ps - n)%N then
+                  \prod_(i < size ps | i \in I) - ps`_i else 0).
+  apply eq_bigr => I _.
+  rewrite big_if/= big_const iter_mulr_1 -rmorph_prod/= coefCM coefXn.
+  under eq_bigr => i _ do rewrite (tnth_nth 0)/=.
+  rewrite -[#|I| == _](eqn_add2r n) subnK//.
+  rewrite -[X in (_ + _)%N == X]card_ord -(cardC I) eqn_add2l.
+  by case: ifP; rewrite ?mulr1 ?mulr0.
+by rewrite -big_mkcond mulr_sumr/=; apply: eq_bigr => I /eqP <-; rewrite prodrN.
+Qed.
+
+Lemma coefPn_prod_XsubC (ps : seq R) :
+  size ps != 0%N ->
+  (\prod_(p <- ps) ('X - p%:P))`_((size ps).-1) =
+  - \sum_(p <- ps) p.
+Proof.
+rewrite coef_prod_XsubC ?leq_pred// => ps0.
+have -> : (size ps - (size ps).-1 = 1)%N.
+  by move: ps0; case: (size ps) => // n _; exact: subSnn.
+rewrite expr1 mulN1r; congr GRing.opp.
+set f : 'I_(size ps) -> {set 'I_(size ps)} := fun a => [set a].
+transitivity (\sum_(I in imset f (mem setT)) \prod_(i in I) ps`_i).
+  apply: congr_big => // I /=.
+  by apply/cards1P/imsetP => [[a ->] | [a _ ->]]; exists a.
+rewrite big_imset/=; last first.
+  by move=> i j _ _ ij; apply/set1P; rewrite -/(f j) -ij set11.
+rewrite -[in RHS](in_tupleE ps) -(map_tnth_enum (_ ps)) big_map enumT.
+apply: congr_big => // i; first exact: in_setT.
+by rewrite big_set1 (tnth_nth 0).
+Qed.
+
+Lemma coef0_prod_XsubC (ps : seq R) :
+  (\prod_(p <- ps) ('X - p%:P))`_0 =
+  (-1) ^+ (size ps) * \prod_(p <- ps) p.
+Proof.
+rewrite coef_prod_XsubC// subn0; congr GRing.mul.
+transitivity (\sum_(I in [set setT : {set 'I_(size ps)}]) \prod_(i in I) ps`_i).
+  apply: congr_big =>// i/=.
+  apply/idP/set1P => [/eqP cardE | ->]; last by rewrite cardsT card_ord.
+  by apply/eqP; rewrite eqEcard subsetT cardsT card_ord cardE leqnn.
+rewrite big_set1 -[in RHS](in_tupleE ps) -(map_tnth_enum (_ ps)) big_map enumT.
+apply: congr_big => // i; first exact: in_setT.
+by rewrite (tnth_nth 0).
+Qed.
 
 Lemma hornerM p q x : (p * q).[x] = p.[x] * q.[x].
 Proof. by rewrite hornerM_comm //; apply: mulrC. Qed.
