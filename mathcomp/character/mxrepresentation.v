@@ -4604,7 +4604,7 @@ case: (pickP [pred x in G | ~~ is_scalar_mx (rG x)]) => [x | scalG].
     by rewrite -order_dvdn order_dvdG.
   case/idPn; rewrite -mxrank_eq0 -(factor_Xn_sub_1 ozG).
   elim: #|G| => [|i IHi]; first by rewrite big_nil horner_mx_C mxrank1.
-  rewrite big_nat_recr => [|//]; rewrite rmorphM mxrankMfree {IHi}//.
+  rewrite big_nat_recr => [|//]; rewrite rmorphM mxrankMfree {IHi}//=.
   rewrite row_free_unit rmorphB /= horner_mx_X horner_mx_C.
   rewrite (mx_Schur irrG) ?subr_eq0 //; last first.
     by apply: contraNneq nscal_rGx => ->; apply: scalar_mx_is_scalar.

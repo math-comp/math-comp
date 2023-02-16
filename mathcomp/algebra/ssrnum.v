@@ -3854,11 +3854,11 @@ Lemma eqC x y : (x == y) = ('Re x == 'Re y) && ('Im x == 'Im y).
 Proof. by apply/eqP/(andPP eqP eqP) => /eqCP. Qed.
 
 Lemma Creal_Re x : 'Re x \is real.
-Proof. by rewrite ReE CrealE fmorph_div rmorph_nat rmorphD conjCK addrC. Qed.
+Proof. by rewrite ReE CrealE fmorph_div rmorph_nat rmorphD /= conjCK addrC. Qed.
 
 Lemma Creal_Im x : 'Im x \is real.
 Proof.
-rewrite ImE CrealE fmorph_div rmorph_nat rmorphM rmorphB conjCK.
+rewrite ImE CrealE fmorph_div rmorph_nat rmorphM /= rmorphB conjCK.
 by rewrite conjCi -opprB mulrNN.
 Qed.
 Hint Resolve Creal_Re Creal_Im : core.
@@ -3889,7 +3889,7 @@ Qed.
 
 Lemma ReMl : {in real, forall x, {morph Re : z / x * z}}.
 Proof.
-by move=> x Rx z /=; rewrite !ReE rmorphM (conj_Creal Rx) -mulrDr -mulrA.
+by move=> x Rx z /=; rewrite !ReE rmorphM /= (conj_Creal Rx) -mulrDr -mulrA.
 Qed.
 
 Lemma ReMr : {in real, forall x, {morph Re : z / z * x}}.
@@ -3897,7 +3897,7 @@ Proof. by move=> x Rx z /=; rewrite mulrC ReMl // mulrC. Qed.
 
 Lemma ImMl : {in real, forall x, {morph Im : z / x * z}}.
 Proof.
-by move=> x Rx z; rewrite !ImE rmorphM (conj_Creal Rx) -mulrBr mulrCA !mulrA.
+by move=> x Rx z; rewrite !ImE rmorphM /= (conj_Creal Rx) -mulrBr mulrCA !mulrA.
 Qed.
 
 Lemma ImMr : {in real, forall x, {morph Im : z / z * x}}.
@@ -3931,7 +3931,7 @@ Qed.
 
 Lemma conjC_rect : {in real &, forall x y, (x + 'i * y)^* = x - 'i * y}.
 Proof.
-by move=> x y Rx Ry; rewrite /= rmorphD rmorphM conjCi mulNr !conj_Creal.
+by move=> x y Rx Ry; rewrite /= rmorphD rmorphM /= conjCi mulNr !conj_Creal.
 Qed.
 
 Lemma addC_rect x1 y1 x2 y2 :
@@ -3974,7 +3974,7 @@ Proof. by rewrite -ImMil mulrCA ImM ImMil ReMil mulNr ['Im _ * _]mulrC. Qed.
 Lemma normC2_rect :
   {in real &, forall x y, `|x + 'i * y| ^+ 2 = x ^+ 2 + y ^+ 2}.
 Proof.
-move=> x y Rx Ry; rewrite /= normCK rmorphD rmorphM conjCi !conj_Creal //.
+move=> x y Rx Ry; rewrite /= normCK rmorphD rmorphM /= conjCi !conj_Creal //.
 by rewrite mulrC mulNr -subr_sqr exprMn sqrCi mulN1r opprK.
 Qed.
 
@@ -3982,7 +3982,7 @@ Lemma normC2_Re_Im z : `|z| ^+ 2 = 'Re z ^+ 2 + 'Im z ^+ 2.
 Proof. by rewrite -normC2_rect -?Crect. Qed.
 
 Lemma invC_Crect x y : (x + 'i * y)^-1  = (x^* - 'i * y^*) / `|x + 'i * y| ^+ 2.
-Proof. by rewrite /= invC_norm mulrC !rmorphE rmorphM conjCi mulNr. Qed.
+Proof. by rewrite /= invC_norm mulrC !rmorphE rmorphM /= conjCi mulNr. Qed.
 
 Lemma invC_rect :
   {in real &, forall x y, (x + 'i * y)^-1  = (x - 'i * y) / (x ^+ 2 + y ^+ 2)}.
@@ -4120,7 +4120,7 @@ without loss leI0z: z zn_x leR0z / 'Im z >= 0.
   move=> IHz; have: 'Im z \is real by [].
   case/real_ge0P=> [|/ltW leIz0]; first exact: IHz.
   apply: (IHz z^* ); rewrite ?Re_conj ?Im_conj ?oppr_ge0 //.
-  by rewrite -rmorphX zn_x conj_Creal.
+  by rewrite -rmorphX /= zn_x conj_Creal.
 by apply: le_trans leR0z _; rewrite -Re_y ?rootC_Re_max ?ltr0_real.
 Qed.
 

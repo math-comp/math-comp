@@ -77,16 +77,16 @@ Proof.
   have{} char2: 2%N \in [char L] by apply/eqP.
   without loss{eJ} eJ: e / conj e = e + 1.
     move/(_ (e / (e + conj e))); apply.
-    rewrite fmorph_div rmorphD conjK -{1}[conj e](addNKr e) mulrDl.
+    rewrite fmorph_div rmorphD /= conjK -{1}[conj e](addNKr e) mulrDl.
     by rewrite opp_id (addrC e) divff // addr_eq0 opp_id.
-  pose a := e * conj e; have aJ: conj a = a by rewrite rmorphM conjK mulrC.
+  pose a := e * conj e; have aJ: conj a = a by rewrite rmorphM /= conjK mulrC.
   have [w Dw] := @solve_monicpoly _ 2%N (nth 0 [:: e * a; - 1]) isT.
   have{} Dw: w ^+ 2 + w = e * a.
     by rewrite Dw !big_ord_recl big_ord0 /= mulr1 mulN1r addr0 subrK.
-  pose b := w + conj w; have bJ: conj b = b by rewrite rmorphD conjK addrC.
+  pose b := w + conj w; have bJ: conj b = b by rewrite rmorphD /= conjK addrC.
   have Db2: b ^+ 2 + b = a.
     rewrite -Frobenius_autE // rmorphD addrACA Dw /= Frobenius_autE -rmorphX.
-    by rewrite -rmorphD Dw rmorphM aJ eJ -mulrDl -{1}[e]opp_id addKr mul1r.
+    by rewrite -rmorphD Dw rmorphM /= aJ eJ -mulrDl -{1}[e]opp_id addKr mul1r.
   have /eqP[] := oner_eq0 [ringType of L];
     apply: (addrI b); rewrite addr0 -{2}bJ.
   have: (b + e) * (b + conj e) == 0.
@@ -127,7 +127,7 @@ Proof. by rewrite exprMn sqrtK mulN1r. Qed.
 Lemma iJ : conj i = - i.
 Proof.
   have nz2 := nz2.
-  have /sqrtE[b]: conj i ^+ 2 = - 1 by rewrite -rmorphX sqrtK rmorphN1.
+  have /sqrtE[b]: conj i ^+ 2 = - 1 by rewrite -rmorphX /= sqrtK rmorphN1.
   rewrite mulr_sign -/i; case: b => // Ri.
   case: conj_nt => z; wlog zJ: z / conj z = - z.
     move/(_ (z - conj z)); rewrite !rmorphB conjK opprB => zJ.
@@ -136,18 +136,18 @@ Proof.
   have [u Ru [v Rv Dz]]:
     exists2 u, conj u = u & exists2 v, conj v = v & (u + z * v) ^+ 2 = z.
   - pose y := sqrt z; exists ((y + conj y) / 2).
-      by rewrite fmorph_div rmorphD conjK addrC rmorph_nat.
+      by rewrite fmorph_div rmorphD /= conjK addrC rmorph_nat.
     exists ((y - conj y) / (z *+ 2)).
-      rewrite fmorph_div rmorphMn zJ mulNrn invrN mulrN -mulNr rmorphB opprB.
+      rewrite fmorph_div rmorphMn /= zJ mulNrn invrN mulrN -mulNr rmorphB opprB.
       by rewrite conjK.
     rewrite -(mulr_natl z) invfM (mulrC z) !mulrA divfK // -mulrDl addrACA.
     (* FIX ME : had to add the explicit pattern *)
     by rewrite subrr addr0 -mulr2n -[_ *+ 2]mulr_natr mulfK ?Neq0 ?sqrtK.
-  suffices u0: u = 0 by rewrite -Dz u0 add0r rmorphX rmorphM Rv zJ mulNr sqrrN.
-  suffices [b Du]: exists b : bool, u = (-1) ^+ b * i * z * v.
+  suff u0: u = 0 by rewrite -Dz u0 add0r rmorphX rmorphM /= Rv zJ mulNr sqrrN.
+  suff [b Du]: exists b : bool, u = (-1) ^+ b * i * z * v.
     apply: mul2I; rewrite mul0rn mulr2n -{2}Ru.
-    by rewrite Du !rmorphM rmorph_sign Rv Ri zJ !mulrN mulNr subrr.
-  have/eqP:= zJ; rewrite -addr_eq0 -{1 2}Dz rmorphX rmorphD rmorphM Ru Rv zJ.
+    by rewrite Du !rmorphM /= rmorph_sign Rv Ri zJ !mulrN mulNr subrr.
+  have/eqP:= zJ; rewrite -addr_eq0 -{1 2}Dz rmorphX rmorphD rmorphM /= Ru Rv zJ.
   rewrite mulNr sqrrB sqrrD addrACA (addrACA (u ^+ 2)) addNr addr0 -!mulr2n.
   rewrite -mulrnDl -(mul0rn _ 2) (inj_eq mul2I) /= -[rhs in _ + rhs]opprK.
   rewrite -sqrMi subr_eq0 eqf_sqr -mulNr !mulrA.
@@ -164,7 +164,7 @@ Qed.
 Lemma normE x y : y ^+ 2 = x -> norm x = y * conj y.
 Proof.
   rewrite /norm => /sqrtE[b /(canLR (signrMK b)) <-].
-  by rewrite !rmorphM rmorph_sign mulrACA -mulrA signrMK.
+  by rewrite !rmorphM /= rmorph_sign mulrACA -mulrA signrMK.
 Qed.
 
 Lemma norm_eq0 x : norm x = 0 -> x = 0.
@@ -194,12 +194,12 @@ Proof. by rewrite posE. Qed.
 Lemma posP x : reflect (exists y, x = y * conj y) (le 0 x).
 Proof.
   rewrite posE; apply: (iffP eqP) => [Dx | [y {x}->]]; first by exists (sqrt x).
-  by rewrite (normE (normK y)) rmorphM conjK (mulrC (conj _)) -expr2 normK.
+  by rewrite (normE (normK y)) rmorphM /= conjK (mulrC (conj _)) -expr2 normK.
 Qed.
 
 Lemma posJ x : le 0 x -> conj x = x.
 Proof.
-  by case/posP=> {x}u ->; rewrite rmorphM conjK mulrC.
+  by case/posP=> {x}u ->; rewrite rmorphM /= conjK mulrC.
 Qed.
 
 Lemma pos_linear x y : le 0 x -> le 0 y -> le x y || le y x.
@@ -216,12 +216,12 @@ Proof.
   case/andP=> nz_x /sqrtJ uJ /sqrtJ vJ.
   set u := sqrt x in uJ; set v := sqrt y in vJ; pose w := u + i * v.
   have ->: x + y = w * conj w.
-    rewrite rmorphD rmorphM iJ uJ vJ mulNr mulrC -subr_sqr sqrMi opprK.
+    rewrite rmorphD rmorphM /= iJ uJ vJ mulNr mulrC -subr_sqr sqrMi opprK.
     by rewrite !sqrtK.
   apply/andP; split; last by apply/posP; exists w.
   rewrite -normK expf_eq0 //=; apply: contraNneq nz_x => /norm_eq0 w0.
   rewrite -[x]sqrtK expf_eq0 /= -/u -(inj_eq mul2I) !mulr2n -{2}(rmorph0 conj).
-  by rewrite -w0 rmorphD rmorphM iJ uJ vJ mulNr addrACA subrr addr0.
+  by rewrite -w0 rmorphD rmorphM /= iJ uJ vJ mulNr addrACA subrr addr0.
 Qed.
 
 Lemma sposD x y : lt 0 x -> lt 0 y -> lt 0 (x + y).
@@ -248,13 +248,13 @@ Proof.
   rewrite addrA addrC !addrA -(addrC (y * conj y)) !addrA.
   move: (y * _ + _) => u; rewrite -!addrA leB opprD addrACA {u}subrr add0r -leB.
   rewrite {}le_sqr ?posD //.
-    by rewrite rmorphD !rmorphM !conjK addrC mulrC (mulrC y).
+    by rewrite rmorphD !rmorphM /= !conjK addrC mulrC (mulrC y).
   rewrite -mulr2n -mulr_natr exprMn normK -natrX mulr_natr sqrrD mulrACA.
   rewrite -rmorphM (mulrC y x) addrAC leB mulrnA mulr2n opprD addrACA.
   rewrite subrr addr0 {2}(mulrC x) rmorphM mulrACA -opprB addrAC -sqrrB -sqrMi.
   apply/posP; exists (i * (x * conj y - y * conj x)); congr (_ * _).
-  rewrite !(rmorphM, rmorphB) iJ !conjK mulNr -mulrN opprB.
-  by rewrite (mulrC x) (mulrC y).
+  rewrite !(rmorphM, rmorphB) /= !(rmorphB, rmorphM) iJ /= !conjK.
+  by rewrite mulNr -mulrN opprB (mulrC x) (mulrC y).
 Qed.
 
 HB.instance Definition _ :=
@@ -905,7 +905,7 @@ Qed.
 
 Lemma Cnat_norm_Cint x : x \in Cint -> `|x| \in Cnat.
 Proof.
-case/CintP=> [m ->]; rewrite [m]intEsign rmorphM rmorph_sign.
+case/CintP=> [m ->]; rewrite [m]intEsign rmorphM /= rmorph_sign.
 by rewrite normrM normr_sign mul1r normr_nat rpred_nat.
 Qed.
 
@@ -1185,7 +1185,7 @@ suffices /mapP/sig2_eqW[y _ ->]: x \in map nu r by exists y.
 rewrite -root_prod_XsubC; congr (root _ x): (root_minCpoly x).
 have [q [Dq _] _] := minCpolyP x; rewrite Dq -(eq_map_poly (fmorph_rat nu)).
 rewrite (map_poly_comp nu) -{q}Dq Dp (monicP (minCpoly_monic x)) scale1r.
-rewrite rmorph_prod big_map; apply: eq_bigr => z _.
+rewrite rmorph_prod big_map /=; apply: eq_bigr => z _.
 by rewrite rmorphB /= map_polyX map_polyC.
 Qed.
 Definition algC_invaut nu x := sval (algC_invaut_subproof nu x).

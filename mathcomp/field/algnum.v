@@ -133,10 +133,10 @@ have QxsC_Z a zz: QxsC (a *: zz) = QtoC a * QxsC zz.
   by rewrite mulrzr mulrzl -!rmorphMz scalerMzl -mulrzr -numqE scaler_int.
 apply: decP (x1 \in <<in_tuple s1>>%VS) _; rewrite /in_Crat_span size_map.
 apply: (iffP idP) => [/coord_span-> | [a Dx]].
-  move: (coord _) => a; exists [ffun i => a i x1]; rewrite rmorph_sum.
+  move: (coord _) => a; exists [ffun i => a i x1]; rewrite rmorph_sum /=.
   by apply: eq_bigr => i _; rewrite ffunE (nth_map 0).
 have{Dx} ->: x1 = \sum_i a i *: s1`_i.
-  apply: (fmorph_inj QxsC); rewrite Dx rmorph_sum.
+  apply: (fmorph_inj QxsC); rewrite Dx rmorph_sum /=.
   by apply: eq_bigr => i _; rewrite QxsC_Z (nth_map 0).
 by apply: memv_suml => i _; rewrite memvZ ?memv_span ?mem_nth.
 Qed.
@@ -173,7 +173,7 @@ Proof. by rewrite -in_algE fmorph_eq_rat. Qed.
 
 Lemma rmorphZ_num (Qz : fieldExtType rat) rR (f : {rmorphism Qz -> rR}) a x :
   f (a *: x) = ratr a * f x.
-Proof. by rewrite -mulr_algl rmorphM alg_num_field fmorph_rat. Qed.
+Proof. by rewrite -mulr_algl rmorphM /= alg_num_field fmorph_rat. Qed.
 
 Lemma fmorph_numZ (Qz1 Qz2 : fieldExtType rat) (f : {rmorphism Qz1 -> Qz2}) :
   scalable f.
@@ -201,13 +201,13 @@ Proof.
 pose b := vbasis {:Qn}.
 have Qn_bC (u : {x | x \in Crat_span (map QnC b)}): {y | QnC y = sval u}.
   case: u => _ /= /Crat_spanP/sig_eqW[a ->].
-  exists (\sum_i a i *: b`_i); rewrite rmorph_sum; apply: eq_bigr => i _.
+  exists (\sum_i a i *: b`_i); rewrite rmorph_sum /=; apply: eq_bigr => i _.
   by rewrite rmorphZ_num (nth_map 0) // -(size_map QnC).
 pose CtoQn x := oapp (fun u => sval (Qn_bC u)) 0 (insub x).
-suffices QnCK: cancel QnC CtoQn by exists CtoQn; rewrite // -(rmorph0 QnC).
+suffices QnCK: cancel QnC CtoQn by exists CtoQn; rewrite // -(rmorph0 QnC) /=.
 move=> x; rewrite /CtoQn insubT => /= [|Qn_x]; last first.
   by case: (Qn_bC _) => x1 /= /fmorph_inj.
-rewrite (coord_vbasis (memvf x)) rmorph_sum rpred_sum // => i _.
+rewrite (coord_vbasis (memvf x)) rmorph_sum rpred_sum //= => i _.
 rewrite rmorphZ_num Crat_spanZ ?mem_Crat_span // -/b.
 by rewrite -tnth_nth -tnth_map mem_tnth.
 Qed.
@@ -223,7 +223,7 @@ have nu0a : additive nu0.
   by move=> x y; apply: (fmorph_inj QnC); rewrite !(QnC_nu0, rmorphB).
 have nu0m : multiplicative nu0.
   split=> [x y|]; apply: (fmorph_inj QnC); rewrite ?QnC_nu0 ?rmorph1 //.
-  by rewrite ?(rmorphM, QnC_nu0).
+  by rewrite !rmorphM /= !QnC_nu0.
 pose nu0aM := GRing.isAdditive.Build Qn Qn nu0 nu0a.
 pose nu0mM := GRing.isMultiplicative.Build Qn Qn nu0 nu0m.
 pose nu0RM : GRing.RMorphism.type _ _ := HB.pack nu0 nu0aM nu0mM.
@@ -253,7 +253,7 @@ have: root (map_poly (nu \o QnC) (minPoly 1%AS x)) (nu (QnC x)).
   by rewrite fmorph_root root_minPoly.
 rewrite map_Qnum_poly ?minPolyOver // Hrs.
 rewrite [map_poly _ _](_:_ = \prod_(y <- map QnC rs) ('X - y%:P)); last first.
-  rewrite big_map rmorph_prod; apply: eq_bigr => i _.
+  rewrite big_map rmorph_prod /=; apply: eq_bigr => i _.
   by rewrite rmorphB /= map_polyX map_polyC.
 rewrite root_prod_XsubC.
 by case/mapP => y _ ?; exists y.
@@ -282,7 +282,7 @@ have Qz_Zs a: inQzs (\sum_(i < m) s`_i *~ a i).
   rewrite big_mkcond; apply: eq_bigr => ij _ /=; rewrite nth_image (tnth_nth 0).
   rewrite (can2_eq (@enum_rankK _) (@enum_valK _)) ffunE -scaler_int /val21.
   case Dij: (enum_val ij) => [i j1]; rewrite xpair_eqE eqxx /= eq_sym -mulrb.
-  by rewrite linearZ rmorphMn rmorph_int mulrnAl; case: eqP => // ->.
+  by rewrite linearZ rmorphMn /= rmorph_int mulrnAl; case: eqP => // ->.
 case Qz_v: (inQzs v); last by right=> [[a Dv]]; rewrite Dv Qz_Zs in Qz_v.
 have [Qz [QzC [z1s Dz_s _]]] := num_field_exists z_s.
 have sz_z1s: size z1s = #|IzT| by rewrite -(size_map QzC) Dz_s size_map cardE.
@@ -308,7 +308,7 @@ have [Zsv | Zs'v] := dec_Qint_span sz [ffun j => sval (xv j)].
   by rewrite nth_image enum_rankK /= (tnth_nth 0).
 right=> [[a Dv]]; case: Zs'v; exists a.
 apply/ffunP=> j; rewrite sum_ffunE !ffunE; apply: (fmorph_inj QzC).
-case: (xv j) => /= _ <-; rewrite Dv linear_sum rmorph_sum.
+case: (xv j) => /= _ <-; rewrite Dv linear_sum rmorph_sum /=.
 apply: eq_bigr => i _; rewrite nth_mktuple raddfMz !ffunMzE rmorphMz ffunE.
 by rewrite -(nth_map _ 0 QzC) ?sz_z1s // Dz_s nth_image enum_rankK -tnth_nth.
 Qed.
@@ -383,7 +383,7 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
       {in01 : {lrmorphism _ -> _} | Sinj mu0 =1 QrC \o in01}.
     have in01P y: {yy | Sinj mu0 y = QrC yy}.
       exists (\sum_i coord b0 i y *: (map_poly (in_alg Qr) ps`_i).[zz]).
-      rewrite {1}(coord_vbasis (memvf y)) !rmorph_sum; apply: eq_bigr => i _.
+      rewrite {1}(coord_vbasis (memvf y)) !rmorph_sum /=; apply: eq_bigr => i _.
       rewrite !SinjZ; congr (_ * _); rewrite -(nth_map _ 0) ?size_tuple // Ds.
       rewrite -horner_map Dz Sinj_poly (nth_map 0) //.
       by have:= congr1 size Ds; rewrite !size_map size_tuple => <-.
@@ -393,7 +393,7 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     have in01a : additive in01.
       by move=> ? ?; apply: (fmorph_inj QrC); rewrite !rwM.
     have in01m : multiplicative in01.
-      by split; try move=> ? ?; apply: (fmorph_inj QrC); rewrite !rwM.
+      by split; try move=> ? ?; apply: (fmorph_inj QrC); rewrite !rwM /= ?rwM.
     have in01l : scalable in01.
       by try move=> ? ?; apply: (fmorph_inj QrC); rewrite !rwM.
     pose in01aM := GRing.isAdditive.Build _ _ in01 in01a.
@@ -430,7 +430,7 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
   have splitQr: splittingFieldFor K pr fullv.
     apply: splittingFieldForS (sub1v (sub K algK)) (subvf _) _; exists rr => //.
     congr (_ %= _): (eqpxx pr); apply/(map_poly_inj QrC).
-    rewrite Sinj_poly Dr -Drr big_map rmorph_prod; apply: eq_bigr => zz _.
+    rewrite Sinj_poly Dr -Drr big_map rmorph_prod /=; apply: eq_bigr => zz _.
     by rewrite rmorphB /= map_polyX map_polyC.
   have [f1 aut_f1 Df1]:= kHom_extends (sub1v (ASpace algK)) hom_f Qpr splitQr.
   pose f1mM := GRing.isMultiplicative.Build _ _ f1 (kHom_lrmorphism aut_f1).
@@ -438,8 +438,8 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
   exists (SubAut Qr QrC nu) => //; exists in01 => //= y.
   by rewrite -Df -Df1 //; apply/memK; exists y.
 have phiZ: scalable phi.
-  move=> a y; do 2!rewrite -mulr_algl -in_algE.
-  by rewrite -[a]divq_num_den !(fmorph_div, rmorphM, rmorph_int).
+  move=> a y; do 2!rewrite -mulr_algl -in_algE; rewrite -[a]divq_num_den.
+  by rewrite fmorph_div rmorphM [X in X * _]fmorph_div !rmorph_int.
 pose philM := GRing.isScalable.Build _ _ _ _ phi phiZ.
 pose phiLRM : GRing.LRMorphism.type _ _ _ _ :=
   HB.pack (GRing.RMorphism.sort phi) philM.
@@ -478,7 +478,7 @@ have num : multiplicative nu.
   have [n] := max3 (x1 * x2) x1 x2.
   case=> /mem_ext[y Dx] /mem_ext[y1 Dx1] /mem_ext[y2 Dx2].
   rewrite -Dx nu_inj; rewrite -Dx1 -Dx2 -rmorphM in Dx.
-  by rewrite (fmorph_inj _ Dx) !rmorphM -!nu_inj Dx1 Dx2.
+  by rewrite (fmorph_inj _ Dx) !rmorphM /= -!nu_inj Dx1 Dx2.
 pose nuaM := GRing.isAdditive.Build _ _ nu nua.
 pose numM := GRing.isMultiplicative.Build _ _ nu num.
 pose nuRM : GRing.RMorphism.type _ _ := HB.pack nu nuaM numM.
@@ -497,7 +497,7 @@ have [Qn [QnC [[|zn []] // [Dz]]] genQn] := num_field_exists [:: z].
 pose phi := kHomExtend 1 \1 zn (zn ^+ k).
 have homQn1: kHom 1 1 (\1%VF : 'End(Qn)) by rewrite kHom1.
 have pzn_zk0: root (map_poly \1%VF (minPoly 1 zn)) (zn ^+ k).
-  rewrite -(fmorph_root QnC) rmorphX Dz -map_poly_comp.
+  rewrite -(fmorph_root QnC) rmorphX /= Dz -map_poly_comp.
   rewrite (@eq_map_poly _ _ _ QnC) => [|a]; last by rewrite /= id_lfunE.
   set p1 := map_poly _ _.
   have [q1 Dp1]: exists q1, p1 = pQtoC q1.
@@ -521,7 +521,7 @@ pose phimM := GRing.isMultiplicative.Build _ _ phi phim.
 pose phiRM : GRing.RMorphism.type _ _ := HB.pack (fun_of_lfun phi) phimM.
 have [nu Dnu] := extend_algC_subfield_aut QnC phiRM.
 exists nu => _ /(prim_rootP prim_z)[i ->].
-rewrite rmorphX exprAC -Dz -Dnu /= -{1}[zn]hornerX /phi.
+rewrite rmorphX /= exprAC -Dz -Dnu /= -{1}[zn]hornerX /phi.
 rewrite (kHomExtend_poly homQn1) ?polyOverX //.
 rewrite map_polyE map_id_in => [|?]; last by rewrite id_lfunE.
 by rewrite polyseqK hornerX rmorphX.

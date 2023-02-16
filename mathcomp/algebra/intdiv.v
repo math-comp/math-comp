@@ -855,7 +855,7 @@ have nz_prim_r q1: q1 != 0 -> map_poly to_r (zprimitive q1) != 0.
   rewrite -leqNgt dvdn_leq // -(dvdzE r true) -nz_q1 -zcontents_primitive.
   rewrite dvdz_contents; apply/polyOverP=> i /=; rewrite dvdzE /=.
   have /polyP/(_ i)/eqP := r_dv_q1; rewrite coef_map coef0 /=.
-  rewrite {1}[_`_i]intEsign rmorphM rmorph_sign /= mulf_eq0 signr_eq0 /=.
+  rewrite {1}[_`_i]intEsign rmorphM /= rmorph_sign /= mulf_eq0 signr_eq0 /=.
   by rewrite -val_eqE /= val_Fp_nat.
 suffices{nz_prim_r} /idPn[]: map_poly to_r (zprimitive p * zprimitive q) == 0.
   by rewrite rmorphM mulf_neq0 ?nz_prim_r.
@@ -900,7 +900,7 @@ Qed.
 Lemma dvdp_rat_int p q : (pZtoQ p %| pZtoQ q) = (p %| q).
 Proof.
 apply/dvdpP/Pdiv.Idomain.dvdpP=> [[/= r1 Dq] | [[/= a r] nz_a Dq]]; last first.
-  exists (a%:~R^-1 *: pZtoQ r); rewrite -scalerAl -rmorphM -Dq.
+  exists (a%:~R^-1 *: pZtoQ r); rewrite -scalerAl -rmorphM -Dq /=.
   by rewrite -{2}[a]intz scaler_int rmorphMz -scaler_int scalerK ?intr_eq0.
 have [r [a nz_a Dr1]] := rat_poly_scale r1; exists (a, r) => //=.
 apply: (map_inj_poly _ _ : injective pZtoQ) => //; first exact: intr_inj.

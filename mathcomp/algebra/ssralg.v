@@ -737,6 +737,9 @@ Reserved Notation "'{' 'semi_additive' U '->' V '}'"
 Reserved Notation "'{' 'additive' U '->' V '}'"
   (at level 0, U at level 98, V at level 99,
    format "{ 'additive'  U  ->  V }").
+Reserved Notation "'{' 'srmorphism' U '->' V '}'"
+  (at level 0, U at level 98, V at level 99,
+   format "{ 'srmorphism'  U  ->  V }").
 Reserved Notation "'{' 'rmorphism' U '->' V '}'"
   (at level 0, U at level 98, V at level 99,
    format "{ 'rmorphism'  U  ->  V }").
@@ -2282,18 +2285,98 @@ End ScaleFun.
 
 End AdditiveTheory.
 
-Definition multiplicative (R S : ringType) (f : R -> S) : Prop :=
+Definition multiplicative (R S : semiRingType) (f : R -> S) : Prop :=
   {morph f : x y / x * y}%R * (f 1 = 1).
 
-HB.mixin Record isMultiplicative (R S : ringType) (f : R -> S) := {
+HB.mixin Record isMultiplicative (R S : semiRingType) (f : R -> S) := {
   rmorphism_subproof : multiplicative f
 }.
 
 #[infer(R,S)]
-HB.structure Definition RMorphism (R S : ringType) :=
-  {f of @Additive R S f & isMultiplicative R S f}.
+HB.structure Definition SRMorphism (R S : semiRingType) :=
+  {f of @SemiAdditive R S f & isMultiplicative R S f}.
 (* FIXME: remove the @ once
    https://github.com/math-comp/hierarchy-builder/issues/319 is fixed *)
+
+Module SRMorphismExports.
+Notation "{ 'srmorphism' U -> V }" := (SRMorphism.type U%type V%type)
+  : type_scope.
+Notation "[ 'srmorphism' 'of' f 'as' g ]" := (SRMorphism.clone _ _ f%function g)
+  (at level 0, format "[ 'srmorphism'  'of'  f  'as'  g ]") : form_scope.
+Notation "[ 'srmorphism' 'of' f ]" := (SRMorphism.clone _ _ f%function _)
+  (at level 0, format "[ 'srmorphism'  'of'  f ]") : form_scope.
+End SRMorphismExports.
+HB.export SRMorphismExports.
+
+Section SRmorphismTheory.
+
+Section Properties.
+
+Variables (R S : semiRingType) (k : unit) (f : {srmorphism R -> S}).
+
+Lemma rmorph0 : f 0 = 0. Proof. exact: raddf0. Qed.
+Lemma rmorphD : {morph f : x y / x + y}. Proof. exact: raddfD. Qed.
+Lemma rmorphMn n : {morph f : x / x *+ n}. Proof. exact: raddfMn. Qed.
+Lemma rmorph_sum I r (P : pred I) E :
+  f (\sum_(i <- r | P i) E i) = \sum_(i <- r | P i) f (E i).
+Proof. exact: raddf_sum. Qed.
+
+Lemma rmorphismMP : multiplicative f. Proof. exact: rmorphism_subproof. Qed.
+Lemma rmorph1 : f 1 = 1. Proof. by case: rmorphismMP. Qed.
+Lemma rmorphM : {morph f: x y  / x * y}. Proof. by case: rmorphismMP. Qed.
+
+Lemma rmorph_prod I r (P : pred I) E :
+  f (\prod_(i <- r | P i) E i) = \prod_(i <- r | P i) f (E i).
+Proof. exact: (big_morph f rmorphM rmorph1). Qed.
+
+Lemma rmorphX n : {morph f: x / x ^+ n}.
+Proof. by elim: n => [|n IHn] x; rewrite ?rmorph1 // !exprS rmorphM IHn. Qed.
+
+Lemma rmorph_nat n : f n%:R = n%:R. Proof. by rewrite rmorphMn rmorph1. Qed.
+
+Lemma rmorph_char p : p \in [char R] -> p \in [char S].
+Proof. by rewrite !inE -rmorph_nat => /andP[-> /= /eqP->]; rewrite rmorph0. Qed.
+
+Lemma rmorph_eq_nat x n : injective f -> (f x == n%:R) = (x == n%:R).
+Proof. by move/inj_eq <-; rewrite rmorph_nat. Qed.
+
+Lemma rmorph_eq1 x : injective f -> (f x == 1) = (x == 1).
+Proof. exact: rmorph_eq_nat 1%N. Qed.
+
+Lemma can2_srmorphism f' : cancel f f' -> cancel f' f -> multiplicative f'.
+Proof.
+move=> fK f'K.
+by split=> [x y|]; apply: (canLR fK); rewrite /= (rmorphM, rmorph1) ?f'K.
+Qed.
+
+End Properties.
+
+Section Projections.
+
+Variables (R S T : semiRingType).
+Variables (f : {srmorphism S -> T}) (g : {srmorphism R -> S}).
+
+Fact idfun_is_multiplicative : multiplicative (@idfun R).
+Proof. by []. Qed.
+#[export]
+HB.instance Definition _ := isMultiplicative.Build R R idfun
+  idfun_is_multiplicative.
+
+Fact comp_is_multiplicative : multiplicative (f \o g).
+Proof. by split=> [x y|] /=; rewrite ?rmorph1 ?rmorphM. Qed.
+#[export]
+HB.instance Definition _ := isMultiplicative.Build R T (f \o g)
+  comp_is_multiplicative.
+
+End Projections.
+
+End SRmorphismTheory.
+
+#[infer(R,S)]
+HB.structure Definition RMorphism (R S : ringType) :=
+  {f of @Additive R S f & isMultiplicative R S f}.
+(* FIXME: Additive has very strange implicit arguments
+   (without @, one would have to write Additive R f) *)
 
 Module RMorphismExports.
 Module RMorphism.
@@ -2317,67 +2400,37 @@ Section Properties.
 
 Variables (R S : ringType) (k : unit) (f : {rmorphism R -> S}).
 
-Lemma rmorph0 : f 0 = 0. Proof. exact: raddf0. Qed.
 Lemma rmorphN : {morph f : x / - x}. Proof. exact: raddfN. Qed.
-Lemma rmorphD : {morph f : x y / x + y}. Proof. exact: raddfD. Qed.
 Lemma rmorphB : {morph f: x y / x - y}. Proof. exact: raddfB. Qed.
-Lemma rmorphMn n : {morph f : x / x *+ n}. Proof. exact: raddfMn. Qed.
 Lemma rmorphMNn n : {morph f : x / x *- n}. Proof. exact: raddfMNn. Qed.
-Lemma rmorph_sum I r (P : pred I) E :
-  f (\sum_(i <- r | P i) E i) = \sum_(i <- r | P i) f (E i).
-Proof. exact: raddf_sum. Qed.
 Lemma rmorphMsign n : {morph f : x / (- 1) ^+ n * x}.
 Proof. exact: raddfMsign. Qed.
 
-Lemma rmorphismMP : multiplicative f. Proof. exact: rmorphism_subproof. Qed.
-Lemma rmorph1 : f 1 = 1. Proof. by case: rmorphismMP. Qed.
-Lemma rmorphM : {morph f: x y  / x * y}. Proof. by case: rmorphismMP. Qed.
-
-Lemma rmorph_prod I r (P : pred I) E :
-  f (\prod_(i <- r | P i) E i) = \prod_(i <- r | P i) f (E i).
-Proof. exact: (big_morph f rmorphM rmorph1). Qed.
-
-Lemma rmorphX n : {morph f: x / x ^+ n}.
-Proof. by elim: n => [|n IHn] x; rewrite ?rmorph1 // !exprS rmorphM IHn. Qed.
-
-Lemma rmorph_nat n : f n%:R = n%:R. Proof. by rewrite rmorphMn rmorph1. Qed.
 Lemma rmorphN1 : f (- 1) = (- 1). Proof. by rewrite rmorphN rmorph1. Qed.
 
 Lemma rmorph_sign n : f ((- 1) ^+ n) = (- 1) ^+ n.
-Proof. by rewrite rmorphX rmorphN1. Qed.
-
-Lemma rmorph_char p : p \in [char R] -> p \in [char S].
-Proof. by rewrite !inE -rmorph_nat => /andP[-> /= /eqP->]; rewrite rmorph0. Qed.
-
-Lemma rmorph_eq_nat x n : injective f -> (f x == n%:R) = (x == n%:R).
-Proof. by move/inj_eq <-; rewrite rmorph_nat. Qed.
-
-Lemma rmorph_eq1 x : injective f -> (f x == 1) = (x == 1).
-Proof. exact: rmorph_eq_nat 1%N. Qed.
+Proof. by rewrite rmorphX /= rmorphN1. Qed.
 
 Lemma can2_rmorphism f' : cancel f f' -> cancel f' f -> multiplicative f'.
 Proof.
 move=> fK f'K.
-by split=> [x y|]; apply: (canLR fK); rewrite /= (rmorphM, rmorph1) ?f'K.
+by split=> [x y |]; apply: (canLR fK); rewrite /= (rmorphM, rmorph1) /= ?f'K.
 Qed.
 
 End Properties.
 
 Section Projections.
 
-Variables (R S T : ringType) (f : {rmorphism S -> T}) (g : {rmorphism R -> S}).
+Variables (R S T : ringType).
+Variables (f : {rmorphism S -> T}) (g : {rmorphism R -> S}).
 
-Fact idfun_is_multiplicative : multiplicative (@idfun R).
-Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build R R idfun
-  idfun_is_multiplicative.
+HB.instance Definition _ : isMultiplicative R R idfun :=
+  SRMorphism.on idfun.
 
-Fact comp_is_multiplicative : multiplicative (f \o g).
-Proof. by split=> [x y|] /=; rewrite ?rmorph1 ?rmorphM. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build R T (f \o g)
-  comp_is_multiplicative.
+HB.instance Definition _ : isMultiplicative R T (f \o g) :=
+  SRMorphism.on (f \o g).
 
 End Projections.
 
@@ -2716,8 +2769,8 @@ Section LRMorphismTheory.
 Variables (R : ringType) (A B : lalgType R) (C : ringType) (s : R -> C -> C).
 Variables (k : unit) (f : {lrmorphism A -> B}) (g : {lrmorphism B -> C | s}).
 
-#[export] HB.instance Definition _ := RMorphism.on (@idfun A).
-#[export] HB.instance Definition _ := RMorphism.on (g \o f).
+#[export] HB.instance Definition _ := SRMorphism.on (@idfun A).
+#[export] HB.instance Definition _ := SRMorphism.on (g \o f).
 
 Lemma rmorph_alg a : f a%:A = a%:A.
 Proof. by rewrite linearZ rmorph1. Qed.
@@ -3296,7 +3349,7 @@ by apply: (canRL (mulrK (rmorph_unit Ux))); rewrite -rmorphM mulVr ?rmorph1.
 Qed.
 
 Lemma rmorph_div x y : y \in unit -> f (x / y) = f x / f y.
-Proof. by move=> Uy; rewrite rmorphM rmorphV. Qed.
+Proof. by move=> Uy; rewrite rmorphM /= rmorphV. Qed.
 
 End UnitRingMorphism.
 
@@ -4460,7 +4513,7 @@ by rewrite rmorphV ?unitfE.
 Qed.
 
 Lemma fmorph_div : {morph f : x y / x / y}.
-Proof. by move=> x y; rewrite rmorphM fmorphV. Qed.
+Proof. by move=> x y; rewrite rmorphM /= fmorphV. Qed.
 
 End FieldMorphismInv.
 

@@ -3048,12 +3048,12 @@ Proof. by rewrite rmorph_sum; apply: eq_bigr => i _; rewrite mxE. Qed.
 Lemma det_map_mx n' (A : 'M_n') : \det A^f = f (\det A).
 Proof.
 rewrite rmorph_sum //; apply: eq_bigr => s _.
-rewrite rmorphM rmorph_sign rmorph_prod; congr (_ * _).
+rewrite rmorphM /= rmorph_sign rmorph_prod; congr (_ * _).
 by apply: eq_bigr => i _; rewrite mxE.
 Qed.
 
 Lemma cofactor_map_mx (A : 'M_n) i j : cofactor A^f i j = f (cofactor A i j).
-Proof. by rewrite rmorphM rmorph_sign -det_map_mx map_row' map_col'. Qed.
+Proof. by rewrite rmorphM /= rmorph_sign -det_map_mx map_row' map_col'. Qed.
 
 Lemma map_mx_adj (A : 'M_n) : (\adj A)^f = \adj A^f.
 Proof. by apply/matrixP=> i j; rewrite !mxE cofactor_map_mx. Qed.

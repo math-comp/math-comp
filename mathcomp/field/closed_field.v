@@ -715,7 +715,7 @@ have Einv0 : Einv 0 = 0.
   rewrite /Einv; case: Bezout_eq1_coprimepP => // ex_uv.
   case/negP: (oner_neq0 E); rewrite [X in X == _]piE.
   rewrite -[_ 1]/(PtoE 1); have [uv <-] := ex_uv.
-  by rewrite rmorphD !rmorphM PtoEd /= reprK !mulr0 addr0.
+  by rewrite rmorphD !rmorphM [X in _ + _ * X]PtoEd /= reprK !mulr0 addr0.
 have EmulV : forall x, x != 0 -> Einv x * x = 1.
   rewrite /Einv=> z nz_z; case: Bezout_eq1_coprimepP => [ex_uv |]; last first.
     move/Bezout_eq1_coprimepP; rewrite I'co //.
@@ -821,12 +821,16 @@ pose Kmul (x y : K) := EtoK _ (uncurry *%R (pairK (repr x) (repr y))).
 pose Kinv (x : K) := EtoK _ (tagged (repr x))^-1.
 have EtoK_D i: {morph EtoK i : x y / x + y >-> Kadd x y}.
   move=> x y; apply: eqEtoK; set j := maxn (tag _) _; rewrite !rmorphD.
-  by rewrite -!toEtrans ?le_max  // => lexm leym; rewrite !toErepr.
+  rewrite -![X in _ = X + _]toEtrans ?le_max// => lexm.
+  rewrite -![X in _ = _ + X]toEtrans ?le_max// => leym.
+  by rewrite !toErepr.
 have EtoK_N i: {morph EtoK i : x / - x >-> Kopp x}.
   by move=> x; apply: eqEtoK; set j := tag _; rewrite !rmorphN toErepr.
 have EtoK_M i: {morph EtoK i : x y / x * y >-> Kmul x y}.
   move=> x y; apply: eqEtoK; set j := maxn (tag _) _; rewrite !rmorphM.
-  by rewrite -!toEtrans ?le_max  // => lexm leym; rewrite !toErepr.
+  rewrite -![X in _ = X * _]toEtrans ?le_max// => lexm.
+  rewrite -![X in _ = _ * X]toEtrans ?le_max// => leym.
+  by rewrite !toErepr.
 have EtoK_V i: {morph EtoK i : x / x^-1 >-> Kinv x}.
   by move=> x; apply: eqEtoK; set j := tag _; rewrite !fmorphV toErepr.
 case: {toErepr}I in (Kadd) (Kopp) (Kmul) (Kinv) EtoK_D EtoK_N EtoK_M EtoK_V.

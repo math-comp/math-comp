@@ -895,7 +895,7 @@ apply: (canLR (mulfK (nz_den _))); apply: (mulIf (nz_den x)).
 rewrite mulrAC mulrBl divfK ?nz_den // mulrAC -!rmorphM.
 apply: (mulIf (nz_den y)); rewrite mulrAC mulrBl divfK ?nz_den //.
 rewrite -!(rmorphM, rmorphB); congr _%:~R; apply: injZtoQ.
-rewrite !(rmorphM, rmorphB) [_ - _]lock /= -lock !numqE.
+rewrite !(rmorphM, rmorphB) /= !(rmorphM, rmorphB) [_ - _]lock /= -lock !numqE.
 by rewrite (mulrAC y) -!mulrBl -mulrA mulrAC !mulrA.
 Qed.
 
@@ -938,7 +938,7 @@ Lemma ltrq0 x : (ratr F x < 0) = (x < 0).
 Proof. by rewrite (_ : 0 = ratr F 0) ?ltr_rat ?rmorph0. Qed.
 
 Lemma ratr_sg x : ratr F (sgr x) = sgr (ratr F x).
-Proof. by rewrite !sgr_def fmorph_eq0 ltrq0 rmorphMn rmorph_sign. Qed.
+Proof. by rewrite !sgr_def fmorph_eq0 ltrq0 rmorphMn /= rmorph_sign. Qed.
 
 Lemma ratr_norm x : ratr F `|x| = `|ratr F x|.
 Proof.

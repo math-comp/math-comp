@@ -950,7 +950,7 @@ Proof. exact: cfAut_char. Qed.
 
 Lemma cfAut_char1 u (chi : 'CF(G)) :
   chi \is a character -> cfAut u chi 1%g = chi 1%g.
-Proof. by move/Cnat_char1=> Nchi1; rewrite cfunE aut_Cnat. Qed.
+Proof. by move/Cnat_char1=> Nchi1; rewrite cfunE /= aut_Cnat. Qed.
 
 Lemma cfAut_irr1 u i : (cfAut u 'chi[G]_i) 1%g = 'chi_i 1%g.
 Proof. exact: cfAut_char1 (irr_char i). Qed.
@@ -1426,7 +1426,7 @@ Lemma mul_lin_irr xi chi :
 Proof.
 move=> Lxi; rewrite !irrEchar => /andP[Nphi /eqP <-].
 rewrite rpredM // ?lin_charW //=; apply/eqP; congr (_ * _).
-apply: eq_bigr => x Gx; rewrite !cfunE rmorphM mulrACA -(lin_charV_conj Lxi) //.
+apply: eq_bigr=> x Gx; rewrite !cfunE rmorphM/= mulrACA -(lin_charV_conj Lxi)//.
 by rewrite -lin_charM ?groupV // mulgV lin_char1 ?mul1r.
 Qed.
 

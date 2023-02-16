@@ -572,7 +572,7 @@ have F0pz: pz \is a polyOver 1%VS.
 have{splitLp} splitLpz: splittingFieldFor 1 pz imL.
   have [r def_p defL] := splitLp; exists (map inLz r) => [|{def_p}].
     move: def_p; rewrite -(eqp_map [rmorphism of inLz]) rmorph_prod.
-    rewrite big_map; congr (_ %= _); apply: eq_big => // y _.
+    rewrite big_map; congr (_ %= _); apply: eq_big => //= y _.
     by rewrite rmorphB /= map_polyX map_polyC.
   apply/eqP; rewrite eqEsubv /= -{2}defL {defL}; apply/andP; split.
     by apply/Fadjoin_seqP; rewrite sub1v; split=> // _ /mapP[y r_y ->].

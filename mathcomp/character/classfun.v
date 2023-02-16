@@ -332,7 +332,7 @@ Proof. by apply/cfunP=> x; rewrite !cfunE rmorphM. Qed.
 
 Lemma cfAut_is_additive : additive cfAut.
 Proof.
-by move=> phi psi; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE rmorphB.
+by move=> phi psi; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE /= rmorphB.
 Qed.
 
 Lemma cfAut_is_multiplicative : multiplicative cfAut.
@@ -669,7 +669,7 @@ Lemma cfConjCE phi x : ( phi^* )%CF x = (phi x)^*.
 Proof. by rewrite cfunE. Qed.
 
 Lemma cfConjCK : involutive (fun phi => phi^* )%CF.
-Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE conjCK. Qed.
+Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE /= conjCK. Qed.
 
 Lemma cfConjC_cfun1 : ( 1^* )%CF = 1 :> 'CF(G).
 Proof. exact: rmorph1. Qed.
@@ -867,8 +867,8 @@ Proof. by rewrite -!cfdotrE linearZ. Qed.
 
 Lemma cfdotC phi psi : '[phi, psi] = ('[psi, phi])^*.
 Proof.
-rewrite /cfdot rmorphM fmorphV rmorph_nat rmorph_sum; congr (_ * _).
-by apply: eq_bigr=> x _; rewrite rmorphM conjCK mulrC.
+rewrite /cfdot rmorphM /= fmorphV rmorph_nat rmorph_sum; congr (_ * _).
+by apply: eq_bigr=> x _; rewrite rmorphM /= conjCK mulrC.
 Qed.
 
 Lemma eq_cfdotr A phi psi1 psi2 :
@@ -897,8 +897,8 @@ Lemma cfdot_cfAut (u : {rmorphism algC -> algC}) phi psi :
     {in image psi G, {morph u : x / x^*}} ->
   '[cfAut u phi, cfAut u psi] = u '[phi, psi].
 Proof.
-move=> uC; rewrite rmorphM fmorphV rmorph_nat rmorph_sum; congr (_ * _).
-by apply: eq_bigr => x Gx; rewrite !cfunE rmorphM uC ?map_f ?mem_enum.
+move=> uC; rewrite rmorphM /= fmorphV rmorph_nat rmorph_sum; congr (_ * _).
+by apply: eq_bigr => x Gx; rewrite !cfunE rmorphM /= uC ?map_f ?mem_enum.
 Qed.
 
 Lemma cfdot_conjC phi psi : '[phi^*, psi^*] = '[phi, psi]^*.
@@ -2487,9 +2487,9 @@ Proof. by apply/cfunP=> x; rewrite !cfunElock rmorphMn. Qed.
 Lemma cfAutInd (psi : 'CF(H)) : ('Ind[G] psi)^u = 'Ind psi^u.
 Proof.
 have [sHG | not_sHG] := boolP (H \subset G).
-  apply/cfunP=> x; rewrite !(cfunE, cfIndE) // rmorphM fmorphV rmorph_nat.
+  apply/cfunP=> x; rewrite !(cfunE, cfIndE) // rmorphM /= fmorphV rmorph_nat.
   by congr (_ * _); rewrite rmorph_sum; apply: eq_bigr => y; rewrite !cfunE.
-rewrite !cfIndEout // linearZ /= cfAut_cfuni rmorphM rmorph_nat.
+rewrite !cfIndEout // linearZ /= cfAut_cfuni rmorphM rmorph_nat /=.
 rewrite -cfdot_cfAut ?rmorph1 // => _ /imageP[x Hx ->].
 by rewrite cfun1E Hx !rmorph1.
 Qed.

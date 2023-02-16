@@ -333,7 +333,8 @@ have QtoQ z x: x \in sQ z -> {Qxz : 'AHom(Q x, Q z) | morph_ofQ x z Qxz}.
   have Qxza : additive Qxz.
     by move=> u v; apply: (canLR (ofQ_K z)); rewrite !rmorphB !QxzE.
   have Qxzm : multiplicative Qxz.
-    by split=>[u v|]; apply: (canLR (ofQ_K z)); rewrite ?rmorph1 ?rmorphM ?QxzE.
+    by split=> [u v|]; apply: (canLR (ofQ_K z));
+      rewrite ?rmorph1 ?rmorphM /= ?QxzE.
   have QxzaM := GRing.isAdditive.Build _ _ _ Qxza.
   have QxzmM := GRing.isMultiplicative.Build _ _ _ Qxzm.
   have QxzlM := GRing.isScalable.Build _ _ _ _ _ (rat_linear Qxza).
@@ -360,7 +361,7 @@ have{gen PET2 genP} PET s: {z | sQs z s & <<1 & map (inQ z) s>>%VS = fullv}.
   by rewrite -defQs -(canLR (ofQ_K y) Dz) -QzyE ofQ_K.
 pose rp s := \prod_(z <- s) ('X - z%:P).
 have map_rp (f : {rmorphism _ -> _}) s: rp _ s ^ f = rp _ (map f s).
-  rewrite rmorph_prod /rp big_map; apply: eq_bigr => x _.
+  rewrite rmorph_prod /rp big_map; apply: eq_bigr => x _ /=.
   by rewrite rmorphB /= map_polyX map_polyC.
 pose is_Gal z := SplittingField.axiom (Q z).
 have galQ x: {z | x \in sQ z & is_Gal z}.
@@ -643,7 +644,7 @@ have R'i n: i \notin sQ (x_ n).
   apply: contraL (@ltr01 Rn) => /sQ_inQ[v Di].
   suffices /eqP <-: - QxR v ^+ 2 == 1 by rewrite oppr_gt0 -leNgt sqr_ge0.
   rewrite -rmorphX -rmorphN fmorph_eq1 -(fmorph_eq1 (ofQ x)) rmorphN eqr_oppLR.
-  by rewrite rmorphX Di Di2.
+  by rewrite rmorphX /= Di Di2.
 have szX2_1: size ('X^2 + 1) = 3%N.
   by move=> R; rewrite size_addl ?size_polyXn ?size_poly1.
 have minp_i n (p_i := minPoly (R_ n) (i_ n)): p_i = 'X^2 + 1.
@@ -681,7 +682,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     by rewrite -Dv -CnQtE sQof2 defCn -genCn aimg_adjoin aimg1.
   have Dit: ofQ t i_t = i by rewrite CnQtE inQ_K.
   have Dit2: i_t ^+ 2 = -1.
-    by apply: (fmorph_inj (ofQ t)); rewrite rmorphX rmorphN1 Dit.
+    by apply: (fmorph_inj (ofQ t)); rewrite rmorphX rmorphN1 /= Dit.
   have dimCn: \dim_Rn Cn = 2%N.
     rewrite -adjoin_degreeE adjoin_degree_aimg.
     by apply: succn_inj; rewrite -size_minPoly minp_i szX2_1.
@@ -749,7 +750,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
       by rewrite lead_coefX sz_pw -signr_odd odd_2'nat oddPG mulrN1 opprK.
     have Dp0: p.[0] = - ofQ t pw.[0] ^+ 2.
       rewrite -(rmorph0 (ofQ t)) horner_map hornerM rmorphM.
-      by rewrite horner_comp !hornerN hornerX oppr0 rmorphN mulNr.
+      by rewrite horner_comp !hornerN hornerX oppr0 /= rmorphN mulNr.
     have Rpw: pw \is a polyOver Rn by apply: minPolyOver.
     have Rp: p \is a polyOver (sQ (x_ n)).
       apply/polyOver_poly=> j _; rewrite -memRn; apply: polyOverP j => /=.
@@ -843,7 +844,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     suffices /eqP->: v == 0 by rewrite mul0r addr0.
     by rewrite y2_0 mulr0 eq_sym sqrf_eq0 fmorph_eq0 in px0.
   apply/eqP/esym/(mulIf nz_x2); rewrite -exprMn -rmorphX -Dw2 rmorphD rmorphM.
-  rewrite Dit mulrDl -expr2 mulrA divfK; last by rewrite expf_eq0 in nz_x2.
+  rewrite /= Dit mulrDl -expr2 mulrA divfK; last by rewrite expf_eq0 in nz_x2.
   rewrite mulr_natr addrC sqrrD exprMn Di2 mulN1r -(eqP px0) -mulNr opprB.
   by rewrite -mulrnAl -mulrnAr -rmorphMn -!mulrDl addrAC subrK.
 have inFTA n z: (n_ z <= n)%N -> z = ofQ (z_ n) (inQ (z_ n) z).

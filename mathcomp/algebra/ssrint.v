@@ -838,7 +838,7 @@ Proof.
 move=> n; wlog : n / 0 <= n; case: n=> [] n //; do ?exact.
   by rewrite NegzE !rmorphN=>->.
 move=> _; elim: n=> [|n ihn]; first by rewrite rmorph0.
-by rewrite intS !rmorphD !rmorph1 ihn.
+by rewrite intS !rmorphD /= !rmorph1 ihn.
 Qed.
 
 (* intmul and ler/ltr *)

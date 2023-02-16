@@ -3035,7 +3035,7 @@ Lemma aut_unity_rootC u v z n : n > 0 -> z ^+ n = 1 -> u (v z) = v (u z).
 Proof.
 move=> n_gt0 /(aut_unity_rootP _ n_gt0) def_z.
 have [[i def_uz] [j def_vz]] := (def_z u, def_z v).
-by rewrite !(def_uz, def_vz, rmorphX) exprAC.
+by rewrite def_vz def_uz !rmorphX /= def_vz def_uz exprAC.
 Qed.
 
 End AutPolyRoot.

@@ -1495,7 +1495,7 @@ have co_e_mu_t: coprime e #[(mu / 'chi_t)%R]%CF.
   suffices dv_o_mu_t: #[(mu / 'chi_t)%R]%CF %| 'o(mu)%CF * 'o('chi_t)%CF.
     by rewrite (coprime_dvdr dv_o_mu_t) // coprimeMr o_mu co_e_lam.
   rewrite !cfDet_order_lin //; apply/dvdn_cforderP=> x Gx.
-  rewrite invr_lin_char // !cfunE exprMn -rmorphX {2}mulnC.
+  rewrite invr_lin_char // !cfunE exprMn -rmorphX {2}mulnC /=.
   by rewrite !(dvdn_cforderP _) ?conjC1 ?mulr1 // dvdn_mulr.
 have /eqP mu_t_1: mu / 'chi_t == 1.
   rewrite -(dvdn_cforder (_ / _)%R 1) -(eqnP co_e_mu_t) dvdn_gcd dvdnn andbT.

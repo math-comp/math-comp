@@ -78,7 +78,7 @@ have /fin_all_exists[k Dk] i: exists k, e 0 i = z ^+ k.
   have [|k ->] := (prim_rootP prim_z) (e 0 i); last by exists k.
   by have /dvdnP[q ->] := x_dv_n; rewrite mulnC exprM enx1 expr1n.
 exists (\sum_i w ^+ k i); rewrite rmorph_sum; apply/eq_bigr => i _.
-by rewrite rmorphX Dz Dk.
+by rewrite rmorphX /= Dz Dk.
 Qed.
 
 Section GenericClassSums.
@@ -547,7 +547,7 @@ have [j ->]: exists j, 'chi_i = 'Res 'chi[G]_j.
     exact/irrP/lin_char_irr/rpredM.
   have /fin_all_exists[rQ DrQ] (j : Iirr (G / H)) := Mlin i (mod_Iirr j).
   have mulJi: ('chi[G]_i)^*%CF * 'chi_i = 1.
-    apply/cfun_inP=> x Gx; rewrite !cfunE -lin_charV_conj ?linG // cfun1E Gx.
+    apply/cfun_inP=> x Gx; rewrite !cfunE /= -lin_charV_conj ?linG // cfun1E Gx.
     by rewrite lin_charV ?mulVf ?lin_char_neq0 ?linG.
   have inj_rQ: injective rQ.
     move=> j1 j2 /(congr1 (fun k => (('chi_i)^*%CF * 'chi_k) / H)%CF).
@@ -663,9 +663,9 @@ have Qpi1: pi1 \in Crat.
   apply: eq_bigr => i _; have /QnGg[b Db] := irr_char i.
   have Lchi_i: 'chi_i \is a linear_char by rewrite irr_cyclic_lin.
   have /(prim_rootP pr_eps)[m Dem]: b ^+ n = 1.
-    apply/eqP; rewrite -(fmorph_eq1 QnC) rmorphX Db -lin_charX //.
+    apply/eqP; rewrite -(fmorph_eq1 QnC) rmorphX /= Db -lin_charX //.
     by rewrite -expg_mod_order orderE defG modnn lin_char1.
-  rewrite -Db -DnuC Dem rmorphX /= defItoQ exprAC -{m}Dem rmorphX {b}Db.
+  rewrite -Db /= -DnuC Dem rmorphX /= defItoQ exprAC -{m}Dem rmorphX /= {b}Db.
   by rewrite lin_charX.
 clear I ItoS imItoS injItoS ItoQ inItoQ defItoQ imItoQ injItoQ.
 clear Qn galQn QnC gQnC eps pr_eps QnGg calG.
