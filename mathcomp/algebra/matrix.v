@@ -1609,32 +1609,27 @@ HB.instance Definition _ {mul : T -> T -> T} {add : Monoid.add_law idm mul} :=
 End MatrixLaws.
 
 (*****************************************************************************)
-(********************* Matrix Zmodule (additive) structure *******************)
+(**************** Matrix Zsemimodule (semi-additive) structure ***************)
 (*****************************************************************************)
 
-Section MatrixZmodule.
+Section MatrixZsemimodule.
 
-Variable V : zmodType.
+Variable V : zsemimodType.
 
 Section FixedDim.
 
 Variables m n : nat.
 Implicit Types A B : 'M[V]_(m, n).
 
-Fact oppmx_key : unit. Proof. by []. Qed.
 Fact addmx_key : unit. Proof. by []. Qed.
-Definition oppmx := @map_mx V V -%R m n.
 Definition addmx := @map2_mx V V V +%R m n.
 
 Definition addmxA : associative addmx := map2_mxA.
 Definition addmxC : commutative addmx := map2_mxC.
 Definition add0mx : left_id (const_mx 0) addmx := map2_1mx.
 
-Lemma addNmx : left_inverse (const_mx 0) oppmx addmx.
-Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE addNr. Qed.
-
-HB.instance Definition _ := GRing.isZmodule.Build 'M[V]_(m, n)
-  addmxA addmxC add0mx addNmx.
+HB.instance Definition _ := GRing.isZsemimodule.Build 'M[V]_(m, n)
+  addmxA addmxC add0mx.
 
 Lemma mulmxnE A d i j : (A *+ d) i j = A i j *+ d.
 Proof. by elim: d => [|d IHd]; rewrite ?mulrS mxE ?IHd. Qed.
@@ -1643,29 +1638,31 @@ Lemma summxE I r (P : pred I) (E : I -> 'M_(m, n)) i j :
   (\sum_(k <- r | P k) E k) i j = \sum_(k <- r | P k) E k i j.
 Proof. by apply: (big_morph (fun A => A i j)) => [A B|]; rewrite mxE. Qed.
 
-Lemma const_mx_is_additive : additive const_mx.
-Proof. by move=> a b; apply/matrixP=> i j; rewrite !mxE. Qed.
-HB.instance Definition _ := GRing.isAdditive.Build V 'M[V]_(m, n) const_mx
-  const_mx_is_additive.
+Lemma const_mx_is_semi_additive : semi_additive const_mx.
+Proof. by split=> [|a b]; apply/matrixP => // i j; rewrite !mxE. Qed.
+HB.instance Definition _ :=
+  GRing.isSemiAdditive.Build V [the zsemimodType of 'M[V]_(m, n)] const_mx
+    const_mx_is_semi_additive.
 
 End FixedDim.
 
-Section Additive.
+Section SemiAdditive.
 
 Variables (m n p q : nat) (f : 'I_p -> 'I_q -> 'I_m) (g : 'I_p -> 'I_q -> 'I_n).
 
 Definition swizzle_mx k (A : 'M[V]_(m, n)) :=
   \matrix[k]_(i, j) A (f i j) (g i j).
 
-Lemma swizzle_mx_is_additive k : additive (swizzle_mx k).
-Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE. Qed.
+Lemma swizzle_mx_is_semi_additive k : semi_additive (swizzle_mx k).
+Proof. by split=> [|A B]; apply/matrixP => i j; rewrite !mxE. Qed.
 HB.instance Definition _ k :=
-  GRing.isAdditive.Build 'M_(m, n) 'M_(p, q) (swizzle_mx k)
-    (swizzle_mx_is_additive k).
+  GRing.isSemiAdditive.Build
+    [the zsemimodType of 'M_(m, n)] [the zsemimodType of 'M_(p, q)]
+    (swizzle_mx k) (swizzle_mx_is_semi_additive k).
 
-End Additive.
+End SemiAdditive.
 
-Local Notation SwizzleAdd op := (GRing.Additive.copy op (swizzle_mx _ _ _)).
+Local Notation SwizzleAdd op := (GRing.SemiAdditive.copy op (swizzle_mx _ _ _)).
 
 HB.instance Definition _ m n := SwizzleAdd (@trmx V m n).
 HB.instance Definition _ m n i := SwizzleAdd (@row V m n i).
@@ -1683,8 +1680,9 @@ HB.instance Definition _ m1 m2 n := SwizzleAdd (@usubmx V m1 m2 n).
 HB.instance Definition _ m1 m2 n := SwizzleAdd (@dsubmx V m1 m2 n).
 HB.instance Definition _ m n := SwizzleAdd (@vec_mx V m n).
 HB.instance Definition _ m n :=
-  GRing.isAdditive.Build 'M_(m, n) 'rV_(m * n) mxvec
-    (can2_additive (@vec_mxK V m n) mxvecK).
+  GRing.isSemiAdditive.Build
+    [the zsemimodType of 'M_(m, n)] [the zsemimodType of 'rV_(m * n)] mxvec
+    (can2_semi_additive (@vec_mxK V m n) mxvecK).
 
 Lemma flatmx0 n : all_equal_to (0 : 'M_(0, n)).
 Proof. by move=> A; apply/matrixP=> [] []. Qed.
@@ -1717,18 +1715,6 @@ Lemma block_mx0 m1 m2 n1 n2 : block_mx 0 0 0 0 = 0 :> 'M_(m1 + m2, n1 + n2).
 Proof. exact: block_mx_const. Qed.
 
 Ltac split_mxE := apply/matrixP=> i j; do ![rewrite mxE | case: split => ?].
-
-Lemma opp_row_mx m n1 n2 (A1 : 'M_(m, n1)) (A2 : 'M_(m, n2)) :
-  - row_mx A1 A2 = row_mx (- A1) (- A2).
-Proof. by split_mxE. Qed.
-
-Lemma opp_col_mx m1 m2 n (A1 : 'M_(m1, n)) (A2 : 'M_(m2, n)) :
-  - col_mx A1 A2 = col_mx (- A1) (- A2).
-Proof. by split_mxE. Qed.
-
-Lemma opp_block_mx m1 m2 n1 n2 (Aul : 'M_(m1, n1)) Aur Adl (Adr : 'M_(m2, n2)) :
-  - block_mx Aul Aur Adl Adr = block_mx (- Aul) (- Aur) (- Adl) (- Adr).
-Proof. by rewrite opp_col_mx !opp_row_mx. Qed.
 
 Lemma add_row_mx m n1 n2 (A1 : 'M_(m, n1)) (A2 : 'M_(m, n2)) B1 B2 :
   row_mx A1 A2 + row_mx B1 B2 = row_mx (A1 + B1) (A2 + B2).
@@ -1971,13 +1957,14 @@ Definition diag_mx n (d : 'rV[V]_n) :=
 Lemma tr_diag_mx n (d : 'rV_n) : (diag_mx d)^T = diag_mx d.
 Proof. by apply/matrixP=> i j /[!mxE]; case: eqVneq => // ->. Qed.
 
-Lemma diag_mx_is_additive n : additive (@diag_mx n).
+Lemma diag_mx_is_semi_additive n : semi_additive (@diag_mx n).
 Proof.
-by move=>A B; apply/matrixP=>i j; rewrite !mxE mulrnBl.
+by split=> [|A B]; apply/matrixP => i j; rewrite !mxE ?mul0rn// mulrnDl.
 Qed.
 HB.instance Definition _ n :=
-  GRing.isAdditive.Build [the zmodType of 'rV_n] [the zmodType of 'M_n]
-    (@diag_mx n) (@diag_mx_is_additive n).
+  GRing.isSemiAdditive.Build
+    [the zsemimodType of 'rV_n] [the zsemimodType of 'M_n] (@diag_mx n)
+    (@diag_mx_is_semi_additive n).
 
 Lemma diag_mx_row m n (l : 'rV_n) (r : 'rV_m) :
   diag_mx (row_mx l r) = block_mx (diag_mx l) 0 0 (diag_mx r).
@@ -2017,11 +2004,11 @@ Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
 Lemma tr_scalar_mx a : (a%:M)^T = a%:M.
 Proof. by apply/matrixP=> i j; rewrite !mxE eq_sym. Qed.
 
-Lemma scalar_mx_is_additive : additive scalar_mx.
-Proof. by move=> a b; rewrite -!diag_const_mx !raddfB. Qed.
+Lemma scalar_mx_is_semi_additive : semi_additive scalar_mx.
+Proof. by split=> [|a b]; rewrite -!diag_const_mx ?raddf0// !raddfD. Qed.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build V [the zmodType of 'M_n] scalar_mx
-    scalar_mx_is_additive.
+  GRing.isSemiAdditive.Build V [the zsemimodType of 'M_n] scalar_mx
+    scalar_mx_is_semi_additive.
 
 Definition is_scalar_mx (A : 'M[V]_n) :=
   if insub 0%N is Some i then A == (A i i)%:M else true.
@@ -2076,13 +2063,16 @@ Local Notation "'\tr' A" := (mxtrace A) : ring_scope.
 Lemma mxtrace_tr A : \tr A^T = \tr A.
 Proof. by apply: eq_bigr=> i _; rewrite mxE. Qed.
 
-Lemma mxtrace_is_additive : additive mxtrace.
+Lemma mxtrace_is_semi_additive : semi_additive mxtrace.
 Proof.
-move=>A B; rewrite -sumrN -big_split /=.
-by apply: eq_bigr=> i _; rewrite !mxE.
+split=> [|A B].
+- rewrite /mxtrace; under eq_bigr => i _ do rewrite mxE.
+  by rewrite big_const_idem //= addr0.
+- by rewrite -big_split /=; apply: eq_bigr => i _; rewrite mxE.
 Qed.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build [the zmodType of 'M_n] V mxtrace mxtrace_is_additive.
+  GRing.isSemiAdditive.Build [the zsemimodType of 'M_n] V mxtrace
+    mxtrace_is_semi_additive.
 
 Lemma mxtrace0 : \tr 0 = 0. Proof. exact: raddf0. Qed.
 Lemma mxtraceD A B : \tr (A + B) = \tr A + \tr B. Proof. exact: raddfD. Qed.
@@ -2109,7 +2099,7 @@ rewrite /(\tr _) big_split_ord /=.
 by congr (_ + _); under eq_bigr do rewrite (block_mxEul, block_mxEdr).
 Qed.
 
-End MatrixZmodule.
+End MatrixZsemimodule.
 
 Arguments is_diag_mx {V m n}.
 Arguments is_diag_mxP {V m n A}.
@@ -2118,6 +2108,144 @@ Arguments is_trig_mxP {V m n A}.
 Arguments scalar_mx {V n}.
 Arguments is_scalar_mxP {V n A}.
 
+(* Parametricity over the semi-additive structure. *)
+Section MapZsemimodMatrix.
+
+Variables (aR rR : zsemimodType) (f : {semi_additive aR -> rR}) (m n : nat).
+Local Notation "A ^f" := (map_mx f A) : ring_scope.
+Implicit Type A : 'M[aR]_(m, n).
+
+Lemma map_mx0 : 0^f = 0 :> 'M_(m, n).
+Proof. by rewrite map_const_mx raddf0. Qed.
+
+Lemma map_mxD A B : (A + B)^f = A^f + B^f.
+Proof. by apply/matrixP=> i j; rewrite !mxE raddfD. Qed.
+
+Definition map_mx_sum := big_morph _ map_mxD map_mx0.
+
+HB.instance Definition _ :=
+  GRing.isSemiAdditive.Build
+    [the zsemimodType of 'M[aR]_(m, n)] [the zsemimodType of 'M[rR]_(m, n)]
+    (map_mx f) (map_mx0, map_mxD).
+
+End MapZsemimodMatrix.
+
+Section MatrixZmodule.
+
+Variable V : zmodType.
+
+Section FixedDim.
+
+Variables m n : nat.
+Implicit Types A B : 'M[V]_(m, n).
+
+Fact oppmx_key : unit. Proof. by []. Qed.
+Definition oppmx := @map_mx V V -%R m n.
+
+Lemma addNmx : left_inverse (const_mx 0) oppmx (@addmx V m n).
+Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE addNr. Qed.
+
+HB.instance Definition _ := GRing.Zsemimodule_isZmodule.Build 'M[V]_(m, n)
+  addNmx.
+
+Lemma const_mx_is_additive : additive const_mx.
+Proof. by move=> a b; apply/matrixP=> i j; rewrite !mxE. Qed.
+HB.instance Definition _ :=
+  GRing.isAdditive.Build V [the zmodType of 'M[V]_(m, n)] const_mx
+    const_mx_is_additive.
+
+End FixedDim.
+
+Section Additive.
+
+Variables (m n p q : nat) (f : 'I_p -> 'I_q -> 'I_m) (g : 'I_p -> 'I_q -> 'I_n).
+
+Lemma swizzle_mx_is_additive k : additive (swizzle_mx f g k).
+Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE. Qed.
+HB.instance Definition _ k :=
+  GRing.isAdditive.Build
+    [the zmodType of 'M_(m, n)] [the zmodType of 'M_(p, q)] (swizzle_mx f g k)
+    (swizzle_mx_is_additive k).
+
+End Additive.
+
+Local Notation SwizzleAdd op := (GRing.Additive.copy op (swizzle_mx _ _ _)).
+
+HB.instance Definition _ m n := SwizzleAdd (@trmx V m n).
+HB.instance Definition _ m n i := SwizzleAdd (@row V m n i).
+HB.instance Definition _ m n j := SwizzleAdd (@col V m n j).
+HB.instance Definition _ m n i := SwizzleAdd (@row' V m n i).
+HB.instance Definition _ m n j := SwizzleAdd (@col' V m n j).
+HB.instance Definition _ m n m' n' f g := SwizzleAdd (@mxsub V m n m' n' f g).
+HB.instance Definition _ m n s := SwizzleAdd (@row_perm V m n s).
+HB.instance Definition _ m n s := SwizzleAdd (@col_perm V m n s).
+HB.instance Definition _ m n i1 i2 := SwizzleAdd (@xrow V m n i1 i2).
+HB.instance Definition _ m n j1 j2 := SwizzleAdd (@xcol V m n j1 j2).
+HB.instance Definition _ m n1 n2 := SwizzleAdd (@lsubmx V m n1 n2).
+HB.instance Definition _ m n1 n2 := SwizzleAdd (@rsubmx V m n1 n2).
+HB.instance Definition _ m1 m2 n := SwizzleAdd (@usubmx V m1 m2 n).
+HB.instance Definition _ m1 m2 n := SwizzleAdd (@dsubmx V m1 m2 n).
+HB.instance Definition _ m n := SwizzleAdd (@vec_mx V m n).
+HB.instance Definition _ m n :=
+  GRing.isAdditive.Build
+    [the zmodType of 'M_(m, n)] [the zmodType of 'rV_(m * n)] mxvec
+    (can2_additive (@vec_mxK V m n) mxvecK).
+
+Ltac split_mxE := apply/matrixP=> i j; do ![rewrite mxE | case: split => ?].
+
+Lemma opp_row_mx m n1 n2 (A1 : 'M_(m, n1)) (A2 : 'M_(m, n2)) :
+  - row_mx A1 A2 = row_mx (- A1) (- A2).
+Proof. by split_mxE. Qed.
+
+Lemma opp_col_mx m1 m2 n (A1 : 'M_(m1, n)) (A2 : 'M_(m2, n)) :
+  - col_mx A1 A2 = col_mx (- A1) (- A2).
+Proof. by split_mxE. Qed.
+
+Lemma opp_block_mx m1 m2 n1 n2 (Aul : 'M_(m1, n1)) Aur Adl (Adr : 'M_(m2, n2)) :
+  - block_mx Aul Aur Adl Adr = block_mx (- Aul) (- Aur) (- Adl) (- Adr).
+Proof. by rewrite opp_col_mx !opp_row_mx. Qed.
+
+(* Diagonal matrices *)
+
+Lemma diag_mx_is_additive n : additive (@diag_mx V n).
+Proof.
+by move=>A B; apply/matrixP=>i j; rewrite !mxE mulrnBl.
+Qed.
+HB.instance Definition _ n :=
+  GRing.isAdditive.Build [the zmodType of 'rV_n] [the zmodType of 'M_n]
+    (@diag_mx V n) (@diag_mx_is_additive n).
+
+(* Scalar matrix : a diagonal matrix with a constant on the diagonal *)
+Section ScalarMx.
+
+Variable n : nat.
+
+Lemma scalar_mx_is_additive : additive (@scalar_mx V n).
+Proof. by move=> a b; rewrite -!diag_const_mx !raddfB. Qed.
+HB.instance Definition _ :=
+  GRing.isAdditive.Build V [the zmodType of 'M_n] scalar_mx
+    scalar_mx_is_additive.
+
+End ScalarMx.
+
+(* The trace. *)
+Section Trace.
+
+Variable n : nat.
+
+Lemma mxtrace_is_additive : additive (@mxtrace V n).
+Proof.
+move=>A B; rewrite -sumrN -big_split /=.
+by apply: eq_bigr=> i _; rewrite !mxE.
+Qed.
+HB.instance Definition _ :=
+  GRing.isAdditive.Build [the zmodType of 'M_n] V (@mxtrace V n)
+    mxtrace_is_additive.
+
+End Trace.
+
+End MatrixZmodule.
+
 (* Parametricity over the additive structure. *)
 Section MapZmodMatrix.
 
@@ -2125,19 +2253,11 @@ Variables (aR rR : zmodType) (f : {additive aR -> rR}) (m n : nat).
 Local Notation "A ^f" := (map_mx f A) : ring_scope.
 Implicit Type A : 'M[aR]_(m, n).
 
-Lemma map_mx0 : 0^f = 0 :> 'M_(m, n).
-Proof. by rewrite map_const_mx raddf0. Qed.
-
 Lemma map_mxN A : (- A)^f = - A^f.
 Proof. by apply/matrixP=> i j; rewrite !mxE raddfN. Qed.
 
-Lemma map_mxD A B : (A + B)^f = A^f + B^f.
-Proof. by apply/matrixP=> i j; rewrite !mxE raddfD. Qed.
-
 Lemma map_mxB A B : (A - B)^f = A^f - B^f.
 Proof. by rewrite map_mxD map_mxN. Qed.
-
-Definition map_mx_sum := big_morph _ map_mxD map_mx0.
 
 HB.instance Definition _ :=
   GRing.isAdditive.Build 'M[aR]_(m, n) 'M[rR]_(m, n) (map_mx f) map_mxB.
