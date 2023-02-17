@@ -999,7 +999,7 @@ Lemma coord_free n (X : n.-tuple vT) (i j : 'I_n) :
   free X -> coord X j (X`_i) = (i == j)%:R.
 Proof.
 rewrite unlock free_b2mx => /row_freeP[Ct CtK]; rewrite -row_b2mx.
-by rewrite -row_mul -[pinvmx _]mulmx1 -CtK 2!mulmxA mulmxKpV // CtK !mxE.
+by rewrite -row_mul -[pinvmx _]mulmx1 -CtK 3!mulmxA mulmxKpV // CtK !mxE.
 Qed.
 
 Lemma coord_sum_free n (X : n.-tuple vT) k j :

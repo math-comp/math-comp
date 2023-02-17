@@ -292,12 +292,13 @@ exists (val_submod 1%:M *m row_mx pU pV) => [||g Gg].
   rewrite in_submodE mulmxA -in_submodE -mulmxA mul_row_col mulmxDr.
   rewrite -[pU *m _]mulmxA -[pV *m _]mulmxA !mulKVmx -?row_free_unit //.
   rewrite addrC (in_submodE V) 2![val_submod 1%:M *m _]mulmxA -in_submodE.
-  rewrite addrC (in_submodE U) 2![val_submod 1%:M *m _]mulmxA -in_submodE.
-  rewrite -!val_submodE !in_submodK ?proj_mx_sub //.
+  rewrite addrC (in_submodE U) 2![val_submod 1%:M *m _ in X in X + _]mulmxA.
+  rewrite -in_submodE -!val_submodE !in_submodK ?proj_mx_sub //.
   by rewrite add_proj_mx ?val_submodK // val_submod1 defW.
 rewrite mulmxA -val_submodE -[submod_repr _ g]mul1mx val_submodJ //.
-rewrite -(mulmxA _ (rG g)) mul_mx_row -mulmxA mul_row_block !mulmx0 addr0 add0r.
-rewrite !mul_mx_row; set W' := val_submod 1%:M; congr (row_mx _ _).
+rewrite -(mulmxA _ (rG g)) mul_mx_row -[in RHS]mulmxA mul_row_block.
+rewrite !mulmx0 addr0 add0r !mul_mx_row.
+set W' := val_submod 1%:M; congr (row_mx _ _).
   rewrite 3!mulmxA in_submodE mulmxA.
   have hom_pU: (W' <= dom_hom_mx rG (proj_mx U V))%MS.
     by rewrite val_submod1 -defW proj_mx_hom.

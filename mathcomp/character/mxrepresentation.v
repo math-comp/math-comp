@@ -3044,7 +3044,7 @@ split=> [[B eqrUV injB homB] | [f injf homf defV]].
     rewrite -(mulmxA _ B) -homB // val_submodE 3!(mulmxA U) (mulmxA _ _ B).
     rewrite -in_submodE -in_submodJ //.
     have [u ->] := submxP (mxmoduleP modU x Gx).
-    by rewrite in_submodE -mulmxA -defUf !mulmxA mulmx1.
+    by rewrite in_submodE -mulmxA -defUf !mulmxA !mulmx1.
   apply/eqmxP; rewrite -mxrank_leqif_eq.
     by rewrite mxrankMfree ?eqrUV ?row_free_unit.
   by rewrite -defUf mulmxA val_submodP.
@@ -3166,7 +3166,8 @@ have sU1V: (U1 <= V)%MS by rewrite val_submod1.
 have sU1U': (in_submod V U1 <= U')%MS by rewrite genmxE submxMr ?val_submod1.
 exists modU', (in_submod U' (in_submod V U1)) => // [|x Gx].
   apply/row_freeP; exists (v1 _ _ *m v1 _ _ *m in_submod U 1%:M).
-  by rewrite 2!mulmxA -in_submodE -!val_submodE !in_submodK ?val_submodK.
+  rewrite mulmxA [X in X *m _]mulmxA -in_submodE.
+  by rewrite -!val_submodE !in_submodK ?val_submodK.
 rewrite -!in_submodJ // -(val_submodJ modU) // mul1mx.
 by rewrite 2!{1}in_submodE mulmxA (mulmxA _ U1) -val_submodE -!in_submodE.
 Qed.

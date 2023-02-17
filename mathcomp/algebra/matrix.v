@@ -2270,9 +2270,9 @@ End MapZmodMatrix.
 
 Section MatrixAlgebra.
 
-Variable R : ringType.
+Variable R : semiRingType.
 
-Section RingModule.
+Section SemiRingModule.
 
 (* The ring module/vector space structure *)
 
@@ -2301,63 +2301,10 @@ Proof. by apply/matrixP=> i j; rewrite !mxE mulrDr. Qed.
 Lemma scalemxA x y A : x *m: (y *m: A) = (x * y) *m: A.
 Proof. by apply/matrixP=> i j; rewrite !mxE mulrA. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_isLmodule.Build R 'M[R]_(m, n)
-  scalemxA scale1mx scalemxDr scalemxDl.
-
-Lemma scalemx_const a b : a *: const_mx b = const_mx (a * b).
-Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
-
-Lemma matrix_sum_delta A :
-  A = \sum_(i < m) \sum_(j < n) A i j *: delta_mx i j.
-Proof.
-apply/matrixP=> i j.
-rewrite summxE (bigD1_ord i) // summxE (bigD1_ord j) //= !mxE !eqxx mulr1.
-rewrite !big1 ?addr0 //= => [i' | j'] _.
-  by rewrite summxE big1// => j' _; rewrite !mxE eq_liftF mulr0.
-by rewrite !mxE eqxx eq_liftF mulr0.
-Qed.
-
-End RingModule.
-
-Section StructuralLinear.
-
-Lemma swizzle_mx_is_scalable m n p q f g k :
-  scalable (@swizzle_mx R m n p q f g k).
-Proof. by move=> a A; apply/matrixP=> i j; rewrite !mxE. Qed.
-HB.instance Definition _ m n p q f g k :=
-  GRing.isScalable.Build R 'M[R]_(m, n) 'M[R]_(p, q) *:%R (swizzle_mx f g k)
-    (swizzle_mx_is_scalable f g k).
-
-Local Notation SwizzleLin op := (GRing.Linear.copy op (swizzle_mx _ _ _)).
-
-HB.instance Definition _ m n := SwizzleLin (@trmx R m n).
-HB.instance Definition _ m n i := SwizzleLin (@row R m n i).
-HB.instance Definition _ m n j := SwizzleLin (@col R m n j).
-HB.instance Definition _ m n i := SwizzleLin (@row' R m n i).
-HB.instance Definition _ m n j := SwizzleLin (@col' R m n j).
-HB.instance Definition _ m n m' n' f g := SwizzleLin (@mxsub R m n m' n' f g).
-HB.instance Definition _ m n s := SwizzleLin (@row_perm R m n s).
-HB.instance Definition _ m n s := SwizzleLin (@col_perm R m n s).
-HB.instance Definition _ m n i1 i2 := SwizzleLin (@xrow R m n i1 i2).
-HB.instance Definition _ m n j1 j2 := SwizzleLin (@xcol R m n j1 j2).
-HB.instance Definition _ m n1 n2 := SwizzleLin (@lsubmx R m n1 n2).
-HB.instance Definition _ m n1 n2 := SwizzleLin (@rsubmx R m n1 n2).
-HB.instance Definition _ m1 m2 n := SwizzleLin (@usubmx R m1 m2 n).
-HB.instance Definition _ m1 m2 n := SwizzleLin (@dsubmx R m1 m2 n).
-
-HB.instance Definition _ m n := SwizzleLin (@vec_mx R m n).
-Definition mxvec_is_scalable m n := can2_scalable (@vec_mxK R m n) mxvecK.
-HB.instance Definition _ m n :=
-  GRing.isScalable.Build R 'M_(m, n) 'rV_(m * n) *:%R mxvec
-    (@mxvec_is_scalable m n).
-
-End StructuralLinear.
+End SemiRingModule.
 
 Lemma trmx_delta m n i j : (delta_mx i j)^T = delta_mx j i :> 'M[R]_(n, m).
 Proof. by apply/matrixP=> i' j'; rewrite !mxE andbC. Qed.
-
-Lemma row_sum_delta n (u : 'rV_n) : u = \sum_(j < n) u 0 j *: delta_mx 0 j.
-Proof. by rewrite {1}[u]matrix_sum_delta big_ord1. Qed.
 
 Lemma delta_mx_lshift m n1 n2 i j :
   delta_mx i (lshift n2 j) = row_mx (delta_mx i j) 0 :> 'M_(m, n1 + n2).
@@ -2399,61 +2346,11 @@ Proof. by rewrite -vec_mx_delta vec_mxK. Qed.
 
 Ltac split_mxE := apply/matrixP=> i j; do ![rewrite mxE | case: split => ?].
 
-Lemma scale_row_mx m n1 n2 a (A1 : 'M_(m, n1)) (A2 : 'M_(m, n2)) :
-  a *: row_mx A1 A2 = row_mx (a *: A1) (a *: A2).
-Proof. by split_mxE. Qed.
-
-Lemma scale_col_mx m1 m2 n a (A1 : 'M_(m1, n)) (A2 : 'M_(m2, n)) :
-  a *: col_mx A1 A2 = col_mx (a *: A1) (a *: A2).
-Proof. by split_mxE. Qed.
-
-Lemma scale_block_mx m1 m2 n1 n2 a (Aul : 'M_(m1, n1)) (Aur : 'M_(m1, n2))
-                                   (Adl : 'M_(m2, n1)) (Adr : 'M_(m2, n2)) :
-  a *: block_mx Aul Aur Adl Adr
-     = block_mx (a *: Aul) (a *: Aur) (a *: Adl) (a *: Adr).
-Proof. by rewrite scale_col_mx !scale_row_mx. Qed.
-
-(* Diagonal matrices *)
-
-Lemma diag_mx_is_linear n : linear (@diag_mx R n).
-Proof.
-by move=> a A B; apply/matrixP=> i j; rewrite !mxE mulrnAr mulrnDl.
-Qed.
-HB.instance Definition _ n :=
-  GRing.isLinear.Build R
-    [the lmodType R of 'rV_n] [the zmodType of 'M_n] _ (@diag_mx _ n)
-    (@diag_mx_is_linear n).
-
-Lemma diag_mx_sum_delta n (d : 'rV_n) :
-  diag_mx d = \sum_i d 0 i *: delta_mx i i.
-Proof.
-apply/matrixP=> i j; rewrite summxE (bigD1_ord i) //= !mxE eqxx /=.
-by rewrite eq_sym mulr_natr big1 ?addr0 // => i'; rewrite !mxE eq_liftF mulr0.
-Qed.
-
-Lemma row_diag_mx n (d : 'rV_n) i :
-  row i (diag_mx d) = d 0 i *: delta_mx 0 i.
-Proof. by apply/rowP => j; rewrite !mxE eqxx eq_sym mulr_natr. Qed.
-
 (* Scalar matrix *)
 
 Notation "x %:M" := (scalar_mx x) : ring_scope.
 
 Lemma trmx1 n : (1%:M)^T = 1%:M :> 'M[R]_n. Proof. exact: tr_scalar_mx. Qed.
-
-Lemma scale_scalar_mx n a1 a2 : a1 *: a2%:M = (a1 * a2)%:M :> 'M_n.
-Proof. by apply/matrixP=> i j; rewrite !mxE mulrnAr. Qed.
-
-Lemma scalemx1 n a : a *: 1%:M = a%:M :> 'M_n.
-Proof. by rewrite scale_scalar_mx mulr1. Qed.
-
-Lemma scalar_mx_sum_delta n a : a%:M = \sum_i a *: delta_mx i i :> 'M_n.
-Proof.
-by rewrite -diag_const_mx diag_mx_sum_delta; under eq_bigr do rewrite mxE.
-Qed.
-
-Lemma mx1_sum_delta n : 1%:M = \sum_i delta_mx i i :> 'M_n.
-Proof. by rewrite [1%:M]scalar_mx_sum_delta -scaler_sumr scale1r. Qed.
 
 Lemma row1 n i : row i (1%:M : 'M_n) = delta_mx 0 i.
 Proof. by apply/rowP=> j; rewrite !mxE eq_sym. Qed.
@@ -2486,16 +2383,6 @@ Proof.
 by apply/matrixP=> i k; rewrite !mxE big1 // => j _; rewrite mxE mulr0.
 Qed.
 
-Lemma mulmxN m n p (A : 'M_(m, n)) (B : 'M_(n, p)) : A *m (- B) = - (A *m B).
-Proof.
-by apply/matrixP=> i k; rewrite !mxE -sumrN; under eq_bigr do rewrite mxE mulrN.
-Qed.
-
-Lemma mulNmx m n p (A : 'M_(m, n)) (B : 'M_(n, p)) : - A *m B = - (A *m B).
-Proof.
-by apply/matrixP=> i k; rewrite !mxE -sumrN; under eq_bigr do rewrite mxE mulNr.
-Qed.
-
 Lemma mulmxDl m n p (A1 A2 : 'M_(m, n)) (B : 'M_(n, p)) :
   (A1 + A2) *m B = A1 *m B + A2 *m B.
 Proof.
@@ -2510,14 +2397,6 @@ apply/matrixP=> i k; rewrite !mxE -big_split /=.
 by apply: eq_bigr => j _; rewrite mxE mulrDr.
 Qed.
 
-Lemma mulmxBl m n p (A1 A2 : 'M_(m, n)) (B : 'M_(n, p)) :
-  (A1 - A2) *m B = A1 *m B - A2 *m B.
-Proof. by rewrite mulmxDl mulNmx. Qed.
-
-Lemma mulmxBr m n p (A : 'M_(m, n)) (B1 B2 : 'M_(n, p)) :
-  A *m (B1 - B2) = A *m B1 - A *m B2.
-Proof. by rewrite mulmxDr mulmxN. Qed.
-
 Lemma mulmx_suml m n p (A : 'M_(n, p)) I r P (B_ : I -> 'M_(m, n)) :
    (\sum_(i <- r | P i) B_ i) *m A = \sum_(i <- r | P i) B_ i *m A.
 Proof.
@@ -2529,14 +2408,6 @@ Lemma mulmx_sumr m n p (A : 'M_(m, n)) I r P (B_ : I -> 'M_(n, p)) :
 Proof.
 by apply: (big_morph (mulmx A)) => [B C|]; rewrite ?mulmx0 ?mulmxDr.
 Qed.
-
-Lemma scalemxAl m n p a (A : 'M_(m, n)) (B : 'M_(n, p)) :
-  a *: (A *m B) = (a *: A) *m B.
-Proof.
-apply/matrixP=> i k; rewrite !mxE big_distrr /=.
-by apply: eq_bigr => j _; rewrite mulrA mxE.
-Qed.
-(* Right scaling associativity requires a commutative ring *)
 
 Lemma rowE m n i (A : 'M_(m, n)) : row i A = delta_mx 0 i *m A.
 Proof.
@@ -2556,10 +2427,6 @@ Proof. by split=> [eqAB|->//]; apply/row_matrixP => i; rewrite !rowE eqAB. Qed.
 Lemma row_mul m n p (i : 'I_m) A (B : 'M_(n, p)) :
   row i (A *m B) = row i A *m B.
 Proof. by rewrite !rowE mulmxA. Qed.
-
-Lemma mulmx_sum_row m n (u : 'rV_m) (A : 'M_(m, n)) :
-  u *m A = \sum_i u 0 i *: row i A.
-Proof. by apply/rowP => j /[!(mxE, summxE)]; apply: eq_bigr => i _ /[!mxE]. Qed.
 
 Lemma mxsub_mul m n m' n' p f g (A : 'M_(m, p)) (B : 'M_(p, n)) :
   mxsub f g (A *m B) = rowsub f A *m colsub g B :> 'M_(m', n').
@@ -2607,16 +2474,16 @@ Lemma mulmx_diag n (d e : 'rV_n) :
   diag_mx d *m diag_mx e = diag_mx (\row_j (d 0 j * e 0 j)).
 Proof. by apply/matrixP=> i j; rewrite mul_diag_mx !mxE mulrnAr. Qed.
 
-Lemma mul_scalar_mx m n a (A : 'M_(m, n)) : a%:M *m A = a *: A.
+Lemma scalar_mxM n a b : (a * b)%:M = a%:M *m b%:M :> 'M_n.
 Proof.
-by rewrite -diag_const_mx mul_diag_mx; apply/matrixP=> i j; rewrite !mxE.
+rewrite -[in RHS]diag_const_mx mul_diag_mx.
+by apply/matrixP => i j; rewrite !mxE mulrnAr.
 Qed.
 
-Lemma scalar_mxM n a b : (a * b)%:M = a%:M *m b%:M :> 'M_n.
-Proof. by rewrite mul_scalar_mx scale_scalar_mx. Qed.
-
 Lemma mul1mx m n (A : 'M_(m, n)) : 1%:M *m A = A.
-Proof. by rewrite mul_scalar_mx scale1r. Qed.
+Proof.
+by rewrite -diag_const_mx mul_diag_mx; apply/matrixP => i j; rewrite !mxE mul1r.
+Qed.
 
 Lemma mulmx1 m n (A : 'M_(m, n)) : A *m 1%:M = A.
 Proof.
@@ -2775,22 +2642,6 @@ Lemma pid_mx_id m n p r :
   r <= n -> (pid_mx r : 'M_(m, n)) *m (pid_mx r : 'M_(n, p)) = pid_mx r.
 Proof. by move=> le_r_n; rewrite mul_pid_mx minnn (minn_idPr _). Qed.
 
-Definition copid_mx {n} r : 'M_n := 1%:M - pid_mx r.
-
-Lemma mul_copid_mx_pid m n r :
-  r <= m -> copid_mx r *m pid_mx r = 0 :> 'M_(m, n).
-Proof. by move=> le_r_m; rewrite mulmxBl mul1mx pid_mx_id ?subrr. Qed.
-
-Lemma mul_pid_mx_copid m n r :
-  r <= n -> pid_mx r *m copid_mx r = 0 :> 'M_(m, n).
-Proof. by move=> le_r_n; rewrite mulmxBr mulmx1 pid_mx_id ?subrr. Qed.
-
-Lemma copid_mx_id n r :
-  r <= n -> copid_mx r *m copid_mx r = copid_mx r :> 'M_n.
-Proof.
-by move=> le_r_n; rewrite mulmxBl mul1mx mul_pid_mx_copid // oppr0 addr0.
-Qed.
-
 Lemma pid_mxErow m n (le_mn : m <= n) :
   pid_mx m = rowsub (widen_ord le_mn) 1%:M.
 Proof. by apply/matrixP=> i j; rewrite !mxE -!val_eqE/= ltn_ord andbT. Qed.
@@ -2867,6 +2718,509 @@ Proof. by rewrite !usubmxEsub mul_rowsub_mx. Qed.
 Lemma mul_dsub_mx m k n p (A : 'M_(m + k, n)) (B : 'M_(n, p)) :
   dsubmx A *m B = dsubmx (A *m B).
 Proof. by rewrite !dsubmxEsub mul_rowsub_mx. Qed.
+
+(* The trace *)
+
+Section Trace.
+
+Variable n : nat.
+Local Notation "'\tr' A" := (mxtrace A) : ring_scope.
+
+Lemma mxtrace1 : \tr (1%:M : 'M[R]_n) = n%:R. Proof. exact: mxtrace_scalar. Qed.
+
+End Trace.
+
+(* The matrix ring structure requires a strutural condition (dimension of the *)
+(* form n.+1) to satisfy the nontriviality condition we have imposed.         *)
+Section MatrixSemiRing.
+
+Variable n' : nat.
+Local Notation n := n'.+1.
+
+Lemma matrix_nonzero1 : 1%:M != 0 :> 'M[R]_n.
+Proof. by apply/eqP=> /matrixP/(_ 0 0)/eqP; rewrite !mxE oner_eq0. Qed.
+
+HB.instance Definition _ := GRing.Zsemimodule_isSemiRing.Build 'M[R]_n
+  (@mulmxA n n n n) (@mul1mx n n) (@mulmx1 n n)
+  (@mulmxDl n n n) (@mulmxDr n n n) (@mul0mx n n n) (@mulmx0 n n n)
+  matrix_nonzero1.
+
+Lemma mulmxE : mulmx = *%R. Proof. by []. Qed.
+Lemma idmxE : 1%:M = 1 :> 'M_n. Proof. by []. Qed.
+
+Lemma scalar_mx_is_multiplicative : multiplicative (@scalar_mx R n).
+Proof. by split=> //; apply: scalar_mxM. Qed.
+HB.instance Definition _ :=
+  GRing.isMultiplicative.Build R [the semiRingType of 'M_n] (@scalar_mx _ n)
+    scalar_mx_is_multiplicative.
+
+End MatrixSemiRing.
+
+Section LiftPerm.
+
+(* Block expresssion of a lifted permutation matrix, for the Cormen LUP. *)
+
+Variable n : nat.
+
+(* These could be in zmodp, but that would introduce a dependency on perm. *)
+
+Definition lift0_perm s : 'S_n.+1 := lift_perm 0 0 s.
+
+Lemma lift0_perm0 s : lift0_perm s 0 = 0.
+Proof. exact: lift_perm_id. Qed.
+
+Lemma lift0_perm_lift s k' :
+  lift0_perm s (lift 0 k') = lift (0 : 'I_n.+1) (s k').
+Proof. exact: lift_perm_lift. Qed.
+
+Lemma lift0_permK s : cancel (lift0_perm s) (lift0_perm s^-1).
+Proof. by move=> i; rewrite /lift0_perm -lift_permV permK. Qed.
+
+Lemma lift0_perm_eq0 s i : (lift0_perm s i == 0) = (i == 0).
+Proof. by rewrite (canF_eq (lift0_permK s)) lift0_perm0. Qed.
+
+(* Block expresssion of a lifted permutation matrix *)
+
+Definition lift0_mx A : 'M_(1 + n) := block_mx 1 0 0 A.
+
+Lemma lift0_mx_perm s : lift0_mx (perm_mx s) = perm_mx (lift0_perm s).
+Proof.
+apply/matrixP=> /= i j; rewrite !mxE split1 /=; case: unliftP => [i'|] -> /=.
+  rewrite lift0_perm_lift !mxE split1 /=.
+  by case: unliftP => [j'|] ->; rewrite ?(inj_eq (lift_inj _)) /= !mxE.
+rewrite lift0_perm0 !mxE split1 /=.
+by case: unliftP => [j'|] ->; rewrite /= mxE.
+Qed.
+
+Lemma lift0_mx_is_perm s : is_perm_mx (lift0_mx (perm_mx s)).
+Proof. by rewrite lift0_mx_perm perm_mx_is_perm. Qed.
+
+End LiftPerm.
+
+Lemma exp_block_diag_mx m n (A: 'M_m.+1) (B : 'M_n.+1) k :
+  (block_mx A 0 0 B) ^+ k = block_mx (A ^+ k) 0 0 (B ^+ k).
+Proof.
+elim: k=> [|k IHk]; first by rewrite !expr0 -scalar_mx_block.
+rewrite !exprS IHk [LHS](mulmx_block A _ _ _ (A ^+ k)).
+by rewrite !mulmx0 !mul0mx !add0r !addr0.
+Qed.
+
+End MatrixAlgebra.
+
+Arguments delta_mx {R m n}.
+Arguments perm_mx {R n}.
+Arguments tperm_mx {R n}.
+Arguments pid_mx {R m n}.
+Prenex Implicits diag_mx is_scalar_mx.
+Prenex Implicits mulmx mxtrace.
+
+Arguments mul_delta_mx {R m n p}.
+
+#[global] Hint Extern 0 (is_true (is_diag_mx (scalar_mx _))) =>
+  apply: scalar_mx_is_diag : core.
+#[global] Hint Extern 0 (is_true (is_trig_mx (scalar_mx _))) =>
+  apply: scalar_mx_is_trig : core.
+#[global] Hint Extern 0 (is_true (is_diag_mx (diag_mx _))) =>
+  apply: diag_mx_is_diag : core.
+#[global] Hint Extern 0 (is_true (is_trig_mx (diag_mx _))) =>
+  apply: diag_mx_is_trig : core.
+
+Notation "a %:M" := (scalar_mx a) : ring_scope.
+Notation "A *m B" := (mulmx A B) : ring_scope.
+Notation "\tr A" := (mxtrace A) : ring_scope.
+
+(* Non-commutative transpose requires multiplication in the converse ring.   *)
+Lemma trmx_mul_rev (R : semiRingType) m n p
+    (A : 'M[R]_(m, n)) (B : 'M[R]_(n, p)) :
+  (A *m B)^T = (B : 'M[R^c]_(n, p))^T *m (A : 'M[R^c]_(m, n))^T.
+Proof.
+by apply/matrixP=> k i /[!mxE]; apply: eq_bigr => j _ /[!mxE].
+Qed.
+
+HB.instance Definition _ (M : countZsemimodType) m n :=
+  [Countable of 'M[M]_(m, n) by <:].
+HB.instance Definition _ (R : countSemiRingType) n :=
+  [Countable of 'M[R]_n.+1 by <:].
+
+Section FinZsemimodMatrix.
+Variables (V : finZsemimodType) (m n : nat).
+Local Notation MV := 'M[V]_(m, n).
+
+HB.instance Definition _ := [Finite of MV by <:].
+
+End FinZsemimodMatrix.
+
+#[compress_coercions]
+HB.instance Definition _ (R : finSemiRingType) (m n : nat) :=
+  FinRing.Zsemimodule.on 'M[R]_(m, n).
+
+#[compress_coercions]
+HB.instance Definition _ (R : finSemiRingType) n :=
+  [Finite of 'M[R]_n.+1 by <:].
+
+(* Parametricity over the algebra structure. *)
+Section MapSemiRingMatrix.
+
+Variables (aR rR : semiRingType) (f : {srmorphism aR -> rR}).
+Local Notation "A ^f" := (map_mx f A) : ring_scope.
+
+Section FixedSize.
+
+Variables m n p : nat.
+Implicit Type A : 'M[aR]_(m, n).
+
+Lemma map_mxM A B : (A *m B)^f = A^f *m B^f :> 'M_(m, p).
+Proof.
+apply/matrixP=> i k; rewrite !mxE rmorph_sum //.
+by apply: eq_bigr => j; rewrite !mxE rmorphM.
+Qed.
+
+Lemma map_delta_mx i j : (delta_mx i j)^f = delta_mx i j :> 'M_(m, n).
+Proof. by apply/matrixP=> i' j'; rewrite !mxE rmorph_nat. Qed.
+
+Lemma map_diag_mx d : (diag_mx d)^f = diag_mx d^f :> 'M_n.
+Proof. by apply/matrixP=> i j; rewrite !mxE rmorphMn. Qed.
+
+Lemma map_scalar_mx a : a%:M^f = (f a)%:M :> 'M_n.
+Proof. by apply/matrixP=> i j; rewrite !mxE rmorphMn. Qed.
+
+Lemma map_mx1 : 1%:M^f = 1%:M :> 'M_n.
+Proof. by rewrite map_scalar_mx rmorph1. Qed.
+
+Lemma map_perm_mx (s : 'S_n) : (perm_mx s)^f = perm_mx s.
+Proof. by apply/matrixP=> i j; rewrite !mxE rmorph_nat. Qed.
+
+Lemma map_tperm_mx (i1 i2 : 'I_n) : (tperm_mx i1 i2)^f = tperm_mx i1 i2.
+Proof. exact: map_perm_mx. Qed.
+
+Lemma map_pid_mx r : (pid_mx r)^f = pid_mx r :> 'M_(m, n).
+Proof. by apply/matrixP=> i j; rewrite !mxE rmorph_nat. Qed.
+
+Lemma trace_map_mx (A : 'M_n) : \tr A^f = f (\tr A).
+Proof. by rewrite rmorph_sum; apply: eq_bigr => i _; rewrite mxE. Qed.
+
+End FixedSize.
+
+Lemma map_mx_is_multiplicative n' (n := n'.+1) :
+  multiplicative (map_mx f : 'M_n -> 'M_n).
+Proof. by split; [apply: map_mxM | apply: map_mx1]. Qed.
+
+HB.instance Definition _ n' :=
+  GRing.isMultiplicative.Build
+    [the semiRingType of 'M[aR]_n'.+1] [the semiRingType of 'M[rR]_n'.+1]
+    (map_mx f) (map_mx_is_multiplicative n').
+
+End MapSemiRingMatrix.
+
+Section CommMx.
+(***********************************************************************)
+(************* Commutation property specialized to 'M[R]_n *************)
+(***********************************************************************)
+(* GRing.comm is bound to (non trivial) rings, and matrices form a     *)
+(* (non trivial) ring only when they are square and of manifestly      *)
+(* positive size. However during proofs in endomorphism reduction, we  *)
+(* take restrictions, which are matrices of size #|V| (with V a matrix *)
+(* space) and it becomes cumbersome to state commutation between       *)
+(* restrictions, unless we relax the setting, and this relaxation      *)
+(* corresponds to comm_mx A B := A *m B = B *m A.                      *)
+(* As witnessed by comm_mxE, when A and B have type 'M_n.+1,           *)
+(*   comm_mx A B is convertible to GRing.comm A B.                     *)
+(* The boolean version comm_mxb is designed to be used with seq.allrel *)
+(***********************************************************************)
+
+Context {R : semiRingType} {n : nat}.
+Implicit Types (f g p : 'M[R]_n) (fs : seq 'M[R]_n) (d : 'rV[R]_n) (I : Type).
+
+Definition comm_mx  f g : Prop := f *m g =  g *m f.
+Definition comm_mxb f g : bool := f *m g == g *m f.
+
+Lemma comm_mx_sym f g : comm_mx f g -> comm_mx g f.
+Proof. by rewrite /comm_mx. Qed.
+
+Lemma comm_mx_refl f : comm_mx f f. Proof. by []. Qed.
+
+Lemma comm_mx0 f : comm_mx f 0. Proof. by rewrite /comm_mx mulmx0 mul0mx. Qed.
+Lemma comm0mx f : comm_mx 0 f. Proof. by rewrite /comm_mx mulmx0 mul0mx. Qed.
+
+Lemma comm_mx1 f : comm_mx f 1%:M.
+Proof. by rewrite /comm_mx mulmx1 mul1mx. Qed.
+
+Lemma comm1mx f : comm_mx 1%:M f.
+Proof. by rewrite /comm_mx mulmx1 mul1mx. Qed.
+
+Hint Resolve comm_mx0 comm0mx comm_mx1 comm1mx : core.
+
+Lemma comm_mxD f g g' : comm_mx f g -> comm_mx f g' -> comm_mx f (g + g').
+Proof. by rewrite /comm_mx mulmxDl mulmxDr => -> ->. Qed.
+
+Lemma comm_mxM f g g' : comm_mx f g -> comm_mx f g' -> comm_mx f (g *m g').
+Proof. by rewrite /comm_mx mulmxA => ->; rewrite -!mulmxA => ->. Qed.
+
+Lemma comm_mx_sum I (s : seq I) (P : pred I) (F : I -> 'M[R]_n) (f : 'M[R]_n) :
+  (forall i : I, P i -> comm_mx f (F i)) -> comm_mx f (\sum_(i <- s | P i) F i).
+Proof. by move=> comm_mxfF; elim/big_ind: _ => // g h; apply: comm_mxD. Qed.
+
+Lemma comm_mxP f g : reflect (comm_mx f g) (comm_mxb f g).
+Proof. exact: eqP. Qed.
+
+Notation all_comm_mx fs := (all2rel comm_mxb fs).
+
+Lemma all_comm_mxP fs :
+  reflect {in fs &, forall f g, f *m g = g *m f} (all_comm_mx fs).
+Proof. by apply: (iffP allrelP) => fsP ? ? ? ?; apply/eqP/fsP. Qed.
+
+Lemma all_comm_mx1 f : all_comm_mx [:: f].
+Proof. by rewrite /comm_mxb all2rel1. Qed.
+
+Lemma all_comm_mx2P f g : reflect (f *m g = g *m f) (all_comm_mx [:: f; g]).
+Proof. by rewrite /comm_mxb /= all2rel2 ?eqxx //; exact: eqP. Qed.
+
+Lemma all_comm_mx_cons f fs :
+  all_comm_mx (f :: fs) = all (comm_mxb f) fs && all_comm_mx fs.
+Proof. by rewrite /comm_mxb /= all2rel_cons //= eqxx. Qed.
+
+End CommMx.
+Notation all_comm_mx := (allrel comm_mxb).
+
+Lemma comm_mxE (R : ringType) (n : nat) : @comm_mx R n.+1 = @GRing.comm _.
+Proof. by []. Qed.
+
+Section ComMatrix.
+(* Lemmas for matrices with coefficients in a commutative ring *)
+Variable R : comSemiRingType.
+
+Section AssocLeft.
+
+Variables m n p : nat.
+Implicit Type A : 'M[R]_(m, n).
+Implicit Type B : 'M[R]_(n, p).
+
+Lemma trmx_mul A B : (A *m B)^T = B^T *m A^T.
+Proof.
+rewrite trmx_mul_rev; apply/matrixP=> k i; rewrite !mxE.
+by apply: eq_bigr => j _; rewrite mulrC.
+Qed.
+
+End AssocLeft.
+
+Lemma diag_mxC n (d e : 'rV[R]_n) :
+  diag_mx d *m diag_mx e = diag_mx e *m diag_mx d.
+Proof.
+by rewrite !mulmx_diag; congr (diag_mx _); apply/rowP=> i; rewrite !mxE mulrC.
+Qed.
+
+Lemma diag_mx_comm n (d e : 'rV[R]_n) : comm_mx (diag_mx d) (diag_mx e).
+Proof. exact: diag_mxC. Qed.
+
+Lemma scalar_mxC m n a (A : 'M[R]_(m, n)) : A *m a%:M = a%:M *m A.
+Proof.
+rewrite -!diag_const_mx mul_mx_diag mul_diag_mx.
+by apply/matrixP => i j; rewrite !mxE mulrC.
+Qed.
+
+Lemma comm_mx_scalar n a (A : 'M[R]_n) : comm_mx A a%:M.
+Proof. exact: scalar_mxC. Qed.
+
+Lemma comm_scalar_mx n a (A : 'M[R]_n) : comm_mx a%:M A.
+Proof. exact/comm_mx_sym/comm_mx_scalar. Qed.
+
+Lemma mxtrace_mulC m n (A : 'M[R]_(m, n)) B :
+   \tr (A *m B) = \tr (B *m A).
+Proof.
+have expand_trM C D: \tr (C *m D) = \sum_i \sum_j C i j * D j i.
+  by apply: eq_bigr => i _; rewrite mxE.
+rewrite !{}expand_trM exchange_big /=.
+by do 2!apply: eq_bigr => ? _; apply: mulrC.
+Qed.
+
+End ComMatrix.
+
+Arguments comm_mx_scalar {R n}.
+Arguments comm_scalar_mx {R n}.
+Arguments diag_mx_comm {R n}.
+
+HB.instance Definition _ (R : finComSemiRingType) (n' : nat) :=
+  [Finite of 'M[R]_n'.+1 by <:].
+
+#[global] Hint Resolve comm_mx_scalar comm_scalar_mx : core.
+
+Section MatrixAlgebra.
+
+Variable R : ringType.
+
+Section RingModule.
+
+(* The ring module/vector space structure *)
+
+Variables m n : nat.
+Implicit Types A B : 'M[R]_(m, n).
+
+Local Notation "x *m: A" := (scalemx x A) (at level 40) : ring_scope.
+
+HB.instance Definition _ := GRing.Zmodule_isLmodule.Build R 'M[R]_(m, n)
+  (@scalemxA R m n) (@scale1mx R m n) (@scalemxDr R m n) (@scalemxDl R m n).
+
+Lemma scalemx_const a b : a *: const_mx b = const_mx (a * b).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma matrix_sum_delta A :
+  A = \sum_(i < m) \sum_(j < n) A i j *: delta_mx i j.
+Proof.
+apply/matrixP=> i j.
+rewrite summxE (bigD1_ord i) // summxE (bigD1_ord j) //= !mxE !eqxx mulr1.
+rewrite !big1 ?addr0 //= => [i' | j'] _.
+  by rewrite summxE big1// => j' _; rewrite !mxE eq_liftF mulr0.
+by rewrite !mxE eqxx eq_liftF mulr0.
+Qed.
+
+End RingModule.
+
+Section StructuralLinear.
+
+Lemma swizzle_mx_is_scalable m n p q f g k :
+  scalable (@swizzle_mx R m n p q f g k).
+Proof. by move=> a A; apply/matrixP=> i j; rewrite !mxE. Qed.
+HB.instance Definition _ m n p q f g k :=
+  GRing.isScalable.Build R
+    [the lmodType R of 'M[R]_(m, n)] [the zmodType of 'M[R]_(p, q)]
+    *:%R (swizzle_mx f g k)
+    (swizzle_mx_is_scalable f g k).
+
+Local Notation SwizzleLin op := (GRing.Linear.copy op (swizzle_mx _ _ _)).
+
+HB.instance Definition _ m n := SwizzleLin (@trmx R m n).
+HB.instance Definition _ m n i := SwizzleLin (@row R m n i).
+HB.instance Definition _ m n j := SwizzleLin (@col R m n j).
+HB.instance Definition _ m n i := SwizzleLin (@row' R m n i).
+HB.instance Definition _ m n j := SwizzleLin (@col' R m n j).
+HB.instance Definition _ m n m' n' f g := SwizzleLin (@mxsub R m n m' n' f g).
+HB.instance Definition _ m n s := SwizzleLin (@row_perm R m n s).
+HB.instance Definition _ m n s := SwizzleLin (@col_perm R m n s).
+HB.instance Definition _ m n i1 i2 := SwizzleLin (@xrow R m n i1 i2).
+HB.instance Definition _ m n j1 j2 := SwizzleLin (@xcol R m n j1 j2).
+HB.instance Definition _ m n1 n2 := SwizzleLin (@lsubmx R m n1 n2).
+HB.instance Definition _ m n1 n2 := SwizzleLin (@rsubmx R m n1 n2).
+HB.instance Definition _ m1 m2 n := SwizzleLin (@usubmx R m1 m2 n).
+HB.instance Definition _ m1 m2 n := SwizzleLin (@dsubmx R m1 m2 n).
+
+HB.instance Definition _ m n := SwizzleLin (@vec_mx R m n).
+Definition mxvec_is_scalable m n := can2_scalable (@vec_mxK R m n) mxvecK.
+HB.instance Definition _ m n :=
+  GRing.isScalable.Build R
+    [the lmodType R of 'M_(m, n)] [the zmodType of 'rV_(m * n)] *:%R mxvec
+    (@mxvec_is_scalable m n).
+
+End StructuralLinear.
+
+Lemma row_sum_delta n (u : 'rV_n) : u = \sum_(j < n) u 0 j *: delta_mx 0 j.
+Proof. by rewrite {1}[u]matrix_sum_delta big_ord1. Qed.
+
+Ltac split_mxE := apply/matrixP=> i j; do ![rewrite mxE | case: split => ?].
+
+Lemma scale_row_mx m n1 n2 a (A1 : 'M_(m, n1)) (A2 : 'M_(m, n2)) :
+  a *: row_mx A1 A2 = row_mx (a *: A1) (a *: A2).
+Proof. by split_mxE. Qed.
+
+Lemma scale_col_mx m1 m2 n a (A1 : 'M_(m1, n)) (A2 : 'M_(m2, n)) :
+  a *: col_mx A1 A2 = col_mx (a *: A1) (a *: A2).
+Proof. by split_mxE. Qed.
+
+Lemma scale_block_mx m1 m2 n1 n2 a (Aul : 'M_(m1, n1)) (Aur : 'M_(m1, n2))
+                                   (Adl : 'M_(m2, n1)) (Adr : 'M_(m2, n2)) :
+  a *: block_mx Aul Aur Adl Adr
+     = block_mx (a *: Aul) (a *: Aur) (a *: Adl) (a *: Adr).
+Proof. by rewrite scale_col_mx !scale_row_mx. Qed.
+
+(* Diagonal matrices *)
+
+Lemma diag_mx_is_linear n : linear (@diag_mx R n).
+Proof.
+by move=> a A B; apply/matrixP=> i j; rewrite !mxE mulrnAr mulrnDl.
+Qed.
+HB.instance Definition _ n :=
+  GRing.isLinear.Build R
+    [the lmodType R of 'rV_n] [the zmodType of 'M_n] _ (@diag_mx _ n)
+    (@diag_mx_is_linear n).
+
+Lemma diag_mx_sum_delta n (d : 'rV_n) :
+  diag_mx d = \sum_i d 0 i *: delta_mx i i.
+Proof.
+apply/matrixP=> i j; rewrite summxE (bigD1_ord i) //= !mxE eqxx /=.
+by rewrite eq_sym mulr_natr big1 ?addr0 // => i'; rewrite !mxE eq_liftF mulr0.
+Qed.
+
+Lemma row_diag_mx n (d : 'rV_n) i :
+  row i (diag_mx d) = d 0 i *: delta_mx 0 i.
+Proof. by apply/rowP => j; rewrite !mxE eqxx eq_sym mulr_natr. Qed.
+
+(* Scalar matrix *)
+
+Lemma scale_scalar_mx n a1 a2 : a1 *: a2%:M = (a1 * a2)%:M :> 'M_n.
+Proof. by apply/matrixP=> i j; rewrite !mxE mulrnAr. Qed.
+
+Lemma scalemx1 n a : a *: 1%:M = a%:M :> 'M_n.
+Proof. by rewrite scale_scalar_mx mulr1. Qed.
+
+Lemma scalar_mx_sum_delta n a : a%:M = \sum_i a *: delta_mx i i :> 'M_n.
+Proof.
+by rewrite -diag_const_mx diag_mx_sum_delta; under eq_bigr do rewrite mxE.
+Qed.
+
+Lemma mx1_sum_delta n : 1%:M = \sum_i delta_mx i i :> 'M[R]_n.
+Proof. by rewrite [1%:M]scalar_mx_sum_delta -scaler_sumr scale1r. Qed.
+
+Lemma mulmxN m n p (A : 'M[R]_(m, n)) (B : 'M_(n, p)) : A *m (- B) = - (A *m B).
+Proof.
+by apply/matrixP=> i k; rewrite !mxE -sumrN; under eq_bigr do rewrite mxE mulrN.
+Qed.
+
+Lemma mulNmx m n p (A : 'M[R]_(m, n)) (B : 'M_(n, p)) : - A *m B = - (A *m B).
+Proof.
+by apply/matrixP=> i k; rewrite !mxE -sumrN; under eq_bigr do rewrite mxE mulNr.
+Qed.
+
+Lemma mulmxBl m n p (A1 A2 : 'M[R]_(m, n)) (B : 'M_(n, p)) :
+  (A1 - A2) *m B = A1 *m B - A2 *m B.
+Proof. by rewrite mulmxDl mulNmx. Qed.
+
+Lemma mulmxBr m n p (A : 'M[R]_(m, n)) (B1 B2 : 'M_(n, p)) :
+  A *m (B1 - B2) = A *m B1 - A *m B2.
+Proof. by rewrite mulmxDr mulmxN. Qed.
+
+Lemma scalemxAl m n p a (A : 'M_(m, n)) (B : 'M_(n, p)) :
+  a *: (A *m B) = (a *: A) *m B.
+Proof.
+apply/matrixP=> i k; rewrite !mxE big_distrr /=.
+by apply: eq_bigr => j _; rewrite mulrA mxE.
+Qed.
+(* Right scaling associativity requires a commutative ring *)
+
+Lemma mulmx_sum_row m n (u : 'rV_m) (A : 'M_(m, n)) :
+  u *m A = \sum_i u 0 i *: row i A.
+Proof. by apply/rowP => j /[!(mxE, summxE)]; apply: eq_bigr => i _ /[!mxE]. Qed.
+
+Lemma mul_scalar_mx m n a (A : 'M_(m, n)) : a%:M *m A = a *: A.
+Proof.
+by rewrite -diag_const_mx mul_diag_mx; apply/matrixP=> i j; rewrite !mxE.
+Qed.
+
+(* Partial identity matrix (used in rank decomposition). *)
+
+Definition copid_mx {n} r : 'M[R]_n := 1%:M - pid_mx r.
+
+Lemma mul_copid_mx_pid m n r :
+  r <= m -> copid_mx r *m pid_mx r = 0 :> 'M_(m, n).
+Proof. by move=> le_r_m; rewrite mulmxBl mul1mx pid_mx_id ?subrr. Qed.
+
+Lemma mul_pid_mx_copid m n r :
+  r <= n -> pid_mx r *m copid_mx r = 0 :> 'M_(m, n).
+Proof. by move=> le_r_n; rewrite mulmxBr mulmx1 pid_mx_id ?subrr. Qed.
+
+Lemma copid_mx_id n r :
+  r <= n -> copid_mx r *m copid_mx r = copid_mx r :> 'M_n.
+Proof.
+by move=> le_r_n; rewrite mulmxBl mul1mx mul_pid_mx_copid // oppr0 addr0.
+Qed.
 
 (* Correspondence between matrices and linear function on row vectors. *)
 Section LinRowVector.
@@ -2966,8 +3320,6 @@ HB.instance Definition _ :=
 Lemma mxtraceZ a (A : 'M_n) : \tr (a *: A) = a * \tr A.
 Proof. exact: scalarZ. Qed.
 
-Lemma mxtrace1 : \tr (1%:M : 'M[R]_n) = n%:R. Proof. exact: mxtrace_scalar. Qed.
-
 End Trace.
 
 (* The matrix ring structure requires a strutural condition (dimension of the *)
@@ -2977,73 +3329,13 @@ Section MatrixRing.
 Variable n' : nat.
 Local Notation n := n'.+1.
 
-Lemma matrix_nonzero1 : 1%:M != 0 :> 'M[R]_n.
-Proof. by apply/eqP=> /matrixP/(_ 0 0)/eqP; rewrite !mxE oner_eq0. Qed.
-
-HB.instance Definition _ := GRing.Zmodule_isRing.Build 'M[R]_n (@mulmxA n n n n)
-  (@mul1mx n n) (@mulmx1 n n) (@mulmxDl n n n) (@mulmxDr n n n) matrix_nonzero1.
+HB.instance Definition _ := GRing.SemiRing.on 'M[R]_n.
 HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build R 'M[R]_n
   (@scalemxAl n n n).
 
-Lemma mulmxE : mulmx = *%R. Proof. by []. Qed.
-Lemma idmxE : 1%:M = 1 :> 'M_n. Proof. by []. Qed.
-
-Lemma scalar_mx_is_multiplicative : multiplicative (@scalar_mx R n).
-Proof. by split=> //; apply: scalar_mxM. Qed.
-HB.instance Definition _ :=
-  GRing.isMultiplicative.Build R [the ringType of 'M_n] (@scalar_mx _ n)
-    scalar_mx_is_multiplicative.
+HB.instance Definition _ := GRing.SRMorphism.on (@scalar_mx R n).
 
 End MatrixRing.
-
-Section LiftPerm.
-
-(* Block expresssion of a lifted permutation matrix, for the Cormen LUP. *)
-
-Variable n : nat.
-
-(* These could be in zmodp, but that would introduce a dependency on perm. *)
-
-Definition lift0_perm s : 'S_n.+1 := lift_perm 0 0 s.
-
-Lemma lift0_perm0 s : lift0_perm s 0 = 0.
-Proof. exact: lift_perm_id. Qed.
-
-Lemma lift0_perm_lift s k' :
-  lift0_perm s (lift 0 k') = lift (0 : 'I_n.+1) (s k').
-Proof. exact: lift_perm_lift. Qed.
-
-Lemma lift0_permK s : cancel (lift0_perm s) (lift0_perm s^-1).
-Proof. by move=> i; rewrite /lift0_perm -lift_permV permK. Qed.
-
-Lemma lift0_perm_eq0 s i : (lift0_perm s i == 0) = (i == 0).
-Proof. by rewrite (canF_eq (lift0_permK s)) lift0_perm0. Qed.
-
-(* Block expresssion of a lifted permutation matrix *)
-
-Definition lift0_mx A : 'M_(1 + n) := block_mx 1 0 0 A.
-
-Lemma lift0_mx_perm s : lift0_mx (perm_mx s) = perm_mx (lift0_perm s).
-Proof.
-apply/matrixP=> /= i j; rewrite !mxE split1 /=; case: unliftP => [i'|] -> /=.
-  rewrite lift0_perm_lift !mxE split1 /=.
-  by case: unliftP => [j'|] ->; rewrite ?(inj_eq (lift_inj _)) /= !mxE.
-rewrite lift0_perm0 !mxE split1 /=.
-by case: unliftP => [j'|] ->; rewrite /= mxE.
-Qed.
-
-Lemma lift0_mx_is_perm s : is_perm_mx (lift0_mx (perm_mx s)).
-Proof. by rewrite lift0_mx_perm perm_mx_is_perm. Qed.
-
-End LiftPerm.
-
-Lemma exp_block_diag_mx m n (A: 'M_m.+1) (B : 'M_n.+1) k :
-  (block_mx A 0 0 B) ^+ k = block_mx (A ^+ k) 0 0 (B ^+ k).
-Proof.
-elim: k=> [|k IHk]; first by rewrite !expr0 -scalar_mx_block.
-rewrite !exprS IHk [LHS](mulmx_block A _ _ _ (A ^+ k)).
-by rewrite !mulmx0 !mul0mx !add0r !addr0.
-Qed.
 
 (* Determinants and adjugates are defined here, but most of their properties *)
 (* only hold for matrices over a commutative ring, so their theory is        *)
@@ -3063,39 +3355,13 @@ Definition adjugate n (A : 'M_n) := \matrix[adjugate_key]_(i, j) cofactor A j i.
 
 End MatrixAlgebra.
 
-Arguments delta_mx {R m n}.
-Arguments perm_mx {R n}.
-Arguments tperm_mx {R n}.
-Arguments pid_mx {R m n}.
 Arguments copid_mx {R n}.
 Arguments lin_mulmxr {R m n p}.
-Prenex Implicits diag_mx is_scalar_mx.
-Prenex Implicits mulmx mxtrace determinant cofactor adjugate.
+Prenex Implicits determinant cofactor adjugate.
 
-Arguments mul_delta_mx {R m n p}.
-
-#[global] Hint Extern 0 (is_true (is_diag_mx (scalar_mx _))) =>
-  apply: scalar_mx_is_diag : core.
-#[global] Hint Extern 0 (is_true (is_trig_mx (scalar_mx _))) =>
-  apply: scalar_mx_is_trig : core.
-#[global] Hint Extern 0 (is_true (is_diag_mx (diag_mx _))) =>
-  apply: diag_mx_is_diag : core.
-#[global] Hint Extern 0 (is_true (is_trig_mx (diag_mx _))) =>
-  apply: diag_mx_is_trig : core.
-
-Notation "a %:M" := (scalar_mx a) : ring_scope.
-Notation "A *m B" := (mulmx A B) : ring_scope.
 Arguments mulmxr {_ _ _ _} B A /.
-Notation "\tr A" := (mxtrace A) : ring_scope.
 Notation "'\det' A" := (determinant A) : ring_scope.
 Notation "'\adj' A" := (adjugate A) : ring_scope.
-
-(* Non-commutative transpose requires multiplication in the converse ring.   *)
-Lemma trmx_mul_rev (R : ringType) m n p (A : 'M[R]_(m, n)) (B : 'M[R]_(n, p)) :
-  (A *m B)^T = (B : 'M[R^c]_(n, p))^T *m (A : 'M[R^c]_(m, n))^T.
-Proof.
-by apply/matrixP=> k i /[!mxE]; apply: eq_bigr => j _ /[!mxE].
-Qed.
 
 HB.instance Definition _ (M : countZmodType) m n :=
   [Countable of 'M[M]_(m, n) by <:].
@@ -3135,36 +3401,6 @@ Implicit Type A : 'M[aR]_(m, n).
 Lemma map_mxZ a A : (a *: A)^f = f a *: A^f.
 Proof. by apply/matrixP=> i j; rewrite !mxE rmorphM. Qed.
 
-Lemma map_mxM A B : (A *m B)^f = A^f *m B^f :> 'M_(m, p).
-Proof.
-apply/matrixP=> i k; rewrite !mxE rmorph_sum //.
-by apply: eq_bigr => j; rewrite !mxE rmorphM.
-Qed.
-
-Lemma map_delta_mx i j : (delta_mx i j)^f = delta_mx i j :> 'M_(m, n).
-Proof. by apply/matrixP=> i' j'; rewrite !mxE rmorph_nat. Qed.
-
-Lemma map_diag_mx d : (diag_mx d)^f = diag_mx d^f :> 'M_n.
-Proof. by apply/matrixP=> i j; rewrite !mxE rmorphMn. Qed.
-
-Lemma map_scalar_mx a : a%:M^f = (f a)%:M :> 'M_n.
-Proof. by apply/matrixP=> i j; rewrite !mxE rmorphMn. Qed.
-
-Lemma map_mx1 : 1%:M^f = 1%:M :> 'M_n.
-Proof. by rewrite map_scalar_mx rmorph1. Qed.
-
-Lemma map_perm_mx (s : 'S_n) : (perm_mx s)^f = perm_mx s.
-Proof. by apply/matrixP=> i j; rewrite !mxE rmorph_nat. Qed.
-
-Lemma map_tperm_mx (i1 i2 : 'I_n) : (tperm_mx i1 i2)^f = tperm_mx i1 i2.
-Proof. exact: map_perm_mx. Qed.
-
-Lemma map_pid_mx r : (pid_mx r)^f = pid_mx r :> 'M_(m, n).
-Proof. by apply/matrixP=> i j; rewrite !mxE rmorph_nat. Qed.
-
-Lemma trace_map_mx (A : 'M_n) : \tr A^f = f (\tr A).
-Proof. by rewrite rmorph_sum; apply: eq_bigr => i _; rewrite mxE. Qed.
-
 Lemma det_map_mx n' (A : 'M_n') : \det A^f = f (\det A).
 Proof.
 rewrite rmorph_sum //; apply: eq_bigr => s _.
@@ -3183,18 +3419,13 @@ End FixedSize.
 Lemma map_copid_mx n r : (copid_mx r)^f = copid_mx r :> 'M_n.
 Proof. by rewrite map_mxB map_mx1 map_pid_mx. Qed.
 
-Lemma map_mx_is_multiplicative n' (n := n'.+1) :
-  multiplicative (map_mx f : 'M_n -> 'M_n).
-Proof. by split; [apply: map_mxM | apply: map_mx1]. Qed.
-
-HB.instance Definition _ n' :=
-  GRing.isMultiplicative.Build 'M[aR]_n'.+1 'M[rR]_n'.+1 (map_mx f)
-    (map_mx_is_multiplicative n').
+HB.instance Definition _ n' := GRing.SRMorphism.on (@map_mx _ _ f n'.+1 n'.+1).
 
 Lemma map_lin1_mx m n (g : 'rV_m -> 'rV_n) gf :
   (forall v, (g v)^f = gf v^f) -> (lin1_mx g)^f = lin1_mx gf.
 Proof.
-by move=> def_gf; apply/matrixP=> i j; rewrite !mxE -map_delta_mx -def_gf mxE.
+move=> def_gf; apply/matrixP => i j; rewrite !mxE.
+by rewrite -(map_delta_mx f) -def_gf mxE.
 Qed.
 
 Lemma map_lin_mx m1 n1 m2 n2 (g : 'M_(m1, n1) -> 'M_(m2, n2)) gf :
@@ -3210,82 +3441,21 @@ Section CommMx.
 (***********************************************************************)
 (************* Commutation property specialized to 'M[R]_n *************)
 (***********************************************************************)
-(* GRing.comm is bound to (non trivial) rings, and matrices form a     *)
-(* (non trivial) ring only when they are square and of manifestly      *)
-(* positive size. However during proofs in endomorphism reduction, we  *)
-(* take restrictions, which are matrices of size #|V| (with V a matrix *)
-(* space) and it becomes cumbersome to state commutation between       *)
-(* restrictions, unless we relax the setting, and this relaxation      *)
-(* corresponds to comm_mx A B := A *m B = B *m A.                      *)
-(* As witnessed by comm_mxE, when A and B have type 'M_n.+1,           *)
-(*   comm_mx A B is convertible to GRing.comm A B.                     *)
-(* The boolean version comm_mxb is designed to be used with seq.allrel *)
+(* See comment on top of SemiRing section CommMx above.                *)
 (***********************************************************************)
 
 Context {R : ringType} {n : nat}.
 Implicit Types (f g p : 'M[R]_n) (fs : seq 'M[R]_n) (d : 'rV[R]_n) (I : Type).
-
-Definition comm_mx  f g : Prop := f *m g =  g *m f.
-Definition comm_mxb f g : bool := f *m g == g *m f.
-
-Lemma comm_mx_sym f g : comm_mx f g -> comm_mx g f.
-Proof. by rewrite /comm_mx. Qed.
-
-Lemma comm_mx_refl f : comm_mx f f. Proof. by []. Qed.
-
-Lemma comm_mx0 f : comm_mx f 0. Proof. by rewrite /comm_mx mulmx0 mul0mx. Qed.
-Lemma comm0mx f : comm_mx 0 f. Proof. by rewrite /comm_mx mulmx0 mul0mx. Qed.
-
-Lemma comm_mx1 f : comm_mx f 1%:M.
-Proof. by rewrite /comm_mx mulmx1 mul1mx. Qed.
-
-Lemma comm1mx f : comm_mx 1%:M f.
-Proof. by rewrite /comm_mx mulmx1 mul1mx. Qed.
-
-Hint Resolve comm_mx0 comm0mx comm_mx1 comm1mx : core.
 
 Lemma comm_mxN f g : comm_mx f g -> comm_mx f (- g).
 Proof. by rewrite /comm_mx mulmxN mulNmx => ->. Qed.
 
 Lemma comm_mxN1 f : comm_mx f (- 1%:M). Proof. exact/comm_mxN/comm_mx1. Qed.
 
-Lemma comm_mxD f g g' : comm_mx f g -> comm_mx f g' -> comm_mx f (g + g').
-Proof. by rewrite /comm_mx mulmxDl mulmxDr => -> ->. Qed.
-
 Lemma comm_mxB f g g' : comm_mx f g -> comm_mx f g' -> comm_mx f (g - g').
 Proof. by move=> fg fg'; apply/comm_mxD => //; apply/comm_mxN. Qed.
 
-Lemma comm_mxM f g g' : comm_mx f g -> comm_mx f g' -> comm_mx f (g *m g').
-Proof. by rewrite /comm_mx mulmxA => ->; rewrite -!mulmxA => ->. Qed.
-
-Lemma comm_mx_sum I (s : seq I) (P : pred I) (F : I -> 'M[R]_n) (f : 'M[R]_n) :
-  (forall i : I, P i -> comm_mx f (F i)) -> comm_mx f (\sum_(i <- s | P i) F i).
-Proof. by move=> comm_mxfF; elim/big_ind: _ => // g h; apply: comm_mxD. Qed.
-
-Lemma comm_mxP f g : reflect (comm_mx f g) (comm_mxb f g).
-Proof. exact: eqP. Qed.
-
-Notation all_comm_mx fs := (all2rel comm_mxb fs).
-
-Lemma all_comm_mxP fs :
-  reflect {in fs &, forall f g, f *m g = g *m f} (all_comm_mx fs).
-Proof. by apply: (iffP allrelP) => fsP ? ? ? ?; apply/eqP/fsP. Qed.
-
-Lemma all_comm_mx1 f : all_comm_mx [:: f].
-Proof. by rewrite /comm_mxb all2rel1. Qed.
-
-Lemma all_comm_mx2P f g : reflect (f *m g = g *m f) (all_comm_mx [:: f; g]).
-Proof. by rewrite /comm_mxb /= all2rel2 ?eqxx //; exact: eqP. Qed.
-
-Lemma all_comm_mx_cons f fs :
-  all_comm_mx (f :: fs) = all (comm_mxb f) fs && all_comm_mx fs.
-Proof. by rewrite /comm_mxb /= all2rel_cons //= eqxx. Qed.
-
 End CommMx.
-Notation all_comm_mx := (allrel comm_mxb).
-
-Lemma comm_mxE (R : ringType) (n : nat) : @comm_mx R n.+1 = @GRing.comm _.
-Proof. by []. Qed.
 
 Section ComMatrix.
 (* Lemmas for matrices with coefficients in a commutative ring *)
@@ -3296,12 +3466,6 @@ Section AssocLeft.
 Variables m n p : nat.
 Implicit Type A : 'M[R]_(m, n).
 Implicit Type B : 'M[R]_(n, p).
-
-Lemma trmx_mul A B : (A *m B)^T = B^T *m A^T.
-Proof.
-rewrite trmx_mul_rev; apply/matrixP=> k i; rewrite !mxE.
-by apply: eq_bigr => j _; rewrite mulrC.
-Qed.
 
 Lemma scalemxAr a A B : a *: (A *m B) = A *m (a *: B).
 Proof. by apply: trmx_inj; rewrite trmx_mul !linearZ /= trmx_mul scalemxAl. Qed.
@@ -3369,37 +3533,8 @@ HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build R 'M[R]_n
 
 End MatrixAlgType.
 
-Lemma diag_mxC n (d e : 'rV[R]_n) :
-  diag_mx d *m diag_mx e = diag_mx e *m diag_mx d.
-Proof.
-by rewrite !mulmx_diag; congr (diag_mx _); apply/rowP=> i; rewrite !mxE mulrC.
-Qed.
-
-Lemma diag_mx_comm n (d e : 'rV[R]_n) : comm_mx (diag_mx d) (diag_mx e).
-Proof. exact: diag_mxC. Qed.
-
-Lemma scalar_mxC m n a (A : 'M[R]_(m, n)) : A *m a%:M = a%:M *m A.
-Proof.
-by apply: trmx_inj; rewrite trmx_mul tr_scalar_mx !mul_scalar_mx linearZ.
-Qed.
-
 Lemma mul_mx_scalar m n a (A : 'M[R]_(m, n)) : A *m a%:M = a *: A.
 Proof. by rewrite scalar_mxC mul_scalar_mx. Qed.
-
-Lemma comm_mx_scalar n a (A : 'M[R]_n) : comm_mx A a%:M.
-Proof. by rewrite /comm_mx mul_mx_scalar mul_scalar_mx. Qed.
-
-Lemma comm_scalar_mx n a (A : 'M[R]_n) : comm_mx a%:M A.
-Proof. exact/comm_mx_sym/comm_mx_scalar. Qed.
-
-Lemma mxtrace_mulC m n (A : 'M[R]_(m, n)) B :
-   \tr (A *m B) = \tr (B *m A).
-Proof.
-have expand_trM C D: \tr (C *m D) = \sum_i \sum_j C i j * D j i.
-  by apply: eq_bigr => i _; rewrite mxE.
-rewrite !{}expand_trM exchange_big /=.
-by do 2!apply: eq_bigr => ? _; apply: mulrC.
-Qed.
 
 (* The theory of determinants *)
 
@@ -3637,14 +3772,9 @@ End ComMatrix.
 
 Arguments lin_mul_row {R m n} u.
 Arguments lin_mulmx {R m n p} A.
-Arguments comm_mx_scalar {R n}.
-Arguments comm_scalar_mx {R n}.
-Arguments diag_mx_comm {R n}.
 
 HB.instance Definition _ (R : finComRingType) (n' : nat) :=
   [Finite of 'M[R]_n'.+1 by <:].
-
-#[global] Hint Resolve comm_mx_scalar comm_scalar_mx : core.
 
 (*****************************************************************************)
 (********************** Matrix unit ring and inverse matrices ****************)
