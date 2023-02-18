@@ -2710,7 +2710,7 @@ case/memmx_sumsP=> A_ -> R_A; pose A2_ i := vec_mx (row i <<R2>>%MS).
 pose A1_ i := mxvec (A_ i) *m pinvmx (R1 *m lin_mx (mulmxr (A2_ i))) *m R1.
 exists (vec_mx \o A1_) => [i|]; first by rewrite vec_mxK submxMl.
 exists A2_ => [i|]; first by rewrite vec_mxK -(genmxE R2) row_sub.
-apply: eq_bigr => i _; rewrite -[_ *m _](mx_rV_lin [linear of mulmxr _]).
+apply: eq_bigr => i _; rewrite -[_ *m _](mx_rV_lin [linear of mulmxr (A2_ i)]).
 by rewrite -mulmxA mulmxKpV ?mxvecK // -(genmxE (_ *m _)) R_A.
 Qed.
 Arguments mulsmxP {m1 m2 n A R1 R2}.
@@ -2815,7 +2815,7 @@ Lemma cent_mx_fun_is_linear : linear cent_mx_fun.
 Proof.
 move=> a A B; apply/row_matrixP=> i; rewrite linearP row_mul mul_rV_lin.
 rewrite /= [row i _ as v in a *: v]row_mul mul_rV_lin row_mul mul_rV_lin.
-by rewrite -linearP -(linearP [linear of mulmx _ \- mulmxr _]).
+by rewrite -linearP -(linearP [linear of mulmx (vec_mx (row i R)) \- mulmxr _]).
 Qed.
 HB.instance Definition _ :=
   GRing.isLinear.Build F
