@@ -2456,7 +2456,7 @@ have{cBcE} cBncEn A: centgmx rGn A -> A *m Bn = Bn *m A.
   rewrite -defAij row_mul -defAij -!mulmxA (cent_mxP cBcE) {k}//.
   rewrite memmx_cent_envelop; apply/centgmxP=> x Gx; apply/row_matrixP=> k.
   rewrite !row_mul !rowE !{}defAij /= -row_mul mulmxA mul_delta_mx.
-  congr (row i _); rewrite -(mul_vec_lin [linear of mulmxr _]) -mulmxA.
+  congr (row i _); rewrite -(mul_vec_lin [linear of mulmxr (rG x)]) -mulmxA.
   by rewrite -(centgmxP cAG) // mulmxA mx_rV_lin.
 suffices redGn: mx_completely_reducible rGn 1%:M.
   have [V modV defUV] := redGn _ modU (submx1 _); move/mxdirect_addsP=> dxUV.
@@ -4604,7 +4604,7 @@ case: (pickP [pred x in G | ~~ is_scalar_mx (rG x)]) => [x | scalG].
     by rewrite -order_dvdn order_dvdG.
   case/idPn; rewrite -mxrank_eq0 -(factor_Xn_sub_1 ozG).
   elim: #|G| => [|i IHi]; first by rewrite big_nil horner_mx_C mxrank1.
-  rewrite big_nat_recr //= rmorphM mxrankMfree {IHi}//.
+  rewrite big_nat_recr => [|//]; rewrite rmorphM mxrankMfree {IHi}//.
   rewrite row_free_unit rmorphB /= horner_mx_X horner_mx_C.
   rewrite (mx_Schur irrG) ?subr_eq0 //; last first.
     by apply: contraNneq nscal_rGx => ->; apply: scalar_mx_is_scalar.
@@ -5139,7 +5139,7 @@ case uB: (B \is a GRing.unit); last by rewrite invr_out ?uB ?horner_mx_mem.
 have defAd: Ad = Ad *m m B *m m B^-1.
   apply/row_matrixP=> i.
   by rewrite !row_mul mul_rV_lin /= mx_rV_lin /= mulmxK ?vec_mxK.
-rewrite -[B^-1]mul1mx -(mul_vec_lin [linear of mulmxr _]) defAd submxMr //.
+rewrite -[B^-1]mul1mx -(mul_vec_lin [linear of mulmxr B^-1]) defAd submxMr //.
 rewrite -mxval_gen1 (submx_trans (horner_mx_mem _ _)) // {1}defAd.
 rewrite -(geq_leqif (mxrank_leqif_sup _)) ?mxrankM_maxl // -{}defAd.
 apply/row_subP=> i; rewrite row_mul rowK mul_vec_lin /= -{2}[A]horner_mx_X.
