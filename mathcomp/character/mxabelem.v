@@ -746,7 +746,7 @@ Qed.
 Lemma mxsimple_abelem_subg U : mxsimple rHG U <-> mxsimple rH U.
 Proof.
 have eq_modH := mxmodule_abelem_subg; rewrite /mxsimple eq_modH.
-by split=> [] [-> -> minU]; split=> // V; have:= minU V; rewrite eq_modH.
+by split=> [] [-> -> minU]; split=> [//|//|V]; have:= minU V; rewrite eq_modH.
 Qed.
 
 End SubGroup.
@@ -798,7 +798,7 @@ have{irrG faithfulG cGz1} Urz1: rG z - 1%:M \in unitmx.
   by rewrite !inE Gz mul1mx -order_eq1 ozp -implybNN neq_ltn orbC prime_gt1.
 do [case: n n_gt0 => // n' _; set n := n'.+1] in rG Urz1 *.
 have charMp: p \in [char 'M[F]_n].
-  exact: (rmorph_char [rmorphism of scalar_mx]).
+  exact: (rmorph_char [rmorphism of @scalar_mx F n]).
 have{Urz1}: Frobenius_aut charMp (rG z - 1) \in GRing.unit by rewrite unitrX.
 rewrite (Frobenius_autB_comm _ (commr1 _)) Frobenius_aut1.
 by rewrite -[_ (rG z)](repr_mxX rG) // -ozp expg_order repr_mx1 subrr unitr0.
