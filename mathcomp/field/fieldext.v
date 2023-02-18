@@ -1386,7 +1386,7 @@ have unitM : GRing.ComUnitRing_isField cuL.
   by rewrite modp_mull add0r.
 pose feL : fieldExtType F := HB.pack vL aL cuL unitM.
 exists feL; first by rewrite dimvf; apply: mul1n.
-exists [linear of toPF as rVpoly].
+exists [linear of toPF as @rVpoly F n].
 have tol_lin: linear toL by move=> a q1 q2; rewrite -linearP -modpZl -modpD.
 have tol_mul : multiplicative (toL : {poly F} -> aL).
   by split=> [q r|];
