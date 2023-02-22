@@ -872,6 +872,14 @@ Proof. by rewrite big_const -iteropE. Qed.
 Lemma sumr_const_nat m n x : \sum_(n <= i < m) x = x *+ (m - n).
 Proof. by rewrite big_const_nat iter_addr_0. Qed.
 
+Section ClosedPredicates.
+
+Variable S : {pred V}.
+
+Definition addr_closed := 0 \in S /\ {in S &, forall u v, u + v \in S}.
+
+End ClosedPredicates.
+
 End ZsemimoduleTheory.
 
 HB.mixin Record Zsemimodule_isZmodule V of Zsemimodule V := {
@@ -1032,7 +1040,6 @@ Section ClosedPredicates.
 
 Variable S : {pred V}.
 
-Definition addr_closed := 0 \in S /\ {in S &, forall u v, u + v \in S}.
 Definition oppr_closed := {in S, forall u, - u \in S}.
 Definition subr_2closed := {in S &, forall u v, u - v \in S}.
 Definition zmod_closed := 0 \in S /\ subr_2closed.
@@ -1040,7 +1047,7 @@ Definition zmod_closed := 0 \in S /\ subr_2closed.
 Lemma zmod_closedN : zmod_closed -> oppr_closed.
 Proof. by case=> S0 SB y Sy; rewrite -sub0r !SB. Qed.
 
-Lemma zmod_closedD : zmod_closed -> addr_closed.
+Lemma zmod_closedD : zmod_closed -> addr_closed S.
 Proof.
 by case=> S0 SB; split=> // y z Sy Sz; rewrite -[z]opprK -[- z]sub0r !SB.
 Qed.
@@ -4802,7 +4809,7 @@ HB.mixin Record isOppClosed (V : zmodType) (S : {pred V}) := {
   rpredNr : oppr_closed S
 }.
 
-HB.mixin Record isAddClosed (V : zmodType) (S : {pred V}) := {
+HB.mixin Record isAddClosed (V : zsemimodType) (S : {pred V}) := {
   rpred0D : addr_closed S
 }.
 
@@ -4984,9 +4991,9 @@ HB.instance Definition _ := isSubalgClosed.Build R A S
   (divalg_closedZ divalg_closed_subproof).
 HB.end.
 
-Section ZmodulePred.
+Section ZsemimodulePred.
 
-Variables (V : zmodType).
+Variables (V : zsemimodType).
 
 Section Add.
 
@@ -5006,6 +5013,12 @@ Lemma rpredMn n : {in S, forall u, u *+ n \in S}.
 Proof. by move=> u Su; rewrite -(card_ord n) -sumr_const rpred_sum. Qed.
 
 End Add.
+
+End ZsemimodulePred.
+
+Section ZmodulePred.
+
+Variables (V : zmodType).
 
 Section Opp.
 
@@ -5236,24 +5249,66 @@ End FieldPred.
 (* remove uses of program definition *)
 Obligation Tactic := idtac.
 
+HB.mixin Record isSubZsemimodule (V : zsemimodType) (S : pred V) U
+    of Sub V S U & Zsemimodule U := {
+  valD_subproof : semi_additive (val : U -> V);
+}.
+
+#[short(type="subZsemimodType")]
+HB.structure Definition SubZsemimodule (V : zsemimodType) S :=
+  { U of SubChoice V S U & Zsemimodule U & isSubZsemimodule V S U }.
+
+Section additive.
+Context (V : zsemimodType) (S : pred V) (U : SubZsemimodule.type S).
+Notation val := (val : U -> V).
+#[export]
+HB.instance Definition _ := isSemiAdditive.Build U V val valD_subproof.
+Lemma valD : {morph val : x y / x + y}. Proof. exact: raddfD. Qed.
+Lemma val0 : val 0 = 0. Proof. exact: raddf0. Qed.
+End additive.
+
+HB.factory Record SubChoice_isSubZsemimodule (V : zsemimodType) S U
+    of SubChoice V S U := {
+  addr_closed_subproof : addr_closed S
+}.
+
+HB.builders Context V S U of SubChoice_isSubZsemimodule V S U.
+
+HB.instance Definition _ := isAddClosed.Build V S addr_closed_subproof.
+
+Let inU v Sv : U := sub v Sv.
+Let zeroU := inU (rpred0 (AddClosed.clone V S _)).
+Let addU (u1 u2 : U) := inU (rpredD (valP u1) (valP u2)).
+
+Program Definition zmodU := @isZsemimodule.Build U zeroU addU _ _ _.
+Next Obligation. by move=> x y z; apply: val_inj; rewrite !subK addrA. Qed.
+Next Obligation. by move=> x y; apply: val_inj; rewrite !subK addrC. Qed.
+Next Obligation. by move=> x; apply: val_inj; rewrite !subK add0r. Qed.
+HB.instance Definition _ := zmodU.
+
+Lemma val0 : (val : U -> V) 0 = 0. Proof. by rewrite !subK. Qed.
+Lemma valD : semi_additive (val : U -> V).
+Proof. by split=> [|x y]; rewrite !subK. Qed.
+HB.instance Definition _ := isSubZsemimodule.Build V S U valD.
+HB.end.
+
 Implicit Type V : zmodType.
 
-HB.mixin Record isSubZmodule V (S : pred V) U of Sub V S U & Zmodule U := {
+HB.mixin Record isSubZmodule V (S : pred V) U
+    of SubZsemimodule V S U & Zmodule U := {
   valB_subproof : additive (val : U -> V);
 }.
 
 #[short(type="subZmodType")]
 HB.structure Definition SubZmodule V S :=
-  { U of SubChoice V S U & Zmodule U & isSubZmodule V S U }.
+  { U of SubZsemimodule V S U & Zmodule U & isSubZmodule V S U }.
 
 Section additive.
 Context V (S : pred V) (U : SubZmodule.type S).
 Notation val := (val : U -> V).
 #[export]
 HB.instance Definition _ := isAdditive.Build U V val valB_subproof.
-Lemma valD : {morph val : x y / x + y}. Proof. exact: raddfD. Qed.
 Lemma valB : {morph val : x y / x - y}. Proof. exact: raddfB. Qed.
-Lemma val0 : val 0 = 0. Proof. exact: raddf0. Qed.
 Lemma valN : {morph val : x / - x}. Proof. exact: raddfN. Qed.
 End additive.
 
@@ -5277,9 +5332,13 @@ Next Obligation. by move=> x; apply: val_inj; rewrite !subK add0r. Qed.
 Next Obligation. by move=> x; apply: val_inj; rewrite !subK addNr. Qed.
 HB.instance Definition _ := zmodU.
 
-Lemma valD : additive (val : U -> V).
-Proof. by move=> x y /=; rewrite !subK. Qed.
-HB.instance Definition _ := isSubZmodule.Build V S U valD.
+Lemma valD : semi_additive (val : U -> V).
+Proof. by split=> [|x y]; rewrite !subK. Qed.
+HB.instance Definition _ := isSubZsemimodule.Build V S U valD.
+
+Lemma valB : additive (val : U -> V).
+Proof. by move=> x y; rewrite !subK. Qed.
+HB.instance Definition _ := isSubZmodule.Build V S U valB.
 HB.end.
 
 HB.mixin Record isSubRing (R : ringType) (S : pred R) U
@@ -5590,6 +5649,10 @@ HB.end.
 
 Module SubExports.
 
+Notation "[ 'SubChoice_isSubZsemimodule' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubZsemimodule.Build _ _ U rpred0D)
+  (at level 0, format "[ 'SubChoice_isSubZsemimodule'  'of'  U  'by'  <: ]")
+  : form_scope.
 Notation "[ 'SubChoice_isSubZmodule' 'of' U 'by' <: ]" :=
   (SubChoice_isSubZmodule.Build _ _ U (zmodClosedP _))
   (at level 0, format "[ 'SubChoice_isSubZmodule'  'of'  U  'by'  <: ]")
