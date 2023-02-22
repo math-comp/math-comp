@@ -336,7 +336,7 @@ by rewrite !ltnS leqnSn ltn_eqF//; apply => //; rewrite expr1n.
 Qed.
 
 Lemma prim2_rootN1 (F : fieldType) : 2%:R != 0 :> F ->
-   2.-primitive_root (- 1 : F).
+  2.-primitive_root (- 1 : F).
 Proof.
 move=> tow_neq0; apply/'forall_eqP => -[[|[|]]]//= _; last first.
   by apply/unity_rootP; rewrite -signr_odd.

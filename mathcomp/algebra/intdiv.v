@@ -1120,8 +1120,8 @@ Proof.
 move=> p_prime qN1 Ndvd_pql Ndvd_pq0 dvd_pq.
 have qN0 : q != 0 by rewrite -lead_coef_eq0; apply: contraNneq Ndvd_pql => ->.
 split.
-   rewrite size_map_poly_id0 ?intr_eq0 ?lead_coef_eq0//.
-   by rewrite ltn_neqAle eq_sym qN1 size_poly_gt0.
+  rewrite size_map_poly_id0 ?intr_eq0 ?lead_coef_eq0//.
+  by rewrite ltn_neqAle eq_sym qN1 size_poly_gt0.
 move=> f' +/dvdpP_rat_int[f [d dN0 feq]]; rewrite {f'}feq size_scale// => fN1.
 move=> /= [g q_eq]; rewrite q_eq (eqp_trans (eqp_scale _ _))//.
 have fN0 : f != 0 by apply: contra_neq qN0; rewrite q_eq => ->; rewrite mul0r.

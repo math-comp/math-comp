@@ -3205,7 +3205,7 @@ by rewrite coprimep_expl// coprimep_sym coprimep_XsubC.
 Qed.
 
 Lemma mupM x q1 q2 : q1 != 0 -> q2 != 0 ->
-   mup x (q1 * q2) = (mup x q1 + mup x q2)%N.
+  mup x (q1 * q2) = (mup x q1 + mup x q2)%N.
 Proof.
 move=> q1N0 q2N0; apply/eqP; rewrite eqn_leq mup_leq ?mulf_neq0//.
 rewrite mup_geq ?mulf_neq0// exprD ?dvdp_mul; do ?by rewrite -mup_geq.
@@ -3217,7 +3217,7 @@ by rewrite dvdp_XsubCl rootM negb_or r1Nx r2Nx.
 Qed.
 
 Lemma mu_prod_XsubC x (s : seq F) :
-   mup x (\prod_(x <- s) ('X - x%:P)) = count_mem x s.
+  mup x (\prod_(x <- s) ('X - x%:P)) = count_mem x s.
 Proof.
 elim: s => [|y s IHs]; rewrite (big_cons, big_nil)/=.
   by rewrite mupNroot// root1.

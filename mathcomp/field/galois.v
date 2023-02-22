@@ -86,7 +86,7 @@ Lemma splitting_ahom (F : fieldType) (L L' : fieldExtType F)
 Proof.
 do [suff init (p : {poly L}) (k : {subfield L})
     (K := [FalgType F of subvs_of k]) (f : 'AHom(K, L')) :
-    p \is a polyOver k ->  splittingFieldFor k p fullv ->
+    p \is a polyOver k -> splittingFieldFor k p fullv ->
     splittingFieldFor (limg f) (p ^ (f \o vsproj k)) E' ->
       {g : 'AHom(L, L') | limg g = E'}] in p *.
   move=> pf pE'; pose K := [FalgType F of subvs_of (1%VS : {vspace L})].
