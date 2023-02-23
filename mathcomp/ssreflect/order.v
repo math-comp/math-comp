@@ -27,6 +27,7 @@ From mathcomp Require Import finset.
 (*        tbLatticeType d == latticeType with both a top and a bottom         *)
 (*     distrLatticeType d == the type of distributive lattices                *)
 (*    bDistrLatticeType d == distrLatticeType with a bottom element           *)
+(*    tDistrLatticeType d == distrLatticeType with a top element              *)
 (*   tbDistrLatticeType d == distrLatticeType with both a top and a bottom    *)
 (*   cbDistrLatticeType d == the type of sectionally complemented distributive*)
 (*                           lattices                                         *)
@@ -63,7 +64,7 @@ From mathcomp Require Import finset.
 (*   @Order.join        disp T x y == x `|` y (in order_scope)                *)
 (* For bLatticeType T                                                         *)
 (*   @Order.bottom      disp T     == 0       (in order_scope)                *)
-(* For tbLatticeType T                                                        *)
+(* For tLatticeType T                                                         *)
 (*   @Order.top         disp T     == 1       (in order_scope)                *)
 (* For cbDistrLatticeType T                                                   *)
 (*   @Order.sub         disp T x y == x `|` y (in order_scope)                *)
@@ -1473,15 +1474,18 @@ HB.mixin Record hasTop d (T : Type) of POrder d T := {
 (* HB.structure Definition TPOrder d := { T of hasBottom d T & POrder d T }. *)
 (* HB.structure Definition TLattice d := { T of hasTop d T & Lattice d T }. *)
 (* HB.structure Definition TBOrder d := { T of hasTop d T & BPOrder d T }. *)
+#[short(type="tLatticeType")]
+HB.structure Definition TLattice d := { T of hasTop d T & Lattice d T }.
+
 #[short(type="tbLatticeType")]
-HB.structure Definition TBLattice d := { T of hasTop d T & BLattice d T }.
+HB.structure Definition TBLattice d := { T of BLattice d T & TLattice d T }.
 
 Module TBLatticeExports.
 (* FIXME: clone? *)
 End TBLatticeExports.
 HB.export TBLatticeExports.
 
-Module TBLatticeSyntax.
+Module TLatticeSyntax.
 
 Notation "1" := top : order_scope.
 
@@ -1510,8 +1514,8 @@ Notation "\meet_ ( i 'in' A | P ) F" :=
 Notation "\meet_ ( i 'in' A ) F" :=
  (\big[meet/1]_(i in A) F%O) : order_scope.
 
-End TBLatticeSyntax.
-HB.export TBLatticeSyntax.
+End TLatticeSyntax.
+HB.export TLatticeSyntax.
 
 (* TODO: rename to lattice_ismeet_distributive ? *)
 #[key="T"]
@@ -3757,7 +3761,7 @@ Proof. by move=> x; rewrite joinC join0x. Qed.
 Lemma join_eq0 x y : (x `|` y == 0) = (x == 0) && (y == 0).
 Proof.
 apply/idP/idP; last by move=> /andP [/eqP-> /eqP->]; rewrite joinx0.
-by move=> /eqP xUy0; rewrite -!lex0 -!xUy0 ?leUl ?leUr.
+by move=> /eqP xUy0; rewrite -!lex0 -xUy0 leUl leUr.
 Qed.
 
 Variant eq0_xor_gt0 x : bool -> bool -> Set :=
@@ -3829,8 +3833,6 @@ Module Import DualTBLattice.
 Section DualTBLattice.
 Context {disp : unit} {L : tbLatticeType disp}.
 
-Lemma lex1 (x : L) : x <= top. Proof. exact: lex1. Qed.
-
 HB.instance Definition _ := hasBottom.Build _ L^d lex1.
 (* FIXME: BUG? *)
 (* HB.instance Definition _ := TBLattice.on L^d. *)
@@ -3845,32 +3847,101 @@ HB.instance Definition _ d (T : finLatticeType d) := FinLattice.on T^d.
 
 End DualTBLattice.
 
-Module Import TBLatticeTheory.
-Section TBLatticeTheory.
-Context {disp : unit} {L : tbLatticeType disp}.
+Module Import TLatticeTheory.
+Section TLatticeTheory.
+Context {disp : unit} {L : tLatticeType disp}.
 Implicit Types (I : finType) (T : eqType) (x y : L).
 
 Local Notation "1" := top.
 
-Hint Resolve le0x lex1 : core.
+Lemma lex1 (x : L) : x <= top. Proof. exact: lex1. Qed.
+
+Hint Resolve lex1 : core.
 
 Lemma meetx1 : right_id 1 (@meet _ L).
-Proof. exact: (@joinx0 _ [the tbLatticeType _ of L^d]). Qed.
+Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
 
 Lemma meet1x : left_id 1 (@meet _ L).
-Proof. exact: (@join0x _ [the tbLatticeType _ of L^d]). Qed.
+Proof. by move=> x; apply/eqP; rewrite meetC meetx1. Qed.
 
 Lemma joinx1 : right_zero 1 (@join _ L).
-Proof. exact: (@meetx0 _ [the tbLatticeType _ of L^d]). Qed.
+Proof. by move=> x; apply/eqP; rewrite -leEjoin. Qed.
 
 Lemma join1x : left_zero 1 (@join _ L).
-Proof. exact: (@meet0x _ [the tbLatticeType _ of L^d]). Qed.
+Proof. by move=> x; apply/eqP; rewrite joinC joinx1. Qed.
 
 Lemma le1x x : (1 <= x) = (x == 1).
-Proof. exact: (@lex0 _ [the tbLatticeType _ of L^d]). Qed.
+Proof. by rewrite le_eqVlt (le_gtF (lex1 _)) eq_sym; case: eqP. Qed.
 
 Lemma meet_eq1 x y : (x `&` y == 1) = (x == 1) && (y == 1).
-Proof. exact: (@join_eq0 _ [the tbLatticeType _ of L^d]). Qed.
+Proof.
+apply/idP/idP; last by move=> /andP[/eqP-> /eqP->]; rewrite meetx1.
+by move=> /eqP xIy1; rewrite -!le1x -xIy1 leIl leIr.
+Qed.
+
+HB.instance Definition _ := Monoid.isComLaw.Build L 1 meet
+  (@meetA _ L) (@meetC _ L) meet1x.
+
+HB.instance Definition _ := Monoid.isMulLaw.Build L 1 join join1x joinx1.
+
+Lemma meets_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
+  x \in r -> P x -> \meet_(i <- r | P i) F i <= F x.
+Proof. by move=> xr Px; rewrite (big_rem x) ?Px //= leIl. Qed.
+
+Lemma meets_max_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (u : L) :
+  x \in r -> P x -> F x <= u -> \meet_(x <- r | P x) F x <= u.
+Proof. move=> ? ?; apply: le_trans; exact: meets_inf_seq. Qed.
+
+Lemma meets_inf I (j : I) (P : {pred I}) (F : I -> L) :
+   P j -> \meet_(i | P i) F i <= F j.
+Proof. exact: meets_inf_seq. Qed.
+
+Lemma meets_max I (j : I) (u : L) (P : {pred I}) (F : I -> L) :
+   P j -> F j <= u -> \meet_(i | P i) F i <= u.
+Proof. exact: meets_max_seq. Qed.
+
+Lemma meets_ge J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
+  (forall x : J, P x -> u <= F x) -> u <= \meet_(x <- r | P x) F x.
+Proof. by move=> leFm; elim/big_rec: _ => // i x Px xu; rewrite lexI leFm. Qed.
+
+Lemma meetsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (l : L) :
+  reflect (forall x : T, x \in r -> P x -> l <= F x)
+          (l <= \meet_(x <- r | P x) F x).
+Proof.
+apply: (iffP idP) => leFm => [x xr Px|].
+  exact/(le_trans leFm)/meets_inf_seq.
+by rewrite big_seq_cond meets_ge// => x /andP[/leFm].
+Qed.
+
+Lemma meetsP I (l : L) (P : {pred I}) (F : I -> L) :
+   reflect (forall i : I, P i -> l <= F i) (l <= \meet_(i | P i) F i).
+Proof. by apply: (iffP (meetsP_seq _ _ _ _)) => H ? ?; apply: H. Qed.
+
+Lemma le_meets I (A B : {set I}) (F : I -> L) :
+   A \subset B -> \meet_(i in B) F i <= \meet_(i in A) F i.
+Proof. by move=> /subsetP AB; apply/meetsP => i iA; apply/meets_inf/AB. Qed.
+
+Lemma meets_setU I (A B : {set I}) (F : I -> L) :
+   \meet_(i in (A :|: B)) F i = \meet_(i in A) F i `&` \meet_(i in B) F i.
+Proof.
+rewrite -!big_enum; have /= <- := @big_cat _ _ [the Monoid.com_law _ of meet].
+apply/eq_big_idem; first exact: meetxx.
+by move=> ?; rewrite mem_cat !mem_enum inE.
+Qed.
+
+Lemma meets_seq I (r : seq I) (F : I -> L) :
+   \meet_(i <- r) F i = \meet_(i in r) F i.
+Proof.
+by rewrite -big_enum; apply/eq_big_idem => ?; rewrite /= ?meetxx ?mem_enum.
+Qed.
+
+End TLatticeTheory.
+
+End TLatticeTheory.
+
+Module Import TBLatticeTheory.
+Section TBLatticeTheory.
+Context {disp : unit} {L : tbLatticeType disp}.
 
 HB.instance Definition _ := Monoid.isComLaw.Build L 1 meet
   (@meetA _ L) (@meetC _ L) meet1x.
@@ -3878,47 +3949,6 @@ HB.instance Definition _ := Monoid.isComLaw.Build L 1 meet
 HB.instance Definition _ := Monoid.isMulLaw.Build L 0 meet
   (@meet0x _ L) (@meetx0 _ _).
 HB.instance Definition _ := Monoid.isMulLaw.Build L 1 join join1x joinx1.
-
-Lemma meets_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
-  x \in r -> P x -> \meet_(i <- r | P i) F i <= F x.
-Proof. exact: (@joins_sup_seq _ [the tbLatticeType _ of L^d]). Qed.
-
-Lemma meets_max_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (u : L) :
-  x \in r -> P x -> F x <= u -> \meet_(x <- r | P x) F x <= u.
-Proof. exact: (@joins_min_seq _ [the tbLatticeType _ of L^d]). Qed.
-
-Lemma meets_inf I (j : I) (P : {pred I}) (F : I -> L) :
-   P j -> \meet_(i | P i) F i <= F j.
-Proof. exact: (@joins_sup _ [the tbLatticeType _ of L^d]). Qed.
-
-Lemma meets_max I (j : I) (u : L) (P : {pred I}) (F : I -> L) :
-   P j -> F j <= u -> \meet_(i | P i) F i <= u.
-Proof. exact: (@joins_min _ [the tbLatticeType _ of L^d]). Qed.
-
-Lemma meets_ge J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
-  (forall x : J, P x -> u <= F x) -> u <= \meet_(x <- r | P x) F x.
-Proof. exact: (@joins_le _ [the tbLatticeType _ of L^d]). Qed.
-
-Lemma meetsP I (l : L) (P : {pred I}) (F : I -> L) :
-   reflect (forall i : I, P i -> l <= F i) (l <= \meet_(i | P i) F i).
-Proof. exact: (@joinsP _ [the tbLatticeType _ of L^d]). Qed.
-
-Lemma meetsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (l : L) :
-  reflect (forall x : T, x \in r -> P x -> l <= F x)
-          (l <= \meet_(x <- r | P x) F x).
-Proof. exact: (@joinsP_seq _ [the tbLatticeType _ of L^d]). Qed.
-
-Lemma le_meets I (A B : {set I}) (F : I -> L) :
-   A \subset B -> \meet_(i in B) F i <= \meet_(i in A) F i.
-Proof. exact: (@le_joins _ [the tbLatticeType _ of L^d]). Qed.
-
-Lemma meets_setU I (A B : {set I}) (F : I -> L) :
-   \meet_(i in (A :|: B)) F i = \meet_(i in A) F i `&` \meet_(i in B) F i.
-Proof. exact: (@joins_setU _ [the tbLatticeType _ of L^d]). Qed.
-
-Lemma meets_seq I (r : seq I) (F : I -> L) :
-   \meet_(i <- r) F i = \meet_(i in r) F i.
-Proof. exact: (@joins_seq _ [the tbLatticeType _ of L^d]). Qed.
 
 End TBLatticeTheory.
 
@@ -7130,7 +7160,7 @@ Module Syntax.
 Export POSyntax.
 Export LatticeSyntax.
 Export BLatticeSyntax.
-Export TBLatticeSyntax.
+Export TLatticeSyntax.
 Export CBDistrLatticeSyntax.
 Export CTBDistrLatticeSyntax.
 Export DualSyntax.
@@ -7147,6 +7177,7 @@ Export LatticeTheoryMeet.
 Export LatticeTheoryJoin.
 Export DistrLatticeTheory.
 Export BLatticeTheory.
+Export TLatticeTheory.
 Export DualTBLattice.
 Export TBLatticeTheory.
 Export BDistrLatticeTheory.
