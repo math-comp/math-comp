@@ -1033,6 +1033,22 @@ Reserved Notation "\join^p_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
            format "'[' \join^p_ ( i  'in'  A ) '/  '  F ']'").
 
+Reserved Notation "'{' 'omorphism' U '->' V '}'"
+  (at level 0, U at level 98, V at level 99,
+   format "{ 'omorphism'  U  ->  V }").
+Reserved Notation "'{' 'lmorphism' U '->' V '}'"
+  (at level 0, U at level 98, V at level 99,
+   format "{ 'lmorphism'  U  ->  V }").
+Reserved Notation "'{' 'blmorphism' U '->' V '}'"
+  (at level 0, U at level 98, V at level 99,
+   format "{ 'blmorphism'  U  ->  V }").
+Reserved Notation "'{' 'tlmorphism' U '->' V '}'"
+  (at level 0, U at level 98, V at level 99,
+   format "{ 'tlmorphism'  U  ->  V }").
+Reserved Notation "'{' 'tblmorphism' U '->' V '}'"
+  (at level 0, U at level 98, V at level 99,
+   format "{ 'tblmorphism'  U  ->  V }").
+
 Module Order.
 
 (**************)
@@ -4744,6 +4760,267 @@ Notation IsoDistrLatticeMixin d T := (IsoDistrLattice d T).
 End CanExports.
 Export CanExports.
 
+(* Morphism hierarchy. *)
+
+Definition order_morphism d (T : porderType d) d' (T' : porderType d')
+  (f : T -> T') : Prop := {mono f : x y / x <= y}.
+
+HB.mixin Record isOrderMorphism d (T : porderType d) d' (T' : porderType d')
+    (apply : T -> T') := {
+  omorph_le_subproof : order_morphism apply;
+}.
+
+#[infer(T,T')]
+HB.structure Definition OrderMorphism d (T : porderType d)
+  d' (T' : porderType d') := {f of isOrderMorphism d T d' T' f}.
+
+Module OrderMorphismExports.
+Notation "{ 'omorphism' T -> T' }" :=
+  (OrderMorphism.type _ T%type _ T'%type) : type_scope.
+Notation "[ 'omorphism' 'of' f 'as' g ]" :=
+  (OrderMorphism.clone _ _ _ _ f%function g)
+  (at level 0, format "[ 'omorphism'  'of'  f  'as'  g ]") : form_scope.
+Notation "[ 'omorphism' 'of' f ]" :=
+  (OrderMorphism.clone _ _ _ _ f%function _)
+  (at level 0, format "[ 'omorphism'  'of'  f ]") : form_scope.
+End OrderMorphismExports.
+HB.export OrderMorphismExports.
+
+Module Import OrderMorphismTheory.
+Section OrderMorphismTheory.
+
+Section Properties.
+
+Variables (d : unit) (T : porderType d) (d' : unit) (T' : porderType d').
+Variables (f : {omorphism T -> T'}).
+
+Lemma omorph_le : {mono f : x y / x <= y}.
+Proof. exact: omorph_le_subproof. Qed.
+
+Lemma omorph_inj : injective f.
+Proof. by move=> x y fxfy; apply: le_anti; rewrite -!omorph_le fxfy lexx. Qed.
+
+Lemma omorph_lt : {mono f : x y / x < y}.
+Proof. move=> x y; rewrite !lt_def omorph_le inj_eq//; exact: omorph_inj. Qed.
+
+End Properties.
+
+Section IdCompFun.
+
+Variables (d : unit) (T : porderType d) (d' : unit) (T' : porderType d').
+Variables (d'' : unit) (T'' : porderType d'').
+Variables (f : {omorphism T' -> T''}) (g : {omorphism T -> T'}).
+
+Fact idfun_is_order_morphism : order_morphism (@idfun T).
+Proof. by []. Qed.
+#[export]
+HB.instance Definition _ := isOrderMorphism.Build d T d T idfun
+  idfun_is_order_morphism.
+
+Fact comp_is_order_morphism : order_morphism (f \o g).
+Proof. by move=> x y; rewrite /= !omorph_le. Qed.
+#[export]
+HB.instance Definition _ := isOrderMorphism.Build d T d'' T'' (f \o g)
+  comp_is_order_morphism.
+
+End IdCompFun.
+
+End OrderMorphismTheory.
+End OrderMorphismTheory.
+
+Definition meet_morphism d (T : latticeType d) d' (T' : latticeType d')
+  (f : T -> T') : Prop := {morph f : x y / x `&` y}.
+
+Definition join_morphism d (T : latticeType d) d' (T' : latticeType d')
+  (f : T -> T') : Prop := {morph f : x y / x `|` y}.
+
+HB.mixin Record isLatticeMorphism d (T : latticeType d) d' (T' : latticeType d')
+    (apply : T -> T') := {
+  omorphI_subproof : meet_morphism apply;
+  omorphU_subproof : join_morphism apply;
+}.
+
+#[infer(T,T')]
+HB.structure Definition LatticeMorphism d (T : latticeType d)
+    d' (T' : latticeType d') :=
+  {f of isLatticeMorphism d T d' T' f & @OrderMorphism d T d' T' f}.
+
+Module LatticeMorphismExports.
+Notation "{ 'lmorphism' T -> T' }" :=
+  (LatticeMorphism.type _ T%type _ T'%type) : type_scope.
+Notation "[ 'lmorphism' 'of' f 'as' g ]" :=
+  (LatticeMorphism.clone _ _ _ _ f%function g)
+  (at level 0, format "[ 'lmorphism'  'of'  f  'as'  g ]") : form_scope.
+Notation "[ 'lmorphism' 'of' f ]" :=
+  (LatticeMorphism.clone _ _ _ _ f%function _)
+  (at level 0, format "[ 'lmorphism'  'of'  f ]") : form_scope.
+End LatticeMorphismExports.
+HB.export LatticeMorphismExports.
+
+Module Import LatticeMorphismTheory.
+Section LatticeMorphismTheory.
+
+Section Properties.
+
+Variables (d : unit) (T : latticeType d) (d' : unit) (T' : latticeType d').
+Variables (f : {lmorphism T -> T'}).
+
+Lemma omorphI : {morph f : x y / x `&` y}.
+Proof. exact: omorphI_subproof. Qed.
+
+Lemma omorphU : {morph f : x y / x `|` y}.
+Proof. exact: omorphU_subproof. Qed.
+
+End Properties.
+
+Section IdCompFun.
+
+Variables (d : unit) (T : latticeType d) (d' : unit) (T' : latticeType d').
+Variables (d'' : unit) (T'' : latticeType d'').
+Variables (f : {lmorphism T' -> T''}) (g : {lmorphism T -> T'}).
+
+Fact idfun_is_meet_morphism : meet_morphism (@idfun T). Proof. by []. Qed.
+Fact idfun_is_join_morphism : join_morphism (@idfun T). Proof. by []. Qed.
+#[export]
+HB.instance Definition _ := isLatticeMorphism.Build d T d T idfun
+  idfun_is_meet_morphism idfun_is_join_morphism.
+
+Fact comp_is_meet_morphism : meet_morphism (f \o g).
+Proof. by move=> x y; rewrite /= !omorphI. Qed.
+Fact comp_is_join_morphism : join_morphism (f \o g).
+Proof. by move=> x y; rewrite /= !omorphU. Qed.
+#[export]
+HB.instance Definition _ := isLatticeMorphism.Build d T d'' T'' (f \o g)
+  comp_is_meet_morphism comp_is_join_morphism.
+
+End IdCompFun.
+
+End LatticeMorphismTheory.
+End LatticeMorphismTheory.
+
+HB.mixin Record isBLatticeMorphism d (T : bLatticeType d)
+    d' (T' : bLatticeType d') (apply : T -> T') := {
+  omorph0_subproof : apply 0 = 0;
+}.
+
+HB.mixin Record isTLatticeMorphism d (T : tLatticeType d)
+    d' (T' : tLatticeType d') (apply : T -> T') := {
+  omorph1_subproof : apply 1 = 1;
+}.
+
+#[infer(T,T')]
+HB.structure Definition BLatticeMorphism d (T : bLatticeType d)
+    d' (T' : bLatticeType d') :=
+  {f of isBLatticeMorphism d T d' T' f & @LatticeMorphism d T d' T' f}.
+
+#[infer(T,T')]
+HB.structure Definition TLatticeMorphism d (T : tLatticeType d)
+    d' (T' : tLatticeType d') :=
+  {f of isTLatticeMorphism d T d' T' f & @LatticeMorphism d T d' T' f}.
+
+#[infer(T,T')]
+HB.structure Definition TBLatticeMorphism d (T : tbLatticeType d)
+    d' (T' : tbLatticeType d') :=
+  {f of @BLatticeMorphism d T d' T' f & @TLatticeMorphism d T d' T' f}.
+
+Module TBLatticeMorphismExports.
+Notation "{ 'blmorphism' T -> T' }" :=
+  (BLatticeMorphism.type _ T%type _ T'%type) : type_scope.
+Notation "[ 'blmorphism' 'of' f 'as' g ]" :=
+  (BLatticeMorphism.clone _ _ _ _ f%function g)
+  (at level 0, format "[ 'blmorphism'  'of'  f  'as'  g ]") : form_scope.
+Notation "[ 'blmorphism' 'of' f ]" :=
+  (BLatticeMorphism.clone _ _ _ _ f%function _)
+  (at level 0, format "[ 'blmorphism'  'of'  f ]") : form_scope.
+Notation "{ 'tlmorphism' T -> T' }" :=
+  (TLatticeMorphism.type _ T%type _ T'%type) : type_scope.
+Notation "[ 'tlmorphism' 'of' f 'as' g ]" :=
+  (TLatticeMorphism.clone _ _ _ _ f%function g)
+  (at level 0, format "[ 'tlmorphism'  'of'  f  'as'  g ]") : form_scope.
+Notation "[ 'tlmorphism' 'of' f ]" :=
+  (TLatticeMorphism.clone _ _ _ _ f%function _)
+  (at level 0, format "[ 'tlmorphism'  'of'  f ]") : form_scope.
+Notation "{ 'tblmorphism' T -> T' }" :=
+  (TBLatticeMorphism.type _ T%type _ T'%type) : type_scope.
+Notation "[ 'tblmorphism' 'of' f 'as' g ]" :=
+  (TBLatticeMorphism.clone _ _ _ _ f%function g)
+  (at level 0, format "[ 'tblmorphism'  'of'  f  'as'  g ]") : form_scope.
+Notation "[ 'tblmorphism' 'of' f ]" :=
+  (TBLatticeMorphism.clone _ _ _ _ f%function _)
+  (at level 0, format "[ 'tblmorphism'  'of'  f ]") : form_scope.
+End TBLatticeMorphismExports.
+HB.export TBLatticeMorphismExports.
+
+Module Import BLatticeMorphismTheory.
+Section BLatticeMorphismTheory.
+
+Section Properties.
+
+Variables (d : unit) (T : bLatticeType d) (d' : unit) (T' : bLatticeType d').
+Variables (f : {blmorphism T -> T'}).
+
+Lemma omorph0 : f 0 = 0.
+Proof. exact: omorph0_subproof. Qed.
+
+End Properties.
+
+Section IdCompFun.
+
+Variables (d : unit) (T : bLatticeType d) (d' : unit) (T' : bLatticeType d').
+Variables (d'' : unit) (T'' : bLatticeType d'').
+Variables (f : {blmorphism T' -> T''}) (g : {blmorphism T -> T'}).
+
+Fact idfun_is_bottom_morphism : (@idfun T) 0 = 0. Proof. by []. Qed.
+#[export]
+HB.instance Definition _ := isBLatticeMorphism.Build d T d T idfun
+  idfun_is_bottom_morphism.
+
+Fact comp_is_bottom_morphism : (f \o g) 0 = 0.
+Proof. by rewrite /= !omorph0. Qed.
+#[export]
+HB.instance Definition _ := isBLatticeMorphism.Build d T d'' T'' (f \o g)
+  comp_is_bottom_morphism.
+
+End IdCompFun.
+
+End BLatticeMorphismTheory.
+End BLatticeMorphismTheory.
+
+Module Import TLatticeMorphismTheory.
+Section TLatticeMorphismTheory.
+
+Section Properties.
+
+Variables (d : unit) (T : tLatticeType d) (d' : unit) (T' : tLatticeType d').
+Variables (f : {tlmorphism T -> T'}).
+
+Lemma omorph1 : f 1 = 1.
+Proof. exact: omorph1_subproof. Qed.
+
+End Properties.
+
+Section IdCompFun.
+
+Variables (d : unit) (T : tLatticeType d) (d' : unit) (T' : tLatticeType d').
+Variables (d'' : unit) (T'' : tLatticeType d'').
+Variables (f : {tlmorphism T' -> T''}) (g : {tlmorphism T -> T'}).
+
+Fact idfun_is_top_morphism : (@idfun T) 1 = 1. Proof. by []. Qed.
+#[export]
+HB.instance Definition _ := isTLatticeMorphism.Build d T d T idfun
+  idfun_is_top_morphism.
+
+Fact comp_is_top_morphism : (f \o g) 1 = 1.
+Proof. by rewrite /= !omorph1. Qed.
+#[export]
+HB.instance Definition _ := isTLatticeMorphism.Build d T d'' T'' (f \o g)
+  comp_is_top_morphism.
+
+End IdCompFun.
+
+End TLatticeMorphismTheory.
+End TLatticeMorphismTheory.
+
 Module SubOrder.
 
 Section Partial.
@@ -7184,6 +7461,11 @@ Export BDistrLatticeTheory.
 Export DualTBDistrLattice.
 Export TBDistrLatticeTheory.
 Export DualOrder. (* FIXME? *)
+
+Export OrderMorphismTheory.
+Export LatticeMorphismTheory.
+Export BLatticeMorphismTheory.
+Export TLatticeMorphismTheory.
 End LTheory.
 
 Module CTheory.
