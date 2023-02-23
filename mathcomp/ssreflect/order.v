@@ -5021,6 +5021,107 @@ End IdCompFun.
 End TLatticeMorphismTheory.
 End TLatticeMorphismTheory.
 
+Module Import ClosedPredicates.
+Section ClosedPredicates.
+
+Variable (d : unit) (T : latticeType d).
+Variable S : {pred T}.
+
+Definition meet_closed := {in S &, forall u v, u `&` v \in S}.
+
+Definition join_closed := {in S &, forall u v, u `|` v \in S}.
+
+End ClosedPredicates.
+End ClosedPredicates.
+
+(* Mixins for stability properties *)
+
+HB.mixin Record isLatticeClosed d (T : latticeType d) (S : {pred T}) := {
+  opredI : meet_closed S;
+  opredU : join_closed S;
+}.
+
+HB.mixin Record isBLatticeClosed d (T : bLatticeType d) (S : {pred T}) := {
+  opred0 : 0 \in S;
+}.
+
+HB.mixin Record isTLatticeClosed d (T : tLatticeType d) (S : {pred T}) := {
+  opred1 : 1 \in S;
+}.
+
+(* Structures for stability properties *)
+
+#[infer(T), short(type="latticeClosed")]
+HB.structure Definition LatticeClosed d T := {S of isLatticeClosed d T S}.
+
+#[infer(T), short(type="bLatticeClosed")]
+HB.structure Definition BLatticeClosed d T :=
+  {S of isBLatticeClosed d T S & @LatticeClosed d T S}.
+
+#[infer(T), short(type="tLatticeClosed")]
+HB.structure Definition TLatticeClosed d T :=
+  {S of isTLatticeClosed d T S & @LatticeClosed d T S}.
+
+#[infer(T), short(type="tbLatticeClosed")]
+HB.structure Definition TBLatticeClosed d (T : tbLatticeType d) :=
+  {S of @BLatticeClosed d T S & @TLatticeClosed d T S}.
+
+HB.factory Record isTBLatticeClosed d (T : tbLatticeType d) (S : {pred T}) := {
+  rpredI : meet_closed S;
+  rpredU : join_closed S;
+  rpred0 : 0 \in S;
+  rpred1 : 1 \in S;
+}.
+
+HB.builders Context d T S of isTBLatticeClosed d T S.
+HB.instance Definition _ := isLatticeClosed.Build d T S rpredI rpredU.
+HB.instance Definition _ := isBLatticeClosed.Build d T S rpred0.
+HB.instance Definition _ := isTLatticeClosed.Build d T S rpred1.
+HB.end.
+
+Module Import LatticePred.
+Section LatticePred.
+
+Variables (d : unit) (T : latticeType d).
+Variable S : latticeClosed d T.
+
+Lemma opredI : {in S &, forall u v, u `&` v \in S}.
+Proof. exact: opredI. Qed.
+
+Lemma opredU : {in S &, forall u v, u `|` v \in S}.
+Proof. exact: opredU. Qed.
+
+End LatticePred.
+
+Section BLatticePred.
+
+Variables (d : unit) (T : bLatticeType d).
+Variable S : bLatticeClosed d T.
+
+Lemma opred0 : 0 \in S.
+Proof. exact: opred0. Qed.
+
+Lemma opred_joins I r (P : pred I) F :
+  (forall i, P i -> F i \in S) -> \join_(i <- r | P i) F i \in S.
+Proof. by move=> FS; elim/big_ind: _; [exact: opred0 | exact: opredU |]. Qed.
+
+End BLatticePred.
+
+Section TLatticePred.
+
+Variables (d : unit) (T : tLatticeType d).
+Variable S : tLatticeClosed d T.
+
+Lemma opred1 : 1 \in S.
+Proof. exact: opred1. Qed.
+
+Lemma opred_meets I r (P : pred I) F :
+  (forall i, P i -> F i \in S) -> \meet_(i <- r | P i) F i \in S.
+Proof. by move=> FS; elim/big_ind: _; [exact: opred1 | exact: opredI |]. Qed.
+
+End TLatticePred.
+End LatticePred.
+
 Module SubOrder.
 
 Section Partial.
@@ -7466,6 +7567,9 @@ Export OrderMorphismTheory.
 Export LatticeMorphismTheory.
 Export BLatticeMorphismTheory.
 Export TLatticeMorphismTheory.
+
+Export ClosedPredicates.
+Export LatticePred.
 End LTheory.
 
 Module CTheory.
