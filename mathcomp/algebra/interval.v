@@ -101,8 +101,8 @@ Notation "`] a , '+oo' [" := (Interval (BRight a) +oo)
 Notation "`] -oo , '+oo' [" := (Interval -oo +oo)
   (at level 0, format "`] -oo ,  '+oo' [") : ring_scope.
 
-Fact itv_bound_display (disp : unit) : unit. Proof. exact. Qed.
-Fact interval_display (disp : unit) : unit. Proof. exact. Qed.
+Fact itv_bound_display (disp : Order.disp_t) : Order.disp_t. Proof. exact. Qed.
+Fact interval_display (disp : Order.disp_t) : Order.disp_t. Proof. exact. Qed.
 
 Section IntervalEq.
 
@@ -184,7 +184,7 @@ Export IntervalChoice.Exports.
 
 Section IntervalPOrder.
 
-Variable (disp : unit) (T : porderType disp).
+Variable (disp : Order.disp_t) (T : porderType disp).
 Implicit Types (x y z : T) (b bl br : itv_bound T) (i : interval T).
 
 Definition le_bound b1 b2 :=
@@ -221,11 +221,25 @@ Definition itv_bound_porderMixin :=
 Canonical itv_bound_porderType :=
   POrderType (itv_bound_display disp) (itv_bound T) itv_bound_porderMixin.
 
+Lemma bound_le0x b : -oo <= b. Proof. by []. Qed.
+
+Lemma bound_lex1 b : b <= +oo. Proof. by case: b => [|[]]. Qed.
+
+Canonical itv_bound_bPOrderType :=
+  BPOrderType (itv_bound T) (BottomMixin bound_le0x).
+Canonical itv_bound_tPOrderType :=
+  TPOrderType (itv_bound T) (TopMixin bound_lex1).
+Canonical itv_bound_tbPOrderType := [tbPOrderType of itv_bound T].
+
+Lemma leEbound : <=%O = le_bound. Proof. by []. Qed.
+
+Lemma ltEbound : <%O = lt_bound. Proof. by []. Qed.
+
 Lemma bound_lexx c1 c2 x : (BSide c1 x <= BSide c2 x) = (c2 ==> c1).
-Proof. by rewrite /<=%O /= lteifxx. Qed.
+Proof. by rewrite leEbound /= lteifxx. Qed.
 
 Lemma bound_ltxx c1 c2 x : (BSide c1 x < BSide c2 x) = (c1 && ~~ c2).
-Proof. by rewrite /<%O /= lteifxx. Qed.
+Proof. by rewrite ltEbound /= lteifxx. Qed.
 
 Lemma ge_pinfty b : (+oo <= b) = (b == +oo). Proof. by move: b => [|[]]. Qed.
 
@@ -311,6 +325,15 @@ Definition interval_porderMixin :=
   LePOrderMixin (fun _ _ => erefl) subitv_refl subitv_anti subitv_trans.
 Canonical interval_porderType :=
   POrderType (interval_display disp) (interval T) interval_porderMixin.
+
+Lemma itv_le0x i : Interval +oo -oo <= i. Proof. by case: i => [[|[]]]. Qed.
+
+Lemma itv_lex1 i : i <= `]-oo, +oo[. Proof. by case: i => [?[|[]]]. Qed.
+
+Canonical interval_bPOrderType :=
+  BPOrderType (interval T) (BottomMixin itv_le0x).
+Canonical interval_tPOrderType := TPOrderType (interval T) (TopMixin itv_lex1).
+Canonical interval_tbPOrderType := [tbPOrderType of interval T].
 
 Definition pred_of_itv i : pred T := [pred x | `[x, x] <= i].
 
@@ -475,7 +498,7 @@ End IntervalPOrder.
 
 Section IntervalLattice.
 
-Variable (disp : unit) (T : latticeType disp).
+Variable (disp : Order.disp_t) (T : latticeType disp).
 Implicit Types (x y z : T) (b bl br : itv_bound T) (i : interval T).
 
 Definition bound_meet bl br : itv_bound T :=
@@ -539,24 +562,32 @@ Qed.
 Lemma bound_leEmeet b1 b2 : (b1 <= b2) = (bound_meet b1 b2 == b1).
 Proof.
 by case: b1 b2 => [[]?|[]][[]?|[]] //=;
-  rewrite [LHS]/<=%O /eq_op /= ?eqxx //= -leEmeet; case: lcomparableP.
+  rewrite leEbound /eq_op /= ?eqxx //= -leEmeet; case: lcomparableP.
 Qed.
 
 Definition itv_bound_latticeMixin :=
-  LatticeMixin bound_meetC bound_joinC bound_meetA bound_joinA
+  LatticePOrderMixin bound_meetC bound_joinC bound_meetA bound_joinA
                bound_joinKI bound_meetKU bound_leEmeet.
-Canonical itv_bound_latticeType :=
-  LatticeType (itv_bound T) itv_bound_latticeMixin.
-
-Lemma bound_le0x b : -oo <= b. Proof. by []. Qed.
-
-Lemma bound_lex1 b : b <= +oo. Proof. by case: b => [|[]]. Qed.
-
-Canonical itv_bound_bLatticeType :=
-  BLatticeType (itv_bound T) (BottomMixin bound_le0x).
-
-Canonical itv_bound_tbLatticeType :=
-  TBLatticeType (itv_bound T) (TopMixin bound_lex1).
+Canonical itv_bound_meetSemilatticeType :=
+  MeetSemilatticeType (itv_bound T) itv_bound_latticeMixin.
+Canonical itv_bound_bMeetSemilatticeType :=
+  [bMeetSemilatticeType of itv_bound T].
+Canonical itv_bound_tMeetSemilatticeType :=
+  [tMeetSemilatticeType of itv_bound T].
+Canonical itv_bound_tbMeetSemilatticeType :=
+  [tbMeetSemilatticeType of itv_bound T].
+Canonical itv_bound_joinSemilatticeType :=
+  JoinSemilatticeType (itv_bound T) itv_bound_latticeMixin.
+Canonical itv_bound_bJoinSemilatticeType :=
+  [bJoinSemilatticeType of itv_bound T].
+Canonical itv_bound_tJoinSemilatticeType :=
+  [tJoinSemilatticeType of itv_bound T].
+Canonical itv_bound_tbJoinSemilatticeType :=
+  [tbJoinSemilatticeType of itv_bound T].
+Canonical itv_bound_latticeType := [latticeType of itv_bound T].
+Canonical itv_bound_bLatticeType := [bLatticeType of itv_bound T].
+Canonical itv_bound_tLatticeType := [tLatticeType of itv_bound T].
+Canonical itv_bound_tbLatticeType := [tbLatticeType of itv_bound T].
 
 Definition itv_meet i1 i2 : interval T :=
   let: Interval b1l b1r := i1 in
@@ -588,20 +619,28 @@ Lemma itv_leEmeet i1 i2 : (i1 <= i2) = (itv_meet i1 i2 == i1).
 Proof. by case: i1 i2 => [? ?][? ?]; rewrite /eq_op /= eq_meetl eq_joinl. Qed.
 
 Definition interval_latticeMixin :=
-  LatticeMixin itv_meetC itv_joinC itv_meetA itv_joinA
-               itv_joinKI itv_meetKU itv_leEmeet.
-Canonical interval_latticeType :=
-  LatticeType (interval T) interval_latticeMixin.
+  LatticePOrderMixin itv_meetC itv_joinC itv_meetA itv_joinA
+                     itv_joinKI itv_meetKU itv_leEmeet.
+Canonical interval_meetSemilatticeType :=
+  MeetSemilatticeType (interval T) interval_latticeMixin.
+Canonical interval_bMeetSemilatticeType := [bMeetSemilatticeType of interval T].
+Canonical interval_tMeetSemilatticeType := [tMeetSemilatticeType of interval T].
+Canonical interval_tbMeetSemilatticeType :=
+  [tbMeetSemilatticeType of interval T].
+Canonical interval_joinSemilatticeType :=
+  JoinSemilatticeType (interval T) interval_latticeMixin.
+Canonical interval_bJoinSemilatticeType := [bJoinSemilatticeType of interval T].
+Canonical interval_tJoinSemilatticeType := [tJoinSemilatticeType of interval T].
+Canonical interval_tbJoinSemilatticeType :=
+  [tbJoinSemilatticeType of interval T].
+Canonical interval_latticeType := [latticeType of interval T].
+Canonical interval_bLatticeType := [bLatticeType of interval T].
+Canonical interval_tLatticeType := [tLatticeType of interval T].
+Canonical interval_tbLatticeType := [tbLatticeType of interval T].
 
-Lemma itv_le0x i : Interval +oo -oo <= i. Proof. by case: i => [[|[]]]. Qed.
+Lemma meetEitv : Order.meet = itv_meet. Proof. by []. Qed.
 
-Lemma itv_lex1 i : i <= `]-oo, +oo[. Proof. by case: i => [?[|[]]]. Qed.
-
-Canonical interval_bLatticeType :=
-  BLatticeType (interval T) (BottomMixin itv_le0x).
-
-Canonical interval_tbLatticeType :=
-  TBLatticeType (interval T) (TopMixin itv_lex1).
+Lemma joinEitv : Order.join = itv_join. Proof. by []. Qed.
 
 Lemma in_itvI x i1 i2 : x \in i1 `&` i2 = (x \in i1) && (x \in i2).
 Proof. exact: lexI. Qed.
@@ -610,26 +649,28 @@ End IntervalLattice.
 
 Section IntervalTotal.
 
-Variable (disp : unit) (T : orderType disp).
+Variable (disp : Order.disp_t) (T : orderType disp).
 Implicit Types (a b c : itv_bound T) (x y z : T) (i : interval T).
 
 Lemma itv_bound_totalMixin : totalLatticeMixin [latticeType of itv_bound T].
-Proof. by move=> [[]?|[]][[]?|[]]; rewrite /<=%O //=; case: ltgtP. Qed.
+Proof. by move=> [[]?|[]][[]?|[]]; rewrite leEbound //=; case: ltgtP. Qed.
 
 Canonical itv_bound_distrLatticeType :=
   DistrLatticeType (itv_bound T) itv_bound_totalMixin.
 Canonical itv_bound_bDistrLatticeType := [bDistrLatticeType of itv_bound T].
+Canonical itv_bound_tDistrLatticeType := [tDistrLatticeType of itv_bound T].
 Canonical itv_bound_tbDistrLatticeType := [tbDistrLatticeType of itv_bound T].
 Canonical itv_bound_orderType := OrderType (itv_bound T) itv_bound_totalMixin.
 
 Lemma itv_meetUl : @left_distributive (interval T) _ Order.meet Order.join.
 Proof.
-by move=> [? ?][? ?][? ?]; rewrite /Order.meet /Order.join /= -meetUl -joinIl.
+by move=> [? ?][? ?][? ?]; rewrite meetEitv joinEitv /= -meetUl -joinIl.
 Qed.
 
 Canonical interval_distrLatticeType :=
   DistrLatticeType (interval T) (DistrLatticeMixin itv_meetUl).
 Canonical interval_bDistrLatticeType := [bDistrLatticeType of interval T].
+Canonical interval_tDistrLatticeType := [tDistrLatticeType of interval T].
 Canonical interval_tbDistrLatticeType := [tbDistrLatticeType of interval T].
 
 Lemma itv_splitU c a b : a <= c <= b ->
@@ -653,7 +694,8 @@ Qed.
 Lemma itv_total_meet3E i1 i2 i3 :
   i1 `&` i2 `&` i3 \in [:: i1 `&` i2; i1 `&` i3; i2 `&` i3].
 Proof.
-case: i1 i2 i3 => [b1l b1r] [b2l b2r] [b3l b3r]; rewrite !inE /eq_op /=.
+case: i1 i2 i3 => [b1l b1r] [b2l b2r] [b3l b3r].
+rewrite !inE meetEitv /eq_op /=.
 case: (leP b1l b2l); case: (leP b1l b3l); case: (leP b2l b3l);
   case: (leP b1r b2r); case: (leP b1r b3r); case: (leP b2r b3r);
   rewrite ?eqxx ?orbT //= => b23r b13r b12r b23l b13l b12l.
@@ -672,7 +714,8 @@ Qed.
 Lemma itv_total_join3E i1 i2 i3 :
   i1 `|` i2 `|` i3 \in [:: i1 `|` i2; i1 `|` i3; i2 `|` i3].
 Proof.
-case: i1 i2 i3 => [b1l b1r] [b2l b2r] [b3l b3r]; rewrite !inE /eq_op /=.
+case: i1 i2 i3 => [b1l b1r] [b2l b2r] [b3l b3r].
+rewrite !inE joinEitv /eq_op /=.
 case: (leP b1l b2l); case: (leP b1l b3l); case: (leP b2l b3l);
   case: (leP b1r b2r); case: (leP b1r b3r); case: (leP b2r b3r);
   rewrite ?eqxx ?orbT //= => b23r b13r b12r b23l b13l b12l.
@@ -714,16 +757,16 @@ Variable R : numDomainType.
 Implicit Types x : R.
 
 Lemma mem0_itvcc_xNx x : (0 \in `[- x, x]) = (0 <= x).
-Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_le0 andbb. Qed.
+Proof. by rewrite itv_boundlr leEbound /= oppr_le0 andbb. Qed.
 
 Lemma mem0_itvoo_xNx x : 0 \in `](- x), x[ = (0 < x).
-Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_lt0 andbb. Qed.
+Proof. by rewrite itv_boundlr leEbound /= oppr_lt0 andbb. Qed.
 
 Lemma oppr_itv ba bb (xa xb x : R) :
   (- x \in Interval (BSide ba xa) (BSide bb xb)) =
   (x \in Interval (BSide (~~ bb) (- xb)) (BSide (~~ ba) (- xa))).
 Proof.
-by rewrite !itv_boundlr /<=%O /= !implybF negbK andbC lteif_oppl lteif_oppr.
+by rewrite !itv_boundlr leEbound /= !implybF negbK andbC lteif_oppl lteif_oppr.
 Qed.
 
 Lemma oppr_itvoo (a b x : R) : (- x \in `]a, b[) = (x \in `](- b), (- a)[).
