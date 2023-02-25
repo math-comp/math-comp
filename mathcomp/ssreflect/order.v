@@ -5253,20 +5253,41 @@ Fact valD : order_morphism (val : U -> T). Proof. by []. Qed.
 HB.instance Definition _ := isSubPOrder.Build d T S d' U valD.
 HB.end.
 
-HB.mixin Record isSubLattice d (T : latticeType d) (S : pred T) d' U
+HB.mixin Record isMeetSubLattice d (T : latticeType d) (S : pred T) d' U
     of Sub T S U & Lattice d' U := {
   valI_subproof : {morph (val : U -> T) : x y / x `&` y};
+}.
+
+HB.mixin Record isJoinSubLattice d (T : latticeType d) (S : pred T) d' U
+    of Sub T S U & Lattice d' U := {
   valU_subproof : {morph (val : U -> T) : x y / x `|` y};
 }.
 
+#[short(type="subPOrderLattice")]
+HB.structure Definition SubPOrderLattice d (T : latticeType d) S d' :=
+  { U of @SubPOrder d T S d' U & Lattice d' U }.
+
+#[short(type="meetSubLattice")]
+HB.structure Definition MeetSubLattice d (T : latticeType d) S d' :=
+  { U of @SubPOrderLattice d T S d' U & isMeetSubLattice d T S d' U }.
+
+#[short(type="joinSubLattice")]
+HB.structure Definition JoinSubLattice d (T : latticeType d) S d' :=
+  { U of @SubPOrderLattice d T S d' U & isJoinSubLattice d T S d' U }.
+
 #[short(type="subLattice")]
 HB.structure Definition SubLattice d (T : latticeType d) S d' :=
-  { U of @SubPOrder d T S d' U & Lattice d' U & isSubLattice d T S d' U }.
+  { U of @MeetSubLattice d T S d' U & @JoinSubLattice d T S d' U }.
 
 #[export]
 HB.instance Definition _ (d : unit) (T : latticeType d) (S : pred T)
-    d' (U : SubLattice.type S d') :=
-  isLatticeMorphism.Build d' U d T val valI_subproof valU_subproof.
+    d' (U : MeetSubLattice.type S d') :=
+  isMeetLatticeMorphism.Build d' U d T val valI_subproof.
+
+#[export]
+HB.instance Definition _ (d : unit) (T : latticeType d) (S : pred T)
+    d' (U : JoinSubLattice.type S d') :=
+  isJoinLatticeMorphism.Build d' U d T val valU_subproof.
 
 HB.factory Record SubPOrder_isSubLattice d (T : latticeType d) S d' U
     of @SubPOrder d T S d' U := {
@@ -5303,7 +5324,8 @@ Fact valI : meet_morphism (val : U -> T).
 Proof. by move=> x y; rewrite !subK. Qed.
 Fact valU : join_morphism (val : U -> T).
 Proof. by move=> x y; rewrite !subK. Qed.
-HB.instance Definition _ := isSubLattice.Build d T S d' U valI valU.
+HB.instance Definition _ := isMeetSubLattice.Build d T S d' U valI.
+HB.instance Definition _ := isJoinSubLattice.Build d T S d' U valU.
 HB.end.
 
 HB.factory Record SubChoice_isSubLattice d (T : latticeType d) S (d' : unit) U
@@ -5318,26 +5340,30 @@ HB.instance Definition _ := SubPOrder_isSubLattice.Build d T S d' U
   opredI_subproof opredU_subproof.
 HB.end.
 
-HB.mixin Record isSubBLattice d (T : bLatticeType d) (S : pred T) d' U
+HB.mixin Record isBSubLattice d (T : bLatticeType d) (S : pred T) d' U
     of Sub T S U & BLattice d' U := {
   val0_subproof : (val : U -> T) 0 = 0;
 }.
 
-#[short(type="subBLattice")]
-HB.structure Definition SubBLattice d (T : bLatticeType d) S d' :=
-  { U of @SubLattice d T S d' U & BLattice d' U & isSubBLattice d T S d' U }.
+#[short(type="bJoinSubLattice")]
+HB.structure Definition BJoinSubLattice d (T : bLatticeType d) S d' :=
+  { U of @JoinSubLattice d T S d' U & BLattice d' U & isBSubLattice d T S d' U }.
+
+#[short(type="bSubLattice")]
+HB.structure Definition BSubLattice d (T : bLatticeType d) S d' :=
+  { U of @SubLattice d T S d' U & @BJoinSubLattice d T S d' U }.
 
 #[export]
 HB.instance Definition _ (d : unit) (T : bLatticeType d) (S : pred T)
-    d' (U : SubBLattice.type S d') :=
+    d' (U : BJoinSubLattice.type S d') :=
   isBLatticeMorphism.Build d' U d T val val0_subproof.
 
-HB.factory Record SubLattice_isSubBLattice d (T : bLatticeType d) S d' U
-    of @SubLattice d T S d' U := {
+HB.factory Record SubPOrder_isBSubLattice d (T : bLatticeType d) S d' U
+    of @SubPOrder d T S d' U & Lattice d' U := {
   opred0_subproof : 0 \in S;
 }.
 
-HB.builders Context d T S d' U of SubLattice_isSubBLattice d T S d' U.
+HB.builders Context d T S d' U of SubPOrder_isBSubLattice d T S d' U.
 
 Let inU v Sv : U := eqtype.sub v Sv.
 Let zeroU : U := inU opred0_subproof.
@@ -5346,43 +5372,47 @@ Fact le0x x : zeroU <= x. Proof. by rewrite leEsub /= subK le0x. Qed.
 HB.instance Definition _ := hasBottom.Build d' U le0x.
 
 Fact val0 : (val : U -> T) 0 = 0. Proof. by rewrite subK. Qed.
-HB.instance Definition _ := isSubBLattice.Build d T S d' U val0.
+HB.instance Definition _ := isBSubLattice.Build d T S d' U val0.
 HB.end.
 
-HB.factory Record SubChoice_isSubBLattice d (T : bLatticeType d) S (d' : unit) U
+HB.factory Record SubChoice_isBSubLattice d (T : bLatticeType d) S (d' : unit) U
     of SubChoice T S U := {
   opredI_subproof : meet_closed S;
   opredU_subproof : join_closed S;
   opred0_subproof : 0 \in S;
 }.
 
-HB.builders Context d T S d' U of SubChoice_isSubBLattice d T S d' U.
+HB.builders Context d T S d' U of SubChoice_isBSubLattice d T S d' U.
 HB.instance Definition _ := SubChoice_isSubLattice.Build d T S d' U
   opredI_subproof opredU_subproof.
-HB.instance Definition _ := SubLattice_isSubBLattice.Build d T S d' U
+HB.instance Definition _ := SubPOrder_isBSubLattice.Build d T S d' U
   opred0_subproof.
 HB.end.
 
-HB.mixin Record isSubTLattice d (T : tLatticeType d) (S : pred T) d' U
+HB.mixin Record isTSubLattice d (T : tLatticeType d) (S : pred T) d' U
     of Sub T S U & TLattice d' U := {
   val1_subproof : (val : U -> T) 1 = 1;
 }.
 
-#[short(type="subTLattice")]
-HB.structure Definition SubTLattice d (T : tLatticeType d) S d' :=
-  { U of @SubLattice d T S d' U & TLattice d' U & isSubTLattice d T S d' U }.
+#[short(type="tMeetSubLattice")]
+HB.structure Definition TMeetSubLattice d (T : tLatticeType d) S d' :=
+  { U of @MeetSubLattice d T S d' U & TLattice d' U & isTSubLattice d T S d' U }.
+
+#[short(type="tSubLattice")]
+HB.structure Definition TSubLattice d (T : tLatticeType d) S d' :=
+  { U of @SubLattice d T S d' U & @TMeetSubLattice d T S d' U }.
 
 #[export]
 HB.instance Definition _ (d : unit) (T : tLatticeType d) (S : pred T)
-    d' (U : SubTLattice.type S d') :=
+    d' (U : TMeetSubLattice.type S d') :=
   isTLatticeMorphism.Build d' U d T val val1_subproof.
 
-HB.factory Record SubLattice_isSubTLattice d (T : tLatticeType d) S d' U
-    of @SubLattice d T S d' U := {
+HB.factory Record SubPOrder_isTSubLattice d (T : tLatticeType d) S d' U
+    of @SubPOrder d T S d' U & Lattice d' U := {
   opred1_subproof : 1 \in S;
 }.
 
-HB.builders Context d T S d' U of SubLattice_isSubTLattice d T S d' U.
+HB.builders Context d T S d' U of SubPOrder_isTSubLattice d T S d' U.
 
 Let inU v Sv : U := eqtype.sub v Sv.
 Let oneU : U := inU opred1_subproof.
@@ -5391,45 +5421,45 @@ Fact lex1 x : x <= oneU. Proof. by rewrite leEsub /= subK lex1. Qed.
 HB.instance Definition _ := hasTop.Build d' U lex1.
 
 Fact val1 : (val : U -> T) 1 = 1. Proof. by rewrite subK. Qed.
-HB.instance Definition _ := isSubTLattice.Build d T S d' U val1.
+HB.instance Definition _ := isTSubLattice.Build d T S d' U val1.
 HB.end.
 
-HB.factory Record SubChoice_isSubTLattice d (T : tLatticeType d) S (d' : unit) U
+HB.factory Record SubChoice_isTSubLattice d (T : tLatticeType d) S (d' : unit) U
     of SubChoice T S U := {
   opredI_subproof : meet_closed S;
   opredU_subproof : join_closed S;
   opred1_subproof : 1 \in S;
 }.
 
-HB.builders Context d T S d' U of SubChoice_isSubTLattice d T S d' U.
+HB.builders Context d T S d' U of SubChoice_isTSubLattice d T S d' U.
 HB.instance Definition _ := SubChoice_isSubLattice.Build d T S d' U
   opredI_subproof opredU_subproof.
-HB.instance Definition _ := SubLattice_isSubTLattice.Build d T S d' U
+HB.instance Definition _ := SubPOrder_isTSubLattice.Build d T S d' U
   opred1_subproof.
 HB.end.
 
-#[short(type="subTBLattice")]
-HB.structure Definition SubTBLattice d (T : tbLatticeType d) S d' :=
-  { U of @SubBLattice d T S d' U & @SubTLattice d T S d' U}.
+#[short(type="tbSubLattice")]
+HB.structure Definition TBSubLattice d (T : tbLatticeType d) S d' :=
+  { U of @BSubLattice d T S d' U & @TSubLattice d T S d' U}.
 
 #[export]
 HB.instance Definition _ (d : unit) (T : tbLatticeType d) (S : pred T) d'
-    (U : SubTBLattice.type S d') := BLatticeMorphism.on (val : U -> T).
+    (U : TBSubLattice.type S d') := BLatticeMorphism.on (val : U -> T).
 
-HB.factory Record SubLattice_isSubTBLattice d (T : tbLatticeType d) S d' U
-    of @SubLattice d T S d' U := {
+HB.factory Record SubPOrder_isTBSubLattice d (T : tbLatticeType d) S d' U
+    of @SubPOrder d T S d' U & Lattice d' U := {
   opred0_subproof : 0 \in S;
   opred1_subproof : 1 \in S;
 }.
 
-HB.builders Context d T S d' U of SubLattice_isSubTBLattice d T S d' U.
-HB.instance Definition _ := SubLattice_isSubBLattice.Build d T S d' U
+HB.builders Context d T S d' U of SubPOrder_isTBSubLattice d T S d' U.
+HB.instance Definition _ := SubPOrder_isBSubLattice.Build d T S d' U
   opred0_subproof.
-HB.instance Definition _ := SubLattice_isSubTLattice.Build d T S d' U
+HB.instance Definition _ := SubPOrder_isTSubLattice.Build d T S d' U
   opred1_subproof.
 HB.end.
 
-HB.factory Record SubChoice_isSubTBLattice d (T : tbLatticeType d) S
+HB.factory Record SubChoice_isTBSubLattice d (T : tbLatticeType d) S
     (d' : unit) U of SubChoice T S U := {
   opredI_subproof : meet_closed S;
   opredU_subproof : join_closed S;
@@ -5437,10 +5467,10 @@ HB.factory Record SubChoice_isSubTBLattice d (T : tbLatticeType d) S
   opred1_subproof : 1 \in S;
 }.
 
-HB.builders Context d T S d' U of SubChoice_isSubTBLattice d T S d' U.
+HB.builders Context d T S d' U of SubChoice_isTBSubLattice d T S d' U.
 HB.instance Definition _ := SubChoice_isSubLattice.Build d T S d' U
   opredI_subproof opredU_subproof.
-HB.instance Definition _ := SubLattice_isSubTBLattice.Build d T S d' U
+HB.instance Definition _ := SubPOrder_isTBSubLattice.Build d T S d' U
   opred0_subproof opred1_subproof.
 HB.end.
 
@@ -5495,59 +5525,59 @@ Notation "[ 'SubChoice_isSubLattice' 'of' U 'by' <: 'with' disp ]" :=
   (SubChoice_isSubLattice.Build _ _ _ disp U (@opredI _ _ _) (@opredU _ _ _))
   (at level 0, format "[ 'SubChoice_isSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
     : form_scope.
-Notation "[ 'SubLattice_isSubBLattice' 'of' U 'by' <: ]" :=
-  (SubLattice_isSubBLattice.Build _ _ _ _ U (opred0 _))
-  (at level 0, format "[ 'SubLattice_isSubBLattice'  'of'  U  'by'  <: ]")
+Notation "[ 'SubPOrder_isBSubLattice' 'of' U 'by' <: ]" :=
+  (SubPOrder_isBSubLattice.Build _ _ _ _ U (opred0 _))
+  (at level 0, format "[ 'SubPOrder_isBSubLattice'  'of'  U  'by'  <: ]")
   : form_scope.
-Notation "[ 'SubLattice_isSubBLattice' 'of' U 'by' <: 'with' disp ]" :=
-  (SubLattice_isSubBLattice.Build _ _ _ disp U (opred0 _))
-  (at level 0, format "[ 'SubLattice_isSubBLattice'  'of'  U  'by'  <:  'with'  disp ]")
+Notation "[ 'SubPOrder_isBSubLattice' 'of' U 'by' <: 'with' disp ]" :=
+  (SubPOrder_isBSubLattice.Build _ _ _ disp U (opred0 _))
+  (at level 0, format "[ 'SubPOrder_isBSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
-Notation "[ 'SubChoice_isSubBLattice' 'of' U 'by' <: ]" :=
-  (SubChoice_isSubBLattice.Build _ _ _ _ U
+Notation "[ 'SubChoice_isBSubLattice' 'of' U 'by' <: ]" :=
+  (SubChoice_isBSubLattice.Build _ _ _ _ U
      (@opredI _ _ _) (@opredU _ _ _) (opred0 _))
-  (at level 0, format "[ 'SubChoice_isSubBLattice'  'of'  U  'by'  <: ]")
+  (at level 0, format "[ 'SubChoice_isBSubLattice'  'of'  U  'by'  <: ]")
   : form_scope.
-Notation "[ 'SubChoice_isSubBLattice' 'of' U 'by' <: 'with' disp ]" :=
-  (SubChoice_isSubBLattice.Build _ _ _ disp U
+Notation "[ 'SubChoice_isBSubLattice' 'of' U 'by' <: 'with' disp ]" :=
+  (SubChoice_isBSubLattice.Build _ _ _ disp U
      (@opredI _ _ _) (@opredU _ _ _) (opred0 _))
-  (at level 0, format "[ 'SubChoice_isSubBLattice'  'of'  U  'by'  <:  'with'  disp ]")
+  (at level 0, format "[ 'SubChoice_isBSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
-Notation "[ 'SubLattice_isSubTLattice' 'of' U 'by' <: ]" :=
-  (SubLattice_isSubTLattice.Build _ _ _ _ U (opred1 _))
-  (at level 0, format "[ 'SubLattice_isSubTLattice'  'of'  U  'by'  <: ]")
+Notation "[ 'SubPOrder_isTSubLattice' 'of' U 'by' <: ]" :=
+  (SubPOrder_isTSubLattice.Build _ _ _ _ U (opred1 _))
+  (at level 0, format "[ 'SubPOrder_isTSubLattice'  'of'  U  'by'  <: ]")
   : form_scope.
-Notation "[ 'SubLattice_isSubTLattice' 'of' U 'by' <: 'with' disp ]" :=
-  (SubLattice_isSubTLattice.Build _ _ _ disp U (opred1 _))
-  (at level 0, format "[ 'SubLattice_isSubTLattice'  'of'  U  'by'  <:  'with'  disp ]")
+Notation "[ 'SubPOrder_isTSubLattice' 'of' U 'by' <: 'with' disp ]" :=
+  (SubPOrder_isTSubLattice.Build _ _ _ disp U (opred1 _))
+  (at level 0, format "[ 'SubPOrder_isTSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
-Notation "[ 'SubChoice_isSubTLattice' 'of' U 'by' <: ]" :=
-  (SubChoice_isSubTLattice.Build _ _ _ _ U
+Notation "[ 'SubChoice_isTSubLattice' 'of' U 'by' <: ]" :=
+  (SubChoice_isTSubLattice.Build _ _ _ _ U
      (@opredI _ _ _) (@opredU _ _ _) (opred1 _))
-  (at level 0, format "[ 'SubChoice_isSubTLattice'  'of'  U  'by'  <: ]")
+  (at level 0, format "[ 'SubChoice_isTSubLattice'  'of'  U  'by'  <: ]")
   : form_scope.
-Notation "[ 'SubChoice_isSubTLattice' 'of' U 'by' <: 'with' disp ]" :=
-  (SubChoice_isSubTLattice.Build _ _ _ disp U
+Notation "[ 'SubChoice_isTSubLattice' 'of' U 'by' <: 'with' disp ]" :=
+  (SubChoice_isTSubLattice.Build _ _ _ disp U
      (@opredI _ _ _) (@opredU _ _ _) (opred1 _))
-  (at level 0, format "[ 'SubChoice_isSubTLattice'  'of'  U  'by'  <:  'with'  disp ]")
+  (at level 0, format "[ 'SubChoice_isTSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
-Notation "[ 'SubLattice_isSubTBLattice' 'of' U 'by' <: ]" :=
-  (SubLattice_isSubTBLattice.Build _ _ _ _ U (opred0 _) (opred1 _))
-  (at level 0, format "[ 'SubLattice_isSubTBLattice'  'of'  U  'by'  <: ]")
+Notation "[ 'SubPOrder_isTBSubLattice' 'of' U 'by' <: ]" :=
+  (SubPOrder_isTBSubLattice.Build _ _ _ _ U (opred0 _) (opred1 _))
+  (at level 0, format "[ 'SubPOrder_isTBSubLattice'  'of'  U  'by'  <: ]")
   : form_scope.
-Notation "[ 'SubLattice_isSubTBLattice' 'of' U 'by' <: 'with' disp ]" :=
-  (SubLattice_isSubTBLattice.Build _ _ _ disp U (opred0 _) (opred1 _))
-  (at level 0, format "[ 'SubLattice_isSubTBLattice'  'of'  U  'by'  <:  'with'  disp ]")
+Notation "[ 'SubPOrder_isTBSubLattice' 'of' U 'by' <: 'with' disp ]" :=
+  (SubPOrder_isTBSubLattice.Build _ _ _ disp U (opred0 _) (opred1 _))
+  (at level 0, format "[ 'SubPOrder_isTBSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
-Notation "[ 'SubChoice_isSubTBLattice' 'of' U 'by' <: ]" :=
-  (SubChoice_isSubTBLattice.Build _ _ _ _ U
+Notation "[ 'SubChoice_isTBSubLattice' 'of' U 'by' <: ]" :=
+  (SubChoice_isTBSubLattice.Build _ _ _ _ U
      (@opredI _ _ _) (@opredU _ _ _) (opred0 _) (opred1 _))
-  (at level 0, format "[ 'SubChoice_isSubTBLattice'  'of'  U  'by'  <: ]")
+  (at level 0, format "[ 'SubChoice_isTBSubLattice'  'of'  U  'by'  <: ]")
   : form_scope.
-Notation "[ 'SubChoice_isSubTBLattice' 'of' U 'by' <: 'with' disp ]" :=
-  (SubChoice_isSubTBLattice.Build _ _ _ disp U
+Notation "[ 'SubChoice_isTBSubLattice' 'of' U 'by' <: 'with' disp ]" :=
+  (SubChoice_isTBSubLattice.Build _ _ _ disp U
      (@opredI _ _ _) (@opredU _ _ _) (opred0 _) (opred1 _))
-  (at level 0, format "[ 'SubChoice_isSubTBLattice'  'of'  U  'by'  <:  'with'  disp ]")
+  (at level 0, format "[ 'SubChoice_isTBSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
 Notation "[ 'SubLattice_isSubOrder' 'of' U 'by' <: ]" :=
   (SubLattice_isSubOrder.Build _ _ _ _ U)
