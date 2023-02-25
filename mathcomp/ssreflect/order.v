@@ -5267,17 +5267,65 @@ HB.mixin Record isJoinSubLattice d (T : latticeType d) (S : pred T) d' U
 HB.structure Definition SubPOrderLattice d (T : latticeType d) S d' :=
   { U of @SubPOrder d T S d' U & Lattice d' U }.
 
+#[short(type="subPOrderBLattice")]
+HB.structure Definition SubPOrderBLattice d (T : latticeType d) S d' :=
+  { U of @SubPOrderLattice d T S d' U & BLattice d' U }.
+
+#[short(type="subPOrderTLattice")]
+HB.structure Definition SubPOrderTLattice d (T : latticeType d) S d' :=
+  { U of @SubPOrderLattice d T S d' U & TLattice d' U }.
+
+#[short(type="subPOrderTBLattice")]
+HB.structure Definition SubPOrderTBLattice d (T : latticeType d) S d' :=
+  { U of @SubPOrderLattice d T S d' U & TBLattice d' U }.
+
 #[short(type="meetSubLattice")]
 HB.structure Definition MeetSubLattice d (T : latticeType d) S d' :=
   { U of @SubPOrderLattice d T S d' U & isMeetSubLattice d T S d' U }.
+
+#[short(type="meetSubBLattice")]
+HB.structure Definition MeetSubBLattice d (T : latticeType d) S d' :=
+  { U of @MeetSubLattice d T S d' U & BLattice d' U }.
+
+#[short(type="meetSubTLattice")]
+HB.structure Definition MeetSubTLattice d (T : latticeType d) S d' :=
+  { U of @MeetSubLattice d T S d' U & TLattice d' U }.
+
+#[short(type="meetSubTBLattice")]
+HB.structure Definition MeetSubTBLattice d (T : latticeType d) S d' :=
+  { U of @MeetSubLattice d T S d' U & TBLattice d' U }.
 
 #[short(type="joinSubLattice")]
 HB.structure Definition JoinSubLattice d (T : latticeType d) S d' :=
   { U of @SubPOrderLattice d T S d' U & isJoinSubLattice d T S d' U }.
 
+#[short(type="joinSubBLattice")]
+HB.structure Definition JoinSubBLattice d (T : latticeType d) S d' :=
+  { U of @JoinSubLattice d T S d' U & BLattice d' U }.
+
+#[short(type="joinSubTLattice")]
+HB.structure Definition JoinSubTLattice d (T : latticeType d) S d' :=
+  { U of @JoinSubLattice d T S d' U & TLattice d' U }.
+
+#[short(type="joinSubTBLattice")]
+HB.structure Definition JoinSubTBLattice d (T : latticeType d) S d' :=
+  { U of @JoinSubLattice d T S d' U & TBLattice d' U }.
+
 #[short(type="subLattice")]
 HB.structure Definition SubLattice d (T : latticeType d) S d' :=
   { U of @MeetSubLattice d T S d' U & @JoinSubLattice d T S d' U }.
+
+#[short(type="subBLattice")]
+HB.structure Definition SubBLattice d (T : latticeType d) S d' :=
+  { U of @SubLattice d T S d' U & BLattice d' U }.
+
+#[short(type="subTLattice")]
+HB.structure Definition SubTLattice d (T : latticeType d) S d' :=
+  { U of @SubLattice d T S d' U & TLattice d' U }.
+
+#[short(type="subTBLattice")]
+HB.structure Definition SubTBLattice d (T : latticeType d) S d' :=
+  { U of @SubLattice d T S d' U & TBLattice d' U }.
 
 #[export]
 HB.instance Definition _ (d : unit) (T : latticeType d) (S : pred T)
@@ -5349,9 +5397,17 @@ HB.mixin Record isBSubLattice d (T : bLatticeType d) (S : pred T) d' U
 HB.structure Definition BJoinSubLattice d (T : bLatticeType d) S d' :=
   { U of @JoinSubLattice d T S d' U & BLattice d' U & isBSubLattice d T S d' U }.
 
+#[short(type="bJoinSubTLattice")]
+HB.structure Definition BJoinSubTLattice d (T : bLatticeType d) S d' :=
+  { U of @BJoinSubLattice d T S d' U & TBLattice d' U }.
+
 #[short(type="bSubLattice")]
 HB.structure Definition BSubLattice d (T : bLatticeType d) S d' :=
   { U of @SubLattice d T S d' U & @BJoinSubLattice d T S d' U }.
+
+#[short(type="bSubTLattice")]
+HB.structure Definition BSubTLattice d (T : bLatticeType d) S d' :=
+  { U of @BSubLattice d T S d' U & TBLattice d' U }.
 
 #[export]
 HB.instance Definition _ (d : unit) (T : bLatticeType d) (S : pred T)
@@ -5398,9 +5454,17 @@ HB.mixin Record isTSubLattice d (T : tLatticeType d) (S : pred T) d' U
 HB.structure Definition TMeetSubLattice d (T : tLatticeType d) S d' :=
   { U of @MeetSubLattice d T S d' U & TLattice d' U & isTSubLattice d T S d' U }.
 
+#[short(type="tMeetSubBLattice")]
+HB.structure Definition TMeetSubBLattice d (T : tLatticeType d) S d' :=
+  { U of @TMeetSubLattice d T S d' U & TBLattice d' U }.
+
 #[short(type="tSubLattice")]
 HB.structure Definition TSubLattice d (T : tLatticeType d) S d' :=
   { U of @SubLattice d T S d' U & @TMeetSubLattice d T S d' U }.
+
+#[short(type="tSubBLattice")]
+HB.structure Definition TSubBLattice d (T : tLatticeType d) S d' :=
+  { U of @TSubLattice d T S d' U & TBLattice d' U }.
 
 #[export]
 HB.instance Definition _ (d : unit) (T : tLatticeType d) (S : pred T)
