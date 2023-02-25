@@ -28,6 +28,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- in `order.v`
+  + fix `\meet^p_` and `\join^p_` notations
+  + fix the scope of `n.-tuplelexi` notations
+
 ### Renamed
 
 ### Removed

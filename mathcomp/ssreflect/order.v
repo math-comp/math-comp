@@ -6513,8 +6513,15 @@ Notation "><^p y" := [pred x | ~~ (>=<^p%O x y)] : order_scope.
 Notation "><^p y :> T" := (><^p (y : T)) (only parsing) : order_scope.
 Notation "x ><^p y" := (~~ (><^p%O x y)) : order_scope.
 
-Notation "x `&^p` y" :=  (@meet prod_display _ x y) : order_scope.
-Notation "x `|^p` y" := (@join prod_display _ x y) : order_scope.
+(* The following Local Notations are here to define the \join^p_ and \meet^p_ *)
+(* notations later. Do not remove them.                                       *)
+Local Notation "0" := (@bottom prod_display _).
+Local Notation "1" := (@top prod_display _).
+Local Notation meet := (@meet prod_display _).
+Local Notation join := (@join prod_display _).
+
+Notation "x `&^p` y" :=  (meet x y) : order_scope.
+Notation "x `|^p` y" := (join x y) : order_scope.
 
 Notation "\join^p_ ( i <- r | P ) F" :=
   (\big[join/0]_(i <- r | P%B) F%O) : order_scope.
@@ -8076,9 +8083,9 @@ Module Exports.
 
 Notation "n .-tuplelexi[ disp ]" := (type disp n)
   (at level 2, disp at next level, format "n .-tuplelexi[ disp ]") :
-  order_scope.
+  type_scope.
 Notation "n .-tuplelexi" := (n.-tuplelexi[lexi_display])
-  (at level 2, format "n .-tuplelexi") : order_scope.
+  (at level 2, format "n .-tuplelexi") : type_scope.
 
 Canonical eqType.
 Canonical choiceType.
