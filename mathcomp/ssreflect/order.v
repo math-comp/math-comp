@@ -1036,6 +1036,12 @@ Reserved Notation "\join^p_ ( i 'in' A ) F"
 Reserved Notation "'{' 'omorphism' U '->' V '}'"
   (at level 0, U at level 98, V at level 99,
    format "{ 'omorphism'  U  ->  V }").
+Reserved Notation "'{' 'mlmorphism' U '->' V '}'"
+  (at level 0, U at level 98, V at level 99,
+   format "{ 'mlmorphism'  U  ->  V }").
+Reserved Notation "'{' 'jlmorphism' U '->' V '}'"
+  (at level 0, U at level 98, V at level 99,
+   format "{ 'jlmorphism'  U  ->  V }").
 Reserved Notation "'{' 'lmorphism' U '->' V '}'"
   (at level 0, U at level 98, V at level 99,
    format "{ 'lmorphism'  U  ->  V }").
@@ -4834,20 +4840,63 @@ Definition meet_morphism d (T : latticeType d) d' (T' : latticeType d')
 Definition join_morphism d (T : latticeType d) d' (T' : latticeType d')
   (f : T -> T') : Prop := {morph f : x y / x `|` y}.
 
-HB.mixin Record isLatticeMorphism d (T : latticeType d) d' (T' : latticeType d')
-    (apply : T -> T') := {
+HB.mixin Record isMeetLatticeMorphism d (T : latticeType d)
+    d' (T' : latticeType d') (apply : T -> T') := {
   omorphI_subproof : meet_morphism apply;
+}.
+
+HB.mixin Record isJoinLatticeMorphism d (T : latticeType d)
+    d' (T' : latticeType d') (apply : T -> T') := {
   omorphU_subproof : join_morphism apply;
 }.
 
 #[infer(T,T')]
+HB.structure Definition MeetLatticeMorphism d (T : latticeType d)
+    d' (T' : latticeType d') :=
+  {f of isMeetLatticeMorphism d T d' T' f & @OrderMorphism d T d' T' f}.
+
+#[infer(T,T')]
+HB.structure Definition JoinLatticeMorphism d (T : latticeType d)
+    d' (T' : latticeType d') :=
+  {f of isJoinLatticeMorphism d T d' T' f & @OrderMorphism d T d' T' f}.
+
+#[infer(T,T')]
 HB.structure Definition LatticeMorphism d (T : latticeType d)
     d' (T' : latticeType d') :=
-  {f of isLatticeMorphism d T d' T' f & @OrderMorphism d T d' T' f}.
+  {f of @MeetLatticeMorphism d T d' T' f & @JoinLatticeMorphism d T d' T' f}.
+
+HB.factory Record isLatticeMorphism d (T : latticeType d)
+    d' (T' : latticeType d') (f : T -> T') of @OrderMorphism d T d' T' f := {
+  omorphI_subproof : meet_morphism f;
+  omorphU_subproof : join_morphism f;
+}.
+
+HB.builders Context d T d' T' f of isLatticeMorphism d T d' T' f.
+HB.instance Definition _ := isMeetLatticeMorphism.Build d T d' T' f
+  omorphI_subproof.
+HB.instance Definition _ := isJoinLatticeMorphism.Build d T d' T' f
+  omorphU_subproof.
+HB.end.
 
 Module LatticeMorphismExports.
+Notation "{ 'mlmorphism' T -> T' }" :=
+  (MeetLatticeMorphism.type _ T%type _ T'%type) : type_scope.
+Notation "{ 'jlmorphism' T -> T' }" :=
+  (JoinLatticeMorphism.type _ T%type _ T'%type) : type_scope.
 Notation "{ 'lmorphism' T -> T' }" :=
   (LatticeMorphism.type _ T%type _ T'%type) : type_scope.
+Notation "[ 'mlmorphism' 'of' f 'as' g ]" :=
+  (MeetLatticeMorphism.clone _ _ _ _ f%function g)
+  (at level 0, format "[ 'mlmorphism'  'of'  f  'as'  g ]") : form_scope.
+Notation "[ 'mlmorphism' 'of' f ]" :=
+  (MeetLatticeMorphism.clone _ _ _ _ f%function _)
+  (at level 0, format "[ 'mlmorphism'  'of'  f ]") : form_scope.
+Notation "[ 'jlmorphism' 'of' f 'as' g ]" :=
+  (JoinLatticeMorphism.clone _ _ _ _ f%function g)
+  (at level 0, format "[ 'jlmorphism'  'of'  f  'as'  g ]") : form_scope.
+Notation "[ 'jlmorphism' 'of' f ]" :=
+  (JoinLatticeMorphism.clone _ _ _ _ f%function _)
+  (at level 0, format "[ 'jlmorphism'  'of'  f ]") : form_scope.
 Notation "[ 'lmorphism' 'of' f 'as' g ]" :=
   (LatticeMorphism.clone _ _ _ _ f%function g)
   (at level 0, format "[ 'lmorphism'  'of'  f  'as'  g ]") : form_scope.
@@ -4863,12 +4912,11 @@ Section LatticeMorphismTheory.
 Section Properties.
 
 Variables (d : unit) (T : latticeType d) (d' : unit) (T' : latticeType d').
-Variables (f : {lmorphism T -> T'}).
 
-Lemma omorphI : {morph f : x y / x `&` y}.
+Lemma omorphI (f : {mlmorphism T -> T'}) : {morph f : x y / x `&` y}.
 Proof. exact: omorphI_subproof. Qed.
 
-Lemma omorphU : {morph f : x y / x `|` y}.
+Lemma omorphU (f : {jlmorphism T -> T'}) : {morph f : x y / x `|` y}.
 Proof. exact: omorphU_subproof. Qed.
 
 End Properties.
@@ -4877,21 +4925,40 @@ Section IdCompFun.
 
 Variables (d : unit) (T : latticeType d) (d' : unit) (T' : latticeType d').
 Variables (d'' : unit) (T'' : latticeType d'').
-Variables (f : {lmorphism T' -> T''}) (g : {lmorphism T -> T'}).
+
+Section MeetCompFun.
+
+Variables (f : {mlmorphism T' -> T''}) (g : {mlmorphism T -> T'}).
 
 Fact idfun_is_meet_morphism : meet_morphism (@idfun T). Proof. by []. Qed.
-Fact idfun_is_join_morphism : join_morphism (@idfun T). Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isLatticeMorphism.Build d T d T idfun
-  idfun_is_meet_morphism idfun_is_join_morphism.
+HB.instance Definition _ := isMeetLatticeMorphism.Build d T d T idfun
+  idfun_is_meet_morphism.
 
 Fact comp_is_meet_morphism : meet_morphism (f \o g).
 Proof. by move=> x y; rewrite /= !omorphI. Qed.
+#[export]
+HB.instance Definition _ := isMeetLatticeMorphism.Build d T d'' T'' (f \o g)
+  comp_is_meet_morphism.
+
+End MeetCompFun.
+
+Section JoinCompFun.
+
+Variables (f : {jlmorphism T' -> T''}) (g : {jlmorphism T -> T'}).
+
+Fact idfun_is_join_morphism : join_morphism (@idfun T). Proof. by []. Qed.
+#[export]
+HB.instance Definition _ := isJoinLatticeMorphism.Build d T d T idfun
+  idfun_is_join_morphism.
+
 Fact comp_is_join_morphism : join_morphism (f \o g).
 Proof. by move=> x y; rewrite /= !omorphU. Qed.
 #[export]
-HB.instance Definition _ := isLatticeMorphism.Build d T d'' T'' (f \o g)
-  comp_is_meet_morphism comp_is_join_morphism.
+HB.instance Definition _ := isJoinLatticeMorphism.Build d T d'' T'' (f \o g)
+  comp_is_join_morphism.
+
+End JoinCompFun.
 
 End IdCompFun.
 
@@ -4910,13 +4977,11 @@ HB.mixin Record isTLatticeMorphism d (T : tLatticeType d)
 
 #[infer(T,T')]
 HB.structure Definition BLatticeMorphism d (T : bLatticeType d)
-    d' (T' : bLatticeType d') :=
-  {f of isBLatticeMorphism d T d' T' f & @LatticeMorphism d T d' T' f}.
+    d' (T' : bLatticeType d') := {f of isBLatticeMorphism d T d' T' f}.
 
 #[infer(T,T')]
 HB.structure Definition TLatticeMorphism d (T : tLatticeType d)
-    d' (T' : tLatticeType d') :=
-  {f of isTLatticeMorphism d T d' T' f & @LatticeMorphism d T d' T' f}.
+    d' (T' : tLatticeType d') := {f of isTLatticeMorphism d T d' T' f}.
 
 #[infer(T,T')]
 HB.structure Definition TBLatticeMorphism d (T : tbLatticeType d)
