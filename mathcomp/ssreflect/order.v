@@ -5101,8 +5101,11 @@ End ClosedPredicates.
 
 (* Mixins for stability properties *)
 
-HB.mixin Record isLatticeClosed d (T : latticeType d) (S : {pred T}) := {
+HB.mixin Record isMeetLatticeClosed d (T : latticeType d) (S : {pred T}) := {
   opredI : meet_closed S;
+}.
+
+HB.mixin Record isJoinLatticeClosed d (T : latticeType d) (S : {pred T}) := {
   opredU : join_closed S;
 }.
 
@@ -5116,44 +5119,68 @@ HB.mixin Record isTLatticeClosed d (T : tLatticeType d) (S : {pred T}) := {
 
 (* Structures for stability properties *)
 
+#[infer(T), short(type="meetLatticeClosed")]
+HB.structure Definition MeetLatticeClosed d T :=
+  {S of isMeetLatticeClosed d T S}.
+
+#[infer(T), short(type="joinLatticeClosed")]
+HB.structure Definition JoinLatticeClosed d T :=
+  {S of isJoinLatticeClosed d T S}.
+
 #[infer(T), short(type="latticeClosed")]
-HB.structure Definition LatticeClosed d T := {S of isLatticeClosed d T S}.
+HB.structure Definition LatticeClosed d T :=
+  {S of @MeetLatticeClosed d T S & @JoinLatticeClosed d T S}.
 
 #[infer(T), short(type="bLatticeClosed")]
-HB.structure Definition BLatticeClosed d T :=
-  {S of isBLatticeClosed d T S & @LatticeClosed d T S}.
+HB.structure Definition BLatticeClosed d T := {S of isBLatticeClosed d T S}.
+
+#[infer(T), short(type="bJoinLatticeClosed")]
+HB.structure Definition BJoinLatticeClosed d T :=
+  {S of isBLatticeClosed d T S & @JoinLatticeClosed d T S}.
 
 #[infer(T), short(type="tLatticeClosed")]
-HB.structure Definition TLatticeClosed d T :=
-  {S of isTLatticeClosed d T S & @LatticeClosed d T S}.
+HB.structure Definition TLatticeClosed d T := {S of isTLatticeClosed d T S}.
+
+#[infer(T), short(type="tMeetLatticeClosed")]
+HB.structure Definition TMeetLatticeClosed d T :=
+  {S of isTLatticeClosed d T S & @MeetLatticeClosed d T S}.
 
 #[infer(T), short(type="tbLatticeClosed")]
 HB.structure Definition TBLatticeClosed d (T : tbLatticeType d) :=
   {S of @BLatticeClosed d T S & @TLatticeClosed d T S}.
 
+HB.factory Record isLatticeClosed d (T : latticeType d) (S : {pred T}) := {
+  opredI : meet_closed S;
+  opredU : join_closed S;
+}.
+
+HB.builders Context d T S of isLatticeClosed d T S.
+HB.instance Definition _ := isMeetLatticeClosed.Build d T S opredI.
+HB.instance Definition _ := isJoinLatticeClosed.Build d T S opredU.
+HB.end.
+
 HB.factory Record isTBLatticeClosed d (T : tbLatticeType d) (S : {pred T}) := {
-  rpredI : meet_closed S;
-  rpredU : join_closed S;
-  rpred0 : 0 \in S;
-  rpred1 : 1 \in S;
+  opredI : meet_closed S;
+  opredU : join_closed S;
+  opred0 : 0 \in S;
+  opred1 : 1 \in S;
 }.
 
 HB.builders Context d T S of isTBLatticeClosed d T S.
-HB.instance Definition _ := isLatticeClosed.Build d T S rpredI rpredU.
-HB.instance Definition _ := isBLatticeClosed.Build d T S rpred0.
-HB.instance Definition _ := isTLatticeClosed.Build d T S rpred1.
+HB.instance Definition _ := isLatticeClosed.Build d T S opredI opredU.
+HB.instance Definition _ := isBLatticeClosed.Build d T S opred0.
+HB.instance Definition _ := isTLatticeClosed.Build d T S opred1.
 HB.end.
 
 Module Import LatticePred.
 Section LatticePred.
 
 Variables (d : unit) (T : latticeType d).
-Variable S : latticeClosed d T.
 
-Lemma opredI : {in S &, forall u v, u `&` v \in S}.
+Lemma opredI (S : meetLatticeClosed d T) : {in S &, forall u v, u `&` v \in S}.
 Proof. exact: opredI. Qed.
 
-Lemma opredU : {in S &, forall u v, u `|` v \in S}.
+Lemma opredU (S : joinLatticeClosed d T) : {in S &, forall u v, u `|` v \in S}.
 Proof. exact: opredU. Qed.
 
 End LatticePred.
@@ -5161,12 +5188,11 @@ End LatticePred.
 Section BLatticePred.
 
 Variables (d : unit) (T : bLatticeType d).
-Variable S : bLatticeClosed d T.
 
-Lemma opred0 : 0 \in S.
+Lemma opred0 (S : bLatticeClosed d T) : 0 \in S.
 Proof. exact: opred0. Qed.
 
-Lemma opred_joins I r (P : pred I) F :
+Lemma opred_joins (S : bJoinLatticeClosed d T) I r (P : pred I) F :
   (forall i, P i -> F i \in S) -> \join_(i <- r | P i) F i \in S.
 Proof. by move=> FS; elim/big_ind: _; [exact: opred0 | exact: opredU |]. Qed.
 
@@ -5175,12 +5201,11 @@ End BLatticePred.
 Section TLatticePred.
 
 Variables (d : unit) (T : tLatticeType d).
-Variable S : tLatticeClosed d T.
 
-Lemma opred1 : 1 \in S.
+Lemma opred1 (S : tLatticeClosed d T) : 1 \in S.
 Proof. exact: opred1. Qed.
 
-Lemma opred_meets I r (P : pred I) F :
+Lemma opred_meets (S : tMeetLatticeClosed d T) I r (P : pred I) F :
   (forall i, P i -> F i \in S) -> \meet_(i <- r | P i) F i \in S.
 Proof. by move=> FS; elim/big_ind: _; [exact: opred1 | exact: opredI |]. Qed.
 
