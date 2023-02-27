@@ -975,37 +975,6 @@ move=> a Ea; apply: canRL (lker0_lfunK (AEnd_lker0 _)) _.
 by rewrite -galM // mulVg gal_id.
 Qed.
 
-
-Lemma galois_subW E F : galois E F -> (E <= F)%VS. Proof. by case/andP. Qed.
-
-Lemma galois_normalW E F : galois E F -> (normalField E F)%VS.
-Proof. by case/and3P. Qed.
-
-Lemma galois_separableW E F : galois E F -> (separable E F)%VS.
-Proof. by case/and3P. Qed.
-
-Lemma normalField_refl E : normalField E E.
-Proof.
-apply/forallP => /= u; apply/implyP; rewrite in_set.
-by move=> /andP[/andP[_ /fixedSpace_limg->]].
-Qed.
-Hint Resolve normalField_refl : core.
-
-Lemma galois_refl E : galois E E.
-Proof. by rewrite /galois subvv separable_refl normalField_refl. Qed.
-
-Lemma gal1 K (g : gal_of K) : g \in 'Gal(K / 1%VS)%g.
-Proof. by rewrite gal_kHom ?sub1v// k1HomE ahomWin. Qed.
-
-Lemma Fadjoin_sub E x y : x \in <<E; y>>%VS -> (<<E; x>> <= <<E; y>>)%VS.
-Proof. by move=> xEy; apply/FadjoinP; rewrite subv_adjoin. Qed.
-
-Lemma galvv E : ('Gal(E / E) = 1)%g.
-Proof.
-apply/trivgP/subsetP=> u uG; rewrite inE.
-by apply/gal_eqP => x xE; rewrite gal_id (fixed_gal _ uG).
-Qed.
-
 (* Standard mathematical notation for 'Gal(E / K) puts the larger field first.*)
 Definition galoisG V U := gal V @* <<kAEnd (U :&: V) V>>.
 Local Notation "''Gal' ( V / U )" := (galoisG V U) : group_scope.
@@ -1029,6 +998,9 @@ Qed.
 Lemma gal_kHom K E x : (K <= E)%VS -> (x \in 'Gal(E / K)) = kHom K E x.
 Proof. by move/gal_kAut->; rewrite /kAut limg_gal eqxx andbT. Qed.
 
+Lemma gal1 K (g : gal_of K) : g \in 'Gal(K / 1%VS)%g.
+Proof. by rewrite gal_kHom ?sub1v// k1HomE ahomWin. Qed.
+
 Lemma kAut_to_gal K E f :
   kAut K E f -> {x : gal_of E | x \in 'Gal(E / K) & {in E, f =1 x}}.
 Proof.
@@ -1044,6 +1016,12 @@ Qed.
 Lemma fixed_gal K E x a :
   (K <= E)%VS -> x \in 'Gal(E / K) -> a \in K -> x a = a.
 Proof. by move/gal_kHom=> -> /kAHomP idKx /idKx. Qed.
+
+Lemma galvv E : ('Gal(E / E) = 1)%g.
+Proof.
+apply/trivgP/subsetP=> u uG; rewrite inE.
+by apply/gal_eqP => x xE; rewrite gal_id (fixed_gal _ uG).
+Qed.
 
 Lemma fixedPoly_gal K E x p :
   (K <= E)%VS -> x \in 'Gal(E / K) -> p \is a polyOver K -> map_poly x p = p.
@@ -1241,6 +1219,13 @@ End TraceAndNormField.
 
 Definition normalField U V := [forall x in kAEndf U, x @: V == V]%VS.
 
+Lemma normalField_refl V : normalField V V.
+Proof.
+apply/forallP => /= u; apply/implyP; rewrite in_set.
+by move=> /andP[/andP[_ /fixedSpace_limg->]].
+Qed.
+Hint Resolve normalField_refl : core.
+
 Lemma normalField_kAut K M E f :
   (K <= M <= E)%VS -> normalField K M -> kAut K E f -> kAut K M f.
 Proof.
@@ -1371,6 +1356,17 @@ by rewrite !big_cons IHr.
 Qed.
 
 Definition galois U V := [&& (U <= V)%VS, separable U V & normalField U V].
+
+Lemma galois_subW U V : galois U V -> (U <= V)%VS. Proof. by case/andP. Qed.
+
+Lemma galois_normalW U V : galois U V -> normalField U V.
+Proof. by case/and3P. Qed.
+
+Lemma galois_separableW U V : galois U V -> separable U V.
+Proof. by case/and3P. Qed.
+
+Lemma galois_refl E : galois E E.
+Proof. by rewrite /galois subvv separable_refl normalField_refl. Qed.
 
 Lemma galoisS K M E : (K <= M <= E)%VS -> galois K E -> galois M E.
 Proof.

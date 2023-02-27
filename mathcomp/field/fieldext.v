@@ -171,6 +171,9 @@ apply: (iffP idP) => [sKxE | /andP].
 by rewrite -subv_add => /agenvS; rewrite subfield_closed.
 Qed.
 
+Lemma subv_Fadjoin2 E x y : x \in <<E; y>>%VS -> (<<E; x>> <= <<E; y>>)%VS.
+Proof. by move=> xEy; apply/FadjoinP; rewrite subv_adjoin. Qed.
+
 Lemma Fadjoin_seqP {K} {rs : seq L} {E} :
   reflect (K <= E /\ {subset rs <= E})%VS (<<K & rs>> <= E)%VS.
 Proof.
