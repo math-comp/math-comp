@@ -431,3 +431,8 @@ Notation "{ 'unit' R }" := (unit_of (Phant R))
 Prenex Implicits FinRing.uval.
 Notation "''U'" := (unit_action _) (at level 8) : action_scope.
 Notation "''U'" := (unit_groupAction _) (at level 8) : groupAction_scope.
+
+(* Finite Algebraic structure for bool *)
+
+#[hnf] HB.instance Definition _ := GRing.Ring.on bool.
+#[hnf] HB.instance Definition _ := isField.Build bool.

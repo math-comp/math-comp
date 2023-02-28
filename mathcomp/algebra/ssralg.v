@@ -6873,3 +6873,22 @@ End Test3.
 *)
 
 (* end hide *)
+
+(* Algebraic structure of bool *)
+
+HB.instance Definition _ := isZmodule.Build bool addbA addbC addFb addbb.
+HB.instance Definition _ := Zmodule_isComRing.Build bool
+  andbA andbC andTb andb_addl isT.
+
+Fact mulVb (b : bool) : b != 0 -> b * b = 1.
+Proof. by case: b. Qed.
+
+Fact invb_out (x y : bool) : y * x = 1 -> x != 0.
+Proof. by case: x; case: y. Qed.
+
+HB.instance Definition _ := ComRing_hasMulInverse.Build bool
+  mulVb invb_out (fun x => fun => erefl x).
+
+Lemma bool_fieldP : Field.axiom bool. Proof. by []. Qed.
+
+HB.instance Definition _ := ComUnitRing_isField.Build bool bool_fieldP.
