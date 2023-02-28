@@ -1631,3 +1631,16 @@ Notation "{ 'unit' R }" := (unit_of (Phant R))
 Prenex Implicits FinRing.uval.
 Notation "''U'" := (unit_action _) (at level 8) : action_scope.
 Notation "''U'" := (unit_groupAction _) (at level 8) : groupAction_scope.
+
+(* Finite Algebraic structure for bool *)
+
+Canonical bool_finZmodType := Eval hnf in [finZmodType of bool].
+Canonical bool_finRingType := Eval hnf in [finRingType of bool].
+Canonical bool_finComRingType := Eval hnf in [finComRingType of bool].
+Canonical bool_finUnitRingType := Eval hnf in [finUnitRingType of bool].
+Canonical bool_finComUnitRingType := Eval hnf in [finComUnitRingType of bool].
+Canonical bool_finIdomainType := Eval hnf in [finIdomainType of bool].
+Canonical bool_finFieldType := Eval hnf in [finFieldType of bool].
+Canonical bool_decFieldType :=
+  Eval hnf in [decFieldType of bool for bool_finFieldType].
+
