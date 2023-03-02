@@ -32,6 +32,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + fix `\meet^p_` and `\join^p_` notations
   + fix the scope of `n.-tuplelexi` notations
 
+- in `intdiv.v`
+  + `zcontents` is now of type `{poly int} -> int`
 ### Renamed
 
 ### Removed
