@@ -34,6 +34,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `intdiv.v`
   + `zcontents` is now of type `{poly int} -> int`
+  + `divz` is now of type `int -> int -> int`
 ### Renamed
 
 ### Removed
