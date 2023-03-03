@@ -52,7 +52,7 @@ Unset Printing Implicit Defensive.
 Import Order.TTheory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
-Definition divz (m d : int) :=
+Definition divz (m d : int) : int :=
   let: (K, n) := match m with Posz n => (Posz, n) | Negz n => (Negz, n) end in
   sgz d * K (n %/ `|d|)%N.
 
@@ -367,7 +367,7 @@ Lemma lez_divLR d m n : 0 < d -> (d %| m)%Z -> ((m %/ d)%Z <= n) = (m <= n * d).
 Proof. by move=> /ler_pmul2r <- /divzK->. Qed.
 
 Lemma ltz_divRL d m n : 0 < d -> (d %| m)%Z -> (n < m %/ d)%Z = (n * d < m).
-Proof. by move=> /ltr_pmul2r <- /divzK->. Qed.
+Proof. by move=> /ltr_pmul2r/(_ n)<- /divzK->. Qed.
 
 Lemma eqz_div d m n : d != 0 -> (d %| m)%Z -> (n == m %/ d)%Z = (n * d == m).
 Proof. by move=> /mulIf/inj_eq <- /divzK->. Qed.
