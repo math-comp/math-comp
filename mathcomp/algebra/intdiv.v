@@ -710,7 +710,7 @@ End Chinese.
 
 Section ZpolyScale.
 
-Definition zcontents p :=
+Definition zcontents (p : {poly int}) : int :=
   sgz (lead_coef p) * \big[gcdn/0%N]_(i < size p) `|(p`_i)%R|%N.
 
 Lemma sgz_contents p : sgz (zcontents p) = sgz (lead_coef p).
