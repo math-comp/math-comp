@@ -1168,7 +1168,7 @@ Section LiftedPOrder.
 Variable T' : Type.
 Implicit Type f : T' -> T.
 Definition min_fun f g x := min (f x) (g x).
-Definition max_fun f g x := min (f x) (g x).
+Definition max_fun f g x := max (f x) (g x).
 End LiftedPOrder.
 
 End POrderDef.

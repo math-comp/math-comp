@@ -38,6 +38,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `intdiv.v`
   + `zcontents` is now of type `{poly int} -> int`
   + `divz` is now of type `int -> int -> int`
+
+- in `order.v`
+  + fix the definition of `max_fun` (notation `\max`)
+    which was equal to `min_fun`
+
 ### Renamed
 
 ### Removed
