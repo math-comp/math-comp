@@ -1461,29 +1461,29 @@ Notation "0" := bottom : order_scope.
 Notation "\bot" := bottom : order_scope.
 
 Notation "\join_ ( i <- r | P ) F" :=
-  (\big[@join _ _/0%O]_(i <- r | P%B) F%O) : order_scope.
+  (\big[@join _ _ / \bot]_(i <- r | P%B) F%O) : order_scope.
 Notation "\join_ ( i <- r ) F" :=
-  (\big[@join _ _/0%O]_(i <- r) F%O) : order_scope.
+  (\big[@join _ _ / \bot]_(i <- r) F%O) : order_scope.
 Notation "\join_ ( i | P ) F" :=
-  (\big[@join _ _/0%O]_(i | P%B) F%O) : order_scope.
+  (\big[@join _ _ / \bot]_(i | P%B) F%O) : order_scope.
 Notation "\join_ i F" :=
-  (\big[@join _ _/0%O]_i F%O) : order_scope.
+  (\big[@join _ _ / \bot]_i F%O) : order_scope.
 Notation "\join_ ( i : I | P ) F" :=
-  (\big[@join _ _/0%O]_(i : I | P%B) F%O) (only parsing) : order_scope.
+  (\big[@join _ _ / \bot]_(i : I | P%B) F%O) (only parsing) : order_scope.
 Notation "\join_ ( i : I ) F" :=
-  (\big[@join _ _/0%O]_(i : I) F%O) (only parsing) : order_scope.
+  (\big[@join _ _ / \bot]_(i : I) F%O) (only parsing) : order_scope.
 Notation "\join_ ( m <= i < n | P ) F" :=
-  (\big[@join _ _/0%O]_(m <= i < n | P%B) F%O) : order_scope.
+  (\big[@join _ _ / \bot]_(m <= i < n | P%B) F%O) : order_scope.
 Notation "\join_ ( m <= i < n ) F" :=
-  (\big[@join _ _/0%O]_(m <= i < n) F%O) : order_scope.
+  (\big[@join _ _ / \bot]_(m <= i < n) F%O) : order_scope.
 Notation "\join_ ( i < n | P ) F" :=
-  (\big[@join _ _/0%O]_(i < n | P%B) F%O) : order_scope.
+  (\big[@join _ _ / \bot]_(i < n | P%B) F%O) : order_scope.
 Notation "\join_ ( i < n ) F" :=
-  (\big[@join _ _/0%O]_(i < n) F%O) : order_scope.
+  (\big[@join _ _ / \bot]_(i < n) F%O) : order_scope.
 Notation "\join_ ( i 'in' A | P ) F" :=
-  (\big[@join _ _/0%O]_(i in A | P%B) F%O) : order_scope.
+  (\big[@join _ _ / \bot]_(i in A | P%B) F%O) : order_scope.
 Notation "\join_ ( i 'in' A ) F" :=
-  (\big[@join _ _/0%O]_(i in A) F%O) : order_scope.
+  (\big[@join _ _ / \bot]_(i in A) F%O) : order_scope.
 
 End BLatticeSyntax.
 HB.export BLatticeSyntax.
@@ -1509,29 +1509,29 @@ Notation "1" := top : order_scope.
 Notation "\top" := top : order_scope.
 
 Notation "\meet_ ( i <- r | P ) F" :=
-  (\big[meet/1]_(i <- r | P%B) F%O) : order_scope.
+  (\big[meet / \top]_(i <- r | P%B) F%O) : order_scope.
 Notation "\meet_ ( i <- r ) F" :=
-  (\big[meet/1]_(i <- r) F%O) : order_scope.
+  (\big[meet / \top]_(i <- r) F%O) : order_scope.
 Notation "\meet_ ( i | P ) F" :=
-  (\big[meet/1]_(i | P%B) F%O) : order_scope.
+  (\big[meet / \top]_(i | P%B) F%O) : order_scope.
 Notation "\meet_ i F" :=
-  (\big[meet/1]_i F%O) : order_scope.
+  (\big[meet / \top]_i F%O) : order_scope.
 Notation "\meet_ ( i : I | P ) F" :=
-  (\big[meet/1]_(i : I | P%B) F%O) (only parsing) : order_scope.
+  (\big[meet / \top]_(i : I | P%B) F%O) (only parsing) : order_scope.
 Notation "\meet_ ( i : I ) F" :=
-  (\big[meet/1]_(i : I) F%O) (only parsing) : order_scope.
+  (\big[meet / \top]_(i : I) F%O) (only parsing) : order_scope.
 Notation "\meet_ ( m <= i < n | P ) F" :=
- (\big[meet/1]_(m <= i < n | P%B) F%O) : order_scope.
+ (\big[meet / \top]_(m <= i < n | P%B) F%O) : order_scope.
 Notation "\meet_ ( m <= i < n ) F" :=
- (\big[meet/1]_(m <= i < n) F%O) : order_scope.
+ (\big[meet / \top]_(m <= i < n) F%O) : order_scope.
 Notation "\meet_ ( i < n | P ) F" :=
- (\big[meet/1]_(i < n | P%B) F%O) : order_scope.
+ (\big[meet / \top]_(i < n | P%B) F%O) : order_scope.
 Notation "\meet_ ( i < n ) F" :=
- (\big[meet/1]_(i < n) F%O) : order_scope.
+ (\big[meet / \top]_(i < n) F%O) : order_scope.
 Notation "\meet_ ( i 'in' A | P ) F" :=
- (\big[meet/1]_(i in A | P%B) F%O) : order_scope.
+ (\big[meet / \top]_(i in A | P%B) F%O) : order_scope.
 Notation "\meet_ ( i 'in' A ) F" :=
- (\big[meet/1]_(i in A) F%O) : order_scope.
+ (\big[meet / \top]_(i in A) F%O) : order_scope.
 
 End TLatticeSyntax.
 HB.export TLatticeSyntax.
@@ -1751,60 +1751,60 @@ Notation "\top^d" := dual_top : order_scope.
 
 (* The following Local Notations are here to define the \join^d_ and \meet^d_ *)
 (* notations later. Do not remove them.                                       *)
-Local Notation "0" := dual_bottom.
-Local Notation "1" := dual_top.
+Local Notation "\bot" := dual_bottom.
+Local Notation "\top" := dual_top.
 Local Notation join := dual_join.
 Local Notation meet := dual_meet.
 
 Notation "\join^d_ ( i <- r | P ) F" :=
-  (\big[join/0]_(i <- r | P%B) F%O) : order_scope.
+  (\big[join / \bot]_(i <- r | P%B) F%O) : order_scope.
 Notation "\join^d_ ( i <- r ) F" :=
-  (\big[join/0]_(i <- r) F%O) : order_scope.
+  (\big[join / \bot]_(i <- r) F%O) : order_scope.
 Notation "\join^d_ ( i | P ) F" :=
-  (\big[join/0]_(i | P%B) F%O) : order_scope.
+  (\big[join / \bot]_(i | P%B) F%O) : order_scope.
 Notation "\join^d_ i F" :=
-  (\big[join/0]_i F%O) : order_scope.
+  (\big[join / \bot]_i F%O) : order_scope.
 Notation "\join^d_ ( i : I | P ) F" :=
-  (\big[join/0]_(i : I | P%B) F%O) (only parsing) : order_scope.
+  (\big[join / \bot]_(i : I | P%B) F%O) (only parsing) : order_scope.
 Notation "\join^d_ ( i : I ) F" :=
-  (\big[join/0]_(i : I) F%O) (only parsing) : order_scope.
+  (\big[join / \bot]_(i : I) F%O) (only parsing) : order_scope.
 Notation "\join^d_ ( m <= i < n | P ) F" :=
- (\big[join/0]_(m <= i < n | P%B) F%O) : order_scope.
+ (\big[join / \bot]_(m <= i < n | P%B) F%O) : order_scope.
 Notation "\join^d_ ( m <= i < n ) F" :=
- (\big[join/0]_(m <= i < n) F%O) : order_scope.
+ (\big[join / \bot]_(m <= i < n) F%O) : order_scope.
 Notation "\join^d_ ( i < n | P ) F" :=
- (\big[join/0]_(i < n | P%B) F%O) : order_scope.
+ (\big[join / \bot]_(i < n | P%B) F%O) : order_scope.
 Notation "\join^d_ ( i < n ) F" :=
- (\big[join/0]_(i < n) F%O) : order_scope.
+ (\big[join / \bot]_(i < n) F%O) : order_scope.
 Notation "\join^d_ ( i 'in' A | P ) F" :=
- (\big[join/0]_(i in A | P%B) F%O) : order_scope.
+ (\big[join / \bot]_(i in A | P%B) F%O) : order_scope.
 Notation "\join^d_ ( i 'in' A ) F" :=
- (\big[join/0]_(i in A) F%O) : order_scope.
+ (\big[join / \bot]_(i in A) F%O) : order_scope.
 
 Notation "\meet^d_ ( i <- r | P ) F" :=
-  (\big[meet/1]_(i <- r | P%B) F%O) : order_scope.
+  (\big[meet / \top]_(i <- r | P%B) F%O) : order_scope.
 Notation "\meet^d_ ( i <- r ) F" :=
-  (\big[meet/1]_(i <- r) F%O) : order_scope.
+  (\big[meet / \top]_(i <- r) F%O) : order_scope.
 Notation "\meet^d_ ( i | P ) F" :=
-  (\big[meet/1]_(i | P%B) F%O) : order_scope.
+  (\big[meet / \top]_(i | P%B) F%O) : order_scope.
 Notation "\meet^d_ i F" :=
-  (\big[meet/1]_i F%O) : order_scope.
+  (\big[meet / \top]_i F%O) : order_scope.
 Notation "\meet^d_ ( i : I | P ) F" :=
-  (\big[meet/1]_(i : I | P%B) F%O) (only parsing) : order_scope.
+  (\big[meet / \top]_(i : I | P%B) F%O) (only parsing) : order_scope.
 Notation "\meet^d_ ( i : I ) F" :=
-  (\big[meet/1]_(i : I) F%O) (only parsing) : order_scope.
+  (\big[meet / \top]_(i : I) F%O) (only parsing) : order_scope.
 Notation "\meet^d_ ( m <= i < n | P ) F" :=
- (\big[meet/1]_(m <= i < n | P%B) F%O) : order_scope.
+ (\big[meet / \top]_(m <= i < n | P%B) F%O) : order_scope.
 Notation "\meet^d_ ( m <= i < n ) F" :=
- (\big[meet/1]_(m <= i < n) F%O) : order_scope.
+ (\big[meet / \top]_(m <= i < n) F%O) : order_scope.
 Notation "\meet^d_ ( i < n | P ) F" :=
- (\big[meet/1]_(i < n | P%B) F%O) : order_scope.
+ (\big[meet / \top]_(i < n | P%B) F%O) : order_scope.
 Notation "\meet^d_ ( i < n ) F" :=
- (\big[meet/1]_(i < n) F%O) : order_scope.
+ (\big[meet / \top]_(i < n) F%O) : order_scope.
 Notation "\meet^d_ ( i 'in' A | P ) F" :=
- (\big[meet/1]_(i in A | P%B) F%O) : order_scope.
+ (\big[meet / \top]_(i in A | P%B) F%O) : order_scope.
 Notation "\meet^d_ ( i 'in' A ) F" :=
- (\big[meet/1]_(i in A) F%O) : order_scope.
+ (\big[meet / \top]_(i in A) F%O) : order_scope.
 
 End DualSyntax.
 
@@ -3702,47 +3702,47 @@ Module Import BLatticeTheory.
 Section BLatticeTheory.
 Context {disp : unit} {L : bLatticeType disp}.
 Implicit Types (I : finType) (T : eqType) (x y z : L).
-Local Notation "0" := bottom.
+Local Notation "\bot" := bottom.
 
-(* Non-distributive lattice theory with 0 & 1 *)
-Lemma le0x x : 0 <= x. Proof. exact: le0x. Qed.
+(* Non-distributive lattice theory with \bot & \top *)
+Lemma le0x x : \bot <= x. Proof. exact: le0x. Qed.
 Hint Resolve le0x : core.
 
-Lemma lex0 x : (x <= 0) = (x == 0).
+Lemma lex0 x : (x <= \bot) = (x == \bot).
 Proof. by rewrite le_eqVlt (le_gtF (le0x _)) orbF. Qed.
 
-Lemma ltx0 x : (x < 0) = false.
+Lemma ltx0 x : (x < \bot) = false.
 Proof. by rewrite lt_neqAle lex0 andNb. Qed.
 
-Lemma lt0x x : (0 < x) = (x != 0).
+Lemma lt0x x : (\bot < x) = (x != \bot).
 Proof. by rewrite lt_neqAle le0x andbT eq_sym. Qed.
 
-Lemma meet0x : left_zero 0 (@meet _ L).
+Lemma meet0x : left_zero \bot (@meet _ L).
 Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
 
-Lemma meetx0 : right_zero 0 (@meet _ L).
+Lemma meetx0 : right_zero \bot (@meet _ L).
 Proof. by move=> x; rewrite meetC meet0x. Qed.
 
-Lemma join0x : left_id 0 (@join _ L).
+Lemma join0x : left_id \bot (@join _ L).
 Proof. by move=> x; apply/eqP; rewrite -leEjoin. Qed.
 
-Lemma joinx0 : right_id 0 (@join _ L).
+Lemma joinx0 : right_id \bot (@join _ L).
 Proof. by move=> x; rewrite joinC join0x. Qed.
 
-Lemma join_eq0 x y : (x `|` y == 0) = (x == 0) && (y == 0).
+Lemma join_eq0 x y : (x `|` y == \bot) = (x == \bot) && (y == \bot).
 Proof.
 apply/idP/idP; last by move=> /andP [/eqP-> /eqP->]; rewrite joinx0.
 by move=> /eqP xUy0; rewrite -!lex0 -xUy0 leUl leUr.
 Qed.
 
 Variant eq0_xor_gt0 x : bool -> bool -> Set :=
-    Eq0NotPOs : x = 0 -> eq0_xor_gt0 x true false
-  | POsNotEq0 : 0 < x -> eq0_xor_gt0 x false true.
+    Eq0NotPOs : x = \bot -> eq0_xor_gt0 x true false
+  | POsNotEq0 : \bot < x -> eq0_xor_gt0 x false true.
 
-Lemma posxP x : eq0_xor_gt0 x (x == 0) (0 < x).
+Lemma posxP x : eq0_xor_gt0 x (x == \bot) (\bot < x).
 Proof. by rewrite lt0x; have [] := eqVneq; constructor; rewrite ?lt0x. Qed.
 
-HB.instance Definition _ := Monoid.isComLaw.Build L 0 join
+HB.instance Definition _ := Monoid.isComLaw.Build L \bot join
   (@joinA _ L) (@joinC _ L) join0x.
 
 Lemma joins_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
@@ -3809,8 +3809,8 @@ HB.instance Definition _ := hasBottom.Build _ L^d lex1.
 (* HB.instance Definition _ := TBLattice.on L^d. *)
 HB.instance Definition _ := hasTop.Build _ L^d (@le0x _ L).
 
-Lemma botEdual : (dual_bottom : L^d) = 1 :> L. Proof. by []. Qed.
-Lemma topEdual : (dual_top : L^d) = 0 :> L. Proof. by []. Qed.
+Lemma botEdual : (dual_bottom : L^d) = \top :> L. Proof. by []. Qed.
+Lemma topEdual : (dual_top : L^d) = \bot :> L. Proof. by []. Qed.
 
 End DualTBLattice.
 
@@ -3823,37 +3823,37 @@ Section TLatticeTheory.
 Context {disp : unit} {L : tLatticeType disp}.
 Implicit Types (I : finType) (T : eqType) (x y : L).
 
-Local Notation "1" := top.
+Local Notation "\top" := top.
 
 Lemma lex1 (x : L) : x <= top. Proof. exact: lex1. Qed.
 
 Hint Resolve lex1 : core.
 
-Lemma meetx1 : right_id 1 (@meet _ L).
+Lemma meetx1 : right_id \top (@meet _ L).
 Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
 
-Lemma meet1x : left_id 1 (@meet _ L).
+Lemma meet1x : left_id \top (@meet _ L).
 Proof. by move=> x; apply/eqP; rewrite meetC meetx1. Qed.
 
-Lemma joinx1 : right_zero 1 (@join _ L).
+Lemma joinx1 : right_zero \top (@join _ L).
 Proof. by move=> x; apply/eqP; rewrite -leEjoin. Qed.
 
-Lemma join1x : left_zero 1 (@join _ L).
+Lemma join1x : left_zero \top (@join _ L).
 Proof. by move=> x; apply/eqP; rewrite joinC joinx1. Qed.
 
-Lemma le1x x : (1 <= x) = (x == 1).
+Lemma le1x x : (\top <= x) = (x == \top).
 Proof. by rewrite le_eqVlt (le_gtF (lex1 _)) eq_sym; case: eqP. Qed.
 
-Lemma meet_eq1 x y : (x `&` y == 1) = (x == 1) && (y == 1).
+Lemma meet_eq1 x y : (x `&` y == \top) = (x == \top) && (y == \top).
 Proof.
 apply/idP/idP; last by move=> /andP[/eqP-> /eqP->]; rewrite meetx1.
 by move=> /eqP xIy1; rewrite -!le1x -xIy1 leIl leIr.
 Qed.
 
-HB.instance Definition _ := Monoid.isComLaw.Build L 1 meet
+HB.instance Definition _ := Monoid.isComLaw.Build L \top meet
   (@meetA _ L) (@meetC _ L) meet1x.
 
-HB.instance Definition _ := Monoid.isMulLaw.Build L 1 join join1x joinx1.
+HB.instance Definition _ := Monoid.isMulLaw.Build L \top join join1x joinx1.
 
 Lemma meets_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> \meet_(i <- r | P i) F i <= F x.
@@ -3914,12 +3914,12 @@ Module Import TBLatticeTheory.
 Section TBLatticeTheory.
 Context {disp : unit} {L : tbLatticeType disp}.
 
-HB.instance Definition _ := Monoid.isComLaw.Build L 1 meet
+HB.instance Definition _ := Monoid.isComLaw.Build L \top meet
   (@meetA _ L) (@meetC _ L) meet1x.
 
-HB.instance Definition _ := Monoid.isMulLaw.Build L 0 meet
+HB.instance Definition _ := Monoid.isMulLaw.Build L \bot meet
   (@meet0x _ L) (@meetx0 _ _).
-HB.instance Definition _ := Monoid.isMulLaw.Build L 1 join join1x joinx1.
+HB.instance Definition _ := Monoid.isMulLaw.Build L \top join join1x joinx1.
 
 End TBLatticeTheory.
 
@@ -3929,27 +3929,27 @@ Module Import BDistrLatticeTheory.
 Section BDistrLatticeTheory.
 Context {disp : unit} {L : bDistrLatticeType disp}.
 Implicit Types (I : finType) (T : eqType) (x y z : L).
-Local Notation "0" := bottom.
-(* Distributive lattice theory with 0 & 1 *)
+Local Notation "\bot" := bottom.
+(* Distributive lattice theory with \bot & \top *)
 
-Lemma leU2l_le y t x z : x `&` t = 0 -> x `|` y <= z `|` t -> x <= z.
+Lemma leU2l_le y t x z : x `&` t = \bot -> x `|` y <= z `|` t -> x <= z.
 Proof.
 by move=> xIt0 /(leI2 (lexx x)); rewrite joinKI meetUr xIt0 joinx0 leIidl.
 Qed.
 
-Lemma leU2r_le y t x z : x `&` t = 0 -> y `|` x <= t `|` z -> x <= z.
+Lemma leU2r_le y t x z : x `&` t = \bot -> y `|` x <= t `|` z -> x <= z.
 Proof. by rewrite joinC [_ `|` z]joinC => /leU2l_le H /H. Qed.
 
-Lemma disjoint_lexUl z x y : x `&` z = 0 -> (x <= y `|` z) = (x <= y).
+Lemma disjoint_lexUl z x y : x `&` z = \bot -> (x <= y `|` z) = (x <= y).
 Proof.
 move=> xz0; apply/idP/idP=> xy; last by rewrite lexU2 ?xy.
 by apply: (@leU2l_le x z); rewrite ?joinxx.
 Qed.
 
-Lemma disjoint_lexUr z x y : x `&` z = 0 -> (x <= z `|` y) = (x <= y).
+Lemma disjoint_lexUr z x y : x `&` z = \bot -> (x <= z `|` y) = (x <= y).
 Proof. by move=> xz0; rewrite joinC; rewrite disjoint_lexUl. Qed.
 
-Lemma leU2E x y z t : x `&` t = 0 -> y `&` z = 0 ->
+Lemma leU2E x y z t : x `&` t = \bot -> y `&` z = \bot ->
   (x `|` y <= z `|` t) = (x <= z) && (y <= t).
 Proof.
 move=> dxt dyz; apply/idP/andP; last by case=> ? ?; exact: leU2.
@@ -3957,9 +3957,9 @@ by move=> lexyzt; rewrite (leU2l_le _ lexyzt) // (leU2r_le _ lexyzt).
 Qed.
 
 Lemma joins_disjoint I (d : L) (P : {pred I}) (F : I -> L) :
-   (forall i : I, P i -> d `&` F i = 0) -> d `&` \join_(i | P i) F i = 0.
+   (forall i : I, P i -> d `&` F i = \bot) -> d `&` \join_(i | P i) F i = \bot.
 Proof.
-move=> d_Fi_disj; have : \big[andb/true]_(i | P i) (d `&` F i == 0).
+move=> d_Fi_disj; have : \big[andb/true]_(i | P i) (d `&` F i == \bot).
   rewrite big_all_cond; apply/allP => i _ /=.
   by apply/implyP => /d_Fi_disj ->.
 elim/big_rec2: _ => [|i y]; first by rewrite meetx0.
@@ -3989,21 +3989,21 @@ Section TBDistrLatticeTheory.
 Context {disp : unit} {L : tbDistrLatticeType disp}.
 Implicit Types (I : finType) (T : eqType) (x y : L).
 
-Local Notation "1" := top.
+Local Notation "\top" := top.
 
-Lemma leI2l_le y t x z : y `|` z = 1 -> x `&` y <= z `&` t -> x <= z.
+Lemma leI2l_le y t x z : y `|` z = \top -> x `&` y <= z `&` t -> x <= z.
 Proof. by rewrite joinC; exact: (@leU2l_le _ L^d). Qed.
 
-Lemma leI2r_le y t x z : y `|` z = 1 -> y `&` x <= t `&` z -> x <= z.
+Lemma leI2r_le y t x z : y `|` z = \top -> y `&` x <= t `&` z -> x <= z.
 Proof. by rewrite joinC; exact: (@leU2r_le _ L^d). Qed.
 
-Lemma cover_leIxl z x y : z `|` y = 1 -> (x `&` z <= y) = (x <= y).
+Lemma cover_leIxl z x y : z `|` y = \top -> (x `&` z <= y) = (x <= y).
 Proof. by rewrite joinC; exact: (@disjoint_lexUl _ L^d). Qed.
 
-Lemma cover_leIxr z x y : z `|` y = 1 -> (z `&` x <= y) = (x <= y).
+Lemma cover_leIxr z x y : z `|` y = \top -> (z `&` x <= y) = (x <= y).
 Proof. by rewrite joinC; exact: (@disjoint_lexUr _ L^d). Qed.
 
-Lemma leI2E x y z t : x `|` t = 1 -> y `|` z = 1 ->
+Lemma leI2E x y z t : x `|` t = \top -> y `|` z = \top ->
   (x `&` y <= z `&` t) = (x <= z) && (y <= t).
 Proof. by move=> ? ?; apply: (@leU2E _ L^d); rewrite meetC. Qed.
 
@@ -4013,7 +4013,7 @@ HB.instance Definition _ := Monoid.isAddLaw.Build L join meet
   (@joinIl _ L) (@joinIr _ _).
 
 Lemma meets_total I (d : L) (P : {pred I}) (F : I -> L) :
-   (forall i : I, P i -> d `|` F i = 1) -> d `|` \meet_(i | P i) F i = 1.
+   (forall i : I, P i -> d `|` F i = \top) -> d `|` \meet_(i | P i) F i = \top.
 Proof. exact: (@joins_disjoint _ L^d). Qed.
 
 End TBDistrLatticeTheory.
@@ -4023,20 +4023,20 @@ Module Import CBDistrLatticeTheory.
 Section CBDistrLatticeTheory.
 Context {disp : unit} {L : cbDistrLatticeType disp}.
 Implicit Types (x y z : L).
-Local Notation "0" := bottom.
+Local Notation "\bot" := bottom.
 
-Lemma diffKI x y : y `&` (x `\` y) = 0.
+Lemma diffKI x y : y `&` (x `\` y) = \bot.
 Proof. exact: diffKI. Qed.
 
-Lemma diffIK x y : (x `\` y) `&` y = 0.
+Lemma diffIK x y : (x `\` y) `&` y = \bot.
 Proof. by rewrite meetC diffKI. Qed.
 #[deprecated(since="mathcomp 2.0.0", note="Use diffIK instead.")]
 Notation subIK := diffIK.
 
-Lemma meetIB z x y : (z `&` y) `&` (x `\` y) = 0.
+Lemma meetIB z x y : (z `&` y) `&` (x `\` y) = \bot.
 Proof. by rewrite -meetA diffKI meetx0. Qed.
 
-Lemma meetBI z x y : (x `\` y) `&` (z `&` y) = 0.
+Lemma meetBI z x y : (x `\` y) `&` (z `&` y) = \bot.
 Proof. by rewrite meetC meetIB. Qed.
 
 Lemma joinIB y x : (x `&` y) `|` (x `\` y) = x.
@@ -4055,7 +4055,7 @@ Lemma leBx x y : x `\` y <= x.
 Proof. by rewrite -{2}[x](joinIB y) lexU2 // lexx orbT. Qed.
 Hint Resolve leBx : core.
 
-Lemma diffxx x : x `\` x = 0. Proof. by have := diffKI x x; rewrite meet_r. Qed.
+Lemma diffxx x : x `\` x = \bot. Proof. by have := diffKI x x; rewrite meet_r. Qed.
 #[deprecated(since="mathcomp 2.0.0", note="Use diffxx instead.")]
 Notation subxx := diffxx.
 
@@ -4098,7 +4098,7 @@ Qed.
 #[deprecated(since="mathcomp 2.0.0", note="Use diffUx instead.")]
 Notation subUx := diffUx.
 
-Lemma diff_eq0 x y : (x `\` y == 0) = (x <= y).
+Lemma diff_eq0 x y : (x `\` y == \bot) = (x <= y).
 Proof. by rewrite -lex0 leBLR joinx0. Qed.
 #[deprecated(since="mathcomp 2.0.0", note="Use diff_eq0 instead.")]
 Notation sub_eq0 := diff_eq0.
@@ -4115,7 +4115,7 @@ Proof. by move=> lexy; rewrite leBLR joinxB meet_r ?leBUK ?leUr ?lexUl. Qed.
 Lemma leB2 x y z t : x <= z -> t <= y -> x `\` y <= z `\` t.
 Proof. by move=> /(@leBl t) ? /(@leBr x) /le_trans ->. Qed.
 
-Lemma meet_eq0E_diff z x y : x <= z -> (x `&` y == 0) = (x <= z `\` y).
+Lemma meet_eq0E_diff z x y : x <= z -> (x `&` y == \bot) = (x <= z `\` y).
 Proof.
 move=> xz; apply/idP/idP; last by move=> /meet_r <-; rewrite -meetA meetBI.
 by move=> /eqP xIy_eq0; rewrite -[x](joinIB y) xIy_eq0 join0x leBl.
@@ -4123,13 +4123,13 @@ Qed.
 #[deprecated(since="mathcomp 2.0.0", note="Use meet_eq0E_sub instead.")]
 Notation meet_eq0E_sub := meet_eq0E_diff.
 
-Lemma leBRL x y z : (x <= z `\` y) = (x <= z) && (x `&` y == 0).
+Lemma leBRL x y z : (x <= z `\` y) = (x <= z) && (x `&` y == \bot).
 Proof.
 apply/idP/idP => [xyz|]; first by rewrite (@meet_eq0E_diff z) // (le_trans xyz).
 by move=> /andP [?]; rewrite -meet_eq0E_diff.
 Qed.
 
-Lemma eq_diff x y z : (x `\` y == z) = (z <= x <= y `|` z) && (z `&` y == 0).
+Lemma eq_diff x y z : (x `\` y == z) = (z <= x <= y `|` z) && (z `&` y == \bot).
 Proof. by rewrite eq_le leBLR leBRL andbCA andbA. Qed.
 #[deprecated(since="mathcomp 2.0.0", note="Use eq_sub instead.")]
 Notation eq_sub := eq_diff.
@@ -4143,12 +4143,12 @@ Qed.
 #[deprecated(since="mathcomp 2.0.0", note="Use diffxU instead.")]
 Notation subxU := diffxU.
 
-Lemma diffx0 x : x `\` 0 = x.
+Lemma diffx0 x : x `\` \bot = x.
 Proof. by apply/eqP; rewrite eq_diff join0x meetx0 lexx eqxx. Qed.
 #[deprecated(since="mathcomp 2.0.0", note="Use diffx0 instead.")]
 Notation subx0 := diffx0.
 
-Lemma diff0x x : 0 `\` x = 0.
+Lemma diff0x x : \bot `\` x = \bot.
 Proof. by apply/eqP; rewrite eq_diff joinx0 meet0x lexx eqxx le0x. Qed.
 #[deprecated(since="mathcomp 2.0.0", note="Use diff0x instead.")]
 Notation sub0x := diff0x.
@@ -4198,23 +4198,23 @@ Proof. by rewrite diffUx diffxx joinx0. Qed.
 Lemma joinBKC x y : (x `|` y) `\` x = (y `\` x).
 Proof. by rewrite diffUx diffxx join0x. Qed.
 
-Lemma disj_le x y : x `&` y == 0 -> x <= y = (x == 0).
-Proof. by rewrite [x == 0]eq_sym -eq_meetl => /eqP ->. Qed.
+Lemma disj_le x y : x `&` y == \bot -> x <= y = (x == \bot).
+Proof. by rewrite [x == \bot]eq_sym -eq_meetl => /eqP ->. Qed.
 
-Lemma disj_leC x y : y `&` x == 0 -> x <= y = (x == 0).
+Lemma disj_leC x y : y `&` x == \bot -> x <= y = (x == \bot).
 Proof. by rewrite meetC => /disj_le. Qed.
 
-Lemma disj_diffl x y : x `&` y == 0 -> x `\` y = x.
+Lemma disj_diffl x y : x `&` y == \bot -> x `\` y = x.
 Proof. by move=> dxy; apply/eqP; rewrite eq_diff dxy lexx leUr. Qed.
 #[deprecated(since="mathcomp 2.0.0", note="Use disj_diffl instead.")]
 Notation disj_subl := disj_diffl.
 
-Lemma disj_diffr x y : x `&` y == 0 -> y `\` x = y.
+Lemma disj_diffr x y : x `&` y == \bot -> y `\` x = y.
 Proof. by rewrite meetC => /disj_diffl. Qed.
 #[deprecated(since="mathcomp 2.0.0", note="Use disj_diffr instead.")]
 Notation disj_subr := disj_diffr.
 
-Lemma lt0B x y : x < y -> 0 < y `\` x.
+Lemma lt0B x y : x < y -> \bot < y `\` x.
 Proof. by move=> ?; rewrite lt_leAnge le0x leBLR joinx0 /= lt_geF. Qed.
 
 End CBDistrLatticeTheory.
@@ -4224,13 +4224,13 @@ Module Import CTBDistrLatticeTheory.
 Section CTBDistrLatticeTheory.
 Context {disp : unit} {L : ctbDistrLatticeType disp}.
 Implicit Types (x y z : L).
-Local Notation "0" := bottom.
-Local Notation "1" := top.
+Local Notation "\bot" := bottom.
+Local Notation "\top" := top.
 
-Lemma complE x : ~` x = 1 `\` x.
+Lemma complE x : ~` x = \top `\` x.
 Proof. exact: complE. Qed.
 
-Lemma diff1x x : 1 `\` x = ~` x.
+Lemma diff1x x : \top `\` x = ~` x.
 Proof. by rewrite complE. Qed.
 #[deprecated(since="mathcomp 2.0.0", note="Use diff1x instead.")]
 Notation sub1x := diff1x.
@@ -4246,7 +4246,7 @@ Proof. by move=> x; rewrite !complE diffxB diffxx meet1x join0x. Qed.
 Lemma compl_inj : injective (@compl _ L).
 Proof. exact/inv_inj/complK. Qed.
 
-Lemma disj_leC x y : (x `&` y == 0) = (x <= ~` y).
+Lemma disj_leC x y : (x `&` y == \bot) = (x <= ~` y).
 Proof. by rewrite -diff_eq0 diffE complK. Qed.
 
 Lemma leC x y : (~` x <= ~` y) = (y <= x).
@@ -4262,22 +4262,22 @@ Proof. by rewrite !complE diffxU. Qed.
 Lemma complI  x y : ~` (x `&` y) = ~` x `|` ~` y.
 Proof. by rewrite !complE diffxI. Qed.
 
-Lemma joinxC  x :  x `|` ~` x = 1.
+Lemma joinxC  x :  x `|` ~` x = \top.
 Proof. by rewrite complE diffKU joinx1. Qed.
 
-Lemma joinCx  x : ~` x `|` x = 1.
+Lemma joinCx  x : ~` x `|` x = \top.
 Proof. by rewrite joinC joinxC. Qed.
 
-Lemma meetxC  x :  x `&` ~` x = 0.
+Lemma meetxC  x :  x `&` ~` x = \bot.
 Proof. by rewrite complE diffKI. Qed.
 
-Lemma meetCx  x : ~` x `&` x = 0.
+Lemma meetCx  x : ~` x `&` x = \bot.
 Proof. by rewrite meetC meetxC. Qed.
 
-Lemma compl1 : ~` 1 = 0 :> L.
+Lemma compl1 : ~` \top = \bot :> L.
 Proof. by rewrite complE diffxx. Qed.
 
-Lemma compl0 : ~` 0 = 1 :> L.
+Lemma compl0 : ~` \bot = \top :> L.
 Proof. by rewrite complE diffx0. Qed.
 
 Lemma complB x y : ~` (x `\` y) = ~` x `|` y.
@@ -4986,12 +4986,12 @@ End LatticeMorphismTheory.
 
 HB.mixin Record isBLatticeMorphism d (T : bLatticeType d)
     d' (T' : bLatticeType d') (apply : T -> T') := {
-  omorph0_subproof : apply 0 = 0;
+  omorph0_subproof : apply \bot = \bot;
 }.
 
 HB.mixin Record isTLatticeMorphism d (T : tLatticeType d)
     d' (T' : tLatticeType d') (apply : T -> T') := {
-  omorph1_subproof : apply 1 = 1;
+  omorph1_subproof : apply \top = \top;
 }.
 
 #[infer(T,T')]
@@ -5025,7 +5025,7 @@ Section Properties.
 Variables (d : unit) (T : bLatticeType d) (d' : unit) (T' : bLatticeType d').
 Variables (f : {blmorphism T -> T'}).
 
-Lemma omorph0 : f 0 = 0.
+Lemma omorph0 : f \bot = \bot.
 Proof. exact: omorph0_subproof. Qed.
 
 End Properties.
@@ -5036,12 +5036,12 @@ Variables (d : unit) (T : bLatticeType d) (d' : unit) (T' : bLatticeType d').
 Variables (d'' : unit) (T'' : bLatticeType d'').
 Variables (f : {blmorphism T' -> T''}) (g : {blmorphism T -> T'}).
 
-Fact idfun_is_bottom_morphism : (@idfun T) 0 = 0. Proof. by []. Qed.
+Fact idfun_is_bottom_morphism : (@idfun T) \bot = \bot. Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isBLatticeMorphism.Build d T d T idfun
   idfun_is_bottom_morphism.
 
-Fact comp_is_bottom_morphism : (f \o g) 0 = 0.
+Fact comp_is_bottom_morphism : (f \o g) \bot = \bot.
 Proof. by rewrite /= !omorph0. Qed.
 #[export]
 HB.instance Definition _ := isBLatticeMorphism.Build d T d'' T'' (f \o g)
@@ -5060,7 +5060,7 @@ Section Properties.
 Variables (d : unit) (T : tLatticeType d) (d' : unit) (T' : tLatticeType d').
 Variables (f : {tlmorphism T -> T'}).
 
-Lemma omorph1 : f 1 = 1.
+Lemma omorph1 : f \top = \top.
 Proof. exact: omorph1_subproof. Qed.
 
 End Properties.
@@ -5071,12 +5071,12 @@ Variables (d : unit) (T : tLatticeType d) (d' : unit) (T' : tLatticeType d').
 Variables (d'' : unit) (T'' : tLatticeType d'').
 Variables (f : {tlmorphism T' -> T''}) (g : {tlmorphism T -> T'}).
 
-Fact idfun_is_top_morphism : (@idfun T) 1 = 1. Proof. by []. Qed.
+Fact idfun_is_top_morphism : (@idfun T) \top = \top. Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isTLatticeMorphism.Build d T d T idfun
   idfun_is_top_morphism.
 
-Fact comp_is_top_morphism : (f \o g) 1 = 1.
+Fact comp_is_top_morphism : (f \o g) \top = \top.
 Proof. by rewrite /= !omorph1. Qed.
 #[export]
 HB.instance Definition _ := isTLatticeMorphism.Build d T d'' T'' (f \o g)
@@ -5111,11 +5111,11 @@ HB.mixin Record isJoinLatticeClosed d (T : latticeType d) (S : {pred T}) := {
 }.
 
 HB.mixin Record isBLatticeClosed d (T : bLatticeType d) (S : {pred T}) := {
-  opred0 : 0 \in S;
+  opred0 : \bot \in S;
 }.
 
 HB.mixin Record isTLatticeClosed d (T : tLatticeType d) (S : {pred T}) := {
-  opred1 : 1 \in S;
+  opred1 : \top \in S;
 }.
 
 (* Structures for stability properties *)
@@ -5163,8 +5163,8 @@ HB.end.
 HB.factory Record isTBLatticeClosed d (T : tbLatticeType d) (S : {pred T}) := {
   opredI : meet_closed S;
   opredU : join_closed S;
-  opred0 : 0 \in S;
-  opred1 : 1 \in S;
+  opred0 : \bot \in S;
+  opred1 : \top \in S;
 }.
 
 HB.builders Context d T S of isTBLatticeClosed d T S.
@@ -5190,7 +5190,7 @@ Section BLatticePred.
 
 Variables (d : unit) (T : bLatticeType d).
 
-Lemma opred0 (S : bLatticeClosed d T) : 0 \in S.
+Lemma opred0 (S : bLatticeClosed d T) : \bot \in S.
 Proof. exact: opred0. Qed.
 
 Lemma opred_joins (S : bJoinLatticeClosed d T) I r (P : pred I) F :
@@ -5203,7 +5203,7 @@ Section TLatticePred.
 
 Variables (d : unit) (T : tLatticeType d).
 
-Lemma opred1 (S : tLatticeClosed d T) : 1 \in S.
+Lemma opred1 (S : tLatticeClosed d T) : \top \in S.
 Proof. exact: opred1. Qed.
 
 Lemma opred_meets (S : tMeetLatticeClosed d T) I r (P : pred I) F :
@@ -5385,7 +5385,7 @@ HB.end.
 
 HB.mixin Record isBSubLattice d (T : bLatticeType d) (S : pred T) d' U
     of SubType T S U & BLattice d' U := {
-  val0_subproof : (val : U -> T) 0 = 0;
+  val0_subproof : (val : U -> T) \bot = \bot;
 }.
 
 #[short(type="bJoinSubLattice")]
@@ -5411,7 +5411,7 @@ HB.instance Definition _ (d : unit) (T : bLatticeType d) (S : pred T)
 
 HB.factory Record SubPOrder_isBSubLattice d (T : bLatticeType d) S d' U
     of @SubPOrder d T S d' U & Lattice d' U := {
-  opred0_subproof : 0 \in S;
+  opred0_subproof : \bot \in S;
 }.
 
 HB.builders Context d T S d' U of SubPOrder_isBSubLattice d T S d' U.
@@ -5422,7 +5422,7 @@ Let zeroU : U := inU opred0_subproof.
 Fact le0x x : zeroU <= x. Proof. by rewrite leEsub /= SubK le0x. Qed.
 HB.instance Definition _ := hasBottom.Build d' U le0x.
 
-Fact val0 : (val : U -> T) 0 = 0. Proof. by rewrite SubK. Qed.
+Fact val0 : (val : U -> T) \bot = \bot. Proof. by rewrite SubK. Qed.
 HB.instance Definition _ := isBSubLattice.Build d T S d' U val0.
 HB.end.
 
@@ -5430,7 +5430,7 @@ HB.factory Record SubChoice_isBSubLattice d (T : bLatticeType d) S (d' : unit) U
     of SubChoice T S U := {
   opredI_subproof : meet_closed S;
   opredU_subproof : join_closed S;
-  opred0_subproof : 0 \in S;
+  opred0_subproof : \bot \in S;
 }.
 
 HB.builders Context d T S d' U of SubChoice_isBSubLattice d T S d' U.
@@ -5442,7 +5442,7 @@ HB.end.
 
 HB.mixin Record isTSubLattice d (T : tLatticeType d) (S : pred T) d' U
     of SubType T S U & TLattice d' U := {
-  val1_subproof : (val : U -> T) 1 = 1;
+  val1_subproof : (val : U -> T) \top = \top;
 }.
 
 #[short(type="tMeetSubLattice")]
@@ -5468,7 +5468,7 @@ HB.instance Definition _ (d : unit) (T : tLatticeType d) (S : pred T)
 
 HB.factory Record SubPOrder_isTSubLattice d (T : tLatticeType d) S d' U
     of @SubPOrder d T S d' U & Lattice d' U := {
-  opred1_subproof : 1 \in S;
+  opred1_subproof : \top \in S;
 }.
 
 HB.builders Context d T S d' U of SubPOrder_isTSubLattice d T S d' U.
@@ -5479,7 +5479,7 @@ Let oneU : U := inU opred1_subproof.
 Fact lex1 x : x <= oneU. Proof. by rewrite leEsub /= SubK lex1. Qed.
 HB.instance Definition _ := hasTop.Build d' U lex1.
 
-Fact val1 : (val : U -> T) 1 = 1. Proof. by rewrite SubK. Qed.
+Fact val1 : (val : U -> T) \top = \top. Proof. by rewrite SubK. Qed.
 HB.instance Definition _ := isTSubLattice.Build d T S d' U val1.
 HB.end.
 
@@ -5487,7 +5487,7 @@ HB.factory Record SubChoice_isTSubLattice d (T : tLatticeType d) S (d' : unit) U
     of SubChoice T S U := {
   opredI_subproof : meet_closed S;
   opredU_subproof : join_closed S;
-  opred1_subproof : 1 \in S;
+  opred1_subproof : \top \in S;
 }.
 
 HB.builders Context d T S d' U of SubChoice_isTSubLattice d T S d' U.
@@ -5507,8 +5507,8 @@ HB.instance Definition _ (d : unit) (T : tbLatticeType d) (S : pred T) d'
 
 HB.factory Record SubPOrder_isTBSubLattice d (T : tbLatticeType d) S d' U
     of @SubPOrder d T S d' U & Lattice d' U := {
-  opred0_subproof : 0 \in S;
-  opred1_subproof : 1 \in S;
+  opred0_subproof : \bot \in S;
+  opred1_subproof : \top \in S;
 }.
 
 HB.builders Context d T S d' U of SubPOrder_isTBSubLattice d T S d' U.
@@ -5522,8 +5522,8 @@ HB.factory Record SubChoice_isTBSubLattice d (T : tbLatticeType d) S
     (d' : unit) U of SubChoice T S U := {
   opredI_subproof : meet_closed S;
   opredU_subproof : join_closed S;
-  opred0_subproof : 0 \in S;
-  opred1_subproof : 1 \in S;
+  opred0_subproof : \bot \in S;
+  opred1_subproof : \top \in S;
 }.
 
 HB.builders Context d T S d' U of SubChoice_isTBSubLattice d T S d' U.
@@ -5728,7 +5728,7 @@ Lemma leEnat : le = leq. Proof. by []. Qed.
 Lemma ltEnat : lt = ltn. Proof. by []. Qed.
 Lemma minEnat : min = minn. Proof. by []. Qed.
 Lemma maxEnat : max = maxn. Proof. by []. Qed.
-Lemma botEnat : 0%O = 0%N :> nat. Proof. by []. Qed.
+Lemma botEnat : \bot = 0%N :> nat. Proof. by []. Qed.
 
 End NatOrder.
 
@@ -6019,8 +6019,8 @@ HB.instance Definition _ :=
 HB.instance Definition _ :=
    hasTop.Build _ 'I_n (@leq_ord _ : forall x, x <= ord_max).
 
-Lemma botEord : 0%O = ord0. Proof. by []. Qed.
-Lemma topEord : 1%O = ord_max. Proof. by []. Qed.
+Lemma botEord : \bot = ord0. Proof. by []. Qed.
+Lemma topEord : \top = ord_max. Proof. by []. Qed.
 
 End NonTrivial.
 
@@ -6148,8 +6148,8 @@ Notation "x ><^p y" := (~~ (><^p%O x y)) : order_scope.
 
 (* The following Local Notations are here to define the \join^p_ and \meet^p_ *)
 (* notations later. Do not remove them.                                       *)
-Local Notation "0" := (@bottom prod_display _).
-Local Notation "1" := (@top prod_display _).
+Local Notation "\bot" := (@bottom prod_display _).
+Local Notation "\top" := (@top prod_display _).
 Local Notation meet := (@meet prod_display _).
 Local Notation join := (@join prod_display _).
 
@@ -6157,54 +6157,54 @@ Notation "x `&^p` y" :=  (meet x y) : order_scope.
 Notation "x `|^p` y" := (join x y) : order_scope.
 
 Notation "\join^p_ ( i <- r | P ) F" :=
-  (\big[join/0]_(i <- r | P%B) F%O) : order_scope.
+  (\big[join / \bot]_(i <- r | P%B) F%O) : order_scope.
 Notation "\join^p_ ( i <- r ) F" :=
-  (\big[join/0]_(i <- r) F%O) : order_scope.
+  (\big[join / \bot]_(i <- r) F%O) : order_scope.
 Notation "\join^p_ ( i | P ) F" :=
-  (\big[join/0]_(i | P%B) F%O) : order_scope.
+  (\big[join / \bot]_(i | P%B) F%O) : order_scope.
 Notation "\join^p_ i F" :=
-  (\big[join/0]_i F%O) : order_scope.
+  (\big[join / \bot]_i F%O) : order_scope.
 Notation "\join^p_ ( i : I | P ) F" :=
-  (\big[join/0]_(i : I | P%B) F%O) (only parsing) : order_scope.
+  (\big[join / \bot]_(i : I | P%B) F%O) (only parsing) : order_scope.
 Notation "\join^p_ ( i : I ) F" :=
-  (\big[join/0]_(i : I) F%O) (only parsing) : order_scope.
+  (\big[join / \bot]_(i : I) F%O) (only parsing) : order_scope.
 Notation "\join^p_ ( m <= i < n | P ) F" :=
- (\big[join/0]_(m <= i < n | P%B) F%O) : order_scope.
+ (\big[join / \bot]_(m <= i < n | P%B) F%O) : order_scope.
 Notation "\join^p_ ( m <= i < n ) F" :=
- (\big[join/0]_(m <= i < n) F%O) : order_scope.
+ (\big[join / \bot]_(m <= i < n) F%O) : order_scope.
 Notation "\join^p_ ( i < n | P ) F" :=
- (\big[join/0]_(i < n | P%B) F%O) : order_scope.
+ (\big[join / \bot]_(i < n | P%B) F%O) : order_scope.
 Notation "\join^p_ ( i < n ) F" :=
- (\big[join/0]_(i < n) F%O) : order_scope.
+ (\big[join / \bot]_(i < n) F%O) : order_scope.
 Notation "\join^p_ ( i 'in' A | P ) F" :=
- (\big[join/0]_(i in A | P%B) F%O) : order_scope.
+ (\big[join / \bot]_(i in A | P%B) F%O) : order_scope.
 Notation "\join^p_ ( i 'in' A ) F" :=
- (\big[join/0]_(i in A) F%O) : order_scope.
+ (\big[join / \bot]_(i in A) F%O) : order_scope.
 
 Notation "\meet^p_ ( i <- r | P ) F" :=
-  (\big[meet/1]_(i <- r | P%B) F%O) : order_scope.
+  (\big[meet / \top]_(i <- r | P%B) F%O) : order_scope.
 Notation "\meet^p_ ( i <- r ) F" :=
-  (\big[meet/1]_(i <- r) F%O) : order_scope.
+  (\big[meet / \top]_(i <- r) F%O) : order_scope.
 Notation "\meet^p_ ( i | P ) F" :=
-  (\big[meet/1]_(i | P%B) F%O) : order_scope.
+  (\big[meet / \top]_(i | P%B) F%O) : order_scope.
 Notation "\meet^p_ i F" :=
-  (\big[meet/1]_i F%O) : order_scope.
+  (\big[meet / \top]_i F%O) : order_scope.
 Notation "\meet^p_ ( i : I | P ) F" :=
-  (\big[meet/1]_(i : I | P%B) F%O) (only parsing) : order_scope.
+  (\big[meet / \top]_(i : I | P%B) F%O) (only parsing) : order_scope.
 Notation "\meet^p_ ( i : I ) F" :=
-  (\big[meet/1]_(i : I) F%O) (only parsing) : order_scope.
+  (\big[meet / \top]_(i : I) F%O) (only parsing) : order_scope.
 Notation "\meet^p_ ( m <= i < n | P ) F" :=
- (\big[meet/1]_(m <= i < n | P%B) F%O) : order_scope.
+ (\big[meet / \top]_(m <= i < n | P%B) F%O) : order_scope.
 Notation "\meet^p_ ( m <= i < n ) F" :=
- (\big[meet/1]_(m <= i < n) F%O) : order_scope.
+ (\big[meet / \top]_(m <= i < n) F%O) : order_scope.
 Notation "\meet^p_ ( i < n | P ) F" :=
- (\big[meet/1]_(i < n | P%B) F%O) : order_scope.
+ (\big[meet / \top]_(i < n | P%B) F%O) : order_scope.
 Notation "\meet^p_ ( i < n ) F" :=
- (\big[meet/1]_(i < n) F%O) : order_scope.
+ (\big[meet / \top]_(i < n) F%O) : order_scope.
 Notation "\meet^p_ ( i 'in' A | P ) F" :=
- (\big[meet/1]_(i in A | P%B) F%O) : order_scope.
+ (\big[meet / \top]_(i in A | P%B) F%O) : order_scope.
 Notation "\meet^p_ ( i 'in' A ) F" :=
- (\big[meet/1]_(i in A) F%O) : order_scope.
+ (\big[meet / \top]_(i in A) F%O) : order_scope.
 
 End ProdSyntax.
 
@@ -6373,13 +6373,13 @@ End Lattice.
 Section BLattice.
 Variable (T : bLatticeType disp1) (T' : bLatticeType disp2).
 
-Fact le0x (x : T * T') : (0, 0) <= x :> T * T'.
+Fact le0x (x : T * T') : (\bot, \bot) <= x :> T * T'.
 Proof. by rewrite /<=%O /= /le !le0x. Qed.
 
 #[export]
 HB.instance Definition _ := hasBottom.Build _ (T * T') le0x.
 
-Lemma botEprod : 0 = (0, 0) :> T * T'. Proof. by []. Qed.
+Lemma botEprod : \bot = (\bot, \bot) :> T * T'. Proof. by []. Qed.
 
 End BLattice.
 
@@ -6392,7 +6392,7 @@ Proof. by rewrite /<=%O /= /le !lex1. Qed.
 #[export]
 HB.instance Definition _ := hasTop.Build _ (T * T') lex1.
 
-Lemma topEprod : 1 = (1, 1) :> T * T'. Proof. by []. Qed.
+Lemma topEprod : \top = (\top, \top) :> T * T'. Proof. by []. Qed.
 
 End TBLattice.
 
@@ -6426,7 +6426,8 @@ Implicit Types (x y : T * T').
 
 Definition diff x y := (x.1 `\` y.1, x.2 `\` y.2).
 
-Lemma diffKI x y : y `&` diff x y = 0. Proof. by congr pair; rewrite diffKI. Qed.
+Lemma diffKI x y : y `&` diff x y = \bot.
+Proof. by congr pair; rewrite diffKI. Qed.
 
 Lemma joinIB x y : x `&` y `|` diff x y = x.
 Proof. by case: x => ? ?; congr pair; rewrite joinIB. Qed.
@@ -6444,7 +6445,8 @@ Implicit Types (x y : T * T').
 
 Definition compl x : T * T' := (~` x.1, ~` x.2).
 
-Lemma complE x : compl x = diff 1 x. Proof. by congr pair; rewrite complE. Qed.
+Lemma complE x : compl x = diff \top x.
+Proof. by congr pair; rewrite complE. Qed.
 
 #[export]
 HB.instance Definition _ := hasComplement.Build _ (T * T') complE.
@@ -6630,7 +6632,7 @@ End Total.
 Section FinDistrLattice.
 Variable (T : finOrderType disp1) (T' : T -> finOrderType disp2).
 
-Fact le0x (x : {t : T & T' t}) : Tagged T' (0 : T' 0) <= x.
+Fact le0x (x : {t : T & T' t}) : Tagged T' (\bot : T' \bot) <= x.
 Proof.
 rewrite leEsig /=; case: comparableP (le0x (tag x)) => //=.
 by case: x => //= x px x0; rewrite x0 in px *; rewrite tagged_asE le0x.
@@ -6638,9 +6640,9 @@ Qed.
 #[export]
 HB.instance Definition _ := hasBottom.Build _ {t : T & T' t} le0x.
 
-Lemma botEsig : 0 = Tagged T' (0 : T' 0). Proof. by []. Qed.
+Lemma botEsig : \bot = Tagged T' (\bot : T' \bot). Proof. by []. Qed.
 
-Fact lex1 (x : {t : T & T' t}) : x <= Tagged T' (1 : T' 1).
+Fact lex1 (x : {t : T & T' t}) : x <= Tagged T' (\top : T' \top).
 Proof.
 rewrite leEsig /=; case: comparableP (lex1 (tag x)) => //=.
 by case: x => //= x px x0; rewrite x0 in px *; rewrite tagged_asE lex1.
@@ -6648,7 +6650,7 @@ Qed.
 #[export]
 HB.instance Definition _ := hasTop.Build _ {t : T & T' t} lex1.
 
-Lemma topEsig : 1 = Tagged T' (1 : T' 1). Proof. by []. Qed.
+Lemma topEsig : \top = Tagged T' (\top : T' \top). Proof. by []. Qed.
 
 End FinDistrLattice.
 
@@ -6763,21 +6765,21 @@ End Total.
 Section FinDistrLattice.
 Variable (T : finOrderType disp1) (T' : finOrderType disp2).
 
-Fact le0x (x : T * T') : (0, 0) <= x :> T * T'.
+Fact le0x (x : T * T') : (\bot, \bot) <= x :> T * T'.
 Proof. by case: x => // x1 x2; rewrite leEprodlexi/= !le0x implybT. Qed.
 
 #[export]
 HB.instance Definition _ := hasBottom.Build _ (T * T') le0x.
 
-Lemma botEprodlexi : 0 = (0, 0) :> T * T'. Proof. by []. Qed.
+Lemma botEprodlexi : \bot = (\bot, \bot) :> T * T'. Proof. by []. Qed.
 
-Fact lex1 (x : T * T') : x <= (1, 1) :> T * T'.
+Fact lex1 (x : T * T') : x <= (\top, \top) :> T * T'.
 Proof. by case: x => // x1 x2; rewrite leEprodlexi/= !lex1 implybT. Qed.
 
 #[export]
 HB.instance Definition _ := hasTop.Build _ (T * T') lex1.
 
-Lemma topEprodlexi : 1 = (1, 1) :> T * T'. Proof. by []. Qed.
+Lemma topEprodlexi : \top = (\top, \top) :> T * T'. Proof. by []. Qed.
 
 End FinDistrLattice.
 
@@ -6951,7 +6953,7 @@ Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := hasBottom.Build _ (seq T) (@le0s _).
 
-Lemma botEseq : 0 = [::] :> seq T.
+Lemma botEseq : \bot = [::] :> seq T.
 Proof. by []. Qed.
 
 End Lattice.
@@ -7292,13 +7294,14 @@ Section BLattice.
 Variables (n : nat) (T : bLatticeType disp).
 Implicit Types (t : n.-tuple T).
 
-Fact le0x t : [tuple of nseq n 0] <= t :> n.-tuple T.
+Fact le0x t : [tuple of nseq n \bot] <= t :> n.-tuple T.
 Proof. by rewrite leEtprod; apply/forallP => i; rewrite tnth_nseq le0x. Qed.
 
 #[export]
 HB.instance Definition _ := hasBottom.Build _ (n.-tuple T) le0x.
 
-Lemma botEtprod : 0 = [tuple of nseq n 0] :> n.-tuple T. Proof. by []. Qed.
+Lemma botEtprod : \bot = [tuple of nseq n \bot] :> n.-tuple T.
+Proof. by []. Qed.
 
 End BLattice.
 
@@ -7306,13 +7309,14 @@ Section TBLattice.
 Variables (n : nat) (T : tbLatticeType disp).
 Implicit Types (t : n.-tuple T).
 
-Fact lex1 t : t <= [tuple of nseq n 1] :> n.-tuple T.
+Fact lex1 t : t <= [tuple of nseq n \top] :> n.-tuple T.
 Proof. by rewrite leEtprod; apply/forallP => i; rewrite tnth_nseq lex1. Qed.
 
 #[export]
 HB.instance Definition _ := hasTop.Build _ (n.-tuple T) lex1.
 
-Lemma topEtprod : 1 = [tuple of nseq n 1] :> n.-tuple T. Proof. by []. Qed.
+Lemma topEtprod : \top = [tuple of nseq n \top] :> n.-tuple T.
+Proof. by []. Qed.
 
 End TBLattice.
 
@@ -7356,7 +7360,7 @@ Qed.
 #[deprecated(since="mathcomp 2.0.0", note="Use tnth_diff instead.")]
 Notation tnth_sub := tnth_diff.
 
-Lemma diffKI t1 t2 : t2 `&` diff t1 t2 = 0.
+Lemma diffKI t1 t2 : t2 `&` diff t1 t2 = \bot.
 Proof.
 by apply: eq_from_tnth => i; rewrite tnth_meet tnth_diff diffKI tnth_nseq.
 Qed.
@@ -7385,7 +7389,7 @@ Definition compl t : n.-tuple T := map_tuple compl t.
 Fact tnth_compl t i : tnth (compl t) i = ~` tnth t i.
 Proof. by rewrite tnth_map. Qed.
 
-Lemma complE t : compl t = diff 1 t.
+Lemma complE t : compl t = diff \top t.
 Proof.
 by apply: eq_from_tnth => i; rewrite tnth_compl tnth_diff complE tnth_nseq.
 Qed.
@@ -7575,12 +7579,13 @@ Section BDistrLattice.
 Variables (n : nat) (T : finOrderType disp).
 Implicit Types (t : n.-tuple T).
 
-Fact le0x t : [tuple of nseq n 0] <= t :> n.-tuple T.
+Fact le0x t : [tuple of nseq n \bot] <= t :> n.-tuple T.
 Proof. by apply: sub_seqprod_lexi; apply: le0x (t : n.-tupleprod T). Qed.
 
 #[export] HB.instance Definition _ := hasBottom.Build _ (n.-tuple T) le0x.
 
-Lemma botEtlexi : 0 = [tuple of nseq n 0] :> n.-tuple T. Proof. by []. Qed.
+Lemma botEtlexi : \bot = [tuple of nseq n \bot] :> n.-tuple T.
+Proof. by []. Qed.
 
 End BDistrLattice.
 
@@ -7588,12 +7593,13 @@ Section TBDistrLattice.
 Variables (n : nat) (T : finOrderType disp).
 Implicit Types (t : n.-tuple T).
 
-Fact lex1 t : t <= [tuple of nseq n 1].
+Fact lex1 t : t <= [tuple of nseq n \top].
 Proof. by apply: sub_seqprod_lexi; apply: lex1 (t : n.-tupleprod T). Qed.
 
 #[export] HB.instance Definition _ := hasTop.Build _ (n.-tuple T) lex1.
 
-Lemma topEtlexi : 1 = [tuple of nseq n 1] :> n.-tuple T. Proof. by []. Qed.
+Lemma topEtlexi : \top = [tuple of nseq n \top] :> n.-tuple T.
+Proof. by []. Qed.
 
 End TBDistrLattice.
 
@@ -7774,9 +7780,9 @@ Lemma meetEsubset A B : A `&` B = A :&: B.
 Proof. by []. Qed.
 Lemma joinEsubset A B : A `|` B = A :|: B.
 Proof. by []. Qed.
-Lemma botEsubset : 0 = set0 :> {subset T}.
+Lemma botEsubset : \bot = set0 :> {subset T}.
 Proof. by []. Qed.
-Lemma topEsubset : 1 = setT :> {subset T}.
+Lemma topEsubset : \top = setT :> {subset T}.
 Proof. by []. Qed.
 Lemma subEsubset A B : A `\` B = A :\: B.
 Proof. by []. Qed.
