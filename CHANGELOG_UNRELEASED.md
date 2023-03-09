@@ -49,6 +49,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + notations `0%O`, `1%O`, `0^d%O` and `1^d%O` as backward compatible
     replacements of removed  notation `0`, `1`, `0^d` and `1^d`
     for bottom and top of lattices
+  + notations `\top` and `\bot` for `Order.top` and `Order.bottom`
+  + notations `\top^d` and `\bot^d` for `Order.dual_top` and `Order.dual_bottom`
 
 ### Changed
 
