@@ -208,17 +208,17 @@ From mathcomp Require Import finset.
 (*           x `&` y == the meet of x and y                                   *)
 (*           x `|` y == the join of x and y                                   *)
 (* In a type T, where T is canonically a bLatticeType d:                      *)
-(*                 0 == the bottom element                                    *)
+(*              \bot == the bottom element                                    *)
 (*   \join_<range> e == iterated join of a lattice with a bottom              *)
 (* In a type T, where T is canonically a tbLatticeType d:                     *)
-(*                 1 == the top element                                       *)
+(*              \top == the top element                                       *)
 (*   \meet_<range> e == iterated meet of a lattice with a top                 *)
 (*                                                                            *)
 (* For x, y of type T, where T is canonically a cbDistrLatticeType d:         *)
-(*           x `\` y == the (sectional) complement of y in [0, x]             *)
+(*           x `\` y == the (sectional) complement of y in [\bot, x]          *)
 (*                                                                            *)
 (* For x of type T, where T is canonically a ctbDistrLatticeType d:           *)
-(*              ~` x == the complement of x in [0, 1]                         *)
+(*              ~` x == the complement of x in [\bot, \top]                   *)
 (*                                                                            *)
 (* There are three distinct uses of the symbols                               *)
 (*   <, <=, >, >=, _ <= _ ?= iff _, >=<, and ><                               *)
@@ -253,9 +253,9 @@ From mathcomp Require Import finset.
 (*   x `&` y == @Order.meet        d T x y                                    *)
 (*   x `|` y == @Order.join        d T x y                                    *)
 (* For bLatticeType T (in order_scope):                                       *)
-(*   0       == @Order.bottom      d T                                        *)
+(*   \bot    == @Order.bottom      d T                                        *)
 (* For tLatticeType T (in order_scope):                                       *)
-(*   1       == @Order.top         d T                                        *)
+(*   \top    == @Order.top         d T                                        *)
 (* For cbDistrLatticeType T (in order_scope):                                 *)
 (*   x `|` y == @Order.sub         d T x y                                    *)
 (* For ctbDistrLatticeType T (in order_scope):                                *)
@@ -483,6 +483,8 @@ Reserved Notation "~` A" (at level 35, right associativity).
 (* Reserved notation for lattices with bottom/top elements. *)
 Reserved Notation "0%O" (at level 0).  (* deprecated in 1.17.0 *)
 Reserved Notation "1%O" (at level 0).  (* deprecated in 1.17.0 *)
+Reserved Notation "\bot" (at level 0).
+Reserved Notation "\top" (at level 0).
 
 (* Notations for dual partial and total order *)
 Reserved Notation "x <=^d y" (at level 70, y at next level).
@@ -531,6 +533,8 @@ Reserved Notation "0^d%O" (at level 0).  (* deprecated in 1.17.0 *)
 Reserved Notation "1^d%O" (at level 0).  (* deprecated in 1.17.0 *)
 Reserved Notation "0^d" (at level 0).
 Reserved Notation "1^d" (at level 0).
+Reserved Notation "\bot^d" (at level 0).
+Reserved Notation "\top^d" (at level 0).
 
 (* Reserved notations for product ordering of prod or seq *)
 Reserved Notation "x <=^p y" (at level 70, y at next level).
@@ -1454,6 +1458,7 @@ HB.export BLatticeExports.
 Module BLatticeSyntax.
 Notation "0%O" := bottom (only parsing).  (* deprecated in 1.17.0 *)
 Notation "0" := bottom : order_scope.
+Notation "\bot" := bottom : order_scope.
 
 Notation "\join_ ( i <- r | P ) F" :=
   (\big[@join _ _/0%O]_(i <- r | P%B) F%O) : order_scope.
@@ -1501,6 +1506,7 @@ Module TLatticeSyntax.
 
 Notation "1%O" := top (only parsing).  (* deprecated in 1.17.0 *)
 Notation "1" := top : order_scope.
+Notation "\top" := top : order_scope.
 
 Notation "\meet_ ( i <- r | P ) F" :=
   (\big[meet/1]_(i <- r | P%B) F%O) : order_scope.
@@ -1740,6 +1746,8 @@ Notation "0^d%O" := dual_bottom (only parsing).  (* deprecated in 1.17.0 *)
 Notation "1^d%O" := dual_top (only parsing).  (* deprecated in 1.17.0 *)
 Notation "0^d" := dual_bottom : order_scope.
 Notation "1^d" := dual_top : order_scope.
+Notation "\bot^d" := dual_bottom : order_scope.
+Notation "\top^d" := dual_top : order_scope.
 
 (* The following Local Notations are here to define the \join^d_ and \meet^d_ *)
 (* notations later. Do not remove them.                                       *)
