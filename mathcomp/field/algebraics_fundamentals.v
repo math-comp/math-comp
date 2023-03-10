@@ -141,7 +141,7 @@ rewrite coef_map /= fmorph_eq_rat (le_trans (real_ler_norm _)) //.
 rewrite normrN normrM lerpM //.
   rewrite normf_div -!intr_norm -!abszE lerpiMr ?ler0n //.
   by rewrite invf_le1 ?ler1n ?ltr0n absz_gt0.
-rewrite normrX ger0_norm ?(ltrW x_gt0) // lerweX2l ?leq_ord //.
+rewrite normrX ger0_norm ?(ltrW x_gt0) // lerweXn2l ?leq_ord //.
 by rewrite (le_trans _ lb_x) // natr1 ler1n.
 Qed.
 

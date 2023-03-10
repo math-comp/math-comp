@@ -130,7 +130,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_pmul2l` -> `lerpM2l`
   + `ltr_pmul2l` -> `ltrpM2l`
   + `lter_pmul2l` -> `lterpM2l`
-  + `ler_pmul2r` -> `lerpM2r`
+  + `ler_pmul2r` -> `lerpM2r'
   + `ltr_pmul2r` -> `ltrpM2r`
   + `lter_pmul2r` -> `lterpM2r`
   + `ler_nmul2l` -> `lernM2l`
@@ -199,9 +199,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_iexpn2l` -> `leriX2l`
   + `ltr_iexpn2l` -> `ltriX2l`
   + `lter_iexpn2l` -> `lteriX2l`
-  + `ler_eexpn2l` -> `lereX2l`
-  + `ltr_eexpn2l` -> `ltreX2l`
-  + `lter_eexpn2l` -> `ltereX2l`
+  + `ler_eexpn2l` -> `lereXn2l`
+  + `ltr_eexpn2l` -> `ltreXn2l`
+  + `lter_eexpn2l` -> `ltereXn2l`
   + `ler_wpmul2l` -> `lerwpM2l`
   + `ler_wpmul2r` -> `lerwpM2r`
   + `ler_wnmul2l` -> `lerwnM2l`
@@ -217,12 +217,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ltr_eexpr` -> `ltreXr`
   + `lter_eexpr` -> `ltereXr`
   + `lter_expr` -> `lterXr`
-  + `ler_wiexpn2l` -> `lerwiX2l`
-  + `ler_weexpn2l` -> `lerweX2l`
-  + `lteif_pmul2l` -> `lteifpM2l`
-  + `lteif_pmul2r` -> `lteifpM2r`
-  + `lteif_nmul2l` -> `lteifnM2l`
-  + `lteif_nmul2r` -> `lteifnM2r`
+  + `ler_wiexpn2l` -> `lerwiXn2l`
+  + `ler_weexpn2l` -> `lerweXn2l`
   + `ler_pimull` -> `lerpiMl`
   + `ler_nimull` -> `lerniMl`
   + `ler_pimulr` -> `lerpiMr`
@@ -235,8 +231,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `lteif_ndivr_mulr` -> `lteif_ndivrMr`
   + `lteif_ndivl_mull` -> `lteif_ndivlMl`
   + `lteif_ndivr_mull` -> `lteif_ndivrMl`
-  + `ler_addgt0Pr` -> `lerDgt0Pr`
-  + `ler_addgt0Pl` -> `lerDgt0Pl`
   + `ler_pdivl_mulr` -> `ler_pdivlMr`
   + `ltr_pdivl_mulr` -> `ltr_pdivlMr`
   + `lter_pdivl_mulr` -> `lter_pdivlMr`
@@ -261,6 +255,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_ndivr_mull` -> `ler_ndivrMl`
   + `ltr_ndivr_mull` -> `ltr_ndivrMl`
   + `lter_ndivr_mull` -> `lter_ndivrMl`
+  + `ler_pmuln2r` -> `lerpMn2r`
+  + `ltr_pmuln2r` -> `ltrpMn2r`
 - in `ssrint.v`:
   + `leq_add_dist` -> `leqD_dist`
   + `lez_add1r` -> `lez1D`
@@ -268,19 +264,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ltz_add1r` -> `ltz1D`
   + `ltz_addr1` -> `ltzD1`
   + `oppz_add` -> `oppzD`
-  + `ler_wpiexpz2l` -> `lerwpiXz2l`
-  + `ler_wniexpz2l` -> `lerwniXz2l`
-  + `ler_wpeexpz2l` -> `lerwpeXz2l`
-  + `ler_wneexpz2l` -> `lerwneXz2l`
-  + `ler_weexpz2l` -> `lerweXz2l`
-  + `ler_piexpz2l` -> `lerpiXz2l`
-  + `ltr_piexpz2l` -> `ltrpiXz2l`
-  + `ler_niexpz2l` -> `lerniXz2l`
-  + `ltr_niexpz2l` -> `ltrniXz2l`
-  + `ler_eexpz2l` -> `lereXz2l`
-  + `ltr_eexpz2l` -> `ltreXz2l`
-  + `ler_wpexpz2r` -> `lerwpXz2r`
-  + `ler_wnexpz2r` -> `lerwnXz2r`
   + `leqif_add_distz` -> `leqifD_distz`
   + `leqif_add_dist` -> `leqifD_dist`
 

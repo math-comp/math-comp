@@ -946,7 +946,7 @@ have AtoB_P s (psi := 'chi_s) (chi := 'Ind[G] psi): s \in calA ->
       by case/cfclassP=> y _ ->; rewrite cfConjg1.
     rewrite reindex_cfclass //= sumr_const -(eq_card (cfclass_IirrE _ _)).
     rewrite mulr_natl mulrnAr card_cfclass_Iirr //.
-    rewrite (mono_leif (ler_pmuln2r (indexg_gt0 G T))).
+    rewrite (mono_leif (lerpMn2r (indexg_gt0 G T))).
     rewrite (mono_leif (lerpM2r (irr1_gt0 t))); apply: leif_eq.
     by rewrite /e -(cfResRes _ sHT) ?cfdot_Res_ge_constt.
   have [_ /esym] := leif_trans ub_chi_r lb_chi_r; rewrite eqxx.
