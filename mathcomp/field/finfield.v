@@ -629,7 +629,7 @@ have /eqP-n1z: `|z| == 1 by rewrite -(pexpr_eq1 n_gt0) // -normrX zn1 normr1.
 suffices /eqP/normC_sub_eq[t n1t [Dq Dz]]:
   `|q%:R - z : algC| == `|q%:R : algC| - `|z|.
   suffices z1: z == 1 by rewrite leq_eqVlt -dvdn1 (prim_order_dvd z_prim) z1.
-  by rewrite Dz n1z mul1r -(eqr_pmuln2r q_gt0) Dq normr_nat mulr_natl.
+  by rewrite Dz n1z mul1r -(eqrpMn2r q_gt0) Dq normr_nat mulr_natl.
 pose aq d : algC := (cyclotomic (z ^+ (n %/ d)) d).[q%:R].
 suffices: `|aq n| <= (q - 1)%:R.
   rewrite eq_le lerB_dist andbT n1z normr_nat natrB //; apply: le_trans.

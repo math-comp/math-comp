@@ -130,7 +130,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_pmul2l` -> `lerpM2l`
   + `ltr_pmul2l` -> `ltrpM2l`
   + `lter_pmul2l` -> `lterpM2l`
-  + `ler_pmul2r` -> `lerpM2r'
+  + `ler_pmul2r` -> `lerpM2r`
   + `ltr_pmul2r` -> `ltrpM2r`
   + `lter_pmul2r` -> `lterpM2r`
   + `ler_nmul2l` -> `lernM2l`
@@ -255,8 +255,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_ndivr_mull` -> `ler_ndivrMl`
   + `ltr_ndivr_mull` -> `ltr_ndivrMl`
   + `lter_ndivr_mull` -> `lter_ndivrMl`
+  + `eqr_pmuln2r` -> `eqrpMn2r`
+  + `ler_muln2r` -> `lerMn2r`
   + `ler_pmuln2r` -> `lerpMn2r`
+  + `ler_pmuln2l` -> `lerpMn2l`
   + `ltr_pmuln2r` -> `ltrpMn2r`
+  + `ltr_wmuln2r` -> `ltrwMn2r`
+  + `ler_wmuln2r` -> `lerwMn2r`
+  + `ltr_wpmuln2r` -> `ltrwpMn2r`
+  + `ler_wpmuln2l` -> `lerwpMn2l`
+  + `ler_wnmuln2l` -> `lerwnMn2l`
+  + `ltr_muln2r` -> `ltrMn2r`
+  + `eqr_muln2r` -> `eqrMn2r`
+  + `ltr_pmuln2l` -> `ltrpMn2l`
+  + `ler_nmuln2l` -> `lernMn2l`
+  + `ltr_nmuln2l` -> `ltrnMn2l`
 - in `ssrint.v`:
   + `leq_add_dist` -> `leqD_dist`
   + `lez_add1r` -> `lez1D`
@@ -266,6 +279,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `oppz_add` -> `oppzD`
   + `leqif_add_distz` -> `leqifD_distz`
   + `leqif_add_dist` -> `leqifD_dist`
+  + `ler_pmulz2r` -> `lerpMz2r`
+  + `ler_pmulz2l` -> `lerpMz2l`
+  + `ler_wpmulz2r` -> `lerwpMz2r`
+  + `ler_wpmulz2l` -> `lerwpMz2l`
+  + `ler_wnmulz2l` -> `lerwnMz2l`
+  + `ler_nmulz2r` -> `lernMz2r`
+  + `ltr_pmulz2r` -> `ltrpMz2r`
+  + `ler_nmulz2l` -> `lernMz2l`
+  + `ltr_pmulz2l` -> `ltrpMz2l`
+  + `ltr_nmulz2r` -> `ltrnMz2r`
+  + `ltr_nmulz2l` -> `ltrnMz2l`
+  + `ler_wnmulz2r` -> `lerwnMz2r`
+
 
 ### Removed
 

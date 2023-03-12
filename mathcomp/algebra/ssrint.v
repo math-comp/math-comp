@@ -270,7 +270,7 @@ Lemma subzSS (m n : nat) : m.+1%:Z - n.+1%:Z = m%:Z - n%:Z.
 Proof. by elim: n m=> [|n ihn] m //; rewrite !subzn. Qed.
 
 End intZmoduleTheory.
-#[deprecated(since="mathcomp 1.16.0", note="Use oppzD instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use oppzD instead.")]
 Notation oppz_add := oppzD.
 
 Module intRing.
@@ -523,13 +523,13 @@ Lemma ltzD1 x y : (x < y + 1) = (x <= y).
 Proof. by rewrite -lezD1 lerD2r. Qed.
 
 End intOrderedTheory.
-#[deprecated(since="mathcomp 1.16.0", note="Use lez1D instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lez1D instead.")]
 Notation lez_add1r := lez1D.
-#[deprecated(since="mathcomp 1.16.0", note="Use lezD1 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lezD1 instead.")]
 Notation lez_addr1 := lezD1.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltz1D instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltz1D instead.")]
 Notation ltz_add1r := ltz1D.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltzD1 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltzD1 instead.")]
 Notation ltz_addr1 := ltzD1.
 
 Bind Scope ring_scope with int.
@@ -871,127 +871,125 @@ by rewrite intS !rmorphD !rmorph1 ihn.
 Qed.
 
 (* intmul and ler/ltr *)
-Lemma ler_pmulz2r n (hn : 0 < n) : {mono *~%R^~ n :x y / x <= y :> R}.
+Lemma lerpMz2r n (hn : 0 < n) : {mono *~%R^~ n :x y / x <= y :> R}.
 Proof. by move=> x y; case: n hn=> [[]|] // n _; rewrite lerpMn2r. Qed.
 
-Lemma ltr_pmulz2r n (hn : 0 < n) : {mono *~%R^~ n : x y / x < y :> R}.
-Proof. exact: leW_mono (ler_pmulz2r _). Qed.
+Lemma ltrpMz2r n (hn : 0 < n) : {mono *~%R^~ n : x y / x < y :> R}.
+Proof. exact: leW_mono (lerpMz2r _). Qed.
 
-Lemma ler_nmulz2r n (hn : n < 0) : {mono *~%R^~ n : x y /~ x <= y :> R}.
+Lemma lernMz2r n (hn : n < 0) : {mono *~%R^~ n : x y /~ x <= y :> R}.
 Proof.
-by move=> x y /=; rewrite -![_ *~ n]mulNrNz ler_pmulz2r (oppr_cp0, lerN2).
+by move=> x y /=; rewrite -![_ *~ n]mulNrNz lerpMz2r (oppr_cp0, lerN2).
 Qed.
 
-Lemma ltr_nmulz2r n (hn : n < 0) : {mono *~%R^~ n : x y /~ x < y :> R}.
-Proof. exact: leW_nmono (ler_nmulz2r _). Qed.
+Lemma ltrnMz2r n (hn : n < 0) : {mono *~%R^~ n : x y /~ x < y :> R}.
+Proof. exact: leW_nmono (lernMz2r _). Qed.
 
-Lemma ler_wpmulz2r n (hn : 0 <= n) : {homo *~%R^~ n : x y / x <= y :> R}.
-Proof. by move=> x y xy; case: n hn=> [] // n _; rewrite ler_wmuln2r. Qed.
+Lemma lerwpMz2r n (hn : 0 <= n) : {homo *~%R^~ n : x y / x <= y :> R}.
+Proof. by move=> x y xy; case: n hn=> [] // n _; rewrite lerwMn2r. Qed.
 
-Lemma ler_wnmulz2r n (hn : n <= 0) : {homo *~%R^~ n : x y /~ x <= y :> R}.
-Proof.
-by move=> x y xy /=; rewrite -lerN2 -!mulrNz ler_wpmulz2r // oppr_ge0.
-Qed.
+Lemma lerwnMz2r n (hn : n <= 0) : {homo *~%R^~ n : x y /~ x <= y :> R}.
+Proof. by move=> x y xy /=; rewrite -lerN2 -!mulrNz lerwpMz2r // oppr_ge0. Qed.
 
 Lemma mulrz_ge0 x n (x0 : 0 <= x) (n0 : 0 <= n) : 0 <= x *~ n.
-Proof. by rewrite -(mul0rz _ n) ler_wpmulz2r. Qed.
+Proof. by rewrite -(mul0rz _ n) lerwpMz2r. Qed.
 
 Lemma mulrz_le0 x n (x0 : x <= 0) (n0 : n <= 0) : 0 <= x *~ n.
-Proof. by rewrite -(mul0rz _ n) ler_wnmulz2r. Qed.
+Proof. by rewrite -(mul0rz _ n) lerwnMz2r. Qed.
 
 Lemma mulrz_ge0_le0 x n (x0 : 0 <= x) (n0 : n <= 0) : x *~ n <= 0.
-Proof. by rewrite -(mul0rz _ n) ler_wnmulz2r. Qed.
+Proof. by rewrite -(mul0rz _ n) lerwnMz2r. Qed.
 
 Lemma mulrz_le0_ge0 x n (x0 : x <= 0) (n0 : 0 <= n) : x *~ n <= 0.
-Proof. by rewrite -(mul0rz _ n) ler_wpmulz2r. Qed.
+Proof. by rewrite -(mul0rz _ n) lerwpMz2r. Qed.
 
 Lemma pmulrz_lgt0 x n (n0 : 0 < n) : 0 < x *~ n = (0 < x).
-Proof. by rewrite -(mul0rz _ n) ltr_pmulz2r // mul0rz. Qed.
+Proof. by rewrite -(mul0rz _ n) ltrpMz2r // mul0rz. Qed.
 
 Lemma nmulrz_lgt0 x n (n0 : n < 0) : 0 < x *~ n = (x < 0).
-Proof. by rewrite -(mul0rz _ n) ltr_nmulz2r // mul0rz. Qed.
+Proof. by rewrite -(mul0rz _ n) ltrnMz2r // mul0rz. Qed.
 
 Lemma pmulrz_llt0 x n (n0 : 0 < n) : x *~ n < 0 = (x < 0).
-Proof. by rewrite -(mul0rz _ n) ltr_pmulz2r // mul0rz. Qed.
+Proof. by rewrite -(mul0rz _ n) ltrpMz2r // mul0rz. Qed.
 
 Lemma nmulrz_llt0 x n (n0 : n < 0) : x *~ n < 0 = (0 < x).
-Proof. by rewrite -(mul0rz _ n) ltr_nmulz2r // mul0rz. Qed.
+Proof. by rewrite -(mul0rz _ n) ltrnMz2r // mul0rz. Qed.
 
 Lemma pmulrz_lge0 x n (n0 : 0 < n) : 0 <= x *~ n = (0 <= x).
-Proof. by rewrite -(mul0rz _ n) ler_pmulz2r // mul0rz. Qed.
+Proof. by rewrite -(mul0rz _ n) lerpMz2r // mul0rz. Qed.
 
 Lemma nmulrz_lge0 x n (n0 : n < 0) : 0 <= x *~ n = (x <= 0).
-Proof. by rewrite -(mul0rz _ n) ler_nmulz2r // mul0rz. Qed.
+Proof. by rewrite -(mul0rz _ n) lernMz2r // mul0rz. Qed.
 
 Lemma pmulrz_lle0 x n (n0 : 0 < n) : x *~ n <= 0 = (x <= 0).
-Proof. by rewrite -(mul0rz _ n) ler_pmulz2r // mul0rz. Qed.
+Proof. by rewrite -(mul0rz _ n) lerpMz2r // mul0rz. Qed.
 
 Lemma nmulrz_lle0 x n (n0 : n < 0) : x *~ n <= 0 = (0 <= x).
-Proof. by rewrite -(mul0rz _ n) ler_nmulz2r // mul0rz. Qed.
+Proof. by rewrite -(mul0rz _ n) lernMz2r // mul0rz. Qed.
 
-Lemma ler_wpmulz2l x (hx : 0 <= x) : {homo *~%R x : x y / x <= y}.
+Lemma lerwpMz2l x (hx : 0 <= x) : {homo *~%R x : x y / x <= y}.
 Proof.
 by move=> m n /= hmn; rewrite -subr_ge0 -mulrzBr mulrz_ge0 // subr_ge0.
 Qed.
 
-Lemma ler_wnmulz2l x (hx : x <= 0) : {homo *~%R x : x y /~ x <= y}.
+Lemma lerwnMz2l x (hx : x <= 0) : {homo *~%R x : x y /~ x <= y}.
 Proof.
 by move=> m n /= hmn; rewrite -subr_ge0 -mulrzBr mulrz_le0 // subr_le0.
 Qed.
 
-Lemma ler_pmulz2l x (hx : 0 < x) : {mono *~%R x : x y / x <= y}.
+Lemma lerpMz2l x (hx : 0 < x) : {mono *~%R x : x y / x <= y}.
 Proof.
 move=> m n /=; rewrite real_mono ?num_real // => {m n}.
 by move=> m n /= hmn; rewrite -subr_gt0 -mulrzBr pmulrz_lgt0 // subr_gt0.
 Qed.
 
-Lemma ler_nmulz2l x (hx : x < 0) : {mono *~%R x : x y /~ x <= y}.
+Lemma lernMz2l x (hx : x < 0) : {mono *~%R x : x y /~ x <= y}.
 Proof.
 move=> m n /=; rewrite real_nmono ?num_real // => {m n}.
 by move=> m n /= hmn; rewrite -subr_gt0 -mulrzBr nmulrz_lgt0 // subr_lt0.
 Qed.
 
-Lemma ltr_pmulz2l x (hx : 0 < x) : {mono *~%R x : x y / x < y}.
-Proof. exact: leW_mono (ler_pmulz2l _). Qed.
+Lemma ltrpMz2l x (hx : 0 < x) : {mono *~%R x : x y / x < y}.
+Proof. exact: leW_mono (lerpMz2l _). Qed.
 
-Lemma ltr_nmulz2l x (hx : x < 0) : {mono *~%R x : x y /~ x < y}.
-Proof. exact: leW_nmono (ler_nmulz2l _). Qed.
+Lemma ltrnMz2l x (hx : x < 0) : {mono *~%R x : x y /~ x < y}.
+Proof. exact: leW_nmono (lernMz2l _). Qed.
 
 Lemma pmulrz_rgt0 x n (x0 : 0 < x) : 0 < x *~ n = (0 < n).
-Proof. by rewrite -(mulr0z x) ltr_pmulz2l. Qed.
+Proof. by rewrite -(mulr0z x) ltrpMz2l. Qed.
 
 Lemma nmulrz_rgt0 x n (x0 : x < 0) : 0 < x *~ n = (n < 0).
-Proof. by rewrite -(mulr0z x) ltr_nmulz2l. Qed.
+Proof. by rewrite -(mulr0z x) ltrnMz2l. Qed.
 
 Lemma pmulrz_rlt0 x n (x0 : 0 < x) : x *~ n < 0 = (n < 0).
-Proof. by rewrite -(mulr0z x) ltr_pmulz2l. Qed.
+Proof. by rewrite -(mulr0z x) ltrpMz2l. Qed.
 
 Lemma nmulrz_rlt0 x n (x0 : x < 0) : x *~ n < 0 = (0 < n).
-Proof. by rewrite -(mulr0z x) ltr_nmulz2l. Qed.
+Proof. by rewrite -(mulr0z x) ltrnMz2l. Qed.
 
 Lemma pmulrz_rge0 x n (x0 : 0 < x) : 0 <= x *~ n = (0 <= n).
-Proof. by rewrite -(mulr0z x) ler_pmulz2l. Qed.
+Proof. by rewrite -(mulr0z x) lerpMz2l. Qed.
 
 Lemma nmulrz_rge0 x n (x0 : x < 0) : 0 <= x *~ n = (n <= 0).
-Proof. by rewrite -(mulr0z x) ler_nmulz2l. Qed.
+Proof. by rewrite -(mulr0z x) lernMz2l. Qed.
 
 Lemma pmulrz_rle0 x n (x0 : 0 < x) : x *~ n <= 0 = (n <= 0).
-Proof. by rewrite -(mulr0z x) ler_pmulz2l. Qed.
+Proof. by rewrite -(mulr0z x) lerpMz2l. Qed.
 
 Lemma nmulrz_rle0 x n (x0 : x < 0) : x *~ n <= 0 = (0 <= n).
-Proof. by rewrite -(mulr0z x) ler_nmulz2l. Qed.
+Proof. by rewrite -(mulr0z x) lernMz2l. Qed.
 
 Lemma mulrIz x (hx : x != 0) : injective ( *~%R x).
 Proof.
 move=> y z; rewrite -![x *~ _]mulrzr => /(mulfI hx).
-by apply: inc_inj y z; apply: ler_pmulz2l.
+by apply: inc_inj y z; exact: lerpMz2l.
 Qed.
 
 Lemma ler_int m n : (m%:~R <= n%:~R :> R) = (m <= n).
-Proof. by rewrite ler_pmulz2l. Qed.
+Proof. by rewrite lerpMz2l. Qed.
 
 Lemma ltr_int m n : (m%:~R < n%:~R :> R) = (m < n).
-Proof. by rewrite ltr_pmulz2l. Qed.
+Proof. by rewrite ltrpMz2l. Qed.
 
 Lemma eqr_int m n : (m%:~R == n%:~R :> R) = (m == n).
 Proof. by rewrite (inj_eq (mulrIz _)) ?oner_eq0. Qed.
@@ -1040,6 +1038,30 @@ End PO.
 End NumMorphism.
 
 End MorphTheory.
+#[deprecated(since="mathcomp 1.17.0", note="Use lerpMz2r instead.")]
+Notation ler_pmulz2r := lerpMz2r.
+#[deprecated(since="mathcomp 1.17.0", note="Use lerpMz2l instead.")]
+Notation ler_pmulz2l := lerpMz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use lerwpMz2r instead.")]
+Notation ler_wpmulz2r := lerwpMz2r.
+#[deprecated(since="mathcomp 1.17.0", note="Use lerwpMz2l instead.")]
+Notation ler_wpmulz2l := lerwpMz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use lerwnMz2l instead.")]
+Notation ler_wnmulz2l := lerwnMz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use lernMz2r instead.")]
+Notation ler_nmulz2r := lernMz2r.
+#[deprecated(since="mathcomp 1.17.0", note="Use lernMz2l instead.")]
+Notation ler_nmulz2l := lernMz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrpMz2r instead.")]
+Notation ltr_pmulz2r := ltrpMz2r.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrpMz2l instead.")]
+Notation ltr_pmulz2l := ltrpMz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrnMz2r instead.")]
+Notation ltr_nmulz2r := ltrnMz2r.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrnMz2l instead.")]
+Notation ltr_nmulz2l := ltrnMz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use lerwnMz2r instead.")]
+Notation ler_wnmulz2r := lerwnMz2r.
 
 Arguments intr_inj {R} [x1 x2].
 
@@ -1762,11 +1784,11 @@ End Distn.
 
 End IntDist.
 
-#[deprecated(since="mathcomp 1.16.0", note="Use leqD_dist instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use leqD_dist instead.")]
 Notation leq_add_dist := leqD_dist.
-#[deprecated(since="mathcomp 1.16.0", note="Use leqifD_distz instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use leqifD_distz instead.")]
 Notation leqif_add_distz := leqifD_distz.
-#[deprecated(since="mathcomp 1.16.0", note="Use leqifD_dist instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use leqifD_dist instead.")]
 Notation leqif_add_dist := leqifD_dist.
 
 Section NormInt.

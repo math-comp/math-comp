@@ -2132,7 +2132,7 @@ Proof. by move/lerpMn2r/leW_mono. Qed.
 Lemma pmulrnI n : (0 < n)%N -> injective ((@GRing.natmul R)^~ n).
 Proof. by move/lerpMn2r/inc_inj. Qed.
 
-Lemma eqr_pmuln2r n : (0 < n)%N -> {mono (@GRing.natmul R)^~ n : x y / x == y}.
+Lemma eqrpMn2r n : (0 < n)%N -> {mono (@GRing.natmul R)^~ n : x y / x == y}.
 Proof. by move/pmulrnI/inj_eq. Qed.
 
 Lemma pmulrn_lgt0 x n : (0 < n)%N -> (0 < x *+ n) = (0 < x).
@@ -2147,29 +2147,29 @@ Proof. by move=> n_gt0; rewrite -(mul0rn _ n) lerpMn2r // mul0rn. Qed.
 Lemma pmulrn_lle0 x n : (0 < n)%N -> (x *+ n <= 0) = (x <= 0).
 Proof. by move=> n_gt0; rewrite -(mul0rn _ n) lerpMn2r // mul0rn. Qed.
 
-Lemma ltr_wmuln2r x y n : x < y -> (x *+ n < y *+ n) = (0 < n)%N.
+Lemma ltrwMn2r x y n : x < y -> (x *+ n < y *+ n) = (0 < n)%N.
 Proof. by move=> ltxy; case: n=> // n; rewrite ltrpMn2r. Qed.
 
-Lemma ltr_wpmuln2r n : (0 < n)%N -> {homo (@GRing.natmul R)^~ n : x y / x < y}.
-Proof. by move=> n_gt0 x y /= / ltr_wmuln2r ->. Qed.
+Lemma ltrwpMn2r n : (0 < n)%N -> {homo (@GRing.natmul R)^~ n : x y / x < y}.
+Proof. by move=> n_gt0 x y /= / ltrwMn2r ->. Qed.
 
-Lemma ler_wmuln2r n : {homo (@GRing.natmul R)^~ n : x y / x <= y}.
+Lemma lerwMn2r n : {homo (@GRing.natmul R)^~ n : x y / x <= y}.
 Proof. by move=> x y hxy /=; case: n=> // n; rewrite lerpMn2r. Qed.
 
 Lemma mulrn_wge0 x n : 0 <= x -> 0 <= x *+ n.
-Proof. by move=> /(ler_wmuln2r n); rewrite mul0rn. Qed.
+Proof. by move=> /(lerwMn2r n); rewrite mul0rn. Qed.
 
 Lemma mulrn_wle0 x n : x <= 0 -> x *+ n <= 0.
-Proof. by move=> /(ler_wmuln2r n); rewrite mul0rn. Qed.
+Proof. by move=> /(lerwMn2r n); rewrite mul0rn. Qed.
 
-Lemma ler_muln2r n x y : (x *+ n <= y *+ n) = ((n == 0%N) || (x <= y)).
+Lemma lerMn2r n x y : (x *+ n <= y *+ n) = ((n == 0%N) || (x <= y)).
 Proof. by case: n => [|n]; rewrite ?lexx ?eqxx // lerpMn2r. Qed.
 
-Lemma ltr_muln2r n x y : (x *+ n < y *+ n) = ((0 < n)%N && (x < y)).
+Lemma ltrMn2r n x y : (x *+ n < y *+ n) = ((0 < n)%N && (x < y)).
 Proof. by case: n => [|n]; rewrite ?lexx ?eqxx // ltrpMn2r. Qed.
 
-Lemma eqr_muln2r n x y : (x *+ n == y *+ n) = (n == 0)%N || (x == y).
-Proof. by rewrite !(@eq_le _ R) !ler_muln2r -orb_andr. Qed.
+Lemma eqrMn2r n x y : (x *+ n == y *+ n) = (n == 0)%N || (x == y).
+Proof. by rewrite !(@eq_le _ R) !lerMn2r -orb_andr. Qed.
 
 (* More characteristic zero properties. *)
 
@@ -2186,14 +2186,14 @@ move=> x_neq0 m n; without loss /subnK <-: m n / (n <= m)%N.
 by move/eqP; rewrite mulrnDr -subr_eq0 addrK mulrn_eq0 => /predU1P[-> | /idPn].
 Qed.
 
-Lemma ler_wpmuln2l x :
+Lemma lerwpMn2l x :
   0 <= x -> {homo (@GRing.natmul R x) : m n / (m <= n)%N >-> m <= n}.
 Proof. by move=> xge0 m n /subnK <-; rewrite mulrnDr ler_paddl ?mulrn_wge0. Qed.
 
-Lemma ler_wnmuln2l x :
+Lemma lerwnMn2l x :
   x <= 0 -> {homo (@GRing.natmul R x) : m n / (n <= m)%N >-> m <= n}.
 Proof.
-by move=> xle0 m n hmn /=; rewrite -lerN2 -!mulNrn ler_wpmuln2l // oppr_cp0.
+by move=> xle0 m n hmn /=; rewrite -lerN2 -!mulNrn lerwpMn2l // oppr_cp0.
 Qed.
 
 Lemma mulrn_wgt0 x n : 0 < x -> 0 < x *+ n = (0 < n)%N.
@@ -2202,32 +2202,30 @@ Proof. by case: n => // n hx; rewrite pmulrn_lgt0. Qed.
 Lemma mulrn_wlt0 x n : x < 0 -> x *+ n < 0 = (0 < n)%N.
 Proof. by case: n => // n hx; rewrite pmulrn_llt0. Qed.
 
-Lemma ler_pmuln2l x :
+Lemma lerpMn2l x :
   0 < x -> {mono (@GRing.natmul R x) : m n / (m <= n)%N >-> m <= n}.
 Proof.
-move=> x_gt0 m n /=; case: leqP => hmn; first by rewrite ler_wpmuln2l // ltW.
+move=> x_gt0 m n /=; case: leqP => hmn; first by rewrite lerwpMn2l // ltW.
 by rewrite -(subnK (ltnW hmn)) mulrnDr gerDr lt_geF // mulrn_wgt0 // subn_gt0.
 Qed.
 
-Lemma ltr_pmuln2l x :
+Lemma ltrpMn2l x :
   0 < x -> {mono (@GRing.natmul R x) : m n / (m < n)%N >-> m < n}.
-Proof. by move=> x_gt0; apply: leW_mono (ler_pmuln2l _). Qed.
+Proof. by move=> x_gt0; apply: leW_mono (lerpMn2l _). Qed.
 
-Lemma ler_nmuln2l x :
+Lemma lernMn2l x :
   x < 0 -> {mono (@GRing.natmul R x) : m n / (n <= m)%N >-> m <= n}.
-Proof.
-by move=> x_lt0 m n /=; rewrite -lerN2 -!mulNrn ler_pmuln2l // oppr_gt0.
-Qed.
+Proof. by move=> x_lt0 m n /=; rewrite -lerN2 -!mulNrn lerpMn2l// oppr_gt0. Qed.
 
-Lemma ltr_nmuln2l x :
+Lemma ltrnMn2l x :
   x < 0 -> {mono (@GRing.natmul R x) : m n / (n < m)%N >-> m < n}.
-Proof. by move=> x_lt0; apply: leW_nmono (ler_nmuln2l _). Qed.
+Proof. by move=> x_lt0; apply: leW_nmono (lernMn2l _). Qed.
 
 Lemma ler_nat m n : (m%:R <= n%:R :> R) = (m <= n)%N.
-Proof. by rewrite ler_pmuln2l. Qed.
+Proof. by rewrite lerpMn2l. Qed.
 
 Lemma ltr_nat m n : (m%:R < n%:R :> R) = (m < n)%N.
-Proof. by rewrite ltr_pmuln2l. Qed.
+Proof. by rewrite ltrpMn2l. Qed.
 
 Lemma eqr_nat m n : (m%:R == n%:R :> R) = (m == n)%N.
 Proof. by rewrite (inj_eq (mulrIn _)) ?oner_eq0. Qed.
@@ -2254,25 +2252,25 @@ Lemma ltr0N1 : 0 < -1 :> R = false. Proof. by rewrite le_gtF // lerN10. Qed.
 Lemma ler0N1 : 0 <= -1 :> R = false. Proof. by rewrite lt_geF // ltrN10. Qed.
 
 Lemma pmulrn_rgt0 x n : 0 < x -> 0 < x *+ n = (0 < n)%N.
-Proof. by move=> x_gt0; rewrite -(mulr0n x) ltr_pmuln2l. Qed.
+Proof. by move=> x_gt0; rewrite -(mulr0n x) ltrpMn2l. Qed.
 
 Lemma pmulrn_rlt0 x n : 0 < x -> x *+ n < 0 = false.
-Proof. by move=> x_gt0; rewrite -(mulr0n x) ltr_pmuln2l. Qed.
+Proof. by move=> x_gt0; rewrite -(mulr0n x) ltrpMn2l. Qed.
 
 Lemma pmulrn_rge0 x n : 0 < x -> 0 <= x *+ n.
-Proof. by move=> x_gt0; rewrite -(mulr0n x) ler_pmuln2l. Qed.
+Proof. by move=> x_gt0; rewrite -(mulr0n x) lerpMn2l. Qed.
 
 Lemma pmulrn_rle0 x n : 0 < x -> x *+ n <= 0 = (n == 0)%N.
-Proof. by move=> x_gt0; rewrite -(mulr0n x) ler_pmuln2l ?leqn0. Qed.
+Proof. by move=> x_gt0; rewrite -(mulr0n x) lerpMn2l ?leqn0. Qed.
 
 Lemma nmulrn_rgt0 x n : x < 0 -> 0 < x *+ n = false.
-Proof. by move=> x_lt0; rewrite -(mulr0n x) ltr_nmuln2l. Qed.
+Proof. by move=> x_lt0; rewrite -(mulr0n x) ltrnMn2l. Qed.
 
 Lemma nmulrn_rge0 x n : x < 0 -> 0 <= x *+ n = (n == 0)%N.
-Proof. by move=> x_lt0; rewrite -(mulr0n x) ler_nmuln2l ?leqn0. Qed.
+Proof. by move=> x_lt0; rewrite -(mulr0n x) lernMn2l ?leqn0. Qed.
 
 Lemma nmulrn_rle0 x n : x < 0 -> x *+ n <= 0.
-Proof. by move=> x_lt0; rewrite -(mulr0n x) ler_nmuln2l. Qed.
+Proof. by move=> x_lt0; rewrite -(mulr0n x) lernMn2l. Qed.
 
 (* (x * y) compared to 0 *)
 (* Remark : pmulr_rgt0 and pmulr_rge0 are defined above *)
@@ -3508,324 +3506,350 @@ Qed.
 
 End NumDomainOperationTheory.
 
-#[deprecated(since="mathcomp 1.16.0", note="Use lerN2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerN2 instead.")]
 Notation ler_opp2 := lerN2.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrN2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrN2 instead.")]
 Notation ltr_opp2 := ltrN2.
-#[deprecated(since="mathcomp 1.16.0", note="Use lterN2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lterN2 instead.")]
 Notation lter_opp2 := lterN2.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerNr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerNr instead.")]
 Notation ler_oppr := lerNr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrNr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrNr instead.")]
 Notation ltr_oppr := ltrNr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lterNr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lterNr instead.")]
 Notation lter_oppr := lterNr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerNl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerNl instead.")]
 Notation ler_oppl := lerNl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrNl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrNl instead.")]
 Notation ltr_oppl := ltrNl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lterNl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lterNl instead.")]
 Notation lter_oppl := lterNl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteifN2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteifN2 instead.")]
 Notation lteif_opp2 := lteifN2.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerD2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerD2l instead.")]
 Notation ler_add2l := lerD2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerD2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerD2r instead.")]
 Notation ler_add2r := lerD2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerD2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerD2 instead.")]
 Notation ler_add2 := lerD2.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrD2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrD2l instead.")]
 Notation ltr_add2l := ltrD2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrD2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrD2r instead.")]
 Notation ltr_add2r := ltrD2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrD2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrD2 instead.")]
 Notation ltr_add2 := ltrD2.
-#[deprecated(since="mathcomp 1.16.0", note="Use lterD2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lterD2 instead.")]
 Notation lter_add2 := lterD2.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerD instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerD instead.")]
 Notation ler_add := lerD.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_ltD instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_ltD instead.")]
 Notation ler_lt_add := ler_ltD.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_leD instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_leD instead.")]
 Notation ltr_le_add := ltr_leD.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrD instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrD instead.")]
 Notation ltr_add := ltrD.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerB instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerB instead.")]
 Notation ler_sub := lerB.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_ltB instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_ltB instead.")]
 Notation ler_lt_sub := ler_ltB.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_leB instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_leB instead.")]
 Notation ltr_le_sub := ltr_leB.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrB instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrB instead.")]
 Notation ltr_sub := ltrB.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerBlDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerBlDr instead.")]
 Notation ler_subl_addr := lerBlDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerBrDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerBrDr instead.")]
 Notation ler_subr_addr := lerBrDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerBDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerBDr instead.")]
 Notation ler_sub_addr := lerBDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrBlDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrBlDr instead.")]
 Notation ltr_subl_addr := ltrBlDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrBrDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrBrDr instead.")]
 Notation ltr_subr_addr := ltrBrDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrBDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrBDr instead.")]
 Notation ltr_sub_addr := ltrBDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lterBDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lterBDr instead.")]
 Notation lter_sub_addr := lterBDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerBlDl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerBlDl instead.")]
 Notation ler_subl_addl := lerBlDl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrBlDl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrBlDl instead.")]
 Notation ltr_subl_addl := ltrBlDl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerBrDl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerBrDl instead.")]
 Notation ler_subr_addl := lerBrDl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrBrDl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrBrDl instead.")]
 Notation ltr_subr_addl := ltrBrDl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerBDl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerBDl instead.")]
 Notation ler_sub_addl := lerBDl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrBDl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrBDl instead.")]
 Notation ltr_sub_addl := ltrBDl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lterBDl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lterBDl instead.")]
 Notation lter_sub_addl := lterBDl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerDl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerDl instead.")]
 Notation ler_addl := lerDl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrDl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrDl instead.")]
 Notation ltr_addl := ltrDl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerDr instead.")]
 Notation ler_addr := lerDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrDr instead.")]
 Notation ltr_addr := ltrDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use gerDl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use gerDl instead.")]
 Notation ger_addl := gerDl.
-#[deprecated(since="mathcomp 1.16.0", note="Use gtrDl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use gtrDl instead.")]
 Notation gtr_addl := gtrDl.
-#[deprecated(since="mathcomp 1.16.0", note="Use gerDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use gerDr instead.")]
 Notation ger_addr := gerDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use gtrDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use gtrDr instead.")]
 Notation gtr_addr := gtrDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use cprD instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use cprD instead.")]
 Notation cpr_add := cprD.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteifD2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteifD2l instead.")]
 Notation lteif_add2l := lteifD2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteifD2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteifD2r instead.")]
 Notation lteif_add2r := lteifD2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteifD2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteifD2 instead.")]
 Notation lteif_add2 := lteifD2.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteifBlDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteifBlDr instead.")]
 Notation lteif_subl_addr := lteifBlDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteifBrDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteifBrDr instead.")]
 Notation lteif_subr_addr := lteifBrDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteifBDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteifBDr instead.")]
 Notation lteif_sub_addr := lteifBDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteifBlDl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteifBlDl instead.")]
 Notation lteif_subl_addl := lteifBlDl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteifBrDl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteifBrDl instead.")]
 Notation lteif_subr_addl := lteifBrDl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteifBDl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteifBDl instead.")]
 Notation lteif_sub_addl := lteifBDl.
-#[deprecated(since="mathcomp 1.16.0", note="Use leifD instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use leifD instead.")]
 Notation leif_add := leifD.
-#[deprecated(since="mathcomp 1.16.0", note="Use gtrN instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use gtrN instead.")]
 Notation gtr_opp := gtrN.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteifNl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteifNl instead.")]
 Notation lteif_oppl := lteifNl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteifNr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteifNr instead.")]
 Notation lteif_oppr := lteifNr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteif0Nr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteif0Nr instead.")]
 Notation lteif_0oppr := lteif0Nr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteifNr0 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteifNr0 instead.")]
 Notation lteif_oppr0 := lteifNr0.
-#[deprecated(since="mathcomp 1.16.0", note="Use lterNE instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lterNE instead.")]
 Notation lter_oppE := lterNE.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_distD instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_distD instead.")]
 Notation ler_dist_add := ler_distD.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_dist_normD instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_dist_normD instead.")]
 Notation ler_dist_norm_add := ler_dist_normD.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerB_normD instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerB_normD instead.")]
 Notation ler_sub_norm_add := lerB_normD.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerB_dist instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerB_dist instead.")]
 Notation ler_sub_dist := lerB_dist.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerB_real instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerB_real instead.")]
 Notation ler_sub_real := lerB_real.
-#[deprecated(since="mathcomp 1.16.0", note="Use gerB_real instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use gerB_real instead.")]
 Notation ger_sub_real := gerB_real.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrX2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrX2r instead.")]
 Notation ltr_expn2r := ltrX2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerX2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerX2r instead.")]
 Notation ler_expn2r := lerX2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use lterX2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lterX2r instead.")]
 Notation lter_expn2r := lterX2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerpM instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerpM instead.")]
 Notation ler_pmul := lerpM.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrpM instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrpM instead.")]
 Notation ltr_pmul := ltrpM.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerpV2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerpV2 instead.")]
 Notation ler_pinv := lerpV2.
-#[deprecated(since="mathcomp 1.16.0", note="Use lernV2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lernV2 instead.")]
 Notation ler_ninv := lernV2.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrpV2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrpV2 instead.")]
 Notation ltr_pinv := ltrpV2.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrnV2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrnV2 instead.")]
 Notation ltr_ninv := ltrnV2.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerpM2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerpM2l instead.")]
 Notation ler_pmul2l := lerpM2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrpM2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrpM2l instead.")]
 Notation ltr_pmul2l := ltrpM2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use lterpM2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lterpM2l instead.")]
 Notation lter_pmul2l := lterpM2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerpM2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerpM2r instead.")]
 Notation ler_pmul2r := lerpM2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrpM2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrpM2r instead.")]
 Notation ltr_pmul2r := ltrpM2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use lterpM2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lterpM2r instead.")]
 Notation lter_pmul2r := lterpM2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use lernM2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lernM2l instead.")]
 Notation ler_nmul2l := lernM2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrnM2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrnM2l instead.")]
 Notation ltr_nmul2l := ltrnM2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use lternM2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lternM2l instead.")]
 Notation lter_nmul2l := lternM2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use lernM2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lernM2r instead.")]
 Notation ler_nmul2r := lernM2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrnM2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrnM2r instead.")]
 Notation ltr_nmul2r := ltrnM2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use lternM2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lternM2r instead.")]
 Notation lter_nmul2r := lternM2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use minrpMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use minrpMr instead.")]
 Notation minr_pmulr := minrpMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use maxrpMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use maxrpMr instead.")]
 Notation maxr_pmulr := maxrpMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use minrpMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use minrpMl instead.")]
 Notation minr_pmull := minrpMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use maxrpMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use maxrpMl instead.")]
 Notation maxr_pmull := maxrpMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrwpX2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrwpX2r instead.")]
 Notation ltr_wpexpn2r := ltrwpX2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerpX2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerpX2r instead.")]
 Notation ler_pexpn2r := lerpX2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrpX2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrpX2r instead.")]
 Notation ltr_pexpn2r := ltrpX2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use lterpX2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lterpX2r instead.")]
 Notation lter_pexpn2r := lterpX2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use gerpMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use gerpMl instead.")]
 Notation ger_pmull := gerpMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use gtrpMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use gtrpMl instead.")]
 Notation gtr_pmull := gtrpMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use gerpMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use gerpMr instead.")]
 Notation ger_pmulr := gerpMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use gtrpMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use gtrpMr instead.")]
 Notation gtr_pmulr := gtrpMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerpMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerpMl instead.")]
 Notation ler_pmull := lerpMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrpMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrpMl instead.")]
 Notation ltr_pmull := ltrpMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerpMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerpMr instead.")]
 Notation ler_pmulr := lerpMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrpMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrpMr instead.")]
 Notation ltr_pmulr := ltrpMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use gernMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use gernMl instead.")]
 Notation ger_nmull := gernMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use gtrnMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use gtrnMl instead.")]
 Notation gtr_nmull := gtrnMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use gernMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use gernMr instead.")]
 Notation ger_nmulr := gernMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use gtrnMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use gtrnMr instead.")]
 Notation gtr_nmulr := gtrnMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lernMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lernMl instead.")]
 Notation ler_nmull := lernMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrnMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrnMl instead.")]
 Notation ltr_nmull := ltrnMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lernMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lernMr instead.")]
 Notation ler_nmulr := lernMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrnMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrnMr instead.")]
 Notation ltr_nmulr := ltrnMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use leifpM instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use leifpM instead.")]
 Notation leif_pmul := leifpM.
-#[deprecated(since="mathcomp 1.16.0", note="Use leifnM instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use leifnM instead.")]
 Notation leif_nmul := leifnM.
-#[deprecated(since="mathcomp 1.16.0", note="Use eqrX2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use eqrX2 instead.")]
 Notation eqr_expn2 := eqrX2.
-#[deprecated(since="mathcomp 1.16.0", note="Use real_maxrnMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use real_maxrnMr instead.")]
 Notation real_maxr_nmulr := real_maxrnMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use real_minrnMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use real_minrnMr instead.")]
 Notation real_minr_nmulr := real_minrnMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use real_minrnMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use real_minrnMl instead.")]
 Notation real_minr_nmull := real_minrnMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use real_maxrnMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use real_maxrnMl instead.")]
 Notation real_maxr_nmull := real_maxrnMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use real_ltr_distlDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use real_ltr_distlDr instead.")]
 Notation real_ltr_distl_addr := real_ltr_distlDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use real_ler_distlDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use real_ler_distlDr instead.")]
 Notation real_ler_distl_addr := real_ler_distlDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use real_ltr_distlCDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use real_ltr_distlCDr instead.")]
 Notation real_ltr_distlC_addr := real_ltr_distlCDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use real_ler_distlCDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use real_ler_distlCDr instead.")]
 Notation real_ler_distlC_addr := real_ler_distlCDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use real_ltr_distlBl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use real_ltr_distlBl instead.")]
 Notation real_ltr_distl_subl := real_ltr_distlBl.
-#[deprecated(since="mathcomp 1.16.0", note="Use real_ler_distlBl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use real_ler_distlBl instead.")]
 Notation real_ler_distl_subl := real_ler_distlBl.
-#[deprecated(since="mathcomp 1.16.0", note="Use real_ltr_distlCBl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use real_ltr_distlCBl instead.")]
 Notation real_ltr_distlC_subl := real_ltr_distlCBl.
-#[deprecated(since="mathcomp 1.16.0", note="Use real_ler_distlCBl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use real_ler_distlCBl instead.")]
 Notation real_ler_distlC_subl := real_ler_distlCBl.
-#[deprecated(since="mathcomp 1.16.0", note="Use leriX2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use leriX2l instead.")]
 Notation ler_iexpn2l := leriX2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltriX2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltriX2l instead.")]
 Notation ltr_iexpn2l := ltriX2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteriX2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteriX2l instead.")]
 Notation lter_iexpn2l := lteriX2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use lereXn2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lereXn2l instead.")]
 Notation ler_eexpn2l := lereXn2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltreXn2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltreXn2l instead.")]
 Notation ltr_eexpn2l := ltreXn2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltereXn2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltereXn2l instead.")]
 Notation lter_eexpn2l := ltereXn2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerwpM2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerwpM2l instead.")]
 Notation ler_wpmul2l := lerwpM2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerwpM2rinstead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerwpM2rinstead.")]
 Notation ler_wpmul2r := lerwpM2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerwnM2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerwnM2l instead.")]
 Notation ler_wnmul2l := lerwnM2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerwnM2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerwnM2r instead.")]
 Notation ler_wnmul2r := lerwnM2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerpeMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerpeMl instead.")]
 Notation ler_pemull := lerpeMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerneMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerneMl instead.")]
 Notation ler_nemull := lerneMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerpeMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerpeMr instead.")]
 Notation ler_pemulr := lerpeMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerneMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerneMr instead.")]
 Notation ler_nemulr := lerneMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use leriXr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use leriXr instead.")]
 Notation ler_iexpr:= leriXr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltriXr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltriXr instead.")]
 Notation ltr_iexpr := ltriXr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteriXr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteriXr instead.")]
 Notation lter_iexpr := lteriXr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lereXr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lereXr instead.")]
 Notation ler_eexpr := lereXr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltreXr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltreXr instead.")]
 Notation ltr_eexpr := ltreXr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltereXr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltereXr instead.")]
 Notation lter_eexpr := ltereXr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lterXr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lterXr instead.")]
 Notation lter_expr := lterXr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerwiXn2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerwiXn2l instead.")]
 Notation ler_wiexpn2l := lerwiXn2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerweXn2l instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerweXn2l instead.")]
 Notation ler_weexpn2l := lerweXn2l.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerpiMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerpiMl instead.")]
 Notation ler_pimull := lerpiMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerniMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerniMl instead.")]
 Notation ler_nimull := lerniMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerpiMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerpiMr instead.")]
 Notation ler_pimulr := lerpiMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerniMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerniMr instead.")]
 Notation ler_nimulr := lerniMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lerpMn2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lerpMn2r instead.")]
 Notation ler_pmuln2r := lerpMn2r.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltrpMn2r instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrpMn2r instead.")]
 Notation ltr_pmuln2r := ltrpMn2r.
+#[deprecated(since="mathcomp 1.17.0", note="Use lerpMn2l instead.")]
+Notation ler_pmuln2l := lerpMn2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use lerwpMn2l instead.")]
+Notation ler_wpmuln2l := lerwpMn2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use eqrpMn2r instead.")]
+Notation eqr_pmuln2r := eqrpMn2r.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrwMn2r instead.")]
+Notation ltr_wmuln2r := ltrwMn2r.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrwpMn2r instead.")]
+Notation ltr_wpmuln2r := ltrwpMn2r.
+#[deprecated(since="mathcomp 1.17.0", note="Use lerwMn2r instead.")]
+Notation ler_wmuln2r := lerwMn2r.
+#[deprecated(since="mathcomp 1.17.0", note="Use lerwnMn2l instead.")]
+Notation ler_wnmuln2l := lerwnMn2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use lerMn2r instead.")]
+Notation ler_muln2r := lerMn2r.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltrMn2r instead.")]
+Notation ltr_muln2r := ltrMn2r.
+#[deprecated(since="mathcomp 1.17.0", note="Use eqrMn2r instead.")]
+Notation eqr_muln2r := eqrMn2r.
+#[deprecated(since="mathcomp 1.17.0", note="ltrpMn2l instead.")]
+Notation ltr_pmuln2l := ltrpMn2l.
+#[deprecated(since="mathcomp 1.17.0", note="lernMn2l instead.")]
+Notation ler_nmuln2l := lernMn2l.
+#[deprecated(since="mathcomp 1.17.0", note="ltrnMn2l instead.")]
+Notation ltr_nmuln2l := ltrnMn2l.
 
 #[global] Hint Resolve lerN2 ltrN2 real0 real1 normr_real : core.
 Arguments ler_sqr {R} [x y].
@@ -4166,7 +4190,7 @@ pose E' i := E i / n%:R.
 have defE' i: E' i *+ n = E i by rewrite -mulr_natr divfK ?pnatr_eq0 -?lt0n.
 have /leif_AGM_scaled (i): i \in A -> 0 <= E' i *+ n by rewrite defE' => /Ege0.
 rewrite -/n -mulr_suml (eq_bigr _ (in1W defE')); congr (_ <= _ ?= iff _).
-by do 2![apply: eq_forallb_in => ? _]; rewrite -(eqr_pmuln2r n_gt0) !defE'.
+by do 2![apply: eq_forallb_in => ? _]; rewrite -(eqrpMn2r n_gt0) !defE'.
 Qed.
 
 Implicit Type p : {poly F}.
@@ -4201,81 +4225,81 @@ Proof. by move=> sHG; rewrite -divgS // natf_div ?cardSg. Qed.
 
 End NumFieldTheory.
 
-#[deprecated(since="mathcomp 1.16.0", note="Use lefpV2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lefpV2 instead.")]
 Notation lef_pinv := lefpV2.
-#[deprecated(since="mathcomp 1.16.0", note="Use lefnV2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lefnV2 instead.")]
 Notation lef_ninv := lefnV2.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltfpV2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltfpV2 instead.")]
 Notation ltf_pinv := ltfpV2.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltfnV2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltfnV2 instead.")]
 Notation ltf_ninv := ltfnV2.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltefpV2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltefpV2 instead.")]
 Notation ltef_pinv := ltefpV2.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltefnV2 instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltefnV2 instead.")]
 Notation ltef_ninv := ltefnV2.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteif_pdivlMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteif_pdivlMr instead.")]
 Notation lteif_pdivl_mulr := lteif_pdivlMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteif_pdivrMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteif_pdivrMr instead.")]
 Notation lteif_pdivr_mulr := lteif_pdivrMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteif_pdivlMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteif_pdivlMl instead.")]
 Notation lteif_pdivl_mull := lteif_pdivlMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteif_pdivrMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteif_pdivrMl instead.")]
 Notation lteif_pdivr_mull := lteif_pdivrMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteif_ndivlMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteif_ndivlMr instead.")]
 Notation lteif_ndivl_mulr := lteif_ndivlMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteif_ndivrMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteif_ndivrMr instead.")]
 Notation lteif_ndivr_mulr := lteif_ndivrMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteif_ndivlMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteif_ndivlMl instead.")]
 Notation lteif_ndivl_mull := lteif_ndivlMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lteif_ndivrMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lteif_ndivrMl instead.")]
 Notation lteif_ndivr_mull := lteif_ndivrMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_pdivlMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_pdivlMr instead.")]
 Notation ler_pdivl_mulr := ler_pdivlMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_pdivlMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_pdivlMr instead.")]
 Notation ltr_pdivl_mulr := ltr_pdivlMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lter_pdivlMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lter_pdivlMr instead.")]
 Notation lter_pdivl_mulr := lter_pdivlMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_pdivrMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_pdivrMr instead.")]
 Notation ler_pdivr_mulr := ler_pdivrMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_pdivrMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_pdivrMr instead.")]
 Notation ltr_pdivr_mulr := ltr_pdivrMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lter_pdivrMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lter_pdivrMr instead.")]
 Notation lter_pdivr_mulr := lter_pdivrMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_pdivlMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_pdivlMl instead.")]
 Notation ler_pdivl_mull := ler_pdivlMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_pdivlMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_pdivlMl instead.")]
 Notation ltr_pdivl_mull := ltr_pdivlMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lter_pdivlMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lter_pdivlMl instead.")]
 Notation lter_pdivl_mull := lter_pdivlMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_pdivrMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_pdivrMl instead.")]
 Notation ler_pdivr_mull := ler_pdivrMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_pdivrMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_pdivrMl instead.")]
 Notation ltr_pdivr_mull := ltr_pdivrMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lter_pdivrMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lter_pdivrMl instead.")]
 Notation lter_pdivr_mull := lter_pdivrMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_ndivlMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_ndivlMr instead.")]
 Notation ler_ndivl_mulr := ler_ndivlMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_ndivlMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_ndivlMr instead.")]
 Notation ltr_ndivl_mulr := ltr_ndivlMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lter_ndivlMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lter_ndivlMr instead.")]
 Notation lter_ndivl_mulr := lter_ndivlMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_ndivrMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_ndivrMr instead.")]
 Notation ler_ndivr_mulr := ler_ndivrMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_ndivrMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_ndivrMr instead.")]
 Notation ltr_ndivr_mulr := ltr_ndivrMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use lter_ndivrMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lter_ndivrMr instead.")]
 Notation lter_ndivr_mulr := lter_ndivrMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_ndivlMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_ndivlMl instead.")]
 Notation ler_ndivl_mull := ler_ndivlMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_ndivlMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_ndivlMl instead.")]
 Notation ltr_ndivl_mull := ltr_ndivlMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lter_ndivlMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lter_ndivlMl instead.")]
 Notation lter_ndivl_mull := lter_ndivlMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_ndivrMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_ndivrMl instead.")]
 Notation ler_ndivr_mull := ler_ndivrMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_ndivrMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_ndivrMl instead.")]
 Notation ltr_ndivr_mull := ltr_ndivrMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use lter_ndivrMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use lter_ndivrMl instead.")]
 Notation lter_ndivr_mull := lter_ndivrMl.
 
 Section RealDomainTheory.
@@ -5652,32 +5676,32 @@ Coercion normedZmodMixin : numMixin >-> normed_mixin_of.
 Coercion numDomainMixin : numMixin >-> mixin_of.
 Definition NumDomainOfIdomain (T : idomainType) (m : of_ T) :=
   NumDomainType (POrderType ring_display T m) m.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_normD instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_normD instead.")]
 Notation ler_norm_add := ler_normD.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_normB instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_normB instead.")]
 Notation ler_norm_sub := ler_normB.
 Notation ltr_distl_addr := ltr_distlDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_distlDr instead.")]
 Notation ler_distl_addr := ler_distlDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_distlCDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_distlCDr instead.")]
 Notation ltr_distlC_addr := ltr_distlCDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlCDr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_distlCDr instead.")]
 Notation ler_distlC_addr := ler_distlCDr.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_distlBl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_distlBl instead.")]
 Notation ltr_distl_subl := ltr_distlBl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlBl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_distlBl instead.")]
 Notation ler_distl_subl := ler_distlBl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ltr_distlCBl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_distlCBl instead.")]
 Notation ltr_distlC_subl := ltr_distlCBl.
-#[deprecated(since="mathcomp 1.16.0", note="Use ler_distlCBl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_distlCBl instead.")]
 Notation ler_distlC_subl := ler_distlCBl.
-#[deprecated(since="mathcomp 1.16.0", note="Use real_maxrnMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use real_maxrnMr instead.")]
 Notation maxr_nmulr := maxrnMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use minrnMr instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use minrnMr instead.")]
 Notation minr_nmulr := minrnMr.
-#[deprecated(since="mathcomp 1.16.0", note="Use minrnMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use minrnMl instead.")]
 Notation minr_nmull := minrnMl.
-#[deprecated(since="mathcomp 1.16.0", note="Use maxrnMl instead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use maxrnMl instead.")]
 Notation maxr_nmull := maxrnMl.
 End Exports.
 
