@@ -14,4 +14,4 @@
 <!-- leave this note as a reminder to reviewers -->
 ##### Automatic note to reviewers
 
-Read [this Checklist](https://github.com/math-comp/math-comp/wiki/Checklist-for-following,-reviewing-and-playing-with-a-PR#checklist-for-reviewing-a-pr) and make sure there is a milestone.
+Read [this Checklist](https://github.com/math-comp/math-comp/wiki/Checklist-for-creating-and-review-PRs) and make sure there is a milestone.
