@@ -45,6 +45,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `ssrfun.v`
   + lemmas `inj_omap`, `omap_id`, `eq_omap`, `omapK`
+- in `order.v`
+  + notations `0%O`, `1%O`, `0^d%O` and `1^d%O` as backward compatible
+    replacements of removed  notation `0`, `1`, `0^d` and `1^d`
+    for bottom and top of lattices
 
 ### Changed
 
@@ -383,6 +387,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `in_segment_addgt0Pl` -> `in_segmentDgt0Pl`
 
 ### Removed
+
+### Deprecated
+
+- in `order.v`
+  + notations `0%O`, `1%O`, `0^d%O` and `1^d%O`
 
 ### Infrastructure
 
