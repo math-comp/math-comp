@@ -774,6 +774,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemma `big_enum_rank_cond_AC`, use `big_enum_rank_cond`
   + lemma `big_nat_rev_AC`, use `big_nat_rev`
   + lemma `big_rev_mkord_AC`, use `big_rev_mkord`
+- in `order.v`
+  + notations `0`, `1`, `0^d` and `1^d` in `order_scope`
 
 ### Deprecated
 
