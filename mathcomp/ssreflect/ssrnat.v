@@ -165,8 +165,8 @@ Lemma succn_inj : injective succn. Proof. by move=> n m []. Qed.
 
 (* Predeclare postfix doubling/halving operators. *)
 
-Reserved Notation "n .*2" (at level 2, format "n .*2").
-Reserved Notation "n ./2" (at level 2, format "n ./2").
+Reserved Notation "n .*2" (at level 2, left associativity, format "n .*2").
+Reserved Notation "n ./2" (at level 2, left associativity, format "n ./2").
 
 (* Canonical comparison and eqType for nat.                                *)
 
