@@ -43,6 +43,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + fix the definition of `max_fun` (notation `\max`)
     which was equal to `min_fun`
 
+- in `ssrnat.v`
+  + change the doubling and halving operators to be left-associative
+
 ### Renamed
 
 ### Removed
