@@ -535,8 +535,6 @@ Reserved Notation "~^d` A" (at level 35, right associativity).
 
 Reserved Notation "0^d%O" (at level 0).  (* deprecated in 1.17.0 *)
 Reserved Notation "1^d%O" (at level 0).  (* deprecated in 1.17.0 *)
-Reserved Notation "0^d" (at level 0).
-Reserved Notation "1^d" (at level 0).
 Reserved Notation "\bot^d" (at level 0).
 Reserved Notation "\top^d" (at level 0).
 
@@ -1479,7 +1477,6 @@ Definition bottom {disp : unit} {T : bLatticeType disp} : T :=
 
 Module Import BLatticeSyntax.
 Notation "0%O" := bottom (only parsing).  (* deprecated in 1.17.0 *)
-Notation "0" := bottom : order_scope.
 Notation "\bot" := bottom : order_scope.
 
 Notation "\join_ ( i <- r | P ) F" :=
@@ -1586,7 +1583,6 @@ Definition top disp {T : tbLatticeType disp} : T :=
 Module Import TBLatticeSyntax.
 
 Notation "1%O" := top (only parsing).  (* deprecated in 1.17.0 *)
-Notation "1" := top : order_scope.
 Notation "\top" := top : order_scope.
 
 Notation "\meet_ ( i <- r | P ) F" :=
@@ -2652,8 +2648,6 @@ Notation "x `|^d` y" := (dual_join x y) : order_scope.
 
 Notation "0^d%O" := dual_bottom (only parsing).  (* deprecated in 1.17.0 *)
 Notation "1^d%O" := dual_top (only parsing).  (* deprecated in 1.17.0 *)
-Notation "0^d" := dual_bottom : order_scope.
-Notation "1^d" := dual_top : order_scope.
 Notation "\bot^d" := dual_bottom : order_scope.
 Notation "\top^d" := dual_top : order_scope.
 
