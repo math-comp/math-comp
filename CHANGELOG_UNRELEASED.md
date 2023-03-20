@@ -95,6 +95,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssrfun.v`
   + lemmas `inj_omap`, `omap_id`, `eq_omap`, `omapK`
 
+- in `order.v`
+  + notations `0%O`, `1%O`, `0^d%O` and `1^d%O` as backward compatible
+    replacements of removed  notation `0`, `1`, `0^d` and `1^d`
+    for bottom and top of lattices
+
 ### Changed
 
 - in `galois.v`
@@ -932,6 +937,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + notation `[countType of T]`, use `Countable.clone T _` or `T : countType`
   + notation `[countMixin of T by <:]`, use `[Countable of T by <:]`
   + notation `[subCountType of T]`, use `SubCountable.clone _ _ T _`
+
+- in `order.v`
+  + notations `0%O`, `1%O`, `0^d%O` and `1^d%O`
 
 ### Infrastructure
 
