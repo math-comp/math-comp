@@ -240,63 +240,6 @@ Proof. by rewrite (addnC m) addnC addnCA. Qed.
 Lemma addnACA : interchange addn addn.
 Proof. by move=> m n p q; rewrite -!addnA (addnCA n). Qed.
 
-Lemma addnCl_ m n p : (m + n) + p = (n + m) + p.
-Proof. by rewrite (addnC m n). Qed.
-
-Lemma addnArC m n p : (m + n) + p = (n + p) + m.
-Proof. by rewrite -addnA addnC. Qed.
-
-Lemma addnCrA m n p : (m + n) + p = (p + m) + n.
-Proof. by rewrite addnC addnA. Qed.
-
-Lemma addnCrAAC m n p : (m + n) + p = (p + n) + m.
-Proof. by rewrite addnC addnA addnAC. Qed.
-
-Lemma addnArCr m n p : (m + n) + p = m + (p + n).
-Proof. by rewrite -addnA (addnC p n). Qed.
-
-Lemma addnACC m n p : (m + n) + p = n + (m + p).
-Proof. by rewrite addnAC addnC. Qed.
-
-Lemma addnACCCr m n p : (m + n) + p = n + (p + m).
-Proof. by rewrite addnAC addnC (addnC m p). Qed.
-
-Lemma addnCr m n p : (m + n) + p = p + (m + n).
-Proof. by rewrite addnC. Qed.
-
-Lemma addnCCr m n p : (m + n) + p = p + (n + m).
-Proof. by rewrite addnC (addnC n m). Qed.
-
-Lemma addnAr m n p : (m + n) + p = m + (n + p).
-Proof. by rewrite -addnA. Qed.
-
-Lemma addnCrACl m n p : m + (n + p) = (p + m) + n.
-Proof. by rewrite (addnC n p) addnA (addnC m p). Qed.
-
-Lemma addnCCl m n p : m + (n + p) = (p + n) + m.
-Proof. by rewrite addnC (addnC n p). Qed.
-
-Lemma addnCr_ m n p : m + (n + p) = m + (p + n).
-Proof. by rewrite (addnC p n). Qed.
-
-Lemma addnClA m n p : m + (n + p) = n + (p + m).
-Proof. by rewrite addnC addnA. Qed.
-
-Lemma addnACl m n p : m + (n + p) = p + (m + n).
-Proof. by rewrite addnA addnC. Qed.
-
-Lemma addnCClA m n p : m + (n + p) = p + (n + m).
-Proof. by rewrite addnC (addnC n p) addnA. Qed.
-
-Lemma addnACAl m n p : m + (n + p) = (m + p) + n.
-Proof. by rewrite addnAC addnA. Qed.
-
-Lemma addnACCl m n p : m + (n + p) = (n + m) + p.
-Proof. by rewrite addnAC addnC. Qed.
-
-Lemma addnCl m n p : m + (n + p) = (n + p) + m.
-Proof. by rewrite addnC. Qed.
-
 Lemma addn_eq0 m n : (m + n == 0) = (m == 0) && (n == 0).
 Proof. by case: m; case: n. Qed.
 
@@ -655,49 +598,34 @@ Proof. by rewrite -subn_eq0; move/eqP => ->; rewrite subn0. Qed.
 Lemma subnBAC m n p : p <= n -> n <= m -> m - (n - p) = p + (m - n).
 Proof. by move=> pn nm; rewrite subnA // addnC. Qed.
 
-Lemma subDnAC m n p : p <= m -> (m + n) - p = (m - p) + n.
-Proof. by move=> pm; rewrite -addnBAC. Qed.
-
-Lemma subDnCAC m n p : p <= n -> (m + n) - p = (n - p) + m.
+Lemma subDnCAC m n p : p <= n -> m + n - p = n - p + m.
 Proof. by move=> pn; rewrite addnC -addnBAC. Qed.
 
-Lemma subDnA_geq m n p : p <= n -> (m + n) - p = m + (n - p).
-Proof. by move=> pn; rewrite -addnBA. Qed.
-
-Lemma subDnA_leq m n p : n <= p -> (m + n) - p = m - (p - n).
-Proof. by move=> np; rewrite -subnBA. Qed.
-
-Lemma subDnCA_geq m n p : p <= m -> (m + n) - p = n + (m - p).
+Lemma subDnCA_geq m n p : p <= m -> m + n - p = n + (m - p).
 Proof. by move=> pm; rewrite addnC -addnBA. Qed.
 
-Lemma subDnCA_leq m n p : m <= p -> (m + n) - p = n - (p - m).
+Lemma subDnCA_leq m n p : m <= p -> m + n - p = n - (p - m).
 Proof. by move=> mp; rewrite addnC -subnBA. Qed.
 
-Lemma proposed_addnBC m n : (m - n) + n = (n - m) + m.
+Lemma proposed_addnBC m n : m - n + n = n - m + m.
 Proof. by rewrite -[in RHS]addnBn addnC. Qed.
 
-Lemma proposed_addnCB m n : (m - n) + n = m + (n - m).
+Lemma proposed_addnCB m n : m - n + n = m + (n - m).
 Proof. by rewrite proposed_addnBC addnC. Qed.
 
-Lemma addBnCAC m n p : n <= m -> (m - n) + p = (p + m) - n.
+Lemma addBnCAC m n p : n <= m -> m - n + p = p + m - n.
 Proof. by move=> nm; rewrite [p + m]addnC addnBAC. Qed.
 
-Lemma addBnCACAC m n p : n <= m -> n <= p -> (m - n) + p = (p - n) + m.
+Lemma addBnCACAC m n p : n <= m -> n <= p -> m - n + p = p - n + m.
 Proof. by move=> nm np; rewrite addnC addnBA // subDnCA_geq // addnC. Qed.
 
-Lemma addBnAC m n p : n <= m -> n <= p -> (m - n) + p = m + (p - n).
-Proof. by move=> nm np; rewrite -addnABC. Qed.
+Lemma addBnACACC m n p : n <= m -> p <= n -> m - n + p = m - (n - p).
+Proof. by move=> nm pn; rewrite subnBA // -subDnCAC // addnC. Qed.
 
-Lemma addBnACACC m n p : n <= m -> p <= n -> (m - n) + p = m - (n - p).
-Proof. by move=> nm pn; rewrite -subDnA_leq  // -subDnCAC // addnC. Qed.
-
-Lemma addnBl_leq m n p : m <= n -> (m - n) + p = p.
+Lemma addnBl_leq m n p : m <= n -> m - n + p = p.
 Proof. by rewrite -subn_eq0; move/eqP => ->; rewrite add0n. Qed.
 
-Lemma subBnA m n p : (m - n) - p = m - (n + p).
-Proof. by rewrite -subnDA. Qed.
-
-Lemma subBnCA m n p : (m - n) - p = m - (p + n).
+Lemma subBnCA m n p : m - n - p = m - (p + n).
 Proof. by rewrite addnC -subnDA. Qed.
 
 Lemma predn_sub m n : (m - n).-1 = (m.-1 - n).
