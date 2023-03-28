@@ -4158,23 +4158,24 @@ rewrite -(@ler_pXn2r R 2) ?nnegrE ?sqrtr_ge0 //.
 by rewrite !sqr_sqrtr // (le_trans pa).
 Qed.
 
-Lemma ler_psqrt : {in @pos R &, {mono sqrt : a b / a <= b}}.
+Lemma ler_psqrt : {in @nneg R &, {mono sqrt : a b / a <= b}}.
 Proof.
 apply: le_mono_in => x y x_gt0 y_gt0.
 rewrite !lt_neqAle => /andP[neq_xy le_xy].
-by rewrite ler_wsqrtr // eqr_sqrt ?ltW // neq_xy.
+by rewrite ler_wsqrtr // eqr_sqrt // neq_xy.
 Qed.
 
-Lemma ler_sqrt a b : 0 < b -> (sqrt a <= sqrt b) = (a <= b).
+Lemma ler_sqrt a b : 0 <= b -> (sqrt a <= sqrt b) = (a <= b).
 Proof.
-move=> b_gt0; have [a_le0|a_gt0] := ler0P a; last by rewrite ler_psqrt.
-by rewrite ler0_sqrtr // sqrtr_ge0 (le_trans a_le0) ?ltW.
+move=> b_ge0; have [a_le0|a_gt0] := ler0P a; last first.
+  by rewrite ler_psqrt // nnegrE ltW.
+by rewrite ler0_sqrtr // sqrtr_ge0 (le_trans a_le0).
 Qed.
 
 Lemma ltr_sqrt a b : 0 < b -> (sqrt a < sqrt b) = (a < b).
 Proof.
 move=> b_gt0; have [a_le0|a_gt0] := ler0P a; last first.
-  by rewrite (leW_mono_in ler_psqrt).
+  by rewrite (leW_mono_in ler_psqrt)//; apply: ltW.
 by rewrite ler0_sqrtr // sqrtr_gt0 b_gt0 (le_lt_trans a_le0).
 Qed.
 

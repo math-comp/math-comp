@@ -27,6 +27,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + generalized lemmas `big_set0` and `big_set` from semigroups
     to arbitrary binary operators
 
+- in `ssrnum.v`
+  + generalize `ler_sqrt`
+  + generalize `ler_psqrt` to use `nneg` instead of `pos`
+
 ### Renamed
 
 ### Removed
