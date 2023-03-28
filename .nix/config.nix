@@ -68,12 +68,14 @@ with builtins; with (import <nixpkgs> {}).lib;
     };
     "coq-8.14".coqPackages = common-bundles // {
       coq.override.version = "8.14";
+      coqeal.job = false;
     };
     "coq-8.13".coqPackages = common-bundles // {
       coq.override.version = "8.13";
       mathcomp-classical.job = false;
       mathcomp-analysis.job = false;
       graph-theory.job = false;
+      coqeal.job = false;
     };
   };
 }
