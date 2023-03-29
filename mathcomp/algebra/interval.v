@@ -787,7 +787,7 @@ case: i => [x y] lti; have := mem_miditv lti; rewrite inE => /andP[+ _].
 by move=> /le_trans; apply; rewrite !bnd_simp.
 Qed.
 
-Lemma in_segment_addgt0Pr x y z :
+Lemma in_segmentDgt0Pr x y z :
   reflect (forall e, e > 0 -> y \in `[x - e, z + e]) (y \in `[x, z]).
 Proof.
 apply/(iffP idP)=> [xyz e /[dup] e_gt0 /ltW e_ge0 | xyz_e].
@@ -796,11 +796,16 @@ by rewrite in_itv /= ; apply/andP; split; apply/ler_addgt0Pr => ? /xyz_e;
   rewrite in_itv /= lerBDr => /andP [].
 Qed.
 
-Lemma in_segment_addgt0Pl x y z :
+Lemma in_segmentDgt0Pl x y z :
   reflect (forall e, e > 0 -> y \in `[(- e + x), (e + z)]) (y \in `[x, z]).
 Proof.
-apply/(equivP (in_segment_addgt0Pr x y z)).
+apply/(equivP (in_segmentDgt0Pr x y z)).
 by split=> zxy e /zxy; rewrite [z + _]addrC [_ + x]addrC.
 Qed.
 
 End IntervalField.
+
+#[deprecated(since="mathcomp 1.17.0", note="Use in_segmentDgt0Pr instead.")]
+Notation in_segment_addgt0Pr := in_segmentDgt0Pr.
+#[deprecated(since="mathcomp 1.17.0", note="Use in_segmentDgt0Pl instead.")]
+Notation in_segment_addgt0Pl := in_segmentDgt0Pl.

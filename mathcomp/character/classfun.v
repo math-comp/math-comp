@@ -953,7 +953,7 @@ without loss ophi: phi / '[phi, psi] = 0.
   rewrite (canRL (subrK _) (erefl phi1)) rpredDr ?rpredZ ?memv_line //.
   rewrite cfdotDl ophi add0r cfdotZl normrM (ger0_norm (cfnorm_ge0 _)).
   rewrite exprMn mulrA -cfnormZ cfnormDd; last by rewrite cfdotZr ophi mulr0.
-  by have:= IHo _ ophi; rewrite mulrDl -leif_subLR subrr ophi normCK mul0r.
+  by have:= IHo _ ophi; rewrite mulrDl -leifBLR subrr ophi normCK mul0r.
 rewrite ophi normCK mul0r; split; first by rewrite mulr_ge0 ?cfnorm_ge0.
 rewrite eq_sym mulf_eq0 orbC cfnorm_eq0 (negPf nz_psi) /=.
 apply/idP/idP=> [|/vlineP[a {2}->]]; last by rewrite cfdotZr ophi mulr0.
@@ -975,7 +975,7 @@ Proof.
 rewrite -(mono_in_leif ler_sqr) ?rpredD ?qualifE ?sqrtC_ge0 ?cfnorm_ge0 //.
 rewrite andbC sqrrD !sqrtCK addrAC cfnormD (mono_leif (lerD2l _)).
 rewrite -mulr_natr -[_ + _](divfK (negbT (eqC_nat 2 0))) -/('Re _).
-rewrite (mono_leif (lerpM2r _)) ?ltr0n //.
+rewrite (mono_leif (ler_pM2r _)) ?ltr0n //.
 have:= leif_trans (leif_Re_Creal '[phi, psi]) (cfCauchySchwarz_sqrt phi psi).
 congr (_ <= _ ?= iff _); first by rewrite ReE.
 apply: andb_id2r; rewrite free_cons span_seq1 seq1_free -negb_or negbK orbC /=.

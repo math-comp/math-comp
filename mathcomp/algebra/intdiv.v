@@ -186,7 +186,7 @@ case: p => // p p_gt0; wlog d_gt0: d / d > 0; last case: d => // d in d_gt0 *.
   by move=> IH; case/intP: d => [|d|d]; rewrite ?mulr0 ?divz0 ?mulrN ?divzN ?IH.
 rewrite {1}(divz_eq m d) mulrDr mulrCA divzMDl ?mulf_neq0 ?gt_eqF // addrC.
 rewrite divz_small ?add0r // PoszM pmulr_rge0 ?modz_ge0 ?gt_eqF //=.
-by rewrite ltrpM2l ?ltz_pmod.
+by rewrite ltr_pM2l ?ltz_pmod.
 Qed.
 Arguments divzMpl [p m d].
 
@@ -214,8 +214,8 @@ Qed.
 Lemma ltz_divLR m n d : d > 0 -> ((m %/ d)%Z < n) = (m < n * d).
 Proof.
 move=> d_gt0; apply/idP/idP.
-  by rewrite -[_ < n]lezD1 -(lerpM2r d_gt0); exact/lt_le_trans/ltz_ceil.
-by rewrite -(ltrpM2r d_gt0 _ n); apply/le_lt_trans/lez_floor; rewrite gt_eqF.
+  by rewrite -[_ < n]lezD1 -(ler_pM2r d_gt0); exact/lt_le_trans/ltz_ceil.
+by rewrite -(ltr_pM2r d_gt0 _ n); apply/le_lt_trans/lez_floor; rewrite gt_eqF.
 Qed.
 
 Lemma lez_divRL m n d : d > 0 -> (m <= (n %/ d)%Z) = (m * d <= n).
@@ -362,10 +362,10 @@ Lemma divzK d m : (d %| m)%Z -> (m %/ d)%Z * d = m.
 Proof. by rewrite dvdz_eq => /eqP. Qed.
 
 Lemma lez_divLR d m n : 0 < d -> (d %| m)%Z -> ((m %/ d)%Z <= n) = (m <= n * d).
-Proof. by move=> /lerpM2r <- /divzK->. Qed.
+Proof. by move=> /ler_pM2r <- /divzK->. Qed.
 
 Lemma ltz_divRL d m n : 0 < d -> (d %| m)%Z -> (n < m %/ d)%Z = (n * d < m).
-Proof. by move=> /ltrpM2r/(_ n)<- /divzK->. Qed.
+Proof. by move=> /ltr_pM2r/(_ n)<- /divzK->. Qed.
 
 Lemma eqz_div d m n : d != 0 -> (d %| m)%Z -> (n == m %/ d)%Z = (n * d == m).
 Proof. by move=> /mulIf/inj_eq <- /divzK->. Qed.

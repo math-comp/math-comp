@@ -938,7 +938,7 @@ have AtoB_P s (psi := 'chi_s) (chi := 'Ind[G] psi): s \in calA ->
   have ub_chi_r: 'chi_r 1%g <= chi 1%g ?= iff ('chi_r == chi).
     have Nchi: chi \is a character by rewrite cfInd_char ?irr_char.
     have [chi1 Nchi1->] := constt_charP _ Nchi sGr.
-    rewrite addrC cfunE -leif_subLR subrr eq_sym -subr_eq0 addrK.
+    rewrite addrC cfunE -leifBLR subrr eq_sym -subr_eq0 addrK.
     by split; rewrite ?char1_ge0 // eq_sym char1_eq0.
   have lb_chi_r: chi 1%g <= 'chi_r 1%g ?= iff (f == e).
     rewrite cfInd1 // -(cfRes1 H) DpsiH -(cfRes1 H 'chi_r) DrH !cfunE sum_cfunE.
@@ -946,8 +946,8 @@ have AtoB_P s (psi := 'chi_s) (chi := 'Ind[G] psi): s \in calA ->
       by case/cfclassP=> y _ ->; rewrite cfConjg1.
     rewrite reindex_cfclass //= sumr_const -(eq_card (cfclass_IirrE _ _)).
     rewrite mulr_natl mulrnAr card_cfclass_Iirr //.
-    rewrite (mono_leif (lerpMn2r (indexg_gt0 G T))).
-    rewrite (mono_leif (lerpM2r (irr1_gt0 t))); apply: leif_eq.
+    rewrite (mono_leif (ler_pMn2r (indexg_gt0 G T))).
+    rewrite (mono_leif (ler_pM2r (irr1_gt0 t))); apply: leif_eq.
     by rewrite /e -(cfResRes _ sHT) ?cfdot_Res_ge_constt.
   have [_ /esym] := leif_trans ub_chi_r lb_chi_r; rewrite eqxx.
   by case/andP=> /eqP Dchi /eqP->; rewrite cfIirrE -/chi -?Dchi ?mem_irr.
@@ -1039,7 +1039,7 @@ have [_]: '['Ind[G] phi] <= '['Ind[G] psi] ?= iff d_delta.
     rewrite DpsiG cfdot_suml; apply: eq_bigr => b _.
     rewrite -scalerAl cfdotZl cfdot_sumr; congr (_ * _).
     by apply: eq_bigr => g _; rewrite -scalerAl cfdotZr conj_Cnat.
-  have eMmono := mono_leif (lerpM2l (egt0 _ _)).
+  have eMmono := mono_leif (ler_pM2l (egt0 _ _)).
   apply: leif_sum => b /eMmono->; apply: leif_sum => g /eMmono->.
   split; last exact: eq_sym.
   have /CnatP[n Dd]: d b g \in Cnat by rewrite Cnat_cfdot_char.
@@ -1149,7 +1149,7 @@ have [defKT | ltKT_K] := eqVneq (K :&: T) K; last first.
     by have /cfclassP[y _ ->] := mem_nth 0 (valP i); rewrite cfConjg1.
   rewrite eqn_leq lt0n (contraNneq _ (irr1_neq0 s)); last first.
     by rewrite Dth1 => ->; rewrite !mul0r.
-  rewrite -leC_nat -(lerpM2r (gt0CiG K L)) -/t -(lerpM2r (irr1_gt0 p0)).
+  rewrite -leC_nat -(ler_pM2r (gt0CiG K L)) -/t -(ler_pM2r (irr1_gt0 p0)).
   rewrite mul1r -Dth1 -cfInd1 //.
   by rewrite char1_ge_constt ?cfInd_char ?irr_char ?constt_Ind_Res.
 have IKphi: 'I_K[phi] = K by rewrite -{1}(setIidPl sKG) -setIA.
@@ -1167,9 +1167,9 @@ have [inj_Mphi | /injectivePn[i [j i'j eq_mm_ij]]] := boolP (injectiveb mmLth).
   suffices /eqP e1: e == 1%N by constructor 1; rewrite DthL e1 scale1r mem_irr.
   rewrite eqn_leq lt0n (contraNneq _ (irr1_neq0 s)); last first.
     by rewrite -(cfRes1 L) DthL cfunE => ->; rewrite !mul0r.
-  rewrite -leq_sqr -leC_nat natrX -(lerpM2r (irr1_gt0 p0)) -mulrA mul1r.
+  rewrite -leq_sqr -leC_nat natrX -(ler_pM2r (irr1_gt0 p0)) -mulrA mul1r.
   have ->: e%:R * 'chi_p0 1%g = 'Res[L] theta 1%g by rewrite DthL cfunE.
-  rewrite cfRes1 -(lerpM2l (gt0CiG K L)) -cfInd1 // -/phi.
+  rewrite cfRes1 -(ler_pM2l (gt0CiG K L)) -cfInd1 // -/phi.
   rewrite -card_quotient // -card_Iirr_abelian // mulr_natl.
   rewrite ['Ind phi]cfun_sum_cfdot sum_cfunE (bigID [in codom mmLth]) /=.
   rewrite ler_paddr ?sumr_ge0 // => [i _|].

@@ -118,58 +118,58 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_sub_dist` -> `lerB_dist`
   + `ler_sub_real` -> `lerB_real`
   + `ger_sub_real` -> `gerB_real`
-  + `ltr_expn2r` -> `ltrX2r`
-  + `ler_expn2r` -> `lerX2r`
-  + `lter_expn2r` -> `lterX2r`
-  + `ler_pmul` -> `lerpM`
-  + `ltr_pmul` -> `ltrpM`
-  + `ler_pinv` -> `lerpV2`
-  + `ler_ninv` -> `lernV2`
-  + `ltr_pinv` -> `ltrpV2`
-  + `ltr_ninv` -> `ltrnV2`
-  + `ler_pmul2l` -> `lerpM2l`
-  + `ltr_pmul2l` -> `ltrpM2l`
-  + `lter_pmul2l` -> `lterpM2l`
-  + `ler_pmul2r` -> `lerpM2r`
-  + `ltr_pmul2r` -> `ltrpM2r`
-  + `lter_pmul2r` -> `lterpM2r`
-  + `ler_nmul2l` -> `lernM2l`
-  + `ltr_nmul2l` -> `ltrnM2l`
-  + `lter_nmul2l` -> `lternM2l`
-  + `ler_nmul2r` -> `lernM2r`
-  + `ltr_nmul2r` -> `ltrnM2r`
-  + `lter_nmul2r` -> `lternM2r`
-  + `lef_pinv` -> `lefpV2`
-  + `lef_ninv` -> `lefnV2`
-  + `ltf_pinv` -> `ltfpV2`
-  + `ltf_ninv` -> `ltfnV2`
-  + `ltef_pinv` -> `ltefpV2`
-  + `ltef_ninv` -> `ltefnV2`
-  + `minr_pmulr` -> `minrpMr`
-  + `maxr_pmulr` -> `maxrpMr`
-  + `minr_pmull` -> `minrpMl`
-  + `maxr_pmull` -> `maxrpMl`
-  + `ltr_wpexpn2r` -> `ltrwpX2r`
-  + `ler_pexpn2r` -> `lerpX2r`
-  + `ltr_pexpn2r` -> `ltrpX2r`
-  + `lter_pexpn2r` -> `lterpX2r`
-  + `ger_pmull` -> `gerpMl`
-  + `gtr_pmull` -> `gtrpMl`
-  + `ger_pmulr` -> `gerpMr`
-  + `gtr_pmulr` -> `gtrpMr`
-  + `ler_pmull` -> `lerpMl`
-  + `ltr_pmull` -> `ltrpMl`
-  + `ler_pmulr` -> `lerpMr`
-  + `ltr_pmulr` -> `ltrpMr`
-  + `ger_nmull` -> `gernMl`
-  + `gtr_nmull` -> `gtrnMl`
-  + `ger_nmulr` -> `gernMr`
-  + `gtr_nmulr` -> `gtrnMr`
-  + `ler_nmull` -> `lernMl`
-  + `ltr_nmull` -> `ltrnMl`
-  + `ler_nmulr` -> `lernMr`
-  + `ltr_nmulr` -> `ltrnMr`
-  + `leif_pmul` -> `leifpM`
+  + `ltr_expn2r` -> `ltrXn2r`
+  + `ler_expn2r` -> `lerXn2r`
+  + `lter_expn2r` -> `lterXn2r`
+  + `ler_pmul` -> `ler_pM`
+  + `ltr_pmul` -> `ltr_pM`
+  + `ler_pinv` -> `ler_pV2`
+  + `ler_ninv` -> `ler_nV2`
+  + `ltr_pinv` -> `ltr_pV2`
+  + `ltr_ninv` -> `ltr_nV2`
+  + `ler_pmul2l` -> `ler_pM2l`
+  + `ltr_pmul2l` -> `ltr_pM2l`
+  + `lter_pmul2l` -> `lter_pM2l`
+  + `ler_pmul2r` -> `ler_pM2r`
+  + `ltr_pmul2r` -> `ltr_pM2r`
+  + `lter_pmul2r` -> `lter_pM2r`
+  + `ler_nmul2l` -> `ler_nM2l`
+  + `ltr_nmul2l` -> `ltr_nM2l`
+  + `lter_nmul2l` -> `lter_nM2l`
+  + `ler_nmul2r` -> `ler_nM2r`
+  + `ltr_nmul2r` -> `ltr_nM2r`
+  + `lter_nmul2r` -> `lter_nM2r`
+  + `lef_pinv` -> `lef_pV2`
+  + `lef_ninv` -> `lef_nV2`
+  + `ltf_pinv` -> `ltf_pV2`
+  + `ltf_ninv` -> `ltf_nV2`
+  + `ltef_pinv` -> `ltef_pV2`
+  + `ltef_ninv` -> `ltef_nV2`
+  + `minr_pmulr` -> `minr_pMr`
+  + `maxr_pmulr` -> `maxr_pMr`
+  + `minr_pmull` -> `minr_pMl`
+  + `maxr_pmull` -> `maxr_pMl`
+  + `ltr_wpexpn2r` -> `ltr_wpX2r`
+  + `ler_pexpn2r` -> `ler_pX2r`
+  + `ltr_pexpn2r` -> `ltr_pX2r`
+  + `lter_pexpn2r` -> `lter_pX2r`
+  + `ger_pmull` -> `ger_pMl`
+  + `gtr_pmull` -> `gtr_pMl`
+  + `ger_pmulr` -> `ger_pMr`
+  + `gtr_pmulr` -> `gtr_pMr`
+  + `ler_pmull` -> `ler_pMl`
+  + `ltr_pmull` -> `ltr_pMl`
+  + `ler_pmulr` -> `ler_pMr`
+  + `ltr_pmulr` -> `ltr_pMr`
+  + `ger_nmull` -> `ger_nMl`
+  + `gtr_nmull` -> `gtr_nMl`
+  + `ger_nmulr` -> `ger_nMr`
+  + `gtr_nmulr` -> `gtr_nMr`
+  + `ler_nmull` -> `ler_nMl`
+  + `ltr_nmull` -> `ltr_nMl`
+  + `ler_nmulr` -> `ler_nMr`
+  + `ltr_nmulr` -> `ltr_nMr`
+  + `leif_pmul` -> `leif_pM`
   + `leif_nmul` -> `leifnM`
   + `eqr_expn2` -> `eqrX2`
   + `real_maxr_nmulr` -> `real_maxrnMr`
@@ -202,14 +202,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_eexpn2l` -> `lereXn2l`
   + `ltr_eexpn2l` -> `ltreXn2l`
   + `lter_eexpn2l` -> `ltereXn2l`
-  + `ler_wpmul2l` -> `lerwpM2l`
-  + `ler_wpmul2r` -> `lerwpM2r`
-  + `ler_wnmul2l` -> `lerwnM2l`
-  + `ler_wnmul2r` -> `lerwnM2r`
-  + `ler_pemull` -> `lerpeMl`
-  + `ler_nemull` -> `lerneMl`
-  + `ler_pemulr` -> `lerpeMr`
-  + `ler_nemulr` -> `lerneMr`
+  + `ler_wpmul2l` -> `ler_wpM2l`
+  + `ler_wpmul2r` -> `ler_wpM2r`
+  + `ler_wnmul2l` -> `ler_wnM2l`
+  + `ler_wnmul2r` -> `ler_wnM2r`
+  + `ler_pemull` -> `ler_peMl`
+  + `ler_nemull` -> `ler_neMl`
+  + `ler_pemulr` -> `ler_peMr`
+  + `ler_nemulr` -> `ler_neMr`
   + `ler_iexpr` -> `leriXr`
   + `ltr_iexpr` -> `ltriXr`
   + `lter_iexpr` -> `lteriXr`
@@ -219,10 +219,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `lter_expr` -> `lterXr`
   + `ler_wiexpn2l` -> `lerwiXn2l`
   + `ler_weexpn2l` -> `lerweXn2l`
-  + `ler_pimull` -> `lerpiMl`
-  + `ler_nimull` -> `lerniMl`
-  + `ler_pimulr` -> `lerpiMr`
-  + `ler_nimulr` -> `lerniMr`
+  + `ler_pimull` -> `ler_piMl`
+  + `ler_nimull` -> `ler_niMl`
+  + `ler_pimulr` -> `ler_piMr`
+  + `ler_nimulr` -> `ler_niMr`
   + `lteif_pdivl_mulr` -> `lteif_pdivlMr`
   + `lteif_pdivr_mulr` -> `lteif_pdivrMr`
   + `lteif_pdivl_mull` -> `lteif_pdivlMl`
@@ -257,19 +257,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `lter_ndivr_mull` -> `lter_ndivrMl`
   + `eqr_pmuln2r` -> `eqrpMn2r`
   + `ler_muln2r` -> `lerMn2r`
-  + `ler_pmuln2r` -> `lerpMn2r`
-  + `ler_pmuln2l` -> `lerpMn2l`
-  + `ltr_pmuln2r` -> `ltrpMn2r`
-  + `ltr_wmuln2r` -> `ltrwMn2r`
-  + `ler_wmuln2r` -> `lerwMn2r`
-  + `ltr_wpmuln2r` -> `ltrwpMn2r`
-  + `ler_wpmuln2l` -> `lerwpMn2l`
-  + `ler_wnmuln2l` -> `lerwnMn2l`
+  + `ler_pmuln2r` -> `ler_pMn2r`
+  + `ler_pmuln2l` -> `ler_pMn2l`
+  + `ltr_pmuln2r` -> `ltr_pMn2r`
+  + `ltr_wmuln2r` -> `ltr_wMn2r`
+  + `ler_wmuln2r` -> `ler_wMn2r`
+  + `ltr_wpmuln2r` -> `ltr_wpMn2r`
+  + `ler_wpmuln2l` -> `ler_wpMn2l`
+  + `ler_wnmuln2l` -> `ler_wnMn2l`
   + `ltr_muln2r` -> `ltrMn2r`
   + `eqr_muln2r` -> `eqrMn2r`
-  + `ltr_pmuln2l` -> `ltrpMn2l`
-  + `ler_nmuln2l` -> `lernMn2l`
-  + `ltr_nmuln2l` -> `ltrnMn2l`
+  + `ltr_pmuln2l` -> `ltr_pMn2l`
+  + `ler_nmuln2l` -> `ler_nMn2l`
+  + `ltr_nmuln2l` -> `ltr_nMn2l`
+  + `normC_add_eq` -> `normCDeq`
+  + `normC_sub_eq` -> `normCBeq`
+  + `leif_subLR` -> `leifBLR`
+  + `leif_subRL` -> `leifBRL`
 - in `ssrint.v`:
   + `leq_add_dist` -> `leqD_dist`
   + `lez_add1r` -> `lez1D`
@@ -279,19 +283,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `oppz_add` -> `oppzD`
   + `leqif_add_distz` -> `leqifD_distz`
   + `leqif_add_dist` -> `leqifD_dist`
-  + `ler_pmulz2r` -> `lerpMz2r`
-  + `ler_pmulz2l` -> `lerpMz2l`
-  + `ler_wpmulz2r` -> `lerwpMz2r`
-  + `ler_wpmulz2l` -> `lerwpMz2l`
-  + `ler_wnmulz2l` -> `lerwnMz2l`
-  + `ler_nmulz2r` -> `lernMz2r`
-  + `ltr_pmulz2r` -> `ltrpMz2r`
-  + `ler_nmulz2l` -> `lernMz2l`
-  + `ltr_pmulz2l` -> `ltrpMz2l`
-  + `ltr_nmulz2r` -> `ltrnMz2r`
-  + `ltr_nmulz2l` -> `ltrnMz2l`
-  + `ler_wnmulz2r` -> `lerwnMz2r`
-
+  + `ler_pmulz2r` -> `ler_pMz2r`
+  + `ler_pmulz2l` -> `ler_pMz2l`
+  + `ler_wpmulz2r` -> `ler_wpMz2r`
+  + `ler_wpmulz2l` -> `ler_wpMz2l`
+  + `ler_wnmulz2l` -> `ler_wnMz2l`
+  + `ler_nmulz2r` -> `ler_nMz2r`
+  + `ltr_pmulz2r` -> `ltr_pMz2r`
+  + `ler_nmulz2l` -> `ler_nMz2l`
+  + `ltr_pmulz2l` -> `ltr_pMz2l`
+  + `ltr_nmulz2r` -> `ltr_nMz2r`
+  + `ltr_nmulz2l` -> `ltr_nMz2l`
+  + `ler_wnmulz2r` -> `ler_wnMz2r`
+  + `ler_wpexpz2r` -> `ler_wpXz2r`
+  + `ler_wnexpz2r` -> `ler_wnXz2r`
+  + `ler_pexpz2r` -> `ler_pXz2r`
+  + `ltr_pexpz2r` -> `ltr_pXz2r`
+  + `ler_nexpz2r` -> `ler_nXz2r`
+  + `ltr_nexpz2r` -> `ltr_nXz2r`
+- in `interval.v`:
+  + `in_segment_addgt0Pr` -> `in_segmentDgt0Pr`
+  + `in_segment_addgt0Pl` -> `in_segmentDgt0Pl`
 
 ### Removed
 

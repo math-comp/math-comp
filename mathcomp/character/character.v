@@ -1622,7 +1622,7 @@ rewrite cfkerEirr inE /= -(inj_eq (mulfI Ci)).
 have:= (normC_sum_upper _ Kx) i; rewrite !cfunE => -> // {Ci}i _.
 have chi_i_ge0: 0 <= '[chi, 'chi_i].
   by rewrite Cnat_ge0 ?Cnat_cfdot_char_irr.
-by rewrite !cfunE normrM (normr_idP _) ?lerwpM2l ?char1_ge_norm ?irr_char.
+by rewrite !cfunE normrM (normr_idP _) ?ler_wpM2l ?char1_ge_norm ?irr_char.
 Qed.
 
 Lemma TI_cfker_irr : \bigcap_i cfker 'chi[G]_i = [1].
@@ -2863,7 +2863,7 @@ Lemma cfnorm_Res_leif H phi :
 Proof.
 move=> sHG; rewrite cfun_onE mulrCA natf_indexg // -mulrA mulKf ?neq0CG //.
 rewrite (big_setID H) (setIidPr sHG) /= addrC.
-rewrite (mono_leif (lerpM2l _)) ?invr_gt0 ?gt0CG // -leif_subLR -sumrB.
+rewrite (mono_leif (ler_pM2l _)) ?invr_gt0 ?gt0CG // -leifBLR -sumrB.
 rewrite big1 => [|x Hx]; last by rewrite !cfResE ?subrr.
 have ->: (support phi \subset H) = (G :\: H \subset [set x | phi x == 0]).
   rewrite subDset setUC -subDset; apply: eq_subset => x.

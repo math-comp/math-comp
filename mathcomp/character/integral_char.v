@@ -275,7 +275,7 @@ pose alpha := 'chi_i g / m%:R.
 have a_lt1: `|alpha| < 1.
   rewrite normrM normfV normr_nat -{2}(divff nz_m).
   rewrite lt_def (can_eq (mulfVK nz_m)) eq_sym -{1}Dm -irr_cfcenterE // notZg.
-  by rewrite lerpM2r ?invr_gt0 ?ltr0n // -Dm char1_ge_norm ?irr_char.
+  by rewrite ler_pM2r ?invr_gt0 ?ltr0n // -Dm char1_ge_norm ?irr_char.
 have Za: alpha \in Aint.
   have [u _ /dvdnP[v eq_uv]] := Bezoutl #|g ^: G| m_gt0.
   suffices ->: alpha = v%:R * 'chi_i g - u%:R * (alpha * #|g ^: G|%:R).
@@ -290,7 +290,7 @@ have{Qn_g} [a Da]: exists a, QnC a = alpha.
 have Za_nu nu: sval (gQnC nu) alpha \in Aint by rewrite Aint_aut.
 have norm_a_nu nu: `|sval (gQnC nu) alpha| <= 1.
   move: {nu}(sval _) => nu; rewrite fmorph_div rmorph_nat normrM normfV.
-  rewrite normr_nat -Dm -(lerpM2r (irr1_gt0 (aut_Iirr nu i))) mul1r.
+  rewrite normr_nat -Dm -(ler_pM2r (irr1_gt0 (aut_Iirr nu i))) mul1r.
   congr (_ <= _): (char1_ge_norm g (irr_char (aut_Iirr nu i))).
   by rewrite !aut_IirrE !cfunE Dm rmorph_nat divfK.
 pose beta := QnC (galNorm 1 {:Qn} a).
