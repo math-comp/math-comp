@@ -6720,3 +6720,32 @@ End Test3.
 *)
 
 (* end hide *)
+
+(* Algebraic structure of bool *)
+
+Definition bool_zmodMixin := ZmodMixin addbA addbC addFb addbb.
+Canonical bool_zmodType := ZmodType bool bool_zmodMixin.
+
+Definition bool_comRingMixin := ComRingMixin andbA andbC andTb andb_addl isT.
+
+Canonical bool_ringType :=  Eval hnf in RingType bool bool_comRingMixin.
+Canonical bool_comRingType := Eval hnf in ComRingType bool andbC.
+
+Fact mulVb (b : bool) : b != 0 -> b * b = 1.
+Proof. by case: b. Qed.
+
+Fact invb_out (x y : bool) : y * x = 1 -> x != 0.
+Proof. by case: x; case: y. Qed.
+
+Definition bool_unitRingMixin :=
+  ComUnitRingMixin mulVb invb_out (fun x => fun => erefl x).
+Canonical bool_unitRingType := Eval hnf in UnitRingType bool bool_unitRingMixin.
+Canonical bool_comUnitRingType := Eval hnf in [comUnitRingType of bool].
+
+Lemma bool_fieldMixin : GRing.Field.mixin_of [unitRingType of bool].
+Proof. by []. Qed.
+
+Definition bool_idomainMixin := FieldIdomainMixin bool_fieldMixin.
+Canonical bool_idomainType := Eval hnf in IdomainType bool bool_idomainMixin.
+Canonical bool_fieldType := Eval hnf in FieldType bool bool_fieldMixin.
+
