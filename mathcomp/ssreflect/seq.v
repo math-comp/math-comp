@@ -581,6 +581,11 @@ Proof. by rewrite -cats1 all_cat all_seq1 andbC. Qed.
 
 End SeqFind.
 
+Lemma find_pred0 s : find pred0 s = size s. Proof. by []. Qed.
+
+Lemma find_predT s : find predT s = 0.
+Proof. by case: s. Qed.
+
 Lemma eq_find a1 a2 : a1 =1 a2 -> find a1 =1 find a2.
 Proof. by move=> Ea; elim=> //= x s IHs; rewrite Ea IHs. Qed.
 
