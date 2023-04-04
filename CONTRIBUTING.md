@@ -81,7 +81,7 @@ This particular example can be problematic if matrix.v is imported because then,
 - There is a number of "macros" that are available to state lemmas, like `commutative`, `associative`,...
   (see [`ssrfun.v`](https://github.com/coq/coq/blob/master/theories/ssr/ssrfun.v))
 
-- There are also macros that are available to to localize a statement, like `{in A, P}`,...
+- There are also macros that are available to localize a statement, like `{in A, P}`,...
   (see [`ssrbool.v`](https://github.com/coq/coq/blob/master/theories/ssr/ssrbool.v))
 
 ### Naming of variables
@@ -216,3 +216,109 @@ enclosed in the `(*` / `*)` delimiters, e.g.
 (* et, mattis eget, convallis nec, purus.                                     *)
 ```
 Multiline comments are strictly limited to out-commented code.
+
+## Instantiating structures with Hierarchy Builder
+
+First
+```Coq
+From HB Require Import structures.
+```
+
+The structure names can be founs in the header comments, for instance,
+the `eqType` structure is defined in
+[`eqtype.v`](https://github.com/math-comp/math-comp/blob/master/mathcomp/ssreflect/eqtype.v).
+Basic information about structures can be obtained via `HB.about`, for
+instance
+
+```Coq
+HB.about eqType.
+```
+
+### Regular factories
+
+Factories enabling to build a structure can be discoverd with
+`HB.howto`, for instance
+
+```Coq
+HB.howto eqType.
+```
+
+tells us that `eqType` instances can be built with `hasDecEq.Build`,
+one can then
+
+```Coq
+HB.about hasDecEq.Build.
+```
+
+to learn that `hasDecEq.Build` is expecting a type `T`, a predicate
+`eq_op : rel T` (implicit argument, as indicated by the square
+brackets) and proof of `Equality.axiom eq_op`. One can thus
+instantiate an `eqType` on some type `T` with
+
+```Coq
+HB.instance Definition _ := hasDecEq.Build T proof_of_Equality_axiom.
+```
+
+or
+
+```Coq
+HB.instance Definition _ := @hasDecEq.Build T eq_op proof_of_Equality_axiom.
+```
+
+which should output a few lines among which:
+
+```Coq
+module_T__canonical__eqtype_Equality is defined
+```
+
+(beware that the output may not be visible by default with VSCoq).
+Absence of such a line indicates failure of the command.
+
+### Aliases / feather factories
+
+In addition to the regular factories, listed by `HB.howto`, the
+library defines some aliases (aka feather factories). Those aliases
+are documented in the header comments. For instance, an `eqType`
+instance on some type `T` can be derived from some `T'` already
+equipped with an `eqType` structure, given a function `f : T -> T'`
+and a proof `injf : injective f`
+
+```Coq
+HB.instance Definition _ := Equality.copy T (inj_type injf).
+```
+
+### Listing instances on a given type
+
+Instances a type is already equipped with can be listed with
+`HB.about`, for instance
+
+```Coq
+HB.about bool.
+```
+
+lists all the structures `bool` is already equipped with.
+
+### Graph of the hierarchy
+
+A graph of the hierarchy can be obtained with
+
+```Coq
+HB.graph "hierarchy.dot".
+```
+
+then
+
+```shell
+tred hierarchy.dot | xdot
+```
+
+or
+
+```shell
+tred hierarchy.dot | dot -Tpng > hierarchy.png
+```
+
+## Adding new structures with Hierarchy Builder
+
+See the
+[documentation of Hierarchy Builder](https://github.com/math-comp/hierarchy-builder#readme).
