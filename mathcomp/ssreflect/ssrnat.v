@@ -598,6 +598,9 @@ Proof. by move=> pn; rewrite addnC subnBA. Qed.
 Lemma subnBr_leq n p m : n <= p -> m - (n - p) = m.
 Proof. by rewrite -subn_eq0 => /eqP->; rewrite subn0. Qed.
 
+Lemma subnBl_leq m n p : m <= n -> (m - n) - p = 0.
+Proof. by rewrite -subn_eq0 => /eqP->. Qed.
+
 Lemma subnBAC m n p : p <= n -> n <= m -> m - (n - p) = p + (m - n).
 Proof. by move=> pn nm; rewrite subnA // addnC. Qed.
 
