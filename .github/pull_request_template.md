@@ -8,8 +8,11 @@
 
 <!-- please fill in the following checklist -->
 - [ ] added corresponding entries in `CHANGELOG_UNRELEASED.md`
-  (only append to minimize problems when merging/rebasing)
-  (you can consider the use of `etc/changes.sh` to generate the changelog)
+
+<!-- only append to minimize problems when merging/rebasing -->
+<!-- consider the use of `changelog/changes.sh` from
+     https://github.com/math-comp/tools to generate the changelog -->
+
 - [ ] added corresponding documentation in the headers
 - [ ] tried to abide by the [contribution guide](https://github.com/math-comp/math-comp/blob/master/CONTRIBUTING.md)
 
