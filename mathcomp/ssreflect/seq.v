@@ -963,6 +963,12 @@ Notation "[ 'seq' x <- s | C ]" := (filter (fun x => C%B) s)
 Notation "[ 'seq' x <- s | C1 & C2 ]" := [seq x <- s | C1 && C2]
  (at level 0, x at level 99,
   format "[ '[hv' 'seq'  x  <-  s '/ '  |  C1 '/ '  &  C2 ] ']'") : seq_scope.
+Notation "[ 'seq' ' x <- s | C ]" := (filter (fun x => C%B) s)
+ (at level 0, x strict pattern,
+  format "[ '[hv' 'seq'  ' x  <-  s '/ '  |  C ] ']'") : seq_scope.
+Notation "[ 'seq' ' x <- s | C1 & C2 ]" := [seq x <- s | C1 && C2]
+ (at level 0, x strict pattern,
+  format "[ '[hv' 'seq'  ' x  <-  s '/ '  |  C1 '/ '  &  C2 ] ']'") : seq_scope.
 Notation "[ 'seq' x : T <- s | C ]" := (filter (fun x : T => C%B) s)
  (at level 0, x at level 99, only parsing).
 Notation "[ 'seq' x : T <- s | C1 & C2 ]" := [seq x : T <- s | C1 && C2]
@@ -2489,32 +2495,18 @@ Qed.
 End Map.
 
 Notation "[ 'seq' E | i <- s ]" := (map (fun i => E) s)
-  (at level 0, E at level 99, i name,
+  (at level 0, E at level 99, i binder,
    format "[ '[hv' 'seq'  E '/ '  |  i  <-  s ] ']'") : seq_scope.
 
 Notation "[ 'seq' E | i <- s & C ]" := [seq E | i <- [seq i <- s | C]]
-  (at level 0, E at level 99, i name,
+  (at level 0, E at level 99, i binder,
    format "[ '[hv' 'seq'  E '/ '  |  i  <-  s '/ '  &  C ] ']'") : seq_scope.
 
-Notation "[ 'seq' E | i : T <- s ]" := (map (fun i : T => E) s)
-  (at level 0, E at level 99, i name, only parsing) : seq_scope.
-
-Notation "[ 'seq' E | i : T <- s & C ]" :=
-  [seq E | i : T <- [seq i : T <- s | C]]
-  (at level 0, E at level 99, i name, only parsing) : seq_scope.
-
 Notation "[ 'seq' E : R | i <- s ]" := (@map _ R (fun i => E) s)
-  (at level 0, E at level 99, i name, only parsing) : seq_scope.
+  (at level 0, E at level 99, i binder, only parsing) : seq_scope.
 
 Notation "[ 'seq' E : R | i <- s & C ]" := [seq E : R | i <- [seq i <- s | C]]
-  (at level 0, E at level 99, i name, only parsing) : seq_scope.
-
-Notation "[ 'seq' E : R | i : T <- s ]" := (@map T R (fun i : T => E) s)
-  (at level 0, E at level 99, i name, only parsing) : seq_scope.
-
-Notation "[ 'seq' E : R | i : T <- s & C ]" :=
-  [seq E : R | i : T <- [seq i : T <- s | C]]
-  (at level 0, E at level 99, i name, only parsing) : seq_scope.
+  (at level 0, E at level 99, i binder, only parsing) : seq_scope.
 
 Lemma filter_mask T a (s : seq T) : filter a s = mask (map a s) s.
 Proof. by elim: s => //= x s <-; case: (a x). Qed.
@@ -2749,7 +2741,7 @@ Proof. by move=> fK; elim=> //= x s IHs /andP[/fK-> /IHs->]. Qed.
 
 End MapComp.
 
-Lemma eq_in_map (S : eqType) T (f g : S -> T) (s : seq S) : 
+Lemma eq_in_map (S : eqType) T (f g : S -> T) (s : seq S) :
   {in s, f =1 g} <-> map f s = map g s.
 Proof.
 by elim: s => //= x s IHs; rewrite forall_cons IHs; split => -[-> ->].
@@ -2914,7 +2906,7 @@ Definition mkseq f n : seq T := map f (iota 0 n).
 Lemma size_mkseq f n : size (mkseq f n) = n.
 Proof. by rewrite size_map size_iota. Qed.
 
-Lemma mkseqS f n : 
+Lemma mkseqS f n :
   mkseq f n.+1 = rcons (mkseq f n) (f n).
 Proof. by rewrite /mkseq -addn1 iotaD add0n map_cat cats1. Qed.
 
@@ -3454,18 +3446,12 @@ Arguments flatten_mapP {S T A s y}.
 
 Notation "[ 'seq' E | x <- s , y <- t ]" :=
   (flatten [seq [seq E | y <- t] | x <- s])
-  (at level 0, E at level 99, x name, y name,
+  (at level 0, E at level 99, x binder, y binder,
    format "[ '[hv' 'seq'  E '/ '  |  x  <-  s , '/   '  y  <-  t ] ']'")
    : seq_scope.
-Notation "[ 'seq' E | x : S <- s , y : T <- t ]" :=
-  (flatten [seq [seq E | y : T <- t] | x : S  <- s])
-  (at level 0, E at level 99, x name, y name, only parsing) : seq_scope.
-Notation "[ 'seq' E : R | x : S <- s , y : T <- t ]" :=
-  (flatten [seq [seq E : R | y : T <- t] | x : S  <- s])
-  (at level 0, E at level 99, x name, y name, only parsing) : seq_scope.
 Notation "[ 'seq' E : R | x <- s , y <- t ]" :=
   (flatten [seq [seq E : R | y <- t] | x  <- s])
-  (at level 0, E at level 99, x name, y name, only parsing) : seq_scope.
+  (at level 0, E at level 99, x binder, y binder, only parsing) : seq_scope.
 
 Section PrefixSuffixInfix.
 
