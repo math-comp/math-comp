@@ -14,6 +14,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemma `foldl_foldr`
   + lemmas `unzip1_map_nth_zip`, `unzip2_map_nth_zip`, `perm_zip_sym`,
 	`perm_zip1`, `perm_zip2`
+  + lemmas `find_pred0`, `find_predT`
+
+- in `bigop.v`
+  + lemma `big_if`
+
+- in `seq.v`
+  + lemmas `sumn_ncons`, `sumn_set_nth`, `sumn_set_nth_ltn`,
+    `sumn_set_nth0`
+
+- in `finset.v`
+  + lemmas `bigA_distr`, `subset_cons`, `subset_cons2`, `subset_catl`,
+    `subset_catr`, `subset_cat2`, `filter_subset`, `subset_filter`,
+    `map_subset`.
 
 - in `poly.v`
   + multirule `coefE`
