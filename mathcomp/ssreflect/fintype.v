@@ -1133,16 +1133,24 @@ End Injectiveb.
 Definition image_mem T T' f mA : seq T' := map f (@enum_mem T mA).
 Notation image f A := (image_mem f (mem A)).
 Notation "[ 'seq' F | x 'in' A ]" := (image (fun x => F) A)
-  (at level 0, F at level 99, x name,
+  (at level 0, F at level 99, x binder,
    format "'[hv' [ 'seq'  F '/ '  |  x  'in'  A ] ']'") : seq_scope.
-Notation "[ 'seq' F | x : T 'in' A ]" := (image (fun x : T => F) A)
-  (at level 0, F at level 99, x name, only parsing) : seq_scope.
+Notation "[ 'seq' F | x ]" :=
+  [seq F | x in pred_of_simpl (@pred_of_argType
+    (* kludge for getting the type of x *)
+    match _, (fun x => I) with
+    | T, f
+      => match match f return T -> True with f' => f' end with
+         | _ => T
+         end
+    end)]
+  (at level 0, F at level 99, x binder, only parsing) : seq_scope.
 Notation "[ 'seq' F | x : T ]" :=
   [seq F | x : T in pred_of_simpl (@pred_of_argType T)]
-  (at level 0, F at level 99, x name,
+  (at level 0, F at level 99, x name, only printing,
    format "'[hv' [ 'seq'  F '/ '  |  x  :  T ] ']'") : seq_scope.
-Notation "[ 'seq' F , x ]" := [seq F | x : _ ]
-  (at level 0, F at level 99, x name, only parsing) : seq_scope.
+Notation "[ 'seq' F , x ]" := [seq F | x ]
+  (at level 0, F at level 99, x binder, only parsing) : seq_scope.
 
 Definition codom T T' f := @image_mem T T' f (mem T).
 
