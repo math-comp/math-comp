@@ -772,8 +772,8 @@ Lemma subset_cat2 (s1 s2 s3: seq T):
   s1 \subset s2 -> s3 ++ s1 \subset s3 ++ s2.
 Proof.
 move/subsetP=> ss1s2; apply /subsetP=> x; rewrite !mem_cat=> /orP-[xins3|xins1].
-- by apply/orP; left.
-- by apply/orP; right; apply ss1s2.
+  by apply/orP; left.
+by apply/orP; right; apply ss1s2.
 Qed.
 
 Lemma filter_subset p s :
