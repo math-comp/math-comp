@@ -1940,61 +1940,61 @@ Definition cprD := (lerDl, lerDr, gerDl, gerDl,
                     ltrDl, ltrDr, gtrDl, gtrDl).
 
 (* Addition with left member knwon to be positive/negative *)
-Lemma ler_paddl y x z : 0 <= x -> y <= z -> y <= x + z.
+Lemma ler_wpDl y x z : 0 <= x -> y <= z -> y <= x + z.
 Proof. by move=> *; rewrite -[y]add0r lerD. Qed.
 
-Lemma ltr_paddl y x z : 0 <= x -> y < z -> y < x + z.
+Lemma ltr_wpDl y x z : 0 <= x -> y < z -> y < x + z.
 Proof. by move=> *; rewrite -[y]add0r ler_ltD. Qed.
 
-Lemma ltr_spaddl y x z : 0 < x -> y <= z -> y < x + z.
+Lemma ltr_pwDl y x z : 0 < x -> y <= z -> y < x + z.
 Proof. by move=> *; rewrite -[y]add0r ltr_leD. Qed.
 
-Lemma ltr_spsaddl y x z : 0 < x -> y < z -> y < x + z.
+Lemma ltr_pDl y x z : 0 < x -> y < z -> y < x + z.
 Proof. by move=> *; rewrite -[y]add0r ltrD. Qed.
 
-Lemma ler_naddl y x z : x <= 0 -> y <= z -> x + y <= z.
+Lemma ler_wnDl y x z : x <= 0 -> y <= z -> x + y <= z.
 Proof. by move=> *; rewrite -[z]add0r lerD. Qed.
 
-Lemma ltr_naddl y x z : x <= 0 -> y < z -> x + y < z.
+Lemma ltr_wnDl y x z : x <= 0 -> y < z -> x + y < z.
 Proof. by move=> *; rewrite -[z]add0r ler_ltD. Qed.
 
-Lemma ltr_snaddl y x z : x < 0 -> y <= z -> x + y < z.
+Lemma ltr_nwDl y x z : x < 0 -> y <= z -> x + y < z.
 Proof. by move=> *; rewrite -[z]add0r ltr_leD. Qed.
 
-Lemma ltr_snsaddl y x z : x < 0 -> y < z -> x + y < z.
+Lemma ltr_nDl y x z : x < 0 -> y < z -> x + y < z.
 Proof. by move=> *; rewrite -[z]add0r ltrD. Qed.
 
 (* Addition with right member we know positive/negative *)
-Lemma ler_paddr y x z : 0 <= x -> y <= z -> y <= z + x.
-Proof. by move=> *; rewrite [_ + x]addrC ler_paddl. Qed.
+Lemma ler_wpDr y x z : 0 <= x -> y <= z -> y <= z + x.
+Proof. by move=> *; rewrite addrC ler_wpDl. Qed.
 
-Lemma ltr_paddr y x z : 0 <= x -> y < z -> y < z + x.
-Proof. by move=> *; rewrite [_ + x]addrC ltr_paddl. Qed.
+Lemma ltr_wpDr y x z : 0 <= x -> y < z -> y < z + x.
+Proof. by move=> *; rewrite addrC ltr_wpDl. Qed.
 
-Lemma ltr_spaddr y x z : 0 < x -> y <= z -> y < z + x.
-Proof. by move=> *; rewrite [_ + x]addrC ltr_spaddl. Qed.
+Lemma ltr_pwDr y x z : 0 < x -> y <= z -> y < z + x.
+Proof. by move=> *; rewrite addrC ltr_pwDl. Qed.
 
-Lemma ltr_spsaddr y x z : 0 < x -> y < z -> y < z + x.
-Proof. by move=> *; rewrite [_ + x]addrC ltr_spsaddl. Qed.
+Lemma ltr_pDr y x z : 0 < x -> y < z -> y < z + x.
+Proof. by move=> *; rewrite addrC ltr_pDl. Qed.
 
-Lemma ler_naddr y x z : x <= 0 -> y <= z -> y + x <= z.
-Proof. by move=> *; rewrite [_ + x]addrC ler_naddl. Qed.
+Lemma ler_wnDr y x z : x <= 0 -> y <= z -> y + x <= z.
+Proof. by move=> *; rewrite addrC ler_wnDl. Qed.
 
-Lemma ltr_naddr y x z : x <= 0 -> y < z -> y + x < z.
-Proof. by move=> *; rewrite [_ + x]addrC ltr_naddl. Qed.
+Lemma ltr_wnDr y x z : x <= 0 -> y < z -> y + x < z.
+Proof. by move=> *; rewrite addrC ltr_wnDl. Qed.
 
-Lemma ltr_snaddr y x z : x < 0 -> y <= z -> y + x < z.
-Proof. by move=> *; rewrite [_ + x]addrC ltr_snaddl. Qed.
+Lemma ltr_nwDr y x z : x < 0 -> y <= z -> y + x < z.
+Proof. by move=> *; rewrite addrC ltr_nwDl. Qed.
 
-Lemma ltr_snsaddr y x z : x < 0 -> y < z -> y + x < z.
-Proof. by move=> *; rewrite [_ + x]addrC ltr_snsaddl. Qed.
+Lemma ltr_nDr y x z : x < 0 -> y < z -> y + x < z.
+Proof. by move=> *; rewrite addrC ltr_nDl. Qed.
 
 (* x and y have the same sign and their sum is null *)
 Lemma paddr_eq0 (x y : R) :
   0 <= x -> 0 <= y -> (x + y == 0) = (x == 0) && (y == 0).
 Proof.
 rewrite le0r; case/orP=> [/eqP->|hx]; first by rewrite add0r eqxx.
-by rewrite (gt_eqF hx) /= => hy; rewrite gt_eqF // ltr_spaddl.
+by rewrite (gt_eqF hx) /= => hy; rewrite gt_eqF // ltr_pwDl.
 Qed.
 
 Lemma naddr_eq0 (x y : R) :
@@ -2011,7 +2011,7 @@ Proof. by case/orP=> /andP []; [apply: paddr_eq0 | apply: naddr_eq0]. Qed.
 (* big sum and ler *)
 Lemma sumr_ge0 I (r : seq I) (P : pred I) (F : I -> R) :
   (forall i, P i -> (0 <= F i)) -> 0 <= \sum_(i <- r | P i) (F i).
-Proof. exact: (big_ind _ _ (@ler_paddl 0)). Qed.
+Proof. exact: (big_ind _ _ (@ler_wpDl 0)). Qed.
 
 Lemma ler_sum I (r : seq I) (P : pred I) (F G : I -> R) :
     (forall i, P i -> F i <= G i) ->
@@ -2188,7 +2188,7 @@ Qed.
 
 Lemma ler_wpMn2l x :
   0 <= x -> {homo (@GRing.natmul R x) : m n / (m <= n)%N >-> m <= n}.
-Proof. by move=> xge0 m n /subnK <-; rewrite mulrnDr ler_paddl ?mulrn_wge0. Qed.
+Proof. by move=> xge0 m n /subnK <-; rewrite mulrnDr ler_wpDl ?mulrn_wge0. Qed.
 
 Lemma ler_wnMn2l x :
   x <= 0 -> {homo (@GRing.natmul R x) : m n / (n <= m)%N >-> m <= n}.
@@ -2684,7 +2684,7 @@ Proof.
 case: n => // n _ x y; rewrite !qualifE /= =>  x_ge0 y_ge0.
 have [-> | nzx] := eqVneq x 0; first by rewrite exprS mul0r exprn_ge0.
 rewrite -subr_ge0 subrXX pmulr_lge0 ?subr_ge0 //= big_ord_recr /=.
-rewrite subnn expr0 mul1r /= ltr_spaddr // ?exprn_gt0 ?lt0r ?nzx //.
+rewrite subnn expr0 mul1r /= ltr_pwDr // ?exprn_gt0 ?lt0r ?nzx //.
 by rewrite sumr_ge0 // => i _; rewrite mulr_ge0 ?exprn_ge0.
 Qed.
 
@@ -3480,7 +3480,7 @@ have{nz_pi} pi_gt0: 0 < pi.
 rewrite -/(En i) -/(En j); pose E' := [eta En with j |-> En i + En j - mu].
 have E'ge0 k: k \in A' -> E' k *+ n' >= 0.
   case/andP=> /= _ Ak; apply: mulrn_wge0; case: ifP => _; last exact: Ege0.
-  by rewrite subr_ge0 ler_paddl ?Ege0 // ltW.
+  by rewrite subr_ge0 ler_wpDl ?Ege0 // ltW.
 rewrite -/n Dn in leAm; have{leAm IHm E'ge0}: _ <= _ := IHm _ leAm _ E'ge0.
 have ->: \sum_(k in A') E' k = mu *+ n'.
   apply: (addrI mu); rewrite -mulrS -Dn -sumrMnl (bigD1 i Ai) big_andbC /=.
@@ -3864,6 +3864,38 @@ Notation lteif_pmul2r := lteif_pM2r.
 Notation lteif_nmul2l := lteif_nM2l.
 #[deprecated(since="mathcomp 1.17.0", note="Use lteif_nM2r instead.")]
 Notation lteif_nmul2r := lteif_nM2r.
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_wpDl instead.")]
+Notation ler_paddl := ler_wpDl.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_wpDl instead.")]
+Notation ltr_paddl := ltr_wpDl.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_pwDl instead.")]
+Notation ltr_spaddl := ltr_pwDl.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_pDl instead.")]
+Notation ltr_spsaddl := ltr_pDl.
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_wnDl instead.")]
+Notation ler_naddl := ler_wnDl.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_wnDl instead.")]
+Notation ltr_naddl := ltr_wnDl.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_nwDl instead.")]
+Notation ltr_snaddl := ltr_nwDl.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_nDl instead.")]
+Notation ltr_snsaddl := ltr_nDl.
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_wpDr instead.")]
+Notation ler_paddr := ler_wpDr.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_wpDr instead.")]
+Notation ltr_paddr := ltr_wpDr.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_pwDr instead.")]
+Notation ltr_spaddr := ltr_pwDr.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_pDr instead.")]
+Notation ltr_spsaddr := ltr_pDr.
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_wnDr instead.")]
+Notation ler_naddr := ler_wnDr.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_wnDr instead.")]
+Notation ltr_naddr := ltr_wnDr.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_nwDr instead.")]
+Notation ltr_snaddr := ltr_nwDr.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_nDr instead.")]
+Notation ltr_snsaddr := ltr_nDr.
 
 #[global] Hint Resolve lerN2 ltrN2 real0 real1 normr_real : core.
 Arguments ler_sqr {R} [x y].
@@ -4150,7 +4182,7 @@ Definition midf_lte := (midf_le, midf_lt).
 
 Lemma ler_addgt0Pr x y : reflect (forall e, e > 0 -> x <= y + e) (x <= y).
 Proof.
-apply/(iffP idP)=> [lexy e e_gt0 | lexye]; first by rewrite ler_paddr// ltW.
+apply/(iffP idP)=> [lexy e e_gt0 | lexye]; first by rewrite ler_wpDr// ltW.
 have [||ltyx]// := comparable_leP.
   rewrite (@comparabler_trans _ (y + 1))// /Order.comparable ?lexye ?ltr01//.
   by rewrite lerDl ler01 orbT.
@@ -4222,10 +4254,10 @@ have b_ge0: 0 <= b by rewrite (le_trans (normr_ge0 q.[1])) ?ub_q ?normr1.
 have{b_ge0} ba_ge0: 0 <= b / `|a| by rewrite divr_ge0.
 rewrite real_leNgt ?rpredD ?rpred1 ?ger0_real //.
 apply: contraL px0 => lb_x; rewrite rootE.
-have x_ge1: 1 <= `|x| by rewrite (le_trans _ (ltW lb_x)) // ler_paddl.
+have x_ge1: 1 <= `|x| by rewrite (le_trans _ (ltW lb_x)) // ler_wpDl.
 have nz_x: x != 0 by rewrite -normr_gt0 (lt_le_trans ltr01).
 rewrite {}Dp // mulf_neq0 ?expf_neq0 // subr_eq0 eq_sym.
-have: (b / `|a|) < `|x| by rewrite (lt_trans _ lb_x) // ltr_spaddr ?ltr01.
+have: (b / `|a|) < `|x| by rewrite (lt_trans _ lb_x) // ltr_pwDr ?ltr01.
 apply: contraTneq => /(canRL (divfK nz_x))Dax.
 rewrite ltr_pdivrMr ?normr_gt0 ?lead_coef_eq0 // mulrC -normrM -{}Dax.
 by rewrite le_gtF // ub_q // normfV invf_le1 ?normr_gt0.
@@ -4668,11 +4700,11 @@ have [p_le1 | p_gt1] := leqP (size p) 1.
   by rewrite -[p`_0]lead_coefC -size1_polyC // mon_p ltr01.
 pose lb := \sum_(j < n.+1) `|p`_j|; exists (lb + 1) => x le_ub_x.
 have x_ge1: 1 <= x; last have x_gt0 := lt_le_trans ltr01 x_ge1.
-  by rewrite -(lerD2l lb) ler_paddl ?sumr_ge0 // => j _.
+  by rewrite -(lerD2l lb) ler_wpDl ?sumr_ge0 // => j _.
 rewrite horner_coef -(subnK p_gt1) -/n addnS big_ord_recr /= addn1.
 rewrite [in p`__]subnSK // subn1 -lead_coefE mon_p mul1r -ltrBlDl sub0r.
 apply: le_lt_trans (_ : lb * x ^+ n < _); last first.
-  by rewrite exprS ltr_pM2r ?exprn_gt0// -(ltrD2r 1) ltr_spaddr.
+  by rewrite exprS ltr_pM2r ?exprn_gt0// -(ltrD2r 1) ltr_pwDr.
 rewrite -sumrN mulr_suml ler_sum // => j _; apply: le_trans (ler_norm _) _.
 rewrite normrN normrM ler_wpM2l // normrX.
 by rewrite ger0_norm ?(ltW x_gt0) // ler_weXn2l ?leq_ord.
@@ -5255,7 +5287,7 @@ suffices /existsP[i ltRwi0]: [exists i : 'I_n, 'Re (w ^+ i) < 0].
   by exists (w ^+ i) => //; rewrite exprAC wn1 expr1n.
 apply: contra_eqT (congr1 Re pw_0) => /existsPn geRw0.
 rewrite raddf_sum raddf0 /= (bigD1 (Ordinal (ltnW n_gt1))) //=.
-rewrite (Creal_ReP _ _) ?rpred1 // gt_eqF ?ltr_paddr ?ltr01 //=.
+rewrite (Creal_ReP _ _) ?rpred1 // gt_eqF ?ltr_wpDr ?ltr01 //=.
 by apply: sumr_ge0 => i _; rewrite real_leNgt ?rpred0.
 Qed.
 

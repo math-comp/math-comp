@@ -324,6 +324,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `lteif_pmul2r` -> `lteif_pM2r`
   + `lteif_nmul2l` -> `lteif_nM2l`
   + `lteif_nmul2r` -> `lteif_nM2r`
+  + `ler_paddl` -> `ler_wpDl`
+  + `ltr_paddl` -> `ltr_wpDl`
+  + `ltr_spaddl` -> `ltr_pwDl`
+  + `ltr_spsaddl` -> `ltr_pDl`
+  + `ler_naddl` -> `ler_wnDl`
+  + `ltr_naddl` -> `ltr_wnDl`
+  + `ltr_snaddl` -> `ltr_nwDl`
+  + `ltr_snsaddl` -> `ltr_nDl`
+  + `ler_paddr` -> `ler_wpDr`
+  + `ltr_paddr` -> `ltr_wpDr`
+  + `ltr_spaddr` -> `ltr_pwDr`
+  + `ltr_spsaddr` -> `ltr_pDr`
+  + `ler_naddr` -> `ler_wnDr`
+  + `ltr_naddr` -> `ltr_wnDr`
+  + `ltr_snaddr` -> `ltr_nwDr`
+  + `ltr_snsaddr` -> `ltr_nDr`
 - in `interval.v`:
   + `in_segment_addgt0Pr` -> `in_segmentDgt0Pr`
   + `in_segment_addgt0Pl` -> `in_segmentDgt0Pl`

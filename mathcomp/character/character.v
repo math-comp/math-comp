@@ -1558,7 +1558,7 @@ Lemma constt_ortho_char (phi psi : 'CF(G)) i j :
 Proof.
 move=> _ _ /constt_charP[//|phi1 Nphi1 ->] /constt_charP[//|psi1 Npsi1 ->].
 rewrite cfdot_irr; case: eqP => // -> /eqP/idPn[].
-rewrite cfdotDl !cfdotDr cfnorm_irr -addrA gt_eqF ?ltr_paddr ?ltr01 //.
+rewrite cfdotDl !cfdotDr cfnorm_irr -addrA gt_eqF ?ltr_wpDr ?ltr01 //.
 by rewrite Cnat_ge0 ?rpredD ?Cnat_cfdot_char ?irr_char.
 Qed.
 

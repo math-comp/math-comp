@@ -106,7 +106,7 @@ This particular example can be problematic if matrix.v is imported because then,
 Or in the presence of a property denoted by an n-ary or unary predicate:
  - `naryPredicate_mainSymbol+`
  - `mainSymbol_unaryPredicate`
-There is an underscore before "suffixes" when "suffixes" starts with a one-letter small identifier (i.e., not a capital letter or a number or a longer identifier such as "if"); this is to make the "suffixes" readable enough.
+There is an underscore before "suffixes" when "suffixes" starts with a one-letter small identifier (i.e., not a capital letter or a number or a longer identifier such as "if"). Since the intent is to make the "suffixes" readable enough, there are exceptions for short names (e.g., `lern1`).
 
 #### Where:
  - `mainSymbol` is the most meaningful part of the lemma. It generally is the head symbol of the right-hand side of an equation or the head symbol of a theorem. It can also simply be the main object of study, head symbol or not. It is usually either
@@ -166,6 +166,10 @@ Abbreviations are in the header of the file which introduces them. We list here 
   - `z` -- an int argument
   - `p` -- positive number, as in `ltr_pM2l x : 0 < x -> {mono *%R x : x y / x < y}`
   - `n` -- negative number
+  - `w` -- non strict (weak) monotony, as in `ler_wpM2r x : 0 <= x -> {homo *%R^~ x : y z / y <= z}`
+  - `wp` -- non-negative number
+  - `wn` -- non-positive number
+
 
 #### Special naming conventions (non exhaustive)
 - For the infix membership predicate `_ \in _`, the prefix `in_` is used for lemmas that unfold specific predicates, possibly propagating the infix membership (e.g, `in_cons` or `in_set0`). These lemmas are generally part of the `inE` multirule. Other lemmas involving the infix membership predicated use the generic prefix `mem_` (e.g., `mem_head` or `mem_map`).

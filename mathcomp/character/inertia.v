@@ -964,7 +964,7 @@ have part_c: {in calA, forall s (chi := 'Ind[G] 'chi_s),
     rewrite irr_consttE -(canLR (addKr _) DchiT) addrC cfdotBl cfdot_irr.
     by rewrite mulrb ifN_eqC ?subr0.
   rewrite -(cfResRes chi sHT sTG) DchiT Dphi !rmorphD !cfdotDl /=.
-  rewrite -ltrBDl subrr ltr_paddr ?lt_def //;
+  rewrite -ltrBDl subrr ltr_wpDr ?lt_def //;
     rewrite Cnat_ge0 ?Cnat_cfdot_char ?cfRes_char ?irr_char //.
   by rewrite andbT -irr_consttE -constt_Ind_Res.
 do [split=> //; try by move=> s /AtoB_P[]] => [s1 s2 As1 As2 | r].
@@ -1059,7 +1059,7 @@ apply/idP/idP=> [|/imageP[b Sb ->]].
   apply: contraR => N'i; rewrite big1 // => b Sb.
   rewrite cfdotZl cfdot_irr mulrb ifN_eqC ?mulr0 //.
   by apply: contraNneq N'i => ->; apply: image_f.
-rewrite gt_eqF // (bigD1 b) //= cfdotZl cfnorm_irr mulr1 ltr_paddr ?egt0 //.
+rewrite gt_eqF // (bigD1 b) //= cfdotZl cfnorm_irr mulr1 ltr_wpDr ?egt0 //.
 apply: sumr_ge0 => g /andP[Sg _]; rewrite cfdotZl cfdot_irr.
 by rewrite mulr_ge0 ?ler0n ?Cnat_ge0.
 Qed.
@@ -1172,7 +1172,7 @@ have [inj_Mphi | /injectivePn[i [j i'j eq_mm_ij]]] := boolP (injectiveb mmLth).
   rewrite cfRes1 -(ler_pM2l (gt0CiG K L)) -cfInd1 // -/phi.
   rewrite -card_quotient // -card_Iirr_abelian // mulr_natl.
   rewrite ['Ind phi]cfun_sum_cfdot sum_cfunE (bigID [in codom mmLth]) /=.
-  rewrite ler_paddr ?sumr_ge0 // => [i _|].
+  rewrite ler_wpDr ?sumr_ge0 // => [i _|].
     by rewrite char1_ge0 ?rpredZ_Cnat ?Cnat_cfdot_char ?cfInd_char ?irr_char.
   rewrite -big_uniq //= big_image -sumr_const ler_sum // => i _.
   rewrite cfunE -[in leRHS](cfRes1 L) -cfdot_Res_r mmLthL cfRes1.

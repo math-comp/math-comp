@@ -134,7 +134,7 @@ move: lb_x; rewrite polySpred ?monic_neq0 // !big_ord_recr coef_map /=.
 rewrite -lead_coefE (monicP mon_p) natrD rmorph1 mul1r => lb_x.
 case: _.-1 (lb_x) => [|n]; first by rewrite !big_ord0 !add0r ltr01.
 rewrite -ltrBlDl add0r -(ler_pM2r (x_gt0 n)) -exprS.
-apply: lt_le_trans; rewrite mulrDl mul1r ltr_spaddr // -sumrN.
+apply: lt_le_trans; rewrite mulrDl mul1r ltr_pwDr // -sumrN.
 rewrite natr_sum mulr_suml ler_sum // => j _.
 rewrite coef_map /= fmorph_eq_rat (le_trans (real_ler_norm _)) //.
   by rewrite rpredN rpredM ?rpred_rat ?rpredX // ger0_real.
@@ -469,8 +469,8 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
         by case: n => // n; rewrite expnS leq_pmul2l // ltn_expl.
       rewrite -mulrA hornerM normrM ler_pM //.
       have [/ltW qc_le0 | qc_ge0] := ltrP q.[c] 0.
-        by apply: le_trans (lb1 c b1 _); rewrite ?ler0_norm ?ler_paddl.
-      by apply: le_trans (lb1 a1 c _); rewrite ?ger0_norm ?ler_paddr ?oppr_ge0.
+        by apply: le_trans (lb1 c b1 _); rewrite ?ler0_norm ?ler_wpDl.
+      by apply: le_trans (lb1 a1 c _); rewrite ?ger0_norm ?ler_wpDr ?oppr_ge0.
     case{c le_a1c le_cb1 lbMu}=> [[/=qa2_le0 qb2_ge0 le_ab2] [/=le_a12 le_b21]].
     pose h := b2 - a2; have h_ge0: 0 <= h by rewrite subr_ge0.
     have [-> | nz_q] := eqVneq q 0.
