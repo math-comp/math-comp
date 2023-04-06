@@ -1188,13 +1188,13 @@ Implicit Types x y : R.
 Implicit Types m n : int.
 Local Coercion Posz : nat >-> int.
 
-Lemma exprz_pmulzl x m n : 0 <= n -> (x *~ m) ^ n = x ^ n *~ (m ^ n).
+Lemma exprz_pMzl x m n : 0 <= n -> (x *~ m) ^ n = x ^ n *~ (m ^ n).
 Proof.
 by elim: n=> [|n ihn|n _] // _; rewrite !exprSz ihn // mulrzAr mulrzAl -mulrzA.
 Qed.
 
 Lemma exprz_pintl m n (hn : 0 <= n) : m%:~R ^ n = (m ^ n)%:~R :> R.
-Proof. by rewrite exprz_pmulzl // exp1rz. Qed.
+Proof. by rewrite exprz_pMzl // exp1rz. Qed.
 
 Lemma exprzMzl x m n (ux : x \is a GRing.unit) (um : m%:~R \is a @GRing.unit R):
    (x *~ m) ^ n = (m%:~R ^ n) * x ^ n :> R.
@@ -1220,7 +1220,7 @@ Qed.
 
 Lemma rmorphXz (R' : unitRingType) (f : {rmorphism R -> R'}) n :
   {in GRing.unit, {morph f : x / x ^ n}}.
-Proof. by case: n => n x Ux; rewrite ?rmorphV ?rpredX ?rmorphX. Qed.
+Proof. by case: n => n x Ux; rewrite ?rmorphV ?rpredX ?rmorphXn. Qed.
 
 End Exprz_Zint_UnitRing.
 
@@ -1276,7 +1276,7 @@ Qed.
 
 Lemma fmorphXz (R : unitRingType) (f : {rmorphism F -> R}) n :
   {morph f : x / x ^ n}.
-Proof. by case: n => n x; rewrite ?fmorphV rmorphX. Qed.
+Proof. by case: n => n x; rewrite ?fmorphV rmorphXn. Qed.
 
 End ExprzField.
 
@@ -1296,45 +1296,43 @@ Proof. by case: n=> n; rewrite ?NegzE -?invr_expz ?invr_gt0 ?exprn_gt0. Qed.
 
 Definition exprz_gte0 := (exprz_ge0, exprz_gt0).
 
-Lemma ler_wpiexpz2l x (x0 : 0 <= x) (x1 : x <= 1) :
+Lemma ler_wpiXz2l x (x0 : 0 <= x) (x1 : x <= 1) :
   {in >= 0 &, {homo exprz x : x y /~ x <= y}}.
 Proof.
 move=> [] m [] n; rewrite -!topredE /= ?oppr_cp0 ?ltz_nat // => _ _.
-by rewrite lez_nat -?exprnP => /lerwiXn2l; apply.
+by rewrite lez_nat -?exprnP => /ler_wiXn2l; apply.
 Qed.
 
-Lemma ler_wniexpz2l x (x0 : 0 <= x) (x1 : x <= 1) :
+Lemma ler_wniXz2l x (x0 : 0 <= x) (x1 : x <= 1) :
   {in < 0 &, {homo exprz x : x y /~ x <= y}}.
 Proof.
 move=> [] m [] n; rewrite ?NegzE -!topredE /= ?oppr_cp0 ?ltz_nat // => _ _.
 rewrite lerN2 lez_nat -?invr_expz=> hmn; have := x0.
 rewrite le0r=> /predU1P [->|lx0]; first by rewrite !exp0rz invr0.
-by rewrite lef_pV2 -?topredE /= ?exprz_gt0 // lerwiXn2l.
+by rewrite lef_pV2 -?topredE /= ?exprz_gt0 // ler_wiXn2l.
 Qed.
 
-Fact ler_wpeexpz2l x (x1 : 1 <= x) :
-  {in >= 0 &, {homo exprz x : x y / x <= y}}.
+Fact ler_wpeXz2l x (x1 : 1 <= x) : {in >= 0 &, {homo exprz x : x y / x <= y}}.
 Proof.
 move=> [] m [] n; rewrite -!topredE /= ?oppr_cp0 ?ltz_nat // => _ _.
-by rewrite lez_nat -?exprnP=> /lerweXn2l; apply.
+by rewrite lez_nat -?exprnP=> /ler_weXn2l; apply.
 Qed.
 
-Fact ler_wneexpz2l x (x1 : 1 <= x) :
-  {in <= 0 &, {homo exprz x : x y / x <= y}}.
+Fact ler_wneXz2l x (x1 : 1 <= x) : {in <= 0 &, {homo exprz x : x y / x <= y}}.
 Proof.
 move=> m n hm hn /= hmn.
 rewrite -lef_pV2 -?topredE /= ?exprz_gt0 ?(lt_le_trans ltr01) //.
-by rewrite !invr_expz ler_wpeexpz2l ?lerN2 -?topredE //= oppr_cp0.
+by rewrite !invr_expz ler_wpeXz2l ?lerN2 -?topredE //= oppr_cp0.
 Qed.
 
-Lemma ler_weexpz2l x (x1 : 1 <= x) : {homo exprz x : x y / x <= y}.
+Lemma ler_weXz2l x (x1 : 1 <= x) : {homo exprz x : x y / x <= y}.
 Proof.
 move=> m n /= hmn; case: (lerP 0 m)=> [|/ltW] hm.
-  by rewrite ler_wpeexpz2l // [_ \in _](le_trans hm).
+  by rewrite ler_wpeXz2l // [_ \in _](le_trans hm).
 case: (lerP n 0)=> [|/ltW] hn.
-  by rewrite ler_wneexpz2l // [_ \in _](le_trans hmn).
-apply: (@le_trans _ _ (x ^ 0)); first by rewrite ler_wneexpz2l.
-by rewrite ler_wpeexpz2l.
+  by rewrite ler_wneXz2l // [_ \in _](le_trans hmn).
+apply: (@le_trans _ _ (x ^ 0)); first by rewrite ler_wneXz2l.
+by rewrite ler_wpeXz2l.
 Qed.
 
 Lemma pexprz_eq1 x n (x0 : 0 <= x) : (x ^ n == 1) = ((n == 0) || (x == 1)).
@@ -1351,39 +1349,39 @@ rewrite -!expfzDr ?gt_eqF // subrr expr0z=> /eqP.
 by rewrite pexprz_eq1 ?(ltW x0) // (negPf nx1) subr_eq0 orbF=> /eqP.
 Qed.
 
-Lemma ler_piexpz2l x (x0 : 0 < x) (x1 : x < 1) :
+Lemma ler_piXz2l x (x0 : 0 < x) (x1 : x < 1) :
   {in >= 0 &, {mono exprz x : x y /~ x <= y}}.
 Proof.
 apply: (le_nmono_in (inj_nhomo_lt_in _ _)).
   by move=> n m hn hm /=; apply: ieexprIz; rewrite // lt_eqF.
-by apply: ler_wpiexpz2l; rewrite ?ltW.
+by apply: ler_wpiXz2l; rewrite ?ltW.
 Qed.
 
-Lemma ltr_piexpz2l x (x0 : 0 < x) (x1 : x < 1) :
+Lemma ltr_piXz2l x (x0 : 0 < x) (x1 : x < 1) :
   {in >= 0 &, {mono exprz x : x y /~ x < y}}.
-Proof. exact: (leW_nmono_in (ler_piexpz2l _ _)). Qed.
+Proof. exact: (leW_nmono_in (ler_piXz2l _ _)). Qed.
 
-Lemma ler_niexpz2l x (x0 : 0 < x) (x1 : x < 1) :
+Lemma ler_niXz2l x (x0 : 0 < x) (x1 : x < 1) :
   {in < 0 &, {mono exprz x : x y /~ x <= y}}.
 Proof.
 apply: (le_nmono_in (inj_nhomo_lt_in _ _)).
   by move=> n m hn hm /=; apply: ieexprIz; rewrite // lt_eqF.
-by apply: ler_wniexpz2l; rewrite ?ltW.
+by apply: ler_wniXz2l; rewrite ?ltW.
 Qed.
 
-Lemma ltr_niexpz2l x (x0 : 0 < x) (x1 : x < 1) :
+Lemma ltr_niXz2l x (x0 : 0 < x) (x1 : x < 1) :
   {in < 0 &, {mono (exprz x) : x y /~ x < y}}.
-Proof. exact: (leW_nmono_in (ler_niexpz2l _ _)). Qed.
+Proof. exact: (leW_nmono_in (ler_niXz2l _ _)). Qed.
 
-Lemma ler_eexpz2l x (x1 : 1 < x) : {mono (exprz x) : x y / x <= y}.
+Lemma ler_eXz2l x (x1 : 1 < x) : {mono exprz x : x y / x <= y}.
 Proof.
 apply: (le_mono (inj_homo_lt _ _)).
   by apply: ieexprIz; rewrite ?(lt_trans ltr01) // gt_eqF.
-by apply: ler_weexpz2l; rewrite ?ltW.
+by apply: ler_weXz2l; rewrite ?ltW.
 Qed.
 
-Lemma ltr_eexpz2l x (x1 : 1 < x) : {mono (exprz x) : x y / x < y}.
-Proof. exact: (leW_mono (ler_eexpz2l _)). Qed.
+Lemma ltr_eXz2l x (x1 : 1 < x) : {mono exprz x : x y / x < y}.
+Proof. exact: (leW_mono (ler_eXz2l _)). Qed.
 
 Lemma ler_wpXz2r n (hn : 0 <= n) :
   {in >= 0 & , {homo (@exprz R)^~ n : x y / x <= y}}.
@@ -1444,8 +1442,7 @@ Lemma ltr_nXz2r n (hn : n < 0) :
   {in > 0 & , {mono ((@exprz R)^~ n) : x y /~ x < y}}.
 Proof. exact: leW_nmono_in (ler_nXz2r _). Qed.
 
-Lemma eqr_expz2 n x y : n != 0 -> 0 <= x -> 0 <= y ->
-  (x ^ n == y ^ n) = (x == y).
+Lemma eqrXz2 n x y : n != 0 -> 0 <= x -> 0 <= y -> (x ^ n == y ^ n) = (x == y).
 Proof. by  move=> *; rewrite (inj_in_eq (pexpIrz _)). Qed.
 
 End ExprzOrder.
@@ -1502,6 +1499,32 @@ Notation ltr_pexpz2r := ltr_pXz2r.
 Notation ler_nexpz2r := ler_nXz2r.
 #[deprecated(since="mathcomp 1.17.0", note="Use ltr_nXz2r instead.")]
 Notation ltr_nexpz2r := ltr_nXz2r.
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_wpiXz2l instead.")]
+Notation ler_wpiexpz2l := ler_wpiXz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_wniXz2l instead.")]
+Notation ler_wniexpz2l := ler_wniXz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_wpeXz2l instead.")]
+Notation ler_wpeexpz2l := ler_wpeXz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_wneXz2l instead.")]
+Notation ler_wneexpz2l := ler_wneXz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_weXz2l instead.")]
+Notation ler_weexpz2l := ler_weXz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_piXz2l instead.")]
+Notation ler_piexpz2l := ler_piXz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_piXz2l instead.")]
+Notation ltr_piexpz2l := ltr_piXz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_niXz2l instead.")]
+Notation ler_niexpz2l := ler_niXz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_niXz2l instead.")]
+Notation ltr_niexpz2l := ltr_niXz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_eXz2l instead.")]
+Notation ler_eexpz2l := ler_eXz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_eXz2l instead.")]
+Notation ltr_eexpz2l := ltr_eXz2l.
+#[deprecated(since="mathcomp 1.17.0", note="Use eqrXz2 instead.")]
+Notation eqr_expz2 := eqrXz2.
+#[deprecated(since="mathcomp 1.17.0", note="Use exprz_pMzl instead.")]
+Notation exprz_pmulzl := exprz_pMzl.
 
 Section MoreSgz.
 

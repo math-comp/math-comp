@@ -45,6 +45,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Renamed
 
+- in `ssralg.v`:
+  + `rmorphX` -> `rmorphXn`
+- in `fraction.v`:
+  + `tofracX` -> `tofracXn`
+- in `mxrepresentation.v`:
+  + `mxval_grootX` -> `mxval_grootXn`
 - in `ssrnum.v`:
   + `ler_opp2` -> `lerN2`
   + `ltr_opp2` -> `ltrN2`
@@ -149,10 +155,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `maxr_pmulr` -> `maxr_pMr`
   + `minr_pmull` -> `minr_pMl`
   + `maxr_pmull` -> `maxr_pMl`
-  + `ltr_wpexpn2r` -> `ltr_wpX2r`
-  + `ler_pexpn2r` -> `ler_pX2r`
-  + `ltr_pexpn2r` -> `ltr_pX2r`
-  + `lter_pexpn2r` -> `lter_pX2r`
+  + `ltr_wpexpn2r` -> `ltr_wpXn2r`
+  + `ler_pexpn2r` -> `ler_pXn2r`
+  + `ltr_pexpn2r` -> `ltr_pXn2r`
+  + `lter_pexpn2r` -> `lter_pXn2r`
   + `ger_pmull` -> `ger_pMl`
   + `gtr_pmull` -> `gtr_pMl`
   + `ger_pmulr` -> `ger_pMr`
@@ -170,10 +176,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_nmulr` -> `ler_nMr`
   + `ltr_nmulr` -> `ltr_nMr`
   + `leif_pmul` -> `leif_pM`
-  + `leif_nmul` -> `leifnM`
-  + `eqr_expn2` -> `eqrX2`
-  + `real_maxr_nmulr` -> `real_maxrnMr`
-  + `real_minr_nmulr` -> `real_minrnMr`
+  + `leif_nmul` -> `leif_nM`
+  + `eqr_expn2` -> `eqrXn2`
+  + `real_maxr_nmulr` -> `real_maxr_nMr`
+  + `real_minr_nmulr` -> `real_minr_nMr`
   + `real_minr_nmull` -> `real_minrnMl`
   + `real_maxr_nmull` -> `real_maxrnMl`
   + `real_ltr_distl_addr` -> `real_ltr_distlDr`
@@ -192,16 +198,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_distl_subl` -> `ler_distlBl`
   + `ltr_distlC_subl` -> `ltr_distlCBl`
   + `ler_distlC_subl` -> `ler_distlCBl`
-  + `maxr_nmulr` -> `maxrnMr`
-  + `minr_nmulr` -> `minrnMr`
-  + `minr_nmull` -> `minrnMl`
-  + `maxr_nmull` -> `maxrnMl`
-  + `ler_iexpn2l` -> `leriX2l`
-  + `ltr_iexpn2l` -> `ltriX2l`
-  + `lter_iexpn2l` -> `lteriX2l`
-  + `ler_eexpn2l` -> `lereXn2l`
-  + `ltr_eexpn2l` -> `ltreXn2l`
-  + `lter_eexpn2l` -> `ltereXn2l`
+  + `maxr_nmulr` -> `maxr_nMr`
+  + `minr_nmulr` -> `minr_nMr`
+  + `minr_nmull` -> `minr_nMl`
+  + `maxr_nmull` -> `maxr_nMl`
+  + `ler_iexpn2l` -> `ler_iXn2l`
+  + `ltr_iexpn2l` -> `ltr_iXn2l`
+  + `lter_iexpn2l` -> `lter_iXn2l`
+  + `ler_eexpn2l` -> `ler_eXn2l`
+  + `ltr_eexpn2l` -> `ltr_eXn2l`
+  + `lter_eexpn2l` -> `lter_eXn2l`
   + `ler_wpmul2l` -> `ler_wpM2l`
   + `ler_wpmul2r` -> `ler_wpM2r`
   + `ler_wnmul2l` -> `ler_wnM2l`
@@ -210,15 +216,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_nemull` -> `ler_neMl`
   + `ler_pemulr` -> `ler_peMr`
   + `ler_nemulr` -> `ler_neMr`
-  + `ler_iexpr` -> `leriXr`
-  + `ltr_iexpr` -> `ltriXr`
-  + `lter_iexpr` -> `lteriXr`
-  + `ler_eexpr` -> `lereXr`
-  + `ltr_eexpr` -> `ltreXr`
-  + `lter_eexpr` -> `ltereXr`
-  + `lter_expr` -> `lterXr`
-  + `ler_wiexpn2l` -> `lerwiXn2l`
-  + `ler_weexpn2l` -> `lerweXn2l`
+  + `ler_iexpr` -> `ler_iXnr`
+  + `ltr_iexpr` -> `ltr_iXnr`
+  + `lter_iexpr` -> `lter_iXnr`
+  + `ler_eexpr` -> `ler_eXnr`
+  + `ltr_eexpr` -> `ltr_eXnr`
+  + `lter_eexpr` -> `lter_eXnr`
+  + `lter_expr` -> `lter_Xnr`
+  + `ler_wiexpn2l` -> `ler_wiXn2l`
+  + `ler_weexpn2l` -> `ler_weXn2l`
   + `ler_pimull` -> `ler_piMl`
   + `ler_nimull` -> `ler_niMl`
   + `ler_pimulr` -> `ler_piMr`
@@ -255,7 +261,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ler_ndivr_mull` -> `ler_ndivrMl`
   + `ltr_ndivr_mull` -> `ltr_ndivrMl`
   + `lter_ndivr_mull` -> `lter_ndivrMl`
-  + `eqr_pmuln2r` -> `eqrpMn2r`
+  + `eqr_pmuln2r` -> `eqr_pMn2r`
   + `ler_muln2r` -> `lerMn2r`
   + `ler_pmuln2r` -> `ler_pMn2r`
   + `ler_pmuln2l` -> `ler_pMn2l`
@@ -301,6 +307,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ltr_pexpz2r` -> `ltr_pXz2r`
   + `ler_nexpz2r` -> `ler_nXz2r`
   + `ltr_nexpz2r` -> `ltr_nXz2r`
+  + `ler_wpiexpz2l` -> `ler_wpiXz2l`
+  + `ler_wniexpz2l` -> `ler_wniXz2l`
+  + `ler_wpeexpz2l` -> `ler_wpeXz2l`
+  + `ler_wneexpz2l` -> `ler_wneXz2l`
+  + `ler_weexpz2l` -> `ler_weXz2l`
+  + `ler_piexpz2l` -> `ler_piXz2l`
+  + `ltr_piexpz2l` -> `ltr_piXz2l`
+  + `ler_niexpz2l` -> `ler_niXz2l`
+  + `ltr_niexpz2l` -> `ltr_niXz2l`
+  + `ler_eexpz2l` -> `ler_eXz2l`
+  + `ltr_eexpz2l` -> `ltr_eXz2l`
+  + `eqr_expz2` -> `eqrXz2`
+  + `exprz_pmulzl` -> `exprz_pMzl`
+  + `lteif_pmul2l` -> `lteif_pM2l`
+  + `lteif_pmul2r` -> `lteif_pM2r`
+  + `lteif_nmul2l` -> `lteif_nM2l`
+  + `lteif_nmul2r` -> `lteif_nM2r`
 - in `interval.v`:
   + `in_segment_addgt0Pr` -> `in_segmentDgt0Pr`
   + `in_segment_addgt0Pl` -> `in_segmentDgt0Pl`

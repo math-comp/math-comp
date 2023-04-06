@@ -53,7 +53,7 @@ Definition numden_Ratio := (numer_Ratio, denom_Ratio).
 
 Variant Ratio_spec (n d : R) : {ratio R} -> R -> R -> Type :=
   | RatioNull of d = 0 : Ratio_spec n d ratio0 n 0
-  | RatioNonNull (d_neq0 : d != 0) : 
+  | RatioNonNull (d_neq0 : d != 0) :
     Ratio_spec n d (@mkRatio (n, d) d_neq0) n d.
 
 Lemma RatioP n d : Ratio_spec n d (Ratio n d) n d.
@@ -364,7 +364,7 @@ Lemma tofracMn n : {morph tofrac: x / x *+ n}. Proof. exact: rmorphMn. Qed.
 Lemma tofracMNn n : {morph tofrac: x / x *- n}. Proof. exact: rmorphMNn. Qed.
 Lemma tofrac1 : 1%:F = 1. Proof. exact: rmorph1. Qed.
 Lemma tofracM : {morph tofrac: x y  / x * y}. Proof. exact: rmorphM. Qed.
-Lemma tofracX n : {morph tofrac: x / x ^+ n}. Proof. exact: rmorphX. Qed.
+Lemma tofracXn n : {morph tofrac: x / x ^+ n}. Proof. exact: rmorphXn. Qed.
 
 Lemma tofrac_eq (p q : R): (p%:F == q%:F) = (p == q).
 Proof.
@@ -375,3 +375,6 @@ Qed.
 Lemma tofrac_eq0 (p : R): (p%:F == 0) = (p == 0).
 Proof. by rewrite tofrac_eq. Qed.
 End FracFieldTheory.
+
+#[deprecated(since="mathcomp 1.17.0", note="Use tofracXn instead.")]
+Notation tofracX := tofracXn.

@@ -328,7 +328,7 @@ have [nHy | not_nHy] := boolP (y \in 'N(H)); last by rewrite !cfConjgEout.
 rewrite (reindex_astabs 'J y) ?astabsJ //=.
 by apply: eq_bigr=> x _; rewrite !cfConjgEJ.
 Qed.
- 
+
 (* Isaacs' 6.1.d *)
 Lemma cfdot_Res_conjg psi phi y :
   y \in G -> '['Res[H, G] psi, phi ^ y] = '['Res[H] psi, phi].
@@ -352,7 +352,7 @@ Proof. by case/andP=> Nchi chi1; rewrite qualifE cfConjg1 cfConjg_char. Qed.
 
 Lemma cfConjg_irr y chi : chi \in irr H -> (chi ^ y)%CF \in irr H.
 Proof. by rewrite !irrEchar cfConjg_iso => /andP[/cfConjg_char->]. Qed.
- 
+
 Definition conjg_Iirr i y := cfIirr ('chi[H]_i ^ y)%CF.
 
 Lemma conjg_IirrE i y : 'chi_(conjg_Iirr i y) = ('chi_i ^ y)%CF.
@@ -526,7 +526,7 @@ by rewrite mulr_natl -sumr_const; apply: eq_bigr => y /IGpsi/inertia_valJ->.
 Qed.
 
 (* This is Isaacs, Corollary (6.7). *)
-Corollary constt0_Res_cfker i : 
+Corollary constt0_Res_cfker i :
   H <| G -> 0 \in irr_constt ('Res[H] 'chi[G]_i) -> H \subset cfker 'chi[G]_i.
 Proof.
 move=> nsHG /(Clifford_Res_sum_cfclass nsHG); have [sHG nHG] := andP nsHG.
@@ -537,7 +537,7 @@ by rewrite def_chiH !cfunE cfun11 cfun1E Hx.
 Qed.
 
 (* This is Isaacs, Lemma (6.8). *)
-Lemma dvdn_constt_Res1_irr1 i j : 
+Lemma dvdn_constt_Res1_irr1 i j :
     H <| G -> j \in irr_constt ('Res[H, G] 'chi_i) ->
   exists n, 'chi_i 1%g = n%:R * 'chi_j 1%g.
 Proof.
@@ -812,7 +812,7 @@ Lemma inertia_dprodr L psi :
 Proof. by move=> nKL nHL; apply: inertia_sdprod. Qed.
 
 Lemma inertia_dprod L (phi : 'CF(K)) (psi : 'CF(H)) :
-    L \subset 'N(K) -> L \subset 'N(H) -> phi 1%g != 0 -> psi 1%g != 0 -> 
+    L \subset 'N(K) -> L \subset 'N(H) -> phi 1%g != 0 -> psi 1%g != 0 ->
   'I_L[cfDprod KxH phi psi] = 'I_L[phi] :&: 'I_L[psi].
 Proof.
 move=> nKL nHL nz_phi nz_psi; apply/eqP; rewrite eqEsubset subsetI.
@@ -1276,7 +1276,7 @@ have lin_alpha: alpha \is a linear_char by apply: rpred_div.
 have alpha_e: alpha ^+ e = 1.
   have kerNalpha: N \subset cfker alpha.
     by rewrite -subsetIidl -cfker_Res ?lin_charW // alphaN_1 cfker_cfun1.
-  apply/eqP; rewrite -(cfQuoK nsNG kerNalpha) -rmorphX cfMod_eq1 //.
+  apply/eqP; rewrite -(cfQuoK nsNG kerNalpha) -rmorphXn cfMod_eq1 //.
   rewrite -dvdn_cforder /e -card_quotient //.
   by rewrite cforder_lin_char_dvdG ?cfQuo_lin_char.
 have det_alphaXeta b: cfDet (alpha ^+ b * eta) = alpha ^+ (b * f) * nu.
@@ -1289,7 +1289,7 @@ have alpha_bf: alpha ^+ (b * f) = alpha.
 have /irrP[c Dc]: alpha ^+ b * eta \in irr G.
   by rewrite mul_lin_irr ?rpredX ?mem_irr.
 have chiN: 'Res 'chi_c = theta.
-  by rewrite -Dc rmorphM rmorphX /= alphaN_1 expr1n mul1r.
+  by rewrite -Dc rmorphM rmorphXn /= alphaN_1 expr1n mul1r.
 have det_chi: cfDet 'chi_c = mu by rewrite -Dc det_alphaXeta alpha_bf divrK.
 exists c => // c2 c2Nth det_c2_mu; apply: irr_inj.
 have [irrMc _ imMc _] := constt_Ind_ext nsNG chiN.
@@ -1303,7 +1303,7 @@ have s2_lin: 'chi_s2 \is a linear_char.
   by rewrite Dc2 cfunE cfMod1.
 have s2Xf_1: 'chi_s2 ^+ f = 1.
   apply/(can_inj (cfModK nsNG))/(mulIr (lin_char_unitr lin_mu))/esym.
-  rewrite rmorph1 rmorphX /= mul1r -{1}det_c2_mu Dc2 -det_chi.
+  rewrite rmorph1 rmorphXn /= mul1r -{1}det_c2_mu Dc2 -det_chi.
   by rewrite cfDet_mul_lin ?cfMod_lin_char ?irr_char // -(cfRes1 N) chiN.
 suffices /eqP s2_1: 'chi_s2 == 1 by rewrite Dc2 s2_1 rmorph1 mul1r.
 rewrite -['chi_s2]expr1 -dvdn_cforder -(eqnP co_e_f) dvdn_gcd.
@@ -1398,7 +1398,7 @@ wlog [p p_lam]: lambda @m lam_lin IGlam p_ext_lam /
   have [q||u] := IHp _ (lin_mu p) IGmu; [ | by exists p | by exists u].
   rewrite o_mu => /eqnP-> {q}.
   have [Hp sylHp [u uNlam]] := p_ext_lam p m_p; exists Hp => //.
-  rewrite /mu cfX -cf_lam -uNlam -rmorphX /=; set nu := _ ^+ _.
+  rewrite /mu cfX -cf_lam -uNlam -rmorphXn /=; set nu := _ ^+ _.
   have /lin_char_irr/irrP[v ->]: nu \is a linear_char; last by exists v.
   by rewrite rpredX // linN ?irr_char ?uNlam.
 have pi_m_p: p \in \pi(m) by rewrite p_lam !inE.
@@ -1437,7 +1437,7 @@ have DcN: 'Res[N] 'chi_c = lambda *+ f.
   by rewrite -scaler_nat fK.
 have /lin_char_irr/irrP[d Dd]: cfDet 'chi_c ^+ b \is a linear_char.
   by rewrite rpredX // cfDet_lin_char.
-exists d; rewrite -{}Dd rmorphX /= -cfDetRes ?irr_char // DcN.
+exists d; rewrite -{}Dd rmorphXn /= -cfDetRes ?irr_char // DcN.
 rewrite cfDetMn ?lin_charW // -exprM cfDet_id //.
 rewrite -(expr_mod _ (exp_cforder _)) -cfDet_order_lin // -/m.
 by rewrite fb_mod_m /m cfDet_order_lin // expr_mod ?exp_cforder.
@@ -1470,7 +1470,7 @@ have /irrP[u Du]: nu ^+ (b * e) \in irr G by rewrite lin_char_irr ?rpredX.
 exists u; set mu := 'chi_u in Du *.
 have uNlam: 'Res mu = lambda.
   rewrite cfDet_order_lin // in be_mod_lam.
-  rewrite -Du rmorphX /= vNlam -(expr_mod _ (exp_cforder _)) //.
+  rewrite -Du rmorphXn /= vNlam -(expr_mod _ (exp_cforder _)) //.
   by rewrite be_mod_lam expr_mod ?exp_cforder.
 have lin_mu: mu \is a linear_char by rewrite -Du rpredX.
 have o_mu: ('o(mu) = 'o(lambda))%CF.
@@ -1478,7 +1478,7 @@ have o_mu: ('o(mu) = 'o(lambda))%CF.
     by rewrite !cfDet_order_lin // -uNlam cforder_Res.
   have kerNnu_olam: N \subset cfker (nu ^+ 'o(lambda)%CF).
     rewrite -subsetIidl -cfker_Res ?rpredX ?irr_char //.
-    by rewrite rmorphX /= vNlam cfDet_order_lin // exp_cforder cfker_cfun1.
+    by rewrite rmorphXn /= vNlam cfDet_order_lin // exp_cforder cfker_cfun1.
   apply/eqP; rewrite eqn_dvd dv_o_lam_mu andbT cfDet_order_lin //.
   rewrite dvdn_cforder -Du exprAC -dvdn_cforder dvdn_mull //.
   rewrite -(cfQuoK nsNG kerNnu_olam) cforder_mod // /e -card_quotient //.
@@ -1494,7 +1494,7 @@ have co_e_mu_t: coprime e #[(mu / 'chi_t)%R]%CF.
   suffices dv_o_mu_t: #[(mu / 'chi_t)%R]%CF %| 'o(mu)%CF * 'o('chi_t)%CF.
     by rewrite (coprime_dvdr dv_o_mu_t) // coprimeMr o_mu co_e_lam.
   rewrite !cfDet_order_lin //; apply/dvdn_cforderP=> x Gx.
-  rewrite invr_lin_char // !cfunE exprMn -rmorphX {2}mulnC.
+  rewrite invr_lin_char // !cfunE exprMn -rmorphXn {2}mulnC.
   by rewrite !(dvdn_cforderP _) ?conjC1 ?mulr1 // dvdn_mulr.
 have /eqP mu_t_1: mu / 'chi_t == 1.
   rewrite -(dvdn_cforder (_ / _)%R 1) -(eqnP co_e_mu_t) dvdn_gcd dvdnn andbT.

@@ -82,7 +82,7 @@ have nz2: 2%:R != 0 :> L.
     by rewrite Dw !big_ord_recl big_ord0 /= mulr1 mulN1r addr0 subrK.
   pose b := w + conj w; have bJ: conj b = b by rewrite rmorphD conjK addrC.
   have Db2: b ^+ 2 + b = a.
-    rewrite -Frobenius_autE // rmorphD addrACA Dw /= Frobenius_autE -rmorphX.
+    rewrite -Frobenius_autE // rmorphD addrACA Dw /= Frobenius_autE -rmorphXn.
     by rewrite -rmorphD Dw rmorphM aJ eJ -mulrDl -{1}[e]opp_id addKr mul1r.
   have /eqP[] := oner_eq0 L; apply: (addrI b); rewrite addr0 -{2}bJ.
   have: (b + e) * (b + conj e) == 0.
@@ -102,7 +102,7 @@ have sqrtE x y: y ^+ 2 = x -> {b : bool | y = (-1) ^+ b * sqrt x}.
 pose i := sqrt (- 1).
 have sqrMi x: (i * x) ^+ 2 = - x ^+ 2 by rewrite exprMn sqrtK mulN1r.
 have iJ : conj i = - i.
-  have /sqrtE[b]: conj i ^+ 2 = - 1 by rewrite -rmorphX sqrtK rmorphN1.
+  have /sqrtE[b]: conj i ^+ 2 = - 1 by rewrite -rmorphXn sqrtK rmorphN1.
   rewrite mulr_sign -/i; case: b => // Ri.
   case: conj_nt => z; wlog zJ: z / conj z = - z.
     move/(_ (z - conj z)); rewrite !rmorphB conjK opprB => zJ.
@@ -117,17 +117,17 @@ have iJ : conj i = - i.
       by rewrite conjK.
     rewrite -(mulr_natl z) invfM (mulrC z) !mulrA divfK // -mulrDl addrACA.
     by rewrite subrr addr0 -mulr2n -mulr_natr mulfK ?Neq0 ?sqrtK.
-  suffices u0: u = 0 by rewrite -Dz u0 add0r rmorphX rmorphM Rv zJ mulNr sqrrN.
+  suffices u0: u = 0 by rewrite -Dz u0 add0r rmorphXn rmorphM Rv zJ mulNr sqrrN.
   suffices [b Du]: exists b : bool, u = (-1) ^+ b * i * z * v.
     apply: mul2I; rewrite mul0rn mulr2n -{2}Ru.
     by rewrite Du !rmorphM rmorph_sign Rv Ri zJ !mulrN mulNr subrr.
-  have/eqP:= zJ; rewrite -addr_eq0 -{1 2}Dz rmorphX rmorphD rmorphM Ru Rv zJ.
+  have/eqP:= zJ; rewrite -addr_eq0 -{1 2}Dz rmorphXn rmorphD rmorphM Ru Rv zJ.
   rewrite mulNr sqrrB sqrrD addrACA (addrACA (u ^+ 2)) addNr addr0 -!mulr2n.
   rewrite -mulrnDl -(mul0rn _ 2) (inj_eq mul2I) /= -[rhs in _ + rhs]opprK.
   rewrite -sqrMi subr_eq0 eqf_sqr -mulNr !mulrA.
   by case/pred2P=> ->; [exists false | exists true]; rewrite mulr_sign.
 pose norm x := sqrt x * conj (sqrt x).
-have normK x : norm x ^+ 2 = x * conj x by rewrite exprMn -rmorphX sqrtK.
+have normK x : norm x ^+ 2 = x * conj x by rewrite exprMn -rmorphXn sqrtK.
 have normE x y : y ^+ 2 = x -> norm x = y * conj y.
   rewrite /norm => /sqrtE[b /(canLR (signrMK b)) <-].
   by rewrite !rmorphM rmorph_sign mulrACA -mulrA signrMK.
@@ -397,9 +397,9 @@ have [z pz0]: exists z, root p z by apply/closed_rootP; rewrite sz_p eqSS -lt0n.
 have Az: integralOver ratr z.
   by apply: integral_root Ap; rewrite // -size_poly_gt0 sz_p.
 exists (LtoC Az); apply/CtoL_inj; rewrite -[CtoL _]subr0 -(rootP pz0).
-rewrite rmorphX /= LtoC_K hornerD hornerXn hornerN opprD addNKr opprK.
+rewrite rmorphXn /= LtoC_K hornerD hornerXn hornerN opprD addNKr opprK.
 rewrite horner_poly rmorph_sum; apply: eq_bigr => k _.
-by rewrite rmorphM rmorphX /= LtoC_K.
+by rewrite rmorphM rmorphXn /= LtoC_K.
 Qed.
 
 Definition decFieldMixin := closed_field_QEMixin closedFieldAxiom.
@@ -429,7 +429,7 @@ have [i i2]: exists i : type, i ^+ 2 = -1.
   by rewrite !big_ord_recl big_ord0 /= mul0r mulr1 !addr0; exists i.
 move/(_ i)/(congr1 CtoL); rewrite LtoC_K => iL_J.
 have/lt_geF/idP[] := @ltr01 Lnum; rewrite -oppr_ge0 -(rmorphN1 CtoL_rmorphism).
-by rewrite -i2 rmorphX /= expr2 -{2}iL_J -(svalP LnumMixin) exprn_ge0.
+by rewrite -i2 rmorphXn /= expr2 -{2}iL_J -(svalP LnumMixin) exprn_ge0.
 Qed.
 
 Definition numMixin : numMixin closedFieldType :=
@@ -631,7 +631,7 @@ Definition CratrE :=
   let CnF := Algebraics.Implementation.numFieldType in
   let QtoCm := ratr_rmorphism CnF in
   ((rmorph0 QtoCm, rmorph1 QtoCm, rmorphMn QtoCm, rmorphN QtoCm, rmorphD QtoCm),
-   (rmorphM QtoCm, rmorphX QtoCm, fmorphV QtoCm),
+   (rmorphM QtoCm, rmorphXn QtoCm, fmorphV QtoCm),
    (rmorphMz QtoCm, rmorphXz QtoCm, @ratr_norm CnF, @ratr_sg CnF),
    =^~ (@ler_rat CnF, @ltr_rat CnF, (inj_eq (fmorph_inj QtoCm)))).
 
@@ -639,7 +639,7 @@ Definition CintrE :=
   let CnF := Algebraics.Implementation.numFieldType in
   let ZtoCm := intmul1_rmorphism CnF in
   ((rmorph0 ZtoCm, rmorph1 ZtoCm, rmorphMn ZtoCm, rmorphN ZtoCm, rmorphD ZtoCm),
-   (rmorphM ZtoCm, rmorphX ZtoCm),
+   (rmorphM ZtoCm, rmorphXn ZtoCm),
    (rmorphMz ZtoCm, @intr_norm CnF, @intr_sg CnF),
    =^~ (@ler_int CnF, @ltr_int CnF, (inj_eq (@intr_inj CnF)))).
 
@@ -724,7 +724,7 @@ Lemma floorCM : {in Cint &, {morph floorC : x y / x * y}}.
 Proof. by move=> _ _ /CintP[m1 ->] /CintP[m2 ->]; rewrite -rmorphM !intCK. Qed.
 
 Lemma floorCX n : {in Cint, {morph floorC : x / x ^+ n}}.
-Proof. by move=> _ /CintP[m ->]; rewrite -rmorphX !intCK. Qed.
+Proof. by move=> _ /CintP[m ->]; rewrite -rmorphXn !intCK. Qed.
 
 Lemma rpred_Cint
         (S : {pred algC}) (ringS : subringPred S) (kS : keyed_pred ringS) x :
@@ -929,7 +929,7 @@ Lemma Cint_ler_sqr x : x \in Cint -> x <= x ^+ 2.
 Proof.
 move=> Zx; have [-> | nz_x] := eqVneq x 0; first by rewrite expr0n.
 apply: le_trans (_ : `|x| <= _); first by rewrite real_ler_norm ?Creal_Cint.
-by rewrite -Cint_normK // lereXr // norm_Cint_ge1.
+by rewrite -Cint_normK // ler_eXnr // norm_Cint_ge1.
 Qed.
 
 (* Integer divisibility. *)

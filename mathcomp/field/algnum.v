@@ -480,7 +480,7 @@ have [Qn [QnC [[|zn []] // [Dz]]] genQn] := num_field_exists [:: z].
 pose phi := kHomExtend 1 \1 zn (zn ^+ k).
 have homQn1: kHom 1 1 (\1%VF : 'End(Qn)) by rewrite kHom1.
 have pzn_zk0: root (map_poly \1%VF (minPoly 1 zn)) (zn ^+ k).
-  rewrite -(fmorph_root QnC) rmorphX Dz -map_poly_comp.
+  rewrite -(fmorph_root QnC) rmorphXn Dz -map_poly_comp.
   rewrite (@eq_map_poly _ _ _ QnC) => [|a]; last by rewrite /= id_lfunE.
   set p1 := map_poly _ _.
   have [q1 Dp1]: exists q1, p1 = pQtoC q1.
@@ -502,10 +502,10 @@ have phiM: lrmorphism phi.
   by apply/kHom_lrmorphism; rewrite -genQn span_seq1 /= kHomExtendP.
 have [nu Dnu] := extend_algC_subfield_aut QnC (RMorphism phiM).
 exists nu => _ /(prim_rootP prim_z)[i ->].
-rewrite rmorphX exprAC -Dz -Dnu /= -{1}[zn]hornerX /phi.
+rewrite rmorphXn exprAC -Dz -Dnu /= -{1}[zn]hornerX /phi.
 rewrite (kHomExtend_poly homQn1) ?polyOverX //.
 rewrite map_polyE map_id_in => [|?]; last by rewrite id_lfunE.
-by rewrite polyseqK hornerX rmorphX.
+by rewrite polyseqK hornerX rmorphXn.
 Qed.
 
 (* Algebraic integers. *)

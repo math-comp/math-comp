@@ -385,7 +385,7 @@ without loss{K} ->: K / K = 1%AS; last rewrite /order dimv1 expn1.
 pose f x := x ^+ #|F|.
 have idfP x: reflect (f x = x) (x \in 1%VS).
   apply: (iffP (vlineP _ _)) => [[a ->] | xFx].
-    by rewrite -in_algE -[LHS]rmorphX expf_card.
+    by rewrite -in_algE -[LHS]rmorphXn expf_card.
   pose q := map_poly (in_alg L) ('X^#|F| - 'X).
   have: root q x.
     rewrite /q rmorphB /= map_polyXn map_polyX.
@@ -540,7 +540,7 @@ pose q := 'X^m - 'X; have Dq R: q R = ('X^m.-1 - 1) * ('X - 0).
   by rewrite subr0 mulrBl mul1r -exprSr prednK.
 have /FinSplittingFieldFor[/= L splitLq]: q [ringType of 'F_p] != 0.
   by rewrite Dq monic_neq0 ?rpredM ?monicXsubC ?monic_Xn_sub_1.
-rewrite [_^%:A]rmorphB rmorphX /= map_polyX -/(q L) in splitLq.
+rewrite [_^%:A]rmorphB rmorphXn /= map_polyX -/(q L) in splitLq.
 have charL: p \in [char L] by rewrite char_lalg char_Fp.
 pose Fm := FinFieldExtType L; exists Fm => //.
 have /finField_galois_generator[/= a _ Da]: (1 <= {:L})%VS by apply: sub1v.
@@ -629,7 +629,7 @@ have /eqP-n1z: `|z| == 1 by rewrite -(pexpr_eq1 n_gt0) // -normrX zn1 normr1.
 suffices /eqP/normCBeq[t n1t [Dq Dz]]:
   `|q%:R - z : algC| == `|q%:R : algC| - `|z|.
   suffices z1: z == 1 by rewrite leq_eqVlt -dvdn1 (prim_order_dvd z_prim) z1.
-  by rewrite Dz n1z mul1r -(eqrpMn2r q_gt0) Dq normr_nat mulr_natl.
+  by rewrite Dz n1z mul1r -(eqr_pMn2r q_gt0) Dq normr_nat mulr_natl.
 pose aq d : algC := (cyclotomic (z ^+ (n %/ d)) d).[q%:R].
 suffices: `|aq n| <= (q - 1)%:R.
   rewrite eq_le lerB_dist andbT n1z normr_nat natrB //; apply: le_trans.

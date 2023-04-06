@@ -77,7 +77,7 @@ have /fin_all_exists[k Dk] i: exists k, e 0 i = z ^+ k.
   have [|k ->] := (prim_rootP prim_z) (e 0 i); last by exists k.
   by have /dvdnP[q ->] := x_dv_n; rewrite mulnC exprM enx1 expr1n.
 exists (\sum_i w ^+ k i); rewrite rmorph_sum; apply/eq_bigr => i _.
-by rewrite rmorphX Dz Dk.
+by rewrite rmorphXn Dz Dk.
 Qed.
 
 Section GenericClassSums.
@@ -638,7 +638,7 @@ have /fin_all_exists2[ItoQ inItoQ defItoQ] (k : I):
   have [|nu cGnu Dnu] := kHom_to_gal _ (normalFieldf 1) hom_nu.
     by rewrite !subvf.
   exists nu => //; apply: (fmorph_inj QnC).
-  rewrite -Dnu ?memvf // lfunE DnuQ rmorphX DnuC //.
+  rewrite -Dnu ?memvf // lfunE DnuQ rmorphXn DnuC //.
   by rewrite prim_expr_order // fmorph_primitive_root.
 have{defQn} imItoQ: calG = ItoQ @: {:I}.
   apply/setP=> nu; apply/idP/imsetP=> [cGnu | [k _ ->] //].
@@ -663,9 +663,9 @@ have Qpi1: pi1 \in Crat.
   apply: eq_bigr => i _; have /QnGg[b Db] := irr_char i.
   have Lchi_i: 'chi_i \is a linear_char by rewrite irr_cyclic_lin.
   have /(prim_rootP pr_eps)[m Dem]: b ^+ n = 1.
-    apply/eqP; rewrite -(fmorph_eq1 QnC) rmorphX Db -lin_charX //.
+    apply/eqP; rewrite -(fmorph_eq1 QnC) rmorphXn Db -lin_charX //.
     by rewrite -expg_mod_order orderE defG modnn lin_char1.
-  rewrite -Db -DnuC Dem rmorphX /= defItoQ exprAC -{m}Dem rmorphX {b}Db.
+  rewrite -Db -DnuC Dem rmorphXn /= defItoQ exprAC -{m}Dem rmorphXn {b}Db.
   by rewrite lin_charX.
 clear I ItoS imItoS injItoS ItoQ inItoQ defItoQ imItoQ injItoQ.
 clear Qn galQn QnC gQnC eps pr_eps QnGg calG.

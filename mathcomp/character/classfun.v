@@ -1275,12 +1275,12 @@ Variables (aT rT : finGroupType) (G : {group aT}) (R : {group rT}).
 Variable f : {rmorphism 'CF(G) -> 'CF(R)}.
 
 Lemma cforder_rmorph phi : #[f phi]%CF %| #[phi]%CF.
-Proof. by rewrite dvdn_cforder -rmorphX exp_cforder rmorph1. Qed.
+Proof. by rewrite dvdn_cforder -rmorphXn exp_cforder rmorph1. Qed.
 
 Lemma cforder_inj_rmorph phi : injective f -> #[f phi]%CF = #[phi]%CF.
 Proof.
 move=> inj_f; apply/eqP; rewrite eqn_dvd cforder_rmorph dvdn_cforder /=.
-by rewrite -(rmorph_eq1 _ inj_f) rmorphX exp_cforder.
+by rewrite -(rmorph_eq1 _ inj_f) rmorphXn exp_cforder.
 Qed.
 
 End MorphOrder.

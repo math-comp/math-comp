@@ -2686,7 +2686,7 @@ Lemma cfDetIsom aT rT (G : {group aT}) (R : {group rT})
 Proof.
 rewrite rmorph_prod /cfDet (reindex (isom_Iirr isoGR)); last first.
   by exists (isom_Iirr (isom_sym isoGR)) => i; rewrite ?isom_IirrK ?isom_IirrKV.
-apply: eq_bigr => i; rewrite -!cfDetRepr !irrRepr isom_IirrE rmorphX cfIsom_iso.
+apply: eq_bigr=> i; rewrite -!cfDetRepr !irrRepr isom_IirrE rmorphXn cfIsom_iso.
 by rewrite /= ![in cfIsom _]unlock cfDetMorph ?cfRes_char ?cfDetRes ?irr_char.
 Qed.
 

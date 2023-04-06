@@ -106,6 +106,7 @@ This particular example can be problematic if matrix.v is imported because then,
 Or in the presence of a property denoted by an n-ary or unary predicate:
  - `naryPredicate_mainSymbol+`
  - `mainSymbol_unaryPredicate`
+There is an underscore before "suffixes" when "suffixes" starts with a one-letter small identifier (i.e., not a capital letter or a number or a longer identifier such as "if"); this is to make the "suffixes" readable enough.
 
 #### Where:
  - `mainSymbol` is the most meaningful part of the lemma. It generally is the head symbol of the right-hand side of an equation or the head symbol of a theorem. It can also simply be the main object of study, head symbol or not. It is usually either
@@ -113,53 +114,58 @@ Or in the presence of a property denoted by an n-ary or unary predicate:
    + a special "canonical" operation, such as a ring morphism or a
      subtype predicate. e.g. `linear`, `raddf`, `rmorph`, `rpred`, etc.
  - "condition" is used when the lemma applies under some hypothesis.
- - "suffixes" are there to refine what shape and/or what other symbols  the lemma has. It can either be the name of a symbol ("add", "mul", etc.), or the (short) name of a predicate ("`inj`" for "`injectivity`", "`id`" for "identity", etc.) or an abbreviation.
+ - "suffixes" are there to refine what shape and/or what other symbols the lemma has. It can either be the name of a symbol ("add", "mul", etc.), or the (short) name of a predicate ("`inj`" for "`injectivity`", "`id`" for "identity", etc.) or an abbreviation.
+
 Abbreviations are in the header of the file which introduces them. We list here the main abbreviations.
-  - `A` -- associativity, as in `andbA : associative andb.`
-  - `AC` -- right commutativity.
-  - `ACA` -- self-interchange (inner commutativity), e.g., `orbACA : (a || b) || (c || d) = (a || c) || (b || d).`
-  - `b` -- a boolean argument, as in `andbb : idempotent andb.`
-  - `C` -- commutativity, as in `andbC : commutative andb.`
-        -- alternatively, predicate or set complement, as in `predC.`
-        -- alternatively, constant.
-  - `CA` -- left commutativity.
-  - `D` -- predicate or set difference, as in `predD.`
-  - `E` -- elimination lemma, as in `negbFE : ~~ b = false -> b.`
-  - `F` or `f` -- boolean false, as in `andbF : b && false = false.`
-  - `F` -- alternatively, about a finite type.
+  - `A` -- associativity, as in `andbA : associative andb`
+  - `AC` -- right commutativity
+  - `ACA` -- self-interchange (inner commutativity), e.g., `orbACA : (a || b) || (c || d) = (a || c) || (b || d)`
+  - `b` -- a boolean argument, as in `andbb : idempotent andb`
+  - `C` -- commutativity, as in `andbC : commutative andb`
+        -- alternatively, predicate or set complement, as in `predC`
+        -- alternatively, constant
+  - `CA` -- left commutativity
+  - `D` -- predicate or set difference, as in `predD`
+  - `E` -- elimination lemma, as in `negbFE : ~~ b = false -> b`
+  - `F` or `f` -- boolean false, as in `andbF : b && false = false`
+  - `F` -- alternatively, about a finite type
   - `g` -- a group argument.
-  - `I` -- left/right injectivity, as in `addbI : right_injective addb.`
-        -- alternatively predicate or set intersection, as in `predI.`
+  - `I` -- left/right injectivity, as in `addbI : right_injective addb`
+        -- alternatively predicate or set intersection, as in `predI`
   - `l` -- the left-hand of an operation, as in
-    + `andb_orl : left_distributive andb orb.`
-    + ``ltr_norml x y : (`|x| < y) = (- y < x < y).``
-  - `L` -- the left-hand of a relation, as in `ltn_subrL : n - m < n = (0 < m) && (0 < n).`
-  - `LR` -- moving an operator from the left-hand to the right-hand of an relation, as in `leq_subLR : (m - n <= p) = (m <= n + p).`
-  - `N` or `n` -- boolean negation, as in `andbN : a && (~~ a) = false.`
-  - `n` -- alternatively, it is a natural number argument.
-  - `N` -- alternatively ring negation, as in `mulNr : (- x) * y = - (x * y).`
+    + `andb_orl : left_distributive andb orb`
+    + ``ltr_norml x y : (`|x| < y) = (- y < x < y)``
+  - `L` -- the left-hand of a relation, as in `ltn_subrL : n - m < n = (0 < m) && (0 < n)`
+  - `LR` -- moving an operator from the left-hand to the right-hand of an relation, as in `leq_subLR : (m - n <= p) = (m <= n + p)`
+  - `N` or `n` -- boolean negation, as in `andbN : a && (~~ a) = false`
+  - `n` -- alternatively, it is a natural number argument
+  - `N` -- alternatively ring negation, as in `mulNr : (- x) * y = - (x * y)`
   - `P` -- a characteristic property, often a reflection lemma, as in
-     `andP : reflect (a /\ b) (a && b)`.
+     `andP : reflect (a /\ b) (a && b)`
   - `r` -- a right-hand operation, as in
-    + `orb_andr : right_distributive orb andb.`
-    + ``ler_normr x y : (x <= `|y|) = (x <= y) || (x <= - y).``
-    + alternatively, it is a ring argument.
-  - `R` -- the right-hand of a relation, as in `ltn_subrR : n < n - m = false`.
-  - `RL` -- moving an operator from the right-hand to the left-hand of an relation, as in `ltn_subRL : (n < p - m) = (m + n < p).`
-  - `T` or `t` -- boolean truth, as in `andbT: right_id true andb.`
-  - `T` -- alternatively, total set.
-  - `U` -- predicate or set union, as in `predU`.
-  - `W` -- weakening, as in `in1W : {in D, forall x, P} -> forall x, P.`
-  - `0` -- ring or nat 0, or empty set, as in `addr0 : x + 0 = x.`
-  - `1` -- ring; nat or group 1, as in `mulr1 : x * 1 = x.`
-  - `D` -- addition, as in `linearD : f (u + v) = f u + f v.`
-  - `B` -- subtraction, as in `opprB : - (x - y) = y - x.`
-  - `M` -- multiplication, as in `invfM : (x * y)^-1 = x^-1 * y^-1.`
-  - `Mn` -- ring nat multiplication, as in `raddfMn : f (x *+ n) = f x *+ n.`
-  - `V` -- multiplicative inverse, as in `mulVr : x^-1 * x = 1.`
-  - `X` -- exponentiation, as in `rmorphX : f (x ^+ n) = f x ^+ n.`
-  - `Z` -- (left) module scaling, as in `linearZ : f (a *: v)  = s *: f v.`
-  - `z` -- an int argument.
+    + `orb_andr : right_distributive orb andb`
+    + ``ler_normr x y : (x <= `|y|) = (x <= y) || (x <= - y)``
+    + alternatively, it is a ring argument
+  - `R` -- the right-hand of a relation, as in `ltn_subrR : n < n - m = false`
+  - `RL` -- moving an operator from the right-hand to the left-hand of an relation, as in `ltn_subRL : (n < p - m) = (m + n < p)`
+  - `T` or `t` -- boolean truth, as in `andbT: right_id true andb`
+  - `T` -- alternatively, total set
+  - `U` -- predicate or set union, as in `predU`
+  - `W` -- weakening, as in `in1W : {in D, forall x, P} -> forall x, P`
+  - `0` -- ring or nat 0, or empty set, as in `addr0 : x + 0 = x`
+  - `1` -- ring; nat or group 1, as in `mulr1 : x * 1 = x`
+  - `D` -- addition, as in `linearD : f (u + v) = f u + f v`
+  - `B` -- subtraction, as in `opprB : - (x - y) = y - x`
+  - `M` -- multiplication, as in `invfM : (x * y)^-1 = x^-1 * y^-1`
+  - `Mn` -- ring nat multiplication, as in `raddfMn : f (x *+ n) = f x *+ n`
+  - `V` -- multiplicative inverse, as in `mulVr : x^-1 * x = 1`
+  - `X` -- exponentiation, as in `rmorphXn : f (x ^+ n) = f x ^+ n`
+    + `Xn` -- nat exponentiation
+    + `Xz` -- int exponentiation
+  - `Z` -- (left) module scaling, as in `linearZ : f (a *: v)  = s *: f v`
+  - `z` -- an int argument
+  - `p` -- positive number, as in `ltr_pM2l x : 0 < x -> {mono *%R x : x y / x < y}`
+  - `n` -- negative number
 
 #### Special naming conventions (non exhaustive)
 - For the infix membership predicate `_ \in _`, the prefix `in_` is used for lemmas that unfold specific predicates, possibly propagating the infix membership (e.g, `in_cons` or `in_set0`). These lemmas are generally part of the `inE` multirule. Other lemmas involving the infix membership predicated use the generic prefix `mem_` (e.g., `mem_head` or `mem_map`).
