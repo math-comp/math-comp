@@ -744,56 +744,41 @@ Qed.
 Lemma subset_all s A : (s \subset A) = all [in A] s.
 Proof. exact: (sameP (subsetP _ _) allP). Qed.
 
-Lemma subset_cons s x:
-  s \subset x :: s.
-Proof. by apply/subsetP=> y; rewrite inE=> yins; rewrite yins orbT.
+Lemma subset_cons s x : s \subset x :: s.
+Proof. by apply/subsetP => y /[!inE] ->; rewrite orbT. Qed.
+
+Lemma subset_cons2 s1 s2 x : s1 \subset s2 -> x :: s1 \subset x :: s2.
+Proof. 
+by move=> ?; apply/subsetP => y /[!inE]; case: eqP => // _; apply: subsetP.
 Qed.
 
-Lemma subset_cons2 s1 s2 x:
-  s1 \subset s2 -> x :: s1 \subset x :: s2.
+Lemma subset_catl s s' : s \subset s ++ s'.
+Proof. by apply/subsetP=> x xins; rewrite mem_cat xins. Qed.
+
+Lemma subset_catr s s' : s \subset s' ++ s.
+Proof. by apply/subsetP => x xins; rewrite mem_cat xins orbT. Qed.
+
+Lemma subset_cat2 s1 s2 s3 : s1 \subset s2 -> s3 ++ s1 \subset s3 ++ s2.
 Proof.
-move/subsetP=> ss1s2; apply/subsetP => y.
-by rewrite !inE; case: eqP=> //= _; apply: ss1s2.
+move=> /subsetP s12; apply/subsetP => x.
+by rewrite !mem_cat => /orP[->|/s12->]; rewrite ?orbT.
 Qed.
 
-Lemma subset_catl (s s': seq T):
-  s \subset s ++ s'.
-Proof.
-by apply/subsetP=> x xins; rewrite mem_cat xins.
-Qed.
+Lemma filter_subset p s : [seq a <- s | p a] \subset s.
+Proof. by apply/subsetP=> x; rewrite mem_filter => /andP[]. Qed.
 
-Lemma subset_catr (s s': seq T):
-  s \subset s' ++ s.
-Proof.
-by apply/subsetP=> x xins; rewrite mem_cat xins; apply/orP; right.
-Qed.
 
-Lemma subset_cat2 (s1 s2 s3: seq T):
-  s1 \subset s2 -> s3 ++ s1 \subset s3 ++ s2.
-Proof.
-move/subsetP=> ss1s2; apply /subsetP=> x; rewrite !mem_cat=> /orP-[xins3|xins1].
-  by apply/orP; left.
-by apply/orP; right; apply ss1s2.
-Qed.
-
-Lemma filter_subset p s :
-  [seq a <- s | p a] \subset s.
-Proof.
-by apply/subsetP=> x; rewrite mem_filter => /andP-[px xins].
-Qed.
-
-Lemma subset_filter p (s1 s2 : seq T) :
+Lemma subset_filter p s1 s2 :
   s1 \subset s2 -> [seq a <- s1 | p a] \subset [seq a <- s2 | p a].
 Proof.
-move/subsetP=> ss1s2; apply/subsetP=> x; rewrite !mem_filter=> /andP-[px xins1].
-by apply/andP; split => //; apply ss1s2.
+by move/subsetP=> s12; apply/subsetP=> x; rewrite !mem_filter=> /andP[-> /s12].
 Qed.
 
 Lemma map_subset {T' : eqType} s1 s2 (f : T -> T') :
   s1 \subset s2 -> {subset [seq f x | x <- s1 ] <= [seq f x | x <- s2]}.
 Proof.
-move/subsetP=> ss1s2 x; move/mapP=> [y yins1] eqxfy; apply/mapP.
-by exists y=> //=; apply ss1s2.
+move=> /subsetP ss1s2 x /mapP[y yins1] eqxfy.
+by apply/mapP; exists y => //; apply: ss1s2.
 Qed.
 
 Lemma properE A B : A \proper B = (A \subset B) && ~~(B \subset A).
