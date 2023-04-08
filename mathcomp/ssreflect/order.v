@@ -3836,7 +3836,7 @@ Proof. by move=> /subsetP AB; apply/joinsP => i iA; apply/joins_sup/AB. Qed.
 Lemma joins_setU I (A B : {set I}) (F : I -> L) :
   \join_(i in (A :|: B)) F i = \join_(i in A) F i `|` \join_(i in B) F i.
 Proof.
-rewrite -!big_enum; have /= <- := @big_cat _ _ [the Monoid.com_law _ of join].
+rewrite -!big_enum; have /= <- := @big_cat _ _ join.
 apply/eq_big_idem; first exact: joinxx.
 by move=> ?; rewrite mem_cat !mem_enum inE.
 Qed.
@@ -3946,7 +3946,7 @@ Proof. by move=> /subsetP AB; apply/meetsP => i iA; apply/meets_inf/AB. Qed.
 Lemma meets_setU I (A B : {set I}) (F : I -> L) :
    \meet_(i in (A :|: B)) F i = \meet_(i in A) F i `&` \meet_(i in B) F i.
 Proof.
-rewrite -!big_enum; have /= <- := @big_cat _ _ [the Monoid.com_law _ of meet].
+rewrite -!big_enum; have /= <- := @big_cat _ _ meet.
 apply/eq_big_idem; first exact: meetxx.
 by move=> ?; rewrite mem_cat !mem_enum inE.
 Qed.
@@ -4042,23 +4042,21 @@ Implicit Types (I : finType) (T : eqType) (x y : L).
 
 Local Notation "1" := top.
 
-Local Notation Ld := [the tbDistrLatticeType _ of L^d].
-
 Lemma leI2l_le y t x z : y `|` z = 1 -> x `&` y <= z `&` t -> x <= z.
-Proof. by rewrite joinC; exact: (@leU2l_le _ Ld). Qed.
+Proof. by rewrite joinC; exact: (@leU2l_le _ L^d). Qed.
 
 Lemma leI2r_le y t x z : y `|` z = 1 -> y `&` x <= t `&` z -> x <= z.
-Proof. by rewrite joinC; exact: (@leU2r_le _ Ld). Qed.
+Proof. by rewrite joinC; exact: (@leU2r_le _ L^d). Qed.
 
 Lemma cover_leIxl z x y : z `|` y = 1 -> (x `&` z <= y) = (x <= y).
-Proof. by rewrite joinC; exact: (@disjoint_lexUl _ Ld). Qed.
+Proof. by rewrite joinC; exact: (@disjoint_lexUl _ L^d). Qed.
 
 Lemma cover_leIxr z x y : z `|` y = 1 -> (z `&` x <= y) = (x <= y).
-Proof. by rewrite joinC; exact: (@disjoint_lexUr _ Ld). Qed.
+Proof. by rewrite joinC; exact: (@disjoint_lexUr _ L^d). Qed.
 
 Lemma leI2E x y z t : x `|` t = 1 -> y `|` z = 1 ->
   (x `&` y <= z `&` t) = (x <= z) && (y <= t).
-Proof. by move=> ? ?; apply: (@leU2E _ Ld); rewrite meetC. Qed.
+Proof. by move=> ? ?; apply: (@leU2E _ L^d); rewrite meetC. Qed.
 
 HB.instance Definition _ := Monoid.isAddLaw.Build L meet join
   (@meetUl _ L) (@meetUr _ _).
@@ -4067,7 +4065,7 @@ HB.instance Definition _ := Monoid.isAddLaw.Build L join meet
 
 Lemma meets_total I (d : L) (P : {pred I}) (F : I -> L) :
    (forall i : I, P i -> d `|` F i = 1) -> d `|` \meet_(i | P i) F i = 1.
-Proof. exact: (@joins_disjoint _ Ld). Qed.
+Proof. exact: (@joins_disjoint _ L^d). Qed.
 
 End TBDistrLatticeTheory.
 End TBDistrLatticeTheory.
@@ -7684,8 +7682,7 @@ Lemma sorted_filter_gt x s :
   sorted <=%O s -> [seq y <- s | x < y] = drop (count (<= x) s) s.
 Proof.
 move=> s_sorted; rewrite count_le_gt -[LHS]revK -filter_rev.
-rewrite (@sorted_filter_lt _ [the orderType _ of T^d]).
-  by rewrite take_rev revK count_rev.
+rewrite (@sorted_filter_lt _ T^d); first by rewrite take_rev revK count_rev.
 by rewrite rev_sorted.
 Qed.
 
@@ -7693,8 +7690,7 @@ Lemma sorted_filter_ge x s :
   sorted <=%O s -> [seq y <- s | x <= y] = drop (count (< x) s) s.
 Proof.
 move=> s_sorted; rewrite count_lt_ge -[LHS]revK -filter_rev.
-rewrite (@sorted_filter_le _ [the orderType _ of T^d]).
-  by rewrite take_rev revK count_rev.
+rewrite (@sorted_filter_le _ T^d); first by rewrite take_rev revK count_rev.
 by rewrite rev_sorted.
 Qed.
 

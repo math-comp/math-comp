@@ -2905,8 +2905,7 @@ by rewrite -(morphim_mx_abs_irr _ nHG) splitG //; apply/morphim_mx_irr.
 Qed.
 
 Lemma coset_splitting_field gT (H : {set gT}) :
-  group_closure_field gT ->
-  group_closure_field [the finGroupType of coset_of H].
+  group_closure_field gT -> group_closure_field (coset_of H).
 Proof.
 move=> split_gT Gbar; have ->: Gbar = (coset H @*^-1 Gbar / H)%G.
   by apply: val_inj; rewrite /= /quotient morphpreK ?sub_im_coset.

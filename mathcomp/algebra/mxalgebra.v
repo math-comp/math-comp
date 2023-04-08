@@ -2818,8 +2818,7 @@ rewrite /= [row i _ as v in a *: v]row_mul mul_rV_lin row_mul mul_rV_lin.
 by rewrite -linearP -(linearP [linear of mulmx (vec_mx (row i R)) \- mulmxr _]).
 Qed.
 HB.instance Definition _ :=
-  GRing.isLinear.Build F
-    [the lmodType F of 'M[F]_n] [the zmodType of 'M[F]_(m, n * n)] _ cent_mx_fun
+  GRing.isLinear.Build F 'M[F]_n 'M[F]_(m, n * n) _ cent_mx_fun
     cent_mx_fun_is_linear.
 
 Definition cent_mx := kermx (lin_mx cent_mx_fun).

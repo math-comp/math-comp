@@ -137,7 +137,7 @@ End OtherDefs.
 
 Module Import VectorExports.
 Bind Scope ring_scope with Vector.sort.
-Notation "[ 'vectType' R 'of' T 'for' cT ]" := (@Vector.clone [the ringType of R] T%type cT)
+Notation "[ 'vectType' R 'of' T 'for' cT ]" := (@Vector.clone R T%type cT)
   (at level 0, format "[ 'vectType'  R  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'vectType' R 'of' T ]" := [vectType R of T%type for _]
   (at level 0, format "[ 'vectType'  R  'of'  T ]") : form_scope.
@@ -180,12 +180,10 @@ Lemma r2v_inj : injective r2v. Proof. exact: can_inj r2vK. Qed.
 Lemma v2rK : cancel v2r r2v.   Proof. by have/bij_can_sym:= r2vK; apply. Qed.
 Lemma v2r_inj : injective v2r. Proof. exact: can_inj v2rK. Qed.
 
-HB.instance Definition _ :=
-  GRing.isLinear.Build R vT [zmodType of 'rV_vT] _ v2r
-    (s2valP v2r_subproof).
-HB.instance Definition _ :=
-  GRing.isLinear.Build R [the lmodType R of 'rV_vT] vT _ r2v
-    (can2_linear v2rK r2vK).
+HB.instance Definition _ := GRing.isLinear.Build R vT 'rV_vT _ v2r
+  (s2valP v2r_subproof).
+HB.instance Definition _ := GRing.isLinear.Build R 'rV_vT vT _ r2v
+  (can2_linear v2rK r2vK).
 End Iso.
 
 Section Vspace.
@@ -1876,9 +1874,8 @@ Lemma subvs_inj : injective vsval. Proof. exact: val_inj. Qed.
 Lemma congr_subvs u v : u = v -> vsval u = vsval v. Proof. exact: congr1. Qed.
 
 Lemma vsval_is_linear : linear vsval. Proof. by []. Qed.
-HB.instance Definition _ :=
-  GRing.isLinear.Build K [the lmodType K of subvs_of] vT _ vsval
-    vsval_is_linear.
+HB.instance Definition _ := GRing.isLinear.Build K subvs_of vT _ vsval
+  vsval_is_linear.
 
 Fact vsproj_key : unit. Proof. by []. Qed.
 Definition vsproj_def u := Subvs (memv_proj U u).
@@ -1892,9 +1889,8 @@ Proof. by move=> w; apply/val_inj/vsprojK/subvsP. Qed.
 
 Lemma vsproj_is_linear : linear vsproj.
 Proof. by move=> k w1 w2; apply: val_inj; rewrite unlock /= linearP. Qed.
-HB.instance Definition _ :=
-  GRing.isLinear.Build K vT [the zmodType of subvs_of] _ vsproj
-    vsproj_is_linear.
+HB.instance Definition _ := GRing.isLinear.Build K vT subvs_of _ vsproj
+  vsproj_is_linear.
 
 Fact subvs_vect_iso : vector_axiom (\dim U) subvs_of.
 Proof.

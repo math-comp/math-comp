@@ -1640,9 +1640,8 @@ Proof. by apply: (big_morph (fun A => A i j)) => [A B|]; rewrite mxE. Qed.
 
 Lemma const_mx_is_semi_additive : semi_additive const_mx.
 Proof. by split=> [|a b]; apply/matrixP => // i j; rewrite !mxE. Qed.
-HB.instance Definition _ :=
-  GRing.isSemiAdditive.Build V [the zsemimodType of 'M[V]_(m, n)] const_mx
-    const_mx_is_semi_additive.
+HB.instance Definition _ := GRing.isSemiAdditive.Build V 'M[V]_(m, n) const_mx
+  const_mx_is_semi_additive.
 
 End FixedDim.
 
@@ -1655,10 +1654,8 @@ Definition swizzle_mx k (A : 'M[V]_(m, n)) :=
 
 Lemma swizzle_mx_is_semi_additive k : semi_additive (swizzle_mx k).
 Proof. by split=> [|A B]; apply/matrixP => i j; rewrite !mxE. Qed.
-HB.instance Definition _ k :=
-  GRing.isSemiAdditive.Build
-    [the zsemimodType of 'M_(m, n)] [the zsemimodType of 'M_(p, q)]
-    (swizzle_mx k) (swizzle_mx_is_semi_additive k).
+HB.instance Definition _ k := GRing.isSemiAdditive.Build 'M_(m, n) 'M_(p, q)
+  (swizzle_mx k) (swizzle_mx_is_semi_additive k).
 
 End SemiAdditive.
 
@@ -1679,10 +1676,8 @@ HB.instance Definition _ m n1 n2 := SwizzleAdd (@rsubmx V m n1 n2).
 HB.instance Definition _ m1 m2 n := SwizzleAdd (@usubmx V m1 m2 n).
 HB.instance Definition _ m1 m2 n := SwizzleAdd (@dsubmx V m1 m2 n).
 HB.instance Definition _ m n := SwizzleAdd (@vec_mx V m n).
-HB.instance Definition _ m n :=
-  GRing.isSemiAdditive.Build
-    [the zsemimodType of 'M_(m, n)] [the zsemimodType of 'rV_(m * n)] mxvec
-    (can2_semi_additive (@vec_mxK V m n) mxvecK).
+HB.instance Definition _ m n := GRing.isSemiAdditive.Build 'M_(m, n) 'rV_(m * n)
+  mxvec (can2_semi_additive (@vec_mxK V m n) mxvecK).
 
 Lemma flatmx0 n : all_equal_to (0 : 'M_(0, n)).
 Proof. by move=> A; apply/matrixP=> [] []. Qed.
@@ -1961,10 +1956,8 @@ Lemma diag_mx_is_semi_additive n : semi_additive (@diag_mx n).
 Proof.
 by split=> [|A B]; apply/matrixP => i j; rewrite !mxE ?mul0rn// mulrnDl.
 Qed.
-HB.instance Definition _ n :=
-  GRing.isSemiAdditive.Build
-    [the zsemimodType of 'rV_n] [the zsemimodType of 'M_n] (@diag_mx n)
-    (@diag_mx_is_semi_additive n).
+HB.instance Definition _ n := GRing.isSemiAdditive.Build 'rV_n 'M_n (@diag_mx n)
+  (@diag_mx_is_semi_additive n).
 
 Lemma diag_mx_row m n (l : 'rV_n) (r : 'rV_m) :
   diag_mx (row_mx l r) = block_mx (diag_mx l) 0 0 (diag_mx r).
@@ -2006,9 +1999,8 @@ Proof. by apply/matrixP=> i j; rewrite !mxE eq_sym. Qed.
 
 Lemma scalar_mx_is_semi_additive : semi_additive scalar_mx.
 Proof. by split=> [|a b]; rewrite -!diag_const_mx ?raddf0// !raddfD. Qed.
-HB.instance Definition _ :=
-  GRing.isSemiAdditive.Build V [the zsemimodType of 'M_n] scalar_mx
-    scalar_mx_is_semi_additive.
+HB.instance Definition _ := GRing.isSemiAdditive.Build V 'M_n scalar_mx
+  scalar_mx_is_semi_additive.
 
 Definition is_scalar_mx (A : 'M[V]_n) :=
   if insub 0%N is Some i then A == (A i i)%:M else true.
@@ -2070,9 +2062,8 @@ split=> [|A B].
   by rewrite big_const_idem //= addr0.
 - by rewrite -big_split /=; apply: eq_bigr => i _; rewrite mxE.
 Qed.
-HB.instance Definition _ :=
-  GRing.isSemiAdditive.Build [the zsemimodType of 'M_n] V mxtrace
-    mxtrace_is_semi_additive.
+HB.instance Definition _ := GRing.isSemiAdditive.Build 'M_n V mxtrace
+  mxtrace_is_semi_additive.
 
 Lemma mxtrace0 : \tr 0 = 0. Proof. exact: raddf0. Qed.
 Lemma mxtraceD A B : \tr (A + B) = \tr A + \tr B. Proof. exact: raddfD. Qed.
@@ -2124,9 +2115,8 @@ Proof. by apply/matrixP=> i j; rewrite !mxE raddfD. Qed.
 Definition map_mx_sum := big_morph _ map_mxD map_mx0.
 
 HB.instance Definition _ :=
-  GRing.isSemiAdditive.Build
-    [the zsemimodType of 'M[aR]_(m, n)] [the zsemimodType of 'M[rR]_(m, n)]
-    (map_mx f) (map_mx0, map_mxD).
+  GRing.isSemiAdditive.Build 'M[aR]_(m, n) 'M[rR]_(m, n) (map_mx f)
+    (map_mx0, map_mxD).
 
 End MapZsemimodMatrix.
 
@@ -2150,9 +2140,8 @@ HB.instance Definition _ := GRing.Zsemimodule_isZmodule.Build 'M[V]_(m, n)
 
 Lemma const_mx_is_additive : additive const_mx.
 Proof. by move=> a b; apply/matrixP=> i j; rewrite !mxE. Qed.
-HB.instance Definition _ :=
-  GRing.isAdditive.Build V [the zmodType of 'M[V]_(m, n)] const_mx
-    const_mx_is_additive.
+HB.instance Definition _ := GRing.isAdditive.Build V 'M[V]_(m, n) const_mx
+  const_mx_is_additive.
 
 End FixedDim.
 
@@ -2162,10 +2151,8 @@ Variables (m n p q : nat) (f : 'I_p -> 'I_q -> 'I_m) (g : 'I_p -> 'I_q -> 'I_n).
 
 Lemma swizzle_mx_is_additive k : additive (swizzle_mx f g k).
 Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE. Qed.
-HB.instance Definition _ k :=
-  GRing.isAdditive.Build
-    [the zmodType of 'M_(m, n)] [the zmodType of 'M_(p, q)] (swizzle_mx f g k)
-    (swizzle_mx_is_additive k).
+HB.instance Definition _ k := GRing.isAdditive.Build 'M_(m, n) 'M_(p, q)
+  (swizzle_mx f g k) (swizzle_mx_is_additive k).
 
 End Additive.
 
@@ -2186,10 +2173,8 @@ HB.instance Definition _ m n1 n2 := SwizzleAdd (@rsubmx V m n1 n2).
 HB.instance Definition _ m1 m2 n := SwizzleAdd (@usubmx V m1 m2 n).
 HB.instance Definition _ m1 m2 n := SwizzleAdd (@dsubmx V m1 m2 n).
 HB.instance Definition _ m n := SwizzleAdd (@vec_mx V m n).
-HB.instance Definition _ m n :=
-  GRing.isAdditive.Build
-    [the zmodType of 'M_(m, n)] [the zmodType of 'rV_(m * n)] mxvec
-    (can2_additive (@vec_mxK V m n) mxvecK).
+HB.instance Definition _ m n := GRing.isAdditive.Build 'M_(m, n) 'rV_(m * n)
+  mxvec (can2_additive (@vec_mxK V m n) mxvecK).
 
 Ltac split_mxE := apply/matrixP=> i j; do ![rewrite mxE | case: split => ?].
 
@@ -2211,9 +2196,8 @@ Lemma diag_mx_is_additive n : additive (@diag_mx V n).
 Proof.
 by move=>A B; apply/matrixP=>i j; rewrite !mxE mulrnBl.
 Qed.
-HB.instance Definition _ n :=
-  GRing.isAdditive.Build [the zmodType of 'rV_n] [the zmodType of 'M_n]
-    (@diag_mx V n) (@diag_mx_is_additive n).
+HB.instance Definition _ n := GRing.isAdditive.Build 'rV_n 'M_n (@diag_mx V n)
+  (@diag_mx_is_additive n).
 
 (* Scalar matrix : a diagonal matrix with a constant on the diagonal *)
 Section ScalarMx.
@@ -2222,9 +2206,8 @@ Variable n : nat.
 
 Lemma scalar_mx_is_additive : additive (@scalar_mx V n).
 Proof. by move=> a b; rewrite -!diag_const_mx !raddfB. Qed.
-HB.instance Definition _ :=
-  GRing.isAdditive.Build V [the zmodType of 'M_n] scalar_mx
-    scalar_mx_is_additive.
+HB.instance Definition _ := GRing.isAdditive.Build V 'M_n scalar_mx
+  scalar_mx_is_additive.
 
 End ScalarMx.
 
@@ -2238,9 +2221,8 @@ Proof.
 move=>A B; rewrite -sumrN -big_split /=.
 by apply: eq_bigr=> i _; rewrite !mxE.
 Qed.
-HB.instance Definition _ :=
-  GRing.isAdditive.Build [the zmodType of 'M_n] V (@mxtrace V n)
-    mxtrace_is_additive.
+HB.instance Definition _ := GRing.isAdditive.Build 'M_n V (@mxtrace V n)
+  mxtrace_is_additive.
 
 End Trace.
 
@@ -2750,9 +2732,8 @@ Lemma idmxE : 1%:M = 1 :> 'M_n. Proof. by []. Qed.
 
 Lemma scalar_mx_is_multiplicative : multiplicative (@scalar_mx R n).
 Proof. by split=> //; apply: scalar_mxM. Qed.
-HB.instance Definition _ :=
-  GRing.isMultiplicative.Build R [the semiRingType of 'M_n] (@scalar_mx _ n)
-    scalar_mx_is_multiplicative.
+HB.instance Definition _ := GRing.isMultiplicative.Build R 'M_n (@scalar_mx _ n)
+  scalar_mx_is_multiplicative.
 
 End MatrixSemiRing.
 
@@ -2906,9 +2887,8 @@ Lemma map_mx_is_multiplicative n' (n := n'.+1) :
 Proof. by split; [apply: map_mxM | apply: map_mx1]. Qed.
 
 HB.instance Definition _ n' :=
-  GRing.isMultiplicative.Build
-    [the semiRingType of 'M[aR]_n'.+1] [the semiRingType of 'M[rR]_n'.+1]
-    (map_mx f) (map_mx_is_multiplicative n').
+  GRing.isMultiplicative.Build 'M[aR]_n'.+1 'M[rR]_n'.+1 (map_mx f)
+    (map_mx_is_multiplicative n').
 
 End MapSemiRingMatrix.
 
@@ -3081,9 +3061,7 @@ Lemma swizzle_mx_is_scalable m n p q f g k :
   scalable (@swizzle_mx R m n p q f g k).
 Proof. by move=> a A; apply/matrixP=> i j; rewrite !mxE. Qed.
 HB.instance Definition _ m n p q f g k :=
-  GRing.isScalable.Build R
-    [the lmodType R of 'M[R]_(m, n)] [the zmodType of 'M[R]_(p, q)]
-    *:%R (swizzle_mx f g k)
+  GRing.isScalable.Build R 'M[R]_(m, n) 'M[R]_(p, q) *:%R (swizzle_mx f g k)
     (swizzle_mx_is_scalable f g k).
 
 Local Notation SwizzleLin op := (GRing.Linear.copy op (swizzle_mx _ _ _)).
@@ -3106,8 +3084,7 @@ HB.instance Definition _ m1 m2 n := SwizzleLin (@dsubmx R m1 m2 n).
 HB.instance Definition _ m n := SwizzleLin (@vec_mx R m n).
 Definition mxvec_is_scalable m n := can2_scalable (@vec_mxK R m n) mxvecK.
 HB.instance Definition _ m n :=
-  GRing.isScalable.Build R
-    [the lmodType R of 'M_(m, n)] [the zmodType of 'rV_(m * n)] *:%R mxvec
+  GRing.isScalable.Build R 'M_(m, n) 'rV_(m * n) *:%R mxvec
     (@mxvec_is_scalable m n).
 
 End StructuralLinear.
@@ -3137,10 +3114,8 @@ Lemma diag_mx_is_linear n : linear (@diag_mx R n).
 Proof.
 by move=> a A B; apply/matrixP=> i j; rewrite !mxE mulrnAr mulrnDl.
 Qed.
-HB.instance Definition _ n :=
-  GRing.isLinear.Build R
-    [the lmodType R of 'rV_n] [the zmodType of 'M_n] _ (@diag_mx _ n)
-    (@diag_mx_is_linear n).
+HB.instance Definition _ n := GRing.isLinear.Build R 'rV_n 'M_n _ (@diag_mx _ n)
+  (@diag_mx_is_linear n).
 
 Lemma diag_mx_sum_delta n (d : 'rV_n) :
   diag_mx d = \sum_i d 0 i *: delta_mx i i.
@@ -3281,8 +3256,7 @@ Definition lin_mulmxr B := lin_mx (mulmxr B).
 Lemma mulmxr_is_linear B : linear (mulmxr B).
 Proof. by move=> a A1 A2; rewrite /= mulmxDl scalemxAl. Qed.
 HB.instance Definition _ B :=
-  GRing.isLinear.Build R
-    [the lmodType R of 'M_(m, n)] [the zmodType of 'M_(m, p)] _ (mulmxr B)
+  GRing.isLinear.Build R 'M_(m, n) 'M_(m, p) _ (mulmxr B)
     (mulmxr_is_linear B).
 
 Lemma lin_mulmxr_is_linear : linear lin_mulmxr.
@@ -3313,9 +3287,8 @@ Proof.
 move=> a A B; rewrite mulr_sumr -big_split /=.
 by apply: eq_bigr=> i _; rewrite !mxE.
 Qed.
-HB.instance Definition _ :=
-  GRing.isLinear.Build R [the lmodType R of 'M_n] R _ (@mxtrace _ n)
-    mxtrace_is_scalar.
+HB.instance Definition _ := GRing.isLinear.Build R 'M_n R _ (@mxtrace _ n)
+  mxtrace_is_scalar.
 
 Lemma mxtraceZ a (A : 'M_n) : \tr (a *: A) = a * \tr A.
 Proof. exact: scalarZ. Qed.
@@ -3473,9 +3446,7 @@ Proof. by apply: trmx_inj; rewrite trmx_mul !linearZ /= trmx_mul scalemxAl. Qed.
 Lemma mulmx_is_scalable A : scalable (@mulmx _ m n p A).
 Proof. by move=> a B; rewrite scalemxAr. Qed.
 HB.instance Definition _ A :=
-  GRing.isScalable.Build R
-    [the lmodType R of 'M[R]_(n, p)] [the zmodType of 'M[R]_(m, p)]
-    *:%R (mulmx A)
+  GRing.isScalable.Build R 'M[R]_(n, p) 'M[R]_(m, p) *:%R (mulmx A)
     (mulmx_is_scalable A).
 
 Definition lin_mulmx A : 'M[R]_(n * p, m * p) := lin_mx (mulmx A).
@@ -3486,9 +3457,7 @@ move=> a A B; apply/row_matrixP=> i; rewrite linearP /= !rowE !mul_rV_lin /=.
 by rewrite [_ *m _](linearP [linear of mulmxr (_ : 'M[R]__)]) linearP.
 Qed.
 HB.instance Definition _ :=
-  GRing.isLinear.Build R
-    [the lmodType R of 'M[R]_(m, n)] [the zmodType of 'M[R]_(n * p, m * p)]
-    _ lin_mulmx
+  GRing.isLinear.Build R 'M[R]_(m, n) 'M[R]_(n * p, m * p) _ lin_mulmx
     lin_mulmx_is_linear.
 
 End AssocLeft.

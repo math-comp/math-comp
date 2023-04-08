@@ -650,12 +650,12 @@ End ClosedFieldQE.
 End ClosedFieldQE.
 
 HB.factory Record Field_isAlgClosed F of GRing.Field F := {
-  solve_monicpoly : GRing.closed_field_axiom [the ringType of F];
+  solve_monicpoly : GRing.closed_field_axiom F;
 }.
 
 HB.builders Context F of Field_isAlgClosed F.
   HB.instance Definition _ := GRing.decidable_of_QE.Build F
-    (@ClosedFieldQE.wf_ex_elim [the GRing.Field.type of F])
+    (@ClosedFieldQE.wf_ex_elim F)
     (ClosedFieldQE.holds_ex_elim solve_monicpoly).
   HB.instance Definition _ := GRing.DecField_isAlgClosed.Build F
     solve_monicpoly.

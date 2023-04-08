@@ -315,7 +315,7 @@ by rewrite inE /= Zx groupV (subsetP sgzZZ) ?mem_morphim.
 Qed.
 
 Fact cprod_by_key : unit. Proof. by []. Qed.
-Definition cprod_by_def := [the finGroupType of subg_of [group of setX H K / kerHK]].
+Definition cprod_by_def : finGroupType := subg_of (setX H K / kerHK).
 Definition cprod_by := locked_with cprod_by_key cprod_by_def.
 Local Notation C := [set: FinGroup.sort cprod_by].
 (*FIXME : Check if we need arg_sort instead of sort*)

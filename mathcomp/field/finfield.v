@@ -185,8 +185,7 @@ Local Notation ffT := (finvect_type fT).
 
 HB.instance Definition _ := FieldExt.on ffT.
 
-Lemma ffT_splitting_subproof :
-  SplittingField.axiom [the fieldExtType _ of ffT].
+Lemma ffT_splitting_subproof : SplittingField.axiom ffT.
 Proof.
 exists ('X^#|ffT| - 'X).
   by rewrite (@rpredB [zmodType of {poly fT}]) 1?rpredX ?polyOverX.
@@ -492,7 +491,7 @@ suffices [L [ys Dp]]: {L : fieldExtType F & splits L p^%:A}.
   have [zs Dys]: {zs | map toL zs = ys}.
     exists (map (vsproj _) ys); rewrite -map_comp map_id_in // => y ys_y.
     by rewrite /= lfunE /= vsprojK ?seqv_sub_adjoin.
-  exists [the fieldExtType F of Lp], zs.
+  exists Lp, zs.
     set lhs := (lhs in lhs %= _); set rhs := (rhs in _ %= rhs).
     suffices: map_poly toL lhs %= map_poly toL rhs by rewrite eqp_map.
     rewrite -Dys big_map in Dp; apply: etrans Dp; apply: congr2.
@@ -503,7 +502,7 @@ suffices [L [ys Dp]]: {L : fieldExtType F & splits L p^%:A}.
   by case/memv_imgP=> v Lzs_v; rewrite memvf lfunE => /val_inj->.
 move: {2}_.+1 (ltnSn (size p)) => n; elim: n => // n IHn in F p nz_p * => lbn.
 have [Cp|C'p] := leqP (size p) 1.
-  exists [the fieldExtType F of F^o], [::].
+  exists F^o, [::].
   by rewrite big_nil -size_poly_eq1 size_map_poly eqn_leq Cp size_poly_gt0.
 have [r r_dv_p irr_r]: {r | r %| p & irreducible_poly r}.
   pose rVp (v : 'rV_n) (r := rVpoly v) := (1 < size r) && (r %| p).
@@ -531,7 +530,7 @@ suffices: splits L p^%:A^%:A.
   rewrite -[_^%:A]map_poly_comp.
 (* FIX ME : had to give the F explicitely  *)
   rewrite -(eq_map_poly (fun a : F => baseField_scaleE a 1)).
-  by exists [the fieldExtType F of baseFieldType L].
+  by exists (baseFieldType L).
 exists (x%:A :: zs); rewrite big_cons; set rhs := _ * _.
 by rewrite Dp mulrC [_^%:A]rmorphM /= mapXsubC /= eqp_mull.
 Qed.

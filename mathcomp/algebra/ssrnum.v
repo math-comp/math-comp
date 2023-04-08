@@ -404,7 +404,7 @@ End RealFieldExports.
 HB.export RealFieldExports.
 
 HB.mixin Record RealField_isArchimedean R of RealField R := {
-  archi_bound_subproof : archimedean_axiom [the NumDomain.type of R]
+  archi_bound_subproof : archimedean_axiom R
 }.
 
 #[short(type="archiFieldType")]
@@ -421,7 +421,7 @@ End ArchimedeanFieldExports.
 HB.export ArchimedeanFieldExports.
 
 HB.mixin Record RealField_isClosed R of RealField R := {
-  poly_ivt_subproof : real_closed_axiom [the NumDomain.type of R]
+  poly_ivt_subproof : real_closed_axiom R
 }.
 
 #[short(type="rcfType")]
@@ -4447,8 +4447,7 @@ HB.builders Context R of IntegralDomain_isNumRing R.
 
   Lemma le01 : 0 <= 1.
   Proof.
-  have n1_nz: `|1| != 0 :> R.
-    by apply: contraNneq (@oner_neq0 [the GRing.Ring.type of R]) => /norm_eq0->.
+  have n1_nz: `|1| != 0 :> R by apply: contraNneq (@oner_neq0 R) => /norm_eq0->.
   by rewrite ge0_def -(inj_eq (mulfI n1_nz)) -normM !mulr1.
   Qed.
 
@@ -4504,7 +4503,7 @@ HB.builders Context R of IntegralDomain_isNumRing R.
 HB.end.
 
 HB.factory Record NumDomain_isReal R of NumDomain R := {
-  real : real_axiom [the NumDomain.type of R]
+  real : real_axiom R
 }.
 
 HB.builders Context R of NumDomain_isReal R.

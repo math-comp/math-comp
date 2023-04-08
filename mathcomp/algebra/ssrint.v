@@ -386,9 +386,7 @@ HB.instance Definition _ := GRing.ComUnitRing_isIntegral.Build int
   intUnitRing.idomain_axiomz.
 
 Definition absz m := match m with Posz p => p | Negz n => n.+1 end.
-Notation "m - n" :=
-  (@GRing.add [the GRing.Zmodule.type of int]
-     m%N (@GRing.opp [the GRing.Zmodule.type of int] n%N)) : distn_scope.
+Notation "m - n" := (@GRing.add int m%N (@GRing.opp int n%N)) : distn_scope.
 Arguments absz m%distn_scope.
 Local Notation "`| m |" := (absz m) : nat_scope.
 

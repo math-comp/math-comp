@@ -169,7 +169,7 @@ HB.instance Definition _ :=
 HB.instance Definition _ :=
   @GRing.isMultiplicative.Build _ _ kHomf (kHom_is_multiplicative homKEf).
 
-Definition kHom_rmorphism := Eval hnf in [the {rmorphism _ -> _} of kHomf].
+Definition kHom_rmorphism := Eval hnf in (kHomf : {rmorphism _ -> _}).
 
 End kHomMorphism.
 
@@ -214,7 +214,7 @@ HB.instance Definition _ := @GRing.isAdditive.Build _ _ kHomf
   kHomExtend_additive_subproof.
 HB.instance Definition _ := @GRing.isScalable.Build _ _ _ _ kHomf
   kHomExtend_scalable_subproof.
-Let kHomExtendLinear := Eval hnf in [the {linear _ -> _} of kHomf].
+Let kHomExtendLinear := Eval hnf in (kHomf : {linear _ -> _}).
 Definition kHomExtend := linfun kHomExtendLinear.
 
 Lemma kHomExtendE z : kHomExtend z = (map_poly f (Fadjoin_poly E x z)).[y].
@@ -361,9 +361,8 @@ Arguments kHom_lrmorphism {F L f}.
 Definition splitting_field_axiom (F : fieldType) (L : fieldExtType F) :=
   exists2 p : {poly L}, p \is a polyOver 1%VS & splittingFieldFor 1 p {:L}.
 
-HB.mixin Record FieldExt_isSplittingField
-    (F : fieldType) L of FieldExt F L := {
-  splittingFieldP_subproof : splitting_field_axiom [the fieldExtType _ of L]
+HB.mixin Record FieldExt_isSplittingField (F : fieldType) L of FieldExt F L := {
+  splittingFieldP_subproof : splitting_field_axiom L
 }.
 
 #[mathcomp(axiom="splitting_field_axiom"), infer(F), short(type="splittingFieldType")]
@@ -421,8 +420,7 @@ HB.end.
 
 HB.instance Definition _ (F : fieldType) := GRing.Field.on (F^o).
 
-Fact regular_splittingAxiom (F : fieldType) :
-  SplittingField.axiom [the fieldExtType F of F^o].
+Fact regular_splittingAxiom (F : fieldType) : SplittingField.axiom F^o.
 Proof.
 exists 1; first exact: rpred1.
 by exists [::]; [rewrite big_nil eqpxx | rewrite Fadjoin_nil regular_fullv].
@@ -451,8 +449,7 @@ apply: sig2_eqW; have [p F0p [rs splitLp genLrs]] := splittingFieldP.
 by exists (p, rs); rewrite // /factF F0p splitLp.
 Qed.
 
-Fact fieldOver_splitting E :
-  SplittingField.axiom [the fieldExtType _ of fieldOver E].
+Fact fieldOver_splitting E : SplittingField.axiom (fieldOver E).
 Proof.
 have [p Fp [r Dp defL]] := splittingFieldP; exists p.
   apply/polyOverP=> j; rewrite trivial_fieldOver.
@@ -465,7 +462,7 @@ by split=> // y r_y; rewrite -defL0 seqv_sub_adjoin.
 Qed.
 
 HB.instance Definition _ E := FieldExt_isSplittingField.Build
-  [the fieldType of subvs_of E] (fieldOver E) (fieldOver_splitting E).
+  (subvs_of E) (fieldOver E) (fieldOver_splitting E).
 
 Lemma enum_AEnd : {kAutL : seq 'AEnd(L) | forall f, f \in kAutL}.
 Proof.
@@ -552,7 +549,7 @@ without loss{d leqd IHd nz_q q_gt1} irr_q: q q_dv_q1 / irreducible_poly q.
 have{irr_q} [Lz [inLz [z qz0]]]: {Lz : fieldExtType F &
   {inLz : 'AHom(L, Lz) & {z : Lz | root (map_poly inLz q) z}}}.
 - have [Lz0 _ [z qz0 defLz]] := irredp_FAdjoin irr_q.
-  pose Lz := [the fieldExtType _ of baseFieldType Lz0].
+  pose Lz : fieldExtType _ := baseFieldType Lz0.
   pose inLz : {rmorphism L -> Lz} := [rmorphism of in_alg Lz0].
   have inLzL_linear: linear (locked inLz).
     move=> a u v; rewrite -(@mulr_algl F Lz) baseField_scaleE.

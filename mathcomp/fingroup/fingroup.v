@@ -270,8 +270,7 @@ End Notations.
 HB.export Notations.
 
 HB.mixin Record BaseFinGroup_isGroup G of BaseFinGroup G := {
-  mulVg_subproof :
-    left_inverse (@oneg [the BaseFinGroup.type of G]) (@invg _) (@mulg _)
+  mulVg_subproof : left_inverse (@oneg G) (@invg _) (@mulg _)
 }.
 
 #[short(type="finGroupType")]
@@ -321,8 +320,7 @@ HB.end.
 
 #[compress_coercions]
 HB.instance Definition _ (T : baseFinGroupType) :
-    Finite (BaseFinGroup.arg_sort T) :=
-  Finite.class [the finType of (T : Type)].
+    Finite (BaseFinGroup.arg_sort T) := Finite.class T.
 
 (* Arguments of conjg are restricted to true groups to avoid an *)
 (* improper interpretation of A ^ B with A and B sets, namely:  *)
@@ -687,8 +685,7 @@ End GroupSet.
 Identity Coercion GroupSet_of_sort : GroupSet.sort >-> set_of.
 
 Module Type GroupSetBaseGroupSig.
-Definition sort (gT : baseFinGroupType) :=
-  BaseFinGroup.arg_sort [the baseFinGroupType of {set gT}].
+Definition sort (gT : baseFinGroupType) := BaseFinGroup.arg_sort {set gT}.
 End GroupSetBaseGroupSig.
 
 Module MakeGroupSetBaseGroup (Gset_base : GroupSetBaseGroupSig).
@@ -697,7 +694,7 @@ End MakeGroupSetBaseGroup.
 
 Module Export GroupSetBaseGroup := MakeGroupSetBaseGroup GroupSet.
 HB.instance Definition _ gT : Finite (GroupSet.sort gT) :=
-   Finite.class [the finType of {set gT}].
+   Finite.class {set gT}.
 
 Section GroupSetMulDef.
 (* Some of these constructs could be defined on a baseFinGroupType. *)

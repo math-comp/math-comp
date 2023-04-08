@@ -624,9 +624,8 @@ Proof. exact: coef_opp_poly. Qed.
 Lemma coefB p q i : (p - q)`_i = p`_i - q`_i.
 Proof. by rewrite coefD coefN. Qed.
 
-HB.instance Definition _ i :=
-  GRing.isAdditive.Build [the zmodType of {poly R}] R (coefp i)
-    (fun p => (coefB p)^~ i).
+HB.instance Definition _ i := GRing.isAdditive.Build {poly R} R (coefp i)
+  (fun p => (coefB p)^~ i).
 
 Lemma coefMn p n i : (p *+ n)`_i = p`_i *+ n.
 Proof. exact: (raddfMn [additive of coefp i]). Qed.
@@ -644,8 +643,7 @@ Proof. by move=> c; apply/polyP=> [[|i]]; rewrite coefN !coefC ?oppr0. Qed.
 Lemma polyCB : {morph (@polyC R) : a b / a - b}.
 Proof. by move=> a b; rewrite polyCD polyCN. Qed.
 
-HB.instance Definition _ :=
-  GRing.isAdditive.Build R [the zmodType of {poly R}] (@polyC _) polyCB.
+HB.instance Definition _ := GRing.isAdditive.Build R {poly R} (@polyC _) polyCB.
 
 Lemma polyCMn n : {morph (@polyC R) : c / c *+ n}. Proof. exact: raddfMn. Qed.
 
@@ -661,9 +659,8 @@ Proof. by rewrite /lead_coef size_opp coefN. Qed.
 
 Fact polyC_multiplicative : multiplicative (@polyC R).
 Proof. by split; first apply: polyCM. Qed.
-HB.instance Definition _ :=
-  GRing.isMultiplicative.Build R [the ringType of {poly R}] (@polyC R)
-    polyC_multiplicative.
+HB.instance Definition _ := GRing.isMultiplicative.Build R {poly R} (@polyC R)
+  polyC_multiplicative.
 
 Lemma polyC_exp n : {morph (@polyC R) : c / c ^+ n}. Proof. exact: rmorphX. Qed.
 
@@ -732,9 +729,8 @@ Qed.
 Lemma size_scale_leq a p : size (a *: p) <= size p.
 Proof. by rewrite -[*:%R]/scale_poly unlock size_poly. Qed.
 
-HB.instance Definition _ i :=
-  GRing.isScalable.Build R [the lmodType R of {poly R}] R *%R (coefp i)
-    (fun a => (coefZ a) ^~ i).
+HB.instance Definition _ i := GRing.isScalable.Build R {poly R} R *%R (coefp i)
+  (fun a => (coefZ a) ^~ i).
 HB.instance Definition _ := GRing.Linear.on (coefp 0).
 
 (* The indeterminate, at last! *)
@@ -1496,10 +1492,8 @@ Proof.
 move=> k p q; apply/polyP=> i.
 by rewrite !(coef_deriv, coefD, coefZ) mulrnDl mulrnAr.
 Qed.
-HB.instance Definition _ :=
-  GRing.isLinear.Build R
-    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ deriv
-    deriv_is_linear.
+HB.instance Definition _ := GRing.isLinear.Build R {poly R} {poly R} _ deriv
+  deriv_is_linear.
 
 Lemma deriv0 : 0^`() = 0.
 Proof. exact: linear0. Qed.
@@ -1578,8 +1572,7 @@ Qed.
 Fact derivn_is_linear n : linear (derivn n).
 Proof. by elim: n => // n IHn a p q; rewrite derivnS IHn linearP. Qed.
 HB.instance Definition _ n :=
-  GRing.isLinear.Build R
-    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ (derivn n)
+  GRing.isLinear.Build R {poly R} {poly R} _ (derivn n)
     (derivn_is_linear n).
 
 Lemma derivnC c n : c%:P^`(n) = if n == 0%N then c%:P else 0.
@@ -1680,8 +1673,7 @@ move=> k p q; apply/polyP=> i.
 by rewrite !(coef_nderivn, coefD, coefZ) mulrnDl mulrnAr.
 Qed.
 HB.instance Definition _ n :=
-  GRing.isLinear.Build R
-    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ (nderivn n)
+  GRing.isLinear.Build R {poly R} {poly R} _ (nderivn n)
     (nderivn_is_linear n).
 
 Lemma nderivnD n : {morph nderivn n : p q / p + q}.
@@ -1920,9 +1912,7 @@ HB.instance Definition _ :=
 Lemma map_polyZ c p : (c *: p)^f = f c *: p^f.
 Proof. by apply/polyP=> i; rewrite !(coef_map, coefZ) /= rmorphM. Qed.
 HB.instance Definition _ :=
-  GRing.isScalable.Build aR
-    [the lmodType aR of {poly aR}] [the zmodType of {poly rR}]
-    (f \; *:%R) (map_poly f)
+  GRing.isScalable.Build aR {poly aR} {poly rR} (f \; *:%R) (map_poly f)
     map_polyZ.
 
 Lemma map_polyX : ('X)^f = 'X.
@@ -1983,8 +1973,7 @@ by apply: comm_coef_poly => i; rewrite coef_map cfu.
 Qed.
 
 HB.instance Definition _ :=
-  GRing.isLinear.Build aR
-    [the lmodType aR of {poly aR}] rR _ (horner_morph cfu)
+  GRing.isLinear.Build aR {poly aR} rR _ (horner_morph cfu)
     horner_is_linear.
 
 HB.instance Definition _ :=
@@ -2072,8 +2061,7 @@ move=> a q r.
 by rewrite /comp_poly rmorphD /= map_polyZ !hornerE_comm mul_polyC.
 Qed.
 HB.instance Definition _ p :=
-  GRing.isLinear.Build R
-    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ (comp_poly p)
+  GRing.isLinear.Build R {poly R} {poly R} _ (comp_poly p)
     (comp_poly_is_linear p).
 
 Lemma comp_poly0 p : 0 \Po p = 0.
@@ -2187,10 +2175,8 @@ Proof. by apply/polyP => i; rewrite !(coefZ, coef_even_poly). Qed.
 Fact even_poly_is_linear : linear even_poly.
 Proof. by move=> k p q; rewrite even_polyD even_polyZ. Qed.
 
-HB.instance Definition _ :=
-  GRing.isLinear.Build R
-    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ even_poly
-    even_poly_is_linear.
+HB.instance Definition _ := GRing.isLinear.Build R {poly R} {poly R} _ even_poly
+  even_poly_is_linear.
 
 Lemma even_polyC (c : R) : even_poly c%:P = c%:P.
 Proof. by apply/polyP => i; rewrite coef_even_poly !coefC; case: i. Qed.
@@ -2224,10 +2210,8 @@ Proof. by apply/polyP => i; rewrite !(coefZ, coef_odd_poly). Qed.
 Fact odd_poly_is_linear : linear odd_poly.
 Proof. by move=> k p q; rewrite odd_polyD odd_polyZ. Qed.
 
-HB.instance Definition _ :=
-  GRing.isLinear.Build R
-    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ odd_poly
-    odd_poly_is_linear.
+HB.instance Definition _ := GRing.isLinear.Build R {poly R} {poly R} _ odd_poly
+  odd_poly_is_linear.
 
 Lemma size_odd_poly_eq p : ~~ odd (size p) -> size (odd_poly p) = (size p)./2.
 Proof.
@@ -2304,8 +2288,7 @@ Fact take_poly_is_linear m : linear (take_poly m).
 Proof. by move=> k p q; rewrite take_polyD take_polyZ. Qed.
 
 HB.instance Definition _ m :=
-  GRing.isLinear.Build R
-    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ (take_poly m)
+  GRing.isLinear.Build R {poly R} {poly R} _ (take_poly m)
     (take_poly_is_linear m).
 
 Lemma take_poly_sum m I r P (p : I -> {poly R}) :
@@ -2368,8 +2351,7 @@ Fact drop_poly_is_linear m : linear (drop_poly m).
 Proof. by move=> k p q; rewrite drop_polyD drop_polyZ. Qed.
 
 HB.instance Definition _ m :=
-  GRing.isLinear.Build R
-    [the lmodType R of {poly R}] [the zmodType of {poly R}] _ (drop_poly m)
+  GRing.isLinear.Build R {poly R} {poly R} _ (drop_poly m)
     (drop_poly_is_linear m).
 
 Lemma drop_poly_sum m I r P (p : I -> {poly R}) :
@@ -2517,7 +2499,7 @@ by split=> [p q|]; rewrite !evalE ?rmorph1// rmorphM.
 Qed.
 
 HB.instance Definition _ x :=
-  GRing.isLinear.Build R [the lmodType R of {poly R}] R _ (horner_eval x)
+  GRing.isLinear.Build R {poly R} R _ (horner_eval x)
     (horner_eval_is_linear x).
 
 HB.instance Definition _ x :=

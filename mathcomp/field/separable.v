@@ -486,7 +486,7 @@ HB.instance Definition _ := @GRing.isAdditive.Build _ _ body
   (extendDerivation_additive_subproof E).
 HB.instance Definition _ := @GRing.isScalable.Build _ _ _ _ body
   (extendDerivation_scalable_subproof E).
-Let extendDerivationLinear := Eval hnf in [the {linear _ -> _} of body].
+Let extendDerivationLinear := Eval hnf in (body : {linear _ -> _}).
 Definition extendDerivation : 'End(L) := linfun extendDerivationLinear.
 End DerivationLinear.
 

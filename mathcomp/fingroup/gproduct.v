@@ -1172,7 +1172,7 @@ Qed.
 HB.instance Definition _ := isMulGroup.Build sdT
   sdprod_mulgA sdprod_mul1g sdprod_mulVg.
 
-Definition sdprod_groupType := [the FinGroup.type of sdT].
+Definition sdprod_groupType : finGroupType := sdT.
 
 Definition sdpair1 x := insubd sdprod_one (1, x) : sdT.
 Definition sdpair2 a := insubd sdprod_one (a, 1) : sdT.

@@ -218,7 +218,7 @@ HB.instance Definition _ (K : {subfield L}) :=
 HB.instance Definition _ (K : {subfield L}) :=
   [SubComUnitRing_isSubIntegralDomain of subvs_of K by <:].
 
-Lemma subvs_fieldMixin K : GRing.field_axiom [the idomainType of subvs_of K].
+Lemma subvs_fieldMixin K : GRing.field_axiom (subvs_of K).
 Proof.
 by move=> w nz_w; rewrite unitrE -val_eqE /= vsval_invf algid1 divff.
 Qed.
@@ -341,9 +341,8 @@ move=> a u v; apply/polyP=> i; rewrite coefD coefZ !coef_poly.
 case: ifP => lti; last by rewrite mulr0 addr0.
 by rewrite linearP mulrA -mulrDl mulr_algl.
 Qed.
-HB.instance Definition _ :=
-  GRing.isLinear.Build F0 L [the zmodType of {poly L}] _ Fadjoin_poly
-    Fadjoin_poly_is_linear.
+HB.instance Definition _ := GRing.isLinear.Build F0 L {poly L} _ Fadjoin_poly
+  Fadjoin_poly_is_linear.
 
 Lemma size_minPoly : size minPoly = n.+1.
 Proof. by rewrite size_addl ?size_polyXn // size_opp ltnS size_poly. Qed.
@@ -555,7 +554,7 @@ move=> a p; rewrite -mul_polyC rmorphM /= fieldExt_hornerC.
 by rewrite -scalerAl mul1r.
 Qed.
 HB.instance Definition _ :=
-  GRing.isScalable.Build F0 [the lmodType F0 of {poly F0}] L *:%R fieldExt_horner
+  GRing.isScalable.Build F0 {poly F0} L *:%R fieldExt_horner
     fieldExt_hornerZ.
 
 End Horner.
@@ -654,7 +653,7 @@ Proof. exact: mulrCA. Qed.
 HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build _ L_F
   fieldOver_scaleAr.
 
-Fact fieldOver_vectMixin : Lmodule_hasFinDim [the ringType of K_F] L_F.
+Fact fieldOver_vectMixin : Lmodule_hasFinDim K_F L_F.
 Proof.
 have [bL [_ nz_bL] [defL dxSbL]] := field_module_semisimple (subvf (F * _)).
 do [set n := \dim_F {:L} in bL nz_bL *; set SbL := (\sum_i _)%VS] in defL dxSbL.
@@ -811,7 +810,7 @@ Let n := \dim {:F}.
 Let bF : n.-tuple F := vbasis {:F}.
 Let coordF (x : F) := (coord_vbasis (memvf x)).
 
-Fact baseField_vectMixin : Lmodule_hasFinDim [the fieldType of F0] L0.
+Fact baseField_vectMixin : Lmodule_hasFinDim F0 L0.
 Proof.
 pose bL := vbasis {:L}; set m := \dim {:L} in bL.
 pose v2r (x : L0) := mxvec (\matrix_(i, j) coord bF j (coord bL i x)).
@@ -1235,8 +1234,7 @@ HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build _ subFExtend
 Fact subfx_evalZ : scalable subfx_eval.
 Proof. by move=> a q; rewrite -mul_polyC rmorphM. Qed.
 HB.instance Definition _ :=
-  GRing.isScalable.Build F
-    [the lmodType F of {poly F}] [the zmodType of subFExtend] *:%R subfx_eval
+  GRing.isScalable.Build F {poly F} subFExtend *:%R subfx_eval
     subfx_evalZ.
 
 Hypothesis (pz0 : root p^iota z).
@@ -1326,7 +1324,7 @@ Lemma irredp_FAdjoin (F : fieldType) (p : {poly F}) :
   {L : fieldExtType F & \dim {:L} = (size p).-1 &
     {z | root (map_poly (in_alg L) p) z & <<1; z>>%VS = fullv}}.
 Proof.
-case=> p_gt1 irr_p; set n := (size p).-1; pose vL := [the vectType F of 'rV_n].
+case=> p_gt1 irr_p; set n := (size p).-1; pose vL : vectType F := 'rV_n.
 have Dn: n.+1 = size p := ltn_predK p_gt1.
 have nz_p: p != 0 by rewrite -size_poly_eq0 -Dn.
 suffices [L dimL [toPF [toL toPF_K toL_K]]]:

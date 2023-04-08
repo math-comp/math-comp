@@ -1760,25 +1760,24 @@ Section SemiRightRegular.
 
 Variable R : semiRingType.
 Implicit Types x y : R.
-Let Rc := [the semiRingType of R^c].
 
 Lemma mulIr_eq0 x y : rreg x -> (y * x == 0) = (y == 0).
-Proof. exact: (@mulrI_eq0 Rc). Qed.
+Proof. exact: (@mulrI_eq0 R^c). Qed.
 
 Lemma rreg_neq0 x : rreg x -> x != 0.
-Proof. exact: (@lreg_neq0 Rc). Qed.
+Proof. exact: (@lreg_neq0 R^c). Qed.
 
 Lemma rreg1 : rreg (1 : R).
-Proof. exact: (@lreg1 Rc). Qed.
+Proof. exact: (@lreg1 R^c). Qed.
 
 Lemma rregM x y : rreg x -> rreg y -> rreg (x * y).
-Proof. by move=> reg_x reg_y; apply: (@lregM Rc). Qed.
+Proof. by move=> reg_x reg_y; apply: (@lregM R^c). Qed.
 
-Lemma revrX x n : (x : Rc) ^+ n = (x : R) ^+ n.
+Lemma revrX x n : (x : R^c) ^+ n = (x : R) ^+ n.
 Proof. by elim: n => // n IHn; rewrite exprS exprSr IHn. Qed.
 
 Lemma rregX x n : rreg x -> rreg (x ^+ n).
-Proof. by move/(@lregX Rc x n); rewrite revrX. Qed.
+Proof. by move/(@lregX R^c x n); rewrite revrX. Qed.
 
 End SemiRightRegular.
 
@@ -1786,13 +1785,12 @@ Section RightRegular.
 
 Variable R : ringType.
 Implicit Types x y : R.
-Let Rc := [the ringType of R^c].
 
 Lemma mulIr0_rreg x : (forall y, y * x = 0 -> y = 0) -> rreg x.
-Proof. exact: (@mulrI0_lreg Rc). Qed.
+Proof. exact: (@mulrI0_lreg R^c). Qed.
 
 Lemma rregN x : rreg x -> rreg (- x).
-Proof. exact: (@lregN Rc). Qed.
+Proof. exact: (@lregN R^c). Qed.
 
 End RightRegular.
 
@@ -1809,8 +1807,7 @@ HB.structure Definition Lmodule (R : ringType) :=
 
 Module LmodExports.
 Bind Scope ring_scope with Lmodule.sort.
-Notation "[ 'lmodType' R 'of' T 'for' cT ]" :=
-  (@Lmodule.clone [the ringType of R] T%type cT)
+Notation "[ 'lmodType' R 'of' T 'for' cT ]" := (@Lmodule.clone R T%type cT)
   (at level 0, format "[ 'lmodType'  R  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'lmodType' R 'of' T ]" := [lmodType R of T%type for _]
   (at level 0, format "[ 'lmodType'  R  'of'  T ]") : form_scope.
@@ -1912,8 +1909,7 @@ HB.structure Definition Lalgebra R :=
 
 Module LalgExports.
 Bind Scope ring_scope with Lalgebra.sort.
-Notation "[ 'lalgType' R 'of' T 'for' cT ]" :=
-  (Lalgebra.clone [the ringType of R] T%type cT)
+Notation "[ 'lalgType' R 'of' T 'for' cT ]" := (Lalgebra.clone R T%type cT)
   (at level 0, format "[ 'lalgType'  R  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'lalgType' R 'of' T ]" := [lalgType R of T%type for _]
   (at level 0, format "[ 'lalgType'  R  'of'  T ]") : form_scope.
@@ -2792,7 +2788,7 @@ Proof. by rewrite linearZ rmorph1. Qed.
 End LRMorphismTheory.
 
 HB.mixin Record SemiRing_hasCommutativeMul R of SemiRing R := {
-  mulrC : commutative (@mul [the semiRingType of R])
+  mulrC : commutative (@mul R)
 }.
 #[short(type="comSemiRingType")]
 HB.structure Definition ComSemiRing :=
@@ -2862,7 +2858,7 @@ End ComSemiRingTheory.
 HB.structure Definition ComRing := {R of Ring R & ComSemiRing R}.
 
 HB.factory Record Ring_hasCommutativeMul R of Ring R := {
-  mulrC : commutative (@mul [the ringType of R])
+  mulrC : commutative (@mul R)
 }.
 HB.builders Context R of Ring_hasCommutativeMul R.
 HB.instance Definition _ := SemiRing_hasCommutativeMul.Build R mulrC.
@@ -2983,8 +2979,7 @@ HB.structure Definition Algebra (R : ringType) :=
 
 Module AlgExports.
 Bind Scope ring_scope with Algebra.sort.
-Notation "[ 'algType' R 'of' T 'for' cT ]" :=
-  (Algebra.clone [the ringType of R] T%type cT)
+Notation "[ 'algType' R 'of' T 'for' cT ]" := (Algebra.clone R T%type cT)
   (at level 0, format "[ 'algType'  R  'of'  T  'for'  cT ]")
   : form_scope.
 Notation "[ 'algType' R 'of' T ]" := [algType R of T%type for _]
@@ -3008,8 +3003,7 @@ HB.structure Definition ComAlgebra R := {V of ComRing V & Algebra R V}.
 
 Module ComAlgExports.
 Bind Scope ring_scope with ComAlgebra.sort.
-Notation "[ 'comAlgType' R 'of' T ]" :=
-    (ComAlgebra.clone [the ringType of R] T%type _)
+Notation "[ 'comAlgType' R 'of' T ]" := (ComAlgebra.clone R T%type _)
   (at level 0, format "[ 'comAlgType'  R  'of'  T ]") : form_scope.
 End ComAlgExports.
 HB.export ComAlgExports.
@@ -3403,8 +3397,7 @@ HB.structure Definition UnitAlgebra R := {V of Algebra R V & UnitRing V}.
 
 Module UnitAlgebraExports.
 Bind Scope ring_scope with UnitAlgebra.sort.
-Notation "[ 'unitAlgType' R 'of' T ]" :=
-  (UnitAlgebra.clone [the ringType of R] T%type _)
+Notation "[ 'unitAlgType' R 'of' T ]" := (UnitAlgebra.clone R T%type _)
   (at level 0, format "[ 'unitAlgType'  R  'of'  T ]") : form_scope.
 End UnitAlgebraExports.
 HB.export UnitAlgebraExports.
@@ -3414,8 +3407,7 @@ HB.structure Definition ComUnitAlgebra R := {V of ComAlgebra R V & UnitRing V}.
 
 Module ComUnitAlgebraExports.
 Bind Scope ring_scope with UnitAlgebra.sort.
-Notation "[ 'comUnitAlgType' R 'of' T ]" :=
-  (ComUnitAlgebra.clone [the ringType of R] T%type _)
+Notation "[ 'comUnitAlgType' R 'of' T ]" := (ComUnitAlgebra.clone R T%type _)
   (at level 0, format "[ 'comUnitAlgType'  R  'of'  T ]") : form_scope.
 End ComUnitAlgebraExports.
 HB.export ComUnitAlgebraExports.
@@ -4187,7 +4179,7 @@ Definition integral_domain_axiom (R : ringType) :=
   forall x y : R, x * y = 0 -> (x == 0) || (y == 0).
 
 HB.mixin Record ComUnitRing_isIntegral R of ComUnitRing R := {
-  mulf_eq0_subproof : integral_domain_axiom [the ringType of R];
+  mulf_eq0_subproof : integral_domain_axiom R;
 }.
 
 #[mathcomp(axiom="integral_domain_axiom"), short(type="idomainType")]
@@ -4332,7 +4324,7 @@ Arguments rregP {R x}.
 Definition field_axiom (R : unitRingType) := forall x : R, x != 0 -> x \in unit.
 
 HB.mixin Record UnitRing_isField R of UnitRing R := {
-  fieldP : field_axiom [the unitRingType of R];
+  fieldP : field_axiom R;
 }.
 
 #[mathcomp(axiom="field_axiom"), short(type="fieldType")]
@@ -4355,7 +4347,7 @@ by rewrite -(unitrMr _ Ux) xy0 unitr0.
 Qed.
 
 HB.factory Record ComUnitRing_isField R of ComUnitRing R := {
-  fieldP : field_axiom [the unitRingType of R];
+  fieldP : field_axiom R;
 }.
 HB.builders Context R of ComUnitRing_isField R.
 HB.instance Definition _ :=
@@ -4372,7 +4364,7 @@ HB.builders Context R of ComRing_isField R.
 
 Fact intro_unit (x y : R) : y * x = 1 -> x != 0.
 Proof.
-move=> yx1; apply: contraNneq (@oner_neq0 [the ringType of R]) => x0.
+move=> yx1; apply: contraNneq (@oner_neq0 R) => x0.
 by rewrite -yx1 x0 mulr0.
 Qed.
 
@@ -4764,7 +4756,7 @@ Definition closed_field_axiom (R : ringType) :=
    exists x : R, x ^+ n = \sum_(i < n) P i * (x ^+ i).
 
 HB.mixin Record DecField_isAlgClosed F of DecidableField F := {
-  solve_monicpoly : closed_field_axiom [the ringType of F];
+  solve_monicpoly : closed_field_axiom F;
 }.
 
 #[mathcomp(axiom="closed_field_axiom"), short(type="closedFieldType")]
@@ -6562,7 +6554,7 @@ Proof. by apply/eqP => /ffunP/(_ a)/eqP; rewrite !ffunE oner_eq0. Qed.
 HB.instance Definition _ := Zsemimodule_isSemiRing.Build {ffun aT -> R}
   ffun_mulA ffun_mul_1l ffun_mul_1r ffun_mul_addl ffun_mul_addr
   ffun_mul_0l ffun_mul_0r ffun1_nonzero.
-Definition ffun_semiring := ([the semiRingType of {ffun aT -> R}] : Type).
+Definition ffun_semiring : semiRingType := {ffun aT -> R}.
 *)
 
 End FinFunSemiRing.
@@ -6578,7 +6570,7 @@ Variable (aT : finType) (R : ringType) (a : aT).
 HB.instance Definition _ := Zmodule_isRing.Build {ffun aT -> R}
   (@ffun_mulA _ _) (@ffun_mul_1l _ _) (@ffun_mul_1r _ _)
   (@ffun_mul_addl _ _) (@ffun_mul_addr _ _) (@ffun1_nonzero _ _ a).
-Definition ffun_ring := ([the ringType of {ffun aT -> R}] : Type).
+Definition ffun_ring : ringType := {ffun aT -> R}.
 
 End FinFunRing.
 
@@ -6734,14 +6726,12 @@ HB.instance Definition _ := Zmodule_isLmodule.Build R (V1 * V2)%type
 
 Fact fst_is_scalable : scalable fst. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ :=
-  isScalable.Build R [the lmodType R of (V1 * V2)%type] V1 *:%R fst
-    fst_is_scalable.
+HB.instance Definition _ := isScalable.Build R (V1 * V2)%type V1 *:%R fst
+  fst_is_scalable.
 Fact snd_is_scalable : scalable snd. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ :=
-  isScalable.Build R [the lmodType R of (V1 * V2)%type] V2 *:%R snd
-    snd_is_scalable.
+HB.instance Definition _ := isScalable.Build R (V1 * V2)%type V2 *:%R snd
+  snd_is_scalable.
 
 End PairLmod.
 

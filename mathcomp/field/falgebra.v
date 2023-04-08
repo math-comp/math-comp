@@ -106,7 +106,7 @@ HB.factory Record Algebra_isFalgebra (K : fieldType) A
            of Vector K A & GRing.Algebra K A := {}.
 
 HB.builders Context K A of Algebra_isFalgebra K A.
-  Let vA := [the Vector.type K of A].
+  Let vA : Vector.type K := A.
   Let am u := linfun (u \o* idfun : vA -> vA).
   Let uam := [pred u | lker (am u) == 0%VS].
   Let vam := [fun u => if u \in uam then (am u)^-1%VF 1 else u].
@@ -245,9 +245,8 @@ move=> a u v; apply/lfunP => w.
 by rewrite !lfunE /= scale_lfunE !lfunE /= mulrDl scalerAl.
 Qed.
 #[hnf]
-HB.instance Definition _ :=
-  GRing.isLinear.Build K aT [the zmodType of (hom aT aT)] _ amull
-    amull_is_linear.
+HB.instance Definition _ := GRing.isLinear.Build K aT (hom aT aT) _ amull
+  amull_is_linear.
 
 (* amull is a converse ring morphism *)
 Lemma amull1 : amull 1 = \1%VF.
@@ -269,9 +268,8 @@ by apply/lfunP=> w; rewrite comp_lfunE !lfunE /= mulrA.
 Qed.
 
 #[hnf]
-HB.instance Definition _ :=
-  GRing.isLinear.Build K aT [the zmodType of (hom aT aT)] _ amulr
-    amulr_is_linear.
+HB.instance Definition _ := GRing.isLinear.Build K aT (hom aT aT) _ amulr
+  amulr_is_linear.
 #[hnf]
 HB.instance Definition _ := GRing.isMultiplicative.Build aT (hom aT aT) amulr
   amulr_is_multiplicative.

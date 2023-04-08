@@ -298,7 +298,7 @@ Definition L' : Type := eta L.
 HB.instance Definition _ := GRing.ClosedField.on L'.
 HB.instance Definition _ := isComplex.Build L' conjL_K conjL_nt.
 
-Notation cfType := [the Num.ClosedField.type of L'].
+Notation cfType := (L' : closedFieldType).
 
 Definition QtoL := [rmorphism of @ratr cfType].
 
@@ -412,7 +412,7 @@ Fact inv0 : inv 0 = 0. Proof. by apply: CtoL_inj; rewrite !LtoC_K invr0. Qed.
 
 HB.instance Definition _ := GRing.ComRing_isField.Build type mulVf inv0.
 
-Fact closedFieldAxiom : GRing.closed_field_axiom [the ringType of type].
+Fact closedFieldAxiom : GRing.closed_field_axiom type.
 Proof.
 move=> n a n_gt0; pose p := 'X^n - \poly_(i < n) CtoL (a i).
 have Ap: {in p : seq L, integralRange QtoL}.
@@ -477,11 +477,11 @@ Qed.
 HB.instance Definition _ := isComplex.Build type conjK conj_nt.
 
 Lemma normK u : `|u| ^+ 2 = u * conj u.
-Proof. by apply: (@normCK [the numClosedFieldType of type]). Qed.
+Proof. by apply: (@normCK type). Qed.
 
 Definition conjMixin := Num.ClosedField.on type.
 
-Lemma algebraic : integralRange (@ratr [the unitRingType of type]).
+Lemma algebraic : integralRange (@ratr type).
 Proof.
 move=> u; have [p mon_p pu0] := CtoL_P u; exists p => {mon_p}//.
 rewrite -(fmorph_root [rmorphism of CtoL]) -map_poly_comp; congr (root _ _):pu0.
@@ -571,14 +571,14 @@ Delimit Scope C_scope with C.
 Delimit Scope C_core_scope with Cc.
 Delimit Scope C_expanded_scope with Cx.
 Open Scope C_core_scope.
-Notation algCeq := [the eqType of type].
-Notation algCzmod := [the zmodType of type].
-Notation algCring := [the ringType of type].
-Notation algCuring := [the unitRingType of type].
-Notation algCnum := [the numDomainType of type].
-Notation algCfield := [the fieldType of type].
-Notation algCnumField := [the numFieldType of type].
-Notation algCnumClosedField := [the numClosedFieldType of type].
+Notation algCeq := (type : eqType).
+Notation algCzmod := (type : zmodType).
+Notation algCring := (type : ringType).
+Notation algCuring := (type : unitRingType).
+Notation algCnum := (type : numDomainType).
+Notation algCfield := (type : fieldType).
+Notation algCnumField := (type : numFieldType).
+Notation algCnumClosedField := (type : numClosedFieldType).
 
 Notation Creal := (@Num.Def.Rreal algCnum).
 

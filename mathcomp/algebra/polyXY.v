@@ -114,8 +114,7 @@ HB.instance Definition _ :=
 Lemma swapXY_is_scalable : scalable_for (map_poly polyC \; *%R) swapXY.
 Proof. by move=> p u /=; rewrite -mul_polyC rmorphM /= swapXY_polyC. Qed.
 HB.instance Definition _ :=
-  GRing.isScalable.Build [the ringType of {poly R}]
-    [the lmodType _ of {poly {poly R}}] [the zmodType of {poly {poly R}}]
+  GRing.isScalable.Build {poly R} {poly {poly R}} {poly {poly R}}
     (map_poly polyC \; *%R) swapXY swapXY_is_scalable.
 
 Lemma swapXY_comp_poly p u : swapXY (p^:P \Po u) = p^:P \Po swapXY u.

@@ -95,7 +95,7 @@ Definition gact := (base_act \ act_dom)%gact.
 
 End Construction.
 
-HB.lock Definition gtype q p e := [the finGroupType of sdprod_by (gact q p e)].
+HB.lock Definition gtype q p e : finGroupType := sdprod_by (gact q p e).
 Canonical gtype_unlockable := Unlockable gtype.unlock.
 
 Section ConstructionCont.
@@ -170,8 +170,8 @@ Definition quaternion_kernel :=
 
 End SpecializeExtremals.
 
-HB.lock Definition quaternion_gtype n :=
-  [the finGroupType of coset_of (quaternion_kernel n)].
+HB.lock Definition quaternion_gtype n : finGroupType :=
+  coset_of (quaternion_kernel n).
 Canonical quaternion_unlock := Unlockable quaternion_gtype.unlock.
 
 Notation "''Mod_' m" := (modular_gtype m) : type_scope.
