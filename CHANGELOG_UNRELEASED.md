@@ -31,12 +31,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + generalize `ler_sqrt`
   + generalize `ler_psqrt` to use `nneg` instead of `pos`
 
+- in `finset.v`
+  + definitions `set_of` and `setTfor`
+    (phantom trick now useless with reverse coercions)
+
+- in `generic_quotient.v`
+  + `pi_phant` -> `pi_subdef`
+  + `quot_type_subdef` -> `quot_type_of`
+
+- in `fingroup.v`
+  + definitions `group_of`, `group_setT`, `setT_group`
+    (phantom trick now useless with reverse coercions)
+
+- in `perm.v`
+  + definition `perm_of` (phantom trick now useless with reverse coercions)
+
 ### Renamed
 
 ### Removed
 
 - in `poly.v`
   + definition `poly_of` (phantom trick now useless with reverse coercions)
+
+- in `eqtype.v`
+  + definition `sub_type_of` (phantom trick now useless with reverse coercions)
+
+- in `order.v`
+  + definition `SetSubsetOrder.type_of` (phantom trick now useless with reverse coercions)
 
 ### Deprecated
 

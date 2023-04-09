@@ -396,7 +396,7 @@ Proof. by rewrite /quotient morphpreK ?sub_im_coset. Qed.
 
 (* Variant of morhphim_ker *)
 Lemma trivg_quotient : H / H = 1.
-Proof. by rewrite -{3}ker_coset /quotient morphim_ker. Qed.
+Proof. by rewrite -[X in X / _]ker_coset /quotient morphim_ker. Qed.
 
 Lemma quotientS1 G : G \subset H -> G / H = 1.
 Proof. by move=> sGH; apply/trivgP; rewrite -trivg_quotient quotientS. Qed.
@@ -425,7 +425,9 @@ Proof. by move=> nHG; rewrite -cosetpreSK quotientGK. Qed.
 
 (* Variant of ker_trivg_morphim. *)
 Lemma quotient_sub1 A : A \subset 'N(H) -> (A / H \subset [1]) = (A \subset H).
-Proof. by move=> nHA /=; rewrite -{10}ker_coset ker_trivg_morphim nHA. Qed.
+Proof.
+by move=> nHA /=; rewrite -[gval H in RHS]ker_coset ker_trivg_morphim nHA.
+Qed.
 
 Lemma quotientSK A B :
   A \subset 'N(H) -> (A / H \subset B / H) = (A \subset H * B).

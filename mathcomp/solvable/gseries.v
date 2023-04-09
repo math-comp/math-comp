@@ -41,7 +41,7 @@ Section GroupDefs.
 Variable gT : finGroupType.
 Implicit Types A B U V : {set gT}.
 
-Local Notation groupT := (group_of (Phant gT)).
+Local Notation groupT := (group_of gT).
 
 Definition subnormal A B :=
   (A \subset B) && (iter #|B| (fun N => generated (class_support A N)) B == A).

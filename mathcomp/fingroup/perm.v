@@ -49,10 +49,8 @@ Variable T : finType.
 Inductive perm_type : predArgType :=
   Perm (pval : {ffun T -> T}) & injectiveb pval.
 Definition pval p := let: Perm f _ := p in f.
-Definition perm_of of phant T := perm_type.
+Definition perm_of := perm_type.
 Identity Coercion type_of_perm : perm_of >-> perm_type.
-
-Notation pT := (perm_of (Phant T)).
 
 HB.instance Definition _ := [isSub for pval].
 HB.instance Definition _ := [Finite of perm_type by <:].
@@ -63,8 +61,9 @@ by move=> f_inj; apply/injectiveP; apply: eq_inj f_inj _ => x; rewrite ffunE.
 Qed.
 
 End PermDefSection.
+Arguments perm_of T%type.
 
-Notation "{ 'perm' T }" := (perm_of (Phant T))
+Notation "{ 'perm' T }" := (perm_of T)
   (at level 0, format "{ 'perm'  T }") : type_scope.
 
 Arguments pval _ _%g.

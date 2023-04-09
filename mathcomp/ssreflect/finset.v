@@ -120,7 +120,7 @@ Variable T : finType.
 
 Inductive set_type : predArgType := FinSet of {ffun pred T}.
 Definition finfun_of_set A := let: FinSet f := A in f.
-Definition set_of of phant T := set_type.
+Definition set_of := set_type.
 Identity Coercion type_of_set_of : set_of >-> set_type.
 
 Definition set_isSub := Eval hnf in [isNew for finfun_of_set].
@@ -133,9 +133,10 @@ Delimit Scope set_scope with SET.
 Bind Scope set_scope with set_type.
 Bind Scope set_scope with set_of.
 Open Scope set_scope.
+Arguments set_of T%type.
 Arguments finfun_of_set {T} A%SET.
 
-Notation "{ 'set' T }" := (set_of (Phant T))
+Notation "{ 'set' T }" := (set_of T)
   (at level 0, format "{ 'set'  T }") : type_scope.
 
 (* We later define several subtypes that coerce to set; for these it is       *)
@@ -218,9 +219,9 @@ by split=> [eqAB|-> //]; apply/val_inj/ffunP=> x; have:= eqAB x; rewrite unlock.
 Qed.
 
 Definition set0 := [set x : T | false].
-Definition setTfor (phT : phant T) := [set x : T | true].
+Definition setTfor := [set x : T | true].
 
-Lemma in_setT x : x \in setTfor (Phant T).
+Lemma in_setT x : x \in setTfor.
 Proof. by rewrite in_set. Qed.
 
 Lemma eqsVneq A B : eq_xor_neq A B (B == A) (A == B).
@@ -234,10 +235,11 @@ End BasicSetTheory.
 Arguments eqsVneq {T} A B, {T A B}.
 
 Arguments set0 {T}.
+Arguments setTfor T%type.
 Arguments eq_finset {T} [pA] pB eq_pAB.
 #[global] Hint Resolve in_setT : core.
 
-Notation "[ 'set' : T ]" := (setTfor (Phant T))
+Notation "[ 'set' : T ]" := (setTfor T)
   (at level 0, format "[ 'set' :  T ]") : set_scope.
 
 Notation setT := [set: _] (only parsing).
@@ -1004,7 +1006,8 @@ Arguments subUsetP {T A B C}.
 Arguments subsetDP {T A B C}.
 Arguments subsetD1P {T A B x}.
 Prenex Implicits set1.
-#[global] Hint Resolve subsetT_hint : core.
+#[global] Hint Extern 0 (is_true (subset _ (mem (pred_of_set (setTfor _))))) =>
+  solve [apply: subsetT_hint] : core.
 
 Section setOpsAlgebra.
 

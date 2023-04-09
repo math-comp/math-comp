@@ -788,7 +788,7 @@ Lemma cfdotElr A B phi psi :
      phi \in 'CF(G, A) -> psi \in 'CF(G, B) ->
   '[phi, psi] = #|G|%:R^-1 * \sum_(x in A :&: B) phi x * (psi x)^*.
 Proof.
-move=> Aphi Bpsi; rewrite (big_setID G) cfdotE (big_setID (A :&: B)) setIC /=.
+move=> Aphi Bpsi; rewrite (big_setID G)/= cfdotE (big_setID (A :&: B))/= setIC.
 congr (_ * (_ + _)); rewrite !big1 // => x /setDP[_].
   by move/cfun0->; rewrite mul0r.
 rewrite inE; case/nandP=> notABx; first by rewrite (cfun_on0 Aphi) ?mul0r.
@@ -1580,7 +1580,7 @@ Definition cfIsom :=
   locked_with cfIsom_key (cfMorph \o 'Res[G1] : 'CF(G) -> 'CF(R)).
 Canonical cfIsom_unlockable := [unlockable of cfIsom].
 
-Lemma cfIsomE phi x : x \in G -> cfIsom phi (f x) = phi x.
+Lemma cfIsomE phi (x : aT : finType) : x \in G -> cfIsom phi (f x) = phi x.
 Proof.
 move=> Gx; rewrite unlock cfMorphE //= /restrm ?defG ?cfRes_id ?invmE //.
 by rewrite -defR mem_morphim.

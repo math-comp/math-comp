@@ -139,8 +139,8 @@ Section QuotientDef.
 
 Variable T : Type.
 Variable qT : quotType T.
-Definition pi_phant of phant qT := @quot_pi_subdef _ qT.
-Local Notation "\pi" := (pi_phant (Phant qT)).
+Definition pi_subdef := @quot_pi_subdef _ qT.
+Local Notation "\pi" := pi_subdef.
 
 Lemma repr_ofK : cancel (@repr_of _ _) \pi.
 Proof. exact: repr_ofK_subproof. Qed.
@@ -152,22 +152,23 @@ Arguments repr_ofK {T qT}.
 (* Protecting some symbols. *)
 (****************************)
 
-HB.lock Definition pi := pi_phant.
-HB.lock Definition mpi := pi_phant.
+HB.lock Definition pi := pi_subdef.
+HB.lock Definition mpi := pi_subdef.
 HB.lock Definition repr := repr_of.
 
 (*******************)
 (* Fancy Notations *)
 (*******************)
 
-Notation "\pi_ Q" := (@pi _ _ (Phant Q)) : quotient_scope.
-Notation "\pi" := (@pi _ _ (Phant _))  (only parsing) : quotient_scope.
+Arguments pi.body [T]%type qT%type.
+Notation "\pi_ Q" := (@pi _ Q) : quotient_scope.
+Notation "\pi" := (@pi _ _)  (only parsing) : quotient_scope.
 Notation "x == y %[mod Q ]" := (\pi_Q x == \pi_Q y) : quotient_scope.
 Notation "x = y %[mod Q ]" := (\pi_Q x = \pi_Q y) : quotient_scope.
 Notation "x != y %[mod Q ]" := (\pi_Q x != \pi_Q y) : quotient_scope.
 Notation "x <> y %[mod Q ]" := (\pi_Q x <> \pi_Q y) : quotient_scope.
 
-Local Notation "\mpi" := (@mpi _ _ (Phant _)).
+Local Notation "\mpi" := (@mpi _ _).
 Canonical mpi_unlock := Unlockable mpi.unlock.
 Canonical pi_unlock := Unlockable pi.unlock.
 Canonical repr_unlock := Unlockable repr.unlock.
@@ -326,12 +327,10 @@ Notation "[ 'eqQuotType' e 'of' Q ]" := (EqQuotient.clone _ e Q%type _)
 (* - get the subType structure and maybe declare it Canonical.            *)
 (**************************************************************************)
 
-
-Definition quot_type_subdef T (qT : quotType T) of phant qT : Type := qT.
-Notation quot_type_of T Q := (@quot_type_subdef T _ (Phant Q)).
-Notation quot_type Q := (quot_type_subdef (Phant Q)).
-HB.instance Definition _ T (qT : quotType T) :=
-  Quotient.copy (quot_type qT) qT.
+Definition quot_type_of T (qT : quotType T) : Type := qT.
+Arguments quot_type_of T%type qT%type : clear implicits.
+Notation quot_type Q := (quot_type_of _ Q).
+HB.instance Definition _ T (qT : quotType T) := Quotient.on (quot_type qT).
 
 Module QuotSubType.
 Section QuotSubType.
