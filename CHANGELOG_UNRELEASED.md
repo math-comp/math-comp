@@ -35,6 +35,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Removed
 
+- in `poly.v`
+  + definition `poly_of` (phantom trick now useless with reverse coercions)
+
 ### Deprecated
 
 ### Infrastructure

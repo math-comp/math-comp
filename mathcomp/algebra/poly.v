@@ -144,26 +144,18 @@ HB.instance Definition _ := [Choice of polynomial by <:].
 
 Lemma poly_inj : injective polyseq. Proof. exact: val_inj. Qed.
 
-Definition poly_of of phant R := polynomial.
-Identity Coercion type_poly_of : poly_of >-> polynomial.
-
-Local Notation "{poly}" := (poly_of (Phant R)).
-
-HB.instance Definition _ := SubType.on {poly}.
-HB.instance Definition _ := Choice.on {poly}.
-
-Definition coefp i (p : poly_of (Phant R)) := p`_i.
+Definition coefp i (p : polynomial) := p`_i.
 
 End Polynomial.
 
 (* We need to break off the section here to let the Bind Scope directives     *)
 (* take effect.                                                               *)
-Bind Scope ring_scope with poly_of.
 Bind Scope ring_scope with polynomial.
+Arguments polynomial R%type.
 Arguments polyseq {R} p%R.
 Arguments poly_inj {R} [p1%R p2%R] : rename.
 Arguments coefp {R} i%N / p%R.
-Notation "{ 'poly' T }" := (poly_of (Phant T)) : type_scope.
+Notation "{ 'poly' T }" := (polynomial T) : type_scope.
 
 Section SemiPolynomialTheory.
 
@@ -320,7 +312,6 @@ Qed.
 
 HB.instance Definition _ := GRing.isNmodule.Build (polynomial R)
   add_polyA add_polyC add_poly0.
-HB.instance Definition _ := GRing.Nmodule.on {poly R}.
 
 (* Properties of the zero polynomial *)
 Lemma polyC0 : 0%:P = 0 :> {poly R}. Proof. by []. Qed.
@@ -503,7 +494,6 @@ Proof. by rewrite polyC_eq0 oner_neq0. Qed.
 HB.instance Definition _ := GRing.Nmodule_isSemiRing.Build (polynomial R)
   mul_polyA mul_1poly mul_poly1 mul_polyDl mul_polyDr mul_0poly mul_poly0
   poly1_neq0.
-HB.instance Definition _ := GRing.SemiRing.on {poly R}.
 
 Lemma polyC1 : 1%:P = 1 :> {poly R}. Proof. by []. Qed.
 
@@ -619,7 +609,6 @@ Qed.
 
 HB.instance Definition _ := GRing.Nmodule_isZmodule.Build (polynomial R)
   add_polyN.
-HB.instance Definition _ := GRing.Zmodule.on {poly R}.
 
 (* Size, leading coef, morphism properties of coef *)
 
@@ -724,7 +713,6 @@ HB.instance Definition _ := GRing.Zmodule_isLmodule.Build R (polynomial R)
   scale_polyA scale_1poly scale_polyDr scale_polyDl.
 HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build R (polynomial R)
   scale_polyAl.
-HB.instance Definition _ := GRing.Lalgebra.on {poly R}.
 
 Lemma mul_polyC a p : a%:P * p = a *: p.
 Proof. by rewrite -scale_polyE. Qed.
@@ -2436,7 +2424,6 @@ Qed.
 HB.instance Definition _ := GRing.Ring_hasCommutativeMul.Build (polynomial R)
   poly_mul_comm.
 HB.instance Definition _ := GRing.Lalgebra_isComAlgebra.Build R (polynomial R).
-HB.instance Definition _ := GRing.ComAlgebra.on {poly R}.
 
 Lemma coef_prod_XsubC (ps : seq R) (n : nat) :
   (n <= size ps)%N ->
@@ -2654,11 +2641,9 @@ Proof. by rewrite /poly_inv => p /negbTE/= ->. Qed.
 
 HB.instance Definition _ := GRing.ComRing_hasMulInverse.Build (polynomial R)
   poly_mulVp poly_intro_unit poly_inv_out.
-HB.instance Definition _ := GRing.ComUnitRing.on {poly R}.
 
 HB.instance Definition _ := GRing.ComUnitRing_isIntegral.Build (polynomial R)
   poly_idomainAxiom.
-HB.instance Definition _ := GRing.IntegralDomain.on {poly R}.
 
 Lemma poly_unitE p :
   (p \in GRing.unit) = (size p == 1) && (p`_0 \in GRing.unit).
@@ -2834,26 +2819,16 @@ End PolynomialIdomain.
 
 (* FIXME: these are seamingly artifical ways to close the inheritance graph *)
 (*    We make parameters more and more precise to trigger completion by HB  *)
-
 HB.instance Definition _ (R : countRingType) :=
   [Countable of polynomial R by <:].
-HB.instance Definition _ (R : countRingType) := Countable.on {poly R}.
-
 HB.instance Definition _ (R : countComRingType) :=
   [Countable of polynomial R by <:].
-HB.instance Definition _ (R : countComRingType) := Countable.on {poly R}.
-
 HB.instance Definition _ (R : countUnitRingType) :=
   [Countable of polynomial R by <:].
-HB.instance Definition _ (R : countUnitRingType) := Countable.on {poly R}.
-
 HB.instance Definition _ (R : countComUnitRingType) :=
   [Countable of polynomial R by <:].
-HB.instance Definition _ (R : countComUnitRingType) := Countable.on {poly R}.
-
 HB.instance Definition _ (R : countIdomainType) :=
   [Countable of polynomial R by <:].
-HB.instance Definition _ (R : countIdomainType) := Countable.on {poly R}.
 
 Section MapFieldPoly.
 
