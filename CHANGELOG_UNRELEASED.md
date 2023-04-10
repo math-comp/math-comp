@@ -57,6 +57,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `matrix.v`
   + definitions `GLtype`, `GLval`, `GLgroup` and `GLgroup_group`
     (phantom trick now useless with reverse coercions)
+- in `alt.v`
+  + definitions `Sym`, `Sym_group`, `Alt`, `Alt_group`
+    (phantom trick now useless with reverse coercions)
 
 - in `qpoly.v`
   + definitions `polyn`
