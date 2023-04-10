@@ -525,27 +525,20 @@ Qed.
 
 Definition is_aspace U := has_algid U && (U * U <= U)%VS.
 Structure aspace := ASpace {asval :> {vspace aT}; _ : is_aspace asval}.
-Definition aspace_of of phant aT := aspace.
-Local Notation "{ 'aspace' T }" := (aspace_of (Phant T)) : type_scope.
 
 HB.instance Definition _ := [isSub for asval].
-HB.instance Definition _ := [Equality of aspace by <:].
 HB.instance Definition _ := [Choice of aspace by <:].
 
-HB.instance Definition _ := SubType.on {aspace aT}.
-HB.instance Definition _ := Equality.on {aspace aT}.
-HB.instance Definition _ := Choice.on {aspace aT}.
-
-Definition clone_aspace U (A : {aspace aT}) :=
-  fun algU & phant_id algU (valP A) =>  @ASpace U algU : {aspace aT}.
+Definition clone_aspace U (A : aspace) :=
+  fun algU & phant_id algU (valP A) =>  @ASpace U algU : aspace.
 
 Fact aspace1_subproof : is_aspace 1.
 Proof. by rewrite /is_aspace prod1v -memvE has_algid1 memv_line. Qed.
-Canonical aspace1 : {aspace aT} := ASpace aspace1_subproof.
+Canonical aspace1 : aspace := ASpace aspace1_subproof.
 
 Lemma aspacef_subproof : is_aspace fullv.
 Proof. by rewrite /is_aspace subvf has_algid1 ?memvf. Qed.
-Canonical aspacef : {aspace aT} := ASpace aspacef_subproof.
+Canonical aspacef : aspace := ASpace aspacef_subproof.
 
 Lemma polyOver1P p :
   reflect (exists q, p = map_poly (in_alg aT) q) (p \is a polyOver 1%VS).
@@ -561,11 +554,11 @@ End FalgebraTheory.
 
 Delimit Scope aspace_scope with AS.
 Bind Scope aspace_scope with aspace.
-Bind Scope aspace_scope with aspace_of.
 Arguments asval {K aT} a%AS.
+Arguments aspace [K]%type aT%type.
 Arguments clone_aspace [K aT U%VS A%AS algU] _.
 
-Notation "{ 'aspace' T }" := (aspace_of (Phant T)) : type_scope.
+Notation "{ 'aspace' T }" := (aspace T) : type_scope.
 Notation "A * B" := (prodv A B) : vspace_scope.
 Notation "A ^+ n" := (expv A n) : vspace_scope.
 Notation "'C [ u ]" := (centraliser1_vspace u) : vspace_scope.

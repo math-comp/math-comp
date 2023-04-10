@@ -69,6 +69,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + definitions `vector_axiom_def`, `space`, `vs2mx`, `pred_of_vspace`
     (phantom trick now useless with reverse coercions)
 
+- in `fieldext.v`
+  + definition `baseField_type`
+    (phantom trick now useless with reverse coercions)
+
 ### Renamed
 
 - in `ring_quotient.v`
@@ -96,6 +100,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `ring_quotient.v`
   + definition `Quotient.type_of` (phantom trick now useless with reverse coercions)
+
+- in `falgebra.v`
+  + definition `aspace_of` (phantom trick now useless with reverse coercions)
 
 ### Deprecated
 

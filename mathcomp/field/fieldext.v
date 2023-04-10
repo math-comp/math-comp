@@ -92,8 +92,8 @@ Notation "[ 'fieldExtType' F 'of' L ]" := (FieldExt.clone F L%type _)
 #[deprecated(since="mathcomp 2.0.0", note="Use FieldExt.clone instead.")]
 Notation "[ 'fieldExtType' F 'of' L 'for' K ]" := (FieldExt.clone F L%type K)
   (at level 0, format "[ 'fieldExtType'  F  'of'  L  'for'  K ]") : form_scope.
-Notation "{ 'subfield' L }" := (@aspace_of _ _ (Phant L))
-  (* NB: was (@aspace_of _ (falgType _) (Phant L)) *)
+Notation "{ 'subfield' L }" := (aspace L)
+  (* NB: was (@aspace_of _ (FalgType _) (Phant L)) *)
   (at level 0, format "{ 'subfield'  L }") : type_scope.
 End FieldExtExports.
 HB.export FieldExtExports.
@@ -765,8 +765,8 @@ Section BaseField.
 
 Variables (F0 : fieldType) (F : fieldExtType F0) (L : fieldExtType F).
 
-Definition baseField_type of phant L : Type := L.
-Notation L0 := (baseField_type (Phant (FieldExt.sort L))).
+Definition baseFieldType : Type := L.
+Notation L0 := baseFieldType.
 
 HB.instance Definition _ := GRing.Field.on L0.
 
@@ -873,7 +873,7 @@ Canonical baseAspace E := ASpace (baseAspace_suproof E).
 
 End BaseField.
 
-Notation baseFieldType L := (baseField_type (Phant L)).
+Arguments baseFieldType [F0 F]%type L%type.
 
 HB.lock Definition refBaseField (F0 : fieldType) (F : fieldExtType F0)
   (L : fieldExtType F) := baseAspace (1%AS : {aspace L}).
