@@ -310,28 +310,22 @@ Qed.
 Canonical equiv_equiv := EquivRelPack equiv_is_equiv.
 Canonical equiv_encModRel := defaultEncModRel equiv.
 
-Definition type := {eq_quot equiv}.
-Definition type_of of phant R := type.
-Local Notation quot := (type_of (Phant R)).
+Definition quot := {eq_quot equiv}.
 
 #[export]
-HB.instance Definition _ : EqQuotient R equiv type := EqQuotient.on type.
-#[export]
-HB.instance Definition _ := Choice.on type.
-#[export]
-HB.instance Definition _ := EqQuotient.on quot.
+HB.instance Definition _ : EqQuotient R equiv quot := EqQuotient.on quot.
 #[export]
 HB.instance Definition _ := Choice.on quot.
 
-Lemma idealrBE x y : (x - y) \in I = (x == y %[mod type]).
+Lemma idealrBE x y : (x - y) \in I = (x == y %[mod quot]).
 Proof. by rewrite piE equivE. Qed.
 
-Lemma idealrDE x y : (x + y) \in I = (x == - y %[mod type]).
+Lemma idealrDE x y : (x + y) \in I = (x == - y %[mod quot]).
 Proof. by rewrite -idealrBE opprK. Qed.
 
-Definition zero : type := lift_cst type 0.
-Definition add := lift_op2 type +%R.
-Definition opp := lift_op1 type -%R.
+Definition zero : quot := lift_cst quot 0.
+Definition add := lift_op2 quot +%R.
+Definition opp := lift_op1 quot -%R.
 
 Canonical pi_zero_morph := PiConst zero.
 
@@ -363,18 +357,15 @@ Lemma addNq: left_inverse zero opp add.
 Proof. by move=> x; rewrite -[x]reprK !piE addNr. Qed.
 
 #[export]
-HB.instance Definition _ := GRing.isZmodule.Build type addqA addqC add0q addNq.
+HB.instance Definition _ := GRing.isZmodule.Build quot addqA addqC add0q addNq.
 #[export]
-HB.instance Definition _ := GRing.Zmodule.on quot.
-#[export]
-HB.instance Definition _ := @isZmodQuotient.Build R equiv 0 -%R +%R type
+HB.instance Definition _ := @isZmodQuotient.Build R equiv 0 -%R +%R quot
   (lock _) pi_opp pi_add.
-#[export]
-HB.instance Definition _ := @ZmodQuotient.on quot.
 
 End ZmodQuotient.
 
-Notation "{ 'quot' I }" := (@type_of _ I (Phant _)) : type_scope.
+Arguments quot R%type I%type.
+Notation "{ 'quot' I }" := (quot I) : type_scope.
 
 Section RingQuotient.
 
@@ -415,16 +406,12 @@ Lemma nonzero1q: one != 0.
 Proof. by rewrite piE equivE subr0 idealr1. Qed.
 
 #[export]
-HB.instance Definition _ := GRing.Zmodule_isComRing.Build (type idealI)
+HB.instance Definition _ := GRing.Zmodule_isComRing.Build (quot idealI)
   mulqA mulqC mul1q mulq_addl nonzero1q.
-#[export]
-HB.instance Definition _ := GRing.ComRing.on {quot idealI}.
 
 #[export]
 HB.instance Definition _ := @isRingQuotient.Build
-  R (equiv idealI) 0 -%R +%R 1%R *%R (type idealI) (lock _) pi_mul.
-#[export]
-HB.instance Definition _ := @RingQuotient.on {quot idealI}.
+  R (equiv idealI) 0 -%R +%R 1%R *%R (quot idealI) (lock _) pi_mul.
 
 End RingQuotient.
 
@@ -444,8 +431,7 @@ End Quotient.
 
 Export Quotient.Exports.
 
-Notation "{ 'ideal_quot' I }" :=
-  (@Quotient.type_of _ I (Phant _)) : type_scope.
+Notation "{ 'ideal_quot' I }" := (@Quotient.quot _ I) : type_scope.
 Notation "x == y %[ 'mod_ideal' I ]" :=
   (x == y %[mod {ideal_quot I}]) : quotient_scope.
 Notation "x = y %[ 'mod_ideal' I ]" :=

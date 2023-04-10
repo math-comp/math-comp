@@ -1288,7 +1288,7 @@ Hypothesis irr_p : irreducible_poly p.
 Let nz_p : p != 0. Proof. exact: irredp_neq0. Qed.
 
 (* The Vector axiom requires irreducibility. *)
-Lemma min_subfx_vect : vector_axiom_def (size p).-1 (Phant subFExtend).
+Lemma min_subfx_vect : Vector.axiom (size p).-1 subFExtend.
 Proof.
 move/subfx_irreducibleP: irr_p => /=/(_ nz_p) min_p; set d := (size p).-1.
 have Dd: d.+1 = size p by rewrite polySpred.

@@ -100,27 +100,27 @@ Delimit Scope vspace_scope with VS.
 Import GRing.Theory.
 
 (* Finite dimension vector space *)
-Definition vector_axiom_def (R : ringType) n (V : lmodType R) of phant V :=
+Definition vector_axiom_def (R : ringType) n (V : lmodType R) :=
   {v2r : V -> 'rV[R]_n | linear v2r & bijective v2r}.
+Arguments vector_axiom_def [R] n%N V%type.
 
 HB.mixin Record Lmodule_hasFinDim (R : ringType) (V : Type) of GRing.Lmodule R V :=
   { dim : nat;
-    vector_subdef : vector_axiom_def dim (Phant V) }.
+    vector_subdef : vector_axiom_def dim V }.
 
 #[mathcomp(axiom="vector_axiom_def"), short(type="vectType")]
 HB.structure Definition Vector (R : ringType) :=
   { V of Lmodule_hasFinDim R V & GRing.Lmodule R V }.
 
-(* FIXME: Vector.axiom requires a phantom type *
- * -> a shortand notation is used instead      *)
-Notation vector_axiom n V := (Vector.axiom n (Phant V)).
+#[deprecated(since="mathcomp 2.2.0", note="Use Vector.axiom instead.")]
+Notation vector_axiom := Vector.axiom.
 Arguments dim {R} s.
 
 (* FIXME: S/space and H/hom were defined behind the module Vector *
  * Perhaps we should change their names to avoid conflits.        *)
 Section OtherDefs.
 Local Coercion dim : Vector.type >-> nat.
-Inductive space (K : fieldType) (vT : Vector.type K) (phV : phant vT) :=
+Inductive space (K : fieldType) (vT : Vector.type K) :=
   Space (mx : 'M[K]_vT) & <<mx>>%MS == mx.
 Inductive hom (R : ringType) (vT wT : Vector.type R) :=
   Hom of 'M[R]_(vT, wT).
@@ -136,7 +136,9 @@ Notation "[ 'vectType' R 'of' T 'for' cT ]" := (Vector.clone R T%type cT)
 Notation "[ 'vectType' R 'of' T ]" := (Vector.clone R T%type _)
   (at level 0, format "[ 'vectType'  R  'of'  T ]") : form_scope.
 
-Notation "{ 'vspace' vT }" := (space (Phant vT)) : type_scope.
+Arguments space [K] vT%type.
+
+Notation "{ 'vspace' vT }" := (space vT) : type_scope.
 Notation "''Hom' ( aT , rT )" := (hom aT rT) : type_scope.
 Notation "''End' ( vT )" := (hom vT vT) : type_scope.
 
@@ -157,7 +159,7 @@ Section Iso.
 Variables (R : ringType) (vT rT : vectType R).
 Local Coercion dim : Vector.type >-> nat.
 
-Fact v2r_subproof : vector_axiom vT vT. Proof. exact: vector_subdef. Qed.
+Fact v2r_subproof : Vector.axiom vT vT. Proof. exact: vector_subdef. Qed.
 Definition v2r := s2val v2r_subproof.
 
 Let v2r_bij : bijective v2r := s2valP' v2r_subproof.
@@ -188,15 +190,15 @@ Definition b2mx n (X : n.-tuple vT) := \matrix_i v2r (tnth X i).
 Lemma b2mxK n (X : n.-tuple vT) i : r2v (row i (b2mx X)) = X`_i.
 Proof. by rewrite rowK v2rK -tnth_nth. Qed.
 
-Definition vs2mx {phV} (U : @space K vT phV) := let: Space mx _ := U in mx.
+Definition vs2mx (U : @space K vT) := let: Space mx _ := U in mx.
 Lemma gen_vs2mx (U : {vspace vT}) : <<vs2mx U>>%MS = vs2mx U.
 Proof. by apply/eqP; rewrite /vs2mx; case: U. Qed.
 
 Fact mx2vs_subproof m (A : 'M[K]_(m, vT)) : <<(<<A>>)>>%MS == <<A>>%MS.
 Proof. by rewrite genmx_id. Qed.
-Definition mx2vs {m} A : {vspace vT} := Space _ (@mx2vs_subproof m A).
+Definition mx2vs {m} A : {vspace vT} := Space (@mx2vs_subproof m A).
 
-HB.instance Definition _ := [isSub of {vspace vT} for (@vs2mx (Phant vT))].
+HB.instance Definition _ := [isSub of {vspace vT} for vs2mx].
 Lemma vs2mxK : cancel vs2mx mx2vs.
 Proof. by move=> v; apply: val_inj; rewrite /= gen_vs2mx. Qed.
 Lemma mx2vsK m (M : 'M_(m, vT)) : (vs2mx (mx2vs M) :=: M)%MS.
@@ -229,10 +231,9 @@ Definition subsetv U V := (vs2mx U <= vs2mx V)%MS.
 Definition vline u := mx2vs (v2r u).
 
 (* Vspace membership is defined as line inclusion. *)
-Definition pred_of_vspace phV (U : space phV) : {pred vT} :=
+Definition pred_of_vspace (U : space vT) : {pred vT} :=
   fun v => (vs2mx (vline v) <= vs2mx U)%MS.
-Canonical vspace_predType :=
-  @PredType _ (unkeyed {vspace vT}) (@pred_of_vspace _).
+Canonical vspace_predType := @PredType _ (unkeyed {vspace vT}) pred_of_vspace.
 
 Definition fullv : {vspace vT} := mx2vs 1%:M.
 Definition addv U V := mx2vs (vs2mx U + vs2mx V).
@@ -343,7 +344,7 @@ Proof. by rewrite -genmxE. Qed.
 Let mem_r2v rv U : (r2v rv \in U) = (rv <= vs2mx U)%MS.
 Proof. by rewrite memvK r2vK. Qed.
 
-Let vs2mx0 : @vs2mx K vT _ 0 = 0.
+Let vs2mx0 : @vs2mx K vT 0 = 0.
 Proof. by rewrite /= linear0 genmx0. Qed.
 
 Let vs2mxD U V : vs2mx (U + V) = (vs2mx U + vs2mx V)%MS.
@@ -1337,7 +1338,7 @@ HB.instance Definition _ :=
 
 Lemma scale_lfunE k f x : (k *: f) x = k *: f x. Proof. exact: lfunE. Qed.
 
-Fact lfun_vect_iso : vector_axiom (dim aT * dim rT) 'Hom(aT, rT).
+Fact lfun_vect_iso : Vector.axiom (dim aT * dim rT) 'Hom(aT, rT).
 Proof.
 exists (mxvec \o f2mx) => [a f g|].
   rewrite /= -linearP /= -[A in _ = mxvec A]/(f2mx (Hom _)).
@@ -1886,7 +1887,7 @@ Proof. by move=> k w1 w2; apply: val_inj; rewrite unlock /= linearP. Qed.
 HB.instance Definition _ := GRing.isLinear.Build K vT subvs_of _ vsproj
   vsproj_is_linear.
 
-Fact subvs_vect_iso : vector_axiom (\dim U) subvs_of.
+Fact subvs_vect_iso : Vector.axiom (\dim U) subvs_of.
 Proof.
 exists (fun w => \row_i coord (vbasis U) i (vsval w)).
   by move=> k w1 w2; apply/rowP=> i; rewrite !mxE linearP.
@@ -1911,7 +1912,7 @@ Variables (R : ringType) (m n : nat).
 
 (* The apparently useless => /= in line 1 of the proof performs some evar     *)
 (* expansions that the Ltac interpretation of exists is incapable of doing.   *)
-Fact matrix_vect_iso : vector_axiom (m * n) 'M[R]_(m, n).
+Fact matrix_vect_iso : Vector.axiom (m * n) 'M[R]_(m, n).
 Proof.
 exists mxvec => /=; first exact: linearP.
 by exists vec_mx; [apply: mxvecK | apply: vec_mxK].
@@ -1925,7 +1926,7 @@ Section RegularVectType.
 
 Variable R : ringType.
 
-Fact regular_vect_iso : vector_axiom 1 R^o.
+Fact regular_vect_iso : Vector.axiom 1 R^o.
 Proof.
 exists (fun a => a%:M) => [a b c|]; first by rewrite rmorphD scale_scalar_mx.
 by exists (fun A : 'M_1 => A 0 0) => [a | A]; rewrite ?mxE // -mx11_scalar.
@@ -1939,7 +1940,7 @@ Section ProdVector.
 
 Variables (R : ringType) (vT1 vT2 : vectType R).
 
-Fact pair_vect_iso : vector_axiom (dim vT1 + dim vT2) (vT1 * vT2).
+Fact pair_vect_iso : Vector.axiom (dim vT1 + dim vT2) (vT1 * vT2).
 Proof.
 pose p2r (u : vT1 * vT2) := row_mx (v2r u.1) (v2r u.2).
 pose r2p w := (r2v (lsubmx w) : vT1, r2v (rsubmx w) : vT2).
@@ -1961,7 +1962,7 @@ Section FunVectType.
 Variable (I : finType) (R : ringType) (vT : vectType R).
 
 (* Type unification with exist is again a problem in this proof. *)
-Fact ffun_vect_iso : vector_axiom (#|I| * dim vT) {ffun I -> vT}.
+Fact ffun_vect_iso : Vector.axiom (#|I| * dim vT) {ffun I -> vT}.
 Proof.
 pose fr (f : {ffun I -> vT}) := mxvec (\matrix_(i < #|I|) v2r (f (enum_val i))).
 exists fr => /= [k f g|].

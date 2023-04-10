@@ -200,7 +200,7 @@ apply/subsetP=> v; rewrite inE genmxE => /submxP[u ->{v}].
 rewrite mulmx_sum_row group_prod // => i _.
 rewrite rowK; move: (enum_val i) (enum_valP i) => v Lv.
 have [->|] := eqVneq (u 0 i) 0; first by rewrite scale0r group1.
-by rewrite -unitfE => aP; rewrite ((actsP linL) (FinRing.Unit _ aP)) ?inE.
+by rewrite -unitfE => aP; rewrite ((actsP linL) (FinRing.Unit aP)) ?inE.
 Qed.
 
 Lemma rowg_mx1 : rowg_mx 1%g = 0.
@@ -928,7 +928,7 @@ have prim_w e: 0 < e < p -> p.-primitive_root (w ^+ e).
 have /cyclicP[a defAutZ]: cyclic (Aut 'Z(S)) by rewrite Aut_prime_cyclic ?ozp.
 have phi_unitP (i : 'I_p.-1): (i.+1%:R : 'Z_#[z]) \in GRing.unit.
   by rewrite unitZpE ?order_gt1 // ozp prime_coprime // -lt0n !modIp'.
-pose ephi i := invm (injm_Zpm a) (Zp_unitm (FinRing.Unit _ (phi_unitP i))).
+pose ephi i := invm (injm_Zpm a) (Zp_unitm (FinRing.Unit (phi_unitP i))).
 pose j : 'Z_#[z] := val (invm (injm_Zp_unitm z) a).
 have co_j_p: coprime j p.
   rewrite coprime_sym /j; case: (invm _ a) => /=.

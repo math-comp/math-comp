@@ -367,7 +367,7 @@ Definition cfReal phi := cfAut conjC phi == phi.
 Definition cfConjC_subset (S1 S2 : seq classfun) :=
   [/\ uniq S1, {subset S1 <= S2} & cfAut_closed conjC S1].
 
-Fact cfun_vect_iso : vector_axiom #|classes G| classfun.
+Fact cfun_vect_iso : Vector.axiom #|classes G| classfun.
 Proof.
 exists (fun phi => \row_i phi (repr (enum_val i))) => [a phi psi|].
   by apply/rowP=> i; rewrite !(mxE, cfunE).

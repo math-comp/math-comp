@@ -590,7 +590,7 @@ Proof.
 apply/subsetP=> x /setIdP[ax]; rewrite !inE -order_dvdn.
 have [a1 | nta] := eqVneq a 1; first by rewrite a1 cycle1 inE in ax.
 rewrite -order_eq1 -dvdn1; move/eqnP: (valP u) => /= <-.
-by rewrite dvdn_gcd {2}Zp_cast ?order_gt1 // order_dvdG.
+by rewrite dvdn_gcd [in X in X && _]Zp_cast ?order_gt1 // order_dvdG.
 Qed.
 
 Lemma im_cyclem : cyclem (val u) a @* <[a]> = <[a]>.

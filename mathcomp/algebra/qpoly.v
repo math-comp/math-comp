@@ -60,7 +60,7 @@ Reserved Notation "{ 'poly' '%/' p }"
 
 Section poly_of_size_zmod.
 Context {R : ringType}.
-Implicit Types (phR : phant R) (n : nat).
+Implicit Types (n : nat).
 
 Section poly_of_size.
 Variable (n : nat).
@@ -85,31 +85,29 @@ Arguments poly_of_size_pred _ _ /.
 
 Section npoly.
 
-Record npoly_of phR n : predArgType := NPoly_of {
+Variable (n : nat).
+
+Record npoly : predArgType := NPoly {
   polyn :> {poly R};
   _ : polyn \is a poly_of_size n
 }.
 
-Variable (n : nat).
+HB.instance Definition _ := [isSub for @polyn].
 
-Local Notation "'{poly_' n R }" := (@npoly_of (Phant R) n).
-
-HB.instance Definition _ := [isSub for @polyn (Phant R) n].
-
-Lemma npoly_is_a_poly_of_size (p : {poly_n R}) : val p \is a poly_of_size n.
+Lemma npoly_is_a_poly_of_size (p : npoly) : val p \is a poly_of_size n.
 Proof. by case: p. Qed.
 Hint Resolve npoly_is_a_poly_of_size : core.
 
-Lemma size_npoly (p : {poly_n R}) : size p <= n.
+Lemma size_npoly (p : npoly) : size p <= n.
 Proof. exact: npoly_is_a_poly_of_size. Qed.
 Hint Resolve size_npoly : core.
 
-HB.instance Definition _ := [Choice of {poly_n R} by <:].
-HB.instance Definition _ := [SubChoice_isSubLmodule of {poly_n R} by <:].
+HB.instance Definition _ := [Choice of npoly by <:].
+HB.instance Definition _ := [SubChoice_isSubLmodule of npoly by <:].
 
-Definition npoly_rV : {poly_n R} -> 'rV[R]_n := poly_rV \o val.
-Definition rVnpoly : 'rV[R]_n -> {poly_n R} :=
-  insubd (0 : {poly_n R}) \o rVpoly.
+Definition npoly_rV : npoly -> 'rV[R]_n := poly_rV \o val.
+Definition rVnpoly : 'rV[R]_n -> npoly :=
+  insubd (0 : npoly) \o rVpoly.
 Arguments rVnpoly /.
 Arguments npoly_rV /.
 
@@ -122,21 +120,23 @@ Lemma rVnpolyK : cancel rVnpoly npoly_rV.
 Proof. by move=> p /=; rewrite val_insubd [_ \is a _]size_poly rVpolyK. Qed.
 Hint Resolve npoly_rV_K rVnpolyK : core.
 
-Lemma npoly_vect_axiom : Vector.axiom n (Phant {poly_n R}).
+Lemma npoly_vect_axiom : Vector.axiom n npoly.
 Proof. by exists npoly_rV; [move=> ???; exact: linearP|exists rVnpoly]. Qed.
 
-HB.instance Definition _ := Lmodule_hasFinDim.Build R {poly_n R}
-  npoly_vect_axiom.
+HB.instance Definition _ := Lmodule_hasFinDim.Build R npoly npoly_vect_axiom.
 
 End npoly.
 End poly_of_size_zmod.
 
-Notation "'{poly_' n R }" := (npoly_of (Phant R) n) : type_scope.
-Notation NPoly := (NPoly_of (Phant _)).
+Arguments npoly {R}%type n%N.
+
+Notation "'{poly_' n R }" := (@npoly R n) : type_scope.
+
 #[global]
 Hint Resolve size_npoly npoly_is_a_poly_of_size : core.
 
 Arguments poly_of_size_pred _ _ _ /.
+Arguments npoly : clear implicits.
 
 HB.instance Definition _ (R : countRingType) n :=
   [Countable of {poly_n R} by <:].
@@ -147,13 +147,13 @@ HB.instance Definition _  (R : finRingType) n : isFinite {poly_n R} :=
 Section npoly_theory.
 Context (R : ringType) {n : nat}.
 
-Lemma polyn_is_linear : linear (@polyn _ _ _ : {poly_n R} -> _).
+Lemma polyn_is_linear : linear (@polyn _ _ : {poly_n R} -> _).
 Proof. by []. Qed.
 HB.instance Definition _ :=
   GRing.isLinear.Build R {poly_n R} {poly R} _ (polyn (n:=n)) polyn_is_linear.
 
-Canonical npoly (E : nat -> R) : {poly_n R} :=
-   @NPoly_of _ (Phant R) _ (\poly_(i < n) E i) (size_poly _ _).
+Canonical mk_npoly (E : nat -> R) : {poly_n R} :=
+  @NPoly R _ (\poly_(i < n) E i) (size_poly _ _).
 
 Fact size_npoly0 : size (0 : {poly R}) <= n.
 Proof. by rewrite size_poly0. Qed.
@@ -162,7 +162,7 @@ Definition npoly0 := NPoly (size_npoly0).
 
 Fact npolyp_key : unit. Proof. exact: tt. Qed.
 Definition npolyp : {poly R} -> {poly_n R} :=
-  locked_with npolyp_key (npoly \o (nth 0)).
+  locked_with npolyp_key (mk_npoly \o (nth 0)).
 
 Definition npoly_of_seq := npolyp \o Poly.
 
@@ -189,7 +189,7 @@ Lemma coefn_sum (I : Type) (r : seq I) (P : pred I)
 Proof. by rewrite !raddf_sum //= coef_sum. Qed.
 
 End npoly_theory.
-Arguments npoly {R} n E.
+Arguments mk_npoly {R} n E.
 Arguments npolyp {R} n p.
 
 Section fin_npoly.
@@ -458,7 +458,7 @@ rewrite qualifE/= -ltnS prednK ?size_mk_monic_gt0 //.
 by apply: ltn_rmodpN0; rewrite mk_monic_neq0.
 Qed.
 
-Definition in_qpoly p : {poly %/ h} := NPoly_of _ (poly_of_size_mod p).
+Definition in_qpoly p : {poly %/ h} := NPoly (poly_of_size_mod p).
 
 Lemma in_qpoly_small (p : {poly R}) :
   size p < size (mk_monic h) -> in_qpoly p = p :> {poly R}.
@@ -487,7 +487,7 @@ rewrite qualifE/= -ltnS size_polyC prednK ?size_mk_monic_gt0 //.
 by rewrite (leq_ltn_trans _ size_mk_monic_gt1) //; case: eqP.
 Qed.
 
-Definition qpolyC k : {poly %/ h} :=  NPoly_of _ (qpolyC_proof k).
+Definition qpolyC k : {poly %/ h} :=  NPoly (qpolyC_proof k).
 
 Lemma qpolyCE k : qpolyC k = k%:P :> {poly R}.
 Proof. by []. Qed.

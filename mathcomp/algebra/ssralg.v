@@ -949,10 +949,8 @@ Local Notation "\prod_ ( m <= i < n ) F" := (\big[*%R/1%R]_(m <= i < n) F%R).
 (* The ``field'' characteristic; the definition, and many of the theorems,   *)
 (* has to apply to rings as well; indeed, we need the Frobenius automorphism *)
 (* results for a non commutative ring in the proof of Gorenstein 2.6.3.      *)
-Definition char (R : semiRingType) of phant R : nat_pred :=
+Definition char (R : semiRingType) : nat_pred :=
   [pred p | prime p & p%:R == 0 :> R].
-
-Local Notation "[ 'char' R ]" := (char (Phant R)) : ring_scope.
 
 (* Converse ring tag. *)
 Definition converse R : Type := R.
@@ -1184,12 +1182,12 @@ rewrite exprD1n !big_ord_recr big_ord0 /= add0r.
 by rewrite addrC addrA addrAC.
 Qed.
 
-Definition Frobenius_aut p of p \in [char R] := fun x => x ^+ p.
+Definition Frobenius_aut p of p \in char R := fun x => x ^+ p.
 
 Section FrobeniusAutomorphism.
 
 Variable p : nat.
-Hypothesis charFp : p \in [char R].
+Hypothesis charFp : p \in char R.
 
 Lemma charf0 : p%:R = 0 :> R. Proof. by apply/eqP; case/andP: charFp. Qed.
 Lemma charf_prime : prime p. Proof. by case/andP: charFp. Qed.
@@ -1209,7 +1207,7 @@ move/(congr1 (fun m => m%:R : R))/eqP.
 by rewrite natrD !natrM charf0 n0 !mulr0 pn1 addr0 oner_eq0.
 Qed.
 
-Lemma charf_eq : [char R] =i (p : nat_pred).
+Lemma charf_eq : char R =i (p : nat_pred).
 Proof.
 move=> q; apply/andP/eqP=> [[q_pr q0] | ->]; last by rewrite charf0.
 by apply/eqP; rewrite eq_sym -dvdn_prime2 // dvdn_charf.
@@ -1256,7 +1254,7 @@ End FrobeniusAutomorphism.
 
 Section Char2.
 
-Hypothesis charR2 : 2 \in [char R].
+Hypothesis charR2 : 2 \in char R.
 
 Lemma addrr_char2 x : x + x = 0. Proof. by rewrite -mulr2n mulrn_char. Qed.
 
@@ -1469,7 +1467,7 @@ Proof. by rewrite subrX1 !big_ord_recr big_ord0 /= addrAC add0r. Qed.
 Section FrobeniusAutomorphism.
 
 Variable p : nat.
-Hypothesis charFp : p \in [char R].
+Hypothesis charFp : p \in char R.
 
 Hint Resolve charf_prime : core.
 
@@ -1488,10 +1486,10 @@ Qed.
 
 End FrobeniusAutomorphism.
 
-Lemma exprNn_char x n : [char R].-nat n -> (- x) ^+ n = - (x ^+ n).
+Lemma exprNn_char x n : (char R).-nat n -> (- x) ^+ n = - (x ^+ n).
 Proof.
 pose p := pdiv n; have [|n_gt1 charRn] := leqP n 1; first by case: (n) => [|[]].
-have charRp: p \in [char R] by rewrite (pnatPpi charRn) // pi_pdiv.
+have charRp: p \in char R by rewrite (pnatPpi charRn) // pi_pdiv.
 have /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (charf_eq charRp)).
 elim: e => // e IHe; rewrite expnSr !exprM {}IHe.
 by rewrite -Frobenius_autE Frobenius_autN.
@@ -1499,7 +1497,7 @@ Qed.
 
 Section Char2.
 
-Hypothesis charR2 : 2 \in [char R].
+Hypothesis charR2 : 2 \in char R.
 
 Lemma oppr_char2 x : - x = x.
 Proof. by apply/esym/eqP; rewrite -addr_eq0 addrr_char2. Qed.
@@ -1835,7 +1833,7 @@ HB.export AdditiveExports.
 (* Lifted additive operations. *)
 Section LiftedNmod.
 Variables (U : Type) (V : nmodType).
-Definition null_fun_head (phV : phant V) of U : V := let: Phant := phV in 0.
+Definition null_fun of U : V := 0.
 Definition add_fun (f g : U -> V) x := f x + g x.
 End LiftedNmod.
 Section LiftedZmod.
@@ -1857,13 +1855,12 @@ End LiftedSemiRing.
 Section LiftedScale.
 Variables (R : ringType) (U : Type) (V : lmodType R) (A : lalgType R).
 Definition scale_fun a (f : U -> V) x := a *: f x.
-Definition in_alg_head (phA : phant A) k : A := let: Phant := phA in k%:A.
+Definition in_alg_head k : A := k%:A.
 End LiftedScale.
 
-Notation null_fun V := (null_fun_head (Phant V)) (only parsing).
 (* The real in_alg notation is declared after GRing.Theory so that at least *)
 (* in Coq 8.2 it gets precedence when GRing.Theory is not imported.         *)
-Local Notation in_alg_loc A := (in_alg_head (Phant A)) (only parsing).
+Local Notation in_alg_loc A := (in_alg_head A) (only parsing).
 
 Local Notation "\0" := (null_fun _) : ring_scope.
 Local Notation "f \+ g" := (add_fun f g) : ring_scope.
@@ -1874,6 +1871,8 @@ Local Notation "x \*o f" := (mull_fun x f) : ring_scope.
 Local Notation "x \o* f" := (mulr_fun x f) : ring_scope.
 Local Notation "f \* g" := (mul_fun f g) : ring_scope.
 
+Arguments null_fun {_} V _ /.
+Arguments in_alg_head {_} A _ /.
 Arguments add_fun {_ _} f g _ /.
 Arguments sub_fun {_ _} f g _ /.
 Arguments opp_fun {_ _} f _ /.
@@ -2101,7 +2100,7 @@ Proof. by elim: n => [|n IHn] x; rewrite ?rmorph1 // !exprS rmorphM IHn. Qed.
 
 Lemma rmorph_nat n : f n%:R = n%:R. Proof. by rewrite rmorphMn rmorph1. Qed.
 
-Lemma rmorph_char p : p \in [char R] -> p \in [char S].
+Lemma rmorph_char p : p \in char R -> p \in char S.
 Proof. by rewrite !inE -rmorph_nat => /andP[-> /= /eqP->]; rewrite rmorph0. Qed.
 
 Lemma rmorph_eq_nat x n : injective f -> (f x == n%:R) = (x == n%:R).
@@ -2636,7 +2635,7 @@ Qed.
 
 Section FrobeniusAutomorphism.
 
-Variables (p : nat) (charRp : p \in [char R]).
+Variables (p : nat) (charRp : p \in char R).
 
 Lemma Frobenius_aut_is_additive : additive (Frobenius_aut charRp).
 Proof. move=> x y; exact: Frobenius_autB_comm (mulrC _ _). Qed.
@@ -2656,10 +2655,10 @@ HB.instance Definition _ := isMultiplicative.Build R R (Frobenius_aut charRp)
 
 End FrobeniusAutomorphism.
 
-Lemma exprDn_char x y n : [char R].-nat n -> (x + y) ^+ n = x ^+ n + y ^+ n.
+Lemma exprDn_char x y n : (char R).-nat n -> (x + y) ^+ n = x ^+ n + y ^+ n.
 Proof.
 pose p := pdiv n; have [|n_gt1 charRn] := leqP n 1; first by case: (n) => [|[]].
-have charRp: p \in [char R] by rewrite (pnatPpi charRn) ?pi_pdiv.
+have charRp: p \in char R by rewrite (pnatPpi charRn) ?pi_pdiv.
 have{charRn} /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (charf_eq charRp)).
 by elim: e => // e IHe; rewrite !expnSr !exprM IHe -Frobenius_autE rmorphD.
 Qed.
@@ -3978,7 +3977,7 @@ Lemma sqrf_eq0 x : (x ^+ 2 == 0) = (x == 0). Proof. exact: expf_eq0. Qed.
 Lemma expf_neq0 x m : x != 0 -> x ^+ m != 0.
 Proof. by move=> x_nz; rewrite expf_eq0; apply/nandP; right. Qed.
 
-Lemma natf_neq0 n : (n%:R != 0 :> R) = [char R]^'.-nat n.
+Lemma natf_neq0 n : (n%:R != 0 :> R) = (char R)^'.-nat n.
 Proof.
 have [-> | /prod_prime_decomp->] := posnP n; first by rewrite eqxx.
 rewrite !big_seq; elim/big_rec: _ => [|[p e] s /=]; first by rewrite oner_eq0.
@@ -3986,14 +3985,14 @@ case/mem_prime_decomp=> p_pr _ _; rewrite pnatM pnatX eqn0Ngt orbC => <-.
 by rewrite natrM natrX mulf_eq0 expf_eq0 negb_or negb_and pnatE ?inE p_pr.
 Qed.
 
-Lemma natf0_char n : n > 0 -> n%:R == 0 :> R -> exists p, p \in [char R].
+Lemma natf0_char n : n > 0 -> n%:R == 0 :> R -> exists p, p \in char R.
 Proof.
-move=> n_gt0 nR_0; exists (pdiv n`_[char R]).
+move=> n_gt0 nR_0; exists (pdiv n`_(char R)).
 apply: pnatP (pdiv_dvd _); rewrite ?part_pnat // ?pdiv_prime //.
 by rewrite ltn_neqAle eq_sym partn_eq1 // -natf_neq0 nR_0 /=.
 Qed.
 
-Lemma charf'_nat n : [char R]^'.-nat n = (n%:R != 0 :> R).
+Lemma charf'_nat n : (char R)^'.-nat n = (n%:R != 0 :> R).
 Proof.
 have [-> | n_gt0] := posnP n; first by rewrite eqxx.
 apply/idP/idP => [|nz_n]; last first.
@@ -4003,7 +4002,7 @@ have [p_pr _] := andP charRp; rewrite (eq_pnat _ (eq_negn (charf_eq charRp))).
 by rewrite p'natE // (dvdn_charf charRp) n0.
 Qed.
 
-Lemma charf0P : [char R] =i pred0 <-> (forall n, (n%:R == 0 :> R) = (n == 0)%N).
+Lemma charf0P : char R =i pred0 <-> (forall n, (n%:R == 0 :> R) = (n == 0)%N).
 Proof.
 split=> charF0 n; last by rewrite !inE charF0 andbC; case: eqP => // ->.
 have [-> | n_gt0] := posnP; first exact: eqxx.
@@ -4204,7 +4203,7 @@ by move=> ?; rewrite -mulr_suml -(divr1 a) eqr_div ?oner_eq0// mulr1 divr1.
 Qed.
 
 Lemma char0_natf_div :
-  [char F] =i pred0 -> forall m d, d %| m -> (m %/ d)%:R = m%:R / d%:R :> F.
+  char F =i pred0 -> forall m d, d %| m -> (m %/ d)%:R = m%:R / d%:R :> F.
 Proof.
 move/charf0P=> char0F m [|d] d_dv_m; first by rewrite divn0 invr0 mulr0.
 by rewrite natr_div // unitfE char0F.
@@ -4230,7 +4229,7 @@ Proof. exact: inj_eq fmorph_inj. Qed.
 Lemma fmorph_eq1 x : (f x == 1) = (x == 1).
 Proof. by rewrite -(inj_eq fmorph_inj) rmorph1. Qed.
 
-Lemma fmorph_char : [char R] =i [char F].
+Lemma fmorph_char : char R =i char F.
 Proof. by move=> p; rewrite !inE -fmorph_eq0 rmorph_nat. Qed.
 
 End FieldMorphismInj.
@@ -4278,7 +4277,7 @@ Qed.
 
 End ModuleTheory.
 
-Lemma char_lalg (A : lalgType F) : [char A] =i [char F].
+Lemma char_lalg (A : lalgType F) : char A =i char F.
 Proof. by move=> p; rewrite inE -scaler_nat scaler_eq0 oner_eq0 orbF. Qed.
 
 End FieldTheory.
@@ -6137,7 +6136,8 @@ Notation "1" := (@one _) : ring_scope.
 Notation "- 1" := (opp 1) : ring_scope.
 
 Notation "n %:R" := (natmul 1 n) : ring_scope.
-Notation "[ 'char' R ]" := (char (Phant R)) : ring_scope.
+Arguments GRing.char R%type.
+Notation "[ 'char' R ]" := (GRing.char R) : ring_scope.
 Notation Frobenius_aut chRp := (Frobenius_aut chRp).
 Notation "*%R" := (@mul _) : fun_scope.
 Notation "x * y" := (mul x y) : ring_scope.
@@ -6158,6 +6158,8 @@ Notation "x \*o f" := (mull_fun x f) : ring_scope.
 Notation "x \o* f" := (mulr_fun x f) : ring_scope.
 Notation "f \* g" := (mul_fun f g) : ring_scope.
 
+Arguments null_fun {_} V _ /.
+Arguments in_alg_head {_} A _ /.
 Arguments add_fun {_ _} f g _ /.
 Arguments sub_fun {_ _} f g _ /.
 Arguments opp_fun {_ _} f _ /.
