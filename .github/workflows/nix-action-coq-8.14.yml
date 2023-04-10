@@ -13,7 +13,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -67,7 +67,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -123,7 +123,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -181,7 +181,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -227,7 +227,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -275,7 +275,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -313,7 +313,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -345,70 +345,6 @@ jobs:
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
         --argstr job "coq-bits"
-  coqeal:
-    needs:
-    - coq
-    - mathcomp-algebra
-    - multinomials
-    - mathcomp-real-closed
-    runs-on: ubuntu-latest
-    steps:
-    - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  if [ -z \"$merge_commit\" ]; then\n    echo \"tested_commit=${{\
-        \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
-        \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
-    - name: Git checkout
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-        ref: ${{ env.tested_commit }}
-    - name: Cachix install
-      uses: cachix/install-nix-action@v20
-      with:
-        nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v12
-      with:
-        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-        extraPullNames: coq, coq-community
-        name: math-comp
-    - id: stepCheck
-      name: Checking presence of CI target coqeal
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.14\" --argstr job \"coqeal\" \\\n   --dry-run 2>&1 > /dev/null)\n\
-        echo $nb_dry_run\necho ::set-output name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\")\n"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
-        --argstr job "coq"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: mathcomp-algebra'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
-        --argstr job "mathcomp-algebra"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: bignums'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
-        --argstr job "bignums"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: paramcoq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
-        --argstr job "paramcoq"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: multinomials'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
-        --argstr job "multinomials"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: mathcomp-real-closed'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
-        --argstr job "mathcomp-real-closed"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.14"
-        --argstr job "coqeal"
   coquelicot:
     needs:
     - coq
@@ -423,7 +359,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -469,7 +405,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -516,7 +452,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -568,7 +504,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -624,7 +560,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -681,7 +617,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -745,7 +681,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -812,7 +748,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -879,7 +815,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -930,7 +866,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -982,7 +918,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1040,7 +976,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1090,7 +1026,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1153,7 +1089,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1210,7 +1146,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1255,7 +1191,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1313,7 +1249,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1359,7 +1295,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1410,7 +1346,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1474,7 +1410,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1514,7 +1450,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1567,7 +1503,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1611,7 +1547,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1669,7 +1605,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1737,7 +1673,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1807,7 +1743,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
@@ -1853,7 +1789,7 @@ jobs:
         \ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n  else\n    echo\
         \ \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
