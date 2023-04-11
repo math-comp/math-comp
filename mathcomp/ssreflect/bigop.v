@@ -331,7 +331,7 @@ HB.mixin Record isLaw T (op : T -> T -> T) := {
 
 #[export]
 HB.structure Definition Law T := {op of isLaw T op}.
-Definition law := Law.type.
+Notation law := Law.type.
 
 HB.mixin Record isCommutativeLaw T (op : T -> T -> T) := {
   opC : commutative op;
@@ -339,7 +339,7 @@ HB.mixin Record isCommutativeLaw T (op : T -> T -> T) := {
 
 #[export]
 HB.structure Definition ComLaw T := {op of Law T op & isCommutativeLaw T op}.
-Definition com_law := ComLaw.type.
+Notation com_law := ComLaw.type.
 
 HB.factory Record isComLaw T (op : T -> T -> T) := {
   opA : associative op;
@@ -397,7 +397,7 @@ HB.mixin Record isMonoidLaw T (idm : T) (op : T -> T -> T) := {
 #[export]
 HB.structure Definition Law T idm :=
   {op of SemiGroup.Law T op & isMonoidLaw T idm op}.
-Definition law := Law.type.
+Notation law := Law.type.
 
 HB.factory Record isLaw T (idm : T) (op : T -> T -> T) := {
   opA : associative op;
@@ -415,7 +415,7 @@ HB.end.
 #[export]
 HB.structure Definition ComLaw T idm :=
   {op of Law T idm op & isCommutativeLaw T op}.
-Definition com_law := ComLaw.type.
+Notation com_law := ComLaw.type.
 
 HB.factory Record isComLaw T (idm : T) (op : T -> T -> T) := {
   opA : associative op;
@@ -439,7 +439,7 @@ HB.mixin Record isMulLaw T (zero : T) (mul : T -> T -> T) := {
 
 #[export]
 HB.structure Definition MulLaw T zero := {mul of isMulLaw T zero mul}.
-Definition mul_law := MulLaw.type.
+Notation mul_law := MulLaw.type.
 
 HB.mixin Record isAddLaw T (mul : T -> T -> T) (op : T -> T -> T) := {
   mul_op_Dl : left_distributive mul op;
@@ -449,7 +449,7 @@ HB.mixin Record isAddLaw T (mul : T -> T -> T) (op : T -> T -> T) := {
 #[export]
 HB.structure Definition AddLaw T zero mul :=
   {add of ComLaw T zero add & isAddLaw T mul add}.
-Definition add_law := AddLaw.type.
+Notation add_law := AddLaw.type.
 
 Module Import Exports. HB.reexport. End Exports.
 
