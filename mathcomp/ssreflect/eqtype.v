@@ -305,7 +305,7 @@ Module Export EqTypePred := MakeEqTypePred eqtype.Equality.
 Lemma unit_eqP : Equality.axiom (fun _ _ : unit => true).
 Proof. by do 2!case; left. Qed.
 
-HB.instance Definition unit_hasDecEq := hasDecEq.Build unit unit_eqP.
+HB.instance Definition _ := hasDecEq.Build unit unit_eqP.
 
 (* Comparison for booleans. *)
 
@@ -315,7 +315,7 @@ Definition eqb b := addb (~~ b).
 Lemma eqbP : Equality.axiom eqb.
 Proof. by do 2!case; constructor. Qed.
 
-HB.instance Definition bool_hasDecEq := hasDecEq.Build bool eqbP.
+HB.instance Definition _ := hasDecEq.Build bool eqbP.
 
 Lemma eqbE : eqb = eq_op. Proof. by []. Qed.
 
@@ -758,7 +758,7 @@ Variables (T : eqType) (P : pred T) (sT : subType P).
 Local Notation ev_ax := (fun T v => @Equality.axiom T (fun x y => v x == v y)).
 Lemma val_eqP : ev_ax sT val. Proof. exact: inj_eqAxiom val_inj. Qed.
 
-HB.instance Definition sub_hasDecEq := hasDecEq.Build (sub_type sT) val_eqP.
+HB.instance Definition _ := hasDecEq.Build (sub_type sT) val_eqP.
 
 End SubEqType.
 
@@ -795,7 +795,7 @@ move=> [x1 x2] [y1 y2] /=; apply: (iffP andP) => [[]|[<- <-]] //=.
 by do 2!move/eqP->.
 Qed.
 
-HB.instance Definition prod_hasDecEq := hasDecEq.Build (T1 * T2)%type pair_eqP.
+HB.instance Definition _ := hasDecEq.Build (T1 * T2)%type pair_eqP.
 
 Lemma pair_eqE : pair_eq = eq_op :> rel _. Proof. by []. Qed.
 
@@ -832,7 +832,7 @@ Proof.
 case=> [x|] [y|] /=; by [constructor | apply: (iffP eqP) => [|[]] ->].
 Qed.
 
-HB.instance Definition option_hasDecEq := hasDecEq.Build (option T) opt_eqP.
+HB.instance Definition _ := hasDecEq.Build (option T) opt_eqP.
 
 End OptionEqType.
 
@@ -869,7 +869,7 @@ case: eqP => [<-|Hij] y; last by right; case.
 by apply: (iffP eqP) => [->|<-]; rewrite tagged_asE.
 Qed.
 
-HB.instance Definition tag_hasDecEq := hasDecEq.Build {i : I & T_ i} tag_eqP.
+HB.instance Definition _ := hasDecEq.Build {i : I & T_ i} tag_eqP.
 
 Lemma tag_eqE : tag_eq = eq_op. Proof. by []. Qed.
 
@@ -898,7 +898,7 @@ Definition sum_eq u v :=
 Lemma sum_eqP : Equality.axiom sum_eq.
 Proof. case=> x [] y /=; by [right | apply: (iffP eqP) => [->|[->]]]. Qed.
 
-HB.instance Definition sum_hasDecEq := hasDecEq.Build (T1 + T2)%type sum_eqP.
+HB.instance Definition _ := hasDecEq.Build (T1 + T2)%type sum_eqP.
 
 Lemma sum_eqE : sum_eq = eq_op. Proof. by []. Qed.
 
