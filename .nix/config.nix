@@ -59,6 +59,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "multinomials"
       "mathcomp-zify"
       "mathcomp-abel"
+      "mathcomp-tarjan"
     ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
