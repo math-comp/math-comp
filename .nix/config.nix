@@ -38,7 +38,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "mathcomp-abel" "multinomials" "mathcomp-real-closed" "coqeal"
       "fourcolor" "odd-order" "gaia" "deriving" "mathcomp-zify"
       "extructures" "mathcomp-classical" "mathcomp-analysis" "reglang"
-      "graph-theory" "coquelicot"
+      "graph-theory" "coquelicot" "mathcomp-tarjan"
     ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
