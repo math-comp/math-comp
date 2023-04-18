@@ -1410,7 +1410,7 @@ Variables (S : {pred R}) (ringS : semiringPred S) (kS : keyed_pred ringS).
 Fact polyOver_mulr_closed : mulr_closed (polyOver kS).
 Proof.
 split=> [|p q]; first by rewrite polyOverC rpred1.
-apply polyOver_mulr_2closed=>//; apply rpredM.
+by apply polyOver_mulr_2closed=> //; apply rpredM.
 Qed.
 Canonical polyOver_mulrPred := MulrPred polyOver_mulr_closed.
 Canonical polyOver_semiringPred := SemiringPred polyOver_mulr_closed.
