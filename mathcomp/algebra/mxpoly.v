@@ -347,7 +347,7 @@ Lemma horner_rVpoly m (u : 'rV_m) :
 Proof.
 rewrite mulmx_sum_row linear_sum [rVpoly u]poly_def rmorph_sum.
 apply: eq_bigr => i _.
-by rewrite valK /= !linearZ rmorphX /= horner_mx_X rowK /= mxvecK.
+by rewrite valK /= !linearZ rmorphXn /= horner_mx_X rowK /= mxvecK.
 Qed.
 
 End OneMatrix.
@@ -454,7 +454,7 @@ Qed.
 Lemma char_poly_det : char_poly`_0 = (- 1) ^+ n * \det A.
 Proof.
 rewrite big_distrr coef_sum [0%N]lock /=; apply: eq_bigr => s _.
-rewrite -{1}rmorphN -rmorphX mul_polyC coefZ /=.
+rewrite -{1}rmorphN -rmorphXn mul_polyC coefZ /=.
 rewrite mulrA -exprD addnC exprD -mulrA -lock; congr (_ * _).
 transitivity (\prod_(i < n) - A i (s i)); last by rewrite prodrN card_ord.
 elim: (index_enum _) => [|i e IHe]; rewrite !(big_nil, big_cons) ?coef1 //.
@@ -689,7 +689,7 @@ Qed.
 
 Lemma mx_root_minpoly : horner_mx A p_A = 0.
 Proof.
-rewrite rmorphB -{3}(horner_mx_X A) -rmorphX /=.
+rewrite rmorphB -{3}(horner_mx_X A) -rmorphXn /=.
 by rewrite mx_inv_hornerK ?subrr ?horner_mx_mem.
 Qed.
 
@@ -829,7 +829,7 @@ Local Notation fp := (map_poly f).
 Variables (n' : nat) (A : 'M[aR]_n'.+1).
 
 Lemma map_powers_mx e : (powers_mx A e)^f = powers_mx A^f e.
-Proof. by apply/row_matrixP=> i; rewrite -map_row !rowK map_mxvec rmorphX. Qed.
+Proof. by apply/row_matrixP=> i; rewrite -map_row !rowK map_mxvec rmorphXn. Qed.
 
 Lemma map_horner_mx p : (horner_mx A p)^f = horner_mx A^f (fp p).
 Proof.
@@ -864,7 +864,7 @@ Lemma mxminpoly_map : mxminpoly A^f = fp (mxminpoly A).
 Proof.
 rewrite rmorphB; congr (_ - _).
   by rewrite /= map_polyXn degree_mxminpoly_map.
-rewrite degree_mxminpoly_map -rmorphX /=.
+rewrite degree_mxminpoly_map -rmorphXn /=.
 apply/polyP=> i; rewrite coef_map //= !coef_rVpoly degree_mxminpoly_map.
 case/insub: i => [i|]; last by rewrite rmorph0.
 by rewrite -map_powers_mx -map_pinvmx // -map_mxvec -map_mxM // mxE.
@@ -987,7 +987,7 @@ Definition geigenspace n (g : 'M_n) a := kermxpoly g (('X - a%:P) ^+ n).
 Lemma geigenspaceE n' (g : 'M_n'.+1) a :
   geigenspace g a = kermx ((g - a%:M) ^+ n'.+1).
 Proof.
-by rewrite /geigenspace /kermxpoly rmorphX/= rmorphB/= horner_mx_X horner_mx_C.
+by rewrite /geigenspace /kermxpoly rmorphXn/= rmorphB/= horner_mx_X horner_mx_C.
 Qed.
 
 Lemma eigenspace_sub_geigen n (g : 'M_n) a :
@@ -1032,7 +1032,7 @@ Qed.
 
 Lemma map_geigenspace (n : nat) (g : 'M_n) (a : aF) :
   map_mx f (geigenspace g a) = geigenspace (map_mx f g) (f a).
-Proof. by rewrite map_kermxpoly rmorphX /= rmorphB /= map_polyX map_polyC. Qed.
+Proof. by rewrite map_kermxpoly rmorphXn/= rmorphB /= map_polyX map_polyC. Qed.
 
 Lemma eigenpoly_map n (g : 'M_n) (p : {poly aF}) :
   eigenpoly (map_mx f g) (map_poly f p) = eigenpoly g p.

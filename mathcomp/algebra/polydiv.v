@@ -3098,7 +3098,7 @@ have [-> | bn0] := eqVneq b 0.
   by rewrite (rmorph0 [rmorphism of map_poly f]) scalp0.
 rewrite unlock redivp_map lead_coef_map rmorph_unit; last first.
   by rewrite unitfE lead_coef_eq0.
-rewrite modpE divpE !map_polyZ !rmorphV ?rmorphX // unitfE.
+rewrite modpE divpE !map_polyZ !rmorphV ?rmorphXn // unitfE.
 by rewrite expf_neq0 // lead_coef_eq0.
 Qed.
 
@@ -3123,7 +3123,8 @@ rewrite /egcdp !size_map_poly {}le_qp; move: (size q) => n.
 elim: n => /= [|n IHn] in p q *; first by rewrite rmorph1 rmorph0.
 rewrite map_poly_eq0; have [_ | nz_q] := ifPn; first by rewrite rmorph1 rmorph0.
 rewrite -map_modp (IHn q (p %% q)); case: (egcdp_rec _ _ n) => u v /=.
-by rewrite map_polyZ lead_coef_map -rmorphX scalp_map rmorphB rmorphM -map_divp.
+rewrite map_polyZ lead_coef_map -rmorphXn scalp_map rmorphB rmorphM.
+by rewrite -map_divp.
 Qed.
 
 Lemma dvdp_map p q : (p^f %| q^f) = (p %| q).

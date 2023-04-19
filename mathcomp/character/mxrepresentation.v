@@ -722,7 +722,7 @@ Proof. exact: enum_valK_in. Qed.
 
 Lemma gring_indexK : {in G, cancel gring_index enum_val}.
 Proof. exact: enum_rankK_in. Qed.
-  
+
 Definition regular_mx x : 'M[R]_nG :=
   \matrix_i delta_mx 0 (gring_index (enum_val i * x)).
 
@@ -1720,7 +1720,7 @@ Variant mxsemisimple (V : 'M_n) :=
 (* This is a slight generalization of Aschbacher 12.5 for finite sets. *)
 Lemma sum_mxsimple_direct_compl m I W (U : 'M_(m, n)) :
     let V := (\sum_(i : I) W i)%MS in
-    (forall i : I, mxsimple (W i)) -> mxmodule U -> (U <= V)%MS -> 
+    (forall i : I, mxsimple (W i)) -> mxmodule U -> (U <= V)%MS ->
   {J : {set I} | let S := U + \sum_(i in J) W i in S :=: V /\ mxdirect S}%MS.
 Proof.
 move=> V simW modU sUV; pose V_ (J : {set I}) := (\sum_(i in J) W i)%MS.
@@ -1917,7 +1917,7 @@ Qed.
 
 Lemma hom_mxsemisimple_iso I P U W f :
   let V := (\sum_(i : I |  P i) W i)%MS in
-  mxsimple U -> (forall i, P i -> W i != 0 -> mxsimple (W i)) -> 
+  mxsimple U -> (forall i, P i -> W i != 0 -> mxsimple (W i)) ->
   (V <= dom_hom_mx f)%MS -> (U <= V *m f)%MS ->
   {i | P i & mx_iso (W i) U}.
 Proof.
@@ -3022,7 +3022,7 @@ by rewrite mulmxA homB1 // -!mulmxA homB2.
 Qed.
 
 Lemma mx_rsim_def n1 n2 (rG1 : reprG n1) (rG2 : reprG n2) :
-    mx_rsim rG1 rG2 -> 
+    mx_rsim rG1 rG2 ->
   exists B, exists2 B', B' *m B = 1%:M &
     forall x, x \in G -> rG1 x = B *m rG2 x *m B'.
 Proof.
@@ -3204,7 +3204,7 @@ Qed.
 
 Lemma mxtrace_dsum_mod (I : finType) (P : pred I) U W
                        (modU : forall i, mG (U i)) (modW : mG W) :
-    let S := (\sum_(i | P i) U i)%MS in (S :=: W)%MS -> mxdirect S -> 
+    let S := (\sum_(i | P i) U i)%MS in (S :=: W)%MS -> mxdirect S ->
   {in G, forall x, \sum_(i | P i) \tr (sr (modU i) x) = \tr (sr modW x)}.
 Proof.
 move=> /= sumS dxS x Gx; have [m lePm] := ubnP #|P|.
@@ -3704,13 +3704,13 @@ by rewrite -[_ *m _]mul1mx mulmxA -val_submodE val_submodJ.
 Qed.
 
 Lemma section_eqmx U1 U2 V1 V2 modU1 modU2 modV1 modV2
-                   (eqU : (U1 :=: U2)%MS) (eqV : (V1 :=: V2)%MS) : 
+                   (eqU : (U1 :=: U2)%MS) (eqV : (V1 :=: V2)%MS) :
   mx_rsim (@section_repr U1 V1 modU1 modV1) (@section_repr U2 V2 modU2 modV2).
 Proof. by apply: section_eqmx_add => //; apply: adds_eqmx. Qed.
 
 Lemma mx_butterfly U V W modU modV modW :
     ~~ (U == V)%MS -> max_submod U W -> max_submod V W ->
-  let modUV := capmx_module modU modV in 
+  let modUV := capmx_module modU modV in
      max_submod (U :&: V)%MS U
   /\ mx_rsim (@section_repr V W modV modW) (@section_repr _ U modUV modU).
 Proof.
@@ -3771,7 +3771,7 @@ Local Notation rsimT := mx_rsim_trans.
 Local Notation rsimC := mx_rsim_sym.
 
 Lemma mx_JordanHolder U V compU compV :
-  let m := size U in (last 0 U :=: last 0 V)%MS -> 
+  let m := size U in (last 0 U :=: last 0 V)%MS ->
   m = size V  /\ (exists p : 'S_m, forall i : 'I_m,
      mx_rsim (@series_repr U i compU) (@series_repr V (p i) compV)).
 Proof.
@@ -4167,7 +4167,7 @@ Hypothesis F'G : [char F]^'.-group G.
 
 Lemma irr_mx_sum : (\sum_(i : sG) i = 1%:M)%MS.
 Proof. by apply: reducible_Socle1; apply: mx_Maschke. Qed.
- 
+
 Lemma Wedderburn_sum : (\sum_i 'R_i :=: R_G)%MS.
 Proof. by apply: eqmx_trans sums_R _; rewrite /Socle irr_mx_sum mul1mx. Qed.
 
@@ -4599,7 +4599,7 @@ Proof.
 move=> ozG cGG [|n] rG irrG; first by case/mx_irrP: irrG.
 case: (pickP [pred x in G | ~~ is_scalar_mx (rG x)]) => [x | scalG].
   case/andP=> Gx nscal_rGx; have: horner_mx (rG x) ('X^#|G| - 1) == 0.
-    rewrite rmorphB rmorphX /= horner_mx_C horner_mx_X.
+    rewrite rmorphB rmorphXn /= horner_mx_C horner_mx_X.
     rewrite -repr_mxX ?inE // ((_ ^+ _ =P 1)%g _) ?repr_mx1 ?subrr //.
     by rewrite -order_dvdn order_dvdG.
   case/idPn; rewrite -mxrank_eq0 -(factor_Xn_sub_1 ozG).
@@ -4889,7 +4889,7 @@ Prenex Implicits mxmodule_form mxnonsimple_form mxnonsimple_sat.
 
 (* Change of representation field (by tensoring) *)
 Section ChangeOfField.
-  
+
 Variables (aF rF : fieldType) (f : {rmorphism aF -> rF}).
 Local Notation "A ^f" := (map_mx (GRing.RMorphism.sort f) A) : ring_scope.
 Variables (gT : finGroupType) (G : {group gT}).
@@ -5053,7 +5053,7 @@ Record gen_of {F : fieldType} {gT : finGroupType} {G : {group gT}} {n' : nat}
 
 Local Arguments rVval {F gT G%G n'%N rG A%R irrG cGA} x%R : rename.
 Bind Scope ring_scope with gen_of.
- 
+
 Section GenField.
 
 Variables (F : fieldType) (gT : finGroupType) (G : {group gT}) (n' : nat).
@@ -5143,7 +5143,7 @@ rewrite -[B^-1]mul1mx -(mul_vec_lin [linear of mulmxr B^-1]) defAd submxMr //.
 rewrite -mxval_gen1 (submx_trans (horner_mx_mem _ _)) // {1}defAd.
 rewrite -(geq_leqif (mxrank_leqif_sup _)) ?mxrankM_maxl // -{}defAd.
 apply/row_subP=> i; rewrite row_mul rowK mul_vec_lin /= -{2}[A]horner_mx_X.
-by rewrite -rmorphX mulmxE -rmorphM horner_mx_mem.
+by rewrite -rmorphXn mulmxE -rmorphM horner_mx_mem.
 Qed.
 
 Lemma gen_mulA : associative genM.
@@ -5226,8 +5226,8 @@ rewrite /mxval [pval _]poly_rV_K ?size_mod_mxminpoly // -horner_mxK.
 by rewrite mx_inv_hornerK ?horner_mx_mem // horner_mx_X.
 Qed.
 
-Lemma mxval_grootX k : mxval (groot ^+ k) = A ^+ k.
-Proof. by rewrite rmorphX /= mxval_groot. Qed.
+Lemma mxval_grootXn k : mxval (groot ^+ k) = A ^+ k.
+Proof. by rewrite rmorphXn /= mxval_groot. Qed.
 
 Lemma map_mxminpoly_groot : (map_poly gen pA).[groot] = 0.
 Proof. (* The [_ groot] prevents divergence of simpl. *)
@@ -5333,7 +5333,7 @@ rewrite mxval1 mulmx1 => Bx'j; rewrite (submx_trans Bx'j) in nBj => {Bx'j} //.
 apply/row_subP; case/mxvec_indexP=> i k.
 rewrite row_mul rowK mxvecE mxE rowE -mulmxA.
 have ->: A ^+ k *m mxval x^-1 = mxval (groot ^+ k / x).
-  by rewrite mxvalM rmorphX /= mxval_groot.
+  by rewrite mxvalM rmorphXn /= mxval_groot.
 rewrite [mxval _]horner_rVpoly; move: {k u x}(val _) => u.
 rewrite (mulmx_sum_row u) !linear_sum summx_sub //= => k _.
 rewrite !linearZ scalemx_sub //= rowK mxvecK -rowE.
@@ -5527,7 +5527,7 @@ Proof.
 rewrite genmxE; apply/idP/idP=> sUV.
   apply: submx_trans (submx_in_gen sUV) _.
   apply/row_subP; case/mxvec_indexP=> i k; rewrite -in_gen_row rowK mxvecE mxE.
-  rewrite -mxval_grootX -val_gen_row -val_genZ val_genK scalemx_sub //.
+  rewrite -mxval_grootXn -val_gen_row -val_genZ val_genK scalemx_sub //.
   exact: row_sub.
 rewrite -[U]in_genK; case/submxP: sUV => u ->{U}.
 apply/row_subP=> i0; rewrite -val_gen_row row_mul; move: {i0 u}(row _ u) => u.
@@ -5595,6 +5595,9 @@ Lemma gen_mx_faithful : mx_faithful rGA = mx_faithful rG.
 Proof. by rewrite /mx_faithful rker_gen. Qed.
 
 End GenField.
+
+#[deprecated(since="mathcomp 1.17.0", note="Use mxval_grootXn instead.")]
+Notation mxval_grootX := mxval_grootXn.
 
 Section DecideGenField.
 

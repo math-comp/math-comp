@@ -662,7 +662,7 @@ Proof. by split; first apply: polyCM. Qed.
 HB.instance Definition _ := GRing.isMultiplicative.Build R {poly R} (@polyC R)
   polyC_multiplicative.
 
-Lemma polyC_exp n : {morph (@polyC R) : c / c ^+ n}. Proof. exact: rmorphX. Qed.
+Lemma polyC_exp n : {morph (@polyC R) : c / c ^+ n}. Proof. exact: rmorphXn. Qed.
 
 Lemma size_Msign p n : size ((-1) ^+ n * p) = size p.
 Proof.
@@ -1919,7 +1919,7 @@ Lemma map_polyX : ('X)^f = 'X.
 Proof. by apply/polyP=> i; rewrite coef_map !coefX /= rmorph_nat. Qed.
 
 Lemma map_polyXn n : ('X^n)^f = 'X^n.
-Proof. by rewrite rmorphX /= map_polyX. Qed.
+Proof. by rewrite rmorphXn /= map_polyX. Qed.
 
 Lemma monic_map p : p \is monic -> p^f \is monic.
 Proof.
@@ -2868,7 +2868,7 @@ Lemma fmorph_root p x : root p^f (f x) = root p x.
 Proof. by rewrite rootE horner_map // fmorph_eq0. Qed.
 
 Lemma fmorph_unity_root n z : n.-unity_root (f z) = n.-unity_root z.
-Proof. by rewrite !unity_rootE -(inj_eq (fmorph_inj f)) rmorphX ?rmorph1. Qed.
+Proof. by rewrite !unity_rootE -(inj_eq (fmorph_inj f)) rmorphXn ?rmorph1. Qed.
 
 Lemma fmorph_primitive_root n z :
   n.-primitive_root (f z) = n.-primitive_root z.
@@ -3053,7 +3053,7 @@ Lemma aut_unity_rootC u v z n : n > 0 -> z ^+ n = 1 -> u (v z) = v (u z).
 Proof.
 move=> n_gt0 /(aut_unity_rootP _ n_gt0) def_z.
 have [[i def_uz] [j def_vz]] := (def_z u, def_z v).
-by rewrite def_vz def_uz !rmorphX /= def_vz def_uz exprAC.
+by rewrite def_vz def_uz !rmorphXn /= def_vz def_uz exprAC.
 Qed.
 
 End AutPolyRoot.
