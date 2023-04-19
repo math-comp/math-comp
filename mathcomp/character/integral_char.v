@@ -77,7 +77,7 @@ have /fin_all_exists[k Dk] i: exists k, e 0 i = z ^+ k.
   have [|k ->] := (prim_rootP prim_z) (e 0 i); last by exists k.
   by have /dvdnP[q ->] := x_dv_n; rewrite mulnC exprM enx1 expr1n.
 exists (\sum_i w ^+ k i); rewrite rmorph_sum; apply/eq_bigr => i _.
-by rewrite rmorphX Dz Dk.
+by rewrite rmorphXn Dz Dk.
 Qed.
 
 Section GenericClassSums.
@@ -275,7 +275,7 @@ pose alpha := 'chi_i g / m%:R.
 have a_lt1: `|alpha| < 1.
   rewrite normrM normfV normr_nat -{2}(divff nz_m).
   rewrite lt_def (can_eq (mulfVK nz_m)) eq_sym -{1}Dm -irr_cfcenterE // notZg.
-  by rewrite ler_pmul2r ?invr_gt0 ?ltr0n // -Dm char1_ge_norm ?irr_char.
+  by rewrite ler_pM2r ?invr_gt0 ?ltr0n // -Dm char1_ge_norm ?irr_char.
 have Za: alpha \in Aint.
   have [u _ /dvdnP[v eq_uv]] := Bezoutl #|g ^: G| m_gt0.
   suffices ->: alpha = v%:R * 'chi_i g - u%:R * (alpha * #|g ^: G|%:R).
@@ -290,7 +290,7 @@ have{Qn_g} [a Da]: exists a, QnC a = alpha.
 have Za_nu nu: sval (gQnC nu) alpha \in Aint by rewrite Aint_aut.
 have norm_a_nu nu: `|sval (gQnC nu) alpha| <= 1.
   move: {nu}(sval _) => nu; rewrite fmorph_div rmorph_nat normrM normfV.
-  rewrite normr_nat -Dm -(ler_pmul2r (irr1_gt0 (aut_Iirr nu i))) mul1r.
+  rewrite normr_nat -Dm -(ler_pM2r (irr1_gt0 (aut_Iirr nu i))) mul1r.
   congr (_ <= _): (char1_ge_norm g (irr_char (aut_Iirr nu i))).
   by rewrite !aut_IirrE !cfunE Dm rmorph_nat divfK.
 pose beta := QnC (galNorm 1 {:Qn} a).
@@ -638,7 +638,7 @@ have /fin_all_exists2[ItoQ inItoQ defItoQ] (k : I):
   have [|nu cGnu Dnu] := kHom_to_gal _ (normalFieldf 1) hom_nu.
     by rewrite !subvf.
   exists nu => //; apply: (fmorph_inj QnC).
-  rewrite -Dnu ?memvf // lfunE DnuQ rmorphX DnuC //.
+  rewrite -Dnu ?memvf // lfunE DnuQ rmorphXn DnuC //.
   by rewrite prim_expr_order // fmorph_primitive_root.
 have{defQn} imItoQ: calG = ItoQ @: {:I}.
   apply/setP=> nu; apply/idP/imsetP=> [cGnu | [k _ ->] //].
@@ -663,9 +663,9 @@ have Qpi1: pi1 \in Crat.
   apply: eq_bigr => i _; have /QnGg[b Db] := irr_char i.
   have Lchi_i: 'chi_i \is a linear_char by rewrite irr_cyclic_lin.
   have /(prim_rootP pr_eps)[m Dem]: b ^+ n = 1.
-    apply/eqP; rewrite -(fmorph_eq1 QnC) rmorphX Db -lin_charX //.
+    apply/eqP; rewrite -(fmorph_eq1 QnC) rmorphXn Db -lin_charX //.
     by rewrite -expg_mod_order orderE defG modnn lin_char1.
-  rewrite -Db -DnuC Dem rmorphX /= defItoQ exprAC -{m}Dem rmorphX {b}Db.
+  rewrite -Db -DnuC Dem rmorphXn /= defItoQ exprAC -{m}Dem rmorphXn {b}Db.
   by rewrite lin_charX.
 clear I ItoS imItoS injItoS ItoQ inItoQ defItoQ imItoQ injItoQ.
 clear Qn galQn QnC gQnC eps pr_eps QnGg calG.
@@ -676,7 +676,7 @@ have{pi1 Zpi1} pi2_ge1: 1 <= pi2.
     by rewrite (big_morph Num.norm (@normrM _) (@normr1 _)) -prodrXl.
   by rewrite Cint_normK // sqr_Cint_ge1 //; apply/prodf_neq0.
 have Sgt0: (#|S| > 0)%N by rewrite (cardD1 g) [g \in S]Sg.
-rewrite -mulr_natr -ler_pdivl_mulr ?ltr0n //.
+rewrite -mulr_natr -ler_pdivlMr ?ltr0n //.
 have n2chi_ge0 s: s \in S -> 0 <= `|chi s| ^+ 2 by rewrite exprn_ge0.
 rewrite -(expr_ge1 Sgt0); last by rewrite divr_ge0 ?ler0n ?sumr_ge0.
 by rewrite (le_trans pi2_ge1) // leif_AGM.
@@ -689,9 +689,9 @@ Proof.
 move=> chi1gt1; apply/exists_eq_inP; apply: contraFT (lt_geF chi1gt1).
 move=> /exists_inPn-nz_chi.
 rewrite -(norm_Cnat (Cnat_irr1 i)) -(@expr_le1 _ 2)//.
-rewrite -(ler_add2r (#|G|%:R * '['chi_i])) {1}cfnorm_irr mulr1.
+rewrite -(lerD2r (#|G|%:R * '['chi_i])) {1}cfnorm_irr mulr1.
 rewrite (cfnormE (cfun_onG _)) mulVKf ?neq0CG // (big_setD1 1%g) //=.
-rewrite addrCA ler_add2l (cardsD1 1%g) group1 mulrS ler_add2l.
+rewrite addrCA lerD2l (cardsD1 1%g) group1 mulrS lerD2l.
 rewrite -sumr_const !(partition_big_imset (fun s => <[s]>)) /=.
 apply: ler_sum => _ /imsetP[g /setD1P[ntg Gg] ->].
 have sgG: <[g]> \subset G by rewrite cycle_subG.

@@ -800,8 +800,8 @@ Proof. by rewrite normrEsign denq_mulr_sign. Qed.
 
 Fact rat_archimedean : Num.archimedean_axiom [numDomainType of rat].
 Proof.
-move=> x; exists `|numq x|.+1; rewrite mulrS ltr_spaddl //.
-rewrite pmulrn abszE intr_norm numqE normrM ler_pemulr //.
+move=> x; exists `|numq x|.+1; rewrite mulrS ltr_pwDl //.
+rewrite pmulrn abszE intr_norm numqE normrM ler_peMr //.
 by rewrite -intr_norm ler1n absz_gt0 denq_eq0.
 Qed.
 
@@ -949,8 +949,8 @@ Canonical ratr_rmorphism := RMorphism ratr_is_rmorphism.
 Lemma ler_rat : {mono (@ratr F) : x y / x <= y}.
 Proof.
 move=> x y /=; case: (ratP x) => nx dx cndx; case: (ratP y) => ny dy cndy.
-rewrite !fmorph_div /= !ratr_int !ler_pdivl_mulr ?ltr0z //.
-by rewrite ![_ / _ * _]mulrAC !ler_pdivr_mulr ?ltr0z // -!rmorphM /= !ler_int.
+rewrite !fmorph_div /= !ratr_int !ler_pdivlMr ?ltr0z //.
+by rewrite ![_ / _ * _]mulrAC !ler_pdivrMr ?ltr0z // -!rmorphM /= !ler_int.
 Qed.
 
 Lemma ltr_rat : {mono (@ratr F) : x y / x < y}.

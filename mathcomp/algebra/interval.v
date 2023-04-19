@@ -723,7 +723,7 @@ Lemma oppr_itv ba bb (xa xb x : R) :
   (- x \in Interval (BSide ba xa) (BSide bb xb)) =
   (x \in Interval (BSide (~~ bb) (- xb)) (BSide (~~ ba) (- xa))).
 Proof.
-by rewrite !itv_boundlr /<=%O /= !implybF negbK andbC lteif_oppl lteif_oppr.
+by rewrite !itv_boundlr /<=%O /= !implybF negbK andbC lteifNl lteifNr.
 Qed.
 
 Lemma oppr_itvoo (a b x : R) : (- x \in `]a, b[) = (x \in `](- b), (- a)[).
@@ -771,8 +771,8 @@ Proof. by move=> xa xb ?; apply: mid_in_itv. Qed.
 Lemma mem_miditv i : (i.1 < i.2)%O -> miditv i \in i.
 Proof.
 move: i => [[ba a|[]] [bb b|[]]] //= ab; first exact: mid_in_itv.
-by rewrite !in_itv -lteif_subl_addl subrr lteif01.
-by rewrite !in_itv lteif_subl_addr -lteif_subl_addl subrr lteif01.
+by rewrite !in_itv -lteifBlDl subrr lteif01.
+by rewrite !in_itv lteifBlDr -lteifBlDl subrr lteif01.
 Qed.
 
 Lemma miditv_le_left i b : (i.1 < i.2)%O -> (BSide b (miditv i) <= i.2)%O.
@@ -787,20 +787,25 @@ case: i => [x y] lti; have := mem_miditv lti; rewrite inE => /andP[+ _].
 by move=> /le_trans; apply; rewrite !bnd_simp.
 Qed.
 
-Lemma in_segment_addgt0Pr x y z :
+Lemma in_segmentDgt0Pr x y z :
   reflect (forall e, e > 0 -> y \in `[x - e, z + e]) (y \in `[x, z]).
 Proof.
 apply/(iffP idP)=> [xyz e /[dup] e_gt0 /ltW e_ge0 | xyz_e].
-  by rewrite in_itv /= ler_subl_addr !ler_paddr// (itvP xyz).
+  by rewrite in_itv /= lerBDr !ler_wpDr// (itvP xyz).
 by rewrite in_itv /= ; apply/andP; split; apply/ler_addgt0Pr => ? /xyz_e;
-  rewrite in_itv /= ler_subl_addr => /andP [].
+  rewrite in_itv /= lerBDr => /andP [].
 Qed.
 
-Lemma in_segment_addgt0Pl x y z :
+Lemma in_segmentDgt0Pl x y z :
   reflect (forall e, e > 0 -> y \in `[(- e + x), (e + z)]) (y \in `[x, z]).
 Proof.
-apply/(equivP (in_segment_addgt0Pr x y z)).
+apply/(equivP (in_segmentDgt0Pr x y z)).
 by split=> zxy e /zxy; rewrite [z + _]addrC [_ + x]addrC.
 Qed.
 
 End IntervalField.
+
+#[deprecated(since="mathcomp 1.17.0", note="Use in_segmentDgt0Pr instead.")]
+Notation in_segment_addgt0Pr := in_segmentDgt0Pr.
+#[deprecated(since="mathcomp 1.17.0", note="Use in_segmentDgt0Pl instead.")]
+Notation in_segment_addgt0Pl := in_segmentDgt0Pl.
