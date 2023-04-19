@@ -59,6 +59,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "multinomials"
       "mathcomp-zify"
       "mathcomp-abel"
+      "mathcomp-tarjan"
     ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
@@ -77,7 +78,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       bignums.override.version = "master";
       paramcoq.override.version = "master";
       coq-elpi.override.version = "coq-master";
-      hierarchy-builder.override.version = "coq-master";
+      hierarchy-builder.override.version = "proux01:coq-master";
       interval.job = false;
     };
     "coq-8.17".coqPackages = common-bundles // {
