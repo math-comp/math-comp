@@ -402,7 +402,7 @@ apply: (mulIf nz_px); rewrite -hornerM -rmorphM Dq rmorphM hornerM /= q1x0.
   by rewrite mul0r mulr0.
 rewrite coef0; congr (_ == 0); rewrite !horner_coef coef_sum.
 rewrite size_map_poly !size_map_poly_id0 ?map_poly_eq0 ?lead_coef_eq0 //.
-by apply: eq_bigr => i _; rewrite -rmorphX coefMC !coef_map.
+by apply: eq_bigr => i _; rewrite -rmorphXn coefMC !coef_map.
 Qed.
 
 Lemma algebraic_root_polyXY x y :

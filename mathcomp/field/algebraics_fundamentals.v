@@ -134,15 +134,15 @@ have x_gt0 k: 0 < x ^+ k by rewrite exprn_gt0 // lt_def nz_x.
 move: lb_x; rewrite polySpred ?monic_neq0 // !big_ord_recr coef_map /=.
 rewrite -lead_coefE (monicP mon_p) natrD rmorph1 mul1r => lb_x.
 case: _.-1 (lb_x) => [|n]; first by rewrite !big_ord0 !add0r ltr01.
-rewrite -ltr_subl_addl add0r -(ler_pmul2r (x_gt0 n)) -exprS.
-apply: lt_le_trans; rewrite mulrDl mul1r ltr_spaddr // -sumrN.
+rewrite -ltrBlDl add0r -(ler_pM2r (x_gt0 n)) -exprS.
+apply: lt_le_trans; rewrite mulrDl mul1r ltr_pwDr // -sumrN.
 rewrite natr_sum mulr_suml ler_sum // => j _.
 rewrite coef_map /= fmorph_eq_rat (le_trans (real_ler_norm _)) //.
   by rewrite rpredN rpredM ?rpred_rat ?rpredX // ger0_real.
-rewrite normrN normrM ler_pmul //.
-  rewrite normf_div -!intr_norm -!abszE ler_pimulr ?ler0n //.
-  by rewrite invf_le1 ?ler1n ?ltr0n ?absz_gt0 ?denq_eq0.
-rewrite normrX ger0_norm ?(ltrW x_gt0) // ler_weexpn2l ?leq_ord //.
+rewrite normrN normrM ler_pM //.
+  rewrite normf_div -!intr_norm -!abszE ler_piMr ?ler0n //.
+  by rewrite invf_le1 ?ler1n ?ltr0n absz_gt0.
+rewrite normrX ger0_norm ?(ltrW x_gt0) // ler_weXn2l ?leq_ord //.
 by rewrite (le_trans _ lb_x) // natr1 ler1n.
 Qed.
 
@@ -180,14 +180,14 @@ have /dvdzP[b Da]: (denq y %| a)%Z.
   apply: ZtoQinj; rewrite /ZtoQ rmorphM mulr_suml rmorph_sum /=.
   transitivity ((p1 ^ intr).[y] * (denq y ^+ d)%:~R).
     rewrite Dp1 !hornerE (rootP qy0) subr0.
-    by rewrite !rmorphX /= numqE exprMn mulrA.
+    by rewrite !rmorphXn /= numqE exprMn mulrA.
   have sz_p1: (size (p1 ^ ZtoQ)%R <= d)%N.
     rewrite Dp1 size_scale ?intr_eq0 //; apply/leq_sizeP=> i.
     rewrite leq_eqVlt eq_sym -polySpred ?monic_neq0 // coefB coefXn.
     case: eqP => [-> _ | _ /(nth_default 0)->//].
     by rewrite -lead_coefE (monicP mon_q).
   rewrite (horner_coef_wide _ sz_p1) mulr_suml; apply: eq_bigr => i _.
-  rewrite -!mulrA -exprSr coef_map !rmorphM !rmorphX /= numqE exprMn -mulrA.
+  rewrite -!mulrA -exprSr coef_map !rmorphM !rmorphXn /= numqE exprMn -mulrA.
   by rewrite -exprD -addSnnS subnKC.
 pose m := `|(numq y * b + N)%R|%N.
 have Dm: m%:R = `|y * a%:~R + N%:R|.
@@ -195,11 +195,11 @@ have Dm: m%:R = `|y * a%:~R + N%:R|.
 have ltr_Qnat n1 n2 : (n1%:R < n2%:R :> rat = _) := ltr_nat _ n1 n2.
 have ub_y: `|y * a%:~R| < N%:R.
   apply: le_lt_trans (archi_boundP (normr_ge0 _)); rewrite !normrM.
-  by rewrite ler_pmul // (le_trans _ (ler_norm n)) ?ltW ?ub_n.
+  by rewrite ler_pM // (le_trans _ (ler_norm n)) ?ltW ?ub_n.
 apply/mapP; exists m.
   rewrite mem_iota /= add0n -addnn -ltr_Qnat Dm natrD.
-  by rewrite (le_lt_trans (ler_norm_add _ _)) // normr_nat ltr_add2r.
-rewrite Dm ger0_norm ?addrK ?mulfK ?intr_eq0 // -ler_subl_addl sub0r.
+  by rewrite (le_lt_trans (ler_normD _ _)) // normr_nat ltrD2.
+rewrite Dm ger0_norm ?addrK ?mulfK ?intr_eq0 // -lerBlDl sub0r.
 by rewrite (le_trans (ler_norm _)) ?normrN ?ltW.
 Qed.
 
@@ -383,7 +383,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   case: xR => x [R QxR] /= [/inQpK <-]; move: (p ^ _) => {}p mon_p /inQ_K<- Dc.
   have{c Dc} p0_le0: (p ^ QxR).[0] <= 0.
     rewrite horner_coef0 coef_map -[p`_0]ofQ_K -coef_map -horner_coef0 (eqP Dc).
-    by rewrite -rmorphX -rmorphN ofQ_K /= rmorphN rmorphX oppr_le0 sqr_ge0.
+    by rewrite -rmorphXn -rmorphN ofQ_K /= rmorphN rmorphXn oppr_le0 sqr_ge0.
   have [s Dp] := closed_field_poly_normal (p ^ ofQ x).
   have{Dp} /all_and2[s_p p_s] y: root (p ^ ofQ x) y <-> (y \in s).
     by rewrite Dp (monicP mon_p) scale1r root_prod_XsubC.
@@ -417,7 +417,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     have [q0_le0 | q0_gt0] := lerP ((q ^ QxR).[0]) 0.
       by apply: (IHp q) => //; exists u; rewrite ?Dy.
     have r0_le0: (r ^ QxR).[0] <= 0.
-      by rewrite -(ler_pmul2r q0_gt0) mul0r -hornerM -rmorphM -Dp.
+      by rewrite -(ler_pM2r q0_gt0) mul0r -hornerM -rmorphM -Dp.
     apply: (IHd r mon_r) => // [w rw0|].
       by rewrite s_p // Dp rmorphM rootM rw0.
     apply: leq_trans le_p_d; rewrite Dp size_Mmonic ?monic_neq0 // addnC.
@@ -472,14 +472,14 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     suffices lb1 a2 b2 (ab1 := (a1, b1)) (ab2 := (a2, b2)) :
       xup q ab2 /\ sub_itv ab2 ab1 -> q.[b2] - q.[a2] <= Mdq * wid ab1.
     + apply: le_lt_trans (_ : Mu * Mdq * wid (a1, b1) < h2); last first.
-        rewrite {}Dab1 mulrA ltr_pdivr_mulr ?ltr0n ?expn_gt0 //.
+        rewrite {}Dab1 mulrA ltr_pdivrMr ?ltr0n ?expn_gt0 //.
         rewrite (lt_le_trans (archi_boundP _)) ?mulr_ge0 ?ltr_nat // -/n.
-        rewrite ler_pdivl_mull ?ltr0n // -natrM ler_nat.
+        rewrite ler_pdivlMl ?ltr0n // -natrM ler_nat.
         by case: n => // n; rewrite expnS leq_pmul2l // ltn_expl.
-      rewrite -mulrA hornerM normrM ler_pmul //.
+      rewrite -mulrA hornerM normrM ler_pM //.
       have [/ltW qc_le0 | qc_ge0] := ltrP q.[c] 0.
-        by apply: le_trans (lb1 c b1 _); rewrite ?ler0_norm ?ler_paddl.
-      by apply: le_trans (lb1 a1 c _); rewrite ?ger0_norm ?ler_paddr ?oppr_ge0.
+        by apply: le_trans (lb1 c b1 _); rewrite ?ler0_norm ?ler_wpDl.
+      by apply: le_trans (lb1 a1 c _); rewrite ?ger0_norm ?ler_wpDr ?oppr_ge0.
     case{c le_a1c le_cb1 lbMu}=> [[/=qa2_le0 qb2_ge0 le_ab2] [/=le_a12 le_b21]].
     pose h := b2 - a2; have h_ge0: 0 <= h by rewrite subr_ge0.
     have [-> | nz_q] := eqVneq q 0.
@@ -490,11 +490,11 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     have /MqP MqPx1: a2 \in itv ab by rewrite inE le_aa2 (le_trans le_ab2).
     apply: le_trans (le_trans (ler_norm _) (ler_norm_sum _ _ _)) _.
     apply: le_trans (_ : `|dq.[h] * h| <= _); last first.
-      by rewrite normrM ler_pmul ?normr_ge0 ?MdqP // ?ger0_norm ?ler_sub ?h_ge0.
+      by rewrite normrM ler_pM ?normr_ge0 ?MdqP // ?ger0_norm ?lerB ?h_ge0.
     rewrite horner_poly ger0_norm ?mulr_ge0 ?sumr_ge0 // => [|j _]; last first.
       by rewrite mulr_ge0 ?exprn_ge0 // (le_trans _ (MqPx1 _)).
     rewrite mulr_suml ler_sum // => j _; rewrite normrM -mulrA -exprSr.
-    by rewrite ler_pmul // normrX ger0_norm.
+    by rewrite ler_pM // normrX ger0_norm.
   have [ab0 xab0]: {ab | xup (p ^ QxR) ab}.
     have /monic_Cauchy_bound[b pb_gt0]: p ^ QxR \is monic by apply: monic_map.
     by exists (0, `|b|); rewrite /xup normr_ge0 p0_le0 ltW ?pb_gt0 ?ler_norm.
@@ -516,10 +516,10 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
       exists (Num.max 1 M) => [|s /ubM vM]; first by rewrite lt_maxr ltr01.
       by rewrite le_maxr orbC vM.
     exists (h2 / M) => [|a xn_a]; first by rewrite divr_gt0 ?invr_gt0 ?ltr0n.
-    rewrite ltr_pdivr_mulr // -(ltr_add2l h2) -mulr2n -mulr_natl divff //.
+    rewrite ltr_pdivrMr // -(ltrD2l h2) -mulr2n -mulr_natl divff //.
     rewrite -normr1 -(hornerC 1 a) -[1%:P]r_pq_1 hornerD.
-    rewrite ?(le_lt_trans (ler_norm_add _ _)) ?ltr_le_add ?ub_rp //.
-    by rewrite mulrC hornerM normrM ler_wpmul2l ?ubM.
+    rewrite ?(le_lt_trans (ler_normD _ _)) ?ltr_leD ?ub_rp //.
+    by rewrite mulrC hornerM normrM ler_wpM2l ?ubM.
   have ab_le m n: (m <= n)%N -> (ab_ n).2 \in Iab_ m.
     move/subnKC=> <-; move: {n}(n - m)%N => n; rewrite /ab_.
     have /(findP m)[/(findP n)[[_ _]]] := xab0.
@@ -545,7 +545,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     case: (find _ _ _) => c d /= le_cd [/= le_ac le_db] _ /(_ c)/implyP.
     rewrite inE lexx le_cd hornerM hornerC normrM le_gtF //.
     rewrite ger0_norm ?divr_ge0 ?invr_ge0 ?ler0n ?(ltW e_gt0) // mulrAC.
-    rewrite ler_pdivl_mulr // ler_wpmul2l ?invr_ge0 ?ler0n // ltW // v_gte //=.
+    rewrite ler_pdivlMr // ler_wpM2l ?invr_ge0 ?ler0n // ltW // v_gte //=.
     by rewrite inE -/b (le_trans le_a) //= (le_trans le_cd).
   pose lim_pos m v := exists2 e, e > 0 & forall n, (m <= n)%N -> e < nlim v n.
   have posP v: reflect (exists m, lim_pos m v) (lt 0 v).
@@ -570,7 +570,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     rewrite geq_max => /andP[le_mk le_nk]; rewrite /nlim /lim.
     have ->: q_ (v + w) = q_ v + q_ w.
       by apply: (map_poly_inj QxzM); rewrite rmorphD /= !{1}Dq /q1_ !raddfD.
-    by rewrite rmorphD hornerD ltr_add ?v_gtd ?w_gte.
+    by rewrite rmorphD hornerD ltrD ?v_gtd ?w_gte.
   have posM v w: lt 0 v -> lt 0 w -> lt 0 (v * w).
     move=> /posP[m [d d_gt0 v_gtd]] /posP[n [e e_gt0 w_gte]].
     have /dvdpP[r /(canRL (subrK _))Dqvw]: p %| q_ (v * w) - q_ v * q_ w.
@@ -581,10 +581,10 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     pose f := d * e * h2; apply/posP; exists (maxn N (maxn m n)), f => [|k].
       by rewrite !mulr_gt0 ?invr_gt0 ?ltr0n.
    rewrite !geq_max => /and3P[/ab_le/ub_rp{}ub_rp le_mk le_nk].
-    rewrite -(ltr_add2r f) -mulr2n -mulr_natr divfK // /nlim /lim Dqvw.
-    rewrite rmorphD hornerD /= -addrA -ltr_subl_addl ler_lt_add //.
-      by rewrite rmorphM hornerM ler_pmul ?ltW ?v_gtd ?w_gte.
-    rewrite -ltr_pdivr_mull ?mulr_gt0 // (le_lt_trans _ ub_rp) //.
+    rewrite -(ltrD2r f) -mulr2n -mulr_natr divfK // /nlim /lim Dqvw.
+    rewrite rmorphD hornerD /= -addrA -ltrBlDl ler_ltD //.
+      by rewrite rmorphM hornerM ler_pM ?ltW ?v_gtd ?w_gte.
+    rewrite -ltr_pdivrMl ?mulr_gt0 // (le_lt_trans _ ub_rp) //.
     by rewrite -scalerAl hornerZ -rmorphM mulrN -normrN ler_norm.
   pose le v w := (v == w) || lt v w.
   pose abs v := if le 0 v then v else - v.
@@ -643,8 +643,8 @@ have R'i n: i \notin sQ (x_ n).
   rewrite /x_; case: (xR n) => x [Rn QxR] /=.
   apply: contraL (@ltr01 Rn) => /sQ_inQ[v Di].
   suffices /eqP <-: - QxR v ^+ 2 == 1 by rewrite oppr_gt0 -leNgt sqr_ge0.
-  rewrite -rmorphX -rmorphN fmorph_eq1 -(fmorph_eq1 (ofQ x)) rmorphN eqr_oppLR.
-  by rewrite rmorphX /= Di Di2.
+  rewrite -rmorphXn -rmorphN fmorph_eq1 -(fmorph_eq1 (ofQ x)) rmorphN eqr_oppLR.
+  by rewrite rmorphXn /= Di Di2.
 have szX2_1: size ('X^2 + 1) = 3%N.
   by move=> R; rewrite size_addl ?size_polyXn ?size_poly1.
 have minp_i n (p_i := minPoly (R_ n) (i_ n)): p_i = 'X^2 + 1.
@@ -682,7 +682,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     by rewrite -Dv -CnQtE sQof2 defCn -genCn aimg_adjoin aimg1.
   have Dit: ofQ t i_t = i by rewrite CnQtE inQ_K.
   have Dit2: i_t ^+ 2 = -1.
-    by apply: (fmorph_inj (ofQ t)); rewrite rmorphX rmorphN1 /= Dit.
+    by apply: (fmorph_inj (ofQ t)); rewrite rmorphXn rmorphN1 /= Dit.
   have dimCn: \dim_Rn Cn = 2%N.
     rewrite -adjoin_degreeE adjoin_degree_aimg.
     by apply: succn_inj; rewrite -size_minPoly minp_i szX2_1.
@@ -843,7 +843,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     apply: contraNneq R'w2 => y2_0; rewrite -Dw2 mulrCA.
     suffices /eqP->: v == 0 by rewrite mul0r addr0.
     by rewrite y2_0 mulr0 eq_sym sqrf_eq0 fmorph_eq0 in px0.
-  apply/eqP/esym/(mulIf nz_x2); rewrite -exprMn -rmorphX -Dw2 rmorphD rmorphM.
+  apply/eqP/esym/(mulIf nz_x2); rewrite -exprMn -rmorphXn -Dw2 rmorphD rmorphM.
   rewrite /= Dit mulrDl -expr2 mulrA divfK; last by rewrite expf_eq0 in nz_x2.
   rewrite mulr_natr addrC sqrrD exprMn Di2 mulN1r -(eqP px0) -mulNr opprB.
   by rewrite -mulrnAl -mulrnAr -rmorphMn -!mulrDl addrAC subrK.

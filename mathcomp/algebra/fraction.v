@@ -320,7 +320,7 @@ Lemma tofracMn n : {morph tofrac: x / x *+ n}. Proof. exact: rmorphMn. Qed.
 Lemma tofracMNn n : {morph tofrac: x / x *- n}. Proof. exact: rmorphMNn. Qed.
 Lemma tofrac1 : 1%:F = 1. Proof. exact: rmorph1. Qed.
 Lemma tofracM : {morph tofrac: x y  / x * y}. Proof. exact: rmorphM. Qed.
-Lemma tofracX n : {morph tofrac: x / x ^+ n}. Proof. exact: rmorphX. Qed.
+Lemma tofracXn n : {morph tofrac: x / x ^+ n}. Proof. exact: rmorphXn. Qed.
 
 Lemma tofrac_eq (p q : R): (p%:F == q%:F) = (p == q).
 Proof.
@@ -331,3 +331,6 @@ Qed.
 Lemma tofrac_eq0 (p : R): (p%:F == 0) = (p == 0).
 Proof. by rewrite tofrac_eq. Qed.
 End FracFieldTheory.
+
+#[deprecated(since="mathcomp 1.17.0", note="Use tofracXn instead.")]
+Notation tofracX := tofracXn.

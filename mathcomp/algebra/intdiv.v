@@ -175,7 +175,7 @@ Proof. by have [-> // | d_nz] := eqVneq; rewrite -{1}[d]mul1r mulzK. Qed.
 Lemma ltz_pmod m d : d > 0 -> (m %% d)%Z < d.
 Proof.
 case: m d => n [] // d d_gt0; first by rewrite modz_nat ltz_nat ltn_pmod.
-by rewrite modNz_nat // -lez_addr1 addrAC subrK ger_addl oppr_le0.
+by rewrite modNz_nat // -lezD1 addrAC subrK gerDl oppr_le0.
 Qed.
 
 Lemma ltz_mod m d : d != 0 -> (m %% d)%Z < `|d|.
@@ -187,7 +187,7 @@ case: p => // p p_gt0; wlog d_gt0: d / d > 0; last case: d => // d in d_gt0 *.
   by move=> IH; case/intP: d => [|d|d]; rewrite ?mulr0 ?divz0 ?mulrN ?divzN ?IH.
 rewrite {1}(divz_eq m d) mulrDr mulrCA divzMDl ?mulf_neq0 ?gt_eqF // addrC.
 rewrite divz_small ?add0r // PoszM pmulr_rge0 ?modz_ge0 ?gt_eqF //=.
-by rewrite ltr_pmul2l ?ltz_pmod.
+by rewrite ltr_pM2l ?ltz_pmod.
 Qed.
 Arguments divzMpl [p m d].
 
@@ -206,19 +206,17 @@ wlog d_gt0: d / d > 0; last case: d d_gt0 => // d d_gt0.
 case: m => n; first by rewrite divz_nat leq_div.
 by rewrite divNz_nat // NegzE !abszN ltnS leq_div.
 Qed.
- 
+
 Lemma ltz_ceil m d : d > 0 -> m < ((m %/ d)%Z + 1) * d.
 Proof.
-by case: d => // d d_gt0; rewrite mulrDl mul1r -ltr_subl_addl ltz_mod ?gt_eqF.
+by case: d => // d d_gt0; rewrite mulrDl mul1r -ltrBlDl ltz_mod ?gt_eqF.
 Qed.
 
 Lemma ltz_divLR m n d : d > 0 -> ((m %/ d)%Z < n) = (m < n * d).
 Proof.
 move=> d_gt0; apply/idP/idP.
-  by rewrite -[_ < n]lez_addr1 -(ler_pmul2r d_gt0);
-     apply: lt_le_trans (ltz_ceil _ _).
-rewrite -(ltr_pmul2r d_gt0 _ n) //; apply: le_lt_trans (lez_floor _ _).
-by rewrite gt_eqF.
+  by rewrite -[_ < n]lezD1 -(ler_pM2r d_gt0); exact/lt_le_trans/ltz_ceil.
+by rewrite -(ltr_pM2r d_gt0 _ n); apply/le_lt_trans/lez_floor; rewrite gt_eqF.
 Qed.
 
 Lemma lez_divRL m n d : d > 0 -> (m <= (n %/ d)%Z) = (m * d <= n).
@@ -362,10 +360,10 @@ Lemma divzK d m : (d %| m)%Z -> (m %/ d)%Z * d = m.
 Proof. by rewrite dvdz_eq => /eqP. Qed.
 
 Lemma lez_divLR d m n : 0 < d -> (d %| m)%Z -> ((m %/ d)%Z <= n) = (m <= n * d).
-Proof. by move=> /ler_pmul2r <- /divzK->. Qed.
+Proof. by move=> /ler_pM2r <- /divzK->. Qed.
 
 Lemma ltz_divRL d m n : 0 < d -> (d %| m)%Z -> (n < m %/ d)%Z = (n * d < m).
-Proof. by move=> /ltr_pmul2r/(_ n)<- /divzK->. Qed.
+Proof. by move=> /ltr_pM2r/(_ n)<- /divzK->. Qed.
 
 Lemma eqz_div d m n : d != 0 -> (d %| m)%Z -> (n == m %/ d)%Z = (n * d == m).
 Proof. by move=> /mulIf/inj_eq <- /divzK->. Qed.

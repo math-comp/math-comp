@@ -684,7 +684,7 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*  Mn -- ring by nat multiplication, as in raddfMn : f (x *+ n) = f x *+ n.  *)
 (*   N -- ring opposite, as in mulNr : (- x) * y = - (x * y).                 *)
 (*   V -- ring inverse, as in mulVr : x^-1 * x = 1.                           *)
-(*   X -- ring exponentiation, as in rmorphX : f (x ^+ n) = f x ^+ n.         *)
+(*   X -- ring exponentiation, as in rmorphXn : f (x ^+ n) = f x ^+ n.        *)
 (*   Z -- (left) module scaling, as in linearZ : f (a *: v)  = s *: f v.      *)
 (* The operator suffixes D, B, M and X are also used for the corresponding    *)
 (* operations on nat, as in natrX : (m ^ n)%:R = m%:R ^+ n. For the binary    *)
@@ -2339,7 +2339,7 @@ Lemma rmorph_prod I r (P : pred I) E :
   f (\prod_(i <- r | P i) E i) = \prod_(i <- r | P i) f (E i).
 Proof. exact: (big_morph f rmorphM rmorph1). Qed.
 
-Lemma rmorphX n : {morph f: x / x ^+ n}.
+Lemma rmorphXn n : {morph f : x / x ^+ n}.
 Proof. by elim: n => [|n IHn] x; rewrite ?rmorph1 // !exprS rmorphM IHn. Qed.
 
 Lemma rmorph_nat n : f n%:R = n%:R. Proof. by rewrite rmorphMn rmorph1. Qed.
@@ -2419,7 +2419,7 @@ Proof. exact: raddfMsign. Qed.
 Lemma rmorphN1 : f (- 1) = (- 1). Proof. by rewrite rmorphN rmorph1. Qed.
 
 Lemma rmorph_sign n : f ((- 1) ^+ n) = (- 1) ^+ n.
-Proof. by rewrite rmorphX /= rmorphN1. Qed.
+Proof. by rewrite rmorphXn /= rmorphN1. Qed.
 
 Lemma can2_rmorphism f' : cancel f f' -> cancel f' f -> multiplicative f'.
 Proof.
@@ -6224,7 +6224,9 @@ Definition rmorphMsign := rmorphMsign.
 Definition rmorph_nat := rmorph_nat.
 Definition rmorph_eq_nat := rmorph_eq_nat.
 Definition rmorph_prod := rmorph_prod.
-Definition rmorphX := rmorphX.
+Definition rmorphXn := rmorphXn.
+#[deprecated(since="mathcomp 1.17.0", note="Use rmorphXn instead.")]
+Notation rmorphX := rmorphXn.
 Definition rmorphN1 := rmorphN1.
 Definition rmorph_sign := rmorph_sign.
 Definition rmorph_char := rmorph_char.
@@ -6306,7 +6308,7 @@ Definition imaginary_exists := imaginary_exists.
 Definition raddf := (raddf0, raddfN, raddfD, raddfMn).
 
 Definition rmorphE :=
-  (rmorphD, rmorph0, rmorphB, rmorphN, rmorphMNn, rmorphMn, rmorph1, rmorphX).
+  (rmorphD, rmorph0, rmorphB, rmorphN, rmorphMNn, rmorphMn, rmorph1, rmorphXn).
 
 Definition linearE :=
   (linearD, linear0, linearB, linearMNn, linearMn, linearZ).
