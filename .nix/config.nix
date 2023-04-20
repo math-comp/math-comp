@@ -35,8 +35,8 @@ with builtins; with (import <nixpkgs> {}).lib;
   bundles = let
     master = [
       "mathcomp-bigenough"
-      "deriving"
-      "extructures"
+      # "deriving"  # requires univ poly
+      # "extructures"  # requires deriving
     ];
     hierarchy-builder = [
       "coqeal"
@@ -80,12 +80,14 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq-elpi.override.version = "coq-master";
       hierarchy-builder.override.version = "proux01:coq-master";
       interval.job = false;
+      coqeal.job = false;
     };
     "coq-8.17".coqPackages = common-bundles // {
       coq.override.version = "8.17";
     };
     "coq-8.16".coqPackages = common-bundles // {
       coq.override.version = "8.16";
+      deriving.job = false;  # currently not ported
     };
   };
 }
