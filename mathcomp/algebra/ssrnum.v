@@ -5730,6 +5730,7 @@ Definition NumDomainOfIdomain (T : idomainType) (m : of_ T) :=
 Notation ler_norm_add := ler_normD.
 #[deprecated(since="mathcomp 1.17.0", note="Use ler_normB instead.")]
 Notation ler_norm_sub := ler_normB.
+#[deprecated(since="mathcomp 1.17.0", note="Use ltr_distlDr instead.")]
 Notation ltr_distl_addr := ltr_distlDr.
 #[deprecated(since="mathcomp 1.17.0", note="Use ler_distlDr instead.")]
 Notation ler_distl_addr := ler_distlDr.
