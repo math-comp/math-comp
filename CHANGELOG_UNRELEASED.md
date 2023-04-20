@@ -27,7 +27,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemma `bigA_distr`
 
 - in `poly.v`
-  + lemmas `coef_prod_XsubC`, `coefPn_prod_XsubC`, `coef0_prod_XsubC`
+  + lemmas `coef_prod_XsubC`, `coefPn_prod_XsubC`, `coef0_prod_XsubC`,
+	 `polyOver_mulr_2closed`
 
 - in `ssralg.v`
   + `bool` is now canonically a `fieldType` with additive law `addb` and

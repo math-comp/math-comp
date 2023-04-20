@@ -1386,6 +1386,13 @@ by apply/polyOverP=> i; rewrite coefD rpredD ?(polyOverP _).
 Qed.
 Canonical polyOver_addrPred := AddrPred polyOver_addr_closed.
 
+Lemma polyOver_mulr_2closed :
+  GRing.mulr_2closed kS -> GRing.mulr_2closed (polyOver kS).
+Proof.
+move=> mulS p q /polyOverP Sp /polyOverP Sq; apply/polyOverP=> i.
+by rewrite coefM rpred_sum // => j _; apply: mulS.
+Qed.
+
 End PolyOverAdd.
 
 Fact polyOverNr S (addS : zmodPred S) (kS : keyed_pred addS) :
@@ -1402,8 +1409,8 @@ Variables (S : {pred R}) (ringS : semiringPred S) (kS : keyed_pred ringS).
 
 Fact polyOver_mulr_closed : mulr_closed (polyOver kS).
 Proof.
-split=> [|p q /polyOverP Sp /polyOverP Sq]; first by rewrite polyOverC rpred1.
-by apply/polyOverP=> i; rewrite coefM rpred_sum // => j _; apply: rpredM.
+split=> [|p q]; first by rewrite polyOverC rpred1.
+exact/polyOver_mulr_2closed/rpredM.
 Qed.
 Canonical polyOver_mulrPred := MulrPred polyOver_mulr_closed.
 Canonical polyOver_semiringPred := SemiringPred polyOver_mulr_closed.
