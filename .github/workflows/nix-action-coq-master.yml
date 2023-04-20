@@ -1693,14 +1693,8 @@ jobs:
         --argstr job "reglang"
 name: Nix CI for bundle coq-master
 'on':
-  pull_request:
-    paths:
-    - .github/workflows/**
-  pull_request_target:
-    types:
-    - opened
-    - synchronize
-    - reopened
+  pull_request: []
   push:
     branches:
     - master
+    - hierarchy-builder
