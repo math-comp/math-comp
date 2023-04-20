@@ -697,6 +697,12 @@ Proof. by move=> pn; rewrite ltn_subRL addnC subnK. Qed.
 Lemma ltn_sub2lE m n p : p <= m -> (m - p < m - n) = (n < p).
 Proof. by move=> pm; rewrite ltn_subCr subKn. Qed.
 
+Lemma eqn_sub2rE p m n : p <= m -> p <= n -> (m - p == n - p) = (m == n).
+Proof. by move=> pm pn; rewrite !eqn_leq !leq_sub2rE. Qed.
+
+Lemma eqn_sub2lE m n p : p <= m -> n <= m -> (m - p == m - n) = (p == n).
+Proof. by move=> pm nm; rewrite !eqn_leq !leq_sub2lE // -!eqn_leq eq_sym. Qed.
+
 (* Max and min. *)
 
 Definition maxn m n := if m < n then n else m.
