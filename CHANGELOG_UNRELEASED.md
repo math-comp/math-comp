@@ -41,7 +41,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `addnCBA`, `addnBr_leq`, `addnBl_leq`, `subnDAC`,
     `subnCBA`, `subnBr_leq`, `subnBl_leq`, `subnBAC`, `subDnAC`,
     `subDnCA`, `subDnCAC`, `addnBC`, `addnCB`, `addBnAC`, `addBnCAC`,
-    `addBnA`, `subBnAC`
+    `addBnA`, `subBnAC`, `eqn_sub2lE`, `eqn_sub2rE`
 
 ### Changed
 
