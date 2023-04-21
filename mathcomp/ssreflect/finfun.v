@@ -102,7 +102,7 @@ Notation "{ 'ffun' fT }" := (finfun_of (Phant fT))
 Notation "{ 'dffun' fT }" := (dfinfun_of (Phant fT))
   (at level 0, format "{ 'dffun'  '[hv' fT ']' }") : type_scope.
 
-Definition exp_finIndexType n := [finType of 'I_n].
+Definition exp_finIndexType n : finType := 'I_n.
 Notation "T ^ n" :=
   (@finfun_of (exp_finIndexType n) (fun=> T) (Phant _)) : type_scope.
 

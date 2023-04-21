@@ -1756,7 +1756,7 @@ Qed.
 
 Lemma mxsemisimple0 : mxsemisimple 0.
 Proof.
-exists [finType of 'I_0] (fun _ => 0); [by case | by rewrite big_ord0 | ].
+exists 'I_0 (fun _ => 0); [by case | by rewrite big_ord0 | ].
 by rewrite mxdirectE /= !big_ord0 mxrank0.
 Qed.
 
@@ -1972,7 +1972,7 @@ Lemma component_mx_def : {I : finType & {W : I -> 'M_n |
   forall i, mx_iso U (W i) & compU = \sum_i W i}}%MS.
 Proof.
 pose r i := row i iso_u; pose r_nz i := r i != 0; pose I := {i | r_nz i}.
-exists [finType of I]; exists (fun i => cyclic_mx (r (sval i))) => [i|].
+exists I; exists (fun i => cyclic_mx (r (sval i))) => [i|].
   apply/mxsimple_isoP=> //; apply/and3P.
   split; first by rewrite cyclic_mx_module.
     apply/rowV0Pn; exists (r (sval i)); last exact: (svalP i).

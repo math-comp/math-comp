@@ -176,6 +176,7 @@ Module Finite.
 HB.lock Definition enum T := isFinite.enum_subdef (Finite.class T).
 
 Notation axiom := finite_axiom.
+#[deprecated(since="mathcomp 2.0.0", note="Use isFinite.Build instead.")]
 Notation EnumMixin m := (@isFinite.Build _ _ m).
 
 Lemma uniq_enumP (T : eqType) e : uniq e -> e =i T -> axiom e.
@@ -231,10 +232,13 @@ HB.instance Definition _ := isFinite.Build fT f.
 
 End CanonicalFinType.
 
+#[deprecated(since="mathcomp 2.0.0", note="Use isFinite.Build instead.")]
 Notation FinMixin x := (Finite.EnumMixin x).
 Notation UniqFinMixin := Finite.UniqMixin.
+#[deprecated(since="mathcomp 2.0.0", note="Use Finite.clone instead.")]
 Notation "[ 'finType' 'of' T 'for' cT ]" := (Finite.clone T%type cT)
   (at level 0, format "[ 'finType'  'of'  T  'for'  cT ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use Finite.clone instead.")]
 Notation "[ 'finType' 'of' T ]" := (Finite.clone T%type _)
   (at level 0, format "[ 'finType'  'of'  T ]") : form_scope.
 
@@ -1425,6 +1429,7 @@ Qed.
 
 End SubFinType.
 
+#[deprecated(since="mathcomp 2.0.0", note="Use SubFinite.clone instead.")]
 Notation "[ 'subFinType' 'of' T ]" := (SubFinite.clone _ _ T%type _)
   (at level 0, format "[ 'subFinType'  'of'  T ]") : form_scope.
 
@@ -1456,15 +1461,14 @@ HB.end.
 (* This assumes that T has a subCountType structure over a type that  *)
 (* has a finType structure.                                           *)
 
-Notation "[ 'isFinite' 'of' T 'by' <: ]" :=
-    (SubCountable_isFinite.Build _ _ T)
-  (at level 0, format "[ 'isFinite'  'of'  T  'by'  <: ]") : form_scope.
-
 HB.instance Definition _ (T : finType) (P : pred T) (sT : subType P) :=
-  [isFinite of sub_type sT by <:].
+  (SubCountable_isFinite.Build _ _ (sub_type sT)).
 
 Notation "[ 'Finite' 'of' T 'by' <: ]" := (Finite.copy T%type (sub_type T))
   (at level 0, format "[ 'Finite'  'of'  T  'by'  <: ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use [Finite of _ by <:] instead.")]
+Notation "[ 'finMixin' 'of' T 'by' <: ]" := [Finite of T%type by <:]
+  (at level 0, format "[ 'finMixin'  'of'  T  'by'  <: ]") : form_scope.
 
 Section SubCountable_isFiniteTheory.
 
