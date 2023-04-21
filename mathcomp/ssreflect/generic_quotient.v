@@ -161,6 +161,7 @@ Canonical mpi_unlock := Unlockable mpi.unlock.
 Canonical pi_unlock := Unlockable pi.unlock.
 Canonical repr_unlock := Unlockable repr.unlock.
 
+#[deprecated(since="mathcomp 2.0.0", note="Use Quotient.clone instead.")]
 Notation "[ 'quotType' 'of' Q ]" := (Quotient.clone _ Q%type _)
  (at level 0, format "[ 'quotType'  'of'  Q ]") : form_scope.
 
@@ -302,6 +303,7 @@ HB.structure Definition EqQuotient T eq_quot_op :=
 Canonical pi_eq_quot_mono T eq_quot_op eqT :=
   PiMono2 (@pi_eq_quot T eq_quot_op eqT).
 
+#[deprecated(since="mathcomp 2.0.0", note="Use EqQuotient.clone instead.")]
 Notation "[ 'eqQuotType' e 'of' Q ]" := (EqQuotient.clone _ e Q%type _)
  (at level 0, format "[ 'eqQuotType'  e  'of'  Q ]") : form_scope.
 
