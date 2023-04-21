@@ -609,7 +609,7 @@ Variables (gT : finGroupType) (G : {group gT}).
 
 Fixpoint ncprod_def n : finGroupType :=
   if n is n'.+1 then xcprod G [set: ncprod_def n']
-  else [finGroupType of subg_of 'Z(G)].
+  else subg_of 'Z(G).
 Fact ncprod_key : unit. Proof. by []. Qed.
 Definition ncprod := locked_with ncprod_key ncprod_def.
 

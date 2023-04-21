@@ -241,6 +241,7 @@ HB.structure Definition BaseFinGroup := { G of isMulBaseGroup G & Finite G }.
 Module BaseFinGroupExports.
 Bind Scope group_scope with BaseFinGroup.arg_sort.
 Bind Scope group_scope with BaseFinGroup.sort.
+#[deprecated(since="mathcomp 2.0.0", note="Use BaseFinGroup.clone instead.")]
 Notation "[ 'baseFinGroupType' 'of' T ]" := (@BaseFinGroup.clone T%type _)
   (at level 0, format "[ 'baseFinGroupType'  'of'  T ]") : form_scope.
 End BaseFinGroupExports.
@@ -278,6 +279,7 @@ HB.structure Definition FinGroup :=
   { G of BaseFinGroup_isGroup G & BaseFinGroup G }.
 
 Module FinGroupExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use FinGroup.clone instead.")]
 Notation "[ 'finGroupType' 'of' T ]" := (@FinGroup.clone T%type _)
   (at level 0, format "[ 'finGroupType'  'of'  T ]") : form_scope.
 Bind Scope group_scope with FinGroup.sort.
