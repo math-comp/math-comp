@@ -1644,7 +1644,7 @@ Arguments has_nthP {T a s}.
 Arguments all_nthP {T a s}.
 
 Definition bitseq := seq bool.
-Canonical bitseq_eqType := Eval hnf in [eqType of bitseq].
+#[hnf] HB.instance Definition _ := Equality.on bitseq.
 Canonical bitseq_predType := Eval hnf in [predType of bitseq].
 
 (* Generalizations of splitP (from path.v): split_find_nth and split_find *)

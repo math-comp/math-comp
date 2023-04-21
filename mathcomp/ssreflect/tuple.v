@@ -306,7 +306,7 @@ Section EqTuple.
 Variables (n : nat) (T : eqType).
 
 HB.instance Definition tuple_hasDecEq : hasDecEq (n.-tuple T) :=
-  [hasDecEq of n.-tuple T by <:].
+  [Equality of n.-tuple T by <:].
 Canonical tuple_predType := PredType (pred_of_seq : n.-tuple T -> pred T).
 
 Lemma eqEtuple (t1 t2 : n.-tuple T) :
@@ -632,7 +632,7 @@ Proof. by move=> s; apply: val_inj; case: s => [[]]. Qed.
 End SeqBseq.
 
 HB.instance Definition bseq_hasDecEq n (T : eqType) :=
-  [hasDecEq of n.-bseq T by <:].
+  [Equality of n.-bseq T by <:].
 
 Canonical bseq_predType n (T : eqType) :=
   Eval hnf in PredType (fun t : n.-bseq T => mem_seq t).

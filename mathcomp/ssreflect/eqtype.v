@@ -130,10 +130,10 @@ HB.mixin Record hasDecEq T := { eq_op : rel T; eqP : eq_axiom eq_op }.
 #[mathcomp(axiom="eq_axiom"), short(type="eqType")]
 HB.structure Definition Equality := { T of hasDecEq T }.
 
-Notation "[ 'hasDecEq' 'of' T ]" := (Equality.on T%type)
-  (at level 0, format "[ 'hasDecEq'  'of'  T ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use Equality.clone instead.")]
 Notation "[ 'eqType' 'of' T 'for' C ]" := (Equality.clone T%type C)
   (at level 0, format "[ 'eqType'  'of'  T  'for'  C ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use Equality.clone instead.")]
 Notation "[ 'eqType' 'of' T ]" := (Equality.clone T%type _)
   (at level 0, format "[ 'eqType'  'of'  T ]") : form_scope.
 
@@ -733,18 +733,32 @@ Variables (T : Type) (eT : eqType) (f : T -> eT).
 Lemma inj_eqAxiom : injective f -> Equality.axiom (fun x y => f x == f y).
 Proof. by move=> f_inj x y; apply: (iffP eqP) => [|-> //]; apply: f_inj. Qed.
 
-Definition InjEqMixin f_inj := hasDecEq.Build T (inj_eqAxiom f_inj).
-HB.instance Definition _ f_inj : hasDecEq (inj_type f_inj) := InjEqMixin f_inj.
+HB.instance Definition _ f_inj := hasDecEq.Build (inj_type f_inj)
+  (inj_eqAxiom f_inj).
 
-Definition PcanEqMixin g (fK : pcancel f g) := InjEqMixin (pcan_inj fK).
-HB.instance Definition _ g (fK : pcancel f g) : hasDecEq (pcan_type fK) :=
-  PcanEqMixin fK.
+HB.instance Definition _ g (fK : pcancel f g) := Equality.copy (pcan_type fK)
+  (inj_type (pcan_inj fK)).
 
-Definition CanEqMixin g (fK : cancel f g) := InjEqMixin (can_inj fK).
-HB.instance Definition _ g (fK : cancel f g) : hasDecEq (can_type fK) :=
-  CanEqMixin fK.
+HB.instance Definition _ g (fK : cancel f g) := Equality.copy (can_type fK)
+  (inj_type (can_inj fK)).
+
+Definition deprecated_InjEqMixin f_inj := hasDecEq.Build T (inj_eqAxiom f_inj).
+Definition deprecated_PcanEqMixin g (fK : pcancel f g) :=
+  deprecated_InjEqMixin (pcan_inj fK).
+Definition deprecated_CanEqMixin g (fK : cancel f g) :=
+  deprecated_InjEqMixin (can_inj fK).
 
 End TransferEqType.
+
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use Equality.copy T (inj_type f_inj) instead")]
+Notation InjEqMixin := deprecated_InjEqMixin.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use Equality.copy T (pcan_type fK) instead")]
+Notation PcanEqMixin := deprecated_PcanEqMixin.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use Equality.copy T (can_type fK) instead")]
+Notation CanEqMixin := deprecated_CanEqMixin.
 
 Definition sub_type_of T (P : pred T) (sT : subType P) of phant sT : Type := sT.
 Notation sub_type T := (sub_type_of (Phant T)).
@@ -770,14 +784,9 @@ Arguments val_eqP {T P sT x y}.
 
 Notation "[ 'Equality' 'of' T 'by' <: ]" := (Equality.copy T%type (sub_type T))
   (at level 0, format "[ 'Equality'  'of'  T  'by'  <: ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use [Equality of _ by <:] or [hasDecEq of _ by <:] instead")]
-Notation "[ 'eqMixin' 'of' T 'by' <: ]" :=
-  (hasDecEq.Build (T : Type) (@val_eqP _ _ _))
+#[deprecated(since="mathcomp 2.0.0", note="Use [Equality of _ by <:] instead.")]
+Notation "[ 'eqMixin' 'of' T 'by' <: ]" := [Equality of T%type by <:]
   (at level 0, format "[ 'eqMixin'  'of'  T  'by'  <: ]") : form_scope.
-Notation "[ 'hasDecEq' 'of' T 'by' <: ]" :=
-  (hasDecEq.Build (T : Type) (@val_eqP _ _ _))
-  (at level 0, format "[ 'hasDecEq'  'of'  T  'by'  <: ]") : form_scope.
 
 HB.instance Definition _ := Equality.copy void (pcan_type (of_voidK unit)).
 HB.instance Definition _ (T : eqType) (P : pred T) :=

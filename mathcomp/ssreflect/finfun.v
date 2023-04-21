@@ -231,19 +231,19 @@ Variable aT : finType.
 Notation dffun_aT rT rS := {dffun forall x : aT, rT x : rS}.
 
 Local Remark dffun_hasDecEq rT : hasDecEq (dffun_aT rT eqType).
-Proof. exact: PcanEqMixin tfgraphK. Qed.
+Proof. exact: (Equality.on (pcan_type tfgraphK)). Qed.
 HB.instance Definition _ rT := dffun_hasDecEq rT.
 HB.instance Definition _ (rT : eqType) :=
   Equality.copy {ffun aT -> rT} {dffun forall _, rT}.
 
 Local Remark dffun_hasChoice rT : hasChoice (dffun_aT rT choiceType).
-Proof. exact: PcanChoiceMixin tfgraphK. Qed.
+Proof. exact: (Choice.on (pcan_type tfgraphK)). Qed.
 HB.instance Definition _ rT := dffun_hasChoice rT.
 HB.instance Definition _ (rT : choiceType) :=
   Choice.copy {ffun aT -> rT} {dffun forall _, rT}.
 
 Local Remark dffun_isCountable rT : isCountable (dffun_aT rT countType).
-Proof. exact: PcanCountMixin tfgraphK. Qed.
+Proof. exact: (Countable.on (pcan_type tfgraphK)). Qed.
 HB.instance Definition _ rT := dffun_isCountable rT.
 HB.instance Definition _ (rT : countType) :=
   Countable.copy {ffun aT -> rT} {dffun forall _, rT}.

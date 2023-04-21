@@ -162,7 +162,7 @@ Definition Cfun := locked_with classfun_key (fun flag : nat => Classfun).
 HB.instance Definition _ := [isSub for cfun_val].
 HB.instance Definition _ := [Choice of classfun by <:].
 
-Definition cfun_eqType := [eqType of classfun].
+Definition cfun_eqType : eqType := classfun.
 
 Definition fun_of_cfun phi := cfun_val phi : gT -> algC.
 Coercion fun_of_cfun : classfun >-> Funclass.
