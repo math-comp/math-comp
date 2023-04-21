@@ -1132,16 +1132,19 @@ HB.end.
 
 Module POrderExports.
 Arguments le_trans {d s} [_ _ _].
+#[deprecated(since="mathcomp 2.0.0", note="Use POrder.clone instead.")]
 Notation "[ 'porderType' 'of' T 'for' cT ]" := (POrder.clone _ T%type cT)
   (at level 0, format "[ 'porderType'  'of'  T  'for'  cT ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use POrder.clone instead.")]
 Notation "[ 'porderType' 'of' T 'for' cT 'with' disp ]" :=
   (POrder.clone disp T%type cT)
   (at level 0, format "[ 'porderType'  'of'  T  'for'  cT  'with'  disp ]") :
   form_scope.
-Notation "[ 'porderType' 'of' T ]" := [porderType of T%type for _]
+#[deprecated(since="mathcomp 2.0.0", note="Use POrder.clone instead.")]
+Notation "[ 'porderType' 'of' T ]" := (POrder.clone _ T%type _)
   (at level 0, format "[ 'porderType'  'of'  T ]") : form_scope.
-Notation "[ 'porderType' 'of' T 'with' disp ]" :=
-  [porderType of T%type for _ with disp]
+#[deprecated(since="mathcomp 2.0.0", note="Use POrder.clone instead.")]
+Notation "[ 'porderType' 'of' T 'with' disp ]" := (POrder.clone disp T%type _)
   (at level 0, format "[ 'porderType'  'of'  T  'with' disp ]") : form_scope.
 End POrderExports.
 HB.export POrderExports.
@@ -1369,16 +1372,19 @@ HB.structure Definition Lattice d :=
   { T of POrder_isLattice d T & POrder d T }.
 
 Module LatticeExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use Lattice.clone instead.")]
 Notation "[ 'latticeType' 'of' T 'for' cT ]" := (Lattice.clone _ T%type cT)
   (at level 0, format "[ 'latticeType'  'of'  T  'for'  cT ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use Lattice.clone instead.")]
 Notation "[ 'latticeType' 'of' T 'for' cT 'with' disp ]" :=
   (Lattice.clone disp T%type cT)
   (at level 0, format "[ 'latticeType'  'of'  T  'for'  cT  'with'  disp ]") :
   form_scope.
-Notation "[ 'latticeType' 'of' T ]" := [latticeType of T%type for _]
+#[deprecated(since="mathcomp 2.0.0", note="Use Lattice.clone instead.")]
+Notation "[ 'latticeType' 'of' T ]" := (Lattice.clone _ T%type _)
   (at level 0, format "[ 'latticeType'  'of'  T ]") : form_scope.
-Notation "[ 'latticeType' 'of' T 'with' disp ]" :=
-  [latticeType of T%type for _ with disp]
+#[deprecated(since="mathcomp 2.0.0", note="Use Lattice.clone instead.")]
+Notation "[ 'latticeType' 'of' T 'with' disp ]" := (Lattice.clone disp T%type _)
   (at level 0, format "[ 'latticeType'  'of'  T  'with' disp ]") : form_scope.
 End LatticeExports.
 HB.export LatticeExports.
@@ -1440,9 +1446,11 @@ HB.mixin Record hasBottom d (T : Type) of POrder d T := {
 HB.structure Definition BLattice d := { T of hasBottom d T & Lattice d T }.
 
 Module BLatticeExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use BLattice.clone instead.")]
 Notation "[ 'bLatticeType' 'of' T 'for' cT ]" := (BLattice.clone _ T%type cT)
   (at level 0, format "[ 'bLatticeType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'bLatticeType' 'of' T ]" := [bLatticeType of T%type for _]
+#[deprecated(since="mathcomp 2.0.0", note="Use BLattice.clone instead.")]
+Notation "[ 'bLatticeType' 'of' T ]" := (BLattice.clone _ T%type _)
   (at level 0, format "[ 'bLatticeType'  'of'  T ]") : form_scope.
 (* Notation "[ 'bLatticeType' 'of' T 'for' cT 'with' disp ]" := *)
 (*   (@clone_with T _ cT disp _ id) *)
@@ -1558,6 +1566,7 @@ HB.structure Definition BDistrLattice d :=
   { T of hasBottom d T & DistrLattice d T}.
 
 Module BDistrLatticeExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use BDistrLattice.clone instead.")]
 Notation "[ 'bDistrLatticeType' 'of' T ]" := (BDistrLattice.clone _ T%type _)
   (at level 0, format "[ 'bDistrLatticeType'  'of'  T ]") : form_scope.
 End BDistrLatticeExports.
@@ -1568,6 +1577,7 @@ HB.structure Definition TBDistrLattice d :=
   { T of TBLattice d T & BDistrLattice d T }.
 
 Module TBDistrLatticeExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use TBDistrLattice.clone instead.")]
 Notation "[ 'tbDistrLatticeType' 'of' T ]" := (TBDistrLattice.clone _ T%type _)
   (at level 0, format "[ 'tbDistrLatticeType'  'of'  T ]") : form_scope.
 End TBDistrLatticeExports.
@@ -1675,6 +1685,7 @@ HB.export TotalExports.
 HB.structure Definition FinPOrder d := { T of Finite T & POrder d T }.
 
 Module FinPOrderExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use BLattice.clone instead.")]
 Notation "[ 'finPOrderType' 'of' T ]" := (FinPOrder.clone _ T%type _ )
   (at level 0, format "[ 'finPOrderType'  'of'  T ]") : form_scope.
 End FinPOrderExports.
@@ -1684,6 +1695,7 @@ HB.export FinPOrderExports.
 HB.structure Definition FinLattice d := { T of Finite T & TBLattice d T }.
 
 Module FinLatticeExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use FinLattice.clone instead.")]
 Notation "[ 'finLatticeType' 'of' T ]" := (FinLattice.clone _ T%type _ )
   (at level 0, format "[ 'finLatticeType'  'of'  T ]") : form_scope.
 End FinLatticeExports.
@@ -1694,6 +1706,7 @@ HB.structure Definition FinDistrLattice d :=
   { T of Finite T & TBDistrLattice d T }.
 
 Module FinDistrLatticeExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use FinDistrLattice.clone instead.")]
 Notation "[ 'finDistrLatticeType' 'of' T ]" := (FinDistrLattice.clone _ T%type _ )
   (at level 0, format "[ 'finDistrLatticeType'  'of'  T ]") : form_scope.
 End FinDistrLatticeExports.
@@ -1704,17 +1717,18 @@ HB.structure Definition FinCDistrLattice d :=
   { T of Finite T & CTBDistrLattice d T }.
 
 Module FinCDistrLatticeExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use FinCDistrLattice.clone instead.")]
 Notation "[ 'finCDistrLatticeType' 'of' T ]" := (FinCDistrLattice.clone _ T%type _ )
   (at level 0, format "[ 'finCDistrLatticeType'  'of'  T ]") : form_scope.
 End FinCDistrLatticeExports.
 HB.export FinCDistrLatticeExports.
-
 
 #[short(type="finOrderType")]
 HB.structure Definition FinTotal d :=
   { T of Total d T & FinDistrLattice d T }.
 
 Module FinTotalExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use FinTotal.clone instead.")]
 Notation "[ 'finOrderType' 'of' T ]" := (FinTotal.clone _ T%type _ )
   (at level 0, format "[ 'finOrderType'  'of'  T ]") : form_scope.
 End FinTotalExports.
@@ -3010,59 +3024,59 @@ Implicit Types (x y : L).
 
 (* lattice theory *)
 Lemma joinAC : right_commutative (@join _ L).
-Proof. exact: (@meetAC _ [latticeType of L^d]). Qed.
+Proof. exact: (@meetAC _ L^d). Qed.
 Lemma joinCA : left_commutative (@join _ L).
-Proof. exact: (@meetCA _ [latticeType of L^d]). Qed.
+Proof. exact: (@meetCA _ L^d). Qed.
 Lemma joinACA : interchange (@join _ L) (@join _ L).
-Proof. exact: (@meetACA _ [latticeType of L^d]). Qed.
+Proof. exact: (@meetACA _ L^d). Qed.
 
 Lemma joinxx x : x `|` x = x.
-Proof. exact: (@meetxx _ [latticeType of L^d]). Qed.
+Proof. exact: (@meetxx _ L^d). Qed.
 
 Lemma joinKU y x : x `|` (x `|` y) = x `|` y.
-Proof. exact: (@meetKI _ [latticeType of L^d]). Qed.
+Proof. exact: (@meetKI _ L^d). Qed.
 Lemma joinUK y x : (x `|` y) `|` y = x `|` y.
-Proof. exact: (@meetIK _ [latticeType of L^d]). Qed.
+Proof. exact: (@meetIK _ L^d). Qed.
 Lemma joinKUC y x : x `|` (y `|` x) = x `|` y.
-Proof. exact: (@meetKIC _ [latticeType of L^d]). Qed.
+Proof. exact: (@meetKIC _ L^d). Qed.
 Lemma joinUKC y x : y `|` x `|` y = x `|` y.
-Proof. exact: (@meetIKC _ [latticeType of L^d]). Qed.
+Proof. exact: (@meetIKC _ L^d). Qed.
 
 (* interaction with order *)
 Lemma leUx x y z : (x `|` y <= z) = (x <= z) && (y <= z).
-Proof. exact: (@lexI _ [latticeType of L^d]). Qed.
+Proof. exact: (@lexI _ L^d). Qed.
 Lemma lexUl x y z : x <= y -> x <= y `|` z.
-Proof. exact: (@leIxl _ [latticeType of L^d]). Qed.
+Proof. exact: (@leIxl _ L^d). Qed.
 Lemma lexUr x y z : x <= z -> x <= y `|` z.
-Proof. exact: (@leIxr _ [latticeType of L^d]). Qed.
+Proof. exact: (@leIxr _ L^d). Qed.
 Lemma lexU2 x y z : (x <= y) || (x <= z) -> x <= y `|` z.
-Proof. exact: (@leIx2 _ [latticeType of L^d]). Qed.
+Proof. exact: (@leIx2 _ L^d). Qed.
 
 Lemma leUr x y : x <= y `|` x.
-Proof. exact: (@leIr _ [latticeType of L^d]). Qed.
+Proof. exact: (@leIr _ L^d). Qed.
 Lemma leUl x y : x <= x `|` y.
-Proof. exact: (@leIl _ [latticeType of L^d]). Qed.
+Proof. exact: (@leIl _ L^d). Qed.
 
 Lemma join_idPr {x y} : reflect (x `|` y = y) (x <= y).
-Proof. exact: (@meet_idPr _ [latticeType of L^d]). Qed.
+Proof. exact: (@meet_idPr _ L^d). Qed.
 Lemma join_idPl {x y} : reflect (y `|` x = y) (x <= y).
-Proof. exact: (@meet_idPl _ [latticeType of L^d]). Qed.
+Proof. exact: (@meet_idPl _ L^d). Qed.
 
 Lemma join_l x y : y <= x -> x `|` y = x. Proof. exact/join_idPl. Qed.
 Lemma join_r x y : x <= y -> x `|` y = y. Proof. exact/join_idPr. Qed.
 
 Lemma leUidl x y : (x `|` y <= y) = (x <= y).
-Proof. exact: (@leIidr _ [latticeType of L^d]). Qed.
+Proof. exact: (@leIidr _ L^d). Qed.
 Lemma leUidr x y : (y `|` x <= y) = (x <= y).
-Proof. exact: (@leIidl _ [latticeType of L^d]). Qed.
+Proof. exact: (@leIidl _ L^d). Qed.
 
 Lemma eq_joinl x y : (x `|` y == x) = (y <= x).
-Proof. exact: (@eq_meetl _ [latticeType of L^d]). Qed.
+Proof. exact: (@eq_meetl _ L^d). Qed.
 Lemma eq_joinr x y : (x `|` y == y) = (x <= y).
-Proof. exact: (@eq_meetr _ [latticeType of L^d]). Qed.
+Proof. exact: (@eq_meetr _ L^d). Qed.
 
 Lemma leU2 x y z t : x <= z -> y <= t -> x `|` y <= z `|` t.
-Proof. exact: (@leI2 _ [latticeType of L^d]). Qed.
+Proof. exact: (@leI2 _ L^d). Qed.
 
 Lemma lcomparableP x y : incomparel x y
   (min y x) (min x y) (max y x) (max x y)
@@ -4389,8 +4403,8 @@ Fact leP x y : le_xor_gt x y
   (min y x) (min x y) (max y x) (max x y) (x <= y) (y < x).
 Proof. exact: comparable_leP. Qed.
 
-Definition meet := @min _ [porderType of T].
-Definition join := @max _ [porderType of T].
+Definition meet := @min _ T.
+Definition join := @max _ T.
 
 Fact meetC : commutative meet.
 Proof. by move=> x y; rewrite /meet; have [] := ltgtP. Qed.
@@ -4646,20 +4660,22 @@ Definition Can f' (f_can : cancel f f') := Pcan (can_pcan f_can).
 End CancelPartial.
 End CancelPartial.
 
+#[deprecated(since="mathcomp 2.0.0", note="Use POrder.clone and pcan_type.")]
 Notation PcanPartial := CancelPartial.Pcan.
+#[deprecated(since="mathcomp 2.0.0", note="Use POrder.clone and can_type.")]
 Notation CanPartial := CancelPartial.Can.
 
 #[export]
 HB.instance Definition _ (disp : unit) (T : choiceType)
   (disp' : unit) (T' : porderType disp') (f : T -> T')
   (f' : T' -> option T) (f_can : pcancel f f') : isPOrdered disp (pcan_type f_can) :=
-  PcanPartial disp (f_can : @pcancel _ (pcan_type f_can)  f f').
+  CancelPartial.Pcan disp (f_can : @pcancel _ (pcan_type f_can)  f f').
 
 #[export]
 HB.instance Definition _ (disp : unit) (T : choiceType)
   (disp' : unit) (T' : porderType disp') (f : T -> T') (f' : T' ->  T)
   (f_can : cancel f f') : isPOrdered disp (can_type f_can) :=
-  CanPartial disp (f_can : @cancel _ (can_type f_can)  f f').
+  CancelPartial.Can disp (f_can : @cancel _ (can_type f_can)  f f').
 
 Section CancelTotal.
 Variables (disp : unit) (T : choiceType).
@@ -4750,9 +4766,9 @@ Module CanExports.
 #[deprecated(since="mathcomp 2.0.0", note="use Order.MonoTotal instead.")]
 Notation MonoTotalMixin d T := (MonoTotal d T).
 #[deprecated(since="mathcomp 2.0.0", note="use Order.PcanPartial instead.")]
-Notation PcanPOrderMixin := PcanPartial.
+Notation PcanPOrderMixin := CancelPartial.Pcan.
 #[deprecated(since="mathcomp 2.0.0", note="use Order.CanPartial instead.")]
-Notation CanPOrderMixin := CanPartial.
+Notation CanPOrderMixin := CancelPartial.Can.
 #[deprecated(since="mathcomp 2.0.0", note="use Order.PcanTotal instead.")]
 Notation PcanOrderMixin := PcanTotal.
 #[deprecated(since="mathcomp 2.0.0", note="use Order.CanTotal instead.")]
@@ -6760,7 +6776,7 @@ Section Total.
 Variable (T : orderType disp1) (T' : orderType disp2).
 Implicit Types (x y : T * T').
 
-Fact total : total (<=%O: rel [porderType of T * T']).
+Fact total : total (<=%O : rel (T * T')).
 Proof.
 move=> x y; rewrite /<=%O /= /le; case: ltgtP => //= _; exact: le_total.
 Qed.
