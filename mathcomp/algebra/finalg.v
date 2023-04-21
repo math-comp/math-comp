@@ -46,6 +46,8 @@ Import GRing.Theory.
 HB.structure Definition Zsemimodule := {M of GRing.Zsemimodule M & Finite M}.
 
 Module ZsemimoduleExports.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use FinRing.Zsemimodule.clone instead.")]
 Notation "[ 'finZsemimodType' 'of' T ]" := (Zsemimodule.clone T _)
   (at level 0, format "[ 'finZsemimodType'  'of'  T ]") : form_scope.
 End ZsemimoduleExports.
@@ -55,6 +57,7 @@ HB.export ZsemimoduleExports.
 HB.structure Definition Zmodule := {M of GRing.Zmodule M & Finite M}.
 
 Module ZmoduleExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use FinRing.Zmodule.clone instead.")]
 Notation "[ 'finZmodType' 'of' T ]" := (Zmodule.clone T%type _)
   (at level 0, format "[ 'finZmodType'  'of'  T ]") : form_scope.
 Notation "[ 'finGroupMixin' 'of' R 'for' +%R ]" :=
@@ -67,6 +70,8 @@ HB.export ZmoduleExports.
 HB.structure Definition SemiRing := {R of GRing.SemiRing R & Finite R}.
 
 Module SemiRingExports.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use FinRing.SemiRing.clone instead.")]
 Notation "[ 'finSemiRingType' 'of' T ]" := (SemiRing.clone T _)
   (at level 0, format "[ 'finSemiRingType'  'of'  T ]") : form_scope.
 End SemiRingExports.
@@ -76,6 +81,7 @@ HB.export SemiRingExports.
 HB.structure Definition Ring := {R of GRing.Ring R & Finite R}.
 
 Module RingExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use FinRing.Ring.clone instead.")]
 Notation "[ 'finRingType' 'of' T ]" := (Ring.clone T%type _)
   (at level 0, format "[ 'finRingType'  'of'  T ]") : form_scope.
 End RingExports.
@@ -85,6 +91,8 @@ HB.export RingExports.
 HB.structure Definition ComSemiRing := {R of GRing.ComSemiRing R & Finite R}.
 
 Module ComSemiRingExports.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use FinRing.ComSemiRing.clone instead.")]
 Notation "[ 'finComSemiRingType' 'of' T ]" := (ComSemiRing.clone T _)
   (at level 0, format "[ 'finComSemiRingType'  'of'  T ]") : form_scope.
 End ComSemiRingExports.
@@ -94,6 +102,7 @@ HB.export ComSemiRingExports.
 HB.structure Definition ComRing := {R of GRing.ComRing R & Finite R}.
 
 Module ComRingExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use FinRing.ComRing.clone instead.")]
 Notation "[ 'finComRingType' 'of' T ]" := (ComRing.clone T%type _)
   (at level 0, format "[ 'finComRingType'  'of'  T ]") : form_scope.
 End ComRingExports.
@@ -103,6 +112,8 @@ HB.export ComRingExports.
 HB.structure Definition UnitRing := {R of GRing.UnitRing R & Finite R}.
 
 Module UnitRingExports.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use FinRing.UnitRing.clone instead.")]
 Notation "[ 'finUnitRingType' 'of' T ]" := (UnitRing.clone T%type _)
   (at level 0, format "[ 'finUnitRingType'  'of'  T ]") : form_scope.
 End UnitRingExports.
@@ -112,6 +123,8 @@ HB.export UnitRingExports.
 HB.structure Definition ComUnitRing := {R of GRing.ComUnitRing R & Finite R}.
 
 Module ComUnitRingExports.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use FinRing.ComUnitRing.clone instead.")]
 Notation "[ 'finComUnitRingType' 'of' T ]" := (ComUnitRing.clone T%type _)
   (at level 0, format "[ 'finComUnitRingType'  'of'  T ]") : form_scope.
 End ComUnitRingExports.
@@ -122,6 +135,8 @@ HB.structure Definition IntegralDomain :=
   {R of GRing.IntegralDomain R & Finite R}.
 
 Module IntegralDomainExports.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use FinRing.IntegralDomain.clone instead.")]
 Notation "[ 'finIntegralDomainType' 'of' T ]" := (IntegralDomain.clone T%type _)
   (at level 0, format "[ 'finIntegralDomainType'  'of'  T ]") : form_scope.
 End IntegralDomainExports.
@@ -131,6 +146,7 @@ HB.export IntegralDomainExports.
 HB.structure Definition Field := {R of GRing.Field R & Finite R}.
 
 Module FieldExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use FinRing.Field.clone instead.")]
 Notation "[ 'finFieldType' 'of' T ]" := (Field.clone T%type _)
   (at level 0, format "[ 'finFieldType'  'of'  T ]") : form_scope.
 End FieldExports.
@@ -141,6 +157,7 @@ HB.structure Definition Lmodule (R : ringType) :=
   {M of GRing.Lmodule R M & Finite M}.
 
 Module LmoduleExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use FinRing.Lmodule.clone instead.")]
 Notation "[ 'finLmodType' R 'of' T ]" := (Lmodule.clone R T%type _)
   (at level 0, format "[ 'finLmodType'  R  'of'  T ]") : form_scope.
 End LmoduleExports.
@@ -151,6 +168,8 @@ HB.structure Definition Lalgebra (R : ringType) :=
   {M of GRing.Lalgebra R M & Finite M}.
 
 Module LalgebraExports.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use FinRing.Lalgebra.clone instead.")]
 Notation "[ 'finLalgType' R 'of' T ]" := (Lalgebra.clone R T%type _)
   (at level 0, format "[ 'finLalgType'  R  'of'  T ]") : form_scope.
 End LalgebraExports.
@@ -161,6 +180,7 @@ HB.structure Definition Algebra (R : ringType) :=
   {M of GRing.Algebra R M & Finite M}.
 
 Module AlgebraExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use FinRing.Algebra.clone instead.")]
 Notation "[ 'finAlgType' R 'of' T ]" := (Algebra.clone R T%type _)
   (at level 0, format "[ 'finAlgType'  R  'of'  T ]") : form_scope.
 End AlgebraExports.
@@ -171,6 +191,8 @@ HB.structure Definition UnitAlgebra (R : unitRingType) :=
   {M of GRing.UnitAlgebra R M & Finite M}.
 
 Module UnitAlgebraExports.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use FinRing.UnitAlgebra.clone instead.")]
 Notation "[ 'finUnitAlgType' R 'of' T ]" := (UnitAlgebra.clone R T%type _)
   (at level 0, format "[ 'finUnitAlgType'  R  'of'  T ]") : form_scope.
 End UnitAlgebraExports.

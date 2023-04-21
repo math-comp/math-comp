@@ -2173,6 +2173,6 @@ Proof. by move/char_Fp/fin_lmod_char_abelem->. Qed.
 
 Lemma fin_ring_char_abelem p (R : finRingType) :
   p \in [char R]%R -> p.-abelem [set: R].
-Proof. exact: fin_lmod_char_abelem [finLmodType R of R^o]. Qed.
+Proof. exact: fin_lmod_char_abelem R^o. Qed.
 
 End FimModAbelem.
