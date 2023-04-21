@@ -263,7 +263,7 @@ Theorem Fundamental_Theorem_of_Algebraics :
 Proof.
 have maxn3 n1 n2 n3: {m | [/\ n1 <= m, n2 <= m & n3 <= m]%N}.
   by exists (maxn n1 (maxn n2 n3)); apply/and3P; rewrite -!geq_max.
-have [C [/= QtoC algC]] := countable_algebraic_closure [countFieldType of rat].
+have [C [/= QtoC algC]] := countable_algebraic_closure rat.
 exists C; have [i Di2] := GRing.imaginary_exists C.
 pose Qfield := fieldExtType rat.
 pose Cmorph (L : Qfield) := {rmorphism L -> C}.
