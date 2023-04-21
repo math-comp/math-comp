@@ -1404,14 +1404,21 @@ HB.instance Definition _ :=
   GRing.isAddClosed.Build [zmodType of {poly R}] (polyOver_pred S)
     polyOver_addr_closed.
 
-Lemma polyOver_mulr_2closed :
-  GRing.mulr_2closed kS -> GRing.mulr_2closed (polyOver kS).
-Proof.
-move=> mulS p q /polyOverP Sp /polyOverP Sq; apply/polyOverP=> i.
-by rewrite coefM rpred_sum // => j _; apply: mulS.
-Qed.
-
 End PolyOverAdd.
+
+Section PolyOverSemiRing2.
+
+Variable S : semiring2Closed R.
+
+Lemma polyOver_mulr_2closed : GRing.mulr_2closed (polyOver S).
+Proof.
+move=> p q /polyOverP Sp /polyOverP Sq; apply/polyOverP=> i.
+by rewrite coefM rpred_sum // => j _; rewrite rpredM.
+Qed.
+HB.instance Definition _ := GRing.isMul2Closed.Build {poly R} (polyOver_pred S)
+  polyOver_mulr_2closed.
+
+End PolyOverSemiRing2.
 
 Fact polyOverNr (zmodS : zmodClosed R) : oppr_closed (polyOver zmodS).
 Proof.
@@ -1425,14 +1432,10 @@ Section PolyOverSemiring.
 
 Variable S : semiringClosed R.
 
-Fact polyOver_mulr_closed : mulr_closed (polyOver S).
-Proof.
-split=> [|p q]; first by rewrite polyOverC rpred1.
-exact/polyOver_mulr_2closed/rpredM.
-Qed.
-HB.instance Definition _ :=
-  GRing.isMulClosed.Build [ringType of {poly R}] (polyOver_pred S)
-    polyOver_mulr_closed.
+Fact polyOver_mul1_closed : 1 \in (polyOver S).
+Proof. by rewrite polyOverC rpred1. Qed.
+HB.instance Definition _ := GRing.isMul1Closed.Build {poly R} (polyOver_pred S)
+  polyOver_mul1_closed.
 
 Lemma polyOverZ : {in S & polyOver S, forall c p, c *: p \is a polyOver S}.
 Proof.
@@ -1454,9 +1457,7 @@ Section PolyOverRing.
 
 Variable S : subringClosed R.
 
-HB.instance Definition _ :=
-  GRing.isMulClosed.Build [ringType of {poly R}] (polyOver_pred S)
-    (polyOver_mulr_closed S).
+HB.instance Definition _ := GRing.MulClosed.on (polyOver_pred S).
 
 Lemma polyOverXsubC c : ('X - c%:P \in polyOver S) = (c \in S).
 Proof. by rewrite rpredBl ?polyOverX ?polyOverC. Qed.

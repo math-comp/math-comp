@@ -4812,8 +4812,12 @@ HB.mixin Record isAddClosed (V : zsemimodType) (S : {pred V}) := {
   rpred0D : addr_closed S
 }.
 
-HB.mixin Record isMulClosed (R : semiRingType) (S : {pred R}) := {
-  rpred1M : mulr_closed S
+HB.mixin Record isMul2Closed (R : semiRingType) (S : {pred R}) := {
+  rpredM : mulr_2closed S
+}.
+
+HB.mixin Record isMul1Closed (R : semiRingType) (S : {pred R}) := {
+  rpred1 : 1 \in S
 }.
 
 HB.mixin Record isInvClosed (R : unitRingType) (S : {pred R}) := {
@@ -4836,12 +4840,19 @@ HB.structure Definition AddClosed V := {S of isAddClosed V S}.
 #[infer(V), short(type="zmodClosed")]
 HB.structure Definition ZmodClosed V := {S of OppClosed V S & AddClosed V S}.
 
+#[infer(R), short(type="mulr2Closed")]
+HB.structure Definition Mul2Closed R := {S of isMul2Closed R S}.
+
 #[infer(R), short(type="mulrClosed")]
-HB.structure Definition MulClosed R := {S of isMulClosed R S}.
+HB.structure Definition MulClosed R := {S of Mul2Closed R S & isMul1Closed R S}.
 
 #[infer(R), short(type="smulClosed")]
 HB.structure Definition SmulClosed (R : ringType) :=
   {S of OppClosed R S & MulClosed R S}.
+
+#[infer(R), short(type="semiring2Closed")]
+HB.structure Definition Semiring2Closed (R : semiRingType) :=
+  {S of AddClosed R S & Mul2Closed R S}.
 
 #[infer(R), short(type="semiringClosed")]
 HB.structure Definition SemiringClosed (R : semiRingType) :=
@@ -4886,6 +4897,15 @@ HB.instance Definition _ := isOppClosed.Build V S
   (zmod_closedN zmod_closed_subproof).
 HB.instance Definition _ := isAddClosed.Build V S
   (zmod_closedD zmod_closed_subproof).
+HB.end.
+
+HB.factory Record isMulClosed (R : semiRingType) (S : {pred R}) := {
+  rpred1M : mulr_closed S
+}.
+
+HB.builders Context R S of isMulClosed R S.
+HB.instance Definition _ := isMul2Closed.Build R S (proj2 rpred1M).
+HB.instance Definition _ := isMul1Closed.Build R S (proj1 rpred1M).
 HB.end.
 
 HB.factory Record isSmulClosed (R : ringType) (S : R -> bool) := {
@@ -5071,11 +5091,8 @@ Section Mul.
 
 Variable S : mulrClosed R.
 
-Lemma rpred1 : 1 \in S.
-Proof. by case: (@rpred1M _ S). Qed.
-
-Lemma rpredM : {in S &, forall u v, u * v \in S}.
-Proof. by case: (@rpred1M _ S). Qed.
+Lemma rpred1M : mulr_closed S.
+Proof. exact: (conj rpred1 rpredM). Qed.
 
 Lemma rpred_prod I r (P : pred I) F :
   (forall i, P i -> F i \in S) -> \prod_(i <- r | P i) F i \in S.
@@ -5138,7 +5155,7 @@ Variables (R : ringType) (A : lalgType R).
 
 Lemma subalgClosedP (algS : subalgClosed A) : subalg_closed algS.
 Proof.
-split; [ exact: rpred1M.1 | | exact: rpredM ].
+split; [ exact: rpred1 | | exact: rpredM ].
 by move=> a u v uS vS; apply: rpredD; first exact: rpredZ.
 Qed.
 
@@ -5163,7 +5180,7 @@ Proof. by move=> x Sx; rewrite /= rpredV rpredX. Qed.
 
 Lemma rpredMl x y : x \in S -> x \is a unit-> (x * y \in S) = (y \in S).
 Proof.
-move=> Sx Ux; apply/idP/idP=> [Sxy | /(rpredM Sx)-> //].
+move=> Sx Ux; apply/idP/idP=> [Sxy | /(rpredM _ _ Sx)-> //].
 by rewrite -(mulKr Ux y); rewrite rpredM ?rpredV.
 Qed.
 
@@ -5378,8 +5395,8 @@ HB.builders Context R S U of SubZsemimodule_isSubSemiRing R S U.
 HB.instance Definition _ := isMulClosed.Build R S mulr_closed_subproof.
 
 Let inU v Sv : U := sub v Sv.
-Let oneU : U := inU (rpred1 (MulClosed.clone R S _)).
-Let mulU (u1 u2 : U) := inU (rpredM (valP u1) (valP u2)).
+Let oneU : U := inU (@rpred1 _ (MulClosed.clone R S _)).
+Let mulU (u1 u2 : U) := inU (rpredM _ _ (valP u1) (valP u2)).
 
 Program Definition semiringU := @Zsemimodule_isSemiRing.Build U oneU mulU
   _ _ _ _ _ _ _ _.
@@ -5429,8 +5446,8 @@ HB.builders Context R S U of SubZmodule_isSubRing R S U.
 HB.instance Definition _ := isSubringClosed.Build R S subring_closed_subproof.
 
 Let inU v Sv : U := sub v Sv.
-Let oneU : U := inU (rpred1 (MulClosed.clone R S _)).
-Let mulU (u1 u2 : U) := inU (rpredM (valP u1) (valP u2)).
+Let oneU : U := inU (@rpred1 _ (MulClosed.clone R S _)).
+Let mulU (u1 u2 : U) := inU (rpredM _ _ (valP u1) (valP u2)).
 
 Program Definition ringU := @Zmodule_isRing.Build U oneU mulU _ _ _ _ _ _.
 Next Obligation. by move=> x y z; apply: val_inj; rewrite !subK mulrA. Qed.
@@ -5741,7 +5758,7 @@ Notation "[ 'SubChoice_isSubZmodule' 'of' U 'by' <: ]" :=
   (at level 0, format "[ 'SubChoice_isSubZmodule'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubZsemimodule_isSubSemiRing' 'of' U 'by' <: ]" :=
-  (SubZsemimodule_isSubSemiRing.Build _ _ U rpred1M)
+  (SubZsemimodule_isSubSemiRing.Build _ _ U (@rpred1M _ _))
   (at level 0, format "[ 'SubZsemimodule_isSubSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubSemiRing' 'of' U 'by' <: ]" :=
@@ -6103,8 +6120,8 @@ Definition rpredBl := rpredBl.
 Definition zmodClosedP := zmodClosedP.
 Definition rpredMsign := rpredMsign.
 Definition rpred1M := @rpred1M.
-Definition rpred1 := rpred1.
-Definition rpredM := rpredM.
+Definition rpred1 := @rpred1.
+Definition rpredM := @rpredM.
 Definition rpred_prod := rpred_prod.
 Definition rpredX := rpredX.
 Definition rpred_nat := rpred_nat.
