@@ -1563,7 +1563,7 @@ Section SeqFinType.
 Variables (T : choiceType) (s : seq T).
 Local Notation sT := (seq_sub s).
 
-HB.instance Definition _ := [hasChoice of sT by <:].
+HB.instance Definition _ := [Choice of sT by <:].
 HB.instance Definition _ : isCountable sT := seq_sub_isCountable s.
 HB.instance Definition _ : isFinite sT := seq_sub_isFinite s.
 

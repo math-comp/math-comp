@@ -288,10 +288,13 @@ Module Export ChoiceNamespace.
   End Choice.
 End ChoiceNamespace.
 
+#[deprecated(since="mathcomp 2.0.0", note="Use Choice.on instead.")]
 Notation "[ 'hasChoice' 'of' T ]" := (Choice.on _ : hasChoice T%type)
   (at level 0, format "[ 'hasChoice'  'of'  T ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use Choice.clone instead.")]
 Notation "[ 'choiceType' 'of' T 'for' C ]" := (Choice.clone T%type C)
   (at level 0, format "[ 'choiceType'  'of'  T  'for'  C ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use Choice.clone instead.")]
 Notation "[ 'choiceType' 'of' T ]" := (Choice.clone T%type _)
   (at level 0, format "[ 'choiceType'  'of'  T ]") : form_scope.
 
@@ -457,7 +460,7 @@ Qed.
 HB.instance Definition _ := nat_hasChoice.
 
 HB.instance Definition _ : hasChoice bool := CanChoiceMixin oddb.
-HB.instance Definition _ := [hasChoice of bitseq].
+HB.instance Definition _ := Choice.on bitseq.
 
 HB.instance Definition _ := CanChoiceMixin bool_of_unitK.
 
@@ -486,10 +489,9 @@ Notation subChoiceType := SubChoice.type.
 Prenex Implicits xchoose choose.
 Notation "[ 'Choice' 'of' T 'by' <: ]" := (Choice.copy T%type (sub_type T))
   (at level 0, format "[ 'Choice'  'of'  T  'by'  <: ]") : form_scope.
-
-Notation "[ 'hasChoice' 'of' T 'by' <: ]" :=
-  (sub_hasChoice _ : hasChoice T)
-  (at level 0, format "[ 'hasChoice'  'of'  T  'by'  <: ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use [Choice of _ by <:] instead.")]
+Notation "[ 'choiceMixin' 'of' T 'by' <: ]" := [Choice of T%type by <:]
+  (at level 0, format "[ 'choiceMixin'  'of'  T  'by'  <: ]") : form_scope.
 
 HB.instance Definition _ (T : choiceType) (P : pred T) :=
   [Choice of {x | P x} by <:].
@@ -504,10 +506,13 @@ Arguments isCountable.axioms_ T%type_scope.
 #[short(type="countType")]
 HB.structure Definition Countable := { T of Choice T & isCountable T }.
 
+#[deprecated(since="mathcomp 2.0.0", note="Use Countable.on instead.")]
 Notation "[ 'isCountable' 'of' T ]" := (Countable.on T%type : isCountable T%type)
   (at level 0, format "[ 'isCountable'  'of'  T ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use Countable.clone instead.")]
 Notation "[ 'countType' 'of' T 'for' cT ]" := (Countable.clone T%type cT)
 (at level 0, format "[ 'countType'  'of'  T  'for'  cT ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use Countable.clone instead.")]
 Notation "[ 'countType' 'of' T ]" := (Countable.clone T%type _)
   (at level 0, format "[ 'countType'  'of'  T ]") : form_scope.
 
@@ -564,8 +569,9 @@ End CountableTheory.
 Notation "[ 'Countable' 'of' T 'by' <: ]" :=
     (Countable.copy T%type (sub_type T))
   (at level 0, format "[ 'Countable'  'of'  T  'by'  <: ]") : form_scope.
-Notation "[ 'isCountable' 'of' T 'by' <: ]" := [Countable of T by <:]
-  (at level 0, format "[ 'isCountable'  'of'  T  'by'  <: ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use [Countable of _ by <:] instead.")]
+Notation "[ 'countMixin' 'of' T 'by' <: ]" := [Countable of T%type by <:]
+  (at level 0, format "[ 'countMixin'  'of'  T  'by'  <: ]") : form_scope.
 
 Arguments pickle_inv {T} n.
 Arguments pickleK {T} x : rename.
@@ -577,7 +583,7 @@ HB.structure Definition SubCountable T (P : pred T) :=
   { sT of Countable sT & isSub T P sT}.
 
 (* This assumes that T has both countType and subType structures. *)
-(* TODO: replace with trivial pack *)
+#[deprecated(since="mathcomp 2.0.0", note="Use SubCountable.clone instead.")]
 Notation "[ 'subCountType' 'of' T ]" := (SubCountable.clone _ _ T%type _)
   (at level 0, format "[ 'subCountType'  'of'  T ]") : form_scope.
 
@@ -610,7 +616,7 @@ Lemma nat_pickleK : pcancel id (@Some nat). Proof. by []. Qed.
 HB.instance Definition _ : isCountable nat := isCountable.Build nat nat_pickleK.
 
 HB.instance Definition _ := Countable.copy bool (can_type oddb).
-HB.instance Definition _ : isCountable bitseq := [isCountable of bitseq].
+HB.instance Definition _ : isCountable bitseq := Countable.on bitseq.
 
 HB.instance Definition _ := Countable.copy unit (can_type bool_of_unitK).
 

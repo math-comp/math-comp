@@ -346,9 +346,9 @@ Qed.
 End EqTuple.
 
 HB.instance Definition tuple_hasChoice n (T : choiceType) :=
-  [hasChoice of n.-tuple T by <:].
+  [Choice of n.-tuple T by <:].
 HB.instance Definition tuple_isCountable n (T : countType) :=
-  [isCountable of n.-tuple T by <:].
+  [Countable of n.-tuple T by <:].
 
 Module Type FinTupleSig.
 Section FinTupleSig.
@@ -641,10 +641,10 @@ Lemma membsE n (T : eqType) (bs : n.-bseq T) : mem bs = mem (bseqval bs).
 Proof. by []. Qed.
 
 HB.instance Definition bseq_hasChoice n (T : choiceType) :=
-  [hasChoice of n.-bseq T by <:].
+  [Choice of n.-bseq T by <:].
 
 HB.instance Definition bseq_isCountable n (T : countType) :=
-  [isCountable of n.-bseq T by <:].
+  [Countable of n.-bseq T by <:].
 
 Definition bseq_tagged_tuple n T (s : n.-bseq T) : {k : 'I_n.+1 & k.-tuple T} :=
   Tagged _ (in_tuple s : (Ordinal (size_bseq s : size s < n.+1)).-tuple _).
