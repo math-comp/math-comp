@@ -101,6 +101,10 @@ From mathcomp Require Import div ssralg countalg binomial.
 (*   C - constant polynomial (as in polyseqC : a%:P = nseq (a != 0) a).       *)
 (*   X - the polynomial variable 'X (as in coefX : 'X`_i = (i == 1%N)).       *)
 (*   Xn - power of 'X (as in monicXn : monic 'X^n).                           *)
+(*                                                                            *)
+(* Pdeg2.Field (exported by the present library) : theory of the degree 2     *)
+(*   polynomials.                                                             *)
+(* Pdeg2.FieldMonic : theory of Pdeg2.Field specialized to monic polynomials. *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -3098,6 +3102,131 @@ Definition mem_unity_roots := mem_unity_roots.
 Definition prim_rootP := prim_rootP.
 
 End UnityRootTheory.
+
+Module Export Pdeg2.
+
+Module Export Field.
+
+Section Pdeg2Field.
+Variable F : fieldType.
+Hypothesis nz2 : 2 != 0 :> F.
+
+Variable p : {poly F}.
+Hypothesis degp : size p = 3%N.
+
+Let a := p`_2.
+Let b := p`_1.
+Let c := p`_0.
+
+Let pneq0 : p != 0. Proof. by rewrite -size_poly_gt0 degp. Qed.
+Let aneq0 : a != 0.
+Proof. by move: pneq0; rewrite -lead_coef_eq0 lead_coefE degp. Qed.
+Let a2neq0 : 2 * a != 0. Proof. by rewrite mulf_neq0. Qed.
+Let sqa2neq0 : (2 * a) ^+ 2 != 0. Proof. exact: expf_neq0. Qed.
+
+Let aa4 : 4 * a * a = (2 * a)^+2.
+Proof. by rewrite expr2 mulrACA mulrA -natrM. Qed.
+
+Let splitr (x : F) : x = x / 2 + x / 2.
+Proof.
+apply: (mulIf nz2); rewrite -mulrDl mulfVK//.
+by rewrite -[2]/(1 + 1)%:R natrD mulrDr mulr1.
+Qed.
+
+Let pE : p = a *: 'X^2 + b *: 'X + c%:P.
+Proof.
+apply/polyP => + /[!coefE] => -[|[|[|i]]] /=; rewrite !Monoid.simpm//.
+by rewrite nth_default// degp.
+Qed.
+
+Let delta := b ^+ 2 - 4 * a * c.
+
+Lemma deg2_poly_canonical :
+  p = a *: (('X + (b / (2 * a))%:P)^+2 - (delta / (4 * a ^+ 2))%:P).
+Proof.
+rewrite pE sqrrD -!addrA scalerDr; congr +%R; rewrite addrA scalerDr; congr +%R.
+- rewrite -mulrDr -polyCD -!mul_polyC mulrA mulrAC -polyCM.
+  by rewrite [a * _]mulrC mulrDl invfM -!mulrA mulVf// mulr1 -splitr.
+- rewrite [a ^+ 2]expr2 mulrA aa4 -polyC_exp -polyCB expr_div_n -mulrBl subKr.
+  by rewrite scale_polyC mulrCA mulrACA aa4 mulrCA mulfV// mulr1.
+Qed.
+
+Variable r : F.
+Hypothesis r_sqrt_delta : r ^+ 2 = delta.
+
+Let r1 := (- b - r) / (2 * a).
+Let r2 := (- b + r) / (2 * a).
+
+Lemma deg2_poly_factor : p = a *: ('X - r1%:P) * ('X - r2%:P).
+Proof.
+rewrite [p]deg2_poly_canonical//= -/a -/b -/c -/delta /r1 /r2.
+rewrite ![(- b + _) * _]mulrDl 2!polyCD 2!opprD 2!addrA !mulNr !polyCN !opprK.
+rewrite -scalerAl [in RHS]mulrC -subr_sqr -polyC_exp -[4]/(2 * 2)%:R natrM.
+by rewrite -expr2 -exprMn [in RHS]exprMn exprVn r_sqrt_delta.
+Qed.
+
+Lemma deg2_poly_root1 : root p r1.
+Proof.
+apply/factor_theorem.
+by exists (a *: ('X - r2%:P)); rewrite deg2_poly_factor -!scalerAl mulrC.
+Qed.
+
+Lemma deg2_poly_root2 : root p r2.
+Proof.
+apply/factor_theorem.
+by exists (a *: ('X - r1%:P)); rewrite deg2_poly_factor -!scalerAl.
+Qed.
+
+End Pdeg2Field.
+End Field.
+
+Module FieldMonic.
+
+Section Pdeg2FieldMonic.
+Variable F : fieldType.
+Hypothesis nz2 : 2 != 0 :> F.
+
+Variable p : {poly F}.
+Hypothesis degp : size p = 3%N.
+Hypothesis monicp : p \is monic.
+
+Let a := p`_2.
+Let b := p`_1.
+Let c := p`_0.
+
+Let a1 : a = 1. Proof. by move: (monicP monicp); rewrite lead_coefE degp. Qed.
+
+Let delta := b ^+ 2 - 4 * c.
+
+Lemma deg2_poly_canonical : p = (('X + (b / 2)%:P)^+2 - (delta / 4)%:P).
+Proof. by rewrite [p]deg2_poly_canonical// -/a a1 scale1r expr1n !mulr1. Qed.
+
+Variable r : F.
+Hypothesis r_sqrt_delta : r ^+ 2 = delta.
+
+Let r1 := (- b - r) / 2.
+Let r2 := (- b + r) / 2.
+
+Lemma deg2_poly_factor : p = ('X - r1%:P) * ('X - r2%:P).
+Proof.
+by rewrite [p](@deg2_poly_factor _ _ _ _ r)// -/a a1 !mulr1 ?scale1r.
+Qed.
+
+Lemma deg2_poly_root1 : root p r1.
+Proof.
+rewrite /r1 -[2]mulr1 -[X in 2 * X]a1.
+by apply: deg2_poly_root1; rewrite // -/a a1 mulr1.
+Qed.
+
+Lemma deg2_poly_root2 : root p r2.
+Proof.
+rewrite /r2 -[2]mulr1 -[X in 2 * X]a1.
+by apply: deg2_poly_root2; rewrite // -/a a1 mulr1.
+Qed.
+
+End Pdeg2FieldMonic.
+End FieldMonic.
+End Pdeg2.
 
 Section DecField.
 
