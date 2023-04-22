@@ -4187,6 +4187,7 @@ HB.structure Definition IntegralDomain :=
   {R of ComUnitRing_isIntegral R & ComUnitRing R}.
 
 Module IntegralDomainExports.
+Bind Scope ring_scope with IntegralDomain.sort.
 Notation "[ 'idomainType' 'of' T 'for' cT ]" := (IntegralDomain.clone T%type cT)
   (at level 0, format "[ 'idomainType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'idomainType' 'of' T ]" := (IntegralDomain.clone T%type _)
@@ -4331,6 +4332,7 @@ HB.mixin Record UnitRing_isField R of UnitRing R := {
 HB.structure Definition Field := { R of IntegralDomain R & UnitRing_isField R }.
 
 Module FieldExports.
+Bind Scope ring_scope with Field.sort.
 Notation "[ 'fieldType' 'of' T 'for' cT ]" := (Field.clone T%type cT)
   (at level 0, format "[ 'fieldType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'fieldType' 'of' T ]" := (Field.clone T%type _)
@@ -4566,6 +4568,7 @@ HB.mixin Record Field_isDec R of UnitRing R := {
 HB.structure Definition DecidableField := { F of Field F & Field_isDec F }.
 
 Module DecFieldExports.
+Bind Scope ring_scope with DecidableField.sort.
 Notation "[ 'decFieldType' 'of' T 'for' cT ]" := (DecidableField.clone T%type cT)
   (at level 0, format "[ 'decFieldType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'decFieldType' 'of' T ]" := (DecidableField.clone T%type _)
@@ -4764,6 +4767,7 @@ HB.structure Definition ClosedField :=
   { F of DecidableField F & DecField_isAlgClosed F }.
 
 Module ClosedFieldExports.
+Bind Scope ring_scope with ClosedField.sort.
 Notation "[ 'closedFieldType' 'of' T 'for' cT ]" := (ClosedField.clone T%type cT)
   (at level 0, format "[ 'closedFieldType'  'of'  T  'for'  cT ]") : form_scope.
 Notation "[ 'closedFieldType' 'of' T ]" := (ClosedField.clone T%type _)
