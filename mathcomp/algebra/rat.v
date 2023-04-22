@@ -764,7 +764,7 @@ Proof. by case: b; rewrite ?(mul1r, mulN1r) // denqN. Qed.
 Lemma denq_norm x : denq `|x| = denq x.
 Proof. by rewrite normrEsign denq_mulr_sign. Qed.
 
-Fact rat_archimedean : Num.archimedean_axiom [numDomainType of rat].
+Fact rat_archimedean : Num.archimedean_axiom rat.
 Proof.
 move=> x; exists `|numq x|.+1; rewrite mulrS ltr_pwDl //.
 rewrite pmulrn abszE intr_norm numqE normrM ler_peMr //.

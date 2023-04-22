@@ -648,7 +648,7 @@ Definition Cchar : [char algC] =i pred0 := @char_num _.
 (* manifest rationals, such as 3^-1 + 7%:%^-1 < 2%:%^-1 :> algC.              *)
 (* Missing norm and integer exponent, due to gaps in ssrint and rat.          *)
 Definition CratrE :=
-  let CnF := [numClosedFieldType of algC] in
+  let CnF : numClosedFieldType := algC in
   let QtoCm : {rmorphism _ -> _} := @ratr CnF in
   ((rmorph0 QtoCm, rmorph1 QtoCm, rmorphMn QtoCm, rmorphN QtoCm, rmorphD QtoCm),
    (rmorphM QtoCm, rmorphXn QtoCm, fmorphV QtoCm),
@@ -656,7 +656,7 @@ Definition CratrE :=
    =^~ (@ler_rat CnF, @ltr_rat CnF, (inj_eq (fmorph_inj QtoCm)))).
 
 Definition CintrE :=
-  let CnF := [numFieldType of algC] in
+  let CnF : numClosedFieldType := algC in
   let ZtoCm : {rmorphism _ -> _} := *~%R (1 : CnF) in
   ((rmorph0 ZtoCm, rmorph1 ZtoCm, rmorphMn ZtoCm, rmorphN ZtoCm, rmorphD ZtoCm),
    (rmorphM ZtoCm, rmorphXn ZtoCm),
@@ -698,7 +698,7 @@ Proof.
 case/andP=> lemx ltxm1; apply/eqP; rewrite eq_le -!ltzD1.
 have /floorC_itv/andP[lefx ltxf1]: x \is Creal.
   by rewrite -[x](subrK m%:~R) rpredD ?realz ?lerB_real.
-by rewrite -!(ltr_int [numFieldType of algC]) 2?(@le_lt_trans _ _ x).
+by rewrite -!(ltr_int algC) 2?(@le_lt_trans _ _ x).
 Qed.
 
 Lemma intCK : cancel intr floorC.
@@ -779,7 +779,7 @@ Lemma truncC_itv x : 0 <= x -> (truncC x)%:R <= x < (truncC x).+1%:R.
 Proof.
 move=> x_ge0; have /andP[lemx ltxm1] := floorC_itv (ger0_real x_ge0).
 rewrite /truncC x_ge0 -addn1 !pmulrn PoszD gez0_abs ?lemx //.
-by rewrite -ltzD1 -(ltr_int [numFieldType of algC]) (le_lt_trans x_ge0).
+by rewrite -ltzD1 -(ltr_int algC) (le_lt_trans x_ge0).
 Qed.
 
 Lemma truncC_def x n : n%:R <= x < n.+1%:R -> truncC x = n.
