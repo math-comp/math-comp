@@ -693,8 +693,6 @@ Definition FinDomainFieldType : finFieldType :=
  HB.pack iR fC.
 
 Definition FinDomainSplittingFieldType p (charRp : p \in [char R]) :=
-  let RoverFp := [splittingFieldType _ of
-    @PrimeCharType p FinDomainFieldType charRp] in
-  [splittingFieldType 'F_p of R for RoverFp].
+  SplittingField.clone 'F_p R (@PrimeCharType p FinDomainFieldType charRp).
 
 End FinDomain.
