@@ -384,7 +384,7 @@ Qed.
 
 HB.instance Definition _ := Lmodule_hasFinDim.Build algC classfun cfun_vect_iso.
 
-Definition cfun_vectType := [vectType _ of classfun].
+Definition cfun_vectType : vectType _ := classfun.
 
 Definition cfun_base A : #|classes B ::&: A|.-tuple classfun :=
   [tuple of [seq '1_xB | xB in classes B ::&: A]].

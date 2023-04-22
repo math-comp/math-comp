@@ -137,9 +137,11 @@ End OtherDefs.
 
 Module Import VectorExports.
 Bind Scope ring_scope with Vector.sort.
-Notation "[ 'vectType' R 'of' T 'for' cT ]" := (@Vector.clone R T%type cT)
+#[deprecated(since="mathcomp 2.0.0", note="Use Vector.clone instead.")]
+Notation "[ 'vectType' R 'of' T 'for' cT ]" := (Vector.clone R T%type cT)
   (at level 0, format "[ 'vectType'  R  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'vectType' R 'of' T ]" := [vectType R of T%type for _]
+#[deprecated(since="mathcomp 2.0.0", note="Use Vector.clone instead.")]
+Notation "[ 'vectType' R 'of' T ]" := (Vector.clone R T%type _)
   (at level 0, format "[ 'vectType'  R  'of'  T ]") : form_scope.
 
 Notation "{ 'vspace' vT }" := (space (Phant vT)) : type_scope.

@@ -308,7 +308,7 @@ Qed.
 HB.instance Definition _ := Lmodule_hasFinDim.Build 'F_p R
   primeChar_vectAxiom.
 
-Lemma primeChar_dimf : \dim {: [vectType 'F_p of R]} = n.
+Lemma primeChar_dimf : \dim {: R : vectType 'F_p } = n.
 Proof. by rewrite dimvf. Qed.
 
 End FinRing.
