@@ -188,7 +188,7 @@ HB.instance Definition _ := FieldExt.on ffT.
 Lemma ffT_splitting_subproof : SplittingField.axiom ffT.
 Proof.
 exists ('X^#|ffT| - 'X).
-  by rewrite (@rpredB [zmodType of {poly fT}]) 1?rpredX ?polyOverX.
+  by rewrite (@rpredB {poly fT}) 1?rpredX ?polyOverX.
 exists (enum ffT); first by rewrite big_enum finField_genPoly eqpxx.
 by apply/vspaceP=> x; rewrite memvf seqv_sub_adjoin ?mem_enum.
 Qed.
@@ -241,19 +241,19 @@ Proof. by move=> a x y /=; rewrite /primeChar_scale mulrDr. Qed.
 Lemma primeChar_scaleDl x : {morph primeChar_scale^~ x: a b / a + b}.
 Proof. by move=> a b; rewrite /primeChar_scale natrFp natrD mulrDl. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_isLmodule.Build [ringType of 'F_p] R
-    primeChar_scaleA primeChar_scale1 primeChar_scaleDr primeChar_scaleDl.
+HB.instance Definition _ := GRing.Zmodule_isLmodule.Build 'F_p R
+  primeChar_scaleA primeChar_scale1 primeChar_scaleDr primeChar_scaleDl.
 
 Lemma primeChar_scaleAl (a : 'F_p) (u v : R) :  a *: (u * v) = (a *: u) * v.
 Proof. by apply: mulrA. Qed.
 
-HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build [ringType of 'F_p] R
+HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build 'F_p R
   primeChar_scaleAl.
 
 Lemma primeChar_scaleAr (a : 'F_p) (x y : R) : a *: (x * y) = x * (a *: y).
 Proof. by rewrite ![a *: _]mulr_natl mulrnAr. Qed.
 
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build [ringType of 'F_p] R
+HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build 'F_p R
   primeChar_scaleAr.
 
 End PrimeCharRing.
@@ -305,10 +305,10 @@ move=> a x y; rewrite [a *: _]mulr_natl morphM ?morphX ?inE // zmodXgE.
 by congr (_ + _); rewrite -scaler_nat natr_Zp.
 Qed.
 
-HB.instance Definition _ := Lmodule_hasFinDim.Build [ringType of 'F_p] R
+HB.instance Definition _ := Lmodule_hasFinDim.Build 'F_p R
   primeChar_vectAxiom.
 
-Lemma primeChar_dimf : \dim {: [vectType [ringType of 'F_p] of R]} = n.
+Lemma primeChar_dimf : \dim {: [vectType 'F_p of R]} = n.
 Proof. by rewrite dimvf. Qed.
 
 End FinRing.
@@ -542,7 +542,7 @@ move=> pr_p k_gt0; have m_gt1: m > 1 by rewrite (ltn_exp2l 0) ?prime_gt1.
 have m_gt0 := ltnW m_gt1; have m1_gt0: m.-1 > 0 by rewrite -ltnS prednK.
 pose q := 'X^m - 'X; have Dq R: q R = ('X^m.-1 - 1) * ('X - 0).
   by rewrite subr0 mulrBl mul1r -exprSr prednK.
-have /FinSplittingFieldFor[/= L splitLq]: q [ringType of 'F_p] != 0.
+have /FinSplittingFieldFor[/= L splitLq]: q 'F_p != 0.
   by rewrite Dq monic_neq0 ?rpredM ?monicXsubC ?monic_Xn_sub_1.
 rewrite [_^%:A]rmorphB rmorphXn /= map_polyX -/(q L) in splitLq.
 have charL: p \in [char L] by rewrite char_lalg char_Fp.
@@ -695,6 +695,6 @@ Definition FinDomainFieldType : finFieldType :=
 Definition FinDomainSplittingFieldType p (charRp : p \in [char R]) :=
   let RoverFp := [splittingFieldType _ of
     @PrimeCharType p FinDomainFieldType charRp] in
-  [splittingFieldType [fieldType of 'F_p] of R for RoverFp].
+  [splittingFieldType 'F_p of R for RoverFp].
 
 End FinDomain.

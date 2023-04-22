@@ -1710,7 +1710,7 @@ Definition lfun_comp_ringType : ringType :=
   HB.pack 'End(vT) lfun_comp_ringMixin.
 
 (* In the standard endomorphism ring product is categorical composition. *)
-Definition lfun_ringType : ringType := [ringType of lfun_comp_ringType^c].
+Definition lfun_ringType : ringType := lfun_comp_ringType^c.
 
 Definition lfun_lalgMixin := GRing.Lmodule_isLalgebra.Build R lfun_ringType
   (fun k x y => comp_lfunZr k y x).

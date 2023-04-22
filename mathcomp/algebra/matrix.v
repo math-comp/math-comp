@@ -3268,8 +3268,7 @@ rewrite linearZ /= !row_mul rowE mul_delta_mx_cond.
 by case: (k == i); [rewrite -!rowE linearZ | rewrite !mul0mx raddf0].
 Qed.
 HB.instance Definition _ :=
-  GRing.isLinear.Build R
-    [lmodType R of 'M_(n, p)] [zmodType of 'M_(m * n, m * p)] _ lin_mulmxr
+  GRing.isLinear.Build R 'M_(n, p) 'M_(m * n, m * p) _ lin_mulmxr
     lin_mulmxr_is_linear.
 
 End Mulmxr.
@@ -3454,7 +3453,7 @@ Definition lin_mulmx A : 'M[R]_(n * p, m * p) := lin_mx (mulmx A).
 Lemma lin_mulmx_is_linear : linear lin_mulmx.
 Proof.
 move=> a A B; apply/row_matrixP=> i; rewrite linearP /= !rowE !mul_rV_lin /=.
-by rewrite [_ *m _](linearP [linear of mulmxr (_ : 'M[R]__)]) linearP.
+by rewrite [_ *m _](linearP (mulmxr (_ : 'M[R]__))) linearP.
 Qed.
 HB.instance Definition _ :=
   GRing.isLinear.Build R 'M[R]_(m, n) 'M[R]_(n * p, m * p) _ lin_mulmx
@@ -3471,7 +3470,7 @@ Definition lin_mul_row u : 'M[R]_(m * n, n) := lin1_mx (mulmx u \o vec_mx).
 Lemma lin_mul_row_is_linear : linear lin_mul_row.
 Proof.
 move=> a u v; apply/row_matrixP=> i; rewrite linearP /= !rowE !mul_rV_lin1 /=.
-by rewrite [_ *m _](linearP [linear of mulmxr (_ : 'M[R]__)]).
+by rewrite [_ *m _](linearP (mulmxr (_ : 'M[R]__))).
 Qed.
 HB.instance Definition _ :=
   GRing.isLinear.Build R _ _ _ lin_mul_row lin_mul_row_is_linear.
@@ -4201,7 +4200,7 @@ split=> [|p q Sp Sq]; first by rewrite mxOver0 // ?rpred0.
 by apply/mxOverP=> i j; rewrite mxE rpredD // !(mxOverP _).
 Qed.
 HB.instance Definition _ :=
-  GRing.isAddClosed.Build [zmodType of 'M[M]_(m, n)] (mxOver_pred addS)
+  GRing.isAddClosed.Build 'M[M]_(m, n) (mxOver_pred addS)
     mxOver_add_subproof.
 End mxOverAdd.
 
@@ -4210,7 +4209,7 @@ Variable oppS : opprClosed M.
 Fact mxOver_opp_subproof : oppr_closed (@mxOver m n _ oppS).
 Proof. by move=> A /mxOverP SA; apply/mxOverP=> i j; rewrite mxE rpredN. Qed.
 HB.instance Definition _ :=
-  GRing.isOppClosed.Build [zmodType of 'M[M]_(m, n)] (mxOver_pred oppS)
+  GRing.isOppClosed.Build 'M[M]_(m, n) (mxOver_pred oppS)
     mxOver_opp_subproof.
 End mxOverOpp.
 

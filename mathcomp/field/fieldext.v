@@ -592,7 +592,7 @@ Qed.
 
 Lemma map_minPoly :  map_poly f (minPoly K x) = minPoly (f @: K) (f x).
 Proof.
-set fp := minPoly (f @: K) (f x); pose fM := [rmorphism of f].
+set fp := minPoly (f @: K) (f x).
 have [p Kp Dp]: exists2 p, p \is a polyOver K & map_poly f p = fp.
   have Kfp: fp \is a polyOver (f @: K)%VS by apply: minPolyOver.
   exists (map_poly f^-1%VF fp).
@@ -601,9 +601,9 @@ have [p Kp Dp]: exists2 p, p \is a polyOver K & map_poly f p = fp.
   rewrite -map_poly_comp map_poly_id // => _ /(allP Kfp)/memv_imgP[y _ ->].
   by rewrite /= limg_lfunVK ?memv_img ?memvf.
 apply/eqP; rewrite -eqp_monic ?monic_map ?monic_minPoly // -Dp eqp_map.
-have: ~~ (p %= 1) by rewrite -size_poly_eq1 -(size_map_poly fM) Dp size_minPoly.
+have: ~~ (p %= 1) by rewrite -size_poly_eq1 -(size_map_poly f) Dp size_minPoly.
 apply: implyP; rewrite implyNb orbC eqp_sym minPoly_irr //.
-rewrite -(dvdp_map fM) Dp minPoly_dvdp ?fmorph_root ?root_minPoly //.
+rewrite -(dvdp_map f) Dp minPoly_dvdp ?fmorph_root ?root_minPoly //.
 by apply/polyOver_poly=> j _; apply/memv_img/polyOverP/minPolyOver.
 Qed.
 
@@ -1260,7 +1260,7 @@ Proof. by rewrite subfx_injZ rmorph1 mulr1. Qed.
 Lemma subfxEroot x : {q | x = (map_poly (in_alg subFExtend) q).[subfx_root]}.
 Proof.
 have /sig_eqW[q ->] := subfxE x; exists q.
-apply: (fmorph_inj [rmorphism of subfx_inj]).
+apply: (fmorph_inj subfx_inj).
 rewrite -horner_map /= subfx_inj_root subfx_inj_eval //.
 by rewrite -map_poly_comp (eq_map_poly subfx_inj_base).
 Qed.
@@ -1384,7 +1384,7 @@ have unitM : GRing.ComUnitRing_isField cuL.
   by rewrite modp_mull add0r.
 pose feL : fieldExtType F := HB.pack vL aL cuL unitM.
 exists feL; first by rewrite dimvf; apply: mul1n.
-exists [linear of toPF as @rVpoly F n].
+exists toPF.
 have tol_lin: linear toL by move=> a q1 q2; rewrite -linearP -modpZl -modpD.
 have tol_mul : multiplicative (toL : {poly F} -> aL).
   by split=> [q r|];

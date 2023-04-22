@@ -59,7 +59,6 @@ Local Notation pQtoC := (map_poly ratr).
 
 Local Definition intr_inj_ZtoC := (intr_inj : injective ZtoC).
 #[local] Hint Resolve intr_inj_ZtoC : core.
-Local Notation QtoCm := [rmorphism of QtoC].
 
 (* Number fields and rational spans. *)
 Lemma algC_PET (s : seq algC) :
@@ -117,7 +116,7 @@ have [r [Dr /monic_neq0 nz_r] dv_r] := minCpolyP z.
 have rz0: root (pQtoC r) z by rewrite dv_r.
 have irr_r: irreducible_poly r.
   by apply/(subfx_irreducibleP rz0 nz_r)=> q qz0 nzq; rewrite dvdp_leq // -dv_r.
-exists (SubFieldExtType rz0 irr_r), [rmorphism of @subfx_inj _ _ QtoCm z r].
+exists (SubFieldExtType rz0 irr_r), (@subfx_inj _ _ QtoC z r).
 exists (subfx_root _ z r) => [|x]; first exact: subfx_inj_root.
 by have{x} [p ->] := subfxEroot rz0 nz_r x; exists p.
 Qed.
@@ -227,8 +226,7 @@ have nu0m : multiplicative nu0.
 pose nu0aM := GRing.isAdditive.Build Qn Qn nu0 nu0a.
 pose nu0mM := GRing.isMultiplicative.Build Qn Qn nu0 nu0m.
 pose nu0RM : GRing.RMorphism.type _ _ := HB.pack nu0 nu0aM nu0mM.
-pose nu0lM :=
-  GRing.isScalable.Build [ringType of rat] Qn Qn *:%R nu0 (fmorph_numZ nu0RM).
+pose nu0lM := GRing.isScalable.Build rat Qn Qn *:%R nu0 (fmorph_numZ nu0RM).
 pose nu0LRM : GRing.LRMorphism.type _ _ _ _ := HB.pack nu0 nu0aM nu0mM nu0lM.
 by exists nu0LRM.
 Qed.
@@ -491,7 +489,7 @@ Lemma Qn_aut_exists k n :
   {u : {rmorphism algC -> algC} | forall z, z ^+ n = 1 -> u z = z ^+ k}.
 Proof.
 have [-> /eqnP | n_gt0 co_k_n] := posnP n.
-  by rewrite gcdn0 => ->; exists [rmorphism of idfun].
+  by rewrite gcdn0 => ->; exists idfun.
 have [z prim_z] := C_prim_root_exists n_gt0.
 have [Qn [QnC [[|zn []] // [Dz]]] genQn] := num_field_exists [:: z].
 pose phi := kHomExtend 1 \1 zn (zn ^+ k).
@@ -541,7 +539,7 @@ move: px0; rewrite Dp -pZtoQtoC; have [q [-> mon_q] ->] := minCpolyP x.
 case/dvdpP_rat_int=> qz [a nz_a Dq] [r].
 move/(congr1 (fun q1 => lead_coef (a *: pZtoQ q1))).
 rewrite rmorphM scalerAl -Dq lead_coefZ lead_coefM /=.
-have /monicP->: pZtoQ pz \is monic by rewrite -(map_monic QtoCm) pZtoQtoC -Dp.
+have /monicP->: pZtoQ pz \is monic by rewrite -(map_monic QtoC) pZtoQtoC -Dp.
 rewrite (monicP mon_q) mul1r mulr1 lead_coef_map_inj //; last exact: intr_inj.
 rewrite Dq => ->; apply/polyOverP=> i; rewrite !(coefZ, coef_map).
 by rewrite -rmorphM /= rmorph_int Cint_int.
@@ -553,7 +551,7 @@ case/CratP=> a ->{z} /polyOverP/(_ 0%N).
 have [p [Dp mon_p] dv_p] := minCpolyP (ratr a); rewrite Dp coef_map.
 suffices /eqP->: p == 'X - a%:P by rewrite polyseqXsubC /= rmorphN rpredN.
 rewrite -eqp_monic ?monicXsubC // irredp_XsubC //.
-  by rewrite -(size_map_poly QtoCm) -Dp neq_ltn size_minCpoly orbT.
+  by rewrite -(size_map_poly QtoC) -Dp neq_ltn size_minCpoly orbT.
 by rewrite -dv_p fmorph_root root_XsubC.
 Qed.
 

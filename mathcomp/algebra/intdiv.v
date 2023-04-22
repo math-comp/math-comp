@@ -432,8 +432,8 @@ Proof.
 split=> [|_ _ /dvdzP[p ->] /dvdzP[q ->]]; first exact: dvdz0.
 by rewrite -mulrBl dvdz_mull.
 Qed.
-HB.instance Definition _ d :=
-  GRing.isZmodClosed.Build [zmodType of int] (dvdz d) (dvdz_zmod_closed d).
+HB.instance Definition _ d := GRing.isZmodClosed.Build int (dvdz d)
+  (dvdz_zmod_closed d).
 
 Lemma dvdz_exp k d m : (0 < k)%N -> (d %| m -> d %| m ^+ k)%Z.
 Proof. by case: k => // k _ d_dv_m; rewrite exprS dvdz_mulr. Qed.

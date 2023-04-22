@@ -150,10 +150,8 @@ Qed.
 
 Lemma poly_rV_is_linear : linear poly_rV.
 Proof. by move=> a p q; apply/rowP=> i; rewrite !mxE coefD coefZ. Qed.
-HB.instance Definition _ :=
-  GRing.isLinear.Build R
-    [lmodType R of {poly R}] [zmodType of 'rV_d] _ poly_rV
-    poly_rV_is_linear.
+HB.instance Definition _ := GRing.isLinear.Build R {poly R} 'rV_d _ poly_rV
+  poly_rV_is_linear.
 
 Lemma rVpoly_is_linear : linear rVpoly.
 Proof.
@@ -634,7 +632,7 @@ Lemma horner_mx_mem p : (horner_mx A p \in Ad)%MS.
 Proof.
 elim/poly_ind: p => [|p a IHp]; first by rewrite rmorph0 // linear0 sub0mx.
 rewrite rmorphD rmorphM /= horner_mx_C horner_mx_X.
-rewrite addrC -scalemx1 linearP /= -(mul_vec_lin [linear of mulmxr A]).
+rewrite addrC -scalemx1 linearP /= -(mul_vec_lin (mulmxr A)).
 case/submxP: IHp => u ->{p}.
 have: (powers_mx A (1 + d) <= Ad)%MS.
   rewrite -(geq_leqif (mxrank_leqif_sup _)).

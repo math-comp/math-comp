@@ -87,8 +87,7 @@ Proof.
   have Db2: b ^+ 2 + b = a.
     rewrite -Frobenius_autE // rmorphD addrACA Dw /= Frobenius_autE -rmorphXn.
     by rewrite -rmorphD Dw rmorphM /= aJ eJ -mulrDl -{1}[e]opp_id addKr mul1r.
-  have /eqP[] := oner_eq0 [ringType of L];
-    apply: (addrI b); rewrite addr0 -{2}bJ.
+  have /eqP[] := oner_eq0 L; apply: (addrI b); rewrite addr0 -{2}bJ.
   have: (b + e) * (b + conj e) == 0.
     (* FIX ME : had to add pattern selection *)
     rewrite mulrDl 2![_ * (b + _)]mulrDr -/a.
@@ -300,7 +299,7 @@ HB.instance Definition _ := isComplex.Build L' conjL_K conjL_nt.
 
 Notation cfType := (L' : closedFieldType).
 
-Definition QtoL := [rmorphism of @ratr cfType].
+Definition QtoL : {rmorphism _ -> _} := @ratr cfType.
 
 Notation pQtoL := (map_poly QtoL).
 
@@ -470,7 +469,7 @@ have [i i2]: exists i : type, i ^+ 2 = -1.
   by rewrite !big_ord_recl big_ord0 /= mul0r mulr1 !addr0; exists i.
 move/(_ i)/(congr1 CtoL); rewrite LtoC_K => iL_J.
 have/lt_geF/idP[] := @ltr01 cfType.
-rewrite -oppr_ge0 -(rmorphN1 [rmorphism of CtoL]).
+rewrite -oppr_ge0 -(rmorphN1 CtoL).
 by rewrite -i2 rmorphXn /= expr2 -{2}iL_J -normCK  exprn_ge0.
 Qed.
 
@@ -484,7 +483,7 @@ Definition conjMixin := Num.ClosedField.on type.
 Lemma algebraic : integralRange (@ratr type).
 Proof.
 move=> u; have [p mon_p pu0] := CtoL_P u; exists p => {mon_p}//.
-rewrite -(fmorph_root [rmorphism of CtoL]) -map_poly_comp; congr (root _ _):pu0.
+rewrite -(fmorph_root CtoL) -map_poly_comp; congr (root _ _):pu0.
 by apply/esym/eq_map_poly; apply: fmorph_eq_rat.
 Qed.
 
@@ -505,7 +504,6 @@ Local Notation algC := type.
 
 Local Notation "z ^*" := (conj z) (at level 2, format "z ^*") : ring_scope.
 Local Notation QtoC := (ratr : rat -> algC).
-Local Notation QtoCm := [rmorphism of QtoC].
 Local Notation pQtoC := (map_poly QtoC).
 Local Notation ZtoQ := (intr : int -> rat).
 Local Notation ZtoC := (intr : int -> algC).
@@ -551,7 +549,7 @@ have [p [mon_p px0 irr_p]] := minPoly_decidable_closure isQ (algebraic x).
 exists p => // q; apply/idP/idP=> [qx0 | /dvdpP[r ->]]; last first.
   by rewrite rmorphM rootM px0 orbT.
 suffices /eqp_dvdl <-: gcdp p q %= p by apply: dvdp_gcdr.
-rewrite irr_p ?dvdp_gcdl ?gtn_eqF // -(size_map_poly QtoCm) gcdp_map /=.
+rewrite irr_p ?dvdp_gcdl ?gtn_eqF // -(size_map_poly QtoC) gcdp_map /=.
 rewrite (@root_size_gt1 _ x) ?root_gcd ?px0 //.
 by rewrite gcdp_eq0 negb_and map_poly_eq0 monic_neq0.
 Qed.
@@ -630,7 +628,6 @@ Import Algebraics.Internals.
 Local Notation ZtoQ := (intr : int -> rat).
 Local Notation ZtoC := (intr : int -> algC).
 Local Notation QtoC := (ratr : rat -> algC).
-Local Notation QtoCm := [rmorphism of QtoC].
 Local Notation CtoQ := getCrat.
 Local Notation intrp := (map_poly intr).
 Local Notation pZtoQ := (map_poly ZtoQ).
@@ -652,7 +649,7 @@ Definition Cchar : [char algC] =i pred0 := @char_num _.
 (* Missing norm and integer exponent, due to gaps in ssrint and rat.          *)
 Definition CratrE :=
   let CnF := [numClosedFieldType of algC] in
-  let QtoCm := [rmorphism of @ratr CnF] in
+  let QtoCm : {rmorphism _ -> _} := @ratr CnF in
   ((rmorph0 QtoCm, rmorph1 QtoCm, rmorphMn QtoCm, rmorphN QtoCm, rmorphD QtoCm),
    (rmorphM QtoCm, rmorphXn QtoCm, fmorphV QtoCm),
    (rmorphMz QtoCm, rmorphXz QtoCm, @ratr_norm CnF, @ratr_sg CnF),
@@ -660,14 +657,14 @@ Definition CratrE :=
 
 Definition CintrE :=
   let CnF := [numFieldType of algC] in
-  let ZtoCm := [rmorphism of *~%R (1 : CnF)] in
+  let ZtoCm : {rmorphism _ -> _} := *~%R (1 : CnF) in
   ((rmorph0 ZtoCm, rmorph1 ZtoCm, rmorphMn ZtoCm, rmorphN ZtoCm, rmorphD ZtoCm),
    (rmorphM ZtoCm, rmorphXn ZtoCm),
    (rmorphMz ZtoCm, @intr_norm CnF, @intr_sg CnF),
    =^~ (@ler_int CnF, @ltr_int CnF, (inj_eq (@intr_inj CnF)))).
 
 Let nz2 : 2 != 0 :> algC.
-Proof. by rewrite -(rmorph0 [rmorphism of *~%R 1]) -CintrE. Qed.
+Proof. by rewrite -(rmorph0 ( *~%R 1)) -CintrE. Qed.
 
 (* Conjugation and norm. *)
 

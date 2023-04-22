@@ -628,14 +628,14 @@ HB.instance Definition _ i := GRing.isAdditive.Build {poly R} R (coefp i)
   (fun p => (coefB p)^~ i).
 
 Lemma coefMn p n i : (p *+ n)`_i = p`_i *+ n.
-Proof. exact: (raddfMn [additive of coefp i]). Qed.
+Proof. exact: (raddfMn (coefp i)). Qed.
 
 Lemma coefMNn p n i : (p *- n)`_i = p`_i *- n.
 Proof. by rewrite coefN coefMn. Qed.
 
 Lemma coef_sum I (r : seq I) (P : pred I) (F : I -> {poly R}) k :
   (\sum_(i <- r | P i) F i)`_k = \sum_(i <- r | P i) (F i)`_k.
-Proof. exact: (raddf_sum [additive of coefp k]). Qed.
+Proof. exact: (raddf_sum (coefp k)). Qed.
 
 Lemma polyCN : {morph (@polyC R) : c / - c}.
 Proof. by move=> c; apply/polyP=> [[|i]]; rewrite coefN !coefC ?oppr0. Qed.
@@ -927,8 +927,8 @@ Proof. by move=> mon_q; rewrite !monicE lead_coef_Mmonic. Qed.
 
 Fact monic_mulr_closed : mulr_closed monic.
 Proof. by split=> [|p q mon_p]; rewrite (monic1, monicMl). Qed.
-HB.instance Definition _ :=
-  GRing.isMulClosed.Build [ringType of {poly R}] monic_pred monic_mulr_closed.
+HB.instance Definition _ := GRing.isMulClosed.Build {poly R} monic_pred
+  monic_mulr_closed.
 
 Lemma monic_exp p n : p \is monic -> p ^+ n \is monic.
 Proof. exact: rpredX. Qed.
@@ -1400,9 +1400,8 @@ Proof.
 split=> [|p q Sp Sq]; first exact: polyOver0.
 by apply/polyOverP=> i; rewrite coefD rpredD ?(polyOverP _).
 Qed.
-HB.instance Definition _ :=
-  GRing.isAddClosed.Build [zmodType of {poly R}] (polyOver_pred S)
-    polyOver_addr_closed.
+HB.instance Definition _ := GRing.isAddClosed.Build {poly R} (polyOver_pred S)
+  polyOver_addr_closed.
 
 End PolyOverAdd.
 
@@ -1425,8 +1424,7 @@ Proof.
 by move=> p /polyOverP Sp; apply/polyOverP=> i; rewrite coefN rpredN.
 Qed.
 HB.instance Definition _ (zmodS : zmodClosed R) :=
-  GRing.isOppClosed.Build [zmodType of {poly R}] (polyOver_pred zmodS)
-    (@polyOverNr _).
+  GRing.isOppClosed.Build {poly R} (polyOver_pred zmodS) (@polyOverNr _).
 
 Section PolyOverSemiring.
 

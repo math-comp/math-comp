@@ -117,7 +117,6 @@ Local Notation pQtoC := (map_poly ratr).
 
 Local Definition algC_intr_inj := @intr_inj [numDomainType of algC].
 #[local] Hint Resolve algC_intr_inj : core.
-Local Notation QtoC_M := [rmorphism of @ratr [numFieldType of algC]].
 
 Lemma C_prim_root_exists n : (n > 0)%N -> {z : algC | n.-primitive_root z}.
 Proof.
@@ -168,7 +167,7 @@ have nz_q: pZtoC q != 0.
 have [r def_zn]: exists r, cyclotomic z n = pZtoC r.
   have defZtoC: ZtoC =1 QtoC \o ZtoQ by move=> a; rewrite /= rmorph_int.
   have /dvdpP[r0 Dr0]: map_poly ZtoQ q %| 'X^n - 1.
-    rewrite -(dvdp_map QtoC_M) mapXn1 -map_poly_comp.
+    rewrite -(dvdp_map (@ratr algC)) mapXn1 -map_poly_comp.
     by rewrite -(eq_map_poly defZtoC) -defXn1 dvdp_mull.
   have [r [a nz_a Dr]] := rat_poly_scale r0.
   exists (zprimitive r); apply: (mulIf nz_q); rewrite defXn1.
@@ -270,8 +269,7 @@ have [|k_gt1] := leqP k 1; last have [p p_pr /dvdnP[k1 Dk]] := pdivP k_gt1.
   by rewrite -(subnKC g_gt1) -(subnKC (size_minCpoly z)) !addnS.
 move: cokn; rewrite Dk coprimeMl => /andP[cok1n].
 rewrite prime_coprime // (dvdn_charf (char_Fp p_pr)) => /co_fg {co_fg}.
-have charFpX: p \in [char {poly 'F_p}].
-  by rewrite (rmorph_char [rmorphism of polyC]) ?char_Fp.
+have charFpX: p \in [char {poly 'F_p}] by rewrite (rmorph_char polyC) ?char_Fp.
 rewrite -(coprimep_pexpr _ _ (prime_gt0 p_pr)) -(Frobenius_autE charFpX).
 rewrite -[g]comp_polyXr map_comp_poly -horner_map /= Frobenius_autE -rmorphXn.
 rewrite -!map_poly_comp (@eq_map_poly _ _ _ (polyC \o *~%R 1)); last first.

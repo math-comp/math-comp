@@ -71,13 +71,11 @@ Unset Printing Implicit Defensive.
 Import Order.TTheory GroupScope GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
-Local Notation algCF := [fieldType of algC].
-
 Section AlgC.
 
 Variable (gT : finGroupType).
 
-Lemma groupC : group_closure_field algCF gT.
+Lemma groupC : group_closure_field algC gT.
 Proof. exact: group_closure_closed_field. Qed.
 
 End AlgC.
@@ -394,7 +392,7 @@ Section Char.
 
 Variables (gT : finGroupType) (G : {group gT}).
 
-Fact cfRepr_subproof n (rG : mx_representation algCF G n) :
+Fact cfRepr_subproof n (rG : mx_representation algC G n) :
   is_class_fun <<G>> [ffun x => \tr (rG x) *+ (x \in G)].
 Proof.
 rewrite genGid; apply: intro_class_fun => [x y Gx Gy | _ /negbTE-> //].
@@ -429,9 +427,9 @@ Proof. by rewrite cfRepr_dsum /= sumr_const card_ord. Qed.
 
 Section StandardRepr.
 
-Variables (n : nat) (rG : mx_representation algCF G n).
+Variables (n : nat) (rG : mx_representation algC G n).
 Let sG := DecSocleType rG.
-Let iG : irrType algCF G := DecSocleType _.
+Let iG : irrType algC G := DecSocleType _.
 
 Definition standard_irr (W : sG) := irr_comp iG (socle_repr W).
 
@@ -491,7 +489,7 @@ Lemma cfRegE x : @cfReg G x = #|G|%:R *+ (x == 1%g).
 Proof. by rewrite cfunE cfuniE ?normal1 // inE mulr_natr. Qed.
 
 (* This is Isaacs, Lemma (2.10). *)
-Lemma cfReprReg : cfRepr (regular_repr algCF G) = cfReg G.
+Lemma cfReprReg : cfRepr (regular_repr algC G) = cfReg G.
 Proof.
 apply/cfun_inP=> x Gx; rewrite cfRegE.
 have [-> | ntx] := eqVneq x 1%g; first by rewrite cfRepr1.
@@ -551,7 +549,7 @@ Section IrrClassDef.
 
 Variables (gT : finGroupType) (G : {group gT}).
 
-Let sG := DecSocleType (regular_repr algCF G).
+Let sG := DecSocleType (regular_repr algC G).
 
 Lemma NirrE : Nirr G = #|classes G|.
 Proof. by rewrite /pred_Nirr (cardD1 [1]) classes1. Qed.
@@ -640,7 +638,7 @@ rewrite size_tuple => lt_i_G <-.
 by exists (Ordinal lt_i_G); rewrite (tnth_nth 0).
 Qed.
 
-Let sG := DecSocleType (regular_repr algCF G).
+Let sG := DecSocleType (regular_repr algC G).
 Let C'G := algC'G G.
 Let closG := @groupC _ G.
 Local Notation W i := (@socle_of_Iirr _ G i).
@@ -693,8 +691,8 @@ rewrite sum_cfunE (reindex _ (socle_of_Iirr_bij _)); apply: eq_bigr => i _.
 by rewrite -irrRepr cfRepr1 !cfunE Gx mulr_natl.
 Qed.
 
-Let aG := regular_repr algCF G.
-Let R_G := group_ring algCF G.
+Let aG := regular_repr algC G.
+Let R_G := group_ring algC G.
 
 Lemma xcfun_annihilate i j A : i != j -> (A \in 'R_j)%MS -> ('chi_i).[A]%CF = 0.
 Proof.
@@ -723,7 +721,7 @@ Qed.
 Lemma irr_free : free (irr G).
 Proof.
 apply/freeP=> s s0 i; apply: (mulIf (irr1_neq0 i)).
-rewrite mul0r -(raddf0 [additive of xcfun_r 'e_i]) -{}s0 raddf_sum /=.
+rewrite mul0r -(raddf0 (xcfun_r 'e_i)) -{}s0 raddf_sum /=.
 rewrite (bigD1 i)//= -tnth_nth xcfunZl xcfun_id eqxx big1 ?addr0 // => j ne_ji.
 by rewrite -tnth_nth xcfunZl xcfun_id (negbTE ne_ji) mulr0.
 Qed.
@@ -756,7 +754,7 @@ rewrite (coord_basis irr_basis (memvf phi)) -eq_sum_nth_irr.
 by exists ((coord (irr G))^~ phi).
 Qed.
 
-Lemma cfRepr_standard n (rG : mx_representation algCF G n) :
+Lemma cfRepr_standard n (rG : mx_representation algC G n) :
   cfRepr (standard_grepr rG)
     = \sum_i (standard_irr_coef rG (W i))%:R *: 'chi_i.
 Proof.
@@ -848,8 +846,8 @@ Proof.
 split=> [|chi xi /forallP-Nchi /forallP-Nxi]; first exact: cfun0_char.
 by apply/forallP=> i; rewrite linearD rpredD /=.
 Qed.
-HB.instance Definition _ :=
-  GRing.isAddClosed.Build [zmodType of classfun G] character_pred add_char.
+HB.instance Definition _ := GRing.isAddClosed.Build (classfun G) character_pred
+  add_char.
 
 Lemma char_sum_irrP {phi} :
   reflect (exists n, phi = \sum_i (n i)%:R *: 'chi_i) (phi \is a character).
@@ -891,7 +889,7 @@ Lemma char1_gt0 chi : chi \is a character -> (0 < chi 1%g) = (chi != 0).
 Proof. by move=> Nchi; rewrite -char1_eq0 // Cnat_gt0 ?Cnat_char1. Qed.
 
 Lemma char_reprP phi :
-  reflect (exists rG : representation algCF G, phi = cfRepr rG)
+  reflect (exists rG : representation algC G, phi = cfRepr rG)
           (phi \is a character).
 Proof.
 apply: (iffP char_sum_irrP) => [[n ->] | [[n rG] ->]]; last first.
@@ -902,7 +900,7 @@ rewrite cfRepr_dsum; apply: eq_bigr => i _.
 by rewrite cfRepr_muln irrRepr scaler_nat.
 Qed.
 
-Local Notation reprG := (mx_representation algCF G).
+Local Notation reprG := (mx_representation algC G).
 
 Lemma cfRepr_char n (rG : reprG n) : cfRepr rG \is a character.
 Proof. by apply/char_reprP; exists (Representation rG). Qed.
@@ -920,8 +918,8 @@ split=> [|_ _ /char_reprP[rG1 ->] /char_reprP[rG2 ->]]; first exact: cfun1_char.
 apply/char_reprP; exists (Representation (prod_repr rG1 rG2)).
 by rewrite cfRepr_prod.
 Qed.
-HB.instance Definition _ :=
-  GRing.isMulClosed.Build [ringType of classfun G] character_pred mul_char.
+HB.instance Definition _ := GRing.isMulClosed.Build (classfun G) character_pred
+  mul_char.
 
 End IsChar.
 Prenex Implicits character.
@@ -934,7 +932,7 @@ Variables (gT : finGroupType) (G : {group gT}).
 Implicit Type u : {rmorphism algC -> algC}.
 Implicit Type chi : 'CF(G).
 
-Lemma cfRepr_map u n (rG : mx_representation algCF G n) :
+Lemma cfRepr_map u n (rG : mx_representation algC G n) :
   cfRepr (map_repr u rG) = cfAut u (cfRepr rG).
 Proof. by apply/cfun_inP=> x Gx; rewrite !cfunE Gx map_reprE trace_map_mx. Qed.
 
@@ -1107,8 +1105,7 @@ rewrite invr_lin_char // qualifE/= cfunE.
 by rewrite rpredM ?lin_char1 ?mulr1 ?lin_charW //= cfConjC_lin_char.
 Qed.
 HB.instance Definition _ :=
-  GRing.isDivClosed.Build [unitRingType of classfun G] linear_char_pred
-    linear_char_divr.
+  GRing.isDivClosed.Build (classfun G) linear_char_pred linear_char_divr.
 
 Lemma irr_cyclic_lin i : cyclic G -> 'chi[G]_i \is a linear_char.
 Proof. by move/cyclic_abelian/char_abelianP. Qed.
@@ -1126,7 +1123,7 @@ Section OrthogonalityRelations.
 Variables aT gT : finGroupType.
 
 (* This is Isaacs, Lemma (2.15) *)
-Lemma repr_rsim_diag (G : {group gT}) f (rG : mx_representation algCF G f) x :
+Lemma repr_rsim_diag (G : {group gT}) f (rG : mx_representation algC G f) x :
     x \in G -> let chi := cfRepr rG in
   exists e,
  [/\ (*a*) exists2 B, B \in unitmx & rG x = invmx B *m diag_mx e *m B,
@@ -1144,7 +1141,7 @@ have [I U W simU W1 dxW]: mxsemisimple rG 1%:M.
 have linU i: \rank (U i) = 1%N.
   by apply: mxsimple_abelian_linear cGG (simU i); apply: groupC.
 have castI: f = #|I|.
-  by rewrite -(mxrank1 algCF f) -W1 (eqnP dxW) /= -sum1_card; apply/eq_bigr.
+  by rewrite -(mxrank1 algC f) -W1 (eqnP dxW) /= -sum1_card; apply/eq_bigr.
 pose B := \matrix_j nz_row (U (enum_val (cast_ord castI j))).
 have rowU i: (nz_row (U i) :=: U i)%MS.
   apply/eqmxP; rewrite -(geq_leqif (mxrank_leqif_eq (nz_row_sub _))) linU.
@@ -1202,7 +1199,7 @@ Theorem generalized_orthogonality_relation y (i j : Iirr G) :
     = (i == j)%:R * ('chi_i y / 'chi_i 1%g).
 Proof.
 pose W := @socle_of_Iirr _ G; pose e k := Wedderburn_id (W k).
-pose aG := regular_repr algCF G.
+pose aG := regular_repr algC G.
 have [Gy | notGy] := boolP (y \in G); last first.
   rewrite cfun0 // mul0r big1 ?mulr0 // => x Gx.
   by rewrite cfun0 ?groupMl ?mul0r.
@@ -1490,7 +1487,7 @@ case/char_reprP=> rG ->; case Gx: (x \in G); last first.
 by have [e [_ _ []]] := repr_rsim_diag rG Gx.
 Qed.
 
-Lemma max_cfRepr_norm_scalar n (rG : mx_representation algCF G n) x :
+Lemma max_cfRepr_norm_scalar n (rG : mx_representation algC G n) x :
      x \in G -> `|cfRepr rG x| = cfRepr rG 1%g ->
    exists2 c, `|c| = 1 & rG x = c%:M.
 Proof.
@@ -1501,7 +1498,7 @@ have{} def_e: e = const_mx c by apply/rowP=> i; rewrite mxE def_e ?andbT.
 by exists c => //; rewrite def_x def_e diag_const_mx scalar_mxC mulmxKV.
 Qed.
 
-Lemma max_cfRepr_mx1 n (rG : mx_representation algCF G n) x :
+Lemma max_cfRepr_mx1 n (rG : mx_representation algC G n) x :
    x \in G -> cfRepr rG x = cfRepr rG 1%g -> rG x = 1%:M.
 Proof.
 move=> Gx kerGx; have [|c _ def_x] := @max_cfRepr_norm_scalar n rG x Gx.
@@ -1578,7 +1575,7 @@ Section Kernel.
 Variable (gT : finGroupType) (G : {group gT}).
 Implicit Types (phi chi xi : 'CF(G)) (H : {group gT}).
 
-Lemma cfker_repr n (rG : mx_representation algCF G n) :
+Lemma cfker_repr n (rG : mx_representation algC G n) :
   cfker (cfRepr rG) = rker rG.
 Proof.
 apply/esym/setP=> x; rewrite inE mul1mx /=.
@@ -1685,7 +1682,7 @@ Section Restrict.
 
 Variable (gT : finGroupType) (G H : {group gT}).
 
-Lemma cfRepr_sub n (rG : mx_representation algCF G n) (sHG : H \subset G) :
+Lemma cfRepr_sub n (rG : mx_representation algC G n) (sHG : H \subset G) :
   cfRepr (subg_repr rG sHG) = 'Res[H] (cfRepr rG).
 Proof.
 by apply/cfun_inP => x Hx; rewrite cfResE // !cfunE Hx (subsetP sHG).
@@ -1774,7 +1771,7 @@ Section Morphim.
 Variables (aT rT : finGroupType) (G D : {group aT}) (f : {morphism D >-> rT}).
 Implicit Type chi : 'CF(f @* G).
 
-Lemma cfRepr_morphim n (rfG : mx_representation algCF (f @* G) n) sGD :
+Lemma cfRepr_morphim n (rfG : mx_representation algC (f @* G) n) sGD :
   cfRepr (morphim_repr rfG sGD) = cfMorph (cfRepr rfG).
 Proof.
 apply/cfun_inP=> x Gx; have Dx: x \in D := subsetP sGD x Gx.
@@ -2567,7 +2564,7 @@ Arguments irr_prime_injP {gT G i}.
 Section DetRepr.
 
 Variables (gT : finGroupType) (G : {group gT}).
-Variables (n : nat) (rG : mx_representation [fieldType of algC] G n).
+Variables (n : nat) (rG : mx_representation algC G n).
 
 Definition det_repr_mx x : 'M_1 := (\det (rG x))%:M.
 
@@ -2729,7 +2726,7 @@ Variable (gT : finGroupType) (G : {group gT}).
 Implicit Types (phi chi : 'CF(G)) (H : {group gT}).
 
 (* This is Isaacs (2.27)(a). *)
-Lemma cfcenter_repr n (rG : mx_representation algCF G n) :
+Lemma cfcenter_repr n (rG : mx_representation algC G n) :
   'Z(cfRepr rG)%CF = rcenter rG.
 Proof.
 rewrite /cfcenter /rcenter cfRepr_char /=.

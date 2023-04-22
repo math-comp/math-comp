@@ -705,7 +705,7 @@ pose IpM := isProperIdeal.Build _ I (idealr_closed_nontrivial I_ideal).
 pose Iid : idealrPred _ := HB.pack I IaM IoM IpM.
 pose EMixin := GRing.Ring_hasCommutativeMul.Build _ (@Quotient.mulqC _ Iid).
 pose E : comRingType := HB.pack _ EMixin.
-pose PtoE : {rmorphism {poly F} -> E} := [rmorphism of \pi_E%qT : {poly F} -> E].
+pose PtoE : {rmorphism {poly F} -> E} := \pi_E%qT.
 have PtoEd i: PtoE (d i) = 0.
   by apply/eqP; rewrite piE Quotient.equivE subr0; apply/memI; exists i.
 pose Einv (z : E) (q := repr z) (dq := d (pickle q).+1) :=
@@ -728,7 +728,7 @@ pose EfieldMixin := GRing.ComRing_isField.Build _ EmulV Einv0.
 pose Efield : fieldType := HB.pack E EfieldMixin.
 pose EIsCountable := @CanCountMixin _ E _ _ reprK.
 pose Ecount : countFieldType := HB.pack E Efield EIsCountable.
-pose FtoE := [rmorphism of PtoE \o polyC]; pose w : E := PtoE 'X.
+pose FtoE : {rmorphism _ -> _} := PtoE \o polyC; pose w : E := PtoE 'X.
 have defPtoE q: (map_poly FtoE q).[w] = PtoE q.
   by rewrite map_poly_comp horner_map [_.['X]]comp_polyXr.
 exists Ecount, FtoE, w => [|u].
@@ -763,8 +763,7 @@ pose incEp E i j :=
 pose fix E_ i := if i is i1.+1 then MkExt _ (incEp (E_ i1) i1) else MkExt F \0.
 pose E i := tag (E_ i); pose Krep := {i : nat & E i}.
 pose fix toEadd i k : {rmorphism E i -> E (k + i)%N} :=
-  if k is k1.+1 then [rmorphism of EtoInc _ (k1 + i)%N \o toEadd _ _]
-  else [rmorphism of idfun].
+  if k isn't k1.+1 then idfun else EtoInc _ (k1 + i)%N \o toEadd _ _.
 pose toE i j (le_ij : i <= j) :=
   ecast j {rmorphism E i -> E j} (subnK le_ij) (toEadd i (j - i)%N).
 have toEeq i le_ii: toE i i le_ii =1 id.

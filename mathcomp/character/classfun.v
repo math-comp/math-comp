@@ -272,7 +272,7 @@ Qed.
 HB.instance Definition _ := GRing.Zmodule_isComRing.Build classfun
   cfun_mulA cfun_mulC cfun_mul1 cfun_mulD cfun_nz1.
 
-Definition cfun_ringType := [ringType of classfun].
+Definition cfun_ringType : ringType := classfun.
 
 Lemma expS_cfunE phi n x : (phi ^+ n.+1) x = phi x ^+ n.+1.
 Proof. by elim: n => //= n IHn; rewrite !cfunE IHn. Qed.
@@ -303,20 +303,19 @@ Proof. by move=> a phi psi; apply/cfunP=> x; rewrite !cfunE mulrDr. Qed.
 Fact cfun_scaleDl phi : {morph cfun_scale^~ phi : a b / a + b}.
 Proof. by move=> a b; apply/cfunP=> x; rewrite !cfunE mulrDl. Qed.
 
-HB.instance Definition _ :=
-  GRing.Zmodule_isLmodule.Build [ringType of algC] classfun
-      cfun_scaleA cfun_scale1 cfun_scaleDr cfun_scaleDl.
+HB.instance Definition _ := GRing.Zmodule_isLmodule.Build algC classfun
+  cfun_scaleA cfun_scale1 cfun_scaleDr cfun_scaleDl.
 
 Fact cfun_scaleAl a phi psi : a *: (phi * psi) = (a *: phi) * psi.
 Proof. by apply/cfunP=> x; rewrite !cfunE mulrA. Qed.
 Fact cfun_scaleAr a phi psi : a *: (phi * psi) = phi * (a *: psi).
 Proof. by rewrite !(mulrC phi) cfun_scaleAl. Qed.
 
-HB.instance Definition _ :=
-  GRing.Lmodule_isLalgebra.Build [ringType of algC] classfun cfun_scaleAl.
+HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build algC classfun
+  cfun_scaleAl.
 
-HB.instance Definition _ :=
-  GRing.Lalgebra_isAlgebra.Build [ringType of algC] classfun cfun_scaleAr.
+HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build algC classfun
+  cfun_scaleAr.
 
 Section Automorphism.
 
@@ -383,8 +382,7 @@ rewrite def_i; have [y Gy ->] := repr_class <<B>> x.
 by rewrite groupJ // /eK classGidl // -def_i enum_valK_in.
 Qed.
 
-HB.instance Definition _ :=
-  Lmodule_hasFinDim.Build [ringType of algC] classfun  cfun_vect_iso.
+HB.instance Definition _ := Lmodule_hasFinDim.Build algC classfun cfun_vect_iso.
 
 Definition cfun_vectType := [vectType _ of classfun].
 
@@ -2421,10 +2419,10 @@ Proof. exact: raddfZ_Cnat. Qed.
 Lemma cfAutZ_Cint z phi : z \in Cint -> (z *: phi)^u = z *: phi^u.
 Proof. exact: raddfZ_Cint. Qed.
 
-Lemma cfAutK : cancel (@cfAut gT G u) (cfAut [rmorphism of algC_invaut u]).
+Lemma cfAutK : cancel (@cfAut gT G u) (cfAut (algC_invaut u)).
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE /= algC_autK. Qed.
 
-Lemma cfAutVK : cancel (cfAut [rmorphism of algC_invaut u]) (@cfAut gT G u).
+Lemma cfAutVK : cancel (cfAut (algC_invaut u)) (@cfAut gT G u).
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE /= algC_invautK. Qed.
 
 Lemma cfAut_inj : injective (@cfAut gT G u).

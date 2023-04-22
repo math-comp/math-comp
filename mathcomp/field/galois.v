@@ -342,7 +342,7 @@ have [m DfpEz]: {m | fpEz %= \prod_(w <- mask m rs) ('X - w%:P)}.
   have /polyOver_subvs[q Dq] := polyOverSv sKE Kp.
   have /polyOver_subvs[qz Dqz] := minPolyOver E z.
   rewrite /fpEz Dq Dqz -2?{1}map_poly_comp (dvdp_map (kHom_rmorphism homEf)).
-  rewrite -(dvdp_map [rmorphism of @vsval _ _ E]) -Dqz -Dq.
+  rewrite -(dvdp_map (@vsval _ _ E)) -Dqz -Dq.
   by rewrite minPoly_dvdp ?(polyOverSv sKE) // (eqp_root Dp) root_prod_XsubC.
 exists (mask m rs)`_0; rewrite (eqp_root DfpEz) root_prod_XsubC mem_nth //.
 rewrite -ltnS -(size_prod_XsubC _ id) -(eqp_size DfpEz).
@@ -550,7 +550,7 @@ have{irr_q} [Lz [inLz [z qz0]]]: {Lz : fieldExtType F &
   {inLz : 'AHom(L, Lz) & {z : Lz | root (map_poly inLz q) z}}}.
 - have [Lz0 _ [z qz0 defLz]] := irredp_FAdjoin irr_q.
   pose Lz : fieldExtType _ := baseFieldType Lz0.
-  pose inLz : {rmorphism L -> Lz} := [rmorphism of in_alg Lz0].
+  pose inLz : {rmorphism L -> Lz} := in_alg Lz0.
   have inLzL_linear: linear (locked inLz).
     move=> a u v; rewrite -(@mulr_algl F Lz) baseField_scaleE.
     by rewrite -{1}mulr_algl rmorphD rmorphM -lock.
@@ -568,7 +568,7 @@ have F0pz: pz \is a polyOver 1%VS.
   exact: (polyOverP F0p).
 have{splitLp} splitLpz: splittingFieldFor 1 pz imL.
   have [r def_p defL] := splitLp; exists (map inLz r) => [|{def_p}].
-    move: def_p; rewrite -(eqp_map [rmorphism of inLz]) rmorph_prod.
+    move: def_p; rewrite -(eqp_map inLz) rmorph_prod.
     rewrite big_map; congr (_ %= _); apply: eq_big => //= y _.
     by rewrite rmorphB /= map_polyX map_polyC.
   apply/eqP; rewrite eqEsubv /= -{2}defL {defL}; apply/andP; split.
@@ -588,9 +588,9 @@ have [f homLf fxz]: exists2 f : 'End(Lz), kHom 1 imL f & f (inLz x) = z.
       by case: sig_eqW => a; case: ifP; rewrite /= ?rmorph0 ?linearZ ?rmorph1.
     rewrite Dq2 dvdp_map minPoly_dvdp //.
       apply/polyOverP=> i; have[a] := F0q1z i.
-      rewrite -(rmorph1 [rmorphism of inLz]) -linearZ.
+      rewrite -(rmorph1 inLz) -linearZ.
       by rewrite Dq2 coef_map => /fmorph_inj->; rewrite rpredZ ?mem1v.
-    by rewrite -(fmorph_root [rmorphism of inLz]) -Dq2 root_minPoly.
+    by rewrite -(fmorph_root inLz) -Dq2 root_minPoly.
   have q1z_z: root q1z z.
     rewrite !root_factor_theorem in qz0 *.
     by apply: dvdp_trans qz0 (dvdp_trans _ Dq1z); rewrite dvdp_map.
@@ -629,8 +629,8 @@ have Df1 u: inLz (f1 u) = f (inLz u).
   by rewrite (eqp_root def_pz) root_prod_XsubC.
 suffices f1_is_ahom : ahom_in {:L} f1.
   apply/hasP; exists (AHom f1_is_ahom); first exact: DautL.
-  by rewrite /fx_root -(fmorph_root [rmorphism of inLz]) /= Df1 fxz.
-apply/ahom_inP; split=> [a b _ _|]; apply: (fmorph_inj [rmorphism of inLz]).
+  by rewrite /fx_root -(fmorph_root inLz) /= Df1 fxz.
+apply/ahom_inP; split=> [a b _ _|]; apply: (fmorph_inj inLz).
   by rewrite rmorphM /= !Df1 rmorphM fM ?in_imL.
 by rewrite /= Df1 /= fFid ?rmorph1 ?mem1v.
 Qed.

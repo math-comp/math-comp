@@ -67,8 +67,7 @@ exists (HB.pack_for (splittingFieldType rat) Qn Qn_ax).
   exists ('X^n - 1); split => //.
   apply: separable_Xn_sub_1; rewrite -(fmorph_eq0 QnC) rmorph_nat.
   by rewrite pnatr_eq0 -lt0n cardG_gt0.
-exists QnC => [// nuQn|].
-  exact: (extend_algC_subfield_aut QnC [rmorphism of nuQn]).
+exists QnC => [// nuQn|]; first exact: (extend_algC_subfield_aut QnC nuQn).
 rewrite span_seq1 in genQn.
 exists w => // hT H phi Nphi x x_dv_n.
 apply: sig_eqW; have [rH ->] := char_reprP Nphi.

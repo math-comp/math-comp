@@ -739,13 +739,13 @@ Definition group_ring := enveloping_algebra_mx aG.
 Local Notation R_G := group_ring.
 
 Definition gring_row : 'M[R]_nG -> 'rV_nG := row (gring_index 1).
-Canonical gring_row_linear := [linear of gring_row].
+HB.instance Definition _ := GRing.Linear.on gring_row.
 
 Lemma gring_row_mul A B : gring_row (A *m B) = gring_row A *m B.
 Proof. exact: row_mul. Qed.
 
 Definition gring_proj x := row (gring_index x) \o trmx \o gring_row.
-Canonical gring_proj_linear x := [linear of gring_proj x].
+HB.instance Definition _ x := GRing.Linear.on (gring_proj x).
 
 Lemma gring_projE : {in G &, forall x y, gring_proj x (aG y) = (x == y)%:R}.
 Proof.
@@ -767,7 +767,7 @@ Section GringMx.
 Variables (n : nat) (rG : mx_representation G n).
 
 Definition gring_mx := vec_mx \o mulmxr (enveloping_algebra_mx rG).
-Canonical gring_mx_linear := [linear of gring_mx].
+HB.instance Definition _ := GRing.Linear.on gring_mx.
 
 Lemma gring_mxJ a x :
   x \in G -> gring_mx (a *m aG x) = gring_mx a *m rG x.
@@ -794,7 +794,7 @@ Section GringOp.
 Variables (n : nat) (rG : mx_representation G n).
 
 Definition gring_op := gring_mx rG \o gring_row.
-Canonical gring_op_linear := [linear of gring_op].
+HB.instance Definition _ := GRing.Linear.on gring_op.
 
 Lemma gring_opE a : gring_op a = gring_mx rG (gring_row a).
 Proof. by []. Qed.
@@ -1033,8 +1033,8 @@ Variable U : 'M[F]_n.
 Definition val_submod m : 'M_(m, \rank U) -> 'M_(m, n) := mulmxr (row_base U).
 Definition in_submod m : 'M_(m, n) -> 'M_(m, \rank U) :=
    mulmxr (invmx (row_ebase U) *m pid_mx (\rank U)).
-Canonical val_submod_linear m := [linear of @val_submod m].
-Canonical in_submod_linear m := [linear of @in_submod m].
+HB.instance Definition _ m := GRing.Linear.on (@val_submod m).
+HB.instance Definition _ m := GRing.Linear.on (@in_submod m).
 
 Lemma val_submodE m W : @val_submod m W = W *m val_submod 1%:M.
 Proof. by rewrite mulmxA mulmx1. Qed.
@@ -1094,8 +1094,8 @@ Qed.
 Definition val_factmod m : _ -> 'M_(m, n) :=
   mulmxr (row_base (cokermx U) *m row_ebase U).
 Definition in_factmod m : 'M_(m, n) -> _ := mulmxr (col_base (cokermx U)).
-Canonical val_factmod_linear m := [linear of @val_factmod m].
-Canonical in_factmod_linear m := [linear of @in_factmod m].
+HB.instance Definition _ m := GRing.Linear.on (@val_factmod m).
+HB.instance Definition _ m := GRing.Linear.on (@in_factmod m).
 
 Lemma val_factmodE m W : @val_factmod m W = W *m val_factmod 1%:M.
 Proof. by rewrite mulmxA mulmx1. Qed.
@@ -2452,11 +2452,12 @@ have{cBcE} cBncEn A: centgmx rGn A -> A *m Bn = Bn *m A.
   rewrite mul_rV_lin mul_vec_lin /= -mulmxA; apply: (canLR vec_mxK).
   apply/row_matrixP=> i; set dj0 := delta_mx j 0.
   pose Aij := row i \o vec_mx \o mulmxr A \o mxvec \o mulmx dj0.
-  have defAij := mul_rV_lin1 [linear of Aij]; rewrite /= {2}/Aij /= in defAij.
+  have defAij := mul_rV_lin1 (GRing.Linear.clone _ _ _ _ Aij _).
+  rewrite /= {2}/Aij /= in defAij.
   rewrite -defAij row_mul -defAij -!mulmxA (cent_mxP cBcE) {k}//.
   rewrite memmx_cent_envelop; apply/centgmxP=> x Gx; apply/row_matrixP=> k.
   rewrite !row_mul !rowE !{}defAij /= -row_mul mulmxA mul_delta_mx.
-  congr (row i _); rewrite -(mul_vec_lin [linear of mulmxr (rG x)]) -mulmxA.
+  congr (row i _); rewrite -(mul_vec_lin (mulmxr (rG x))) -mulmxA.
   by rewrite -(centgmxP cAG) // mulmxA mx_rV_lin.
 suffices redGn: mx_completely_reducible rGn 1%:M.
   have [V modV defUV] := redGn _ modU (submx1 _); move/mxdirect_addsP=> dxUV.
@@ -3859,9 +3860,8 @@ Section Regular.
 Variables (gT : finGroupType) (G : {group gT}).
 Local Notation nG := #|pred_of_set (gval G)|.
 
-Local Notation rF := ([comUnitRingType of F]).
-Local Notation aG := (regular_repr rF G).
-Local Notation R_G := (group_ring rF G).
+Local Notation aG := (regular_repr F G).
+Local Notation R_G := (group_ring F G).
 
 Lemma gring_free : row_free R_G.
 Proof.
@@ -4126,7 +4126,7 @@ apply/andP; split; last first.
 apply/mulsmx_subP=> A B R_A; rewrite !genmxE !mem_sub_gring => /andP[R_B SiB].
 rewrite envelop_mxM {R_A}// gring_row_mul -{R_B}(gring_rowK R_B).
 pose f := mulmx (gring_row A) \o gring_mx aG.
-rewrite -[_ *m _](mul_rV_lin1 [linear of f]).
+rewrite -[_ *m _](mul_rV_lin1 f).
 suffices: (i *m lin1_mx f <= i)%MS by apply: submx_trans; rewrite submxMr.
 apply: hom_component_mx; first exact: socle_simple.
 apply/rV_subP=> v _; apply/hom_mxP=> x Gx.
@@ -5139,7 +5139,7 @@ case uB: (B \is a GRing.unit); last by rewrite invr_out ?uB ?horner_mx_mem.
 have defAd: Ad = Ad *m m B *m m B^-1.
   apply/row_matrixP=> i.
   by rewrite !row_mul mul_rV_lin /= mx_rV_lin /= mulmxK ?vec_mxK.
-rewrite -[B^-1]mul1mx -(mul_vec_lin [linear of mulmxr B^-1]) defAd submxMr //.
+rewrite -[B^-1]mul1mx -(mul_vec_lin (mulmxr B^-1)) defAd submxMr //.
 rewrite -mxval_gen1 (submx_trans (horner_mx_mem _ _)) // {1}defAd.
 rewrite -(geq_leqif (mxrank_leqif_sup _)) ?mxrankM_maxl // -{}defAd.
 apply/row_subP=> i; rewrite row_mul rowK mul_vec_lin /= -{2}[A]horner_mx_X.
@@ -5239,8 +5239,7 @@ Qed.
 (* Plugging the extension morphism gen into the ext_repr construction   *)
 (* yields a (reducible) tensored representation.                           *)
 
-Lemma non_linear_gen_reducible :
-  d > 1 -> mxnonsimple (map_repr [rmorphism of gen] rG) 1%:M.
+Lemma non_linear_gen_reducible : d > 1 -> mxnonsimple (map_repr gen rG) 1%:M.
 Proof.
 rewrite ltnNge mxminpoly_linear_is_scalar => Anscal.
 pose Af := map_mx gen A; exists (kermx (Af - groot%:M)).
@@ -5249,7 +5248,7 @@ rewrite submx1 kermx_centg_module /=; last first.
   by rewrite -!map_mxM 1?(centgmxP cGA).
 rewrite andbC mxrank_ker -subn_gt0 mxrank1 subKn ?rank_leq_row // lt0n.
 rewrite mxrank_eq0 subr_eq0; case: eqP => [defAf | _].
-  rewrite -(map_mx_is_scalar [rmorphism of gen]) -/Af in Anscal.
+  rewrite -(map_mx_is_scalar gen) -/Af in Anscal.
   by case/is_scalar_mxP: Anscal; exists groot.
 rewrite -mxrank_eq0 mxrank_ker subn_eq0 row_leq_rank.
 apply/row_freeP=> [[XA' XAK]].
@@ -5792,7 +5791,7 @@ move: F => F0 [] // nosplit; pose nG := #|G|; pose aG F := regular_repr F G.
 pose m := nG.+1; pose F := F0; pose U : seq 'M[F]_nG := [::].
 suffices: size U + m <= nG by rewrite ltnn.
 have: mx_subseries (aG F) U /\ path ltmx 0 U by [].
-pose f : {rmorphism F0 -> F} := [rmorphism of idfun].
+pose f : {rmorphism F0 -> F} := idfun.
 elim: m F U f => [|m IHm] F U f [modU ltU].
   by rewrite addn0 (leq_trans (max_size_mx_series ltU)) ?rank_leq_row.
 rewrite addnS ltnNge -implybF; apply/implyP=> le_nG_Um; apply: nosplit.
@@ -5805,7 +5804,7 @@ rewrite {cG}memmx_cent_envelop -mxminpoly_linear_is_scalar -ltnNge => cGA.
 move/(non_linear_gen_reducible irrG cGA).
 (* FIXME: _ matches a generated constant *)
 set F' := _ irrG cGA; set rG' := @map_repr _ F' _ _ _ _ rG.
-move: F' ([rmorphism of gen  _ _] : {rmorphism F -> F'}) => F' f' in rG' * => irrG'.
+move: F' (gen _ _ : {rmorphism F -> F'}) => F' f' in rG' * => irrG'.
 pose U' := [seq map_mx f' Ui | Ui <- U].
 have modU': mx_subseries (aG F') U'.
   apply: etrans modU; rewrite /mx_subseries all_map; apply: eq_all => Ui.
@@ -5824,7 +5823,7 @@ apply: (mx_Schreier modU') => [|[V' [compV' _ sUV']]].
 have{sUV'} defV': V' = U'; last rewrite {V'}defV' in compV'.
   apply/eqP; rewrite eq_sym -(geq_leqif (size_subseq_leqif sUV')) size_map.
   rewrite -(leq_add2r m); apply: leq_trans le_nG_Um.
-  apply: IHm [rmorphism of f' \o f] _.
+  apply: IHm (f' \o f) _.
   by rewrite (mx_series_lt compV'); case: compV'.
 suffices{irrG'}: mx_irreducible rG' by case/mxsimpleP=> _ _ [].
 have ltiU': i < size U' by rewrite size_map.
@@ -5847,7 +5846,7 @@ have [le_n_i _ -> // | lt_i_n] := leqP n i.
   by exists F' => // G _; apply: splitF'; apply: leq_trans le_n_i.
 have:= @group_splitting_field_exists _ (enum_val (Ordinal lt_i_n)) F'.
 apply: classic_bind => [[Fs f' splitFs]] _ -> //.
-exists Fs => [|G]; first exact: [rmorphism of (f' \o f)].
+exists Fs => [|G]; first exact: (f' \o f).
 rewrite ltnS leq_eqVlt -{1}[i]/(val (Ordinal lt_i_n)) val_eqE.
 case/predU1P=> [defG | ltGi]; first by rewrite -[G]enum_rankK defG.
 by apply: (extend_group_splitting_field f'); apply: splitF'.

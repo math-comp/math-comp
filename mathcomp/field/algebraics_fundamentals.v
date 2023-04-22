@@ -275,7 +275,7 @@ have /all_tag[Q /all_tag[ofQ genQz]] z: {Qz : Qfield & genQfield z Qz}.
   have [|p [/monic_neq0 nzp pz0 irr_p]] := minPoly_decidable_closure _ (algC z).
     exact: rat_algebraic_decidable.
   pose Qz := SubFieldExtType pz0 irr_p.
-  pose QzC := [rmorphism of @subfx_inj _ _ QtoC z p].
+  pose QzC : {rmorphism _ -> _} := @subfx_inj _ _ QtoC z p.
   exists Qz, QzC, (subfx_root QtoC z p); first exact: subfx_inj_root.
   apply/vspaceP=> u; rewrite memvf; apply/Fadjoin1_polyP.
   by have [q] := subfxEroot pz0 nzp u; exists q.
@@ -389,7 +389,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     by rewrite Dp (monicP mon_p) scale1r root_prod_XsubC.
   rewrite map_monic in mon_p; have [z /andP[z_x /allP/=z_s] _] := PET (x :: s).
   have{z_x} [[Qxz QxzE] Dx] := (QtoQ z x z_x, inQ_K z x z_x).
-  pose Qx := <<1; inQ z x>>%AS; pose QxzM := [rmorphism of Qxz].
+  pose Qx := <<1; inQ z x>>%AS.
   have pQwx q1: q1 \is a polyOver Qx -> {q | q1 = q ^ Qxz}.
     move/polyOverP=> Qx_q1; exists ((q1 ^ ofQ z) ^ inQ x).
     apply: (map_poly_inj (ofQ z)); rewrite -map_poly_comp (eq_map_poly QxzE).
@@ -410,7 +410,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     have /pQwx[q Dq] := minPolyOver Qx u.
     have mon_q: q \is monic by have:= monic_minPoly Qx u; rewrite Dq map_monic.
     have /dvdpP/sig_eqW[r Dp]: q %| p.
-      rewrite -(dvdp_map QxzM) -Dq minPoly_dvdp //.
+      rewrite -(dvdp_map Qxz) -Dq minPoly_dvdp //.
         by apply: polyOver_poly => j _; rewrite -sQof2 QxzE Dx.
       by rewrite -(fmorph_root (ofQ z)) Dy -map_poly_comp (eq_map_poly QxzE).
     have mon_r: r \is monic by rewrite Dp monicMr in mon_p.
@@ -421,7 +421,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     apply: (IHd r mon_r) => // [w rw0|].
       by rewrite s_p // Dp rmorphM rootM rw0.
     apply: leq_trans le_p_d; rewrite Dp size_Mmonic ?monic_neq0 // addnC.
-    by rewrite -(size_map_poly QxzM q) -Dq size_minPoly !ltnS leq_addl.
+    by rewrite -(size_map_poly Qxz q) -Dq size_minPoly !ltnS leq_addl.
   exists u => {s s_y}//; set y := ofQ z (t_ u); set p1 := minPoly Qx u in Dp.
   have /QtoQ[Qyz QyzE]: y \in sQ z := sQof z (t_ u).
   pose q1_ v := Fadjoin_poly Qx u (Qyz v).
@@ -429,12 +429,12 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     by rewrite Fadjoin_poly_eq // -Dt -sQof2 QyzE sQof.
   have /all_sig2[q_ coqp Dq] v: {q | v != 0 -> coprimep p q & q ^ Qxz = q1_ v}.
     have /pQwx[q Dq]: q1_ v \is a polyOver Qx by apply: Fadjoin_polyOver.
-    exists q => // nz_v; rewrite -(coprimep_map QxzM) -Dp -Dq -gcdp_eqp1.
+    exists q => // nz_v; rewrite -(coprimep_map Qxz) -Dp -Dq -gcdp_eqp1.
     have /minPoly_irr/orP[] // := dvdp_gcdl p1 (q1_ v).
       by rewrite gcdp_polyOver ?minPolyOver ?Fadjoin_polyOver.
     rewrite -/p1 {1}/eqp dvdp_gcd => /and3P[_ _ /dvdp_leq/=/implyP].
     rewrite size_minPoly ltnNge size_poly (contraNneq _ nz_v) // => q1v0.
-    by rewrite -(fmorph_eq0 [rmorphism of Qyz]) /= QyzE q1v0 horner0.
+    by rewrite -(fmorph_eq0 Qyz) /= QyzE q1v0 horner0.
   pose h2 : R := 2^-1; have nz2: 2 != 0 :> R by rewrite pnatr_eq0.
   pose itv ab := [pred c : R | ab.1 <= c <= ab.2].
   pose wid ab : R := ab.2 - ab.1; pose mid ab := (ab.1 + ab.2) * h2.
@@ -502,10 +502,10 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   pose lim v a := (q_ v ^ QxR).[a]; pose nlim v n := lim v (ab_ n).2.
   have lim0 a: lim 0 a = 0.
     rewrite /lim; suffices /eqP ->: q_ 0 == 0 by rewrite rmorph0 horner0.
-    by rewrite -(map_poly_eq0 QxzM) Dq /q1_ !raddf0.
+    by rewrite -(map_poly_eq0 Qxz) Dq /q1_ !raddf0.
   have limN v a: lim (- v) a = - lim v a.
     rewrite /lim; suffices ->: q_ (- v) = - q_ v by rewrite rmorphN hornerN.
-    by apply: (map_poly_inj QxzM); rewrite Dq /q1_ !raddfN /= Dq.
+    by apply: (map_poly_inj Qxz); rewrite Dq /q1_ !raddfN /= Dq.
   pose lim_nz n v := exists2 e, e > 0 & {in Iab_ n, forall a, e < `|lim v a| }.
   have /(all_sig_cond 0%N)[n_ nzP] v: v != 0 -> {n | lim_nz n v}.
     move=> nz_v; do [move/(_ v nz_v); rewrite -(coprimep_map QxR)] in coqp.
@@ -569,12 +569,12 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     apply/posP; exists (maxn m n), (d + e) => [|k]; first exact: addr_gt0.
     rewrite geq_max => /andP[le_mk le_nk]; rewrite /nlim /lim.
     have ->: q_ (v + w) = q_ v + q_ w.
-      by apply: (map_poly_inj QxzM); rewrite rmorphD /= !{1}Dq /q1_ !raddfD.
+      by apply: (map_poly_inj Qxz); rewrite rmorphD /= !{1}Dq /q1_ !raddfD.
     by rewrite rmorphD hornerD ltrD ?v_gtd ?w_gte.
   have posM v w: lt 0 v -> lt 0 w -> lt 0 (v * w).
     move=> /posP[m [d d_gt0 v_gtd]] /posP[n [e e_gt0 w_gte]].
     have /dvdpP[r /(canRL (subrK _))Dqvw]: p %| q_ (v * w) - q_ v * q_ w.
-      rewrite -(dvdp_map QxzM) rmorphB rmorphM /= !Dq -Dp minPoly_dvdp //.
+      rewrite -(dvdp_map Qxz) rmorphB rmorphM /= !Dq -Dp minPoly_dvdp //.
         by rewrite rpredB 1?rpredM ?Fadjoin_polyOver.
       by rewrite rootE !hornerE -!QyzE rmorphM subrr.
     have /(find_root ((d * e)^-1 *: r ^ QxR))[N ub_rp] := xab0.
@@ -599,7 +599,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   pose Ry : realFieldType := HB.pack (Q y) RyM.
   have QisArchi : Num.RealField_isArchimedean Ry.
     by constructor; apply: (@rat_algebraic_archimedean Ry _ alg_integral).
-  exists (HB.pack_for archiFieldType _ QisArchi); apply: [rmorphism of idfun].
+  exists (HB.pack_for archiFieldType _ QisArchi); apply: idfun.
 have some_realC: realC.
   suffices /all_sig[f QfK] x: {a | in_alg (Q 0) a = x}.
     have fA : additive f.

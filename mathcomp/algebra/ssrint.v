@@ -253,7 +253,7 @@ Variant int_spec (x : int) : int -> Type :=
 Lemma intP x : int_spec x x.
 Proof. by move: x=> [] [] *; rewrite ?NegzE; constructor. Qed.
 
-Definition oppzD := (@opprD [zmodType of int]).
+Definition oppzD := @opprD int.
 
 Lemma subzn (m n : nat) : (n <= m)%N -> m%:Z - n%:Z = (m - n)%N.
 Proof.
@@ -1713,8 +1713,8 @@ Module Export IntDist.
 (* This notation is supposed to work even if the ssrint library is not Imported.
    Since we can't rely on the CS database to contain the zmodule instance on
    int we put the instance by hand in the notation. *)
-Local Definition int_zsemimodType := [zsemimodType of int].
-Local Definition int_zmodType := [zmodType of int].
+Local Definition int_zsemimodType : zsemimodType := int.
+Local Definition int_zmodType : zmodType := int.
 Notation "m - n" :=
   (@GRing.add int_zsemimodType (m%N : int)
     (@GRing.opp int_zmodType (n%N : int))) : distn_scope.
@@ -1866,8 +1866,8 @@ Lemma Znat_def n : (n \is a Znat) = (0 <= n). Proof. by []. Qed.
 
 Lemma Znat_semiring_closed : semiring_closed Znat.
 Proof. by do 2?split => //; [apply: addr_ge0 | apply: mulr_ge0]. Qed.
-HB.instance Definition _ :=
-  GRing.isSemiringClosed.Build [ringType of int] Znat_pred Znat_semiring_closed.
+HB.instance Definition _ := GRing.isSemiringClosed.Build int Znat_pred
+  Znat_semiring_closed.
 
 Lemma ZnatP (m : int) : reflect (exists n : nat, m = n) (m \is a Znat).
 Proof. by apply: (iffP idP) => [|[n -> //]]; case: m => // n; exists n. Qed.

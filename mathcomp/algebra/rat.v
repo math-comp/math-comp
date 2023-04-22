@@ -798,8 +798,8 @@ split=> // _ _ /QintP[x ->] /QintP[y ->]; apply/QintP.
 by exists (x * y); rewrite -rmorphM.
 Qed.
 
-HB.instance Definition _ :=
-  GRing.isSubringClosed.Build [ringType of rat] Qint_pred Qint_subring_closed.
+HB.instance Definition _ := GRing.isSubringClosed.Build rat Qint_pred
+  Qint_subring_closed.
 
 End QintPred.
 Arguments Qint_pred _ /.
@@ -827,8 +827,8 @@ do 2?split; move=> // x y; rewrite !Qnat_def => /andP[xQ hx] /andP[yQ hy].
 by rewrite rpredM // mulr_ge0.
 Qed.
 
-HB.instance Definition _ :=
-  GRing.isSemiringClosed.Build [ringType of rat] Qnat_pred Qnat_semiring_closed.
+HB.instance Definition _ := GRing.isSemiringClosed.Build rat Qnat_pred
+  Qnat_semiring_closed.
 
 End QnatPred.
 Arguments Qnat_pred _ /.
