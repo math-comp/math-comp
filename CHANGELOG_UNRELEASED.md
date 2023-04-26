@@ -43,6 +43,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `subDnCA`, `subDnCAC`, `addnBC`, `addnCB`, `addBnAC`, `addBnCAC`,
     `addBnA`, `subBnAC`, `eqn_sub2lE`, `eqn_sub2rE`
 
+- in `ssrfun.v`
+  + lemmas `inj_omap`, `omap_id`, `eq_omap`, `omapK`
+
 ### Changed
 
 - in `order.v`
