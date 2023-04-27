@@ -69,3 +69,21 @@ Qed.
 (* this change of order has also been PRed to Coq PR 17249 *)
 Notation "@ 'sval'" := (@proj1_sig) (at level 10, format "@ 'sval'").
 Notation sval := (@proj1_sig _ _).
+
+(**********************)
+(* not yet backported *)
+(**********************)
+
+Lemma inj_omap {aT rT : Type} (f : aT -> rT) :
+  injective f -> injective (omap f).
+Proof. by move=> injf [?|] [?|] //= [/injf->]. Qed.
+
+Lemma omap_id {T : Type} (x : option T) : omap id x = x.
+Proof. by case: x. Qed.
+
+Lemma eq_omap {aT rT : Type} (f g : aT -> rT) : f =1 g -> omap f =1 omap g.
+Proof. by move=> Ef [?|] //=; rewrite Ef. Qed.
+
+Lemma omapK {aT rT : Type} (f : aT -> rT) (g : rT -> aT) :
+  cancel f g -> cancel (omap f) (omap g).
+Proof. by move=> fK [?|] //=; rewrite fK. Qed.
