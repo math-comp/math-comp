@@ -31,6 +31,7 @@ From mathcomp Require Import div ssralg countalg binomial.
 (*               p`_i == the coefficient of 'X^i in p; this is in fact just   *)
 (*                       the ring_scope notation generic seq-indexing using   *)
 (*                       nth 0%R, combined with the polyseq coercion.         *)
+(*                   *** The multi-rule coefE simplifies p`_i                 *)
 (*            coefp i == the linear function p |-> p`_i (self-exapanding).    *)
 (*             size p == 1 + the degree of p, or 0 if p = 0 (this is the      *)
 (*                       generic seq function combined with polyseq).         *)
@@ -2368,6 +2369,14 @@ by move=> tpq dpq; rewrite -[p](poly_take_drop n) -[q](poly_take_drop n) tpq dpq
 Qed.
 
 End Surgery.
+
+Definition coefE :=
+  (coef0, coef1, coefC, coefX, coefXn, coef_sumMXn,
+   coefZ, coefMC, coefCM, coefXnM, coefMXn, coefXM, coefMX, coefMNn, coefMn,
+   coefN, coefB, coefD, coef_even_poly, coef_odd_poly,
+   coef_take_poly, coef_drop_poly, coef_cons, coef_Poly, coef_poly,
+   coef_deriv, coef_nderivn, coef_derivn, coef_map, coef_sum,
+   coef_comp_poly_Xn, coef_comp_poly).
 
 Section PolynomialComRing.
 
