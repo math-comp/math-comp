@@ -726,7 +726,6 @@ Qed.
 Lemma filter_subset p s : [seq a <- s | p a] \subset s.
 Proof. by apply/subsetP=> x; rewrite mem_filter => /andP[]. Qed.
 
-
 Lemma subset_filter p s1 s2 :
   s1 \subset s2 -> [seq a <- s1 | p a] \subset [seq a <- s2 | p a].
 Proof.
