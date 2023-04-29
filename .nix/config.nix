@@ -73,6 +73,7 @@ with builtins; with (import <nixpkgs> {}).lib;
          mathcomp-doc.job = true;
        };
   in {
+    "coq-master".push-branches = [ "master" "hierarchy-builder" ];
     "coq-master".coqPackages = common-bundles // {
       coq.override.version = "master";
       bignums.override.version = "master";
@@ -82,9 +83,11 @@ with builtins; with (import <nixpkgs> {}).lib;
       interval.job = false;
       coqeal.job = false;
     };
+    "coq-8.17".push-branches = [ "master" "hierarchy-builder" ];
     "coq-8.17".coqPackages = common-bundles // {
       coq.override.version = "8.17";
     };
+    "coq-8.16".push-branches = [ "master" "hierarchy-builder" ];
     "coq-8.16".coqPackages = common-bundles // {
       coq.override.version = "8.16";
       deriving.job = false;  # currently not ported
