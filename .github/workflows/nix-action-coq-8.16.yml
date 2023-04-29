@@ -2349,3 +2349,4 @@ name: Nix CI for bundle coq-8.16
   push:
     branches:
     - master
+    - hierarchy-builder
