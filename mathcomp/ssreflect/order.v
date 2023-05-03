@@ -6,209 +6,254 @@ From mathcomp Require Import path fintype tuple bigop finset div prime finfun.
 From mathcomp Require Import finset.
 
 (******************************************************************************)
+(* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
+(*                                                                            *)
 (* This files defines types equipped with order relations.                    *)
 (*                                                                            *)
-(* Use one of the following modules implementing different theories:          *)
+(* * How to use orders in MathComp?                                           *)
+(* Use one of the following modules implementing different theories (all      *)
+(* located in the module Order):                                              *)
 (*   Order.LTheory: partially ordered types and lattices excluding complement *)
-(*                  and totality related theorems.                            *)
-(*   Order.CTheory: complemented lattices including Order.LTheory.            *)
-(*   Order.TTheory: totally ordered types including Order.LTheory.            *)
+(*                  and totality related theorems                             *)
+(*   Order.CTheory: complemented lattices including Order.LTheory             *)
+(*   Order.TTheory: totally ordered types including Order.LTheory             *)
 (*    Order.Theory: ordered types including all of the above theory modules   *)
-(*                                                                            *)
 (* To access the definitions, notations, and the theory from, say,            *)
 (* "Order.Xyz", insert "Import Order.Xyz." at the top of your scripts.        *)
 (* Notations are accessible by opening the scope "order_scope" bound to the   *)
 (* delimiting key "O".                                                        *)
 (*                                                                            *)
-(* We provide the following structures of ordered types                       *)
+(* * Interfaces                                                               *)
+(* Before providing the list of interfaces, a word is necessary about         *)
+(*"displays". Each generic partial order has, as a first argument, a display  *)
+(* to control the printing of notations. For example, when m and n are of     *)
+(* type natdvd (an alias of nat), (Order.le m n) is displayed m %| n; natdvd  *)
+(* is associated to the display dvd_display. Instantiating d with tt or an    *)
+(* unknown display will lead to a default display for notations. See below    *)
+(* for more details about displays.                                           *)
+(*                                                                            *)
+(* We provide the following interfaces for types equipped with an order:      *)
+(*                                                                            *)
 (*           porderType d == the type of partially ordered types              *)
+(*                           The HB class is called POrder.                   *)
 (*          latticeType d == the type of non-distributive lattices            *)
+(*                           The HB class is called Lattice.                  *)
 (*         bLatticeType d == latticeType with a bottom element                *)
+(*                           The HB class is called BLattice.                 *)
+(*         tLatticeType d == latticeType with a top element                   *)
+(*                           The HB class is called TLattice.                 *)
 (*        tbLatticeType d == latticeType with both a top and a bottom         *)
+(*                           The HB class is called TBLattice.                *)
 (*     distrLatticeType d == the type of distributive lattices                *)
+(*                           The HB class is called DistrLattice.             *)
 (*    bDistrLatticeType d == distrLatticeType with a bottom element           *)
-(*    tDistrLatticeType d == distrLatticeType with a top element              *)
+(*                           The HB class is called BDistrLattice.            *)
 (*   tbDistrLatticeType d == distrLatticeType with both a top and a bottom    *)
+(*                           The HB class is called TBDistrLattice.           *)
 (*   cbDistrLatticeType d == the type of sectionally complemented distributive*)
 (*                           lattices                                         *)
 (*                           (lattices with bottom and a difference operation)*)
+(*                           The HB class is called CBDistrLattice.           *)
 (*  ctbDistrLatticeType d == the type of complemented distributive lattices   *)
 (*                           (lattices with top, bottom, difference,          *)
 (*                            and complement)                                 *)
+(*                           The HB class is called CTBDistrLattice.          *)
 (*            orderType d == the type of totally ordered types                *)
+(*                           The HB class is called Total.                    *)
 (*        finPOrderType d == the type of partially ordered finite types       *)
+(*                           The HB class is called FinPOrder.                *)
 (*       finLatticeType d == the type of nonempty finite non-distributive     *)
 (*                           lattices                                         *)
+(*                           The HB class is called FinLattice.               *)
 (*  finDistrLatticeType d == the type of nonempty finite distributive lattices*)
+(*                           The HB class is called FinDistrLattice.          *)
 (* finCDistrLatticeType d == the type of nonempty finite complemented         *)
 (*                           distributive lattices                            *)
+(*                           The HB class is called FinCDistrLattice.         *)
 (*         finOrderType d == the type of nonempty totally ordered finite types*)
+(*                           The HB class is called FinTotal.                 *)
 (*                                                                            *)
-(* Each generic partial order and lattice operations symbols also has a first *)
-(* argument which is the display, the second which is the minimal structure   *)
-(* they operate on and then the operands. Here is the exhaustive list of all  *)
-(* such symbols for partial orders and lattices together with their default   *)
-(* display (as displayed by Check). We document their meaning in the          *)
-(* paragraph after the next.                                                  *)
+(* and their joins with subType:                                              *)
 (*                                                                            *)
-(* For porderType T                                                           *)
-(*   @Order.le          disp T     == <=%O    (in fun_scope)                  *)
-(*   @Order.lt          disp T     == <%O     (in fun_scope)                  *)
-(*   @Order.comparable  disp T     == >=<%O   (in fun_scope)                  *)
-(*   @Order.ge          disp T     == >=%O    (in fun_scope)                  *)
-(*   @Order.gt          disp T     == >%O     (in fun_scope)                  *)
-(*   @Order.leif        disp T     == <?=%O   (in fun_scope)                  *)
-(*   @Order.lteif       disp T     == <?<=%O  (in fun_scope)                  *)
-(* For latticeType T                                                          *)
-(*   @Order.meet        disp T x y == x `&` y (in order_scope)                *)
-(*   @Order.join        disp T x y == x `|` y (in order_scope)                *)
-(* For bLatticeType T                                                         *)
-(*   @Order.bottom      disp T     == 0       (in order_scope)                *)
-(* For tLatticeType T                                                         *)
-(*   @Order.top         disp T     == 1       (in order_scope)                *)
-(* For cbDistrLatticeType T                                                   *)
-(*   @Order.sub         disp T x y == x `|` y (in order_scope)                *)
-(* For ctbDistrLatticeType T                                                  *)
-(*   @Order.compl       disp T x   == ~` x    (in order_scope)                *)
+(*     subPOrder d T P d' == join of porderType d' and subType (P : pred T)   *)
+(*                           such that val is monotonic                       *)
+(*                           The HB class is called SubPOrder.                *)
+(* meetSubLattice d T P d' == join of latticeType d' and subType (P : pred T) *)
+(*                           such that val is monotonic and a morphism for    *)
+(*                           meet                                             *)
+(*                           The HB class is called MeetSubLattice.           *)
+(* joinSubLattice d T P d' == join of latticeType d' and subType (P : pred T) *)
+(*                           such that val is monotonic and a morphism for    *)
+(*                           join                                             *)
+(*                           The HB class is called JoinSubLattice.           *)
+(*    subLattice d T P d' == join of JoinSubLattice and MeetSubLattice        *)
+(*                           The HB class is called SubLattice.               *)
+(* bJoinSubLattice d T P d' == join of JoinSubLattice and BLattice            *)
+(*                           such that val is a morphism for \bot             *)
+(*                           The HB class is called BJoinSubLattice.          *)
+(* tMeetSubLattice d T P d' == join of MeetSubLattice and TLattice            *)
+(*                           such that val is a morphism for \top             *)
+(*                           The HB class is called TMeetSubLattice.          *)
+(*   bSubLattice d T P d' == join of SubLattice and BLattice                  *)
+(*                           such that val is a morphism for \bot             *)
+(*                           The HB class is called BSubLattice.              *)
+(*   tSubLattice d T P d' == join of SubLattice and TLattice                  *)
+(*                           such that val is a morphism for \top             *)
+(*                           The HB class is called BSubLattice.              *)
+(*      subOrder d T P d' == join of orderType d' and subLatticeType d T P d' *)
+(*                           The HB class is called SubOrder.                 *)
+(* subPOrderLattice d T P d' == join of SubPOrder and Lattice                 *)
+(*                           The HB class is called SubPOrderLattice.         *)
+(* subPOrderBLattice d T P d' == join of SubPOrder and BLattice               *)
+(*                           The HB class is called SubPOrderBLattice.        *)
+(* subPOrderTLattice d T P d' == join of SubPOrder and TLattice               *)
+(*                           The HB class is called SubPOrderTLattice.        *)
+(* subPOrderTBLattice d T P d' == join of SubPOrder and TBLattice             *)
+(*                           The HB class is called SubPOrderTBLattice.       *)
+(* meetSubBLattice d T P d' == join of MeetSubLattice and BLattice            *)
+(*                           The HB class is called MeetSubBLattice.          *)
+(* meetSubTLattice d T P d' == join of MeetSubLattice and TLattice            *)
+(*                           The HB class is called MeetSubTLattice.          *)
+(* meetSubTBLattice d T P d' == join of MeetSubLattice and TBLattice          *)
+(*                           The HB class is called MeetSubTBLattice.         *)
+(* joinSubBLattice d T P d' == join of JoinSubLattice and BLattice            *)
+(*                           The HB class is called JoinSubBLattice.          *)
+(* joinSubTLattice d T P d' == join of JoinSubLattice and TLattice            *)
+(*                           The HB class is called JoinSubTLattice.          *)
+(* joinSubTBLattice d T P d' == join of JoinSubLattice and TBLattice          *)
+(*                           The HB class is called JoinSubTBLattice.         *)
+(*   subBLattice d T P d' == join of SubLattice and BLattice                  *)
+(*                           The HB class is called SubBLattice.              *)
+(*   subTLattice d T P d' == join of SubLattice and TLattice                  *)
+(*                           The HB class is called SubTLattice.              *)
+(*  subTBLattice d T P d' == join of SubLattice and TBLattice                 *)
+(*                           The HB class is called SubTBLattice.             *)
+(* bJoinSubTLattice d T P d' == join of BJoinSubLattice and TBLattice         *)
+(*                           The HB class is called BJoinSubTLattice.         *)
+(* tMeetSubBLattice d T P d' == join of TMeetSubLattice and TBLattice         *)
+(*                           The HB class is called TMeetSubBLattice.         *)
+(*  bSubTLattice d T P d' == join of BSubLattice and TBLattice                *)
+(*                           The HB class is called BSubTLattice.             *)
+(*  tSubBLattice d T P d' == join of TSubLattice and TBLattice                *)
+(*                           The HB class is called TSubBLattice.             *)
+(* tbSubBLattice d T P d' == join of BSubLattice and TSubLattice              *)
+(*                           The HB class is called TBSubLattice.             *)
 (*                                                                            *)
-(* This first argument named either d, disp or display, of type unit,         *)
-(* configures the printing of notations.                                      *)
-(* Instantiating d with tt or an unknown key will lead to a default           *)
-(* display for notations, i.e. we have:                                       *)
+(* Morphisms between the above structures:                                    *)
+(*                                                                            *)
+(* OrderMorphism.type d T d' T' == monotonic function between the two porder  *)
+(*                        := {omorphism T -> T'}                              *)
+(* MeetLatticeMorphism.type d T d' T',                                        *)
+(* JoinLatticeMorphism.type d T d' T',                                        *)
+(* LatticeMorphism.type d T d' T' == monotonic function between two lattices  *)
+(*                           which are morphism for meet, join, and meet/join *)
+(*                           respectively                                     *)
+(* BLatticeMorphism.type d T d' T' := {blmorphism T -> T'},                   *)
+(* TLatticeMorphism.type d T d' T' := {tlmorphism T -> T'},                   *)
+(* TBLatticeMorphism.type d T d' T' := {tblmorphism T -> T'}                  *)
+(*                        == monotonic function between two lattices with     *)
+(*                           bottom/top which are morphism for bottom/top     *)
+(*                                                                            *)
+(* Closedness predicates for the algebraic structures:                        *)
+(*                                                                            *)
+(*  meetLatticeClosed d T == predicate closed under meet on T : latticeType d *)
+(*                           The HB class is MeetLatticeClosed.               *)
+(*  joinLatticeClosed d T == predicate closed under join on T : latticeType d *)
+(*                           The HB class is JoinLatticeClosed.               *)
+(*      latticeClosed d T == predicate closed under meet and join             *)
+(*                           The HB class is JoinLatticeClosed.               *)
+(*     bLatticeClosed d T == predicate that contains bottom                   *)
+(*                           The HB class is BLatticeClosed.                  *)
+(*     tLatticeClosed d T == predicate that contains top                      *)
+(*                           The HB class is TLatticeClosed.                  *)
+(*    tbLatticeClosed d T == predicate that contains top and bottom           *)
+(*                           the HB class ie TBLatticeClosed.                 *)
+(* bJoinLatticeClosed d T == predicate that contains bottom and is closed     *)
+(*                           under join                                       *)
+(*                           The HB class is BJoinLatticeClosed.              *)
+(* tMeetLatticeClosed d T == predicate that contains top and is closed under  *)
+(*                           meet                                             *)
+(*                           The HB class is TMeetLatticeClosed.              *)
+(*                                                                            *)
+(* * Useful lemmas:                                                           *)
+(* On orderType, leP ltP ltgtP are the three main lemmas for case analysis.   *)
+(* On porderType, one may use comparableP, comparable_leP, comparable_ltP,    *)
+(* and comparable_ltgtP, which are the four main lemmas for case analysis.    *)
+(*                                                                            *)
 (* For x, y of type T, where T is canonically a porderType d:                 *)
-(*            x <= y <-> x is less than or equal to y.                        *)
-(*             x < y <-> x is less than y (:= (y != x) && (x <= y)).          *)
+(*            x <= y <-> x is less than or equal to y                         *)
+(*             x < y <-> x is less than y (:= (y != x) && (x <= y))           *)
 (*           min x y <-> if x < y then x else y                               *)
 (*           max x y <-> if x < y then y else x                               *)
-(*            x >= y <-> x is greater than or equal to y (:= y <= x).         *)
-(*             x > y <-> x is greater than y (:= y < x).                      *)
-(*   x <= y ?= iff C <-> x is less than y, or equal iff C is true.            *)
-(*    x < y ?<= if C <-> x is smaller than y, and strictly if C is false.     *)
-(*           x >=< y <-> x and y are comparable (:= (x <= y) || (y <= x)).    *)
-(*            x >< y <-> x and y are incomparable (:= ~~ x >=< y).            *)
+(*            x >= y <-> x is greater than or equal to y (:= y <= x)          *)
+(*             x > y <-> x is greater than y (:= y < x)                       *)
+(*   x <= y ?= iff C <-> x is less than y, or equal iff C is true             *)
+(*    x < y ?<= if C <-> x is smaller than y, and strictly if C is false      *)
+(*           x >=< y <-> x and y are comparable (:= (x <= y) || (y <= x))     *)
+(*            x >< y <-> x and y are incomparable (:= ~~ x >=< y)             *)
 (*          f \min g <-> the function x |-> Order.min (f x) (g x);            *)
-(*                       f \min g simplifies on application.                  *)
+(*                       f \min g simplifies on application                   *)
 (*          f \max g <-> the function x |-> Order.max (f x) (g x);            *)
-(*                       f \max g simplifies on application.                  *)
+(*                       f \max g simplifies on application                   *)
+(*                                                                            *)
 (* For x, y of type T, where T is canonically a latticeType d:                *)
-(*           x `&` y == the meet of x and y.                                  *)
-(*           x `|` y == the join of x and y.                                  *)
+(*           x `&` y == the meet of x and y                                   *)
+(*           x `|` y == the join of x and y                                   *)
 (* In a type T, where T is canonically a bLatticeType d:                      *)
-(*                 0 == the bottom element.                                   *)
-(*   \join_<range> e == iterated join of a lattice with a bottom.             *)
+(*                 0 == the bottom element                                    *)
+(*   \join_<range> e == iterated join of a lattice with a bottom              *)
 (* In a type T, where T is canonically a tbLatticeType d:                     *)
-(*                 1 == the top element.                                      *)
-(*   \meet_<range> e == iterated meet of a lattice with a top.                *)
+(*                 1 == the top element                                       *)
+(*   \meet_<range> e == iterated meet of a lattice with a top                 *)
+(*                                                                            *)
 (* For x, y of type T, where T is canonically a cbDistrLatticeType d:         *)
-(*           x `\` y == the (sectional) complement of y in [0, x].            *)
+(*           x `\` y == the (sectional) complement of y in [0, x]             *)
+(*                                                                            *)
 (* For x of type T, where T is canonically a ctbDistrLatticeType d:           *)
-(*              ~` x == the complement of x in [0, 1].                        *)
+(*              ~` x == the complement of x in [0, 1]                         *)
 (*                                                                            *)
 (* There are three distinct uses of the symbols                               *)
 (*   <, <=, >, >=, _ <= _ ?= iff _, >=<, and ><                               *)
-(*   in the default display:                                                  *)
-(* they can be 0-ary, unary (prefix), and binary (infix).                     *)
+(* in the default display: they can be 0-ary, unary (prefix), and binary      *)
+(* (infix).                                                                   *)
 (* 0. <%O, <=%O, >%O, >=%O, <?=%O, >=<%O, and ><%O stand respectively for     *)
 (*    lt, le, gt, ge, leif (_ <= _ ?= iff _), comparable, and incomparable.   *)
 (* 1. (< x),  (<= x), (> x), (>= x), (>=< x), and (>< x) stand respectively   *)
 (*    for (>%O x), (>=%O x), (<%O x), (<=%O x), (>=<%O x), and (><%O x).      *)
 (*    So (< x) is a predicate characterizing elements smaller than x.         *)
 (* 2. (x < y), (x <= y), ... mean what they are expected to.                  *)
-(*  These conventions are compatible with Haskell's,                          *)
-(*   where ((< y) x) = (x < y) = ((<) x y),                                   *)
-(*   except that we write <%O instead of (<).                                 *)
+(*    These conventions are compatible with Haskell's,                        *)
+(*    where ((< y) x) = (x < y) = ((<) x y),                                  *)
+(*    except that we write <%O instead of (<).                                *)
 (*                                                                            *)
-(* Alternative notation displays can be defined by :                          *)
-(* 1. declaring a new opaque definition of type unit. Using the idiom         *)
-(*    `Lemma my_display : unit. Proof. exact: tt. Qed.`                       *)
-(* 2. using this symbol to tag canonical porderType structures using          *)
-(*    `Canonical my_porderType := POrderType my_display my_type my_mixin`,    *)
-(* 3. declaring notations for the main operations of this library, by         *)
-(*    setting the first argument of the definition to the display, e.g.       *)
-(*    `Notation my_syndef_le x y := @Order.le my_display _ x y.` or           *)
-(*    `Notation "x <=< y" := @Order.lt my_display _ x y (at level ...).`      *)
-(*    Non overloaded notations will default to the default display.           *)
+(* Like each generic partial order, lattice operations symbols also have a    *)
+(* first argument which is the display (ranged over by d of type unit),       *)
+(* the second which is the minimal structure they operate on and then the     *)
+(* operands.  Here is the exhaustive l list of all such symbols for partial   *)
+(* orders and lattices together with their default printed notation (as       *)
+(* displayed by Check).                                                       *)
 (*                                                                            *)
-(* One may use displays either for convenience or to disambiguate between     *)
-(* different structures defined on "copies" of a type (as explained below.)   *)
-(* We provide the following "copies" of types,                                *)
-(* the first one is a *documented example*                                    *)
-(*            natdvd := nat                                                   *)
-(*                   == a "copy" of nat which is canonically ordered using    *)
-(*                      divisibility predicate dvdn.                          *)
-(*                      Notation %|, %<|, gcd, lcm are used instead of        *)
-(*                      <=, <, meet and join.                                 *)
-(*              T^d  := dual T,                                               *)
-(*                      where dual is a new definition for (fun T => T)       *)
-(*                   == a "copy" of T, such that if T is canonically ordered, *)
-(*                      then T^d is canonically ordered with the dual         *)
-(*                      order, and displayed with an extra ^d in the notation *)
-(*                      i.e. <=^d, <^d, >=<^d, ><^d, `&`^d, `|`^d are         *)
-(*                      used and displayed instead of                         *)
-(*                      <=, <, >=<, ><, `&`, `|`                              *)
-(*     T *prod[d] T' := T * T'                                                *)
-(*                   == a "copy" of the cartesian product such that,          *)
-(*                      if T and T' are canonically ordered,                  *)
-(*                      then T *prod[d] T' is canonically ordered in product  *)
-(*                      order.                                                *)
-(*                      i.e. (x1, x2) <= (y1, y2) =                           *)
-(*                             (x1 <= y1) && (x2 <= y2),                      *)
-(*                      and displayed in display d                            *)
-(*           T *p T' := T *prod[prod_display] T'                              *)
-(*                      where prod_display adds an extra ^p to all notations  *)
-(*     T *lexi[d] T' := T * T'                                                *)
-(*                   == a "copy" of the cartesian product such that,          *)
-(*                      if T and T' are canonically ordered,                  *)
-(*                      then T *lexi[d] T' is canonically ordered in          *)
-(*                      lexicographic order                                   *)
-(*                      i.e. (x1, x2) <= (y1, y2) =                           *)
-(*                             (x1 <= y1) && ((x1 >= y1) ==> (x2 <= y2))      *)
-(*                      and  (x1, x2) < (y1, y2) =                            *)
-(*                             (x1 <= y1) && ((x1 >= y1) ==> (x2 < y2))       *)
-(*                      and displayed in display d                            *)
-(*           T *l T' := T *lexi[lexi_display] T'                              *)
-(*                      where lexi_display adds an extra ^l to all notations  *)
-(*  seqprod_with d T := seq T                                                 *)
-(*                   == a "copy" of seq, such that if T is canonically        *)
-(*                      ordered, then seqprod_with d T is canonically ordered *)
-(*                      in product order i.e.                                 *)
-(*                      [:: x1, .., xn] <= [y1, .., yn] =                     *)
-(*                        (x1 <= y1) && ... && (xn <= yn)                     *)
-(*                      and displayed in display d                            *)
-(* n.-tupleprod[d] T == same with n.tuple T                                   *)
-(*         seqprod T := seqprod_with prod_display T                           *)
-(*    n.-tupleprod T := n.-tuple[prod_display] T                              *)
-(*  seqlexi_with d T := seq T                                                 *)
-(*                   == a "copy" of seq, such that if T is canonically        *)
-(*                      ordered, then seqprod_with d T is canonically ordered *)
-(*                      in lexicographic order i.e.                           *)
-(*                      [:: x1, .., xn] <= [y1, .., yn] =                     *)
-(*                        (x1 <= x2) && ((x1 >= y1) ==> ((x2 <= y2) && ...))  *)
-(*                      and displayed in display d                            *)
-(* n.-tuplelexi[d] T == same with n.tuple T                                   *)
-(*         seqlexi T := lexiprod_with lexi_display T                          *)
-(*    n.-tuplelexi T := n.-tuple[lexi_display] T                              *)
-(*     {subset[d] T} := {set T}                                               *)
-(*                   == a "copy" of set which is canonically ordered by the   *)
-(*                      subset order and displayed in display d               *)
-(*        {subset T} := {subset[subset_display] T}                            *)
+(* For porderType T (in fun_scope):                                           *)
+(*   <=%O    == @Order.le          d T                                        *)
+(*   <%O     == @Order.lt          d T                                        *)
+(*   >=<%O   == @Order.comparable  d T                                        *)
+(*   >=%O    == @Order.ge          d T                                        *)
+(*   >%O     == @Order.gt          d T                                        *)
+(*   <?=%O   == @Order.leif        d T                                        *)
+(*   <?<=%O  == @Order.lteif       d T                                        *)
+(* For latticeType T (in order_scope):                                        *)
+(*   x `&` y == @Order.meet        d T x y                                    *)
+(*   x `|` y == @Order.join        d T x y                                    *)
+(* For bLatticeType T (in order_scope):                                       *)
+(*   0       == @Order.bottom      d T                                        *)
+(* For tLatticeType T (in order_scope):                                       *)
+(*   1       == @Order.top         d T                                        *)
+(* For cbDistrLatticeType T (in order_scope):                                 *)
+(*   x `|` y == @Order.sub         d T x y                                    *)
+(* For ctbDistrLatticeType T (in order_scope):                                *)
+(*   ~` x    == @Order.compl       d T x                                      *)
 (*                                                                            *)
-(* Beware that canonical structure inference will not try to find the copy of *)
-(* the structures that fits the display one mentioned, but will rather        *)
-(* determine which canonical structure and display to use depending on the    *)
-(* copy of the type one provided. In this sense they are merely displays      *)
-(* to inform the user of what the inference did, rather than additional       *)
-(* input for the inference.                                                   *)
-(*                                                                            *)
-(* Existing displays are either dual_display d (where d is a display),        *)
-(* dvd_display (both explained above), ring_display (from algebra/ssrnum      *)
-(* to change the scope of the usual notations to ring_scope). We also provide *)
-(* lexi_display and prod_display for lexicographic and product order          *)
-(* respectively.                                                              *)
-(* The default display is tt and users can define their own as explained      *)
-(* above.                                                                     *)
-(*                                                                            *)
-(* For porderType we provide the following operations                         *)
+(* For porderType we provide the following operations:                        *)
 (*   [arg min_(i < i0 | P) M] == a value i : T minimizing M : R, subject to   *)
 (*                      the condition P (i may appear in P and M), and        *)
 (*                      provided P holds for i0.                              *)
@@ -227,207 +272,148 @@ From mathcomp Require Import finset.
 (*      ltLHS := (X in (X < _)%O)%pattern                                     *)
 (*      ltRHS := (X in (_ < X)%O)%pattern                                     *)
 (*                                                                            *)
-(* In order to build the above structures, one must provide the appropriate   *)
-(* factory instance to the following structure constructors. The list of      *)
-(* possible factories is indicated after each constructor. Each factory is    *)
-(* documented in the next paragraph.                                          *)
-(* NB: Since each mixim_of record of structure in this library is an internal *)
-(* interface that is not designed to be used by users directly, one should    *)
-(* not build structure instances from their Mixin constructors.               *)
+(* One may use displays either for convenience or to disambiguate between     *)
+(* different structures defined on "copies" of a type (as explained below).   *)
+(* We provide the following "copies" of types:                                *)
+(*            natdvd := nat                                                   *)
+(*                   == a "copy" of nat which is canonically ordered using    *)
+(*                      divisibility predicate dvdn                           *)
+(*                      Notation %|, %<|, gcd, lcm are used instead of        *)
+(*                      <=, <, meet and join.                                 *)
+(*              T^d  := dual T,                                               *)
+(*                      where dual is a new definition for (fun T => T)       *)
+(*                   == a "copy" of T, such that if T is canonically ordered, *)
+(*                      then T^d is canonically ordered with the dual         *)
+(*                      order, and displayed with an extra ^d in the notation *)
+(*                      i.e. <=^d, <^d, >=<^d, ><^d, `&`^d, `|`^d are         *)
+(*                      used and displayed instead of                         *)
+(*                      <=, <, >=<, ><, `&`, `|`                              *)
+(*     T *prod[d] T' := T * T'                                                *)
+(*                   == a "copy" of the cartesian product such that,          *)
+(*                      if T and T' are canonically ordered,                  *)
+(*                      then T *prod[d] T' is canonically ordered in product  *)
+(*                      order, i.e.,                                          *)
+(*                      (x1, x2) <= (y1, y2) = (x1 <= y1) && (x2 <= y2),      *)
+(*                      and displayed in display d                            *)
+(*           T *p T' := T *prod[prod_display] T'                              *)
+(*                      where prod_display adds an extra ^p to all notations  *)
+(*     T *lexi[d] T' := T * T'                                                *)
+(*                   == a "copy" of the cartesian product such that,          *)
+(*                      if T and T' are canonically ordered,                  *)
+(*                      then T *lexi[d] T' is canonically ordered in          *)
+(*                      lexicographic order,                                  *)
+(*                      i.e., (x1, x2) <= (y1, y2) =                          *)
+(*                              (x1 <= y1) && ((x1 >= y1) ==> (x2 <= y2))     *)
+(*                      and   (x1, x2) < (y1, y2) =                           *)
+(*                              (x1 <= y1) && ((x1 >= y1) ==> (x2 < y2))      *)
+(*                      and displayed in display d                            *)
+(*           T *l T' := T *lexi[lexi_display] T'                              *)
+(*                      where lexi_display adds an extra ^l to all notations  *)
+(*  seqprod_with d T := seq T                                                 *)
+(*                   == a "copy" of seq, such that if T is canonically        *)
+(*                      ordered, then seqprod_with d T is canonically ordered *)
+(*                      in product order, i.e.,                               *)
+(*                      [:: x1, .., xn] <= [y1, .., yn] =                     *)
+(*                        (x1 <= y1) && ... && (xn <= yn)                     *)
+(*                      and displayed in display d                            *)
+(* n.-tupleprod[d] T == same with n.tuple T                                   *)
+(*         seqprod T := seqprod_with prod_display T                           *)
+(*    n.-tupleprod T := n.-tuple[prod_display] T                              *)
+(*  seqlexi_with d T := seq T                                                 *)
+(*                   == a "copy" of seq, such that if T is canonically        *)
+(*                      ordered, then seqprod_with d T is canonically ordered *)
+(*                      in lexicographic order, i.e.,                         *)
+(*                      [:: x1, .., xn] <= [y1, .., yn] =                     *)
+(*                        (x1 <= x2) && ((x1 >= y1) ==> ((x2 <= y2) && ...))  *)
+(*                      and displayed in display d                            *)
+(* n.-tuplelexi[d] T == same with n.tuple T                                   *)
+(*         seqlexi T := lexiprod_with lexi_display T                          *)
+(*    n.-tuplelexi T := n.-tuple[lexi_display] T                              *)
+(*     {subset[d] T} := {set T}                                               *)
+(*                   == a "copy" of set which is canonically ordered by the   *)
+(*                      subset order and displayed in display d               *)
+(*        {subset T} := {subset[subset_display] T}                            *)
 (*                                                                            *)
-(* POrderType disp T pord_mixin                                               *)
-(*                  == builds a porderType from a canonical choiceType        *)
-(*                     instance of T where pord_mixin can be of types         *)
-(*                       lePOrderMixin, ltPOrderMixin, meetJoinMixin,         *)
-(*                       leOrderMixin, or ltOrderMixin                        *)
-(*                     or computed using PcanPOrderMixin or CanPOrderMixin.   *)
-(*                     disp is a display as explained above                   *)
+(* Existing displays are either dual_display d (where d is a display),        *)
+(* dvd_display, ring_display (from algebra/ssrnum.v to change the scope of    *)
+(* the usual notations to ring_scope). We also provide lexi_display and       *)
+(* prod_display for lexicographic and product order respectively.             *)
 (*                                                                            *)
-(* LatticeType T lat_mixin                                                    *)
-(*                  == builds a latticeType from a porderType where lat_mixin *)
-(*                     can be of types                                        *)
-(*                       latticeMixin, distrLatticePOrderMixin,               *)
-(*                       totalPOrderMixin, meetJoinMixin, leOrderMixin, or    *)
-(*                       ltOrderMixin                                         *)
-(*                     or computed using IsoLatticeMixin.                     *)
+(* Beware of the asymmetry of canonical structure inference. Canonical        *)
+(* structure inference makes it possible to infer the display associated to a *)
+(* type (or a named copy of a type) from the name. However, it does not help  *)
+(* finding the named copy when the display is provided. In this sense         *)
+(* displays are merely used to inform the user and the notation mechanism of  *)
+(* what the inference did; they are not additional input for the inference.   *)
 (*                                                                            *)
-(* BLatticeType T bot_mixin                                                   *)
-(*                  == builds a bLatticeType from a latticeType and bottom    *)
-(*                     where bot_mixin is of type bottomMixin.                *)
+(* Alternative notation displays can be defined by :                          *)
+(* 1. declaring a new opaque definition of type unit. Using the idiom         *)
+(*    `Fact my_display : unit. Proof. exact: tt. Qed.`                        *)
+(* 2. using this symbol to tag canonical porderType structures using          *)
+(*    `HB.instance Definition _ := isPOrdered.Build my_display my_type ...`,  *)
+(* 3. declaring notations for the main operations of this library, by         *)
+(*    setting the first argument of the definition to the display, e.g.       *)
+(*    `Notation my_syndef_le x y := @Order.le my_display _ x y.` or           *)
+(*    `Notation "x <=< y" := @Order.lt my_display _ x y (at level ...).`      *)
+(*    Non overloaded notations will default to the default display.           *)
+(* We suggest the user to refer to the example of natdvd (further explained   *)
+(* below) as guide line example to add their own displays.                    *)
 (*                                                                            *)
-(* TBLatticeType T top_mixin                                                  *)
-(*                  == builds a tbLatticeType from a bLatticeType and top     *)
-(*                     where top_mixin is of type topMixin.                   *)
+(* The following notations are provided to build substructures:               *)
+(* [SubChoice_isSubPOrder of U by <: with disp] ==                            *)
+(* [SubChoice_isSubPOrder of U by <:] == porderType mixin for a subType       *)
+(*                          whose base type is a porderType                   *)
+(* [SubPOrder_isSubLattice of U by <: with disp] ==                           *)
+(* [SubPOrder_isSubLattice of U by <:] ==                                     *)
+(* [SubChoice_isSubLattice of U by <: with disp] ==                           *)
+(* [SubChoice_isSubLattice of U by <:] == latticeType mixin for a subType     *)
+(*                          whose base type is a latticeType and whose        *)
+(*                          predicate's is a latticeClosed                    *)
+(* [SubPOrder_isBSubLattice of U by <: with disp] ==                          *)
+(* [SubPOrder_isBSubLattice of U by <:] ==                                    *)
+(* [SubChoice_isBSubLattice of U by <: with disp] ==                          *)
+(* [SubChoice_isBSubLattice of U by <:] == blatticeType mixin for a subType   *)
+(*                          whose base type is a blatticeType and whose       *)
+(*                          predicate's is both a latticeClosed               *)
+(*                          and a bLatticeClosed                              *)
+(* [SubPOrder_isTSubLattice of U by <: with disp] ==                          *)
+(* [SubPOrder_isTSubLattice of U by <:] ==                                    *)
+(* [SubChoice_isTSubLattice of U by <: with disp] ==                          *)
+(* [SubChoice_isTSubLattice of U by <:] == tlatticeType mixin for a subType   *)
+(*                          whose base type is a tlatticeType and whose       *)
+(*                          predicate's is both a latticeClosed               *)
+(*                          and a tLatticeClosed                              *)
+(* [SubPOrder_isTBSubLattice of U by <: with disp] ==                         *)
+(* [SubPOrder_isTBSubLattice of U by <:] ==                                   *)
+(* [SubChoice_isTBSubLattice of U by <: with disp] ==                         *)
+(* [SubChoice_isTBSubLattice of U by <:] == tblatticeType mixin for a subType *)
+(*                          whose base type is a tblatticeType and whose      *)
+(*                          predicate's is both a latticeClosed               *)
+(*                          and a tbLatticeClosed                             *)
+(* [SubLattice_isSubOrder of U by <: with disp] ==                            *)
+(* [SubLattice_isSubOrder of U by <:] ==                                      *)
+(* [SubChoice_isSubOrder of U by <: with disp] ==                             *)
+(* [SubChoice_isSubOrder of U by <:] == orderType mixin for a subType whose   *)
+(*                          base type is an orderType                         *)
+(*   [POrder of U by <:] == porderType mixin for a subType whose base type is *)
+(*                          a porderType                                      *)
+(*    [Order of U by <:] == orderType mixin for a subType whose base type is  *)
+(*                          an orderType                                      *)
 (*                                                                            *)
-(* DistrLatticeType T lat_mixin                                               *)
-(*                  == builds a distrLatticeType from a porderType where      *)
-(*                     lat_mixin can be of types                              *)
-(*                       distrLatticeMixin, distrLatticePOrderMixin,          *)
-(*                       totalLatticeMixin, totalPOrderMixin, meetJoinMixin,  *)
-(*                       leOrderMixin, or ltOrderMixin                        *)
-(*                     or computed using IsoLatticeMixin.                     *)
-(*                                                                            *)
-(* CBDistrLatticeType T sub_mixin                                             *)
-(*                  == builds a cbDistrLatticeType from a bDistrLatticeType   *)
-(*                     and a difference operation where sub_mixin is of type  *)
-(*                     cbDistrLatticeMixin.                                   *)
-(*                                                                            *)
-(* CTBDistrLatticeType T compl_mixin                                          *)
-(*                  == builds a ctbDistrLatticeType from a tbDistrLatticeType *)
-(*                     and a complement operation where compl_mixin is of     *)
-(*                     type ctbDistrLatticeMixin.                             *)
-(*                                                                            *)
-(* OrderType T ord_mixin                                                      *)
-(*                  == builds an orderType from a distrLatticeType where      *)
-(*                     ord_mixin can be of types                              *)
-(*                       totalOrderMixin, totalPOrderMixin, totalLatticeMixin,*)
-(*                       leOrderMixin, or ltOrderMixin                        *)
-(*                     or computed using MonoTotalMixin.                      *)
-(*                                                                            *)
-(* Additionally:                                                              *)
-(* - [porderType of _] ... notations are available to recover structures on   *)
-(*    "copies" of the types, as in eqType, choiceType, ssralg...              *)
-(* - [finPOrderType of _] ... notations to compute joins between finite types *)
-(*                            and ordered types                               *)
-(*                                                                            *)
-(* List of possible factories:                                                *)
-(*                                                                            *)
-(* - lePOrderMixin == on a choiceType, takes le, lt,                          *)
-(*                    reflexivity, antisymmetry and transitivity of le.       *)
-(*                    (can build:  porderType)                                *)
-(*                                                                            *)
-(* - ltPOrderMixin == on a choiceType, takes le, lt,                          *)
-(*                    irreflexivity and transitivity of lt.                   *)
-(*                    (can build:  porderType)                                *)
-(*                                                                            *)
-(* - latticeMixin == on a porderType, takes meet, join,                       *)
-(*                   commutativity and associativity of meet and join, and    *)
-(*                   some absorption laws.                                    *)
-(*                   (can build:  latticeType)                                *)
-(*                                                                            *)
-(* - distrLatticeMixin ==                                                     *)
-(*                   on a latticeType, takes distributivity of meet over join.*)
-(*                   (can build:  distrLatticeType)                           *)
-(*                                                                            *)
-(* - distrLatticePOrderMixin == on a porderType, takes meet, join,            *)
-(*                   commutativity and associativity of meet and join, and    *)
-(*                   the absorption and distributive laws.                    *)
-(*                   (can build:  latticeType, distrLatticeType)              *)
-(*                                                                            *)
-(* - meetJoinMixin == on a choiceType, takes le, lt, meet, join,              *)
-(*                    commutativity and associativity of meet and join,       *)
-(*                    the absorption and distributive laws, and               *)
-(*                    idempotence of meet.                                    *)
-(*                    (can build:  porderType, latticeType, distrLatticeType) *)
-(*                                                                            *)
-(* - meetJoinLeMixin == on a porderType, takes meet, join, and a proof that   *)
-(*                    those are respectvely the greatest lower bound and the  *)
-(*                    least upper bound.                                      *)
-(*                    (can build: latticeType)                                *)
-(*                                                                            *)
-(* - leOrderMixin == on a choiceType, takes le, lt, meet, join,               *)
-(*                   antisymmetry, transitivity and totality of le.           *)
-(*                   (can build:  porderType, latticeType, distrLatticeType,  *)
-(*                                orderType)                                  *)
-(*                                                                            *)
-(* - ltOrderMixin == on a choiceType, takes le, lt, meet, join,               *)
-(*                   irreflexivity, transitivity and totality of lt.          *)
-(*                   (can build:  porderType, latticeType, distrLatticeType,  *)
-(*                                orderType)                                  *)
-(*                                                                            *)
-(* - totalPOrderMixin == on a porderType T, totality of the order of T        *)
-(*                    := total (<=%O : rel T)                                 *)
-(*                   (can build: latticeType, distrLatticeType, orderType)    *)
-(*                                                                            *)
-(* - totalLatticeMixin == on a latticeType T, totality of the order of T      *)
-(*                    := total (<=%O : rel T)                                 *)
-(*                   (can build distrLatticeType, orderType)                  *)
-(*                                                                            *)
-(* - totalOrderMixin == on a distrLatticeType T, totality of the order of T   *)
-(*                    := total (<=%O : rel T)                                 *)
-(*                   (can build: orderType)                                   *)
-(*    NB: the above three mixins are kept separate from each other (even      *)
-(*        though they are convertible), in order to avoid ambiguous coercion  *)
-(*        paths.                                                              *)
-(*                                                                            *)
-(* - bottomMixin, topMixin, cbDistrLatticeMixin, ctbDistrLatticeMixin         *)
-(*                == mixins with one extra operation                          *)
-(*                   (respectively bottom, top, difference, and complement)   *)
-(*                                                                            *)
-(* Additionally:                                                              *)
-(* - [porderMixin of T by <:] creates a porderMixin by subtyping.             *)
-(* - [totalOrderMixin of T by <:] creates the associated totalOrderMixin.     *)
-(* - PCanPOrderMixin, CanPOrderMixin create porderMixin from cancellations    *)
-(* - MonoTotalMixin creates a totalPOrderMixin from monotonicity              *)
-(* - IsoLatticeMixin creates a distrLatticeMixin from an ordered structure    *)
-(*   isomorphism (i.e., cancel f f', cancel f' f, {mono f : x y / x <= y})    *)
-(*                                                                            *)
-(* List of "big pack" notations:                                              *)
-(* - DistrLatticeOfChoiceType builds a distrLatticeType from a choiceType and *)
-(*   a meetJoinMixin.                                                         *)
-(* - DistrLatticeOfPOrderType builds a distrLatticeType from a porderType and *)
-(*   a distrLatticePOrderMixin.                                               *)
-(* - OrderOfChoiceType builds an orderType from a choiceType, and a           *)
-(*   leOrderMixin or a ltOrderMixin.                                          *)
-(* - OrderOfPOrder builds an orderType from a porderType and a                *)
-(*   totalPOrderMixin.                                                        *)
-(* - OrderOfLattice builds an orderType from a latticeType and a              *)
-(*   totalLatticeMixin.                                                       *)
-(* NB: These big pack notations should be used only to construct instances on *)
-(*     the fly, e.g., in the middle of a proof, and should not be used to     *)
-(*     declare canonical instances. See field/algebraics_fundamentals.v for   *)
-(*     an example usage.                                                      *)
-(*                                                                            *)
-(* We provide the following canonical instances of ordered types              *)
-(* - all possible structures on bool                                          *)
-(* - porderType, latticeType, distrLatticeType, orderType and bLatticeType    *)
-(*   on nat for the leq order                                                 *)
-(* - porderType, latticeType, distrLatticeType, orderType and finPOrderType   *)
-(*   on 'I_n and bLatticeType, tbLatticeType, bDistrLatticeType,              *)
-(*   tbDistrLatticeType, finLatticeType, finDistrLatticeType and finOrderType *)
-(*   on 'I_n.+1 (to guarantee it is nonempty).                                *)
-(* - porderType, latticeType, distrLatticeType, bLatticeType, tbLatticeType,  *)
-(*   on nat for the dvdn order, where meet and join are respectively gcdn and *)
-(*   lcmn                                                                     *)
-(* - porderType, latticeType, distrLatticeType, orderType, bLatticeType,      *)
-(*   tbLatticeType, cbDistrLatticeType, ctbDistrLatticeType                   *)
-(*   on T *prod[disp] T' a "copy" of T * T'                                   *)
-(*     using product order (and T *p T' its specialization to prod_display)   *)
-(* - porderType, latticeType, distrLatticeType, and orderType, on             *)
-(*     T *lexi[disp] T' another "copy" of T * T', with lexicographic ordering *)
-(*     (and T *l T' its specialization to lexi_display)                       *)
-(* - porderType, latticeType, distrLatticeType, and orderType, on             *)
-(*     {t : T & T' x} with lexicographic ordering                             *)
-(* - porderType, latticeType, distrLatticeType, orderType, bLatticeType,      *)
-(*   tbLatticeType, cbDistrLatticeType, ctbDistrLatticeType                   *)
-(*   on seqprod_with disp T a "copy" of seq T                                 *)
-(*     using product order (and seqprod T' its specialization to prod_display)*)
-(* - porderType, latticeType, distrLatticeType, and orderType, on             *)
-(*     seqlexi_with disp T another "copy" of seq T, with lexicographic        *)
-(*     ordering (and seqlexi T its specialization to lexi_display)            *)
-(* - porderType, latticeType, distrLatticeType, orderType, bLatticeType,      *)
-(*   tbLatticeType, cbDistrLatticeType, ctbDistrLatticeType                   *)
-(*   on n.-tupleprod[disp] a "copy" of n.-tuple T                             *)
-(*     using product order (and n.-tupleprod T its specialization             *)
-(*     to prod_display)                                                       *)
-(* - porderType, latticeType, distrLatticeType, and orderType, on             *)
-(*     n.-tuplelexi[d] T another "copy" of n.-tuple T, with lexicographic     *)
-(*     ordering (and n.-tuplelexi T its specialization to lexi_display)       *)
-(* - porderType, latticeType, distrLatticeType, orderType, bLatticeType,      *)
-(*   tbLatticeType, cbDistrLatticeType, ctbDistrLatticeType                   *)
-(*   on {subset[disp] T} a "copy" of {set T} using subset order               *)
-(*     (and {subset T} its specialization to subset_display)                  *)
-(* and all possible finite type instances                                     *)
+(* We provide expected instances of ordered types for bool, nat (for leq and  *)
+(* and dvdn), 'I_n, 'I_n.+1 (with a top and bottom), nat for dvdn,            *)
+(* T *prod[disp] T', T *lexi[disp] T', {t : T & T' x} (with lexicographic     *)
+(* ordering), seqprod_with d T (using product order), seqlexi_with d T        *)
+(* (with lexicographic ordering), n.-tupleprod[disp] (using product order),   *)
+(* n.-tuplelexi[d] T (with lexicographic ordering), on {subset[disp] T}       *)
+(* (using subset order) and all possible finite type instances.               *)
+(* (Use `HB.about type` to discover the instances on type.)                   *)
 (*                                                                            *)
 (* In order to get a canonical order on prod, seq, tuple or set, one may      *)
-(*   import modules DefaultProdOrder or DefaultProdLexiOrder,                 *)
-(*   DefaultSeqProdOrder or DefaultSeqLexiOrder,                              *)
-(*   DefaultTupleProdOrder or DefaultTupleLexiOrder                           *)
-(*   and DefaultSetSubsetOrder.                                               *)
-(*                                                                            *)
-(* On orderType, leP ltP ltgtP are the three main lemmas for case analysis.   *)
-(* On porderType, one may use comparableP, comparable_leP, comparable_ltP,    *)
-(*   and comparable_ltgtP, which are the four main lemmas for case analysis.  *)
+(* import modules DefaultProdOrder or DefaultProdLexiOrder,                   *)
+(* DefaultSeqProdOrder or DefaultSeqLexiOrder,                                *)
+(* DefaultTupleProdOrder or DefaultTupleLexiOrder,                            *)
+(* and DefaultSetSubsetOrder.                                                 *)
 (*                                                                            *)
 (* We also provide specialized versions of some theorems from path.v.         *)
 (*                                                                            *)
@@ -4449,7 +4435,6 @@ HB.instance Definition _ :=
   Lattice_isTotal.Build d T comparableT.
 HB.end.
 
-(* was MeetJoinMixin *)
 HB.factory Record isMeetJoinDistrLattice (d : unit) T of Choice T := {
   le : rel T;
   lt : rel T;
@@ -4489,9 +4474,82 @@ HB.instance Definition _ := POrder_isMeetDistrLattice.Build d T
 
 HB.end.
 
-(* FIXME: doesn't typecheck
+HB.factory Record POrder_isMeetJoinLattice (d : unit) T of POrder d T := {
+  meet : T -> T -> T;
+  join : T -> T -> T;
+  meetP : forall x y z, (x <= meet y z) = (x <= y) && (x <= z);
+  joinP : forall x y z, (join x y <= z) = (x <= z) && (y <= z);
+}.
 
-HB.factory Record leOrder T of Choice T := {
+HB.builders
+  Context (d : unit) T of POrder_isMeetJoinLattice d T.
+
+Fact meet_lel x y : meet x y <= meet y x.
+Proof.
+have:= le_refl (meet x y); rewrite meetP => /andP [mlex mley].
+by rewrite meetP mlex mley.
+Qed.
+Fact meetC : commutative meet.
+Proof. by move=> x y; apply: le_anti; rewrite !meet_lel. Qed.
+Fact meet_leL {x y} : (meet x y) <= x.
+Proof. by have:= le_refl (meet x y); rewrite meetP => /andP []. Qed.
+Fact meet_leR {x y} : (meet x y) <= y.
+Proof. by have:= le_refl (meet x y); rewrite meetP => /andP []. Qed.
+
+Fact join_lel x y : join x y <= join y x.
+Proof.
+have:= le_refl (join y x); rewrite joinP => /andP [ylej xlej].
+by rewrite joinP ylej xlej.
+Qed.
+Fact joinC : commutative join.
+Proof. by move=> x y; apply: le_anti; rewrite !join_lel. Qed.
+Fact join_leL {x y} : x <= (join x y).
+Proof. by have:= le_refl (join x y); rewrite joinP => /andP []. Qed.
+Fact join_leR {x y} : y <= (join x y).
+Proof. by have:= le_refl (join x y); rewrite joinP => /andP []. Qed.
+
+Fact meetA : associative meet.
+Proof.
+move=> x y z; apply: le_anti.
+apply/andP; split; rewrite !meetP -?andbA; apply/and3P; split.
+- exact: meet_leL.
+- exact: le_trans meet_leR meet_leL.
+- exact: le_trans meet_leR meet_leR.
+- exact: le_trans meet_leL meet_leL.
+- exact: le_trans meet_leL meet_leR.
+- exact: meet_leR.
+Qed.
+Fact joinA : associative join.
+Proof.
+move=> x y z; apply: le_anti.
+apply/andP; split; rewrite !joinP -?andbA; apply/and3P; split.
+- exact: le_trans join_leL join_leL.
+- exact: le_trans join_leR join_leL.
+- exact: join_leR.
+- exact: join_leL.
+- exact: le_trans join_leL join_leR.
+- exact: le_trans join_leR join_leR.
+Qed.
+Fact joinKI y x : meet x (join x y) = x.
+Proof.
+apply/le_anti/andP; split; first exact: meet_leL.
+by rewrite meetP le_refl join_leL.
+Qed.
+Fact meetKU y x : join x (meet x y) = x.
+Proof.
+apply/le_anti/andP; split; last exact: join_leL.
+by rewrite joinP le_refl meet_leL.
+Qed.
+Fact leEmeet x y : (x <= y) = (meet x y == x).
+Proof. by rewrite eq_le meetP meet_leL le_refl. Qed.
+
+HB.instance Definition _ :=
+  POrder_isLattice.Build d T meetC joinC meetA joinA joinKI meetKU leEmeet.
+
+HB.end.
+
+
+HB.factory Record isOrdered (d : unit) T of Choice T := {
   le : rel T;
   lt : rel T;
   meet : T -> T -> T;
@@ -4499,26 +4557,6 @@ HB.factory Record leOrder T of Choice T := {
   lt_def : forall x y, lt x y = (y != x) && le x y;
   meet_def : forall x y, meet x y = if lt x y then x else y;
   join_def : forall x y, join x y = if lt x y then y else x;
-  le_anti : antisymmetric le;
-  le_trans : transitive le;
-  le_total : total le;
-}.*)
-
-(* workaround *)
-HB.factory Record isOrdered (d : unit) T of Choice T := {
-  le : rel T;
-  lt : rel T;
-  meet : T -> T -> T;
-  join : T -> T -> T;
-  lt_def : forall x y, lt x y = (y != x) && le x y;
-  meet_def : forall x y, meet x y = match lt x y with
-                               | true => x
-                               | false => y
-                               end;
-  join_def : forall x y, join x y = match lt x y with
-                               | true => y
-                               | false => x
-                               end;
   le_anti : antisymmetric le;
   le_trans : transitive le;
   le_total : total le;
@@ -4570,21 +4608,14 @@ HB.instance Definition _ := DistrLattice_isTotal.Build d T le_total.
 
 HB.end.
 
-(* was LtOrderMixin *)
 HB.factory Record LtOrder (d : unit) T of Choice T := {
   le : rel T;
   lt : rel T;
   meet : T -> T -> T;
   join : T -> T -> T;
   le_def   : forall x y, le x y = (x == y) || lt x y;
-  meet_def : forall x y, meet x y = match lt x y with
-                               | true => x
-                               | false => y
-                               end;
-  join_def : forall x y, join x y = match lt x y with
-                               | true => y
-                               | false => x
-                               end;
+  meet_def : forall x y, meet x y = if lt x y then x else y;
+  join_def : forall x y, join x y = if lt x y then y else x;
   lt_irr   : irreflexive lt;
   lt_trans : transitive lt;
   lt_total : forall x y, x != y -> lt x y || lt y x;
@@ -4797,12 +4828,6 @@ HB.structure Definition OrderMorphism d (T : porderType d)
 Module OrderMorphismExports.
 Notation "{ 'omorphism' T -> T' }" :=
   (OrderMorphism.type _ T%type _ T'%type) : type_scope.
-Notation "[ 'omorphism' 'of' f 'as' g ]" :=
-  (OrderMorphism.clone _ _ _ _ f%function g)
-  (at level 0, format "[ 'omorphism'  'of'  f  'as'  g ]") : form_scope.
-Notation "[ 'omorphism' 'of' f ]" :=
-  (OrderMorphism.clone _ _ _ _ f%function _)
-  (at level 0, format "[ 'omorphism'  'of'  f ]") : form_scope.
 End OrderMorphismExports.
 HB.export OrderMorphismExports.
 
@@ -5005,28 +5030,10 @@ HB.structure Definition TBLatticeMorphism d (T : tbLatticeType d)
 Module TBLatticeMorphismExports.
 Notation "{ 'blmorphism' T -> T' }" :=
   (BLatticeMorphism.type _ T%type _ T'%type) : type_scope.
-Notation "[ 'blmorphism' 'of' f 'as' g ]" :=
-  (BLatticeMorphism.clone _ _ _ _ f%function g)
-  (at level 0, format "[ 'blmorphism'  'of'  f  'as'  g ]") : form_scope.
-Notation "[ 'blmorphism' 'of' f ]" :=
-  (BLatticeMorphism.clone _ _ _ _ f%function _)
-  (at level 0, format "[ 'blmorphism'  'of'  f ]") : form_scope.
 Notation "{ 'tlmorphism' T -> T' }" :=
   (TLatticeMorphism.type _ T%type _ T'%type) : type_scope.
-Notation "[ 'tlmorphism' 'of' f 'as' g ]" :=
-  (TLatticeMorphism.clone _ _ _ _ f%function g)
-  (at level 0, format "[ 'tlmorphism'  'of'  f  'as'  g ]") : form_scope.
-Notation "[ 'tlmorphism' 'of' f ]" :=
-  (TLatticeMorphism.clone _ _ _ _ f%function _)
-  (at level 0, format "[ 'tlmorphism'  'of'  f ]") : form_scope.
 Notation "{ 'tblmorphism' T -> T' }" :=
   (TBLatticeMorphism.type _ T%type _ T'%type) : type_scope.
-Notation "[ 'tblmorphism' 'of' f 'as' g ]" :=
-  (TBLatticeMorphism.clone _ _ _ _ f%function g)
-  (at level 0, format "[ 'tblmorphism'  'of'  f  'as'  g ]") : form_scope.
-Notation "[ 'tblmorphism' 'of' f ]" :=
-  (TBLatticeMorphism.clone _ _ _ _ f%function _)
-  (at level 0, format "[ 'tblmorphism'  'of'  f ]") : form_scope.
 End TBLatticeMorphismExports.
 HB.export TBLatticeMorphismExports.
 
@@ -5713,13 +5720,13 @@ HB.export DeprecatedSubOrder.Exports.
 (* INSTANCES *)
 (*************)
 
-(*******************************)
-(* Canonical structures on nat *)
-(*******************************)
+(********************)
+(* Instances on nat *)
+(********************)
 
 (******************************************************************************)
-(* This is an example of creation of multiple canonical declarations on the   *)
-(* same type, with distinct displays, on the example of natural numbers.      *)
+(* This is an example of creation of multiple instances on the same type,     *)
+(* with distinct displays, on the example of natural numbers.                 *)
 (* We declare two distinct canonical orders:                                  *)
 (* - leq which is total, and where meet and join are minn and maxn, on nat    *)
 (* - dvdn which is partial, and where meet and join are gcdn and lcmn,        *)
@@ -5728,7 +5735,7 @@ HB.export DeprecatedSubOrder.Exports.
 
 (******************************************************************************)
 (* The Module NatOrder defines leq as the canonical order on the type nat,    *)
-(* i.e. without creating a "copy". We define and use nat_display and proceed  *)
+(* i.e., without creating a "copy". We define and use nat_display and proceed *)
 (* like standard canonical structure declaration, except we use this display. *)
 (* We also use a single factory LeOrderMixin to instantiate three different   *)
 (* canonical declarations porderType, distrLatticeType, orderType             *)
@@ -5739,7 +5746,7 @@ HB.export DeprecatedSubOrder.Exports.
 Module NatOrder.
 Section NatOrder.
 
-Lemma nat_display : unit. Proof. exact: tt. Qed.
+Fact nat_display : unit. Proof. exact: tt. Qed.
 
 Lemma ltn_def x y : (x < y)%N = (y != x) && (x <= y)%N.
 Proof. by rewrite ltn_neqAle eq_sym. Qed.
@@ -5858,7 +5865,7 @@ End NatMonotonyTheory.
 (* first parameter is set to dvd_display.                                   *)
 (****************************************************************************)
 
-Lemma dvd_display : unit. Proof. exact: tt. Qed.
+Fact dvd_display : unit. Proof. exact: tt. Qed.
 
 Module DvdSyntax.
 
@@ -5981,10 +5988,12 @@ Definition t := nat.
 #[export]
 HB.instance Definition _ := Choice.copy t nat.
 
+(* Note that this where the dvd_display is associated with the type NatDvd.t. *)
 #[export]
 HB.instance Definition _ := isMeetJoinDistrLattice.Build
   dvd_display t le_def (fun _ _ => erefl)
   gcdnC lcmnC gcdnA lcmnA joinKI meetKU meetUl gcdnn.
+(* NatDvd.t is associated below with the notation "natdvd".                   *)
 
 #[export]
 HB.instance Definition _ := hasBottom.Build _ t (dvd1n : forall m : t, (1 %| m)).
@@ -6014,14 +6023,14 @@ End Exports.
 End NatDvd.
 HB.export NatDvd.Exports.
 
-(***********************************)
-(* Canonical structures on ordinal *)
-(***********************************)
+(************************)
+(* Instances on ordinal *)
+(************************)
 
 Module OrdinalOrder.
 Section OrdinalOrder.
 
-Lemma ord_display : unit. Proof. exact: tt. Qed.
+Fact ord_display : unit. Proof. exact: tt. Qed.
 
 Section PossiblyTrivial.
 Variable (n : nat).
@@ -6062,9 +6071,9 @@ End Exports.
 End OrdinalOrder.
 HB.export OrdinalOrder.Exports.
 
-(*******************************)
-(* Canonical structure on bool *)
-(*******************************)
+(*********************)
+(* Instances on bool *)
+(*********************)
 
 Module BoolOrder.
 Section BoolOrder.
@@ -7805,7 +7814,7 @@ Proof. by []. Qed.
 Lemma complEsubset A : ~` A = ~: A.
 Proof. by []. Qed.
 
-Lemma subset_display : unit. Proof. exact: tt. Qed.
+Fact subset_display : unit. Proof. exact: tt. Qed.
 
 End SetSubsetOrder.
 
