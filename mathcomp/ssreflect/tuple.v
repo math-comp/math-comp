@@ -305,7 +305,7 @@ Section EqTuple.
 
 Variables (n : nat) (T : eqType).
 
-HB.instance Definition tuple_hasDecEq : hasDecEq (n.-tuple T) :=
+HB.instance Definition _ : hasDecEq (n.-tuple T) :=
   [Equality of n.-tuple T by <:].
 Canonical tuple_predType := PredType (pred_of_seq : n.-tuple T -> pred T).
 
@@ -345,9 +345,9 @@ Qed.
 
 End EqTuple.
 
-HB.instance Definition tuple_hasChoice n (T : choiceType) :=
+HB.instance Definition _ n (T : choiceType) :=
   [Choice of n.-tuple T by <:].
-HB.instance Definition tuple_isCountable n (T : countType) :=
+HB.instance Definition _ n (T : countType) :=
   [Countable of n.-tuple T by <:].
 
 Module Type FinTupleSig.
@@ -398,8 +398,7 @@ Variables (n : nat) (T : finType).
 (* but in practice it will not work because the mixin_enum projector          *)
 (* has been buried under an opaque alias, to avoid some performance issues    *)
 (* during type inference.                                                     *)
-HB.instance Definition tuple_finMixin : isFinite (n.-tuple T) :=
-  FinMixin (@FinTuple.enumP n T).
+HB.instance Definition _ := isFinite.Build (n.-tuple T) (@FinTuple.enumP n T).
 
 Lemma card_tuple : #|{:n.-tuple T}| = #|T| ^ n.
 Proof. by rewrite [#|_|]cardT enumT unlock FinTuple.size_enum. Qed.
@@ -675,5 +674,5 @@ Proof. exact/Bijective/bseq_tagged_tupleK/tagged_tuple_bseqK. Qed.
 #[global] Hint Resolve bseq_tagged_tuple_bij tagged_tuple_bseq_bij : core.
 
 #[non_forgetful_inheritance]
-HB.instance Definition bseq_isFinite n (T : finType) : isFinite (n.-bseq T) :=
-  CanFinMixin (@bseq_tagged_tupleK n T).
+HB.instance Definition _ n (T : finType) := isFinite.Build (n.-bseq T)
+  (pcan_enumP (can_pcan (@bseq_tagged_tupleK n T))).

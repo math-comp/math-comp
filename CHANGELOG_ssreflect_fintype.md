@@ -9,6 +9,9 @@
 
 ### Removed
 
+- in `fintype.v`
+  + definition `adhoc_seq_sub_choiceMixin`
+
 ### Deprecated
 
 - in `fintype.v`

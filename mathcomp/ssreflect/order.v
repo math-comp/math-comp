@@ -5689,9 +5689,8 @@ Module DeprecatedSubOrder.
 Section Partial.
 Context {disp : unit} {T : porderType disp} (P : {pred T}) (sT : subType P).
 
-#[export]
 HB.instance Definition _ : isPOrdered disp (sub_type sT) :=
-  PcanPartial disp (valK : @pcancel _ (sub_type sT) val insub).
+  CancelPartial.Pcan disp (valK : @pcancel _ (sub_type sT) val insub).
 
 End Partial.
 

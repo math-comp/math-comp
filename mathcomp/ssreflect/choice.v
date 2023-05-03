@@ -402,8 +402,7 @@ Section SubChoice.
 
 Variables (P : pred T) (sT : subType P).
 
-HB.instance Definition _ : hasChoice (sub_type sT) :=
-  pcancel_hasChoice_subproof (@valK T P sT).
+#[hnf] HB.instance Definition _ := Choice.copy (sub_type sT) (pcan_type valK).
 
 End SubChoice.
 
@@ -561,8 +560,8 @@ HB.instance Definition _ sT (f : sT -> T) f' (fK : pcancel f f') :
 HB.instance Definition _ sT (f : sT -> T) f' (fK : cancel f f') :
   isCountable (can_type fK) := CanCountMixin_deprecated fK.
 
-HB.instance Definition sub_isCountable (P : pred T) (sT : subType P) :
-  isCountable (sub_type sT) := PcanCountMixin_deprecated (@valK T P sT).
+#[hnf] HB.instance Definition _ (P : pred T) (sT : subType P) :=
+  Countable.copy (sub_type sT) (pcan_type valK).
 
 Definition pickle_seq s := CodeSeq.code (map (@pickle T) s).
 Definition unpickle_seq n := Some (pmap (@unpickle T) (CodeSeq.decode n)).

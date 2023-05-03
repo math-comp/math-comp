@@ -1541,13 +1541,11 @@ Definition seq_sub_isFinite := isFinite.Build seq_sub seq_sub_axiom.
 
 (* Beware: these are not the canonical instances, as they are not consistent  *)
 (* with the generic sub_choiceType canonical instance.                        *)
-Definition adhoc_seq_sub_hasChoice := PcanChoiceMixin seq_sub_pickleK.
-Definition adhoc_seq_sub_choiceType := HB.pack_for choiceType seq_sub
-  adhoc_seq_sub_hasChoice.
+Definition adhoc_seq_sub_choiceType : choiceType := pcan_type seq_sub_pickleK.
 Definition adhoc_seq_sub_countType := HB.pack_for countType seq_sub
-  seq_sub_isCountable adhoc_seq_sub_hasChoice.
+  seq_sub_isCountable (Choice.class adhoc_seq_sub_choiceType).
 Definition adhoc_seq_sub_finType := HB.pack_for finType seq_sub
-  seq_sub_isFinite seq_sub_isCountable adhoc_seq_sub_hasChoice.
+  seq_sub_isFinite seq_sub_isCountable (Choice.class adhoc_seq_sub_choiceType).
 
 End SeqSubType.
 
