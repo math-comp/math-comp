@@ -1,10 +1,80 @@
 ### Added
 
+- in `ssralg.v`
+  + structure `zsemimodType` (aka Monoid on a choiceType), `semiRingType`,
+    `comSemiRingType`, `subZsemimodType`, `subZmodType`, `subSemiRingType`,
+    `subComSemiRingType`, `subRingType`, `subComRingType`, `subLmodType`,
+    `subLalgType`, `subAlgType`, `subUnitRingType`, `subComUnitRingType`,
+    `subIdomainType`, `subField`
+  + predicate `semi_additive`
+  + notation `{semi_additive U -> V}`
+  + predicate `multiplicative`
+  + notation `{srmorphism U -> V}`
+  + morphism `semiring2Closed`
+  + morphism `semiringClosed`
+
 ### Changed
+
+- in `ssralg.v`
+  + structures `zmodType`, `ringType`, `lmodType`, `lalgType`, `comRingType`,
+    `algType`, `comAlgType`, `unitRingType`, `comUnitRingType`, `unitAlgType`,
+    `comUnitAlgType`, `idomainType`, `fieldType`, `decFieldType`,
+    `closedFieldType` ported to HB
+
+  + morphisms `additive`, `SRMorphism`, `RMorphism`, `Scale.law`, `Linear`,
+    `LRMorphism` ported to HB
+
+  + predicates `opprClosed`, `addrClosed`, `zmodClosed`, `mulr2Closed`,
+    `mulrClosed`, `smulClosed`, `subringClosed`, `divClosed`, `sdivClosed`,
+    `submodClosed`, `subalgClosed`, `divringClosed`, `divalgClosed` ported to HB
 
 ### Renamed
 
+- in `ssralg.v`
+  + `*Pred` -> `*Closed`
+  + notation `[zmodMixin of M by <:]`, use `[SubChoice_isSubZmodule of U by <:]`
+  + notation `[ringMixin of R by <:]`, use `[SubZmodule_isSubRing of U by <:]`
+  + notation `[comRingMixin of R by <:]`, use `[SubZmodule_isSubComRing of U by <:]`
+  + notation `[unitRingMixin of R by <:]`, use `[SubRing_isSubUnitRing of U by <:]`
+  + notation `[comUnitRingMixin of R by <:]`, use `[SubChoice_isSubComUnitRing of U by <:]`
+  + notation `[idomainMixin of R by <:]`, use `[SubComUnitRing_isSubIntegralDomain of U by <:]`
+  + notation `[fieldMixin of R by <:]`, use `[SubIntegralDomain_isSubField of U by <:]`
+  + notation `[lmodMixin of R by <:]`, use `[SubZmodule_isSubLmodule of U by <:]`
+  + notation `[lalgMixin of R by <:]`, use `[SubRing_SubLmodule_isSubLalgebra of U by <:]`
+  + notation `[algMixin of R by <:]`, use `[SubLalgebra_isSubAlgebra of U by <:]`
+
 ### Removed
+
+- in `ssralg.v`
+  + notation `ZmodType`, use `isZmodule.Build`
+  + notation `RingType`, use `Zmodule_isRing.Build`
+  + notation `ComRingType`, use `hasCommutativeMul.Build`
+  + notation `UnitRingType`, use `Ring_hasMulInverse.Build`
+  + notation `UnitRingType`, use `Ring_hasMulInverse.Build`
+  + notation `ComUnitRingMixin`, use `ComRing_hasMulInverse.Build`
+  + notation `IdomainType`, use `ComUnitRing_isIntegral.Build`
+  + notation `FieldMixin`, use `UnitRing_isField.Build`
+  + notation `FieldType`, use `UnitRing_isField.Build`
+  + notation `FieldUnitMixin`, use `ComRing_isField.Build`
+  + notation `FieldIdomainMixin`
+  + notation `GRing.Field.IdomainType`, use `ComRing_isField.Build`
+  + notation `DecFieldMixin`, use `Field_isDec.Build`
+  + notation `DecFieldType`, use `Field_isDec.Build`
+  + notation `QEdecFieldMixin`, use `Decidable_of_QE.Build`
+  + notation `ClosedFieldType`, use `DecField_isAlgClosed.Build`
+  + notation `LmodMixin`, use `Zmodule_isLmodule.Build`
+  + notation `LmodType`, use `Zmodule_isLmodule.Build`
+  + notation `LalgType`, use `Lmodule_isLalgebra.Build`
+  + notation `AlgType`, use `Lalgebra_isAlgebra.Build`
+  + notation `ComAlgType`, use `Lalgebra_isAlgebra.Build`
+  + module `GRing.DefaultPred`
+  + notation `Additive`, use `isAdditive.Build`
+  + notation `RMorphism`, use `Additive_isMultiplicative.Build`
+  + notation `AddRMorphism`, use `Additive_isMultiplicative.Build`
+  + notation `Linear`, use `isScalable.Build`
+  + notation `AddLinear`, use `isScalable.Build`
+  + notation `LRMorphism`, use `isScalable.Build`
+  + notation `AddLRMorphism`, use `isScalable.Build`
 
 ### Deprecated
 
