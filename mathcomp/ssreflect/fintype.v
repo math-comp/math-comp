@@ -178,7 +178,7 @@ Proof. by move=> Ue sT x; rewrite count_uniq_mem ?sT. Qed.
 Section WithCountType.
 Variable (T : countType).
 
-Definition UniqMixin e Ue (eT : e =i T) :=
+Definition UniqMixin_deprecated e Ue (eT : e =i T) :=
   @isFinite.Build T e (uniq_enumP Ue eT).
 
 Variable n : nat.
@@ -193,9 +193,15 @@ apply: uniq_enumP (pmap_uniq (@pickle_invK T) (iota_uniq _ _)) _ => x.
 by rewrite mem_pmap -pickleK_inv map_f // mem_iota ubT.
 Qed.
 
-Definition CountMixin := EnumMixin count_enumP.
+Definition CountMixin_deprecated := @isFinite.Build _ _ count_enumP.
 
 End WithCountType.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use isFinite.Build and Finite.uniq_enumP instead.")]
+Notation UniqMixin := UniqMixin_deprecated.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use isFinite.Build and Finite.count_enumP instead.")]
+Notation CountMixin := CountMixin_deprecated.
 End Finite.
 Canonical finEnum_unlock := Unlockable Finite.enum.unlock.
 End FiniteNES.
@@ -226,8 +232,10 @@ HB.instance Definition _ := isFinite.Build fT f.
 End CanonicalFinType.
 
 #[deprecated(since="mathcomp 2.0.0", note="Use isFinite.Build instead.")]
-Notation FinMixin x := (Finite.EnumMixin x).
-Notation UniqFinMixin := Finite.UniqMixin.
+Notation FinMixin x := (@isFinite.Build _ _ x).
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use isFinite.Build with Finite.uniq_enumP instead.")]
+Notation UniqFinMixin := Finite.UniqMixin_deprecated.
 #[deprecated(since="mathcomp 2.0.0", note="Use Finite.clone instead.")]
 Notation "[ 'finType' 'of' T 'for' cT ]" := (Finite.clone T%type cT)
   (at level 0, format "[ 'finType'  'of'  T  'for'  cT ]") : form_scope.
@@ -1345,16 +1353,15 @@ End EqImage.
 (* Standard finTypes *)
 
 Lemma unit_enumP : Finite.axiom [::tt]. Proof. by case. Qed.
-
-HB.instance Definition unit_isFinite : isFinite unit := FinMixin unit_enumP.
+HB.instance Definition _ := isFinite.Build unit unit_enumP.
 Lemma card_unit : #|{: unit}| = 1. Proof. by rewrite cardT enumT unlock. Qed.
 
 Lemma bool_enumP : Finite.axiom [:: true; false]. Proof. by case. Qed.
-HB.instance Definition bool_isFinite : isFinite bool := FinMixin bool_enumP.
+HB.instance Definition _ := isFinite.Build bool bool_enumP.
 Lemma card_bool : #|{: bool}| = 2. Proof. by rewrite cardT enumT unlock. Qed.
 
 Lemma void_enumP : Finite.axiom (Nil void). Proof. by case. Qed.
-HB.instance Definition void_isFinite : isFinite void := FinMixin void_enumP.
+HB.instance Definition _ := isFinite.Build void void_enumP.
 Lemma card_void : #|{: void}| = 0. Proof. by rewrite cardT enumT unlock. Qed.
 
 Local Notation enumF T := (Finite.enum T).
@@ -1368,8 +1375,7 @@ Definition option_enum := None :: map some (enumF T).
 Lemma option_enumP : Finite.axiom option_enum.
 Proof. by case=> [x|]; rewrite /= count_map (count_pred0, enumP). Qed.
 
-HB.instance
-Definition option_isFinite : isFinite (option T) := FinMixin option_enumP.
+HB.instance Definition _ := isFinite.Build (option T) option_enumP.
 
 Lemma card_option : #|{: option T}| = #|T|.+1.
 Proof. by rewrite !cardT !enumT [in LHS]unlock /= !size_map. Qed.
@@ -1386,21 +1392,26 @@ move=> fK x; rewrite count_uniq_mem ?undup_uniq // mem_undup.
 by rewrite mem_pmap -fK map_f // -enumT mem_enum.
 Qed.
 
-Definition PcanFinMixin g fK := FinMixin (@pcan_enumP g fK).
+Definition PcanFinMixin_deprecated g fK := @isFinite.Build _ _ (@pcan_enumP g fK).
 
-Definition CanFinMixin g (fK : cancel f g) := PcanFinMixin (can_pcan fK).
+Definition CanFinMixin_deprecated g (fK : cancel f g) := PcanFinMixin_deprecated (can_pcan fK).
 
 End TransferFinTypeFromCount.
+
+#[deprecated(since="mathcomp 2.0.0", note="Use pcan_type instead.")]
+Notation PcanFinMixin := PcanFinMixin_deprecated.
+#[deprecated(since="mathcomp 2.0.0", note="Use can_type instead.")]
+Notation CanFinMixin := CanFinMixin_deprecated.
 
 Section TransferFinType.
 
 Variables (eT : Type) (fT : finType) (f : eT -> fT).
 
-HB.instance Definition _ g (fK : cancel f g) : isFinite (can_type fK) :=
-  CanFinMixin (fK : cancel (f : can_type fK -> fT) _).
+HB.instance Definition _ (g : fT -> option eT) (fK : pcancel f g) :=
+  isFinite.Build (pcan_type fK) (@pcan_enumP (pcan_type fK) fT f g fK).
 
-HB.instance Definition _ g (fK : pcancel f g) : isFinite (pcan_type fK) :=
-  PcanFinMixin (fK : pcancel (f : pcan_type fK -> fT) _).
+HB.instance Definition _ (g : fT -> eT) (fK : cancel f g) :=
+  isFinite.Build (can_type fK) (@pcan_enumP (can_type fK) fT f _ (can_pcan fK)).
 
 End TransferFinType.
 
@@ -1446,10 +1457,9 @@ rewrite pmap_filter; last exact: insubK.
 by apply: eq_filter => x; apply: isSome_insub.
 Qed.
 
-HB.instance Definition SubFinMixin : isFinite sT :=
-  UniqFinMixin sub_enum_uniq mem_sub_enum.
+HB.instance Definition SubFinMixin := isFinite.Build sT
+  (Finite.uniq_enumP sub_enum_uniq mem_sub_enum).
 HB.end.
-
 
 (* This assumes that T has a subCountType structure over a type that  *)
 (* has a finType structure.                                           *)
@@ -1487,7 +1497,7 @@ Section CardSig.
 
 Variables (T : finType) (P : pred T).
 
-HB.instance Definition sig_isFinite := [Finite of {x | P x} by <:].
+HB.instance Definition _ := [Finite of {x | P x} by <:].
 
 Lemma card_sig : #|{: {x | P x}}| = #|[pred x | P x]|.
 Proof. exact: card_sub. Qed.
@@ -1502,7 +1512,7 @@ Variables (T : eqType) (s : seq T).
 Record seq_sub : Type := SeqSub {ssval : T; ssvalP : in_mem ssval (@mem T _ s)}.
 
 HB.instance Definition _ := [isSub for ssval].
-HB.instance Definition seq_sub_hasDecEq := [Equality of seq_sub by <:].
+HB.instance Definition _ := [Equality of seq_sub by <:].
 
 Definition seq_sub_enum : seq seq_sub := undup (pmap insub s).
 
@@ -1738,8 +1748,8 @@ Proof. by rewrite pmap_sub_uniq ?iota_uniq. Qed.
 Lemma mem_ord_enum i : i \in ord_enum.
 Proof. by rewrite -(mem_map ord_inj) val_ord_enum mem_iota ltn_ord. Qed.
 
-HB.instance Definition _ : isFinite ordinal :=
-  UniqFinMixin ord_enum_uniq mem_ord_enum.
+HB.instance Definition _ := isFinite.Build ordinal
+  (Finite.uniq_enumP ord_enum_uniq mem_ord_enum).
 
 End OrdinalSub.
 
@@ -2238,8 +2248,7 @@ Proof.
 by case=> x1 x2; rewrite (predX_prod_enum (pred1 x1) (pred1 x2)) !card1.
 Qed.
 
-HB.instance Definition prod_isFinite : isFinite (T1 * T2)%type :=
-  FinMixin prod_enumP.
+HB.instance Definition _ := isFinite.Build (T1 * T2)%type prod_enumP.
 
 Lemma cardX (A1 : {pred T1}) (A2 : {pred T2}) :
   #|[predX A1 & A2]| = #|A1| * #|A2|.
@@ -2270,8 +2279,7 @@ rewrite -size_filter -cardE /=; case: eqP => [-> | ne_j_i].
 by apply: eq_card0 => y.
 Qed.
 
-HB.instance Definition tag_isFinite : isFinite {i : I & T_ i} :=
-  FinMixin tag_enumP.
+HB.instance Definition _ := isFinite.Build {i : I & T_ i} tag_enumP.
 
 Lemma card_tagged :
   #|{: {i : I & T_ i}}| = sumn (map (fun i => #|T_ i|) (enum I)).
@@ -2298,8 +2306,8 @@ Qed.
 Lemma mem_sum_enum u : u \in sum_enum.
 Proof. by case: u => x; rewrite mem_cat -!enumT map_f ?mem_enum ?orbT. Qed.
 
-HB.instance Definition sum_isFinite : isFinite (T1 + T2)%type :=
-  UniqFinMixin sum_enum_uniq mem_sum_enum.
+HB.instance Definition sum_isFinite := isFinite.Build (T1 + T2)%type
+  (Finite.uniq_enumP sum_enum_uniq mem_sum_enum).
 
 Lemma card_sum : #|{: T1 + T2}| = #|T1| + #|T2|.
 Proof. by rewrite !cardT !enumT [in LHS]unlock size_cat !size_map. Qed.
