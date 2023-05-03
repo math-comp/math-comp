@@ -6,7 +6,7 @@ contributing, you should comply to these conventions to get your code
 integrated to the library.
 
 This file is not comprehensive yet and might still contain mistakes or
-unclear indications, please consider contributing.
+unclear indications, please consider contributing to its improvement.
 
 ## Proof style
 
@@ -21,7 +21,7 @@ too long to fit on one line), then just cut it over several lines to
 make it readable.
 - Lines end with a point `.` and only have `;` inside them.
 - Lines that close a goal must start with a terminator (`by` or
-  `exact`). You should consider using an editor that highlight those
+  `exact`). You should consider using an editor that highlights those
   terminators in a specific color (e.g. red).
 - Chaining too many optional rewrites makes error detection hard. The idiom is
   ```
