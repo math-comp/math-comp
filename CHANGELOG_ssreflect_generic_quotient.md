@@ -2,9 +2,16 @@
 
 ### Changed
 
+- in `generic_quotient.v`,
+  + structures quotType and eqQuotType ported to HB
+
 ### Renamed
 
 ### Removed
+
+- in `generic_quotient.v`,
+  + notation `QuotClass`, use `isQuotient.Build`
+  + notation `EqQuotType`, use `isEqQuotient.Build`
 
 ### Deprecated
 
