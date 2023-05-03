@@ -2,6 +2,9 @@
 
 ### Changed
 
+- in `fintype.v`
+  + structures `finType` and `subFinType` ported to HB
+
 ### Renamed
 
 ### Removed
