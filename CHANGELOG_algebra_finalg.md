@@ -1,10 +1,21 @@
 ### Added
 
+- in `finalg.v`
+  + structures `finComSemiRingType`, `finSemiRingType` and `finZsemimodType`
+
 ### Changed
+
+- in `finalg.v`
+  + structures `finZmodType`, `finRingType`, `finComRingType`,
+    `finUnitRingType`, `finComUnitRingType`, `finIdomType`, `finFieldType`,
+    `finLmodType`, `finLalgType`, `finAlgType`, `finUnitAlgType` ported to HB
 
 ### Renamed
 
 ### Removed
+
+- in `finalg.v`
+  + notation `[baseFinGroupType of R for +%R]`
 
 ### Deprecated
 
