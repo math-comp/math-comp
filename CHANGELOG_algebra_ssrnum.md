@@ -1,8 +1,23 @@
 ### Added
 
+- in `ssrnum.v`
+  + structures `porderZmodType`
+
 ### Changed
 
+- in `ssrnum.v`
+  + structures `normedZmodType`, `numDomainType`,
+    `numFieldType`, `numFieldType`, `numClosedFieldType`, `realDomainType`,
+    `realFieldType`, `archiFieldType`, `rcfType` ported to HB
+
 ### Renamed
+
+- in `ssrnum.v`
+  + notation `NormedZmodType`, use `Zmodule_isNormed.Build`
+  + notation `NumDomainType`, use `isNumRing.Build`
+  + notation `NumClosedFieldType`, use `NumField_isImaginary.Build`
+  + notation `ArchiFieldType`, use `RealField_isArchimedean.Build`
+  + notation `RcfType`, use `RealField_isClosed.Build`
 
 ### Removed
 
