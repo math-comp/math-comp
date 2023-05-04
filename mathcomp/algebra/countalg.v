@@ -3,24 +3,23 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop ssralg.
-(* From mathcomp Require Import generic_quotient ring_quotient. *)
 
 (*****************************************************************************)
 (* This file clones part of ssralg hierachy for countable types; it does not *)
 (* cover the left module / algebra interfaces, providing only                *)
-(*          countZmodType == countable zmodType interface.                   *)
-(*          countRingType == countable ringType interface.                   *)
-(*       countComRingType == countable comRingType interface.                *)
-(*      countUnitRingType == countable unitRingType interface.               *)
-(*   countComUnitRingType == countable comUnitRingType interface.            *)
-(*       countIdomainType == countable idomainType interface.                *)
-(*         countFieldType == countable fieldType interface.                  *)
-(*      countDecFieldType == countable decFieldType interface.               *)
-(*   countClosedFieldType == countable closedFieldType interface.            *)
-(* The interface cloning syntax is extended to these structures              *)
-(*   [countZmodType of M] == countZmodType structure for an M that has both  *)
-(*                           zmodType and countType structures.              *)
-(*                    ... etc                                                *)
+(*      countZsemimodType == countable zsemimodType interface                *)
+(*          countZmodType == countable zmodType interface                    *)
+(*      countSemiRingType == countable semiRingType interface                *)
+(*          countRingType == countable ringType interface                    *)
+(*   countComSemiRingType == countable comSemiRingType interface             *)
+(*       countComRingType == countable comRingType interface                 *)
+(*      countUnitRingType == countable unitRingType interface                *)
+(*   countComUnitRingType == countable comUnitRingType interface             *)
+(*       countIdomainType == countable idomainType interface                 *)
+(*         countFieldType == countable fieldType interface                   *)
+(*      countDecFieldType == countable decFieldType interface                *)
+(*   countClosedFieldType == countable closedFieldType interface             *)
+(*                                                                           *)
 (* This file provides constructions for both simple extension and algebraic  *)
 (* closure of countable fields.                                              *)
 (*****************************************************************************)
@@ -140,13 +139,13 @@ HB.structure Definition Field := {R of GRing.Field R & Countable R}.
 
 Module FieldExports.
 #[deprecated(since="mathcomp 2.0.0", note="Use CountRing.Field.clone instead.")]
-Notation "[ 'countFieldType' 'of' T ]" := (Field.clone T%type _) (*(do_pack pack T)*)
+Notation "[ 'countFieldType' 'of' T ]" := (Field.clone T%type _)
   (at level 0, format "[ 'countFieldType'  'of'  T ]") : form_scope.
 End FieldExports.
 HB.export FieldExports.
 
 #[short(type="countDecFieldType")]
-HB.structure Definition DecidableField := 
+HB.structure Definition DecidableField :=
   {R of GRing.DecidableField R & Countable R}.
 
 Module DecidableFieldExports.
