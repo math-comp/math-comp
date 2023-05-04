@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `seq.v`
   + lemma `foldl_foldr`
+  + lemmas `unzip1_map_nth_zip`, `unzip2_map_nth_zip`, `perm_zip_sym`,
+	`perm_zip1`, `perm_zip2`
 
 - in `poly.v`
   + multirule `coefE`
