@@ -2152,8 +2152,10 @@ Fact socle_can_subproof :
   cancel (fun W => SeqSub (socle_mem W)) (fun s => PackSocle (valP s)).
 Proof. by move=> W /=; apply: val_inj; rewrite /= PackSocleK. Qed.
 
-HB.instance Definition _ : isCountable sG := CanCountMixin socle_can_subproof.
-HB.instance Definition _ : isFinite sG := CanFinMixin socle_can_subproof.
+HB.instance Definition _ := isCountable.Build sG
+  (pcan_pickleK (can_pcan socle_can_subproof)).
+HB.instance Definition _ := isFinite.Build sG
+  (pcan_enumP (can_pcan socle_can_subproof)).
 
 End SocleDef.
 

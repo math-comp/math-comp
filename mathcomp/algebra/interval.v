@@ -105,45 +105,10 @@ Notation "`] -oo , '+oo' [" := (Interval -oo +oo)
 Fact itv_bound_display (disp : unit) : unit. Proof. exact. Qed.
 Fact interval_display (disp : unit) : unit. Proof. exact. Qed.
 
-Section IntervalEq.
+Module IntervalCan.
+Section IntervalCan.
 
-Variable T : eqType.
-
-Definition eq_itv_bound (b1 b2 : itv_bound T) : bool :=
-  match b1, b2 with
-    | BSide a x, BSide b y => (a == b) && (x == y)
-    | BInfty a, BInfty b => a == b
-    | _, _ => false
-  end.
-
-Lemma eq_itv_boundP : Equality.axiom eq_itv_bound.
-Proof.
-move=> b1 b2; apply: (iffP idP).
-- by move: b1 b2 => [a x|a][b y|b] => //= [/andP [/eqP -> /eqP ->]|/eqP ->].
-- by move=> <-; case: b1 => //= a x; rewrite !eqxx.
-Qed.
-
-HB.instance Definition _  :=  hasDecEq.Build (itv_bound T) eq_itv_boundP.
-
-Definition eqitv (x y : interval T) : bool :=
-  let: Interval x x' := x in
-  let: Interval y y' := y in (x == y) && (x' == y').
-
-Lemma eqitvP : Equality.axiom eqitv.
-Proof.
-move=> x y; apply: (iffP idP).
-- by move: x y => [x x'][y y'] => //= /andP [] /eqP -> /eqP ->.
-- by move=> <-; case: x => /= x x'; rewrite !eqxx.
-Qed.
-
-HB.instance Definition _  :=  hasDecEq.Build (interval T) eqitvP.
-
-End IntervalEq.
-
-Module IntervalChoice.
-Section IntervalChoice.
-
-Variable T : choiceType.
+Variable T : Type.
 
 Lemma itv_bound_can :
   cancel (fun b : itv_bound T =>
@@ -157,27 +122,38 @@ Lemma interval_can :
     (fun '(Interval b1 b2) => (b1, b2)) (fun '(b1, b2) => Interval b1 b2).
 Proof. by case. Qed.
 
-End IntervalChoice.
+End IntervalCan.
 
-#[export]
-HB.instance Definition _ (T : choiceType) := CanChoiceMixin (@itv_bound_can T).
-#[export]
-HB.instance Definition _ (T : choiceType) := CanChoiceMixin (@interval_can T).
-#[export]
-HB.instance Definition _ (T : countType) := CanCountMixin (@itv_bound_can T).
-#[export]
-HB.instance Definition _ (T : countType) := CanCountMixin (@interval_can T).
-#[export]
-HB.instance Definition _ (T : finType) : isFinite (itv_bound T) :=
-   (CanFinMixin (@itv_bound_can T)).
-HB.instance Definition _ (T : finType) : isFinite (interval T) :=
-   (CanFinMixin (@interval_can T)).
+#[export, hnf]
+HB.instance Definition _ (T : eqType)  := Equality.copy (itv_bound T)
+  (can_type (@itv_bound_can T)).
+#[export, hnf]
+HB.instance Definition _ (T : eqType)  := Equality.copy (interval T)
+  (can_type (@interval_can T)).
+#[export, hnf]
+HB.instance Definition _ (T : choiceType)  := Choice.copy (itv_bound T)
+  (can_type (@itv_bound_can T)).
+#[export, hnf]
+HB.instance Definition _ (T : choiceType)  := Choice.copy (interval T)
+  (can_type (@interval_can T)).
+#[export, hnf]
+HB.instance Definition _ (T : countType)  := Countable.copy (itv_bound T)
+  (can_type (@itv_bound_can T)).
+#[export, hnf]
+HB.instance Definition _ (T : countType)  := Countable.copy (interval T)
+  (can_type (@interval_can T)).
+#[export, hnf]
+HB.instance Definition _ (T : finType)  := Finite.copy (itv_bound T)
+  (can_type (@itv_bound_can T)).
+#[export, hnf]
+HB.instance Definition _ (T : finType)  := Finite.copy (interval T)
+  (can_type (@interval_can T)).
 
 Module Exports. HB.reexport. End Exports.
 
-End IntervalChoice.
+End IntervalCan.
 
-Export IntervalChoice.Exports.
+Export IntervalCan.Exports.
 
 Section IntervalPOrder.
 
@@ -223,7 +199,7 @@ Proof. by rewrite /<=%O /= lteifxx. Qed.
 Lemma bound_ltxx c1 c2 x : (BSide c1 x < BSide c2 x) = (c1 && ~~ c2).
 Proof. by rewrite /<%O /= lteifxx. Qed.
 
-Lemma ge_pinfty b : (+oo <= b) = (b == +oo). Proof. by move: b => [|[]]. Qed.
+Lemma ge_pinfty b : (+oo <= b) = (b == +oo). Proof. by case: b => [|] []. Qed.
 
 Lemma le_ninfty b : (b <= -oo) = (b == -oo). Proof. by case: b => // - []. Qed.
 
@@ -533,8 +509,15 @@ Qed.
 
 Lemma bound_leEmeet b1 b2 : (b1 <= b2) = (bound_meet b1 b2 == b1).
 Proof.
-by case: b1 b2 => [[]?|[]][[]?|[]] //=;
-  rewrite [LHS]/<=%O /eq_op /= ?eqxx //= -leEmeet; case: lcomparableP.
+case: b1 b2 => [[]t[][]|[][][]] //=; rewrite ?eqxx// => t';
+  rewrite [LHS]/<=%O /eq_op ?andbT ?andbF ?orbF/= /eq_op/= /eq_op/=;
+  case: lcomparableP => //=; rewrite ?eqxx//=; [| | |].
+- by move/lt_eqF.
+- move=> ic; apply: esym; apply: contraNF ic.
+  by move=> /eqP/meet_idPl; apply: le_comparable.
+- by move/lt_eqF.
+- move=> ic; apply: esym; apply: contraNF ic.
+  by move=> /eqP/meet_idPl; apply: le_comparable.
 Qed.
 
 HB.instance Definition _ :=
@@ -578,7 +561,9 @@ Lemma itv_joinKI i2 i1 : itv_meet i1 (itv_join i1 i2) = i1.
 Proof. by case: i1 i2 => [? ?][? ?] /=; rewrite meetKU joinKI. Qed.
 
 Lemma itv_leEmeet i1 i2 : (i1 <= i2) = (itv_meet i1 i2 == i1).
-Proof. by case: i1 i2 => [? ?][? ?]; rewrite /eq_op /= eq_meetl eq_joinl. Qed.
+Proof.
+by case: i1 i2 => [? ?] [? ?]; rewrite /eq_op/=/eq_op/= eq_meetl eq_joinl.
+Qed.
 
 HB.instance Definition _ :=
   Order.POrder_isLattice.Build (interval_display disp) (interval T)

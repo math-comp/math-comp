@@ -142,11 +142,11 @@ Proof.
     rewrite -(mulr_natl z) invfM (mulrC z) !mulrA divfK // -mulrDl addrACA.
     (* FIX ME : had to add the explicit pattern *)
     by rewrite subrr addr0 -mulr2n -[_ *+ 2]mulr_natr mulfK ?Neq0 ?sqrtK.
-  suff u0: u = 0 by rewrite -Dz u0 add0r rmorphX rmorphM /= Rv zJ mulNr sqrrN.
+  suff u0: u = 0 by rewrite -Dz u0 add0r rmorphXn rmorphM /= Rv zJ mulNr sqrrN.
   suff [b Du]: exists b : bool, u = (-1) ^+ b * i * z * v.
     apply: mul2I; rewrite mul0rn mulr2n -{2}Ru.
     by rewrite Du !rmorphM /= rmorph_sign Rv Ri zJ !mulrN mulNr subrr.
-  have/eqP:= zJ; rewrite -addr_eq0 -{1 2}Dz rmorphX rmorphD rmorphM /= Ru Rv zJ.
+  have/eqP:= zJ; rewrite -addr_eq0 -{1 2}Dz rmorphXn rmorphD rmorphM /= Ru Rv zJ.
   rewrite mulNr sqrrB sqrrD addrACA (addrACA (u ^+ 2)) addNr addr0 -!mulr2n.
   rewrite -mulrnDl -(mul0rn _ 2) (inj_eq mul2I) /= -[rhs in _ + rhs]opprK.
   rewrite -sqrMi subr_eq0 eqf_sqr -mulNr !mulrA.
@@ -156,9 +156,7 @@ Qed.
 Definition norm x := sqrt x * conj (sqrt x).
 
 Lemma normK x : norm x ^+ 2 = x * conj x.
-Proof.
-  by rewrite exprMn -rmorphX sqrtK.
-Qed.
+Proof. by rewrite exprMn -rmorphXn sqrtK. Qed.
 
 Lemma normE x y : y ^+ 2 = x -> norm x = y * conj y.
 Proof.
@@ -317,7 +315,8 @@ Definition type : Type := {eq_quot eq_root}%qT.
 
 HB.instance Definition _ : EqQuotient _ eq_root type := EqQuotient.on type.
 HB.instance Definition _ := Choice.on type.
-HB.instance Definition _ : isCountable type := CanCountMixin reprK.
+HB.instance Definition _ := isCountable.Build type
+  (pcan_pickleK (can_pcan reprK)).
 
 Definition CtoL (u : type) := rootQtoL (repr u).
 

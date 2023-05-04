@@ -726,7 +726,7 @@ have EmulV : forall x, x != 0 -> Einv x * x = 1.
   by apply/memI; exists i; apply: dvdp_mull.
 pose EfieldMixin := GRing.ComRing_isField.Build _ EmulV Einv0.
 pose Efield : fieldType := HB.pack E EfieldMixin.
-pose EIsCountable := @CanCountMixin _ E _ _ reprK.
+pose EIsCountable := isCountable.Build E (pcan_pickleK (can_pcan (reprK))).
 pose Ecount : countFieldType := HB.pack E Efield EIsCountable.
 pose FtoE : {rmorphism _ -> _} := PtoE \o polyC; pose w : E := PtoE 'X.
 have defPtoE q: (map_poly FtoE q).[w] = PtoE q.
@@ -795,7 +795,7 @@ have eqKtrans : transitive eqKrep.
   do [rewrite -toEtrans ?le_max // -maxnA => lez2m] in lez3m *.
   by rewrite (toEtrans (maxn (tag z2) (tag z3))) // eq_z23 -toEtrans.
 pose K := {eq_quot EquivRel _ eqKrefl eqKsym eqKtrans}%qT.
-have cntK : isCountable K := CanCountMixin reprK.
+pose cntK := isCountable.Build K (pcan_pickleK (can_pcan (reprK))).
 pose EtoKrep i (x : E i) : K := \pi%qT (Tagged E x).
 have [EtoK piEtoK]: {EtoK | forall i, EtoKrep i =1 EtoK i} by exists EtoKrep.
 pose FtoK := EtoK 0%N; rewrite {}/EtoKrep in piEtoK.

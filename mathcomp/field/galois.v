@@ -660,7 +660,8 @@ Definition inAEnd f := SeqSub (svalP (enum_AEnd L) f).
 Fact inAEndK : cancel inAEnd val. Proof. by []. Qed.
 
 HB.instance Definition _ := Countable.copy 'AEnd(L) (can_type inAEndK).
-HB.instance Definition _ : isFinite 'AEnd(L) := CanFinMixin inAEndK.
+HB.instance Definition _ := isFinite.Build 'AEnd(L)
+  (pcan_enumP (can_pcan inAEndK)).
 
 (* the group operation is the categorical composition operation *)
 Definition comp_AEnd (f g : 'AEnd(L)) : 'AEnd(L) := (g \o f)%AF.
@@ -745,7 +746,8 @@ Fact gal_sgvalK : cancel gal_sgval Gal. Proof. by case. Qed.
 Let gal_sgval_inj := can_inj gal_sgvalK.
 
 HB.instance Definition _ := Countable.copy gal_of (can_type gal_sgvalK).
-HB.instance Definition _ : isFinite gal_of := CanFinMixin gal_sgvalK.
+HB.instance Definition _ := isFinite.Build gal_of
+  (pcan_enumP (can_pcan gal_sgvalK)).
 
 Definition gal_one := Gal 1%g.
 Definition gal_inv x := Gal (gal_sgval x)^-1.

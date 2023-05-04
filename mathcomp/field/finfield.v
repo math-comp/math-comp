@@ -169,10 +169,10 @@ Variables (R : finRingType) (vT : vectType R).
 Local Notation fvT := (finvect_type vT).
 
 HB.instance Definition _ := Vector.on fvT.
-HB.instance Definition _ : isCountable fvT :=
-  CanCountMixin VectorInternalTheory.v2rK.
-HB.instance Definition _ : isFinite fvT :=
-  CanFinMixin (VectorInternalTheory.v2rK : @cancel _ fvT _ _).
+HB.instance Definition _ := isCountable.Build fvT
+  (pcan_pickleK (can_pcan VectorInternalTheory.v2rK)).
+HB.instance Definition _ := isFinite.Build fvT
+  (pcan_enumP (can_pcan (VectorInternalTheory.v2rK : @cancel _ fvT _ _))).
 
 End FinVector.
 
