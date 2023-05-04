@@ -1,6 +1,15 @@
 ### Added
 
+- in `countalg.v`
+  + structures `countComSemiRingType`, `countSemiRingType` and
+    `countZsemimodType`
+
 ### Changed
+
+- in `countalg.v`
+  + structures `countZmodType`, `countRingType`, `countComRingType`,
+    `countUnitRingType`, `countComUnitRingType`, `countIdomainType`,
+    `countFieldType`, `countDecFieldType`, `countClosedFieldType` ported to HB
 
 ### Renamed
 
