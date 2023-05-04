@@ -14,7 +14,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `perm_on_id`, `perm_onC`, `tperm_on`
 
 - in `seq.v`
-  + lemmas `find_pred0`, `find_predT`
+  + lemmas `find_pred0`, `find_predT`, `unzip1_seq`, `unzip2_seq`, `perm_zip_sym`, `perm_zip1`, 
+	`perm_zip2`
 
 - in `bigop.v`
   + lemma `big_if`

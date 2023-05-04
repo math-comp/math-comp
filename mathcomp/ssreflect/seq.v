@@ -3205,7 +3205,50 @@ Lemma zip_map I f g (s : seq I) :
   zip (map f s) (map g s) = [seq (f i, g i) | i <- s].
 Proof. by elim: s => //= i s ->. Qed.
 
+Lemma unzip1_seq x y s t l :
+  size s = size t -> unzip1 [seq nth (x, y) (zip s t) i | i <- l] = [seq nth x s i | i <- l].
+Proof. by move=> st; elim: l => [//=|n l IH /=]; rewrite nth_zip /= ?IH ?st. Qed.
+
+Lemma unzip2_seq x y s t l :
+  size s = size t -> unzip2 [seq nth (x, y) (zip s t) i | i <- l] = [seq nth y t i | i <- l].
+Proof. by move=> st; elim: l => [//=|n l IH /=]; rewrite nth_zip /= ?IH ?st. Qed.
+
 End Zip.
+
+Lemma perm_zip_sym (S T : eqType) (x : S) (y : T) (s1 s2 : seq S) (t1 t2 : seq T) : 
+  size s1 = size t1 -> size s2 = size t2 -> 
+  perm_eq (zip s1 t1) (zip s2 t2) -> perm_eq (zip t1 s1) (zip t2 s2).
+Proof.
+move=> eq1 eq2 /(perm_iotaP (x, y)) [l p] eqz.  
+rewrite size_zip -eq2 minnn in p.
+apply/(perm_iotaP (y, x)); exists l => //; first by rewrite size_zip -eq2  minnn.   
+have -> : s1 = [seq nth x s2 i | i <- l].    
+  by rewrite -(@unzip1_seq _ _ _ y _ t2) -?eqz ?unzip1_zip // eq1.
+have -> : t1 = [seq nth y t2 i | i <- l].
+  by rewrite -(@unzip2_seq _ _ x _ s2) -?eqz ?unzip2_zip // eq1.  
+rewrite zip_map.
+apply: (@eq_from_nth _ (y, x)) => [|j ltjs]; first by rewrite !size_map. 
+rewrite size_map in ltjs.
+by rewrite ?(nth_map 0) ?nth_zip.
+Qed.
+
+Lemma perm_zip1 (S T : eqType) (x : S) (y : T) (s1 s2 : seq S) (t1 t2 : seq T) : 
+  size s1 = size t1 -> size s2 = size t2 ->
+  perm_eq (zip s1 t1) (zip s2 t2) -> perm_eq s1 s2.
+Proof. 
+move=> eq1 eq2 /(perm_iotaP (x, y)) [l p] eqz.
+rewrite size_zip -eq2 minnn in p.
+apply/(perm_iotaP x); exists l => //.
+rewrite -(@unzip1_zip _ _ s1 t1) ?eq12 //= ?eqz ?eq1 //= /unzip1 -?map_comp.
+apply: (@eq_from_nth _ x) => [|j ltjs]; first by rewrite !size_map.
+rewrite size_map in ltjs.
+by rewrite !(nth_map 0) /= ?nth_zip.
+Qed. 
+
+Lemma perm_zip2 (S T : eqType) (x : S) (y : T) (s1 s2 : seq S) (t1 t2 : seq T) : 
+  size s1 = size t1 -> size s2 = size t2 ->
+  perm_eq (zip s1 t1) (zip s2 t2) -> perm_eq t1 t2.
+Proof. by move=> ? ? ?; rewrite (@perm_zip1 _ _ _ _ _ _ s1 s2) 1?perm_zip_sym. Qed.
 
 Prenex Implicits zip unzip1 unzip2 all2.
 
