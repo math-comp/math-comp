@@ -236,15 +236,18 @@ HB.about eqType.
 
 ### Regular factories
 
-Factories enabling to build a structure can be discoverd with
+Factories enabling to build a structure can be discovered with
 `HB.howto`, for instance
 
 ```Coq
 HB.howto eqType.
 ```
 
-tells us that `eqType` instances can be built with `hasDecEq.Build`,
-one can then
+tells us that `eqType` instances can be built with `hasDecEq.Build`.
+(Note that by default `HB.howto` may not return all the available factories;
+it might be necessary to increase the depth search using a natural number
+as in `HB.howto xyzType 5`.)
+One can then
 
 ```Coq
 HB.about hasDecEq.Build.
