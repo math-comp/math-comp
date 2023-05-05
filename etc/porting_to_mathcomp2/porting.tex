@@ -1,0 +1,441 @@
+\documentclass{article}
+
+\def\coq{\textsc{Coq}}
+\def\mathcomp{\textsc{MathComp}}
+\def\hb{\textsc{HB}}
+\def\compdecmodal{\textsc{CompDecModal}}
+
+\usepackage[usenames]{xcolor}
+\usepackage{minted}
+\setminted{fontsize=\small}
+\usemintedstyle{ssr}
+\def\coqin#1{\mintinline{ssr}{#1}}
+
+\newminted[failure]{ssr}{bgcolor=lightgray}
+\newminted[success]{ssr}{frame=single}
+
+\def\rei#1{TODO(rei): #1}
+\def\newterm#1{{\sl #1}}
+
+\usepackage{fullpage}
+\usepackage{hyperref}
+\usepackage{graphicx}
+
+\title{Porting Coq Scripts to the Mathematical Components Library Version 2}
+
+\begin{document}
+
+\maketitle
+
+The goal of this document is to explain how to port developments using \mathcomp{}
+to \mathcomp{}~2.
+
+The Mathematical Components library (hereafter, \mathcomp) provides a number
+of mathematical structures organized as hierarchies. Hierarchy Builder (hereafter, \hb)
+is an extension of the \coq{} proof assistant to ease the development of
+hierarchies of structures~\cite{cohen2020fscd}. \mathcomp{}~2 is the result
+of the port of \mathcomp{} to \hb{}~\cite{mathcomp2021coq}.
+
+For the sake of concreteness, we illustrate the port of
+\compdecmodal~\cite{compdecmodal} in Sect.~\ref{sec:compdecmodal}.
+Before that we review basic usage of \hb{} in Sect.~\ref{sec:reminder}
+and review the documentation tools available for porting in Sect.~\ref{sec:explore}.
+
+\tableofcontents
+
+\section{Quick Reminder About \hb}
+\label{sec:reminder}
+
+The goal of this section is to briefly explain the three main commands
+introduced by \hb: \coqin{HB.mixin}, \coqin{HB.structure}, and
+\coqin{HB.instance}. The knowledgeable reader can safely skip this
+section.
+
+Let us explain in a generic way the most basic scenario.
+Here is the pattern to declare a structure \coqin{Struct} that sits
+sit at the bottom of a hierarchy.  The interface of the structure goes
+into a mixin:
+\begin{minted}{ssr}
+HB.mixin Record isStruct params carrier := {
+  ... properties about the carrier ...
+}
+\end{minted}
+
+The structure itself is declared like a sigma-type:
+\begin{minted}{ssr}
+#[short(type=structType)]
+HB.structure Definition Struct := {carrier of isStruct carrier}
+\end{minted}
+\hb{} is using \coq{} attributes to declare the type corresponding to a structure.
+
+Here is the pattern to declare a new structure \coqin{NewStruct} that
+extends the existing structure \coqin{Struct}; note the \coqin{of} syntax.
+\begin{minted}{ssr}
+HB.mixin Record NewStruct_from_Struct params carrier
+    of Struct params carrier := {
+  ... more properties about the carrier ...
+}
+\end{minted}
+
+In the case of the extended structure, the sigma-type makes appear the
+dependency to the parent structure; note the \coqin{&} syntax.
+\begin{minted}{ssr}
+#[short(type=newStructType)]
+HB.structure NewStruct params :=
+  {carrier of NewStruct_from_Struct parames carrier
+            & Struct params carrier}.
+\end{minted}
+
+This process results in the creation of the types \coqin{structType}
+and \coqin{newStructType} such that elements of the latter are also
+understood to be elements of the former.
+
+Finally, the declaration of a mixin \coqin{Struct} is accompanied by
+the creation of a constructor \coqin{Struct.Build} which is used to instantiate
+a structure using the command:
+\begin{minted}{ssr}
+HB.instance Definition _ := Struct.Build params.
+\end{minted}
+The command \coqin{HB.instance} should trigger the printing of several
+lines of information output such as
+\coqin{module_type__canonical__struct_Struct}.  The absence of this
+output often indicates failure of the \coqin{HB.instance} command.
+
+For more information about \hb{} see:
+\begin{itemize}
+\item the original paper for an extensive introduction to \hb{} commands~\cite{cohen2020fscd},
+\item the \hb{} development for documentation and examples~\cite{hb}
+(start with the \href{https://github.com/math-comp/hierarchy-builder#readme}{README}),
+\item various papers for more applications~\cite{mathcomp2021coq} \cite[Sect.~3]{affeldt2022arxiv} \cite[Sect.~4]{affeldt2023cpp}.
+\end{itemize}
+
+\section{Tools to Port \mathcomp{} Applications}
+\label{sec:explore}
+
+\subsection{Documentation}
+
+The following pieces of documentation are useful during the process of
+porting a \mathcomp{} application to \mathcomp~2:
+\begin{itemize}
+\item The changelog is the primary source of information. See \coqin{CHANGELOG.md}.
+\item Additionally, structures are documented in the headers of the
+  source code according to the following format:
+\begin{minted}{text}
+(*****************************************************************************)
+(*                             Centered Title                                *)
+(*                                                                           *)
+(* Some introductory text: what is this file about, instructions to use this *)
+(* file, etc.                                                                *)
+(*                                                                           *)
+(* Reference: bib entry if any                                               *)
+(*                                                                           *)
+(* * Section Name                                                            *)
+(*   definition == prose explanation of the definition and its parameters    *)
+(*     notation == prose explanation, scope information should appear nearby *)
+(*   structType == name of structures should make clear the corresponding    *)
+(*                 HB structure with the following sentence:                 *) 
+(*                 "The HB class is Xyz."                                    *)
+(*     shortcut := a shortcut can be explained with (pseudo-)code instead of *)
+(*                 prose                                                     *)
+(*                                                                           *)
+(* Acknowledgments: people                                                   *)
+(*****************************************************************************)    
+\end{minted}
+See for example the \coqin{eqType} structure defined in the file
+\coqin{ssreflect/eqtype.v}.
+%
+See this
+\href{https://github.com/math-comp/analysis/wiki/How-to-document}{wiki
+  entry} for more information about the documentation of scripts.
+\item Optionally, the user can double-check the naming of identifiers
+  and lemmas with the naming conventions explained in
+  \coqin{CONTRIBUTING.md}.
+\end{itemize}
+
+\subsection{\hb{} Commands Useful to Explore an Existing Hierarchy}
+
+Besides the changelog and the headers of source code, the user can use
+\hb{} commands to explore a hierarchy of mathematical structures.
+
+\subsubsection{Information about Structures with \coqin{HB.about}}
+
+Basic information about structures can be obtained via the command
+\coqin{HB.about} as in:
+\begin{minted}{ssr}
+> HB.about eqType.
+HB: eqType is a structure (from "./ssreflect/eqtype.v", line 137)
+HB: eqType characterizing operations and axioms are:
+    - eqP
+    - eq_op
+HB: eqtype.Equality is a factory for the following mixins:
+    - hasDecEq (* new, not from inheritance *)
+HB: eqtype.Equality inherits from:
+HB: eqtype.Equality is inherited by:
+    - SubEquality
+    - choice.Choice
+...
+\end{minted}
+(The output message refers to a \newterm{factoriy}: this is a
+generalization of mixin.)
+
+\paragraph{Graph of an \hb{} Hierarchy}
+
+It is also possible to explore a \hb{} hierarchy using the command
+\coqin{HB.graph}. Inside a \coq{} file:
+\begin{minted}{ssr}
+HB.graph "hierarchy.dot".
+\end{minted}
+From a terminal:
+\begin{minted}{text}
+tred hierarchy.dot | dot -Tpng > hierarchy.png
+\end{minted}
+For example, Fig.~\ref{fig:eqtype_hier} displays the immediate
+vicinity of \coqin{eqType}.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=9cm]{eqtype_hier.png}
+\caption{The vicinity of the structure {\tt eqType} in \mathcomp{}}
+\label{fig:eqtype_hier}
+\end{figure}
+
+\subsubsection{Information about Constructors with \coqin{HB.howto} and \coqin{HB.about}}
+
+To discover constructors to build a structure, one can use the command
+\coqin{HB.howto}. For instance
+\begin{minted}{ssr}
+> HB.howto eqType.
+HB: solutions (use 'HB.about F.Build' to see the arguments of each factory F):
+    - hasDecEq
+\end{minted}
+tells us that \coqin{eqType} instances can be built with \coqin{hasDecEq.Build}.
+(Note that by default \coqin{HB.howto} may not return all the available factories;
+it might be necessary to increase the depth search using a natural number
+as in \coqin{HB.howto xyzType 5}.)
+
+To learn which parameters a \coqin{xyz.Build} constructor is expecting, one
+can use the \coqin{HB.about} command:
+\begin{minted}{ssr}
+> HB.about hasDecEq.Build.
+HB: hasDecEq.Build is a factory constructor
+    (from "./ssreflect/eqtype.v", line 135)
+HB: hasDecEq.Build requires its subject to be already equipped with:
+HB: hasDecEq.Build provides the following mixins:
+    - hasDecEq
+HB: arguments: hasDecEq.Build T [eq_op] eqP
+    - T : Type
+    - eq_op : rel T
+    - eqP : Equality.axiom eq_op
+\end{minted}
+The message indicates that \coqin{hasDecEq.Build} is expecting a type
+\coqin{T}, a predicate \coqin{eq_op : rel T} (implicit argument,
+as indicated by the square brackets) and a proof of \coqin{Equality.axiom eq_op}.
+One can thus instantiate an \coqin{eqType} on some type \coqin{T} with]
+\begin{minted}{ssr}
+HB.instance Definition _ := hasDecEq.Build T proof_of_Equality_axiom.
+\end{minted}
+or
+\begin{minted}{ssr}
+HB.instance Definition _ := @hasDecEq.Build T eq_op proof_of_Equality_axiom.
+\end{minted}
+which should output a few lines among which (recall that the absence of this output
+often indicate an instantiation problem)\footnote{Beware that at the time of this writing the output may not be visible
+by default with vscoq.}:
+\begin{minted}{text}
+module_T__canonical__eqtype_Equality is defined
+\end{minted}
+
+\paragraph{Discover Aliases and feather factories}
+
+In addition to the structures and constructors listed by \coqin{HB.about}, the
+library defines some aliases (a.k.a.\ feather factories). These aliases
+are documented in the header comments. For instance, an \coqin{eqType}
+instance on some type \coqin{T} can be derived from some \coqin{T'} already
+equipped with an \coqin{eqType} structure, given a function \coqin{f : T -> T'}
+and a proof \coqin{injf : injective f}:
+\begin{minted}{ssr}
+HB.instance Definition _ := Equality.copy T (inj_type injf).
+\end{minted}
+See \coqin{eqType.v} for \coqin{inj_type}.
+
+\subsubsection{Information about instances with \coqin{HB.about}}
+
+Instances a type is already equipped with can be listed with
+\coqin{HB.about}, for instance:
+\begin{minted}{ssr}
+> HB.about bool.
+HB: bool is canonically equipped with structures:
+    - Order.BDistrLattice
+      Order.BLattice
+      Order.BPOrder
+      (from "./ssreflect/order.v", line 6064)
+...
+\end{minted}
+
+lists all the structures \coqin{bool} is already equipped with.
+
+\section{Porting a Development using \mathcomp{} to \mathcomp~2}
+\label{sec:compdecmodal}
+
+The basic strategy to port an existing \mathcomp{} development to
+\mathcomp~2 is to (1)~install \mathcomp~2, (2)~compile the existing source
+code, and (3)~fix the errors one after the other.
+%
+For the sake of concreteness, we explain the port of
+\compdecmodal~\cite{compdecmodal}. This is a development with a
+moderate use of \mathcomp{} whose port involves fixing the
+instantiation of basic structures that most developments using
+\mathcomp{} are likely to use.
+
+\subsection{Import the \hb{} Library}
+
+First thing first, any \coq{} file using \hb{} must start with:
+\begin{minted}{ssr}
+From HB Require Import structures.
+\end{minted}
+
+\subsection{Instantiation of Structures with \mathcomp~2}
+
+From the viewpoint of the \mathcomp{} user, the main change is the way
+mathematical structures are now instantiated. Most \coqin{Canonical}
+(or \coqin{Canonical Structure}) commands are replaced by
+\coqin{HB.instance} (see Sect.~\ref{sec:reminder}) and there are small
+changes to \mathcomp{} notations such \coqin{[subType ...]}, etc.
+
+Regarding \compdecmodal, the first offending set of commands is the
+following (file \coqin{fset.v}):
+\begin{failure}
+Section FinSets.
+ Variable T : choiceType.
+ ...
+ Canonical Structure fset_subType := [subType for elements by fset_type_rect].
+ Canonical Structure fset_eqType := EqType _ [eqMixin of fset_type by <:].
+ Canonical Structure fset_predType := PredType (fun (X : fset_type) x => nosimpl x \in elements X).
+ Canonical Structure fset_choiceType := Eval hnf in ChoiceType _ [choiceMixin of fset_type by <:].
+End FinSets.
+
+Canonical Structure fset_countType (T : countType) :=
+  Eval hnf in CountType _ [countMixin of fset_type T by <:].
+Canonical Structure fset_subCountType (T : countType) :=
+  Eval hnf in [subCountType of fset_type T].
+\end{failure}
+
+Let us consider compilation errors in order:
+\begin{failure}
+> Canonical Structure fset_subType := [subType for elements by fset_type_rect].
+Error: Syntax error: [reduce] expected after ':=' (in [def_body]).
+\end{failure}
+This error is due to a change of notation that is documented in the
+changelog.  Search for the string, say, ``\coqin{[subType}'' in
+\coqin{CHANGELOG.md}:
+\begin{minted}{text}
+- in `eqtype.v`
+  ...
+  + notation `[subType for v by rec]`, use `[isSub for v by rec]`
+  ...
+\end{minted}
+The fix is therefore the following:
+\begin{success}
+> HB.instance Definition _ := [isSub for elements by fset_type_rect].
+HB_unnamed_factory_3 is defined
+fset_fset_type__canonical__eqtype_SubType is defined
+\end{success}
+Note that the instance need not be named and better not be since it is
+the job of \hb{} to figure out instances automatically.
+%
+It is important to check that \hb{} displays more than one message as
+a response to \coqin{HB.instance}, otherwise this might indicate a
+failed instantiation.
+
+Next compilation error:
+\begin{failure}
+> Canonical Structure fset_eqType := EqType _ [eqMixin of fset_type by <:].
+Error: The reference EqType was not found in the current environment.
+\end{failure}
+This error is primarily due to the remove of the \coqin{EqType}
+constructor~\cite[Sect.~2.1]{garillot2009tphols}. In fact, most
+\coqin{xyzType} constructors from \mathcomp{} should not be necessary
+anymore. See the changelog.
+%
+Similarly to the \coqin{[subType for _ by _]} notation above, 
+the \coqin{[eqMixin of _ by <:]} has changed:
+\begin{minted}{text}
+- in `eqtype.v`
+  ...
+  + notation `[eqMixin of T by <:]`, use `[Equality of T by <:]`
+  ...
+\end{minted}
+The fix is therefore:
+\begin{success}
+> HB.instance Definition _ := [Equality of fset_type by <:].
+HB_unnamed_factory_8 is defined
+eqtype_Equality__to__eqtype_hasDecEq is defined
+HB_unnamed_mixin_10 is defined
+fset_fset_type__canonical__eqtype_Equality is defined
+fset_fset_type__canonical__eqtype_SubEquality is defined
+\end{success}
+
+The next two compilation errors are similarly due to the removal of
+\coqin{choiceType} and \coqin{CountType}, and to the change of the
+notations \coqin{[choiceMixin of _ by <:]} and \coqin{[countMixin of _
+  by <:]}:
+\begin{failure}
+> Canonical Structure fset_choiceType := Eval hnf in ChoiceType _ [choiceMixin of fset_type by <:].
+Error: The reference ChoiceType was not found in the current environment.
+> Canonical Structure fset_countType (T : countType) :=
+>   Eval hnf in CountType _ [countMixin of fset_type T by <:].
+Error: The reference CountType was not found in the current environment.
+\end{failure}
+The fix can again be inferred from the changelog:
+\begin{success}
+> HB.instance Definition _ := [Choice of fset_type by <:].
+HB_unnamed_factory_11 is defined
+choice_Choice__to__choice_hasChoice is defined
+HB_unnamed_mixin_14 is defined
+fset_fset_type__canonical__choice_Choice is defined
+fset_fset_type__canonical__choice_SubChoice is defined
+> HB.instance Definition _ (T : countType) := [Countable of fset_type T by <:].
+T is declared
+HB_unnamed_factory_30 is defined
+choice_Countable__to__choice_hasChoice is defined
+choice_Countable__to__eqtype_hasDecEq is defined
+choice_Countable__to__choice_Choice_isCountable is defined
+HB_unnamed_mixin_34 is defined
+fset_fset_type__canonical__choice_Countable is defined
+fset_fset_type__canonical__choice_SubCountable is defined
+\end{success}
+Note that, although \hb{} does provide an \coqin{#[hnf]} attribute, it
+should not be necessary in general.
+
+The last message by \hb{} is important because it indicates that the next command
+\begin{failure}
+> Canonical Structure fset_subCountType (T : countType) :=
+>  Eval hnf in [subCountType of fset_type T].
+Warning: Notation "[ subCountType of _ ]" is deprecated since mathcomp 2.0.0.
+Use SubCountable.clone instead.
+[deprecated-notation,deprecated]
+fset_subCountType is defined
+\end{failure}
+can now be removed.
+
+To sum up, here follows the complete fix:
+\begin{success}
+Section FinSets.
+ Variable T : choiceType.
+ ...
+ HB.instance Definition _ := [isSub for elements by fset_type_rect].
+ HB.instance Definition _ := [Equality of fset_type by <:].
+ Canonical Structure fset_predType := PredType (fun (X : fset_type) x => nosimpl x \in elements X).
+ HB.instance Definition _ := [Choice of fset_type by <:].
+End FinSets.
+
+HB.instance Definition _ (T : countType) := [Countable of fset_type T by <:].
+Canonical Structure fset_subCountType (T : countType) :=
+  Eval hnf in [subCountType of fset_type T].
+\end{success}
+
+
+\bibliographystyle{abbrv}
+\bibliography{porting}
+
+\end{document}
