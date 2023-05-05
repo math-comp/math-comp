@@ -2,6 +2,9 @@
 
 ### Changed
 
+- in `fieldext.v`
+  + structure `fieldExtType` ported to HB
+
 ### Renamed
 
 ### Removed
