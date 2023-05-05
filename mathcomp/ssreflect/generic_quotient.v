@@ -370,11 +370,11 @@ HB.instance Definition _ (T : finType) (qT : quotType T) :=
   [Finite of quot_type qT by <:].
 
 Notation "[ 'Sub' Q 'of' T 'by' %/ ]" :=
-  (Sub.copy Q%type (quot_type_of T Q))
+  (SubType.copy Q%type (quot_type_of T Q))
   (at level 0, format "[ 'Sub'  Q  'of'  T  'by'  %/ ]") : form_scope.
 
 Notation "[ 'Sub' Q 'by' %/ ]" :=
-  (Sub.copy Q%type (quot_type Q))
+  (SubType.copy Q%type (quot_type Q))
   (at level 0, format "[ 'Sub'  Q  'by'  %/ ]") : form_scope.
 
 Notation "[ 'Equality' 'of' Q 'by' <:%/ ]" :=

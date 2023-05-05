@@ -5196,7 +5196,7 @@ End TLatticePred.
 End LatticePred.
 
 HB.mixin Record isSubPOrder d (T : porderType d) (S : pred T) d' U
-    of Sub T S U & POrder d' U := {
+    of SubType T S U & POrder d' U := {
   val_le_subproof : {mono (val : U -> T) : x y / x <= y};
 }.
 
@@ -5237,12 +5237,12 @@ HB.instance Definition _ := isSubPOrder.Build d T S d' U valD.
 HB.end.
 
 HB.mixin Record isMeetSubLattice d (T : latticeType d) (S : pred T) d' U
-    of Sub T S U & Lattice d' U := {
+    of SubType T S U & Lattice d' U := {
   valI_subproof : {morph (val : U -> T) : x y / x `&` y};
 }.
 
 HB.mixin Record isJoinSubLattice d (T : latticeType d) (S : pred T) d' U
-    of Sub T S U & Lattice d' U := {
+    of SubType T S U & Lattice d' U := {
   valU_subproof : {morph (val : U -> T) : x y / x `|` y};
 }.
 
@@ -5372,7 +5372,7 @@ HB.instance Definition _ := SubPOrder_isSubLattice.Build d T S d' U
 HB.end.
 
 HB.mixin Record isBSubLattice d (T : bLatticeType d) (S : pred T) d' U
-    of Sub T S U & BLattice d' U := {
+    of SubType T S U & BLattice d' U := {
   val0_subproof : (val : U -> T) 0 = 0;
 }.
 
@@ -5429,7 +5429,7 @@ HB.instance Definition _ := SubPOrder_isBSubLattice.Build d T S d' U
 HB.end.
 
 HB.mixin Record isTSubLattice d (T : tLatticeType d) (S : pred T) d' U
-    of Sub T S U & TLattice d' U := {
+    of SubType T S U & TLattice d' U := {
   val1_subproof : (val : U -> T) 1 = 1;
 }.
 

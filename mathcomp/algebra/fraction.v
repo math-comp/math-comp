@@ -36,7 +36,7 @@ Local Notation "{ 'ratio' T }" := (ratio_of (Phant T)).
 
 HB.instance Definition _ := [isSub for frac].
 HB.instance Definition _ := [Choice of ratio by <:].
-HB.instance Definition _ := Sub.on {ratio R}.
+HB.instance Definition _ := SubType.on {ratio R}.
 HB.instance Definition _ := Choice.on {ratio R}.
 
 Lemma denom_ratioP : forall f : ratio, f.2 != 0. Proof. by case. Qed.

@@ -144,7 +144,7 @@ Identity Coercion type_poly_of : poly_of >-> polynomial.
 
 Local Notation "{poly}" := (poly_of (Phant R)).
 
-HB.instance Definition _ := Sub.on {poly}.
+HB.instance Definition _ := SubType.on {poly}.
 HB.instance Definition _ := Choice.on {poly}.
 
 Definition coefp i (p : poly_of (Phant R)) := p`_i.

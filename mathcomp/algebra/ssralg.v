@@ -5025,7 +5025,7 @@ End FieldPred.
 Obligation Tactic := idtac.
 
 HB.mixin Record isSubNmodule (V : nmodType) (S : pred V) U
-    of Sub V S U & Nmodule U := {
+    of SubType V S U & Nmodule U := {
   valD_subproof : semi_additive (val : U -> V);
 }.
 

@@ -532,7 +532,7 @@ HB.instance Definition _ := [isSub for asval].
 HB.instance Definition _ := [Equality of aspace by <:].
 HB.instance Definition _ := [Choice of aspace by <:].
 
-HB.instance Definition _ := Sub.on {aspace aT}.
+HB.instance Definition _ := SubType.on {aspace aT}.
 HB.instance Definition _ := Equality.on {aspace aT}.
 HB.instance Definition _ := Choice.on {aspace aT}.
 

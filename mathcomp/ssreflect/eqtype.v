@@ -16,7 +16,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*                The main notation is the boolean equality "==", see below.  *)
 (*   subType P == types isomorphic to {x : T | P x}                           *)
 (*                with P : pred T for some type T                             *)
-(*                The HB class is called Sub.                                 *)
+(*                The HB class is called SubType.                             *)
 (* subEqType P == join of eqType and subType P                                *)
 (*                The HB class is called SubEquality.                         *)
 (*                                                                            *)
@@ -537,10 +537,10 @@ HB.mixin Record isSub (T : Type) (P : pred T) (sub_sort : Type) := {
 }.
 
 #[short(type="subType")]
-HB.structure Definition Sub (T : Type) (P : pred T) := { S of isSub T P S }.
+HB.structure Definition SubType (T : Type) (P : pred T) := { S of isSub T P S }.
 
-Notation val := (isSub.val_subdef (Sub.on _)).
-Notation "\val" := (isSub.val_subdef (Sub.on _)) (only parsing).
+Notation val := (isSub.val_subdef (SubType.on _)).
+Notation "\val" := (isSub.val_subdef (SubType.on _)) (only parsing).
 Notation "\val" := (isSub.val_subdef _) (only printing).
 
 #[short(type="subEqType")]
@@ -560,7 +560,7 @@ Section Theory.
 
 Variable sT : subType P.
 
-Local Notation val := (isSub.val_subdef (Sub.on sT)).
+Local Notation val := (isSub.val_subdef (SubType.on sT)).
 Local Notation sub := (@sub _ _ sT).
 
 Lemma subK x Px : val (@sub x Px) = x. Proof. exact: subK_subproof. Qed.
@@ -768,7 +768,7 @@ Notation CanEqMixin := deprecated_CanEqMixin.
 Definition sub_type_of T (P : pred T) (sT : subType P) of phant sT : Type := sT.
 Notation sub_type T := (sub_type_of (Phant T)).
 HB.instance Definition _ T (P : pred T) (sT : subType P) :=
-  Sub.copy (sub_type sT) sT.
+  SubType.copy (sub_type sT) sT.
 
 Section SubEqType.
 
