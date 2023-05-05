@@ -9,7 +9,7 @@ From mathcomp Require Import mxpoly vector falgebra fieldext separable galois.
 From mathcomp Require ssrnum ssrint algC cyclotomic.
 
 (******************************************************************************)
-(*  Additional constructions and results on finite fields.                    *)
+(*           Additional constructions and results on finite fields            *)
 (*                                                                            *)
 (*         FinFieldExtType L == A FinFieldType structure on the carrier of L, *)
 (*                              where L IS a fieldExtType F structure for an  *)
@@ -20,13 +20,11 @@ From mathcomp Require ssrnum ssrint algC cyclotomic.
 (*                              carrier of L, where L IS a fieldExtType F for *)
 (*                              an F with a finFieldType structure; this      *)
 (*                              should not be made canonical.                 *)
-(*          Import FinVector :: Declares canonical default finType, finRing,  *)
+(*           finvect_type vT == alias of vT : vecType R equipped with         *)
+(*                              canonical instances for finType, finRing,     *)
 (*                              etc structures (including FinFieldExtType     *)
 (*                              above) for abstract vectType, falgType and    *)
-(*                              fieldExtType over a finFieldType. This should *)
-(*                              be used with caution (e.g., local to a proof) *)
-(*                              as the finType so obtained may clash with the *)
-(*                              canonical one for standard types like matrix. *)
+(*                              fieldExtType over a finFieldType.             *)
 (*      PrimeCharType charRp == The carrier of a ringType R such that         *)
 (*                              charRp : p \in [char R] holds. This type has  *)
 (*                              canonical ringType, ..., fieldType structures *)
@@ -201,7 +199,8 @@ End FinFieldExt.
 Definition FinSplittingFieldType (F : finFieldType) (fT : fieldExtType F) :=
   HB.pack_for (splittingFieldType F) fT (SplittingField.on (finvect_type fT)).
 Definition FinFieldExtType (F : finFieldType) (fT : fieldExtType F) :=
-  HB.pack_for finFieldType (FinSplittingFieldType fT) (FinRing.Field.on (finvect_type fT)).
+  HB.pack_for finFieldType (FinSplittingFieldType fT)
+    (FinRing.Field.on (finvect_type fT)).
 Arguments FinSplittingFieldType : clear implicits.
 
 Section PrimeChar.
@@ -528,7 +527,7 @@ have [L [zs Dq]]: {L : fieldExtType K & splits L q^%:A}.
   by rewrite ltnS Dszp size_mul ?polyXsubC_eq0 ?size_XsubC ?addn2 in lbn.
 suffices: splits L p^%:A^%:A.
   rewrite -[_^%:A]map_poly_comp.
-(* FIX ME : had to give the F explicitely  *)
+(* TODO_HB : had to give the F explicitely  *)
   rewrite -(eq_map_poly (fun a : F => baseField_scaleE a 1)).
   by exists (baseFieldType L).
 exists (x%:A :: zs); rewrite big_cons; set rhs := _ * _.
