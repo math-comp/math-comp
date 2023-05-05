@@ -226,9 +226,8 @@ rewrite -(index_map Some_inj) nth_index ?map_f//.
 by apply/count_memPn=> /eqP; rewrite f.
 Qed.
 
-HB.instance Definition _ := Equality.copy fT T.
-HB.instance Definition _ := Countable.copy fT
-  (count_type (isCountable.Build fT fin_pickleK)).
+HB.instance Definition _ := Equality.on fT.
+HB.instance Definition _ := isCountable.Build fT fin_pickleK.
 HB.instance Definition _ := isFinite.Build fT f.
 
 End CanonicalFinType.
@@ -1394,16 +1393,18 @@ move=> fK x; rewrite count_uniq_mem ?undup_uniq // mem_undup.
 by rewrite mem_pmap -fK map_f // -enumT mem_enum.
 Qed.
 
-Definition PcanFinMixin_deprecated g fK := @isFinite.Build _ _ (@pcan_enumP g fK).
+Definition PCanIsFinite g fK := @isFinite.Build _ _ (@pcan_enumP g fK).
 
-Definition CanFinMixin_deprecated g (fK : cancel f g) := PcanFinMixin_deprecated (can_pcan fK).
+Definition CanIsFinite g (fK : cancel f g) := PCanIsFinite (can_pcan fK).
 
 End TransferFinTypeFromCount.
 
-#[deprecated(since="mathcomp 2.0.0", note="Use pcan_type instead.")]
-Notation PcanFinMixin := PcanFinMixin_deprecated.
-#[deprecated(since="mathcomp 2.0.0", note="Use can_type instead.")]
-Notation CanFinMixin := CanFinMixin_deprecated.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use pcan_type instead or PCanIsFInite.")]
+Notation PcanFinMixin := PCanIsFinite.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use can_type instead or CanIsFinite.")]
+Notation CanFinMixin := CanIsFinite.
 
 Section TransferFinType.
 

@@ -9,7 +9,16 @@
   + `[choiceMixin of T by <:]` becomes `[Choice of T by <:]`
   + `[countMixin of T by <:]` becomes `[Countable of T by <:]`
   + `Choice.mixin_of` becomes `hasChoice`
-  + `Countable.mixin_of` becomes `isCountable`
+  + `Countable.mixin_of` becomes `Choice_isCountable`
+  + `ChoiceMixin` becomes `hasChoice.Build`
+  + `CountMixin` becomes `Choice_isCountable.Build`
+  + `CountChoiceMixin` is subsumed by `Equality_isCountable.Build`
+    (instead of two successive calls to `CountChoiceMixin` and
+    `CountMixin`, only one to `Equality_isCountable.Build` is necessary)
+  + `CanChoiceMixin` -> use `Choice.copy` with `can_type` or `CanHasChoice`
+  + `PcanChoiceMixin` -> use `Choice.copy` with `pcan_type` or `PCanHasChoice`
+  + `CanCountMixin` -> use `Countable.copy` with `can_type` or `CanIsCountable`
+  + `PcanCountMixin` -> use `Countable.copy` with `pcan_type` or `PCanIsCountable`
 
 ### Renamed
 
@@ -19,7 +28,6 @@
   + `seq_choiceMixin` -> `seq_hasChoice`
   + `tagged_choiceMixin` -> `tagged_hasChoice`
   + `nat_choiceMixin` -> `nat_hasChoice`
-  + `PcanChoiceMixin` -> `pcancel_hasChoice_subproof`
 
 ### Removed
 
@@ -51,6 +59,7 @@
     `prod_countMixin`, `prod_countType`,
     `sum_countMixin`, `sum_countType`,
     `tree_countMixin`, `tree_countType`
+  + `CountChoiceMixin`
 
 ### Deprecated
 
@@ -64,7 +73,3 @@
   + notation `[countType of T]`, use `Countable.clone T _` or `T : countType`
   + notation `[countMixin of T by <:]`, use `[Countable of T by <:]`
   + notation `[subCountType of T]`, use `SubCountable.clone _ _ T _`
-  + `CanChoiceMixin` -> use Choice.copy with can_type
-  + `PcanChoiceMixin` -> use Choice.copy with pcan_type
-  + `CanCountMixin` -> use Countable.copy with can_type
-  + `PcanCountMixin` -> use Countable.copy with pcan_type
