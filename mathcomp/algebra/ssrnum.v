@@ -97,7 +97,7 @@ Module Num.
 
 #[short(type="porderZmodType")]
 HB.structure Definition POrderedZmodule :=
-  { R of Order.isPOrdered ring_display R & GRing.Zmodule R }.
+  { R of Order.isPOrder ring_display R & GRing.Zmodule R }.
 
 HB.mixin Record Zmodule_isNormed (R : POrderedZmodule.type) M
          of GRing.Zmodule M := {
@@ -4847,10 +4847,6 @@ Notation maxr_nmull := maxr_nMl.
 
 End Theory.
 
-(*************)
-(* FACTORIES *)
-(*************)
-
 HB.factory Record IntegralDomain_isNumRing R of GRing.IntegralDomain R := {
   Rle : rel R;
   Rlt : rel R;
@@ -4934,7 +4930,7 @@ HB.builders Context R of IntegralDomain_isNumRing R.
   Proof. by rewrite -mulN1r normM -[RHS]mul1r normrN1. Qed.
 
   HB.instance Definition _ :=
-    Order.isLtLePOrdered.Build ring_display R le_def' ltrr lt_trans.
+    Order.LtLe_isPOrder.Build ring_display R le_def' ltrr lt_trans.
 
   HB.instance Definition _ :=
     Zmodule_isNormed.Build _ R normD norm_eq0 normrMn normrN.

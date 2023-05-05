@@ -40,8 +40,14 @@ From mathcomp Require Import finset.
 (*                           The HB class is called POrder.                   *)
 (*          latticeType d == the type of non-distributive lattices            *)
 (*                           The HB class is called Lattice.                  *)
+(*          bPOrderType d == partial order with a bottom element              *)
+(*                           The HB class is called BPOrder.                  *)
 (*         bLatticeType d == latticeType with a bottom element                *)
 (*                           The HB class is called BLattice.                 *)
+(*          tPOrderType d == partial order with a top element                 *)
+(*                           The HB class is called TPOrder.                  *)
+(*         tbPOrderType d == partial order with a top and a bottom elements   *)
+(*                           The HB class is called TBPOrder.                 *)
 (*         tLatticeType d == latticeType with a top element                   *)
 (*                           The HB class is called TLattice.                 *)
 (*        tbLatticeType d == latticeType with both a top and a bottom         *)
@@ -352,7 +358,7 @@ From mathcomp Require Import finset.
 (* 1. declaring a new opaque definition of type unit. Using the idiom         *)
 (*    `Fact my_display : unit. Proof. exact: tt. Qed.`                        *)
 (* 2. using this symbol to tag canonical porderType structures using          *)
-(*    `HB.instance Definition _ := isPOrdered.Build my_display my_type ...`,  *)
+(*    `HB.instance Definition _ := isPOrder.Build my_display my_type ...`,    *)
 (* 3. declaring notations for the main operations of this library, by         *)
 (*    setting the first argument of the definition to the display, e.g.       *)
 (*    `Notation my_syndef_le x y := @Order.le my_display _ x y.` or           *)
@@ -1045,11 +1051,7 @@ Reserved Notation "'{' 'tblmorphism' U '->' V '}'"
 
 Module Order.
 
-(**************)
-(* STRUCTURES *)
-(**************)
-
-HB.mixin Record isPOrdered (d : unit) T of hasDecEq T := {
+HB.mixin Record isPOrder (d : unit) T of Equality T := {
   le       : rel T;
   lt       : rel T;
   lt_def   : forall x y, lt x y = (y != x) && (le x y);
@@ -1060,29 +1062,29 @@ HB.mixin Record isPOrdered (d : unit) T of hasDecEq T := {
 
 #[short(type="porderType")]
 HB.structure Definition POrder (d : unit) :=
-  { T of Choice T & isPOrdered d T }.
+  { T of Choice T & isPOrder d T }.
 
-HB.factory Record isLePOrdered (d : unit) T of hasDecEq T := {
+HB.factory Record Le_isPOrder (d : unit) T of Equality T := {
   le       : rel T;
   le_refl  : reflexive     le;
   le_anti  : antisymmetric le;
   le_trans : transitive    le;
 }.
 
-HB.builders Context (d : unit) T of isLePOrdered d T.
+HB.builders Context (d : unit) T of Le_isPOrder d T.
 (* TODO: print nice error message when keyed type is not provided *)
-HB.instance Definition _ := @isPOrdered.Build d T
+HB.instance Definition _ := @isPOrder.Build d T
   le _ (fun _ _ => erefl) le_refl le_anti le_trans.
 HB.end.
 
-HB.factory Record isLtLePOrdered (d : unit) T of hasDecEq T := {
+HB.factory Record LtLe_isPOrder (d : unit) T of Equality T := {
   le : rel T;
   lt : rel T;
   le_def   : forall x y, le x y = (x == y) || lt x y;
   lt_irr   : irreflexive lt;
   lt_trans : transitive lt;
 }.
-HB.builders Context (d : unit) T of isLtLePOrdered d T.
+HB.builders Context (d : unit) T of LtLe_isPOrder d T.
 
 Let le_refl : reflexive le. Proof. by move=> x; rewrite le_def eqxx. Qed.
 
@@ -1102,19 +1104,19 @@ Qed.
 Let lt_def x y : lt x y = (y != x) && (le x y).
 Proof. by rewrite le_def; case: eqVneq => //= ->; rewrite lt_irr. Qed.
 
-HB.instance Definition _ := @isPOrdered.Build d T
+HB.instance Definition _ := @isPOrder.Build d T
   le lt lt_def le_refl le_anti le_trans.
 
 HB.end.
 
-HB.factory Record isLtPOrdered (d : unit) T of hasDecEq T := {
+HB.factory Record Lt_isPOrder (d : unit) T of Equality T := {
   lt       : rel T;
   lt_irr   : irreflexive lt;
   lt_trans : transitive  lt;
 }.
 #[key="T"]
-HB.builders Context (d : unit) (T : Type) of isLtPOrdered d T.
-HB.instance Definition _ := @isLtLePOrdered.Build d T
+HB.builders Context (d : unit) (T : Type) of Lt_isPOrder d T.
+HB.instance Definition _ := @LtLe_isPOrder.Build d T
   _ lt (fun _ _ => erefl) lt_irr lt_trans.
 HB.end.
 
@@ -1428,8 +1430,8 @@ HB.mixin Record hasBottom d (T : Type) of POrder d T := {
   bottom : T;
   le0x : forall x, bottom <= x;
 }.
-(* TODO: Restore when we remove the mathcomp attribute *)
-(* HB.structure Definition BPOrder d := { T of hasBottom d T & POrder d T }. *)
+#[short(type="bPOrderType")]
+HB.structure Definition BPOrder d := { T of hasBottom d T & POrder d T }.
 #[short(type="bLatticeType")]
 HB.structure Definition BLattice d := { T of hasBottom d T & Lattice d T }.
 
@@ -1440,15 +1442,6 @@ Notation "[ 'bLatticeType' 'of' T 'for' cT ]" := (BLattice.clone _ T%type cT)
 #[deprecated(since="mathcomp 2.0.0", note="Use BLattice.clone instead.")]
 Notation "[ 'bLatticeType' 'of' T ]" := (BLattice.clone _ T%type _)
   (at level 0, format "[ 'bLatticeType'  'of'  T ]") : form_scope.
-(* Notation "[ 'bLatticeType' 'of' T 'for' cT 'with' disp ]" := *)
-(*   (@clone_with T _ cT disp _ id) *)
-(*   (at level 0, *)
-(*    format "[ 'bLatticeType'  'of'  T  'for'  cT  'with'  disp ]") : *)
-(*   form_scope. *)
-(* Notation "[ 'bLatticeType' 'of' T 'with' disp ]" := *)
-(*   [bLatticeType of T for _ with disp] *)
-(*   (at level 0, format "[ 'bLatticeType'  'of'  T  'with' disp ]") : *)
-(*   form_scope. *)
 End BLatticeExports.
 HB.export BLatticeExports.
 
@@ -1488,20 +1481,14 @@ HB.mixin Record hasTop d (T : Type) of POrder d T := {
   top : T;
   lex1 : forall x, x <= top;
 }.
-(* TODO: Restore when we remove the mathcomp attribute *)
-(* HB.structure Definition TPOrder d := { T of hasBottom d T & POrder d T }. *)
-(* HB.structure Definition TLattice d := { T of hasTop d T & Lattice d T }. *)
-(* HB.structure Definition TBOrder d := { T of hasTop d T & BPOrder d T }. *)
+#[short(type="tPOrderType")]
+HB.structure Definition TPOrder d := { T of hasTop d T & POrder d T }.
+#[short(type="tbPOrderType")]
+HB.structure Definition TBPOrder d := { T of hasTop d T & BPOrder d T }.
 #[short(type="tLatticeType")]
 HB.structure Definition TLattice d := { T of hasTop d T & Lattice d T }.
-
 #[short(type="tbLatticeType")]
 HB.structure Definition TBLattice d := { T of BLattice d T & TLattice d T }.
-
-Module TBLatticeExports.
-(* FIXME: clone? *)
-End TBLatticeExports.
-HB.export TBLatticeExports.
 
 Module TLatticeSyntax.
 
@@ -1535,19 +1522,13 @@ Notation "\meet_ ( i 'in' A ) F" :=
 End TLatticeSyntax.
 HB.export TLatticeSyntax.
 
-(* TODO: rename to lattice_ismeet_distributive ? *)
 #[key="T"]
-HB.mixin Record Lattice_MeetIsDistributive d (T : Type) of Lattice d T := {
+HB.mixin Record Lattice_Meet_isDistrLattice d (T : Type) of Lattice d T := {
   meetUl : @left_distributive T T meet join;
 }.
 #[short(type="distrLatticeType")]
 HB.structure Definition DistrLattice d :=
-  { T of Lattice_MeetIsDistributive d T & Lattice d T }.
-
-Module DistrLatticeExports.
-(* FIXME: clone? *)
-End DistrLatticeExports.
-HB.export DistrLatticeExports.
+  { T of Lattice_Meet_isDistrLattice d T & Lattice d T }.
 
 #[short(type="bDistrLatticeType")]
 HB.structure Definition BDistrLattice d :=
@@ -1572,41 +1553,27 @@ End TBDistrLatticeExports.
 HB.export TBDistrLatticeExports.
 
 #[key="T"]
-HB.mixin Record hasSub d (T : Type) of BDistrLattice d T := {
-  sub    : T -> T -> T;
-  subKI  : forall x y, y `&` sub x y = bottom;
-  joinIB : forall x y, (x `&` y) `|` sub x y = x
+HB.mixin Record hasRelativeComplement d (T : Type) of BDistrLattice d T := {
+  diff   : T -> T -> T;
+  diffKI : forall x y, y `&` diff x y = bottom;
+  joinIB : forall x y, (x `&` y) `|` diff x y = x
 }.
 
 #[short(type="cbDistrLatticeType")]
 HB.structure Definition CBDistrLattice d :=
-  { T of hasSub d T & BDistrLattice d T }.
+  { T of hasRelativeComplement d T & BDistrLattice d T }.
 
-Module CBDistrLatticeExports.
-(*Notation "[ 'cbDistrLatticeType' 'of' T 'for' cT ]" := (@CBDistrLattice.clone _ T%type cT)
-  (at level 0, format "[ 'cbDistrLatticeType'  'of'  T  'for'  cT ]") :
-  form_scope.
-Notation "[ 'cbDistrLatticeType' 'of' T 'for' cT 'with' disp ]" :=
-  (@CBDistrLattice.clone disp T%type cT)
-  (at level 0,
-   format "[ 'cbDistrLatticeType'  'of'  T  'for'  cT  'with'  disp ]") :
-  form_scope.
-Notation "[ 'cbDistrLatticeType' 'of' T ]" := [cbDistrLatticeType of T for _]
-  (at level 0, format "[ 'cbDistrLatticeType'  'of'  T ]") : form_scope.
-Notation "[ 'cbDistrLatticeType' 'of' T 'with' disp ]" :=
-  [cbDistrLatticeType of T for _ with disp]
-  (at level 0, format "[ 'cbDistrLatticeType'  'of'  T  'with' disp ]") :
-    form_scope.*)
-End CBDistrLatticeExports.
-
-HB.export CBDistrLatticeExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use diff instead.")]
+Notation sub := diff.
+#[deprecated(since="mathcomp 2.0.0", note="Use diffKI instead.")]
+Notation subKI := diffKI.
 
 Module Import CBDistrLatticeSyntax.
-Notation "x `\` y" := (sub x y) : order_scope.
+Notation "x `\` y" := (diff x y) : order_scope.
 End CBDistrLatticeSyntax.
 
 #[key="T"]
-HB.mixin Record hasCompl d (T : Type) of
+HB.mixin Record hasComplement d (T : Type) of
          TBDistrLattice d T & CBDistrLattice d T := {
   compl : T -> T;
   complE : forall x : T, compl x = (top : T) `\` x (* FIXME? *)
@@ -1614,29 +1581,7 @@ HB.mixin Record hasCompl d (T : Type) of
 
 #[short(type="ctbDistrLatticeType")]
 HB.structure Definition CTBDistrLattice d :=
-  { T of hasCompl d T & TBDistrLattice d T & CBDistrLattice d T }.
-
-Module CTBDistrLatticeExports.
-(* Notation "[ 'ctbDistrLatticeType' 'of' T 'for' cT ]" := (@clone T _ cT _ id) *)
-(*   (at level 0, format "[ 'ctbDistrLatticeType'  'of'  T  'for'  cT ]") : *)
-(*   form_scope. *)
-(* Notation "[ 'ctbDistrLatticeType' 'of' T 'for' cT 'with' disp ]" := *)
-(*   (@clone_with T _ cT disp _ id) *)
-(*   (at level 0, *)
-(*    format "[ 'ctbDistrLatticeType'  'of'  T  'for'  cT  'with'  disp ]") *)
-(*   : form_scope. *)
-(* Notation "[ 'ctbDistrLatticeType' 'of' T ]" := [ctbDistrLatticeType of T for _] *)
-(*   (at level 0, format "[ 'ctbDistrLatticeType'  'of'  T ]") : form_scope. *)
-(* Notation "[ 'ctbDistrLatticeType' 'of' T 'with' disp ]" := *)
-(*   [ctbDistrLatticeType of T for _ with disp] *)
-(*   (at level 0, format "[ 'ctbDistrLatticeType'  'of'  T  'with' disp ]") : *)
-(*   form_scope. *)
-(* Notation "[ 'default_ctbDistrLatticeType' 'of' T ]" := *)
-(*   (@pack T _ _ _ id _ _ id (Mixin (fun=> erefl))) *)
-(*   (at level 0, format "[ 'default_ctbDistrLatticeType'  'of'  T ]") : *)
-(*   form_scope. *)
-End CTBDistrLatticeExports.
-HB.export CTBDistrLatticeExports.
+  { T of hasComplement d T & TBDistrLattice d T & CBDistrLattice d T }.
 
 Module Import CTBDistrLatticeSyntax.
 Notation "~` A" := (compl A) : order_scope.
@@ -1648,22 +1593,6 @@ HB.mixin Record DistrLattice_isTotal d T of DistrLattice d T :=
 #[short(type="orderType")]
 HB.structure Definition Total d :=
   { T of DistrLattice_isTotal d T & DistrLattice d T }.
-
-Module TotalExports.
-(* Notation "[ 'orderType' 'of' T 'for' cT ]" := (@clone T _ cT _ id) *)
-(*   (at level 0, format "[ 'orderType'  'of'  T  'for'  cT ]") : form_scope. *)
-(* Notation "[ 'orderType' 'of' T 'for' cT 'with' disp ]" := *)
-(*   (@clone_with T _ cT disp _ id) *)
-(*   (at level 0, format "[ 'orderType'  'of'  T  'for'  cT  'with'  disp ]") : *)
-(*   form_scope. *)
-(* Notation "[ 'orderType' 'of' T ]" := [orderType of T for _] *)
-(*   (at level 0, format "[ 'orderType'  'of'  T ]") : form_scope. *)
-(* Notation "[ 'orderType' 'of' T 'with' disp ]" := *)
-(*   [orderType of T for _ with disp] *)
-(*   (at level 0, format "[ 'orderType'  'of'  T  'with' disp ]") : form_scope. *)
-End TotalExports.
-
-HB.export TotalExports.
 
 (**********)
 (* FINITE *)
@@ -1680,7 +1609,7 @@ End FinPOrderExports.
 HB.export FinPOrderExports.
 
 #[short(type="finLatticeType")]
-HB.structure Definition FinLattice d := { T of Finite T & TBLattice d T }.
+HB.structure Definition FinLattice d := { T of Finite T & TBLattice d T }. (* FIXME *)
 
 Module FinLatticeExports.
 #[deprecated(since="mathcomp 2.0.0", note="Use FinLattice.clone instead.")]
@@ -2871,7 +2800,7 @@ Fact dual_le_anti : antisymmetric (@ge _ T).
 Proof. by move=> x y /andP [xy yx]; apply/le_anti/andP; split. Qed.
 
 HB.instance Definition _ :=
-  isPOrdered.Build
+  isPOrder.Build
     (dual_display disp) (T^d)
     dual_lt_def lexx dual_le_anti
     (fun y z x zy yx => @le_trans _ _ y x z yx zy).
@@ -3117,7 +3046,7 @@ Proof. by move=> x y z; rewrite meetUr joinIK meetUl -joinA meetUKC. Qed.
 Lemma joinIr : right_distributive (@join _ L) (@meet _ L).
 Proof. by move=> x y z; rewrite !(joinC x) -joinIl. Qed.
 
-HB.instance Definition _ := Lattice_MeetIsDistributive.Build _ L^d joinIl.
+HB.instance Definition _ := Lattice_Meet_isDistrLattice.Build _ L^d joinIl.
 
 End DistrLatticeTheory.
 End DistrLatticeTheory.
@@ -3757,7 +3686,7 @@ Context {disp : unit} {L : bLatticeType disp}.
 Implicit Types (I : finType) (T : eqType) (x y z : L).
 Local Notation "0" := bottom.
 
-(* Non-distributive lattice theory with 0 & 1*)
+(* Non-distributive lattice theory with 0 & 1 *)
 Lemma le0x x : 0 <= x. Proof. exact: le0x. Qed.
 Hint Resolve le0x : core.
 
@@ -3983,7 +3912,7 @@ Section BDistrLatticeTheory.
 Context {disp : unit} {L : bDistrLatticeType disp}.
 Implicit Types (I : finType) (T : eqType) (x y z : L).
 Local Notation "0" := bottom.
-(* Distributive lattice theory with 0 & 1*)
+(* Distributive lattice theory with 0 & 1 *)
 
 Lemma leU2l_le y t x z : x `&` t = 0 -> x `|` y <= z `|` t -> x <= z.
 Proof.
@@ -4078,14 +4007,16 @@ Context {disp : unit} {L : cbDistrLatticeType disp}.
 Implicit Types (x y z : L).
 Local Notation "0" := bottom.
 
-Lemma subKI x y : y `&` (x `\` y) = 0.
-Proof. exact: subKI. Qed.
+Lemma diffKI x y : y `&` (x `\` y) = 0.
+Proof. exact: diffKI. Qed.
 
-Lemma subIK x y : (x `\` y) `&` y = 0.
-Proof. by rewrite meetC subKI. Qed.
+Lemma diffIK x y : (x `\` y) `&` y = 0.
+Proof. by rewrite meetC diffKI. Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diffIK instead.")]
+Notation subIK := diffIK.
 
 Lemma meetIB z x y : (z `&` y) `&` (x `\` y) = 0.
-Proof. by rewrite -meetA subKI meetx0. Qed.
+Proof. by rewrite -meetA diffKI meetx0. Qed.
 
 Lemma meetBI z x y : (x `\` y) `&` (z `&` y) = 0.
 Proof. by rewrite meetC meetIB. Qed.
@@ -4106,7 +4037,9 @@ Lemma leBx x y : x `\` y <= x.
 Proof. by rewrite -{2}[x](joinIB y) lexU2 // lexx orbT. Qed.
 Hint Resolve leBx : core.
 
-Lemma subxx x : x `\` x = 0. Proof. by have := subKI x x; rewrite meet_r. Qed.
+Lemma diffxx x : x `\` x = 0. Proof. by have := diffKI x x; rewrite meet_r. Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diffxx instead.")]
+Notation subxx := diffxx.
 
 Lemma leBl z x y : x <= y -> x `\` z <= y `\` z.
 Proof.
@@ -4114,38 +4047,46 @@ rewrite -{1}[x](joinIB z) -{1}[y](joinIB z).
 by rewrite leU2E ?meetIB ?meetBI // => /andP [].
 Qed.
 
-Lemma subKU y x : y `|` (x `\` y) = y `|` x.
+Lemma diffKU y x : y `|` (x `\` y) = y `|` x.
 Proof.
 apply/eqP; rewrite eq_le leU2 //= leUx leUl.
 by apply/meet_idPl; have := joinIB y x; rewrite joinIl join_l.
 Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diffKU instead.")]
+Notation subKU := diffKU.
 
-Lemma subUK y x : (x `\` y) `|` y = x `|` y.
-Proof. by rewrite joinC subKU joinC. Qed.
+Lemma diffUK y x : (x `\` y) `|` y = x `|` y.
+Proof. by rewrite joinC diffKU joinC. Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diffUK instead.")]
+Notation subUK := diffUK.
 
 Lemma leBKU y x : y <= x -> y `|` (x `\` y) = x.
-Proof. by move=> /join_r {2}<-; rewrite subKU. Qed.
+Proof. by move=> /join_r {2}<-; rewrite diffKU. Qed.
 
 Lemma leBUK y x : y <= x -> (x `\` y) `|` y = x.
 Proof. by move=> leyx; rewrite joinC leBKU. Qed.
 
 Lemma leBLR x y z : (x `\` y <= z) = (x <= y `|` z).
 Proof.
-apply/idP/idP; first by move=> /join_r <-; rewrite joinA subKU joinAC leUr.
-by rewrite -{1}[x](joinIB y) => /(leU2r_le (subIK _ _)).
+apply/idP/idP; first by move=> /join_r <-; rewrite joinA diffKU joinAC leUr.
+by rewrite -{1}[x](joinIB y) => /(leU2r_le (diffIK _ _)).
 Qed.
 
-Lemma subUx x y z : (x `|` y) `\` z = (x `\` z) `|` (y `\` z).
+Lemma diffUx x y z : (x `|` y) `\` z = (x `\` z) `|` (y `\` z).
 Proof.
 apply/eqP; rewrite eq_le leUx !leBl ?leUr ?leUl ?andbT //.
-by rewrite leBLR joinA subKU joinAC subKU joinAC -joinA leUr.
+by rewrite leBLR joinA diffKU joinAC diffKU joinAC -joinA leUr.
 Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diffUx instead.")]
+Notation subUx := diffUx.
 
-Lemma sub_eq0 x y : (x `\` y == 0) = (x <= y).
+Lemma diff_eq0 x y : (x `\` y == 0) = (x <= y).
 Proof. by rewrite -lex0 leBLR joinx0. Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diff_eq0 instead.")]
+Notation sub_eq0 := diff_eq0.
 
 Lemma joinxB x y z : x `|` (y `\` z) = ((x `|` y) `\` z) `|` (x `&` z).
-Proof. by rewrite subUx joinAC joinBI. Qed.
+Proof. by rewrite diffUx joinAC joinBI. Qed.
 
 Lemma joinBx x y z : (y `\` z) `|` x = ((y `|` x) `\` z) `|` (z `&` x).
 Proof. by rewrite ![_ `|` x]joinC ![_ `&` x]meetC joinxB. Qed.
@@ -4156,70 +4097,88 @@ Proof. by move=> lexy; rewrite leBLR joinxB meet_r ?leBUK ?leUr ?lexUl. Qed.
 Lemma leB2 x y z t : x <= z -> t <= y -> x `\` y <= z `\` t.
 Proof. by move=> /(@leBl t) ? /(@leBr x) /le_trans ->. Qed.
 
-Lemma meet_eq0E_sub z x y : x <= z -> (x `&` y == 0) = (x <= z `\` y).
+Lemma meet_eq0E_diff z x y : x <= z -> (x `&` y == 0) = (x <= z `\` y).
 Proof.
 move=> xz; apply/idP/idP; last by move=> /meet_r <-; rewrite -meetA meetBI.
 by move=> /eqP xIy_eq0; rewrite -[x](joinIB y) xIy_eq0 join0x leBl.
 Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use meet_eq0E_sub instead.")]
+Notation meet_eq0E_sub := meet_eq0E_diff.
 
 Lemma leBRL x y z : (x <= z `\` y) = (x <= z) && (x `&` y == 0).
 Proof.
-apply/idP/idP => [xyz|]; first by rewrite (@meet_eq0E_sub z) // (le_trans xyz).
-by move=> /andP [?]; rewrite -meet_eq0E_sub.
+apply/idP/idP => [xyz|]; first by rewrite (@meet_eq0E_diff z) // (le_trans xyz).
+by move=> /andP [?]; rewrite -meet_eq0E_diff.
 Qed.
 
-Lemma eq_sub x y z : (x `\` y == z) = (z <= x <= y `|` z) && (z `&` y == 0).
+Lemma eq_diff x y z : (x `\` y == z) = (z <= x <= y `|` z) && (z `&` y == 0).
 Proof. by rewrite eq_le leBLR leBRL andbCA andbA. Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use eq_sub instead.")]
+Notation eq_sub := eq_diff.
 
-Lemma subxU x y z : z `\` (x `|` y) = (z `\` x) `&` (z `\` y).
+Lemma diffxU x y z : z `\` (x `|` y) = (z `\` x) `&` (z `\` y).
 Proof.
 apply/eqP; rewrite eq_le lexI !leBr ?leUl ?leUr //=.
-rewrite leBRL leIx2 ?leBx //= meetUr meetAC subIK -meetA subIK.
+rewrite leBRL leIx2 ?leBx //= meetUr meetAC diffIK -meetA diffIK.
 by rewrite meet0x meetx0 joinx0.
 Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diffxU instead.")]
+Notation subxU := diffxU.
 
-Lemma subx0 x : x `\` 0 = x.
-Proof. by apply/eqP; rewrite eq_sub join0x meetx0 lexx eqxx. Qed.
+Lemma diffx0 x : x `\` 0 = x.
+Proof. by apply/eqP; rewrite eq_diff join0x meetx0 lexx eqxx. Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diffx0 instead.")]
+Notation subx0 := diffx0.
 
-Lemma sub0x x : 0 `\` x = 0.
-Proof. by apply/eqP; rewrite eq_sub joinx0 meet0x lexx eqxx le0x. Qed.
+Lemma diff0x x : 0 `\` x = 0.
+Proof. by apply/eqP; rewrite eq_diff joinx0 meet0x lexx eqxx le0x. Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diff0x instead.")]
+Notation sub0x := diff0x.
 
-Lemma subIx x y z : (x `&` y) `\` z = (x `\` z) `&` (y `\` z).
+Lemma diffIx x y z : (x `&` y) `\` z = (x `\` z) `&` (y `\` z).
 Proof.
-apply/eqP; rewrite eq_sub joinIr ?leI2 ?subKU ?leUr ?leBx //=.
-by rewrite -meetA subIK meetx0.
+apply/eqP; rewrite eq_diff joinIr ?leI2 ?diffKU ?leUr ?leBx //=.
+by rewrite -meetA diffIK meetx0.
 Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diffIx instead.")]
+Notation subIx := diffIx.
 
 Lemma meetxB x y z : x `&` (y `\` z) = (x `&` y) `\` z.
-Proof. by rewrite subIx -{1}[x](joinBI z) meetUl meetIB joinx0. Qed.
+Proof. by rewrite diffIx -{1}[x](joinBI z) meetUl meetIB joinx0. Qed.
 
 Lemma meetBx x y z : (x `\` y) `&` z = (x `&` z) `\` y.
 Proof. by rewrite ![_ `&` z]meetC meetxB. Qed.
 
-Lemma subxI x y z : x `\` (y `&` z) = (x `\` y) `|` (x `\` z).
+Lemma diffxI x y z : x `\` (y `&` z) = (x `\` y) `|` (x `\` z).
 Proof.
-apply/eqP; rewrite eq_sub leUx !leBx //= joinIl joinA joinCA !subKU.
+apply/eqP; rewrite eq_diff leUx !leBx //= joinIl joinA joinCA !diffKU.
 rewrite joinCA -joinA [_ `|` x]joinC ![x `|` _]join_l //.
 by rewrite -joinIl leUr /= meetUl {1}[_ `&` z]meetC ?meetBI joinx0.
 Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diffxI instead.")]
+Notation subxI := diffxI.
 
-Lemma subBx x y z : (x `\` y) `\` z = x `\` (y `|` z).
+Lemma diffBx x y z : (x `\` y) `\` z = x `\` (y `|` z).
 Proof.
-apply/eqP; rewrite eq_sub leBr ?leUl //=.
-by rewrite subxU joinIr subKU -joinIr meet_l ?leUr //= -meetA subIK meetx0.
+apply/eqP; rewrite eq_diff leBr ?leUl //=.
+by rewrite diffxU joinIr diffKU -joinIr meet_l ?leUr //= -meetA diffIK meetx0.
 Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diffBx instead.")]
+Notation subBx := diffBx.
 
-Lemma subxB x y z : x `\` (y `\` z) = (x `\` y) `|` (x `&` z).
+Lemma diffxB x y z : x `\` (y `\` z) = (x `\` y) `|` (x `&` z).
 Proof.
-rewrite -[y in RHS](joinIB z) subxU joinIl subxI -joinA joinBI join_r //.
-by rewrite joinBx meetKU meetA meetAC subIK meet0x joinx0 meet_r.
+rewrite -[y in RHS](joinIB z) diffxU joinIl diffxI -joinA joinBI join_r //.
+by rewrite joinBx meetKU meetA meetAC diffIK meet0x joinx0 meet_r.
 Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diffxB instead.")]
+Notation subxB := diffxB.
 
 Lemma joinBK x y : (y `|` x) `\` x = (y `\` x).
-Proof. by rewrite subUx subxx joinx0. Qed.
+Proof. by rewrite diffUx diffxx joinx0. Qed.
 
 Lemma joinBKC x y : (x `|` y) `\` x = (y `\` x).
-Proof. by rewrite subUx subxx join0x. Qed.
+Proof. by rewrite diffUx diffxx join0x. Qed.
 
 Lemma disj_le x y : x `&` y == 0 -> x <= y = (x == 0).
 Proof. by rewrite [x == 0]eq_sym -eq_meetl => /eqP ->. Qed.
@@ -4227,11 +4186,15 @@ Proof. by rewrite [x == 0]eq_sym -eq_meetl => /eqP ->. Qed.
 Lemma disj_leC x y : y `&` x == 0 -> x <= y = (x == 0).
 Proof. by rewrite meetC => /disj_le. Qed.
 
-Lemma disj_subl x y : x `&` y == 0 -> x `\` y = x.
-Proof. by move=> dxy; apply/eqP; rewrite eq_sub dxy lexx leUr. Qed.
+Lemma disj_diffl x y : x `&` y == 0 -> x `\` y = x.
+Proof. by move=> dxy; apply/eqP; rewrite eq_diff dxy lexx leUr. Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use disj_diffl instead.")]
+Notation disj_subl := disj_diffl.
 
-Lemma disj_subr x y : x `&` y == 0 -> y `\` x = y.
-Proof. by rewrite meetC => /disj_subl. Qed.
+Lemma disj_diffr x y : x `&` y == 0 -> y `\` x = y.
+Proof. by rewrite meetC => /disj_diffl. Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use disj_diffr instead.")]
+Notation disj_subr := disj_diffr.
 
 Lemma lt0B x y : x < y -> 0 < y `\` x.
 Proof. by move=> ?; rewrite lt_leAnge le0x leBLR joinx0 /= lt_geF. Qed.
@@ -4249,20 +4212,24 @@ Local Notation "1" := top.
 Lemma complE x : ~` x = 1 `\` x.
 Proof. exact: complE. Qed.
 
-Lemma sub1x x : 1 `\` x = ~` x.
+Lemma diff1x x : 1 `\` x = ~` x.
 Proof. by rewrite complE. Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diff1x instead.")]
+Notation sub1x := diff1x.
 
-Lemma subE x y : x `\` y = x `&` ~` y.
+Lemma diffE x y : x `\` y = x `&` ~` y.
 Proof. by rewrite complE meetxB meetx1. Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diffE instead.")]
+Notation subE := diffE.
 
 Lemma complK : involutive (@compl _ L).
-Proof. by move=> x; rewrite !complE subxB subxx meet1x join0x. Qed.
+Proof. by move=> x; rewrite !complE diffxB diffxx meet1x join0x. Qed.
 
 Lemma compl_inj : injective (@compl _ L).
 Proof. exact/inv_inj/complK. Qed.
 
 Lemma disj_leC x y : (x `&` y == 0) = (x <= ~` y).
-Proof. by rewrite -sub_eq0 subE complK. Qed.
+Proof. by rewrite -diff_eq0 diffE complK. Qed.
 
 Lemma leC x y : (~` x <= ~` y) = (y <= x).
 Proof.
@@ -4272,31 +4239,31 @@ by move=> leyx; rewrite !complE leBr.
 Qed.
 
 Lemma complU x y : ~` (x `|` y) = ~` x `&` ~` y.
-Proof. by rewrite !complE subxU. Qed.
+Proof. by rewrite !complE diffxU. Qed.
 
 Lemma complI  x y : ~` (x `&` y) = ~` x `|` ~` y.
-Proof. by rewrite !complE subxI. Qed.
+Proof. by rewrite !complE diffxI. Qed.
 
 Lemma joinxC  x :  x `|` ~` x = 1.
-Proof. by rewrite complE subKU joinx1. Qed.
+Proof. by rewrite complE diffKU joinx1. Qed.
 
 Lemma joinCx  x : ~` x `|` x = 1.
 Proof. by rewrite joinC joinxC. Qed.
 
 Lemma meetxC  x :  x `&` ~` x = 0.
-Proof. by rewrite complE subKI. Qed.
+Proof. by rewrite complE diffKI. Qed.
 
 Lemma meetCx  x : ~` x `&` x = 0.
 Proof. by rewrite meetC meetxC. Qed.
 
 Lemma compl1 : ~` 1 = 0 :> L.
-Proof. by rewrite complE subxx. Qed.
+Proof. by rewrite complE diffxx. Qed.
 
 Lemma compl0 : ~` 0 = 1 :> L.
-Proof. by rewrite complE subx0. Qed.
+Proof. by rewrite complE diffx0. Qed.
 
 Lemma complB x y : ~` (x `\` y) = ~` x `|` y.
-Proof. by rewrite !complE subxB meet1x. Qed.
+Proof. by rewrite !complE diffxB meet1x. Qed.
 
 Lemma leBC x y : x `\` y <= ~` y.
 Proof. by rewrite leBLR joinxC lex1. Qed.
@@ -4318,11 +4285,7 @@ Proof. by elim/big_rec2: _=> [|i x y ? <-]; rewrite ?compl1 ?complI. Qed.
 End CTBDistrLatticeTheory.
 End CTBDistrLatticeTheory.
 
-(*************)
-(* FACTORIES *)
-(*************)
-
-HB.factory Record POrder_isMeetDistrLattice d T of POrder d T := {
+HB.factory Record POrder_Meet_isDistrLattice d T of POrder d T := {
   meet : T -> T -> T;
   join : T -> T -> T;
   meetC : commutative meet;
@@ -4335,13 +4298,12 @@ HB.factory Record POrder_isMeetDistrLattice d T of POrder d T := {
   meetUl : left_distributive meet join;
 }.
 
-HB.builders
-  Context d T of POrder_isMeetDistrLattice d T.
+HB.builders Context d T of POrder_Meet_isDistrLattice d T.
 
 HB.instance Definition _ :=
   POrder_isLattice.Build d T meetC joinC meetA joinA joinKI meetKU leEmeet.
 HB.instance Definition _ :=
-  Lattice_MeetIsDistributive.Build d T meetUl.
+  Lattice_Meet_isDistrLattice.Build d T meetUl.
 
 HB.end.
 
@@ -4366,7 +4328,7 @@ move=> x y z; case: (leP x z); case: (leP y z); case: (leP x y);
 Qed.
 
 HB.instance Definition _ :=
-  Lattice_MeetIsDistributive.Build d T meetUl.
+  Lattice_Meet_isDistrLattice.Build d T meetUl.
 HB.instance Definition _ :=
   DistrLattice_isTotal.Build d T comparableT.
 
@@ -4468,15 +4430,15 @@ move=> y x z; rewrite !le_def => /eqP lexy /eqP leyz; apply/eqP.
 by rewrite -[in LHS]lexy -meetA leyz lexy.
 Qed.
 
-HB.instance Definition _ := isPOrdered.Build d T
+HB.instance Definition _ := isPOrder.Build d T
   lt_def le_refl le_anti le_trans.
 
-HB.instance Definition _ := POrder_isMeetDistrLattice.Build d T
+HB.instance Definition _ := POrder_Meet_isDistrLattice.Build d T
   meetC joinC meetA joinA joinKI meetKU le_def meetUl.
 
 HB.end.
 
-HB.factory Record POrder_isMeetJoinLattice (d : unit) T of POrder d T := {
+HB.factory Record POrder_MeetJoin_isLattice (d : unit) T of POrder d T := {
   meet : T -> T -> T;
   join : T -> T -> T;
   meetP : forall x y z, (x <= meet y z) = (x <= y) && (x <= z);
@@ -4484,7 +4446,7 @@ HB.factory Record POrder_isMeetJoinLattice (d : unit) T of POrder d T := {
 }.
 
 HB.builders
-  Context (d : unit) T of POrder_isMeetJoinLattice d T.
+  Context (d : unit) T of POrder_MeetJoin_isLattice d T.
 
 Fact meet_lel x y : meet x y <= meet y x.
 Proof.
@@ -4550,8 +4512,7 @@ HB.instance Definition _ :=
 
 HB.end.
 
-
-HB.factory Record isOrdered (d : unit) T of Choice T := {
+HB.factory Record isOrder (d : unit) T of Choice T := {
   le : rel T;
   lt : rel T;
   meet : T -> T -> T;
@@ -4564,13 +4525,12 @@ HB.factory Record isOrdered (d : unit) T of Choice T := {
   le_total : total le;
 }.
 
-HB.builders
-  Context (d : unit) T of isOrdered d T.
+HB.builders Context (d : unit) T of isOrder d T.
 
 Fact le_refl : reflexive le.
 Proof. by move=> x; case: (le x x) (le_total x x). Qed.
 
-HB.instance Definition _ := isPOrdered.Build d T
+HB.instance Definition _ := isPOrder.Build d T
   lt_def le_refl le_anti le_trans.
 
 Section GeneratedOrder.
@@ -4604,7 +4564,7 @@ Proof. by rewrite meetE (eq_meetl x y). Qed.
 End GeneratedOrder.
 
 HB.instance Definition _ :=
-  POrder_isMeetDistrLattice.Build d T meetC joinC meetA joinA
+  POrder_Meet_isDistrLattice.Build d T meetC joinC meetA joinA
                                       joinKI meetKU le_def meetUl.
 HB.instance Definition _ := DistrLattice_isTotal.Build d T le_total.
 
@@ -4651,7 +4611,7 @@ Fact le_total : total le.
 Proof. by move=> x y; rewrite !le_def; case: eqVneq => //; exact: lt_total. Qed.
 
 HB.instance Definition _ :=
-  isOrdered.Build d T lt_def meet_def_le join_def_le le_anti le_trans le_total.
+  isOrder.Build d T lt_def meet_def_le join_def_le le_anti le_trans le_total.
 HB.end.
 
 HB.factory Record MonoTotal disp T of POrder disp T := {
@@ -4684,7 +4644,7 @@ Fact trans : transitive le. Proof. by move=> y x z xy /(le_trans xy). Qed.
 Fact lt_def x y : lt x y = (y != x) && le x y.
 Proof. by rewrite /lt lt_def (inj_eq (pcan_inj f_can)). Qed.
 
-Definition Pcan := isPOrdered.Build disp T lt_def refl anti trans.
+Definition Pcan := isPOrder.Build disp T lt_def refl anti trans.
 
 End PCan.
 
@@ -4701,13 +4661,13 @@ Notation CanPartial := CancelPartial.Can.
 #[export]
 HB.instance Definition _ (disp : unit) (T : choiceType)
   (disp' : unit) (T' : porderType disp') (f : T -> T')
-  (f' : T' -> option T) (f_can : pcancel f f') : isPOrdered disp (pcan_type f_can) :=
+  (f' : T' -> option T) (f_can : pcancel f f') : isPOrder disp (pcan_type f_can) :=
   CancelPartial.Pcan disp (f_can : @pcancel _ (pcan_type f_can)  f f').
 
 #[export]
 HB.instance Definition _ (disp : unit) (T : choiceType)
   (disp' : unit) (T' : porderType disp') (f : T -> T') (f' : T' ->  T)
-  (f_can : cancel f f') : isPOrdered disp (can_type f_can) :=
+  (f_can : cancel f f') : isPOrder disp (can_type f_can) :=
   CancelPartial.Can disp (f_can : @cancel _ (can_type f_can)  f f').
 
 Section CancelTotal.
@@ -4791,7 +4751,7 @@ HB.instance Definition _ := IsoLattice.Build _ T f_can f'_can f_mono.
 Lemma meetUl : left_distributive (meet : T -> T -> T) join.
 Proof. by move=> x y z; rewrite /meet /join /= !f'_can meetUl. Qed.
 
-HB.instance Definition _ := Lattice_MeetIsDistributive.Build _ T meetUl.
+HB.instance Definition _ := Lattice_Meet_isDistrLattice.Build _ T meetUl.
 
 HB.end.
 
@@ -5269,7 +5229,7 @@ Proof. by rewrite /lt lt_def (inj_eq val_inj). Qed.
 Fact le_refl : reflexive le. Proof. move=> x; exact: lexx. Qed.
 Fact le_anti : antisymmetric le. Proof. by move=> x y /le_anti/val_inj. Qed.
 Fact le_trans : transitive le. Proof. move=> x y z; exact: le_trans. Qed.
-HB.instance Definition _ := isPOrdered.Build d' U
+HB.instance Definition _ := isPOrder.Build d' U
   lt_def le_refl le_anti le_trans.
 
 Fact valD : order_morphism (val : U -> T). Proof. by []. Qed.
@@ -5691,7 +5651,7 @@ Module DeprecatedSubOrder.
 Section Partial.
 Context {disp : unit} {T : porderType disp} (P : {pred T}) (sT : subType P).
 
-HB.instance Definition _ : isPOrdered disp (sub_type sT) :=
+HB.instance Definition _ : isPOrder disp (sub_type sT) :=
   CancelPartial.Pcan disp (valK : @pcancel _ (sub_type sT) val insub).
 
 End Partial.
@@ -5754,8 +5714,8 @@ Proof. by rewrite ltn_neqAle eq_sym. Qed.
 
 #[export]
 HB.instance Definition _ :=
-  isOrdered.Build nat_display nat ltn_def (fun _ _ => erefl) (fun _ _ => erefl)
-                  anti_leq leq_trans leq_total.
+  isOrder.Build nat_display nat ltn_def (fun _ _ => erefl) (fun _ _ => erefl)
+                anti_leq leq_trans leq_total.
 
 #[export]
 HB.instance Definition _ := hasBottom.Build nat_display nat leq0n.
@@ -6099,12 +6059,12 @@ Definition sub x y := x && ~~ y.
 Lemma subKI x y : y && sub x y = false. Proof. by case: x y => [] []. Qed.
 Lemma joinIB x y : (x && y) || sub x y = x. Proof. by case: x y => [] []. Qed.
 
-#[export] HB.instance Definition _ := @isOrdered.Build bool_display bool
+#[export] HB.instance Definition _ := @isOrder.Build bool_display bool
    _ _ andb orb ltn_def andbE orbE anti leq_trans leq_total.
 #[export] HB.instance Definition _ := @hasBottom.Build _ bool false leq0n.
 #[export] HB.instance Definition _ := @hasTop.Build _ bool true leq_b1.
-#[export] HB.instance Definition _ := @hasSub.Build _ bool sub subKI joinIB.
-#[export] HB.instance Definition _ := @hasCompl.Build _ bool
+#[export] HB.instance Definition _ := @hasRelativeComplement.Build _ bool sub subKI joinIB.
+#[export] HB.instance Definition _ := @hasComplement.Build _ bool
   negb (fun x => erefl : ~~ x = sub true x).
 
 Lemma leEbool : le = (leq : rel bool). Proof. by []. Qed.
@@ -6127,9 +6087,9 @@ End Exports.
 End BoolOrder.
 HB.export BoolOrder.Exports.
 
-(*******************************)
-(* Definition of prod_display. *)
-(*******************************)
+(******************************)
+(* Definition of prod_display *)
+(******************************)
 
 Fact prod_display : unit. Proof. by []. Qed.
 
@@ -6244,9 +6204,9 @@ Notation "\meet^p_ ( i 'in' A ) F" :=
 
 End ProdSyntax.
 
-(*******************************)
-(* Definition of lexi_display. *)
-(*******************************)
+(******************************)
+(* Definition of lexi_display *)
+(******************************)
 
 Fact lexi_display : unit. Proof. by []. Qed.
 
@@ -6307,10 +6267,10 @@ Notation "x `|^l` y" := (joinlexi x y) : order_scope.
 
 End LexiSyntax.
 
-(*************************************************)
-(* We declare a "copy" of the cartesian product, *)
-(* which has canonical product order.            *)
-(*************************************************)
+(************************************************)
+(* We declare a "copy" of the cartesian product *)
+(* which has canonical product order.           *)
+(************************************************)
 
 Module ProdOrder.
 Section ProdOrder.
@@ -6351,7 +6311,7 @@ Qed.
 
 #[export]
 HB.instance Definition _ :=
-  isPOrdered.Build disp3 (T * T') (rrefl _) refl anti trans.
+  isPOrder.Build disp3 (T * T') (rrefl _) refl anti trans.
 
 Lemma leEprod x y : (x <= y) = (x.1 <= y.1) && (x.2 <= y.2). Proof. by []. Qed.
 
@@ -6439,7 +6399,7 @@ Fact meetUl : left_distributive (@meet T T') (@join T T').
 Proof. by move=> ? ? ?; congr pair; rewrite meetUl. Qed.
 
 #[export]
-HB.instance Definition _ := Lattice_MeetIsDistributive.Build _ (T * T') meetUl.
+HB.instance Definition _ := Lattice_Meet_isDistrLattice.Build _ (T * T') meetUl.
 
 End DistrLattice.
 
@@ -6460,15 +6420,15 @@ Section CBDistrLattice.
 Variable (T : cbDistrLatticeType disp1) (T' : cbDistrLatticeType disp2).
 Implicit Types (x y : T * T').
 
-Definition sub x y := (x.1 `\` y.1, x.2 `\` y.2).
+Definition diff x y := (x.1 `\` y.1, x.2 `\` y.2).
 
-Lemma subKI x y : y `&` sub x y = 0. Proof. by congr pair; rewrite subKI. Qed.
+Lemma diffKI x y : y `&` diff x y = 0. Proof. by congr pair; rewrite diffKI. Qed.
 
-Lemma joinIB x y : x `&` y `|` sub x y = x.
+Lemma joinIB x y : x `&` y `|` diff x y = x.
 Proof. by case: x => ? ?; congr pair; rewrite joinIB. Qed.
 
 #[export]
-HB.instance Definition _ := hasSub.Build _ (T * T') subKI joinIB.
+HB.instance Definition _ := hasRelativeComplement.Build _ (T * T') diffKI joinIB.
 
 Lemma subEprod x y : x `\` y = (x.1 `\` y.1, x.2 `\` y.2). Proof. by []. Qed.
 
@@ -6480,10 +6440,10 @@ Implicit Types (x y : T * T').
 
 Definition compl x : T * T' := (~` x.1, ~` x.2).
 
-Lemma complE x : compl x = sub 1 x. Proof. by congr pair; rewrite complE. Qed.
+Lemma complE x : compl x = diff 1 x. Proof. by congr pair; rewrite complE. Qed.
 
 #[export]
-HB.instance Definition _ := hasCompl.Build _ (T * T') complE.
+HB.instance Definition _ := hasComplement.Build _ (T * T') complE.
 
 Lemma complEprod x : ~` x = (~` x.1, ~` x.2). Proof. by []. Qed.
 
@@ -6570,9 +6530,9 @@ HB.instance Definition _
 End DefaultProdOrder.
 End DefaultProdOrder.
 
-(********************************************************)
-(* We declare lexicographic ordering on dependent pairs *)
-(********************************************************)
+(*********************************************************)
+(* We declare lexicographic ordering on dependent pairs. *)
+(*********************************************************)
 
 Module SigmaOrder.
 Section SigmaOrder.
@@ -6618,7 +6578,7 @@ Qed.
 
 #[export]
 HB.instance Definition _ :=
-  isPOrdered.Build disp2 {t : T & T' t} lt_def refl anti trans.
+  isPOrder.Build disp2 {t : T & T' t} lt_def refl anti trans.
 
 Lemma leEsig x y : x <= y =
   (tag x <= tag y) && ((tag x >= tag y) ==> (tagged x <= tagged_as x y)).
@@ -6756,7 +6716,7 @@ Qed.
 
 #[export]
 HB.instance Definition _ :=
-  isPOrdered.Build disp3 (T * T') lt_def refl anti trans.
+  isPOrder.Build disp3 (T * T') lt_def refl anti trans.
 
 Lemma leEprodlexi x y :
   (x <= y) = (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 <= y.2)).
@@ -6900,7 +6860,7 @@ by rewrite (le_trans xy)// ihs.
 Qed.
 
 #[export]
-HB.instance Definition _ := isPOrdered.Build disp' (seq T) (rrefl _) refl anti trans.
+HB.instance Definition _ := isPOrder.Build disp' (seq T) (rrefl _) refl anti trans.
 
 Lemma leEseq s1 s2 : s1 <= s2 = if s1 isn't x1 :: s1' then true else
                                 if s2 isn't x2 :: s2' then false else
@@ -7000,7 +6960,7 @@ Proof. by elim=> [|? ? ih] [|? ?] [|? ?] //=; rewrite meetUl ih. Qed.
 
 #[export]
 HB.instance Definition _ :=
-  Lattice_MeetIsDistributive.Build _ (seq T) meetUl.
+  Lattice_Meet_isDistrLattice.Build _ (seq T) meetUl.
 
 End DistrLattice.
 
@@ -7092,7 +7052,7 @@ by rewrite eqseq_cons ihs1; case: comparableP.
 Qed.
 
 #[export]
-HB.instance Definition _ := isPOrdered.Build disp' (seq T) lt_def refl anti trans.
+HB.instance Definition _ := isPOrder.Build disp' (seq T) lt_def refl anti trans.
 
 Lemma leEseqlexi s1 s2 :
    s1 <= s2 = if s1 isn't x1 :: s1' then true else
@@ -7364,7 +7324,7 @@ Qed.
 
 #[export]
 HB.instance Definition _ :=
-  Lattice_MeetIsDistributive.Build _ (n.-tuple T) meetUl.
+  Lattice_Meet_isDistrLattice.Build _ (n.-tuple T) meetUl.
 
 End DistrLattice.
 
@@ -7381,30 +7341,34 @@ Section CBDistrLattice.
 Variables (n : nat) (T : cbDistrLatticeType disp).
 Implicit Types (t : n.-tuple T).
 
-Definition sub t1 t2 : n.-tuple T :=
+Definition diff t1 t2 : n.-tuple T :=
   [tuple of [seq x.1 `\` x.2 | x <- zip t1 t2]].
 
-Fact tnth_sub t1 t2 i : tnth (sub t1 t2) i = tnth t1 i `\` tnth t2 i.
+Fact tnth_diff t1 t2 i : tnth (diff t1 t2) i = tnth t1 i `\` tnth t2 i.
 Proof.
 rewrite tnth_map -(tnth_map fst) -(tnth_map snd) -/unzip1 -/unzip2.
 by rewrite !(tnth_nth (tnth_default t1 i))/= unzip1_zip ?unzip2_zip ?size_tuple.
 Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use tnth_diff instead.")]
+Notation tnth_sub := tnth_diff.
 
-Lemma subKI t1 t2 : t2 `&` sub t1 t2 = 0.
+Lemma diffKI t1 t2 : t2 `&` diff t1 t2 = 0.
 Proof.
-by apply: eq_from_tnth => i; rewrite tnth_meet tnth_sub subKI tnth_nseq.
+by apply: eq_from_tnth => i; rewrite tnth_meet tnth_diff diffKI tnth_nseq.
 Qed.
 
-Lemma joinIB t1 t2 : t1 `&` t2 `|` sub t1 t2 = t1.
+Lemma joinIB t1 t2 : t1 `&` t2 `|` diff t1 t2 = t1.
 Proof.
-by apply: eq_from_tnth => i; rewrite tnth_join tnth_meet tnth_sub joinIB.
+by apply: eq_from_tnth => i; rewrite tnth_join tnth_meet tnth_diff joinIB.
 Qed.
 
-#[export] HB.instance Definition _ := hasSub.Build _ (n.-tuple T) subKI joinIB.
+#[export] HB.instance Definition _ := hasRelativeComplement.Build _ (n.-tuple T) diffKI joinIB.
 
-Lemma subEtprod t1 t2 :
+Lemma diffEtprod t1 t2 :
   t1 `\` t2 = [tuple of [seq x.1 `\` x.2 | x <- zip t1 t2]].
 Proof. by []. Qed.
+#[deprecated(since="mathcomp 2.0.0", note="Use diffEtprod instead.")]
+Notation subEtprod := diffEtprod.
 
 End CBDistrLattice.
 
@@ -7417,12 +7381,12 @@ Definition compl t : n.-tuple T := map_tuple compl t.
 Fact tnth_compl t i : tnth (compl t) i = ~` tnth t i.
 Proof. by rewrite tnth_map. Qed.
 
-Lemma complE t : compl t = sub 1 t.
+Lemma complE t : compl t = diff 1 t.
 Proof.
-by apply: eq_from_tnth => i; rewrite tnth_compl tnth_sub complE tnth_nseq.
+by apply: eq_from_tnth => i; rewrite tnth_compl tnth_diff complE tnth_nseq.
 Qed.
 
-#[export] HB.instance Definition _ := hasCompl.Build _ (n.-tuple T) complE.
+#[export] HB.instance Definition _ := hasComplement.Build _ (n.-tuple T) complE.
 
 Lemma complEtprod t : ~` t = [tuple of [seq ~` x | x <- t]].
 Proof. by []. Qed.
@@ -7462,12 +7426,12 @@ Definition meetEtprod := @meetEtprod.
 Definition joinEtprod := @joinEtprod.
 Definition botEtprod := @botEtprod.
 Definition topEtprod := @topEtprod.
-Definition subEtprod := @subEtprod.
+Definition diffEtprod := @diffEtprod.
 Definition complEtprod := @complEtprod.
 
 Definition tnth_meet := @tnth_meet.
 Definition tnth_join := @tnth_join.
-Definition tnth_sub := @tnth_sub.
+Definition tnth_diff := @tnth_diff.
 Definition tnth_compl := @tnth_compl.
 
 End Exports.
@@ -7792,13 +7756,13 @@ by rewrite !inE => /and3P[->].
 Qed.
 
 #[export]
-HB.instance Definition _ := hasSub.Build disp {subset T} setIDv (@setID _).
+HB.instance Definition _ := hasRelativeComplement.Build disp {subset T} setIDv (@setID _).
 
 Lemma setTDsym A : ~: A = setT :\: A.
 Proof. by rewrite setTD. Qed.
 
 #[export]
-HB.instance Definition _ := hasCompl.Build disp {subset T} setTDsym.
+HB.instance Definition _ := hasComplement.Build disp {subset T} setTDsym.
 
 Lemma leEsubset A B : (A <= B) = (A \subset B).
 Proof. by []. Qed.
@@ -8136,7 +8100,9 @@ Module Theory.
 Export CTheory TotalTheory.
 End Theory.
 
-Module Exports. HB.reexport. End Exports.
+Module Exports.
+HB.reexport.
+End Exports.
 End Order.
 Export Order.Exports.
 

@@ -192,7 +192,7 @@ by case=> [[]?|[]] [[]?|[]] [[]?|[]] lexy leyz //;
 Qed.
 
 HB.instance Definition _ :=
-  Order.isPOrdered.Build (itv_bound_display disp) (itv_bound T)
+  Order.isPOrder.Build (itv_bound_display disp) (itv_bound T)
     lt_bound_def le_bound_refl le_bound_anti le_bound_trans.
 
 Lemma bound_lexx c1 c2 x : (BSide c1 x <= BSide c2 x) = (c2 ==> c1).
@@ -282,7 +282,7 @@ by rewrite (le_trans Hl' Hl) (le_trans Hr Hr').
 Qed.
 
 HB.instance Definition _ :=
-  Order.isPOrdered.Build  (interval_display disp) (interval T)
+  Order.isPOrder.Build  (interval_display disp) (interval T)
   (fun _ _ => erefl) subitv_refl subitv_anti subitv_trans.
 
 Definition pred_of_itv i : pred T := [pred x | `[x, x] <= i].
@@ -604,7 +604,7 @@ by move=> [? ?][? ?][? ?]; rewrite /Order.meet /Order.join /= -meetUl -joinIl.
 Qed.
 
 HB.instance Definition _ :=
-  Order.Lattice_MeetIsDistributive.Build
+  Order.Lattice_Meet_isDistrLattice.Build
     (interval_display disp) (interval T) itv_meetUl.
 
 Lemma itv_splitU c a b : a <= c <= b ->

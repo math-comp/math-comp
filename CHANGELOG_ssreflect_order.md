@@ -35,6 +35,29 @@
 - in `order.v`:
   + `[porderMixin of T by <:]` -> `[POrder of T by <:]`
   + `[totalOrderMixin of T by <:]` -> `[Order of T by <:]`
+  + `sub` -> `diff`
+  + `subKI` -> `diffKI`
+  + `subIK` -> `diffIK`
+  + `subxx` -> `diffxx`
+  + `subKU` -> `diffKU`
+  + `subUK` -> `diffUK`
+  + `subUx` -> `diffUx`
+  + `sub_eq0` -> `diff_eq0`
+  + `meet_eq0E_sub` -> `meet_eq0E_diff`
+  + `eq_sub` -> `eq_diff`
+  + `subxU` -> `diffxU`
+  + `subx0` -> `diffx0`
+  + `sub0x` -> `diff0x`
+  + `subIx` -> `diffIx`
+  + `subxI` -> `diffxI`
+  + `subBx` -> `diffBx`
+  + `subxB` -> `diffxB`
+  + `disj_subl` -> `disj_diffl`
+  + `disj_subr` -> `disj_diffr`
+  + `sub1x` -> `diff1x`
+  + `subE` -> `diffE`
+  + `tnth_sub` -> `tnth_diff`
+  + `subEtprod` -> `diffEtprod`
 
 ### Removed
 
