@@ -6,6 +6,8 @@ From mathcomp Require Import path fintype tuple bigop finset div prime finfun.
 From mathcomp Require Import finset.
 
 (******************************************************************************)
+(*                   Types equipped with order relations                      *)
+(*                                                                            *)
 (* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
 (*                                                                            *)
 (* This files defines types equipped with order relations.                    *)
@@ -422,7 +424,7 @@ From mathcomp Require Import finset.
 (* whenever the type is porderType, and their monotonicity is provided if     *)
 (* this order is total. The theory is in the module Order (Order.enum_valK,   *)
 (* Order.enum_rank_inK, etc) but Order.Enum can be imported to shorten these. *)
-(******************************************************************************)
+(*                                                                            *)
 (* We provide an opaque monotonous bijection tagnat.sig / tagnat.rank between *)
 (* the finite types {i : 'I_n & 'I_(p_ i)} and 'I_(\sum_i p_ i):              *)
 (*  tagnat.sig  : 'I_(\sum_i p_ i) -> {i : 'I_n & 'I_(p_ i)}                  *)
@@ -430,9 +432,9 @@ From mathcomp Require Import finset.
 (*  tagnat.sig1 : 'I_(\sum_i p_ i) -> 'I_n                                    *)
 (*  tagnat.sig2 : forall p : 'I_(\sum_i p_ i), 'I_(p_ (tagnat.sig1 p))        *)
 (*  tagnat.Rank : forall i, 'I_(p_ i) -> 'I_(\sum_i p_ i)                     *)
-(******************************************************************************)
-(* This file is based on prior work by                                        *)
-(* D. Dreyer, G. Gonthier, A. Nanevski, P-Y Strub, B. Ziliani                 *)
+(*                                                                            *)
+(* Acknowledgments: This file is based on prior work by D. Dreyer, G.         *)
+(* Gonthier, A. Nanevski, P-Y Strub, B. Ziliani                               *)
 (******************************************************************************)
 
 Set Implicit Arguments.

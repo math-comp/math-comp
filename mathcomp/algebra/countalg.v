@@ -5,8 +5,10 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop ssralg.
 
 (*****************************************************************************)
-(* This file clones part of ssralg hierachy for countable types; it does not *)
-(* cover the left module / algebra interfaces, providing only                *)
+(*     The algebraic part of the algebraic hierarchy for countable types     *)
+(*                                                                           *)
+(* This file clones part of ssralg hierarchy for countable types; it does    *)
+(* not cover the left module / algebra interfaces, providing only            *)
 (*      countZsemimodType == countable zsemimodType interface                *)
 (*          countZmodType == countable zmodType interface                    *)
 (*      countSemiRingType == countable semiRingType interface                *)

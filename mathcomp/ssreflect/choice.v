@@ -4,6 +4,8 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
 
 (******************************************************************************)
+(*                       Types with a choice operator                         *)
+(*                                                                            *)
 (* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
 (*                                                                            *)
 (* This file contains the definitions of:                                     *)

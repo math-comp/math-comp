@@ -6,9 +6,12 @@ From mathcomp Require Import fintype finset fingroup morphism perm action.
 From mathcomp Require Import ssralg countalg.
 
 (*****************************************************************************)
-(* This file clones the entire ssralg hierachy for finite types; this allows *)
-(* type inference to function properly on expressions that mix combinatorial *)
-(* and algebraic operators (e.g., [set x + y | x in A, y in A]).             *)
+(*      The algebraic part of the algebraic hierarchy for finite types       *)
+(*                                                                           *)
+(* This file clones the entire ssralg hierarchy for finite types; this       *)
+(* allows type inference to function properly on expressions that mix        *)
+(* combinatorial and algebraic operators, e.g., [set x + y | x in A, y in A].*)
+(*                                                                           *)
 (*   finZsemimodType, finZmodType, finSemiRingType, finRingType,             *)
 (*   finComRingType, finComSemiRingType, finUnitRingType, finComUnitRingType,*)
 (*   finIdomType, finFieldType, finLmodType, finLalgType, finAlgType,        *)

@@ -5,11 +5,12 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
 From mathcomp Require Import choice fintype finfun bigop prime binomial.
 
 (******************************************************************************)
+(*            The algebraic part of the algebraic hierarchy                   *)
+(*                                                                            *)
 (* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
 (*                                                                            *)
-(*   The algebraic part of the Algebraic Hierarchy, as described in           *)
-(*          ``Packaging mathematical structures'', TPHOLs09, by               *)
-(*   Francois Garillot, Georges Gonthier, Assia Mahboubi, Laurence Rideau     *)
+(* Reference: Francois Garillot, Georges Gonthier, Assia Mahboubi, Laurence   *)
+(* Rideau, Packaging mathematical structures, TPHOLs 2009                     *)
 (*                                                                            *)
 (* This file defines the following algebraic structures:                      *)
 (*                                                                            *)

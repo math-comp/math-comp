@@ -5,6 +5,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import path.
 
 (******************************************************************************)
+(*                             Finite types                                   *)
+(*                                                                            *)
 (* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
 (*                                                                            *)
 (* This file defines an interface for finite types:                           *)

@@ -6,9 +6,11 @@ From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
 From mathcomp Require Import ssralg poly.
 
 (******************************************************************************)
+(*                            Number structures                               *)
+(*                                                                            *)
 (* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
 (*                                                                            *)
-(* This file defines some classes to manipulate number structures, i.e        *)
+(* This file defines some classes to manipulate number structures, i.e,       *)
 (* structures with an order and a norm. To use this file, insert              *)
 (* "Import Num.Theory." before your scripts. You can also "Import Num.Def."   *)
 (* to enjoy shorter notations (e.g., minr instead of Num.min, lerif instead   *)

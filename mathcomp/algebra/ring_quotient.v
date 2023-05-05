@@ -5,11 +5,11 @@ From mathcomp Require Import ssreflect eqtype choice ssreflect ssrbool ssrnat.
 From mathcomp Require Import ssrfun seq ssralg generic_quotient.
 
 (******************************************************************************)
-(*          This file describes quotients of algebraic structures.            *)
+(*                   Quotients of algebraic structures                        *)
 (*                                                                            *)
-(* It defines a join hierarchy mixing the structures defined  in file ssralg  *)
-(* (up to  unit ring type)  and the  quotType quotient structure  defined in  *)
-(* file  generic_quotient.   Every structure  in  that  (join) hierarchy  is  *)
+(* This file defines a join hierarchy mixing the structures defined in file   *)
+(* ssralg (up to unit ring type) and the quotType quotient structure defined  *)
+(* in generic_quotient.v.   Every structure  in  that  (join) hierarchy  is   *)
 (* parametrized by  a base type  T and the  constants and operations  on the  *)
 (* base type  that will  be used  to confer its  algebraic structure  to the  *)
 (* quotient.  Note  that T  itself  is  in general  not  an  instance of  an  *)

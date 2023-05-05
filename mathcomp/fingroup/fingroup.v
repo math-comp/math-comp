@@ -5,6 +5,8 @@ From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
 From mathcomp Require Import fintype div path tuple bigop prime finset.
 
 (******************************************************************************)
+(*                               Finite groups                                *)
+(*                                                                            *)
 (* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
 (*                                                                            *)
 (* This file defines the main interface for finite groups:                    *)
@@ -302,7 +304,7 @@ move=> x y /=; rewrite -[y^-1 * _]mul1g -(mulVg (x * y)) -2!mulgA (mulgA y).
 by rewrite mulgV mul1g mulgV -(mulgV (x * y)) mulgA mulVg mul1g.
 Qed.
 
-HB.instance Definition _ := 
+HB.instance Definition _ :=
   isMulBaseGroup.Build G mulgA mul1g mk_invgK mk_invMg.
 HB.instance Definition _ := BaseFinGroup_isGroup.Build G mulVg.
 

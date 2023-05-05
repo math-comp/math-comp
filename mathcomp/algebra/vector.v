@@ -6,7 +6,8 @@ From mathcomp Require Import fintype bigop finfun tuple.
 From mathcomp Require Import ssralg matrix mxalgebra zmodp.
 
 (******************************************************************************)
-(*  * Finite dimensional vector spaces                                        *)
+(*                    Finite dimensional vector spaces                        *)
+(*                                                                            *)
 (*           vectType R == interface structure for finite dimensional (more   *)
 (*                         precisely, detachable) vector spaces over R, which *)
 (*                         should be at least a ringType.                     *)

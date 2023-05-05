@@ -5,6 +5,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice.
 From mathcomp Require Import seq fintype.
 
 (*****************************************************************************)
+(*                            Quotient Types                                 *)
+(*                                                                           *)
 (* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.  *)
 (*                                                                           *)
 (* Provided a base type T, this files defines an interface for quotients Q   *)
@@ -13,8 +15,7 @@ From mathcomp Require Import seq fintype.
 (* provides a helper to quotient T by a decidable equivalence relation (e    *)
 (* : rel T) if T is a choiceType (or encodable as a choiceType modulo e).    *)
 (*                                                                           *)
-(* See "Pragmatic Quotient Types in Coq", proceedings of ITP2013,            *)
-(* by Cyril Cohen.                                                           *)
+(* Reference: Cyril Cohen, Pragmatic Quotient Types in Coq, ITP 2013         *)
 (*                                                                           *)
 (* *** Generic Quotienting ***                                               *)
 (*         quotType T == the type of quotient types based on T               *)

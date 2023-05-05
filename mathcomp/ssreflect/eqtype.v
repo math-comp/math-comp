@@ -4,6 +4,8 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool.
 
 (******************************************************************************)
+(*                      Types with a decidable equality                       *)
+(*                                                                            *)
 (* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
 (*                                                                            *)
 (* This file defines two "base" combinatorial structures:                     *)
