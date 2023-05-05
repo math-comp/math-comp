@@ -2,9 +2,16 @@
 
 ### Changed
 
+- in `ring_quotient.v`
+  + structures `zmodQuotType`, `ringQuotType` and `unitRingQuotType` have been ported to HB.
+  + structures `proper_ideal`, `idealr` and `primeIdealr` have been ported to HB.
+
 ### Renamed
 
 ### Removed
+
+- in `ring_quotient.v`
+  + removed `MkIdeal` and `MkPrimeIdeal` in favor of generic HB commands.
 
 ### Deprecated
 
