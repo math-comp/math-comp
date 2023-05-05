@@ -180,15 +180,21 @@ Abbreviations are in the header of the file which introduces them. We list here 
 
 ### Naming conventions for definitions (non exhaustive)
 
-- Structure for types
-  - Mixed case, the first letter lowercase and the first letter of each internal word capitalized, end with `Type`
-  - e.g., `unitRingType`
-- Packed classes
-  - Mixed case, the first letter of each internal word capitalized, end with `Type`
-  - e.g., `UnitRingType`
-- Mixins
-  - Mixed case, the first letter of each internal word capitalised, end with `Mixin`
-  - e.g., `UnitRingMixin`
+- types of mathematical structures
+  + Mixed case, the first letter lowercase and the first letter of each internal
+    word capitalized, end with `Type`
+  + e.g., `unitRingType`
+- HB structures
+  + Mixed case, the first letter of each internal word capitalized
+  + e.g., `UnitRing`
+- interfaces (mixins, factories)
+  + when the interface sits at the bottom of a hierarchy: mixed case, starts
+    with `is` or `has`, the first letter of each internal word capitalized
+    * e.g., `hasChoice`, `isZsemimodule`
+  + when the interface extends a structure `A`: `A_isB` or `A_hasB` where `B`
+    is mixed case, the first letter of each internal word capitalised
+    * e.g., `Zsemimodule_isZmodule`, `Zmodule_isRing`, `SemiRing_hasCommutativeMul`
+    * exception: `Choice_` can be omitted
 - Coq Modules:
   - Mixed case, the first letter of each internal word capitalized
   - e.g., `NumDomain` in `ssrnum.v`
