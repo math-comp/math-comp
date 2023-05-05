@@ -5331,7 +5331,7 @@ HB.builders Context d T S d' U of SubPOrder_isSubLattice d T S d' U.
 HB.instance Definition _ := isLatticeClosed.Build d T S
   opredI_subproof opredU_subproof.
 
-Let inU v Sv : U := eqtype.sub v Sv.
+Let inU v Sv : U := Sub v Sv.
 Let meetU (u1 u2 : U) : U := inU (opredI (valP u1) (valP u2)).
 Let joinU (u1 u2 : U) : U := inU (opredU (valP u1) (valP u2)).
 
@@ -5340,21 +5340,21 @@ Obligation Tactic := idtac.
 
 Program Definition latticeU := @POrder_isLattice.Build d' U meetU joinU
   _ _ _ _ _ _ _.
-Next Obligation. by move=> x y; apply: val_inj; rewrite !subK meetC. Qed.
-Next Obligation. by move=> x y; apply: val_inj; rewrite !subK joinC. Qed.
-Next Obligation. by move=> x y z; apply: val_inj; rewrite !subK meetA. Qed.
-Next Obligation. by move=> x y z; apply: val_inj; rewrite !subK joinA. Qed.
-Next Obligation. by move=> y x; apply: val_inj; rewrite !subK joinKI. Qed.
-Next Obligation. by move=> y x; apply: val_inj; rewrite !subK meetKU. Qed.
+Next Obligation. by move=> x y; apply: val_inj; rewrite !SubK meetC. Qed.
+Next Obligation. by move=> x y; apply: val_inj; rewrite !SubK joinC. Qed.
+Next Obligation. by move=> x y z; apply: val_inj; rewrite !SubK meetA. Qed.
+Next Obligation. by move=> x y z; apply: val_inj; rewrite !SubK joinA. Qed.
+Next Obligation. by move=> y x; apply: val_inj; rewrite !SubK joinKI. Qed.
+Next Obligation. by move=> y x; apply: val_inj; rewrite !SubK meetKU. Qed.
 Next Obligation.
-by move=> x y; rewrite leEsub -(inj_eq val_inj) subK leEmeet.
+by move=> x y; rewrite leEsub -(inj_eq val_inj) SubK leEmeet.
 Qed.
 HB.instance Definition _ := latticeU.
 
 Fact valI : meet_morphism (val : U -> T).
-Proof. by move=> x y; rewrite !subK. Qed.
+Proof. by move=> x y; rewrite !SubK. Qed.
 Fact valU : join_morphism (val : U -> T).
-Proof. by move=> x y; rewrite !subK. Qed.
+Proof. by move=> x y; rewrite !SubK. Qed.
 HB.instance Definition _ := isMeetSubLattice.Build d T S d' U valI.
 HB.instance Definition _ := isJoinSubLattice.Build d T S d' U valU.
 HB.end.
@@ -5404,13 +5404,13 @@ HB.factory Record SubPOrder_isBSubLattice d (T : bLatticeType d) S d' U
 
 HB.builders Context d T S d' U of SubPOrder_isBSubLattice d T S d' U.
 
-Let inU v Sv : U := eqtype.sub v Sv.
+Let inU v Sv : U := Sub v Sv.
 Let zeroU : U := inU opred0_subproof.
 
-Fact le0x x : zeroU <= x. Proof. by rewrite leEsub /= subK le0x. Qed.
+Fact le0x x : zeroU <= x. Proof. by rewrite leEsub /= SubK le0x. Qed.
 HB.instance Definition _ := hasBottom.Build d' U le0x.
 
-Fact val0 : (val : U -> T) 0 = 0. Proof. by rewrite subK. Qed.
+Fact val0 : (val : U -> T) 0 = 0. Proof. by rewrite SubK. Qed.
 HB.instance Definition _ := isBSubLattice.Build d T S d' U val0.
 HB.end.
 
@@ -5461,13 +5461,13 @@ HB.factory Record SubPOrder_isTSubLattice d (T : tLatticeType d) S d' U
 
 HB.builders Context d T S d' U of SubPOrder_isTSubLattice d T S d' U.
 
-Let inU v Sv : U := eqtype.sub v Sv.
+Let inU v Sv : U := Sub v Sv.
 Let oneU : U := inU opred1_subproof.
 
-Fact lex1 x : x <= oneU. Proof. by rewrite leEsub /= subK lex1. Qed.
+Fact lex1 x : x <= oneU. Proof. by rewrite leEsub /= SubK lex1. Qed.
 HB.instance Definition _ := hasTop.Build d' U lex1.
 
-Fact val1 : (val : U -> T) 1 = 1. Proof. by rewrite subK. Qed.
+Fact val1 : (val : U -> T) 1 = 1. Proof. by rewrite SubK. Qed.
 HB.instance Definition _ := isTSubLattice.Build d T S d' U val1.
 HB.end.
 

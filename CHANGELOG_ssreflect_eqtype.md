@@ -11,12 +11,6 @@
 
 ### Renamed
 
-- in `eqtype.v`
-  + `Sub` -> `sub`
-  + `Sub_spec` -> `sub_spec`
-  + `SubK` -> `subK`
-  + `SubP` -> `subP`
-
 ### Removed
 
 - in `eqtype.v`
@@ -30,11 +24,11 @@
   + `option_eqMixin` and `option_eqType`, use `option T : eqType`
   + `tag_eqMixin` and `tag_eqType`, use `{i : I & T_ i} : eqType`
   + `sum_eqMixin` and `sum_eqType`, use `(T1 + T2)%type : eqType`
-  + definition `clone_subType`, use `Sub.clone`
+  + definition `clone_subType`, use `SubType.clone`
   + notation `[subType for v]`, use `[isSub for v]`
   + notation `[subType for v by rec]`, use `[isSub for v by rec]`
   + notation `[subType of T for v]`, use `[isSub of T for v]`
-  + notation `[subType of T]`, use `Sub.clone T _`
+  + notation `[subType of T]`, use `SubType.clone T _`
   + definition `NewType`
   + notation `[newType for v]`, use `[isNew for v]`
   + notation `[newType for v by rec]`, use `[isNew for v by rec]`

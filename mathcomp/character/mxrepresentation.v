@@ -1780,7 +1780,7 @@ have{simW} simWr (i : tI) : mxsimple (W (r_ i)).
 have [J []] := sum_mxsimple_direct_sub simWr defV.
 case: (set_0Vmem J) => [-> V0 | [j0 Jj0]].
   by rewrite -mxrank_eq0 -V0 big_set0 mxrank0 in nzV.
-pose K := {j | j \in J}; pose k0 : K := sub j0 Jj0.
+pose K := {j | j \in J}; pose k0 : K := Sub j0 Jj0.
 have bij_KJ: {on J, bijective (sval : K -> _)}.
   by exists (insubd k0) => [k _ | j Jj]; rewrite ?valKd ?insubdK.
 have J_K (k : K) : sval k \in J by apply: valP k.
@@ -1983,7 +1983,7 @@ rewrite -(eq_bigr _ (fun _ _ => genmx_id _)) -genmx_sums -genmx_component.
 rewrite [in compU]unlock; apply/genmxP/andP; split; last first.
   by apply/sumsmx_subP => i _; rewrite (sumsmx_sup (sval i)).
 apply/sumsmx_subP => i _.
-case i0: (r_nz i); first by rewrite (sumsmx_sup (sub i i0)).
+case i0: (r_nz i); first by rewrite (sumsmx_sup (Sub i i0)).
 by move/negbFE: i0; rewrite -cyclic_mx_eq0 => /eqP->; apply: sub0mx.
 Qed.
 
@@ -4589,7 +4589,7 @@ exists (fun i => oapp h' [1 sGq]%irr (insub i)) => [j | i] lin_i.
   exists g => [||G'x]; last 1 [case/morphimP=> x _ Gx ->] || by [].
   by rewrite quo_repr_coset ?hom_g.
 rewrite (insubT (mem _) lin_i) /=; apply/esym/eqP/socle_rsimP.
-set u := sub i lin_i; apply: mx_rsim_trans (rsim_irr_comp sG F'G (irrG _)).
+set u := Sub i lin_i; apply: mx_rsim_trans (rsim_irr_comp sG F'G (irrG _)).
 have [g lin_g inj_g hom_g] := rsim_irr_comp sGq F'Gq (irrGq u).
 exists g => [||x Gx]; last 1 [have:= hom_g (coset _ x)] || by [].
 by rewrite quo_repr_coset; first by apply; rewrite mem_quotient.

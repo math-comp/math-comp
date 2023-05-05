@@ -1431,7 +1431,7 @@ Implicit Type sT : subFinType P.
 
 Lemma codom_val sT x : (x \in codom (val : sT -> T)) = P x.
 Proof.
-by apply/codomP/idP=> [[u ->]|Px]; last exists (sub x Px); rewrite ?valP ?subK.
+by apply/codomP/idP=> [[u ->]|Px]; last exists (Sub x Px); rewrite ?valP ?SubK.
 Qed.
 
 End SubFinType.

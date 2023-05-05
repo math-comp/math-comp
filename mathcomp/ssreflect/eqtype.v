@@ -60,7 +60,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*             val is injective because P is proof-irrelevant (P is in bool,  *)
 (*             and the is_true coercion expands to P = true).                 *)
 (*     valP == the generic proof of P (val u) for u : subType P               *)
-(* sub x Px == The generic constructor for a subType P; Px is a proof of P x  *)
+(* Sub x Px == The generic constructor for a subType P; Px is a proof of P x  *)
 (*             and P should be inferred from the expected return type.        *)
 (*  insub x == the generic partial projection of T into a subType S of T      *)
 (*             This returns an option S; if S : subType P then                *)
@@ -531,9 +531,9 @@ Definition eq_comparable (T : eqType) : comparable T :=
 #[key="sub_sort"]
 HB.mixin Record isSub (T : Type) (P : pred T) (sub_sort : Type) := {
   val_subdef : sub_sort -> T;
-  sub : forall x, P x -> sub_sort;
-  sub_rect : forall K (_ : forall x Px, K (@sub x Px)) u, K u;
-  subK_subproof : forall x Px, val_subdef (@sub x Px) = x
+  Sub : forall x, P x -> sub_sort;
+  Sub_rect : forall K (_ : forall x Px, K (@Sub x Px)) u, K u;
+  SubK_subproof : forall x Px, val_subdef (@Sub x Px) = x
 }.
 
 #[short(type="subType")]
@@ -542,6 +542,9 @@ HB.structure Definition SubType (T : Type) (P : pred T) := { S of isSub T P S }.
 Notation val := (isSub.val_subdef (SubType.on _)).
 Notation "\val" := (isSub.val_subdef (SubType.on _)) (only parsing).
 Notation "\val" := (isSub.val_subdef _) (only printing).
+
+#[deprecated(since="mathcomp 2.0.0", note="Use Sub instead.")]
+Notation sub := Sub.
 
 #[short(type="subEqType")]
 HB.structure Definition SubEquality T (P : pred T) :=
@@ -561,17 +564,17 @@ Section Theory.
 Variable sT : subType P.
 
 Local Notation val := (isSub.val_subdef (SubType.on sT)).
-Local Notation sub := (@sub _ _ sT).
+Local Notation Sub := (@Sub _ _ sT).
 
-Lemma subK x Px : val (@sub x Px) = x. Proof. exact: subK_subproof. Qed.
+Lemma SubK x Px : val (@Sub x Px) = x. Proof. exact: SubK_subproof. Qed.
 
-Variant sub_spec : sT -> Type := subSpec x Px : sub_spec (sub x Px).
+Variant Sub_spec : sT -> Type := subSpec x Px : Sub_spec (Sub x Px).
 
-Lemma subP u : sub_spec u.
-Proof. by elim/(@sub_rect _ _ sT) : u. Qed.
+Lemma SubP u : Sub_spec u.
+Proof. by elim/(@Sub_rect _ _ sT) : u. Qed.
 (* BUG in elim? sT could be inferred from u *)
 
-Definition insub x := if idP is ReflectT Px then Some (sub x Px) else None.
+Definition insub x := if idP is ReflectT Px then Some (Sub x Px) else None.
 
 Definition insubd u0 x := odflt u0 (insub x).
 
@@ -581,12 +584,12 @@ Variant insub_spec x : option sT -> Type :=
 
 Lemma insubP x : insub_spec x (insub x).
 Proof.
-by rewrite /insub; case: {-}_ / idP; [left; rewrite ?subK | right; apply/negP].
+by rewrite /insub; case: {-}_ / idP; [left; rewrite ?SubK | right; apply/negP].
 Qed.
 
-Lemma insubT x Px : insub x = Some (sub x Px).
+Lemma insubT x Px : insub x = Some (Sub x Px).
 Proof.
-do [case: insubP => [/subP[y Py] _ <- | /negP// ]; rewrite subK]  in Px *.
+do [case: insubP => [/SubP[y Py] _ <- | /negP// ]; rewrite SubK]  in Px *.
 by rewrite (bool_irrelevance Px Py).
 Qed.
 
@@ -603,10 +606,10 @@ Lemma insubK : ocancel insub val.
 Proof. by move=> x; case: insubP. Qed.
 
 Lemma valP u : P (val u).
-Proof. by case/subP: u => x Px; rewrite subK. Qed.
+Proof. by case/SubP: u => x Px; rewrite SubK. Qed.
 
 Lemma valK : pcancel val insub.
-Proof. by case/subP=> x Px; rewrite subK; apply: insubT. Qed.
+Proof. by case/SubP=> x Px; rewrite SubK; apply: insubT. Qed.
 
 Lemma val_inj : injective val.
 Proof. exact: pcan_inj valK. Qed.
@@ -621,7 +624,7 @@ Lemma insubdK u0 : {in P, cancel (insubd u0) val}.
 Proof. by move=> x Px; rewrite val_insubd [P x]Px. Qed.
 
 Let insub_eq_aux x isPx : P x = isPx -> option sT :=
-  if isPx as b return _ = b -> _ then fun Px => Some (sub x Px) else fun=> None.
+  if isPx as b return _ = b -> _ then fun Px => Some (Sub x Px) else fun=> None.
 Definition insub_eq x := insub_eq_aux (erefl (P x)).
 
 Lemma insub_eqE : insub_eq =1 insub.
@@ -634,8 +637,15 @@ End Theory.
 
 End SubType.
 
+#[deprecated(since="mathcomp 2.0.0", note="Use SubK instead.")]
+Notation subK := SubK.
+#[deprecated(since="mathcomp 2.0.0", note="Use Sub_spec instead.")]
+Notation sub_spec := Sub_spec.
+#[deprecated(since="mathcomp 2.0.0", note="Use SubP instead.")]
+Notation subP := SubP.
+
 (* Arguments val {T P sT} u : rename. *)
-Arguments sub {T P sT} x Px : rename.
+Arguments Sub {T P sT} x Px : rename.
 Arguments vrefl {T P} x Px.
 Arguments vrefl_rect {T P} x Px.
 Arguments insub {T P sT} x.
@@ -687,11 +697,11 @@ Notation "[ 'isNew' 'for' v ]" := (@NewMixin _ _ v _ _ _)
 Notation "[ 'isNew' 'of'  T  'for' v ]" :=
   (@NewMixin _ T v _ inlined_new_rect vrefl_rect) (only parsing) : form_scope.
 
-Definition innew T nT x := @sub T predT nT x (erefl true).
+Definition innew T nT x := @Sub T predT nT x (erefl true).
 Arguments innew {T nT}.
 
 Lemma innew_val T nT : cancel val (@innew T nT).
-Proof. by move=> u; apply: val_inj; apply: subK. Qed.
+Proof. by move=> u; apply: val_inj; apply: SubK. Qed.
 
 HB.instance Definition _ T (P : pred T) := [isSub of sig P for sval].
 

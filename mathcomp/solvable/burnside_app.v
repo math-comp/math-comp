@@ -39,7 +39,7 @@ Definition square := 'I_4.
 HB.instance Definition _ := SubType.on square.
 HB.instance Definition _ := Finite.on square.
 
-Definition mksquare i : square := sub (i %% _) (ltn_mod i 4).
+Definition mksquare i : square := Sub (i %% _) (ltn_mod i 4).
 Definition c0 := mksquare 0.
 Definition c1 := mksquare 1.
 Definition c2 := mksquare 2.
@@ -471,7 +471,7 @@ Definition cube := 'I_6.
 HB.instance Definition _ := SubType.on cube.
 HB.instance Definition _ := Finite.on cube.
 
-Definition mkFcube i : cube := sub (i %% 6) (ltn_mod i 6).
+Definition mkFcube i : cube := Sub (i %% 6) (ltn_mod i 6).
 Definition F0 := mkFcube 0.
 Definition F1 := mkFcube 1.
 Definition F2 := mkFcube 2.
