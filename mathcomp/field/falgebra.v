@@ -6,18 +6,12 @@ From mathcomp Require Import choice fintype div tuple finfun bigop ssralg.
 From mathcomp Require Import finalg zmodp matrix vector poly.
 
 (******************************************************************************)
-(* Finite dimensional free algebras, usually known as F-algebras.             *)
-(*       FalgType K   == the interface type for F-algebras over K; it simply  *)
+(*        Finite dimensional free algebras, usually known as F-algebras       *)
+(*                                                                            *)
+(*       falgType K   == the interface type for F-algebras over K; it simply  *)
 (*                       joins the unitAlgType K and vectType K interfaces.   *)
-(* [FalgType K of aT] == an FalgType K structure for a type aT that has both  *)
-(*                       unitAlgType K and vectType K canonical structures.   *)
-(* [FalgType K of aT for vT] == an FalgType K structure for a type aT with a  *)
-(*                       unitAlgType K canonical structure, given a structure *)
-(*                       vT : vectType K whose lmodType K projection matches  *)
-(*                       the canonical lmodType for aT.                       *)
-(* FalgUnitRingType T == a default unitRingType structure for a type T with   *)
-(*                       both algType and vectType structures.                *)
-(*   Any aT with an FalgType structure inherits all the Vector, Ring and      *)
+(*                       The HB class is called Falgebra.                     *)
+(*   Any aT with an falgType structure inherits all the Vector, Ring and      *)
 (* Algebra operations, and supports the following additional operations:      *)
 (*           \dim_A M == (\dim M %/ dim A)%N -- free module dimension.        *)
 (*            amull u == the linear function v |-> u * v, for u, v : aT.      *)
@@ -43,7 +37,7 @@ From mathcomp Require Import finalg zmodp matrix vector poly.
 (*      <<U & vs>>%VS == agenv (U + <<vs>>) (adjoin vs to U).                 *)
 (*        {aspace aT} == a subType of {vspace aT} consisting of sub-algebras  *)
 (*                       of aT (see below); for A : {aspace aT}, subvs_of A   *)
-(*                       has a canonical FalgType K structure.                *)
+(*                       has a canonical falgType K structure.                *)
 (*        is_aspace U <=> the characteristic predicate of {aspace aT} stating *)
 (*                       that U is closed under product and contains an       *)
 (*                       identity element, := has_algid U && (U * U <= U)%VS. *)
@@ -68,10 +62,8 @@ From mathcomp Require Import finalg zmodp matrix vector poly.
 (*                       contain 1). Note that f @: U need not be a           *)
 (*                       subalgebra when U is, as f could annilate U.         *)
 (*      'AHom(aT, rT) == the type of algebra homomorphisms from aT to rT,     *)
-(*                       where aT and rT ARE FalgType structures. Elements of *)
+(*                       where aT and rT ARE falgType structures. Elements of *)
 (*                       'AHom(aT, rT) coerce to 'End(aT, rT) and aT -> rT.   *)
-(* --> Caveat: aT and rT must denote actual FalgType structures, not their    *)
-(*     projections on Type.                                                   *)
 (*          'AEnd(aT) == algebra endomorphisms of aT (:= 'AHom(aT, aT)).      *)
 (******************************************************************************)
 
@@ -97,9 +89,11 @@ Notation "\dim_ E V" := (divn (\dim V) (\dim E))
 Import GRing.Theory.
 
 (* Finite dimensional algebra *)
-#[short(type="FalgType")]
+#[short(type="falgType")]
 HB.structure Definition Falgebra (R : ringType) :=
   { A of Vector R A & GRing.UnitAlgebra R A }.
+#[deprecated(since="mathcomp 2.0.0", note="Use falgType instead.")]
+Notation FalgType := falgType.
 
 (* Supply a default unitRing mixin for the default unitAlgType base type. *)
 HB.factory Record Algebra_isFalgebra (K : fieldType) A
@@ -142,6 +136,7 @@ Notation "[ 'FalgType' F 'of' L ]" := (Falgebra.clone F L%type _)
 #[deprecated(since="mathcomp 2.0.0", note="Use Falgebra.clone instead.")]
 Notation "[ 'FalgType' F 'of' L 'for' L' ]" := (Falgebra.clone F L%type L')
   (at level 0, format "[ 'FalgType'  F  'of'  L  'for'  L' ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use Algebra_isFalgebra.Build instead.")]
 Notation FalgUnitRingType T := (Algebra_isFalgebra.Build _ T).
 End FalgebraExports.
 HB.export FalgebraExports.
@@ -160,7 +155,7 @@ Proof. by apply/esym/eqP; rewrite eqEdim subvf dim_vline oner_eq0 dimvf. Qed.
 
 Section Proper.
 
-Variables (R : ringType) (aT : FalgType R).
+Variables (R : ringType) (aT : falgType R).
 
 Import VectorInternalTheory.
 
@@ -176,7 +171,7 @@ Module FalgLfun.
 
 Section FalgLfun.
 
-Variable (R : comRingType) (aT : FalgType R).
+Variable (R : comRingType) (aT : falgType R).
 Implicit Types f g : 'End(aT).
 
 HB.instance Definition _ := GRing.Algebra.copy 'End(aT)
@@ -189,7 +184,7 @@ End FalgLfun.
 
 Section InvLfun.
 
-Variable (K : fieldType) (aT : FalgType K).
+Variable (K : fieldType) (aT : falgType K).
 Implicit Types f g : 'End(aT).
 
 Definition lfun_invr f := if lker f == 0%VS then f^-1%VF else f.
@@ -227,7 +222,7 @@ End FalgLfun.
 
 Section FalgebraTheory.
 
-Variables (K : fieldType) (aT : FalgType K).
+Variables (K : fieldType) (aT : falgType K).
 Implicit Types (u v : aT) (U V W : {vspace aT}).
 
 Import FalgLfun.
@@ -595,7 +590,7 @@ Arguments polyOver1P {K aT p}.
 
 Section AspaceTheory.
 
-Variables (K : fieldType) (aT : FalgType K).
+Variables (K : fieldType) (aT : falgType K).
 Implicit Types (u v e : aT) (U V : {vspace aT}) (A B : {aspace aT}).
 Import FalgLfun.
 
@@ -806,7 +801,7 @@ Arguments memv_cosetP {K aT U v w}.
 
 Section Closure.
 
-Variables (K : fieldType) (aT : FalgType K).
+Variables (K : fieldType) (aT : falgType K).
 Implicit Types (u v : aT) (U V W : {vspace aT}).
 
 (* Subspaces of an F-algebra form a Kleene algebra *)
@@ -959,9 +954,9 @@ Notation "<< U ; x >>" := << U + <[x]> >>%AS : aspace_scope.
 
 Section SubFalgType.
 
-(* The FalgType structure of subvs_of A for A : {aspace aT}.                  *)
+(* The falgType structure of subvs_of A for A : {aspace aT}.                  *)
 (* We can't use the rpred-based mixin, because A need not contain 1.          *)
-Variable (K : fieldType) (aT : FalgType K) (A : {aspace aT}).
+Variable (K : fieldType) (aT : falgType K) (A : {aspace aT}).
 
 Definition subvs_one := Subvs (memv_algid A).
 Definition subvs_mul (u v : subvs_of A) :=
@@ -991,7 +986,7 @@ Proof. exact/val_inj/scalerAr. Qed.
 HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build K (subvs_of A)
   subvs_scaleAr.
 
-HB.instance Definition _ := FalgUnitRingType (subvs_of A).
+HB.instance Definition _ := Algebra_isFalgebra.Build K (subvs_of A).
 
 Implicit Type w : subvs_of A.
 
@@ -1016,7 +1011,7 @@ Variable K : fieldType.
 
 Section Class_Def.
 
-Variables aT rT : FalgType K.
+Variables aT rT : falgType K.
 
 Definition ahom_in (U : {vspace aT}) (f : 'Hom(aT, rT)) :=
   all2rel (fun x y : aT => f (x * y) == f x * f y) (vbasis U) && (f 1 == 1).
@@ -1060,7 +1055,7 @@ Arguments ahomP {aT rT f}.
 
 Section LRMorphism.
 
-Variables aT rT sT : FalgType K.
+Variables aT rT sT : falgType K.
 
 Fact ahom_is_multiplicative (f : ahom aT rT) : multiplicative f.
 Proof. by apply/ahomP; case: f. Qed.

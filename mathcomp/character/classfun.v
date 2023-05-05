@@ -13,7 +13,7 @@ From mathcomp Require Import matrix vector falgebra ssrnum algC algnum.
 (*          'CF(G) == the type of class functions on G : {group gT}, i.e.,    *)
 (*                    which map gT to the type algC of complex algebraics,    *)
 (*                    have support in G, and are constant on each conjugacy   *)
-(*                    class of G. 'CF(G) implements the FalgType interface of *)
+(*                    class of G. 'CF(G) implements the falgType interface of *)
 (*                    finite-dimensional F-algebras.                          *)
 (*                    The identity 1 : 'CF(G) is the indicator function of G, *)
 (*                    and (later) the principal character.                    *)

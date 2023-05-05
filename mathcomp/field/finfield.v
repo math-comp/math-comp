@@ -22,7 +22,7 @@ From mathcomp Require ssrnum ssrint algC cyclotomic.
 (*                              should not be made canonical.                 *)
 (*          Import FinVector :: Declares canonical default finType, finRing,  *)
 (*                              etc structures (including FinFieldExtType     *)
-(*                              above) for abstract vectType, FalgType and    *)
+(*                              above) for abstract vectType, falgType and    *)
 (*                              fieldExtType over a finFieldType. This should *)
 (*                              be used with caution (e.g., local to a proof) *)
 (*                              as the finType so obtained may clash with the *)
@@ -32,7 +32,7 @@ From mathcomp Require ssrnum ssrint algC cyclotomic.
 (*                              canonical ringType, ..., fieldType structures *)
 (*                              compatible with those of R, as well as        *)
 (*                              canonical lmodType 'F_p, ..., algType 'F_p    *)
-(*                              structures, plus an FalgType structure if R   *)
+(*                              structures, plus an falgType structure if R   *)
 (*                              is a finUnitRingType and a splittingFieldType *)
 (*                              struture if R is a finFieldType.              *)
 (* FinSplittingFieldFor nz_p == sigma-pair whose sval is a splittingFieldType *)
@@ -176,7 +176,7 @@ HB.instance Definition _ := isFinite.Build fvT
 
 End FinVector.
 
-HB.instance Definition _ (F : finFieldType) (aT : FalgType F) :=
+HB.instance Definition _ (F : finFieldType) (aT : falgType F) :=
   Falgebra.on (finvect_type aT).
 
 Section FinFieldExt.

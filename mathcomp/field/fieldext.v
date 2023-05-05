@@ -9,15 +9,15 @@ From mathcomp Require Import mxpoly generic_quotient.
 (******************************************************************************)
 (*  * Finite dimensional field extentions                                     *)
 (*      fieldExtType F == the interface type for finite field extensions of F *)
-(*                        it simply combines the fieldType and FalgType F     *)
+(*                        it simply combines the fieldType and falgType F     *)
 (*                        interfaces.                                         *)
 (* [fieldExtType F of L] == a fieldExt F structure for a type L that has both *)
-(*                        FalgType F and fieldType canonical instances. The   *)
+(*                        falgType F and fieldType canonical instances. The   *)
 (*                        field class instance must be manifest with explicit *)
 (*                        comRing, idomain, and field mixins. If L has an     *)
 (*                        abstract field class should use the 'for' variant.  *)
 (* [fieldExtType F of L for K] == a fieldExtType F structure for a type L     *)
-(*                        that has an FalgType F canonical structure, given   *)
+(*                        that has an falgType F canonical structure, given   *)
 (*                        a K : fieldType whose unitRingType projection       *)
 (*                        coincides with the canonical unitRingType for F.    *)
 (*        {subfield L} == the type of subfields of L that are also extensions *)
@@ -99,7 +99,7 @@ Notation "[ 'fieldExtType' F 'of' L ]" := (FieldExt.clone F L%type _)
 Notation "[ 'fieldExtType' F 'of' L 'for' K ]" := (FieldExt.clone F L%type K)
   (at level 0, format "[ 'fieldExtType'  F  'of'  L  'for'  K ]") : form_scope.
 Notation "{ 'subfield' L }" := (@aspace_of _ _ (Phant L))
-  (* NB: was (@aspace_of _ (FalgType _) (Phant L)) *)
+  (* NB: was (@aspace_of _ (falgType _) (Phant L)) *)
   (at level 0, format "{ 'subfield'  L }") : type_scope.
 End FieldExtExports.
 HB.export FieldExtExports.
@@ -144,12 +144,12 @@ Proof.
 by apply/eqP; rewrite eqEsubv sub_agenv agenv_sub_modr ?sub1v ?asubv.
 Qed.
 
-Lemma AHom_lker0 (rT : FalgType F0) (f : 'AHom(L, rT)) : lker f == 0%VS.
+Lemma AHom_lker0 (rT : falgType F0) (f : 'AHom(L, rT)) : lker f == 0%VS.
 Proof. by apply/lker0P; apply: fmorph_inj. Qed.
 
 Lemma AEnd_lker0 (f : 'AEnd(L)) : lker f == 0%VS. Proof. exact: AHom_lker0. Qed.
 
-Fact aimg_is_aspace (rT : FalgType F0) (f : 'AHom(L, rT)) (E : {subfield L}) :
+Fact aimg_is_aspace (rT : falgType F0) (f : 'AHom(L, rT)) (E : {subfield L}) :
   is_aspace (f @: E).
 Proof.
 rewrite /is_aspace -aimgM limgS ?prodv_id // has_algid1 //.

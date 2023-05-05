@@ -20,7 +20,7 @@ Goal forall R : comUnitRingType,
     [the comUnitAlgType R of R^o] = R :> comUnitRingType.
 Proof. by move=> [? []]. Qed.
 
-Goal forall R : comUnitRingType, [the FalgType R of R^o] = R :> unitRingType.
+Goal forall R : comUnitRingType, [the falgType R of R^o] = R :> unitRingType.
 Proof. by move=> [? []]. Qed.
 
 Goal forall K : fieldType, [the fieldExtType K of K^o] = K :> fieldType.
