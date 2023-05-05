@@ -26,56 +26,46 @@ From mathcomp Require Import ssrfun seq ssralg generic_quotient.
 (* non commutative ring and left or two-sided ideals.                         *)
 (*                                                                            *)
 (* The file defines the following Structures:                                 *)
-(* zmodQuotType T e z n a     == Z-module  obtained  by  quotienting type  T  *)
+(*     zmodQuotType T e z n a == Z-module  obtained  by  quotienting type  T  *)
 (*                               with  the  relation  e  and  whose neutral,  *)
 (*                               opposite and addition are the images in the  *)
 (*                               quotient  of  the  parameters  z,  n and a,  *)
-(*                               respectively.                                *)
+(*                               respectively                                 *)
+(*                               The HB class is called ZmodQuotient.         *)
 (* ringQuotType T e z n a o m == ring  obtained  by quotienting  type T with  *)
 (*                               the relation e  and  whose zero opposite,    *)
 (*                               addition, one, and multiplication are  the   *)
 (*                               images  in  the  quotient  of the parameters *)
-(*                               z, n, a, o, m, respectively.                 *)
+(*                               z, n, a, o, m, respectively                  *)
+(*                               The HB class is called RingQuotient.         *)
 (*   unitRingQuotType ... u i == As in the previous cases, instance of unit   *)
 (*                               ring whose unit predicate  is obtained from  *)
-(*                               u and the inverse from i.                    *)
-(*                 idealr R S == S : {pred R} is a non-trivial, decidable,    *)
-(*                               right ideal of the ring R.                   *)
-(*           prime_idealr R S == S : {pred R} is a non-trivial, decidable,    *)
-(*                               right, prime ideal of the ring R.            *)
+(*                               u and the inverse from i                     *)
+(*                               The HB class is called UnitRingQuotient.     *)
+(*                   idealr R == {pred R} is a non-trivial, decidable,        *)
+(*                               right ideal of the ring R                    *)
+(*                               (join of GRing.ZmodClosed and ProperIdeal)   *)
+(*                               The HB class is called Idealr.               *)
+(*             prime_idealr R == {pred R} is a non-trivial, decidable,        *)
+(*                               right, prime ideal of the ring R             *)
+(*                               The HB class is called PrimeIdealr.          *)
 (*                                                                            *)
 (* The formalization of ideals features the following constructions:          *)
-(*       proper_ideal S == the  collective predicate (S : pred R) on the      *)
+(*           proper_ideal R == the  collective predicate (S : pred R) on the  *)
 (*                             ring R is stable by the ring product and does  *)
-(*                             contain R's one.                               *)
+(*                             contain R's one                                *)
+(*                             The HB class is called ProperIdeal.            *)
+(*                 idealr R == join of GRing.ZmodClosed and ProperIdeal       *)
 (*   prime_idealr_closed S  := u * v \in S -> (u \in S) || (v \in S)          *)
 (*          idealr_closed S == the collective predicate (S : pred R) on the   *)
-(*                             ring  R  represents  a  (right) ideal.  This   *)
-(*                             implies its being a proper_ideal.              *)
-(*                                                                            *)
-(*           MkIdeal idealS == packs idealS : proper_ideal S into an idealr S *)
-(*                             interface structure associating the            *)
-(*                             idealr_closed   property   to  the   canonical *)
-(*                             pred_key S  (see ssrbool), which  must already *)
-(*                             be a zmodPred (see ssralg).                    *)
-(*     MkPrimeIdeal pidealS == packs  pidealS : prime_idealr_closed S  into a *)
-(*                             prime_idealr S interface structure associating *)
-(*                             the  prime_idealr_closed   property   to   the *)
-(*                             canonical pred_key S (see ssrbool), which must *)
-(*                             already be an idealr (see above).              *)
+(*                             ring  R  represents  a  (right) ideal          *)
+(*                             This implies its being a proper_ideal.         *)
 (*          {ideal_quot kI} == quotient by the keyed (right) ideal predicate  *)
 (*                             kI of a commutative ring R. Note that we only  *)
 (*                             provide canonical structures of ring quotients *)
 (*                             for commutative rings, in which a right ideal  *)
-(*                             is obviously a two-sided ideal.                *)
-(*                                                                            *)
-(* Note :                                                                     *)
-(* if (I : pred R) is a predicate over a ring R and (ideal : idealr I) is an  *)
-(* instance of (right) ideal, in order to quantify over an arbitrary (keyed)  *)
-(* predicate describing  ideal, use  type (keyed_pred  ideal), as  in:        *)
-(*     forall (kI : keyed_pred ideal),...                                     *)
+(*                             is obviously a two-sided ideal                 *)
 (******************************************************************************)
-
 
 Import GRing.Theory.
 
@@ -249,10 +239,10 @@ HB.mixin Record isProperIdeal (R : ringType) (S : R -> bool) := {
   proper_ideal_subproof : proper_ideal S
 }.
 
-#[short(type="properIdealPred")]
+#[short(type="proper_ideal")]
 HB.structure Definition ProperIdeal R := {S of isProperIdeal R S}.
 
-#[short(type="idealrPred")]
+#[short(type="idealr")]
 HB.structure Definition Idealr (R : ringType) :=
   {S of GRing.ZmodClosed R S & ProperIdeal R S}.
 
@@ -260,7 +250,7 @@ HB.mixin Record isPrimeIdealrClosed (R : ringType) (S : R -> bool) := {
   prime_idealr_closed_subproof : prime_idealr_closed S
 }.
 
-#[short(type="primeIdealrPred")]
+#[short(type="prime_idealr")]
 HB.structure Definition PrimeIdealr (R : ringType) :=
   {S of Idealr R S & isPrimeIdealrClosed R S}.
 
@@ -276,7 +266,7 @@ HB.instance Definition _ := isProperIdeal.Build R S
 HB.end.
 
 Section IdealTheory.
-Variables (R : ringType) (idealrI : idealrPred R).
+Variables (R : ringType) (idealrI : idealr R).
 Local Notation I := (idealrI : pred R).
 
 Lemma idealr1 : 1 \in I = false.
@@ -291,7 +281,7 @@ End IdealTheory.
 
 Section PrimeIdealTheory.
 
-Variables (R : comRingType) (pidealI : primeIdealrPred R).
+Variables (R : comRingType) (pidealI : prime_idealr R).
 Local Notation I := (pidealI : pred R).
 
 Lemma prime_idealrM u v : (u * v \in I) = (u \in I) || (v \in I).
@@ -388,7 +378,7 @@ Notation "{ 'quot' I }" := (@type_of _ I (Phant _)) : type_scope.
 
 Section RingQuotient.
 
-Variables (R : comRingType) (idealI : idealrPred R).
+Variables (R : comRingType) (idealI : idealr R).
 Local Notation I := (idealI : pred R).
 
 Definition one : {quot idealI} := lift_cst {quot idealI} 1.
@@ -440,7 +430,7 @@ End RingQuotient.
 
 Section IDomainQuotient.
 
-Variables (R : comRingType) (I : primeIdealrPred R).
+Variables (R : comRingType) (I : prime_idealr R).
 
 Lemma rquot_IdomainAxiom (x y : {quot I}): x * y = 0 -> (x == 0) || (y == 0).
 Proof.

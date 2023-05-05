@@ -704,7 +704,7 @@ have I_ideal : idealr_closed I.
 pose IaM := GRing.isAddClosed.Build _ I (idealr_closedB I_ideal).
 pose IoM := GRing.isOppClosed.Build _ I (idealr_closedB I_ideal).
 pose IpM := isProperIdeal.Build _ I (idealr_closed_nontrivial I_ideal).
-pose Iid : idealrPred _ := HB.pack I IaM IoM IpM.
+pose Iid : idealr _ := HB.pack I IaM IoM IpM.
 pose EMixin := GRing.Ring_hasCommutativeMul.Build _ (@Quotient.mulqC _ Iid).
 pose E : comRingType := HB.pack _ EMixin.
 pose PtoE : {rmorphism {poly F} -> E} := \pi_E%qT.
