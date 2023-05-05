@@ -6,6 +6,9 @@
 
 ### Removed
 
+- in `vector.v`
+  + notation `VectMixin` and `VectType`, use `Lmodule_hasFinDim.Build`
+
 ### Deprecated
 
 - in `vector.v`
