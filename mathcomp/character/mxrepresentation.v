@@ -5738,7 +5738,7 @@ move=> e f; have [tor rto] := GRing.to_rformP e f.
 exact: (iffP (sat_gen_form e (GRing.to_rform_rformula f))).
 Qed.
 
-#[export] HB.instance Definition _ := GRing.Field_isDec.Build FA gen_satP.
+#[export] HB.instance Definition _ := GRing.Field_isDecField.Build FA gen_satP.
 
 End DecideGenField.
 

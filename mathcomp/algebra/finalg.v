@@ -377,7 +377,7 @@ HB.builders Context F of isField F.
     by move=> i f IH e; apply: (iffP forallP) => f_ x; apply/IH.
   Qed.
 
-  HB.instance Definition _ := GRing.Field_isDec.Build F decidable.
+  HB.instance Definition _ := GRing.Field_isDecField.Build F decidable.
 HB.end.
 
 #[export, non_forgetful_inheritance]

@@ -656,7 +656,7 @@ HB.factory Record Field_isAlgClosed F of GRing.Field F := {
 }.
 
 HB.builders Context F of Field_isAlgClosed F.
-  HB.instance Definition _ := GRing.decidable_of_QE.Build F
+  HB.instance Definition _ := GRing.Field_QE_isDecField.Build F
     (@ClosedFieldQE.wf_ex_elim F)
     (ClosedFieldQE.holds_ex_elim solve_monicpoly).
   HB.instance Definition _ := GRing.DecField_isAlgClosed.Build F

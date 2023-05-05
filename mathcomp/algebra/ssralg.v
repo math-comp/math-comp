@@ -4447,13 +4447,13 @@ Definition decidable_field_axiom (R : unitRingType)
     (s : seq R -> pred (formula R)) :=
   forall e f, reflect (holds e f) (s e f).
 
-HB.mixin Record Field_isDec R of UnitRing R := {
+HB.mixin Record Field_isDecField R of UnitRing R := {
   sat : seq R -> pred (formula R);
   satP : decidable_field_axiom sat;
 }.
 
 #[mathcomp(axiom="decidable_field_axiom"), short(type="decFieldType")]
-HB.structure Definition DecidableField := { F of Field F & Field_isDec F }.
+HB.structure Definition DecidableField := { F of Field F & Field_isDecField F }.
 
 Module DecFieldExports.
 Bind Scope ring_scope with DecidableField.sort.
@@ -4632,17 +4632,15 @@ Qed.
 
 End QE_Mixin.
 
-(* TODO_HB: wrong name *)
-HB.factory Record decidable_of_QE F of Field F := {
+HB.factory Record Field_QE_isDecField F of Field F := {
   proj : nat -> seq (term F) * seq (term F) -> formula F;
   wf_proj : wf_QE_proj proj;
   ok_proj : valid_QE_proj proj;
 }.
-HB.builders Context F of decidable_of_QE F.
+HB.builders Context F of Field_QE_isDecField F.
 
-HB.instance Definition qe_is_def_field : Field_isDec F :=
-  Field_isDec.Build F (proj_satP wf_proj ok_proj).
-
+HB.instance Definition qe_is_def_field : Field_isDecField F :=
+  Field_isDecField.Build F (proj_satP wf_proj ok_proj).
 HB.end.
 
 (* Axiom == all non-constant monic polynomials have a root *)

@@ -58,9 +58,8 @@
   + notation `FieldUnitMixin`, use `ComRing_isField.Build`
   + notation `FieldIdomainMixin`
   + notation `GRing.Field.IdomainType`, use `ComRing_isField.Build`
-  + notation `DecFieldMixin`, use `Field_isDec.Build`
-  + notation `DecFieldType`, use `Field_isDec.Build`
-  + notation `QEdecFieldMixin`, use `Decidable_of_QE.Build`
+  + notation `DecFieldMixin`, use `Field_isDecField.Build`
+  + notation `QEdecFieldMixin`, use `Field_QE_isDecField.Build`
   + notation `ClosedFieldType`, use `DecField_isAlgClosed.Build`
   + notation `LmodMixin`, use `Zmodule_isLmodule.Build`
   + notation `LmodType`, use `Zmodule_isLmodule.Build`
