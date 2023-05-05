@@ -1,15 +1,13 @@
 ### Added
 
 - in `ssralg.v`
-  + structure `zsemimodType` (aka Monoid on a choiceType), `semiRingType`,
-    `comSemiRingType`, `subZsemimodType`, `subZmodType`, `subSemiRingType`,
+  + structure `nmodType` (aka Monoid on a choiceType), `semiRingType`,
+    `comSemiRingType`, `subNmodType`, `subZmodType`, `subSemiRingType`,
     `subComSemiRingType`, `subRingType`, `subComRingType`, `subLmodType`,
     `subLalgType`, `subAlgType`, `subUnitRingType`, `subComUnitRingType`,
     `subIdomainType`, `subField`
   + predicate `semi_additive`
-  + notation `{semi_additive U -> V}`
   + predicate `multiplicative`
-  + notation `{srmorphism U -> V}`
   + morphism `semiring2Closed`
   + morphism `semiringClosed`
 
@@ -21,8 +19,10 @@
     `comUnitAlgType`, `idomainType`, `fieldType`, `decFieldType`,
     `closedFieldType` ported to HB
 
-  + morphisms `additive`, `SRMorphism`, `RMorphism`, `Scale.law`, `Linear`,
-    `LRMorphism` ported to HB
+  + morphisms `additive` and `rmorphism` ported to HB and generalized to
+    `nmodType` and `semiRingType` respectively.
+
+  + morphisms `linear` and `lrmorphism` ported to HB
 
   + predicates `opprClosed`, `addrClosed`, `zmodClosed`, `mulr2Closed`,
     `mulrClosed`, `smulClosed`, `subringClosed`, `divClosed`, `sdivClosed`,
@@ -78,8 +78,8 @@
 ### Deprecated
 
 - in `ssralg.v`
-  + notation `[zsemimodType of T for cT]`, use `GRing.Zsemimodule.clone T cT`
-  + notation `[zsemimodType of T]`, use `GRing.Zsemimodule.clone T _` or `T : zsemimodType`
+  + notation `[nmodType of T for cT]`, use `GRing.Nmodule.clone T cT`
+  + notation `[nmodType of T]`, use `GRing.Nmodule.clone T _` or `T : nmodType`
   + notation `[zmodType of T for cT]`, use `GRing.Zmodule.clone T cT`
   + notation `[zmodType of T]`, use `GRing.Zmodule.clone T _` or `T : zmodType`
   + notation `[semiRingType of T for cT]`, use `GRing.SemiRing.clone T cT`

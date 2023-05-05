@@ -877,7 +877,8 @@ pose aM := GRing.isAdditive.Build U V f fB.
 pose phi : GRing.Additive.type U V := HB.pack f aM.
 rewrite -[f]/(phi : _ -> _) -{2}[a]divq_num_den mulrC -scalerA.
 apply: canRL (scalerK _) _; first by rewrite intr_eq0 denq_neq0.
-by rewrite !scaler_int -2!raddfMz scalerMzl -mulrzr -numqE scaler_int.
+rewrite 2!scaler_int -3!raddfMz /=.
+by rewrite -scalerMzr scalerMzl -mulrzr -numqE scaler_int.
 Qed.
 
 End Linear.
@@ -895,7 +896,7 @@ apply: (canLR (mulfK (nz_den _))); apply: (mulIf (nz_den x)).
 rewrite mulrAC mulrBl divfK ?nz_den // mulrAC -!rmorphM.
 apply: (mulIf (nz_den y)); rewrite mulrAC mulrBl divfK ?nz_den //.
 rewrite -!(rmorphM, rmorphB); congr _%:~R; apply: injZtoQ.
-rewrite !(rmorphM, rmorphB) /= !(rmorphM, rmorphB) [_ - _]lock /= -lock !numqE.
+rewrite !(rmorphM, rmorphB) /= [_ - _]lock /= -lock !numqE.
 by rewrite (mulrAC y) -!mulrBl -mulrA mulrAC !mulrA.
 Qed.
 

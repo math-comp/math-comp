@@ -12,11 +12,10 @@ From mathcomp Require Import ssralg countalg.
 (* allows type inference to function properly on expressions that mix        *)
 (* combinatorial and algebraic operators, e.g., [set x + y | x in A, y in A].*)
 (*                                                                           *)
-(*   finZsemimodType, finZmodType, finSemiRingType, finRingType,             *)
-(*   finComRingType, finComSemiRingType, finUnitRingType, finComUnitRingType,*)
-(*   finIdomType, finFieldType, finLmodType, finLalgType, finAlgType,        *)
-(*   finUnitAlgType                                                          *)
-(*      == the finite counterparts of zmodType, etc                          *)
+(*   finNmodType, finZmodType, finSemiRingType, finRingType, finComRingType, *)
+(*   finComSemiRingType, finUnitRingType, finComUnitRingType, finIdomType,   *)
+(*   finFieldType, finLmodType, finLalgType, finAlgType, finUnitAlgType      *)
+(*      == the finite counterparts of nmodType, etc                          *)
 (* Note that a finFieldType is canonically decidable.                        *)
 (*   This file also provides direct tie-ins with finite group theory:        *)
 (*     [finGroupMixin of R for +%R] == structures for R                      *)
@@ -39,16 +38,16 @@ Module FinRing.
 
 Import GRing.Theory.
 
-#[short(type="finZsemimodType")]
-HB.structure Definition Zsemimodule := {M of GRing.Zsemimodule M & Finite M}.
+#[short(type="finNmodType")]
+HB.structure Definition Nmodule := {M of GRing.Nmodule M & Finite M}.
 
-Module ZsemimoduleExports.
+Module NmoduleExports.
 #[deprecated(since="mathcomp 2.0.0",
-  note="Use FinRing.Zsemimodule.clone instead.")]
-Notation "[ 'finZsemimodType' 'of' T ]" := (Zsemimodule.clone T _)
-  (at level 0, format "[ 'finZsemimodType'  'of'  T ]") : form_scope.
-End ZsemimoduleExports.
-HB.export ZsemimoduleExports.
+  note="Use FinRing.Nmodule.clone instead.")]
+Notation "[ 'finNmodType' 'of' T ]" := (Nmodule.clone T _)
+  (at level 0, format "[ 'finNmodType'  'of'  T ]") : form_scope.
+End NmoduleExports.
+HB.export NmoduleExports.
 
 #[short(type="finZmodType")]
 HB.structure Definition Zmodule := {M of GRing.Zmodule M & Finite M}.

@@ -14,12 +14,12 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                                                                            *)
 (* This file defines the following algebraic structures:                      *)
 (*                                                                            *)
-(*    zsemimodType == additive abelian monoid                                 *)
-(*                    The HB class is called Zsemimodule.                     *)
-(*        zmodType == additive abelian group (semi ZModule with an opposite)  *)
+(*        nmodType == additive abelian monoid                                 *)
+(*                    The HB class is called Nmodule.                         *)
+(*        zmodType == additive abelian group (Nmodule with an opposite)       *)
 (*                    The HB class is called Zmodule.                         *)
 (*    semiRingType == non-commutative semi rings                              *)
-(*                    (semi ZModule with a multiplication)                    *)
+(*                    (NModule with a multiplication)                         *)
 (*                    The HB class is called SemiRing.                        *)
 (* comSemiringType == commutative semi rings                                  *)
 (*                    The HB class is called ComSemiRing.                     *)
@@ -56,9 +56,9 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                                                                            *)
 (* and their joins with subType:                                              *)
 (*                                                                            *)
-(*     subZsemimodType V P == join of zsemimodType and subType (P : pred V)   *)
-(*                            such that val is semi_additive                  *)
-(*                            The HB class is called SubZsemimodule.          *)
+(*         subNmodType V P == join of nmodType and subType (P : pred V) such  *)
+(*                            that val is semi_additive                       *)
+(*                            The HB class is called SubNmodule.              *)
 (*         subZmodType V P == join of zmodType and subType (P : pred V)       *)
 (*                            such that val is additive                       *)
 (*                            The HB class is called SubZmodule.              *)
@@ -98,22 +98,20 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                                                                            *)
 (* Morphisms between the above structures:                                    *)
 (*                                                                            *)
-(*  semi_additive U V == semi additive function between zsemimodType U and V  *)
-(*                       The HB class is called SemiAdditive.                 *)
-(*       additive U V == additive function between zmodType U and V           *)
-(*                       The HB class is called Additive.                     *)
-(* SRMorphism.type R S == semi ring morphism between R and S                  *)
-(* RMorphism.type R S == ring morphism between R and S                        *)
-(* GRing.Scale.law R V == scaling morphism : R -> V -> V                      *)
-(*                       The HB class is called GRing.Scale.Law.              *)
-(*  Linear.type R U V == linear functions : U -> V                            *)
+(*     Additive.type U V == semi additive (resp. additive) functions between  *)
+(*                          nmodType (resp. zmodType) instances U and V       *)
+(*    RMorphism.type R S == semi ring (resp. ring) morphism between           *)
+(*                          semiRingType (resp. ringType) instances R and S   *)
+(*   GRing.Scale.law R V == scaling morphism : R -> V -> V                    *)
+(*                          The HB class is called GRing.Scale.Law.           *)
+(*     Linear.type R U V == linear functions : U -> V                         *)
 (* LRMorphism.type R A B == linear ring morphisms, i.e., algebra morphisms    *)
 (*                                                                            *)
 (* Closedness predicates for the algebraic structures:                        *)
 (*                                                                            *)
 (*  opprClosed V == predicate closed under opposite on V : zmodType           *)
 (*                  The HB class is called OppClosed.                         *)
-(*  addrClosed V == predicate closed under addition on V : zsemimodType       *)
+(*  addrClosed V == predicate closed under addition on V : nmodType           *)
 (*                  The HB class is called AddClosed.                         *)
 (*  zmodClosed V == predicate closed under opposite and addition on V         *)
 (*                  The HB class is called ZmodClosed.                        *)
@@ -143,9 +141,9 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                  The HB class is called DivalgClosed.                      *)
 (*                                                                            *)
 (* Canonical properties of the algebraic structures:                          *)
-(*  * zsemimodType (additive abelian monoids):                                *)
-(*                     0 == the zero (additive identity) of a Zmodule.        *)
-(*                 x + y == the sum of x and y (in a Zmodule).                *)
+(*  * nmodType (additive abelian monoids):                                    *)
+(*                     0 == the zero (additive identity) of a Nmodule         *)
+(*                 x + y == the sum of x and y (in a Nmodule)                 *)
 (*                x *+ n == n times x, with n in nat (non-negative), i.e.,    *)
 (*                          x + (x + .. (x + x)..) (n terms); x *+ 1 is thus  *)
 (*                          convertible to x, and x *+ 2 to x + x             *)
@@ -155,9 +153,9 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*             support f == 0.-support f, i.e., [pred x | f x != 0]           *)
 (*         addr_closed S <-> collective predicate S is closed under finite    *)
 (*                           sums (0 and x + y in S, for x, y in S)           *)
-(* [SubChoice_isSubZsemimodule of U by <:] == zsemimodType mixin for a subType*)
-(*                          whose base type is a zsemimodType and whose       *)
-(*                          predicate's is a zsemimodClosed                   *)
+(* [SubChoice_isSubNmodule of U by <:] == nmodType mixin for a subType whose  *)
+(*                          base type is a nmodType and whose predicate's is  *)
+(*                          a nmodClosed                                      *)
 (*                                                                            *)
 (*  * zmodType (additive abelian groups):                                     *)
 (*                   - x == the opposite (additive inverse) of x              *)
@@ -205,7 +203,7 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                           products (1 and x * y in S for x, y in S)        *)
 (*      semiring_closed S <-> collective predicate S is closed under semiring *)
 (*                           operations (0, 1, x + y and x * y in S)          *)
-(* [SubZsemimodule_isSubSemiRing of R by <:] ==                               *)
+(* [SubNmodule_isSubSemiRing of R by <:] ==                                   *)
 (* [SubChoice_isSubSemiRing of R by <:] == semiRingType mixin for a           *)
 (*                           subType whose base type is a semiRingType and    *)
 (*                           whose predicate's is a semiringClosed            *)
@@ -224,7 +222,7 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                           subringClosed                                    *)
 (*                                                                            *)
 (*  * ComSemiRing (commutative SemiRings):                                    *)
-(* [SubZsemimodule_isSubComSemiRing of R by <:] ==                            *)
+(* [SubNmodule_isSubComSemiRing of R by <:] ==                                *)
 (* [SubChoice_isSubComSemiRing of R by <:] == comSemiRingType mixin for a     *)
 (*                           subType whose base type is a comSemiRingType and *)
 (*                           whose predicate's is a semiringClosed            *)
@@ -341,43 +339,32 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*   In addition to this structure hierarchy, we also develop a separate,     *)
 (* parallel hierarchy for morphisms linking these structures:                 *)
 (*                                                                            *)
-(* * SemiAdditive (semi additive functions):                                  *)
+(* * Additive (semi additive or additive functions):                          *)
 (*        semi_additive f <-> f of type U -> V is semi additive, i.e., f maps *)
-(*                           the Zsemimodule structure of U to that of V, 0 to*)
-(*                           0 and + to +                                     *)
+(*                           the Nmodule structure of U to that of V, 0 to 0  *)
+(*                           and + to +                                       *)
 (*                        := (f 0 = 0) * {morph f : x y / x + y}              *)
-(* {semi_additive U -> V} == the interface type for a Structure (keyed on     *)
-(*                           a function f : U -> V) that encapsulates the     *)
-(*                           semi_additive property; both U and V must have   *)
-(*                           zsemimodType canonical structures                *)
-(*                                                                            *)
-(* * Additive (additive functions):                                           *)
 (*             additive f <-> f of type U -> V is additive, i.e., f maps the  *)
 (*                           Zmodule structure of U to that of V, 0 to 0,     *)
 (*                           - to - and + to + (equivalently, binary - to -)  *)
 (*                        := {morph f : u v / u - v}                          *)
 (*      {additive U -> V} == the interface type for a Structure (keyed on     *)
 (*                           a function f : U -> V) that encapsulates the     *)
-(*                           additive property; both U and V must have        *)
-(*                           zmodType canonical structures.                   *)
+(*                           semi_additive property; both U and V must have   *)
+(*                           canonical nmodType instances                     *)
+(*                           When both U and V have zmodType instances, it is *)
+(*                           an additive function.                            *)
 (*                                                                            *)
-(* * SRMorphism (semiring morphisms):                                         *)
+(* * RMorphism (semiring or ring morphisms):                                  *)
 (*       multiplicative f <-> f of type R -> S is multiplicative, i.e., f     *)
-(*                           maps 1 and * in R to 1 and * in S, respectively, *)
-(*                           R ans S must have canonical ringType structures. *)
-(*    {srmorphism R -> S} == the interface type for semiring morphisms; both  *)
-(*                           R and S must have semiRingType structures.       *)
+(*                           maps 1 and * in R to 1 and * in S, respectively  *)
+(*                           R ans S must have canonical semiRingType         *)
+(*                           instances                                        *)
+(*     {rmorphism R -> S} == the interface type for semiring morphisms; both  *)
+(*                           R and S must have semiRingType instances         *)
+(*                           When both R and S have ringType instances, it is *)
+(*                           a ring morphism.                                 *)
 (*                                                                            *)
-(* * RMorphism (ring morphisms):                                              *)
-(*       multiplicative f <-> f of type R -> S is multiplicative, i.e., f     *)
-(*                           maps 1 and * in R to 1 and * in S, respectively, *)
-(*                           R ans S must have canonical ringType structures. *)
-(*            rmorphism f <-> f is a ring morphism, i.e., f is both additive  *)
-(*                           and multiplicative.                              *)
-(*     {rmorphism R -> S} == the interface type for ring morphisms, i.e.,     *)
-(*                           a Structure that encapsulates the rmorphism      *)
-(*                           property for functions f : R -> S; both R and S  *)
-(*                           must have ringType structures.                   *)
 (*  -> If R and S are UnitRings the f also maps units to units and inverses   *)
 (*     of units to inverses; if R is a field then f is a field isomorphism    *)
 (*     between R and its image.                                               *)
@@ -562,15 +549,9 @@ Reserved Notation "a \o* f" (at level 40).
 Reserved Notation "a \*: f" (at level 40).
 Reserved Notation "f \* g" (at level 40, left associativity).
 
-Reserved Notation "'{' 'semi_additive' U '->' V '}'"
-  (at level 0, U at level 98, V at level 99,
-   format "{ 'semi_additive'  U  ->  V }").
 Reserved Notation "'{' 'additive' U '->' V '}'"
   (at level 0, U at level 98, V at level 99,
    format "{ 'additive'  U  ->  V }").
-Reserved Notation "'{' 'srmorphism' U '->' V '}'"
-  (at level 0, U at level 98, V at level 99,
-   format "{ 'srmorphism'  U  ->  V }").
 Reserved Notation "'{' 'rmorphism' U '->' V '}'"
   (at level 0, U at level 98, V at level 99,
    format "{ 'rmorphism'  U  ->  V }").
@@ -597,7 +578,7 @@ Module Import GRing.
 
 Import Monoid.Theory.
 
-HB.mixin Record isZsemimodule V := {
+HB.mixin Record isNmodule V := {
   zero : V;
   add : V -> V -> V;
   addrA : associative add;
@@ -605,21 +586,21 @@ HB.mixin Record isZsemimodule V := {
   add0r : left_id zero add;
 }.
 
-#[short(type="zsemimodType")]
-HB.structure Definition Zsemimodule := {V of isZsemimodule V & Choice V}.
+#[short(type="nmodType")]
+HB.structure Definition Nmodule := {V of isNmodule V & Choice V}.
 
-Module ZsemimodExports.
-Bind Scope ring_scope with Zsemimodule.sort.
+Module NmodExports.
+Bind Scope ring_scope with Nmodule.sort.
 #[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.Zsemimodule.clone instead.")]
-Notation "[ 'zsemimodType' 'of' T 'for' cT ]" := (Zsemimodule.clone T cT)
-  (at level 0, format "[ 'zsemimodType'  'of'  T  'for'  cT ]") : form_scope.
+  note="Use GRing.Nmodule.clone instead.")]
+Notation "[ 'nmodType' 'of' T 'for' cT ]" := (Nmodule.clone T cT)
+  (at level 0, format "[ 'nmodType'  'of'  T  'for'  cT ]") : form_scope.
 #[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.Zsemimodule.clone instead.")]
-Notation "[ 'zsemimodType' 'of' T ]" :=  (Zsemimodule.clone T _)
-  (at level 0, format "[ 'zsemimodType'  'of'  T ]") : form_scope.
-End ZsemimodExports.
-HB.export ZsemimodExports.
+  note="Use GRing.Nmodule.clone instead.")]
+Notation "[ 'nmodType' 'of' T ]" :=  (Nmodule.clone T _)
+  (at level 0, format "[ 'nmodType'  'of'  T ]") : form_scope.
+End NmodExports.
+HB.export NmodExports.
 
 Local Notation "0" := (@zero _) : ring_scope.
 Local Notation "+%R" := (@add _) : fun_scope.
@@ -636,9 +617,9 @@ Local Notation "\sum_ ( i 'in' A ) F" := (\big[+%R/0]_(i in A) F).
 
 Local Notation "s `_ i" := (nth 0 s i) : ring_scope.
 
-Section ZsemimoduleTheory.
+Section NmoduleTheory.
 
-Variable V : zsemimodType.
+Variable V : nmodType.
 Implicit Types x y : V.
 
 Lemma addr0 : @right_id V V 0 +%R.
@@ -715,16 +696,15 @@ Definition addr_closed := 0 \in S /\ {in S &, forall u v, u + v \in S}.
 
 End ClosedPredicates.
 
-End ZsemimoduleTheory.
+End NmoduleTheory.
 
-HB.mixin Record Zsemimodule_isZmodule V of Zsemimodule V := {
+HB.mixin Record Nmodule_isZmodule V of Nmodule V := {
   opp : V -> V;
   addNr : left_inverse zero opp add
 }.
 
 #[short(type="zmodType")]
-HB.structure Definition Zmodule :=
-  {V of Zsemimodule_isZmodule V & Zsemimodule V}.
+HB.structure Definition Zmodule := {V of Nmodule_isZmodule V & Nmodule V}.
 
 HB.factory Record isZmodule V of Choice V := {
   zero : V;
@@ -738,8 +718,8 @@ HB.factory Record isZmodule V of Choice V := {
 
 HB.builders Context V of isZmodule V.
 
-HB.instance Definition _ := isZsemimodule.Build V addrA addrC add0r.
-HB.instance Definition _ := Zsemimodule_isZmodule.Build V addNr.
+HB.instance Definition _ := isNmodule.Build V addrA addrC add0r.
+HB.instance Definition _ := Nmodule_isZmodule.Build V addNr.
 
 HB.end.
 
@@ -899,7 +879,7 @@ Arguments opprK {V}.
 Arguments oppr_inj {V} [x1 x2].
 Arguments telescope_sumr_eq {V n m} f u.
 
-HB.mixin Record Zsemimodule_isSemiRing R of Zsemimodule R := {
+HB.mixin Record Nmodule_isSemiRing R of Nmodule R := {
   one : R;
   mul : R -> R -> R;
   mulrA : associative mul;
@@ -913,8 +893,7 @@ HB.mixin Record Zsemimodule_isSemiRing R of Zsemimodule R := {
 }.
 
 #[short(type="semiRingType")]
-HB.structure Definition SemiRing :=
-  { R of Zsemimodule_isSemiRing R & Zsemimodule R }.
+HB.structure Definition SemiRing := { R of Nmodule_isSemiRing R & Nmodule R }.
 
 HB.factory Record isSemiRing R of Choice R := {
   zero : R;
@@ -934,9 +913,9 @@ HB.factory Record isSemiRing R of Choice R := {
   oner_neq0 : one != zero
 }.
 HB.builders Context R of isSemiRing R.
-  HB.instance Definition _ := @isZsemimodule.Build R
+  HB.instance Definition _ := @isNmodule.Build R
     zero add addrA addrC add0r.
-  HB.instance Definition _ := @Zsemimodule_isSemiRing.Build R
+  HB.instance Definition _ := @Nmodule_isSemiRing.Build R
     one mul mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0 oner_neq0.
 HB.end.
 
@@ -1319,7 +1298,7 @@ HB.builders Context R of Zmodule_isRing R.
   Proof. by move=> x; apply: (addIr (1 * x)); rewrite -mulrDl !add0r mul1r. Qed.
   Lemma mulr0 : @right_zero R R 0 mul.
   Proof. by move=> x; apply: (addIr (x * 1)); rewrite -mulrDr !add0r mulr1. Qed.
-  HB.instance Definition _ := Zsemimodule_isSemiRing.Build R
+  HB.instance Definition _ := Nmodule_isSemiRing.Build R
     mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0 oner_neq0.
 HB.end.
 
@@ -1565,37 +1544,28 @@ End ClosedPredicates.
 
 End RingTheory.
 
-Module ConverseZsemimodExports.
-Section RightRegular.
+Module ConverseRingExports.
 
-Variable R : semiRingType.
-Implicit Types x y : R.
+HB.instance Definition _ (T : eqType) := Equality.copy T^c T.
 
-HB.instance Definition _ := Zsemimodule.copy R^c R.
+HB.instance Definition _ (T : choiceType) := Choice.copy T^c T.
 
-HB.instance Definition _ :=
-  let mul' x y := y * x in
+HB.instance Definition _ (U : nmodType) := Nmodule.copy U^c U.
+
+HB.instance Definition _ (U : zmodType) := Zmodule.copy U^c U.
+
+HB.instance Definition _ (R : semiRingType) :=
+  let mul' (x y : R) := y * x in
   let mulrA' x y z := esym (mulrA z y x) in
   let mulrDl' x y z := mulrDr z x y in
   let mulrDr' x y z := mulrDl y z x in
-  Zsemimodule_isSemiRing.Build R^c
+  Nmodule_isSemiRing.Build R^c
     mulrA' mulr1 mul1r mulrDl' mulrDr' mulr0 mul0r oner_neq0.
 
-End RightRegular.
-End ConverseZsemimodExports.
-HB.export ConverseZsemimodExports.
+HB.instance Definition _ (R : ringType) := SemiRing.copy R^c R.
 
-Module ConverseZmodExports.
-Section RightRegular.
-
-Variable R : ringType.
-Implicit Types x y : R.
-
-HB.instance Definition _ := Zmodule.copy R^c R.
-
-End RightRegular.
-End ConverseZmodExports.
-HB.export ConverseZmodExports.
+End ConverseRingExports.
+HB.export ConverseRingExports.
 
 Section SemiRightRegular.
 
@@ -1812,27 +1782,18 @@ End LalgebraTheory.
 
 (* Morphism hierarchy. *)
 
-Definition semi_additive (U V : zsemimodType) (f : U -> V) : Prop :=
+Definition semi_additive (U V : nmodType) (f : U -> V) : Prop :=
   (f 0 = 0) * {morph f : x y / x + y}.
 
-HB.mixin Record isSemiAdditive (U V : zsemimodType) (apply : U -> V) := {
+HB.mixin Record isSemiAdditive (U V : nmodType) (apply : U -> V) := {
   semi_additive_subproof : semi_additive apply;
 }.
 
 #[infer(U,V),mathcomp(axiom="semi_additive")]
-HB.structure Definition SemiAdditive (U V : zsemimodType) :=
+HB.structure Definition Additive (U V : nmodType) :=
   {f of isSemiAdditive U V f}.
 
-HB.mixin Record SemiAdditive_isAdditive (U V : zmodType) (apply : U -> V) := {
-  opp_subproof : {morph apply : x / - x}
-}.
-
-Definition additive (U V : zmodType) (f : U -> V) :=
-  {morph f : x y / x - y}.
-
-#[infer(U,V),mathcomp(axiom="additive")]
-HB.structure Definition Additive (U V : zmodType) :=
-  {f of isSemiAdditive U V f & SemiAdditive_isAdditive U V f}.
+Definition additive (U V : zmodType) (f : U -> V) := {morph f : x y / x - y}.
 
 HB.factory Record isAdditive (U V : zmodType) (apply : U -> V) := {
   additive_subproof : additive apply;
@@ -1842,37 +1803,19 @@ HB.builders Context U V apply of isAdditive U V apply.
 Local Lemma raddf0 : apply 0 = 0.
 Proof. by rewrite -[0]subr0 additive_subproof subrr. Qed.
 
-Local Lemma raddfN : {morph apply : x / - x}.
-Proof. by move=> x /=; rewrite -sub0r additive_subproof raddf0 sub0r. Qed.
-
 Local Lemma raddfD : {morph apply : x y / x + y}.
-Proof. by move=> x y; rewrite -[y]opprK additive_subproof -raddfN. Qed.
+Proof.
+move=> x y; rewrite -[y in LHS]opprK -[- y]add0r.
+by rewrite !additive_subproof raddf0 sub0r opprK.
+Qed.
 
 HB.instance Definition _ := isSemiAdditive.Build U V apply (conj raddf0 raddfD).
 
-HB.instance Definition _ := SemiAdditive_isAdditive.Build U V apply raddfN.
-
 HB.end.
-
-Module SemiAdditiveExports.
-Notation "{ 'semi_additive' U -> V }" :=
-  (SemiAdditive.type U%type V%type) : type_scope.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.SemiAdditive.clone instead.")]
-Notation "[ 'semi_additive' 'of' f 'as' g ]" :=
-  (SemiAdditive.clone _ _ f%function g)
-  (at level 0, format "[ 'semi_additive'  'of'  f  'as'  g ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.SemiAdditive.clone instead.")]
-Notation "[ 'semi_additive' 'of' f ]" :=
-  (SemiAdditive.clone _ _ f%function _)
-  (at level 0, format "[ 'semi_additive'  'of'  f ]") : form_scope.
-End SemiAdditiveExports.
-HB.export SemiAdditiveExports.
 
 Module AdditiveExports.
 Module Additive.
-Definition apply_deprecated (U V : zmodType) (phUV : phant (U -> V)) :=
+Definition apply_deprecated (U V : nmodType) (phUV : phant (U -> V)) :=
   @Additive.sort U V.
 #[deprecated(since="mathcomp 2.0", note="Use Additive.sort instead.")]
 Notation apply := apply_deprecated.
@@ -1888,11 +1831,11 @@ End AdditiveExports.
 HB.export AdditiveExports.
 
 (* Lifted additive operations. *)
-Section LiftedZsemimod.
-Variables (U : Type) (V : zsemimodType).
+Section LiftedNmod.
+Variables (U : Type) (V : nmodType).
 Definition null_fun_head (phV : phant V) of U : V := let: Phant := phV in 0.
 Definition add_fun (f g : U -> V) x := f x + g x.
-End LiftedZsemimod.
+End LiftedNmod.
 Section LiftedZmod.
 Variables (U : Type) (V : zmodType).
 Definition sub_fun (f g : U -> V) x := f x - g x.
@@ -1937,11 +1880,11 @@ Arguments mulr_fun {_ _} a f _ /.
 Arguments scale_fun {_ _ _} a f _ /.
 Arguments mul_fun {_ _} f g _ /.
 
-Section SemiAdditiveTheory.
+Section AdditiveTheory.
 
 Section Properties.
 
-Variables (U V : zsemimodType) (k : unit) (f : {semi_additive U -> V}).
+Variables (U V : nmodType) (k : unit) (f : {additive U -> V}).
 
 Lemma raddf0 : f 0 = 0.
 Proof. exact: semi_additive_subproof.1. Qed.
@@ -1969,7 +1912,7 @@ End Properties.
 
 Section SemiRingProperties.
 
-Variables (R S : semiRingType) (f : {semi_additive R -> S}).
+Variables (R S : semiRingType) (f : {additive R -> S}).
 
 Lemma raddfMnat n x : f (n%:R * x) = n%:R * f x.
 Proof. by rewrite !mulr_natl raddfMn. Qed.
@@ -1978,8 +1921,8 @@ End SemiRingProperties.
 
 Section AddFun.
 
-Variables (U V W : zsemimodType).
-Variables (f g : {semi_additive V -> W}) (h : {semi_additive U -> V}).
+Variables (U V W : nmodType).
+Variables (f g : {additive V -> W}) (h : {additive U -> V}).
 
 Fact idfun_is_semi_additive : semi_additive (@idfun U).
 Proof. by []. Qed.
@@ -2011,8 +1954,7 @@ End AddFun.
 
 Section MulFun.
 
-Variables (R : semiRingType) (U : zsemimodType).
-Variables (a : R) (f : {semi_additive U -> R}).
+Variables (R : semiRingType) (U : nmodType) (a : R) (f : {additive U -> R}).
 
 Fact mull_fun_is_semi_additive : semi_additive (a \*o f).
 Proof. by split=> [|x y]; rewrite /= ?raddf0 ?mulr0// raddfD mulrDr. Qed.
@@ -2028,16 +1970,15 @@ HB.instance Definition _ := isSemiAdditive.Build U R (a \o* f)
 
 End MulFun.
 
-End SemiAdditiveTheory.
-
-Section AdditiveTheory.
-
 Section Properties.
 
 Variables (U V : zmodType) (k : unit) (f : {additive U -> V}).
 
 Lemma raddfN : {morph f : x / - x}.
-Proof. exact: opp_subproof. Qed.
+Proof.
+move=> x.
+by rewrite -[LHS]addr0 -(subrr (f x)) addrA -raddfD addNr raddf0 sub0r.
+Qed.
 
 Lemma raddfB : {morph f : x y / x - y}.
 Proof. by move=> x y; rewrite raddfD -raddfN. Qed.
@@ -2074,32 +2015,10 @@ Section AddFun.
 
 Variables (U V W : zmodType) (f g : {additive V -> W}) (h : {additive U -> V}).
 
-Fact idfun_is_additive : additive (@idfun U).
-Proof. by []. Qed.
-#[export]
-HB.instance Definition _ := isAdditive.Build U U idfun idfun_is_additive.
-
-Fact comp_is_additive : additive (f \o h).
-Proof. by move=> x y /=; rewrite !raddfB. Qed.
-#[export]
-HB.instance Definition _ := isAdditive.Build U W (f \o h) comp_is_additive.
-
 Fact opp_is_additive : additive (-%R : U -> U).
 Proof. by move=> x y; rewrite /= opprD. Qed.
 #[export]
 HB.instance Definition _ := isAdditive.Build U U -%R opp_is_additive.
-
-Fact null_fun_is_additive : additive (\0 : U -> V).
-Proof. by move=> /=; rewrite subr0. Qed.
-#[export]
-HB.instance Definition _ := isAdditive.Build U V \0 null_fun_is_additive.
-
-Fact add_fun_is_additive : additive (f \+ g).
-Proof.
-by move=> x y /=; rewrite !raddfB addrCA -!addrA addrCA -opprD.
-Qed.
-#[export]
-HB.instance Definition _ := isAdditive.Build V W (f \+ g) add_fun_is_additive.
 
 Fact sub_fun_is_additive : additive (f \- g).
 Proof.
@@ -2114,23 +2033,6 @@ Proof. by move=> x y /=; rewrite !raddfB opprB addrC opprK. Qed.
 HB.instance Definition _ := isAdditive.Build V W (\- g) opp_fun_is_additive.
 
 End AddFun.
-
-Section MulFun.
-
-Variables (R : ringType) (U : zmodType).
-Variables (a : R) (f : {additive U -> R}).
-
-Fact mull_fun_is_additive : additive (a \*o f).
-Proof. by move=> x y /=; rewrite raddfB mulrBr. Qed.
-#[export]
-HB.instance Definition _ := isAdditive.Build U R (a \*o f) mull_fun_is_additive.
-
-Fact mulr_fun_is_additive : additive (a \o* f).
-Proof. by move=> x y /=; rewrite raddfB mulrBl. Qed.
-#[export]
-HB.instance Definition _ := isAdditive.Build U R (a \o* f) mulr_fun_is_additive.
-
-End MulFun.
 
 Section ScaleFun.
 
@@ -2154,30 +2056,29 @@ HB.mixin Record isMultiplicative (R S : semiRingType) (f : R -> S) := {
 }.
 
 #[infer(R,S)]
-HB.structure Definition SRMorphism (R S : semiRingType) :=
-  {f of @SemiAdditive R S f & isMultiplicative R S f}.
+HB.structure Definition RMorphism (R S : semiRingType) :=
+  {f of @Additive R S f & isMultiplicative R S f}.
 (* FIXME: remove the @ once
    https://github.com/math-comp/hierarchy-builder/issues/319 is fixed *)
 
-Module SRMorphismExports.
-Notation "{ 'srmorphism' U -> V }" := (SRMorphism.type U%type V%type)
+Module RMorphismExports.
+Notation "{ 'rmorphism' U -> V }" := (RMorphism.type U%type V%type)
   : type_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use GRing.RMorphism.clone instead.")]
+Notation "[ 'rmorphism' 'of' f 'as' g ]" := (RMorphism.clone _ _ f%function g)
+  (at level 0, format "[ 'rmorphism'  'of'  f  'as'  g ]") : form_scope.
 #[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.SRMorphism.clone instead.")]
-Notation "[ 'srmorphism' 'of' f 'as' g ]" := (SRMorphism.clone _ _ f%function g)
-  (at level 0, format "[ 'srmorphism'  'of'  f  'as'  g ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.SRMorphism.clone instead.")]
-Notation "[ 'srmorphism' 'of' f ]" := (SRMorphism.clone _ _ f%function _)
-  (at level 0, format "[ 'srmorphism'  'of'  f ]") : form_scope.
-End SRMorphismExports.
-HB.export SRMorphismExports.
+  note="Use GRing.RMorphism.clone instead.")]
+Notation "[ 'rmorphism' 'of' f ]" := (RMorphism.clone _ _ f%function _)
+  (at level 0, format "[ 'rmorphism'  'of'  f ]") : form_scope.
+End RMorphismExports.
+HB.export RMorphismExports.
 
-Section SRmorphismTheory.
+Section RmorphismTheory.
 
 Section Properties.
 
-Variables (R S : semiRingType) (k : unit) (f : {srmorphism R -> S}).
+Variables (R S : semiRingType) (k : unit) (f : {rmorphism R -> S}).
 
 Lemma rmorph0 : f 0 = 0. Proof. exact: raddf0. Qed.
 Lemma rmorphD : {morph f : x y / x + y}. Proof. exact: raddfD. Qed.
@@ -2208,7 +2109,7 @@ Proof. by move/inj_eq <-; rewrite rmorph_nat. Qed.
 Lemma rmorph_eq1 x : injective f -> (f x == 1) = (x == 1).
 Proof. exact: rmorph_eq_nat 1%N. Qed.
 
-Lemma can2_srmorphism f' : cancel f f' -> cancel f' f -> multiplicative f'.
+Lemma can2_rmorphism f' : cancel f f' -> cancel f' f -> multiplicative f'.
 Proof.
 move=> fK f'K.
 by split=> [x y|]; apply: (canLR fK); rewrite /= (rmorphM, rmorph1) ?f'K.
@@ -2219,7 +2120,7 @@ End Properties.
 Section Projections.
 
 Variables (R S T : semiRingType).
-Variables (f : {srmorphism S -> T}) (g : {srmorphism R -> S}).
+Variables (f : {rmorphism S -> T}) (g : {rmorphism R -> S}).
 
 Fact idfun_is_multiplicative : multiplicative (@idfun R).
 Proof. by []. Qed.
@@ -2234,34 +2135,6 @@ HB.instance Definition _ := isMultiplicative.Build R T (f \o g)
   comp_is_multiplicative.
 
 End Projections.
-
-End SRmorphismTheory.
-
-#[infer(R,S)]
-HB.structure Definition RMorphism (R S : ringType) :=
-  {f of @Additive R S f & isMultiplicative R S f}.
-(* FIXME: Additive has very strange implicit arguments
-   (without @, one would have to write Additive R f) *)
-
-Module RMorphismExports.
-Module RMorphism.
-Definition apply_deprecated (R S : ringType) (phRS : phant (R -> S)) :=
-  @RMorphism.sort R S.
-#[deprecated(since="mathcomp 2.0", note="Use RMorphism.sort instead.")]
-Notation apply := apply_deprecated.
-End RMorphism.
-Notation "{ 'rmorphism' U -> V }" := (RMorphism.type U%type V%type)
-  : type_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.RMorphism.clone instead.")]
-Notation "[ 'rmorphism' 'of' f 'as' g ]" := (RMorphism.clone _ _ f%function g)
-  (at level 0, format "[ 'rmorphism'  'of'  f  'as'  g ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.RMorphism.clone instead.")]
-Notation "[ 'rmorphism' 'of' f ]" := (RMorphism.clone _ _ f%function _)
-  (at level 0, format "[ 'rmorphism'  'of'  f ]") : form_scope.
-End RMorphismExports.
-HB.export RMorphismExports.
-
-Section RmorphismTheory.
 
 Section Properties.
 
@@ -2278,28 +2151,7 @@ Lemma rmorphN1 : f (- 1) = (- 1). Proof. by rewrite rmorphN rmorph1. Qed.
 Lemma rmorph_sign n : f ((- 1) ^+ n) = (- 1) ^+ n.
 Proof. by rewrite rmorphXn /= rmorphN1. Qed.
 
-Lemma can2_rmorphism f' : cancel f f' -> cancel f' f -> multiplicative f'.
-Proof.
-move=> fK f'K.
-by split=> [x y |]; apply: (canLR fK); rewrite /= (rmorphM, rmorph1) /= ?f'K.
-Qed.
-
 End Properties.
-
-Section Projections.
-
-Variables (R S T : ringType).
-Variables (f : {rmorphism S -> T}) (g : {rmorphism R -> S}).
-
-#[export]
-HB.instance Definition _ : isMultiplicative R R idfun :=
-  SRMorphism.on idfun.
-
-#[export]
-HB.instance Definition _ : isMultiplicative R T (f \o g) :=
-  SRMorphism.on (f \o g).
-
-End Projections.
 
 Section InAlgebra.
 
@@ -2640,8 +2492,8 @@ Section LRMorphismTheory.
 Variables (R : ringType) (A B : lalgType R) (C : ringType) (s : R -> C -> C).
 Variables (k : unit) (f : {lrmorphism A -> B}) (g : {lrmorphism B -> C | s}).
 
-#[export] HB.instance Definition _ := SRMorphism.on (@idfun A).
-#[export] HB.instance Definition _ := SRMorphism.on (g \o f).
+#[export] HB.instance Definition _ := RMorphism.on (@idfun A).
+#[export] HB.instance Definition _ := RMorphism.on (g \o f).
 
 Lemma rmorph_alg a : f a%:A = a%:A.
 Proof. by rewrite linearZ rmorph1. Qed.
@@ -2668,7 +2520,7 @@ Notation "[ 'comSemiRingType' 'of' T ]" := (ComSemiRing.clone T _)
 End ComSemiRingExports.
 HB.export ComSemiRingExports.
 
-HB.factory Record Zsemimodule_isComSemiRing R of Zsemimodule R := {
+HB.factory Record Nmodule_isComSemiRing R of Nmodule R := {
   one : R;
   mul : R -> R -> R;
   mulrA : associative mul;
@@ -2678,12 +2530,12 @@ HB.factory Record Zsemimodule_isComSemiRing R of Zsemimodule R := {
   mul0r : left_zero zero mul;
   oner_neq0 : one != zero
 }.
-HB.builders Context R of Zsemimodule_isComSemiRing R.
+HB.builders Context R of Nmodule_isComSemiRing R.
   Definition mulr1 := Monoid.mulC_id mulrC mul1r.
   Definition mulrDr := Monoid.mulC_dist mulrC mulrDl.
   Lemma mulr0 : right_zero zero mul.
   Proof. by move=> x; rewrite mulrC mul0r. Qed.
-  HB.instance Definition _ := Zsemimodule_isSemiRing.Build R
+  HB.instance Definition _ := Nmodule_isSemiRing.Build R
     mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0 oner_neq0.
   HB.instance Definition _ := SemiRing_hasCommutativeMul.Build R mulrC.
 HB.end.
@@ -4702,12 +4554,12 @@ Qed.
 
 (* Mixins for stability properties *)
 
-HB.mixin Record isOppClosed (V : zmodType) (S : {pred V}) := {
-  rpredNr : oppr_closed S
+HB.mixin Record isAddClosed (V : nmodType) (S : {pred V}) := {
+  rpred0D : addr_closed S
 }.
 
-HB.mixin Record isAddClosed (V : zsemimodType) (S : {pred V}) := {
-  rpred0D : addr_closed S
+HB.mixin Record isOppClosed (V : zmodType) (S : {pred V}) := {
+  rpredNr : oppr_closed S
 }.
 
 HB.mixin Record isMul2Closed (R : semiRingType) (S : {pred R}) := {
@@ -4908,9 +4760,9 @@ HB.instance Definition _ := isSubalgClosed.Build R A S
   (divalg_closedZ divalg_closed_subproof).
 HB.end.
 
-Section ZsemimodulePred.
+Section NmodulePred.
 
-Variables (V : zsemimodType).
+Variables (V : nmodType).
 
 Section Add.
 
@@ -4931,7 +4783,7 @@ Proof. by move=> u Su; rewrite -(card_ord n) -sumr_const rpred_sum. Qed.
 
 End Add.
 
-End ZsemimodulePred.
+End NmodulePred.
 
 Section ZmodulePred.
 
@@ -5172,17 +5024,17 @@ End FieldPred.
 (* remove uses of program definition *)
 Obligation Tactic := idtac.
 
-HB.mixin Record isSubZsemimodule (V : zsemimodType) (S : pred V) U
-    of Sub V S U & Zsemimodule U := {
+HB.mixin Record isSubNmodule (V : nmodType) (S : pred V) U
+    of Sub V S U & Nmodule U := {
   valD_subproof : semi_additive (val : U -> V);
 }.
 
-#[short(type="subZsemimodType")]
-HB.structure Definition SubZsemimodule (V : zsemimodType) S :=
-  { U of SubChoice V S U & Zsemimodule U & isSubZsemimodule V S U }.
+#[short(type="subNmodType")]
+HB.structure Definition SubNmodule (V : nmodType) S :=
+  { U of SubChoice V S U & Nmodule U & isSubNmodule V S U }.
 
 Section additive.
-Context (V : zsemimodType) (S : pred V) (U : SubZsemimodule.type S).
+Context (V : nmodType) (S : pred V) (U : SubNmodule.type S).
 Notation val := (val : U -> V).
 #[export]
 HB.instance Definition _ := isSemiAdditive.Build U V val valD_subproof.
@@ -5190,12 +5042,12 @@ Lemma valD : {morph val : x y / x + y}. Proof. exact: raddfD. Qed.
 Lemma val0 : val 0 = 0. Proof. exact: raddf0. Qed.
 End additive.
 
-HB.factory Record SubChoice_isSubZsemimodule (V : zsemimodType) S U
+HB.factory Record SubChoice_isSubNmodule (V : nmodType) S U
     of SubChoice V S U := {
   addr_closed_subproof : addr_closed S
 }.
 
-HB.builders Context V S U of SubChoice_isSubZsemimodule V S U.
+HB.builders Context V S U of SubChoice_isSubNmodule V S U.
 
 HB.instance Definition _ := isAddClosed.Build V S addr_closed_subproof.
 
@@ -5203,28 +5055,33 @@ Let inU v Sv : U := sub v Sv.
 Let zeroU := inU (rpred0 (AddClosed.clone V S _)).
 Let addU (u1 u2 : U) := inU (rpredD (valP u1) (valP u2)).
 
-Program Definition zmodU := @isZsemimodule.Build U zeroU addU _ _ _.
-Next Obligation. by move=> x y z; apply: val_inj; rewrite !subK addrA. Qed.
-Next Obligation. by move=> x y; apply: val_inj; rewrite !subK addrC. Qed.
-Next Obligation. by move=> x; apply: val_inj; rewrite !subK add0r. Qed.
-HB.instance Definition _ := zmodU.
+Lemma addUA : associative addU.
+Proof. by move=> x y z; apply/val_inj; rewrite !subK addrA. Qed.
+
+Lemma addUC : commutative addU.
+Proof. by move=> x y; apply/val_inj; rewrite !subK addrC. Qed.
+
+Lemma add0U : left_id zeroU addU.
+Proof. by move=> x; apply/val_inj; rewrite !subK add0r. Qed.
+
+HB.instance Definition _ := @isNmodule.Build U zeroU addU addUA addUC add0U.
 
 Lemma val0 : (val : U -> V) 0 = 0. Proof. by rewrite !subK. Qed.
 Lemma valD : semi_additive (val : U -> V).
 Proof. by split=> [|x y]; rewrite !subK. Qed.
-HB.instance Definition _ := isSubZsemimodule.Build V S U valD.
+HB.instance Definition _ := isSubNmodule.Build V S U valD.
 HB.end.
 
 Implicit Type V : zmodType.
 
 HB.mixin Record isSubZmodule V (S : pred V) U
-    of SubZsemimodule V S U & Zmodule U := {
+    of SubNmodule V S U & Zmodule U := {
   valB_subproof : additive (val : U -> V);
 }.
 
 #[short(type="subZmodType")]
 HB.structure Definition SubZmodule V S :=
-  { U of SubZsemimodule V S U & Zmodule U & isSubZmodule V S U }.
+  { U of SubNmodule V S U & Zmodule U & isSubZmodule V S U }.
 
 Section additive.
 Context V (S : pred V) (U : SubZmodule.type S).
@@ -5248,6 +5105,7 @@ Let zeroU := inU (rpred0 (AddClosed.clone V S _)).
 Let oppU (u : U) := inU (rpredNr _ (valP u)).
 Let addU (u1 u2 : U) := inU (rpredD (valP u1) (valP u2)).
 
+(* TODO: This instance should be declared through Nmodule_isZmodule.Build. *)
 Program Definition zmodU := @isZmodule.Build U zeroU oppU addU _ _ _ _.
 Next Obligation. by move=> x y z; apply: val_inj; rewrite !subK addrA. Qed.
 Next Obligation. by move=> x y; apply: val_inj; rewrite !subK addrC. Qed.
@@ -5257,7 +5115,7 @@ HB.instance Definition _ := zmodU.
 
 Lemma valD : semi_additive (val : U -> V).
 Proof. by split=> [|x y]; rewrite !subK. Qed.
-HB.instance Definition _ := isSubZsemimodule.Build V S U valD.
+HB.instance Definition _ := isSubNmodule.Build V S U valD.
 
 Lemma valB : additive (val : U -> V).
 Proof. by move=> x y; rewrite !subK. Qed.
@@ -5265,13 +5123,13 @@ HB.instance Definition _ := isSubZmodule.Build V S U valB.
 HB.end.
 
 HB.mixin Record isSubSemiRing (R : semiRingType) (S : pred R) U
-    of SubZsemimodule R S U & SemiRing U := {
+    of SubNmodule R S U & SemiRing U := {
   valM_subproof : multiplicative (val : U -> R);
 }.
 
 #[short(type="subSemiRingType")]
 HB.structure Definition SubSemiRing (R : semiRingType) (S : pred R) :=
-  { U of SubZsemimodule R S U & SemiRing U & isSubSemiRing R S U }.
+  { U of SubNmodule R S U & SemiRing U & isSubSemiRing R S U }.
 
 Section multiplicative.
 Context (R : semiRingType) (S : pred R) (U : SubSemiRing.type S).
@@ -5283,12 +5141,12 @@ Lemma valM : {morph val : x y / x * y}. Proof. exact: rmorphM. Qed.
 Lemma valM1 : multiplicative val. Proof. exact: valM_subproof. Qed.
 End multiplicative.
 
-HB.factory Record SubZsemimodule_isSubSemiRing (R : semiRingType) S U
-    of SubZsemimodule R S U := {
+HB.factory Record SubNmodule_isSubSemiRing (R : semiRingType) S U
+    of SubNmodule R S U := {
   mulr_closed_subproof : mulr_closed S
 }.
 
-HB.builders Context R S U of SubZsemimodule_isSubSemiRing R S U.
+HB.builders Context R S U of SubNmodule_isSubSemiRing R S U.
 
 HB.instance Definition _ := isMulClosed.Build R S mulr_closed_subproof.
 
@@ -5296,7 +5154,7 @@ Let inU v Sv : U := sub v Sv.
 Let oneU : U := inU (@rpred1 _ (MulClosed.clone R S _)).
 Let mulU (u1 u2 : U) := inU (rpredM _ _ (valP u1) (valP u2)).
 
-Program Definition semiringU := @Zsemimodule_isSemiRing.Build U oneU mulU
+Program Definition semiringU := @Nmodule_isSemiRing.Build U oneU mulU
   _ _ _ _ _ _ _ _.
 Next Obligation. by move=> x y z; apply: val_inj; rewrite !subK mulrA. Qed.
 Next Obligation. by move=> x; apply: val_inj; rewrite !subK mul1r. Qed.
@@ -5529,9 +5387,9 @@ HB.factory Record SubChoice_isSubSemiRing (R : semiRingType) S U
 }.
 
 HB.builders Context (R : semiRingType) S U of SubChoice_isSubSemiRing R S U.
-HB.instance Definition _ := SubChoice_isSubZsemimodule.Build R S U
+HB.instance Definition _ := SubChoice_isSubNmodule.Build R S U
   (semiring_closedD semiring_closed_subproof).
-HB.instance Definition _ := SubZsemimodule_isSubSemiRing.Build R S U
+HB.instance Definition _ := SubNmodule_isSubSemiRing.Build R S U
   (semiring_closedM semiring_closed_subproof).
 HB.end.
 
@@ -5647,17 +5505,17 @@ HB.end.
 
 Module SubExports.
 
-Notation "[ 'SubChoice_isSubZsemimodule' 'of' U 'by' <: ]" :=
-  (SubChoice_isSubZsemimodule.Build _ _ U rpred0D)
-  (at level 0, format "[ 'SubChoice_isSubZsemimodule'  'of'  U  'by'  <: ]")
+Notation "[ 'SubChoice_isSubNmodule' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubNmodule.Build _ _ U rpred0D)
+  (at level 0, format "[ 'SubChoice_isSubNmodule'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubZmodule' 'of' U 'by' <: ]" :=
   (SubChoice_isSubZmodule.Build _ _ U (zmodClosedP _))
   (at level 0, format "[ 'SubChoice_isSubZmodule'  'of'  U  'by'  <: ]")
   : form_scope.
-Notation "[ 'SubZsemimodule_isSubSemiRing' 'of' U 'by' <: ]" :=
-  (SubZsemimodule_isSubSemiRing.Build _ _ U (@rpred1M _ _))
-  (at level 0, format "[ 'SubZsemimodule_isSubSemiRing'  'of'  U  'by'  <: ]")
+Notation "[ 'SubNmodule_isSubSemiRing' 'of' U 'by' <: ]" :=
+  (SubNmodule_isSubSemiRing.Build _ _ U (@rpred1M _ _))
+  (at level 0, format "[ 'SubNmodule_isSubSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubSemiRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubSemiRing.Build _ _ U (semiringClosedP _))
@@ -6386,9 +6244,9 @@ Notation "''exists' ''X_' i , f" := (Exists i f) : term_scope.
 Notation "''forall' ''X_' i , f" := (Forall i f) : term_scope.
 
 (* Lifting Structure from the codomain of finfuns. *)
-Section FinFunZsemimod.
+Section FinFunNmod.
 
-Variable (aT : finType) (rT : zsemimodType).
+Variable (aT : finType) (rT : nmodType).
 Implicit Types f g : {ffun aT -> rT}.
 
 Definition ffun_zero := [ffun a : aT => (0 : rT)].
@@ -6402,7 +6260,7 @@ Fact ffun_add0 : left_id ffun_zero ffun_add.
 Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE add0r. Qed.
 
 #[export]
-HB.instance Definition _  := isZsemimodule.Build {ffun aT -> rT}
+HB.instance Definition _  := isNmodule.Build {ffun aT -> rT}
   ffun_addA ffun_addC ffun_add0.
 
 Section Sum.
@@ -6421,7 +6279,7 @@ End Sum.
 Lemma ffunMnE f n x : (f *+ n) x = f x *+ n.
 Proof. by rewrite -[n]card_ord -!sumr_const sum_ffunE. Qed.
 
-End FinFunZsemimod.
+End FinFunNmod.
 
 Section FinFunZmod.
 
@@ -6434,7 +6292,7 @@ Fact ffun_addN : left_inverse (@ffun_zero _ _) ffun_opp (@ffun_add _ _).
 Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE addNr. Qed.
 
 #[export]
-HB.instance Definition _  := Zsemimodule_isZmodule.Build {ffun aT -> rT}
+HB.instance Definition _  := Nmodule_isZmodule.Build {ffun aT -> rT}
   ffun_addN.
 
 End FinFunZmod.
@@ -6468,7 +6326,7 @@ Proof. by apply/eqP => /ffunP/(_ a)/eqP; rewrite !ffunE oner_eq0. Qed.
 
 (* TODO_HB uncomment once ffun_ring below is fixed
 #[export]
-HB.instance Definition _ := Zsemimodule_isSemiRing.Build {ffun aT -> R}
+HB.instance Definition _ := Nmodule_isSemiRing.Build {ffun aT -> R}
   ffun_mulA ffun_mul_1l ffun_mul_1r ffun_mul_addl ffun_mul_addr
   ffun_mul_0l ffun_mul_0r ffun1_nonzero.
 Definition ffun_semiring : semiRingType := {ffun aT -> R}.
@@ -6532,12 +6390,11 @@ HB.instance Definition _ := Zmodule_isLmodule.Build R {ffun aT -> rT}
 End FinFunLmod.
 
 (* External direct product. *)
-Section PairZmod.
+Section PairNmod.
 
-Variables M1 M2 : zmodType.
+Variables U V : nmodType.
 
-Definition opp_pair (x : M1 * M2) := (- x.1, - x.2).
-Definition add_pair (x y : M1 * M2) := (x.1 + y.1, x.2 + y.2).
+Definition add_pair (x y : U * V) := (x.1 + y.1, x.2 + y.2).
 
 Fact pair_addA : associative add_pair.
 Proof. by move=> x y z; congr (_, _); apply: addrA. Qed.
@@ -6548,28 +6405,39 @@ Proof. by move=> x y; congr (_, _); apply: addrC. Qed.
 Fact pair_add0 : left_id (0, 0) add_pair.
 Proof. by case=> x1 x2; congr (_, _); apply: add0r. Qed.
 
-Fact pair_addN : left_inverse (0, 0) opp_pair add_pair.
+#[export]
+HB.instance Definition _ := isNmodule.Build (U * V)%type
+  pair_addA pair_addC pair_add0.
+
+Fact fst_is_semi_additive : semi_additive fst. Proof. by []. Qed.
+#[export]
+HB.instance Definition _ := isSemiAdditive.Build (U * V)%type U fst
+  fst_is_semi_additive.
+
+Fact snd_is_semi_additive : semi_additive snd. Proof. by []. Qed.
+#[export]
+HB.instance Definition _ := isSemiAdditive.Build (U * V)%type V snd
+  snd_is_semi_additive.
+
+End PairNmod.
+
+Section PairZmod.
+
+Variables U V : zmodType.
+
+Definition opp_pair (x : U * V) := (- x.1, - x.2).
+
+Fact pair_addN : left_inverse (0, 0) opp_pair (@add_pair U V).
 Proof. by move=> x; congr (_, _); apply: addNr. Qed.
 
 #[export]
-HB.instance Definition _ := isZmodule.Build (M1 * M2)%type
-  pair_addA pair_addC pair_add0 pair_addN.
-
-Fact fst_is_additive : additive fst. Proof. by []. Qed.
-#[export]
-HB.instance Definition _ := isAdditive.Build (M1 * M2)%type M1 fst
-  fst_is_additive.
-
-Fact snd_is_additive : additive snd. Proof. by []. Qed.
-#[export]
-HB.instance Definition _ := isAdditive.Build (M1 * M2)%type M2 snd
-  snd_is_additive.
+HB.instance Definition _ := Nmodule_isZmodule.Build (U * V)%type pair_addN.
 
 End PairZmod.
 
-Section PairRing.
+Section PairSemiRing.
 
-Variables R1 R2 : ringType.
+Variables R1 R2 : semiRingType.
 
 Definition mul_pair (x y : R1 * R2) := (x.1 * y.1, x.2 * y.2).
 
@@ -6588,12 +6456,19 @@ Proof. by move=> x y z; congr (_, _); apply: mulrDl. Qed.
 Fact pair_mulDr : right_distributive mul_pair +%R.
 Proof. by move=> x y z; congr (_, _); apply: mulrDr. Qed.
 
+Fact pair_mul0r : left_zero 0 mul_pair.
+Proof. by move=> x; congr (_, _); apply: mul0r. Qed.
+
+Fact pair_mulr0 : right_zero 0 mul_pair.
+Proof. by move=> x; congr (_, _); apply: mulr0. Qed.
+
 Fact pair_one_neq0 : (1, 1) != 0 :> R1 * R2.
 Proof. by rewrite xpair_eqE oner_eq0. Qed.
 
 #[export]
-HB.instance Definition _ := Zmodule_isRing.Build (R1 * R2)%type
-   pair_mulA pair_mul1l pair_mul1r pair_mulDl pair_mulDr pair_one_neq0.
+HB.instance Definition _ := Nmodule_isSemiRing.Build (R1 * R2)%type
+  pair_mulA pair_mul1l pair_mul1r pair_mulDl pair_mulDr pair_mul0r pair_mulr0
+  pair_one_neq0.
 
 Fact fst_is_multiplicative : multiplicative fst. Proof. by []. Qed.
 #[export]
@@ -6604,7 +6479,11 @@ Fact snd_is_multiplicative : multiplicative snd. Proof. by []. Qed.
 HB.instance Definition _ := isMultiplicative.Build (R1 * R2)%type R2 snd
   snd_is_multiplicative.
 
-End PairRing.
+End PairSemiRing.
+
+#[export]
+HB.instance Definition _ (R1 R2 : ringType) :=
+  SemiRing.copy (R1 * R1)%type (R1 * R1)%type.
 
 Section PairComRing.
 

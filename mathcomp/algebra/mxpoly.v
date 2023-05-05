@@ -306,7 +306,7 @@ exists (row_mx (- c *: poly_rV q') (k *: poly_rV p')).
     by rewrite linear0 mul0r size_poly0.
   rewrite /r p0 gcd0p -size_poly_eq0 -(size_scale q nz_k) q'r.
   rewrite -(size_scale _ nz_c) scalerAl -(poly_rV_K le_q'_dq) -linearZ.
-  by rewrite -[c]opprK scaleNr q0 !linear0 mul0r size_poly0.
+  by rewrite -[c]opprK scaleNr q0 oppr0 linear0 mul0r size_poly0.
 rewrite mul_row_col scaleNr mulNmx !mul_rV_lin1 /= !linearZ /= !poly_rV_K //.
 by rewrite !scalerCA p'r q'r mulrCA addNr.
 Qed.

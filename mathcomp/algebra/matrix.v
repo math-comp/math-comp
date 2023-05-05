@@ -1609,12 +1609,12 @@ HB.instance Definition _ {mul : T -> T -> T} {add : Monoid.add_law idm mul} :=
 End MatrixLaws.
 
 (*****************************************************************************)
-(**************** Matrix Zsemimodule (semi-additive) structure ***************)
+(************* Matrix Nmodule (additive abelian monoid) structure ************)
 (*****************************************************************************)
 
-Section MatrixZsemimodule.
+Section MatrixNmodule.
 
-Variable V : zsemimodType.
+Variable V : nmodType.
 
 Section FixedDim.
 
@@ -1628,7 +1628,7 @@ Definition addmxA : associative addmx := map2_mxA.
 Definition addmxC : commutative addmx := map2_mxC.
 Definition add0mx : left_id (const_mx 0) addmx := map2_1mx.
 
-HB.instance Definition _ := GRing.isZsemimodule.Build 'M[V]_(m, n)
+HB.instance Definition _ := GRing.isNmodule.Build 'M[V]_(m, n)
   addmxA addmxC add0mx.
 
 Lemma mulmxnE A d i j : (A *+ d) i j = A i j *+ d.
@@ -1659,7 +1659,7 @@ HB.instance Definition _ k := GRing.isSemiAdditive.Build 'M_(m, n) 'M_(p, q)
 
 End SemiAdditive.
 
-Local Notation SwizzleAdd op := (GRing.SemiAdditive.copy op (swizzle_mx _ _ _)).
+Local Notation SwizzleAdd op := (GRing.Additive.copy op (swizzle_mx _ _ _)).
 
 HB.instance Definition _ m n := SwizzleAdd (@trmx V m n).
 HB.instance Definition _ m n i := SwizzleAdd (@row V m n i).
@@ -2090,7 +2090,7 @@ rewrite /(\tr _) big_split_ord /=.
 by congr (_ + _); under eq_bigr do rewrite (block_mxEul, block_mxEdr).
 Qed.
 
-End MatrixZsemimodule.
+End MatrixNmodule.
 
 Arguments is_diag_mx {V m n}.
 Arguments is_diag_mxP {V m n A}.
@@ -2100,9 +2100,9 @@ Arguments scalar_mx {V n}.
 Arguments is_scalar_mxP {V n A}.
 
 (* Parametricity over the semi-additive structure. *)
-Section MapZsemimodMatrix.
+Section MapNmodMatrix.
 
-Variables (aR rR : zsemimodType) (f : {semi_additive aR -> rR}) (m n : nat).
+Variables (aR rR : nmodType) (f : {additive aR -> rR}) (m n : nat).
 Local Notation "A ^f" := (map_mx f A) : ring_scope.
 Implicit Type A : 'M[aR]_(m, n).
 
@@ -2118,7 +2118,7 @@ HB.instance Definition _ :=
   GRing.isSemiAdditive.Build 'M[aR]_(m, n) 'M[rR]_(m, n) (map_mx f)
     (map_mx0, map_mxD).
 
-End MapZsemimodMatrix.
+End MapNmodMatrix.
 
 Section MatrixZmodule.
 
@@ -2135,7 +2135,7 @@ Definition oppmx := @map_mx V V -%R m n.
 Lemma addNmx : left_inverse (const_mx 0) oppmx (@addmx V m n).
 Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE addNr. Qed.
 
-HB.instance Definition _ := GRing.Zsemimodule_isZmodule.Build 'M[V]_(m, n)
+HB.instance Definition _ := GRing.Nmodule_isZmodule.Build 'M[V]_(m, n)
   addNmx.
 
 Lemma const_mx_is_additive : additive const_mx.
@@ -2722,7 +2722,7 @@ Local Notation n := n'.+1.
 Lemma matrix_nonzero1 : 1%:M != 0 :> 'M[R]_n.
 Proof. by apply/eqP=> /matrixP/(_ 0 0)/eqP; rewrite !mxE oner_eq0. Qed.
 
-HB.instance Definition _ := GRing.Zsemimodule_isSemiRing.Build 'M[R]_n
+HB.instance Definition _ := GRing.Nmodule_isSemiRing.Build 'M[R]_n
   (@mulmxA n n n n) (@mul1mx n n) (@mulmx1 n n)
   (@mulmxDl n n n) (@mulmxDr n n n) (@mul0mx n n n) (@mulmx0 n n n)
   matrix_nonzero1.
@@ -2818,22 +2818,22 @@ Proof.
 by apply/matrixP=> k i /[!mxE]; apply: eq_bigr => j _ /[!mxE].
 Qed.
 
-HB.instance Definition _ (M : countZsemimodType) m n :=
+HB.instance Definition _ (M : countNmodType) m n :=
   [Countable of 'M[M]_(m, n) by <:].
 HB.instance Definition _ (R : countSemiRingType) n :=
   [Countable of 'M[R]_n.+1 by <:].
 
-Section FinZsemimodMatrix.
-Variables (V : finZsemimodType) (m n : nat).
+Section FinNmodMatrix.
+Variables (V : finNmodType) (m n : nat).
 Local Notation MV := 'M[V]_(m, n).
 
 HB.instance Definition _ := [Finite of MV by <:].
 
-End FinZsemimodMatrix.
+End FinNmodMatrix.
 
 #[compress_coercions]
 HB.instance Definition _ (R : finSemiRingType) (m n : nat) :=
-  FinRing.Zsemimodule.on 'M[R]_(m, n).
+  FinRing.Nmodule.on 'M[R]_(m, n).
 
 #[compress_coercions]
 HB.instance Definition _ (R : finSemiRingType) n :=
@@ -2842,7 +2842,7 @@ HB.instance Definition _ (R : finSemiRingType) n :=
 (* Parametricity over the algebra structure. *)
 Section MapSemiRingMatrix.
 
-Variables (aR rR : semiRingType) (f : {srmorphism aR -> rR}).
+Variables (aR rR : semiRingType) (f : {rmorphism aR -> rR}).
 Local Notation "A ^f" := (map_mx f A) : ring_scope.
 
 Section FixedSize.
@@ -3305,7 +3305,7 @@ HB.instance Definition _ := GRing.SemiRing.on 'M[R]_n.
 HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build R 'M[R]_n
   (@scalemxAl n n n).
 
-HB.instance Definition _ := GRing.SRMorphism.on (@scalar_mx R n).
+HB.instance Definition _ := GRing.RMorphism.on (@scalar_mx R n).
 
 End MatrixRing.
 
@@ -3391,7 +3391,7 @@ End FixedSize.
 Lemma map_copid_mx n r : (copid_mx r)^f = copid_mx r :> 'M_n.
 Proof. by rewrite map_mxB map_mx1 map_pid_mx. Qed.
 
-HB.instance Definition _ n' := GRing.SRMorphism.on (@map_mx _ _ f n'.+1 n'.+1).
+HB.instance Definition _ n' := GRing.RMorphism.on (@map_mx _ _ f n'.+1 n'.+1).
 
 Lemma map_lin1_mx m n (g : 'rV_m -> 'rV_n) gf :
   (forall v, (g v)^f = gf v^f) -> (lin1_mx g)^f = lin1_mx gf.

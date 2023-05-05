@@ -290,7 +290,7 @@ Proof.
 by apply/polyP=> i; rewrite coef_poly; case: ltnP => // /(nth_default 0)->.
 Qed.
 
-(* Zsemimodule structure for polynomial *)
+(* Nmodule structure for polynomial *)
 Definition add_poly_def p q := \poly_(i < maxn (size p) (size q)) (p`_i + q`_i).
 Fact add_poly_key : unit. Proof. by []. Qed.
 Definition add_poly := locked_with add_poly_key add_poly_def.
@@ -313,9 +313,9 @@ Proof.
 by move=> p; apply/polyP=> i; rewrite coef_add_poly coefC if_same add0r.
 Qed.
 
-HB.instance Definition _ := GRing.isZsemimodule.Build (polynomial R)
+HB.instance Definition _ := GRing.isNmodule.Build (polynomial R)
   add_polyA add_polyC add_poly0.
-HB.instance Definition _ := GRing.Zsemimodule.on {poly R}.
+HB.instance Definition _ := GRing.Nmodule.on {poly R}.
 
 (* Properties of the zero polynomial *)
 Lemma polyC0 : 0%:P = 0 :> {poly R}. Proof. by []. Qed.
@@ -495,7 +495,7 @@ Qed.
 Fact poly1_neq0 : 1%:P != 0 :> {poly R}.
 Proof. by rewrite polyC_eq0 oner_neq0. Qed.
 
-HB.instance Definition _ := GRing.Zsemimodule_isSemiRing.Build (polynomial R)
+HB.instance Definition _ := GRing.Nmodule_isSemiRing.Build (polynomial R)
   mul_polyA mul_1poly mul_poly1 mul_polyDl mul_polyDr mul_0poly mul_poly0
   poly1_neq0.
 HB.instance Definition _ := GRing.SemiRing.on {poly R}.
@@ -612,7 +612,7 @@ move=> p; apply/polyP=> i.
 by rewrite coef_add_poly coef_opp_poly coefC if_same addNr.
 Qed.
 
-HB.instance Definition _ := GRing.Zsemimodule_isZmodule.Build (polynomial R)
+HB.instance Definition _ := GRing.Nmodule_isZmodule.Build (polynomial R)
   add_polyN.
 HB.instance Definition _ := GRing.Zmodule.on {poly R}.
 

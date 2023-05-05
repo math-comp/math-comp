@@ -250,8 +250,8 @@ Proof.
   rewrite -rmorphM (mulrC y x) addrAC leB mulrnA mulr2n opprD addrACA.
   rewrite subrr addr0 {2}(mulrC x) rmorphM mulrACA -opprB addrAC -sqrrB -sqrMi.
   apply/posP; exists (i * (x * conj y - y * conj x)); congr (_ * _).
-  rewrite !(rmorphM, rmorphB) /= !(rmorphB, rmorphM) iJ /= !conjK.
-  by rewrite mulNr -mulrN opprB (mulrC x) (mulrC y).
+  rewrite !(rmorphM, rmorphB) iJ !conjK mulNr -mulrN opprB.
+  by rewrite (mulrC x) (mulrC y).
 Qed.
 
 HB.instance Definition _ :=
@@ -455,7 +455,6 @@ Definition conj : {rmorphism type -> type} :=
   GRing.RMorphism.Pack
     (GRing.RMorphism.Class
        (GRing.isSemiAdditive.Build _ _ _ conj_is_semi_additive)
-       (GRing.SemiAdditive_isAdditive.Build _ _ _ conj_is_additive)
        (GRing.isMultiplicative.Build _ _ _ conj_is_multiplicative)).
 
 Lemma conjK : involutive conj.

@@ -9,7 +9,7 @@ From mathcomp Require Import fintype bigop ssralg.
 (*                                                                           *)
 (* This file clones part of ssralg hierarchy for countable types; it does    *)
 (* not cover the left module / algebra interfaces, providing only            *)
-(*      countZsemimodType == countable zsemimodType interface                *)
+(*          countNmodType == countable nmodType interface                    *)
 (*          countZmodType == countable zmodType interface                    *)
 (*      countSemiRingType == countable semiRingType interface                *)
 (*          countRingType == countable ringType interface                    *)
@@ -37,15 +37,15 @@ Module CountRing.
 
 Import GRing.Theory.
 
-#[short(type="countZsemimodType")]
-HB.structure Definition Zsemimodule := {M of GRing.Zsemimodule M & Countable M}.
-Module ZsemimoduleExports.
+#[short(type="countNmodType")]
+HB.structure Definition Nmodule := {M of GRing.Nmodule M & Countable M}.
+Module NmoduleExports.
 #[deprecated(since="mathcomp 2.0.0",
-  note="Use CountRing.Zsemimodule.clone instead.")]
-Notation "[ 'countZsemimodType' 'of' T ]" := (Zsemimodule.clone T _)
-  (at level 0, format "[ 'countZsemimodType'  'of'  T ]") : form_scope.
-End ZsemimoduleExports.
-HB.export ZsemimoduleExports.
+  note="Use CountRing.Nmodule.clone instead.")]
+Notation "[ 'countNmodType' 'of' T ]" := (Nmodule.clone T _)
+  (at level 0, format "[ 'countNmodType'  'of'  T ]") : form_scope.
+End NmoduleExports.
+HB.export NmoduleExports.
 
 #[short(type="countZmodType")]
 HB.structure Definition Zmodule := {M of GRing.Zmodule M & Countable M}.
@@ -170,7 +170,7 @@ End ClosedFieldExports.
 HB.export ClosedFieldExports.
 
 #[export]
-HB.instance Definition _ (R : countZsemimodType) := Zsemimodule.on R^o.
+HB.instance Definition _ (R : countNmodType) := Nmodule.on R^o.
 #[export]
 HB.instance Definition _ (R : countZmodType) := Zmodule.on R^o.
 #[export]
