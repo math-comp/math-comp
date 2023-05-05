@@ -2,7 +2,14 @@
 
 ### Changed
 
+- in `falgebra.v`
+  + structure `falgType` ported to HB
+
 ### Renamed
+
+- in `falgebra.v`
+  + strcture `FalgType` -> `falgType`
+  + notation `FalgUnitRingType`, use `Algebra_isFalgebra.Build`
 
 ### Removed
 
