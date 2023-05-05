@@ -6,6 +6,8 @@ From mathcomp Require Import div fintype bigop order ssralg finset fingroup.
 From mathcomp Require Import ssrnum.
 
 (******************************************************************************)
+(*                         Intervals in ordered types                         *)
+(*                                                                            *)
 (* This file provides support for intervals in ordered types. The datatype    *)
 (* (interval T) gives a formal characterization of an interval, as the pair   *)
 (* of its right and left bounds.                                              *)
@@ -38,12 +40,12 @@ From mathcomp Require Import ssrnum.
 (* same interval. However, these pathological issues do not arise when R is a *)
 (* real domain: we could provide a specific theory for this important case.   *)
 (*                                                                            *)
-(* See also ``Formal proofs in real algebraic geometry: from ordered fields   *)
-(* to quantifier elimination'', LMCS journal, 2012                            *)
-(* by Cyril Cohen and Assia Mahboubi                                          *)
+(* References:                                                                *)
+(* - Cyril Cohen, Assia Mahboubi, Formal proofs in real algebraic geometry:   *)
+(* from ordered fields quantifier elimination, LMCS, 2012                     *)
+(* - Cyril Cohen, Formalized algebraic numbers: construction and first-order  *)
+(* theory, PhD thesis, 2012, section 4.3                                      *)
 (*                                                                            *)
-(* And "Formalized algebraic numbers: construction and first-order theory"    *)
-(* Cyril Cohen, PhD, 2012, section 4.3.                                       *)
 (******************************************************************************)
 
 Set Implicit Arguments.

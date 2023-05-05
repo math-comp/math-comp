@@ -6,7 +6,7 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 (************************************************************************)
-(* Small Scale Rewriting using Associativity and Commutativity          *)
+(*     Small Scale Rewriting using Associativity and Commutativity      *)
 (*                                                                      *)
 (* Rewriting with AC (not modulo AC), using a small scale command.      *)
 (* Replaces opA, opC, opAC, opCA, ... and any combinations of them      *)

@@ -5,10 +5,14 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
 From mathcomp Require Import ssrAC choice tuple bigop ssralg poly polydiv.
 From mathcomp Require Import generic_quotient.
 
-(* This file builds the field of fraction of any integral domain. *)
-(* The main result of this file is the existence of the field *)
-(* and of the tofrac function which is a injective ring morphism from R *)
-(* to its fraction field {fraction R} *)
+(******************************************************************************)
+(*                  Field of fraction of an integral domain                   *)
+(*                                                                            *)
+(* This file builds the field of fraction of any integral domain. The main    *)
+(* result of this file is the existence of the field and of the tofrac        *)
+(* function which is a injective ring morphism from R to its fraction field   *)
+(* {fraction R}.                                                              *)
+(******************************************************************************)
 
 Set Implicit Arguments.
 Unset Strict Implicit.
