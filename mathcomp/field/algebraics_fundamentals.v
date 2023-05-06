@@ -505,7 +505,8 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     by rewrite -(map_poly_eq0 Qxz) Dq /q1_ !raddf0.
   have limN v a: lim (- v) a = - lim v a.
     rewrite /lim; suffices ->: q_ (- v) = - q_ v by rewrite rmorphN hornerN.
-    by apply: (map_poly_inj Qxz); rewrite Dq /q1_ !raddfN /= Dq.
+    apply: (map_poly_inj Qxz).
+    by rewrite Dq /q1_ (raddfN _ v) (raddfN _ (Qyz v)) [RHS]raddfN /= Dq.
   pose lim_nz n v := exists2 e, e > 0 & {in Iab_ n, forall a, e < `|lim v a| }.
   have /(all_sig_cond 0%N)[n_ nzP] v: v != 0 -> {n | lim_nz n v}.
     move=> nz_v; do [move/(_ v nz_v); rewrite -(coprimep_map QxR)] in coqp.
