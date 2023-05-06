@@ -1916,7 +1916,7 @@ case: m n => [|m] [|n] in V d * => Vd rdV; rewrite ?thinmx0//=.
   by rewrite /row_free mxrank.unlock in rdV.
 apply/diagonalizableP; pose u := undup [seq d 0 i | i <- enum 'I_n.+1].
 exists u; first by rewrite undup_uniq.
-by rewrite (dvdp_trans (mxminpoly_conj _ _))// mxminpoly_diag.
+by rewrite (dvdp_trans (mxminpoly_conj (f:=diag_mx d) _ _))// mxminpoly_diag.
 Qed.
 
 Lemma codiagonalizableP n (As : seq 'M[F]_n) :
