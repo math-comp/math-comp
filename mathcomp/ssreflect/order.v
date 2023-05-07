@@ -5221,20 +5221,14 @@ HB.factory Record SubChoice_isSubPOrder d (T : porderType d) S (d' : unit) U
     of SubChoice T S U := {}.
 
 HB.builders Context d T S d' U of SubChoice_isSubPOrder d T S d' U.
-
-Definition le (x y : U) := val x <= val y.
-Definition lt (x y : U) := val x < val y.
-Fact lt_def x y : lt x y = (y != x) && (le x y).
-Proof. by rewrite /lt lt_def (inj_eq val_inj). Qed.
-Fact le_refl : reflexive le. Proof. move=> x; exact: lexx. Qed.
-Fact le_anti : antisymmetric le. Proof. by move=> x y /le_anti/val_inj. Qed.
-Fact le_trans : transitive le. Proof. move=> x y z; exact: le_trans. Qed.
-HB.instance Definition _ := isPOrder.Build d' U
-  lt_def le_refl le_anti le_trans.
-
+HB.instance Definition _ : isPOrder d' U := CancelPartial.Pcan d' (@valK _ _ U).
 Fact valD : order_morphism (val : U -> T). Proof. by []. Qed.
 HB.instance Definition _ := isSubPOrder.Build d T S d' U valD.
 HB.end.
+
+#[export]
+HB.instance Definition _ d (T : porderType d) (S : pred T) (d' : unit)
+  (U : subType S) := SubChoice_isSubPOrder.Build d T S d' (sub_type U).
 
 HB.mixin Record isMeetSubLattice d (T : latticeType d) (S : pred T) d' U
     of SubType T S U & Lattice d' U := {
@@ -5648,20 +5642,12 @@ HB.export SubOrderExports.
 
 Module DeprecatedSubOrder.
 
-Section Partial.
-Context {disp : unit} {T : porderType disp} (P : {pred T}) (sT : subType P).
-
-HB.instance Definition _ : isPOrder disp (sub_type sT) :=
-  CancelPartial.Pcan disp (valK : @pcancel _ (sub_type sT) val insub).
-
-End Partial.
-
 Section Total.
 Context {disp : unit} {T : orderType disp} (P : {pred T}) (sT : subType P).
 
 #[export]
 HB.instance Definition _ :=
-  MonoTotal.Build _ (sub_type sT) (fun _ _ => erefl).
+  MonoTotal.Build disp (sub_type sT) (fun _ _ => erefl).
 
 End Total.
 
