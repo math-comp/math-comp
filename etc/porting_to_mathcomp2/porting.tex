@@ -29,23 +29,62 @@
 
 \maketitle
 
-The goal of this document is to explain how to port developments using \mathcomp{}
-to \mathcomptwo.
+The goal of this document is to explain how to port developments
+using the Mathematical Components library (hereafter, \mathcomp) to \mathcomptwo.
 
-The Mathematical Components library (hereafter, \mathcomp) provides a number
-of mathematical structures organized as hierarchies. Hierarchy Builder (hereafter, \hb)
-is an extension of the \coq{} proof assistant to ease the development of
-hierarchies of structures~\cite{cohen2020fscd}. \mathcomptwo{} is the result
-of the port of \mathcomp{} to \hb{}~\cite{mathcomp2021coq}.
+\mathcomp{} provides a number of mathematical structures organized as
+hierarchies. Hierarchy Builder (hereafter, \hb) is an extension of the
+\coq{} proof assistant to ease the development of hierarchies of
+structures~\cite{cohen2020fscd}. \mathcomptwo{} is the result of the
+port of \mathcomp{} to \hb{}~\cite{mathcomp2021coq}.
+
+\tableofcontents
+
+\section{Target Audience}
+
+Based on the observation of several developments, we can distinguish
+three categories of users of \mathcomp:
+\begin{enumerate}
+\item \mathcomp{} users who have not been using the \coqin{Canonical}
+  command should not see much difference compared to the past version
+  upgrades of \mathcomp{}.
+  %
+  Some identifiers that are now useless have been removed but this is
+  documented in the changelog. For example \coqin{bool_eqType} might
+  need to be replaced by \coqin{bool : eqType} or just \coqin{bool}.
+  %
+  Also, the behavior of some rewritings might have changed, requiring
+  explicit patterns. Typically, it might happen that rewriting with
+  associativity lemmas requires the user to indicate whether it is
+  supposed to happen on the left or the right-hand side of an
+  equality, so that \coqin{rewrite addrA} might need to be rewritten
+  \coqin{rewrite [in LHS]addrA}.
+  %
+  For such users, reading this tutorial through the end might not be
+  necessary.
+\item The target readers are primarily \mathcomp{} users who have been
+  instantiating structures using the \coqin{Canonical} command.
+\item As for the few users who have been developing their own
+  hierarchies of structures, this tutorial might be of little help and
+  they need to refer to:
+  \begin{itemize}
+  \item the original paper for an extensive introduction to \hb{} commands~\cite{cohen2020fscd},
+  \item the \hb{} development for documentation and examples~\cite{hb}
+    (start with the \href{https://github.com/math-comp/hierarchy-builder#readme}{README}),
+  \item various papers for more applications~\cite{mathcomp2021coq}
+    \cite[Sect.~3]{affeldt2022arxiv} \cite[Sect.~4]{affeldt2023cpp},
+  \item already ported developments such as
+    \href{https://github.com/math-comp/odd-order}{odd-order},
+    \href{https://github.com/math-comp/multinomials}{multinomials}, etc.
+  \end{itemize}
+\end{enumerate}
 
 For the sake of concreteness, we illustrate the port of
 \compdecmodal~\cite{compdecmodal} in Sect.~\ref{sec:compdecmodal}.
 Before that we review basic usage of \hb{} in Sect.~\ref{sec:reminder}
 and review the documentation tools available for porting in Sect.~\ref{sec:explore}.
 
-\tableofcontents
-
-\section{Quick Reminder About \hb}
+\section{Quick Reminder About the \hb{} Vocabulary}
 \label{sec:reminder}
 
 The goal of this section is to briefly explain the three main commands
@@ -105,17 +144,6 @@ module_type__canonical__struct_Struct is defined
 \end{minted}
 The absence of this output often indicates failure of the
 \coqin{HB.instance} command.
-
-\bigskip
-
-For more information about \hb{} see:
-\begin{itemize}
-\item the original paper for an extensive introduction to \hb{} commands~\cite{cohen2020fscd},
-\item the \hb{} development for documentation and examples~\cite{hb}
-(start with the \href{https://github.com/math-comp/hierarchy-builder#readme}{README}),
-\item various papers for more applications~\cite{mathcomp2021coq} \cite[Sect.~3]{affeldt2022arxiv} \cite[Sect.~4]{affeldt2023cpp}.
-  \rei{more pointers}
-\end{itemize}
 
 \section{Tools to Port \mathcomp{} Applications}
 \label{sec:explore}
