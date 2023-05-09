@@ -162,7 +162,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `IsoLatticeMixin` is replaced by `Order.IsoLattice`
 
 - in `generic_quotient.v`,
-  + structures quotType and eqQuotType ported to HB
+  + structures `quotType` and `eqQuotType` ported to HB
 
 - in `fintype.v`
   + structures `finType` and `subFinType` ported to HB
