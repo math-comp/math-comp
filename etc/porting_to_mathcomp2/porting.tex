@@ -23,20 +23,25 @@
 \usepackage{graphicx}
 \usepackage{marginnote}
 
-\title{Porting Coq Scripts to the Mathematical Components Library Version 2}
+\title{Porting Coq Scripts to \\ the Mathematical Components Library Version 2}
+
+\author{Reynald Affeldt \and Yves Bertot \and Cyril Cohen \and Pierre Roux \and Kazuhiko Sakaguchi \and Enrico Tassi}
 
 \begin{document}
 
 \maketitle
 
-The goal of this document is to explain how to port developments
-using the Mathematical Components library (hereafter, \mathcomp) to \mathcomptwo.
-
-\mathcomp{} provides a number of mathematical structures organized as
+The Mathematical Components library (hereafter, \mathcomp{})~\cite{mathcompbook} provides,
+among others, a number of mathematical structures organized as
 hierarchies. Hierarchy Builder (hereafter, \hb) is an extension of the
 \coq{} proof assistant to ease the development of hierarchies of
-structures~\cite{cohen2020fscd}. \mathcomptwo{} is the result of the
+structures~\cite{cohen2020fscd}. \mathcomptwo{}~\cite{mathcomp2} is the result of the
 port of \mathcomp{} to \hb{}~\cite{mathcomp2021coq}.
+
+The goal of this document is to explain how to port \mathcomp{}
+developments to \mathcomptwo.  It has been written by the participants
+of the \mathcomp{} Documentation Sprint that happened from
+[2023-05-03] to [2023-05-10].
 
 \tableofcontents
 
@@ -58,7 +63,8 @@ three categories of users of \mathcomp:
   associativity lemmas requires the user to indicate whether it is
   supposed to happen on the left or the right-hand side of an
   equality, so that \coqin{rewrite addrA} might need to be rewritten
-  \coqin{rewrite [in LHS]addrA}.
+  \coqin{rewrite [in LHS]addrA}. See Sect.~\ref{sec:other} for a
+  concrete example.
   %
   For such users, reading this tutorial through the end might not be
   necessary.
@@ -451,7 +457,7 @@ HB_unnamed_mixin_34 is defined
 fset_fset_type__canonical__choice_Countable is defined
 fset_fset_type__canonical__choice_SubCountable is defined
 \end{success}
-Note that, although \hb{} does provide an \coqin{#[hnf]} attribute, it
+Note that, although \hb{} does provide an \mintinline{ssr}{#[hnf]} attribute, it
 should not be necessary in general.
 
 To sum up, here follows the complete fix:
@@ -608,6 +614,7 @@ HB.instance Definition _ (T : choiceType) :=
 \end{success}
 
 \subsection{Other Compilation Errors}
+\label{sec:other}
 
 Since other compilation errors are similar to the one already explained above, we go faster about them.
 
@@ -652,6 +659,40 @@ Note that we have added a type information to make the key (here,
 \coqin{form}) explicit as recommended when performing instantiations.
 This fix is sufficient because it generates the \coqin{Choice} instance
 along with the \coqin{Countable} instance.
+
+\paragraph{More Instantiations of \coqin{Equality} Structures}
+
+The next compilation errors in the files \coqin{Kstar_def.v}, \coqin{gen_def.v}
+and \coqin{CTL_def.v} are handled as already explained above.
+
+\paragraph{Failing Rewriting}
+
+The next compilation ``error'' is in the file \coqin{CTL/demo.v}.
+It is actually a tactic whose execution has been substantially slowed down by the upgrade to \mathcomptwo:
+\begin{failure}
+move => [p' y]. rewrite /MRel /Mstate (negbTE (root_internal _)) [_ && _]/= orbF.
+\end{failure}
+The offending rewrite is the one with \coqin{orbF}. It used to apply
+by default to the left-hand side of an \coqin{<->} equivalence but now
+the user is required to indicate the rewrite location with a pattern
+to recover a reasonable execution time:
+\begin{success}
+move => [p' y]. rewrite /MRel /Mstate (negbTE (root_internal _)) [_ && _]/=.
+rewrite [in X in X <-> _]orbF.
+\end{success}
+This kind of slow down is however rather exceptional.
+
+\bigskip
+
+There are a few more compilation errors but they are similar to the ones we explained so far.
+
+\subsection{Conclusion of the Port of \compdecmodal}
+
+The result of porting \compdecmodal{} can be found
+\href{https://github.com/affeldt-aist/comp-dec-modal/tree/tutorial_mathcomp2}{online}.
+It required the edition of 10 files, 35 insertions, and 67 deletions,
+which represents a moderate amount of work for an improvement in terms
+of readability and for future extensions.
 
 \bibliographystyle{abbrv}
 \bibliography{porting}
