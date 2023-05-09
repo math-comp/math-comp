@@ -393,6 +393,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `order.v`
   + notations `0`, `1`, `0^d` and `1^d` in `order_scope`
 
+- in `ssrbool.v`
+  + notation `mono2W_in` that was deprecated in 1.14.0
+
 ### Deprecated
 
 - in `order.v`
