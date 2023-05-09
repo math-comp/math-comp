@@ -577,7 +577,7 @@ Proof. exact/eqP/commgP/commuteV/commuteX. Qed.
 
 End GroupIdentities.
 
-Hint Rewrite mulg1 @mul1g invg1 @mulVg mulgV (@invgK) mulgK mulgKV
+#[global] Hint Rewrite mulg1 @mul1g invg1 @mulVg mulgV (@invgK) mulgK mulgKV
              @invMg @mulgA : gsimpl.
 
 Ltac gsimpl := autorewrite with gsimpl; try done.
