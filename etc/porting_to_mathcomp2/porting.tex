@@ -2,6 +2,7 @@
 
 \def\coq{\textsc{Coq}}
 \def\mathcomp{\textsc{MathComp}}
+\def\mathcomptwo{\mathcomp~2}
 \def\hb{\textsc{HB}}
 \def\compdecmodal{\textsc{CompDecModal}}
 
@@ -14,12 +15,13 @@
 \newminted[failure]{ssr}{bgcolor=lightgray}
 \newminted[success]{ssr}{frame=single}
 
-\def\rei#1{TODO(rei): #1}
+\def\rei#1{{\color{red}{TODO(rei): #1}}}
 \def\newterm#1{{\sl #1}}
 
 \usepackage{fullpage}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{marginnote}
 
 \title{Porting Coq Scripts to the Mathematical Components Library Version 2}
 
@@ -28,12 +30,12 @@
 \maketitle
 
 The goal of this document is to explain how to port developments using \mathcomp{}
-to \mathcomp{}~2.
+to \mathcomptwo.
 
 The Mathematical Components library (hereafter, \mathcomp) provides a number
 of mathematical structures organized as hierarchies. Hierarchy Builder (hereafter, \hb)
 is an extension of the \coq{} proof assistant to ease the development of
-hierarchies of structures~\cite{cohen2020fscd}. \mathcomp{}~2 is the result
+hierarchies of structures~\cite{cohen2020fscd}. \mathcomptwo{} is the result
 of the port of \mathcomp{} to \hb{}~\cite{mathcomp2021coq}.
 
 For the sake of concreteness, we illustrate the port of
@@ -98,8 +100,13 @@ HB.instance Definition _ := Struct.Build params.
 \end{minted}
 The command \coqin{HB.instance} should trigger the printing of several
 lines of information output such as
-\coqin{module_type__canonical__struct_Struct}.  The absence of this
-output often indicates failure of the \coqin{HB.instance} command.
+\begin{minted}{ssr}
+module_type__canonical__struct_Struct is defined
+\end{minted}
+The absence of this output often indicates failure of the
+\coqin{HB.instance} command.
+
+\bigskip
 
 For more information about \hb{} see:
 \begin{itemize}
@@ -107,6 +114,7 @@ For more information about \hb{} see:
 \item the \hb{} development for documentation and examples~\cite{hb}
 (start with the \href{https://github.com/math-comp/hierarchy-builder#readme}{README}),
 \item various papers for more applications~\cite{mathcomp2021coq} \cite[Sect.~3]{affeldt2022arxiv} \cite[Sect.~4]{affeldt2023cpp}.
+  \rei{more pointers}
 \end{itemize}
 
 \section{Tools to Port \mathcomp{} Applications}
@@ -115,7 +123,7 @@ For more information about \hb{} see:
 \subsection{Documentation}
 
 The following pieces of documentation are useful during the process of
-porting a \mathcomp{} application to \mathcomp~2:
+porting a \mathcomp{} application to \mathcomptwo:
 \begin{itemize}
 \item The changelog is the primary source of information. See \coqin{CHANGELOG.md}.
 \item Additionally, structures are documented in the headers of the
@@ -158,6 +166,7 @@ Besides the changelog and the headers of source code, the user can use
 \hb{} commands to explore a hierarchy of mathematical structures.
 
 \subsubsection{Information about Structures with \coqin{HB.about}}
+\label{sec:info_structures}
 
 Basic information about structures can be obtained via the command
 \coqin{HB.about} as in:
@@ -200,6 +209,7 @@ vicinity of \coqin{eqType}.
 \end{figure}
 
 \subsubsection{Information about Constructors with \coqin{HB.howto} and \coqin{HB.about}}
+\label{sec:info_constructors}
 
 To discover constructors to build a structure, one can use the command
 \coqin{HB.howto}. For instance
@@ -274,11 +284,11 @@ HB: bool is canonically equipped with structures:
 
 lists all the structures \coqin{bool} is already equipped with.
 
-\section{Porting a Development using \mathcomp{} to \mathcomp~2}
+\section{Porting a \mathcomp{}Development to \mathcomptwo}
 \label{sec:compdecmodal}
 
 The basic strategy to port an existing \mathcomp{} development to
-\mathcomp~2 is to (1)~install \mathcomp~2, (2)~compile the existing source
+\mathcomptwo{} is to (1)~install \mathcomptwo, (2)~compile the existing source
 code, and (3)~fix the errors one after the other.
 %
 For the sake of concreteness, we explain the port of
@@ -287,6 +297,15 @@ moderate use of \mathcomp{} whose port involves fixing the
 instantiation of basic structures that most developments using
 \mathcomp{} are likely to use.
 
+In the following, the offending commands appear in a gray areas
+\begin{minted}[bgcolor=lightgray]{text}
+command incompatible with MathComp 2
+\end{minted}
+and their fixes are single famed:
+\begin{minted}[frame=single]{text}
+MathComp 2 fix for the command above
+\end{minted}
+
 \subsection{Import the \hb{} Library}
 
 First thing first, any \coq{} file using \hb{} must start with:
@@ -294,7 +313,7 @@ First thing first, any \coq{} file using \hb{} must start with:
 From HB Require Import structures.
 \end{minted}
 
-\subsection{Instantiation of Structures with \mathcomp~2}
+\subsection{Instantiation of Structures with \mathcomptwo}
 
 From the viewpoint of the \mathcomp{} user, the main change is the way
 mathematical structures are now instantiated. Most \coqin{Canonical}
@@ -407,33 +426,204 @@ fset_fset_type__canonical__choice_SubCountable is defined
 Note that, although \hb{} does provide an \coqin{#[hnf]} attribute, it
 should not be necessary in general.
 
-The last message by \hb{} is important because it indicates that the next command
-\begin{failure}
+To sum up, here follows the complete fix:
+\begin{minted}[frame=single,numbers=left,escapeinside=??]{ssr}
+Section FinSets.
+ Variable T : choiceType.
+ ...
+ HB.instance Definition _ := [isSub for elements by fset_type_rect].
+ HB.instance Definition _ := [Equality of fset_type by <:]. ?\label{line:eqtype}?
+ Canonical Structure fset_predType := PredType (fun (X : fset_type) x => nosimpl x \in elements X).
+ HB.instance Definition _ := [Choice of fset_type by <:]. ?\label{line:choicetype}?
+End FinSets.
+
+HB.instance Definition _ (T : countType) := [Countable of fset_type T by <:]. ?\label{line:countttype}?
+Canonical Structure fset_subCountType (T : countType) := ?\label{line:subcounttype}?
+  Eval hnf in [subCountType of fset_type T]. Moreover, 
+\end{minted}
+
+In fact, we can go one step further. The instantiation of the
+countable structure at line~\ref{line:countttype} shows the
+subcountable structure has been generated automatically by \hb,
+rendering the command at line~\ref{line:subcounttype} useless, as was
+suggest by the deprecation warning:
+\begin{minted}{ssr}
 > Canonical Structure fset_subCountType (T : countType) :=
 >  Eval hnf in [subCountType of fset_type T].
 Warning: Notation "[ subCountType of _ ]" is deprecated since mathcomp 2.0.0.
 Use SubCountable.clone instead.
 [deprecated-notation,deprecated]
 fset_subCountType is defined
-\end{failure}
-can now be removed.
-
-To sum up, here follows the complete fix:
+\end{minted}
+Moreover, instead of instantiating the \coqin{Equality} structure at
+line~\ref{line:eqtype} and then the \coqin{Choice} structure at
+line~\ref{line:choicetype}, one can start by instantiating the
+\coqin{Choice} structure and get the \coqin{Equality} structure
+automatically, so that a better fix would be:
 \begin{success}
 Section FinSets.
  Variable T : choiceType.
  ...
  HB.instance Definition _ := [isSub for elements by fset_type_rect].
- HB.instance Definition _ := [Equality of fset_type by <:].
- Canonical Structure fset_predType := PredType (fun (X : fset_type) x => nosimpl x \in elements X).
  HB.instance Definition _ := [Choice of fset_type by <:].
+ Canonical Structure fset_predType := PredType (fun (X : fset_type) x => nosimpl x \in elements X).
 End FinSets.
 
 HB.instance Definition _ (T : countType) := [Countable of fset_type T by <:].
-Canonical Structure fset_subCountType (T : countType) :=
-  Eval hnf in [subCountType of fset_type T].
+\end{success}
+This small example already illustrates the advantage of porting to \mathcomptwo.
+
+\subsection{Finitely Iterated Operators}
+
+The next series of compilation errors that occur when porting
+\compdecmodal{} is about finitely iterated operators, which are likely
+to be used by most \mathcomp{} developments:
+\begin{failure}
+Canonical Structure fsetU_law (T : choiceType) := 
+  Monoid.Law (@fsetUA T) (@fset0U T) (@fsetU0 T).
+Canonical Structure fsetU_comlaw (T : choiceType) := 
+  Monoid.ComLaw (@fsetUC T).
+\end{failure}
+
+The first compilation error indicates a change in the signature of a constructor:
+\begin{failure}
+> Canonical Structure fsetU_law (T : choiceType) := 
+>   Monoid.Law (@fsetUA T) (@fset0U T) (@fsetU0 T).
+Error:
+In environment
+T : choiceType
+The term "fsetUA (T:=T)" has type "forall X Y Z : {fset T}, X `|` (Y `|` Z) = X `|` Y `|` Z"
+while it is expected to have type "Type".
+\end{failure}
+We can use \coqin{HB.about} to discover the relevant structure (see Sect.~\ref{sec:info_structures}):
+\begin{minted}{ssr}
+> HB.about Monoid.Law.
+HB: Monoid.Law.type is a structure (from "./ssreflect/bigop.v", line 415)
+...
+\end{minted}
+We can now use \coqin{HB.howto} to discover how to build this structure (see Sect.~\ref{sec:info_constructors}):
+\begin{minted}{ssr}
+> HB.howto Monoid.Law.type
+HB: solutions (use 'HB.about F.Build' to see the arguments of each factory F):
+    - Monoid.isLaw
+    - SemiGroup.isLaw; Monoid.isMonoidLaw
+\end{minted}
+Finally, we can use \coqin{HB.about} to learn about the parameters of a constructot (see Sect.~\ref{sec:info_constructors}):
+\begin{minted}{ssr}
+> HB.about Monoid.isLaw.Build
+...
+HB: arguments: Monoid.isLaw.Build T idm op opA op1m opm1
+    - T : Type
+    - idm : T
+    - op : T -> T -> T
+    - opA : associative op
+    - op1m : left_id idm op
+    - opm1 : right_id idm op
+\end{minted}
+We have now enough information to fix the compilation error:
+\begin{success}
+HB.instance Definition _ (T : choiceType) := 
+  Monoid.isLaw.Build {fset T} fset0 fsetU (@fsetUA T) (@fset0U T) (@fsetU0 T).  
+\end{success}
+Note that we have made explicit the \newterm{key} (the operator
+\coqin{fsetU}) in the instantiation. Though not strictly necessary, this is
+good practice to document it on this occasion.
+
+\bigskip
+
+Next compilation error:
+\begin{failure}
+> Canonical Structure fsetU_comlaw (T : choiceType) := 
+>   Monoid.ComLaw (@fsetUC T).
+Error:
+In environment
+T : choiceType
+The term "fsetUC (T:=T)" has type "forall X Y : {fset T}, X `|` Y = Y `|` X"
+  while it is expected to have type "Type".  
+\end{failure}
+This is similar to above: use \coqin{HB.about} to learn about
+\coqin{Monoid.ComLaw} and use \coqin{HB.howto} to inquire about its construction.
+\begin{minted}{ssr}
+> HB.howto Monoid.ComLaw.type.
+HB: solutions (use 'HB.about F.Build' to see the arguments of each factory F):
+    - Monoid.isComLaw
+    - SemiGroup.isComLaw; Monoid.isMonoidLaw
+    - SemiGroup.isCommutativeLaw; Monoid.isLaw
+    - SemiGroup.isLaw; SemiGroup.isCommutativeLaw; Monoid.isMonoidLaw
+\end{minted}
+Note that since the key \coqin{fsetU} has already been equipped with a \coqin{Monoid.Law} structure,
+we can add this key as an additional parameter to \coqin{HB.howto} to restrict the search:
+\begin{minted}{ssr}
+> HB.howto fsetU Monoid.ComLaw.type.
+HB: solutions (use 'HB.about F.Build' to see the arguments of each factory F):
+    - SemiGroup.isCommutativeLaw
+\end{minted}
+We can then check the parameters of \coqin{SemiGroup.isCommutativeLaw.Build} to come up with the following fix:
+\begin{success}
+HB.instance Definition _ (T : choiceType) :=
+  SemiGroup.isCommutativeLaw.Build _ fsetU (@fsetUC T).
 \end{success}
 
+To sum up, we fix the compilation errors about finitely iterated operators using:
+\begin{success}
+HB.instance Definition _ (T : choiceType) :=
+  SemiGroup.isCommutativeLaw.Build _ fsetU (@fsetUC T).
+HB.instance Definition _ (T : choiceType) := 
+  Monoid.isLaw.Build {fset T} fset0 fsetU (@fsetUA T) (@fset0U T) (@fsetU0 T).  
+\end{success}
+In fact, we could have proceeded with only one instantiation since
+we can get the \coqin{Monoid.Law} structure from the instantiation of the 
+\coqin{Monoid.ComLaw} structure, so that a better fix would be:
+\begin{success}
+HB.instance Definition _ (T : choiceType) :=
+  Monoid.isComLaw.Build _ _ fsetU (@fsetUA T) (@fsetUC T) (@fset0U T).
+\end{success}
+
+\subsection{Other Compilation Errors}
+
+Since other compilation errors are similar to the one already explained above, we go faster about them.
+
+\paragraph{Instantiation of an \coqin{Equality} Structure}
+
+Next failure in the file \coqin{K/K_def.v}:
+\begin{failure}
+Definition form_eqMixin := EqMixin (compareP eq_form_dec).
+Canonical Structure form_eqType := Eval hnf in @EqType form form_eqMixin.
+\end{failure}
+The failure is primarily caused by the removal of \coqin{EqMixin}. The changelog
+suggests to use the constructor \coqin{hasDecEq.Build} whose parameters
+can be double-checked with \coqin{HB.howto} leading to the following fix:
+\begin{success}
+HB.instance Definition _ := hasDecEq.Build form (compareP eq_form_dec).  
+\end{success}
+
+\paragraph{Instantiation of a \coqin{Countable} Structure}
+
+Next failure in the file \coqin{K/K_def.v}:
+\begin{failure}
+Definition form_countMixin := PcanCountMixin formChoice.pickleP.
+Definition form_choiceMixin := CountChoiceMixin form_countMixin.
+Canonical Structure form_ChoiceType := Eval hnf in ChoiceType form form_choiceMixin.
+Canonical Structure form_CountType := Eval hnf in CountType form form_countMixin.  
+\end{failure}
+We learn that \coqin{PcanCountMixin} is deprecated and that
+\coqin{CountChoiceMixin} is no more. The changelog suggests to use
+\coqin{PCanIsCountable} instead of \coqin{PcanCountMixin}.  According
+to \coqin{Locate}, \coqin{PCanIsCountable} is located in the file
+\coqin{ssreflect/choice.v} and it has the following type:
+\begin{minted}{ssr}
+PCanIsCountable :
+forall [T : countType] [sT : Type] [f : sT -> T] [f' : T -> option sT], pcancel f f' ->
+  isCountable.axioms_ sT
+\end{minted}
+The fix in this case is therefore:
+\begin{success}
+HB.instance Definition _ : isCountable form := PCanIsCountable formChoice.pickleP.  
+\end{success}
+Note that we have added a type information to make the key (here,
+\coqin{form}) explicit as recommended when performing instantiations.
+This fix is sufficient because it generates the \coqin{Choice} instance
+along with the \coqin{Countable} instance.
 
 \bibliographystyle{abbrv}
 \bibliography{porting}
