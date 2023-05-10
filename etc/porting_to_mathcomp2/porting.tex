@@ -21,16 +21,27 @@
 \usepackage{fullpage}
 \usepackage{hyperref}
 \usepackage{graphicx}
-\usepackage{marginnote}
+\usepackage{authblk}
 
 \title{Porting Coq Scripts to \\ the Mathematical Components Library Version 2}
-
-\author{Reynald Affeldt \and Yves Bertot \and Cyril Cohen \and Pierre Roux \and Kazuhiko Sakaguchi \and Enrico Tassi}
+\author[2]{Reynald Affeldt}
+\author[1,4]{Yves Bertot}
+\author[1,4]{Cyril Cohen}
+\author[3]{Pierre Roux}
+\author[1]{Kazuhiko Sakaguchi}
+\author[1,4]{Enrico Tassi}
+\affil[1]{Inria, France}
+\affil[2]{National Institute of Advanced Industrial Science and Technology (AIST), Japan}
+\affil[3]{ONERA / DTIS, Universit\'e de Toulouse, France}
+\affil[4]{Universit\'e C\^ote d'Azur, France}
+\date{}                     %% if you don't need date to appear
+\setcounter{Maxaffil}{0}
 
 \begin{document}
 
 \maketitle
 
+\begin{abstract}
 The Mathematical Components library (hereafter, \mathcomp{})~\cite{mathcompbook} provides,
 among others, a number of mathematical structures organized as
 hierarchies. Hierarchy Builder (hereafter, \hb) is an extension of the
@@ -38,17 +49,18 @@ hierarchies. Hierarchy Builder (hereafter, \hb) is an extension of the
 structures~\cite{cohen2020fscd}. \mathcomptwo{}~\cite{mathcomp2} is the result of the
 port of \mathcomp{} to \hb{}~\cite{mathcomp2021coq}.
 
-The goal of this document is to explain how to port \mathcomp{}
-developments to \mathcomptwo.  It has been written by the participants
-of the \mathcomp{} Documentation Sprint that happened from
-[2023-05-03] to [2023-05-10].
+This document is a technical report whose goal is to explain how to
+port \mathcomp{} developments to \mathcomptwo.  It has been written by
+the participants of the \mathcomp{} Documentation Sprint that happened
+from [2023-05-03] to [2023-05-10].
+\end{abstract}
 
 \tableofcontents
 
-\section{Target Audience}
+\section{Target Audience of this Document}
 
-Based on the observation of several developments, we can distinguish
-three categories of users of \mathcomp:
+Based on our experience porting several developments to \mathcomptwo,
+we can distinguish three categories of users:
 \begin{enumerate}
 \item \mathcomp{} users who have not been using the \coqin{Canonical}
   command should not see much difference compared to the past version
@@ -62,9 +74,9 @@ three categories of users of \mathcomp:
   explicit patterns. Typically, it might happen that rewriting with
   associativity lemmas requires the user to indicate whether it is
   supposed to happen on the left or the right-hand side of an
-  equality, so that \coqin{rewrite addrA} might need to be rewritten
-  \coqin{rewrite [in LHS]addrA}. See Sect.~\ref{sec:other} for a
-  concrete example.
+  equivalence relation, so that \coqin{rewrite addrA} might need to be
+  rewritten \coqin{rewrite [in LHS]addrA} for example. See
+  Sect.~\ref{sec:other} for a concrete example.
   %
   For such users, reading this tutorial through the end might not be
   necessary.
@@ -72,7 +84,7 @@ three categories of users of \mathcomp:
   instantiating structures using the \coqin{Canonical} command.
 \item As for the few users who have been developing their own
   hierarchies of structures, this tutorial might be of little help and
-  they need to refer to:
+  they rather need to refer to:
   \begin{itemize}
   \item the original paper for an extensive introduction to \hb{} commands~\cite{cohen2020fscd},
   \item the \hb{} development for documentation and examples~\cite{hb}
@@ -87,10 +99,11 @@ three categories of users of \mathcomp:
 
 For the sake of concreteness, we illustrate the port of
 \compdecmodal~\cite{compdecmodal} in Sect.~\ref{sec:compdecmodal}.
-Before that we review basic usage of \hb{} in Sect.~\ref{sec:reminder}
-and review the documentation tools available for porting in Sect.~\ref{sec:explore}.
+Before that we review the basics of \hb{} in Sect.~\ref{sec:reminder}
+and review the documentation tools available for porting in
+Sect.~\ref{sec:explore}.
 
-\section{Quick Reminder About the \hb{} Vocabulary}
+\section{Quick Reminder about the \hb{} Vocabulary}
 \label{sec:reminder}
 
 The goal of this section is to briefly explain the three main commands
@@ -98,10 +111,9 @@ introduced by \hb: \coqin{HB.mixin}, \coqin{HB.structure}, and
 \coqin{HB.instance}. The knowledgeable reader can safely skip this
 section.
 
-Let us explain in a generic way the most basic scenario.
-Here is the pattern to declare a structure \coqin{Struct} that sits
-sit at the bottom of a hierarchy.  The interface of the structure goes
-into a mixin:
+Let us consider the most basic scenario in generic terms.  Here is the
+pattern to declare a structure \coqin{Struct} that sits at the bottom
+of a hierarchy.  The interface of the structure goes into a mixin:
 \begin{minted}{ssr}
 HB.mixin Record isStruct params carrier := {
   ... properties about the carrier ...
@@ -113,7 +125,7 @@ The structure itself is declared like a sigma-type:
 #[short(type=structType)]
 HB.structure Definition Struct := {carrier of isStruct carrier}
 \end{minted}
-\hb{} is using \coq{} attributes to declare the type corresponding to a structure.
+Note that \hb{} is using \coq{} attributes to declare the type corresponding to a structure.
 
 Here is the pattern to declare a new structure \coqin{NewStruct} that
 extends the existing structure \coqin{Struct}; note the \coqin{of} syntax.
@@ -159,9 +171,9 @@ The absence of this output often indicates failure of the
 The following pieces of documentation are useful during the process of
 porting a \mathcomp{} application to \mathcomptwo:
 \begin{itemize}
-\item The changelog is the primary source of information. See \coqin{CHANGELOG.md}.
-\item Additionally, structures are documented in the headers of the
-  source code according to the following format:
+\item The changelog is the primary source of information. See \coqin{CHANGELOG.md}~\cite{mathcomp2}.
+\item Additionally, structures are documented in the headers of \coq{} scripts
+  according to the following format:
 \begin{minted}{text}
 (*****************************************************************************)
 (*                             Centered Title                                *)
@@ -191,12 +203,12 @@ See this
   entry} for more information about the documentation of scripts.
 \item Optionally, the user can double-check the naming of identifiers
   and lemmas with the naming conventions explained in
-  \coqin{CONTRIBUTING.md}.
+  \coqin{CONTRIBUTING.md}~\cite{mathcomp2}.
 \end{itemize}
 
 \subsection{\hb{} Commands Useful to Explore an Existing Hierarchy}
 
-Besides the changelog and the headers of source code, the user can use
+Besides the changelog and the headers of \coq{} scripts, the user can use
 \hb{} commands to explore a hierarchy of mathematical structures.
 
 \subsubsection{Information about Structures with \coqin{HB.about}}
@@ -218,7 +230,7 @@ HB: eqtype.Equality is inherited by:
     - choice.Choice
 ...
 \end{minted}
-(The output message refers to a \newterm{factoriy}: this is a
+(The output message refers to a \newterm{factory}: this is a
 generalization of mixin.)
 
 \paragraph{Graph of an \hb{} Hierarchy}
@@ -245,7 +257,7 @@ vicinity of \coqin{eqType}.
 \subsubsection{Information about Constructors with \coqin{HB.howto} and \coqin{HB.about}}
 \label{sec:info_constructors}
 
-To discover constructors to build a structure, one can use the command
+To discover constructors that build a structure, one can use the command
 \coqin{HB.howto}. For instance
 \begin{minted}{ssr}
 > HB.howto eqType.
@@ -282,14 +294,16 @@ or
 \begin{minted}{ssr}
 HB.instance Definition _ := @hasDecEq.Build T eq_op proof_of_Equality_axiom.
 \end{minted}
-which should output a few lines among which (recall that the absence of this output
-often indicate an instantiation problem)\footnote{Beware that at the time of this writing the output may not be visible
-by default with vscoq.}:
+which should output a few lines among which (recall that the absence
+of this output often indicate an instantiation problem)\footnote{We
+  have also observed at the time of this writing that the output of
+  the \coqin{HB.instance} command may not be visible by default with
+  VSCoq.}:
 \begin{minted}{text}
 module_T__canonical__eqtype_Equality is defined
 \end{minted}
 
-\paragraph{Discover Aliases and feather factories}
+\paragraph{Discover Aliases and Feather Factories}
 
 In addition to the structures and constructors listed by \coqin{HB.about}, the
 library defines some aliases (a.k.a.\ feather factories). These aliases
@@ -302,7 +316,7 @@ HB.instance Definition _ := Equality.copy T (inj_type injf).
 \end{minted}
 See \coqin{eqType.v} for \coqin{inj_type}.
 
-\subsubsection{Information about instances with \coqin{HB.about}}
+\subsubsection{Information about Instances with \coqin{HB.about}}
 
 Instances a type is already equipped with can be listed with
 \coqin{HB.about}, for instance:
@@ -315,15 +329,14 @@ HB: bool is canonically equipped with structures:
       (from "./ssreflect/order.v", line 6064)
 ...
 \end{minted}
-
 lists all the structures \coqin{bool} is already equipped with.
 
-\section{Porting a \mathcomp{}Development to \mathcomptwo}
+\section{Porting a \mathcomp{} Development to \mathcomptwo}
 \label{sec:compdecmodal}
 
 The basic strategy to port an existing \mathcomp{} development to
-\mathcomptwo{} is to (1)~install \mathcomptwo, (2)~compile the existing source
-code, and (3)~fix the errors one after the other.
+\mathcomptwo{} is to (1)~install \mathcomptwo, (2)~compile the existing \coq{}
+scripts, and (3)~fix the errors one after the other.
 %
 For the sake of concreteness, we explain the port of
 \compdecmodal~\cite{compdecmodal}. This is a development with a
@@ -335,7 +348,7 @@ In the following, the offending commands appear in a gray areas
 \begin{minted}[bgcolor=lightgray]{text}
 command incompatible with MathComp 2
 \end{minted}
-and their fixes are single famed:
+and their fixes are singly famed:
 \begin{minted}[frame=single]{text}
 MathComp 2 fix for the command above
 \end{minted}
@@ -460,6 +473,22 @@ fset_fset_type__canonical__choice_SubCountable is defined
 Note that, although \hb{} does provide an \mintinline{ssr}{#[hnf]} attribute, it
 should not be necessary in general.
 
+Finally, the last \coqin{Canonical} command causes a deprecation
+warning that needs to be addressed:
+\begin{failure}
+> Canonical Structure fset_subCountType (T : countType) :=
+>  Eval hnf in [subCountType of fset_type T].
+Warning: Notation "[ subCountType of _ ]" is deprecated since mathcomp 2.0.0.
+Use SubCountable.clone instead.
+[deprecated-notation,deprecated]
+fset_subCountType is defined  
+\end{failure}
+In fact, going back one step, it can be observed by the output the
+\coqin{HB.instance} commands that the instantiation of the
+\coqin{Countable} structure already triggered the instantiation of the
+\coqin{SubCountable} structure, rendering the last \coqin{Canonical}
+command harmful. It therefore needs to be deleted.
+
 To sum up, here follows the complete fix:
 \begin{minted}[frame=single,numbers=left,escapeinside=??]{ssr}
 Section FinSets.
@@ -472,28 +501,14 @@ Section FinSets.
 End FinSets.
 
 HB.instance Definition _ (T : countType) := [Countable of fset_type T by <:]. ?\label{line:countttype}?
-Canonical Structure fset_subCountType (T : countType) := ?\label{line:subcounttype}?
-  Eval hnf in [subCountType of fset_type T].
 \end{minted}
 
-In fact, we can go one step further. The instantiation of the
-countable structure at line~\ref{line:countttype} shows the
-subcountable structure has been generated automatically by \hb,
-rendering the command at line~\ref{line:subcounttype} useless, as was
-suggest by the deprecation warning:
-\begin{minted}{ssr}
-> Canonical Structure fset_subCountType (T : countType) :=
->  Eval hnf in [subCountType of fset_type T].
-Warning: Notation "[ subCountType of _ ]" is deprecated since mathcomp 2.0.0.
-Use SubCountable.clone instead.
-[deprecated-notation,deprecated]
-fset_subCountType is defined
-\end{minted}
-Moreover, instead of instantiating the \coqin{Equality} structure at
-line~\ref{line:eqtype} and then the \coqin{Choice} structure at
-line~\ref{line:choicetype}, one can start by instantiating the
-\coqin{Choice} structure and get the \coqin{Equality} structure
-automatically, so that a better fix would be:
+In fact, we can go one step further. Instead of instantiating the
+\coqin{Equality} structure at line~\ref{line:eqtype} and then the
+\coqin{Choice} structure at line~\ref{line:choicetype}, one can start
+by instantiating the \coqin{Choice} structure and get the
+\coqin{Equality} structure automatically, so that a shorter fix would
+be:
 \begin{success}
 Section FinSets.
  Variable T : choiceType.
@@ -662,7 +677,7 @@ along with the \coqin{Countable} instance.
 
 \paragraph{More Instantiations of \coqin{Equality} Structures}
 
-The next compilation errors in the files \coqin{Kstar_def.v}, \coqin{gen_def.v}
+The next compilation errors in the files \coqin{Kstar_def.v}, \coqin{gen_def.v},
 and \coqin{CTL_def.v} are handled as already explained above.
 
 \paragraph{Failing Rewriting}
@@ -686,13 +701,24 @@ This kind of slow down is however rather exceptional.
 
 There are a few more compilation errors but they are similar to the ones we explained so far.
 
-\subsection{Conclusion of the Port of \compdecmodal}
+\section{Conclusion}
 
-The result of porting \compdecmodal{} can be found
-\href{https://github.com/affeldt-aist/comp-dec-modal/tree/tutorial_mathcomp2}{online}.
-It required the edition of 10 files, 35 insertions, and 67 deletions,
-which represents a moderate amount of work for an improvement in terms
-of readability and for future extensions.
+This document illustrated the port of a typical \mathcomp{}
+development to \mathcomptwo. We reviewed the available tools
+(documentation and \hb{} tactics) and went through a number of
+concrete sample errors and warnings that we explained and corrected.
+
+The example of porting \compdecmodal{} demonstrated that the use of
+\hb{} improves the \coq{} scripts in terms of readability and even
+allows for improvements. The complete fix can be found
+\href{https://github.com/affeldt-aist/comp-dec-modal/tree/tutorial_mathcomp2}{online},
+it required the edition of 10 files, 35 insertions, and 67 deletions,
+which arguably represents a moderate amount of work.
+
+The migration process to \mathcomptwo{} will surely generate more
+questions that the community is ready to answer via the math-comp
+streams on \url{https://coq.zulipchat.com}.
+
 
 \bibliographystyle{abbrv}
 \bibliography{porting}
