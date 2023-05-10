@@ -12,7 +12,7 @@ install: [ make "-C" "mathcomp/field" "install" ]
 depends: [ "coq-mathcomp-solvable" { = version } ]
 
 tags: [ "keyword:algebra" "keyword:field" "keyword:small scale reflection" "keyword:mathematical components" "keyword:odd order theorem" "logpath:mathcomp.field" ]
-authors: [ "Jeremy Avigad <>" "Andrea Asperti <>" "Stephane Le Roux <>" "Yves Bertot <>" "Laurence Rideau <>" "Enrico Tassi <>" "Ioana Pasca <>" "Georges Gonthier <>" "Sidi Ould Biha <>" "Cyril Cohen <>" "Francois Garillot <>" "Alexey Solovyev <>" "Russell O'Connor <>" "Laurent Théry <>" "Assia Mahboubi <>" ]
+authors: [ "The Mathematical Components team" ]
 
 synopsis: "Mathematical Components Library on Fields"
 description:"""
