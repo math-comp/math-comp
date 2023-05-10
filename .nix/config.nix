@@ -46,7 +46,7 @@ with builtins; with (import <nixpkgs> {}).lib;
          mathcomp-doc.job = true;
        };
   in {
-    "coq-master".push-branches = [ "master" "hierarchy-builder" ];
+    "coq-master".push-branches = [ "mathcomp-1" "master" ];
     "coq-master".coqPackages = common-bundles // {
       coq.override.version = "master";
       bignums.override.version = "master";
@@ -54,7 +54,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq-elpi.override.version = "coq-master";
       hierarchy-builder.override.version = "coq-master";
     };
-    "coq-8.17".push-branches = [ "master" "hierarchy-builder" ];
+    "coq-8.17".push-branches = [ "mathcomp-1" "master" ];
     "coq-8.17".coqPackages = common-bundles // {
       coq.override.version = "8.17";
       coqeal.job = false;
@@ -62,7 +62,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       mathcomp-analysis.job = false;
       graph-theory.job = false;
     };
-    "coq-8.16".push-branches = [ "master" "hierarchy-builder" ];
+    "coq-8.16".push-branches = [ "mathcomp-1" "master" ];
     "coq-8.16".coqPackages = common-bundles // {
       coq.override.version = "8.16";
     };
