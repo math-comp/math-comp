@@ -236,8 +236,8 @@ ci-fourcolor-dev:
 .ci-odd-order:
   extends: .ci
   variables:
-    CONTRIB_URL: "https://github.com/math-comp/odd-order.git"
-    CONTRIB_VERSION: master
+    CONTRIB_URL: "https://github.com/proux01/odd-order.git"
+    CONTRIB_VERSION: hierarchy-builder
   script:
     - make -j "${NJOBS}"
     - make install
@@ -282,8 +282,8 @@ ci-bigenough-dev:
 .ci-real-closed:
   extends: .ci
   variables:
-    CONTRIB_URL: "https://github.com/math-comp/real-closed.git"
-    CONTRIB_VERSION: master
+    CONTRIB_URL: "https://github.com/proux01/real-closed.git"
+    CONTRIB_VERSION: hierarchy-builder
   script:
     - opam pin add -n -k path coq-mathcomp-real-closed .
     - opam install -y -v -j "${NJOBS}" --deps-only coq-mathcomp-real-closed
@@ -298,8 +298,8 @@ ci-real-closed-dev:
 .ci-finmap:
   extends: .ci
   variables:
-    CONTRIB_URL: "https://github.com/math-comp/finmap.git"
-    CONTRIB_VERSION: master
+    CONTRIB_URL: "https://github.com/proux01/finmap.git"
+    CONTRIB_VERSION: hierarchy-builder
   script:
     - opam pin add -n -k path coq-mathcomp-finmap .
     - opam install -y -v -j "${NJOBS}" --deps-only coq-mathcomp-finmap
@@ -314,8 +314,8 @@ ci-finmap-dev:
 .ci-multinomials:
   extends: .ci
   variables:
-    CONTRIB_URL: "https://github.com/math-comp/multinomials.git"
-    CONTRIB_VERSION: master
+    CONTRIB_URL: "https://github.com/proux01/multinomials.git"
+    CONTRIB_VERSION: hierarchy-builder
   script:
     - opam pin add -n -k path coq-mathcomp-multinomials .
     - opam install -y -v -j "${NJOBS}" --deps-only coq-mathcomp-multinomials
@@ -337,15 +337,15 @@ ci-multinomials-dev:
     - opam install -y -v -j "${NJOBS}" --deps-only coq-mathcomp-analysis
     - opam install -y -v -j "${NJOBS}" coq-mathcomp-analysis
 
-ci-analysis-8.14:
+ci-analysis-8.15:
   extends: .ci-analysis
   variables:
-    COQ_VERSION: "8.14"
+    COQ_VERSION: "8.15"
 
-ci-analysis-dev:
+ci-analysis-8.16:
   extends: .ci-analysis
   variables:
-    COQ_VERSION: "dev"
+    COQ_VERSION: "8.16"
 
 # The FCSL-PCM library
 .ci-fcsl-pcm:

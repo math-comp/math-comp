@@ -314,9 +314,10 @@ by rewrite inE /= Zx groupV (subsetP sgzZZ) ?mem_morphim.
 Qed.
 
 Fact cprod_by_key : unit. Proof. by []. Qed.
-Definition cprod_by_def := subFinGroupType [group of setX H K / kerHK].
+Definition cprod_by_def : finGroupType := subg_of (setX H K / kerHK).
 Definition cprod_by := locked_with cprod_by_key cprod_by_def.
-Local Notation C := [set: FinGroup.arg_sort (FinGroup.base cprod_by)].
+Local Notation C := [set: FinGroup.sort cprod_by].
+(*FIXME : Check if we need arg_sort instead of sort*)
 
 Definition in_cprod : gTH * gTK -> cprod_by :=
   let: tt as k := cprod_by_key return _ -> locked_with k cprod_by_def in
@@ -608,7 +609,7 @@ Variables (gT : finGroupType) (G : {group gT}).
 
 Fixpoint ncprod_def n : finGroupType :=
   if n is n'.+1 then xcprod G [set: ncprod_def n']
-  else [finGroupType of subg_of 'Z(G)].
+  else subg_of 'Z(G).
 Fact ncprod_key : unit. Proof. by []. Qed.
 Definition ncprod := locked_with ncprod_key ncprod_def.
 
@@ -650,5 +651,3 @@ by case: ncprodS => gz isoZ; apply: Aut_cprod_by_full.
 Qed.
 
 End IterCprod.
-
-

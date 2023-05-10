@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
 From mathcomp Require Import fintype tuple finfun bigop fingroup perm div.
 From mathcomp Require Import ssralg zmodp matrix mxalgebra.
@@ -77,7 +78,9 @@ Proof. by rewrite swapXY_polyC map_polyX. Qed.
 
 Lemma swapXY_is_additive : additive swapXY.
 Proof. by move=> u v; rewrite unlock rmorphB !hornerE. Qed.
-Canonical swapXY_addf := Additive swapXY_is_additive.
+HB.instance Definition _ :=
+  GRing.isAdditive.Build {poly {poly R}} {poly {poly R}} swapXY
+    swapXY_is_additive.
 
 Lemma coef_swapXY u i j : (swapXY u)`_i`_j = u`_j`_i.
 Proof.
@@ -104,12 +107,15 @@ rewrite (eq_bigr _ (fun _ _ => coefM _ _ _)) exchange_big /=.
 apply: eq_bigr => j1 _; rewrite coefM; apply: eq_bigr=> i1 _.
 by rewrite !coef_swapXY.
 Qed.
-Canonical swapXY_rmorphism := AddRMorphism swapXY_is_multiplicative.
+HB.instance Definition _ :=
+  GRing.isMultiplicative.Build {poly {poly R}} {poly {poly R}} swapXY
+    swapXY_is_multiplicative.
 
 Lemma swapXY_is_scalable : scalable_for (map_poly polyC \; *%R) swapXY.
 Proof. by move=> p u /=; rewrite -mul_polyC rmorphM /= swapXY_polyC. Qed.
-Canonical swapXY_linear := AddLinear swapXY_is_scalable.
-Canonical swapXY_lrmorphism := [lrmorphism of swapXY].
+HB.instance Definition _ :=
+  GRing.isScalable.Build {poly R} {poly {poly R}} {poly {poly R}}
+    (map_poly polyC \; *%R) swapXY swapXY_is_scalable.
 
 Lemma swapXY_comp_poly p u : swapXY (p^:P \Po u) = p^:P \Po swapXY u.
 Proof.
@@ -322,7 +328,8 @@ have /factorX[|v2 nz_v2 Dv1]: root (swapXY v1) 0; rewrite ?swapXY_eq0 //.
 rewrite ltnS (canRL swapXYK Dv1) -sizeYE sizeY_mulX sizeYE in ltvn.
 have [p1 nz_p1 Dp] := factorX _ _ nz_p p0_0.
 apply: IHn nz_u _ _ nz_p1 ltvn; first by rewrite swapXY_eq0.
-apply: (@mulIf _ ('X * 'Y)); first by rewrite mulf_neq0 ?polyC_eq0 ?nzX.
+have: 'X * 'Y != 0 :> {poly {poly R}} by rewrite mulf_neq0 ?polyC_eq0 ?nzX.
+move/mulIf; apply.
 rewrite -scalerAl mulrA mulrAC -{1}swapXY_X -rmorphM /= -Dv1 swapXYK -Dv Dvu.
 by rewrite /poly_XmY Dp rmorphM /= map_polyX comp_polyM comp_polyX mulrA.
 Qed.
@@ -333,7 +340,7 @@ Section PolyXY_Field.
 
 Variables (F E : fieldType) (FtoE : {rmorphism F -> E}).
 
-Local Notation pFtoE := (map_poly (GRing.RMorphism.apply FtoE)).
+Local Notation pFtoE := (map_poly (GRing.RMorphism.sort FtoE)).
 
 Lemma div_annihilantP (p q : {poly E}) (x y : E) :
     p != 0 -> q != 0 -> y != 0 -> p.[x] = 0 -> q.[y] = 0 ->

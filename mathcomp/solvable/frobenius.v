@@ -91,7 +91,7 @@ Definition Frobenius_action :=
 End FrobeniusAction.
 
 Variant has_Frobenius_action G H : Prop :=
-  HasFrobeniusAction sT S to of @Frobenius_action G H sT S to.
+  hasFrobeniusAction sT S to of @Frobenius_action G H sT S to.
 
 End Definitions.
 
@@ -298,7 +298,7 @@ Lemma Frobenius_actionP G H :
 Proof.
 apply: (iffP andP) => [[neqHG] | [sT S to [ffulG transG regG ntH [u Su defH]]]].
   case/normedTI_P=> nzH /subsetIP[sHG _] tiHG.
-  suffices: Frobenius_action G H (rcosets H G) 'Rs by apply: HasFrobeniusAction.
+  suffices: Frobenius_action G H (rcosets H G) 'Rs by apply: hasFrobeniusAction.
   pose Hfix x := 'Fix_(rcosets H G | 'Rs)[x].
   have regG: {in G^#, forall x, #|Hfix x| <= 1}.
     move=> x /setD1P[ntx Gx].
@@ -596,7 +596,7 @@ Proof.
 move=> defG FrobG.
 have partG: partition (gval K |: (H^# :^: K)) G.
   apply: Frobenius_partition; apply/andP; rewrite defG; split=> //.
-  by apply/Frobenius_actionP; apply: HasFrobeniusAction FrobG.
+  by apply/Frobenius_actionP; apply: hasFrobeniusAction FrobG.
 have{FrobG} [ffulG transG regG ntH [u Su defH]]:= FrobG.
 apply/setP=> x /[!inE]; have [-> | ntx] := eqVneq; first exact: group1.
 rewrite /= -(cover_partition partG) /cover.

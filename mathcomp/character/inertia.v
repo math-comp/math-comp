@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
 From mathcomp Require Import choice fintype div tuple finfun bigop prime order.
 From mathcomp Require Import ssralg ssrnum finset fingroup morphism perm.
@@ -116,8 +117,8 @@ Proof. by rewrite cfunElock conj1g if_same. Qed.
 
 Fact cfConjg_is_linear y : linear (cfConjg y : 'CF(G) -> 'CF(G)).
 Proof. by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock. Qed.
-Canonical cfConjg_additive y := Additive (cfConjg_is_linear y).
-Canonical cfConjg_linear y := AddLinear (cfConjg_is_linear y).
+HB.instance Definition _ y :=GRing.isLinear.Build _ _ _ _ (cfConjg y)
+  (cfConjg_is_linear y).
 
 Lemma cfConjg_cfuniJ A y : y \in 'N(G) -> ('1_A ^ y)%CF = '1_(A :^ y) :> 'CF(G).
 Proof.
@@ -140,8 +141,8 @@ Proof.
 split=> [phi psi|]; last exact: cfConjg_cfun1.
 by apply/cfunP=> x; rewrite !cfunElock.
 Qed.
-Canonical cfConjg_rmorphism y := AddRMorphism (cfConjg_is_multiplicative y).
-Canonical cfConjg_lrmorphism y := [lrmorphism of cfConjg y].
+HB.instance Definition _ y := GRing.isMultiplicative.Build _ _ (cfConjg y)
+  (cfConjg_is_multiplicative y).
 
 Lemma cfConjg_eq1 phi y : ((phi ^ y)%CF == 1) = (phi == 1).
 Proof. by apply: rmorph_eq1; apply: can_inj (cfConjgK y). Qed.
@@ -348,7 +349,7 @@ Qed.
 
 Lemma cfConjg_lin_char (chi : 'CF(H)) y :
   chi \is a linear_char -> (chi ^ y)%CF \is a linear_char.
-Proof. by case/andP=> Nchi chi1; rewrite qualifE cfConjg1 cfConjg_char. Qed.
+Proof. by case/andP=> Nchi chi1; rewrite qualifE/= cfConjg1 cfConjg_char. Qed.
 
 Lemma cfConjg_irr y chi : chi \in irr H -> (chi ^ y)%CF \in irr H.
 Proof. by rewrite !irrEchar cfConjg_iso => /andP[/cfConjg_char->]. Qed.
@@ -1196,7 +1197,7 @@ apply/bigcapP=> y /(subsetP IGtheta)/setIdP[nKy /eqP th_y].
 apply: contraR nz_th_x; rewrite mem_conjg -{}th_y cfConjgE {nKy}//.
 move: {x y}(x ^ _) => x U'x; have [Kx | /cfun0-> //] := boolP (x \in K).
 have /eqP := congr1 (fun k => (('chi_j %% L)%CF^-1 * 'chi_k) x) eq_mm_ij.
-rewrite -rmorphV // !mmLthE !mulrA -!rmorphM mulVr //= rmorph1 !cfunE.
+rewrite -rmorphV // !mmLthE !mulrA -!rmorphM mulVr // rmorph1 !cfunE.
 rewrite (mulrC _^-1) -/mu -subr_eq0 -mulrBl cfun1E Kx mulf_eq0 => /orP[]//.
 rewrite mulrb subr_eq0 -(lin_char1 lin_mu) [_ == _](contraNF _ U'x) //.
 by rewrite /U cfkerEchar ?lin_charW // inE Kx.
@@ -1298,7 +1299,7 @@ have /codomP[s2 Dc2]: c2 \in codom (@mul_mod_Iirr G N c).
 have{} Dc2: 'chi_c2 = ('chi_s2 %% N)%CF * 'chi_c.
   by rewrite Dc2 cfIirrE // mod_IirrE.
 have s2_lin: 'chi_s2 \is a linear_char.
-  rewrite qualifE irr_char; apply/eqP/(mulIf (irr1_neq0 c)).
+  rewrite qualifE/= irr_char; apply/eqP/(mulIf (irr1_neq0 c)).
   rewrite mul1r -[in RHS](cfRes1 N) chiN -c2Nth cfRes1.
   by rewrite Dc2 cfunE cfMod1.
 have s2Xf_1: 'chi_s2 ^+ f = 1.
@@ -1329,7 +1330,7 @@ have [G0 maxG0 sNG0]: {G0 | maxnormal (gval G0) G G & N \subset G0}.
   by apply: maxgroup_exists; rewrite properEneq ltNG sNG.
 have [/andP[ltG0G nG0G] maxG0_P] := maxgroupP maxG0.
 set mu := 'chi_u in uNdth; have lin_mu: mu \is a linear_char.
-  by rewrite qualifE irr_char -(cfRes1 N) uNdth /= lin_char1 ?cfDet_lin_char.
+  by rewrite qualifE/= irr_char -(cfRes1 N) uNdth /= lin_char1 ?cfDet_lin_char.
 have sG0G := proper_sub ltG0G; have nsNG0 := normalS sNG0 sG0G nsNG.
 have nsG0G: G0 <| G by apply/andP.
 have /lin_char_irr/irrP[u0 Du0] := cfRes_lin_char G0 lin_mu.
@@ -1494,7 +1495,7 @@ have co_e_mu_t: coprime e #[(mu / 'chi_t)%R]%CF.
   suffices dv_o_mu_t: #[(mu / 'chi_t)%R]%CF %| 'o(mu)%CF * 'o('chi_t)%CF.
     by rewrite (coprime_dvdr dv_o_mu_t) // coprimeMr o_mu co_e_lam.
   rewrite !cfDet_order_lin //; apply/dvdn_cforderP=> x Gx.
-  rewrite invr_lin_char // !cfunE exprMn -rmorphXn {2}mulnC.
+  rewrite invr_lin_char // !cfunE exprMn -rmorphXn {2}mulnC /=.
   by rewrite !(dvdn_cforderP _) ?conjC1 ?mulr1 // dvdn_mulr.
 have /eqP mu_t_1: mu / 'chi_t == 1.
   rewrite -(dvdn_cforder (_ / _)%R 1) -(eqnP co_e_mu_t) dvdn_gcd dvdnn andbT.

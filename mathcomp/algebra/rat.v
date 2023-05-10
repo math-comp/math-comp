@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop order ssralg countalg div ssrnum.
 From mathcomp Require Import ssrint prime.
@@ -47,14 +48,10 @@ Delimit Scope rat_scope with Q.
 Definition ratz (n : int) := @Rat (n, 1) (coprimen1 _).
 (* Coercion ratz (n : int) := @Rat (n, 1) (coprimen1 _). *)
 
-Canonical rat_subType := Eval hnf in [subType for valq].
-Definition rat_eqMixin := [eqMixin of rat by <:].
-Canonical rat_eqType := EqType rat rat_eqMixin.
-Definition rat_choiceMixin := [choiceMixin of rat by <:].
-Canonical rat_choiceType := ChoiceType rat rat_choiceMixin.
-Definition rat_countMixin := [countMixin of rat by <:].
-Canonical rat_countType := CountType rat rat_countMixin.
-Canonical rat_subCountType := [subCountType of rat].
+Definition rat_isSub := Eval hnf in [isSub for valq].
+HB.instance Definition _ := rat_isSub.
+#[hnf] HB.instance Definition _ := [Equality of rat by <:].
+HB.instance Definition _ := [Countable of rat by <:].
 
 Definition numq x := nosimpl ((valq x).1).
 Definition denq x := nosimpl ((valq x).2).
@@ -429,8 +426,7 @@ rewrite !addq_subdefE /oppq_subdef //= mulNr addNr; apply/eqP.
 by rewrite fracq_eq ?mulf_neq0 ?denq_neq0 //= !mul0r.
 Qed.
 
-Definition rat_ZmodMixin := ZmodMixin addqA addqC add0q addNq.
-Canonical rat_ZmodType := ZmodType rat rat_ZmodMixin.
+HB.instance Definition _ := GRing.isZmodule.Build rat addqA addqC add0q addNq.
 
 Definition mulq_subdef (x y : int * int) :=
   let: (x1, x2) := x in
@@ -501,10 +497,8 @@ Qed.
 
 Fact nonzero1q : oneq != zeroq. Proof. by []. Qed.
 
-Definition rat_comRingMixin :=
-  ComRingMixin mulqA mulqC mul1q mulq_addl nonzero1q.
-Canonical rat_Ring := Eval hnf in RingType rat rat_comRingMixin.
-Canonical rat_comRing := Eval hnf in ComRingType rat mulqC.
+HB.instance Definition _ :=
+  GRing.Zmodule_isComRing.Build rat mulqA mulqC mul1q mulq_addl nonzero1q.
 
 Fact mulVq x : x != 0 -> mulq (invq x) x = 1.
 Proof.
@@ -515,25 +509,7 @@ Qed.
 
 Fact invq0 : invq 0 = 0. Proof. exact/eqP. Qed.
 
-Definition RatFieldUnitMixin := FieldUnitMixin mulVq invq0.
-Canonical rat_unitRing :=
-  Eval hnf in UnitRingType rat RatFieldUnitMixin.
-Canonical rat_comUnitRing := Eval hnf in [comUnitRingType of rat].
-
-Fact rat_field_axiom : GRing.Field.mixin_of rat_unitRing. Proof. exact. Qed.
-
-Definition RatFieldIdomainMixin := (FieldIdomainMixin rat_field_axiom).
-Canonical rat_idomainType :=
-  Eval hnf in IdomainType rat (FieldIdomainMixin rat_field_axiom).
-Canonical rat_fieldType := FieldType rat rat_field_axiom.
-
-Canonical rat_countZmodType := [countZmodType of rat].
-Canonical rat_countRingType := [countRingType of rat].
-Canonical rat_countComRingType := [countComRingType of rat].
-Canonical rat_countUnitRingType := [countUnitRingType of rat].
-Canonical rat_countComUnitRingType := [countComUnitRingType of rat].
-Canonical rat_countIdomainType := [countIdomainType of rat].
-Canonical rat_countFieldType := [countFieldType of rat].
+HB.instance Definition _ := GRing.ComRing_isField.Build rat mulVq invq0.
 
 Lemma numq_eq0 x : (numq x == 0) = (x == 0).
 Proof.
@@ -758,19 +734,9 @@ Qed.
 Fact lt_rat_def x y : (lt_rat x y) = (y != x) && (le_rat x y).
 Proof. by rewrite lt_ratE le_ratE lt_def rat_eq. Qed.
 
-Definition ratLeMixin : realLeMixin rat_idomainType :=
-  RealLeMixin le_rat0D le_rat0M le_rat0_anti subq_ge0
-              (@le_rat_total 0) norm_ratN ge_rat0_norm lt_rat_def.
-
-Canonical rat_porderType := POrderType ring_display rat ratLeMixin.
-Canonical rat_latticeType := LatticeType rat ratLeMixin.
-Canonical rat_distrLatticeType := DistrLatticeType rat ratLeMixin.
-Canonical rat_orderType := OrderType rat le_rat_total.
-Canonical rat_numDomainType := NumDomainType rat ratLeMixin.
-Canonical rat_normedZmodType := NormedZmodType rat rat ratLeMixin.
-Canonical rat_numFieldType := [numFieldType of rat].
-Canonical rat_realDomainType := [realDomainType of rat].
-Canonical rat_realFieldType := [realFieldType of rat].
+HB.instance Definition _ :=
+   Num.IntegralDomain_isLeReal.Build rat le_rat0D le_rat0M le_rat0_anti
+     subq_ge0 (@le_rat_total 0) norm_ratN ge_rat0_norm lt_rat_def.
 
 Lemma numq_ge0 x : (0 <= numq x) = (0 <= x).
 Proof.
@@ -798,20 +764,21 @@ Proof. by case: b; rewrite ?(mul1r, mulN1r) // denqN. Qed.
 Lemma denq_norm x : denq `|x| = denq x.
 Proof. by rewrite normrEsign denq_mulr_sign. Qed.
 
-Fact rat_archimedean : Num.archimedean_axiom [numDomainType of rat].
+Fact rat_archimedean : Num.archimedean_axiom rat.
 Proof.
 move=> x; exists `|numq x|.+1; rewrite mulrS ltr_pwDl //.
 rewrite pmulrn abszE intr_norm numqE normrM ler_peMr //.
 by rewrite -intr_norm ler1n absz_gt0 denq_eq0.
 Qed.
 
-Canonical archiType := ArchiFieldType rat rat_archimedean.
+HB.instance Definition _ :=
+  Num.RealField_isArchimedean.Build rat rat_archimedean.
 
 Section QintPred.
 
-Definition Qint := [qualify a x : rat | denq x == 1].
-Fact Qint_key : pred_key Qint. Proof. by []. Qed.
-Canonical Qint_keyed := KeyedQualifier Qint_key.
+Definition Qint_pred := fun x : rat => denq x == 1.
+Arguments Qint_pred _ /.
+Definition Qint := [qualify a x : rat | Qint_pred x].
 
 Lemma Qint_def x : (x \is a Qint) = (denq x == 1). Proof. by []. Qed.
 
@@ -831,21 +798,17 @@ split=> // _ _ /QintP[x ->] /QintP[y ->]; apply/QintP.
 by exists (x * y); rewrite -rmorphM.
 Qed.
 
-Canonical Qint_opprPred := OpprPred Qint_subring_closed.
-Canonical Qint_addrPred := AddrPred Qint_subring_closed.
-Canonical Qint_mulrPred := MulrPred Qint_subring_closed.
-Canonical Qint_zmodPred := ZmodPred Qint_subring_closed.
-Canonical Qint_semiringPred := SemiringPred Qint_subring_closed.
-Canonical Qint_smulrPred := SmulrPred Qint_subring_closed.
-Canonical Qint_subringPred := SubringPred Qint_subring_closed.
+HB.instance Definition _ := GRing.isSubringClosed.Build rat Qint_pred
+  Qint_subring_closed.
 
 End QintPred.
+Arguments Qint_pred _ /.
 
 Section QnatPred.
 
-Definition Qnat := [qualify a x : rat | (x \is a Qint) && (0 <= x)].
-Fact Qnat_key : pred_key Qnat. Proof. by []. Qed.
-Canonical Qnat_keyed := KeyedQualifier Qnat_key.
+Definition Qnat_pred := fun x : rat => (x \is a Qint) && (0 <= x).
+Arguments Qnat_pred _ /.
+Definition Qnat := [qualify a x | Qnat_pred x].
 
 Lemma Qnat_def x : (x \is a Qnat) = (x \is a Qint) && (0 <= x).
 Proof. by []. Qed.
@@ -864,11 +827,11 @@ do 2?split; move=> // x y; rewrite !Qnat_def => /andP[xQ hx] /andP[yQ hy].
 by rewrite rpredM // mulr_ge0.
 Qed.
 
-Canonical Qnat_addrPred := AddrPred Qnat_semiring_closed.
-Canonical Qnat_mulrPred := MulrPred Qnat_semiring_closed.
-Canonical Qnat_semiringPred := SemiringPred Qnat_semiring_closed.
+HB.instance Definition _ := GRing.isSemiringClosed.Build rat Qnat_pred
+  Qnat_semiring_closed.
 
 End QnatPred.
+Arguments Qnat_pred _ /.
 
 Lemma natq_div m n : n %| m -> (m %/ n)%:R = m%:R / n%:R :> rat.
 Proof. exact/char0_natf_div/char_num. Qed.
@@ -885,9 +848,7 @@ Proof. by rewrite /ratr numq_int denq_int divr1. Qed.
 Lemma ratr_nat n : ratr n%:R = n%:R.
 Proof. exact: (ratr_int n). Qed.
 
-Lemma rpred_rat (S : {pred R}) (ringS : divringPred S) (kS : keyed_pred ringS)
-                a :
-  ratr a \in kS.
+Lemma rpred_rat (S : divringClosed R) a : ratr a \in S.
 Proof. by rewrite rpred_div ?rpred_int. Qed.
 
 End InRing.
@@ -909,16 +870,16 @@ Section Linear.
 
 Implicit Types (U V : lmodType rat) (A B : lalgType rat).
 
-Lemma rat_linear U V (f : U -> V) : additive f -> linear f.
+Lemma rat_linear U V (f : U -> V) : additive f -> scalable f.
 Proof.
-move=> fB a u v; pose phi := Additive fB; rewrite [f _](raddfD phi).
-congr (_ + _); rewrite -{2}[a]divq_num_den mulrC -scalerA.
+move=> fB a u.
+pose aM := GRing.isAdditive.Build U V f fB.
+pose phi : GRing.Additive.type U V := HB.pack f aM.
+rewrite -[f]/(phi : _ -> _) -{2}[a]divq_num_den mulrC -scalerA.
 apply: canRL (scalerK _) _; first by rewrite intr_eq0 denq_neq0.
-by rewrite !scaler_int -raddfMz scalerMzl -mulrzr -numqE scaler_int raddfMz.
+rewrite 2!scaler_int -3!raddfMz /=.
+by rewrite -scalerMzr scalerMzl -mulrzr -numqE scaler_int.
 Qed.
-
-Lemma rat_lrmorphism A B (f : A -> B) : rmorphism f -> lrmorphism f.
-Proof. by case=> /rat_linear fZ fM; do ?split=> //; apply: fZ. Qed.
 
 End Linear.
 
@@ -926,25 +887,34 @@ Section InPrealField.
 
 Variable F : numFieldType.
 
-Fact ratr_is_rmorphism : rmorphism (@ratr F).
+Fact ratr_is_additive : additive (@ratr F).
 Proof.
 have injZtoQ: @injective rat int intr by apply: intr_inj.
 have nz_den x: (denq x)%:~R != 0 :> F by rewrite intr_eq0 denq_eq0.
-do 2?split; rewrite /ratr ?divr1 // => x y; last first.
-  rewrite mulrC mulrAC; apply: canLR (mulKf (nz_den _)) _; rewrite !mulrA.
-  do 2!apply: canRL (mulfK (nz_den _)) _; rewrite -!rmorphM; congr _%:~R.
-  apply: injZtoQ; rewrite !rmorphM [x * y]lock /= !numqE -lock.
-  by rewrite -!mulrA mulrA mulrCA -!mulrA (mulrCA y).
+move=> x y.
 apply: (canLR (mulfK (nz_den _))); apply: (mulIf (nz_den x)).
 rewrite mulrAC mulrBl divfK ?nz_den // mulrAC -!rmorphM.
 apply: (mulIf (nz_den y)); rewrite mulrAC mulrBl divfK ?nz_den //.
 rewrite -!(rmorphM, rmorphB); congr _%:~R; apply: injZtoQ.
-rewrite !(rmorphM, rmorphB) [_ - _]lock /= -lock !numqE.
+rewrite !(rmorphM, rmorphB) /= [_ - _]lock /= -lock !numqE.
 by rewrite (mulrAC y) -!mulrBl -mulrA mulrAC !mulrA.
 Qed.
 
-Canonical ratr_additive := Additive ratr_is_rmorphism.
-Canonical ratr_rmorphism := RMorphism ratr_is_rmorphism.
+Fact ratr_is_multiplicative : multiplicative (@ratr F).
+Proof.
+have injZtoQ: @injective rat int intr by apply: intr_inj.
+have nz_den x: (denq x)%:~R != 0 :> F by rewrite intr_eq0 denq_eq0.
+split=> [x y|]; last by rewrite /ratr divr1.
+rewrite /ratr mulrC mulrAC; apply: canLR (mulKf (nz_den _)) _; rewrite !mulrA.
+do 2!apply: canRL (mulfK (nz_den _)) _; rewrite -!rmorphM; congr _%:~R.
+apply: injZtoQ; rewrite !rmorphM [x * y]lock /= !numqE -lock.
+by rewrite -!mulrA mulrA mulrCA -!mulrA (mulrCA y).
+Qed.
+
+HB.instance Definition _ := GRing.isAdditive.Build rat F (@ratr F)
+  ratr_is_additive.
+HB.instance Definition _ := GRing.isMultiplicative.Build rat F (@ratr F)
+  ratr_is_multiplicative.
 
 Lemma ler_rat : {mono (@ratr F) : x y / x <= y}.
 Proof.
@@ -969,7 +939,7 @@ Lemma ltrq0 x : (ratr F x < 0) = (x < 0).
 Proof. by rewrite (_ : 0 = ratr F 0) ?ltr_rat ?rmorph0. Qed.
 
 Lemma ratr_sg x : ratr F (sgr x) = sgr (ratr F x).
-Proof. by rewrite !sgr_def fmorph_eq0 ltrq0 rmorphMn rmorph_sign. Qed.
+Proof. by rewrite !sgr_def fmorph_eq0 ltrq0 rmorphMn /= rmorph_sign. Qed.
 
 Lemma ratr_norm x : ratr F `|x| = `|ratr F x|.
 Proof.
@@ -986,7 +956,7 @@ End InPrealField.
 
 Arguments ratr {R}.
 
-(* Conntecting rationals to the ring an field tactics *)
+(* Connecting rationals to the ring and field tactics *)
 
 Ltac rat_to_ring :=
   rewrite -?[0%Q]/(0 : rat)%R -?[1%Q]/(1 : rat)%R

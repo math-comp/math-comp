@@ -1,84 +1,41 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
 From mathcomp Require Import ssralg poly.
 
 (******************************************************************************)
-(* This file defines some classes to manipulate number structures, i.e        *)
+(*                            Number structures                               *)
+(*                                                                            *)
+(* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
+(*                                                                            *)
+(* This file defines some classes to manipulate number structures, i.e,       *)
 (* structures with an order and a norm. To use this file, insert              *)
 (* "Import Num.Theory." before your scripts. You can also "Import Num.Def."   *)
 (* to enjoy shorter notations (e.g., minr instead of Num.min, lerif instead   *)
 (* of Num.leif, etc.).                                                        *)
 (*                                                                            *)
-(*   * NumDomain (Integral domain with an order and a norm)                   *)
-(*    numDomainType == interface for a num integral domain.                   *)
-(*   NumDomainType T m                                                        *)
-(*                  == packs the num mixin into a numDomainType. The carrier  *)
-(*                     T must have an integral domain and a partial order     *)
-(*                     structures.                                            *)
-(*   [numDomainType of T for S]                                               *)
-(*                  == T-clone of the numDomainType structure S.              *)
-(*   [numDomainType of T]                                                     *)
-(*                  == clone of a canonical numDomainType structure on T.     *)
+(* This file defines the following number structures:                         *)
 (*                                                                            *)
-(*   * NormedZmodule (Zmodule with a norm)                                    *)
-(*   normedZmodType R                                                         *)
-(*                  == interface for a normed Zmodule structure indexed by    *)
-(*                     numDomainType R.                                       *)
-(*   NormedZmodType R T m                                                     *)
-(*                  == pack the normed Zmodule mixin into a normedZmodType.   *)
-(*                     The carrier T must have an integral domain structure.  *)
-(*   [normedZmodType R of T for S]                                            *)
-(*                  == T-clone of the normedZmodType R structure S.           *)
-(*   [normedZmodType R of T]                                                  *)
-(*                  == clone of a canonical normedZmodType R structure on T.  *)
-(*                                                                            *)
-(*   * NumField (Field with an order and a norm)                              *)
-(*     numFieldType == interface for a num field.                             *)
-(*   [numFieldType of T]                                                      *)
-(*                  == clone of a canonical numFieldType structure on T.      *)
-(*                                                                            *)
-(*   * NumClosedField (Partially ordered Closed Field with conjugation)       *)
-(*   numClosedFieldType                                                       *)
-(*                  == interface for a closed field with conj.                *)
-(*   NumClosedFieldType T r                                                   *)
-(*                  == packs the real closed axiom r into a                   *)
-(*                     numClosedFieldType. The carrier T must have a closed   *)
-(*                     field type structure.                                  *)
-(*   [numClosedFieldType of T]                                                *)
-(*                  == clone of a canonical numClosedFieldType structure on T.*)
-(*   [numClosedFieldType of T for S]                                          *)
-(*                  == T-clone of the numClosedFieldType structure S.         *)
-(*                                                                            *)
-(*   * RealDomain (Num domain where all elements are positive or negative)    *)
-(*   realDomainType == interface for a real integral domain.                  *)
-(*   [realDomainType of T]                                                    *)
-(*                  == clone of a canonical realDomainType structure on T.    *)
-(*                                                                            *)
-(*   * RealField (Num Field where all elements are positive or negative)      *)
-(*    realFieldType == interface for a real field.                            *)
-(*   [realFieldType of T]                                                     *)
-(*                  == clone of a canonical realFieldType structure on T.     *)
-(*                                                                            *)
-(*   * ArchiField (A Real Field with the archimedean axiom)                   *)
-(*   archiFieldType == interface for an archimedean field.                    *)
-(*   ArchiFieldType T r                                                       *)
-(*                  == packs the archimedean axiom r into an archiFieldType.  *)
-(*                     The carrier T must have a real field type structure.   *)
-(*   [archiFieldType of T for S]                                              *)
-(*                  == T-clone of the archiFieldType structure S.             *)
-(*   [archiFieldType of T]                                                    *)
-(*                  == clone of a canonical archiFieldType structure on T.    *)
-(*                                                                            *)
-(*   * RealClosedField (Real Field with the real closed axiom)                *)
-(*          rcfType == interface for a real closed field.                     *)
-(*      RcfType T r == packs the real closed axiom r into a rcfType.          *)
-(*                     The carrier T must have a real field type structure.   *)
-(*   [rcfType of T] == clone of a canonical realClosedFieldType structure on  *)
-(*                     T.                                                     *)
-(*   [rcfType of T for S]                                                     *)
-(*                  == T-clone of the realClosedFieldType structure S.        *)
+(*  porderZmodType == join of Order.POrder and GRing.Zmodule                  *)
+(*                    The HB class is called POrderedZmodule.                 *)
+(*  normedZmodType == Zmodule with a norm                                     *)
+(*                    The HB class is called NormedZmodule.                   *)
+(*   numDomainType == Integral domain with an order and a norm                *)
+(*                    The HB class is called NumDomain.                       *)
+(*    numFieldType == Field with an order and a norm                          *)
+(*                    The HB class is called NumField.                        *)
+(* numClosedFieldType == Partially ordered Closed Field with conjugation      *)
+(*                    The HB class is called ClosedField.                     *)
+(*  realDomainType == Num domain where all elements are positive or negative  *)
+(*                    The HB class is called RealDomain.                      *)
+(*   realFieldType == Num Field where all elements are positive or negative   *)
+(*                    The HB class is called RealField.                       *)
+(*  archiFieldType == A Real Field with the archimedean axiom                 *)
+(*                    The HB class is called ArchimedeanField.                *)
+(*         rcfType == A Real Field with the real closed axiom                 *)
+(*                    The HB class is called RealClosedField.                 *)
 (*                                                                            *)
 (* The ordering symbols and notations (<, <=, >, >=, _ <= _ ?= iff _,         *)
 (* _ < _ ?<= if _, >=<, and ><) and lattice operations (meet and join)        *)
@@ -87,26 +44,26 @@ From mathcomp Require Import ssralg poly.
 (* e.g., <%R. All the other ordering notations are the same as order.v.       *)
 (*                                                                            *)
 (* Over these structures, we have the following operations                    *)
-(*             `|x| == norm of x.                                             *)
+(*             `|x| == norm of x                                              *)
 (*         Num.sg x == sign of x: equal to 0 iff x = 0, to 1 iff x > 0, and   *)
-(*                     to -1 in all other cases (including x < 0).            *)
-(*  x \is a Num.pos <=> x is positive (:= x > 0).                             *)
-(*  x \is a Num.neg <=> x is negative (:= x < 0).                             *)
-(* x \is a Num.nneg <=> x is positive or 0 (:= x >= 0).                       *)
-(* x \is a Num.real <=> x is real (:= x >= 0 or x < 0).                       *)
+(*                     to -1 in all other cases (including x < 0)             *)
+(*  x \is a Num.pos <=> x is positive (:= x > 0)                              *)
+(*  x \is a Num.neg <=> x is negative (:= x < 0)                              *)
+(* x \is a Num.nneg <=> x is positive or 0 (:= x >= 0)                        *)
+(* x \is a Num.real <=> x is real (:= x >= 0 or x < 0)                        *)
 (*      Num.bound x == in archimedean fields, and upper bound for x, i.e.,    *)
-(*                     and n such that `|x| < n%:R.                           *)
+(*                     and n such that `|x| < n%:R                            *)
 (*       Num.sqrt x == in a real-closed field, a positive square root of x if *)
-(*                     x >= 0, or 0 otherwise.                                *)
+(*                     x >= 0, or 0 otherwise                                 *)
 (* For numeric algebraically closed fields we provide the generic definitions *)
-(*         'i == the imaginary number (:= sqrtC (-1)).                        *)
-(*      'Re z == the real component of z.                                     *)
-(*      'Im z == the imaginary component of z.                                *)
-(*        z^* == the complex conjugate of z (:= conjC z).                     *)
-(*    sqrtC z == a nonnegative square root of z, i.e., 0 <= sqrt x if 0 <= x. *)
+(*         'i == the imaginary number (:= sqrtC (-1))                         *)
+(*      'Re z == the real component of z                                      *)
+(*      'Im z == the imaginary component of z                                 *)
+(*        z^* == the complex conjugate of z (:= conjC z)                      *)
+(*    sqrtC z == a nonnegative square root of z, i.e., 0 <= sqrt x if 0 <= x  *)
 (*  n.-root z == more generally, for n > 0, an nth root of z, chosen with a   *)
 (*               minimal non-negative argument for n > 1 (i.e., with a        *)
-(*               maximal real part subject to a nonnegative imaginary part).  *)
+(*               maximal real part subject to a nonnegative imaginary part)   *)
 (*               Note that n.-root (-1) is a primitive 2nth root of unity,    *)
 (*               an thus not equal to -1 for n odd > 1 (this will be shown in *)
 (*               file cyclotomic.v).                                          *)
@@ -138,220 +95,70 @@ Fact ring_display : unit. Proof. exact: tt. Qed.
 
 Module Num.
 
-Record normed_mixin_of (R T : zmodType)
-       (Rorder : Order.POrder.mixin_of (Equality.class R))
-       (le_op := Order.POrder.le Rorder)
-  := NormedMixin {
-  norm_op : T -> R;
-  _ : forall x y, le_op (norm_op (x + y)) (norm_op x + norm_op y);
-  _ : forall x, norm_op x = 0 -> x = 0;
-  _ : forall x n, norm_op (x *+ n) = norm_op x *+ n;
-  _ : forall x, norm_op (- x) = norm_op x;
+#[short(type="porderZmodType")]
+HB.structure Definition POrderedZmodule :=
+  { R of Order.isPOrder ring_display R & GRing.Zmodule R }.
+
+HB.mixin Record Zmodule_isNormed (R : POrderedZmodule.type) M
+         of GRing.Zmodule M := {
+  norm : M -> R;
+  ler_normD : forall x y, norm (x + y) <= norm x + norm y;
+  normr0_eq0 : forall x, norm x = 0 -> x = 0;
+  normrMn : forall x n, norm (x *+ n) = norm x *+ n;
+  normrN : forall x, norm (- x) = norm x;
 }.
 
-Record mixin_of (R : ringType)
-       (Rorder : Order.POrder.mixin_of (Equality.class R))
-       (le_op := Order.POrder.le Rorder) (lt_op := Order.POrder.lt Rorder)
-       (normed : @normed_mixin_of R R Rorder) (norm_op := norm_op normed)
-  := Mixin {
-  _ : forall x y, lt_op 0 x -> lt_op 0 y -> lt_op 0 (x + y);
-  _ : forall x y, le_op 0 x -> le_op 0 y -> le_op x y || le_op y x;
-  _ : {morph norm_op : x y / x * y};
-  _ : forall x y, (le_op x y) = (norm_op (y - x) == y - x);
-}.
+#[short(type="normedZmodType"), infer(R)]
+HB.structure Definition NormedZmodule (R : porderZmodType) :=
+  { M of Zmodule_isNormed R M & GRing.Zmodule M }.
+Arguments norm {R M} x : rename.
 
-Local Notation ring_for T b := (@GRing.Ring.Pack T b).
-
-Module NumDomain.
-
-Section ClassDef.
-Set Primitive Projections.
-Record class_of T := Class {
-  base : GRing.IntegralDomain.class_of T;
-  order_mixin : Order.POrder.mixin_of (Equality.class (ring_for T base));
-  normed_mixin : normed_mixin_of (ring_for T base) order_mixin;
-  mixin : mixin_of normed_mixin;
-}.
-Unset Primitive Projections.
-
-Local Coercion base : class_of >-> GRing.IntegralDomain.class_of.
-Local Coercion order_base T (class_of_T : class_of T) :=
-  @Order.POrder.Class _ class_of_T (order_mixin class_of_T).
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c  as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c.
-Definition pack (b0 : GRing.IntegralDomain.class_of _) om0
-           (nm0 : @normed_mixin_of (ring_for T b0) (ring_for T b0) om0)
-           (m0 : @mixin_of (ring_for T b0) om0 nm0) :=
-  fun bT (b : GRing.IntegralDomain.class_of T)
-      & phant_id (@GRing.IntegralDomain.class bT) b =>
-  fun om & phant_id om0 om =>
-  fun nm & phant_id nm0 nm =>
-  fun m & phant_id m0 m =>
-  @Pack T (@Class T b om nm m).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition porderType := @Order.POrder.Pack ring_display cT class.
-Definition porder_zmodType := @GRing.Zmodule.Pack porderType class.
-Definition porder_ringType := @GRing.Ring.Pack porderType class.
-Definition porder_comRingType := @GRing.ComRing.Pack porderType class.
-Definition porder_unitRingType := @GRing.UnitRing.Pack porderType class.
-Definition porder_comUnitRingType := @GRing.ComUnitRing.Pack porderType class.
-Definition porder_idomainType := @GRing.IntegralDomain.Pack porderType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion base  : class_of >-> GRing.IntegralDomain.class_of.
-Coercion order_base : class_of >-> Order.POrder.class_of.
-Coercion normed_mixin : class_of >-> normed_mixin_of.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion porderType : type >-> Order.POrder.type.
-Canonical porderType.
-Canonical porder_zmodType.
-Canonical porder_ringType.
-Canonical porder_comRingType.
-Canonical porder_unitRingType.
-Canonical porder_comUnitRingType.
-Canonical porder_idomainType.
-Notation numDomainType := type.
-Notation NumDomainType T m := (@pack T _ _ _ m _ _ id _ id _ id _ id).
-Notation "[ 'numDomainType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
-  (at level 0, format "[ 'numDomainType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'numDomainType' 'of' T ]" := (@clone T _ _ id)
-  (at level 0, format "[ 'numDomainType'  'of'  T ]") : form_scope.
-End Exports.
-
-End NumDomain.
-Import NumDomain.Exports.
-
-Local Notation num_for T b := (@NumDomain.Pack T b).
-
-Module NormedZmodule.
-
-Section ClassDef.
-
-Variable R : numDomainType.
-
-Set Primitive Projections.
-Record class_of (T : Type) := Class {
-  base : GRing.Zmodule.class_of T;
-  mixin : @normed_mixin_of R (@GRing.Zmodule.Pack T base) (NumDomain.class R);
-}.
-Unset Primitive Projections.
-
-Local Coercion base : class_of >-> GRing.Zmodule.class_of.
-Local Coercion mixin : class_of >-> normed_mixin_of.
-
-Structure type (phR : phant R) :=
-  Pack { sort; _ : class_of sort }.
-Local Coercion sort : type >-> Sortclass.
-
-Variables (phR : phant R) (T : Type) (cT : type phR).
-
-Definition class := let: Pack _ c := cT return class_of cT in c.
-Definition clone c of phant_id class c := @Pack phR T c.
-Definition pack b0 (m0 : @normed_mixin_of R (@GRing.Zmodule.Pack T b0)
-                                          (NumDomain.class R)) :=
-  Pack phR (@Class T b0 m0).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> GRing.Zmodule.class_of.
-Coercion mixin : class_of >-> normed_mixin_of.
-Coercion sort : type >-> Sortclass.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Notation normedZmodType R := (type (Phant R)).
-Notation NormedZmodType R T m := (@pack _ (Phant R) T _ m).
-Notation NormedZmodMixin := Mixin.
-Notation "[ 'normedZmodType' R 'of' T 'for' cT ]" :=
+Module NormedZmoduleExports.
+Bind Scope ring_scope with NormedZmodule.sort.
+(* Notation "[ 'normedZmodType' R 'of' T 'for' cT ]" :=
   (@clone _ (Phant R) T cT _ idfun)
   (at level 0, format "[ 'normedZmodType'  R  'of'  T  'for'  cT ]") :
   form_scope.
 Notation "[ 'normedZmodType' R 'of' T ]" := (@clone _ (Phant R) T _ _ id)
-  (at level 0, format "[ 'normedZmodType'  R  'of'  T ]") : form_scope.
-End Exports.
+  (at level 0, format "[ 'normedZmodType'  R  'of'  T ]") : form_scope. *)
+End NormedZmoduleExports.
+HB.export NormedZmoduleExports.
 
-End NormedZmodule.
-Import NormedZmodule.Exports.
+HB.mixin Record isNumRing R of GRing.Ring R & POrderedZmodule R
+  & NormedZmodule (POrderedZmodule.clone R _) R := {
+ addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
+ ger_leVge : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
+ normrM : {morph (norm : R -> R) : x y / x * y};
+ ler_def : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
+}.
 
-Module NumDomain_joins.
-Import NumDomain.
-Section NumDomain_joins.
+#[short(type="numDomainType")]
+HB.structure Definition NumDomain := { R of
+     GRing.IntegralDomain R &
+     POrderedZmodule R &
+     NormedZmodule (POrderedZmodule.clone R _) R &
+     isNumRing R
+  }.
+Arguments addr_gt0 {_} [x y] : rename.
+Arguments ger_leVge {_} [x y] : rename.
 
-Variables (T : Type) (cT : type).
+(* TODO: make isNumDomain depend on intermediate structures *)
+(* TODO: make isNumDomain.sort canonically a NumDomain *)
 
-Notation class := (class cT).
-Definition normedZmodType : normedZmodType cT :=
-  @NormedZmodule.Pack
-     cT (Phant cT) cT (NormedZmodule.Class (NumDomain.normed_mixin class)).
-Definition normedZmod_ringType := @GRing.Ring.Pack normedZmodType class.
-Definition normedZmod_comRingType := @GRing.ComRing.Pack normedZmodType class.
-Definition normedZmod_unitRingType := @GRing.UnitRing.Pack normedZmodType class.
-Definition normedZmod_comUnitRingType :=
-  @GRing.ComUnitRing.Pack normedZmodType class.
-Definition normedZmod_idomainType :=
-  @GRing.IntegralDomain.Pack normedZmodType class.
-Definition normedZmod_porderType :=
-  @Order.POrder.Pack ring_display normedZmodType class.
-
-End NumDomain_joins.
-
-Module Exports.
-Coercion normedZmodType : type >-> NormedZmodule.type.
-Canonical normedZmodType.
-Canonical normedZmod_ringType.
-Canonical normedZmod_comRingType.
-Canonical normedZmod_unitRingType.
-Canonical normedZmod_comUnitRingType.
-Canonical normedZmod_idomainType.
-Canonical normedZmod_porderType.
-End Exports.
-End NumDomain_joins.
-Export NumDomain_joins.Exports.
+Module NumDomainExports.
+Bind Scope ring_scope with NumDomain.sort.
+#[deprecated(since="mathcomp 2.0.0", note="Use Num.NumDomain.clone instead.")]
+Notation "[ 'numDomainType' 'of' T 'for' cT ]" := (NumDomain.clone T%type cT)
+  (at level 0, format "[ 'numDomainType'  'of'  T  'for'  cT ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use Num.NumDomain.clone instead.")]
+Notation "[ 'numDomainType' 'of' T ]" := (NumDomain.clone T%type _)
+  (at level 0, format "[ 'numDomainType'  'of'  T ]") : form_scope.
+End NumDomainExports.
+HB.export NumDomainExports.
 
 Module Import Def.
 
-Definition normr (R : numDomainType) (T : normedZmodType R) : T -> R :=
-  nosimpl (norm_op (NormedZmodule.class T)).
-Arguments normr {R T} x.
+Notation normr := norm.
 
 Notation ler := (@Order.le ring_display _) (only parsing).
 Notation "@ 'ler' R" := (@Order.le ring_display R)
@@ -386,15 +193,23 @@ Context {R : numDomainType}.
 Implicit Types (x : R).
 
 Definition sgr x : R := if x == 0 then 0 else if x < 0 then -1 else 1.
-Definition Rpos : qualifier 0 R := [qualify x : R | 0 < x].
-Definition Rneg : qualifier 0 R := [qualify x : R | x < 0].
-Definition Rnneg : qualifier 0 R := [qualify x : R | 0 <= x].
-Definition Rreal : qualifier 0 R := [qualify x : R | (0 <= x) || (x <= 0)].
+Definition Rpos_pred := fun x : R => 0 < x.
+Definition Rpos : qualifier 0 R := [qualify x | Rpos_pred x].
+Definition Rneg_pred := fun x : R => x < 0.
+Definition Rneg : qualifier 0 R := [qualify x : R | Rneg_pred x].
+Definition Rnneg_pred := fun x : R => 0 <= x.
+Definition Rnneg : qualifier 0 R := [qualify x : R | Rnneg_pred x].
+Definition Rreal_pred := fun x : R => (0 <= x) || (x <= 0).
+Definition Rreal : qualifier 0 R := [qualify x : R | Rreal_pred x].
 
 End Def. End Def.
 
+Arguments Rpos_pred _ _ /.
+Arguments Rneg_pred _ _ /.
+Arguments Rnneg_pred _ _ /.
+Arguments Rreal_pred _ _ /.
+
 (* Shorter qualified names, when Num.Def is not imported. *)
-Notation norm := normr (only parsing).
 Notation le := ler (only parsing).
 Notation lt := ltr (only parsing).
 Notation ge := ger (only parsing).
@@ -410,21 +225,9 @@ Notation neg := Rneg.
 Notation nneg := Rnneg.
 Notation real := Rreal.
 
-Module Keys. Section Keys.
-Variable R : numDomainType.
-Fact Rpos_key : pred_key (@pos R). Proof. by []. Qed.
-Definition Rpos_keyed := KeyedQualifier Rpos_key.
-Fact Rneg_key : pred_key (@real R). Proof. by []. Qed.
-Definition Rneg_keyed := KeyedQualifier Rneg_key.
-Fact Rnneg_key : pred_key (@nneg R). Proof. by []. Qed.
-Definition Rnneg_keyed := KeyedQualifier Rnneg_key.
-Fact Rreal_key : pred_key (@real R). Proof. by []. Qed.
-Definition Rreal_keyed := KeyedQualifier Rreal_key.
-End Keys. End Keys.
-
 (* (Exported) symbolic syntax. *)
 Module Import Syntax.
-Import Def Keys.
+Import Def.
 
 Notation "`| x |" := (norm x) : ring_scope.
 
@@ -478,11 +281,6 @@ Notation ">< y" := [pred x | ~~ comparable x y] : ring_scope.
 Notation ">< y :> T" := (>< (y : T)) (only parsing) : ring_scope.
 Notation "x >< y" := (~~ (comparable x y)) : ring_scope.
 
-Canonical Rpos_keyed.
-Canonical Rneg_keyed.
-Canonical Rnneg_keyed.
-Canonical Rreal_keyed.
-
 Export Order.POCoercions.
 
 End Syntax.
@@ -502,705 +300,118 @@ Definition real_closed_axiom : Prop :=
 End ExtensionAxioms.
 
 (* The rest of the numbers interface hierarchy. *)
-Module NumField.
 
-Section ClassDef.
+#[short(type="numFieldType")]
+HB.structure Definition NumField := { R of GRing.UnitRing_isField R &
+     GRing.IntegralDomain R &
+     POrderedZmodule R &
+     NormedZmodule (POrderedZmodule.clone R _) R &
+     isNumRing R }.
 
-Set Primitive Projections.
-Record class_of R := Class {
-  base  : NumDomain.class_of R;
-  mixin : GRing.Field.mixin_of (num_for R base);
-}.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> NumDomain.class_of.
-Local Coercion base2 R (c : class_of R) : GRing.Field.class_of _ :=
-  GRing.Field.Class (@mixin _ c).
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition pack :=
-  fun bT b & phant_id (NumDomain.class bT) (b : NumDomain.class_of T) =>
-  fun mT m & phant_id (GRing.Field.mixin (GRing.Field.class mT)) m =>
-  Pack (@Class T b m).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition porderType := @Order.POrder.Pack ring_display cT class.
-Definition numDomainType := @NumDomain.Pack cT class.
-Definition fieldType := @GRing.Field.Pack cT class.
-Definition normedZmodType := NormedZmodType numDomainType cT class.
-Definition porder_fieldType := @GRing.Field.Pack porderType class.
-Definition normedZmod_fieldType := @GRing.Field.Pack normedZmodType class.
-Definition numDomain_fieldType := @GRing.Field.Pack numDomainType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> NumDomain.class_of.
-Coercion base2 : class_of >-> GRing.Field.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion porderType : type >-> Order.POrder.type.
-Canonical porderType.
-Coercion numDomainType : type >-> NumDomain.type.
-Canonical numDomainType.
-Coercion fieldType : type >-> GRing.Field.type.
-Canonical fieldType.
-Coercion normedZmodType : type >-> NormedZmodule.type.
-Canonical normedZmodType.
-Canonical porder_fieldType.
-Canonical normedZmod_fieldType.
-Canonical numDomain_fieldType.
-Notation numFieldType := type.
-Notation "[ 'numFieldType' 'of' T ]" := (@pack T _ _ id _ _ id)
+Module NumFieldExports.
+Bind Scope ring_scope with NumField.sort.
+#[deprecated(since="mathcomp 2.0.0", note="Use Num.NumField.clone instead.")]
+Notation "[ 'numFieldType' 'of' T ]" := (NumField.clone T%type _)
   (at level 0, format "[ 'numFieldType'  'of'  T ]") : form_scope.
-End Exports.
+End NumFieldExports.
+HB.export NumFieldExports.
 
-End NumField.
-Import NumField.Exports.
-
-Module ClosedField.
-
-Section ClassDef.
-
-Record imaginary_mixin_of (R : numDomainType) := ImaginaryMixin {
+HB.mixin Record NumField_isImaginary R of NumField R := {
   imaginary : R;
   conj_op : {rmorphism R -> R};
-  _ : imaginary ^+ 2 = - 1;
-  _ : forall x, x * conj_op x = `|x| ^+ 2;
+  sqrCi : imaginary ^+ 2 = - 1;
+  normCK : forall x, `|x| ^+ 2 = x * conj_op x;
 }.
 
-Set Primitive Projections.
-Record class_of R := Class {
-  base : NumField.class_of R;
-  decField_mixin : GRing.DecidableField.mixin_of (num_for R base);
-  closedField_axiom : GRing.ClosedField.axiom (num_for R base);
-  conj_mixin  : imaginary_mixin_of (num_for R base);
-}.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> NumField.class_of.
-Local Coercion base2 R (c : class_of R) : GRing.ClosedField.class_of R :=
-  @GRing.ClosedField.Class
-    R (@GRing.DecidableField.Class R (base c) (@decField_mixin _ c))
-    (@closedField_axiom _ c).
+#[short(type="numClosedFieldType")]
+HB.structure Definition ClosedField :=
+  { R of NumField_isImaginary R & GRing.ClosedField R & NumField R }.
 
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone := fun b & phant_id class (b : class_of T) => Pack b.
-Definition pack :=
-  fun bT b & phant_id (NumField.class bT) (b : NumField.class_of T) =>
-  fun mT dec closed
-      & phant_id (GRing.ClosedField.class mT)
-                 (@GRing.ClosedField.Class
-                    _ (@GRing.DecidableField.Class _ b dec) closed) =>
-  fun mc => Pack (@Class T b dec closed mc).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition porderType := @Order.POrder.Pack ring_display cT class.
-Definition numDomainType := @NumDomain.Pack cT class.
-Definition fieldType := @GRing.Field.Pack cT class.
-Definition numFieldType := @NumField.Pack cT class.
-Definition decFieldType := @GRing.DecidableField.Pack cT class.
-Definition closedFieldType := @GRing.ClosedField.Pack cT class.
-Definition normedZmodType := NormedZmodType numDomainType cT class.
-Definition porder_decFieldType := @GRing.DecidableField.Pack porderType class.
-Definition normedZmod_decFieldType :=
-  @GRing.DecidableField.Pack normedZmodType class.
-Definition numDomain_decFieldType :=
-  @GRing.DecidableField.Pack numDomainType class.
-Definition numField_decFieldType :=
-  @GRing.DecidableField.Pack numFieldType class.
-Definition porder_closedFieldType := @GRing.ClosedField.Pack porderType class.
-Definition normedZmod_closedFieldType :=
-  @GRing.ClosedField.Pack normedZmodType class.
-Definition numDomain_closedFieldType :=
-  @GRing.ClosedField.Pack numDomainType class.
-Definition numField_closedFieldType :=
-  @GRing.ClosedField.Pack numFieldType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> NumField.class_of.
-Coercion base2 : class_of >-> GRing.ClosedField.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion porderType : type >-> Order.POrder.type.
-Canonical porderType.
-Coercion numDomainType : type >-> NumDomain.type.
-Canonical numDomainType.
-Coercion fieldType : type >-> GRing.Field.type.
-Canonical fieldType.
-Coercion decFieldType : type >-> GRing.DecidableField.type.
-Canonical decFieldType.
-Coercion numFieldType : type >-> NumField.type.
-Canonical numFieldType.
-Coercion closedFieldType : type >-> GRing.ClosedField.type.
-Canonical closedFieldType.
-Coercion normedZmodType : type >-> NormedZmodule.type.
-Canonical normedZmodType.
-Canonical porder_decFieldType.
-Canonical normedZmod_decFieldType.
-Canonical numDomain_decFieldType.
-Canonical numField_decFieldType.
-Canonical porder_closedFieldType.
-Canonical normedZmod_closedFieldType.
-Canonical numDomain_closedFieldType.
-Canonical numField_closedFieldType.
-Notation numClosedFieldType := type.
-Notation NumClosedFieldType T m := (@pack T _ _ id _ _ _ id m).
-Notation "[ 'numClosedFieldType' 'of' T 'for' cT ]" := (@clone T cT _ id)
+Module ClosedFieldExports.
+Bind Scope ring_scope with ClosedField.sort.
+#[deprecated(since="mathcomp 2.0.0", note="Use Num.ClosedField.clone instead.")]
+Notation "[ 'numClosedFieldType' 'of' T 'for' cT ]" := (ClosedField.clone T%type cT)
   (at level 0, format "[ 'numClosedFieldType'  'of'  T  'for' cT ]") :
                                                          form_scope.
-Notation "[ 'numClosedFieldType' 'of' T ]" := (@clone T _ _ id)
+#[deprecated(since="mathcomp 2.0.0", note="Use Num.ClosedField.clone instead.")]
+Notation "[ 'numClosedFieldType' 'of' T ]" := (ClosedField.clone T%type _)
   (at level 0, format "[ 'numClosedFieldType'  'of'  T ]") : form_scope.
-End Exports.
+End ClosedFieldExports.
+HB.export ClosedFieldExports.
 
-End ClosedField.
-Import ClosedField.Exports.
+#[short(type="realDomainType")]
+HB.structure Definition RealDomain :=
+  { R of Order.Total ring_display R & NumDomain R }.
 
-Module RealDomain.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R := Class {
-  base   : NumDomain.class_of R;
-  nmixin : Order.Lattice.mixin_of base;
-  lmixin : Order.DistrLattice.mixin_of (Order.Lattice.Class nmixin);
-  tmixin : Order.Total.mixin_of base;
-}.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> NumDomain.class_of.
-Local Coercion base2 T (c : class_of T) : Order.Total.class_of T :=
-  @Order.Total.Class _ (@Order.DistrLattice.Class _ _ (lmixin c)) (@tmixin _ c).
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition pack :=
-  fun bT b & phant_id (NumDomain.class bT) (b : NumDomain.class_of T) =>
-  fun mT n l m &
-      phant_id (@Order.Total.class ring_display mT)
-               (@Order.Total.Class T (@Order.DistrLattice.Class
-                                        T (@Order.Lattice.Class T b n) l) m) =>
-  Pack (@Class T b n l m).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition porderType := @Order.POrder.Pack ring_display cT class.
-Definition latticeType := @Order.Lattice.Pack ring_display cT class.
-Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT class.
-Definition orderType := @Order.Total.Pack ring_display cT class.
-Definition numDomainType := @NumDomain.Pack cT class.
-Definition normedZmodType := NormedZmodType numDomainType cT class.
-Definition zmod_latticeType := @Order.Lattice.Pack ring_display zmodType class.
-Definition ring_latticeType := @Order.Lattice.Pack ring_display ringType class.
-Definition comRing_latticeType :=
-  @Order.Lattice.Pack ring_display comRingType class.
-Definition unitRing_latticeType :=
-  @Order.Lattice.Pack ring_display unitRingType class.
-Definition comUnitRing_latticeType :=
-  @Order.Lattice.Pack ring_display comUnitRingType class.
-Definition idomain_latticeType :=
-  @Order.Lattice.Pack ring_display idomainType class.
-Definition normedZmod_latticeType :=
-  @Order.Lattice.Pack ring_display normedZmodType class.
-Definition numDomain_latticeType :=
-  @Order.Lattice.Pack ring_display numDomainType class.
-Definition zmod_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display zmodType class.
-Definition ring_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display ringType class.
-Definition comRing_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display comRingType class.
-Definition unitRing_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display unitRingType class.
-Definition comUnitRing_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display comUnitRingType class.
-Definition idomain_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display idomainType class.
-Definition normedZmod_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display normedZmodType class.
-Definition numDomain_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display numDomainType class.
-Definition zmod_orderType := @Order.Total.Pack ring_display zmodType class.
-Definition ring_orderType := @Order.Total.Pack ring_display ringType class.
-Definition comRing_orderType :=
-  @Order.Total.Pack ring_display comRingType class.
-Definition unitRing_orderType :=
-  @Order.Total.Pack ring_display unitRingType class.
-Definition comUnitRing_orderType :=
-  @Order.Total.Pack ring_display comUnitRingType class.
-Definition idomain_orderType :=
-  @Order.Total.Pack ring_display idomainType class.
-Definition normedZmod_orderType :=
-  @Order.Total.Pack ring_display normedZmodType class.
-Definition numDomain_orderType :=
-  @Order.Total.Pack ring_display numDomainType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> NumDomain.class_of.
-Coercion base2 : class_of >-> Order.Total.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion porderType : type >-> Order.POrder.type.
-Canonical porderType.
-Coercion numDomainType : type >-> NumDomain.type.
-Canonical numDomainType.
-Coercion latticeType : type >-> Order.Lattice.type.
-Canonical latticeType.
-Coercion distrLatticeType : type >-> Order.DistrLattice.type.
-Canonical distrLatticeType.
-Coercion orderType : type >-> Order.Total.type.
-Canonical orderType.
-Coercion normedZmodType : type >-> NormedZmodule.type.
-Canonical normedZmodType.
-Canonical zmod_latticeType.
-Canonical ring_latticeType.
-Canonical comRing_latticeType.
-Canonical unitRing_latticeType.
-Canonical comUnitRing_latticeType.
-Canonical idomain_latticeType.
-Canonical normedZmod_latticeType.
-Canonical numDomain_latticeType.
-Canonical zmod_distrLatticeType.
-Canonical ring_distrLatticeType.
-Canonical comRing_distrLatticeType.
-Canonical unitRing_distrLatticeType.
-Canonical comUnitRing_distrLatticeType.
-Canonical idomain_distrLatticeType.
-Canonical normedZmod_distrLatticeType.
-Canonical numDomain_distrLatticeType.
-Canonical zmod_orderType.
-Canonical ring_orderType.
-Canonical comRing_orderType.
-Canonical unitRing_orderType.
-Canonical comUnitRing_orderType.
-Canonical idomain_orderType.
-Canonical normedZmod_orderType.
-Canonical numDomain_orderType.
-Notation realDomainType := type.
-Notation "[ 'realDomainType' 'of' T ]" := (@pack T _ _ id _ _ _ _ id)
+Module RealDomainExports.
+Bind Scope ring_scope with RealDomain.sort.
+#[deprecated(since="mathcomp 2.0.0", note="Use Num.RealDomain.clone instead.")]
+Notation "[ 'realDomainType' 'of' T ]" := (RealDomain.clone T%type _)
   (at level 0, format "[ 'realDomainType'  'of'  T ]") : form_scope.
-End Exports.
+End RealDomainExports.
+HB.export RealDomainExports.
 
-End RealDomain.
-Import RealDomain.Exports.
+#[short(type="realFieldType")]
+HB.structure Definition RealField :=
+  { R of Order.Total ring_display R & NumField R }.
 
-Module RealField.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R := Class {
-  base  : NumField.class_of R;
-  nmixin : Order.Lattice.mixin_of base;
-  lmixin : Order.DistrLattice.mixin_of (Order.Lattice.Class nmixin);
-  tmixin : Order.Total.mixin_of base;
-}.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> NumField.class_of.
-Local Coercion base2 R (c : class_of R) : RealDomain.class_of R :=
-  @RealDomain.Class _ _ (nmixin c) (lmixin c) (@tmixin R c).
-
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition pack :=
-  fun bT (b : NumField.class_of T) & phant_id (NumField.class bT) b =>
-  fun mT n l t
-      & phant_id (RealDomain.class mT) (@RealDomain.Class T b n l t) =>
-  Pack (@Class T b n l t).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition porderType := @Order.POrder.Pack ring_display cT class.
-Definition numDomainType := @NumDomain.Pack cT class.
-Definition latticeType := @Order.Lattice.Pack ring_display cT class.
-Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT class.
-Definition orderType := @Order.Total.Pack ring_display cT class.
-Definition realDomainType := @RealDomain.Pack cT class.
-Definition fieldType := @GRing.Field.Pack cT class.
-Definition numFieldType := @NumField.Pack cT class.
-Definition normedZmodType := NormedZmodType numDomainType cT class.
-Definition field_latticeType :=
-  @Order.Lattice.Pack ring_display fieldType class.
-Definition field_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display fieldType class.
-Definition field_orderType := @Order.Total.Pack ring_display fieldType class.
-Definition field_realDomainType := @RealDomain.Pack fieldType class.
-Definition numField_latticeType :=
-  @Order.Lattice.Pack ring_display numFieldType class.
-Definition numField_distrLatticeType :=
-  @Order.DistrLattice.Pack ring_display numFieldType class.
-Definition numField_orderType :=
-  @Order.Total.Pack ring_display numFieldType class.
-Definition numField_realDomainType := @RealDomain.Pack numFieldType class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> NumField.class_of.
-Coercion base2 : class_of >-> RealDomain.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion porderType : type >-> Order.POrder.type.
-Canonical porderType.
-Coercion numDomainType : type >-> NumDomain.type.
-Canonical numDomainType.
-Coercion latticeType : type >-> Order.Lattice.type.
-Canonical latticeType.
-Coercion distrLatticeType : type >-> Order.DistrLattice.type.
-Canonical distrLatticeType.
-Coercion orderType : type >-> Order.Total.type.
-Canonical orderType.
-Coercion realDomainType : type >-> RealDomain.type.
-Canonical realDomainType.
-Coercion fieldType : type >-> GRing.Field.type.
-Canonical fieldType.
-Coercion numFieldType : type >-> NumField.type.
-Canonical numFieldType.
-Coercion normedZmodType : type >-> NormedZmodule.type.
-Canonical normedZmodType.
-Canonical field_latticeType.
-Canonical field_distrLatticeType.
-Canonical field_orderType.
-Canonical field_realDomainType.
-Canonical numField_latticeType.
-Canonical numField_distrLatticeType.
-Canonical numField_orderType.
-Canonical numField_realDomainType.
-Notation realFieldType := type.
-Notation "[ 'realFieldType' 'of' T ]" := (@pack T _ _ id _ _ _ _ id)
+Module RealFieldExports.
+Bind Scope ring_scope with RealField.sort.
+#[deprecated(since="mathcomp 2.0.0", note="Use Num.RealField.clone instead.")]
+Notation "[ 'realFieldType' 'of' T ]" := (RealField.clone T%type _)
   (at level 0, format "[ 'realFieldType'  'of'  T ]") : form_scope.
-End Exports.
+End RealFieldExports.
+HB.export RealFieldExports.
 
-End RealField.
-Import RealField.Exports.
-
-Module ArchimedeanField.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R := Class {
-  base : RealField.class_of R;
-  mixin : archimedean_axiom (num_for R base)
+HB.mixin Record RealField_isArchimedean R of RealField R := {
+  archi_bound_subproof : archimedean_axiom R
 }.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> RealField.class_of.
 
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c.
-Definition pack b0 (m0 : archimedean_axiom (num_for T b0)) :=
-  fun bT b & phant_id (RealField.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m).
+#[short(type="archiFieldType")]
+HB.structure Definition ArchimedeanField :=
+  { R of RealField_isArchimedean R & RealField R }.
 
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition porderType := @Order.POrder.Pack ring_display cT class.
-Definition latticeType := @Order.Lattice.Pack ring_display cT class.
-Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT class.
-Definition orderType := @Order.Total.Pack ring_display cT class.
-Definition numDomainType := @NumDomain.Pack cT class.
-Definition realDomainType := @RealDomain.Pack cT class.
-Definition fieldType := @GRing.Field.Pack cT class.
-Definition numFieldType := @NumField.Pack cT class.
-Definition realFieldType := @RealField.Pack cT class.
-Definition normedZmodType := NormedZmodType numDomainType cT class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> RealField.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion porderType : type >-> Order.POrder.type.
-Canonical porderType.
-Coercion latticeType : type >-> Order.Lattice.type.
-Canonical latticeType.
-Coercion distrLatticeType : type >-> Order.DistrLattice.type.
-Canonical distrLatticeType.
-Coercion orderType : type >-> Order.Total.type.
-Canonical orderType.
-Coercion numDomainType : type >-> NumDomain.type.
-Canonical numDomainType.
-Coercion realDomainType : type >-> RealDomain.type.
-Canonical realDomainType.
-Coercion fieldType : type >-> GRing.Field.type.
-Canonical fieldType.
-Coercion numFieldType : type >-> NumField.type.
-Canonical numFieldType.
-Coercion realFieldType : type >-> RealField.type.
-Canonical realFieldType.
-Coercion normedZmodType : type >-> NormedZmodule.type.
-Canonical normedZmodType.
-Notation archiFieldType := type.
-Notation ArchiFieldType T m := (@pack T _ m _ _ id _ id).
-Notation "[ 'archiFieldType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
+Module ArchimedeanFieldExports.
+Bind Scope ring_scope with ArchimedeanField.sort.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use Num.ArchimedeanField.clone instead.")]
+Notation "[ 'archiFieldType' 'of' T 'for' cT ]" := (ArchimedeanField.clone T%type cT)
   (at level 0, format "[ 'archiFieldType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'archiFieldType' 'of' T ]" := (@clone T _ _ id)
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use Num.ArchimedeanField.clone instead.")]
+Notation "[ 'archiFieldType' 'of' T ]" := (ArchimedeanField.clone T%type _)
   (at level 0, format "[ 'archiFieldType'  'of'  T ]") : form_scope.
-End Exports.
+End ArchimedeanFieldExports.
+HB.export ArchimedeanFieldExports.
 
-End ArchimedeanField.
-Import ArchimedeanField.Exports.
-
-Module RealClosedField.
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of R := Class {
-  base : RealField.class_of R;
-  mixin : real_closed_axiom (num_for R base)
+HB.mixin Record RealField_isClosed R of RealField R := {
+  poly_ivt_subproof : real_closed_axiom R
 }.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> RealField.class_of.
 
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c.
-Definition pack b0 (m0 : real_closed_axiom (num_for T b0)) :=
-  fun bT b & phant_id (RealField.class bT) b =>
-  fun    m & phant_id m0 m => Pack (@Class T b m).
+#[short(type="rcfType")]
+HB.structure Definition RealClosedField :=
+  { R of RealField_isClosed R & RealField R }.
 
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-Definition zmodType := @GRing.Zmodule.Pack cT class.
-Definition ringType := @GRing.Ring.Pack cT class.
-Definition comRingType := @GRing.ComRing.Pack cT class.
-Definition unitRingType := @GRing.UnitRing.Pack cT class.
-Definition comUnitRingType := @GRing.ComUnitRing.Pack cT class.
-Definition idomainType := @GRing.IntegralDomain.Pack cT class.
-Definition porderType := @Order.POrder.Pack ring_display cT class.
-Definition latticeType := @Order.Lattice.Pack ring_display cT class.
-Definition distrLatticeType := @Order.DistrLattice.Pack ring_display cT class.
-Definition orderType := @Order.Total.Pack ring_display cT class.
-Definition numDomainType := @NumDomain.Pack cT class.
-Definition realDomainType := @RealDomain.Pack cT class.
-Definition fieldType := @GRing.Field.Pack cT class.
-Definition numFieldType := @NumField.Pack cT class.
-Definition realFieldType := @RealField.Pack cT class.
-Definition normedZmodType := NormedZmodType numDomainType cT class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> RealField.class_of.
-Coercion sort : type >-> Sortclass.
-Bind Scope ring_scope with sort.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Coercion zmodType : type >-> GRing.Zmodule.type.
-Canonical zmodType.
-Coercion ringType : type >-> GRing.Ring.type.
-Canonical ringType.
-Coercion comRingType : type >-> GRing.ComRing.type.
-Canonical comRingType.
-Coercion unitRingType : type >-> GRing.UnitRing.type.
-Canonical unitRingType.
-Coercion comUnitRingType : type >-> GRing.ComUnitRing.type.
-Canonical comUnitRingType.
-Coercion idomainType : type >-> GRing.IntegralDomain.type.
-Canonical idomainType.
-Coercion porderType : type >-> Order.POrder.type.
-Canonical porderType.
-Coercion latticeType : type >-> Order.Lattice.type.
-Canonical latticeType.
-Coercion distrLatticeType : type >-> Order.DistrLattice.type.
-Canonical distrLatticeType.
-Coercion orderType : type >-> Order.Total.type.
-Canonical orderType.
-Coercion numDomainType : type >-> NumDomain.type.
-Canonical numDomainType.
-Coercion realDomainType : type >-> RealDomain.type.
-Canonical realDomainType.
-Coercion fieldType : type >-> GRing.Field.type.
-Canonical fieldType.
-Coercion numFieldType : type >-> NumField.type.
-Canonical numFieldType.
-Coercion realFieldType : type >-> RealField.type.
-Canonical realFieldType.
-Coercion normedZmodType : type >-> NormedZmodule.type.
-Canonical normedZmodType.
-Notation rcfType := Num.RealClosedField.type.
-Notation RcfType T m := (@pack T _ m _ _ id _ id).
-Notation "[ 'rcfType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
+Module RealClosedFieldExports.
+Bind Scope ring_scope with RealClosedField.sort.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use Num.RealClosedField.clone instead.")]
+Notation "[ 'rcfType' 'of' T 'for' cT ]" := (RealClosedField.clone T%type cT)
   (at level 0, format "[ 'rcfType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'rcfType' 'of' T ]" :=  (@clone T _ _ id)
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use Num.RealClosedField.clone instead.")]
+Notation "[ 'rcfType' 'of' T ]" :=  (RealClosedField.clone T%type _)
   (at level 0, format "[ 'rcfType'  'of'  T ]") : form_scope.
-End Exports.
-
-End RealClosedField.
-Import RealClosedField.Exports.
+End RealClosedFieldExports.
+HB.export RealClosedFieldExports.
 
 (* The elementary theory needed to support the definition of the derived      *)
 (* operations for the extensions described above.                             *)
 Module Import Internals.
 
-Section NormedZmodule.
-Variables (R : numDomainType) (V : normedZmodType R).
-Implicit Types (l : R) (x y : V).
-
-Lemma ler_normD x y : `|x + y| <= `|x| + `|y|.
-Proof. by case: V x y => ? [? []]. Qed.
-
-Lemma normr0_eq0 x : `|x| = 0 -> x = 0.
-Proof. by case: V x => ? [? []]. Qed.
-
-Lemma normrMn x n : `|x *+ n| = `|x| *+ n.
-Proof. by case: V x => ? [? []]. Qed.
-
-Lemma normrN x : `|- x| = `|x|.
-Proof. by case: V x => ? [? []]. Qed.
-
-End NormedZmodule.
-
 Section NumDomain.
 Variable R : numDomainType.
 Implicit Types x y : R.
-
-(* Lemmas from the signature *)
-
-Lemma addr_gt0 x y : 0 < x -> 0 < y -> 0 < x + y.
-Proof. by case: R x y => ? [? ? ? []]. Qed.
-
-Lemma ger_leVge x y : 0 <= x -> 0 <= y -> (x <= y) || (y <= x).
-Proof. by case: R x y => ? [? ? ? []]. Qed.
-
-Lemma normrM : {morph norm : x y / (x : R) * y}.
-Proof. by case: R => ? [? ? ? []]. Qed.
-
-Lemma ler_def x y : (x <= y) = (`|y - x| == y - x).
-Proof. by case: R x y => ? [? ? ? []]. Qed.
 
 (* Basic consequences (just enough to get predicate closure properties). *)
 
@@ -1248,8 +459,9 @@ split=> [|x y x_gt0 y_gt0]; rewrite posrE ?ltr01 //.
 have [Uy|/invr_out->] := boolP (y \is a GRing.unit); last by rewrite pmulr_rgt0.
 by rewrite -(pmulr_rgt0 _ y_gt0) mulrC divrK.
 Qed.
-Canonical pos_mulrPred := MulrPred pos_divr_closed.
-Canonical pos_divrPred := DivrPred pos_divr_closed.
+#[export]
+HB.instance Definition _ := GRing.isDivClosed.Build R Rpos_pred
+  pos_divr_closed.
 
 Fact nneg_divr_closed : divr_closed (@nneg R).
 Proof.
@@ -1257,17 +469,21 @@ split=> [|x y]; rewrite !nnegrE ?ler01 ?le0r // -!posrE.
 case/predU1P=> [-> _ | x_gt0]; first by rewrite mul0r eqxx.
 by case/predU1P=> [-> | y_gt0]; rewrite ?invr0 ?mulr0 ?eqxx // orbC rpred_div.
 Qed.
-Canonical nneg_mulrPred := MulrPred nneg_divr_closed.
-Canonical nneg_divrPred := DivrPred nneg_divr_closed.
+#[export]
+HB.instance Definition _ := GRing.isDivClosed.Build R Rnneg_pred
+  nneg_divr_closed.
 
 Fact nneg_addr_closed : addr_closed (@nneg R).
 Proof. by split; [apply: lexx | apply: addr_ge0]. Qed.
-Canonical nneg_addrPred := AddrPred nneg_addr_closed.
-Canonical nneg_semiringPred := SemiringPred nneg_divr_closed.
+#[export]
+HB.instance Definition _ := GRing.isAddClosed.Build R Rnneg_pred
+  nneg_addr_closed.
 
 Fact real_oppr_closed : oppr_closed (@real R).
 Proof. by move=> x; rewrite /= !realE oppr_ge0 orbC -!oppr_ge0 opprK. Qed.
-Canonical real_opprPred := OpprPred real_oppr_closed.
+#[export]
+HB.instance Definition _ := GRing.isOppClosed.Build R Rreal_pred
+  real_oppr_closed.
 
 Fact real_addr_closed : addr_closed (@real R).
 Proof.
@@ -1278,8 +494,9 @@ without loss{Rx} x_ge0: x y Ry / 0 <= x.
 case/orP: Ry => [y_ge0 | y_le0]; first by rewrite realE -nnegrE rpredD.
 by rewrite realE -[y]opprK orbC -oppr_ge0 opprB !subr_ge0 ger_leVge ?oppr_ge0.
 Qed.
-Canonical real_addrPred := AddrPred real_addr_closed.
-Canonical real_zmodPred := ZmodPred real_oppr_closed.
+#[export]
+HB.instance Definition _ := GRing.isAddClosed.Build R Rreal_pred
+  real_addr_closed.
 
 Fact real_divr_closed : divr_closed (@real R).
 Proof.
@@ -1291,26 +508,19 @@ without loss{Ry} y_ge0: y / 0 <= y; last by rewrite realE -nnegrE rpred_div.
 case/orP: Ry => [? | y_le0]; first exact.
 by rewrite -rpredN -mulrN -invrN; apply; rewrite ?oppr_ge0.
 Qed.
-Canonical real_mulrPred := MulrPred real_divr_closed.
-Canonical real_smulrPred := SmulrPred real_divr_closed.
-Canonical real_divrPred := DivrPred real_divr_closed.
-Canonical real_sdivrPred := SdivrPred real_divr_closed.
-Canonical real_semiringPred := SemiringPred real_divr_closed.
-Canonical real_subringPred := SubringPred real_divr_closed.
-Canonical real_divringPred := DivringPred real_divr_closed.
+#[export]
+HB.instance Definition _ := GRing.isDivClosed.Build R Rreal_pred
+  real_divr_closed.
 
 End NumDomain.
 
 Lemma num_real (R : realDomainType) (x : R) : x \is real.
 Proof. exact: le_total. Qed.
 
-Fact archi_bound_subproof (R : archiFieldType) : archimedean_axiom R.
-Proof. by case: R => ? []. Qed.
-
 Section RealClosed.
 Variable R : rcfType.
 
-Lemma poly_ivt : real_closed_axiom R. Proof. by case: R => ? []. Qed.
+Lemma poly_ivt : real_closed_axiom R. Proof. exact: poly_ivt_subproof. Qed.
 
 Fact sqrtr_subproof (x : R) :
   exists2 y, 0 <= y & (if 0 <= x then y ^+ 2 == x else y == 0) : bool.
@@ -1325,28 +535,13 @@ Qed.
 
 End RealClosed.
 
+Module Exports. HB.reexport. End Exports.
+
 End Internals.
 
 Module PredInstances.
 
-Canonical pos_mulrPred.
-Canonical pos_divrPred.
-
-Canonical nneg_addrPred.
-Canonical nneg_mulrPred.
-Canonical nneg_divrPred.
-Canonical nneg_semiringPred.
-
-Canonical real_addrPred.
-Canonical real_opprPred.
-Canonical real_zmodPred.
-Canonical real_mulrPred.
-Canonical real_smulrPred.
-Canonical real_divrPred.
-Canonical real_sdivrPred.
-Canonical real_semiringPred.
-Canonical real_subringPred.
-Canonical real_divringPred.
+Export Internals.Exports.
 
 End PredInstances.
 
@@ -1368,12 +563,13 @@ Section NumIntegralDomainTheory.
 Variable R : numDomainType.
 Implicit Types (V : normedZmodType R) (x y z t : R).
 
-(* Lemmas from the signature (reexported from internals). *)
+(* Lemmas from the signature (reexported). *)
 
 Definition ler_normD V (x y : V) : `|x + y| <= `|x| + `|y| :=
   ler_normD x y.
 Definition addr_gt0 x y : 0 < x -> 0 < y -> 0 < x + y := @addr_gt0 R x y.
-Definition normr0_eq0 V (x : V) : `|x| = 0 -> x = 0 := @normr0_eq0 R V x.
+Definition normr0_eq0 V (x : V) : `|x| = 0 -> x = 0 :=
+  @normr0_eq0 R V x.
 Definition ger_leVge x y : 0 <= x -> 0 <= y -> (x <= y) || (y <= x) :=
   @ger_leVge R x y.
 Definition normrM : {morph norm : x y / (x : R) * y} := @normrM R.
@@ -1411,12 +607,18 @@ Qed.
 Lemma ler01 : 0 <= 1 :> R. Proof. exact: ler01. Qed.
 Lemma ltr01 : 0 < 1 :> R. Proof. exact: ltr01. Qed.
 Lemma ler0n n : 0 <= n%:R :> R. Proof. by rewrite -nnegrE rpred_nat. Qed.
-Hint Resolve ler01 ltr01 ler0n : core.
+Hint Extern 0 (is_true (@Order.le ring_display _ _ _)) =>
+  (apply: ler01) : core.
+Hint Extern 0 (is_true (@Order.lt ring_display _ _ _)) =>
+  (apply: ltr01) : core.
+Hint Extern 0 (is_true (@Order.le ring_display _ _ _)) =>
+  (apply: ler0n) : core.
 Lemma ltr0Sn n : 0 < n.+1%:R :> R.
 Proof. by elim: n => // n; apply: addr_gt0. Qed.
 Lemma ltr0n n : (0 < n%:R :> R) = (0 < n)%N.
 Proof. by case: n => //= n; apply: ltr0Sn. Qed.
-Hint Resolve ltr0Sn : core.
+Hint Extern 0 (is_true (@Order.lt ring_display _ _ _)) =>
+  (apply: ltr0Sn) : core.
 
 Lemma pnatr_eq0 n : (n%:R == 0 :> R) = (n == 0)%N.
 Proof. by case: n => [|n]; rewrite ?mulr0n ?eqxx // gt_eqF. Qed.
@@ -1440,13 +642,13 @@ Proof. exact: (big_morph norm normrM normr1). Qed.
 Lemma normrX n x : `|x ^+ n| = `|x| ^+ n.
 Proof. by rewrite -(card_ord n) -!prodr_const normr_prod. Qed.
 
-Lemma normr_unit : {homo (@norm R R) : x / x \is a GRing.unit}.
+Lemma normr_unit : {homo (@norm _ (* R *) R) : x / x \is a GRing.unit}.
 Proof.
 move=> x /= /unitrP [y [yx xy]]; apply/unitrP; exists `|y|.
 by rewrite -!normrM xy yx normr1.
 Qed.
 
-Lemma normrV : {in GRing.unit, {morph (@norm R R) : x / x ^-1}}.
+Lemma normrV : {in GRing.unit, {morph (@norm _ (* R *) R) : x / x ^-1}}.
 Proof.
 move=> x ux; apply: (mulrI (normr_unit ux)).
 by rewrite -normrM !divrr ?normr1 ?normr_unit.
@@ -1526,9 +728,9 @@ Lemma subr_ge0 x y : (0 <= y - x) = (x <= y). Proof. exact: subr_ge0. Qed.
 Lemma subr_gt0 x y : (0 < y - x) = (x < y).
 Proof. by rewrite !lt_def subr_eq0 subr_ge0. Qed.
 Lemma subr_le0  x y : (y - x <= 0) = (y <= x).
-Proof. by rewrite -subr_ge0 opprB add0r subr_ge0. Qed.
+Proof. by rewrite -[LHS]subr_ge0 opprB add0r subr_ge0. Qed.  (* FIXME: rewrite pattern *)
 Lemma subr_lt0  x y : (y - x < 0) = (y < x).
-Proof. by rewrite -subr_gt0 opprB add0r subr_gt0. Qed.
+Proof. by rewrite -[LHS]subr_gt0 opprB add0r subr_gt0. Qed.  (* FIXME: rewrite pattern *)
 
 Definition subr_lte0 := (subr_le0, subr_lt0).
 Definition subr_gte0 := (subr_ge0, subr_gt0).
@@ -1566,11 +768,18 @@ Arguments ler01 {R}.
 Arguments ltr01 {R}.
 Arguments normr_idP {R x}.
 Arguments normr0P {R V v}.
-#[global] Hint Resolve ler01 ltr01 ltr0Sn ler0n : core.
+#[global] Hint Extern 0 (is_true (@Order.le ring_display _ _ _)) =>
+  (apply: ler01) : core.
+#[global] Hint Extern 0 (is_true (@Order.lt ring_display _ _ _)) =>
+  (apply: ltr01) : core.
+#[global] Hint Extern 0 (is_true (@Order.le ring_display _ _ _)) =>
+  (apply: ler0n) : core.
+#[global] Hint Extern 0 (is_true (@Order.lt ring_display _ _ _)) =>
+  (apply: ltr0Sn) : core.
 #[global] Hint Extern 0 (is_true (0 <= norm _)) => apply: normr_ge0 : core.
 
 Lemma normr_nneg (R : numDomainType) (x : R) : `|x| \is Num.nneg.
-Proof. by rewrite qualifE. Qed.
+Proof. by rewrite qualifE /=. Qed.
 #[global] Hint Resolve normr_nneg : core.
 
 Section NumDomainOperationTheory.
@@ -3278,7 +2487,8 @@ Lemma leifD x1 y1 C1 x2 y2 C2 :
     x1 <= y1 ?= iff C1 -> x2 <= y2 ?= iff C2 ->
   x1 + x2 <= y1 + y2 ?= iff C1 && C2.
 Proof.
-rewrite -(mono_leif (lerD2r x2)) -(mono_leif (C := C2) (lerD2l y1)).
+rewrite -(mono_leif (C := C1) (lerD2r x2)).
+rewrite -(mono_leif (C := C2) (lerD2l y1)).
 exact: leif_trans.
 Qed.
 
@@ -3502,7 +2712,7 @@ Lemma poly_disk_bound p b : {ub | forall x, `|x| <= b -> `|p.[x]| <= ub}.
 Proof.
 exists (\sum_(j < size p) `|p`_j| * b ^+ j) => x le_x_b.
 rewrite horner_coef (le_trans (ler_norm_sum _ _ _)) ?ler_sum // => j _.
-rewrite normrM normrX ler_wpM2l ?lerXn2r ?unfold_in //.
+rewrite normrM normrX ler_wpM2l ?lerXn2r ?unfold_in //=.
 exact: le_trans (normr_ge0 x) le_x_b.
 Qed.
 
@@ -4110,13 +3320,13 @@ Definition lter_ndivrMl := (ler_ndivrMl, ltr_ndivrMl).
 Lemma natf_div m d : (d %| m)%N -> (m %/ d)%:R = m%:R / d%:R :> F.
 Proof. by apply: char0_natf_div; apply: (@char_num F). Qed.
 
-Lemma normfV : {morph (@norm F F) : x / x ^-1}.
+Lemma normfV : {morph (norm : F -> F) : x / x ^-1}.
 Proof.
 move=> x /=; have [/normrV //|Nux] := boolP (x \is a GRing.unit).
 by rewrite !invr_out // unitfE normr_eq0 -unitfE.
 Qed.
 
-Lemma normf_div : {morph (@norm F F) : x y / x / y}.
+Lemma normf_div : {morph (norm : F -> F) : x y / x / y}.
 Proof. by move=> x y /=; rewrite normrM normfV. Qed.
 
 Lemma invr_sg x : (sg x)^-1 = sgr x.
@@ -4187,7 +3397,7 @@ have [||ltyx]// := comparable_leP.
   rewrite (@comparabler_trans _ (y + 1))// /Order.comparable ?lexye ?ltr01//.
   by rewrite lerDl ler01 orbT.
 have /midf_lt [_] := ltyx; rewrite le_gtF//.
-rewrite -(@addrK _ y y) addrAC -addrA 2!mulrDl -splitr lexye//.
+rewrite -(@addrK _ y y) (addrAC _ _ x) -addrA 2!mulrDl -splitr lexye//.
 by rewrite divr_gt0// ?ltr0n// subr_gt0.
 Qed.
 
@@ -4502,7 +3712,7 @@ Lemma sgr_smul x y : sg (sg x * y) = sg x * sg y.
 Proof. by rewrite sgrM sgr_id. Qed.
 
 Lemma sgr_gt0 x : (sg x > 0) = (x > 0).
-Proof. by rewrite -sgr_cp0 sgr_id sgr_cp0. Qed.
+Proof. by rewrite -[LHS]sgr_cp0 sgr_id sgr_cp0. Qed.
 
 Lemma sgr_ge0 x : (sgr x >= 0) = (x >= 0).
 Proof. by rewrite !leNgt sgr_lt0. Qed.
@@ -4856,27 +4066,21 @@ Qed.
 
 End RealClosedFieldTheory.
 
-Definition conjC {C : numClosedFieldType} : {rmorphism C -> C} :=
- ClosedField.conj_op (ClosedField.conj_mixin (ClosedField.class C)).
-Notation "z ^*" := (@conjC _ z) (at level 2, format "z ^*") : ring_scope.
-
-Definition imaginaryC {C : numClosedFieldType} : C :=
- ClosedField.imaginary (ClosedField.conj_mixin (ClosedField.class C)).
-Notation "'i" := (@imaginaryC _) (at level 0) : ring_scope.
+Notation "z ^*" := (conj_op z) (at level 2, format "z ^*") : ring_scope.
+Notation "'i" := imaginary (at level 0) : ring_scope.
 
 Section ClosedFieldTheory.
 
 Variable C : numClosedFieldType.
 Implicit Types a x y z : C.
 
-Definition normCK x : `|x| ^+ 2 = x * x^*.
-Proof. by case: C x => ? [? ? ? []]. Qed.
+Definition normCK : forall x, `|x| ^+ 2 = x * x^* := normCK.
 
-Lemma sqrCi : 'i ^+ 2 = -1 :> C. Proof. by case: C => ? [? ? ? []]. Qed.
+Definition sqrCi : 'i ^+ 2 = -1 :> C := sqrCi.
 
 Lemma mulCii : 'i * 'i = -1 :> C. Proof. exact: sqrCi. Qed.
 
-Lemma conjCK : involutive (@conjC C).
+Lemma conjCK : involutive (@conj_op C).
 Proof.
 have JE x : x^* = `|x|^+2 / x.
   have [->|x_neq0] := eqVneq x 0; first by rewrite rmorph0 invr0 mulr0.
@@ -4888,7 +4092,7 @@ by rewrite divff ?mul1r ?invrK // !expf_eq0 normr_eq0 //.
 Qed.
 
 Let Re2 z := z + z^*.
-Definition nnegIm z := (0 <= imaginaryC * (z^* - z)).
+Definition nnegIm z := (0 <= 'i * (z^* - z)).
 Definition argCle y z := nnegIm z ==> nnegIm y && (Re2 z <= Re2 y).
 
 Variant rootC_spec n (x : C) : Type :=
@@ -4947,7 +4151,7 @@ Lemma normCKC x : `|x| ^+ 2 = x^* * x. Proof. by rewrite normCK mulrC. Qed.
 Lemma mul_conjC_ge0 x : 0 <= x * x^*.
 Proof. by rewrite -normCK exprn_ge0. Qed.
 
-Lemma mul_conjC_gt0 x : (0 < x * x^*) = (x != 0).
+Lemma mul_conjC_gt0 x : (0 < x * x^* ) = (x != 0).
 Proof.
 have [->|x_neq0] := eqVneq; first by rewrite rmorph0 mulr0.
 by rewrite -normCK exprn_gt0 ?normr_gt0.
@@ -4956,11 +4160,11 @@ Qed.
 Lemma mul_conjC_eq0 x : (x * x^* == 0) = (x == 0).
 Proof. by rewrite -normCK expf_eq0 normr_eq0. Qed.
 
-Lemma conjC_ge0 x : (0 <= x^*) = (0 <= x).
+Lemma conjC_ge0 x : (0 <= x^* ) = (0 <= x).
 Proof.
 wlog suffices: x / 0 <= x -> 0 <= x^*.
   by move=> IH; apply/idP/idP=> /IH; rewrite ?conjCK.
-rewrite le0r => /predU1P[-> | x_gt0]; first by rewrite rmorph0.
+rewrite [in X in X -> _]le0r => /predU1P[-> | x_gt0]; first by rewrite rmorph0.
 by rewrite -(pmulr_rge0 _ x_gt0) mul_conjC_ge0.
 Qed.
 
@@ -4993,7 +4197,7 @@ Proof. by move/CrealP. Qed.
 Lemma conj_normC z : `|z|^* = `|z|.
 Proof. by rewrite conj_Creal ?normr_real. Qed.
 
-Lemma CrealJ : {mono (@conjC C) : x / x \is Num.real}.
+Lemma CrealJ : {mono (@conj_op C) : x / x \is Num.real}.
 Proof. by apply: (homo_mono1 conjCK) => x xreal; rewrite conj_Creal. Qed.
 
 Lemma geC0_conj x : 0 <= x -> x^* = x.
@@ -5048,7 +4252,7 @@ Proof. by rewrite -invCi invC_norm normCi expr1n invr1 mul1r. Qed.
 Lemma Crect x : x = 'Re x + 'i * 'Im x.
 Proof.
 rewrite !(ReE, ImE) 2!mulrA mulCii mulN1r opprB -mulrDl.
-by rewrite addrACA subrr addr0 -mulr2n -mulr_natr mulfK.
+by rewrite addrACA subrr addr0 mulrDl -splitr.
 Qed.
 
 Lemma eqCP x y : x = y <-> ('Re x = 'Re y) /\ ('Im x = 'Im y).
@@ -5058,24 +4262,26 @@ Lemma eqC x y : (x == y) = ('Re x == 'Re y) && ('Im x == 'Im y).
 Proof. by apply/eqP/(andPP eqP eqP) => /eqCP. Qed.
 
 Lemma Creal_Re x : 'Re x \is real.
-Proof. by rewrite ReE CrealE fmorph_div rmorph_nat rmorphD conjCK addrC. Qed.
+Proof. by rewrite ReE CrealE fmorph_div rmorph_nat rmorphD /= conjCK addrC. Qed.
 
 Lemma Creal_Im x : 'Im x \is real.
 Proof.
-rewrite ImE CrealE fmorph_div rmorph_nat rmorphM rmorphB conjCK.
+rewrite ImE CrealE fmorph_div rmorph_nat rmorphM /= rmorphB conjCK.
 by rewrite conjCi -opprB mulrNN.
 Qed.
 Hint Resolve Creal_Re Creal_Im : core.
 
 Fact Re_is_additive : additive Re.
 Proof. by move=> x y; rewrite !ReE rmorphB addrACA -opprD mulrBl. Qed.
-Canonical Re_additive := Additive Re_is_additive.
+#[export]
+HB.instance Definition _ := GRing.isAdditive.Build C C Re Re_is_additive.
 
 Fact Im_is_additive : additive Im.
 Proof.
 by move=> x y; rewrite !ImE rmorphB opprD addrACA -opprD mulrBr mulrBl.
 Qed.
-Canonical Im_additive := Additive Im_is_additive.
+#[export]
+HB.instance Definition _ := GRing.isAdditive.Build C C Im Im_is_additive.
 
 Lemma Creal_ImP z : reflect ('Im z = 0) (z \is real).
 Proof.
@@ -5091,7 +4297,7 @@ Qed.
 
 Lemma ReMl : {in real, forall x, {morph Re : z / x * z}}.
 Proof.
-by move=> x Rx z /=; rewrite !ReE rmorphM (conj_Creal Rx) -mulrDr -mulrA.
+by move=> x Rx z /=; rewrite !ReE rmorphM /= (conj_Creal Rx) -mulrDr -mulrA.
 Qed.
 
 Lemma ReMr : {in real, forall x, {morph Re : z / z * x}}.
@@ -5099,7 +4305,7 @@ Proof. by move=> x Rx z /=; rewrite mulrC ReMl // mulrC. Qed.
 
 Lemma ImMl : {in real, forall x, {morph Im : z / x * z}}.
 Proof.
-by move=> x Rx z; rewrite !ImE rmorphM (conj_Creal Rx) -mulrBr mulrCA !mulrA.
+by move=> x Rx z; rewrite !ImE rmorphM /= (conj_Creal Rx) -mulrBr mulrCA !mulrA.
 Qed.
 
 Lemma ImMr : {in real, forall x, {morph Im : z / z * x}}.
@@ -5133,7 +4339,7 @@ Qed.
 
 Lemma conjC_rect : {in real &, forall x y, (x + 'i * y)^* = x - 'i * y}.
 Proof.
-by move=> x y Rx Ry; rewrite /= rmorphD rmorphM conjCi mulNr !conj_Creal.
+by move=> x y Rx Ry; rewrite /= rmorphD rmorphM /= conjCi mulNr !conj_Creal.
 Qed.
 
 Lemma addC_rect x1 y1 x2 y2 :
@@ -5176,7 +4382,7 @@ Proof. by rewrite -ImMil mulrCA ImM ImMil ReMil mulNr ['Im _ * _]mulrC. Qed.
 Lemma normC2_rect :
   {in real &, forall x y, `|x + 'i * y| ^+ 2 = x ^+ 2 + y ^+ 2}.
 Proof.
-move=> x y Rx Ry; rewrite /= normCK rmorphD rmorphM conjCi !conj_Creal //.
+move=> x y Rx Ry; rewrite /= normCK rmorphD rmorphM /= conjCi !conj_Creal //.
 by rewrite mulrC mulNr -subr_sqr exprMn sqrCi mulN1r opprK.
 Qed.
 
@@ -5184,7 +4390,7 @@ Lemma normC2_Re_Im z : `|z| ^+ 2 = 'Re z ^+ 2 + 'Im z ^+ 2.
 Proof. by rewrite -normC2_rect -?Crect. Qed.
 
 Lemma invC_Crect x y : (x + 'i * y)^-1  = (x^* - 'i * y^*) / `|x + 'i * y| ^+ 2.
-Proof. by rewrite /= invC_norm mulrC !rmorphE rmorphM conjCi mulNr. Qed.
+Proof. by rewrite /= invC_norm mulrC !rmorphE rmorphM /= conjCi mulNr. Qed.
 
 Lemma invC_rect :
   {in real &, forall x y, (x + 'i * y)^-1  = (x - 'i * y) / (x ^+ 2 + y ^+ 2)}.
@@ -5233,7 +4439,7 @@ Proof. by rewrite ReM ImV ReV !mulrA -mulrBl mulrN opprK. Qed.
 
 Lemma leif_normC_Re_Creal z : `|'Re z| <= `|z| ?= iff (z \is real).
 Proof.
-rewrite -(mono_in_leif ler_sqr); try by rewrite qualifE.
+rewrite -(mono_in_leif ler_sqr); try by rewrite qualifE /=.
 rewrite [`|'Re _| ^+ 2]normCK conj_Creal // normC2_Re_Im -expr2.
 rewrite addrC -leifBLR subrr (sameP (Creal_ImP _) eqP) -sqrf_eq0 eq_sym.
 by apply: leif_eq; rewrite -realEsqr.
@@ -5301,7 +4507,7 @@ have [w wn1 ltRw0] := neg_unity_root n_gt1.
 wlog leRI0yw: w wn1 ltRw0 / 0 <= 'Re y * 'Im w.
   move=> IHw; have: 'Re y * 'Im w \is real by rewrite rpredM.
   case/real_ge0P=> [|/ltW leRIyw0]; first exact: IHw.
-  apply: (IHw w^*); rewrite ?Re_conj ?Im_conj ?mulrN ?oppr_ge0 //.
+  apply: (IHw w^* ); rewrite ?Re_conj ?Im_conj ?mulrN ?oppr_ge0 //.
   by rewrite -rmorphXn wn1 rmorph1.
 exists (w * y); first by rewrite exprMn wn1 mul1r rootCK.
 rewrite [w]Crect [y]Crect mulC_rect.
@@ -5321,8 +4527,8 @@ have [z zn_x leR0z]: exists2 z, z ^+ n = x & 'Re z >= 0.
 without loss leI0z: z zn_x leR0z / 'Im z >= 0.
   move=> IHz; have: 'Im z \is real by [].
   case/real_ge0P=> [|/ltW leIz0]; first exact: IHz.
-  apply: (IHz z^*); rewrite ?Re_conj ?Im_conj ?oppr_ge0 //.
-  by rewrite -rmorphXn zn_x conj_Creal.
+  apply: (IHz z^* ); rewrite ?Re_conj ?Im_conj ?oppr_ge0 //.
+  by rewrite -rmorphXn /= zn_x conj_Creal.
 by apply: le_trans leR0z _; rewrite -Re_y ?rootC_Re_max ?ltr0_real.
 Qed.
 
@@ -5347,7 +4553,7 @@ Qed.
 Lemma ler_rootCl n : (n > 0)%N -> {in Num.nneg, {mono n.-root : x y / x <= y}}.
 Proof.
 move=> n_gt0 x x_ge0 y; have [y_ge0 | not_y_ge0] := boolP (0 <= y).
-  by rewrite -(ler_pXn2r n_gt0) ?qualifE ?rootC_ge0 ?rootCK.
+  by rewrite -(ler_pXn2r n_gt0) ?qualifE /= ?rootC_ge0 ?rootCK.
 rewrite (contraNF (@le_trans _ _ _ 0 _ _)) ?rootC_ge0 //.
 by rewrite (contraNF (le_trans x_ge0)).
 Qed.
@@ -5399,7 +4605,7 @@ Proof. by move=> n_gt0; rewrite -{1}(rootC1 n_gt0) eqr_rootC. Qed.
 
 Lemma rootC_ge1 n x : (n > 0)%N -> (n.-root x >= 1) = (x >= 1).
 Proof.
-by move=> n_gt0; rewrite -{1}(rootC1 n_gt0) ler_rootCl // qualifE ler01.
+by move=> n_gt0; rewrite -{1}(rootC1 n_gt0) ler_rootCl // qualifE /= ler01.
 Qed.
 
 Lemma rootC_gt1 n x : (n > 0)%N -> (n.-root x > 1) = (x > 1).
@@ -5453,7 +4659,7 @@ move=> Ege0; have [n0 | n_gt0] := posnP n.
   rewrite n0 root0C invr0 mulr0; apply/leif_refl/forall_inP=> i.
   by rewrite (card0_eq n0).
 rewrite -(mono_in_leif (ler_pXn2r n_gt0)) ?rootCK //=; first 1 last.
-- by rewrite qualifE rootC_ge0 // prodr_ge0.
+- by rewrite qualifE /= rootC_ge0 // prodr_ge0.
 - by rewrite rpred_div ?rpred_nat ?rpred_sum.
 exact: leif_AGM.
 Qed.
@@ -5492,7 +4698,7 @@ apply/Creal_ImP/le_anti;
 by rewrite leI0x -oppr_ge0 -raddfN -defNx Im_rootC_ge0.
 Qed.
 
-Lemma normC_def x : `|x| = sqrtC (x * x^*).
+Lemma normC_def x : `|x| = sqrtC (x * x^* ).
 Proof. by rewrite -normCK sqrCK. Qed.
 
 Lemma norm_conjC x : `|x^*| = `|x|.
@@ -5518,7 +4724,7 @@ have uE z: (`|u z| = 1) * (`|z| * u z = z).
 have [->|nz_x] := eqVneq x 0; first by exists (u y); rewrite uE ?normr0 ?mul0r.
 exists (u x); rewrite uE // /u (negPf nz_x); congr (_ , _).
 have{lin_xy} def2xy: `|x| * `|y| *+ 2 = x * y ^* + y * x ^*.
-  apply/(addrI (x * x^*))/(addIr (y * y^*)); rewrite -2!{1}normCK -sqrrD.
+  apply/(addrI (x * x^* ))/(addIr (y * y^* )); rewrite -2!{1}normCK -sqrrD.
   by rewrite addrA -addrA -!mulrDr -mulrDl -rmorphD -normCK lin_xy.
 have def_xy: x * y^* = y * x^*.
   apply/eqP; rewrite -subr_eq0 -[_ == 0](@expf_eq0 _ _ 2).
@@ -5597,7 +4803,7 @@ Notation normC_sub_eq := normCBeq.
 
 Notation "n .-root" := (@nthroot _ n).
 Notation sqrtC := 2.-root.
-Notation "'i" := (@imaginaryC _) : ring_scope.
+Notation "'i" := imaginary : ring_scope.
 Notation "'Re z" := (Re z) : ring_scope.
 Notation "'Im z" := (Im z) : ring_scope.
 
@@ -5610,122 +4816,6 @@ Arguments sqrCK_P {C x}.
 #[global] Hint Extern 0 (is_true (in_mem ('Im _) _)) =>
   solve [apply: Creal_Im] : core.
 
-End Theory.
-
-(*************)
-(* FACTORIES *)
-(*************)
-
-Module NumMixin.
-Section NumMixin.
-Variable (R : idomainType).
-
-Record of_ := Mixin {
-  le : rel R;
-  lt : rel R;
-  norm : R -> R;
-  normD     : forall x y, le (norm (x + y)) (norm x + norm y);
-  addr_gt0  : forall x y, lt 0 x -> lt 0 y -> lt 0 (x + y);
-  norm_eq0  : forall x, norm x = 0 -> x = 0;
-  ger_total : forall x y, le 0 x -> le 0 y -> le x y || le y x;
-  normM     : {morph norm : x y / x * y};
-  le_def    : forall x y, (le x y) = (norm (y - x) == y - x);
-  lt_def    : forall x y, (lt x y) = (y != x) && (le x y)
-}.
-
-Variable (m : of_).
-
-Local Notation "x <= y" := (le m x y) : ring_scope.
-Local Notation "x < y" := (lt m x y) : ring_scope.
-Local Notation "`| x |" := (norm m x) : ring_scope.
-
-Lemma ltrr x : x < x = false. Proof. by rewrite lt_def eqxx. Qed.
-
-Lemma ge0_def x : (0 <= x) = (`|x| == x).
-Proof. by rewrite le_def subr0. Qed.
-
-Lemma subr_ge0 x y : (0 <= x - y) = (y <= x).
-Proof. by rewrite ge0_def -le_def. Qed.
-
-Lemma subr_gt0 x y : (0 < y - x) = (x < y).
-Proof. by rewrite !lt_def subr_eq0 subr_ge0. Qed.
-
-Lemma lt_trans : transitive (lt m).
-Proof.
-move=> y x z le_xy le_yz.
-by rewrite -subr_gt0 -(subrK y z) -addrA addr_gt0 // subr_gt0.
-Qed.
-
-Lemma le01 : 0 <= 1.
-Proof.
-have n1_nz: `|1| != 0 :> R by apply: contraNneq (@oner_neq0 R) => /norm_eq0->.
-by rewrite ge0_def -(inj_eq (mulfI n1_nz)) -normM !mulr1.
-Qed.
-
-Lemma lt01 : 0 < 1.
-Proof. by rewrite lt_def oner_neq0 le01. Qed.
-
-Lemma ltW x y : x < y -> x <= y. Proof. by rewrite lt_def => /andP[]. Qed.
-
-Lemma lerr x : x <= x.
-Proof.
-have n2: `|2| == 2 :> R by rewrite -ge0_def ltW ?addr_gt0 ?lt01.
-rewrite le_def subrr -(inj_eq (addrI `|0|)) addr0 -mulr2n -mulr_natr.
-by rewrite -(eqP n2) -normM mul0r.
-Qed.
-
-Lemma le_def' x y : (x <= y) = (x == y) || (x < y).
-Proof. by rewrite lt_def; case: eqVneq => //= ->; rewrite lerr. Qed.
-
-Lemma le_trans : transitive (le m).
-by move=> y x z; rewrite !le_def' => /predU1P [->|hxy] // /predU1P [<-|hyz];
-  rewrite ?hxy ?(lt_trans hxy hyz) orbT.
-Qed.
-
-Lemma normrMn x n : `|x *+ n| = `|x| *+ n.
-Proof.
-rewrite -mulr_natr -[RHS]mulr_natr normM.
-congr (_ * _); apply/eqP; rewrite -ge0_def.
-elim: n => [|n ih]; [exact: lerr | apply: (le_trans ih)].
-by rewrite le_def -natrB // subSnn -[_%:R]subr0 -le_def mulr1n le01.
-Qed.
-
-Lemma normrN1 : `|-1| = 1 :> R.
-Proof.
-have: `|-1| ^+ 2 == 1 :> R
-  by rewrite expr2 /= -normM mulrNN mul1r -[1]subr0 -le_def le01.
-rewrite sqrf_eq1 => /predU1P [] //; rewrite -[-1]subr0 -le_def.
-have ->: 0 <= -1 = (-1 == 0 :> R) || (0 < -1)
-  by rewrite lt_def; case: eqP => // ->; rewrite lerr.
-by rewrite oppr_eq0 oner_eq0 => /(addr_gt0 lt01); rewrite subrr ltrr.
-Qed.
-
-Lemma normrN x : `|- x| = `|x|.
-Proof. by rewrite -mulN1r normM -[RHS]mul1r normrN1. Qed.
-
-Definition ltPOrderMixin : ltPOrderMixin R :=
-  LtPOrderMixin le_def' ltrr lt_trans.
-
-Definition normedZmodMixin :
-  @normed_mixin_of R R ltPOrderMixin :=
-  @Num.NormedMixin _ _ ltPOrderMixin (norm m)
-                   (normD m) (@norm_eq0 m) normrMn normrN.
-
-Definition numDomainMixin :
-  @mixin_of R ltPOrderMixin normedZmodMixin :=
-  @Num.Mixin _ ltPOrderMixin normedZmodMixin (@addr_gt0 m)
-             (@ger_total m) (@normM m) (@le_def m).
-
-End NumMixin.
-
-Module Exports.
-Notation numMixin := of_.
-Notation NumMixin := Mixin.
-Coercion ltPOrderMixin : numMixin >-> Order.LtPOrderMixin.of_.
-Coercion normedZmodMixin : numMixin >-> normed_mixin_of.
-Coercion numDomainMixin : numMixin >-> mixin_of.
-Definition NumDomainOfIdomain (T : idomainType) (m : of_ T) :=
-  NumDomainType (POrderType ring_display T m) m.
 #[deprecated(since="mathcomp 1.17.0", note="Use ler_normD instead.")]
 Notation ler_norm_add := ler_normD.
 #[deprecated(since="mathcomp 1.17.0", note="Use ler_normB instead.")]
@@ -5754,254 +4844,292 @@ Notation minr_nmulr := minr_nMr.
 Notation minr_nmull := minr_nMl.
 #[deprecated(since="mathcomp 1.17.0", note="Use maxr_nMl instead.")]
 Notation maxr_nmull := maxr_nMl.
-End Exports.
 
-End NumMixin.
-Import NumMixin.Exports.
+End Theory.
 
-Module RealMixin.
-Section RealMixin.
-Variables (R : numDomainType).
-
-Variable (real : real_axiom R).
-
-Lemma le_total : totalPOrderMixin R.
-Proof.
-move=> x y; move: (real (x - y)).
-by rewrite unfold_in !ler_def subr0 add0r opprB orbC.
-Qed.
-
-End RealMixin.
-
-Module Exports.
-Coercion le_total : real_axiom >-> totalPOrderMixin.
-Definition RealDomainOfNumDomain (T : numDomainType) (m : real_axiom T) :=
-  [realDomainType of OrderOfPOrder m].
-End Exports.
-
-End RealMixin.
-Import RealMixin.Exports.
-
-Module RealLeMixin.
-Section RealLeMixin.
-Variables (R : idomainType).
-
-Record of_ := Mixin {
-  le : rel R;
-  lt : rel R;
+HB.factory Record IntegralDomain_isNumRing R of GRing.IntegralDomain R := {
+  Rle : rel R;
+  Rlt : rel R;
   norm : R -> R;
-  le0_add   : forall x y, le 0 x -> le 0 y -> le 0 (x + y);
-  le0_mul   : forall x y, le 0 x -> le 0 y -> le 0 (x * y);
-  le0_anti  : forall x, le 0 x -> le x 0 -> x = 0;
-  sub_ge0   : forall x y, le 0 (y - x) = le x y;
-  le0_total : forall x, le 0 x || le x 0;
-  normN     : forall x, norm (- x) = norm x;
-  ge0_norm  : forall x, le 0 x -> norm x = x;
-  lt_def    : forall x y, lt x y = (y != x) && le x y;
+  normD     : forall x y, Rle (norm (x + y)) (norm x + norm y);
+  addr_gt0  : forall x y, Rlt 0 x -> Rlt 0 y -> Rlt 0 (x + y);
+  norm_eq0  : forall x, norm x = 0 -> x = 0;
+  ger_total : forall x y, Rle 0 x -> Rle 0 y -> Rle x y || Rle y x;
+  normM     : {morph norm : x y / x * y};
+  le_def    : forall x y, (Rle x y) = (norm (y - x) == y - x);
+  lt_def    : forall x y, (Rlt x y) = (y != x) && (Rle x y)
 }.
 
-Variable (m : of_).
+HB.builders Context R of IntegralDomain_isNumRing R.
+  Local Notation "x <= y" := (Rle x y) : ring_scope.
+  Local Notation "x < y" := (Rlt x y) : ring_scope.
+  Local Notation "`| x |" := (norm x) : ring_scope.
 
-Local Notation "x <= y" := (le m x y) : ring_scope.
-Local Notation "x < y" := (lt m x y) : ring_scope.
-Local Notation "`| x |" := (norm m x) : ring_scope.
+  Lemma ltrr x : x < x = false. Proof. by rewrite lt_def eqxx. Qed.
 
-Let le0N x : (0 <= - x) = (x <= 0). Proof. by rewrite -sub0r sub_ge0. Qed.
-Let leN_total x : 0 <= x \/ 0 <= - x.
-Proof. by apply/orP; rewrite le0N le0_total. Qed.
+  Lemma ge0_def x : (0 <= x) = (`|x| == x).
+  Proof. by rewrite le_def subr0. Qed.
 
-Let le00 : 0 <= 0. Proof. by have:= le0_total m 0; rewrite orbb. Qed.
+  Lemma subr_ge0 x y : (0 <= x - y) = (y <= x).
+  Proof. by rewrite ge0_def -le_def. Qed.
 
-Fact lt0_add x y : 0 < x -> 0 < y -> 0 < x + y.
-Proof.
-rewrite !lt_def => /andP [x_neq0 l0x] /andP [y_neq0 l0y]; rewrite le0_add //.
-rewrite andbT addr_eq0; apply: contraNneq x_neq0 => hxy.
-by rewrite [x](@le0_anti m) // hxy -le0N opprK.
-Qed.
+  Lemma subr_gt0 x y : (0 < y - x) = (x < y).
+  Proof. by rewrite !lt_def subr_eq0 subr_ge0. Qed.
 
-Fact eq0_norm x : `|x| = 0 -> x = 0.
-Proof.
-case: (leN_total x) => /ge0_norm => [-> // | Dnx nx0].
-by rewrite -[x]opprK -Dnx normN nx0 oppr0.
-Qed.
+  Lemma lt_trans : transitive Rlt.
+  Proof.
+  move=> y x z le_xy le_yz.
+  by rewrite -subr_gt0 -(subrK y z) -addrA addr_gt0 // subr_gt0.
+  Qed.
 
-Fact le_def x y : (x <= y) = (`|y - x| == y - x).
-Proof.
-wlog ->: x y / x = 0 by move/(_ 0 (y - x)); rewrite subr0 sub_ge0 => ->.
-rewrite {x}subr0; apply/idP/eqP=> [/ge0_norm// | Dy].
-by have [//| ny_ge0] := leN_total y; rewrite -Dy -normN ge0_norm.
-Qed.
+  Lemma le01 : 0 <= 1.
+  Proof.
+  have n1_nz: `|1| != 0 :> R by apply: contraNneq (@oner_neq0 R) => /norm_eq0->.
+  by rewrite ge0_def -(inj_eq (mulfI n1_nz)) -normM !mulr1.
+  Qed.
 
-Fact normM : {morph norm m : x y / x * y}.
-Proof.
-move=> x y /=; wlog x_ge0 : x / 0 <= x.
-  by move=> IHx; case: (leN_total x) => /IHx//; rewrite mulNr !normN.
-wlog y_ge0 : y / 0 <= y; last by rewrite ?ge0_norm ?le0_mul.
-by move=> IHy; case: (leN_total y) => /IHy//; rewrite mulrN !normN.
-Qed.
+  Lemma lt01 : 0 < 1.
+  Proof. by rewrite lt_def oner_neq0 le01. Qed.
 
-Fact le_normD x y : `|x + y| <= `|x| + `|y|.
-Proof.
-wlog x_ge0 : x y / 0 <= x.
-  by move=> IH; case: (leN_total x) => /IH// /(_ (- y)); rewrite -opprD !normN.
-rewrite -sub_ge0 ge0_norm //; have [y_ge0 | ny_ge0] := leN_total y.
-  by rewrite !ge0_norm ?subrr ?le0_add.
-rewrite -normN ge0_norm //; have [hxy|hxy] := leN_total (x + y).
-  by rewrite ge0_norm // opprD addrCA -addrA addKr le0_add.
-by rewrite -normN ge0_norm // opprK addrCA addrNK le0_add.
-Qed.
+  Lemma ltW x y : x < y -> x <= y. Proof. by rewrite lt_def => /andP[]. Qed.
 
-Fact le_total : total (le m).
-Proof. by move=> x y; rewrite -sub_ge0 -opprB le0N orbC -sub_ge0 le0_total. Qed.
+  Lemma lerr x : x <= x.
+  Proof.
+  have n2: `|2| == 2 :> R by rewrite -ge0_def ltW ?addr_gt0 ?lt01.
+  rewrite le_def subrr -(inj_eq (addrI `|0|)) addr0 -mulr2n -mulr_natr.
+  by rewrite -(eqP n2) -normM mul0r.
+  Qed.
 
-Definition numMixin : numMixin R :=
-  NumMixin le_normD lt0_add eq0_norm (in2W le_total) normM le_def (lt_def m).
+  Lemma le_def' x y : (x <= y) = (x == y) || (x < y).
+  Proof. by rewrite lt_def; case: eqVneq => //= ->; rewrite lerr. Qed.
 
-Definition orderMixin :
-  totalPOrderMixin (POrderType ring_display R numMixin) :=
-  le_total.
+  Lemma le_trans : transitive Rle.
+  by move=> y x z; rewrite !le_def' => /predU1P [->|hxy] // /predU1P [<-|hyz];
+    rewrite ?hxy ?(lt_trans hxy hyz) orbT.
+  Qed.
 
-End RealLeMixin.
+  Lemma normrMn x n : `|x *+ n| = `|x| *+ n.
+  Proof.
+  rewrite -mulr_natr -[RHS]mulr_natr normM.
+  congr (_ * _); apply/eqP; rewrite -ge0_def.
+  elim: n => [|n ih]; [exact: lerr | apply: (le_trans ih)].
+  by rewrite le_def -natrB // subSnn -[_%:R]subr0 -le_def mulr1n le01.
+  Qed.
 
-Module Exports.
-Notation realLeMixin := of_.
-Notation RealLeMixin := Mixin.
-Coercion numMixin : realLeMixin >-> NumMixin.of_.
-Coercion orderMixin : realLeMixin >-> totalPOrderMixin.
-Definition LeRealDomainOfIdomain (R : idomainType) (m : of_ R) :=
-  [realDomainType of @OrderOfPOrder _ (NumDomainOfIdomain m) m].
-Definition LeRealFieldOfField (R : fieldType) (m : of_ R) :=
-  [realFieldType of [numFieldType of LeRealDomainOfIdomain m]].
-End Exports.
+  Lemma normrN1 : `|-1| = 1 :> R.
+  Proof.
+  have: `|-1| ^+ 2 == 1 :> R
+    by rewrite expr2 /= -normM mulrNN mul1r -[1]subr0 -le_def le01.
+  rewrite sqrf_eq1 => /predU1P [] //; rewrite -[-1]subr0 -le_def.
+  have ->: 0 <= -1 = (-1 == 0 :> R) || (0 < -1)
+    by rewrite lt_def; case: eqP => // ->; rewrite lerr.
+  by rewrite oppr_eq0 oner_eq0 => /(addr_gt0 lt01); rewrite subrr ltrr.
+  Qed.
 
-End RealLeMixin.
-Import RealLeMixin.Exports.
+  Lemma normrN x : `|- x| = `|x|.
+  Proof. by rewrite -mulN1r normM -[RHS]mul1r normrN1. Qed.
 
-Module RealLtMixin.
-Section RealLtMixin.
-Variables (R : idomainType).
+  HB.instance Definition _ :=
+    Order.LtLe_isPOrder.Build ring_display R le_def' ltrr lt_trans.
 
-Record of_ := Mixin {
-  lt : rel R;
-  le : rel R;
-  norm : R -> R;
-  lt0_add   : forall x y, lt 0 x -> lt 0 y -> lt 0 (x + y);
-  lt0_mul   : forall x y, lt 0 x -> lt 0 y -> lt 0 (x * y);
-  lt0_ngt0  : forall x,  lt 0 x -> ~~ (lt x 0);
-  sub_gt0   : forall x y, lt 0 (y - x) = lt x y;
-  lt0_total : forall x, x != 0 -> lt 0 x || lt x 0;
-  normN     : forall x, norm (- x) = norm x;
-  ge0_norm  : forall x, le 0 x -> norm x = x;
-  le_def    : forall x y, le x y = (x == y) || lt x y;
+  HB.instance Definition _ :=
+    Zmodule_isNormed.Build _ R normD norm_eq0 normrMn normrN.
+
+  HB.instance Definition _ :=
+    isNumRing.Build R addr_gt0 ger_total normM le_def.
+HB.end.
+
+HB.factory Record NumDomain_isReal R of NumDomain R := {
+  real : real_axiom R
 }.
 
-Variable (m : of_).
+HB.builders Context R of NumDomain_isReal R.
+  Lemma le_total : Order.POrder_isTotal ring_display R.
+  Proof.
+  constructor=> x y; move: (real (x - y)).
+  by rewrite unfold_in /= !ler_def subr0 add0r opprB orbC.
+  Qed.
 
-Local Notation "x < y" := (lt m x y) : ring_scope.
-Local Notation "x <= y" := (le m x y) : ring_scope.
-Local Notation "`| x |" := (norm m x) : ring_scope.
+  HB.instance Definition _ := le_total.
+HB.end.
 
-Fact lt0N x : (- x < 0) = (0 < x).
-Proof. by rewrite -sub_gt0 add0r opprK. Qed.
-Let leN_total x : 0 <= x \/ 0 <= - x.
-Proof.
-rewrite !le_def [_ == - x]eq_sym oppr_eq0 -[0 < - x]lt0N opprK.
-apply/orP; case: (eqVneq x) => //=; exact: lt0_total.
-Qed.
+HB.factory Record IntegralDomain_isLeReal R of GRing.IntegralDomain R := {
+  Rle : rel R;
+  Rlt : rel R;
+  norm : R -> R;
+  le0_add   : forall x y, Rle 0 x -> Rle 0 y -> Rle 0 (x + y);
+  le0_mul   : forall x y, Rle 0 x -> Rle 0 y -> Rle 0 (x * y);
+  le0_anti  : forall x, Rle 0 x -> Rle x 0 -> x = 0;
+  sub_ge0   : forall x y, Rle 0 (y - x) = Rle x y;
+  le0_total : forall x, Rle 0 x || Rle x 0;
+  normN     : forall x, norm (- x) = norm x;
+  ge0_norm  : forall x, Rle 0 x -> norm x = x;
+  lt_def    : forall x y, Rlt x y = (y != x) && Rle x y;
+}.
 
-Let le00 : (0 <= 0). Proof. by rewrite le_def eqxx. Qed.
+HB.builders Context R of IntegralDomain_isLeReal R.
+  Local Notation le := Rle.
+  Local Notation lt := Rlt.
 
-Fact sub_ge0 x y : (0 <= y - x) = (x <= y).
-Proof. by rewrite !le_def eq_sym subr_eq0 eq_sym sub_gt0. Qed.
+  Local Notation "x <= y" := (le x y) : ring_scope.
+  Local Notation "x < y" := (lt x y) : ring_scope.
+  Local Notation "`| x |" := (norm x) : ring_scope.
 
-Fact le0_add x y : 0 <= x -> 0 <= y -> 0 <= x + y.
-Proof.
-rewrite !le_def => /predU1P [<-|x_gt0]; first by rewrite add0r.
-by case/predU1P=> [<-|y_gt0]; rewrite ?addr0 ?x_gt0 ?lt0_add // orbT.
-Qed.
+  Let le0N x : (0 <= - x) = (x <= 0). Proof. by rewrite -sub0r sub_ge0. Qed.
+  Let leN_total x : 0 <= x \/ 0 <= - x.
+  Proof. by apply/orP; rewrite le0N le0_total. Qed.
 
-Fact le0_mul x y : 0 <= x -> 0 <= y -> 0 <= x * y.
-Proof.
-rewrite !le_def => /predU1P [<-|x_gt0]; first by rewrite mul0r eqxx.
-by case/predU1P=> [<-|y_gt0]; rewrite ?mulr0 ?eqxx ?lt0_mul // orbT.
-Qed.
+  Let le00 : 0 <= 0. Proof. by have:= le0_total 0; rewrite orbb. Qed.
 
-Fact normM : {morph norm m : x y / x * y}.
-Proof.
-move=> x y /=; wlog x_ge0 : x / 0 <= x.
-  by move=> IHx; case: (leN_total x) => /IHx//; rewrite mulNr !normN.
-wlog y_ge0 : y / 0 <= y; last by rewrite ?ge0_norm ?le0_mul.
-by move=> IHy; case: (leN_total y) => /IHy//; rewrite mulrN !normN.
-Qed.
+  Fact lt0_add x y : 0 < x -> 0 < y -> 0 < x + y.
+  Proof.
+  rewrite !lt_def => /andP [x_neq0 l0x] /andP [y_neq0 l0y]; rewrite le0_add //.
+  rewrite andbT addr_eq0; apply: contraNneq x_neq0 => hxy.
+  by rewrite [x](@le0_anti) // hxy -le0N opprK.
+  Qed.
 
-Fact le_normD x y : `|x + y| <= `|x| + `|y|.
-Proof.
-wlog x_ge0 : x y / 0 <= x.
-  by move=> IH; case: (leN_total x) => /IH// /(_ (- y)); rewrite -opprD !normN.
-rewrite -sub_ge0 ge0_norm //; have [y_ge0 | ny_ge0] := leN_total y.
-  by rewrite !ge0_norm ?subrr ?le0_add.
-rewrite -normN ge0_norm //; have [hxy|hxy] := leN_total (x + y).
-  by rewrite ge0_norm // opprD addrCA -addrA addKr le0_add.
-by rewrite -normN ge0_norm // opprK addrCA addrNK le0_add.
-Qed.
+  Fact eq0_norm x : `|x| = 0 -> x = 0.
+  Proof.
+  case: (leN_total x) => /ge0_norm => [-> // | Dnx nx0].
+  by rewrite -[x]opprK -Dnx normN nx0 oppr0.
+  Qed.
 
-Fact eq0_norm x : `|x| = 0 -> x = 0.
-Proof.
-case: (leN_total x) => /ge0_norm => [-> // | Dnx nx0].
-by rewrite -[x]opprK -Dnx normN nx0 oppr0.
-Qed.
+  Fact le_def x y : (x <= y) = (`|y - x| == y - x).
+  Proof.
+  wlog ->: x y / x = 0 by move/(_ 0 (y - x)); rewrite subr0 sub_ge0 => ->.
+  rewrite {x}subr0; apply/idP/eqP=> [/ge0_norm// | Dy].
+  by have [//| ny_ge0] := leN_total y; rewrite -Dy -normN ge0_norm.
+  Qed.
 
-Fact le_def' x y : (x <= y) = (`|y - x| == y - x).
-Proof.
-wlog ->: x y / x = 0 by move/(_ 0 (y - x)); rewrite subr0 sub_ge0 => ->.
-rewrite {x}subr0; apply/idP/eqP=> [/ge0_norm// | Dy].
-by have [//| ny_ge0] := leN_total y; rewrite -Dy -normN ge0_norm.
-Qed.
+  Fact normM : {morph norm : x y / x * y}.
+  Proof.
+  move=> x y /=; wlog x_ge0 : x / 0 <= x.
+    by move=> IHx; case: (leN_total x) => /IHx//; rewrite mulNr !normN.
+  wlog y_ge0 : y / 0 <= y; last by rewrite ?ge0_norm ?le0_mul.
+  by move=> IHy; case: (leN_total y) => /IHy//; rewrite mulrN !normN.
+  Qed.
 
-Fact lt_def x y : (x < y) = (y != x) && (x <= y).
-Proof.
-rewrite le_def; case: eqVneq => //= ->; rewrite -sub_gt0 subrr.
-by apply/idP=> lt00; case/negP: (lt0_ngt0 lt00).
-Qed.
+  Fact le_normD x y : `|x + y| <= `|x| + `|y|.
+  Proof.
+  wlog x_ge0 : x y / 0 <= x.
+    by move=> IH; case: (leN_total x) => /IH// /(_ (- y)); rewrite -opprD !normN.
+  rewrite -sub_ge0 ge0_norm //; have [y_ge0 | ny_ge0] := leN_total y.
+    by rewrite !ge0_norm ?subrr ?le0_add.
+  rewrite -normN ge0_norm //; have [hxy|hxy] := leN_total (x + y).
+    by rewrite ge0_norm // opprD addrCA -addrA addKr le0_add.
+  by rewrite -normN ge0_norm // opprK addrCA addrNK le0_add.
+  Qed.
 
-Fact le_total : total (le m).
-Proof.
-move=> x y; rewrite !le_def; have [->|] //= := eqVneq; rewrite -subr_eq0.
-by move/(lt0_total m); rewrite -(sub_gt0 _ (x - y)) sub0r opprB !sub_gt0 orbC.
-Qed.
+  Fact le_total : total le.
+  Proof. by move=> x y; rewrite -sub_ge0 -opprB le0N orbC -sub_ge0 le0_total. Qed.
 
-Definition numMixin : numMixin R :=
-  NumMixin le_normD (@lt0_add m) eq0_norm (in2W le_total) normM le_def' lt_def.
+  HB.instance Definition _ := IntegralDomain_isNumRing.Build R
+    le_normD lt0_add eq0_norm (in2W le_total) normM le_def lt_def.
 
-Definition orderMixin :
-  totalPOrderMixin (POrderType ring_display R numMixin) :=
-  le_total.
+  HB.instance Definition _ := Order.POrder_isTotal.Build ring_display R
+    le_total.
+HB.end.
 
-End RealLtMixin.
+HB.factory Record IntegralDomain_isLtReal R of GRing.IntegralDomain R := {
+  Rlt : rel R;
+  Rle : rel R;
+  norm : R -> R;
+  lt0_add   : forall x y, Rlt 0 x -> Rlt 0 y -> Rlt 0 (x + y);
+  lt0_mul   : forall x y, Rlt 0 x -> Rlt 0 y -> Rlt 0 (x * y);
+  lt0_ngt0  : forall x,  Rlt 0 x -> ~~ (Rlt x 0);
+  sub_gt0   : forall x y, Rlt 0 (y - x) = Rlt x y;
+  lt0_total : forall x, x != 0 -> Rlt 0 x || Rlt x 0;
+  normN     : forall x, norm (- x) = norm x;
+  ge0_norm  : forall x, Rle 0 x -> norm x = x;
+  le_def    : forall x y, Rle x y = (x == y) || Rlt x y;
+}.
 
-Module Exports.
-Notation realLtMixin := of_.
-Notation RealLtMixin := Mixin.
-Coercion numMixin : realLtMixin >-> NumMixin.of_.
-Coercion orderMixin : realLtMixin >-> totalPOrderMixin.
-Definition LtRealDomainOfIdomain (R : idomainType) (m : of_ R) :=
-  [realDomainType of @OrderOfPOrder _ (NumDomainOfIdomain m) m].
-Definition LtRealFieldOfField (R : fieldType) (m : of_ R) :=
-  [realFieldType of [numFieldType of LtRealDomainOfIdomain m]].
-End Exports.
+HB.builders Context R of IntegralDomain_isLtReal R.
+  Local Notation le := Rle.
+  Local Notation lt := Rlt.
 
-End RealLtMixin.
-Import RealLtMixin.Exports.
+  Local Notation "x < y" := (lt x y) : ring_scope.
+  Local Notation "x <= y" := (le x y) : ring_scope.
+  Local Notation "`| x |" := (norm x) : ring_scope.
 
+  Fact lt0N x : (- x < 0) = (0 < x).
+  Proof. by rewrite -sub_gt0 add0r opprK. Qed.
+  Let leN_total x : 0 <= x \/ 0 <= - x.
+  Proof.
+  rewrite !le_def [_ == - x]eq_sym oppr_eq0 -[0 < - x]lt0N opprK.
+  apply/orP; case: (eqVneq x) => //=; exact: lt0_total.
+  Qed.
+
+  Let le00 : (0 <= 0). Proof. by rewrite le_def eqxx. Qed.
+
+  Fact sub_ge0 x y : (0 <= y - x) = (x <= y).
+  Proof. by rewrite !le_def eq_sym subr_eq0 eq_sym sub_gt0. Qed.
+
+  Fact le0_add x y : 0 <= x -> 0 <= y -> 0 <= x + y.
+  Proof.
+  rewrite !le_def => /predU1P [<-|x_gt0]; first by rewrite add0r.
+  by case/predU1P=> [<-|y_gt0]; rewrite ?addr0 ?x_gt0 ?lt0_add // orbT.
+  Qed.
+
+  Fact le0_mul x y : 0 <= x -> 0 <= y -> 0 <= x * y.
+  Proof.
+  rewrite !le_def => /predU1P [<-|x_gt0]; first by rewrite mul0r eqxx.
+  by case/predU1P=> [<-|y_gt0]; rewrite ?mulr0 ?eqxx ?lt0_mul // orbT.
+  Qed.
+
+  Fact normM : {morph norm : x y / x * y}.
+  Proof.
+  move=> x y /=; wlog x_ge0 : x / 0 <= x.
+    by move=> IHx; case: (leN_total x) => /IHx//; rewrite mulNr !normN.
+  wlog y_ge0 : y / 0 <= y; last by rewrite ?ge0_norm ?le0_mul.
+  by move=> IHy; case: (leN_total y) => /IHy//; rewrite mulrN !normN.
+  Qed.
+
+  Fact le_normD x y : `|x + y| <= `|x| + `|y|.
+  Proof.
+  wlog x_ge0 : x y / 0 <= x.
+    by move=> IH; case: (leN_total x) => /IH// /(_ (- y)); rewrite -opprD !normN.
+  rewrite -sub_ge0 ge0_norm //; have [y_ge0 | ny_ge0] := leN_total y.
+    by rewrite !ge0_norm ?subrr ?le0_add.
+  rewrite -normN ge0_norm //; have [hxy|hxy] := leN_total (x + y).
+    by rewrite ge0_norm // opprD addrCA -addrA addKr le0_add.
+  by rewrite -normN ge0_norm // opprK addrCA addrNK le0_add.
+  Qed.
+
+  Fact eq0_norm x : `|x| = 0 -> x = 0.
+  Proof.
+  case: (leN_total x) => /ge0_norm => [-> // | Dnx nx0].
+  by rewrite -[x]opprK -Dnx normN nx0 oppr0.
+  Qed.
+
+  Fact le_def' x y : (x <= y) = (`|y - x| == y - x).
+  Proof.
+  wlog ->: x y / x = 0 by move/(_ 0 (y - x)); rewrite subr0 sub_ge0 => ->.
+  rewrite {x}subr0; apply/idP/eqP=> [/ge0_norm// | Dy].
+  by have [//| ny_ge0] := leN_total y; rewrite -Dy -normN ge0_norm.
+  Qed.
+
+  Fact lt_def x y : (x < y) = (y != x) && (x <= y).
+  Proof.
+  rewrite le_def; case: eqVneq => //= ->; rewrite -sub_gt0 subrr.
+  by apply/idP=> lt00; case/negP: (lt0_ngt0 lt00).
+  Qed.
+
+  Fact le_total : total le.
+  Proof.
+  move=> x y; rewrite !le_def; have [->|] //= := eqVneq; rewrite -subr_eq0.
+  by move/lt0_total; rewrite -(sub_gt0 (x - y)) sub0r opprB !sub_gt0 orbC.
+  Qed.
+
+  HB.instance Definition _ := IntegralDomain_isNumRing.Build R
+    le_normD lt0_add eq0_norm (in2W le_total) normM le_def' lt_def.
+
+  HB.instance Definition _ := Order.POrder_isTotal.Build ring_display R
+    le_total.
+HB.end.
+
+Module Exports. HB.reexport. End Exports.
 End Num.
+Export Num.Exports.
 
-Export Num.NumDomain.Exports Num.NormedZmodule.Exports.
-Export Num.NumDomain_joins.Exports.
-Export Num.NumField.Exports Num.ClosedField.Exports.
-Export Num.RealDomain.Exports Num.RealField.Exports.
-Export Num.ArchimedeanField.Exports Num.RealClosedField.Exports.
 Export Num.Syntax Num.PredInstances.
-Export Num.NumMixin.Exports Num.RealMixin.Exports.
-Export Num.RealLeMixin.Exports Num.RealLtMixin.Exports.
-
-Notation ImaginaryMixin := Num.ClosedField.ImaginaryMixin.

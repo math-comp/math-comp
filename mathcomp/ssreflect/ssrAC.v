@@ -1,3 +1,4 @@
+From HB Require Import structures.
 Require Import BinPos BinNat.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq bigop.
 Set Implicit Arguments.
@@ -5,7 +6,7 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 (************************************************************************)
-(* Small Scale Rewriting using Associativity and Commutativity          *)
+(*     Small Scale Rewriting using Associativity and Commutativity      *)
 (*                                                                      *)
 (* Rewriting with AC (not modulo AC), using a small scale command.      *)
 (* Replaces opA, opC, opAC, opCA, ... and any combinations of them      *)
@@ -68,7 +69,8 @@ Notation vmrefl := (ltac: (vm_compute; reflexivity)) (only parsing).
 
 Module AC.
 
-Canonical positive_eqType := EqType positive (EqMixin Pos.eqb_spec).
+HB.instance Definition _ := hasDecEq.Build positive
+  (fun _ _ => equivP idP (Pos.eqb_eq _ _)).
 
 Inductive syntax := Leaf of positive | Op of syntax & syntax.
 Coercion serial := (fix loop (acc : seq positive) (s : syntax) :=
@@ -219,7 +221,11 @@ Notation AC_check_pattern :=
 
 Notation opACof law p s :=
 ((fun T idx op assoc lid rid comm => (change_type (@AC.direct T idx
-   (@Monoid.ComLaw _ _ (@Monoid.Law _ idx op assoc lid rid) comm)
+   (Monoid.ComLaw.Pack  (* FIXME: find a way to make this robust to hierarchy evolutions *)
+      (Monoid.ComLaw.Class
+         (SemiGroup.isLaw.Axioms_ op assoc)
+         (Monoid.isMonoidLaw.Axioms_ idx op lid rid)
+         (SemiGroup.isCommutativeLaw.Axioms_ op comm)))
    p%AC s%AC AC_check_pattern) cbvrefl)) _ _ law
 (Monoid.mulmA _) (Monoid.mul1m _) (Monoid.mulm1 _) (Monoid.mulmC _))
 (only parsing).
@@ -236,7 +242,7 @@ Notation "op .[ 'ACl' s ]" := (opACl op s%AC)
   (at level 2, left associativity, only parsing).
 
 Notation AC_strategy :=
-  (ltac: (cbv -[Monoid.com_operator Monoid.operator]; reflexivity))
+  (ltac: (cbv -[Monoid.ComLaw.sort Monoid.Law.sort]; reflexivity))
   (only parsing).
 Notation ACof p s := (change_type
   (@AC.direct _ _ _  p%AC s%AC AC_check_pattern) AC_strategy)

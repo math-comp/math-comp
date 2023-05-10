@@ -1,54 +1,68 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
 
 (******************************************************************************)
+(*                       Types with a choice operator                         *)
+(*                                                                            *)
+(* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
+(*                                                                            *)
 (* This file contains the definitions of:                                     *)
-(*   choiceType == interface for types with a choice operator.                *)
-(*    countType == interface for countable types (implies choiceType).        *)
-(* subCountType == interface for types that are both subType and countType.   *)
-(*  xchoose exP == a standard x such that P x, given exP : exists x : T, P x  *)
-(*                 when T is a choiceType. The choice depends only on the     *)
-(*                 extent of P (in particular, it is independent of exP).     *)
-(*   choose P x0 == if P x0, a standard x such that P x.                      *)
-(*      pickle x == a nat encoding the value x : T, where T is a countType.   *)
+(*    choiceType == interface for types with a choice operator                *)
+(*                  The HB class is Choice.                                   *)
+(*                  The exact contents is documented below just before        *)
+(*                  hasChoice.                                                *)
+(* subChoiceType == interface for types that are both subType and choiceType  *)
+(*                  The HB class is SubChoice.                                *)
+(*     countType == interface for countable types (implies choiceType)        *)
+(*                  The HB class is Countable.                                *)
+(*  subCountType == interface for types that are both subType and countType   *)
+(*                  The HB class is SubCountable.                             *)
+(*                                                                            *)
+(*   xchoose exP == a standard x such that P x, given exP : exists x : T, P x *)
+(*                  when T is a choiceType                                    *)
+(*                  The choice depends only on the extent of P (in particular,*)
+(*                  it is independent of exP).                                *)
+(*   choose P x0 == if P x0, a standard x such that P x                       *)
+(*      pickle x == a nat encoding the value x : T, where T is a countType    *)
 (*    unpickle n == a partial inverse to pickle: unpickle (pickle x) = Some x *)
 (*  pickle_inv n == a sharp partial inverse to pickle pickle_inv n = Some x   *)
-(*                  if and only if pickle x = n.                              *)
-(*            choiceMixin T == type of choice mixins; the exact contents is   *)
-(*                        documented below in the Choice submodule.           *)
-(*           ChoiceType T m == the packed choiceType class for T and mixin m. *)
-(* [choiceType of T for cT] == clone for T of the choiceType cT.              *)
-(*        [choiceType of T] == clone for T of the choiceType inferred for T.  *)
-(*            CountType T m == the packed countType class for T and mixin m.  *)
-(*  [countType of T for cT] == clone for T of the countType cT.               *)
-(*        [count Type of T] == clone for T of the countType inferred for T.   *)
-(* [choiceMixin of T by <:] == Choice mixin for T when T has a subType p      *)
-(*                        structure with p : pred cT and cT has a Choice      *)
-(*                        structure; the corresponding structure is Canonical.*)
-(*  [countMixin of T by <:] == Count mixin for a subType T of a countType.    *)
-(*  PcanChoiceMixin fK == Choice mixin for T, given f : T -> cT where cT has  *)
-(*                        a Choice structure, a left inverse partial function *)
-(*                        g and fK : pcancel f g.                             *)
-(*   CanChoiceMixin fK == Choice mixin for T, given f : T -> cT, g and        *)
-(*                        fK : cancel f g.                                    *)
-(*   PcanCountMixin fK == Count mixin for T, given f : T -> cT where cT has   *)
-(*                        a Countable structure, a left inverse partial       *)
-(*                        function g and fK : pcancel f g.                    *)
-(*    CanCountMixin fK == Count mixin for T, given f : T -> cT, g and         *)
-(*                        fK : cancel f g.                                    *)
+(*                  if and only if pickle x = n                               *)
+(*                                                                            *)
+(* PCanIsCountable ff' == builds an instance of the isCountable interface     *)
+(*                        given ff' : pcancel f f' where the codomain of f is *)
+(*                        a countType                                         *)
+(*  CanIsCountable ff' == builds an instance of the isCountable interface     *)
+(*                        given ff' : cancel f f' where the codomain of f is  *)
+(*                        a countType                                         *)
+(*                                                                            *)
+(* [Choice of T by <:], [Countable of T by <:] == Choice/Countable interface  *)
+(*                  for T when T has a subType p structure with p : pred cT   *)
+(*                  and cT has a Choice/Countable interface                   *)
+(*                  The corresponding structure is Canonical. This notation   *)
+(*                  is in form_scope.                                         *)
+(*                                                                            *)
+(* List of Choice/Countable factories with a dedicated alias:                 *)
+(*        pcan_type fK == Choice/Countable for T, given f : T -> cT where cT  *)
+(*                        has a Choice/Countable structure, a left inverse    *)
+(*                        partial function g and fK : pcancel f g             *)
+(*         can_type fK == Choice/Countable for T, given f : T -> cT, g and    *)
+(*                        fK : cancel f g                                     *)
+(*                                                                            *)
 (*      GenTree.tree T == generic n-ary tree type with nat-labeled nodes and  *)
 (*                        T-labeled leaves, for example GenTree.Leaf (x : T), *)
-(*                        GenTree.Node 5 [:: t; t']. GenTree.tree is equipped *)
-(*                        with canonical eqType, choiceType, and countType    *)
-(*                        instances, and so simple datatypes can be similarly *)
-(*                        equipped by encoding into GenTree.tree and using    *)
-(*                        the mixins above.                                   *)
-(*        CodeSeq.code == bijection from seq nat to nat.                      *)
-(*      CodeSeq.decode == bijection inverse to CodeSeq.code.                  *)
+(*                        GenTree.Node 5 [:: t; t']                           *)
+(*                        GenTree.tree is equipped with eqType, choiceType,   *)
+(*                        and countType instances, and so simple datatypes    *)
+(*                        can be similarly equipped by encoding into          *)
+(*                        GenTree.tree and using the interfaces above.        *)
+(*        CodeSeq.code == bijection from seq nat to nat                       *)
+(*      CodeSeq.decode == bijection inverse to CodeSeq.code                   *)
+(*                                                                            *)
 (* In addition to the lemmas relevant to these definitions, this file also    *)
-(* contains definitions of a Canonical choiceType and countType instances for *)
-(* all basic datatypes (e.g., nat, bool, subTypes, pairs, sums, etc.).        *)
+(* contains definitions of choiceType and countType instances for all basic   *)
+(* basic datatypes (e.g., nat, bool, subTypes, pairs, sums, etc.).            *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -180,7 +194,7 @@ Fixpoint encode t : seq (nat + T) :=
   | Node n f => inl _ n.+1 :: rcons (flatten (map encode f)) (inl _ 0)
   end.
 
-Definition decode_step c fs := 
+Definition decode_step c fs :=
   match c with
   | inr x => (Leaf x :: fs.1, fs.2)
   | inl 0 => ([::], fs.1 :: fs.2)
@@ -202,8 +216,8 @@ End Def.
 End GenTree.
 Arguments GenTree.codeK : clear implicits.
 
-Definition tree_eqMixin (T : eqType) := PcanEqMixin (GenTree.codeK T).
-Canonical tree_eqType (T : eqType) := EqType (GenTree.tree T) (tree_eqMixin T).
+HB.instance Definition _ (T : eqType) := Equality.copy (GenTree.tree T)
+  (pcan_type (GenTree.codeK T)).
 
 (* Structures for Types with a choice function, and for Types with countably  *)
 (* many elements. The two concepts are closely linked: we indeed make         *)
@@ -244,79 +258,60 @@ Canonical tree_eqType (T : eqType) := EqType (GenTree.tree T) (tree_eqMixin T).
 (* choiceType because in practice the base type of an Equality/Choice subType *)
 (* is always an Equality/Choice Type).                                        *)
 
-Module Choice.
-
-Section ClassDef.
-
-Record mixin_of T := Mixin {
-  find : pred T -> nat -> option T;
-  _ : forall P n x, find P n = Some x -> P x;
-  _ : forall P : pred T, (exists x, P x) -> exists n, find P n;
-  _ : forall P Q : pred T, P =1 Q -> find P =1 find Q
+HB.mixin Record hasChoice T := Mixin {
+  find_subdef : pred T -> nat -> option T;
+  choice_correct_subdef {P n x} : find_subdef P n = Some x -> P x;
+  choice_complete_subdef {P : pred T} :
+    (exists x, P x) -> exists n, find_subdef P n;
+  choice_extensional_subdef {P Q : pred T} :
+    P =1 Q -> find_subdef P =1 find_subdef Q
 }.
 
-Set Primitive Projections.
-Record class_of T := Class {base : Equality.class_of T; mixin : mixin_of T}.
-Unset Primitive Projections.
-Local Coercion base : class_of >->  Equality.class_of.
+#[short(type="choiceType")]
+HB.structure Definition Choice := { T of hasChoice T & hasDecEq T}.
 
-Structure type := Pack {sort; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c.
+Module Export ChoiceNamespace.
+  Module Choice.
 
-Definition pack m :=
-  fun b bT & phant_id (Equality.class bT) b => Pack (@Class T b m).
+  Module InternalTheory.
 
-(* Inheritance *)
-Definition eqType := @Equality.Pack cT class.
+  Notation find := find_subdef.
 
-End ClassDef.
+  Notation correct := choice_correct_subdef.
+  Arguments correct {_ _ _ _}.
 
-Module Import Exports.
-Coercion base : class_of >-> Equality.class_of.
-Coercion mixin : class_of >-> mixin_of.
-Coercion sort : type >-> Sortclass.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Notation choiceType := type.
-Notation choiceMixin := mixin_of.
-Notation ChoiceType T m := (@pack T m _ _ id).
-Notation "[ 'choiceType' 'of' T 'for' cT ]" :=  (@clone T cT _ idfun)
-  (at level 0, format "[ 'choiceType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'choiceType' 'of' T ]" := (@clone T _ _ id)
+  Notation complete := choice_complete_subdef.
+  Arguments complete {_ _}.
+
+  Notation extensional := choice_extensional_subdef.
+  Arguments extensional {_ _ _}.
+
+  Section InternalTheory.
+
+  Variable T : Choice.type.
+  Implicit Types P Q : pred T.
+
+  Fact xchoose_subproof P exP :
+    {x | find P (ex_minn (@choice_complete_subdef _ P exP)) = Some x}.
+  Proof.
+  case: (ex_minnP (complete exP)) => n.
+  by case: (find P n) => // x; exists x.
+  Qed.
+
+  End InternalTheory.
+  End InternalTheory.
+  End Choice.
+End ChoiceNamespace.
+
+#[deprecated(since="mathcomp 2.0.0", note="Use Choice.on instead.")]
+Notation "[ 'hasChoice' 'of' T ]" := (Choice.on _ : hasChoice T%type)
+  (at level 0, format "[ 'hasChoice'  'of'  T ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use Choice.clone instead.")]
+Notation "[ 'choiceType' 'of' T 'for' C ]" := (Choice.clone T%type C)
+  (at level 0, format "[ 'choiceType'  'of'  T  'for'  C ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use Choice.clone instead.")]
+Notation "[ 'choiceType' 'of' T ]" := (Choice.clone T%type _)
   (at level 0, format "[ 'choiceType'  'of'  T ]") : form_scope.
-
-End Exports.
-
-Module InternalTheory.
-Section InternalTheory.
-(* Inner choice function. *)
-Definition find T := find (mixin (class T)).
-
-Variable T : choiceType.
-Implicit Types P Q : pred T.
-
-Lemma correct P n x : find P n = Some x -> P x.
-Proof. by case: T => _ [_ []] //= in P n x *. Qed.
-
-Lemma complete P : (exists x, P x) -> (exists n, find P n).
-Proof. by case: T => _ [_ []] //= in P *. Qed.
-
-Lemma extensional P Q : P =1 Q -> find P =1 find Q.
-Proof. by case: T => _ [_ []] //= in P Q *. Qed.
-
-Fact xchoose_subproof P exP : {x | find P (ex_minn (@complete P exP)) = Some x}.
-Proof.
-by case: (ex_minnP (complete exP)) => n; case: (find P n) => // x; exists x.
-Qed.
-
-End InternalTheory.
-End InternalTheory.
-
-End Choice.
-Export Choice.Exports.
 
 Section ChoiceTheory.
 
@@ -388,7 +383,7 @@ Section CanChoice.
 
 Variables (sT : Type) (f : sT -> T).
 
-Lemma PcanChoiceMixin f' : pcancel f f' -> choiceMixin sT.
+Lemma PCanHasChoice f' : pcancel f f' -> hasChoice sT.
 Proof.
 move=> fK; pose liftP sP := [pred x | oapp sP false (f' x)].
 pose sf sP := [fun n => obind f' (find (liftP sP) n)].
@@ -400,8 +395,13 @@ exists sf => [sP n x | sP [y sPy] | sP sQ eqPQ n] /=.
 by congr (obind _ _); apply: extensional => x /=; case: (f' x) => /=.
 Qed.
 
-Definition CanChoiceMixin f' (fK : cancel f f') :=
-  PcanChoiceMixin (can_pcan fK).
+Definition CanHasChoice f' (fK : cancel f f') :=
+  PCanHasChoice (can_pcan fK).
+
+HB.instance Definition _ f' (fK : pcancel f f') : hasChoice (pcan_type fK) :=
+  PCanHasChoice fK.
+HB.instance Definition _ f' (fK : cancel f f') : hasChoice (can_type fK) :=
+  PCanHasChoice (can_pcan fK).
 
 End CanChoice.
 
@@ -409,13 +409,11 @@ Section SubChoice.
 
 Variables (P : pred T) (sT : subType P).
 
-Definition sub_choiceMixin := PcanChoiceMixin (@valK T P sT).
-Definition sub_choiceClass := @Choice.Class sT (sub_eqMixin sT) sub_choiceMixin.
-Canonical sub_choiceType := Choice.Pack sub_choiceClass.
+#[hnf] HB.instance Definition _ := Choice.copy (sub_type sT) (pcan_type valK).
 
 End SubChoice.
 
-Fact seq_choiceMixin : choiceMixin (seq T).
+Fact seq_hasChoice : hasChoice (seq T).
 Proof.
 pose r f := [fun xs => fun x : T => f (x :: xs) : option (seq T)].
 pose fix f sP ns xs {struct ns} :=
@@ -434,7 +432,7 @@ elim: {n}(dc n) nil => [|n ns IHs] xs /=; first by rewrite eqPQ.
 rewrite (@extensional _ _ (r (f sQ ns) xs)) => [|x]; last by rewrite IHs.
 by case: find => /=.
 Qed.
-Canonical seq_choiceType := Eval hnf in ChoiceType (seq T) seq_choiceMixin.
+HB.instance Definition _ := seq_hasChoice.
 
 End OneType.
 
@@ -442,7 +440,7 @@ Section TagChoice.
 
 Variables (I : choiceType) (T_ : I -> choiceType).
 
-Fact tagged_choiceMixin : choiceMixin {i : I & T_ i}.
+Fact tagged_hasChoice : hasChoice {i : I & T_ i}.
 Proof.
 pose mkT i (x : T_ i) := Tagged T_ x.
 pose ft tP n i := omap (mkT i) (find (tP \o mkT i) n).
@@ -461,122 +459,93 @@ rewrite (@extensional _ _ (ft sQ nt)) => [|i].
   by case: find => //= i; congr (omap _ _); apply: extensional => x /=.
 by congr (omap _ _); apply: extensional => x /=.
 Qed.
-Canonical tagged_choiceType :=
-  Eval hnf in ChoiceType {i : I & T_ i} tagged_choiceMixin.
+HB.instance Definition _ := tagged_hasChoice.
 
 End TagChoice.
 
-Fact nat_choiceMixin : choiceMixin nat.
+Fact nat_hasChoice : hasChoice nat.
 Proof.
 pose f := [fun (P : pred nat) n => if P n then Some n else None].
 exists f => [P n m | P [n Pn] | P Q eqPQ n] /=; last by rewrite eqPQ.
   by case: ifP => // Pn [<-].
 by exists n; rewrite Pn.
 Qed.
-Canonical nat_choiceType := Eval hnf in ChoiceType nat nat_choiceMixin.
+HB.instance Definition _ := nat_hasChoice.
 
-Definition bool_choiceMixin := CanChoiceMixin oddb.
-Canonical bool_choiceType := Eval hnf in ChoiceType bool bool_choiceMixin.
-Canonical bitseq_choiceType := Eval hnf in [choiceType of bitseq].
+HB.instance Definition _ := Choice.copy bool (can_type oddb).
+HB.instance Definition _ := Choice.on bitseq.
 
-Definition unit_choiceMixin := CanChoiceMixin bool_of_unitK.
-Canonical unit_choiceType := Eval hnf in ChoiceType unit unit_choiceMixin.
+HB.instance Definition _ := Choice.copy unit (can_type bool_of_unitK).
 
-Definition void_choiceMixin := PcanChoiceMixin (of_voidK unit).
-Canonical void_choiceType := Eval hnf in ChoiceType void void_choiceMixin.
+HB.instance Definition _ := Choice.copy void (pcan_type (of_voidK unit)).
 
-Definition option_choiceMixin T := CanChoiceMixin (@seq_of_optK T).
-Canonical option_choiceType T :=
-  Eval hnf in ChoiceType (option T) (option_choiceMixin T).
+HB.instance Definition _ T :=
+  Choice.copy (option T) (can_type (@seq_of_optK (Choice.sort T))).
 
-Definition sig_choiceMixin T (P : pred T) : choiceMixin {x | P x} :=
-   sub_choiceMixin _.
-Canonical sig_choiceType T (P : pred T) :=
- Eval hnf in ChoiceType {x | P x} (sig_choiceMixin P).
+HB.instance Definition _ (T1 T2 : choiceType) :=
+  Choice.copy (T1 * T2)%type (can_type (@tag_of_pairK T1 T2)).
 
-Definition prod_choiceMixin T1 T2 := CanChoiceMixin (@tag_of_pairK T1 T2).
-Canonical prod_choiceType T1 T2 :=
-  Eval hnf in ChoiceType (T1 * T2) (prod_choiceMixin T1 T2).
+HB.instance Definition _ (T1 T2 : choiceType) :=
+  Choice.copy (T1 + T2)%type (pcan_type (@opair_of_sumK T1 T2)).
 
-Definition sum_choiceMixin T1 T2 := PcanChoiceMixin (@opair_of_sumK T1 T2).
-Canonical sum_choiceType T1 T2 :=
-  Eval hnf in ChoiceType (T1 + T2) (sum_choiceMixin T1 T2).
-
-Definition tree_choiceMixin T := PcanChoiceMixin (GenTree.codeK T).
-Canonical tree_choiceType T := ChoiceType (GenTree.tree T) (tree_choiceMixin T).
+HB.instance Definition _ T :=
+  Choice.copy (GenTree.tree T) (pcan_type (GenTree.codeK T)).
 
 End ChoiceTheory.
+#[deprecated(since="mathcomp 2.0.0", note="Use Choice.copy with can_type or CanHasChoice.")]
+Notation CanChoiceMixin := CanHasChoice.
+#[deprecated(since="mathcomp 2.0.0", note="Use Choice.copy with pcan_type or PCanHasChoice.")]
+Notation PcanChoiceMixin := PCanHasChoice.
+
+#[short(type="subChoiceType")]
+HB.structure Definition SubChoice T (P : pred T) :=
+  { sT of Choice sT & isSub T P sT }.
 
 Prenex Implicits xchoose choose.
-Notation "[ 'choiceMixin' 'of' T 'by' <: ]" :=
-  (sub_choiceMixin _ : choiceMixin T)
+Notation "[ 'Choice' 'of' T 'by' <: ]" := (Choice.copy T%type (sub_type T))
+  (at level 0, format "[ 'Choice'  'of'  T  'by'  <: ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use [Choice of _ by <:] instead.")]
+Notation "[ 'choiceMixin' 'of' T 'by' <: ]" := [Choice of T%type by <:]
   (at level 0, format "[ 'choiceMixin'  'of'  T  'by'  <: ]") : form_scope.
 
-Module Countable.
+HB.instance Definition _ (T : choiceType) (P : pred T) :=
+  [Choice of {x | P x} by <:].
 
-Record mixin_of (T : Type) : Type := Mixin {
+HB.mixin Record Choice_isCountable (T : Type) : Type := {
+    pickle : T -> nat;
+    unpickle : nat -> option T;
+    pickleK : pcancel pickle unpickle
+}.
+Arguments Choice_isCountable.axioms_ T%type_scope.
+
+#[short(type="countType")]
+HB.structure Definition Countable := { T of Choice T & Choice_isCountable T }.
+
+#[deprecated(since="mathcomp 2.0.0", note="Use Countable.on instead.")]
+Notation "[ 'isCountable' 'of' T ]" := (Countable.on T%type : Choice_isCountable T%type)
+  (at level 0, format "[ 'isCountable'  'of'  T ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use Countable.clone instead.")]
+Notation "[ 'countType' 'of' T 'for' cT ]" := (Countable.clone T%type cT)
+(at level 0, format "[ 'countType'  'of'  T  'for'  cT ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use Countable.clone instead.")]
+Notation "[ 'countType' 'of' T ]" := (Countable.clone T%type _)
+  (at level 0, format "[ 'countType'  'of'  T ]") : form_scope.
+
+HB.factory Record isCountable (T : Type) : Type := {
   pickle : T -> nat;
   unpickle : nat -> option T;
   pickleK : pcancel pickle unpickle
 }.
-
-Definition EqMixin T m := PcanEqMixin (@pickleK T m).
-Definition ChoiceMixin T m := PcanChoiceMixin (@pickleK T m).
-
-Section ClassDef.
-
-Set Primitive Projections.
-Record class_of T := Class { base : Choice.class_of T; mixin : mixin_of T }.
-Unset Primitive Projections.
-Local Coercion base : class_of >-> Choice.class_of.
-
-Structure type : Type := Pack {sort : Type; _ : class_of sort}.
-Local Coercion sort : type >-> Sortclass.
-Variables (T : Type) (cT : type).
-Definition class := let: Pack _ c as cT' := cT return class_of cT' in c.
-Definition clone c of phant_id class c := @Pack T c.
-
-Definition pack m :=
-  fun bT b & phant_id (Choice.class bT) b => Pack (@Class T b m).
-
-Definition eqType := @Equality.Pack cT class.
-Definition choiceType := @Choice.Pack cT class.
-
-End ClassDef.
-
-Module Exports.
-Coercion base : class_of >-> Choice.class_of.
-Coercion mixin : class_of >-> mixin_of.
-Coercion sort : type >-> Sortclass.
-Coercion eqType : type >-> Equality.type.
-Canonical eqType.
-Coercion choiceType : type >-> Choice.type.
-Canonical choiceType.
-Notation countType := type.
-Notation CountType T m := (@pack T m _ _ id).
-Notation CountMixin := Mixin.
-Notation CountChoiceMixin := ChoiceMixin.
-Notation "[ 'countType' 'of' T 'for' cT ]" := (@clone T cT _ idfun)
- (at level 0, format "[ 'countType'  'of'  T  'for'  cT ]") : form_scope.
-Notation "[ 'countType' 'of' T ]" := (@clone T _ _ id)
-  (at level 0, format "[ 'countType'  'of'  T ]") : form_scope.
-
-End Exports.
-
-End Countable.
-Export Countable.Exports.
-
-Definition unpickle T := Countable.unpickle (Countable.class T).
-Definition pickle T := Countable.pickle (Countable.class T).
-Arguments unpickle {T} n.
-Arguments pickle {T} x.
+HB.builders Context T of isCountable T.
+  HB.instance Definition _ := Equality.copy T (pcan_type pickleK).
+  HB.instance Definition _ := PCanHasChoice pickleK.
+  HB.instance Definition _ := Choice_isCountable.Build T pickleK.
+HB.end.
+Arguments isCountable.axioms_ T%type_scope.
 
 Section CountableTheory.
 
 Variable T : countType.
-
-Lemma pickleK : @pcancel nat T pickle unpickle.
-Proof. exact: Countable.pickleK. Qed.
 
 Definition pickle_inv n :=
   obind (fun x : T => if pickle x == n then Some x else None) (unpickle n).
@@ -593,54 +562,52 @@ Lemma pcan_pickleK sT f f' :
   @pcancel T sT f f' -> pcancel (pickle \o f) (pcomp f' unpickle).
 Proof. by move=> fK x; rewrite /pcomp pickleK /= fK. Qed.
 
-Definition PcanCountMixin sT f f' (fK : pcancel f f') :=
-  @CountMixin sT _ _ (pcan_pickleK fK).
+Definition PCanIsCountable sT (f : sT -> T) f' (fK : pcancel f f') :=
+  isCountable.Build sT (pcan_pickleK fK).
 
-Definition CanCountMixin sT f f' (fK : cancel f f') :=
-  @PcanCountMixin sT _ _ (can_pcan fK).
+Definition CanIsCountable sT f f' (fK : cancel f f') :=
+  @PCanIsCountable sT _ _ (can_pcan fK).
 
-Definition sub_countMixin P sT := PcanCountMixin (@valK T P sT).
+HB.instance Definition _ sT (f : sT -> T) f' (fK : pcancel f f') :
+  isCountable (pcan_type fK) := PCanIsCountable fK.
+HB.instance Definition _ sT (f : sT -> T) f' (fK : cancel f f') :
+  isCountable (can_type fK) := CanIsCountable fK.
+
+#[hnf] HB.instance Definition _ (P : pred T) (sT : subType P) :=
+  Countable.copy (sub_type sT) (pcan_type valK).
 
 Definition pickle_seq s := CodeSeq.code (map (@pickle T) s).
 Definition unpickle_seq n := Some (pmap (@unpickle T) (CodeSeq.decode n)).
 Lemma pickle_seqK : pcancel pickle_seq unpickle_seq.
 Proof. by move=> s; rewrite /unpickle_seq CodeSeq.codeK (map_pK pickleK). Qed.
 
-Definition seq_countMixin := CountMixin pickle_seqK.
-Canonical seq_countType := Eval hnf in CountType (seq T) seq_countMixin.
+HB.instance Definition _ := isCountable.Build (seq T) pickle_seqK.
 
 End CountableTheory.
+#[deprecated(since="mathcomp 2.0.0", note="Use Countable.copy with can_type or CanIsCountable.")]
+Notation CanCountMixin := CanIsCountable.
+#[deprecated(since="mathcomp 2.0.0", note="Use Countable.copy with pcan_type or PCanIsCountable")]
+Notation PcanCountMixin := PCanIsCountable.
 
-Notation "[ 'countMixin' 'of' T 'by' <: ]" :=
-    (sub_countMixin _ : Countable.mixin_of T)
+Notation "[ 'Countable' 'of' T 'by' <: ]" :=
+    (Countable.copy T%type (sub_type T))
+  (at level 0, format "[ 'Countable'  'of'  T  'by'  <: ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use [Countable of _ by <:] instead.")]
+Notation "[ 'countMixin' 'of' T 'by' <: ]" := [Countable of T%type by <:]
   (at level 0, format "[ 'countMixin'  'of'  T  'by'  <: ]") : form_scope.
 
 Arguments pickle_inv {T} n.
-Arguments pickleK {T} x.
+Arguments pickleK {T} x : rename.
 Arguments pickleK_inv {T} x.
 Arguments pickle_invK {T} n : rename.
 
-Section SubCountType.
-
-Variables (T : choiceType) (P : pred T).
-Import Countable.
-
-Structure subCountType : Type :=
-  SubCountType {subCount_sort :> subType P; _ : mixin_of subCount_sort}.
-
-Coercion sub_countType (sT : subCountType) :=
-  Eval hnf in pack (let: SubCountType _ m := sT return mixin_of sT in m) id.
-Canonical sub_countType.
-
-Definition pack_subCountType U :=
-  fun sT cT & sub_sort sT * sort cT -> U * U =>
-  fun b m   & phant_id (Class b m) (class cT) => @SubCountType sT m.
-
-End SubCountType.
+#[short(type="subCountType")]
+HB.structure Definition SubCountable T (P : pred T) :=
+  { sT of Countable sT & isSub T P sT}.
 
 (* This assumes that T has both countType and subType structures. *)
-Notation "[ 'subCountType' 'of' T ]" :=
-    (@pack_subCountType _ _ T _ _ id _ _ id)
+#[deprecated(since="mathcomp 2.0.0", note="Use SubCountable.clone instead.")]
+Notation "[ 'subCountType' 'of' T ]" := (SubCountable.clone _ _ T%type _)
   (at level 0, format "[ 'subCountType'  'of'  T ]") : form_scope.
 
 Section TagCountType.
@@ -658,49 +625,39 @@ Proof.
 by case=> i x; rewrite /unpickle_tagged CodeSeq.codeK /= pickleK /= pickleK.
 Qed.
 
-Definition tag_countMixin := CountMixin pickle_taggedK.
-Canonical tag_countType := Eval hnf in CountType {i : I & T_ i} tag_countMixin.
+HB.instance Definition _ :=
+  Choice_isCountable.Build {i : I & T_ i} pickle_taggedK.
 
 End TagCountType.
 
-(* The remaining Canonicals for standard datatypes. *)
+(* The remaining instances for standard datatypes. *)
 Section CountableDataTypes.
 
 Implicit Type T : countType.
 
 Lemma nat_pickleK : pcancel id (@Some nat). Proof. by []. Qed.
-Definition nat_countMixin := CountMixin nat_pickleK.
-Canonical nat_countType := Eval hnf in CountType nat nat_countMixin.
+HB.instance Definition _ := Choice_isCountable.Build nat nat_pickleK.
 
-Definition bool_countMixin := CanCountMixin oddb.
-Canonical bool_countType := Eval hnf in CountType bool bool_countMixin.
-Canonical bitseq_countType :=  Eval hnf in [countType of bitseq].
+HB.instance Definition _ := Countable.copy bool (can_type oddb).
+HB.instance Definition _ := Countable.on bitseq.
 
-Definition unit_countMixin := CanCountMixin bool_of_unitK.
-Canonical unit_countType := Eval hnf in CountType unit unit_countMixin.
+HB.instance Definition _ := Countable.copy unit (can_type bool_of_unitK).
 
-Definition void_countMixin := PcanCountMixin (of_voidK unit).
-Canonical void_countType := Eval hnf in CountType void void_countMixin.
+HB.instance Definition _ := Countable.copy void
+  (pcan_type (of_voidK unit)).
 
-Definition option_countMixin T := CanCountMixin (@seq_of_optK T).
-Canonical option_countType T :=
-  Eval hnf in CountType (option T) (option_countMixin T).
+HB.instance Definition _ T := Countable.copy (option T)
+  (can_type (@seq_of_optK T)).
 
-Definition sig_countMixin T (P : pred T) := [countMixin of {x | P x} by <:].
-Canonical sig_countType T (P : pred T) :=
-  Eval hnf in CountType {x | P x} (sig_countMixin P).
-Canonical sig_subCountType T (P : pred T) :=
-  Eval hnf in [subCountType of {x | P x}].
+HB.instance Definition _ T (P : pred T) := [Countable of {x | P x} by <:].
 
-Definition prod_countMixin T1 T2 := CanCountMixin (@tag_of_pairK T1 T2).
-Canonical prod_countType T1 T2 :=
-  Eval hnf in CountType (T1 * T2) (prod_countMixin T1 T2).
+HB.instance Definition _ T1 T2 :=
+  Countable.copy (T1 * T2)%type (can_type (@tag_of_pairK T1 T2)).
 
-Definition sum_countMixin T1 T2 := PcanCountMixin (@opair_of_sumK T1 T2).
-Canonical sum_countType T1 T2 :=
-  Eval hnf in CountType (T1 + T2) (sum_countMixin T1 T2).
+HB.instance Definition _ (T1 T2 : countType) :=
+  Countable.copy (T1 + T2)%type (pcan_type (@opair_of_sumK T1 T2)).
 
-Definition tree_countMixin T := PcanCountMixin (GenTree.codeK T).
-Canonical tree_countType T := CountType (GenTree.tree T) (tree_countMixin T).
+HB.instance Definition _ T := Countable.copy (GenTree.tree T)
+   (pcan_type (GenTree.codeK T)).
 
 End CountableDataTypes.

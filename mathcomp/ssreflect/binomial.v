@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
 From mathcomp Require Import div fintype tuple finfun bigop prime finset.
 
@@ -66,8 +67,9 @@ have mFpA: associative mFp.
 have mFpC: commutative mFp by move=> i j; apply: val_inj; rewrite /= mulnC.
 have mFp1: left_id Fp1 mFp by move=> i; apply: val_inj; rewrite /= mul1n.
 have mFp1r: right_id Fp1 mFp by move=> i; apply: val_inj; rewrite /= muln1.
-pose mFpLaw := Monoid.Law mFpA mFp1 mFp1r.
-pose mFpM := Monoid.operator (@Monoid.ComLaw _ _ mFpLaw mFpC).
+pose mFpcM := Monoid.isComLaw.Build 'I_p Fp1 mFp mFpA mFpC mFp1.
+pose mFpCL : Monoid.com_law _ := HB.pack mFp mFpcM.
+pose mFpM := Monoid.Law.sort mFpCL.
 pose vFp (i : 'I_p) := toFp (egcdn i p).1.
 have vFpV i: i != Fp0 -> mFp (vFp i) i = Fp1.
   rewrite -val_eqE /= -lt0n => i_gt0; apply: val_inj => /=.

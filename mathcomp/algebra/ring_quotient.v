@@ -1,14 +1,15 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect eqtype choice ssreflect ssrbool ssrnat.
 From mathcomp Require Import ssrfun seq ssralg generic_quotient.
 
 (******************************************************************************)
-(*          This file describes quotients of algebraic structures.            *)
+(*                   Quotients of algebraic structures                        *)
 (*                                                                            *)
-(* It defines a join hierarchy mixing the structures defined  in file ssralg  *)
-(* (up to  unit ring type)  and the  quotType quotient structure  defined in  *)
-(* file  generic_quotient.   Every structure  in  that  (join) hierarchy  is  *)
+(* This file defines a join hierarchy mixing the structures defined in file   *)
+(* ssralg (up to unit ring type) and the quotType quotient structure defined  *)
+(* in generic_quotient.v.   Every structure  in  that  (join) hierarchy  is   *)
 (* parametrized by  a base type  T and the  constants and operations  on the  *)
 (* base type  that will  be used  to confer its  algebraic structure  to the  *)
 (* quotient.  Note  that T  itself  is  in general  not  an  instance of  an  *)
@@ -25,56 +26,46 @@ From mathcomp Require Import ssrfun seq ssralg generic_quotient.
 (* non commutative ring and left or two-sided ideals.                         *)
 (*                                                                            *)
 (* The file defines the following Structures:                                 *)
-(* zmodQuotType T e z n a     == Z-module  obtained  by  quotienting type  T  *)
+(*     zmodQuotType T e z n a == Z-module  obtained  by  quotienting type  T  *)
 (*                               with  the  relation  e  and  whose neutral,  *)
 (*                               opposite and addition are the images in the  *)
 (*                               quotient  of  the  parameters  z,  n and a,  *)
-(*                               respectively.                                *)
+(*                               respectively                                 *)
+(*                               The HB class is called ZmodQuotient.         *)
 (* ringQuotType T e z n a o m == ring  obtained  by quotienting  type T with  *)
 (*                               the relation e  and  whose zero opposite,    *)
 (*                               addition, one, and multiplication are  the   *)
 (*                               images  in  the  quotient  of the parameters *)
-(*                               z, n, a, o, m, respectively.                 *)
+(*                               z, n, a, o, m, respectively                  *)
+(*                               The HB class is called RingQuotient.         *)
 (*   unitRingQuotType ... u i == As in the previous cases, instance of unit   *)
 (*                               ring whose unit predicate  is obtained from  *)
-(*                               u and the inverse from i.                    *)
-(*                 idealr R S == S : {pred R} is a non-trivial, decidable,    *)
-(*                               right ideal of the ring R.                   *)
-(*           prime_idealr R S == S : {pred R} is a non-trivial, decidable,    *)
-(*                               right, prime ideal of the ring R.            *)
+(*                               u and the inverse from i                     *)
+(*                               The HB class is called UnitRingQuotient.     *)
+(*                   idealr R == {pred R} is a non-trivial, decidable,        *)
+(*                               right ideal of the ring R                    *)
+(*                               (join of GRing.ZmodClosed and ProperIdeal)   *)
+(*                               The HB class is called Idealr.               *)
+(*             prime_idealr R == {pred R} is a non-trivial, decidable,        *)
+(*                               right, prime ideal of the ring R             *)
+(*                               The HB class is called PrimeIdealr.          *)
 (*                                                                            *)
 (* The formalization of ideals features the following constructions:          *)
-(*       proper_ideal S == the  collective predicate (S : pred R) on the      *)
+(*           proper_ideal R == the  collective predicate (S : pred R) on the  *)
 (*                             ring R is stable by the ring product and does  *)
-(*                             contain R's one.                               *)
+(*                             contain R's one                                *)
+(*                             The HB class is called ProperIdeal.            *)
+(*                 idealr R == join of GRing.ZmodClosed and ProperIdeal       *)
 (*   prime_idealr_closed S  := u * v \in S -> (u \in S) || (v \in S)          *)
 (*          idealr_closed S == the collective predicate (S : pred R) on the   *)
-(*                             ring  R  represents  a  (right) ideal.  This   *)
-(*                             implies its being a proper_ideal.              *)
-(*                                                                            *)
-(*           MkIdeal idealS == packs idealS : proper_ideal S into an idealr S *)
-(*                             interface structure associating the            *)
-(*                             idealr_closed   property   to  the   canonical *)
-(*                             pred_key S  (see ssrbool), which  must already *)
-(*                             be a zmodPred (see ssralg).                    *)
-(*     MkPrimeIdeal pidealS == packs  pidealS : prime_idealr_closed S  into a *)
-(*                             prime_idealr S interface structure associating *)
-(*                             the  prime_idealr_closed   property   to   the *)
-(*                             canonical pred_key S (see ssrbool), which must *)
-(*                             already be an idealr (see above).              *)
+(*                             ring  R  represents  a  (right) ideal          *)
+(*                             This implies its being a proper_ideal.         *)
 (*          {ideal_quot kI} == quotient by the keyed (right) ideal predicate  *)
 (*                             kI of a commutative ring R. Note that we only  *)
 (*                             provide canonical structures of ring quotients *)
 (*                             for commutative rings, in which a right ideal  *)
-(*                             is obviously a two-sided ideal.                *)
-(*                                                                            *)
-(* Note :                                                                     *)
-(* if (I : pred R) is a predicate over a ring R and (ideal : idealr I) is an  *)
-(* instance of (right) ideal, in order to quantify over an arbitrary (keyed)  *)
-(* predicate describing  ideal, use  type (keyed_pred  ideal), as  in:        *)
-(*     forall (kI : keyed_pred ideal),...                                     *)
+(*                             is obviously a two-sided ideal                 *)
 (******************************************************************************)
-
 
 Import GRing.Theory.
 
@@ -96,98 +87,42 @@ Reserved Notation "m <> n %[ 'mod_ideal' I ]" (at level 70, n at next level,
 Reserved Notation "m != n %[ 'mod_ideal' I ]" (at level 70, n at next level,
   format "'[hv ' m '/'  !=  n '/'  %[ 'mod_ideal'  I ] ']'").
 
+(* Variable (T : Type).
+Variable eqT : rel T.
+Variables (zeroT : T) (oppT : T -> T) (addT : T -> T -> T). *)
 
-Section ZmodQuot.
+HB.mixin Record isZmodQuotient T eqT (zeroT : T) (oppT : T -> T) (addT : T -> T -> T)
+(Q : Type) of GRing.Zmodule Q & EqQuotient T eqT Q := {
+  pi_zeror : \pi_Q zeroT = 0;
+  pi_oppr : {morph \pi_Q : x / oppT x >-> - x};
+  pi_addr : {morph \pi_Q : x y / addT x y >-> x + y}
+}.
+
+#[short(type="zmodQuotType")]
+HB.structure Definition ZmodQuotient T eqT zeroT oppT addT :=
+  {Q of isZmodQuotient T eqT zeroT oppT addT Q &
+        GRing.Zmodule Q & EqQuotient T eqT Q}.
+
+Section ZModQuotient.
 
 Variable (T : Type).
 Variable eqT : rel T.
 Variables (zeroT : T) (oppT : T -> T) (addT : T -> T -> T).
+Implicit Type zqT : ZmodQuotient.type eqT zeroT oppT addT.
 
-Record zmod_quot_mixin_of (Q : Type) (qc : quot_class_of T Q)
-  (zc : GRing.Zmodule.class_of Q) := ZmodQuotMixinPack {
-    zmod_eq_quot_mixin :> eq_quot_mixin_of eqT qc zc;
-    _ : \pi_(QuotTypePack qc) zeroT = 0 :> GRing.Zmodule.Pack zc;
-    _ : {morph \pi_(QuotTypePack qc) : x /
-         oppT x >-> @GRing.opp (GRing.Zmodule.Pack zc) x};
-    _ : {morph \pi_(QuotTypePack qc) : x y /
-         addT x y >-> @GRing.add (GRing.Zmodule.Pack zc) x y}
-}.
+Canonical pi_zero_quot_morph zqT := PiMorph (@pi_zeror _ _ _ _ _ zqT).
+Canonical pi_opp_quot_morph zqT := PiMorph1 (@pi_oppr _ _ _ _ _ zqT).
+Canonical pi_add_quot_morph zqT := PiMorph2 (@pi_addr _ _ _ _ _ zqT).
 
-Record zmod_quot_class_of (Q : Type) : Type := ZmodQuotClass {
-  zmod_quot_quot_class :> quot_class_of T Q;
-  zmod_quot_zmod_class :> GRing.Zmodule.class_of Q;
-  zmod_quot_mixin :> zmod_quot_mixin_of
-    zmod_quot_quot_class zmod_quot_zmod_class
-}.
+End ZModQuotient.
 
-Structure zmodQuotType : Type := ZmodQuotTypePack {
-  zmod_quot_sort :> Type;
-  _ : zmod_quot_class_of zmod_quot_sort
-}.
-
-Implicit Type zqT : zmodQuotType.
-
-Definition zmod_quot_class zqT : zmod_quot_class_of zqT :=
-  let: ZmodQuotTypePack _ cT as qT' := zqT return zmod_quot_class_of qT' in cT.
-
-Definition zmod_eq_quot_class zqT (zqc : zmod_quot_class_of zqT) :
-  eq_quot_class_of eqT zqT := EqQuotClass zqc.
-
-Canonical zmodQuotType_eqType zqT := Equality.Pack (zmod_quot_class zqT).
-Canonical zmodQuotType_choiceType zqT :=
-  Choice.Pack (zmod_quot_class zqT).
-Canonical zmodQuotType_zmodType zqT :=
-  GRing.Zmodule.Pack (zmod_quot_class zqT).
-Canonical zmodQuotType_quotType zqT := QuotTypePack (zmod_quot_class zqT).
-Canonical zmodQuotType_eqQuotType zqT := EqQuotTypePack
-  (zmod_eq_quot_class (zmod_quot_class zqT)).
-
-Coercion zmodQuotType_eqType : zmodQuotType >-> eqType.
-Coercion zmodQuotType_choiceType : zmodQuotType >-> choiceType.
-Coercion zmodQuotType_zmodType : zmodQuotType >-> zmodType.
-Coercion zmodQuotType_quotType : zmodQuotType >-> quotType.
-Coercion zmodQuotType_eqQuotType : zmodQuotType >-> eqQuotType.
-
-Definition ZmodQuotType_pack Q :=
-  fun (qT : quotType T) (zT : zmodType) qc zc
-  of phant_id (quot_class qT) qc & phant_id (GRing.Zmodule.class zT) zc =>
-    fun m => ZmodQuotTypePack (@ZmodQuotClass Q qc zc m).
-
-Definition ZmodQuotMixin_pack Q :=
-  fun (qT : eqQuotType eqT) (qc : eq_quot_class_of eqT Q)
-      of phant_id (eq_quot_class qT) qc =>
-  fun (zT : zmodType) zc of phant_id (GRing.Zmodule.class zT) zc =>
-    fun e m0 mN mD => @ZmodQuotMixinPack Q qc zc e m0 mN mD.
-
-Definition ZmodQuotType_clone (Q : Type) qT cT
-  of phant_id (zmod_quot_class qT) cT := @ZmodQuotTypePack Q cT.
-
-Lemma zmod_quot_mixinP zqT :
-  zmod_quot_mixin_of (zmod_quot_class zqT) (zmod_quot_class zqT).
-Proof. by case: zqT => [] ? [] ? ? []. Qed.
-
-Lemma pi_zeror zqT : \pi_zqT zeroT = 0.
-Proof. by case: zqT => [] ? [] ? ? []. Qed.
-
-Lemma pi_oppr zqT : {morph \pi_zqT : x / oppT x >-> - x}.
-Proof. by case: zqT => [] ? [] ? ? []. Qed.
-
-Lemma pi_addr zqT : {morph \pi_zqT : x y / addT x y >-> x + y}.
-Proof. by case: zqT => [] ? [] ? ? []. Qed.
-
-Canonical pi_zero_quot_morph zqT := PiMorph (pi_zeror zqT).
-Canonical pi_opp_quot_morph zqT := PiMorph1 (pi_oppr zqT).
-Canonical pi_add_quot_morph zqT := PiMorph2 (pi_addr zqT).
-
-End ZmodQuot.
-
-Notation ZmodQuotType z o a Q m :=
-  (@ZmodQuotType_pack _ _ z o a Q _ _ _ _ id id m).
+Module ZModQuotientExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use ZmodQuotient.clone instead.")]
 Notation "[ 'zmodQuotType' z , o & a 'of' Q ]" :=
-  (@ZmodQuotType_clone _ _ z o a Q _ _ id)
+  (ZmodQuotient.clone _ _ z o%function a%function Q%type _)
   (at level 0, format "[ 'zmodQuotType'  z ,  o  &  a  'of'  Q ]") : form_scope.
-Notation ZmodQuotMixin Q m0 mN mD :=
-  (@ZmodQuotMixin_pack _ _ _ _ _ Q _ _ id _ _ id (pi_eq_quot _) m0 mN mD).
+End ZModQuotientExports.
+HB.export ZModQuotientExports.
 
 Section PiAdditive.
 
@@ -197,104 +132,47 @@ Variable Q : @zmodQuotType V equivV zeroV -%R +%R.
 Lemma pi_is_additive : additive \pi_Q.
 Proof. by move=> x y /=; rewrite !piE. Qed.
 
-Canonical pi_additive := Additive pi_is_additive.
+HB.instance Definition _ := GRing.isAdditive.Build V Q \pi_Q pi_is_additive.
 
 End PiAdditive.
 
-Section RingQuot.
-
-Variable (T : Type).
+(* Variable (T : Type).
 Variable eqT : rel T.
 Variables (zeroT : T) (oppT : T -> T) (addT : T -> T -> T).
 Variables (oneT : T) (mulT : T -> T -> T).
+ *)
+HB.mixin Record isRingQuotient T eqT zeroT oppT
+addT (oneT : T) (mulT : T -> T -> T) (Q : Type)
+  of ZmodQuotient T eqT zeroT oppT addT Q & GRing.Ring Q:=
+  {
+    pi_oner : \pi_Q oneT = 1;
+    pi_mulr : {morph \pi_Q : x y / mulT x y >-> x * y}
+  }.
 
-Record ring_quot_mixin_of (Q : Type) (qc : quot_class_of T Q)
-  (rc : GRing.Ring.class_of Q) := RingQuotMixinPack {
-    ring_zmod_quot_mixin :> zmod_quot_mixin_of eqT zeroT oppT addT qc rc;
-    _ : \pi_(QuotTypePack qc) oneT = 1 :> GRing.Ring.Pack rc;
-    _ : {morph \pi_(QuotTypePack qc) : x y /
-         mulT x y >-> @GRing.mul (GRing.Ring.Pack rc) x y}
-}.
+#[short(type="ringQuotType")]
+HB.structure Definition RingQuotient T eqT zeroT oppT addT oneT mulT :=
+  {Q of isRingQuotient T eqT zeroT oppT addT oneT mulT Q &
+   ZmodQuotient T eqT zeroT oppT addT Q & GRing.Ring Q }.
 
-Record ring_quot_class_of (Q : Type) : Type := RingQuotClass {
-  ring_quot_quot_class :> quot_class_of T Q;
-  ring_quot_ring_class :> GRing.Ring.class_of Q;
-  ring_quot_mixin :> ring_quot_mixin_of
-    ring_quot_quot_class ring_quot_ring_class
-}.
+Section ringQuotient.
+(*Clash with the module name RingQuotient*)
 
-Structure ringQuotType : Type := RingQuotTypePack {
-  ring_quot_sort :> Type;
-  _ : ring_quot_class_of ring_quot_sort
-}.
+Variable (T : Type).
+Variable eqT : rel T.
+Variables (zeroT : T) (oppT : T -> T) (addT : T -> T -> T) (oneT : T) (mulT : T -> T -> T).
+Implicit Type rqT : RingQuotient.type eqT zeroT oppT addT oneT mulT.
 
-Implicit Type rqT : ringQuotType.
+Canonical pi_one_quot_morph rqT := PiMorph (@pi_oner _ _ _ _ _ _ _ rqT).
+Canonical pi_mul_quot_morph rqT := PiMorph2 (@pi_mulr _ _ _ _ _ _ _ rqT).
 
-Definition ring_quot_class rqT : ring_quot_class_of rqT :=
-  let: RingQuotTypePack _ cT as qT' := rqT return ring_quot_class_of qT' in cT.
-
-Definition ring_zmod_quot_class rqT (rqc : ring_quot_class_of rqT) :
-  zmod_quot_class_of eqT zeroT oppT addT rqT := ZmodQuotClass rqc.
-Definition ring_eq_quot_class rqT (rqc : ring_quot_class_of rqT) :
-  eq_quot_class_of eqT rqT := EqQuotClass rqc.
-
-Canonical ringQuotType_eqType rqT := Equality.Pack (ring_quot_class rqT).
-Canonical ringQuotType_choiceType rqT := Choice.Pack (ring_quot_class rqT).
-Canonical ringQuotType_zmodType rqT :=
-  GRing.Zmodule.Pack (ring_quot_class rqT).
-Canonical ringQuotType_ringType rqT :=
-  GRing.Ring.Pack (ring_quot_class rqT).
-Canonical ringQuotType_quotType rqT := QuotTypePack (ring_quot_class rqT).
-Canonical ringQuotType_eqQuotType rqT :=
-  EqQuotTypePack (ring_eq_quot_class (ring_quot_class rqT)).
-Canonical ringQuotType_zmodQuotType rqT :=
-  ZmodQuotTypePack (ring_zmod_quot_class (ring_quot_class rqT)).
-
-Coercion ringQuotType_eqType : ringQuotType >-> eqType.
-Coercion ringQuotType_choiceType : ringQuotType >-> choiceType.
-Coercion ringQuotType_zmodType : ringQuotType >-> zmodType.
-Coercion ringQuotType_ringType : ringQuotType >-> ringType.
-Coercion ringQuotType_quotType : ringQuotType >-> quotType.
-Coercion ringQuotType_eqQuotType : ringQuotType >-> eqQuotType.
-Coercion ringQuotType_zmodQuotType : ringQuotType >-> zmodQuotType.
-
-Definition RingQuotType_pack Q :=
-  fun (qT : quotType T) (zT : ringType) qc rc
-  of phant_id (quot_class qT) qc & phant_id (GRing.Ring.class zT) rc =>
-    fun m => RingQuotTypePack (@RingQuotClass Q qc rc m).
-
-Definition RingQuotMixin_pack Q :=
-  fun (qT : zmodQuotType eqT zeroT oppT addT) =>
-  fun (qc : zmod_quot_class_of eqT zeroT oppT addT Q)
-      of phant_id (zmod_quot_class qT) qc =>
-  fun (rT : ringType) rc of phant_id (GRing.Ring.class rT) rc =>
-    fun mZ m1 mM => @RingQuotMixinPack Q qc rc mZ m1 mM.
-
-Definition RingQuotType_clone (Q : Type) qT cT
-  of phant_id (ring_quot_class qT) cT := @RingQuotTypePack Q cT.
-
-Lemma ring_quot_mixinP rqT :
-  ring_quot_mixin_of (ring_quot_class rqT) (ring_quot_class rqT).
-Proof. by case: rqT => [] ? [] ? ? []. Qed.
-
-Lemma pi_oner rqT : \pi_rqT oneT = 1.
-Proof. by case: rqT => [] ? [] ? ? []. Qed.
-
-Lemma pi_mulr rqT : {morph \pi_rqT : x y / mulT x y >-> x * y}.
-Proof. by case: rqT => [] ? [] ? ? []. Qed.
-
-Canonical pi_one_quot_morph rqT := PiMorph (pi_oner rqT).
-Canonical pi_mul_quot_morph rqT := PiMorph2 (pi_mulr rqT).
-
-End RingQuot.
-
-Notation RingQuotType o mul Q mix :=
-  (@RingQuotType_pack _ _ _ _ _ o mul Q _ _ _ _ id id mix).
+End ringQuotient.
+Module RingQuotientExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use RingQuotient.clone instead.")]
 Notation "[ 'ringQuotType' o & m 'of' Q ]" :=
-  (@RingQuotType_clone _ _ _ _ _ o m Q _ _ id)
+  (RingQuotient.clone _ _ _ _ _ o m%function Q%type _)
   (at level 0, format "[ 'ringQuotType'  o  &  m  'of'  Q ]") : form_scope.
-Notation RingQuotMixin Q m1 mM :=
-  (@RingQuotMixin_pack _ _ _ _ _ _ _ Q _ _ id _ _ id (zmod_quot_mixinP _) m1 mM).
+End RingQuotientExports.
+HB.export RingQuotientExports.
 
 Section PiRMorphism.
 
@@ -305,122 +183,42 @@ Variable Q : @ringQuotType R equivR zeroR -%R +%R 1 *%R.
 Lemma pi_is_multiplicative : multiplicative \pi_Q.
 Proof. by split; do ?move=> x y /=; rewrite !piE. Qed.
 
-Canonical pi_rmorphism := AddRMorphism pi_is_multiplicative.
+HB.instance Definition _ := GRing.isMultiplicative.Build R Q \pi_Q
+  pi_is_multiplicative.
 
 End PiRMorphism.
 
-Section UnitRingQuot.
+HB.mixin Record isUnitRingQuotient T eqT zeroT oppT addT oneT mulT (unitT : pred T) (invT : T -> T)
+  (Q : Type) of RingQuotient T eqT zeroT oppT addT oneT mulT Q & GRing.UnitRing Q :=
+  {
+    pi_unitr : {mono \pi_Q : x / unitT x >-> x \in GRing.unit};
+    pi_invr : {morph \pi_Q : x / invT x >-> x^-1}
+  }.
 
+#[short(type="unitRingQuotType")]
+HB.structure Definition UnitRingQuotient T eqT zeroT oppT addT oneT mulT unitT invT :=
+  {Q of isUnitRingQuotient T eqT zeroT oppT addT oneT mulT unitT invT Q & GRing.UnitRing Q & isQuotient T Q & isEqQuotient T eqT Q & isZmodQuotient T eqT zeroT oppT addT Q & isRingQuotient T eqT zeroT oppT addT oneT mulT Q}.
+
+Section UnitRingQuot.
 Variable (T : Type).
 Variable eqT : rel T.
 Variables (zeroT : T) (oppT : T -> T) (addT : T -> T -> T).
 Variables (oneT : T) (mulT : T -> T -> T).
 Variables (unitT : pred T) (invT : T -> T).
+Implicit Type urqT : UnitRingQuotient.type eqT zeroT oppT addT oneT mulT unitT invT.
 
-Record unit_ring_quot_mixin_of (Q : Type) (qc : quot_class_of T Q)
-  (rc : GRing.UnitRing.class_of Q) := UnitRingQuotMixinPack {
-    unit_ring_zmod_quot_mixin :>
-        ring_quot_mixin_of eqT zeroT oppT addT oneT mulT qc rc;
-    _ : {mono \pi_(QuotTypePack qc) : x /
-         unitT x >-> x \in @GRing.unit (GRing.UnitRing.Pack rc)};
-    _ : {morph \pi_(QuotTypePack qc) : x /
-         invT x >-> @GRing.inv (GRing.UnitRing.Pack rc) x}
-}.
-
-Record unit_ring_quot_class_of (Q : Type) : Type := UnitRingQuotClass {
-  unit_ring_quot_quot_class :> quot_class_of T Q;
-  unit_ring_quot_ring_class :> GRing.UnitRing.class_of Q;
-  unit_ring_quot_mixin :> unit_ring_quot_mixin_of
-    unit_ring_quot_quot_class unit_ring_quot_ring_class
-}.
-
-Structure unitRingQuotType : Type := UnitRingQuotTypePack {
-  unit_ring_quot_sort :> Type;
-  _ : unit_ring_quot_class_of unit_ring_quot_sort
-}.
-
-Implicit Type rqT : unitRingQuotType.
-
-Definition unit_ring_quot_class rqT : unit_ring_quot_class_of rqT :=
-  let: UnitRingQuotTypePack _ cT as qT' := rqT
-    return unit_ring_quot_class_of qT' in cT.
-
-Definition unit_ring_ring_quot_class rqT (rqc : unit_ring_quot_class_of rqT) :
-  ring_quot_class_of eqT zeroT oppT addT oneT mulT rqT := RingQuotClass rqc.
-Definition unit_ring_zmod_quot_class rqT (rqc : unit_ring_quot_class_of rqT) :
-  zmod_quot_class_of eqT zeroT oppT addT rqT := ZmodQuotClass rqc.
-Definition unit_ring_eq_quot_class rqT (rqc : unit_ring_quot_class_of rqT) :
-  eq_quot_class_of eqT rqT := EqQuotClass rqc.
-
-Canonical unitRingQuotType_eqType rqT :=
-  Equality.Pack (unit_ring_quot_class rqT).
-Canonical unitRingQuotType_choiceType rqT :=
-  Choice.Pack (unit_ring_quot_class rqT).
-Canonical unitRingQuotType_zmodType rqT :=
-  GRing.Zmodule.Pack (unit_ring_quot_class rqT).
-Canonical unitRingQuotType_ringType rqT :=
-  GRing.Ring.Pack (unit_ring_quot_class rqT).
-Canonical unitRingQuotType_unitRingType rqT :=
-  GRing.UnitRing.Pack (unit_ring_quot_class rqT).
-Canonical unitRingQuotType_quotType rqT :=
-  QuotTypePack (unit_ring_quot_class rqT).
-Canonical unitRingQuotType_eqQuotType rqT :=
-  EqQuotTypePack (unit_ring_eq_quot_class (unit_ring_quot_class rqT)).
-Canonical unitRingQuotType_zmodQuotType rqT :=
-  ZmodQuotTypePack (unit_ring_zmod_quot_class (unit_ring_quot_class rqT)).
-Canonical unitRingQuotType_ringQuotType rqT :=
-  RingQuotTypePack (unit_ring_ring_quot_class (unit_ring_quot_class rqT)).
-
-Coercion unitRingQuotType_eqType : unitRingQuotType >-> eqType.
-Coercion unitRingQuotType_choiceType : unitRingQuotType >-> choiceType.
-Coercion unitRingQuotType_zmodType : unitRingQuotType >-> zmodType.
-Coercion unitRingQuotType_ringType : unitRingQuotType >-> ringType.
-Coercion unitRingQuotType_unitRingType : unitRingQuotType >-> unitRingType.
-Coercion unitRingQuotType_quotType : unitRingQuotType >-> quotType.
-Coercion unitRingQuotType_eqQuotType : unitRingQuotType >-> eqQuotType.
-Coercion unitRingQuotType_zmodQuotType : unitRingQuotType >-> zmodQuotType.
-Coercion unitRingQuotType_ringQuotType : unitRingQuotType >-> ringQuotType.
-
-Definition UnitRingQuotType_pack Q :=
-  fun (qT : quotType T) (rT : unitRingType) qc rc
-  of phant_id (quot_class qT) qc & phant_id (GRing.UnitRing.class rT) rc =>
-    fun m => UnitRingQuotTypePack (@UnitRingQuotClass Q qc rc m).
-
-Definition UnitRingQuotMixin_pack Q :=
-  fun (qT : ringQuotType eqT zeroT oppT addT oneT mulT) =>
-  fun (qc : ring_quot_class_of eqT zeroT oppT addT oneT mulT Q)
-      of phant_id (zmod_quot_class qT) qc =>
-  fun (rT : unitRingType) rc of phant_id (GRing.UnitRing.class rT) rc =>
-    fun mR mU mV => @UnitRingQuotMixinPack Q qc rc mR mU mV.
-
-Definition UnitRingQuotType_clone (Q : Type) qT cT
-  of phant_id (unit_ring_quot_class qT) cT := @UnitRingQuotTypePack Q cT.
-
-Lemma unit_ring_quot_mixinP rqT :
-  unit_ring_quot_mixin_of (unit_ring_quot_class rqT) (unit_ring_quot_class rqT).
-Proof. by case: rqT => [] ? [] ? ? []. Qed.
-
-Lemma pi_unitr rqT : {mono \pi_rqT : x / unitT x >-> x \in GRing.unit}.
-Proof. by case: rqT => [] ? [] ? ? []. Qed.
-
-Lemma pi_invr rqT : {morph \pi_rqT : x / invT x >-> x^-1}.
-Proof. by case: rqT => [] ? [] ? ? []. Qed.
-
-Canonical pi_unit_quot_morph rqT := PiMono1 (pi_unitr rqT).
-Canonical pi_inv_quot_morph rqT := PiMorph1 (pi_invr rqT).
+Canonical pi_unit_quot_morph urqT := PiMono1 (@pi_unitr _ _ _ _ _ _ _ _ _ urqT).
+Canonical pi_inv_quot_morph urqT := PiMorph1 (@pi_invr _ _ _ _ _ _ _ _ _ urqT).
 
 End UnitRingQuot.
 
-Notation UnitRingQuotType u i Q mix :=
-  (@UnitRingQuotType_pack _ _ _ _ _ _ _ u i Q _ _ _ _ id id mix).
+Module UnitRingQuotientExports.
+#[deprecated(since="mathcomp 2.0.0", note="Use RingQuotient.clone instead.")]
 Notation "[ 'unitRingQuotType' u & i 'of' Q ]" :=
-  (@UnitRingQuotType_clone _ _ _ _ _ _ _ u i Q _ _ id)
+  (UnitRingQuotient.clone _ _ _ _ _ _ _ u i%function Q%type _)
   (at level 0, format "[ 'unitRingQuotType'  u  &  i  'of'  Q ]") : form_scope.
-Notation UnitRingQuotMixin Q mU mV :=
-  (@UnitRingQuotMixin_pack _ _ _ _ _ _ _ _ _ Q
-    _ _ id _ _ id (zmod_quot_mixinP _) mU mV).
-
-Section IdealDef.
+End UnitRingQuotientExports.
+HB.export UnitRingQuotientExports.
 
 Definition proper_ideal (R : ringType) (S : {pred R}) : Prop :=
   1 \notin S /\ forall a, {in S, forall u, a * u \in S}.
@@ -437,62 +235,70 @@ Proof. by case=> S0 S1 hS; split => // a x xS; rewrite -[_ * _]addr0 hS. Qed.
 Lemma idealr_closedB R S : @idealr_closed R S -> zmod_closed S.
 Proof. by case=> S0 _ hS; split=> // x y xS yS; rewrite -mulN1r addrC hS. Qed.
 
-Coercion idealr_closedB : idealr_closed >-> zmod_closed.
-Coercion idealr_closed_nontrivial : idealr_closed >-> proper_ideal.
-
-Structure idealr (R : ringType) (S : {pred R}) := MkIdeal {
-  idealr_zmod :> zmodPred S;
-  _ : proper_ideal S
+HB.mixin Record isProperIdeal (R : ringType) (S : R -> bool) := {
+  proper_ideal_subproof : proper_ideal S
 }.
 
-Structure prime_idealr (R : ringType) (S : {pred R}) := MkPrimeIdeal {
-  prime_idealr_zmod :> idealr S;
-  _ : prime_idealr_closed S
+#[short(type="proper_ideal")]
+HB.structure Definition ProperIdeal R := {S of isProperIdeal R S}.
+
+#[short(type="idealr")]
+HB.structure Definition Idealr (R : ringType) :=
+  {S of GRing.ZmodClosed R S & ProperIdeal R S}.
+
+HB.mixin Record isPrimeIdealrClosed (R : ringType) (S : R -> bool) := {
+  prime_idealr_closed_subproof : prime_idealr_closed S
 }.
 
-Definition Idealr (R : ringType) (I : {pred R}) (zmodI : zmodPred I)
-            (kI : keyed_pred zmodI) : proper_ideal I -> idealr I.
-Proof. by move=> kI1; split => //. Qed.
+#[short(type="prime_idealr")]
+HB.structure Definition PrimeIdealr (R : ringType) :=
+  {S of Idealr R S & isPrimeIdealrClosed R S}.
+
+HB.factory Record isIdealr (R : ringType) (S : R -> bool) := {
+  idealr_closed_subproof : idealr_closed S
+}.
+
+HB.builders Context R S of isIdealr R S.
+HB.instance Definition _ := GRing.isZmodClosed.Build R S
+  (idealr_closedB idealr_closed_subproof).
+HB.instance Definition _ := isProperIdeal.Build R S
+  (idealr_closed_nontrivial idealr_closed_subproof).
+HB.end.
 
 Section IdealTheory.
-Variables (R : ringType) (I : {pred R})
-          (idealrI : idealr I) (kI : keyed_pred idealrI).
+Variables (R : ringType) (idealrI : idealr R).
+Local Notation I := (idealrI : pred R).
 
-Lemma idealr1 : 1 \in kI = false.
-Proof. by apply: negPf; case: idealrI kI => ? /= [? _] [] /= _ ->. Qed.
+Lemma idealr1 : 1 \in I = false.
+Proof. apply: negPf; exact: proper_ideal_subproof.1. Qed.
 
-Lemma idealMr a u : u \in kI -> a * u \in kI.
-Proof.
-by case: idealrI kI=> ? /= [? hI] [] /= ? hkI; rewrite !hkI; apply: hI.
-Qed.
+Lemma idealMr a u : u \in I -> a * u \in I.
+Proof. exact: proper_ideal_subproof.2. Qed.
 
-Lemma idealr0 : 0 \in kI. Proof. exact: rpred0. Qed.
+Lemma idealr0 : 0 \in I. Proof. exact: rpred0. Qed.
 
 End IdealTheory.
 
 Section PrimeIdealTheory.
 
-Variables (R : comRingType) (I : {pred R})
-          (pidealrI : prime_idealr I) (kI : keyed_pred pidealrI).
+Variables (R : comRingType) (pidealI : prime_idealr R).
+Local Notation I := (pidealI : pred R).
 
-Lemma prime_idealrM u v : (u * v \in kI) = (u \in kI) || (v \in kI).
+Lemma prime_idealrM u v : (u * v \in I) = (u \in I) || (v \in I).
 Proof.
 apply/idP/idP; last by case/orP => /idealMr hI; rewrite // mulrC.
-by case: pidealrI kI=> ? /= hI [] /= ? hkI; rewrite !hkI; apply: hI.
+exact: prime_idealr_closed_subproof.
 Qed.
 
 End PrimeIdealTheory.
 
-End IdealDef.
-
 Module Quotient.
 Section ZmodQuotient.
-Variables (R : zmodType) (I : {pred R})
-          (zmodI : zmodPred I) (kI : keyed_pred zmodI).
+Variables (R : zmodType) (I : zmodClosed R).
 
-Definition equiv (x y : R) := (x - y) \in kI.
+Definition equiv (x y : R) := (x - y) \in I.
 
-Lemma equivE x y : (equiv x y) = (x - y \in kI). Proof. by []. Qed.
+Lemma equivE x y : (equiv x y) = (x - y \in I). Proof. by []. Qed.
 
 Lemma equiv_is_equiv : equiv_class_of equiv.
 Proof.
@@ -506,16 +312,21 @@ Canonical equiv_encModRel := defaultEncModRel equiv.
 
 Definition type := {eq_quot equiv}.
 Definition type_of of phant R := type.
+Local Notation quot := (type_of (Phant R)).
 
-Canonical rquot_quotType := [quotType of type].
-Canonical rquot_eqType := [eqType of type].
-Canonical rquot_choiceType := [choiceType of type].
-Canonical rquot_eqQuotType := [eqQuotType equiv of type].
+#[export]
+HB.instance Definition _ : EqQuotient R equiv type := EqQuotient.on type.
+#[export]
+HB.instance Definition _ := Choice.on type.
+#[export]
+HB.instance Definition _ := EqQuotient.on quot.
+#[export]
+HB.instance Definition _ := Choice.on quot.
 
-Lemma idealrBE x y : (x - y) \in kI = (x == y %[mod type]).
+Lemma idealrBE x y : (x - y) \in I = (x == y %[mod type]).
 Proof. by rewrite piE equivE. Qed.
 
-Lemma idealrDE x y : (x + y) \in kI = (x == - y %[mod type]).
+Lemma idealrDE x y : (x + y) \in I = (x == - y %[mod type]).
 Proof. by rewrite -idealrBE opprK. Qed.
 
 Definition zero : type := lift_cst type 0.
@@ -529,7 +340,6 @@ Proof.
 move=> x; unlock opp; apply/eqP; rewrite piE equivE.
 by rewrite -opprD rpredN idealrDE opprK reprK.
 Qed.
-
 Canonical pi_opp_morph := PiMorph1 pi_opp.
 
 Lemma pi_add : {morph \pi : x y / x + y >-> add x y}.
@@ -552,32 +362,34 @@ Proof. by move=> x; rewrite -[x]reprK !piE add0r. Qed.
 Lemma addNq: left_inverse zero opp add.
 Proof. by move=> x; rewrite -[x]reprK !piE addNr. Qed.
 
-Definition rquot_zmodMixin := ZmodMixin addqA addqC add0q addNq.
-Canonical rquot_zmodType := Eval hnf in ZmodType type rquot_zmodMixin.
-
-Definition rquot_zmodQuotMixin := ZmodQuotMixin type (lock _) pi_opp pi_add.
-Canonical rquot_zmodQuotType := ZmodQuotType 0 -%R +%R type rquot_zmodQuotMixin.
+#[export]
+HB.instance Definition _ := GRing.isZmodule.Build type addqA addqC add0q addNq.
+#[export]
+HB.instance Definition _ := GRing.Zmodule.on quot.
+#[export]
+HB.instance Definition _ := @isZmodQuotient.Build R equiv 0 -%R +%R type
+  (lock _) pi_opp pi_add.
+#[export]
+HB.instance Definition _ := @ZmodQuotient.on quot.
 
 End ZmodQuotient.
 
-Notation "{ 'quot' I }" := (@type_of _ _ _ I (Phant _)) : type_scope.
+Notation "{ 'quot' I }" := (@type_of _ I (Phant _)) : type_scope.
 
 Section RingQuotient.
 
-Variables (R : comRingType) (I : {pred R})
-          (idealI : idealr I) (kI : keyed_pred idealI).
+Variables (R : comRingType) (idealI : idealr R).
+Local Notation I := (idealI : pred R).
 
-Local Notation type := {quot kI}.
-
-Definition one: type := lift_cst type 1.
-Definition mul := lift_op2 type *%R.
+Definition one : {quot idealI} := lift_cst {quot idealI} 1.
+Definition mul := lift_op2 {quot idealI} *%R.
 
 Canonical pi_one_morph := PiConst one.
 
 Lemma pi_mul: {morph \pi : x y / x * y >-> mul x y}.
 Proof.
 move=> x y; unlock mul; apply/eqP; rewrite piE equivE.
-rewrite -[_ * _](addrNK (x * repr (\pi_type y))) -mulrBr.
+rewrite -[_ * _](addrNK (x * repr (\pi_{quot idealI} y))) -mulrBr.
 rewrite -addrA -mulrBl rpredD //.
   by rewrite idealMr // idealrDE opprK reprK.
 by rewrite mulrC idealMr // idealrDE opprK reprK.
@@ -602,33 +414,38 @@ Qed.
 Lemma nonzero1q: one != 0.
 Proof. by rewrite piE equivE subr0 idealr1. Qed.
 
-Definition rquot_comRingMixin :=
-  ComRingMixin mulqA mulqC mul1q mulq_addl nonzero1q.
+#[export]
+HB.instance Definition _ := GRing.Zmodule_isComRing.Build (type idealI)
+  mulqA mulqC mul1q mulq_addl nonzero1q.
+#[export]
+HB.instance Definition _ := GRing.ComRing.on {quot idealI}.
 
-Canonical rquot_ringType    := Eval hnf in RingType type rquot_comRingMixin.
-Canonical rquot_comRingType := Eval hnf in ComRingType type mulqC.
-
-Definition rquot_ringQuotMixin := RingQuotMixin type (lock _) pi_mul.
-Canonical rquot_ringQuotType := RingQuotType 1 *%R type rquot_ringQuotMixin.
+#[export]
+HB.instance Definition _ := @isRingQuotient.Build
+  R (equiv idealI) 0 -%R +%R 1%R *%R (type idealI) (lock _) pi_mul.
+#[export]
+HB.instance Definition _ := @RingQuotient.on {quot idealI}.
 
 End RingQuotient.
 
 Section IDomainQuotient.
 
-Variables (R : comRingType) (I : {pred R})
-          (pidealI : prime_idealr I) (kI : keyed_pred pidealI).
+Variables (R : comRingType) (I : prime_idealr R).
 
-Lemma rquot_IdomainAxiom (x y : {quot kI}): x * y = 0 -> (x == 0) || (y == 0).
+Lemma rquot_IdomainAxiom (x y : {quot I}): x * y = 0 -> (x == 0) || (y == 0).
 Proof.
 by move=> /eqP; rewrite -[x]reprK -[y]reprK !piE !equivE !subr0 prime_idealrM.
 Qed.
 
 End IDomainQuotient.
 
+Module Exports. HB.reexport. End Exports.
 End Quotient.
 
+Export Quotient.Exports.
+
 Notation "{ 'ideal_quot' I }" :=
-  (@Quotient.type_of _ _ _ I (Phant _)) : type_scope.
+  (@Quotient.type_of _ I (Phant _)) : type_scope.
 Notation "x == y %[ 'mod_ideal' I ]" :=
   (x == y %[mod {ideal_quot I}]) : quotient_scope.
 Notation "x = y %[ 'mod_ideal' I ]" :=
@@ -637,13 +454,3 @@ Notation "x != y %[ 'mod_ideal' I ]" :=
   (x != y %[mod {ideal_quot I}]) : quotient_scope.
 Notation "x <> y %[ 'mod_ideal' I ]" :=
   (x <> y %[mod {ideal_quot I}]) : quotient_scope.
-
-Canonical Quotient.rquot_eqType.
-Canonical Quotient.rquot_choiceType.
-Canonical Quotient.rquot_zmodType.
-Canonical Quotient.rquot_ringType.
-Canonical Quotient.rquot_comRingType.
-Canonical Quotient.rquot_quotType.
-Canonical Quotient.rquot_eqQuotType.
-Canonical Quotient.rquot_zmodQuotType.
-Canonical Quotient.rquot_ringQuotType.

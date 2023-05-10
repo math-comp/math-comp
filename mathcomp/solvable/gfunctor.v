@@ -363,7 +363,7 @@ Proof. by case F. Qed.
 Lemma gFunctorI gT (G H : {group gT}) :
   F gT G :&: H = F gT G :&: F gT (G :&: H).
 Proof.
-rewrite -{1}(setIidPr (gFsub F G)) [G :&: _]setIC -setIA.
+rewrite -{1}(setIidPr (gFsub F G)) setIAC setIC.
 rewrite -(setIidPr (gFhereditary (subsetIl G H))).
 by rewrite setIC -setIA (setIidPr (gFsub F (G :&: H))).
 Qed.

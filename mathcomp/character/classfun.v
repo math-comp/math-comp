@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
 From mathcomp Require Import ssralg poly finset fingroup morphism perm.
@@ -12,7 +13,7 @@ From mathcomp Require Import matrix vector falgebra ssrnum algC algnum.
 (*          'CF(G) == the type of class functions on G : {group gT}, i.e.,    *)
 (*                    which map gT to the type algC of complex algebraics,    *)
 (*                    have support in G, and are constant on each conjugacy   *)
-(*                    class of G. 'CF(G) implements the FalgType interface of *)
+(*                    class of G. 'CF(G) implements the falgType interface of *)
 (*                    finite-dimensional F-algebras.                          *)
 (*                    The identity 1 : 'CF(G) is the indicator function of G, *)
 (*                    and (later) the principal character.                    *)
@@ -158,11 +159,10 @@ Implicit Types phi psi xi : classfun.
 Fact classfun_key : unit. Proof. by []. Qed.
 Definition Cfun := locked_with classfun_key (fun flag : nat => Classfun).
 
-Canonical cfun_subType := Eval hnf in [subType for cfun_val].
-Definition cfun_eqMixin := Eval hnf in [eqMixin of classfun by <:].
-Canonical cfun_eqType := Eval hnf in EqType classfun cfun_eqMixin.
-Definition cfun_choiceMixin := Eval hnf in [choiceMixin of classfun by <:].
-Canonical cfun_choiceType := Eval hnf in ChoiceType classfun cfun_choiceMixin.
+HB.instance Definition _ := [isSub for cfun_val].
+HB.instance Definition _ := [Choice of classfun by <:].
+
+Definition cfun_eqType : eqType := classfun.
 
 Definition fun_of_cfun phi := cfun_val phi : gT -> algC.
 Coercion fun_of_cfun : classfun >-> Funclass.
@@ -244,8 +244,8 @@ Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE add0r. Qed.
 Fact cfun_addN : left_inverse cfun_zero cfun_opp cfun_add.
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE addNr. Qed.
 
-Definition cfun_zmodMixin := ZmodMixin cfun_addA cfun_addC cfun_add0 cfun_addN.
-Canonical cfun_zmodType := ZmodType classfun cfun_zmodMixin.
+HB.instance Definition _ := GRing.isZmodule.Build classfun
+  cfun_addA cfun_addC cfun_add0 cfun_addN.
 
 Lemma muln_cfunE phi n x : (phi *+ n) x = phi x *+ n.
 Proof. by elim: n => [|n IHn]; rewrite ?mulrS !cfunE ?IHn. Qed.
@@ -269,10 +269,10 @@ Proof.
 by apply/eqP=> /cfunP/(_ 1%g)/eqP; rewrite cfun1Egen cfunE group1 oner_eq0.
 Qed.
 
-Definition cfun_ringMixin :=
-  ComRingMixin cfun_mulA cfun_mulC cfun_mul1 cfun_mulD cfun_nz1.
-Canonical cfun_ringType := RingType classfun cfun_ringMixin.
-Canonical cfun_comRingType := ComRingType classfun cfun_mulC.
+HB.instance Definition _ := GRing.Zmodule_isComRing.Build classfun
+  cfun_mulA cfun_mulC cfun_mul1 cfun_mulD cfun_nz1.
+
+Definition cfun_ringType : ringType := classfun.
 
 Lemma expS_cfunE phi n x : (phi ^+ n.+1) x = phi x ^+ n.+1.
 Proof. by elim: n => //= n IHn; rewrite !cfunE IHn. Qed.
@@ -290,9 +290,8 @@ Qed.
 Fact cfun_inv0id : {in [predC cfun_unit], cfun_inv =1 id}.
 Proof. by rewrite /cfun_inv => phi /negbTE/= ->. Qed.
 
-Definition cfun_unitMixin := ComUnitRingMixin cfun_mulV cfun_unitP cfun_inv0id.
-Canonical cfun_unitRingType := UnitRingType classfun cfun_unitMixin.
-Canonical cfun_comUnitRingType := [comUnitRingType of classfun].
+HB.instance Definition _ :=
+   GRing.ComRing_hasMulInverse.Build classfun cfun_mulV cfun_unitP cfun_inv0id.
 
 Fact cfun_scaleA a b phi :
   cfun_scale a (cfun_scale b phi) = cfun_scale (a * b) phi.
@@ -304,18 +303,19 @@ Proof. by move=> a phi psi; apply/cfunP=> x; rewrite !cfunE mulrDr. Qed.
 Fact cfun_scaleDl phi : {morph cfun_scale^~ phi : a b / a + b}.
 Proof. by move=> a b; apply/cfunP=> x; rewrite !cfunE mulrDl. Qed.
 
-Definition cfun_lmodMixin :=
-  LmodMixin cfun_scaleA cfun_scale1 cfun_scaleDr cfun_scaleDl.
-Canonical cfun_lmodType := LmodType algC classfun cfun_lmodMixin.
+HB.instance Definition _ := GRing.Zmodule_isLmodule.Build algC classfun
+  cfun_scaleA cfun_scale1 cfun_scaleDr cfun_scaleDl.
 
 Fact cfun_scaleAl a phi psi : a *: (phi * psi) = (a *: phi) * psi.
 Proof. by apply/cfunP=> x; rewrite !cfunE mulrA. Qed.
 Fact cfun_scaleAr a phi psi : a *: (phi * psi) = phi * (a *: psi).
 Proof. by rewrite !(mulrC phi) cfun_scaleAl. Qed.
 
-Canonical cfun_lalgType := LalgType algC classfun cfun_scaleAl.
-Canonical cfun_algType := AlgType algC classfun cfun_scaleAr.
-Canonical cfun_unitAlgType := [unitAlgType algC of classfun].
+HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build algC classfun
+  cfun_scaleAl.
+
+HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build algC classfun
+  cfun_scaleAr.
 
 Section Automorphism.
 
@@ -329,32 +329,44 @@ Proof. by apply/cfunP=> x; rewrite !cfunElock rmorph_nat. Qed.
 Lemma cfAutZ a phi : cfAut (a *: phi) = u a *: cfAut phi.
 Proof. by apply/cfunP=> x; rewrite !cfunE rmorphM. Qed.
 
-Lemma cfAut_is_rmorphism : rmorphism cfAut.
+Lemma cfAut_is_additive : additive cfAut.
 Proof.
-by do 2?split=> [phi psi|]; apply/cfunP=> x;
-   rewrite ?cfAut_cfun1i // !cfunE (rmorphB, rmorphM).
+by move=> phi psi; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE /= rmorphB.
 Qed.
-Canonical cfAut_additive := Additive cfAut_is_rmorphism.
-Canonical cfAut_rmorphism := RMorphism cfAut_is_rmorphism.
+
+Lemma cfAut_is_multiplicative : multiplicative cfAut.
+Proof.
+by split=> [phi psi|]; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE rmorphM.
+Qed.
+
+HB.instance Definition _ := GRing.isAdditive.Build classfun classfun cfAut
+  cfAut_is_additive.
+HB.instance Definition _ := GRing.isMultiplicative.Build classfun classfun cfAut
+  cfAut_is_multiplicative.
 
 Lemma cfAut_cfun1 : cfAut 1 = 1. Proof. exact: rmorph1. Qed.
 
 Lemma cfAut_scalable : scalable_for (u \; *:%R) cfAut.
 Proof. by move=> a phi; apply/cfunP=> x; rewrite !cfunE rmorphM. Qed.
-Canonical cfAut_linear := AddLinear cfAut_scalable.
-Canonical cfAut_lrmorphism := [lrmorphism of cfAut].
+
+HB.instance Definition _ :=
+  GRing.isScalable.Build algC classfun classfun (u \; *:%R) cfAut
+    cfAut_scalable.
 
 Definition cfAut_closed (S : seq classfun) :=
   {in S, forall phi, cfAut phi \in S}.
 
 End Automorphism.
 
+(* FIX ME this has changed *)
+Notation conjC := Num.conj_op.
+
 Definition cfReal phi := cfAut conjC phi == phi.
 
 Definition cfConjC_subset (S1 S2 : seq classfun) :=
   [/\ uniq S1, {subset S1 <= S2} & cfAut_closed conjC S1].
 
-Fact cfun_vect_iso : Vector.axiom #|classes G| classfun.
+Fact cfun_vect_iso : vector_axiom #|classes G| classfun.
 Proof.
 exists (fun phi => \row_i phi (repr (enum_val i))) => [a phi psi|].
   by apply/rowP=> i; rewrite !(mxE, cfunE).
@@ -369,9 +381,10 @@ apply/rowP=> i; rewrite mxE cfunE; have /imsetP[x Gx def_i] := enum_valP i.
 rewrite def_i; have [y Gy ->] := repr_class <<B>> x.
 by rewrite groupJ // /eK classGidl // -def_i enum_valK_in.
 Qed.
-Definition cfun_vectMixin := VectMixin cfun_vect_iso.
-Canonical cfun_vectType := VectType algC classfun cfun_vectMixin.
-Canonical cfun_FalgType := [FalgType algC of classfun].
+
+HB.instance Definition _ := Lmodule_hasFinDim.Build algC classfun cfun_vect_iso.
+
+Definition cfun_vectType : vectType _ := classfun.
 
 Definition cfun_base A : #|classes B ::&: A|.-tuple classfun :=
   [tuple of [seq '1_xB | xB in classes B ::&: A]].
@@ -399,10 +412,14 @@ Arguments cfdotr {gT B%g} psi%CF phi%CF /.
 Arguments cfnorm {gT B%g} phi%CF /.
 
 Notation "''CF' ( G )" := (classfun G) : type_scope.
+
 Notation "''CF' ( G )" := (@fullv _ (cfun_vectType G)) : vspace_scope.
 Notation "''1_' A" := (cfun_indicator _ A) : ring_scope.
 Notation "''CF' ( G , A )" := (classfun_on G A) : ring_scope.
 Notation "1" := (@GRing.one (cfun_ringType _)) (only parsing) : cfun_scope.
+
+(* FIX ME this has changed *)
+Notation conjC := Num.conj_op.
 
 Notation "phi ^*" := (cfAut conjC phi) : cfun_scope.
 Notation cfConjC_closed := (cfAut_closed conjC).
@@ -584,7 +601,7 @@ by rewrite pnatr_eq0 -lt0n lt0b => /class_eqP->.
 Qed.
 
 Lemma dim_cfun : \dim 'CF(G) = #|classes G|.
-Proof. by rewrite dimvf /Vector.dim /= genGid. Qed.
+Proof. by rewrite dimvf /dim /= genGid. Qed.
 
 Lemma dim_cfun_on A : \dim 'CF(G, A) = #|classes G ::&: A|.
 Proof. by rewrite (eqnP (cfun_base_free A)) size_tuple. Qed.
@@ -645,13 +662,13 @@ rewrite -andbA; apply: andb_id2l => /imsetP[x Gx ->].
 by rewrite !class_sub_norm ?normsD ?normG // inE andbC.
 Qed.
 
-Lemma cfConjCE phi x : (phi^*)%CF x = (phi x)^*.
+Lemma cfConjCE phi x : ( phi^* )%CF x = (phi x)^*.
 Proof. by rewrite cfunE. Qed.
 
-Lemma cfConjCK : involutive (fun phi => phi^*)%CF.
-Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE conjCK. Qed.
+Lemma cfConjCK : involutive (fun phi => phi^* )%CF.
+Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE /= conjCK. Qed.
 
-Lemma cfConjC_cfun1 : (1^*)%CF = 1 :> 'CF(G).
+Lemma cfConjC_cfun1 : ( 1^* )%CF = 1 :> 'CF(G).
 Proof. exact: rmorph1. Qed.
 
 (* Class function kernel and faithful class functions *)
@@ -796,7 +813,7 @@ Qed.
 
 Lemma cfnormE A phi :
   phi \in 'CF(G, A) -> '[phi] = #|G|%:R^-1 * (\sum_(x in A) `|phi x| ^+ 2).
-Proof. by move/cfdotEl->; rewrite (eq_bigr _ (fun _ _ => normCK _)). Qed.
+Proof.  by move/cfdotEl->; rewrite (eq_bigr _ (fun _ _ => normCK _)). Qed.
 
 Lemma eq_cfdotl A phi1 phi2 psi :
   psi \in 'CF(G, A) -> {in A, phi1 =1 phi2} -> '[phi1, psi] = '[phi2, psi].
@@ -824,8 +841,9 @@ move=> a phi psi; rewrite scalerAr -mulrDr; congr (_ * _).
 rewrite linear_sum -big_split; apply: eq_bigr => x _ /=.
 by rewrite !cfunE mulrDl -mulrA.
 Qed.
-Canonical cfdotr_additive xi := Additive (cfdotr_is_linear xi).
-Canonical cfdotr_linear xi := Linear (cfdotr_is_linear xi).
+
+HB.instance Definition _ xi := GRing.isLinear.Build algC _ _ _ (cfdotr xi)
+  (cfdotr_is_linear xi).
 
 Lemma cfdot0l xi : '[0, xi] = 0.
 Proof. by rewrite -cfdotrE linear0. Qed.
@@ -845,8 +863,8 @@ Proof. by rewrite -!cfdotrE linearZ. Qed.
 
 Lemma cfdotC phi psi : '[phi, psi] = ('[psi, phi])^*.
 Proof.
-rewrite /cfdot rmorphM fmorphV rmorph_nat rmorph_sum; congr (_ * _).
-by apply: eq_bigr=> x _; rewrite rmorphM conjCK mulrC.
+rewrite /cfdot rmorphM /= fmorphV rmorph_nat rmorph_sum; congr (_ * _).
+by apply: eq_bigr=> x _; rewrite rmorphM /= conjCK mulrC.
 Qed.
 
 Lemma eq_cfdotr A phi psi1 psi2 :
@@ -855,7 +873,8 @@ Proof. by move=> Aphi /eq_cfdotl eq_dot; rewrite cfdotC eq_dot // -cfdotC. Qed.
 
 Lemma cfdotBr xi phi psi : '[xi, phi - psi] = '[xi, phi] - '[xi, psi].
 Proof. by rewrite !(cfdotC xi) -rmorphB cfdotBl. Qed.
-Canonical cfun_dot_additive xi := Additive (cfdotBr xi).
+HB.instance Definition _ xi :=
+  GRing.isAdditive.Build _ _ (cfdot xi) (cfdotBr xi).
 
 Lemma cfdot0r xi : '[xi, 0] = 0. Proof. exact: raddf0. Qed.
 Lemma cfdotNr xi phi : '[xi, - phi] = - '[xi, phi].
@@ -874,8 +893,8 @@ Lemma cfdot_cfAut (u : {rmorphism algC -> algC}) phi psi :
     {in image psi G, {morph u : x / x^*}} ->
   '[cfAut u phi, cfAut u psi] = u '[phi, psi].
 Proof.
-move=> uC; rewrite rmorphM fmorphV rmorph_nat rmorph_sum; congr (_ * _).
-by apply: eq_bigr => x Gx; rewrite !cfunE rmorphM uC ?map_f ?mem_enum.
+move=> uC; rewrite rmorphM /= fmorphV rmorph_nat rmorph_sum; congr (_ * _).
+by apply: eq_bigr => x Gx; rewrite !cfunE rmorphM /= uC ?map_f ?mem_enum.
 Qed.
 
 Lemma cfdot_conjC phi psi : '[phi^*, psi^*] = '[phi, psi]^*.
@@ -922,11 +941,11 @@ Lemma cfnorm_sign n phi : '[(-1) ^+ n *: phi] = '[phi].
 Proof. by rewrite -signr_odd scaler_sign; case: (odd n); rewrite ?cfnormN. Qed.
 
 Lemma cfnormD phi psi :
-  let d := '[phi, psi] in '[phi + psi] = '[phi] + '[psi] + (d + d^*).
+  let d := '[phi, psi] in '[phi + psi] = '[phi] + '[psi] + ( d + d^* ).
 Proof. by rewrite /= addrAC -cfdotC cfdotDl !cfdotDr !addrA. Qed.
 
 Lemma cfnormB phi psi :
-  let d := '[phi, psi] in '[phi - psi] = '[phi] + '[psi] - (d + d^*).
+  let d := '[phi, psi] in '[phi - psi] = '[phi] + '[psi] - ( d + d^* ).
 Proof. by rewrite /= cfnormD cfnormN cfdotNr rmorphN -opprD. Qed.
 
 Lemma cfnormDd phi psi : '[phi, psi] = 0 -> '[phi + psi] = '[phi] + '[psi].
@@ -963,16 +982,17 @@ Qed.
 Lemma cfCauchySchwarz_sqrt phi psi :
   `|'[phi, psi]| <= sqrtC '[phi] * sqrtC '[psi] ?= iff ~~ free (phi :: psi).
 Proof.
-rewrite -(sqrCK (normr_ge0 _)) -sqrtCM ?qualifE ?cfnorm_ge0 //.
-rewrite (mono_in_leif (@ler_sqrtC _)) 1?rpredM ?qualifE ?cfnorm_ge0 //.
-exact: cfCauchySchwarz.
+rewrite -(sqrCK (normr_ge0 _)) -sqrtCM ?qualifE/= ?cfnorm_ge0 //.
+rewrite (mono_in_leif (@ler_sqrtC _)) 1?rpredM ?qualifE/= ?cfnorm_ge0 //;
+  [ exact: cfCauchySchwarz | exact: O.. ].
 Qed.
 
 Lemma cf_triangle_leif phi psi :
   sqrtC '[phi + psi] <= sqrtC '[phi] + sqrtC '[psi]
            ?= iff ~~ free (phi :: psi) && (0 <= coord [tuple psi] 0 phi).
 Proof.
-rewrite -(mono_in_leif ler_sqr) ?rpredD ?qualifE ?sqrtC_ge0 ?cfnorm_ge0 //.
+rewrite -(mono_in_leif ler_sqr) ?rpredD ?qualifE/= ?sqrtC_ge0 ?cfnorm_ge0 //;
+  [| exact: O.. ].
 rewrite andbC sqrrD !sqrtCK addrAC cfnormD (mono_leif (lerD2l _)).
 rewrite -mulr_natr -[_ + _](divfK (negbT (eqC_nat 2 0))) -/('Re _).
 rewrite (mono_leif (ler_pM2r _)) ?ltr0n //.
@@ -1369,8 +1389,8 @@ Lemma cfRes_is_linear : linear cfRes.
 Proof.
 by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock mulrnAr mulrnDl.
 Qed.
-Canonical cfRes_additive := Additive cfRes_is_linear.
-Canonical cfRes_linear := Linear cfRes_is_linear.
+HB.instance Definition _ := GRing.isLinear.Build algC _ _ _ cfRes
+  cfRes_is_linear.
 
 Lemma cfRes_cfun1 : cfRes 1 = 1.
 Proof.
@@ -1383,8 +1403,8 @@ Proof.
 split=> [phi psi|]; [apply/cfunP=> x | exact: cfRes_cfun1].
 by rewrite !cfunElock mulrnAr mulrnAl -mulrnA mulnb andbb.
 Qed.
-Canonical cfRes_rmorphism := AddRMorphism cfRes_is_multiplicative.
-Canonical cfRes_lrmorphism := [lrmorphism of cfRes].
+HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfRes
+  cfRes_is_multiplicative.
 
 End Restrict.
 
@@ -1478,16 +1498,16 @@ Fact cfMorph_is_linear : linear cfMorph.
 Proof.
 by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock mulrnAr -mulrnDl.
 Qed.
-Canonical cfMorph_additive := Additive cfMorph_is_linear.
-Canonical cfMorph_linear := Linear cfMorph_is_linear.
+HB.instance Definition _ := GRing.isLinear.Build algC _ _ _ cfMorph
+  cfMorph_is_linear.
 
 Fact cfMorph_is_multiplicative : multiplicative cfMorph.
 Proof.
 split=> [phi psi|]; [apply/cfunP=> x | exact: cfMorph_cfun1].
 by rewrite !cfunElock mulrnAr mulrnAl -mulrnA mulnb andbb.
 Qed.
-Canonical cfMorph_rmorphism := AddRMorphism cfMorph_is_multiplicative.
-Canonical cfMorph_lrmorphism := [lrmorphism of cfMorph].
+HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfMorph
+  cfMorph_is_multiplicative.
 
 Hypothesis sGD : G \subset D.
 
@@ -1568,10 +1588,21 @@ Qed.
 Lemma cfIsom1 phi : cfIsom phi 1%g = phi 1%g.
 Proof. by rewrite -(morph1 f) cfIsomE. Qed.
 
-Canonical cfIsom_additive := [additive of cfIsom].
-Canonical cfIsom_linear := [linear of cfIsom].
-Canonical cfIsom_rmorphism := [rmorphism of cfIsom].
-Canonical cfIsom_lrmorphism := [lrmorphism of cfIsom].
+Lemma cfIsom_is_additive : additive cfIsom.
+Proof. rewrite unlock; exact: raddfB. Qed.
+
+Lemma cfIsom_is_multiplicative : multiplicative cfIsom.
+Proof. rewrite unlock; exact: (rmorphM _, rmorph1 _). Qed.
+
+Lemma cfIsom_is_scalable : scalable cfIsom.
+Proof. rewrite unlock; exact: linearZ_LR. Qed.
+
+HB.instance Definition _ := GRing.isAdditive.Build _ _ cfIsom cfIsom_is_additive.
+HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfIsom
+  cfIsom_is_multiplicative.
+HB.instance Definition _ := GRing.isScalable.Build _ _ _ _ cfIsom
+  cfIsom_is_scalable.
+
 Lemma cfIsom_cfun1 : cfIsom 1 = 1. Proof. exact: rmorph1. Qed.
 
 Lemma cfker_isom phi : cfker (cfIsom phi) = f @* cfker phi.
@@ -1650,10 +1681,7 @@ Proof. by move/normal_norm=> nBG; apply: cfMorphE. Qed.
 
 Lemma cfMod1 phi : (phi %% B)%CF 1%g = phi 1%g. Proof. exact: cfMorph1. Qed.
 
-Canonical cfMod_additive := [additive of cfMod].
-Canonical cfMod_rmorphism := [rmorphism of cfMod].
-Canonical cfMod_linear := [linear of cfMod].
-Canonical cfMod_lrmorphism := [lrmorphism of cfMod].
+HB.instance Definition _ := GRing.LRMorphism.on cfMod.
 
 Lemma cfMod_cfun1 : (1 %% B)%CF = 1. Proof. exact: rmorph1. Qed.
 
@@ -1815,10 +1843,20 @@ Definition cfSdprod :=
    (cfMorph \o cfIsom (tagged (sdprod_isom defG)) : 'CF(H) -> 'CF(G)).
 Canonical cfSdprod_unlockable := [unlockable of cfSdprod].
 
-Canonical cfSdprod_additive := [additive of cfSdprod].
-Canonical cfSdprod_linear := [linear of cfSdprod].
-Canonical cfSdprod_rmorphism := [rmorphism of cfSdprod].
-Canonical cfSdprod_lrmorphism := [lrmorphism of cfSdprod].
+Lemma cfSdprod_is_additive : additive cfSdprod.
+Proof. rewrite unlock; exact: raddfB. Qed.
+
+Lemma cfSdprod_is_multiplicative : multiplicative cfSdprod.
+Proof. rewrite unlock; exact: (rmorphM _, rmorph1 _). Qed.
+
+Lemma cfSdprod_is_scalable : scalable cfSdprod.
+Proof. rewrite unlock; exact: linearZ_LR. Qed.
+
+HB.instance Definition _ := GRing.isAdditive.Build _ _ cfSdprod cfSdprod_is_additive.
+HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfSdprod
+  cfSdprod_is_multiplicative.
+HB.instance Definition _ := GRing.isScalable.Build _ _ _ _ cfSdprod
+  cfSdprod_is_scalable.
 
 Lemma cfSdprod1 phi : cfSdprod phi 1%g = phi 1%g.
 Proof. by rewrite unlock /= cfMorph1 cfIsom1. Qed.
@@ -1883,14 +1921,8 @@ Definition cfDprodr := cfSdprod (dprodWsd KxH).
 Definition cfDprodl := cfSdprod (dprodWsdC KxH).
 Definition cfDprod phi psi := cfDprodl phi * cfDprodr psi.
 
-Canonical cfDprodl_additive := [additive of cfDprodl].
-Canonical cfDprodl_linear := [linear of cfDprodl].
-Canonical cfDprodl_rmorphism := [rmorphism of cfDprodl].
-Canonical cfDprodl_lrmorphism := [lrmorphism of cfDprodl].
-Canonical cfDprodr_additive := [additive of cfDprodr].
-Canonical cfDprodr_linear := [linear of cfDprodr].
-Canonical cfDprodr_rmorphism := [rmorphism of cfDprodr].
-Canonical cfDprodr_lrmorphism := [lrmorphism of cfDprodr].
+HB.instance Definition _ := GRing.LRMorphism.on cfDprodl.
+HB.instance Definition _ := GRing.LRMorphism.on cfDprodr.
 
 Lemma cfDprodl1 phi : cfDprodl phi 1%g = phi 1%g. Proof. exact: cfSdprod1. Qed.
 Lemma cfDprodr1 psi : cfDprodr psi 1%g = psi 1%g. Proof. exact: cfSdprod1. Qed.
@@ -2021,10 +2053,7 @@ by have [[_ Gi' _ defGi']] := dprodP defGi; rewrite (bigdprodWY defGi') -defGi'.
 Qed.
 Definition cfBigdprodi i := cfDprodl (cfBigdprodi_subproof i) \o 'Res[_, A i].
 
-Canonical cfBigdprodi_additive i := [additive of @cfBigdprodi i].
-Canonical cfBigdprodi_linear i := [linear of @cfBigdprodi i].
-Canonical cfBigdprodi_rmorphism i := [rmorphism of @cfBigdprodi i].
-Canonical cfBigdprodi_lrmorphism i := [lrmorphism of @cfBigdprodi i].
+HB.instance Definition _ i := GRing.LRMorphism.on (@cfBigdprodi i).
 
 Lemma cfBigdprodi1 i (phi : 'CF(A i)) : cfBigdprodi phi 1%g = phi 1%g.
 Proof. by rewrite cfDprodl1 cfRes1. Qed.
@@ -2197,8 +2226,8 @@ move=> c phi psi; apply/cfunP=> x; rewrite !cfunElock; case: ifP => _.
 rewrite mulrnAr -mulrnDl !(mulrCA c) -!mulrDr [c * _]mulr_sumr -big_split /=.
 by congr (_ * (_ * _) *+ _); apply: eq_bigr => y; rewrite !cfunE mulrA mulrDl.
 Qed.
-Canonical cfInd_additive := Additive cfInd_is_linear.
-Canonical cfInd_linear := Linear cfInd_is_linear.
+HB.instance Definition _ := GRing.isLinear.Build algC _ _ _ cfInd
+  cfInd_is_linear.
 
 End Def.
 
@@ -2292,12 +2321,12 @@ have [sHG | not_sHG] := boolP (H \subset G); last first.
   rewrite cfResEout // cfIndEout // cfdotZr cfdotZl mulrAC; congr (_ * _).
   rewrite (cfdotEl _ (cfuni_on _ _)) mulVKf ?neq0CG // big_set1.
   by rewrite cfuniE ?normal1 ?set11 ?mul1r.
-transitivity (#|H|%:R^-1 * \sum_(x in G) phi x * (psi x)^*).
+transitivity (#|H|%:R^-1 * \sum_(x in G) phi x * (psi x)^* ).
   rewrite (big_setID H) /= (setIidPr sHG) addrC big1 ?add0r; last first.
     by move=> x /setDP[_ /cfun0->]; rewrite mul0r.
   by congr (_ * _); apply: eq_bigr => x Hx; rewrite cfResE.
 set h' := _^-1; apply: canRL (mulKf (neq0CG G)) _.
-transitivity (h' * \sum_(y in G) \sum_(x in G) phi (x ^ y) * (psi (x ^ y))^*).
+transitivity (h' * \sum_(y in G) \sum_(x in G) phi (x ^ y) * (psi (x ^ y))^* ).
   rewrite mulrCA mulr_natl -sumr_const; congr (_ * _); apply: eq_bigr => y Gy.
   by rewrite (reindex_acts 'J _ Gy) ?astabsJ ?normG.
 rewrite exchange_big mulr_sumr; apply: eq_bigr => x _; rewrite cfIndE //=.
@@ -2390,10 +2419,10 @@ Proof. exact: raddfZ_Cnat. Qed.
 Lemma cfAutZ_Cint z phi : z \in Cint -> (z *: phi)^u = z *: phi^u.
 Proof. exact: raddfZ_Cint. Qed.
 
-Lemma cfAutK : cancel (@cfAut gT G u) (cfAut (algC_invaut_rmorphism u)).
+Lemma cfAutK : cancel (@cfAut gT G u) (cfAut (algC_invaut u)).
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE /= algC_autK. Qed.
 
-Lemma cfAutVK : cancel (cfAut (algC_invaut_rmorphism u)) (@cfAut gT G u).
+Lemma cfAutVK : cancel (cfAut (algC_invaut u)) (@cfAut gT G u).
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE /= algC_invautK. Qed.
 
 Lemma cfAut_inj : injective (@cfAut gT G u).
@@ -2452,9 +2481,9 @@ Proof. by apply/cfunP=> x; rewrite !cfunElock rmorphMn. Qed.
 Lemma cfAutInd (psi : 'CF(H)) : ('Ind[G] psi)^u = 'Ind psi^u.
 Proof.
 have [sHG | not_sHG] := boolP (H \subset G).
-  apply/cfunP=> x; rewrite !(cfunE, cfIndE) // rmorphM fmorphV rmorph_nat.
+  apply/cfunP=> x; rewrite !(cfunE, cfIndE) // rmorphM /= fmorphV rmorph_nat.
   by congr (_ * _); rewrite rmorph_sum; apply: eq_bigr => y; rewrite !cfunE.
-rewrite !cfIndEout // linearZ /= cfAut_cfuni rmorphM rmorph_nat.
+rewrite !cfIndEout // linearZ /= cfAut_cfuni rmorphM rmorph_nat /=.
 rewrite -cfdot_cfAut ?rmorph1 // => _ /imageP[x Hx ->].
 by rewrite cfun1E Hx !rmorph1.
 Qed.

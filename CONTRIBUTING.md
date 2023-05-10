@@ -6,7 +6,7 @@ contributing, you should comply to these conventions to get your code
 integrated to the library.
 
 This file is not comprehensive yet and might still contain mistakes or
-unclear indications, please consider contributing.
+unclear indications, please consider contributing to its improvement.
 
 ## Proof style
 
@@ -21,7 +21,7 @@ too long to fit on one line), then just cut it over several lines to
 make it readable.
 - Lines end with a point `.` and only have `;` inside them.
 - Lines that close a goal must start with a terminator (`by` or
-  `exact`). You should consider using an editor that highlight those
+  `exact`). You should consider using an editor that highlights those
   terminators in a specific color (e.g. red).
 - Chaining too many optional rewrites makes error detection hard. The idiom is
   ```
@@ -81,7 +81,7 @@ This particular example can be problematic if matrix.v is imported because then,
 - There is a number of "macros" that are available to state lemmas, like `commutative`, `associative`,...
   (see [`ssrfun.v`](https://github.com/coq/coq/blob/master/theories/ssr/ssrfun.v))
 
-- There are also macros that are available to to localize a statement, like `{in A, P}`,...
+- There are also macros that are available to localize a statement, like `{in A, P}`,...
   (see [`ssrbool.v`](https://github.com/coq/coq/blob/master/theories/ssr/ssrbool.v))
 
 ### Naming of variables
@@ -180,15 +180,22 @@ Abbreviations are in the header of the file which introduces them. We list here 
 
 ### Naming conventions for definitions (non exhaustive)
 
-- Structure for types
-  - Mixed case, the first letter lowercase and the first letter of each internal word capitalized, end with `Type`
-  - e.g., `unitRingType`
-- Packed classes
-  - Mixed case, the first letter of each internal word capitalized, end with `Type`
-  - e.g., `UnitRingType`
-- Mixins
-  - Mixed case, the first letter of each internal word capitalised, end with `Mixin`
-  - e.g., `UnitRingMixin`
+- types of mathematical structures
+  + Mixed case, the first letter lowercase and the first letter of each internal
+    word capitalized, end with `Type`
+  + e.g., `unitRingType`
+- HB structures
+  + Mixed case, the first letter of each internal word capitalized
+  + e.g., `UnitRing`
+- interfaces (mixins, factories)
+  + when the interface sits at the bottom of a hierarchy: mixed case, starts
+    with `is` or `has`, the first letter of each internal word capitalized
+    * e.g., `hasChoice`, `isZsemimodule`
+  + when the interface extends a structure `A` into a structure `B` using `C`:
+    `A_C_isB` or `A_C_hasB` where
+    `B` and `C` are mixed case, the first letter of each internal word capitalised
+    * e.g., `Zsemimodule_isZmodule`, `SemiRing_hasCommutativeMul`, `Lattice_Meet_isDistrLattice`
+    * exceptions: `Choice_`, `Equality_` can be omitted
 - Coq Modules:
   - Mixed case, the first letter of each internal word capitalized
   - e.g., `NumDomain` in `ssrnum.v`
@@ -201,18 +208,5 @@ Abbreviations are in the header of the file which introduces them. We list here 
 - Partial order is abbreviated to `porder` or `POrder`, e.g., `porderType`, `CanPOrderMixin` in `order.v`
 
 ## Doc style
-### Header documentary comments
-We try to document types, definitions and notations precisely, but only describe
-the lemmas and theorems in general terms, because we don't want to discourage users
-from actually reading the documentation.
-There are some exceptions for some particularly important theorems.
 
-### Commenting source code
-The MathComp library uses exclusively block comments, with 80-character lines
-enclosed in the `(*` / `*)` delimiters, e.g.
-```
-(* Lorem ipsum dolor sit amet, consectetuer adipiscing elit.  Donec hendrerit *)
-(* tempor tellus.  Donec pretium posuere tellus.  Proin quam nisl, tincidunt  *)
-(* et, mattis eget, convallis nec, purus.                                     *)
-```
-Multiline comments are strictly limited to out-commented code.
+See this [wiki entry](https://github.com/math-comp/math-comp/wiki/How-to-document)

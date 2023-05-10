@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype tuple finfun bigop finset fingroup.
 From mathcomp Require Import action perm primitive_action.
@@ -30,22 +31,13 @@ Section colouring.
 
 Variable n : nat.
 Definition  colors := 'I_n.
-Canonical colors_eqType := Eval hnf in [eqType of colors].
-Canonical colors_choiceType := Eval hnf in [choiceType of colors].
-Canonical colors_countType := Eval hnf in [countType of colors].
-Canonical colors_finType := Eval hnf in [finType of colors].
+HB.instance Definition _ := Finite.on colors.
 
 Section square_colouring.
 
 Definition square := 'I_4.
-Canonical square_eqType := Eval hnf in [eqType of square].
-Canonical square_choiceType := Eval hnf in [choiceType of square].
-Canonical square_countType := Eval hnf in [countType of square].
-Canonical square_finType := Eval hnf in [finType of square].
-Canonical square_subType := Eval hnf in [subType of square].
-Canonical square_subCountType :=
-  Eval hnf in [subCountType of square].
-Canonical square_subFinType := Eval hnf in [subFinType of square].
+HB.instance Definition _ := SubType.on square.
+HB.instance Definition _ := Finite.on square.
 
 Definition mksquare i : square := Sub (i %% _) (ltn_mod i 4).
 Definition c0 := mksquare 0.
@@ -476,13 +468,8 @@ End square_colouring.
 Section cube_colouring.
 
 Definition cube := 'I_6.
-Canonical cube_eqType := Eval hnf in [eqType of cube].
-Canonical cube_choiceType := Eval hnf in [choiceType of cube].
-Canonical cube_countType := Eval hnf in [countType of cube].
-Canonical cube_finType := Eval hnf in [finType of cube].
-Canonical cube_subType := Eval hnf in [subType of cube].
-Canonical cube_subCountType := Eval hnf in [subCountType of cube].
-Canonical cube_subFinType := Eval hnf in [subFinType of cube].
+HB.instance Definition _ := SubType.on cube.
+HB.instance Definition _ := Finite.on cube.
 
 Definition mkFcube i : cube := Sub (i %% 6) (ltn_mod i 6).
 Definition F0 := mkFcube 0.
@@ -1276,9 +1263,5 @@ End colouring.
 Corollary burnside_app_iso_3_3col: cube_coloring_number24 3 = 57.
 Proof. by apply/eqP; rewrite -(@eqn_pmul2r 24) // burnside_app_iso3. Qed.
 
-
 Corollary burnside_app_iso_2_4col: square_coloring_number8 4 = 55.
 Proof. by apply/eqP; rewrite -(@eqn_pmul2r 8) // burnside_app_iso. Qed.
-
-
-

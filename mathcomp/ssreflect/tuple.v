@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 From mathcomp Require Import seq choice fintype path.
 
@@ -11,36 +12,36 @@ Unset Printing Implicit Defensive.
 (* This file defines tuples, i.e., sequences with a fixed (known) length,     *)
 (* and sequences with bounded length.                                         *)
 (* For tuples we define:                                                      *)
-(*         n.-tuple T == the type of n-tuples of elements of type T.          *)
-(*       [tuple of s] == the tuple whose underlying sequence (value) is s.    *)
+(*         n.-tuple T == the type of n-tuples of elements of type T           *)
+(*       [tuple of s] == the tuple whose underlying sequence (value) is s     *)
 (*                       The size of s must be known: specifically, Coq must  *)
 (*                       be able to infer a Canonical tuple projecting on s.  *)
-(*         in_tuple s == the (size s).-tuple with value s.                    *)
-(*            [tuple] == the empty tuple.                                     *)
-(* [tuple x1; ..; xn] == the explicit n.-tuple <x1; ..; xn>.                  *)
+(*         in_tuple s == the (size s).-tuple with value s                     *)
+(*            [tuple] == the empty tuple                                      *)
+(* [tuple x1; ..; xn] == the explicit n.-tuple <x1; ..; xn>                   *)
 (*  [tuple E | i < n] == the n.-tuple with general term E (i : 'I_n is bound  *)
-(*                       in E).                                               *)
-(*        tcast Emn t == the m.-tuple t cast as an n.-tuple using Emn : m = n.*)
+(*                       in E)                                                *)
+(*        tcast Emn t == the m.-tuple t cast as an n.-tuple using Emn : m = n *)
 (* As n.-tuple T coerces to seq t, all seq operations (size, nth, ...) can be *)
 (* applied to t : n.-tuple T; we provide a few specialized instances when     *)
 (* avoids the need for a default value.                                       *)
 (*            tsize t == the size of t (the n in n.-tuple T)                  *)
-(*           tnth t i == the i'th component of t, where i : 'I_n.             *)
+(*           tnth t i == the i'th component of t, where i : 'I_n              *)
 (*         [tnth t i] == the i'th component of t, where i : nat and i < n     *)
-(*                       is convertible to true.                              *)
-(*            thead t == the first element of t, when n is m.+1 for some m.   *)
+(*                       is convertible to true                               *)
+(*            thead t == the first element of t, when n is m.+1 for some m    *)
 (* For bounded sequences we define:                                           *)
 (*         n.-bseq T  == the type of bounded sequences of elements of type T, *)
 (*                       the length of a bounded sequence is smaller or       *)
-(*                       or equal to n.                                       *)
-(*       [bseq of s]  == the bounded sequence whose underlying value is s.    *)
+(*                       or equal to n                                        *)
+(*       [bseq of s]  == the bounded sequence whose underlying value is s     *)
 (*                       The size of s must be known.                         *)
-(*         in_bseq s  == the (size s).-bseq with value s.                     *)
-(*            [bseq]  == the empty bseq.                                      *)
-(*     insub_bseq n s == the n.-bseq of value s if size s <= n, else [bseq].  *)
-(* [bseq x1; ..; xn]  == the explicit n.-bseq <x1; ..; xn>.                   *)
-(*    cast_bseq Emn t == the m.-bseq t cast as an n.-tuple using Emn : m = n. *)
-(*   widen_bseq Lmn t == the m.-bseq t cast as an n.-tuple using Lmn : m <= n.*)
+(*         in_bseq s  == the (size s).-bseq with value s                      *)
+(*            [bseq]  == the empty bseq                                       *)
+(*     insub_bseq n s == the n.-bseq of value s if size s <= n, else [bseq]   *)
+(* [bseq x1; ..; xn]  == the explicit n.-bseq <x1; ..; xn>                    *)
+(*    cast_bseq Emn t == the m.-bseq t cast as an n.-tuple using Emn : m = n  *)
+(*   widen_bseq Lmn t == the m.-bseq t cast as an n.-tuple using Lmn : m <= n *)
 (* Most seq constructors (cons, behead, cat, rcons, belast, take, drop, rot,  *)
 (* rotr, map, ...) can be used to build tuples and bounded sequences via      *)
 (* the [tuple of s] and [bseq of s] constructs respectively.                  *)
@@ -59,7 +60,7 @@ Variables (n : nat) (T : Type).
 
 Structure tuple_of : Type := Tuple {tval :> seq T; _ : size tval == n}.
 
-Canonical tuple_subType := Eval hnf in [subType for tval].
+HB.instance Definition _ := [isSub for tval].
 
 Implicit Type t : tuple_of.
 
@@ -304,9 +305,8 @@ Section EqTuple.
 
 Variables (n : nat) (T : eqType).
 
-Definition tuple_eqMixin := Eval hnf in [eqMixin of n.-tuple T by <:].
-Canonical tuple_eqType := Eval hnf in EqType (n.-tuple T) tuple_eqMixin.
-
+HB.instance Definition _ : hasDecEq (n.-tuple T) :=
+  [Equality of n.-tuple T by <:].
 Canonical tuple_predType := PredType (pred_of_seq : n.-tuple T -> pred T).
 
 Lemma eqEtuple (t1 t2 : n.-tuple T) :
@@ -345,20 +345,10 @@ Qed.
 
 End EqTuple.
 
-Definition tuple_choiceMixin n (T : choiceType) :=
-  [choiceMixin of n.-tuple T by <:].
-
-Canonical tuple_choiceType n (T : choiceType) :=
-  Eval hnf in ChoiceType (n.-tuple T) (tuple_choiceMixin n T).
-
-Definition tuple_countMixin n (T : countType) :=
-  [countMixin of n.-tuple T by <:].
-
-Canonical tuple_countType n (T : countType) :=
-  Eval hnf in CountType (n.-tuple T) (tuple_countMixin n T).
-
-Canonical tuple_subCountType n (T : countType) :=
-  Eval hnf in [subCountType of n.-tuple T].
+HB.instance Definition _ n (T : choiceType) :=
+  [Choice of n.-tuple T by <:].
+HB.instance Definition _ n (T : countType) :=
+  [Countable of n.-tuple T by <:].
 
 Module Type FinTupleSig.
 Section FinTupleSig.
@@ -408,9 +398,7 @@ Variables (n : nat) (T : finType).
 (* but in practice it will not work because the mixin_enum projector          *)
 (* has been buried under an opaque alias, to avoid some performance issues    *)
 (* during type inference.                                                     *)
-Definition tuple_finMixin := Eval hnf in FinMixin (@FinTuple.enumP n T).
-Canonical tuple_finType := Eval hnf in FinType (n.-tuple T) tuple_finMixin.
-Canonical tuple_subFinType := Eval hnf in [subFinType of n.-tuple T].
+HB.instance Definition _ := isFinite.Build (n.-tuple T) (@FinTuple.enumP n T).
 
 Lemma card_tuple : #|{:n.-tuple T}| = #|T| ^ n.
 Proof. by rewrite [#|_|]cardT enumT unlock FinTuple.size_enum. Qed.
@@ -472,7 +460,7 @@ Variables (n : nat) (T : Type).
 
 Structure bseq_of : Type := Bseq {bseqval :> seq T; _ : size bseqval <= n}.
 
-Canonical bseq_subType := Eval hnf in [subType for bseqval].
+HB.instance Definition _ := [isSub for bseqval].
 
 Implicit Type bs : bseq_of.
 
@@ -642,11 +630,8 @@ Proof. by move=> s; apply: val_inj; case: s => [[]]. Qed.
 
 End SeqBseq.
 
-Definition bseq_eqMixin n (T : eqType) :=
-  Eval hnf in [eqMixin of n.-bseq T by <:].
-
-Canonical bseq_eqType n (T : eqType) :=
-  Eval hnf in EqType (n.-bseq T) (bseq_eqMixin n T).
+HB.instance Definition bseq_hasDecEq n (T : eqType) :=
+  [Equality of n.-bseq T by <:].
 
 Canonical bseq_predType n (T : eqType) :=
   Eval hnf in PredType (fun t : n.-bseq T => mem_seq t).
@@ -654,20 +639,11 @@ Canonical bseq_predType n (T : eqType) :=
 Lemma membsE n (T : eqType) (bs : n.-bseq T) : mem bs = mem (bseqval bs).
 Proof. by []. Qed.
 
-Definition bseq_choiceMixin n (T : choiceType) :=
-  [choiceMixin of n.-bseq T by <:].
+HB.instance Definition bseq_hasChoice n (T : choiceType) :=
+  [Choice of n.-bseq T by <:].
 
-Canonical bseq_choiceType n (T : choiceType) :=
-  Eval hnf in ChoiceType (n.-bseq T) (bseq_choiceMixin n T).
-
-Definition bseq_countMixin n (T : countType) :=
-  [countMixin of n.-bseq T by <:].
-
-Canonical bseq_countType n (T : countType) :=
-  Eval hnf in CountType (n.-bseq T) (bseq_countMixin n T).
-
-Canonical bseq_subCountType n (T : countType) :=
-  Eval hnf in [subCountType of n.-bseq T].
+HB.instance Definition bseq_isCountable n (T : countType) :=
+  [Countable of n.-bseq T by <:].
 
 Definition bseq_tagged_tuple n T (s : n.-bseq T) : {k : 'I_n.+1 & k.-tuple T} :=
   Tagged _ (in_tuple s : (Ordinal (size_bseq s : size s < n.+1)).-tuple _).
@@ -697,11 +673,6 @@ Proof. exact/Bijective/bseq_tagged_tupleK/tagged_tuple_bseqK. Qed.
 
 #[global] Hint Resolve bseq_tagged_tuple_bij tagged_tuple_bseq_bij : core.
 
-Definition bseq_finMixin n (T : finType) :=
-  CanFinMixin (@bseq_tagged_tupleK n T).
-
-Canonical bseq_finType n (T : finType) :=
-  Eval hnf in FinType (n.-bseq T) (bseq_finMixin n T).
-
-Canonical bseq_subFinType n (T : finType) :=
-  Eval hnf in [subFinType of n.-bseq T].
+#[non_forgetful_inheritance]
+HB.instance Definition _ n (T : finType) := isFinite.Build (n.-bseq T)
+  (pcan_enumP (can_pcan (@bseq_tagged_tupleK n T))).

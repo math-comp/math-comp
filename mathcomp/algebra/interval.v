@@ -1,10 +1,13 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import div fintype bigop order ssralg finset fingroup.
 From mathcomp Require Import ssrnum.
 
 (******************************************************************************)
+(*                         Intervals in ordered types                         *)
+(*                                                                            *)
 (* This file provides support for intervals in ordered types. The datatype    *)
 (* (interval T) gives a formal characterization of an interval, as the pair   *)
 (* of its right and left bounds.                                              *)
@@ -41,12 +44,12 @@ From mathcomp Require Import ssrnum.
 (* same interval. However, these pathological issues do not arise when R is a *)
 (* real domain: we could provide a specific theory for this important case.   *)
 (*                                                                            *)
-(* See also ``Formal proofs in real algebraic geometry: from ordered fields   *)
-(* to quantifier elimination'', LMCS journal, 2012                            *)
-(* by Cyril Cohen and Assia Mahboubi                                          *)
+(* References:                                                                *)
+(* - Cyril Cohen, Assia Mahboubi, Formal proofs in real algebraic geometry:   *)
+(* from ordered fields quantifier elimination, LMCS, 2012                     *)
+(* - Cyril Cohen, Formalized algebraic numbers: construction and first-order  *)
+(* theory, PhD thesis, 2012, section 4.3                                      *)
 (*                                                                            *)
-(* And "Formalized algebraic numbers: construction and first-order theory"    *)
-(* Cyril Cohen, PhD, 2012, section 4.3.                                       *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -108,47 +111,10 @@ Notation "`] -oo , '+oo' [" := (Interval -oo +oo)
 Fact itv_bound_display (disp : unit) : unit. Proof. exact. Qed.
 Fact interval_display (disp : unit) : unit. Proof. exact. Qed.
 
-Section IntervalEq.
+Module IntervalCan.
+Section IntervalCan.
 
-Variable T : eqType.
-
-Definition eq_itv_bound (b1 b2 : itv_bound T) : bool :=
-  match b1, b2 with
-    | BSide a x, BSide b y => (a == b) && (x == y)
-    | BInfty a, BInfty b => a == b
-    | _, _ => false
-  end.
-
-Lemma eq_itv_boundP : Equality.axiom eq_itv_bound.
-Proof.
-move=> b1 b2; apply: (iffP idP).
-- by move: b1 b2 => [a x|a][b y|b] => //= [/andP [/eqP -> /eqP ->]|/eqP ->].
-- by move=> <-; case: b1 => //= a x; rewrite !eqxx.
-Qed.
-
-Canonical itv_bound_eqMixin := EqMixin eq_itv_boundP.
-Canonical itv_bound_eqType := EqType (itv_bound T) itv_bound_eqMixin.
-
-Definition eqitv (x y : interval T) : bool :=
-  let: Interval x x' := x in
-  let: Interval y y' := y in (x == y) && (x' == y').
-
-Lemma eqitvP : Equality.axiom eqitv.
-Proof.
-move=> x y; apply: (iffP idP).
-- by move: x y => [x x'][y y'] => //= /andP [] /eqP -> /eqP ->.
-- by move=> <-; case: x => /= x x'; rewrite !eqxx.
-Qed.
-
-Canonical interval_eqMixin := EqMixin eqitvP.
-Canonical interval_eqType := EqType (interval T) interval_eqMixin.
-
-End IntervalEq.
-
-Module IntervalChoice.
-Section IntervalChoice.
-
-Variable T : choiceType.
+Variable T : Type.
 
 Lemma itv_bound_can :
   cancel (fun b : itv_bound T =>
@@ -162,29 +128,38 @@ Lemma interval_can :
     (fun '(Interval b1 b2) => (b1, b2)) (fun '(b1, b2) => Interval b1 b2).
 Proof. by case. Qed.
 
-End IntervalChoice.
+End IntervalCan.
 
-Module Exports.
+#[export, hnf]
+HB.instance Definition _ (T : eqType)  := Equality.copy (itv_bound T)
+  (can_type (@itv_bound_can T)).
+#[export, hnf]
+HB.instance Definition _ (T : eqType)  := Equality.copy (interval T)
+  (can_type (@interval_can T)).
+#[export, hnf]
+HB.instance Definition _ (T : choiceType)  := Choice.copy (itv_bound T)
+  (can_type (@itv_bound_can T)).
+#[export, hnf]
+HB.instance Definition _ (T : choiceType)  := Choice.copy (interval T)
+  (can_type (@interval_can T)).
+#[export, hnf]
+HB.instance Definition _ (T : countType)  := Countable.copy (itv_bound T)
+  (can_type (@itv_bound_can T)).
+#[export, hnf]
+HB.instance Definition _ (T : countType)  := Countable.copy (interval T)
+  (can_type (@interval_can T)).
+#[export, hnf]
+HB.instance Definition _ (T : finType)  := Finite.copy (itv_bound T)
+  (can_type (@itv_bound_can T)).
+#[export, hnf]
+HB.instance Definition _ (T : finType)  := Finite.copy (interval T)
+  (can_type (@interval_can T)).
 
-Canonical itv_bound_choiceType (T : choiceType) :=
-  ChoiceType (itv_bound T) (CanChoiceMixin (@itv_bound_can T)).
-Canonical interval_choiceType (T : choiceType) :=
-  ChoiceType (interval T) (CanChoiceMixin (@interval_can T)).
+Module Exports. HB.reexport. End Exports.
 
-Canonical itv_bound_countType (T : countType) :=
-  CountType (itv_bound T) (CanCountMixin (@itv_bound_can T)).
-Canonical interval_countType (T : countType) :=
-  CountType (interval T) (CanCountMixin (@interval_can T)).
+End IntervalCan.
 
-Canonical itv_bound_finType (T : finType) :=
-  FinType (itv_bound T) (CanFinMixin (@itv_bound_can T)).
-Canonical interval_finType (T : finType) :=
-  FinType (interval T) (CanFinMixin (@interval_can T)).
-
-End Exports.
-
-End IntervalChoice.
-Export IntervalChoice.Exports.
+Export IntervalCan.Exports.
 
 Section IntervalPOrder.
 
@@ -220,10 +195,9 @@ by case=> [[]?|[]] [[]?|[]] [[]?|[]] lexy leyz //;
   apply: (lteif_imply _ (lteif_trans lexy leyz)).
 Qed.
 
-Definition itv_bound_porderMixin :=
-  LePOrderMixin lt_bound_def le_bound_refl le_bound_anti le_bound_trans.
-Canonical itv_bound_porderType :=
-  POrderType (itv_bound_display disp) (itv_bound T) itv_bound_porderMixin.
+HB.instance Definition _ :=
+  Order.isPOrder.Build (itv_bound_display disp) (itv_bound T)
+    lt_bound_def le_bound_refl le_bound_anti le_bound_trans.
 
 Lemma bound_lexx c1 c2 x : (BSide c1 x <= BSide c2 x) = (c2 ==> c1).
 Proof. by rewrite /<=%O /= lteifxx. Qed.
@@ -231,7 +205,7 @@ Proof. by rewrite /<=%O /= lteifxx. Qed.
 Lemma bound_ltxx c1 c2 x : (BSide c1 x < BSide c2 x) = (c1 && ~~ c2).
 Proof. by rewrite /<%O /= lteifxx. Qed.
 
-Lemma ge_pinfty b : (+oo <= b) = (b == +oo). Proof. by move: b => [|[]]. Qed.
+Lemma ge_pinfty b : (+oo <= b) = (b == +oo). Proof. by case: b => [|] []. Qed.
 
 Lemma le_ninfty b : (b <= -oo) = (b == -oo). Proof. by case: b => // - []. Qed.
 
@@ -311,10 +285,9 @@ case=> [yl yr][xl xr][zl zr] /andP [Hl Hr] /andP [Hl' Hr'] /=.
 by rewrite (le_trans Hl' Hl) (le_trans Hr Hr').
 Qed.
 
-Definition interval_porderMixin :=
-  LePOrderMixin (fun _ _ => erefl) subitv_refl subitv_anti subitv_trans.
-Canonical interval_porderType :=
-  POrderType (interval_display disp) (interval T) interval_porderMixin.
+HB.instance Definition _ :=
+  Order.isPOrder.Build  (interval_display disp) (interval T)
+  (fun _ _ => erefl) subitv_refl subitv_anti subitv_trans.
 
 Definition pred_of_itv i : pred T := [pred x | `[x, x] <= i].
 
@@ -542,25 +515,30 @@ Qed.
 
 Lemma bound_leEmeet b1 b2 : (b1 <= b2) = (bound_meet b1 b2 == b1).
 Proof.
-by case: b1 b2 => [[]?|[]][[]?|[]] //=;
-  rewrite [LHS]/<=%O /eq_op /= ?eqxx //= -leEmeet; case: lcomparableP.
+case: b1 b2 => [[]t[][]|[][][]] //=; rewrite ?eqxx// => t';
+  rewrite [LHS]/<=%O /eq_op ?andbT ?andbF ?orbF/= /eq_op/= /eq_op/=;
+  case: lcomparableP => //=; rewrite ?eqxx//=; [| | |].
+- by move/lt_eqF.
+- move=> ic; apply: esym; apply: contraNF ic.
+  by move=> /eqP/meet_idPl; apply: le_comparable.
+- by move/lt_eqF.
+- move=> ic; apply: esym; apply: contraNF ic.
+  by move=> /eqP/meet_idPl; apply: le_comparable.
 Qed.
 
-Definition itv_bound_latticeMixin :=
-  LatticeMixin bound_meetC bound_joinC bound_meetA bound_joinA
-               bound_joinKI bound_meetKU bound_leEmeet.
-Canonical itv_bound_latticeType :=
-  LatticeType (itv_bound T) itv_bound_latticeMixin.
+HB.instance Definition _ :=
+  Order.POrder_isLattice.Build (itv_bound_display disp) (itv_bound T)
+    bound_meetC bound_joinC bound_meetA bound_joinA
+    bound_joinKI bound_meetKU bound_leEmeet.
 
 Lemma bound_le0x b : -oo <= b. Proof. by []. Qed.
 
 Lemma bound_lex1 b : b <= +oo. Proof. by case: b => [|[]]. Qed.
 
-Canonical itv_bound_bLatticeType :=
-  BLatticeType (itv_bound T) (BottomMixin bound_le0x).
-
-Canonical itv_bound_tbLatticeType :=
-  TBLatticeType (itv_bound T) (TopMixin bound_lex1).
+HB.instance Definition _ :=
+  Order.hasBottom.Build (itv_bound_display disp) (itv_bound T) bound_le0x.
+HB.instance Definition _ :=
+  Order.hasTop.Build (itv_bound_display disp) (itv_bound T) bound_lex1.
 
 Definition itv_meet i1 i2 : interval T :=
   let: Interval b1l b1r := i1 in
@@ -589,23 +567,23 @@ Lemma itv_joinKI i2 i1 : itv_meet i1 (itv_join i1 i2) = i1.
 Proof. by case: i1 i2 => [? ?][? ?] /=; rewrite meetKU joinKI. Qed.
 
 Lemma itv_leEmeet i1 i2 : (i1 <= i2) = (itv_meet i1 i2 == i1).
-Proof. by case: i1 i2 => [? ?][? ?]; rewrite /eq_op /= eq_meetl eq_joinl. Qed.
+Proof.
+by case: i1 i2 => [? ?] [? ?]; rewrite /eq_op/=/eq_op/= eq_meetl eq_joinl.
+Qed.
 
-Definition interval_latticeMixin :=
-  LatticeMixin itv_meetC itv_joinC itv_meetA itv_joinA
-               itv_joinKI itv_meetKU itv_leEmeet.
-Canonical interval_latticeType :=
-  LatticeType (interval T) interval_latticeMixin.
+HB.instance Definition _ :=
+  Order.POrder_isLattice.Build (interval_display disp) (interval T)
+    itv_meetC itv_joinC itv_meetA itv_joinA
+    itv_joinKI itv_meetKU itv_leEmeet.
 
 Lemma itv_le0x i : Interval +oo -oo <= i. Proof. by case: i => [[|[]]]. Qed.
 
 Lemma itv_lex1 i : i <= `]-oo, +oo[. Proof. by case: i => [?[|[]]]. Qed.
 
-Canonical interval_bLatticeType :=
-  BLatticeType (interval T) (BottomMixin itv_le0x).
-
-Canonical interval_tbLatticeType :=
-  TBLatticeType (interval T) (TopMixin itv_lex1).
+HB.instance Definition _ :=
+  Order.hasBottom.Build (interval_display disp) (interval T) itv_le0x.
+HB.instance Definition _ :=
+  Order.hasTop.Build (interval_display disp) (interval T) itv_lex1.
 
 Lemma in_itvI x i1 i2 : x \in i1 `&` i2 = (x \in i1) && (x \in i2).
 Proof. exact: lexI. Qed.
@@ -617,24 +595,21 @@ Section IntervalTotal.
 Variable (disp : unit) (T : orderType disp).
 Implicit Types (a b c : itv_bound T) (x y z : T) (i : interval T).
 
-Lemma itv_bound_totalMixin : totalLatticeMixin [latticeType of itv_bound T].
+Lemma itv_bound_total : total (<=%O : rel (itv_bound T)).
 Proof. by move=> [[]?|[]][[]?|[]]; rewrite /<=%O //=; case: ltgtP. Qed.
 
-Canonical itv_bound_distrLatticeType :=
-  DistrLatticeType (itv_bound T) itv_bound_totalMixin.
-Canonical itv_bound_bDistrLatticeType := [bDistrLatticeType of itv_bound T].
-Canonical itv_bound_tbDistrLatticeType := [tbDistrLatticeType of itv_bound T].
-Canonical itv_bound_orderType := OrderType (itv_bound T) itv_bound_totalMixin.
+HB.instance Definition _ :=
+  Order.Lattice_isTotal.Build
+    (itv_bound_display disp) (itv_bound T) itv_bound_total.
 
 Lemma itv_meetUl : @left_distributive (interval T) _ Order.meet Order.join.
 Proof.
 by move=> [? ?][? ?][? ?]; rewrite /Order.meet /Order.join /= -meetUl -joinIl.
 Qed.
 
-Canonical interval_distrLatticeType :=
-  DistrLatticeType (interval T) (DistrLatticeMixin itv_meetUl).
-Canonical interval_bDistrLatticeType := [bDistrLatticeType of interval T].
-Canonical interval_tbDistrLatticeType := [tbDistrLatticeType of interval T].
+HB.instance Definition _ :=
+  Order.Lattice_Meet_isDistrLattice.Build
+    (interval_display disp) (interval T) itv_meetUl.
 
 Lemma itv_splitU c a b : a <= c <= b ->
   forall y, y \in Interval a b = (y \in Interval a c) || (y \in Interval c b).

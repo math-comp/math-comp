@@ -1,9 +1,10 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
 From mathcomp Require Import ssralg poly finset fingroup morphism perm.
-From mathcomp Require Import automorphism quotient action finalg zmodp.
+From mathcomp Require Import automorphism quotient action countalg finalg zmodp.
 From mathcomp Require Import commutator cyclic center pgroup sylow gseries.
 From mathcomp Require Import nilpotent abelian ssrnum ssrint polydiv rat.
 From mathcomp Require Import matrix mxalgebra intdiv mxpoly vector falgebra.
@@ -60,14 +61,13 @@ have splitXn1: splittingFieldFor 1 ('X^n - 1) {:Qn}.
   exists r; first by rewrite -Dr eqpxx.
   apply/eqP; rewrite eqEsubv subvf -genQn adjoin_seqSr //; apply/allP=> /=.
   by rewrite andbT -root_prod_XsubC -Dr; apply/unity_rootP/prim_expr_order.
-have Qn_ax : SplittingField.axiom Qn by exists ('X^n - 1).
-exists (SplittingFieldType _ _ Qn_ax).
+have Qn_ax : FieldExt_isSplittingField _ Qn by constructor; exists ('X^n - 1).
+exists (HB.pack_for (splittingFieldType rat) Qn Qn_ax).
   apply/splitting_galoisField.
   exists ('X^n - 1); split => //.
   apply: separable_Xn_sub_1; rewrite -(fmorph_eq0 QnC) rmorph_nat.
   by rewrite pnatr_eq0 -lt0n cardG_gt0.
-exists QnC => [// nuQn|].
-  exact: (extend_algC_subfield_aut QnC [rmorphism of nuQn]).
+exists QnC => [// nuQn|]; first exact: (extend_algC_subfield_aut QnC nuQn).
 rewrite span_seq1 in genQn.
 exists w => // hT H phi Nphi x x_dv_n.
 apply: sig_eqW; have [rH ->] := char_reprP Nphi.
@@ -77,7 +77,7 @@ have /fin_all_exists[k Dk] i: exists k, e 0 i = z ^+ k.
   have [|k ->] := (prim_rootP prim_z) (e 0 i); last by exists k.
   by have /dvdnP[q ->] := x_dv_n; rewrite mulnC exprM enx1 expr1n.
 exists (\sum_i w ^+ k i); rewrite rmorph_sum; apply/eq_bigr => i _.
-by rewrite rmorphXn Dz Dk.
+by rewrite rmorphXn /= Dz Dk.
 Qed.
 
 Section GenericClassSums.
@@ -144,13 +144,12 @@ rewrite (set_gring_classM_coef _ _ Kk_g) -sumr_const; apply: eq_big => [] [x y].
 by rewrite /h2 /= => /andP[_ /eqP->].
 Qed.
 
-Fact gring_irr_mode_key : unit. Proof. by []. Qed.
-Definition gring_irr_mode_def (i : Iirr G) := ('chi_i 1%g)^-1 *: 'chi_i.
-Definition gring_irr_mode := locked_with gring_irr_mode_key gring_irr_mode_def.
-Canonical gring_irr_mode_unlockable := [unlockable fun gring_irr_mode].
-
 End GenericClassSums.
 
+
+HB.lock Definition gring_irr_mode  (gT : finGroupType) (G : {group gT})
+  (i : Iirr G) := ('chi_i 1%g)^-1 *: 'chi_i.
+Canonical gring_irr_mode_unlockable := Unlockable gring_irr_mode.unlock.
 Arguments gring_irr_mode {gT G%G} i%R _%g : extra scopes.
 
 Notation "''K_' i" := (gring_class_sum _ i)
@@ -547,7 +546,7 @@ have [j ->]: exists j, 'chi_i = 'Res 'chi[G]_j.
     exact/irrP/lin_char_irr/rpredM.
   have /fin_all_exists[rQ DrQ] (j : Iirr (G / H)) := Mlin i (mod_Iirr j).
   have mulJi: ('chi[G]_i)^*%CF * 'chi_i = 1.
-    apply/cfun_inP=> x Gx; rewrite !cfunE -lin_charV_conj ?linG // cfun1E Gx.
+    apply/cfun_inP=> x Gx; rewrite !cfunE /= -lin_charV_conj ?linG // cfun1E Gx.
     by rewrite lin_charV ?mulVf ?lin_char_neq0 ?linG.
   have inj_rQ: injective rQ.
     move=> j1 j2 /(congr1 (fun k => (('chi_i)^*%CF * 'chi_k) / H)%CF).
@@ -663,9 +662,9 @@ have Qpi1: pi1 \in Crat.
   apply: eq_bigr => i _; have /QnGg[b Db] := irr_char i.
   have Lchi_i: 'chi_i \is a linear_char by rewrite irr_cyclic_lin.
   have /(prim_rootP pr_eps)[m Dem]: b ^+ n = 1.
-    apply/eqP; rewrite -(fmorph_eq1 QnC) rmorphXn Db -lin_charX //.
+    apply/eqP; rewrite -(fmorph_eq1 QnC) rmorphXn /= Db -lin_charX //.
     by rewrite -expg_mod_order orderE defG modnn lin_char1.
-  rewrite -Db -DnuC Dem rmorphXn /= defItoQ exprAC -{m}Dem rmorphXn {b}Db.
+  rewrite -Db /= -DnuC Dem rmorphXn /= defItoQ exprAC -{m}Dem rmorphXn /= {b}Db.
   by rewrite lin_charX.
 clear I ItoS imItoS injItoS ItoQ inItoQ defItoQ imItoQ injItoQ.
 clear Qn galQn QnC gQnC eps pr_eps QnGg calG.

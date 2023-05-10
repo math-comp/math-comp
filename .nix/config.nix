@@ -34,14 +34,41 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   bundles = let
     master = [
-      "mathcomp-finmap" "mathcomp-bigenough"
-      "mathcomp-abel" "multinomials" "mathcomp-real-closed" "coqeal"
-      "fourcolor" "odd-order" "gaia" "deriving" "mathcomp-zify"
-      "extructures" "mathcomp-classical" "mathcomp-analysis" "reglang"
-      "graph-theory" "coquelicot" "mathcomp-tarjan"
+      "mathcomp-bigenough"
+      # "deriving"  # requires univ poly
+      # "extructures"  # requires deriving
+    ];
+    hierarchy-builder = [
+      "coqeal"
+      "coquelicot"
+      "interval"
+      "reglang"
+      "fourcolor"
+      "gaia"
+      "graph-theory"
+      "coq-bits"
+      "mathcomp-classical"
+      "mathcomp-analysis"
+    ];
+    hirarchy-builder = [
+      "odd-order"
+    ];
+    proux01-hierarchy-builder = [
+      "mathcomp-finmap"
+      "mathcomp-real-closed"
+      "multinomials"
+      "mathcomp-zify"
+      "mathcomp-abel"
+      "mathcomp-tarjan"
     ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
+    // listToAttrs (forEach hierarchy-builder (p:
+      { name = p; value.override.version = "hierarchy-builder"; }))
+    // listToAttrs (forEach hirarchy-builder (p:
+      { name = p; value.override.version = "hirarchy-builder"; }))
+    // listToAttrs (forEach proux01-hierarchy-builder (p:
+      { name = p; value.override.version = "proux01:hierarchy-builder"; }))
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
        };
@@ -52,22 +79,18 @@ with builtins; with (import <nixpkgs> {}).lib;
       bignums.override.version = "master";
       paramcoq.override.version = "master";
       coq-elpi.override.version = "coq-master";
-      hierarchy-builder.override.version = "coq-master";
+      hierarchy-builder.override.version = "proux01:coq-master";
+      interval.job = false;
+      coqeal.job = false;
     };
     "coq-8.17".push-branches = [ "master" "hierarchy-builder" ];
     "coq-8.17".coqPackages = common-bundles // {
       coq.override.version = "8.17";
-      coqeal.job = false;
-      mathcomp-classical.job = false;
-      mathcomp-analysis.job = false;
-      graph-theory.job = false;
     };
     "coq-8.16".push-branches = [ "master" "hierarchy-builder" ];
     "coq-8.16".coqPackages = common-bundles // {
       coq.override.version = "8.16";
-    };
-    "coq-8.15".coqPackages = common-bundles // {
-      coq.override.version = "8.15";
+      deriving.job = false;  # currently not ported
     };
   };
 }

@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
 From mathcomp Require Import fintype finfun bigop order ssralg countalg ssrnum.
 From mathcomp Require Import poly.
@@ -110,12 +111,7 @@ Definition int_of_natsum (m : nat + nat) :=
 Lemma natsum_of_intK : cancel natsum_of_int int_of_natsum.
 Proof. by case. Qed.
 
-Definition int_eqMixin := CanEqMixin natsum_of_intK.
-Definition int_countMixin := CanCountMixin natsum_of_intK.
-Definition int_choiceMixin := CountChoiceMixin int_countMixin.
-Canonical int_eqType := Eval hnf in EqType int int_eqMixin.
-Canonical int_choiceType := Eval hnf in ChoiceType int int_choiceMixin.
-Canonical int_countType := Eval hnf in CountType int int_countMixin.
+HB.instance Definition _ := Countable.copy int (can_type natsum_of_intK).
 
 Lemma eqz_nat (m n : nat) : (m%:Z == n%:Z) = (m == n). Proof. by []. Qed.
 
@@ -221,12 +217,12 @@ Lemma addNz : left_inverse (0:int) oppz addz. Proof. by do 3?elim. Qed.
 Lemma predn_int (n : nat) : 0 < n -> n.-1%:Z = n - 1.
 Proof. by case: n=> // n _ /=; rewrite subn1. Qed.
 
-Definition Mixin := ZmodMixin addzA addzC add0z addNz.
+Definition Mixin := GRing.isZmodule.Build int addzA addzC add0z addNz.
 
 End intZmod.
 End intZmod.
 
-Canonical int_ZmodType := ZmodType int intZmod.Mixin.
+HB.instance Definition _ := intZmod.Mixin.
 
 Local Open Scope ring_scope.
 
@@ -257,7 +253,7 @@ Variant int_spec (x : int) : int -> Type :=
 Lemma intP x : int_spec x x.
 Proof. by move: x=> [] [] *; rewrite ?NegzE; constructor. Qed.
 
-Definition oppzD := (@opprD [zmodType of int]).
+Definition oppzD := @opprD int.
 
 Lemma subzn (m n : nat) : (n <= m)%N -> m%:Z - n%:Z = (m - n)%N.
 Proof.
@@ -330,13 +326,13 @@ Qed.
 
 Lemma nonzero1z : 1%Z != 0. Proof. by []. Qed.
 
-Definition comMixin := ComRingMixin mulzA mulzC mul1z mulz_addl nonzero1z.
+Definition comMixin := GRing.Zmodule_isComRing.Build int
+  mulzA mulzC mul1z mulz_addl nonzero1z.
 
 End intRing.
 End intRing.
 
-Canonical int_Ring := Eval hnf in RingType int intRing.comMixin.
-Canonical int_comRing := Eval hnf in ComRingType int intRing.mulzC.
+HB.instance Definition _ := intRing.comMixin.
 
 Section intRingTheory.
 
@@ -381,27 +377,18 @@ by case: m n => m [] n //= /eqP;
   rewrite ?(NegzE, mulrN, mulNr) ?oppr_eq0 -PoszM [_ == _]muln_eq0.
 Qed.
 
-Definition comMixin := ComUnitRingMixin mulVz unitzPl invz_out.
+Definition comMixin := GRing.ComRing_hasMulInverse.Build int
+  mulVz unitzPl invz_out.
 
 End intUnitRing.
 End intUnitRing.
 
-Canonical int_unitRingType :=
-  Eval hnf in UnitRingType int intUnitRing.comMixin.
-Canonical int_comUnitRing := Eval hnf in [comUnitRingType of int].
-Canonical int_idomainType :=
-  Eval hnf in IdomainType int intUnitRing.idomain_axiomz.
-
-Canonical int_countZmodType := [countZmodType of int].
-Canonical int_countRingType := [countRingType of int].
-Canonical int_countComRingType := [countComRingType of int].
-Canonical int_countUnitRingType := [countUnitRingType of int].
-Canonical int_countComUnitRingType := [countComUnitRingType of int].
-Canonical int_countIdomainType := [countIdomainType of int].
+HB.instance Definition _ := intUnitRing.comMixin.
+HB.instance Definition _ := GRing.ComUnitRing_isIntegral.Build int
+  intUnitRing.idomain_axiomz.
 
 Definition absz m := match m with Posz p => p | Negz n => n.+1 end.
-Notation "m - n" :=
-  (@GRing.add int_ZmodType m%N (@GRing.opp int_ZmodType n%N)) : distn_scope.
+Notation "m - n" := (@GRing.add int m%N (@GRing.opp int n%N)) : distn_scope.
 Arguments absz m%distn_scope.
 Local Notation "`| m |" := (absz m) : nat_scope.
 
@@ -460,20 +447,13 @@ Proof.
 by move: m n => [] m [] n //=; rewrite (ltn_neqAle, leq_eqVlt) // eq_sym.
 Qed.
 
-Definition Mixin : realLeMixin int_idomainType :=
-  RealLeMixin
-    lez_add lez_mul lez_anti subz_ge0 (lez_total 0) normzN gez0_norm ltz_def.
+Definition Mixin := Num.IntegralDomain_isLeReal.Build int
+  lez_add lez_mul lez_anti subz_ge0 (lez_total 0) normzN gez0_norm ltz_def.
 
 End intOrdered.
 End intOrdered.
 
-Canonical int_porderType := POrderType ring_display int intOrdered.Mixin.
-Canonical int_latticeType := LatticeType int intOrdered.Mixin.
-Canonical int_distrLatticeType := DistrLatticeType int intOrdered.Mixin.
-Canonical int_orderType := OrderType int intOrdered.lez_total.
-Canonical int_numDomainType := NumDomainType int intOrdered.Mixin.
-Canonical int_normedZmodType := NormedZmodType int int intOrdered.Mixin.
-Canonical int_realDomainType := [realDomainType of int].
+HB.instance Definition _ := intOrdered.Mixin.
 
 Section intOrderedTheory.
 
@@ -572,7 +552,7 @@ Definition print (x : Iintmul) : Number.int :=
   | IIntmul IOne (Negz n) => Number.IntDecimal (Decimal.Neg (Nat.to_uint n.+1))
   end.
 
-Arguments GRing.one {R}.
+Arguments GRing.one {_}.
 Set Warnings "-via-type-remapping,-via-type-mismatch".
 Number Notation Idummy_placeholder parse print (via Iintmul
   mapping [[intmul] => IIntmul, [GRing.one] => IOne])
@@ -631,10 +611,9 @@ rewrite -?(opprD) ?(add0r, addr0, mulrnDr, subn0) //.
 * by rewrite -addnS -addSn mulrnDr.
 Qed.
 
-Definition Mint_LmodMixin :=
-  @LmodMixin _ [zmodType of M] (fun n x => x *~ n)
-   mulrzA_C mulr1z mulrzDr mulrzDl.
-Canonical Mint_LmodType := LmodType int M^z Mint_LmodMixin.
+HB.instance Definition _ := GRing.Zmodule.on M^z.  (* FIXME, the error message below "nomsg" when we forget this line is not very helpful *)
+HB.instance Definition _ := @GRing.Zmodule_isLmodule.Build _ M^z
+  (fun n x => x *~ n) mulrzA_C mulr1z mulrzDr mulrzDl.
 
 Lemma scalezrE n x : n *: (x : M^z) = x *~ n. Proof. by []. Qed.
 
@@ -671,7 +650,8 @@ Lemma mulrz_suml : forall n I r (P : pred I) (F : I -> M),
   (\sum_(i <- r | P i) F i) *~ n= \sum_(i <- r | P i) F i *~ n.
 Proof. by rewrite -/M^z; apply: scaler_sumr. Qed.
 
-Canonical intmul_additive x := Additive (@mulrzBr x).
+HB.instance Definition _ (x : M) := GRing.isAdditive.Build int M ( *~%R x)
+  (@mulrzBr x).
 
 End ZintLmod.
 
@@ -725,11 +705,10 @@ Proof. exact: mulrzDl. Qed.
 Lemma intrM m n : (m * n)%:~R = m%:~R * n%:~R :> R.
 Proof. by rewrite mulrzA -mulrzr. Qed.
 
-Lemma intmul1_is_rmorphism : rmorphism ( *~%R (1 : R)).
-Proof.
-by do ?split; move=> // x y /=; rewrite ?intrD ?mulrNz ?intrM.
-Qed.
-Canonical intmul1_rmorphism := RMorphism intmul1_is_rmorphism.
+Lemma intmul1_is_multiplicative : multiplicative ( *~%R (1 : R)).
+Proof. by split; move=> // x y /=; rewrite ?intrD ?mulrNz ?intrM. Qed.
+HB.instance Definition _ := GRing.isMultiplicative.Build int R ( *~%R 1)
+  intmul1_is_multiplicative.
 
 Lemma mulr2z n : n *~ 2 = n + n. Proof. exact: mulr2n. Qed.
 
@@ -867,7 +846,7 @@ Proof.
 move=> n; wlog : n / 0 <= n; case: n=> [] n //; do ?exact.
   by rewrite NegzE !rmorphN=>->.
 move=> _; elim: n=> [|n ihn]; first by rewrite rmorph0.
-by rewrite intS !rmorphD !rmorph1 ihn.
+by rewrite intS !rmorphD /= !rmorph1 ihn.
 Qed.
 
 (* intmul and ler/ltr *)
@@ -1731,8 +1710,14 @@ End MoreAbsz.
 
 Module Export IntDist.
 
+(* This notation is supposed to work even if the ssrint library is not Imported.
+   Since we can't rely on the CS database to contain the zmodule instance on
+   int we put the instance by hand in the notation. *)
+Local Definition int_nmodType : nmodType := int.
+Local Definition int_zmodType : zmodType := int.
 Notation "m - n" :=
-  (@GRing.add int_ZmodType m%N (@GRing.opp int_ZmodType n%N)) : distn_scope.
+  (@GRing.add int_nmodType (m%N : int)
+    (@GRing.opp int_zmodType (n%N : int))) : distn_scope.
 Arguments absz m%distn_scope.
 Notation "`| m |" := (absz m) : nat_scope.
 Coercion Posz : nat >-> int.
@@ -1798,7 +1783,7 @@ wlog le_m31 : m1 m3 / (m3 <= m1)%R.
   by rewrite (addrC `|_|)%R orbC !(distrC m1) !(distrC m3).
 rewrite ger0_norm ?subr_ge0 // orb_idl => [|/andP[le_m12 le_m23]]; last first.
   by have /eqP->: m2 == m3; rewrite ?lexx // eq_le le_m23 (le_trans le_m31).
-rewrite -{1}(subrK m2 m1) -addrA -subr_ge0 andbC -[X in X && _]subr_ge0.
+rewrite -{1}(subrK m2 m1) -(addrA _ m2) -subr_ge0 andbC -[X in X && _]subr_ge0.
 by apply: leifD; apply/real_leif_norm/num_real.
 Qed.
 
@@ -1874,17 +1859,15 @@ End PolyZintRing.
 
 Section ZnatPred.
 
-Definition Znat := [qualify a n : int | 0 <= n].
-Fact Znat_key : pred_key Znat. by []. Qed.
-Canonical Znat_keyd := KeyedQualifier Znat_key.
+Definition Znat_pred := fun n : int => 0 <= n.
+Definition Znat := [qualify a n : int | Znat_pred n].
 
 Lemma Znat_def n : (n \is a Znat) = (0 <= n). Proof. by []. Qed.
 
 Lemma Znat_semiring_closed : semiring_closed Znat.
 Proof. by do 2?split => //; [apply: addr_ge0 | apply: mulr_ge0]. Qed.
-Canonical Znat_addrPred := AddrPred Znat_semiring_closed.
-Canonical Znat_mulrPred := MulrPred Znat_semiring_closed.
-Canonical Znat_semiringPred := SemiringPred Znat_semiring_closed.
+HB.instance Definition _ := GRing.isSemiringClosed.Build int Znat_pred
+  Znat_semiring_closed.
 
 Lemma ZnatP (m : int) : reflect (exists n : nat, m = n) (m \is a Znat).
 Proof. by apply: (iffP idP) => [|[n -> //]]; case: m => // n; exists n. Qed.
@@ -1893,25 +1876,25 @@ End ZnatPred.
 
 Section rpred.
 
-Lemma rpredMz M S (addS : @zmodPred M S) (kS : keyed_pred addS) m :
-  {in kS, forall u, u *~ m \in kS}.
+Lemma rpredMz (M : zmodType) (S : zmodClosed M) m :
+  {in S, forall u, u *~ m \in S}.
 Proof. by case: m => n u Su; rewrite ?rpredN ?rpredMn. Qed.
 
-Lemma rpred_int R S (ringS : @subringPred R S) (kS : keyed_pred ringS) m :
-  m%:~R \in kS.
+Lemma rpred_int (R : ringType) (S : subringClosed R) m : m%:~R \in S.
 Proof. by rewrite rpredMz ?rpred1. Qed.
 
-Lemma rpredZint (R : ringType) (M : lmodType R) S
-                 (addS : @zmodPred M S) (kS : keyed_pred addS) m :
-  {in kS, forall u, m%:~R *: u \in kS}.
+Lemma rpredZint (R : ringType) (M : lmodType R) (S : zmodClosed M) m :
+  {in S, forall u, m%:~R *: u \in S}.
 Proof. by move=> u Su; rewrite /= scaler_int rpredMz. Qed.
 
-Lemma rpredXz R S (divS : @divrPred R S) (kS : keyed_pred divS) m :
-  {in kS, forall x, x ^ m \in kS}.
+Lemma rpredXz (R : unitRingType) (S : divClosed R) m :
+  {in S, forall x, x ^ m \in S}.
 Proof. by case: m => n x Sx; rewrite ?rpredV rpredX. Qed.
 
-Lemma rpredXsign R S (divS : @divrPred R S) (kS : keyed_pred divS) n x :
-  (x ^ ((-1) ^+ n) \in kS) = (x \in kS).
+Lemma rpredXsign (R : unitRingType) (S : divClosed R) n x :
+  (x ^ ((-1) ^+ n) \in S) = (x \in S).
 Proof. by rewrite -signr_odd; case: (odd n); rewrite ?rpredV. Qed.
 
 End rpred.
+
+Arguments Znat_pred _ /.

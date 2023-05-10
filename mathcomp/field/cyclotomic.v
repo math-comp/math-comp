@@ -50,7 +50,7 @@ End Ring.
 Lemma separable_Xn_sub_1 (R : idomainType) n :
   n%:R != 0 :> R -> @separable_poly R ('X^n - 1).
 Proof.
-case: n => [/eqP// | n nz_n]; rewrite /separable_poly linearB /= derivC subr0.
+case: n => [/eqP// | n nz_n]; rewrite unlock linearB /= derivC subr0.
 rewrite derivXn -scaler_nat coprimepZr //= exprS -scaleN1r coprimep_sym.
 by rewrite coprimep_addl_mul coprimepZr ?coprimep1 // (signr_eq0 _ 1).
 Qed.
@@ -115,9 +115,8 @@ Local Notation pZtoQ := (map_poly ZtoQ).
 Local Notation pZtoC := (map_poly ZtoC).
 Local Notation pQtoC := (map_poly ratr).
 
-Local Definition algC_intr_inj := @intr_inj [numDomainType of algC].
+Local Definition algC_intr_inj := @intr_inj algC.
 #[local] Hint Resolve algC_intr_inj : core.
-Local Notation QtoC_M := (ratr_rmorphism [numFieldType of algC]).
 
 Lemma C_prim_root_exists n : (n > 0)%N -> {z : algC | n.-primitive_root z}.
 Proof.
@@ -168,7 +167,7 @@ have nz_q: pZtoC q != 0.
 have [r def_zn]: exists r, cyclotomic z n = pZtoC r.
   have defZtoC: ZtoC =1 QtoC \o ZtoQ by move=> a; rewrite /= rmorph_int.
   have /dvdpP[r0 Dr0]: map_poly ZtoQ q %| 'X^n - 1.
-    rewrite -(dvdp_map QtoC_M) mapXn1 -map_poly_comp.
+    rewrite -(dvdp_map (@ratr algC)) mapXn1 -map_poly_comp.
     by rewrite -(eq_map_poly defZtoC) -defXn1 dvdp_mull.
   have [r [a nz_a Dr]] := rat_poly_scale r0.
   exists (zprimitive r); apply: (mulIf nz_q); rewrite defXn1.
@@ -250,7 +249,7 @@ have [zk gzk0]: exists zk, root (pZtoC g) zk.
   by exists rg`_0; rewrite Dg root_prod_XsubC mem_nth.
 have [k cokn Dzk]: exists2 k, coprime k n & zk = z ^+ k.
   have: root pz zk by rewrite -Dpz -Dfg rmorphM rootM gzk0 orbT.
-  rewrite -[pz](big_image _ _ _ (fun r => 'X - r%:P)) root_prod_XsubC.
+  rewrite -[pz](big_image _ _ _ _ (fun r => 'X - r%:P)) root_prod_XsubC.
   by case/imageP=> k; exists k.
 have co_fg (R : idomainType): n%:R != 0 :> R -> @coprimep R (intrp f) (intrp g).
   move=> nz_n; have: separable_poly (intrp ('X^n - 1) : {poly R}).
@@ -270,8 +269,7 @@ have [|k_gt1] := leqP k 1; last have [p p_pr /dvdnP[k1 Dk]] := pdivP k_gt1.
   by rewrite -(subnKC g_gt1) -(subnKC (size_minCpoly z)) !addnS.
 move: cokn; rewrite Dk coprimeMl => /andP[cok1n].
 rewrite prime_coprime // (dvdn_charf (char_Fp p_pr)) => /co_fg {co_fg}.
-have charFpX: p \in [char {poly 'F_p}].
-  by rewrite (rmorph_char (polyC_rmorphism _)) ?char_Fp.
+have charFpX: p \in [char {poly 'F_p}] by rewrite (rmorph_char polyC) ?char_Fp.
 rewrite -(coprimep_pexpr _ _ (prime_gt0 p_pr)) -(Frobenius_autE charFpX).
 rewrite -[g]comp_polyXr map_comp_poly -horner_map /= Frobenius_autE -rmorphXn.
 rewrite -!map_poly_comp (@eq_map_poly _ _ _ (polyC \o *~%R 1)); last first.

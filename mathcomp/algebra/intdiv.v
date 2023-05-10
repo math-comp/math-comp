@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
 From mathcomp Require Import ssralg poly ssrnum ssrint rat matrix.
@@ -298,7 +299,7 @@ Lemma eqz_modDr p m n d : (m + p == n + p %[mod d])%Z = (m == n %[mod d])%Z.
 Proof. by rewrite -!(addrC p) eqz_modDl. Qed.
 
 Lemma modzMml m n d : ((m %% d)%Z * n = m * n %[mod d])%Z.
-Proof. by rewrite {2}(divz_eq m d) mulrDl mulrAC modzMDl. Qed.
+Proof. by rewrite {2}(divz_eq m d) [in RHS]mulrDl mulrAC modzMDl. Qed.  (* FIXME: rewrite pattern *)
 
 Lemma modzMmr m n d : (m * (n %% d)%Z = m * n %[mod d])%Z.
 Proof. by rewrite !(mulrC m) modzMml. Qed.
@@ -316,9 +317,6 @@ Lemma modz_absm m d : ((-1) ^+ (m < 0)%R * (m %% d)%Z = `|m|%:Z %[mod d])%Z.
 Proof. by rewrite modzMmr -abszEsign. Qed.
 
 (** Divisibility **)
-
-Fact dvdz_key d : pred_key (dvdz d). Proof. by []. Qed.
-Canonical dvdz_keyed d := KeyedPred (dvdz_key d).
 
 Lemma dvdzE d m : (d %| m)%Z = (`|d| %| `|m|)%N. Proof. by []. Qed.
 Lemma dvdz0 d : (d %| 0)%Z. Proof. exact: dvdn0. Qed.
@@ -434,9 +432,8 @@ Proof.
 split=> [|_ _ /dvdzP[p ->] /dvdzP[q ->]]; first exact: dvdz0.
 by rewrite -mulrBl dvdz_mull.
 Qed.
-Canonical dvdz_addPred d := AddrPred (dvdz_zmod_closed d).
-Canonical dvdz_oppPred d := OpprPred (dvdz_zmod_closed d).
-Canonical dvdz_zmodPred d := ZmodPred (dvdz_zmod_closed d).
+HB.instance Definition _ d := GRing.isZmodClosed.Build int (dvdz d)
+  (dvdz_zmod_closed d).
 
 Lemma dvdz_exp k d m : (0 < k)%N -> (d %| m -> d %| m ^+ k)%Z.
 Proof. by case: k => // k _ d_dv_m; rewrite exprS dvdz_mulr. Qed.
@@ -856,7 +853,7 @@ have nz_prim_r q1: q1 != 0 -> map_poly to_r (zprimitive q1) != 0.
   rewrite -leqNgt dvdn_leq // -(dvdzE r true) -nz_q1 -zcontents_primitive.
   rewrite dvdz_contents; apply/polyOverP=> i /=; rewrite dvdzE /=.
   have /polyP/(_ i)/eqP := r_dv_q1; rewrite coef_map coef0 /=.
-  rewrite {1}[_`_i]intEsign rmorphM rmorph_sign /= mulf_eq0 signr_eq0 /=.
+  rewrite {1}[_`_i]intEsign rmorphM /= rmorph_sign /= mulf_eq0 signr_eq0 /=.
   by rewrite -val_eqE /= val_Fp_nat.
 suffices{nz_prim_r} /idPn[]: map_poly to_r (zprimitive p * zprimitive q) == 0.
   by rewrite rmorphM mulf_neq0 ?nz_prim_r.
@@ -901,7 +898,7 @@ Qed.
 Lemma dvdp_rat_int p q : (pZtoQ p %| pZtoQ q) = (p %| q).
 Proof.
 apply/dvdpP/Pdiv.Idomain.dvdpP=> [[/= r1 Dq] | [[/= a r] nz_a Dq]]; last first.
-  exists (a%:~R^-1 *: pZtoQ r); rewrite -scalerAl -rmorphM -Dq.
+  exists (a%:~R^-1 *: pZtoQ r); rewrite -scalerAl -rmorphM -Dq /=.
   by rewrite -{2}[a]intz scaler_int rmorphMz -scaler_int scalerK ?intr_eq0.
 have [r [a nz_a Dr1]] := rat_poly_scale r1; exists (a, r) => //=.
 apply: (map_inj_poly _ _ : injective pZtoQ) => //; first exact: intr_inj.

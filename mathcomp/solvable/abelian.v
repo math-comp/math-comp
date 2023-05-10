@@ -1,9 +1,9 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path choice.
 From mathcomp Require Import div fintype finfun bigop finset prime binomial.
 From mathcomp Require Import fingroup morphism perm automorphism action.
-From mathcomp Require Import quotient gfunctor gproduct ssralg finalg zmodp.
+From mathcomp Require Import quotient gfunctor gproduct ssralg countalg finalg zmodp.
 From mathcomp Require Import cyclic pgroup gseries nilpotent sylow.
 
 (******************************************************************************)
@@ -2173,6 +2173,6 @@ Proof. by move/char_Fp/fin_lmod_char_abelem->. Qed.
 
 Lemma fin_ring_char_abelem p (R : finRingType) :
   p \in [char R]%R -> p.-abelem [set: R].
-Proof. exact: fin_lmod_char_abelem [finLmodType R of R^o]. Qed.
+Proof. exact: fin_lmod_char_abelem R^o. Qed.
 
 End FimModAbelem.

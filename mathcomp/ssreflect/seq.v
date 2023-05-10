@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 
 (******************************************************************************)
@@ -1049,8 +1050,7 @@ have [<-|neqx] := x1 =P x2; last by right; case.
 by apply: (iffP (IHs s2)) => [<-|[]].
 Qed.
 
-Canonical seq_eqMixin := EqMixin eqseqP.
-Canonical seq_eqType := Eval hnf in EqType (seq T) seq_eqMixin.
+HB.instance Definition _ := hasDecEq.Build (seq T) eqseqP.
 
 Lemma eqseqE : eqseq = eq_op. Proof. by []. Qed.
 
@@ -1644,7 +1644,7 @@ Arguments has_nthP {T a s}.
 Arguments all_nthP {T a s}.
 
 Definition bitseq := seq bool.
-Canonical bitseq_eqType := Eval hnf in [eqType of bitseq].
+#[hnf] HB.instance Definition _ := Equality.on bitseq.
 Canonical bitseq_predType := Eval hnf in [predType of bitseq].
 
 (* Generalizations of splitP (from path.v): split_find_nth and split_find *)
@@ -2826,7 +2826,7 @@ End PmapSub.
 
 Section EqPmapSub.
 
-Variables (T : eqType) (p : pred T) (sT : subType p).
+Variables (T : eqType) (p : pred T) (sT : subEqType p).
 
 Let insT : T -> option sT := insub.
 
