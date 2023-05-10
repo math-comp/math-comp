@@ -2348,5 +2348,5 @@ name: Nix CI for bundle coq-8.16
     - reopened
   push:
     branches:
+    - mathcomp-1
     - master
-    - hierarchy-builder

@@ -2055,5 +2055,5 @@ name: Nix CI for bundle coq-master
     - reopened
   push:
     branches:
+    - mathcomp-1
     - master
-    - hierarchy-builder
