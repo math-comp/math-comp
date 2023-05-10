@@ -193,10 +193,10 @@ Abbreviations are in the header of the file which introduces them. We list here 
     * e.g., `hasChoice`, `isZsemimodule`
   + when the interface extends a structure `A` into a structure `B` using `C`:
     `A_C_isB` or `A_C_hasB` where
-    `B` and `C` are mixed case, the first letter of each internal word capitalised
+    `B` and `C` are mixed case, the first letter of each internal word capitalized
     * e.g., `Zsemimodule_isZmodule`, `SemiRing_hasCommutativeMul`, `Lattice_Meet_isDistrLattice`
     * exceptions: `Choice_`, `Equality_` can be omitted
-- Coq Modules:
+- Coq modules
   - Mixed case, the first letter of each internal word capitalized
   - e.g., `NumDomain` in `ssrnum.v`
 
