@@ -217,6 +217,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `subE` -> `diffE`
   + `tnth_sub` -> `tnth_diff`
   + `subEtprod` -> `diffEtprod`
+  + `PcanPartial` -> `PCanIsPartial`
+  + `CanPartial` -> `CanIsPartial`
+  + `PcanTotal` -> `PCanIsTotal`
+  + `CanTotal` -> `CanIsTotal`
 
 - in `choice.v`
   + `choiceMixin` -> `hasChoice`
@@ -538,6 +542,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + notation `[finDistrLatticeType of T]`, use `FinDistrLattice.clone _ T _` or `T : finDistrLatticeType`
   + notation `[finCDistrLatticeType of T]`, use `FinCDistrLattice.clone _ T _` or `T : finCDistrLatticeType`
   + notation `[finOrderType of T]`, use `FinTotal.clone _ T _` or `T : finOrderType`
+  + notation `PcanPartial`, use `PCanIsPartial`
+  + notation `CanPartial`, use `CanIsPartial`
+  + notation `PcanTotal`, use `PCanIsTotal`
+  + notation `CanTotal`, use `CanIsTotal`
 
 - in `generic_quotient.v`
   + notation `[quotType of Q]`, use `Quotient.clone _ Q _` or `Q : quotType`

@@ -4665,9 +4665,12 @@ Definition Can f' (f_can : cancel f f') := Pcan (can_pcan f_can).
 End CancelPartial.
 End CancelPartial.
 
-#[deprecated(since="mathcomp 2.0.0", note="Use POrder.clone and pcan_type.")]
+Notation PCanIsPartial := CancelPartial.Pcan.
+Notation CanIsPartial := CancelPartial.Can.
+
+#[deprecated(since="mathcomp 2.0.0", note="Use PCanIsPartial.")]
 Notation PcanPartial := CancelPartial.Pcan.
-#[deprecated(since="mathcomp 2.0.0", note="Use POrder.clone and can_type.")]
+#[deprecated(since="mathcomp 2.0.0", note="Use CanIsPartial.")]
 Notation CanPartial := CancelPartial.Can.
 
 #[export]
@@ -4694,7 +4697,7 @@ Variables (f' : T' -> option T) (f_can : pcancel f f').
 HB.instance Definition _ :=
    MonoTotal.Build disp (pcan_type f_can) (fun _ _ => erefl).
 
-Definition PcanTotal : DistrLattice_isTotal _ (pcan_type f_can) :=
+Definition PCanIsTotal : DistrLattice_isTotal _ (pcan_type f_can) :=
   Total.on (pcan_type f_can).
 
 End PCan.
@@ -4707,11 +4710,16 @@ Variables (f' : T' -> T) (f_can : cancel f f').
 HB.instance Definition _ :=
    MonoTotal.Build disp (can_type f_can) (fun _ _ => erefl).
 
-Definition CanTotal : DistrLattice_isTotal _ (can_type f_can) :=
+Definition CanIsTotal : DistrLattice_isTotal _ (can_type f_can) :=
   Total.on (can_type f_can).
 
 End Can.
 End CancelTotal.
+
+#[deprecated(since="mathcomp 2.0.0", note="Use PCanIsTotal.")]
+Notation PcanTotal := PCanIsTotal.
+#[deprecated(since="mathcomp 2.0.0", note="Use CanIsTotal.")]
+Notation CanTotal := CanIsTotal.
 
 HB.factory Record IsoLattice disp T of POrder disp T := {
   disp' : unit;
@@ -4770,14 +4778,14 @@ HB.end.
 Module CanExports.
 #[deprecated(since="mathcomp 2.0.0", note="use Order.MonoTotal instead.")]
 Notation MonoTotalMixin d T := (MonoTotal d T).
-#[deprecated(since="mathcomp 2.0.0", note="use Order.PcanPartial instead.")]
+#[deprecated(since="mathcomp 2.0.0", note="use Order.PCanIsPartial instead.")]
 Notation PcanPOrderMixin := CancelPartial.Pcan.
-#[deprecated(since="mathcomp 2.0.0", note="use Order.CanPartial instead.")]
+#[deprecated(since="mathcomp 2.0.0", note="use Order.CanIsPartial instead.")]
 Notation CanPOrderMixin := CancelPartial.Can.
-#[deprecated(since="mathcomp 2.0.0", note="use Order.PcanTotal instead.")]
-Notation PcanOrderMixin := PcanTotal.
-#[deprecated(since="mathcomp 2.0.0", note="use Order.CanTotal instead.")]
-Notation CanOrderMixin := CanTotal.
+#[deprecated(since="mathcomp 2.0.0", note="use Order.PCanIsTotal instead.")]
+Notation PcanOrderMixin := PCanIsTotal.
+#[deprecated(since="mathcomp 2.0.0", note="use Order.CanIsTotal instead.")]
+Notation CanOrderMixin := CanIsTotal.
 #[deprecated(since="mathcomp 2.0.0", note="use Order.IsoLattice instead.")]
 Notation IsoLatticeMixin d T := (IsoLattice d T).
 #[deprecated(since="mathcomp 2.0.0", note="use Order.IsoDistrLattice instead.")]
