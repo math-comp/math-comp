@@ -1914,4 +1914,4 @@ name: Nix CI for bundle coq-8.17
   push:
     branches:
     - master
-    - hierarchy-builder
+    - mathcomp-1

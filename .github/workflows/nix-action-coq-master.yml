@@ -1997,4 +1997,4 @@ name: Nix CI for bundle coq-master
   push:
     branches:
     - master
-    - hierarchy-builder
+    - mathcomp-1
