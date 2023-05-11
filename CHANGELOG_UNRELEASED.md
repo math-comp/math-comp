@@ -10,6 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- in `seq.v`
+  + lemma `foldl_foldr`
+
 - in `poly.v`
   + multirule `coefE`
   + lemmas `deg2_poly_canonical`, `deg2_poly_factor`,
