@@ -3081,6 +3081,20 @@ Proof. by rewrite -cats1 foldl_cat. Qed.
 
 End FoldLeft.
 
+Section Folds.
+
+Variables (T : Type) (f : T -> T -> T).
+
+Hypotheses (fA : associative f) (fC : commutative f).
+
+Lemma foldl_foldr x0 l : foldl f x0 l = foldr f x0 l.
+Proof.
+elim: l x0 => [//|x1 l IHl] x0 /=; rewrite {}IHl.
+by elim: l x0 x1 => [//|x2 l IHl] x0 x1 /=; rewrite IHl !fA [f x2 x1]fC.
+Qed.
+
+End Folds.
+
 Section Scan.
 
 Variables (T1 : Type) (x1 : T1) (T2 : Type) (x2 : T2).
