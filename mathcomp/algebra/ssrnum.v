@@ -76,6 +76,12 @@ From mathcomp Require Import ssralg poly.
 (*   i : interior = in [0, 1] or ]0, 1[                                       *)
 (*   e : exterior = in [1, +oo[ or ]1; +oo[                                   *)
 (*   w : non strict (weak) monotony                                           *)
+(*                                                                            *)
+(* Pdeg2.NumClosed : theory of the degree 2 polynomials on NumClosedField.    *)
+(* Pdeg2.NumClosedMonic : theory of Pdeg2.NumClosed specialized to monic      *)
+(*   polynomials.                                                             *)
+(* Pdeg2.Real : theory of the degree 2 polynomials on RealField and rcfType.  *)
+(* Pdeg2.RealMonic : theory of Pdeg2.Real specialized to monic polynomials.   *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -4815,6 +4821,534 @@ Arguments sqrCK_P {C x}.
   solve [apply: Creal_Re] : core.
 #[global] Hint Extern 0 (is_true (in_mem ('Im _) _)) =>
   solve [apply: Creal_Im] : core.
+
+Module Export Pdeg2.
+
+Module NumClosed.
+
+Section Pdeg2NumClosed.
+
+Variables (F : numClosedFieldType) (p : {poly F}).
+
+Hypothesis degp : size p = 3%N.
+
+Let a := p`_2.
+Let b := p`_1.
+Let c := p`_0.
+
+Let delta := b ^+ 2 - 4 * a * c.
+
+Let r1 := (- b - sqrtC delta) / (2 * a).
+Let r2 := (- b + sqrtC delta) / (2 * a).
+
+Lemma deg2_poly_factor : p = a *: ('X - r1%:P) * ('X - r2%:P).
+Proof. by apply: deg2_poly_factor; rewrite ?pnatr_eq0// sqrtCK. Qed.
+
+Lemma deg2_poly_root1 : root p r1.
+Proof. by apply: deg2_poly_root1; rewrite ?pnatr_eq0// sqrtCK. Qed.
+
+Lemma deg2_poly_root2 : root p r2.
+Proof. by apply: deg2_poly_root2; rewrite ?pnatr_eq0// sqrtCK. Qed.
+
+End Pdeg2NumClosed.
+
+End NumClosed.
+
+Module NumClosedMonic.
+
+Export FieldMonic.
+
+Section Pdeg2NumClosedMonic.
+
+Variables (F : numClosedFieldType) (p : {poly F}).
+
+Hypothesis degp : size p = 3%N.
+Hypothesis monicp : p \is monic.
+
+Let a := p`_2.
+Let b := p`_1.
+Let c := p`_0.
+
+Let delta := b ^+ 2 - 4 * c.
+
+Let r1 := (- b - sqrtC delta) / 2.
+Let r2 := (- b + sqrtC delta) / 2.
+
+Lemma deg2_poly_factor : p = ('X - r1%:P) * ('X - r2%:P).
+Proof. by apply: deg2_poly_factor; rewrite ?pnatr_eq0// sqrtCK. Qed.
+
+Lemma deg2_poly_root1 : root p r1.
+Proof. by apply: deg2_poly_root1; rewrite ?pnatr_eq0// sqrtCK. Qed.
+
+Lemma deg2_poly_root2 : root p r2.
+Proof. by apply: deg2_poly_root2; rewrite ?pnatr_eq0// sqrtCK. Qed.
+
+End Pdeg2NumClosedMonic.
+End NumClosedMonic.
+
+Module Real.
+
+Section Pdeg2Real.
+
+Variable F : realFieldType.
+
+Section Pdeg2RealConvex.
+
+Variable p : {poly F}.
+Hypothesis degp : size p = 3%N.
+
+Let a := p`_2.
+Let b := p`_1.
+Let c := p`_0.
+
+Hypothesis age0 : 0 <= a.
+
+Let delta := b ^+ 2 - 4 * a * c.
+
+Let pneq0 : p != 0. Proof. by rewrite -size_poly_gt0 degp. Qed.
+Let aneq0 : a != 0.
+Proof. by move: pneq0; rewrite -lead_coef_eq0 lead_coefE degp. Qed.
+Let agt0 : 0 < a. Proof. by rewrite lt_def aneq0. Qed.
+Let a4gt0 : 0 < 4 * a. Proof. by rewrite mulr_gt0 ?ltr0n. Qed.
+
+Lemma deg2_poly_min x : p.[- b / (2 * a)] <= p.[x].
+Proof.
+rewrite [p]deg2_poly_canonical ?pnatr_eq0// -/a -/b -/c /delta !hornerE/=.
+by rewrite ler_pM2l// lerD2r addrC mulNr subrr expr0n sqr_ge0.
+Qed.
+
+Lemma deg2_poly_minE : p.[- b / (2 * a)] = - delta / (4 * a).
+Proof.
+rewrite [p]deg2_poly_canonical ?pnatr_eq0// -/a -/b -/c -/delta !hornerE/=.
+rewrite [X in X^+2]addrC [in LHS]mulNr subrr expr0n add0r mulNr.
+by rewrite mulrC mulNr invfM mulrA mulfVK.
+Qed.
+
+Lemma deg2_poly_gt0 : reflect (forall x, 0 < p.[x]) (delta < 0).
+Proof.
+apply/(iffP idP) => [dlt0 x | /(_ (- b / (2 * a)))]; last first.
+  by rewrite deg2_poly_minE ltr_pdivlMr// mul0r oppr_gt0.
+apply: lt_le_trans (deg2_poly_min _).
+by rewrite deg2_poly_minE ltr_pdivlMr// mul0r oppr_gt0.
+Qed.
+
+Lemma deg2_poly_ge0 : reflect (forall x, 0 <= p.[x]) (delta <= 0).
+Proof.
+apply/(iffP idP) => [dlt0 x | /(_ (- b / (2 * a)))]; last first.
+  by rewrite deg2_poly_minE ler_pdivlMr// mul0r oppr_ge0.
+apply: le_trans (deg2_poly_min _).
+by rewrite deg2_poly_minE ler_pdivlMr// mul0r oppr_ge0.
+Qed.
+
+End Pdeg2RealConvex.
+
+Section Pdeg2RealConcave.
+
+Variable p : {poly F}.
+Hypothesis degp : size p = 3%N.
+
+Let a := p`_2.
+Let b := p`_1.
+Let c := p`_0.
+
+Hypothesis ale0 : a <= 0.
+
+Let delta := b ^+ 2 - 4 * a * c.
+
+Let degpN : size (- p) = 3%N. Proof. by rewrite size_opp. Qed.
+Let b2a : - (- p)`_1 / (2 * (- p)`_2) = - b / (2 * a).
+Proof. by rewrite !coefN mulrN divrNN. Qed.
+Let deltaN : (- p)`_1 ^+ 2 - 4 * (- p)`_2 * (- p)`_0 = delta.
+Proof. by rewrite !coefN sqrrN -mulrN opprK mulrN mulNr. Qed.
+
+Lemma deg2_poly_max x : p.[x] <= p.[- b / (2 * a)].
+Proof. by rewrite -lerN2 -!hornerN -b2a deg2_poly_min// coefN oppr_ge0. Qed.
+
+Lemma deg2_poly_maxE : p.[- b / (2 * a)] = - delta / (4 * a).
+Proof.
+apply/eqP; rewrite [eqbRHS]mulNr -eqr_oppLR -hornerN -b2a.
+by rewrite deg2_poly_minE// deltaN coefN mulrN divrNN.
+Qed.
+
+Lemma deg2_poly_lt0 : reflect (forall x, p.[x] < 0) (delta < 0).
+Proof.
+rewrite -deltaN; apply/(iffP (deg2_poly_gt0 _ _)); rewrite ?coefN ?oppr_ge0//.
+- by move=> gt0 x; rewrite -oppr_gt0 -hornerN gt0.
+- by move=> lt0 x; rewrite hornerN oppr_gt0 lt0.
+Qed.
+
+Lemma deg2_poly_le0 : reflect (forall x, p.[x] <= 0) (delta <= 0).
+Proof.
+rewrite -deltaN; apply/(iffP (deg2_poly_ge0 _ _)); rewrite ?coefN ?oppr_ge0//.
+- by move=> ge0 x; rewrite -oppr_ge0 -hornerN ge0.
+- by move=> le0 x; rewrite hornerN oppr_ge0 le0.
+Qed.
+
+End Pdeg2RealConcave.
+End Pdeg2Real.
+
+Section Pdeg2RealClosed.
+
+Variable F : rcfType.
+
+Section Pdeg2RealClosedConvex.
+
+Variable p : {poly F}.
+Hypothesis degp : size p = 3%N.
+
+Let a := p`_2.
+Let b := p`_1.
+Let c := p`_0.
+
+Let pneq0 : p != 0. Proof. by rewrite -size_poly_gt0 degp. Qed.
+Let aneq0 : a != 0.
+Proof. by move: pneq0; rewrite -lead_coef_eq0 lead_coefE degp. Qed.
+Let sqa2 : 4 * a ^+ 2 = (2 * a) ^+ 2. Proof. by rewrite exprMn -natrX. Qed.
+Let nz2 : 2 != 0 :> F. Proof. by rewrite pnatr_eq0. Qed.
+
+Let delta := b ^+ 2 - 4 * a * c.
+
+Let r1 := (- b - sqrt delta) / (2 * a).
+Let r2 := (- b + sqrt delta) / (2 * a).
+
+Lemma deg2_poly_factor : 0 <= delta -> p = a *: ('X - r1%:P) * ('X - r2%:P).
+Proof. by move=> dge0; apply: deg2_poly_factor; rewrite ?sqr_sqrtr. Qed.
+
+Lemma deg2_poly_root1 : 0 <= delta -> root p r1.
+Proof. by move=> dge0; apply: deg2_poly_root1; rewrite ?sqr_sqrtr. Qed.
+
+Lemma deg2_poly_root2 : 0 <= delta -> root p r2.
+Proof. by move=> dge0; apply: deg2_poly_root2; rewrite ?sqr_sqrtr. Qed.
+
+Lemma deg2_poly_noroot : reflect (forall x, ~~ root p x) (delta < 0).
+Proof.
+apply/(iffP idP) => [dlt0 x | /(_ r1)].
+  case: ltgtP aneq0 => [agt0 _|alt0 _|//]; rewrite rootE; last first.
+    exact/lt0r_neq0/(deg2_poly_gt0 degp (ltW alt0)).
+  rewrite -oppr_eq0 -hornerN.
+  apply/lt0r_neq0/deg2_poly_gt0; rewrite ?size_opp ?coefN ?oppr_ge0 ?ltW//.
+  by rewrite sqrrN -mulrA mulrNN mulrA.
+by rewrite ltNge; apply: contraNN => ?; apply: deg2_poly_root1.
+Qed.
+
+Hypothesis age0 : 0 <= a.
+
+Let agt0 : 0 < a. Proof. by rewrite lt_def aneq0. Qed.
+Let a2gt0 : 0 < 2 * a. Proof. by rewrite mulr_gt0 ?ltr0n. Qed.
+Let a4gt0 : 0 < 4 * a. Proof. by rewrite mulr_gt0 ?ltr0n. Qed.
+Let aa4gt0 : 0 < 4 * a * a. Proof. by rewrite mulr_gt0 ?ltr0n. Qed.
+
+Let xb4 x : (x + b / (2 * a)) ^+ 2 * (4 * a * a) = (x * (2 * a) + b) ^+ 2.
+Proof.
+have -> : 4 * a * a = (2 * a) ^+ 2 by rewrite expr2 mulrACA -natrM mulrA.
+by rewrite -exprMn mulrDl mulfVK ?mulf_neq0 ?pnatr_eq0.
+Qed.
+
+Lemma deg2_poly_gt0l x : x < r1 -> 0 < p.[x].
+Proof.
+move=> xltr1; have [? | dge0] := ltP delta 0; first exact: deg2_poly_gt0.
+have {}xltr1 : sqrt delta < - (x * (2 * a) + b).
+  by rewrite ltrNr -ltrBrDr addrC -ltr_pdivlMr.
+rewrite [p]deg2_poly_canonical// -/a -/b -/c -/delta !hornerE/=.
+rewrite mulr_gt0// subr_gt0 ltr_pdivrMr// xb4 -sqrrN.
+rewrite -ltr_sqrt ?sqrtr_sqr ?(lt_le_trans xltr1) ?ler_norm//.
+by rewrite exprn_gt0 ?(le_lt_trans _ xltr1) ?sqrtr_ge0.
+Qed.
+
+Lemma deg2_poly_gt0r x : r2 < x -> 0 < p.[x].
+Proof.
+move=> xgtr2; have [? | dge0] := ltP delta 0; first exact: deg2_poly_gt0.
+have {}xgtr2 : sqrt delta < x * (2 * a) + b.
+  by rewrite -ltrBlDr addrC -ltr_pdivrMr.
+rewrite [p]deg2_poly_canonical// -/a -/b -/c -/delta !hornerE/=.
+rewrite mulr_gt0// subr_gt0 ltr_pdivrMr// xb4.
+rewrite -ltr_sqrt ?sqrtr_sqr ?(lt_le_trans xgtr2) ?ler_norm//.
+by rewrite exprn_gt0 ?(le_lt_trans _ xgtr2) ?sqrtr_ge0.
+Qed.
+
+Lemma deg2_poly_lt0m x : r1 < x < r2 -> p.[x] < 0.
+Proof.
+move=> /andP[r1ltx xltr2].
+have [dle0 | dgt0] := leP delta 0.
+  by move: (lt_trans r1ltx xltr2); rewrite /r1 /r2 ler0_sqrtr// oppr0 ltxx.
+rewrite [p]deg2_poly_canonical// !hornerE/= -/a -/b -/c -/delta.
+rewrite pmulr_rlt0// subr_lt0 ltr_pdivlMr// xb4 -ltr_sqrt// sqrtr_sqr ltr_norml.
+by rewrite -ltrBlDr addrC -ltr_pdivrMr// r1ltx -ltrBrDr addrC -ltr_pdivlMr.
+Qed.
+
+Lemma deg2_poly_ge0l x : x <= r1 -> 0 <= p.[x].
+Proof.
+rewrite le_eqVlt => /orP[/eqP->|xltr1]; last exact/ltW/deg2_poly_gt0l.
+have [dge0|dlt0] := leP 0 delta; last by apply: deg2_poly_ge0 => //; apply: ltW.
+by rewrite le_eqVlt (rootP (deg2_poly_root1 dge0)) eqxx.
+Qed.
+
+Lemma deg2_poly_ge0r x : r2 <= x -> 0 <= p.[x].
+Proof.
+rewrite le_eqVlt => /orP[/eqP<-|xgtr2]; last exact/ltW/deg2_poly_gt0r.
+have [dge0|dlt0] := leP 0 delta; last by apply: deg2_poly_ge0 => //; apply: ltW.
+by rewrite le_eqVlt (rootP (deg2_poly_root2 dge0)) eqxx.
+Qed.
+
+Lemma deg2_poly_le0m x : 0 <= delta -> r1 <= x <= r2 -> p.[x] <= 0.
+Proof.
+move=> dge0; rewrite le_eqVlt andb_orl => /orP[/andP[/eqP<- _]|].
+  by rewrite le_eqVlt (rootP (deg2_poly_root1 dge0)) eqxx.
+rewrite le_eqVlt andb_orr => /orP[/andP[_ /eqP->]|].
+  by rewrite le_eqVlt (rootP (deg2_poly_root2 dge0)) eqxx.
+by move=> ?; apply/ltW/deg2_poly_lt0m.
+Qed.
+
+End Pdeg2RealClosedConvex.
+
+Section Pdeg2RealClosedConcave.
+
+Variable p : {poly F}.
+Hypothesis degp : size p = 3%N.
+
+Let a := p`_2.
+Let b := p`_1.
+Let c := p`_0.
+
+Let delta := b ^+ 2 - 4 * a * c.
+
+Let r1 := (- b + sqrt delta) / (2 * a).
+Let r2 := (- b - sqrt delta) / (2 * a).
+
+Hypothesis ale0 : a <= 0.
+
+Let degpN : size (- p) = 3%N. Proof. by rewrite size_opp. Qed.
+Let aNge0 : 0 <= (- p)`_2. Proof. by rewrite coefN oppr_ge0. Qed.
+Let deltaN : (- p)`_1 ^+ 2 - 4 * (- p)`_2 * (- p)`_0 = delta.
+Proof. by rewrite !coefN sqrrN -mulrN opprK mulrN mulNr. Qed.
+Let r1N : (- (- p)`_1 - sqrt delta) / (2 * (- p)`_2) = r1.
+Proof. by rewrite !coefN -opprD mulrN divrNN. Qed.
+Let r2N : (- (- p)`_1 + sqrt delta) / (2 * (- p)`_2) = r2.
+Proof. by rewrite !coefN mulrN divrN -mulNr opprK opprD. Qed.
+
+Lemma deg2_poly_lt0l x : x < r1 -> p.[x] < 0.
+Proof. by move=> ?; rewrite -oppr_gt0 -hornerN deg2_poly_gt0l// deltaN r1N. Qed.
+
+Lemma deg2_poly_lt0r x : r2 < x -> p.[x] < 0.
+Proof. by move=> ?; rewrite -oppr_gt0 -hornerN deg2_poly_gt0r// deltaN r2N. Qed.
+
+Lemma deg2_poly_gt0m x : r1 < x < r2 -> 0 < p.[x].
+Proof.
+by move=> ?; rewrite -oppr_lt0 -hornerN deg2_poly_lt0m// deltaN r1N r2N.
+Qed.
+
+Lemma deg2_poly_le0l x : x <= r1 -> p.[x] <= 0.
+Proof. by move=> ?; rewrite -oppr_ge0 -hornerN deg2_poly_ge0l// deltaN r1N. Qed.
+
+Lemma deg2_poly_le0r x : r2 <= x -> p.[x] <= 0.
+Proof. by move=> ?; rewrite -oppr_ge0 -hornerN deg2_poly_ge0r// deltaN r2N. Qed.
+
+Lemma deg2_poly_ge0m x : 0 <= delta -> r1 <= x <= r2 -> 0 <= p.[x].
+Proof.
+by move=> ? ?; rewrite -oppr_le0 -hornerN deg2_poly_le0m ?deltaN// r1N r2N.
+Qed.
+
+End Pdeg2RealClosedConcave.
+End Pdeg2RealClosed.
+End Real.
+
+Module RealMonic.
+
+Import Real.
+Export FieldMonic.
+
+Section Pdeg2RealMonic.
+
+Variable F : realFieldType.
+
+Variable p : {poly F}.
+Hypothesis degp : size p = 3%N.
+Hypothesis monicp : p \is monic.
+
+Let a := p`_2.
+Let b := p`_1.
+Let c := p`_0.
+
+Let delta := b ^+ 2 - 4 * c.
+
+Let a1 : a = 1. Proof. by move: (monicP monicp); rewrite lead_coefE degp. Qed.
+Let a2 : 2 * a = 2. Proof. by rewrite a1 mulr1. Qed.
+Let a4 : 4 * a = 4. Proof. by rewrite a1 mulr1. Qed.
+
+Lemma deg2_poly_min x : p.[- b / 2] <= p.[x].
+Proof. by rewrite -a2 deg2_poly_min -/a ?a1 ?ler01. Qed.
+
+Let deltam : delta = b ^+ 2 - 4 * a * c. Proof. by rewrite a1 mulr1. Qed.
+
+Lemma deg2_poly_minE : p.[- b / 2] = - delta / 4.
+Proof. by rewrite -a2 -a4 deltam deg2_poly_minE. Qed.
+
+Lemma deg2_poly_gt0 : reflect (forall x, 0 < p.[x]) (delta < 0).
+Proof. by rewrite deltam; apply: deg2_poly_gt0; rewrite // -/a a1 ler01. Qed.
+
+Lemma deg2_poly_ge0 : reflect (forall x, 0 <= p.[x]) (delta <= 0).
+Proof. by rewrite deltam; apply: deg2_poly_ge0; rewrite // -/a a1 ler01. Qed.
+
+End Pdeg2RealMonic.
+
+Section Pdeg2RealClosedMonic.
+
+Variables (F : rcfType) (p : {poly F}).
+Hypothesis degp : size p = 3%N.
+Hypothesis monicp : p \is monic.
+
+Let a := p`_2.
+Let b := p`_1.
+Let c := p`_0.
+
+Let a1 : a = 1. Proof. by move: (monicP monicp); rewrite lead_coefE degp. Qed.
+
+Let delta := b ^+ 2 - 4 * c.
+
+Let deltam : delta = b ^+ 2 - 4 * a * c. Proof. by rewrite a1 mulr1. Qed.
+
+Let r1 := (- b - sqrt delta) / 2.
+Let r2 := (- b + sqrt delta) / 2.
+
+Let nz2 : 2 != 0 :> F. Proof. by rewrite pnatr_eq0. Qed.
+
+Lemma deg2_poly_factor : 0 <= delta -> p = ('X - r1%:P) * ('X - r2%:P).
+Proof. by move=> dge0; apply: deg2_poly_factor; rewrite ?sqr_sqrtr. Qed.
+
+Lemma deg2_poly_root1 : 0 <= delta -> root p r1.
+Proof. by move=> dge0; apply: deg2_poly_root1; rewrite ?sqr_sqrtr. Qed.
+
+Lemma deg2_poly_root2 : 0 <= delta -> root p r2.
+Proof. by move=> dge0; apply: deg2_poly_root2; rewrite ?sqr_sqrtr. Qed.
+
+Lemma deg2_poly_noroot : reflect (forall x, ~~ root p x) (delta < 0).
+Proof. by rewrite deltam; apply: deg2_poly_noroot. Qed.
+
+Lemma deg2_poly_gt0l x : x < r1 -> 0 < p.[x].
+Proof.
+by move=> ?; apply: deg2_poly_gt0l; rewrite // -/a ?a1 ?ler01 ?mulr1.
+Qed.
+
+Lemma deg2_poly_gt0r x : r2 < x -> 0 < p.[x].
+Proof.
+by move=> ?; apply: deg2_poly_gt0r; rewrite // -/a ?a1 ?ler01 ?mulr1.
+Qed.
+
+Lemma deg2_poly_lt0m x : r1 < x < r2 -> p.[x] < 0.
+Proof.
+by move=> ?; apply: deg2_poly_lt0m; rewrite // -/a ?a1 ?ler01 ?mulr1.
+Qed.
+
+Lemma deg2_poly_ge0l x : x <= r1 -> 0 <= p.[x].
+Proof.
+by move=> ?; apply: deg2_poly_ge0l; rewrite // -/a ?a1 ?ler01 ?mulr1.
+Qed.
+
+Lemma deg2_poly_ge0r x : r2 <= x -> 0 <= p.[x].
+Proof.
+by move=> ?; apply: deg2_poly_ge0r; rewrite // -/a ?a1 ?ler01 ?mulr1.
+Qed.
+
+Lemma deg2_poly_le0m x : 0 <= delta -> r1 <= x <= r2 -> p.[x] <= 0.
+move=> dge0 xm.
+by apply: deg2_poly_le0m; rewrite -/a -/b -/c ?a1 ?mulr1 -/delta ?ler01.
+Qed.
+
+End Pdeg2RealClosedMonic.
+End RealMonic.
+End Pdeg2.
+
+Section Degle2PolyRealConvex.
+
+Variable (F : realFieldType) (p : {poly F}).
+Hypothesis degp : (size p <= 3)%N.
+
+Let a := p`_2.
+Let b := p`_1.
+Let c := p`_0.
+
+Let delta := b ^+ 2 - 4 * a * c.
+
+Lemma deg_le2_poly_delta_ge0 : 0 <= a -> (forall x, 0 <= p.[x]) -> delta <= 0.
+Proof.
+move=> age0 pge0; move: degp; rewrite leq_eqVlt => /orP[/eqP|] degp'.
+  exact/(Real.deg2_poly_ge0 degp' age0).
+have a0 : a = 0 by rewrite /a nth_default.
+rewrite /delta a0 mulr0 mul0r subr0 exprn_even_le0//=.
+have [//|/eqP nzb] := eqP; move: (pge0 ((- 1 - c) / b)).
+have -> : p = b *: 'X + c%:P.
+  apply/polyP => + /[!coefE] => -[|[|i]] /=; rewrite !Monoid.simpm//.
+  by rewrite nth_default// -ltnS (leq_trans degp').
+by rewrite !hornerE/= mulrAC mulfV// mul1r subrK ler0N1.
+Qed.
+
+End Degle2PolyRealConvex.
+
+Section Degle2PolyRealConcave.
+
+Variable (F : realFieldType) (p : {poly F}).
+Hypothesis degp : (size p <= 3)%N.
+
+Let a := p`_2.
+Let b := p`_1.
+Let c := p`_0.
+
+Let delta := b ^+ 2 - 4 * a * c.
+
+Lemma deg_le2_poly_delta_le0 : a <= 0 -> (forall x, p.[x] <= 0) -> delta <= 0.
+Proof.
+move=> ale0 ple0; rewrite /delta -sqrrN -[c]opprK mulrN -mulNr -[-(4 * a)]mulrN.
+rewrite -!coefN deg_le2_poly_delta_ge0 ?size_opp ?coefN ?oppr_ge0// => x.
+by rewrite hornerN oppr_ge0.
+Qed.
+
+End Degle2PolyRealConcave.
+
+Section Degle2PolyRealClosedConvex.
+
+Variable (F : rcfType) (p : {poly F}).
+Hypothesis degp : (size p <= 3)%N.
+
+Let a := p`_2.
+Let b := p`_1.
+Let c := p`_0.
+
+Let delta := b ^+ 2 - 4 * a * c.
+
+Lemma deg_le2_poly_ge0 : (forall x, 0 <= p.[x]) -> delta <= 0.
+Proof.
+have [age0|alt0] := leP 0 a; first exact: deg_le2_poly_delta_ge0.
+move=> pge0; move: degp; rewrite leq_eqVlt => /orP[/eqP|] degp'; last first.
+  by move: alt0; rewrite /a nth_default ?ltxx.
+have [//|dge0] := leP delta 0.
+pose r1 := (- b - sqrt delta) / (2 * a).
+pose r2 := (- b + sqrt delta) / (2 * a).
+pose x0 := Num.max (r1 + 1) (r2 + 1).
+move: (pge0 x0); rewrite (Real.deg2_poly_factor degp' (ltW dge0)).
+rewrite !hornerE/= -mulrA nmulr_rge0// leNgt => /negbTE<-.
+by apply: mulr_gt0; rewrite subr_gt0 lt_maxr ltrDl ltr01 ?orbT.
+Qed.
+
+End Degle2PolyRealClosedConvex.
+
+Section Degle2PolyRealClosedConcave.
+
+Variable (F : rcfType) (p : {poly F}).
+Hypothesis degp : (size p <= 3)%N.
+
+Let a := p`_2.
+Let b := p`_1.
+Let c := p`_0.
+
+Let delta := b ^+ 2 - 4 * a * c.
+
+Lemma deg_le2_poly_le0 : (forall x, p.[x] <= 0) -> delta <= 0.
+Proof.
+move=> ple0; rewrite /delta -sqrrN -[c]opprK mulrN -mulNr -[-(4 * a)]mulrN.
+by rewrite -!coefN deg_le2_poly_ge0 ?size_opp// => x; rewrite hornerN oppr_ge0.
+Qed.
+
+End Degle2PolyRealClosedConcave.
 
 #[deprecated(since="mathcomp 1.17.0", note="Use ler_normD instead.")]
 Notation ler_norm_add := ler_normD.
