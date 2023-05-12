@@ -35,6 +35,9 @@ with builtins; with (import <nixpkgs> {}).lib;
   bundles = let
     master = [
       "mathcomp-bigenough"
+      "mathcomp-real-closed"
+      "fourcolor"
+      "odd-order"
       # "deriving"  # requires univ poly
       # "extructures"  # requires deriving
     ];
@@ -43,19 +46,14 @@ with builtins; with (import <nixpkgs> {}).lib;
       "coquelicot"
       "interval"
       "reglang"
-      "fourcolor"
       "gaia"
       "graph-theory"
       "coq-bits"
       "mathcomp-classical"
       "mathcomp-analysis"
     ];
-    hirarchy-builder = [
-      "odd-order"
-    ];
     proux01-hierarchy-builder = [
       "mathcomp-finmap"
-      "mathcomp-real-closed"
       "multinomials"
       "mathcomp-zify"
       "mathcomp-abel"
@@ -65,8 +63,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       { name = p; value.override.version = "master"; }))
     // listToAttrs (forEach hierarchy-builder (p:
       { name = p; value.override.version = "hierarchy-builder"; }))
-    // listToAttrs (forEach hirarchy-builder (p:
-      { name = p; value.override.version = "hirarchy-builder"; }))
     // listToAttrs (forEach proux01-hierarchy-builder (p:
       { name = p; value.override.version = "proux01:hierarchy-builder"; }))
     // { mathcomp-ssreflect.main-job = true;
@@ -82,6 +78,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       hierarchy-builder.override.version = "proux01:coq-master";
       interval.job = false;
       coqeal.job = false;
+      coquelicot.job = false;
     };
     "coq-8.17".push-branches = [ "master" "mathcomp-1" ];
     "coq-8.17".coqPackages = common-bundles // {
