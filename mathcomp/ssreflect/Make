@@ -34,3 +34,4 @@ order.v
 -arg -w -arg -non-reversible-notation
 -arg -w -arg +deprecated-hint-without-locality
 -arg -w -arg +deprecated-hint-rewrite-without-locality
+-arg -w -arg -opaque-let
