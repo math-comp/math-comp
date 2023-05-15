@@ -37,20 +37,20 @@ https://github.com/coq-community/coq-nix-toolbox#overlays (for sha256
 hashes, one can just put an empty string, run the `nix-build` command
 above and an error will give the correct value).
 
-### Updating nixpkgs
+### Updating coq-nix-toolbox
 
-The nixpkgs version used is the one defined by the coq-nix-toolbox.
-This can be overriden in `.nix/nixpkgs.nix`, which can be updated by
-```shell
-% nix-shell --run "updateNixpkgsMaster"
-```
-for the current master branch or
-```shell
-% nix-shell --run "updateNixpkgs owner branch"
-```
-for a specific branch.
-See the [coq-nix-toolbox README](https://github.com/coq-community/coq-nix-toolbox#available-shell-hooks)
-for details.
+Once overlays are satisfactory, they should eventually be merged into
+the nixpkgs package repository.
+
+The file `.nix/coq-nix-toolbox.nix` contains the git commit hash of
+the version of coq-nix-toolbox used (c.f.,
+https://github.com/coq-community/coq-nix-toolbox ). Coq-nix-toolbox
+itself contains the git commit hash of the version of nixpkgs it uses
+(c.f. https://github.com/NixOS/nixpkgs/ ). So in order to add or
+remove a Nix derivation (package), one needs to first update nixpkgs,
+then coq-nix-toolbox and finally the `.nix/coq-nix-toolbox.nix` file
+here. See the [coq-nix-toolbox README](https://github.com/coq-community/coq-nix-toolbox#testing-coqpackages-updates-in-nixpkgs)
+for details of the process.
 
 ### Learning Nix basics
 
