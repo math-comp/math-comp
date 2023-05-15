@@ -38,12 +38,12 @@ with builtins; with (import <nixpkgs> {}).lib;
       "mathcomp-real-closed"
       "fourcolor"
       "odd-order"
+      "coquelicot"
       # "deriving"  # requires univ poly
       # "extructures"  # requires deriving
     ];
     hierarchy-builder = [
       "coqeal"
-      "coquelicot"
       "interval"
       "reglang"
       "gaia"
