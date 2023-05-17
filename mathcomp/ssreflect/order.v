@@ -5685,7 +5685,7 @@ Context {disp : unit} {T : orderType disp} (P : {pred T}) (sT : subType P).
 
 #[export]
 HB.instance Definition _ :=
-  MonoTotal.Build disp (sub_type sT) (fun _ _ => erefl).
+  SubPOrder_isSubOrder.Build disp T P disp (sub_type sT).
 
 End Total.
 

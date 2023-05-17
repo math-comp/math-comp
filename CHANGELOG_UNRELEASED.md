@@ -99,6 +99,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- in `order.v`
+  + make `[Order of T by <:]` compatible with the SubOrder hierarchy
+
+
 ### Renamed
 
 - in `algC.v`
