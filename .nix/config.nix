@@ -39,6 +39,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "fourcolor"
       "odd-order"
       "coquelicot"
+      "gaia"
       # "deriving"  # requires univ poly
       # "extructures"  # requires deriving
     ];
@@ -46,7 +47,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       "coqeal"
       "interval"
       "reglang"
-      "gaia"
       "graph-theory"
       "coq-bits"
       "mathcomp-classical"
