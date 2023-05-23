@@ -42,10 +42,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `addnCBA`, `addnBr_leq`, `addnBl_leq`, `subnDAC`,
     `subnCBA`, `subnBr_leq`, `subnBl_leq`, `subnBAC`, `subDnAC`,
     `subDnCA`, `subDnCAC`, `addnBC`, `addnCB`, `addBnAC`, `addBnCAC`,
-    `addBnA`, `subBnAC`, `eqn_sub2lE`, `eqn_sub2rE`
+    `addBnA`, `subBnAC`, `eqn_sub2lE`, `eqn_sub2rE`, `congr_pred`
 
 - in `ssrfun.v`
   + lemmas `inj_omap`, `omap_id`, `eq_omap`, `omapK`
+
 - in `order.v`
   + notations `0%O`, `1%O`, `0^d%O` and `1^d%O` as backward compatible
     replacements of removed  notation `0`, `1`, `0^d` and `1^d`
