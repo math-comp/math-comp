@@ -354,6 +354,9 @@ Proof. by case: n. Qed.
 Lemma prednK n : 0 < n -> n.-1.+1 = n.
 Proof. exact: ltn_predK. Qed.
 
+Lemma congr_pred m n : 0 < m -> 0 < n -> (m.-1 == n.-1) = (m == n).
+Proof. by case: m => [//=|m _ /= lt0n]; rewrite -(@prednK n) ?eqSS. Qed.
+
 Lemma leqNgt m n : (m <= n) = ~~ (n < m).
 Proof. by elim: m n => [|m IHm] []. Qed.
 
