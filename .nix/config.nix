@@ -34,10 +34,9 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   bundles = let
     master = [
-      "mathcomp-finmap" "mathcomp-bigenough"
-      "multinomials"
-      "gaia" "deriving" "mathcomp-zify"
-      "extructures" "mathcomp-classical" "mathcomp-analysis" "reglang"
+      "mathcomp-bigenough"
+      "deriving"
+      "extructures" "reglang"
       "coquelicot" "mathcomp-tarjan"
     ];
     common-bundles = listToAttrs (forEach master (p:
@@ -45,6 +44,10 @@ with builtins; with (import <nixpkgs> {}).lib;
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
          graph-theory.job = false;
+         mathcomp-classical.job = false;
+         mathcomp-analysis.job = false;
+         multinomials.job = false;
+         coqeal.job = false;
        };
   in {
     "coq-master".push-branches = [ "mathcomp-1" "master" ];
@@ -58,9 +61,6 @@ with builtins; with (import <nixpkgs> {}).lib;
     "coq-8.17".push-branches = [ "mathcomp-1" "master" ];
     "coq-8.17".coqPackages = common-bundles // {
       coq.override.version = "8.17";
-      coqeal.job = false;
-      mathcomp-classical.job = false;
-      mathcomp-analysis.job = false;
     };
     "coq-8.16".push-branches = [ "mathcomp-1" "master" ];
     "coq-8.16".coqPackages = common-bundles // {
