@@ -43,7 +43,7 @@ From mathcomp Require Import ssralg poly.
 (* (%R). 0-ary ordering symbols for the ring_display have the suffix "%R",    *)
 (* e.g., <%R. All the other ordering notations are the same as order.v.       *)
 (*                                                                            *)
-(* Over these structures, we have the following operations                    *)
+(* Over these structures, we have the following operations:                   *)
 (*             `|x| == norm of x                                              *)
 (*         Num.sg x == sign of x: equal to 0 iff x = 0, to 1 iff x > 0, and   *)
 (*                     to -1 in all other cases (including x < 0)             *)
@@ -196,9 +196,8 @@ Notation "@ 'minr' R" := (@Order.min ring_display R)
 
 Section Def.
 Context {R : numDomainType}.
-Implicit Types (x : R).
 
-Definition sgr x : R := if x == 0 then 0 else if x < 0 then -1 else 1.
+Definition sgr (x : R) : R := if x == 0 then 0 else if x < 0 then -1 else 1.
 Definition Rpos_pred := fun x : R => 0 < x.
 Definition Rpos : qualifier 0 R := [qualify x | Rpos_pred x].
 Definition Rneg_pred := fun x : R => x < 0.
@@ -439,7 +438,7 @@ Qed.
 Lemma ltr01 : 0 < 1 :> R. Proof. by rewrite lt_def oner_neq0 ler01. Qed.
 
 Lemma le0r x : (0 <= x) = (x == 0) || (0 < x).
-Proof. by rewrite lt_def; case: eqP => // ->; rewrite lexx. Qed.
+Proof. by rewrite le_eqVlt eq_sym. Qed.
 
 Lemma addr_ge0 x y : 0 <= x -> 0 <= y -> 0 <= x + y.
 Proof.
@@ -592,22 +591,17 @@ Lemma realE x : (x \is real) = (0 <= x) || (x <= 0). Proof. by []. Qed.
 
 (* General properties of <= and < *)
 
-Lemma lt0r x : (0 < x) = (x != 0) && (0 <= x). Proof. by rewrite lt_def. Qed.
+Lemma lt0r x : (0 < x) = (x != 0) && (0 <= x). Proof. exact: lt_def. Qed.
 Lemma le0r x : (0 <= x) = (x == 0) || (0 < x). Proof. exact: le0r. Qed.
 
-Lemma lt0r_neq0 (x : R) : 0 < x -> x != 0.
-Proof. by rewrite lt0r; case/andP. Qed.
-
-Lemma ltr0_neq0 (x : R) : x < 0 -> x != 0.
-Proof. by rewrite lt_neqAle; case/andP. Qed.
+Lemma lt0r_neq0 (x : R) : 0 < x -> x != 0. Proof. by move=> /gt_eqF ->. Qed.
+Lemma ltr0_neq0 (x : R) : x < 0 -> x != 0. Proof. by move=> /lt_eqF ->. Qed.
 
 Lemma pmulr_rgt0 x y : 0 < x -> (0 < x * y) = (0 < y).
 Proof. exact: pmulr_rgt0. Qed.
 
 Lemma pmulr_rge0 x y : 0 < x -> (0 <= x * y) = (0 <= y).
-Proof.
-by rewrite !le0r mulf_eq0; case: eqP => // [-> /negPf[] | _ /pmulr_rgt0->].
-Qed.
+Proof. by move=> x_gt0; rewrite !le0r mulf_eq0 pmulr_rgt0 // gt_eqF. Qed.
 
 (* Integer comparisons and characteristic 0. *)
 Lemma ler01 : 0 <= 1 :> R. Proof. exact: ler01. Qed.
@@ -868,13 +862,10 @@ Lemma gtr0_real x : 0 < x -> x \is real. Proof. by move=> /ltW/ger0_real. Qed.
 
 Lemma ltr0_real x : x < 0 -> x \is real. Proof. by move=> /ltW/ler0_real. Qed.
 
-Lemma real0 : 0 \is @real R. Proof. by rewrite ger0_real. Qed.
-Hint Resolve real0 : core.
-
-Lemma real1 : 1 \is @real R. Proof. by rewrite ger0_real. Qed.
-Hint Resolve real1 : core.
-
-Lemma realn n : n%:R \is @real R. Proof. by rewrite ger0_real. Qed.
+Lemma real0 : 0 \is @real R. Proof. exact: rpred0. Qed.
+Lemma real1 : 1 \is @real R. Proof. exact: rpred1. Qed.
+Lemma realn n : n%:R \is @real R. Proof. exact: rpred_nat. Qed.
+#[local] Hint Resolve real0 real1 : core.
 
 Lemma ler_leVge x y : x <= 0 -> y <= 0 -> (x <= y) || (y <= x).
 Proof. by rewrite -!oppr_ge0 => /(ger_leVge _) /[apply]; rewrite !lerN2. Qed.
@@ -888,7 +879,7 @@ Proof. exact: real_leVge. Qed.
 Lemma realB : {in real &, forall x y, x - y \is real}.
 Proof. exact: rpredB. Qed.
 
-Lemma realN : {mono (@GRing.opp R) : x /  x \is real}.
+Lemma realN : {mono (@GRing.opp R) : x / x \is real}.
 Proof. exact: rpredN. Qed.
 
 Lemma realBC x y : (x - y \is real) = (y - x \is real).
@@ -3113,7 +3104,11 @@ Notation ltr_snaddr := ltr_nwDr.
 #[deprecated(since="mathcomp 1.17.0", note="Use ltr_nDr instead.")]
 Notation ltr_snsaddr := ltr_nDr.
 
-#[global] Hint Resolve lerN2 ltrN2 real0 real1 normr_real : core.
+#[global] Hint Resolve lerN2 ltrN2 normr_real : core.
+#[global] Hint Extern 0 (is_true (_%:R \is real)) => apply: realn : core.
+#[global] Hint Extern 0 (is_true (0 \is real)) => apply: real0 : core.
+#[global] Hint Extern 0 (is_true (1 \is real)) => apply: real1 : core.
+
 Arguments ler_sqr {R} [x y].
 Arguments ltr_sqr {R} [x y].
 Arguments signr_inj {R} [x1 x2].
@@ -4243,8 +4238,7 @@ Proof. by move=> n_gt0; rewrite -{1}(rootC0 n) eqr_rootC. Qed.
 Lemma nonRealCi : ('i : C) \isn't real.
 Proof. by rewrite realEsqr sqrCi oppr_ge0 lt_geF ?ltr01. Qed.
 
-Lemma neq0Ci : 'i != 0 :> C.
-Proof. by apply: contraNneq nonRealCi => ->; apply: real0. Qed.
+Lemma neq0Ci : 'i != 0 :> C. Proof. by apply: contraNneq nonRealCi => ->. Qed.
 
 Lemma normCi : `|'i| = 1 :> C.
 Proof. by apply/eqP; rewrite -(@pexpr_eq1 _ _ 2) // -normrX sqrCi normrN1. Qed.

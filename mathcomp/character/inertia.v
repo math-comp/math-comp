@@ -1235,9 +1235,9 @@ move=> nsNG iGN pr_p IGchi.
 have [t sGt] := constt_cfInd_irr s (normal_sub nsNG); exists t.
 have [e DtN]: exists e, 'Res 'chi_t = e%:R *: 'chi_s.
   rewrite constt_Ind_Res in sGt.
-  rewrite (Clifford_Res_sum_cfclass nsNG sGt); set e := '[_, _].
-  rewrite cfclass_invariant // big_seq1.
-  by exists (truncC e); rewrite truncCK ?Cnat_cfdot_char ?cfRes_char ?irr_char.
+  rewrite (Clifford_Res_sum_cfclass nsNG sGt) cfclass_invariant // big_seq1.
+  set e := '[_, _]; exists (truncC e).
+  by rewrite truncCK ?Cnat_cfdot_char ?cfRes_char ?irr_char.
 have [/irrWnorm/eqP | [c injc DtNc]] := cfRes_prime_irr_cases t nsNG iGN pr_p.
   rewrite DtN cfnormZ cfnorm_irr normr_nat mulr1 -natrX pnatr_eq1.
   by rewrite muln_eq1 andbb => /eqP->; rewrite scale1r.

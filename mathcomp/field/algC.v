@@ -473,9 +473,6 @@ Qed.
 
 HB.instance Definition _ := isComplex.Build type conjK conj_nt.
 
-Lemma normK u : `|u| ^+ 2 = u * conj u.
-Proof. by apply: (@normCK type). Qed.
-
 Definition conjMixin := Num.ClosedField.on type.
 
 Lemma algebraic : integralRange (@ratr type).
@@ -1101,7 +1098,7 @@ Qed.
 
 Lemma Crat0 : 0 \in Crat. Proof. by apply/CratP; exists 0; rewrite rmorph0. Qed.
 Lemma Crat1 : 1 \in Crat. Proof. by apply/CratP; exists 1; rewrite rmorph1. Qed.
-Hint Resolve Crat0 Crat1 : core.
+#[local] Hint Resolve Crat0 Crat1 : core.
 
 Fact Crat_divring_closed : divring_closed Crat.
 Proof.

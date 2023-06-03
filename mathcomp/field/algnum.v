@@ -564,8 +564,8 @@ Qed.
 Lemma Aint_int x : x%:~R \in Aint.
 Proof. by rewrite Aint_Cint ?Cint_int. Qed.
 
-Lemma Aint0 : 0 \in Aint. Proof. exact: (Aint_int 0). Qed.
-Lemma Aint1 : 1 \in Aint. Proof. exact: (Aint_int 1). Qed.
+Lemma Aint0 : 0 \in Aint. Proof. exact: Aint_int 0. Qed.
+Lemma Aint1 : 1 \in Aint. Proof. exact: Aint_int 1. Qed.
 #[global] Hint Resolve Aint0 Aint1 : core.
 
 Lemma Aint_unity_root n x : (n > 0)%N -> n.-unity_root x -> x \in Aint.

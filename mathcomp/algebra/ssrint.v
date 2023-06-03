@@ -1554,7 +1554,7 @@ Lemma sgzP x :
   (sgz x == 0)  (sgz x == -1) (sgz x == 1) `|x| (sgr x) (sgz x).
 Proof.
 rewrite ![_ == sgz _]eq_sym ![_ == sgr _]eq_sym !sgr_cp0 !sgz_cp0.
-by rewrite /sgr /sgz !leNgt; case: ltrgt0P; constructor.
+by rewrite /sgz; case: sgrP; constructor.
 Qed.
 
 Lemma sgzN x : sgz (- x) = - sgz x.
@@ -1576,15 +1576,11 @@ Proof. by rewrite -eqr_oppLR -mulrN -sgzN mulz_sg_eq1. Qed.
 (*   (sgr y * sgr z == sgr x) = ((sgr y * sgr x == sgr z) && (sgr z != 0)). *)
 (* Proof. by do 3!case: sgrP=> _. Qed. *)
 
-Lemma sgzM x y : sgz (x * y) = sgz x  * sgz y.
+Lemma sgzM x y : sgz (x * y) = sgz x * sgz y.
 Proof.
-case: (sgzP x)=> hx; first by rewrite hx ?mul0r sgz0.
-  case: (sgzP y)=> hy; first by rewrite hy !mulr0 sgz0.
-    by apply/eqP; rewrite mul1r sgz_cp0 pmulr_rgt0.
-  by apply/eqP; rewrite mul1r sgz_cp0 nmulr_llt0.
-case: (sgzP y)=> hy; first by rewrite hy !mulr0 sgz0.
-  by apply/eqP; rewrite mulr1 sgz_cp0 nmulr_rlt0.
-by apply/eqP; rewrite mulN1r opprK sgz_cp0 nmulr_rgt0.
+rewrite -sgz_sgr -(sgz_sgr x) -(sgz_sgr y) sgrM.
+by case: sgrP; case: sgrP; rewrite /sgz ?(mulNr, mul0r, mul1r);
+  rewrite ?(oppr_eq0, oppr_cp0, eqxx, ltxx, ltr01, ltr10, oner_eq0).
 Qed.
 
 Lemma sgzX (n : nat) x : sgz (x ^+ n) = (sgz x) ^+ n.

@@ -2342,8 +2342,8 @@ Lemma cfIndM phi psi:  H \subset G ->
 Proof.
 move=> HsG; apply/cfun_inP=> x Gx; rewrite !cfIndE // !cfunE !cfIndE // -mulrA.
 congr (_ * _); rewrite mulr_suml; apply: eq_bigr=> i iG; rewrite !cfunE.
-case: (boolP (x^i \in H))=> xJi; last by rewrite cfun0gen ?mul0r ?genGid.
-by rewrite !cfResE //; congr (_*_); rewrite cfunJgen ?genGid.
+case: (boolP (x ^ i \in H)) => xJi; last by rewrite cfun0gen ?mul0r ?genGid.
+by rewrite !cfResE //; congr (_ * _); rewrite cfunJgen ?genGid.
 Qed.
 
 End Induced.
