@@ -107,6 +107,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `ssrint.v`
   + `RMorphism` instance for `Posz`
+- in `seq.v`
+  + lemma `rem_mem`
 
 - in `cyclic.v`
   + added lemma `units_Zp_cyclic`
