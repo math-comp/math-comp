@@ -2386,6 +2386,13 @@ Proof. by apply: subseq_uniq; apply: rem_subseq. Qed.
 Lemma mem_rem s : {subset rem s <= s}.
 Proof. exact: mem_subseq (rem_subseq s). Qed.
 
+Lemma rem_mem y s : y != x -> y \in s -> y \in rem s.
+Proof.
+move=> yx; elim: s => [//|z s IHs] /=.
+rewrite inE => /orP[/eqP<-|ys]; first by rewrite (negbTE yx) inE eqxx.
+by case: ifP => _ //; rewrite inE IHs ?orbT.
+Qed.
+
 Lemma rem_filter s : uniq s -> rem s = filter (predC1 x) s.
 Proof.
 elim: s => //= y s IHs /andP[not_s_y /IHs->].

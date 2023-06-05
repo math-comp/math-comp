@@ -58,6 +58,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `RealMonic.deg2_poly_le0m`, `deg_le2_poly_delta_ge0`,
     `deg_le2_poly_delta_le0`, `deg_le2_poly_ge0`, `deg_le2_poly_le0`
 
+- in `seq.v`
+  + lemma `rem_mem`
+
 - in `cyclic.v`
   + added lemma `units_Zp_cyclic`
 - in `finalg.v`
