@@ -165,11 +165,13 @@ in `qfpoly.v`
     `sum_nat_eq1`, `prod_nat_seq_eq0`, `prod_nat_seq_neq0`,
     `prod_nat_seq_eq1`, `prod_nat_seq_neq1`
 
+- in `archimedean.v`
+  + lemmas `sum_truncK`, `prod_truncK`
+
 ### Changed
 
 - in `order.v`
   + make `[Order of T by <:]` compatible with the SubOrder hierarchy
-
 
 ### Renamed
 
