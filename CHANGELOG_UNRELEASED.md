@@ -97,6 +97,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + notations `[SubPOrder_isSubOrder of U by <: with disp]` and
     `[SubPOrder_isSubOrder of U by <:]`
 
+- in `ssralg.v`
+  + `semiRingType` instance for `nat`
+  + `RMorphism` instance for `GRing.natmul`
+  + lemmas `natr0E`, `natr1E`, `natn`, `natrDE`, `natrME`, `natrXE`
+  + multirule `natrE`
+
 ### Changed
 
 - in `order.v`

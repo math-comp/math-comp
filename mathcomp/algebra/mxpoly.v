@@ -1902,8 +1902,8 @@ Proof.
 split=> [[P Punit /diagonalizable_forPex[d /(simmxLR Punit)->]]|].
   rewrite mxminpoly_uconj ?unitmx_inv// mxminpoly_diag.
   by eexists; [|by []]; rewrite undup_uniq.
-rewrite diagonalizablePeigen => -[rs rsu rsP].
-exists rs; rewrite // !(big_nth 0) !big_mkord in rsP *.
+rewrite diagonalizablePeigen => -[rs rsu rsP]; exists rs => //.
+rewrite (big_nth 0) [X in (X :=: _)%MS](big_nth 0) !big_mkord in rsP *.
 rewrite (eq_bigr _ (fun _ _ => eigenspace_poly _ _)).
 apply: (eqmx_trans (eqmx_sym (kermxpoly_prod _ _)) (kermxpoly_min _)) => //.
 by move=> i j _ _; rewrite coprimep_XsubC root_XsubC nth_uniq.

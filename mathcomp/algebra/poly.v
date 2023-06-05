@@ -1794,7 +1794,7 @@ Lemma map_polyE p : map_poly p = Poly (map f p).
 Proof.
 rewrite /map_poly unlock; congr Poly.
 apply: (@eq_from_nth _ 0); rewrite size_mkseq ?size_map // => i lt_i_p.
-by rewrite (nth_map 0) ?nth_mkseq.
+by rewrite [RHS](nth_map 0) ?nth_mkseq.
 Qed.
 
 Definition commr_rmorph u := forall x, GRing.comm u (f x).

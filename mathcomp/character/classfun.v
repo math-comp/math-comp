@@ -828,7 +828,7 @@ Lemma cfdot_cfuni A B :
 Proof.
 move=> nsAG nsBG; rewrite (cfdotElr (cfuni_on G A) (cfuni_on G B)) mulrC.
 congr (_ / _); rewrite -sumr_const; apply: eq_bigr => x /setIP[Ax Bx].
-by rewrite !cfuniE // Ax Bx rmorph1 mulr1.
+by rewrite !cfuniE // Ax Bx mul1r rmorph1.
 Qed.
 
 Lemma cfnorm1 : '[1]_G = 1.
