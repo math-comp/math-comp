@@ -2582,6 +2582,66 @@ Lemma sum_nat_eq0 (I : finType) (P : pred I) (E : I -> nat) :
   (\sum_(i | P i) E i == 0)%N = [forall (i | P i), E i == 0%N].
 Proof. by rewrite eq_sym -(@leqif_sum I P _ (fun _ => 0%N) E) ?big1_eq. Qed.
 
+Lemma sum_nat_seq_eq0 I r (P : pred I) F :
+  (\sum_(i <- r | P i) F i == 0)%N = all (fun i => P i ==> (F i == 0%N)) r.
+Proof. by rewrite (big_morph _ (id1:=true) addn_eq0)// big_all_cond. Qed.
+
+Lemma sum_nat_seq_neq0 I r (P : pred I) F :
+  (\sum_(i <- r | P i) F i != 0)%N = has (fun i => P i && (F i != 0)%N) r.
+Proof.
+by rewrite sum_nat_seq_eq0// -has_predC; apply: eq_has => x /=; case Px: (P x).
+Qed.
+
+Lemma sum_nat_seq_eq1 (I : eqType) r (P : pred I) (F : I -> nat) :
+    (\sum_(i <- r | P i) F i = 1)%N ->
+  exists i, [/\ i \in r, P i, F i = 1
+            & forall j, j != i -> j \in r -> P j -> F j = 0]%N.
+Proof.
+move=> sumF1.
+have [i ir /andP[Pi nZfi]] : exists2 i, i \in r & (P i && (F i != 0%N)).
+  apply/hasP/(contraPT _ sumF1); rewrite -all_predC => /allP zF.
+  rewrite (eqP (eqbRL (sum_nat_seq_eq0 _ _ _) _))//.
+  by apply/allP => i ir; rewrite implybE -[_ == _]negbK -negb_and; apply: zF.
+exists i; split=> //.
+  apply/eqP/(contraTT _ (eq_leq sumF1)) => n1Fi; rewrite -ltnNge (big_rem i)//=.
+  by rewrite Pi (leq_trans _ (leq_addr _ _))//; case: (F i) nZfi n1Fi => [|[|]].
+move=> j ji rj Pj; apply/eqP/(contraTT _ (eq_leq sumF1)) => nzFj.
+rewrite -ltnNge (big_rem i) 1?(big_rem j) ?rem_mem//= Pi Pj addnA.
+by rewrite (leq_trans _ (leq_addr _ _))// -addn1 leq_add ?lt0n.
+Qed.
+
+Lemma sum_nat_eq1 (I : finType) (P : pred I) (F : I -> nat) :
+  reflect
+    (exists i : I, [/\ P i, F i = 1 & forall j, j != i -> P j -> F j = 0]%N)
+    (\sum_(i | P i) F i == 1)%N.
+Proof.
+apply/(iffP idP) => [|[i [Pi Fi1 zFj]]].
+  move=> /eqP/sum_nat_seq_eq1[i [? ? ? ji]]; exists i; split=> //.
+  by move=> ? ? ?; apply: ji.
+rewrite (bigD1 i)//= Fi1 -[X in _ == X]addn0 eqn_add2l sum_nat_eq0.
+by apply/forall_inP => j /andP[Pj ji]; apply/eqP/zFj.
+Qed.
+
+Lemma prod_nat_seq_eq0 I r (P : pred I) F :
+  (\prod_(i <- r | P i) F i == 0)%N = has (fun i => P i && (F i == 0%N)) r.
+Proof. by rewrite (big_morph _ (id1 := false) muln_eq0)// big_has_cond. Qed.
+
+Lemma prod_nat_seq_neq0 I r (P : pred I) F :
+  (\prod_(i <- r | P i) F i != 0)%N = all (fun i => P i ==> (F i != 0%N)) r.
+Proof.
+by rewrite prod_nat_seq_eq0 -all_predC; apply: eq_all => i /=; case: (P i).
+Qed.
+
+Lemma prod_nat_seq_eq1 I r (P : pred I) F :
+  (\prod_(i <- r | P i) F i == 1)%N = all (fun i => P i ==> (F i == 1%N)) r.
+Proof. by rewrite (big_morph _ (id1:=true) muln_eq1)// big_all_cond. Qed.
+
+Lemma prod_nat_seq_neq1 I r (P : pred I) F :
+  (\prod_(i <- r | P i) F i != 1)%N = has (fun i => P i && (F i != 1%N)) r.
+Proof.
+by rewrite prod_nat_seq_eq1 -has_predC; apply: eq_has => i /=; case: (P i).
+Qed.
+
 Lemma leq_prod I r (P : pred I) (E1 E2 : I -> nat) :
     (forall i, P i -> E1 i <= E2 i) ->
   \prod_(i <- r | P i) E1 i <= \prod_(i <- r | P i) E2 i.

@@ -119,7 +119,12 @@ in `qfpoly.v`
   `ordS_bij`, `ordS_inj`, `ord_pred_bij`, `ord_pred_inj`
 
 - in `zmodp.v`
-	+ lemmas `add_1_Zp`, `add_Zp_1`, `sub_Zp_1` and `add_N1_Zp`.
+  + lemmas `add_1_Zp`, `add_Zp_1`, `sub_Zp_1` and `add_N1_Zp`.
+
+- in `bigop.v`
+  + lemmas `sum_nat_seq_eq0`, `sum_nat_seq_neq0`, `sum_nat_seq_eq1`,
+    `sum_nat_eq1`, `prod_nat_seq_eq0`, `prod_nat_seq_neq0`,
+    `prod_nat_seq_eq1`, `prod_nat_seq_neq1`
 
 ### Changed
 
