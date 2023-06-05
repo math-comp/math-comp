@@ -160,6 +160,11 @@ in `qfpoly.v`
   `qX_exp_neq0`, `qX_exp_inj`, `powX_eq_mod`, `qX_expK`, `plogp_lt`, 
   `plogp_X`, `plogp0`, `plogp1`, `plogp_div_eq0`, `plogpD`
    
+- in `bigop.v`
+  + lemmas `sum_nat_seq_eq0`, `sum_nat_seq_neq0`, `sum_nat_seq_eq1`,
+    `sum_nat_eq1`, `prod_nat_seq_eq0`, `prod_nat_seq_neq0`,
+    `prod_nat_seq_eq1`, `prod_nat_seq_neq1`
+
 ### Changed
 
 - in `order.v`
