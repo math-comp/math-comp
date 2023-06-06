@@ -3788,7 +3788,7 @@ Notation ltr_eexpn2l := ltr_eXn2l.
 Notation lter_eexpn2l := lter_eXn2l.
 #[deprecated(since="mathcomp 1.17.0", note="Use ler_wpM2l instead.")]
 Notation ler_wpmul2l := ler_wpM2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_wpM2rinstead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_wpM2r instead.")]
 Notation ler_wpmul2r := ler_wpM2r.
 #[deprecated(since="mathcomp 1.17.0", note="Use ler_wnM2l instead.")]
 Notation ler_wnmul2l := ler_wnM2l.
