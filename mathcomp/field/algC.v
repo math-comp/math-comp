@@ -271,7 +271,7 @@ Parameter conjMixin : Num.ClosedField type.
 Parameter isCountable : Countable type.
 
 (* Note that this cannot be included in conjMixin since a few proofs
-   depend from Rnat being definitionally equal to (trunc x)%:R == x *)
+   depend from nat_num being definitionally equal to (trunc x)%:R == x *)
 Axiom archimedean : Num.archimedean_axiom (Num.ClosedField.Pack conjMixin).
 
 Axiom algebraic : integralRange (@ratr (Num.ClosedField.Pack conjMixin)).
@@ -1195,7 +1195,7 @@ Notation truncC_itv := mc_2_0.truncC_itv (only parsing).
 Notation truncC_def := mc_2_0.truncC_def (only parsing).
 #[deprecated(since="mathcomp 2.1.0", note="Use natRK instead.")]
 Notation natCK := mc_2_0.natCK (only parsing).
-#[deprecated(since="mathcomp 2.1.0", note="Use RnatP instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use natrP instead.")]
 Notation CnatP := mc_2_0.CnatP (only parsing).
 #[deprecated(since="mathcomp 2.1.0", note="Use truncK instead.")]
 Notation truncCK := mc_2_0.truncCK (only parsing).
