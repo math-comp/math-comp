@@ -3,8 +3,8 @@
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime.
 From mathcomp Require Import ssralg poly finset fingroup finalg zmodp cyclic.
-From mathcomp Require Import ssrnum ssrint polydiv rat intdiv mxpoly.
-From mathcomp Require Import vector falgebra fieldext separable galois algC.
+From mathcomp Require Import ssrnum ssrint archimedean polydiv intdiv mxpoly.
+From mathcomp Require Import rat vector falgebra fieldext separable galois algC.
 
 (******************************************************************************)
 (* This file provides few basic properties of cyclotomic polynomials.         *)
@@ -117,6 +117,7 @@ Local Notation pQtoC := (map_poly ratr).
 
 Local Definition algC_intr_inj := @intr_inj algC.
 #[local] Hint Resolve algC_intr_inj : core.
+Local Notation intCK := (@intrKfloor algC).
 
 Lemma C_prim_root_exists n : (n > 0)%N -> {z : algC | n.-primitive_root z}.
 Proof.
@@ -133,7 +134,7 @@ Qed.
 
 Definition Cyclotomic n : {poly int} :=
   let: exist z _ := C_prim_root_exists (ltn0Sn n.-1) in
-  map_poly floorC (cyclotomic z n).
+  map_poly Num.floor (cyclotomic z n).
 
 Notation "''Phi_' n" := (Cyclotomic n)
   (at level 8, n at level 2, format "''Phi_' n").
@@ -141,7 +142,7 @@ Notation "''Phi_' n" := (Cyclotomic n)
 Lemma Cyclotomic_monic n : 'Phi_n \is monic.
 Proof.
 rewrite /'Phi_n; case: (C_prim_root_exists _) => z /= _.
-rewrite monicE lead_coefE coef_map_id0 ?(int_algC_K 0) ?getCint0 //.
+rewrite monicE lead_coefE coef_map_id0 ?(int_algC_K 0) ?floor0 //.
 by rewrite size_poly_eq -lead_coefE (monicP (cyclotomic_monic _ _)) (intCK 1).
 Qed.
 
@@ -177,7 +178,7 @@ have [r def_zn]: exists r, cyclotomic z n = pZtoC r.
     rewrite map_polyZ mapXn1 Dr0 Dr -scalerAl scalerKV ?intr_eq0 //.
     by rewrite rmorphM.
   by rewrite zprimitiveZ // zprimitive_monic ?monic_Xn_sub_1 ?mapXn1.
-rewrite floorCpK; last by apply/polyOverP=> i; rewrite def_zn coef_map Cint_int.
+rewrite floorpK; last by apply/polyOverP=> i; rewrite def_zn coef_map /=.
 pose f e (k : 'I_n) := Ordinal (ltn_pmod (k * e) n_gt0).
 have [e Dz0] := prim_rootP prim_z (prim_expr_order prim_z0).
 have co_e_n: coprime e n by rewrite -(prim_root_exp_coprime e prim_z) -Dz0.

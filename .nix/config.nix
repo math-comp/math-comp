@@ -35,27 +35,27 @@ with builtins; with (import <nixpkgs> {}).lib;
   bundles = let
     master = [
       "mathcomp-bigenough"
+      "mathcomp-finmap"
       "mathcomp-real-closed"
       "fourcolor"
       "odd-order"
       "coquelicot"
       "gaia"
+      "multinomials"
+      "mathcomp-zify"
+      "coqeal"
+      "interval"
+      "graph-theory"
       # "deriving"  # requires univ poly
       # "extructures"  # requires deriving
     ];
     hierarchy-builder = [
-      "coqeal"
-      "interval"
       "reglang"
-      "graph-theory"
       "coq-bits"
       "mathcomp-classical"
       "mathcomp-analysis"
     ];
     proux01-hierarchy-builder = [
-      "mathcomp-finmap"
-      "multinomials"
-      "mathcomp-zify"
       "mathcomp-abel"
       "mathcomp-tarjan"
     ];

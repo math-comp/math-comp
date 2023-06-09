@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop order ssralg countalg div ssrnum.
-From mathcomp Require Import ssrint prime.
+From mathcomp Require Import ssrint prime archimedean.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)
@@ -16,9 +16,6 @@ From mathcomp Require Import ssrint prime.
 (*                 rationals of the generic ring morphism n%:~R               *)
 (*       numq r == numerator of (r : rat)                                     *)
 (*       denq r == denominator of (r : rat)                                   *)
-(* x \is a Qint == x is an element of rat whose denominator is equal to 1     *)
-(* x \is a Qnat == x is a non-negative element of rat whose denominator       *)
-(*                 is equal to 1                                              *)
 (*       ratr r == generic embedding of (r : rat) into an arbitrary unit ring.*)
 (* [rat x // y] == smart constructor for rationals, definitionally equal      *)
 (*                 to x / y for concrete values, intended for printing only   *)
@@ -764,74 +761,44 @@ Proof. by case: b; rewrite ?(mul1r, mulN1r) // denqN. Qed.
 Lemma denq_norm x : denq `|x| = denq x.
 Proof. by rewrite normrEsign denq_mulr_sign. Qed.
 
-Fact rat_archimedean : Num.archimedean_axiom rat.
+Module ratArchimedean.
+Section ratArchimedean.
+
+Implicit Types x : rat.
+
+Let trunc x : nat := if 0 <= x then (`|numq x| %/ `|denq x|)%N else 0%N.
+
+Lemma truncP x :
+  if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N.
 Proof.
-move=> x; exists `|numq x|.+1; rewrite mulrS ltr_pwDl //.
-rewrite pmulrn abszE intr_norm numqE normrM ler_peMr //.
-by rewrite -intr_norm ler1n absz_gt0 denq_eq0.
+rewrite /trunc -numq_ge0; case: (ratP x) => -[] //= n d _.
+rewrite ler_pdivlMr ?ltr_pdivrMr ?ltr0z // -!natrM ler_nat ltr_nat.
+by rewrite leq_trunc_div ltn_ceil.
 Qed.
 
-HB.instance Definition _ :=
-  Num.RealField_isArchimedean.Build rat rat_archimedean.
+Let is_nat x := (0 <= x) && (denq x == 1).
 
-Section QintPred.
-
-Definition Qint_pred := fun x : rat => denq x == 1.
-Arguments Qint_pred _ /.
-Definition Qint := [qualify a x : rat | Qint_pred x].
-
-Lemma Qint_def x : (x \is a Qint) = (denq x == 1). Proof. by []. Qed.
-
-Lemma numqK : {in Qint, cancel (fun x => numq x) intr}.
-Proof. by move=> x /(_ =P 1 :> int) Zx; rewrite numqE Zx rmorph1 mulr1. Qed.
-
-Lemma QintP x : reflect (exists z, x = z%:~R) (x \in Qint).
+Lemma is_natE x : is_nat x = ((trunc x)%:R == x).
 Proof.
-apply: (iffP idP) => [/numqK <- | [z ->]]; first by exists (numq x).
-by rewrite Qint_def denq_int.
+rewrite /is_nat /trunc -numq_ge0 !rat_eq; case: (ratP x) => -[] //= n d pnd.
+rewrite pmulrn numq_int denq_int mulr1 -PoszM !eqz_nat -dvdn_eq.
+apply/eqP/idP => [->|/dvdnP[k nE]] //.
+by move/eqP: pnd; rewrite nE gcdnC gcdnMl.
 Qed.
 
-Fact Qint_subring_closed : subring_closed Qint.
-Proof.
-split=> // _ _ /QintP[x ->] /QintP[y ->]; apply/QintP.
-  by exists (x - y); rewrite -rmorphB.
-by exists (x * y); rewrite -rmorphM.
-Qed.
+Lemma is_intE x : (denq x == 1) = is_nat x || is_nat (- x).
+Proof. by rewrite /is_nat denqN oppr_ge0 -andb_orl le_total. Qed.
 
-HB.instance Definition _ := GRing.isSubringClosed.Build rat Qint_pred
-  Qint_subring_closed.
+End ratArchimedean.
+End ratArchimedean.
 
-End QintPred.
-Arguments Qint_pred _ /.
+HB.instance Definition _ := Num.NumDomain_isArchimedean.Build rat
+  ratArchimedean.truncP ratArchimedean.is_natE ratArchimedean.is_intE.
 
-Section QnatPred.
+Lemma Qint_def (x : rat) : (x \is a Num.int) = (denq x == 1). Proof. by []. Qed.
 
-Definition Qnat_pred := fun x : rat => (x \is a Qint) && (0 <= x).
-Arguments Qnat_pred _ /.
-Definition Qnat := [qualify a x | Qnat_pred x].
-
-Lemma Qnat_def x : (x \is a Qnat) = (x \is a Qint) && (0 <= x).
-Proof. by []. Qed.
-
-Lemma QnatP x : reflect (exists n : nat, x = n%:R) (x \in Qnat).
-Proof.
-rewrite Qnat_def; apply: (iffP idP) => [/andP []|[n ->]]; last first.
-  by rewrite Qint_def pmulrn denq_int eqxx ler0z.
-by move=> /QintP [] [] n ->; rewrite ?ler0z // => _; exists n.
-Qed.
-
-Fact Qnat_semiring_closed : semiring_closed Qnat.
-Proof.
-do 2?split; move=> // x y; rewrite !Qnat_def => /andP[xQ hx] /andP[yQ hy].
-  by rewrite rpredD // addr_ge0.
-by rewrite rpredM // mulr_ge0.
-Qed.
-
-HB.instance Definition _ := GRing.isSemiringClosed.Build rat Qnat_pred
-  Qnat_semiring_closed.
-
-End QnatPred.
-Arguments Qnat_pred _ /.
+Lemma numqK : {in Num.int, cancel (fun x => numq x) intr}.
+Proof. by move=> _ /intrP [x ->]; rewrite numq_int. Qed.
 
 Lemma natq_div m n : n %| m -> (m %/ n)%:R = m%:R / n%:R :> rat.
 Proof. exact/char0_natf_div/char_num. Qed.
@@ -846,7 +813,7 @@ Lemma ratr_int z : ratr z%:~R = z%:~R.
 Proof. by rewrite /ratr numq_int denq_int divr1. Qed.
 
 Lemma ratr_nat n : ratr n%:R = n%:R.
-Proof. exact: (ratr_int n). Qed.
+Proof. exact: ratr_int n. Qed.
 
 Lemma rpred_rat (S : divringClosed R) a : ratr a \in S.
 Proof. by rewrite rpred_div ?rpred_int. Qed.
@@ -954,6 +921,22 @@ Proof. by move=> x y; rewrite !maxEle ler_rat; case: leP. Qed.
 
 End InPrealField.
 
+Section InParchiField.
+
+Variable F : archiNumFieldType.
+
+Lemma floor_rat : {mono (@ratr F) : x / Num.floor x}.
+Proof.
+move=> x; apply: floor_def; apply/andP; split.
+- by rewrite -ratr_int ler_rat ge_floor // num_real.
+- by rewrite -ratr_int ltr_rat lt_succ_floor // num_real.
+Qed.
+
+Lemma ceil_rat : {mono (@ratr F) : x / Num.ceil x}.
+Proof. by move=> x; rewrite /Num.ceil -rmorphN floor_rat. Qed.
+
+End InParchiField.
+
 Arguments ratr {R}.
 
 (* Connecting rationals to the ring and field tactics *)
@@ -997,3 +980,30 @@ Notation "[ 'rat' x // y ]" :=
 (* A specialization of vm_compute rewrite rule for pattern _%:Q *)
 Lemma rat_vm_compute n (x : rat) : vm_compute_eq n%:Q x -> n%:Q = x.
 Proof. exact. Qed.
+
+Module mc_2_0.
+
+Local Notation Qint := (Num.int : qualifier 1 rat) (only parsing).
+Local Notation Qnat := (Num.nat : qualifier 1 rat) (only parsing).
+
+Local Lemma QintP (x : rat) : reflect (exists z, x = z%:~R) (x \in Qint).
+Proof. exact: intrP. Qed.
+
+Local Lemma Qnat_def (x : rat) : (x \is a Qnat) = (x \is a Qint) && (0 <= x).
+Proof. exact: natrEint. Qed.
+
+Local Lemma QnatP x : reflect (exists n : nat, x = n%:R) (x \in Qnat).
+Proof. exact: natrP. Qed.
+
+End mc_2_0.
+
+#[deprecated(since="mathcomp 2.1.0", note="Use Num.int instead.")]
+Notation Qint := (Num.int : qualifier 1 rat) (only parsing).
+#[deprecated(since="mathcomp 2.1.0", note="Use Num.nat instead.")]
+Notation Qnat := (Num.nat : qualifier 1 rat) (only parsing).
+#[deprecated(since="mathcomp 2.1.0", note="Use intrP instead.")]
+Notation QintP := mc_2_0.QintP (only parsing).
+#[deprecated(since="mathcomp 2.1.0", note="Use natrEint instead.")]
+Notation Qnat_def := mc_2_0.Qnat_def (only parsing).
+#[deprecated(since="mathcomp 2.1.0", note="Use natrP instead.")]
+Notation QnatP := mc_2_0.QnatP (only parsing).

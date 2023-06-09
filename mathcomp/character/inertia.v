@@ -8,6 +8,7 @@ From mathcomp Require Import automorphism quotient action zmodp cyclic center.
 From mathcomp Require Import gproduct commutator gseries nilpotent pgroup.
 From mathcomp Require Import sylow maximal frobenius matrix mxalgebra.
 From mathcomp Require Import mxrepresentation vector algC classfun character.
+From mathcomp Require Import archimedean.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -511,7 +512,7 @@ have{chiHk chiHj}: '['Res[H] ('Ind[G] 'chi_j), 'chi_k] != 0.
   rewrite !inE !cfdot_Res_l in chiHj chiHk *.
   apply: contraNneq chiHk; rewrite cfdot_sum_irr => /psumr_eq0P/(_ i isT)/eqP.
   rewrite -cfdotC cfdotC mulf_eq0 conjC_eq0 (negbTE chiHj) /= => -> // i1.
-  by rewrite -cfdotC Cnat_ge0 // rpredM ?Cnat_cfdot_char ?cfInd_char ?irr_char.
+  by rewrite -cfdotC natr_ge0 // rpredM ?Cnat_cfdot_char ?cfInd_char ?irr_char.
 rewrite cfResInd // cfdotZl mulf_eq0 cfdot_suml => /norP[_].
 apply: contraR => chiGk'j; rewrite big1 // => x Gx; apply: contraNeq chiGk'j.
 rewrite -conjg_IirrE cfdot_irr pnatr_eq0; case: (_ =P k) => // <- _.
@@ -544,7 +545,7 @@ Lemma dvdn_constt_Res1_irr1 i j :
 Proof.
 move=> nsHG chiHj; have [sHG nHG] := andP nsHG; rewrite -(cfResE _ sHG) //.
 rewrite {1}(Clifford_Res_sum_cfclass nsHG chiHj) cfunE sum_cfunE.
-have /CnatP[n ->]: '['Res[H] 'chi_i, 'chi_j] \in Cnat.
+have /natrP[n ->]: '['Res[H] 'chi_i, 'chi_j] \in Num.nat.
   by rewrite Cnat_cfdot_char ?cfRes_char ?irr_char.
 exists (n * size ('chi_j ^: G)%CF)%N; rewrite natrM -mulrA; congr (_ * _).
 rewrite mulr_natl -[size _]card_ord big_tnth -sumr_const; apply: eq_bigr => k _.
@@ -966,7 +967,7 @@ have part_c: {in calA, forall s (chi := 'Ind[G] 'chi_s),
     by rewrite mulrb ifN_eqC ?subr0.
   rewrite -(cfResRes chi sHT sTG) DchiT Dphi !rmorphD !cfdotDl /=.
   rewrite -ltrBDl subrr ltr_wpDr ?lt_def //;
-    rewrite Cnat_ge0 ?Cnat_cfdot_char ?cfRes_char ?irr_char //.
+    rewrite natr_ge0 ?Cnat_cfdot_char ?cfRes_char ?irr_char //.
   by rewrite andbT -irr_consttE -constt_Ind_Res.
 do [split=> //; try by move=> s /AtoB_P[]] => [s1 s2 As1 As2 | r].
   have [[irr_s1G _ _] [irr_s2G _ _]] := (AtoB_P _ As1, AtoB_P _ As2).
@@ -1023,8 +1024,8 @@ move=> IGphi irr_psi calS.
 have IGpsi: G \subset 'I[psi].
   by rewrite (subset_trans _ (inertia_mul _ _)) // subsetI IGphi.
 pose e b := '['Ind[G] phi, 'chi_b]; pose d b g := '['chi_b * chi, 'chi_g * chi].
-have Ne b: e b \in Cnat by rewrite Cnat_cfdot_char ?cfInd_char ?irr_char.
-have egt0 b: b \in calS -> e b > 0 by rewrite Cnat_gt0.
+have Ne b: e b \in Num.nat by rewrite Cnat_cfdot_char ?cfInd_char ?irr_char.
+have egt0 b: b \in calS -> e b > 0 by rewrite natr_gt0.
 have DphiG: 'Ind phi = \sum_(b in calS) e b *: 'chi_b := cfun_sum_constt _.
 have DpsiG: 'Ind psi = \sum_(b in calS) e b *: 'chi_b * chi.
   by rewrite /psi -cNt cfIndM // DphiG mulr_suml.
@@ -1035,15 +1036,15 @@ have [_]: '['Ind[G] phi] <= '['Ind[G] psi] ?= iff d_delta.
   pose sum_d := \sum_(b in calS) e b * \sum_(g in calS) e g * d b g.
   have ->: '['Ind[G] phi] = sum_delta.
     rewrite DphiG cfdot_suml; apply: eq_bigr => b _; rewrite cfdotZl cfdot_sumr.
-    by congr (_ * _); apply: eq_bigr => g; rewrite cfdotZr cfdot_irr conj_Cnat.
+    by congr (_ * _); apply: eq_bigr => g; rewrite cfdotZr cfdot_irr conj_natr.
   have ->: '['Ind[G] psi] = sum_d.
     rewrite DpsiG cfdot_suml; apply: eq_bigr => b _.
     rewrite -scalerAl cfdotZl cfdot_sumr; congr (_ * _).
-    by apply: eq_bigr => g _; rewrite -scalerAl cfdotZr conj_Cnat.
+    by apply: eq_bigr => g _; rewrite -scalerAl cfdotZr conj_natr.
   have eMmono := mono_leif (ler_pM2l (egt0 _ _)).
   apply: leif_sum => b /eMmono->; apply: leif_sum => g /eMmono->.
   split; last exact: eq_sym.
-  have /CnatP[n Dd]: d b g \in Cnat by rewrite Cnat_cfdot_char.
+  have /natrP[n Dd]: d b g \in Num.nat by rewrite Cnat_cfdot_char.
   have [Db | _] := eqP; rewrite Dd leC_nat // -ltC_nat -Dd Db cfnorm_gt0.
   by rewrite -char1_eq0 // cfunE mulf_neq0 ?irr1_neq0.
 rewrite -!cfdot_Res_l ?cfRes_Ind_invariant // !cfdotZl cfnorm_irr irrWnorm //.
@@ -1062,7 +1063,7 @@ apply/idP/idP=> [|/imageP[b Sb ->]].
   by apply: contraNneq N'i => ->; apply: image_f.
 rewrite gt_eqF // (bigD1 b) //= cfdotZl cfnorm_irr mulr1 ltr_wpDr ?egt0 //.
 apply: sumr_ge0 => g /andP[Sg _]; rewrite cfdotZl cfdot_irr.
-by rewrite mulr_ge0 ?ler0n ?Cnat_ge0.
+by rewrite mulr_ge0 ?ler0n ?natr_ge0.
 Qed.
 
 (* This is Isaacs, Corollary (6.17) (due to Gallagher). *)
@@ -1077,7 +1078,7 @@ have [] := constt_Ind_mul_ext IHchi0; rewrite irr0 ?mul1r ?mem_irr //.
 set psiG := 'Ind 1 => irrMchi injMchi constt_theta {2}->.
 have dot_psiG b: '[psiG, 'chi_(mod_Iirr b)] = 'chi[G / N]_b 1%g.
   rewrite mod_IirrE // -cfdot_Res_r cfRes_sub_ker ?cfker_mod //.
-  by rewrite cfdotZr cfnorm1 mulr1 conj_Cnat ?cfMod1 ?Cnat_irr1.
+  by rewrite cfdotZr cfnorm1 mulr1 conj_natr ?cfMod1 ?Cnat_irr1.
 have mem_psiG (b : Iirr (G / N)): mod_Iirr b \in irr_constt psiG.
   by rewrite irr_consttE dot_psiG irr1_neq0.
 have constt_psiG b: (b \in irr_constt psiG) = (N \subset cfker 'chi_b).
@@ -1128,7 +1129,8 @@ have nsKT_G: K :&: T <| G.
   exact: subset_trans (der1_min nLK abKbar) (sub_Inertia _ sLK).
 have [e DthL]: exists e, 'Res theta = e%:R *: \sum_(xi <- (phi ^: K)%CF) xi.
   rewrite (Clifford_Res_sum_cfclass nsLK sLp0) -/phi; set e := '[_, _].
-  by exists (truncC e); rewrite truncCK ?Cnat_cfdot_char ?cfRes_char ?irr_char.
+  exists (Num.trunc e).
+  by rewrite truncK ?Cnat_cfdot_char ?cfRes_char ?irr_char.
 have [defKT | ltKT_K] := eqVneq (K :&: T) K; last first.
   have defKT: K :&: T = L.
     apply: maxL; last by rewrite subsetI sLK sub_Inertia.
@@ -1174,7 +1176,7 @@ have [inj_Mphi | /injectivePn[i [j i'j eq_mm_ij]]] := boolP (injectiveb mmLth).
   rewrite -card_quotient // -card_Iirr_abelian // mulr_natl.
   rewrite ['Ind phi]cfun_sum_cfdot sum_cfunE (bigID [in codom mmLth]) /=.
   rewrite ler_wpDr ?sumr_ge0 // => [i _|].
-    by rewrite char1_ge0 ?rpredZ_Cnat ?Cnat_cfdot_char ?cfInd_char ?irr_char.
+    by rewrite char1_ge0 ?rpredZ_nat ?Cnat_cfdot_char ?cfInd_char ?irr_char.
   rewrite -big_uniq //= big_image -sumr_const ler_sum // => i _.
   rewrite cfunE -[in leRHS](cfRes1 L) -cfdot_Res_r mmLthL cfRes1.
   by rewrite DthL cfdotZr rmorph_nat cfnorm_irr mulr1.
@@ -1235,9 +1237,9 @@ move=> nsNG iGN pr_p IGchi.
 have [t sGt] := constt_cfInd_irr s (normal_sub nsNG); exists t.
 have [e DtN]: exists e, 'Res 'chi_t = e%:R *: 'chi_s.
   rewrite constt_Ind_Res in sGt.
-  rewrite (Clifford_Res_sum_cfclass nsNG sGt); set e := '[_, _].
-  rewrite cfclass_invariant // big_seq1.
-  by exists (truncC e); rewrite truncCK ?Cnat_cfdot_char ?cfRes_char ?irr_char.
+  rewrite (Clifford_Res_sum_cfclass nsNG sGt) cfclass_invariant // big_seq1.
+  set e := '[_, _]; exists (Num.trunc e).
+  by rewrite truncK ?Cnat_cfdot_char ?cfRes_char ?irr_char.
 have [/irrWnorm/eqP | [c injc DtNc]] := cfRes_prime_irr_cases t nsNG iGN pr_p.
   rewrite DtN cfnormZ cfnorm_irr normr_nat mulr1 -natrX pnatr_eq1.
   by rewrite muln_eq1 andbb => /eqP->; rewrite scale1r.
@@ -1257,14 +1259,14 @@ Qed.
 (* This is Isaacs, Lemma (6.24). *)
 Lemma extend_to_cfdet G N s c0 u :
     let theta := 'chi_s in let lambda := cfDet theta in let mu := 'chi_u in
-    N <| G -> coprime #|G : N| (truncC (theta 1%g)) ->
+    N <| G -> coprime #|G : N| (Num.trunc (theta 1%g)) ->
     'Res[N, G] 'chi_c0 = theta -> 'Res[N, G] mu = lambda ->
   exists2 c, 'Res 'chi_c = theta /\ cfDet 'chi_c = mu
           & forall c1, 'Res 'chi_c1 = theta -> cfDet 'chi_c1 = mu -> c1 = c.
 Proof.
-move=> theta lambda mu nsNG; set e := #|G : N|; set f := truncC _.
+move=> theta lambda mu nsNG; set e := #|G : N|; set f := Num.trunc _.
 set eta := 'chi_c0 => co_e_f etaNth muNlam; have [sNG nNG] := andP nsNG.
-have fE: f%:R = theta 1%g by rewrite truncCK ?Cnat_irr1.
+have fE: f%:R = theta 1%g by rewrite truncK ?Cnat_irr1.
 pose nu := cfDet eta; have lin_nu: nu \is a linear_char := cfDet_lin_char _.
 have nuNlam: 'Res nu = lambda by rewrite -cfDetRes ?irr_char ?etaNth.
 have lin_lam: lambda \is a linear_char := cfDet_lin_char _.
@@ -1314,11 +1316,11 @@ Qed.
 (* This is Isaacs, Theorem (6.25). *)
 Theorem solvable_irr_extendible_from_det G N s (theta := 'chi[N]_s) :
     N <| G -> solvable (G / N) ->
-    G \subset 'I[theta] -> coprime #|G : N| (truncC (theta 1%g)) ->
+    G \subset 'I[theta] -> coprime #|G : N| (Num.trunc (theta 1%g)) ->
   [exists c, 'Res 'chi[G]_c == theta]
     = [exists u, 'Res 'chi[G]_u == cfDet theta].
 Proof.
-set e := #|G : N|; set f := truncC _ => nsNG solG IGtheta co_e_f.
+set e := #|G : N|; set f := Num.trunc _ => nsNG solG IGtheta co_e_f.
 apply/exists_eqP/exists_eqP=> [[c cNth] | [u uNdth]].
   have /lin_char_irr/irrP[u Du] := cfDet_lin_char 'chi_c.
   by exists u; rewrite -Du -cfDetRes ?irr_char ?cNth.
@@ -1418,10 +1420,10 @@ have [c vGc co_p_f]: exists2 c, c \in irr_constt nuG & ~~ (p %| 'chi_c 1%g)%C.
   rewrite prime_coprime // negbK -dvdC_nat -[rhs in (_ %| rhs)%C]mulr1.
   rewrite -(lin_char1 lin_v) -cfInd1 // ['Ind _]cfun_sum_constt /=.
   rewrite sum_cfunE rpred_sum // => i /p_dv_v1 p_dv_chi1i.
-  rewrite cfunE dvdC_mull // rpred_Cnat //.
+  rewrite cfunE dvdC_mull // intr_nat //.
   by rewrite Cnat_cfdot_char ?cfInd_char ?irr_char.
-pose f := truncC ('chi_c 1%g); pose b := (egcdn f m).1.
-have fK: f%:R = 'chi_c 1%g by rewrite truncCK ?Cnat_irr1.
+pose f := Num.trunc ('chi_c 1%g); pose b := (egcdn f m).1.
+have fK: f%:R = 'chi_c 1%g by rewrite truncK ?Cnat_irr1.
 have fb_mod_m: f * b = 1 %[mod m].
   have co_m_f: coprime m f.
     by rewrite (pnat_coprime p_m) ?p'natE // -dvdC_nat CdivE fK.
@@ -1507,13 +1509,13 @@ Qed.
 (* This is Isaacs, Corollary (6.28). *)
 Corollary extend_solvable_coprime_irr G N t (theta := 'chi[N]_t) :
     N <| G -> solvable (G / N) -> G \subset 'I[theta] ->
-    coprime #|G : N| ('o(theta)%CF * truncC (theta 1%g)) ->
+    coprime #|G : N| ('o(theta)%CF * Num.trunc (theta 1%g)) ->
   exists c, [/\ 'Res 'chi[G]_c = theta, 'o('chi_c)%CF = 'o(theta)%CF
               & forall d,
                   'Res 'chi_d = theta -> coprime #|G : N| 'o('chi_d)%CF ->
                 d = c].
 Proof.
-set e := #|G : N|; set f := truncC _ => nsNG solG IGtheta.
+set e := #|G : N|; set f := Num.trunc _ => nsNG solG IGtheta.
 rewrite coprimeMr => /andP[co_e_th co_e_f].
 have [sNG nNG] := andP nsNG; pose lambda := cfDet theta.
 have lin_lam: lambda \is a linear_char := cfDet_lin_char theta.

@@ -4,9 +4,9 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
 From mathcomp Require Import div fintype path tuple bigop finset prime order.
 From mathcomp Require Import ssralg poly polydiv mxpoly countalg closed_field.
-From mathcomp Require Import ssrnum ssrint rat intdiv fingroup finalg zmodp.
-From mathcomp Require Import cyclic pgroup sylow vector falgebra fieldext.
-From mathcomp Require Import separable galois.
+From mathcomp Require Import ssrnum ssrint archimedean rat intdiv fingroup.
+From mathcomp Require Import finalg zmodp cyclic pgroup sylow vector falgebra.
+From mathcomp Require Import fieldext separable galois.
 
 (******************************************************************************)
 (*   The main result in this file is the existence theorem that underpins the *)
@@ -461,11 +461,11 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     pose d := wid ab; pose dq := \poly_(i < (size q).-1) Mq i.+1.
     have d_ge0: 0 <= d by rewrite subr_ge0; case: xab.
     have [Mdq MdqP] := poly_disk_bound dq d.
-    pose n := Num.bound (Mu * Mdq * d); exists n => c /= /andP[].
+    pose n := Num.bound (Mu * Mdq * d); exists n => c /andP[].
     have{xab} [[]] := findP n _ _ xab; case: (find n q ab) => a1 b1 /=.
     rewrite -/d => qa1_le0 qb1_ge0 le_ab1 [/= le_aa1 le_b1b] Dab1 le_a1c le_cb1.
     have /MuP lbMu: c \in itv ab.
-      by rewrite !inE (le_trans le_aa1) ?(le_trans le_cb1).
+      by rewrite inE (le_trans le_aa1) ?(le_trans le_cb1).
     have Mu_ge0: 0 <= Mu by rewrite (le_trans _ lbMu).
     have Mdq_ge0: 0 <= Mdq.
       by rewrite (le_trans _ (MdqP 0 _)) ?normr0.
@@ -598,7 +598,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   pose RyM := Num.IntegralDomain_isLtReal.Build (Q y) posD
                 posM posNneg posB posVneg absN absE (rrefl _).
   pose Ry : realFieldType := HB.pack (Q y) RyM.
-  have QisArchi : Num.RealField_isArchimedean Ry.
+  have QisArchi : Num.NumDomain_bounded_isArchimedean Ry.
     by constructor; apply: (@rat_algebraic_archimedean Ry _ alg_integral).
   exists (HB.pack_for archiFieldType _ QisArchi); apply: idfun.
 have some_realC: realC.
