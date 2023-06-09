@@ -666,11 +666,7 @@ Lemma ffunMzE (I : finType) (M : zmodType) (f : {ffun I -> M}) z x :
 Proof. by case: z => n; rewrite ?ffunE ffunMnE. Qed.
 
 Lemma intz (n : int) : n%:~R = n.
-Proof.
-elim: n=> //= n ihn; rewrite /intmul /=.
-  by rewrite -addn1 mulrnDr /= PoszD -ihn.
-by rewrite nmulrn intS opprD mulrzDl ihn.
-Qed.
+Proof. by case: n => n; rewrite ?NegzE /intmul/= -(rmorphMn Posz)/= natn. Qed.
 
 Lemma natz (n : nat) : n%:R = n%:Z :> int.
 Proof. by rewrite pmulrn intz. Qed.
