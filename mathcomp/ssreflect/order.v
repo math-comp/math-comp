@@ -400,6 +400,8 @@ From mathcomp Require Import finset.
 (*                          and a tbLatticeClosed                             *)
 (* [SubLattice_isSubOrder of U by <: with disp] ==                            *)
 (* [SubLattice_isSubOrder of U by <:] ==                                      *)
+(* [SubPOrder_isSubOrder of U by <: with disp] ==                             *)
+(* [SubPOrder_isSubOrder of U by <:] ==                                       *)
 (* [SubChoice_isSubOrder of U by <: with disp] ==                             *)
 (* [SubChoice_isSubOrder of U by <:] == orderType mixin for a subType whose   *)
 (*                          base type is an orderType                         *)
@@ -5548,16 +5550,24 @@ Proof. by move=> x y; rewrite !leEsub le_total. Qed.
 HB.instance Definition _ := Lattice_isTotal.Build d' U totalU.
 HB.end.
 
-HB.factory Record SubChoice_isSubOrder d (T : orderType d) S (d' : unit) U
-    of @SubChoice T S U := {}.
+HB.factory Record SubPOrder_isSubOrder d (T : orderType d) S d' U
+    of @SubPOrder d T S d' U := {}.
 
-HB.builders Context d T S d' U of SubChoice_isSubOrder d T S d' U.
+HB.builders Context d T S d' U of SubPOrder_isSubOrder d T S d' U.
 Fact opredI : meet_closed S.
 Proof. by move=> x y Sx Sy; rewrite meetEtotal; case: leP. Qed.
 Fact opredU : join_closed S.
 Proof. by move=> x y Sx Sy; rewrite joinEtotal; case: leP. Qed.
-HB.instance Definition _ := SubChoice_isSubLattice.Build d T S d' U opredI opredU.
+HB.instance Definition _ := SubPOrder_isSubLattice.Build d T S d' U opredI opredU.
 HB.instance Definition _ := SubLattice_isSubOrder.Build d T S d' U.
+HB.end.
+
+HB.factory Record SubChoice_isSubOrder d (T : orderType d) S (d' : unit) U
+    of @SubChoice T S U := {}.
+
+HB.builders Context d T S d' U of SubChoice_isSubOrder d T S d' U.
+HB.instance Definition _ := SubChoice_isSubPOrder.Build d T S d' U.
+HB.instance Definition _ := SubPOrder_isSubOrder.Build d T S d' U.
 HB.end.
 
 Module SubOrderExports.
@@ -5648,6 +5658,14 @@ Notation "[ 'SubLattice_isSubOrder' 'of' U 'by' <: 'with' disp ]" :=
   (SubLattice_isSubOrder.Build _ _ _ disp U)
   (at level 0, format "[ 'SubLattice_isSubOrder'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
+Notation "[ 'SubPOrder_isSubOrder' 'of' U 'by' <: ]" :=
+  (SubPOrder_isSubOrder.Build _ _ _ _ U)
+  (at level 0, format "[ 'SubPOrder_isSubOrder'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubPOrder_isSubOrder' 'of' U 'by' <: 'with' disp ]" :=
+  (SubPOrder_isSubOrder.Build _ _ _ disp U)
+  (at level 0, format "[ 'SubPOrder_isSubOrder'  'of'  U  'by'  <:  'with'  disp ]")
+  : form_scope.
 Notation "[ 'SubChoice_isSubOrder' 'of' U 'by' <: ]" :=
   (SubChoice_isSubOrder.Build _ _ _ _ U)
   (at level 0, format "[ 'SubChoice_isSubOrder'  'of'  U  'by'  <: ]")
@@ -5667,7 +5685,7 @@ Context {disp : unit} {T : orderType disp} (P : {pred T}) (sT : subType P).
 
 #[export]
 HB.instance Definition _ :=
-  MonoTotal.Build disp (sub_type sT) (fun _ _ => erefl).
+  SubPOrder_isSubOrder.Build disp T P disp (sub_type sT).
 
 End Total.
 

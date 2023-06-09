@@ -92,8 +92,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `algC.v`
   + lemma `Implementation.archimedean`
   + instance of `archiClosedFieldType` on `Implementation.type`
+- in `order.v`
+  + factory `SubPOrder_isSubOrder`
+  + notations `[SubPOrder_isSubOrder of U by <: with disp]` and
+    `[SubPOrder_isSubOrder of U by <:]`
 
 ### Changed
+
+- in `order.v`
+  + make `[Order of T by <:]` compatible with the SubOrder hierarchy
+
 
 ### Renamed
 
