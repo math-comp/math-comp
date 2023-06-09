@@ -103,6 +103,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `natr0E`, `natr1E`, `natn`, `natrDE`, `natrME`, `natrXE`
   + multirule `natrE`
 
+- in `ssrint.v`
+  + `RMorphism` instance for `Posz`
+
 ### Changed
 
 - in `order.v`

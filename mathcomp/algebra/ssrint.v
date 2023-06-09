@@ -224,6 +224,9 @@ End intZmod.
 
 HB.instance Definition _ := intZmod.Mixin.
 
+HB.instance Definition _ := GRing.isSemiAdditive.Build nat int Posz
+  (erefl, intZmod.PoszD).
+
 Local Open Scope ring_scope.
 
 Section intZmoduleTheory.
@@ -347,6 +350,9 @@ Lemma predn_int (n : nat) : (0 < n)%N -> n.-1%:Z = n%:Z - 1.
 Proof. exact: intZmod.predn_int. Qed.
 
 End intRingTheory.
+
+HB.instance Definition _ := GRing.isMultiplicative.Build nat int Posz
+  (PoszM, erefl).
 
 Module intUnitRing.
 Section intUnitRing.
@@ -807,7 +813,7 @@ Proof. by apply: big_morph=> // x y; rewrite !pmulrn -rmorphD. Qed.
 
 Lemma prodMz : forall I r (P : pred I) F,
  (\prod_(i <- r | P i) F i)%N%:~R = \prod_(i <- r | P i) ((F i)%:~R) :> R.
-Proof. by apply: big_morph=> // x y; rewrite !pmulrn PoszM -rmorphM. Qed.
+Proof. by apply: big_morph=> // x y; rewrite pmulrn PoszM -[RHS]rmorphM. Qed.
 
 End ZintBigMorphism.
 
