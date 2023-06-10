@@ -34,23 +34,23 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   bundles = let
     master = [
+      "coqeal"
+      "coquelicot"
+      "fourcolor"
+      "gaia"
+      "graph-theory"
+      "interval"
       "mathcomp-bigenough"
       "mathcomp-finmap"
       "mathcomp-real-closed"
-      "fourcolor"
-      "odd-order"
-      "coquelicot"
-      "gaia"
-      "multinomials"
       "mathcomp-zify"
-      "coqeal"
-      "interval"
-      "graph-theory"
+      "multinomials"
+      "odd-order"
+      "reglang"
       # "deriving"  # requires univ poly
       # "extructures"  # requires deriving
     ];
     hierarchy-builder = [
-      "reglang"
       "coq-bits"
       "mathcomp-classical"
       "mathcomp-analysis"
