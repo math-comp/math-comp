@@ -300,7 +300,8 @@ have szX: size X == m.
   rewrite -(eqn_pmul2r (adim_gt0 F)) dimM -defM (directvP dxFX) /=.
   rewrite -sum1_size big_distrl; apply/eqP/eq_big_seq => x Xx /=.
   by rewrite mul1n dim_cosetv ?(memPn nzX).
-rewrite directvE /= !(big_nth 0) (eqP szX) !big_mkord -directvE /= in defM dxFX.
+rewrite directvE /= (big_nth 0) [eqbRHS](big_nth 0) in defM dxFX.
+rewrite (eqP szX) !big_mkord -directvE in defM dxFX.
 exists (Tuple szX) => //; split=> // _ /tnthP[i ->]; rewrite (tnth_nth 0) /=.
 by rewrite -defM memvE (sumv_sup i) ?field_subvMl.
 Qed.
@@ -363,10 +364,10 @@ Proof. by rewrite [n]prednK // divn_gt0 ?adim_gt0 // dimvS ?subv_adjoin. Qed.
 Lemma dim_Fadjoin : \dim <<K; x>> = (n * \dim K)%N.
 Proof. by rewrite adjoin_degreeE -dim_sup_field ?subv_adjoin. Qed.
 
-Lemma adjoin0_deg : adjoin_degree K 0 = 1%N.
+Lemma adjoin0_deg : adjoin_degree K 0 = 1.
 Proof. by rewrite /adjoin_degree addv0 subfield_closed divnn adim_gt0. Qed.
 
-Lemma adjoin_deg_eq1 : (n == 1%N) = (x \in K).
+Lemma adjoin_deg_eq1 : (n == 1) = (x \in K).
 Proof.
 rewrite (sameP Fadjoin_idP eqP) adjoin_degreeE; have sK_Kx := subv_adjoin K x.
 apply/eqP/idP=> [dimKx1 | /eqP->]; last by rewrite divnn adim_gt0.

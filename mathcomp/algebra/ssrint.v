@@ -224,6 +224,9 @@ End intZmod.
 
 HB.instance Definition _ := intZmod.Mixin.
 
+HB.instance Definition _ := GRing.isSemiAdditive.Build nat int Posz
+  (erefl, intZmod.PoszD).
+
 Local Open Scope ring_scope.
 
 Section intZmoduleTheory.
@@ -348,6 +351,9 @@ Proof. exact: intZmod.predn_int. Qed.
 
 End intRingTheory.
 
+HB.instance Definition _ := GRing.isMultiplicative.Build nat int Posz
+  (PoszM, erefl).
+
 Module intUnitRing.
 Section intUnitRing.
 Implicit Types m n : int.
@@ -359,7 +365,7 @@ Definition invz n : int := n.
 Lemma mulVz : {in unitz, left_inverse 1%R invz *%R}.
 Proof. by move=> n /pred2P[] ->. Qed.
 
-Lemma mulzn_eq1 m (n : nat) : (m * n == 1) = (m == 1) && (n == 1%N).
+Lemma mulzn_eq1 m (n : nat) : (m * n == 1) = (m == 1) && (n == 1).
 Proof. by case: m => m /=; [rewrite -PoszM [_==_]muln_eq1 | case: n]. Qed.
 
 Lemma unitzPl m n : n * m = 1 -> m \is a unitz.
@@ -470,12 +476,12 @@ Definition ltez_nat := (lez_nat, ltz_nat).
 
 Lemma leNz_nat m n : (- m%:Z <= n). Proof. by case: m. Qed.
 
-Lemma ltNz_nat m n : (- m%:Z < n) = (m != 0%N) || (n != 0%N).
+Lemma ltNz_nat m n : (- m%:Z < n) = (m != 0) || (n != 0).
 Proof. by move: m n=> [|?] []. Qed.
 
 Definition lteNz_nat := (leNz_nat, ltNz_nat).
 
-Lemma lezN_nat m n : (m%:Z <= - n%:Z) = (m == 0%N) && (n == 0%N).
+Lemma lezN_nat m n : (m%:Z <= - n%:Z) = (m == 0) && (n == 0).
 Proof. by move: m n=> [|?] []. Qed.
 
 Lemma ltzN_nat m n : (m%:Z < - n%:Z) = false.
@@ -483,7 +489,7 @@ Proof. by move: m n=> [|?] []. Qed.
 
 Lemma le0z_nat n : 0 <= n :> int. Proof. by []. Qed.
 
-Lemma lez0_nat n : n <= 0 :> int = (n == 0%N :> nat). Proof. by elim: n. Qed.
+Lemma lez0_nat n : n <= 0 :> int = (n == 0 :> nat). Proof. by elim: n. Qed.
 
 Definition ltezN_nat := (lezN_nat, ltzN_nat).
 Definition ltez_natE := (ltez_nat, lteNz_nat, ltezN_nat, le0z_nat, lez0_nat).
@@ -660,11 +666,7 @@ Lemma ffunMzE (I : finType) (M : zmodType) (f : {ffun I -> M}) z x :
 Proof. by case: z => n; rewrite ?ffunE ffunMnE. Qed.
 
 Lemma intz (n : int) : n%:~R = n.
-Proof.
-elim: n=> //= n ihn; rewrite /intmul /=.
-  by rewrite -addn1 mulrnDr /= PoszD -ihn.
-by rewrite nmulrn intS opprD mulrzDl ihn.
-Qed.
+Proof. by case: n => n; rewrite ?NegzE /intmul/= -(rmorphMn Posz)/= natn. Qed.
 
 Lemma natz (n : nat) : n%:R = n%:Z :> int.
 Proof. by rewrite pmulrn intz. Qed.
@@ -807,7 +809,7 @@ Proof. by apply: big_morph=> // x y; rewrite !pmulrn -rmorphD. Qed.
 
 Lemma prodMz : forall I r (P : pred I) F,
  (\prod_(i <- r | P i) F i)%N%:~R = \prod_(i <- r | P i) ((F i)%:~R) :> R.
-Proof. by apply: big_morph=> // x y; rewrite !pmulrn PoszM -rmorphM. Qed.
+Proof. by apply: big_morph=> // x y; rewrite pmulrn PoszM -[RHS]rmorphM. Qed.
 
 End ZintBigMorphism.
 

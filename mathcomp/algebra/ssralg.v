@@ -6678,3 +6678,24 @@ HB.instance Definition _ := ComRing_hasMulInverse.Build bool
 Lemma bool_fieldP : Field.axiom bool. Proof. by []. Qed.
 
 HB.instance Definition _ := ComUnitRing_isField.Build bool bool_fieldP.
+
+(* Algebraic structure of nat *)
+
+HB.instance Definition _ := isNmodule.Build nat addnA addnC add0n.
+HB.instance Definition _ := Nmodule_isComSemiRing.Build nat
+  mulnA mulnC mul1n mulnDl mul0n erefl.
+
+HB.instance Definition _ (V : nmodType) (x : V) :=
+  isSemiAdditive.Build nat V (natmul x) (mulr0n x, mulrnDr x).
+
+HB.instance Definition _ (R : semiRingType) :=
+  isMultiplicative.Build nat R (natmul 1) (natrM R, mulr1n 1).
+
+Lemma natr0E : 0 = 0%N. Proof. by []. Qed.
+Lemma natr1E : 1 = 1%N. Proof. by []. Qed.
+Lemma natn n : n%:R = n.
+Proof. by elim: n => [//|n IHn]; rewrite -nat1r IHn. Qed.
+Lemma natrDE n m : n + m = (n + m)%N. Proof. by []. Qed.
+Lemma natrME n m : n * m = (n * m)%N. Proof. by []. Qed.
+Lemma natrXE n m : n ^+ m = (n ^ m)%N. Proof. by []. Qed.
+Definition natrE := (natr0E, natr1E, natn, natrDE, natrME, natrXE).
