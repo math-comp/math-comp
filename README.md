@@ -1,4 +1,4 @@
-[![pipeline status](https://gitlab.com/math-comp/math-comp/badges/master/pipeline.svg)](https://gitlab.com/math-comp/math-comp/commits/master)
+[![pipeline status](https://gitlab.inria.fr/math-comp/math-comp/badges/master/pipeline.svg)](https://gitlab.inria.fr/math-comp/math-comp/commits/master)
 [![Join the chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://coq.zulipchat.com/#narrow/stream/237664-math-comp-users)
 
 # The Mathematical Components repository
