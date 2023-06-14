@@ -75,7 +75,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       bignums.override.version = "master";
       paramcoq.override.version = "master";
       coq-elpi.override.version = "coq-master";
-      hierarchy-builder.override.version = "proux01:coq-master";
+      hierarchy-builder.override.version = "coq-master";
       interval.job = false;
       coqeal.job = false;
       coquelicot.job = false;
