@@ -159,6 +159,8 @@ doc: __always__ Makefile.coq
 		-g --utf8 -R . mathcomp \
 		--parse-comments \
 		--multi-index $(COQFILES) -d htmldoc
+	. ../etc/utils/builddoc_lib.sh; \
+		cd _build_doc && postprocess_html
 	cp ../etc/artwork/coqdoc.css _build_doc/htmldoc
 
 doc-clean:
