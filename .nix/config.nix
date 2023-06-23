@@ -36,8 +36,8 @@ with builtins; with (import <nixpkgs> {}).lib;
     master = [
       "mathcomp-bigenough"
       "deriving"
-      "extructures" "reglang"
-      "coquelicot" "mathcomp-tarjan"
+      "extructures"
+      "coquelicot"
     ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
@@ -48,6 +48,8 @@ with builtins; with (import <nixpkgs> {}).lib;
          mathcomp-analysis.job = false;
          multinomials.job = false;
          coqeal.job = false;
+         reglang.job = false;
+         mathcomp-tarjan.job = false;
        };
   in {
     "coq-master".push-branches = [ "mathcomp-1" "master" ];
