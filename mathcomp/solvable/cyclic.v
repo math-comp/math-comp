@@ -800,6 +800,9 @@ apply: field_mul_group_cyclic FinRing.uval _ _ => // u _.
 by split=> /eqP ?; apply/eqP.
 Qed.
 
+Lemma units_Zp_cyclic p : prime p -> cyclic (units_Zp p).
+Proof. by move/pdiv_id <-; exact: field_unit_group_cyclic. Qed.
+
 Section PrimitiveRoots.
 
 Open Scope ring_scope.
