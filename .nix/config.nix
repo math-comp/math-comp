@@ -47,6 +47,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "multinomials"
       "odd-order"
       "reglang"
+      "mathcomp-tarjan"
       # "deriving"  # requires univ poly
       # "extructures"  # requires deriving
     ];
@@ -57,7 +58,6 @@ with builtins; with (import <nixpkgs> {}).lib;
     ];
     proux01-hierarchy-builder = [
       "mathcomp-abel"
-      "mathcomp-tarjan"
     ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
