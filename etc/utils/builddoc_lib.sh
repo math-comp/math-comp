@@ -44,12 +44,17 @@ sed -r -e '
 	/\(\*\*/,/\*\*\)/s/\[/#[#/g;
 	/\(\*\*/,/\*\*\)/s/]/#]#/g;
 
-	# only in 8.4
-        #	/\(\*\*/,/\*\*\)/s/\_/#\_#/g;
-
 	# the lexer glues sharp with other symbols
-	/\(\*\*/,/\*\*\)/s/([^A-Za-z0-9 ])#\[#/\1 #[#/g;
-	/\(\*\*/,/\*\*\)/s/([^A-Za-z0-9 ])#]#/\1 #]#/g;
+	/\(\*\*/,/\*\*\)/s/([^`A-Za-z0-9 ])#\[#/\1 #[#/g;
+	/\(\*\*/,/\*\*\)/s/([^`A-Za-z0-9 ])#]#/\1 #]#/g;
+	' |
+
+sed -r -e '
+	# quote a few things
+	/\(\*\*/,/\*\*\)/s/<</#<<#/g;
+	/\(\*\*/,/\*\*\)/s/>>/#>>#/g;
+	/\(\*\*/,/\*\*\)/s/-->/#-->#/g;
+	/\(\*\*/,/\*\*\)/s/_/#_#/g;
 	' |
 
 sed -r -e '
@@ -59,6 +64,44 @@ sed -r -e '
 	s/\n\*\*\)\n/**)/g;
 	' > $f.tmp
 	mv $f.tmp $f
+done
+}
+
+postprocess_html() {
+# post processing
+for f in htmldoc/*.html; do
+sed -r -i -e '
+        # line end spaces
+	s/[ ]*$//;
+        ' $f
+sed -r -i -e '
+	# read the whole file into the pattern space
+	# :a is the label, N glues the current line; b branches
+	# to a if not EOF
+	:a; N; $!ba;
+
+	# extra blank line
+    	s/<div\ class="doc">\n/<div class="doc">/g;
+    	s/<div class="paragraph"> <\/div>//g;
+
+	# weird underscore
+    	s/ /_/g;
+ 
+        # putting back underscore
+	s/#\_#/\_/g;
+	s/#\_/\_/g;
+
+        # avoid << and >> being interpretet as HTML tags
+	s/<</\&lt;\&lt;/g;
+	s/>>/\&gt;\&gt;/g;
+
+
+	# abundance of <br/>
+    	s/\n<br\/> <br\/>//g;
+
+        s/\n\n\n+/\n\n/g;
+        s/\n\n<\/li>/\n<\/li>/g;
+	' $f
 done
 }
 
