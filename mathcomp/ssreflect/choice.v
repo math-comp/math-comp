@@ -502,7 +502,7 @@ HB.structure Definition SubChoice T (P : pred T) :=
   { sT of Choice sT & isSub T P sT }.
 
 Prenex Implicits xchoose choose.
-Notation "[ 'Choice' 'of' T 'by' <: ]" := (Choice.copy T%type (sub_type T))
+Notation "[ 'Choice' 'of' T 'by' <: ]" := (Choice.copy T%type (sub_type T%type))
   (at level 0, format "[ 'Choice'  'of'  T  'by'  <: ]") : form_scope.
 #[deprecated(since="mathcomp 2.0.0", note="Use [Choice of _ by <:] instead.")]
 Notation "[ 'choiceMixin' 'of' T 'by' <: ]" := [Choice of T%type by <:]
@@ -590,7 +590,7 @@ Notation CanCountMixin := CanIsCountable.
 Notation PcanCountMixin := PCanIsCountable.
 
 Notation "[ 'Countable' 'of' T 'by' <: ]" :=
-    (Countable.copy T%type (sub_type T))
+    (Countable.copy T%type (sub_type T%type))
   (at level 0, format "[ 'Countable'  'of'  T  'by'  <: ]") : form_scope.
 #[deprecated(since="mathcomp 2.0.0", note="Use [Countable of _ by <:] instead.")]
 Notation "[ 'countMixin' 'of' T 'by' <: ]" := [Countable of T%type by <:]

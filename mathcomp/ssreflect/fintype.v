@@ -1474,7 +1474,7 @@ HB.end.
 HB.instance Definition _ (T : finType) (P : pred T) (sT : subType P) :=
   (SubCountable_isFinite.Build _ _ (sub_type sT)).
 
-Notation "[ 'Finite' 'of' T 'by' <: ]" := (Finite.copy T%type (sub_type T))
+Notation "[ 'Finite' 'of' T 'by' <: ]" := (Finite.copy T%type (sub_type T%type))
   (at level 0, format "[ 'Finite'  'of'  T  'by'  <: ]") : form_scope.
 #[deprecated(since="mathcomp 2.0.0", note="Use [Finite of _ by <:] instead.")]
 Notation "[ 'finMixin' 'of' T 'by' <: ]" := [Finite of T%type by <:]

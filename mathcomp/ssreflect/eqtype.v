@@ -797,7 +797,7 @@ Proof. exact/val_eqP/eqP. Qed.
 
 Arguments val_eqP {T P sT x y}.
 
-Notation "[ 'Equality' 'of' T 'by' <: ]" := (Equality.copy T%type (sub_type T))
+Notation "[ 'Equality' 'of' T 'by' <: ]" := (Equality.copy T%type (sub_type T%type))
   (at level 0, format "[ 'Equality'  'of'  T  'by'  <: ]") : form_scope.
 #[deprecated(since="mathcomp 2.0.0", note="Use [Equality of _ by <:] instead.")]
 Notation "[ 'eqMixin' 'of' T 'by' <: ]" := [Equality of T%type by <:]

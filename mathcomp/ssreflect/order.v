@@ -5692,10 +5692,10 @@ End Total.
 Module Exports.
 HB.reexport DeprecatedSubOrder.
 Notation "[ 'POrder' 'of' T 'by' <: ]" :=
-  (POrder.copy T%type (sub_type T))
+  (POrder.copy T%type (sub_type T%type))
   (at level 0, format "[ 'POrder'  'of'  T  'by'  <: ]") : form_scope.
 Notation "[ 'Order' 'of' T 'by' <: ]" :=
-  (Total.copy T%type (sub_type T))
+  (Total.copy T%type (sub_type T%type))
   (at level 0, only parsing) : form_scope.
 End Exports.
 End DeprecatedSubOrder.
