@@ -582,11 +582,42 @@ Proof.
 by move=> Hd; case: (monic_comreg mond)=> Hc Hr; rewrite /rmodp redivp_eq.
 Qed.
 
+Lemma rmodp_id (p : {poly R}) : rmodp (rmodp p d) d = rmodp p d.
+Proof.
+by rewrite rmodp_small // ltn_rmodpN0 // monic_neq0.
+Qed.
+
 Lemma rmodpD p q : rmodp (p + q) d = rmodp p d + rmodp q d.
 Proof.
 rewrite [p in LHS]rdivp_eq [q in LHS]rdivp_eq addrACA -mulrDl.
 rewrite rmodp_addl_mul_small //; apply: (leq_ltn_trans (size_add _ _)).
 by rewrite gtn_max !ltn_rmodp // monic_neq0.
+Qed.
+
+Lemma rmodpN p : rmodp (- p) d = - (rmodp p d).
+Proof.
+rewrite {1}(rdivp_eq p) opprD // -mulNr rmodp_addl_mul_small //.
+by rewrite size_opp ltn_rmodp // monic_neq0.
+Qed.
+
+Lemma rmodpB p q : rmodp (p - q) d = rmodp p d - rmodp q d.
+Proof. by rewrite rmodpD rmodpN. Qed.
+
+Lemma rmodpZ a p : rmodp (a *: p) d = a *: (rmodp p d).
+Proof.
+case: (altP (a =P 0%R)) => [-> | cn0]; first by rewrite !scale0r rmod0p.
+have -> : ((a *: p) = (a *: (rdivp p d)) * d + a *: (rmodp p d))%R.
+  by rewrite -scalerAl -scalerDr -rdivp_eq.
+rewrite  rmodp_addl_mul_small //.
+rewrite -mul_polyC; apply: leq_ltn_trans (size_mul_leq _ _) _.
+  rewrite size_polyC cn0 addSn add0n /= ltn_rmodp.
+by apply: monic_neq0.
+Qed.
+
+Lemma rmodp_sum (I : Type) (r : seq I) (P : pred I) (F : I -> {poly R}) :
+   rmodp (\sum_(i <- r | P i) F i) d = (\sum_(i <- r | P i) (rmodp (F i) d)).
+Proof.
+by elim/big_rec2: _ => [|i p q _ <-]; rewrite ?(rmod0p, rmodpD).
 Qed.
 
 Lemma rmodp_mulmr p q : rmodp (p * (rmodp q d)) d = rmodp (p * q) d.
@@ -638,6 +669,34 @@ by rewrite rmodp_small ?rmodp_mull ?addr0// size_polyXn ltnS size_take_poly.
 Qed.
 
 End RingMonic.
+
+Section ComRingMonic.
+
+Variable R : comRingType.
+Implicit Types p q r : {poly R}.
+Variable d : {poly R}.
+Hypothesis mond : d \is monic.
+
+Lemma rmodp_mulml p q : rmodp (rmodp p d * q) d = rmodp (p * q) d.
+Proof. by rewrite [in LHS]mulrC [in RHS]mulrC rmodp_mulmr. Qed.
+
+Lemma rmodpX p n : rmodp ((rmodp p d) ^+ n) d = rmodp (p ^+ n) d.
+Proof.
+elim: n => [|n IH]; first by rewrite !expr0.
+rewrite !exprS -rmodp_mulmr // IH rmodp_mulmr //.
+by rewrite mulrC rmodp_mulmr // mulrC.
+Qed.
+
+Lemma rmodp_compr p q : rmodp (p \Po (rmodp q d)) d = (rmodp (p \Po q) d).
+Proof.
+elim/poly_ind: p => [|p c IH]; first by rewrite !comp_polyC !rmod0p.
+rewrite !comp_polyD !comp_polyM addrC rmodpD //.
+  rewrite mulrC -rmodp_mulmr // IH rmodp_mulmr //.
+  rewrite !comp_polyX !comp_polyC.
+by rewrite mulrC rmodp_mulmr // -rmodpD // addrC.
+Qed.
+
+End ComRingMonic.
 
 End RingMonic.
 
@@ -1059,7 +1118,7 @@ Qed.
 Lemma ltn_modpN0 p q : q != 0 -> size (p %% q) < size q.
 Proof. by rewrite ltn_modp. Qed.
 
-Lemma modp_mod p q : (p %% q) %% q = p %% q.
+Lemma modp_id p q : (p %% q) %% q = p %% q.
 Proof.
 by have [->|qn0] := eqVneq q 0; rewrite ?modp0 // modp_small ?ltn_modp.
 Qed.
@@ -2364,6 +2423,9 @@ End IDomainPseudoDivision.
 
 #[global] Hint Resolve eqpxx divp0 divp1 mod0p modp0 modp1 : core.
 #[global] Hint Resolve dvdp_mull dvdp_mulr dvdpp dvdp0 : core.
+
+#[deprecated(since="mathcomp 2.1.0", note="Use modp_id instead.")]
+Notation modp_mod := modp_id.
 
 End CommonIdomain.
 
