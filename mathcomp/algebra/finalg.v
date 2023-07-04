@@ -126,9 +126,12 @@ Notation "[ 'finComUnitRingType' 'of' T ]" := (ComUnitRing.clone T%type _)
 End ComUnitRingExports.
 HB.export ComUnitRingExports.
 
-#[short(type="finIntegralDomainType")]
+#[short(type="finIdomainType")]
 HB.structure Definition IntegralDomain :=
   {R of GRing.IntegralDomain R & Finite R}.
+#[deprecated(since="mathcomp 2.1.0",
+  note="Use finIdomainType (not available in mathcomp 2.0.0).")]
+Notation finIntegralDomainType := finIdomainType.
 
 Module IntegralDomainExports.
 #[deprecated(since="mathcomp 2.0.0",
@@ -418,7 +421,7 @@ HB.instance Definition _ (R : finRingType) := Ring.on R^o.
 HB.instance Definition _ (R : finComRingType) := Ring.on R^o.
 HB.instance Definition _ (R : finUnitRingType) := Ring.on R^o.
 HB.instance Definition _ (R : finComUnitRingType) := Ring.on R^o.
-HB.instance Definition _ (R : finIntegralDomainType) := Ring.on R^o.
+HB.instance Definition _ (R : finIdomainType) := Ring.on R^o.
 HB.instance Definition _ (R : finFieldType) := Ring.on R^o.
 End RegularExports.
 HB.export RegularExports.
@@ -443,6 +446,10 @@ End FinRing.
 
 Import FinRing.
 HB.reexport.
+
+#[deprecated(since="mathcomp 2.1.0",
+  note="Use finIdomainType (not available in mathcomp 2.0.0).")]
+Notation finIntegralDomainType := finIdomainType.
 
 Notation "{ 'unit' R }" := (unit_of (Phant R))
   (at level 0, format "{ 'unit'  R }") : type_scope.
