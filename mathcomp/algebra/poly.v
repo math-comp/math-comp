@@ -640,6 +640,16 @@ Canonical polyC_rmorphism := AddRMorphism polyC_multiplicative.
 
 Lemma polyC_exp n : {morph polyC : c / c ^+ n}. Proof. exact: rmorphXn. Qed.
 
+Lemma polyC_natr n : n%:R%:P = n%:R :> {poly R}.
+Proof. by rewrite rmorph_nat. Qed.
+
+Lemma char_poly : [char {poly R}] =i [char R].
+Proof.
+move=> p; rewrite !inE; congr (_ && _).
+apply/eqP/eqP=> [/(congr1 val) /=|]; last by rewrite -polyC_natr => ->.
+by rewrite polyseq0 -polyC_natr polyseqC; case: eqP.
+Qed.
+
 Lemma size_exp_leq p n : size (p ^+ n) <= ((size p).-1 * n).+1.
 Proof.
 elim: n => [|n IHn]; first by rewrite size_poly1.

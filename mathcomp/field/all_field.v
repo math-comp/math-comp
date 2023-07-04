@@ -8,3 +8,4 @@ Require Export fieldext.
 Require Export finfield.
 Require Export galois.
 Require Export separable.
+Require Export qfpoly.
