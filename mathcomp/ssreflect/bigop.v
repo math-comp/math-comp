@@ -2592,34 +2592,30 @@ Proof.
 by rewrite sum_nat_seq_eq0// -has_predC; apply: eq_has => x /=; case Px: (P x).
 Qed.
 
-Lemma sum_nat_seq_eq1 (I : eqType) r (P : pred I) (F : I -> nat) :
-    (\sum_(i <- r | P i) F i = 1)%N ->
-  exists i, [/\ i \in r, P i, F i = 1
-            & forall j, j != i -> j \in r -> P j -> F j = 0]%N.
-Proof.
-move=> sumF1.
-have [i ir /andP[Pi nZfi]] : exists2 i, i \in r & (P i && (F i != 0%N)).
-  apply/hasP/(contraPT _ sumF1); rewrite -all_predC => /allP zF.
-  rewrite (eqP (eqbRL (sum_nat_seq_eq0 _ _ _) _))//.
-  by apply/allP => i ir; rewrite implybE -[_ == _]negbK -negb_and; apply: zF.
-exists i; split=> //.
-  apply/eqP/(contraTT _ (eq_leq sumF1)) => n1Fi; rewrite -ltnNge (big_rem i)//=.
-  by rewrite Pi (leq_trans _ (leq_addr _ _))//; case: (F i) nZfi n1Fi => [|[|]].
-move=> j ji rj Pj; apply/eqP/(contraTT _ (eq_leq sumF1)) => nzFj.
-rewrite -ltnNge (big_rem i) 1?(big_rem j) ?rem_mem//= Pi Pj addnA.
-by rewrite (leq_trans _ (leq_addr _ _))// -addn1 leq_add ?lt0n.
-Qed.
-
 Lemma sum_nat_eq1 (I : finType) (P : pred I) (F : I -> nat) :
   reflect
     (exists i : I, [/\ P i, F i = 1 & forall j, j != i -> P j -> F j = 0]%N)
     (\sum_(i | P i) F i == 1)%N.
 Proof.
-apply/(iffP idP) => [|[i [Pi Fi1 zFj]]].
-  move=> /eqP/sum_nat_seq_eq1[i [? ? ? ji]]; exists i; split=> //.
-  by move=> ? ? ?; apply: ji.
-rewrite (bigD1 i)//= Fi1 -[X in _ == X]addn0 eqn_add2l sum_nat_eq0.
-by apply/forall_inP => j /andP[Pj ji]; apply/eqP/zFj.
+apply/(iffP idP) => [sumF_eq1 | [i [Pi Fi1 zFj]]]; last first.
+  rewrite (bigD1 i)//= Fi1 addn_eq1//= orbF sum_nat_eq0.
+  by apply/forall_inP => j /andP[Pj ji]; apply/eqP/zFj.
+have /forall_inPn [i Pi FiN0]: ~~ [forall i in P, F i == 0].
+  by apply: contraTN sumF_eq1 => /'forall_in_eqP F0; rewrite big1.
+move: sumF_eq1; rewrite (bigD1 i)//= addn_eq1 (negPf FiN0)/= orbF.
+move=> /andP[/eqP Fi1]; rewrite sum_nat_eq0 => /'forall_in_eqP FNi0.
+by exists i; split; rewrite // => j /[swap] Nij /(conj Nij)/andP/FNi0.
+Qed.
+
+Lemma sum_nat_seq_eq1 (I : eqType) r (P : pred I) (F : I -> nat) :
+    (\sum_(i <- r | P i) F i = 1)%N ->
+  exists i, [/\ i \in r, P i, F i = 1
+            & forall j, j != i -> j \in r -> P j -> F j = 0]%N.
+Proof.
+rewrite big_tnth/= => /eqP/sum_nat_eq1[/= i [Pi Fi FNi]].
+exists (tnth (in_tuple r) i); split;  rewrite //= ?mem_tnth// => j.
+move=> /[swap] /(tnthP (in_tuple r))[{} j -> Nij /FNi->//].
+by apply: contra_neq Nij => ->.
 Qed.
 
 Lemma prod_nat_seq_eq0 I r (P : pred I) F :

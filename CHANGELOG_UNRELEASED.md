@@ -126,6 +126,9 @@ in `qfpoly.v`
     `sum_nat_eq1`, `prod_nat_seq_eq0`, `prod_nat_seq_neq0`,
     `prod_nat_seq_eq1`, `prod_nat_seq_neq1`
 
+- in `ssrnat.v`
+  + lemma `addn_eq1`
+
 ### Changed
 
 ### Renamed
