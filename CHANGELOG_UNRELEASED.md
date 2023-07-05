@@ -168,6 +168,9 @@ in `qfpoly.v`
 - in `archimedean.v`
   + lemmas `sum_truncK`, `prod_truncK`
 
+- in `ssrnat.v`
+  + lemma `addn_eq1`
+
 ### Changed
 
 - in `order.v`
