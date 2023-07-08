@@ -205,21 +205,29 @@ Proof. by move=> /natrP[n ->]; rewrite pnatr_eq0 ltr0n lt0n. Qed.
 Lemma norm_natr x : x \is a nat_num -> `|x| = x.
 Proof. by move/natr_ge0/ger0_norm. Qed.
 
+Lemma sum_truncK I r (P : pred I) F : (forall i, P i -> F i \is a nat_num) ->
+  (\sum_(i <- r | P i) trunc (F i))%:R = \sum_(i <- r | P i) F i.
+Proof.
+by move=> natr; rewrite -sumrMnr; apply: eq_bigr => i Pi; rewrite truncK ?natr.
+Qed.
+
+Lemma prod_truncK I r (P : pred I) F : (forall i, P i -> F i \is a nat_num) ->
+  (\prod_(i <- r | P i) trunc (F i))%:R = \prod_(i <- r | P i) F i.
+Proof.
+by move=> natr; rewrite natr_prod; apply: eq_bigr => i Pi; rewrite truncK ?natr.
+Qed.
+
 Lemma natr_sum_eq1 (I : finType) (P : pred I) (F : I -> R) :
      (forall i, P i -> F i \is a nat_num) -> \sum_(i | P i) F i = 1 ->
    {i : I | [/\ P i, F i = 1 & forall j, j != i -> P j -> F j = 0]}.
 Proof.
-move=> natF sumF1; pose nF i := trunc (F i).
-have{natF} defF i: P i -> F i = (nF i)%:R by move/natF; rewrite natrE => /eqP.
-have{sumF1} /eqP sumF1: (\sum_(i | P i) nF i == 1)%N.
-  by rewrite -(@eqr_nat R) natr_sum -(eq_bigr _ defF) sumF1.
-have [i Pi nZfi]: {i : I | P i & nF i != 0%N}.
-  by apply/sig2W/exists_inP; rewrite -negb_forall_in -sum_nat_eq0 sumF1.
-have F'ge0 := (leq0n _, etrans (eq_sym _ _) (sum_nat_eq0 (predD1 P i) nF)).
-rewrite -lt0n in nZfi; have [_] := (leqif_add (leqif_eq nZfi) (F'ge0 _)).
-rewrite /= big_andbC -bigD1 // sumF1 => /esym/andP/=[/eqP Fi1 /forall_inP Fi'0].
-exists i; split=> // [|j neq_ji Pj]; first by rewrite defF // -Fi1.
-by rewrite defF // (eqP (Fi'0 j _)) // neq_ji.
+move=> natF /eqP; rewrite -sum_truncK// -[1]/1%:R eqr_nat => /sum_nat_eq1 exi.
+have [i /and3P[Pi /eqP f1 /forallP a]] : {i : I | [&& P i, trunc (F i) == 1
+    & [forall j : I, ((j != i) ==> P j ==> (trunc (F j) == 0))]]}.
+  apply/sigW; have [i [Pi /eqP f1 a]] := exi; exists i; apply/and3P; split=> //.
+  by apply/forallP => j; apply/implyP => ji; apply/implyP => Pj; apply/eqP/a.
+exists i; split=> [//||j ji Pj]; rewrite -[LHS]truncK ?natF ?f1//; apply/eqP.
+by rewrite -[0]/0%:R eqr_nat; apply: implyP Pj; apply: implyP ji; apply: a.
 Qed.
 
 Lemma natr_mul_eq1 x y :
@@ -230,10 +238,9 @@ Lemma natr_prod_eq1 (I : finType) (P : pred I) (F : I -> R) :
     (forall i, P i -> F i \is a nat_num) -> \prod_(i | P i) F i = 1 ->
   forall i, P i -> F i = 1.
 Proof.
-move=> natF prodF1; apply/eqfun_inP; rewrite -big_andE.
-move: prodF1; elim/(big_load (fun x => x \is a nat_num)): _.
-elim/big_rec2: _ => // i all1x x /natF N_Fi [Nx x1all1].
-by split=> [|/eqP]; rewrite ?rpredM ?natr_mul_eq1 // => /andP[-> /eqP].
+move=> natF /eqP; rewrite -prod_truncK// -[1]/1%:R eqr_nat prod_nat_seq_eq1.
+move/allP => a i Pi; apply/eqP; rewrite -[F i]truncK ?natF// eqr_nat.
+by apply: implyP Pi; apply: a; apply: mem_index_enum.
 Qed.
 
 (* floor and int_num *)

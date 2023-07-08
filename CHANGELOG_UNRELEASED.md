@@ -107,6 +107,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `ssrint.v`
   + `RMorphism` instance for `Posz`
+- in `seq.v`
+  + lemma `rem_mem`
 
 - in `cyclic.v`
   + added lemma `units_Zp_cyclic`
@@ -158,11 +160,21 @@ in `qfpoly.v`
   `qX_exp_neq0`, `qX_exp_inj`, `powX_eq_mod`, `qX_expK`, `plogp_lt`, 
   `plogp_X`, `plogp0`, `plogp1`, `plogp_div_eq0`, `plogpD`
    
+- in `bigop.v`
+  + lemmas `sum_nat_seq_eq0`, `sum_nat_seq_neq0`, `sum_nat_seq_eq1`,
+    `sum_nat_eq1`, `prod_nat_seq_eq0`, `prod_nat_seq_neq0`,
+    `prod_nat_seq_eq1`, `prod_nat_seq_neq1`
+
+- in `archimedean.v`
+  + lemmas `sum_truncK`, `prod_truncK`
+
+- in `ssrnat.v`
+  + lemma `addn_eq1`
+
 ### Changed
 
 - in `order.v`
   + make `[Order of T by <:]` compatible with the SubOrder hierarchy
-
 
 ### Renamed
 
