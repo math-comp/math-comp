@@ -400,7 +400,7 @@ have fZ: scalable f.
 pose faM := GRing.isAdditive.Build _ _ f fA.
 pose fmM := GRing.isMultiplicative.Build _ _ f fM.
 pose flM := GRing.isScalable.Build _ _ _ _ f fZ.
-pose fLRM : GRing.LRMorphism.type _ _ _ _ := HB.pack f faM fmM flM.
+pose fLRM : {lrmorphism _ -> _} := HB.pack f faM fmM flM.
 have /kAut_to_gal[alpha galLalpha Dalpha]: kAut 1 {:L} (linfun fLRM).
   rewrite kAutfE; apply/kHomP; split=> [x y _ _ | x /idfP]; rewrite !lfunE //=.
   exact: (rmorphM fLRM).

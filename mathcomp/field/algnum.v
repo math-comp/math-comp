@@ -226,7 +226,7 @@ pose nu0aM := GRing.isAdditive.Build Qn Qn nu0 nu0a.
 pose nu0mM := GRing.isMultiplicative.Build Qn Qn nu0 nu0m.
 pose nu0RM : GRing.RMorphism.type _ _ := HB.pack nu0 nu0aM nu0mM.
 pose nu0lM := GRing.isScalable.Build rat Qn Qn *:%R nu0 (fmorph_numZ nu0RM).
-pose nu0LRM : GRing.LRMorphism.type _ _ _ _ := HB.pack nu0 nu0aM nu0mM nu0lM.
+pose nu0LRM : {lrmorphism _ -> _} := HB.pack nu0 nu0aM nu0mM nu0lM.
 by exists nu0LRM.
 Qed.
 
@@ -396,7 +396,7 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     pose in01aM := GRing.isAdditive.Build _ _ in01 in01a.
     pose in01mM := GRing.isMultiplicative.Build _ _ in01 in01m.
     pose in01lM := GRing.isScalable.Build _ _  _ _ in01 in01l.
-    pose in01LRM : GRing.LRMorphism.type _ _ _ _ := HB.pack in01
+    pose in01LRM : {lrmorphism _ -> _} := HB.pack in01
       in01aM in01mM in01lM.
     by exists in01LRM.
   have {z zz Dz px} Dx: exists xx, x = QrC xx.
@@ -431,15 +431,14 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     by rewrite rmorphB /= map_polyX map_polyC.
   have [f1 aut_f1 Df1]:= kHom_extends (sub1v (ASpace algK)) hom_f Qpr splitQr.
   pose f1mM := GRing.isMultiplicative.Build _ _ f1 (kHom_lrmorphism aut_f1).
-  pose nu : GRing.LRMorphism.type _ _ _ _ := HB.pack (fun_of_lfun f1) f1mM.
+  pose nu : {lrmorphism _ -> _} := HB.pack (fun_of_lfun f1) f1mM.
   exists (SubAut Qr QrC nu) => //; exists in01 => //= y.
   by rewrite -Df -Df1 //; apply/memK; exists y.
 have phiZ: scalable phi.
   move=> a y; do 2!rewrite -mulr_algl -in_algE; rewrite -[a]divq_num_den.
   by rewrite fmorph_div rmorphM [X in X * _]fmorph_div !rmorph_int.
 pose philM := GRing.isScalable.Build _ _ _ _ phi phiZ.
-pose phiLRM : GRing.LRMorphism.type _ _ _ _ :=
-  HB.pack (GRing.RMorphism.sort phi) philM.
+pose phiLRM : {lrmorphism _ -> _} := HB.pack (GRing.RMorphism.sort phi) philM.
 pose fix ext n :=
   if n is i.+1 then oapp (fun x => s2val (ext1 (ext i) x)) (ext i) (unpickle i)
   else SubAut Qs QsC phiLRM.
@@ -478,7 +477,7 @@ have num : multiplicative nu.
   by rewrite (fmorph_inj _ Dx) !rmorphM /= -!nu_inj Dx1 Dx2.
 pose nuaM := GRing.isAdditive.Build _ _ nu nua.
 pose numM := GRing.isMultiplicative.Build _ _ nu num.
-pose nuRM : GRing.RMorphism.type _ _ := HB.pack nu nuaM numM.
+pose nuRM : {rmorphism _ -> _} := HB.pack nu nuaM numM.
 by exists nuRM => x; rewrite /= (nu_inj 0).
 Qed.
 
