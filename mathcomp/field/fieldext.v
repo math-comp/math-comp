@@ -1388,8 +1388,7 @@ have tol_mul : multiplicative (toL : {poly F} -> aL).
     apply: toPinj; rewrite !toL_K // modp_mul -!(mulrC r) modp_mul.
 pose toLlM := GRing.isLinear.Build _ _ _ _ toL tol_lin.
 pose toLmM := GRing.isMultiplicative.Build _ _ _ tol_mul.
-pose toLLRM : GRing.LRMorphism.type _ _ _ _ :=
-  HB.pack (toL : {poly F} -> aL) toLlM toLmM.
+pose toLLRM : {lrmorphism _ -> feL} := HB.pack toL toLlM toLmM.
 by exists toLLRM.
 Qed.
 
