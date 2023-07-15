@@ -224,6 +224,8 @@ End intZmod.
 
 HB.instance Definition _ := intZmod.Mixin.
 
+Import NatInstances.
+
 HB.instance Definition _ := GRing.isSemiAdditive.Build nat int Posz
   (erefl, intZmod.PoszD).
 

@@ -6680,10 +6680,11 @@ Lemma bool_fieldP : Field.axiom bool. Proof. by []. Qed.
 HB.instance Definition _ := ComUnitRing_isField.Build bool bool_fieldP.
 
 (* Algebraic structure of nat *)
-
+Module Import NatInstances.
 HB.instance Definition _ := isNmodule.Build nat addnA addnC add0n.
 HB.instance Definition _ := Nmodule_isComSemiRing.Build nat
   mulnA mulnC mul1n mulnDl mul0n erefl.
+End NatInstances.
 
 HB.instance Definition _ (V : nmodType) (x : V) :=
   isSemiAdditive.Build nat V (natmul x) (mulr0n x, mulrnDr x).
