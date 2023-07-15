@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From elpi.apps Require Import coercion.
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
 From mathcomp Require Import choice fintype finfun bigop prime binomial.
@@ -516,6 +517,7 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Declare Scope ring_scope.
+Declare Scope ring_coercions.
 Declare Scope term_scope.
 Declare Scope linear_ring_scope.
 
@@ -570,6 +572,8 @@ Reserved Notation "'{' 'linear' U '->' V '}'"
 
 Declare Scope ring_scope.
 Delimit Scope ring_scope with R.
+Declare Scope ring_coercions.
+Delimit Scope ring_coercions with Rc.
 Declare Scope term_scope.
 Delimit Scope term_scope with T.
 Local Open Scope ring_scope.
@@ -6135,7 +6139,11 @@ Notation support := 0.-support.
 Notation "1" := (@one _) : ring_scope.
 Notation "- 1" := (opp 1) : ring_scope.
 
-Notation "n %:R" := (natmul 1 n) : ring_scope.
+Notation "n %:R" := (natmul 1 n) (only parsing) : ring_scope.
+Notation "n" := (natmul 1 n) (only printing, at level 2) : ring_scope.
+Notation "n '%:R'" := (natmul 1 n) (only printing) : ring_coercions.
+Disable Notation "n %:R" : ring_coercions.
+
 Notation "[ 'char' R ]" := (char (Phant R)) : ring_scope.
 Notation Frobenius_aut chRp := (Frobenius_aut chRp).
 Notation "*%R" := (@mul _) : fun_scope.
@@ -6700,3 +6708,12 @@ Lemma natrDE n m : n + m = (n + m)%N. Proof. by []. Qed.
 Lemma natrME n m : n * m = (n * m)%N. Proof. by []. Qed.
 Lemma natrXE n m : n ^+ m = (n ^ m)%N. Proof. by []. Qed.
 Definition natrE := (natr0E, natr1E, natn, natrDE, natrME, natrXE).
+
+Elpi Accumulate Coercion lp:{{
+coercion _ N Inferred Expected Res :-
+  coq.unify-eq {{ nat }} Inferred ok, !,
+  coq.unify-eq {{ GRing.SemiRing.sort lp:R }} Expected ok, !,
+  coq.unify-eq {{ GRing.Nmodule.sort lp:V }} Expected ok, !,
+  Res = {{ @GRing.natmul lp:V (@GRing.one lp:R) lp:N }}.
+}}.
+Elpi Typecheck Coercion.
