@@ -234,7 +234,7 @@ Proof. by case: x. Qed.
 Fact scalq_eq0 x : (scalq x == 0) = (x.2 == 0).
 Proof.
 case: x => n d; rewrite scalq_def /= mulf_eq0 sgr_eq0 /= eqz_nat.
-rewrite -[gcdn _ _ == 0]negbK -lt0n gcdn_gt0 ?absz_gt0 [X in ~~ X]orbC.
+rewrite -[gcdn _ _ == 0%N]negbK -lt0n gcdn_gt0 ?absz_gt0 [X in ~~ X]orbC.
 by case: sgrP.
 Qed.
 
@@ -607,7 +607,7 @@ Qed.
 Lemma coprimeq_num n d : coprime `|n| `|d| -> numq (n%:~R / d%:~R) = sgr d * n.
 Proof.
 move=> cnd /=; have <- := fracqE (n, d).
-rewrite num_fracq/= (eqP (cnd : _ == 1)) divn1.
+rewrite num_fracq/= (eqP (cnd : _ == 1%N)) divn1.
 have [|d_gt0|d_lt0] := sgrP d;
 by rewrite (mul0r, mul1r, mulN1r) //= ?[_ ^ _]signrN ?mulNr mulz_sign_abs.
 Qed.
@@ -616,7 +616,7 @@ Lemma coprimeq_den n d :
   coprime `|n| `|d| -> denq (n%:~R / d%:~R) = (if d == 0 then 1 else `|d|).
 Proof.
 move=> cnd; have <- := fracqE (n, d).
-by rewrite den_fracq/= (eqP (cnd : _ == 1)) divn1; case: d {cnd}; case.
+by rewrite den_fracq/= (eqP (cnd : _ == 1%N)) divn1; case: d {cnd}; case.
 Qed.
 
 Lemma denqVz (i : int) : i != 0 -> denq (i%:~R^-1) = `|i|.

@@ -313,7 +313,7 @@ apply/prodvP=> _ _ /vlineP[a ->] /vlineP[b ->].
 by rewrite -scalerAr -scalerAl !memvZ ?memv_line.
 Qed.
 
-Lemma dimv1: \dim (1%VS : {vspace aT}) = 1.
+Lemma dimv1: \dim (1%VS : {vspace aT}) = 1%N.
 Proof. by rewrite dim_vline oner_neq0. Qed.
 
 Lemma dim_prodv U V : \dim (U * V) <= \dim U * \dim V.

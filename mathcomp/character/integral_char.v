@@ -324,7 +324,7 @@ rewrite ltnNge {C}defC; set m := #|_|; apply/negP=> p_natC.
 have{p_natC} [p p_pr [a Dm]]: {p : nat & prime p & {a | m = p ^ a}%N}.
   have /prod_prime_decomp->: (0 < m)%N by rewrite /m -index_cent1.
   rewrite prime_decompE; case Dpr: (primes _) p_natC => [|p []] // _.
-    by exists 2%N => //; rewrite big_nil; exists 0.
+    by exists 2%N => //; rewrite big_nil; exists 0%N.
   rewrite big_seq1; exists p; last by exists (logn p m).
   by have:= mem_primes p m; rewrite Dpr mem_head => /esym/and3P[].
 have{simpleG} [ntG minG] := simpleP _ simpleG.

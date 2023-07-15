@@ -364,10 +364,10 @@ Proof. by rewrite [n]prednK // divn_gt0 ?adim_gt0 // dimvS ?subv_adjoin. Qed.
 Lemma dim_Fadjoin : \dim <<K; x>> = (n * \dim K)%N.
 Proof. by rewrite adjoin_degreeE -dim_sup_field ?subv_adjoin. Qed.
 
-Lemma adjoin0_deg : adjoin_degree K 0 = 1.
+Lemma adjoin0_deg : adjoin_degree K 0 = 1%N.
 Proof. by rewrite /adjoin_degree addv0 subfield_closed divnn adim_gt0. Qed.
 
-Lemma adjoin_deg_eq1 : (n == 1) = (x \in K).
+Lemma adjoin_deg_eq1 : (n == 1%N) = (x \in K).
 Proof.
 rewrite (sameP Fadjoin_idP eqP) adjoin_degreeE; have sK_Kx := subv_adjoin K x.
 apply/eqP/idP=> [dimKx1 | /eqP->]; last by rewrite divnn adim_gt0.

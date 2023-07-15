@@ -531,7 +531,7 @@ have{pG esG} [Es p3Es defG] := extraspecial_structure pG esG.
 set Z := 'Z(G) in oZ defG p3Es.
 elim: Es {+}G => [|E Es IHs] S in n oG expG p3Es defG *.
   rewrite big_nil cprod1g in defG; rewrite -defG.
-  have ->: n = 0.
+  have ->: n = 0%N.
     apply: double_inj; apply/eqP.
     by rewrite -eqSS -(eqn_exp2l _ _ p_gt1) -oG -defG oZ.
   by rewrite isog_cyclic_card prime_cyclic ?oZ ?card_pX1p2n //=.
@@ -670,7 +670,7 @@ rewrite subEproper; case/predU1P=> [defG1 | ltZG1].
       by apply: contra (extraspecial_nonabelian esG); apply: cyclic_abelian.
     move: oZ; rewrite defG1; move/prime_Ohm1P; rewrite (negPf not_cycG) /=.
     by apply=> //; apply: contra not_cycG; move/eqP->; apply: cyclic1.
-  have [n0 n'3]: n = 0 /\ n' = 3.
+  have [n0 n'3]: n = 0%N /\ n' = 3.
     have [[x y] genG _] := generators_quaternion n'_gt2 isoG.
     have n'3: n' = 3.
       have [_ [_ _ oG' _] _ _ _] := quaternion_structure n'_gt2 genG isoG.
@@ -696,7 +696,7 @@ have isoE: E \isog 2^{1+2}.
   by rewrite (eq_y2 x) // -cycle_subG -defZx defZE.
 rewrite oG doubleS 2!expnS divnMl ?mulKn // in oR.
 case: ifP esR => [_ defR | _ esR].
-  have ->: n = 0 by move/eqP: oR; rewrite defR oZ (eqn_exp2l 1) //; case n.
+  have ->: n = 0%N by move/eqP: oR; rewrite defR oZ (eqn_exp2l 1) //; case n.
   left; apply: isog_trans (isog_symr (ncprod1 _)).
   by rewrite -defG defR -defZE cprod_center_id.
 have AutZin2_1p2: Aut_in (Aut 2^{1+2}) 'Z(2^{1+2}) \isog Aut 'Z(2^{1+2}).

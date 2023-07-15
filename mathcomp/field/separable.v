@@ -54,7 +54,7 @@ Qed.
 
 Lemma poly_square_freeP p :
   (forall u v, u * v %| p -> coprimep u v)
-  <-> (forall u, size u != 1 -> ~~ (u ^+ 2 %| p)).
+  <-> (forall u, size u != 1%N -> ~~ (u ^+ 2 %| p)).
 Proof.
 split=> [sq'p u | sq'p u v dvd_uv_p].
   by apply: contra => /sq'p; rewrite coprimepp.
@@ -95,7 +95,7 @@ Lemma separable_coprime p u v : separable p -> u * v %| p -> coprimep u v.
 Proof. by move=> /separable_polyP[sq'p _] /sq'p. Qed.
 
 Lemma separable_nosquare p u k :
-  separable p -> 1 < k -> size u != 1 -> (u ^+ k %| p) = false.
+  separable p -> 1 < k -> size u != 1%N -> (u ^+ k %| p) = false.
 Proof.
 move=> /separable_polyP[/poly_square_freeP sq'p _] /subnKC <- /sq'p.
 by apply: contraNF; apply: dvdp_trans; rewrite exprD dvdp_mulr.
@@ -605,7 +605,7 @@ Lemma separable_exponent K x :
 Proof.
 pose d := adjoin_degree K x; move: {2}d.+1 (ltnSn d) => n.
 elim: n => // n IHn in x @d *; rewrite ltnS => le_d_n.
-have [[p charLp]|] := altP (separablePn K x); last by rewrite negbK; exists 1.
+have [[p charLp]|] := altP (separablePn K x); last by rewrite negbK; exists 1%N.
 case=> g Kg defKx; have p_pr := charf_prime charLp.
 suffices /IHn[m /andP[charLm sepKxpm]]: adjoin_degree K (x ^+ p) < n.
   by exists (p * m)%N; rewrite pnatM pnatE // charLp charLm exprM.
@@ -637,9 +637,9 @@ move=> charLp; apply/idP/idP=> [sepKx | /Fadjoin_poly_eq]; last first.
   - by rewrite rootE !hornerE horner_comp hornerXn Dx subrr.
   rewrite unlock !(derivE, deriv_comp) -mulr_natr -rmorphMn /= mL0.
   by rewrite !mulr0 subr0 coprimep1.
-without loss{e} ->: e x sepKx / e = 0.
+without loss{e} ->: e x sepKx / e = 0%N.
   move=> IH; elim: {e}e.+1 => [|e]; [exact: memv_adjoin | apply: subvP].
-  apply/FadjoinP/andP; rewrite subv_adjoin expnSr exprM (IH 0) //.
+  apply/FadjoinP/andP; rewrite subv_adjoin expnSr exprM (IH 0%N) //.
   by have /adjoin_separableP-> := sepKx; rewrite ?rpredX ?memv_adjoin.
 set K' := <<K; x ^+ p>>%VS; have sKK': (K <= K')%VS := subv_adjoin _ _.
 pose q := minPoly K' x; pose g := 'X^p - (x ^+ p)%:P.
@@ -651,7 +651,7 @@ have co_c_g: coprimep c g.
   rewrite /g polyC_exp -!(Frobenius_autE charPp) -rmorphB coprimep_expr //.
   have: separable_poly q := separable_elementS sKK' sepKx.
   by rewrite Dq separable_mul => /and3P[].
-have{g K'g co_c_g} /size_poly1P[a nz_a Dc]: size c == 1.
+have{g K'g co_c_g} /size_poly1P[a nz_a Dc]: size c == 1%N.
   suffices c_dv_g: c %| g by rewrite -(eqp_size (dvdp_gcd_idl c_dv_g)).
   have: q %| g by rewrite minPoly_dvdp // rootE !hornerE subrr.
   by apply: dvdp_trans; rewrite Dq dvdp_mulIl.
@@ -693,7 +693,7 @@ Lemma separable_inseparable_element K x :
   separable_element K x && purely_inseparable_element K x = (x \in K).
 Proof.
 rewrite /purely_inseparable_element; case: ex_minnP => [[|m]] //=.
-rewrite subfield_closed; case: m => /= [-> //| m _ /(_ 1)/implyP/= insepKx].
+rewrite subfield_closed; case: m => /= [-> //| m _ /(_ 1%N)/implyP/= insepKx].
 by rewrite (negPf insepKx) (contraNF (@base_separable K x) insepKx).
 Qed.
 
@@ -830,7 +830,7 @@ have adjK_C z t: (<<<<K; z>>; t>> = <<<<K; t>>; z>>)%VS.
   by rewrite !agenv_add_id -!addvA (addvC <[_]>%VS).
 have [z defKz] := Primitive_Element_Theorem x sepKyn.
 exists z => [|/adjoin_separable->]; rewrite ?sepKx_y // -defKz.
-have [|n_gt1|-> //] := ltngtP n 1; first by case: (n) charLn.
+have [|n_gt1|-> //] := ltngtP n 1%N; first by case: (n) charLn.
 apply/eqP; rewrite !(adjK_C _ x) eqEsubv; apply/andP.
 split; apply/FadjoinP/andP; rewrite subv_adjoin ?rpredX ?memv_adjoin //=.
 by rewrite -charf_n_separable ?sepKx_y.

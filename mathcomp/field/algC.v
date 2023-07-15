@@ -1015,11 +1015,11 @@ Proof. exact: truncK. Qed.
 Lemma truncC_gt0 x : (0 < truncC x)%N = (1 <= x).
 Proof. exact: trunc_gt0. Qed.
 
-Lemma truncC0Pn x : reflect (truncC x = 0) (~~ (1 <= x)).
+Lemma truncC0Pn x : reflect (truncC x = 0%N) (~~ (1 <= x)).
 Proof. exact: trunc0Pn. Qed.
 
-Lemma truncC0 : truncC 0 = 0. Proof. exact: trunc0. Qed.
-Lemma truncC1 : truncC 1 = 1. Proof. exact: trunc1. Qed.
+Lemma truncC0 : truncC 0 = 0%N. Proof. exact: trunc0. Qed.
+Lemma truncC1 : truncC 1 = 1%N. Proof. exact: trunc1. Qed.
 
 Lemma truncCD :
   {in Cnat & Num.nneg, {morph truncC : x y / x + y >-> (x + y)%N}}.

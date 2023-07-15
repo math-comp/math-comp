@@ -182,14 +182,14 @@ Fixpoint Gaussian_elimination_ {F : fieldType} {m n} : 'M[F]_(m, n) -> 'M_m * 'M
       let u := ursubmx A1 in let v := a^-1 *: dlsubmx A1 in
       let: (L, U, r) := Gaussian_elimination_ (drsubmx A1 - v *m u) in
       (xrow i 0 (block_mx 1 0 v L), xcol j 0 (block_mx a%:M u 0 U), r.+1)
-    else (1%:M, 1%:M, 0)
-  | _, _ => fun _ => (1%:M, 1%:M, 0)
+    else (1%:M, 1%:M, 0%N)
+  | _, _ => fun _ => (1%:M, 1%:M, 0%N)
   end.
 HB.lock Definition Gaussian_elimination := @Gaussian_elimination_.
 Canonical Gaussian_elimination_unlockable := Unlockable Gaussian_elimination.unlock.
 
 HB.lock Definition mxrank (F : fieldType) m n (A : 'M_(m, n)) :=
-  if [|| m == 0 | n == 0]%N then 0 else (@Gaussian_elimination F m n A).2.
+  if [|| m == 0 | n == 0]%N then 0%N else (@Gaussian_elimination F m n A).2.
 Canonical mxrank_unlockable := Unlockable mxrank.unlock.
 
 Section RowSpaceTheoryDefs.
@@ -509,7 +509,7 @@ Proof. by rewrite -scaleN1r mxrank_scale_nz // oppr_eq0 oner_eq0. Qed.
 Lemma mxrank0 m n : \rank (0 : 'M_(m, n)) = 0%N.
 Proof. by apply/eqP; rewrite -leqn0 -(@mulmx0 _ m 0 n 0) mulmx_max_rank. Qed.
 
-Lemma mxrank_eq0 m n (A : 'M_(m, n)) : (\rank A == 0) = (A == 0).
+Lemma mxrank_eq0 m n (A : 'M_(m, n)) : (\rank A == 0%N) = (A == 0).
 Proof.
 apply/eqP/eqP=> [rA0 | ->{A}]; last exact: mxrank0.
 move: (col_base A) (row_base A) (mulmx_base A); rewrite rA0 => Ac Ar <-.
@@ -753,7 +753,7 @@ Proof. by rewrite -row_full_unit => /eqnP. Qed.
 
 Lemma mxrank1 n : \rank (1%:M : 'M_n) = n. Proof. exact: mxrank_unit. Qed.
 
-Lemma mxrank_delta m n i j : \rank (delta_mx i j : 'M_(m, n)) = 1.
+Lemma mxrank_delta m n i j : \rank (delta_mx i j : 'M_(m, n)) = 1%N.
 Proof.
 apply/eqP; rewrite eqn_leq lt0n mxrank_eq0.
 rewrite -{1}(mul_delta_mx (0 : 'I_1)) mulmx_max_rank.
@@ -1869,7 +1869,7 @@ Qed.
 Lemma maxrankfun_inj : injective mxf.
 Proof.
 move=> i j eqAij; have /row_free_inj := maxrowsub_free.
-move=> /(_ 1) /(_ (delta_mx 0 i) (delta_mx 0 j)).
+move=> /(_ 1%N) /(_ (delta_mx 0 i) (delta_mx 0 j)).
 rewrite -!rowE !row_rowsub eqAij => /(_ erefl) /matrixP /(_ 0 i) /eqP.
 by rewrite !mxE !eqxx/=; case: (i =P j); rewrite // oner_eq0.
 Qed.
@@ -2561,7 +2561,7 @@ move=> p_pr; have p_gt1 := prime_gt1 p_pr.
 have p_i_gt0: p ^ _ > 0 by move=> i; rewrite expn_gt0 ltnW.
 have <- : #|'GL_n.-1.+1(p)| = #|'GL_n(p)| by [].
 rewrite (card_GL _ (ltn0Sn n.-1)) card_ord Fp_cast // big_add1 /=.
-pose p'gt0 m := m > 0 /\ logn p m = 0.
+pose p'gt0 m := m > 0 /\ logn p m = 0%N.
 suffices [Pgt0 p'P]: p'gt0 (\prod_(0 <= i < n.-1.+1) (p ^ i.+1 - 1))%N.
   by rewrite lognM // p'P pfactorK // addn0; case n.
 apply: big_ind => [|m1 m2 [m10 p'm1] [m20]|i _]; rewrite {}/p'gt0 ?logn1 //.

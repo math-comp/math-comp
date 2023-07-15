@@ -1475,7 +1475,7 @@ Proof. by move=> /(ler_wMn2r n); rewrite mul0rn. Qed.
 Lemma mulrn_wle0 x n : x <= 0 -> x *+ n <= 0.
 Proof. by move=> /(ler_wMn2r n); rewrite mul0rn. Qed.
 
-Lemma lerMn2r n x y : (x *+ n <= y *+ n) = ((n == 0) || (x <= y)).
+Lemma lerMn2r n x y : (x *+ n <= y *+ n) = ((n == 0%N) || (x <= y)).
 Proof. by case: n => [|n]; rewrite ?lexx ?eqxx // ler_pMn2r. Qed.
 
 Lemma ltrMn2r n x y : (x *+ n < y *+ n) = ((0 < n)%N && (x < y)).
@@ -1544,9 +1544,9 @@ Lemma eqr_nat m n : (m%:R == n%:R :> R) = (m == n)%N.
 Proof. by rewrite (inj_eq (mulrIn _)) ?oner_eq0. Qed.
 
 Lemma pnatr_eq1 n : (n%:R == 1 :> R) = (n == 1)%N.
-Proof. exact: eqr_nat 1. Qed.
+Proof. exact: eqr_nat 1%N. Qed.
 
-Lemma lern0 n : (n%:R <= 0 :> R) = (n == 0).
+Lemma lern0 n : (n%:R <= 0 :> R) = (n == 0%N).
 Proof. by rewrite -[0]/0%:R ler_nat leqn0. Qed.
 
 Lemma ltrn0 n : (n%:R < 0 :> R) = false.
@@ -1863,7 +1863,7 @@ move=> xge0 xle1; elim: n=> [|*]; rewrite ?expr0 // exprS.
 by rewrite mulr_ile1 ?exprn_ge0.
 Qed.
 
-Lemma exprn_ilt1 n x : 0 <= x -> x < 1 -> x ^+ n < 1 = (n != 0).
+Lemma exprn_ilt1 n x : 0 <= x -> x < 1 -> x ^+ n < 1 = (n != 0%N).
 Proof.
 move=> xge0 xlt1.
 case: n; [by rewrite eqxx ltxx | elim=> [|n ihn]; first by rewrite expr1].
@@ -1877,7 +1877,7 @@ Proof.
 by move=> x_ge1; elim: n=> [|n ihn]; rewrite ?expr0 // exprS mulr_ege1.
 Qed.
 
-Lemma exprn_egt1 n x : 1 < x -> 1 < x ^+ n = (n != 0).
+Lemma exprn_egt1 n x : 1 < x -> 1 < x ^+ n = (n != 0%N).
 Proof.
 move=> xgt1; case: n; first by rewrite eqxx ltxx.
 by elim=> [|n ihn]; rewrite ?expr1// exprS mulr_egt1 // exprn_ge0.
@@ -1925,7 +1925,7 @@ move=> xge1 m n /= hmn; rewrite -(subnK hmn) exprD.
 by rewrite ler_peMl ?(exprn_ge0, exprn_ege1) // (le_trans _ xge1) ?ler01.
 Qed.
 
-Lemma ieexprn_weq1 x n : 0 <= x -> (x ^+ n == 1) = ((n == 0) || (x == 1)).
+Lemma ieexprn_weq1 x n : 0 <= x -> (x ^+ n == 1) = ((n == 0%N) || (x == 1)).
 Proof.
 move=> xle0; case: n => [|n]; first by rewrite expr0 eqxx.
 case: (@real_ltgtP x 1); do ?by rewrite ?ger0_real.
@@ -1970,7 +1970,7 @@ Proof. by move=> xgt1; apply: (leW_mono (ler_eXn2l _)). Qed.
 
 Definition lter_eXn2l := (ler_eXn2l, ltr_eXn2l).
 
-Lemma ltrXn2r n x y : 0 <= x -> x < y -> x ^+ n < y ^+ n = (n != 0).
+Lemma ltrXn2r n x y : 0 <= x -> x < y -> x ^+ n < y ^+ n = (n != 0%N).
 Proof.
 move=> xge0 xlty; case: n; first by rewrite ltxx.
 elim=> [|n IHn]; rewrite ?[_ ^+ _.+2]exprS //.
@@ -2040,7 +2040,7 @@ Definition expr_gte1 := (expr_ge1, expr_gt1).
 Lemma pexpr_eq1 x n : (0 < n)%N -> 0 <= x -> (x ^+ n == 1) = (x == 1).
 Proof. by move=> ngt0 xge0; rewrite !eq_le expr_le1 // expr_ge1. Qed.
 
-Lemma pexprn_eq1 x n : 0 <= x -> (x ^+ n == 1) = (n == 0) || (x == 1).
+Lemma pexprn_eq1 x n : 0 <= x -> (x ^+ n == 1) = (n == 0%N) || (x == 1).
 Proof. by case: n => [|n] xge0; rewrite ?eqxx // pexpr_eq1 ?gtn_eqF. Qed.
 
 Lemma eqrXn2 n x y :
@@ -2419,7 +2419,7 @@ by rewrite andbT negb_and lt0n negbK.
 Qed.
 
 Lemma real_exprn_even_le0 n x :
-  x \is real -> ~~ odd n -> (x ^+ n <= 0) = (n != 0) && (x == 0).
+  x \is real -> ~~ odd n -> (x ^+ n <= 0) = (n != 0%N) && (x == 0).
 Proof.
 move=> xR n_even; rewrite !real_leNgt ?rpred0 ?rpredX //.
 by rewrite real_exprn_even_gt0 // negb_or negbK.
@@ -2525,13 +2525,13 @@ Proof. by rewrite -sqrf_eq0 sqr_sg pnatr_eq0; case: (x == 0). Qed.
 Lemma sgr_odd n x : x != 0 -> (sg x) ^+ n = (sg x) ^+ (odd n).
 Proof. by rewrite /sg; do 2!case: ifP => // _; rewrite ?expr1n ?signr_odd. Qed.
 
-Lemma sgrMn x n : sg (x *+ n) = (n != 0)%:R * sg x.
+Lemma sgrMn x n : sg (x *+ n) = (n != 0%N)%:R * sg x.
 Proof.
 case: n => [|n]; first by rewrite mulr0n sgr0 mul0r.
 by rewrite !sgr_def mulrn_eq0 mul1r pmulrn_llt0.
 Qed.
 
-Lemma sgr_nat n : sg n%:R = (n != 0)%:R :> R.
+Lemma sgr_nat n : sg n%:R = (n != 0%N)%:R :> R.
 Proof. by rewrite sgrMn sgr1 mulr1. Qed.
 
 Lemma sgr_id x : sg (sg x) = sg x.
@@ -3914,7 +3914,7 @@ Proof. by move=> even_n; rewrite real_exprn_even_ge0 ?num_real. Qed.
 Lemma exprn_even_gt0 n x : ~~ odd n -> (0 < x ^+ n) = (n == 0)%N || (x != 0).
 Proof. by move=> even_n; rewrite real_exprn_even_gt0 ?num_real. Qed.
 
-Lemma exprn_even_le0 n x : ~~ odd n -> (x ^+ n <= 0) = (n != 0) && (x == 0).
+Lemma exprn_even_le0 n x : ~~ odd n -> (x ^+ n <= 0) = (n != 0%N) && (x == 0).
 Proof. by move=> even_n; rewrite real_exprn_even_le0 ?num_real. Qed.
 
 Lemma exprn_even_lt0 n x : ~~ odd n -> (x ^+ n < 0) = false.
@@ -5009,7 +5009,7 @@ Section Pdeg2NumClosed.
 
 Variables (F : numClosedFieldType) (p : {poly F}).
 
-Hypothesis degp : size p = 3.
+Hypothesis degp : size p = 3%N.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -5041,7 +5041,7 @@ Section Pdeg2NumClosedMonic.
 
 Variables (F : numClosedFieldType) (p : {poly F}).
 
-Hypothesis degp : size p = 3.
+Hypothesis degp : size p = 3%N.
 Hypothesis monicp : p \is monic.
 
 Let a := p`_2.
@@ -5074,7 +5074,7 @@ Variable F : realFieldType.
 Section Pdeg2RealConvex.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3.
+Hypothesis degp : size p = 3%N.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -5124,7 +5124,7 @@ End Pdeg2RealConvex.
 Section Pdeg2RealConcave.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3.
+Hypothesis degp : size p = 3%N.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -5134,7 +5134,7 @@ Hypothesis ale0 : a <= 0.
 
 Let delta := b ^+ 2 - 4 * a * c.
 
-Let degpN : size (- p) = 3. Proof. by rewrite size_opp. Qed.
+Let degpN : size (- p) = 3%N. Proof. by rewrite size_opp. Qed.
 Let b2a : - (- p)`_1 / (2 * (- p)`_2) = - b / (2 * a).
 Proof. by rewrite !coefN mulrN divrNN. Qed.
 Let deltaN : (- p)`_1 ^+ 2 - 4 * (- p)`_2 * (- p)`_0 = delta.
@@ -5173,7 +5173,7 @@ Variable F : rcfType.
 Section Pdeg2RealClosedConvex.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3.
+Hypothesis degp : size p = 3%N.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -5283,7 +5283,7 @@ End Pdeg2RealClosedConvex.
 Section Pdeg2RealClosedConcave.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3.
+Hypothesis degp : size p = 3%N.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -5296,7 +5296,7 @@ Let r2 := (- b - sqrt delta) / (2 * a).
 
 Hypothesis ale0 : a <= 0.
 
-Let degpN : size (- p) = 3. Proof. by rewrite size_opp. Qed.
+Let degpN : size (- p) = 3%N. Proof. by rewrite size_opp. Qed.
 Let aNge0 : 0 <= (- p)`_2. Proof. by rewrite coefN oppr_ge0. Qed.
 Let deltaN : (- p)`_1 ^+ 2 - 4 * (- p)`_2 * (- p)`_0 = delta.
 Proof. by rewrite !coefN sqrrN -mulrN opprK mulrN mulNr. Qed.
@@ -5341,7 +5341,7 @@ Section Pdeg2RealMonic.
 Variable F : realFieldType.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3.
+Hypothesis degp : size p = 3%N.
 Hypothesis monicp : p \is monic.
 
 Let a := p`_2.
@@ -5373,7 +5373,7 @@ End Pdeg2RealMonic.
 Section Pdeg2RealClosedMonic.
 
 Variables (F : rcfType) (p : {poly F}).
-Hypothesis degp : size p = 3.
+Hypothesis degp : size p = 3%N.
 Hypothesis monicp : p \is monic.
 
 Let a := p`_2.

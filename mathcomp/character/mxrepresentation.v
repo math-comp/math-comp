@@ -414,7 +414,7 @@ rewrite (subsetP ffulG) // inE groupM ?repr_mxM ?groupV //= eq_rGxy.
 by rewrite mulmxA repr_mxK.
 Qed.
 
-Lemma rker_linear : n = 1 -> G^`(1)%g \subset rker.
+Lemma rker_linear : n = 1%N -> G^`(1)%g \subset rker.
 Proof.
 move=> n1; rewrite gen_subG; apply/subsetP=> xy; case/imset2P=> x y Gx Gy ->.
 rewrite !inE groupR //= /commg mulgA -invMg repr_mxM ?groupV ?groupM //.
@@ -988,7 +988,7 @@ by move=> modU Gx sWU; apply: submx_trans (mxmoduleP modU x Gx); apply: submxMr.
 Qed.
 
 Lemma mxmodule_eigenvector m (U : 'M_(m, n)) :
-    mxmodule U -> \rank U = 1 ->
+    mxmodule U -> \rank U = 1%N ->
   {u : 'rV_n & {a | (U :=: u)%MS & {in G, forall x, u *m rG x = a x *: u}}}.
 Proof.
 move=> modU linU; set u := nz_row U; exists u.
@@ -2359,19 +2359,19 @@ rewrite mulmx_sub {v}// [A]a_G linear_sum summx_sub //= => x Gx.
 by rewrite linearZ /= scalemx_sub // (mxmoduleP Umod).
 Qed.
 
-Lemma linear_mx_abs_irr : n = 1 -> mx_absolutely_irreducible.
+Lemma linear_mx_abs_irr : n = 1%N -> mx_absolutely_irreducible.
 Proof.
 move=> n1; rewrite /mx_absolutely_irreducible /row_full eqn_leq rank_leq_col.
 rewrite {1 2 3}n1 /= lt0n mxrank_eq0; apply: contraTneq envelop_mx1 => ->.
 by rewrite eqmx0 submx0 mxvec_eq0 -mxrank_eq0 mxrank1 n1.
 Qed.
 
-Lemma abelian_abs_irr : abelian G -> mx_absolutely_irreducible = (n == 1).
+Lemma abelian_abs_irr : abelian G -> mx_absolutely_irreducible = (n == 1%N).
 Proof.
 move=> cGG; apply/idP/eqP=> [absG|]; last exact: linear_mx_abs_irr.
 have [n_gt0 _] := andP absG.
 pose M := <<delta_mx 0 (Ordinal n_gt0) : 'rV[F]_n>>%MS.
-have rM: \rank M = 1 by rewrite genmxE mxrank_delta.
+have rM: \rank M = 1%N by rewrite genmxE mxrank_delta.
 suffices defM: (M == 1%:M)%MS by rewrite (eqmxP defM) mxrank1 in rM.
 case: (mx_abs_irrW absG) => _ _ ->; rewrite ?submx1 -?mxrank_eq0 ?rM //.
 apply/mxmoduleP=> x Gx; suffices: is_scalar_mx (rG x).
@@ -2944,20 +2944,20 @@ Qed.
 Hypothesis splitG : group_splitting_field G.
 
 Lemma mx_irr_abelian_linear n (rG : mx_representation F G n) :
-  mx_irreducible rG -> abelian G -> n = 1.
+  mx_irreducible rG -> abelian G -> n = 1%N.
 Proof.
 by move=> irrG cGG; apply/eqP; rewrite -(abelian_abs_irr rG) ?splitG.
 Qed.
 
 Lemma mxsimple_abelian_linear n (rG : mx_representation F G n) M :
-  abelian G -> mxsimple rG M -> \rank M = 1.
+  abelian G -> mxsimple rG M -> \rank M = 1%N.
 Proof.
 move=> cGG simM; have [modM _ _] := simM.
 by move/(submod_mx_irr modM)/mx_irr_abelian_linear: simM => ->.
 Qed.
 
 Lemma linear_mxsimple n (rG : mx_representation F G n) (M : 'M_n) :
-  mxmodule rG M -> \rank M = 1 -> mxsimple rG M.
+  mxmodule rG M -> \rank M = 1%N -> mxsimple rG M.
 Proof.
 move=> modM rM1; apply/(submod_mx_irr modM).
 by apply: mx_abs_irrW; rewrite linear_mx_abs_irr.
@@ -4095,13 +4095,13 @@ apply/sumsmx_subP=> i _; have [f _ hom_f <-]:= isoW i.
 by apply/rfix_mxP=> x Gx; rewrite -(hom_mxP hom_f) // (rfix_mxP G _).
 Qed.
 
-Lemma rank_irr1 : \rank 1%irr = 1.
+Lemma rank_irr1 : \rank 1%irr = 1%N.
 Proof.
 apply/eqP; rewrite eqn_leq lt0n mxrank_eq0 nz_socle andbT.
 by rewrite irr1_rfix rfix_regular rank_leq_row.
 Qed.
 
-Lemma degree_irr1 : 'n_1 = 1.
+Lemma degree_irr1 : 'n_1 = 1%N.
 Proof.
 apply/eqP; rewrite eqn_leq irr_degree_gt0 -rank_irr1.
 by rewrite mxrankS ?component_mx_id //; apply: socle_simple.
@@ -4436,12 +4436,12 @@ rewrite -(mxtrace_submod1 (Socle_module sG) soc1) // mxtrace_Socle //.
 by apply: eq_bigr => i _; rewrite irr_mx_mult.
 Qed.
 
-Definition linear_irr := [set i | 'n_i == 1].
+Definition linear_irr := [set i | 'n_i == 1%N].
 
-Lemma irr_degree_abelian : abelian G -> forall i, 'n_i = 1.
+Lemma irr_degree_abelian : abelian G -> forall i, 'n_i = 1%N.
 Proof. by move=> cGG i; apply: mxsimple_abelian_linear (socle_simple i). Qed.
 
-Lemma linear_irr_comp i : 'n_i = 1 -> (i :=: socle_base i)%MS.
+Lemma linear_irr_comp i : 'n_i = 1%N -> (i :=: socle_base i)%MS.
 Proof.
 move=> ni1; apply/eqmxP; rewrite andbC -mxrank_leqif_eq -/'n_i.
   by rewrite -(mxrankMfree _ gring_free) -genmxE rank_Wedderburn_subring ni1.
@@ -4614,7 +4614,7 @@ case: (pickP [pred x in G | ~~ is_scalar_mx (rG x)]) => [x | scalG].
   rewrite addmx_sub ?eqmx_opp ?scalar_mx_cent //= memmx_cent_envelop.
   by apply/centgmxP=> j Zh_j; rewrite -!repr_mxM // (centsP cGG).
 pose M := <<delta_mx 0 0 : 'rV[F]_n.+1>>%MS.
-have linM: \rank M = 1 by rewrite genmxE mxrank_delta.
+have linM: \rank M = 1%N by rewrite genmxE mxrank_delta.
 have modM: mxmodule rG M.
   apply/mxmoduleP=> x Gx; move/idPn: (scalG x); rewrite /= Gx negbK.
   by case/is_scalar_mxP=> ? ->; rewrite scalar_mxC submxMl.
@@ -4836,12 +4836,12 @@ elim: m [::] => // m IHm Ms /ltnSE-Ms_ge_n simMs.
 pose V := span Ms; pose Vt := mx_term V.
 pose Ut i := vec_mx (row_var F (n * n) i); pose Zt := mx_term (0 : 'M[F]_n).
 pose exU i f := Exists_row_form (n * n) i (~ submx_form (Ut i) Zt /\ f (Ut i)).
-pose meetUVf U := exU 1 (fun W => submx_form W Vt /\ submx_form W U)%T.
+pose meetUVf U := exU 1%N (fun W => submx_form W Vt /\ submx_form W U)%T.
 pose mx_sat := GRing.sat (@row_env F (n * n) [::]).
 have ev_sub0 := GRing.qf_evalP _ (submx_form_qf _ Zt).
 have ev_mod := GRing.qf_evalP _ (mxmodule_form_qf rG _).
 pose ev := (eval_mxmodule, eval_submx, eval_vec_mx, eval_row_var, eval_mx_term).
-case haveU: (mx_sat (exU 0 (fun U => mxmodule_form rG U /\ ~ meetUVf _ U)%T)).
+case haveU: (mx_sat (exU 0%N (fun U => mxmodule_form rG U /\ ~ meetUVf _ U)%T)).
   have [U modU]: {U : 'M_n | mxmodule rG U & (U != 0) && ((U :&: V)%MS == 0)}.
     apply: sig2W; case/Exists_rowP: (satP haveU) => //= u [nzU [modU tiUV]].
     exists (vec_mx u); first by move/ev_mod: modU; rewrite !ev.
@@ -5281,7 +5281,7 @@ Definition subbase nA (B : 'rV_nA) : 'M_(nA * d, n) :=
   \matrix_ik mxvec (\matrix_(i, k) (row (B 0 i) (A ^+ k))) 0 ik.
 
 Lemma gen_dim_ex_proof : exists nA, [exists B : 'rV_nA, row_free (subbase B)].
-Proof. by exists 0; apply/existsP; exists 0; rewrite /row_free unlock. Qed.
+Proof. by exists 0%N; apply/existsP; exists 0; rewrite /row_free unlock. Qed.
 
 Lemma gen_dim_ub_proof nA :
   [exists B : 'rV_nA, row_free (subbase B)] -> (nA <= n)%N.

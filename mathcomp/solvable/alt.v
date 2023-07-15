@@ -255,7 +255,7 @@ have FF (H : {group {perm T}}): H <| 'Alt_T -> H :<>: 1 -> 20 %| #|H|.
 apply/simpleP; split => [|H Hnorm]; first by rewrite trivg_card1 F1.
 case Hcard1: (#|H| == 1%N); move/eqP: Hcard1 => Hcard1.
   by left; apply: card1_trivg; rewrite Hcard1.
-right; case Hcard60: (#|H| == 60); move/eqP: Hcard60 => Hcard60.
+right; case Hcard60: (#|H| == 60%N); move/eqP: Hcard60 => Hcard60.
   by apply/eqP; rewrite eqEcard Hcard60 F1 andbT; case/andP: Hnorm.
 have {Hcard1 Hcard60} Hcard20: #|H| = 20.
   have Hdiv: 20 %| #|H| by apply: FF => // HH; case Hcard1; rewrite HH cards1.

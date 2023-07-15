@@ -397,7 +397,7 @@ Definition cfnorm phi := cfdot phi phi.
 
 Coercion seq_of_cfun phi := [:: phi].
 
-Definition cforder phi := \big[lcmn/1]_(x in <<B>>) #[phi x]%C.
+Definition cforder phi := \big[lcmn/1%N]_(x in <<B>>) #[phi x]%C.
 
 End Defs.
 

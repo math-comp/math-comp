@@ -1518,14 +1518,14 @@ Variables (gT : finGroupType) (G : {group gT}).
 Inductive extremal_group_type :=
   ModularGroup | Dihedral | SemiDihedral | Quaternion | NotExtremal.
 
-Definition index_extremal_group_type c : nat :=
+Definition index_extremal_group_type c :=
   match c with
   | ModularGroup => 0
   | Dihedral => 1
   | SemiDihedral => 2
   | Quaternion => 3
   | NotExtremal => 4
-  end.
+  end%N.
 
 Definition enum_extremal_groups :=
   [:: ModularGroup; Dihedral; SemiDihedral; Quaternion].
@@ -1768,7 +1768,7 @@ have [y X'y]: exists2 y, y \in G :\: X &
     rewrite -scXG !inE groupX //= andbT -ker_conj_aut !inE morphX // -def_s.
     rewrite andbC -(inj_in_eq m_inj) ?group1 // m_s m1 oX pfactorK // -/r.
     rewrite mulrSr -subr_eq0 addrK -val_eqE /= val_Zp_nat //.
-    by rewrite [_ == 0]dvdn_Pexp2l // -def_n ltnn.
+    by rewrite [_ == 0%N]dvdn_Pexp2l // -def_n ltnn.
   rewrite {1}p2 /= => [[t [At ot m_t]]]; rewrite {1}oX pfactorK // -{1}def_n.
   rewrite eqSS subn_eq0 => defA; exists y; rewrite ?inE ?notXy //.
   rewrite p2 -(norm_conj_autE _ Xx) //= -/ay -def_m ?Aut_aut //.
@@ -1796,7 +1796,7 @@ have p_i: p %| i.
   have genX: generator X (y ^- p).
     by rewrite def_yp defX generator_coprime ox coprimeXl.
   rewrite -scXG (setIidPl _) // centsC ((X :=P: _) genX) cycle_subG groupV.
-  rewrite /= -(defG 0) mul1g centY inE -defX (subsetP cXX) ?X_Gp //.
+  rewrite /= -(defG 0%N) mul1g centY inE -defX (subsetP cXX) ?X_Gp //.
   by rewrite (subsetP (cycle_abelian y)) ?mem_cycle.
 case=> [[n_gt23 xy] | [p2 Z_xxy]].
   suffices ->: cG = ModularGroup by []; apply/modular_group_classP.
@@ -1845,7 +1845,7 @@ case/pred2P: Z_xxy => xy; last first.
   exists n => //; rewrite isogEcard card_semidihedral // oG p2 leqnn andbT.
   rewrite Grp_semidihedral //; apply/existsP=> /=.
   case/pred2P: Zy2 => y2; [exists (x, y) | exists (x, x * y)].
-    by rewrite /= -{1}[y]mul1g (defG 0) y2 xy -p2 -/q -ox expg_order.
+    by rewrite /= -{1}[y]mul1g (defG 0%N) y2 xy -p2 -/q -ox expg_order.
   rewrite /= (defG 1%N) conjgM {2}/conjg mulKg -p2 -/q -ox expg_order -xy.
   rewrite !xpair_eqE !eqxx /= andbT p2 expgS {2}(conjgC x) xy mulgA -(mulgA x).
   rewrite [y * y]y2 -expgS -expgD addSnnS prednK // addnn -mul2n -p2 def_pr.
@@ -1854,11 +1854,11 @@ case/pred2P: Zy2 => y2.
   suffices ->: cG = Dihedral by []; apply/dihedral_classP.
   exists n => //; rewrite isogEcard card_2dihedral // oG p2 leqnn andbT.
   rewrite Grp_2dihedral //; apply/existsP; exists (x, y) => /=.
-  by rewrite /= -{1}[y]mul1g (defG 0) y2 xy -p2 -/q -ox expg_order.
+  by rewrite /= -{1}[y]mul1g (defG 0%N) y2 xy -p2 -/q -ox expg_order.
 suffices ->: cG = Quaternion by []; apply/quaternion_classP.
 exists n => //; rewrite isogEcard card_quaternion // oG p2 leqnn andbT.
 rewrite Grp_quaternion //; apply/existsP; exists (x, y) => /=.
-by rewrite /= -{1}[y]mul1g (defG 0) y2 xy -p2 -/q -ox expg_order.
+by rewrite /= -{1}[y]mul1g (defG 0%N) y2 xy -p2 -/q -ox expg_order.
 Qed.
 
 (* This is Aschbacher (23.5) *)
@@ -1953,7 +1953,7 @@ have [a [fGa oa au n_gt01 cycGs]]: exists a,
     have: (f @* Gs) * <[s]> \subset A by rewrite mulG_subG cycle_subG sfGsA.
     move/subset_leq_card; apply: contraL; move/eqP; move/TI_cardMg->.
     rewrite -(dprod_card defA) -ltnNge mulnC -!orderE ltn_pmul2r // oc.
-    by rewrite card_injm // oGs p2 (ltn_exp2l 1).
+    by rewrite card_injm // oGs p2 (ltn_exp2l 1%N).
   rewrite -def_m // oa m_a expg_znat // p2; split=> //.
   rewrite abelian_rank1_cyclic // (rank_pgroup pGs) //.
   rewrite -(injm_p_rank injf) // p_rank_abelian 1?morphim_abelian //= p2 -/Gs.

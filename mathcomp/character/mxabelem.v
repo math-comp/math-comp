@@ -359,7 +359,7 @@ Qed.
 
 Lemma rank_mx_group m n q : 'r([set: 'M['Z_q]_(m, n)]) = (m * n)%N.
 Proof.
-wlog q_gt1: q / q > 1 by case: q => [|[|q -> //]] /(_ 2)->.
+wlog q_gt1: q / q > 1 by case: q => [|[|q -> //]] /(_ 2%N)->.
 set G := setT; have cGG: abelian G := zmod_abelian _.
 have [mn0 | ] := posnP (m * n).
   by rewrite [G](card1_trivg _) ?rank1 // cardsT card_mx mn0.
@@ -380,7 +380,7 @@ Qed.
 
 Lemma mx_group_homocyclic m n q : homocyclic [set: 'M['Z_q]_(m, n)].
 Proof.
-wlog q_gt1: q / q > 1 by case: q => [|[|q -> //]] /(_ 2)->.
+wlog q_gt1: q / q > 1 by case: q => [|[|q -> //]] /(_ 2%N)->.
 set G := setT; have cGG: abelian G := zmod_abelian _.
 rewrite -max_card_abelian //= rank_mx_group cardsT card_mx card_ord -/G.
 rewrite {1}Zp_cast //; have [-> // | ] := posnP (m * n).
@@ -878,7 +878,7 @@ have nb_irr: #|sS| = (p ^ n.*2 + p.-1)%N.
     apply/eqP; rewrite eqEcard sub1set class_refl cards1.
     by rewrite -index_cent1 (setIidPl _) ?indexgg // sub_cent1.
   move/eqP: (class_formula S); rewrite (bigID [in Zcl]) /=.
-  rewrite (eq_bigr (fun _ => 1)) => [|zS]; last first.
+  rewrite (eq_bigr (fun _ => 1%N)) => [|zS]; last first.
     case/andP=> _ /setIdP[/imsetP[z Sz ->{zS}] /subsetIP[_ cSzS]].
     rewrite (setIidPl _) ?indexgg // sub_cent1 (subsetP cSzS) //.
     exact: mem_repr (class_refl S z).
@@ -965,7 +965,7 @@ have inj_iphi: injective iphi.
   move=> i1 i2 eqi12; apply/eqP.
   move/eqP: (congr1 (fun i => irr_mode i (z ^+ 1)) eqi12).
   rewrite /irr_mode !{1}[irr_repr _ _]phi_ze !{1}mxE !mul1n.
-  by rewrite (eq_prim_root_expr (prim_w 1 p_gt1)) !modIp'.
+  by rewrite (eq_prim_root_expr (prim_w 1%N p_gt1)) !modIp'.
 have deg_phi i: irr_degree (iphi i) = irr_degree i0.
   by case: (rsim_irr_comp sS F'S (rphi_irr i)).
 have im_iphi: codom iphi =i ~: linS.
@@ -984,7 +984,7 @@ split=> // [i | ze | i].
 rewrite deg_phi {i}; set d := irr_degree i0.
 apply/eqP; move/eqP: (sum_irr_degree sS F'S splitF).
 rewrite (bigID [in linS]) /= -/irr_degree.
-rewrite (eq_bigr (fun=> 1)) => [|i]; last by rewrite !inE; move/eqP->.
+rewrite (eq_bigr (fun=> 1%N)) => [|i]; last by rewrite !inE; move/eqP->.
 rewrite sum1_card nb_lin.
 rewrite (eq_bigl [in codom iphi]) // => [|i]; last first.
   by rewrite -in_setC -im_iphi.
@@ -1019,7 +1019,7 @@ have{prZ} ntZ: 'Z(S) :!=: 1%g by case: eqP prZ => // ->; rewrite cards1.
 have [_ [iphi]] := extraspecial_repr_structure sS.
 set phi := fun i => _ => [] [inj_phi im_phi _ phiZ dim_phi] _.
 have [modU nzU _]:= simU; pose rU := submod_repr modU.
-have nlinU: \rank U != 1.
+have nlinU: \rank U != 1%N.
   apply/eqP=> /(rker_linear rU); apply/negP; rewrite /rker rstab_submod.
   by rewrite (eqmx_rstab _ (val_submod1 _)) (eqP ffulU) defS' subG1.
 have irrU: mx_irreducible rU by apply/submod_mx_irr.

@@ -155,7 +155,7 @@ apply/leq_sizeP=> j le_uY_j; apply/polyP=> i; rewrite coef_swapXY coef0.
 by rewrite nth_default // (leq_trans _ le_uY_j) ?max_size_coefXY.
 Qed.
 
-Lemma sizeY_eq0 u : (sizeY u == 0) = (u == 0).
+Lemma sizeY_eq0 u : (sizeY u == 0%N) = (u == 0).
 Proof. by rewrite sizeYE size_poly_eq0 swapXY_eq0. Qed.
 
 Lemma sizeY_mulX u : sizeY (u * 'X) = sizeY u.

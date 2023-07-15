@@ -436,7 +436,7 @@ Definition standard_irr (W : sG) := irr_comp iG (socle_repr W).
 Definition standard_socle i := pick [pred W | standard_irr W == i].
 Local Notation soc := standard_socle.
 
-Definition standard_irr_coef i := oapp (fun W => socle_mult W) 0 (soc i).
+Definition standard_irr_coef i := oapp (fun W => socle_mult W) 0%N (soc i).
 
 Definition standard_grepr :=
   \big[dadd_grepr/grepr0]_i
@@ -735,7 +735,7 @@ Proof. by move=> i; apply: irr_inj; rewrite cfIirrE ?mem_irr. Qed.
 Lemma irr_eq1 i : ('chi_i == 1) = (i == 0).
 Proof. by rewrite -irr0 (inj_eq irr_inj). Qed.
 
-Lemma cforder_irr_eq1 i : (#['chi_i]%CF == 1) = (i == 0).
+Lemma cforder_irr_eq1 i : (#['chi_i]%CF == 1%N) = (i == 0).
 Proof. by rewrite -dvdn1 dvdn_cforder irr_eq1. Qed.
 
 Lemma irr_basis : basis_of 'CF(G)%VS (irr G).
@@ -1136,7 +1136,7 @@ move=> Gx; without loss cGG: G rG Gx / abelian G.
 have [I U W simU W1 dxW]: mxsemisimple rG 1%:M.
   rewrite -(reducible_Socle1 (DecSocleType rG) (mx_Maschke _ (algC'G G))).
   exact: Socle_semisimple.
-have linU i: \rank (U i) = 1.
+have linU i: \rank (U i) = 1%N.
   by apply: mxsimple_abelian_linear cGG (simU i); apply: groupC.
 have castI: f = #|I|.
   by rewrite -(mxrank1 algC f) -W1 (eqnP dxW) /= -sum1_card; apply/eq_bigr.
@@ -1464,7 +1464,7 @@ Qed.
 
 Lemma eq_subZnat_irr (a b : nat) (i j r t : Iirr G) :
   (a%:R *: 'chi_i - b%:R *: 'chi_j == a%:R *: 'chi_r - b%:R *: 'chi_t)
-    = [|| a == 0 | i == r] && [|| b == 0 | j == t]
+     =   [|| a == 0%N | i == r] && [|| b == 0%N | j == t]
       || [&& i == j, r == t & a == b].
 Proof.
 rewrite -!scaleNr eq_addZ_irr oppr_eq0 opprK -addr_eq0 -natrD eqr_nat.

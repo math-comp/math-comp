@@ -578,7 +578,7 @@ elim: {1 3}n 0%N (addn0 n) => [|m IHm] i def_i /=.
   rewrite big_seq1 {i}[i]def_i rYE // ?def_n //.
   rewrite -(mulgA _ _ g) -rcosetM -expgSr -[(H :* x) :* _]rcosetE.
   rewrite -actpermE morphX ?inE // permX // -{2}def_n n_eq iter_porbit mulgA.
-  by rewrite -[H :* x]rcoset1 (rYE _ 0) ?mulg1.
+  by rewrite -[H :* x]rcoset1 (rYE _ 0%N) ?mulg1.
 rewrite big_cons rYE //; last by rewrite def_n -def_i ltnS leq_addl.
 rewrite permE /= rcosetE -rcosetM -(mulgA _ _ g) -expgSr.
 rewrite addSnnS in def_i; rewrite IHm //.

@@ -185,7 +185,7 @@ Proof. by rewrite val_insubd /=; case: (c == 0). Qed.
 Lemma size_polyC c : size c%:P = (c != 0).
 Proof. by rewrite polyseqC size_nseq. Qed.
 
-Lemma coefC c i : c%:P`_i = if i == 0 then c else 0.
+Lemma coefC c i : c%:P`_i = if i == 0%N then c else 0.
 Proof. by rewrite polyseqC; case: i => [|[]]; case: eqP. Qed.
 
 Lemma polyCK : cancel polyC (coefp 0).
@@ -225,10 +225,10 @@ Lemma polyseq_cons c p :
 Proof. by case: p => [[]]. Qed.
 
 Lemma size_cons_poly c p :
-  size (cons_poly c p) = (if nilp p && (c == 0) then 0 else (size p).+1).
+  size (cons_poly c p) = (if nilp p && (c == 0) then 0%N else (size p).+1).
 Proof. by case: p => [[|c' s] _] //=; rewrite size_polyC; case: eqP. Qed.
 
-Lemma coef_cons c p i : (cons_poly c p)`_i = if i == 0 then c else p`_i.-1.
+Lemma coef_cons c p i : (cons_poly c p)`_i = if i == 0%N then c else p`_i.-1.
 Proof.
 by case: p i => [[|c' s] _] [] //=; rewrite polyseqC; case: eqP => //= _ [].
 Qed.
@@ -336,13 +336,13 @@ Proof. by rewrite coefC if_same. Qed.
 
 Lemma lead_coef0 : lead_coef 0 = 0 :> R. Proof. exact: lead_coefC. Qed.
 
-Lemma size_poly_eq0 p : (size p == 0) = (p == 0).
+Lemma size_poly_eq0 p : (size p == 0%N) = (p == 0).
 Proof. by rewrite size_eq0 -polyseq0. Qed.
 
 Lemma size_poly_leq0 p : (size p <= 0) = (p == 0).
 Proof. by rewrite leqn0 size_poly_eq0. Qed.
 
-Lemma size_poly_leq0P p : reflect (p = 0) (size p <= 0).
+Lemma size_poly_leq0P p : reflect (p = 0) (size p <= 0%N).
 Proof. by apply: (iffP idP); rewrite size_poly_leq0; move/eqP. Qed.
 
 Lemma size_poly_gt0 p : (0 < size p) = (p != 0).
@@ -369,7 +369,7 @@ Qed.
 Lemma polyC_eq0 (c : R) : (c%:P == 0) = (c == 0).
 Proof. by rewrite -nil_poly polyseqC; case: (c == 0). Qed.
 
-Lemma size_poly1P p : reflect (exists2 c, c != 0 & p = c%:P) (size p == 1).
+Lemma size_poly1P p : reflect (exists2 c, c != 0 & p = c%:P) (size p == 1%N).
 Proof.
 apply: (iffP eqP) => [pC | [c nz_c ->]]; last by rewrite size_polyC nz_c.
 have def_p: p = (p`_0)%:P by rewrite -size1_polyC ?pC.
@@ -510,10 +510,10 @@ Lemma polyC1 : 1%:P = 1 :> {poly R}. Proof. by []. Qed.
 Lemma polyseq1 : (1 : {poly R}) = [:: 1] :> seq R.
 Proof. by rewrite polyseqC oner_neq0. Qed.
 
-Lemma size_poly1 : size (1 : {poly R}) = 1.
+Lemma size_poly1 : size (1 : {poly R}) = 1%N.
 Proof. by rewrite polyseq1. Qed.
 
-Lemma coef1 i : (1 : {poly R})`_i = (i == 0)%:R.
+Lemma coef1 i : (1 : {poly R})`_i = (i == 0%N)%:R.
 Proof. by case: i => [|i]; rewrite polyseq1 /= ?nth_nil. Qed.
 
 Lemma lead_coef1 : lead_coef 1 = 1 :> R. Proof. exact: lead_coefC. Qed.
@@ -758,12 +758,12 @@ Local Notation "'X" := polyX.
 Lemma polyseqX : 'X = [:: 0; 1] :> seq R.
 Proof. by rewrite unlock !polyseq_cons nil_poly eqxx /= polyseq1. Qed.
 
-Lemma size_polyX : size 'X = 2. Proof. by rewrite polyseqX. Qed.
+Lemma size_polyX : size 'X = 2%N. Proof. by rewrite polyseqX. Qed.
 
 Lemma polyX_eq0 : ('X == 0) = false.
 Proof. by rewrite -size_poly_eq0 size_polyX. Qed.
 
-Lemma coefX i : 'X`_i = (i == 1)%:R.
+Lemma coefX i : 'X`_i = (i == 1%N)%:R.
 Proof. by case: i => [|[|i]]; rewrite polyseqX //= nth_nil. Qed.
 
 Lemma lead_coefX : lead_coef 'X = 1.
@@ -801,10 +801,10 @@ Qed.
 Lemma polyseqXsubC a : 'X - a%:P = [:: - a; 1] :> seq R.
 Proof. by rewrite -['X]mul1r -polyCN -cons_poly_def polyseq_cons polyseq1. Qed.
 
-Lemma size_XsubC a : size ('X - a%:P) = 2.
+Lemma size_XsubC a : size ('X - a%:P) = 2%N.
 Proof. by rewrite polyseqXsubC. Qed.
 
-Lemma size_XaddC b : size ('X + b%:P) = 2.
+Lemma size_XaddC b : size ('X + b%:P) = 2%N.
 Proof. by rewrite -[b]opprK rmorphN size_XsubC. Qed.
 
 Lemma lead_coefXsubC a : lead_coef ('X - a%:P) = 1.
@@ -814,7 +814,7 @@ Lemma polyXsubC_eq0 a : ('X - a%:P == 0) = false.
 Proof. by rewrite -nil_poly polyseqXsubC. Qed.
 
 Lemma size_MXaddC p c :
-  size (p * 'X + c%:P) = (if (p == 0) && (c == 0) then 0 else (size p).+1).
+  size (p * 'X + c%:P) = (if (p == 0) && (c == 0) then 0%N else (size p).+1).
 Proof. by rewrite -cons_poly_def size_cons_poly nil_poly. Qed.
 
 Lemma polyseqMX p : p != 0 -> p * 'X = 0 :: p :> seq R.
@@ -831,7 +831,7 @@ have [-> | nzp] := eqVneq p 0; first by rewrite mul0r.
 by rewrite /lead_coef !nth_last polyseqMX.
 Qed.
 
-Lemma size_XmulC a : a != 0 -> size ('X * a%:P) = 2.
+Lemma size_XmulC a : a != 0 -> size ('X * a%:P) = 2%N.
 Proof.
 by move=> nz_a; rewrite -commr_polyX size_mulX ?polyC_eq0 ?size_polyC nz_a.
 Qed.
@@ -1245,7 +1245,7 @@ Lemma multiplicity_XsubC p a :
   {m | exists2 q, (p != 0) ==> ~~ root q a & p = q * ('X - a%:P) ^+ m}.
 Proof.
 have [n le_p_n] := ubnP (size p); elim: n => // n IHn in p le_p_n *.
-have [-> | nz_p /=] := eqVneq p 0; first by exists 0, 0; rewrite ?mul0r.
+have [-> | nz_p /=] := eqVneq p 0; first by exists 0%N, 0; rewrite ?mul0r.
 have [/sig_eqW[p1 Dp] | nz_pa] := altP (factor_theorem p a); last first.
   by exists 0%N, p; rewrite ?mulr1.
 have nz_p1: p1 != 0 by apply: contraNneq nz_p => p1_0; rewrite Dp p1_0 mul0r.
@@ -1596,7 +1596,7 @@ HB.instance Definition _ n :=
   GRing.isLinear.Build R {poly R} {poly R} _ (derivn n)
     (derivn_is_linear n).
 
-Lemma derivnC c n : c%:P^`(n) = if n == 0 then c%:P else 0.
+Lemma derivnC c n : c%:P^`(n) = if n == 0%N then c%:P else 0.
 Proof. by case: n => // n; rewrite derivSn derivC linear0. Qed.
 
 Lemma derivnD n : {morph derivn n : p q / p + q}.
@@ -1674,7 +1674,7 @@ Proof. by rewrite -[p^`N(0)](nderivn_def 0). Qed.
 Lemma nderivn1 p : p^`N(1) = p^`().
 Proof. by rewrite -[p^`N(1)](nderivn_def 1). Qed.
 
-Lemma nderivnC c n : (c%:P)^`N(n) = if n == 0 then c%:P else 0.
+Lemma nderivnC c n : (c%:P)^`N(n) = if n == 0%N then c%:P else 0.
 Proof.
 apply/polyP=> i; rewrite coef_nderivn.
 by case: n => [|n]; rewrite ?bin0 // coef0 coefC mul0rn.
@@ -2460,7 +2460,8 @@ transitivity (\sum_(I in {set 'I_(size ps)}) if #|I| == (size ps - n)%N then
 by rewrite -big_mkcond mulr_sumr/=; apply: eq_bigr => I /eqP <-; rewrite prodrN.
 Qed.
 
-Lemma coefPn_prod_XsubC (ps : seq R) : size ps != 0 ->
+Lemma coefPn_prod_XsubC (ps : seq R) :
+  size ps != 0%N ->
   (\prod_(p <- ps) ('X - p%:P))`_((size ps).-1) =
   - \sum_(p <- ps) p.
 Proof.
@@ -2627,7 +2628,7 @@ by rewrite eq_sym pq0 size_poly0 (polySpred p_nz) (polySpred q_nz) addnS.
 Qed.
 
 Definition poly_unit : pred {poly R} :=
-  fun p => (size p == 1) && (p`_0 \in GRing.unit).
+  fun p => (size p == 1%N) && (p`_0 \in GRing.unit).
 
 Definition poly_inv p := if p \in poly_unit then (p`_0)^-1%:P else p.
 
@@ -2642,7 +2643,7 @@ Proof.
 move=> pq1; apply/andP; split; last first.
   apply/unitrP; exists q`_0.
   by rewrite 2!mulrC -!/(coefp 0 _) -rmorphM pq1 rmorph1.
-have: size (q * p) == 1 by rewrite pq1 size_poly1.
+have: size (q * p) == 1%N by rewrite pq1 size_poly1.
 have [-> | nz_p] := eqVneq p 0; first by rewrite mulr0 size_poly0.
 have [-> | nz_q] := eqVneq q 0; first by rewrite mul0r size_poly0.
 rewrite size_mul // (polySpred nz_p) (polySpred nz_q) addnS addSn !eqSS.
@@ -2661,7 +2662,7 @@ HB.instance Definition _ := GRing.ComUnitRing_isIntegral.Build (polynomial R)
 HB.instance Definition _ := GRing.IntegralDomain.on {poly R}.
 
 Lemma poly_unitE p :
-  (p \in GRing.unit) = (size p == 1) && (p`_0 \in GRing.unit).
+  (p \in GRing.unit) = (size p == 1%N) && (p`_0 \in GRing.unit).
 Proof. by []. Qed.
 
 Lemma poly_invE p : p ^-1 = if p \in GRing.unit then (p`_0)^-1%:P else p.
@@ -2720,7 +2721,8 @@ move=> nzF; rewrite big_tnth size_prod; last by move=> i; rewrite nzF ?mem_tnth.
 by rewrite cardT /= size_enum_ord [in RHS]big_tnth.
 Qed.
 
-Lemma size_mul_eq1 p q : (size (p * q) == 1) = ((size p == 1) && (size q == 1)).
+Lemma size_mul_eq1 p q :
+  (size (p * q) == 1%N) = ((size p == 1%N) && (size q == 1%N)).
 Proof.
 have [->|pNZ] := eqVneq p 0; first by rewrite mul0r size_poly0.
 have [->|qNZ] := eqVneq q 0; first by rewrite mulr0 size_poly0 andbF.
@@ -2729,7 +2731,7 @@ by move: pNZ qNZ; rewrite -!size_poly_gt0; (do 2 case: size) => //= n [|[|]].
 Qed.
 
 Lemma size_prod_seq_eq1 (I : eqType) (s : seq I) (P : pred I) (F : I -> {poly R}) :
-  reflect (forall i, P i && (i \in s) -> size (F i) = 1)
+  reflect (forall i, P i && (i \in s) -> size (F i) = 1%N)
           (size (\prod_(i <- s | P i) F i) == 1%N).
 Proof.
 rewrite (big_morph _ (id1:=true) size_mul_eq1) ?size_polyC ?oner_neq0//.
@@ -2739,8 +2741,8 @@ by move=> h i ins; apply/implyP => Pi; rewrite h ?Pi.
 Qed.
 
 Lemma size_prod_eq1 (I : finType) (P : pred I) (F : I -> {poly R}) :
-  reflect (forall i, P i -> size (F i) = 1)
-          (size (\prod_(i | P i) F i) == 1).
+  reflect (forall i, P i -> size (F i) = 1%N)
+          (size (\prod_(i | P i) F i) == 1%N).
 Proof.
 apply: (iffP (size_prod_seq_eq1 _ _ _)) => Hi i.
   by move=> Pi; apply: Hi; rewrite Pi /= mem_index_enum.
@@ -2804,13 +2806,13 @@ rewrite mulf_eq0 expf_eq0 !lead_coef_eq0 -[q == 0]size_poly_leq0.
 by rewrite [_ <= 0]leqNgt (leq_ltn_trans _ sq_gt1) ?andbF ?orbF.
 Qed.
 
-Lemma size_comp_poly2 p q : size q = 2 -> size (p \Po q) = size p.
+Lemma size_comp_poly2 p q : size q = 2%N -> size (p \Po q) = size p.
 Proof.
 move=> sq2; have [->|pN0] := eqVneq p 0; first by rewrite comp_polyC.
 by rewrite polySpred ?size_comp_poly ?comp_poly_eq0 ?sq2 // muln1 polySpred.
 Qed.
 
-Lemma comp_poly2_eq0 p q : size q = 2 -> (p \Po q == 0) = (p == 0).
+Lemma comp_poly2_eq0 p q : size q = 2%N -> (p \Po q == 0) = (p == 0).
 Proof. by rewrite -!size_poly_eq0 => /size_comp_poly2->. Qed.
 
 Theorem max_poly_roots p rs :
@@ -2947,7 +2949,7 @@ Proof.
 move=> size_p /uniq_roots_prod_XsubC def_p Urs.
 case/def_p: Urs => q -> {p def_p} in size_p *.
 have [q0 | nz_q] := eqVneq q 0; first by rewrite q0 mul0r size_poly0 in size_p.
-have{q nz_q size_p} /size_poly1P[c _ ->]: size q == 1.
+have{q nz_q size_p} /size_poly1P[c _ ->]: size q == 1%N.
   rewrite -(eqn_add2r (size rs)) add1n -size_p.
   by rewrite size_Mmonic ?monic_prod_XsubC // size_prod_XsubC addnS.
 by rewrite lead_coef_Mmonic ?monic_prod_XsubC // lead_coefC mul_polyC.
@@ -2960,7 +2962,7 @@ Section FieldRoots.
 Variable F : fieldType.
 Implicit Types (p : {poly F}) (rs : seq F).
 
-Lemma poly2_root p : size p = 2 -> {r | root p r}.
+Lemma poly2_root p : size p = 2%N -> {r | root p r}.
 Proof.
 case: p => [[|p0 [|p1 []]] //= nz_p1]; exists (- p0 / p1).
 by rewrite /root addr_eq0 /= mul0r add0r mulrC divfK ?opprK.
@@ -3117,7 +3119,7 @@ Variable F : fieldType.
 Hypothesis nz2 : 2 != 0 :> F.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3.
+Hypothesis degp : size p = 3%N.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -3192,7 +3194,7 @@ Variable F : fieldType.
 Hypothesis nz2 : 2 != 0 :> F.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3.
+Hypothesis degp : size p = 3%N.
 Hypothesis monicp : p \is monic.
 
 Let a := p`_2.
@@ -3264,7 +3266,7 @@ Variable F : fieldType.
 Hypothesis closedF : GRing.closed_field_axiom F.
 Implicit Type p : {poly F}.
 
-Lemma closed_rootP p : reflect (exists x, root p x) (size p != 1).
+Lemma closed_rootP p : reflect (exists x, root p x) (size p != 1%N).
 Proof.
 have [-> | nz_p] := eqVneq p 0.
   by rewrite size_poly0; left; exists 0; rewrite root0.
@@ -3297,7 +3299,7 @@ Implicit Type p : {poly F}.
 
 Let closedF := @solve_monicpoly F.
 
-Lemma closed_rootP p : reflect (exists x, root p x) (size p != 1).
+Lemma closed_rootP p : reflect (exists x, root p x) (size p != 1%N).
 Proof. exact: PreClosedField.closed_rootP. Qed.
 
 Lemma closed_nonrootP p : reflect (exists x, ~~ root p x) (p != 0).

@@ -222,8 +222,8 @@ Lemma natr_sum_eq1 (I : finType) (P : pred I) (F : I -> R) :
    {i : I | [/\ P i, F i = 1 & forall j, j != i -> P j -> F j = 0]}.
 Proof.
 move=> natF /eqP; rewrite -sum_truncK// -[1]/1%:R eqr_nat => /sum_nat_eq1 exi.
-have [i /and3P[Pi /eqP f1 /forallP a]] : {i : I | [&& P i, trunc (F i) == 1
-    & [forall j : I, ((j != i) ==> P j ==> (trunc (F j) == 0))]]}.
+have [i /and3P[Pi /eqP f1 /forallP a]] : {i : I | [&& P i, trunc (F i) == 1%N
+    & [forall j : I, ((j != i) ==> P j ==> (trunc (F j) == 0%N))]]}.
   apply/sigW; have [i [Pi /eqP f1 a]] := exi; exists i; apply/and3P; split=> //.
   by apply/forallP => j; apply/implyP => ji; apply/implyP => Pj; apply/eqP/a.
 exists i; split=> [//||j ji Pj]; rewrite -[LHS]truncK ?natF ?f1//; apply/eqP.

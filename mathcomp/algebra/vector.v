@@ -660,10 +660,10 @@ Lemma addv_diff U V : (U :\: V + V = U + V)%VS.
 Proof. by rewrite -{2}(addv_diff_cap U V) -addvA (addv_idPr (capvSr U V)). Qed.
 
 (* Subspace dimension. *)
-Lemma dimv0 : \dim (0%VS : {vspace vT}) = 0.
+Lemma dimv0 : \dim (0%VS : {vspace vT}) = 0%N.
 Proof. by rewrite /dimv vs2mx0 mxrank0. Qed.
 
-Lemma dimv_eq0 U :  (\dim U == 0) = (U == 0%VS).
+Lemma dimv_eq0 U :  (\dim U == 0%N) = (U == 0%VS).
 Proof. by rewrite /dimv /= mxrank_eq0 {2}/eq_op /= linear0 genmx0. Qed.
 
 Lemma dimvf : \dim {:vT} = dim vT.

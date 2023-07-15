@@ -1113,7 +1113,7 @@ Definition block_mxAx := block_mxA. (* Bypass Prenex Implicits *)
 Section Induction.
 
 Lemma row_ind m (P : forall n, 'M[R]_(m, n) -> Type) :
-    (forall A, P 0 A) ->
+    (forall A, P 0%N A) ->
     (forall n c A, P n A -> P (1 + n)%N (row_mx c A)) ->
   forall n A, P n A.
 Proof.
@@ -1122,7 +1122,7 @@ by rewrite -[n.+1]/(1 + n)%N in A *; rewrite -[A]hsubmxK; apply: PS.
 Qed.
 
 Lemma col_ind n (P : forall m, 'M[R]_(m, n) -> Type) :
-    (forall A, P 0 A) ->
+    (forall A, P 0%N A) ->
     (forall m r A, P m A -> P (1 + m)%N (col_mx r A)) ->
   forall m A, P m A.
 Proof.
@@ -1131,8 +1131,8 @@ by rewrite -[m.+1]/(1 + m)%N in A *; rewrite -[A]vsubmxK; apply: PS.
 Qed.
 
 Lemma mx_ind (P : forall m n, 'M[R]_(m, n) -> Type) :
-    (forall m A, P m 0 A) ->
-    (forall n A, P 0 n A) ->
+    (forall m A, P m 0%N A) ->
+    (forall n A, P 0%N n A) ->
     (forall m n x r c A, P m n A -> P (1 + m)%N (1 + n)%N (block_mx x r c A)) ->
   forall m n A, P m n A.
 Proof.
@@ -1144,7 +1144,7 @@ Definition matrix_rec := mx_ind.
 Definition matrix_ind := mx_ind.
 
 Lemma sqmx_ind (P : forall n, 'M[R]_n -> Type) :
-    (forall A, P 0 A) ->
+    (forall A, P 0%N A) ->
     (forall n x r c A, P n A -> P (1 + n)%N (block_mx x r c A)) ->
   forall n A, P n A.
 Proof.
@@ -1152,7 +1152,7 @@ by move=> P0 PS; elim=> [//|n IHn] A; rewrite -[A](@submxK 1 _ 1); apply: PS.
 Qed.
 
 Lemma ringmx_ind (P : forall n, 'M[R]_n.+1 -> Type) :
-    (forall x, P 0 x) ->
+    (forall x, P 0%N x) ->
     (forall n x (r : 'rV_n.+1) (c : 'cV_n.+1) A,
        P n A -> P (1 + n)%N (block_mx x r c A)) ->
   forall n A, P n A.
@@ -1890,8 +1890,8 @@ split.
 Qed.
 
 Lemma trigmx_ind (P : forall m n, 'M_(m, n) -> Type) :
-  (forall m, P m 0 0) ->
-  (forall n, P 0 n 0) ->
+  (forall m, P m 0%N 0) ->
+  (forall n, P 0%N n 0) ->
   (forall m n x c A, is_trig_mx A ->
     P m n A -> P (1 + m)%N (1 + n)%N (block_mx x 0 c A)) ->
   forall m n A, is_trig_mx A -> P m n A.
@@ -1901,7 +1901,7 @@ move=> P0l P0r PS m n A; elim: A => {m n} [m|n|m n xx r c] A PA;
 by rewrite is_trig_block_mx => // /and3P[/eqP-> _ Atrig]; apply: PS (PA _).
 Qed.
 
-Lemma trigsqmx_ind (P : forall n, 'M[V]_n -> Type) : (P 0 0) ->
+Lemma trigsqmx_ind (P : forall n, 'M[V]_n -> Type) : (P 0%N 0) ->
   (forall n x c A, is_trig_mx A -> P n A -> P (1 + n)%N (block_mx x 0 c A)) ->
   forall n A, is_trig_mx A -> P n A.
 Proof.
@@ -1920,8 +1920,8 @@ by rewrite andbACA -!andbA; congr [&& _, _, _ & _]; rewrite andbCA.
 Qed.
 
 Lemma diagmx_ind (P : forall m n, 'M_(m, n) -> Type) :
-  (forall m, P m 0 0) ->
-  (forall n, P 0 n 0) ->
+  (forall m, P m 0%N 0) ->
+  (forall n, P 0%N n 0) ->
   (forall m n x c A, is_diag_mx A ->
     P m n A -> P (1 + m)%N (1 + n)%N (block_mx x 0 c A)) ->
   forall m n A, is_diag_mx A -> P m n A.
@@ -1933,7 +1933,7 @@ exact: PS (PA _).
 Qed.
 
 Lemma diagsqmx_ind (P : forall n, 'M[V]_n -> Type) :
-    (P 0 0) ->
+    (P 0%N 0) ->
   (forall n x c A, is_diag_mx A -> P n A -> P (1 + n)%N (block_mx x 0 c A)) ->
   forall n A, is_diag_mx A -> P n A.
 Proof.
@@ -2003,7 +2003,7 @@ HB.instance Definition _ := GRing.isSemiAdditive.Build V 'M_n scalar_mx
   scalar_mx_is_semi_additive.
 
 Definition is_scalar_mx (A : 'M[V]_n) :=
-  if insub 0 is Some i then A == (A i i)%:M else true.
+  if insub 0%N is Some i then A == (A i i)%:M else true.
 
 Lemma is_scalar_mxP A : reflect (exists a, A = a%:M) (is_scalar_mx A).
 Proof.

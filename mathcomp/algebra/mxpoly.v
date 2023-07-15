@@ -1083,7 +1083,7 @@ move=> mon_p pw0 intRp intRq.
 pose memR y := exists x, y = RtoK x.
 have memRid x: memR (RtoK x) by exists x.
 have memR_nat n: memR n%:R by rewrite -(rmorph_nat RtoK) /=.
-have [memR0 memR1]: memR 0 * memR 1 := (memR_nat 0, memR_nat 1).
+have [memR0 memR1]: memR 0 * memR 1 := (memR_nat 0%N, memR_nat 1%N).
 have memRN1: memR (- 1) by exists (- 1); rewrite rmorphN1.
 pose rVin (E : K -> Prop) n (a : 'rV[K]_n) := forall i, E (a 0 i).
 pose pXin (E : K -> Prop) (r : {poly K}) := forall i, E r`_i.
@@ -1162,7 +1162,7 @@ have{mon_p pw0 intRp intRq}: genI S.
   exists (map_poly RtoK q); split=> // [|i]; first exact: monic_map.
   by rewrite coef_map /=; apply: genR.
 elim: {w p q}S => /= [_|x S IH [[p [mon_p px0 Sp]] /IH{IH}[m2 [X2 defS]]]].
-  exists 1, 1 => y; split=> [[a [Fa ->]] | Fy].
+  exists 1%N, 1 => y; split=> [[a [Fa ->]] | Fy].
     by rewrite tr_scalar_mx mulmx1; apply: Fa.
   by exists y%:M; split=> [i|]; rewrite 1?ord1 ?tr_scalar_mx ?mulmx1 mxE.
 pose m1 := (size p).-1; pose X1 := \row_(i < m1) x ^+ i.
@@ -1288,7 +1288,7 @@ Lemma algebraic_inv u : algebraicOver FtoE u -> algebraicOver FtoE u^-1.
 Proof.
 have [-> | /expf_neq0 nz_u_n] := eqVneq u 0; first by rewrite invr0.
 case=> p nz_p pu0; exists (Poly (rev p)).
-  apply/eqP=> /polyP/(_ 0); rewrite coef_Poly coef0 nth_rev ?size_poly_gt0 //.
+  apply/eqP=> /polyP/(_ 0%N); rewrite coef_Poly coef0 nth_rev ?size_poly_gt0 //.
   by apply/eqP; rewrite subn1 lead_coef_eq0.
 apply/eqP/(mulfI (nz_u_n (size p).-1)); rewrite mulr0 -(rootP pu0).
 rewrite (@horner_coef_wide _ (size p)); last first.

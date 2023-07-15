@@ -365,7 +365,7 @@ Definition invz n : int := n.
 Lemma mulVz : {in unitz, left_inverse 1%R invz *%R}.
 Proof. by move=> n /pred2P[] ->. Qed.
 
-Lemma mulzn_eq1 m (n : nat) : (m * n == 1) = (m == 1) && (n == 1).
+Lemma mulzn_eq1 m (n : nat) : (m * n == 1) = (m == 1) && (n == 1%N).
 Proof. by case: m => m /=; [rewrite -PoszM [_==_]muln_eq1 | case: n]. Qed.
 
 Lemma unitzPl m n : n * m = 1 -> m \is a unitz.
@@ -476,12 +476,12 @@ Definition ltez_nat := (lez_nat, ltz_nat).
 
 Lemma leNz_nat m n : (- m%:Z <= n). Proof. by case: m. Qed.
 
-Lemma ltNz_nat m n : (- m%:Z < n) = (m != 0) || (n != 0).
+Lemma ltNz_nat m n : (- m%:Z < n) = (m != 0%N) || (n != 0%N).
 Proof. by move: m n=> [|?] []. Qed.
 
 Definition lteNz_nat := (leNz_nat, ltNz_nat).
 
-Lemma lezN_nat m n : (m%:Z <= - n%:Z) = (m == 0) && (n == 0).
+Lemma lezN_nat m n : (m%:Z <= - n%:Z) = (m == 0%N) && (n == 0%N).
 Proof. by move: m n=> [|?] []. Qed.
 
 Lemma ltzN_nat m n : (m%:Z < - n%:Z) = false.
@@ -489,7 +489,7 @@ Proof. by move: m n=> [|?] []. Qed.
 
 Lemma le0z_nat n : 0 <= n :> int. Proof. by []. Qed.
 
-Lemma lez0_nat n : n <= 0 :> int = (n == 0 :> nat). Proof. by elim: n. Qed.
+Lemma lez0_nat n : n <= 0 :> int = (n == 0%N :> nat). Proof. by elim: n. Qed.
 
 Definition ltezN_nat := (lezN_nat, ltzN_nat).
 Definition ltez_natE := (ltez_nat, lteNz_nat, ltezN_nat, le0z_nat, lez0_nat).

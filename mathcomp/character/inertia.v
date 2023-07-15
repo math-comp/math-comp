@@ -1145,7 +1145,7 @@ have [defKT | ltKT_K] := eqVneq (K :&: T) K; last first.
     by apply: contraTeq; rewrite !pK !nth_uniq ?t_cast ?cfclass_uniq.
   have{} DthL: 'Res theta = e%:R *: \sum_(i < t) (phi ^: K)%CF`_i.
     by rewrite DthL (big_nth 0) big_mkord t_cast.
-  suffices /eqP e1: e == 1 by rewrite DthL e1 scale1r; apply: eq_bigr.
+  suffices /eqP e1: e == 1%N by rewrite DthL e1 scale1r; apply: eq_bigr.
   have Dth1: theta 1%g = e%:R * t%:R * phi 1%g.
     rewrite -[t]card_ord -mulrA -(cfRes1 L) DthL cfunE; congr (_ * _).
     rewrite mulr_natl -sumr_const sum_cfunE -t_cast; apply: eq_bigr => i _.
@@ -1167,7 +1167,7 @@ have mmLthL i: 'Res[L] 'chi_(mmLth i) = 'Res[L] theta.
   rewrite mmLthE rmorphM /= cfRes_sub_ker ?cfker_mod ?lin_char1 //.
   by rewrite scale1r mul1r.
 have [inj_Mphi | /injectivePn[i [j i'j eq_mm_ij]]] := boolP (injectiveb mmLth).
-  suffices /eqP e1: e == 1 by constructor 1; rewrite DthL e1 scale1r mem_irr.
+  suffices /eqP e1: e == 1%N by constructor 1; rewrite DthL e1 scale1r mem_irr.
   rewrite eqn_leq lt0n (contraNneq _ (irr1_neq0 s)); last first.
     by rewrite -(cfRes1 L) DthL cfunE => ->; rewrite !mul0r.
   rewrite -leq_sqr -leC_nat natrX -(ler_pM2r (irr1_gt0 p0)) -mulrA mul1r.
@@ -1243,7 +1243,7 @@ have [e DtN]: exists e, 'Res 'chi_t = e%:R *: 'chi_s.
 have [/irrWnorm/eqP | [c injc DtNc]] := cfRes_prime_irr_cases t nsNG iGN pr_p.
   rewrite DtN cfnormZ cfnorm_irr normr_nat mulr1 -natrX pnatr_eq1.
   by rewrite muln_eq1 andbb => /eqP->; rewrite scale1r.
-have nz_e: e != 0.
+have nz_e: e != 0%N.
   have: 'Res[N] 'chi_t != 0 by rewrite cfRes_eq0 // ?irr_char ?irr_neq0.
   by rewrite DtN; apply: contraNneq => ->; rewrite scale0r.
 have [i s'ci]: exists i, c i != s.

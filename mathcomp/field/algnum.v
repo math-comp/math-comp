@@ -470,7 +470,7 @@ have nua : additive nu.
   rewrite -Dx nu_inj; rewrite -Dx1 -Dx2 -rmorphB in Dx.
   by rewrite (fmorph_inj _ Dx) !rmorphB -!nu_inj Dx1 Dx2.
 have num : multiplicative nu.
-  split=> [x1 x2|]; last by rewrite -(rmorph1 QsC) (nu_inj 0) !rmorph1.
+  split=> [x1 x2|]; last by rewrite -(rmorph1 QsC) (nu_inj 0%N) !rmorph1.
   have [n] := max3 (x1 * x2) x1 x2.
   case=> /mem_ext[y Dx] /mem_ext[y1 Dx1] /mem_ext[y2 Dx2].
   rewrite -Dx nu_inj; rewrite -Dx1 -Dx2 -rmorphM in Dx.
@@ -478,7 +478,7 @@ have num : multiplicative nu.
 pose nuaM := GRing.isAdditive.Build _ _ nu nua.
 pose numM := GRing.isMultiplicative.Build _ _ nu num.
 pose nuRM : {rmorphism _ -> _} := HB.pack nu nuaM numM.
-by exists nuRM => x; rewrite /= (nu_inj 0).
+by exists nuRM => x; rewrite /= (nu_inj 0%N).
 Qed.
 
 (* Extended automorphisms of Q_n. *)
@@ -545,7 +545,7 @@ Qed.
 
 Lemma Cint_rat_Aint z : z \in Crat -> z \in Aint -> z \in Num.int.
 Proof.
-case/CratP=> a ->{z} /polyOverP/(_ 0).
+case/CratP=> a ->{z} /polyOverP/(_ 0%N).
 have [p [Dp mon_p] dv_p] := minCpolyP (ratr a); rewrite Dp coef_map.
 suffices /eqP->: p == 'X - a%:P by rewrite polyseqXsubC /= rmorphN rpredN.
 rewrite -eqp_monic ?monicXsubC // irredp_XsubC //.
@@ -798,7 +798,7 @@ Proof. by rewrite eqAmod0_rat ?rpred_nat // dvdC_nat. Qed.
 
 Definition orderC x :=
   let p := minCpoly x in
-  oapp val 0 [pick n : 'I_(2 * size p ^ 2) | p == intrp 'Phi_n].
+  oapp val 0%N [pick n : 'I_(2 * size p ^ 2) | p == intrp 'Phi_n].
 
 Notation "#[ x ]" := (orderC x) : C_scope.
 

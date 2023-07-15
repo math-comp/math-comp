@@ -1259,7 +1259,7 @@ apply: (iffP idP) => [/and3P[sKE /separableP sepKE nKE] | fixedKE].
   apply/eqP; rewrite eqEsubv galois_connection_subv ?andbT //.
   apply/subvP=> a /mem_fixedFieldP[Ea fixEa]; rewrite -adjoin_deg_eq1.
   have [r /allP Er splitKa] := normalFieldP nKE a Ea.
-  rewrite -eqSS -size_minPoly splitKa size_prod_XsubC eqSS -[1]/(size [:: a]).
+  rewrite -eqSS -size_minPoly splitKa size_prod_XsubC eqSS -/(size [:: a]).
   have Ur: uniq r by rewrite -separable_prod_XsubC -splitKa; apply: sepKE.
   rewrite -uniq_size_uniq {Ur}// => b; rewrite inE -root_prod_XsubC -splitKa.
   apply/eqP/idP=> [-> | pKa_b_0]; first exact: root_minPoly.
