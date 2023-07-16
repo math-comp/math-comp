@@ -5009,7 +5009,7 @@ Section Pdeg2NumClosed.
 
 Variables (F : numClosedFieldType) (p : {poly F}).
 
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -5041,7 +5041,7 @@ Section Pdeg2NumClosedMonic.
 
 Variables (F : numClosedFieldType) (p : {poly F}).
 
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 Hypothesis monicp : p \is monic.
 
 Let a := p`_2.
@@ -5074,7 +5074,7 @@ Variable F : realFieldType.
 Section Pdeg2RealConvex.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -5124,7 +5124,7 @@ End Pdeg2RealConvex.
 Section Pdeg2RealConcave.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -5134,7 +5134,7 @@ Hypothesis ale0 : a <= 0.
 
 Let delta := b ^+ 2 - 4 * a * c.
 
-Let degpN : size (- p) = 3%N. Proof. by rewrite size_opp. Qed.
+Let degpN : size (- p) = 3. Proof. by rewrite size_opp. Qed.
 Let b2a : - (- p)`_1 / (2 * (- p)`_2) = - b / (2 * a).
 Proof. by rewrite !coefN mulrN divrNN. Qed.
 Let deltaN : (- p)`_1 ^+ 2 - 4 * (- p)`_2 * (- p)`_0 = delta.
@@ -5173,7 +5173,7 @@ Variable F : rcfType.
 Section Pdeg2RealClosedConvex.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -5283,7 +5283,7 @@ End Pdeg2RealClosedConvex.
 Section Pdeg2RealClosedConcave.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -5296,7 +5296,7 @@ Let r2 := (- b - sqrt delta) / (2 * a).
 
 Hypothesis ale0 : a <= 0.
 
-Let degpN : size (- p) = 3%N. Proof. by rewrite size_opp. Qed.
+Let degpN : size (- p) = 3. Proof. by rewrite size_opp. Qed.
 Let aNge0 : 0 <= (- p)`_2. Proof. by rewrite coefN oppr_ge0. Qed.
 Let deltaN : (- p)`_1 ^+ 2 - 4 * (- p)`_2 * (- p)`_0 = delta.
 Proof. by rewrite !coefN sqrrN -mulrN opprK mulrN mulNr. Qed.
@@ -5341,7 +5341,7 @@ Section Pdeg2RealMonic.
 Variable F : realFieldType.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 Hypothesis monicp : p \is monic.
 
 Let a := p`_2.
@@ -5373,7 +5373,7 @@ End Pdeg2RealMonic.
 Section Pdeg2RealClosedMonic.
 
 Variables (F : rcfType) (p : {poly F}).
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 Hypothesis monicp : p \is monic.
 
 Let a := p`_2.

@@ -758,7 +758,7 @@ Local Notation "'X" := polyX.
 Lemma polyseqX : 'X = [:: 0; 1] :> seq R.
 Proof. by rewrite unlock !polyseq_cons nil_poly eqxx /= polyseq1. Qed.
 
-Lemma size_polyX : size 'X = 2%N. Proof. by rewrite polyseqX. Qed.
+Lemma size_polyX : size 'X = 2. Proof. by rewrite polyseqX. Qed.
 
 Lemma polyX_eq0 : ('X == 0) = false.
 Proof. by rewrite -size_poly_eq0 size_polyX. Qed.
@@ -801,10 +801,10 @@ Qed.
 Lemma polyseqXsubC a : 'X - a%:P = [:: - a; 1] :> seq R.
 Proof. by rewrite -['X]mul1r -polyCN -cons_poly_def polyseq_cons polyseq1. Qed.
 
-Lemma size_XsubC a : size ('X - a%:P) = 2%N.
+Lemma size_XsubC a : size ('X - a%:P) = 2.
 Proof. by rewrite polyseqXsubC. Qed.
 
-Lemma size_XaddC b : size ('X + b%:P) = 2%N.
+Lemma size_XaddC b : size ('X + b%:P) = 2.
 Proof. by rewrite -[b]opprK rmorphN size_XsubC. Qed.
 
 Lemma lead_coefXsubC a : lead_coef ('X - a%:P) = 1.
@@ -831,7 +831,7 @@ have [-> | nzp] := eqVneq p 0; first by rewrite mul0r.
 by rewrite /lead_coef !nth_last polyseqMX.
 Qed.
 
-Lemma size_XmulC a : a != 0 -> size ('X * a%:P) = 2%N.
+Lemma size_XmulC a : a != 0 -> size ('X * a%:P) = 2.
 Proof.
 by move=> nz_a; rewrite -commr_polyX size_mulX ?polyC_eq0 ?size_polyC nz_a.
 Qed.
@@ -2806,13 +2806,13 @@ rewrite mulf_eq0 expf_eq0 !lead_coef_eq0 -[q == 0]size_poly_leq0.
 by rewrite [_ <= 0]leqNgt (leq_ltn_trans _ sq_gt1) ?andbF ?orbF.
 Qed.
 
-Lemma size_comp_poly2 p q : size q = 2%N -> size (p \Po q) = size p.
+Lemma size_comp_poly2 p q : size q = 2 -> size (p \Po q) = size p.
 Proof.
 move=> sq2; have [->|pN0] := eqVneq p 0; first by rewrite comp_polyC.
 by rewrite polySpred ?size_comp_poly ?comp_poly_eq0 ?sq2 // muln1 polySpred.
 Qed.
 
-Lemma comp_poly2_eq0 p q : size q = 2%N -> (p \Po q == 0) = (p == 0).
+Lemma comp_poly2_eq0 p q : size q = 2 -> (p \Po q == 0) = (p == 0).
 Proof. by rewrite -!size_poly_eq0 => /size_comp_poly2->. Qed.
 
 Theorem max_poly_roots p rs :
@@ -2962,7 +2962,7 @@ Section FieldRoots.
 Variable F : fieldType.
 Implicit Types (p : {poly F}) (rs : seq F).
 
-Lemma poly2_root p : size p = 2%N -> {r | root p r}.
+Lemma poly2_root p : size p = 2 -> {r | root p r}.
 Proof.
 case: p => [[|p0 [|p1 []]] //= nz_p1]; exists (- p0 / p1).
 by rewrite /root addr_eq0 /= mul0r add0r mulrC divfK ?opprK.
@@ -3119,7 +3119,7 @@ Variable F : fieldType.
 Hypothesis nz2 : 2 != 0 :> F.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -3194,7 +3194,7 @@ Variable F : fieldType.
 Hypothesis nz2 : 2 != 0 :> F.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 Hypothesis monicp : p \is monic.
 
 Let a := p`_2.
