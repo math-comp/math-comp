@@ -542,7 +542,9 @@ Proof. by []. Qed.
 Lemma nmulrn (R : zmodType) (x : R) (n : nat) : x *- n = x *~ - n%:Z.
 Proof. by case: n=> [] //; rewrite ?oppr0. Qed.
 
+Variant Ione := IOne : Ione.
 Variant Iintmul := IIntmul : Ione -> int -> Iintmul.
+Variant Idummy_placeholder :=.
 
 Definition parse (x : Number.int) : Iintmul :=
   let i :=

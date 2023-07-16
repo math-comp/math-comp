@@ -6105,26 +6105,6 @@ Export AllExports.
 Export Scale.Exports.
 Export ClosedExports.
 
-Variant Ione := IOne : Ione.
-Variant Inatmul := INatmul : Ione -> nat -> Inatmul.
-Variant Idummy_placeholder :=.
-
-Definition parse (x : Number.uint) : Inatmul :=
-  INatmul IOne (Nat.of_num_uint x).
-
-Definition print (x : Inatmul) : Number.uint :=
-  match x with
-  | INatmul IOne n => Number.UIntDecimal (Nat.to_uint n)
-  end.
-
-Arguments GRing.one {_}.
-Set Warnings "-via-type-remapping,-via-type-mismatch".
-Number Notation Idummy_placeholder parse print (via Inatmul
-  mapping [[GRing.natmul] => INatmul, [GRing.one] => IOne])
-  : ring_scope.
-Set Warnings "via-type-remapping,via-type-mismatch".
-Arguments GRing.one : clear implicits.
-
 Notation "0" := (@zero _) : ring_scope.
 Notation "-%R" := (@opp _) : ring_scope.
 Notation "- x" := (opp x) : ring_scope.

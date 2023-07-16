@@ -3137,7 +3137,7 @@ Proof. by rewrite expr2 mulrACA mulrA -natrM. Qed.
 Let splitr (x : F) : x = x / 2 + x / 2.
 Proof.
 apply: (mulIf nz2); rewrite -mulrDl mulfVK//.
-by rewrite -[2]/(1 + 1)%:R natrD mulrDr mulr1.
+by rewrite -[2%:R]/(1 + 1)%:R natrD mulrDr mulr1.
 Qed.
 
 Let pE : p = a *: 'X^2 + b *: 'X + c%:P.
@@ -3168,7 +3168,7 @@ Lemma deg2_poly_factor : p = a *: ('X - r1%:P) * ('X - r2%:P).
 Proof.
 rewrite [p]deg2_poly_canonical//= -/a -/b -/c -/delta /r1 /r2.
 rewrite ![(- b + _) * _]mulrDl 2!polyCD 2!opprD 2!addrA !mulNr !polyCN !opprK.
-rewrite -scalerAl [in RHS]mulrC -subr_sqr -polyC_exp -[4]/(2 * 2)%:R natrM.
+rewrite -scalerAl [in RHS]mulrC -subr_sqr -polyC_exp -[4%:R]/(2 * 2)%:R natrM.
 by rewrite -expr2 -exprMn [in RHS]exprMn exprVn r_sqrt_delta.
 Qed.
 
@@ -3221,13 +3221,13 @@ Qed.
 
 Lemma deg2_poly_root1 : root p r1.
 Proof.
-rewrite /r1 -[2]mulr1 -[X in 2 * X]a1.
+rewrite /r1 -[2%:R]mulr1 -[X in 2 * X]a1.
 by apply: deg2_poly_root1; rewrite // -/a a1 mulr1.
 Qed.
 
 Lemma deg2_poly_root2 : root p r2.
 Proof.
-rewrite /r2 -[2]mulr1 -[X in 2 * X]a1.
+rewrite /r2 -[2%:R]mulr1 -[X in 2 * X]a1.
 by apply: deg2_poly_root2; rewrite // -/a a1 mulr1.
 Qed.
 
