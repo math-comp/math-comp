@@ -23,7 +23,7 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   ## select an entry to build in the following `bundles` set
   ## defaults to "default"
-  default-bundle = "coq-8.16";
+  default-bundle = "coq-master";
 
   ## write one `bundles.name` attribute set per
   ## alternative configuration, the can be used to
@@ -74,20 +74,12 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq.override.version = "master";
       bignums.override.version = "master";
       paramcoq.override.version = "master";
-      coq-elpi.override.version = "coq-master";
-      hierarchy-builder.override.version = "coq-master";
+      elpi.override.version = "master";
+      coq-elpi.override.version = "proux01:coercion_hook";
+      hierarchy-builder.override.version = "proux01:coq-master+batch-accumulation";
       interval.job = false;
       coqeal.job = false;
       coquelicot.job = false;
-    };
-    "coq-8.17".push-branches = [ "master" "mathcomp-1" ];
-    "coq-8.17".coqPackages = common-bundles // {
-      coq.override.version = "8.17";
-    };
-    "coq-8.16".push-branches = [ "master" "mathcomp-1" ];
-    "coq-8.16".coqPackages = common-bundles // {
-      coq.override.version = "8.16";
-      deriving.job = false;  # currently not ported
     };
   };
 }
