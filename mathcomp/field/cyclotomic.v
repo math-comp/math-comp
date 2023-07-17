@@ -22,7 +22,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import IntInstances.
+Import IntInstances RatInstances.
 
 Import GRing.Theory Num.Theory.
 Local Open Scope ring_scope.

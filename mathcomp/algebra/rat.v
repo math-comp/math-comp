@@ -41,7 +41,7 @@ Record rat : Set := Rat {
   _ : (0 < valq.2) && coprime `|valq.1| `|valq.2|
 }.
 
-Bind Scope ring_scope with rat.
+Bind Scope rat_scope with rat.
 Delimit Scope rat_scope with Q.
 
 Definition ratz (n : int) := @Rat (n, 1) (coprimen1 _).
@@ -425,7 +425,11 @@ rewrite !addq_subdefE /oppq_subdef //= mulNr addNr; apply/eqP.
 by rewrite fracq_eq ?mulf_neq0 ?denq_neq0 //= !mul0r.
 Qed.
 
+Module Import RatZmodInstance.
+
 HB.instance Definition _ := GRing.isZmodule.Build rat addqA addqC add0q addNq.
+
+End RatZmodInstance.
 
 Definition mulq_subdef (x y : int * int) :=
   let: (x1, x2) := x in
@@ -496,8 +500,12 @@ Qed.
 
 Fact nonzero1q : oneq != zeroq. Proof. by []. Qed.
 
+Module Import RatRingInstance.
+
 HB.instance Definition _ :=
   GRing.Zmodule_isComRing.Build rat mulqA mulqC mul1q mulq_addl nonzero1q.
+
+End RatRingInstance.
 
 Fact mulVq x : x != 0 -> mulq (invq x) x = 1.
 Proof.
@@ -508,7 +516,11 @@ Qed.
 
 Fact invq0 : invq 0 = 0. Proof. exact/eqP. Qed.
 
+Module Import RatFieldInstance.
+
 HB.instance Definition _ := GRing.ComRing_isField.Build rat mulVq invq0.
+
+End RatFieldInstance.
 
 Lemma numq_eq0 x : (numq x == 0) = (x == 0).
 Proof.
@@ -517,19 +529,31 @@ rewrite -[x]valqK fracq_eq0; case: fracqP=> /= [|k {}x k0].
 by rewrite !mulf_eq0 (negPf k0) /= denq_eq0 orbF.
 Qed.
 
-Notation "n %:Q" := ((n : int)%:~R : rat) : ring_scope.
+(* This notation is supposed to work even if the library is not Imported.
+   Since we can't rely on the CS database to contain the zmodule instance
+   on rat we put the instance by hand in the notations. *)
+Local Definition rat_nmodType : nmodType := rat.
+Local Definition rat_zmodType : zmodType := rat.
+Local Definition rat_semiRingType : semiRingType := rat.
+Local Definition rat_unitRingType : unitRingType := rat.
+
+Notation "n %:Q" :=
+  (@intmul rat_zmodType (@GRing.one rat_semiRingType) (n%Z : int) : rat)
+  (only parsing) : ring_scope.
+Notation "n '%:Q'" := (n%:Q) (only printing) : ring_coercions.
+Disable Notation "n %:Q" : ring_coercions.
 
 #[global] Hint Resolve denq_neq0 denq_gt0 denq_ge0 : core.
 
 Definition subq (x y : rat) : rat := (addq x (oppq y)).
 Definition divq (x y : rat) : rat := (mulq x (invq y)).
 
-Infix "+" := addq : rat_scope.
-Notation "- x" := (oppq x) : rat_scope.
-Infix "*" := mulq : rat_scope.
-Notation "x ^-1" := (invq x) : rat_scope.
-Infix "-" := subq : rat_scope.
-Infix "/" := divq : rat_scope.
+Notation "x + y" := (@GRing.add rat_nmodType x%Q y%Q) : rat_scope.
+Notation "- x" := (@GRing.opp rat_zmodType x%Q) : rat_scope.
+Notation "x * y" := (@GRing.mul rat_semiRingType x%Q y%Q) : rat_scope.
+Notation "x ^-1" := (@GRing.inv rat_unitRingType x%Q) : rat_scope.
+Notation "x - y" := (x%Q + - y%Q)%Q : rat_scope.
+Notation "x / y" := (x%Q * y%Q ^-1)%Q : rat_scope.
 
 (* ratz should not be used, %:Q should be used instead *)
 Lemma ratzE n : ratz n = n%:Q.
@@ -606,7 +630,8 @@ rewrite -{1}[x](divq_num_den); case hd: denq => [p|n].
 by move: (denq_gt0 x); rewrite hd.
 Qed.
 
-Lemma coprimeq_num n d : coprime `|n| `|d| -> numq (n%:~R / d%:~R) = sgr d * n.
+Lemma coprimeq_num n d :
+  coprime `|n| `|d| -> numq (n%:~R / d%:~R) = sgr d * n.
 Proof.
 move=> cnd /=; have <- := fracqE (n, d).
 rewrite num_fracq/= (eqP (cnd : _ == 1%N)) divn1.
@@ -733,9 +758,13 @@ Qed.
 Fact lt_rat_def x y : (lt_rat x y) = (y != x) && (le_rat x y).
 Proof. by rewrite lt_ratE le_ratE lt_def rat_eq. Qed.
 
+Module Import RatNumFieldInstance.
+
 HB.instance Definition _ :=
    Num.IntegralDomain_isLeReal.Build rat le_rat0D le_rat0M le_rat0_anti
      subq_ge0 (@le_rat_total 0) norm_ratN ge_rat0_norm lt_rat_def.
+
+End RatNumFieldInstance.
 
 Lemma numq_ge0 x : (0 <= numq x) = (0 <= x).
 Proof.
@@ -794,8 +823,12 @@ Proof. by rewrite /is_nat denqN oppr_ge0 -andb_orl le_total. Qed.
 End ratArchimedean.
 End ratArchimedean.
 
+Module Import RatArchiFieldInstance.
+
 HB.instance Definition _ := Num.NumDomain_isArchimedean.Build rat
   ratArchimedean.truncP ratArchimedean.is_natE ratArchimedean.is_intE.
+
+End RatArchiFieldInstance.
 
 Lemma Qint_def (x : rat) : (x \is a Num.int) = (denq x == 1). Proof. by []. Qed.
 
@@ -943,22 +976,10 @@ Arguments ratr {R}.
 
 (* Connecting rationals to the ring and field tactics *)
 
-Ltac rat_to_ring :=
-  rewrite -?[0%Q]/(0 : rat)%R -?[1%Q]/(1 : rat)%R
-          -?[(_ - _)%Q]/(_ - _ : rat)%R -?[(_ / _)%Q]/(_ / _ : rat)%R
-          -?[(_ + _)%Q]/(_ + _ : rat)%R -?[(_ * _)%Q]/(_ * _ : rat)%R
-          -?[(- _)%Q]/(- _ : rat)%R -?[(_ ^-1)%Q]/(_ ^-1 : rat)%R /=.
-
-Ltac ring_to_rat :=
-  rewrite -?[0%R]/0%Q -?[1%R]/1%Q
-          -?[(_ - _)%R]/(_ - _)%Q -?[(_ / _)%R]/(_ / _)%Q
-          -?[(_ + _)%R]/(_ + _)%Q -?[(_ * _)%R]/(_ * _)%Q
-          -?[(- _)%R]/(- _)%Q -?[(_ ^-1)%R]/(_ ^-1)%Q /=.
-
 Lemma rat_ring_theory : (ring_theory 0%Q 1%Q addq mulq subq oppq eq).
 Proof.
-split => * //; rat_to_ring;
-by rewrite ?(add0r, addrA, mul1r, mulrA, mulrDl, subrr) // (addrC, mulrC).
+by split=> *;
+  rewrite ?(add0q, addqA, mul1q, mulqA, mulq_addl) // 1?(addqC, mulqC)// ?addNq.
 Qed.
 
 Require setoid_ring.Field_theory setoid_ring.Field_tac.
@@ -966,8 +987,8 @@ Require setoid_ring.Field_theory setoid_ring.Field_tac.
 Lemma rat_field_theory :
   Field_theory.field_theory 0%Q 1%Q addq mulq subq oppq divq invq eq.
 Proof.
-split => //; first exact: rat_ring_theory.
-by move=> p /eqP p_neq0; rat_to_ring; rewrite mulVf.
+split=> //; first exact: rat_ring_theory.
+by move=> p /eqP p_neq0; rewrite [LHS]mulVf.
 Qed.
 
 Add Field rat_field : rat_field_theory.
@@ -1009,3 +1030,23 @@ Notation QintP := mc_2_0.QintP (only parsing).
 Notation Qnat_def := mc_2_0.Qnat_def (only parsing).
 #[deprecated(since="mathcomp 2.1.0", note="Use natrP instead.")]
 Notation QnatP := mc_2_0.QnatP (only parsing).
+
+Module RatInstances.
+Export RatZmodInstance.
+Export RatRingInstance.
+Export RatFieldInstance.
+Export RatNumFieldInstance.
+Export RatArchiFieldInstance.
+End RatInstances.
+
+Notation "x" := (ratr x) (only printing) : ring_scope.
+Notation "'ratr' x" := (ratr x) (only printing, at level 2) : ring_coercions.
+Disable Notation "'ratr' x" : ring_coercions.
+
+Elpi Accumulate Coercion lp:{{
+coercion _ X Inferred Expected Res :-
+  coq.unify-eq {{ rat }} Inferred ok, !,
+  coq.unify-eq {{ GRing.UnitRing.sort lp:R }} Expected ok, !,
+  Res = {{ @ratr lp:R lp:X }}.
+}}.
+Elpi Typecheck Coercion.

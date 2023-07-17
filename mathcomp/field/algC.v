@@ -54,7 +54,7 @@ Declare Scope C_scope.
 Declare Scope C_core_scope.
 Declare Scope C_expanded_scope.
 
-Import IntInstances.
+Import IntInstances RatInstances.
 
 Import Order.TTheory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.

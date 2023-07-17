@@ -1,4 +1,4 @@
-From mathcomp Require Import all_ssreflect ssralg ssrint.
+From mathcomp Require Import all_ssreflect ssralg ssrnum ssrint rat.
 
 Import GRing.Theory.
 
@@ -38,3 +38,20 @@ by rewrite addrCA addrA.
 Qed.
 
 End DemoCoercionsIntmul.
+
+Section DemoCoercionsRatr.
+
+Variable F : numFieldType.
+
+Variables (x : F) (r : rat).
+
+Lemma test_rat : r + x + 1 = x + (r + 1)%Q.
+Proof.
+(* now we need some printing of coercions *)
+Enable Notation (all) : ring_coercions.
+rewrite raddfD/= rmorph1.
+Disable Notation (all) : ring_coercions.
+by rewrite addrCA addrA.
+Qed.
+
+End DemoCoercionsRatr.
