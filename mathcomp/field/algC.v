@@ -54,6 +54,8 @@ Declare Scope C_scope.
 Declare Scope C_core_scope.
 Declare Scope C_expanded_scope.
 
+Import IntInstances.
+
 Import Order.TTheory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
@@ -69,7 +71,7 @@ Lemma nz2: 2 != 0 :> L.
 Proof.
   apply/eqP=> char2; apply: conj_nt => e; apply/eqP/idPn=> eJ.
   have opp_id x: - x = x :> L.
-    by apply/esym/eqP; rewrite -addr_eq0 -mulr2n -mulr_natl pmulrn char2 mul0r.
+    by apply/esym/eqP; rewrite -addr_eq0 -mulr2n -mulr_natl char2 mul0r.
   have{} char2: 2%N \in [char L] by apply/eqP.
   without loss{eJ} eJ: e / conj e = e + 1.
     move/(_ (e / (e + conj e))); apply.
@@ -636,7 +638,7 @@ Definition CintrE :=
    =^~ (@ler_int CnF, @ltr_int CnF, (inj_eq (@intr_inj CnF)))).
 
 Let nz2 : 2 != 0 :> algC.
-Proof. by rewrite -(rmorph0 ( *~%R 1)) -CintrE. Qed.
+Proof. by rewrite -(rmorph0 ( *~%R 1)) pmulrn -CintrE. Qed.
 
 (* Conjugation and norm. *)
 

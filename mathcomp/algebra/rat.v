@@ -22,6 +22,8 @@ From mathcomp Require Import ssrint prime archimedean.
 (*                 of normal forms. The parsable notation is for debugging.   *)
 (******************************************************************************)
 
+Import IntInstances.
+
 Import Order.TTheory GRing.Theory Num.Theory.
 
 Set Implicit Arguments.

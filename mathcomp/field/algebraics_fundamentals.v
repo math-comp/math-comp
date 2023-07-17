@@ -113,6 +113,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Import IntInstances.
+
 Import Order.TTheory GroupScope GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
@@ -127,7 +129,7 @@ Proof.
 move=> algC x.
 without loss x_ge0: x / 0 <= x by rewrite -normr_id; apply.
 have [-> | nz_x] := eqVneq x 0; first by exists 1%N; rewrite normr0.
-have [p mon_p px0] := algC x; exists (\sum_(j < size p) `|numq p`_j|)%N.
+have [p mon_p px0] := algC x; exists (\sum_(j < size p) `|numq (p`_j)%R|)%N.
 rewrite ger0_norm // real_ltNge ?rpred_nat ?ger0_real //.
 apply: contraL px0 => lb_x; rewrite rootE gt_eqF // horner_coef size_map_poly.
 have x_gt0 k: 0 < x ^+ k by rewrite exprn_gt0 // lt_def nz_x.

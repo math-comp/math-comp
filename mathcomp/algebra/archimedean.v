@@ -49,6 +49,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Import IntInstances.
+
 Local Open Scope ring_scope.
 Import Order.TTheory GRing.Theory Num.Theory.
 
@@ -100,8 +102,9 @@ End Internals.
 
 Module Import Def.
 Export ssrnum.Num.Def.
-Definition floor {R : archiNumDomainType} (x : R) := sval (floor_subproof x).
-Definition ceil {R : archiNumDomainType} (x : R) := - floor (- x).
+Definition floor {R : archiNumDomainType} (x : R) : int :=
+  sval (floor_subproof x).
+Definition ceil {R : archiNumDomainType} (x : R) : int := - floor (- x).
 End Def.
 
 Notation trunc := trunc.

@@ -44,6 +44,8 @@ Unset Printing Implicit Defensive.
 Declare Scope algC_scope.
 Declare Scope algC_expanded_scope.
 
+Import IntInstances.
+
 Import GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 

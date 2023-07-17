@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From elpi.apps Require Import coercion.
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
 From mathcomp Require Import fintype finfun bigop order ssralg countalg ssrnum.
@@ -48,7 +49,6 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Declare Scope int_scope.
-Declare Scope distn_scope.
 Declare Scope rat_scope.
 
 Reserved Notation "n %:Z" (at level 2, left associativity, format "n %:Z").
@@ -60,6 +60,8 @@ Reserved Notation "n != m :> 'int'"
   (at level 70, m at next level, format "n  !=  m  :>  'int'").
 Reserved Notation "n <> m :> 'int'"
   (at level 70, m at next level, format "n  <>  m  :>  'int'").
+
+Import NatInstances.
 
 Import Order.TTheory GRing.Theory Num.Theory.
 Delimit Scope int_scope with Z.
@@ -222,12 +224,26 @@ Definition Mixin := GRing.isZmodule.Build int addzA addzC add0z addNz.
 End intZmod.
 End intZmod.
 
+Module Import IntZmodInstance.
+
 HB.instance Definition _ := intZmod.Mixin.
 
-Import NatInstances.
+End IntZmodInstance.
 
 HB.instance Definition _ := GRing.isSemiAdditive.Build nat int Posz
   (erefl, intZmod.PoszD).
+
+(* These notations are supposed to work even if the library is not Imported.
+   Since we can't rely on the CS database to contain the {n,z}module instances
+   on int we put the instance by hand in the notations. *)
+Local Definition int_nmodType : nmodType := int.
+Local Definition int_zmodType : zmodType := int.
+
+Notation "-%Z" := (@GRing.opp int_zmodType) : int_scope.
+Notation "- x" := (-%Z x%Z) : int_scope.
+Notation "+%Z" := (@GRing.add int_nmodType) : int_scope.
+Notation "x + y" := (+%Z x%Z y%Z) : int_scope.
+Notation "x - y" := (x%Z + - y%Z)%Z : int_scope.
 
 Local Open Scope ring_scope.
 
@@ -305,12 +321,12 @@ by case: (intP m)=> {m} [|m|m]; rewrite ?mul0z //;
 case: (intP n)=> {n} [|n|n]; rewrite ?mulz0 //= mulnC.
 Qed.
 
-Lemma mulNz (m n : int) : ((- m) * n)%Z = - (m * n)%Z.
+Lemma mulNz (m n : int) : ((- m)%R * n)%Z = - (m * n)%Z.
 Proof. by rewrite mulzC mulzN mulzC. Qed.
 
 Lemma mulzA : associative mulz.
 Proof.
-by move=> [] m [] n [] p; rewrite ?NegzE ?(mulnA,mulNz,mulzN,opprK) //= ?mulnA.
+by move=> [] m [] n [] p; rewrite ?NegzE ?(mulNz,mulzN) ?opprK /= ?mulnA.
 Qed.
 
 Lemma mul1z : left_id 1%Z mulz.
@@ -337,7 +353,17 @@ Definition comMixin := GRing.Zmodule_isComRing.Build int
 End intRing.
 End intRing.
 
+Module Import IntRingInstance.
+
 HB.instance Definition _ := intRing.comMixin.
+
+End IntRingInstance.
+
+Local Definition int_semiRingType : semiRingType := int.
+
+Notation "*%Z" := (@GRing.mul int_semiRingType) : int_scope.
+Notation "x * y" := ( *%Z x%Z y%Z) : int_scope.
+Notation "x ^+ n" := (@GRing.exp int_semiRingType x%Z n) : int_scope.
 
 Section intRingTheory.
 
@@ -391,13 +417,16 @@ Definition comMixin := GRing.ComRing_hasMulInverse.Build int
 End intUnitRing.
 End intUnitRing.
 
+Module Import IntUnitRingInstance.
+
 HB.instance Definition _ := intUnitRing.comMixin.
 HB.instance Definition _ := GRing.ComUnitRing_isIntegral.Build int
   intUnitRing.idomain_axiomz.
 
+End IntUnitRingInstance.
+
 Definition absz m := match m with Posz p => p | Negz n => n.+1 end.
-Notation "m - n" := (@GRing.add int m%N (@GRing.opp int n%N)) : distn_scope.
-Arguments absz m%distn_scope.
+Arguments absz m%int_scope.
 Local Notation "`| m |" := (absz m) : nat_scope.
 
 Module intOrdered.
@@ -461,7 +490,11 @@ Definition Mixin := Num.IntegralDomain_isLeReal.Build int
 End intOrdered.
 End intOrdered.
 
+Module Import IntNumDomainInstance.
+
 HB.instance Definition _ := intOrdered.Mixin.
+
+End IntNumDomainInstance.
 
 Section intOrderedTheory.
 
@@ -520,7 +553,7 @@ Notation ltz_add1r := ltz1D.
 #[deprecated(since="mathcomp 1.17.0", note="Use ltzD1 instead.")]
 Notation ltz_addr1 := ltzD1.
 
-Bind Scope ring_scope with int.
+Bind Scope int_scope with int.
 
 (* definition of intmul *)
 Definition intmul (R : zmodType) (x : R) (n : int) := nosimpl
@@ -533,42 +566,19 @@ Notation "*~%R" := (@intmul _) (at level 0, format " *~%R") : fun_scope.
 Notation "x *~ n" := (intmul x n)
   (at level 40, left associativity, format "x  *~  n") : ring_scope.
 Notation intr := ( *~%R 1).
-Notation "n %:~R" := (1 *~ n)%R
-  (at level 2, left associativity, format "n %:~R")  : ring_scope.
+
+Notation "n %:~R" := (1 *~ n%Z)%R
+  (only parsing, at level 2, left associativity)  : ring_scope.
+Notation "n" := (1 *~ n%Z)%R (only printing, at level 2)  : ring_scope.
+Notation "n '%:~R'" := (1 *~ n%Z)%R
+  (only printing, format "n %:~R") : ring_coercions.
+Disable Notation "n %:~R" : ring_coercions.
 
 Lemma pmulrn (R : zmodType) (x : R) (n : nat) : x *+ n = x *~ n%:Z.
 Proof. by []. Qed.
 
 Lemma nmulrn (R : zmodType) (x : R) (n : nat) : x *- n = x *~ - n%:Z.
 Proof. by case: n=> [] //; rewrite ?oppr0. Qed.
-
-Variant Ione := IOne : Ione.
-Variant Iintmul := IIntmul : Ione -> int -> Iintmul.
-Variant Idummy_placeholder :=.
-
-Definition parse (x : Number.int) : Iintmul :=
-  let i :=
-    match x with
-    | Number.IntDecimal (Decimal.Pos u) => Posz (Nat.of_uint u)
-    | Number.IntDecimal (Decimal.Neg u) => Negz (Nat.of_uint u).-1
-    | Number.IntHexadecimal (Hexadecimal.Pos u) => Posz (Nat.of_hex_uint u)
-    | Number.IntHexadecimal (Hexadecimal.Neg u) => Negz (Nat.of_hex_uint u).-1
-    end in
-  IIntmul IOne i.
-
-Definition print (x : Iintmul) : Number.int :=
-  match x with
-  | IIntmul IOne (Posz n) => Number.IntDecimal (Decimal.Pos (Nat.to_uint n))
-  | IIntmul IOne (Negz n) => Number.IntDecimal (Decimal.Neg (Nat.to_uint n.+1))
-  end.
-
-Arguments GRing.one {_}.
-Set Warnings "-via-type-remapping,-via-type-mismatch".
-Number Notation Idummy_placeholder parse print (via Iintmul
-  mapping [[intmul] => IIntmul, [GRing.one] => IOne])
-  : ring_scope.
-Set Warnings "via-type-remapping,via-type-mismatch".
-Arguments GRing.one : clear implicits.
 
 Section ZintLmod.
 
@@ -1078,7 +1088,9 @@ Lemma invr_expz x n : (x ^ n)^-1 = x ^ (- n).
 Proof. by case: (intP n)=> // [|m]; rewrite ?opprK ?expr0z ?invr1 // invrK. Qed.
 
 Lemma exprz_inv x n : (x^-1) ^ n = x ^ (- n).
-Proof. by case: (intP n)=> // m; rewrite -[_ ^ (- _)]exprVn ?opprK ?invrK. Qed.
+Proof.
+by case: (intP n)=> // m; rewrite -[_ ^ (- _)%R]exprVn ?opprK ?invrK.
+Qed.
 
 Lemma exp1rz n : 1 ^ n = 1 :> R.
 Proof. by case: (intP n)=> // m; rewrite -?exprz_inv ?invr1; apply: expr1n. Qed.
@@ -1466,7 +1478,7 @@ Proof. by rewrite !(fun_if sgz) !sgzE. Qed.
 Lemma normr_sgz x : `|sgz x| = (x != 0).
 Proof. by rewrite sgz_def -mulr_natr normrMsign normr_nat natz. Qed.
 
-Lemma normr_sg x : `|sgr x| = (x != 0)%:~R.
+Lemma normr_sg x : `|sgr x| = (x != 0%N)%:~R.
 Proof. by rewrite sgr_def -mulr_natr normrMsign normr_nat. Qed.
 
 End Sgz.
@@ -1566,7 +1578,7 @@ Qed.
 Lemma sgzN x : sgz (- x) = - sgz x.
 Proof. by rewrite /sgz oppr_eq0 oppr_lt0; case: ltrgtP. Qed.
 
-Lemma mulz_sg x : sgz x * sgz x = (x != 0)%:~R.
+Lemma mulz_sg x : sgz x * sgz x = (x != 0%N)%:~R.
 Proof. by case: sgzP; rewrite ?(mulr0, mulr1, mulrNN). Qed.
 
 Lemma mulz_sg_eq1 x y : (sgz x * sgz y == 1) = (x != 0) && (sgz x == sgz y).
@@ -1712,15 +1724,6 @@ End MoreAbsz.
 
 Module Export IntDist.
 
-(* This notation is supposed to work even if the ssrint library is not Imported.
-   Since we can't rely on the CS database to contain the zmodule instance on
-   int we put the instance by hand in the notation. *)
-Local Definition int_nmodType : nmodType := int.
-Local Definition int_zmodType : zmodType := int.
-Notation "m - n" :=
-  (@GRing.add int_nmodType (m%N : int)
-    (@GRing.opp int_zmodType (n%N : int))) : distn_scope.
-Arguments absz m%distn_scope.
 Notation "`| m |" := (absz m) : nat_scope.
 Coercion Posz : nat >-> int.
 
@@ -1733,10 +1736,10 @@ Implicit Types n d : nat.
 Lemma distnC m1 m2 : `|m1 - m2| = `|m2 - m1|.
 Proof. by rewrite -opprB abszN. Qed.
 
-Lemma distnDl d n1 n2 : `|d + n1 - (d + n2)| = `|n1 - n2|.
+Lemma distnDl d n1 n2 : `|(d + n1)%N - (d + n2)%N| = `|n1 - n2|.
 Proof. by rewrite !PoszD opprD addrCA -addrA addKr. Qed.
 
-Lemma distnDr d n1 n2 : `|n1 + d - (n2 + d)| = `|n1 - n2|.
+Lemma distnDr d n1 n2 : `|(n1 + d)%N - (n2 + d)%N| = `|n1 - n2|.
 Proof. by rewrite -!(addnC d) distnDl. Qed.
 
 Lemma distnEr n1 n2 : n1 <= n2 -> `|n1 - n2| = n2 - n1.
@@ -1879,8 +1882,12 @@ Proof. by case: n. Qed.
 End intArchimedean.
 End intArchimedean.
 
+Module Import IntArchimedeanInstance.
+
 HB.instance Definition _ := Num.NumDomain_isArchimedean.Build int
   intArchimedean.truncP intArchimedean.is_natE intArchimedean.is_intE.
+
+End IntArchimedeanInstance.
 
 Section rpred.
 
@@ -1925,3 +1932,20 @@ Notation Znat := (Num.Def.nat_num : qualifier 1 int) (only parsing).
 Notation Znat_def := mc_2_0.Znat_def (only parsing).
 #[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
 Notation ZnatP := mc_2_0.ZnatP (only parsing).
+
+Module IntInstances.
+Export IntZmodInstance.
+Export IntRingInstance.
+Export IntUnitRingInstance.
+Export IntNumDomainInstance.
+Export IntArchimedeanInstance.
+End IntInstances.
+
+Elpi Accumulate Coercion lp:{{
+coercion _ N Inferred Expected Res :-
+  coq.unify-eq {{ int }} Inferred ok, !,
+  coq.unify-eq {{ GRing.SemiRing.sort lp:R }} Expected ok, !,
+  coq.unify-eq {{ GRing.Zmodule.sort lp:V }} Expected ok, !,
+  Res = {{ @intmul lp:V (@GRing.one lp:R) lp:N }}.
+}}.
+Elpi Typecheck Coercion.

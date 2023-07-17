@@ -50,6 +50,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Import IntInstances.
+
 Import Order.TTheory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
@@ -612,7 +614,7 @@ Proof.
 apply: (iffP eqP) => [<-| [[u v] /= Duv]].
   by exists (egcdz m n); case: egcdzP.
 congr _%:Z; apply: gcdn_def; rewrite ?dvd1n // => d dv_d_n dv_d_m.
-by rewrite -(dvdzE d 1) -Duv [m]intEsg [n]intEsg rpredD ?dvdz_mull.
+by rewrite -(dvdzE d 1%:R) -Duv [m]intEsg [n]intEsg rpredD ?dvdz_mull.
 Qed.
 
 Lemma Gauss_dvdz m n p :
