@@ -132,6 +132,10 @@ in `qfpoly.v`
 - in `ssrnum.v`:
   + lemmas `gerBl`, `gtrBl`
 
+- in `ssralg.v`
+  + support for negative constant (like `-42`) in the `Number
+    Notation` in `ring_scope`
+
 ### Changed
 
 - in `ssralg.v`
