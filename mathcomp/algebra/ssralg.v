@@ -6099,21 +6099,34 @@ Export Scale.Exports.
 Export ClosedExports.
 
 Variant Ione := IOne : Ione.
-Variant Inatmul := INatmul : Ione -> nat -> Inatmul.
+Inductive Inatmul :=
+  | INatmul : Ione -> nat -> Inatmul
+  | IOpp : Inatmul -> Inatmul.
 Variant Idummy_placeholder :=.
 
-Definition parse (x : Number.uint) : Inatmul :=
-  INatmul IOne (Nat.of_num_uint x).
-
-Definition print (x : Inatmul) : Number.uint :=
+Definition parse (x : Number.int) : Inatmul :=
   match x with
-  | INatmul IOne n => Number.UIntDecimal (Nat.to_uint n)
+  | Number.IntDecimal (Decimal.Pos u) => INatmul IOne (Nat.of_uint u)
+  | Number.IntDecimal (Decimal.Neg u) => IOpp (INatmul IOne (Nat.of_uint u))
+  | Number.IntHexadecimal (Hexadecimal.Pos u) =>
+      INatmul IOne (Nat.of_hex_uint u)
+  | Number.IntHexadecimal (Hexadecimal.Neg u) =>
+      IOpp (INatmul IOne (Nat.of_hex_uint u))
+  end.
+
+Definition print (x : Inatmul) : option Number.int :=
+  match x with
+  | INatmul IOne n =>
+      Some (Number.IntDecimal (Decimal.Pos (Nat.to_uint n)))
+  | IOpp (INatmul IOne n) =>
+      Some (Number.IntDecimal (Decimal.Neg (Nat.to_uint n)))
+  | _ => None
   end.
 
 Arguments GRing.one {_}.
 Set Warnings "-via-type-remapping,-via-type-mismatch".
 Number Notation Idummy_placeholder parse print (via Inatmul
-  mapping [[GRing.natmul] => INatmul, [GRing.one] => IOne])
+  mapping [[GRing.natmul] => INatmul, [GRing.opp] => IOpp, [GRing.one] => IOne])
   : ring_scope.
 Set Warnings "via-type-remapping,via-type-mismatch".
 Arguments GRing.one : clear implicits.

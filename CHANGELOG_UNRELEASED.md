@@ -195,6 +195,10 @@ in `qfpoly.v`
 - in `zmodp.v`
 	+ lemmas `add_1_Zp`, `add_Zp_1`, `sub_Zp_1` and `add_N1_Zp`.
 
+- in `ssralg.v`
+  + support for negative constant (like `-42`) in the `Number
+    Notation` in `ring_scope`
+
 ### Changed
 
 - in `order.v`
