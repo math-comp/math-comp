@@ -171,6 +171,9 @@ in `qfpoly.v`
 - in `ssrnat.v`
   + lemma `addn_eq1`
 
+- in `bigop.v`
+  + lemma `big_condT`
+
 ### Changed
 
 - in `order.v`
