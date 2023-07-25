@@ -95,6 +95,9 @@ in `qfpoly.v`
   `plogp_X`, `plogp0`, `plogp1`, `plogp_div_eq0`, `plogpD`
    
 
+- in `bigop.v`
+  + lemma `big_condT`
+
 ### Changed
 
 ### Renamed
