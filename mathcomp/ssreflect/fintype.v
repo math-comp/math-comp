@@ -1900,8 +1900,8 @@ Definition ord_pred n (i : 'I_n) := Ordinal (ord_pred_subproof i).
 Lemma ordSK n : cancel (@ordS n) (@ord_pred n).
 Proof.
 move=> [i ilt]; apply/val_inj => /=.
-case: (ltngtP i.+1 n) ilt => // [ismall|<-]; last by rewrite modnn/= modn_small.
-by rewrite [i.+1 %% n]modn_small// addSn/= modnDr modn_small// ltnW.
+case: (ltngtP i.+1) (ilt) => // [Silt|<-]; last by rewrite modnn/= modn_small.
+by rewrite [i.+1 %% n]modn_small// addSn/= modnDr modn_small.
 Qed.
 
 Lemma ord_predK n : cancel (@ord_pred n) (@ordS n).
