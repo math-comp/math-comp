@@ -88,9 +88,19 @@ Definition Zp_inv x := if coprime p x then inZp (egcdn x p).1 else x.
 Lemma Zp_add0z : left_id Zp0 Zp_add.
 Proof. exact: valZpK. Qed.
 
+Lemma Zp_add1z x : Zp_add Zp1 x = ordS x.
+Proof. by apply: val_inj; rewrite /= modnDml. Qed.
+
 Lemma Zp_addNz : left_inverse Zp0 Zp_opp Zp_add.
 Proof.
 by move=> x; apply: val_inj; rewrite /= modnDml subnK ?modnn // ltnW.
+Qed.
+
+Lemma Zp_addzN1 x : Zp_add x (Zp_opp Zp1) = ord_pred x.
+Proof.
+apply: val_inj => /=; move: x => [x /= _]; rewrite modnDmr.
+case: p' => [|n]; first by rewrite 2!modn1.
+by rewrite [1 %% _]modn_small//= subn1 [in RHS]addnS.
 Qed.
 
 Lemma Zp_addA : associative Zp_add.

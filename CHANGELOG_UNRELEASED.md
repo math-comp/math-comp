@@ -178,6 +178,9 @@ in `qfpoly.v`
   + lemmas `ordS_subproof`, `ord_pred_subproof`, `ordSK`, `ord_predK`,
   `ordS_bij`, `ordS_inj`, `ord_pred_bij`, `ord_pred_inj`
 
+- in `zmodp.v`
+	+ lemmas `Zp_add1z, `Zp_addzN1`
+
 ### Changed
 
 - in `order.v`
