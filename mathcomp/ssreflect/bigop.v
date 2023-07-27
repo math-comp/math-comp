@@ -988,6 +988,7 @@ Proof. exact: big_map. Qed.
 Lemma big_condT (J : finType) (A : {pred J}) F :
   \big[op/idx]_(i in A | true) F i = \big[op/idx]_(i in A) F i.
 Proof. by apply: eq_bigl => i; exact: andbT. Qed.
+
 (* The following lemmas can be used to localise extensionality to a specific  *)
 (* index sequence. This is done by ssreflect rewriting, before applying       *)
 (* congruence or induction lemmas.                                            *)
