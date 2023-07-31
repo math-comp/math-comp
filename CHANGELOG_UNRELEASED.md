@@ -173,6 +173,7 @@ in `qfpoly.v`
 
 - in `bigop.v`
   + lemma `big_condT`
+
 - in `fintype.v`
   + definitions `ordS`, `ord_pred`
   + lemmas `ordS_subproof`, `ord_pred_subproof`, `ordSK`, `ord_predK`,
