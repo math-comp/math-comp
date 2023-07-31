@@ -94,7 +94,6 @@ in `qfpoly.v`
   `qX_exp_neq0`, `qX_exp_inj`, `powX_eq_mod`, `qX_expK`, `plogp_lt`, 
   `plogp_X`, `plogp0`, `plogp1`, `plogp_div_eq0`, `plogpD`
    
-
 - in `bigop.v`
   + lemma `big_condT`
 
