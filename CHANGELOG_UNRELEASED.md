@@ -179,7 +179,7 @@ in `qfpoly.v`
   `ordS_bij`, `ordS_inj`, `ord_pred_bij`, `ord_pred_inj`
 
 - in `zmodp.v`
-	+ lemmas `Zp_add1z, `Zp_addzN1`
+	+ lemmas `add_1_Zp`, `add_Zp_1`, `sub_Zp_1` and `add_N1_Zp`.
 
 ### Changed
 
