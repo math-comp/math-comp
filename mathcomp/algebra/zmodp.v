@@ -87,19 +87,9 @@ Definition Zp_inv x := if coprime p x then inZp (egcdn x p).1 else x.
 Lemma Zp_add0z : left_id Zp0 Zp_add.
 Proof. exact: valZpK. Qed.
 
-Lemma Zp_add1z x : Zp_add Zp1 x = ordS x.
-Proof. by apply: val_inj; rewrite /= modnDml. Qed.
-
 Lemma Zp_addNz : left_inverse Zp0 Zp_opp Zp_add.
 Proof.
 by move=> x; apply: val_inj; rewrite /= modnDml subnK ?modnn // ltnW.
-Qed.
-
-Lemma Zp_addzN1 x : Zp_add x (Zp_opp Zp1) = ord_pred x.
-Proof.
-apply: val_inj => /=; move: x => [x /= _]; rewrite modnDmr.
-case: p' => [|n]; first by rewrite 2!modn1.
-by rewrite [1 %% _]modn_small//= subn1 [in RHS]addnS.
 Qed.
 
 Lemma Zp_addA : associative Zp_add.
@@ -271,6 +261,24 @@ Notation "''F_' p" := 'Z_(pdiv p)
   (at level 8, p at level 2, format "''F_' p") : type_scope.
 
 Arguments natr_Zp {p'} x.
+
+Section ZpRing.
+
+Import GRing.Theory.
+
+Lemma add_1_Zp p (x : 'Z_p) : 1 + x = ordS x.
+Proof. by case: p => [|[|p]] in x *; apply/val_inj. Qed.
+
+Lemma add_Zp_1 p (x : 'Z_p) : x + 1 = ordS x.
+Proof. by rewrite addrC add_1_Zp. Qed.
+
+Lemma sub_Zp_1 p (x : 'Z_p) : x - 1 = ord_pred x.
+Proof. by apply: (addIr 1); rewrite addrNK add_Zp_1 ord_predK. Qed.
+
+Lemma add_N1_Zp p (x : 'Z_p) : -1 + x = ord_pred x.
+Proof. by rewrite addrC sub_Zp_1. Qed.
+
+End ZpRing.
 
 Section Groups.
 
