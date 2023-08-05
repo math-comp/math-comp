@@ -809,6 +809,42 @@ Section PrimitiveRoots.
 Open Scope ring_scope.
 Import GRing.Theory.
 
+(* This subproof has  been extracted out of [has_prim_root] for performance reasons.
+   See github PR #1059 for further documentation and investigation on this problem. *)
+Lemma has_prim_root_subproof (F : fieldType) (n : nat) (rs : seq F)
+    (n_gt0 : n > 0)
+    (rsn1 : all n.-unity_root rs)
+    (Urs : uniq rs)
+    (sz_rs : size rs = n)
+    (r := fun s => val (s : seq_sub rs))
+    (rn1 : forall x : seq_sub rs, r x ^+ n = 1)
+    (prim_r : forall z : F, z ^+ n = 1 -> z \in rs)
+    (r' := (fun s (e : s ^+ n = 1) => {| ssval := s; ssvalP := prim_r s e |})
+       : forall s : F, s ^+ n = 1 -> seq_sub rs)
+    (sG_1 := r' 1 (expr1n F n) : seq_sub rs)
+    (sG_VP : forall s : seq_sub rs, r s ^+ n.-1 ^+ n = 1)
+    (sG_MP : forall s s0 : seq_sub rs, (r s * r s0) ^+ n = 1)
+    (sG_V := (fun s : seq_sub rs => r' (r s ^+ n.-1) (sG_VP s))
+       : seq_sub rs -> seq_sub rs)
+    (sG_M := (fun s s0 : seq_sub rs => r' (r s * r s0) (sG_MP s s0))
+       : seq_sub rs -> seq_sub rs -> seq_sub rs)
+    (sG_Ag : associative sG_M)
+    (sG_1g : left_id sG_1 sG_M)
+    (sG_Vg : left_inverse sG_1 sG_V sG_M) :
+  has n.-primitive_root rs.
+Proof.
+pose ssMG : isMulGroup (seq_sub rs) := isMulGroup.Build (seq_sub rs) sG_Ag sG_1g sG_Vg.
+pose gT : finGroupType := HB.pack (seq_sub rs) ssMG.
+have /cyclicP[x gen_x]: @cyclic gT setT.
+  apply: (@field_mul_group_cyclic gT [set: _] F r) => // x _.
+  by split=> [ri1 | ->]; first apply: val_inj.
+apply/hasP; exists (r x); first exact: (valP x).
+have [m prim_x dvdmn] := prim_order_exists n_gt0 (rn1 x).
+rewrite -((m =P n) _) // eqn_dvd {}dvdmn -sz_rs -(card_seq_sub Urs) -cardsT.
+rewrite gen_x (@order_dvdn gT) /(_ == _) /= -{prim_x}(prim_expr_order prim_x).
+by apply/eqP; elim: m => //= m IHm; rewrite exprS expgS /= -IHm.
+Qed.
+
 Lemma has_prim_root (F : fieldType) (n : nat) (rs : seq F) :
     n > 0 -> all n.-unity_root rs -> uniq rs -> size rs >= n ->
   has n.-primitive_root rs.
@@ -828,16 +864,7 @@ have sG_Ag: associative sG_M by move=> x y z; apply: val_inj; rewrite /= mulrA.
 have sG_1g: left_id sG_1 sG_M by move=> x; apply: val_inj; rewrite /= mul1r.
 have sG_Vg: left_inverse sG_1 sG_V sG_M.
   by move=> x; apply: val_inj; rewrite /= -exprSr prednK ?rn1.
-pose ssMG := isMulGroup.Build (seq_sub rs) sG_Ag sG_1g sG_Vg.
-pose gT : finGroupType := HB.pack (seq_sub rs) ssMG.
-have /cyclicP[x gen_x]: @cyclic gT setT.
-  apply: (@field_mul_group_cyclic gT [set: _] F r) => // x _.
-  by split=> [ri1 | ->]; first apply: val_inj.
-apply/hasP; exists (r x); first exact: (valP x).
-have [m prim_x dvdmn] := prim_order_exists n_gt0 (rn1 x).
-rewrite -((m =P n) _) // eqn_dvd {}dvdmn -sz_rs -(card_seq_sub Urs) -cardsT.
-rewrite gen_x (@order_dvdn gT) /(_ == _) /= -{prim_x}(prim_expr_order prim_x).
-by apply/eqP; elim: m => //= m IHm; rewrite exprS expgS /= -IHm.
+exact: has_prim_root_subproof.
 Qed.
 
 End PrimitiveRoots.
