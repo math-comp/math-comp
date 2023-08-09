@@ -127,6 +127,8 @@ coq-dev:
     - opam list
     - coqc --version
     - echo "${COQ_VERSION}"
+    # adapt to Git's patch for CVE-2022-24765 that is off-topic here
+    - git config --global --add safe.directory "${CI_PROJECT_DIR}"
     - git rev-parse --verify HEAD
     - git describe --all --long --abbrev=40 --always --dirty
     - pwd
