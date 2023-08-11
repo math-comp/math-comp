@@ -10,9 +10,11 @@ license: "CECILL-B"
 build: [ make "-C" "mathcomp/ssreflect" "-j" "%{jobs}%" ]
 install: [ make "-C" "mathcomp/ssreflect" "install" ]
 depends: [
-  "coq" { ((>= "8.16" & < "8.19~") | (= "dev"))}
+  ( ( "coq" {>= "8.16" & < "8.17~"} & "elpi" {>= "1.16.5"} ) |
+  # The line above can be removed at the time support for 8.16 is dropped
+    ( "coq" {>= "8.17"}
+    & "elpi" {>= "1.17.0"} ) )
   "coq-hierarchy-builder" { >= "1.5.0"}
-  "elpi" { >= "1.17.0" }
 ]
 
 tags: [ "keyword:small scale reflection" "keyword:mathematical components" "keyword:odd order theorem" "logpath:mathcomp.ssreflect" ]
