@@ -104,8 +104,12 @@ coq-8.16:
 coq-8.17:
   extends: .opam-build-once
 
-# coq-8.18: # to uncomment when 8.18+rc1 available
-#   # to be replaced with .opam-build-once when 8.18.0 available
+coq-8.18:
+  # to be replaced with .opam-build-once when 8.18.0 available
+  extends: .opam-build
+
+# coq-8.19: # to uncomment when 8.19+rc1 available
+#   # to be replaced with .opam-build-once when 8.19.0 available
 #   extends: .opam-build
 
 coq-dev:
@@ -127,6 +131,8 @@ coq-dev:
     - opam list
     - coqc --version
     - echo "${COQ_VERSION}"
+    # adapt to Git's patch for CVE-2022-24765 that is off-topic here
+    - git config --global --add safe.directory "${CI_PROJECT_DIR}"
     - git rev-parse --verify HEAD
     - git describe --all --long --abbrev=40 --always --dirty
     - pwd
@@ -163,11 +169,17 @@ test-coq-8.17:
   variables:
     COQ_VERSION: "8.17"
 
-# test-coq-8.18: # to uncomment when 8.18+rc1 available
-#   # to be replaced with .test-once when 8.18.0 available
+test-coq-8.18:
+  # to be replaced with .test-once when 8.18.0 available
+  extends: .test
+  variables:
+    COQ_VERSION: "8.18"
+
+# test-coq-8.19: # to uncomment when 8.19+rc1 available
+#   # to be replaced with .test-once when 8.19.0 available
 #   extends: .test
 #   variables:
-#     COQ_VERSION: "8.18"
+#     COQ_VERSION: "8.19"
 
 test-coq-dev:
   extends: .test
@@ -403,8 +415,12 @@ mathcomp-dev_coq-8.16:
 mathcomp-dev_coq-8.17:
   extends: .docker-deploy-once
 
-# mathcomp-dev_coq-8.18: # to uncomment when 8.18+rc1 available
-#   # to be replaced with .docker-deploy-once when 8.18.0 available
+mathcomp-dev_coq-8.18:
+  # to be replaced with .docker-deploy-once when 8.18.0 available
+  extends: .docker-deploy
+
+# mathcomp-dev_coq-8.19: # to uncomment when 8.19+rc1 available
+#   # to be replaced with .docker-deploy-once when 8.19.0 available
 #   extends: .docker-deploy
 
 mathcomp-dev_coq-dev:
