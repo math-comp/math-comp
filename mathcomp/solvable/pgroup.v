@@ -1258,7 +1258,8 @@ Proof. by rewrite -(pHallNK pi G H); apply: sdprod_pcore_HallP. Qed.
 Lemma pcoreI pi rho G : 'O_[predI pi & rho](G) = 'O_pi('O_rho(G)).
 Proof.
 apply/eqP; rewrite eqEsubset !pcore_max //.
-- by rewrite /pgroup pnatI -!pgroupE !(pcore_pgroup, pgroupS (pcore_sub pi _)).
+- rewrite /pgroup pnatI -!pgroupE.
+  by rewrite pcore_pgroup (pgroupS (pcore_sub pi _))// pcore_pgroup.
 - by rewrite !gFnormal_trans.
 - by apply: sub_pgroup (pcore_pgroup _ _) => p /andP[].
 apply/andP; split; first by apply: sub_pcore => p /andP[].

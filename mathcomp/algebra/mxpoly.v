@@ -900,7 +900,7 @@ case: n => [|n] in g *; first by rewrite !thinmx0.
 by rewrite /kermxpoly horner_mx_X.
 Qed.
 
-Lemma kermxpoly_min n (g : 'M_n.+1) p :
+Lemma kermxpoly_min n (g : 'M[K]_n.+1) p :
   mxminpoly g %| p -> (kermxpoly g p :=: 1)%MS.
 Proof. by rewrite /kermxpoly => /mxminpoly_minP ->; apply: kermx0. Qed.
 
@@ -1958,7 +1958,7 @@ have := dAAs B; rewrite inE BAs orbT => /(_ isT) [P Punit].
 move=> /diagonalizable_forPex[D /(simmxLR Punit)->] sePD.
 have rAeP : row_free (row_base (eigenspace A rs`_i) *m invmx P).
   by rewrite /row_free mxrankMfree ?row_free_unit ?unitmx_inv// eq_row_base.
-rewrite -conjMumx ?unitmx_inv ?row_base_free//.
+rewrite -conjMumx ?unitmx_inv ?row_base_free => [|//|//|//].
 apply/diagonalizable_conj_diag => //.
 by rewrite stablemx_comp// stablemx_unit ?unitmx_inv.
 Qed.
