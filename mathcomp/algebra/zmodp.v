@@ -262,6 +262,24 @@ Notation "''F_' p" := 'Z_(pdiv p)
 
 Arguments natr_Zp {p'} x.
 
+Section ZpRing.
+
+Import GRing.Theory.
+
+Lemma add_1_Zp p (x : 'Z_p) : 1 + x = ordS x.
+Proof. by case: p => [|[|p]] in x *; apply/val_inj. Qed.
+
+Lemma add_Zp_1 p (x : 'Z_p) : x + 1 = ordS x.
+Proof. by rewrite addrC add_1_Zp. Qed.
+
+Lemma sub_Zp_1 p (x : 'Z_p) : x - 1 = ord_pred x.
+Proof. by apply: (addIr 1); rewrite addrNK add_Zp_1 ord_predK. Qed.
+
+Lemma add_N1_Zp p (x : 'Z_p) : -1 + x = ord_pred x.
+Proof. by rewrite addrC sub_Zp_1. Qed.
+
+End ZpRing.
+
 Section Groups.
 
 Variable p : nat.

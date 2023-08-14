@@ -97,6 +97,14 @@ in `qfpoly.v`
 - in `bigop.v`
   + lemma `big_condT`
 
+- in `fintype.v`
+  + definitions `ordS`, `ord_pred`
+  + lemmas `ordS_subproof`, `ord_pred_subproof`, `ordSK`, `ord_predK`,
+  `ordS_bij`, `ordS_inj`, `ord_pred_bij`, `ord_pred_inj`
+
+- in `zmodp.v`
+	+ lemmas `add_1_Zp`, `add_Zp_1`, `sub_Zp_1` and `add_N1_Zp`.
+
 ### Changed
 
 ### Renamed

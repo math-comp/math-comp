@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import path.
+From mathcomp Require Import path div.
 
 (******************************************************************************)
 (*    The Finite interface describes Types with finitely many elements,       *)
@@ -58,6 +58,10 @@ From mathcomp Require Import path.
 (*  cast_ord eq_n_m i == the element j : 'I_m with the same value as i : 'I_n *)
 (*                       given eq_n_m : n = m (indeed, i : nat and j : nat    *)
 (*                       are convertible).                                    *)
+(*           ordS n i == the successor of i : 'I_n along the cyclic structure *)
+(*                       of 'I_n, reduces in nat to i.+1 %% n.                *)
+(*       ord_pred n i == the predecessor of i : 'I_n along the cyclic         *)
+(*                       structure of 'I_n, reduces in nat to (i + n).-1 %% n.*)
 (* widen_ord le_n_m i == a j : 'I_m with the same value as i : 'I_n, given    *)
 (*                       le_n_m : n <= m.                                     *)
 (*          rev_ord i == the complement to n.-1 of i : 'I_n, such that        *)
@@ -1884,6 +1888,40 @@ Proof. by move=> i; apply: val_inj. Qed.
 
 Lemma cast_ord_inj n1 n2 eq_n : injective (@cast_ord n1 n2 eq_n).
 Proof. exact: can_inj (cast_ordK eq_n). Qed.
+
+Fact ordS_subproof n (i : 'I_n) : i.+1 %% n < n.
+Proof. by case: n i => [|n] [m m_lt]//=; rewrite ltn_pmod. Qed.
+Definition ordS n (i : 'I_n) := Ordinal (ordS_subproof i).
+
+Fact ord_pred_subproof n (i : 'I_n) : (i + n).-1 %% n < n.
+Proof. by case: n i => [|n] [m m_lt]//=; rewrite ltn_pmod. Qed.
+Definition ord_pred n (i : 'I_n) := Ordinal (ord_pred_subproof i).
+
+Lemma ordSK n : cancel (@ordS n) (@ord_pred n).
+Proof.
+move=> [i ilt]; apply/val_inj => /=.
+case: (ltngtP i.+1) (ilt) => // [Silt|<-]; last by rewrite modnn/= modn_small.
+by rewrite [i.+1 %% n]modn_small// addSn/= modnDr modn_small.
+Qed.
+
+Lemma ord_predK n : cancel (@ord_pred n) (@ordS n).
+Proof.
+move=> [[|i] ilt]; apply/val_inj => /=.
+  by rewrite [n.-1 %% n]modn_small// prednK// modnn.
+by rewrite modnDr [i %% n]modn_small ?modn_small// ltnW.
+Qed.
+
+Lemma ordS_bij n : bijective (@ordS n).
+Proof. exact: (Bijective (@ordSK n) (@ord_predK n)). Qed.
+
+Lemma ordS_inj n : injective (@ordS n).
+Proof. exact: (bij_inj (ordS_bij n)). Qed.
+
+Lemma ord_pred_bij n : bijective (@ord_pred n).
+Proof. exact (Bijective (@ord_predK n) (@ordSK n)). Qed.
+
+Lemma ord_pred_inj n : injective (@ord_pred n).
+Proof. exact: (bij_inj (ord_pred_bij n)). Qed.
 
 Lemma rev_ord_proof n (i : 'I_n) : n - i.+1  < n.
 Proof. by case: n i => [|n] [i lt_i_n] //; rewrite ltnS subSS leq_subr. Qed.
