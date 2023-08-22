@@ -428,7 +428,7 @@ Section OpsTheory.
 
 Variable T : finType.
 
-Implicit Types (A B C D: {pred T}) (P Q : pred T) (x y : T) (s : seq T).
+Implicit Types (A B C D : {pred T}) (P Q : pred T) (x y : T) (s : seq T).
 
 Lemma enumP : Finite.axiom (Finite.enum T).
 Proof. by rewrite unlock; apply: enumP_subdef. Qed.
@@ -707,7 +707,7 @@ Lemma subset_cons s x : s \subset x :: s.
 Proof. by apply/subsetP => y /[!inE] ->; rewrite orbT. Qed.
 
 Lemma subset_cons2 s1 s2 x : s1 \subset s2 -> x :: s1 \subset x :: s2.
-Proof. 
+Proof.
 by move=> ?; apply/subsetP => y /[!inE]; case: eqP => // _; apply: subsetP.
 Qed.
 
@@ -732,14 +732,7 @@ Proof.
 by move/subsetP=> s12; apply/subsetP=> x; rewrite !mem_filter=> /andP[-> /s12].
 Qed.
 
-Lemma map_subset {T' : eqType} s1 s2 (f : T -> T') :
-  s1 \subset s2 -> {subset [seq f x | x <- s1 ] <= [seq f x | x <- s2]}.
-Proof.
-move=> /subsetP ss1s2 x /mapP[y yins1] eqxfy.
-by apply/mapP; exists y => //; apply: ss1s2.
-Qed.
-
-Lemma properE A B : A \proper B = (A \subset B) && ~~(B \subset A).
+Lemma properE A B : A \proper B = (A \subset B) && ~~ (B \subset A).
 Proof. by []. Qed.
 
 Lemma properP A B :
@@ -914,6 +907,13 @@ Lemma disjoint_cat s1 s2 A :
 Proof. by rewrite !disjoint_has has_cat negb_or. Qed.
 
 End OpsTheory.
+
+Lemma map_subset {T T' : finType} (s1 s2 : seq T) (f : T -> T') :
+  s1 \subset s2 -> [seq f x | x <- s1 ] \subset [seq f x | x <- s2].
+Proof.
+move=> s1s2; apply/subsetP => _ /mapP[y] /[swap] -> ys1.
+by apply/mapP; exists y => //; move/subsetP : s1s2; exact.
+Qed.
 
 #[global] Hint Resolve subxx_hint : core.
 
