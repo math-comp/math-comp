@@ -34,30 +34,30 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   bundles = let
     master = [
-      "mathcomp-bigenough"
-      "mathcomp-real-closed"
-      "fourcolor"
-      "odd-order"
+      "coqeal"
       "coquelicot"
+      "fourcolor"
       "gaia"
+      "graph-theory"
+      "interval"
+      "mathcomp-bigenough"
+      "mathcomp-finmap"
+      "mathcomp-real-closed"
+      "mathcomp-zify"
+      "multinomials"
+      "odd-order"
+      "reglang"
+      "mathcomp-tarjan"
       # "deriving"  # requires univ poly
       # "extructures"  # requires deriving
     ];
     hierarchy-builder = [
-      "coqeal"
-      "interval"
-      "reglang"
-      "graph-theory"
       "coq-bits"
       "mathcomp-classical"
       "mathcomp-analysis"
     ];
     proux01-hierarchy-builder = [
-      "mathcomp-finmap"
-      "multinomials"
-      "mathcomp-zify"
       "mathcomp-abel"
-      "mathcomp-tarjan"
     ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
@@ -75,7 +75,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       bignums.override.version = "master";
       paramcoq.override.version = "master";
       coq-elpi.override.version = "coq-master";
-      hierarchy-builder.override.version = "proux01:coq-master";
+      hierarchy-builder.override.version = "coq-master";
       interval.job = false;
       coqeal.job = false;
       coquelicot.job = false;

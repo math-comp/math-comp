@@ -4,9 +4,9 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
 From mathcomp Require Import div fintype path tuple bigop finset prime order.
 From mathcomp Require Import ssralg poly polydiv mxpoly countalg closed_field.
-From mathcomp Require Import ssrnum ssrint rat intdiv fingroup finalg zmodp.
-From mathcomp Require Import cyclic pgroup sylow vector falgebra fieldext.
-From mathcomp Require Import separable galois.
+From mathcomp Require Import ssrnum ssrint archimedean rat intdiv fingroup.
+From mathcomp Require Import finalg zmodp cyclic pgroup sylow vector falgebra.
+From mathcomp Require Import fieldext separable galois.
 
 (******************************************************************************)
 (*   The main result in this file is the existence theorem that underpins the *)
@@ -126,7 +126,7 @@ Lemma rat_algebraic_archimedean (C : numFieldType) (QtoC : Qmorphism C) :
 Proof.
 move=> algC x.
 without loss x_ge0: x / 0 <= x by rewrite -normr_id; apply.
-have [-> | nz_x] := eqVneq x 0; first by exists 1%N; rewrite normr0.
+have [-> | nz_x] := eqVneq x 0; first by exists 1; rewrite normr0.
 have [p mon_p px0] := algC x; exists (\sum_(j < size p) `|numq p`_j|)%N.
 rewrite ger0_norm // real_ltNge ?rpred_nat ?ger0_real //.
 apply: contraL px0 => lb_x; rewrite rootE gt_eqF // horner_coef size_map_poly.
@@ -236,7 +236,8 @@ without loss{nCq} qx0: q mon_q q_dv_p / root (q ^ FtoL) x.
   have /dvdpP[q1 Dp] := q_dv_p; rewrite DpI Dp rmorphM rootM -implyNb in pIx0.
   have mon_q1: q1 \is monic by rewrite Dp monicMr in mon_p.
   move=> IH; apply: (IH) (implyP pIx0 _) => //; apply: contra nCq => /IH IHq1.
-  rewrite -(subnn (size q1)) {1}IHq1 ?Dp ?dvdp_mulr // polySpred ?monic_neq0 //.
+  rewrite natr1E -(subnn (size q1)) {1}IHq1 ?Dp ?dvdp_mulr //.
+  rewrite polySpred ?monic_neq0 //.
   by rewrite eqSS size_monicM ?monic_neq0 // -!subn1 subnAC addKn.
 have /dvdp_prod_XsubC[m Dq]: q ^ FtoL %| p_ I by rewrite DpI dvdp_map.
 pose B := [set j in mask m (enum I)]; have{} Dq: q ^ FtoL = p_ B.
@@ -338,7 +339,7 @@ have QtoQ z x: x \in sQ z -> {Qxz : 'AHom(Q x, Q z) | morph_ofQ x z Qxz}.
   have QxzaM := GRing.isAdditive.Build _ _ _ Qxza.
   have QxzmM := GRing.isMultiplicative.Build _ _ _ Qxzm.
   have QxzlM := GRing.isScalable.Build _ _ _ _ _ (rat_linear Qxza).
-  pose QxzLRM : GRing.LRMorphism.type _ _ _ _ := HB.pack Qxz QxzaM QxzmM QxzlM.
+  pose QxzLRM : {lrmorphism _ -> _} := HB.pack Qxz QxzaM QxzmM QxzlM.
   by exists (linfun_ahom QxzLRM) => u; rewrite lfunE QxzE.
 pose sQs z s := all (mem (sQ z)) s.
 have inQsK z s: sQs z s -> map (ofQ z) (map (inQ z) s) = s.
@@ -403,7 +404,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     {u | minPoly Qx u = p ^ Qxz & ofQ z u \in s}.
   - move=> IHp; move: {2}_.+1 (ltnSn (size p)) => d.
     elim: d => // d IHd in p mon_p s_p p0_le0 *; rewrite ltnS => le_p_d.
-    have /closed_rootP/sig_eqW[y py0]: size (p ^ ofQ x) != 1%N.
+    have /closed_rootP/sig_eqW[y py0]: size (p ^ ofQ x) != 1.
       rewrite size_map_poly size_poly_eq1 eqp_monic ?rpred1 //.
       by apply: contraTneq p0_le0 => ->; rewrite rmorph1 hornerC lt_geF ?ltr01.
     have /s_p s_y := py0; have /z_s/sQ_inQ[u Dy] := s_y.
@@ -461,11 +462,11 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     pose d := wid ab; pose dq := \poly_(i < (size q).-1) Mq i.+1.
     have d_ge0: 0 <= d by rewrite subr_ge0; case: xab.
     have [Mdq MdqP] := poly_disk_bound dq d.
-    pose n := Num.bound (Mu * Mdq * d); exists n => c /= /andP[].
+    pose n := Num.bound (Mu * Mdq * d); exists n => c /andP[].
     have{xab} [[]] := findP n _ _ xab; case: (find n q ab) => a1 b1 /=.
     rewrite -/d => qa1_le0 qb1_ge0 le_ab1 [/= le_aa1 le_b1b] Dab1 le_a1c le_cb1.
     have /MuP lbMu: c \in itv ab.
-      by rewrite !inE (le_trans le_aa1) ?(le_trans le_cb1).
+      by rewrite inE (le_trans le_aa1) ?(le_trans le_cb1).
     have Mu_ge0: 0 <= Mu by rewrite (le_trans _ lbMu).
     have Mdq_ge0: 0 <= Mdq.
       by rewrite (le_trans _ (MdqP 0 _)) ?normr0.
@@ -508,7 +509,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     apply: (map_poly_inj Qxz).
     by rewrite Dq /q1_ (raddfN _ v) (raddfN _ (Qyz v)) [RHS]raddfN /= Dq.
   pose lim_nz n v := exists2 e, e > 0 & {in Iab_ n, forall a, e < `|lim v a| }.
-  have /(all_sig_cond 0%N)[n_ nzP] v: v != 0 -> {n | lim_nz n v}.
+  have /(all_sig_cond 0)[n_ nzP] v: v != 0 -> {n | lim_nz n v}.
     move=> nz_v; do [move/(_ v nz_v); rewrite -(coprimep_map QxR)] in coqp.
     have /sig_eqW[r r_pq_1] := Bezout_eq1_coprimepP _ _ coqp.
     have /(find_root r.1)[n ub_rp] := xab0; exists n.
@@ -563,7 +564,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     by rewrite /nlim -limN (lt_trans e_gt0) ?nv_gte ?leq_maxr.
   have posVneg v: v != 0 -> lt 0 v || lt v 0.
     case/nzP=> e e_gt0 v_gte; rewrite -posN; set w := - v.
-    have [m [le_vm le_wm _]] := maxn3 (n_ v) (n_ w) 0%N; rewrite !(posE m) //.
+    have [m [le_vm le_wm _]] := maxn3 (n_ v) (n_ w) 0; rewrite !(posE m) //.
     by rewrite /nlim limN -ltr_normr (lt_trans e_gt0) ?v_gte ?ab_le.
   have posD v w: lt 0 v -> lt 0 w -> lt 0 (v + w).
     move=> /posP[m [d d_gt0 v_gtd]] /posP[n [e e_gt0 w_gte]].
@@ -598,7 +599,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   pose RyM := Num.IntegralDomain_isLtReal.Build (Q y) posD
                 posM posNneg posB posVneg absN absE (rrefl _).
   pose Ry : realFieldType := HB.pack (Q y) RyM.
-  have QisArchi : Num.RealField_isArchimedean Ry.
+  have QisArchi : Num.NumDomain_bounded_isArchimedean Ry.
     by constructor; apply: (@rat_algebraic_archimedean Ry _ alg_integral).
   exists (HB.pack_for archiFieldType _ QisArchi); apply: idfun.
 have some_realC: realC.
@@ -615,7 +616,7 @@ have some_realC: realC.
   by exists q.[0]; rewrite -horner_map rmorph0.
 pose fix xR n : realC :=
   if n isn't n'.+1 then some_realC else
-  if unpickle (nth 0%N (CodeSeq.decode n') 1) isn't Some (p, c) then xR n' else
+  if unpickle (nth 0 (CodeSeq.decode n') 1) isn't Some (p, c) then xR n' else
   tag (add_Rroot (xR n') p c).
 pose x_ n := tag (xR n).
 have sRle m n: (m <= n)%N -> {subset sQ (x_ m) <= sQ (x_ n)}.
@@ -887,8 +888,8 @@ have conjaM := GRing.isAdditive.Build _ _ _ conjA.
 have conjmM := GRing.isMultiplicative.Build _ _ _ conjM.
 pose conjRM : GRing.RMorphism.type _ _ := HB.pack conj conjaM conjmM.
 exists conjRM => [z | /(_ i)/eqP/idPn[]] /=.
-  by have [n [/conjE-> /(conjK (n_ z))->]] := maxn3 (n_ (conj z)) (n_ z) 0%N.
+  by have [n [/conjE-> /(conjK (n_ z))->]] := maxn3 (n_ (conj z)) (n_ z) 0.
 rewrite /conj/conj_ cj_i rmorphN inQ_K // eq_sym -addr_eq0 -mulr2n -mulr_natl.
-rewrite mulf_neq0 ?(memPnC (R'i 0%N)) ?(rpred0 (sQC _)) //.
+rewrite mulf_neq0 ?(memPnC (R'i 0)) ?(rpred0 (sQC _)) //.
 by have /charf0P-> := ftrans (fmorph_char QtoC) (char_num _).
 Qed.

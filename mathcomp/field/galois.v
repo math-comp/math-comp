@@ -548,8 +548,7 @@ have{irr_q} [Lz [inLz [z qz0]]]: {Lz : fieldExtType F &
     move=> a u v; rewrite -(@mulr_algl F Lz) baseField_scaleE.
     by rewrite -{1}mulr_algl rmorphD rmorphM -lock.
   pose inLzLlM := GRing.isLinear.Build _ _ _ _ _ inLzL_linear.
-  pose inLzLL : GRing.Linear.type _ _ _ _ :=
-    HB.pack (locked inLz : _ -> _) inLzLlM.
+  pose inLzLL : {linear _ -> _} := HB.pack (locked inLz : _ -> _) inLzLlM.
   have ihLzZ: ahom_in {:L} (linfun inLzLL).
     by apply/ahom_inP; split=> [u v|]; rewrite !lfunE (rmorphM, rmorph1).
   exists Lz, (AHom ihLzZ), z; congr (root _ z): qz0.
@@ -1260,7 +1259,7 @@ apply: (iffP idP) => [/and3P[sKE /separableP sepKE nKE] | fixedKE].
   apply/eqP; rewrite eqEsubv galois_connection_subv ?andbT //.
   apply/subvP=> a /mem_fixedFieldP[Ea fixEa]; rewrite -adjoin_deg_eq1.
   have [r /allP Er splitKa] := normalFieldP nKE a Ea.
-  rewrite -eqSS -size_minPoly splitKa size_prod_XsubC eqSS -/(size [:: a]).
+  rewrite -eqSS -size_minPoly splitKa size_prod_XsubC eqSS -[1]/(size [:: a]).
   have Ur: uniq r by rewrite -separable_prod_XsubC -splitKa; apply: sepKE.
   rewrite -uniq_size_uniq {Ur}// => b; rewrite inE -root_prod_XsubC -splitKa.
   apply/eqP/idP=> [-> | pKa_b_0]; first exact: root_minPoly.

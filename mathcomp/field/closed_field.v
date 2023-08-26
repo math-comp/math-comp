@@ -81,7 +81,7 @@ Fixpoint eval_poly (e : seq F) pf :=
 Definition rpoly (p : polyF) := all (@rterm F) p.
 
 Definition sizeT : polyF -> cps nat := (fix loop p :=
-  if p isn't c :: q then ret 0%N
+  if p isn't c :: q then ret 0
   else 'let n <- loop q;
        if n is m.+1 then ret m.+2 else
        'if (c == 0) then 0%N else 1%N).
@@ -125,7 +125,7 @@ by apply: qf_cps_if; rewrite //= rc.
 Qed.
 
 Definition isnull (p : polyF) : cps bool :=
-  'let n <- sizeT p; ret (n == 0%N).
+  'let n <- sizeT p; ret (n == 0).
 
 Lemma isnullP (p : polyF) : isnull p ->_e (eval_poly e p == 0).
 Proof. by move=> e k; rewrite sizeTP size_poly_eq0. Qed.
@@ -319,7 +319,7 @@ Qed.
 
 Definition redivpT (p : polyF) (q : polyF) : cps (nat * polyF * polyF) :=
   'let b <- isnull q;
-  if b then ret (0%N, [::0%T], p) else
+  if b then ret (0, [::0%T], p) else
   'let sq <- sizeT q; 'let sp <- sizeT p;
   'let lq <- lead_coefT q;
   redivp_rec_loopT q sq lq 0 [::0%T] p sp.
@@ -440,7 +440,7 @@ Qed.
 Fixpoint rgdcop_recT n (q : polyF) (p : polyF) :=
   if n is m.+1 then
     'let g <- rgcdpT p q; 'let sg <- sizeT g;
-    if sg == 1%N then ret p
+    if sg == 1 then ret p
     else 'let r <- rdivpT p g;
           rgdcop_recT m q r
   else 'let b <- isnull q; ret [::b%:R%T].
@@ -488,11 +488,11 @@ Qed.
 
 Definition ex_elim_seq (ps : seq polyF) (q : polyF) : fF :=
   ('let g <- rgcdpTs ps; 'let d <- rgdcopT q g;
-  'let n <- sizeT d; ret (n != 1%N)) GRing.Bool.
+  'let n <- sizeT d; ret (n != 1)) GRing.Bool.
 
 Lemma ex_elim_seqP (ps : seq polyF) (q : polyF) (e : seq F) :
   let gp := (\big[@rgcdp _/0%:P]_(p <- ps)(eval_poly e p)) in
-  qf_eval e (ex_elim_seq ps q) = (size (rgdcop (eval_poly e q) gp) != 1%N).
+  qf_eval e (ex_elim_seq ps q) = (size (rgdcop (eval_poly e q) gp) != 1).
 Proof.
 by do ![rewrite (rgcdpTsP,rgdcopTP,sizeTP,eval_lift) //= | move=> * //=].
 Qed.
@@ -734,7 +734,7 @@ pose FtoE : {rmorphism _ -> _} := PtoE \o polyC; pose w : E := PtoE 'X.
 have defPtoE q: (map_poly FtoE q).[w] = PtoE q.
   by rewrite map_poly_comp horner_map [_.['X]]comp_polyXr.
 exists Ecount, FtoE, w => [|u].
-  by rewrite /root defPtoE (PtoEd 0%N).
+  by rewrite /root defPtoE (PtoEd 0).
 by exists (repr u); rewrite defPtoE /= reprK.
 Qed.
 
@@ -800,7 +800,7 @@ pose K := {eq_quot EquivRel _ eqKrefl eqKsym eqKtrans}%qT.
 pose cntK := isCountable.Build K (pcan_pickleK (can_pcan (reprK))).
 pose EtoKrep i (x : E i) : K := \pi%qT (Tagged E x).
 have [EtoK piEtoK]: {EtoK | forall i, EtoKrep i =1 EtoK i} by exists EtoKrep.
-pose FtoK := EtoK 0%N; rewrite {}/EtoKrep in piEtoK.
+pose FtoK := EtoK 0; rewrite {}/EtoKrep in piEtoK.
 have eqEtoK i j x y:
   toE i _ (leMl i j) x = toE j _ (leMr i j) y -> EtoK i x = EtoK j y.
 - by move/eqP=> eq_xy; rewrite -!piEtoK; apply/eqmodP.
@@ -915,8 +915,8 @@ have Kclosed: GRing.closed_field_axiom Kfield.
 suffices{Kclosed} algF_K: {FtoK : {rmorphism F -> Kfield} | integralRange FtoK}.
   pose Kcc := Field_isAlgClosed.Build Kfield Kclosed.
   by exists (HB.pack_for countClosedFieldType K Kfield Kcc).
-exists (EtoKM 0%N) => /= z; have [i [{}z ->]] := KtoE z.
-suffices{z} /(_ z)[p mon_p]: integralRange (toE 0%N i isT).
+exists (EtoKM 0) => /= z; have [i [{}z ->]] := KtoE z.
+suffices{z} /(_ z)[p mon_p]: integralRange (toE 0 i isT).
   by rewrite -(fmorph_root (EtoKM i)) -map_poly_comp toEtoKp; exists p.
 rewrite /toE /E; clear - minXp_gt1 ext1root ext1gen.
 move: (i - 0)%N (subnK _) => n; case: i /.

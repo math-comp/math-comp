@@ -32,8 +32,6 @@ From mathcomp Require Import ssralg poly.
 (*                    The HB class is called RealDomain.                      *)
 (*   realFieldType == Num Field where all elements are positive or negative   *)
 (*                    The HB class is called RealField.                       *)
-(*  archiFieldType == A Real Field with the archimedean axiom                 *)
-(*                    The HB class is called ArchimedeanField.                *)
 (*         rcfType == A Real Field with the real closed axiom                 *)
 (*                    The HB class is called RealClosedField.                 *)
 (*                                                                            *)
@@ -43,7 +41,7 @@ From mathcomp Require Import ssralg poly.
 (* (%R). 0-ary ordering symbols for the ring_display have the suffix "%R",    *)
 (* e.g., <%R. All the other ordering notations are the same as order.v.       *)
 (*                                                                            *)
-(* Over these structures, we have the following operations                    *)
+(* Over these structures, we have the following operations:                   *)
 (*             `|x| == norm of x                                              *)
 (*         Num.sg x == sign of x: equal to 0 iff x = 0, to 1 iff x > 0, and   *)
 (*                     to -1 in all other cases (including x < 0)             *)
@@ -51,8 +49,6 @@ From mathcomp Require Import ssralg poly.
 (*  x \is a Num.neg <=> x is negative (:= x < 0)                              *)
 (* x \is a Num.nneg <=> x is positive or 0 (:= x >= 0)                        *)
 (* x \is a Num.real <=> x is real (:= x >= 0 or x < 0)                        *)
-(*      Num.bound x == in archimedean fields, and upper bound for x, i.e.,    *)
-(*                     and n such that `|x| < n%:R                            *)
 (*       Num.sqrt x == in a real-closed field, a positive square root of x if *)
 (*                     x >= 0, or 0 otherwise                                 *)
 (* For numeric algebraically closed fields we provide the generic definitions *)
@@ -162,6 +158,30 @@ Notation "[ 'numDomainType' 'of' T ]" := (NumDomain.clone T%type _)
 End NumDomainExports.
 HB.export NumDomainExports.
 
+HB.mixin Record NumDomain_isArchimedean R of NumDomain R := {
+  trunc_subdef : R -> nat;
+  nat_num_subdef : pred R;
+  int_num_subdef : pred R;
+  trunc_subproof :
+    forall x,
+      if 0 <= x then (trunc_subdef x)%:R <= x < (trunc_subdef x).+1%:R
+      else trunc_subdef x == 0%N;
+  nat_num_subproof : forall x, nat_num_subdef x = ((trunc_subdef x)%:R == x);
+  int_num_subproof :
+    forall x, int_num_subdef x = nat_num_subdef x || nat_num_subdef (- x);
+}.
+
+#[short(type="archiNumDomainType")]
+HB.structure Definition ArchiNumDomain :=
+  { R of NumDomain_isArchimedean R & NumDomain R }.
+
+Module ArchiNumDomainExports.
+Bind Scope ring_scope with ArchiNumDomain.sort.
+#[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
+Notation archiNumDomainType := archiNumDomainType (only parsing).
+End ArchiNumDomainExports.
+HB.export ArchiNumDomainExports.
+
 Module Import Def.
 
 Notation normr := norm.
@@ -194,11 +214,10 @@ Notation minr := (@Order.min ring_display _).
 Notation "@ 'minr' R" := (@Order.min ring_display R)
   (at level 10, R at level 8, only parsing) : fun_scope.
 
-Section Def.
+Section NumDomainDef.
 Context {R : numDomainType}.
-Implicit Types (x : R).
 
-Definition sgr x : R := if x == 0 then 0 else if x < 0 then -1 else 1.
+Definition sgr (x : R) : R := if x == 0 then 0 else if x < 0 then -1 else 1.
 Definition Rpos_pred := fun x : R => 0 < x.
 Definition Rpos : qualifier 0 R := [qualify x | Rpos_pred x].
 Definition Rneg_pred := fun x : R => x < 0.
@@ -208,12 +227,27 @@ Definition Rnneg : qualifier 0 R := [qualify x : R | Rnneg_pred x].
 Definition Rreal_pred := fun x : R => (0 <= x) || (x <= 0).
 Definition Rreal : qualifier 0 R := [qualify x : R | Rreal_pred x].
 
-End Def. End Def.
+End NumDomainDef.
+
+Section ArchiNumDomainDef.
+Context {R : ArchiNumDomain.type}.
+
+Definition trunc : R -> nat := @trunc_subdef R.
+Definition nat_num : qualifier 1 R := [qualify a x : R | nat_num_subdef x].
+Definition int_num : qualifier 1 R := [qualify a x : R | int_num_subdef x].
+
+End ArchiNumDomainDef.
+
+End Def.
 
 Arguments Rpos_pred _ _ /.
 Arguments Rneg_pred _ _ /.
 Arguments Rnneg_pred _ _ /.
 Arguments Rreal_pred _ _ /.
+
+Arguments trunc {R} : simpl never.
+Arguments nat_num {R} : simpl never.
+Arguments int_num {R} : simpl never.
 
 (* Shorter qualified names, when Num.Def is not imported. *)
 Notation le := ler (only parsing).
@@ -230,6 +264,9 @@ Notation pos := Rpos.
 Notation neg := Rneg.
 Notation nneg := Rnneg.
 Notation real := Rreal.
+(* Not to pollute the local namespace, Num.nat and Num.int are defined later. *)
+#[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
+Notation trunc := trunc (only parsing).
 
 (* (Exported) symbolic syntax. *)
 Module Import Syntax.
@@ -369,27 +406,6 @@ Notation "[ 'realFieldType' 'of' T ]" := (RealField.clone T%type _)
 End RealFieldExports.
 HB.export RealFieldExports.
 
-HB.mixin Record RealField_isArchimedean R of RealField R := {
-  archi_bound_subproof : archimedean_axiom R
-}.
-
-#[short(type="archiFieldType")]
-HB.structure Definition ArchimedeanField :=
-  { R of RealField_isArchimedean R & RealField R }.
-
-Module ArchimedeanFieldExports.
-Bind Scope ring_scope with ArchimedeanField.sort.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use Num.ArchimedeanField.clone instead.")]
-Notation "[ 'archiFieldType' 'of' T 'for' cT ]" := (ArchimedeanField.clone T%type cT)
-  (at level 0, format "[ 'archiFieldType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use Num.ArchimedeanField.clone instead.")]
-Notation "[ 'archiFieldType' 'of' T ]" := (ArchimedeanField.clone T%type _)
-  (at level 0, format "[ 'archiFieldType'  'of'  T ]") : form_scope.
-End ArchimedeanFieldExports.
-HB.export ArchimedeanFieldExports.
-
 HB.mixin Record RealField_isClosed R of RealField R := {
   poly_ivt_subproof : real_closed_axiom R
 }.
@@ -410,6 +426,81 @@ Notation "[ 'rcfType' 'of' T ]" :=  (RealClosedField.clone T%type _)
   (at level 0, format "[ 'rcfType'  'of'  T ]") : form_scope.
 End RealClosedFieldExports.
 HB.export RealClosedFieldExports.
+
+#[short(type="archiNumFieldType")]
+HB.structure Definition ArchiNumField :=
+  { R of NumDomain_isArchimedean R & NumField R }.
+
+Module ArchiNumFieldExports.
+Bind Scope ring_scope with ArchiNumField.sort.
+#[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
+Notation archiNumFieldType := archiNumFieldType (only parsing).
+End ArchiNumFieldExports.
+HB.export ArchiNumFieldExports.
+
+#[short(type="archiClosedFieldType")]
+HB.structure Definition ArchiClosedField :=
+  { R of NumDomain_isArchimedean R & ClosedField R }.
+
+Module ArchiClosedFieldExports.
+Bind Scope ring_scope with ArchiClosedField.sort.
+#[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
+Notation archiClosedFieldType := archiClosedFieldType (only parsing).
+End ArchiClosedFieldExports.
+HB.export ArchiClosedFieldExports.
+
+#[short(type="archiDomainType")]
+HB.structure Definition ArchiDomain :=
+  { R of NumDomain_isArchimedean R & RealDomain R }.
+
+Module ArchiDomainExports.
+Bind Scope ring_scope with ArchiDomain.sort.
+#[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
+Notation archiDomainType := archiDomainType (only parsing).
+End ArchiDomainExports.
+HB.export ArchiDomainExports.
+
+#[short(type="archiFieldType")]
+HB.structure Definition ArchiField :=
+  { R of NumDomain_isArchimedean R & RealField R }.
+
+Module ArchiFieldExports.
+Bind Scope ring_scope with ArchiField.sort.
+#[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
+Notation archiFieldType := archiFieldType (only parsing).
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use Num.ArchiField.clone instead.")]
+Notation "[ 'archiFieldType' 'of' T 'for' cT ]" := (ArchiField.clone T%type cT)
+  (at level 0, format "[ 'archiFieldType'  'of'  T  'for'  cT ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0",
+  note="Use Num.ArchiField.clone instead.")]
+Notation "[ 'archiFieldType' 'of' T ]" := (ArchiField.clone T%type _)
+  (at level 0, format "[ 'archiFieldType'  'of'  T ]") : form_scope.
+End ArchiFieldExports.
+HB.export ArchiFieldExports.
+
+Module ArchimedeanField.
+#[deprecated(since="mathcomp 2.1.0",
+  note="Require archimedean.v and use archiFieldType instead.")]
+Notation sort := ArchiField.sort (only parsing).
+#[deprecated(since="mathcomp 2.1.0",
+  note="Require archimedean.v and use archiFieldType.on instead.")]
+Notation on R := (ArchiField.on R) (only parsing).
+End ArchimedeanField.
+#[deprecated(since="mathcomp 2.1.0",
+  note="Require archimedean.v and use ArchiField instead.")]
+Notation ArchimedeanField R := (ArchiField R) (only parsing).
+
+#[short(type="archiRcfType")]
+HB.structure Definition ArchiRealClosedField :=
+  { R of NumDomain_isArchimedean R & RealClosedField R }.
+
+Module ArchiRealClosedFieldExports.
+Bind Scope ring_scope with ArchiRealClosedField.sort.
+#[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
+Notation archiRcfType := archiRcfType (only parsing).
+End ArchiRealClosedFieldExports.
+HB.export ArchiRealClosedFieldExports.
 
 (* The elementary theory needed to support the definition of the derived      *)
 (* operations for the extensions described above.                             *)
@@ -439,7 +530,7 @@ Qed.
 Lemma ltr01 : 0 < 1 :> R. Proof. by rewrite lt_def oner_neq0 ler01. Qed.
 
 Lemma le0r x : (0 <= x) = (x == 0) || (0 < x).
-Proof. by rewrite lt_def; case: eqP => // ->; rewrite lexx. Qed.
+Proof. by rewrite le_eqVlt eq_sym. Qed.
 
 Lemma addr_ge0 x y : 0 <= x -> 0 <= y -> 0 <= x + y.
 Proof.
@@ -541,6 +632,20 @@ Qed.
 
 End RealClosed.
 
+Section ArchiNumDomain.
+Variable R : ArchiNumDomain.type.
+Implicit Types x y : R.
+
+Lemma truncP x :
+  if 0 <= x then (Def.trunc x)%:R <= x < (Def.trunc x).+1%:R
+  else Def.trunc x == 0%N.
+Proof. exact: trunc_subproof. Qed.
+
+Lemma trunc_itv x : 0 <= x -> (Def.trunc x)%:R <= x < (Def.trunc x).+1%:R.
+Proof. by move=> x_ge0; move: (truncP x); rewrite x_ge0. Qed.
+
+End ArchiNumDomain.
+
 Module Exports. HB.reexport. End Exports.
 
 End Internals.
@@ -553,13 +658,14 @@ End PredInstances.
 
 Module Import ExtraDef.
 
-Definition archi_bound {R} x := sval (sigW (@archi_bound_subproof R x)).
+Definition archi_bound {R : ArchiNumDomain.type} (x : R) := (Def.trunc `|x|).+1.
 
 Definition sqrtr {R} x := s2val (sig2W (@sqrtr_subproof R x)).
 
 End ExtraDef.
 
-Notation bound := archi_bound.
+#[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
+Notation bound := archi_bound (only parsing).
 Notation sqrt := sqrtr.
 
 Module Import Theory.
@@ -592,22 +698,17 @@ Lemma realE x : (x \is real) = (0 <= x) || (x <= 0). Proof. by []. Qed.
 
 (* General properties of <= and < *)
 
-Lemma lt0r x : (0 < x) = (x != 0) && (0 <= x). Proof. by rewrite lt_def. Qed.
+Lemma lt0r x : (0 < x) = (x != 0) && (0 <= x). Proof. exact: lt_def. Qed.
 Lemma le0r x : (0 <= x) = (x == 0) || (0 < x). Proof. exact: le0r. Qed.
 
-Lemma lt0r_neq0 (x : R) : 0 < x -> x != 0.
-Proof. by rewrite lt0r; case/andP. Qed.
-
-Lemma ltr0_neq0 (x : R) : x < 0 -> x != 0.
-Proof. by rewrite lt_neqAle; case/andP. Qed.
+Lemma lt0r_neq0 (x : R) : 0 < x -> x != 0. Proof. by move=> /gt_eqF ->. Qed.
+Lemma ltr0_neq0 (x : R) : x < 0 -> x != 0. Proof. by move=> /lt_eqF ->. Qed.
 
 Lemma pmulr_rgt0 x y : 0 < x -> (0 < x * y) = (0 < y).
 Proof. exact: pmulr_rgt0. Qed.
 
 Lemma pmulr_rge0 x y : 0 < x -> (0 <= x * y) = (0 <= y).
-Proof.
-by rewrite !le0r mulf_eq0; case: eqP => // [-> /negPf[] | _ /pmulr_rgt0->].
-Qed.
+Proof. by move=> x_gt0; rewrite !le0r mulf_eq0 pmulr_rgt0 // gt_eqF. Qed.
 
 (* Integer comparisons and characteristic 0. *)
 Lemma ler01 : 0 <= 1 :> R. Proof. exact: ler01. Qed.
@@ -868,13 +969,10 @@ Lemma gtr0_real x : 0 < x -> x \is real. Proof. by move=> /ltW/ger0_real. Qed.
 
 Lemma ltr0_real x : x < 0 -> x \is real. Proof. by move=> /ltW/ler0_real. Qed.
 
-Lemma real0 : 0 \is @real R. Proof. by rewrite ger0_real. Qed.
-Hint Resolve real0 : core.
-
-Lemma real1 : 1 \is @real R. Proof. by rewrite ger0_real. Qed.
-Hint Resolve real1 : core.
-
-Lemma realn n : n%:R \is @real R. Proof. by rewrite ger0_real. Qed.
+Lemma real0 : 0 \is @real R. Proof. exact: rpred0. Qed.
+Lemma real1 : 1 \is @real R. Proof. exact: rpred1. Qed.
+Lemma realn n : n%:R \is @real R. Proof. exact: rpred_nat. Qed.
+#[local] Hint Resolve real0 real1 : core.
 
 Lemma ler_leVge x y : x <= 0 -> y <= 0 -> (x <= y) || (y <= x).
 Proof. by rewrite -!oppr_ge0 => /(ger_leVge _) /[apply]; rewrite !lerN2. Qed.
@@ -888,7 +986,7 @@ Proof. exact: real_leVge. Qed.
 Lemma realB : {in real &, forall x y, x - y \is real}.
 Proof. exact: rpredB. Qed.
 
-Lemma realN : {mono (@GRing.opp R) : x /  x \is real}.
+Lemma realN : {mono (@GRing.opp R) : x / x \is real}.
 Proof. exact: rpredN. Qed.
 
 Lemma realBC x y : (x - y \is real) = (y - x \is real).
@@ -1377,7 +1475,7 @@ Proof. by move=> /(ler_wMn2r n); rewrite mul0rn. Qed.
 Lemma mulrn_wle0 x n : x <= 0 -> x *+ n <= 0.
 Proof. by move=> /(ler_wMn2r n); rewrite mul0rn. Qed.
 
-Lemma lerMn2r n x y : (x *+ n <= y *+ n) = ((n == 0%N) || (x <= y)).
+Lemma lerMn2r n x y : (x *+ n <= y *+ n) = ((n == 0) || (x <= y)).
 Proof. by case: n => [|n]; rewrite ?lexx ?eqxx // ler_pMn2r. Qed.
 
 Lemma ltrMn2r n x y : (x *+ n < y *+ n) = ((0 < n)%N && (x < y)).
@@ -1446,9 +1544,9 @@ Lemma eqr_nat m n : (m%:R == n%:R :> R) = (m == n)%N.
 Proof. by rewrite (inj_eq (mulrIn _)) ?oner_eq0. Qed.
 
 Lemma pnatr_eq1 n : (n%:R == 1 :> R) = (n == 1)%N.
-Proof. exact: eqr_nat 1%N. Qed.
+Proof. exact: eqr_nat 1. Qed.
 
-Lemma lern0 n : (n%:R <= 0 :> R) = (n == 0%N).
+Lemma lern0 n : (n%:R <= 0 :> R) = (n == 0).
 Proof. by rewrite -[0]/0%:R ler_nat leqn0. Qed.
 
 Lemma ltrn0 n : (n%:R < 0 :> R) = false.
@@ -1765,7 +1863,7 @@ move=> xge0 xle1; elim: n=> [|*]; rewrite ?expr0 // exprS.
 by rewrite mulr_ile1 ?exprn_ge0.
 Qed.
 
-Lemma exprn_ilt1 n x : 0 <= x -> x < 1 -> x ^+ n < 1 = (n != 0%N).
+Lemma exprn_ilt1 n x : 0 <= x -> x < 1 -> x ^+ n < 1 = (n != 0).
 Proof.
 move=> xge0 xlt1.
 case: n; [by rewrite eqxx ltxx | elim=> [|n ihn]; first by rewrite expr1].
@@ -1779,7 +1877,7 @@ Proof.
 by move=> x_ge1; elim: n=> [|n ihn]; rewrite ?expr0 // exprS mulr_ege1.
 Qed.
 
-Lemma exprn_egt1 n x : 1 < x -> 1 < x ^+ n = (n != 0%N).
+Lemma exprn_egt1 n x : 1 < x -> 1 < x ^+ n = (n != 0).
 Proof.
 move=> xgt1; case: n; first by rewrite eqxx ltxx.
 by elim=> [|n ihn]; rewrite ?expr1// exprS mulr_egt1 // exprn_ge0.
@@ -1827,7 +1925,7 @@ move=> xge1 m n /= hmn; rewrite -(subnK hmn) exprD.
 by rewrite ler_peMl ?(exprn_ge0, exprn_ege1) // (le_trans _ xge1) ?ler01.
 Qed.
 
-Lemma ieexprn_weq1 x n : 0 <= x -> (x ^+ n == 1) = ((n == 0%N) || (x == 1)).
+Lemma ieexprn_weq1 x n : 0 <= x -> (x ^+ n == 1) = ((n == 0) || (x == 1)).
 Proof.
 move=> xle0; case: n => [|n]; first by rewrite expr0 eqxx.
 case: (@real_ltgtP x 1); do ?by rewrite ?ger0_real.
@@ -1872,7 +1970,7 @@ Proof. by move=> xgt1; apply: (leW_mono (ler_eXn2l _)). Qed.
 
 Definition lter_eXn2l := (ler_eXn2l, ltr_eXn2l).
 
-Lemma ltrXn2r n x y : 0 <= x -> x < y -> x ^+ n < y ^+ n = (n != 0%N).
+Lemma ltrXn2r n x y : 0 <= x -> x < y -> x ^+ n < y ^+ n = (n != 0).
 Proof.
 move=> xge0 xlty; case: n; first by rewrite ltxx.
 elim=> [|n IHn]; rewrite ?[_ ^+ _.+2]exprS //.
@@ -1942,7 +2040,7 @@ Definition expr_gte1 := (expr_ge1, expr_gt1).
 Lemma pexpr_eq1 x n : (0 < n)%N -> 0 <= x -> (x ^+ n == 1) = (x == 1).
 Proof. by move=> ngt0 xge0; rewrite !eq_le expr_le1 // expr_ge1. Qed.
 
-Lemma pexprn_eq1 x n : 0 <= x -> (x ^+ n == 1) = (n == 0%N) || (x == 1).
+Lemma pexprn_eq1 x n : 0 <= x -> (x ^+ n == 1) = (n == 0) || (x == 1).
 Proof. by case: n => [|n] xge0; rewrite ?eqxx // pexpr_eq1 ?gtn_eqF. Qed.
 
 Lemma eqrXn2 n x y :
@@ -2321,7 +2419,7 @@ by rewrite andbT negb_and lt0n negbK.
 Qed.
 
 Lemma real_exprn_even_le0 n x :
-  x \is real -> ~~ odd n -> (x ^+ n <= 0) = (n != 0%N) && (x == 0).
+  x \is real -> ~~ odd n -> (x ^+ n <= 0) = (n != 0) && (x == 0).
 Proof.
 move=> xR n_even; rewrite !real_leNgt ?rpred0 ?rpredX //.
 by rewrite real_exprn_even_gt0 // negb_or negbK.
@@ -2427,13 +2525,13 @@ Proof. by rewrite -sqrf_eq0 sqr_sg pnatr_eq0; case: (x == 0). Qed.
 Lemma sgr_odd n x : x != 0 -> (sg x) ^+ n = (sg x) ^+ (odd n).
 Proof. by rewrite /sg; do 2!case: ifP => // _; rewrite ?expr1n ?signr_odd. Qed.
 
-Lemma sgrMn x n : sg (x *+ n) = (n != 0%N)%:R * sg x.
+Lemma sgrMn x n : sg (x *+ n) = (n != 0)%:R * sg x.
 Proof.
 case: n => [|n]; first by rewrite mulr0n sgr0 mul0r.
 by rewrite !sgr_def mulrn_eq0 mul1r pmulrn_llt0.
 Qed.
 
-Lemma sgr_nat n : sg n%:R = (n != 0%N)%:R :> R.
+Lemma sgr_nat n : sg n%:R = (n != 0)%:R :> R.
 Proof. by rewrite sgrMn sgr1 mulr1. Qed.
 
 Lemma sgr_id x : sg (sg x) = sg x.
@@ -2998,7 +3096,7 @@ Notation ltr_eexpn2l := ltr_eXn2l.
 Notation lter_eexpn2l := lter_eXn2l.
 #[deprecated(since="mathcomp 1.17.0", note="Use ler_wpM2l instead.")]
 Notation ler_wpmul2l := ler_wpM2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_wpM2rinstead.")]
+#[deprecated(since="mathcomp 1.17.0", note="Use ler_wpM2r instead.")]
 Notation ler_wpmul2r := ler_wpM2r.
 #[deprecated(since="mathcomp 1.17.0", note="Use ler_wnM2l instead.")]
 Notation ler_wnmul2l := ler_wnM2l.
@@ -3113,7 +3211,11 @@ Notation ltr_snaddr := ltr_nwDr.
 #[deprecated(since="mathcomp 1.17.0", note="Use ltr_nDr instead.")]
 Notation ltr_snsaddr := ltr_nDr.
 
-#[global] Hint Resolve lerN2 ltrN2 real0 real1 normr_real : core.
+#[global] Hint Resolve lerN2 ltrN2 normr_real : core.
+#[global] Hint Extern 0 (is_true (_%:R \is real)) => apply: realn : core.
+#[global] Hint Extern 0 (is_true (0 \is real)) => apply: real0 : core.
+#[global] Hint Extern 0 (is_true (1 \is real)) => apply: real1 : core.
+
 Arguments ler_sqr {R} [x y].
 Arguments ltr_sqr {R} [x y].
 Arguments signr_inj {R} [x1 x2].
@@ -3812,7 +3914,7 @@ Proof. by move=> even_n; rewrite real_exprn_even_ge0 ?num_real. Qed.
 Lemma exprn_even_gt0 n x : ~~ odd n -> (0 < x ^+ n) = (n == 0)%N || (x != 0).
 Proof. by move=> even_n; rewrite real_exprn_even_gt0 ?num_real. Qed.
 
-Lemma exprn_even_le0 n x : ~~ odd n -> (x ^+ n <= 0) = (n != 0%N) && (x == 0).
+Lemma exprn_even_le0 n x : ~~ odd n -> (x ^+ n <= 0) = (n != 0) && (x == 0).
 Proof. by move=> even_n; rewrite real_exprn_even_le0 ?num_real. Qed.
 
 Lemma exprn_even_lt0 n x : ~~ odd n -> (x ^+ n < 0) = false.
@@ -3941,22 +4043,6 @@ Lemma leif_AGM2 : x * y <= ((x + y) / 2)^+ 2 ?= iff (x == y).
 Proof. by apply: real_leif_AGM2; apply: num_real. Qed.
 
 End RealField.
-
-Section ArchimedeanFieldTheory.
-
-Variables (F : archiFieldType) (x : F).
-
-Lemma archi_boundP : 0 <= x -> x < (bound x)%:R.
-Proof. by move/ger0_norm=> {1}<-; rewrite /bound; case: (sigW _). Qed.
-
-Lemma upper_nthrootP i : (bound x <= i)%N -> x < 2 ^+ i.
-Proof.
-rewrite /bound; case: (sigW _) => /= b le_x_b le_b_i.
-apply: le_lt_trans (ler_norm x) (lt_trans le_x_b _ ).
-by rewrite -natrX ltr_nat (leq_ltn_trans le_b_i) // ltn_expl.
-Qed.
-
-End ArchimedeanFieldTheory.
 
 Section RealClosedFieldTheory.
 
@@ -4243,8 +4329,7 @@ Proof. by move=> n_gt0; rewrite -{1}(rootC0 n) eqr_rootC. Qed.
 Lemma nonRealCi : ('i : C) \isn't real.
 Proof. by rewrite realEsqr sqrCi oppr_ge0 lt_geF ?ltr01. Qed.
 
-Lemma neq0Ci : 'i != 0 :> C.
-Proof. by apply: contraNneq nonRealCi => ->; apply: real0. Qed.
+Lemma neq0Ci : 'i != 0 :> C. Proof. by apply: contraNneq nonRealCi => ->. Qed.
 
 Lemma normCi : `|'i| = 1 :> C.
 Proof. by apply/eqP; rewrite -(@pexpr_eq1 _ _ 2) // -normrX sqrCi normrN1. Qed.
@@ -4822,6 +4907,100 @@ Arguments sqrCK_P {C x}.
 #[global] Hint Extern 0 (is_true (in_mem ('Im _) _)) =>
   solve [apply: Creal_Im] : core.
 
+Module mc_2_0.
+
+Local Lemma archi_boundP (R : ArchiNumDomain.type) (x : R) :
+  0 <= x -> x < (archi_bound x)%:R.
+Proof.
+move=> x_ge0; case/trunc_itv/andP: (normr_ge0 x) => _.
+exact/le_lt_trans/real_ler_norm/ger0_real.
+Qed.
+
+Local Lemma upper_nthrootP (R : ArchiDomain.type) (x : R) i :
+  (archi_bound x <= i)%N -> x < 2%:R ^+ i.
+Proof.
+case/trunc_itv/andP: (normr_ge0 x) => _ /ltr_normlW xlt le_b_i.
+by rewrite (lt_le_trans xlt) // -natrX ler_nat (ltn_trans le_b_i) // ltn_expl.
+Qed.
+
+Section ArchiNumDomainTheory.
+
+Variable R : ArchiNumDomain.type.
+Implicit Type x : R.
+
+Local Notation nat_num := (@nat_num R).
+Local Notation int_num := (@int_num R).
+
+Lemma natrE x : (x \is a nat_num) = ((Def.trunc x)%:R == x).
+Proof. exact: Num.nat_num_subproof. Qed.
+
+Lemma trunc_def x n : n%:R <= x < n.+1%:R -> Def.trunc x = n.
+Proof.
+case/andP=> lemx ltxm1; apply/eqP; rewrite eqn_leq -ltnS -[(n <= _)%N]ltnS.
+have/trunc_itv/andP[lefx ltxf1]: 0 <= x by apply: le_trans lemx; apply: ler0n.
+by rewrite -!(ltr_nat R) 2?(@le_lt_trans _ _ x).
+Qed.
+
+Lemma natrK : cancel (GRing.natmul 1) (@Def.trunc R).
+Proof. by move=> m; apply: trunc_def; rewrite ler_nat ltr_nat ltnS leqnn. Qed.
+
+Lemma natr_nat n : n%:R \is a nat_num. Proof. by rewrite natrE natrK. Qed.
+#[local] Hint Resolve natr_nat : core.
+
+Lemma natrP x : reflect (exists n, x = n%:R) (x \is a nat_num).
+Proof.
+apply: (iffP idP) => [|[n ->]]; rewrite // natrE => /eqP <-.
+by exists (Def.trunc x).
+Qed.
+
+Lemma nat_num0 : 0 \is a nat_num. Proof. exact: (natr_nat 0). Qed.
+Lemma nat_num1 : 1 \is a nat_num. Proof. exact: (natr_nat 1). Qed.
+#[local] Hint Resolve nat_num0 nat_num1 : core.
+
+Fact nat_num_semiring : semiring_closed nat_num.
+Proof.
+by do 2![split] => //= _ _ /natrP[n ->] /natrP[m ->]; rewrite -(natrD, natrM).
+Qed.
+#[export]
+HB.instance Definition _ := GRing.isSemiringClosed.Build R nat_num_subdef
+  nat_num_semiring.
+
+Lemma intrE x : (x \is a int_num) = (x \is a nat_num) || (- x \is a nat_num).
+Proof. exact: Num.int_num_subproof. Qed.
+
+Lemma int_num1 : 1 \is a int_num. Proof. by rewrite intrE nat_num1. Qed.
+#[local] Hint Resolve int_num1 : core.
+
+Fact int_num_subring : subring_closed int_num.
+Proof.
+split=> // u v /[!intrE] /orP[]/natrP[n] + /orP[]/natrP[m]; rewrite ?opprB.
+- move=> -> ->.
+  by case: (leqP n m) => [|/ltnW] ?; apply/orP; [right|left]; rewrite -mulrnBr.
+- by move=> -> ->; rewrite -mulrnDr natr_nat.
+- by move=> -> ->; rewrite -mulrnDr natr_nat orbT.
+- rewrite -[u in u - v]opprK -[v in v - u]opprK => -> ->.
+  by case: (leqP n m) => [|/ltnW] ?;
+    apply/orP; [left|right]; rewrite addrC -mulrnBr.
+- by move=> -> ->; rewrite -natrM natr_nat.
+- by rewrite -mulrN => -> ->; rewrite -natrM natr_nat orbT.
+- by rewrite -mulNr => -> ->; rewrite -natrM natr_nat orbT.
+- by rewrite -mulrNN => -> ->; rewrite -natrM natr_nat.
+Qed.
+#[export]
+HB.instance Definition _ := GRing.isSubringClosed.Build R int_num_subdef
+  int_num_subring.
+
+End ArchiNumDomainTheory.
+
+Module Exports. HB.reexport. End Exports.
+
+End mc_2_0.
+
+#[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
+Notation archi_boundP := mc_2_0.archi_boundP (only parsing).
+#[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
+Notation upper_nthrootP := mc_2_0.upper_nthrootP (only parsing).
+
 Module Export Pdeg2.
 
 Module NumClosed.
@@ -4830,7 +5009,7 @@ Section Pdeg2NumClosed.
 
 Variables (F : numClosedFieldType) (p : {poly F}).
 
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -4862,7 +5041,7 @@ Section Pdeg2NumClosedMonic.
 
 Variables (F : numClosedFieldType) (p : {poly F}).
 
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 Hypothesis monicp : p \is monic.
 
 Let a := p`_2.
@@ -4895,7 +5074,7 @@ Variable F : realFieldType.
 Section Pdeg2RealConvex.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -4945,7 +5124,7 @@ End Pdeg2RealConvex.
 Section Pdeg2RealConcave.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -4955,7 +5134,7 @@ Hypothesis ale0 : a <= 0.
 
 Let delta := b ^+ 2 - 4 * a * c.
 
-Let degpN : size (- p) = 3%N. Proof. by rewrite size_opp. Qed.
+Let degpN : size (- p) = 3. Proof. by rewrite size_opp. Qed.
 Let b2a : - (- p)`_1 / (2 * (- p)`_2) = - b / (2 * a).
 Proof. by rewrite !coefN mulrN divrNN. Qed.
 Let deltaN : (- p)`_1 ^+ 2 - 4 * (- p)`_2 * (- p)`_0 = delta.
@@ -4994,7 +5173,7 @@ Variable F : rcfType.
 Section Pdeg2RealClosedConvex.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -5104,7 +5283,7 @@ End Pdeg2RealClosedConvex.
 Section Pdeg2RealClosedConcave.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 
 Let a := p`_2.
 Let b := p`_1.
@@ -5117,7 +5296,7 @@ Let r2 := (- b - sqrt delta) / (2 * a).
 
 Hypothesis ale0 : a <= 0.
 
-Let degpN : size (- p) = 3%N. Proof. by rewrite size_opp. Qed.
+Let degpN : size (- p) = 3. Proof. by rewrite size_opp. Qed.
 Let aNge0 : 0 <= (- p)`_2. Proof. by rewrite coefN oppr_ge0. Qed.
 Let deltaN : (- p)`_1 ^+ 2 - 4 * (- p)`_2 * (- p)`_0 = delta.
 Proof. by rewrite !coefN sqrrN -mulrN opprK mulrN mulNr. Qed.
@@ -5162,7 +5341,7 @@ Section Pdeg2RealMonic.
 Variable F : realFieldType.
 
 Variable p : {poly F}.
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 Hypothesis monicp : p \is monic.
 
 Let a := p`_2.
@@ -5194,7 +5373,7 @@ End Pdeg2RealMonic.
 Section Pdeg2RealClosedMonic.
 
 Variables (F : rcfType) (p : {poly F}).
-Hypothesis degp : size p = 3%N.
+Hypothesis degp : size p = 3.
 Hypothesis monicp : p \is monic.
 
 Let a := p`_2.
@@ -5662,8 +5841,61 @@ HB.builders Context R of IntegralDomain_isLtReal R.
     le_total.
 HB.end.
 
+HB.factory Record NumDomain_bounded_isArchimedean R of NumDomain R := {
+  archi_bound_subproof : archimedean_axiom R
+}.
+
+HB.builders Context R of NumDomain_bounded_isArchimedean R.
+  Implicit Type x : R.
+
+  Definition bound x := sval (sigW (archi_bound_subproof x)).
+
+  Lemma boundP x : 0 <= x -> x < (bound x)%:R.
+  Proof. by move/ger0_norm=> {1}<-; rewrite /bound; case: (sigW _). Qed.
+
+  Fact trunc_subproof x : {m | 0 <= x -> m%:R <= x < m.+1%:R }.
+  Proof.
+  have [Rx | _] := boolP (0 <= x); last by exists 0%N.
+  have/ex_minnP[n lt_x_n1 min_n]: exists n, x < n.+1%:R.
+    by exists (bound x); rewrite (lt_trans (boundP Rx)) ?ltr_nat.
+  exists n => _; rewrite {}lt_x_n1 andbT; case: n min_n => //= n min_n.
+  rewrite real_leNgt ?rpred_nat ?ger0_real //; apply/negP => /min_n.
+  by rewrite ltnn.
+  Qed.
+
+  Definition trunc x := if 0 <= x then sval (trunc_subproof x) else 0%N.
+
+  Lemma truncP x :
+    if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N.
+  Proof.
+  rewrite /trunc; case: trunc_subproof => // n hn.
+  by case: ifP => x_ge0; rewrite ?(ifT _ _ x_ge0) ?(ifF _ _ x_ge0) // hn.
+  Qed.
+
+  HB.instance Definition _ := NumDomain_isArchimedean.Build R
+    truncP (fun => erefl) (fun => erefl).
+HB.end.
+
+Module RealField_isArchimedean.
+#[deprecated(since="mathcomp 2.1.0",
+  note="NumDomain_bounded_isArchimedean.Build instead.")]
+Notation Build R p := (NumDomain_bounded_isArchimedean.Build R p).
+End RealField_isArchimedean.
+
+#[deprecated(since="mathcomp 2.1.0",
+  note="NumDomain_bounded_isArchimedean instead.")]
+Notation RealField_isArchimedean T := (NumDomain_bounded_isArchimedean T).
+
 Module Exports. HB.reexport. End Exports.
+
+(* Not to pollute the local namespace, we define Num.nat and Num.int here. *)
+#[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
+Notation nat := nat_num (only parsing).
+#[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
+Notation int := int_num (only parsing).
+
 End Num.
 Export Num.Exports.
+Export Num.Theory.mc_2_0.Exports.
 
 Export Num.Syntax Num.PredInstances.

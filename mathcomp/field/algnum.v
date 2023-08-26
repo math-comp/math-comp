@@ -3,10 +3,9 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime.
-From mathcomp Require Import ssralg finalg zmodp poly ssrnum ssrint rat.
-From mathcomp Require Import polydiv intdiv algC matrix mxalgebra mxpoly.
-From mathcomp Require Import vector falgebra fieldext separable galois.
-From mathcomp Require Import cyclotomic.
+From mathcomp Require Import ssralg poly polydiv ssrnum ssrint archimedean rat.
+From mathcomp Require Import finalg zmodp matrix mxalgebra mxpoly vector intdiv.
+From mathcomp Require Import falgebra fieldext separable galois algC cyclotomic.
 
 (******************************************************************************)
 (* This file provides a few basic results and constructions in algebraic      *)
@@ -227,7 +226,7 @@ pose nu0aM := GRing.isAdditive.Build Qn Qn nu0 nu0a.
 pose nu0mM := GRing.isMultiplicative.Build Qn Qn nu0 nu0m.
 pose nu0RM : GRing.RMorphism.type _ _ := HB.pack nu0 nu0aM nu0mM.
 pose nu0lM := GRing.isScalable.Build rat Qn Qn *:%R nu0 (fmorph_numZ nu0RM).
-pose nu0LRM : GRing.LRMorphism.type _ _ _ _ := HB.pack nu0 nu0aM nu0mM nu0lM.
+pose nu0LRM : {lrmorphism _ -> _} := HB.pack nu0 nu0aM nu0mM nu0lM.
 by exists nu0LRM.
 Qed.
 
@@ -397,7 +396,7 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     pose in01aM := GRing.isAdditive.Build _ _ in01 in01a.
     pose in01mM := GRing.isMultiplicative.Build _ _ in01 in01m.
     pose in01lM := GRing.isScalable.Build _ _  _ _ in01 in01l.
-    pose in01LRM : GRing.LRMorphism.type _ _ _ _ := HB.pack in01
+    pose in01LRM : {lrmorphism _ -> _} := HB.pack in01
       in01aM in01mM in01lM.
     by exists in01LRM.
   have {z zz Dz px} Dx: exists xx, x = QrC xx.
@@ -432,15 +431,14 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     by rewrite rmorphB /= map_polyX map_polyC.
   have [f1 aut_f1 Df1]:= kHom_extends (sub1v (ASpace algK)) hom_f Qpr splitQr.
   pose f1mM := GRing.isMultiplicative.Build _ _ f1 (kHom_lrmorphism aut_f1).
-  pose nu : GRing.LRMorphism.type _ _ _ _ := HB.pack (fun_of_lfun f1) f1mM.
+  pose nu : {lrmorphism _ -> _} := HB.pack (fun_of_lfun f1) f1mM.
   exists (SubAut Qr QrC nu) => //; exists in01 => //= y.
   by rewrite -Df -Df1 //; apply/memK; exists y.
 have phiZ: scalable phi.
   move=> a y; do 2!rewrite -mulr_algl -in_algE; rewrite -[a]divq_num_den.
   by rewrite fmorph_div rmorphM [X in X * _]fmorph_div !rmorph_int.
 pose philM := GRing.isScalable.Build _ _ _ _ phi phiZ.
-pose phiLRM : GRing.LRMorphism.type _ _ _ _ :=
-  HB.pack (GRing.RMorphism.sort phi) philM.
+pose phiLRM : {lrmorphism _ -> _} := HB.pack (GRing.RMorphism.sort phi) philM.
 pose fix ext n :=
   if n is i.+1 then oapp (fun x => s2val (ext1 (ext i) x)) (ext i) (unpickle i)
   else SubAut Qs QsC phiLRM.
@@ -472,15 +470,15 @@ have nua : additive nu.
   rewrite -Dx nu_inj; rewrite -Dx1 -Dx2 -rmorphB in Dx.
   by rewrite (fmorph_inj _ Dx) !rmorphB -!nu_inj Dx1 Dx2.
 have num : multiplicative nu.
-  split=> [x1 x2|]; last by rewrite -(rmorph1 QsC) (nu_inj 0%N) !rmorph1.
+  split=> [x1 x2|]; last by rewrite -(rmorph1 QsC) (nu_inj 0) !rmorph1.
   have [n] := max3 (x1 * x2) x1 x2.
   case=> /mem_ext[y Dx] /mem_ext[y1 Dx1] /mem_ext[y2 Dx2].
   rewrite -Dx nu_inj; rewrite -Dx1 -Dx2 -rmorphM in Dx.
   by rewrite (fmorph_inj _ Dx) !rmorphM /= -!nu_inj Dx1 Dx2.
 pose nuaM := GRing.isAdditive.Build _ _ nu nua.
 pose numM := GRing.isMultiplicative.Build _ _ nu num.
-pose nuRM : GRing.RMorphism.type _ _ := HB.pack nu nuaM numM.
-by exists nuRM => x; rewrite /= (nu_inj 0%N).
+pose nuRM : {rmorphism _ -> _} := HB.pack nu nuaM numM.
+by exists nuRM => x; rewrite /= (nu_inj 0).
 Qed.
 
 (* Extended automorphisms of Q_n. *)
@@ -527,14 +525,14 @@ Qed.
 
 (* Algebraic integers. *)
 
-Definition Aint : {pred algC} := fun x => minCpoly x \is a polyOver Cint.
+Definition Aint : {pred algC} := fun x => minCpoly x \is a polyOver Num.int.
 
 Lemma root_monic_Aint p x :
-  root p x -> p \is monic -> p \is a polyOver Cint -> x \in Aint.
+  root p x -> p \is monic -> p \is a polyOver Num.int -> x \in Aint.
 Proof.
 have pZtoQtoC pz: pQtoC (pZtoQ pz) = pZtoC pz.
   by rewrite -map_poly_comp; apply: eq_map_poly => b; rewrite /= rmorph_int.
-move=> px0 mon_p /floorCpP[pz Dp]; rewrite unfold_in.
+move=> px0 mon_p /floorpP[pz Dp]; rewrite unfold_in.
 move: px0; rewrite Dp -pZtoQtoC; have [q [-> mon_q] ->] := minCpolyP x.
 case/dvdpP_rat_int=> qz [a nz_a Dq] [r].
 move/(congr1 (fun q1 => lead_coef (a *: pZtoQ q1))).
@@ -542,12 +540,12 @@ rewrite rmorphM scalerAl -Dq lead_coefZ lead_coefM /=.
 have /monicP->: pZtoQ pz \is monic by rewrite -(map_monic QtoC) pZtoQtoC -Dp.
 rewrite (monicP mon_q) mul1r mulr1 lead_coef_map_inj //; last exact: intr_inj.
 rewrite Dq => ->; apply/polyOverP=> i; rewrite !(coefZ, coef_map).
-by rewrite -rmorphM /= rmorph_int Cint_int.
+by rewrite -rmorphM /= rmorph_int.
 Qed.
 
-Lemma Cint_rat_Aint z : z \in Crat -> z \in Aint -> z \in Cint.
+Lemma Cint_rat_Aint z : z \in Crat -> z \in Aint -> z \in Num.int.
 Proof.
-case/CratP=> a ->{z} /polyOverP/(_ 0%N).
+case/CratP=> a ->{z} /polyOverP/(_ 0).
 have [p [Dp mon_p] dv_p] := minCpolyP (ratr a); rewrite Dp coef_map.
 suffices /eqP->: p == 'X - a%:P by rewrite polyseqXsubC /= rmorphN rpredN.
 rewrite -eqp_monic ?monicXsubC // irredp_XsubC //.
@@ -555,17 +553,16 @@ rewrite -eqp_monic ?monicXsubC // irredp_XsubC //.
 by rewrite -dv_p fmorph_root root_XsubC.
 Qed.
 
-Lemma Aint_Cint : {subset Cint <= Aint}.
+Lemma Aint_Cint : {subset Num.int <= Aint}.
 Proof.
 move=> x; rewrite -polyOverXsubC.
 by apply: root_monic_Aint; rewrite ?monicXsubC ?root_XsubC.
 Qed.
 
-Lemma Aint_int x : x%:~R \in Aint.
-Proof. by rewrite Aint_Cint ?Cint_int. Qed.
+Lemma Aint_int x : x%:~R \in Aint. Proof. by rewrite Aint_Cint. Qed.
 
-Lemma Aint0 : 0 \in Aint. Proof. exact: (Aint_int 0). Qed.
-Lemma Aint1 : 1 \in Aint. Proof. exact: (Aint_int 1). Qed.
+Lemma Aint0 : 0 \in Aint. Proof. exact: Aint_int 0. Qed.
+Lemma Aint1 : 1 \in Aint. Proof. exact: Aint_int 1. Qed.
 #[global] Hint Resolve Aint0 Aint1 : core.
 
 Lemma Aint_unity_root n x : (n > 0)%N -> n.-unity_root x -> x \in Aint.
@@ -580,8 +577,8 @@ move=> pr_z; apply/(Aint_unity_root (prim_order_gt0 pr_z))/unity_rootP.
 exact: prim_expr_order.
 Qed.
 
-Lemma Aint_Cnat : {subset Cnat <= Aint}.
-Proof. by move=> z /Cint_Cnat/Aint_Cint. Qed.
+Lemma Aint_Cnat : {subset Num.nat <= Aint}.
+Proof. by move=> z /intr_nat/Aint_Cint. Qed.
 
 (* This is Isaacs, Lemma (3.3) *)
 Lemma Aint_subring_exists (X : seq algC) :
@@ -618,7 +615,7 @@ have SmulX (i : 'I_m): {in S, forall x, x * X`_i \in S}.
   have [/monicP ] := (minCpoly_monic X`_i, root_minCpoly X`_i).
   rewrite /root horner_coef lead_coefE -(subnKC (size_minCpoly _)) subn2.
   rewrite big_ord_recr /= addrC addr_eq0 => ->; rewrite mul1r => /eqP->.
-  have /floorCpP[p Dp]: X`_i \in Aint.
+  have /floorpP[p Dp]: X`_i \in Aint.
     by have [/(nth_default 0)-> | /(mem_nth 0)/AZ_X] := leqP (size X) i.
   rewrite -/(n i) Dp mulNr rpredN // mulr_suml rpred_sum // => [[e le_e]] /= _.
   rewrite coef_map -mulrA mulrzl rpredMz ?sYS //; apply/imageP.
@@ -650,7 +647,8 @@ Proof.
 move=> mulS.
 pose Sm := GRing.isMulClosed.Build _ _ mulS.
 pose SC : mulrClosed _ := HB.pack S Sm.
-have ZP_C c: (ZtoC c)%:P \is a polyOver Cint by rewrite raddfMz rpred_int.
+have ZP_C c: (ZtoC c)%:P \is a polyOver Num.int_num_subdef.
+  by rewrite raddfMz rpred_int.
 move=> S_P x Sx; pose v := \row_(i < n) Y`_i.
 have [v0 | nz_v] := eqVneq v 0.
   case/S_P: Sx => {}x ->; rewrite big1 ?isAlgInt0 // => i _.
@@ -659,7 +657,7 @@ have sYS (i : 'I_n): x * Y`_i \in SC.
   by rewrite rpredM //; apply/S_P/Cint_spanP/mem_Cint_span/memt_nth.
 pose A := \matrix_(i, j < n) sval (sig_eqW (S_P _ (sYS j))) i.
 pose p := char_poly (map_mx ZtoC A).
-have: p \is a polyOver Cint.
+have: p \is a polyOver Num.int_num_subdef.
   rewrite rpred_sum // => s _; rewrite rpredMsign rpred_prod // => j _.
   by rewrite !mxE /= rpredB ?rpredMn ?polyOverX.
 apply: root_monic_Aint (char_poly_monic _).
@@ -800,7 +798,7 @@ Proof. by rewrite eqAmod0_rat ?rpred_nat // dvdC_nat. Qed.
 
 Definition orderC x :=
   let p := minCpoly x in
-  oapp val 0%N [pick n : 'I_(2 * size p ^ 2) | p == intrp 'Phi_n].
+  oapp val 0 [pick n : 'I_(2 * size p ^ 2) | p == intrp 'Phi_n].
 
 Notation "#[ x ]" := (orderC x) : C_scope.
 

@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
-From mathcomp Require Import ssralg poly ssrnum ssrint rat matrix.
+From mathcomp Require Import ssralg poly ssrnum ssrint archimedean rat matrix.
 From mathcomp Require Import polydiv perm zmodp mxalgebra vector.
 
 (******************************************************************************)
@@ -321,7 +321,7 @@ Proof. by rewrite modzMmr -abszEsign. Qed.
 Lemma dvdzE d m : (d %| m)%Z = (`|d| %| `|m|)%N. Proof. by []. Qed.
 Lemma dvdz0 d : (d %| 0)%Z. Proof. exact: dvdn0. Qed.
 Lemma dvd0z n : (0 %| n)%Z = (n == 0). Proof. by rewrite -absz_eq0 -dvd0n. Qed.
-Lemma dvdz1 d : (d %| 1)%Z = (`|d|%N == 1%N). Proof. exact: dvdn1. Qed.
+Lemma dvdz1 d : (d %| 1)%Z = (`|d|%N == 1). Proof. exact: dvdn1. Qed.
 Lemma dvd1z m : (1 %| m)%Z. Proof. exact: dvd1n. Qed.
 Lemma dvdzz m : (m %| m)%Z. Proof. exact: dvdnn. Qed.
 
@@ -456,18 +456,15 @@ Lemma divzDr m n d :
   (d %| n)%Z -> ((m + n) %/ d)%Z = (m %/ d)%Z + (n %/ d)%Z.
 Proof. by move=> dv_n; rewrite addrC divzDl // addrC. Qed.
 
-Lemma Qint_dvdz (m d : int) : (d %| m)%Z -> ((m%:~R / d%:~R : rat) \is a Qint).
+Lemma Qint_dvdz (m d : int) : (d %| m)%Z -> (m%:~R / d%:~R : rat) \is a Num.int.
 Proof.
 case/dvdzP=> z ->; rewrite rmorphM /=; have [->|dn0] := eqVneq d 0.
   by rewrite mulr0 mul0r.
-by rewrite mulfK ?intr_eq0 // rpred_int.
+by rewrite mulfK ?intr_eq0.
 Qed.
 
-Lemma Qnat_dvd (m d : nat) : (d %| m)%N -> ((m%:R / d%:R : rat) \is a Qnat).
-Proof.
-move=> h; rewrite Qnat_def divr_ge0 ?ler0n // -[m%:R]/(m%:~R) -[d%:R]/(d%:~R).
-by rewrite Qint_dvdz.
-Qed.
+Lemma Qnat_dvd (m d : nat) : (d %| m)%N -> (m%:R / d%:R : rat) \is a Num.nat.
+Proof. by move=> h; rewrite natrEint divr_ge0 ?ler0n // !pmulrn Qint_dvdz. Qed.
 
 (* Greatest common divisor *)
 
@@ -706,7 +703,7 @@ End Chinese.
 Section ZpolyScale.
 
 Definition zcontents (p : {poly int}) : int :=
-  sgz (lead_coef p) * \big[gcdn/0%N]_(i < size p) `|(p`_i)%R|%N.
+  sgz (lead_coef p) * \big[gcdn/0]_(i < size p) `|(p`_i)%R|%N.
 
 Lemma sgz_contents p : sgz (zcontents p) = sgz (lead_coef p).
 Proof.
@@ -932,7 +929,7 @@ Lemma int_Smith_normal_form m n (M : 'M[int]_(m, n)) :
 Proof.
 move: {2}_.+1 (ltnSn (m + n)) => mn.
 elim: mn => // mn IHmn in m n M *; rewrite ltnS => le_mn.
-have [[i j] nzMij | no_ij] := pickP (fun k => M k.1 k.2 != 0%N); last first.
+have [[i j] nzMij | no_ij] := pickP (fun k => M k.1 k.2 != 0); last first.
   do 2![exists 1%:M; first exact: unitmx1]; exists nil => //=.
   apply/matrixP=> i j; apply/eqP; rewrite mulmx1 mul1mx mxE nth_nil mul0rn.
   exact: negbFE (no_ij (i, j)).
