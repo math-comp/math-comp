@@ -832,6 +832,9 @@ Proof. by rewrite !ltnNge leq_min negb_and. Qed.
 Lemma geq_min m n1 n2 : (m >= minn n1 n2) = (m >= n1) || (m >= n2).
 Proof. by rewrite -ltnS gtn_min. Qed.
 
+Lemma ltn_min m n1 n2 : (m < minn n1 n2) = (m < n1) && (m < n2).
+Proof. by rewrite !ltnNge geq_min negb_or. Qed.
+
 Lemma geq_minl m n : minn m n <= m. Proof. by rewrite geq_min leqnn. Qed.
 Lemma geq_minr m n : minn m n <= n. Proof. by rewrite minnC geq_minl. Qed.
 

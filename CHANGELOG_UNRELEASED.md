@@ -23,7 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `FieldMonic.deg2_poly_root1`, `FieldMonic.deg2_poly_root2`
 
 - in `ssrnat.v`
-  + lemma `congr_pred`
+  + lemma `congr_pred`, `ltn_min`
 
 - in `ssrnum.v`
   + lemmas `NumClosed.deg2_poly_factor`, `NumClosed.deg2_poly_root1`,
