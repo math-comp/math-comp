@@ -131,6 +131,9 @@ in `qfpoly.v`
 
 ### Changed
 
+- in `ssralg.v`
+  + implicits of `natr1` and `nat1r`
+
 ### Renamed
 
 - in `polydiv.v`
