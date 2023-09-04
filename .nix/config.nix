@@ -80,6 +80,11 @@ with builtins; with (import <nixpkgs> {}).lib;
       coqeal.job = false;
       coquelicot.job = false;
     };
+    "coq-8.18".push-branches = [ "master" "mathcomp-1" ];
+    "coq-8.18".coqPackages = common-bundles // {
+      coq.override.version = "8.18";
+      interval.job = false;
+    };
     "coq-8.17".push-branches = [ "master" "mathcomp-1" ];
     "coq-8.17".coqPackages = common-bundles // {
       coq.override.version = "8.17";
