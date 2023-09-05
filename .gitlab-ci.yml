@@ -51,8 +51,7 @@ stages:
     - docker build -f Dockerfile.make --pull --build-arg=coq_image="coqorg/coq:${COQ_VERSION}" -t "${IMAGE}" .
   except:
     refs:
-      # TODO: comment-out when we'll have more CI minutes
-      - /^pr-.*$/
+      # - /^pr-.*$/
       - tags
       - merge_requests
       - schedules
@@ -81,8 +80,7 @@ make-coq-latest:
     - docker logout "${CI_REGISTRY}"
   except:
     refs:
-      # TODO: comment-out when we'll have more CI minutes
-      - /^pr-.*$/
+      # - /^pr-.*$/
       - tags
       - merge_requests
 
@@ -90,8 +88,7 @@ make-coq-latest:
   extends: .opam-build
   except:
     refs:
-      # TODO: comment-out when we'll have more CI minutes
-      - /^pr-.*$/
+      # - /^pr-.*$/
       - tags
       - merge_requests
       - schedules
@@ -141,8 +138,7 @@ coq-dev:
     - make test-suite TEST_SKIP_BUILD=1
   except:
     refs:
-      # TODO: comment-out when we'll have more CI minutes
-      - /^pr-.*$/
+      # - /^pr-.*$/
       - tags
       - merge_requests
 
@@ -151,8 +147,7 @@ coq-dev:
   extends: .test
   except:
     refs:
-      # TODO: comment-out when we'll have more CI minutes
-      - /^pr-.*$/
+      # - /^pr-.*$/
       - tags
       - merge_requests
       - schedules
@@ -208,8 +203,7 @@ test-coq-dev:
 #     - git describe --all --long --abbrev=40 --always --dirty
 #   except:
 #     refs:
-#       # TODO: comment-out when we'll have more CI minutes
-#       - /^pr-.*$/
+#       # - /^pr-.*$/
 #       - tags
 #       - merge_requests
 #       - schedules
