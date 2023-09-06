@@ -4365,7 +4365,8 @@ Lemma irr_comp_rsim n1 n2 rG1 rG2 :
   @mx_rsim _ G n1 rG1 n2 rG2 -> irr_comp rG1 = irr_comp rG2.
 Proof.
 case=> f eq_n12; rewrite -eq_n12 in rG2 f * => inj_f hom_f.
-congr (odflt _ _); apply: eq_pick => i; rewrite -!mxrank_eq0.
+rewrite /irr_comp; apply/f_equal/eq_pick => i; rewrite -!mxrank_eq0.
+(* [congr (odflt 1%irr _)] works but is very slow *)
 rewrite -(mxrankMfree _ inj_f); symmetry; rewrite -(eqmxMfull _ inj_f).
 have /envelop_mxP[e ->{i}]: ('e_i \in R_G)%MS.
   by rewrite -Wedderburn_sum (sumsmx_sup i) ?Wedderburn_id_mem.
@@ -4382,7 +4383,7 @@ Qed.
 Lemma irr_repr'_op0 i j A :
   j != i -> (A \in 'R_j)%MS -> gring_op (irr_repr i) A = 0.
 Proof.
-by move=> neq_ij /irr_comp'_op0-> //; [apply: socle_irr | rewrite irr_reprK].
+by move=> neq_ij /irr_comp'_op0->; [|apply: socle_irr|rewrite irr_reprK].
 Qed.
 
 Lemma op_Wedderburn_id i : gring_op (irr_repr i) 'e_i = 1%:M.
@@ -5113,7 +5114,7 @@ Lemma mxval0 : mxval 0 = 0.
 Proof. by rewrite /mxval [pval _]raddf0 rmorph0. Qed.
 
 Lemma mxvalN : {morph mxval : x / - x}.
-Proof. by move=> x; rewrite /mxval [pval _]raddfN rmorphN. Qed.
+Proof. by move=> x; rewrite /mxval [pval _](@raddfN 'rV[F]_d) rmorphN. Qed.
 
 Lemma mxvalD : {morph mxval : x y / x + y}.
 Proof. by move=> x y; rewrite /mxval [pval _]raddfD rmorphD. Qed.

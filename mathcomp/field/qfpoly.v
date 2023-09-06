@@ -303,7 +303,7 @@ rewrite leq_eqVlt; apply/orP; left; apply/eqP.
 rewrite -orderE gX_order card_qfpoly -[in RHS](mk_monicE primitive_mi).
 rewrite -card_qpoly -(cardC1 (0 : {poly %/ h with primitive_mi})).
 rewrite cardsT card_sub.
-by apply: eq_card => x; rewrite unitfE.
+by apply: eq_card => x; rewrite [LHS]unitfE.
 Qed.
 
 Let pred_card_qT_gt0 : 0 < #|qT|.-1.

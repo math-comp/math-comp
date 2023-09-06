@@ -732,7 +732,7 @@ pose EIsCountable := isCountable.Build E (pcan_pickleK (can_pcan (reprK))).
 pose Ecount : countFieldType := HB.pack E Efield EIsCountable.
 pose FtoE : {rmorphism _ -> _} := PtoE \o polyC; pose w : E := PtoE 'X.
 have defPtoE q: (map_poly FtoE q).[w] = PtoE q.
-  by rewrite map_poly_comp horner_map [_.['X]]comp_polyXr.
+  by rewrite (map_poly_comp PtoE polyC) horner_map [_.['X]]comp_polyXr.
 exists Ecount, FtoE, w => [|u].
   by rewrite /root defPtoE (PtoEd 0).
 by exists (repr u); rewrite defPtoE /= reprK.

@@ -3160,7 +3160,7 @@ have [-> | bn0] := eqVneq b 0.
   by rewrite (rmorph0 (map_poly f)) scalp0.
 rewrite unlock redivp_map lead_coef_map rmorph_unit; last first.
   by rewrite unitfE lead_coef_eq0.
-rewrite modpE divpE !map_polyZ !rmorphV ?rmorphXn // unitfE.
+rewrite modpE divpE !map_polyZ [in RHS]rmorphV ?rmorphXn // unitfE.
 by rewrite expf_neq0 // lead_coef_eq0.
 Qed.
 
