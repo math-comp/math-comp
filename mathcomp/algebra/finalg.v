@@ -151,7 +151,7 @@ Notation "[ 'finFieldType' 'of' T ]" := (Field.clone T%type _)
 End FieldExports.
 HB.export FieldExports.
 
-#[infer(R), short(type="finLmodType")]
+#[short(type="finLmodType")]
 HB.structure Definition Lmodule (R : ringType) :=
   {M of GRing.Lmodule R M & Finite M}.
 
@@ -162,7 +162,7 @@ Notation "[ 'finLmodType' R 'of' T ]" := (Lmodule.clone R T%type _)
 End LmoduleExports.
 HB.export LmoduleExports.
 
-#[infer(R), short(type="finLalgType")]
+#[short(type="finLalgType")]
 HB.structure Definition Lalgebra (R : ringType) :=
   {M of GRing.Lalgebra R M & Finite M}.
 
@@ -174,7 +174,7 @@ Notation "[ 'finLalgType' R 'of' T ]" := (Lalgebra.clone R T%type _)
 End LalgebraExports.
 HB.export LalgebraExports.
 
-#[infer(R), short(type="finAlgType")]
+#[short(type="finAlgType")]
 HB.structure Definition Algebra (R : ringType) :=
   {M of GRing.Algebra R M & Finite M}.
 
@@ -185,7 +185,7 @@ Notation "[ 'finAlgType' R 'of' T ]" := (Algebra.clone R T%type _)
 End AlgebraExports.
 HB.export AlgebraExports.
 
-#[infer(R), short(type="finUnitAlgType")]
+#[short(type="finUnitAlgType")]
 HB.structure Definition UnitAlgebra (R : unitRingType) :=
   {M of GRing.UnitAlgebra R M & Finite M}.
 
@@ -386,33 +386,33 @@ HB.end.
 HB.instance Definition _ (R : ringType) (M : Lmodule.type R) :=
   [finGroupMixin of M for +%R].
 
-Coercion Lmodule_to_baseFinGroup (R : ringType) (M : Lmodule.type_ R) :=
+Coercion Lmodule_to_baseFinGroup (R : ringType) (M : Lmodule.type R) :=
   BaseFinGroup.clone M _.
-Coercion Lmodule_to_finGroup (R : ringType) (M : Lmodule.type_ R) : finGroupType :=
+Coercion Lmodule_to_finGroup (R : ringType) (M : Lmodule.type R) : finGroupType :=
   FinGroup.clone (M : Type) _.
 
 #[export, non_forgetful_inheritance]
 HB.instance Definition _ (R : ringType) (M : Lalgebra.type R) :=
   [finGroupMixin of M for +%R].
-Coercion Lalgebra_to_baseFinGroup (R : ringType) (M : Lalgebra.type_ R) :=
+Coercion Lalgebra_to_baseFinGroup (R : ringType) (M : Lalgebra.type R) :=
   BaseFinGroup.clone M _.
-Coercion Lalgebra_to_finGroup (R : ringType) (M : Lalgebra.type_ R) :=
+Coercion Lalgebra_to_finGroup (R : ringType) (M : Lalgebra.type R) :=
   FinGroup.clone M _.
 
 #[export, non_forgetful_inheritance]
 HB.instance Definition _ (R : ringType) (M : Algebra.type R) :=
   [finGroupMixin of M for +%R].
-Coercion Algebra_to_baseFinGroup (R : ringType) (M : Algebra.type_ R) :=
+Coercion Algebra_to_baseFinGroup (R : ringType) (M : Algebra.type R) :=
   BaseFinGroup.clone M _.
-Coercion Algebra_to_finGroup (R : ringType) (M : Algebra.type_ R) :=
+Coercion Algebra_to_finGroup (R : ringType) (M : Algebra.type R) :=
   FinGroup.clone M _.
 
 #[export, non_forgetful_inheritance]
 HB.instance Definition _ (R : unitRingType) (M : UnitAlgebra.type R) :=
   [finGroupMixin of M for +%R].
-Coercion UnitAlgebra_to_baseFinGroup (R : unitRingType) (M : UnitAlgebra.type_ R) :=
+Coercion UnitAlgebra_to_baseFinGroup (R : unitRingType) (M : UnitAlgebra.type R) :=
   BaseFinGroup.clone M _.
-Coercion UnitAlgebra_to_finGroup (R : unitRingType) (M : UnitAlgebra.type_ R) :=
+Coercion UnitAlgebra_to_finGroup (R : unitRingType) (M : UnitAlgebra.type R) :=
   FinGroup.clone M _.
 
 Module RegularExports.

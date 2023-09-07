@@ -1612,7 +1612,7 @@ HB.mixin Record Zmodule_isLmodule (R : ringType) V of Zmodule V := {
   scalerDr : right_distributive scale +%R;
   scalerDl : forall v, {morph scale^~ v: a b / a + b}
 }.
-#[infer(R), short(type="lmodType")]
+#[short(type="lmodType")]
 HB.structure Definition Lmodule (R : ringType) :=
   {M of Zmodule M & Zmodule_isLmodule R M}.
 
@@ -1716,7 +1716,7 @@ End LmoduleTheory.
 HB.mixin Record Lmodule_isLalgebra R V of Ring V & Lmodule R V := {
   scalerAl : forall (a : R) (u v : V), a *: (u * v) = (a *: u) * v
 }.
-#[infer(R), short(type="lalgType")]
+#[short(type="lalgType")]
 HB.structure Definition Lalgebra R :=
   {A of Lmodule_isLalgebra R A & Ring A & Lmodule R A}.
 
@@ -1789,7 +1789,7 @@ HB.mixin Record isSemiAdditive (U V : nmodType) (apply : U -> V) := {
   semi_additive_subproof : semi_additive apply;
 }.
 
-#[infer(U,V),mathcomp(axiom="semi_additive")]
+#[mathcomp(axiom="semi_additive")]
 HB.structure Definition Additive (U V : nmodType) :=
   {f of isSemiAdditive U V f}.
 
@@ -2055,7 +2055,6 @@ HB.mixin Record isMultiplicative (R S : semiRingType) (f : R -> S) := {
   rmorphism_subproof : multiplicative f
 }.
 
-#[infer(R,S)]
 HB.structure Definition RMorphism (R S : semiRingType) :=
   {f of @Additive R S f & isMultiplicative R S f}.
 (* FIXME: remove the @ once
@@ -2232,7 +2231,6 @@ HB.mixin Record isScalable (R : ringType) (U : lmodType R) (V : zmodType)
   linear_subproof : scalable_for s f;
 }.
 
-#[infer(R,U,V)]
 HB.structure Definition Linear (R : ringType) (U : lmodType R) (V : zmodType)
     (s : R -> V -> V) :=
   {f of @Additive U V f & isScalable R U V s f}.
@@ -2273,7 +2271,7 @@ Definition apply_deprecated (phUV : phant (U -> V)) := @Linear.sort R U V s.
 #[deprecated(since="mathcomp 2.0", note="Use Linear.sort instead.")]
 Notation apply := apply_deprecated.
 (* Support for right-to-left rewriting with the generic linearZ rule. *)
-Local Notation mapUV := (Linear.type R U V s).
+Local Notation mapUV := (@Linear.type R U V s).
 Definition map_class := mapUV.
 Definition map_at (a : R) := mapUV.
 Structure map_for a s_a := MapFor {map_for_map : mapUV; _ : s a = s_a}.
@@ -2295,7 +2293,6 @@ Notation "[ 'linear' 'of' f 'as' g ]" := (Linear.clone _ _ _ _ f%function g)
 Notation "[ 'linear' 'of' f ]" := (Linear.clone _ _ _ _ f%function _)
   (at level 0, format "[ 'linear'  'of'  f ]") : form_scope.
 (* Support for right-to-left rewriting with the generic linearZ rule. *)
-Identity Coercion lineratype_id : Linear.type >-> Linear.type_.
 Coercion Linear.map_for_map : Linear.map_for >-> Linear.type.
 Coercion Linear.unify_map_at : Linear.map_at >-> Linear.map_for.
 Canonical Linear.unify_map_at.
@@ -2462,7 +2459,6 @@ End LinearLalg.
 
 End LinearTheory.
 
-#[infer(R,A,B)]
 HB.structure Definition LRMorphism (R : ringType) (A : lalgType R) (B : ringType)
     (s : R -> B -> B) :=
   {f of @RMorphism A B f & isScalable R A B s f}.
@@ -2694,7 +2690,7 @@ End ComRingTheory.
 HB.mixin Record Lalgebra_isAlgebra (R : ringType) V of Lalgebra R V := {
   scalerAr : forall k (x y : V), k *: (x * y) = x * (k *: y);
 }.
-#[infer(R), short(type="algType")]
+#[short(type="algType")]
 HB.structure Definition Algebra (R : ringType) :=
   {A of Lalgebra_isAlgebra R A & Lalgebra R A}.
 
@@ -2721,7 +2717,7 @@ HB.instance Definition lalgebra_is_algebra : Lalgebra_isAlgebra R V :=
 
 HB.end.
 
-#[infer(R), short(type="comAlgType")]
+#[short(type="comAlgType")]
 HB.structure Definition ComAlgebra R := {V of ComRing V & Algebra R V}.
 
 Module ComAlgExports.
@@ -3122,7 +3118,7 @@ HB.instance Definition mulinverse : Ring_hasMulInverse R :=
 
 HB.end.
 
-#[infer(R), short(type="unitAlgType")]
+#[short(type="unitAlgType")]
 HB.structure Definition UnitAlgebra R := {V of Algebra R V & UnitRing V}.
 
 Module UnitAlgebraExports.
@@ -3134,7 +3130,7 @@ Notation "[ 'unitAlgType' R 'of' T ]" := (UnitAlgebra.clone R T%type _)
 End UnitAlgebraExports.
 HB.export UnitAlgebraExports.
 
-#[infer(R), short(type="comUnitAlgType")]
+#[short(type="comUnitAlgType")]
 HB.structure Definition ComUnitAlgebra R := {V of ComAlgebra R V & UnitRing V}.
 
 Module ComUnitAlgebraExports.
@@ -4581,42 +4577,42 @@ HB.mixin Record isScaleClosed (R : ringType) (V : lmodType R)
 
 (* Structures for stability properties *)
 
-#[infer(V), short(type="opprClosed")]
+#[short(type="opprClosed")]
 HB.structure Definition OppClosed V := {S of isOppClosed V S}.
 
-#[infer(V), short(type="addrClosed")]
+#[short(type="addrClosed")]
 HB.structure Definition AddClosed V := {S of isAddClosed V S}.
 
-#[infer(V), short(type="zmodClosed")]
+#[short(type="zmodClosed")]
 HB.structure Definition ZmodClosed V := {S of OppClosed V S & AddClosed V S}.
 
-#[infer(R), short(type="mulr2Closed")]
+#[short(type="mulr2Closed")]
 HB.structure Definition Mul2Closed R := {S of isMul2Closed R S}.
 
-#[infer(R), short(type="mulrClosed")]
+#[short(type="mulrClosed")]
 HB.structure Definition MulClosed R := {S of Mul2Closed R S & isMul1Closed R S}.
 
-#[infer(R), short(type="smulClosed")]
+#[short(type="smulClosed")]
 HB.structure Definition SmulClosed (R : ringType) :=
   {S of OppClosed R S & MulClosed R S}.
 
-#[infer(R), short(type="semiring2Closed")]
+#[short(type="semiring2Closed")]
 HB.structure Definition Semiring2Closed (R : semiRingType) :=
   {S of AddClosed R S & Mul2Closed R S}.
 
-#[infer(R), short(type="semiringClosed")]
+#[short(type="semiringClosed")]
 HB.structure Definition SemiringClosed (R : semiRingType) :=
   {S of AddClosed R S & MulClosed R S}.
 
-#[infer(R), short(type="subringClosed")]
+#[short(type="subringClosed")]
 HB.structure Definition SubringClosed (R : ringType) :=
   {S of ZmodClosed R S & MulClosed R S}.
 
-#[infer(R), short(type="divClosed")]
+#[short(type="divClosed")]
 HB.structure Definition DivClosed (R : unitRingType) :=
   {S of MulClosed R S & isInvClosed R S}.
 
-#[infer(R), short(type="sdivClosed")]
+#[short(type="sdivClosed")]
 HB.structure Definition SdivClosed (R : unitRingType) :=
   {S of SmulClosed R S & isInvClosed R S}.
 
@@ -4628,7 +4624,7 @@ HB.structure Definition SubmodClosed (R : ringType) (V : lmodType R) :=
 HB.structure Definition SubalgClosed (R : ringType) (A : lalgType R) :=
   {S of SubringClosed A S & isScaleClosed R A S}.
 
-#[infer (R), short(type="divringClosed")]
+#[short(type="divringClosed")]
 HB.structure Definition DivringClosed (R : unitRingType) :=
   {S of SubringClosed R S & isInvClosed R S}.
 
@@ -5274,7 +5270,7 @@ Fact valZ : scalable (val : W -> _). Proof. by move=> k w; rewrite SubK. Qed.
 HB.instance Definition _ := isSubLmodule.Build R V S W valZ.
 HB.end.
 
-#[infer(R), short(type="subLalgType")]
+#[short(type="subLalgType")]
 HB.structure Definition SubLalgebra (R : ringType) (V : lalgType R) S :=
   {W of SubRing V S W & @SubLmodule R V S W & Lalgebra R W}.
 
@@ -5288,7 +5284,7 @@ Proof. by apply: val_inj; rewrite !(linearZ, rmorphM)/= linearZ scalerAl. Qed.
 HB.instance Definition _ := Lmodule_isLalgebra.Build R W scalerAl.
 HB.end.
 
-#[infer(R), short(type="subAlgType")]
+#[short(type="subAlgType")]
 HB.structure Definition SubAlgebra (R : ringType) (V : algType R) S :=
   {W of @SubLalgebra R V S W & Algebra R W}.
 

@@ -201,6 +201,12 @@ in `qfpoly.v`
   + make `[Order of T by <:]` compatible with the SubOrder hierarchy
 - in `ssralg.v`
   + implicits of `natr1` and `nat1r`
+  + implicits of `Linear.type`, use the `{linear _ -> _}` notation
+    for compatibility
+  + implicits of `RMorphism.type`, use the `{rmorphism _ -> _}`
+    notation for compatibility
+  + implicits of `LRMorphism.type`, use the `{lrmorphism _ -> _}`
+    notation for compatibility
 
 ### Renamed
 
