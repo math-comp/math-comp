@@ -199,6 +199,8 @@ in `qfpoly.v`
 
 - in `order.v`
   + make `[Order of T by <:]` compatible with the SubOrder hierarchy
+- in `ssralg.v`
+  + implicits of `natr1` and `nat1r`
 
 ### Renamed
 

@@ -5692,6 +5692,8 @@ Definition mulr_natr := mulr_natr.
 Definition natrD := natrD.
 Definition nat1r := nat1r.
 Definition natr1 := natr1.
+Arguments natr1 {R} n.
+Arguments nat1r {R} n.
 Definition natrB := natrB.
 Definition natr_sum := natr_sum.
 Definition natrM := natrM.

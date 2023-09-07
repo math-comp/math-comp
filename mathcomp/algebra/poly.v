@@ -3134,8 +3134,7 @@ Proof. by rewrite expr2 mulrACA mulrA -natrM. Qed.
 
 Let splitr (x : F) : x = x / 2 + x / 2.
 Proof.
-apply: (mulIf nz2); rewrite -mulrDl mulfVK//.
-by rewrite -[2]/(1 + 1)%:R natrD mulrDr mulr1.
+by apply: (mulIf nz2); rewrite -mulrDl mulfVK// mulr_natr mulr2n.
 Qed.
 
 Let pE : p = a *: 'X^2 + b *: 'X + c%:P.
