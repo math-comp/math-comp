@@ -3693,37 +3693,37 @@ Proof. exact: total_homo_mono_in. Qed.
 
 End TotalMonotonyTheory.
 
-#[deprecated(since="mathcomp 2.0.1", note="Use comparable_le_min instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use comparable_le_min instead.")]
 Notation comparable_le_minr := comparable_le_min.
-#[deprecated(since="mathcomp 2.0.1", note="Use comparable_ge_min instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use comparable_ge_min instead.")]
 Notation comparable_le_minl := comparable_ge_min.
-#[deprecated(since="mathcomp 2.0.1", note="Use comparable_gt_min instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use comparable_gt_min instead.")]
 Notation comparable_lt_minl := comparable_gt_min.
-#[deprecated(since="mathcomp 2.0.1", note="Use comparable_lt_min instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use comparable_lt_min instead.")]
 Notation comparable_lt_minr := comparable_lt_min.
-#[deprecated(since="mathcomp 2.0.1", note="Use comparable_le_max instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use comparable_le_max instead.")]
 Notation comparable_le_maxr := comparable_le_max.
-#[deprecated(since="mathcomp 2.0.1", note="Use comparable_ge_max instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use comparable_ge_max instead.")]
 Notation comparable_le_maxl := comparable_ge_max.
-#[deprecated(since="mathcomp 2.0.1", note="Use comparable_lt_max instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use comparable_lt_max instead.")]
 Notation comparable_lt_maxr := comparable_lt_max.
-#[deprecated(since="mathcomp 2.0.1", note="Use comparable_gt_max instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use comparable_gt_max instead.")]
 Notation comparable_lt_maxl := comparable_gt_max.
-#[deprecated(since="mathcomp 2.0.1", note="Use ge_max instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use ge_max instead.")]
 Notation le_maxl := ge_max.
-#[deprecated(since="mathcomp 2.0.1", note="Use le_max instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use le_max instead.")]
 Notation le_maxr := le_max.
-#[deprecated(since="mathcomp 2.0.1", note="Use gt_max instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use gt_max instead.")]
 Notation lt_maxl := gt_max.
-#[deprecated(since="mathcomp 2.0.1", note="Use lt_max instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use lt_max instead.")]
 Notation lt_maxr := lt_max.
-#[deprecated(since="mathcomp 2.0.1", note="Use lt_min instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use lt_min instead.")]
 Notation lt_minr := lt_min.
-#[deprecated(since="mathcomp 2.0.1", note="Use gt_max instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use gt_max instead.")]
 Notation lt_minl := gt_min.
-#[deprecated(since="mathcomp 2.0.1", note="Use le_min instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use le_min instead.")]
 Notation le_minr := le_min.
-#[deprecated(since="mathcomp 2.0.1", note="Use ge_min instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use ge_min instead.")]
 Notation le_minl := ge_min.
 
 End TotalTheory.
