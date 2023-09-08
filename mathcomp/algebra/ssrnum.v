@@ -4006,7 +4006,7 @@ Variable p : {poly R}.
 Lemma poly_itv_bound a b : {ub | forall x, a <= x <= b -> `|p.[x]| <= ub}.
 Proof.
 have [ub le_p_ub] := poly_disk_bound p (Num.max `|a| `|b|).
-exists ub => x /andP[le_a_x le_x_b]; rewrite le_p_ub // le_maxr !ler_normr.
+exists ub => x /andP[le_a_x le_x_b]; rewrite le_p_ub // le_max !ler_normr.
 by have [_|_] := ler0P x; rewrite ?lerN2 ?le_a_x ?le_x_b orbT.
 Qed.
 
@@ -5505,7 +5505,7 @@ pose r2 := (- b + sqrt delta) / (2 * a).
 pose x0 := Num.max (r1 + 1) (r2 + 1).
 move: (pge0 x0); rewrite (Real.deg2_poly_factor degp' (ltW dge0)).
 rewrite !hornerE/= -mulrA nmulr_rge0// leNgt => /negbTE<-.
-by apply: mulr_gt0; rewrite subr_gt0 lt_maxr ltrDl ltr01 ?orbT.
+by apply: mulr_gt0; rewrite subr_gt0 lt_max ltrDl ltr01 ?orbT.
 Qed.
 
 End Degle2PolyRealClosedConvex.

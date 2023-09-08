@@ -277,6 +277,24 @@ in `qfpoly.v`
 - in `polydiv.v`
   + `modp_mod` -> `modp_id`
 
+- in `order.v`
+  + `le_maxl` -> `ge_max`
+  + `le_maxr` -> `le_max`
+  + `lt_maxr` -> `lt_max`
+  + `lt_maxl` -> `gt_max`
+  + `lt_minr` -> `lt_min`
+  + `lt_minl` -> `gt_min`
+  + `le_minr` -> `le_min`
+  + `le_minl` -> `ge_min`
+  + `comparable_le_maxr` -> `comparable_le_max`
+  + `comparable_le_maxl` -> `comparable_ge_max`
+  + `comparable_lt_maxr` -> `comparable_lt_max`
+  + `comparable_lt_maxl` -> `comparable_gt_max`
+  + `comparable_lt_minl` -> `comparable_gt_min`
+  + `comparable_lt_minr` -> `comparable_lt_min`
+  + `comparable_le_minr` -> `comparable_le_min`
+  + `comparable_le_minl` -> `comparable_ge_min`
+
 ### Removed
 
 - in `ssrint.v`

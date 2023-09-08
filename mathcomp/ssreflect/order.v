@@ -2340,49 +2340,49 @@ Proof. by apply: (iffP idP); rewrite (rwP eqP) comparable_eq_minr. Qed.
 Lemma comparable_max_idPl : reflect (max x y = x) (y <= x).
 Proof. by apply: (iffP idP); rewrite (rwP eqP) comparable_eq_maxl. Qed.
 
-Lemma comparable_le_minr : (z <= min x y) = (z <= x) && (z <= y).
+Lemma comparable_le_min : (z <= min x y) = (z <= x) && (z <= y).
 Proof.
 case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; last rewrite andbC;
   by case: (comparableP z) => // [/lt_trans xlt/xlt|->] /ltW.
 Qed.
 
-Lemma comparable_le_minl : (min x y <= z) = (x <= z) || (y <= z).
+Lemma comparable_ge_min : (min x y <= z) = (x <= z) || (y <= z).
 Proof.
 case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; last rewrite orbC;
   by move=> xy _; apply/idP/idP => [->|/orP[]]//; apply/le_trans/ltW.
 Qed.
 
-Lemma comparable_lt_minr : (z < min x y) = (z < x) && (z < y).
+Lemma comparable_lt_min : (z < min x y) = (z < x) && (z < y).
 Proof.
 case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; last rewrite andbC;
   by case: (comparableP z) => // /lt_trans xlt/xlt.
 Qed.
 
-Lemma comparable_lt_minl : (min x y < z) = (x < z) || (y < z).
+Lemma comparable_gt_min : (min x y < z) = (x < z) || (y < z).
 Proof.
 case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; last rewrite orbC;
   by move=> xy _; apply/idP/idP => [->|/orP[]]//; apply/lt_trans.
 Qed.
 
-Lemma comparable_le_maxr : (z <= max x y) = (z <= x) || (z <= y).
+Lemma comparable_le_max : (z <= max x y) = (z <= x) || (z <= y).
 Proof.
 case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; first rewrite orbC;
   by move=> xy _; apply/idP/idP => [->|/orP[]]// /le_trans->//; apply/ltW.
 Qed.
 
-Lemma comparable_le_maxl : (max x y <= z) = (x <= z) && (y <= z).
+Lemma comparable_ge_max : (max x y <= z) = (x <= z) && (y <= z).
 Proof.
 case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; first rewrite andbC;
   by case: (comparableP z) => // [ylt /lt_trans /(_ _)/ltW|->/ltW]->.
 Qed.
 
-Lemma comparable_lt_maxr : (z < max x y) = (z < x) || (z < y).
+Lemma comparable_lt_max : (z < max x y) = (z < x) || (z < y).
 Proof.
 case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; first rewrite orbC;
   by move=> xy _; apply/idP/idP => [->|/orP[]]// /lt_trans->.
 Qed.
 
-Lemma comparable_lt_maxl : (max x y < z) = (x < z) && (y < z).
+Lemma comparable_gt_max : (max x y < z) = (x < z) && (y < z).
 Proof.
 case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; first rewrite andbC;
 by case: (comparableP z) => // ylt /lt_trans->.
@@ -2405,19 +2405,19 @@ Proof. by case: C => /=; case: comparableP. Qed.
 
 Lemma comparable_lteif_minr C :
   (z < Order.min x y ?<= if C) = (z < x ?<= if C) && (z < y ?<= if C).
-Proof. by case: C; rewrite /= (comparable_le_minr, comparable_lt_minr). Qed.
+Proof. by case: C; rewrite /= (comparable_le_min, comparable_lt_min). Qed.
 
 Lemma comparable_lteif_minl C :
   (Order.min x y < z ?<= if C) = (x < z ?<= if C) || (y < z ?<= if C).
-Proof. by case: C; rewrite /= (comparable_le_minl, comparable_lt_minl). Qed.
+Proof. by case: C; rewrite /= (comparable_ge_min, comparable_gt_min). Qed.
 
 Lemma comparable_lteif_maxr C :
   (z < Order.max x y ?<= if C) = (z < x ?<= if C) || (z < y ?<= if C).
-Proof. by case: C; rewrite /= (comparable_le_maxr, comparable_lt_maxr). Qed.
+Proof. by case: C; rewrite /= (comparable_le_max, comparable_lt_max). Qed.
 
 Lemma comparable_lteif_maxl C :
   (Order.max x y < z ?<= if C) = (x < z ?<= if C) && (y < z ?<= if C).
-Proof. by case: C; rewrite /= (comparable_le_maxl, comparable_lt_maxl). Qed.
+Proof. by case: C; rewrite /= (comparable_ge_max, comparable_gt_max). Qed.
 
 End Comparable2.
 
@@ -3204,29 +3204,29 @@ Proof. exact: comparable_min_idPr. Qed.
 Lemma max_idPl x y : reflect (max x y = x) (y <= x).
 Proof. exact: comparable_max_idPl. Qed.
 
-Lemma le_minr z x y : (z <= min x y) = (z <= x) && (z <= y).
-Proof. exact: comparable_le_minr. Qed.
+Lemma le_min z x y : (z <= min x y) = (z <= x) && (z <= y).
+Proof. exact: comparable_le_min. Qed.
 
-Lemma le_minl z x y : (min x y <= z) = (x <= z) || (y <= z).
-Proof. exact: comparable_le_minl. Qed.
+Lemma ge_min z x y : (min x y <= z) = (x <= z) || (y <= z).
+Proof. exact: comparable_ge_min. Qed.
 
-Lemma lt_minr z x y : (z < min x y) = (z < x) && (z < y).
-Proof. exact: comparable_lt_minr. Qed.
+Lemma lt_min z x y : (z < min x y) = (z < x) && (z < y).
+Proof. exact: comparable_lt_min. Qed.
 
-Lemma lt_minl z x y : (min x y < z) = (x < z) || (y < z).
-Proof. exact: comparable_lt_minl. Qed.
+Lemma gt_min z x y : (min x y < z) = (x < z) || (y < z).
+Proof. exact: comparable_gt_min. Qed.
 
-Lemma le_maxr z x y : (z <= max x y) = (z <= x) || (z <= y).
-Proof. exact: comparable_le_maxr. Qed.
+Lemma le_max z x y : (z <= max x y) = (z <= x) || (z <= y).
+Proof. exact: comparable_le_max. Qed.
 
-Lemma le_maxl z x y : (max x y <= z) = (x <= z) && (y <= z).
-Proof. exact: comparable_le_maxl. Qed.
+Lemma ge_max z x y : (max x y <= z) = (x <= z) && (y <= z).
+Proof. exact: comparable_ge_max. Qed.
 
-Lemma lt_maxr z x y : (z < max x y) = (z < x) || (z < y).
-Proof. exact: comparable_lt_maxr. Qed.
+Lemma lt_max z x y : (z < max x y) = (z < x) || (z < y).
+Proof. exact: comparable_lt_max. Qed.
 
-Lemma lt_maxl z x y : (max x y < z) = (x < z) && (y < z).
-Proof. exact: comparable_lt_maxl. Qed.
+Lemma gt_max z x y : (max x y < z) = (x < z) && (y < z).
+Proof. exact: comparable_gt_max. Qed.
 
 Lemma minxK x y : max (min x y) y = y. Proof. exact: comparable_minxK. Qed.
 Lemma minKx x y : max x (min x y) = x. Proof. exact: comparable_minKx. Qed.
@@ -3249,10 +3249,10 @@ HB.instance Definition _ := SemiGroup.isComLaw.Build T max maxA maxC.
 HB.instance Definition _ := SemiGroup.isComLaw.Build T min minA minC.
 
 Lemma leIx x y z : (meet y z <= x) = (y <= x) || (z <= x).
-Proof. by rewrite meetEtotal le_minl. Qed.
+Proof. by rewrite meetEtotal ge_min. Qed.
 
 Lemma lexU x y z : (x <= join y z) = (x <= y) || (x <= z).
-Proof. by rewrite joinEtotal le_maxr. Qed.
+Proof. by rewrite joinEtotal le_max. Qed.
 
 Lemma ltxI x y z : (x < meet y z) = (x < y) && (x < z).
 Proof. by rewrite !ltNge leIx negb_or. Qed.
@@ -3278,19 +3278,19 @@ Proof. by case: C => /=; case: leP. Qed.
 
 Lemma lteif_minr z x y C :
   (z < Order.min x y ?<= if C) = (z < x ?<= if C) && (z < y ?<= if C).
-Proof. by case: C; rewrite /= (le_minr, lt_minr). Qed.
+Proof. by case: C; rewrite /= (le_min, lt_min). Qed.
 
 Lemma lteif_minl z x y C :
   (Order.min x y < z ?<= if C) = (x < z ?<= if C) || (y < z ?<= if C).
-Proof. by case: C; rewrite /= (le_minl, lt_minl). Qed.
+Proof. by case: C; rewrite /= (ge_min, gt_min). Qed.
 
 Lemma lteif_maxr z x y C :
   (z < Order.max x y ?<= if C) = (z < x ?<= if C) || (z < y ?<= if C).
-Proof. by case: C; rewrite /= (le_maxr, lt_maxr). Qed.
+Proof. by case: C; rewrite /= (le_max, lt_max). Qed.
 
 Lemma lteif_maxl z x y C :
   (Order.max x y < z ?<= if C) = (x < z ?<= if C) && (y < z ?<= if C).
-Proof. by case: C; rewrite /= (le_maxl, lt_maxl). Qed.
+Proof. by case: C; rewrite /= (ge_max, gt_max). Qed.
 
 Section ArgExtremum.
 
@@ -3364,8 +3364,8 @@ Proof. by rewrite (bigID_idem _ _ a) //= maxxx. Qed.
 
 End bigminmax_Type.
 
-Let le_minr_id (x y : T) : x >= min x y. Proof. by rewrite le_minl lexx. Qed.
-Let le_maxr_id (x y : T) : x <= max x y. Proof. by rewrite le_maxr lexx. Qed.
+Let ge_min_id (x y : T) : x >= min x y. Proof. by rewrite ge_min lexx. Qed.
+Let le_max_id (x y : T) : x <= max x y. Proof. by rewrite le_max lexx. Qed.
 
 Lemma sub_bigmin [x0] I r (P P' : {pred I}) (F : I -> T) :
     (forall i, P' i -> P i) ->
@@ -3478,12 +3478,12 @@ Proof. by move/(bigD1 _) ->. Qed.
 Lemma bigmin_le_cond j P F : P j -> \big[min/x]_(i | P i) F i <= F j.
 Proof.
 have := mem_index_enum j; rewrite unlock; elim: (index_enum I) => //= i l ih.
-rewrite inE => /orP [/eqP-> ->|/ih leminlfi Pi]; first by rewrite le_minl lexx.
-by case: ifPn => Pj; [rewrite le_minl leminlfi// orbC|exact: leminlfi].
+rewrite inE => /orP [/eqP-> ->|/ih leminlfi Pi]; first by rewrite ge_min lexx.
+by case: ifPn => Pj; [rewrite ge_min leminlfi// orbC|exact: leminlfi].
 Qed.
 
 Lemma le_bigmax_cond j P F : P j -> F j <= \big[max/x]_(i | P i) F i.
-Proof. by move=> Pj; rewrite (bigmaxD1 _ Pj) le_maxr lexx. Qed.
+Proof. by move=> Pj; rewrite (bigmaxD1 _ Pj) le_max lexx. Qed.
 
 Lemma bigmin_le j F : \big[min/x]_i F i <= F j.
 Proof. exact: bigmin_le_cond. Qed.
@@ -3503,7 +3503,7 @@ Lemma bigmin_geP m P F :
           (m <= \big[min/x]_(i | P i) F i).
 Proof.
 apply: (iffP idP) => [lemFi|[lemx lemPi]]; [split|exact: le_bigmin].
-- by rewrite (le_trans lemFi)// bigmin_idl le_minl lexx.
+- by rewrite (le_trans lemFi)// bigmin_idl ge_min lexx.
 - by move=> i Pi; rewrite (le_trans lemFi)// (bigminD1 _ Pi)// le_minl lexx.
 Qed.
 
@@ -3512,7 +3512,7 @@ Lemma bigmax_leP m P F :
           (\big[max/x]_(i | P i) F i <= m).
 Proof.
 apply: (iffP idP) => [|[? ?]]; last exact: bigmax_le.
-rewrite bigmax_idl le_maxl => /andP[-> leFm]; split=> // i Pi.
+rewrite bigmax_idl ge_max => /andP[-> leFm]; split=> // i Pi.
 by apply: le_trans leFm; exact: le_bigmax_cond.
 Qed.
 
@@ -3520,7 +3520,7 @@ Lemma bigmin_gtP m P F :
   reflect (m < x /\ forall i, P i -> m < F i) (m < \big[min/x]_(i | P i) F i).
 Proof.
 apply: (iffP idP) => [lemFi|[lemx lemPi]]; [split|exact: lt_bigmin].
-- by rewrite (lt_le_trans lemFi)// bigmin_idl le_minl lexx.
+- by rewrite (lt_le_trans lemFi)// bigmin_idl ge_min lexx.
 - by move=> i Pi; rewrite (lt_le_trans lemFi)// (bigminD1 _ Pi)// le_minl lexx.
 Qed.
 
@@ -3528,7 +3528,7 @@ Lemma bigmax_ltP m P F :
   reflect (x < m /\ forall i, P i -> F i < m) (\big[max/x]_(i | P i) F i < m).
 Proof.
 apply: (iffP idP) => [|[? ?]]; last exact: bigmax_lt.
-rewrite bigmax_idl lt_maxl => /andP[-> ltFm]; split=> // i Pi.
+rewrite bigmax_idl gt_max => /andP[-> ltFm]; split=> // i Pi.
 by apply: le_lt_trans ltFm; exact: le_bigmax_cond.
 Qed.
 
@@ -3564,7 +3564,7 @@ Lemma le_bigmin2 P F1 F2 : (forall i, P i -> F1 i <= F2 i) ->
   \big[min/x]_(i | P i) F1 i <= \big[min/x]_(i | P i) F2 i.
 Proof.
 move=> FG; elim/big_ind2 : _ => // a b e f ba fe.
-rewrite le_minl 2!le_minr ba fe /= andbT.
+rewrite ge_min 2!le_min ba fe /= andbT.
 move: (le_total a e) => /orP[/(le_trans ba)-> // | /(le_trans fe)->].
 by rewrite orbT.
 Qed.
@@ -3573,7 +3573,7 @@ Lemma le_bigmax2 P F1 F2 : (forall i, P i -> F1 i <= F2 i) ->
   \big[max/x]_(i | P i) F1 i <= \big[max/x]_(i | P i) F2 i.
 Proof.
 move=> FG; elim/big_ind2 : _ => // a b e f ba fe.
-rewrite le_maxr 2!le_maxl ba fe /= andbT; have [//|/= af] := leP f a.
+rewrite le_max 2!ge_max ba fe /= andbT; have [//|/= af] := leP f a.
 by rewrite (le_trans ba) // (le_trans _ fe) // ltW.
 Qed.
 
@@ -3692,6 +3692,40 @@ Lemma le_nmono_in :
 Proof. exact: total_homo_mono_in. Qed.
 
 End TotalMonotonyTheory.
+
+#[deprecated(since="mathcomp 2.0.1", note="Use comparable_le_min instead.")]
+Notation comparable_le_minr := comparable_le_min.
+#[deprecated(since="mathcomp 2.0.1", note="Use comparable_ge_min instead.")]
+Notation comparable_le_minl := comparable_ge_min.
+#[deprecated(since="mathcomp 2.0.1", note="Use comparable_gt_min instead.")]
+Notation comparable_lt_minl := comparable_gt_min.
+#[deprecated(since="mathcomp 2.0.1", note="Use comparable_lt_min instead.")]
+Notation comparable_lt_minr := comparable_lt_min.
+#[deprecated(since="mathcomp 2.0.1", note="Use comparable_le_max instead.")]
+Notation comparable_le_maxr := comparable_le_max.
+#[deprecated(since="mathcomp 2.0.1", note="Use comparable_ge_max instead.")]
+Notation comparable_le_maxl := comparable_ge_max.
+#[deprecated(since="mathcomp 2.0.1", note="Use comparable_lt_max instead.")]
+Notation comparable_lt_maxr := comparable_lt_max.
+#[deprecated(since="mathcomp 2.0.1", note="Use comparable_gt_max instead.")]
+Notation comparable_lt_maxl := comparable_gt_max.
+#[deprecated(since="mathcomp 2.0.1", note="Use ge_max instead.")]
+Notation le_maxl := ge_max.
+#[deprecated(since="mathcomp 2.0.1", note="Use le_max instead.")]
+Notation le_maxr := le_max.
+#[deprecated(since="mathcomp 2.0.1", note="Use gt_max instead.")]
+Notation lt_maxl := gt_max.
+#[deprecated(since="mathcomp 2.0.1", note="Use lt_max instead.")]
+Notation lt_maxr := lt_max.
+#[deprecated(since="mathcomp 2.0.1", note="Use lt_min instead.")]
+Notation lt_minr := lt_min.
+#[deprecated(since="mathcomp 2.0.1", note="Use gt_max instead.")]
+Notation lt_minl := gt_min.
+#[deprecated(since="mathcomp 2.0.1", note="Use le_min instead.")]
+Notation le_minr := le_min.
+#[deprecated(since="mathcomp 2.0.1", note="Use ge_min instead.")]
+Notation le_minl := ge_min.
+
 End TotalTheory.
 
 Module Import BLatticeTheory.
@@ -8134,6 +8168,7 @@ Module Exports.
 HB.reexport.
 End Exports.
 End Order.
+
 Export Order.Exports.
 
 Export Order.Syntax.

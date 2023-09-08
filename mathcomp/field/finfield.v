@@ -322,7 +322,7 @@ HB.instance Definition _ (R : finComRingType) charRp :=
   FinRing.ComRing.on (type R charRp).
 HB.instance Definition _ (R : finComUnitRingType) charRp :=
   FinRing.ComUnitRing.on (type R charRp).
-HB.instance Definition _ (R : finIntegralDomainType) charRp :=
+HB.instance Definition _ (R : finIdomainType) charRp :=
   FinRing.IntegralDomain.on (type R charRp).
 
 Section FinField.
@@ -687,7 +687,7 @@ Definition FinDomainFieldType : finFieldType :=
  let cC := GRing.Ring_hasCommutativeMul.Build R finDomain_mulrC in
  let cR : comUnitRingType := HB.pack R cC in
  let iC := GRing.ComUnitRing_isIntegral.Build cR domR in
- let iR : finIntegralDomainType := HB.pack cR iC in
+ let iR : finIdomainType := HB.pack cR iC in
  let fC := GRing.UnitRing_isField.Build iR finDomain_field in
  HB.pack iR fC.
 
