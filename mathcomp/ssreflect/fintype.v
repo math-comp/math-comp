@@ -469,7 +469,7 @@ Section OpsTheory.
 
 Variable T : finType.
 
-Implicit Types (A B C D: {pred T}) (P Q : pred T) (x y : T) (s : seq T).
+Implicit Types (A B C D : {pred T}) (P Q : pred T) (x y : T) (s : seq T).
 
 Lemma enumP : Finite.axiom (Finite.enum T).
 Proof. by rewrite unlock; case T => ? [? []]. Qed.
@@ -744,7 +744,36 @@ Qed.
 Lemma subset_all s A : (s \subset A) = all [in A] s.
 Proof. exact: (sameP (subsetP _ _) allP). Qed.
 
-Lemma properE A B : A \proper B = (A \subset B) && ~~(B \subset A).
+Lemma subset_cons s x : s \subset x :: s.
+Proof. by apply/subsetP => y /[!inE] ->; rewrite orbT. Qed.
+
+Lemma subset_cons2 s1 s2 x : s1 \subset s2 -> x :: s1 \subset x :: s2.
+Proof.
+by move=> ?; apply/subsetP => y /[!inE]; case: eqP => // _; apply: subsetP.
+Qed.
+
+Lemma subset_catl s s' : s \subset s ++ s'.
+Proof. by apply/subsetP=> x xins; rewrite mem_cat xins. Qed.
+
+Lemma subset_catr s s' : s \subset s' ++ s.
+Proof. by apply/subsetP => x xins; rewrite mem_cat xins orbT. Qed.
+
+Lemma subset_cat2 s1 s2 s3 : s1 \subset s2 -> s3 ++ s1 \subset s3 ++ s2.
+Proof.
+move=> /subsetP s12; apply/subsetP => x.
+by rewrite !mem_cat => /orP[->|/s12->]; rewrite ?orbT.
+Qed.
+
+Lemma filter_subset p s : [seq a <- s | p a] \subset s.
+Proof. by apply/subsetP=> x; rewrite mem_filter => /andP[]. Qed.
+
+Lemma subset_filter p s1 s2 :
+  s1 \subset s2 -> [seq a <- s1 | p a] \subset [seq a <- s2 | p a].
+Proof.
+by move/subsetP=> s12; apply/subsetP=> x; rewrite !mem_filter=> /andP[-> /s12].
+Qed.
+
+Lemma properE A B : A \proper B = (A \subset B) && ~~ (B \subset A).
 Proof. by []. Qed.
 
 Lemma properP A B :
@@ -919,6 +948,13 @@ Lemma disjoint_cat s1 s2 A :
 Proof. by rewrite !disjoint_has has_cat negb_or. Qed.
 
 End OpsTheory.
+
+Lemma map_subset {T T' : finType} (s1 s2 : seq T) (f : T -> T') :
+  s1 \subset s2 -> [seq f x | x <- s1 ] \subset [seq f x | x <- s2].
+Proof.
+move=> s1s2; apply/subsetP => _ /mapP[y] /[swap] -> ys1.
+by apply/mapP; exists y => //; move/subsetP : s1s2; exact.
+Qed.
 
 #[global] Hint Resolve subxx_hint : core.
 

@@ -135,7 +135,10 @@ Notation "m > n" := (gt m n) : coq_nat_scope.
 (* i.e., unprotected version of operators.                             *)
 
 Delimit Scope N_scope with num.
+(* use #[warning="-hiding-delimiting-key"] attribute once we require Coq 8.18 *)
+Set Warnings "-hiding-delimiting-key".
 Delimit Scope nat_scope with N.
+Set Warnings "hiding-delimiting-key".
 Delimit Scope nat_rec_scope with Nrec.
 
 (* Postfix notation for the successor and predecessor functions.  *)
@@ -242,6 +245,10 @@ Proof. by move=> m n p q; rewrite -!addnA (addnCA n). Qed.
 
 Lemma addn_eq0 m n : (m + n == 0) = (m == 0) && (n == 0).
 Proof. by case: m; case: n. Qed.
+
+Lemma addn_eq1 m n :
+  (m + n == 1) = ((m == 1) && (n == 0)) || ((m == 0) && (n == 1)).
+Proof. by case: m n => [|[|m]] [|[|n]]. Qed.
 
 Lemma eqn_add2l p m n : (p + m == p + n) = (m == n).
 Proof. by elim: p. Qed.
@@ -1985,7 +1992,10 @@ Arguments N.eqb !n !m.
 
 Section NumberInterpretation.
 
+(* use #[warning="-hiding-delimiting-key"] attribute once we require Coq 8.18 *)
+Set Warnings "-hiding-delimiting-key".
 Import BinPos.
+Set Warnings "hiding-delimiting-key".
 
 Section Trec.
 

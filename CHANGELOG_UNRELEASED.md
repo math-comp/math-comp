@@ -12,6 +12,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `seq.v`
   + lemma `foldl_foldr`
+  + lemmas `find_pred0`, `find_predT`
+
+- in `bigop.v`
+  + lemma `big_if`
+
+- in `seq.v`
+  + lemmas `sumn_ncons`, `sumn_set_nth`, `sumn_set_nth_ltn`,
+    `sumn_set_nth0`
+
+- in `finset.v`
+  + lemmas `bigA_distr`, `subset_cons`, `subset_cons2`, `subset_catl`,
+    `subset_catr`, `subset_cat2`, `filter_subset`, `subset_filter`,
+    `map_subset`.
 
 - in `poly.v`
   + multirule `coefE`
@@ -44,6 +57,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `RealMonic.deg2_poly_ge0l`, `RealMonic.deg2_poly_ge0r`,
     `RealMonic.deg2_poly_le0m`, `deg_le2_poly_delta_ge0`,
     `deg_le2_poly_delta_le0`, `deg_le2_poly_ge0`, `deg_le2_poly_le0`
+
+- in `seq.v`
+  + lemma `rem_mem`
 
 - in `cyclic.v`
   + added lemma `units_Zp_cyclic`
@@ -103,14 +119,43 @@ in `qfpoly.v`
   `ordS_bij`, `ordS_inj`, `ord_pred_bij`, `ord_pred_inj`
 
 - in `zmodp.v`
-	+ lemmas `add_1_Zp`, `add_Zp_1`, `sub_Zp_1` and `add_N1_Zp`.
+  + lemmas `add_1_Zp`, `add_Zp_1`, `sub_Zp_1` and `add_N1_Zp`.
+
+- in `bigop.v`
+  + lemmas `sum_nat_seq_eq0`, `sum_nat_seq_neq0`, `sum_nat_seq_eq1`,
+    `sum_nat_eq1`, `prod_nat_seq_eq0`, `prod_nat_seq_neq0`,
+    `prod_nat_seq_eq1`, `prod_nat_seq_neq1`
+
+- in `ssrnat.v`
+  + lemma `addn_eq1`
 
 ### Changed
+
+- in `ssralg.v`
+  + implicits of `natr1` and `nat1r`
 
 ### Renamed
 
 - in `polydiv.v`
   + `modp_mod` -> `modp_id`
+
+- in `order.v`
+  + `le_maxl` -> `ge_max`
+  + `le_maxr` -> `le_max`
+  + `lt_maxr` -> `lt_max`
+  + `lt_maxl` -> `gt_max`
+  + `lt_minr` -> `lt_min`
+  + `lt_minl` -> `gt_min`
+  + `le_minr` -> `le_min`
+  + `le_minl` -> `ge_min`
+  + `comparable_le_maxr` -> `comparable_le_max`
+  + `comparable_le_maxl` -> `comparable_ge_max`
+  + `comparable_lt_maxr` -> `comparable_lt_max`
+  + `comparable_lt_maxl` -> `comparable_gt_max`
+  + `comparable_lt_minl` -> `comparable_gt_min`
+  + `comparable_lt_minr` -> `comparable_lt_min`
+  + `comparable_le_minr` -> `comparable_le_min`
+  + `comparable_le_minl` -> `comparable_ge_min`
 
 ### Removed
 

@@ -2723,13 +2723,10 @@ Lemma size_prod_seq_eq1 (I : eqType) (s : seq I) (P : pred I) (F : I -> {poly R}
   reflect (forall i, P i && (i \in s) -> size (F i) = 1%N)
           (size (\prod_(i <- s | P i) F i) == 1%N).
 Proof.
-have -> : (size (\prod_(i <- s | P i) F i) == 1%N) =
-  (all [pred i | P i ==> (size (F i) == 1%N)] s).
-  elim: s => [|a s IHs /=]; first by rewrite big_nil size_poly1.
-  by rewrite big_cons; case: (P a) => //=; rewrite size_mul_eq1 IHs.
-apply: (iffP allP) => /= [/(_ _ _)/implyP /(_ _)/eqP|] sF_eq1 i.
-  by move=> /andP[Pi si]; rewrite sF_eq1.
-by move=> si; apply/implyP => Pi; rewrite sF_eq1 ?Pi.
+rewrite (big_morph _ (id1:=true) size_mul_eq1) ?size_polyC ?oner_neq0//.
+rewrite big_all_cond; apply/(iffP allP).
+  by move=> h i /andP[Pi ins]; apply/eqP/(implyP (h i ins) Pi).
+by move=> h i ins; apply/implyP => Pi; rewrite h ?Pi.
 Qed.
 
 Lemma size_prod_eq1 (I : finType) (P : pred I) (F : I -> {poly R}) :
@@ -3118,8 +3115,7 @@ Proof. by rewrite expr2 mulrACA mulrA -natrM. Qed.
 
 Let splitr (x : F) : x = x / 2 + x / 2.
 Proof.
-apply: (mulIf nz2); rewrite -mulrDl mulfVK//.
-by rewrite -[2]/(1 + 1)%:R natrD mulrDr mulr1.
+by apply: (mulIf nz2); rewrite -mulrDl mulfVK// mulr_natr mulr2n.
 Qed.
 
 Let pE : p = a *: 'X^2 + b *: 'X + c%:P.
