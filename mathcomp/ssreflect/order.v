@@ -5385,21 +5385,22 @@ Let inU v Sv : U := Sub v Sv.
 Let meetU (u1 u2 : U) : U := inU (opredI (valP u1) (valP u2)).
 Let joinU (u1 u2 : U) : U := inU (opredU (valP u1) (valP u2)).
 
-(* remove uses of program definition *)
-Obligation Tactic := idtac.
-
-Program Definition latticeU := @POrder_isLattice.Build d' U meetU joinU
-  _ _ _ _ _ _ _.
-Next Obligation. by move=> x y; apply: val_inj; rewrite !SubK meetC. Qed.
-Next Obligation. by move=> x y; apply: val_inj; rewrite !SubK joinC. Qed.
-Next Obligation. by move=> x y z; apply: val_inj; rewrite !SubK meetA. Qed.
-Next Obligation. by move=> x y z; apply: val_inj; rewrite !SubK joinA. Qed.
-Next Obligation. by move=> y x; apply: val_inj; rewrite !SubK joinKI. Qed.
-Next Obligation. by move=> y x; apply: val_inj; rewrite !SubK meetKU. Qed.
-Next Obligation.
-by move=> x y; rewrite leEsub -(inj_eq val_inj) SubK leEmeet.
-Qed.
-HB.instance Definition _ := latticeU.
+Let meetUC : commutative meetU.
+Proof. by move=> x y; apply: val_inj; rewrite !SubK meetC. Qed.
+Let joinUC : commutative joinU.
+Proof. by move=> x y; apply: val_inj; rewrite !SubK joinC. Qed.
+Let meetUA : associative meetU.
+Proof. by move=> x y z; apply: val_inj; rewrite !SubK meetA. Qed.
+Let joinUA : associative joinU.
+Proof. by move=> x y z; apply: val_inj; rewrite !SubK joinA. Qed.
+Lemma joinUKI y x : meetU x (joinU x y) = x.
+Proof. by apply: val_inj; rewrite !SubK joinKI. Qed.
+Let meetUKU y x : joinU x (meetU x y) = x.
+Proof. by apply: val_inj; rewrite !SubK meetKU. Qed.
+Let le_meetU x y : (x <= y) = (meetU x y == x).
+Proof. by rewrite leEsub -(inj_eq val_inj) SubK leEmeet. Qed.
+HB.instance Definition _ := POrder_isLattice.Build d' U
+  meetUC joinUC meetUA joinUA joinUKI meetUKU le_meetU.
 
 Fact valI : meet_morphism (val : U -> T).
 Proof. by move=> x y; rewrite !SubK. Qed.

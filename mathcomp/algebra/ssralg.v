@@ -5021,9 +5021,6 @@ End Predicates.
 
 End FieldPred.
 
-(* remove uses of program definition *)
-Obligation Tactic := idtac.
-
 HB.mixin Record isSubNmodule (V : nmodType) (S : pred V) U
     of SubType V S U & Nmodule U := {
   valD_subproof : semi_additive (val : U -> V);
@@ -5105,13 +5102,12 @@ Let zeroU := inU (rpred0 (AddClosed.clone V S _)).
 Let oppU (u : U) := inU (rpredNr _ (valP u)).
 Let addU (u1 u2 : U) := inU (rpredD (valP u1) (valP u2)).
 
-(* TODO: This instance should be declared through Nmodule_isZmodule.Build. *)
-Program Definition zmodU := @isZmodule.Build U zeroU oppU addU _ _ _ _.
-Next Obligation. by move=> x y z; apply: val_inj; rewrite !SubK addrA. Qed.
-Next Obligation. by move=> x y; apply: val_inj; rewrite !SubK addrC. Qed.
-Next Obligation. by move=> x; apply: val_inj; rewrite !SubK add0r. Qed.
-Next Obligation. by move=> x; apply: val_inj; rewrite !SubK addNr. Qed.
-HB.instance Definition _ := zmodU.
+HB.instance Definition _ := SubChoice_isSubNmodule.Build V S U
+  (zmod_closedD zmod_closed_subproof).
+
+Lemma addNr : left_inverse zeroU oppU addU.
+Proof. by move=> x; apply: val_inj; rewrite !SubK addNr. Qed.
+HB.instance Definition _ := Nmodule_isZmodule.Build U addNr.
 
 Lemma valD : semi_additive (val : U -> V).
 Proof. by split=> [|x y]; rewrite !SubK. Qed.
@@ -5154,21 +5150,28 @@ Let inU v Sv : U := Sub v Sv.
 Let oneU : U := inU (@rpred1 _ (MulClosed.clone R S _)).
 Let mulU (u1 u2 : U) := inU (rpredM _ _ (valP u1) (valP u2)).
 
-Program Definition semiringU := @Nmodule_isSemiRing.Build U oneU mulU
-  _ _ _ _ _ _ _ _.
-Next Obligation. by move=> x y z; apply: val_inj; rewrite !SubK mulrA. Qed.
-Next Obligation. by move=> x; apply: val_inj; rewrite !SubK mul1r. Qed.
-Next Obligation. by move=> x; apply: val_inj; rewrite !SubK mulr1. Qed.
-Next Obligation.
+Lemma mulrA : associative mulU.
+Proof. by move=> x y z; apply: val_inj; rewrite !SubK mulrA. Qed.
+Lemma mul1r : left_id oneU mulU.
+Proof. by move=> x; apply: val_inj; rewrite !SubK mul1r. Qed.
+Lemma mulr1 : right_id oneU mulU.
+Proof. by move=> x; apply: val_inj; rewrite !SubK mulr1. Qed.
+Lemma mulrDl : left_distributive mulU +%R.
+Proof.
 by move=> x y z; apply: val_inj; rewrite !(SubK, raddfD)/= !SubK mulrDl.
 Qed.
-Next Obligation.
+Lemma mulrDr : right_distributive mulU +%R.
+Proof.
 by move=> x y z; apply: val_inj; rewrite !(SubK, raddfD)/= !SubK mulrDr.
 Qed.
-Next Obligation. by move=> x; apply: val_inj; rewrite SubK val0 mul0r. Qed.
-Next Obligation. by move=> x; apply: val_inj; rewrite SubK val0 mulr0. Qed.
-Next Obligation. by rewrite -(inj_eq val_inj) SubK raddf0 oner_neq0. Qed.
-HB.instance Definition _ := semiringU.
+Lemma mul0r : left_zero 0%R mulU.
+Proof. by move=> x; apply: val_inj; rewrite SubK val0 mul0r. Qed.
+Lemma mulr0 : right_zero 0%R mulU.
+Proof. by move=> x; apply: val_inj; rewrite SubK val0 mulr0. Qed.
+Lemma oner_neq0 : oneU != 0.
+Proof. by rewrite -(inj_eq val_inj) SubK raddf0 oner_neq0. Qed.
+HB.instance Definition _ := Nmodule_isSemiRing.Build U
+  mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0 oner_neq0.
 
 Lemma valM : multiplicative (val : U -> R).
 Proof. by split=> [x y|] /=; rewrite !SubK. Qed.
@@ -5205,22 +5208,8 @@ Let inU v Sv : U := Sub v Sv.
 Let oneU : U := inU (@rpred1 _ (MulClosed.clone R S _)).
 Let mulU (u1 u2 : U) := inU (rpredM _ _ (valP u1) (valP u2)).
 
-Program Definition ringU := @Zmodule_isRing.Build U oneU mulU _ _ _ _ _ _.
-Next Obligation. by move=> x y z; apply: val_inj; rewrite !SubK mulrA. Qed.
-Next Obligation. by move=> x; apply: val_inj; rewrite !SubK mul1r. Qed.
-Next Obligation. by move=> x; apply: val_inj; rewrite !SubK mulr1. Qed.
-Next Obligation.
-by move=> x y z; apply: val_inj; rewrite !(SubK, raddfD)/= !SubK mulrDl.
-Qed.
-Next Obligation.
-by move=> x y z; apply: val_inj; rewrite !(SubK, raddfD)/= !SubK mulrDr.
-Qed.
-Next Obligation. by rewrite -(inj_eq val_inj) SubK raddf0 oner_neq0. Qed.
-HB.instance Definition _ := ringU.
-
-Lemma valM : multiplicative (val : U -> R).
-Proof. by split=> [x y|] /=; rewrite !SubK. Qed.
-HB.instance Definition _ := isSubSemiRing.Build R S U valM.
+HB.instance Definition _ := SubNmodule_isSubSemiRing.Build R S U
+  (smulr_closedM (subring_closedM subring_closed_subproof)).
 HB.end.
 
 #[short(type="subComRingType")]
@@ -5266,16 +5255,20 @@ HB.instance Definition _ := isSubmodClosed.Build R V S submod_closed_subproof.
 Let inW v Sv : W := Sub v Sv.
 Let scaleW a (w : W) := inW (rpredZ a _ (valP w)).
 
-Program Definition lmodU := @Zmodule_isLmodule.Build R W scaleW _ _ _ _.
-Next Obligation. by move=> a b v; apply: val_inj; rewrite !SubK scalerA. Qed.
-Next Obligation. by move=> x; apply: val_inj; rewrite SubK scale1r. Qed.
-Next Obligation.
+Lemma scalerA' a b v : scaleW a (scaleW b v) = scaleW (a * b) v.
+Proof. by apply: val_inj; rewrite !SubK scalerA. Qed.
+Lemma scale1r : left_id 1 scaleW.
+Proof. by move=> x; apply: val_inj; rewrite SubK scale1r. Qed.
+Lemma scalerDr : right_distributive scaleW +%R.
+Proof.
 by move=> a u v; apply: val_inj; rewrite !(SubK, raddfD)/= !SubK.
 Qed.
-Next Obligation.
-by move=> v a b; apply: val_inj; rewrite !(SubK, raddfD)/= !SubK scalerDl.
+Lemma scalerDl v : {morph scaleW^~ v : a b / a + b}.
+Proof.
+by move=> a b; apply: val_inj; rewrite !(SubK, raddfD)/= !SubK scalerDl.
 Qed.
-HB.instance Definition _ := lmodU.
+HB.instance Definition _ := Zmodule_isLmodule.Build R W
+  scalerA' scale1r scalerDr scalerDl.
 
 Fact valZ : scalable (val : W -> _). Proof. by move=> k w; rewrite SubK. Qed.
 HB.instance Definition _ := isSubLmodule.Build R V S W valZ.
@@ -5325,22 +5318,24 @@ HB.instance Definition _ := isDivringClosed.Build R S divring_closed_subproof.
 Let inU v Sv : U := Sub v Sv.
 Let invU (u : U) := inU (rpredVr _ (valP u)).
 
-Program Definition unitringU :=
-  @Ring_hasMulInverse.Build U [pred x | val x \is a unit] invU _ _ _ _.
-Next Obligation.
+Lemma mulVr : {in [pred x | val x \is a unit], left_inverse 1 invU *%R}.
+Proof.
 by move=> x /[!inE] xu; apply: val_inj; rewrite rmorphM rmorph1 /= SubK mulVr.
 Qed.
-Next Obligation.
+Lemma divrr : {in [pred x | val x \is a unit], right_inverse 1 invU *%R}.
 by move=> x /[!inE] xu; apply: val_inj; rewrite rmorphM rmorph1 /= SubK mulrV.
 Qed.
-Next Obligation.
-move=> x y [/(congr1 val) yx1 /(congr1 val) xy1]; rewrite inE.
-by apply: rev_unitrP (val y) _; rewrite !rmorphM rmorph1 in yx1 xy1.
+Lemma unitrP (x y : U) : y * x = 1 /\ x * y = 1 -> val x \is a unit.
+Proof.
+move=> -[/(congr1 val) yx1 /(congr1 val) xy1].
+by apply: rev_unitrP (val y) _; rewrite !rmorphM rmorph1 /= in yx1 xy1.
 Qed.
-Next Obligation.
+Lemma invr_out : {in [pred x | val x \isn't a unit], invU =1 id}.
+Proof.
 by move=> x /[!inE] xNU; apply: val_inj; rewrite SubK invr_out.
 Qed.
-HB.instance Definition _ : Ring_hasMulInverse U := unitringU.
+HB.instance Definition _ := Ring_hasMulInverse.Build U
+  mulVr divrr unitrP invr_out.
 HB.end.
 
 #[short(type="subComUnitRingType")]
