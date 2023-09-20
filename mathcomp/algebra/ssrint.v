@@ -540,32 +540,6 @@ Proof. by []. Qed.
 Lemma nmulrn (R : zmodType) (x : R) (n : nat) : x *- n = x *~ - n%:Z.
 Proof. by case: n=> [] //; rewrite ?oppr0. Qed.
 
-Variant Iintmul := IIntmul : Ione -> int -> Iintmul.
-
-Definition parse (x : Number.int) : Iintmul :=
-  let i :=
-    match x with
-    | Number.IntDecimal (Decimal.Pos u) => Posz (Nat.of_uint u)
-    | Number.IntDecimal (Decimal.Neg u) => Negz (Nat.of_uint u).-1
-    | Number.IntHexadecimal (Hexadecimal.Pos u) => Posz (Nat.of_hex_uint u)
-    | Number.IntHexadecimal (Hexadecimal.Neg u) => Negz (Nat.of_hex_uint u).-1
-    end in
-  IIntmul IOne i.
-
-Definition print (x : Iintmul) : Number.int :=
-  match x with
-  | IIntmul IOne (Posz n) => Number.IntDecimal (Decimal.Pos (Nat.to_uint n))
-  | IIntmul IOne (Negz n) => Number.IntDecimal (Decimal.Neg (Nat.to_uint n.+1))
-  end.
-
-Arguments GRing.one {_}.
-Set Warnings "-via-type-remapping,-via-type-mismatch".
-Number Notation Idummy_placeholder parse print (via Iintmul
-  mapping [[intmul] => IIntmul, [GRing.one] => IOne])
-  : ring_scope.
-Set Warnings "via-type-remapping,via-type-mismatch".
-Arguments GRing.one : clear implicits.
-
 Section ZintLmod.
 
 Definition zmodule (M : Type) : Type := M.
