@@ -137,7 +137,7 @@ Lemma card_qfpoly : #|{poly %/ h with hI}| = #|R| ^ (size h).-1.
 Proof. by rewrite card_monic_qpoly ?hI. Qed.
 
 Lemma card_qfpoly_gt1 : 1 < #|{poly %/ h with hI}|.
-Proof. by have := card_finRing_gt1 [finRingType of {poly %/ h with hI}]. Qed.
+Proof. by have := card_finRing_gt1 {poly %/ h with hI}. Qed.
 
 End FinField.
 
@@ -420,7 +420,7 @@ Proof.
 move=> /ltnW size_gt1.
 rewrite /plogp.
 case (boolP (primitive_poly p)) => // Hh; first by apply: qlogp_lt.
-by rewrite ltn_predRL (card_finRing_gt1 [finRingType of {poly %/ p}]).
+by rewrite ltn_predRL (card_finRing_gt1 {poly %/ p}).
 Qed.
 
 Lemma plogp_X (p q : {poly F}) :
