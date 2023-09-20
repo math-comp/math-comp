@@ -337,6 +337,10 @@ in `qfpoly.v`
   + lemmas `archi_boundP`, `upper_nthrootP`, `truncP`, `trunc_itv`
     (moved to `archimedean.v`)
 
+- in `ssrint.v`
+  + `mulrzDr` temporarily deprecated, use `mulrzDl_tmp` instead, will eventually be renamed `mulrzDl`
+  + `mulrzDl` temporarily deprecated, use `mulrzDr_tmp` instead, will eventually be renamed `mulrzDr`
+
 ### Infrastructure
 
 ### Misc

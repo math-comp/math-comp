@@ -591,7 +591,7 @@ Proof. by rewrite !mulrzA_C mulrC. Qed.
 
 Fact mulr1z (x : M) : x *~ 1 = x. Proof. by []. Qed.
 
-Fact mulrzDr m : {morph ( *~%R^~ m : M -> M) : x y / x + y}.
+Fact mulrzDl_tmp m : {morph ( *~%R^~ m : M -> M) : x y / x + y}.
 Proof.
 by elim: m=> [|m _|m _] x y;
   rewrite ?addr0 /intmul //= ?mulrnDl // opprD.
@@ -608,7 +608,7 @@ rewrite -{2}[m](@subnKC n)// mulrnDr addrAC subrr add0r.
 by rewrite subzn.
 Qed.
 
-Fact mulrzDl x : {morph *~%R x : m n / m + n}.
+Fact mulrzDr_tmp x : {morph *~%R x : m n / m + n}.
 Proof.
 elim=> [|m _|m _]; elim=> [|n _|n _]; rewrite /intmul //=;
 rewrite -?(opprD) ?(add0r, addr0, mulrnDr, subn0) //.
@@ -619,7 +619,7 @@ Qed.
 
 HB.instance Definition _ := GRing.Zmodule.on M^z.  (* FIXME, the error message below "nomsg" when we forget this line is not very helpful *)
 HB.instance Definition _ := @GRing.Zmodule_isLmodule.Build _ M^z
-  (fun n x => x *~ n) mulrzA_C mulr1z mulrzDr mulrzDl.
+  (fun n x => x *~ n) mulrzA_C mulr1z mulrzDl_tmp mulrzDr_tmp.
 
 Lemma scalezrE n x : n *: (x : M^z) = x *~ n. Proof. by []. Qed.
 
@@ -660,6 +660,11 @@ HB.instance Definition _ (x : M) := GRing.isAdditive.Build int M ( *~%R x)
   (@mulrzBr x).
 
 End ZintLmod.
+
+#[deprecated(since="mathcomp 2.1.0", note="Use mulrzDr_tmp instead. mulrzDl will be renamed mulrzDr in the future.")]
+Notation mulrzDl := mulrzDr_tmp.
+#[deprecated(since="mathcomp 2.1.0", note="Use mulrzDl_tmp instead. mulrzDr will be renamed mulrzDl in the future.")]
+Notation mulrzDr := mulrzDl_tmp.
 
 Lemma ffunMzE (I : finType) (M : zmodType) (f : {ffun I -> M}) z x :
   (f *~ z) x = f x *~ z.
@@ -702,7 +707,7 @@ Lemma mulrbz x (b : bool) : x *~ b = (if b then x else 0).
 Proof. by case: b. Qed.
 
 Lemma intrD m n : (m + n)%:~R = m%:~R + n%:~R :> R.
-Proof. exact: mulrzDl. Qed.
+Proof. exact: mulrzDr_tmp. Qed.
 
 Lemma intrM m n : (m * n)%:~R = m%:~R * n%:~R :> R.
 Proof. by rewrite mulrzA -mulrzr. Qed.
@@ -735,8 +740,8 @@ Implicit Types u v w : V.
 Lemma scaler_int n v : n%:~R *: v = v *~ n.
 Proof.
 elim: n=> [|n ihn|n ihn]; first by rewrite scale0r.
-  by rewrite intS !mulrzDl scalerDl ihn scale1r.
-by rewrite intS opprD !mulrzDl scalerDl ihn scaleN1r.
+  by rewrite intS !mulrzDr_tmp scalerDl ihn scale1r.
+by rewrite intS opprD !mulrzDr_tmp scalerDl ihn scaleN1r.
 Qed.
 
 Lemma scalerMzl a v n : (a *: v) *~ n = (a *~ n) *: v.
