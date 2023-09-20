@@ -643,7 +643,7 @@ Definition CintrE :=
    (rmorphMz ZtoCm, @intr_norm CnF, @intr_sg CnF),
    =^~ (@ler_int CnF, @ltr_int CnF, (inj_eq (@intr_inj CnF)))).
 
-Let nz2 : 2 != 0 :> algC. Proof. by rewrite -!CintrE. Qed.
+Let nz2 : 2 != 0 :> algC. Proof. by rewrite pnatr_eq0. Qed.
 
 (* Conjugation and norm. *)
 
