@@ -120,7 +120,7 @@ by rewrite -mulnA Zp_cast.
 Qed.
 
 Lemma Grp_pX1p2 :
-  p^{1+2} \isog Grp (x : y : (x ^+ p, y ^+ p, [~ x, y, x], [~ x, y, y])).
+  p^{1+2} \isog Grp (x : y : x ^+ p, y ^+ p, [~ x, y, x], [~ x, y, y]).
 Proof.
 rewrite [@gtype _]unlock; apply: intro_isoGrp => [|rT H].
   apply/existsP; pose x := sdpair1 actp (0, 1)%R; pose y := sdpair2 actp 1%R.
