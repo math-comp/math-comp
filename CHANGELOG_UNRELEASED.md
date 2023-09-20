@@ -161,6 +161,10 @@ in `qfpoly.v`
 
 ### Deprecated
 
+- in `ssrint.v`
+  + `mulrzDr` temporarily deprecated, use `mulrzDl_tmp` instead, will eventually be renamed `mulrzDl`
+  + `mulrzDl` temporarily deprecated, use `mulrzDr_tmp` instead, will eventually be renamed `mulrzDr`
+
 ### Infrastructure
 
 ### Misc
