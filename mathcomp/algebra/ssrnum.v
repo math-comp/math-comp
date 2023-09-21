@@ -1240,8 +1240,14 @@ Proof. by rewrite -{1}[x]add0r lterD2. Qed.
 Lemma gerDl x y : (x + y <= x) = (y <= 0).
 Proof. by rewrite -{2}[x]addr0 lterD2. Qed.
 
+Lemma gerBl x y : (x - y <= x) = (0 <= y).
+Proof. by rewrite lerBlDl lerDr. Qed.
+
 Lemma gtrDl x y : (x + y < x) = (y < 0).
 Proof. by rewrite -{2}[x]addr0 lterD2. Qed.
+
+Lemma gtrBl x y : (x - y < x) = (0 < y).
+Proof. by rewrite ltrBlDl ltrDr. Qed.
 
 Lemma gerDr x y : (y + x <= x) = (y <= 0).
 Proof. by rewrite -{2}[x]add0r lterD2. Qed.
