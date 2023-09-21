@@ -129,6 +129,9 @@ in `qfpoly.v`
 - in `ssrnat.v`
   + lemma `addn_eq1`
 
+- in `ssrnum.v`:
+  + lemmas `gerBl`, `gtrBl`
+
 ### Changed
 
 - in `ssralg.v`
