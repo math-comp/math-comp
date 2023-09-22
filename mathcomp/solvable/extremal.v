@@ -118,7 +118,7 @@ by rewrite mulnC -!orderE !order_Zp1 !Zp_cast.
 Qed.
 
 Lemma Grp : (exists s, [/\ s \in Aut B, #[s] %| p & s b = b ^+ e]) ->
-  [set: gtype] \isog Grp (x : y : (x ^+ q, y ^+ p, x ^ y = x ^+ e)).
+  [set: gtype] \isog Grp (x : y : x ^+ q, y ^+ p, x ^ y = x ^+ e).
 Proof.
 rewrite [gtype.body]unlock => [[s [AutBs dvd_s_p sb]]].
 have memB: _ \in B by move=> c; rewrite -Zp_cycle inE.
@@ -448,7 +448,7 @@ Lemma card_modular_group : #|'Mod_(p ^ n)| = (p ^ n)%N.
 Proof. by rewrite Extremal.card def_p ?def_q // -expnS def_n. Qed.
 
 Lemma Grp_modular_group :
-  'Mod_(p ^ n) \isog Grp (x : y : (x ^+ q, y ^+ p, x ^ y = x ^+ r.+1)).
+  'Mod_(p ^ n) \isog Grp (x : y : x ^+ q, y ^+ p, x ^ y = x ^+ r.+1).
 Proof.
 rewrite /modular_gtype def_p def_q def_r; apply: Extremal.Grp => //.
 set B := <[_]>; have Bb: Zp1 \in B by apply: cycle_id.
@@ -634,9 +634,9 @@ Local Notation ED := [set: gsort (Extremal.gtype q p q.-1)].
 Lemma card_ext_dihedral : #|ED| = (p./2 * m)%N.
 Proof. by rewrite Extremal.card // /m -mul2n -divn2 mulnA divnK. Qed.
 
-Lemma Grp_ext_dihedral : ED \isog Grp (x : y : (x ^+ q, y ^+ p, x ^ y = x^-1)).
+Lemma Grp_ext_dihedral : ED \isog Grp (x : y : x ^+ q, y ^+ p, x ^ y = x^-1).
 Proof.
-suffices isoED: ED \isog Grp (x : y : (x ^+ q, y ^+ p, x ^ y = x ^+ q.-1)).
+suffices isoED: ED \isog Grp (x : y : x ^+ q, y ^+ p, x ^ y = x ^+ q.-1).
   move=> gT G; rewrite isoED.
   apply: eq_existsb => [[x y]] /=; rewrite !xpair_eqE.
   congr (_ && _); apply: andb_id2l; move/eqP=> xq1; congr (_ && (_ == _)).
@@ -655,10 +655,10 @@ End Dihedral_extension.
 Lemma card_dihedral : #|'D_m| = m.
 Proof. by rewrite /('D_m)%type def_q card_ext_dihedral ?mul1n. Qed.
 
-Lemma Grp_dihedral : 'D_m \isog Grp (x : y : (x ^+ q, y ^+ 2, x ^ y = x^-1)).
+Lemma Grp_dihedral : 'D_m \isog Grp (x : y : x ^+ q, y ^+ 2, x ^ y = x^-1).
 Proof. by rewrite /('D_m)%type def_q; apply: Grp_ext_dihedral. Qed.
 
-Lemma Grp'_dihedral : 'D_m \isog Grp (x : y : (x ^+ 2, y ^+ 2, (x * y) ^+ q)).
+Lemma Grp'_dihedral : 'D_m \isog Grp (x : y : x ^+ 2, y ^+ 2, (x * y) ^+ q).
 Proof.
 move=> gT G; rewrite Grp_dihedral; apply/existsP/existsP=> [] [[x y]] /=.
   case/eqP=> <- xq1 y2 xy; exists (x * y, y); rewrite !xpair_eqE /= eqEsubset.
@@ -698,7 +698,7 @@ by rewrite eqEcard cycle_subG /= cycle2g // !inE -order_eq1 ox; case/andP.
 Qed.
 
 Lemma Grp_2dihedral n : n > 1 ->
-  'D_(2 ^ n) \isog Grp (x : y : (x ^+ (2 ^ n.-1), y ^+ 2, x ^ y = x^-1)).
+  'D_(2 ^ n) \isog Grp (x : y : x ^+ (2 ^ n.-1), y ^+ 2, x ^ y = x^-1).
 Proof.
 move=> n_gt1; rewrite -(ltn_predK n_gt1) expnS mul2n /=.
 by apply: Grp_dihedral; rewrite (ltn_exp2l 0) // -(subnKC n_gt1).
@@ -719,7 +719,7 @@ Qed.
 
 Lemma Grp_semidihedral n : n > 3 ->
   'SD_(2 ^ n) \isog
-     Grp (x : y : (x ^+ (2 ^ n.-1), y ^+ 2, x ^ y = x ^+ (2 ^ n.-2).-1)).
+     Grp (x : y : x ^+ (2 ^ n.-1), y ^+ 2, x ^ y = x ^+ (2 ^ n.-2).-1).
 Proof.
 move=> n_gt3.
 rewrite /('SD__)%type -(subnKC (ltnW (ltnW n_gt3))) pdiv_pfactor //.
@@ -749,7 +749,7 @@ Hypothesis n_gt2 : n > 2.
 Let m := (2 ^ n)%N.
 Let q := (2 ^ n.-1)%N.
 Let r := (2 ^ n.-2)%N.
-Let GrpQ := 'Q_m \isog Grp (x : y : (x ^+ q, y ^+ 2 = x ^+ r, x ^ y = x^-1)).
+Let GrpQ := 'Q_m \isog Grp (x : y : x ^+ q, y ^+ 2 = x ^+ r, x ^ y = x^-1).
 Let defQ :  #|'Q_m| = m /\ GrpQ.
 Proof.
 have q_gt1 : q > 1 by rewrite (ltn_exp2l 0) // -(subnKC n_gt2).
@@ -759,7 +759,7 @@ have def_q : m %/ pdiv m = q
 have r_gt1 : r > 1 by rewrite (ltn_exp2l 0) // -(subnKC n_gt2).
 have def2r : (2 * r)%N = q by rewrite -expnS /q -(subnKC n_gt2).
 rewrite /GrpQ [quaternion_gtype]unlock /quaternion_kernel {}def_q.
-set B := [set: _]; have: B \homg Grp (u : v : (u ^+ q, v ^+ 4, u ^ v = u^-1)).
+set B := [set: _]; have: B \homg Grp (u : v : u ^+ q, v ^+ 4, u ^ v = u^-1).
   by rewrite -Grp_ext_dihedral ?homg_refl.
 have: #|B| = (q * 4)%N by rewrite card_ext_dihedral // mulnC -muln2 -mulnA.
 rewrite {}/B; move: (Extremal.gtype q 4 _) => gT.
