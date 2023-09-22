@@ -67,6 +67,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       { name = p; value.override.version = "proux01:hierarchy-builder"; }))
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
+         deriving.job = false;  # currently not ported
        };
   in {
     "coq-master".push-branches = [ "master" "mathcomp-1" ];
