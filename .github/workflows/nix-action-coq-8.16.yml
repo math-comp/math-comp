@@ -42,8 +42,8 @@ jobs:
       name: Checking presence of CI target QuickChick
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"QuickChick\" \\\n   --dry-run 2>&1 >\
-        \ /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -107,8 +107,8 @@ jobs:
       name: Checking presence of CI target Verdi
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"Verdi\" \\\n   --dry-run 2>&1 > /dev/null)\n\
-        echo $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep \"built:\" |\
-        \ sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
+        s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -174,8 +174,8 @@ jobs:
       name: Checking presence of CI target addition-chains
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"addition-chains\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
+        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -243,8 +243,8 @@ jobs:
       name: Checking presence of CI target autosubst
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"autosubst\" \\\n   --dry-run 2>&1 > /dev/null)\n\
-        echo $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep \"built:\" |\
-        \ sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
+        s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -300,8 +300,8 @@ jobs:
       name: Checking presence of CI target category-theory
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"category-theory\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
+        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -359,8 +359,8 @@ jobs:
       name: Checking presence of CI target coq
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"coq\" \\\n   --dry-run 2>&1 > /dev/null)\n\
-        echo $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep \"built:\" |\
-        \ sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
+        s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -408,8 +408,8 @@ jobs:
       name: Checking presence of CI target coq-bits
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"coq-bits\" \\\n   --dry-run 2>&1 > /dev/null)\n\
-        echo $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep \"built:\" |\
-        \ sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
+        s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -467,8 +467,8 @@ jobs:
       name: Checking presence of CI target coqeal
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"coqeal\" \\\n   --dry-run 2>&1 > /dev/null)\n\
-        echo $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep \"built:\" |\
-        \ sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
+        s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -540,8 +540,8 @@ jobs:
       name: Checking presence of CI target coquelicot
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"coquelicot\" \\\n   --dry-run 2>&1 >\
-        \ /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -599,8 +599,8 @@ jobs:
       name: Checking presence of CI target fourcolor
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"fourcolor\" \\\n   --dry-run 2>&1 > /dev/null)\n\
-        echo $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep \"built:\" |\
-        \ sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
+        s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -666,8 +666,8 @@ jobs:
       name: Checking presence of CI target gaia
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"gaia\" \\\n   --dry-run 2>&1 > /dev/null)\n\
-        echo $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep \"built:\" |\
-        \ sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
+        s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -734,8 +734,8 @@ jobs:
       name: Checking presence of CI target graph-theory
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"graph-theory\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
+        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -809,8 +809,8 @@ jobs:
       name: Checking presence of CI target interval
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"interval\" \\\n   --dry-run 2>&1 > /dev/null)\n\
-        echo $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep \"built:\" |\
-        \ sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
+        s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -887,8 +887,8 @@ jobs:
       name: Checking presence of CI target mathcomp
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp\" \\\n   --dry-run 2>&1 > /dev/null)\n\
-        echo $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep \"built:\" |\
-        \ sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
+        s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -969,8 +969,8 @@ jobs:
       name: Checking presence of CI target mathcomp-abel
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-abel\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
+        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -1031,8 +1031,8 @@ jobs:
       name: Checking presence of CI target mathcomp-algebra
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-algebra\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
+        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -1098,8 +1098,8 @@ jobs:
       name: Checking presence of CI target mathcomp-analysis
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-analysis\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run\
-        \ | grep \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
+        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -1167,8 +1167,8 @@ jobs:
       name: Checking presence of CI target mathcomp-bigenough
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-bigenough\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run\
-        \ | grep \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
+        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -1228,8 +1228,8 @@ jobs:
       name: Checking presence of CI target mathcomp-character
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-character\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run\
-        \ | grep \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
+        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -1306,8 +1306,8 @@ jobs:
       name: Checking presence of CI target mathcomp-classical
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-classical\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run\
-        \ | grep \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
+        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -1370,8 +1370,8 @@ jobs:
       name: Checking presence of CI target mathcomp-doc
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-doc\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
+        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -1430,8 +1430,8 @@ jobs:
       name: Checking presence of CI target mathcomp-field
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-field\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
+        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -1503,8 +1503,8 @@ jobs:
       name: Checking presence of CI target mathcomp-fingroup
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-fingroup\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run\
-        \ | grep \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
+        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -1564,8 +1564,8 @@ jobs:
       name: Checking presence of CI target mathcomp-finmap
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-finmap\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
+        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -1626,8 +1626,8 @@ jobs:
       name: Checking presence of CI target mathcomp-real-closed
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-real-closed\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run\
-        \ | grep \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
+        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -1701,8 +1701,8 @@ jobs:
       name: Checking presence of CI target mathcomp-single
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-single\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
+        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -1752,8 +1752,8 @@ jobs:
       name: Checking presence of CI target mathcomp-solvable
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-solvable\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run\
-        \ | grep \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
+        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -1820,8 +1820,8 @@ jobs:
       name: Checking presence of CI target mathcomp-ssreflect
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-ssreflect\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run\
-        \ | grep \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
+        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -1878,8 +1878,8 @@ jobs:
       name: Checking presence of CI target mathcomp-tarjan
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-tarjan\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
+        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -1941,8 +1941,8 @@ jobs:
       name: Checking presence of CI target mathcomp-zify
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"mathcomp-zify\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
+        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -2010,8 +2010,8 @@ jobs:
       name: Checking presence of CI target multinomials
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"multinomials\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
+        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -2089,8 +2089,8 @@ jobs:
       name: Checking presence of CI target odd-order
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"odd-order\" \\\n   --dry-run 2>&1 > /dev/null)\n\
-        echo $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep \"built:\" |\
-        \ sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
+        s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -2170,8 +2170,8 @@ jobs:
       name: Checking presence of CI target reglang
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"reglang\" \\\n   --dry-run 2>&1 > /dev/null)\n\
-        echo $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep \"built:\" |\
-        \ sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
+        s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
@@ -2227,8 +2227,8 @@ jobs:
       name: Checking presence of CI target relation-algebra
       run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
         \ bundle \"coq-8.16\" --argstr job \"relation-algebra\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho name=status::$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
+        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.16"
