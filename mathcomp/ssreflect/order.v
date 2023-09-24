@@ -4839,13 +4839,12 @@ HB.mixin Record isOrderMorphism d (T : porderType d) d' (T' : porderType d')
   omorph_le_subproof : order_morphism apply;
 }.
 
-#[infer(T,T')]
 HB.structure Definition OrderMorphism d (T : porderType d)
   d' (T' : porderType d') := {f of isOrderMorphism d T d' T' f}.
 
 Module OrderMorphismExports.
 Notation "{ 'omorphism' T -> T' }" :=
-  (OrderMorphism.type _ T%type _ T'%type) : type_scope.
+  (@OrderMorphism.type _ T%type _ T'%type) : type_scope.
 End OrderMorphismExports.
 HB.export OrderMorphismExports.
 
@@ -4907,17 +4906,14 @@ HB.mixin Record isJoinLatticeMorphism d (T : latticeType d)
   omorphU_subproof : join_morphism apply;
 }.
 
-#[infer(T,T')]
 HB.structure Definition MeetLatticeMorphism d (T : latticeType d)
     d' (T' : latticeType d') :=
   {f of isMeetLatticeMorphism d T d' T' f & @OrderMorphism d T d' T' f}.
 
-#[infer(T,T')]
 HB.structure Definition JoinLatticeMorphism d (T : latticeType d)
     d' (T' : latticeType d') :=
   {f of isJoinLatticeMorphism d T d' T' f & @OrderMorphism d T d' T' f}.
 
-#[infer(T,T')]
 HB.structure Definition LatticeMorphism d (T : latticeType d)
     d' (T' : latticeType d') :=
   {f of @MeetLatticeMorphism d T d' T' f & @JoinLatticeMorphism d T d' T' f}.
@@ -4937,11 +4933,11 @@ HB.end.
 
 Module LatticeMorphismExports.
 Notation "{ 'mlmorphism' T -> T' }" :=
-  (MeetLatticeMorphism.type _ T%type _ T'%type) : type_scope.
+  (@MeetLatticeMorphism.type _ T%type _ T'%type) : type_scope.
 Notation "{ 'jlmorphism' T -> T' }" :=
-  (JoinLatticeMorphism.type _ T%type _ T'%type) : type_scope.
+  (@JoinLatticeMorphism.type _ T%type _ T'%type) : type_scope.
 Notation "{ 'lmorphism' T -> T' }" :=
-  (LatticeMorphism.type _ T%type _ T'%type) : type_scope.
+  (@LatticeMorphism.type _ T%type _ T'%type) : type_scope.
 Notation "[ 'mlmorphism' 'of' f 'as' g ]" :=
   (MeetLatticeMorphism.clone _ _ _ _ f%function g)
   (at level 0, format "[ 'mlmorphism'  'of'  f  'as'  g ]") : form_scope.
@@ -5032,26 +5028,23 @@ HB.mixin Record isTLatticeMorphism d (T : tLatticeType d)
   omorph1_subproof : apply \top = \top;
 }.
 
-#[infer(T,T')]
 HB.structure Definition BLatticeMorphism d (T : bLatticeType d)
     d' (T' : bLatticeType d') := {f of isBLatticeMorphism d T d' T' f}.
 
-#[infer(T,T')]
 HB.structure Definition TLatticeMorphism d (T : tLatticeType d)
     d' (T' : tLatticeType d') := {f of isTLatticeMorphism d T d' T' f}.
 
-#[infer(T,T')]
 HB.structure Definition TBLatticeMorphism d (T : tbLatticeType d)
     d' (T' : tbLatticeType d') :=
   {f of @BLatticeMorphism d T d' T' f & @TLatticeMorphism d T d' T' f}.
 
 Module TBLatticeMorphismExports.
 Notation "{ 'blmorphism' T -> T' }" :=
-  (BLatticeMorphism.type _ T%type _ T'%type) : type_scope.
+  (@BLatticeMorphism.type _ T%type _ T'%type) : type_scope.
 Notation "{ 'tlmorphism' T -> T' }" :=
-  (TLatticeMorphism.type _ T%type _ T'%type) : type_scope.
+  (@TLatticeMorphism.type _ T%type _ T'%type) : type_scope.
 Notation "{ 'tblmorphism' T -> T' }" :=
-  (TBLatticeMorphism.type _ T%type _ T'%type) : type_scope.
+  (@TBLatticeMorphism.type _ T%type _ T'%type) : type_scope.
 End TBLatticeMorphismExports.
 HB.export TBLatticeMorphismExports.
 
@@ -5158,33 +5151,33 @@ HB.mixin Record isTLatticeClosed d (T : tLatticeType d) (S : {pred T}) := {
 
 (* Structures for stability properties *)
 
-#[infer(T), short(type="meetLatticeClosed")]
+#[short(type="meetLatticeClosed")]
 HB.structure Definition MeetLatticeClosed d T :=
   {S of isMeetLatticeClosed d T S}.
 
-#[infer(T), short(type="joinLatticeClosed")]
+#[short(type="joinLatticeClosed")]
 HB.structure Definition JoinLatticeClosed d T :=
   {S of isJoinLatticeClosed d T S}.
 
-#[infer(T), short(type="latticeClosed")]
+#[short(type="latticeClosed")]
 HB.structure Definition LatticeClosed d T :=
   {S of @MeetLatticeClosed d T S & @JoinLatticeClosed d T S}.
 
-#[infer(T), short(type="bLatticeClosed")]
+#[short(type="bLatticeClosed")]
 HB.structure Definition BLatticeClosed d T := {S of isBLatticeClosed d T S}.
 
-#[infer(T), short(type="bJoinLatticeClosed")]
+#[short(type="bJoinLatticeClosed")]
 HB.structure Definition BJoinLatticeClosed d T :=
   {S of isBLatticeClosed d T S & @JoinLatticeClosed d T S}.
 
-#[infer(T), short(type="tLatticeClosed")]
+#[short(type="tLatticeClosed")]
 HB.structure Definition TLatticeClosed d T := {S of isTLatticeClosed d T S}.
 
-#[infer(T), short(type="tMeetLatticeClosed")]
+#[short(type="tMeetLatticeClosed")]
 HB.structure Definition TMeetLatticeClosed d T :=
   {S of isTLatticeClosed d T S & @MeetLatticeClosed d T S}.
 
-#[infer(T), short(type="tbLatticeClosed")]
+#[short(type="tbLatticeClosed")]
 HB.structure Definition TBLatticeClosed d (T : tbLatticeType d) :=
   {S of @BLatticeClosed d T S & @TLatticeClosed d T S}.
 
@@ -5216,10 +5209,10 @@ Section LatticePred.
 
 Variables (d : unit) (T : latticeType d).
 
-Lemma opredI (S : meetLatticeClosed d T) : {in S &, forall u v, u `&` v \in S}.
+Lemma opredI (S : meetLatticeClosed T) : {in S &, forall u v, u `&` v \in S}.
 Proof. exact: opredI. Qed.
 
-Lemma opredU (S : joinLatticeClosed d T) : {in S &, forall u v, u `|` v \in S}.
+Lemma opredU (S : joinLatticeClosed T) : {in S &, forall u v, u `|` v \in S}.
 Proof. exact: opredU. Qed.
 
 End LatticePred.
@@ -5228,10 +5221,10 @@ Section BLatticePred.
 
 Variables (d : unit) (T : bLatticeType d).
 
-Lemma opred0 (S : bLatticeClosed d T) : \bot \in S.
+Lemma opred0 (S : bLatticeClosed T) : \bot \in S.
 Proof. exact: opred0. Qed.
 
-Lemma opred_joins (S : bJoinLatticeClosed d T) I r (P : pred I) F :
+Lemma opred_joins (S : bJoinLatticeClosed T) I r (P : pred I) F :
   (forall i, P i -> F i \in S) -> \join_(i <- r | P i) F i \in S.
 Proof. by move=> FS; elim/big_ind: _; [exact: opred0 | exact: opredU |]. Qed.
 
@@ -5241,10 +5234,10 @@ Section TLatticePred.
 
 Variables (d : unit) (T : tLatticeType d).
 
-Lemma opred1 (S : tLatticeClosed d T) : \top \in S.
+Lemma opred1 (S : tLatticeClosed T) : \top \in S.
 Proof. exact: opred1. Qed.
 
-Lemma opred_meets (S : tMeetLatticeClosed d T) I r (P : pred I) F :
+Lemma opred_meets (S : tMeetLatticeClosed T) I r (P : pred I) F :
   (forall i, P i -> F i \in S) -> \meet_(i <- r | P i) F i \in S.
 Proof. by move=> FS; elim/big_ind: _; [exact: opred1 | exact: opredI |]. Qed.
 

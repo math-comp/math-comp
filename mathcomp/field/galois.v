@@ -356,7 +356,7 @@ HB.mixin Record FieldExt_isSplittingField (F : fieldType) L of FieldExt F L := {
   splittingFieldP_subproof : splitting_field_axiom L
 }.
 
-#[mathcomp(axiom="splitting_field_axiom"), infer(F), short(type="splittingFieldType")]
+#[mathcomp(axiom="splitting_field_axiom"), short(type="splittingFieldType")]
 HB.structure Definition SplittingField F :=
  { T of FieldExt_isSplittingField F T & FieldExt F T }.
 

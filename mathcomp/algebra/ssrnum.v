@@ -110,7 +110,7 @@ HB.mixin Record Zmodule_isNormed (R : POrderedZmodule.type) M
   normrN : forall x, norm (- x) = norm x;
 }.
 
-#[short(type="normedZmodType"), infer(R)]
+#[short(type="normedZmodType")]
 HB.structure Definition NormedZmodule (R : porderZmodType) :=
   { M of Zmodule_isNormed R M & GRing.Zmodule M }.
 Arguments norm {R M} x : rename.

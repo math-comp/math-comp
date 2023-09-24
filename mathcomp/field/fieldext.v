@@ -80,7 +80,7 @@ Unset Printing Implicit Defensive.
 Local Open Scope ring_scope.
 Import GRing.Theory.
 
-#[infer(R), short(type="fieldExtType")]
+#[short(type="fieldExtType")]
 HB.structure Definition FieldExt (R : ringType) := {T of Falgebra R T &
   GRing.Ring_hasCommutativeMul T & GRing.Field T}.
 
@@ -662,7 +662,7 @@ have r2v_lin: linear r2v.
   move=> a u v; rewrite /r2v scaler_sumr -big_split /=; apply: eq_bigr => i _.
   by rewrite scalerA -scalerDl !mxE.
 pose r2vlM := GRing.isLinear.Build _ _ _ _ r2v r2v_lin.
-pose r2vL : GRing.Linear.type _ _ _ _ := HB.pack r2v r2vlM.
+pose r2vL : GRing.Linear.type _ _ := HB.pack r2v r2vlM.
 have v2rP x: {r : 'rV[K_F]_n | x = r2v r}.
   apply: sig_eqW; have /memv_sumP[y Fy ->]: x \in SbL by rewrite defL memvf.
   have /fin_all_exists[r Dr] i: exists r, y i = r *: (bL`_i : L_F).

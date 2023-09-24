@@ -107,7 +107,7 @@ HB.mixin Record Lmodule_hasFinDim (R : ringType) (V : Type) of GRing.Lmodule R V
   { dim : nat;
     vector_subdef : vector_axiom_def dim (Phant V) }.
 
-#[mathcomp(axiom="vector_axiom_def"), infer(R), short(type="vectType")]
+#[mathcomp(axiom="vector_axiom_def"), short(type="vectType")]
 HB.structure Definition Vector (R : ringType) :=
   { V of Lmodule_hasFinDim R V & GRing.Lmodule R V }.
 
@@ -119,7 +119,7 @@ Arguments dim {R} s.
 (* FIXME: S/space and H/hom were defined behind the module Vector *
  * Perhaps we should change their names to avoid conflits.        *)
 Section OtherDefs.
-Local Coercion dim : Vector.type_ >-> nat.
+Local Coercion dim : Vector.type >-> nat.
 Inductive space (K : fieldType) (vT : Vector.type K) (phV : phant vT) :=
   Space (mx : 'M[K]_vT) & <<mx>>%MS == mx.
 Inductive hom (R : ringType) (vT wT : Vector.type R) :=
@@ -155,7 +155,7 @@ Module VectorInternalTheory.
 
 Section Iso.
 Variables (R : ringType) (vT rT : vectType R).
-Local Coercion dim : Vector.type_ >-> nat.
+Local Coercion dim : Vector.type >-> nat.
 
 Fact v2r_subproof : vector_axiom vT vT. Proof. exact: vector_subdef. Qed.
 Definition v2r := s2val v2r_subproof.
@@ -182,7 +182,7 @@ End Iso.
 
 Section Vspace.
 Variables (K : fieldType) (vT : vectType K).
-Local Coercion dim : Vector.type_ >-> nat.
+Local Coercion dim : Vector.type >-> nat.
 
 Definition b2mx n (X : n.-tuple vT) := \matrix_i v2r (tnth X i).
 Lemma b2mxK n (X : n.-tuple vT) i : r2v (row i (b2mx X)) = X`_i.
@@ -1069,7 +1069,7 @@ have lin_f: linear f.
   move=> k u v; rewrite scaler_sumr -big_split; apply: eq_bigr => i _.
   by rewrite /= scalerA -scalerDl linearP.
 pose flM := GRing.isLinear.Build _ _ _ _ f lin_f.
-pose fL : GRing.Linear.type _ _ _ _ := HB.pack f flM.
+pose fL : GRing.Linear.type _ _ := HB.pack f flM.
 exists fL => freeX eq_szX.
 apply/esym/(@eq_from_nth _ 0); rewrite ?size_map eq_szX // => i ltiX.
 rewrite (nth_map 0) //= /f (bigD1 (Ordinal ltiX)) //=.
@@ -1947,7 +1947,7 @@ have r2pK : cancel r2p p2r by move=> w; rewrite /p2r !r2vK hsubmxK.
 have p2rK : cancel p2r r2p by case=> u v; rewrite /r2p row_mxKl row_mxKr !v2rK.
 have r2p_lin: linear r2p by move=> a u v; congr (_ , _); rewrite /= !linearP.
 pose r2plM := GRing.isLinear.Build _ _ _ _ r2p r2p_lin.
-pose r2pL : GRing.Linear.type _ _ _ _ := HB.pack r2p r2plM.
+pose r2pL : GRing.Linear.type _ _ := HB.pack r2p r2plM.
 by exists p2r; [apply: (@can2_linear _ _ _ r2pL) | exists r2p].
 Qed.
 HB.instance Definition _ := Lmodule_hasFinDim.Build _ (vT1 * vT2)%type
@@ -1995,7 +1995,7 @@ Lemma vsolve_eqP (U : {vspace vT}) :
 Proof.
 have lhsZ: linear lhsf by move=> a u v; apply/ffunP=> i; rewrite !ffunE linearP.
 pose lhslM := GRing.isLinear.Build _ _ _ _ lhsf lhsZ.
-pose lhsL : GRing.Linear.type _ _ _ _ := HB.pack lhsf lhslM.
+pose lhsL : GRing.Linear.type _ _ := HB.pack lhsf lhslM.
 apply: (iffP memv_imgP) => [] [u Uu sol_u]; exists u => //.
   by move=> i; rewrite -[tnth rhs i]ffunE sol_u (lfunE lhsL) ffunE.
 by apply/ffunP=> i; rewrite (lfunE lhsL) !ffunE sol_u.
