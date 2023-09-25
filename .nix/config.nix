@@ -48,8 +48,8 @@ with builtins; with (import <nixpkgs> {}).lib;
       "odd-order"
       "reglang"
       "mathcomp-tarjan"
-      # "deriving"  # requires univ poly
-      # "extructures"  # requires deriving
+      "deriving"
+      # "extructures"  # not yet ported
     ];
     hierarchy-builder = [
       "coq-bits"
@@ -67,7 +67,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       { name = p; value.override.version = "proux01:hierarchy-builder"; }))
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
-         deriving.job = false;  # currently not ported
        };
   in {
     "coq-master".push-branches = [ "master" "mathcomp-1" ];
@@ -93,7 +92,6 @@ with builtins; with (import <nixpkgs> {}).lib;
     "coq-8.16".push-branches = [ "master" "mathcomp-1" ];
     "coq-8.16".coqPackages = common-bundles // {
       coq.override.version = "8.16";
-      deriving.job = false;  # currently not ported
     };
   };
 }
