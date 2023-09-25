@@ -35,7 +35,6 @@ with builtins; with (import <nixpkgs> {}).lib;
   bundles = let
     master = [
       "mathcomp-bigenough"
-      "deriving"
       "extructures"
       "coquelicot"
     ];
@@ -50,6 +49,8 @@ with builtins; with (import <nixpkgs> {}).lib;
          coqeal.job = false;
          reglang.job = false;
          mathcomp-tarjan.job = false;
+         deriving.job = false;
+         extructures.job = false;
        };
   in {
     "coq-master".push-branches = [ "mathcomp-1" "master" ];
