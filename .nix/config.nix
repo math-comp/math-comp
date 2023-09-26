@@ -40,6 +40,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "gaia"
       "graph-theory"
       "interval"
+      "mathcomp-algebra-tactics"
       "mathcomp-bigenough"
       "mathcomp-finmap"
       "mathcomp-real-closed"
