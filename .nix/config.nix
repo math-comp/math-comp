@@ -40,6 +40,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "gaia"
       "graph-theory"
       "interval"
+      "mathcomp-algebra-tactics"
       "mathcomp-bigenough"
       "mathcomp-finmap"
       "mathcomp-real-closed"
@@ -49,7 +50,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "reglang"
       "mathcomp-tarjan"
       "deriving"
-      # "extructures"  # not yet ported
+      "extructures"
     ];
     hierarchy-builder = [
       "coq-bits"
