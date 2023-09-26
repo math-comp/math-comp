@@ -49,7 +49,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "reglang"
       "mathcomp-tarjan"
       "deriving"
-      # "extructures"  # not yet ported
+      "extructures"
     ];
     hierarchy-builder = [
       "coq-bits"
