@@ -212,6 +212,11 @@ in `qfpoly.v`
   + implicits of `LRMorphism.type`, use the `{lrmorphism _ -> _}`
     notation for compatibility
 
+- in `ssrint.v`
+  + scope of second argument of `intmul` changed from `ring_scope` to
+    `int_scope` so that `42%:~R` parses as `(Posz 42)%:~R` rather than
+    `42%:R%:~R`
+
 ### Renamed
 
 - in `algC.v`
