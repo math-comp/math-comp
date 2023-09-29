@@ -211,6 +211,7 @@ in `qfpoly.v`
     notation for compatibility
   + implicits of `LRMorphism.type`, use the `{lrmorphism _ -> _}`
     notation for compatibility
+  + fixed (generalized) the `comSemiRingType` instance for `prod`
 
 ### Renamed
 
