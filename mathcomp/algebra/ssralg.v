@@ -6487,22 +6487,26 @@ HB.instance Definition _ := isMultiplicative.Build (R1 * R2)%type R2 snd
 
 End PairSemiRing.
 
-#[export]
-HB.instance Definition _ (R1 R2 : ringType) :=
-  SemiRing.copy (R1 * R1)%type (R1 * R1)%type.
+Section PairComSemiRing.
 
-Section PairComRing.
-
-Variables R1 R2 : comRingType.
+Variables R1 R2 : comSemiRingType.
 
 Fact pair_mulC : commutative (@mul_pair R1 R2).
 Proof. by move=> x y; congr (_, _); apply: mulrC. Qed.
 
 #[export]
-HB.instance Definition _ := Ring_hasCommutativeMul.Build (R1 * R2)%type
+HB.instance Definition _ := SemiRing_hasCommutativeMul.Build (R1 * R2)%type
   pair_mulC.
 
-End PairComRing.
+End PairComSemiRing.
+
+#[export]
+HB.instance Definition _ (R1 R2 : ringType) :=
+  SemiRing.copy (R1 * R1)%type (R1 * R1)%type.
+
+#[export]
+HB.instance Definition _ (R1 R2 : comRingType) :=
+  SemiRing.copy (R1 * R1)%type (R1 * R1)%type.
 
 Section PairLmod.
 
