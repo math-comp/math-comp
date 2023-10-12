@@ -635,6 +635,9 @@ Reserved Notation "'{' 'linear' U '->' V '|' s '}'"
 Reserved Notation "'{' 'linear' U '->' V '}'"
   (U at level 98, V at level 99, format "{ 'linear'  U  ->  V }").
 
+Reserved Notation "R ^c" := (format "R ^c").
+Reserved Notation "R ^o" := (format "R ^o").
+
 Declare Scope ring_scope.
 Delimit Scope ring_scope with R.
 Declare Scope term_scope.
@@ -1092,7 +1095,7 @@ Local Notation has_char0 L := (char L =i pred0).
 
 (* Converse ring tag. *)
 Definition converse R : Type := R.
-Local Notation "R ^c" := (converse R) (at level 2, format "R ^c") : type_scope.
+Local Notation "R ^c" := (converse R) : type_scope.
 
 Section PzSemiRingTheory.
 
@@ -1986,7 +1989,7 @@ Local Notation "k %:A" := (k *: 1) : ring_scope.
 
 (* Regular ring algebra tag. *)
 Definition regular R : Type := R.
-Local Notation "R ^o" := (regular R) (at level 2, format "R ^o") : type_scope.
+Local Notation "R ^o" := (regular R) : type_scope.
 
 Section RegularAlgebra.
 #[export]
@@ -6941,8 +6944,8 @@ Notation "\prod_ ( i 'in' A | P ) F" :=
 Notation "\prod_ ( i 'in' A ) F" :=
   (\big[*%R/1%R]_(i in A) F%R) : ring_scope.
 
-Notation "R ^c" := (converse R) (at level 2, format "R ^c") : type_scope.
-Notation "R ^o" := (regular R) (at level 2, format "R ^o") : type_scope.
+Notation "R ^c" := (converse R) : type_scope.
+Notation "R ^o" := (regular R) : type_scope.
 
 Bind Scope term_scope with term.
 Bind Scope term_scope with formula.

@@ -123,7 +123,7 @@ Reserved Notation "p ^:P" (format "p ^:P").
 Reserved Notation "'X".
 Reserved Notation "''X^' n" (at level 3, n at level 2, format "''X^' n").
 Reserved Notation "\poly_ ( i < n ) E"
-  (at level 36, E at level 36, i, n at level 50,
+  (at level 34, E at level 36, i, n at level 50,
    format "\poly_ ( i  <  n )  E").
 Reserved Notation "p \Po q" (at level 50).
 Reserved Notation "p ^`N ( n )" (format "p ^`N ( n )").

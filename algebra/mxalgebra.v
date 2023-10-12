@@ -146,7 +146,7 @@ Reserved Notation "\rank A" (at level 10, A at level 8, format "\rank  A").
 Reserved Notation "A ^C"    (format "A ^C").
 
 Notation "''A_' ( m , n )" := 'M_(m, n ^ 2)
-  (at level 8, format "''A_' ( m ,  n )") : type_scope.
+  (format "''A_' ( m ,  n )") : type_scope.
 
 Notation "''A_' ( n )" := 'A_(n ^ 2, n) (only parsing) : type_scope.
 
@@ -154,7 +154,7 @@ Notation "''A_' n" := 'A_(n)
   (n at next level, format "''A_' n") : type_scope.
 
 Notation "''A' [ F ]_ ( m , n )" := 'M[F]_(m, n ^ 2)
-  (at level 8, only parsing) : type_scope.
+  (only parsing) : type_scope.
 
 Notation "''A' [ F ]_ ( n )" := 'A[F]_(n ^ 2, n) (only parsing) : type_scope.
 

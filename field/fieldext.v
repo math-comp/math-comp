@@ -1232,7 +1232,7 @@ Section NonZero.
 
 Hypothesis nz_p : p != 0.
 
-Lemma subfx_inj_eval q : subfx_inj (subfx_eval q) = q^iota.[z].
+Lemma subfx_inj_eval q : subfx_inj (subfx_eval q) = (q^iota).[z].
 Proof.
 by rewrite piE /iotaFz poly_rV_modp_K iotaPz_modp /iotaPz /z0 /wf_p nz_p pz0.
 Qed.
