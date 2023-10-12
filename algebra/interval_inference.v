@@ -1443,7 +1443,7 @@ Proof. by apply/and3P; rewrite /= num_real !bnd_simp. Qed.
 
 Canonical Posz_inum n := Itv.mk (num_spec_Posz n).
 
-Lemma num_spec_Negz n : num_spec (Itv.Real `]-oo, -1]) (Negz n).
+Lemma num_spec_Negz n : num_spec (Itv.Real `]-oo, (-1)]) (Negz n).
 Proof. by apply/and3P; rewrite /= num_real !bnd_simp. Qed.
 
 Canonical Negz_inum n := Itv.mk (num_spec_Negz n).
@@ -1600,7 +1600,7 @@ Goal 0%:i01 = 1%:i01 :> {i01 R}.
 Proof.
 Abort.
 
-Goal (- x%:num)%:itv = (- x%:num)%:itv :> {itv R & `[-1, 0]}.
+Goal (- x%:num)%:itv = (- x%:num)%:itv :> {itv R & `[(-1), 0]}.
 Proof.
 Abort.
 

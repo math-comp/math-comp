@@ -623,16 +623,16 @@ Reserved Notation "~^sl` A" (at level 35, right associativity).
 (* Reserved notations for divisibility *)
 
 Reserved Notation "\gcd_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \gcd_ i '/  '  F ']'").
 Reserved Notation "\gcd_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \gcd_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\gcd_ ( i <- r ) F"
   (F at level 41,
            format "'[' \gcd_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\gcd_ ( m <= i < n | P ) F"
-  (F at level 41, i, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \gcd_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\gcd_ ( m <= i < n ) F"
   (F at level 41,
@@ -643,29 +643,29 @@ Reserved Notation "\gcd_ ( i | P ) F"
 Reserved Notation "\gcd_ ( i : t | P ) F" (F at level 41).
 Reserved Notation "\gcd_ ( i : t ) F" (F at level 41).
 Reserved Notation "\gcd_ ( i < n | P ) F"
-  (F at level 41, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \gcd_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\gcd_ ( i < n ) F"
   (F at level 41,
            format "'[' \gcd_ ( i  <  n )  F ']'").
 Reserved Notation "\gcd_ ( i 'in' A | P ) F"
-  (F at level 41, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \gcd_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\gcd_ ( i 'in' A ) F"
   (F at level 41,
            format "'[' \gcd_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\lcm_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \lcm_ i '/  '  F ']'").
 Reserved Notation "\lcm_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \lcm_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\lcm_ ( i <- r ) F"
   (F at level 41,
            format "'[' \lcm_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\lcm_ ( m <= i < n | P ) F"
-  (F at level 41, i, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \lcm_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\lcm_ ( m <= i < n ) F"
   (F at level 41,
@@ -676,13 +676,13 @@ Reserved Notation "\lcm_ ( i | P ) F"
 Reserved Notation "\lcm_ ( i : t | P ) F" (F at level 41).
 Reserved Notation "\lcm_ ( i : t ) F" (F at level 41).
 Reserved Notation "\lcm_ ( i < n | P ) F"
-  (F at level 41, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \lcm_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\lcm_ ( i < n ) F"
   (F at level 41,
            format "'[' \lcm_ ( i  <  n )  F ']'").
 Reserved Notation "\lcm_ ( i 'in' A | P ) F"
-  (F at level 41, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \lcm_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\lcm_ ( i 'in' A ) F"
   (F at level 41,
@@ -690,16 +690,16 @@ Reserved Notation "\lcm_ ( i 'in' A ) F"
 
 (* Reserved notations for iterative meet and join *)
 Reserved Notation "\meet_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \meet_ i '/  '  F ']'").
 Reserved Notation "\meet_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \meet_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\meet_ ( i <- r ) F"
-  (F at level 41, r at level 50,
+  (F at level 41,
            format "'[' \meet_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\meet_ ( m <= i < n | P ) F"
-  (F at level 41, i, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \meet_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\meet_ ( m <= i < n ) F"
   (F at level 41,
@@ -710,29 +710,29 @@ Reserved Notation "\meet_ ( i | P ) F"
 Reserved Notation "\meet_ ( i : t | P ) F" (F at level 41).
 Reserved Notation "\meet_ ( i : t ) F" (F at level 41).
 Reserved Notation "\meet_ ( i < n | P ) F"
-  (F at level 41, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \meet_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\meet_ ( i < n ) F"
   (F at level 41,
            format "'[' \meet_ ( i  <  n )  F ']'").
 Reserved Notation "\meet_ ( i 'in' A | P ) F"
-  (F at level 41, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \meet_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\meet_ ( i 'in' A ) F"
   (F at level 41,
            format "'[' \meet_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\join_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \join_ i '/  '  F ']'").
 Reserved Notation "\join_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \join_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\join_ ( i <- r ) F"
-  (F at level 41, r at level 50,
+  (F at level 41,
            format "'[' \join_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\join_ ( m <= i < n | P ) F"
-  (F at level 41, i, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \join_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\join_ ( m <= i < n ) F"
   (F at level 41,
@@ -743,506 +743,478 @@ Reserved Notation "\join_ ( i | P ) F"
 Reserved Notation "\join_ ( i : t | P ) F" (F at level 41).
 Reserved Notation "\join_ ( i : t ) F" (F at level 41).
 Reserved Notation "\join_ ( i < n | P ) F"
-  (F at level 41, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \join_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\join_ ( i < n ) F"
   (F at level 41,
            format "'[' \join_ ( i  <  n )  F ']'").
 Reserved Notation "\join_ ( i 'in' A | P ) F"
-  (F at level 41, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \join_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\join_ ( i 'in' A ) F"
   (F at level 41,
            format "'[' \join_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\meet^d_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \meet^d_ i '/  '  F ']'").
 Reserved Notation "\meet^d_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \meet^d_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^d_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \meet^d_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\meet^d_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \meet^d_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^d_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \meet^d_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\meet^d_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \meet^d_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\meet^d_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\meet^d_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\meet^d_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\meet^d_ ( i : t ) F" (F at level 41).
 Reserved Notation "\meet^d_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \meet^d_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^d_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \meet^d_ ( i  <  n )  F ']'").
 Reserved Notation "\meet^d_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \meet^d_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^d_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \meet^d_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\join^d_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \join^d_ i '/  '  F ']'").
 Reserved Notation "\join^d_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \join^d_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\join^d_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \join^d_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\join^d_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \join^d_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\join^d_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \join^d_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\join^d_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \join^d_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\join^d_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\join^d_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\join^d_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\join^d_ ( i : t ) F" (F at level 41).
 Reserved Notation "\join^d_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \join^d_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\join^d_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \join^d_ ( i  <  n )  F ']'").
 Reserved Notation "\join^d_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \join^d_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\join^d_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \join^d_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\meet^p_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \meet^p_ i '/  '  F ']'").
 Reserved Notation "\meet^p_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \meet^p_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^p_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \meet^p_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\meet^p_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \meet^p_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^p_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \meet^p_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\meet^p_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \meet^p_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\meet^p_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\meet^p_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\meet^p_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\meet^p_ ( i : t ) F" (F at level 41).
 Reserved Notation "\meet^p_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \meet^p_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^p_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \meet^p_ ( i  <  n )  F ']'").
 Reserved Notation "\meet^p_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \meet^p_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^p_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \meet^p_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\join^p_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \join^p_ i '/  '  F ']'").
 Reserved Notation "\join^p_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \join^p_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\join^p_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \join^p_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\join^p_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \join^p_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\join^p_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \join^p_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\join^p_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \join^p_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\join^p_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\join^p_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\join^p_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\join^p_ ( i : t ) F" (F at level 41).
 Reserved Notation "\join^p_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \join^p_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\join^p_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \join^p_ ( i  <  n )  F ']'").
 Reserved Notation "\join^p_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \join^p_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\join^p_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \join^p_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\min^p_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \min^p_ i '/  '  F ']'").
 Reserved Notation "\min^p_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \min^p_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\min^p_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \min^p_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\min^p_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \min^p_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\min^p_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \min^p_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\min^p_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \min^p_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\min^p_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\min^p_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\min^p_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\min^p_ ( i : t ) F" (F at level 41).
 Reserved Notation "\min^p_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \min^p_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\min^p_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \min^p_ ( i  <  n )  F ']'").
 Reserved Notation "\min^p_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \min^p_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\min^p_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \min^p_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\max^p_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \max^p_ i '/  '  F ']'").
 Reserved Notation "\max^p_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \max^p_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\max^p_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \max^p_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\max^p_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \max^p_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max^p_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \max^p_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\max^p_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \max^p_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\max^p_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\max^p_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\max^p_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\max^p_ ( i : t ) F" (F at level 41).
 Reserved Notation "\max^p_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \max^p_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max^p_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \max^p_ ( i  <  n )  F ']'").
 Reserved Notation "\max^p_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \max^p_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\max^p_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \max^p_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\meet^sp_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \meet^sp_ i '/  '  F ']'").
 Reserved Notation "\meet^sp_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \meet^sp_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^sp_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \meet^sp_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\meet^sp_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \meet^sp_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^sp_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \meet^sp_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\meet^sp_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \meet^sp_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\meet^sp_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\meet^sp_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\meet^sp_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\meet^sp_ ( i : t ) F" (F at level 41).
 Reserved Notation "\meet^sp_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \meet^sp_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^sp_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \meet^sp_ ( i  <  n )  F ']'").
 Reserved Notation "\meet^sp_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \meet^sp_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^sp_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \meet^sp_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\join^sp_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \join^sp_ i '/  '  F ']'").
 Reserved Notation "\join^sp_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \join^sp_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\join^sp_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \join^sp_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\join^sp_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \join^sp_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\join^sp_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \join^sp_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\join^sp_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \join^sp_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\join^sp_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\join^sp_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\join^sp_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\join^sp_ ( i : t ) F" (F at level 41).
 Reserved Notation "\join^sp_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \join^sp_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\join^sp_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \join^sp_ ( i  <  n )  F ']'").
 Reserved Notation "\join^sp_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \join^sp_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\join^sp_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \join^sp_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\min^sp_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \min^sp_ i '/  '  F ']'").
 Reserved Notation "\min^sp_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \min^sp_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\min^sp_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \min^sp_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\min^sp_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \min^sp_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\min^sp_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \min^sp_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\min^sp_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \min^sp_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\min^sp_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\min^sp_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\min^sp_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\min^sp_ ( i : t ) F" (F at level 41).
 Reserved Notation "\min^sp_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \min^sp_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\min^sp_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \min^sp_ ( i  <  n )  F ']'").
 Reserved Notation "\min^sp_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \min^sp_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\min^sp_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \min^sp_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\max^sp_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \max^sp_ i '/  '  F ']'").
 Reserved Notation "\max^sp_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \max^sp_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\max^sp_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \max^sp_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\max^sp_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \max^sp_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max^sp_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \max^sp_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\max^sp_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \max^sp_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\max^sp_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\max^sp_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\max^sp_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\max^sp_ ( i : t ) F" (F at level 41).
 Reserved Notation "\max^sp_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \max^sp_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max^sp_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \max^sp_ ( i  <  n )  F ']'").
 Reserved Notation "\max^sp_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \max^sp_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\max^sp_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \max^sp_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\meet^l_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \meet^l_ i '/  '  F ']'").
 Reserved Notation "\meet^l_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \meet^l_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^l_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \meet^l_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\meet^l_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \meet^l_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^l_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \meet^l_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\meet^l_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \meet^l_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\meet^l_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\meet^l_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\meet^l_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\meet^l_ ( i : t ) F" (F at level 41).
 Reserved Notation "\meet^l_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \meet^l_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^l_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \meet^l_ ( i  <  n )  F ']'").
 Reserved Notation "\meet^l_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \meet^l_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\meet^l_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \meet^l_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\join^l_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \join^l_ i '/  '  F ']'").
 Reserved Notation "\join^l_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \join^l_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\join^l_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \join^l_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\join^l_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \join^l_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\join^l_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \join^l_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\join^l_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \join^l_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\join^l_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\join^l_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\join^l_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\join^l_ ( i : t ) F" (F at level 41).
 Reserved Notation "\join^l_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \join^l_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\join^l_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \join^l_ ( i  <  n )  F ']'").
 Reserved Notation "\join^l_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \join^l_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\join^l_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \join^l_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\min^l_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \min^l_ i '/  '  F ']'").
 Reserved Notation "\min^l_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \min^l_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\min^l_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \min^l_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\min^l_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \min^l_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\min^l_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \min^l_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\min^l_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \min^l_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\min^l_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\min^l_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\min^l_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\min^l_ ( i : t ) F" (F at level 41).
 Reserved Notation "\min^l_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \min^l_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\min^l_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \min^l_ ( i  <  n )  F ']'").
 Reserved Notation "\min^l_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \min^l_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\min^l_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \min^l_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\max^l_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \max^l_ i '/  '  F ']'").
 Reserved Notation "\max^l_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \max^l_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\max^l_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \max^l_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\max^l_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \max^l_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max^l_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \max^l_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\max^l_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \max^l_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\max^l_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\max^l_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\max^l_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\max^l_ ( i : t ) F" (F at level 41).
 Reserved Notation "\max^l_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \max^l_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max^l_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \max^l_ ( i  <  n )  F ']'").
 Reserved Notation "\max^l_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \max^l_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\max^l_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \max^l_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "'{' 'omorphism' U '->' V '}'"

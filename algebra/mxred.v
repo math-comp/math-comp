@@ -480,7 +480,7 @@ Qed.
 Lemma diagonalizable_conj_diag m n (V : 'M[F]_(m, n)) (d : 'rV[F]_n) :
   stablemx V (diag_mx d) -> row_free V -> diagonalizable (conjmx V (diag_mx d)).
 Proof.
-move: m n => [|m] [|n] in V d *; rewrite ?thinmx0; [by []|by []| |] => Vd rdV.
+(move: m n => [|m] [|n] in V d *; rewrite ?thinmx0; [by []|by []| |]) => Vd rdV.
 - by rewrite /row_free mxrank0 in rdV.
 - apply/diagonalizableP; pose u := undup [seq d 0 i | i <- enum 'I_n.+1].
   exists u; first by rewrite undup_uniq.

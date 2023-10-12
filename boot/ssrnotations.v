@@ -37,8 +37,7 @@ Reserved Notation "e .[ x1 , x2 , .. , xn ]" (left associativity,
   format "e '[ ' .[ x1 , '/'  x2 , '/'  .. , '/'  xn ] ']'").
 
 (* Reserved notation for subscripting and superscripting *)
-Reserved Notation "s `_ i" (at level 3, i at level 2, left associativity,
-  format "s `_ i").
+Reserved Notation "s `_ i" (at level 1, left associativity, format "s `_ i").
 Reserved Notation "x ^-1" (left associativity, format "x ^-1").
 
 (* Reserved notation for integer multipliers and exponents *)
@@ -77,6 +76,21 @@ Reserved Notation "''Z' ( A )" (format "''Z' ( A )").
 (* Compatibility with group action centraliser notation. *)
 Reserved Notation "''C_' ( A ) [ x ]".
 Reserved Notation "''C_' ( B ) ( A )".
+Reserved Notation "''C' [ x | to ]" (format "''C' [ x | to ]").
+Reserved Notation "''C' ( S | to )" (format "''C' ( S | to )").
+Reserved Notation "''C_' A [ x | to ]"
+  (A at level 2, format "''C_' A [ x  |  to ]").
+Reserved Notation "''C_' A ( S | to )"
+  (A at level 2, format "''C_' A ( S  |  to )").
+Reserved Notation "''C_' ( A ) [ x | to ]".
+Reserved Notation "''C_' ( A ) ( S | to )".
+Reserved Notation "''C_' ( | to ) [ a ]" (format "''C_' ( | to ) [ a ]").
+Reserved Notation "''C_' ( G | to ) [ a ]" (format "''C_' ( G  |  to ) [ a ]").
+Reserved Notation "''C_' ( | to ) ( A )" (format "''C_' ( | to ) ( A )").
+Reserved Notation "''C_' ( G | to ) ( A )" (format "''C_' ( G  |  to ) ( A )").
+
+(* Bionomial coefficient *)
+Reserved Notation "''C' ( n , m )" (format "''C' ( n ,  m )").
 
 (* Reserved notation for Euclidean division and divisibility. *)
 Reserved Notation "m %/ d" (at level 40, no associativity).
@@ -100,7 +114,7 @@ Reserved Notation "a ^` ()" (format "a ^` ()").
 Reserved Notation "a ^` ( n )" (format "a ^` ( n )").
 
 (* Reserved notation for absolute value. *)
-Reserved Notation  "`| x |" (x at level 99, format "`| x |").
+Reserved Notation  "`| x |" (format "`| x |").
 
 (* Reserved notation for conditional comparison *)
 Reserved Notation "x <= y ?= 'iff' c" (c at next level,
