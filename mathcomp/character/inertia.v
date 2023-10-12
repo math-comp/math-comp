@@ -36,9 +36,9 @@ Local Open Scope ring_scope.
 (******************************************************************************)
 
 Reserved Notation "''I[' phi ]"
-  (at level 8, format "''I[' phi ]").
+  (at level 0, format "''I[' phi ]").
 Reserved Notation "''I_' G [ phi ]"
-  (at level 8, G at level 2, format "''I_' G [ phi ]").
+  (at level 0, G at level 2, format "''I_' G [ phi ]").
 
 Section ConjDef.
 

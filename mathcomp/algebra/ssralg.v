@@ -523,11 +523,11 @@ Reserved Notation "+%R" (at level 0).
 Reserved Notation "-%R" (at level 0).
 Reserved Notation "*%R" (at level 0, format " *%R").
 Reserved Notation "*:%R" (at level 0, format " *:%R").
-Reserved Notation "n %:R" (at level 2, left associativity, format "n %:R").
-Reserved Notation "k %:A" (at level 2, left associativity, format "k %:A").
+Reserved Notation "n %:R" (at level 1, left associativity, format "n %:R").
+Reserved Notation "k %:A" (at level 1, left associativity, format "k %:A").
 Reserved Notation "[ 'char' F ]" (at level 0, format "[ 'char'  F ]").
 
-Reserved Notation "x %:T" (at level 2, left associativity, format "x %:T").
+Reserved Notation "x %:T" (at level 1, left associativity, format "x %:T").
 Reserved Notation "''X_' i" (at level 8, i at level 2, format "''X_' i").
 (* Patch for recurring Coq parser bug: Coq seg faults when a level 200 *)
 (* notation is used as a pattern.                                      *)
@@ -538,7 +538,7 @@ Reserved Notation "''forall' ''X_' i , f"
   (at level 199, i at level 2, right associativity,
    format "'[hv' ''forall'  ''X_' i , '/ '  f ']'").
 
-Reserved Notation "x ^f" (at level 2, left associativity, format "x ^f").
+Reserved Notation "x ^f" (at level 1, left associativity, format "x ^f").
 
 Reserved Notation "\0" (at level 0).
 Reserved Notation "f \+ g" (at level 50, left associativity).
@@ -956,7 +956,7 @@ Local Notation "[ 'char' R ]" := (char (Phant R)) : ring_scope.
 
 (* Converse ring tag. *)
 Definition converse R : Type := R.
-Local Notation "R ^c" := (converse R) (at level 2, format "R ^c") : type_scope.
+Local Notation "R ^c" := (converse R) (at level 1, format "R ^c") : type_scope.
 
 Section SemiRingTheory.
 
@@ -1736,7 +1736,7 @@ Local Notation "k %:A" := (k *: 1) : ring_scope.
 
 (* Regular ring algebra tag. *)
 Definition regular R : Type := R.
-Local Notation "R ^o" := (regular R) (at level 2, format "R ^o") : type_scope.
+Local Notation "R ^o" := (regular R) (at level 1, format "R ^o") : type_scope.
 
 Module RegularLalgExports.
 Section LalgebraTheory.
@@ -6221,8 +6221,8 @@ Notation "\prod_ ( i 'in' A | P ) F" :=
 Notation "\prod_ ( i 'in' A ) F" :=
   (\big[*%R/1%R]_(i in A) F%R) : ring_scope.
 
-Notation "R ^c" := (converse R) (at level 2, format "R ^c") : type_scope.
-Notation "R ^o" := (regular R) (at level 2, format "R ^o") : type_scope.
+Notation "R ^c" := (converse R) (at level 1, format "R ^c") : type_scope.
+Notation "R ^o" := (regular R) (at level 1, format "R ^o") : type_scope.
 
 Bind Scope term_scope with term.
 Bind Scope term_scope with formula.

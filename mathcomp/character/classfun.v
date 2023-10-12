@@ -99,20 +99,21 @@ Import Order.TTheory GroupScope GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 Delimit Scope cfun_scope with CF.
 
-Reserved Notation "''CF' ( G , A )" (at level 8, format "''CF' ( G ,  A )").
-Reserved Notation "''CF' ( G )" (at level 8, format "''CF' ( G )").
+Reserved Notation "''CF' ( G , A )" (at level 0, format "''CF' ( G ,  A )").
+Reserved Notation "''CF' ( G )" (at level 0, format "''CF' ( G )").
 Reserved Notation "''1_' G" (at level 8, G at level 2, format "''1_' G").
-Reserved Notation "''Res[' H , G ]" (at level 8). (* only parsing *)
-Reserved Notation "''Res[' H ]" (at level 8, format "''Res[' H ]").
-Reserved Notation "''Res'" (at level 8). (* only parsing *)
-Reserved Notation "''Ind[' G , H ]" (at level 8). (* only parsing *)
-Reserved Notation "''Ind[' G ]" (at level 8). (* only "''Ind[' G ]" *)
-Reserved Notation "''Ind'" (at level 8). (* only parsing *)
-Reserved Notation "'[ phi , psi ]_ G" (at level 2). (* only parsing *)
+Reserved Notation "''Res[' H , G ]" (at level 0). (* only parsing *)
+Reserved Notation "''Res[' H ]" (at level 0, format "''Res[' H ]").
+Reserved Notation "''Res'" (at level 0). (* only parsing *)
+Reserved Notation "''Ind[' G , H ]" (at level 0). (* only parsing *)
+Reserved Notation "''Ind[' G ]" (at level 0). (* only "''Ind[' G ]" *)
+Reserved Notation "''Ind'" (at level 0). (* only parsing *)
+Reserved Notation "'[ phi , psi ]_ G"
+  (at level 0, G at level 2). (* only parsing *)
 Reserved Notation "'[ phi , psi ]"
-  (at level 2, format "'[hv' ''[' phi , '/ '  psi ] ']'").
-Reserved Notation "'[ phi ]_ G" (at level 2). (* only parsing *)
-Reserved Notation "'[ phi ]" (at level 2, format "''[' phi ]").
+  (at level 0, format "'[hv' ''[' phi , '/ '  psi ] ']'").
+Reserved Notation "'[ phi ]_ G" (at level 0, G at level 2). (* only parsing *)
+Reserved Notation "'[ phi ]" (at level 0, format "''[' phi ]").
 Reserved Notation "phi ^u" (at level 3, format "phi ^u").
 
 Section AlgC.

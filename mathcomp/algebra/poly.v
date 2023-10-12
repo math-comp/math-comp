@@ -117,15 +117,15 @@ Import GRing.Theory.
 Local Open Scope ring_scope.
 
 Reserved Notation "{ 'poly' T }" (at level 0, format "{ 'poly'  T }").
-Reserved Notation "c %:P" (at level 2, format "c %:P").
-Reserved Notation "p ^:P" (at level 2, format "p ^:P").
+Reserved Notation "c %:P" (at level 1, format "c %:P").
+Reserved Notation "p ^:P" (at level 1, format "p ^:P").
 Reserved Notation "'X" (at level 0).
 Reserved Notation "''X^' n" (at level 3, n at level 2, format "''X^' n").
 Reserved Notation "\poly_ ( i < n ) E"
-  (at level 36, E at level 36, i, n at level 50,
+  (at level 34, E at level 36, i, n at level 50,
    format "\poly_ ( i  <  n )  E").
 Reserved Notation "p \Po q" (at level 50).
-Reserved Notation "p ^`N ( n )" (at level 8, format "p ^`N ( n )").
+Reserved Notation "p ^`N ( n )" (at level 1, format "p ^`N ( n )").
 Reserved Notation "n .-unity_root" (at level 2, format "n .-unity_root").
 Reserved Notation "n .-primitive_root"
   (at level 2, format "n .-primitive_root").
@@ -1501,7 +1501,7 @@ Proof. by apply/polyP=> i; rewrite coef_deriv coef0 coefC mul0rn. Qed.
 Lemma derivX : ('X)^`() = 1.
 Proof. by apply/polyP=> [[|i]]; rewrite coef_deriv coef1 coefX ?mul0rn. Qed.
 
-Lemma derivXn n : 'X^n^`() = 'X^n.-1 *+ n.
+Lemma derivXn n : ('X^n)^`() = 'X^n.-1 *+ n.
 Proof.
 case: n => [|n]; first exact: derivC.
 apply/polyP=> i; rewrite coef_deriv coefMn !coefXn eqSS.
@@ -1617,7 +1617,7 @@ Proof. exact: linearN. Qed.
 Lemma derivnZ n : scalable (derivn n).
 Proof. exact: linearZZ. Qed.
 
-Lemma derivnXn m n : 'X^m^`(n) = 'X^(m - n) *+ m ^_ n.
+Lemma derivnXn m n : ('X^m)^`(n) = 'X^(m - n) *+ m ^_ n.
 Proof.
 apply/polyP=>i; rewrite coef_derivn coefMn !coefXn.
 case: (ltnP m n) => [lt_m_n | le_m_n].
@@ -1680,7 +1680,7 @@ apply/polyP=> i; rewrite coef_nderivn.
 by case: n => [|n]; rewrite ?bin0 // coef0 coefC mul0rn.
 Qed.
 
-Lemma nderivnXn m n : 'X^m^`N(n) = 'X^(m - n) *+ 'C(m, n).
+Lemma nderivnXn m n : ('X^m)^`N(n) = 'X^(m - n) *+ 'C(m, n).
 Proof.
 apply/polyP=> i; rewrite coef_nderivn coefMn !coefXn.
 have [lt_m_n | le_n_m] := ltnP m n.

@@ -180,8 +180,7 @@ Arguments binomial_rec : simpl nomatch.
 
 Definition binomial := nosimpl binomial_rec.
 
-Notation "''C' ( n , m )" := (binomial n m)
-  (at level 8, format "''C' ( n ,  m )") : nat_scope.
+Notation "''C' ( n , m )" := (binomial n m) : nat_scope.
 
 Lemma binE : binomial = binomial_rec. Proof. by []. Qed.
 

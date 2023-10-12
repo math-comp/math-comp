@@ -53,10 +53,10 @@ Arguments lower_central_at n%N {gT} A%g.
 Arguments upper_central_at n%N {gT} A%g.
 
 Notation "''L_' n ( G )" := (lower_central_at n G)
-  (at level 8, n at level 2, format "''L_' n ( G )") : group_scope.
+  (at level 0, n at level 2, format "''L_' n ( G )") : group_scope.
 
 Notation "''Z_' n ( G )" := (upper_central_at n G)
-  (at level 8, n at level 2, format "''Z_' n ( G )") : group_scope.
+  (at level 0, n at level 2, format "''Z_' n ( G )") : group_scope.
 
 Section PropertiesDefs.
 

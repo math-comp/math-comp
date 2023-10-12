@@ -164,9 +164,9 @@ Arguments pi_arg_of_fin_pred {T pT} A /.
 Definition pi_of (n : pi_arg) : nat_pred := [pred p in primes n].
 
 Notation "\pi ( n )" := (pi_of n)
-  (at level 2, format "\pi ( n )") : nat_scope.
+  (at level 0, format "\pi ( n )") : nat_scope.
 Notation "\p 'i' ( A )" := \pi(#|A|)
-  (at level 2, format "\p 'i' ( A )") : nat_scope.
+  (at level 0, format "\p 'i' ( A )") : nat_scope.
 
 Definition pdiv n := head 1 (primes n).
 
@@ -1036,9 +1036,9 @@ Definition partn := \prod_(0 <= p < n.+1 | p \in pi) p ^ logn p n.
 
 End NatPreds.
 
-Notation "pi ^'" := (negn pi) (at level 2, format "pi ^'") : nat_scope.
+Notation "pi ^'" := (negn pi) (at level 1, format "pi ^'") : nat_scope.
 
-Notation "pi .-nat" := (pnat pi) (at level 2, format "pi .-nat") : nat_scope.
+Notation "pi .-nat" := (pnat pi) (at level 1, format "pi .-nat") : nat_scope.
 
 Notation "n `_ pi" := (partn n pi) : nat_scope.
 

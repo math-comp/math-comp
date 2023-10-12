@@ -154,14 +154,14 @@ Reserved Notation "[ ~ x1 , x2 , .. , xn ]" (at level 0,
 Reserved Notation "[ 1 gT ]" (at level 0, format "[ 1  gT ]").
 Reserved Notation "[ 1 ]" (at level 0, format "[ 1 ]").
 Reserved Notation "[ 'subg' G ]" (at level 0, format "[ 'subg'  G ]").
-Reserved Notation "A ^#" (at level 2, format "A ^#").
+Reserved Notation "A ^#" (at level 1, format "A ^#").
 Reserved Notation "A :^ x" (at level 35, right associativity).
 Reserved Notation "x ^: B" (at level 35, right associativity).
 Reserved Notation "A :^: B" (at level 35, right associativity).
 Reserved Notation "#| B : A |" (at level 0, B, A at level 99,
   format "#| B  :  A |").
-Reserved Notation "''N' ( A )" (at level 8, format "''N' ( A )").
-Reserved Notation "''N_' G ( A )" (at level 8, G at level 2,
+Reserved Notation "''N' ( A )" (at level 0, format "''N' ( A )").
+Reserved Notation "''N_' G ( A )" (at level 0, G at level 2,
   format "''N_' G ( A )").
 Reserved Notation "A <| B" (at level 70, no associativity).
 Reserved Notation "A <*> B" (at level 40, left associativity).

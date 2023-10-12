@@ -48,7 +48,7 @@ Declare Scope int_scope.
 Declare Scope distn_scope.
 Declare Scope rat_scope.
 
-Reserved Notation "n %:Z" (at level 2, left associativity, format "n %:Z").
+Reserved Notation "n %:Z" (at level 1, left associativity, format "n %:Z").
 Reserved Notation "n = m :> 'int'"
   (at level 70, m at next level, format "n  =  m  :>  'int'").
 Reserved Notation "n == m :> 'int'"
@@ -529,7 +529,7 @@ Notation "x *~ n" := (intmul x n)
   (at level 40, left associativity, format "x  *~  n") : ring_scope.
 Notation intr := ( *~%R 1).
 Notation "n %:~R" := (1 *~ n)%R
-  (at level 2, left associativity, format "n %:~R")  : ring_scope.
+  (at level 1, left associativity, format "n %:~R")  : ring_scope.
 
 Lemma pmulrn (R : zmodType) (x : R) (n : nat) : x *+ n = x *~ n%:Z.
 Proof. by []. Qed.
@@ -1037,7 +1037,7 @@ Local Coercion Posz : nat >-> int.
 
 Lemma exprnP x (n : nat) : x ^+ n = x ^ n. Proof. by []. Qed.
 
-Lemma exprnN x (n : nat) : x ^- n = x ^ -n%:Z.
+Lemma exprnN x (n : nat) : x ^- n = x ^ (-n%:Z).
 Proof. by case: n=> //; rewrite oppr0 expr0 invr1. Qed.
 
 Lemma expr0z x : x ^ 0 = 1. Proof. by []. Qed.

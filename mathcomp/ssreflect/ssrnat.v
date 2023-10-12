@@ -149,18 +149,18 @@ Delimit Scope nat_rec_scope with Nrec.
 Notation succn := Datatypes.S.
 Notation predn := Peano.pred.
 
-Notation "n .+1" := (succn n) (at level 2, left associativity,
+Notation "n .+1" := (succn n) (at level 1, left associativity,
   format "n .+1") : nat_scope.
-Notation "n .+2" := n.+1.+1 (at level 2, left associativity,
+Notation "n .+2" := n.+1.+1 (at level 1, left associativity,
   format "n .+2") : nat_scope.
-Notation "n .+3" := n.+2.+1 (at level 2, left associativity,
+Notation "n .+3" := n.+2.+1 (at level 1, left associativity,
   format "n .+3") : nat_scope.
-Notation "n .+4" := n.+2.+2 (at level 2, left associativity,
+Notation "n .+4" := n.+2.+2 (at level 1, left associativity,
   format "n .+4") : nat_scope.
 
-Notation "n .-1" := (predn n) (at level 2, left associativity,
+Notation "n .-1" := (predn n) (at level 1, left associativity,
   format "n .-1") : nat_scope.
-Notation "n .-2" := n.-1.-1 (at level 2, left associativity,
+Notation "n .-2" := n.-1.-1 (at level 1, left associativity,
   format "n .-2") : nat_scope.
 
 Lemma succnK : cancel succn predn. Proof. by []. Qed.
@@ -168,8 +168,8 @@ Lemma succn_inj : injective succn. Proof. by move=> n m []. Qed.
 
 (* Predeclare postfix doubling/halving operators. *)
 
-Reserved Notation "n .*2" (at level 2, left associativity, format "n .*2").
-Reserved Notation "n ./2" (at level 2, left associativity, format "n ./2").
+Reserved Notation "n .*2" (at level 1, left associativity, format "n .*2").
+Reserved Notation "n ./2" (at level 1, left associativity, format "n ./2").
 
 (* Canonical comparison and eqType for nat.                                *)
 

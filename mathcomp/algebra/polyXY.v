@@ -47,9 +47,9 @@ Local Notation "p ^ f" := (map_poly f p) : ring_scope.
 Local Notation eval := horner_eval.
 
 Notation "'Y" := 'X%:P : ring_scope.
-Notation "p ^:P" := (p ^ polyC) (at level 2, format "p ^:P") : ring_scope.
+Notation "p ^:P" := (p ^ polyC) (at level 1, format "p ^:P") : ring_scope.
 Notation "p .[ x , y ]" := (p.[x%:P].[y])
-  (at level 2, left associativity, format "p .[ x ,  y ]") : ring_scope.
+  (at level 1, left associativity, format "p .[ x ,  y ]") : ring_scope.
 
 Section PolyXY_Ring.
 
