@@ -106,18 +106,15 @@ Arguments extraspecial {gT} A%_g.
 Arguments SCN {gT} B%_g.
 Arguments SCN_at {gT} n%_N B%_g.
 
-Notation "''Phi' ( A )" := (Frattini A)
-  (at level 8, format "''Phi' ( A )") : group_scope.
+Notation "''Phi' ( A )" := (Frattini A) (format "''Phi' ( A )") : group_scope.
 Notation "''Phi' ( G )" := (Frattini_group G) : Group_scope.
 
-Notation "''F' ( G )" := (Fitting G)
-  (at level 8, format "''F' ( G )") : group_scope.
+Notation "''F' ( G )" := (Fitting G) (format "''F' ( G )") : group_scope.
 Notation "''F' ( G )" := (Fitting_group G) : Group_scope.
 
-Notation "''SCN' ( B )" := (SCN B)
-  (at level 8, format "''SCN' ( B )") : group_scope.
+Notation "''SCN' ( B )" := (SCN B) (format "''SCN' ( B )") : group_scope.
 Notation "''SCN_' n ( B )" := (SCN_at n B)
-  (at level 8, n at level 2, format "''SCN_' n ( B )") : group_scope.
+  (n at level 2, format "''SCN_' n ( B )") : group_scope.
 
 Section PMax.
 

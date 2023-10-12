@@ -994,7 +994,7 @@ Local Coercion Posz : nat >-> int.
 
 Lemma exprnP x (n : nat) : x ^+ n = x ^ n. Proof. by []. Qed.
 
-Lemma exprnN x (n : nat) : x ^- n = x ^ -n%:Z.
+Lemma exprnN x (n : nat) : x ^- n = x ^ (-n%:Z).
 Proof. by case: n=> //; rewrite oppr0 expr0 invr1. Qed.
 
 Lemma expr0z x : x ^ 0 = 1. Proof. by []. Qed.

@@ -121,9 +121,9 @@ Reserved Notation "{ 'poly' T }" (format "{ 'poly'  T }").
 Reserved Notation "c %:P" (format "c %:P").
 Reserved Notation "p ^:P" (format "p ^:P").
 Reserved Notation "'X".
-Reserved Notation "''X^' n" (at level 3, n at level 2, format "''X^' n").
+Reserved Notation "''X^' n" (at level 1, format "''X^' n").
 Reserved Notation "\poly_ ( i < n ) E"
-  (at level 36, E at level 36, i, n at level 50,
+  (at level 34, E at level 36, i, n at level 50,
    format "\poly_ ( i  <  n )  E").
 Reserved Notation "p \Po q" (at level 50).
 Reserved Notation "p ^`N ( n )" (format "p ^`N ( n )").
@@ -1564,7 +1564,7 @@ Proof. by apply/polyP=> i; rewrite coef_deriv coef0 coefC mul0rn. Qed.
 Lemma derivX : ('X)^`() = 1.
 Proof. by apply/polyP=> [[|i]]; rewrite coef_deriv coef1 coefX ?mul0rn. Qed.
 
-Lemma derivXn n : ('X^n)^`() = 'X^n.-1 *+ n.
+Lemma derivXn n : ('X^n)^`() = 'X^(n.-1) *+ n.
 Proof.
 case: n => [|n]; first exact: derivC.
 apply/polyP=> i; rewrite coef_deriv coefMn !coefXn eqSS.
@@ -2615,7 +2615,7 @@ by rewrite -big_mkcond mulr_sumr/=; apply: eq_bigr => I /eqP <-; rewrite prodrN.
 Qed.
 
 Lemma coefPn_prod_XsubC (ps : seq R) : size ps != 0 ->
-  (\prod_(p <- ps) ('X - p%:P))`_((size ps).-1) =
+  (\prod_(p <- ps) ('X - p%:P))`_(size ps).-1 =
   - \sum_(p <- ps) p.
 Proof.
 rewrite coef_prod_XsubC ?leq_pred// => ps0.

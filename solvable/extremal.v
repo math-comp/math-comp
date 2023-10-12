@@ -54,10 +54,10 @@ Unset Printing Implicit Defensive.
 Local Notation "n %:R" := (n %:R%R).
 Import GroupScope GRing.Theory.
 
-Reserved Notation "''Mod_' m" (at level 8, m at level 2, format "''Mod_' m").
-Reserved Notation "''D_' m" (at level 8, m at level 2, format "''D_' m").
-Reserved Notation "''SD_' m" (at level 8, m at level 2, format "''SD_' m").
-Reserved Notation "''Q_' m" (at level 8, m at level 2, format "''Q_' m").
+Reserved Notation "''Mod_' m" (at level 0, m at level 2, format "''Mod_' m").
+Reserved Notation "''D_' m" (at level 0, m at level 2, format "''D_' m").
+Reserved Notation "''SD_' m" (at level 0, m at level 2, format "''SD_' m").
+Reserved Notation "''Q_' m" (at level 0, m at level 2, format "''Q_' m").
 
 Module Extremal.
 

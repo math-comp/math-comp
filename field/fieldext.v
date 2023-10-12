@@ -961,7 +961,7 @@ Variables (F L : fieldType) (iota : {rmorphism F -> L}).
 Variables (z : L) (p : {poly F}).
 
 Local Notation "p ^iota" := (map_poly (GRing.RMorphism.sort iota) p)
-  (at level 2, format "p ^iota") : ring_scope.
+  (format "p ^iota") : ring_scope.
 
 Let wf_p := (p != 0) && root p^iota z.
 Let p0 : {poly F} := if wf_p then (lead_coef p)^-1 *: p else 'X.
@@ -1249,7 +1249,7 @@ Section NonZero.
 
 Hypothesis nz_p : p != 0.
 
-Lemma subfx_inj_eval q : subfx_inj (subfx_eval q) = q^iota.[z].
+Lemma subfx_inj_eval q : subfx_inj (subfx_eval q) = (q^iota).[z].
 Proof.
 by rewrite piE /iotaFz poly_rV_modp_K iotaPz_modp /iotaPz /z0 /wf_p nz_p pz0.
 Qed.

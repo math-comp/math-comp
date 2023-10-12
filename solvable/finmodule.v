@@ -166,7 +166,7 @@ by apply: val_inj; rewrite !fmvalJ ?groupM ?conjgM.
 Qed.
 
 Canonical actr_action := Action actr_is_action.
-Notation "''M'" := actr_action (at level 8) : action_scope.
+Notation "''M'" := actr_action : action_scope.
 
 Lemma act0r x : 0 ^@ x = 0.
 Proof. by rewrite /actr conj1g morph1 if_same. Qed.
@@ -193,7 +193,7 @@ by apply/morphicP=> u v _ _; rewrite !permE /= actAr.
 Qed.
 
 Canonical actr_groupAction := GroupAction actr_is_groupAction.
-Notation "''M'" := actr_groupAction (at level 8) : groupAction_scope.
+Notation "''M'" := actr_groupAction : groupAction_scope.
 
 Lemma actr1 u : u ^@ 1 = u.
 Proof. exact: act1. Qed.
@@ -217,7 +217,7 @@ End OneFinMod.
 Bind Scope ring_scope with fmod_of.
 Prenex Implicits fmval fmod actr.
 Notation "u ^@ x" := (actr u x) : ring_scope.
-Notation "''M'" := actr_action (at level 8) : action_scope.
+Notation "''M'" := actr_action : action_scope.
 Notation "''M'" := actr_groupAction : groupAction_scope.
 
 Module Exports.

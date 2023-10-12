@@ -719,7 +719,7 @@ Lemma real_BSide_max b x y : x \in Num.real -> y \in Num.real ->
   BSide b (Order.max x y) = Order.max (BSide b x) (BSide b y).
 Proof. by move=> xr yr; apply/comparable_BSide_max/real_comparable. Qed.
 
-Lemma mem0_itvcc_xNx x : (0 \in `[- x, x]) = (0 <= x).
+Lemma mem0_itvcc_xNx x : (0 \in `[(- x), x]) = (0 <= x).
 Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_le0 andbb. Qed.
 
 Lemma mem0_itvoo_xNx x : 0 \in `](- x), x[ = (0 < x).
@@ -794,7 +794,7 @@ by move=> /le_trans; apply; rewrite !bnd_simp.
 Qed.
 
 Lemma in_segmentDgt0Pr x y z :
-  reflect (forall e, e > 0 -> y \in `[x - e, z + e]) (y \in `[x, z]).
+  reflect (forall e, e > 0 -> y \in `[(x - e), (z + e)]) (y \in `[x, z]).
 Proof.
 apply/(iffP idP)=> [xyz e /[dup] e_gt0 /ltW e_ge0 | xyz_e].
   by rewrite in_itv /= lerBDr !ler_wpDr// (itvP xyz).

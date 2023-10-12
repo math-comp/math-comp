@@ -118,7 +118,7 @@ Reserved Notation "x != y %[mod_eq e ]"
 #[warning="-postfix-notation-not-level-1"]
 Reserved Notation "x <> y %[mod_eq e ]"
   (no associativity,   format "'[hv ' x '/'  <>  y '/'  %[mod_eq  e ] ']'").
-Reserved Notation "{eq_quot e }" (e at level 0, format "{eq_quot  e }").
+Reserved Notation "{eq_quot e }" (format "{eq_quot  e }").
 
 Delimit Scope quotient_scope with qT.
 Local Open Scope quotient_scope.

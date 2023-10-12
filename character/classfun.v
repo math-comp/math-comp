@@ -107,8 +107,10 @@ Reserved Notation "''Res'". (* only parsing *)
 Reserved Notation "''Ind[' G , H ]". (* only parsing *)
 Reserved Notation "''Ind[' G ]". (* only "''Ind[' G ]" *)
 Reserved Notation "''Ind'". (* only parsing *)
-Reserved Notation "'[ phi , psi ]_ G" (at level 0). (* only parsing *)
-Reserved Notation "'[ phi ]_ G" (at level 0). (* only parsing *)
+Reserved Notation "'[ phi , psi ]_ G"
+  (at level 0, G at level 2). (* only parsing *)
+Reserved Notation "'[ phi ]_ G"
+  (at level 0, G at level 2). (* only parsing *)
 Reserved Notation "phi ^u" (format "phi ^u").
 
 Section AlgC.

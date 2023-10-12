@@ -156,7 +156,7 @@ Notation "''K_' i" := (gring_class_sum _ i)
   (at level 8, i at level 2, format "''K_' i") : ring_scope.
 
 Notation "''omega_' i [ A ]" := (xcfun (gring_irr_mode i) A)
-  (at level 8, i at level 2, format "''omega_' i [ A ]") : ring_scope.
+  (i at level 2, format "''omega_' i [ A ]") : ring_scope.
 
 Section IntegralChar.
 

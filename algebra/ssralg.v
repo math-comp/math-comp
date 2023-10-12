@@ -684,6 +684,9 @@ Reserved Notation "'{' 'linear' U '->' V '}'"
    format "{ 'linear'  U  ->  V }").
 Reserved Notation "'{' 'scalar' U '}'" (format "{ 'scalar'  U }").
 
+Reserved Notation "R ^c" (format "R ^c").
+Reserved Notation "R ^o" (format "R ^o").
+
 Declare Scope ring_scope.
 Delimit Scope ring_scope with R.
 Declare Scope term_scope.
@@ -1047,7 +1050,7 @@ Notation has_char0 L := (has_pchar0 L) (only parsing).
 
 (* Converse ring tag. *)
 Definition converse R : Type := R.
-Local Notation "R ^c" := (converse R) (at level 2, format "R ^c") : type_scope.
+Local Notation "R ^c" := (converse R) : type_scope.
 
 Section PzSemiRingTheory.
 
@@ -2069,7 +2072,7 @@ HB.end.
 
 (* Regular ring algebra tag. *)
 Definition regular R : Type := R.
-Local Notation "R ^o" := (regular R) (at level 2, format "R ^o") : type_scope.
+Local Notation "R ^o" := (regular R) : type_scope.
 
 Section RegularAlgebra.
 #[export]
@@ -4343,7 +4346,7 @@ Qed.
 Lemma dnf_to_rform bcs : rformula (dnf_to_form bcs) = all dnf_rterm bcs.
 Proof.
 elim: bcs => //= [[cl1 cl2] bcs ->]; rewrite {2}/dnf_rterm /=; congr (_ && _).
-by congr andb; [elim: cl1 | elim: cl2] => //= t cl ->; rewrite andbT.
+by (congr andb; [elim: cl1 | elim: cl2]) => //= t cl ->; rewrite andbT.
 Qed.
 
 Section If.
@@ -7194,8 +7197,8 @@ Notation "\prod_ ( i 'in' A | P ) F" :=
 Notation "\prod_ ( i 'in' A ) F" :=
   (\big[*%R/1%R]_(i in A) F%R) : ring_scope.
 
-Notation "R ^c" := (converse R) (at level 2, format "R ^c") : type_scope.
-Notation "R ^o" := (regular R) (at level 2, format "R ^o") : type_scope.
+Notation "R ^c" := (converse R) : type_scope.
+Notation "R ^o" := (regular R) : type_scope.
 
 Bind Scope term_scope with term.
 Bind Scope term_scope with formula.
