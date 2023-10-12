@@ -121,9 +121,9 @@ Reserved Notation "{ 'poly' T }" (format "{ 'poly'  T }").
 Reserved Notation "c %:P" (format "c %:P").
 Reserved Notation "p ^:P" (format "p ^:P").
 Reserved Notation "'X".
-Reserved Notation "''X^' n" (at level 3, n at level 2, format "''X^' n").
+Reserved Notation "''X^' n" (at level 1, format "''X^' n").
 Reserved Notation "\poly_ ( i < n ) E"
-  (at level 36, E at level 36, i, n at level 50,
+  (at level 34, E at level 36, i, n at level 50,
    format "\poly_ ( i  <  n )  E").
 Reserved Notation "p \Po q" (at level 50).
 Reserved Notation "p ^`N ( n )" (format "p ^`N ( n )").
@@ -162,8 +162,8 @@ Section SemiPolynomialTheory.
 Variable R : nzSemiRingType.
 Implicit Types (a b c x y z : R) (p q r d : {poly R}).
 
-Definition lead_coef p := p`_(size p).-1.
-Lemma lead_coefE p : lead_coef p = p`_(size p).-1. Proof. by []. Qed.
+Definition lead_coef p := p`_((size p).-1).
+Lemma lead_coefE p : lead_coef p = p`_((size p).-1). Proof. by []. Qed.
 
 Definition poly_nil := @Polynomial R [::] (oner_neq0 R).
 Definition polyC c : {poly R} := insubd poly_nil [:: c].
@@ -220,7 +220,7 @@ Lemma size_cons_poly c p :
   size (cons_poly c p) = (if nilp p && (c == 0) then 0 else (size p).+1).
 Proof. by case: p => [[|c' s] _] //=; rewrite size_polyC; case: eqP. Qed.
 
-Lemma coef_cons c p i : (cons_poly c p)`_i = if i == 0 then c else p`_i.-1.
+Lemma coef_cons c p i : (cons_poly c p)`_i = if i == 0 then c else p`_(i.-1).
 Proof.
 by case: p i => [[|c' s] _] [] //=; rewrite polyseqC; case: eqP => //= _ [].
 Qed.
@@ -525,7 +525,7 @@ Lemma size_polyMleq p q : size (p * q) <= (size p + size q).-1.
 Proof. by rewrite -[*%R]/mul_poly unlock size_poly. Qed.
 
 Lemma mul_lead_coef p q :
-  lead_coef p * lead_coef q = (p * q)`_(size p + size q).-2.
+  lead_coef p * lead_coef q = (p * q)`_((size p + size q).-2).
 Proof.
 pose dp := (size p).-1; pose dq := (size q).-1.
 have [-> | nz_p] := eqVneq p 0; first by rewrite lead_coef0 !mul0r coef0.
@@ -787,14 +787,14 @@ apply/polyP=> i; rewrite coefMr coefM.
 by apply: eq_bigr => j _; rewrite coefX commr_nat.
 Qed.
 
-Lemma coefMX p i : (p * 'X)`_i = (if (i == 0)%N then 0 else p`_i.-1).
+Lemma coefMX p i : (p * 'X)`_i = (if (i == 0)%N then 0 else p`_(i.-1)).
 Proof.
 rewrite coefMr big_ord_recl coefX ?simp.
 case: i => [|i]; rewrite ?big_ord0 //= big_ord_recl polyseqX subn1 /=.
 by rewrite big1 ?simp // => j _; rewrite nth_nil !simp.
 Qed.
 
-Lemma coefXM p i : ('X * p)`_i = (if (i == 0)%N then 0 else p`_i.-1).
+Lemma coefXM p i : ('X * p)`_i = (if (i == 0)%N then 0 else p`_(i.-1)).
 Proof. by rewrite -commr_polyX coefMX. Qed.
 
 Lemma cons_poly_def p a : cons_poly a p = p * 'X + a%:P.
@@ -1542,11 +1542,11 @@ End PolyOverRing.
 
 (* Single derivative. *)
 
-Definition deriv p := \poly_(i < (size p).-1) (p`_i.+1 *+ i.+1).
+Definition deriv p := \poly_(i < (size p).-1) (p`_(i.+1) *+ i.+1).
 
 Local Notation "a ^` ()" := (deriv a).
 
-Lemma coef_deriv p i : p^`()`_i = p`_i.+1 *+ i.+1.
+Lemma coef_deriv p i : p^`()`_i = p`_(i.+1) *+ i.+1.
 Proof.
 rewrite coef_poly -subn1 ltn_subRL.
 by case: leqP => // /(nth_default 0) ->; rewrite mul0rn.
@@ -1564,7 +1564,7 @@ Proof. by apply/polyP=> i; rewrite coef_deriv coef0 coefC mul0rn. Qed.
 Lemma derivX : ('X)^`() = 1.
 Proof. by apply/polyP=> [[|i]]; rewrite coef_deriv coef1 coefX ?mul0rn. Qed.
 
-Lemma derivXn n : ('X^n)^`() = 'X^n.-1 *+ n.
+Lemma derivXn n : ('X^n)^`() = 'X^(n.-1) *+ n.
 Proof.
 case: n => [|n]; first exact: derivC.
 apply/polyP=> i; rewrite coef_deriv coefMn !coefXn eqSS.
@@ -2319,15 +2319,15 @@ Implicit Type p q : {poly R}.
 
 (* Even part of a polynomial                                                  *)
 
-Definition even_poly p : {poly R} := \poly_(i < uphalf (size p)) p`_i.*2.
+Definition even_poly p : {poly R} := \poly_(i < uphalf (size p)) p`_(i.*2).
 
 Lemma size_even_poly p : size (even_poly p) <= uphalf (size p).
 Proof. exact: size_poly. Qed.
 
-Lemma coef_even_poly p i : (even_poly p)`_i = p`_i.*2.
+Lemma coef_even_poly p i : (even_poly p)`_i = p`_(i.*2).
 Proof. by rewrite coef_poly gtn_uphalf_double if_nth ?leqVgt. Qed.
 
-Lemma even_polyE s p : size p <= s.*2 -> even_poly p = \poly_(i < s) p`_i.*2.
+Lemma even_polyE s p : size p <= s.*2 -> even_poly p = \poly_(i < s) p`_(i.*2).
 Proof.
 move=> pLs2; apply/polyP => i; rewrite coef_even_poly !coef_poly if_nth //.
 by case: ltnP => //= ?; rewrite (leq_trans pLs2) ?leq_double.
@@ -2358,16 +2358,16 @@ Proof. by apply/polyP => i; rewrite coef_even_poly !coefC; case: i. Qed.
 
 (* Odd part of a polynomial                                                   *)
 
-Definition odd_poly p : {poly R} := \poly_(i < (size p)./2) p`_i.*2.+1.
+Definition odd_poly p : {poly R} := \poly_(i < (size p)./2) p`_(i.*2.+1).
 
 Lemma size_odd_poly p : size (odd_poly p) <= (size p)./2.
 Proof. exact: size_poly. Qed.
 
-Lemma coef_odd_poly p i : (odd_poly p)`_i = p`_i.*2.+1.
+Lemma coef_odd_poly p i : (odd_poly p)`_i = p`_(i.*2.+1).
 Proof. by rewrite coef_poly gtn_half_double if_nth ?leqVgt. Qed.
 
 Lemma odd_polyE s p :
-  size p <= s.*2.+1 -> odd_poly p = \poly_(i < s) p`_i.*2.+1.
+  size p <= s.*2.+1 -> odd_poly p = \poly_(i < s) p`_(i.*2.+1).
 Proof.
 move=> pLs2; apply/polyP => i; rewrite coef_odd_poly !coef_poly if_nth //.
 by case: ltnP => //= ?; rewrite (leq_trans pLs2) ?ltnS ?leq_double.

@@ -797,7 +797,7 @@ Qed.
 
 (* This is Isaacs, Theorem (2.12). *)
 Lemma Wedderburn_id_expansion i :
-  'e_i = #|G|%:R^-1 *: \sum_(x in G) 'chi_i 1%g * 'chi_i x^-1%g *: aG x.
+  'e_i = #|G|%:R^-1 *: (\sum_(x in G) 'chi_i 1%g * 'chi_i x^-1%g *: aG x).
 Proof.
 have Rei: ('e_i \in 'R_i)%MS by apply: Wedderburn_id_mem.
 have /envelop_mxP[a def_e]: ('e_i \in R_G)%MS; last rewrite -/aG in def_e.
@@ -2668,7 +2668,7 @@ Proof. by rewrite cforder_lin_char_dvdG ?cfDet_lin_char. Qed.
 End DetOrder.
 
 Notation "''o' ( phi )" := (cfDet_order phi)
-  (at level 8, format "''o' ( phi )") : cfun_scope.
+  (format "''o' ( phi )") : cfun_scope.
 
 Section CfDetOps.
 

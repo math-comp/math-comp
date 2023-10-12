@@ -1095,7 +1095,7 @@ Qed.
 Lemma eq_partn pi1 pi2 n : pi1 =i pi2 -> n`_pi1 = n`_pi2.
 Proof. by move=> pi12; apply: eq_in_partn => p _. Qed.
 
-Lemma partnNK pi n : n`_pi^'^' = n`_pi.
+Lemma partnNK pi n : n`_(pi^'^') = n`_pi.
 Proof. by apply: eq_partn; apply: negnK. Qed.
 
 Lemma widen_partn m pi n :
@@ -1202,7 +1202,7 @@ Proof.
 by move=> ? ? /(@in1W _ predT)/eq_partn_from_log; rewrite !partnT// => ->.
 Qed.
 
-Lemma partnC pi n : n > 0 -> n`_pi * n`_pi^' = n.
+Lemma partnC pi n : n > 0 -> n`_pi * n`_(pi^') = n.
 Proof.
 move=> n_gt0; rewrite -[RHS]partnT /partn //.
 do 2!rewrite mulnC big_mkcond /=; rewrite -big_split; apply: eq_bigr => p _ /=.
@@ -1386,7 +1386,7 @@ Proof.
 by move=> pi'rho pi_m /(sub_in_pnat (in1W pi'rho)); apply: pnat_coprime.
 Qed.
 
-Lemma coprime_partC pi m n : coprime m`_pi n`_pi^'.
+Lemma coprime_partC pi m n : coprime m`_pi n`_(pi^').
 Proof. by apply: (@pnat_coprime pi); apply: part_pnat. Qed.
 
 Lemma pnat_1 pi n : pi.-nat n -> pi^'.-nat n -> n = 1.
@@ -1443,7 +1443,7 @@ Lemma partn_part pi rho n : {subset pi <= rho} -> n`_rho`_pi = n`_pi.
 Proof.
 move=> pi_sub_rho; have [->|n_gt0] := posnP n; first by rewrite !partn0 partn1.
 rewrite -[in RHS](partnC rho n_gt0) partnM //.
-suffices: pi^'.-nat n`_rho^' by move/part_p'nat->; rewrite muln1.
+suffices: pi^'.-nat n`_(rho^') by move/part_p'nat->; rewrite muln1.
 by apply: sub_in_pnat (part_pnat _ _) => q _; apply/contra/pi_sub_rho.
 Qed.
 
@@ -1603,7 +1603,7 @@ elim/ltn_ind: n => // n IHn.
 case: (leqP n 1) => [|lt1n]; first by rewrite unlock; case: (n) => [|[]].
 pose p := pdiv n; have p_pr: prime p by apply: pdiv_prime.
 have p1 := prime_gt1 p_pr; have p0 := ltnW p1.
-pose np := n`_p; pose np' := n`_p^'.
+pose np := n`_p; pose np' := n`_(p^').
 have co_npp': coprime np np' by rewrite coprime_partC.
 have [n0 np0 np'0]: [/\ n > 0, np > 0 & np' > 0] by rewrite ltnW ?part_gt0.
 have def_n: n = np * np' by rewrite partnC.

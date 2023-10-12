@@ -106,8 +106,7 @@ Proof. by case: t. Qed.
 
 End TupleDef.
 
-Notation "n .-tuple" := (tuple_of n)
-  (at level 2, format "n .-tuple") : type_scope.
+Notation "n .-tuple" := (tuple_of n) (format "n .-tuple") : type_scope.
 
 Notation "{ 'tuple' n 'of' T }" := (n.-tuple T : predArgType)
   (only parsing) : type_scope.
@@ -499,8 +498,7 @@ Canonical nil_bseq n T := Bseq (isT : @size T [::] <= n).
 Canonical cons_bseq n T x (t : bseq_of n T) :=
   Bseq (valP t : size (x :: t) <= n.+1).
 
-Notation "n .-bseq" := (bseq_of n)
-  (at level 2, format "n .-bseq") : type_scope.
+Notation "n .-bseq" := (bseq_of n) (format "n .-bseq") : type_scope.
 
 Notation "{ 'bseq' n 'of' T }" := (n.-bseq T : predArgType)
   (only parsing) : type_scope.

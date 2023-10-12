@@ -250,7 +250,7 @@ suffices m_x: m %| #[x] by rewrite -oxm orderXdiv // mulnC divnK.
 apply/dvdn_partP=> // p; rewrite mem_primes => /and3P[p_pr _ p_m].
 have n_p: p \in \pi(n) by apply: (pnatP _ _ n_m).
 have p_oxm: p %| #[x ^+ (p ^ logn p m)].
-  apply: dvdn_trans (orderXdvd _ m`_p^'); rewrite -expgM -p_part ?partnC //.
+  apply: dvdn_trans (orderXdvd _ m`_(p^')); rewrite -expgM -p_part ?partnC //.
   by rewrite oxm; rewrite mem_primes in n_p; case/and3P: n_p.
 by rewrite (orderXpfactor (erefl _) p_pr p_oxm) p_part // dvdn_mulr.
 Qed.
@@ -309,7 +309,7 @@ Prenex Implicits cyclic Zpm.
 (* Euler's theorem *)
 Theorem Euler_exp_totient a n : coprime a n -> a ^ totient n  = 1 %[mod n].
 Proof.
-case: n => [|[|n']] //; [by rewrite !modn1 | set n := n'.+2] => co_a_n.
+(case: n => [|[|n']] //; [by rewrite !modn1 | set n := n'.+2]) => co_a_n.
 have{co_a_n} Ua: coprime n (inZp a : 'I_n) by rewrite coprime_sym coprime_modl.
 have: FinRing.unit 'Z_n Ua ^+ totient n == 1.
   by rewrite -card_units_Zp // -order_dvdn order_dvdG ?inE.

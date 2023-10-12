@@ -285,8 +285,6 @@ Delimit Scope fin_quant_scope with Q. (* Bogus, only used to declare scope. *)
 Bind Scope fin_quant_scope with quantified.
 
 Notation "F ^*" := (Quantified F).
-#[warning="-notation-incompatible-prefix"]
-Notation "F ^~" := (~~ F) (at level 2).
 
 Section Definitions.
 
@@ -299,8 +297,8 @@ Definition quant0b Bp := pred0b [pred x : T | let: F^* := Bp x x in F].
 Definition ex B x y := B.
 (* Binding the predicate value rather than projecting it prevents spurious    *)
 (* unfolding of the boolean connectives by unification.                       *)
-Definition all B x y := let: F^* := B in F^~^*.
-Definition all_in C B x y := let: F^* := B in (C ==> F)^~^*.
+Definition all B x y := let: F^* := B in (~~ F)^*.
+Definition all_in C B x y := let: F^* := B in (~~ (C ==> F))^*.
 Definition ex_in C B x y :=  let: F^* := B in (C && F)^*.
 
 End Definitions.
@@ -340,31 +338,31 @@ Notation ", 'forall' x 'in' A B" := [x | all_in (x \in A) B]^*
 Notation ", 'forall' x : T 'in' A B" := [x : T | all_in (x \in A) B]^*
   (only parsing) : bool_scope.
 
-Notation "[ 'exists' x B ]" := [x | ex B]^~
+Notation "[ 'exists' x B ]" := (~~ [x | ex B])
   (x at level 99,
    format "[ '[hv' 'exists'  x B ] ']'") : bool_scope.
-Notation "[ 'exists' x : T B ]" := [x : T | ex B]^~ (only parsing) : bool_scope.
-Notation "[ 'exists' ( x | C ) B ]" := [x | ex_in C B]^~
+Notation "[ 'exists' x : T B ]" := (~~ [x : T | ex B]) (only parsing) : bool_scope.
+Notation "[ 'exists' ( x | C ) B ]" := (~~ [x | ex_in C B])
   (x at level 99,
    format "[ '[hv' '[' 'exists'  ( x '/  '  |  C ) ']' B ] ']'") : bool_scope.
-Notation "[ 'exists' ( x : T | C ) B ]" := [x : T | ex_in C B]^~
+Notation "[ 'exists' ( x : T | C ) B ]" := (~~ [x : T | ex_in C B])
   (only parsing) : bool_scope.
-Notation "[ 'exists' x 'in' A B ]" := [x | ex_in (x \in A) B]^~
+Notation "[ 'exists' x 'in' A B ]" := (~~ [x | ex_in (x \in A) B])
   (format "[ '[hv' '[' 'exists'  x '/  '  'in'  A ']' B ] ']'") : bool_scope.
-Notation "[ 'exists' x : T 'in' A B ]" := [x : T | ex_in (x \in A) B]^~
+Notation "[ 'exists' x : T 'in' A B ]" := (~~ [x : T | ex_in (x \in A) B])
   (only parsing) : bool_scope.
-Notation ", 'exists' x B" := [x | ex B]^~^*
+Notation ", 'exists' x B" := (~~ [x | ex B])^*
   (x at level 99, format ", '/ '  'exists'  x B") : fin_quant_scope.
-Notation ", 'exists' x : T B" := [x : T | ex B]^~^*
+Notation ", 'exists' x : T B" := (~~ [x : T | ex B])^*
   (only parsing) : fin_quant_scope.
-Notation ", 'exists' ( x | C ) B" := [x | ex_in C B]^~^*
+Notation ", 'exists' ( x | C ) B" := (~~ [x | ex_in C B])^*
   (x at level 99,
    format ", '/ '  '[' 'exists'  ( x '/  '  |  C ) ']' B") : fin_quant_scope.
-Notation ", 'exists' ( x : T | C ) B" := [x : T | ex_in C B]^~^*
+Notation ", 'exists' ( x : T | C ) B" := (~~ [x : T | ex_in C B])^*
   (only parsing) : fin_quant_scope.
-Notation ", 'exists' x 'in' A B" := [x | ex_in (x \in A) B]^~^*
+Notation ", 'exists' x 'in' A B" := (~~ [x | ex_in (x \in A) B])^*
   (format ", '/ '  '[' 'exists'  x '/  '  'in'  A ']' B") : bool_scope.
-Notation ", 'exists' x : T 'in' A B" := [x : T | ex_in (x \in A) B]^~^*
+Notation ", 'exists' x : T 'in' A B" := (~~ [x : T | ex_in (x \in A) B])^*
   (only parsing) : bool_scope.
 
 End Exports.

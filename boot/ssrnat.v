@@ -145,19 +145,13 @@ Delimit Scope nat_scope with N.
 Notation succn := Datatypes.S.
 Notation predn := Peano.pred.
 
-Notation "n .+1" := (succn n) (at level 2, left associativity,
-  format "n .+1") : nat_scope.
-Notation "n .+2" := n.+1.+1 (at level 2, left associativity,
-  format "n .+2") : nat_scope.
-Notation "n .+3" := n.+2.+1 (at level 2, left associativity,
-  format "n .+3") : nat_scope.
-Notation "n .+4" := n.+2.+2 (at level 2, left associativity,
-  format "n .+4") : nat_scope.
+Notation "n .+1" := (succn n) (left associativity, format "n .+1") : nat_scope.
+Notation "n .+2" := n.+1.+1 (left associativity, format "n .+2") : nat_scope.
+Notation "n .+3" := n.+2.+1 (left associativity, format "n .+3") : nat_scope.
+Notation "n .+4" := n.+2.+2 (left associativity, format "n .+4") : nat_scope.
 
-Notation "n .-1" := (predn n) (at level 2, left associativity,
-  format "n .-1") : nat_scope.
-Notation "n .-2" := n.-1.-1 (at level 2, left associativity,
-  format "n .-2") : nat_scope.
+Notation "n .-1" := (predn n) (left associativity, format "n .-1") : nat_scope.
+Notation "n .-2" := n.-1.-1 (left associativity, format "n .-2") : nat_scope.
 
 Lemma succnK : cancel succn predn. Proof. by []. Qed.
 Lemma succn_inj : injective succn. Proof. by move=> n m []. Qed.
@@ -1333,7 +1327,7 @@ Arguments factorial : simpl never.
 #[deprecated(since="mathcomp 2.3.0", note="Use factorial instead.")]
 Definition fact_rec := factorial.
 
-Notation "n `!" := (factorial n) (at level 2, format "n `!") : nat_scope.
+Notation "n `!" := (factorial n) (at level 1, format "n `!") : nat_scope.
 
 Lemma factE n : factorial n = if n is n'.+1 then n * factorial n' else 1.
 Proof. by case: n. Qed.
