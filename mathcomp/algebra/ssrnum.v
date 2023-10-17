@@ -48,6 +48,7 @@ From mathcomp Require Import ssralg poly.
 (*  x \is a Num.pos <=> x is positive (:= x > 0)                              *)
 (*  x \is a Num.neg <=> x is negative (:= x < 0)                              *)
 (* x \is a Num.nneg <=> x is positive or 0 (:= x >= 0)                        *)
+(* x \is a Num.npos <=> x is negative or 0 (:= x <= 0)                        *)
 (* x \is a Num.real <=> x is real (:= x >= 0 or x < 0)                        *)
 (*       Num.sqrt x == in a real-closed field, a positive square root of x if *)
 (*                     x >= 0, or 0 otherwise                                 *)
@@ -224,6 +225,8 @@ Definition Rneg_pred := fun x : R => x < 0.
 Definition Rneg : qualifier 0 R := [qualify x : R | Rneg_pred x].
 Definition Rnneg_pred := fun x : R => 0 <= x.
 Definition Rnneg : qualifier 0 R := [qualify x : R | Rnneg_pred x].
+Definition Rnpos_pred := fun x : R => x <= 0.
+Definition Rnpos : qualifier 0 R := [qualify x : R | Rnpos_pred x].
 Definition Rreal_pred := fun x : R => (0 <= x) || (x <= 0).
 Definition Rreal : qualifier 0 R := [qualify x : R | Rreal_pred x].
 
@@ -263,6 +266,7 @@ Notation min := minr.
 Notation pos := Rpos.
 Notation neg := Rneg.
 Notation nneg := Rnneg.
+Notation npos := Rnpos.
 Notation real := Rreal.
 (* Not to pollute the local namespace, Num.nat and Num.int are defined later. *)
 #[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
@@ -694,6 +698,7 @@ Definition normrN V (x : V) : `|- x| = `|x| := normrN x.
 Lemma posrE x : (x \is pos) = (0 < x). Proof. by []. Qed.
 Lemma negrE x : (x \is neg) = (x < 0). Proof. by []. Qed.
 Lemma nnegrE x : (x \is nneg) = (0 <= x). Proof. by []. Qed.
+Lemma nposrE x : (x \is npos) = (x <= 0). Proof. by []. Qed.
 Lemma realE x : (x \is real) = (0 <= x) || (x <= 0). Proof. by []. Qed.
 
 (* General properties of <= and < *)
@@ -828,6 +833,25 @@ Proof. by move=> x_le0; rewrite -[r in _ = r]ger0_norm ?normrN ?oppr_ge0. Qed.
 
 Definition gtr0_norm x (hx : 0 < x) := ger0_norm (ltW hx).
 Definition ltr0_norm x (hx : x < 0) := ler0_norm (ltW hx).
+
+Lemma ge0_ler_normr :
+  {in nneg &, {mono (@normr _ R) : x y / x <= y}}.
+Proof. by move=> x y; rewrite !nnegrE => x0 y0; rewrite !ger0_norm. Qed.
+
+Lemma gt0_ler_normr :
+  {in pos &, {mono (@normr _ R) : x y / x <= y}}.
+Proof. by move=> x y; rewrite !posrE => /ltW x0 /ltW y0; exact: ge0_ler_normr. Qed.
+
+Lemma le0_ger_normr :
+  {in npos &, {mono (@normr _ R) : x y / x <= y >-> x >= y}}.
+Proof. 
+move=> x y; rewrite !nposrE => x0 y0.
+by rewrite !ler0_norm// -subr_ge0 opprK addrC subr_ge0.
+Qed.
+
+Lemma lt0_ger_normr :
+  {in Num.neg &, {mono (@Num.Def.normr _ R) : x y / x <= y >-> x >= y}}.
+Proof. by move=> x y; rewrite !negrE => /ltW x0 /ltW y0; exact: le0_ger_normr. Qed.
 
 (* Comparision to 0 of a difference *)
 
