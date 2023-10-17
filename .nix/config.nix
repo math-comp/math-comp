@@ -42,6 +42,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "interval"
       "mathcomp-abel"
       "mathcomp-algebra-tactics"
+      "mathcomp-apery"
       "mathcomp-bigenough"
       "mathcomp-finmap"
       "mathcomp-real-closed"
@@ -74,7 +75,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq-elpi.override.version = "coq-master";
       hierarchy-builder.override.version = "master";
       interval.job = false;
-      coqeal.job = false;
       coquelicot.job = false;
     };
     "coq-8.18".push-branches = [ "master" "mathcomp-1" ];
