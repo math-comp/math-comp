@@ -182,7 +182,7 @@ in `qfpoly.v`
   + lemmas `sum_truncK`, `prod_truncK`
 
 - in `ssrnat.v`
-  + lemma `addn_eq1`
+  + lemma `addn_eq1`, `ltn_min`
 
 - in `bigop.v`
   + lemma `big_condT`
