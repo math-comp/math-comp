@@ -167,3 +167,7 @@ Notation "[ 'predU' A & B ]" := (predU [in A] [in B]) : fun_scope.
 Notation "[ 'predD' A & B ]" := (predD [in A] [in B]) : fun_scope.
 Notation "[ 'predC' A ]" := (predC [in A]) : fun_scope.
 Notation "[ 'preim' f 'of' A ]" := (preim f [in A]) : fun_scope.
+
+Lemma relpre_trans {T' T : Type} {leT : rel T} {f : T' -> T} :
+  transitive leT -> transitive (relpre f leT).
+Proof. by move=> + y x z; apply. Qed.

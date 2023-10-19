@@ -10,11 +10,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- in `ssrbool.v`
+  + lemma `relpre_trans`
+
 - in `seq.v`
   + lemma `foldl_foldr`
   + lemmas `unzip1_map_nth_zip`, `unzip2_map_nth_zip`, `perm_zip_sym`,
 	`perm_zip1`, `perm_zip2`
   + lemmas `find_pred0`, `find_predT`
+  + lemmas `allrel_revl`, `allrel_revr`, `allrel_rev2`, `eq_allrel_meml`,
+    `eq_allrel_memr`, `eq_allrel_mem2`
 
 - in `bigop.v`
   + lemma `big_if`
