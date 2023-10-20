@@ -834,24 +834,24 @@ Proof. by move=> x_le0; rewrite -[r in _ = r]ger0_norm ?normrN ?oppr_ge0. Qed.
 Definition gtr0_norm x (hx : 0 < x) := ger0_norm (ltW hx).
 Definition ltr0_norm x (hx : x < 0) := ler0_norm (ltW hx).
 
-Lemma ger0_le_normr :
+Lemma ger0_le_norm :
   {in nneg &, {mono (@normr _ R) : x y / x <= y}}.
 Proof. by move=> x y; rewrite !nnegrE => x0 y0; rewrite !ger0_norm. Qed.
 
-Lemma gtr0_le_normr :
+Lemma gtr0_le_norm :
   {in pos &, {mono (@normr _ R) : x y / x <= y}}.
-Proof. by move=> x y; rewrite !posrE => /ltW x0 /ltW y0; exact: ger0_le_normr. Qed.
+Proof. by move=> x y; rewrite !posrE => /ltW x0 /ltW y0; exact: ger0_le_norm. Qed.
 
-Lemma ler0_ge_normr :
+Lemma ler0_ge_norm :
   {in npos &, {mono (@normr _ R) : x y / x <= y >-> x >= y}}.
 Proof. 
 move=> x y; rewrite !nposrE => x0 y0.
 by rewrite !ler0_norm// -subr_ge0 opprK addrC subr_ge0.
 Qed.
 
-Lemma ltr0_ge_normr :
+Lemma ltr0_ge_norm :
   {in neg &, {mono (@normr _ R) : x y / x <= y >-> x >= y}}.
-Proof. by move=> x y; rewrite !negrE => /ltW x0 /ltW y0; exact: ler0_ge_normr. Qed.
+Proof. by move=> x y; rewrite !negrE => /ltW x0 /ltW y0; exact: ler0_ge_norm. Qed.
 
 (* Comparision to 0 of a difference *)
 
