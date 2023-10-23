@@ -129,6 +129,13 @@ in `qfpoly.v`
 - in `ssrnat.v`
   + lemma `addn_eq1`
 
+- in `ssrnum.v`:
+  + lemmas `gerBl`, `gtrBl`
+
+- in `ssralg.v`
+  + support for negative constant (like `-42`) in the `Number
+    Notation` in `ring_scope`
+
 ### Changed
 
 - in `ssralg.v`
@@ -160,6 +167,10 @@ in `qfpoly.v`
 ### Removed
 
 ### Deprecated
+
+- in `ssrint.v`
+  + `mulrzDr` temporarily deprecated, use `mulrzDl_tmp` instead, will eventually be renamed `mulrzDl`
+  + `mulrzDl` temporarily deprecated, use `mulrzDr_tmp` instead, will eventually be renamed `mulrzDr`
 
 ### Infrastructure
 

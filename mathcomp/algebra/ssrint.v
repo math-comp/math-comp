@@ -13,16 +13,13 @@ From mathcomp Require Import poly.
 (*                However (Posz m = Posz n) is displayed as (m = n :> int)    *)
 (*                (and so are ==, != and <>)                                  *)
 (*                Lemma NegzE : turns (Negz n) into - n.+1%:Z.                *)
-(*    <number> == <number> as an int with <number> an optional minus sign     *)
+(*    <number> == <number> as an int, with <number> an optional minus sign    *)
 (*                followed by a sequence of digits. This notation is in       *)
 (*                int_scope (delimited with %Z).                              *)
 (*      x *~ m == m times x, with m : int;                                    *)
 (*                convertible to x *+ n if m is Posz n                        *)
 (*                convertible to x *- n.+1 if m is Negz n.                    *)
 (*       m%:~R == the image of m : int in a generic ring (:= 1 *~ m).         *)
-(*    <number> == <number>%:~R with <number> an optional minus sign followed  *)
-(*                by a sequence of digits. This notation is in ring_scope     *)
-(*                (delimited with %R).                                        *)
 (*       x ^ m == x to the m, with m : int;                                   *)
 (*                convertible to x ^+ n if m is Posz n                        *)
 (*                convertible to x ^- n.+1 if m is Negz n.                    *)
@@ -554,32 +551,6 @@ Proof. by []. Qed.
 Lemma nmulrn (R : zmodType) (x : R) (n : nat) : x *- n = x *~ - n%:Z.
 Proof. by case: n=> [] //; rewrite ?oppr0. Qed.
 
-Variant Iintmul := IIntmul : Ione -> int -> Iintmul.
-
-Definition parse (x : Number.int) : Iintmul :=
-  let i :=
-    match x with
-    | Number.IntDecimal (Decimal.Pos u) => Posz (Nat.of_uint u)
-    | Number.IntDecimal (Decimal.Neg u) => Negz (Nat.of_uint u).-1
-    | Number.IntHexadecimal (Hexadecimal.Pos u) => Posz (Nat.of_hex_uint u)
-    | Number.IntHexadecimal (Hexadecimal.Neg u) => Negz (Nat.of_hex_uint u).-1
-    end in
-  IIntmul IOne i.
-
-Definition print (x : Iintmul) : Number.int :=
-  match x with
-  | IIntmul IOne (Posz n) => Number.IntDecimal (Decimal.Pos (Nat.to_uint n))
-  | IIntmul IOne (Negz n) => Number.IntDecimal (Decimal.Neg (Nat.to_uint n.+1))
-  end.
-
-Arguments GRing.one {R}.
-Set Warnings "-via-type-remapping,-via-type-mismatch".
-Number Notation Idummy_placeholder parse print (via Iintmul
-  mapping [[intmul] => IIntmul, [GRing.one] => IOne])
-  : ring_scope.
-Set Warnings "via-type-remapping,via-type-mismatch".
-Arguments GRing.one : clear implicits.
-
 Section ZintLmod.
 
 Definition zmodule (M : Type) : Type := M.
@@ -605,7 +576,7 @@ Proof. by rewrite !mulrzA_C mulrC. Qed.
 
 Fact mulr1z (x : M) : x *~ 1 = x. Proof. by []. Qed.
 
-Fact mulrzDr m : {morph ( *~%R^~ m : M -> M) : x y / x + y}.
+Fact mulrzDl_tmp m : {morph ( *~%R^~ m : M -> M) : x y / x + y}.
 Proof.
 by elim: m=> [|m _|m _] x y;
   rewrite ?addr0 /intmul //= ?mulrnDl // opprD.
@@ -622,7 +593,7 @@ rewrite -{2}[m](@subnKC n)// mulrnDr addrAC subrr add0r.
 by rewrite subzn.
 Qed.
 
-Fact mulrzDl x : {morph *~%R x : m n / m + n}.
+Fact mulrzDr_tmp x : {morph *~%R x : m n / m + n}.
 Proof.
 elim=> [|m _|m _]; elim=> [|n _|n _]; rewrite /intmul //=;
 rewrite -?(opprD) ?(add0r, addr0, mulrnDr, subn0) //.
@@ -633,7 +604,7 @@ Qed.
 
 Definition Mint_LmodMixin :=
   @LmodMixin _ [zmodType of M] (fun n x => x *~ n)
-   mulrzA_C mulr1z mulrzDr mulrzDl.
+   mulrzA_C mulr1z mulrzDl_tmp mulrzDr_tmp.
 Canonical Mint_LmodType := LmodType int M^z Mint_LmodMixin.
 
 Lemma scalezrE n x : n *: (x : M^z) = x *~ n. Proof. by []. Qed.
@@ -675,6 +646,11 @@ Canonical intmul_additive x := Additive (@mulrzBr x).
 
 End ZintLmod.
 
+#[deprecated(since="mathcomp 2.1.0", note="Use mulrzDr_tmp instead. mulrzDl will be renamed mulrzDr in the future.")]
+Notation mulrzDl := mulrzDr_tmp.
+#[deprecated(since="mathcomp 2.1.0", note="Use mulrzDl_tmp instead. mulrzDr will be renamed mulrzDl in the future.")]
+Notation mulrzDr := mulrzDl_tmp.
+
 Lemma ffunMzE (I : finType) (M : zmodType) (f : {ffun I -> M}) z x :
   (f *~ z) x = f x *~ z.
 Proof. by case: z => n; rewrite ?ffunE ffunMnE. Qed.
@@ -683,7 +659,7 @@ Lemma intz (n : int) : n%:~R = n.
 Proof.
 elim: n=> //= n ihn; rewrite /intmul /=.
   by rewrite -addn1 mulrnDr /= PoszD -ihn.
-by rewrite nmulrn intS opprD mulrzDl ihn.
+by rewrite nmulrn intS opprD mulrzDr_tmp ihn.
 Qed.
 
 Lemma natz (n : nat) : n%:R = n%:Z :> int.
@@ -720,7 +696,7 @@ Lemma mulrbz x (b : bool) : x *~ b = (if b then x else 0).
 Proof. by case: b. Qed.
 
 Lemma intrD m n : (m + n)%:~R = m%:~R + n%:~R :> R.
-Proof. exact: mulrzDl. Qed.
+Proof. exact: mulrzDr_tmp. Qed.
 
 Lemma intrM m n : (m * n)%:~R = m%:~R * n%:~R :> R.
 Proof. by rewrite mulrzA -mulrzr. Qed.
@@ -754,8 +730,8 @@ Implicit Types u v w : V.
 Lemma scaler_int n v : n%:~R *: v = v *~ n.
 Proof.
 elim: n=> [|n ihn|n ihn]; first by rewrite scale0r.
-  by rewrite intS !mulrzDl scalerDl ihn scale1r.
-by rewrite intS opprD !mulrzDl scalerDl ihn scaleN1r.
+  by rewrite intS !mulrzDr_tmp scalerDl ihn scale1r.
+by rewrite intS opprD !mulrzDr_tmp scalerDl ihn scaleN1r.
 Qed.
 
 Lemma scalerMzl a v n : (a *: v) *~ n = (a *~ n) *: v.
