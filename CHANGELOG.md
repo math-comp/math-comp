@@ -306,6 +306,12 @@ Reynald Affeldt, Sophie Bernard, Alessandro Bruni, Fernando Chu, Cyril Cohen, Jo
 
 ### Removed
 
+- in `ssrbool.v`
+  + `rel_of_simpl_rel` (use `rel_of_simpl`)
+
+- in `fintype.v`
+  + `enum_ordS` (use `enum_ordSl` instead)
+
 - in `ssrint.v`
   + definition `Znat_pred`
   + lemma `Znat_semiring_closed`

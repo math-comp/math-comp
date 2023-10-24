@@ -1,10 +1,6 @@
 From mathcomp Require Import ssreflect ssrfun.
 From Coq Require Export ssrbool.
 
-(* 8.11 addition in Coq but renamed *)
-#[deprecated(since="mathcomp 1.15", note="Use rel_of_simpl instead.")]
-Notation rel_of_simpl_rel := rel_of_simpl.
-
 (******************************************************************************)
 (* Local additions:                                                           *)
 (*        [in A] == the applicative counterpart of a collective predicate A:  *)
