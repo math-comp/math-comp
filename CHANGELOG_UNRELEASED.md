@@ -201,6 +201,10 @@ in `qfpoly.v`
 - in `ssrnum.v`:
   + lemmas `gerBl`, `gtrBl`
 
+- in `ssrnum.v`
+  + added `Num.npos` and lemma `nposrE`
+  + added lemmas `ger0_le_norm`, `gtr0_le_norm`, `ler0_ge_norm` and `ltr0_ge_norm` 
+
 ### Changed
 
 - in `order.v`
