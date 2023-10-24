@@ -93,6 +93,7 @@ From mathcomp Require Import ssralg poly.
 (*  x \is a Num.pos <=> x is positive (:= x > 0).                             *)
 (*  x \is a Num.neg <=> x is negative (:= x < 0).                             *)
 (* x \is a Num.nneg <=> x is positive or 0 (:= x >= 0).                       *)
+(* x \is a Num.npos <=> x is negative or 0 (:= x <= 0).                       *)
 (* x \is a Num.real <=> x is real (:= x >= 0 or x < 0).                       *)
 (*      Num.bound x == in archimedean fields, and upper bound for x, i.e.,    *)
 (*                     and n such that `|x| < n%:R.                           *)
@@ -395,6 +396,7 @@ Definition sgr x : R := if x == 0 then 0 else if x < 0 then -1 else 1.
 Definition Rpos : qualifier 0 R := [qualify x : R | 0 < x].
 Definition Rneg : qualifier 0 R := [qualify x : R | x < 0].
 Definition Rnneg : qualifier 0 R := [qualify x : R | 0 <= x].
+Definition Rnpos : qualifier 0 R := [qualify x : R | x <= 0].
 Definition Rreal : qualifier 0 R := [qualify x : R | (0 <= x) || (x <= 0)].
 
 End Def. End Def.
@@ -414,6 +416,7 @@ Notation min := minr.
 Notation pos := Rpos.
 Notation neg := Rneg.
 Notation nneg := Rnneg.
+Notation npos := Rnpos.
 Notation real := Rreal.
 
 Module Keys. Section Keys.
@@ -1392,6 +1395,7 @@ Definition normrN V (x : V) : `|- x| = `|x| := normrN x.
 Lemma posrE x : (x \is pos) = (0 < x). Proof. by []. Qed.
 Lemma negrE x : (x \is neg) = (x < 0). Proof. by []. Qed.
 Lemma nnegrE x : (x \is nneg) = (0 <= x). Proof. by []. Qed.
+Lemma nposrE x : (x \is npos) = (x <= 0). Proof. by []. Qed.
 Lemma realE x : (x \is real) = (0 <= x) || (x <= 0). Proof. by []. Qed.
 
 (* General properties of <= and < *)
@@ -1525,6 +1529,25 @@ Proof. by move=> x_le0; rewrite -[r in _ = r]ger0_norm ?normrN ?oppr_ge0. Qed.
 
 Definition gtr0_norm x (hx : 0 < x) := ger0_norm (ltW hx).
 Definition ltr0_norm x (hx : x < 0) := ler0_norm (ltW hx).
+
+Lemma ger0_le_norm :
+  {in nneg &, {mono (@normr _ R) : x y / x <= y}}.
+Proof. by move=> x y; rewrite !nnegrE => x0 y0; rewrite !ger0_norm. Qed.
+
+Lemma gtr0_le_norm :
+  {in pos &, {mono (@normr _ R) : x y / x <= y}}.
+Proof. by move=> x y; rewrite !posrE => /ltW x0 /ltW y0; exact: ger0_le_norm. Qed.
+
+Lemma ler0_ge_norm :
+  {in npos &, {mono (@normr _ R) : x y / x <= y >-> x >= y}}.
+Proof. 
+move=> x y; rewrite !nposrE => x0 y0.
+by rewrite !ler0_norm// -subr_ge0 opprK addrC subr_ge0.
+Qed.
+
+Lemma ltr0_ge_norm :
+  {in neg &, {mono (@normr _ R) : x y / x <= y >-> x >= y}}.
+Proof. by move=> x y; rewrite !negrE => /ltW x0 /ltW y0; exact: ler0_ge_norm. Qed.
 
 (* Comparision to 0 of a difference *)
 
