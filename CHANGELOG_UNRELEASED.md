@@ -175,6 +175,12 @@ in `qfpoly.v`
 
 ### Removed
 
+- in `ssrbool.v`
+  + `rel_of_simpl_rel` (use `rel_of_simpl`)
+
+- in `fintype.v`
+  + `enum_ordS` (use `enum_ordSl` instead)
+
 ### Deprecated
 
 - in `ssrint.v`
