@@ -2301,9 +2301,6 @@ Arguments sub_ord {n'}.
 Arguments sub_ordK {n'}.
 Arguments inord_val {n'}.
 
-#[deprecated(since="mathcomp 1.15.0", note="Use enum_ordSl instead.")]
-Notation enum_ordS := enum_ordSl.
-
 Lemma ord1 : all_equal_to (ord0 : 'I_1).
 Proof. by case=> [[] // ?]; apply: val_inj. Qed.
 
