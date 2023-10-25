@@ -5,13 +5,13 @@ Last releases: [[2.1.0] - 2023-10-24](#210---2023-10-24), [[2.0.0] - 2023-05-10]
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [2.1.0] - 2023-10-24
+
 This release is compatible with Coq versions 8.16, 8.17, and 8.18.
 
 The contributors to this version are:
 
 Reynald Affeldt, Sophie Bernard, Alessandro Bruni, Fernando Chu, Cyril Cohen, Josh Cohen, Hugo Deleye, Jason Gross, Pierre Jouvelot, Erik Martin-Dorel, Pierre Roux, Kazuhiko Sakaguchi, Julin Shaji, Enrico Tassi, Laurent Théry, Quentin Vermande
-
-## [2.1.0] - 2023-10-24
 
 ### Added
 
