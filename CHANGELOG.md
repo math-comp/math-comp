@@ -264,7 +264,7 @@ Reynald Affeldt, Sophie Bernard, Alessandro Bruni, Fernando Chu, Cyril Cohen, Jo
   + `CintEsign` -> `intrEsign`
   + `truncC_itv` -> `trunc_itv`
   + `truncC_def` -> `trunc_def`
-  + `natCK` -> `natRK`
+  + `natCK` -> `natrK`
   + `CnatP` -> `natrP`
   + `truncCK` -> `truncK`
   + `truncC_gt0` -> `trunc_gt0`
