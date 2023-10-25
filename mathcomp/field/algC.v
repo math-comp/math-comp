@@ -1193,7 +1193,7 @@ Notation CintEsign := mc_2_0.CintEsign (only parsing).
 Notation truncC_itv := mc_2_0.truncC_itv (only parsing).
 #[deprecated(since="mathcomp 2.1.0", note="Use trunc_def instead.")]
 Notation truncC_def := mc_2_0.truncC_def (only parsing).
-#[deprecated(since="mathcomp 2.1.0", note="Use natRK instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use natrK instead.")]
 Notation natCK := mc_2_0.natCK (only parsing).
 #[deprecated(since="mathcomp 2.1.0", note="Use natrP instead.")]
 Notation CnatP := mc_2_0.CnatP (only parsing).
