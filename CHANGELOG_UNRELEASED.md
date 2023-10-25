@@ -10,9 +10,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- in `ssrbool.v`
+  + lemma `relpre_trans`
+
 - in `seq.v`
   + lemma `foldl_foldr`
   + lemmas `find_pred0`, `find_predT`
+  + lemmas `allrel_revl`, `allrel_revr`, `allrel_rev2`, `eq_allrel_meml`,
+    `eq_allrel_memr`, `eq_allrel_mem2`
 
 - in `bigop.v`
   + lemma `big_if`
@@ -136,6 +141,10 @@ in `qfpoly.v`
   + support for negative constant (like `-42`) in the `Number
     Notation` in `ring_scope`
 
+- in `ssrnum.v`
+  + added `Num.npos` and lemma `nposrE`
+  + added lemmas `ger0_le_norm`, `gtr0_le_norm`, `ler0_ge_norm` and `ltr0_ge_norm` 
+
 ### Changed
 
 - in `ssralg.v`
@@ -165,6 +174,12 @@ in `qfpoly.v`
   + `comparable_le_minl` -> `comparable_ge_min`
 
 ### Removed
+
+- in `ssrbool.v`
+  + `rel_of_simpl_rel` (use `rel_of_simpl`)
+
+- in `fintype.v`
+  + `enum_ordS` (use `enum_ordSl` instead)
 
 ### Deprecated
 

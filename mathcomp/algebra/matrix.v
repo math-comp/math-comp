@@ -120,7 +120,7 @@ From mathcomp Require Import div prime binomial ssralg finalg zmodp countalg.
 (*         A *m B == the matrix product of A and B; the width of A must be    *)
 (*                   equal to the height of B.                                *)
 (*           a%:M == the scalar matrix with a's on the main diagonal; in      *)
-(*                   particular 1%:M denotes the identity matrix, and is is   *)
+(*                   particular 1%:M denotes the identity matrix, and is      *)
 (*                   equal to 1%R when n is of the form n'.+1 (e.g., n >= 1). *)
 (* is_scalar_mx A <=> A is a scalar matrix (A = a%:M for some A).             *)
 (*      diag_mx d == the diagonal matrix whose main diagonal is d : 'rV_n.    *)
