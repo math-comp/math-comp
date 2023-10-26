@@ -504,7 +504,7 @@ Import Implementation.
 Local Notation algC := type.
 
 Local Notation QtoC := (ratr : rat -> algC).
-Local Notation pQtoC := (map_poly QtoC).
+Local Notation pQtoC := (map_poly QtoC : {poly rat} -> {poly algC}).
 
 Fact algCi_subproof : {i : algC | i ^+ 2 = -1}.
 Proof. exact: GRing.imaginary_exists. Qed.
@@ -520,7 +520,7 @@ by case: (sig_eqW _) => b /= /fmorph_inj.
 Qed.
 
 Fact minCpoly_subproof (x : algC) :
-  {p | p \is monic & forall q, root (pQtoC q) x = (p %| q)%R}.
+  {p : {poly rat} | p \is monic & forall q, root (pQtoC q) x = (p %| q)%R}.
 Proof.
 have isQ := rat_algebraic_decidable algebraic.
 have [p [mon_p px0 irr_p]] := minPoly_decidable_closure isQ (algebraic x).
@@ -849,7 +849,7 @@ by rewrite rmorph_int floorK.
 Qed.
 
 Lemma minCpolyP x :
-   {p | minCpoly x = pQtoC p /\ p \is monic
+   {p : {poly rat} | minCpoly x = pQtoC p /\ p \is monic
       & forall q, root (pQtoC q) x = (p %| q)%R}.
 Proof. by rewrite /minCpoly; case: (minCpoly_subproof x) => p; exists p. Qed.
 
