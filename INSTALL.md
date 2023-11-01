@@ -11,20 +11,20 @@ also available as OPAM packages.
 If you just installed OPAM version 2 you should proceed as follows: 
 ```
 opam --version # should print 2.x.y
-opam init -n --comp=ocaml-base-compiler.4.05.0
+opam init -n --comp=ocaml-base-compiler.4.14.1
 eval $(opam config env)
 ```
 Once your OPAM environment is configured
 you can install any math-comp package via
 ```
 opam repo add coq-released https://coq.inria.fr/opam/released
-opam pin add -n coq -k version 8.12.0
+opam pin add -n coq -k version 8.18.0
 opam install coq -j3
 opam install coq-mathcomp-ssreflect -j3
 ```
 Replace `ssreflect` here by the package you want, the dependencies will be
 installed automatically. We recommend pinning a particular version of Coq
-(we give `8.12.0` as an example, see `CHANGELOG.md` for the supported versions).
+(we give `8.18.0` as an example, see `CHANGELOG.md` for the supported versions).
 To get the latest development version you need to execute the following:
 ```
 opam repo add coq-extra-dev https://coq.inria.fr/opam/extra-dev
@@ -79,9 +79,9 @@ this file `INSTALL.md`) and that you have OPAM installed and
 configured with the standard Coq repositories.
 
 First, we recommend pinning a particular version of Coq
-(e.g. `8.12.0`):
+(e.g. `8.18.0`):
 ```
-opam pin add -n coq -k version 8.12.0
+opam pin add -n coq -k version 8.18.0
 ```
 
 Then for each math-comp package, pin the `opam` file:
