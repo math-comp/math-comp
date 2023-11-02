@@ -329,8 +329,8 @@ Hypothesis n_gt0 : (0 < n)%N.
 Hypothesis x_inj : injective x.
 
 Let lagrange_def_sample (i j : 'I_n) : (lagrange_def i).[x j] = (i == j)%:R.
-Proof using x_inj.
-rewrite hornerM hornerC; set p := (\prod_(_ < _ | _) _).
+Proof.
+clear n_gt0; rewrite hornerM hornerC; set p := (\prod_(_ < _ | _) _).
 have [<-|neq_ij] /= := altP eqP.
   rewrite mulVf // horner_prod; apply/prodf_neq0 => k neq_ki.
   by rewrite hornerXsubC subr_eq0 inj_eq // eq_sym.
@@ -339,7 +339,7 @@ by rewrite hornerXsubC subrr mul0r mulr0.
 Qed.
 
 Let size_lagrange_def i : size (lagrange_def i) = n.
-Proof using n_gt0 x_inj.
+Proof.
 rewrite size_Cmul; last first.
   suff : (lagrange_def i).[x i] != 0.
     by rewrite hornerE mulf_eq0 => /norP [].
