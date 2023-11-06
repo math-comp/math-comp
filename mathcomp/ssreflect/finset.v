@@ -1369,6 +1369,26 @@ Arguments imsetP {aT rT f D y}.
 Arguments imset2P {aT aT2 rT f2 D1 D2 y}.
 Arguments imset_disjoint {aT rT f A B}.
 
+Section BigOpsAnyOp. (* Any operator op : R -> R -> R *)
+Variables (R : Type) (x : R).
+Variables (op : R -> R -> R).
+Variables I J : finType.
+Implicit Type A B : {set I}.
+Implicit Type h : I -> J.
+Implicit Type P : pred I.
+Implicit Type F : I -> R.
+
+Lemma big_set0 F : \big[op/x]_(i in set0) F i = x.
+Proof. by apply big_pred0=>i ; rewrite inE. Qed.
+
+Lemma big_condT A F :
+  \big[op/x]_(i in A | true) F i = \big[op/x]_(i in A) F i.
+Proof. by apply: eq_bigl=>i ; by rewrite andbT. Qed.
+
+Lemma big_setT F : \big[op/x]_(i in [set: I]) F i = \big[op/x]_i F i.
+Proof. by under eq_bigl do rewrite in_setT. Qed.
+End BigOpsAnyOp.
+
 Section BigOpsSemiGroup.
 
 Variables (R : Type) (op : SemiGroup.com_law R).
@@ -1387,6 +1407,21 @@ Qed.
 
 End BigOpsSemiGroup.
 
+Section BigOpsSemiGroup.
+Variables (R : Type) (x : R).
+Variables (op : SemiGroup.com_law R).
+Variables I J : finType.
+Implicit Type A B : {set I}.
+
+Lemma big_subset A (F : {set I} -> R):
+  \big[op/x]_(B : {set I} | B \subset A) F B
+  = op (F A) (\big[op/x]_(B : {set I} | B \proper A) F B).
+Proof.
+rewrite (bigD1 A)// ; congr (op _ _).
+by apply: eq_bigl=>B; rewrite andbC properEneq.
+Qed.
+End BigOpsSemiGroup.
+
 Section BigOps.
 
 Variables (R : Type) (idx : R).
@@ -1397,11 +1432,24 @@ Implicit Type h : I -> J.
 Implicit Type P : pred I.
 Implicit Type F : I -> R.
 
-Lemma big_set0 F : \big[op/idx]_(i in set0) F i = idx.
-Proof. by apply: big_pred0 => i; rewrite inE. Qed.
-
 Lemma big_set1 a F : \big[op/idx]_(i in [set a]) F i = F a.
 Proof. by apply: big_pred1 => i; rewrite !inE. Qed.
+
+Lemma big_setUI A B F :
+  aop (\big[aop/idx]_(i in A :|: B) F i)
+      (\big[aop/idx]_(i in A :&: B) F i)
+  =
+    aop (\big[aop/idx]_(i in A) F i) (\big[aop/idx]_(i in B) F i).
+Proof.
+rewrite [E in aop E _ = _](bigID (fun i => i \in A)).
+rewrite [E in aop (aop E _) _ = _](bigID (fun i => i \in B)).
+rewrite -Monoid.mulmA.
+rewrite [E in _ = aop _ E](bigID (fun i => i \in A)).
+rewrite [E in _ = aop E _](bigID (fun i => i \in B)).
+rewrite [E in _ = aop _ E]Monoid.mulmC.
+do 2 congr (aop _ _); apply: eq_bigl=>i; rewrite !inE;
+  by case (i \in A); case (i \in B).
+Qed.
 
 Lemma big_set (A : pred I) F :
    \big[op/idx]_(i in [set i | A i]) (F i) = \big[op/idx]_(i in A) (F i).
@@ -1455,6 +1503,15 @@ Lemma partition_big_imset h (A : {pred I}) F :
   \big[aop/idx]_(i in A) F i =
      \big[aop/idx]_(j in h @: A) \big[aop/idx]_(i in A | h i == j) F i.
 Proof. by apply: partition_big => i Ai; apply/imsetP; exists i. Qed.
+
+Lemma big_subsetI A B (F : {set I} -> R) :
+  aop (\big[aop/idx]_(C : {set I} | (C \subset A) && ~~(C \subset B)) F C)
+      (\big[aop/idx]_(C : {set I} | C \subset A :&: B) F C)
+  = \big[aop/idx]_(C : {set I} | C \subset A) F C.
+Proof.
+rewrite [E in _=E](bigID (fun C : {set I} => C \subset B)) [E in _=E]Monoid.mulmC.
+by congr (aop _ _); apply: eq_bigl=>/=C; exact: subsetI.
+Qed.
 
 End BigOps.
 
