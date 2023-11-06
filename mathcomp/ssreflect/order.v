@@ -4239,6 +4239,32 @@ Lemma bigmax_mkcond P F :
   \big[max/x]_(i <- r | P i) F i = \big[max/x]_(i <- r) if P i then F i else x.
 Proof. by rewrite big_mkcond_idem ?maxxx//; [exact: maxA|exact: maxC]. Qed.
 
+Lemma bigmin_mkcondl P Q F :
+  \big[min/x]_(i <- r | P i && Q i) F i
+  = \big[min/x]_(i <- r | Q i) if P i then F i else x.
+Proof.
+rewrite bigmin_mkcond [RHS]bigmin_mkcond.
+by apply: eq_bigr => i _; case: P; case: Q.
+Qed.
+
+Lemma bigmin_mkcondr P Q F :
+  \big[min/x]_(i <- r | P i && Q i) F i
+  = \big[min/x]_(i <- r | P i) if Q i then F i else x.
+Proof. by under eq_bigl do rewrite andbC; apply: bigmin_mkcondl. Qed.
+
+Lemma bigmax_mkcondl P Q F :
+  \big[max/x]_(i <- r | P i && Q i) F i
+  = \big[max/x]_(i <- r | Q i) if P i then F i else x.
+Proof.
+rewrite bigmax_mkcond [RHS]bigmax_mkcond.
+by apply: eq_bigr => i _; case: P; case: Q.
+Qed.
+
+Lemma bigmax_mkcondr P Q F :
+  \big[max/x]_(i <- r | P i && Q i) F i
+  = \big[max/x]_(i <- r | P i) if Q i then F i else x.
+Proof. by under eq_bigl do rewrite andbC; apply: bigmax_mkcondl. Qed.
+
 Lemma bigmin_split P F1 F2 :
   \big[min/x]_(i <- r | P i) (min (F1 i) (F2 i)) =
     min (\big[min/x]_(i <- r | P i) F1 i) (\big[min/x]_(i <- r | P i) F2 i).
@@ -4376,6 +4402,26 @@ Lemma subset_bigmax_cond [x0] (I : finType) (A A' P P' : {pred I}) (F : I -> T) 
   \big[max/x0]_(i in A | P i) F i <= \big[max/x0]_(i in A' | P' i) F i.
 Proof. exact: (subset_le_big_cond maxA maxC). Qed.
 
+Section bigminmax_eqType.
+Variable (I : eqType) (r : seq I) (x : T).
+Implicit Types (P : pred I) (F : I -> T).
+
+Lemma bigmin_le_id P F : \big[min/x]_(i <- r | P i) F i <= x.
+Proof. by rewrite bigmin_idl. Qed.
+
+Lemma bigmax_ge_id P F : \big[max/x]_(i <- r | P i) F i >= x.
+Proof. by rewrite bigmax_idl. Qed.
+
+Lemma bigmin_eq_id P F :
+  (forall i, P i -> x <= F i) -> \big[min/x]_(i <- r | P i) F i = x.
+Proof. by move=> x_le; apply: le_anti; rewrite bigmin_le_id le_bigmin. Qed.
+
+Lemma bigmax_eq_id P F :
+  (forall i, P i -> x >= F i) -> \big[max/x]_(i <- r | P i) F i = x.
+Proof. by move=> x_ge; apply: le_anti; rewrite bigmax_ge_id bigmax_le. Qed.
+
+End bigminmax_eqType.
+
 Section bigminmax_finType.
 Variable (I : finType) (x : T).
 Implicit Types (P : pred I) (F : I -> T).
@@ -4490,7 +4536,81 @@ rewrite le_max 2!ge_max ba fe /= andbT; have [//|/= af] := leP f a.
 by rewrite (le_trans ba) // (le_trans _ fe) // ltW.
 Qed.
 
+Lemma bigmaxUl (A B : {set I}) F :
+  \big[max/x]_(i in A) F i <= \big[max/x]_(i in A :|: B) F i.
+Proof. by apply: sub_bigmax => t; rewrite in_setU => ->. Qed.
+
+Lemma bigmaxUr (A B : {set I}) F :
+  \big[max/x]_(i in B) F i <= \big[max/x]_(i in A :|: B) F i.
+Proof. by under [leRHS]eq_bigl do rewrite setUC; apply: bigmaxUl. Qed.
+
+Lemma bigminUl (A B : {set I}) F :
+  \big[min/x]_(i in A) F i >= \big[min/x]_(i in A :|: B) F i.
+Proof. by apply: sub_bigmin => t; rewrite in_setU => ->. Qed.
+
+Lemma bigminUr (A B : {set I}) F :
+  \big[min/x]_(i in B) F i >= \big[min/x]_(i in A :|: B) F i.
+Proof. by under [leLHS]eq_bigl do rewrite setUC; apply: bigminUl. Qed.
+
+Lemma bigmaxIl (A B : {set I}) F :
+  \big[max/x]_(i in A) F i >= \big[max/x]_(i in A :&: B) F i.
+Proof. by apply: sub_bigmax => t; rewrite in_setI => /andP[-> _]. Qed.
+
+Lemma bigmaxIr (A B : {set I}) F :
+  \big[max/x]_(i in B) F i >= \big[max/x]_(i in A :&: B) F i.
+Proof. by under eq_bigl do rewrite setIC; apply: bigmaxIl. Qed.
+
+Lemma bigminIl (A B : {set I}) F :
+  \big[min/x]_(i in A) F i <= \big[min/x]_(i in A :&: B) F i.
+Proof. by apply: sub_bigmin => t; rewrite in_setI => /andP[->_]. Qed.
+
+Lemma bigminIr (A B : {set I}) F :
+  \big[min/x]_(i in B) F i <= \big[min/x]_(i in A :&: B) F i.
+Proof. by under [leRHS]eq_bigl do rewrite setIC; apply: bigminIl. Qed.
+
+Lemma bigmaxD (A B : {set I}) F :
+  \big[max/x]_(i in B) F i >= \big[max/x]_(i in B :\: A) F i.
+Proof. by apply: sub_bigmax => t; rewrite in_setD => /andP[_->]. Qed.
+
+Lemma bigminD (A B : {set I}) F :
+  \big[min/x]_(i in B) F i <= \big[min/x]_(i in B :\: A) F i.
+Proof. by apply: sub_bigmin => t; rewrite in_setD => /andP[_->]. Qed.
+
+Lemma bigmaxU (A B : {set I}) F :
+  \big[max/x]_(i in A :|: B) F i
+  = max (\big[max/x]_(i in A) F i) (\big[max/x]_(i in B) F i).
+Proof.
+apply: le_anti; rewrite ge_max bigmaxUl bigmaxUr !andbT; apply/bigmax_leP.
+split=> [|i /[!in_setU]/orP[iA|iB]]; first by rewrite le_max bigmax_ge_id.
+- by rewrite le_max le_bigmax_cond.
+- by rewrite le_max orbC le_bigmax_cond.
+Qed.
+
+Lemma bigminU (A B : {set I}) F :
+  \big[min/x]_(i in A :|: B) F i
+  = min (\big[min/x]_(i in A) F i) (\big[min/x]_(i in B) F i).
+Proof.
+apply: le_anti; rewrite le_min bigminUl bigminUr !andbT; apply/bigmin_geP.
+split=> [|i /[!in_setU]/orP[iA|iB]]; first by rewrite ge_min bigmin_le_id.
+- by rewrite ge_min bigmin_le_cond.
+- by rewrite ge_min orbC bigmin_le_cond.
+Qed.
+
+Lemma bigmin_set1 j F : \big[min/x]_(i in [set j]) F i = min (F j) x.
+Proof. exact: big_set1E. Qed.
+
+Lemma bigmax_set1 j F : \big[max/x]_(i in [set j]) F i = max (F j) x.
+Proof. exact: big_set1E. Qed.
+
 End bigminmax_finType.
+
+Lemma bigmin_imset [I J : finType] x [h : I -> J] [A : {set I}] (F : J -> T) :
+  \big[min/x]_(j in [set h x | x in A]) F j = \big[min/x]_(i in A) F (h i).
+Proof. by apply: big_imset_idem; [apply: minA|apply: minC|apply: minxx]. Qed.
+
+Lemma bigmax_imset [I J : finType] x [h : I -> J] [A : {set I}] (F : J -> T) :
+  \big[max/x]_(j in [set h x | x in A]) F j = \big[max/x]_(i in A) F (h i).
+Proof. by apply: big_imset_idem; [apply: maxA|apply: maxC|apply: maxxx]. Qed.
 
 End TotalTheory.
 
