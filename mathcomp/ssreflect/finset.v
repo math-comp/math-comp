@@ -1513,41 +1513,40 @@ rewrite [E in _=E](bigID (fun C : {set I} => C \subset B)) [E in _=E]Monoid.mulm
 by congr (aop _ _); apply: eq_bigl=>/=C; exact: subsetI.
 Qed.
 
-(* HERE: WIP *)
 Lemma big_partitionS (f : {set I} -> I -> R) :
   \big[aop/idx]_(A : {set I}) (\big[aop/idx]_(i in A) f A i)
   = \big[aop/idx]_(i : I) \big[aop/idx]_(A : {set I} | i \in A) f A i.
-  Proof.
-  set pair_sig : finType := ({p : {set I} * I | p.2 \in p.1}).
-  set f1 : pair_sig -> {set I} := fun s => (val s).1.
-  set f2 : pair_sig -> I := fun s => (val s).2.
-  have proof1 :
-    \big[aop/idx]_i \big[aop/idx]_(A: {set I} | i \in A) f A i =
-      \big[aop/idx]_i \big[aop/idx]_(s: pair_sig | (f2 s)==i) f (f1 s) (f2 s).
-  apply eq_bigr => x _.
-  set f1inv : {set I} -> option pair_sig :=
-    fun A : {set I} => match (boolP (x \in A)) with
-                    | AltTrue h => Some (exist _ (A,x) h) | _ => None end.
-  rewrite (reindex_omap f1 f1inv) => /=.
-  - apply eq_big => /= s ;  destruct s as [[A y] Hy] ; simpl in Hy.
-    + rewrite /f1/f1inv/f2 => /=.
-      case (boolP (x \in A)) => Hx /=.
-      * case (boolP (y == x)) => H0 //= ;
-          last by apply/eqP ; case => /eqP ; rewrite eq_sym (negbTE H0).
-        apply/eqP ; apply f_equal.
-        have H : sval (exist (fun x0 : {set I} * I => x0.2 \in x0.1) (A, x) Hx)
-                 = sval (exist (fun p : {set I} * I => p.2 \in p.1) (A, y) Hy)
-          by simpl ; rewrite (eqP H0).
-        apply (eq_sig _ _ H) => //=.
-        exact: eq_irrelevance.
-      * symmetry ; apply/eqP => Hcontra.
-        by rewrite -Hcontra Hy in Hx.
-    + rewrite /f1/f2 => /= /andP [Hx Hinv].
-      move: Hinv ; rewrite /f1inv.
-      case (boolP (x\in A)) => H ; last by rewrite Hx in H.
-      by move/eqP ; case => ->.
-  - rewrite /omap/obind/oapp/f1inv => A Hx.
-    by case (boolP (x \in A)) => // ; rewrite Hx.
+Proof.
+set pair_sig : finType := ({p : {set I} * I | p.2 \in p.1}).
+set f1 : pair_sig -> {set I} := fun s => (val s).1.
+set f2 : pair_sig -> I := fun s => (val s).2.
+have proof1 :
+  \big[aop/idx]_i \big[aop/idx]_(A: {set I} | i \in A) f A i =
+    \big[aop/idx]_i \big[aop/idx]_(s: pair_sig | (f2 s)==i) f (f1 s) (f2 s).
+apply eq_bigr => x _.
+set f1inv : {set I} -> option pair_sig :=
+  fun A : {set I} => match (boolP (x \in A)) with
+                  | AltTrue h => Some (exist _ (A,x) h) | _ => None end.
+rewrite (reindex_omap f1 f1inv) => /=.
+- apply eq_big => /= s ;  destruct s as [[A y] Hy] ; simpl in Hy.
+  + rewrite /f1/f1inv/f2 => /=.
+    case (boolP (x \in A)) => Hx /=.
+    * case (boolP (y == x)) => H0 //= ;
+                              last by apply/eqP ; case => /eqP ; rewrite eq_sym (negbTE H0).
+      apply/eqP ; apply f_equal.
+      have H : sval (exist (fun x0 : {set I} * I => x0.2 \in x0.1) (A, x) Hx)
+               = sval (exist (fun p : {set I} * I => p.2 \in p.1) (A, y) Hy)
+        by simpl ; rewrite (eqP H0).
+      apply (eq_sig _ _ H) => //=.
+      exact: eq_irrelevance.
+    * symmetry ; apply/eqP => Hcontra.
+      by rewrite -Hcontra Hy in Hx.
+  + rewrite /f1/f2 => /= /andP [Hx Hinv].
+    move: Hinv ; rewrite /f1inv.
+    case (boolP (x\in A)) => H ; last by rewrite Hx in H.
+    by move/eqP ; case => ->.
+- rewrite /omap/obind/oapp/f1inv => A Hx.
+  by case (boolP (x \in A)) => // ; rewrite Hx.
   have proof2 :
     \big[aop/idx]_(A : {set I}) (\big[aop/idx]_(x in A) f A x)
     = \big[aop/idx]_(A : {set I})
@@ -1557,29 +1556,29 @@ Lemma big_partitionS (f : {set I} -> I -> R) :
     fun x => match (boolP (x \in A)) with
           | AltTrue h => Some (exist _ (A,x) h) | _ => None end.
   rewrite (reindex_omap f2 f2inv) => /=.
-  - apply eq_big => /= s ;  destruct s as [[B x] HB] ; simpl in HB.
-    + rewrite /f1/f2inv/f2 => /=.
-      case (boolP (x \in A)) => HA /=.
-      * case (boolP (B == A)) =>H0 //=;
-          last by apply/eqP ; case => /eqP ; rewrite eq_sym (negbTE H0).
-        apply/eqP ; apply f_equal.
-        have H : sval (exist (fun x0 : {set I} * I => x0.2 \in x0.1) (A, x) HA)
-                 = sval (exist (fun p : {set I} * I => p.2 \in p.1) (B, x) HB)
-          by simpl ; rewrite (eqP H0).
-        apply (eq_sig _ _ H) => //=.
-        exact: eq_irrelevance.
-      * symmetry ; apply/eqP => Hcontra.
-        by rewrite -Hcontra HB in HA.
-    + rewrite /f1/f2 => /= /andP [Hx Hinv].
-      move: Hinv ; rewrite /f2inv.
-      case (boolP (x\in A)) => H ; last by rewrite Hx in H.
-      by move/eqP ; case => ->.
-  - rewrite /omap/obind/oapp/f2inv => x Hx.
-    by case (boolP (x \in A)) => // ; rewrite Hx.
-  rewrite proof2 proof1.
-  rewrite -[LHS](partition_big f1 (P:=predT) predT)=> //.
-  rewrite -[RHS](partition_big f2 (P:=predT) predT)=> //.  
-  Qed.
+- apply eq_big => /= s ;  destruct s as [[B x] HB] ; simpl in HB.
+  + rewrite /f1/f2inv/f2 => /=.
+    case (boolP (x \in A)) => HA /=.
+    * case (boolP (B == A)) =>H0 //=;
+                             last by apply/eqP ; case => /eqP ; rewrite eq_sym (negbTE H0).
+      apply/eqP ; apply f_equal.
+      have H : sval (exist (fun x0 : {set I} * I => x0.2 \in x0.1) (A, x) HA)
+               = sval (exist (fun p : {set I} * I => p.2 \in p.1) (B, x) HB)
+        by simpl ; rewrite (eqP H0).
+      apply (eq_sig _ _ H) => //=.
+      exact: eq_irrelevance.
+    * symmetry ; apply/eqP => Hcontra.
+      by rewrite -Hcontra HB in HA.
+  + rewrite /f1/f2 => /= /andP [Hx Hinv].
+    move: Hinv ; rewrite /f2inv.
+    case (boolP (x\in A)) => H ; last by rewrite Hx in H.
+    by move/eqP ; case => ->.
+- rewrite /omap/obind/oapp/f2inv => x Hx.
+  by case (boolP (x \in A)) => // ; rewrite Hx.
+rewrite proof2 proof1.
+rewrite -[LHS](partition_big f1 (P:=predT) predT)=> //.
+by rewrite -[RHS](partition_big f2 (P:=predT) predT)=> //.  
+Qed.
 
 End BigOps.
 

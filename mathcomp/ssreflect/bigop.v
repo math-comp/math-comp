@@ -2105,12 +2105,12 @@ Local Notation "x * y" := (op x y).
 Lemma big_eq1F (I : finType) r (P : pred I) F :
   \big[op/idx]_(i <- r | P i) F i != idx -> exists i, [&& i \in r, P i & F i != idx].
 Proof.
-move=>H; apply/existsP/negbNE/existsPn=>Hcontra.
+move=>Hneq1; apply/existsP/negbNE/existsPn=>Hcontra.
 have Hcontra2 :  forall i : I, P i && (i \in r) -> F i = idx.
 move=>i /andP[Hi1 Hi2] ; move: (Hcontra i).
 by rewrite !negb_and=>/orP// ; case=>[|/orP] ; last case ;
   rewrite ?Hi2 ?Hi1=>///negPn/eqP->.
-by rewrite (big1_seq _ Hcontra2) eqxx in H.
+by rewrite (big1_seq _ Hcontra2) eqxx in Hneq1.
 Qed.
 End Plain.
 End MonoidPropertiesWithDecEq.
