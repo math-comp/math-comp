@@ -1227,7 +1227,7 @@ Lemma mem_imset2 (D : {pred aT}) (D2 : aT -> {pred aT2}) x x2 :
   (f2 x x2 \in [set f2 y y2 | y in D, y2 in D2 y])
     = (x \in D) && (x2 \in D2 x).
 Proof.
-move=> inj2_f; apply/imset2P/andP => [|[xD xD2]]; l exists x x2.
+move=> inj2_f; apply/imset2P/andP => [|[xD xD2]]; last by exists x x2.
 by move => [x' x2' xD xD2 eq_f2]; case: (inj2_f _ _ _ _ eq_f2) => -> ->.
 Qed.
 
