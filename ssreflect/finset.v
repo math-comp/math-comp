@@ -453,10 +453,7 @@ Lemma pick_set1E a : [pick x in [set a]] = Some a.
 Proof. by case: pickP=>[t'|/(_ a)] ; rewrite inE ?eqxx=>///eqP->. Qed.
 
 Lemma set10F a : [set a] != set0.
-Proof.
-apply/eqP/setP=>Hcontra ; have := Hcontra a.
-by rewrite in_set1 in_set0 eqxx.
-Qed.
+Proof. by apply/eqP => /setP/(_ a); rewrite !inE eqxx. Qed.
 
 Lemma set2P x a b : reflect (x = a \/ x = b) (x \in [set a; b]).
 Proof. by rewrite !inE; apply: pred2P. Qed.
