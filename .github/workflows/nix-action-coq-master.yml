@@ -2072,8 +2072,10 @@ name: Nix CI for bundle coq-master
 'on':
   pull_request:
     paths:
-    - .github/workflows/**
+    - .github/workflows/nix-action-coq-master.yml
   pull_request_target:
+    paths-ignore:
+    - .github/workflows/nix-action-coq-master.yml
     types:
     - opened
     - synchronize
