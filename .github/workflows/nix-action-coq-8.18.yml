@@ -2172,8 +2172,10 @@ name: Nix CI for bundle coq-8.18
 'on':
   pull_request:
     paths:
-    - .github/workflows/**
+    - .github/workflows/nix-action-coq-8.18.yml
   pull_request_target:
+    paths-ignore:
+    - .github/workflows/nix-action-coq-8.18.yml
     types:
     - opened
     - synchronize

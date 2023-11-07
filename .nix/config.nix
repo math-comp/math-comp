@@ -40,6 +40,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "gaia"
       "graph-theory"
       "interval"
+      "mathcomp-abel"
       "mathcomp-algebra-tactics"
       "mathcomp-bigenough"
       "mathcomp-finmap"
@@ -57,15 +58,10 @@ with builtins; with (import <nixpkgs> {}).lib;
       "mathcomp-classical"
       "mathcomp-analysis"
     ];
-    proux01-hierarchy-builder = [
-      "mathcomp-abel"
-    ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
     // listToAttrs (forEach hierarchy-builder (p:
       { name = p; value.override.version = "hierarchy-builder"; }))
-    // listToAttrs (forEach proux01-hierarchy-builder (p:
-      { name = p; value.override.version = "proux01:hierarchy-builder"; }))
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
        };
