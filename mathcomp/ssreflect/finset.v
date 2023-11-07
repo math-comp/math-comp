@@ -1423,6 +1423,19 @@ Proof.
 rewrite (bigD1 A)// ; congr (op _ _).
 by apply: eq_bigl=>B; rewrite andbC properEneq.
 Qed.
+
+Lemma big_imset_idem (h : I -> J) (A : {pred I}) F : idempotent op ->
+  \big[op/x]_(j in [set h i | i in A]) F j = \big[op/x]_(i in A) F (h i).
+Proof.
+rewrite -!big_image=>Hidem.
+rewrite -big_undup// -[in RHS]big_undup//.
+apply: perm_big; apply: perm_undup=>j; apply/imageP.
+case (boolP (j \in [seq h j | j in A]))=>[Hj | /imageP Hj].
+- by exists j=>//; apply/imsetP; exact: imageP Hj.
+- move=> [k /imsetP [i Hi1 ->] Hi2].
+  by have : exists2 x : I, x \in A & j = h x by exists i.
+Qed.
+
 End BigOpsSemiGroup.
 
 Section BigOps.

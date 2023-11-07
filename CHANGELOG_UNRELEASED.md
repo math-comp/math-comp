@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `finset.v`
   + lemmas `big_subset`, `big_setUI`, `big_subsetI`, `big_partitionS`,
-  `big_set1E`.
+  `big_set1E`, `big_imset_idem`.
 
 ### Changed
 
