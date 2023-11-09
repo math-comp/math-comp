@@ -1378,6 +1378,9 @@ Implicit Type F : I -> R.
 Lemma big_set0 F : \big[op/x]_(i in set0) F i = x.
 Proof. by apply: big_pred0 => i; rewrite inE. Qed.
 
+Lemma big_set1E j F : \big[op/x]_(i in [set j]) F i = op (F j) x.
+Proof. by rewrite -big_pred1_eq_id; apply: eq_bigl => i; apply: in_set1. Qed.
+
 Lemma big_set (A : pred I) F :
   \big[op/x]_(i in [set i | A i]) (F i) = \big[op/x]_(i in A) (F i).
 Proof. by apply: eq_bigl => i; rewrite inE. Qed.
@@ -1398,6 +1401,17 @@ Lemma subset_le_big_cond (I : finType) (A A' P P' : {pred I}) (F : I -> R) :
   le (\big[op/x]_(i in A | P i) F i) (\big[op/x]_(i in A' | P' i) F i).
 Proof.
 by move=> /subsetP AP; apply: sub_le_big => // i; have /[!inE] := AP i.
+Qed.
+
+Lemma big_imset_idem [I J : finType] (h : I -> J) (A : pred I) F :
+    idempotent op ->
+  \big[op/x]_(j in h @: A) F j = \big[op/x]_(i in A) F (h i).
+Proof.
+rewrite -!big_image => op_idem; rewrite -big_undup// -[RHS]big_undup//.
+apply/perm_big/perm_undup => j; apply/imageP.
+have [mem_j | /imageP mem_j] := boolP (j \in [seq h j | j in A]).
+- by exists j => //; apply/imsetP; apply: imageP mem_j.
+- by case=> k /imsetP [i j_in_A ->] eq_i; apply: mem_j; exists i.
 Qed.
 
 End BigOpsSemiGroup.
