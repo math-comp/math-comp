@@ -10,6 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- in `finset.v`
+  + lemmas `big_set1E`, `big_imset_idem`.
+
 ### Changed
 
 - Notations declared in the `fun_scope` are now declared in the
