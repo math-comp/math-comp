@@ -545,8 +545,7 @@ have{irr_q} [Lz [inLz [z qz0]]]: {Lz : fieldExtType F &
   pose Lz : fieldExtType _ := baseFieldType Lz0.
   pose inLz : {rmorphism L -> Lz} := in_alg Lz0.
   have inLzL_linear: linear (locked inLz).
-    move=> a u v; rewrite -(@mulr_algl F Lz) baseField_scaleE.
-    by rewrite -{1}mulr_algl rmorphD rmorphM -lock.
+    by move=> a u v; rewrite -[in LHS]mulr_algl rmorphD rmorphM -lock mulr_algl.
   pose inLzLlM := GRing.isLinear.Build _ _ _ _ _ inLzL_linear.
   pose inLzLL : {linear _ -> _} := HB.pack (locked inLz : _ -> _) inLzLlM.
   have ihLzZ: ahom_in {:L} (linfun inLzLL).

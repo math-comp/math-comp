@@ -1607,7 +1607,7 @@ End RightRegular.
 
 HB.mixin Record Zmodule_isLmodule (R : ringType) V of Zmodule V := {
   scale : R -> V -> V;
-  scalerA' : forall a b v, scale a (scale b v) = scale (a * b) v;
+  scalerA : forall a b v, scale a (scale b v) = scale (a * b) v;
   scale1r : left_id 1 scale;
   scalerDr : right_distributive scale +%R;
   scalerDl : forall v, {morph scale^~ v: a b / a + b}
@@ -1615,6 +1615,9 @@ HB.mixin Record Zmodule_isLmodule (R : ringType) V of Zmodule V := {
 #[short(type="lmodType")]
 HB.structure Definition Lmodule (R : ringType) :=
   {M of Zmodule M & Zmodule_isLmodule R M}.
+
+(* FIXME: see #1126 and #1127 *)
+Arguments scalerA [R s] (a b)%ring_scope v.
 
 Module LmodExports.
 Bind Scope ring_scope with Lmodule.sort.
@@ -1634,10 +1637,6 @@ Section LmoduleTheory.
 
 Variables (R : ringType) (V : lmodType R).
 Implicit Types (a b c : R) (u v : V).
-
-(* TODO: fix the type for the exported operation *)
-Lemma scalerA a b v : scale a (scale b v) = scale (a * b) v.
-Proof. exact: scalerA'. Qed.
 
 Lemma scale0r v : 0 *: v = 0.
 Proof. by apply: (addIr (1 *: v)); rewrite -scalerDl !add0r. Qed.
@@ -1662,7 +1661,7 @@ Proof. by rewrite scalerDr scalerN. Qed.
 
 Lemma scaler_nat n v : n%:R *: v = v *+ n.
 Proof.
-elim: n => /= [|n ]; first by rewrite scale0r.
+elim: n => /= [|n]; first by rewrite scale0r.
 by rewrite !mulrS scalerDl ?scale1r => ->.
 Qed.
 
@@ -1741,8 +1740,11 @@ Local Notation "R ^o" := (regular R) (at level 2, format "R ^o") : type_scope.
 Module RegularLalgExports.
 Section LalgebraTheory.
 
+HB.instance Definition _ (V : nmodType) := Nmodule.on V^o.
+HB.instance Definition _ (V : zmodType) := Zmodule.on V^o.
+HB.instance Definition _ (R : semiRingType) := SemiRing.on R^o.
+
 Variables (R : ringType) (A : lalgType R).
-Implicit Types x y : A.
 
 HB.instance Definition _ := Ring.on R^o.
 
@@ -2188,13 +2190,12 @@ Definition law := Law.type.
 Section ScaleLaw.
 
 Variables (R : ringType) (V : zmodType) (s_law : law R V).
-Local Notation s_op := (Law.sort s_law).
 
-Lemma N1op : s_op (-1) =1 -%R. Proof. exact: N1op_subproof. Qed.
-Fact opB a : additive (s_op a). Proof. exact: op_additive_subproof. Qed.
+Lemma N1op : s_law (-1) =1 -%R. Proof. exact: N1op_subproof. Qed.
+Fact opB a : additive (s_law a). Proof. exact: op_additive_subproof. Qed.
 
 Variables (aR : ringType) (nu : {rmorphism aR -> R}).
-Fact compN1op : (nu \; s_op) (-1) =1 -%R.
+Fact compN1op : (nu \; s_law) (-1) =1 -%R.
 Proof. by move=> v; rewrite /= rmorphN1 N1op. Qed.
 
 End ScaleLaw.
@@ -2730,21 +2731,20 @@ End ComAlgExports.
 HB.export ComAlgExports.
 
 Section AlgebraTheory.
-Variables (R : comRingType) (A : algType R).
+Variables (R : comRingType).
 #[export]
-HB.instance Definition converse_ : SemiRing_hasCommutativeMul R^c :=
+HB.instance Definition _ :=
   SemiRing_hasCommutativeMul.Build R^c (fun _ _ => mulrC _ _).
 #[export]
-HB.instance Definition regular_comSemiRingType :
-  SemiRing_hasCommutativeMul R^o := ComSemiRing.on R^o.
+HB.instance Definition _ := ComSemiRing.on R^o.
 #[export]
-HB.instance Definition regular_comAlgType : Lalgebra_isComAlgebra R R^o :=
-  Lalgebra_isComAlgebra.Build R R^o.
+HB.instance Definition _ := Lalgebra_isComAlgebra.Build R R^o.
 End AlgebraTheory.
 
 Section AlgebraTheory.
 
-Variables (R : comRingType) (A : algType R).
+(* TODO: MC-1 port (R has been changed from comRingType to ringType) *)
+Variables (R : ringType) (A : algType R).
 Implicit Types (k : R) (x y : A).
 
 Lemma scalerCA k x y : k *: x * y = x * (k *: y).
@@ -3015,10 +3015,9 @@ Section UnitRingTheory.
 Variable R : unitRingType.
 Implicit Types x y : R.
 
-HB.instance Definition xxx1 : Ring_hasMulInverse R^c :=
+HB.instance Definition _ :=
   Ring_hasMulInverse.Build R^c (@mulrV R) (@mulVr R) (@rev_unitrP R) (@invr_out R).
-HB.instance Definition xxx2 : Ring_hasMulInverse R^o :=
-  UnitRing.on R^o.
+HB.instance Definition _ := UnitRing.on R^o.
 End UnitRingTheory.
 End RegularConverseUnitRingExports.
 HB.export RegularConverseUnitRingExports.
@@ -3113,7 +3112,7 @@ Proof. by move=> x Ux /=; rewrite mulrC mulVx. Qed.
 Fact mulC_unitP x y : y * x = 1 /\ x * y = 1 -> unit x.
 Proof. by case=> yx _; apply: unitPl yx. Qed.
 
-HB.instance Definition mulinverse : Ring_hasMulInverse R :=
+HB.instance Definition _ :=
   Ring_hasMulInverse.Build R mulVx mulC_mulrV mulC_unitP invr_out.
 
 HB.end.
@@ -3177,8 +3176,8 @@ Variable R : comUnitRingType.
 Implicit Types x y : R.
 
 (* TODO: HB.recover_all_instances (R^o). *)
-HB.instance Definition _ : Ring_hasMulInverse (R^c) := xxx1 R.
-HB.instance Definition _ : Ring_hasMulInverse (R^o) := xxx2 R.
+HB.instance Definition _ := ComUnitRing.on R^c.
+HB.instance Definition _ := ComUnitRing.on R^o.
 End ComUnitRingTheory.
 End RegularConverseComUnitRingExports.
 HB.export RegularConverseComUnitRingExports.
@@ -4045,11 +4044,7 @@ Proof. by apply: (iffP idP) => [/mulIf | /rreg_neq0]. Qed.
 End IntegralDomainTheory.
 
 Module RegularIdomainExports.
-Section IntegralDomainTheory.
-Variable R : idomainType.
-HB.instance Definition regular_integral : ComUnitRing_isIntegral R^o :=
-  IntegralDomain.on R^o.
-End IntegralDomainTheory.
+HB.instance Definition _ (R : idomainType) := IntegralDomain.on R^o.
 End RegularIdomainExports.
 HB.export RegularIdomainExports.
 
@@ -5355,7 +5350,7 @@ Qed.
 HB.instance Definition _ := ComUnitRing_isIntegral.Build U id.
 HB.end.
 
-#[short(type="subField")]
+#[short(type="subFieldType")]
 HB.structure Definition SubField (F : fieldType) (S : pred F) :=
   {U of SubIntegralDomain F S U & Field U}.
 
@@ -6266,7 +6261,7 @@ Fact ffun_add0 : left_id ffun_zero ffun_add.
 Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE add0r. Qed.
 
 #[export]
-HB.instance Definition _  := isNmodule.Build {ffun aT -> rT}
+HB.instance Definition _ := isNmodule.Build {ffun aT -> rT}
   ffun_addA ffun_addC ffun_add0.
 
 Section Sum.
@@ -6298,7 +6293,7 @@ Fact ffun_addN : left_inverse (@ffun_zero _ _) ffun_opp (@ffun_add _ _).
 Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE addNr. Qed.
 
 #[export]
-HB.instance Definition _  := Nmodule_isZmodule.Build {ffun aT -> rT}
+HB.instance Definition _ := Nmodule_isZmodule.Build {ffun aT -> rT}
   ffun_addN.
 
 End FinFunZmod.
@@ -6561,7 +6556,8 @@ End PairLalg.
 
 Section PairAlg.
 
-Variables (R : comRingType) (A1 A2 : algType R).
+(* TODO: MC-1 port (R has been changed from comRingType to ringType) *)
+Variables (R : ringType) (A1 A2 : algType R).
 
 Fact pair_scaleAr a (u v : A1 * A2) : a *: (u * v) = u * (a *: v).
 Proof. by congr (_, _); apply: scalerAr. Qed.
