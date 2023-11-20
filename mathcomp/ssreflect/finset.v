@@ -1369,6 +1369,21 @@ Arguments imsetP {aT rT f D y}.
 Arguments imset2P {aT aT2 rT f2 D1 D2 y}.
 Arguments imset_disjoint {aT rT f A B}.
 
+Section BigOpsAnyOp.
+
+Variables (R : Type) (x : R) (op : R -> R -> R).
+Variables I : finType.
+Implicit Type F : I -> R.
+
+Lemma big_set0 F : \big[op/x]_(i in set0) F i = x.
+Proof. by apply: big_pred0 => i; rewrite inE. Qed.
+
+Lemma big_set (A : pred I) F :
+  \big[op/x]_(i in [set i | A i]) (F i) = \big[op/x]_(i in A) (F i).
+Proof. by apply: eq_bigl => i; rewrite inE. Qed.
+
+End BigOpsAnyOp.
+
 Section BigOpsSemiGroup.
 
 Variables (R : Type) (op : SemiGroup.com_law R).
@@ -1397,15 +1412,8 @@ Implicit Type h : I -> J.
 Implicit Type P : pred I.
 Implicit Type F : I -> R.
 
-Lemma big_set0 F : \big[op/idx]_(i in set0) F i = idx.
-Proof. by apply: big_pred0 => i; rewrite inE. Qed.
-
 Lemma big_set1 a F : \big[op/idx]_(i in [set a]) F i = F a.
 Proof. by apply: big_pred1 => i; rewrite !inE. Qed.
-
-Lemma big_set (A : pred I) F :
-   \big[op/idx]_(i in [set i | A i]) (F i) = \big[op/idx]_(i in A) (F i).
-Proof. by apply: eq_bigl => i; rewrite inE. Qed.
 
 Lemma big_setID A B F :
   \big[aop/idx]_(i in A) F i =

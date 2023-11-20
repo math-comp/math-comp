@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- in `finset.v`
+  + generalized lemmas `big_set0` and `big_set` from semigroups
+    to arbitrary binary operators
+
 ### Renamed
 
 ### Removed
