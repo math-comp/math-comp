@@ -1369,6 +1369,29 @@ Arguments imsetP {aT rT f D y}.
 Arguments imset2P {aT aT2 rT f2 D1 D2 y}.
 Arguments imset_disjoint {aT rT f A B}.
 
+Section BigOpsAnyOp. (* Any operator op : R -> R -> R *)
+Variables (R : Type) (x : R).
+Variables (op : R -> R -> R).
+Variables I J : finType.
+Implicit Type A B : {set I}.
+Implicit Type h : I -> J.
+Implicit Type P : pred I.
+Implicit Type F : I -> R.
+
+Lemma big_set0 F : \big[op/x]_(i in set0) F i = x.
+Proof. by apply big_pred0=>i ; rewrite inE. Qed.
+
+Lemma big_set1E j F : \big[op/x]_(i in [set j]) F i = op (F j) x.
+Proof. by rewrite -big_pred1_eq_id; apply: eq_bigl=>i; exact: in_set1. Qed.
+
+Lemma big_condT A F :
+  \big[op/x]_(i in A | true) F i = \big[op/x]_(i in A) F i.
+Proof. by apply: eq_bigl=>i ; by rewrite andbT. Qed.
+
+Lemma big_setT F : \big[op/x]_(i in [set: I]) F i = \big[op/x]_i F i.
+Proof. by under eq_bigl do rewrite in_setT. Qed.
+End BigOpsAnyOp.
+
 Section BigOpsSemiGroup.
 
 Variables (R : Type) (op : SemiGroup.com_law R).
@@ -1387,6 +1410,34 @@ Qed.
 
 End BigOpsSemiGroup.
 
+Section BigOpsSemiGroup.
+Variables (R : Type) (x : R).
+Variables (op : SemiGroup.com_law R).
+Variables I J : finType.
+Implicit Type A B : {set I}.
+
+Lemma big_subset A (F : {set I} -> R):
+  \big[op/x]_(B : {set I} | B \subset A) F B
+  = op (F A) (\big[op/x]_(B : {set I} | B \proper A) F B).
+Proof.
+rewrite (bigD1 A)// ; congr (op _ _).
+by apply: eq_bigl=>B; rewrite andbC properEneq.
+Qed.
+
+Lemma big_imset_idem (h : I -> J) (A : {pred I}) F : idempotent op ->
+  \big[op/x]_(j in [set h i | i in A]) F j = \big[op/x]_(i in A) F (h i).
+Proof.
+rewrite -!big_image=>Hidem.
+rewrite -big_undup// -[in RHS]big_undup//.
+apply: perm_big; apply: perm_undup=>j; apply/imageP.
+case (boolP (j \in [seq h j | j in A]))=>[Hj | /imageP Hj].
+- by exists j=>//; apply/imsetP; exact: imageP Hj.
+- move=> [k /imsetP [i Hi1 ->] Hi2].
+  by have : exists2 x : I, x \in A & j = h x by exists i.
+Qed.
+
+End BigOpsSemiGroup.
+
 Section BigOps.
 
 Variables (R : Type) (idx : R).
@@ -1397,11 +1448,24 @@ Implicit Type h : I -> J.
 Implicit Type P : pred I.
 Implicit Type F : I -> R.
 
-Lemma big_set0 F : \big[op/idx]_(i in set0) F i = idx.
-Proof. by apply: big_pred0 => i; rewrite inE. Qed.
-
 Lemma big_set1 a F : \big[op/idx]_(i in [set a]) F i = F a.
 Proof. by apply: big_pred1 => i; rewrite !inE. Qed.
+
+Lemma big_setUI A B F :
+  aop (\big[aop/idx]_(i in A :|: B) F i)
+      (\big[aop/idx]_(i in A :&: B) F i)
+  =
+    aop (\big[aop/idx]_(i in A) F i) (\big[aop/idx]_(i in B) F i).
+Proof.
+rewrite [E in aop E _ = _](bigID (fun i => i \in A)).
+rewrite [E in aop (aop E _) _ = _](bigID (fun i => i \in B)).
+rewrite -Monoid.mulmA.
+rewrite [E in _ = aop _ E](bigID (fun i => i \in A)).
+rewrite [E in _ = aop E _](bigID (fun i => i \in B)).
+rewrite [E in _ = aop _ E]Monoid.mulmC.
+do 2 congr (aop _ _); apply: eq_bigl=>i; rewrite !inE;
+  by case (i \in A); case (i \in B).
+Qed.
 
 Lemma big_set (A : pred I) F :
    \big[op/idx]_(i in [set i | A i]) (F i) = \big[op/idx]_(i in A) (F i).
@@ -1455,6 +1519,82 @@ Lemma partition_big_imset h (A : {pred I}) F :
   \big[aop/idx]_(i in A) F i =
      \big[aop/idx]_(j in h @: A) \big[aop/idx]_(i in A | h i == j) F i.
 Proof. by apply: partition_big => i Ai; apply/imsetP; exists i. Qed.
+
+Lemma big_subsetI A B (F : {set I} -> R) :
+  aop (\big[aop/idx]_(C : {set I} | (C \subset A) && ~~(C \subset B)) F C)
+      (\big[aop/idx]_(C : {set I} | C \subset A :&: B) F C)
+  = \big[aop/idx]_(C : {set I} | C \subset A) F C.
+Proof.
+rewrite [E in _=E](bigID (fun C : {set I} => C \subset B)) [E in _=E]Monoid.mulmC.
+by congr (aop _ _); apply: eq_bigl=>/=C; exact: subsetI.
+Qed.
+
+Lemma big_partitionS (f : {set I} -> I -> R) :
+  \big[aop/idx]_(A : {set I}) (\big[aop/idx]_(i in A) f A i)
+  = \big[aop/idx]_(i : I) \big[aop/idx]_(A : {set I} | i \in A) f A i.
+Proof.
+set pair_sig : finType := ({p : {set I} * I | p.2 \in p.1}).
+set f1 : pair_sig -> {set I} := fun s => (val s).1.
+set f2 : pair_sig -> I := fun s => (val s).2.
+have proof1 :
+  \big[aop/idx]_i \big[aop/idx]_(A: {set I} | i \in A) f A i =
+    \big[aop/idx]_i \big[aop/idx]_(s: pair_sig | (f2 s)==i) f (f1 s) (f2 s).
+apply eq_bigr => x _.
+set f1inv : {set I} -> option pair_sig :=
+  fun A : {set I} => match (boolP (x \in A)) with
+                  | AltTrue h => Some (exist _ (A,x) h) | _ => None end.
+rewrite (reindex_omap f1 f1inv) => /=.
+- apply eq_big => /= s ;  destruct s as [[A y] Hy] ; simpl in Hy.
+  + rewrite /f1/f1inv/f2 => /=.
+    case (boolP (x \in A)) => Hx /=.
+    * case (boolP (y == x)) => H0 //= ;
+        last by apply/eqP ; case => /eqP ; rewrite eq_sym (negbTE H0).
+      apply/eqP ; apply f_equal.
+      have H : sval (exist (fun x0 : {set I} * I => x0.2 \in x0.1) (A, x) Hx)
+               = sval (exist (fun p : {set I} * I => p.2 \in p.1) (A, y) Hy)
+        by simpl ; rewrite (eqP H0).
+      apply (eq_sig _ _ H) => //=.
+      exact: eq_irrelevance.
+    * symmetry ; apply/eqP => Hcontra.
+      by rewrite -Hcontra Hy in Hx.
+  + rewrite /f1/f2 => /= /andP [Hx Hinv].
+    move: Hinv ; rewrite /f1inv.
+    case (boolP (x\in A)) => H ; last by rewrite Hx in H.
+    by move/eqP ; case => ->.
+- rewrite /omap/obind/oapp/f1inv => A Hx.
+  by case (boolP (x \in A)) => // ; rewrite Hx.
+  have proof2 :
+    \big[aop/idx]_(A : {set I}) (\big[aop/idx]_(x in A) f A x)
+    = \big[aop/idx]_(A : {set I})
+      (\big[aop/idx]_(s : pair_sig | f1 s == A) f (f1 s) (f2 s)).
+  apply eq_bigr => A _.
+  set f2inv : I -> option pair_sig :=
+    fun x => match (boolP (x \in A)) with
+          | AltTrue h => Some (exist _ (A,x) h) | _ => None end.
+  rewrite (reindex_omap f2 f2inv) => /=.
+- apply eq_big => /= s ;  destruct s as [[B x] HB] ; simpl in HB.
+  + rewrite /f1/f2inv/f2 => /=.
+    case (boolP (x \in A)) => HA /=.
+    * case (boolP (B == A)) =>H0 //=;
+        last by apply/eqP ; case => /eqP ; rewrite eq_sym (negbTE H0).
+      apply/eqP ; apply f_equal.
+      have H : sval (exist (fun x0 : {set I} * I => x0.2 \in x0.1) (A, x) HA)
+               = sval (exist (fun p : {set I} * I => p.2 \in p.1) (B, x) HB)
+        by simpl ; rewrite (eqP H0).
+      apply (eq_sig _ _ H) => //=.
+      exact: eq_irrelevance.
+    * symmetry ; apply/eqP => Hcontra.
+      by rewrite -Hcontra HB in HA.
+  + rewrite /f1/f2 => /= /andP [Hx Hinv].
+    move: Hinv ; rewrite /f2inv.
+    case (boolP (x\in A)) => H ; last by rewrite Hx in H.
+    by move/eqP ; case => ->.
+- rewrite /omap/obind/oapp/f2inv => x Hx.
+  by case (boolP (x \in A)) => // ; rewrite Hx.
+rewrite proof2 proof1.
+rewrite -[LHS](partition_big f1 (P:=predT) predT)=> //.
+by rewrite -[RHS](partition_big f2 (P:=predT) predT)=> //.  
+Qed.
 
 End BigOps.
 

@@ -1996,6 +1996,20 @@ Lemma bigU (I : finType) (A B : pred I) F :
     (\big[*%M/1]_(i in A) F i) * (\big[*%M/1]_(i in B) F i).
 Proof. exact/bigU_idem/mul1m. Qed.
 
+Lemma bigUI (I : finType) (P Q : pred I) F :
+  (\big[*%M/1]_(i in [predU P & Q]) F i) * \big[*%M/1]_(i in [predI P & Q]) F i
+  = (\big[*%M/1]_(i in P) F i) * (\big[*%M/1]_(i in Q) F i).
+Proof.
+rewrite [E in E * _ = _](bigID (fun i => i \in P)).
+rewrite [E in  (E * _) * _ = _](bigID (fun i => i \in Q)).
+rewrite -Monoid.mulmA.
+rewrite [E in _ = _ * E](bigID (fun i => i \in P)).
+rewrite [E in _ = E * _](bigID (fun i => i \in Q)).
+rewrite [E in _ = _ * E]Monoid.mulmC.
+do 2 congr (_*_); apply: eq_bigl=>i; rewrite !inE;
+  by case (i \in P); case (i \in Q).
+Qed.
+
 Lemma partition_big I (s : seq I)
       (J : finType) (P : pred I) (p : I -> J) (Q : pred J) F :
   (forall i, P i -> Q (p i)) ->
@@ -2076,6 +2090,30 @@ Proof. exact/exchange_big_nat_idem/mul1m. Qed.
 End Abelian.
 
 End MonoidProperties.
+
+Section MonoidPropertiesWithDecEq.
+Import Monoid.Theory.
+Variable R : eqType.
+Variable idx : R.
+Local Notation "1" := idx.
+
+Section Plain.
+Variable op : Monoid.law 1.
+Local Notation "*%M" := op (at level 0).
+Local Notation "x * y" := (op x y).
+
+Lemma big_eq1F (I : finType) r (P : pred I) F :
+  \big[op/idx]_(i <- r | P i) F i != idx -> exists i, [&& i \in r, P i & F i != idx].
+Proof.
+move=>Hneq1; apply/existsP/negbNE/existsPn=>Hcontra.
+have Hcontra2 :  forall i : I, P i && (i \in r) -> F i = idx.
+move=>i /andP[Hi1 Hi2] ; move: (Hcontra i).
+by rewrite !negb_and=>/orP// ; case=>[|/orP] ; last case ;
+  rewrite ?Hi2 ?Hi1=>///negPn/eqP->.
+by rewrite (big1_seq _ Hcontra2) eqxx in Hneq1.
+Qed.
+End Plain.
+End MonoidPropertiesWithDecEq.
 
 Arguments big_filter [R idx op I].
 Arguments big_filter_cond [R idx op I].
@@ -2398,6 +2436,20 @@ Lemma bigA_distr_bigA (I J : finType) F :
   \big[*%M/1]_(i : I) \big[+%M/0]_(j : J) F i j
     = \big[+%M/0]_(f : {ffun I -> J}) \big[*%M/1]_i F i (f i).
 Proof. by rewrite bigA_distr_big; apply: eq_bigl => ?; apply/familyP. Qed.
+
+Lemma partition_big_distrl (I J : finType) (P : pred J)
+                           (h : I -> J) (f : I -> R) (g : J -> R) :
+    \big[+%M/0]_(A | P (h A)) (f A * g (h A))
+    = \big[+%M/0]_(B | P B) (\big[+%M/0]_(A | h A == B) f A * g B).
+Proof.
+under [RHS]eq_bigr do rewrite big_distrl /=.
+rewrite [LHS](partition_big h P) => //.
+apply: eq_bigr => B HB ; apply: eq_big => [A | A /andP [_ HA2]].
+- case (boolP (h A == B)) => H; last by rewrite andbF.
+  by rewrite (eqP H) HB.
+- by rewrite (eqP HA2).
+Qed.
+
 
 End Distributivity.
 
