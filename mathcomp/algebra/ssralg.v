@@ -4811,24 +4811,23 @@ HB.mixin Record isScaleClosed (R : semiRingType) (V : lSemiModType R)
 
 (* Structures for stability properties *)
 
-#[short(type="opprClosed")]
-HB.structure Definition OppClosed V := {S of isOppClosed V S}.
-
 #[short(type="addrClosed")]
-HB.structure Definition AddClosed V := {S of isAddClosed V S}.
+HB.structure Definition AddClosed (V : nmodType) := {S of isAddClosed V S}.
+
+#[short(type="opprClosed")]
+HB.structure Definition OppClosed (V : zmodType) := {S of isOppClosed V S}.
 
 #[short(type="zmodClosed")]
-HB.structure Definition ZmodClosed V := {S of OppClosed V S & AddClosed V S}.
+HB.structure Definition ZmodClosed (V : zmodType) :=
+  {S of OppClosed V S & AddClosed V S}.
 
 #[short(type="mulr2Closed")]
-HB.structure Definition Mul2Closed R := {S of isMul2Closed R S}.
+HB.structure Definition Mul2Closed (R : semiRingType) :=
+  {S of isMul2Closed R S}.
 
 #[short(type="mulrClosed")]
-HB.structure Definition MulClosed R := {S of Mul2Closed R S & isMul1Closed R S}.
-
-#[short(type="smulClosed")]
-HB.structure Definition SmulClosed (R : ringType) :=
-  {S of OppClosed R S & MulClosed R S}.
+HB.structure Definition MulClosed (R : semiRingType) :=
+  {S of Mul2Closed R S & isMul1Closed R S}.
 
 #[short(type="semiring2Closed")]
 HB.structure Definition Semiring2Closed (R : semiRingType) :=
@@ -4837,6 +4836,10 @@ HB.structure Definition Semiring2Closed (R : semiRingType) :=
 #[short(type="semiringClosed")]
 HB.structure Definition SemiringClosed (R : semiRingType) :=
   {S of AddClosed R S & MulClosed R S}.
+
+#[short(type="smulClosed")]
+HB.structure Definition SmulClosed (R : ringType) :=
+  {S of OppClosed R S & MulClosed R S}.
 
 #[short(type="subringClosed")]
 HB.structure Definition SubringClosed (R : ringType) :=
@@ -4850,21 +4853,13 @@ HB.structure Definition DivClosed (R : unitRingType) :=
 HB.structure Definition SdivClosed (R : unitRingType) :=
   {S of SmulClosed R S & isInvClosed R S}.
 
-#[short(type="semimodClosed")]
-HB.structure Definition SemimodClosed (R : semiRingType) (V : lSemiModType R) :=
+#[short(type="submodClosed")]
+HB.structure Definition SubmodClosed (R : semiRingType) (V : lSemiModType R) :=
   {S of AddClosed V S & isScaleClosed R V S}.
 
-#[short(type="submodClosed")]
-HB.structure Definition SubmodClosed (R : ringType) (V : lmodType R) :=
-  {S of ZmodClosed V S & isScaleClosed R V S}.
-
-#[short(type="semialgClosed")]
-HB.structure Definition SemialgClosed (R : semiRingType) (A : lSemiAlgType R) :=
-  {S of SemiringClosed A S & isScaleClosed R A S}.
-
 #[short(type="subalgClosed")]
-HB.structure Definition SubalgClosed (R : ringType) (A : lalgType R) :=
-  {S of SubringClosed A S & isScaleClosed R A S}.
+HB.structure Definition SubalgClosed (R : semiRingType) (A : lSemiAlgType R) :=
+  {S of SemiringClosed A S & isScaleClosed R A S}.
 
 #[short(type="divringClosed")]
 HB.structure Definition DivringClosed (R : unitRingType) :=
