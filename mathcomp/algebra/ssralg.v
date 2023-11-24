@@ -1683,6 +1683,23 @@ HB.instance Definition _ :=
 
 HB.end.
 
+HB.factory Record LSemiModule_isLmodule (R : ringType) V
+  of LSemiModule R V := {}.
+
+HB.builders Context R V of LSemiModule_isLmodule R V.
+
+Definition opp : V -> V := scale (- 1).
+
+Lemma addNr : left_inverse 0 opp +%R.
+Proof.
+move=> v; suff : scale (-1 + 1) v = 0 by  rewrite scalerDl scale1r.
+by rewrite addNr scale0r.
+Qed.
+
+HB.instance Definition _ := Nmodule_isZmodule.Build V addNr.
+
+HB.end.
+
 Section LSemiModuleTheory.
 
 Variables (R : semiRingType) (V : lSemiModType R).
