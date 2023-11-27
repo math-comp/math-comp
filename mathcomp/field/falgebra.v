@@ -82,8 +82,8 @@ Reserved Notation "{ 'aspace' T }" (at level 0, format "{ 'aspace'  T }").
 Reserved Notation "<< U & vs >>" (at level 0, format "<< U  &  vs >>").
 Reserved Notation "<< U ; x >>" (at level 0, format "<< U ;  x >>").
 Reserved Notation "''AHom' ( T , rT )"
-  (at level 8, format "''AHom' ( T ,  rT )").
-Reserved Notation "''AEnd' ( T )" (at level 8, format "''AEnd' ( T )").
+  (at level 0, format "''AHom' ( T ,  rT )").
+Reserved Notation "''AEnd' ( T )" (at level 0, format "''AEnd' ( T )").
 
 Notation "\dim_ E V" := (divn (\dim V) (\dim E))
   (at level 10, E at level 2, V at level 8, format "\dim_ E  V") : nat_scope.

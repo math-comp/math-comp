@@ -1799,7 +1799,7 @@ HB.instance Definition _ := isFinite.Build ordinal
 End OrdinalSub.
 
 Notation "''I_' n" := (ordinal n)
-  (at level 8, n at level 2, format "''I_' n").
+  (at level 0, n at level 2, format "''I_' n").
 
 #[global] Hint Resolve ltn_ord : core.
 

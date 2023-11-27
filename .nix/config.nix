@@ -36,7 +36,7 @@ with builtins; with (import <nixpkgs> {}).lib;
     master = [
       "coqeal"
       "coquelicot"
-      "fourcolor"
+      # "fourcolor"
       "gaia"
       "graph-theory"
       "interval"
@@ -44,26 +44,34 @@ with builtins; with (import <nixpkgs> {}).lib;
       "mathcomp-algebra-tactics"
       "mathcomp-apery"
       "mathcomp-bigenough"
-      "mathcomp-finmap"
-      "mathcomp-real-closed"
+      # "mathcomp-finmap"
+      # "mathcomp-real-closed"
       "mathcomp-zify"
-      "multinomials"
-      "odd-order"
+      # "multinomials"
+      # "odd-order"
       "reglang"
-      "mathcomp-tarjan"
+      # "mathcomp-tarjan"
       "deriving"
       "extructures"
     ];
     hierarchy-builder = [
       "coq-bits"
-      "mathcomp-classical"
-      "mathcomp-analysis"
+      # "mathcomp-classical"
+      # "mathcomp-analysis"
     ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
     // listToAttrs (forEach hierarchy-builder (p:
       { name = p; value.override.version = "hierarchy-builder"; }))
-    // { mathcomp-ssreflect.main-job = true;
+    // { fourcolor.override.version = "mc_1110";
+         mathcomp-classical.override.version = "proux01:mc_1110";
+         mathcomp-analysis.override.version = "proux01:mc_1110";
+         mathcomp-finmap.override.version = "proux01:mc_1110";
+         mathcomp-real-closed.override.version = "proux01:mc_1110";
+         multinomials.override.version = "proux01:mc_1110";
+         odd-order.override.version = "mc_1110";
+         mathcomp-tarjan.override.version = "proux01:mc_1110";
+         mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
        };
   in {
@@ -75,6 +83,17 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq-elpi.override.version = "coq-master";
       hierarchy-builder.override.version = "master";
       interval.job = false;
+      coquelicot.job = false;
+    };
+    "coq-17876".push-branches = [ "master" "mathcomp-1" ];
+    "coq-17876".coqPackages = common-bundles // {
+      coq.override.version = "proux01:master+gramlib-support-for-non-assoc-and-non-recovery";
+      bignums.override.version = "master";
+      paramcoq.override.version = "master";
+      coq-elpi.override.version = "coq-master";
+      hierarchy-builder.override.version = "master";
+      interval.job = false;
+      coqeal.job = false;
       coquelicot.job = false;
     };
     "coq-8.18".push-branches = [ "master" "mathcomp-1" ];

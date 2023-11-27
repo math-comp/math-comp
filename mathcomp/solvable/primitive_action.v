@@ -180,7 +180,7 @@ Arguments ntransitive {gT sT} n%N A%g S%g to%act.
 Arguments n_act {gT sT} to {n} t a.
 
 Notation "n .-dtuple ( S )" := (dtuple_on n S)
-  (at level 8, format "n .-dtuple ( S )") : set_scope.
+  (at level 1, format "n .-dtuple ( S )") : set_scope.
 
 Notation "[ 'transitive' ^ n A , 'on' S | to ]" := (ntransitive n A S to)
   (at level 0, n at level 8,

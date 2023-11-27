@@ -46,9 +46,9 @@ Unset Printing Implicit Defensive.
 Local Notation "n %:R" := (n %:R%R).
 Import GroupScope GRing.Theory.
 
-Reserved Notation "p ^{1+2}" (at level 2, format "p ^{1+2}").
+Reserved Notation "p ^{1+2}" (at level 1, format "p ^{1+2}").
 Reserved Notation "p ^{1+2* n }"
-  (at level 2, n at level 2, format "p ^{1+2* n }").
+  (at level 1, n at level 2, format "p ^{1+2* n }").
 Reserved Notation "''D^' n" (at level 8, n at level 2, format "''D^' n").
 Reserved Notation "''D^' n * 'Q'"
   (at level 8, n at level 2, format "''D^' n * 'Q'").

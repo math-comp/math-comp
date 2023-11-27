@@ -32,15 +32,15 @@
 
 (* Reserved notation for evaluation *)
 Reserved Notation "e .[ x ]"
-  (at level 2, left associativity, format "e .[ x ]").
+  (at level 1, left associativity, format "e .[ x ]").
 
-Reserved Notation "e .[ x1 , x2 , .. , xn ]" (at level 2, left associativity,
+Reserved Notation "e .[ x1 , x2 , .. , xn ]" (at level 1, left associativity,
   format "e '[ ' .[ x1 , '/'  x2 , '/'  .. , '/'  xn ] ']'").
 
 (* Reserved notation for subscripting and superscripting *)
 Reserved Notation "s `_ i" (at level 3, i at level 2, left associativity,
   format "s `_ i").
-Reserved Notation "x ^-1" (at level 3, left associativity, format "x ^-1").
+Reserved Notation "x ^-1" (at level 1, left associativity, format "x ^-1").
 
 (* Reserved notation for integer multipliers and exponents *)
 Reserved Notation "x *+ n" (at level 40, left associativity).
@@ -67,16 +67,35 @@ Reserved Notation "<[ a ] >"  (at level 0, format "<[ a ] >").
 Reserved Notation "#[ x ]" (at level 0, format "#[ x ]").
 
 (* Reserved notation for centralisers and centers. *)
-Reserved Notation "''C' [ x ]" (at level 8, format "''C' [ x ]").
+Reserved Notation "''C' [ x ]" (at level 0, format "''C' [ x ]").
 Reserved Notation "''C_' A [ x ]"
-  (at level 8, A at level 2, format "''C_' A [ x ]").
-Reserved Notation "''C' ( A )" (at level 8, format "''C' ( A )").
+  (at level 0, A at level 2, format "''C_' A [ x ]").
+Reserved Notation "''C' ( A )" (at level 0, format "''C' ( A )").
 Reserved Notation "''C_' B ( A )"
-  (at level 8, B at level 2, format "''C_' B ( A )").
-Reserved Notation "''Z' ( A )" (at level 8, format "''Z' ( A )").
+  (at level 0, B at level 2, format "''C_' B ( A )").
+Reserved Notation "''Z' ( A )" (at level 0, format "''Z' ( A )").
 (* Compatibility with group action centraliser notation. *)
-Reserved Notation "''C_' ( A ) [ x ]" (at level 8).
-Reserved Notation "''C_' ( B ) ( A )" (at level 8).
+Reserved Notation "''C_' ( A ) [ x ]" (at level 0).
+Reserved Notation "''C_' ( B ) ( A )" (at level 0).
+Reserved Notation "''C' [ x | to ]" (at level 0, format "''C' [ x | to ]").
+Reserved Notation "''C' ( S | to )" (at level 0, format "''C' ( S | to )").
+Reserved Notation "''C_' A [ x | to ]"
+  (at level 0, A at level 2, format "''C_' A [ x  |  to ]").
+Reserved Notation "''C_' A ( S | to )"
+  (at level 0, A at level 2, format "''C_' A ( S  |  to )").
+Reserved Notation "''C_' ( A ) [ x | to ]" (only parsing, at level 0).
+Reserved Notation "''C_' ( A ) ( S | to )" (only parsing, at level 0).
+Reserved Notation "''C_' ( | to ) [ a ]"
+  (at level 0, format "''C_' ( | to ) [ a ]").
+Reserved Notation "''C_' ( G | to ) [ a ]"
+  (at level 0, format "''C_' ( G  |  to ) [ a ]").
+Reserved Notation "''C_' ( | to ) ( A )"
+  (at level 0, format "''C_' ( | to ) ( A )").
+Reserved Notation "''C_' ( G | to ) ( A )"
+  (at level 0, format "''C_' ( G  |  to ) ( A )").
+
+(* Bionomial coefficient *)
+Reserved Notation "''C' ( n , m )" (at level 0, n, m at level 200, format "''C' ( n ,  m )").
 
 (* Reserved notation for Euclidean division and divisibility. *)
 Reserved Notation "m %/ d" (at level 40, no associativity). 
@@ -92,11 +111,11 @@ Reserved Notation "m != n %[mod d ]" (at level 70, n at next level,
   format "'[hv ' m '/'  !=  n '/'  %[mod  d ] ']'").
 
 (* Reserved notation for derivatives. *)
-Reserved Notation "a ^` ()" (at level 8, format "a ^` ()").
-Reserved Notation "a ^` ( n )" (at level 8, format "a ^` ( n )").
+Reserved Notation "a ^` ()" (at level 1, format "a ^` ()").
+Reserved Notation "a ^` ( n )" (at level 1, format "a ^` ( n )").
 
 (* Reserved notation for absolute value. *)
-Reserved Notation  "`| x |" (at level 0, x at level 99, format "`| x |").
+Reserved Notation  "`| x |" (at level 0, format "`| x |").
 
 (* Reserved notation for conditional comparison *)
 Reserved Notation "x <= y ?= 'iff' c" (at level 70, y, c at next level,
