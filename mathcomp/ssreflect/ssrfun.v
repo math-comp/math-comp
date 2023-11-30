@@ -66,8 +66,6 @@ Qed.
 (* v8.18 additions *)
 (*******************)
 
-(* this change of order has also been PRed to Coq PR 17249 *)
-Notation "@ 'sval'" := (@proj1_sig) (at level 10, format "@ 'sval'").
 Notation sval := (@proj1_sig _ _).
 
 (**********************)
@@ -87,3 +85,44 @@ Proof. by move=> Ef [?|] //=; rewrite Ef. Qed.
 Lemma omapK {aT rT : Type} (f : aT -> rT) (g : rT -> aT) :
   cancel f g -> cancel (omap f) (omap g).
 Proof. by move=> fK [?|] //=; rewrite fK. Qed.
+
+(* The notations below are already defined in Coq.ssr.ssrfun, but we redefine *)
+(* them in different notation scopes (mostly fun_scope -> function_scope, in  *)
+(* order to replace the former with the latter).                              *)
+
+Open Scope function_scope.
+
+Notation "f ^~ y" := (fun x => f x y) : function_scope.
+Notation "@^~ x" := (fun f => f x) : function_scope.
+
+Notation "[ 'fun' : T => E ]" := (SimplFun (fun _ : T => E)) : function_scope.
+Notation "[ 'fun' x => E ]" := (SimplFun (fun x => E)) : function_scope.
+Notation "[ 'fun' x y => E ]" := (fun x => [fun y => E]) : function_scope.
+Notation "[ 'fun' x : T => E ]" := (SimplFun (fun x : T => E))
+  (only parsing) : function_scope.
+Notation "[ 'fun' x y : T => E ]" := (fun x : T => [fun y : T => E])
+  (only parsing) : function_scope.
+Notation "[ 'fun' ( x : T ) y => E ]" := (fun x : T => [fun y => E])
+  (only parsing) : function_scope.
+Notation "[ 'fun' x ( y : T ) => E ]" := (fun x => [fun y : T => E])
+  (only parsing) : function_scope.
+Notation "[ 'fun' ( x : T ) ( y : U ) => E ]" := (fun x : T => [fun y : U => E])
+  (only parsing) : function_scope.
+
+Notation "f1 =1 f2" := (eqfun f1 f2) : type_scope.
+Notation "f1 =1 f2 :> A" := (f1 =1 (f2 : A)) : type_scope.
+Notation "f1 =2 f2" := (eqrel f1 f2) : type_scope.
+Notation "f1 =2 f2 :> A" := (f1 =2 (f2 : A)) : type_scope.
+
+Notation "f1 \o f2" := (comp f1 f2) : function_scope.
+Notation "f1 \; f2" := (catcomp f1 f2) : function_scope.
+
+Notation "[ 'eta' f ]" := (fun x => f x) : function_scope.
+
+Notation "'fun' => E" := (fun _ => E) : function_scope.
+
+Notation "@ 'id' T" := (fun x : T => x)
+  (at level 10, T at level 8, only parsing) : function_scope.
+
+Notation "@ 'sval'" := (@proj1_sig) (at level 10, only parsing) :
+  function_scope.

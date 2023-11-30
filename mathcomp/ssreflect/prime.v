@@ -1050,7 +1050,7 @@ Lemma negnK pi : pi^'^' =i pi.
 Proof. by move=> p; apply: negbK. Qed.
 
 Lemma eq_negn pi1 pi2 : pi1 =i pi2 -> pi1^' =i pi2^'.
-Proof. by move=> eq_pi n; rewrite !inE eq_pi. Qed.
+Proof. by move=> eq_pi n; rewrite inE eq_pi. Qed.
 
 Lemma eq_piP m n : \pi(m) =i \pi(n) <-> \pi(m) = \pi(n).
 Proof.
