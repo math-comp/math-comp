@@ -221,7 +221,7 @@ Arguments acts_on {aT D%g rT} A%g S%g to%act.
 Arguments atrans {aT D%g rT} A%g S%g to%act.
 Arguments faithful {aT D%g rT} A%g S%g to%act.
 
-Notation "to ^*" := (setact to) (at level 2, format "to ^*") : fun_scope.
+Notation "to ^*" := (setact to) (at level 2, format "to ^*") : function_scope.
 
 Prenex Implicits orbit amove.
 

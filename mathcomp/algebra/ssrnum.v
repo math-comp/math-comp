@@ -362,31 +362,31 @@ Arguments normr {R T} x.
 
 Notation ler := (@Order.le ring_display _) (only parsing).
 Notation "@ 'ler' R" := (@Order.le ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
+  (at level 10, R at level 8, only parsing) : function_scope.
 Notation ltr := (@Order.lt ring_display _) (only parsing).
 Notation "@ 'ltr' R" := (@Order.lt ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
+  (at level 10, R at level 8, only parsing) : function_scope.
 Notation ger := (@Order.ge ring_display _) (only parsing).
 Notation "@ 'ger' R" := (@Order.ge ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
+  (at level 10, R at level 8, only parsing) : function_scope.
 Notation gtr := (@Order.gt ring_display _) (only parsing).
 Notation "@ 'gtr' R" := (@Order.gt ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
+  (at level 10, R at level 8, only parsing) : function_scope.
 Notation lerif := (@Order.leif ring_display _) (only parsing).
 Notation "@ 'lerif' R" := (@Order.leif ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
+  (at level 10, R at level 8, only parsing) : function_scope.
 Notation lterif := (@Order.lteif ring_display _) (only parsing).
 Notation "@ 'lteif' R" := (@Order.lteif ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
+  (at level 10, R at level 8, only parsing) : function_scope.
 Notation comparabler := (@Order.comparable ring_display _) (only parsing).
 Notation "@ 'comparabler' R" := (@Order.comparable ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
+  (at level 10, R at level 8, only parsing) : function_scope.
 Notation maxr := (@Order.max ring_display _).
 Notation "@ 'maxr' R" := (@Order.max ring_display R)
-    (at level 10, R at level 8, only parsing) : fun_scope.
+    (at level 10, R at level 8, only parsing) : function_scope.
 Notation minr := (@Order.min ring_display _).
 Notation "@ 'minr' R" := (@Order.min ring_display R)
-  (at level 10, R at level 8, only parsing) : fun_scope.
+  (at level 10, R at level 8, only parsing) : function_scope.
 
 Section Def.
 Context {R : numDomainType}.
@@ -437,14 +437,14 @@ Import Def Keys.
 
 Notation "`| x |" := (norm x) : ring_scope.
 
-Notation "<=%R" := le : fun_scope.
-Notation ">=%R" := ge : fun_scope.
-Notation "<%R" := lt : fun_scope.
-Notation ">%R" := gt : fun_scope.
-Notation "<?=%R" := leif : fun_scope.
-Notation "<?<=%R" := lteif : fun_scope.
-Notation ">=<%R" := comparable : fun_scope.
-Notation "><%R" := (fun x y => ~~ (comparable x y)) : fun_scope.
+Notation "<=%R" := le : function_scope.
+Notation ">=%R" := ge : function_scope.
+Notation "<%R" := lt : function_scope.
+Notation ">%R" := gt : function_scope.
+Notation "<?=%R" := leif : function_scope.
+Notation "<?<=%R" := lteif : function_scope.
+Notation ">=<%R" := comparable : function_scope.
+Notation "><%R" := (fun x y => ~~ (comparable x y)) : function_scope.
 
 Notation "<= y" := (ge y) : ring_scope.
 Notation "<= y :> T" := (<= (y : T)) (only parsing) : ring_scope.
