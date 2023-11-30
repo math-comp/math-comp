@@ -245,7 +245,7 @@ From mathcomp Require Import finset.
 (* orders and lattices together with their default printed notation (as       *)
 (* displayed by Check).                                                       *)
 (*                                                                            *)
-(* For porderType T (in fun_scope):                                           *)
+(* For porderType T (in function_scope):                                      *)
 (*   <=%O    == @Order.le          d T                                        *)
 (*   <%O     == @Order.lt          d T                                        *)
 (*   >=<%O   == @Order.comparable  d T                                        *)
@@ -1232,14 +1232,14 @@ Arguments max_fun {_ _ _} f g _ /.
 
 Module Import POSyntax.
 
-Notation "<=%O" := le : fun_scope.
-Notation ">=%O" := ge : fun_scope.
-Notation "<%O" := lt : fun_scope.
-Notation ">%O" := gt : fun_scope.
-Notation "<?=%O" := leif : fun_scope.
-Notation "<?<=%O" := lteif : fun_scope.
-Notation ">=<%O" := comparable : fun_scope.
-Notation "><%O" := (fun x y => ~~ (comparable x y)) : fun_scope.
+Notation "<=%O" := le : function_scope.
+Notation ">=%O" := ge : function_scope.
+Notation "<%O" := lt : function_scope.
+Notation ">%O" := gt : function_scope.
+Notation "<?=%O" := leif : function_scope.
+Notation "<?<=%O" := lteif : function_scope.
+Notation ">=<%O" := comparable : function_scope.
+Notation "><%O" := (fun x y => ~~ (comparable x y)) : function_scope.
 
 Notation "<= y" := (ge y) : order_scope.
 Notation "<= y :> T" := (<= (y : T)) (only parsing) : order_scope.
@@ -1691,14 +1691,14 @@ Notation dual_top := (@top (dual_display _) _).
 Module Import DualSyntax.
 
 Notation "T ^d" := (dual T) (at level 2, format "T ^d") : type_scope.
-Notation "<=^d%O" := dual_le : fun_scope.
-Notation ">=^d%O" := dual_ge : fun_scope.
-Notation "<^d%O" := dual_lt : fun_scope.
-Notation ">^d%O" := dual_gt : fun_scope.
-Notation "<?=^d%O" := dual_leif : fun_scope.
-Notation "<?<=^d%O" := dual_lteif : fun_scope.
-Notation ">=<^d%O" := dual_comparable : fun_scope.
-Notation "><^d%O" := (fun x y => ~~ dual_comparable x y) : fun_scope.
+Notation "<=^d%O" := dual_le : function_scope.
+Notation ">=^d%O" := dual_ge : function_scope.
+Notation "<^d%O" := dual_lt : function_scope.
+Notation ">^d%O" := dual_gt : function_scope.
+Notation "<?=^d%O" := dual_leif : function_scope.
+Notation "<?<=^d%O" := dual_lteif : function_scope.
+Notation ">=<^d%O" := dual_comparable : function_scope.
+Notation "><^d%O" := (fun x y => ~~ dual_comparable x y) : function_scope.
 
 Notation "<=^d y" := (>=^d%O y) : order_scope.
 Notation "<=^d y :> T" := (<=^d (y : T)) (only parsing) : order_scope.
@@ -6008,20 +6008,20 @@ Module DvdSyntax.
 
 Notation dvd := (@le dvd_display _).
 Notation "@ 'dvd' T" :=
-  (@le dvd_display T) (at level 10, T at level 8, only parsing) : fun_scope.
+  (@le dvd_display T) (at level 10, T at level 8, only parsing) : function_scope.
 Notation sdvd := (@lt dvd_display _).
 Notation "@ 'sdvd' T" :=
-  (@lt dvd_display T) (at level 10, T at level 8, only parsing) : fun_scope.
+  (@lt dvd_display T) (at level 10, T at level 8, only parsing) : function_scope.
 
 Notation "x %| y" := (dvd x y) : order_scope.
 Notation "x %<| y" := (sdvd x y) : order_scope.
 
 Notation gcd := (@meet dvd_display _).
 Notation "@ 'gcd' T" :=
-  (@meet dvd_display T) (at level 10, T at level 8, only parsing) : fun_scope.
+  (@meet dvd_display T) (at level 10, T at level 8, only parsing) : function_scope.
 Notation lcm := (@join dvd_display _).
 Notation "@ 'lcm' T" :=
-  (@join dvd_display T) (at level 10, T at level 8, only parsing) : fun_scope.
+  (@join dvd_display T) (at level 10, T at level 8, only parsing) : function_scope.
 
 Notation nat0 := (@top dvd_display _).
 Notation nat1 := (@bottom dvd_display _).
@@ -6271,15 +6271,15 @@ Fact prod_display : unit. Proof. by []. Qed.
 
 Module Import ProdSyntax.
 
-Notation "<=^p%O" := (@le prod_display _) : fun_scope.
-Notation ">=^p%O" := (@ge prod_display _)  : fun_scope.
-Notation ">=^p%O" := (@ge prod_display _)  : fun_scope.
-Notation "<^p%O" := (@lt prod_display _) : fun_scope.
-Notation ">^p%O" := (@gt prod_display _) : fun_scope.
-Notation "<?=^p%O" := (@leif prod_display _) : fun_scope.
-Notation ">=<^p%O" := (@comparable prod_display _) : fun_scope.
+Notation "<=^p%O" := (@le prod_display _) : function_scope.
+Notation ">=^p%O" := (@ge prod_display _)  : function_scope.
+Notation ">=^p%O" := (@ge prod_display _)  : function_scope.
+Notation "<^p%O" := (@lt prod_display _) : function_scope.
+Notation ">^p%O" := (@gt prod_display _) : function_scope.
+Notation "<?=^p%O" := (@leif prod_display _) : function_scope.
+Notation ">=<^p%O" := (@comparable prod_display _) : function_scope.
 Notation "><^p%O" := (fun x y => ~~ (@comparable prod_display _ x y)) :
-  fun_scope.
+  function_scope.
 
 Notation "<=^p y" := (>=^p%O y) : order_scope.
 Notation "<=^p y :> T" := (<=^p (y : T)) (only parsing) : order_scope.
@@ -6388,15 +6388,15 @@ Fact lexi_display : unit. Proof. by []. Qed.
 
 Module Import LexiSyntax.
 
-Notation "<=^l%O" := (@le lexi_display _) : fun_scope.
-Notation ">=^l%O" := (@ge lexi_display _) : fun_scope.
-Notation ">=^l%O" := (@ge lexi_display _) : fun_scope.
-Notation "<^l%O" := (@lt lexi_display _) : fun_scope.
-Notation ">^l%O" := (@gt lexi_display _) : fun_scope.
-Notation "<?=^l%O" := (@leif lexi_display _) : fun_scope.
-Notation ">=<^l%O" := (@comparable lexi_display _) : fun_scope.
+Notation "<=^l%O" := (@le lexi_display _) : function_scope.
+Notation ">=^l%O" := (@ge lexi_display _) : function_scope.
+Notation ">=^l%O" := (@ge lexi_display _) : function_scope.
+Notation "<^l%O" := (@lt lexi_display _) : function_scope.
+Notation ">^l%O" := (@gt lexi_display _) : function_scope.
+Notation "<?=^l%O" := (@leif lexi_display _) : function_scope.
+Notation ">=<^l%O" := (@comparable lexi_display _) : function_scope.
 Notation "><^l%O" := (fun x y => ~~ (@comparable lexi_display _ x y)) :
-  fun_scope.
+  function_scope.
 
 Notation "<=^l y" := (>=^l%O y) : order_scope.
 Notation "<=^l y :> T" := (<=^l (y : T)) (only parsing) : order_scope.

@@ -394,9 +394,9 @@ Arguments predD1P {T x y b}.
 Prenex Implicits pred1 pred2 pred3 pred4 predU1 predC1 predD1.
 
 Notation "[ 'predU1' x & A ]" := (predU1 x [in A])
-  (at level 0, format "[ 'predU1'  x  &  A ]") : fun_scope.
+  (at level 0, format "[ 'predU1'  x  &  A ]") : function_scope.
 Notation "[ 'predD1' A & x ]" := (predD1 [in A] x)
-  (at level 0, format "[ 'predD1'  A  &  x ]") : fun_scope.
+  (at level 0, format "[ 'predD1'  A  &  x ]") : function_scope.
 
 (* Lemmas for reflected equality and functions.   *)
 
@@ -490,21 +490,21 @@ Arguments app_fdelta {aT rT%type} df%FUN_DELTA f z.
 Notation "[ 'fun' z : T => F 'with' d1 , .. , dn ]" :=
   (SimplFunDelta (fun z : T =>
      app_fdelta d1%FUN_DELTA .. (app_fdelta dn%FUN_DELTA  (fun _ => F)) ..))
-  (at level 0, z name, only parsing) : fun_scope.
+  (at level 0, z name, only parsing) : function_scope.
 
 Notation "[ 'fun' z => F 'with' d1 , .. , dn ]" :=
   (SimplFunDelta (fun z =>
      app_fdelta d1%FUN_DELTA .. (app_fdelta dn%FUN_DELTA (fun _ => F)) ..))
   (at level 0, z name, format
    "'[hv' [ '[' 'fun'  z  => '/ '  F ']' '/'  'with'  '[' d1 , '/'  .. , '/'  dn ']' ] ']'"
-   ) : fun_scope.
+   ) : function_scope.
 
 Notation "[ 'eta' f 'with' d1 , .. , dn ]" :=
   (SimplFunDelta (fun _ =>
      app_fdelta d1%FUN_DELTA .. (app_fdelta dn%FUN_DELTA f) ..))
   (at level 0, format
   "'[hv' [ '[' 'eta' '/ '  f ']' '/'  'with'  '[' d1 , '/'  .. , '/'  dn ']' ] ']'"
-  ) : fun_scope.
+  ) : function_scope.
 
 (* Various EqType constructions.                                         *)
 
@@ -841,7 +841,7 @@ Definition predX T1 T2 (p1 : pred T1) (p2 : pred T2) :=
   [pred z | p1 z.1 & p2 z.2].
 
 Notation "[ 'predX' A1 & A2 ]" := (predX [in A1] [in A2])
-  (at level 0, format "[ 'predX'  A1  &  A2 ]") : fun_scope.
+  (at level 0, format "[ 'predX'  A1  &  A2 ]") : function_scope.
 
 Section OptionEqType.
 

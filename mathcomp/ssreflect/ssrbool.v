@@ -156,13 +156,13 @@ Proof. by case: b1 b2 => [] []. Qed.
 (********************)
 
 Notation "[ 'in' A ]" := (in_mem^~ (mem A))
-  (at level 0, format "[ 'in'  A ]") : fun_scope.
+  (at level 0, format "[ 'in'  A ]") : function_scope.
 
-Notation "[ 'predI' A & B ]" := (predI [in A] [in B]) : fun_scope.
-Notation "[ 'predU' A & B ]" := (predU [in A] [in B]) : fun_scope.
-Notation "[ 'predD' A & B ]" := (predD [in A] [in B]) : fun_scope.
-Notation "[ 'predC' A ]" := (predC [in A]) : fun_scope.
-Notation "[ 'preim' f 'of' A ]" := (preim f [in A]) : fun_scope.
+Notation "[ 'predI' A & B ]" := (predI [in A] [in B]) : function_scope.
+Notation "[ 'predU' A & B ]" := (predU [in A] [in B]) : function_scope.
+Notation "[ 'predD' A & B ]" := (predD [in A] [in B]) : function_scope.
+Notation "[ 'predC' A ]" := (predC [in A]) : function_scope.
+Notation "[ 'preim' f 'of' A ]" := (preim f [in A]) : function_scope.
 
 Lemma relpre_trans {T' T : Type} {leT : rel T} {f : T' -> T} :
   transitive leT -> transitive (relpre f leT).
