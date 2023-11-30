@@ -28,19 +28,19 @@ Variable T : finType.
 Implicit Types (s : {perm T}) (x y z : T).
 
 (** Definitions of the alternate groups and some Properties **)
-Definition Sym of phant T : {set {perm T}} := setT.
+Definition Sym : {set {perm T}} := setT.
 
-Canonical Sym_group phT := Eval hnf in [group of Sym phT].
+Canonical Sym_group := Eval hnf in [group of Sym].
 
-Local Notation "'Sym_T" := (Sym (Phant T)) (at level 0).
+Local Notation "'Sym_T" := Sym (at level 0).
 
 Canonical sign_morph := @Morphism _ _ 'Sym_T _ (in2W (@odd_permM _)).
 
-Definition Alt of phant T := 'ker (@odd_perm T).
+Definition Alt := 'ker (@odd_perm T).
 
-Canonical Alt_group phT := Eval hnf in [group of Alt phT].
+Canonical Alt_group := Eval hnf in [group of Alt].
 
-Local Notation "'Alt_T" := (Alt (Phant T)) (at level 0).
+Local Notation "'Alt_T" := Alt (at level 0).
 
 Lemma Alt_even p : (p \in 'Alt_T) = ~~ p.
 Proof. by rewrite !inE /=; case: odd_perm. Qed.
@@ -115,13 +115,18 @@ Qed.
 
 End SymAltDef.
 
-Notation "''Sym_' T" := (Sym (Phant T))
-  (at level 8, T at level 2, format "''Sym_' T") : group_scope.
-Notation "''Sym_' T" := (Sym_group (Phant T)) : Group_scope.
+Arguments Sym T%type.
+Arguments Sym_group T%type.
+Arguments Alt T%type.
+Arguments Alt_group T%type.
 
-Notation "''Alt_' T" := (Alt (Phant T))
+Notation "''Sym_' T" := (Sym T)
+  (at level 8, T at level 2, format "''Sym_' T") : group_scope.
+Notation "''Sym_' T" := (Sym_group T) : Group_scope.
+
+Notation "''Alt_' T" := (Alt T)
   (at level 8, T at level 2, format "''Alt_' T") : group_scope.
-Notation "''Alt_' T" := (Alt_group (Phant T)) : Group_scope.
+Notation "''Alt_' T" := (Alt_group T) : Group_scope.
 
 Lemma trivial_Alt_2 (T : finType) : #|T| <= 2 -> 'Alt_T = 1.
 Proof.

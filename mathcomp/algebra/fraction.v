@@ -31,18 +31,14 @@ Variable R : ringType.
 
 (* ratios are pairs of R, such that the second member is nonzero *)
 Inductive ratio := mkRatio { frac :> R * R; _ : frac.2 != 0 }.
-Definition ratio_of of phant R := ratio.
-Local Notation "{ 'ratio' T }" := (ratio_of (Phant T)).
 
 HB.instance Definition _ := [isSub for frac].
 HB.instance Definition _ := [Choice of ratio by <:].
-HB.instance Definition _ := SubType.on {ratio R}.
-HB.instance Definition _ := Choice.on {ratio R}.
 
 Lemma denom_ratioP : forall f : ratio, f.2 != 0. Proof. by case. Qed.
 
 Definition ratio0 := (@mkRatio (0, 1) (oner_neq0 _)).
-Definition Ratio x y : {ratio R} := insubd ratio0 (x, y).
+Definition Ratio x y : ratio := insubd ratio0 (x, y).
 
 Lemma numer_Ratio x y : y != 0 -> (Ratio x y).1 = x.
 Proof. by move=> ny0; rewrite /Ratio /insubd insubT. Qed.
@@ -52,7 +48,7 @@ Proof. by move=> ny0; rewrite /Ratio /insubd insubT. Qed.
 
 Definition numden_Ratio := (numer_Ratio, denom_Ratio).
 
-Variant Ratio_spec (n d : R) : {ratio R} -> R -> R -> Type :=
+Variant Ratio_spec (n d : R) : ratio -> R -> R -> Type :=
   | RatioNull of d = 0 : Ratio_spec n d ratio0 n 0
   | RatioNonNull (d_neq0 : d != 0) :
     Ratio_spec n d (@mkRatio (n, d) d_neq0) n d.
@@ -70,8 +66,9 @@ Proof. by rewrite /Ratio /insubd; case: insubP; rewrite //= eqxx. Qed.
 
 End FracDomain.
 
-Notation "{ 'ratio' T }" := (ratio_of (Phant T)) : type_scope.
-Identity Coercion type_fracdomain_of : ratio_of >-> ratio.
+Arguments ratio R%type.
+
+Notation "{ 'ratio' T }" := (ratio T) : type_scope.
 
 Notation "'\n_' x"  := (frac x).1
   (at level 8, x at level 2, format "'\n_' x").
@@ -112,14 +109,10 @@ Qed.
 Canonical equivf_equiv := EquivRel equivf equivf_refl equivf_sym equivf_trans.
 
 Definition type := {eq_quot equivf}.
-Definition type_of of phant R := type.
-Notation "{ 'fraction' T }" := (type_of (Phant T)) : type_scope.
 
 (* we recover some structure for the quotient *)
 HB.instance Definition _ : EqQuotient _ equivf type := EqQuotient.on type.
 HB.instance Definition _ := Choice.on type.
-HB.instance Definition _ := EqQuotient.on {fraction R}.
-HB.instance Definition _ := Choice.on {fraction R}.
 
 (* we explain what was the equivalence on the quotient *)
 Lemma equivf_def (x y : ratio R) : x == y %[mod type]
@@ -141,7 +134,7 @@ case=> [[n d] /= nd]; rewrite /Ratio /insubd; apply: val_inj=> /=.
 by case: insubP=> //=; rewrite nd.
 Qed.
 
-Definition tofrac := lift_embed {fraction R} (fun x : R => Ratio x 1).
+Definition tofrac := lift_embed type (fun x : R => Ratio x 1).
 Canonical tofrac_pi_morph := PiEmbed tofrac.
 
 Notation "x %:F"  := (@tofrac x).
@@ -149,7 +142,7 @@ Notation "x %:F"  := (@tofrac x).
 Implicit Types a b c : type.
 
 Definition addf x y : dom := Ratio (\n_x * \d_y + \n_y * \d_x) (\d_x * \d_y).
-Definition add := lift_op2 {fraction R} addf.
+Definition add := lift_op2 type addf.
 
 Lemma pi_add : {morph \pi : x y / addf x y >-> add x y}.
 Proof.
@@ -161,7 +154,7 @@ Qed.
 Canonical pi_add_morph := PiMorph2 pi_add.
 
 Definition oppf x : dom := Ratio (- \n_x) \d_x.
-Definition opp := lift_op1 {fraction R} oppf.
+Definition opp := lift_op1 type oppf.
 Lemma pi_opp : {morph \pi : x / oppf x >-> opp x}.
 Proof.
 move=> x; unlock opp; apply/eqmodP; rewrite /= /equivf /oppf /=.
@@ -170,7 +163,7 @@ Qed.
 Canonical pi_opp_morph := PiMorph1 pi_opp.
 
 Definition mulf x y : dom := Ratio (\n_x * \n_y) (\d_x * \d_y).
-Definition mul := lift_op2 {fraction R} mulf.
+Definition mul := lift_op2 type mulf.
 
 Lemma pi_mul : {morph \pi : x y / mulf x y >-> mul x y}.
 Proof.
@@ -181,7 +174,7 @@ Qed.
 Canonical pi_mul_morph := PiMorph2 pi_mul.
 
 Definition invf x : dom := Ratio \d_x \n_x.
-Definition inv := lift_op1 {fraction R} invf.
+Definition inv := lift_op1 type invf.
 
 Lemma pi_inv : {morph \pi : x / invf x >-> inv x}.
 Proof.
@@ -277,7 +270,9 @@ End FracField.
 End FracField.
 HB.export FracField.
 
-Notation "{ 'fraction' T }" := (FracField.type_of (Phant T)).
+Arguments FracField.type R%type.
+
+Notation "{ 'fraction' T }" := (FracField.type T).
 Notation equivf := (@FracField.equivf _).
 #[global] Hint Resolve denom_ratioP : core.
 

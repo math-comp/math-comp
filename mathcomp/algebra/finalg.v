@@ -273,24 +273,22 @@ Section UnitsGroup.
 
 Variable R : finUnitRingType.
 
-Inductive unit_of (phR : phant R) := Unit (x : R) of x \is a GRing.unit.
+Inductive unit_of := Unit (x : R) of x \is a GRing.unit.
 Bind Scope group_scope with unit_of.
 
-Let phR := Phant R.
-Local Notation uT := (unit_of phR).
-Implicit Types u v : uT.
+Implicit Types u v : unit_of.
 Definition uval u := let: Unit x _ := u in x.
 
 #[export] HB.instance Definition _ := [isSub for uval].
-#[export] HB.instance Definition _ := [Finite of uT by <:].
+#[export] HB.instance Definition _ := [Finite of unit_of by <:].
 
-Definition unit1 := Unit phR (@GRing.unitr1 _).
+Definition unit1 := Unit (@GRing.unitr1 _).
 Lemma unit_inv_proof u : (val u)^-1 \is a GRing.unit.
 Proof. by rewrite unitrV ?(valP u). Qed.
-Definition unit_inv u := Unit phR (unit_inv_proof u).
+Definition unit_inv u := Unit (unit_inv_proof u).
 Lemma unit_mul_proof u v : val u * val v \is a GRing.unit.
 Proof. by rewrite (unitrMr _ (valP u)) ?(valP v). Qed.
-Definition unit_mul u v := Unit phR (unit_mul_proof u v).
+Definition unit_mul u v := Unit (unit_mul_proof u v).
 Lemma unit_muluA : associative unit_mul.
 Proof. by move=> u v w; apply/val_inj/mulrA. Qed.
 Lemma unit_mul1u : left_id unit1 unit_mul.
@@ -298,13 +296,13 @@ Proof. by move=> u; apply/val_inj/mul1r. Qed.
 Lemma unit_mulVu : left_inverse unit1 unit_inv unit_mul.
 Proof. by move=> u; apply/val_inj/(mulVr (valP u)). Qed.
 
-#[export] HB.instance Definition _ := isMulGroup.Build uT
+#[export] HB.instance Definition _ := isMulGroup.Build unit_of
   unit_muluA unit_mul1u unit_mulVu.
 
-Lemma val_unit1 : val (1%g : uT) = 1. Proof. by []. Qed.
-Lemma val_unitM x y : val (x * y : uT)%g = val x * val y. Proof. by []. Qed.
-Lemma val_unitV x : val (x^-1 : uT)%g = (val x)^-1. Proof. by []. Qed.
-Lemma val_unitX n x : val (x ^+ n : uT)%g = val x ^+ n.
+Lemma val_unit1 : val (1%g : unit_of) = 1. Proof. by []. Qed.
+Lemma val_unitM x y : val (x * y : unit_of)%g = val x * val y. Proof. by []. Qed.
+Lemma val_unitV x : val (x^-1 : unit_of)%g = (val x)^-1. Proof. by []. Qed.
+Lemma val_unitX n x : val (x ^+ n : unit_of)%g = val x ^+ n.
 Proof. by case: n; last by elim=> //= n ->. Qed.
 
 Definition unit_act x u := x * val u.
@@ -324,12 +322,13 @@ End UnitsGroup.
 
 Module Import UnitsGroupExports.
 Bind Scope group_scope with unit_of.
+Arguments unit_of R%type.
 Canonical unit_action.
 Canonical unit_groupAction.
 End UnitsGroupExports.
 HB.export UnitsGroupExports.
 
-Notation unit R Ux := (Unit (Phant R) Ux).
+Notation unit R Ux := (@Unit R%type _ Ux).
 
 #[export, non_forgetful_inheritance]
 HB.instance Definition _ (R : ComUnitRing.type) := [finGroupMixin of R for +%R].
@@ -454,7 +453,7 @@ Notation finIntegralDomainType := finIdomainType.
 Lemma card_finRing_gt1 (R : finRingType) : 1 < #|R|.
 Proof. by rewrite (cardD1 0) (cardD1 1) !inE GRing.oner_neq0. Qed.
 
-Notation "{ 'unit' R }" := (unit_of (Phant R))
+Notation "{ 'unit' R }" := (unit_of R)
   (at level 0, format "{ 'unit'  R }") : type_scope.
 Prenex Implicits FinRing.uval.
 Notation "''U'" := (unit_action _) (at level 8) : action_scope.

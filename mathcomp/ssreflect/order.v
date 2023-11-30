@@ -7901,11 +7901,9 @@ Module SetSubsetOrder.
 Section SetSubsetOrder.
 
 Definition type (disp : unit) (T : finType) := {set T}.
-Definition type_of (disp : unit) (T : finType) of phant T := type disp T.
-Identity Coercion type_of_type_of : type_of >-> type.
 
 Context {disp : unit} {T : finType}.
-Local Notation "{ 'subset' T }" := (type_of disp (Phant T)).
+Local Notation "{ 'subset' T }" := (type disp T).
 Implicit Type (A B C : {subset T}).
 
 Lemma le_def A B : A \subset B = (A :&: B == A).
@@ -7966,7 +7964,8 @@ Fact subset_display : unit. Proof. exact: tt. Qed.
 End SetSubsetOrder.
 
 Module Exports.
-Notation "{ 'subset' [ d ] T }" := (type_of d (Phant T))
+Arguments type disp T%type.
+Notation "{ 'subset' [ d ] T }" := (type d T)
   (at level 2, d at next level, format "{ 'subset' [ d ]  T }") : type_scope.
 Notation "{ 'subset' T }" := {subset[subset_display] T}
   (at level 2, format "{ 'subset' T }") : type_scope.

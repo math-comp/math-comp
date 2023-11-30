@@ -775,10 +775,9 @@ Notation PcanEqMixin := deprecated_PcanEqMixin.
   note="Use Equality.copy T (can_type fK) instead")]
 Notation CanEqMixin := deprecated_CanEqMixin.
 
-Definition sub_type_of T (P : pred T) (sT : subType P) of phant sT : Type := sT.
-Notation sub_type T := (sub_type_of (Phant T)).
+Definition sub_type T (P : pred T) (sT : subType P) : Type := sT.
 HB.instance Definition _ T (P : pred T) (sT : subType P) :=
-  SubType.copy (sub_type sT) sT.
+  SubType.on (sub_type sT).
 
 Section SubEqType.
 

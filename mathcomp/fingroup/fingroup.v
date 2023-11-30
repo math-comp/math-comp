@@ -1172,8 +1172,8 @@ Structure group_type : Type := Group {
   _ : group_set gval
 }.
 
-Definition group_of of phant gT : predArgType := group_type.
-Local Notation groupT := (group_of (Phant gT)).
+Definition group_of : predArgType := group_type.
+Local Notation groupT := group_of.
 Identity Coercion type_of_group : group_of >-> group_type.
 
 HB.instance Definition _ := [isSub for gval].
@@ -1203,21 +1203,23 @@ Proof. by rewrite /group_set set11 mulg1 subxx. Qed.
 Canonical one_group := group group_set_one.
 Canonical set1_group := @group [set 1] group_set_one.
 
-Lemma group_setT (phT : phant gT) : group_set (setTfor phT).
+Lemma group_setT : group_set (setTfor gT).
 Proof. by apply/group_setP; split=> [|x y _ _]; rewrite inE. Qed.
 
-Canonical setT_group phT := group (group_setT phT).
+Canonical setT_group := group group_setT.
 
 End GroupSetMulProp.
 
+Arguments group_of gT%type.
 Arguments lcosetP {gT A x y}.
 Arguments lcosetsP {gT A B C}.
 Arguments rcosetP {gT A x y}.
 Arguments rcosetsP {gT A B C}.
 Arguments group_setP {gT A}.
+Arguments setT_group gT%type.
 Prenex Implicits group_set mulsgP set1gP.
 
-Notation "{ 'group' gT }" := (group_of (Phant gT))
+Notation "{ 'group' gT }" := (group_of gT)
   (at level 0, format "{ 'group'  gT }") : type_scope.
 
 Notation "[ 'group' 'of' G ]" := (clone_group (@group _ G))
@@ -1227,7 +1229,7 @@ Bind Scope Group_scope with group_type.
 Bind Scope Group_scope with group_of.
 Notation "1" := (one_group _) : Group_scope.
 Notation "[ 1 gT ]" := (1%G : {group gT}) : Group_scope.
-Notation "[ 'set' : gT ]" := (setT_group (Phant gT)) : Group_scope.
+Notation "[ 'set' : gT ]" := (setT_group gT) : Group_scope.
 
 (* These definitions come early so we can establish the Notation. *)
 HB.lock

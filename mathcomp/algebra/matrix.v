@@ -3906,19 +3906,20 @@ HB.instance Definition _ (n : nat) (R : finComUnitRingType) :=
 (* Finite inversible matrices and the general linear group. *)
 Section FinUnitMatrix.
 
-Variables (n : nat) (R : finComUnitRingType).
+Variable n : nat.
 
-Definition GLtype of phant R := {unit 'M[R]_n.-1.+1}.
+Definition GLtype (R : finComUnitRingType) := {unit 'M[R]_n.-1.+1}.
 
-Coercion GLval ph (u : GLtype ph) : 'M[R]_n.-1.+1 :=
+Coercion GLval R (u : GLtype R) : 'M[R]_n.-1.+1 :=
   let: FinRing.Unit A _ := u in A.
 
 End FinUnitMatrix.
 
 Bind Scope group_scope with GLtype.
-Arguments GLval {n%N R ph} u%g.
+Arguments GLtype n%N R%type.
+Arguments GLval {n%N R} u%g.
 
-Notation "{ ''GL_' n [ R ] }" := (GLtype n (Phant R))
+Notation "{ ''GL_' n [ R ] }" := (GLtype n R)
   (at level 0, n at level 2, format "{ ''GL_' n [ R ] }") : type_scope.
 Notation "{ ''GL_' n ( p ) }" := {'GL_n['F_p]}
   (at level 0, n at level 2, p at level 10,
@@ -3934,8 +3935,8 @@ Variables (n : nat) (R : finComUnitRingType).
 HB.instance Definition _ := [Finite of {'GL_n[R]} by <:].
 HB.instance Definition _ := FinGroup.on {'GL_n[R]}.
 
-Definition GLgroup of phant R := [set: {'GL_n[R]}].
-Canonical GLgroup_group ph := Eval hnf in [group of GLgroup ph].
+Definition GLgroup := [set: {'GL_n[R]}].
+Canonical GLgroup_group := Eval hnf in [group of GLgroup].
 
 Implicit Types u v : {'GL_n[R]}.
 
@@ -3954,13 +3955,16 @@ Qed.
 
 End GL_unit.
 
-Notation "''GL_' n [ R ]" := (GLgroup n (Phant R))
+Arguments GLgroup n%N R%type.
+Arguments GLgroup_group n%N R%type.
+
+Notation "''GL_' n [ R ]" := (GLgroup n R)
   (at level 8, n at level 2, format "''GL_' n [ R ]") : group_scope.
 Notation "''GL_' n ( p )" := 'GL_n['F_p]
   (at level 8, n at level 2, p at level 10,
    format "''GL_' n ( p )") : group_scope.
-Notation "''GL_' n [ R ]" := (GLgroup_group n (Phant R)) : Group_scope.
-Notation "''GL_' n ( p )" := (GLgroup_group n (Phant 'F_p)) : Group_scope.
+Notation "''GL_' n [ R ]" := (GLgroup_group n R) : Group_scope.
+Notation "''GL_' n ( p )" := (GLgroup_group n 'F_p) : Group_scope.
 
 (*****************************************************************************)
 (********************** Matrices over a domain *******************************)
