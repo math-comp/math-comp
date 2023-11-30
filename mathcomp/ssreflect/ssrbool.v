@@ -158,12 +158,46 @@ Proof. by case: b1 b2 => [] []. Qed.
 Notation "[ 'in' A ]" := (in_mem^~ (mem A))
   (at level 0, format "[ 'in'  A ]") : function_scope.
 
+Lemma relpre_trans {T' T : Type} {leT : rel T} {f : T' -> T} :
+  transitive leT -> transitive (relpre f leT).
+Proof. by move=> + y x z; apply. Qed.
+
+(* The notations below are already defined in Coq.ssr.ssrbool, but we redefine*)
+(* them in different notation scopes (mostly fun_scope -> function_scope, in  *)
+(* order to replace the former with the latter).                              *)
+
+Notation "[ 'pred' : T | E ]" := (SimplPred (fun _ : T => E%B)) :
+  function_scope.
+Notation "[ 'pred' x | E ]" := (SimplPred (fun x => E%B)) : function_scope.
+Notation "[ 'pred' x | E1 & E2 ]" := [pred x | E1 && E2 ] : function_scope.
+Notation "[ 'pred' x : T | E ]" :=
+  (SimplPred (fun x : T => E%B)) (only parsing) : function_scope.
+Notation "[ 'pred' x : T | E1 & E2 ]" :=
+  [pred x : T | E1 && E2 ] (only parsing) : function_scope.
+
+Notation "[ 'rel' x y | E ]" := (SimplRel (fun x y => E%B))
+  (only parsing) : function_scope.
+Notation "[ 'rel' x y : T | E ]" :=
+  (SimplRel (fun x y : T => E%B)) (only parsing) : function_scope.
+
+Notation "[ 'mem' A ]" :=
+  (pred_of_simpl (simpl_of_mem (mem A))) (only parsing) : function_scope.
+
+Notation "[ 'pred' x 'in' A ]" := [pred x | x \in A] : function_scope.
+Notation "[ 'pred' x 'in' A | E ]" := [pred x | x \in A & E] : function_scope.
+Notation "[ 'pred' x 'in' A | E1 & E2 ]" :=
+  [pred x | x \in A & E1 && E2 ] : function_scope.
+
+Notation "[ 'rel' x y 'in' A & B | E ]" :=
+  [rel x y | (x \in A) && (y \in B) && E] : function_scope.
+Notation "[ 'rel' x y 'in' A & B ]" :=
+  [rel x y | (x \in A) && (y \in B)] : function_scope.
+Notation "[ 'rel' x y 'in' A | E ]" := [rel x y in A & A | E] : function_scope.
+Notation "[ 'rel' x y 'in' A ]" := [rel x y in A & A] : function_scope.
+
+(* Both bodies and the scope have been changed for the following notations.   *)
 Notation "[ 'predI' A & B ]" := (predI [in A] [in B]) : function_scope.
 Notation "[ 'predU' A & B ]" := (predU [in A] [in B]) : function_scope.
 Notation "[ 'predD' A & B ]" := (predD [in A] [in B]) : function_scope.
 Notation "[ 'predC' A ]" := (predC [in A]) : function_scope.
 Notation "[ 'preim' f 'of' A ]" := (preim f [in A]) : function_scope.
-
-Lemma relpre_trans {T' T : Type} {leT : rel T} {f : T' -> T} :
-  transitive leT -> transitive (relpre f leT).
-Proof. by move=> + y x z; apply. Qed.
