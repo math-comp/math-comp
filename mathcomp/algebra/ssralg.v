@@ -2307,39 +2307,56 @@ End InSemiAlgebra.
 
 End RmorphismTheory.
 
-Module SemiScale.
+Module Scale.
 
-HB.mixin Record isLaw (R : semiRingType) (V : nmodType) (op : R -> V -> V) := {
+HB.mixin Record isSemiLaw
+    (R : semiRingType) (V : nmodType) (op : R -> V -> V) := {
   op1v : op 1 =1 id;
   op_semi_additive : forall a, semi_additive (op a);
 }.
 
 #[export]
-HB.structure Definition Law R V := {op of isLaw R V op}.
-Definition law := Law.type.
+HB.structure Definition SemiLaw R V := {op of isSemiLaw R V op}.
+Definition semiLaw := SemiLaw.type.
 
-Fact comp_op1v
-  (R : semiRingType) (V : nmodType) (s_law : law R V)
-  (aR : semiRingType) (nu : {rmorphism aR -> R}) : (nu \; s_law) 1 =1 id.
-Proof. by move=> v; rewrite /= rmorph1 op1v. Qed.
-
-(* Fact comp_semi_additive a : semi_additive ((nu \; s_law) a). *)
-(* Proof. exact: (@op_semi_additive _ _ s_law (nu a)). Qed. *)
-
-Module Exports. HB.reexport. End Exports.
-
-End SemiScale.
-Export SemiScale.Exports.
-
-Module Scale.
-
-HB.mixin Record isLaw (R : ringType) (V : zmodType) (op : R -> V -> V) := {
+HB.mixin Record SemiLaw_isLaw
+    (R : ringType) (V : zmodType) (op : R -> V -> V) := {
   N1op : op (-1) =1 -%R;
 }.
 
 #[export]
-HB.structure Definition Law R V := {op of isLaw R V op & SemiScale.Law R op}.
+HB.structure Definition Law R V := {op of SemiLaw_isLaw R V op & SemiLaw R op}.
 Definition law := Law.type.
+
+(*
+HB.factory Record isLaw (R : ringType) (V : zmodType) (op : R -> V -> V) := {
+  N1op : op (-1) =1 -%R;
+  op_additive : forall a, additive (op a);
+}.
+
+HB.builders Context R V op of isLaw R V op.
+
+Fact op1v : op 1 =1 id.
+Proof. Admitted.
+
+Fact op_semi_additive a : semi_additive (op a).
+Proof.
+have opr0 x : op x 0 = 0 by rewrite -[0 in LHS]subr0 op_additive subrr.
+split=> // x y.
+by rewrite -[y in LHS]opprK -[- y]add0r !op_additive opr0 add0r opprK.
+Qed.
+
+HB.instance Definition _ := Scale.isSemiLaw.Build R V op op1v op_semi_additive.
+
+HB.instance Definition _ := Scale.SemiLaw_isLaw.Build R V op N1op.
+
+HB.end.
+*)
+
+Fact comp_op1v
+  (R : semiRingType) (V : nmodType) (s_law : semiLaw R V)
+  (aR : semiRingType) (nu : {rmorphism aR -> R}) : (nu \; s_law) 1 =1 id.
+Proof. by move=> v; rewrite /= rmorph1 op1v. Qed.
 
 Fact compN1op
   (R : ringType) (V : zmodType) (s_law : law R V)
@@ -2352,41 +2369,41 @@ End Scale.
 Export Scale.Exports.
 
 #[export]
-HB.instance Definition _ (R : semiRingType) := SemiScale.isLaw.Build R R *%R
+HB.instance Definition _ (R : semiRingType) := Scale.isSemiLaw.Build R R *%R
   mul1r (fun => mull_fun_is_semi_additive _ idfun).
 
 #[export]
-HB.instance Definition _ (R : ringType) := Scale.isLaw.Build R R *%R
+HB.instance Definition _ (R : ringType) := Scale.SemiLaw_isLaw.Build R R *%R
  (@mulN1r R).
 
 #[export]
 HB.instance Definition _ (R : semiRingType) (V : lSemiModType R) :=
-  SemiScale.isLaw.Build R V *:%R scale1r (fun => (scaler0 _ _, scalerDr _)).
+  Scale.isSemiLaw.Build R V *:%R scale1r (fun => (scaler0 _ _, scalerDr _)).
 
 #[export]
 HB.instance Definition _ (R : ringType) (U : lmodType R) :=
-  Scale.isLaw.Build R U *:%R (@scaleN1r R U).
+  Scale.SemiLaw_isLaw.Build R U *:%R (@scaleN1r R U).
 
 #[export]
 HB.instance Definition _
-  (R : semiRingType) (V : nmodType) (s : SemiScale.law R V)
+  (R : semiRingType) (V : nmodType) (s : Scale.semiLaw R V)
   (aR : semiRingType) (nu : {rmorphism aR -> R}) :=
-  SemiScale.isLaw.Build aR V (nu \; s)
-    (SemiScale.comp_op1v s nu) (fun => SemiScale.op_semi_additive _).
+  Scale.isSemiLaw.Build aR V (nu \; s)
+    (Scale.comp_op1v s nu) (fun => Scale.op_semi_additive _).
 
 #[export]
 HB.instance Definition _ (R : ringType) (V : zmodType) (s : Scale.law R V)
     (aR : ringType) (nu : {rmorphism aR -> R}) :=
-  Scale.isLaw.Build aR V (nu \; s) (@Scale.compN1op _ _ s _ nu).
+  Scale.SemiLaw_isLaw.Build aR V (nu \; s) (@Scale.compN1op _ _ s _ nu).
 
 #[export, non_forgetful_inheritance]
 HB.instance Definition _
-  (R : semiRingType) (V : nmodType) (s : SemiScale.law R V) a :=
-  isSemiAdditive.Build V V (s a) (SemiScale.op_semi_additive a).
+  (R : semiRingType) (V : nmodType) (s : Scale.semiLaw R V) a :=
+  isSemiAdditive.Build V V (s a) (Scale.op_semi_additive a).
 
 #[export, non_forgetful_inheritance]
 HB.instance Definition _ (R : ringType) (V : zmodType) (s : Scale.law R V) a :=
-  isSemiAdditive.Build V V (s a) (SemiScale.op_semi_additive a).
+  isSemiAdditive.Build V V (s a) (Scale.op_semi_additive a).
 
 Definition scalable_for
     (R : semiRingType) (U : lSemiModType R) (V : nmodType)
@@ -2534,7 +2551,7 @@ Variables (s : R -> V -> V).
 (*   Most of this machinery will be invisible to a casual user, because all  *)
 (* the projections and default instances involved are declared as coercions. *)
 
-Variables (S : semiRingType) (h : SemiScale.law S V).
+Variables (S : semiRingType) (h : Scale.semiLaw S V).
 
 Lemma linearZ c a (h_c := h c) (f : Linear.map_for U s a h_c) u :
   f (a *: u) = h_c (Linear.wrap f u).
@@ -2588,7 +2605,7 @@ End Plain.
 
 Section SemiScale.
 
-Variable (s : SemiScale.law R V).
+Variable (s : Scale.semiLaw R V).
 Variables (f : {linear U -> V | s}) (g : {linear U -> V | s}).
 
 Lemma null_fun_is_scalable : scalable_for s (\0 : U -> V).
@@ -2623,7 +2640,7 @@ End Plain.
 
 Section Scale.
 
-Variable (s : SemiScale.law R V).
+Variable (s : Scale.semiLaw R V).
 Variables (f : {linear U -> V | s}) (g : {linear U -> V | s}).
 
 Lemma sub_fun_is_scalable : scalable_for s (f \- g).
