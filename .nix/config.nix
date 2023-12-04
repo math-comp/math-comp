@@ -89,6 +89,9 @@ with builtins; with (import <nixpkgs> {}).lib;
     "coq-8.16".push-branches = [ "master" "mathcomp-1" ];
     "coq-8.16".coqPackages = common-bundles // {
       coq.override.version = "8.16";
+      multinomials.job = false;  # broken with dune on 8.16 in nixpkgs
+      coqeal.job = false;
+      mathcomp-apery.job = false;
     };
   };
 }
