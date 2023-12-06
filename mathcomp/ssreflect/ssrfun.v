@@ -2,11 +2,6 @@ From mathcomp Require Import ssreflect.
 From Coq Require Export ssrfun.
 From mathcomp Require Export ssrnotations.
 
-Definition injective2 (rT aT1 aT2 : Type) (f : aT1 -> aT2 -> rT) :=
-  forall (x1 x2 : aT1) (y1 y2 : aT2), f x1 y1 = f x2 y2 -> (x1 = x2) * (y1 = y2).
-
-Arguments injective2 [rT aT1 aT2] f.
-
 (*******************)
 (* v8.17 additions *)
 (*******************)
@@ -68,23 +63,9 @@ Qed.
 
 Notation sval := (@proj1_sig _ _).
 
-(**********************)
-(* not yet backported *)
-(**********************)
-
-Lemma inj_omap {aT rT : Type} (f : aT -> rT) :
-  injective f -> injective (omap f).
-Proof. by move=> injf [?|] [?|] //= [/injf->]. Qed.
-
-Lemma omap_id {T : Type} (x : option T) : omap id x = x.
-Proof. by case: x. Qed.
-
-Lemma eq_omap {aT rT : Type} (f g : aT -> rT) : f =1 g -> omap f =1 omap g.
-Proof. by move=> Ef [?|] //=; rewrite Ef. Qed.
-
-Lemma omapK {aT rT : Type} (f : aT -> rT) (g : rT -> aT) :
-  cancel f g -> cancel (omap f) (omap g).
-Proof. by move=> fK [?|] //=; rewrite fK. Qed.
+(*******************)
+(* v8.20 additions *)
+(*******************)
 
 (* The notations below are already defined in Coq.ssr.ssrfun, but we redefine *)
 (* them in different notation scopes (mostly fun_scope -> function_scope, in  *)
@@ -126,3 +107,26 @@ Notation "@ 'id' T" := (fun x : T => x)
 
 Notation "@ 'sval'" := (@proj1_sig) (at level 10, only parsing) :
   function_scope.
+
+(**********************)
+(* not yet backported *)
+(**********************)
+
+Definition injective2 (rT aT1 aT2 : Type) (f : aT1 -> aT2 -> rT) :=
+  forall (x1 x2 : aT1) (y1 y2 : aT2), f x1 y1 = f x2 y2 -> (x1 = x2) * (y1 = y2).
+
+Arguments injective2 [rT aT1 aT2] f.
+
+Lemma inj_omap {aT rT : Type} (f : aT -> rT) :
+  injective f -> injective (omap f).
+Proof. by move=> injf [?|] [?|] //= [/injf->]. Qed.
+
+Lemma omap_id {T : Type} (x : option T) : omap id x = x.
+Proof. by case: x. Qed.
+
+Lemma eq_omap {aT rT : Type} (f g : aT -> rT) : f =1 g -> omap f =1 omap g.
+Proof. by move=> Ef [?|] //=; rewrite Ef. Qed.
+
+Lemma omapK {aT rT : Type} (f : aT -> rT) (g : rT -> aT) :
+  cancel f g -> cancel (omap f) (omap g).
+Proof. by move=> fK [?|] //=; rewrite fK. Qed.
