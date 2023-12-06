@@ -71,6 +71,7 @@ Notation sval := (@proj1_sig _ _).
 (* them in different notation scopes (mostly fun_scope -> function_scope, in  *)
 (* order to replace the former with the latter).                              *)
 
+Close Scope fun_scope.
 Open Scope function_scope.
 
 Notation "f ^~ y" := (fun x => f x y) : function_scope.
