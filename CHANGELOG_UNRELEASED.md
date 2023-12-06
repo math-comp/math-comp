@@ -23,6 +23,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- Notations declared in the `fun_scope` are now declared in the
+  `function_scope`.
+
 - in `finset.v`
   + generalized lemmas `big_set0` and `big_set` from semigroups
     to arbitrary binary operators
@@ -105,6 +108,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + definition `aspace_of` (phantom trick now useless with reverse coercions)
 
 ### Deprecated
+
+- in `ssrfun.v`
+  + notation scope `fun_scope`, use `function_scope` instead
 
 - in `vector.v`
   + notation `vector_axiom`, use `Vector.axiom` instead

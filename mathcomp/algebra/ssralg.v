@@ -603,7 +603,7 @@ End NmodExports.
 HB.export NmodExports.
 
 Local Notation "0" := (@zero _) : ring_scope.
-Local Notation "+%R" := (@add _) : fun_scope.
+Local Notation "+%R" := (@add _) : function_scope.
 Local Notation "x + y" := (add x y) : ring_scope.
 
 Definition natmul V x n := nosimpl iterop _ n +%R x (@zero V).
@@ -937,7 +937,7 @@ Definition rreg R x := injective ((@mul R)^~ x).
 
 Local Notation "1" := (@one _) : ring_scope.
 Local Notation "n %:R" := (1 *+ n) : ring_scope.
-Local Notation "*%R" := (@mul _) : fun_scope.
+Local Notation "*%R" := (@mul _) : function_scope.
 Local Notation "x * y" := (mul x y) : ring_scope.
 Local Notation "x ^+ n" := (exp x n) : ring_scope.
 
@@ -1628,7 +1628,7 @@ Notation "[ 'lmodType' R 'of' T ]" := (Lmodule.clone R T%type _)
 End LmodExports.
 HB.export LmodExports.
 
-Local Notation "*:%R" := (@scale _ _) : fun_scope.
+Local Notation "*:%R" := (@scale _ _) : function_scope.
 Local Notation "a *: v" := (scale a v) : ring_scope.
 
 Section LmoduleTheory.
@@ -6124,7 +6124,7 @@ Arguments GRing.one : clear implicits.
 Notation "0" := (@zero _) : ring_scope.
 Notation "-%R" := (@opp _) : ring_scope.
 Notation "- x" := (opp x) : ring_scope.
-Notation "+%R" := (@add _) : fun_scope.
+Notation "+%R" := (@add _) : function_scope.
 Notation "x + y" := (add x y) : ring_scope.
 Notation "x - y" := (add x (- y)) : ring_scope.
 Notation "x *+ n" := (natmul x n) : ring_scope.
@@ -6139,14 +6139,14 @@ Notation "n %:R" := (natmul 1 n) : ring_scope.
 Arguments GRing.char R%type.
 Notation "[ 'char' R ]" := (GRing.char R) : ring_scope.
 Notation Frobenius_aut chRp := (Frobenius_aut chRp).
-Notation "*%R" := (@mul _) : fun_scope.
+Notation "*%R" := (@mul _) : function_scope.
 Notation "x * y" := (mul x y) : ring_scope.
 Notation "x ^+ n" := (exp x n) : ring_scope.
 Notation "x ^-1" := (inv x) : ring_scope.
 Notation "x ^- n" := (inv (x ^+ n)) : ring_scope.
 Notation "x / y" := (mul x y^-1) : ring_scope.
 
-Notation "*:%R" := (@scale _ _) : fun_scope.
+Notation "*:%R" := (@scale _ _) : function_scope.
 Notation "a *: m" := (scale a m) : ring_scope.
 Notation "k %:A" := (scale k 1) : ring_scope.
 Notation "\0" := (null_fun _) : ring_scope.
