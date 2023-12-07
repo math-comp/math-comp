@@ -34,6 +34,7 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   bundles = let
     master = [
+      "coq-bits"
       "coqeal"
       "coquelicot"
       "fourcolor"
@@ -55,7 +56,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       "extructures"
     ];
     hierarchy-builder = [
-      "coq-bits"
       "mathcomp-classical"
       "mathcomp-analysis"
     ];
