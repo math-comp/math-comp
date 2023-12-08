@@ -71,7 +71,6 @@ Notation sval := (@proj1_sig _ _).
 (* them in different notation scopes (mostly fun_scope -> function_scope, in  *)
 (* order to replace the former with the latter).                              *)
 
-Close Scope fun_scope.
 Open Scope function_scope.
 
 Notation "f ^~ y" := (fun x => f x y) : function_scope.
@@ -112,6 +111,9 @@ Notation "@ 'sval'" := (@proj1_sig) (at level 10, only parsing) :
 (**********************)
 (* not yet backported *)
 (**********************)
+
+Delimit Scope function_scope with FUN.
+Close Scope fun_scope.
 
 Definition injective2 (rT aT1 aT2 : Type) (f : aT1 -> aT2 -> rT) :=
   forall (x1 x2 : aT1) (y1 y2 : aT2), f x1 y1 = f x2 y2 -> (x1 = x2) * (y1 = y2).
