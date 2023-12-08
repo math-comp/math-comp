@@ -26,6 +26,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Notations declared in the `fun_scope` are now declared in the
   `function_scope`.
 
+- in `ssrfun.v`
+  + `%FUN` is changed from the delimiter of `fun_scope` to that of
+    `function_scope`
+  + `fun_scope` is closed
+
 - in `finset.v`
   + generalized lemmas `big_set0` and `big_set` from semigroups
     to arbitrary binary operators

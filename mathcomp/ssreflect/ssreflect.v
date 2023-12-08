@@ -6,7 +6,7 @@ Global Set Asymmetric Patterns.
 Global Set Bullet Behavior "None".
 
 (******************************************************************************)
-(* Local additions:                                                           *)
+(* v8.20 additions:                                                           *)
 (*                                                                            *)
 (* [elaborate x] == triggers coq elaboration to fill the holes of the term x  *)
 (*                  The main use case is to trigger typeclass inference in    *)
