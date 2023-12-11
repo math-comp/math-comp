@@ -12,6 +12,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `ssrint.v`
   + lemmas `intrN`, `intrB`
+- in `finmap.v` TODO
+
+- in `finset.v`
+  + lemmas `big_set1E`, `big_imset_idem`.
+
+- in `order.v`
+  + lemmas `bigmin_mkcondl`, `bigmin_mkcondr`, `bigmax_mkcondl`,
+    `bigmax_mkcondr`, `bigmin_le_id`, `bigmax_ge_id`, `bigmin_eq_id`,
+    `bigmax_eq_id`, `bigminUl`, `bigminUr`, `bigmaxUl`, `bigmaxUr`,
+    `bigminIl`, `bigminIr`, `bigmaxIl`, `bigmaxIr`, `bigminD`,
+    `bigmaxD`, `bigminU`, `bigmaxU`, `bigmin_set1`, `bigmax_set1`,
+    `bigmin_imset`, `bigmax_imset`.
 
 ### Changed
 
