@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat div seq.
-From mathcomp Require Import choice fintype finfun bigop.
+From mathcomp Require Import path choice fintype finfun bigop.
 
 (******************************************************************************)
 (* This file defines a type for sets over a finite Type, similar to the type  *)
@@ -114,30 +114,89 @@ Unset Printing Implicit Defensive.
 
 Declare Scope set_scope.
 
-Section SetType.
+Module Type FinSet_SIG.
+Parameter type : choiceType -> predArgType.
+Parameter enum : forall {T}, type T -> seq T.
+Axiom enum_sorted : forall {T} (A : type T), sorted (@prec T) (enum A).
+Parameter of_seq : forall {T : choiceType}, seq T -> type T.
+Axiom enumK : forall {T}, cancel (@enum T) (@of_seq T).
+Axiom of_seqK: forall {T : choiceType} (s : seq T), enum (of_seq s) =i s.
+(* TODO: Add the membership here *)
+(* Axiom mem : [...] *)
+(* Axiom memP : mem A =i enum A *)
+End FinSet_SIG.
 
-Variable T : finType.
+Module FinSet : FinSet_SIG.
+Section FinSet.
+Variable (T : choiceType).
 
-Inductive set_type : predArgType := FinSet of {ffun pred T}.
-Definition finfun_of_set A := let: FinSet f := A in f.
-Definition set_of := set_type.
-Identity Coercion type_of_set_of : set_of >-> set_type.
+Record internal := Build { enum : seq T; enum_sorted : sorted (@prec T) enum }.
+Definition type := internal.
 
-Definition set_isSub := Eval hnf in [isNew for finfun_of_set].
-HB.instance Definition _ := set_isSub.
-HB.instance Definition _ := [Finite of set_type by <:].
+Definition of_seq : seq T -> type.
+Admitted.
 
-End SetType.
+Definition enumK : cancel enum of_seq.
+Admitted.
+
+Definition of_seqK : forall (s : seq T), enum (of_seq s) =i s.
+Admitted.
+
+End FinSet.
+End FinSet.
+
+Notation set_type := FinSet.type.
+Notation set_of := set_type.
 
 Delimit Scope set_scope with SET.
 Bind Scope set_scope with set_type.
 Bind Scope set_scope with set_of.
 Open Scope set_scope.
 Arguments set_of T%type.
-Arguments finfun_of_set {T} A%SET.
 
 Notation "{ 'set' T }" := (set_of T)
   (at level 0, format "{ 'set'  T }") : type_scope.
+
+Canonical set_predType (T : choiceType) :=
+   @PredType T {set T} (fun A => [in FinSet.enum A]
+     (* TODO replace with FinSet.mem *)
+     ).
+
+Section ChoiceType.
+
+Variable (T : choiceType).
+
+(* We should take out the proof relevant part *)
+(* We should probably use a partial iso to seq T *)
+Lemma set_type_choice : Choice (set_type T).
+Admitted.
+HB.instance Definition _ := set_type_choice.
+
+End ChoiceType.
+
+Section CountType.
+
+Variable (T : countType).
+
+(* We should take out the proof relevant part *)
+(* We should probably use a partial iso to seq T *)
+Lemma set_type_countable : isCountable (set_type T).
+Admitted.
+HB.instance Definition _ := set_type_countable.
+
+End CountType.
+
+Section FinType.
+
+Variable (T : finType).
+
+(* We should take out the proof relevant part *)
+(* We should probably use a partial iso to seq T *)
+Lemma set_type_finite : isFinite (set_type T).
+Admitted.
+HB.instance Definition _ := set_type_finite.
+
+End FinType.
 
 (* We later define several subtypes that coerce to set; for these it is       *)
 (* preferable to state equalities at the {set _} level, even when comparing   *)
@@ -155,9 +214,54 @@ Notation "A :!=: B" := (A != B :> {set _})
 Notation "A :=P: B" := (A =P B :> {set _})
   (at level 70, no associativity, only parsing) : set_scope.
 
+(* :TODO: IMPLEMENT the `fun` subject case in HB *)
+(* HB.mixin Record isFinPred (T : choiceType) (P : pred T) := { *)
+(*     pred_set : {set T}; *)
+(*     pred_enumP : pred_set =i P *)
+(* }. *)
+(* #[short(type="finPred")] *)
+(* HB.structure Definition FinPred T := {P of @isFinPred T P}. *)
+
+Structure finPred (T : choiceType) := FinPredPack {
+   finpred :> pred T;
+   pred_set : {set T};
+   pred_enumP : pred_set =i finpred
+}.
+
+Canonical isFinPred_predType T (P : finPred T) :=
+   @PredType T (finPred T) id.
+
+Structure wrapped_prop := WrapProp {unwrap_prop : bool}.
+
+(** The (application A x) structure recognize a boolean expression
+    `apply` depending on `x` that represents a finite set `A` *)
+Structure application T (A : {set T}) (* HERE -> *) x (* <- *) :=
+  Apply {apply; applyP : (x \in A) = unwrap_prop apply}.
+
+(**
+ The class of formulae that we wish to recognize as canonically
+ a finPred is the following:
+ P x := x \in A,        where A is a finPred
+      | x == y
+      | Qx && (R x),  where Qx is an (application A x)
+      | Qx || Rx,     where Qx and Rx are (application _ x)
+      | Qx (+) Rx,    where Qx and Rx are (application _ x)
+      | if Qx then R x else Tx, where Qx and Tx are (application _ x)
+
+Note: we need to make sure the A inferred by application A x is
+      syntactically equal to A and not "just" convertible to A.
+*)
+
+Canonical application_finPred (T : choiceType) (A : {set T})
+    (P : forall x, application A x) :=
+  @FinPredPack T (fun x => unwrap_prop (apply (P x)))
+               A (fun x => applyP (P x)).
+
+STOP.
 
 HB.lock
-Definition finset (T : finType) (P : pred T) : {set T} := @FinSet T (finfun P).
+Definition finset (T : finType) (P : pred T) : {set T} :=
+  FinSet.of_seq (enum P).
 Canonical finset_unlock := Unlockable finset.unlock.
 
 (* The weird type of pred_of_set is imposed by the syntactic restrictions on  *)
@@ -2051,7 +2155,7 @@ have inj_f : {in A &, injective (pblock P)}.
 rewrite -(card_in_imset inj_f); apply: subset_leq_card.
 apply/subsetP => ? /imsetP[x xA ->].
 rewrite !inE pblock_mem ?covP ?subAD ?andbT //.
-by apply: contraTneq AB0 => <-; apply/set0Pn; exists x; rewrite inE APx ?andbT. 
+by apply: contraTneq AB0 => <-; apply/set0Pn; exists x; rewrite inE APx ?andbT.
 Qed.
 
 Section BigOps.
