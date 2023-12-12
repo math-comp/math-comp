@@ -231,6 +231,16 @@ Structure finPred (T : choiceType) := FinPredPack {
 Canonical isFinPred_predType T (P : finPred T) :=
    @PredType T (finPred T) id.
 
+Fail Check fun (T : choiceType) (P : finPred T) => [eta P] : finPred T.
+Fail Check fun (T : choiceType) (P : finPred T) => [in P] : finPred T.
+Fail Check fun (T : choiceType) (A : {set T}) => [in A] : finPred T.
+Fail Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
+   (fun x => (P x) && (Q x)) : finPred T.
+Fail Check fun (T : choiceType) (A : {set T}) (Q : pred T) =>
+   (fun x => (x \in A) && (Q x)) : finPred T.
+Fail Check fun (T : choiceType) (P : finPred T) (Q : finPred T) =>
+   (fun x => (P x) || (Q x)) : finPred T.
+
 Structure wrapped_prop := WrapProp {unwrap_prop : bool}.
 
 (** The (application A x) structure recognize a boolean expression
