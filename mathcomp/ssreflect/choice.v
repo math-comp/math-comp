@@ -258,17 +258,35 @@ HB.instance Definition _ (T : eqType) := Equality.copy (GenTree.tree T)
 (* choiceType because in practice the base type of an Equality/Choice subType *)
 (* is always an Equality/Choice Type).                                        *)
 
-HB.mixin Record hasChoice T := Mixin {
+HB.mixin Record hasWoChoice T := Mixin {
   find_subdef : pred T -> nat -> option T;
   choice_correct_subdef {P n x} : find_subdef P n = Some x -> P x;
   choice_complete_subdef {P : pred T} :
     (exists x, P x) -> exists n, find_subdef P n;
-  choice_extensional_subdef {P Q : pred T} :
-    P =1 Q -> find_subdef P =1 find_subdef Q
+  choice_stable_subdef {P Q : pred T} n :
+    subpred P Q -> [/\ find_subdef P n ==> find_subdef Q n
+      & oapp P false (find_subdef Q n) -> find_subdef P n = find_subdef Q n]
 }.
 
+HB.factory Record hasChoice `{classical_logic} T := Mixin {
+  find : pred T -> nat -> option T;
+  choice_correct {P n x} : find P n = Some x -> P x;
+  choice_complete {P : pred T} :
+    (exists x, P x) -> exists n, find P n;
+  choice_extensional {P Q : pred T} :
+    P =1 Q -> find P =1 find Q
+}.
+HB.builders Context `{classical_logic} T of hasChoice _ T.
+  Lemma choice_stable {P Q : pred T} n :
+    subpred P Q -> [/\ find P n ==> find Q n
+      & oapp P false (find Q n) -> find P n = find Q n].
+  Proof. (* use Zorn's lemma *) Admitted.
+  HB.instance Definition _ := @hasWoChoice.Build T find
+    choice_correct choice_complete (@choice_stable).
+HB.end.
+
 #[short(type="choiceType")]
-HB.structure Definition Choice := { T of hasChoice T & hasDecEq T}.
+HB.structure Definition Choice := { T of hasWoChoice T & hasDecEq T}.
 
 Module Export ChoiceNamespace.
   Module Choice.
@@ -283,8 +301,8 @@ Module Export ChoiceNamespace.
   Notation complete := choice_complete_subdef.
   Arguments complete {_ _}.
 
-  Notation extensional := choice_extensional_subdef.
-  Arguments extensional {_ _ _}.
+  Notation stable := choice_stable_subdef.
+  Arguments stable {_ _ _}.
 
   Section InternalTheory.
 
@@ -298,13 +316,16 @@ Module Export ChoiceNamespace.
   by case: (find P n) => // x; exists x.
   Qed.
 
+  Lemma extensional {P Q : pred T} : P =1 Q -> find P =1 find Q.
+  Admitted.
+
   End InternalTheory.
   End InternalTheory.
   End Choice.
 End ChoiceNamespace.
 
 #[deprecated(since="mathcomp 2.0.0", note="Use Choice.on instead.")]
-Notation "[ 'hasChoice' 'of' T ]" := (Choice.on _ : hasChoice T%type)
+Notation "[ 'hasChoice' 'of' T ]" := (Choice.on _ : hasWoChoice T%type)
   (at level 0, format "[ 'hasChoice'  'of'  T ]") : form_scope.
 #[deprecated(since="mathcomp 2.0.0", note="Use Choice.clone instead.")]
 Notation "[ 'choiceType' 'of' T 'for' C ]" := (Choice.clone T%type C)
@@ -383,7 +404,7 @@ Section CanChoice.
 
 Variables (sT : Type) (f : sT -> T).
 
-Lemma PCanHasChoice f' : pcancel f f' -> hasChoice sT.
+Lemma PCanHasChoice f' : pcancel f f' -> hasWoChoice sT.
 Proof.
 move=> fK; pose liftP sP := [pred x | oapp sP false (f' x)].
 pose sf sP := [fun n => obind f' (find (liftP sP) n)].
@@ -392,15 +413,15 @@ exists sf => [sP n x | sP [y sPy] | sP sQ eqPQ n] /=.
 - have [|n Pn] := @complete T (liftP sP); first by exists (f y); rewrite /= fK.
   exists n; case Df: (find _ n) Pn => //= [x] _.
   by have:= correct Df => /=; case: (f' x).
-by congr (obind _ _); apply: extensional => x /=; case: (f' x) => /=.
-Qed.
+(* by congr (obind _ _); apply: extensional => x /=; case: (f' x) => /=. *)
+Admitted.
 
 Definition CanHasChoice f' (fK : cancel f f') :=
   PCanHasChoice (can_pcan fK).
 
-HB.instance Definition _ f' (fK : pcancel f f') : hasChoice (pcan_type fK) :=
+HB.instance Definition _ f' (fK : pcancel f f') : hasWoChoice (pcan_type fK) :=
   PCanHasChoice fK.
-HB.instance Definition _ f' (fK : cancel f f') : hasChoice (can_type fK) :=
+HB.instance Definition _ f' (fK : cancel f f') : hasWoChoice (can_type fK) :=
   PCanHasChoice (can_pcan fK).
 
 End CanChoice.
@@ -413,7 +434,7 @@ Variables (P : pred T) (sT : subType P).
 
 End SubChoice.
 
-Fact seq_hasChoice : hasChoice (seq T).
+Fact seq_hasChoice : hasWoChoice (seq T).
 Proof.
 pose r f := [fun xs => fun x : T => f (x :: xs) : option (seq T)].
 pose fix f sP ns xs {struct ns} :=
@@ -428,10 +449,10 @@ exists (fun sP nn => f sP (dc nn) nil) => [sP n ys | sP [ys] | sP sQ eqPQ n].
   have /complete[n]: exists z, f sP (dc n1) (z :: xs) by exists y.
   case Df: (find _ n)=> // [x] _; exists (code (n :: dc n1)).
   by rewrite codeK /= Df /= (correct Df).
-elim: {n}(dc n) nil => [|n ns IHs] xs /=; first by rewrite eqPQ.
-rewrite (@extensional _ _ (r (f sQ ns) xs)) => [|x]; last by rewrite IHs.
-by case: find => /=.
-Qed.
+(* elim: {n}(dc n) nil => [|n ns IHs] xs /=; first by rewrite eqPQ. *)
+(* rewrite (@extensional _ _ (r (f sQ ns) xs)) => [|x]; last by rewrite IHs. *)
+(* by case: find => /=. *)
+Admitted.
 HB.instance Definition _ := seq_hasChoice.
 
 End OneType.
@@ -440,7 +461,7 @@ Section TagChoice.
 
 Variables (I : choiceType) (T_ : I -> choiceType).
 
-Fact tagged_hasChoice : hasChoice {i : I & T_ i}.
+Fact tagged_hasChoice : hasWoChoice {i : I & T_ i}.
 Proof.
 pose mkT i (x : T_ i) := Tagged T_ x.
 pose ft tP n i := omap (mkT i) (find (tP \o mkT i) n).
@@ -454,22 +475,22 @@ exists f => [tP n u | tP [[i x] tPxi] | sP sQ eqPQ n].
   have{tPnt}: exists j, ft tP nt j by exists i; rewrite /ft; case: find tPnt.
   case/complete=> ni tPn; exists (code [:: ni; nt]); rewrite /f codeK /fi.
   by case Df: find tPn => //= [j] _; have:= correct Df.
-rewrite /f /fi; case: (dc n) => [|ni [|nt []]] //=.
-rewrite (@extensional _ _ (ft sQ nt)) => [|i].
-  by case: find => //= i; congr (omap _ _); apply: extensional => x /=.
-by congr (omap _ _); apply: extensional => x /=.
-Qed.
+(* rewrite /f /fi; case: (dc n) => [|ni [|nt []]] //=. *)
+(* rewrite (@extensional _ _ (ft sQ nt)) => [|i]. *)
+(*   by case: find => //= i; congr (omap _ _); apply: extensional => x /=. *)
+(* by congr (omap _ _); apply: extensional => x /=. *)
+Admitted.
 HB.instance Definition _ := tagged_hasChoice.
 
 End TagChoice.
 
-Fact nat_hasChoice : hasChoice nat.
+Fact nat_hasChoice : hasWoChoice nat.
 Proof.
 pose f := [fun (P : pred nat) n => if P n then Some n else None].
-exists f => [P n m | P [n Pn] | P Q eqPQ n] /=; last by rewrite eqPQ.
-  by case: ifP => // Pn [<-].
-by exists n; rewrite Pn.
-Qed.
+(* exists f => [P n m | P [n Pn] | P Q eqPQ n] /=; last by rewrite eqPQ. *)
+(*   by case: ifP => // Pn [<-]. *)
+(* by exists n; rewrite Pn. *)
+Admitted.
 HB.instance Definition _ := nat_hasChoice.
 
 HB.instance Definition _ := Choice.copy bool (can_type oddb).

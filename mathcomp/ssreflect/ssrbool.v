@@ -99,3 +99,14 @@ Proof. by case: b1 b2 => [] []. Qed.
 Lemma relpre_trans {T' T : Type} {leT : rel T} {f : T' -> T} :
   transitive leT -> transitive (relpre f leT).
 Proof. by move=> + y x z; apply. Qed.
+
+Class classical_logic := {
+  functional_extensionality_dep :
+       forall (A : Type) (B : A -> Type) (f g : forall x : A, B x),
+       (forall x : A, f x = g x) -> f = g;
+  propositional_extensionality :
+       forall P Q : Prop, P <-> Q -> P = Q;
+  constructive_indefinite_description :
+    forall (A : Type) (P : A -> Prop),
+    (exists x : A, P x) -> {x : A | P x}
+}.
