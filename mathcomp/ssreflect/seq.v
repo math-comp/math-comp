@@ -4724,3 +4724,32 @@ Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" :=
   (all_iff P0 (@cons Prop P1 (.. (@cons Prop Pn nil) ..))) : form_scope.
 
 Ltac tfae := do !apply: AllIffConj.
+
+Section WellOrderedChains.
+
+Lemma wo_chainW (T : eqType) R C : @wo_chain T R C -> chain R C.
+Proof.
+have ne_cons x s: nonempty [mem x :: s : seq T] by exists x; apply: mem_head.
+have all_mem s: all [mem s : seq T] s by apply/allP.
+move=> Rwo; have Rtotal: {in C &, total R}.
+  move=> x y Cx Cy; have /Rwo[] := ne_cons x [::y]; first exact/allP/and3P.
+  by move=> z [] [] /or3P[] // /eqP-> /allP/and3P[] => [_|] ->; rewrite ?orbT.
+have Rxx: {in C, reflexive R} by move=> x Cx; rewrite -[R x x]orbb Rtotal.
+have Ranti: {in C &, antisymmetric R}.
+  move=> x y Cx Cy; have /Rwo[] := ne_cons x [::y]; first exact/allP/and3P.
+  move=> z [_ Uz] /andP[Rxy Ryx]; have /and3P[xy_x xy_y _] := all_mem [:: x; y].
+  by rewrite -(Uz x) ?(Uz y); split=> //; apply/allP; rewrite /= (Rxy, Ryx) Rxx.
+suffices Rtr: {in C & &, transitive R} by apply/total_order_in.
+move=> y x z Cy Cx Cz Rxy Ryz; pose A := [mem [:: x; y; z]].
+have /and4P[Ax Ay Az _]: all A _ := all_mem _.
+have [] := Rwo A; first 1 [exact/allP/and4P | apply: ne_cons].
+move=> _ [[/or4P[]// /eqP-> /allP/and4P[// Ryx Rzy _ _]] _].
+  by rewrite (Ranti x y) ?Rxy.
+by rewrite (Ranti z y) ?Rzy.
+Qed.
+
+Lemma well_order_total (T : eqType) (R : rel T) : well_order R -> total_order R.
+Proof. by move/withinW/wo_chainW/in3T. Qed.
+
+End WellOrderedChains.
+

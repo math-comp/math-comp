@@ -1,3 +1,4 @@
+Require Setoid.
 From mathcomp Require Import ssreflect ssrfun.
 From Coq Require Export ssrbool.
 
@@ -171,3 +172,236 @@ Class classical_logic := {
     forall (A : Type) (P : A -> Prop),
     (exists x : A, P x) -> {x : A | P x}
 }.
+
+
+Reserved Notation "{ 'for' x & y , P }" (at level 0,
+  format "'[hv' { 'for'  x  &  y , '/ '  P } ']'").
+Reserved Notation "{ 'for' x & y & z , P }" (at level 0,
+  format "'[hv' { 'for'  x  &  y   &  z , '/ '  P } ']'").
+Reserved Notation "{ 'in' <= S , P }" (at level 0,
+  format "'[hv' { 'in'  <=  S , '/ '  P } ']'").
+
+Definition identify_source T : Type := T.
+Definition identify_target T : Type := T.
+Variant identical3 {T} x : T -> T -> Prop := Identical3 : @identical3 T x x x.
+Structure identify {T} (x y : T) :=
+  Identify {common_value :> identify_target T; _ : identical3 x y common_value}.
+
+Canonical trivial_identify {T} (x : identify_source T) :=
+  Identify (@Identical3 T x).
+Coercion trivial_identify : identify_source >-> identify.
+
+Section MoreLocalProperties.
+
+Context {T1 T2 T3 : Type} {T : predArgType}.
+Implicit Type A : {pred T}.
+
+Local Notation "{ 'allA' P }" := (forall A : {pred T}, P A : Prop) (at level 0).
+Local Notation "{ 'all2' P }" := (forall x y, P x y : Prop) (at level 0).
+Local Notation "{ 'all3' P }" := (forall x y z, P x y z: Prop) (at level 0).
+Local Notation ph := (phantom _).
+
+Definition prop_for2 (x : T1) (y : T2) P & ph {all2 P} := P x y.
+Definition prop_for3 (x : T1) (y : T2) (z : T3) P & ph {all3 P} := P x y z.
+Definition prop_within d P & ph {allA P} := forall A, sub_mem (mem A) d -> P A.
+
+Lemma for2E x y P phP : @prop_for2 x y P phP = P x y. Proof. by []. Qed.
+Lemma for3E x y z P phP : @prop_for3 x y z P phP = P x y z. Proof. by []. Qed.
+
+Lemma withinW A P : {allA P} -> prop_within (mem A) (inPhantom {allA P}).
+Proof. by move=> allP ? _; apply: allP. Qed.
+
+Lemma withinT P : prop_within (mem T) (inPhantom {allA P}) -> {allA P}.
+Proof. by move=> allP A; apply: allP. Qed.
+
+Lemma sub_within d d' P :
+  sub_mem d d' -> forall phP, @prop_within d' P phP -> @prop_within d P phP.
+Proof. by move=> sdd' phP Pd' A /(_ _ _)/sdd'-/Pd'. Qed.
+
+End MoreLocalProperties.
+
+Notation "{ 'for' x & y , P }" :=
+  (prop_for2 x y (inPhantom P)) : type_scope.
+Notation "{ 'for' x & y & z , P }" :=
+  (prop_for3 x y z (inPhantom P)) : type_scope.
+Notation "{ 'in' <= S , P }" :=
+  (prop_within (mem S) (inPhantom P)) : type_scope.
+
+(*
+Class identical_value {T} (x y : T) := IdenticalValue {}.
+Instance duplicate_value {T} x : @identical_value T x x := IdenticalValue x x.
+*)
+
+Section PairProperties.
+
+Context {T : Type} (d : mem_pred T).
+
+Local Notation "{ 'all1' P }" := (forall x : T, P x : Prop) (at level 0).
+Local Notation "{ 'all2' P }" := (forall x y : T, P x y : Prop) (at level 0).
+Local Notation "{ 'all3' P }" := (forall x y z : T, P x y z: Prop) (at level 0).
+
+Structure phantomProp (P : Prop) : Type :=
+  PhantomProp {phantom_Prop :> Prop; _ : P = phantom_Prop}.
+Canonical PropPhantom P := @PhantomProp P P erefl.
+Local Notation ph := phantomProp.
+Coercion phantom_of_Prop P phP : phantom Prop P :=
+  let: PhantomProp Q defQ := phP in
+  let: erefl in _ = P := esym defQ return phantom Prop P in inPhantom Q.
+
+Ltac elimPh phP := (case: phP => phP; case: phP /).
+
+Definition prop_dup_body P (phP : ph {all1 P}) x y :=
+  forall u : identify x y, P (common_value u).
+Arguments prop_dup_body P phP x y / : clear implicits.
+Local Notation prop_dup P phP := (forall x y, prop_dup_body P phP x y).
+
+Definition prop2_dup_body P (phP : ph {all2 P}) x y z :=
+  forall u : identify y z, P x (common_value u).
+Arguments prop2_dup_body P phP x y z / : clear implicits.
+Local Notation prop2_dup P phP := (forall x y z, prop2_dup_body P phP x y z).
+
+Definition prop2_pair_body P Q (phP : ph {all2 P}) (_ : ph {all2 Q}) x y :=
+  (P x y * Q x y)%type.
+Arguments prop2_pair_body P Q phP phQ x y / : clear implicits.
+Local Notation prop2_pair P Q phP phQ :=
+  (forall x y, prop2_pair_body P Q phP phQ x y).
+
+Definition prop3_pair_body P Q (phP : ph {all3 P}) (_ : ph {all3 Q}) x y z :=
+  (P x y z * Q x y z)%type.
+Arguments prop3_pair_body P Q phP phQ x y z / : clear implicits.
+Local Notation prop3_pair P Q phP phQ :=
+  (forall x y z, prop3_pair_body P Q phP phQ x y z).
+
+Lemma prop_dupE P phP : prop_dup P phP <-> phP.
+Proof. by elimPh phP; split=> P_ /= *; apply: P_. Qed.
+
+Lemma prop_in2_dup P phP :
+  prop_in2 d (inPhantom (prop_dup P phP)) <-> prop_in1 d phP.
+Proof. by elimPh phP; split=> Pd x * => [|[_ []]]; apply Pd. Qed.
+
+Lemma prop2_dupE P phP : prop2_dup P phP <-> phP.
+Proof. by elimPh phP; split=> P_ /= *; apply: P_. Qed.
+
+Lemma prop_in3_dup P phP :
+  prop_in3 d (inPhantom (prop2_dup P phP)) <-> prop_in2 d phP.
+Proof. by elimPh phP; split=> Pd x * => [|[_ []]]; apply Pd. Qed.
+
+Lemma prop2_pairE P Q phP phQ : prop2_pair P Q phP phQ <-> phP /\ phQ.
+Proof. by elimPh phP; elimPh phQ; split=> [] /=; clear d; firstorder. Qed.
+(* or rather import skolemization to avoid the fragility of firstorder relying on unused context variables *)
+(* by elimPh phP; elimPh phQ; split=> [/all_and|] [].*)
+
+Lemma prop3_pairE P Q phP phQ : prop3_pair P Q phP phQ <-> phP /\ phQ.
+Proof. 
+by elimPh phP; elimPh phQ; split=> [] /=; clear d; firstorder. Qed.
+(* or import skolemization? *)
+(* by elimPh phP; elimPh phQ; split=> [/all_and|] []. *)
+
+Lemma prop_in2_pair P Q phP phQ :
+       prop_in2 d (inPhantom (prop2_pair P Q phP phQ))
+   <-> prop_in2 d phP /\ prop_in2 d phQ.
+Proof. by firstorder. Qed.
+(* or import skolemization? *)
+(* by elimPh phP; elimPh phQ; split=> [/all_and|] []; split; auto. *)
+
+Lemma prop_in3_pair P Q phP phQ :
+       prop_in3 d (inPhantom (prop3_pair P Q phP phQ))
+   <-> prop_in3 d phP /\ prop_in3 d phQ.
+Proof. by rewrite /=; firstorder. Qed.
+(* or import skolemization? *)
+(* by elimPh phP; elimPh phQ; split=> [/all_and|] []; split; auto. *)
+
+End PairProperties.
+
+Notation prop_dup Q :=
+  (forall x y, prop_dup_body (PropPhantom Q) x y).
+Notation prop2_dup Q :=
+  (forall x y z, prop2_dup_body (PropPhantom Q) x y z).
+Notation prop_dup2 Q := (prop2_dup (prop_dup Q)).
+Notation prop2_pair Q1 Q2 :=
+  (forall x y, prop2_pair_body (PropPhantom Q1) (PropPhantom Q2)).
+Notation prop3_pair Q1 Q2 :=
+  (forall x y z, prop3_pair_body (PropPhantom Q1) (PropPhantom Q2) x y z).
+
+Section RelDefs.
+
+Variables (T : Type) (R : rel T).
+Implicit Types (x y z : T) (A C : {pred T}).
+
+Definition maximal z := forall x, R z x -> R x z.
+
+Definition minimal z := forall x, R x z -> R z x.
+
+Definition upper_bound A z := {in A, forall x, R x z}.
+
+Definition lower_bound A z := {in A, forall x, R z x}.
+
+Definition preorder := prop3_pair (prop_dup2 (reflexive R)) (transitive R).
+
+Definition partial_order := prop3_pair preorder (prop2_dup (antisymmetric R)).
+
+Definition total_order := prop3_pair partial_order (prop2_dup (total R)).
+
+Definition nonempty A := exists x, x \in A.
+
+Definition minimum_of A z := z \in A /\ lower_bound A z.
+
+Definition maximum_of A z := z \in A /\ upper_bound A z.
+
+Definition well_order := forall A, nonempty A -> exists! z, minimum_of A z.
+
+Definition chain C := {in C & &, total_order}.
+
+Definition wo_chain C := {in <= C, well_order}.
+
+Lemma preorderE : preorder <-> reflexive R /\ transitive R.
+Proof. by rewrite [preorder]prop3_pairE /= prop2_dupE /= prop_dupE. Qed.
+
+Lemma preorder_in A :
+  {in A & &, preorder} <-> {in A, reflexive R} /\ {in A & &, transitive R}.
+Proof. by rewrite prop_in3_pair prop_in3_dup prop_in2_dup. Qed.
+
+Lemma partial_orderE :
+  partial_order <-> [/\ reflexive R, transitive R & antisymmetric R].
+Proof.
+by rewrite [partial_order]prop3_pairE /= preorderE prop2_dupE; split=> [[]|] [].
+Qed.
+
+Lemma partial_order_in A :
+    {in A & &, partial_order}
+  <-> [/\ {in A, reflexive R}, {in A & &, transitive R}
+        & {in A &, antisymmetric R}].
+Proof. by rewrite prop_in3_pair preorder_in prop_in3_dup; split=> [[]|] []. Qed.
+
+Lemma total_orderE :
+  total_order <-> [/\ reflexive R, transitive R, antisymmetric R & total R].
+Proof.
+rewrite [total_order]prop3_pairE /= partial_orderE prop2_dupE /=.
+by split=> [[]|] [].
+Qed.
+
+Lemma total_order_in A :
+    {in A & &, total_order}
+  <-> [/\ {in A, reflexive R}, {in A & &, transitive R},
+          {in A &, antisymmetric R} & {in A &, total R}].
+Proof.
+by rewrite prop_in3_pair partial_order_in prop_in3_dup; split=> [[]|] [].
+Qed.
+
+Lemma antisymmetric_wo_chain C :
+    {in C &, antisymmetric R} ->
+    {in <= C, forall A, nonempty A -> exists z, minimum_of A z} ->
+  wo_chain C.
+Proof.
+move=> Ranti Rwo A sAC /Rwo[//|z [Az lbAz]]; exists z; split=> // x [Ax lbAx].
+by apply: Ranti; rewrite ?sAC ?lbAx ?lbAz.
+Qed.
+
+Lemma antisymmetric_well_order :
+    antisymmetric R -> (forall A, nonempty A -> exists z, minimum_of A z) ->
+  well_order.
+Proof.
+by move=> Ranti /withinW/(antisymmetric_wo_chain (in2W Ranti))/withinT.
+Qed.
+
+End RelDefs.

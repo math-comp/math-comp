@@ -309,12 +309,13 @@ Module Export ChoiceNamespace.
   Variable T : Choice.type.
   Implicit Types P Q : pred T.
 
-  Fact xchoose_subproof P exP :
-    {x | find P (ex_minn (@choice_complete_subdef _ P exP)) = Some x}.
-  Proof.
-  case: (ex_minnP (complete exP)) => n.
-  by case: (find P n) => // x; exists x.
-  Qed.
+  Lemma findP P n x : find P n = Some x -> P x.
+  Proof. by move=> Dx; have:= @correct _ P n; rewrite Dx; apply. Qed.
+
+  Fact xchoose_subproof P :
+      (exists x, P x) ->
+    {x | exists2 m, find P m = Some x & forall n, find P n -> m <= n}.
+  Proof. by case/complete/ex_minnP=> m; case Dx: find => // [x]; exists x, m. Qed.
 
   Lemma extensional {P Q : pred T} : P =1 Q -> find P =1 find Q.
   Admitted.
@@ -348,15 +349,15 @@ Implicit Types P Q : pred T.
 Definition xchoose P exP := sval (@xchoose_subproof T P exP).
 
 Lemma xchooseP P exP : P (@xchoose P exP).
-Proof. by rewrite /xchoose; case: (xchoose_subproof exP) => x /= /correct. Qed.
+Proof. by rewrite /xchoose; case: xchoose_subproof => x [m /= /findP]. Qed.
 
 Lemma eq_xchoose P Q exP exQ : P =1 Q -> @xchoose P exP = @xchoose Q exQ.
 Proof.
-rewrite /xchoose => eqPQ.
-case: (xchoose_subproof exP) => x; case: (xchoose_subproof exQ) => y /=.
-case: ex_minnP => n; rewrite -(extensional eqPQ) => Pn minQn.
-case: ex_minnP => m; rewrite !(extensional eqPQ) => Qm minPm.
-by case: (eqVneq m n) => [-> -> [] //|]; rewrite eqn_leq minQn ?minPm.
+rewrite /xchoose => /extensional-eqPQ.
+case: (xchoose_subproof exP) => x [m /= DfPm minPm]; rewrite eqPQ in DfPm.
+case: (xchoose_subproof exQ) => y [n /= DfQn minQn].
+apply/Some_inj; rewrite -DfPm (@anti_leq m n) //.
+by rewrite minPm ?eqPQ ?DfQn // minQn ?DfPm.
 Qed.
 
 Lemma sigW P : (exists x, P x) -> {x | P x}.
@@ -390,6 +391,9 @@ Definition choose P x0 :=
 Lemma chooseP P x0 : P x0 -> P (choose P x0).
 Proof. by move=> Px0; rewrite /choose insubT xchooseP. Qed.
 
+Lemma choosePeq P x0 : P (choose P x0) = P x0.
+Proof. by case Px0: (P x0); [rewrite chooseP | rewrite /choose insubF]. Qed.
+
 Lemma choose_id P x0 y0 : P x0 -> P y0 -> choose P x0 = choose P y0.
 Proof. by move=> Px0 Py0; rewrite /choose !insubT /=; apply: eq_xchoose. Qed.
 
@@ -399,6 +403,91 @@ rewrite /choose => eqPQ x0.
 do [case: insubP; rewrite eqPQ] => [[x Px] Qx0 _| ?]; last by rewrite insubN.
 by rewrite insubT; apply: eq_xchoose.
 Qed.
+
+Variant xchoose_spec P : T -> Type :=
+  XchooseSpec x of P x & (forall y, P y -> choose P y = x) : xchoose_spec P x.
+
+Lemma xchooseEchoose P exP : xchoose_spec P (@xchoose P exP).
+Proof.
+split=> [|y Py]; first exact: xchooseP.
+by rewrite /choose insubT //=; apply: eq_xchoose.
+Qed.
+
+Definition prec_eq x y := choose (pred2 x y) x == x.
+
+Definition prec x y := (x != y) && prec_eq x y.
+
+Lemma prec_irreflexive : irreflexive prec.
+Proof. by move=> x; rewrite /prec eqxx. Qed.
+
+Lemma precW x y : prec x y -> prec_eq x y. Proof. by case/andP. Qed.
+
+Lemma precNge x y : prec x y = ~~ prec_eq y x.
+Proof.
+rewrite /prec /prec_eq; set xy := pred2 x y; set z := choose xy x.
+rewrite -(@eq_choose xy) => [|? /=]; last by rewrite orbC.
+rewrite -(@choose_id xy x) /= ?eqxx ?orbT // -/z andbC eq_sym.
+by have /pred2P[]: xy z => [|->|->]; rewrite ?chooseP //= eqxx ?andbN.
+Qed.
+
+Lemma prec_eqNgt x y : prec_eq x y = ~~ prec y x.
+Proof. by rewrite precNge negbK. Qed.
+
+Lemma prec_eq_reflexive : reflexive prec_eq.
+Proof. by move=> x; rewrite prec_eqNgt prec_irreflexive. Qed.
+
+Lemma prec_eqVprec x y : prec_eq x y = (x == y) || prec x y.
+Proof. by rewrite /prec; case: eqP => // ->; apply: prec_eq_reflexive. Qed.
+
+Lemma prec_eq_total x y : prec_eq x y || prec_eq y x.
+Proof. by rewrite prec_eqVprec precNge -orbA orNb orbT. Qed.
+
+Lemma prec_eq_antisymmetric : antisymmetric prec_eq.
+Proof.
+by move=> x y; rewrite prec_eqVprec precNge; case: eqP; rewrite ?andNb.
+Qed.
+
+Lemma prec_antisymmetric : antisymmetric prec.
+Proof. by move=> x y; rewrite precNge andbCA andNb andbF. Qed.
+
+Lemma choose_stable P Q x :
+  subpred P Q -> P x -> P (choose Q x) -> choose P x = choose Q x.
+Proof.
+move=> sPQ Px; have Qx: Q x by [rewrite sPQ]; rewrite /choose !insubT /=.
+rewrite /xchoose; case: xchoose_subproof => y [m /= Dy minQm].
+case: xchoose_subproof => z [n /= Dz minPn] Py.
+have [[_ EfPQm] [/implyP-sfPQn _]] := (stable m sPQ, stable n sPQ).
+suffices Dm: m = n by apply/Some_inj; rewrite -Dz -Dm EfPQm Dy.
+by apply/anti_leq; rewrite minPn ?EfPQm ?Dy // minQm ?sfPQn ?Dz. 
+Qed.
+
+Lemma choose_prec_eq P x0 y :
+  P x0 -> P y -> prec_eq (choose P x0) y.
+Proof.
+move=> Px0 Py; apply/eqP; set x := choose P x0; set xy := pred2 x y.
+have Dx: x = choose P x by apply: choose_id; rewrite ?chooseP.
+rewrite [RHS]Dx; apply: choose_stable => [z||]; rewrite -?Dx /= ?eqxx //.
+by case/pred2P=> -> //; rewrite chooseP.
+Qed.
+
+Lemma prec_eq_well : well_order prec_eq.
+Proof.
+move=> A [x Ax]; exists (choose A x); split=> [|y [Ay minAy]].
+  by split=> [|y]; [apply: chooseP | apply: choose_prec_eq].
+by apply/prec_eq_antisymmetric; rewrite minAy ?choose_prec_eq ?[_ \in A]chooseP.
+Qed.
+
+Lemma prec_eq_trans : transitive prec_eq.
+Proof. by case/well_order_total/total_orderE: prec_eq_well. Qed.
+
+Lemma prec_eq_prec_trans y x z : prec_eq x y -> prec y z -> prec x z.
+Proof. by rewrite !precNge => lexy; apply/contra=> /prec_eq_trans->. Qed.
+
+Lemma prec_prec_eq_trans y x z : prec x y -> prec_eq y z -> prec x z.
+Proof. by rewrite !precNge => /contra-ltxy leyz; apply/ltxy/prec_eq_trans. Qed.
+
+Lemma prec_trans : transitive prec.
+Proof. by move=> y x z /precW; apply: prec_eq_prec_trans. Qed.
 
 Section CanChoice.
 
