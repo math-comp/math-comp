@@ -167,6 +167,17 @@ HB.mixin Record isFinite T of Equality T := {
 (* a useless computational interpretation due to the wasteful Peano integer   *)
 (* encodings.                                                                 *)
 
+(* TODO: this should not be a factory because enum_subdef will not be kept intact *)
+(* HB.factory Record isFinite T of Choice T := { *)
+(*   enum_subdef : seq T; *)
+(*   enumP_subdef : finite_axiom enum_subdef *)
+(* }. *)
+(* HB.builders Context T of isFinite T. *)
+(*   Definition enum : seq T. Admitted. *)
+(*   Definition enumP : sorted prec enum. Admitted. *)
+(*   HB.instance Definition _ := Choice_isFinite T enum enumP. *)
+(* HB.end. *)
+
 #[short(type="finType")]
 HB.structure Definition Finite := {T of isFinite T & Countable T }.
 (* As with Countable, the interface explicitly includes the somewhat redundant*)
@@ -176,7 +187,7 @@ HB.structure Definition Finite := {T of isFinite T & Countable T }.
 Module Export FiniteNES.
 Module Finite.
 
-HB.lock Definition enum T := isFinite.enum_subdef (Finite.class T).
+HB.lock Definition enum T := sort prec (isFinite.enum_subdef (Finite.class T)).
 
 Notation axiom := finite_axiom.
 #[deprecated(since="mathcomp 2.0.0", note="Use isFinite.Build instead.")]
@@ -184,6 +195,9 @@ Notation EnumMixin m := (@isFinite.Build _ _ m).
 
 Lemma uniq_enumP (T : eqType) e : uniq e -> e =i T -> axiom e.
 Proof. by move=> Ue sT x; rewrite count_uniq_mem ?sT. Qed.
+
+Lemma enum_prec_sorted T : sorted prec (enum T).
+Admitted.
 
 Section WithCountType.
 Variable (T : countType).
@@ -371,28 +385,132 @@ Notation "A :=P: B" := (A =P B :> {set _})
 (* #[short(type="finPred")] *)
 (* HB.structure Definition FinPred T := {P of @isFinPred T P}. *)
 
-Structure finPred (T : choiceType) := FinPredPack {
-   finpred :> pred T;
-   pred_set : {set T};
-   pred_enumP : pred_set =i finpred
-}.
-
-Canonical isFinPred_predType T (P : finPred T) :=
-   @PredType T (finPred T) id.
 
 Definition setU T (A B : {set T}) :=
    FinSet.of_seq (FinSet.enum A ++ FinSet.enum B).
 
 Lemma in_setU T (A B : {set T}) :
   setU A B =i [pred x | (x \in A) || (x \in B)].
-Proof. by move=> x; rewrite !inE/= /in_mem/= FinSet.of_seqK mem_cat. Qed.
+Proof.
+Admitted.
 
-Definition setI T (A : {set T}) (B : {pred T}) :=
-   FinSet.of_seq (filter B (FinSet.enum A)).
+Definition set_comprehension {T : choiceType} (A : {set T}) (P : {pred T}) :=
+   FinSet.of_seq (filter P (FinSet.enum A)).
 
-Lemma in_setI T (A : {set T}) (B : {pred T}) :
-  setI A B =i [pred x | (x \in A) && (x \in B)].
-Proof. by move=> x; rewrite !inE /in_mem/= FinSet.of_seqK mem_filter andbC. Qed.
+Lemma set_comprehensionE {T : choiceType} (A : {set T}) (P : {pred T}) :
+  set_comprehension A P =i [pred x | (x \in A) & P x].
+Proof. Admitted.
+
+Definition setT (T : finType) := FinSet.of_seq (Finite.enum T).
+
+Structure wrapped_pred T := WrapPred {unwrap_pred :> {pred T}}.
+Definition WrapPred2 := WrapPred.
+Definition WrapPred3 := WrapPred2.
+Canonical WrapPred4 {T} P := @WrapPred3 T P.
+
+Structure finPred (T : choiceType) := FinPredPack {
+   finpred :> wrapped_pred T;
+   pred_set : {set T};
+   pred_enumP : pred_set =i unwrap_pred finpred
+}.
+
+(** TODO: check if non necessary *)
+(* Canonical isFinPred_predType T (P : finPred T) := *)
+(*    @PredType T (finPred T) (@unwrap_pred T). *)
+
+(** The (application A x) structure recognize a boolean expression
+    `apply` depending on `x` that represents a finite set `A` *)
+Structure application T (A : {set T}) x :=
+  Apply {apply; applyP : (x \in A) = apply}.
+
+Canonical finPred_application (T : choiceType) (A : {set T})
+    (P : forall x, application A x) :=
+  @FinPredPack T (WrapPred (fun x => apply (P x))) A (fun x => applyP (P x)).
+
+Canonical finPred_finset (T : choiceType) (A : {set T}) :=
+  @FinPredPack T (WrapPred4 [in A]) A (fun=> erefl).
+
+Lemma setT_comprehension_subproof (T : finType) P :
+  set_comprehension (setT T) P =i P.
+Proof. Admitted.
+
+Canonical finPred_fintype (T : finType) (P : {pred T}) :=
+  @FinPredPack T (WrapPred3 [in P]) (set_comprehension (setT T) P)
+               (@setT_comprehension_subproof T P).
+
+(* we could fill in with expression of type predI  *)
+(* Canonical finPred_ (T : Type) (P : _) := *)
+(*   @FinPredPack T (WrapPred2 ()) _ _. *)
+
+(* This is subsumed by the next rule, and convertible to it *)
+(* Canonical application_finset (T : choiceType) (A : {set T}) x := *)
+(*   @Apply T A x (x \in A) erefl. *)
+
+Canonical application_finpred (T : choiceType) (P : finPred T) x :=
+  @Apply T (pred_set P) x (x \in P) (pred_enumP P x).
+
+Lemma applicationU_subproof (T : choiceType) A B (x : T)
+    (a1 : application A x) (a2 : application B x) :
+  (x \in setU A B) = apply a1 || apply a2.
+Proof. Admitted.
+
+Canonical applicationU (T : choiceType) A B (x : T)
+    (a1 : application A x) (a2 : application B x) :=
+  @Apply T (setU A B) x (apply a1 || apply a2) (applicationU_subproof a1 a2).
+
+Lemma applicationI_subproof (T : choiceType) A (x : T)
+    (a : application A x) (P : {pred T}) :
+  (x \in set_comprehension A P) = apply a && (P x).
+Proof. Admitted.
+
+Canonical applicationI (T : choiceType) A (x : T)
+    (a : application A x) (P : {pred T}) :=
+  @Apply T (set_comprehension A P) x
+         (apply a && P x) (applicationI_subproof a P).
+
+Check fun (T : choiceType) (P : finPred T) => [eta P] : finPred T.
+Fail Check fun (T : choiceType) (P : finPred T) => [in P] : finPred T.
+Fail Check fun (T : choiceType) (A : {set T}) => [in A] : finPred T.
+Fail Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
+   (fun x => (P x) && (Q x)) : finPred T.
+Fail Check fun (T : choiceType) (A : {set T}) (Q : pred T) =>
+   (fun x => (x \in A) && (Q x)) : finPred T.
+Fail Check fun (T : choiceType) (P : finPred T) (Q : finPred T) =>
+   (fun x => (P x) || (Q x)) : finPred T.
+
+Print Canonical Projections finpred.
+Print Canonical Projections unwrap_pred.
+
+(**
+ The class of formulae that we wish to recognize as canonically
+ a finPred is the following:
+ P x :=
+      | x \in A,      where A is a finPred (* WrapPred4 *)
+      | P x,          where T is a finType (* WrapPred3 *)
+     (* all the remaining rules are dealt with by WrapPred *)
+      | x \in A,      where A is a finPred
+      | x == y
+      | Qx && (R x),  where Qx is an (application A x)
+      | Qx || Rx,     where Qx and Rx are (application _ x)
+      | Qx (+) Rx,    where Qx and Rx are (application _ x)
+     (* left out *)
+      | if Qx then R x else Tx, where Qx and Tx are (application _ x)
+
+Note: we need to make sure the A inferred by application A x is
+      syntactically equal to A and not "just" convertible to A.
+*)
+
+
+
+
+(* Canonical finpred_default (T : choiceType) (A : {set T}) (P : wrapped_pred T) := *)
+(*   @FinPredPack T P  *)
+
+(*   unwrap_pred (finpred P) *)
+
+
+
+
 
 Fail Check fun (T : choiceType) (P : finPred T) => [eta P] : finPred T.
 Fail Check fun (T : choiceType) (P : finPred T) => [in P] : finPred T.
@@ -403,34 +521,6 @@ Fail Check fun (T : choiceType) (A : {set T}) (Q : pred T) =>
    (fun x => (x \in A) && (Q x)) : finPred T.
 Fail Check fun (T : choiceType) (P : finPred T) (Q : finPred T) =>
    (fun x => (P x) || (Q x)) : finPred T.
-
-Structure wrapped_prop := WrapProp {unwrap_prop : bool}.
-
-(** The (application A x) structure recognize a boolean expression
-    `apply` depending on `x` that represents a finite set `A` *)
-Structure application T (A : {set T}) x :=
-  Apply {apply; applyP : (x \in A) = unwrap_prop apply}.
-
-
-(**
- The class of formulae that we wish to recognize as canonically
- a finPred is the following:
- P x := x \in A,        where A is a finPred
-      | x == y
-      | Qx && (R x),  where Qx is an (application A x)
-      | Qx || Rx,     where Qx and Rx are (application _ x)
-      | Qx (+) Rx,    where Qx and Rx are (application _ x)
-      | if Qx then R x else Tx, where Qx and Tx are (application _ x)
-
-Note: we need to make sure the A inferred by application A x is
-      syntactically equal to A and not "just" convertible to A.
-*)
-
-Canonical application_finPred (T : choiceType) (A : {set T})
-    (P : forall x, application A x) :=
-  @FinPredPack T (fun x => unwrap_prop (apply (P x)))
-               A (fun x => applyP (P x)).
-
 
 Definition enum_mem T (mA : mem_pred _) := filter mA (Finite.enum T).
 Notation enum A := (enum_mem (mem A)).

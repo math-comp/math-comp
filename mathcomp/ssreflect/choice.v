@@ -607,6 +607,9 @@ Notation CanChoiceMixin := CanHasChoice.
 #[deprecated(since="mathcomp 2.0.0", note="Use Choice.copy with pcan_type or PCanHasChoice.")]
 Notation PcanChoiceMixin := PCanHasChoice.
 
+Arguments prec {T}.
+Arguments prec_eq {T}.
+
 #[short(type="subChoiceType")]
 HB.structure Definition SubChoice T (P : pred T) :=
   { sT of Choice sT & isSub T P sT }.
