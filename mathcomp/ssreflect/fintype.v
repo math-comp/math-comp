@@ -879,6 +879,19 @@ Qed.
 
 Lemma cardC A : #|A| + #|[predC A]| = #|T|.
 Proof. by rewrite !cardE !size_filter count_predC. Qed.
+(* notes:
+
+today:
+Lemma cardU1 (T : finType) (x : T) (A : {pred T}) : #|[predU1 x & A]| = (x \notin A) + #|A|.
+
+options for the future:
+Lemma cardU1 (T : choiceType) (x : T) (A : finPred T) :
+  #|[predU1 x & A]| = (x \notin A) + #|A|.
+Lemma cardU1 (T : choiceType) (x : T) A S (_ : finPred_aux T [predU1 x & A] S) :
+  #|S| = (x \notin A) + #|A|.
+rewrite cardU1. (* works no matter how you derive the finiteness of [predU1 x & A] *)
+
+*)
 
 Lemma cardU1 x A : #|[predU1 x & A]| = (x \notin A) + #|A|.
 Proof.
