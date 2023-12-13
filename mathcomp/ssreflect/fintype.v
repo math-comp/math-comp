@@ -258,6 +258,180 @@ Notation "[ 'finType' 'of' T ]" := (Finite.clone T%type _)
 Definition fin_pred_sort (T : finType) (pT : predType T) := pred_sort pT.
 Identity Coercion pred_sort_of_fin : fin_pred_sort >-> pred_sort.
 
+Module Type FinSet_SIG.
+Parameter type : choiceType -> predArgType.
+Parameter enum : forall {T}, type T -> seq T.
+Axiom enum_sorted : forall {T} (A : type T), sorted (@prec T) (enum A).
+Parameter of_seq : forall {T : choiceType}, seq T -> type T.
+Axiom enumK : forall {T}, cancel (@enum T) (@of_seq T).
+Axiom of_seqK: forall {T : choiceType} (s : seq T), enum (of_seq s) =i s.
+Axiom mem : forall {T : choiceType}, type T -> pred T.
+Axiom memP :  forall {T : choiceType} {A : type T}, mem A =i enum A.
+End FinSet_SIG.
+
+Module FinSet : FinSet_SIG.
+Section FinSet.
+Variable (T : choiceType).
+
+Record internal := Build { enum : seq T; enum_sorted : sorted (@prec T) enum }.
+Definition type := internal.
+
+Definition of_seq : seq T -> type.
+Admitted.
+
+Definition enumK : cancel enum of_seq.
+Admitted.
+
+Definition of_seqK : forall (s : seq T), enum (of_seq s) =i s.
+Admitted.
+
+Definition mem : type -> pred T.
+Admitted.
+
+Definition memP : forall {A : type}, mem A =i enum A.
+Admitted.
+
+End FinSet.
+End FinSet.
+
+Notation set_type := FinSet.type.
+Notation set_of := set_type.
+
+Coercion FinSet.mem : set_type >-> pred.
+
+Declare Scope set_scope.
+Delimit Scope set_scope with SET.
+Bind Scope set_scope with set_type.
+Bind Scope set_scope with set_of.
+Open Scope set_scope.
+Arguments set_of T%type.
+
+Notation "{ 'set' T }" := (set_of T)
+  (at level 0, format "{ 'set'  T }") : type_scope.
+
+Canonical set_predType (T : choiceType) := @PredType T {set T} FinSet.mem.
+
+Section ChoiceType.
+
+Variable (T : choiceType).
+
+(* We should take out the proof relevant part *)
+(* We should probably use a partial iso to seq T *)
+Lemma set_type_choice : Choice (set_type T).
+Admitted.
+HB.instance Definition _ := set_type_choice.
+
+End ChoiceType.
+
+Section CountType.
+
+Variable (T : countType).
+
+(* We should take out the proof relevant part *)
+(* We should probably use a partial iso to seq T *)
+Lemma set_type_countable : isCountable (set_type T).
+Admitted.
+HB.instance Definition _ := set_type_countable.
+
+End CountType.
+
+Section FinType.
+
+Variable (T : finType).
+
+(* We should take out the proof relevant part *)
+(* We should probably use a partial iso to seq T *)
+Lemma set_type_finite : isFinite (set_type T).
+Admitted.
+HB.instance Definition _ := set_type_finite.
+
+End FinType.
+
+(* We later define several subtypes that coerce to set; for these it is       *)
+(* preferable to state equalities at the {set _} level, even when comparing   *)
+(* subtype values, because the primitive "injection" tactic tends to diverge  *)
+(* on complex types (e.g., quotient groups). We provide some parse-only       *)
+(* notation to make this technicality less obstructive.                       *)
+Notation "A :=: B" := (A = B :> {set _})
+  (at level 70, no associativity, only parsing) : set_scope.
+Notation "A :<>: B" := (A <> B :> {set _})
+  (at level 70, no associativity, only parsing) : set_scope.
+Notation "A :==: B" := (A == B :> {set _})
+  (at level 70, no associativity, only parsing) : set_scope.
+Notation "A :!=: B" := (A != B :> {set _})
+  (at level 70, no associativity, only parsing) : set_scope.
+Notation "A :=P: B" := (A =P B :> {set _})
+  (at level 70, no associativity, only parsing) : set_scope.
+
+(* :TODO: IMPLEMENT the `fun` subject case in HB *)
+(* HB.mixin Record isFinPred (T : choiceType) (P : pred T) := { *)
+(*     pred_set : {set T}; *)
+(*     pred_enumP : pred_set =i P *)
+(* }. *)
+(* #[short(type="finPred")] *)
+(* HB.structure Definition FinPred T := {P of @isFinPred T P}. *)
+
+Structure finPred (T : choiceType) := FinPredPack {
+   finpred :> pred T;
+   pred_set : {set T};
+   pred_enumP : pred_set =i finpred
+}.
+
+Canonical isFinPred_predType T (P : finPred T) :=
+   @PredType T (finPred T) id.
+
+Definition setU T (A B : {set T}) :=
+   FinSet.of_seq (FinSet.enum A ++ FinSet.enum B).
+
+Lemma in_setU T (A B : {set T}) :
+  setU A B =i [pred x | (x \in A) || (x \in B)].
+Proof. by move=> x; rewrite !inE/= /in_mem/= FinSet.of_seqK mem_cat. Qed.
+
+Definition setI T (A : {set T}) (B : {pred T}) :=
+   FinSet.of_seq (filter B (FinSet.enum A)).
+
+Lemma in_setI T (A : {set T}) (B : {pred T}) :
+  setI A B =i [pred x | (x \in A) && (x \in B)].
+Proof. by move=> x; rewrite !inE /in_mem/= FinSet.of_seqK mem_filter andbC. Qed.
+
+Fail Check fun (T : choiceType) (P : finPred T) => [eta P] : finPred T.
+Fail Check fun (T : choiceType) (P : finPred T) => [in P] : finPred T.
+Fail Check fun (T : choiceType) (A : {set T}) => [in A] : finPred T.
+Fail Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
+   (fun x => (P x) && (Q x)) : finPred T.
+Fail Check fun (T : choiceType) (A : {set T}) (Q : pred T) =>
+   (fun x => (x \in A) && (Q x)) : finPred T.
+Fail Check fun (T : choiceType) (P : finPred T) (Q : finPred T) =>
+   (fun x => (P x) || (Q x)) : finPred T.
+
+Structure wrapped_prop := WrapProp {unwrap_prop : bool}.
+
+(** The (application A x) structure recognize a boolean expression
+    `apply` depending on `x` that represents a finite set `A` *)
+Structure application T (A : {set T}) x :=
+  Apply {apply; applyP : (x \in A) = unwrap_prop apply}.
+
+
+(**
+ The class of formulae that we wish to recognize as canonically
+ a finPred is the following:
+ P x := x \in A,        where A is a finPred
+      | x == y
+      | Qx && (R x),  where Qx is an (application A x)
+      | Qx || Rx,     where Qx and Rx are (application _ x)
+      | Qx (+) Rx,    where Qx and Rx are (application _ x)
+      | if Qx then R x else Tx, where Qx and Tx are (application _ x)
+
+Note: we need to make sure the A inferred by application A x is
+      syntactically equal to A and not "just" convertible to A.
+*)
+
+Canonical application_finPred (T : choiceType) (A : {set T})
+    (P : forall x, application A x) :=
+  @FinPredPack T (fun x => unwrap_prop (apply (P x)))
+               A (fun x => applyP (P x)).
+
+
 Definition enum_mem T (mA : mem_pred _) := filter mA (Finite.enum T).
 Notation enum A := (enum_mem (mem A)).
 Definition pick (T : finType) (P : pred T) := ohead (enum P).
@@ -1932,7 +2106,7 @@ Section EnumRank.
 
 Variable T : finType.
 Implicit Type A : {pred T}.
-  
+
 Definition enum_rank x := @enum_rank_in T x T (erefl true) x.
 
 Lemma enum_default A : 'I_(#|A|) -> T.
