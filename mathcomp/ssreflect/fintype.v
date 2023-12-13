@@ -409,10 +409,11 @@ Definition WrapPred3 := WrapPred2.
 Canonical WrapPred4 {T} P := @WrapPred3 T P.
 
 Structure finPred (T : choiceType) := FinPredPack {
-   finpred :> wrapped_pred T;
+   finpred :> (*wrapped_*){pred T};
    pred_set : {set T};
-   pred_enumP : pred_set =i unwrap_pred finpred
+   pred_enumP : pred_set =i (*unwrap_pred*) finpred
 }.
+
 
 (** TODO: check if non necessary *)
 (* Canonical isFinPred_predType T (P : finPred T) := *)
@@ -423,21 +424,22 @@ Structure finPred (T : choiceType) := FinPredPack {
 Structure application T (A : {set T}) x :=
   Apply {apply; applyP : (x \in A) = apply}.
 
+(*
 Canonical finPred_application (T : choiceType) (A : {set T})
     (P : forall x, application A x) :=
   @FinPredPack T (WrapPred (fun x => apply (P x))) A (fun x => applyP (P x)).
 
 Canonical finPred_finpred (T : choiceType) (P : finPred T) :=
   @FinPredPack T (WrapPred4 [in P]) (pred_set P) (pred_enumP _).
-
+*)
 Lemma setT_comprehension_subproof (T : finType) P :
   set_comprehension (setT T) P =i P.
 Proof. Admitted.
-
+(*
 Canonical finPred_fintype (T : finType) (P : {pred T}) :=
   @FinPredPack T (WrapPred3 [in P]) (set_comprehension (setT T) P)
                (@setT_comprehension_subproof T P).
-
+*)
 (* we could fill in with expression of type predI  *)
 (* Canonical finPred_ (T : Type) (P : _) := *)
 (*   @FinPredPack T (WrapPred2 ()) _ _. *)
@@ -468,16 +470,113 @@ Canonical applicationI (T : choiceType) A (x : T)
   @Apply T (set_comprehension A P) x
          (apply a && P x) (applicationI_subproof a P).
 
-Check fun (T : choiceType) (P : finPred T) => [in P] : finPred T.
-Fail Check fun (T : choiceType) (P : finPred T) => [in P] : finPred T.
-Fail Check fun (T : choiceType) (A : {set T}) => [in A] : finPred T.
-Fail Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
-   (fun x => (P x) && (Q x)) : finPred T.
-Fail Check fun (T : choiceType) (A : {set T}) (Q : pred T) =>
-   (fun x => (x \in A) && (Q x)) : finPred T.
-Fail Check fun (T : choiceType) (P : finPred T) (Q : finPred T) =>
-   (fun x => (P x) || (Q x)) : finPred T.
+(********)
 
+Lemma applicationI_subproof2 (T : choiceType) (A: {set T}) (P Q : {pred T}) :
+  (forall x, x \in A = Q x) ->
+  forall x, (x \in set_comprehension A P) = (Q x) && (P x).
+Proof. Admitted.
+
+Lemma applicationU_subproof2 (T : choiceType) A B (P Q : {pred T}) :
+  (forall x, x \in A = P x) ->
+  (forall x, x \in B = Q x) ->
+  (forall x, (x \in setU A B) = (P x) || (Q x)).
+Proof. Admitted.
+
+Class finPred_aux(T : choiceType) (P : pred T) (s : {set T}) := OK { proof : s =i P }.
+
+Canonical isFinPred T P s {h : @finPred_aux T P s} :=
+   @FinPredPack T P s (@proof _ _ _ h).
+
+About isFinPred.
+Print Canonical Projections finpred.
+
+Import elpi.
+Elpi Tactic infer.
+Elpi Accumulate lp:{{ /* (* */
+  pred finp i:term, i:term, o:term.
+
+  finp {{ (fun x => lp:(F x)) lp:A }} X Proof :- finp (F A) X Proof.
+
+  finp {{ finpred lp:P lp:X }} X {{ pred_enumP lp:P }}.
+  
+  finp {{ in_mem lp:X (mem (finpred lp:P)) }} X {{ pred_enumP lp:P }}.
+
+  finp {{ in_mem lp:X (mem lp:A) }} X {{ fun x => erefl }}.
+  
+  finp {{ lp:Px && lp:Qx }} X Proof :-
+    finp Px X ProofP, anyp Qx X Q,
+    Proof = {{ applicationI_subproof2 lp:Q lp:ProofP }}.
+
+  finp {{ lp:Px || lp:Qx }} X Proof :-
+    finp Px X ProofP, finp Qx X ProofQ,
+    Proof = {{ applicationU_subproof2 lp:ProofP lp:ProofQ }}.
+
+  finp Px X Proof :-
+    coq.typecheck X Ty ok,
+    coq.unify-eq Ty {{ Finite.sort _ }} ok,
+    anyp Px X P,
+    Proof = {{ setT_comprehension_subproof lp:P }}.
+
+  finp (app[global (const C)|Args]) X Proof :-
+    coq.env.const C (some Body) _,
+    coq.mk-app Body Args Redex,
+    % TODO: simulate exactly what evarconv does
+    @redflags! coq.redflags.betaiotazeta =>
+      coq.reduction.lazy.whd Redex TRed,
+    if (TRed = match T P BS, whd1 T T1)
+       (@redflags! coq.redflags.betaiotazeta =>
+          coq.reduction.lazy.whd (match T1 P BS) Next)
+       (Next = TRed),
+
+    coq.say "unfolding" C "gives" {coq.term->string Next},
+    finp Next X Proof.
+
+  pred anyp i:term, i:term, o:term.
+  anyp T X {{ fun x => lp:(P x) }} :-
+    pi x\ copy X x => copy T (P x).
+    % var P _ L, std.filter L (x\not(x = X)) L', prune P L', T = P X.
+
+  pred find i:term, o:term.
+  find {{ simpl_of_mem (@mem lp:FT _ lp:P) }} _ :- coq.error "TODO".
+  find {{ PredOfSimpl.coerce (SimplPred lp:P) }} Proof :-
+    find P Proof.
+  find {{ fun x : lp:T => lp:(Bo x) }} Proof :-
+    pi x\ decl x `x` T =>
+      finp (Bo x) x Proof.
+
+  solve (goal _ _ ({{ finPred_aux lp:Pred _ }} as Ty) _ [] as G) GL :-
+    coq.say "Proving that" {coq.term->string Pred} "is finPred",
+    % coq.say "Proving that" Pred "is finPred",
+    find Pred Proof,
+    FinalProof = {{ OK lp:Proof }},
+    coq.say "Final proof" {coq.term->string FinalProof},
+    std.assert-ok! (coq.typecheck FinalProof _) "illtyped proof",
+    std.assert-ok! (coq.typecheck FinalProof Ty) "wrong proof",
+    refine FinalProof G GL.
+
+/* *) */ }}.
+Elpi Typecheck. 
+
+Hint Extern 0 (finPred_aux _ _ ) => elpi infer : typeclass_instances.
+(********)
+Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
+  [pred x in A].
+Definition t1' (T : choiceType) (P : finPred T) : finPred T :=
+  [pred x in P] : {pred T}.
+Definition t2 (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
+  [pred x | ([in P] x) && (Q x)].
+Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
+   [pred x | (x \in A) && (Q x)].
+Definition t4 (T : choiceType) (P : finPred T) (Q : finPred T) : finPred T :=
+   [pred x | (finpred P x) || (finpred Q x)].
+Definition t5 (T : finType) (P : pred T) : finPred T :=
+   [pred x | P x].
+Definition def (T : choiceType) (P Q : {pred T}) : pred T := [pred x : T | P x && Q x].
+Definition t6 (T : choiceType) (P : finPred T) Q : finPred T :=
+   [pred x : T | def P Q x ].
+Print SimplFun.
+About cardU1.
 Print Canonical Projections finpred.
 Print Canonical Projections unwrap_pred.
 
