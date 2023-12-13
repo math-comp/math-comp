@@ -427,8 +427,8 @@ Canonical finPred_application (T : choiceType) (A : {set T})
     (P : forall x, application A x) :=
   @FinPredPack T (WrapPred (fun x => apply (P x))) A (fun x => applyP (P x)).
 
-Canonical finPred_finset (T : choiceType) (A : {set T}) :=
-  @FinPredPack T (WrapPred4 [in A]) A (fun=> erefl).
+Canonical finPred_finpred (T : choiceType) (P : finPred T) :=
+  @FinPredPack T (WrapPred4 [in P]) (pred_set P) (pred_enumP _).
 
 Lemma setT_comprehension_subproof (T : finType) P :
   set_comprehension (setT T) P =i P.
@@ -468,7 +468,7 @@ Canonical applicationI (T : choiceType) A (x : T)
   @Apply T (set_comprehension A P) x
          (apply a && P x) (applicationI_subproof a P).
 
-Check fun (T : choiceType) (P : finPred T) => [eta P] : finPred T.
+Check fun (T : choiceType) (P : finPred T) => [in P] : finPred T.
 Fail Check fun (T : choiceType) (P : finPred T) => [in P] : finPred T.
 Fail Check fun (T : choiceType) (A : {set T}) => [in A] : finPred T.
 Fail Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
