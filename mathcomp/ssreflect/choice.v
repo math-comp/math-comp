@@ -350,13 +350,9 @@ Module Export ChoiceNamespace.
 
   Lemma extensional {P Q : pred T} : P =1 Q -> find P =1 find Q.
   Proof.
-  move=> PQE n.
-  have /(stable n) [+ _]: subpred P Q by move=> x; rewrite PQE.
-  
-  have /(stable n) []: subpred Q P by move=> x; rewrite PQE.
-  move: (@findP P n).
-  case: (find P n) => /=; case: (find Q n) => //= x y /(_ y erefl).
-  by rewrite PQE => Qy _ /(_ Qy)/esym.
+  move=> eqPQ n; have /(stable n)[]: subpred P Q by move=> x; rewrite eqPQ.
+  case: (find Q n) (@findP Q n) => [x /= | ]; last by case: (find P n).
+  by move=> /(_ x erefl); rewrite eqPQ => -> _ ->.
   Qed.
 
   End InternalTheory.
@@ -541,14 +537,11 @@ exists sf => [sP n x | sP [y sPy] | sP sQ n sPQ] /=.
 - have [|n Pn] := @complete T (liftP sP); first by exists (f y); rewrite /= fK.
   exists n; case Df: (find _ n) Pn => //= [x] _.
   by have:= correct Df => /=; case: (f' x).
-- have /(stable n) []: subpred (liftP sP) (liftP sQ) by move=> x/=; case: (f' x).
-  move: (@findP _ (liftP sP) n) (@findP _ (liftP sQ) n).
-  case: (find (liftP sP) n); case: (find (liftP sQ) n) => //.
-    move=> x y /(_ y erefl) + /(_ x erefl) => /= sPy sQx _ yx.
-    split=> [| /yx /Some_inj -> //].
-    by case: (f' x) sQx => //= fx _; case: (f' y) sPy.
-  move=> x _ /(_ x erefl) /=; case: (f' x) => //= fx _ _ sPx.
-  by split=> // /sPx.
+have: subpred (liftP sP) (liftP sQ) by move=> x /=; case: (f' x).
+case/(stable n)=> sfPQ EfPQ; split=> [|PfQn]; last first.
+   by rewrite EfPQ //; case: find PfQn.
+case Dx: find sfPQ => //= [x]; case Dy: find => //= [y] _.
+by apply/implyP=> _; have /findP/= := Dy; case: (f' y).
 Qed.
 
 Definition CanHasChoice f' (fK : cancel f f') :=
@@ -575,7 +568,7 @@ pose r f := [fun xs => fun x : T => f (x :: xs) : option (seq T)].
 pose fix f sP ns xs {struct ns} :=
   if ns is n :: ns1 then let fr := r (f sP ns1) xs in obind fr (find fr n)
   else if sP xs then Some xs else None.
-exists (fun sP nn => f sP (dc nn) nil) => [sP n ys | sP [ys] | sP sQ n sPQ /=].
+exists (fun sP nn => f sP (dc nn) nil) => [sP n ys | sP [ys] | sP sQ n ssPQ /=].
 - elim: {n}(dc n) nil => [|n ns IHs] xs /=; first by case: ifP => // sPxs [<-].
   by case: (find _ n) => //= [x]; apply: IHs.
 - rewrite -(cats0 ys); elim/last_ind: ys nil => [|ys y IHs] xs /=.
@@ -584,21 +577,16 @@ exists (fun sP nn => f sP (dc nn) nil) => [sP n ys | sP [ys] | sP sQ n sPQ /=].
   have /complete[n]: exists z, f sP (dc n1) (z :: xs) by exists y.
   case Df: (find _ n)=> // [x] _; exists (code (n :: dc n1)).
   by rewrite codeK /= Df /= (correct Df).
-- apply: (@proj2 (oapp sP false (f sQ (dc n) nil) -> f sP (dc n) nil)). 
-  elim: {n}(dc n) nil => [|n ns IHs] xs /=.
-    by case /boolP: (sP xs) => [/sPQ -> //|/negP sPnil]; case: (sQ xs).
-  have: subpred (fun x => f sP ns (x :: xs)) (fun x => f sQ ns (x :: xs)).
-    by move=> x; move: (IHs (x :: xs)) => [_ []] /implyP.
-  move=> /(stable n) [].
-  move: (@findP _ (fun x => f sP ns (x :: xs)) n).
-  move: (@findP _ (fun x => f sQ ns (x :: xs)) n).
-  case: (find _ n); case: (find _ n) => //.
-    move=> x y /(_ y erefl) fQy /(_ x erefl) fPx _ /= xy.
-    split=> //; split=> [|sPy]; first by rewrite fPx fQy.
-    by move: IHs => /(_ (y :: xs)) []/(_ sPy) /xy /Some_inj -> [_] /(_ sPy).
-  move=> x /(_ x erefl) sQx _ _ /= sPx.
-  suff: ~ (oapp sP false (f sQ ns (x :: xs))) by [].
-  by move: IHs => /(_ (x :: xs)) [+ _] => /[apply] /sPx.
+elim: {n}(dc n) nil => [|n ns IHs] xs /=.
+  by do [split; case: ifP] => //= [/ssPQ-> | _ ->].
+have: subpred (fun x => f sP ns (x :: xs)) (fun x => f sQ ns (x :: xs)).
+  by move=> x /=; have [/implyP] := IHs (x :: xs). 
+case/(stable n) => srfPQ ErfPQ.
+split.
+  apply/implyP; case Dy: find srfPQ => //= [x].
+  by case Dz: find => //= [y]; move/findP: Dz.
+case Dx: find => //= [x] Pfx; have [_ /(_ Pfx)EfPQ] := IHs (x :: xs).
+by rewrite ErfPQ; rewrite Dx /= EfPQ //; case: (f) Pfx.
 Qed.
 
 HB.instance Definition _ := seq_hasChoice.
@@ -623,22 +611,21 @@ exists f => [tP n u | tP [[i x] tPxi] | sP sQ n sPQ].
   have{tPnt}: exists j, ft tP nt j by exists i; rewrite /ft; case: find tPnt.
   case/complete=> ni tPn; exists (code [:: ni; nt]); rewrite /f codeK /fi.
   by case Df: find tPn => //= [j] _; have:= correct Df.
-- rewrite /f; case: (dc n) => // {}n; case=> // m; case=> //; rewrite /fi.
-  have sPQmkT: forall i, subpred (sP \o mkT i) (sQ \o mkT i) by move=> i x /sPQ.
-  have /(stable n) [ftsPQ ftsPQE]: subpred (ft sP m) (ft sQ m).
-    move=> i; rewrite /ft; move: sPQmkT => /(_ i) /(stable m).
-    by case: (find (sQ \o mkT i) m); case: (find (sP \o mkT i) m) => // ? [].
-  have sPftsQ i: oapp sP false (ft sQ m i) -> ft sP m i.
-    rewrite /ft.
-    move: sPQmkT => /(_ i) /(stable m) []; rewrite oapp_comp.
-    by case: (find (sP \o mkT i) m); case: (find (sQ \o mkT i) m) => //= x _ /[apply].
-  split; move: (@findP _ (ft sP m) n) (@findP _ (ft sQ m) n) ftsPQ ftsPQE;
-      case: (find (ft sP m) n); case: (find (ft sQ m) n) => //=.
-  + by move=> i j /(_ j erefl) -> /(_ i erefl).
-  + move=> i j /(_ j erefl) sPj /(_ i erefl) sQi _ /= ij /[dup] /sPftsQ /ij /Some_inj -> sPi.
-    rewrite /ft; congr omap.
-    by move: sPQmkT => /(_ i) /(stable m) [_]; apply; rewrite oapp_comp/=.
-  + by move=> i _ /(_ i erefl) _ _ sPiN /sPftsQ /sPiN.
+rewrite /f; case: (dc n) => // {}n; case=> // m; case=> //; rewrite /fi.
+have sPQmkT i: subpred (sP \o mkT i) (sQ \o mkT i) by move=> x /sPQ.
+have /(stable n) [ftsPQ ftsPQE]: subpred (ft sP m) (ft sQ m).
+  move=> i; rewrite /ft; have [+ _] := stable m (sPQmkT i).
+  by case: find => //= [?]; case: find => // -[].
+split.
+  case Dx: find ftsPQ => //= [x]; case Dy: find => //= [y] _.
+  by apply/implyP=> _; move/findP: Dy.
+case Di: find ftsPQE => //= [i].
+have [_ sPQmkTE] := stable m (sPQmkT i).
+have sPftsQ: oapp sP false (ft sQ m i) -> ft sP m i.
+  move: sPQmkTE; rewrite /ft oapp_comp.
+  by case: find; case: find => //= x /[apply].
+case Dx: find => //= [x|] xi /[dup] H /sPftsQ /xi // /Some_inj ->.
+by rewrite /ft sPQmkTE // oapp_comp /=.
 Qed.
 
 HB.instance Definition _ := tagged_hasChoice.
@@ -648,9 +635,9 @@ End TagChoice.
 Fact nat_hasChoice : hasWoChoice nat.
 Proof.
 pose f := [fun (P : pred nat) n => if P n then Some n else None].
-exists f => [P n m | P [n Pn] | P Q n PQ] /=; first by case: ifP => // Pn [<-].
+exists f => [P n m | P [n Pn] | P Q n sPQ] /=; first by case: ifP => // Pn [<-].
   by exists n; rewrite Pn.
-by move: (PQ n); case: (Q n) => //=; case: (P n) => // /(_ erefl).
+by split; [case: ifP => // /sPQ-> | case: (Q n) => //= ->].
 Qed.
 
 HB.instance Definition _ := nat_hasChoice.
