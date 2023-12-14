@@ -28,7 +28,7 @@ Require Import perm fingroup matrix mxalgebra mxpoly vector countalg.
 (* the polynomial to be monic and of size greater than one. If it is not the  *)
 (* case we quotient by 'X                                                     *)
 (*     mk_monic p == the actual polynomial on which we quotient               *)
-(*                   if p is monic and dof size > 1 it is p otherwise 'X      *)
+(*                   if p is monic and of size > 1 it is p otherwise 'X       *)
 (*    {poly %/ p} == defined as {poly_(size (mk_poly p)).-1 R} on which       *)
 (*                   there is a ring structure                                *)
 (*     in_qpoly q == turn the polynomial q into an element of {poly %/ p} by  *)
