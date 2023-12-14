@@ -435,9 +435,10 @@ Canonical isFinPred T P s {h : @finPred_aux T P s} :=
 About isFinPred.
 Print Canonical Projections finpred.
 
+From mathcomp.ssreflect Extra Dependency "fintype.elpi" as fintype.
 Import elpi.
 Elpi Tactic infer.
-Elpi Accumulate File "fintype.elpi".
+Elpi Accumulate File fintype.
 Elpi Typecheck.
 
 Hint Extern 0 (finPred_aux _ _ ) => elpi infer : typeclass_instances.
