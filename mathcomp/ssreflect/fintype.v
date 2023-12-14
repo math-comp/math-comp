@@ -290,20 +290,27 @@ Variable (T : choiceType).
 Record internal := Build { enum : seq T; enum_sorted : sorted (@prec T) enum }.
 Definition type := internal.
 
-Definition of_seq : seq T -> type.
+HB.instance Definition _ := [isSub for enum].
+HB.instance Definition _ := [Choice of type by <:].
+
+Lemma of_seq_subproof (s : seq T) : sorted prec (sort prec s).
+Proof.
 Admitted.
+
+Definition of_seq (s : seq T) : type := Build (of_seq_subproof s).
 
 Definition enumK : cancel enum of_seq.
-Admitted.
+Proof.
+by move=> [s ?] /=; apply: val_inj; rewrite /= sorted_sort//; apply: prec_trans.
+Qed.
 
 Definition of_seqK : forall (s : seq T), enum (of_seq s) =i s.
-Admitted.
+Proof. exact: mem_sort. Qed.
 
-Definition mem : type -> pred T.
-Admitted.
+Definition mem (x : type) : pred T := [in enum x].
 
 Definition memP : forall {A : type}, mem A =i enum A.
-Admitted.
+Proof. by []. Qed.
 
 End FinSet.
 End FinSet.
