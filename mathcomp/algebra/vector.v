@@ -1919,6 +1919,9 @@ by exists vec_mx; [apply: mxvecK | apply: vec_mxK].
 Qed.
 HB.instance Definition _ := Lmodule_hasFinDim.Build _ 'M[R]_(m, n) matrix_vect_iso.
 
+Lemma dim_matrix : dim 'M[R]_(m, n) = m * n.
+Proof. by []. Qed.
+
 End MatrixVectType.
 
 (* A ring is a one-dimension vector space *)

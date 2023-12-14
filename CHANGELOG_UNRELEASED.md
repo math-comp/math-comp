@@ -21,6 +21,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `bigmaxD`, `bigminU`, `bigmaxU`, `bigmin_set1`, `bigmax_set1`,
     `bigmin_imset`, `bigmax_imset`.
 
+- in `vector.v`
+  + lemma `dim_matrix`
+
 ### Changed
 
 - Notations declared in the `fun_scope` are now declared in the
