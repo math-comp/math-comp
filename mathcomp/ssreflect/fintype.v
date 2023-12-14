@@ -415,12 +415,19 @@ Proof. Admitted.
 
 Module TCFinPred.
 
-Structure finPred (T : choiceType) := FinPredPack {
+(*Structure finPred (T : choiceType) := FinPredPack {
    finpred :> {pred T};
    pred_set : {set T};
    pred_enumP : pred_set =i finpred
+}.*)
+Structure finPred (T : choiceType) := PackFinPred {
+   finpred :> {pred T};
+   pred_eqset :> {A : {set T} | A =i finpred}
 }.
+Coercion pred_set T (F : finPred T) := sval F.
+Definition FinPred T P A A_P := @PackFinPred T P (exist _ A A_P).
 
+(*
 Lemma applicationI_subproof2 (T : choiceType) (A: {set T}) (P Q : {pred T}) :
   (forall x, x \in A = Q x) ->
   forall x, (x \in set_comprehension A P) = (Q x) && (P x).
@@ -431,15 +438,33 @@ Lemma applicationU_subproof2 (T : choiceType) (A B : {set T}) (P Q : {pred T}) :
   (forall x, x \in B = Q x) ->
   (forall x, (x \in setU A B) = (P x) || (Q x)).
 Proof. Admitted.
+*)
 
-Class finPred_aux(T : choiceType) (P : pred T) (s : {set T}) :=
-  OK { proof : s =i P }.
+Class finPred_aux(T : choiceType) (P : {pred T}) :=
+  OK { proof : {A : {set T} | A =i P} }.
 
-Canonical isFinPred T P s {h : @finPred_aux T P s} :=
-   @FinPredPack T P s (@proof _ _ _ h).
+Canonical isFinPred T P {h : @finPred_aux T P} :=
+   @PackFinPred T P (@proof _ _ h).
 
-About isFinPred.
-Print Canonical Projections finpred.
+Structure apply T (F : finPred T) (x : T) := Apply {apply_val :> bool}.
+
+Canonical applyF T F x := @Apply T F x (x \in F).
+
+Definition set0 {T} := @FinSet.of_seq T [::].
+Lemma in_set0 T x : x \in @set0 T = false. Admitted.
+Definition FinPred0 T := FinPred (@in_set0 T).
+Canonical apply0 T x := Apply (FinPred0 T) x false.
+
+Definition FinPredU T (F G : finPred T) := FinPred (@in_setU T F G).
+Canonical applyU T F G x (aF : apply F x) (aG : apply G x) :=
+  Apply (@FinPredU T F G) x (aF || aG).
+
+Definition set1 {T} x := @FinSet.of_seq T [:: x].
+Lemma in_set1 T x y : y \in @set1 T x = (y == x). Admitted.
+Definition FinPred1 T x := FinPred (@in_set1 T x).
+Canonical apply1 T y x := Apply (@FinPred1 T y) x (x == y).
+
+
 
 From mathcomp.ssreflect Extra Dependency "fintype.elpi" as fintype.
 Import elpi.
@@ -447,8 +472,25 @@ Elpi Tactic infer.
 Elpi Accumulate File fintype.
 Elpi Typecheck.
 
-Hint Extern 0 (finPred_aux _ _ ) => elpi infer : typeclass_instances.
+Hint Extern 0 (finPred_aux _ ) => elpi infer : typeclass_instances.
 (********)
+
+
+Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
+  [pred x in A].
+Definition t1' (T : choiceType) (P : finPred T) : finPred T :=
+  [pred x in P] : {pred T}.
+Definition t2 (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
+  [pred x | ([in P] x) && (Q x)].
+Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
+   [pred x | (x \in A) && (Q x)].
+Definition t4 (T : choiceType) (P : finPred T) (Q : finPred T) : finPred T :=
+   [pred x | (finpred P x) || (finpred Q x)].
+Definition t5 (T : finType) (P : pred T) : finPred T :=
+   [pred x | P x].
+Definition def (T : choiceType) (P Q : {pred T}) : pred T := [pred x : T | P x && Q x].
+Definition t6 (T : choiceType) (P : finPred T) Q : finPred T :=
+   [pred x : T | def P Q x ].
 
 End TCFinPred.
 
