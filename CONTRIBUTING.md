@@ -210,3 +210,112 @@ Abbreviations are in the header of the file which introduces them. We list here 
 ## Doc style
 
 See this [wiki entry](https://github.com/math-comp/math-comp/wiki/How-to-document)
+
+## Instantiating structures with Hierarchy Builder
+
+First
+```Coq
+From HB Require Import structures.
+```
+
+The structure names can be found in the header comments, for instance,
+the `eqType` structure is defined in
+[`eqtype.v`](https://github.com/math-comp/math-comp/blob/master/mathcomp/ssreflect/eqtype.v).
+Basic information about structures can be obtained via `HB.about`, for
+instance
+
+```Coq
+HB.about eqType.
+```
+
+### Regular factories
+
+Factories enabling to build a structure can be discovered with
+`HB.howto`, for instance
+
+```Coq
+HB.howto eqType.
+```
+
+tells us that `eqType` instances can be built with `hasDecEq.Build`.
+(Note that by default `HB.howto` may not return all the available factories;
+it might be necessary to increase the depth search using a natural number
+as in `HB.howto xyzType 5`.)
+One can then
+
+```Coq
+HB.about hasDecEq.Build.
+```
+
+to learn that `hasDecEq.Build` is expecting a type `T`, a predicate
+`eq_op : rel T` (implicit argument, as indicated by the square
+brackets) and proof of `Equality.axiom eq_op`. One can thus
+instantiate an `eqType` on some type `T` with
+
+```Coq
+HB.instance Definition _ := hasDecEq.Build T proof_of_Equality_axiom.
+```
+
+or
+
+```Coq
+HB.instance Definition _ := @hasDecEq.Build T eq_op proof_of_Equality_axiom.
+```
+
+which should output a few lines among which:
+
+```Coq
+module_T__canonical__eqtype_Equality is defined
+```
+
+(beware that the output may not be visible by default with VSCoq).
+Absence of such a line indicates failure of the command.
+
+### Aliases / feather factories
+
+In addition to the regular factories, listed by `HB.howto`, the
+library defines some aliases (aka feather factories). Those aliases
+are documented in the header comments. For instance, an `eqType`
+instance on some type `T` can be derived from some `T'` already
+equipped with an `eqType` structure, given a function `f : T -> T'`
+and a proof `injf : injective f`
+
+```Coq
+HB.instance Definition _ := Equality.copy T (inj_type injf).
+```
+
+### Listing instances on a given type
+
+Instances a type is already equipped with can be listed with
+`HB.about`, for instance
+
+```Coq
+HB.about bool.
+```
+
+lists all the structures `bool` is already equipped with.
+
+### Graph of the hierarchy
+
+A graph of the hierarchy can be obtained with
+
+```Coq
+HB.graph "hierarchy.dot".
+```
+
+then
+
+```shell
+tred hierarchy.dot | xdot
+```
+
+or
+
+```shell
+tred hierarchy.dot | dot -Tpng > hierarchy.png
+```
+
+## Adding new structures with Hierarchy Builder
+
+See the
+[documentation of Hierarchy Builder](https://github.com/math-comp/hierarchy-builder#readme).
