@@ -421,12 +421,20 @@ Module TCFinPred.
    pred_enumP : pred_set =i finpred
 }.*)
 Structure finPred (T : choiceType) := PackFinPred {
-   finpred :> {pred T};
+   finpred : {pred T};
    pred_eqset :> {A : {set T} | A =i finpred}
 }.
+Coercion finpred_coe := finpred.
 Coercion pred_set T (F : finPred T) := sval F.
 Definition FinPred T P A A_P := @PackFinPred T P (exist _ A A_P).
 
+
+(* Definition finTypePred {T : finType} (P : pred T) : finPred T :=
+  PackFinPred (exist _ (set_comprehension (setT T) P)
+  (setT_comprehension_subproof P)). *)
+
+Definition finTypeSet {T : finType} (P : pred T) : {A : {set T} | A =i P} :=
+  (exist _ (set_comprehension (setT T) P) (setT_comprehension_subproof P)).
 (*
 Lemma applicationI_subproof2 (T : choiceType) (A: {set T}) (P Q : {pred T}) :
   (forall x, x \in A = Q x) ->
@@ -440,7 +448,7 @@ Lemma applicationU_subproof2 (T : choiceType) (A B : {set T}) (P Q : {pred T}) :
 Proof. Admitted.
 *)
 
-Class finPred_aux(T : choiceType) (P : {pred T}) :=
+Class finPred_aux (T : choiceType) (P : {pred T}) :=
   OK { proof : {A : {set T} | A =i P} }.
 
 Canonical isFinPred T P {h : @finPred_aux T P} :=
@@ -448,16 +456,35 @@ Canonical isFinPred T P {h : @finPred_aux T P} :=
 
 Structure apply T (F : finPred T) (x : T) := Apply {apply_val :> bool}.
 
-Canonical applyF T F x := @Apply T F x (x \in F).
+Canonical applyF T F x := @Apply T F x (finpred_coe F x).
 
 Definition set0 {T} := @FinSet.of_seq T [::].
 Lemma in_set0 T x : x \in @set0 T = false. Admitted.
 Definition FinPred0 T := FinPred (@in_set0 T).
 Canonical apply0 T x := Apply (FinPred0 T) x false.
 
-Definition FinPredU T (F G : finPred T) := FinPred (@in_setU T F G).
-Canonical applyU T F G x (aF : apply F x) (aG : apply G x) :=
-  Apply (@FinPredU T F G) x (aF || aG).
+
+Definition FinPredU_subproof T (F : finPred T) (G : finPred T) :
+  (fun A : {set T} => A =i [pred x | (x \in F) || (x \in G)]) (setU F G).
+Proof. Admitted.
+Definition FinPredU T (F : finPred T) (G : finPred T) :=
+  @FinPred _[pred x | (x \in F) || (x \in G)] (setU F G)
+           (FinPredU_subproof F G).
+Canonical applyU T F G x (aF : apply F x) (aG : apply G x):=
+    Apply (@FinPredU T F G) x (aF || aG).
+
+Definition FinPredI_subproof T (F : finPred T) (G : pred T) :
+  (fun A : {set T} => A =i [pred x in F | G x]) (set_comprehension F G).
+Proof. Admitted.
+Definition FinPredI T (F : finPred T) (G : pred T) :=
+  @FinPred _ [pred x in F | G x] (set_comprehension F G)
+           (FinPredI_subproof F G).
+Canonical applyI T F G x (aF : apply F x) :=
+    Apply (@FinPredI T F G) x (aF && (G x)).
+
+
+Definition FinPredOfSet T (A : {set T}) := @FinPred _ A A (frefl _).
+Canonical applyOfSet T A x := Apply (@FinPredOfSet T A) x (FinSet.mem A x).
 
 Definition set1 {T} x := @FinSet.of_seq T [:: x].
 Lemma in_set1 T x y : y \in @set1 T x = (y == x). Admitted.
@@ -475,20 +502,41 @@ Elpi Typecheck.
 Hint Extern 0 (finPred_aux _ ) => elpi infer : typeclass_instances.
 (********)
 
+About finPred_aux.
 
+Elpi Trace Browser.
 Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
   [pred x in A].
+
+Print Canonical Projections finpred.
+Print applyF.
+(* Set Debug "unification". *)
+(*
+Canonical foo (T : choiceType) F
+    (a : forall x, apply F x) e : finPred T :=
+  @FinPred _ (fun x => @apply_val T _ x (a x)) (pred_set F) e. *)
+
+
+Print Canonical Projections finpred.
+Check fun (T : choiceType) (P : finPred T) x =>
+  finpred_coe P x : apply P x.
+
+Set Printing Existential Instances.
 Definition t1' (T : choiceType) (P : finPred T) : finPred T :=
   [pred x in P] : {pred T}.
+
 Definition t2 (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
-  [pred x | ([in P] x) && (Q x)].
+  [pred x | [in P] x && (Q x)].
+Definition t2' (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
+  [pred x | (x \in P) && (Q x)].
 Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
    [pred x | (x \in A) && (Q x)].
 Definition t4 (T : choiceType) (P : finPred T) (Q : finPred T) : finPred T :=
-   [pred x | (finpred P x) || (finpred Q x)].
+   [pred x | (x \in P) || (x \in Q)].
 Definition t5 (T : finType) (P : pred T) : finPred T :=
    [pred x | P x].
-Definition def (T : choiceType) (P Q : {pred T}) : pred T := [pred x : T | P x && Q x].
+Definition def (T : choiceType) (P Q : {pred T}) : pred T :=
+   [pred x : T | P x && Q x].
 Definition t6 (T : choiceType) (P : finPred T) Q : finPred T :=
    [pred x : T | def P Q x ].
 
@@ -675,8 +723,9 @@ End CSFinPred.
 
 Export TCFinPred.
 
-Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
-  [pred x in A].
+Elpi Trace Browser.
+(* Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
+  [pred x in A]. *)
 Definition t1' (T : choiceType) (P : finPred T) : finPred T :=
   [pred x in P] : {pred T}.
 Definition t2 (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
@@ -684,7 +733,7 @@ Definition t2 (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
 Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
    [pred x | (x \in A) && (Q x)].
 Definition t4 (T : choiceType) (P : finPred T) (Q : finPred T) : finPred T :=
-   [pred x | (finpred P x) || (finpred Q x)].
+   [pred x | (x \in P) || (x \in Q)].
 Definition t5 (T : finType) (P : pred T) : finPred T :=
    [pred x | P x].
 Definition def (T : choiceType) (P Q : {pred T}) : pred T := [pred x : T | P x && Q x].
@@ -704,10 +753,27 @@ Fail Check fun (T : choiceType) (A : {set T}) (Q : pred T) =>
 Fail Check fun (T : choiceType) (P : finPred T) (Q : finPred T) =>
    (fun x => (P x) || (Q x)) : finPred T.
 
+Notation pred_id := (@id {pred _}) (only parsing).
+Notation "A" := (pred_id A) (at level 9, only printing).
+Notation enum A := (FinSet.enum (pred_set (pred_id A))) (only parsing).
+Notation "'enum' A" := (FinSet.enum A) (at level 10, only printing).
 
-Definition enum_mem T (mA : mem_pred _) := filter mA (Finite.enum T).
-Notation enum A := (enum_mem (mem A)).
-Definition pick (T : finType) (P : pred T) := ohead (enum P).
+Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
+  enum [pred x in P | Q x].
+
+Print Graph.
+
+Set Debug "unification".
+Set Printing All.
+Print Canonical Projections pred_set.
+
+
+
+Check fun (T : choiceType) (A : {set T}) => enum A.
+
+Definition set_pick (T : choiceType) (A : {set T}) := ohead (enum A).
+Notation pick A := (set_pick (pred_set (pred_id A))) (only parsing).
+Notation "'pick' A" := (pick A) (at level 10, only printing).
 
 Notation "[ 'pick' x | P ]" := (pick (fun x => P%B))
   (at level 0, x name, format "[ 'pick'  x  |  P  ]") : form_scope.
@@ -745,14 +811,15 @@ Notation "[ 'pick' x : T 'in' A | P & Q ]" := [pick x : T in A | P && Q]
 
 (* We lock the definitions of card and subset to mitigate divergence of the   *)
 (* Coq term comparison algorithm.                                             *)
-HB.lock Definition card (T : finType) (mA : mem_pred T) := size (enum_mem mA).
+HB.lock Definition card (T : choiceType) (A : {set T}) := size (enum A).
 Canonical card_unlock := Unlockable card.unlock.
 
 (* A is at level 99 to allow the notation #|G : H| in groups. *)
-Notation "#| A |" := (card (mem A))
-  (at level 0, A at level 99, format "#| A |") : nat_scope.
+Reserved Notation "#| A |" (at level 0, A at level 99, format "#| A |").
+Notation "#| A |" := (card (pred_set (pred_id A))) (only parsing): nat_scope.
+Notation "#| A |" := (card A) (only printing): nat_scope.
 
-Definition pred0b (T : finType) (P : pred T) := #|P| == 0.
+Definition pred0b (T : choiceType) (P : finPred T) := #|P| == 0.
 Prenex Implicits pred0b.
 
 Module FiniteQuant.
