@@ -4,11 +4,11 @@
   finp {{ (fun x => lp:(F x)) lp:A }} X Proof :- finp (F A) X Proof.
 
   finp {{ finpred lp:P lp:X }} X {{ pred_enumP lp:P }}.
-  
+
   finp {{ in_mem lp:X (mem (finpred lp:P)) }} X {{ pred_enumP lp:P }}.
 
   finp {{ in_mem lp:X (mem lp:A) }} X {{ fun x => erefl }}.
-  
+
   finp {{ lp:Px && lp:Qx }} X Proof :-
     finp Px X ProofP, anyp Qx X Q,
     Proof = {{ applicationI_subproof2 lp:Q lp:ProofP }}.
@@ -42,12 +42,16 @@
     pi x\ copy X x => copy T (P x).
     % var P _ L, std.filter L (x\not(x = X)) L', prune P L', T = P X.
   */
-  pred find i:term, o:term.
-  find {{ simpl_of_mem (@mem lp:FT _ lp:P) }} _ :- coq.error "TODO".
-  find {{ PredOfSimpl.coerce (SimplPred lp:P) }} Proof :-
-    find P Proof.
-  find P Proof :-
-    std.assert-ok! (coq.unify-eq P {{ fun x => @apply_val _ lp:ApplyP x }})
+  % find Type Pred FinPred
+  pred find i:term, i:term, o:term.
+  find T P {{finTypeSet lp:P}} :-
+    coq.elaborate-skeleton T {{finType}} _ ok, !.
+  find _ {{ simpl_of_mem (@mem lp:FT _ lp:P) }} _ :- coq.error "TODO".
+  find T  {{ PredOfSimpl.coerce (SimplPred lp:P) }} Proof :-
+    find T P Proof.
+  find _ P Proof :-
+    % coq.say "unifying" P "with" {{ fun x => @apply_val _ lp:ApplyP x _ }},
+    std.assert-ok! (coq.unify-eq P {{ fun x => @apply_val _ lp:ApplyP x _ }})
       "cannot find Apply",
     Proof = {{ @pred_eqset _ lp:ApplyP }}.
 
@@ -55,12 +59,15 @@
   %   pi x\ decl x `x` T =>
   %     finp (Bo x) x Proof.
 
-  solve (goal _ _ ({{ finPred_aux lp:Pred _ }} as Ty) _ [] as G) GL :-
-    coq.say "Proving that" {coq.term->string Pred} "is finPred",
+  solve (goal _ _ ({{ @finPred_aux lp:T lp:Pred }} as Ty) _ [] as G) GL :-
+    % coq.say "Proving that" {coq.term->string Pred} "is finPred",
     % coq.say "Proving that" Pred "is finPred",
-    find Pred Proof,
+    find T Pred Proof,
     FinalProof = {{ OK lp:Proof }},
     coq.say "Final proof" {coq.term->string FinalProof},
     std.assert-ok! (coq.typecheck FinalProof _) "illtyped proof",
     std.assert-ok! (coq.typecheck FinalProof Ty) "wrong proof",
     refine FinalProof G GL.
+
+
+   solve G GL :- coq.say "catchall: trying to solve" G, coq.fail "STOP".
