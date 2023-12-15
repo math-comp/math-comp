@@ -64,7 +64,7 @@
     % coq.say "Proving that" Pred "is finPred",
     find T Pred Proof,
     FinalProof = {{ OK lp:Proof }},
-    coq.say "Final proof" {coq.term->string FinalProof},
+    % coq.say "Final proof" {coq.term->string FinalProof},
     std.assert-ok! (coq.typecheck FinalProof _) "illtyped proof",
     std.assert-ok! (coq.typecheck FinalProof Ty) "wrong proof",
     refine FinalProof G GL.
