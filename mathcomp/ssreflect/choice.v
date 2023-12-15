@@ -260,7 +260,7 @@ HB.instance Definition _ (T : eqType) := Equality.copy (GenTree.tree T)
 
 HB.mixin Record hasWoChoice T := Mixin {
   find_subdef : pred T -> nat -> option T;
-  choice_correct_subdef {P n x} : find_subdef P n = Some x -> P x;
+  choice_correct_subdef {P n} : oapp P true (find_subdef P n);
   choice_complete_subdef {P : pred T} :
     (exists x, P x) -> exists n, find_subdef P n;
   choice_stable_subdef {P Q : pred T} n :
@@ -270,42 +270,12 @@ HB.mixin Record hasWoChoice T := Mixin {
 
 HB.factory Record hasChoice `{classical_logic} T := Mixin {
   find : pred T -> nat -> option T;
-  choice_correct {P n x} : find P n = Some x -> P x;
+  choice_correct {P n} : oapp P true (find P n);
   choice_complete {P : pred T} :
     (exists x, P x) -> exists n, find P n;
   choice_extensional {P Q : pred T} :
     P =1 Q -> find P =1 find Q
 }.
-
-(* Counter-example for the builder below with an admitted proof. *)
-Section CounterExample.
-Definition find := [fun (P : pred nat) n =>
-  let n := if P 0 then n.-1 else n in
-  if P n then Some n else None].
-
-Lemma choice_correct {P n x} : find P n = Some x -> P x.
-Proof. by rewrite /=; case: (P 0); case /boolP: (P _) => // Pn /Some_inj <-. Qed.
-
-Lemma choice_complete {P : pred nat} : (exists x, P x) -> exists n, find P n.
-Proof.
-move=> [x Px].
-case /boolP: (P 0) => [|/negPf] P0.
-  by exists x.+1; rewrite /= P0 Px.
-by exists x; rewrite /= P0 Px.
-Qed.
-
-Lemma choice_extensional {P Q : pred nat} : P =1 Q -> find P =1 find Q.
-Proof. by move=> PQ n; rewrite /find /= 2!PQ. Qed.
-
-Definition P := fun n => n == 2.
-Definition Q := fun n => (n == 0) || (n == 2).
-
-Lemma PQ : subpred P Q.
-Proof. by move=> n /eqP ->. Qed.
-
-Goal find P 2 ==> find Q 2 = false.
-Proof. by []. Qed.
-End CounterExample.
 
 HB.builders Context `{classical_logic} T of hasChoice _ T.
   Lemma choice_stable {P Q : pred T} n :
@@ -327,7 +297,7 @@ Module Export ChoiceNamespace.
   Notation find := find_subdef.
 
   Notation correct := choice_correct_subdef.
-  Arguments correct {_ _ _ _}.
+  Arguments correct {_} _ _.
 
   Notation complete := choice_complete_subdef.
   Arguments complete {_ _}.
@@ -341,7 +311,7 @@ Module Export ChoiceNamespace.
   Implicit Types P Q : pred T.
 
   Lemma findP P n x : find P n = Some x -> P x.
-  Proof. by move=> Dx; have:= @correct _ P n; rewrite Dx; apply. Qed.
+  Proof. by move=> Dx; have:= correct P n; rewrite Dx; apply. Qed.
 
   Fact xchoose_subproof P :
       (exists x, P x) ->
@@ -532,11 +502,11 @@ Lemma PCanHasChoice f' : pcancel f f' -> hasWoChoice sT.
 Proof.
 move=> fK; pose liftP sP := [pred x | oapp sP false (f' x)].
 pose sf sP := [fun n => obind f' (find (liftP sP) n)].
-exists sf => [sP n x | sP [y sPy] | sP sQ n sPQ] /=.
-- by case Df: (find _ n) => //= [?] Dx; have:= correct Df; rewrite /= Dx.
+exists sf => [sP n | sP [y sPy] | sP sQ n sPQ] /=.
+- by have:= correct (liftP sP) n; case: find => //= x; case: (f' x).
 - have [|n Pn] := @complete T (liftP sP); first by exists (f y); rewrite /= fK.
   exists n; case Df: (find _ n) Pn => //= [x] _.
-  by have:= correct Df => /=; case: (f' x).
+  by have:= findP Df => /=; case: (f' x).
 have: subpred (liftP sP) (liftP sQ) by move=> x /=; case: (f' x).
 case/(stable n)=> sfPQ EfPQ; split=> [|PfQn]; last first.
    by rewrite EfPQ //; case: find PfQn.
@@ -568,7 +538,7 @@ pose r f := [fun xs => fun x : T => f (x :: xs) : option (seq T)].
 pose fix f sP ns xs {struct ns} :=
   if ns is n :: ns1 then let fr := r (f sP ns1) xs in obind fr (find fr n)
   else if sP xs then Some xs else None.
-exists (fun sP nn => f sP (dc nn) nil) => [sP n ys | sP [ys] | sP sQ n ssPQ /=].
+exists (fun sP nn => f sP (dc nn) nil) => [sP n | sP [ys] | sP sQ n ssPQ /=].
 - elim: {n}(dc n) nil => [|n ns IHs] xs /=; first by case: ifP => // sPxs [<-].
   by case: (find _ n) => //= [x]; apply: IHs.
 - rewrite -(cats0 ys); elim/last_ind: ys nil => [|ys y IHs] xs /=.
@@ -576,7 +546,7 @@ exists (fun sP nn => f sP (dc nn) nil) => [sP n ys | sP [ys] | sP sQ n ssPQ /=].
   rewrite cat_rcons => /IHs[n1 sPn1] {IHs}.
   have /complete[n]: exists z, f sP (dc n1) (z :: xs) by exists y.
   case Df: (find _ n)=> // [x] _; exists (code (n :: dc n1)).
-  by rewrite codeK /= Df /= (correct Df).
+  by rewrite codeK /= Df /= (findP Df).
 elim: {n}(dc n) nil => [|n ns IHs] xs /=.
   by do [split; case: ifP] => //= [/ssPQ-> | _ ->].
 have: subpred (fun x => f sP ns (x :: xs)) (fun x => f sQ ns (x :: xs)).
@@ -603,14 +573,14 @@ pose mkT i (x : T_ i) := Tagged T_ x.
 pose ft tP n i := omap (mkT i) (find (tP \o mkT i) n).
 pose fi tP ni nt := obind (ft tP nt) (find (ft tP nt) ni).
 pose f tP n := if dc n is [:: ni; nt] then fi tP ni nt else None.
-exists f => [tP n u | tP [[i x] tPxi] | sP sQ n sPQ].
+exists f => [tP n | tP [[i x] tPxi] | sP sQ n sPQ].
 - rewrite /f /fi; case: (dc n) => [|ni [|nt []]] //=.
   case: (find _ _) => //= [i]; rewrite /ft.
-  by case Df: (find _ _) => //= [x] [<-]; have:= correct Df.
+  by case Df: (find _ _) => //= [x]; have:= findP Df.
 - have /complete[nt tPnt]: exists y, (tP \o mkT i) y by exists x.
   have{tPnt}: exists j, ft tP nt j by exists i; rewrite /ft; case: find tPnt.
   case/complete=> ni tPn; exists (code [:: ni; nt]); rewrite /f codeK /fi.
-  by case Df: find tPn => //= [j] _; have:= correct Df.
+  by case Df: find tPn => //= [j] _; have:= findP Df.
 rewrite /f; case: (dc n) => // {}n; case=> // m; case=> //; rewrite /fi.
 have sPQmkT i: subpred (sP \o mkT i) (sQ \o mkT i) by move=> x /sPQ.
 have /(stable n) [ftsPQ ftsPQE]: subpred (ft sP m) (ft sQ m).
@@ -635,7 +605,7 @@ End TagChoice.
 Fact nat_hasChoice : hasWoChoice nat.
 Proof.
 pose f := [fun (P : pred nat) n => if P n then Some n else None].
-exists f => [P n m | P [n Pn] | P Q n sPQ] /=; first by case: ifP => // Pn [<-].
+exists f => [P n | P [n Pn] | P Q n sPQ] /=; first by case: ifP => // Pn [<-].
   by exists n; rewrite Pn.
 by split; [case: ifP => // /sPQ-> | case: (Q n) => //= ->].
 Qed.
