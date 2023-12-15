@@ -407,6 +407,12 @@ Lemma set_comprehensionE {T : choiceType} (A : {set T}) (P : {pred T}) :
   set_comprehension A P =i [pred x | (x \in A) & P x].
 Proof. Admitted.
 
+Definition setI T (A B : {set T}) := set_comprehension A B.
+
+Lemma in_setI T (A B : {set T}) : setI A B =i [pred x in A | (x \in B)].
+Proof.
+Admitted.
+
 Definition setT (T : finType) := FinSet.of_seq (Finite.enum T).
 
 Lemma setT_comprehension_subproof (T : finType) P :
@@ -415,18 +421,19 @@ Proof. Admitted.
 
 Module TCFinPred.
 
-(*Structure finPred (T : choiceType) := FinPredPack {
-   finpred :> {pred T};
+Structure finPred (T : choiceType) := FinPred {
+   finpred : {pred T};
    pred_set : {set T};
    pred_enumP : pred_set =i finpred
-}.*)
-Structure finPred (T : choiceType) := PackFinPred {
-   finpred : {pred T};
-   pred_eqset :> {A : {set T} | A =i finpred}
 }.
+(* Structure finPred (T : choiceType) := PackFinPred { *)
+(*    finpred : {pred T}; *)
+(*    pred_eqset :> {A : {set T} | A =i finpred} *)
+(* }. *)
 Coercion finpred_coe := finpred.
-Coercion pred_set T (F : finPred T) := sval F.
-Definition FinPred T P A A_P := @PackFinPred T P (exist _ A A_P).
+Coercion pred_set : finPred >-> set_type.
+(* Coercion pred_set T (F : finPred T) := sval F. *)
+(* Definition FinPred T P A A_P := @PackFinPred T P (exist _ A A_P). *)
 
 
 (* Definition finTypePred {T : finType} (P : pred T) : finPred T :=
@@ -451,8 +458,11 @@ Proof. Admitted.
 Class finPred_aux (T : choiceType) (P : {pred T}) :=
   OK { proof : {A : {set T} | A =i P} }.
 
+(* Canonical isFinPred T P {h : @finPred_aux T P} := *)
+(*    @PackFinPred T P (@proof _ _ h). *)
+
 Canonical isFinPred T P {h : @finPred_aux T P} :=
-   @PackFinPred T P (@proof _ _ h).
+   @FinPred T P (sval (@proof _ _ h)) (svalP (@proof _ _ h)).
 
 Structure apply T (F : finPred T) (x : T) := Apply {apply_val :> bool}.
 
@@ -483,7 +493,10 @@ Canonical applyI T F G x (aF : apply F x) :=
     Apply (@FinPredI T F G) x (aF && (G x)).
 
 
-Definition FinPredOfSet T (A : {set T}) := @FinPred _ A A (frefl _).
+Definition finpred_target := finPred.
+Canonical FinPredOfSet T (A : {set T}) : finpred_target T := @FinPred _ A A (frefl _).
+Coercion FinPredOfSet : set_type >-> finpred_target.
+(* Notation "A" := (FinPredOfSet A) (at level 9, only printing). *)
 Canonical applyOfSet T A x := Apply (@FinPredOfSet T A) x (FinSet.mem A x).
 
 Definition set1 {T} x := @FinSet.of_seq T [:: x].
@@ -491,7 +504,9 @@ Lemma in_set1 T x y : y \in @set1 T x = (y == x). Admitted.
 Definition FinPred1 T x := FinPred (@in_set1 T x).
 Canonical apply1 T y x := Apply (@FinPred1 T y) x (x == y).
 
-
+Set Printing Coercions.
+Definition pred_eqset (T : choiceType) (P : finPred T) :
+   {A : {set T} | A =i P} := exist _ (pred_set P) (pred_enumP P).
 
 From mathcomp.ssreflect Extra Dependency "fintype.elpi" as fintype.
 Import elpi.
@@ -599,7 +614,6 @@ Check fun T (A B : {set T}) (F G : finPred T) (y z : T) =>
 Fail Check fun T (A B : {set T}) (F G : finPred T) (y z : T) =>
   A : finPred T.
 
-Set Debug "unification".
 Check fun T (A B : {set T}) (F G : finPred T) (y z : T) =>
   ((fun=> false) : {pred T}) : finPred T.
 
@@ -723,7 +737,6 @@ End CSFinPred.
 
 Export TCFinPred.
 
-Elpi Trace Browser.
 (* Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
   [pred x in A]. *)
 Definition t1' (T : choiceType) (P : finPred T) : finPred T :=
@@ -753,26 +766,22 @@ Fail Check fun (T : choiceType) (A : {set T}) (Q : pred T) =>
 Fail Check fun (T : choiceType) (P : finPred T) (Q : finPred T) =>
    (fun x => (P x) || (Q x)) : finPred T.
 
-Notation pred_id := (@id {pred _}) (only parsing).
-Notation "A" := (pred_id A) (at level 9, only printing).
-Notation enum A := (FinSet.enum (pred_set (pred_id A))) (only parsing).
+Notation enum A := (FinSet.enum (pred_set A)) (only parsing).
 Notation "'enum' A" := (FinSet.enum A) (at level 10, only printing).
+
+(* Notation pred_id := (@id {pred _}) (only parsing). *)
+(* Notation "A" := (pred_id A) (at level 9, only printing). *)
+(* Notation enum A := (FinSet.enum (pred_set (pred_id A))) (only parsing). *)
+(* Notation "'enum' A" := (FinSet.enum A) (at level 10, only printing). *)
 
 Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
   enum [pred x in P | Q x].
-
-Print Graph.
-
-Set Debug "unification".
-Set Printing All.
-Print Canonical Projections pred_set.
-
 
 
 Check fun (T : choiceType) (A : {set T}) => enum A.
 
 Definition set_pick (T : choiceType) (A : {set T}) := ohead (enum A).
-Notation pick A := (set_pick (pred_set (pred_id A))) (only parsing).
+Notation pick A := (set_pick (pred_set A)) (only parsing).
 Notation "'pick' A" := (pick A) (at level 10, only printing).
 
 Notation "[ 'pick' x | P ]" := (pick (fun x => P%B))
@@ -816,7 +825,7 @@ Canonical card_unlock := Unlockable card.unlock.
 
 (* A is at level 99 to allow the notation #|G : H| in groups. *)
 Reserved Notation "#| A |" (at level 0, A at level 99, format "#| A |").
-Notation "#| A |" := (card (pred_set (pred_id A))) (only parsing): nat_scope.
+Notation "#| A |" := (card (pred_set A)) (only parsing): nat_scope.
 Notation "#| A |" := (card A) (only printing): nat_scope.
 
 Definition pred0b (T : choiceType) (P : finPred T) := #|P| == 0.
@@ -924,13 +933,15 @@ End Exports.
 End FiniteQuant.
 Export FiniteQuant.Exports.
 
-Definition disjoint T (A B : mem_pred _) := @pred0b T (predI A B).
+Definition disjoint T (A : finPred T) (B : {pred T}) :=
+  @pred0b T [pred x in A | B x].
 Notation "[ 'disjoint' A & B ]" := (disjoint (mem A) (mem B))
   (at level 0,
    format "'[hv' [ 'disjoint' '/  '  A '/'  &  B ] ']'") : bool_scope.
 
 HB.lock
-Definition subset (T : finType) (A B : mem_pred T) : bool := pred0b (predD A B).
+Definition subset (T : finType) (A : finPred T) (B : {pred T}) : bool :=
+  pred0b [pred x in A | ~~ B x].
 Canonical subset_unlock := Unlockable subset.unlock.
 
 Notation "A \subset B" := (subset (mem A) (mem B))
@@ -942,69 +953,50 @@ Notation "A \proper B" := (proper (mem A) (mem B))
 
 (* image, xinv, inv, and ordinal operations will be defined later. *)
 
-Section OpsTheory.
+Section ChoiceOpsTheory.
 
-Variable T : finType.
-
-Implicit Types (A B C D : {pred T}) (P Q : pred T) (x y : T) (s : seq T).
-
-Lemma enumP : Finite.axiom (Finite.enum T).
-Proof. by rewrite unlock; apply: enumP_subdef. Qed.
-
-Section EnumPick.
-
-Variable P : pred T.
-
-Lemma enumT : enum T = Finite.enum T.
-Proof. exact: filter_predT. Qed.
+Variable T : choiceType.
+Implicit Types (A B : finPred T) (C D : {pred T}).
+Implicit Types (P Q : pred T) (x y : T) (s : seq T).
 
 Lemma mem_enum A : enum A =i A.
-Proof. by move=> x; rewrite mem_filter andbC -has_pred1 has_count enumP. Qed.
+Proof. Admitted.
 
 Lemma enum_uniq A : uniq (enum A).
-Proof.
-by apply/filter_uniq/count_mem_uniq => x; rewrite enumP -enumT mem_enum.
-Qed.
+Proof. Admitted.
 
-Lemma enum0 : enum pred0 = Nil T. Proof. exact: filter_pred0. Qed.
+Lemma enum0 : enum pred0 = Nil T. Proof. Admitted.
 
 Lemma enum1 x : enum (pred1 x) = [:: x].
+Proof. Admitted.
+
+Variant pick_spec P : option T -> Type :=
+  | Pick x of P x         : pick_spec P (Some x)
+  | Nopick of P =i xpred0 : pick_spec P None.
+
+Lemma pickP (A : finPred T) : pick_spec (A : {pred T}) (pick A).
 Proof.
-rewrite [enum _](all_pred1P x _ _); first by rewrite size_filter enumP.
-by apply/allP=> y; rewrite mem_enum.
-Qed.
+Admitted.
 
-Variant pick_spec : option T -> Type :=
-  | Pick x of P x         : pick_spec (Some x)
-  | Nopick of P =1 xpred0 : pick_spec None.
-
-Lemma pickP : pick_spec (pick P).
-Proof.
-rewrite /pick; case: (enum _) (mem_enum P) => [|x s] Pxs /=.
-  by right; apply: fsym.
-by left; rewrite -[P _]Pxs mem_head.
-Qed.
-
-End EnumPick.
+(* Should we keep it? *)
+Definition set_pickP (A : finPred T) : pick_spec [in A] (pick A) := pickP A.
 
 Lemma eq_enum A B : A =i B -> enum A = enum B.
-Proof. by move=> eqAB; apply: eq_filter. Qed.
+Proof. Admitted.
 
-Lemma eq_pick P Q : P =1 Q -> pick P = pick Q.
-Proof. by move=> eqPQ; rewrite /pick (eq_enum eqPQ). Qed.
+Lemma eq_pick A B : A =i B -> pick A = pick B.
+Proof. Admitted.
 
 Lemma cardE A : #|A| = size (enum A).
 Proof. by rewrite unlock. Qed.
 
 Lemma eq_card A B : A =i B -> #|A| = #|B|.
-Proof. by move=> eqAB; rewrite !cardE (eq_enum eqAB). Qed.
+Proof. Admitted.
 
 Lemma eq_card_trans A B n : #|A| = n -> B =i A -> #|B| = n.
-Proof. by move <-; apply: eq_card. Qed.
+Proof. Admitted.
 
 Lemma card0 : #|@pred0 T| = 0. Proof. by rewrite cardE enum0. Qed.
-
-Lemma cardT : #|T| = size (enum T). Proof. by rewrite cardE. Qed.
 
 Lemma card1 x : #|pred1 x| = 1.
 Proof. by rewrite cardE enum1. Qed.
@@ -1012,24 +1004,62 @@ Proof. by rewrite cardE enum1. Qed.
 Lemma eq_card0 A : A =i pred0 -> #|A| = 0.
 Proof. exact: eq_card_trans card0. Qed.
 
-Lemma eq_cardT A : A =i predT -> #|A| = size (enum T).
-Proof. exact: eq_card_trans cardT. Qed.
-
 Lemma eq_card1 x A : A =i pred1 x -> #|A| = 1.
 Proof. exact: eq_card_trans (card1 x). Qed.
 
+Lemma cardsUI A B : #|[predU A & B]| + #|[predI A & B]| = #|A| + #|B|.
+Proof. rewrite !cardE/=. Admitted.
+
+Lemma cardsID B A : #|[predI A & B]| + #|[pred x in A | x \notin B]| = #|A|.
+Proof. Admitted.
+
+Lemma cardsU1 x A : #|[predU1 x & A]| = (x \notin A) + #|A|.
+Proof.
+case Ax: (x \in A).
+  by apply: eq_card => y /[1!inE]/=; case: eqP => // ->.
+rewrite /= -(card1 x) -cardsUI addnC.
+rewrite [#|predI _ _|]eq_card0 => [|y /=].
+  by apply: eq_card => // y; rewrite !inE; admit.
+by rewrite !inE; case: eqP => // ->.
+Admitted.
+
+
+
+End ChoiceOpsTheory.
+
+Section FinOpsTheory.
+
+Variable T : finType.
+
+Implicit Types (A B C D : {pred T}) (P Q : pred T) (x y : T) (s : seq T).
+
+Lemma enumP : Finite.axiom (Finite.enum T).
+Proof.
+rewrite unlock => x.
+Admitted.
+
+Lemma enumT : enum T = Finite.enum T.
+Proof. Admitted.
+
+Lemma cardT : #|T| = size (enum T). Proof. by rewrite cardE. Qed.
+
+Lemma eq_cardT A : A =i predT -> #|A| = size (enum T).
+Proof. exact: eq_card_trans cardT. Qed.
+
 Lemma cardUI A B : #|[predU A & B]| + #|[predI A & B]| = #|A| + #|B|.
-Proof. by rewrite !cardE !size_filter count_predUI. Qed.
+Proof.
+Fail rewrite cardsUI. (* fixme by using finiteness only at the leafs *)
+by rewrite -[RHS]cardsUI; congr (_ + _); apply: eq_card.
+Qed.
 
 Lemma cardID B A : #|[predI A & B]| + #|[predD A & B]| = #|A|.
 Proof.
-rewrite -cardUI addnC [#|predI _ _|]eq_card0 => [|x] /=.
-  by apply: eq_card => x; rewrite !inE andbC -andb_orl orbN.
-by rewrite !inE -!andbA andbC andbA andbN.
+rewrite -[RHS](cardsID B A); congr (_ + _); apply: eq_card => //.
+by move=> x; rewrite !inE andbC.
 Qed.
 
 Lemma cardC A : #|A| + #|[predC A]| = #|T|.
-Proof. by rewrite !cardE !size_filter count_predC. Qed.
+Proof. Admitted.
 (* notes:
 
 today:
@@ -1043,15 +1073,8 @@ Lemma cardU1 (T : choiceType) (x : T) A S (_ : finPred_aux T [predU1 x & A] S) :
 rewrite cardU1. (* works no matter how you derive the finiteness of [predU1 x & A] *)
 
 *)
-
 Lemma cardU1 x A : #|[predU1 x & A]| = (x \notin A) + #|A|.
-Proof.
-case Ax: (x \in A).
-  by apply: eq_card => y /[1!inE]/=; case: eqP => // ->.
-rewrite /= -(card1 x) -cardUI addnC.
-rewrite [#|predI _ _|]eq_card0 => [|y /=]; first exact: eq_card.
-by rewrite !inE; case: eqP => // ->.
-Qed.
+Proof. by rewrite -cardsU1; apply: eq_card. Qed.
 
 Lemma card2 x y : #|pred2 x y| = (x != y).+1.
 Proof. by rewrite cardU1 card1 addn1. Qed.
