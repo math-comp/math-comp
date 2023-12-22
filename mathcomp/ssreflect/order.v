@@ -1310,8 +1310,8 @@ Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
   (at level 0, i, i0 at level 10,
    format "[ 'arg'  'max_' ( i  >  i0 )  F ]") : order_scope.
 
-Notation "f \min g" := (min_fun f g) : order_scope.
-Notation "f \max g" := (max_fun f g) : order_scope.
+Notation "f \min g" := (min_fun f g) : function_scope.
+Notation "f \max g" := (max_fun f g) : function_scope.
 
 Notation leLHS := (X in (X <= _)%O)%pattern.
 Notation leRHS := (X in (_ <= X)%O)%pattern.
