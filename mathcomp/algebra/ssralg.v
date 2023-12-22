@@ -2328,16 +2328,16 @@ HB.mixin Record SemiLaw_isLaw
 HB.structure Definition Law R V := {op of SemiLaw_isLaw R V op & SemiLaw R op}.
 Definition law := Law.type.
 
-(*
 HB.factory Record isLaw (R : ringType) (V : zmodType) (op : R -> V -> V) := {
   N1op : op (-1) =1 -%R;
+  opA : forall a b v, op a (op b v) = op (a * b) v;
   op_additive : forall a, additive (op a);
 }.
 
 HB.builders Context R V op of isLaw R V op.
 
 Fact op1v : op 1 =1 id.
-Proof. Admitted.
+Proof. by move=> x; rewrite -[1]opprK -mulrN1 -opA !N1op opprK. Qed.
 
 Fact op_semi_additive a : semi_additive (op a).
 Proof.
@@ -2351,7 +2351,6 @@ HB.instance Definition _ := Scale.isSemiLaw.Build R V op op1v op_semi_additive.
 HB.instance Definition _ := Scale.SemiLaw_isLaw.Build R V op N1op.
 
 HB.end.
-*)
 
 Fact comp_op1v
   (R : semiRingType) (V : nmodType) (s_law : semiLaw R V)
@@ -2420,6 +2419,8 @@ HB.structure Definition Linear
   (R : semiRingType) (U : lSemiModType R) (V : nmodType) (s : R -> V -> V) :=
   {f of @Additive U V f & isScalable R U V s f}.
 
+(* TODO: Generalize the following definitions and lemmas (also scalable_for   *)
+(* above?) to semi-modules properly, if possible.                             *)
 Definition linear_for (R : semiRingType) (U : lSemiModType R) (V : nmodType)
     (s : R -> V -> V) (f : U -> V) :=
   forall a, {morph f : u v / a *: u + v >-> s a u + v}.
@@ -2434,7 +2435,6 @@ Proof.
 by move=> Lsf a v; rewrite -[a *:v](addrK v) (additive_linear Lsf) Lsf addrK.
 Qed.
 
-(* TODO: generalize the following factory to semi-modules if possible ? *)
 HB.factory Record isLinear (R : ringType) (U : lmodType R) (V : zmodType)
     (s : Scale.law R V) (f : U -> V) := {
   linear_subproof : linear_for s f;
@@ -2445,6 +2445,7 @@ HB.instance Definition _ := isAdditive.Build U V f
 HB.instance Definition _ := isScalable.Build R U V s f
   (scalable_linear linear_subproof).
 HB.end.
+(* /TODO *)
 
 Module LinearExports.
 Notation scalable f := (scalable_for *:%R f).
