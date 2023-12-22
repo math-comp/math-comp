@@ -1906,14 +1906,14 @@ Notation null_fun V := (null_fun_head (Phant V)) (only parsing).
 (* in Coq 8.2 it gets precedence when GRing.Theory is not imported.         *)
 Local Notation in_alg_loc A := (in_alg_head (Phant A)) (only parsing).
 
-Local Notation "\0" := (null_fun _) : ring_scope.
-Local Notation "f \+ g" := (add_fun f g) : ring_scope.
-Local Notation "f \- g" := (sub_fun f g) : ring_scope.
-Local Notation "\- f" := (opp_fun f) : ring_scope.
-Local Notation "a \*: f" := (scale_fun a f) : ring_scope.
-Local Notation "x \*o f" := (mull_fun x f) : ring_scope.
-Local Notation "x \o* f" := (mulr_fun x f) : ring_scope.
-Local Notation "f \* g" := (mul_fun f g) : ring_scope.
+Local Notation "\0" := (null_fun _) : function_scope.
+Local Notation "f \+ g" := (add_fun f g) : function_scope.
+Local Notation "f \- g" := (sub_fun f g) : function_scope.
+Local Notation "\- f" := (opp_fun f) : function_scope.
+Local Notation "a \*: f" := (scale_fun a f) : function_scope.
+Local Notation "x \*o f" := (mull_fun x f) : function_scope.
+Local Notation "x \o* f" := (mulr_fun x f) : function_scope.
+Local Notation "f \* g" := (mul_fun f g) : function_scope.
 
 Arguments add_fun {_ _} f g _ /.
 Arguments sub_fun {_ _} f g _ /.
