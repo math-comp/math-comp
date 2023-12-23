@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
-From mathcomp Require Import ssralg poly.
+From mathcomp Require Import monoid ssralg poly.
 
 (******************************************************************************)
 (*                            Number structures                               *)
@@ -100,10 +100,10 @@ Module Num.
 
 #[short(type="porderZmodType")]
 HB.structure Definition POrderedZmodule :=
-  { R of Order.isPOrder ring_display R & GRing.Zmodule R }.
+  { R of Order.isPOrder ring_display R & Zmodule R }.
 
 HB.mixin Record Zmodule_isNormed (R : POrderedZmodule.type) M
-         of GRing.Zmodule M := {
+         of Zmodule M := {
   norm : M -> R;
   ler_normD : forall x y, norm (x + y) <= norm x + norm y;
   normr0_eq0 : forall x, norm x = 0 -> x = 0;
@@ -113,7 +113,7 @@ HB.mixin Record Zmodule_isNormed (R : POrderedZmodule.type) M
 
 #[short(type="normedZmodType")]
 HB.structure Definition NormedZmodule (R : porderZmodType) :=
-  { M of Zmodule_isNormed R M & GRing.Zmodule M }.
+  { M of Zmodule_isNormed R M & Zmodule M }.
 Arguments norm {R M} x : rename.
 
 Module NormedZmoduleExports.
@@ -433,13 +433,13 @@ HB.instance Definition _ := GRing.isDivClosed.Build R Rnneg_pred
 Fact nneg_addr_closed : addr_closed (@nneg R).
 Proof. by split; [apply: lexx | apply: addr_ge0]. Qed.
 #[export]
-HB.instance Definition _ := GRing.isAddClosed.Build R Rnneg_pred
+HB.instance Definition _ := isAddClosed.Build R Rnneg_pred
   nneg_addr_closed.
 
 Fact real_oppr_closed : oppr_closed (@real R).
 Proof. by move=> x; rewrite /= !realE oppr_ge0 orbC -!oppr_ge0 opprK. Qed.
 #[export]
-HB.instance Definition _ := GRing.isOppClosed.Build R Rreal_pred
+HB.instance Definition _ := isOppClosed.Build R Rreal_pred
   real_oppr_closed.
 
 Fact real_addr_closed : addr_closed (@real R).
@@ -452,7 +452,7 @@ case/orP: Ry => [y_ge0 | y_le0]; first by rewrite realE -nnegrE rpredD.
 by rewrite realE -[y]opprK orbC -oppr_ge0 opprB !subr_ge0 ger_leVge ?oppr_ge0.
 Qed.
 #[export]
-HB.instance Definition _ := GRing.isAddClosed.Build R Rreal_pred
+HB.instance Definition _ := isAddClosed.Build R Rreal_pred
   real_addr_closed.
 
 Fact real_divr_closed : divr_closed (@real R).
@@ -848,7 +848,7 @@ Proof. exact: real_leVge. Qed.
 Lemma realB : {in real &, forall x y, x - y \is real}.
 Proof. exact: rpredB. Qed.
 
-Lemma realN : {mono (@GRing.opp R) : x / x \is real}.
+Lemma realN : {mono (@opp R) : x / x \is real}.
 Proof. exact: rpredN. Qed.
 
 Lemma realBC x y : (x - y \is real) = (y - x \is real).
@@ -1302,18 +1302,18 @@ Qed.
 
 (* complement for x *+ n and <= or < *)
 
-Lemma ler_pMn2r n : (0 < n)%N -> {mono (@GRing.natmul R)^~ n : x y / x <= y}.
+Lemma ler_pMn2r n : (0 < n)%N -> {mono (@natmul R)^~ n : x y / x <= y}.
 Proof.
 by case: n => // n _ x y /=; rewrite -mulr_natl -[y *+ _]mulr_natl ler_pM2l.
 Qed.
 
-Lemma ltr_pMn2r n : (0 < n)%N -> {mono (@GRing.natmul R)^~ n : x y / x < y}.
+Lemma ltr_pMn2r n : (0 < n)%N -> {mono (@natmul R)^~ n : x y / x < y}.
 Proof. by move/ler_pMn2r/leW_mono. Qed.
 
-Lemma pmulrnI n : (0 < n)%N -> injective ((@GRing.natmul R)^~ n).
+Lemma pmulrnI n : (0 < n)%N -> injective ((@natmul R)^~ n).
 Proof. by move/ler_pMn2r/inc_inj. Qed.
 
-Lemma eqr_pMn2r n : (0 < n)%N -> {mono (@GRing.natmul R)^~ n : x y / x == y}.
+Lemma eqr_pMn2r n : (0 < n)%N -> {mono (@natmul R)^~ n : x y / x == y}.
 Proof. by move/pmulrnI/inj_eq. Qed.
 
 Lemma pmulrn_lgt0 x n : (0 < n)%N -> (0 < x *+ n) = (0 < x).
@@ -1331,10 +1331,10 @@ Proof. by move=> n_gt0; rewrite -(mul0rn _ n) ler_pMn2r // mul0rn. Qed.
 Lemma ltr_wMn2r x y n : x < y -> (x *+ n < y *+ n) = (0 < n)%N.
 Proof. by move=> ltxy; case: n=> // n; rewrite ltr_pMn2r. Qed.
 
-Lemma ltr_wpMn2r n : (0 < n)%N -> {homo (@GRing.natmul R)^~ n : x y / x < y}.
+Lemma ltr_wpMn2r n : (0 < n)%N -> {homo (@natmul R)^~ n : x y / x < y}.
 Proof. by move=> n_gt0 x y /= / ltr_wMn2r ->. Qed.
 
-Lemma ler_wMn2r n : {homo (@GRing.natmul R)^~ n : x y / x <= y}.
+Lemma ler_wMn2r n : {homo (@natmul R)^~ n : x y / x <= y}.
 Proof. by move=> x y hxy /=; case: n=> // n; rewrite ler_pMn2r. Qed.
 
 Lemma mulrn_wge0 x n : 0 <= x -> 0 <= x *+ n.
@@ -1360,7 +1360,7 @@ Proof. by rewrite -mulr_natl mulf_eq0 pnatr_eq0. Qed.
 Lemma eqNr x : (- x == x) = (x == 0).
 Proof. by rewrite eq_sym -addr_eq0 -mulr2n mulrn_eq0. Qed.
 
-Lemma mulrIn x : x != 0 -> injective (GRing.natmul x).
+Lemma mulrIn x : x != 0 -> injective (natmul x).
 Proof.
 move=> x_neq0 m n; without loss /subnK <-: m n / (n <= m)%N.
   by move=> IH eq_xmn; case/orP: (leq_total m n) => /IH->.
@@ -1368,11 +1368,11 @@ by move/eqP; rewrite mulrnDr -subr_eq0 addrK mulrn_eq0 => /predU1P[-> | /idPn].
 Qed.
 
 Lemma ler_wpMn2l x :
-  0 <= x -> {homo (@GRing.natmul R x) : m n / (m <= n)%N >-> m <= n}.
+  0 <= x -> {homo (@natmul R x) : m n / (m <= n)%N >-> m <= n}.
 Proof. by move=> xge0 m n /subnK <-; rewrite mulrnDr ler_wpDl ?mulrn_wge0. Qed.
 
 Lemma ler_wnMn2l x :
-  x <= 0 -> {homo (@GRing.natmul R x) : m n / (n <= m)%N >-> m <= n}.
+  x <= 0 -> {homo (@natmul R x) : m n / (n <= m)%N >-> m <= n}.
 Proof.
 by move=> xle0 m n hmn /=; rewrite -lerN2 -!mulNrn ler_wpMn2l // oppr_cp0.
 Qed.
@@ -1384,22 +1384,22 @@ Lemma mulrn_wlt0 x n : x < 0 -> x *+ n < 0 = (0 < n)%N.
 Proof. by case: n => // n hx; rewrite pmulrn_llt0. Qed.
 
 Lemma ler_pMn2l x :
-  0 < x -> {mono (@GRing.natmul R x) : m n / (m <= n)%N >-> m <= n}.
+  0 < x -> {mono (@natmul R x) : m n / (m <= n)%N >-> m <= n}.
 Proof.
 move=> x_gt0 m n /=; case: leqP => hmn; first by rewrite ler_wpMn2l // ltW.
 by rewrite -(subnK (ltnW hmn)) mulrnDr gerDr lt_geF // mulrn_wgt0 // subn_gt0.
 Qed.
 
 Lemma ltr_pMn2l x :
-  0 < x -> {mono (@GRing.natmul R x) : m n / (m < n)%N >-> m < n}.
+  0 < x -> {mono (@natmul R x) : m n / (m < n)%N >-> m < n}.
 Proof. by move=> x_gt0; apply: leW_mono (ler_pMn2l _). Qed.
 
 Lemma ler_nMn2l x :
-  x < 0 -> {mono (@GRing.natmul R x) : m n / (n <= m)%N >-> m <= n}.
+  x < 0 -> {mono (@natmul R x) : m n / (n <= m)%N >-> m <= n}.
 Proof. by move=> xlt0 m n /=; rewrite -lerN2 -!mulNrn ler_pMn2l// oppr_gt0. Qed.
 
 Lemma ltr_nMn2l x :
-  x < 0 -> {mono (@GRing.natmul R x) : m n / (n < m)%N >-> m < n}.
+  x < 0 -> {mono (@natmul R x) : m n / (n < m)%N >-> m < n}.
 Proof. by move=> x_lt0; apply: leW_nmono (ler_nMn2l _). Qed.
 
 Lemma ler_nat m n : (m%:R <= n%:R :> R) = (m <= n)%N.
@@ -2356,7 +2356,7 @@ Lemma signr_inj : injective (fun b : bool => (-1) ^+ b : R).
 Proof. exact: can_inj (fun x => 0 >= x) signr_le0. Qed.
 
 (* Ternary sign (sg). *)
-
+HB.graph graph.dot.
 Lemma sgr_def x : sg x = (-1) ^+ (x < 0)%R *+ (x != 0).
 Proof. by rewrite /sg; do 2!case: ifP => //. Qed.
 
@@ -2779,8 +2779,6 @@ Qed.
 End NumDomainMonotonyTheoryForReals.
 
 Section FinGroup.
-
-Import GroupScope.
 
 Variables (R : numDomainType) (gT : finGroupType).
 Implicit Types G : {group gT}.

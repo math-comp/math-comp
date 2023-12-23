@@ -5,6 +5,7 @@ Require Export eqtype.
 Require Export ssrnat.
 Require Export seq.
 Require Export choice.
+Require Export monoid.
 Require Export path.
 Require Export div.
 Require Export fintype.
