@@ -1183,7 +1183,7 @@ have [i_lt_m1 | m1_le_i] := ltnP i m1.
 rewrite -(subnK m1_le_i) exprD -[x ^+ m1]subr0 -(rootP px0) horner_coef.
 rewrite polySpred ?monic_neq0 // -/m1 big_ord_recr /= -lead_coefE.
 rewrite opprD addrC (monicP mon_p) mul1r subrK !mulrN -mulNr !mulr_sumr.
-apply: Msum => j _; rewrite mulrA mulrACA -exprD; apply: IHn.
+apply: Msum => j _; rewrite [X in M X]mulrA mulrACA -exprD; apply: IHn.
   by rewrite -addnS addnC addnBA // leq_subLR leq_add.
 by rewrite -mulN1r; do 2!apply: (genM) => //; apply: genR.
 Qed.
