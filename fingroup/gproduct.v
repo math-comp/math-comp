@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
-From mathcomp Require Import choice fintype bigop finset fingroup morphism.
-From mathcomp Require Import quotient action finfun.
+From mathcomp Require Import choice fintype bigop finset monoid fingroup.
+From mathcomp Require Import morphism quotient action finfun.
 
 (******************************************************************************)
 (*  Partial, semidirect, central, and direct products.                        *)

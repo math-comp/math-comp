@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop finfun tuple.
-From mathcomp Require Import ssralg matrix mxalgebra zmodp.
+From mathcomp Require Import fintype bigop finfun tuple ssralg matrix mxalgebra.
+From mathcomp Require Import zmodp.
 
 (******************************************************************************)
 (*                    Finite dimensional vector spaces                        *)
@@ -864,7 +864,7 @@ Lemma directv_sum_independent {Us : I -> {vspace vT}} :
 Proof.
 apply: (iffP directv_sumP) => [dxU us Uu u_0 i Pi | dxU i Pi].
   apply/eqP; rewrite -memv0 -(dxU i Pi) memv_cap Uu //= -memvN -sub0r -{1}u_0.
-  by rewrite (bigD1 i) //= addrC addKr memv_sumr // => j /andP[/Uu].
+  by rewrite (bigD1 i) //= [_ - us i]addrC addKr memv_sumr // => j /andP[/Uu].
 apply/eqP; rewrite -subv0; apply/subvP=> v.
 rewrite memv_cap memv0 => /andP[Uiv /memv_sumP[us Uu Dv]].
 have: \sum_(j | P j) [eta us with i |-> - v] j = 0.

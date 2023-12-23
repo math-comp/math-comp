@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype tuple finfun bigop finset prime.
-From mathcomp Require Import binomial ssralg poly polydiv fingroup perm.
+From mathcomp Require Import binomial ssralg poly polydiv monoid fingroup perm.
 From mathcomp Require Import morphism quotient gproduct finalg zmodp cyclic.
 From mathcomp Require Import matrix mxalgebra mxpoly polyXY vector falgebra.
 From mathcomp Require Import fieldext.

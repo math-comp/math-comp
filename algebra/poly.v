@@ -1,9 +1,9 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop finset tuple.
-From mathcomp Require Import div ssralg countalg binomial.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype monoid ssrnat seq.
+From mathcomp Require Import choice fintype bigop finset tuple div ssralg.
+From mathcomp Require Import countalg binomial.
 
 (******************************************************************************)
 (* This file provides a library for univariate polynomials over ring          *)
