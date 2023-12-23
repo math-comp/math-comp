@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop ssralg.
+From mathcomp Require Import fintype bigop monoid ssralg.
 
 (*****************************************************************************)
 (*     The algebraic part of the algebraic hierarchy for countable types     *)
@@ -38,10 +38,10 @@ Module CountRing.
 Import GRing.Theory.
 
 #[short(type="countNmodType")]
-HB.structure Definition Nmodule := {M of GRing.Nmodule M & Countable M}.
+HB.structure Definition Nmodule := {M of Nmodule M & Countable M}.
 
 #[short(type="countZmodType")]
-HB.structure Definition Zmodule := {M of GRing.Zmodule M & Countable M}.
+HB.structure Definition Zmodule := {M of Zmodule M & Countable M}.
 
 #[short(type="countSemiRingType")]
 HB.structure Definition SemiRing := {R of GRing.SemiRing R & Countable R}.
