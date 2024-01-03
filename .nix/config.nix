@@ -23,7 +23,7 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   ## select an entry to build in the following `bundles` set
   ## defaults to "default"
-  default-bundle = "coq-8.16";
+  default-bundle = "coq-master";
 
   ## write one `bundles.name` attribute set per
   ## alternative configuration, the can be used to
@@ -69,29 +69,13 @@ with builtins; with (import <nixpkgs> {}).lib;
   in {
     "coq-master".push-branches = [ "master" "mathcomp-1" ];
     "coq-master".coqPackages = common-bundles // {
-      coq.override.version = "master";
+      coq.override.version = "proux01:dir";
       bignums.override.version = "master";
       paramcoq.override.version = "master";
       coq-elpi.override.version = "coq-master";
       hierarchy-builder.override.version = "master";
       interval.job = false;
       coquelicot.job = false;
-    };
-    "coq-8.18".push-branches = [ "master" "mathcomp-1" ];
-    "coq-8.18".coqPackages = common-bundles // {
-      coq.override.version = "8.18";
-      interval.job = false;
-    };
-    "coq-8.17".push-branches = [ "master" "mathcomp-1" ];
-    "coq-8.17".coqPackages = common-bundles // {
-      coq.override.version = "8.17";
-    };
-    "coq-8.16".push-branches = [ "master" "mathcomp-1" ];
-    "coq-8.16".coqPackages = common-bundles // {
-      coq.override.version = "8.16";
-      multinomials.job = false;  # broken with dune on 8.16 in nixpkgs
-      coqeal.job = false;
-      mathcomp-apery.job = false;
     };
   };
 }
