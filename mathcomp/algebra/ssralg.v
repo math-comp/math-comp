@@ -1,5 +1,6 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+From elpi.apps Require Import coercion.
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
 From mathcomp Require Import choice fintype finfun bigop prime binomial.
@@ -524,6 +525,14 @@ Reserved Notation "-%R" (at level 0).
 Reserved Notation "*%R" (at level 0, format " *%R").
 Reserved Notation "*:%R" (at level 0, format " *:%R").
 Reserved Notation "n %:R" (at level 2, left associativity, format "n %:R").
+Reserved Notation "x %:R = y" (only printing, at level 70, x at level 2,
+  format "x %:R  =  y").
+Reserved Notation "x %:R <> y" (only printing, at level 70, x at level 2,
+  format "x %:R  <>  y").
+Reserved Notation "x %:R == y" (only printing, at level 70, x at level 2,
+  format "x %:R  ==  y").
+Reserved Notation "x %:R != y" (only printing, at level 70, x at level 2,
+  format "x %:R  !=  y").
 Reserved Notation "k %:A" (at level 2, left associativity, format "k %:A").
 Reserved Notation "[ 'char' F ]" (at level 0, format "[ 'char'  F ]").
 
@@ -6135,7 +6144,17 @@ Notation support := 0.-support.
 Notation "1" := (@one _) : ring_scope.
 Notation "- 1" := (opp 1) : ring_scope.
 
+(* %:R is a coercion (see Elpi code at the end of the file) but for clarity,
+   we want it to be displayed for any term that is not a variable, thus
+   n%:R + m%:R is printed n + m whereas (n + m)%:R is printed (n + m)%:R *)
 Notation "n %:R" := (natmul 1 n) : ring_scope.
+Notation "n" := (n%:R) (only printing, n name) : ring_scope.
+Notation "n .+1" := (n.+1%:R) (only printing) : ring_scope.
+Notation "n .-1" := (n.-1%:R) (only printing) : ring_scope.
+Notation "x %:R = y" := (x%:R = y) (only printing) : ring_scope.
+Notation "x %:R <> y" := (x%:R <> y) (only printing) : ring_scope.
+Notation "x %:R == y" := (x%:R == y) (only printing) : ring_scope.
+Notation "x %:R != y" := (x%:R != y) (only printing) : ring_scope.
 Arguments GRing.char R%type.
 Notation "[ 'char' R ]" := (GRing.char R) : ring_scope.
 Notation Frobenius_aut chRp := (Frobenius_aut chRp).
@@ -6707,3 +6726,11 @@ Lemma natrDE n m : n + m = (n + m)%N. Proof. by []. Qed.
 Lemma natrME n m : n * m = (n * m)%N. Proof. by []. Qed.
 Lemma natrXE n m : n ^+ m = (n ^ m)%N. Proof. by []. Qed.
 Definition natrE := (natr0E, natr1E, natn, natrDE, natrME, natrXE).
+
+Elpi Accumulate coercion lp:{{
+coercion _ N Inferred Expected Res :-
+  coq.unify-eq {{ nat }} Inferred ok, !,
+  coq.unify-eq {{ GRing.SemiRing.sort lp:R }} Expected ok, !, % Cyril: optimization: use coercion semiring -> nmodule on R instead of reinfering V
+  Res = {{ @GRing.natmul lp:V_ (@GRing.one lp:R) lp:N }}.
+}}.
+Elpi Typecheck coercion.
