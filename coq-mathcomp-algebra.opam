@@ -11,7 +11,44 @@ build: [ make "-C" "mathcomp/algebra" "-j" "%{jobs}%" ]
 install: [ make "-C" "mathcomp/algebra" "install" ]
 depends: [ "coq-mathcomp-fingroup" { = version } ]
 
-tags: [ "keyword:algebra" "keyword:small scale reflection" "keyword:mathematical components" "keyword:odd order theorem" "logpath:mathcomp.algebra" ]
+tags: [
+  "keyword:small scale reflection"
+  "keyword:mathematical components"
+  "keyword:algebra"
+  "keyword:algebraic structure hierarchies"
+  "keyword:archimedean field"
+  "keyword:floor"
+  "keyword:ceil"
+  "keyword:intervals"
+  "keyword:matrices"
+  "keyword:vectors"
+  "keyword:block matrices"
+  "keyword:determinant"
+  "keyword:Cramer rule"
+  "keyword:Vandermonde matrices"
+  "keyword:LUP decomposition"
+  "keyword:Gaussian elimination"
+  "keyword:matrix rank"
+  "keyword:eigen values"
+  "keyword:single variable polynomials"
+  "keyword:bivariate polynomials"
+  "keyword:polynomial division"
+  "keyword:integers"
+  "keyword:rational numbers"
+  "keyword:semi rings"
+  "keyword:rings"
+  "keyword:left algebra"
+  "keyword:left module"
+  "keyword:unit rings"
+  "keyword:field"
+  "keyword:algebraically closed field"
+  "keyword:additive morphisms"
+  "keyword:ring morphisms"
+  "keyword:finite dimensional vector spaces"
+  "keyword:complex numbers"
+  "keyword:square root"
+  "logpath:mathcomp.algebra"
+]
 authors: [ "The Mathematical Components team" ]
 
 synopsis: "Mathematical Components Library on Algebra"

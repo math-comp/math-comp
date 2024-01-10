@@ -17,7 +17,27 @@ depends: [
   "coq-hierarchy-builder" { >= "1.5.0"}
 ]
 
-tags: [ "keyword:small scale reflection" "keyword:mathematical components" "keyword:odd order theorem" "logpath:mathcomp.ssreflect" ]
+tags: [
+  "keyword:small scale reflection"
+  "keyword:mathematical components"
+  "keyword:bigop"
+  "keyword:big operators"
+  "keyword:biomial coefficient"
+  "keyword:integer division theory"
+  "keyword:finite sets"
+  "keyword:functions with finite domain"
+  "keyword:finite graphs"
+  "keyword:quotient types"
+  "keyword:order theory"
+  "keyword:partial order"
+  "keyword:lattices"
+  "keyword:lists"
+  "keyword:ordering and sorting lists"
+  "keyword:prime numbers"
+  "keyword:tuples"
+  "keyword:bounded lists"
+  "logpath:mathcomp.ssreflect"
+]
 authors: [ "The Mathematical Components team" ]
 
 synopsis: "Small Scale Reflection"

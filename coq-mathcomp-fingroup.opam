@@ -11,7 +11,12 @@ build: [ make "-C" "mathcomp/fingroup" "-j" "%{jobs}%" ]
 install: [ make "-C" "mathcomp/fingroup" "install" ]
 depends: [ "coq-mathcomp-ssreflect" { = version } ]
 
-tags: [ "keyword:finite groups" "keyword:small scale reflection" "keyword:mathematical components" "keyword:odd order theorem" "logpath:mathcomp.fingroup" ]
+tags: [
+  "keyword:small scale reflection"
+  "keyword:mathematical components"
+  "keyword:finite groups"
+  "logpath:mathcomp.fingroup"
+]
 authors: [ "The Mathematical Components team" ]
 
 synopsis: "Mathematical Components Library on finite groups"

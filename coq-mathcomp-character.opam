@@ -11,7 +11,13 @@ build: [ make "-C" "mathcomp/character" "-j" "%{jobs}%" ]
 install: [ make "-C" "mathcomp/character" "install" ]
 depends: [ "coq-mathcomp-field" { = version } ]
 
-tags: [ "keyword:algebra" "keyword:character" "keyword:small scale reflection" "keyword:mathematical components" "keyword:odd order theorem" "logpath:mathcomp.character" ]
+tags: [
+  "keyword:small scale reflection"
+  "keyword:mathematical components"
+  "keyword:algebra"
+  "keyword:character"
+  "logpath:mathcomp.character"
+]
 authors: [ "The Mathematical Components team" ]
 
 synopsis: "Mathematical Components Library on character theory"
