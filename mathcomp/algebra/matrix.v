@@ -882,7 +882,7 @@ Lemma cast_col_mx m1 m2 n n' (eq_n : n = n') A1 A2 :
     = col_mx (castmx (erefl m1, eq_n) A1) (castmx (erefl m2, eq_n) A2).
 Proof. by case: n' / eq_n. Qed.
 
-(* This lemma has Prenex Implicits to help RL rewrititng with castmx_sym. *)
+(* This lemma has Prenex Implicits to help RL rewriting with castmx_sym. *)
 Lemma row_mxA m n1 n2 n3 (A1 : 'M_(m, n1)) (A2 : 'M_(m, n2)) (A3 : 'M_(m, n3)) :
   let cast := (erefl m, esym (addnA n1 n2 n3)) in
   row_mx A1 (row_mx A2 A3) = castmx cast (row_mx (row_mx A1 A2) A3).
