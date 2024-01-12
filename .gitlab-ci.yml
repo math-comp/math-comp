@@ -410,8 +410,12 @@ mathcomp-dev_coq-8.17:
 mathcomp-dev_coq-8.18:
   extends: .docker-deploy-once
 
-# mathcomp-dev_coq-8.19: # to uncomment when 8.19+rc1 available
-#   # to be replaced with .docker-deploy-once when 8.19.0 available
+mathcomp-dev_coq-8.19:
+  # to be replaced with .docker-deploy-once when 8.19.0 available
+  extends: .docker-deploy
+
+# mathcomp-dev_coq-8.20: # to uncomment when 8.20+rc1 available
+#   # to be replaced with .docker-deploy-once when 8.20.0 available
 #   extends: .docker-deploy
 
 mathcomp-dev_coq-dev:
