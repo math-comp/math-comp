@@ -62,10 +62,13 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq-elpi.override.version = "coq-master";
       hierarchy-builder.override.version = "master";
     };
+    "coq-8.19".push-branches = [ "mathcomp-1" "master" ];
+    "coq-8.19".coqPackages = common-bundles // {
+      coq.override.version = "8.19";
+    };
     "coq-8.18".push-branches = [ "mathcomp-1" "master" ];
     "coq-8.18".coqPackages = common-bundles // {
       coq.override.version = "8.18";
-      interval.job = false;
     };
     "coq-8.17".push-branches = [ "mathcomp-1" "master" ];
     "coq-8.17".coqPackages = common-bundles // {
