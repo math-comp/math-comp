@@ -9,7 +9,7 @@ license: "CECILL-B"
 
 build: [ make "-C" "mathcomp/ssreflect" "-j" "%{jobs}%" ]
 install: [ make "-C" "mathcomp/ssreflect" "install" ]
-depends: [ "coq" { ((>= "8.16" & < "8.19~") | (= "dev"))} ]
+depends: [ "coq" { ((>= "8.15" & < "8.20~") | (= "dev"))} ]
 
 tags: [
   "keyword:small scale reflection"
