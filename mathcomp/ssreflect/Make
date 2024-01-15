@@ -31,7 +31,6 @@ order.v
 -arg -w -arg +duplicate-clear
 -arg -w -arg -ambiguous-paths
 -arg -w -arg +undeclared-scope
--arg -w -arg -non-reversible-notation
 -arg -w -arg +deprecated-hint-without-locality
 -arg -w -arg +deprecated-hint-rewrite-without-locality
 -arg -w -arg -opaque-let
