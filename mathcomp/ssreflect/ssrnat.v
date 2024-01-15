@@ -4,6 +4,9 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype.
 Require Import BinNat.
 Require BinPos Ndec.
 Require Export Ring.
+#[export] Set Warnings "-overwriting-delimiting-key".
+(* because there is some Set Warnings "overwriting-delimiting-key".
+   somewhere in the above *)
 
 (******************************************************************************)
 (* A version of arithmetic on nat (natural numbers) that is better suited to  *)
