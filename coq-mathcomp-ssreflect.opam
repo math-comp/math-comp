@@ -11,8 +11,28 @@ build: [ make "-C" "mathcomp/ssreflect" "-j" "%{jobs}%" ]
 install: [ make "-C" "mathcomp/ssreflect" "install" ]
 depends: [ "coq" { ((>= "8.16" & < "8.19~") | (= "dev"))} ]
 
-tags: [ "keyword:small scale reflection" "keyword:mathematical components" "keyword:odd order theorem" "logpath:mathcomp.ssreflect" ]
-authors: [ "Jeremy Avigad <>" "Andrea Asperti <>" "Stephane Le Roux <>" "Yves Bertot <>" "Laurence Rideau <>" "Enrico Tassi <>" "Ioana Pasca <>" "Georges Gonthier <>" "Sidi Ould Biha <>" "Cyril Cohen <>" "Francois Garillot <>" "Alexey Solovyev <>" "Russell O'Connor <>" "Laurent Théry <>" "Assia Mahboubi <>" ]
+tags: [
+  "keyword:small scale reflection"
+  "keyword:mathematical components"
+  "keyword:bigop"
+  "keyword:big operators"
+  "keyword:biomial coefficient"
+  "keyword:integer division theory"
+  "keyword:finite sets"
+  "keyword:functions with finite domain"
+  "keyword:finite graphs"
+  "keyword:quotient types"
+  "keyword:order theory"
+  "keyword:partial order"
+  "keyword:lattices"
+  "keyword:lists"
+  "keyword:ordering and sorting lists"
+  "keyword:prime numbers"
+  "keyword:tuples"
+  "keyword:bounded lists"
+  "logpath:mathcomp.ssreflect"
+]
+authors: [ "The Mathematical Components team" ]
 
 synopsis: "Small Scale Reflection"
 description: """
