@@ -1,9 +1,47 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-Last releases: [[1.18.0] - 2023-11-01](#1180---2023-11-01), [[1.17.0] - 2023-05-09](#1170---2023-05-09), [[1.16.0] - 2023-02-01](#1160---2023-02-01), [[1.15.0] - 2022-06-30](#1150---2022-06-30), and [[1.14.0] - 2022-01-19](#1140---2022-01-19).
+Last releases: [[1.19.0] - 2024-01-15](#1190---2024-01-15), [[1.18.0] - 2023-11-01](#1180---2023-11-01), [[1.17.0] - 2023-05-09](#1170---2023-05-09), [[1.16.0] - 2023-02-01](#1160---2023-02-01) and [[1.15.0] - 2022-06-30](#1150---2022-06-30).
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## [1.19.0] - 2024-01-15
+
+This release is compatible with Coq versions 8.15, 8.16, 8.17, 8.18, and 8.19.
+
+The contributors to this version are:
+Reynald Affeldt, Pierre Pomeret-Coquot, Pierre Roux, Kazuhiko Sakaguchi
+
+### Added
+
+- in `finset.v`
+  + lemmas `big_set1E`, `big_imset_idem`.
+
+- in `order.v`
+  + lemmas `bigmin_mkcondl`, `bigmin_mkcondr`, `bigmax_mkcondl`,
+    `bigmax_mkcondr`, `bigmin_le_id`, `bigmax_ge_id`, `bigmin_eq_id`,
+    `bigmax_eq_id`, `bigminUl`, `bigminUr`, `bigmaxUl`, `bigmaxUr`,
+    `bigminIl`, `bigminIr`, `bigmaxIl`, `bigmaxIr`, `bigminD`,
+    `bigmaxD`, `bigminU`, `bigmaxU`, `bigmin_set1`, `bigmax_set1`,
+    `bigmin_imset`, `bigmax_imset`.
+
+### Changed
+
+- Notations declared in the `fun_scope` are now declared in the
+  `function_scope`.
+
+- in `finset.v`
+  + generalized lemmas `big_set0` and `big_set` from semigroups
+    to arbitrary binary operators
+
+- in `ssrnum.v`
+  + generalize `ler_sqrt`
+  + generalize `ler_psqrt` to use `nneg` instead of `pos`
+
+### Deprecated
+
+- in `ssrfun.v`
+  + notation scope `fun_scope`, use `function_scope` instead
 
 ## [1.18.0] - 2023-11-01
 
