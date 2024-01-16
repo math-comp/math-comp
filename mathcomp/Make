@@ -107,3 +107,5 @@ ssreflect/tuple.v
 -arg -w -arg +deprecated-hint-rewrite-without-locality
 -arg -w -arg -elpi.add-const-for-axiom-or-sectionvar
 -arg -w -arg -opaque-let
+-arg -w -arg -argument-scope-delimiter
+-arg -w -arg -overwriting-delimiting-key

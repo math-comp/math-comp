@@ -1,6 +1,9 @@
 From mathcomp Require Import ssreflect.
 From Coq Require Export ssrfun.
 From mathcomp Require Export ssrnotations.
+#[export] Set Warnings "-overwriting-delimiting-key".
+(* because there is some Set Warnings "overwriting-delimiting-key".
+   somewhere in the above *)
 
 (*******************)
 (* v8.17 additions *)
@@ -112,6 +115,7 @@ Notation "@ 'sval'" := (@proj1_sig) (at level 10, only parsing) :
 (* not yet backported *)
 (**********************)
 
+#[export] Set Warnings "-hiding-delimiting-key".
 Delimit Scope function_scope with FUN.
 Close Scope fun_scope.
 
