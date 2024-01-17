@@ -104,8 +104,12 @@ coq-8.17:
 coq-8.18:
   extends: .opam-build-once
 
-# coq-8.19: # to uncomment when 8.19+rc1 available
-#   # to be replaced with .opam-build-once when 8.19.0 available
+coq-8.19:
+  # to be replaced with .opam-build-once when 8.19.0 available
+  extends: .opam-build
+
+# coq-8.20: # to uncomment when 8.20+rc1 available
+#   # to be replaced with .opam-build-once when 8.20.0 available
 #   extends: .opam-build
 
 coq-dev:
@@ -168,11 +172,17 @@ test-coq-8.18:
   variables:
     COQ_VERSION: "8.18"
 
-# test-coq-8.19: # to uncomment when 8.19+rc1 available
-#   # to be replaced with .test-once when 8.19.0 available
+test-coq-8.19:
+  # to be replaced with .test-once when 8.19.0 available
+  extends: .test
+  variables:
+    COQ_VERSION: "8.19"
+
+# test-coq-8.20: # to uncomment when 8.20+rc1 available
+#   # to be replaced with .test-once when 8.20.0 available
 #   extends: .test
 #   variables:
-#     COQ_VERSION: "8.19"
+#     COQ_VERSION: "8.20"
 
 test-coq-dev:
   extends: .test
