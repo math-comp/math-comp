@@ -1,9 +1,131 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-Last releases: [[2.1.0] - 2023-10-24](#210---2023-10-24), [[2.0.0] - 2023-05-10](#200---2023-05-10), [[1.17.0] - 2023-05-09](#1170---2023-05-09), [[1.16.0] - 2023-02-01](#1160---2023-02-01), [[1.15.0] - 2022-06-30](#1150---2022-06-30), and [[1.14.0] - 2022-01-19](#1140---2022-01-19).
+Last releases: [[2.2.0] - 2024-01-17](#220---2024-01-17), [[2.1.0] - 2023-10-24](#210---2023-10-24), [[2.0.0] - 2023-05-10](#200---2023-05-10), [[1.17.0] - 2023-05-09](#1170---2023-05-09), [[1.16.0] - 2023-02-01](#1160---2023-02-01) and [[1.15.0] - 2022-06-30](#1150---2022-06-30).
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## [2.2.0] - 2024-01-17
+
+This release is compatible with Coq versions 8.16, 8.17, 8.18 and 8.19.
+
+The contributors to this version are:
+
+Reynald Affeldt, Cyril Cohen, Pierre Pomeret-Coquot, Pierre Roux, Kazuhiko Sakaguchi, Julin Shaji, Laurent Théry
+
+### Added
+
+- in `finset.v`
+  + lemmas `big_set1E`, `big_imset_idem`.
+
+- in `order.v`
+  + lemmas `bigmin_mkcondl`, `bigmin_mkcondr`, `bigmax_mkcondl`,
+    `bigmax_mkcondr`, `bigmin_le_id`, `bigmax_ge_id`, `bigmin_eq_id`,
+    `bigmax_eq_id`, `bigminUl`, `bigminUr`, `bigmaxUl`, `bigmaxUr`,
+    `bigminIl`, `bigminIr`, `bigmaxIl`, `bigmaxIr`, `bigminD`,
+    `bigmaxD`, `bigminU`, `bigmaxU`, `bigmin_set1`, `bigmax_set1`,
+    `bigmin_imset`, `bigmax_imset`.
+
+- in `vector.v`
+  + lemma `dim_matrix`
+
+### Changed
+
+- Notations declared in the `fun_scope` are now declared in the
+  `function_scope`.
+
+- in `ssrfun.v`
+  + `%FUN` is changed from the delimiter of `fun_scope` to that of
+    `function_scope`
+  + `fun_scope` is closed
+
+- in `finset.v`
+  + generalized lemmas `big_set0` and `big_set` from semigroups
+    to arbitrary binary operators
+  + definitions `set_of` and `setTfor`
+    (phantom trick now useless with reverse coercions)
+
+- in `fingroup.v`
+  + definitions `group_of`, `group_setT`, `setT_group`
+    (phantom trick now useless with reverse coercions)
+
+- in `perm.v`
+  + definition `perm_of` (phantom trick now useless with reverse coercions)
+
+- in `generic_quotient.v`
+  + `pi_phant` -> `pi_subdef`
+  + `quot_type_subdef` -> `quot_type_of`
+
+- in `ssralg.v`
+  + definitions `char`, `null_fun_head`, `in_alg_head`
+    (phantom trick now useless with reverse coercions)
+
+- in `finalg.v`
+  + definitions `unit_of`
+    (phantom trick now useless with reverse coercions)
+
+- in `ssrnum.v`
+  + generalize `ler_sqrt`
+  + generalize `ler_psqrt` to use `nneg` instead of `pos`
+
+- in `matrix.v`
+  + definitions `GLtype`, `GLval`, `GLgroup` and `GLgroup_group`
+    (phantom trick now useless with reverse coercions)
+
+- in `alt.v`
+  + definitions `Sym`, `Sym_group`, `Alt`, `Alt_group`
+    (phantom trick now useless with reverse coercions)
+
+- in `vector.v`
+  + definitions `vector_axiom_def`, `space`, `vs2mx`, `pred_of_vspace`
+    (phantom trick now useless with reverse coercions)
+
+- in `fieldext.v`
+  + definition `baseField_type`
+    (phantom trick now useless with reverse coercions)
+
+- in `qpoly.v`
+  + definitions `polyn`
+    (phantom trick now useless with reverse coercions)
+
+### Renamed
+
+- in `ring_quotient.v`
+  + `Quotient.type` -> `Quotient.quot`
+
+- in `qpoly.v`
+  + `npoly_of` -> `npoly` (and removed phantom)
+  + `NPoly_of` -> `NPoly` (and removed phantom)
+  + `npoly` -> `mk_npoly`
+
+### Removed
+
+- in `eqtype.v`
+  + definition `sub_type_of` (phantom trick now useless with reverse coercions)
+
+- in `order.v`
+  + definition `SetSubsetOrder.type_of` (phantom trick now useless with reverse coercions)
+
+- in `ring_quotient.v`
+  + definition `Quotient.type_of` (phantom trick now useless with reverse coercions)
+
+- in `poly.v`
+  + definition `poly_of` (phantom trick now useless with reverse coercions)
+
+- in `fraction.v`
+  + definition `ratio_of` (phantom trick now useless with reverse coercions)
+  + definition `FracField.type_of` (phantom trick now useless with reverse coercions)
+
+- in `falgebra.v`
+  + definition `aspace_of` (phantom trick now useless with reverse coercions)
+
+### Deprecated
+
+- in `ssrfun.v`
+  + notation scope `fun_scope`, use `function_scope` instead
+
+- in `vector.v`
+  + notation `vector_axiom`, use `Vector.axiom` instead
 
 ## [2.1.0] - 2023-10-24
 
