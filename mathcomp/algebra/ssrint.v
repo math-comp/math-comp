@@ -516,6 +516,8 @@ Notation ltz_add1r := ltz1D.
 Notation ltz_addr1 := ltzD1.
 
 Bind Scope ring_scope with int.
+(* Uncomment the following line once we require Coq >= 8.17 *)
+(* #[add_top] Bind Scope int_scope with int. *)
 
 (* definition of intmul *)
 Definition intmul (R : zmodType) (x : R) (n : int) := nosimpl
@@ -523,6 +525,9 @@ Definition intmul (R : zmodType) (x : R) (n : int) := nosimpl
     | Posz n => (x *+ n)%R
     | Negz n => (x *- (n.+1))%R
   end.
+(* Remove the following line once we require Coq >= 8.17 (the above
+   "Bind Scope" commands will make it useless) *)
+Arguments intmul [R] x%R n%Z.
 
 Notation "*~%R" := (@intmul _) (at level 0, format " *~%R") : function_scope.
 Notation "x *~ n" := (intmul x n)

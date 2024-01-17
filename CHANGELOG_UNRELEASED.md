@@ -84,6 +84,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + definition `baseField_type`
     (phantom trick now useless with reverse coercions)
 
+- in `ssrint.v`
+  + scope of second argument of `intmul` changed from `ring_scope` to
+    `int_scope` so that `42%:~R` parses as `(Posz 42)%:~R` rather than
+    `42%:R%:~R`
+
 ### Renamed
 
 - in `ring_quotient.v`
