@@ -845,9 +845,9 @@ Section oAC.
 
 Variables (T : Type) (op : T -> T -> T).
 
-Definition AC_subdef of associative op & commutative op :=
+Definition oAC of associative op & commutative op :=
   fun x => oapp (fun y => Some (oapp (op^~ y) y x)) x.
-Definition oAC := nosimpl AC_subdef.
+Arguments oAC : simpl never.
 
 Hypothesis (opA : associative op) (opC : commutative op).
 
@@ -880,6 +880,7 @@ Lemma big_AC_mk_monoid [I : Type] r P (F : I -> T) :
 Proof. by apply: Some_inj; rewrite some_big_AC_mk_monoid. Qed.
 
 End oAC.
+Arguments oAC : simpl never.
 
 Section Extensionality.
 

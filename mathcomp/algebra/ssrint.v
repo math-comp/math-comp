@@ -123,11 +123,12 @@ Definition addz (m n : int) :=
     | Negz n', Posz m' => if n' < m' then Posz (m' - n'.+1) else Negz (n' - m')
   end.
 
-Definition oppz m := nosimpl
+Definition oppz m :=
   match m with
     | Posz n => if n is (n'.+1)%N then Negz n' else Posz 0
     | Negz n => Posz (n.+1)%N
   end.
+Arguments oppz : simpl never.
 
 Local Notation "-%Z" := (@oppz) : int_scope.
 Local Notation "- x" := (oppz x) : int_scope.
@@ -217,6 +218,7 @@ Proof. by case: n=> // n _ /=; rewrite subn1. Qed.
 Definition Mixin := GRing.isZmodule.Build int addzA addzC add0z addNz.
 
 End intZmod.
+Arguments oppz : simpl never.
 End intZmod.
 
 HB.instance Definition _ := intZmod.Mixin.
@@ -518,11 +520,12 @@ Notation ltz_addr1 := ltzD1.
 Bind Scope ring_scope with int.
 
 (* definition of intmul *)
-Definition intmul (R : zmodType) (x : R) (n : int) := nosimpl
+Definition intmul (R : zmodType) (x : R) (n : int) :=
   match n with
     | Posz n => (x *+ n)%R
     | Negz n => (x *- (n.+1))%R
   end.
+Arguments intmul : simpl never.
 
 Notation "*~%R" := (@intmul _) (at level 0, format " *~%R") : function_scope.
 Notation "x *~ n" := (intmul x n)
@@ -1020,11 +1023,12 @@ Notation ltr_nmulz2l := ltr_nMz2l.
 
 Arguments intr_inj {R} [x1 x2].
 
-Definition exprz (R : unitRingType) (x : R) (n : int) := nosimpl
+Definition exprz (R : unitRingType) (x : R) (n : int) :=
   match n with
     | Posz n => x ^+ n
     | Negz n => x ^- (n.+1)
   end.
+Arguments exprz : simpl never.
 
 Notation "x ^ n" := (exprz x n) : ring_scope.
 

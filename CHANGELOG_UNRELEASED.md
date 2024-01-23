@@ -16,13 +16,47 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Removed
 
+- in `div.v`
+  + definition `gcdn_rec`, use `gcdn` directly
+
+- in `binomial.v`
+  + definition `binomial_rec`, use `binomial` directly
+
+- in `bigop.v`
+  + definition `oAC_subdef`, use `oAC` directly
+
+- in `fingroup.v`
+  + definition `expgn_rec`, use `expgn` directly
+
+- in `polydiv.v`
+  + definition `gcdp_rec`, use `gcdp` directly
+
+- in `nilpotent.v`
+  + definition `lower_central_at_rec`, use `lower_central_at` directly
+  + definition `upper_central_at_rec`, use `upper_central_at` directly
+
+- in `commutator.v`
+  + definition `derived_at_rec`, use `derived_at` directly
+
 ### Deprecated
+
+- in `ssreflect.v`
+  + notation `nosimpl` since `Arguments def : simpl never`
+    does the job with Coq >= 8.18
 
 - in `ssrfun.v`
   + notation scope `fun_scope`, use `function_scope` instead
 
 - in `vector.v`
   + notation `vector_axiom`, use `Vector.axiom` instead
+
+- in `ssrnat.v`
+  + definition `addn_rec`, use `addn` directly
+  + definition `subn_rec`, use `subn` directly
+  + definition `muln_rec`, use `muln` directly
+  + definition `expn_rec`, use `expn` directly
+  + definition `fact_rec`, use `factorial` directly
+  + definition `double_rec`, use `double` directly
 
 ### Infrastructure
 

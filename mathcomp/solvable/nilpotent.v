@@ -35,22 +35,16 @@ Section SeriesDefs.
 
 Variables (n : nat) (gT : finGroupType) (A : {set gT}).
 
-Definition lower_central_at_rec := iter n (fun B => [~: B, A]) A.
+(* By convention, the lower central series starts at 1 while the upper series *)
+(* starts at 0 (sic).                                                         *)
+Definition lower_central_at := iter n.-1 (fun B => [~: B, A]) A.
 
-Definition upper_central_at_rec := iter n (fun B => coset B @*^-1 'Z(A / B)) 1.
+Definition upper_central_at := iter n (fun B => coset B @*^-1 'Z(A / B)) 1.
 
 End SeriesDefs.
 
-(* By convention, the lower central series starts at 1 while the upper series *)
-(* starts at 0 (sic).                                                         *)
-Definition lower_central_at n := lower_central_at_rec n.-1.
-
-(* Note: 'nosimpl' MUST be used outside of a section -- the end of section    *)
-(* "cooking" destroys it.                                                     *)
-Definition upper_central_at := nosimpl upper_central_at_rec.
-
 Arguments lower_central_at n%N {gT} A%g.
-Arguments upper_central_at n%N {gT} A%g.
+Arguments upper_central_at n%N {gT} A%g : simpl never.
 
 Notation "''L_' n ( G )" := (lower_central_at n G)
   (at level 8, n at level 2, format "''L_' n ( G )") : group_scope.
@@ -127,7 +121,7 @@ Lemma lcn1 A : 'L_1(A) = A. Proof. by []. Qed.
 Lemma lcnSn n A : 'L_n.+2(A) = [~: 'L_n.+1(A), A]. Proof. by []. Qed.
 Lemma lcnSnS n G : [~: 'L_n(G), G] \subset 'L_n.+1(G).
 Proof. by case: n => //; apply: der1_subG. Qed.
-Lemma lcnE n A : 'L_n.+1(A) = lower_central_at_rec n A.
+Lemma lcnE n A : 'L_n.+1(A) = iter n (fun B => [~: B, A]) A.
 Proof. by []. Qed.
 Lemma lcn2 A : 'L_2(A) = A^`(1). Proof. by []. Qed.
 
@@ -376,7 +370,7 @@ Proof. by []. Qed.
 Lemma ucnSn n A : 'Z_n.+1(A) = coset 'Z_n(A) @*^-1 'Z(A / 'Z_n(A)).
 Proof. by []. Qed.
 
-Lemma ucnE n A : 'Z_n(A) = upper_central_at_rec n A.
+Lemma ucnE n A : 'Z_n(A) = iter n (fun B => coset B @*^-1 'Z(A / B)) 1.
 Proof. by []. Qed.
 
 Lemma ucn_subS n G : 'Z_n(G) \subset 'Z_n.+1(G).

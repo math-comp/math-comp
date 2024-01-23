@@ -574,18 +574,17 @@ Qed.
 (*   A function that computes the gcd of 2 numbers                     *)
 (***********************************************************************)
 
-Fixpoint gcdn_rec m n :=
+Fixpoint gcdn m n :=
   let n' := n %% m in if n' is 0 then m else
-  if m - n'.-1 is m'.+1 then gcdn_rec (m' %% n') n' else n'.
-
-Definition gcdn := nosimpl gcdn_rec.
+  if m - n'.-1 is m'.+1 then gcdn (m' %% n') n' else n'.
+Arguments gcdn : simpl never.
 
 Lemma gcdnE m n : gcdn m n = if m == 0 then n else gcdn (n %% m) m.
 Proof.
-rewrite /gcdn; elim/ltn_ind: m n => -[|m] IHm [|n] //=.
+elim/ltn_ind: m n => -[|m] IHm [|n] //=; rewrite /gcdn -/gcdn.
 case def_p: (_ %% _) => // [p].
 have{def_p} lt_pm: p.+1 < m.+1 by rewrite -def_p ltn_pmod.
-rewrite {}IHm // subn_if_gt ltnW //=; congr gcdn_rec.
+rewrite {}IHm // subn_if_gt ltnW //=; congr gcdn.
 by rewrite -(subnK (ltnW lt_pm)) modnDr.
 Qed.
 

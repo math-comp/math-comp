@@ -1586,7 +1586,7 @@ rewrite (eqp_ltrans (eqp_scale _ _)) ?lc_expn_scalp_neq0 //.
 by rewrite (eqp_rtrans (eqp_scale _ _)) ?lc_expn_scalp_neq0.
 Qed.
 
-Definition gcdp_rec p q :=
+Definition gcdp p q :=
   let: (p1, q1) := if size p < size q then (q, p) else (p, q) in
   if p1 == 0 then q1 else
   let fix loop (n : nat) (pp qq : {poly R}) {struct n} :=
@@ -1594,19 +1594,18 @@ Definition gcdp_rec p q :=
       if rr == 0 then qq else
       if n is n1.+1 then loop n1 qq rr else rr in
   loop (size p1) p1 q1.
-
-Definition gcdp := nosimpl gcdp_rec.
+Arguments gcdp : simpl never.
 
 Lemma gcd0p : left_id 0 gcdp.
 Proof.
-move=> p; rewrite /gcdp /gcdp_rec size_poly0 size_poly_gt0 if_neg.
+move=> p; rewrite /gcdp size_poly0 size_poly_gt0 if_neg.
 case: ifP => /= [_ | nzp]; first by rewrite eqxx.
 by rewrite polySpred !(modp0, nzp) //; case: _.-1 => [|m]; rewrite mod0p eqxx.
 Qed.
 
 Lemma gcdp0 : right_id 0 gcdp.
 Proof.
-move=> p; have:= gcd0p p; rewrite /gcdp /gcdp_rec size_poly0 size_poly_gt0.
+move=> p; have:= gcd0p p; rewrite /gcdp size_poly0 size_poly_gt0.
 by case: eqVneq => //= ->; rewrite eqxx.
 Qed.
 
@@ -1632,7 +1631,7 @@ have Irec: forall k l p q, size q <= k -> size q <= l
   by rewrite -ltnS (leq_trans _ Sn) // ltn_modp.
 have [->|nzp] := eqVneq p 0; first by rewrite mod0p modp0 gcd0p gcdp0 if_same.
 have [->|nzq] := eqVneq q 0; first by rewrite mod0p modp0 gcd0p gcdp0 if_same.
-rewrite /gcdp /gcdp_rec !ltn_modp !(negPf nzp, negPf nzq) /=.
+rewrite /gcdp !ltn_modp !(negPf nzp, negPf nzq) /=.
 have [ltpq|leqp] := ltnP; rewrite !(negPf nzp, negPf nzq) /= polySpred //.
   have [->|nzqp] := eqVneq.
     by case: (size p) => [|[|s]]; rewrite /= modp0 (negPf nzp) // mod0p eqxx.
@@ -2420,6 +2419,7 @@ by rewrite -size_poly_eq1=> /irred_p /(_ dvd_dp); right.
 Qed.
 
 End IDomainPseudoDivision.
+Arguments gcdp : simpl never.
 
 #[global] Hint Resolve eqpxx divp0 divp1 mod0p modp0 modp1 : core.
 #[global] Hint Resolve dvdp_mull dvdp_mulr dvdpp dvdp0 : core.

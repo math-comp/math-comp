@@ -42,3 +42,6 @@ Class vm_compute_eq {T : Type} (x y : T) := vm_compute : x = y.
 #[global]
 Hint Extern 0 (@vm_compute_eq _ _ _) =>
        vm_compute; reflexivity : typeclass_instances.
+
+#[deprecated(since="mathcomp 2.4", note="Use `Arguments def : simpl never` instead (should work fine since Coq 8.18).")]
+Notation nosimpl t := (nosimpl t).
