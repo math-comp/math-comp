@@ -43,8 +43,10 @@ with builtins; with (import <nixpkgs> {}).lib;
       "interval"
       "mathcomp-abel"
       "mathcomp-algebra-tactics"
+      "mathcomp-analysis"
       "mathcomp-apery"
       "mathcomp-bigenough"
+      "mathcomp-classical"
       "mathcomp-finmap"
       "mathcomp-real-closed"
       "mathcomp-zify"
@@ -55,14 +57,8 @@ with builtins; with (import <nixpkgs> {}).lib;
       "deriving"
       "extructures"
     ];
-    hierarchy-builder = [
-      "mathcomp-classical"
-      "mathcomp-analysis"
-    ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
-    // listToAttrs (forEach hierarchy-builder (p:
-      { name = p; value.override.version = "hierarchy-builder"; }))
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
        };
