@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- in `finset_ind.v`
+  + inductive principles `card_rect`, `card_ind`, `card_rec`.
+  + inductive principles `card2_rect`, `card2_ind`, `card2_rec`.
+  + inductive principles `subset_rect`, `subset_ind`, `subset_rec`.
+  + inductive principles `subset2_rect`, `subset2_ind`, `subset2_rec`.
+
 ### Changed
 
 ### Renamed
