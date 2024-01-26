@@ -23,7 +23,7 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   ## select an entry to build in the following `bundles` set
   ## defaults to "default"
-  default-bundle = "coq-8.16";
+  default-bundle = "coq-8.18";
 
   ## write one `bundles.name` attribute set per
   ## alternative configuration, the can be used to
@@ -34,37 +34,29 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   bundles = let
     master = [
-      "mathcomp-bigenough"
-      "extructures"
       "coquelicot"
+      "interval"
     ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
-         graph-theory.job = false;
-         mathcomp-finmap.override.version = "cea9f088c9cddea1173bc2f7c4c7ebda35081b60";
-         mathcomp-classical.override.version = "master";
-         mathcomp-analysis.override.version = "master";
-         multinomials.job = false;
-         coqeal.job = false;
+         mathcomp-bigenough.job = false;
          reglang.job = false;
-         mathcomp-tarjan.job = false;
          deriving.job = false;
-         extructures.job = false;
        };
   in {
     "coq-master".push-branches = [ "mathcomp-1" "master" ];
     "coq-master".coqPackages = common-bundles // {
       coq.override.version = "master";
-      bignums.override.version = "master";
-      paramcoq.override.version = "master";
       coq-elpi.override.version = "coq-master";
       hierarchy-builder.override.version = "master";
+      interval.job = false;
     };
     "coq-8.19".push-branches = [ "mathcomp-1" "master" ];
     "coq-8.19".coqPackages = common-bundles // {
       coq.override.version = "8.19";
+      interval.job = false;
     };
     "coq-8.18".push-branches = [ "mathcomp-1" "master" ];
     "coq-8.18".coqPackages = common-bundles // {
@@ -77,9 +69,6 @@ with builtins; with (import <nixpkgs> {}).lib;
     "coq-8.16".push-branches = [ "mathcomp-1" "master" ];
     "coq-8.16".coqPackages = common-bundles // {
       coq.override.version = "8.16";
-    };
-    "coq-8.15".coqPackages = common-bundles // {
-      coq.override.version = "8.15";
     };
   };
 }
