@@ -24,14 +24,9 @@ Unset Printing Implicit Defensive.
 
 Import GroupScope.
 
-Definition derived_at_rec n (gT : finGroupType) (A : {set gT}) :=
+Definition derived_at n (gT : finGroupType) (A : {set gT}) :=
   iter n (fun B => [~: B, B]) A.
-
-(* Note: 'nosimpl' MUST be used outside of a section -- the end of section   *)
-(* "cooking" destroys it.                                                    *)
-Definition derived_at := nosimpl derived_at_rec.
-
-Arguments derived_at n%N {gT} A%g.
+Arguments derived_at n%N {gT} A%g : simpl never.
 Notation "G ^` ( n )" := (derived_at n G) : group_scope.
 
 Section DerivedBasics.

@@ -23,7 +23,7 @@ Require Export Ring.
 (*   basic arithmetic                                                         *)
 (*     m + n, m - n, m * n                                                    *)
 (*   Important: m - n denotes TRUNCATED subtraction: m - n = 0 if m <= n.     *)
-(*   The definitions use the nosimpl tag to prevent undesirable computation   *)
+(*   The definitions use simpl never to prevent undesirable computation       *)
 (*   during simplification, but remain compatible with the ones provided in   *)
 (*   the Coq.Init.Peano prelude.                                              *)
 (*     For computation, a module NatTrec rebinds all arithmetic notations     *)
@@ -117,7 +117,6 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Declare Scope coq_nat_scope.
-Declare Scope nat_rec_scope.
 
 (* Disable Coq prelude hints to improve proof script robustness. *)
 
@@ -143,7 +142,6 @@ Delimit Scope N_scope with num.
 Set Warnings "-hiding-delimiting-key".
 Delimit Scope nat_scope with N.
 Set Warnings "hiding-delimiting-key".
-Delimit Scope nat_rec_scope with Nrec.
 
 (* Postfix notation for the successor and predecessor functions.  *)
 (* SSreflect uses "pred" for the generic predicate type, and S as *)
@@ -203,13 +201,13 @@ Proof. exact: eq_irrelevance. Qed.
 
 (* Protected addition, with a more systematic set of lemmas.                *)
 
-Definition addn_rec := plus.
-Notation "m + n" := (addn_rec m n) : nat_rec_scope.
-
-Definition addn := nosimpl addn_rec.
+Definition addn := plus.
+Arguments addn : simpl never.
+#[deprecated(since="mathcomp 2.3", note="Use addn instead.")]
+Definition addn_rec := addn.
 Notation "m + n" := (addn m n) : nat_scope.
 
-Lemma addnE : addn = addn_rec. Proof. by []. Qed.
+Lemma addnE : addn = plus. Proof. by []. Qed.
 
 Lemma plusE : plus = addn. Proof. by []. Qed.
 
@@ -275,14 +273,13 @@ Lemma add4n m : 4 + m = m.+4. Proof. by []. Qed.
 (* Protected, structurally decreasing subtraction, and basic lemmas.  *)
 (* Further properties depend on ordering conditions.                  *)
 
-Definition subn_rec := minus.
-Arguments subn_rec : simpl nomatch.
-Notation "m - n" := (subn_rec m n) : nat_rec_scope.
-
-Definition subn := nosimpl subn_rec.
+Definition subn := minus.
+Arguments subn : simpl never.
+#[deprecated(since="mathcomp 2.3", note="Use subn instead.")]
+Definition subn_rec := subn.
 Notation "m - n" := (subn m n) : nat_scope.
 
-Lemma subnE : subn = subn_rec. Proof. by []. Qed.
+Lemma subnE : subn = minus. Proof. by []. Qed.
 Lemma minusE : minus = subn.   Proof. by []. Qed.
 
 Lemma sub0n : left_zero 0 subn.    Proof. by []. Qed.
@@ -1075,14 +1072,14 @@ Proof. by elim: n m => /= [|n IHn] m; rewrite ?subn0 // IHn subnS. Qed.
 
 (* Multiplication. *)
 
-Definition muln_rec := mult.
-Notation "m * n" := (muln_rec m n) : nat_rec_scope.
-
-Definition muln := nosimpl muln_rec.
+Definition muln := mult.
+Arguments muln : simpl never.
+#[deprecated(since="mathcomp 2.3", note="Use muln instead.")]
+Definition muln_rec := muln.
 Notation "m * n" := (muln m n) : nat_scope.
 
-Lemma multE : mult = muln.     Proof. by []. Qed.
-Lemma mulnE : muln = muln_rec. Proof. by []. Qed.
+Lemma multE : mult = muln. Proof. by []. Qed.
+Lemma mulnE : muln = mult. Proof. by []. Qed.
 
 Lemma mul0n : left_zero 0 muln.          Proof. by []. Qed.
 Lemma muln0 : right_zero 0 muln.         Proof. by elim. Qed.
@@ -1231,12 +1228,13 @@ Proof. by move=> x; elim: n => //= n <-; rewrite mulSn iterD. Qed.
 
 (* Exponentiation. *)
 
-Definition expn_rec m n := iterop n muln m 1.
-Notation "m ^ n" := (expn_rec m n) : nat_rec_scope.
-Definition expn := nosimpl expn_rec.
+Definition expn m n := iterop n muln m 1.
+Arguments expn : simpl never.
+#[deprecated(since="mathcomp 2.3", note="Use expn instead.")]
+Definition expn_rec := expn.
 Notation "m ^ n" := (expn m n) : nat_scope.
 
-Lemma expnE : expn = expn_rec. Proof. by []. Qed.
+Lemma expnE n m : expn m n = iterop n muln m 1. Proof. by []. Qed.
 
 Lemma expn0 m : m ^ 0 = 1. Proof. by []. Qed.
 Lemma expn1 m : m ^ 1 = m. Proof. by []. Qed.
@@ -1329,13 +1327,15 @@ Proof. elim: m => //= m ihm x; rewrite expnS iterM; exact/eq_iter. Qed.
 
 (* Factorial. *)
 
-Fixpoint fact_rec n := if n is n'.+1 then n * fact_rec n' else 1.
-
-Definition factorial := nosimpl fact_rec.
+Fixpoint factorial n := if n is n'.+1 then n * factorial n' else 1.
+Arguments factorial : simpl never.
+#[deprecated(since="mathcomp 2.3", note="Use factorial instead.")]
+Definition fact_rec := factorial.
 
 Notation "n `!" := (factorial n) (at level 2, format "n `!") : nat_scope.
 
-Lemma factE : factorial = fact_rec. Proof. by []. Qed.
+Lemma factE n : factorial n = if n is n'.+1 then n * factorial n' else 1.
+Proof. by case: n. Qed.
 
 Lemma fact0 : 0`! = 1. Proof. by []. Qed.
 
@@ -1403,13 +1403,14 @@ Proof. by elim: n => // n IHn; rewrite expnS oddM {}IHn orbC; case odd. Qed.
 
 (* Doubling. *)
 
-Fixpoint double_rec n := if n is n'.+1 then n'.*2%Nrec.+2 else 0
-where "n .*2" := (double_rec n) : nat_rec_scope.
-
-Definition double := nosimpl double_rec.
+Fixpoint double n := if n is n'.+1 then (double n').+2 else 0.
+Arguments double : simpl never.
+#[deprecated(since="mathcomp 2.3", note="Use double instead.")]
+Definition double_rec := double.
 Notation "n .*2" := (double n) : nat_scope.
 
-Lemma doubleE : double = double_rec. Proof. by []. Qed.
+Lemma doubleE n : double n = if n is n'.+1 then (double n').+2 else 0.
+Proof. by case: n. Qed.
 
 Lemma double0 : 0.*2 = 0. Proof. by []. Qed.
 

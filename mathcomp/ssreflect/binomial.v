@@ -121,7 +121,8 @@ Qed.
 
 Fixpoint ffact_rec n m := if m is m'.+1 then n * ffact_rec n.-1 m' else 1.
 
-Definition falling_factorial := nosimpl ffact_rec.
+Definition falling_factorial := ffact_rec.
+Arguments falling_factorial : simpl never.
 
 Notation "n ^_ m" := (falling_factorial n m)
   (at level 30, right associativity) : nat_scope.
@@ -170,20 +171,24 @@ Proof. by move/ffact_fact <-; rewrite mulnK ?fact_gt0. Qed.
 
 (** Binomial coefficients *)
 
-Fixpoint binomial_rec n m :=
+Fixpoint binomial n m :=
   match n, m with
-  | n'.+1, m'.+1 => binomial_rec n' m + binomial_rec n' m'
+  | n'.+1, m'.+1 => binomial n' m + binomial n' m'
   | _, 0 => 1
   | 0, _.+1 => 0
   end.
-Arguments binomial_rec : simpl nomatch.
-
-Definition binomial := nosimpl binomial_rec.
+Arguments binomial : simpl never.
 
 Notation "''C' ( n , m )" := (binomial n m)
   (at level 8, format "''C' ( n ,  m )") : nat_scope.
 
-Lemma binE : binomial = binomial_rec. Proof. by []. Qed.
+Lemma binE n m : binomial n m =
+  match n, m with
+  | n'.+1, m'.+1 => binomial n' m + binomial n' m'
+  | _, 0 => 1
+  | 0, _.+1 => 0
+  end.
+Proof. by case: n. Qed.
 
 Lemma bin0 n : 'C(n, 0) = 1. Proof. by case: n. Qed.
 

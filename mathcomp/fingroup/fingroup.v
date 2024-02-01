@@ -246,11 +246,10 @@ Notation rT := (BaseFinGroup.sort T).
 Definition oneg : rT := Eval unfold oneg_subdef in @oneg_subdef T.
 Definition mulg : T -> T -> rT := Eval unfold mulg_subdef in @mulg_subdef T.
 Definition invg : T -> rT := Eval unfold invg_subdef in @invg_subdef T.
-Definition expgn_rec (x : T) n : rT := iterop n mulg x oneg.
+Definition expgn (x : T) n : rT := iterop n mulg x oneg.
 
 End ElementOps.
-
-Definition expgn := nosimpl expgn_rec.
+Arguments expgn : simpl never.
 
 Notation "1" := (@oneg _) : group_scope.
 Notation "x1 * x2" := (mulg x1 x2) : group_scope.
@@ -378,7 +377,7 @@ Proof. by move=> x; apply: invg_inj; rewrite invMg invg1 mul1g. Qed.
 
 HB.instance Definition _ := Monoid.isLaw.Build T 1 mulgT mulgA mul1g mulg1.
 
-Lemma expgnE x n : x ^+ n = expgn_rec x n. Proof. by []. Qed.
+Lemma expgnE x n : x ^+ n = iterop n mulg x 1. Proof. by []. Qed.
 
 Lemma expg0 x : x ^+ 0 = 1. Proof. by []. Qed.
 Lemma expg1 x : x ^+ 1 = x. Proof. by []. Qed.
@@ -2097,7 +2096,7 @@ Lemma gen_prodgP A x :
 Proof.
 apply: (iffP idP) => [|[n [c Ac ->]]]; last first.
   by apply: group_prod => i _; rewrite mem_gen ?Ac.
-have [n ->] := gen_expgs A; rewrite /expgn /expgn_rec Monoid.iteropE /=.
+have [n ->] := gen_expgs A; rewrite /expgn Monoid.iteropE /=.
 rewrite -[n]card_ord -big_const => /prodsgP[/= c Ac def_x]. 
 have{Ac def_x} ->: x = \prod_(i | c i \in A) c i.
   rewrite big_mkcond {x}def_x; apply: eq_bigr => i _.

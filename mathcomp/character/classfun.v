@@ -445,6 +445,8 @@ Definition cfaithful phi := cfker phi \subset [1].
 
 Definition ortho_rec S1 S2 :=
   all [pred phi | all [pred psi | '[phi, psi] == 0] S2] S1.
+Definition orthogonal := ortho_rec.
+Arguments orthogonal : simpl never.
 
 Fixpoint pair_ortho_rec S :=
   if S is psi :: S' then ortho_rec psi S' && pair_ortho_rec S' else true.
@@ -461,9 +463,7 @@ Definition isometry_from_to mCFD tau mCFR :=
   /\ prop_in1 mCFD (inPhantom (forall phi, in_mem (tau phi) mCFR)).
 
 End Predicates.
-
-(* Outside section so the nosimpl does not get "cooked" out. *)
-Definition orthogonal gT D S1 S2 := nosimpl (@ortho_rec gT D S1 S2).
+Arguments orthogonal : simpl never.
 
 Arguments cfker {gT D%g} phi%CF.
 Arguments cfaithful {gT D%g} phi%CF.

@@ -187,7 +187,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 (*  needed as type inference considers E or C before s.                       *)
 (*   We are quite systematic in providing lemmas to rewrite any composition   *)
 (* of two operations. "rev", whose simplifications are not natural, is        *)
-(* protected with nosimpl.                                                    *)
+(* protected with simpl never.                                                *)
 (*  ** The following are equivalent:                                          *)
 (*  [<-> P0; P1; ..; Pn] <-> P0, P1, ..., Pn are all equivalent.              *)
 (*                       := P0 -> P1 -> ... -> Pn -> P0                       *)

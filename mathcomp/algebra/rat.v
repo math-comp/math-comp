@@ -50,8 +50,10 @@ HB.instance Definition _ := rat_isSub.
 #[hnf] HB.instance Definition _ := [Equality of rat by <:].
 HB.instance Definition _ := [Countable of rat by <:].
 
-Definition numq x := nosimpl ((valq x).1).
-Definition denq x := nosimpl ((valq x).2).
+Definition numq x := (valq x).1.
+Definition denq x := (valq x).2.
+Arguments numq : simpl never.
+Arguments denq : simpl never.
 
 Lemma denq_gt0 x : 0 < denq x.
 Proof. by rewrite /denq; case: x=> [[a b] /= /andP []]. Qed.

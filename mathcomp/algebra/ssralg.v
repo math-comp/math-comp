@@ -606,7 +606,8 @@ Local Notation "0" := (@zero _) : ring_scope.
 Local Notation "+%R" := (@add _) : function_scope.
 Local Notation "x + y" := (add x y) : ring_scope.
 
-Definition natmul V x n := nosimpl iterop _ n +%R x (@zero V).
+Definition natmul V x n := iterop n +%R x (@zero V).
+Arguments natmul : simpl never.
 
 Local Notation "x *+ n" := (natmul x n) : ring_scope.
 
@@ -930,7 +931,8 @@ Notation "[ 'semiRingType' 'of' T ]" := (SemiRing.clone T _)
 End SemiRingExports.
 HB.export SemiRingExports.
 
-Definition exp R x n := nosimpl iterop _ n (@mul R) x (@one R).
+Definition exp R x n := iterop n (@mul R) x (@one R).
+Arguments exp : simpl never.
 Definition comm R x y := @mul R x y = mul y x.
 Definition lreg R x := injective (@mul R x).
 Definition rreg R x := injective ((@mul R)^~ x).
@@ -6127,6 +6129,7 @@ Notation "- x" := (opp x) : ring_scope.
 Notation "+%R" := (@add _) : function_scope.
 Notation "x + y" := (add x y) : ring_scope.
 Notation "x - y" := (add x (- y)) : ring_scope.
+Arguments natmul : simpl never.
 Notation "x *+ n" := (natmul x n) : ring_scope.
 Notation "x *- n" := (opp (x *+ n)) : ring_scope.
 Notation "s `_ i" := (seq.nth 0%R s%R i) : ring_scope.
@@ -6141,6 +6144,7 @@ Notation "[ 'char' R ]" := (GRing.char R) : ring_scope.
 Notation Frobenius_aut chRp := (Frobenius_aut chRp).
 Notation "*%R" := (@mul _) : function_scope.
 Notation "x * y" := (mul x y) : ring_scope.
+Arguments exp : simpl never.
 Notation "x ^+ n" := (exp x n) : ring_scope.
 Notation "x ^-1" := (inv x) : ring_scope.
 Notation "x ^- n" := (inv (x ^+ n)) : ring_scope.
