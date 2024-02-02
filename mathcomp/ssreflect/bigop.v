@@ -2480,21 +2480,22 @@ Proof. by rewrite big_const_nat -Monoid.iteropE. Qed.
 End NatConst.
 
 Lemma telescope_sumn_in n m f : n <= m ->
-  {in [pred i | n <= i <= m], {homo f : x y / x <= y}} ->
+    (forall i, n <= i < m -> f i <= f i.+1) ->
   \sum_(n <= k < m) (f k.+1 - f k) = f m - f n.
 Proof.
 move=> nm fle; rewrite (telescope_big (fun i j => f j - f i)).
   by case: ltngtP nm => // ->; rewrite subnn.
-move=> k /andP[nk km] /=; rewrite addnBAC ?fle 1?ltnW// ?subnKC// ?fle// inE.
-- by rewrite (ltnW nk) ltnW.
-- by rewrite leqnn ltnW// (ltn_trans nk).
+move=> k /andP[nk km]; rewrite /= addnBAC ?subnKC ?fle ?(ltnW nk)//.
+elim: k nk km => [//| k IHk /[!ltnS]/[1!leq_eqVlt]+ km].
+  move=> /predU1P[/[dup]nk -> | nk]; first by rewrite fle ?nk ?leqnn 1?ltnW.
+by rewrite (leq_trans (IHk _ _) (fle _ _))// ltnW// ltnW.
 Qed.
 
 Lemma telescope_sumn n m f : {homo f : x y / x <= y} ->
   \sum_(n <= k < m) (f k.+1 - f k) = f m - f n.
 Proof.
 move=> fle; case: (ltnP n m) => nm.
-apply: (telescope_sumn_in (ltnW nm)) => ? ?; exact: fle.
+  by apply: (telescope_sumn_in (ltnW nm)) => ? ?; apply: fle.
 by apply/esym/eqP; rewrite big_geq// subn_eq0 fle.
 Qed.
 

@@ -19,6 +19,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- in `bigop.v`
+  + weaken hypothesis of lemma `telescope_sumn_in`
+
 - in `zmodp.v`
   + simpler statement of `Fp_Zcast`
 
