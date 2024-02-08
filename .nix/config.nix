@@ -23,7 +23,7 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   ## select an entry to build in the following `bundles` set
   ## defaults to "default"
-  default-bundle = "coq-8.18";
+  default-bundle = "hooks";
 
   ## write one `bundles.name` attribute set per
   ## alternative configuration, the can be used to
@@ -76,6 +76,19 @@ with builtins; with (import <nixpkgs> {}).lib;
       hierarchy-builder.override.version = "master";
       interval.job = false;
       coquelicot.job = false;
+    };
+    "hooks".push-branches = [ "master" "mathcomp-1" ];
+    "hooks".coqPackages = common-bundles // {
+      coq.override.version = "Tragicus:coercion";
+      coq-elpi.override.version = "Tragicus:cswb";
+      hierarchy-builder.override.version = "master";
+      interval.job = false;
+    };
+    "coq-8.19".push-branches = [ "master" "mathcomp-1" ];
+    "coq-8.19".coqPackages = common-bundles // {
+      coq.override.version = "8.19";
+      coq-elpi.override.version = "Tragicus:cswb";
+      interval.job = false;
     };
     "coq-8.18".push-branches = [ "master" "mathcomp-1" ];
     "coq-8.18".coqPackages = common-bundles // {
