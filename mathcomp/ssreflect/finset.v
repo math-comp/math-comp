@@ -249,6 +249,22 @@ Structure finPred (T : choiceType) := FinPred {
    pred_enumP : pred_set =i finpred
 }.
 
+Definition finPred_of_set (T : choiceType) (A : {set T}) :=
+  @FinPred _ A A (fun=> erefl).
+
+Program Definition finPred_comprehensionl (T : choiceType) (fP : finPred T)
+  (Q : {pred T}) := @FinPred _ [predI fP & Q] (set_comprehension fP Q) _.
+Next Obligation. by move=> x; rewrite set_comprehensionE inE pred_enumP. Qed.
+
+Program Definition finPred_comprehensionr (T : choiceType) (P : {pred T})
+  (fQ : finPred T) := @FinPred _ [predI P & fQ] (set_comprehension fQ P) _.
+Next Obligation.
+by move=> x; rewrite set_comprehensionE inE pred_enumP andbC.
+Qed.
+
+
+About FinPred.
+
 Class finPredClass (T : choiceType) (P : {pred T}) :=
   FinPredClass { proof : {A : {set T} | A =i P} }.
 
@@ -264,49 +280,60 @@ From mathcomp.ssreflect Extra Dependency "finset.elpi" as finset.
 Import elpi.
 From elpi Require Import cs.
 Elpi Accumulate cs.db lp:{{
-  pred find i:term, o:term, o:term.
-  find {{fun x => in_mem x (mem lp:A)}} A {{fun _ => eq_refl}}.
-     
+  pred find i:term, i:term, o:term.
+  find CT ({{fun x => in_mem x (mem (mem_set lp:A))}} as P)
+       {{@FinPred lp:CT lp:P lp:A (fun=> erefl)}}:- !.
 
-  % find {{fun x => lp:(P x) && lp:(Q x)}}  :-
-  %  .
-  find {{ fun x : lp:T => lp:(R x) }} S E :-
+  find CT {{fun x : lp:T => lp:(P x) && lp:(Q x)}}
+       {{@finPred_comprehensionl lp:T lp:FP (fun x : lp:T => lp:(Q x))}} :-
+    find CT {{fun x : lp:T => lp:(P x)}} FP, !.
+
+  find CT {{fun x : lp:T => lp:(P x) && lp:(Q x)}} 
+       {{@finPred_comprehensionr lp:T (fun x : lp:T => lp:(P x)) lp:FQ}} :-
+    find CT {{fun x : lp:T => lp:(Q x)}} FQ.
+
+  find CT {{ fun x : lp:T => lp:(R x) }} S :-
     (@pi-decl `x` T x\ redex (R x) (R' x)), !,
-    find {{ fun x : lp:T => lp:(R' x) }} S E.
+    find CT {{ fun x : lp:T => lp:(R' x) }} S.
 
-  redex X Y :- std.spy(
-    @redflags! coq.redflags.betaiotazeta => coq.reduction.lazy.whd X Y),
-    std.spy(not(same_term X Y)). % avoid loop
-  redex (match X P C as M) Y :-
+  pred redex i:term, o:term.
+  redex X Y :-
+    @redflags! coq.redflags.betaiotazeta => coq.reduction.lazy.whd X Y,
+    not (same_term X Y). % avoid loop
+  redex (match X P C) Y :-
   % TODO FIXME to use simpl instead.
     coq.safe-dest-app X (global (const HeadGR)) Tail,
     coq.env.const HeadGR (some Body) _,
-    std.spy(redex (match {coq.mk-app Body Tail} P C) Y).
+    redex (match {coq.mk-app Body Tail} P C) Y.
   % redex (match X P C as M) Y :-
   %   std.spy(coq.whd1 X Xred),
   %   std.spy(redex (match Xred P C) Y).
 
-  cs Ctx {{@finpred lp:CT}} RHS Sol_ :-
+  cs Ctx ({{@finpred lp:CT}}) RHS Sol :- !, std.do![
     coq.say "cs: Head is finpred",
     coq.say "Ctx is" Ctx,
     coq.say "RHS is" {coq.term->string RHS},
-    std.spy(find RHS So E),
-    coq.say "Sol is" {coq.term->string Sol}.
-}}.
+    find CT RHS FinSet,
+    coq.say "found" FinSet,
+    std.assert-ok! (coq.typecheck FinSet _) "solution is ill typed",
+    Sol = FinSet,
+    coq.say "Sol is" {coq.term->string Sol}
+  ].
+}}. 
+Set Warnings "+elpi".
 Elpi Typecheck canonical_solution.
 
 Elpi Override CS All.
 
 Fail Check (fun (T : choiceType) (P : {pred T}) => P : finPred T).
 
-
 Module Tests.
 
-
+Set Debug "elpi-unification".
 Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
   [pred x in A].
 Definition t1' (T : choiceType) (P : finPred T) : finPred T :=
-  [pred x in P] : {pred T}.
+  [pred x in P].
 Definition t2 (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
   [pred x | [in P] x && (Q x)].
 Definition t2' (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
