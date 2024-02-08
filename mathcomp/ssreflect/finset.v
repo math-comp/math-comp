@@ -244,19 +244,82 @@ Proof.
 Admitted.
 
 Structure finPred (T : choiceType) := FinPred {
-   finpred : {pred T};
-   pred_set : {set T};
+   finpred :> {pred T};
+   pred_set :> {set T};
    pred_enumP : pred_set =i finpred
 }.
+
+Class finPredClass (T : choiceType) (P : {pred T}) :=
+  FinPredClass { proof : {A : {set T} | A =i P} }.
+
 (* Structure finPred (T : choiceType) := PackFinPred { *)
 (*    finpred : {pred T}; *)
 (*    pred_eqset :> {A : {set T} | A =i finpred} *)
 (* }. *)
-Coercion finpred_coe := finpred.
-Coercion pred_set : finPred >-> set_type.
+(* Coercion finpred_coe := finpred. *)
+(* Coercion pred_set : finPred >-> set_type. *)
 
-Class finPred_aux (T : choiceType) (P : {pred T}) :=
-  OK { proof : {A : {set T} | A =i P} }.
+
+From mathcomp.ssreflect Extra Dependency "finset.elpi" as finset.
+Import elpi.
+From elpi Require Import cs.
+Elpi Accumulate cs.db lp:{{
+  pred find i:term, o:term, o:term.
+  find {{fun x => in_mem x (mem lp:A)}} A {{fun _ => eq_refl}}.
+     
+
+  % find {{fun x => lp:(P x) && lp:(Q x)}}  :-
+  %  .
+  find {{ fun x : lp:T => lp:(R x) }} S E :-
+    (@pi-decl `x` T x\ redex (R x) (R' x)), !,
+    find {{ fun x : lp:T => lp:(R' x) }} S E.
+
+  redex X Y :- std.spy(
+    @redflags! coq.redflags.betaiotazeta => coq.reduction.lazy.whd X Y),
+    std.spy(not(same_term X Y)). % avoid loop
+  redex (match X P C as M) Y :-
+  % TODO FIXME to use simpl instead.
+    coq.safe-dest-app X (global (const HeadGR)) Tail,
+    coq.env.const HeadGR (some Body) _,
+    std.spy(redex (match {coq.mk-app Body Tail} P C) Y).
+  % redex (match X P C as M) Y :-
+  %   std.spy(coq.whd1 X Xred),
+  %   std.spy(redex (match Xred P C) Y).
+
+  cs Ctx {{@finpred lp:CT}} RHS Sol_ :-
+    coq.say "cs: Head is finpred",
+    coq.say "Ctx is" Ctx,
+    coq.say "RHS is" {coq.term->string RHS},
+    std.spy(find RHS So E),
+    coq.say "Sol is" {coq.term->string Sol}.
+}}.
+Elpi Typecheck canonical_solution.
+
+Elpi Override CS All.
+
+Fail Check (fun (T : choiceType) (P : {pred T}) => P : finPred T).
+
+
+Module Tests.
+
+
+Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
+  [pred x in A].
+Definition t1' (T : choiceType) (P : finPred T) : finPred T :=
+  [pred x in P] : {pred T}.
+Definition t2 (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
+  [pred x | [in P] x && (Q x)].
+Definition t2' (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
+  [pred x | (x \in P) && (Q x)].
+Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
+   [pred x | (x \in A) && (Q x)].
+Definition t4 (T : choiceType) (P : finPred T) (Q : finPred T) : finPred T :=
+   [pred x | (x \in P) || (x \in Q)].
+Definition def (T : choiceType) (P Q : {pred T}) : pred T :=
+   [pred x : T | P x && Q x].
+Definition t6 (T : choiceType) (P : finPred T) Q : finPred T :=
+   [pred x : T | def P Q x ].
+End Tests.
 
 (* Canonical isFinPred T P {h : @finPred_aux T P} := *)
 (*    @PackFinPred T P (@proof _ _ h). *)

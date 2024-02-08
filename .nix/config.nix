@@ -82,6 +82,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq.override.version = "Tragicus:coercion";
       coq-elpi.override.version = "Tragicus:cswb";
       hierarchy-builder.override.version = "master";
+      # vscoq-language-server.override.version = "coq-8.19";
       interval.job = false;
     };
     "coq-8.19".push-branches = [ "master" "mathcomp-1" ];
