@@ -84,6 +84,8 @@ From mathcomp Require Import finset.
 (* * Interfaces                                                               *)
 (* We provide the following interfaces for types equipped with an order:      *)
 (*                                                                            *)
+(*            preorderType d == the type of preordered types                  *)
+(*                              The HB class is called Preorder.              *)
 (*              porderType d == the type of partially ordered types           *)
 (*                              The HB class is called POrder.                *)
 (*             bPOrderType d == porderType with a bottom element (\bot)       *)
@@ -266,7 +268,8 @@ From mathcomp Require Import finset.
 (*                                                                            *)
 (* Morphisms between the above structures:                                    *)
 (*                                                                            *)
-(* OrderMorphism.type d T d' T' == nondecreasing function between two porder  *)
+(* OrderMorphism.type d T d' T' == nondecreasing function between the two     *)
+(*                                 preorder                                   *)
 (*                              := {omorphism T -> T'}                        *)
 (* MeetLatticeMorphism.type d T d' T',                                        *)
 (* JoinLatticeMorphism.type d T d' T',                                        *)
@@ -315,7 +318,7 @@ From mathcomp Require Import finset.
 (* Here is the exhaustive list of all such operations together with their     *)
 (* default notation (defined in order_scope unless specified otherwise).      *)
 (*                                                                            *)
-(* For T of type porderType d, x and y of type T, and C of type bool:         *)
+(* For T of type preorderType d, x and y of type T, and C of type bool:       *)
 (*          x <= y :=  @Order.le d T x y                                      *)
 (*                 <-> x is less than or equal to y.                          *)
 (*           x < y :=  @Order.lt d T x y                                      *)
@@ -400,7 +403,7 @@ From mathcomp Require Import finset.
 (*                 == the complement of x in [\bot, \top],                    *)
 (*                    i.e., rcompl \bot \top x                                *)
 (*                                                                            *)
-(* For porderType we provide the following operations:                        *)
+(* For preorderType we provide the following operations:                        *)
 (*   [arg min_(i < i0 | P) M] == a value i : T minimizing M : R, subject to   *)
 (*                      the condition P (i may appear in P and M), and        *)
 (*                      provided P holds for i0.                              *)
@@ -491,6 +494,9 @@ From mathcomp Require Import finset.
 (*        {subset T} := {subset[subset_display] T}                            *)
 (*                                                                            *)
 (* The following notations are provided to build substructures:               *)
+(* [SubChoice_isSubPreorder of U by <: with disp] ==                          *)
+(* [SubChoice_isSubPreorder of U by <:] == preorderType mixin for a subType   *)
+(*                          whose base type is a preorderType                 *)
 (* [SubChoice_isSubPOrder of U by <: with disp] ==                            *)
 (* [SubChoice_isSubPOrder of U by <:] == porderType mixin for a subType       *)
 (*                          whose base type is a porderType                   *)
@@ -1339,51 +1345,43 @@ Module Order.
 #[projections(primitive)] Record disp_t := Disp {d1 : unit; d2 : unit}.
 
 #[key="T", primitive]
-HB.mixin Record isDuallyPOrder (d : disp_t) T of Equality T := {
+HB.mixin Record isDuallyPreorder (d : disp_t) T of Equality T := {
   le       : rel T;
   lt       : rel T;
-  lt_def   : forall x y, lt x y = (y != x) && (le x y);
-  gt_def   : forall x y, lt y x = (y != x) && (le y x);
+  lt_def   : forall x y, lt x y = (le x y) && ~~ (le y x);
+  gt_def   : forall x y, lt y x = (le y x) && ~~ (le x y);
   le_refl  : reflexive     le;
   ge_refl  : reflexive     (fun x y => le y x);
-  le_anti  : antisymmetric le;
-  ge_anti  : antisymmetric (fun x y => le y x);
   le_trans : transitive    le;
   ge_trans : transitive    (fun x y => le y x);
 }.
 
-#[short(type="porderType")]
-HB.structure Definition POrder (d : disp_t) :=
-  { T of Choice T & isDuallyPOrder d T }.
+#[short(type="preorderType")]
+HB.structure Definition Preorder (d : disp_t) :=
+  { T of Choice T & isDuallyPreorder d T }.
 
 #[key="T", primitive]
-HB.mixin Record hasBottom d T of POrder d T := {
+HB.mixin Record hasBottom d T of Preorder d T := {
   bottom : T;
   le0x : forall x, le bottom x;
 }.
 
 #[key="T", primitive]
-HB.mixin Record hasTop d T of POrder d T := {
+HB.mixin Record hasTop d T of Preorder d T := {
   top : T;
   lex1 : forall x, le x top;
 }.
 
-#[short(type="bPOrderType")]
-HB.structure Definition BPOrder d := { T of hasBottom d T & POrder d T }.
-#[short(type="tPOrderType")]
-HB.structure Definition TPOrder d := { T of hasTop d T & POrder d T }.
-#[short(type="tbPOrderType")]
-HB.structure Definition TBPOrder d := { T of hasTop d T & BPOrder d T }.
+#[short(type="bPreorderType")]
+HB.structure Definition BPreorder d := { T of hasBottom d T & Preorder d T }.
+#[short(type="tPreorderType")]
+HB.structure Definition TPreorder d := { T of hasTop d T & Preorder d T }.
+#[short(type="tbPreorderType")]
+HB.structure Definition TBPreorder d := { T of hasTop d T & BPreorder d T }.
 
-Module POrderExports.
-Arguments le_trans {d s} [_ _ _].
-End POrderExports.
-HB.export POrderExports.
-(* Bind Scope order_scope with POrder.sort. *)
+Section PreorderDef.
 
-Section POrderDef.
-
-Variable (disp : disp_t) (T : porderType disp).
+Variable (disp : disp_t) (T : preorderType disp).
 
 Local Notation "x <= y" := (le x y) : order_scope.
 Local Notation "x < y" := (lt x y) : order_scope.
@@ -1439,17 +1437,17 @@ Definition arg_min {I : finType} := @extremum T I le.
 Definition arg_max {I : finType} := @extremum T I ge.
 
 (* Lifted min/max operations. *)
-Section LiftedPOrder.
+Section LiftedPreorder.
 Variable T' : Type.
 Implicit Type f : T' -> T.
 Definition min_fun f g x := min (f x) (g x).
 Definition max_fun f g x := max (f x) (g x).
-End LiftedPOrder.
+End LiftedPreorder.
 
-Definition nondecreasing disp' (T' : porderType disp') (f : T -> T') : Prop :=
+Definition nondecreasing disp' (T' : preorderType disp') (f : T -> T') : Prop :=
   {homo f : x y / x <= y}.
 
-End POrderDef.
+End PreorderDef.
 
 Prenex Implicits lt le leif lteif.
 Arguments ge {_ _}.
@@ -1567,8 +1565,68 @@ Coercion le_of_leif : leif >-> is_true.
 End POCoercions.
 HB.export POCoercions.
 
+HB.mixin Record Preorder_isDuallyPOrder (d : disp_t) T of Preorder d T := {
+  le_anti  : antisymmetric (@le d T);
+  ge_anti  : antisymmetric (fun x y => @le d T y x);
+}.
+
+#[short(type="porderType")]
+HB.structure Definition POrder (d : disp_t) :=
+  { T of Preorder d T & Preorder_isDuallyPOrder d T }.
+
+#[short(type="bPOrderType")]
+HB.structure Definition BPOrder d := { T of hasBottom d T & POrder d T }.
+#[short(type="tPOrderType")]
+HB.structure Definition TPOrder d := { T of hasTop d T & POrder d T }.
+#[short(type="tbPOrderType")]
+HB.structure Definition TBPOrder d := { T of hasTop d T & BPOrder d T }.
+
+Module POrderExports.
+Arguments le_trans {d s} [_ _ _].
+#[deprecated(since="mathcomp 2.0.0", note="Use POrder.clone instead.")]
+Notation "[ 'porderType' 'of' T 'for' cT ]" := (POrder.clone _ T%type cT)
+  (at level 0, format "[ 'porderType'  'of'  T  'for'  cT ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use POrder.clone instead.")]
+Notation "[ 'porderType' 'of' T 'for' cT 'with' disp ]" :=
+  (POrder.clone disp T%type cT)
+  (at level 0, format "[ 'porderType'  'of'  T  'for'  cT  'with'  disp ]") :
+  form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use POrder.clone instead.")]
+Notation "[ 'porderType' 'of' T ]" := (POrder.clone _ T%type _)
+  (at level 0, format "[ 'porderType'  'of'  T ]") : form_scope.
+#[deprecated(since="mathcomp 2.0.0", note="Use POrder.clone instead.")]
+Notation "[ 'porderType' 'of' T 'with' disp ]" := (POrder.clone disp T%type _)
+  (at level 0, format "[ 'porderType'  'of'  T  'with' disp ]") : form_scope.
+End POrderExports.
+HB.export POrderExports.
+
+(* Bind Scope order_scope with POrder.sort. *)
+
+
+(* HB.mixin Record POrder_isJoinSemiLattice *)
+(*     d (T : indexed Type) of POrder d T := { *)
+(*   join : T -> T -> T; *)
+(*   joinC : commutative join; *)
+(*   joinA : associative join; *)
+(*   le_defU : forall x y, (x <= y) = (join x y == y); *)
+(* }. *)
+(* #[short(type="joinSemiLatticeType")] *)
+(* HB.structure Definition JoinSemiLattice d := *)
+(*   { T of POrder_isJoinSemiLattice d T & POrder d T }. *)
+
+(* HB.mixin Record POrder_isMeetSemiLattice *)
+(*     d (T : indexed Type) of POrder d T := { *)
+(*   meet : T -> T -> T; *)
+(*   meetC : commutative meet; *)
+(*   meetA : associative meet; *)
+(*   le_def : forall x y, (x <= y) = (meet x y == x); *)
+(* }. *)
+(* #[short(type="meetSemiLatticeType")] *)
+(* HB.structure Definition MeetSemiLattice d := *)
+(*   { T of POrder_isMeetSemiLattice d T & POrder d T }. *)
+
 #[key="T", primitive]
-HB.mixin Record POrder_isMeetSemilattice d T of POrder d T := {
+HB.mixin Record POrder_isMeetSemilattice d (T : Type) of POrder d T := {
   meet : T -> T -> T;
   lexI : forall x y z, (x <= meet y z) = (x <= y) && (x <= z);
 }.
@@ -1832,6 +1890,18 @@ End CTBDistrLatticeSyntax.
 (* FINITE *)
 (**********)
 
+#[short(type="finPreorderType")]
+HB.structure Definition FinPreorder d := { T of Finite T & Preorder d T }.
+
+#[short(type="finBPreorderType")]
+HB.structure Definition FinBPreorder d := { T of FinPreorder d T & hasBottom d T }.
+
+#[short(type="finTPreorderType")]
+HB.structure Definition FinTPreorder d := { T of FinPreorder d T & hasTop d T }.
+
+#[short(type="finTBPreorderType")]
+HB.structure Definition FinTBPreorder d := { T of FinBPreorder d T & hasTop d T }.
+
 #[short(type="finPOrderType")]
 HB.structure Definition FinPOrder d := { T of Finite T & POrder d T }.
 
@@ -2042,27 +2112,30 @@ HB.instance Definition _ (T : choiceType) := Choice.on T^d.
 HB.instance Definition _ (T : countType) := Countable.on T^d.
 HB.instance Definition _ (T : finType) := Finite.on T^d.
 
+HB.instance Definition _ (d : disp_t) (T : preorderType d) :=
+  isDuallyPreorder.Build (dual_display d) T^d
+    gt_def lt_def ge_refl le_refl ge_trans le_trans.
 HB.instance Definition _ (d : disp_t) (T : porderType d) :=
-  isDuallyPOrder.Build (dual_display d) T^d
-    gt_def lt_def ge_refl le_refl ge_anti le_anti ge_trans le_trans.
+  Preorder_isDuallyPOrder.Build (dual_display d) T^d
+    ge_anti le_anti.
 
-Lemma leEdual (d : disp_t) (T : porderType d) (x y : T) :
+Lemma leEdual (d : disp_t) (T : preorderType d) (x y : T) :
   (x <=^d y :> T^d) = (y <= x).
 Proof. by []. Qed.
-Lemma ltEdual (d : disp_t) (T : porderType d) (x y : T) :
+Lemma ltEdual (d : disp_t) (T : preorderType d) (x y : T) :
   (x <^d y :> T^d) = (y < x).
 Proof. by []. Qed.
 
-HB.instance Definition _ d (T : tPOrderType d) :=
+HB.instance Definition _ d (T : tPreorderType d) :=
   hasBottom.Build (dual_display d) T^d lex1.
 
-Lemma botEdual d (T : tPOrderType d) : (dual_bottom : T^d) = \top :> T.
+Lemma botEdual d (T : tPreorderType d) : (dual_bottom : T^d) = \top :> T.
 Proof. by []. Qed.
 
-HB.instance Definition _ d (T : bPOrderType d) :=
+HB.instance Definition _ d (T : bPreorderType d) :=
   hasTop.Build (dual_display d) T^d le0x.
 
-Lemma topEdual d (T : bPOrderType d) : (dual_top : T^d) = \bot :> T.
+Lemma topEdual d (T : bPreorderType d) : (dual_top : T^d) = \bot :> T.
 Proof. by []. Qed.
 
 HB.instance Definition _ d (T : joinSemilatticeType d) :=
@@ -2110,12 +2183,14 @@ HB.export DualOrder.
 (* THEORY *)
 (**********)
 
-Module Import POrderTheory.
-Section POrderTheory.
-Context {disp : disp_t} {T : porderType disp}.
+Module Import PreorderTheory.
+Section PreorderTheory.
+
+Context {disp : disp_t} {T : preorderType disp}.
+
 Implicit Types (x y : T) (s : seq T).
 
-Definition nondecreasing disp' (T' : porderType disp') (f : T -> T') : Prop :=
+Definition nondecreasing disp' (T' : preorderType disp') (f : T -> T') : Prop :=
   {homo f : x y / x <= y}.
 
 Lemma geE x y : ge x y = (y <= x). Proof. by []. Qed.
@@ -2129,12 +2204,6 @@ Definition le_refl : reflexive le := lexx.
 Definition ge_refl : reflexive ge := lexx.
 Hint Resolve le_refl : core.
 
-Lemma le_anti: antisymmetric (<=%O : rel T).
-Proof. exact: le_anti. Qed.
-
-Lemma ge_anti: antisymmetric (>=%O : rel T).
-Proof. exact: ge_anti. Qed.
-
 Lemma le_trans: transitive (<=%O : rel T).
 Proof. exact: le_trans. Qed.
 
@@ -2144,46 +2213,42 @@ Proof. by move=> ? ? ? ? /le_trans; apply. Qed.
 Lemma le_le_trans x y z t : z <= x -> y <= t -> x <= y -> z <= t.
 Proof. by move=> + /(le_trans _)/[apply]; apply: le_trans. Qed.
 
-Lemma lt_def x y: (x < y) = (y != x) && (x <= y).
+Lemma lt_le_def x y: (x < y) = (x <= y) && ~~ (y <= x).
 Proof. exact: lt_def. Qed.
 
-Lemma lt_neqAle x y: (x < y) = (x != y) && (x <= y).
-Proof. by rewrite lt_def eq_sym. Qed.
-
 Lemma ltxx x: x < x = false.
-Proof. by rewrite lt_def eqxx. Qed.
+Proof. by rewrite lt_le_def andbN. Qed.
 
 Definition lt_irreflexive : irreflexive lt := ltxx.
 Hint Resolve lt_irreflexive : core.
 
 Definition ltexx := (lexx, ltxx).
 
-Lemma le_eqVlt x y: (x <= y) = (x == y) || (x < y).
-Proof. by rewrite lt_neqAle; case: eqP => //= ->; rewrite lexx. Qed.
-
 Lemma lt_eqF x y: x < y -> x == y = false.
-Proof. by rewrite lt_neqAle => /andP [/negbTE->]. Qed.
+Proof. by apply: contraTF => /eqP ->; rewrite ltxx. Qed.
 
 Lemma gt_eqF x y : y < x -> x == y = false.
-Proof. by rewrite lt_def; case: eqP. Qed.
-
-Lemma eq_le x y: (x == y) = (x <= y <= x).
-Proof. by apply/eqP/idP => [->|/le_anti]; rewrite ?lexx. Qed.
+Proof. by move=> /lt_eqF; rewrite eq_sym. Qed.
 
 Lemma ltW x y: x < y -> x <= y.
-Proof. by rewrite le_eqVlt orbC => ->. Qed.
+Proof. by rewrite lt_le_def => /andP[]. Qed.
 
 Lemma lt_le_trans y x z: x < y -> y <= z -> x < z.
 Proof.
-rewrite !lt_neqAle => /andP [nexy lexy leyz]; rewrite (le_trans lexy) // andbT.
-by apply: contraNneq nexy => eqxz; rewrite eqxz eq_le leyz andbT in lexy *.
+rewrite !lt_le_def => /andP[] xy /negP yx yz.
+apply/andP; split; first exact/(le_trans xy).
+by apply/negP => /(le_trans yz).
 Qed.
 
 Lemma lt_trans: transitive (<%O : rel T).
 Proof. by move=> y x z le1 /ltW le2; apply/(@lt_le_trans y). Qed.
 
 Lemma le_lt_trans y x z: x <= y -> y < z -> x < z.
-Proof. by rewrite le_eqVlt => /orP [/eqP ->|/lt_trans t /t]. Qed.
+Proof.
+rewrite !lt_le_def => xy /andP[] yz /negP zy.
+apply/andP; split; first exact/(le_trans xy).
+by apply/negP => /(fun zx => le_trans zx xy).
+Qed.
 
 Lemma lt_nsym x y : x < y -> y < x -> False.
 Proof. by move=> xy /(lt_trans xy); rewrite ltxx. Qed.
@@ -2202,18 +2267,13 @@ Proof. by apply: contraTF => /le_gtF ->. Qed.
 Definition lt_gtF x y hxy := le_gtF (@ltW x y hxy).
 
 Lemma lt_leAnge x y : (x < y) = (x <= y) && ~~ (y <= x).
-Proof.
-apply/idP/idP => [ltxy|/andP[lexy Nleyx]]; first by rewrite ltW // lt_geF.
-by rewrite lt_neqAle lexy andbT; apply: contraNneq Nleyx => ->.
-Qed.
+Proof. exact: lt_le_def. Qed.
 
 Lemma lt_le_asym x y : x < y <= x = false.
-Proof. by rewrite lt_neqAle -andbA -eq_le eq_sym andNb. Qed.
+Proof. by apply/negP; move=> /andP[] xy /(lt_le_trans xy); rewrite ltxx. Qed.
 
 Lemma le_lt_asym x y : x <= y < x = false.
 Proof. by rewrite andbC lt_le_asym. Qed.
-
-Definition lte_anti := (=^~ eq_le, lt_asym, lt_le_asym, le_lt_asym).
 
 Lemma le_path_min x s : path <=%O x s -> all (>= x) s.
 Proof. exact/order_path_min/le_trans. Qed.
@@ -2239,10 +2299,11 @@ Proof. exact/path_pairwise/le_trans. Qed.
 Lemma lt_path_pairwise x s : path <%O x s = pairwise <%O (x :: s).
 Proof. exact/path_pairwise/lt_trans. Qed.
 
-Lemma lt_sorted_uniq_le s : sorted <%O s = uniq s && sorted <=%O s.
+Lemma lt_sorted_is_uniq_le s : sorted <%O s -> uniq s && sorted <=%O s.
 Proof.
 rewrite le_sorted_pairwise lt_sorted_pairwise uniq_pairwise -pairwise_relI.
-by apply/eq_pairwise => ? ?; rewrite lt_neqAle.
+apply/sub_pairwise => x y/= /[dup] + /ltW ->.
+by case: eqVneq => // ->; rewrite ltxx.
 Qed.
 
 Lemma le_sorted_mask m s : sorted <=%O s -> sorted <=%O (mask m s).
@@ -2283,18 +2344,19 @@ Lemma lt_sorted_leq_nth (x0 : T) (s : seq T) : sorted <%O s ->
   {in [pred n | (n < size s)%N] &,
     {mono nth x0 s : i j / (i <= j)%N >-> i <= j}}.
 Proof.
-rewrite lt_sorted_uniq_le => /andP[s_uniq le_s].
-apply: (total_homo_mono_in _ _ ltn_neqAle lt_neqAle le_anti leq_total) => //.
-move=> i j ilt jlt ltij; rewrite lt_neqAle le_sorted_leq_nth// 1?ltnW//.
-by rewrite nth_uniq// ltn_eqF.
+move=> /[dup] lt_s /lt_sorted_is_uniq_le /andP[s_uniq le_s] i j ilt jlt.
+case/boolP: (i <= j)%N; first exact/le_sorted_leq_nth.
+rewrite -ltnNge => /(sorted_ltn_nth lt_trans x0 lt_s j i jlt ilt).
+by rewrite lt_le_def => /andP[_] /negPf.
 Qed.
 
 Lemma lt_sorted_ltn_nth (x0 : T) (s : seq T) : sorted <%O s ->
   {in [pred n | (n < size s)%N] &,
     {mono nth x0 s : i j / (i < j)%N >-> i < j}}.
 Proof.
-move=> ss; have := lt_sorted_leq_nth x0 ss.
-exact: (anti_mono_in _ ltn_neqAle lt_neqAle anti_leq).
+move=> ss i j ilt jlt.
+rewrite lt_le_def (lt_sorted_leq_nth x0 ss)// (lt_sorted_leq_nth x0 ss)//.
+by rewrite -ltnNge andbC ltn_neqAle -andbA andbb.
 Qed.
 
 Lemma subseq_le_path x s1 s2 : subseq s1 s2 -> path <=%O x s2 -> path <=%O x s1.
@@ -2315,10 +2377,6 @@ Proof. exact/sorted_uniq/ltxx/lt_trans. Qed.
 Lemma lt_sorted_eq s1 s2 :
   sorted <%O s1 -> sorted <%O s2 -> s1 =i s2 -> s1 = s2.
 Proof. exact/irr_sorted_eq/ltxx/lt_trans. Qed.
-
-Lemma le_sorted_eq s1 s2 :
-  sorted <=%O s1 -> sorted <=%O s2 -> perm_eq s1 s2 -> s1 = s2.
-Proof. exact/sorted_eq/le_anti/le_trans. Qed.
 
 Lemma filter_lt_nth x0 s i : sorted <%O s -> (i < size s)%N ->
   [seq x <- s | x < nth x0 s i] = take i s.
@@ -2348,16 +2406,6 @@ Lemma count_le_nth x0 s i : sorted <%O s -> (i < size s)%N ->
   count (<= nth x0 s i) s = i.+1.
 Proof.
 by move=> ss i_lt; rewrite -size_filter/= filter_le_nth// size_takel.
-Qed.
-
-Lemma count_lt_le_mem x s : (count (< x) s < count (<= x) s)%N = (x \in s).
-Proof.
-have := count_predUI (pred1 x) (< x) s.
-have -> : count (predI (pred1 x) (< x)) s = 0%N.
-  rewrite (@eq_count _ _ pred0) ?count_pred0 // => y /=.
-  by rewrite lt_def; case: eqP => //= ->; rewrite eqxx.
-have /eq_count-> : [predU1 x & < x] =1 (<= x) by move=> y /=; rewrite le_eqVlt.
-by rewrite addn0 => ->; rewrite -add1n leq_add2r -has_count has_pred1.
 Qed.
 
 Lemma sorted_filter_lt x s :
@@ -2400,14 +2448,580 @@ Proof. exact/sorted_sort/lt_trans. Qed.
 
 Lemma comparable_leNgt x y : x >=< y -> (x <= y) = ~~ (y < x).
 Proof.
-move=> c_xy; apply/idP/idP => [/le_gtF/negP/negP//|]; rewrite lt_neqAle.
-by move: c_xy => /orP [] -> //; rewrite andbT negbK => /eqP ->.
+rewrite /comparable lt_le_def.
+by case: (x <= y) => //=; case: (y <= x).
 Qed.
 
 Lemma comparable_ltNge x y : x >=< y -> (x < y) = ~~ (y <= x).
 Proof.
-move=> c_xy; apply/idP/idP => [/lt_geF/negP/negP//|].
-by rewrite lt_neqAle eq_le; move: c_xy => /orP [] -> //; rewrite andbT.
+rewrite /comparable lt_le_def.
+by case: (x <= y) => //=; case: (y <= x).
+Qed.
+
+Lemma comparable_sym x y : (y >=< x) = (x >=< y).
+Proof. by rewrite /comparable orbC. Qed.
+
+Lemma comparablexx x : x >=< x.
+Proof. by rewrite /comparable lexx. Qed.
+
+Lemma incomparable_eqF x y : (x >< y) -> (x == y) = false.
+Proof. by apply: contraNF => /eqP ->; rewrite comparablexx. Qed.
+
+Lemma incomparable_leF x y : (x >< y) -> (x <= y) = false.
+Proof. by apply: contraNF; rewrite /comparable => ->. Qed.
+
+Lemma incomparable_ltF x y : (x >< y) -> (x < y) = false.
+Proof. by rewrite lt_le_def => /incomparable_leF ->. Qed.
+
+Lemma le_comparable (x y : T) : x <= y -> x >=< y.
+Proof. by rewrite /comparable => ->. Qed.
+
+Lemma lt_comparable (x y : T) : x < y -> x >=< y.
+Proof. by rewrite /comparable => /ltW ->. Qed.
+
+Lemma ge_comparable (x y : T) : y <= x -> x >=< y.
+Proof. by rewrite /comparable orbC => ->. Qed.
+
+Lemma gt_comparable (x y : T) : y < x -> x >=< y.
+Proof. by rewrite /comparable orbC => /ltW ->. Qed.
+
+(* leif *)
+
+Lemma leif_refl x C : reflect (x <= x ?= iff C) C.
+Proof. by apply: (iffP idP) => [-> | <-] //; split; rewrite ?eqxx. Qed.
+
+Lemma eq_leif x y C : x <= y ?= iff C -> (x == y) = C.
+Proof. by move=> []. Qed.
+
+Lemma eqTleif x y C : x <= y ?= iff C -> C -> x = y.
+Proof. by move=> [] _ <- /eqP. Qed.
+
+(* lteif *)
+
+Lemma lteif_trans x y z C1 C2 :
+  x < y ?<= if C1 -> y < z ?<= if C2 -> x < z ?<= if C1 && C2.
+Proof.
+case: C1 C2 => [][];
+  [exact: le_trans | exact: le_lt_trans | exact: lt_le_trans | exact: lt_trans].
+Qed.
+
+Lemma lteifxx x C : (x < x ?<= if C) = C.
+Proof. by case: C; rewrite /= ltexx. Qed.
+
+Lemma lteifNF x y C : y < x ?<= if ~~ C -> x < y ?<= if C = false.
+Proof. by case: C => [/lt_geF|/le_gtF]. Qed.
+
+Lemma lteifS x y C : x < y -> x < y ?<= if C.
+Proof. by case: C => //= /ltW. Qed.
+
+Lemma lteifT x y : x < y ?<= if true = (x <= y). Proof. by []. Qed.
+
+Lemma lteifF x y : x < y ?<= if false = (x < y). Proof. by []. Qed.
+
+Lemma lteif_orb x y : {morph lteif x y : p q / p || q}.
+Proof.
+case=> [][] /=.
+- by rewrite orbb.
+- by case/boolP: (x < y) => [/ltW -> //|_]; rewrite orbF.
+- by case/boolP: (x < y) => [/ltW ->|].
+- by rewrite orbb.
+Qed.
+
+Lemma lteif_andb x y : {morph lteif x y : p q / p && q}.
+Proof.
+case=> [][] /=.
+- by rewrite andbb.
+- by rewrite lt_le_def andbA andbb.
+- by rewrite andbC lt_le_def andbA andbb.
+- by rewrite andbb.
+Qed.
+
+Lemma lteif_imply C1 C2 x y : C1 ==> C2 -> x < y ?<= if C1 -> x < y ?<= if C2.
+Proof. by case: C1 C2 => [][] //= _ /ltW. Qed.
+
+Lemma lteifW C x y : x < y ?<= if C -> x <= y.
+Proof. by case: C => // /ltW. Qed.
+
+Lemma ltrW_lteif C x y : x < y -> x < y ?<= if C.
+Proof. by case: C => // /ltW. Qed.
+
+(* min and max *)
+
+Lemma minElt x y : min x y = if x < y then x else y. Proof. by []. Qed.
+Lemma maxElt x y : max x y = if x < y then y else x. Proof. by []. Qed.
+
+Lemma minxx : idempotent (min : T -> T -> T).
+Proof. by rewrite /min => x; rewrite ltxx. Qed.
+
+Lemma maxxx : idempotent (max : T -> T -> T).
+Proof. by rewrite /max => x; rewrite ltxx. Qed.
+
+Lemma min_minKx x y : min (min x y) y = min x y.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: (x < y). Qed.
+
+Lemma min_minxK x y : min x (min x y) = min x y.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: (x < y). Qed.
+
+Lemma max_maxKx x y : max (max x y) y = max x y.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: (x < y). Qed.
+
+Lemma max_maxxK x y : max x (max x y) = max x y.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: (x < y). Qed.
+
+Lemma comparable_minl z : {in >=< z &, forall x y, min x y >=< z}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
+
+Lemma comparable_minr z : {in >=<%O z &, forall x y, z >=< min x y}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
+
+Lemma comparable_maxl z : {in >=< z &, forall x y, max x y >=< z}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
+
+Lemma comparable_maxr z : {in >=<%O z &, forall x y, z >=< max x y}.
+Proof. by move=> x y cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
+
+Section Comparable2.
+Variables (z x y : T) (cmp_xy : x >=< y).
+
+Lemma comparable_le_min : (z <= min x y) = (z <= x) && (z <= y).
+Proof.
+move: cmp_xy; rewrite /min /comparable lt_le_def.
+case/boolP: (x <= y) => xy/=; case/boolP: (y <= x) => yx//= _.
+- by rewrite andbC; case/boolP: (z <= y) => zy //=; apply/esym/(le_trans zy).
+- by case/boolP: (z <= x) => zx //=; apply/esym/(le_trans zx).
+- by rewrite andbC; case/boolP: (z <= y) => zy //=; apply/esym/(le_trans zy).
+Qed.
+
+Lemma comparable_ge_min : (min x y <= z) = (x <= z) || (y <= z).
+Proof.
+move: cmp_xy; rewrite /min /comparable lt_le_def.
+case/boolP: (x <= y) => xy/=; case/boolP: (y <= x) => yx//= _.
+- rewrite orbC; case/boolP: (y <= z) => //= /negP yz.
+  by apply/esym/negP => /(le_trans yx).
+- by case/boolP: (x <= z) => //= /negP xz; apply/esym/negP => /(le_trans xy).
+- rewrite orbC; case/boolP: (y <= z) => //= /negP yz.
+  by apply/esym/negP => /(le_trans yx).
+Qed.
+
+Lemma comparable_lt_min : (z < min x y) = (z < x) && (z < y).
+Proof.
+move: cmp_xy; rewrite /min /comparable !lt_le_def.
+case/boolP: (x <= y) => xy/=; case/boolP: (y <= x) => yx//= _.
+- rewrite -!lt_le_def; case/boolP: (z < x) => //= /negP zx.
+  by apply/negP => zy; apply/zx/(lt_le_trans zy).
+- rewrite -!lt_le_def; case/boolP: (z < x) => //= zx; apply/esym/(lt_trans zx).
+  by rewrite lt_le_def xy yx.
+- rewrite -!lt_le_def andbC; case/boolP: (z < y) => //= zy; apply/esym/(lt_trans zy).
+  by rewrite lt_le_def xy yx.
+Qed.
+
+Lemma comparable_gt_min : (min x y < z) = (x < z) || (y < z).
+Proof.
+move: cmp_xy; rewrite /min /comparable !lt_le_def.
+case/boolP: (x <= y) => xy/=; case/boolP: (y <= x) => yx//= _.
+- rewrite -!lt_le_def orbC; case/boolP: (y < z) => //= /negP yz.
+  by apply/esym/negP => xz; apply/yz/(le_lt_trans yx).
+- rewrite -!lt_le_def; case/boolP: (x < z) => //= /negP xz.
+  by apply/esym/negP => yz; apply/xz/(le_lt_trans xy).
+- rewrite -!lt_le_def orbC; case/boolP: (y < z) => //= /negP yz.
+  by apply/esym/negP => xz; apply/yz/(le_lt_trans yx).
+Qed.
+
+Lemma comparable_le_max : (z <= max x y) = (z <= x) || (z <= y).
+Proof.
+move: cmp_xy; rewrite /max /comparable lt_le_def.
+case/boolP: (x <= y) => xy/=; case/boolP: (y <= x) => yx//= _.
+- case/boolP: (z <= x) => //= /negP zx.
+  by apply/esym/negP => zy; apply/zx/(le_trans zy).
+- rewrite orbC; case/boolP: (z <= y) => //= /negP zy.
+  by apply/esym/negP => zx; apply/zy/(le_trans zx).
+- case/boolP: (z <= x) => //= /negP zx.
+  by apply/esym/negP => zy; apply/zx/(le_trans zy).
+Qed.
+
+Lemma comparable_ge_max : (max x y <= z) = (x <= z) && (y <= z).
+Proof.
+move: cmp_xy; rewrite /max /comparable lt_le_def.
+case/boolP: (x <= y) => xy/=; case/boolP: (y <= x) => yx//= _.
+- case/boolP: (x <= z) => //= xz.
+  by apply/esym/(le_trans yx).
+- rewrite andbC; case/boolP: (y <= z) => //= yz.
+  by apply/esym/(le_trans xy).
+- case/boolP: (x <= z) => //= xz.
+  by apply/esym/(le_trans yx).
+Qed.
+
+Lemma comparable_lt_max : (z < max x y) = (z < x) || (z < y).
+Proof.
+move: cmp_xy; rewrite /max /comparable !lt_le_def.
+case/boolP: (x <= y) => xy/=; case/boolP: (y <= x) => yx//= _.
+- rewrite -!lt_le_def; case/boolP: (z < x) => //= /negP zx.
+  by apply/esym/negP => zy; apply/zx/(lt_le_trans zy).
+- rewrite -!lt_le_def orbC; case/boolP: (z < y) => //= /negP zy.
+  by apply/esym/negP => zx; apply/zy/(lt_le_trans zx).
+- rewrite -!lt_le_def; case/boolP: (z < x) => //= /negP zx.
+  by apply/esym/negP => zy; apply/zx/(lt_le_trans zy).
+Qed.
+
+Lemma comparable_gt_max : (max x y < z) = (x < z) && (y < z).
+Proof.
+move: cmp_xy; rewrite /max /comparable !lt_le_def.
+case/boolP: (x <= y) => xy/=; case/boolP: (y <= x) => yx//= _.
+- rewrite -!lt_le_def; case/boolP: (x < z) => //= xz.
+  by apply/esym/(le_lt_trans yx).
+- rewrite -!lt_le_def andbC; case/boolP: (y < z) => //= yz.
+  by apply/esym/(le_lt_trans xy).
+- rewrite -!lt_le_def; case/boolP: (x < z) => //= xz.
+  by apply/esym/(le_lt_trans yx).
+Qed.
+
+Lemma comparable_minxK : max (min x y) y = y.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: (x < y). Qed.
+
+Lemma comparable_minKx : max x (min x y) = x.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: (x < y). Qed.
+
+Lemma comparable_maxxK : min (max x y) y = y.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: (x < y). Qed.
+
+Lemma comparable_maxKx : min x (max x y) = x.
+Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: (x < y). Qed.
+
+Lemma comparable_lteif_minr C :
+  (z < min x y ?<= if C) = (z < x ?<= if C) && (z < y ?<= if C).
+Proof. by case: C; rewrite /= (comparable_le_min, comparable_lt_min). Qed.
+
+Lemma comparable_lteif_minl C :
+  (min x y < z ?<= if C) = (x < z ?<= if C) || (y < z ?<= if C).
+Proof. by case: C; rewrite /= (comparable_ge_min, comparable_gt_min). Qed.
+
+Lemma comparable_lteif_maxr C :
+  (z < max x y ?<= if C) = (z < x ?<= if C) || (z < y ?<= if C).
+Proof. by case: C; rewrite /= (comparable_le_max, comparable_lt_max). Qed.
+
+Lemma comparable_lteif_maxl C :
+  (max x y < z ?<= if C) = (x < z ?<= if C) && (y < z ?<= if C).
+Proof. by case: C; rewrite /= (comparable_ge_max, comparable_gt_max). Qed.
+
+End Comparable2.
+
+Section Comparable3.
+Variables (x y z : T) (cmp_xy : x >=< y) (cmp_xz : x >=< z) (cmp_yz : y >=< z).
+
+Lemma comparable_minA : min x (min y z) = min (min x y) z.
+Proof.
+move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/= !lt_le_def.
+case/boolP: (x <= y) => xy;
+  case/boolP: (y <= x) => yx;
+  case/boolP: (x <= z) => xz;
+  case/boolP: (z <= x) => zx;
+  case/boolP: (y <= z) => yz;
+  case/boolP: (z <= y) => zy //= _ _ _.
+- by move: zx; rewrite (le_trans zy yx).
+- by move: zx; rewrite (le_trans zy yx).
+- by move: zy; rewrite (le_trans zx xy).
+- by move: zy; rewrite (le_trans zx xy).
+- by move: zx; rewrite (le_trans zy yx).
+- by move: zx; rewrite (le_trans zy yx).
+Qed.
+
+Lemma comparable_maxA : max x (max y z) = max (max x y) z.
+Proof.
+move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/= !lt_le_def.
+case/boolP: (x <= y) => xy;
+  case/boolP: (y <= x) => yx;
+  case/boolP: (x <= z) => xz;
+  case/boolP: (z <= x) => zx;
+  case/boolP: (y <= z) => yz;
+  case/boolP: (z <= y) => zy //= _ _ _.
+- by move: zx; rewrite (le_trans zy yx).
+- by move: zx; rewrite (le_trans zy yx).
+- by move: zy; rewrite (le_trans zx xy).
+- by move: zy; rewrite (le_trans zx xy).
+- by move: zx; rewrite (le_trans zy yx).
+- by move: zx; rewrite (le_trans zy yx).
+Qed.
+
+Lemma comparable_min_maxl : min (max x y) z = max (min x z) (min y z).
+Proof.
+move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/= !lt_le_def.
+case/boolP: (x <= y) => xy;
+  case/boolP: (y <= x) => yx;
+  case/boolP: (x <= z) => xz;
+  case/boolP: (z <= x) => zx;
+  case/boolP: (y <= z) => yz;
+  case/boolP: (z <= y) => zy;
+  rewrite ?lexx => //= _ _ _.
+- by move: zx; rewrite (le_trans zy yx).
+- by move: zx; rewrite (le_trans zy yx).
+- by move: zy; rewrite (le_trans zx xy).
+- by move: zy; rewrite (le_trans zx xy).
+- by move: zx; rewrite (le_trans zy yx).
+- by move: zx; rewrite (le_trans zy yx).
+Qed.
+
+Lemma comparable_max_minr :
+  max x (min y z) = min (max x y) (max x z).
+Proof.
+move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/= !lt_le_def.
+case/boolP: (x <= y) => xy;
+  case/boolP: (y <= x) => yx;
+  case/boolP: (x <= z) => xz;
+  case/boolP: (z <= x) => zx;
+  case/boolP: (y <= z) => yz;
+  case/boolP: (z <= y) => zy;
+  rewrite ?lexx => //= _ _ _.
+- by move: zx; rewrite (le_trans zy yx).
+- by move: zx; rewrite (le_trans zy yx).
+- by move: zy; rewrite (le_trans zx xy).
+- by move: zy; rewrite (le_trans zx xy).
+- by move: zx; rewrite (le_trans zy yx).
+- by move: zx; rewrite (le_trans zy yx).
+Qed.
+
+End Comparable3.
+
+Section ArgExtremum.
+
+Context (I : finType) (i0 : I) (P : {pred I}) (F : I -> T) (Pi0 : P i0).
+Hypothesis F_comparable : {in P &, forall i j, F i >=< F j}.
+
+Lemma comparable_arg_minP: extremum_spec <=%O P F (arg_min i0 P F).
+Proof.
+by apply: extremum_inP => // [x _|y x z _ _ _]; [apply: lexx|apply: le_trans].
+Qed.
+
+Lemma comparable_arg_maxP: extremum_spec >=%O P F (arg_max i0 P F).
+Proof.
+apply: extremum_inP => // [x _|y x z _ _ _|]; [exact: lexx|exact: ge_trans|].
+by move=> x y xP yP; rewrite orbC [_ || _]F_comparable.
+Qed.
+
+End ArgExtremum.
+
+(* monotonicity *)
+
+Lemma comparable_bigl x x0 op I (P : pred I) F (s : seq I) :
+  {in >=< x &, forall y z, op y z >=< x} -> x0 >=< x ->
+  {in P, forall i, F i >=< x} -> \big[op/x0]_(i <- s | P i) F i >=< x.
+Proof. by move=> *; elim/big_ind : _. Qed.
+
+Lemma comparable_bigr x x0 op I (P : pred I) F (s : seq I) :
+  {in >=<%O x &, forall y z, x >=< op y z} -> x >=< x0 ->
+  {in P, forall i, x >=< F i} -> x >=< \big[op/x0]_(i <- s | P i) F i.
+Proof. by move=> *; elim/big_ind : _. Qed.
+
+Section bigminmax.
+
+Variables (I : Type) (r : seq I) (f : I -> T) (x0 x : T) (P : pred I).
+
+Lemma bigmax_lt : x0 < x -> (forall i, P i -> f i < x) ->
+  \big[max/x0]_(i <- r | P i) f i < x.
+Proof. by move=> ? ?; elim/big_ind: _ => // *; rewrite maxElt; case: ifPn. Qed.
+
+Lemma lt_bigmin : x < x0 -> (forall i, P i -> x < f i) ->
+  x < \big[min/x0]_(i <- r | P i) f i.
+Proof. by move=> ? ?; elim/big_ind: _ => // *; rewrite minElt; case: ifPn. Qed.
+
+End bigminmax.
+
+End PreorderTheory.
+#[global] Hint Resolve comparable_minr comparable_minl : core.
+#[global] Hint Resolve comparable_maxr comparable_maxl : core.
+
+Section ContraTheory.
+Context {disp1 disp2 : disp_t} {T1 : preorderType disp1} {T2 : preorderType disp2}.
+Implicit Types (x y : T1) (z t : T2) (b : bool) (m n : nat) (P : Prop).
+
+Lemma comparable_contraTle b x y : x >=< y -> (y < x -> ~~ b) -> (b -> x <= y).
+Proof. by move=> /comparable_leNgt ->; case: (y < x); case: b. Qed.
+
+Lemma comparable_contraTlt b x y : x >=< y -> (y <= x -> ~~ b) -> (b -> x < y).
+Proof. by move=> /comparable_ltNge ->; case: (y <= x); case: b. Qed.
+
+Lemma comparable_contraPle P x y : x >=< y -> (y < x -> ~ P) -> (P -> x <= y).
+Proof. by move=> /comparable_leNgt -> np p; apply/negP => /np. Qed.
+
+Lemma comparable_contraPlt P x y : x >=< y -> (y <= x -> ~ P) -> (P -> x < y).
+Proof. by move=> /comparable_ltNge -> np p; apply/negP => /np. Qed.
+
+Lemma comparable_contraNle b x y : x >=< y -> (y < x -> b) -> (~~ b -> x <= y).
+Proof. by move=> /comparable_leNgt ->; case: (y < x); case: b. Qed.
+
+Lemma comparable_contraNlt b x y : x >=< y -> (y <= x -> b) -> (~~ b -> x < y).
+Proof. by move=> /comparable_ltNge ->; case: (y <= x); case: b. Qed.
+
+Lemma comparable_contra_not_le P x y : x >=< y -> (y < x -> P) -> (~ P -> x <= y).
+Proof. by move=> /comparable_leNgt -> np p; apply/negP => /np. Qed.
+
+Lemma comparable_contra_not_lt P x y : x >=< y -> (y <= x -> P) -> (~ P -> x < y).
+Proof. by move=> /comparable_ltNge -> np p; apply/negP => /np. Qed.
+
+Lemma comparable_contraFle b x y : x >=< y -> (y < x -> b) -> (b = false -> x <= y).
+Proof. by move=> /comparable_leNgt -> np /negP p; apply/negP => /np. Qed.
+
+Lemma comparable_contraFlt b x y : x >=< y -> (y <= x -> b) -> (b = false -> x < y).
+Proof. by move=> /comparable_ltNge -> np /negP p; apply/negP => /np. Qed.
+
+Lemma comparable_contra_leq_le m n x y : x >=< y ->
+  (y < x -> (n < m)%N) -> ((m <= n)%N -> x <= y).
+Proof. by rewrite ltnNge; apply/comparable_contraTle. Qed.
+
+Lemma comparable_contra_leq_lt m n x y : x >=< y ->
+  (y <= x -> (n < m)%N) -> ((m <= n)%N -> x < y).
+Proof. by rewrite ltnNge; apply/comparable_contraTlt. Qed.
+
+Lemma comparable_contra_ltn_le m n x y : x >=< y ->
+  (y < x -> (n <= m)%N) -> ((m < n)%N -> x <= y).
+Proof. by rewrite ltnNge; apply/comparable_contraNle. Qed.
+
+Lemma comparable_contra_ltn_lt m n x y : x >=< y ->
+  (y <= x -> (n <= m)%N) -> ((m < n)%N -> x < y).
+Proof. by rewrite ltnNge; apply/comparable_contraNlt. Qed.
+
+Lemma comparable_contra_le x y z t : z >=< t ->
+  (t < z -> y < x) -> (x <= y -> z <= t).
+Proof.
+rewrite /comparable lt_le_def; case: (z <= t) => //= -> /(_ erefl) yx.
+by move=> /(lt_le_trans yx); rewrite ltxx.
+Qed.
+
+Lemma comparable_contra_le_lt x y z t : z >=< t ->
+  (t <= z -> y < x) -> (x <= y -> z < t).
+Proof.
+rewrite /comparable [z < t]lt_le_def orbC; case: (t <= z) => /= [_|-> //].
+by move=> /(_ erefl) yx /(lt_le_trans yx); rewrite ltxx.
+Qed.
+
+Lemma comparable_contra_lt_le x y z t : z >=< t ->
+  (t < z -> y <= x) -> (x < y -> z <= t).
+Proof.
+rewrite /comparable lt_le_def; case: (z <= t) => //= -> /(_ erefl) yx.
+by move=> /(le_lt_trans yx); rewrite ltxx.
+Qed.
+
+Lemma comparable_contra_lt x y z t : z >=< t ->
+ (t <= z -> y <= x) -> (x < y -> z < t).
+Proof.
+rewrite /comparable [z < t]lt_le_def orbC; case: (t <= z) => /= [_|-> //].
+by move=> /(_ erefl) yx /(le_lt_trans yx); rewrite ltxx.
+Qed.
+
+End ContraTheory.
+
+Section PreorderMonotonyTheory.
+
+Context {disp disp' : disp_t}.
+Context {T : preorderType disp} {T' : preorderType disp'}.
+Implicit Types (m n p : nat) (x y z : T) (u v w : T').
+Variables (D D' : {pred T}) (f : T -> T').
+
+Hint Resolve lexx lt_le_def : core.
+
+Lemma leW_mono : {mono f : x y / x <= y} -> {mono f : x y / x < y}.
+Proof. by move=> fmono x y; rewrite !lt_le_def !fmono. Qed.
+
+Lemma leW_nmono : {mono f : x y /~ x <= y} -> {mono f : x y /~ x < y}.
+Proof. by move=> fmono x y; rewrite !lt_le_def !fmono. Qed.
+
+Lemma leW_mono_in :
+  {in D &, {mono f : x y / x <= y}} -> {in D &, {mono f : x y / x < y}}.
+Proof. by move=> fmono x y xD yD; rewrite !lt_le_def !fmono. Qed.
+
+Lemma leW_nmono_in :
+  {in D &, {mono f : x y /~ x <= y}} -> {in D &, {mono f : x y /~ x < y}}.
+Proof. by move=> fmono x y xD yD; rewrite !lt_le_def !fmono. Qed.
+
+End PreorderMonotonyTheory.
+
+End PreorderTheory.
+
+#[global] Hint Resolve lexx le_refl ltxx lt_irreflexive ltW lt_eqF : core.
+
+Arguments leif_refl {disp T x C}.
+
+Module Import BPreorderTheory.
+Section BPreorderTheory.
+Context {disp : disp_t} {T : bPreorderType disp}.
+Implicit Types (x y : T).
+
+Lemma le0x x : \bot <= x. Proof. exact: le0x. Qed.
+
+Lemma ltx0 x : (x < \bot) = false.
+Proof. exact/le_gtF/le0x. Qed.
+
+End BPreorderTheory.
+End BPreorderTheory.
+
+Module Import TPreorderTheory.
+Section TPreorderTheory.
+Context {disp : disp_t} {T : tPreorderType disp}.
+Implicit Types (x y : T).
+
+Lemma lex1 x : x <= \top. Proof. exact: lex1. Qed.
+Lemma lt1x x : (\top < x) = false. Proof. exact: (@ltx0 _ T^d). Qed.
+
+End TPreorderTheory.
+End TPreorderTheory.
+
+#[global] Hint Extern 0 (is_true (\bot <= _)) => exact: le0x : core.
+#[global] Hint Extern 0 (is_true (_ <= \top)) => exact: lex1 : core.
+
+Module Import POrderTheory.
+Section POrderTheory.
+
+Context {disp : disp_t} {T : porderType disp}.
+
+Implicit Types (x y : T) (s : seq T).
+
+Lemma le_anti: antisymmetric (<=%O : rel T).
+Proof. exact: le_anti. Qed.
+
+Lemma ge_anti: antisymmetric (>=%O : rel T).
+Proof. by move=> x y /le_anti. Qed.
+
+Lemma eq_le x y: (x == y) = (x <= y <= x).
+Proof. by apply/eqP/idP => [->|/le_anti]; rewrite ?lexx. Qed.
+
+Lemma lt_def x y : (x < y) = (y != x) && (x <= y).
+Proof.
+rewrite andbC lt_le_def; case/boolP: (x <= y) => //= xy.
+congr negb; apply/idP/eqP => [yx|->]; last exact/lexx.
+by apply/le_anti; rewrite yx.
+Qed.
+
+Lemma lt_neqAle x y: (x < y) = (x != y) && (x <= y).
+Proof. by rewrite lt_def eq_sym. Qed.
+
+Lemma le_eqVlt x y: (x <= y) = (x == y) || (x < y).
+Proof. by rewrite lt_neqAle; case: eqP => //= ->; rewrite lexx. Qed.
+
+Definition lte_anti := (=^~ eq_le, @lt_asym disp T, @lt_le_asym disp T, @le_lt_asym disp T).
+
+Lemma lt_sorted_uniq_le s : sorted <%O s = uniq s && sorted <=%O s.
+Proof.
+rewrite le_sorted_pairwise lt_sorted_pairwise uniq_pairwise -pairwise_relI.
+by apply/eq_pairwise => ? ?; rewrite lt_neqAle.
+Qed.
+
+Lemma le_sorted_eq s1 s2 :
+  sorted <=%O s1 -> sorted <=%O s2 -> perm_eq s1 s2 -> s1 = s2.
+Proof. exact/sorted_eq/le_anti/le_trans. Qed.
+
+Lemma count_lt_le_mem x s : (count (< x) s < count (<= x) s)%N = (x \in s).
+Proof.
+have := count_predUI (pred1 x) (< x) s.
+have -> : count (predI (pred1 x) (< x)) s = 0%N.
+  rewrite (@eq_count _ _ pred0) ?count_pred0 // => y /=.
+  by rewrite lt_neqAle; case: eqP => //= ->; rewrite eqxx.
+have /eq_count-> : [predU1 x & < x] =1 (<= x) by move=> y /=; rewrite le_eqVlt.
+by rewrite addn0 => ->; rewrite -add1n leq_add2r -has_count has_pred1.
+Qed.
+
+Lemma comparable_leNgt x y : x >=< y -> (x <= y) = ~~ (y < x).
+Proof.
+move=> c_xy; apply/idP/idP => [/le_gtF/negP/negP//|]; rewrite lt_neqAle.
+by move: c_xy => /orP [] -> //; rewrite andbT negbK => /eqP ->.
 Qed.
 
 Lemma comparable_ltgtP x y : x >=< y ->
@@ -2429,21 +3043,6 @@ Lemma comparable_ltP x y : x >=< y ->
   lt_xor_ge x y (min y x) (min x y) (max y x) (max x y) (y <= x) (x < y).
 Proof. by move=> /comparable_ltgtP [?|?|->]; constructor; rewrite // ltW. Qed.
 
-Lemma comparable_sym x y : (y >=< x) = (x >=< y).
-Proof. by rewrite /comparable orbC. Qed.
-
-Lemma comparablexx x : x >=< x.
-Proof. by rewrite /comparable lexx. Qed.
-
-Lemma incomparable_eqF x y : (x >< y) -> (x == y) = false.
-Proof. by apply: contraNF => /eqP ->; rewrite comparablexx. Qed.
-
-Lemma incomparable_leF x y : (x >< y) -> (x <= y) = false.
-Proof. by apply: contraNF; rewrite /comparable => ->. Qed.
-
-Lemma incomparable_ltF x y : (x >< y) -> (x < y) = false.
-Proof. by rewrite lt_neqAle => /incomparable_leF ->; rewrite andbF. Qed.
-
 Lemma comparableP x y : incompare x y
   (min y x) (min x y) (max y x) (max x y)
   (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y)
@@ -2455,18 +3054,6 @@ by rewrite /min /max ?incomparable_eqF ?incomparable_leF;
    rewrite ?incomparable_ltF// 1?comparable_sym //; constructor.
 Qed.
 
-Lemma le_comparable (x y : T) : x <= y -> x >=< y.
-Proof. by case: comparableP. Qed.
-
-Lemma lt_comparable (x y : T) : x < y -> x >=< y.
-Proof. by case: comparableP. Qed.
-
-Lemma ge_comparable (x y : T) : y <= x -> x >=< y.
-Proof. by case: comparableP. Qed.
-
-Lemma gt_comparable (x y : T) : y < x -> x >=< y.
-Proof. by case: comparableP. Qed.
-
 (* leif *)
 
 Lemma leifP x y C : reflect (x <= y ?= iff C) (if C then x == y else x < y).
@@ -2476,16 +3063,13 @@ rewrite /leif le_eqVlt; apply: (iffP idP)=> [|[]].
 by move=> /orP[/eqP->|lxy] <-; rewrite ?eqxx // lt_eqF.
 Qed.
 
-Lemma leif_refl x C : reflect (x <= x ?= iff C) C.
-Proof. by apply: (iffP idP) => [-> | <-] //; split; rewrite ?eqxx. Qed.
-
 Lemma leif_trans x1 x2 x3 C12 C23 :
   x1 <= x2 ?= iff C12 -> x2 <= x3 ?= iff C23 -> x1 <= x3 ?= iff C12 && C23.
 Proof.
 move=> ltx12 ltx23; apply/leifP; rewrite -ltx12.
 case eqx12: (x1 == x2).
   by rewrite (eqP eqx12) lt_neqAle !ltx23 andbT; case C23.
-by rewrite (@lt_le_trans x2) ?ltx23 // lt_neqAle eqx12 ltx12.
+by rewrite (@lt_le_trans _ _ x2) ?ltx23 // lt_neqAle eqx12 ltx12.
 Qed.
 
 Lemma leif_le x y : x <= y -> x <= y ?= iff (x >= y).
@@ -2503,60 +3087,16 @@ Proof. by move=> le_xy; rewrite lt_neqAle !le_xy andbT. Qed.
 Lemma ltNleif x y C : x <= y ?= iff ~~ C -> (x < y) = C.
 Proof. by move=> /lt_leif; rewrite negbK. Qed.
 
-Lemma eq_leif x y C : x <= y ?= iff C -> (x == y) = C.
-Proof. by move=> /leifP; case: C comparableP => [] []. Qed.
-
-Lemma eqTleif x y C : x <= y ?= iff C -> C -> x = y.
-Proof. by move=> /eq_leif<-/eqP. Qed.
-
 (* lteif *)
-
-Lemma lteif_trans x y z C1 C2 :
-  x < y ?<= if C1 -> y < z ?<= if C2 -> x < z ?<= if C1 && C2.
-Proof.
-case: C1 C2 => [][];
-  [exact: le_trans | exact: le_lt_trans | exact: lt_le_trans | exact: lt_trans].
-Qed.
 
 Lemma lteif_anti C1 C2 x y :
   (x < y ?<= if C1) && (y < x ?<= if C2) = C1 && C2 && (x == y).
 Proof. by case: C1 C2 => [][]; rewrite lte_anti. Qed.
 
-Lemma lteifxx x C : (x < x ?<= if C) = C.
-Proof. by case: C; rewrite /= ltexx. Qed.
-
-Lemma lteifNF x y C : y < x ?<= if ~~ C -> x < y ?<= if C = false.
-Proof. by case: C => [/lt_geF|/le_gtF]. Qed.
-
-Lemma lteifS x y C : x < y -> x < y ?<= if C.
-Proof. by case: C => //= /ltW. Qed.
-
-Lemma lteifT x y : x < y ?<= if true = (x <= y). Proof. by []. Qed.
-
-Lemma lteifF x y : x < y ?<= if false = (x < y). Proof. by []. Qed.
-
-Lemma lteif_orb x y : {morph lteif x y : p q / p || q}.
-Proof. by case=> [][] /=; case: comparableP. Qed.
-
-Lemma lteif_andb x y : {morph lteif x y : p q / p && q}.
-Proof. by case=> [][] /=; case: comparableP. Qed.
-
-Lemma lteif_imply C1 C2 x y : C1 ==> C2 -> x < y ?<= if C1 -> x < y ?<= if C2.
-Proof. by case: C1 C2 => [][] //= _ /ltW. Qed.
-
-Lemma lteifW C x y : x < y ?<= if C -> x <= y.
-Proof. by case: C => // /ltW. Qed.
-
-Lemma ltrW_lteif C x y : x < y -> x < y ?<= if C.
-Proof. by case: C => // /ltW. Qed.
-
 Lemma lteifN C x y : x < y ?<= if ~~ C -> ~~ (y < x ?<= if C).
 Proof. by case: C => /=; case: comparableP. Qed.
 
 (* min and max *)
-
-Lemma minElt x y : min x y = if x < y then x else y. Proof. by []. Qed.
-Lemma maxElt x y : max x y = if x < y then y else x. Proof. by []. Qed.
 
 Lemma minEle x y : min x y = if x <= y then x else y.
 Proof. by case: comparableP. Qed.
@@ -2578,12 +3118,6 @@ Lemma min_r x y : y <= x -> min x y = y. Proof. by case: comparableP. Qed.
 Lemma max_l x y : y <= x -> max x y = x. Proof. by case: comparableP. Qed.
 Lemma max_r x y : x <= y -> max x y = y. Proof. by case: comparableP. Qed.
 
-Lemma minxx : idempotent (min : T -> T -> T).
-Proof. by rewrite /min => x; rewrite ltxx. Qed.
-
-Lemma maxxx : idempotent (max : T -> T -> T).
-Proof. by rewrite /max => x; rewrite ltxx. Qed.
-
 Lemma eq_minl x y : (min x y == x) = (x <= y).
 Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP. Qed.
 
@@ -2595,30 +3129,6 @@ Proof. by apply: (iffP idP); rewrite (rwP eqP) eq_minl. Qed.
 
 Lemma max_idPr x y : reflect (max x y = y) (x <= y).
 Proof. by apply: (iffP idP); rewrite (rwP eqP) eq_maxr. Qed.
-
-Lemma min_minKx x y : min (min x y) y = min x y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
-
-Lemma min_minxK x y : min x (min x y) = min x y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
-
-Lemma max_maxKx x y : max (max x y) y = max x y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
-
-Lemma max_maxxK x y : max x (max x y) = max x y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
-
-Lemma comparable_minl z : {in >=< z &, forall x y, min x y >=< z}.
-Proof. by move=> x y cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
-
-Lemma comparable_minr z : {in >=<%O z &, forall x y, z >=< min x y}.
-Proof. by move=> x y cmp_xz cmp_yz; rewrite /min; case: ifP. Qed.
-
-Lemma comparable_maxl z : {in >=< z &, forall x y, max x y >=< z}.
-Proof. by move=> x y cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
-
-Lemma comparable_maxr z : {in >=<%O z &, forall x y, z >=< max x y}.
-Proof. by move=> x y cmp_xz cmp_yz; rewrite /max; case: ifP. Qed.
 
 Section Comparable2.
 Context (z x y : T) (cmp_xy : x >=< y).
@@ -2641,108 +3151,14 @@ Proof. by apply: (iffP idP); rewrite (rwP eqP) comparable_eq_minr. Qed.
 Lemma comparable_max_idPl : reflect (max x y = x) (y <= x).
 Proof. by apply: (iffP idP); rewrite (rwP eqP) comparable_eq_maxl. Qed.
 
-Lemma comparable_le_min : (z <= min x y) = (z <= x) && (z <= y).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; last rewrite andbC;
-  by case: (comparableP z) => // [/lt_trans xlt/xlt|->] /ltW.
-Qed.
-
-Lemma comparable_ge_min : (min x y <= z) = (x <= z) || (y <= z).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; last rewrite orbC;
-  by move=> xy _; apply/idP/idP => [->|/orP[]]//; apply/le_trans/ltW.
-Qed.
-
-Lemma comparable_lt_min : (z < min x y) = (z < x) && (z < y).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; last rewrite andbC;
-  by case: (comparableP z) => // /lt_trans xlt/xlt.
-Qed.
-
-Lemma comparable_gt_min : (min x y < z) = (x < z) || (y < z).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; last rewrite orbC;
-  by move=> xy _; apply/idP/idP => [->|/orP[]]//; apply/lt_trans.
-Qed.
-
-Lemma comparable_le_max : (z <= max x y) = (z <= x) || (z <= y).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; first rewrite orbC;
-  by move=> xy _; apply/idP/idP => [->|/orP[]]// /le_trans->//; apply/ltW.
-Qed.
-
-Lemma comparable_ge_max : (max x y <= z) = (x <= z) && (y <= z).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; first rewrite andbC;
-  by case: (comparableP z) => // [ylt /lt_trans /(_ _)/ltW|->/ltW]->.
-Qed.
-
-Lemma comparable_lt_max : (z < max x y) = (z < x) || (z < y).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?orbb//; first rewrite orbC;
-  by move=> xy _; apply/idP/idP => [->|/orP[]]// /lt_trans->.
-Qed.
-
-Lemma comparable_gt_max : (max x y < z) = (x < z) && (y < z).
-Proof.
-case: comparableP cmp_xy => // [||<-//]; rewrite ?andbb//; first rewrite andbC;
-by case: (comparableP z) => // ylt /lt_trans->.
-Qed.
-
-Lemma comparable_minxK : max (min x y) y = y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
-
-Lemma comparable_minKx : max x (min x y) = x.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
-
-Lemma comparable_maxxK : min (max x y) y = y.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
-
-Lemma comparable_maxKx : min x (max x y) = x.
-Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP cmp_xy. Qed.
-
 Lemma comparable_lteifNE C : x >=< y -> x < y ?<= if ~~ C = ~~ (y < x ?<= if C).
 Proof. by case: C => /=; case: comparableP. Qed.
-
-Lemma comparable_lteif_minr C :
-  (z < min x y ?<= if C) = (z < x ?<= if C) && (z < y ?<= if C).
-Proof. by case: C; rewrite /= (comparable_le_min, comparable_lt_min). Qed.
-
-Lemma comparable_lteif_minl C :
-  (min x y < z ?<= if C) = (x < z ?<= if C) || (y < z ?<= if C).
-Proof. by case: C; rewrite /= (comparable_ge_min, comparable_gt_min). Qed.
-
-Lemma comparable_lteif_maxr C :
-  (z < max x y ?<= if C) = (z < x ?<= if C) || (z < y ?<= if C).
-Proof. by case: C; rewrite /= (comparable_le_max, comparable_lt_max). Qed.
-
-Lemma comparable_lteif_maxl C :
-  (max x y < z ?<= if C) = (x < z ?<= if C) && (y < z ?<= if C).
-Proof. by case: C; rewrite /= (comparable_ge_max, comparable_gt_max). Qed.
 
 End Comparable2.
 
 Section Comparable3.
 Context (x y z : T) (cmp_xy : x >=< y) (cmp_xz : x >=< z) (cmp_yz : y >=< z).
 Let P := comparableP.
-
-Lemma comparable_minA : min x (min y z) = min (min x y) z.
-Proof.
-move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/=.
-move: (P x y) (P x z) (P y z) => [xy|xy|xy|<-] [xz|xz|xz|<-]// []//= yz.
-- by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
-- by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
-- by have := lt_trans xy xz; rewrite yz ltxx.
-Qed.
-
-Lemma comparable_maxA : max x (max y z) = max (max x y) z.
-Proof.
-move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/=.
-move: (P x y) (P x z) (P y z) => [xy|xy|xy|<-] [xz|xz|xz|<-]// []//= yz.
-- by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
-- by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
-- by have := lt_trans xy xz; rewrite yz ltxx.
-Qed.
 
 Lemma comparable_max_minl : max (min x y) z = min (max x z) (max y z).
 Proof.
@@ -2751,17 +3167,6 @@ move: (P x y) (P x z) (P y z).
 move=> [xy|xy|xy|<-] [xz|xz|xz|<-] [yz|yz|yz|//->]//= _; rewrite ?ltxx//.
 - by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
 - by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
-Qed.
-
-Lemma comparable_min_maxl : min (max x y) z = max (min x z) (min y z).
-Proof.
-move: cmp_xy cmp_xz cmp_yz; rewrite !(fun_if, if_arg)/=.
-move: (P x y) (P x z) (P y z).
-move=> [xy|xy|xy|<-] [xz|xz|xz|<-] []yz//= _; rewrite ?ltxx//.
-- by have := lt_trans xy (lt_trans yz xz); rewrite ltxx.
-- by have := lt_trans xy yz; rewrite ltxx.
-- by have := lt_trans xy (lt_trans xz yz); rewrite ltxx.
-- by have := lt_trans xy xz; rewrite yz ltxx.
 Qed.
 
 End Comparable3.
@@ -2812,36 +3217,12 @@ rewrite [max _ z]comparable_maxAC// -comparable_maxA// ?comparable_maxl//.
 by rewrite inE comparable_sym.
 Qed.
 
-Lemma comparable_max_minr x y z : x >=< y -> x >=< z -> y >=< z ->
-  max x (min y z) = min (max x y) (max x z).
-Proof.
-move=> xy xz yz; rewrite ![max x _]comparable_maxC// ?comparable_minr//.
-by rewrite comparable_max_minl// 1?comparable_sym.
-Qed.
-
 Lemma comparable_min_maxr x y z : x >=< y -> x >=< z -> y >=< z ->
   min x (max y z) = max (min x y) (min x z).
 Proof.
 move=> xy xz yz; rewrite ![min x _]comparable_minC// ?comparable_maxr//.
 by rewrite comparable_min_maxl// 1?comparable_sym.
 Qed.
-
-Section ArgExtremum.
-Context (I : finType) (i0 : I) (P : {pred I}) (F : I -> T) (Pi0 : P i0).
-Context (F_comparable : {in P &, forall i j, F i >=< F j}).
-
-Lemma comparable_arg_minP: extremum_spec <=%O P F (arg_min i0 P F).
-Proof.
-by apply: extremum_inP => // [x _|y x z _ _ _]; [apply: lexx|apply: le_trans].
-Qed.
-
-Lemma comparable_arg_maxP: extremum_spec >=%O P F (arg_max i0 P F).
-Proof.
-apply: extremum_inP => // [x _|y x z _ _ _|]; [exact: lexx|exact: ge_trans|].
-by move=> x y xP yP; rewrite orbC [_ || _]F_comparable.
-Qed.
-
-End ArgExtremum.
 
 (* monotonicity *)
 
@@ -2864,30 +3245,12 @@ Lemma nmono_leif (f : T -> T) C : {mono f : x y /~ x <= y} ->
   forall x y, (f x <= f y ?= iff C) = (y <= x ?= iff C).
 Proof. by move=> mf x y; rewrite /leif !eq_le !mf. Qed.
 
-Lemma comparable_bigl x x0 op I (P : pred I) F (s : seq I) :
-  {in >=< x &, forall y z, op y z >=< x} -> x0 >=< x ->
-  {in P, forall i, F i >=< x} -> \big[op/x0]_(i <- s | P i) F i >=< x.
-Proof. by move=> *; elim/big_ind : _. Qed.
-
-Lemma comparable_bigr x x0 op I (P : pred I) F (s : seq I) :
-  {in >=<%O x &, forall y z, x >=< op y z} -> x >=< x0 ->
-  {in P, forall i, x >=< F i} -> x >=< \big[op/x0]_(i <- s | P i) F i.
-Proof. by move=> *; elim/big_ind : _. Qed.
-
 Section bigminmax.
 Context (I : Type) (r : seq I) (f : I -> T) (x0 x : T) (P : pred I).
 
 Lemma bigmax_le : x0 <= x -> (forall i, P i -> f i <= x) ->
   \big[max/x0]_(i <- r | P i) f i <= x.
 Proof. by move=> ? ?; elim/big_ind: _ => // *; rewrite maxEle; case: ifPn. Qed.
-
-Lemma bigmax_lt : x0 < x -> (forall i, P i -> f i < x) ->
-  \big[max/x0]_(i <- r | P i) f i < x.
-Proof. by move=> ? ?; elim/big_ind: _ => // *; rewrite maxElt; case: ifPn. Qed.
-
-Lemma lt_bigmin : x < x0 -> (forall i, P i -> x < f i) ->
-  x < \big[min/x0]_(i <- r | P i) f i.
-Proof. by move=> ? ?; elim/big_ind: _ => // *; rewrite minElt; case: ifPn. Qed.
 
 Lemma le_bigmin : x <= x0 -> (forall i, P i -> x <= f i) ->
   x <= \big[min/x0]_(i <- r | P i) f i.
@@ -2903,36 +3266,6 @@ End POrderTheory.
 Section ContraTheory.
 Context {disp1 disp2 : disp_t} {T1 : porderType disp1} {T2 : porderType disp2}.
 Implicit Types (x y : T1) (z t : T2) (b : bool) (m n : nat) (P : Prop).
-
-Lemma comparable_contraTle b x y : x >=< y -> (y < x -> ~~ b) -> (b -> x <= y).
-Proof. by case: comparableP; case: b. Qed.
-
-Lemma comparable_contraTlt b x y : x >=< y -> (y <= x -> ~~ b) -> (b -> x < y).
-Proof. by case: comparableP; case: b. Qed.
-
-Lemma comparable_contraPle P x y : x >=< y -> (y < x -> ~ P) -> (P -> x <= y).
-Proof. by case: comparableP => // _ _ /(_ isT). Qed.
-
-Lemma comparable_contraPlt P x y : x >=< y -> (y <= x -> ~ P) -> (P -> x < y).
-Proof. by case: comparableP => // _ _ /(_ isT). Qed.
-
-Lemma comparable_contraNle b x y : x >=< y -> (y < x -> b) -> (~~ b -> x <= y).
-Proof. by case: comparableP; case: b. Qed.
-
-Lemma comparable_contraNlt b x y : x >=< y -> (y <= x -> b) -> (~~ b -> x < y).
-Proof. by case: comparableP; case: b. Qed.
-
-Lemma comparable_contra_not_le P x y : x >=< y -> (y < x -> P) -> (~ P -> x <= y).
-Proof. by case: comparableP => // _ _ /(_ isT). Qed.
-
-Lemma comparable_contra_not_lt P x y : x >=< y -> (y <= x -> P) -> (~ P -> x < y).
-Proof. by case: comparableP => // _ _ /(_ isT). Qed.
-
-Lemma comparable_contraFle b x y : x >=< y -> (y < x -> b) -> (b = false -> x <= y).
-Proof. by case: comparableP; case: b => // _ _ /implyP. Qed.
-
-Lemma comparable_contraFlt b x y : x >=< y -> (y <= x -> b) -> (b = false -> x < y).
-Proof. by case: comparableP; case: b => // _ _ /implyP. Qed.
 
 Lemma contra_leT b x y : (~~ b -> x < y) -> (y <= x -> b).
 Proof. by case: comparableP; case: b. Qed.
@@ -2958,22 +3291,6 @@ Proof. by case: comparableP; case: b => // _ /implyP. Qed.
 Lemma contra_ltF b x y : (b -> x <= y) -> (y < x -> b = false).
 Proof. by case: comparableP; case: b => // _ /implyP. Qed.
 
-Lemma comparable_contra_leq_le m n x y : x >=< y ->
-  (y < x -> (n < m)%N) -> ((m <= n)%N -> x <= y).
-Proof. by case: comparableP; case: ltngtP. Qed.
-
-Lemma comparable_contra_leq_lt m n x y : x >=< y ->
-  (y <= x -> (n < m)%N) -> ((m <= n)%N -> x < y).
-Proof. by case: comparableP; case: ltngtP. Qed.
-
-Lemma comparable_contra_ltn_le m n x y : x >=< y ->
-  (y < x -> (n <= m)%N) -> ((m < n)%N -> x <= y).
-Proof. by case: comparableP; case: ltngtP. Qed.
-
-Lemma comparable_contra_ltn_lt m n x y : x >=< y ->
-  (y <= x -> (n <= m)%N) -> ((m < n)%N -> x < y).
-Proof. by case: comparableP; case: ltngtP. Qed.
-
 Lemma contra_le_leq x y m n : ((n < m)%N -> y < x) -> (x <= y -> (m <= n)%N).
 Proof. by case: comparableP; case: ltngtP. Qed.
 
@@ -2985,22 +3302,6 @@ Proof. by case: comparableP; case: ltngtP. Qed.
 
 Lemma contra_lt_ltn x y m n : ((n <= m)%N -> y <= x) -> (x < y -> (m < n)%N).
 Proof. by case: comparableP; case: ltngtP. Qed.
-
-Lemma comparable_contra_le x y z t : z >=< t ->
-  (t < z -> y < x) -> (x <= y -> z <= t).
-Proof. by do 2![case: comparableP => //= ?]. Qed.
-
-Lemma comparable_contra_le_lt x y z t : z >=< t ->
-  (t <= z -> y < x) -> (x <= y -> z < t).
-Proof. by do 2![case: comparableP => //= ?]. Qed.
-
-Lemma comparable_contra_lt_le x y z t : z >=< t ->
-  (t < z -> y <= x) -> (x < y -> z <= t).
-Proof. by do 2![case: comparableP => //= ?]. Qed.
-
-Lemma comparable_contra_lt x y z t : z >=< t ->
- (t <= z -> y <= x) -> (x < y -> z < t).
-Proof. by do 2![case: comparableP => //= ?]. Qed.
 
 End ContraTheory.
 
@@ -3034,12 +3335,6 @@ Proof. exact: mono_inj. Qed.
 Lemma dec_inj : {mono f : x y /~ x <= y} -> injective f.
 Proof. exact: mono_inj. Qed.
 
-Lemma leW_mono : {mono f : x y / x <= y} -> {mono f : x y / x < y}.
-Proof. exact: anti_mono. Qed.
-
-Lemma leW_nmono : {mono f : x y /~ x <= y} -> {mono f : x y /~ x < y}.
-Proof. by apply: anti_mono=> // x y; rewrite eq_sym. Qed.
-
 (* Monotony in D D' *)
 Lemma ltW_homo_in :
   {in D & D', {homo f : x y / x < y}} -> {in D & D', {homo f : x y / x <= y}}.
@@ -3067,22 +3362,11 @@ Lemma dec_inj_in :
   {in D &, {mono f : x y /~ x <= y}} -> {in D &, injective f}.
 Proof. exact: mono_inj_in. Qed.
 
-Lemma leW_mono_in :
-  {in D &, {mono f : x y / x <= y}} -> {in D &, {mono f : x y / x < y}}.
-Proof. exact: anti_mono_in. Qed.
-
-Lemma leW_nmono_in :
-  {in D &, {mono f : x y /~ x <= y}} -> {in D &, {mono f : x y /~ x < y}}.
-Proof. by apply: anti_mono_in=> // x y; rewrite eq_sym. Qed.
-
 End POrderMonotonyTheory.
 
 End POrderTheory.
 
-#[global] Hint Resolve lexx le_refl ltxx lt_irreflexive ltW lt_eqF : core.
-
 Arguments leifP {disp T x y C}.
-Arguments leif_refl {disp T x C}.
 Arguments mono_in_leif [disp T A f C].
 Arguments nmono_in_leif [disp T A f C].
 Arguments mono_leif [disp T f C].
@@ -3097,10 +3381,6 @@ Section BPOrderTheory.
 Context {disp : disp_t} {T : bPOrderType disp}.
 Implicit Types (x y : T).
 
-Lemma le0x x : \bot <= x. Proof. exact: le0x. Qed.
-
-Lemma ltx0 x : (x < \bot) = false.
-Proof. exact/le_gtF/le0x. Qed.
 
 Lemma lex0 x : (x <= \bot) = (x == \bot).
 Proof. by rewrite le_eqVlt ltx0 orbF. Qed.
@@ -3123,16 +3403,11 @@ Section TPOrderTheory.
 Context {disp : disp_t} {T : tPOrderType disp}.
 Implicit Types (x y : T).
 
-Lemma lex1 x : x <= \top. Proof. exact: lex1. Qed.
-Lemma lt1x x : (\top < x) = false. Proof. exact: (@ltx0 _ T^d). Qed.
 Lemma le1x x : (\top <= x) = (x == \top). Proof. exact: (@lex0 _ T^d). Qed.
 Lemma ltx1 x : (x < \top) = (x != \top). Proof. exact: (@lt0x _ T^d). Qed.
 
 End TPOrderTheory.
 End TPOrderTheory.
-
-#[global] Hint Extern 0 (is_true (\bot <= _)) => exact: le0x : core.
-#[global] Hint Extern 0 (is_true (_ <= \top)) => exact: lex1 : core.
 
 Module Import MeetTheory.
 Section MeetTheory.
@@ -4371,14 +4646,14 @@ Let leT_anti    := @le_anti _ T.
 Let leT'_anti   := @le_anti _ T'.
 Let ltT_neqAle  := @lt_neqAle _ T.
 Let ltT'_neqAle := @lt_neqAle _ T'.
-Let ltT_def     := @lt_def _ T.
+Let ltT_def     := @lt_le_def _ T.
 Let leT_total   := @le_total _ T.
 
 Lemma le_mono : {homo f : x y / x < y} -> {mono f : x y / x <= y}.
 Proof. exact: total_homo_mono. Qed.
 
 Lemma le_nmono : {homo f : x y /~ x < y} -> {mono f : x y /~ x <= y}.
-Proof. exact: total_homo_mono. Qed.
+Proof. by apply: total_homo_mono => // x y; rewrite eq_sym. Qed.
 
 Lemma le_mono_in :
   {in D &, {homo f : x y / x < y}} -> {in D &, {mono f : x y / x <= y}}.
@@ -4386,7 +4661,7 @@ Proof. exact: total_homo_mono_in. Qed.
 
 Lemma le_nmono_in :
   {in D &, {homo f : x y /~ x < y}} -> {in D &, {mono f : x y /~ x <= y}}.
-Proof. exact: total_homo_mono_in. Qed.
+Proof. by apply: total_homo_mono_in => // x y; rewrite eq_sym. Qed.
 
 End TotalMonotonyTheory.
 
@@ -4678,9 +4953,95 @@ End CTBDistrLatticeTheory.
 (* FACTORIES *)
 (*************)
 
+(* preorder *)
+
+HB.factory Record isPreorder (d : disp_t) T of Equality T := {
+  le       : rel T;
+  lt       : rel T;
+  lt_def   : forall x y, lt x y = (le x y) && ~~ (le y x);
+  le_refl  : reflexive     le;
+  le_trans : transitive    le;
+}.
+
+HB.builders Context (d : disp_t) T of isPreorder d T.
+(* TODO: print nice error message when keyed type is not provided *)
+
+Let ge_trans : transitive (fun x y => le y x).
+Proof. by move=> x y z /[swap]; apply: le_trans. Qed.
+
+HB.instance Definition _ := @isDuallyPreorder.Build d T
+  le _ lt_def (fun x y => lt_def y x) le_refl le_refl le_trans ge_trans.
+HB.end.
+
+HB.factory Record Le_isPreorder (d : disp_t) T of Equality T := {
+  le       : rel T;
+  le_refl  : reflexive     le;
+  le_trans : transitive    le;
+}.
+
+HB.builders Context (d : disp_t) T of Le_isPreorder d T.
+(* TODO: print nice error message when keyed type is not provided *)
+
+HB.instance Definition _ := @isPreorder.Build d T
+  le _ (fun _ _ => erefl) le_refl le_trans.
+HB.end.
+
+HB.factory Record LtLe_isPreorder (d : disp_t) T of Equality T := {
+  le : rel T;
+  lt : rel T;
+  le_def   : forall x y, le x y = (x == y) || lt x y;
+  lt_irr   : irreflexive lt;
+  lt_trans : transitive lt;
+}.
+HB.builders Context (d : disp_t) T of LtLe_isPreorder d T.
+
+Let le_refl : reflexive le. Proof. by move=> x; rewrite le_def eqxx. Qed.
+
+Let le_trans : transitive le.
+Proof.
+move=> y x z; rewrite !le_def; case: (eqVneq x y) => [->|]//= neq_xy.
+by case: (eqVneq y z) => /= [<- ->|_ /lt_trans yx /yx ->]; rewrite orbT.
+Qed.
+
+Let lt_le_def x y : lt x y = (le x y) && ~~ (le y x).
+Proof.
+rewrite !le_def eq_sym; have [->|_ /=] := eqVneq x y; first by rewrite lt_irr.
+case/boolP: (lt x y) => //= xy; apply/esym/negP => /(lt_trans xy).
+by rewrite lt_irr.
+Qed.
+
+HB.instance Definition _ := @isPreorder.Build d T
+  le lt lt_le_def le_refl le_trans .
+
+HB.end.
+
+HB.factory Record Lt_isPreorder (d : disp_t) T of Equality T := {
+  lt       : rel T;
+  lt_irr   : irreflexive lt;
+  lt_trans : transitive  lt;
+}.
+
+HB.builders Context (d : disp_t) (T : Type) of Lt_isPreorder d T.
+HB.instance Definition _ := @LtLe_isPreorder.Build d T
+  _ lt (fun _ _ => erefl) lt_irr lt_trans.
+HB.end.
+
 (* porderType *)
 
-HB.factory Record isPOrder (d : disp_t) T of Equality T := {
+HB.factory Record Preorder_isPOrder (d : disp_t) T of Preorder d T := {
+  le_anti  : antisymmetric (@le d T);
+}.
+
+HB.builders Context (d : disp_t) T of Preorder_isPOrder d T.
+
+Let ge_anti : antisymmetric (fun x y => @le d T y x).
+Proof. by move=> x y; rewrite andbC; apply: le_anti. Qed.
+
+HB.instance Definition _ := Preorder_isDuallyPOrder.Build d T le_anti ge_anti.
+
+HB.end.
+
+HB.factory Record isPOrder (d : disp_t) T of Choice T := {
   le       : rel T;
   lt       : rel T;
   lt_def   : forall x y, lt x y = (y != x) && (le x y);
@@ -4689,34 +5050,34 @@ HB.factory Record isPOrder (d : disp_t) T of Equality T := {
   le_trans : transitive    le;
 }.
 
-HB.builders Context d T of isPOrder d T.
+HB.builders Context (d : disp_t) T of isPOrder d T.
 
-Fact gt_def x y : lt y x = (y != x) && (le y x).
-Proof. by rewrite lt_def eq_sym. Qed.
+Let lt_le_def x y : lt x y = le x y && ~~ le y x.
+Proof.
+rewrite lt_def andbC; case /boolP: (le x y) => //= xy.
+have [->|/negP xyE /=] := eqVneq y x; first by rewrite le_refl.
+by apply/esym/negP => yx; apply/xyE/eqP/le_anti; rewrite yx.
+Qed.
 
-Fact ge_anti : antisymmetric (fun x y => le y x).
-Proof. by move=> ? ? /le_anti ->. Qed.
-
-HB.instance Definition _ := @isDuallyPOrder.Build d T
-  le lt lt_def gt_def le_refl le_refl le_anti ge_anti
-  le_trans (fun _ _ _ Hxy Hyz => le_trans Hyz Hxy).
+HB.instance Definition _ := isPreorder.Build d T lt_le_def le_refl le_trans.
+HB.instance Definition _ := Preorder_isPOrder.Build d T le_anti.
 
 HB.end.
 
-HB.factory Record Le_isPOrder (d : disp_t) T of Equality T := {
+HB.factory Record Le_isPOrder (d : disp_t) T of Choice T := {
   le       : rel T;
   le_refl  : reflexive     le;
   le_anti  : antisymmetric le;
   le_trans : transitive    le;
 }.
 
-HB.builders Context d T of Le_isPOrder d T.
+HB.builders Context (d : disp_t) T of Le_isPOrder d T.
 (* TODO: print nice error message when keyed type is not provided *)
-HB.instance Definition _ := @isPOrder.Build d T
-  le _ (fun _ _ => erefl) le_refl le_anti le_trans.
+HB.instance Definition _ := @Le_isPreorder.Build d T le le_refl le_trans.
+HB.instance Definition _ := @Preorder_isPOrder.Build d T le_anti.
 HB.end.
 
-HB.factory Record LtLe_isPOrder (d : disp_t) T of Equality T := {
+HB.factory Record LtLe_isPOrder (d : disp_t) T of Choice T := {
   le : rel T;
   lt : rel T;
   le_def   : forall x y, le x y = (x == y) || lt x y;
@@ -4724,32 +5085,22 @@ HB.factory Record LtLe_isPOrder (d : disp_t) T of Equality T := {
   lt_trans : transitive lt;
 }.
 
-HB.builders Context d T of LtLe_isPOrder d T.
+HB.builders Context (d : disp_t) T of LtLe_isPOrder d T.
 
-Let le_refl : reflexive le. Proof. by move=> x; rewrite le_def eqxx. Qed.
+HB.instance Definition _ := @LtLe_isPreorder.Build d T le lt le_def lt_irr lt_trans.
 
 Let le_anti : antisymmetric le.
 Proof.
-move=> x y; rewrite !le_def.
-have [//|_/=] := eqVneq x y => /andP[xy yx].
+move=> x y; rewrite !le_def [y == _]eq_sym.
+have [//|neq_xy/=] := eqVneq x y => /andP[xy yx].
 by have := lt_trans xy yx; rewrite lt_irr.
 Qed.
 
-Let le_trans : transitive le.
-Proof.
-move=> y x z; rewrite !le_def; have [->|_]//= := eqVneq x y.
-by case: (eqVneq y z) => /= [<- ->|_ /lt_trans yx /yx ->]; rewrite orbT.
-Qed.
-
-Let lt_def x y : lt x y = (y != x) && (le x y).
-Proof. by rewrite le_def; case: eqVneq => //= ->; rewrite lt_irr. Qed.
-
-HB.instance Definition _ := @isPOrder.Build d T
-  le lt lt_def le_refl le_anti le_trans.
+HB.instance Definition _ := @Preorder_isPOrder.Build d T le_anti.
 
 HB.end.
 
-HB.factory Record Lt_isPOrder (d : disp_t) T of Equality T := {
+HB.factory Record Lt_isPOrder (d : disp_t) T of Choice T := {
   lt       : rel T;
   lt_irr   : irreflexive lt;
   lt_trans : transitive  lt;
@@ -4940,8 +5291,16 @@ move=> y x z; rewrite !le_def => /eqP lexy /eqP leyz; apply/eqP.
 by rewrite -[in LHS]lexy -meetA leyz lexy.
 Qed.
 
-HB.instance Definition _ :=
-  @isPOrder.Build d T le lt lt_def le_refl le_anti le_trans.
+Fact lt_le_def x y : lt x y = (le x y) && ~~ (le y x).
+Proof.
+rewrite lt_def andbC; case/boolP: (le x y) => //= xy.
+congr negb; apply/eqP/idP => [->|yx]; first exact/le_refl.
+by apply/le_anti/andP; split.
+Qed.
+
+HB.instance Definition _ := isPreorder.Build d T
+  lt_le_def le_refl le_trans.
+HB.instance Definition _ := Preorder_isPOrder.Build d T le_anti.
 
 HB.instance Definition _ := @POrder_Meet_isDistrLattice.Build d T
   meet join meetC joinC meetA joinA joinKI meetKU le_def meetUl.
@@ -5191,7 +5550,7 @@ HB.factory Record isOrder (d : disp_t) T of Choice T := {
   lt : rel T;
   meet : T -> T -> T;
   join : T -> T -> T;
-  lt_def : forall x y, lt x y = (y != x) && le x y;
+  lt_neqAle : forall x y, lt x y = (y != x) && le x y;
   meet_def : forall x y, meet x y = if lt x y then x else y;
   join_def : forall x y, join x y = if lt x y then y else x;
   le_anti : antisymmetric le;
@@ -5204,8 +5563,16 @@ HB.builders Context d T of isOrder d T.
 Fact le_refl : reflexive le.
 Proof. by move=> x; case: (le x x) (le_total x x). Qed.
 
-HB.instance Definition _ :=
-  @isPOrder.Build d T le lt lt_def le_refl le_anti le_trans.
+Fact lt_le_def x y : lt x y = (le x y) && ~~ (le y x).
+Proof.
+rewrite lt_neqAle andbC; case/boolP: (le x y) => //= xy.
+congr negb; apply/eqP/idP => [->|yx]; first exact/le_refl.
+by apply/le_anti/andP; split.
+Qed.
+
+HB.instance Definition _ := isPreorder.Build d T
+  lt_le_def le_refl le_trans.
+HB.instance Definition _ := Preorder_isPOrder.Build d T le_anti.
 
 Section GeneratedOrder.
 
@@ -5258,14 +5625,14 @@ HB.factory Record LtOrder (d : disp_t) T of Choice T := {
 
 HB.builders Context d T of LtOrder d T.
 
-Fact lt_def x y : lt x y = (y != x) && le x y.
+Fact lt_neqAle x y : lt x y = (y != x) && le x y.
 Proof. by rewrite le_def; case: eqVneq => //= ->; rewrite lt_irr. Qed.
 
 Fact meet_def_le x y : meet x y = if lt x y then x else y.
-Proof. by rewrite meet_def lt_def; case: eqP. Qed.
+Proof. by rewrite meet_def lt_neqAle; case: eqP. Qed.
 
 Fact join_def_le x y : join x y = if lt x y then y else x.
-Proof. by rewrite join_def lt_def; case: eqP. Qed.
+Proof. by rewrite join_def lt_neqAle; case: eqP. Qed.
 
 Fact le_anti : antisymmetric le.
 Proof.
@@ -5282,8 +5649,8 @@ Qed.
 Fact le_total : total le.
 Proof. by move=> x y; rewrite !le_def; case: eqVneq => //; exact: lt_total. Qed.
 
-HB.instance Definition _ := @isOrder.Build d T
-  le lt meet join lt_def meet_def_le join_def_le le_anti le_trans le_total.
+HB.instance Definition _ :=
+  isOrder.Build d T lt_neqAle meet_def_le join_def_le le_anti le_trans le_total.
 
 HB.end.
 
@@ -5299,50 +5666,70 @@ Proof. by move=> x y; rewrite -!f_mono le_total. Qed.
 HB.instance Definition _ := POrder_isTotal.Build disp T totalT.
 HB.end.
 
-Module CancelPartial.
-Section CancelPartial.
+Module PreCancelPartial.
+Section PreCancelPartial.
 Variables (disp : disp_t) (T : choiceType).
-Variables (disp' : disp_t) (T' : porderType disp') (f : T -> T').
-
-Section PCan.
-Variables (f' : T' -> option T) (f_can : pcancel f f').
+Variables (disp' : disp_t) (T' : preorderType disp') (f : T -> T').
 
 Definition le (x y : T) := f x <= f y.
 Definition lt (x y : T) := f x < f y.
 
 Fact refl : reflexive le. Proof. by move=> ?; apply: lexx. Qed.
-Fact anti : antisymmetric le.
-Proof. by move=> x y /le_anti /(pcan_inj f_can). Qed.
-Fact trans : transitive le. Proof. by move=> y x z xy /(le_trans xy). Qed.
-Fact lt_def x y : lt x y = (y != x) && le x y.
-Proof. by rewrite /lt lt_def (inj_eq (pcan_inj f_can)). Qed.
+Fact trans : transitive le. Proof. by move=> ? ? ?; apply: le_trans. Qed.
+Fact ge_trans : transitive (fun x y => le y x). Proof. by move=> ? ? ?; apply: ge_trans. Qed.
+Fact lt_le_def x y : lt x y = le x y && ~~ le y x.
+Proof. exact: lt_le_def. Qed.
 
-Definition Pcan := isPOrder.Build disp T lt_def refl anti trans.
+Definition PrePcan := isPreorder.Build disp T lt_le_def refl trans.
 
-End PCan.
+End PreCancelPartial.
+End PreCancelPartial.
 
-Definition Can f' (f_can : cancel f f') := Pcan (can_pcan f_can).
-
-End CancelPartial.
-End CancelPartial.
-
-Notation PCanIsPartial := CancelPartial.Pcan.
-Notation CanIsPartial := CancelPartial.Can.
-
-#[export]
+(* FIXME
+Fail #[export]
 HB.instance Definition _ (disp : disp_t) (T : choiceType)
   (disp' : disp_t) (T' : porderType disp') (f : T -> T')
-  (f' : T' -> option T) (f_can : pcancel f f') : isPOrder disp (pcan_type f_can) :=
-  CancelPartial.Pcan disp (f_can : @pcancel _ (pcan_type f_can)  f f').
+  (f_inj : injective f): isPreorder disp (inj_type f_inj) :=
+  @PreCancelPartial.PrePcan disp (inj_type f_inj) disp' T' f.
+ *)
 
 #[export]
-HB.instance Definition _ (disp : disp_t) (T : choiceType)
-  (disp' : disp_t) (T' : porderType disp') (f : T -> T') (f' : T' ->  T)
-  (f_can : cancel f f') : isPOrder disp (can_type f_can) :=
-  CancelPartial.Can disp (f_can : @cancel _ (can_type f_can)  f f').
+HB.instance Definition _ (disp : disp_t) (T : Type)
+  (disp' : disp_t) (T' : preorderType disp') (f : T -> T')
+  (f' : T' -> option T) (f_can : pcancel f f') : isPreorder disp (pcan_type f_can) :=
+  @PreCancelPartial.PrePcan disp (pcan_type f_can) disp' T' f.
+
+#[export]
+HB.instance Definition _ (disp : disp_t) (T : Type)
+  (disp' : disp_t) (T' : preorderType disp') (f : T -> T')
+  (f' : T' -> T) (f_can : cancel f f') : isPreorder disp (can_type f_can) :=
+  @PreCancelPartial.PrePcan disp (can_type f_can) disp' T' f.
+
+
+Module CancelPartial.
+Section CancelPartial.
+Variables (disp : disp_t) (T : Type).
+Variables (disp' : disp_t) (T' : porderType disp') (f : T -> T').
+Variables (f' : T' -> option T) (f_can : pcancel f f').
+
+Fact anti : antisymmetric (@Order.le disp (pcan_type f_can)).
+Proof. by move=> ? ? /le_anti; apply: pcan_inj. Qed.
+
+HB.instance Definition _ :=
+  Preorder_isPOrder.Build disp (pcan_type f_can) anti.
+
+End CancelPartial.
+End CancelPartial.
+HB.export CancelPartial.
+
+HB.instance Definition _ (disp : disp_t) (T : Type)
+ (disp' : disp_t) (T' : porderType disp') (f : T -> T')
+ (f' : T' -> T) (f_can : cancel f f') :=
+ Preorder_isPOrder.Build disp (can_type f_can)
+   (@CancelPartial.anti disp T disp' T' f _ (can_pcan f_can)).
 
 Section CancelTotal.
-Variables (disp : disp_t) (T : choiceType).
+Variables (disp : disp_t) (T : Type).
 Variables (disp' : disp_t) (T' : orderType disp') (f : T -> T').
 
 Section PCan.
@@ -5428,13 +5815,16 @@ HB.end.
 
 (* Morphism hierarchy. *)
 
-HB.mixin Record isOrderMorphism d (T : porderType d) d' (T' : porderType d')
+Definition order_morphism d (T : preorderType d) d' (T' : preorderType d')
+  (f : T -> T') : Prop := {mono f : x y / x <= y}.
+
+HB.mixin Record isOrderMorphism d (T : preorderType d) d' (T' : preorderType d')
     (apply : T -> T') := {
   omorph_le_subproof : {homo apply : x y / x <= y} ;
 }.
 
-HB.structure Definition OrderMorphism d (T : porderType d)
-  d' (T' : porderType d') := {f of isOrderMorphism d T d' T' f}.
+HB.structure Definition OrderMorphism d (T : preorderType d)
+  d' (T' : preorderType d') := {f of isOrderMorphism d T d' T' f}.
 
 Module OrderMorphismExports.
 Notation "{ 'omorphism' T -> T' }" :=
@@ -5445,23 +5835,18 @@ HB.export OrderMorphismExports.
 Module Import OrderMorphismTheory.
 Section OrderMorphismTheory.
 
-Section Properties.
-
-Variables (d : disp_t) (T : porderType d) (d' : disp_t) (T' : porderType d').
-Variables (f : {omorphism T -> T'}).
-
-Lemma omorph_le : {homo f : x y / x <= y}.
+Lemma omorph_le (d : disp_t) (T : preorderType d) (d' : disp_t) (T' : preorderType d')
+(f : {omorphism T -> T'}) : {homo f : x y / x <= y}.
 Proof. exact: omorph_le_subproof. Qed.
 
-Lemma omorph_lt : injective f -> {homo f : x y / x < y}.
+Lemma omorph_lt (d : disp_t) (T : porderType d) (d' : disp_t) (T' : porderType d')
+(f : {omorphism T -> T'}) : injective f -> {homo f : x y / x < y}.
 Proof. by move/inj_homo_lt; apply; apply: omorph_le. Qed.
-
-End Properties.
 
 Section IdCompFun.
 
-Variables (d : disp_t) (T : porderType d) (d' : disp_t) (T' : porderType d').
-Variables (d'' : disp_t) (T'' : porderType d'').
+Variables (d : disp_t) (T : preorderType d) (d' : disp_t) (T' : preorderType d').
+Variables (d'' : disp_t) (T'' : preorderType d'').
 Variables (f : {omorphism T' -> T''}) (g : {omorphism T -> T'}).
 
 Fact idfun_is_nondecreasing : nondecreasing (@idfun T).
@@ -5472,6 +5857,7 @@ HB.instance Definition _ := isOrderMorphism.Build d T d T idfun
 
 Fact comp_is_nondecreasing : nondecreasing (f \o g).
 Proof. by move=> ? ? ?; do 2 apply: omorph_le. Qed.
+
 #[export]
 HB.instance Definition _ := isOrderMorphism.Build d T d'' T'' (f \o g)
   comp_is_nondecreasing.
@@ -5839,42 +6225,56 @@ Proof. by move=> FS; elim/big_ind: _; [exact: opred1 | exact: opredI |]. Qed.
 End TLatticePred.
 End LatticePred.
 
-HB.mixin Record isSubPOrder d (T : porderType d) (S : pred T) d' U
-    of SubType T S U & POrder d' U := {
+HB.mixin Record isSubPreorder d (T : preorderType d) (S : pred T) d' U
+    of SubType T S U & Preorder d' U := {
   le_val : {mono (val : U -> T) : x y / x <= y};
 }.
 
-#[short(type="subPOrder")]
-HB.structure Definition SubPOrder d (T : porderType d) S d' :=
-  { U of SubChoice T S U & POrder d' U & isSubPOrder d T S d' U }.
+#[short(type="subPreorder")]
+HB.structure Definition SubPreorder d (T : preorderType d) S d' :=
+  { U of SubEquality T S U & Preorder d' U & isSubPreorder d T S d' U }.
 
-Module Import SubPOrderTheory.
-Section SubPOrderTheory.
-Context (d : disp_t) (T : porderType d) (S : pred T).
-Context (d' : disp_t) (U : SubPOrder.type S d').
+Module Import SubPreorderTheory.
+Section SubPreorderTheory.
+Context (d : disp_t) (T : preorderType d) (S : pred T).
+Context (d' : disp_t) (U : SubPreorder.type S d').
 Local Notation val := (val : U -> T).
 #[deprecated(since="mathcomp 2.3.0", note="Use le_val instead.")]
 Lemma leEsub x y : (x <= y) = (val x <= val y). Proof. by rewrite le_val. Qed.
 Lemma lt_val : {mono val : x y / x < y}.
-Proof. by move=> x y; rewrite !lt_def (inj_eq val_inj) le_val. Qed.
+Proof. by move=> x y; rewrite !lt_leAnge !le_val. Qed.
 #[deprecated(since="mathcomp 2.3.0", note="Use lt_val instead.")]
 Lemma ltEsub x y : (x < y) = (val x < val y). Proof. by rewrite lt_val. Qed.
 Lemma le_wval : {homo val : x y / x <= y}. Proof. exact/mono2W/le_val. Qed.
 Lemma lt_wval : {homo val : x y / x < y}. Proof. exact/mono2W/lt_val. Qed.
 HB.instance Definition _ := isOrderMorphism.Build d' U d T val le_wval.
-End SubPOrderTheory.
+End SubPreorderTheory.
 Arguments lt_val {d T S d' U} x y.
 Arguments le_wval {d T S d' U} x y.
 Arguments lt_wval {d T S d' U} x y.
-End SubPOrderTheory.
+End SubPreorderTheory.
+
+HB.factory Record SubChoice_isSubPreorder d (T : preorderType d) S (d' : disp_t) U
+    of SubChoice T S U := {}.
+
+HB.builders Context d T S d' U of SubChoice_isSubPreorder d T S d' U.
+HB.instance Definition _ : isPreorder d' U :=
+  @PreCancelPartial.PrePcan d' U d T val.
+Fact valD : order_morphism (val : U -> T). Proof. by []. Qed.
+HB.instance Definition _ := isSubPreorder.Build d T S d' U valD.
+HB.end.
+
+#[short(type="subPOrder")]
+HB.structure Definition SubPOrder d (T : porderType d) S d' :=
+  { U of SubEquality T S U & POrder d' U & isSubPreorder d T S d' U }.
 
 HB.factory Record SubChoice_isSubPOrder d (T : porderType d) S (d' : disp_t) U
     of SubChoice T S U := {}.
 
 HB.builders Context d T S d' U of SubChoice_isSubPOrder d T S d' U.
-HB.instance Definition _ : isPOrder d' U := CancelPartial.Pcan d' (@valK _ _ U).
-Fact valD : {mono (val : U -> T) : x y / x <= y}. Proof. by []. Qed.
-HB.instance Definition _ := isSubPOrder.Build d T S d' U valD.
+HB.instance Definition _ := SubChoice_isSubPreorder.Build d T S d' U.
+HB.instance Definition _ := Preorder_isPOrder.Build d' U
+   (@CancelPartial.anti d' U d T _ _ (@valK _ _ U)).
 HB.end.
 
 #[export]
@@ -6202,6 +6602,14 @@ HB.end.
 
 Module SubOrderExports.
 
+Notation "[ 'SubChoice_isSubPreorder' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubPreorder.Build _ _ _ _ U)
+  (at level 0, format "[ 'SubChoice_isSubPreorder'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubPreorder' 'of' U 'by' <: 'with' disp ]" :=
+  (SubChoice_isSubPreorder.Build _ _ _ disp U)
+  (at level 0, format "[ 'SubChoice_isSubPreorder'  'of'  U  'by'  <:  'with'  disp ]")
+  : form_scope.
 Notation "[ 'SubChoice_isSubPOrder' 'of' U 'by' <: ]" :=
   (SubChoice_isSubPOrder.Build _ _ _ _ U)
   (at level 0, format "[ 'SubChoice_isSubPOrder'  'of'  U  'by'  <: ]")
@@ -6396,17 +6804,13 @@ HB.export NatOrder.Exports.
 Module NatMonotonyTheory.
 Section NatMonotonyTheory.
 
-Context {disp : disp_t} {T : porderType disp}.
+Context {disp : disp_t} {T : preorderType disp}.
 Variables (D : {pred nat}) (f : nat -> T).
 Hypothesis Dconvex : {in D &, forall i j k, i < k < j -> k \in D}.
 
 Lemma homo_ltn_lt_in : {in D, forall i, i.+1 \in D -> f i < f i.+1} ->
   {in D &, {homo f : i j / i < j}}.
 Proof. by apply: homo_ltn_in Dconvex; apply: lt_trans. Qed.
-
-Lemma incn_inP : {in D, forall i, i.+1 \in D -> f i < f i.+1} ->
-  {in D &, {mono f : i j / i <= j}}.
-Proof. by move=> f_inc; apply/le_mono_in/homo_ltn_lt_in. Qed.
 
 Lemma nondecn_inP : {in D, forall i, i.+1 \in D -> f i <= f i.+1} ->
   {in D &, {homo f : i j / i <= j}}.
@@ -6419,10 +6823,6 @@ move=> f_dec; apply: homo_sym_in.
 by apply: homo_ltn_in Dconvex f_dec => ? ? ? ? /lt_trans->.
 Qed.
 
-Lemma decn_inP : {in D, forall i, i.+1 \in D -> f i > f i.+1} ->
-  {in D &, {mono f : i j /~ i <= j}}.
-Proof. by move=> f_dec; apply/le_nmono_in/nhomo_ltn_lt_in. Qed.
-
 Lemma nonincn_inP : {in D, forall i, i.+1 \in D -> f i >= f i.+1} ->
   {in D &, {homo f : i j /~ i <= j}}.
 Proof.
@@ -6433,9 +6833,6 @@ Qed.
 Lemma homo_ltn_lt : (forall i, f i < f i.+1) -> {homo f : i j / i < j}.
 Proof. by apply: homo_ltn; apply: lt_trans. Qed.
 
-Lemma incnP : (forall i, f i < f i.+1) -> {mono f : i j / i <= j}.
-Proof. by move=> f_inc; apply/le_mono/homo_ltn_lt. Qed.
-
 Lemma nondecnP : (forall i, f i <= f i.+1) -> {homo f : i j / i <= j}.
 Proof. by apply: homo_leq => //; apply: le_trans. Qed.
 
@@ -6445,9 +6842,6 @@ move=> f_dec; apply: homo_sym.
 by apply: homo_ltn f_dec => ? ? ? ? /lt_trans->.
 Qed.
 
-Lemma decnP : (forall i, f i > f i.+1) -> {mono f : i j /~ i <= j}.
-Proof. by move=> f_dec; apply/le_nmono/nhomo_ltn_lt. Qed.
-
 Lemma nonincnP : (forall i, f i >= f i.+1) -> {homo f : i j /~ i <= j}.
 Proof.
 move=> /= f_dec; apply: homo_sym.
@@ -6456,18 +6850,39 @@ Qed.
 
 End NatMonotonyTheory.
 Arguments homo_ltn_lt_in {disp T} [D f].
-Arguments incn_inP {disp T} [D f].
 Arguments nondecn_inP {disp T} [D f].
 Arguments nhomo_ltn_lt_in {disp T} [D f].
-Arguments decn_inP {disp T} [D f].
 Arguments nonincn_inP {disp T} [D f].
 Arguments homo_ltn_lt {disp T} [f].
-Arguments incnP {disp T} [f].
 Arguments nondecnP {disp T} [f].
 Arguments nhomo_ltn_lt {disp T} [f].
-Arguments decnP {disp T} [f].
 Arguments nonincnP {disp T} [f].
 
+Section NatMonotonyTheory.
+
+Context {disp : disp_t} {T : porderType disp}.
+Variables (D : {pred nat}) (f : nat -> T).
+Hypothesis Dconvex : {in D &, forall i j k, i < k < j -> k \in D}.
+
+Lemma incn_inP : {in D, forall i, i.+1 \in D -> f i < f i.+1} ->
+  {in D &, {mono f : i j / i <= j}}.
+Proof. by move=> f_inc; apply/le_mono_in/homo_ltn_lt_in. Qed.
+
+Lemma decn_inP : {in D, forall i, i.+1 \in D -> f i > f i.+1} ->
+  {in D &, {mono f : i j /~ i <= j}}.
+Proof. by move=> f_dec; apply/le_nmono_in/nhomo_ltn_lt_in. Qed.
+
+Lemma incnP : (forall i, f i < f i.+1) -> {mono f : i j / i <= j}.
+Proof. by move=> f_inc; apply/le_mono/homo_ltn_lt. Qed.
+
+Lemma decnP : (forall i, f i > f i.+1) -> {mono f : i j /~ i <= j}.
+Proof. by move=> f_dec; apply/le_nmono/nhomo_ltn_lt. Qed.
+
+End NatMonotonyTheory.
+Arguments incn_inP {disp T} [D f].
+Arguments decn_inP {disp T} [D f].
+Arguments incnP {disp T} [f].
+Arguments decnP {disp T} [f].
 End NatMonotonyTheory.
 
 (****************************************************************************)
@@ -7095,7 +7510,7 @@ Local Open Scope type_scope. (* FIXME *)
 
 Definition type (disp : disp_t) (T T' : Type) := T * T'.
 Definition type_
-  (disp1 disp2 : disp_t) (T : porderType disp1) (T' : porderType disp2) :=
+  (disp1 disp2 : disp_t) (T : preorderType disp1) (T' : preorderType disp2) :=
   type (prod_display disp1 disp2) T T'.
 
 Section Basis.
@@ -7110,28 +7525,68 @@ Local Notation "T * T'" := (type disp T T') : type_scope.
 
 End Basis.
 
-Section POrder.
-Context (disp1 disp2 : disp_t) (T1 : porderType disp1) (T2 : porderType disp2).
+Section Preorder.
+Context (disp1 disp2 : disp_t).
+Context (T1 : preorderType disp1) (T2 : preorderType disp2).
 Implicit Types (x y : T1 * T2).
 
 Let le x y := (x.1 <= y.1) && (x.2 <= y.2).
 
 Let lt x y := (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
 
-Fact lt_def x y : lt x y = (y != x) && le x y.
-Proof. by rewrite /lt /le eqE negb_and !lt_def andb_orl andbCA -andbA. Qed.
+Fact lt_def x y : lt x y = le x y && ~~ le y x.
+Proof.
+rewrite /lt /le !lt_leAnge -andbA -andb_orr.
+by rewrite [~~ _ && _]andbC -andb_orr andbA negb_and.
+Qed.
 
 Fact refl : reflexive le. Proof. by move=> ?; rewrite /le !lexx. Qed.
-
-Fact anti : antisymmetric le.
-Proof.
-by move=> [? ?] [? ?]; rewrite andbACA => /andP [] /= /le_anti -> /le_anti ->.
-Qed.
 
 Fact trans : transitive le.
 Proof.
 rewrite /le => y x z /andP [] hxy ? /andP [] /(le_trans hxy) ->.
 by apply: le_trans.
+Qed.
+
+End Preorder.
+
+Section Preorder.
+Context (disp1 disp2 disp3 : disp_t).
+Context (T1 : preorderType disp1) (T2 : preorderType disp2).
+Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
+Implicit Types (x y : T1 * T2).
+
+Let T1' : Type := T1.
+HB.instance Definition _ := Preorder.on T1'.
+Let T2' : Type := T2.
+HB.instance Definition _ := Preorder.on T2'.
+
+Definition le x y := (x.1 <= y.1) && (x.2 <= y.2).
+
+Definition lt x y := (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
+
+#[export]
+HB.instance Definition _ := @isDuallyPreorder.Build disp3 (T1 * T2) le lt
+  (@lt_def _ _ T1' T2') (@lt_def _ _ T1^d T2^d)
+  (@refl _ _ T1' T2') (@refl _ _ T1^d T2^d)
+  (@trans _ _ T1' T2') (@trans _ _ T1^d T2^d).
+
+Lemma leEprod x y : (x <= y) = (x.1 <= y.1) && (x.2 <= y.2). Proof. by []. Qed.
+
+Lemma le_pair (x1 y1 : T1) (x2 y2 : T2) :
+  (x1, x2) <= (y1, y2) :> T1 * T2 = (x1 <= y1) && (x2 <= y2).
+Proof. by []. Qed.
+
+End Preorder.
+
+Section POrder.
+Context (disp1 disp2 disp3 : disp_t).
+Context (T1 : porderType disp1) (T2 : porderType disp2).
+
+Fact anti : antisymmetric (@le disp1 disp2 disp2 T1 T2).
+Proof.
+case=> [? ?] [? ?].
+by rewrite andbAC andbA andbAC -andbA => /= /andP [] /le_anti -> /le_anti ->.
 Qed.
 
 End POrder.
@@ -7147,25 +7602,13 @@ HB.instance Definition _ := POrder.on T1'.
 Let T2' : Type := T2.
 HB.instance Definition _ := POrder.on T2'.
 
-Definition le x y := (x.1 <= y.1) && (x.2 <= y.2).
-
-Definition lt x y := (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
-
 #[export]
-HB.instance Definition _ := @isDuallyPOrder.Build disp3 (T1 * T2) le lt
-  (@lt_def _ _ T1' T2') (@lt_def _ _ T1^d T2^d)
-  (@refl _ _ T1' T2') (@refl _ _ T1^d T2^d)
-  (@anti _ _ T1' T2') (@anti _ _ T1^d T2^d)
-  (@trans _ _ T1' T2') (@trans _ _ T1^d T2^d).
-
-Lemma leEprod x y : (x <= y) = (x.1 <= y.1) && (x.2 <= y.2). Proof. by []. Qed.
+HB.instance Definition _ :=
+  Preorder_isDuallyPOrder.Build disp3 (T1 * T2)
+  (@anti _ _ T1' T2') (@anti _ _ T1^d T2^d).
 
 Lemma ltEprod x y : (x < y) = [&& x != y, x.1 <= y.1 & x.2 <= y.2].
 Proof. by rewrite lt_neqAle. Qed.
-
-Lemma le_pair (x1 y1 : T1) (x2 y2 : T2) :
-  (x1, x2) <= (y1, y2) :> T1 * T2 = (x1 <= y1) && (x2 <= y2).
-Proof. by []. Qed.
 
 Lemma lt_pair (x1 y1 : T1) (x2 y2 : T2) : (x1, x2) < (y1, y2) :> T1 * T2 =
   [&& (x1 != y1) || (x2 != y2), x1 <= y1 & x2 <= y2].
@@ -7173,26 +7616,26 @@ Proof. by rewrite ltEprod negb_and. Qed.
 
 End POrder.
 
-Section BPOrder.
+Section BPreorder.
 Context (disp1 disp2 : disp_t).
-Context (T1 : bPOrderType disp1) (T2 : bPOrderType disp2).
+Context (T1 : bPreorderType disp1) (T2 : bPreorderType disp2).
 Local Notation "T1 * T2" := (type (Disp tt tt) T1 T2) : type_scope.
 Implicit Types (x : T1 * T2).
 
 Fact le0x x : (\bot, \bot) <= x :> T1 * T2.
 Proof. by rewrite leEprod !le0x. Qed.
 
-End BPOrder.
+End BPreorder.
 
-Section BPOrder.
+Section BPreorder.
 Context (disp1 disp2 disp3 : disp_t).
-Context (T1 : bPOrderType disp1) (T2 : bPOrderType disp2).
+Context (T1 : bPreorderType disp1) (T2 : bPreorderType disp2).
 Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 
 Let T1' : Type := T1.
-HB.instance Definition _ := BPOrder.on T1'.
+HB.instance Definition _ := BPreorder.on T1'.
 Let T2' : Type := T2.
-HB.instance Definition _ := BPOrder.on T2'.
+HB.instance Definition _ := BPreorder.on T2'.
 
 #[export]
 HB.instance Definition _ :=
@@ -7200,11 +7643,11 @@ HB.instance Definition _ :=
 
 Lemma botEprod : \bot = (\bot, \bot) :> T1 * T2. Proof. by []. Qed.
 
-End BPOrder.
+End BPreorder.
 
-Section TPOrder.
+Section TPreorder.
 Context (disp1 disp2 disp3 : disp_t).
-Context (T1 : tPOrderType disp1) (T2 : tPOrderType disp2).
+Context (T1 : tPreorderType disp1) (T2 : tPreorderType disp2).
 Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 
 #[export]
@@ -7213,13 +7656,13 @@ HB.instance Definition _ :=
 
 Lemma topEprod : \top = (\top, \top) :> T1 * T2. Proof. by []. Qed.
 
-End TPOrder.
+End TPreorder.
 
 (* FIXME: use HB.saturate *)
 #[export]
 HB.instance Definition _ (disp1 disp2 disp3 : disp_t)
-  (T1 : tbPOrderType disp1) (T2 : tbPOrderType disp2) :=
-  POrder.on (type disp3 T1 T2).
+  (T1 : tbPreorderType disp1) (T2 : tbPreorderType disp2) :=
+  Preorder.on (type disp3 T1 T2).
 (* /FIXME *)
 
 Section MeetSemilattice.
@@ -7490,8 +7933,20 @@ Section FinOrder.
 Context (disp1 disp2 disp3 : disp_t).
 
 #[export]
+HB.instance Definition _ (T1 : finPreorderType disp1)
+  (T2 : finPreorderType disp2) := Preorder.on (type disp3 T1 T2).
+#[export]
 HB.instance Definition _ (T1 : finPOrderType disp1)
   (T2 : finPOrderType disp2) := POrder.on (type disp3 T1 T2).
+#[export]
+HB.instance Definition _ (T1 : finBPreorderType disp1)
+  (T2 : finBPreorderType disp2) := Preorder.on (type disp3 T1 T2).
+#[export]
+HB.instance Definition _ (T1 : finTPreorderType disp1)
+  (T2 : finTPreorderType disp2) := Preorder.on (type disp3 T1 T2).
+#[export]
+HB.instance Definition _ (T1 : finTBPreorderType disp1)
+  (T2 : finTBPreorderType disp2) := Preorder.on (type disp3 T1 T2).
 #[export]
 HB.instance Definition _ (T1 : finBPOrderType disp1)
   (T2 : finBPOrderType disp2) := POrder.on (type disp3 T1 T2).
@@ -7565,14 +8020,22 @@ Let prod T1 T2 := T1 *prod[prod_display disp1 disp2] T2.
 
 (* FIXME: Scopes of arguments are broken in several places.                   *)
 (* FIXME: Declaring a bunch of copies is still a bit painful.                 *)
-HB.instance Definition _ (T1 : porderType disp1) (T2 : porderType disp2) :=
-  POrder.copy (T1 * T2)%type (prod T1 T2).
-HB.instance Definition _ (T1 : bPOrderType disp1) (T2 : bPOrderType disp2) :=
-  BPOrder.copy (T1 * T2)%type (prod T1 T2).
-HB.instance Definition _ (T1 : tPOrderType disp1) (T2 : tPOrderType disp2) :=
-  TPOrder.copy (T1 * T2)%type (prod T1 T2).
-HB.instance Definition _ (T1 : tbPOrderType disp1) (T2 : tbPOrderType disp2) :=
-  TBPOrder.copy (T1 * T2)%type (prod T1 T2).
+HB.instance Definition _ (T : preorderType disp1) (T' : preorderType disp2) :=
+  Preorder.copy (T * T')%type (T *p T').
+HB.instance Definition _ (T : porderType disp1) (T' : porderType disp2) :=
+  POrder.copy (T * T')%type (T *p T').
+HB.instance Definition _ (T1 : bPreorderType disp1) (T2 : bPreorderType disp2) :=
+  BPreorder.copy (T1 * T2)%type (prod T1 T2).
+HB.instance Definition _ (T1 : tPreorderType disp1) (T2 : tPreorderType disp2) :=
+  TPreorder.copy (T1 * T2)%type (prod T1 T2).
+HB.instance Definition _ (T1 : tbPreorderType disp1) (T2 : tbPreorderType disp2) :=
+  TBPreorder.copy (T1 * T2)%type (prod T1 T2).
+HB.instance Definition _ (T : latticeType disp1) (T' : latticeType disp2) :=
+  Lattice.copy (T * T')%type (T *p T').
+HB.instance Definition _ (T : bLatticeType disp1) (T' : bLatticeType disp2) :=
+  BLattice.copy (T * T')%type (T *p T').
+HB.instance Definition _ (T : tbLatticeType disp1) (T' : tbLatticeType disp2) :=
+  TBLattice.copy (T * T')%type (T *p T').
 HB.instance Definition _
   (T1 : meetSemilatticeType disp1) (T2 : meetSemilatticeType disp2) :=
   MeetSemilattice.copy (T1 * T2)%type (prod T1 T2).
@@ -7631,8 +8094,20 @@ HB.instance Definition _
   (T1 : ctbDistrLatticeType disp1) (T2 : ctbDistrLatticeType disp2) :=
   CTBDistrLattice.copy (T1 * T2)%type (prod T1 T2).
 HB.instance Definition _
+  (T1 : finPreorderType disp1) (T2 : finPreorderType disp2) :=
+  FinPreorder.copy (T1 * T2)%type (prod T1 T2).
+HB.instance Definition _
   (T1 : finPOrderType disp1) (T2 : finPOrderType disp2) :=
   FinPOrder.copy (T1 * T2)%type (prod T1 T2).
+HB.instance Definition _
+  (T1 : finBPreorderType disp1) (T2 : finBPreorderType disp2) :=
+  FinBPreorder.copy (T1 * T2)%type (prod T1 T2).
+HB.instance Definition _
+  (T1 : finTPreorderType disp1) (T2 : finTPreorderType disp2) :=
+  FinTPreorder.copy (T1 * T2)%type (prod T1 T2).
+HB.instance Definition _
+  (T1 : finTBPreorderType disp1) (T2 : finTBPreorderType disp2) :=
+  FinTBPreorder.copy (T1 * T2)%type (prod T1 T2).
 HB.instance Definition _
   (T1 : finBPOrderType disp1) (T2 : finBPOrderType disp2) :=
   FinBPOrder.copy (T1 * T2)%type (prod T1 T2).
@@ -7714,17 +8189,19 @@ elim: _ / (@le_anti _ _ x z) in z' leyz' *; last by rewrite (le_trans lexy).
 by rewrite lexx !tagged_asE/= in lexy' leyz' *; rewrite (le_trans lexy').
 Qed.
 
-Fact lt_def x y : lt x y = (y != x) && le x y.
+Fact lt_le_def x y : lt x y = le x y && ~~ le y x.
 Proof.
-rewrite /lt /le; case: x y => [x x'] [y y']//=; rewrite andbCA.
-case: (comparableP x y) => //= xy; last first.
-  by case: _ / xy in y' *; rewrite !tagged_asE eq_Tagged/= lt_def.
-by rewrite andbT; symmetry; apply: contraTneq xy => -[yx _]; rewrite yx ltxx.
+rewrite /lt /le; case: x y => [x x'] [y y']//=.
+case: (comparableP x y) => //= xy.
+by subst y; rewrite !tagged_asE lt_le_def.
 Qed.
 
 #[export]
 HB.instance Definition _ :=
-  isPOrder.Build disp2 {t : T & T' t} lt_def refl anti trans.
+  isPreorder.Build disp2 {t : T & T' t} lt_le_def refl trans.
+#[export]
+HB.instance Definition _ :=
+  Preorder_isPOrder.Build disp2 {t : T & T' t} anti.
 
 Lemma leEsig x y : x <= y =
   (tag x <= tag y) && ((tag x >= tag y) ==> (tagged x <= tagged_as x y)).
@@ -7851,7 +8328,7 @@ Local Open Scope type_scope. (* FIXME *)
 
 Definition type (disp : disp_t) (T T' : Type) := T * T'.
 Definition type_
-  (disp1 disp2 : disp_t) (T : porderType disp1) (T' : porderType disp2) :=
+  (disp1 disp2 : disp_t) (T : preorderType disp1) (T' : preorderType disp2) :=
   type (lexi_display disp1 disp2) T T'.
 
 Section Basis.
@@ -7866,8 +8343,9 @@ Local Notation "T * T'" := (type disp T T') : type_scope.
 
 End Basis.
 
-Section POrder.
-Context (disp1 disp2 : disp_t) (T1 : porderType disp1) (T2 : porderType disp2).
+Section Preorder.
+Context (disp1 disp2 : disp_t).
+Context (T1 : preorderType disp1) (T2 : preorderType disp2).
 Implicit Types (x y : T1 * T2).
 
 Let le x y := (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 <= y.2)).
@@ -7876,11 +8354,6 @@ Let lt x y := (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 < y.2)).
 Fact refl : reflexive le.
 Proof. by move=> ?; rewrite /le !lexx. Qed.
 
-Fact anti : antisymmetric le.
-Proof.
-by rewrite /le => -[x x'] [y y'] /=; case: comparableP => //= -> /le_anti->.
-Qed.
-
 Fact trans : transitive le.
 Proof.
 move=> y x z /andP [hxy /implyP hxy'] /andP [hyz /implyP hyz'].
@@ -7888,33 +8361,33 @@ rewrite /le (le_trans hxy) //=; apply/implyP => hzx.
 by apply/le_trans/hxy'/(le_trans hyz): (hyz' (le_trans hzx hxy)).
 Qed.
 
-Fact lt_def x y : lt x y = (y != x) && le x y.
+Fact lt_le_def x y : lt x y = le x y && ~~ le y x.
 Proof.
-rewrite /lt /le; case: x y => [x1 x2] [y1 y2]//=; rewrite xpair_eqE.
-by case: (comparableP x1 y1); rewrite lt_def.
+rewrite /lt /le; case: x y => [x1 x2] [y1 y2]/=.
+case/boolP: (x1 <= y1); case/boolP: (y1 <= x1) => //= _ _.
+exact/lt_le_def.
 Qed.
 
-End POrder.
+End Preorder.
 
-Section POrder.
+Section Preorder.
 Context (disp1 disp2 disp3 : disp_t).
-Context (T1 : porderType disp1) (T2 : porderType disp2).
+Context (T1 : preorderType disp1) (T2 : preorderType disp2).
 Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 Implicit Types (x y : T1 * T2).
 
 Let T1' : Type := T1.
-HB.instance Definition _ := POrder.on T1'.
+HB.instance Definition _ := Preorder.on T1'.
 Let T2' : Type := T2.
-HB.instance Definition _ := POrder.on T2'.
+HB.instance Definition _ := Preorder.on T2'.
 
 Definition le x y := (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 <= y.2)).
 Definition lt x y := (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 < y.2)).
 
 #[export]
-HB.instance Definition _ := @isDuallyPOrder.Build disp3 (T1 * T2) le lt
-  (@lt_def _ _ T1' T2') (@lt_def _ _ T1^d T2^d)
+HB.instance Definition _ := @isDuallyPreorder.Build disp3 (T1 * T2) le lt
+  (@lt_le_def _ _ T1' T2') (@lt_le_def _ _ T1^d T2^d)
   (@refl _ _ T1' T2') (@refl _ _ T1^d T2^d)
-  (@anti _ _ T1' T2') (@anti _ _ T1^d T2^d)
   (@trans _ _ T1' T2') (@trans _ _ T1^d T2^d).
 
 Lemma leEprodlexi x y :
@@ -7933,28 +8406,57 @@ Lemma ltxi_pair (x1 y1 : T1) (x2 y2 : T2) :
    (x1, x2) < (y1, y2) :> T1 * T2 = (x1 <= y1) && ((x1 >= y1) ==> (x2 < y2)).
 Proof. by []. Qed.
 
+End Preorder.
+
+Section POrder.
+Context (disp1 disp2 disp3 : disp_t).
+Context (T1 : porderType disp1) (T2 : porderType disp2).
+
+Fact anti : antisymmetric (@le disp1 disp2 disp2 T1 T2).
+Proof.
+by rewrite /le => -[x x'] [y y'] /=; case: comparableP => //= -> /le_anti->.
+Qed.
+
 End POrder.
 
-Section BPOrder.
+Section POrder.
+Context (disp1 disp2 disp3 : disp_t).
+Context (T1 : porderType disp1) (T2 : porderType disp2).
+Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
+Implicit Types (x y : T1 * T2).
+
+Let T1' : Type := T1.
+HB.instance Definition _ := POrder.on T1'.
+Let T2' : Type := T2.
+HB.instance Definition _ := POrder.on T2'.
+
+#[export]
+HB.instance Definition _ :=
+  Preorder_isDuallyPOrder.Build disp3 (T1 * T2)
+  (@anti _ _ T1' T2') (@anti _ _ T1^d T2^d).
+
+End POrder.
+
+Section BPreorder.
 Context (disp1 disp2 : disp_t).
-Context (T1 : bPOrderType disp1) (T2 : bPOrderType disp2).
+Context (T1 : bPreorderType disp1) (T2 : bPreorderType disp2).
 Local Notation "T1 * T2" := (type (Disp tt tt) T1 T2) : type_scope.
 Implicit Types (x : T1 * T2).
 
 Fact le0x x : (\bot, \bot) <= x :> T1 * T2.
 Proof. by rewrite leEprodlexi !le0x implybT. Qed.
 
-End BPOrder.
+End BPreorder.
 
-Section BPOrder.
+Section BPreorder.
 Context (disp1 disp2 disp3 : disp_t).
-Context (T1 : bPOrderType disp1) (T2 : bPOrderType disp2).
+Context (T1 : bPreorderType disp1) (T2 : bPreorderType disp2).
 Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 
 Let T1' : Type := T1.
-HB.instance Definition _ := BPOrder.on T1'.
+HB.instance Definition _ := BPreorder.on T1'.
 Let T2' : Type := T2.
-HB.instance Definition _ := BPOrder.on T2'.
+HB.instance Definition _ := BPreorder.on T2'.
 
 #[export]
 HB.instance Definition _ :=
@@ -7962,11 +8464,11 @@ HB.instance Definition _ :=
 
 Lemma botEprodlexi : \bot = (\bot, \bot) :> T1 * T2. Proof. by []. Qed.
 
-End BPOrder.
+End BPreorder.
 
-Section TPOrder.
+Section TPreorder.
 Context (disp1 disp2 disp3 : disp_t).
-Context (T1 : tPOrderType disp1) (T2 : tPOrderType disp2).
+Context (T1 : tPreorderType disp1) (T2 : tPreorderType disp2).
 Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 
 #[export]
@@ -7975,13 +8477,13 @@ HB.instance Definition _ :=
 
 Lemma topEprodlexi : \top = (\top, \top) :> T1 * T2. Proof. by []. Qed.
 
-End TPOrder.
+End TPreorder.
 
 (* FIXME: use HB.saturate *)
 #[export]
 HB.instance Definition _ (disp1 disp2 disp3 : disp_t)
-  (T1 : tbPOrderType disp1) (T2 : tbPOrderType disp2) :=
-  POrder.on (type disp3 T1 T2).
+  (T1 : tbPreorderType disp1) (T2 : tbPreorderType disp2) :=
+  Preorder.on (type disp3 T1 T2).
 (* /FIXME *)
 
 Section Total.
@@ -8003,10 +8505,11 @@ HB.instance Definition _ := POrder_isTotal.Build _ (T1 * T2) total.
 End Total.
 
 Lemma sub_prod_lexi (disp1 disp2 disp3 disp4 : disp_t)
-  (T1 : porderType disp1) (T2 : porderType disp2) :
+  (T1 : preorderType disp1) (T2 : preorderType disp2) :
   subrel (<=%O : rel (T1 *prod[disp3] T2)) (<=%O : rel (type disp4 T1 T2)).
 Proof.
-by case=> [x1 x2] [y1 y2]; rewrite leEprod leEprodlexi /=; case: comparableP.
+case=> [x1 x2] [y1 y2]; rewrite leEprod leEprodlexi /= => /andP[] -> ->.
+exact: implybT.
 Qed.
 
 (* FIXME: use HB.saturate *)
@@ -8014,17 +8517,29 @@ Section ProdLexiOrder.
 Context (disp1 disp2 disp3 : disp_t).
 
 #[export]
-HB.instance Definition _ (T1 : bOrderType disp1)
-  (T2 : bOrderType disp2) := POrder.on (type disp3 T1 T2).
+HB.instance Definition _ (T1 : bPreorderType disp1)
+  (T2 : bPreorderType disp2) := Preorder.on (type disp3 T1 T2).
 #[export]
-HB.instance Definition _ (T1 : tOrderType disp1)
-  (T2 : tOrderType disp2) := POrder.on (type disp3 T1 T2).
+HB.instance Definition _ (T1 : tPreorderType disp1)
+  (T2 : tPreorderType disp2) := Preorder.on (type disp3 T1 T2).
 #[export]
-HB.instance Definition _ (T1 : tbOrderType disp1)
-  (T2 : tbOrderType disp2) := POrder.on (type disp3 T1 T2).
+HB.instance Definition _ (T1 : tbPreorderType disp1)
+  (T2 : tbPreorderType disp2) := Preorder.on (type disp3 T1 T2).
+#[export]
+HB.instance Definition _ (T1 : finPreorderType disp1)
+  (T2 : finPreorderType disp2) := Preorder.on (type disp3 T1 T2).
 #[export]
 HB.instance Definition _ (T1 : finPOrderType disp1)
   (T2 : finPOrderType disp2) := POrder.on (type disp3 T1 T2).
+#[export]
+HB.instance Definition _ (T1 : finBPreorderType disp1)
+  (T2 : finBPreorderType disp2) := Preorder.on (type disp3 T1 T2).
+#[export]
+HB.instance Definition _ (T1 : finTPreorderType disp1)
+  (T2 : finTPreorderType disp2) := Preorder.on (type disp3 T1 T2).
+#[export]
+HB.instance Definition _ (T1 : finTBPreorderType disp1)
+  (T2 : finTBPreorderType disp2) := Preorder.on (type disp3 T1 T2).
 #[export]
 HB.instance Definition _ (T1 : finBPOrderType disp1)
   (T2 : finBPOrderType disp2) := POrder.on (type disp3 T1 T2).
@@ -8073,25 +8588,33 @@ Let prodlexi T1 T2 := T1 *lexi[lexi_display disp1 disp2] T2.
 
 (* FIXME: Scopes of arguments are broken in several places.                   *)
 (* FIXME: Declaring a bunch of copies is still a bit painful.                 *)
+HB.instance Definition _ (T1 : preorderType disp1) (T2 : preorderType disp2) :=
+  Preorder.copy (T1 * T2)%type (prodlexi T1 T2).
 HB.instance Definition _ (T1 : porderType disp1) (T2 : porderType disp2) :=
   POrder.copy (T1 * T2)%type (prodlexi T1 T2).
-HB.instance Definition _ (T1 : bPOrderType disp1) (T2 : bPOrderType disp2) :=
-  BPOrder.copy (T1 * T2)%type (prodlexi T1 T2).
-HB.instance Definition _ (T1 : tPOrderType disp1) (T2 : tPOrderType disp2) :=
-  TPOrder.copy (T1 * T2)%type (prodlexi T1 T2).
-HB.instance Definition _ (T1 : tbPOrderType disp1) (T2 : tbPOrderType disp2) :=
-  TBPOrder.copy (T1 * T2)%type (prodlexi T1 T2).
+HB.instance Definition _ (T1 : bPreorderType disp1) (T2 : bPreorderType disp2) :=
+  BPreorder.copy (T1 * T2)%type (prodlexi T1 T2).
+HB.instance Definition _ (T1 : tPreorderType disp1) (T2 : tPreorderType disp2) :=
+  TPreorder.copy (T1 * T2)%type (prodlexi T1 T2).
+HB.instance Definition _ (T1 : tbPreorderType disp1) (T2 : tbPreorderType disp2) :=
+  TBPreorder.copy (T1 * T2)%type (prodlexi T1 T2).
 HB.instance Definition _ (T1 : orderType disp1) (T2 : orderType disp2) :=
   Total.copy (T1 * T2)%type (prodlexi T1 T2).
-HB.instance Definition _ (T1 : bOrderType disp1) (T2 : bOrderType disp2) :=
-  BTotal.copy (T1 * T2)%type (prodlexi T1 T2).
-HB.instance Definition _ (T1 : tOrderType disp1) (T2 : tOrderType disp2) :=
-  TTotal.copy (T1 * T2)%type (prodlexi T1 T2).
-HB.instance Definition _ (T1 : tbOrderType disp1) (T2 : tbOrderType disp2) :=
-  TBTotal.copy (T1 * T2)%type (prodlexi T1 T2).
+HB.instance Definition _
+  (T1 : finPreorderType disp1) (T2 : finPreorderType disp2) :=
+  FinPreorder.copy (T1 * T2)%type (prodlexi T1 T2).
 HB.instance Definition _
   (T1 : finPOrderType disp1) (T2 : finPOrderType disp2) :=
   FinPOrder.copy (T1 * T2)%type (prodlexi T1 T2).
+HB.instance Definition _
+  (T1 : finBPreorderType disp1) (T2 : finBPreorderType disp2) :=
+  FinBPreorder.copy (T1 * T2)%type (prodlexi T1 T2).
+HB.instance Definition _
+  (T1 : finTPreorderType disp1) (T2 : finTPreorderType disp2) :=
+  FinTPreorder.copy (T1 * T2)%type (prodlexi T1 T2).
+HB.instance Definition _
+  (T1 : finTBPreorderType disp1) (T2 : finTBPreorderType disp2) :=
+  FinTBPreorder.copy (T1 * T2)%type (prodlexi T1 T2).
 HB.instance Definition _
   (T1 : finBPOrderType disp1) (T2 : finBPOrderType disp2) :=
   FinBPOrder.copy (T1 * T2)%type (prodlexi T1 T2).
@@ -8132,8 +8655,8 @@ Local Notation seq := (type disp').
 #[export] HB.instance Definition _ (T : choiceType) := Choice.on (seq T).
 #[export] HB.instance Definition _ (T : countType) := Countable.on (seq T).
 
-Section POrder.
-Context (T : porderType disp).
+Section Preorder.
+Context (T : preorderType disp).
 Implicit Types (s : seq T).
 
 Fixpoint le s1 s2 := if s1 isn't x1 :: s1' then true else
@@ -8142,11 +8665,6 @@ Fixpoint le s1 s2 := if s1 isn't x1 :: s1' then true else
 
 Fact refl : reflexive le. Proof. by elim=> //= ? ? ?; rewrite !lexx. Qed.
 
-Fact anti : antisymmetric le.
-Proof.
-by elim=> [|x s ihs] [|y s'] //=; rewrite andbACA => /andP[/le_anti-> /ihs->].
-Qed.
-
 Fact trans : transitive le.
 Proof.
 elim=> [|y ys ihs] [|x xs] [|z zs] //= /andP[xy xys] /andP[yz yzs].
@@ -8154,8 +8672,7 @@ by rewrite (le_trans xy)// ihs.
 Qed.
 
 #[export]
-HB.instance Definition _ :=
-  isPOrder.Build disp' (seq T) (rrefl _) refl anti trans.
+HB.instance Definition _ := isPreorder.Build disp' (seq T) (rrefl _) refl trans.
 
 Lemma leEseq s1 s2 : s1 <= s2 = if s1 isn't x1 :: s1' then true else
                                 if s2 isn't x2 :: s2' then false else
@@ -8175,6 +8692,19 @@ HB.instance Definition _ := hasBottom.Build _ (seq T) le0s.
 
 Lemma botEseq : \bot = [::] :> seq T.
 Proof. by []. Qed.
+End Preorder.
+
+Section POrder.
+Variable T : porderType disp.
+Implicit Types s : seq T.
+
+Fact anti : antisymmetric (@le T).
+Proof.
+by elim=> [|x s ihs] [|y s'] //=; rewrite andbACA => /andP[/le_anti-> /ihs->].
+Qed.
+
+#[export]
+HB.instance Definition _ := Preorder_isPOrder.Build disp' (seq T) anti.
 
 End POrder.
 
@@ -8282,8 +8812,12 @@ Context {disp : disp_t}.
 
 Notation seqprod := (seqprod_with (seqprod_display disp)).
 
+HB.instance Definition _ (T : preorderType disp) :=
+  Preorder.copy (seq T) (seqprod T).
 HB.instance Definition _ (T : porderType disp) :=
-  BPOrder.copy (seq T) (seqprod T).
+  BPreorder.copy (seq T) (seqprod T).
+HB.instance Definition _ (T : porderType disp) :=
+  POrder.copy (seq T) (seqprod T).
 HB.instance Definition _ (T : meetSemilatticeType disp) :=
   BMeetSemilattice.copy (seq T) (seqprod T).
 HB.instance Definition _ (T : joinSemilatticeType disp) :=
@@ -8305,7 +8839,7 @@ Module SeqLexiOrder.
 Section SeqLexiOrder.
 
 Definition type (disp : disp_t) T := seq T.
-Definition type_ (disp : disp_t) (T : porderType disp) :=
+Definition type_ (disp : disp_t) (T : preorderType disp) :=
   type (seqlexi_display disp) T.
 
 Context {disp disp' : disp_t}.
@@ -8316,8 +8850,8 @@ Local Notation seq := (type disp').
 #[export] HB.instance Definition _ (T : choiceType) := Choice.on (seq T).
 #[export] HB.instance Definition _ (T : countType) := Countable.on (seq T).
 
-Section POrder.
-Context (T : porderType disp).
+Section Preorder.
+Context (T : preorderType disp).
 Implicit Types (s : seq T).
 
 Fixpoint le s1 s2 := if s1 isn't x1 :: s1' then true else
@@ -8330,27 +8864,22 @@ Fixpoint lt s1 s2 := if s2 isn't x2 :: s2' then false else
 Fact refl: reflexive le.
 Proof. by elim => [|x s ih] //=; rewrite lexx. Qed.
 
-Fact anti: antisymmetric le.
-Proof.
-move=> x y /andP []; elim: x y => [|x sx ih] [|y sy] //=.
-by case: comparableP => //= -> lesxsy /(ih _ lesxsy) ->.
-Qed.
-
 Fact trans: transitive le.
 Proof.
-elim=> [|y sy ihs] [|x sx] [|z sz] //=; case: (comparableP x y) => //= [xy|->].
-  by move=> _ /andP[/(lt_le_trans xy) xz _]; rewrite (ltW xz)// lt_geF.
-by case: comparableP => //= _; apply: ihs.
+elim=> [|y sy ihs] [|x sx] [|z sz] //= /andP[] xy /implyP yx /andP[] yz /implyP zy /=.
+rewrite (le_trans xy yz)/=; apply/implyP => zx.
+apply/ihs; first exact/yx/(le_trans yz zx).
+exact/zy/(le_trans zx xy).
 Qed.
 
-Lemma lt_def s1 s2 : lt  s1 s2 = (s2 != s1) && le s1 s2.
+Lemma lt_le_def s1 s2 : lt  s1 s2 = le s1 s2 && ~~ le s2 s1.
 Proof.
-elim: s1 s2 => [|x s1 ihs1] [|y s2]//=.
-by rewrite eqseq_cons ihs1; case: comparableP.
+elim: s1 s2 => [|x s1 ihs1] [|y s2]//=; rewrite ihs1.
+by case: (x <= y); case (y <= x).
 Qed.
 
 #[export]
-HB.instance Definition _ := isPOrder.Build disp' (seq T) lt_def refl anti trans.
+HB.instance Definition _ := isPreorder.Build disp' (seq T) lt_le_def refl trans.
 
 Lemma leEseqlexi s1 s2 :
    s1 <= s2 = if s1 isn't x1 :: s1' then true else
@@ -8392,6 +8921,21 @@ Proof. by rewrite lexi_cons lexx. Qed.
 Lemma eqhead_ltxiE (x : T) s1 s2 : (x :: s1 < x :: s2 :> seq _) = (s1 < s2).
 Proof. by rewrite ltxi_cons lexx. Qed.
 
+End Preorder.
+
+Section POrder.
+Variable T : porderType disp.
+Implicit Types s : seq T.
+
+Fact anti: antisymmetric (@le T).
+Proof.
+move=> x y /andP []; elim: x y => [|x sx ih] [|y sy] //=.
+by case: comparableP => //= -> lesxsy /(ih _ lesxsy) ->.
+Qed.
+
+#[export]
+HB.instance Definition _ := Preorder_isPOrder.Build disp' (seq T) anti.
+
 Lemma neqhead_lexiE (x y : T) s1 s2 : x != y ->
   (x :: s1 <= y :: s2 :> seq _) = (x < y).
 Proof. by rewrite lexi_cons; case: comparableP. Qed.
@@ -8401,7 +8945,7 @@ Lemma neqhead_ltxiE (x y : T) s1 s2 : x != y ->
 Proof. by rewrite ltxi_cons; case: (comparableP x y). Qed.
 
 #[export]
-HB.instance Definition _ := hasBottom.Build _ (seq T) lexi0s.
+HB.instance Definition _ := hasBottom.Build _ (seq T) (@lexi0s T).
 
 End POrder.
 
@@ -8418,7 +8962,7 @@ HB.instance Definition _ := POrder_isTotal.Build _ (seq T) total.
 
 End Total.
 
-Lemma sub_seqprod_lexi d (T : porderType disp) :
+Lemma sub_seqprod_lexi d (T : preorderType disp) :
    subrel (<=%O : rel (seqprod_with d T)) (<=%O : rel (seq T)).
 Proof.
 elim=> [|x1 s1 ihs1] [|x2 s2]//=; rewrite le_cons lexi_cons /=.
@@ -8461,8 +9005,12 @@ Context {disp : disp_t}.
 
 Notation seqlexi := (seqlexi_with (seqlexi_display disp)).
 
+HB.instance Definition _ (T : preorderType disp) :=
+  Preorder.copy (seq T) (seqlexi T).
 HB.instance Definition _ (T : porderType disp) :=
-  BPOrder.copy (seq T) (seqlexi T).
+  POrder.copy (seq T) (seqlexi T).
+HB.instance Definition _ (T : porderType disp) :=
+  BPreorder.copy (seq T) (seqlexi T).
 HB.instance Definition _ (T : orderType disp) :=
   BTotal.copy (seq T) (seqlexi T).
 
@@ -8480,7 +9028,7 @@ Import DefaultSeqProdOrder.
 Section TupleProdOrder.
 
 Definition type (disp : disp_t) n T := n.-tuple T.
-Definition type_ (disp : disp_t) n (T : porderType disp) :=
+Definition type_ (disp : disp_t) n (T : preorderType disp) :=
   type (seqprod_display disp) n T.
 
 Context {disp disp' : disp_t}.
@@ -8497,14 +9045,14 @@ Context (n : nat).
 #[export] HB.instance Definition _ (T : finType) := SubFinite.on (n.-tuple T).
 End Basics.
 
-Section POrder.
-Implicit Types (n : nat) (T : porderType disp).
+Section Preorder.
+Implicit Types (n : nat) (T : preorderType disp).
 
 (* FIXME: this instance should be dualizable, but then we should not depend   *)
 (* on the subtype mechanism, because the pointwise order on seq cannot be the *)
 (* dual of itself.                                                            *)
 #[export] HB.instance Definition _ n T :=
-  [SubChoice_isSubPOrder of n.-tuple T by <: with disp'].
+  [SubChoice_isSubPreorder of n.-tuple T by <: with disp'].
 
 Lemma leEtprod n T (t1 t2 : n.-tuple T) :
    t1 <= t2 = [forall i, tnth t1 i <= tnth t2 i].
@@ -8519,6 +9067,15 @@ rewrite (lext12 ord0)/=; apply/forallP=> i.
 by have := lext12 (lift ord0 i); rewrite !tnthS.
 Qed.
 
+End Preorder.
+
+Section POrder.
+Implicit Types (T : porderType disp).
+
+#[export] HB.instance Definition _ n T := SubChoice.on (n.-tuple T).
+#[export] HB.instance Definition _ n T :=
+  [SubChoice_isSubPOrder of n.-tuple T by <: with disp'].
+
 Lemma ltEtprod n T (t1 t2 : n.-tuple T) :
   t1 < t2 = [exists i, tnth t1 i != tnth t2 i] &&
             [forall i, tnth t1 i <= tnth t2 i].
@@ -8527,7 +9084,7 @@ Proof. by rewrite lt_neqAle leEtprod eqEtuple negb_forall. Qed.
 End POrder.
 
 Section BPOrder.
-Context (n : nat) (T : bPOrderType disp).
+Context (n : nat) (T : bPreorderType disp).
 Implicit Types (t : n.-tuple T).
 
 Fact le0x t : [tuple \bot | _ < n] <= t :> n.-tuple T.
@@ -8541,8 +9098,13 @@ Proof. by []. Qed.
 
 End BPOrder.
 
+(* FIXME: use HB.saturate *)
+#[export]
+HB.instance Definition _ (n : nat) (T : bPOrderType disp) :=
+  POrder.on (n.-tuple T).
+
 Section TPOrder.
-Context (n : nat) (T : tPOrderType disp).
+Context (n : nat) (T : tPreorderType disp).
 Implicit Types (t : n.-tuple T).
 
 Fact lex1 t : t <= [tuple \top | _ < n] :> n.-tuple T.
@@ -8557,6 +9119,12 @@ Proof. by []. Qed.
 End TPOrder.
 
 (* FIXME: use HB.saturate *)
+#[export]
+HB.instance Definition _ (n : nat) (T : tPOrderType disp) :=
+  POrder.on (n.-tuple T).
+#[export]
+HB.instance Definition _ (n : nat) (T : tbPreorderType disp) :=
+  Preorder.on (n.-tuple T).
 #[export]
 HB.instance Definition _ (n : nat) (T : tbPOrderType disp) :=
   POrder.on (n.-tuple T).
@@ -8776,8 +9344,20 @@ End CTBDistrLattice.
 
 (* FIXME: use HB.saturate *)
 #[export]
+HB.instance Definition _ (n : nat) (T : finPreorderType disp) :=
+  Preorder.on (n.-tuple T).
+#[export]
 HB.instance Definition _ (n : nat) (T : finPOrderType disp) :=
   POrder.on (n.-tuple T).
+#[export]
+HB.instance Definition _ (n : nat) (T : finBPreorderType disp) :=
+  Preorder.on (n.-tuple T).
+#[export]
+HB.instance Definition _ (n : nat) (T : finTPreorderType disp) :=
+  Preorder.on (n.-tuple T).
+#[export]
+HB.instance Definition _ (n : nat) (T : finTBPreorderType disp) :=
+  Preorder.on (n.-tuple T).
 #[export]
 HB.instance Definition _ (n : nat) (T : finBPOrderType disp) :=
   POrder.on (n.-tuple T).
@@ -8858,8 +9438,16 @@ Context {disp : disp_t}.
 
 Notation "n .-tupleprod" := n.-tupleprod[seqprod_display disp].
 
+HB.instance Definition _ n (T : preorderType disp) :=
+  Preorder.copy (n.-tuple T) (n.-tupleprod T).
 HB.instance Definition _ n (T : porderType disp) :=
   POrder.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : bPreorderType disp) :=
+  BPreorder.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : tPreorderType disp) :=
+  TPreorder.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : tbPreorderType disp) :=
+  TBPreorder.copy (n.-tuple T) (n.-tupleprod T).
 HB.instance Definition _ n (T : bPOrderType disp) :=
   BPOrder.copy (n.-tuple T) (n.-tupleprod T).
 HB.instance Definition _ n (T : tPOrderType disp) :=
@@ -8965,6 +9553,15 @@ Context (n : nat).
   SubFinite.on (n.-tuple T).
 End Basics.
 
+Section Preorder.
+Implicit Types (T : preorderType disp).
+
+#[export] HB.instance Definition _ n T := SubChoice.on (n.-tuple T).
+#[export] HB.instance Definition _ n T :=
+  [SubChoice_isSubPreorder of n.-tuple T by <: with disp'].
+
+End Preorder.
+
 Section POrder.
 Implicit Types (n : nat) (T : porderType disp).
 
@@ -9026,8 +9623,8 @@ Qed.
 
 End POrder.
 
-Section BPOrder.
-Context (n : nat) (T : bPOrderType disp).
+Section BPreorder.
+Context (n : nat) (T : bPreorderType disp).
 Implicit Types (t : n.-tuple T).
 
 Fact le0x t : [tuple \bot | _ < n] <= t :> n.-tuple T.
@@ -9037,10 +9634,10 @@ Proof. by apply: sub_seqprod_lexi; apply: le0x (t : n.-tupleprod T). Qed.
 
 Lemma botEtlexi : \bot = [tuple \bot | _ < n] :> n.-tuple T. Proof. by []. Qed.
 
-End BPOrder.
+End BPreorder.
 
-Section TPOrder.
-Context (n : nat) (T : tPOrderType disp).
+Section TPreorder.
+Context (n : nat) (T : tPreorderType disp).
 Implicit Types (t : n.-tuple T).
 
 Fact lex1 t : t <= [tuple \top | _ < n].
@@ -9050,12 +9647,27 @@ Proof. by apply: sub_seqprod_lexi; apply: lex1 (t : n.-tupleprod T). Qed.
 
 Lemma topEtlexi : \top = [tuple \top | _ < n] :> n.-tuple T. Proof. by []. Qed.
 
-End TPOrder.
+End TPreorder.
 
 #[export] HB.instance Definition _ n (T : orderType disp) :=
   [SubChoice_isSubOrder of n.-tuple T by <: with disp'].
 
 (* FIXME: use HB.saturate *)
+#[export]
+HB.instance Definition _ (n : nat) (T : bPreorderType disp) :=
+  Preorder.on (n.-tuple T).
+#[export]
+HB.instance Definition _ (n : nat) (T : bPOrderType disp) :=
+  POrder.on (n.-tuple T).
+#[export]
+HB.instance Definition _ (n : nat) (T : tPreorderType disp) :=
+  Preorder.on (n.-tuple T).
+#[export]
+HB.instance Definition _ (n : nat) (T : tPOrderType disp) :=
+  POrder.on (n.-tuple T).
+#[export]
+HB.instance Definition _ (n : nat) (T : tbPreorderType disp) :=
+  Preorder.on (n.-tuple T).
 #[export]
 HB.instance Definition _ (n : nat) (T : tbPOrderType disp) :=
   POrder.on (n.-tuple T).
@@ -9088,7 +9700,7 @@ HB.instance Definition _ (n : nat) (T : finTBOrderType disp) :=
   POrder.on (n.-tuple T).
 (* /FIXME *)
 
-Lemma sub_tprod_lexi d n (T : porderType disp) :
+Lemma sub_tprod_lexi d n (T : preorderType disp) :
    subrel (<=%O : rel (n.-tupleprod[d] T)) (<=%O : rel (n.-tuple T)).
 Proof. exact: sub_seqprod_lexi. Qed.
 
@@ -9124,14 +9736,26 @@ Context {disp : disp_t}.
 
 Notation "n .-tuplelexi" := n.-tuplelexi[seqlexi_display disp].
 
+HB.instance Definition _ n (T : preorderType disp) :=
+  Preorder.copy (n.-tuple T) (n.-tuplelexi T).
 HB.instance Definition _ n (T : porderType disp) :=
   POrder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : bPreorderType disp) :=
+  BPreorder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : tPreorderType disp) :=
+  TPreorder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : tbPreorderType disp) :=
+  TBPreorder.copy (n.-tuple T) (n.-tuplelexi T).
 HB.instance Definition _ n (T : bPOrderType disp) :=
   BPOrder.copy (n.-tuple T) (n.-tuplelexi T).
 HB.instance Definition _ n (T : tPOrderType disp) :=
   TPOrder.copy (n.-tuple T) (n.-tuplelexi T).
 HB.instance Definition _ n (T : tbPOrderType disp) :=
   TBPOrder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : orderType disp) :=
+  Lattice.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : orderType disp) :=
+  DistrLattice.copy (n.-tuple T) (n.-tuplelexi T).
 HB.instance Definition _ n (T : orderType disp) :=
   Total.copy (n.-tuple T) (n.-tuplelexi T).
 HB.instance Definition _ n (T : bOrderType disp) :=
@@ -9506,6 +10130,7 @@ End Syntax.
 
 Module LTheory.
 Export POCoercions.
+Export PreorderTheory.
 Export POrderTheory.
 Export BPOrderTheory.
 Export TPOrderTheory.
@@ -9530,7 +10155,7 @@ Export TLatticeMorphismTheory.
 Export ClosedPredicates.
 Export LatticePred.
 
-Export SubPOrderTheory.
+Export SubPreorderTheory.
 End LTheory.
 
 Module CTheory.
@@ -9696,7 +10321,7 @@ Lemma le_rank : {mono rank : p q / p <= q}.
 Proof. exact: can_mono le_sig. Qed.
 
 Lemma le_Rank i : {mono @Rank i : j k / j <= k}.
-Proof. by move=> j k; rewrite /Rank le_rank/= leEsig/= tagged_asE lexx. Qed.
+Proof. by move=> j k; rewrite /Rank le_rank/= leEsig/= tagged_asE Order.PreorderTheory.lexx. Qed.
 
 Lemma lt_sig : {mono sig : i j / i < j}.
 Proof. by move=> i j; rewrite !ltNge le_sig. Qed.
