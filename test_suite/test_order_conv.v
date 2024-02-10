@@ -4,6 +4,9 @@ Import Order.Theory.
 Section dual_of_dual.
 Context (disp : Order.disp_t).
 
+Let eq_dual_dual_preorderType (T : preorderType disp) :
+  Order.Preorder.on T = Order.Preorder.on T^d^d := erefl.
+
 Let eq_dual_dual_porderType (T : porderType disp) :
   Order.POrder.on T = Order.POrder.on T^d^d := erefl.
 
@@ -145,6 +148,16 @@ Import DefaultProdOrder.
 
 Let eq_dual_prod_porderType (T1 : porderType disp1) (T2 : porderType disp2) :
   Order.POrder.on (T1 * T2)^d = Order.POrder.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_bPreorderType (T1 : bPreorderType disp1) (T2 : bPreorderType disp2) :
+  Order.BPreorder.on (T1 * T2)^d = Order.BPreorder.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_tPreorderType (T1 : tPreorderType disp1) (T2 : tPreorderType disp2) :
+  Order.TPreorder.on (T1 * T2)^d = Order.TPreorder.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_tbPreorderType
+  (T1 : tbPreorderType disp1) (T2 : tbPreorderType disp2) :
+  Order.TBPreorder.on (T1 * T2)^d = Order.TBPreorder.on (T1^d * T2^d)%type := erefl.
 
 Let eq_dual_prod_bPOrderType (T1 : bPOrderType disp1) (T2 : bPOrderType disp2) :
   Order.BPOrder.on (T1 * T2)^d = Order.BPOrder.on (T1^d * T2^d)%type := erefl.
