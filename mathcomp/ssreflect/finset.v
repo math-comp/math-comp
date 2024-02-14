@@ -222,11 +222,11 @@ Notation "A :=P: B" := (A =P B :> {set _})
 (* #[short(type="finPred")] *)
 (* HB.structure Definition FinPred T := {P of @isFinPred T P}. *)
 
-Definition setU T (A B : {set T}) :=
+Definition setU_subdef T (A B : {set T}) :=
    FinSet.of_seq (FinSet.enum A ++ FinSet.enum B).
 
-Lemma in_setU T (A B : {set T}) :
-  setU A B =i [pred x | (x \in A) || (x \in B)].
+Lemma in_setU_subproof T (A B : {set T}) :
+  setU_subdef A B =i [pred x | (x \in A) || (x \in B)].
 Proof.
 Admitted.
 
@@ -237,11 +237,11 @@ Lemma set_comprehensionE {T : choiceType} (A : {set T}) (P : {pred T}) :
   set_comprehension A P =i [pred x | (x \in A) & P x].
 Proof. Admitted.
 
-Definition setI T (A B : {set T}) := set_comprehension A B.
+(* Definition setI T (A B : {set T}) := set_comprehension A B. *)
 
-Lemma in_setI T (A B : {set T}) : setI A B =i [pred x in A | (x \in B)].
+(* Lemma in_setI T (A B : {set T}) : setI A B =i [pred x in A | (x \in B)].
 Proof.
-Admitted.
+Admitted. *)
 
 Structure finPred (T : choiceType) := FinPred {
    finpred :> {pred T};
@@ -249,24 +249,38 @@ Structure finPred (T : choiceType) := FinPred {
    pred_enumP : pred_set =i finpred
 }.
 
+(* A : {set T}
+pred_set : finPred T -> {set T}
+pred_set (A : {set T}) -> pred_set (?P : finPred T)
+pred_set ?P = A *)
+
 Definition finPred_of_set (T : choiceType) (A : {set T}) :=
   @FinPred _ A A (fun=> erefl).
 
+Program Definition finPred0 (T : choiceType) :=
+  @FinPred T pred0 (FinSet.of_seq [::]) _.
+Next Obligation. Admitted.
+
+Program Definition finPred1 (T : choiceType) x :=
+  @FinPred T (pred1 x) (FinSet.of_seq [:: x]) _.
+Next Obligation. Admitted.
+
 Program Definition finPred_comprehensionl (T : choiceType) (fP : finPred T)
-  (Q : {pred T}) := @FinPred _ [predI fP & Q] (set_comprehension fP Q) _.
+  (Q : {pred T}) := @FinPred _ (xpredI (finpred fP) Q) (set_comprehension fP Q) _.
 Next Obligation. by move=> x; rewrite set_comprehensionE inE pred_enumP. Qed.
 
 Program Definition finPred_comprehensionr (T : choiceType) (P : {pred T})
-  (fQ : finPred T) := @FinPred _ [predI P & fQ] (set_comprehension fQ P) _.
+  (fQ : finPred T) := @FinPred _ (xpredI P (finpred fQ)) (set_comprehension fQ P) _.
 Next Obligation.
 by move=> x; rewrite set_comprehensionE inE pred_enumP andbC.
 Qed.
 
+Program Definition finPred_setU (T : choiceType) (fP fQ : finPred T) : finPred T :=
+  @FinPred _ (xpredU (finpred fP) (finpred fQ)) (setU_subdef fP fQ) _.
+Next Obligation. by move=> x; rewrite in_setU_subproof !inE !pred_enumP. Qed.
 
-About FinPred.
-
-Class finPredClass (T : choiceType) (P : {pred T}) :=
-  FinPredClass { proof : {A : {set T} | A =i P} }.
+(* Class finPredClass (T : choiceType) (P : {pred T}) :=
+  FinPredClass { proof : {A : {set T} | A =i P} }. *)
 
 (* Structure finPred (T : choiceType) := PackFinPred { *)
 (*    finpred : {pred T}; *)
@@ -281,40 +295,74 @@ Import elpi.
 From elpi Require Import cs.
 Elpi Accumulate cs.db lp:{{
   pred find i:term, i:term, o:term.
+  find _ ({{fun x => finpred lp:P x}}) P :- !.
+
   find _ ({{fun x => in_mem x (mem (finpred lp:P))}}) P :- !.
 
   find CT ({{fun x => in_mem x (mem (mem_set lp:A))}} as P)
        {{@FinPred lp:CT lp:P lp:A (fun=> erefl)}}:- !.
 
+  find CT {{fun x : lp:_T => false}} {{@finPred0 lp:CT}} :- !.
+
+  find CT {{fun x : lp:_T => x == lp:Y}} {{@finPred1 lp:CT lp:Y}} :- !.
+
   find CT {{fun x : lp:T => lp:(P x) && lp:(Q x)}}
        {{@finPred_comprehensionl lp:CT lp:FP (fun x : lp:T => lp:(Q x))}} :-
-    coq.say "try comprehensionl:" P Q,
     find CT {{fun x : lp:T => lp:(P x)}} FP, !.
 
   find CT {{fun x : lp:T => lp:(P x) && lp:(Q x)}} 
        {{@finPred_comprehensionr lp:CT (fun x : lp:T => lp:(P x)) lp:FQ}} :-
-    coq.say "try comprehensionr:" P Q,
+    find CT {{fun x : lp:T => lp:(Q x)}} FQ, !.
+  
+  :name "andb-final"
+  find _CT {{fun x : _ => _ && _}} _ :- !,
+    coq.error "conjunction of two predicates that are not finpreds".
+
+  find CT {{fun x : lp:T => lp:(P x) || lp:(Q x)}} 
+       {{@finPred_setU lp:CT lp:FP lp:FQ}} :- !,
+    find CT {{fun x : lp:T => lp:(P x)}} FP,
     find CT {{fun x : lp:T => lp:(Q x)}} FQ.
 
   find CT {{ fun x : lp:T => lp:(R x) }} S :-
     (@pi-decl `x` T x\ redex (R x) (R' x)), !,
     find CT {{ fun x : lp:T => lp:(R' x) }} S.
 
+
   pred redex i:term, o:term.
   redex X Y :-
     @redflags! coq.redflags.betaiotazeta => coq.reduction.lazy.whd X Y,
     not (same_term X Y). % avoid loop
-  redex (match X P C) Y :-
-  % TODO FIXME to use simpl instead.
-    coq.safe-dest-app X (global (const HeadGR)) Tail,
-    coq.env.const HeadGR (some Body) _,
-    redex (match {coq.mk-app Body Tail} P C) Y.
+  redex X Y :-
+    coq.safe-dest-app X Head _Tail,
+    coq.env.global (const C) Head, !,
+    coq.redflags.add coq.redflags.betaiotazeta
+      [coq.redflags.delta, coq.redflags.const C] RedFlags,
+    coq.say "redex 2nd case C =" C "and X =" {coq.term->string X},
+    @redflags! RedFlags => coq.reduction.lazy.whd X Y,
+    coq.say "redex 2nd case Y =" {coq.term->string Y},
+    not (same_term X Y). % avoid loop
+  redex (match X P C as M) Y :- coq.say "expand match" {coq.term->string M},
+    % TODO FIXME to use simpl instead.
+    coq.reduction.lazy.whd X X',
+    coq.safe-dest-app X' (global (indc _K)) _, !,
+    redex (match X' P C) Y.
+    % whd-indc X XCstr XArgs, !,
+    % redex (match {coq.mk-app (global (indc XCstr)) XArgs} P C) Y.
+
+    % coq.safe-dest-app X (global (const HeadGR)) Tail,
+    % coq.env.const HeadGR (some Body) _,
+    % redex (match {coq.mk-app Body Tail} P C) Y.
   % redex (match X P C as M) Y :-
   %   std.spy(coq.whd1 X Xred),
   %   std.spy(redex (match Xred P C) Y).
 
+  cs _Ctx ({{@pred_set lp:CT}}) RHS Sol :- !,
+    coq.say "cs: Proj is pred_set",
+    std.spy(Sol = {{@finPred_of_set lp:CT lp:RHS}}).
+    
+
   cs Ctx ({{@finpred lp:CT}}) RHS Sol :- !, std.do![
-    coq.say "cs: Head is finpred",
+    coq.say "cs: Proj is finpred",
     coq.say "Ctx is" Ctx,
     coq.say "RHS is" {coq.term->string RHS},
     (find CT RHS FinSet ; coq.error "not found"),
@@ -338,6 +386,9 @@ Fail Check (fun (T : choiceType) (P : {pred T}) => P : finPred T).
 Module Tests.
 
 Set Debug "elpi-unification".
+Definition tF (T : choiceType) : finPred T := pred0.
+Definition tset1 (T : choiceType) x : finPred T := pred1 x.
+Definition t0 (T : choiceType) (A : {set T}) : finPred T := A.
 Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
   [pred x in A].
 Definition t1' (T : choiceType) (P : finPred T) : finPred T :=
@@ -354,58 +405,12 @@ Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
    [pred x | (x \in A) && (Q x)].
 Definition t4 (T : choiceType) (P : finPred T) (Q : finPred T) : finPred T :=
    [pred x | (x \in P) || (x \in Q)].
-Definition def (T : choiceType) (P Q : {pred T}) : pred T :=
+Definition def (T : choiceType) (P Q : {pred T}) : finPred T :=
    [pred x : T | P x && Q x].
 Definition t6 (T : choiceType) (P : finPred T) Q : finPred T :=
    [pred x : T | def P Q x ].
 End Tests.
 
-(* Canonical isFinPred T P {h : @finPred_aux T P} := *)
-(*    @PackFinPred T P (@proof _ _ h). *)
-
-Canonical isFinPred T P {h : @finPred_aux T P} :=
-   @FinPred T P (sval (@proof _ _ h)) (svalP (@proof _ _ h)).
-
-Structure apply T (F : finPred T) (x : T) := Apply {apply_val :> bool}.
-
-Canonical applyF T F x := @Apply T F x (finpred_coe F x).
-
-Definition set0 {T} := @FinSet.of_seq T [::].
-Lemma in_set0 T x : x \in @set0 T = false. Admitted.
-Definition FinPred0 T := FinPred (@in_set0 T).
-Canonical apply0 T x := Apply (FinPred0 T) x false.
-
-Definition FinPredU_subproof T (F : finPred T) (G : finPred T) :
-  (fun A : {set T} => A =i [pred x | (x \in F) || (x \in G)]) (setU F G).
-Proof. Admitted.
-Definition FinPredU T (F : finPred T) (G : finPred T) :=
-  @FinPred _[pred x | (x \in F) || (x \in G)] (setU F G)
-           (FinPredU_subproof F G).
-Canonical applyU T F G x (aF : apply F x) (aG : apply G x):=
-    Apply (@FinPredU T F G) x (aF || aG).
-
-Definition FinPredI_subproof T (F : finPred T) (G : pred T) :
-  (fun A : {set T} => A =i [pred x in F | G x]) (set_comprehension F G).
-Proof. Admitted.
-Definition FinPredI T (F : finPred T) (G : pred T) :=
-  @FinPred _ [pred x in F | G x] (set_comprehension F G)
-           (FinPredI_subproof F G).
-Canonical applyI T F G x (aF : apply F x) :=
-    Apply (@FinPredI T F G) x (aF && (G x)).
-
-Definition finpred_target := finPred.
-Canonical FinPredOfSet T (A : {set T}) : finpred_target T := @FinPred _ A A (frefl _).
-Coercion FinPredOfSet : set_type >-> finpred_target.
-(* Notation "A" := (FinPredOfSet A) (at level 9, only printing). *)
-Canonical applyOfSet T A x := Apply (@FinPredOfSet T A) x (FinSet.mem A x).
-
-Definition set1 {T} x := @FinSet.of_seq T [:: x].
-Lemma in_set1 T x y : y \in @set1 T x = (y == x). Admitted.
-Definition FinPred1 T x := FinPred (@in_set1 T x).
-Canonical apply1 T y x := Apply (@FinPred1 T y) x (x == y).
-
-Definition pred_eqset (T : choiceType) (P : finPred T) :
-   {A : {set T} | A =i P} := exist _ (pred_set P) (pred_enumP P).
 
 (**
  The class of formulae that we wish to recognize as canonically
@@ -424,35 +429,15 @@ Definition pred_eqset (T : choiceType) (P : finPred T) :
 
 Note: we need to make sure the A inferred by application A x is
       syntactically equal to A and not "just" convertible to A.
-*)
+(* *)
 From mathcomp.ssreflect Extra Dependency "finset.elpi" as finset.
 Import elpi.
 Elpi Tactic infer.
 Elpi Accumulate File finset.
-Elpi Typecheck.
+Elpi Typecheck. *)
 
-Hint Extern 0 (finPred_aux _ ) => elpi infer : typeclass_instances.
 (********)
 
-Module Tests.
-
-Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
-  [pred x in A].
-Definition t1' (T : choiceType) (P : finPred T) : finPred T :=
-  [pred x in P] : {pred T}.
-Definition t2 (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
-  [pred x | [in P] x && (Q x)].
-Definition t2' (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
-  [pred x | (x \in P) && (Q x)].
-Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
-   [pred x | (x \in A) && (Q x)].
-Definition t4 (T : choiceType) (P : finPred T) (Q : finPred T) : finPred T :=
-   [pred x | (x \in P) || (x \in Q)].
-Definition def (T : choiceType) (P Q : {pred T}) : pred T :=
-   [pred x : T | P x && Q x].
-Definition t6 (T : choiceType) (P : finPred T) Q : finPred T :=
-   [pred x : T | def P Q x ].
-End Tests.
 
 Notation enum A := (FinSet.enum (pred_set A)) (only parsing).
 Notation "'enum' A" := (FinSet.enum A) (at level 10, only printing).
@@ -464,7 +449,6 @@ Notation "'enum' A" := (FinSet.enum A) (at level 10, only printing).
 
 Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
   enum [pred x in P | Q x].
-
 
 Check fun (T : choiceType) (A : {set T}) => enum A.
 
@@ -565,8 +549,6 @@ Notation "[ 'set' x 'in' A | P & Q ]" := [set x in A | P && Q]
 Notation "[ 'set' x : T 'in' A | P & Q ]" := [set x : T in A | P && Q]
   (at level 0, x at level 99, only parsing) : set_scope.
 
-Check fun (T : choiceType) (P : finPred T) Q R =>
-  [set x : T | (x \in P) && (Q x && R x)].
 
 
 
@@ -578,11 +560,13 @@ Notation "[ 'set' :: s ]" := (finset [in pred_of_seq s])
 
 (* This lets us use set and subtypes of set, like group or coset_of, both as  *)
 (* collective predicates and as arguments of the \pi(_) notation.             *)
-Coercion pred_of_set: set_type >-> fin_pred_sort.
+(* TODO: Check if useful ?*)
+(* Coercion pred_of_set: set_type >-> fin_pred_sort. *)
 
 (* Declare pred_of_set as a canonical instance of topred, but use the         *)
 (* coercion to resolve mem A to @mem (predPredType T) (pred_of_set A).        *)
-Canonical set_predType T := @PredType _ (unkeyed (set_type T)) (@pred_of_set T).
+(* TODO: Check if useful ?*)
+(* Canonical set_predType T := @PredType _ (unkeyed (set_type T)) (@pred_of_set T). *)
 
 
 Section ChoiceOpsTheory.
@@ -645,14 +629,16 @@ Proof. rewrite !cardE/=. Admitted.
 Lemma cardsID B A : #|[predI A & B]| + #|[pred x in A | x \notin B]| = #|A|.
 Proof. Admitted.
 
+Arguments reverse_coercion : simpl never.
+
 Lemma cardsU1 x A : #|[predU1 x & A]| = (x \notin A) + #|A|.
 Proof.
 case Ax: (x \in A).
-  by apply: eq_card => y /[1!inE]/=; case: eqP => // ->.
-rewrite /= -(card1 x) -cardsUI addnC.
+  (* by apply: eq_card => y /[!inE]/=; case: eqP => // ->.
+rewrite -(card1 x) -cardsUI addnC.
 rewrite [#|predI _ _|]eq_card0 => [|y /=].
   by apply: eq_card => // y; rewrite !inE; admit.
-by rewrite !inE; case: eqP => // ->.
+by rewrite !inE; case: eqP => // ->. *)
 Admitted.
 
 
@@ -661,21 +647,28 @@ End ChoiceOpsTheory.
 
 Section BasicSetTheory.
 
-Variable T : finType.
+Variable T : choiceType.
 Implicit Types (x : T) (A B : {set T}) (pA : pred T).
 
-HB.instance Definition _ := Finite.on {set T}.
+(* HB.instance Definition _ := Finite.on {set T}. *)
 
-Lemma in_set pA x : x \in finset pA = pA x.
-Proof. by rewrite [@finset]unlock unlock [x \in _]ffunE. Qed.
+Lemma in_set (pA : finPred T) x : (x \in [set x | finpred pA x]) = finpred pA x.
+Proof. by rewrite pred_enumP. Qed.
 
 Lemma setP A B : A =i B <-> A = B.
 Proof.
-by split=> [eqAB|-> //]; apply/val_inj/ffunP=> x; have:= eqAB x; rewrite unlock.
-Qed.
+(* by split=> [eqAB|-> //]; apply/val_inj/ffunP=> x; have:= eqAB x; rewrite unlock. *)
+Admitted.
 
 Definition set0 := [set x : T | false].
-Definition setTfor := [set x : T | true].
+Definition setU (A B : {set T}) := [set x | (x \in A) || (x \in B)].
+Print setU.
+Lemma foo (A B : {set T}) x : enum [predU A & B] = enum (setU A B).
+Proof. rewrite /=.
+Proof. rewrite in_set/=.
+
+simpl.
+(* Definition setTfor := [set x : T | true]. *)
 
 Lemma in_setT x : x \in setTfor.
 Proof. by rewrite in_set. Qed.
