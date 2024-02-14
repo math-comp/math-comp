@@ -222,11 +222,18 @@ Notation "A :=P: B" := (A =P B :> {set _})
 (* #[short(type="finPred")] *)
 (* HB.structure Definition FinPred T := {P of @isFinPred T P}. *)
 
-Definition setU_subdef T (A B : {set T}) :=
+Lemma size_enum (T : choiceType) (s : seq T) :
+  size (FinSet.enum (FinSet.of_seq s)) = size (undup s).
+Admitted.
+
+
+Definition setU T (A B : {set T}) :=
    FinSet.of_seq (FinSet.enum A ++ FinSet.enum B).
 
-Lemma in_setU_subproof T (A B : {set T}) :
-  setU_subdef A B =i [pred x | (x \in A) || (x \in B)].
+Notation "A :|: B" := (setU A B) : set_scope.
+
+Lemma in_setU T (A B : {set T}) :
+  setU A B =i [pred x | (x \in A) || (x \in B)].
 Proof.
 Admitted.
 
@@ -276,8 +283,8 @@ by move=> x; rewrite set_comprehensionE inE pred_enumP andbC.
 Qed.
 
 Program Definition finPred_setU (T : choiceType) (fP fQ : finPred T) : finPred T :=
-  @FinPred _ (xpredU (finpred fP) (finpred fQ)) (setU_subdef fP fQ) _.
-Next Obligation. by move=> x; rewrite in_setU_subproof !inE !pred_enumP. Qed.
+  @FinPred _ (xpredU (finpred fP) (finpred fQ)) (setU fP fQ) _.
+Next Obligation. by move=> x; rewrite in_setU !inE !pred_enumP. Qed.
 
 (* Class finPredClass (T : choiceType) (P : {pred T}) :=
   FinPredClass { proof : {A : {set T} | A =i P} }. *)
@@ -326,7 +333,6 @@ Elpi Accumulate cs.db lp:{{
   find CT {{ fun x : lp:T => lp:(R x) }} S :-
     (@pi-decl `x` T x\ redex (R x) (R' x)), !,
     find CT {{ fun x : lp:T => lp:(R' x) }} S.
-
 
   pred redex i:term, o:term.
   redex X Y :-
@@ -381,11 +387,16 @@ move=> T x; reflexivity. *)
 Elpi Override CS All.
 
 
-Fail Check (fun (T : choiceType) (P : {pred T}) => P : finPred T).
+(* Check (fun (T : choiceType) (P : {pred T}) => P : finPred T). *)
 
 Module Tests.
 
 Set Debug "elpi-unification".
+
+(* TODO: fix this *)
+Fail Check (fun (T : choiceType) (A B : {set T}) => A :|: B : finPred T).
+
+
 Definition tF (T : choiceType) : finPred T := pred0.
 Definition tset1 (T : choiceType) x : finPred T := pred1 x.
 Definition t0 (T : choiceType) (A : {set T}) : finPred T := A.
@@ -405,7 +416,7 @@ Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
    [pred x | (x \in A) && (Q x)].
 Definition t4 (T : choiceType) (P : finPred T) (Q : finPred T) : finPred T :=
    [pred x | (x \in P) || (x \in Q)].
-Definition def (T : choiceType) (P Q : {pred T}) : finPred T :=
+Definition def (T : choiceType) (P Q : {pred T}) : {pred T} :=
    [pred x : T | P x && Q x].
 Definition t6 (T : choiceType) (P : finPred T) Q : finPred T :=
    [pred x : T | def P Q x ].
@@ -623,16 +634,29 @@ Proof. exact: eq_card_trans card0. Qed.
 Lemma eq_card1 x A : A =i pred1 x -> #|A| = 1.
 Proof. exact: eq_card_trans (card1 x). Qed.
 
+Notation "[ 'set' x 'in' A | P ]" := (set_comprehension A (fun x => P))
+  (at level 0, x at level 99, format "[ 'set'  x  'in'  A  |  P ]", only printing) : set_scope.
+
 Lemma cardsUI A B : #|[predU A & B]| + #|[predI A & B]| = #|A| + #|B|.
-Proof. rewrite !cardE/=. Admitted.
+Proof.
+(* BUG: stops working if we simplify (simpl) first *)
+rewrite !cardE/= !size_enum undup_cat/= size_cat.
+rewrite -filter_undup !size_filter !undup_id ?enum_uniq//.
+rewrite addnAC; congr (_ + _).
+by under eq_count do rewrite mem_enum; rewrite addnC count_predC.
+Qed.
 
 Lemma cardsID B A : #|[predI A & B]| + #|[pred x in A | x \notin B]| = #|A|.
-Proof. Admitted.
+Proof.
+rewrite !cardE.
+rewrite !size_enum.
+Admitted.
 
 Arguments reverse_coercion : simpl never.
 
 Lemma cardsU1 x A : #|[predU1 x & A]| = (x \notin A) + #|A|.
 Proof.
+rewrite /=.
 case Ax: (x \in A).
   (* by apply: eq_card => y /[!inE]/=; case: eqP => // ->.
 rewrite -(card1 x) -cardsUI addnC.
@@ -661,11 +685,6 @@ Proof.
 Admitted.
 
 Definition set0 := [set x : T | false].
-Definition setU (A B : {set T}) := [set x | (x \in A) || (x \in B)].
-Print setU.
-Lemma foo (A B : {set T}) x : enum [predU A & B] = enum (setU A B).
-Proof. rewrite /=.
-Proof. rewrite in_set/=.
 
 simpl.
 (* Definition setTfor := [set x : T | true]. *)
