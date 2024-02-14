@@ -80,7 +80,7 @@ with builtins; with (import <nixpkgs> {}).lib;
     "hooks".push-branches = [ "master" "mathcomp-1" ];
     "hooks".coqPackages = common-bundles // {
       coq.override.version = "Tragicus:coercion";
-      coq-elpi.override.version = "Tragicus:cswb";
+      coq-elpi.override.version = "Tragicus:cswb2";
       hierarchy-builder.override.version = "master";
       # vscoq-language-server.override.version = "coq-8.19";
       interval.job = false;
