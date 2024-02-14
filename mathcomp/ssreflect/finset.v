@@ -281,15 +281,19 @@ Import elpi.
 From elpi Require Import cs.
 Elpi Accumulate cs.db lp:{{
   pred find i:term, i:term, o:term.
+  find _ ({{fun x => in_mem x (mem (finpred lp:P))}}) P :- !.
+
   find CT ({{fun x => in_mem x (mem (mem_set lp:A))}} as P)
        {{@FinPred lp:CT lp:P lp:A (fun=> erefl)}}:- !.
 
   find CT {{fun x : lp:T => lp:(P x) && lp:(Q x)}}
-       {{@finPred_comprehensionl lp:T lp:FP (fun x : lp:T => lp:(Q x))}} :-
+       {{@finPred_comprehensionl lp:CT lp:FP (fun x : lp:T => lp:(Q x))}} :-
+    coq.say "try comprehensionl:" P Q,
     find CT {{fun x : lp:T => lp:(P x)}} FP, !.
 
   find CT {{fun x : lp:T => lp:(P x) && lp:(Q x)}} 
-       {{@finPred_comprehensionr lp:T (fun x : lp:T => lp:(P x)) lp:FQ}} :-
+       {{@finPred_comprehensionr lp:CT (fun x : lp:T => lp:(P x)) lp:FQ}} :-
+    coq.say "try comprehensionr:" P Q,
     find CT {{fun x : lp:T => lp:(Q x)}} FQ.
 
   find CT {{ fun x : lp:T => lp:(R x) }} S :-
@@ -313,7 +317,7 @@ Elpi Accumulate cs.db lp:{{
     coq.say "cs: Head is finpred",
     coq.say "Ctx is" Ctx,
     coq.say "RHS is" {coq.term->string RHS},
-    find CT RHS FinSet,
+    (find CT RHS FinSet ; coq.error "not found"),
     coq.say "found" FinSet,
     std.assert-ok! (coq.typecheck FinSet _) "solution is ill typed",
     Sol = FinSet,
@@ -322,8 +326,12 @@ Elpi Accumulate cs.db lp:{{
 }}. 
 Set Warnings "+elpi".
 Elpi Typecheck canonical_solution.
+(* 
+Goal forall T (P : finPred T) x, finpred P x = mem_set P x.
+move=> T x; reflexivity. *)
 
 Elpi Override CS All.
+
 
 Fail Check (fun (T : choiceType) (P : {pred T}) => P : finPred T).
 
@@ -334,8 +342,12 @@ Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
   [pred x in A].
 Definition t1' (T : choiceType) (P : finPred T) : finPred T :=
   [pred x in P].
+Definition t1'' (T : choiceType) (P : finPred T) : finPred T :=
+  [pred x | x \in P].
+Definition t1''' (T : choiceType) (P : finPred T) : finPred T :=
+    [pred x | [in P] x].
 Definition t2 (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
-  [pred x | [in P] x && (Q x)].
+  [pred x | (x \in P) && (Q x)].
 Definition t2' (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
   [pred x | (x \in P) && (Q x)].
 Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
