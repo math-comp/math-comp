@@ -879,7 +879,8 @@ Variable gT : finGroupType.
 
 Lemma Aut_prime_cycle_cyclic (a : gT) : prime #[a] -> cyclic (Aut <[a]>).
 Proof.
-move=> pr_a; have inj_um := injm_Zp_unitm a; have eq_a := Fp_Zcast pr_a.
+move=> pr_a; have inj_um := injm_Zp_unitm a.
+have /eq_S/eq_S eq_a := Fp_Zcast pr_a.
 pose fm := cast_ord (esym eq_a) \o val \o invm inj_um.
 apply: (@field_mul_group_cyclic _ _ _ fm) => [f g Af Ag | f Af] /=.
   by apply: val_inj; rewrite /= morphM ?im_Zp_unitm //= eq_a.
