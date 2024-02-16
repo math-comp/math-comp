@@ -342,7 +342,7 @@ Section F_prime.
 
 Hypothesis p_pr : prime p.
 
-Lemma Fp_Zcast : (Zp_trunc (pdiv p)).+2 = (Zp_trunc p).+2.
+Lemma Fp_Zcast : Zp_trunc (pdiv p) = Zp_trunc p.
 Proof. by rewrite /pdiv primes_prime. Qed.
 
 Lemma Fp_cast : (Zp_trunc (pdiv p)).+2 = p.
