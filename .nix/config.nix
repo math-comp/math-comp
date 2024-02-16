@@ -65,10 +65,12 @@ with builtins; with (import <nixpkgs> {}).lib;
     "coq-8.17".push-branches = [ "mathcomp-1" "master" ];
     "coq-8.17".coqPackages = common-bundles // {
       coq.override.version = "8.17";
+      vcfloat.job = false;
     };
     "coq-8.16".push-branches = [ "mathcomp-1" "master" ];
     "coq-8.16".coqPackages = common-bundles // {
       coq.override.version = "8.16";
+      vcfloat.job = false;
     };
   };
 }
