@@ -926,12 +926,16 @@ rewrite /sort; move: [::] {2}_.+1 (ltnSn (size s)./2) => ss n.
 by elim: n => // n IHn in ss s *; case: s => [|x [|y s]] //= /IHn->.
 Qed.
 
-Lemma size_merge s1 s2 : size (merge s1 s2) = size (s1 ++ s2).
+Lemma count_merge (p : pred T) s1 s2 :
+  count p (merge s1 s2) = count p (s1 ++ s2).
 Proof.
-rewrite size_cat; elim: s1 s2 => // x s1 IH1.
+rewrite count_cat; elim: s1 s2 => // x s1 IH1.
 elim=> //= [|y s2 IH2]; first by rewrite addn0.
-by case: leT; rewrite /= ?IH1 ?IH2 !addnS.
+by case: leT; rewrite /= ?IH1 ?IH2 !addnA [_ + p y]addnAC [p x + p y]addnC.
 Qed.
+
+Lemma size_merge s1 s2 : size (merge s1 s2) = size (s1 ++ s2).
+Proof. exact: (count_merge predT). Qed.
 
 Lemma allrel_merge s1 s2 : allrel leT s1 s2 -> merge s1 s2 = s1 ++ s2.
 Proof.
@@ -1100,11 +1104,7 @@ Section EqSortSeq.
 Variables (T : eqType) (leT : rel T).
 
 Lemma perm_merge s1 s2 : perm_eql (merge leT s1 s2) (s1 ++ s2).
-Proof.
-apply/permPl; rewrite perm_sym; elim: s1 s2 => //= x1 s1 IHs1.
-elim; rewrite ?cats0 //= => x2 s2 IHs2.
-by case: ifP; last rewrite (perm_catCA (_ :: _) [:: x2]); rewrite perm_cons.
-Qed.
+Proof. by apply/permPl/permP => ?; rewrite count_merge. Qed.
 
 Lemma mem_merge s1 s2 : merge leT s1 s2 =i s1 ++ s2.
 Proof. by apply: perm_mem; rewrite perm_merge. Qed.
@@ -1127,9 +1127,6 @@ Lemma mem_sort s : sort leT s =i s. Proof. exact/perm_mem/permPl/perm_sort. Qed.
 
 Lemma sort_uniq s : uniq (sort leT s) = uniq s.
 Proof. exact/perm_uniq/permPl/perm_sort. Qed.
-
-Lemma count_merge p s1 s2 : count p (merge leT s1 s2) = count p (s1 ++ s2).
-Proof. exact/permP/permPl/perm_merge. Qed.
 
 Lemma eq_count_merge (p : pred T) s1 s1' s2 s2' :
   count p s1 = count p s1' -> count p s2 = count p s2' ->

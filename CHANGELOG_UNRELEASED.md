@@ -15,6 +15,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `zmodp.v`
   + simpler statement of `Fp_Zcast`
 
+- in `path.v`
+  + generalized `count_merge` from `eqType` to `Type`
+
 ### Renamed
 
 ### Removed
