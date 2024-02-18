@@ -680,6 +680,8 @@ Proof. by rewrite mulNrz mulrNz opprK. Qed.
 Lemma mulrbz x (b : bool) : x *~ b = (if b then x else 0).
 Proof. by case: b. Qed.
 
+Lemma intrN n : (- n)%:~R = - n%:~R :> R. Proof. by rewrite mulrNz. Qed.
+
 Lemma intrD m n : (m + n)%:~R = m%:~R + n%:~R :> R.
 Proof. exact: mulrzDr_tmp. Qed.
 
