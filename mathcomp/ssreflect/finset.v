@@ -438,6 +438,13 @@ End Tests.
      (* left out *)
       | if Qx then R x else Tx, where Qx and Tx are (application _ x)
 
+Additionally, if P x is convertible to false, we yield false.
++ arithmetic inequality with constant upper bound.
+
+Additionally we should find functions (in fact expressions)
+with finite preimage (such as injective functions).
+Recognize finite preimages.
+
 Note: we need to make sure the A inferred by application A x is
       syntactically equal to A and not "just" convertible to A.
 (* *)
@@ -686,7 +693,6 @@ Admitted.
 
 Definition set0 := [set x : T | false].
 
-simpl.
 (* Definition setTfor := [set x : T | true]. *)
 
 Lemma in_setT x : x \in setTfor.
