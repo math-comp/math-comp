@@ -875,11 +875,15 @@ Import elpi.
 From elpi Require Import cs.
 Elpi Accumulate cs.db lp:{{
   pred find i:term, i:term, o:term.
- /* find _ ({{fun x => finpred lp:P x}}) P :- !. */
+ /* 
+   find _ ({{fun x => finpred lp:P x}}) P :- !.
 
   find _ ({{fun x => in_mem x (mem (mem_finpred lp:P))}}) P :- !.
 
   find T {{finpred _}} {{predPredType lp:T}} :- !.
+  */
+  find _ R _ :- coq.say "xxxxxxxxxxx" {coq.term->string R}, fail.
+
 
  /* find CT ({{fun x => in_mem x (mem (mem_set lp:A))}} as P)
        {{@FinPred lp:CT lp:P lp:A (fun=> erefl)}}:- !.
@@ -887,11 +891,11 @@ Elpi Accumulate cs.db lp:{{
   find CT {{fun x : lp:_T => false}} {{@finPred0 lp:CT}} :- !.
 
   find CT {{fun x : lp:_T => x == lp:Y}} {{@finPred1 lp:CT lp:Y}} :- !.
-
-  find CT {{fun x : lp:T => lp:(P x) && lp:(Q x)}}
-       {{@finPred_comprehensionl lp:CT lp:FP (fun x : lp:T => lp:(Q x))}} :-
-    find CT {{fun x : lp:T => lp:(P x)}} FP, !.
-
+*/
+  find CT {{fun x : lp:T => lp:(P x) && lp:(Q_ x)}} _Sol :-
+       % Sol = {{@finPred_comprehensionl lp:CT lp:FP (fun x : lp:T => lp:(Q x))}}
+    find CT {{fun x : lp:T => lp:(P x)}} _FP, !.
+/*
   find CT {{fun x : lp:T => lp:(P x) && lp:(Q x)}} 
        {{@finPred_comprehensionr lp:CT (fun x : lp:T => lp:(P x)) lp:FQ}} :-
     find CT {{fun x : lp:T => lp:(Q x)}} FQ, !.
@@ -904,11 +908,11 @@ Elpi Accumulate cs.db lp:{{
        {{@finPred_setU lp:CT lp:FP lp:FQ}} :- !,
     find CT {{fun x : lp:T => lp:(P x)}} FP,
     find CT {{fun x : lp:T => lp:(Q x)}} FQ.
+    */
 
   find CT {{ fun x : lp:T => lp:(R x) }} S :-
     (@pi-decl `x` T x\ redex (R x) (R' x)), !,
     find CT {{ fun x : lp:T => lp:(R' x) }} S.
-    */
 
   pred redex i:term, o:term.
   redex X Y :-
@@ -942,18 +946,17 @@ Elpi Accumulate cs.db lp:{{
     coq.say "cs: Proj is pred_set",
     std.spy(Sol = {{@finPred_of_set lp:CT lp:RHS}}).*/
 
-  cs Ctx ({{@pred_sort lp:T}}) RHS Sol :- !, std.do![
-    coq.say "cs: Proj is pred_sort",
+  cs Ctx ({{@pattern_pred lp:T}}) RHS Sol :- !, std.do![
+    coq.say "cs: Proj is pattern_pred",
     coq.say "Ctx is" Ctx,
     coq.say "RHS = " RHS,
     coq.say "RHS is" {coq.term->string RHS},
-    (find T RHS FinSet),
-    coq.say "found" FinSet,
-    std.assert-ok! (coq.typecheck FinSet _) "solution is ill typed",
-    Sol = FinSet,
+    (find T RHS FinPred),
+    coq.say "found" FinPred,
+    std.assert-ok! (coq.typecheck FinPred _) "solution is ill typed",
+    Sol = FinPred,
     coq.say "Sol is" {coq.term->string Sol}
   ].
-
   cs _ P V S :- coq.say P V S, fail.
 }}. 
 Set Warnings "+elpi".
@@ -963,17 +966,16 @@ Goal forall T (P : finPred T) x, finpred P x = mem_set P x.
 move=> T x; reflexivity. *)
 
 Elpi Override CS All.
-Set Debug "elpi-unification".
+(*Set Debug "elpi-unification".*)
 (******************************************************************************)
 (*************************** Unit Tests          ******************************)
 (******************************************************************************)
 
 (* Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
   [pred x in A]. *)
-Definition t1' (T : choiceType) (P : {finpred T}) : finpred T :=
-  [pred x in P] : simpl_pred T.
-  stop.
-Definition t2 (T : choiceType) (P : finpred T) (Q : pred T) : finpred T :=
+Definition t1' (T : choiceType) (P : {finpred T}) : {finpred T} :=
+  [pred x in P].
+Definition t2 (T : choiceType) (P : {finpred T}) (Q : pred T) : {finpred T} :=
   [pred x | ([in P] x) && (Q x)].
 Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
    [pred x | (x \in A) && (Q x)].
