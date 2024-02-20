@@ -293,7 +293,7 @@ Definition pick {T} P := ohead (@enum T P).
 (*Structure labeled_pred (T : eqType) := LabelPred {unlabel_pred :> {pred T}}.*)
 
 Structure finpred_pattern (T : eqType) := FinpredPattern {
-  pattern_pred :> pred T; (* the finpred to be displayed *)
+  pattern_pred :> {pred T}; (* the finpred to be displayed *)
   finpred_of_finpred :> finpred T;
   #[canonical=no] finpred_of_eq : mem_finpred finpred_of_finpred = pattern_pred
 }.
@@ -945,6 +945,7 @@ Elpi Accumulate cs.db lp:{{
   cs Ctx ({{@pred_sort lp:T}}) RHS Sol :- !, std.do![
     coq.say "cs: Proj is pred_sort",
     coq.say "Ctx is" Ctx,
+    coq.say RHS,
     coq.say "RHS is" {coq.term->string RHS},
     (find T RHS FinSet ; coq.error "not found"),
     coq.say "found" FinSet,
@@ -969,8 +970,8 @@ Elpi Override CS All.
 
 (* Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
   [pred x in A]. *)
-Definition t1' (T : choiceType) (P : {finpred T}) :=
-  [pred x in P] : {pred T}.
+Definition t1' (T : choiceType) (P : {finpred T}) : finpred T :=
+  [pred x in P].
 Definition t2 (T : choiceType) (P : finpred T) (Q : pred T) : finpred T :=
   [pred x | ([in P] x) && (Q x)].
 Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
