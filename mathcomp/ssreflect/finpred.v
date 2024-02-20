@@ -1,4 +1,4 @@
-(* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
+(* (c) Copyright 2024 Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
@@ -131,9 +131,6 @@ Definition TypePredPattern@{i j k m n} (A : Type@{j}) :=
   @PredPattern@{i m n} TypeArg A TypeSort
     (@LabelType Type@{m} (A -> Type@{k})) id.
 
-Definition ForallLambda {sA A S sB} B :=
-  Forall (@coerce_pred_pattern sA A S sB B).
-
 End Definitions.
 
 Module Exports.
@@ -166,8 +163,10 @@ Canonical PredInSPropPattern.
 Canonical PropPredPattern.
 Canonical TypePredPattern.
 
+Definition Forall {sA A S sB} B := Forall (@coerce_pred_pattern sA A S sB B).
+
 Notation "\Forall x .. z , T" :=
-   (ForallLambda (fun x => .. (ForallLambda (fun z => T)) ..))
+   (Forall (fun x => .. (Forall (fun z => T)) ..))
   (at level 200, x binder, z binder, T at level 200,
    format "'[hv' '\Forall'  '[' x .. z , ']' '/ '  T ']'") : type_scope.
 
@@ -186,10 +185,20 @@ Notation "\Forall x .. z , T" :=
 (*      equality destruction.                                                 *)
 (*    - ssr case: and set do not recognize ssrpatternarg parameters, so we    *)
 (*      must rely on ssrmatching.ssrpattern.                                  *)
+
+Tactic Notation "ForallI" ssrpatternarg(pat) :=
+  let F := fresh "F" in let A := fresh "A" in
+  ssrmatching.ssrpattern pat;
+  set A := (A in let F := forall x : A, _ in _) => F;
+  case: {A} F / (let S : sort := _ in @erefl S F : @Forall _ A S _ _ = _).
+Tactic Notation "ForallI" := ForallI (forall x, _).
+
+(*
 Tactic Notation "ForallI" ssrpatternarg(pat) :=
   let F := fresh "F" in ssrmatching.ssrpattern pat => F;
   case: F / (@erefl _ F : ForallType _ = _).
 Tactic Notation "ForallI" := ForallI (forall x, _).
+*)
 
 End Exports.
 End Forall.
@@ -216,6 +225,38 @@ Lemma tag_of_tag2K {I T1_ T2_} : cancel (@tag_of_tag2 I T1_ T2_) tag2_of_tag.
 Proof. by case. Qed.
 
 (* End of ssrfun complements. *)
+
+(*   This module provides facilities for handling (boolean) predicates with   *)
+(* finite support, i.e., for which an explicit list of the values for which   *)
+(* the predicate holds can given. These facilities include an extensive and   *)
+(* extensible infrastructure for inferring this support. We always assume     *)
+(* the type T of values has Equality, but as noted some of the operations and *)
+(* theory also need T to have Choice. We define                               *)
+(*   {finpred T} == the type of predicates with finite support. This type     *)
+(*                  coerces to {pred T}, and this coercion will unify with    *)
+(*                  many predicates tha have finite support, thereby          *)
+(*                  inferring said support (see list below).                  *)
+(*     finpred T == the representation type for predicates with finite        *)
+(*                  support. This type is used to declare arguments of        *)
+(*                  finpred operations. Predicates P with finite support will *)
+(*                  coerce or reverse coerce to finpred T, but the resulting  *)
+(*                  finpred may not preserve the shape of P - it can present  *)
+(*                  a predicate P' convertible but not identical to P.        *)
+(*                  For this reason {finpred T} should always be used for     *)
+(*                  declaring lamma contexts.                                 *)
+(* card P, #|P| == the cardinal of the support of a finpred P.                *)
+(*     pred0b P == the finpred P is empty (always false).                     *)
+(*    P \subset Q <=> the finpred P is a subset of the (plain) predicate Q    *)
+(*    P \proper Q <=> the finpred P is a proper subset of the finpred Q.      *)
+(*    support P == the support of a finpred P, i.e., a duplicate-free         *)
+(*                 sequence of the values on which P holds. Note that suppprt *)
+(*                 is NOT extensional: support P and support Q may differ for *)
+(*                 equivalent (or even convertible!) P and Q.                 *)
+(*       enum P == a standard enumeration of the support of P, using a Choice *)
+(*                 structure on T; this is both extensional and stable -      *)
+(*                 enum P is a subsequence of enum Q when {subset P <= Q}     *)
+(*       pick P == Some standard x such that P x, or None if P is empty.      *)
+(*                 pick P is extensional and requires Choice on T.            *)
 
 Definition finpred_pred_target (T : eqType) := pred T.
 
