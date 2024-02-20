@@ -76,6 +76,7 @@ ssreflect/choice.v
 ssreflect/div.v
 ssreflect/eqtype.v
 ssreflect/finfun.v
+ssreflect/finpred.v
 ssreflect/fingraph.v
 ssreflect/finset.v
 ssreflect/fintype.v

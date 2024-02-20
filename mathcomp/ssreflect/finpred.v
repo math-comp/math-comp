@@ -945,9 +945,9 @@ Elpi Accumulate cs.db lp:{{
   cs Ctx ({{@pred_sort lp:T}}) RHS Sol :- !, std.do![
     coq.say "cs: Proj is pred_sort",
     coq.say "Ctx is" Ctx,
-    coq.say RHS,
+    coq.say "RHS = " RHS,
     coq.say "RHS is" {coq.term->string RHS},
-    (find T RHS FinSet ; coq.error "not found"),
+    (find T RHS FinSet),
     coq.say "found" FinSet,
     std.assert-ok! (coq.typecheck FinSet _) "solution is ill typed",
     Sol = FinSet,
@@ -963,7 +963,7 @@ Goal forall T (P : finPred T) x, finpred P x = mem_set P x.
 move=> T x; reflexivity. *)
 
 Elpi Override CS All.
-
+Set Debug "elpi-unification".
 (******************************************************************************)
 (*************************** Unit Tests          ******************************)
 (******************************************************************************)
@@ -971,7 +971,8 @@ Elpi Override CS All.
 (* Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
   [pred x in A]. *)
 Definition t1' (T : choiceType) (P : {finpred T}) : finpred T :=
-  [pred x in P].
+  [pred x in P] : simpl_pred T.
+  stop.
 Definition t2 (T : choiceType) (P : finpred T) (Q : pred T) : finpred T :=
   [pred x | ([in P] x) && (Q x)].
 Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
