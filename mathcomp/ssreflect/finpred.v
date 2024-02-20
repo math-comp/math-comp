@@ -279,23 +279,11 @@ Definition pred0b {T} P := @card T P == 0.
 Definition enum {T : choiceType} P := sort prec (@support T P).
 Definition pick {T} P := ohead (@enum T P).
 
-Structure labeled_pred (T : eqType) := LabelPred {unlabel_pred :> {pred T}}.
-
-#[projections(primitive)]
-Structure finpred_of T (P : {pred _}) := FinpredOf {
+Structure finpred_pattern (T : eqType) := FinpredPattern {
+  pattern_pred :> pred T;
   finpred_of_finpred :> finpred T;
-  #[canonical=no] finpred_of_eq : mem_finpred finpred_of_finpred = P
+  #[canonical=no] finpred_of_eq : mem_finpred finpred_of_finpred = pattern_pred;
 }.
-Canonical finpred_of_self (T : eqType) (F : finpred T) :=
-  FinpredOf (@erefl _ (mem_finpred F)).
-Add Printing Constructor finpred_of.
-
-Structure finpred_pattern T := FinpredPattern {
-  pattern_pred :> labeled_pred T;
-  pattern_finpred :> finpred_of pattern_pred
-}.
-Coercion pattern_of_finpred T (A : finpred T) :=
-  @FinpredPattern T (LabelPred (mem_finpred A)) (finpred_of_self A).
 
 Notation "{ 'finpred' T }" := (finpred_pattern T)
    (at level 0, T at level 100, format "{ 'finpred'  T }") : type_scope.
