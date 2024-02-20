@@ -9,8 +9,6 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Declare Scope fin_quant_scope.
-
 (* A structure that matches an arbitrayry (possible dependent) function.      *)
 (*   It can be used to decompose an arbitrary application (?f ?a) using the   *)
 (* pattern (?ef ?a) where ?ef : funPattern ?f. Note that the simple (?f ?a)   *)
@@ -163,7 +161,7 @@ Canonical PredInSPropPattern.
 Canonical PropPredPattern.
 Canonical TypePredPattern.
 
-Definition Forall {sA A S sB} B := Forall (@coerce_pred_pattern sA A S sB B).
+Definition Forall {sA A S sB} B := Forall A S (@coerce_pred_pattern sA A S sB B).
 
 Notation "\Forall x .. z , T" :=
    (Forall (fun x => .. (Forall (fun z => T)) ..))
@@ -573,8 +571,6 @@ Definition LabelSmashProd X C x c
     (sA : Forall.argSort) (S : Forall.sort)
     (A0 A : sA) & Forall.pred_sort A S :=
   @LabelSmashArg X C S x c.
-Set Printing Universes.
-Set Printing Implicit.
 
 #[universes(polymorphic=yes)]
 Canonical MatchSmashProd X C x c sA S A R (z : @Forall.pattern sA S A R) :=
@@ -589,22 +585,8 @@ Canonical SmashProd X CA CR (x : X) (cA : CA) (cR : CR)
   SmashArg (@Forall.Forall sA A S R)
        (LabelSmashProd x (cA, cR) (smashArg_val eA) (smashArg_val eR) z).
 
-Definition LabelSmashProd X C x c (A0 : Type) A S & A -> S :=
-  @LabelSmashArg X C S x c.
-
-#[universes(polymorphic=yes)]
-Canonical MatchSmashProd X C x c A (S := Type) (R : A -> S) :=
-  let z : S := forall a : A, R a in
-  @LabelSmashProd X C x c (TrySmashVar A) A S (TrySmashVar R) (TrySmashProd z).
-Canonical SmashProd X CA CR (x : X) (cA : CA) (cR : CR)
-            A (eA : smashArg Type x cA A)
-            (S : forallSort A) R (eR : smashArg (A -> S) x cR R) z :=
-  SmashArg (@Forall A S R)
-       (LabelSmashProd x (cA, cR) (smashArg_val eA) (smashArg_val eR)
-          (infer_type z)).
-
+(*  Tests for unification order and priorities. *)
 (*
-
 Structure tag1 := MkTag1 {untag1 : unit}.
 Canonical Tag1 u := MkTag1 u.
 Structure tag2 := MkTag2 {untag2 : unit}.
@@ -619,7 +601,6 @@ eapply G.
 suff M : tag1 -> tag2 -> upair -> Prop.
 suff H u1 u2 uu: M u1 u2 uu -> P u1 u2 (upair_val uu).
 apply: H.
-
 *)
 
 Structure manifestSigmaPred I T_ (P : forall x : I, pred (T_ x)) :=
@@ -628,7 +609,7 @@ Definition LabelSigmaPred I T_ (P P1 P2 : forall x : I, pred (T_ x)) :=
   ManifestSigmaPred P tt.
 Canonical MatchSigmaPred I T_ P1 P2 :=
   @LabelSigmaPred I T_ (fun x y => P1 x y && P2 x y)
-                       (fun x y => TrySmVar (P1 x y)) P2.
+                       (fun x y => TrySmashVar (P1 x y)) P2.
 
 Structure splaySigmaPred I T_ (pT := forall x : I, {pred (T_ x)})
                          (P : pT) (P1 : {pred I}) (P2 : pT) :=
@@ -873,6 +854,52 @@ Definition finPreim_minn A :=
   @FinPreimOp_nat A nat (fun=> minn) id (fun _ _ _ => leqnn _).
 Canonical FinPreim_minn A x y1 y2 := OneFinPreimOp x y1 y2 (finPreim_minn A).
 
+(******************************************************************************)
+(*************************** Unit Tests          ******************************)
+(******************************************************************************)
+
+(* Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
+  [pred x in A]. *)
+Definition t1' (T : choiceType) (P : finPred T) : finPred T :=
+  [pred x in P] : {pred T}.
+Definition t2 (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
+  [pred x | ([in P] x) && (Q x)].
+Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
+   [pred x | (x \in A) && (Q x)].
+Definition t4 (T : choiceType) (P : finPred T) (Q : finPred T) : finPred T :=
+   [pred x | (x \in P) || (x \in Q)].
+Definition t5 (T : finType) (P : pred T) : finPred T :=
+   [pred x | P x].
+Definition def (T : choiceType) (P Q : {pred T}) : pred T := [pred x : T | P x && Q x].
+Definition t6 (T : choiceType) (P : finPred T) Q : finPred T :=
+   [pred x : T | def P Q x ].
+Print SimplFun.
+About cardU1.
+Print Canonical Projections finpred.
+
+Fail Check fun (T : choiceType) (P : finPred T) => [eta P] : finPred T.
+Fail Check fun (T : choiceType) (P : finPred T) => [in P] : finPred T.
+Fail Check fun (T : choiceType) (A : {set T}) => [in A] : finPred T.
+Fail Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
+   (fun x => (P x) && (Q x)) : finPred T.
+Fail Check fun (T : choiceType) (A : {set T}) (Q : pred T) =>
+   (fun x => (x \in A) && (Q x)) : finPred T.
+Fail Check fun (T : choiceType) (P : finPred T) (Q : finPred T) =>
+   (fun x => (P x) || (Q x)) : finPred T.
+
+Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
+  enum [pred x in P | Q x].
+
+
+Check fun (T : choiceType) (A : {set T}) => enum A.
+
+
+(******************************************************************************)
+(*************************** fintype starts here ******************************)
+(******************************************************************************)
+
+Declare Scope fin_quant_scope.
+
 Definition finite_axiom (T : eqType) e :=
   forall x : T, count_mem x e = 1.
 
@@ -984,797 +1011,7 @@ Notation "[ 'finType' 'of' T 'for' cT ]" := (Finite.clone T%type cT)
 Notation "[ 'finType' 'of' T ]" := (Finite.clone T%type _)
   (at level 0, format "[ 'finType'  'of'  T ]") : form_scope.
 
-(* Workaround for the silly syntactic uniformity restriction on coercions;    *)
-(* this avoids a cross-dependency between finset.v and prime.v for the        *)
-(* definition of the \pi(A) notation.                                         *)
-Definition fin_pred_sort (T : finType) (pT : predType T) := pred_sort pT.
-Identity Coercion pred_sort_of_fin : fin_pred_sort >-> pred_sort.
 
-
-Module Type FinSet_SIG.
-Parameter type : choiceType -> predArgType.
-Parameter enum : forall {T}, type T -> seq T.
-Axiom enum_sorted : forall {T} (A : type T), sorted (@prec T) (enum A).
-Parameter of_seq : forall {T : choiceType}, seq T -> type T.
-Axiom enumK : forall {T}, cancel (@enum T) (@of_seq T).
-Axiom of_seqK: forall {T : choiceType} (s : seq T), enum (of_seq s) =i s.
-Axiom mem : forall {T : choiceType}, type T -> pred T.
-Axiom memP :  forall {T : choiceType} {A : type T}, mem A =i enum A.
-End FinSet_SIG.
-
-Module FinSet : FinSet_SIG.
-Section FinSet.
-Variable (T : choiceType).
-
-Record internal := Build { enum : seq T; enum_sorted : sorted (@prec T) enum }.
-Definition type := internal.
-
-HB.instance Definition _ := [isSub for enum].
-HB.instance Definition _ := [Choice of type by <:].
-
-Lemma of_seq_subproof (s : seq T) : sorted prec (sort prec s).
-Proof.
-Admitted.
-
-Definition of_seq (s : seq T) : type := Build (of_seq_subproof s).
-
-Definition enumK : cancel enum of_seq.
-Proof.
-by move=> [s ?] /=; apply: val_inj; rewrite /= sorted_sort//; apply: prec_trans.
-Qed.
-
-Definition of_seqK : forall (s : seq T), enum (of_seq s) =i s.
-Proof. exact: mem_sort. Qed.
-
-Definition mem (x : type) : pred T := [in enum x].
-
-Definition memP : forall {A : type}, mem A =i enum A.
-Proof. by []. Qed.
-
-End FinSet.
-End FinSet.
-
-Notation set_type := FinSet.type.
-Notation set_of := set_type.
-
-Declare Scope set_scope.
-Delimit Scope set_scope with SET.
-Bind Scope set_scope with set_type.
-Bind Scope set_scope with set_of.
-Open Scope set_scope.
-Arguments set_of T%type.
-
-Notation "{ 'set' T }" := (set_of T)
-  (at level 0, format "{ 'set'  T }") : type_scope.
-
-Definition set_predType (T : choiceType) := @PredType T {set T} FinSet.mem.
-Coercion mem_set T : {set T} -> {pred T} := FinSet.mem.
-
-Structure finsetPred (T : choiceType) : Type := FinsetPred {
-  #[canonical=no] pred_of_finsetPred :> {pred T};
-  set_of_finsetPred :> {set T};
-  #[canonical=no] mem_finsetPred : set_of_finsetPred =i pred_of_finsetPred
-}.
-
-Record finsetPredOf {T : choiceType} (P : {pred T}) : Type := FinsetPredOf {
-  set_of_finsetPredOf :> {set T};
-  mem_finsetPredOf : set_of_finsetPredOf =i P
-}.
-
-Definition finsetPredClass {T : choiceType} (P : finsetPred T) :=
-  FinsetPredOf (mem_finsetPred P).
-
-Structure finPredType (T : choiceType) : Type := FinPredType {
-  finPred_sort :> Type;
-  #[canonical=no] pred_finPredType : finPred_sort -> {pred T};
-  #[canonical=no] set_finPredType : finPred_sort -> {set T};
-  #[canonical=no] mem_finPredType P : set_finPredType P =i pred_finPredType P
-}.
-
-Canonical finset_finpredType (T : choiceType) :=
-  @FinPredType T {set T} (@mem_set T) id (fun=> frefl _).
-
-Structure wrapped_prop : Type :=
-  WrapProp {unwrap_prop :> bool}.
-
-Structure wrapped_pred (T : choiceType) : Type :=
-  WrapPred {unnwrap_pred :> {pred T}}.
-
-Structure wrapped_set (T : choiceType) : Type :=
-  WrapSet {unwwrap_set :> {set T}}.
-
-Structure finpred (T : choiceType) : Type := Finpred {
-  #[canonical=no] finpred_pred :> wrapped_pred T;
-  finpred_set :> wrapped_set T;
-  #[canonical=no] mem_finpred : finpred_set =i finpred_pred
-}.
-
-Structure finprop {T : choiceType} (P : {pred T}) (A : finsetPred T) (x : T) :=
-  Finprop {finprop_prop :> wrapped_prop}.
-
-Definition FinTypeProp a : bool := a.
-Definition IfProp := FinTypeProp.
-Definition OpProp := IfProp.
-Definition FalseProp := OpProp.
-
-Definition AbstractPred {T : choiceType} (P0 P P1 : {pred T}) & finsetPredOf P1 :=
-  WrapPred P0.
-
-Canonical FinPredTypePred {T P A} (F : forall x, @finprop T P A x) :=
-  AbstractPred P (fun x => F x : bool) (finsetPredClass A).
-
-Canonical CoercedFinpred {T P} A :=
-  @Finpred T (@AbstractPred T P (fun x => FalseProp (P x)) P A)
-             (unkeyed (WrapSet (reverse_coercion (A : {set T}) P)))
-             (mem_finsetPredOf A).
-Notation "P" := (@CoercedFinpred _ P _) (at level 0, only printing).
-
-Canonical FinPredTypeFinpred {T} {pT : finPredType T} (A : pT) :=
-  let P := pred_finPredType A in
-  @Finpred T (@FinPredTypePred T P (FinsetPred (mem_finPredType A))
-                (fun x => Finprop _ _ x (WrapProp true)))
-             (unkeyed (WrapSet (set_finPredType A)))
-             (mem_finPredType A).
-Coercion FinPredTypeFinpred : finPred_sort >-> finpred.
-
-Structure coercionPredType (T : Type) := CoercionPredType {
-  coercionPredType_sort :> Type;
-  #[canonical=no] coercionPredType_coerce : coercionPredType_sort -> {pred T}
-}.
-
-Definition TryPredType (T : Type) := T.
-Canonical PredTypeCoercion T (pT : predType T) :=
-  @CoercionPredType T (TryPredType pT) (@topred T pT).
-
-Structure coercedFinset (T : choiceType) :=
-  CoercedFinset { coercedFinset_set :> {set T} }.
-
-Definition ReverseFinsetCoercion {T pT} P0 P1 (A : @finsetPredOf T P1) :=
-  CoercedFinset (@reverse_coercion {set T} pT A P0).
-
-Canonical MatchReverseFinsetCoercion {T pT} P0 (A : finsetPred T) :=
-  @ReverseFinsetCoercion T (TryPredType pT) P0 A (finsetPredClass A).
-
-Structure manifestCoercedFinset (T : choiceType) := ManifestCoercedFinset {
-  #[canonical=no] manifestCoercedFinset_pred :> {pred T};
-  manifestCoercedFinset_set :> coercedFinset T;
-  #[canonical=no] manifestCoercedFinset_mem :
-    manifestCoercedFinset_set =i manifestCoercedFinset_pred
-}.
-
-Canonical PackManifestCoercedFinset T pT P0
-  (P := @coercionPredType_coerce _ pT P0) (A : @finsetPredOf T P) :=
-  @ManifestCoercedFinset T P (ReverseFinsetCoercion P0 A) (mem_finsetPredOf A).
-
-Definition NaturalSet T & manifestCoercedFinset T & finsetPred T := @WrapSet T.
-Definition FinpredSet := NaturalSet.
-Canonical CoercedSet T F A A0 := @FinpredSet T F A A0.
-
-Definition set0 T := @FinSet.of_seq T nil.
-Fact mem_set0 T x : x \in set0 T = false. Admitted.
-Canonical finset0 T := FinsetPred (@mem_set0 T).
-Canonical CoercedSetFinpred {T} (F : manifestCoercedFinset T) :=
-  @Finpred T (unkeyed (WrapPred F))
-          (@CoercedSet T F (finset0 T) F)
-          (manifestCoercedFinset_mem F).
-
-Definition ManifestCoercedFinpred0 T :=
-  @ManifestCoercedFinset T _ (CoercedFinset (set0 T)) (@mem_set0 T).
-
-Canonical FinsetPredFinpred T (A : finsetPred T) :=
-  @Finpred T (unkeyed (WrapPred A))
-          (@FinpredSet T (ManifestCoercedFinpred0 T) A A)
-          (mem_finsetPred A).
-
-Canonical NaturalFinsetFinpred (T : choiceType) (A : {set T}) :=
-  @Finpred T (unkeyed (WrapPred A))
-          (@NaturalSet T (ManifestCoercedFinpred0 T) (finset0 T) A)
-          (frefl _).
-
-ManifestCoercedFinpred0 
-cA == (A : {pred T}) : {set T} ~> cA == reverse_coercion sA A
-?F : finpred T :: ?F : {pred T} ~=~ A or ?F : {set T} ~=~ cA
-                     --> ?F == fA == {fpred = A; fset = cA; _ : A =i cA}
-ideally ffA == (A : finpred T) ~> ffA == reverse_coercion fA A
-for A : {set T}, cA == A,
-                 fA == {fpred = Finset.mem A; fset = A; frefl _ : A =i A}
-for A : seq T, cA == sA == set_of_seq A,
-   fA == {fpred = mem_seq A; fset = sA; _ : A =i cA}
-ideally the expression for sA has 1 copy of A, that of fA has only 2,
-and only 1 if A : {set T} or A : seq T
- - 1 wrap layers on finpred, 1 wrap layer on finset.
- - for finpred, layer 1 provides the (fun x => apply ?F x ?appF) pattern,
-   copies A for later use
-   as well as shortcuts for A : {set T} and A : {pred T}
-   layer 2 repackages the F inferred from layer 1 in various ways, hiding the appA
-   parameter,
-   the final inferred finpred checks that A and finpred F are convertible.
- - for finset, the wrapper recognises set_of_seq and reverse_coercion, and flags a
-   default value (for A : {set T}). It swaps the reverse_coercion arguments, so that
-   the final finpred instance unifies with A first and sA last.
-  + an additional wrapper layer is needed if we want to recognize sets defined 
-    casually using finpred, i.e., Let A : {set T} := [pred ...].
- *** it should be possible to infer F from fset F.
-ideally, sA == fset F where F is inferred from the apply structure
-  even better F construction may be interlocked and sA extracted by matching.
- *** the {set T} reverse coercion does not need to prove any properties of
-   the constructed set. The apply structure could just construct a set,
-   from which the finpred stucture could be inferred later.
-the apply structure needs 1 wrap layer as well 
-  - to check for predX expressions apply ?F1 x.1 && apply ?F2 x.2,
-    and more generally for sigma types
-  - to check for ?F1 (size x) && all (fun y => ?F2 y) x (and more generally
-    for x in a container type).
-  - to check for if-then-else expressions
-  - to provide finType default if the manifest inference fails
-*** the wrap layer for expr could avoid default projections by pre-wrapping
-    at the calling instance.
-*** && and if expressions use a nonfin structure to determine if the LHS/test is
-  not expected to be a finpred - so the RHS/then branch should be.
-     - ~~ b, nonfin b (where nonfin is an id clone),
-       constant b (except b == false) and m <= n where n is
-       a constant, are the standard nonfin instances.
-  - they also use an auxiliary wrapped structure to implement that selection.
-main database of finpred expression given by an applyop structure,
-   with instances:
-  - false, _ || _, _ && _ (with lhs aux structure to determine orientation,
-    as above),
-    m <= N (with N constant, aux structure to check n is an increasing
-    function of x), m %| N
-+++ To cater for finite sets of prod, sig, sig2 and seq values, apply has a pred
-    parameter that duplicates its projected expression.
-  - we want to recognize, e.g., fun z : A * B => p z.1 && q z where
-    p is a finpred of A and fun y => q (x, y) is a finpred of B for all x : A.
-  - as part of this we recognize preimages of N-to-one functions,
-    i.e., f : A -> B such that there is a g : B -> seq A such that
-    g y =i [pred x | y == f x]. This includes (pair x) (inverse seq1 \o snd),
-    (Tag x) (inverse seq1 \o tagged), val (inverse oapp seq1 nil \o insub).
-  - we should recognize fun t => all p (tval t) as a finpred when p is a finpred
-  - this combines with recognizing fun s => p (size s) && q s as a finpred
-    when p is a nat finpred and fun t : n.-tuple T => q (tval t) is a finpred
-    for all n : nat. This requires a special structure to infer p from the
-    expression p (size s) as it's (still!) not covered by pattern unification.
-  - this is not needed for prod and co. because we can take the initial
-    predicate pq, unify fun x y => pq (x, y) with fun x y => p0 y x && q x y,
-    then look for a finpred P for p0 y that does NOT depend on y
-    (based on the LHS of the target && expression); this works because
-    unification will reduce (alas, too much) the predicates for
-    any subexpression of p0 (e.g., the RHS of an &&), to verify it does indeed
-    not depend on y (it may be worthwhile to use an auxiliary structure to
-    reduce subexpressions that evaluate to x in order to avoid this when
-    possible).
-    We then look for a finpred Q x for q x that can depend on x. The set for
-    pq is then, e.g., \bigcup_(x in P) pair x @: Q x.
-+++ one drawback of this approach is that the finpred constructor for prod
-    needs to take a copy of the original predicate as an argument, both because
-    (except for primitive records) it's not possible to recover pq from the
-    predicates of P and Q; at best we could get fun z => pq (z.1, z.2).
-    (We would get the exact LHS, however, though maybe with undesirable
-    expansion to normal form).
-
-s
-tagged_expr (T : choiceTpe) := {untag_expr : bool}.
-  OpTag
-  IfTag
-  FinTypeTag
-
-expr T (p : pred T) (A : pred_finset T) := {tagged_of_expr : tagged_expr T}
-
-op_expr T (p : pred T) (A : pred_finset T) := {expr_of_op : bool}
-  - T (fun x => p x || q x) (merge A B) / apply T p A || apply T q B
-  - T (fun=> false) emptyset / false
-  - T (fun x => p x && q x) A / a && expr_of_rhs (rhs_tagged T p p q a A)
-
-   
-Module Type FinSet_SIG.
-Parameter type : choiceType -> predArgType.
-Parameter enum : forall {T}, type T -> seq T.
-Axiom enum_sorted : forall {T} (A : type T), sorted (@prec T) (enum A).
-Parameter of_seq : forall {T : choiceType}, seq T -> type T.
-Axiom enumK : forall {T}, cancel (@enum T) (@of_seq T).
-Axiom of_seqK: forall {T : choiceType} (s : seq T), enum (of_seq s) =i s.
-Axiom mem : forall {T : choiceType}, type T -> pred T.
-Axiom memP :  forall {T : choiceType} {A : type T}, mem A =i enum A.
-End FinSet_SIG.
-
-Module FinSet : FinSet_SIG.
-Section FinSet.
-Variable (T : choiceType).
-
-Record internal := Build { enum : seq T; enum_sorted : sorted (@prec T) enum }.
-Definition type := internal.
-
-HB.instance Definition _ := [isSub for enum].
-HB.instance Definition _ := [Choice of type by <:].
-
-Lemma of_seq_subproof (s : seq T) : sorted prec (sort prec s).
-Proof.
-Admitted.
-
-Definition of_seq (s : seq T) : type := Build (of_seq_subproof s).
-
-Definition enumK : cancel enum of_seq.
-Proof.
-by move=> [s ?] /=; apply: val_inj; rewrite /= sorted_sort//; apply: prec_trans.
-Qed.
-
-Definition of_seqK : forall (s : seq T), enum (of_seq s) =i s.
-Proof. exact: mem_sort. Qed.
-
-Definition mem (x : type) : pred T := [in enum x].
-
-Definition memP : forall {A : type}, mem A =i enum A.
-Proof. by []. Qed.
-
-End FinSet.
-End FinSet.
-
-Notation set_type := FinSet.type.
-Notation set_of := set_type.
-
-Declare Scope set_scope.
-Delimit Scope set_scope with SET.
-Bind Scope set_scope with set_type.
-Bind Scope set_scope with set_of.
-Open Scope set_scope.
-Arguments set_of T%type.
-
-Notation "{ 'set' T }" := (set_of T)
-  (at level 0, format "{ 'set'  T }") : type_scope.
-
-Definition set_predType (T : choiceType) := @PredType T {set T} FinSet.mem.
-Coercion mem_set T : {set T} -> {pred T} := FinSet.mem.
-
-Section ChoiceType.
-
-Variable (T : choiceType).
-
-(* We should take out the proof relevant part *)
-(* We should probably use a partial iso to seq T *)
-Lemma set_type_choice : Choice (set_type T).
-Admitted.
-HB.instance Definition _ := set_type_choice.
-
-End ChoiceType.
-
-Section CountType.
-
-Variable (T : countType).
-
-(* We should take out the proof relevant part *)
-(* We should probably use a partial iso to seq T *)
-Lemma set_type_countable : isCountable (set_type T).
-Admitted.
-HB.instance Definition _ := set_type_countable.
-
-End CountType.
-
-Section FinType.
-
-Variable (T : finType).
-
-(* We should take out the proof relevant part *)
-(* We should probably use a partial iso to seq T *)
-Lemma set_type_finite : isFinite (set_type T).
-Admitted.
-HB.instance Definition _ := set_type_finite.
-
-End FinType.
-
-(* We later define several subtypes that coerce to set; for these it is       *)
-(* preferable to state equalities at the {set _} level, even when comparing   *)
-(* subtype values, because the primitive "injection" tactic tends to diverge  *)
-(* on complex types (e.g., quotient groups). We provide some parse-only       *)
-(* notation to make this technicality less obstructive.                       *)
-Notation "A :=: B" := (A = B :> {set _})
-  (at level 70, no associativity, only parsing) : set_scope.
-Notation "A :<>: B" := (A <> B :> {set _})
-  (at level 70, no associativity, only parsing) : set_scope.
-Notation "A :==: B" := (A == B :> {set _})
-  (at level 70, no associativity, only parsing) : set_scope.
-Notation "A :!=: B" := (A != B :> {set _})
-  (at level 70, no associativity, only parsing) : set_scope.
-Notation "A :=P: B" := (A =P B :> {set _})
-  (at level 70, no associativity, only parsing) : set_scope.
-
-(* :TODO: IMPLEMENT the `fun` subject case in HB *)
-(* HB.mixin Record isFinPred (T : choiceType) (P : pred T) := { *)
-(*     pred_set : {set T}; *)
-(*     pred_enumP : pred_set =i P *)
-(* }. *)
-(* #[short(type="finPred")] *)
-(* HB.structure Definition FinPred T := {P of @isFinPred T P}. *)
-
-
-Definition setU T (A B : {set T}) :=
-   FinSet.of_seq (FinSet.enum A ++ FinSet.enum B).
-
-Lemma in_setU T (A B : {set T}) :
-  setU A B =i [pred x | (x \in A) || (x \in B)].
-Proof.
-Admitted.
-
-Definition set_comprehension {T : choiceType} (A : {set T}) (P : {pred T}) :=
-   FinSet.of_seq (filter P (FinSet.enum A)).
-
-Lemma set_comprehensionE {T : choiceType} (A : {set T}) (P : {pred T}) :
-  set_comprehension A P =i [pred x | (x \in A) & P x].
-Proof. Admitted.
-
-Definition setI T (A B : {set T}) := set_comprehension A B.
-
-Lemma in_setI T (A B : {set T}) : setI A B =i [pred x in A | (x \in B)].
-Proof.
-Admitted.
-
-Definition setT (T : finType) := FinSet.of_seq (Finite.enum T).
-
-Lemma setT_comprehension_subproof (T : finType) P :
-  set_comprehension (setT T) P =i P.
-Proof. Admitted.
-
-(*
-
-Module TCFinPred.
-
-Structure finPred (T : choiceType) := FinPred {
-   finpred : {pred T};
-   pred_set : {set T};
-   pred_enumP : pred_set =i finpred
-}.
-(* Structure finPred (T : choiceType) := PackFinPred { *)
-(*    finpred : {pred T}; *)
-(*    pred_eqset :> {A : {set T} | A =i finpred} *)
-(* }. *)
-Coercion finpred_coe := finpred.
-Coercion pred_set : finPred >-> set_type.
-(* Coercion pred_set T (F : finPred T) := sval F. *)
-(* Definition FinPred T P A A_P := @PackFinPred T P (exist _ A A_P). *)
-
-
-(* Definition finTypePred {T : finType} (P : pred T) : finPred T :=
-  PackFinPred (exist _ (set_comprehension (setT T) P)
-  (setT_comprehension_subproof P)). *)
-
-Definition finTypeSet {T : finType} (P : pred T) : {A : {set T} | A =i P} :=
-  (exist _ (set_comprehension (setT T) P) (setT_comprehension_subproof P)).
-(*
-Lemma applicationI_subproof2 (T : choiceType) (A: {set T}) (P Q : {pred T}) :
-  (forall x, x \in A = Q x) ->
-  forall x, (x \in set_comprehension A P) = (Q x) && (P x).
-Proof. Admitted.
-
-Lemma applicationU_subproof2 (T : choiceType) (A B : {set T}) (P Q : {pred T}) :
-  (forall x, x \in A = P x) ->
-  (forall x, x \in B = Q x) ->
-  (forall x, (x \in setU A B) = (P x) || (Q x)).
-Proof. Admitted.
-*)
-
-Class finPred_aux (T : choiceType) (P : {pred T}) :=
-  OK { proof : {A : {set T} | A =i P} }.
-
-(* Canonical isFinPred T P {h : @finPred_aux T P} := *)
-(*    @PackFinPred T P (@proof _ _ h). *)
-
-Canonical isFinPred T P {h : @finPred_aux T P} :=
-   @FinPred T P (sval (@proof _ _ h)) (svalP (@proof _ _ h)).
-
-Structure apply T (F : finPred T) (x : T) := Apply {apply_val :> bool}.
-
-Canonical applyF T F x := @Apply T F x (finpred_coe F x).
-
-Definition set0 {T} := @FinSet.of_seq T [::].
-Lemma in_set0 T x : x \in @set0 T = false. Admitted.
-Definition FinPred0 T := FinPred (@in_set0 T).
-Canonical apply0 T x := Apply (FinPred0 T) x false.
-
-
-Definition FinPredU_subproof T (F : finPred T) (G : finPred T) :
-  (fun A : {set T} => A =i [pred x | (x \in F) || (x \in G)]) (setU F G).
-Proof. Admitted.
-Definition FinPredU T (F : finPred T) (G : finPred T) :=
-  @FinPred _[pred x | (x \in F) || (x \in G)] (setU F G)
-           (FinPredU_subproof F G).
-Canonical applyU T F G x (aF : apply F x) (aG : apply G x):=
-    Apply (@FinPredU T F G) x (aF || aG).
-
-Definition FinPredI_subproof T (F : finPred T) (G : pred T) :
-  (fun A : {set T} => A =i [pred x in F | G x]) (set_comprehension F G).
-Proof. Admitted.
-Definition FinPredI T (F : finPred T) (G : pred T) :=
-  @FinPred _ [pred x in F | G x] (set_comprehension F G)
-           (FinPredI_subproof F G).
-Canonical applyI T F G x (aF : apply F x) :=
-    Apply (@FinPredI T F G) x (aF && (G x)).
-
-
-Definition finpred_target := finPred.
-Canonical FinPredOfSet T (A : {set T}) : finpred_target T := @FinPred _ A A (frefl _).
-Coercion FinPredOfSet : set_type >-> finpred_target.
-(* Notation "A" := (FinPredOfSet A) (at level 9, only printing). *)
-Canonical applyOfSet T A x := Apply (@FinPredOfSet T A) x (FinSet.mem A x).
-
-Definition set1 {T} x := @FinSet.of_seq T [:: x].
-Lemma in_set1 T x y : y \in @set1 T x = (y == x). Admitted.
-Definition FinPred1 T x := FinPred (@in_set1 T x).
-Canonical apply1 T y x := Apply (@FinPred1 T y) x (x == y).
-
-Set Printing Coercions.
-Definition pred_eqset (T : choiceType) (P : finPred T) :
-   {A : {set T} | A =i P} := exist _ (pred_set P) (pred_enumP P).
-
-From mathcomp.ssreflect Extra Dependency "fintype.elpi" as fintype.
-Import elpi.
-Elpi Tactic infer.
-Elpi Accumulate File fintype.
-Elpi Typecheck.
-
-Hint Extern 0 (finPred_aux _ ) => elpi infer : typeclass_instances.
-(********)
-
-About finPred_aux.
-
-Elpi Trace Browser.
-Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
-  [pred x in A].
-
-Print Canonical Projections finpred.
-Print applyF.
-(* Set Debug "unification". *)
-(*
-Canonical foo (T : choiceType) F
-    (a : forall x, apply F x) e : finPred T :=
-  @FinPred _ (fun x => @apply_val T _ x (a x)) (pred_set F) e. *)
-
-
-Print Canonical Projections finpred.
-Check fun (T : choiceType) (P : finPred T) x =>
-  finpred_coe P x : apply P x.
-
-Set Printing Existential Instances.
-Definition t1' (T : choiceType) (P : finPred T) : finPred T :=
-  [pred x in P] : {pred T}.
-
-Definition t2 (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
-  [pred x | [in P] x && (Q x)].
-Definition t2' (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
-  [pred x | (x \in P) && (Q x)].
-Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
-   [pred x | (x \in A) && (Q x)].
-Definition t4 (T : choiceType) (P : finPred T) (Q : finPred T) : finPred T :=
-   [pred x | (x \in P) || (x \in Q)].
-Definition t5 (T : finType) (P : pred T) : finPred T :=
-   [pred x | P x].
-Definition def (T : choiceType) (P Q : {pred T}) : pred T :=
-   [pred x : T | P x && Q x].
-Definition t6 (T : choiceType) (P : finPred T) Q : finPred T :=
-   [pred x : T | def P Q x ].
-
-End TCFinPred.
-*)
-Module CSFinPred.
-
-Structure tagged_pred T := TagPred {#[reversible=no] untag_pred :> {pred T}}.
-Definition xuntag := Eval lazy in untag_pred.
-Definition DisplayTag T (P Q : {pred T}) & unit := TagPred P.
-Arguments DisplayTag /.
-Definition mytt : unit. split. Qed.
-Definition FinTypeTag T P := @DisplayTag T P P mytt.
-Canonical SetTag T P := @FinTypeTag T P.
-
-Structure finPred (T : choiceType) := PackFinPred {
-   finpred :> tagged_pred T;
-   pred_eqset :> {A : {set T} | A =i finpred}
-}.
-Coercion pred_set T (F : finPred T) := sval F.
-Definition FinPred T P A A_P := @PackFinPred T (TagPred P) (exist _ A A_P).
-
-Definition finPred_target := finPred.
-Canonical finpred_of_set T (A : {set T}) : finPred_target T :=
-  @PackFinPred T (SetTag A) (exist _ A (frefl _)).
-Coercion finpred_of_set : set_type >-> finPred_target.
-
-Structure apply T (F : finPred T) (x : T) := Apply {apply_val :> bool}.
-Structure display (T : choiceType) (P : {pred T}) (F_P : {A : {set T} | A =i P})
-                  (F : finPred T)  :=
-   Display {display_trigger :> unit}.
-Canonical display_finpred (T : choiceType) (P : {pred T}) (F : finPred T)
-                        (appF : forall x, apply F x)
-                        F_P
-                        (dF : @display T P F_P (PackFinPred (pred_eqset F))) :=
-   @PackFinPred T (@DisplayTag T P (fun x => appF x) dF) F_P.
-Canonical trivial_display T P F_P uu :=
-  @Display T P F_P (@PackFinPred T (TagPred P) F_P) uu.
-Arguments display_finpred /.
-
-Canonical applyF T F x := @Apply T F x (x \in F).
-
-Definition set0 {T} := @FinSet.of_seq T [::].
-Lemma in_set0 T x : x \in @set0 T = false. Admitted.
-Definition FinPred0 T := FinPred (@in_set0 T).
-Canonical apply0 T x := Apply (FinPred0 T) x false.
-
-Lemma finPredUP T (F G  : finPred T) x :
-  x \in setU F G = (x \in F) || (x \in G). Admitted.
-Definition FinPredU T (F G : finPred T) := FinPred (@finPredUP T F G).
-Canonical applyU T F G x (aF : apply F x) (aG : apply G x) :=
-  Apply (@FinPredU T F G) x (aF || aG).
-
-Definition set1 {T} x := @FinSet.of_seq T [:: x].
-Lemma in_set1 T x y : y \in @set1 T x = (y == x). Admitted.
-Definition FinPred1 T x := FinPred (@in_set1 T x).
-Canonical apply1 T y x := Apply (@FinPred1 T y) x (x == y).
-Print Graph.
-Check fun T (A B : {set T}) (F G : finPred T) (y z : T) =>
-  (A : {pred T}) : finPred T.
-
-Fail Check fun T (A B : {set T}) (F G : finPred T) (y z : T) =>
-  A : finPred T.
-
-Check fun T (A B : {set T}) (F G : finPred T) (y z : T) =>
-  ((fun=> false) : {pred T}) : finPred T.
-
-Check fun T (A B : {set T}) (F G : finPred T) (y z : T) =>
-  ((fun x => x \in A) : {pred T}) : finPred T.
-
-Lemma in_setId T A P x :
-  (x \in @set_comprehension T A P) = (x \in A) && P x. Admitted.
-Lemma FinPredIP T (F : finPred T) (P : pred T) x :
-  (x \in @set_comprehension T F P) = (x \in F) && P x.
-Admitted.
-Definition FinPredI T (F : finPred T) P := FinPred (@FinPredIP T F P).
-Canonical applyI T F P x (aF : apply F x) :=
-  Apply (@FinPredI T F P) x (aF && P x).
-
-Check fun (T : choiceType) (A : {set T}) a =>
-  ((fun x => (x \in A) && false && (x == a) ) : {pred T}) : finPred T.
-
-Arguments pred_eqset : simpl never.
-
-Check fun T (A B : {set T}) (F G : finPred T) (y z : T) =>
-  ((fun x => x == y) : {pred T}) : finPred T.
-
-Check fun (T : choiceType) (a : T) =>
-  ((fun x => (x == a) || false) : {pred T}) : finPred T.
-
-Check fun T (A B : {set T}) (F G : finPred T) (y z : T) =>
-  ([predU A & [pred x in G | (x == y) || (x \in B) || false]] : {pred T})
-    : finPred T.
-
-(** TODO: check if non necessary *)
-(* Canonical isFinPred_predType T (P : finPred T) := *)
-(*    @PredType T (finPred T) (@unwrap_pred T). *)
-
-(** The (application A x) structure recognize a boolean expression
-    `apply` depending on `x` that represents a finite set `A` *)
-(*
-Structure application T (A : {set T}) x :=
-  Apply {apply; applyP : (x \in A) = apply}.
-
-Canonical finPred_application (T : choiceType) (A : {set T})
-    (P : forall x, application A x) :=
-  @FinPredPack T (WrapPred (fun x => apply (P x))) A (fun x => applyP (P x)).
-
-Canonical finPred_finpred (T : choiceType) (P : finPred T) :=
-  @FinPredPack T (WrapPred4 [in P]) (pred_set P) (pred_enumP _).
-
-Canonical finPred_fintype (T : finType) (P : {pred T}) :=
-  @FinPredPack T (WrapPred3 [in P]) (set_comprehension (setT T) P)
-               (@setT_comprehension_subproof T P).
-
-(* we could fill in with expression of type predI  *)
-(* Canonical finPred_ (T : Type) (P : _) := *)
-(*   @FinPredPack T (WrapPred2 ()) _ _. *)
-
-(* This is subsumed by the next rule, and convertible to it *)
-(* Canonical application_finset (T : choiceType) (A : {set T}) x := *)
-(*   @Apply T A x (x \in A) erefl. *)
-
-Canonical application_finpred (T : choiceType) (P : finPred T) x :=
-  @Apply T (pred_set P) x (x \in P) (pred_enumP P x).
-
-Lemma applicationU_subproof (T : choiceType) A B (x : T)
-    (a1 : application A x) (a2 : application B x) :
-  (x \in setU A B) = apply a1 || apply a2.
-Proof. Admitted.
-
-Canonical applicationU (T : choiceType) A B (x : T)
-    (a1 : application A x) (a2 : application B x) :=
-  @Apply T (setU A B) x (apply a1 || apply a2) (applicationU_subproof a1 a2).
-
-Lemma applicationI_subproof (T : choiceType) A (x : T)
-    (a : application A x) (P : {pred T}) :
-  (x \in set_comprehension A P) = apply a && (P x).
-Proof. Admitted.
-
-Canonical applicationI (T : choiceType) A (x : T)
-    (a : application A x) (P : {pred T}) :=
-  @Apply T (set_comprehension A P) x
-         (apply a && P x) (applicationI_subproof a P).
-
-Fail Check fun (T : choiceType) (P : finPred T) => [in P] : finPred T.
-Fail Check fun (T : choiceType) (A : {set T}) => [in A] : finPred T.
-Fail Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
-   (fun x => (P x) && (Q x)) : finPred T.
-Fail Check fun (T : choiceType) (A : {set T}) (Q : pred T) =>
-   (fun x => (x \in A) && (Q x)) : finPred T.
-Fail Check fun (T : choiceType) (P : finPred T) (Q : finPred T) =>
-   (fun x => (P x) || (Q x)) : finPred T.
-
-Print Canonical Projections finpred.
-Print Canonical Projections unwrap_pred.
-*)
-(**
- The class of formulae that we wish to recognize as canonically
- a finPred is the following:
- P x :=
-      | x \in A,      where A is a finPred (* WrapPred4 *)
-      | P x,          where T is a finType (* WrapPred3 *)
-     (* all the remaining rules are dealt with by WrapPred *)
-      | x \in A,      where A is a finPred
-      | x == y
-      | Qx && (R x),  where Qx is an (application A x)
-      | Qx || Rx,     where Qx and Rx are (application _ x)
-      | Qx (+) Rx,    where Qx and Rx are (application _ x)
-     (* left out *)
-      | if Qx then R x else Tx, where Qx and Tx are (application _ x)
-
-Note: we need to make sure the A inferred by application A x is
-      syntactically equal to A and not "just" convertible to A.
-*)
-
-(* Canonical finpred_default (T : choiceType) (A : {set T}) (P : wrapped_pred T) := *)
-(*   @FinPredPack T P  *)
-
-(*   unwrap_pred (finpred P) *)
-
-End CSFinPred.
-
-Export TCFinPred.
-
-(* Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
-  [pred x in A]. *)
-Definition t1' (T : choiceType) (P : finPred T) : finPred T :=
-  [pred x in P] : {pred T}.
-Definition t2 (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
-  [pred x | ([in P] x) && (Q x)].
-Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
-   [pred x | (x \in A) && (Q x)].
-Definition t4 (T : choiceType) (P : finPred T) (Q : finPred T) : finPred T :=
-   [pred x | (x \in P) || (x \in Q)].
-Definition t5 (T : finType) (P : pred T) : finPred T :=
-   [pred x | P x].
-Definition def (T : choiceType) (P Q : {pred T}) : pred T := [pred x : T | P x && Q x].
-Definition t6 (T : choiceType) (P : finPred T) Q : finPred T :=
-   [pred x : T | def P Q x ].
-Print SimplFun.
-About cardU1.
-Print Canonical Projections finpred.
-
-Fail Check fun (T : choiceType) (P : finPred T) => [eta P] : finPred T.
-Fail Check fun (T : choiceType) (P : finPred T) => [in P] : finPred T.
-Fail Check fun (T : choiceType) (A : {set T}) => [in A] : finPred T.
-Fail Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
-   (fun x => (P x) && (Q x)) : finPred T.
-Fail Check fun (T : choiceType) (A : {set T}) (Q : pred T) =>
-   (fun x => (x \in A) && (Q x)) : finPred T.
-Fail Check fun (T : choiceType) (P : finPred T) (Q : finPred T) =>
-   (fun x => (P x) || (Q x)) : finPred T.
-
-Notation enum A := (FinSet.enum (pred_set A)) (only parsing).
-Notation "'enum' A" := (FinSet.enum A) (at level 10, only printing).
-
-(* Notation pred_id := (@id {pred _}) (only parsing). *)
-(* Notation "A" := (pred_id A) (at level 9, only printing). *)
-(* Notation enum A := (FinSet.enum (pred_set (pred_id A))) (only parsing). *)
-(* Notation "'enum' A" := (FinSet.enum A) (at level 10, only printing). *)
-
-Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
-  enum [pred x in P | Q x].
-
-
-Check fun (T : choiceType) (A : {set T}) => enum A.
 
 Definition set_pick (T : choiceType) (A : {set T}) := ohead (enum A).
 Notation pick A := (set_pick (pred_set A)) (only parsing).
