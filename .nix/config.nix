@@ -79,6 +79,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq-elpi.override.version = "Tragicus:cswb";
       hierarchy-builder.override.version = "master";
       vscoq-language-server.override.version = "v2.1.1+coq8.19";
+      coq-lsp.override.version = "0.1.8+8.19";
       interval.job = false;
     };
     "coq-8.19".push-branches = [ "master" "mathcomp-1" ];
