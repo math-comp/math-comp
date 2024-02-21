@@ -76,6 +76,7 @@ ssreflect/choice.v
 ssreflect/div.v
 ssreflect/eqtype.v
 ssreflect/finfun.v
+ssreflect/finpred.v
 ssreflect/fingraph.v
 ssreflect/finset.v
 ssreflect/fintype.v
@@ -107,5 +108,3 @@ ssreflect/tuple.v
 -arg -w -arg +deprecated-hint-rewrite-without-locality
 -arg -w -arg -elpi.add-const-for-axiom-or-sectionvar
 -arg -w -arg -opaque-let
--arg -w -arg -argument-scope-delimiter
--arg -w -arg -overwriting-delimiting-key
