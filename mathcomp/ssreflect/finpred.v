@@ -96,7 +96,7 @@ Definition cast_to {T x y} (Exy : @cast T x y) B :=
   let: Cast in cast _ y := Exy return B x -> B y in id.
 Arguments cast_to {T x y} Exy B.
 Definition cast_from {T x y} (Exy : @cast T x y) B :=
-  let: Cast in cast _ y := Exy return B y -> B x in id.  
+  let: Cast in cast _ y := Exy return B y -> B x in id.
 Arguments cast_from {T x y} Exy B.
 
 Structure pattern@{i m n} sA (S : sort@{i m n}) A B := Pattern {
@@ -259,22 +259,23 @@ Proof. by case. Qed.
 (* Shape of predicates that can be inferred as finpred's                      *)
 (* (T : choiceType unless stated otherwise):                                  *)
 (* - [pred x in P]                       with P : finpred T                   *)
-(* - [pred x | P x && Q x]               with P : finpred T or Q : finpred T  *)
+(* - [pred x | x \in P && Q x]           with P : finpred T and Q : {pred T}  *)
 (*   e.g., [pred x | ([in P] x) && Q x]  with P : finpred T                   *)
 (* - [pred x | (x \in P) || (x \in Q)]   with P, Q : finpred T                *)
 (* - [pred x | P x]                      with P : pred T and T : finType      *)
 (* - [pred x : T | def x ]               where def's arity can be inferred to *)
-(*                                       be of type finPred T                 *)
+(*                                       be of type finpred T                 *)
 (*                                                                            *)
 
-Definition finpred_pred_target (T : eqType) := pred T.
+(* Definition finpred_pred_target (T : eqType) := pred T. *)
 
-Definition finpredEnvelope (T : eqType) (P : finpred_pred_target T) :=
+Definition finpredEnvelope (T : eqType) (P : {pred T}) :=
   {envelope : seq T | {subset P <= envelope}}.
-#[projections(primitive)]
-Record finpred T :=
+(* #[projections(primitive)] *)
+Structure finpred T :=
   Finpred { mem_finpred; finpred_envelope : @finpredEnvelope T mem_finpred}.
-Coercion mem_finpred : finpred >-> finpred_pred_target.
+#[reversible=yes]
+Coercion mem_finpred : finpred >-> pred_sort.
 
 Definition support {T : eqType} (P : finpred T) :=
   undup (filter (mem_finpred P) (sval (finpred_envelope P))).
@@ -291,14 +292,14 @@ Definition enum {T : choiceType} P := sort prec (@support T P).
 Definition pick {T} P := ohead (@enum T P).
 
 (*Structure labeled_pred (T : eqType) := LabelPred {unlabel_pred :> {pred T}}.*)
-
+(*
 Structure finpred_pattern (T : eqType) := FinpredPattern {
   pattern_pred :> {pred T}; (* the finpred to be displayed *)
   finpred_of_finpred :> finpred T;
   #[canonical=no] finpred_of_eq : mem_finpred finpred_of_finpred = pattern_pred
-}.
+}. *)
 
-Notation "{ 'finpred' T }" := (finpred_pattern T)
+Notation "{ 'finpred' T }" := (finpred T)
    (at level 0, T at level 100, format "{ 'finpred'  T }") : type_scope.
 
    (*
@@ -374,7 +375,7 @@ Variant finpred_target (T : eqType) :=
   FinpredTarget of {pred T} & {pred T} & {pred T} & finpred T & finpred T.
 
 Coercion target_of_finpred T P A (eA : _ -> @infer_finpred T P A) F :=
-  FinpredTarget P [eta eA] (mem_finpred A) A F. 
+  FinpredTarget P [eta eA] (mem_finpred A) A F.
 
 Coercion pred_finpred_target T (A : finpred T) (P : {pred T}) :=
   FinpredTarget P (fun x => TryFalse (P x)) P A A.
@@ -388,7 +389,7 @@ Next Obligation. by exists [:: a] => x; rewrite inE. Qed.
 Program Definition finpred1x T a := @Finpred T [pred x | a == x] _.
 Next Obligation. by exists [:: a] => x; rewrite inE eq_sym. Qed.
 
-Program Definition finpredU T A B := 
+Program Definition finpredU T A B :=
   @Finpred T (predU (mem_finpred A) (mem_finpred B)) _.
 Next Obligation.
 by exists (support A ++ support B) => x; rewrite mem_cat !mem_support.
@@ -435,7 +436,7 @@ Canonical InferOpFinpred T P A (m : matchArg) (eA : @op_finpred T P A) :=
   @InferFinpred T P A (TryOp (m eA)).
 
 Definition LabelBinop {T : eqType}
-  (op : bool -> bool -> bool) (P P1 : pred T) (a b : bool) := 
+  (op : bool -> bool -> bool) (P P1 : pred T) (a b : bool) :=
   fun F : forall A B : finpred T, finpred T => @id labeled_bool.
 Definition LabelOneBinop {T : eqType} (P : pred T) a b op F :=
   @LabelBinop T op P P (TryFalse a) (TryFalse b) F (LabelBool (op a b)).
@@ -644,7 +645,7 @@ apply/allpairsPdep; exists a, b; split; try by rewrite mem_support.
 by apply/(canRL to_sigmaK); case: (to_sigma z) @a @b {Aa Bb}.
 Qed.
 
-Program Definition finpred_idK T f (fK : f =1 id) P 
+Program Definition finpred_idK T f (fK : f =1 id) P
   (A : finpred_of (preim f P)) := @Finpred T P _.
 Next Obligation.
 by exists (support A) => z; rewrite mem_support finpred_of_eq inE fK.
@@ -756,7 +757,7 @@ Canonical Finpred_eq (A T : eqType) a x0 y0 (y : A -> T) :=
 Definition finPreim_succ A := @CanFinPreim A _ _ succn predn (frefl _).
 Canonical FinPreim_succ A x y := OneFinPreimApp x y (finPreim_succ A).
 
-Program Definition FinPreim_nat A T f g 
+Program Definition FinPreim_nat A T f g
   (bf : forall x n, n <= g (f x n)) := @FinPreimFun A nat T f _.
 Next Obligation.
 by exists (fun y => iota 0 (g y).+1) => x n; rewrite mem_iota ltnS bf.
@@ -870,99 +871,102 @@ Definition finPreim_minn A :=
 Canonical FinPreim_minn A x y1 y2 := OneFinPreimOp x y1 y2 (finPreim_minn A).
 *)
 
-From mathcomp.ssreflect Extra Dependency "finset.elpi" as finset.
+(* From mathcomp.ssreflect Extra Dependency "finset.elpi" as finset. *)
 Import elpi.
 From elpi Require Import cs.
 Elpi Accumulate cs.db lp:{{
-  pred find i:term, i:term, o:term.
- /* 
-   find _ ({{fun x => finpred lp:P x}}) P :- !.
+  % find EqT P FinP UsingFinType
+  % asserts that the predicate P on an eqType EqT
+  % is the projection of a finite predicate FinP
+  % and UsingFinType is true if we had to use the fact that EqT was
+  % in fact a finite type.
+  pred find i:term, i:term, o:term, o:prop.
 
-  find _ ({{fun x => in_mem x (mem (mem_finpred lp:P))}}) P :- !.
+  % find T {{finpred _}} {{predPredType lp:T}} :- !.
+  find _ R _ _ :- coq.say "xxxxxxxxxxx" {coq.term->string R}, fail.
 
-  find T {{finpred _}} {{predPredType lp:T}} :- !.
-  */
-  find _ R _ :- coq.say "xxxxxxxxxxx" {coq.term->string R}, fail.
+  find EqT R {{@finpred0 lp:EqT}} false :-
+    coq.unify-eq R {{fun x : lp:_T => false}} ok.
 
+  find _ ({{fun x => finpred lp:P x}}) P false :- !.
 
- /* find CT ({{fun x => in_mem x (mem (mem_set lp:A))}} as P)
-       {{@FinPred lp:CT lp:P lp:A (fun=> erefl)}}:- !.
+  find _ ({{fun x : lp:_T => @mem_finpred _ lp:P x}}) P false :- !.
 
-  find CT {{fun x : lp:_T => false}} {{@finPred0 lp:CT}} :- !.
+  % this is a duplicate of above, and could be eliminated using
+  % the right reduction step
+  % find _ ({{fun x : lp:_T => @in_mem _ x (@mem _ _ (@mem_finpred _ lp:P))}}) P :- !.
 
-  find CT {{fun x : lp:_T => x == lp:Y}} {{@finPred1 lp:CT lp:Y}} :- !.
-*/
-  find CT {{fun x : lp:T => lp:(P x) && lp:(Q_ x)}} _Sol :-
-       % Sol = {{@finPred_comprehensionl lp:CT lp:FP (fun x : lp:T => lp:(Q x))}}
-    find CT {{fun x : lp:T => lp:(P x)}} _FP, !.
-/*
-  find CT {{fun x : lp:T => lp:(P x) && lp:(Q x)}} 
-       {{@finPred_comprehensionr lp:CT (fun x : lp:T => lp:(P x)) lp:FQ}} :-
-    find CT {{fun x : lp:T => lp:(Q x)}} FQ, !.
-  
-  :name "andb-final"
-  find _CT {{fun x : _ => _ && _}} _ :- !,
-    coq.error "conjunction of two predicates that are not finpreds".
+  % find EqT ({{fun x => in_mem x (mem (mem_set lp:A))}} as P)
+  %      {{@FinPred lp:EqT lp:P lp:A (fun=> erefl)}}:- !.
 
-  find CT {{fun x : lp:T => lp:(P x) || lp:(Q x)}} 
-       {{@finPred_setU lp:CT lp:FP lp:FQ}} :- !,
-    find CT {{fun x : lp:T => lp:(P x)}} FP,
-    find CT {{fun x : lp:T => lp:(Q x)}} FQ.
-    */
+  find EqT {{fun x : lp:_T => x == lp:Y}} {{@finpred1 lp:EqT lp:Y}} false :- !.
 
-  find CT {{ fun x : lp:T => lp:(R x) }} S :-
+  find EqT {{fun x : lp:T => lp:(P x) && lp:(Q x)}}
+          {{@finpredIr lp:EqT lp:FP (fun x : lp:T => lp:(Q x))}} false :-
+    find EqT {{fun x : lp:T => lp:(P x)}} FP PUsesFinType, not PUsesFinType, !.
+
+  find EqT {{fun x : lp:T => lp:(P x) && lp:(Q x)}} Sol QUsesFinType :-
+    find EqT {{fun x : lp:T => lp:(P x)}} FP _,
+    find EqT {{fun x : lp:T => lp:(Q x)}} FQ QUsesFinType, !,
+    if QUsesFinType
+       (Sol = {{@finpredIr lp:EqT lp:FP (fun x : lp:T => lp:(Q x))}})
+       (Sol = {{@finpredIl lp:EqT (fun x : lp:T => lp:(P x)) lp:FQ}}).
+
+  % find EqT {{fun x : lp:T => lp:(P x) && lp:(Q x)}}
+  %      {{@finPred_comprehensionr lp:EqT (fun x : lp:T => lp:(P x)) lp:FQ}} :-
+  %   find EqT {{fun x : lp:T => lp:(Q x)}} FQ, !.
+
+  % :name "andb-final"
+  % find _EqT {{fun x : _ => _ && _}} _ :- !,
+  %   coq.error "conjunction of two predicates that are not finpreds".
+
+  find EqT {{fun x : lp:T => lp:(P x) || lp:(Q x)}}
+       {{@finpredU lp:EqT lp:FP lp:FQ}} (PUsesFinType; QUsesFinType) :- !,
+    find EqT {{fun x : lp:T => lp:(P x)}} FP PUsesFinType,
+    find EqT {{fun x : lp:T => lp:(Q x)}} FQ QUsesFinType.
+
+  :name "find-unfold"
+  find EqT {{ fun x : lp:T => lp:(R x) }} S SUsesFinType :-
     (@pi-decl `x` T x\ redex (R x) (R' x)), !,
-    find CT {{ fun x : lp:T => lp:(R' x) }} S.
+    find EqT {{ fun x : lp:T => lp:(R' x) }} S SUsesFinType.
 
   pred redex i:term, o:term.
+  % redex X Y :-
+  %   @redflags! coq.redflags.betaiotazeta => coq.reduction.lazy.whd X Y,
+  %   not (same_term X Y). % avoid loop
   redex X Y :-
-    @redflags! coq.redflags.betaiotazeta => coq.reduction.lazy.whd X Y,
-    not (same_term X Y). % avoid loop
+    coq.reduction.lazy.whd_betaiota_deltazeta_for_iota_state X Y,
+    not (same_term X Y).
   redex X Y :-
     coq.safe-dest-app X Head _Tail,
     coq.env.global (const C) Head, !,
     coq.redflags.add coq.redflags.betaiotazeta
       [coq.redflags.delta, coq.redflags.const C] RedFlags,
-    coq.say "redex 2nd case C =" C "and X =" {coq.term->string X},
     @redflags! RedFlags => coq.reduction.lazy.whd X Y,
-    coq.say "redex 2nd case Y =" {coq.term->string Y},
     not (same_term X Y). % avoid loop
-  redex (match X P C as M) Y :- coq.say "expand match" {coq.term->string M},
-    % TODO FIXME to use simpl instead.
-    coq.reduction.lazy.whd X X',
-    coq.safe-dest-app X' (global (indc _K)) _, !,
-    redex (match X' P C) Y.
-    % whd-indc X XCstr XArgs, !,
-    % redex (match {coq.mk-app (global (indc XCstr)) XArgs} P C) Y.
 
-    % coq.safe-dest-app X (global (const HeadGR)) Tail,
-    % coq.env.const HeadGR (some Body) _,
-    % redex (match {coq.mk-app Body Tail} P C) Y.
-  % redex (match X P C as M) Y :-
-  %   std.spy(coq.whd1 X Xred),
-  %   std.spy(redex (match Xred P C) Y).
 
-/*  cs _Ctx ({{@pred_set lp:CT}}) RHS Sol :- !,
+/*  cs _Ctx ({{@pred_set lp:EqT}}) RHS Sol :- !,
     coq.say "cs: Proj is pred_set",
-    std.spy(Sol = {{@finPred_of_set lp:CT lp:RHS}}).*/
+    std.spy(Sol = {{@finPred_of_set lp:EqT lp:RHS}}).*/
 
-  cs Ctx ({{@pattern_pred lp:T}}) RHS Sol :- !, std.do![
-    coq.say "cs: Proj is pattern_pred",
+  cs Ctx ({{@mem_finpred lp:T}}) RHS Sol :- !, std.do![
+    coq.say "cs: Proj is mem_finpred",
     coq.say "Ctx is" Ctx,
     coq.say "RHS = " RHS,
     coq.say "RHS is" {coq.term->string RHS},
-    (find T RHS FinPred),
+    find T RHS FinPred _,
     coq.say "found" FinPred,
     std.assert-ok! (coq.typecheck FinPred _) "solution is ill typed",
     Sol = FinPred,
     coq.say "Sol is" {coq.term->string Sol}
   ].
   cs _ P V S :- coq.say P V S, fail.
-}}. 
+}}.
 Set Warnings "+elpi".
 Elpi Typecheck canonical_solution.
-(* 
-Goal forall T (P : finPred T) x, finpred P x = mem_set P x.
+(*
+Goal forall T (P : finpred T) x, finpred P x = mem_set P x.
 move=> T x; reflexivity. *)
 
 Elpi Override CS All.
@@ -971,40 +975,46 @@ Elpi Override CS All.
 (*************************** Unit Tests          ******************************)
 (******************************************************************************)
 
-(* Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
+(* Definition t1 (T : choiceType) (A : {set T}) : finpred T :=
   [pred x in A]. *)
 Definition t1' (T : choiceType) (P : {finpred T}) : {finpred T} :=
   [pred x in P].
-Definition t2 (T : choiceType) (P : {finpred T}) (Q : pred T) : {finpred T} :=
+Set Printing All.
+Definition t1 (T : eqType) : finpred T := pred0.
+Definition t2 (T : eqType) (P : finpred T) (Q : pred T) : {finpred T} :=
   [pred x | ([in P] x) && (Q x)].
-Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
-   [pred x | (x \in A) && (Q x)].
-Definition t4 (T : choiceType) (P : finPred T) (Q : finPred T) : finPred T :=
+Definition t1 (T : eqType) (P : pred T) (Q : finpred T) : {finpred T} :=
+    [pred x | (P x) && ([in Q] x)].
+(* Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finpred T := *)
+   (* [pred x | (x \in A) && (Q x)]. *)
+Definition t4 (T : eqType) (P : finpred T) (Q : finpred T) : finpred T :=
    [pred x | (x \in P) || (x \in Q)].
-Definition t5 (T : finType) (P : pred T) : finPred T :=
-   [pred x | P x].
-Definition def (T : choiceType) (P Q : {pred T}) : pred T := [pred x : T | P x && Q x].
-Definition t6 (T : choiceType) (P : finPred T) Q : finPred T :=
-   [pred x : T | def P Q x ].
+(* Definition t5 (T : finType) (P : pred T) : finpred T :=
+   [pred x | P x]. *)
+Definition def (T : eqType) (P Q : {pred T}) : pred T :=
+  [pred x : T | P x && Q x].
+Definition t6 (T : eqType) (P : finpred T) Q : finpred T :=
+  [pred x : T | def P Q x ].
 Print SimplFun.
 About cardU1.
 Print Canonical Projections finpred.
 
-Fail Check fun (T : choiceType) (P : finPred T) => [eta P] : finPred T.
-Fail Check fun (T : choiceType) (P : finPred T) => [in P] : finPred T.
-Fail Check fun (T : choiceType) (A : {set T}) => [in A] : finPred T.
-Fail Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
-   (fun x => (P x) && (Q x)) : finPred T.
+(* expected *)
+Fail Check fun (T : eqType) (P : finpred T) => [eta P] : finpred T.
+Fail Check fun (T : choiceType) (P : finpred T) => [in P] : finpred T.
+Fail Check fun (T : choiceType) (A : {set T}) => [in A] : finpred T.
+Fail Check fun (T : choiceType) (P : finpred T) (Q : pred T) =>
+   (fun x => (P x) && (Q x)) : finpred T.
 Fail Check fun (T : choiceType) (A : {set T}) (Q : pred T) =>
-   (fun x => (x \in A) && (Q x)) : finPred T.
-Fail Check fun (T : choiceType) (P : finPred T) (Q : finPred T) =>
-   (fun x => (P x) || (Q x)) : finPred T.
+   (fun x => (x \in A) && (Q x)) : finpred T.
+Fail Check fun (T : choiceType) (P : finpred T) (Q : finpred T) =>
+   (fun x => (P x) || (Q x)) : finpred T.
 
-Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
+Check fun (T : choiceType) (P : finpred T) (Q : pred T) =>
   enum [pred x in P | Q x].
 
 
-Check fun (T : choiceType) (A : {set T}) => enum A.
+(* Check fun (T : choiceType) (A : {set T}) => enum A. *)
 
 
 (******************************************************************************)
@@ -1106,6 +1116,9 @@ rewrite -(index_map Some_inj) nth_index ?map_f//.
 by apply/count_memPn=> /eqP; rewrite f.
 Qed.
 
+Lemma f' : finite_axiom (s : seq fT).
+Proof. exact: f. Qed.
+
 HB.instance Definition _ := Equality.on fT.
 HB.instance Definition _ := isCountable.Build fT fin_pickleK.
 HB.instance Definition _ := isFinite.Build fT f.
@@ -1174,7 +1187,7 @@ Reserved Notation "#| A |" (at level 0, A at level 99, format "#| A |").
 Notation "#| A |" := (card (pred_set A)) (only parsing): nat_scope.
 Notation "#| A |" := (card A) (only printing): nat_scope.
 
-Definition pred0b (T : choiceType) (P : finPred T) := #|P| == 0.
+Definition pred0b (T : choiceType) (P : finpred T) := #|P| == 0.
 Prenex Implicits pred0b.
 
 Module FiniteQuant.
@@ -1279,14 +1292,14 @@ End Exports.
 End FiniteQuant.
 Export FiniteQuant.Exports.
 
-Definition disjoint T (A : finPred T) (B : {pred T}) :=
+Definition disjoint T (A : finpred T) (B : {pred T}) :=
   @pred0b T [pred x in A | B x].
 Notation "[ 'disjoint' A & B ]" := (disjoint (mem A) (mem B))
   (at level 0,
    format "'[hv' [ 'disjoint' '/  '  A '/'  &  B ] ']'") : bool_scope.
 
 HB.lock
-Definition subset (T : finType) (A : finPred T) (B : {pred T}) : bool :=
+Definition subset (T : finType) (A : finpred T) (B : {pred T}) : bool :=
   pred0b [pred x in A | ~~ B x].
 Canonical subset_unlock := Unlockable subset.unlock.
 
@@ -1302,7 +1315,7 @@ Notation "A \proper B" := (proper (mem A) (mem B))
 Section ChoiceOpsTheory.
 
 Variable T : choiceType.
-Implicit Types (A B : finPred T) (C D : {pred T}).
+Implicit Types (A B : finpred T) (C D : {pred T}).
 Implicit Types (P Q : pred T) (x y : T) (s : seq T).
 
 Lemma mem_enum A : enum A =i A.
@@ -1320,12 +1333,12 @@ Variant pick_spec P : option T -> Type :=
   | Pick x of P x         : pick_spec P (Some x)
   | Nopick of P =i xpred0 : pick_spec P None.
 
-Lemma pickP (A : finPred T) : pick_spec (A : {pred T}) (pick A).
+Lemma pickP (A : finpred T) : pick_spec (A : {pred T}) (pick A).
 Proof.
 Admitted.
 
 (* Should we keep it? *)
-Definition set_pickP (A : finPred T) : pick_spec [in A] (pick A) := pickP A.
+Definition set_pickP (A : finpred T) : pick_spec [in A] (pick A) := pickP A.
 
 Lemma eq_enum A B : A =i B -> enum A = enum B.
 Proof. Admitted.
@@ -1412,9 +1425,9 @@ today:
 Lemma cardU1 (T : finType) (x : T) (A : {pred T}) : #|[predU1 x & A]| = (x \notin A) + #|A|.
 
 options for the future:
-Lemma cardU1 (T : choiceType) (x : T) (A : finPred T) :
+Lemma cardU1 (T : choiceType) (x : T) (A : finpred T) :
   #|[predU1 x & A]| = (x \notin A) + #|A|.
-Lemma cardU1 (T : choiceType) (x : T) A S (_ : finPred_aux T [predU1 x & A] S) :
+Lemma cardU1 (T : choiceType) (x : T) A S (_ : finpred_aux T [predU1 x & A] S) :
   #|S| = (x \notin A) + #|A|.
 rewrite cardU1. (* works no matter how you derive the finiteness of [predU1 x & A] *)
 
