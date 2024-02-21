@@ -23,7 +23,7 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   ## select an entry to build in the following `bundles` set
   ## defaults to "default"
-  default-bundle = "coq-8.18";
+  default-bundle = "coq-quentin";
 
   ## write one `bundles.name` attribute set per
   ## alternative configuration, the can be used to
