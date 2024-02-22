@@ -872,25 +872,29 @@ Canonical FinPreim_minn A x y1 y2 := OneFinPreimOp x y1 y2 (finPreim_minn A).
 *)
 
 (* From mathcomp.ssreflect Extra Dependency "finset.elpi" as finset. *)
+
 Import elpi.
 From elpi Require Import cs.
+
+Register negb as cs.negb.
+
 Elpi Accumulate cs.db lp:{{
   % find EqT P FinP UsingFinType
   % asserts that the predicate P on an eqType EqT
   % is the projection of a finite predicate FinP
   % and UsingFinType is true if we had to use the fact that EqT was
   % in fact a finite type.
-  pred find i:term, i:term, o:term, o:prop.
+  pred find i:term, i:term, o:term.
 
   % find T {{finpred _}} {{predPredType lp:T}} :- !.
-  find _ R _ _ :- coq.say "xxxxxxxxxxx" {coq.term->string R}, fail.
+  find _ R _ :- coq.say "xxxxxxxxxxx" {coq.term->string R}, fail.
 
-  find EqT R {{@finpred0 lp:EqT}} false :-
+  find EqT R {{@finpred0 lp:EqT}} :-
     coq.unify-eq R {{fun x : lp:_T => false}} ok.
 
-  find _ ({{fun x => finpred lp:P x}}) P false :- !.
+  find _ ({{fun x => finpred lp:P x}}) P :- !.
 
-  find _ ({{fun x : lp:_T => @mem_finpred _ lp:P x}}) P false :- !.
+  find _ ({{fun x : lp:_T => @mem_finpred _ lp:P x}}) P :- !.
 
   % this is a duplicate of above, and could be eliminated using
   % the right reduction step
@@ -899,36 +903,34 @@ Elpi Accumulate cs.db lp:{{
   % find EqT ({{fun x => in_mem x (mem (mem_set lp:A))}} as P)
   %      {{@FinPred lp:EqT lp:P lp:A (fun=> erefl)}}:- !.
 
-  find EqT {{fun x : lp:_T => x == lp:Y}} {{@finpred1 lp:EqT lp:Y}} false :- !.
+  find EqT {{fun x : lp:_T => x == lp:Y}} {{@finpred1 lp:EqT lp:Y}} :- !.
 
   find EqT {{fun x : lp:T => lp:(P x) && lp:(Q x)}}
-          {{@finpredIr lp:EqT lp:FP (fun x : lp:T => lp:(Q x))}} false :-
-    find EqT {{fun x : lp:T => lp:(P x)}} FP PUsesFinType, not PUsesFinType, !.
+          {{@finpredIr lp:EqT lp:FP (fun x : lp:T => lp:(Q x))}} :-
+    find EqT {{fun x : lp:T => lp:(P x)}} FP, !.
 
-  find EqT {{fun x : lp:T => lp:(P x) && lp:(Q x)}} Sol QUsesFinType :-
-    find EqT {{fun x : lp:T => lp:(P x)}} FP _,
-    find EqT {{fun x : lp:T => lp:(Q x)}} FQ QUsesFinType, !,
-    if QUsesFinType
-       (Sol = {{@finpredIr lp:EqT lp:FP (fun x : lp:T => lp:(Q x))}})
-       (Sol = {{@finpredIl lp:EqT (fun x : lp:T => lp:(P x)) lp:FQ}}).
+  pred obviously-not-finite i:term.
+  obviously-not-finite T :-
+    coq.safe-dest-app T Hd _, coq.env.global {{:gref lib:cs.negb}} Hd.
 
-  % find EqT {{fun x : lp:T => lp:(P x) && lp:(Q x)}}
-  %      {{@finPred_comprehensionr lp:EqT (fun x : lp:T => lp:(P x)) lp:FQ}} :-
-  %   find EqT {{fun x : lp:T => lp:(Q x)}} FQ, !.
+  find EqT {{fun x : lp:T => lp:(P x) && lp:(Q x)}}
+          {{@finpredIl lp:EqT (fun x : lp:T => lp:(P x)) lp:FQ}} :-
+    @pi-decl `_` T x \ obviously-not-finite (P x),
+    find EqT {{fun x : lp:T => lp:(Q x)}} FQ, !.
 
   % :name "andb-final"
   % find _EqT {{fun x : _ => _ && _}} _ :- !,
   %   coq.error "conjunction of two predicates that are not finpreds".
 
   find EqT {{fun x : lp:T => lp:(P x) || lp:(Q x)}}
-       {{@finpredU lp:EqT lp:FP lp:FQ}} (PUsesFinType; QUsesFinType) :- !,
-    find EqT {{fun x : lp:T => lp:(P x)}} FP PUsesFinType,
-    find EqT {{fun x : lp:T => lp:(Q x)}} FQ QUsesFinType.
+       {{@finpredU lp:EqT lp:FP lp:FQ}} :- !,
+    find EqT {{fun x : lp:T => lp:(P x)}} FP,
+    find EqT {{fun x : lp:T => lp:(Q x)}} FQ.
 
   :name "find-unfold"
-  find EqT {{ fun x : lp:T => lp:(R x) }} S SUsesFinType :-
+  find EqT {{ fun x : lp:T => lp:(R x) }} S :-
     (@pi-decl `x` T x\ redex (R x) (R' x)), !,
-    find EqT {{ fun x : lp:T => lp:(R' x) }} S SUsesFinType.
+    find EqT {{ fun x : lp:T => lp:(R' x) }} S.
 
   pred redex i:term, o:term.
   % redex X Y :-
@@ -955,7 +957,7 @@ Elpi Accumulate cs.db lp:{{
     coq.say "Ctx is" Ctx,
     coq.say "RHS = " RHS,
     coq.say "RHS is" {coq.term->string RHS},
-    find T RHS FinPred _,
+    find T RHS FinPred,
     coq.say "found" FinPred,
     std.assert-ok! (coq.typecheck FinPred _) "solution is ill typed",
     Sol = FinPred,
@@ -983,8 +985,8 @@ Set Printing All.
 Definition t1 (T : eqType) : finpred T := pred0.
 Definition t2 (T : eqType) (P : finpred T) (Q : pred T) : {finpred T} :=
   [pred x | ([in P] x) && (Q x)].
-Definition t1 (T : eqType) (P : pred T) (Q : finpred T) : {finpred T} :=
-    [pred x | (P x) && ([in Q] x)].
+Definition t2' (T : eqType) (P : pred T) (Q : finpred T) : {finpred T} :=
+    [pred x | ~~ (P x) && ([in Q] x)].
 (* Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finpred T := *)
    (* [pred x | (x \in A) && (Q x)]. *)
 Definition t4 (T : eqType) (P : finpred T) (Q : finpred T) : finpred T :=
@@ -1051,6 +1053,24 @@ HB.structure Definition Finite := {T of isFinite T & Countable T }.
 (* As with Countable, the interface explicitly includes the somewhat redundant*)
 (* Equality, Choice and Countable superclasses to ensure the forgetful        *)
 (* inheritance criterion is met.                                              *)
+
+Section finpred_finType.
+
+Program Definition finpred_finType (T : finType) (P : pred T) :=
+  @Finpred T P _.
+Next Obligation.
+exists (@enum_subdef T) => x _.
+by rewrite -has_pred1 has_count (@enumP_subdef T).
+Qed.
+
+End finpred_finType.
+
+Elpi Accumulate cs.db lp:{{
+  :before "find-unfold"
+  find EqT ({{fun x => lp:(P x)}} as Pred) {{@finpred_finType FinT Pred}}) :-
+    coq.elaborate EqT {{finType}} FinT ok, !.  
+}}.
+Elpi Typecheck canonical_solution.
 
 Module Export FiniteNES.
 Module Finite.
@@ -1136,9 +1156,7 @@ Notation "[ 'finType' 'of' T 'for' cT ]" := (Finite.clone T%type cT)
 #[deprecated(since="mathcomp 2.0.0", note="Use Finite.clone instead.")]
 Notation "[ 'finType' 'of' T ]" := (Finite.clone T%type _)
   (at level 0, format "[ 'finType'  'of'  T ]") : form_scope.
-
-
-
+(* 
 Definition set_pick (T : choiceType) (A : {set T}) := ohead (enum A).
 Notation pick A := (set_pick (pred_set A)) (only parsing).
 Notation "'pick' A" := (pick A) (at level 10, only printing).
@@ -1174,21 +1192,21 @@ Notation "[ 'pick' x 'in' A | P & Q ]" := [pick x in A | P && Q]
   (at level 0, x name, format
   "[ '[hv ' 'pick'  x  'in'  A '/ '   |  P '/ '  &  Q ] ']'") : form_scope.
 Notation "[ 'pick' x : T 'in' A | P & Q ]" := [pick x : T in A | P && Q]
-  (at level 0, x name, only parsing) : form_scope.
+  (at level 0, x name, only parsing) : form_scope. *)
 
 
 (* We lock the definitions of card and subset to mitigate divergence of the   *)
 (* Coq term comparison algorithm.                                             *)
-HB.lock Definition card (T : choiceType) (A : {set T}) := size (enum A).
-Canonical card_unlock := Unlockable card.unlock.
+(* HB.lock Definition card (T : choiceType) (A : {set T}) := size (enum A).
+Canonical card_unlock := Unlockable card.unlock. *)
 
 (* A is at level 99 to allow the notation #|G : H| in groups. *)
 Reserved Notation "#| A |" (at level 0, A at level 99, format "#| A |").
-Notation "#| A |" := (card (pred_set A)) (only parsing): nat_scope.
-Notation "#| A |" := (card A) (only printing): nat_scope.
-
+(* Notation "#| A |" := (card (pred_set A)) (only parsing): nat_scope.
+Notation "#| A |" := (card A) (only printing): nat_scope. *)
+(* 
 Definition pred0b (T : choiceType) (P : finpred T) := #|P| == 0.
-Prenex Implicits pred0b.
+Prenex Implicits pred0b. *)
 
 Module FiniteQuant.
 
