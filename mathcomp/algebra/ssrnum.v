@@ -3384,8 +3384,13 @@ Definition invf_gte1 := (invf_ge1, invf_gt1).
 Lemma invf_le1 x : 0 < x -> (x^-1 <= 1) = (1 <= x).
 Proof. by move=> x_gt0; rewrite -invf_ge1 ?invr_gt0 // invrK. Qed.
 
+Lemma invf_plt : {in Num.pos &, forall x y, (x^-1 < y) = (y^-1 < x)}.
+Proof.
+by move=> x y ? ?; rewrite -[in LHS](@invrK _ y) ltf_pV2// posrE invr_gt0.
+Qed.
+
 Lemma invf_lt1 x : 0 < x -> (x^-1 < 1) = (1 < x).
-Proof. by move=> x_lt0; rewrite -invf_gt1 ?invr_gt0 // invrK. Qed.
+Proof. by move=> x0; rewrite invf_plt ?invr1 ?posrE. Qed.
 
 Definition invf_lte1 := (invf_le1, invf_lt1).
 Definition invf_cp1 := (invf_gte1, invf_lte1).
