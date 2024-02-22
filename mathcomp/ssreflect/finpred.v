@@ -898,17 +898,17 @@ Canonical FinPreim_minn A x y1 y2 :=
 (*************************** Unit Tests          ******************************)
 (******************************************************************************)
 
-(* 
 Arguments InferredFinpredPattern {T} _ _.
-Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
+(*Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
   [pred x in A]. *)
 
-(*Lemma foo (D := fun T (x : T) => True) (T : eqType) (a b : T)
+Lemma foo (D := fun T (x : T) => True) (T : eqType) (a b : T)
   (G : forall T A, D {finpred T} A -> D {pred T} A) :
    D {pred _} [pred x : {n | 5 < n} | sval x == 3].
 apply: G.
+Abort.
 
-
+(*
 Lemma foo (D := fun T (x : T) => True) (T : eqType) (a b : T)
   (G : forall T A, D {finpred T} A -> D {pred T} A) :
    D {pred _} [pred x | x.1 == a & x.2 == b].
@@ -963,24 +963,21 @@ suff Q (L : labeled_pred T) : D L -> x \in L.
 have foo (A : {finpred T}) : x \in [pred x in A | x == x].
 eapply Q.
 Show Existentials.
+*)
 
-
-Definition t1' (T : choiceType) (P : finpred T) : finpred T :=
+Definition t1' (T : choiceType) (P : finpred T) : {finpred T} :=
   [pred x in P] : {pred T}.
-Definition t2 (T : choiceType) (P : finpred T) (Q : pred T) : finpred T :=
+Fail Definition t2 (T : choiceType) (P : {finpred T}) (Q : pred T) : finpred T :=
   [pred x | ([in P] x) && (Q x)].
-Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finpred T :=
+Fail Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finpred T :=
    [pred x | (x \in A) && (Q x)].
-Definition t4 (T : choiceType) (P : finpred T) (Q : finpred T) : finpred T :=
+Fail Definition t4 (T : choiceType) (P : finpred T) (Q : finpred T) : finpred T :=
    [pred x | (x \in P) || (x \in Q)].
-Definition t5 (T : finType) (P : pred T) : finpred T :=
+Fail Definition t5 (T : finType) (P : pred T) : finpred T :=
    [pred x | P x].
 Definition def (T : choiceType) (P Q : {pred T}) : pred T := [pred x : T | P x && Q x].
-Definition t6 (T : choiceType) (P : finpred T) Q : finpred T :=
+Fail Definition t6 (T : choiceType) (P : finpred T) Q : finpred T :=
    [pred x : T | def P Q x ].
-Print SimplFun.
-About cardU1.
-Print Canonical Projections finpred.
 
 Fail Check fun (T : choiceType) (P : finpred T) => [eta P] : finpred T.
 Fail Check fun (T : choiceType) (P : finpred T) => [in P] : finpred T.
@@ -992,12 +989,10 @@ Fail Check fun (T : choiceType) (A : {set T}) (Q : pred T) =>
 Fail Check fun (T : choiceType) (P : finpred T) (Q : finpred T) =>
    (fun x => (P x) || (Q x)) : finpred T.
 
-Check fun (T : choiceType) (P : finpred T) (Q : pred T) =>
+Fail Check fun (T : choiceType) (P : finpred T) (Q : pred T) =>
   enum [pred x in P | Q x].
 
-
-Check fun (T : choiceType) (A : {set T}) => enum A.
-*)
+Fail Check fun (T : choiceType) (A : {set T}) => enum A.
 
 (* Some operator definitions. *)
 
@@ -1040,6 +1035,20 @@ HB.structure Definition Finite := {T of isFinite T & Countable T }.
 (* As with Countable, the interface explicitly includes the somewhat redundant*)
 (* Equality, Choice and Countable superclasses to ensure the forgetful        *)
 (* inheritance criterion is met.                                              *)
+
+Section finpred_finType.
+
+Program Definition finpred_finType (T : finType) (P : pred T) :=
+  @Finpred T P _.
+Next Obligation.
+exists (@enum_subdef T) => x _.
+by rewrite -has_pred1 has_count (@enumP_subdef T).
+Qed.
+
+Canonical Finpred_finType (T : finType) (P : pred T) b :=
+  @InferFinpred T P (finpred_finType P) (TryFinType b).
+
+End finpred_finType.
 
 Module Export FiniteNES.
 Module Finite.
@@ -1123,9 +1132,7 @@ Notation "[ 'finType' 'of' T 'for' cT ]" := (Finite.clone T%type cT)
 Notation "[ 'finType' 'of' T ]" := (Finite.clone T%type _)
   (at level 0, format "[ 'finType'  'of'  T ]") : form_scope.
 
-
-
-Definition set_pick (T : choiceType) (A : {set T}) := ohead (enum A).
+(* in finset.v Definition set_pick (T : choiceType) (A : {set T}) := ohead (enum A).
 Notation pick A := (set_pick (pred_set A)) (only parsing).
 Notation "'pick' A" := (pick A) (at level 10, only printing).
 
@@ -1162,7 +1169,6 @@ Notation "[ 'pick' x 'in' A | P & Q ]" := [pick x in A | P && Q]
 Notation "[ 'pick' x : T 'in' A | P & Q ]" := [pick x : T in A | P && Q]
   (at level 0, x name, only parsing) : form_scope.
 
-
 (* We lock the definitions of card and subset to mitigate divergence of the   *)
 (* Coq term comparison algorithm.                                             *)
 HB.lock Definition card (T : choiceType) (A : {set T}) := size (enum A).
@@ -1175,6 +1181,7 @@ Notation "#| A |" := (card A) (only printing): nat_scope.
 
 Definition pred0b (T : choiceType) (P : finpred T) := #|P| == 0.
 Prenex Implicits pred0b.
+*)
 
 Module FiniteQuant.
 
@@ -1278,8 +1285,12 @@ End Exports.
 End FiniteQuant.
 Export FiniteQuant.Exports.
 
-Definition disjoint T (A : finPred T) (B : {pred T}) :=
+Definition disjoint (T : eqType) (A : finpred T) (B : finpred T) :=
+  @pred0b T [pred x | (x \in A) || (x \in B)].
+
+Definition disjoint (T : finType) (A : finpred T) (B : {pred T}) :=
   @pred0b T [pred x in A | B x].
+Unset Printing Notations.
 Notation "[ 'disjoint' A & B ]" := (disjoint (mem A) (mem B))
   (at level 0,
    format "'[hv' [ 'disjoint' '/  '  A '/'  &  B ] ']'") : bool_scope.
