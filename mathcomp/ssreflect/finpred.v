@@ -22,6 +22,12 @@ Unset Printing Implicit Defensive.
 (* a canonical instance, as opposed to the matched value C a1 .. an, which is *)
 (* the default and problematic if some of the ai are themselves projections,  *)
 (* particularly projections with a default instance.                          *)
+Structure matchArg {T} := DeclareMatchArg { apply_match_arg :> T -> T }.
+Add Printing Constructor matchArg.
+Definition MatchArg {T} : T -> T := id.
+Canonical MatchArgPattern T := @DeclareMatchArg T MatchArg.
+
+(* Should work when CS resolution bug is fixed.
 Structure funPattern A R (f : forall a : A, R a) :=
   FunPattern { apply_fun_pattern :> forall a, R a }.
 Add Printing Constructor funPattern.
@@ -29,6 +35,7 @@ Definition MatchArg {T} := @id T.
 Definition matchArg {T} := funPattern (@MatchArg T).
 Identity Coercion pattern_of_matchArg : matchArg >-> funPattern.
 Canonical MatchFunPattern A R f := @FunPattern A R f f.
+*)
 
 (******************************************************************************)
 (*   A generic Forall "constructor" for the Gallina forall quantifier, i.e.,  *)
@@ -222,6 +229,9 @@ Definition tag2_of_tag {I T1_ T2_} (z : {x : I & T1_ x * T2_ x}%type) :=
 Lemma tag_of_tag2K {I T1_ T2_} : cancel (@tag_of_tag2 I T1_ T2_) tag2_of_tag.
 Proof. by case. Qed.
 
+Lemma tag2_of_tagK {I T1_ T2_} : cancel tag2_of_tag (@tag_of_tag2 I T1_ T2_).
+Proof. by case=> ? []. Qed.
+
 (* End of ssrfun complements. *)
 
 (*   This module provides facilities for handling (boolean) predicates with   *)
@@ -274,11 +284,6 @@ Proof.
 by case: P => P [s sPs] x; rewrite mem_undup mem_filter; apply/andb_idr/sPs.
 Qed.
 
-Definition card {T} P := size (@support T P).
-Definition pred0b {T} P := @card T P == 0.
-Definition enum {T : choiceType} P := sort prec (@support T P).
-Definition pick {T} P := ohead (@enum T P).
-
 Structure labeled_pred (T : eqType) := LabelPred {unlabel_pred :> {pred T}}.
 
 #[projections(primitive)]
@@ -294,18 +299,20 @@ Structure finpred_pattern T := FinpredPattern {
   pattern_pred :> labeled_pred T;
   pattern_finpred :> finpred_of pattern_pred
 }.
-Coercion pattern_of_finpred T (A : finpred T) :=
+#[reversible=no] Coercion pattern_of_finpred T (A : finpred T) :=
   @FinpredPattern T (LabelPred (mem_finpred A)) (finpred_of_self A).
 
 Notation "{ 'finpred' T }" := (finpred_pattern T)
    (at level 0, T at level 100, format "{ 'finpred'  T }") : type_scope.
 
-Structure finpredType (T : eqType) := FinpredType {
-  finpredType_sort :> Type;
-  finpredType_pred : finpredType_sort -> {pred T};
-  #[canonical=no] finpredType_finpred P : finpred_of (finpredType_pred P)
+Structure coercedFinpred (T : eqType) := CoercedFinpred {
+  pred_of_coerced :> finpred_pred_target T;
+  #[canonical=no] finpred_of_coerced : @finpred_of T pred_of_coerced
 }.
-Canonical self_finpredType T := FinpredType (@finpred_of_self T).
+Notation DeclareCoercedFinpred P A x :=
+   (CoercedFinpred _ A (finpred_of_self A)).
+Canonical CoercedFinpredSelf T A := CoercedFinpred (@finpred_of_self T A).
+Coercion CoercedFinpredSelf : finpred >-> coercedFinpred.
 
 Structure infer_finpred (T : eqType) (P : {pred T}) (F : finpred T) :=
   InferFinpred { finpred_pilot :> bool }.
@@ -315,20 +322,23 @@ Definition TryIfThenElse := TryFinType.
 Definition TryOp := TryIfThenElse.
 Definition TryFalse b := TryOp (MatchArg b).
 
-Definition TryInferFinpred (T : eqType) (P P1 P2 : {pred T}) & finpred_of P2 :=
-   LabelPred P.
-Canonical TryFinpredType (T : eqType) P F (FF : T -> infer_finpred P F) :=
-   TryInferFinpred P [eta FF] (finpred_of_self (reverse_coercion F P)).
+Definition TryInferFinpred T (P : labeled_pred T) :=
+  fun (P1 P2 : {pred T}) & {pred T} -> finpred_of P2 => P.
+Definition TryCoercedFinpred T := @id (labeled_pred T).
+Definition finpred_of_reverse_coercion {T} (F : finpred T) (P : {pred T}) :=
+  finpred_of_self (reverse_coercion F P).
+Canonical LabelPatternFinpred T P F (FF : _ -> @infer_finpred T P F) :=
+  TryCoercedFinpred (TryInferFinpred (LabelPred P) [eta FF]
+                       (finpred_of_reverse_coercion F)).
 
-Canonical FinpredTypePattern T pT F0 :=
-  let F := @finpredType_finpred T pT F0 in
-  let FF _ := InferFinpred _ F false in
-  @FinpredPattern T (TryFinpredType FF) (unkeyed F).
-Coercion FinpredTypePattern : finpredType_sort >-> finpred_pattern.
+Canonical CoercedFinpredPattern T (A : coercedFinpred T) :=
+  @FinpredPattern T (TryCoercedFinpred (LabelPred [eta pred_of_coerced A]))
+                    (unkeyed (finpred_of_coerced A)).
+Coercion CoercedFinpredPattern : coercedFinpred >-> finpred_pattern.
 
-Canonical InferredFinpredPattern T P (F : @finpred_of T P) :=
-  let dummyFF x := TryFalse (P x) in
-  @FinpredPattern T (TryInferFinpred P dummyFF F) (unkeyed F).
+Canonical InferredFinpredPattern T P (F : _ -> @finpred_of T P) :=
+  let pilot x := TryFalse (P x) in
+  @FinpredPattern T (TryInferFinpred (LabelPred P) pilot F) (unkeyed (F P)).
 Notation "P" := (@InferredFinpredPattern _ P _)
    (at level 0, only printing) : fun_scope.
 
@@ -418,16 +428,16 @@ Structure labeled_bool := LabelBool {unlabel_bool :> bool}.
 Structure op_finpred {T : eqType} (P : pred T) (A : finpred T) :=
   OpFinpred {opFinpred_pilot :> labeled_bool}.
 Canonical InferOpFinpred T P A (m : matchArg) (eA : @op_finpred T P A) :=
-  @InferFinpred T P A (TryOp (m eA)).
+  @InferFinpred T P A (TryOp (m (eA : bool))).
 
 Definition LabelBinop {T : eqType}
   (op : bool -> bool -> bool) (P P1 : pred T) (a b : bool) := 
   fun F : forall A B : finpred T, finpred T => @id labeled_bool.
 Definition LabelOneBinop {T : eqType} (P : pred T) a b op F :=
   @LabelBinop T op P P (TryFalse a) (TryFalse b) F (LabelBool (op a b)).
-Fixpoint LabelManyBinop {T : eqType} (P : pred T) a b op Fs :=
-  if Fs isn't F :: Fs' then LabelBool (op a b) else
-  LabelBinop op P P (TryFalse a) (TryFalse b) F (LabelManyBinop P a b op Fs').
+Fixpoint LabelManyBinop {T : eqType} (P : pred T) a b op0 Fs :=
+  if Fs isn't (op, F) :: Fs' then LabelBool (op0 a b) else
+  LabelBinop op P P (TryFalse a) (TryFalse b) F (LabelManyBinop P a b op0 Fs').
 
 Canonical InferBinFinpred {T : eqType} (PQ : (pred T)) op F
     P Q A B (eA : infer_finpred P A) (eB : infer_finpred Q B) c :=
@@ -441,22 +451,30 @@ Fixpoint envelope_seq {T} s :=
   if s isn't x :: s' return finpredEnvelope [pred x in s]
   then finpred_envelope (finpred0 T)
   else finpred_envelope (finpredU (finpred1 x) (Finpred (envelope_seq s'))).
-Definition finpred_seq T s := Finpred (@envelope_seq T s).
+Coercion finpred_seq T s := Finpred (@envelope_seq T s).
+Coercion CoercedFinpred_seq T s := @CoercedFinpred T (mem_seq s) s.
+Canonical CoercedFinpred_seq.
+
+Definition LabelTerminalOp {T : eqType} (op : {pred T}) (F : finpred T) :=
+  @id labeled_bool.
+Definition LabelOneTerminalOp T op F x :=
+  @LabelTerminalOp T op F (LabelBool (op x)).
+Canonical InferTerminalFinpred {T} P F x :=
+  OpFinpred P F (@LabelTerminalOp T P F x).
 
 Definition TryIdK := tt.
 Definition TryIdConv := TryIdK.
 
 Definition LabelIr (T : Type) a b & bool := LabelBool (a && b).
-Definition LabelGraded T a b ea & T -> bool := LabelIr T a b ea.
-Definition LabelSigma T a b (eP : unit) ea eb (ec : unit) :=
-  @LabelGraded T a b ea eb.
+Definition LabelSigma T a b (eP : unit) ea (eb : T -> bool) (ec : unit) :=
+  @LabelIr T a b ea.
 Definition LabelIl T a b (eNa : bool) eb :=
   @LabelSigma T a b tt (TryFalse a) (fun=> eb) TryIdConv.
 Definition TryConst := @id bool.
 Canonical LabelI T a b := LabelIl T a b (TryConst a) (TryFalse b).
 
 Canonical FinpredIr T a b P Q A (eA : infer_finpred P A) :=
-  @InferFinpred T (fun x => P x && Q x) (finpredIr A Q) (LabelIr T a b eA).
+  @OpFinpred T (fun x => P x && Q x) (finpredIr A Q) (LabelIr T a b eA).
 
 Structure not_finpred (T : eqType) (P : {pred T}) :=
   NotFinpred {notFin_pilot :> bool}.
@@ -466,12 +484,12 @@ Canonical GeqNotFin T m n m1 n1 := @NotFinpred T (fun x => m <= n x) (m1 <= n1).
 
 Canonical FinpredIl T a b P Q B
   (nFa : not_finpred P) (eB : infer_finpred Q B) :=
-  @InferFinpred T (fun x => P x && Q x) (finpredIl P B) (LabelIl T a b nFa eB).
+  @OpFinpred T (fun x => P x && Q x) (finpredIl P B) (LabelIl T a b nFa eB).
 
 HB.mixin Record isSigmaType (I : eqType) (T_ : I -> eqType) T := {
   to_sigma : T -> {x : I & T_ x};
   of_sigma : {x : I & T_ x} -> T;
-  (* of_sigmaK : cancel of_sigma to_sigma; expected to hold by conversion *)
+  of_sigmaK : cancel of_sigma to_sigma;
   to_sigmaK : cancel to_sigma of_sigma
 }.
 
@@ -480,14 +498,15 @@ HB.structure Definition SigmaEqType I T_ :=
   {T of isSigmaType I T_ T & Equality T}.
 
 HB.instance Definition _ I T_ :=
-  @isSigmaType.Build I T_ _ id id (frefl _).
+  @isSigmaType.Build I T_ _ id id (frefl _) (frefl _).
 
-HB.instance Definition _ T1 T2 :=
-  @isSigmaType.Build T1 (fun=> T2) _ _ _ tag_of_pairK.
+HB.instance Definition _ (T1 T2 : eqType) :=
+  isSigmaType.Build T1 (fun=> T2) _  pair_of_tagK tag_of_pairK.
 
-HB.instance Definition _ I (T1_ T2_ : _ -> eqType) :=
-  @isSigmaType.Build I _ _ _ _ (@tag_of_tag2K I T1_ T2_).
+HB.instance Definition _ (I : eqType) (T1_ T2_ : I -> eqType) :=
+  isSigmaType.Build _ _ _ (@tag2_of_tagK I T1_ T2_) tag_of_tag2K.
 
+(* To be revised once extra_args of default canonical projections are fixed
 Structure labelSmashArg X C T (x : X) (c : C) := (* x, y not free in d *)
   LabelSmashArg { smashArg_val : T }.
 Structure smashArg X C T Z (x : X) (c : C) (z : Z) :=
@@ -618,6 +637,13 @@ Canonical InferSigmaPred I T_ C P P1 P2 c
     (eP1 : forall x y, @smashArg I C bool bool x c (P1 x)) :=
   SplaySigmaPred P1 P2
     (@LabelSigmaPred I T_ P (fun x y => smashArg_val (eP1 x y)) P2).
+*)
+
+Structure splaySigmaPred I T_ (pT := forall x : I, {pred T_ x})
+                         (P : pT) (P1 : {pred I}) (P2 : pT) :=
+  SplaySigmaPred{ sigmaPred_pilot :> unit }.
+Canonical InferSigmaPred I T_ P1 P2 :=
+  @SplaySigmaPred I T_ (fun x y => P1 x && P2 x y) P1 P2 tt.
 
 Program Definition finpredSigma I T_ (T : sigmaEqType T_)
                       (A : finpred I) (B : forall x, finpred (T_ x)) :=
@@ -650,7 +676,7 @@ Canonical FinpredSigma I T_ (T : sigmaEqType T_) a b (P : {pred T})
                        B (eB : forall x, @infer_finpred (T_ x) (P2 x) (B x))
                        (C0 := finpredSigma T A B) (C0id := finpred_of_self C0)
                        C (eC : finpredIdPreim to_sigmaK P C0id C0 C) :=
-  @InferFinpred T P C (LabelSigma a b eP eA eB eC).
+  @OpFinpred T P C (LabelSigma a b eP eA eB eC).
 
 Record finPreimFun (A B T : eqType) := FinPreimFun {
   finPreim_fun :> A -> B -> T;
@@ -673,37 +699,38 @@ Qed.
 
 Definition TryVal T := @id T.
 
-Structure labelFinPreimExpr (T : eqType) :=
+Structure labelFinPreimExpr (A T : eqType) (x : A) :=
   LabelFinPreimExpr { finPreim_expr : T }.
-Definition LabelFinPreimApp {A B T} (f : finPreimFun A B T)
-                            (x : A) (z z0 : labelFinPreimExpr T) (y : B) := z0.
-Definition OneFinPreimApp {A B T} x y f :=
-  let: FinPreimFun ff _ := f in let z := LabelFinPreimExpr (ff x y) in
-  @LabelFinPreimApp A B T f x z z (TryVal y).
-Fixpoint ManyFinPreimApp {A B T} x y z0 fs :=
-  if fs isn't (FinPreimFun ff _ as f) :: fs' then LabelFinPreimExpr z0 else
-  let z := LabelFinPreimExpr (ff x y) in
-  @LabelFinPreimApp A B T f x z (ManyFinPreimApp x y z0 fs') (TryVal y).
+Definition LabelFinPreimApp {A B T} (f : finPreimFun A B T) (x : A)
+                                  (z z0 : labelFinPreimExpr T x) (y : B) := z0.
+Definition OneFinPreimApp {A B T} x y fxy (f : finPreimFun A B T) :=
+  let z := LabelFinPreimExpr x (f x y) in
+  LabelFinPreimApp f z (LabelFinPreimExpr x fxy) (TryVal y).
+Fixpoint ManyFinPreimApp {A B T} x y f0xy (fs : seq (finPreimFun A B T)) :=
+  if fs isn't f :: fs' then LabelFinPreimExpr x f0xy else
+  let z := LabelFinPreimExpr x (f x y) in
+  @LabelFinPreimApp A B T f x z (ManyFinPreimApp x y f0xy fs') (TryVal y).
 
 Canonical LabelValFinPreim {A T : eqType} {P} (B : @subEqType T P) x y :=
-  let z := LabelFinPreimExpr (TryVal (val y)) in
+  let z := LabelFinPreimExpr x (TryVal (val y)) in
   @LabelFinPreimApp A B T (PcanFinPreim A valK) x z z y.
-Canonical LabelVarFinPreim {A} x := @LabelFinPreimExpr A x.
 
+Canonical LabelVarFinPreim {A} x := @LabelFinPreimExpr A A x x.
+Definition MarkComp T := @id T.
 Definition IdFinPreim A := @CanFinPreim A A A id id (frefl _).
 Structure inferFinPreimApp (A : eqType) T (f : finPreimFun A A T) (x : A) :=
-  InferFinPreimApp { labeled_finPreim_expr :> labelFinPreimExpr T }.
+  InferFinPreimApp { labeled_finPreim_expr :> labelFinPreimExpr T x }.
 Canonical InferFinPreimVar A x :=
-  InferFinPreimApp (IdFinPreim A) x (LabelVarFinPreim x).
+  InferFinPreimApp (IdFinPreim A) (LabelVarFinPreim x).
 Canonical InferFinPreimComp A B T f g x (y : inferFinPreimApp g x) z :=
-  InferFinPreimApp (ComposeFinPreim f g) x
-     (@LabelFinPreimApp A B T f x z z (finPreim_expr y)).
+  InferFinPreimApp (ComposeFinPreim f g)
+     (@LabelFinPreimApp A B T (MarkComp f) x z z (finPreim_expr y)).
 
 Structure inferFinPreim A T (fF : finpred T) (F : finpred A) (x : A) :=
   InferFinPreimPreimage { finPreim_val : T }.
 
 Program Definition finpred_preim A T (f : finPreimFun _ A _) (fF : finpred T) :=
-  @Finpred A (preim (fun x => f x x) (mem_finpred fF)) _.
+  @Finpred A [preim (fun x => f x x) of mem_finpred fF] _.
 Next Obligation.
 case: f => f [g fk] /=; exists (flatten (map g (support fF))) => x Ffx.
 by apply/flatten_mapP; exists (f x x); rewrite ?mem_support.
@@ -723,23 +750,23 @@ Definition LabelPreimPred {A T : eqType} (b : labeled_bool)
 Canonical InferPreimPred {A T : eqType} P b (Ff : finpred T) (F : finpred A)
     (eF : forall x : A, inferFinPreim Ff F x) :=
   OpFinpred P F (LabelPreimPred b P Ff (fun x => finPreim_val (eF x))).
-Definition OneFinpredPred (A T : eqType)
-   (Ff : finpred T) (f : A -> T) (y0 : T) :=
-  let: Finpred P _ := Ff in
-  LabelPreimPred (LabelBool (P y0)) (preim f P) Ff (fun x => TryVal (f x)).
+Definition OneFinpredPred (A T : eqType) (Ff : finpred T) (f : A -> T) b0 :=
+  LabelPreimPred (LabelBool b0) (preim f (mem_finpred Ff))
+        Ff (fun x => TryVar (TryVal (f x))).
 Fixpoint ManyFinpredPred {A T : eqType} (b0 : bool) (f : A -> T)
      (Ffs : seq (finpred T)) :=
-  if Ffs isn't (Finpred P _ as Ff) :: Ffs' then LabelBool b0 else
+  if Ffs isn't Ff :: Ffs' then LabelBool b0 else
   LabelPreimPred (ManyFinpredPred b0 f Ffs')
-    (preim f P) Ff (fun x => TryVal (f x)).
+    (preim f (mem_finpred Ff)) Ff (fun x => TryVar (TryVal (f x))).
 
-Canonical Finpred_leq A m0 m n := @OneFinpredPred A nat (finpred_leq n) m0 m.
+Canonical Finpred_leq A m0 m n :=
+   @OneFinpredPred A _ (finpred_leq n) m (m0 <= n).
 
 Canonical Finpred_eq (A T : eqType) a x0 y0 (y : A -> T) :=
   ManyFinpredPred (x0 == y0 :> T) y [:: finpred1 a; finpred1x a].
 
 Definition finPreim_succ A := @CanFinPreim A _ _ succn predn (frefl _).
-Canonical FinPreim_succ A x y := OneFinPreimApp x y (finPreim_succ A).
+Canonical FinPreim_succ A x n := OneFinPreimApp x n n.+1 (finPreim_succ A).
 
 Program Definition FinPreim_nat A T f g 
   (bf : forall x n, n <= g (f x n)) := @FinPreimFun A nat T f _.
@@ -749,7 +776,7 @@ Qed.
 
 Definition finPreim_pred A :=
   @FinPreim_nat A _ (fun=> predn) succn (fun _ n => leqSpred n).
-Canonical FinPreim_pred A x y := OneFinPreimApp x y (finPreim_pred A).
+Canonical FinPreim_pred A x y := OneFinPreimApp x y y.-1 (finPreim_pred A).
 
 Definition finPreim_addnl A m_ :=
   @FinPreim_nat A _ (fun x n => n + m_ x) id (fun _ _ => leq_addr _ _).
@@ -759,12 +786,12 @@ Canonical FinPreim_addn A m m_ x n m0 n0 :=
   ManyFinPreimApp x n (m0 + n0) [:: finPreim_addnr A m; finPreim_addnl m_].
 
 Definition finPreim_double A := @CanFinPreim A _ _ double half doubleK.
-Canonical FinPreim_double A x n := OneFinPreimApp x n (finPreim_double A).
+Canonical FinPreim_double A x n := OneFinPreimApp x n n.*2 (finPreim_double A).
 
 Program Definition finPreim_half A :=
   @FinPreim_nat A _ (fun=> half) (fun n => n.*2.+1) _.
 Next Obligation. by rewrite -leq_half_double. Qed.
-Canonical FinPreim_half A x n := OneFinPreimApp x n (finPreim_half A).
+Canonical FinPreim_half A x n := OneFinPreimApp x n (half n) (finPreim_half A).
 
 Definition finPreim_mulnl A m_ :=
   @FinPreim_nat A _ (fun x n => n * (m_ x).+1) id
@@ -824,15 +851,15 @@ by rewrite !mem_iota /= !ltnS -geq_min.
 Qed.
 
 Definition LabelFinPreimAppOp {A B1 B2 T} (h : finPreimOp A B1 B2 T)
-           (x : A) (z z0 : labelFinPreimExpr T) (y1 : B1) (y2 : B2) := z0.
-Definition OneFinPreimOp {A B1 B2 T} x y1 y2 h :=
-  let: FinPreimOp op _ := h in let z := LabelFinPreimExpr (op x y1 y2) in
-  @LabelFinPreimAppOp A B1 B2 T h x z z (TryVal y1) (TryVal y2).
-Fixpoint ManyFinPreimOps {A B1 B2 T} x y1 y2 z0 hs :=
-  if hs isn't (FinPreimOp hf _ as h) :: hs' then LabelFinPreimExpr z0 else
-  let z := LabelFinPreimExpr (hf x y1 y2) in
-  @LabelFinPreimAppOp A B1 B2 T h x z (ManyFinPreimOps x y1 y2 z0 hs')
-    (TryVal y1) (TryVal y2).
+           (x : A) (z z0 : labelFinPreimExpr T x) (y1 : B1) (y2 : B2) := z0.
+Definition OneFinPreimOp {A B1 B2 T} x y1 y2 hxy (h : finPreimOp A B1 B2 T) :=
+  let z := LabelFinPreimExpr x (h x y1 y2) in
+  LabelFinPreimAppOp h z (LabelFinPreimExpr x hxy) (TryVal y1) (TryVal y2).
+Fixpoint ManyFinPreimOps {A B1 B2 T} x y1 y2 hxy hs :=
+  if hs isn't h :: hs' then LabelFinPreimExpr x hxy else
+  let z := LabelFinPreimExpr x (@finPreim_op A B1 B2 T h x y1 y2) in
+  let z0 := ManyFinPreimOps x y1 y2 hxy hs' in
+  LabelFinPreimAppOp h z z0 (TryVal y1) (TryVal y2).
 
 Program Definition ComposeFinPreimOp {A B1 B2 T} (h : finPreimOp A B1 B2 T)
   (g1 : finPreimFun A A B1) (g2 : finPreimFun A A B2) :=
@@ -847,52 +874,125 @@ by apply/flatten_mapP; exists (g2 x y).
 Qed.
 Canonical InferFinPreimCompOp {A B1 B2 T} h g1 g2 x
      (y1 : inferFinPreimApp g1 x) (y2 : inferFinPreimApp g2 x) z :=
-  InferFinPreimApp (@ComposeFinPreimOp A B1 B2 T h g1 g2) x
-    (LabelFinPreimAppOp h x z z (finPreim_expr y1) (finPreim_expr y2)).
+  InferFinPreimApp (ComposeFinPreimOp h g1 g2)
+    (@LabelFinPreimAppOp A B1 B2 T h x z z
+       (finPreim_expr y1) (finPreim_expr y2)).
 
 Definition finPreim_minn A :=
   @FinPreimOp_nat A nat (fun=> minn) id (fun _ _ _ => leqnn _).
-Canonical FinPreim_minn A x y1 y2 := OneFinPreimOp x y1 y2 (finPreim_minn A).
+Canonical FinPreim_minn A x y1 y2 :=
+  OneFinPreimOp x y1 y2 (minn y1 y2) (finPreim_minn A).
 
 (******************************************************************************)
 (*************************** Unit Tests          ******************************)
 (******************************************************************************)
 
-(* Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
+(* 
+Arguments InferredFinpredPattern {T} _ _.
+Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
   [pred x in A]. *)
-Definition t1' (T : choiceType) (P : finPred T) : finPred T :=
-  [pred x in P] : {pred T}.
-Definition t2 (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
+(*Lemma foo (D := fun T (x : T) => True) (T : eqType) (a b : T)
+  (G : forall T A, D {finpred T} A -> D {pred T} A) :
+   D {pred _} [pred x : {n | 5 < n} | sval x == 3].
+apply: G.
+
+
+Lemma foo (D := fun T (x : T) => True) (T : eqType) (a b : T)
+  (G : forall T A, D {finpred T} A -> D {pred T} A) :
+   D {pred _} [pred x | x.1 == a & x.2 == b].
+apply: G.
+by [].
+Print Canonical Projections S.
+suff G1 L: D (labelFinPreimExpr _ N) L -> D nat (finPreim_expr L).
+have: D nat N.+1.
+Set Printing All.
+have bar A m n : @FinPreim_succ A m n = @FinPreim_IDN A m n.
+  congr LabelFinPreimApp.
+
+Label
+Lemma foo (D := fun T (x : T) => True) (T : eqType)
+  (G : forall A, D {finpred nat} A -> D {pred nat} A) :
+   D {pred nat} [pred n | n < N].
+refine (G _ _).
+Print Canonical Projections S.
+suff G1 L: D (labelFinPreimExpr _ N) L -> D nat (finPreim_expr L).
+have: D nat N.+1.
+Set Printing All.
+have bar A m n : @FinPreim_succ A m n = @FinPreim_IDN A m n.
+  congr LabelFinPreimApp.
+
+Label
+split.
+refine (G1 _ _).
+Print Canonical Projections IDN.
+have: D _ FinPreim_succ.
+rewrite /FinPreim_succ.
+rewrite /OneFinPreimApp.
+rewrite {1}/finPreim_succ.
+rewrite /CanFinPreim /PcanFinPreim.
+ simpl.
+have: D _ FinPreim_succ.
+rewrite /FinPreim_succ.
+rewrite /OneFinPreimApp. simpl.
+refine (G _ _).
+
+have: D (finpred T) pred0.
+
+refine (P _ _ _).
+have: D _ [in s].
+refine (P _ _).
+rewrite /in_mem.  /=.
+apply: P.
+Definition D {T} (x : T) := True.
+Set Printing Implicit.
+Lemma foo2 (T : eqType) (x : T) 
+           (P : forall A : {finpred T}, D A -> x \in A) : False.
+suff Q (L : labeled_pred T) : D L -> x \in L.
+have foo (A : {finpred T}) : x \in [pred x in A | x == x].
+eapply Q.
+Show Existentials.
+
+
+Definition t1' (T : eqType) (a : T) : finpred T := pred1 a : {pred T}.
+  [pred x in s] : {pred T}.
+Definition t2 (T : choiceType) (P : finpred T) (Q : pred T) : finpred T :=
   [pred x | ([in P] x) && (Q x)].
-Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
+Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finpred T :=
    [pred x | (x \in A) && (Q x)].
-Definition t4 (T : choiceType) (P : finPred T) (Q : finPred T) : finPred T :=
+Definition t4 (T : choiceType) (P : finpred T) (Q : finpred T) : finpred T :=
    [pred x | (x \in P) || (x \in Q)].
-Definition t5 (T : finType) (P : pred T) : finPred T :=
+Definition t5 (T : finType) (P : pred T) : finpred T :=
    [pred x | P x].
 Definition def (T : choiceType) (P Q : {pred T}) : pred T := [pred x : T | P x && Q x].
-Definition t6 (T : choiceType) (P : finPred T) Q : finPred T :=
+Definition t6 (T : choiceType) (P : finpred T) Q : finpred T :=
    [pred x : T | def P Q x ].
 Print SimplFun.
 About cardU1.
 Print Canonical Projections finpred.
 
-Fail Check fun (T : choiceType) (P : finPred T) => [eta P] : finPred T.
-Fail Check fun (T : choiceType) (P : finPred T) => [in P] : finPred T.
-Fail Check fun (T : choiceType) (A : {set T}) => [in A] : finPred T.
-Fail Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
-   (fun x => (P x) && (Q x)) : finPred T.
+Fail Check fun (T : choiceType) (P : finpred T) => [eta P] : finpred T.
+Fail Check fun (T : choiceType) (P : finpred T) => [in P] : finpred T.
+Fail Check fun (T : choiceType) (A : {set T}) => [in A] : finpred T.
+Fail Check fun (T : choiceType) (P : finpred T) (Q : pred T) =>
+   (fun x => (P x) && (Q x)) : finpred T.
 Fail Check fun (T : choiceType) (A : {set T}) (Q : pred T) =>
-   (fun x => (x \in A) && (Q x)) : finPred T.
-Fail Check fun (T : choiceType) (P : finPred T) (Q : finPred T) =>
-   (fun x => (P x) || (Q x)) : finPred T.
+   (fun x => (x \in A) && (Q x)) : finpred T.
+Fail Check fun (T : choiceType) (P : finpred T) (Q : finpred T) =>
+   (fun x => (P x) || (Q x)) : finpred T.
 
-Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
+Check fun (T : choiceType) (P : finpred T) (Q : pred T) =>
   enum [pred x in P | Q x].
 
 
 Check fun (T : choiceType) (A : {set T}) => enum A.
+*)
 
+(* Some operator definitions. *)
+
+Definition card {T} P := size (@support T P).
+Definition pred0b {T} P := @card T P == 0.
+Definition enum {T : choiceType} P := sort prec (@support T P).
+Definition pick {T} P := ohead (@enum T P).
 
 (******************************************************************************)
 (*************************** fintype starts here ******************************)
@@ -1061,7 +1161,7 @@ Reserved Notation "#| A |" (at level 0, A at level 99, format "#| A |").
 Notation "#| A |" := (card (pred_set A)) (only parsing): nat_scope.
 Notation "#| A |" := (card A) (only printing): nat_scope.
 
-Definition pred0b (T : choiceType) (P : finPred T) := #|P| == 0.
+Definition pred0b (T : choiceType) (P : finpred T) := #|P| == 0.
 Prenex Implicits pred0b.
 
 Module FiniteQuant.
