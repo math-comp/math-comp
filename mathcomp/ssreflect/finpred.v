@@ -984,7 +984,6 @@ Elpi Override CS All.
   [pred x in A]. *)
 Definition t1' (T : choiceType) (P : {finpred T}) : {finpred T} :=
   [pred x in P].
-Set Printing All.
 Definition t1 (T : eqType) : finpred T := pred0.
 Definition t2 (T : eqType) (P : finpred T) (Q : pred T) : {finpred T} :=
   [pred x | ([in P] x) && (Q x)].
@@ -1229,6 +1228,7 @@ Implicit Types (B : quantified) (x y : T).
 
 Lemma test : {pred T} = (T -> bool).
 reflexivity.
+Abort.
 About PredOfSimpl.coerce.
 
 Definition test (P : {pred T}) : finpred T := P.
