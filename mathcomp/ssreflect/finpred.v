@@ -302,9 +302,12 @@ Structure finpred_of T (P : {pred _}) := FinpredOf {
   finpred_of_finpred :> finpred T;
   #[canonical=no] finpred_of_eq : mem_finpred finpred_of_finpred = P
 }.
+Add Printing Constructor finpred_of.
 Canonical finpred_of_self (T : eqType) (F : finpred T) :=
   FinpredOf (@erefl _ (mem_finpred F)).
-Add Printing Constructor finpred_of.
+Definition coerce_finpred_of {T} P (F : @finpred_of T P) :=
+  Finpred (let: erefl in _ = P := finpred_of_eq F return finpredEnvelope P in
+           finpred_envelope F).
 
 Structure finpred_pattern T := FinpredPattern {
   pattern_pred :> labeled_pred T;
@@ -761,20 +764,28 @@ Definition LabelPreimPred {A T : eqType} (b : labeled_bool)
 Canonical InferPreimPred {A T : eqType} P b (Ff : finpred T) (F : finpred A)
     (eF : forall x : A, inferFinPreim Ff F x) :=
   OpFinpred P F (LabelPreimPred b P Ff (fun x => finPreim_val (eF x))).
-Definition OneFinpredPred (A T : eqType) (Ff : finpred T) (f : A -> T) b0 :=
-  LabelPreimPred (LabelBool b0) (preim f (mem_finpred Ff))
-        Ff (fun x => TryVar (TryVal (f x))).
-Fixpoint ManyFinpredPred {A T : eqType} (b0 : bool) (f : A -> T)
-     (Ffs : seq (finpred T)) :=
+Definition FinpredPredFor (A T : eqType) z0 (P : {pred T}) Ff f :=
+  @LabelPreimPred A T z0 [preim f of P] Ff (fun x => TryVar (TryVal (f x))).
+Definition OneFinpredPred A T b0 Ff :=
+  @FinpredPredFor A T (LabelBool b0) (mem_finpred Ff) Ff.
+Fixpoint ManyFinpredPred {A T : eqType} b0 Ffs f :=
   if Ffs isn't Ff :: Ffs' then LabelBool b0 else
-  LabelPreimPred (ManyFinpredPred b0 f Ffs')
-    (preim f (mem_finpred Ff)) Ff (fun x => TryVar (TryVal (f x))).
+  @FinpredPredFor A T (ManyFinpredPred b0 Ffs' f) (mem_finpred Ff) Ff f.
+Arguments FinpredPredFor A {T} z0 P Ff f.
+Arguments OneFinpredPred A {T} b0 Ff f.
+Arguments ManyFinpredPred A {T} b0 Ffs f.
 
-Canonical Finpred_leq A m0 m n :=
-   @OneFinpredPred A _ (finpred_leq n) m (m0 <= n).
+Canonical Finpred_finpred {A T} y0 (F : finpred T) f :=
+  OneFinpredPred A (mem_finpred F y0) F f.
 
-Canonical Finpred_eq (A T : eqType) a x0 y0 (y : A -> T) :=
-  ManyFinpredPred (x0 == y0 :> T) y [:: finpred1 a; finpred1x a].
+Canonical Finpred_finpred_pattern {A T} y0 (F : finpred_pattern T) f :=
+  FinpredPredFor A (LabelBool (unlabel_pred F y0)) F (coerce_finpred_of F) f.
+
+Canonical Finpred_seq {A T} s f y0 :=
+  @OneFinpredPred A T (mem_seq s y0) (finpred_seq s) f.
+Canonical Finpred_leq A m0 n m := OneFinpredPred A (m0 <= n) (finpred_leq n) m.
+Canonical Finpred_eq (A T : eqType) (a x0 y0 : T) y :=
+  ManyFinpredPred A (x0 == y0 :> T) [:: finpred1 a; finpred1x a] y.
 
 Definition finPreim_succ A := @CanFinPreim A _ _ succn predn (frefl _).
 Canonical FinPreim_succ A x n := OneFinPreimApp x n n.+1 (finPreim_succ A).
@@ -840,13 +851,6 @@ Canonical InferPreimFinpred {A T : eqType} c (Pf : {pred A}) (P : {pred T}) F Ff
      (LabelPreimFinpred Pf P (fun=> eF) (fun x => finPreim_val (eFf x)) c).
 Canonical Finpred_in {A T} P f x0 Q0 :=
   @LabelOnePreimFinpred A T (fun x P => x \in P) P f x0 Q0.
-Canonical Finpred_finpred {A T} F f y0 :=
-  let b0 := mem_finpred F y0 in let Pf x := mem_finpred F (f x) in
-  @LabelPreimPred A T (LabelBool b0) Pf F (fun x => TryVal (f x)).
-Canonical Finpred_finpred_pattern {A T} (F : finpred_pattern T) f y0 :=
-  let b0 := unlabel_pred F y0 in let Pf x := unlabel_pred F (f x) in
-  @LabelPreimPred A T (LabelBool b0) Pf F (fun x => TryVal (f x)).
-Canonical Finpred_seq {A T} s f y0 := @OneFinpredPred A T (finpred_seq s) f y0.
 
 Structure finPreimOp (A B1 B2 T : eqType) := FinPreimOp {
   finPreim_op :> A -> B1 -> B2 -> T;
