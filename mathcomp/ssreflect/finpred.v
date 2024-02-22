@@ -952,14 +952,17 @@ Elpi Accumulate cs.db lp:{{
     coq.say "cs: Proj is pred_set",
     std.spy(Sol = {{@finPred_of_set lp:EqT lp:RHS}}).*/
 
-  cs Ctx ({{@mem_finpred lp:T}}) RHS Sol :- !, std.do![
+  cs Ctx ({{@mem_finpred lp:_T}}) RHS Sol :- !, std.do![
     coq.say "cs: Proj is mem_finpred",
     coq.say "Ctx is" Ctx,
     coq.say "RHS = " RHS,
     coq.say "RHS is" {coq.term->string RHS},
-    find T RHS FinPred,
+    coq.typecheck RHS {{_ -> bool}} ok,
+    % std.assert-ok! (coq.typecheck RHS {{(lp:T) -> bool}}) "value is ill-typed",
+    % coq.elaborate-skeleton T {{eqType}} EqT ok,
+    find _ RHS FinPred,
     coq.say "found" FinPred,
-    std.assert-ok! (coq.typecheck FinPred _) "solution is ill typed",
+    std.assert-ok! (coq.typecheck FinPred _) "solution is ill-typed",
     Sol = FinPred,
     coq.say "Sol is" {coq.term->string Sol}
   ].
@@ -972,7 +975,7 @@ Goal forall T (P : finpred T) x, finpred P x = mem_set P x.
 move=> T x; reflexivity. *)
 
 Elpi Override CS All.
-(*Set Debug "elpi-unification".*)
+(* Set Debug "elpi-unification". *)
 (******************************************************************************)
 (*************************** Unit Tests          ******************************)
 (******************************************************************************)
@@ -1066,9 +1069,10 @@ Qed.
 End finpred_finType.
 
 Elpi Accumulate cs.db lp:{{
+  % TODO: BUG: this backtracks when unifying the solution at the end when the type is not finite and may be a major source of inefficiency.
+  % We must find a way to detect early the type (RHS and LHS in isolation are unreliable) and to test once and for all whether we can use the finType solution.
   :before "find-unfold"
-  find EqT ({{fun x => lp:(P x)}} as Pred) {{@finpred_finType FinT Pred}}) :-
-    coq.elaborate EqT {{finType}} FinT ok, !.  
+  find _ Pred {{@finpred_finType _ lp:Pred}}.  
 }}.
 Elpi Typecheck canonical_solution.
 
@@ -1222,6 +1226,20 @@ Section Definitions.
 
 Variable T : finType.
 Implicit Types (B : quantified) (x y : T).
+
+Lemma test : {pred T} = (T -> bool).
+reflexivity.
+About PredOfSimpl.coerce.
+
+Definition test (P : {pred T}) : finpred T := P.
+
+Definition def (Bp : T -> T -> quantified) : {pred T} :=
+  [pred x : T | let: F^* := Bp x x in F].
+
+(* Set Debug "elpi-unification". *)
+Definition test' (Bp : T -> T -> quantified) : finpred T := 
+    (def Bp).
+
 
 Definition quant0b Bp := pred0b [pred x : T | let: F^* := Bp x x in F].
 (* The first redundant argument protects the notation from  Coq's K-term      *)
