@@ -242,7 +242,7 @@ Proof. by case=> ? []. Qed.
 (* theory also need T to have Choice. We define                               *)
 (*   {finpred T} == the type of predicates with finite support. This type     *)
 (*                  coerces to {pred T}, and this coercion will unify with    *)
-(*                  many predicates tha have finite support, thereby          *)
+(*                  many predicates that have finite support, thereby         *)
 (*                  inferring said support (see list below).                  *)
 (*     finpred T == the representation type for predicates with finite        *)
 (*                  support. This type is used to declare arguments of        *)
@@ -251,7 +251,7 @@ Proof. by case=> ? []. Qed.
 (*                  finpred may not preserve the shape of P - it can present  *)
 (*                  a predicate P' convertible but not identical to P.        *)
 (*                  For this reason {finpred T} should always be used for     *)
-(*                  declaring lamma contexts.                                 *)
+(*                  declaring lemma contexts.                                 *)
 (* card P, #|P| == the cardinal of the support of a finpred P.                *)
 (*     pred0b P == the finpred P is empty (always false).                     *)
 (*    P \subset Q <=> the finpred P is a subset of the (plain) predicate Q    *)
@@ -265,6 +265,17 @@ Proof. by case=> ? []. Qed.
 (*                 enum P is a subsequence of enum Q when {subset P <= Q}     *)
 (*       pick P == Some standard x such that P x, or None if P is empty.      *)
 (*                 pick P is extensional and requires Choice on T.            *)
+(*                                                                            *)
+(* Shape of predicates that can be inferred as finpred's                      *)
+(* (T : choiceType unless stated otherwise):                                  *)
+(* - [pred x in P]                       with P : finpred T                   *)
+(* - [pred x | P x && Q x]               with P : finpred T or Q : finpred T  *)
+(*   e.g., [pred x | ([in P] x) && Q x] with P : finpred T                    *)
+(* - [pred x | (x \in P) || (x \in Q)]   with P, Q : finpred T                *)
+(* - [pred x | P x]                      with P : pred T and T : finType      *)
+(* - [pred x : T | def x ]               where def's sort can be inferred to  *)
+(*                                       be of type finPred T                 *)
+(*                                                                            *)
 
 Definition finpred_pred_target (T : eqType) := pred T.
 
@@ -891,6 +902,7 @@ Canonical FinPreim_minn A x y1 y2 :=
 Arguments InferredFinpredPattern {T} _ _.
 Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
   [pred x in A]. *)
+
 (*Lemma foo (D := fun T (x : T) => True) (T : eqType) (a b : T)
   (G : forall T A, D {finpred T} A -> D {pred T} A) :
    D {pred _} [pred x : {n | 5 < n} | sval x == 3].
@@ -953,8 +965,8 @@ eapply Q.
 Show Existentials.
 
 
-Definition t1' (T : eqType) (a : T) : finpred T := pred1 a : {pred T}.
-  [pred x in s] : {pred T}.
+Definition t1' (T : choiceType) (P : finpred T) : finpred T :=
+  [pred x in P] : {pred T}.
 Definition t2 (T : choiceType) (P : finpred T) (Q : pred T) : finpred T :=
   [pred x | ([in P] x) && (Q x)].
 Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finpred T :=
