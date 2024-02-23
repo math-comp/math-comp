@@ -234,6 +234,26 @@ Proof. by case=> ? []. Qed.
 
 (* End of ssrfun complements. *)
 
+(* Corresponding eqtype additions. *)
+
+#[hnf] HB.instance Definition _ (I : eqType) (T1_ T2_ : I -> eqType) :=
+   Equality.copy {i : I & T1_ i & T2_ i} (can_type tag_of_tag2K).
+
+Definition otagged_at {I : eqType} {i T_} (w : {i : I & T_ i}) :=
+  if tag w =P i isn't ReflectT Ewi then None else
+  ecast i (option (T_ i)) Ewi (Some (tagged w)).
+
+Lemma TaggedK (I : eqType) T_ i : pcancel (@Tagged I i T_) otagged_at.
+Proof.
+by rewrite /otagged_at => y; case: eqP => //= Eii; rewrite eq_axiomK.
+Qed.
+
+Lemma Tagged2K (I : eqType) i T1_ T2_ y1 :
+  pcancel (@Tagged2 I i T1_ T2_ y1) (omap snd \o otagged_at \o tag_of_tag2).
+Proof. by move=> y2; rewrite /= TaggedK. Qed.
+
+(* End of eqtype complements. *)
+
 (*   This module provides facilities for handling (boolean) predicates with   *)
 (* finite support, i.e., for which an explicit list of the values for which   *)
 (* the predicate holds can given. These facilities include an extensive and   *)
@@ -315,9 +335,10 @@ Structure finpred_pattern T := FinpredPattern {
 }.
 #[reversible=no] Coercion pattern_of_finpred T (A : finpred T) :=
   @FinpredPattern T (LabelPred (mem_finpred A)) (finpred_of_self A).
-
 Notation "{ 'finpred' T }" := (finpred_pattern T)
    (at level 0, T at level 100, format "{ 'finpred'  T }") : type_scope.
+Definition coerce_finpred_pattern {T} (A : {finpred T}) :=
+  coerce_finpred_of A.
 
 Structure coercedFinpred (T : eqType) := CoercedFinpred {
   pred_of_coerced :> finpred_pred_target T;
@@ -354,7 +375,7 @@ Canonical InferredFinpredPattern T P (F : _ -> @finpred_of T P) :=
   let pilot x := TryFalse (P x) in
   @FinpredPattern T (TryInferFinpred (LabelPred P) pilot F) (unkeyed (F P)).
 Notation "P" := (@InferredFinpredPattern _ P _)
-   (at level 0, only printing) : fun_scope.
+   (at level 8, only printing) : fun_scope.
 
 Structure coercionPredType T := CoercionPredType {
   coercionPredType_sort :> Type;
@@ -373,7 +394,7 @@ Canonical FinpredOfPattern T pT P0 (P := @coercionPredType_coerce _ pT P0) F :=
   @FinpredPattern T (unkeyed (LabelPred P))
                     (@FinpredOfReverseCoercion T pT P0 P F).
 Notation "P0" := (@FinpredOfPattern _ _ P0 _)
-   (at level 0, only printing) : fun_scope.
+   (at level 8, only printing) : fun_scope.
 
 Definition finpred_source := finpred.
 Canonical FinpredFinpredPattern T (F : finpred_source T) :=
@@ -701,8 +722,10 @@ Add Printing Constructor finPreimFun.
 Program Definition PcanFinPreim A {B T} f g (fK : pcancel f g) :=
   @FinPreimFun A B T (fun=> f) _.
 Next Obligation. by exists (seq_of_opt \o g) => _ y /=; rewrite fK inE. Qed.
+Arguments PcanFinPreim A {B T} f g fK.
 Definition CanFinPreim A {B T} f g (fK : cancel f g) :=
-  @PcanFinPreim A B T f _ (can_pcan fK).
+  @PcanFinPreim A B T f (Some \o g) (can_pcan fK).
+Arguments CanFinPreim A {B T} f g fK.
 Program Definition ComposeFinPreim {A B C T}
     (f : finPreimFun A C T) (g : finPreimFun A B C) :=
   @FinPreimFun A B T (fun x y => f x (g x y)) _.
@@ -724,10 +747,25 @@ Fixpoint ManyFinPreimApp {A B T} x y f0xy (fs : seq (finPreimFun A B T)) :=
   if fs isn't f :: fs' then LabelFinPreimExpr x f0xy else
   let z := LabelFinPreimExpr x (f x y) in
   @LabelFinPreimApp A B T f x z (ManyFinPreimApp x y f0xy fs') (TryVal y).
-
+About ecast.
 Canonical LabelValFinPreim {A T : eqType} {P} (B : @subEqType T P) x y :=
   let z := LabelFinPreimExpr x (TryVal (val y)) in
-  @LabelFinPreimApp A B T (PcanFinPreim A valK) x z z y.
+  @LabelFinPreimApp A B T (PcanFinPreim A val _ valK) x z z y.
+
+Definition finPreim_pair A (T1 T2 : eqType) (y1 : T1) :=
+  @CanFinPreim A T2 _ (pair y1) snd (frefl _).
+Canonical FinPreim_pair A x (T1 T2 : eqType) (y1 : T1) (y2 : T2) :=
+  OneFinPreimApp x y2 (y1, y2) (finPreim_pair A T2 y1).
+
+Definition finPreim_Tagged A I (T_ : _ -> eqType) i :=
+  PcanFinPreim A (Tagged T_) otagged_as (@TaggedK I T_ i).
+Canonical FinPreim_Tagged A x (I : eqType) (T_ : I -> eqType) i y :=
+  OneFinPreimApp x y (Tagged T_ y) (finPreim_Tagged A T_ i).
+
+Definition finPreim_Tagged2 A (I : eqType) i (T1_ T2_ : I -> eqType) y1 :=
+  PcanFinPreim A (Tagged2 T1_ T2_ y1) _ (@Tagged2K I i T1_ T2_ y1).
+Canonical FinPreim_Tagged2 A x (I : eqType) (T1_ T2_ : I -> eqType) i y1 y2 :=
+  OneFinPreimApp x y2 (Tagged2 T1_ T2_ y1 y2) (@finPreim_Tagged2 A I i _ _ y1).
 
 Canonical LabelVarFinPreim {A} x := @LabelFinPreimExpr A A x x.
 Definition MarkComp T := @id T.
@@ -779,7 +817,8 @@ Canonical Finpred_finpred {A T} y0 (F : finpred T) f :=
   OneFinpredPred A (mem_finpred F y0) F f.
 
 Canonical Finpred_finpred_pattern {A T} y0 (F : finpred_pattern T) f :=
-  FinpredPredFor A (LabelBool (unlabel_pred F y0)) F (coerce_finpred_of F) f.
+  FinpredPredFor A (LabelBool (unlabel_pred F y0))
+                 F (coerce_finpred_pattern F) f.
 
 Canonical Finpred_seq {A T} s f y0 :=
   @OneFinpredPred A T (mem_seq s y0) (finpred_seq s) f.
