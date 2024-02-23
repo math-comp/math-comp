@@ -1648,53 +1648,54 @@ move=> eqAB C; congr (_ == 0); apply: eq_card => x /=.
 by rewrite!inE [X in X && _]eqAB.
 Qed.
 
-Lemma eq_disjoint_r A B : A =i B ->
+Lemma eq_disjoint_r (A B : {pred T}) : A =i B ->
   (@disjoint T)^~ (mem A) =1 (@disjoint T)^~ (mem B).
 Proof.
 move=> eqAB C; congr (_ == 0); apply: eq_card => x /=.
 by rewrite !inE [X in _ && X]eqAB.
 Qed.
 
-Lemma disjointFr A B x : [disjoint A & B] -> x \in A -> x \in B = false.
+Lemma disjointFr A (B : {pred T}) x : [disjoint A & B] ->
+  x \in A -> x \in B = false.
 Proof.
 move/pred0P/(_ x) => /=; rewrite -[X in X && _]/(x \in A).
 by case: (x \in A).
 Qed.
 
-Lemma disjointFl A B x : [disjoint A & B] -> x \in B -> x \in A = false.
-Proof. rewrite disjoint_sym; exact: disjointFr. Qed.
+Lemma disjointFl A (B : {pred T}) x : [disjoint A & B] ->
+  x \in B -> x \in A = false.
+Proof.
+move/pred0P/(_ x) => /=; rewrite -[X in _ && X]/(x \in B) andbC.
+by case: (x \in B).
+Qed.
 
-Lemma disjoint0 A : [disjoint pred0 & A].
+Lemma disjoint0 (A : {pred T}) : [disjoint pred0 & A].
 Proof. exact/(pred0P (finpredIr _ _)). Qed.  (* FIXME: was exact/pred0P *)
 
-FIN.
-
-Lemma eq_disjoint0 A B : A =i pred0 -> [disjoint A & B].
-Proof. by move/eq_disjoint->; apply: disjoint0. Qed.
+Lemma eq_disjoint0 A (B : {pred T}) : A =i pred0 -> [disjoint A & B].
+Proof. by move/(@eq_disjoint _ pred0)->; apply: disjoint0. Qed.
 
 Lemma disjoint1 x A : [disjoint pred1 x & A] = (x \notin A).
 Proof.
+case/boolP: (x \in A).
+
+case: (x \in A).
+
 apply/negbRL/(sameP (pred0Pn _))=> /=.
 apply: introP => [Ax | notAx [_ /andP[/eqP->]]]; last exact: negP.
 by exists x; rewrite inE eqxx.
 Qed.
 
-Lemma eq_disjoint1 x A B :
-  A =i pred1 x ->  [disjoint A & B] = (x \notin B).
-Proof. by move/eq_disjoint->; apply: disjoint1. Qed.
 
-Lemma disjointU A B C :
-  [disjoint predU A B & C] = [disjoint A & C] && [disjoint B & C].
+
+Lemma disjointU A B (C : {pred T}) :
+  [disjoint predU [in A] [in B] & C] = [disjoint A & C] && [disjoint B & C].
 Proof.
-case: [disjoint A & C] / (pred0P (xpredI A C)) => [A0 | nA0] /=.
-  by congr (_ == 0); apply: eq_card => x; rewrite [x \in _]andb_orl A0.
+case: [disjoint A & C] / (pred0P (predI [in A] C)) => [A0 | nA0] /=.
+  by apply: eq_pred0b => x /=; rewrite [x \in _]andb_orl [X in X || _]A0.
 apply/pred0P=> nABC; case: nA0 => x; apply/idPn=> /=; move/(_ x): nABC.
 by rewrite [_ x]andb_orl; case/norP.
 Qed.
-
-Lemma disjointU1 x A B :
-  [disjoint predU1 x A & B] = (x \notin B) && [disjoint A & B].
-Proof. by rewrite disjointU disjoint1. Qed.
 
 Lemma disjoint_cons x s B :
   [disjoint x :: s & B] = (x \notin B) && [disjoint s & B].
@@ -1823,6 +1824,21 @@ apply: (iffP card_geqP) => [[s] []|[x] [y] [z] [[xD yD zD] [xDy xDz yDz]]].
 exists [:: x; y; z]; rewrite /= !inE negb_or xDy xDz eq_sym yDz; split=> // u.
 by rewrite !inE => /or3P [] /eqP->.
 Qed.
+
+Lemma disjoint1 x A : [disjoint pred1 x & A] = (x \notin A).
+Proof.
+apply/negbRL/(sameP (pred0Pn _))=> /=.
+apply: introP => [Ax | notAx [_ /andP[/eqP->]]]; last exact: negP.
+by exists x; rewrite inE eqxx.
+Qed.
+
+Lemma eq_disjoint1 x A B :
+  A =i pred1 x ->  [disjoint A & B] = (x \notin B).
+Proof. by move/eq_disjoint->; apply: disjoint1. Qed.
+
+Lemma disjointU1 x A (B : {pred T}) :
+  [disjoint predU1 x [in A] & B] = (x \notin B) && [disjoint A & B].
+Proof. by rewrite disjointU disjoint1. Qed.
 
 
 
