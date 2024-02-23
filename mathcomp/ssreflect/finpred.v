@@ -1041,7 +1041,7 @@ Notation "#| A |" := (card A) (only printing): nat_scope.
 
 Definition pred0b {T} P := @card T P == 0.
 
-HB.lock Definition enum {T : choiceType} P := sort prec (@support T P).
+HB.lock Definition enum {T : choiceType} P := sort prec_eq (@support T P).
 Canonical enum_unlockable := Unlockable enum.unlock.
 Definition pick {T} P := ohead (@enum T P).
 
@@ -1130,7 +1130,7 @@ End finpred_finType.
 Module Export FiniteNES.
 Module Finite.
 
-HB.lock Definition enum T := sort prec (isFinite.enum_subdef (Finite.class T)).
+HB.lock Definition enum T := sort prec_eq (isFinite.enum_subdef (Finite.class T)).
 Canonical enum_unlockable := Unlockable enum.unlock.
 
 Notation axiom := finite_axiom.
@@ -1140,8 +1140,13 @@ Notation EnumMixin m := (@isFinite.Build _ _ m).
 Lemma uniq_enumP (T : eqType) e : uniq e -> e =i T -> axiom e.
 Proof. by move=> Ue sT x; rewrite count_uniq_mem ?sT. Qed.
 
-Lemma enum_prec_sorted T : sorted prec (enum T).
-Abort.
+Lemma enum_prec_eq_sorted T : sorted prec_eq (enum T).
+Proof. by rewrite unlock sort_sorted//; apply: prec_eq_total. Qed.
+
+Lemma enumP T : axiom (enum T).
+Proof.
+by move=> x; rewrite unlock (permP (permEl (perm_sort _ _))) enumP_subdef.
+Qed.
 
 Section WithCountType.
 Variable (T : countType).
@@ -1839,7 +1844,7 @@ Arguments card_gt1P {T A}.
 Arguments card_gt2P {T A}.
 Arguments properP {T A B}.
 
-Section ChoiceOpsTheory_choiceType.
+Section ChoiceOpsTheory.
 Variable T : choiceType.
 Implicit Types (A B : {finpred T}) (C D : {pred T}).
 Implicit Types (P Q : pred T) (x y : T) (s : seq T).
@@ -1862,31 +1867,37 @@ apply: perm_small_eq => //; apply: uniq_perm => // y.
 by rewrite mem_enum/= !inE.
 Qed.
 
-Lemma pickP (A : finpred T) : pick_spec (A : {pred T}) (pick A).
+Lemma pickP A : pick_spec (A : {pred T}) (pick A).
 Proof.
-Admitted.
+rewrite /pick; case: (enum _) (mem_enum A) => [|x s] Axs /=.
+  by right; apply: fsym.
+by left; rewrite -[_ x]Axs mem_head.
+Qed.
 
 (* Should we keep it? *)
 Definition set_pickP (A : finpred T) : pick_spec [in A] (pick A) := pickP A.
 
+Lemma enum_prec_eq_sorted A : sorted prec_eq (enum A).
+Proof. by rewrite unlock sort_sorted//; apply: prec_eq_total. Qed.
+
 Lemma eq_enum A B : A =i B -> enum A = enum B.
-Proof. Admitted.
+Proof.
+move=> AB; apply: (@sorted_eq _ prec_eq).
+- exact: prec_eq_trans.
+- exact: prec_eq_antisymmetric.
+- exact: enum_prec_eq_sorted.
+- exact: enum_prec_eq_sorted.
+- by apply: uniq_perm => // x; rewrite !mem_enum.
+Qed.
 
 Lemma eq_pick A B : A =i B -> pick A = pick B.
-Proof. Admitted.
+Proof. by rewrite /pick => /eq_enum->. Qed.
 
 Lemma cardE A : #|A| = size (enum A).
 Proof. by rewrite !unlock size_sort. Qed.
 
-End ChoiceOpsTheory_choiceType.
+End ChoiceOpsTheory.
 #[export] Hint Resolve enum_uniq : core.
-
-Section FinOpsTheory_eqType.
-Variable T : eqType.
-
-Implicit Types (A B : {finpred T}).
-Implicit Types (C D : {pred T}) (P Q : pred T) (x y : T) (s : seq T).
-
 
 Section FinOpsTheory_finType.
 Variable T : finType.
@@ -1910,133 +1921,45 @@ Qed.
 Lemma predT_subset A : T \subset A -> forall x, x \in A.
 Proof. by move/subsetP=> allA x; apply: allA. Qed.
 
-
-
-
-
-
-
-
-Lemma enumP : Finite.axiom (Finite.enum T).
-Proof.
-rewrite unlock => x.
-Admitted.
-
 Lemma enumT : enum T = Finite.enum T.
-Proof. Admitted.
+Proof.
+apply: (@sorted_eq _ prec_eq).
+- exact: prec_eq_trans.
+- exact: prec_eq_antisymmetric.
+- exact: enum_prec_eq_sorted.
+- exact: Finite.enum_prec_eq_sorted.
+- apply: uniq_perm => //.
+  + by apply: count_mem_uniq => x; rewrite -has_pred1 has_count Finite.enumP.
+  + by move=> x; rewrite mem_enum inE -has_pred1 has_count Finite.enumP.
+Qed.
 
 Lemma cardT : #|T| = size (enum T). Proof. by rewrite cardE. Qed.
 
 Lemma eq_cardT A : A =i predT -> #|A| = size (enum T).
 Proof. exact: eq_card_trans cardT. Qed.
 
-Lemma cardUI A B : #|[predU A & B]| + #|[predI A & B]| = #|A| + #|B|.
-Proof.
-Fail rewrite cardsUI. (* fixme by using finiteness only at the leafs *)
-by rewrite -[RHS]cardsUI; congr (_ + _); apply: eq_card.
-Qed.
-
-Lemma cardID B A : #|[predI A & B]| + #|[predD A & B]| = #|A|.
-Proof.
-rewrite -[RHS](cardsID B A); congr (_ + _); apply: eq_card => //.
-by move=> x; rewrite !inE andbC.
-Qed.
-
 Lemma cardC A : #|A| + #|[predC A]| = #|T|.
-Proof. Admitted.
-(* notes:
+Proof.
+rewrite -cardUI/= cardT.
+rewrite [X in X + _]eq_cardT.
 
-today:
-Lemma cardU1 (T : finType) (x : T) (A : {pred T}) : #|[predU1 x & A]| = (x \notin A) + #|A|.
+           (@eq_card _ _ T).
+2:{ rewrite /= => x; rewrite inE orbN.
+    Search card "T".
 
-options for the future:
-Lemma cardU1 (T : choiceType) (x : T) (A : finPred T) :
-  #|[predU1 x & A]| = (x \notin A) + #|A|.
-Lemma cardU1 (T : choiceType) (x : T) A S (_ : finPred_aux T [predU1 x & A] S) :
-  #|S| = (x \notin A) + #|A|.
-rewrite cardU1. (* works no matter how you derive the finiteness of [predU1 x & A] *)
+rewrite unlock.
 
-*)
-Lemma cardU1 x A : #|[predU1 x & A]| = (x \notin A) + #|A|.
-Proof. by rewrite -cardsU1; apply: eq_card. Qed.
 
-Lemma card2 x y : #|pred2 x y| = (x != y).+1.
-Proof. by rewrite cardU1 card1 addn1. Qed.
+
+Admitted.
 
 Lemma cardC1 x : #|predC1 x| = #|T|.-1.
 Proof. by rewrite -(cardC (pred1 x)) card1. Qed.
 
-Lemma cardD1 x A : #|A| = (x \in A) + #|[predD1 A & x]|.
-Proof.
-case Ax: (x \in A); last first.
-  by apply: eq_card => y /[!inE]/=; case: eqP => // ->.
-rewrite /= -(card1 x) -cardUI addnC /=.
-rewrite [#|predI _ _|]eq_card0 => [|y]; last by rewrite !inE; case: eqP.
-by apply: eq_card => y /[!inE]; case: eqP => // ->.
-Qed.
-
 Lemma max_card A : #|A| <= #|T|.
 Proof. by rewrite -(cardC A) leq_addr. Qed.
 
-Lemma card_size s : #|s| <= size s.
-Proof.
-elim: s => [|x s IHs] /=; first by rewrite card0.
-by rewrite cardU1 /=; case: (~~ _) => //; apply: leqW.
-Qed.
-
-Lemma card_uniqP s : reflect (#|s| = size s) (uniq s).
-Proof.
-(* TODO(gg): old thm, revisit the proof using the theory of permutations from seq.v *)
-elim: s => [|x s IHs]; first by left; apply: card0.
-rewrite cardU1 /= /addn; case: {+}(x \in s) => /=.
-  by right=> card_Ssz; have:= card_size s; rewrite card_Ssz ltnn.
-by apply: (iffP IHs) => [<-| [<-]].
-Qed.
-
-Lemma card0_eq A : #|A| = 0 -> A =i pred0.
-Proof. by move=> A0 x; apply/idP => Ax; rewrite (cardD1 x) Ax in A0. Qed.
-
 Lemma fintype0 : T -> #|T| <> 0. Proof. by move=> x /card0_eq/(_ x). Qed.
-
-Lemma pred0P P : reflect (P =1 pred0) (pred0b P).
-Proof. by apply: (iffP eqP); [apply: card0_eq | apply: eq_card0]. Qed.
-
-Lemma pred0Pn P : reflect (exists x, P x) (~~ pred0b P).
-Proof.
-case: (pickP P) => [x Px | P0].
-  by rewrite (introN (pred0P P)) => [|P0]; [left; exists x | rewrite P0 in Px].
-by rewrite -lt0n eq_card0 //; right=> [[x]]; rewrite P0.
-Qed.
-
-Lemma card_gt0P A : reflect (exists i, i \in A) (#|A| > 0).
-Proof. by rewrite lt0n; apply: pred0Pn. Qed.
-
-Lemma card_le1P {A} : reflect {in A, forall x, A =i pred1 x} (#|A| <= 1).
-Proof.
-apply: (iffP idP) => [A1 x xA y|]; last first.
-  by have [/= x xA /(_ _ xA)/eq_card1->|/eq_card0->//] := pickP [in A].
-move: A1; rewrite (cardD1 x) xA ltnS leqn0 => /eqP/card0_eq/(_ y).
-by rewrite !inE; have [->|]:= eqP.
-Qed.
-
-Lemma mem_card1 A : #|A| = 1 -> {x | A =i pred1 x}.
-Proof.
-move=> A1; have /card_gt0P/sigW[x xA]: #|A| > 0 by rewrite A1.
-by exists x; apply/card_le1P; rewrite ?A1.
-Qed.
-
-Lemma card1P A : reflect (exists x, A =i pred1 x) (#|A| == 1).
-Proof.
-by apply: (iffP idP) => [/eqP/mem_card1[x inA]|[x /eq_card1/eqP//]]; exists x.
-Qed.
-
-Lemma card_le1_eqP A :
-  reflect {in A &, forall x, all_equal_to x} (#|A| <= 1).
-Proof.
-apply: (iffP card_le1P) => [Ale1 x y xA yA /=|all_eq x xA y].
-  by apply/eqP; rewrite -[_ == _]/(y \in pred1 x) -Ale1.
-by rewrite inE; case: (altP (y =P x)) => [->//|]; exact/contra_neqF/all_eq.
-Qed.
 
 Lemma fintype_le1P : reflect (forall x : T, all_equal_to x) (#|T| <= 1).
 Proof. apply: (iffP (card_le1_eqP {:T})); [exact: in2T | exact: in2W]. Qed.
@@ -2051,6 +1974,8 @@ Proof.
 apply: (iffP idP) => [/eqP/fintype1|] [x eqx]; first by exists x.
 by apply/card1P; exists x => y; rewrite eqx !inE eqxx.
 Qed.
+
+xxxxxx
 
 Lemma subsetE A B : (A \subset B) = pred0b [predD A & B].
 Proof. by rewrite unlock. Qed.
