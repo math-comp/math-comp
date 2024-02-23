@@ -319,9 +319,14 @@ Definition support {T} (P : finpred T) := undup (filter [in P] (envelope P)).
 Lemma support_uniq T P : uniq (@support T P). Proof. exact: undup_uniq. Qed.
 
 Lemma mem_support T P : @support T P =i P.
+#[export] Hint Resolve support_uniq : core.
 Proof.
 by case: P => P [s sPs] x; rewrite mem_undup mem_filter; apply/andb_idr/sPs.
 Qed.
+
+Module Export InE_MemSupport.
+Definition inE := (mem_support, inE).
+End InE_MemSupport.
 
 Structure inferFinpred (T : eqType) (P : {pred T}) (F : finpred T) :=
   InferFinpred { finpred_pilot :> bool }.
@@ -1028,10 +1033,50 @@ Fail Check fun (T : choiceType) (A : {set T}) => enum A.
 
 HB.lock Definition card {T} P := size (@support T P).
 Canonical card_unlockable := Unlockable card.unlock.
+
+(* A is at level 99 to allow the notation #|G : H| in groups. *)
+Reserved Notation "#| A |" (at level 0, A at level 99, format "#| A |").
+Notation "#| A |" := (card ((*pred_set*) A)) (only parsing): nat_scope.  (* TODO *)
+Notation "#| A |" := (card A) (only printing): nat_scope.
+
 Definition pred0b {T} P := @card T P == 0.
+
 HB.lock Definition enum {T : choiceType} P := sort prec (@support T P).
 Canonical enum_unlockable := Unlockable enum.unlock.
 Definition pick {T} P := ohead (@enum T P).
+
+Notation "[ 'pick' x | P ]" := (pick (fun x => P%B))
+  (at level 0, x name, format "[ 'pick'  x  |  P  ]") : form_scope.
+Notation "[ 'pick' x : T | P ]" := (pick (fun x : T => P%B))
+  (at level 0, x name, only parsing) : form_scope.
+Definition pick_true T (x : T) := true.
+Reserved Notation "[ 'pick' x : T ]"
+  (at level 0, x name, format "[ 'pick'  x : T ]").
+Notation "[ 'pick' x : T ]" := [pick x : T | pick_true x]
+  (only parsing) : form_scope.
+Notation "[ 'pick' x : T ]" := [pick x : T | pick_true _]
+  (only printing) : form_scope.
+Notation "[ 'pick' x ]" := [pick x : _]
+  (at level 0, x name, only parsing) : form_scope.
+Notation "[ 'pick' x | P & Q ]" := [pick x | P && Q ]
+  (at level 0, x name,
+   format "[ '[hv ' 'pick'  x  |  P '/ '   &  Q ] ']'") : form_scope.
+Notation "[ 'pick' x : T | P & Q ]" := [pick x : T | P && Q ]
+  (at level 0, x name, only parsing) : form_scope.
+Notation "[ 'pick' x 'in' A ]" := [pick x | x \in A]
+  (at level 0, x name, format "[ 'pick'  x  'in'  A  ]") : form_scope.
+Notation "[ 'pick' x : T 'in' A ]" := [pick x : T | x \in A]
+  (at level 0, x name, only parsing) : form_scope.
+Notation "[ 'pick' x 'in' A | P ]" := [pick x | x \in A & P ]
+  (at level 0, x name,
+   format "[ '[hv ' 'pick'  x  'in'  A '/ '   |  P ] ']'") : form_scope.
+Notation "[ 'pick' x : T 'in' A | P ]" := [pick x : T | x \in A & P ]
+  (at level 0, x name, only parsing) : form_scope.
+Notation "[ 'pick' x 'in' A | P & Q ]" := [pick x in A | P && Q]
+  (at level 0, x name, format
+  "[ '[hv ' 'pick'  x  'in'  A '/ '   |  P '/ '  &  Q ] ']'") : form_scope.
+Notation "[ 'pick' x : T 'in' A | P & Q ]" := [pick x : T in A | P && Q]
+  (at level 0, x name, only parsing) : form_scope.
 
 (******************************************************************************)
 (*************************** fintype starts here ******************************)
@@ -1096,7 +1141,7 @@ Lemma uniq_enumP (T : eqType) e : uniq e -> e =i T -> axiom e.
 Proof. by move=> Ue sT x; rewrite count_uniq_mem ?sT. Qed.
 
 Lemma enum_prec_sorted T : sorted prec (enum T).
-Admitted.
+Abort.
 
 Section WithCountType.
 Variable (T : countType).
@@ -1164,58 +1209,6 @@ Notation "[ 'finType' 'of' T 'for' cT ]" := (Finite.clone T%type cT)
 #[deprecated(since="mathcomp 2.0.0", note="Use Finite.clone instead.")]
 Notation "[ 'finType' 'of' T ]" := (Finite.clone T%type _)
   (at level 0, format "[ 'finType'  'of'  T ]") : form_scope.
-
-(* in finset.v Definition set_pick (T : choiceType) (A : {set T}) := ohead (enum A).
-Notation pick A := (set_pick (pred_set A)) (only parsing).
-Notation "'pick' A" := (pick A) (at level 10, only printing).
-
-Notation "[ 'pick' x | P ]" := (pick (fun x => P%B))
-  (at level 0, x name, format "[ 'pick'  x  |  P  ]") : form_scope.
-Notation "[ 'pick' x : T | P ]" := (pick (fun x : T => P%B))
-  (at level 0, x name, only parsing) : form_scope.
-Definition pick_true T (x : T) := true.
-Reserved Notation "[ 'pick' x : T ]"
-  (at level 0, x name, format "[ 'pick'  x : T ]").
-Notation "[ 'pick' x : T ]" := [pick x : T | pick_true x]
-  (only parsing) : form_scope.
-Notation "[ 'pick' x : T ]" := [pick x : T | pick_true _]
-  (only printing) : form_scope.
-Notation "[ 'pick' x ]" := [pick x : _]
-  (at level 0, x name, only parsing) : form_scope.
-Notation "[ 'pick' x | P & Q ]" := [pick x | P && Q ]
-  (at level 0, x name,
-   format "[ '[hv ' 'pick'  x  |  P '/ '   &  Q ] ']'") : form_scope.
-Notation "[ 'pick' x : T | P & Q ]" := [pick x : T | P && Q ]
-  (at level 0, x name, only parsing) : form_scope.
-Notation "[ 'pick' x 'in' A ]" := [pick x | x \in A]
-  (at level 0, x name, format "[ 'pick'  x  'in'  A  ]") : form_scope.
-Notation "[ 'pick' x : T 'in' A ]" := [pick x : T | x \in A]
-  (at level 0, x name, only parsing) : form_scope.
-Notation "[ 'pick' x 'in' A | P ]" := [pick x | x \in A & P ]
-  (at level 0, x name,
-   format "[ '[hv ' 'pick'  x  'in'  A '/ '   |  P ] ']'") : form_scope.
-Notation "[ 'pick' x : T 'in' A | P ]" := [pick x : T | x \in A & P ]
-  (at level 0, x name, only parsing) : form_scope.
-Notation "[ 'pick' x 'in' A | P & Q ]" := [pick x in A | P && Q]
-  (at level 0, x name, format
-  "[ '[hv ' 'pick'  x  'in'  A '/ '   |  P '/ '  &  Q ] ']'") : form_scope.
-Notation "[ 'pick' x : T 'in' A | P & Q ]" := [pick x : T in A | P && Q]
-  (at level 0, x name, only parsing) : form_scope.
-
-(* We lock the definitions of card and subset to mitigate divergence of the   *)
-(* Coq term comparison algorithm.                                             *)
-HB.lock Definition card (T : choiceType) (A : {set T}) := size (enum A).
-Canonical card_unlock := Unlockable card.unlock.
-*)
-
-(* A is at level 99 to allow the notation #|G : H| in groups. *)
-Reserved Notation "#| A |" (at level 0, A at level 99, format "#| A |").
-Notation "#| A |" := (card ((*pred_set*) A)) (only parsing): nat_scope.
-Notation "#| A |" := (card A) (only printing): nat_scope.
-(*
-Definition pred0b (T : choiceType) (P : finpred T) := #|P| == 0.
-Prenex Implicits pred0b.
-*)
 
 Module FiniteQuant.
 
@@ -1341,7 +1334,7 @@ Notation "A \proper B" := (proper (mem A) (mem B))
 
 (* image, xinv, inv, and ordinal operations will be defined later. *)
 
-Section ChoiceOpsTheory_eqType.
+Section EqOpsTheory.
 Variable T : eqType.
 Implicit Types (A B : {finpred T}) (C D : {pred T}).
 Implicit Types (P Q : pred T) (x y : T) (s : seq T).
@@ -1351,13 +1344,16 @@ Variant pick_spec P : option T -> Type :=
   | Nopick of P =i xpred0 : pick_spec P None.
 
 Lemma eq_card A B : A =i B -> #|A| = #|B|.
-Proof. Admitted.
+Proof.
+rewrite unlock => AB; apply/eqP.
+by rewrite -uniq_size_uniq// => x; rewrite !inE !finpred_of_eq AB.
+Qed.
 
 Lemma eq_pred0b A B : A =i B -> pred0b A = pred0b B.
 Proof. by move=> eAB; congr (_ == 0); apply: eq_card. Qed.
 
 Lemma eq_card_trans A B n : #|A| = n -> B =i A -> #|B| = n.
-Proof. Admitted.
+Proof. by move=> <- /eq_card. Qed.
 
 Lemma card_uniqP s : reflect (#|s| = size s) (uniq s).
 Proof.
@@ -1377,75 +1373,38 @@ Lemma eq_card1 x A : A =i pred1 x -> #|A| = 1.
 Proof. exact: eq_card_trans (card1 x). Qed.
 
 (* TODO: bad name, cardsUI reserved for finset *)
-Lemma cardsUI A B : #|[predU A & B]| + #|[predI A & B]| = #|A| + #|B|.
+Lemma cardUI A B : #|[predU A & B]| + #|[predI A & B]| = #|A| + #|B|.
 Proof.
-(* check duplication *)
-Admitted.
+rewrite unlock.
+set s := support [predU A & B].
+have sI (P : {finpred T}) :
+    {subset P <= s} -> perm_eq (support P) [seq x <- s | x \in P].
+  move=> Ps; rewrite uniq_perm ?filter_uniq /s // => x.
+  by rewrite inE mem_filter andb_idr ?finpred_of_eq//; apply: Ps.
+rewrite !(perm_size (sI _ _))/=.
+- by rewrite !size_filter count_predUI.
+- by move=> x /[!inE]/=/andP[xA _]; rewrite [X in X || _]xA.
+- by move=> x /[!inE]/=.
+- by move=> x xB; rewrite !inE/=; rewrite [X in _ || X]xB orbT.
+- by move=> x; rewrite !inE/= => xA; rewrite [X in X || _]xA.  (* FIXME pattern and why inE goes too far and requires a /= ? *)
+Qed.
+(* TODO Georges: check duplication *)
 
-Lemma cardsID B A : #|[predI A & B]| + #|[pred x in A | x \notin B]| = #|A|.
-Proof. Admitted.
+Lemma cardID B A : #|[predI A & B]| + #|[pred x in A | x \notin B]| = #|A|.
+Proof.
+rewrite -cardUI addnC/= [X in X + _]eq_card0 => [|x] /=.
+  by apply: eq_card => x /[!inE]/=; rewrite -andb_orr orbN andbT.
+by rewrite !inE andbACA andbN andbF.
+Qed.
 
-Lemma cardsU1 x A : #|[predU1 x & A]| = (x \notin A) + #|A|.
+Lemma cardU1 x A : #|[predU1 x & A]| = (x \notin A) + #|A|.
 Proof.
 case Ax: (x \in A).
   by apply: eq_card => y /[1!inE]/=; case: eqP => // ->.
-rewrite /= -(card1 x) -cardsUI addnC.
-rewrite [X in X + _]eq_card0 => [|y /=].
-  by apply: eq_card => // y; rewrite !inE; admit.
+rewrite /= -(card1 x) -cardUI addnC.
+rewrite [X in X + _]eq_card0 => [|y /=]; first exact: eq_card.
 by rewrite !inE; case: eqP => // ->.
-Admitted.
-
-End ChoiceOpsTheory_eqType.
-
-Section ChoiceOpsTheory_choiceType.
-Variable T : choiceType.
-Implicit Types (A B : {finpred T}) (C D : {pred T}).
-Implicit Types (P Q : pred T) (x y : T) (s : seq T).
-
-Lemma mem_enum A : enum A =i A.
-Proof. Admitted.
-
-Lemma enum_uniq A : uniq (enum A).
-Proof. Admitted.
-
-Lemma enum0 : enum pred0 = Nil T. Proof. Admitted.
-
-Lemma enum1 x : enum (pred1 x) = [:: x].
-Proof. Admitted.
-
-Lemma pickP (A : finpred T) : pick_spec (A : {pred T}) (pick A).
-Proof.
-Admitted.
-
-(* Should we keep it? *)
-Definition set_pickP (A : finpred T) : pick_spec [in A] (pick A) := pickP A.
-
-Lemma eq_enum A B : A =i B -> enum A = enum B.
-Proof. Admitted.
-
-Lemma eq_pick A B : A =i B -> pick A = pick B.
-Proof. Admitted.
-
-Lemma cardE A : #|A| = size (enum A).
-Proof. by rewrite !unlock size_sort. Qed.
-
-End ChoiceOpsTheory_choiceType.
-
-Section FinOpsTheory_eqType.
-Variable T : eqType.
-
-Implicit Types (A B : {finpred T}).
-Implicit Types (C D : {pred T}) (P Q : pred T) (x y : T) (s : seq T).
-
-Lemma cardUI A B : #|[predU A & B]| + #|[predI A & B]| = #|A| + #|B|.
-Proof. by rewrite cardsUI. Qed.
-
-Lemma cardID B A : #|[predI A & B]| + #|[predD A & B]| = #|A|.
-Proof.
-rewrite -[RHS](cardsID B A); congr (_ + _); apply: eq_card => //.
-by move=> x; rewrite !inE andbC.
 Qed.
-
 (* notes:
 
 today:
@@ -1459,19 +1418,22 @@ Lemma cardU1 (T : choiceType) (x : T) A S (_ : finPred_aux T [predU1 x & A] S) :
 rewrite cardU1. (* works no matter how you derive the finiteness of [predU1 x & A] \*)
 
 *)
-Lemma cardU1 x A : #|[predU1 x & A]| = (x \notin A) + #|A|.
-Proof. by rewrite -[RHS]cardsU1; apply: eq_card. Qed.
 
 Lemma card2 x y : #|pred2 x y| = (x != y).+1.
-Proof. by rewrite (cardU1 _ (pred1 y)) card1 addn1. Qed.
+Proof. by rewrite cardU1 card1 addn1. Qed.
 
 Lemma cardD1 x A : #|A| = (x \in A) + #|[predD1 A & x]|.
 Proof.
 case Ax: (x \in A); last first.
   by apply: eq_card => y /[!inE]/=; case: eqP => // ->.
 rewrite /= -(card1 x) -cardUI addnC /=.
-rewrite [X in X + _]eq_card0 => [|y]; last by rewrite !inE/=; case: eqP.
+rewrite [X in X + _]eq_card0 => [|y]; last by rewrite /= !inE; case: eqP.
 by apply: eq_card => y /[!inE] /=; case: eqP => // ->.
+Qed.
+
+Lemma card_undup s : #|undup s| = #|s|.
+Proof.
+by apply/eqP; rewrite unlock -uniq_size_uniq// => x; rewrite !inE mem_undup.
 Qed.
 
 Lemma card_size s : #|s| <= size s.
@@ -1560,7 +1522,7 @@ Qed.
 
 Lemma subset_leq_card A B : A \subset B -> #|A| <= #|B|.
 Proof.
-move=> sAB; rewrite -(cardID A B) (@eq_card _ _ A) ?leq_addr// => x.
+move=> sAB; rewrite -(cardID A B) (@eq_card _ A) ?leq_addr// => x.
 by rewrite !inE andbC; case Ax: (x \in A) => //; apply: subsetP Ax.
 Qed.
 
@@ -1745,8 +1707,6 @@ exists [:: x; y; z]; rewrite /= !inE negb_or xDy xDz eq_sym yDz; split=> // u.
 by rewrite !inE => /or3P [] /eqP->.
 Qed.
 
-FIN.
-
 Lemma disjoint_sym A B : [disjoint A & B] = [disjoint B & A].
 Proof. by congr (_ == 0); apply: eq_card => x; apply: andbC. Qed.
 
@@ -1763,6 +1723,21 @@ move=> eqAB C; congr (_ == 0); apply: eq_card => x /=.
 by rewrite !inE [X in _ && X]eqAB.
 Qed.
 
+Lemma subset_disjoint A (B : {pred T}) :
+  (A \subset B) = [disjoint A & [predC B]].
+Proof.
+apply/subsetP/pred0P => /=.
+  by move=> AB x /=; apply/negP => /andP[/AB->].
+move=> + x => /(_ x)/negbT/=; rewrite negb_and negbK => /orP[/negbTE Ax|//].
+by rewrite [x \in A]Ax.  (* FIXME *)
+Qed.
+
+Lemma disjoint_subset A (B : {pred T}) :
+  [disjoint A & B] = (A \subset [predC B]).
+Proof.
+by rewrite subset_disjoint; apply: eq_disjoint_r => x; rewrite !inE negbK.
+Qed.
+
 Lemma disjointFr A (B : {pred T}) x : [disjoint A & B] ->
   x \in A -> x \in B = false.
 Proof.
@@ -1775,6 +1750,23 @@ Lemma disjointFl A (B : {pred T}) x : [disjoint A & B] ->
 Proof.
 move/pred0P/(_ x) => /=; rewrite -[X in _ && X]/(x \in B) andbC.
 by case: (x \in B).
+Qed.
+
+Lemma disjointWl A B (C : {pred T}) :
+   A \subset B -> [disjoint B & C] -> [disjoint A & C].
+Proof. by rewrite 2!disjoint_subset; apply: subset_trans. Qed.
+
+Lemma disjointWr A (B : {pred T}) (C : {finpred T}) :
+  A \subset B -> [disjoint C & B] -> [disjoint C & A].
+Proof.
+rewrite 2!disjoint_subset => /subsetP AB /subsetP BC; apply/subsetP => x /BC.
+exact/contra/AB.
+Qed.
+
+Lemma disjointW (A B C : {finpred T}) (D : {pred T}) :
+  A \subset B -> C \subset D -> [disjoint B & D] -> [disjoint A & C].
+Proof.
+by move=> subAB subCD BD; apply/(disjointWl subAB)/(disjointWr subCD).
 Qed.
 
 Lemma disjoint0 (A : {pred T}) : [disjoint pred0 & A].
@@ -1821,11 +1813,80 @@ Lemma disjoint_cat s1 s2 A :
   [disjoint s1 ++ s2 & A] = [disjoint s1 & A] && [disjoint s2 & A].
 Proof. by rewrite !disjoint_has has_cat negb_or. Qed.
 
-End OpsTheory_eqType.
+End EqOpsTheory.
 
-Section OpsTheory_choiceType.
+Lemma map_subset {T T' : eqType} (s1 s2 : seq T) (f : T -> T') :
+  s1 \subset s2 -> [seq f x | x <- s1 ] \subset [seq f x | x <- s2].
+Proof.
+move=> /(subsetP s1) s1s2; apply/(subsetP (map _ _)) => _ /mapP[y]/[swap]-> ys1.
+by apply/mapP; exists y => //; apply: s1s2.
+Qed.
 
-End OpsTheory_choiceType.
+#[global] Hint Resolve subxx_hint : core.
+
+Arguments pred0P {T P}.
+Arguments pred0Pn {T P}.
+Arguments card_le1P {T A}.
+Arguments card_le1_eqP {T A}.
+Arguments card1P {T A}.
+Arguments subsetP {T A B}.
+Arguments subsetPn {T A B}.
+Arguments subset_eqP {T A B}.
+Arguments card_uniqP {T s}.
+Arguments card_geqP {T A n}.
+Arguments card_gt0P {T A}.
+Arguments card_gt1P {T A}.
+Arguments card_gt2P {T A}.
+Arguments properP {T A B}.
+
+Section ChoiceOpsTheory_choiceType.
+Variable T : choiceType.
+Implicit Types (A B : {finpred T}) (C D : {pred T}).
+Implicit Types (P Q : pred T) (x y : T) (s : seq T).
+
+Lemma mem_enum A : enum A =i A.
+Proof. by rewrite unlock => x; rewrite mem_sort inE finpred_of_eq. Qed.
+
+Lemma enum_uniq (A : finpred T) : uniq (enum A).
+Proof. by rewrite unlock sort_uniq. Qed.
+Hint Resolve enum_uniq : core.
+
+Lemma enum0 : enum pred0 = Nil T.
+Proof.
+by apply: size0nil; move: (@card0 T); rewrite 2!unlock size_sort.
+Qed.
+
+Lemma enum1 x : enum (pred1 x) = [:: x].
+Proof.
+apply: perm_small_eq => //; apply: uniq_perm => // y.
+by rewrite mem_enum/= !inE.
+Qed.
+
+Lemma pickP (A : finpred T) : pick_spec (A : {pred T}) (pick A).
+Proof.
+Admitted.
+
+(* Should we keep it? *)
+Definition set_pickP (A : finpred T) : pick_spec [in A] (pick A) := pickP A.
+
+Lemma eq_enum A B : A =i B -> enum A = enum B.
+Proof. Admitted.
+
+Lemma eq_pick A B : A =i B -> pick A = pick B.
+Proof. Admitted.
+
+Lemma cardE A : #|A| = size (enum A).
+Proof. by rewrite !unlock size_sort. Qed.
+
+End ChoiceOpsTheory_choiceType.
+#[export] Hint Resolve enum_uniq : core.
+
+Section FinOpsTheory_eqType.
+Variable T : eqType.
+
+Implicit Types (A B : {finpred T}).
+Implicit Types (C D : {pred T}) (P Q : pred T) (x y : T) (s : seq T).
+
 
 Section FinOpsTheory_finType.
 Variable T : finType.
@@ -1833,12 +1894,28 @@ Variable T : finType.
 Implicit Types (A B C D : {pred T}) (P Q : pred T) (x y : T) (s : seq T).
 
 Lemma fintype_le1P : reflect (forall x : T, all_equal_to x) (#|T| <= 1).
-Proof. apply: (iffP (card_le1_eqP {:T})); [exact: in2T | exact: in2W]. Qed.
+Proof. by apply: (iffP card_le1_eqP); [exact: in2T | exact: in2W]. Qed.
 
 Lemma fintype1 : #|T| = 1 -> {x : T | all_equal_to x}.
 Proof.
 by move=> /mem_card1[x ex]; exists x => y; suff: y \in T by rewrite ex => /eqP.
 Qed.
+
+Lemma fintype1P : reflect (exists x, all_equal_to x) (#|T| == 1).
+Proof.
+apply: (iffP idP) => [/eqP/fintype1|] [x eqx]; first by exists x.
+by apply/card1P; exists x => y; rewrite eqx !inE eqxx.
+Qed.
+
+Lemma predT_subset A : T \subset A -> forall x, x \in A.
+Proof. by move/subsetP=> allA x; apply: allA. Qed.
+
+
+
+
+
+
+
 
 Lemma enumP : Finite.axiom (Finite.enum T).
 Proof.
@@ -2293,6 +2370,8 @@ by move=> subAB subCD BD; apply/(disjointWl subAB)/(disjointWr subCD).
 Qed.
 
 End OpsTheory_finType.
+Arguments fintype_le1P {T}.
+Arguments fintype1P {T}.
 
 Lemma map_subset {T T' : finType} (s1 s2 : seq T) (f : T -> T') :
   s1 \subset s2 -> [seq f x | x <- s1 ] \subset [seq f x | x <- s2].
