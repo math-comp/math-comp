@@ -1950,8 +1950,6 @@ End FinOpsTheory.
 Arguments fintype_le1P {T}.
 Arguments fintype1P {T}.
 
-ARRET_vendredi_soir.
-
 (**********************************************************************)
 (*                                                                    *)
 (*  Boolean quantifiers for finType                                   *)
@@ -2098,14 +2096,12 @@ Notation "'forall_in_ view" := (forall_inPP _ (fun _ => view))
 (*                                                                    *)
 (**********************************************************************)
 
-Section Injectiveb.
+Section ChoiceInjectiveb.
 
-Variables (aT : finType) (rT : eqType) (f : aT -> rT).
-Implicit Type D : {pred aT}.
+Variables (aT : choiceType) (rT : eqType) (f : aT -> rT).
+Implicit Type D : {finpred aT}.
 
 Definition dinjectiveb D := uniq (map f (enum D)).
-
-Definition injectiveb := dinjectiveb aT.
 
 Lemma dinjectivePn D :
   reflect (exists2 x, x \in D & exists2 y, y \in [predD1 D & x] & f x = f y)
@@ -2117,12 +2113,12 @@ apply: (iffP idP) => [injf | [x Dx [y Dxy eqfxy]]]; last first.
   rewrite inE /= -(mem_enum D) -(mem_rot i) defE inE in Dxy.
   rewrite andb_orr andbC andbN in Dxy.
   by rewrite eqfxy map_f //; case/andP: Dxy.
-pose p := [pred x in D | [exists (y | y \in [predD1 D & x]), f x == f y]].
-case: (pickP p) => [x /= /andP[Dx /exists_inP[y Dxy /eqP eqfxy]] | no_p].
-  by exists x; last exists y.
+pose p := [pred x in D | has (fun y => (y != x) && (f x == f y)) (enum D)].
+case: (pickP p) => [x /=/andP[Dx /hasP[y Dy /andP[ynx /eqP eqfxy]]] | no_p].
+  by exists x => //; exists y => //; rewrite inE ynx/= -mem_enum.
 rewrite /dinjectiveb map_inj_in_uniq ?enum_uniq // in injf => x y Dx Dy eqfxy.
-apply: contraNeq (negbT (no_p x)) => ne_xy /=; rewrite -mem_enum Dx.
-by apply/existsP; exists y; rewrite /= !inE eq_sym ne_xy -mem_enum Dy eqfxy /=.
+apply: contraNeq (negbT (no_p x)) => ne_xy /=; rewrite /p inE -mem_enum Dx/=.
+by apply/hasP; exists y => //; rewrite eq_sym ne_xy/=; apply/eqP.
 Qed.
 
 Lemma dinjectiveP D : reflect {in D &, injective f} (dinjectiveb D).
@@ -2135,61 +2131,65 @@ move=> x y Dx Dy /= eqfxy; apply/eqP; apply/idPn=> nxy; case: injf.
 by exists x => //; exists y => //=; rewrite inE /= eq_sym nxy.
 Qed.
 
+End ChoiceInjectiveb.
+
+Section FinInjectiveb.
+
+Variables (aT : finType) (rT : eqType) (f : aT -> rT).
+Implicit Type D : {finpred aT}.
+
+Definition injectiveb := @dinjectiveb aT rT f aT.
+
 Lemma injectivePn :
   reflect (exists x, exists2 y, x != y & f x = f y) (~~ injectiveb).
 Proof.
-apply: (iffP (dinjectivePn _)) => [[x _ [y nxy eqfxy]] | [x [y nxy eqfxy]]];
+apply: (iffP (dinjectivePn _ _)) => [[x _ [y nxy eqfxy]] | [x [y nxy eqfxy]]];
  by exists x => //; exists y => //; rewrite inE /= andbT eq_sym in nxy *.
 Qed.
 
 Lemma injectiveP : reflect (injective f) injectiveb.
-Proof. by apply: (iffP (dinjectiveP _)) => injf x y => [|_ _]; apply: injf. Qed.
+Proof.
+by apply: (iffP (dinjectiveP _ _)) => injf x y => [|_ _]; apply: injf.
+Qed.
 
-End Injectiveb.
+End FinInjectiveb.
 
-Definition image_mem T T' f mA : seq T' := map f (@enum_mem T mA).
-Notation image f A := (image_mem f (mem A)).
+Definition image (T : choiceType) T' f (A : {finpred T}) : seq T' :=
+  map f (enum A).
 Notation "[ 'seq' F | x 'in' A ]" := (image (fun x => F) A)
   (at level 0, F at level 99, x binder,
    format "'[hv' [ 'seq'  F '/ '  |  x  'in'  A ] ']'") : seq_scope.
 Notation "[ 'seq' F | x ]" :=
-  [seq F | x in pred_of_simpl (@pred_of_argType
+  [seq F | x in @predT
     (* kludge for getting the type of x *)
     match _, (fun x => I) with
     | T, f
       => match match f return T -> True with f' => f' end with
          | _ => T
          end
-    end)]
+    end]
   (at level 0, F at level 99, x binder, only parsing) : seq_scope.
-Notation "[ 'seq' F | x : T ]" :=
-  [seq F | x : T in pred_of_simpl (@pred_of_argType T)]
+Notation "[ 'seq' F | x : T ]" := [seq F | x : T in @predT T]
   (at level 0, F at level 99, x name, only printing,
    format "'[hv' [ 'seq'  F '/ '  |  x  :  T ] ']'") : seq_scope.
 Notation "[ 'seq' F , x ]" := [seq F | x ]
   (at level 0, F at level 99, x binder, only parsing) : seq_scope.
 
-Definition codom T T' f := @image_mem T T' f (mem T).
+Definition codom (T : finType) T' f := @image T T' f T.
 
-Section Image.
+Section ChoiceImage.
 
-Variable T : finType.
-Implicit Type A : {pred T}.
+Variable T : choiceType.
+Implicit Type A : {finpred T}.
 
-Section SizeImage.
+Section ChoiceSizeImage.
 
 Variables (T' : Type) (f : T -> T').
 
 Lemma size_image A : size (image f A) = #|A|.
 Proof. by rewrite size_map -cardE. Qed.
 
-Lemma size_codom : size (codom f) = #|T|.
-Proof. exact: size_image. Qed.
-
-Lemma codomE : codom f = map f (enum T).
-Proof. by []. Qed.
-
-End SizeImage.
+End ChoiceSizeImage.
 
 Variables (T' : eqType) (f : T -> T').
 
@@ -2198,14 +2198,11 @@ Proof.
 by apply: (iffP mapP) => [] [x Ax y_fx]; exists x; rewrite // mem_enum in Ax *.
 Qed.
 
-Lemma codomP y : reflect (exists x, y = f x) (y \in codom f).
-Proof. by apply: (iffP (imageP _ y)) => [][x]; exists x. Qed.
-
 Remark iinv_proof A y : y \in image f A -> {x | x \in A & f x = y}.
 Proof.
-move=> fy; pose b x := A x && (f x == y).
+move=> fy; pose b := [predI A & [pred x | f x == y]].
 case: (pickP b) => [x /andP[Ax /eqP] | nfy]; first by exists x.
-by case/negP: fy => /imageP[x Ax fx_y]; case/andP: (nfy x); rewrite fx_y.
+by case/negP: fy => /imageP[x Ax fx_y]; case/andP: (nfy x); rewrite inE fx_y.
 Qed.
 
 Definition iinv A y fAy := s2val (@iinv_proof A y fAy).
@@ -2228,16 +2225,10 @@ Proof. by rewrite /= f_iinv. Qed.
 Lemma image_f A x : x \in A -> f x \in image f A.
 Proof. by move=> Ax; apply/imageP; exists x. Qed.
 
-Lemma codom_f x : f x \in codom f.
-Proof. exact: image_f. Qed.
-
-Lemma image_codom A : {subset image f A <= codom f}.
-Proof. by move=> _ /imageP[x _ ->]; apply: codom_f. Qed.
-
 Lemma image_pred0 : image f pred0 =i pred0.
-Proof. by move=> x; rewrite /image_mem /= enum0. Qed.
+Proof. by move=> x; rewrite /image /= enum0. Qed.
 
-Section Injective.
+Section ChoiceInjective.
 
 Hypothesis injf : injective f.
 
@@ -2247,15 +2238,59 @@ Proof. by rewrite mem_map ?mem_enum. Qed.
 Lemma pre_image A : [preim f of image f A] =i A.
 Proof. by move=> x; rewrite inE /= mem_image. Qed.
 
+End ChoiceInjective.
+
+End ChoiceImage.
+Arguments imageP {T T' f A y}.
+
+Section FinImage.
+
+Variable T : finType.
+Implicit Type A : {finpred T}.
+
+Section FinSizeImage.
+
+Variables (T' : Type) (f : T -> T').
+
+Lemma size_codom : size (codom f) = #|T|.
+Proof. exact: size_image. Qed.
+
+Lemma codomE : codom f = map f (enum T).
+Proof. by []. Qed.
+
+End FinSizeImage.
+
+Variables (T' : eqType) (f : T -> T').
+
+Lemma codomP y : reflect (exists x, y = f x) (y \in codom f).
+Proof. by apply: (iffP (@imageP _ _ _ _ y)) => [][x]; exists x. Qed.
+
+Lemma codom_f x : f x \in codom f.
+Proof. exact: image_f. Qed.
+
+Lemma image_codom A : {subset image f A <= codom f}.
+Proof. by move=> _ /imageP[x _ ->]; apply: codom_f. Qed.
+
+Section FinInjective.
+
+Hypothesis injf : injective f.
+
 Lemma image_iinv A y (fTy : y \in codom f) :
   (y \in image f A) = (iinv fTy \in A).
-Proof. by rewrite -mem_image ?f_iinv. Qed.
+Proof. by rewrite -(mem_image injf) ?f_iinv. Qed.
 
-Lemma iinv_f x fTfx : @iinv T (f x) fTfx = x.
+Lemma iinv_f x fTfx : @iinv _ _ f T (f x) fTfx = x.
 Proof. by apply: in_iinv_f; first apply: in2W. Qed.
 
 Lemma image_pre (B : pred T') : image f [preim f of B] =i [predI B & codom f].
-Proof. by move=> y; rewrite /image_mem -filter_map /= mem_filter -enumT. Qed.
+Proof.
+move=> y; rewrite /image.
+have /(eq_mem_map f)-> :
+    enum [preim f of B] =i [seq x <- Finite.enum T | preim f B x].
+  move=> x; rewrite mem_enum mem_filter andb_idr// => _.
+  by rewrite -has_pred1 has_count Finite.enumP.  (* FIXME: simplify proof *)
+by rewrite -filter_map mem_filter -enumT.
+Qed.
 
 Lemma bij_on_codom (x0 : T) : {on [pred y in codom f], bijective f}.
 Proof.
@@ -2263,10 +2298,11 @@ pose g y := iinv (valP (insigd (codom_f x0) y)).
 by exists g => [x fAfx | y fAy]; first apply: injf; rewrite f_iinv insubdK.
 Qed.
 
+(* TODO: generalize in section ChoiceInjective above *)
 Lemma bij_on_image A (x0 : T) : {on [pred y in image f A], bijective f}.
 Proof. exact: subon_bij (@image_codom A) (bij_on_codom x0). Qed.
 
-End Injective.
+End FinInjective.
 
 Fixpoint preim_seq s :=
   if s is y :: s' then
@@ -2280,24 +2316,23 @@ elim: s => //= y s IHs; case: pickP => [x /eqP fx_y | nfTy] fTs.
 by case/imageP: (fTs y (mem_head y s)) => x _ fx_y; case/eqP: (nfTy x).
 Qed.
 
-End Image.
+End FinImage.
 
 Prenex Implicits codom iinv.
-Arguments imageP {T T' f A y}.
 Arguments codomP {T T' f y}.
 
-Lemma flatten_imageP (aT : finType) (rT : eqType)
-                     (A : aT -> seq rT) (P : {pred aT}) (y : rT) :
+Lemma flatten_imageP (aT : choiceType) (rT : eqType)
+                     (A : aT -> seq rT) (P : {finpred aT}) (y : rT) :
   reflect (exists2 x, x \in P & y \in A x) (y \in flatten [seq A x | x in P]).
 Proof.
 by apply: (iffP flatten_mapP) => [][x Px]; exists x; rewrite ?mem_enum in Px *.
 Qed.
 Arguments flatten_imageP {aT rT A P y}.
 
-Section CardFunImage.
+Section ChoiceCardFunImage.
 
-Variables (T T' : finType) (f : T -> T').
-Implicit Type A : {pred T}.
+Variables (T : choiceType) (T' : eqType) (f : T -> T').
+Implicit Type A : {finpred T}.
 
 Lemma leq_image_card A : #|image f A| <= #|A|.
 Proof. by rewrite (cardE A) -(size_map f) card_size. Qed.
@@ -2314,41 +2349,61 @@ apply: (iffP eqP) => [eqfA |]; last exact: card_in_image.
 by apply/dinjectiveP; apply/card_uniqP; rewrite size_map -cardE.
 Qed.
 
-Lemma leq_card_in A : {in A &, injective f} -> #|A| <= #|T'|.
-Proof. by move=> /card_in_image <-; rewrite max_card. Qed.
-
 Hypothesis injf : injective f.
 
 Lemma card_image A : #|image f A| = #|A|.
 Proof. by apply: card_in_image; apply: in2W. Qed.
 
+End ChoiceCardFunImage.
+Arguments image_injP {T T' f A}.
+
+Section ChoiceFinCardFunImage.
+
+Variables (T : choiceType) (T' : finType) (f : T -> T').
+Implicit Type A : {finpred T}.
+
+Lemma leq_card_in A : {in A &, injective f} -> #|A| <= #|T'|.
+Proof. by move=> /card_in_image<-; apply: (max_card [seq f x | x in A]). Qed.
+
+End ChoiceFinCardFunImage.
+Arguments leq_card_in [T T'] f.
+
+Section FinCardFunImage.
+
+Variables (T T' : finType) (f : T -> T').
+Implicit Type A : {finpred T}.
+
+Hypothesis injf : injective f.
+
 Lemma card_codom : #|codom f| = #|T|.
 Proof. exact: card_image. Qed.
 
-Lemma card_preim (B : {pred T'}) : #|[preim f of B]| = #|[predI codom f & B]|.
+Lemma card_preim (B : {finpred T'}) : #|[preim f of B]| = #|[predI codom f & B]|.
 Proof.
-rewrite -card_image /=; apply: eq_card => y.
-by rewrite [y \in _]image_pre !inE andbC.
+rewrite -(card_image injf); apply: (@eq_card _ [seq f x | x in [preim f of B]]).
+by move=> y; rewrite [y \in _]image_pre inE andbC.
 Qed.
 
-Lemma leq_card : #|T| <= #|T'|. Proof. exact: (leq_card_in (in2W _)). Qed.
+Lemma leq_card : #|T| <= #|T'|.
+Proof. exact: (@leq_card_in _ _ _ T (in2W injf)). Qed.
 
 Hypothesis card_range : #|T| >= #|T'|.
 
 Let eq_card : #|T| = #|T'|. Proof. by apply/eqP; rewrite eqn_leq leq_card. Qed.
 
 Lemma inj_card_onto y : y \in codom f.
-Proof. by move: y; apply/subset_cardP; rewrite ?card_codom ?subset_predT. Qed.
+Proof.
+move: y; apply/(@subset_cardP T' [pred x | x \in codom f] predT).
+  by rewrite card_codom.
+by rewrite subset_predT.
+Qed.
 
 Lemma inj_card_bij :  bijective f.
 Proof.
 by exists (fun y => iinv (inj_card_onto y)) => y; rewrite ?iinv_f ?f_iinv.
 Qed.
 
-End CardFunImage.
-
-Arguments image_injP {T T' f A}.
-Arguments leq_card_in [T T'] f.
+End FinCardFunImage.
 Arguments leq_card [T T'] f.
 
 Lemma bij_eq_card (T T' : finType) (f : T -> T') : bijective f -> #|T| = #|T'|.
@@ -2396,7 +2451,7 @@ Variables (T : finType) (T' : Type).
 Lemma eq_image (A B : {pred T}) (f g : T -> T') :
   A =i B -> f =1 g -> image f A = image g B.
 Proof.
-by move=> eqAB eqfg; rewrite /image_mem (eq_enum eqAB) (eq_map eqfg).
+by move=> eqAB eqfg; rewrite /image (eq_enum eqAB) (eq_map eqfg).
 Qed.
 
 Lemma eq_codom (f g : T -> T') : f =1 g -> codom f = codom g.
@@ -2417,7 +2472,8 @@ Lemma card_unit : #|{: unit}| = 1. Proof. by rewrite cardT enumT unlock. Qed.
 
 Lemma bool_enumP : Finite.axiom [:: true; false]. Proof. by case. Qed.
 HB.instance Definition _ := isFinite.Build bool bool_enumP.
-Lemma card_bool : #|{: bool}| = 2. Proof. by rewrite cardT enumT unlock. Qed.
+Lemma card_bool : #|{: bool}| = 2.
+Proof. by rewrite cardT enumT unlock size_sort. Qed.
 
 Lemma void_enumP : Finite.axiom (Nil void). Proof. by case. Qed.
 HB.instance Definition _ := isFinite.Build void void_enumP.
@@ -2432,14 +2488,16 @@ Variable T : finType.
 Definition option_enum := None :: map some (enumF T).
 
 Lemma option_enumP : Finite.axiom option_enum.
-Proof. by case=> [x|]; rewrite /= count_map (count_pred0, enumP). Qed.
+Proof. by case=> [x|]; rewrite /= count_map (Finite.enumP, count_pred0). Qed.
 
 HB.instance Definition _ := isFinite.Build (option T) option_enumP.
 
 Lemma card_option : #|{: option T}| = #|T|.+1.
-Proof. by rewrite !cardT !enumT [in LHS]unlock /= !size_map. Qed.
+Proof. by rewrite !cardT !enumT [in LHS]unlock size_sort /= size_map. Qed.
 
 End OptionFinType.
+
+FIN.
 
 Section TransferFinTypeFromCount.
 
