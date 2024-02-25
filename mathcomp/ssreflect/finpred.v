@@ -1322,7 +1322,7 @@ Export FiniteQuant.Exports.
 Definition disjoint (T : eqType) (A : finpred T) (B : {pred T}) :=
   @pred0b T [pred x in A | B x].
 
-Notation "[ 'disjoint' A & B ]" := (disjoint (mem A) (mem B))
+Notation "[ 'disjoint' A & B ]" := (disjoint A B)
   (at level 0,
    format "'[hv' [ 'disjoint' '/  '  A '/'  &  B ] ']'") : bool_scope.
 
@@ -1331,12 +1331,12 @@ Definition subset (T : eqType) (A : finpred T) (B : {pred T}) : bool :=
   pred0b [pred x in A | ~~ B x].
 Canonical subset_unlock := Unlockable subset.unlock.
 
-Notation "A \subset B" := (subset (mem A) (mem B))
+Notation "A \subset B" := (subset A B)
   (at level 70, no associativity) : bool_scope.
 
 Definition proper (T : eqType) (A B : finpred T) :=
   @subset T A B && ~~ subset B A.
-Notation "A \proper B" := (proper (mem A) (mem B))
+Notation "A \proper B" := (proper A B)
   (at level 70, no associativity) : bool_scope.
 
 (* image, xinv, inv, and ordinal operations will be defined later. *)
@@ -1541,15 +1541,14 @@ Hint Resolve subxx_hint : core.
 (* The parametrization by predType makes it easier to apply subxx. *)
 Lemma subxx A : A \subset A. Proof. by []. Qed.
 
-Lemma eq_subset A B : A =i B -> subset (mem A) =1 subset (mem B).
+Lemma eq_subset A B : A =i B -> subset A =1 subset B.
 Proof.
 move=> eqAB C; rewrite !unlock.
 (* by apply: eq_pred0b => /= x; rewrite !inE /= eqAB. *)
 by apply: eq_pred0b => /= x /[!inE]; rewrite [X in X && _]eqAB.  (* FIXME: pattern *)
 Qed.
 
-Lemma eq_subset_r A B :
-  A =i B -> (@subset T)^~ (mem A) =1 (@subset T)^~ (mem B).
+Lemma eq_subset_r A B : A =i B -> (@subset T)^~ A =1 (@subset T)^~ B.
 Proof.
 move=> eqAB C; rewrite !unlock.
 by apply: eq_pred0b => x /= /[!inE]; rewrite [X in ~~ X]eqAB. (* FIXME: pattern *)
@@ -1670,14 +1669,13 @@ Proof. by rewrite properE subxx. Qed.
 Lemma properxx A : (A \proper A) = false.
 Proof. by rewrite properE subxx. Qed.
 
-Lemma eq_proper A B : A =i B -> proper (mem A) =1 proper (mem B).
+Lemma eq_proper A B : A =i B -> proper A =1 proper B.
 Proof.
 move=> eAB C; congr (_ && _); first exact: (eq_subset eAB).
 by rewrite (eq_subset_r eAB).
 Qed.
 
-Lemma eq_proper_r A B :
-  A =i B -> (@proper T)^~ (mem A) =1 (@proper T)^~ (mem B).
+Lemma eq_proper_r A B : A =i B -> (@proper T)^~ A =1 (@proper T)^~ B.
 Proof.
 move=> eAB C; congr (_ && _); first exact: (eq_subset_r eAB).
 by rewrite (eq_subset eAB).
@@ -1720,14 +1718,13 @@ Qed.
 Lemma disjoint_sym A B : [disjoint A & B] = [disjoint B & A].
 Proof. by congr (_ == 0); apply: eq_card => x; apply: andbC. Qed.
 
-Lemma eq_disjoint A B : A =i B -> disjoint (mem A) =1 disjoint (mem B).
+Lemma eq_disjoint A B : A =i B -> disjoint A =1 disjoint B.
 Proof.
 move=> eqAB C; congr (_ == 0); apply: eq_card => x /=.
 by rewrite!inE [X in X && _]eqAB.
 Qed.
 
-Lemma eq_disjoint_r P Q : P =i Q ->
-  (@disjoint T)^~ (mem P) =1 (@disjoint T)^~ (mem Q).
+Lemma eq_disjoint_r P Q : P =i Q -> (@disjoint T)^~ P =1 (@disjoint T)^~ Q.
 Proof.
 move=> eqPQ R; congr (_ == 0); apply: eq_card => x /=.
 by rewrite !inE [X in _ && X]eqPQ.
@@ -1914,8 +1911,8 @@ apply: (iffP idP) => [/eqP/fintype1|] [x eqx]; first by exists x.
 by apply/(@card1P _ T); exists x => y; rewrite eqx [RHS]inE eqxx.
 Qed.
 
-Lemma predT_subset A : T \subset A -> forall x, x \in A.
-Proof. by move/subsetP=> allA x; apply: allA. Qed.
+Lemma predT_subset (P : {pred T}) : T \subset P -> forall x, x \in P.
+Proof. by move/(@subsetP _ T) => + x; apply. Qed.
 
 Lemma enumT : enum T = Finite.enum T.
 Proof.
