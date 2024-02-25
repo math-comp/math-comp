@@ -316,6 +316,7 @@ Arguments Finpred {T} P F.
 
 HB.lock Definition support {T} (F : finpred T) :=
   undup (filter [in F] (envelope F)).
+Canonical support_unlockable := Unlockable support.unlock.
 
 Lemma support_uniq T F : uniq (@support T F).
 Proof. by rewrite support.unlock undup_uniq. Qed.
@@ -1848,7 +1849,7 @@ Hint Resolve enum_uniq : core.
 
 Lemma enum0 : enum pred0 = Nil T.
 Proof.
-by apply: size0nil; move: (@card0 T); rewrite 2!unlock size_sort.
+by apply: size0nil; move: (@card0 T); rewrite !unlock size_sort.
 Qed.
 
 Lemma enum1 x : enum (pred1 x) = [:: x].
@@ -2487,8 +2488,6 @@ Proof. by rewrite !cardT !enumT [in LHS]unlock size_sort /= size_map. Qed.
 
 End OptionFinType.
 
-FIN.
-
 Section TransferFinTypeFromCount.
 
 Variables (eT : countType) (fT : finType) (f : eT -> fT).
@@ -2560,14 +2559,18 @@ Proof. by rewrite mem_pmap_sub -enumT mem_enum. Qed.
 Lemma sub_enum_uniq : uniq sub_enum.
 Proof. by rewrite pmap_sub_uniq // -enumT enum_uniq. Qed.
 
-Lemma val_sub_enum : map val sub_enum = enum P.
+Lemma val_sub_enum : map val sub_enum = enum [pred x | P x].
 Proof.
 rewrite pmap_filter; last exact: insubK.
-by apply: eq_filter => x; apply: isSome_insub.
+apply: (sorted_eq (@prec_eq_trans _) (@prec_eq_antisymmetric _)).
+- by rewrite sorted_filter ?Finite.enum_prec_eq_sorted//; apply: prec_eq_trans.
+- exact: enum_prec_eq_sorted.
+apply: uniq_perm => [|//| x]; first exact/filter_uniq/Finite.enum_uniq.
+by rewrite mem_filter Finite.mem_enum andbT isSome_insub mem_enum.
 Qed.
 
 HB.instance Definition SubFinMixin := isFinite.Build sT
-  (Finite.uniq_enumP sub_enum_uniq mem_sub_enum).
+  (Finite.uniq_axiom sub_enum_uniq mem_sub_enum).
 HB.end.
 
 (* This assumes that T has a subCountType structure over a type that  *)
@@ -2587,7 +2590,10 @@ Section SubCountable_isFiniteTheory.
 Variables (T : finType) (P : pred T) (sfT : subFinType P).
 
 Lemma card_sub : #|sfT| = #|[pred x | P x]|.
-Proof. by rewrite -(eq_card (codom_val sfT)) (card_image val_inj). Qed.
+Proof.
+rewrite -(@eq_card _ (codom (\val : sfT -> T)) [pred x | P x] (codom_val sfT)).
+by rewrite (card_image val_inj).
+Qed.
 
 Lemma eq_card_sub (A : {pred sfT}) : A =i predT -> #|A| = #|[pred x | P x]|.
 Proof. exact: eq_card_trans card_sub. Qed.
@@ -2645,7 +2651,7 @@ Qed.
 
 Definition seq_sub_isCountable := isCountable.Build seq_sub seq_sub_pickleK.
 Fact seq_sub_axiom : Finite.axiom seq_sub_enum.
-Proof. exact: Finite.uniq_enumP (undup_uniq _) mem_seq_sub_enum. Qed.
+Proof. exact: Finite.uniq_axiom (undup_uniq _) mem_seq_sub_enum. Qed.
 Definition seq_sub_isFinite := isFinite.Build seq_sub seq_sub_axiom.
 
 (* Beware: these are not the canonical instances, as they are not consistent  *)
@@ -2683,10 +2689,14 @@ HB.instance Definition _ : isFinite sT := seq_sub_isFinite s.
 
 Lemma card_seq_sub : uniq s -> #|{:sT}| = size s.
 Proof.
-by move=> Us; rewrite cardE enumT -(size_map val) unlock val_seq_sub_enum.
+move=> Us; rewrite cardE enumT unlock /= size_sort /seq_sub_enum.
+rewrite undup_id ?pmap_sub_uniq// size_pmap; apply/eqP; rewrite -all_count.
+by apply/allP => x xs; rewrite insubT.
 Qed.
 
 End SeqFinType.
+
+FIN.
 
 Section Extrema.
 
