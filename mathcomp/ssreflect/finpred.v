@@ -314,19 +314,26 @@ Definition Finpred T P (F : @finpredEnvelope T P) :=
  PackFinpred (LabelPred P) F.
 Arguments Finpred {T} P F.
 
-Definition support {T} (P : finpred T) := undup (filter [in P] (envelope P)).
+HB.lock Definition support {T} (F : finpred T) :=
+  undup (filter [in F] (envelope F)).
 
-Lemma support_uniq T P : uniq (@support T P). Proof. exact: undup_uniq. Qed.
-
-Lemma mem_support T P : @support T P =i P.
+Lemma support_uniq T F : uniq (@support T F).
+Proof. by rewrite support.unlock undup_uniq. Qed.
 #[export] Hint Resolve support_uniq : core.
-Proof.
-by case: P => P [s sPs] x; rewrite mem_undup mem_filter; apply/andb_idr/sPs.
-Qed.
 
-Module Export InE_MemSupport.
-Definition inE := (mem_support, inE).
-End InE_MemSupport.
+Lemma mem_support T F : @support T F =i F.
+Proof.
+case: F => F [s sFs] x.
+by rewrite support.unlock mem_undup mem_filter; apply/andb_idr/sFs.
+Qed.
+Local Definition inE := (mem_support, inE).
+
+Lemma eq_support T (F1 F2 : finpred T) :
+  F1 =i F2 <-> perm_eq (support F1) (support F2).
+Proof.
+split=> [eqF | /perm_mem-eqF x]; last by rewrite -!mem_support.
+by apply/uniq_perm=> // x; rewrite !inE.
+Qed.
 
 Structure inferFinpred (T : eqType) (P : {pred T}) (F : finpred T) :=
   InferFinpred { finpred_pilot :> bool }.
@@ -344,9 +351,10 @@ Structure coercedFinpred (T : eqType) := CoercedFinpred {
 }.
 Notation DeclareCoercedFinpred P F := (@CoercedFinpred _ P (envelope F)).
 
-#[canonical] Coercion FinpredOfCoerced T (A : coercedFinpred T) :=
+Coercion FinpredOfCoerced T (A : coercedFinpred T) :=
   PackFinpred (TryCoercedFinpred (LabelPred [eta pred_of_coerced A]))
               (envelope_of_coerced A).
+Canonical FinpredOfCoerced.
 
 Definition TryFinType := @id bool.
 Definition TryIfThenElse := TryFinType.
@@ -356,6 +364,7 @@ Definition TryFalse b := TryOp (MatchArg b).
 Canonical InferredFinpred T P (P0 := @LabelPred T P) eF :=
   PackFinpred (TryInferFinpred P0 (fun x => TryFalse (P x)) eF) eF.
 Arguments InferredFinpred {T} P eF.
+Notation "P" := (InferredFinpred P _) (at level 8, only printing) : form_scope.
 
 Variant finpredTarget (T : eqType) :=
   FinpredTarget (P0 P1 P2 : {pred T}) of finpred T.
@@ -370,6 +379,7 @@ Structure labeledFinpred T :=
 Canonical LabelInferredFinpred T P eF :=
   LabelFinpred (@InferredFinpred T P eF).
 Canonical LabelCoercedFinpred T F := LabelFinpred (@FinpredOfCoerced T F).
+Canonical DefaultLabeledFinpred T F := @LabelFinpred T F.
 
 #[projections(primitive)]
 Structure finpredPattern (T : eqType) (phT : phant T) :=
@@ -381,8 +391,13 @@ Canonical InferredFinpredPattern T P eF :=
   FinpredPattern (@LabelInferredFinpred T P eF).
 Notation "P" := (@InferredFinpredPattern _ P _)
   (at level 8, only printing) : form_scope.
-#[canonical] Coercion CoercedFinpredPattern T F :=
+Definition finpredPatternDisplayTarget (T : eqType) := {finpred T}.
+Coercion CoercedFinpredPattern T F :=
   FinpredPattern (@LabelCoercedFinpred T F).
+Canonical CoercedFinpredPattern.
+Coercion DefaultFinpredPattern T F :=
+  FinpredPattern (@DefaultLabeledFinpred T F) : finpredPatternDisplayTarget T.
+Canonical DefaultFinpredPattern.
 
 Variant finpredPatternTarget (T : eqType) := FinpredPatternTarget of {pred T}.
 #[reversible=yes] Coercion target_of_finpred_pattern T phT :=
@@ -460,8 +475,9 @@ Fixpoint envelope_of_seq {T} (s : seq _) : finpredEnvelope [pred x in s] :=
   if s isn't x :: s' then envelope (finpred0 T) else
   envelope (finpredU (finpred1 x) (Finpred _ (envelope_of_seq s'))).
 Coercion finpred_seq T s := Finpred _ (@envelope_of_seq T s).
-#[canonical] Coercion CoercedFinpred_seq T s :=
+Coercion CoercedFinpred_seq T s :=
    DeclareCoercedFinpred (@mem_seq T s) s.
+Canonical CoercedFinpred_seq.
 
 Structure labeled_bool := LabelBool {unlabel_bool :> bool}.
 Structure op_finpred {T : eqType} (P : pred T) (A : finpred T) :=
@@ -933,11 +949,12 @@ Canonical FinPreim_minn A x y1 y2 :=
 (*************************** Unit Tests          ******************************)
 (******************************************************************************)
 
-Arguments InferredFinpredPattern {T} _ _.
+
 (*Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
   [pred x in A]. *)
 
 (*
+Arguments InferredFinpredPattern {T} _ _.
 Lemma foo (D := fun T (x : T) => True) (T : eqType) (a b : T)
   (G : forall T A, D {finpred T} A -> D {pred T} A) :
    D {pred _} [pred x : {n | 5 < n} | sval x == 3].
@@ -1046,10 +1063,11 @@ Definition pred0b {T} P := @card T P == 0.
 HB.lock Definition enum {T : choiceType} P := sort prec_eq (@support T P).
 Canonical enum_unlockable := Unlockable enum.unlock.
 Definition pick {T} P := ohead (@enum T P).
+Definition pick_pred {T} := @id {pred T}.
 
-Notation "[ 'pick' x | P ]" := (pick (fun x => P%B))
+Notation "[ 'pick' x | P ]" := (pick (pick_pred (fun x => P%B)))
   (at level 0, x name, format "[ 'pick'  x  |  P  ]") : form_scope.
-Notation "[ 'pick' x : T | P ]" := (pick (fun x : T => P%B))
+Notation "[ 'pick' x : T | P ]" := (pick (pick_pred (fun x : T => P%B)))
   (at level 0, x name, only parsing) : form_scope.
 Definition pick_true T (x : T) := true.
 Reserved Notation "[ 'pick' x : T ]"
@@ -1115,46 +1133,40 @@ HB.structure Definition Finite := {T of isFinite T & Countable T }.
 (* Equality, Choice and Countable superclasses to ensure the forgetful        *)
 (* inheritance criterion is met.                                              *)
 
-Section finpred_finType.
-
-Program Definition finpred_finType (T : finType) (P : pred T) :=
-  @Finpred T P _.
-Next Obligation.
-exists (@enum_subdef T) => x _.
-by rewrite -has_pred1 has_count (@enumP_subdef T).
-Qed.
-
-Canonical Finpred_finType (T : finType) (P : pred T) b :=
-  @InferFinpred T P (finpred_finType P) (TryFinType b).
-
-End finpred_finType.
-
 Module Export FiniteNES.
 Module Finite.
 
-HB.lock Definition enum T := sort prec_eq (isFinite.enum_subdef (Finite.class T)).
+HB.lock Definition enum T :=
+  sort prec_eq (isFinite.enum_subdef (Finite.class T)).
 Canonical enum_unlockable := Unlockable enum.unlock.
 
 Notation axiom := finite_axiom.
 #[deprecated(since="mathcomp 2.0.0", note="Use isFinite.Build instead.")]
 Notation EnumMixin m := (@isFinite.Build _ _ m).
 
-Lemma uniq_enumP (T : eqType) e : uniq e -> e =i T -> axiom e.
+Lemma uniq_axiom (T : eqType) e : uniq e -> e =i T -> axiom e.
 Proof. by move=> Ue sT x; rewrite count_uniq_mem ?sT. Qed.
 
 Lemma enum_prec_eq_sorted T : sorted prec_eq (enum T).
-Proof. by rewrite unlock sort_sorted//; apply: prec_eq_total. Qed.
+Proof. by rewrite unlock; apply/sort_sorted/prec_eq_total. Qed.
 
 Lemma enumP T : axiom (enum T).
 Proof.
 by move=> x; rewrite unlock (permP (permEl (perm_sort _ _))) enumP_subdef.
 Qed.
 
+Lemma mem_enum T x : x \in enum T.
+Proof. by rewrite -has_pred1 has_count enumP. Qed.
+
+Lemma enum_uniq T : uniq (enum T).
+Proof. by apply: count_mem_uniq => x; rewrite enumP mem_enum. Qed.
+
 Section WithCountType.
-Variable (T : countType).
+
+Variable T : countType.
 
 Definition UniqMixin_deprecated e Ue (eT : e =i T) :=
-  @isFinite.Build T e (uniq_enumP Ue eT).
+  @isFinite.Build T e (uniq_axiom Ue eT).
 
 Variable n : nat.
 
@@ -1162,13 +1174,13 @@ Definition count_enum := pmap (@pickle_inv T) (iota 0 n).
 
 Hypothesis ubT : forall x : T, pickle x < n.
 
-Lemma count_enumP : axiom count_enum.
+Lemma count_axiom : axiom count_enum.
 Proof.
-apply: uniq_enumP (pmap_uniq (@pickle_invK T) (iota_uniq _ _)) _ => x.
+apply: uniq_axiom (pmap_uniq (@pickle_invK T) (iota_uniq _ _)) _ => x.
 by rewrite mem_pmap -pickleK_inv map_f // mem_iota ubT.
 Qed.
 
-Definition CountMixin_deprecated := @isFinite.Build _ _ count_enumP.
+Definition CountMixin_deprecated := @isFinite.Build _ _ count_axiom.
 
 End WithCountType.
 #[deprecated(since="mathcomp 2.0.0",
@@ -1180,6 +1192,16 @@ Notation CountMixin := CountMixin_deprecated.
 End Finite.
 Canonical finEnum_unlock := Unlockable Finite.enum.unlock.
 End FiniteNES.
+
+Section finpred_finType.
+
+Program Definition finpred_finType (T : finType) P := @Finpred T P _.
+Next Obligation. by exists (Finite.enum T) => x _; apply: Finite.mem_enum. Qed.
+
+Canonical Finpred_finType (T : finType) (P : pred T) b :=
+  @InferFinpred T P (finpred_finType P) (TryFinType b).
+
+End finpred_finType.
 
 Section CanonicalFinType.
 Variable (T : eqType) (s : seq T).
@@ -1221,7 +1243,6 @@ Module FiniteQuant.
 
 Variant quantified := Quantified of bool.
 
-Delimit Scope fin_quant_scope with Q. (* Bogus, only used to declare scope. *)
 Bind Scope fin_quant_scope with quantified.
 
 Notation "F ^*" := (Quantified F) (at level 2).
@@ -1320,30 +1341,30 @@ End FiniteQuant.
 Export FiniteQuant.Exports.
 
 Definition disjoint (T : eqType) (A : finpred T) (B : {pred T}) :=
-  @pred0b T [pred x in A | B x].
+  @pred0b T [predI A & B].
 
-Notation "[ 'disjoint' A & B ]" := (disjoint (mem A) (mem B))
+Notation "[ 'disjoint' A & B ]" := (disjoint A B)
   (at level 0,
    format "'[hv' [ 'disjoint' '/  '  A '/'  &  B ] ']'") : bool_scope.
 
 HB.lock
 Definition subset (T : eqType) (A : finpred T) (B : {pred T}) : bool :=
-  pred0b [pred x in A | ~~ B x].
+  pred0b [pred x in A | x \notin B].
 Canonical subset_unlock := Unlockable subset.unlock.
 
-Notation "A \subset B" := (subset (mem A) (mem B))
+Notation "A \subset B" := (subset A B)
   (at level 70, no associativity) : bool_scope.
 
 Definition proper (T : eqType) (A B : finpred T) :=
   @subset T A B && ~~ subset B A.
-Notation "A \proper B" := (proper (mem A) (mem B))
+Notation "A \proper B" := (proper A B)
   (at level 70, no associativity) : bool_scope.
 
 (* image, xinv, inv, and ordinal operations will be defined later. *)
 
 Section EqOpsTheory.
 Variable T : eqType.
-Implicit Types (A B : {finpred T}) (C D : {pred T}).
+Implicit Types (A B : {finpred T}) (C D : {pred T}) (F : finpred T).
 Implicit Types (P Q : pred T) (x y : T) (s : seq T).
 
 Variant pick_spec P : option T -> Type :=
@@ -1351,13 +1372,10 @@ Variant pick_spec P : option T -> Type :=
   | Nopick of P =i xpred0 : pick_spec P None.
 
 Lemma eq_card A B : A =i B -> #|A| = #|B|.
-Proof.
-rewrite unlock => AB; apply/eqP.
-by rewrite -uniq_size_uniq// => x; rewrite !inE AB.
-Qed.
+Proof. by rewrite unlock => /eq_support/perm_size. Qed.
 
 Lemma eq_pred0b A B : A =i B -> pred0b A = pred0b B.
-Proof. by move=> eAB; congr (_ == 0); apply: eq_card. Qed.
+Proof. by unfold pred0b => /eq_card->. Qed.
 
 Lemma eq_card_trans A B n : #|A| = n -> B =i A -> #|B| = n.
 Proof. by move=> <- /eq_card. Qed.
@@ -1371,9 +1389,7 @@ Qed.
 Lemma card0 : #|@pred0 T| = 0. Proof. exact/(card_uniqP [::]). Qed.
 
 Lemma card1 x : #|pred1 x| = 1.
-Proof.
-by rewrite (@eq_card _ [::x]); [exact/(card_uniqP [::x])|move=> y /[!inE]].
-Qed.
+Proof. by rewrite -(@eq_card [:: x]) => [|y /[!inE]//]; apply/card_uniqP. Qed.
 
 Lemma eq_card0 A : A =i pred0 -> #|A| = 0.
 Proof. exact: eq_card_trans card0. Qed.
@@ -1381,39 +1397,31 @@ Proof. exact: eq_card_trans card0. Qed.
 Lemma eq_card1 x A : A =i pred1 x -> #|A| = 1.
 Proof. exact: eq_card_trans (card1 x). Qed.
 
-(* TODO: bad name, cardsUI reserved for finset *)
 Lemma cardUI A B : #|[predU A & B]| + #|[predI A & B]| = #|A| + #|B|.
 Proof.
-rewrite unlock.
-set s := support [predU A & B].
-have sI (P : {finpred T}) :
-    {subset P <= s} -> perm_eq (support P) [seq x <- s | x \in P].
-  move=> Ps; rewrite uniq_perm ?filter_uniq /s // => x.
-  by rewrite inE mem_filter andb_idr ?finpred_of_eq//; apply: Ps.
-rewrite !(perm_size (sI _ _))/=.
-- by rewrite !size_filter count_predUI.
-- by move=> x /[!inE]/=/andP[xA _]; rewrite [X in X || _]xA.
-- by move=> x /[!inE]/=.
-- by move=> x xB; rewrite !inE/=; rewrite [X in _ || X]xB orbT.
-- by move=> x; rewrite !inE/= => xA; rewrite [X in X || _]xA.  (* FIXME pattern and why inE goes too far and requires a /= ? *)
+pose U := [predU A & B].
+have Dcard A1: {subset A1 <= U} -> #|A1| = count [in A1] (support U).
+  move=> sA1U; rewrite unlock -size_filter; apply/perm_size.
+  rewrite uniq_perm ?filter_uniq // => x; rewrite mem_filter !inE.
+  exact/esym/andb_idr/sA1U.
+rewrite !Dcard ?count_predUI // => x /[!inE]; try case/andP; move=> -> //.
+exact: orbT.
 Qed.
-(* TODO Georges: check duplication *)
 
-Lemma cardID B A : #|[predI A & B]| + #|[pred x in A | x \notin B]| = #|A|.
+Lemma cardID D A : #|[predI A & D]| + #|[pred x in A | x \notin D]| = #|A|.
 Proof.
-rewrite -cardUI addnC/= [X in X + _]eq_card0 => [|x] /=.
+rewrite -cardUI addnC [in LHS]eq_card0 => [|x] /=.
   by apply: eq_card => x /[!inE]/=; rewrite -andb_orr orbN andbT.
 by rewrite !inE andbACA andbN andbF.
 Qed.
 
 Lemma cardU1 x A : #|[predU1 x & A]| = (x \notin A) + #|A|.
 Proof.
-case Ax: (x \in A).
-  by apply: eq_card => y /[1!inE]/=; case: eqP => // ->.
+case Ax: (x \in A); first by apply/eq_card => y /[!inE]; case: eqP => // ->.
 rewrite /= -(card1 x) -cardUI addnC.
-rewrite [X in X + _]eq_card0 => [|y /=]; first exact: eq_card.
-by rewrite !inE; case: eqP => // ->.
+by rewrite [in RHS]eq_card0 // => y /[!inE]; case: eqP => // ->.
 Qed.
+
 (* notes:
 
 today:
@@ -1429,71 +1437,82 @@ rewrite cardU1. (* works no matter how you derive the finiteness of [predU1 x & 
 *)
 
 Lemma card2 x y : #|pred2 x y| = (x != y).+1.
-Proof. by rewrite (cardU1 x (pred1 y)) card1 addn1. Qed.
+Proof. by rewrite cardU1 inE card1 addn1. Qed.
+(* The cardU1 match succeeds but exposes a finpred1 y structure, as it        *)
+(* matches the finpred structures directly, and the inner finpred1 is not     *)
+(* labeled by a call to reverse_coercion.                                     *)
+(* TO CHECK: it appears the top calls to reverse_coercion fail to match       *)
+(* because of universe constraints ?!?                                        *)
 
 Lemma cardD1 x A : #|A| = (x \in A) + #|[predD1 A & x]|.
 Proof.
-case Ax: (x \in A); last first.
-  by apply: eq_card => y /[!inE]/=; case: eqP => // ->.
-rewrite /= -(card1 x) -cardUI addnC /=.
-rewrite [X in X + _]eq_card0 => [|y]; last by rewrite /= !inE; case: eqP.
-by apply: eq_card => y /[!inE] /=; case: eqP => // ->.
+apply/(@addnI (x \notin A)); rewrite addnA addn_negb -cardU1.
+have <-: x \notin [predD1 A & x] = 1 :> nat by rewrite !inE eqxx.
+by rewrite -[RHS]cardU1; apply/eq_card=> y /[!inE]; rewrite orb_andr orbN.
+(* The [RHS] makes this rewrite work by matching the (_ + _) as a whole       *)
+(* rather than piecewise. The LHS of the (_ + _) cannot match because of the  *)
+(* extraarg default projection bug: trying to match (?x \in ?A) where ?x : T  *)
+(* and ?A : {finpred T}, with (y \in P), will always fail, even when P would  *)
+(* unify with ?A coerced to {pred T}), because it actually tries to match     *)
+(* (P x) with (mem_labeled ?A x), where x : T is a fresh variable. This fails *)
+(* because mem_labeled only has a default instance, which cannot match due to *)
+(* the presence of the extraarg x.                                            *)
+(*   Matching the (_ + _) globally fixes this because although first it fails *)
+(* matching the nat_of_bool (?x \notin ?A) LHS initially as above, ultimately *)
+(* it expands the definition of addn to a fix expression, which gets pushed   *)
+(* as a stack item, leading to a the following unification problem            *)
+(*      nat_of_bool | ZApp (?x \notin ?A), ZFix (fix 0 ...), ZApp (#|?A|)     *)
+(*      nat_of_bool | ZApp (y \notin P), ZFix (fix 0 ...), ZApp (#|P|)        *)
+(* which Coq can resolve because it matches stacks RIGHT TO LEFT, even though *)
+(* it matches application lists LEFT TO RIGHT, the match of the cardinals     *)
+(* succeeds because #|P| already contains the finpred inferred for P, and     *)
+(* then the P to ?A match succeeds by conversion since ?A has been resolved.  *)
 Qed.
 
 Lemma card_undup s : #|undup s| = #|s|.
-Proof.
-by apply/eqP; rewrite unlock -uniq_size_uniq// => x; rewrite !inE mem_undup.
-Qed.
+Proof. by apply/eq_card=> x; rewrite !inE mem_undup. Qed.
 
 Lemma card_size s : #|s| <= size s.
 Proof.
-by rewrite unlock (uniq_leq_size (support_uniq _))// => x /[!mem_support].
+by rewrite unlock (uniq_leq_size (support_uniq _))// => x /[!inE].
 Qed.
 
 Lemma card0_eq A : #|A| = 0 -> A =i pred0.
-Proof. by move=> A0 x; apply/idP => Ax; rewrite (cardD1 x) Ax in A0. Qed.
+Proof. by move=> + x; apply/contra_eqF=> Ax; rewrite (cardD1 x) Ax. Qed.
 
 Lemma card0P A : reflect (forall x, x \notin A) (#|A| == 0).
 Proof.
-apply: (iffP idP); first by move/eqP/card0_eq => + x => ->.
-by move=> xA; apply/eqP/eq_card0 => x; rewrite (negbTE (xA x)).
+apply: (iffP eqP) => [A0 x|A0]; first by rewrite card0_eq.
+by apply/eq_card0=> x; apply/idPn/A0.
 Qed.
 
 Lemma card_gt0P A : reflect (exists x, x \in A) (#|A| > 0).
 Proof.
-apply: (iffP idP).
-  by rewrite unlock -has_predT => /hasP[x /[!mem_support] xA _]; exists x.
-by move=> -[x xA]; rewrite lt0n; apply/negP => /eqP/card0_eq /(_ x); rewrite xA.
+apply: (iffP idP) => [|[x]]; last by rewrite lt0n; apply/contraL=> /card0P->.
+by rewrite unlock -has_predT => /hasP[x /[!inE]]; exists x.
 Qed.
 
-Lemma pred0P (P : {finpred T}) : reflect ((P : {pred T}) =1 pred0) (pred0b P).
+Lemma pred0P A: reflect ((A : {pred T}) =1 pred0) (pred0b A).
 Proof. by apply: (iffP eqP); [apply: card0_eq | apply: eq_card0]. Qed.
 
-Lemma pred0Pn (P : {finpred T}) : reflect (exists x, x \in P) (~~ pred0b P).
-Proof.
-apply: (iffP idP); first by rewrite /pred0b -lt0n => /card_gt0P.
-by move/card_gt0P; rewrite lt0n.
-Qed.
+Lemma pred0Pn A : reflect (exists x, x \in A) (~~ pred0b A).
+Proof. by rewrite -lt0n; apply: card_gt0P. Qed.
 
 Lemma card_le1P {A} : reflect {in A, forall x, A =i pred1 x} (#|A| <= 1).
 Proof.
-case ec: card => [|c].
-  by apply: ReflectT => x; have /eqP/card0P {}ec := ec; rewrite (negbTE (ec x)).
-rewrite ltnS leqn0 -eqSS -ec.
-apply: (iffP idP); last first.
-  move=> A1; apply/eqP.
-  by have /card_gt0P[x /A1/eq_card1] : #|A| > 0 by rewrite ec.
-move=> + x xA; rewrite (cardD1 x) xA add1n eqSS => /card0P/= + y => /(_ y).
-by rewrite !inE negb_and negbK; case: eqP => [-> //| /= _ /negbTE].
+rewrite leq_eqVlt ltnNge orbC; case: posnP => [A0 | Agt0].
+  by apply/ReflectT=> x; rewrite card0_eq.
+apply/(iffP idP)=> A1; last by case/card_gt0P: Agt0 => x /A1/eq_card1->.
+move=> x xA y; rewrite (cardD1 x) xA in A1; have{A1} := card0P _ A1 y.
+by rewrite !inE; case: eqP => [->|_ /negbTE].
 Qed.
 
 Lemma mem_card1 A : #|A| = 1 -> {x | A =i pred1 x}.
 Proof.
-move=> A1.
-have: #|A| > 0 by rewrite A1.
-rewrite unlock; case: support (mem_support A) => [//|x s xsA _]; exists x.
-have /card_le1P := eq_leq A1; apply.
-by rewrite -xsA mem_head.  (* TODO: clean *)
+move=> A1; suffices [x xA]: {x | x \in A}.
+  by exists x; apply/(card_le1P _ x xA); rewrite A1.  
+rewrite unlock in A1; case defA: (support A) A1 => // [x s] _.
+by exists x; rewrite -mem_support defA mem_head.
 Qed.
 
 Lemma card1P A : reflect (exists x, A =i pred1 x) (#|A| == 1).
@@ -1504,27 +1523,26 @@ Qed.
 Lemma card_le1_eqP A :
   reflect {in A &, forall x, all_equal_to x} (#|A| <= 1).
 Proof.
-apply: (iffP card_le1P) => [Ale1 x y xA yA /=|all_eq x xA y].
-  by apply/eqP; rewrite -[_ == _]/(y \in pred1 x) -Ale1.
-by rewrite inE; case: (altP (y =P x)) => [->//|]; exact/contra_neqF/all_eq.
+apply: (iffP card_le1P) => [Ale1 x y /Ale1-> /eqP // | all_eq x xA y].
+by apply/idP/eqP=> [/(all_eq x y xA) | ->].
 Qed.
 
-Lemma subsetE A (B : {pred T}) : (A \subset B) = pred0b [predD A & B].
-Proof. by rewrite unlock; apply: eq_pred0b => /= x; rewrite inE andbC. Qed.
+Lemma subsetE A D : (A \subset D) = pred0b [predD A & D].
+Proof. by rewrite unlock; apply/eq_pred0b => /= x; rewrite inE andbC. Qed.
 
-Lemma subsetP A (B : {pred T}) : reflect {subset A <= B} (A \subset B).
+Lemma subsetP A D : reflect {subset A <= D} (A \subset D).
 Proof.
-rewrite unlock; apply: (iffP (pred0P _)) => /=[AB0 x | sAB x /=].
-  by apply/implyP/idPn; rewrite negb_imply [_ && _]AB0.
-by rewrite -negb_imply; apply/negbF/implyP; apply: sAB.
+rewrite unlock; apply: (iffP (pred0P _)) => /=[AD0 x | sAD x /=].
+  by apply/implyP/idPn; rewrite negb_imply [_ && _]AD0.
+by rewrite -negb_imply; apply/negbF/implyP/sAD.
 Qed.
 
-Lemma subsetPn A (B : {pred T}) :
-  reflect (exists2 x, x \in A & x \notin B) (~~ (A \subset B)).
+Lemma subsetPn A D:
+  reflect (exists2 x, x \in A & x \notin D) (~~ (A \subset D)).
 Proof.
-rewrite unlock; apply: (iffP (pred0Pn _)) => [[x] | [x Ax nBx]].
+rewrite unlock; apply: (iffP (pred0Pn _)) => [[x] | [x Ax D'x]].
   by case/andP; exists x.
-by exists x; rewrite /= inE nBx andbT.
+by exists x; rewrite /= inE D'x andbT.
 Qed.
 
 Lemma subset_leq_card A B : A \subset B -> #|A| <= #|B|.
@@ -1533,38 +1551,30 @@ move=> sAB; rewrite -(cardID A B) (@eq_card _ A) ?leq_addr// => x.
 by rewrite !inE andbC; case Ax: (x \in A) => //; apply: subsetP Ax.
 Qed.
 
-Lemma subxx_hint (A : finpred T) : subset A A.
-Proof. exact/(subsetP [pred x | x \in A]). Qed.
-(* TODO: understand why we need the argument A *)
-Hint Resolve subxx_hint : core.
+Lemma subxx F : F \subset F.
+Proof. exact/subsetP. Qed.
+(* TODO: understand why we need the argument F *)
+Hint Resolve subxx : core.
 
-(* The parametrization by predType makes it easier to apply subxx. *)
-Lemma subxx (A : {finpred T}) : A \subset A.
-Proof. by []. Qed.
-
-Lemma eq_subset A B : A =i B -> subset (mem A) =1 subset (mem B).
+Lemma eq_subset A B : A =i B -> subset A =1 subset B.
 Proof.
-move=> eqAB C; rewrite !unlock.
-(* by apply: eq_pred0b => /= x; rewrite !inE /= eqAB. *)
-by apply: eq_pred0b => /= x /[!inE]; rewrite [X in X && _]eqAB.  (* FIXME: pattern *)
+by move=> eqAB C; rewrite !unlock; apply: eq_pred0b => /= x; rewrite !inE eqAB.
 Qed.
 
-Lemma eq_subset_r A B :
-   A =i B -> (@subset T)^~ (mem A) =1 (@subset T)^~ (mem B).
+Lemma eq_subset_r C D : C =i D -> (@subset T)^~ C =1 (@subset T)^~ D.
 Proof.
-move=> eqAB C; rewrite !unlock.
-by apply: eq_pred0b => x /= /[!inE]; rewrite [X in ~~ X]eqAB. (* FIXME: pattern *)
+by move=> eqCD A; rewrite !unlock; apply/eq_pred0b => x; rewrite !inE eqCD.
 Qed.
 
 Lemma eq_subxx A B : A =i B -> A \subset B.
 Proof. by move/eq_subset->. Qed.
 
-Lemma subset_predT A : A \subset T.
+Lemma subset_predT F : F \subset T.
 Proof. exact/subsetP. Qed.
 
-Lemma subset_pred1 (A : {pred T}) x : (pred1 x \subset A) = (x \in A).
+Lemma subset_pred1 D x : (pred1 x \subset D) = (x \in D).
 Proof.
-by apply/(subsetP (pred1 x))/idP=> [-> // | Ax y /eqP-> //]; apply: eqxx.
+apply/subsetP/idP=> [-> // | Ax y /eqP-> //]; apply: eqxx.
 Qed.
 
 Lemma subset_eqP A B : reflect (A =i B) ((A \subset B) && (B \subset A)).
@@ -1576,10 +1586,9 @@ Qed.
 Lemma subset_cardP A B : #|A| = #|B| -> reflect (A =i B) (A \subset B).
 Proof.
 move=> eqcAB; case: (subsetP A B) (subset_eqP A B) => //= sAB.
-case: (subsetP B A) => [//|[]] x Bx; apply/idPn => Ax.
-case/idP: (ltnn #|A|); rewrite {2}eqcAB (cardD1 x B) Bx /=.
-apply: subset_leq_card; apply/subsetP=> y Ay; rewrite inE /= andbC.
-by rewrite [X in X && _]sAB//=; apply/eqP => eqyx; rewrite -eqyx Ay in Ax.
+case: (subsetP B A) => [//|[]] x Bx; apply: contraFT (ltnn #|A|) => A'x.
+rewrite [leqRHS]eqcAB (cardD1 x B) Bx ltnS.
+by apply/subset_leq_card/subsetP=> y Ay; rewrite inE (memPn A'x) ?sAB.
 Qed.
 
 Lemma subset_leqif_card A B : A \subset B -> #|A| <= #|B| ?= iff (B \subset A).
@@ -1589,13 +1598,11 @@ move=> sAB; split; [exact: subset_leq_card | apply/eqP/idP].
 by move=> sBA; apply: eq_card; apply/subset_eqP; rewrite sAB.
 Qed.
 
-Lemma subset_trans A B (C : {pred T}) : A \subset B -> B \subset C -> A \subset C.
-Proof.
-by move/subsetP=> sAB /subsetP=> sBC; apply/subsetP=> x /sAB; apply: sBC.
-Qed.
+Lemma subset_trans A B C : A \subset B -> B \subset C -> A \subset C.
+Proof. by move/subsetP=> sAB /subsetP=> sBC; apply/subsetP=> x /sAB/sBC. Qed.
 
-Lemma subset_all s (A : {pred T}) : (s \subset A) = all [in A] s.
-Proof. exact: (sameP (subsetP s A) allP). Qed.
+Lemma subset_all s D : (s \subset D) = all [in D] s.
+Proof. exact: (sameP (subsetP s D) allP). Qed.
 
 Lemma subset_cons s x : s \subset x :: s.
 Proof. by apply/(subsetP s) => y /[!inE] ->; rewrite orbT. Qed.
@@ -1618,13 +1625,13 @@ move=> /(subsetP s1) s12; apply/(subsetP (s3 ++ s1)) => x.
 by rewrite !mem_cat => /orP[->|/s12->]; rewrite ?orbT.
 Qed.
 
-Lemma filter_subset p s : [seq a <- s | p a] \subset s.
-Proof. by apply/(subsetP (filter _ _))=> x; rewrite mem_filter => /andP[]. Qed.
+Lemma filter_subset P s : [seq a <- s | P a] \subset s.
+Proof. by apply/subsetP=> x; rewrite mem_filter => /andP[]. Qed.
 
-Lemma subset_filter p s1 s2 :
-  s1 \subset s2 -> [seq a <- s1 | p a] \subset [seq a <- s2 | p a].
+Lemma subset_filter P s1 s2 :
+  s1 \subset s2 -> [seq a <- s1 | P a] \subset [seq a <- s2 | P a].
 Proof.
-move/(subsetP s1)=> s12; apply/(subsetP (filter _ _))=> x.
+move/subsetP=> s12; apply/(subsetP (filter _ _))=> x.
 by rewrite !mem_filter=> /andP[-> /s12].
 Qed.
 
@@ -1641,20 +1648,23 @@ Proof. by case/andP. Qed.
 Lemma proper_subn A B : A \proper B -> ~~ (B \subset A).
 Proof. by case/andP. Qed.
 
-Lemma proper_trans (A B C : {finpred T}) : A \proper B -> B \proper C -> A \proper C.
+Lemma proper_trans (A B C : {finpred T}) :
+  A \proper B -> B \proper C -> A \proper C.
 Proof.
 case/properP=> sAB [x Bx nAx] /properP[sBC [y Cy nBy]].
 rewrite properE (subset_trans sAB) //=; apply/subsetPn; exists y => //.
 by apply: contra nBy; apply: subsetP.
 Qed.
 
-Lemma proper_sub_trans (A B C : {finpred T}) : A \proper B -> B \subset C -> A \proper C.
+Lemma proper_sub_trans (A B C : {finpred T}) :
+  A \proper B -> B \subset C -> A \proper C.
 Proof.
 case/properP=> sAB [x Bx nAx] sBC; rewrite properE (subset_trans sAB) //.
 by apply/subsetPn; exists x; rewrite ?(subsetP _ _ sBC).
 Qed.
 
-Lemma sub_proper_trans (A B C : {finpred T}) : A \subset B -> B \proper C -> A \proper C.
+Lemma sub_proper_trans (A B C : {finpred T}) :
+  A \subset B -> B \proper C -> A \proper C.
 Proof.
 move=> sAB /properP[sBC [x Cx nBx]]; rewrite properE (subset_trans sAB) //.
 by apply/subsetPn; exists x => //; apply: contra nBx; apply: subsetP.
@@ -1662,7 +1672,7 @@ Qed.
 
 Lemma proper_card A B : A \proper B -> #|A| < #|B|.
 Proof.
-by case/andP=> sAB nsAB; rewrite ltn_neqAle !(@subset_leqif_card A B sAB) andbT. (* FIXME: why do we need arguments A and B *)
+by case/andP=> sAB nsAB; rewrite ltn_neqAle !(subset_leqif_card sAB) andbT.
 Qed.
 
 Lemma proper_irrefl A : ~~ (A \proper A).
@@ -1671,14 +1681,13 @@ Proof. by rewrite properE subxx. Qed.
 Lemma properxx A : (A \proper A) = false.
 Proof. by rewrite properE subxx. Qed.
 
-Lemma eq_proper A B : A =i B -> proper (mem A) =1 proper (mem B).
+Lemma eq_proper A B : A =i B -> proper A =1 proper B.
 Proof.
 move=> eAB C; congr (_ && _); first exact: (eq_subset eAB).
 by rewrite (eq_subset_r eAB).
 Qed.
 
-Lemma eq_proper_r A B :
-  A =i B -> (@proper T)^~ (mem A) =1 (@proper T)^~ (mem B).
+Lemma eq_proper_r A B : A =i B -> (@proper T)^~ A =1 (@proper T)^~ B.
 Proof.
 move=> eAB C; congr (_ && _); first exact: (eq_subset_r eAB).
 by rewrite (eq_subset eAB).
@@ -1721,60 +1730,45 @@ Qed.
 Lemma disjoint_sym A B : [disjoint A & B] = [disjoint B & A].
 Proof. by congr (_ == 0); apply: eq_card => x; apply: andbC. Qed.
 
-Lemma eq_disjoint A B : A =i B -> disjoint (mem A) =1 disjoint (mem B).
+Lemma eq_disjoint A B : A =i B -> disjoint A =1 disjoint B.
 Proof.
-move=> eqAB C; congr (_ == 0); apply: eq_card => x /=.
-by rewrite!inE [X in X && _]eqAB.
+by move=> eqAB C; congr (_ == 0); apply: eq_card => x /=; rewrite !inE eqAB.
 Qed.
 
-Lemma eq_disjoint_r (A B : {pred T}) : A =i B ->
-  (@disjoint T)^~ (mem A) =1 (@disjoint T)^~ (mem B).
+Lemma eq_disjoint_r C D : C =i D -> (@disjoint T)^~ C =1 (@disjoint T)^~ D.
 Proof.
-move=> eqAB C; congr (_ == 0); apply: eq_card => x /=.
-by rewrite !inE [X in _ && X]eqAB.
+by move=> eqCD A; congr (_ == 0); apply: eq_card => x /=; rewrite !inE eqCD.
 Qed.
 
-Lemma subset_disjoint A (B : {pred T}) :
-  (A \subset B) = [disjoint A & [predC B]].
+Lemma subset_disjoint A D : (A \subset D) = [disjoint A & [predC D]].
 Proof.
-apply/subsetP/pred0P => /=.
-  by move=> AB x /=; apply/negP => /andP[/AB->].
-move=> + x => /(_ x)/negbT/=; rewrite negb_and negbK => /orP[/negbTE Ax|//].
-by rewrite [x \in A]Ax.  (* FIXME *)
+apply/subsetP/pred0P => [sAD x | + x] /=.
+  by rewrite -negb_imply; apply/negbF/implyP=> /sAD.
+by move/(_ x)/negbT; rewrite /= -negb_imply negbK => /implyP.
 Qed.
 
-Lemma disjoint_subset A (B : {pred T}) :
-  [disjoint A & B] = (A \subset [predC B]).
+Lemma disjoint_subset A D : [disjoint A & D] = (A \subset [predC D]).
 Proof.
 by rewrite subset_disjoint; apply: eq_disjoint_r => x; rewrite !inE negbK.
 Qed.
 
-Lemma disjointFr A (B : {pred T}) x : [disjoint A & B] ->
-  x \in A -> x \in B = false.
-Proof.
-move/pred0P/(_ x) => /=; rewrite -[X in X && _]/(x \in A).
-by case: (x \in A).
-Qed.
+Lemma disjointFr A D x : [disjoint A & D] -> x \in A -> x \in D = false.
+Proof. by move/pred0P/(_ x) => /= + Ax; rewrite Ax. Qed.
 
-Lemma disjointFl A (B : {pred T}) x : [disjoint A & B] ->
-  x \in B -> x \in A = false.
-Proof.
-move/pred0P/(_ x) => /=; rewrite -[X in _ && X]/(x \in B) andbC.
-by case: (x \in B).
-Qed.
+Lemma disjointFl A D x : [disjoint A & D] -> x \in D -> x \in A = false.
+Proof. by move/pred0P/(_ x) => /= + Dx; rewrite Dx andbT. Qed.
 
-Lemma disjointWl A B (C : {pred T}) :
-   A \subset B -> [disjoint B & C] -> [disjoint A & C].
+Lemma disjointWl A B C : A \subset B -> [disjoint B & C] -> [disjoint A & C].
 Proof. by rewrite 2!disjoint_subset; apply: subset_trans. Qed.
 
 Lemma disjointWr A (B : {pred T}) (C : {finpred T}) :
   A \subset B -> [disjoint C & B] -> [disjoint C & A].
 Proof.
-rewrite 2!disjoint_subset => /subsetP AB /subsetP BC; apply/subsetP => x /BC.
-exact/contra/AB.
+rewrite 2!disjoint_subset => /subsetP-sAB /subsetP-sCB'.
+by apply/subsetP => x /sCB'; apply/contra/sAB.
 Qed.
 
-Lemma disjointW (A B C : {finpred T}) (D : {pred T}) :
+Lemma disjointW (A B C : {finpred T}) D :
   A \subset B -> C \subset D -> [disjoint B & D] -> [disjoint A & C].
 Proof.
 by move=> subAB subCD BD; apply/(disjointWl subAB)/(disjointWr subCD).
@@ -1788,9 +1782,8 @@ Proof. by move/(@eq_disjoint _ pred0)->; apply: disjoint0. Qed.
 
 Lemma disjoint1 x (A : {pred T}) : [disjoint pred1 x & A] = (x \notin A).
 Proof.
-apply/idP/idP.
-  by move/pred0P => /= /(_ x)/=; rewrite inE eqxx/= => /negbT.
-by move=> /negbTE xA; apply/pred0P => y /=/[!inE]; case: eqP => // -> /=.
+apply/pred0P/idP; first by move/(_ x); rewrite /= inE eqxx /= => ->.
+by move=> + y; apply/contraNF=> /andP[/eqP<-].
 Qed.
 
 Lemma eq_disjoint1 x A (B : {pred T}) :
@@ -1800,10 +1793,10 @@ Proof. by move/(@eq_disjoint _ (pred1 x))->; apply: disjoint1. Qed.
 Lemma disjointU A B (C : {pred T}) :
   [disjoint [predU A & B] & C] = [disjoint A & C] && [disjoint B & C].
 Proof.
-case: [disjoint A & C] / (pred0P (predI [in A] C)) => [A0 | nA0] /=.
-  by apply: eq_pred0b => x /=; rewrite [x \in _]andb_orl [X in X || _]A0.
-apply/pred0P=> nABC; case: nA0 => x; apply/idPn=> /=; move/(_ x): nABC.
-by rewrite [_ x]andb_orl; case/norP.
+case: [disjoint A & C] / (altP (pred0P [predI A & C])) => [A0|] /=.
+  by apply/eq_pred0b => x; rewrite !inE andb_orl [_ && _]A0.
+apply/contraNF=> /= /pred0P-nABC; apply/pred0P=> x /=.
+by apply: contraFF (nABC x); rewrite /= andb_orl => ->.
 Qed.
 
 Lemma disjointU1 x A (B : {pred T}) :
@@ -1833,15 +1826,15 @@ move=> /(subsetP s1) s1s2; apply/(subsetP (map _ _)) => _ /mapP[y]/[swap]-> ys1.
 by apply/mapP; exists y => //; apply: s1s2.
 Qed.
 
-#[global] Hint Resolve subxx_hint : core.
+#[global] Hint Resolve subxx : core.
 
-Arguments pred0P {T P}.
-Arguments pred0Pn {T P}.
+Arguments pred0P {T P} : rename.
+Arguments pred0Pn {T P} : rename.
 Arguments card_le1P {T A}.
 Arguments card_le1_eqP {T A}.
 Arguments card1P {T A}.
-Arguments subsetP {T A B}.
-Arguments subsetPn {T A B}.
+Arguments subsetP {T A B} : rename.
+Arguments subsetPn {T A B} : rename.
 Arguments subset_eqP {T A B}.
 Arguments card_uniqP {T s}.
 Arguments card_geqP {T A n}.
@@ -1870,10 +1863,10 @@ Qed.
 Lemma enum1 x : enum (pred1 x) = [:: x].
 Proof.
 apply: perm_small_eq => //; apply: uniq_perm => // y.
-by rewrite mem_enum/= !inE.
+by rewrite mem_enum /= !inE.
 Qed.
 
-Lemma pickP A : pick_spec (A : {pred T}) (pick A).
+Lemma pickP A : pick_spec (A : {pred T}) (pick (pick_pred A)).
 Proof.
 rewrite /pick; case: (enum _) (mem_enum A) => [|x s] Axs /=.
   by right; apply: fsym.
@@ -1883,20 +1876,20 @@ Qed.
 (* Should we keep it? *)
 Definition set_pickP (A : {finpred T}) : pick_spec [in A] (pick A) := pickP A.
 
-Lemma enum_prec_eq_sorted A : sorted prec_eq (enum A).
+Lemma enum_prec_eq_sorted (A : finpred T) : sorted prec_eq (enum A).
 Proof. by rewrite unlock sort_sorted//; apply: prec_eq_total. Qed.
+Local Hint Resolve enum_prec_eq_sorted.
 
 Lemma eq_enum A B : A =i B -> enum A = enum B.
 Proof.
-move=> AB; apply: (@sorted_eq _ prec_eq).
+move=> AB; apply: (@sorted_eq _ prec_eq) => //.
 - exact: prec_eq_trans.
 - exact: prec_eq_antisymmetric.
-- exact: enum_prec_eq_sorted.
-- exact: enum_prec_eq_sorted.
-- by apply: uniq_perm => // x; rewrite !mem_enum.
+by apply: uniq_perm => // x; rewrite !mem_enum.
 Qed.
 
-Lemma eq_pick A B : A =i B -> pick A = pick B.
+Lemma eq_pick A B :
+  (A : {pred T}) =1 (B : {pred T}) -> pick (pick_pred A) = pick (pick_pred B).
 Proof. by rewrite /pick => /eq_enum->. Qed.
 
 Lemma cardE A : #|A| = size (enum A).
@@ -1930,14 +1923,11 @@ Proof. by move/subsetP=> allA x; apply: allA. Qed.
 
 Lemma enumT : enum T = Finite.enum T.
 Proof.
-apply: (@sorted_eq _ prec_eq).
-- exact: prec_eq_trans.
-- exact: prec_eq_antisymmetric.
-- exact: (enum_prec_eq_sorted T).
+apply: (sorted_eq (@prec_eq_trans T) (@prec_eq_antisymmetric T)).
+- exact: enum_prec_eq_sorted.
 - exact: Finite.enum_prec_eq_sorted.
-- apply: uniq_perm => //.
-  + by apply: count_mem_uniq => x; rewrite -has_pred1 has_count Finite.enumP.
-  + by move=> x; rewrite (mem_enum T) -has_pred1 has_count Finite.enumP.
+apply: uniq_perm (Finite.enum_uniq T) _ => // x.
+by rewrite mem_enum Finite.mem_enum.
 Qed.
 
 Lemma cardT : #|T| = size (enum T). Proof. by rewrite (cardE T). Qed.
@@ -1946,11 +1936,7 @@ Lemma eq_cardT A : A =i predT -> #|A| = size (enum T).
 Proof. exact: (@eq_card_trans T T) cardT. Qed.
 
 Lemma cardC A : #|A| + #|[predC A]| = #|T|.
-Proof.
-rewrite -cardUI/= cardT eq_cardT ?eq_card0 ?addn0// => x.
-- exact: andbN.
-- exact: orbN.
-Qed.
+Proof. by rewrite -[RHS](cardID A); congr (_ + _); apply/eq_card. Qed.
 
 Lemma cardC1 x : #|predC1 x| = #|T|.-1.
 Proof. by rewrite -(cardC (pred1 x)) card1. Qed.
