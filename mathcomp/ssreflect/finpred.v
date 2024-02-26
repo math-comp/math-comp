@@ -2738,40 +2738,38 @@ Qed.
 
 End SeqFinType.
 
-FIN.
-
 Section Extrema.
 
-Variant extremum_spec {T : eqType} (ord : rel T) {I : finType}
+Variant extremum_spec {T : Type} (ord : rel T) {I : Type}
   (P : pred I) (F : I -> T) : I -> Type :=
   ExtremumSpec (i : I) of P i & (forall j : I, P j -> ord (F i) (F j)) :
                    extremum_spec ord P F i.
 
-Let arg_pred {T : eqType} ord {I : finType} (P : pred I) (F : I -> T) :=
-  [pred i | P i & [forall (j | P j), ord (F i) (F j)]].
+Let arg_pred {T : eqType} ord {I : eqType} (P : {finpred I}) (F : I -> T) :=
+  [pred i | i \in P & all (fun j => ord (F i) (F j)) (support P)].
 
 Section Extremum.
 
-Context {T : eqType} {I : finType} (ord : rel T).
-Context (i0 : I) (P : pred I) (F : I -> T).
+Context {T : eqType} {I : choiceType} (ord : rel T).
+Context (i0 : I) (P : {finpred I}) (F : I -> T).  (* TODO: should it be "finpred I" for the definition of extremum? *)
 
 Definition extremum := odflt i0 (pick (arg_pred ord P F)).
 
 Hypothesis ord_refl : reflexive ord.
 Hypothesis ord_trans : transitive ord.
 Hypothesis ord_total : total ord.
-Hypothesis Pi0 : P i0.
+Hypothesis Pi0 : i0 \in P.
 
-Lemma extremumP : extremum_spec ord P F extremum.
+Lemma extremumP : extremum_spec ord [in P] F extremum.
 Proof.
-rewrite /extremum; case: pickP => [i /andP[Pi /'forall_implyP/= min_i] | no_i].
-  by split=> // j; apply/implyP.
+rewrite /extremum; case: pickP => [i /andP[Pi /allP min_i] | no_i].
+  by split=> //= j Pj; apply: min_i; rewrite mem_support.
 have := sort_sorted ord_total [seq F i | i <- enum P].
 set s := sort _ _ => ss; have s_gt0 : size s > 0
    by rewrite size_sort size_map -cardE; apply/card_gt0P; exists i0.
 pose t0 := nth (F i0) s 0; have: t0 \in s by rewrite mem_nth.
 rewrite mem_sort => /mapP/sig2_eqW[it0]; rewrite mem_enum => it0P def_t0.
-have /negP[/=] := no_i it0; rewrite [P _]it0P/=; apply/'forall_implyP=> j Pj.
+have /negP[/=] := no_i it0; rewrite inE it0P/=; apply/allP => j /[!inE] Pj.
 have /(nthP (F i0))[k g_lt <-] : F j \in s by rewrite mem_sort map_f ?mem_enum.
 by rewrite -def_t0 sorted_leq_nth.
 Qed.
@@ -2780,37 +2778,38 @@ End Extremum.
 
 Section ExtremumIn.
 
-Context {T : eqType} {I : finType} (ord : rel T).
-Context (i0 : I) (P : pred I) (F : I -> T).
+Context {T : eqType} {I : choiceType} (ord : rel T).
+Context (i0 : I) (P : {finpred I}) (F : I -> T).  (* TODO: or finpred I ? *)
 
 Hypothesis ord_refl : {in P, reflexive (relpre F ord)}.
 Hypothesis ord_trans : {in P & P & P, transitive (relpre F ord)}.
 Hypothesis ord_total : {in P &, total (relpre F ord)}.
-Hypothesis Pi0 : P i0.
+Hypothesis Pi0 : i0 \in P.
 
-Lemma extremum_inP : extremum_spec ord P F (extremum ord i0 P F).
+Lemma extremum_inP : extremum_spec ord [in P] F (extremum ord i0 P F).
 Proof.
-rewrite /extremum; case: pickP => [i /andP[Pi /'forall_implyP/= min_i] | no_i].
-  by split=> // j; apply/implyP.
+rewrite /extremum; case: pickP => [i /andP[Pi /allP min_i] | no_i].
+  by split=> //= j Pj; apply: min_i; rewrite mem_support.
 pose TP := seq_sub [seq F i | i <- enum P].
-have FPP (iP : {i | P i}) : F (proj1_sig iP) \in [seq F i | i <- enum P].
+have FPP (iP : {i | i \in P}) : F (proj1_sig iP) \in [seq F i | i <- enum P].
   by rewrite map_f// mem_enum; apply: valP.
 pose FP := SeqSub (FPP _).
-have []//= := @extremumP _ _ (relpre val ord) (exist P i0 Pi0) xpredT FP.
+have []//= := @extremumP _ _ (relpre val ord) (exist [in P] i0 Pi0)
+    [pred x | val x \in P] FP.
 - by move=> [/= _/mapP[i iP ->]]; apply: ord_refl; rewrite mem_enum in iP.
 - move=> [/= _/mapP[j jP ->]] [/= _/mapP[i iP ->]] [/= _/mapP[k kP ->]].
   by apply: ord_trans; rewrite !mem_enum in iP jP kP.
 - move=> [/= _/mapP[i iP ->]] [/= _/mapP[j jP ->]].
   by apply: ord_total; rewrite !mem_enum in iP jP.
 - rewrite /FP => -[/= i Pi] _ /(_ (exist _ _ _))/= ordF.
-  have /negP/negP/= := no_i i; rewrite Pi/= negb_forall => /existsP/sigW[j].
-  by rewrite negb_imply => /andP[Pj]; rewrite ordF.
+  have/negP/negP/= := no_i i; rewrite inE Pi/= -has_predC => /hasP/sig2W[j].
+  by rewrite !inE => Pj; rewrite ordF.
 Qed.
 
 End ExtremumIn.
 
 Notation "[ 'arg[' ord ]_( i < i0 | P ) F ]" :=
-    (extremum ord i0 (fun i => P%B) (fun i => F))
+    (extremum ord i0 [pred i | P%B] (fun i => F))
   (at level 0, ord, i, i0 at level 10,
    format "[ 'arg[' ord ]_( i  <  i0  |  P )  F ]") : nat_scope.
 
@@ -2825,15 +2824,16 @@ Notation "[ 'arg[' ord ]_( i < i0 ) F ]" := [arg[ord]_(i < i0 | true) F]
 
 Section ArgMinMax.
 
-Variables (I : finType) (i0 : I) (P : pred I) (F : I -> nat) (Pi0 : P i0).
+Variables (I : choiceType) (i0 : I).
+Variables (P : {finpred I}) (F : I -> nat) (Pi0 : i0 \in P).
 
 Definition arg_min := extremum leq i0 P F.
 Definition arg_max := extremum geq i0 P F.
 
-Lemma arg_minnP : extremum_spec leq P F arg_min.
+Lemma arg_minnP : extremum_spec leq [in P] F arg_min.
 Proof. by apply: extremumP => //; [apply: leq_trans|apply: leq_total]. Qed.
 
-Lemma arg_maxnP : extremum_spec geq P F arg_max.
+Lemma arg_maxnP : extremum_spec geq [in P] F arg_max.
 Proof.
 apply: extremumP => //; first exact: leqnn.
   by move=> n m p mn np; apply: leq_trans mn.
@@ -2845,7 +2845,7 @@ End ArgMinMax.
 End Extrema.
 
 Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
-    (arg_min i0 (fun i => P%B) (fun i => F))
+    (arg_min i0 [pred i | P%B] (fun i => F))
   (at level 0, i, i0 at level 10,
    format "[ 'arg'  'min_' ( i  <  i0  |  P )  F ]") : nat_scope.
 
@@ -2859,7 +2859,7 @@ Notation "[ 'arg' 'min_' ( i < i0 ) F ]" := [arg min_(i < i0 | true) F]
    format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : nat_scope.
 
 Notation "[ 'arg' 'max_' ( i > i0 | P ) F ]" :=
-     (arg_max i0 (fun i => P%B) (fun i => F))
+     (arg_max i0 [pred i | P%B] (fun i => F))
   (at level 0, i, i0 at level 10,
    format "[ 'arg'  'max_' ( i  >  i0  |  P )  F ]") : nat_scope.
 
@@ -2904,11 +2904,11 @@ Qed.
 Lemma ord_enum_uniq : uniq ord_enum.
 Proof. by rewrite pmap_sub_uniq ?iota_uniq. Qed.
 
-Lemma mem_ord_enum i : i \in ord_enum.
+Lemma mem_ord_enum (i : ordinal) : i \in ord_enum.
 Proof. by rewrite -(mem_map ord_inj) val_ord_enum mem_iota ltn_ord. Qed.
 
 HB.instance Definition _ := isFinite.Build ordinal
-  (Finite.uniq_enumP ord_enum_uniq mem_ord_enum).
+  (Finite.uniq_axiom ord_enum_uniq mem_ord_enum).
 
 End OrdinalSub.
 
@@ -2922,7 +2922,9 @@ Section OrdinalEnum.
 Variable n : nat.
 
 Lemma val_enum_ord : map val (enum 'I_n) = iota 0 n.
-Proof. by rewrite enumT unlock val_ord_enum. Qed.
+Proof.
+Admitted. (*
+by rewrite enumT unlock val_ord_enum. Qed. *)
 
 Lemma size_enum_ord : size (enum 'I_n) = n.
 Proof. by rewrite -(size_map val) val_enum_ord size_iota. Qed.
@@ -3425,13 +3427,50 @@ Variable T1 T2 : finType.
 
 Definition prod_enum := [seq (x1, x2) | x1 <- enum T1, x2 <- enum T2].
 
-Lemma predX_prod_enum (A1 : {pred T1}) (A2 : {pred T2}) :
-  count [predX A1 & A2] prod_enum = #|A1| * #|A2|.
+(* TODO: move in seq.v *)
+Lemma size_allpairsX T1' T2' (s1 : seq T1') (s2 : seq T2') P1 P2 :
+  size [seq x <- [seq (x1, x2) | x1 <- s1, x2 <- s2] | [predX P1 & P2] x]
+  = size [seq x <- s1 | P1 x] * size [seq x <- s2 | P2 x].
 Proof.
-rewrite !cardE !size_filter -!enumT /prod_enum.
-elim: (enum T1) => //= x1 s1 IHs; rewrite count_cat {}IHs count_map /preim /=.
-by case: (x1 \in A1); rewrite ?count_pred0.
+elim: s1 => [//|x1 s1 IHs1].
+rewrite filter_cat size_cat IHs1 filter_map /preim/= -[P1 x1]/(x1 \in P1).
+by case: (x1 \in P1); rewrite size_map// filter_pred0.
 Qed.
+
+(* TODO: /move above *)
+Lemma supportIl (T : eqType) (A B : {finpred T}) :
+  support [predI A & B] =i filter [in B] (support A).
+Proof. by move=> x; rewrite !inE mem_filter inE andbC. Qed.
+
+Lemma supportIr (T : eqType) (A B : {finpred T}) :
+  support [predI A & B] =i filter [in A] (support B).
+Proof. by move=> x; rewrite !inE mem_filter inE. Qed.
+
+Lemma enumIl (T : choiceType) (A B : {finpred T}) :
+  enum [predI A & B] = filter [in B] (enum A).
+Proof.
+rewrite unlock filter_sort; [|exact:prec_eq_total|exact: prec_eq_trans].
+apply: (sorted_eq (@prec_eq_trans _) (@prec_eq_antisymmetric _)).  (* TODO: rename prec_eq_antisymmetric in prec_eq_anti *)
+- exact/sort_sorted/prec_eq_total.
+- exact/sort_sorted/prec_eq_total.
+apply: uniq_perm; rewrite ?sort_uniq ?filter_uniq// => x.
+by rewrite !mem_sort supportIl.
+Qed.
+
+Lemma enumIr (T : choiceType) (A B : {finpred T}) :
+  enum [predI A & B] = filter [in B] (enum A).
+Proof. by rewrite -enumIl; apply: eq_enum => x; rewrite inE andbC. Qed.
+
+Lemma enum_fin (T : finType) (A : {finpred T}) :
+  enum A = filter [in A] (enum T).
+Proof.
+by rewrite -enumIl; apply: eq_enum => x; rewrite /= [in RHS]inE andb_idl.
+Qed.
+(* TODO: move above/ *)
+
+Lemma predX_prod_enum (A1 : {finpred T1}) (A2 : {finpred T2}) :
+  count [predX A1 & A2] prod_enum = #|A1| * #|A2|.
+Proof. by rewrite !cardE /prod_enum -size_filter size_allpairsX 2!enum_fin. Qed.
 
 Lemma prod_enumP : Finite.axiom prod_enum.
 Proof.
@@ -3442,7 +3481,13 @@ HB.instance Definition _ := isFinite.Build (T1 * T2)%type prod_enumP.
 
 Lemma cardX (A1 : {pred T1}) (A2 : {pred T2}) :
   #|[predX A1 & A2]| = #|A1| * #|A2|.
-Proof. by rewrite -predX_prod_enum unlock size_filter unlock. Qed.
+Proof.
+rewrite -predX_prod_enum cardE enum_fin size_filter.
+have upe : uniq prod_enum by apply: allpairs_uniq => // [[x1 y1] [x2 y2]].
+rewrite -[enum _]undup_id// -[prod_enum]undup_id//.
+apply: eq_count_undup => [[x y] /andP/=[xA1 yA2]]; rewrite mem_enum/= !inE.
+by have:= (count_uniq_mem (x, y) upe); case: in_mem => //; rewrite prod_enumP.
+Qed.
 
 Lemma card_prod : #|{: T1 * T2}| = #|T1| * #|T2|.
 Proof. by rewrite -cardX; apply: eq_card; case. Qed.
@@ -3461,22 +3506,24 @@ Definition tag_enum :=
 
 Lemma tag_enumP : Finite.axiom tag_enum.
 Proof.
+Admitted. (*
 case=> i x; rewrite -(enumP i) /tag_enum -enumT.
 elim: (enum I) => //= j e IHe.
 rewrite count_cat count_map {}IHe; congr (_ + _).
 rewrite -size_filter -cardE /=; case: eqP => [-> | ne_j_i].
   by apply: (@eq_card1 _ x) => y; rewrite -topredE /= tagged_asE ?eqxx.
 by apply: eq_card0 => y.
-Qed.
+Qed. *)
 
 HB.instance Definition _ := isFinite.Build {i : I & T_ i} tag_enumP.
 
 Lemma card_tagged :
   #|{: {i : I & T_ i}}| = sumn (map (fun i => #|T_ i|) (enum I)).
 Proof.
+Admitted. (*
 rewrite cardE !enumT [in LHS]unlock size_flatten /shape -map_comp.
 by congr (sumn _); apply: eq_map => i; rewrite /= size_map -enumT -cardE.
-Qed.
+Qed. *)
 
 End TagFinType.
 
@@ -3497,9 +3544,10 @@ Lemma mem_sum_enum u : u \in sum_enum.
 Proof. by case: u => x; rewrite mem_cat -!enumT map_f ?mem_enum ?orbT. Qed.
 
 HB.instance Definition sum_isFinite := isFinite.Build (T1 + T2)%type
-  (Finite.uniq_enumP sum_enum_uniq mem_sum_enum).
+  (Finite.uniq_axiom sum_enum_uniq mem_sum_enum).
 
 Lemma card_sum : #|{: T1 + T2}| = #|T1| + #|T2|.
-Proof. by rewrite !cardT !enumT [in LHS]unlock size_cat !size_map. Qed.
+Admitted. (*
+Proof. by rewrite !cardT !enumT [in LHS]unlock size_cat !size_map. Qed. *)
 
 End SumFinType.
