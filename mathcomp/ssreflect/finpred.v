@@ -25,6 +25,9 @@ Definition Dpat u1 t2 u := TestS u1 (HD (untag1d t2) u).
 Definition Ppat u1 t2 u := TestS u1 (HP (untag1 t2) u).
 Canonical Dtest t1 t2 u := Dpat (untag1d t1) t2 u.
 Canonical Ptest t1 t2 u := Ppat (untag1 t1) t2 u.
+Structure testB := TestB { projB : bool }.
+Definition testN b := negb b.
+Canonical NtestB b := TestB (testN b).
 
 Goal False.
 pose D (x : unit) := True.
@@ -47,7 +50,6 @@ have E' (e : forall u, D (untag1d u) = (u = u)): D (untag2d _).
 (* unfold in INSTANCE field arguments before unfolding in VALUE arguments    *)
 (* unfold in INSTANCE structure before unfolding in PROJECTION structure arg *)
 (* unfold in VALUE extra args before unfolding in PROJECTION extraargs       *)
-Set Debug "unification".
 pose FD (a : HD (untag2d _) (untag1d _) (D (untag2d _))) :=
   a : projTest (untag2d _) (Dpat _ _ (untag2d _)) (D (untag1d _)).
 (* canonical structure resolution priority for projections                *)
@@ -57,6 +59,14 @@ pose FD (a : HD (untag2d _) (untag1d _) (D (untag2d _))) :=
 (*    - in PROJECTION extraargs over those in VALUE extra args            *)
 pose FP (a : HP (untag2 _) (untag1 _) (D (untag2 _))) :=
   a : projTest (untag2 _) (Ppat _ _ (untag2 _)) (D (untag1 _)).
+(* canonical structures are not recognized in the condition of an "if" *)
+pose ite b := if b then tt else tt.
+have b0 : bool := true.
+pose Fok (a : D (ite (projB _))) := a : D (ite (testN b0)).
+pose Ffail0 (a : D (if projB _ then tt else tt)) :=
+  a : D (if testN b0 then tt else tt).
+pose Ffail1 (a : D (ite (projB _))) := a : D (if testN b0 then tt else tt).
+pose Ffail2 (a : D (if testN b0 then tt else tt)) := a : D (ite (projB _)). 
 Abort.
 
 (* A structure that matches an arbitrayry (possible dependent) function.      *)
