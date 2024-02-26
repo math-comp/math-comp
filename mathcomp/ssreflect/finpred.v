@@ -9,6 +9,56 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+(*  Tests for unification order and priorities. *)
+
+Structure tag1 := MkTag1 {untag1 : unit}.
+Definition untag1d := untag1.
+Canonical Tag1 u := MkTag1 u.
+Structure tag2 := MkTag2 {untag2 : unit}.
+Definition untag2d := untag2.
+Canonical Tag2 u := MkTag2 u.
+Structure testS (u : unit) := TestS { projTest : Prop -> Prop }.
+Arguments projTest : clear implicits.
+Definition HD (u0 u : unit) A := A /\ A.
+Definition HP (u0 u : unit) A := A /\ A.
+Definition Dpat u1 t2 u := TestS u1 (HD (untag1d t2) u).
+Definition Ppat u1 t2 u := TestS u1 (HP (untag1 t2) u).
+Canonical Dtest t1 t2 u := Dpat (untag1d t1) t2 u.
+Canonical Ptest t1 t2 u := Ppat (untag1 t1) t2 u.
+
+Goal False.
+pose D (x : unit) := True.
+have a1 : D (untag1 _) by [].
+have a2 : D (untag2 _) by [].
+(* unfold in EXPECTED type before INFERRED type *)
+pose A (a : D (untag1d _)) := a : D (untag2d _).
+(* prioritize solving projection in INFERRED type over those in EXPECTED type *)
+pose B := a1 _ : D (untag2 _).
+(* unify arguments LEFT TO RIGHT *)
+pose C (K : forall x, D x * D x -> Prop) := K _ (a1 _, a2 _).
+(* resolve projections in rewrite RULE before REDEX *)
+have E (e : forall u, D (untag1 u) = (u = u))
+       (H : forall u, ~ D (untag2 u)) : False.
+  refine (H _ _). rewrite e. split.
+(* unfold in rewrite REDEX before RULE *)
+have E' (e : forall u, D (untag1d u) = (u = u)): D (untag2d _).
+  rewrite e. split.
+(* unfold in INSTANCE parameters before unfolding in PROJECTION parameters   *)
+(* unfold in INSTANCE field arguments before unfolding in VALUE arguments    *)
+(* unfold in INSTANCE structure before unfolding in PROJECTION structure arg *)
+(* unfold in VALUE extra args before unfolding in PROJECTION extraargs       *)
+Set Debug "unification".
+pose FD (a : HD (untag2d _) (untag1d _) (D (untag2d _))) :=
+  a : projTest (untag2d _) (Dpat _ _ (untag2d _)) (D (untag1d _)).
+(* canonical structure resolution priority for projections                *)
+(*    - in PROJECTION parameters over those in INSTANCE parameters        *)
+(*    - in VALUE arguments over those in INSTANCE field arguments         *)
+(*    - in PROJECTION structure argument over those in INSTANCE structure *)
+(*    - in PROJECTION extraargs over those in VALUE extra args            *)
+pose FP (a : HP (untag2 _) (untag1 _) (D (untag2 _))) :=
+  a : projTest (untag2 _) (Ppat _ _ (untag2 _)) (D (untag1 _)).
+Abort.
+
 (* A structure that matches an arbitrayry (possible dependent) function.      *)
 (*   It can be used to decompose an arbitrary application (?f ?a) using the   *)
 (* pattern (?ef ?a) where ?ef : funPattern ?f. Note that the simple (?f ?a)   *)
@@ -650,24 +700,6 @@ Canonical SmashProd X CA CR (x : X) (cA : CA) (cR : CR)
             R (eR : smashArg (Forall.pred_sort A S) x cR R) z :=
   SmashArg (@Forall.Forall sA A S R)
        (LabelSmashProd x (cA, cR) (smashArg_val eA) (smashArg_val eR) z).
-
-(*  Tests for unification order and priorities. *)
-(*
-Structure tag1 := MkTag1 {untag1 : unit}.
-Canonical Tag1 u := MkTag1 u.
-Structure tag2 := MkTag2 {untag2 : unit}.
-Canonical Tag2 u := MkTag2 u.
-Structure upair := Upair { upair_val : unit * unit }.
-Canonical udelta u := Upair (u, u).
-Goal False.
-suff P : tag1 -> tag2 -> unit * unit -> Prop.
-pose ut1 := untag1; pose ut2 := untag2.
-suff G u1 u2 : P u1 u2 (untag1 u1, untag2 u2) -> False.
-eapply G.
-suff M : tag1 -> tag2 -> upair -> Prop.
-suff H u1 u2 uu: M u1 u2 uu -> P u1 u2 (upair_val uu).
-apply: H.
-*)
 
 Structure manifestSigmaPred I T_ (P : forall x : I, pred (T_ x)) :=
   ManifestSigmaPred {manifestSigmaPred_pilot :> unit}.
