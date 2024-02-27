@@ -3373,19 +3373,43 @@ Proof. exact: leW_nmono_in lef_nV2. Qed.
 Definition ltef_pV2 := (lef_pV2, ltf_pV2).
 Definition ltef_nV2 := (lef_nV2, ltf_nV2).
 
+Lemma invf_pgt : {in pos &, forall x y, (x < y^-1) = (y < x^-1)}.
+Proof. by move=> x y *; rewrite -[x in LHS]invrK ltf_pV2// posrE invr_gt0. Qed.
+
+Lemma invf_pge : {in pos &, forall x y, (x <= y^-1) = (y <= x^-1)}.
+Proof. by move=> x y *; rewrite -[x in LHS]invrK lef_pV2// posrE invr_gt0. Qed.
+
+Lemma invf_ngt : {in neg &, forall x y, (x < y^-1) = (y < x^-1)}.
+Proof. by move=> x y *; rewrite -[x in LHS]invrK ltf_nV2// negrE invr_lt0. Qed.
+
+Lemma invf_nge : {in neg &, forall x y, (x <= y^-1) = (y <= x^-1)}.
+Proof. by move=> x y *; rewrite -[x in LHS]invrK lef_nV2// negrE invr_lt0. Qed.
+
 Lemma invf_gt1 x : 0 < x -> (1 < x^-1) = (x < 1).
-Proof. by move=> x_gt0; rewrite -{1}[1]invr1 ltf_pV2 ?posrE ?ltr01. Qed.
+Proof. by move=> x0; rewrite invf_pgt ?invr1 ?posrE. Qed.
 
 Lemma invf_ge1 x : 0 < x -> (1 <= x^-1) = (x <= 1).
-Proof. by move=> x_lt0; rewrite -{1}[1]invr1 lef_pV2 ?posrE ?ltr01. Qed.
+Proof. by move=> x0; rewrite invf_pge ?invr1 ?posrE. Qed.
 
 Definition invf_gte1 := (invf_ge1, invf_gt1).
 
+Lemma invf_plt : {in pos &, forall x y, (x^-1 < y) = (y^-1 < x)}.
+Proof. by move=> x y *; rewrite -[y in LHS]invrK ltf_pV2// posrE invr_gt0. Qed.
+
+Lemma invf_ple : {in pos &, forall x y, (x^-1 <= y) = (y^-1 <= x)}.
+Proof. by move=> x y *; rewrite -[y in LHS]invrK lef_pV2// posrE invr_gt0. Qed.
+
+Lemma invf_nlt : {in neg &, forall x y, (x^-1 < y) = (y^-1 < x)}.
+Proof. by move=> x y *; rewrite -[y in LHS]invrK ltf_nV2// negrE invr_lt0. Qed.
+
+Lemma invf_nle : {in neg &, forall x y, (x^-1 <= y) = (y^-1 <= x)}.
+Proof. by move=> x y *; rewrite -[y in LHS]invrK lef_nV2// negrE invr_lt0. Qed.
+
 Lemma invf_le1 x : 0 < x -> (x^-1 <= 1) = (1 <= x).
-Proof. by move=> x_gt0; rewrite -invf_ge1 ?invr_gt0 // invrK. Qed.
+Proof. by move=> x0; rewrite -invf_ple ?invr1 ?posrE. Qed.
 
 Lemma invf_lt1 x : 0 < x -> (x^-1 < 1) = (1 < x).
-Proof. by move=> x_lt0; rewrite -invf_gt1 ?invr_gt0 // invrK. Qed.
+Proof. by move=> x0; rewrite invf_plt ?invr1 ?posrE. Qed.
 
 Definition invf_lte1 := (invf_le1, invf_lt1).
 Definition invf_cp1 := (invf_gte1, invf_lte1).
