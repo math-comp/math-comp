@@ -69,25 +69,71 @@ pose Ffail1 (a : D (ite (projB _))) := a : D (if testN b0 then tt else tt).
 pose Ffail2 (a : D (if testN b0 then tt else tt)) := a : D (ite (projB _)). 
 Abort.
 
+(*   matchedArg T == a special-purpose wrapper type that provides some        *)
+(*                   control over unification priorities (see below).         *)
+(*     MatchedArg == a special constructor for matchedArg T (with T implicit) *)
+(*       matchArg == singleton structure type for MatchArg (with T implicit)  *)
+(* --> these are used as follows:                                             *)
+(*  + Let us write v1 ~ v2 :> T for the unification problem which Coq solves  *)
+(*    by unifying v1 and v2 at type T while giving PRIORITY to projectors in  *)
+(*    v1 during canonical structure resolution AND also unfolding definitions *)
+(*    in  v2 rather than in v1 (the two are bundled in the Coq algorithm).    *)
+(*  + Then unifying ?m v1 with MatchedArg v2 at type matchedArg T, where      *)
+(*    ?m : matchArg is a free unification variable, ensures that Coq always   *)
+(*    solves v1 ~ v2 :> T, and fails promptly if this fails.                  *)
+(*  + In short both (?m v1) ~ (MatchedArg v2) AND (MatchedArg v2) ~ (?m v1)   *)
+(*    reduce to v1 ~ v2.                                                      *)
+(*  + The wrapper type serves as a reminder that MatchedArg or (m : matchArg) *)
+(*    wrappers must be inserted.                                              *)
+(*  One important use for this feature is to match the pattern p_i for an     *)
+(*  argument of a canonical instance (C p_1 ... p_n) of a projection f of     *)
+(*  a structure S to the corresponding argument a_i of a value (C a_1 .. a_n) *)
+(*  which we are unifying with f (?s : S), i.e., for which we are trying to   *)
+(*  infer an instance of S. In this case Coq ALWAYS solve a_i ~ p_i, whereas  *)
+(*  p_i ~ a_i may be needed to allow inferring canonical instances of         *)
+(*  (recursive) projections in p_i for projections in a_i, when the latter    *)
+(*  have default instances. Using (MatchedArg a_i) instead of a_i, and        *)
+(*  (m p_i) with m : matchArg instead of p_i, ensures this.                   *)
+Variant matchedArg T := PackMatchedArg of T.
+Structure matchArg {T} := { apply_matchArg : T -> matchedArg T }.
+Coercion apply_matchArg : matchArg >-> Funclass.
+Variant matchArgLock := MatchArgLock.
+Example MatchArgKey : matchArgLock. Proof. split. Qed.
+Definition MatchedArg {T} (a : T) := let () := MatchArgKey in PackMatchedArg a.
+Canonical MatchArgPattern T := {| apply_matchArg := @MatchedArg T |}.
+(*   Implementation notes: MatchArg is defined as a locked constant to ensure *)
+(* that if p ~ a fails then both ?m p ~ MatchArg a AND MatchArg a ~ ?m p fail *)
+(* quickly, with the strategy followed by Coq's abstract unification machine  *)
+(*   We write v1 =~= v2 for either v1 ~ v2 OR v2 ~ v1, and v|z1;z2;z3 for the *)
+(* stack decomposition of a term z3[z2[z1[v]]], where the stack items z_i are *)
+(* bits of execution context, e.g., ZApp(u_1,...,u_n) == [_] u_1 ... u_n or   *)
+(* ZCase(b) == match [_] with .. b .. end, as in the Debug "unification" log. *)
+(*   Then unifying MatchArg a with ?m p == apply_matchArg ?m p goes through   *)
+(* the following sequence of problems                                         *)
+(*    MatchedArg a =~= apply_matchArg ?m p                                    *)
+(*    MatchedArg|Zapp(T, a) =~= apply_matchArg|Zapp(T, ?m, p) -- stack decomp *)
+(*           ?m ~ MatchArgPattern T -- matching canonical sructure            *)
+(*           p ~ a  -- extararg unification                                   *)
+(*  If p ~ a succeed we are done; otherwise we go through:                    *)
+(*   MatchedArg|Zapp(T, a) =~= ?m|Zcase(T);Zapp(p) -- unfold apply_matchArg   *)
+(*  or                                                                        *)
+(*   MatchArgKey|Zcase(a) =~= apply_matchArg ?m p -- unfold MatchArg          *)
+(*  and then in either case                                                   *)
+(*   MatchArgKey|Zcase(a) =~= ?m|Zcase(T);Zapp(p) -- fail, different stacks   *)
+(*  If we had used PackMatchedArg insread of MatchedArg then we would have    *)
+(*  ended up with                                                             *)
+(*   PackMatchedArg|Zapp(T, a) =~= ?m|Zcase(T);Zapp(p)                        *)
+(*                          a =~= p -- the "consume" heuristice               *)
+(*  forcing us to solve a =~= p all over again, and even possibly diverging   *)
+(* on a ~ p.                                                                  *)
+
+(* Should work when CS resolution bug is fixed.
 (* A structure that matches an arbitrayry (possible dependent) function.      *)
 (*   It can be used to decompose an arbitrary application (?f ?a) using the   *)
 (* pattern (?ef ?a) where ?ef : funPattern ?f. Note that the simple (?f ?a)   *)
 (* pattern cannot reliably be used for this purpose, because the unification  *)
 (* algorithm interprets this as a second-order pattern, unfolding the matchee *)
 (* an even deferring the constraint.                                          *)
-(*   We use a special case of this pattern to force unification priority.     *)
-(* Matching (?m ?p) to (MatchArg a) when ?m : matchArg will match a to ?p     *)
-(* giving priority to ?p for canonical structure resolution. In particular    *)
-(* we can use this to give priority to the value pattern C ?p1 ... ?pn of     *)
-(* a canonical instance, as opposed to the matched value C a1 .. an, which is *)
-(* the default and problematic if some of the ai are themselves projections,  *)
-(* particularly projections with a default instance.                          *)
-Structure matchArg {T} := DeclareMatchArg { apply_match_arg :> T -> T }.
-Add Printing Constructor matchArg.
-Definition MatchArg {T} : T -> T := id.
-Canonical MatchArgPattern T := @DeclareMatchArg T MatchArg.
-
-(* Should work when CS resolution bug is fixed.
 Structure funPattern A R (f : forall a : A, R a) :=
   FunPattern { apply_fun_pattern :> forall a, R a }.
 Add Printing Constructor funPattern.
@@ -357,25 +403,45 @@ Proof. by move=> y2; rewrite /= TaggedK. Qed.
 (*                                       be of type finPred T                 *)
 (*                                                                            *)
 
+Declare Scope coerced_scope.
+Delimit Scope coerced_scope with coerced.
+Open Scope coerced_scope.
+Reserved Notation "P" (at level 8, only printing).
+
 Record finpredEnvelope (T : eqType) (P : {pred T}) :=
   FinpredEnvelope {envelope_seq :> seq T; _ : {subset P <= envelope_seq}}.
+Add Printing Constructor finpredEnvelope.
 
+(* Eta convertibility for finpred_seq construction and ManifestCoerced case. *)
 #[projections(primitive)]
-Structure labeledPred (T : eqType) := LabelPred {mem_labeled :> {pred T}}.
-
-#[projections(primitive)]
-Record finpred T := PackFinpred {
-  #[reversible=no] mem_finpred :> labeledPred T;
-  envelope : finpredEnvelope mem_finpred
-}.
+Record finpred T :=
+  Finpred { finpred_pred; envelope : @finpredEnvelope T finpred_pred}.
 Add Printing Constructor finpred.
-Arguments PackFinpred {T} P F : rename.
-Definition Finpred T P (F : @finpredEnvelope T P) :=
- PackFinpred (LabelPred P) F.
-Arguments Finpred {T} P F.
+Arguments Finpred {T} P E : rename.
+
+Variant finpredPilot := TryInferFinpred.
+Definition TryCoercedFinpred := TryInferFinpred.
+
+Structure appliedFinpred (T : eqType) := AppliedFinpred {
+(* resorting to unnamed fields because the #[canonical=no] attibute is *)
+(* ignored in Coq 8.18 *)
+  _ : T; _ : finpred T; _ : finpredPilot;
+  applied_finpred_holds :> bool
+}.
+
+Definition finpred_source_class := finpred.
+#[reversible=no, warnings="-uniform-inheritance"]
+Coercion apply_finpred {T} x (F : finpred_source_class T) :=
+  @AppliedFinpred T x F TryCoercedFinpred (finpred_pred F x).
+Canonical finpred_predType T :=
+  PredType (fun (F : finpred T) x => apply_finpred x F).
+#[reversible=no, warnings="-uniform-inheritance"]
+Coercion mem_finpred T (F : finpred T) : {pred T} :=
+  fun x => apply_finpred x F.
+Arguments mem_finpred {T} F x /.
 
 HB.lock Definition support {T} (F : finpred T) :=
-  undup (filter [in F] (envelope F)).
+  undup (filter (finpred_pred F) (envelope F)).
 Canonical support_unlockable := Unlockable support.unlock.
 
 Lemma support_uniq T F : uniq (@support T F).
@@ -396,53 +462,62 @@ split=> [eqF | /perm_mem-eqF x]; last by rewrite -!mem_support.
 by apply/uniq_perm=> // x; rewrite !inE.
 Qed.
 
+Structure appliedFinpredMatch T (finT := finpred T) (x : T)
+   (F : finT) (Px : matchedArg bool) (Px1 : bool) (F1 : finT) :=
+  AppliedFinpredMatch {applied_finpred_pilot : finpredPilot}.
+
+Structure coercedFinpredApp T (F : finpred T) (x : T) :=
+  PackCoercedFinpredApp { apply_coerced_finpred :> bool }.
+   (* app_of_coerced_finpred == finpred_pred F x *)
+Notation CoercedFinpredApp A x :=
+   (PackCoercedFinpredApp A x ((A : {pred _}) x)).
+Canonical ManifestCoercedFinpredApp T F x :=
+  PackCoercedFinpredApp F x (@finpred_pred T F x).
+Canonical ManifestCoercedApplyFinpredApp T F x :=
+  PackCoercedFinpredApp F x (@apply_finpred T x F).
+
+Definition InferredFinpred := @Finpred.
+Arguments InferredFinpred {T} P E : rename.
+Notation "P" := (InferredFinpred P _) : coerced_scope.
+
 Structure inferFinpred (T : eqType) (P : {pred T}) (F : finpred T) :=
-  InferFinpred { finpred_pilot :> bool }.
-
-Definition TryCoercedFinpred T := @id (labeledPred T).
-Definition TryInferFinpred T (P0 : labeledPred T) :=
-  fun (P1 P2 : {pred T}) & finpredEnvelope P2 => P0.
-Canonical LabelPatternFinpred T P F eF :=
-  let pF x := @finpred_pilot T P F (eF x) in
-  TryCoercedFinpred (TryInferFinpred (LabelPred P) pF (envelope F)).
-
-Structure coercedFinpred (T : eqType) := CoercedFinpred {
-  pred_of_coerced :> {pred T};
-  #[canonical=no] envelope_of_coerced : finpredEnvelope pred_of_coerced
-}.
-Notation DeclareCoercedFinpred P F := (@CoercedFinpred _ P (envelope F)).
-
-Coercion FinpredOfCoerced T (A : coercedFinpred T) :=
-  PackFinpred (TryCoercedFinpred (LabelPred [eta pred_of_coerced A]))
-              (envelope_of_coerced A).
-Canonical FinpredOfCoerced.
+  InferFinpred { finpred_pilot :> bool }. (* mem_finpred F == P *)
 
 Definition TryFinType := @id bool.
-Definition TryIfThenElse := TryFinType.
+Definition TryIfThenElse (mb : matchedArg bool) := TryFinType.
 Definition TryOp := TryIfThenElse.
-Definition TryFalse b := TryOp (MatchArg b).
+Definition TryFalse b := TryOp (MatchedArg b) b.
 
-Canonical InferredFinpred T P (P0 := @LabelPred T P) eF :=
-  PackFinpred (TryInferFinpred P0 (fun x => TryFalse (P x)) eF) eF.
-Arguments InferredFinpred {T} P eF.
-Notation "P" := (InferredFinpred P _) (at level 8, only printing) : form_scope.
+Canonical MatchCoercedFinpred T F x eFx (m : matchArg) :=
+  let Fx0 := @apply_coerced_finpred T F x eFx in
+  let Fx1 := finpred_pred F x in
+  AppliedFinpredMatch x F (m Fx0) (TryFalse Fx1) F TryCoercedFinpred. 
+
+Canonical MatchInferredFinpred T F x P E eF (m : matchArg) :=
+  let Fx := @finpred_pilot T P F eF in
+  let etaF := InferredFinpred (finpred_pred F) (envelope F) in
+  AppliedFinpredMatch x (InferredFinpred P E) (m (P x)) Fx etaF TryInferFinpred.
+  
+Canonical MatchAppliedFinpred T x F Px eF :=
+  let iF := @applied_finpred_pilot T x F (MatchedArg Px) (TryFalse Px) F eF in
+  AppliedFinpred x F iF Px.
 
 Variant finpredTarget (T : eqType) :=
   FinpredTarget (P0 P1 P2 : {pred T}) of finpred T.
-#[reversible=yes] Coercion target_of_finpred T P (F : finpred T) :=
+#[reversible=yes, warnings="-uniform-inheritance"] 
+Coercion target_of_finpred T P (F : finpred T) :=
   FinpredTarget P P (fun x => TryFalse (P x)) F.
-#[reversible=yes] Coercion pred_finpred_target T P F eF P0 :=
+#[reversible=no, warnings="-uniform-inheritance -ambiguous-paths"]
+Coercion pred_finpred_target T P F eF P0 :=
   @FinpredTarget T P0 P (fun x => @finpred_pilot T P F (eF x)) F.
 
-#[projections(primitive)]
 Structure labeledFinpred T :=
   LabelFinpred {#[reversible=no] unlabel_finpred :> finpred T}.
-Canonical LabelInferredFinpred T P eF :=
-  LabelFinpred (@InferredFinpred T P eF).
-Canonical LabelCoercedFinpred T F := LabelFinpred (@FinpredOfCoerced T F).
-Canonical DefaultLabeledFinpred T F := @LabelFinpred T F.
+Add Printing Constructor labeledFinpred.
+Canonical LabelInferredFinpred T P E :=
+  LabelFinpred (@InferredFinpred T P E).
+Canonical LabelCoercedFinpred T F := @LabelFinpred T F.
 
-#[projections(primitive)]
 Structure finpredPattern (T : eqType) (phT : phant T) :=
   PackFinpredPattern {finpred_of_pattern :> labeledFinpred T}.
 Definition FinpredPattern {T} := @PackFinpredPattern T (Phant T).
@@ -450,21 +525,22 @@ Notation "{ 'finpred' T }" := (finpredPattern (Phant T))
    (at level 0, T at level 100, format "{ 'finpred'  T }") : type_scope.
 Canonical InferredFinpredPattern T P eF :=
   FinpredPattern (@LabelInferredFinpred T P eF).
-Notation "P" := (@InferredFinpredPattern _ P _)
-  (at level 8, only printing) : form_scope.
-Definition finpredPatternDisplayTarget (T : eqType) := {finpred T}.
-Coercion CoercedFinpredPattern T F :=
-  FinpredPattern (@LabelCoercedFinpred T F).
+Notation "P" := (@InferredFinpredPattern _ P _) : coerced_scope.
+
+#[reversible=no]
+Coercion CoercedFinpredPattern T (F : finpred_source_class T) :=
+  FinpredPattern (LabelCoercedFinpred F).
 Canonical CoercedFinpredPattern.
-Coercion DefaultFinpredPattern T F :=
-  FinpredPattern (@DefaultLabeledFinpred T F) : finpredPatternDisplayTarget T.
-Canonical DefaultFinpredPattern.
+Canonical finpredPattern_predType (T : eqType) :=
+  PredType (fun (F : {finpred T}) x => apply_finpred x F).
 
 Variant finpredPatternTarget (T : eqType) := FinpredPatternTarget of {pred T}.
-#[reversible=yes] Coercion target_of_finpred_pattern T phT :=
-  fun F : @finpredPattern T phT =>  FinpredPatternTarget F.
-#[reversible=yes] Coercion finpred_pattern_target_of_pred T P :=
-  @FinpredPatternTarget T P.
+#[reversible=yes]
+Coercion target_of_finpred_pattern T phT (F : @finpredPattern T phT) :=
+   FinpredPatternTarget (fun x => apply_finpred x F).
+#[reversible=no, warnings="-uniform-inheritance"]
+Coercion finpred_pattern_target_of_pred (T : eqType) (P : {pred T}) :=
+  @FinpredPatternTarget T [eta P].
 
 Structure coerciblePredType T := CoerciblePredType {
   coerciblePredType_sort :> Type;
@@ -475,16 +551,14 @@ Definition TryPredType := @id Type.
 Canonical PredTypeCoercible T (pT : predType T) :=
   @CoerciblePredType T (TryPredType pT) (@topred T pT).
 
-Definition LabeledFinpredReverseCoercion
-           T pT (P0 : pT) (P : labeledPred T) (F : @finpredEnvelope T P) F0 :=
-  @LabelFinpred T (reverse_coercion F0 P0).
+Definition LabeledFinpredReverseCoercion T pT P0 P & @finpredEnvelope T P :=
+  fun F0 => LabelFinpred (@reverse_coercion (finpred T) pT F0 P0).
 Canonical LabelFinpredReverseCoercion T pT P0 (F : finpred T) :=
   @LabeledFinpredReverseCoercion T (TryPredType pT) P0 F (envelope F) F.
-Canonical FinpredReverseCoercionPattern T pT P0 eF :=
-  let F := @PackFinpred T (LabelPred (@coerce_sort_to_pred T pT P0)) eF in
+Canonical FinpredReverseCoercionPattern (T : eqType) pT P0 eF :=
+  let F := Finpred (@coerce_sort_to_pred T pT P0) eF in
   FinpredPattern (LabeledFinpredReverseCoercion P0 eF F).
-Notation "P0" := (@FinpredReverseCoercionPattern _ _ P0 _)
-   (at level 8, only printing) : form_scope.
+Notation "P0" := (@FinpredReverseCoercionPattern _ _ P0 _) : coerced_scope.
 
 Program Definition finpred0 T := @Finpred T pred0 _.
 Next Obligation. by exists nil. Qed.
@@ -501,12 +575,12 @@ Next Obligation.
 by exists (support A ++ support B) => x; rewrite mem_cat !mem_support.
 Qed.
 
-Program Definition finpredIr T (A : finpred T) (P : {pred T}) :=
-  @Finpred T [predI A & P] _.
+Program Definition finpredIr T (A : finpred T) (P : pred T) :=
+  @Finpred T [pred x in A | P x] _.
 Next Obligation. by exists (support A) => x /andP[]; rewrite mem_support. Qed.
 
-Program Definition finpredIl (T : eqType) (P : {pred T}) (A : finpred T) :=
-  @Finpred T [predI P & A] _.
+Program Definition finpredIl (T : eqType) (P : pred T) (A : finpred T) :=
+  @Finpred T [pred x | P x & x \in A] _.
 Next Obligation. by exists (support A) => x /andP[]; rewrite mem_support. Qed.
 
 Program Definition finpred_leq n := @Finpred nat [pred m | m <= n] _.
@@ -535,16 +609,18 @@ Qed.
 Fixpoint envelope_of_seq {T} (s : seq _) : finpredEnvelope [pred x in s] :=
   if s isn't x :: s' then envelope (finpred0 T) else
   envelope (finpredU (finpred1 x) (Finpred _ (envelope_of_seq s'))).
+#[warnings="-uniform-inheritance"]
 Coercion finpred_seq T s := Finpred _ (@envelope_of_seq T s).
-Coercion CoercedFinpred_seq T s :=
-   DeclareCoercedFinpred (@mem_seq T s) s.
-Canonical CoercedFinpred_seq.
+Canonical CoercedFinpred_seq (T : eqType) (s : seq T) x :=
+  PackCoercedFinpredApp s x (mem_seq s x).
 
 Structure labeled_bool := LabelBool {unlabel_bool :> bool}.
+Add Printing Constructor labeled_bool.
 Structure op_finpred {T : eqType} (P : pred T) (A : finpred T) :=
   OpFinpred {opFinpred_pilot :> labeled_bool}.
-Canonical InferOpFinpred T P A (m : matchArg) (eA : @op_finpred T P A) :=
-  @InferFinpred T P A (TryOp (m (eA : bool))).
+Add Printing Constructor op_finpred.
+Canonical InferOpFinpred T P A (m : matchArg) (eA : @op_finpred T P A) b :=
+  @InferFinpred T P A (TryOp (m (eA : bool)) b).
 
 Definition LabelBinop {T : eqType}
   (op : bool -> bool -> bool) (P P1 : pred T) (a b : bool) := 
@@ -576,23 +652,31 @@ Definition TryIdConv := TryIdK.
 Definition LabelIr (T : Type) a b & bool := LabelBool (a && b).
 Definition LabelSigma T a b (eP : unit) ea (eb : T -> bool) (ec : unit) :=
   @LabelIr T a b ea.
-Definition LabelIl T a b (eNa : bool) eb :=
+Definition LabelIl T a b (eNa : matchedArg bool) eb :=
   @LabelSigma T a b tt (TryFalse a) (fun=> eb) TryIdConv.
 Definition TryConst := @id bool.
-Canonical LabelI T a b := LabelIl T a b (TryConst a) (TryFalse b).
+Canonical LabelI T a b := LabelIl T a b (MatchedArg (TryConst a)) (TryFalse b).
 
 Canonical FinpredIr T a b P Q A (eA : inferFinpred P A) :=
   @OpFinpred T (fun x => P x && Q x) (finpredIr A Q) (LabelIr T a b eA).
 
 Structure not_finpred (T : eqType) (P : {pred T}) :=
   NotFinpred {notFin_pilot :> bool}.
+Add Printing Constructor not_finpred.
 Canonical ConstNotFin T a a1 := @NotFinpred T (fun=> a) (TryConst a1).
 Canonical NegbNotFin T P a := @NotFinpred T P (negb a).
 Canonical GeqNotFin T m n m1 n1 := @NotFinpred T (fun x => m <= n x) (m1 <= n1).
+(* Cut off spurrious attempt to infer a finpred structure for                 *)
+(* @notFin_pilot T P ?n when P x is of the form applied_finpred_holds ...;    *)
+(* this would actually succeed for if T were finite.                          *)
+Example AppliedFinpredFinite (T : eqType) (x : T) : appliedFinpred T.
+Proof. by split=> //; [apply: finpred0 | left]. Qed.
+Canonical finpredFin T P x := @NotFinpred T P (@AppliedFinpredFinite T x).
 
 Canonical FinpredIl T a b P Q B
-  (nFa : not_finpred P) (eB : inferFinpred Q B) :=
-  @OpFinpred T (fun x => P x && Q x) (finpredIl P B) (LabelIl T a b nFa eB).
+  (m : matchArg) (nFa : not_finpred P) (eB : inferFinpred Q B) :=
+  @OpFinpred T (fun x => P x && Q x) (finpredIl P B)
+               (LabelIl T a b (m (nFa : bool)) eB).
 
 HB.mixin Record isSigmaType (I : eqType) (T_ : I -> eqType) T := {
   to_sigma : T -> {x : I & T_ x};
@@ -802,10 +886,12 @@ Fixpoint ManyFinPreimApp {A B T} x y f0xy (fs : seq (finPreimFun A B T)) :=
   if fs isn't f :: fs' then LabelFinPreimExpr x f0xy else
   let z := LabelFinPreimExpr x (f x y) in
   @LabelFinPreimApp A B T f x z (ManyFinPreimApp x y f0xy fs') (TryVal y).
-About ecast.
-Canonical LabelValFinPreim {A T : eqType} {P} (B : @subEqType T P) x y :=
+
+Definition finPreim_subType A (T : eqType) P (B : @subEqType T P) :=
+  @PcanFinPreim A B T val _ valK.
+Canonical LabelValFinPreim {A T : eqType} {P} (B : @subEqType T P) x (y : B) :=
   let z := LabelFinPreimExpr x (TryVal (val y)) in
-  @LabelFinPreimApp A B T (PcanFinPreim A val _ valK) x z z y.
+  @LabelFinPreimApp A B T (finPreim_subType A B) x z z y.
 
 Definition finPreim_pair A (T1 T2 : eqType) (y1 : T1) :=
   @CanFinPreim A T2 _ (pair y1) snd (frefl _).
@@ -838,7 +924,7 @@ Structure inferFinPreim A T (fF : finpred T) (F : finpred A) (x : A) :=
   InferFinPreimPreimage { finPreim_val : T }.
 
 Program Definition finpred_preim A T (f : finPreimFun _ A _) (fF : finpred T) :=
-  @Finpred A [preim (fun x => f x x) of mem_finpred fF] _.
+  @Finpred A [preim (fun x => f x x) of fF] _.
 Next Obligation.
 case: f => f [g fk] /=; exists (flatten (map g (support fF))) => x Ffx.
 by apply/flatten_mapP; exists (f x x); rewrite ?mem_support.
@@ -861,21 +947,25 @@ Canonical InferPreimPred {A T : eqType} P b (Ff : finpred T) (F : finpred A)
 Definition FinpredPredFor (A T : eqType) z0 (P : {pred T}) Ff f :=
   @LabelPreimPred A T z0 [preim f of P] Ff (fun x => TryVar (TryVal (f x))).
 Definition OneFinpredPred A T b0 Ff :=
-  @FinpredPredFor A T (LabelBool b0) (mem_finpred Ff) Ff.
+  @FinpredPredFor A T (LabelBool b0) (finpred_pred Ff) Ff.
 Fixpoint ManyFinpredPred {A T : eqType} b0 Ffs f :=
   if Ffs isn't Ff :: Ffs' then LabelBool b0 else
-  @FinpredPredFor A T (ManyFinpredPred b0 Ffs' f) (mem_finpred Ff) Ff f.
+  @FinpredPredFor A T (ManyFinpredPred b0 Ffs' f) (finpred_pred Ff) Ff f.
 Arguments FinpredPredFor A {T} z0 P Ff f.
 Arguments OneFinpredPred A {T} b0 Ff f.
 Arguments ManyFinpredPred A {T} b0 Ffs f.
 
 Canonical Finpred_finpred {A T} y0 (F : finpred T) f :=
-  OneFinpredPred A (mem_labeled F y0) F f.
+  OneFinpredPred A (apply_finpred y0 F) F f.
 Canonical Finpred_seq {A T} s f y0 :=
   @OneFinpredPred A T (mem_seq s y0) (finpred_seq s) f.
 Canonical Finpred_leq A m0 n m := OneFinpredPred A (m0 <= n) (finpred_leq n) m.
 Canonical Finpred_eq (A T : eqType) (a x0 y0 : T) y :=
   ManyFinpredPred A (x0 == y0 :> T) [:: finpred1 a; finpred1x a] y.
+Canonical Finpred_eq_op (A T : eqType) eT0 (a x0 y0 : T) y :=
+  ManyFinpredPred A (hasDecEq.eq_op eT0 x0 y0) [:: finpred1 a; finpred1x a] y.
+Canonical Finpred_eqn A n m0 n0 y :=
+  ManyFinpredPred A (eqn m0 n0) [:: finpred_leq n; finpred1 n; finpred1x n] y.
 
 Definition finPreim_succ A := @CanFinPreim A _ _ succn predn (frefl _).
 Canonical FinPreim_succ A x n := OneFinPreimApp x n n.+1 (finPreim_succ A).
@@ -931,16 +1021,16 @@ Canonical FinPreim_maxn A m m_ x n m0 n0 :=
 
 Definition LabelPreimFinpred {A T : eqType}
    (Pf : {pred A}) (P P0 : {pred T}) (f : A -> T) := @id labeled_bool.
-Definition LabelOnePreimFinpred {A T : eqType} op P f x0 Q0 :=
-  @LabelPreimFinpred A T (fun x => op (f x) P) P
-    (fun y => TryFalse (P y)) (fun x => TryVar (f x))
-    (LabelBool (op x0 Q0)).
+Definition LabelOnePreimFinpred {A T : eqType} pT op in_pT (P : pT) f y0 P0 :=
+  @LabelPreimFinpred A T (fun x => op (f x) P) (in_pT P)
+    (fun y => TryFalse (in_pT P y)) (fun x => TryVar (f x))
+    (LabelBool (op y0 P0)).
 Canonical InferPreimFinpred {A T : eqType} c (Pf : {pred A}) (P : {pred T}) F Ff
-           (eF : inferFinpred P F) (eFf : forall x, inferFinPreim F Ff x) :=
+         (eF : T -> inferFinpred P F) (eFf : forall x, inferFinPreim F Ff x) :=
   OpFinpred Pf Ff
-     (LabelPreimFinpred Pf P (fun=> eF) (fun x => finPreim_val (eFf x)) c).
-Canonical Finpred_in {A T} P f x0 Q0 :=
-  @LabelOnePreimFinpred A T (fun x P => x \in P) P f x0 Q0.
+     (LabelPreimFinpred Pf P [eta eF] (fun x => finPreim_val (eFf x)) c).
+Canonical Finpred_in {A T} P f y0 P0 :=
+  @LabelOnePreimFinpred A T (mem_pred T) in_mem pred_of_mem P f y0 P0.
 
 Structure finPreimOp (A B1 B2 T : eqType) := FinPreimOp {
   finPreim_op :> A -> B1 -> B2 -> T;
@@ -997,12 +1087,21 @@ Canonical FinPreim_minn A x y1 y2 :=
   [pred x in A]. *)
 
 (*
-Arguments InferredFinpredPattern {T} _ _.
-Lemma foo (D := fun T (x : T) => True) (T : eqType) (a b : T)
-  (G : forall T A, D {finpred T} A -> D {pred T} A) :
+Lemma foo (D := fun T (x : T) => True)
+  (G : forall (T : eqType) A, D {finpred T} A -> D {pred T} A)
+  (T : eqType) (a b : T) (P Q : {finpred T}) :
    D {pred _} [pred x : {n | 5 < n} | sval x == 3].
-apply: G.
+Set Printing All.
+Set Debug "unification".
+refine (G _ _ _).
 Abort.
+Lemma foo (a : T) A B (D := fun U (z : U) => Prop) : True.
+Set Printing Coercions.
+Close Scope coerced_scope.
+Undelimit Scope coerced_scope.
+Set Printing Width 160.
+Set Printing Implicit.
+Set Debug "unification".
 *)
 
 (*
@@ -1145,23 +1244,23 @@ Notation "[ 'pick' x : T 'in' A | P & Q ]" := [pick x : T in A | P && Q]
 (*************************** fintype starts here ******************************)
 (******************************************************************************)
 
-Definition disjoint (T : eqType) (A : finpred T) (B : {pred T}) :=
-  @pred0b T [predI A & B].
+Definition disjoint (T : eqType) (A : finpred T) (mB : mem_pred T) :=
+  @pred0b T [pred x in A | in_mem x mB].
 
-Notation "[ 'disjoint' A & B ]" := (disjoint A B)
+Notation "[ 'disjoint' A & B ]" := (disjoint A (mem B))
   (at level 0,
    format "'[hv' [ 'disjoint' '/  '  A '/'  &  B ] ']'") : bool_scope.
 
 HB.lock
-Definition subset (T : eqType) (A : finpred T) (B : {pred T}) : bool :=
-  pred0b [pred x in A | x \notin B].
+Definition subset (T : eqType) (A : finpred T) (mB : mem_pred T) : bool :=
+  pred0b [pred x in A | ~~ (in_mem x mB)].
 Canonical subset_unlock := Unlockable subset.unlock.
 
-Notation "A \subset B" := (subset A B)
+Notation "A \subset B" := (subset A (mem B))
   (at level 70, no associativity) : bool_scope.
 
 Definition proper (T : eqType) (A B : finpred T) :=
-  @subset T A B && ~~ subset B A.
+  (A \subset B) && ~~ (B \subset A).
 Notation "A \proper B" := (proper A B)
   (at level 70, no associativity) : bool_scope.
 
@@ -1205,11 +1304,11 @@ Proof. exact: eq_card_trans (card1 x). Qed.
 Lemma cardUI A B : #|[predU A & B]| + #|[predI A & B]| = #|A| + #|B|.
 Proof.
 pose U := [predU A & B].
-have Dcard A1: {subset A1 <= U} -> #|A1| = count [in A1] (support U).
-  move=> sA1U; rewrite unlock -size_filter; apply/perm_size.
-  rewrite uniq_perm ?filter_uniq // => x; rewrite mem_filter !inE.
-  exact/esym/andb_idr/sA1U.
-rewrite !Dcard ?count_predUI // => x /[!inE]; try case/andP; move=> -> //.
+have Dcard C: {subset C <= U} -> #|C| = count [in C] (support U).
+  move=> sCU; rewrite unlock -size_filter; apply/perm_size.
+  rewrite uniq_perm ?filter_uniq // => x.
+  by rewrite mem_filter !inE andb_idr // => /sCU.
+rewrite !{}Dcard ?count_predUI // => x /[!inE]; try case/andP; move=> -> //.
 exact: orbT.
 Qed.
 
@@ -1246,32 +1345,12 @@ Proof. by rewrite cardU1 inE card1 addn1. Qed.
 (* The cardU1 match succeeds but exposes a finpred1 y structure, as it        *)
 (* matches the finpred structures directly, and the inner finpred1 is not     *)
 (* labeled by a call to reverse_coercion.                                     *)
-(* TO CHECK: it appears the top calls to reverse_coercion fail to match       *)
-(* because of universe constraints ?!?                                        *)
 
 Lemma cardD1 x A : #|A| = (x \in A) + #|[predD1 A & x]|.
 Proof.
 apply/(@addnI (x \notin A)); rewrite addnA addn_negb -cardU1.
 have <-: x \notin [predD1 A & x] = 1 :> nat by rewrite !inE eqxx.
-by rewrite -[RHS]cardU1; apply/eq_card=> y /[!inE]; rewrite orb_andr orbN.
-(* The [RHS] makes this rewrite work by matching the (_ + _) as a whole       *)
-(* rather than piecewise. The LHS of the (_ + _) cannot match because of the  *)
-(* extraarg default projection bug: trying to match (?x \in ?A) where ?x : T  *)
-(* and ?A : {finpred T}, with (y \in P), will always fail, even when P would  *)
-(* unify with ?A coerced to {pred T}), because it actually tries to match     *)
-(* (P x) with (mem_labeled ?A x), where x : T is a fresh variable. This fails *)
-(* because mem_labeled only has a default instance, which cannot match due to *)
-(* the presence of the extraarg x.                                            *)
-(*   Matching the (_ + _) globally fixes this because although first it fails *)
-(* matching the nat_of_bool (?x \notin ?A) LHS initially as above, ultimately *)
-(* it expands the definition of addn to a fix expression, which gets pushed   *)
-(* as a stack item, leading to a the following unification problem            *)
-(*      nat_of_bool | ZApp (?x \notin ?A), ZFix (fix 0 ...), ZApp (#|?A|)     *)
-(*      nat_of_bool | ZApp (y \notin P), ZFix (fix 0 ...), ZApp (#|P|)        *)
-(* which Coq can resolve because it matches stacks RIGHT TO LEFT, even though *)
-(* it matches application lists LEFT TO RIGHT, the match of the cardinals     *)
-(* succeeds because #|P| already contains the finpred inferred for P, and     *)
-(* then the P to ?A match succeeds by conversion since ?A has been resolved.  *)
+by rewrite -cardU1; apply/eq_card=> y /[!inE]; rewrite orb_andr orbN.
 Qed.
 
 Lemma card_undup s : #|undup s| = #|s|.
@@ -1337,13 +1416,13 @@ Proof. by rewrite unlock; apply/eq_pred0b => /= x; rewrite inE andbC. Qed.
 
 Lemma subsetP A P : reflect {subset A <= P} (A \subset P).
 Proof.
-rewrite unlock; apply: (iffP (pred0P _)) => /=[AP0 x | sAP x /=].
+rewrite unlock; apply: (iffP (pred0P _)) => [AP0 x | sAP x] /=.
   by apply/implyP/idPn; rewrite negb_imply [_ && _]AP0.
 by rewrite -negb_imply; apply/negbF/implyP/sAP.
 Qed.
 
 Lemma subsetPn A P :
- reflect (exists2 x, x \in A & x \notin P) (~~ (A \subset P)).
+  reflect (exists2 x, x \in A & x \notin P) (~~ (A \subset P)).
 Proof.
 rewrite unlock; apply: (iffP (pred0Pn _)) => [[x] | [x Ax P'x]].
   by case/andP; exists x.
@@ -1360,12 +1439,12 @@ Lemma subxx F : F \subset F.
 Proof. exact/subsetP. Qed.
 Hint Resolve subxx : core.
 
-Lemma eq_subset A B : A =i B -> subset A =1 subset B.
+Lemma eq_subset A B : A =i B -> forall P, (A \subset P) = (B \subset P).
 Proof.
 by move=> eqAB C; rewrite !unlock; apply: eq_pred0b => /= x; rewrite !inE eqAB.
 Qed.
 
-Lemma eq_subset_r P Q : P =i Q -> (@subset T)^~ P =1 (@subset T)^~ Q.
+Lemma eq_subset_r P Q : P =i Q -> forall A, (A \subset P) = (A \subset Q).
 Proof.
 by move=> eqPQ A; rewrite !unlock; apply/eq_pred0b => x; rewrite !inE eqPQ.
 Qed.
@@ -1433,8 +1512,8 @@ Proof. by apply/subsetP=> x; rewrite mem_filter => /andP[]. Qed.
 Lemma subset_filter P s1 s2 :
   s1 \subset s2 -> [seq a <- s1 | P a] \subset [seq a <- s2 | P a].
 Proof.
-move/subsetP=> s12; apply/(subsetP (filter _ _))=> x.
-by rewrite !mem_filter=> /andP[-> /s12].
+move/subsetP=> s12; apply/subsetP=> x.
+by rewrite !mem_filter => /andP[-> /s12].
 Qed.
 
 Lemma properE A B : A \proper B = (A \subset B) && ~~ (B \subset A).
@@ -1529,12 +1608,13 @@ Qed.
 Lemma disjoint_sym A B : [disjoint A & B] = [disjoint B & A].
 Proof. by congr (_ == 0); apply: eq_card => x; apply: andbC. Qed.
 
-Lemma eq_disjoint A B : A =i B -> disjoint A =1 disjoint B.
+Lemma eq_disjoint A B : A =i B -> forall P, [disjoint A & P] = [disjoint B & P].
 Proof.
 by move=> eqAB C; congr (_ == 0); apply: eq_card => x /=; rewrite !inE eqAB.
 Qed.
 
-Lemma eq_disjoint_r P Q : P =i Q -> (@disjoint T)^~ P =1 (@disjoint T)^~ Q.
+Lemma eq_disjoint_r P Q :
+  P =i Q -> forall A, [disjoint A & P] = [disjoint A & Q].
 Proof.
 by move=> eqPQ A; congr (_ == 0); apply: eq_card => x /=; rewrite !inE eqPQ.
 Qed.
@@ -1574,7 +1654,7 @@ Lemma disjoint0 P : [disjoint pred0 & P].
 Proof. exact/pred0P. Qed.
 
 Lemma eq_disjoint0 A P : A =i pred0 -> [disjoint A & P].
-Proof. by move/(@eq_disjoint _ pred0)->; apply: disjoint0. Qed.
+Proof. by move/eq_disjoint->; apply: disjoint0. Qed.
 
 Lemma disjoint1 x P : [disjoint pred1 x & P] = (x \notin P).
 Proof.
@@ -1673,7 +1753,7 @@ Definition set_pickP A : pick_spec [in A] (pick A) := pickP A.
 
 Lemma enum_prec_eq_sorted (A : finpred T) : sorted prec_eq (enum A).
 Proof. by rewrite unlock sort_sorted//; apply: prec_eq_total. Qed.
-Local Hint Resolve enum_prec_eq_sorted.
+Local Hint Resolve enum_prec_eq_sorted : core.
 
 Lemma eq_enum A B : A =i B -> enum A = enum B.
 Proof.
@@ -1700,29 +1780,29 @@ End ChoiceOpsTheory.
 (*                                                                    *)
 (**********************************************************************)
 
-Section ChoiceInjectiveb.
+Section Injectiveb.
 
-Variables (aT : choiceType) (rT : eqType) (f : aT -> rT).
+Variables (aT rT : eqType) (f : aT -> rT).
 Implicit Type D : {finpred aT}.
 
-Definition dinjectiveb D := uniq (map f (enum D)).
+Definition dinjectiveb (D : finpred aT) := uniq (map f (support D)).
 
 Lemma dinjectivePn D :
   reflect (exists2 x, x \in D & exists2 y, y \in [predD1 D & x] & f x = f y)
           (~~ dinjectiveb D).
 Proof.
 apply: (iffP idP) => [injf | [x Dx [y Dxy eqfxy]]]; last first.
-  move: Dx; rewrite -(mem_enum D) => /rot_to[i E defE].
+  move: Dx; rewrite -mem_support => /rot_to[i E defE].
   rewrite /dinjectiveb -(rot_uniq i) -map_rot defE /=; apply/nandP; left.
-  rewrite inE /= -(mem_enum D) -(mem_rot i) defE inE in Dxy.
+  rewrite inE /= -mem_support -(mem_rot i) defE inE in Dxy.
   rewrite andb_orr andbC andbN in Dxy.
   by rewrite eqfxy map_f //; case/andP: Dxy.
-pose p := [pred x in D | has (fun y => (y != x) && (f x == f y)) (enum D)].
-case: (pickP p) => [x /=/andP[Dx /hasP[y Dy /andP[ynx /eqP eqfxy]]] | no_p].
-  by exists x => //; exists y => //; rewrite inE ynx/= -mem_enum.
-rewrite /dinjectiveb map_inj_in_uniq ?enum_uniq // in injf => x y Dx Dy eqfxy.
-apply: contraNeq (negbT (no_p x)) => ne_xy /=; rewrite /p inE -mem_enum Dx/=.
-by apply/hasP; exists y => //; rewrite eq_sym ne_xy/=; apply/eqP.
+pose P := [pred x in D | ~~ [disjoint [predD1 D & x] & [pred y | f x == f y]]].
+have [noP | /pred0Pn[x /andP[Dx]]] := altP (@pred0P _ P); last first.
+  by case/pred0Pn=> y /andP[Dy /eqP-Efxy]; exists x => //; exists y.
+rewrite /dinjectiveb map_inj_in_uniq ?support_uniq // in injf => x y Dx Dy Efxy.
+apply/esym; apply: contraFeq (noP x) => x'y /=; rewrite -mem_support Dx /=.
+by apply/pred0Pn; exists y; rewrite !inE x'y -mem_support Dy Efxy eqxx.
 Qed.
 
 Lemma dinjectiveP D : reflect {in D &, injective f} (dinjectiveb D).
@@ -1735,9 +1815,9 @@ move=> x y Dx Dy /= eqfxy; apply/eqP; apply/idPn=> nxy; case: injf.
 by exists x => //; exists y => //=; rewrite inE /= eq_sym nxy.
 Qed.
 
-End ChoiceInjectiveb.
+End Injectiveb.
 
-Definition image (T : choiceType) T' f (A : {finpred T}) : seq T' :=
+Definition image (T : choiceType) T' f (A : finpred T) : seq T' :=
   map f (enum A).
 Notation "[ 'seq' F | x 'in' A ]" := (image (fun x => F) A)
   (at level 0, F at level 99, x binder,
@@ -1848,8 +1928,9 @@ Qed.
 
 Lemma image_injP A : reflect {in A &, injective f} (#|image f A| == #|A|).
 Proof.
-apply: (iffP eqP) => [eqfA |]; last exact: card_in_image.
-by apply/dinjectiveP; apply/card_uniqP; rewrite size_map -cardE.
+apply: (iffP eqP); [rewrite [in RHS]unlock=> eqfA | exact: card_in_image].
+apply/dinjectiveP/card_uniqP; rewrite size_map -{}eqfA.
+by apply/esym/eq_card/eq_mem_map; rewrite unlock; apply: mem_sort.
 Qed.
 
 Hypothesis injf : injective f.

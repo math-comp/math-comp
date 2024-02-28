@@ -1605,7 +1605,7 @@ Qed.
 
 Lemma predX_prod_enum (A1 : {finpred T1}) (A2 : {finpred T2}) :
   count [predX A1 & A2] prod_enum = #|A1| * #|A2|.
-Proof. by rewrite !cardE /prod_enum -size_filter size_allpairsX 2!enum_fin. Qed.
+Proof. by rewrite !cardE /prod_enum -size_filter size_allpairsX -!enum_fin. Qed.
 
 Lemma prod_enumP : Finite.axiom prod_enum.
 Proof.

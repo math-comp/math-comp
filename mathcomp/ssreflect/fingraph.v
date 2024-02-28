@@ -433,7 +433,7 @@ rewrite /orbit -orderSpred looping_uniq; set n := (order x).-1.
 apply: contraFN (ltnn n) => /trajectP[i lt_i_n eq_fnx_fix].
 rewrite orderSpred -(size_traject f x n).
 apply: (leq_trans (subset_leq_card _) (card_size _)); apply/subsetP=> z.
-rewrite /= inE fconnect_orbit => /trajectP[j le_jn ->{z}].  (* FIXME: extra /= *)
+rewrite [_ \in _]fconnect_orbit => /trajectP[j le_jn ->{z}]. (* FIXME: inE fails *)
 rewrite -orderSpred -/n ltnS leq_eqVlt in le_jn.
 by apply/trajectP; case/predU1P: le_jn => [->|]; [exists i | exists j].
 Qed.
@@ -672,14 +672,11 @@ Qed.
 Lemma order_le_cycle : order x <= size p.
 Proof.
 apply: leq_trans (card_size _); apply/subset_leq_card/subsetP=> y.
-by rewrite /= !(fconnect_cycle, inE) ?eqxx.  (* FIXME: extra /= *)
+by rewrite [y \in _]fconnect_cycle.
 Qed.
 
 Lemma order_cycle : order x = size p.
-Proof.
-rewrite -(card_uniqP Up).
-exact: @eq_card _ (fconnect f x : {pred T}) p fconnect_cycle.  (* FIXME: extra args *)
-Qed.
+Proof. by rewrite -(card_uniqP Up); apply/eq_card/fconnect_cycle. Qed.
 
 Lemma orbitE : orbit x = rot (index x p) p.
 Proof.
@@ -826,8 +823,8 @@ Lemma orbitPcycle {x} : [<->
 Proof.
 tfae=> [xorbit_cycle|||[k fkx]|fx y z|/injectivePcycle//].
 - by apply: eq_order_cycle xorbit_cycle _ _ _ _; rewrite ?mem_orbit.
-- move=> /subset_cardP/(_ _)->; rewrite /= ?inE//; apply/subsetP=> y.  (* FIXME: extra /= *)
-  by apply: connect_trans; apply: fconnect1.
+- move=> /subset_cardP/(_ _)->; first exact: connect0.
+  by apply/subsetP=> y; apply/connect_trans/fconnect1.
 - by exists (findex (f x) x); rewrite // iterSr iter_findex.
 - apply: (@iter_order_cycle (traject f x k.+1)); rewrite /= ?mem_head//.
   by apply/fpathP; exists k.+1; rewrite trajectSr -iterSr fkx.
