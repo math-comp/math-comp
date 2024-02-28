@@ -3510,24 +3510,23 @@ Definition tag_enum :=
 
 Lemma tag_enumP : Finite.axiom tag_enum.
 Proof.
-Admitted. (*
-case=> i x; rewrite -(enumP i) /tag_enum -enumT.
-elim: (enum I) => //= j e IHe.
-rewrite count_cat count_map {}IHe; congr (_ + _).
-rewrite -size_filter -cardE /=; case: eqP => [-> | ne_j_i].
-  by apply: (@eq_card1 _ x) => y; rewrite -topredE /= tagged_asE ?eqxx.
-by apply: eq_card0 => y.
-Qed. *)
+case=> i x; rewrite -(Finite.enumP i) /tag_enum -enumT.
+elim: (enum I) => //= j e IHe; rewrite count_cat count_map {}IHe; congr (_ + _).
+case: eqP => [-> | ne_j_i]; rewrite /preim/= /Tagged /eq_op/= /tag_eq/=.
+  under eq_count => y do rewrite /= tagged_asE eqxx/=.
+  by apply/eqP; rewrite -enumT count_uniq_mem ?mem_enum.
+by have /eqP/negbTE-> := ne_j_i; rewrite /= count_pred0.
+Qed.
 
 HB.instance Definition _ := isFinite.Build {i : I & T_ i} tag_enumP.
 
 Lemma card_tagged :
   #|{: {i : I & T_ i}}| = sumn (map (fun i => #|T_ i|) (enum I)).
 Proof.
-Admitted. (*
-rewrite cardE !enumT [in LHS]unlock size_flatten /shape -map_comp.
-by congr (sumn _); apply: eq_map => i; rewrite /= size_map -enumT -cardE.
-Qed. *)
+rewrite cardE ![in LHS]enumT unlock size_sort size_flatten /shape -map_comp.
+rewrite enumT; congr (sumn _).
+by apply: eq_map => i /=; rewrite -enumT size_map -cardE.
+Qed.
 
 End TagFinType.
 
@@ -3551,7 +3550,8 @@ HB.instance Definition sum_isFinite := isFinite.Build (T1 + T2)%type
   (Finite.uniq_axiom sum_enum_uniq mem_sum_enum).
 
 Lemma card_sum : #|{: T1 + T2}| = #|T1| + #|T2|.
-Admitted. (*
-Proof. by rewrite !cardT !enumT [in LHS]unlock size_cat !size_map. Qed. *)
+Proof.
+by rewrite !cardT !enumT [in LHS]unlock size_sort size_cat !size_map.
+Qed.
 
 End SumFinType.
