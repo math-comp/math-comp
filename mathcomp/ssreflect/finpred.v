@@ -1930,7 +1930,8 @@ Lemma cardE A : #|A| = size (enum A).
 Proof. by rewrite !unlock size_sort. Qed.
 
 End ChoiceOpsTheory.
-#[export] Hint Resolve enum_uniq : core.
+#[export] Hint Extern 0 (is_true (uniq (enum _))) =>
+  solve [apply: enum_uniq] : core.
 
 Section FinOpsTheory.
 Variable T : finType.
@@ -2373,7 +2374,7 @@ Proof. by rewrite (cardE A) -(size_map f) card_size. Qed.
 Lemma card_in_image A : {in A &, injective f} -> #|image f A| = #|A|.
 Proof.
 move=> injf; rewrite (cardE A) -(size_map f); apply/card_uniqP.
-by rewrite map_inj_in_uniq ?enum_uniq // => x y; rewrite !mem_enum; apply: injf.
+by rewrite map_inj_in_uniq// => x y; rewrite !mem_enum; apply: injf.
 Qed.
 
 Lemma image_injP A : reflect {in A &, injective f} (#|image f A| == #|A|).
@@ -2599,7 +2600,7 @@ Lemma mem_sub_enum u : u \in sub_enum.
 Proof. by rewrite mem_pmap_sub -enumT mem_enum. Qed.
 
 Lemma sub_enum_uniq : uniq sub_enum.
-Proof. by rewrite pmap_sub_uniq // -enumT enum_uniq. Qed.
+Proof. by rewrite pmap_sub_uniq // -enumT. Qed.
 
 Lemma val_sub_enum : map val sub_enum = enum [pred x | P x].
 Proof.
