@@ -77,6 +77,7 @@ ssreflect/div.v
 ssreflect/eqtype.v
 ssreflect/finfun.v
 ssreflect/fingraph.v
+ssreflect/finpred.v
 ssreflect/finset.v
 ssreflect/fintype.v
 ssreflect/generic_quotient.v
