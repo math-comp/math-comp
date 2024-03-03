@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype tuple.
+From mathcomp Require Import finpred fintype tuple.
 
 (******************************************************************************)
 (* This file implements a type for functions with a finite domain:            *)
@@ -166,7 +166,7 @@ suffices ffunK f g: (forall x, f x = g x) -> f = finfun g.
   by split=> [/ffunK|] -> //; apply/esym/ffunK.
 case: f => f Dg; rewrite unlock; congr FinfunOf.
 have{} Dg x (aTx : mem_seq (enum aT) x): g x = fun_of_fin_rec f aTx.
-  by rewrite -Dg /= (bool_irrelevance (mem_enum _ _) aTx).
+  by rewrite -Dg /= (bool_irrelevance (mem_enum aT x) aTx).
 elim: (enum aT) / f (enum_uniq aT) => //= x1 s y f IHf /andP[s'x1 Us] in Dg *.
 rewrite Dg ?eqxx //=; case: eqP => // /eq_axiomK-> /= _.
 rewrite {}IHf // => x s_x; rewrite Dg ?s_x ?orbT //.
@@ -327,9 +327,9 @@ Notation "@ 'ffun_on' aT R" :=
   (at level 10, aT, R at level 9).
 
 Lemma nth_fgraph_ord T n (x0 : T) (i : 'I_n) f : nth x0 (fgraph f) i = f i.
-Proof.
-by rewrite -[i in RHS]enum_rankK -tnth_fgraph  (tnth_nth x0) enum_rank_ord.
-Qed.
+Abort.
+(* probably not provable anymore since nat_hasChoice in choice.v is opaque *)
+(* by rewrite -[i in RHS]enum_rankK -tnth_fgraph  (tnth_nth x0) enum_rank_ord. *)
 
 (*****************************************************************************)
 
@@ -395,10 +395,11 @@ Notation pffun_on y D R := (pffun_on_mem y (mem D) (mem R)).
 
 Section FinDepTheory.
 
-Variables (aT : finType) (rT : aT -> finType).
+Variables (aT : finType) (rT : aT -> eqType).
 Notation fT := {dffun forall x : aT, rT x}.
 
-Lemma card_family (F : forall x, pred (rT x)) :
+(* TODO: requires a finPred instance onf family
+Lemma card_family (F : forall x, {finpred (rT x)}) :
   #|(family F : simpl_pred fT)| = foldr muln 1 [seq #|F x| | x : aT].
 Proof.
 rewrite /image_mem; set E := enum aT in (uniqE := enum_uniq aT) *.
@@ -435,15 +436,17 @@ Qed.
 
 Lemma card_dep_ffun : #|fT| = foldr muln 1 [seq #|rT x| | x : aT].
 Proof. by rewrite -card_family; apply/esym/eq_card=> f; apply/familyP. Qed.
+*)
 
 End FinDepTheory.
 
 Section FinFunTheory.
 
-Variables aT rT : finType.
+Variables (aT : finType) (rT : eqType).
 Notation fT := {ffun aT -> rT}.
-Implicit Types (D : {pred aT}) (R : {pred rT}) (F : aT -> pred rT).
+Implicit Types (D : {finpred aT}) (R : {finpred rT}) (F : aT -> {finpred rT}).
 
+(* TODO: requires a finpred instance on pfamily
 Lemma card_pfamily y0 D F :
   #|pfamily y0 D F| = foldr muln 1 [seq #|F x| | x in D].
 Proof.
@@ -465,5 +468,6 @@ Qed.
 
 Lemma card_ffun : #|fT| = #|rT| ^ #|aT|.
 Proof. by rewrite -card_ffun_on; apply/esym/eq_card=> f; apply/forallP. Qed.
+*)
 
 End FinFunTheory.
