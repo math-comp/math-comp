@@ -1171,25 +1171,27 @@ Arguments inj_leq [m n] f _.
 
 (* bijection between any finType T and the Ordinal finType of its cardinal *)
 
-Lemma enum_rank_subproof (T : finType) x0 (A : {pred T}) : x0 \in A -> 0 < #|A|.
+Lemma enum_rank_subproof (T : finType) x0 (A : {finpred T}) :
+  x0 \in A -> 0 < #|A|.
 Proof. by move=> Ax0; rewrite (cardD1 x0) Ax0. Qed.
 
 HB.lock
-Definition enum_rank_in (T : finType) x0 (A : {pred T}) (Ax0 : x0 \in A) x :=
-  insubd (Ordinal (@enum_rank_subproof T x0 [eta A] Ax0)) (index x (enum A)).
+Definition enum_rank_in (T : finType) x0 (A : {finpred T}) (Ax0 : x0 \in A) x :
+    'I_#|A| :=
+  insubd (Ordinal (@enum_rank_subproof T x0 A Ax0)) (index x (enum A)).
 Canonical unlockable_enum_rank_in := Unlockable enum_rank_in.unlock.
 
 Section EnumRank.
 
 Variable T : finType.
-Implicit Type A : {pred T}.
+Implicit Type A : {finpred T}.
 
 Definition enum_rank x := @enum_rank_in T x T (erefl true) x.
 
 Lemma enum_default A : 'I_(#|A|) -> T.
 Proof. by rewrite cardE; case: (enum A) => [|//] []. Qed.
 
-Definition enum_val A i := nth (@enum_default [eta A] i) (enum A) i.
+Definition enum_val A i := nth (@enum_default A i) (enum A) i.
 Prenex Implicits enum_val.
 
 Lemma enum_valP A i : @enum_val A i \in A.
@@ -1290,8 +1292,8 @@ Arguments enum_val_inj {T A} [i1 i2] : rename.
 Arguments enum_rank_inj {T} [x1 x2].
 Prenex Implicits enum_val enum_rank enum_valK enum_rankK.
 
-Lemma enum_rank_ord n i : enum_rank i = cast_ord (esym (card_ord n)) i.
-Abort. (* probably no longer provable either *)
+(* Lemma enum_rank_ord n i : enum_rank i = cast_ord (esym (card_ord n)) i. *)
+(* probably no longer provable either *)
 (* apply: val_inj; rewrite /enum_rank enum_rank_in.unlock.
 by rewrite insubdK ?index_enum_ord // card_ord [_ \in _]ltn_ord. *)
 
