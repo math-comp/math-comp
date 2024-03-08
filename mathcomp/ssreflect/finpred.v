@@ -4,70 +4,9 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import path div.
 
-
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
-
-(*  Tests for unification order and priorities. *)
-
-Structure tag1 := MkTag1 {untag1 : unit}.
-Definition untag1d := untag1.
-Canonical Tag1 u := MkTag1 u.
-Structure tag2 := MkTag2 {untag2 : unit}.
-Definition untag2d := untag2.
-Canonical Tag2 u := MkTag2 u.
-Structure testS (u : unit) := TestS { projTest : Prop -> Prop }.
-Arguments projTest : clear implicits.
-Definition HD (u0 u : unit) A := A /\ A.
-Definition HP (u0 u : unit) A := A /\ A.
-Definition Dpat u1 t2 u := TestS u1 (HD (untag1d t2) u).
-Definition Ppat u1 t2 u := TestS u1 (HP (untag1 t2) u).
-Canonical Dtest t1 t2 u := Dpat (untag1d t1) t2 u.
-Canonical Ptest t1 t2 u := Ppat (untag1 t1) t2 u.
-Structure testB := TestB { projB : bool }.
-Definition testN b := negb b.
-Canonical NtestB b := TestB (testN b).
-
-Goal False.
-pose D (x : unit) := True.
-have a1 : D (untag1 _) by [].
-have a2 : D (untag2 _) by [].
-(* unfold in EXPECTED type before INFERRED type *)
-pose A (a : D (untag1d _)) := a : D (untag2d _).
-(* prioritize solving projection in INFERRED type over those in EXPECTED type *)
-pose B := a1 _ : D (untag2 _).
-(* unify arguments LEFT TO RIGHT *)
-pose C (K : forall x, D x * D x -> Prop) := K _ (a1 _, a2 _).
-(* resolve projections in rewrite RULE before REDEX *)
-have E (e : forall u, D (untag1 u) = (u = u))
-       (H : forall u, ~ D (untag2 u)) : False.
-  refine (H _ _). rewrite e. split.
-(* unfold in rewrite REDEX before RULE *)
-have E' (e : forall u, D (untag1d u) = (u = u)): D (untag2d _).
-  rewrite e. split.
-(* unfold in INSTANCE parameters before unfolding in PROJECTION parameters   *)
-(* unfold in INSTANCE field arguments before unfolding in VALUE arguments    *)
-(* unfold in INSTANCE structure before unfolding in PROJECTION structure arg *)
-(* unfold in VALUE extra args before unfolding in PROJECTION extraargs       *)
-pose FD (a : HD (untag2d _) (untag1d _) (D (untag2d _))) :=
-  a : projTest (untag2d _) (Dpat _ _ (untag2d _)) (D (untag1d _)).
-(* canonical structure resolution priority for projections                *)
-(*    - in PROJECTION parameters over those in INSTANCE parameters        *)
-(*    - in VALUE arguments over those in INSTANCE field arguments         *)
-(*    - in PROJECTION structure argument over those in INSTANCE structure *)
-(*    - in PROJECTION extraargs over those in VALUE extra args            *)
-pose FP (a : HP (untag2 _) (untag1 _) (D (untag2 _))) :=
-  a : projTest (untag2 _) (Ppat _ _ (untag2 _)) (D (untag1 _)).
-(* canonical structures are not recognized in the condition of an "if" *)
-pose ite b := if b then tt else tt.
-have b0 : bool := true.
-pose Fok (a : D (ite (projB _))) := a : D (ite (testN b0)).
-pose Ffail0 (a : D (if projB _ then tt else tt)) :=
-  a : D (if testN b0 then tt else tt).
-pose Ffail1 (a : D (ite (projB _))) := a : D (if testN b0 then tt else tt).
-pose Ffail2 (a : D (if testN b0 then tt else tt)) := a : D (ite (projB _)). 
-Abort.
 
 (*   matchedArg T == a special-purpose wrapper type that provides some        *)
 (*                   control over unification priorities (see below).         *)
@@ -143,177 +82,6 @@ Identity Coercion pattern_of_matchArg : matchArg >-> funPattern.
 Canonical MatchFunPattern A R f := @FunPattern A R f f.
 *)
 
-(******************************************************************************)
-(*   A generic Forall "constructor" for the Gallina forall quantifier, i.e.,  *)
-(*   \Forall x, P := Forall (fun x => P) := forall x, P.                      *)
-(* The main use of Forall is to apply congruence to a forall equality:        *)
-(*    congr1 Forall : forall P Q, P = Q -> Forall P = Forall Q.               *)
-(* in particular in a classical setting with function extensionality, where   *)
-(* we can have (forall x, P x = Q x) -> (forall x, P x) = (forall x, Q x).    *)
-(*   We use a forallSort structure to factor the ad hoc PTS product formation *)
-(* rules; forallSort is keyed on the type of the entire forall expression, or *)
-(* (up to subsumption) the type of the forall body - this is always a sort.   *)
-(*   This implementation has two important limitations:                       *)
-(*     1) It cannot handle the SProp sort and its typing rules. However, its  *)
-(*        main application is extensionality, which is not compatible with    *)
-(*        SProp because an (A : SProp) -> B "function" is not a generic       *)
-(*        (A : Type) -> B function as SProp is not included in Type.          *)
-(*     2) The Forall constructor can't be inserted by a straightforward       *)
-(*        unfold (as in, rewrite -[forall x, _]/(Forall _)) because of the    *)
-(*        way Coq unification handles Type constraints. The ForallI tactic    *)
-(*        mitigates this issue, but there are additional issues with its      *)
-(*        implementation -- see below.                                        *)
-(******************************************************************************)
-
-Module Forall.
-
-Section Definitions.
-
-Set Universe Polymorphism.
-
-Structure sort@{i m n | i < m, m < n} : Type@{n} := PackSort {
-  sort_ : Type@{m};
-  #[canonical=no] ForallType (A : Type@{i}) : (A -> sort_) -> sort_;
-  #[canonical=no] ForallSProp (A : SProp) : (A -> sort_) -> sort_
-}.
-Local Coercion sort_ : sort >-> Sortclass.
-
-Local Notation make_forall := (fun _ B => forall x, B x) (only parsing).
-Notation Sort S := (@PackSort S make_forall make_forall).
-Definition PropSort@{i m n}  : sort@{i m n} := Sort Prop.
-Definition SPropSort@{i m n} : sort@{i m n} := Sort SProp.
-Definition SetSort@{m n}     : sort@{Set m n} := Sort Set.
-Definition TypeSort@{i m n}  : sort@{i m n} := Sort Type@{i}.
-
-Structure argSort@{i m n} : Type@{n} := ArgSort {
-  arg_sort : Type@{m};
-  #[canonical=no] pred_sort : arg_sort -> sort@{i m n} -> Type@{m};
-  #[canonical=no] Forall A S : pred_sort A S -> S
-}.
-Local Coercion arg_sort : argSort >-> Sortclass.
-
-Notation Arg sA F := (@ArgSort sA (fun A S => A -> S) (fun A S => F S A)).
-Definition PropArg@{i m n} := Arg Prop ForallType@{i m n}.
-Definition SPropArg@{i m n} := Arg SProp ForallSProp@{i m n}.
-Definition SetArg@{i m n} := Arg Set ForallType@{i m n}.
-Definition TypeArg@{i j m n} := Arg Type@{j} ForallType@{i m n}.
-
-Structure labeled@{n} (S : Type@{n}) : Type@{n} := LabelSProp { get : S }.
-Definition LabelInSProp := LabelSProp.
-Definition LabelInProp := LabelInSProp.
-Definition LabelProp := LabelInProp.
-Definition LabelType@{n} S F := @LabelProp@{n} S F.
-
-Variant cast@{n} {T : Type@{n}} (x : T) : T -> Type@{n} := Cast : cast x x.
-Definition cast_to {T x y} (Exy : @cast T x y) B :=
-  let: Cast in cast _ y := Exy return B x -> B y in id.
-Arguments cast_to {T x y} Exy B.
-Definition cast_from {T x y} (Exy : @cast T x y) B :=
-  let: Cast in cast _ y := Exy return B y -> B x in id.  
-Arguments cast_from {T x y} Exy B.
-
-Structure pattern@{i m n} sA (S : sort@{i m n}) A B := Pattern {
-   pattern_ : labeled S;
-   #[canonical=no] cast_pattern : cast (get pattern_) (@Forall sA A S B)
-}.
-
-Definition SPropPattern@{i m n} S (A : SProp) B :=
-  @Pattern SPropArg@{i m n} S A B (LabelSProp (ForallSProp B)) (Cast _).
-Definition TypePattern@{i m n} S A B :=
-  @Pattern TypeArg@{i i m n} S A B (LabelType (ForallType B)) (Cast _).
-
-Structure predPattern@{i m n} sA A S : Type@{n} := PredPattern {
-  pred_pattern : labeled@{n} Type@{m};
-  #[canonical=no] coerce_pred_pattern :
-     get pred_pattern -> @pred_sort@{i m n} sA A S
-}.
-
-Definition SPropPredPattern@{i m n} (A : SProp) S :=
-  @PredPattern@{i m n} SPropArg A S (LabelSProp (A -> S)) id.
-Definition PropPredPattern@{i m n} (A : Prop) S :=
-  @PredPattern@{i m n} PropArg A S (LabelProp (A -> S)) id.
-Definition PredInPropPattern@{i j m n} (A : Type@{j}) :=
-  @PredPattern@{i m n} TypeArg A PropSort
-    (@LabelInProp Type@{m} (A -> Prop)) id.
-Definition PredInSPropPattern@{i j m n} (A : Type@{j}) :=
-  @PredPattern@{i m n} TypeArg A SPropSort
-    (@LabelInSProp Type@{m} (A -> SProp)) id.
-Definition TypePredPattern@{i j k m n} (A : Type@{j}) :=
-  @PredPattern@{i m n} TypeArg A TypeSort
-    (@LabelType Type@{m} (A -> Type@{k})) id.
-
-End Definitions.
-
-Module Exports.
-
-Coercion sort_ : sort >-> Sortclass.
-Canonical PropSort.
-Canonical SPropSort.
-Canonical SetSort.
-Canonical TypeSort.
-
-Coercion arg_sort : argSort >-> Sortclass.
-Arguments Forall {sA} A%type S%type P%type : rename.
-Canonical PropArg.
-Canonical SPropArg.
-Canonical SetArg.
-Canonical TypeArg.
-
-Canonical LabelType.
-Arguments cast_to {T x y} Exy B.
-Arguments cast_from {T x y} Exy B.
-
-Coercion pattern_ : pattern >-> labeled.
-Canonical SPropPattern.
-Canonical TypePattern.
-
-Coercion pred_pattern : predPattern >-> labeled.
-Canonical SPropPredPattern.
-Canonical PredInPropPattern.
-Canonical PredInSPropPattern.
-Canonical PropPredPattern.
-Canonical TypePredPattern.
-
-Definition Forall {sA A S sB} B := Forall A S (@coerce_pred_pattern sA A S sB B).
-
-Notation "\Forall x .. z , T" :=
-   (Forall (fun x => .. (Forall (fun z => T)) ..))
-  (at level 200, x binder, z binder, T at level 200,
-   format "'[hv' '\Forall'  '[' x .. z , ']' '/ '  T ']'") : type_scope.
-
-(*  The ForallI implementation has to work around several Coq 8.12 issues:    *)
-(*    - Coq unification defers Type constraints so we must ensure the type    *)
-(*      constraint for the forall term F is processed, and the resulting      *)
-(*      sort unified with the forall_sort projection _BEFORE_ F is unified    *)
-(*      with a Forall _ pattern, because the inferred forallSort structure    *)
-(*      determines the actual shape of that pattern. This is done by passing  *)
-(*      F to erefl, then constraining the type of erefl to Forall _ = _. Note *)
-(*      that putting a redundant F on the right hand side would break due to  *)
-(*      incomplete handling of subtyping.                                     *)
-(*    - ssr rewrite and Coq replace do not handle universe constraints.       *)
-(*      and rewrite does not handle subsumption of the redex type. This means *)
-(*      we cannot use rewrite, replace or fold, and must resort to primitive  *)
-(*      equality destruction.                                                 *)
-(*    - ssr case: and set do not recognize ssrpatternarg parameters, so we    *)
-(*      must rely on ssrmatching.ssrpattern.                                  *)
-
-Tactic Notation "ForallI" ssrpatternarg(pat) :=
-  let F := fresh "F" in let A := fresh "A" in
-  ssrmatching.ssrpattern pat;
-  set A := (A in let F := forall x : A, _ in _) => F;
-  case: {A} F / (let S : sort := _ in @erefl S F : @Forall _ A S _ _ = _).
-Tactic Notation "ForallI" := ForallI (forall x, _).
-
-(*
-Tactic Notation "ForallI" ssrpatternarg(pat) :=
-  let F := fresh "F" in ssrmatching.ssrpattern pat => F;
-  case: F / (@erefl _ F : ForallType _ = _).
-Tactic Notation "ForallI" := ForallI (forall x, _).
-*)
-
-End Exports.
-End Forall.
-Export Forall.Exports.
 
 (*       infer_type t :: When t : inferType T is unconstrained, this pattern  *)
 (*                       will unify with any e : T while instantiating T to   *)
@@ -322,7 +90,6 @@ Export Forall.Exports.
 (*      that arise from the types of unification variables. Using infer_type  *)
 (*      allows the synchronous resolution of structures such as forallSort    *)
 (*      that depend on types.                                                 *)
-
 Structure inferType T := BuildInferType {infer_type : T}.
 Canonical InferType {T} x := @BuildInferType T x.
 
@@ -418,6 +185,7 @@ Record finpred T :=
   Finpred { finpred_pred; envelope : @finpredEnvelope T finpred_pred}.
 Add Printing Constructor finpred.
 Arguments Finpred {T} P E : rename.
+Arguments envelope {T} F : rename, simpl never.
 
 Variant finpredPilot := TryInferFinpred.
 Definition TryCoercedFinpred := TryInferFinpred.
@@ -611,8 +379,10 @@ Fixpoint envelope_of_seq {T} (s : seq _) : finpredEnvelope [pred x in s] :=
   envelope (finpredU (finpred1 x) (Finpred _ (envelope_of_seq s'))).
 #[warnings="-uniform-inheritance"]
 Coercion finpred_seq T s := Finpred _ (@envelope_of_seq T s).
+#[warnings="-uniform-inheritance"]
+Coercion finpredPattern_seq T s := @CoercedFinpredPattern T (s : seq T).
 Canonical CoercedFinpred_seq (T : eqType) (s : seq T) x :=
-  PackCoercedFinpredApp s x (mem_seq s x).
+  CoercedFinpredApp s x.
 
 Structure labeled_bool := LabelBool {unlabel_bool :> bool}.
 Add Printing Constructor labeled_bool.

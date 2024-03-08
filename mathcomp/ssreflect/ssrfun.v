@@ -76,3 +76,14 @@ Proof. by move=> Ef [?|] //=; rewrite Ef. Qed.
 Lemma omapK {aT rT : Type} (f : aT -> rT) (g : rT -> aT) :
   cancel f g -> cancel (omap f) (omap g).
 Proof. by move=> fK [?|] //=; rewrite fK. Qed.
+
+Arguments tag_of_tag2 {_ _ _} _.
+Definition tag2_of_tag {I T1_ T2_} (z : {x : I & T1_ x * T2_ x}%type) :=
+  let y := tagged z in Tagged2 T1_ T2_ y.1 y.2.
+
+Lemma tag_of_tag2K {I T1_ T2_} : cancel (@tag_of_tag2 I T1_ T2_) tag2_of_tag.
+Proof. by case. Qed.
+
+Lemma tag2_of_tagK {I T1_ T2_} : cancel tag2_of_tag (@tag_of_tag2 I T1_ T2_).
+Proof. by case=> ? []. Qed.
+
