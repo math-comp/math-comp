@@ -307,7 +307,6 @@ Variables (n : nat) (T : eqType).
 
 HB.instance Definition _ : hasDecEq (n.-tuple T) :=
   [Equality of n.-tuple T by <:].
-Canonical tuple_predType := PredType (pred_of_seq : n.-tuple T -> pred T).
 
 Lemma eqEtuple (t1 t2 : n.-tuple T) :
   (t1 == t2) = [forall i, tnth t1 i == tnth t2 i].
