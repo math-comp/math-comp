@@ -117,7 +117,7 @@ Notation vector_axiom := Vector.axiom.
 Arguments dim {R} s.
 
 (* FIXME: S/space and H/hom were defined behind the module Vector *
- * Perhaps we should change their names to avoid conflits.        *)
+ * Perhaps we should change their names to avoid conflicts.       *)
 Section OtherDefs.
 Local Coercion dim : Vector.type >-> nat.
 Inductive space (K : fieldType) (vT : Vector.type K) :=

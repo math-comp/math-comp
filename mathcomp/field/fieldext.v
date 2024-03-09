@@ -7,7 +7,7 @@ From mathcomp Require Import finalg zmodp matrix vector falgebra poly polydiv.
 From mathcomp Require Import mxpoly generic_quotient.
 
 (******************************************************************************)
-(*                   Finite dimensional field extentions                      *)
+(*                   Finite dimensional field extensions                      *)
 (*                                                                            *)
 (*      fieldExtType F == the interface type for finite field extensions of F *)
 (*                        it simply combines the fieldType and falgType F     *)
@@ -49,7 +49,7 @@ From mathcomp Require Import mxpoly generic_quotient.
 (*                           (size p).-1 over F.                              *)
 (*            minPoly K x == the monic minimal polynomial of x over the       *)
 (*                           subfield K                                       *)
-(*      adjoin_degree K x == the degree of the minimial polynomial or the     *)
+(*      adjoin_degree K x == the degree of the minimal polynomial or the      *)
 (*                           dimension of K(x)/K                              *)
 (*     Fadjoin_poly K x y == a polynomial p over K such that y = p.[x]        *)
 (*                                                                            *)

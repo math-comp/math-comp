@@ -1105,7 +1105,7 @@ Lemma setX_gen (H1 : {set gT1}) (H2 : {set gT2}) :
 Proof.
 move=> H1_1 H2_1; apply/eqP.
 rewrite eqEsubset gen_subG setXS ?subset_gen //.
-(* TODO: investigate why the occurence selection changed *)
+(* TODO: investigate why the occurrence selection changed *)
 rewrite -[in X in X \subset _]setX_prod.
 rewrite -morphim_pair1g -morphim_pairg1 !morphim_gen ?subsetT //.
 by rewrite morphim_pair1g morphim_pairg1 mul_subG // genS // setXS ?sub1set.

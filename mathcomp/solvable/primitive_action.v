@@ -11,7 +11,7 @@ From mathcomp Require Import fingroup action gseries.
 (*       A does not act on any nontrivial partition of S.                     *)
 (*  imprimitivity_system A to S Q <=>                                         *)
 (*       Q is a non-trivial primitivity system for the action of A on S via   *)
-(*       to, i.e., Q is a non-trivial partiiton of S on which A acts.         *)
+(*       to, i.e., Q is a non-trivial partition of S on which A acts.         *)
 (*       to * n == in the %act scope, the total action induced by the total   *)
 (*                 action to on n.-tuples. via n_act to n.                    *)
 (*  n.-dtuple S == the set of n-tuples with distinct values in S.             *)

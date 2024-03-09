@@ -287,7 +287,7 @@ Variable R : idomainType.
 Lemma Ratio_numden (x : {ratio R}) : Ratio \n_x \d_x = x.
 Proof. exact: FracField.Ratio_numden. Qed.
 
-(* exporting the embeding from R to {fraction R} *)
+(* exporting the embedding from R to {fraction R} *)
 Local Notation tofrac := (@FracField.tofrac R).
 Local Notation "x %:F" := (tofrac x).
 

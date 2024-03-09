@@ -2817,8 +2817,8 @@ Proof. by move=> ??; apply: contraTeq => ?; rewrite leqNgt max_poly_roots. Qed.
 
 End PolynomialIdomain.
 
-(* FIXME: these are seamingly artifical ways to close the inheritance graph *)
-(*    We make parameters more and more precise to trigger completion by HB  *)
+(* FIXME: these are seamingly artificial ways to close the inheritance graph *)
+(*    We make parameters more and more precise to trigger completion by HB   *)
 HB.instance Definition _ (R : countRingType) :=
   [Countable of polynomial R by <:].
 HB.instance Definition _ (R : countComRingType) :=

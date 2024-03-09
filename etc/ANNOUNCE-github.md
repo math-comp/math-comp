@@ -1,6 +1,6 @@
 # The Mathematical Components github organization
 
-We are plase to announce that the development of the Mathematical Components now
+We are pleased to announce that the development of the Mathematical Components now
 happens in the public and takes advantage of github's organization system.
 The purpose of such organization is to create a synergy between the Mathematical Components
 library and its ecosystem of related projects.

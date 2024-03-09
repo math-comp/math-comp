@@ -8179,7 +8179,7 @@ Lemma enum_val_bij : bijective (@enum_val T).
 Proof. by move: enum_rankK enum_valK; exists enum_rank. Qed.
 
 Section total.
-(* We circumvent a shortcomming of finOrderType *)
+(* We circumvent a shortcoming of finOrderType *)
 (* which requires the type to be nonempty and we do not want to rule this out *)
 Hypothesis (leT_total : total (<=%O : rel T)).
 

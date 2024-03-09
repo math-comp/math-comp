@@ -24,7 +24,7 @@ From mathcomp Require Import cyclic pgroup gseries nilpotent sylow.
 (*                       graphically maximal sequence of the orders of the    *)
 (*                       elements of a minimal basis of G (if G is a p-group  *)
 (*                       this is the sequence of orders for any basis of G,   *)
-(*                       sorted in decending order).                          *)
+(*                       sorted in descending order).                         *)
 (*       homocyclic G == G is the direct product of cycles of equal order,    *)
 (*                       i.e., G is abelian with constant abelian type.       *)
 (*        p.-abelem G == G is an elementary abelian p-group, i.e., it is      *)

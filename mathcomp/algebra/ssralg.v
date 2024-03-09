@@ -358,7 +358,7 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (* * RMorphism (semiring or ring morphisms):                                  *)
 (*       multiplicative f <-> f of type R -> S is multiplicative, i.e., f     *)
 (*                           maps 1 and * in R to 1 and * in S, respectively  *)
-(*                           R ans S must have canonical semiRingType         *)
+(*                           R and S must have canonical semiRingType         *)
 (*                           instances                                        *)
 (*     {rmorphism R -> S} == the interface type for semiring morphisms; both  *)
 (*                           R and S must have semiRingType instances         *)

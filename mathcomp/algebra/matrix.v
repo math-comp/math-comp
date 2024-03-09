@@ -47,7 +47,7 @@ From mathcomp Require Import div prime binomial ssralg countalg finalg zmodp.
 (*   xcol j1 j2 A == A with columns j1 and j2 interchanged.                   *)
 (*   row_perm s A == A : 'M_(m, n) with rows permuted by s : 'S_m.            *)
 (*   col_perm s A == A : 'M_(m, n) with columns permuted by s : 'S_n.         *)
-(*   row_mx Al Ar == the row block matrix <Al Ar> obtained by contatenating   *)
+(*   row_mx Al Ar == the row block matrix <Al Ar> obtained by concatenating   *)
 (*                   two matrices Al and Ar of the same height.               *)
 (*   col_mx Au Ad == the column block matrix / Au \ (Au and Ad must have the  *)
 (*                   same width).            \ Ad /                           *)
@@ -387,7 +387,7 @@ Section FixedDim.
 Variables m n : nat.
 Implicit Type A : 'M[R]_(m, n).
 
-(* Reshape a matrix, to accomodate the block functions for instance. *)
+(* Reshape a matrix, to accommodate the block functions for instance. *)
 Definition castmx m' n' (eq_mn : (m = m') * (n = n')) A : 'M_(m', n') :=
   let: erefl in _ = m' := eq_mn.1 return 'M_(m', n') in
   let: erefl in _ = n' := eq_mn.2 return 'M_(m, n') in A.
@@ -2712,8 +2712,8 @@ Lemma mxtrace1 : \tr (1%:M : 'M[R]_n) = n%:R. Proof. exact: mxtrace_scalar. Qed.
 
 End Trace.
 
-(* The matrix ring structure requires a strutural condition (dimension of the *)
-(* form n.+1) to satisfy the nontriviality condition we have imposed.         *)
+(* The matrix ring structure requires a structural condition (dimension of *)
+(* the form n.+1) to satisfy the nontriviality condition we have imposed.  *)
 Section MatrixSemiRing.
 
 Variable n' : nat.
@@ -2739,7 +2739,7 @@ End MatrixSemiRing.
 
 Section LiftPerm.
 
-(* Block expresssion of a lifted permutation matrix, for the Cormen LUP. *)
+(* Block expression of a lifted permutation matrix, for the Cormen LUP. *)
 
 Variable n : nat.
 
@@ -2760,7 +2760,7 @@ Proof. by move=> i; rewrite /lift0_perm -lift_permV permK. Qed.
 Lemma lift0_perm_eq0 s i : (lift0_perm s i == 0) = (i == 0).
 Proof. by rewrite (canF_eq (lift0_permK s)) lift0_perm0. Qed.
 
-(* Block expresssion of a lifted permutation matrix *)
+(* Block expression of a lifted permutation matrix *)
 
 Definition lift0_mx A : 'M_(1 + n) := block_mx 1 0 0 A.
 
@@ -3294,8 +3294,8 @@ Proof. exact: scalarZ. Qed.
 
 End Trace.
 
-(* The matrix ring structure requires a strutural condition (dimension of the *)
-(* form n.+1) to satisfy the nontriviality condition we have imposed.         *)
+(* The matrix ring structure requires a structural condition (dimension of *)
+(* the form n.+1) to satisfy the nontriviality condition we have imposed.  *)
 Section MatrixRing.
 
 Variable n' : nat.
@@ -4074,7 +4074,7 @@ End MapFieldMatrix.
 Arguments map_mx_inj {aF rF f m n} [A1 A2] eqA12f : rename.
 
 (*****************************************************************************)
-(****************************** LUP decomposion ******************************)
+(***************************** LUP decomposition *****************************)
 (*****************************************************************************)
 
 Section CormenLUP.

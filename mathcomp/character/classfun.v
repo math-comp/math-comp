@@ -2202,7 +2202,7 @@ Variables B A : {set gT}.
 Local Notation G := <<B>>.
 Local Notation H := <<A>>.
 
-(* The defalut value for the ~~ (H \subset G) case matches the one for cfRes *)
+(* The default value for the ~~ (H \subset G) case matches the one for cfRes *)
 (* so that Frobenius reciprocity holds even in this degenerate case.         *)
 Definition ffun_cfInd (phi : 'CF(A)) :=
   [ffun x => if H \subset G then #|A|%:R^-1 * (\sum_(y in G) phi (x ^ y))

@@ -13,7 +13,7 @@ Require Import finalg zmodp matrix vector.
 (* This file extends the algebras R[X]/<p> defined in qpoly with the field    *)
 (* when p is irreducible                                                      *)
 (* It defines the new field on top of {qpoly p}. As irreducible is in general *)
-(* decidable in general, this is done by giving a proof explicitely.          *)
+(* decidable in general, this is done by giving a proof explicitly.           *)
 (*      monic_irreducible_poly p == proof that p is monic and irreducible     *)
 (*   {poly %/ p with mi} == defined as {poly %/ p} where mi is proof of       *)
 (*                    monic_irreducible_poly p                                *)

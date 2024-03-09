@@ -91,7 +91,7 @@ sed -r -i -e '
 	s/#\_#/\_/g;
 	s/#\_/\_/g;
 
-        # avoid << and >> being interpretet as HTML tags
+        # avoid << and >> being interpreted as HTML tags
 	s/<</\&lt;\&lt;/g;
 	s/>>/\&gt;\&gt;/g;
 
