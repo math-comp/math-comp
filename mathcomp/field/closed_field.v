@@ -18,7 +18,7 @@ From mathcomp Require Import polydiv matrix mxpoly countalg ring_quotient.
 (* We construct an instance of quantifier elimination mixin,                  *)
 (* (see the ssralg library) from the theory of polynomials with coefficients  *)
 (* in an algebraically closed field (see the polydiv library).                *)
-(* The algebraic operations on fomulae are implemented in CPS style.          *)
+(* The algebraic operations on formulae are implemented in CPS style.         *)
 (* We provide one CPS counterpart for each operation involved in the proof    *)
 (* of quantifier elimination. See the paper above for more details.           *)
 (*                                                                            *)
@@ -26,7 +26,7 @@ From mathcomp Require Import polydiv matrix mxpoly countalg ring_quotient.
 (*    constructions for both simple extension and algebraic closure of        *)
 (*    countable fields, by Georges Gonthier.                                  *)
 (*    Note that the construction of the algebraic closure relies on the       *)
-(*    above mentionned quantifier elimination.                                *)
+(*    above mentioned quantifier elimination.                                 *)
 (******************************************************************************)
 
 Set Implicit Arguments.

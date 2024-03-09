@@ -696,7 +696,7 @@ Anton Trunov, Cyril Cohen, Enrico Tassi, Kazuhiko Sakaguchi, Laurent Théry, Mar
   + notation `RcfType`, use `RealField_isClosed.Build`
 
 - in `falgebra.v`
-  + strcture `FalgType` -> `falgType`
+  + structure `FalgType` -> `falgType`
   + notation `FalgUnitRingType`, use `Algebra_isFalgebra.Build`
 
 - in `galois.v`
@@ -1630,7 +1630,7 @@ Reynald Affeldt, Takafumi Saikawa, Yoshihiro Imai
 
 - in `ssreflect.v`:
   + module `Deprecation` (deprecated in 1.13.0)
-  + notatin `deprecate` (deprecated in 1.13.0)
+  + notation `deprecate` (deprecated in 1.13.0)
 
 - in `ssrbool.v`, removed outdated `Coq 8.10` compatibility code.
 
@@ -1653,7 +1653,7 @@ Reynald Affeldt, Takafumi Saikawa, Yoshihiro Imai
   + notation `iota_add` (deprecated in 1.13.0)
 
 - in `ssrnat.v`:
-  + notatin `fact_smonotone` (deprecated in 1.13.0)
+  + notation `fact_smonotone` (deprecated in 1.13.0)
 
 - in `matrix.v`:
   + notation `card_matrix` (deprecated in 1.13.0)
@@ -2885,7 +2885,7 @@ Pierre-Marie Pédrot, Pierre-Yves Strub, Reynald Affeldt, Simon Boulier, Yves Be
   `incnP`, `nondecnP`, `nhomo_ltn_lt`, `decnP`, `nonincnP` in file
   `order.v`.
 
-- Added lemmas for swaping arguments of homomorphisms and
+- Added lemmas for swapping arguments of homomorphisms and
   monomorphisms: `homo_sym`, `mono_sym`, `homo_sym_in`, `mono_sym_in`,
   `homo_sym_in11`, `mono_sym_in11` in `ssrbool.v`
 

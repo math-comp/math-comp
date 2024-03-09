@@ -12,7 +12,7 @@ usage : packager VERSION [BRANCH] [TAG]"
     files. Actually, this may only matter for the Coq version dependencies
     located in the ssreflect package. Default value is "mathcomp-\$VERSION"
 - TAG is the name of the tag used to build the archive, this is
-    particularily useful for generating the package for the odd order
+    particularly useful for generating the package for the odd order
     theorem if we want to keep it separate from the rest of mathcomp
     e.g. "packager 1.6.1 mathcomp-odd-order.1.6.1 mathcomp-odd-order.1.6.1"
     Default value is "mathcomp-\$VERSION"

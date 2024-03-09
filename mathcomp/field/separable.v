@@ -21,7 +21,7 @@ From mathcomp Require Import fieldext.
 (* purely_inseparable K E <=> every member of E is purely inseparable over K. *)
 (*                                                                            *)
 (*  Derivations are introduced to prove the adjoin_separableP Lemma:          *)
-(*        Derivation K D <=> the linear operator D satifies the Leibniz       *)
+(*        Derivation K D <=> the linear operator D satisfies the Leibniz      *)
 (*                           product rule inside K.                           *)
 (* extendDerivation x D K == given a derivation D on K and a separable        *)
 (*                           element x over K, this function returns the      *)
@@ -289,7 +289,7 @@ Section Derivation.
 
 Variables (K : {vspace L}) (D : 'End(L)).
 
-(* A deriviation only needs to be additive and satify Lebniz's law, but all   *)
+(* A deriviation only needs to be additive and satisfy Lebniz's law, but all  *)
 (* the deriviations used here are going to be linear, so we only define       *)
 (* the Derivation predicate for linear endomorphisms.                         *)
 Definition Derivation : bool :=

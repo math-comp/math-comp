@@ -32,7 +32,7 @@ From mathcomp Require ssrnum ssrint archimedean algC cyclotomic.
 (*                              canonical lmodType 'F_p, ..., algType 'F_p    *)
 (*                              structures, plus an falgType structure if R   *)
 (*                              is a finUnitRingType and a splittingFieldType *)
-(*                              struture if R is a finFieldType               *)
+(*                              structure if R is a finFieldType              *)
 (* FinSplittingFieldFor nz_p == sigma-pair whose sval is a splittingFieldType *)
 (*                              that is the splitting field for p : {poly F}  *)
 (*                              over F : finFieldType, given nz_p : p != 0    *)
@@ -463,7 +463,7 @@ Section FinFieldExists.
 (* The proof of FinSplittingFieldFor is contrived to mitigate this effect:    *)
 (* the abbreviation map_poly_extField alone divides by 3 the proof checking   *)
 (* time, by reducing the number of occurrences of field(Ext)Type structures   *)
-(* in the subgoals; the succesive, apparently redundant 'suffices' localize   *)
+(* in the subgoals; the successive, apparently redundant 'suffices' localize  *)
 (* some of the conversions to smaller subgoals, yielding a further 8-fold     *)
 (* time gain. In particular, we construct the splitting field as a subtype    *)
 (* of a recursive construction rather than prove that the latter yields       *)
@@ -527,7 +527,7 @@ have [L [zs Dq]]: {L : fieldExtType K & splits L q^%:A}.
   by rewrite ltnS Dszp size_mul ?polyXsubC_eq0 ?size_XsubC ?addn2 in lbn.
 suffices: splits L p^%:A^%:A.
   rewrite -[_^%:A]map_poly_comp.
-(* TODO_HB : had to give the F explicitely  *)
+(* TODO_HB : had to give the F explicitly  *)
   rewrite -(eq_map_poly (fun a : F => baseField_scaleE a 1)).
   by exists (baseFieldType L).
 exists (x%:A :: zs); rewrite big_cons; set rhs := _ * _.

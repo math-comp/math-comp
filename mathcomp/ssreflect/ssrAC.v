@@ -33,7 +33,7 @@ Unset Printing Implicit Defensive.
 (* - pattern is optional, as usual, but must be used to select the      *)
 (*   appropriate operator in case of ambiguity such an operator must    *)
 (*   have a canonical Monoid.com_law structure                          *)
-(*   (additions, multiplications, conjuction and disjunction do)        *)
+(*   (additions, multiplications, conjunction and disjunction do)       *)
 (*                                                                      *)
 (* - patternshape is expressed using the syntax                         *)
 (*      p := n | p * p'                                                 *)

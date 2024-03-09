@@ -199,7 +199,7 @@ Number Notation rat parse print (via Irat
   mapping [Rat => IRat, fracq_subproof => Ifracq_subproof])
   : rat_scope.
 
-(* Now, the following should parse as rat (and print unchaged) *)
+(* Now, the following should parse as rat (and print unchanged) *)
 (* Check 12%Q. *)
 (* Check 3.14%Q. *)
 (* Check (-3.14)%Q. *)

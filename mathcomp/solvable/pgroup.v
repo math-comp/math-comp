@@ -20,7 +20,7 @@ From mathcomp Require Import cyclic.
 (*                       y \in <[x]> such that x * y^-1 is a pi'-element.     *)
 (*      pi.-Hall(G) H <=> H is a Hall pi-subgroup of G.                       *)
 (*                    := [&& H \subset G, pi.-group H & pi^'.-nat #|G : H|].  *)
-(*    -> This is also eqivalent to H \subset G /\ #|H| = #|G|`_pi.            *)
+(*    -> This is also equivalent to H \subset G /\ #|H| = #|G|`_pi.           *)
 (*      p.-Sylow(G) P <=> P is a Sylow p-subgroup of G.                       *)
 (*    -> This is the display and preferred input notation for p.-Hall(G) P.   *)
 (*          'Syl_p(G) == the set of the p-Sylow subgroups of G.               *)

@@ -1529,7 +1529,7 @@ Qed.
 (* Sub-, isomorphic, simple, semisimple and completely reducible modules.     *)
 (* All these predicates are intuitionistic (since, e.g., testing simplicity   *)
 (* requires a splitting algorithm fo r the mas field). They are all           *)
-(* specialized to square matrices, to avoid spurrious height parameters.      *)
+(* specialized to square matrices, to avoid spurious height parameters.       *)
 
 (* Module isomorphism is an intentional property in general, but it can be    *)
 (* decided when one of the two modules is known to be simple.                 *)

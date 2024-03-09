@@ -50,7 +50,7 @@ the directory.
 ## Compilation and installation with make
 
 The instructions assume you are in the `mathcomp` directory and that
-you have a supported version of Coq (listed in `CHANGLOG.md`).
+you have a supported version of Coq (listed in `CHANGELOG.md`).
 
 If `coqc` is in your `PATH`, then you are good to go.  Alternatively, you
 can export the `COQBIN` variable to tell `make` where the `coqc` binary is:

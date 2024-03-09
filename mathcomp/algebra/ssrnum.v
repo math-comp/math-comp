@@ -853,7 +853,7 @@ Lemma ltr0_ge_norm :
   {in neg &, {mono (@normr _ R) : x y / x <= y >-> x >= y}}.
 Proof. by move=> x y; rewrite !negrE => /ltW x0 /ltW y0; exact: ler0_ge_norm. Qed.
 
-(* Comparision to 0 of a difference *)
+(* Comparison to 0 of a difference *)
 
 Lemma subr_ge0 x y : (0 <= y - x) = (x <= y). Proof. exact: subr_ge0. Qed.
 Lemma subr_gt0 x y : (0 < y - x) = (x < y).
@@ -1282,7 +1282,7 @@ Proof. by rewrite -{2}[x]add0r lterD2. Qed.
 Definition cprD := (lerDl, lerDr, gerDl, gerDl,
                     ltrDl, ltrDr, gtrDl, gtrDl).
 
-(* Addition with left member knwon to be positive/negative *)
+(* Addition with left member known to be positive/negative *)
 Lemma ler_wpDl y x z : 0 <= x -> y <= z -> y <= x + z.
 Proof. by move=> *; rewrite -[y]add0r lerD. Qed.
 

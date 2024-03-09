@@ -18,7 +18,7 @@ From mathcomp Require Import fintype finset fingroup morphism.
 (*        intensional predicate (in Prop), as even the non-triviality of a    *)
 (*        generated group is undecidable.                                     *)
 (* Syntax details:                                                            *)
-(*  - Grp is a litteral constant.                                             *)
+(*  - Grp is a literal constant.                                              *)
 (*  - There must be at least one generator and one relation.                  *)
 (*  - A relation s_j = 1 can be abbreviated as simply s_j (a.k.a. a relator). *)
 (*  - Two consecutive relations s_j = t, s_j+1 = t can be abbreviated         *)
