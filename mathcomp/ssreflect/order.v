@@ -1234,9 +1234,11 @@ HB.mixin Record isDuallyPOrder (d : disp_t) T of Equality T := {
   lt_def   : forall x y, lt x y = (y != x) && (le x y);
   gt_def   : forall x y, lt y x = (y != x) && (le y x);
   le_refl  : reflexive     le;
+  ge_refl  : reflexive     (fun x y => le y x);
   le_anti  : antisymmetric le;
   ge_anti  : antisymmetric (fun x y => le y x);
   le_trans : transitive    le;
+  ge_trans : transitive    (fun x y => le y x);
 }.
 
 #[short(type="porderType")]
@@ -1748,7 +1750,8 @@ End CBDistrLatticeSyntax.
 HB.mixin Record hasComplement d T of
          CTDistrLattice d T & CBDistrLattice d T := {
   compl : T -> T;
-  complErcompl : forall x : T, compl x = rcompl (\bot : T) \top x; (* FIXME? *)
+  complEdiff : forall x : T, compl x = (top : T) `\` x; (* FIXME? *)
+  complEcodiff : forall x : T, compl x = codiff (\bot : T) x; (* FIXME? *)
 }.
 
 #[short(type="ctbDistrLatticeType")]
@@ -2004,8 +2007,7 @@ HB.instance Definition _ (T : finType) := Finite.on T^d.
 
 HB.instance Definition _ (d : disp_t) (T : porderType d) :=
   isDuallyPOrder.Build (dual_display d) T^d
-    gt_def lt_def le_refl ge_anti le_anti
-    (fun _ _ _ Hxy Hyz => le_trans Hyz Hxy).
+    gt_def lt_def ge_refl le_refl ge_anti le_anti ge_trans le_trans.
 
 Lemma leEdual (d : disp_t) (T : porderType d) (x y : T) :
   (x <=^d y :> T^d) = (y <= x).
@@ -2104,7 +2106,7 @@ HB.instance Definition _ d (T : ctDistrLatticeType d) :=
 HB.instance Definition _ d (T : cbDistrLatticeType d) :=
   hasDualSectionalComplement.Build (dual_display d) T^d diffErcompl.
 HB.instance Definition _ d (T : ctbDistrLatticeType d) :=
-  hasComplement.Build (dual_display d) T^d complErcompl.
+  hasComplement.Build (dual_display d) T^d complEcodiff complEdiff.
 
 HB.saturate.
 (*
@@ -4669,16 +4671,14 @@ Section CTBDistrLatticeTheory.
 Context {disp : disp_t} {L : ctbDistrLatticeType disp}.
 Implicit Types (x y z : L).
 
-Lemma complErcompl x : ~` x = rcompl \bot \top x.
-Proof. exact: complErcompl. Qed.
-
-Lemma complEdiff x : ~` x = \top `\` x.
-Proof. by rewrite complErcompl diffErcompl. Qed.
+Lemma complEdiff x : ~` x = \top `\` x. Proof. exact: complEdiff. Qed.
 #[deprecated(since="mathcomp 2.3.0", note="Use complEdiff instead.")]
 Notation complE := complEdiff.
 
-Lemma complEcodiff x : ~` x = codiff \bot x.
-Proof. by rewrite complErcompl codiffErcompl. Qed.
+Lemma complEcodiff x : ~` x = codiff \bot x. Proof. exact: complEcodiff. Qed.
+
+Lemma complErcompl x : ~` x = rcompl \bot \top x.
+Proof. by rewrite complEdiff diffErcompl. Qed.
 
 Lemma diff1x x : \top `\` x = ~` x.
 Proof. exact/esym/complEdiff. Qed.
@@ -4773,7 +4773,8 @@ Fact ge_anti : antisymmetric (fun x y => le y x).
 Proof. by move=> ? ? /le_anti ->. Qed.
 
 HB.instance Definition _ := @isDuallyPOrder.Build d T
-  le lt lt_def gt_def le_refl le_anti ge_anti le_trans.
+  le lt lt_def gt_def le_refl le_refl le_anti ge_anti
+  le_trans (fun _ _ _ Hxy Hyz => le_trans Hyz Hxy).
 
 HB.end.
 
@@ -5071,10 +5072,11 @@ HB.builders Context d T of CBDistrLattice_hasComplement d T.
 HB.instance Definition _ := @hasDualSectionalComplement.Build d T
   (fun x y => rcompl x \top y) (fun _ _ => erefl).
 
-Fact complErcompl (x : T) : compl x = rcompl (\bot : T) \top x.
+Fact complEcodiff (x : T) : compl x = codiff (\bot : T) x.
 Proof. by rewrite complEdiff diffErcompl. Qed.
 
-HB.instance Definition _ := @hasComplement.Build d T compl complErcompl.
+HB.instance Definition _ :=
+  @hasComplement.Build d T compl complEdiff complEcodiff.
 
 HB.end.
 
@@ -5089,10 +5091,11 @@ HB.builders Context d T of CTDistrLattice_hasComplement d T.
 HB.instance Definition _ := @hasSectionalComplement.Build d T
   (fun x y => rcompl (\bot : T) x y) (fun _ _ => erefl).
 
-Fact complErcompl (x : T) : compl x = rcompl (\bot : T) \top x.
+Fact complEdiff (x : T) : compl x = (\top : T) `\` x.
 Proof. by rewrite complEcodiff codiffErcompl. Qed.
 
-HB.instance Definition _ := @hasComplement.Build d T compl complErcompl.
+HB.instance Definition _ :=
+  @hasComplement.Build d T compl complEdiff complEcodiff.
 
 HB.end.
 
@@ -5123,10 +5126,11 @@ Proof. by rewrite /rcompl /diff join1x meetx1 meet1x. Qed.
 HB.instance Definition _ :=
   @hasDualSectionalComplement.Build d T codiff codiffErcompl.
 
-Fact complErcompl x : compl x = rcompl \bot \top x.
-Proof. by rewrite /rcompl /diff meet0x join0x joinx0 meet1x. Qed.
+Fact complEdiff x : compl x = diff \top x. Proof. exact/esym/meet1x. Qed.
+Fact complEcodiff x : compl x = codiff \bot x. Proof. exact/esym/join0x. Qed.
 
-HB.instance Definition _ := @hasComplement.Build d T compl complErcompl.
+HB.instance Definition _ :=
+  @hasComplement.Build d T compl complEdiff complEcodiff.
 
 HB.end.
 
@@ -7152,6 +7156,9 @@ Module ProdOrder.
 Local Open Scope type_scope. (* FIXME *)
 
 Definition type (disp : disp_t) (T T' : Type) := T * T'.
+Definition type_
+  (disp1 disp2 : disp_t) (T : porderType disp1) (T' : porderType disp2) :=
+  type (prod_display disp1 disp2) T T'.
 
 Section Basis.
 Context {disp : disp_t}.
@@ -7208,8 +7215,10 @@ Definition lt x y := (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
 
 #[export]
 HB.instance Definition _ := @isDuallyPOrder.Build disp3 (T1 * T2) le lt
-  (@lt_def _ _ T1' T2') (@lt_def _ _ T1^d T2^d) (@refl _ _ T1' T2')
-    (@anti _ _ T1' T2') (@anti _ _ T1^d T2^d) (@trans _ _ T1' T2').
+  (@lt_def _ _ T1' T2') (@lt_def _ _ T1^d T2^d)
+  (@refl _ _ T1' T2') (@refl _ _ T1^d T2^d)
+  (@anti _ _ T1' T2') (@anti _ _ T1^d T2^d)
+  (@trans _ _ T1' T2') (@trans _ _ T1^d T2^d).
 
 Lemma leEprod x y : (x <= y) = (x.1 <= y.1) && (x.2 <= y.2). Proof. by []. Qed.
 
@@ -7243,9 +7252,9 @@ Context (T1 : bPOrderType disp1) (T2 : bPOrderType disp2).
 Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 
 Let T1' : Type := T1.
-HB.instance Definition _ := POrder.on T1'.
+HB.instance Definition _ := BPOrder.on T1'.
 Let T2' : Type := T2.
-HB.instance Definition _ := POrder.on T2'.
+HB.instance Definition _ := BPOrder.on T2'.
 
 #[export]
 HB.instance Definition _ :=
@@ -7295,9 +7304,9 @@ Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 Implicit Types (x y : T1 * T2).
 
 Let T1' : Type := T1.
-HB.instance Definition _ := POrder.on T1'.
+HB.instance Definition _ := MeetSemilattice.on T1'.
 Let T2' : Type := T2.
-HB.instance Definition _ := POrder.on T2'.
+HB.instance Definition _ := MeetSemilattice.on T2'.
 
 Definition meet x y := (x.1 `&` y.1, x.2 `&` y.2).
 
@@ -7387,9 +7396,9 @@ Context (T1 : distrLatticeType disp1) (T2 : distrLatticeType disp2).
 Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 
 Let T1' : Type := T1.
-HB.instance Definition _ := POrder.on T1'.
+HB.instance Definition _ := DistrLattice.on T1'.
 Let T2' : Type := T2.
-HB.instance Definition _ := POrder.on T2'.
+HB.instance Definition _ := DistrLattice.on T2'.
 
 #[export]
 HB.instance Definition _ := Lattice_isDistributive.Build disp3 (T1 * T2)
@@ -7432,9 +7441,9 @@ Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 Implicit Types (x y z : T1 * T2).
 
 Let T1' : Type := T1.
-HB.instance Definition _ := POrder.on T1'.
+HB.instance Definition _ := CDistrLattice.on T1'.
 Let T2' : Type := T2.
-HB.instance Definition _ := POrder.on T2'.
+HB.instance Definition _ := CDistrLattice.on T2'.
 
 Definition rcompl x y z := (rcompl x.1 y.1 z.1, rcompl x.2 y.2 z.2).
 
@@ -7468,9 +7477,9 @@ Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 Implicit Types (x y : T1 * T2).
 
 Let T1' : Type := T1.
-HB.instance Definition _ := POrder.on T1'.
+HB.instance Definition _ := CBDistrLattice.on T1'.
 Let T2' : Type := T2.
-HB.instance Definition _ := POrder.on T2'.
+HB.instance Definition _ := CBDistrLattice.on T2'.
 
 Definition diff x y := (diff x.1 y.1, diff x.2 y.2).
 
@@ -7508,8 +7517,8 @@ Implicit Types (x : T1 * T2).
 
 Let compl x := (~` x.1, ~` x.2).
 
-Fact complErcompl x : compl x = rcompl \bot \top x.
-Proof. by rewrite /compl !complErcompl. Qed.
+Fact complEdiff x : compl x = (\top : T1 * T2) `\` x.
+Proof. by rewrite /compl !complEdiff. Qed.
 
 End CTBDistrLattice.
 
@@ -7520,15 +7529,15 @@ Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 Implicit Types (x : T1 * T2).
 
 Let T1' : Type := T1.
-HB.instance Definition _ := POrder.on T1'.
+HB.instance Definition _ := CTBDistrLattice.on T1'.
 Let T2' : Type := T2.
-HB.instance Definition _ := POrder.on T2'.
+HB.instance Definition _ := CTBDistrLattice.on T2'.
 
 Definition compl x := (~` x.1, ~` x.2).
 
 #[export]
-HB.instance Definition _ :=
-  @hasComplement.Build _ (T1 * T2) compl (@complErcompl _ _ T1' T2').
+HB.instance Definition _ := @hasComplement.Build _ (T1 * T2) compl
+  (@complEdiff _ _ T1' T2') (@complEdiff _ _ T1^d T2^d).
 
 Lemma complEprod x : ~` x = (~` x.1, ~` x.2). Proof. by []. Qed.
 
@@ -7588,7 +7597,7 @@ Module Exports.
 HB.reexport ProdOrder.
 Notation "T *prod[ d ] T'" := (type d T T')
   (at level 70, d at next level, format "T  *prod[ d ]  T'") : type_scope.
-Notation "T *p T'" := (type (prod_display _ _) T T')
+Notation "T *p T'" := (type_ T T')
   (at level 70, format "T  *p  T'") : type_scope.
 Definition leEprod := @leEprod.
 Definition ltEprod := @ltEprod.
@@ -7899,6 +7908,9 @@ Module ProdLexiOrder.
 Local Open Scope type_scope. (* FIXME *)
 
 Definition type (disp : disp_t) (T T' : Type) := T * T'.
+Definition type_
+  (disp1 disp2 : disp_t) (T : porderType disp1) (T' : porderType disp2) :=
+  type (lexi_display disp1 disp2) T T'.
 
 Section Basis.
 Context {disp : disp_t}.
@@ -7958,8 +7970,10 @@ Definition lt x y := (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 < y.2)).
 
 #[export]
 HB.instance Definition _ := @isDuallyPOrder.Build disp3 (T1 * T2) le lt
-  (@lt_def _ _ T1' T2') (@lt_def _ _ T1^d T2^d) (@refl _ _ T1' T2')
-    (@anti _ _ T1' T2') (@anti _ _ T1^d T2^d) (@trans _ _ T1' T2').
+  (@lt_def _ _ T1' T2') (@lt_def _ _ T1^d T2^d)
+  (@refl _ _ T1' T2') (@refl _ _ T1^d T2^d)
+  (@anti _ _ T1' T2') (@anti _ _ T1^d T2^d)
+  (@trans _ _ T1' T2') (@trans _ _ T1^d T2^d).
 
 Lemma leEprodlexi x y :
   (x <= y) = (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 <= y.2)).
@@ -7996,9 +8010,9 @@ Context (T1 : bPOrderType disp1) (T2 : bPOrderType disp2).
 Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 
 Let T1' : Type := T1.
-HB.instance Definition _ := POrder.on T1'.
+HB.instance Definition _ := BPOrder.on T1'.
 Let T2' : Type := T2.
-HB.instance Definition _ := POrder.on T2'.
+HB.instance Definition _ := BPOrder.on T2'.
 
 #[export]
 HB.instance Definition _ :=
@@ -8094,7 +8108,7 @@ HB.reexport ProdLexiOrder.
 
 Notation "T *lexi[ d ] T'" := (type d T T')
   (at level 70, d at next level, format "T  *lexi[ d ]  T'") : type_scope.
-Notation "T *l T'" := (type (lexi_display _ _) T T')
+Notation "T *l T'" := (type_ T T')
   (at level 70, format "T  *l  T'") : type_scope.
 
 Definition leEprodlexi := @leEprodlexi.
@@ -8165,6 +8179,8 @@ Module SeqProdOrder.
 Section SeqProdOrder.
 
 Definition type (disp : disp_t) T := seq T.
+Definition type_ (disp : disp_t) (T : porderType disp) :=
+  type (seqprod_display disp) T.
 
 Context {disp disp' : disp_t}.
 
@@ -8303,7 +8319,7 @@ Module Exports.
 HB.reexport SeqProdOrder.
 
 Notation seqprod_with := type.
-Notation seqprod := (type (seqprod_display _)).
+Notation seqprod := type_.
 
 Definition leEseq := @leEseq.
 Definition le0s := @le0s.
@@ -8347,6 +8363,8 @@ Module SeqLexiOrder.
 Section SeqLexiOrder.
 
 Definition type (disp : disp_t) T := seq T.
+Definition type_ (disp : disp_t) (T : porderType disp) :=
+  type (seqlexi_display disp) T.
 
 Context {disp disp' : disp_t}.
 
@@ -8473,7 +8491,7 @@ Module Exports.
 HB.reexport SeqLexiOrder.
 
 Notation seqlexi_with := type.
-Notation seqlexi := (type (seqlexi_display _)).
+Notation seqlexi := type_.
 
 Definition leEseqlexi := @leEseqlexi.
 Definition lexi0s := @lexi0s.
@@ -8521,6 +8539,8 @@ Import DefaultSeqProdOrder.
 Section TupleProdOrder.
 
 Definition type (disp : disp_t) n T := n.-tuple T.
+Definition type_ (disp : disp_t) n (T : porderType disp) :=
+  type (seqprod_display disp) n T.
 
 Context {disp disp' : disp_t}.
 Local Notation "n .-tuple" := (type disp' n) : type_scope.
@@ -8793,13 +8813,18 @@ Implicit Types (t : n.-tuple T).
 
 Definition compl t : n.-tuple T := map_tuple compl t.
 
-Fact complErcompl t : compl t = rcompl \bot \top t.
+Fact complEdiff t : compl t = (\top : n.-tuple T) `\` t.
 Proof.
-by apply: eq_from_tnth => i; rewrite tnth_map !tnth_mktuple complErcompl.
+by apply: eq_from_tnth => i; rewrite tnth_map !tnth_mktuple complEdiff.
+Qed.
+
+Fact complEcodiff t : compl t = codiff (\bot : n.-tuple T) t.
+Proof.
+by apply: eq_from_tnth => i; rewrite tnth_map !tnth_mktuple complEcodiff.
 Qed.
 
 #[export] HB.instance Definition _ :=
-  @hasComplement.Build _ (n.-tuple T) compl complErcompl.
+  @hasComplement.Build _ (n.-tuple T) compl complEdiff complEcodiff.
 
 Lemma tnth_compl t i : tnth (~` t) i = ~` tnth t i.
 Proof. by rewrite tnth_map. Qed.
@@ -8863,7 +8888,7 @@ HB.reexport TupleProdOrder.
 Notation "n .-tupleprod[ disp ]" := (type disp n)
   (at level 2, disp at next level, format "n .-tupleprod[ disp ]") :
   type_scope.
-Notation "n .-tupleprod" := (n.-tupleprod[seqprod_display _])
+Notation "n .-tupleprod" := (type_ n)
   (at level 2, format "n .-tupleprod") : type_scope.
 
 Definition leEtprod := @leEtprod.
@@ -8983,6 +9008,8 @@ Section TupleLexiOrder.
 Import DefaultSeqLexiOrder.
 
 Definition type (disp : disp_t) n T := n.-tuple T.
+Definition type_ (disp : disp_t) n (T : porderType disp) :=
+  type (seqlexi_display disp) n T.
 
 Context {disp disp' : disp_t}.
 Local Notation "n .-tuple" := (type disp' n) : type_scope.
@@ -9134,7 +9161,7 @@ HB.reexport TupleLexiOrder.
 Notation "n .-tuplelexi[ disp ]" := (type disp n)
   (at level 2, disp at next level, format "n .-tuplelexi[ disp ]") :
   type_scope.
-Notation "n .-tuplelexi" := (n.-tuplelexi[seqlexi_display _])
+Notation "n .-tuplelexi" := (type_ n)
   (at level 2, format "n .-tuplelexi") : type_scope.
 
 Definition lexi_tupleP := @lexi_tupleP.
