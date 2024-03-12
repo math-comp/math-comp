@@ -1,0 +1,17 @@
+; Private library (not installed)
+(coq.theory
+ (name mathcomp.all)
+ (modules :standard)
+ (synopsis "Mathematical Components")
+ (theories
+   mathcomp.ssreflect
+   mathcomp.fingroup
+   mathcomp.algebra
+   mathcomp.field
+   mathcomp.solvable
+   mathcomp.character)
+ ; Warnings on import
+ (flags
+  -w -notation-overridden
+  -w -ambiguous-paths
+ ))
