@@ -8,10 +8,6 @@ From Coq Require Export ssrbool.
 (*                  mem A, except that mem A x only simplifies to x \in A.    *)
 (* --> These will become part of the core SSReflect library in later Coq      *)
 (* versions.                                                                  *)
-(*   For the sake of backwards compatibility, this file also replicates       *)
-(* v8.13-15 additions, including a generalization of the statements of        *)
-(* `homoRL_in`, `homoLR_in`, `homo_mono_in`, `monoLR_in`, `monoRL_in`, and    *)
-(* `can_mono_in`.                                                             *)
 (******************************************************************************)
 
 Set Implicit Arguments.
