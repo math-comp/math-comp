@@ -1706,7 +1706,7 @@ HB.structure Definition TTotal d := { T of Total d T & hasTop d T }.
 HB.structure Definition TBTotal d := { T of BTotal d T & hasTop d T }.
 
 #[key="T", primitive]
-HB.mixin Record hasRelativeComplement d T of DistrLattice d T := {
+HB.mixin Record DistrLattice_hasRelativeComplement d T of DistrLattice d T := {
   (* rcompl x y z is the complement of z in the interval [x, y]. *)
   rcompl : T -> T -> T -> T;
   rcomplPmeet : forall x y z, ((x `&` y) `|` z) `&` rcompl x y z = x `&` y;
@@ -1715,10 +1715,10 @@ HB.mixin Record hasRelativeComplement d T of DistrLattice d T := {
 
 #[short(type="cDistrLatticeType")]
 HB.structure Definition CDistrLattice d :=
-  { T of DistrLattice d T & hasRelativeComplement d T }.
+  { T of DistrLattice d T & DistrLattice_hasRelativeComplement d T }.
 
 #[key="T", primitive]
-HB.mixin Record hasSectionalComplement d T
+HB.mixin Record CDistrLattice_hasSectionalComplement d T
          of CDistrLattice d T & hasBottom d T := {
   diff : T -> T -> T;
   diffErcompl : forall x y, diff x y = rcompl (\bot : T) x y; (* FIXME? *)
@@ -1726,10 +1726,11 @@ HB.mixin Record hasSectionalComplement d T
 
 #[short(type="cbDistrLatticeType")]
 HB.structure Definition CBDistrLattice d :=
-  { T of CDistrLattice d T & hasBottom d T & hasSectionalComplement d T }.
+  { T of CDistrLattice d T & hasBottom d T &
+         CDistrLattice_hasSectionalComplement d T }.
 
 #[key="T", primitive]
-HB.mixin Record hasDualSectionalComplement d T
+HB.mixin Record CDistrLattice_hasDualSectionalComplement d T
          of CDistrLattice d T & hasTop d T := {
   codiff : T -> T -> T;
   codiffErcompl : forall x y, codiff x y = rcompl x \top y;
@@ -1737,7 +1738,8 @@ HB.mixin Record hasDualSectionalComplement d T
 
 #[short(type="ctDistrLatticeType")]
 HB.structure Definition CTDistrLattice d :=
-  { T of CDistrLattice d T & hasTop d T & hasDualSectionalComplement d T }.
+  { T of CDistrLattice d T & hasTop d T &
+         CDistrLattice_hasDualSectionalComplement d T }.
 
 #[deprecated(since="mathcomp 2.0.0", note="Use diff instead.")]
 Notation sub := diff.
@@ -1747,7 +1749,7 @@ Notation "x `\` y" := (diff x y) : order_scope.
 End CBDistrLatticeSyntax.
 
 #[key="T", primitive]
-HB.mixin Record hasComplement d T of
+HB.mixin Record CDistrLattice_hasComplement d T of
          CTDistrLattice d T & CBDistrLattice d T := {
   compl : T -> T;
   complEdiff : forall x : T, compl x = (top : T) `\` x; (* FIXME? *)
@@ -1756,7 +1758,8 @@ HB.mixin Record hasComplement d T of
 
 #[short(type="ctbDistrLatticeType")]
 HB.structure Definition CTBDistrLattice d :=
-  { T of CBDistrLattice d T & CTDistrLattice d T & hasComplement d T }.
+  { T of CBDistrLattice d T & CTDistrLattice d T &
+         CDistrLattice_hasComplement d T }.
 
 Module Import CTBDistrLatticeSyntax.
 Notation "~` A" := (compl A) : order_scope.
@@ -2099,14 +2102,16 @@ HB.instance Definition _ d (T : finTBOrderType d) := POrder.on T^d.
 *)
 
 HB.instance Definition _ d (T : cDistrLatticeType d) :=
-  hasRelativeComplement.Build (dual_display d) T^d
+  DistrLattice_hasRelativeComplement.Build (dual_display d) T^d
     (fun x y => rcomplPjoin y x) (fun x y => rcomplPmeet y x).
 HB.instance Definition _ d (T : ctDistrLatticeType d) :=
-  hasSectionalComplement.Build (dual_display d) T^d codiffErcompl.
+  CDistrLattice_hasSectionalComplement.Build (dual_display d) T^d codiffErcompl.
 HB.instance Definition _ d (T : cbDistrLatticeType d) :=
-  hasDualSectionalComplement.Build (dual_display d) T^d diffErcompl.
+  CDistrLattice_hasDualSectionalComplement.Build (dual_display d) T^d
+    diffErcompl.
 HB.instance Definition _ d (T : ctbDistrLatticeType d) :=
-  hasComplement.Build (dual_display d) T^d complEcodiff complEdiff.
+  CDistrLattice_hasComplement.Build (dual_display d) T^d
+    complEcodiff complEdiff.
 
 HB.saturate.
 (*
@@ -5013,6 +5018,18 @@ HB.factory Record BDistrLattice_hasSectionalComplement d T of
   joinIB : forall x y, (x `&` y) `|` diff x y = x;
 }.
 
+Module hasRelativeComplement.
+#[deprecated(since="mathcomp 2.3.0",
+      note="Use BDistrLattice_hasSectionalComplement.Build")]
+Notation Build d T :=
+  (BDistrLattice_hasSectionalComplement.Build d T) (only parsing).
+End hasRelativeComplement.
+
+#[deprecated(since="mathcomp 2.3.0",
+      note="Use BDistrLattice_hasSectionalComplement")]
+Notation hasRelativeComplement d T :=
+  (BDistrLattice_hasSectionalComplement d T) (only parsing).
+
 HB.builders Context d T of BDistrLattice_hasSectionalComplement d T.
 
 Definition rcompl x y z := (x `&` y) `|` diff (y `|` x) z.
@@ -5024,12 +5041,13 @@ Fact rcomplPjoin x y z : ((y `|` x) `&` z) `|` rcompl x y z = y `|` x.
 Proof. by rewrite joinCA joinIB joinA meetUK joinC. Qed.
 
 HB.instance Definition _ :=
-  @hasRelativeComplement.Build d T rcompl rcomplPmeet rcomplPjoin.
+  @DistrLattice_hasRelativeComplement.Build d T rcompl rcomplPmeet rcomplPjoin.
 
 Fact diffErcompl x y : diff x y = rcompl \bot x y.
 Proof. by rewrite /rcompl meet0x join0x joinx0. Qed.
 
-HB.instance Definition _ := @hasSectionalComplement.Build d T diff diffErcompl.
+HB.instance Definition _ :=
+  @CDistrLattice_hasSectionalComplement.Build d T diff diffErcompl.
 
 HB.end.
 
@@ -5051,13 +5069,13 @@ Fact rcomplPjoin x y z : ((y `|` x) `&` z) `|` rcompl x y z = y `|` x.
 Proof. by rewrite joinIr meetUKC joinIl codiffKU meetx1 joinKI. Qed.
 
 HB.instance Definition _ :=
-  @hasRelativeComplement.Build d T rcompl rcomplPmeet rcomplPjoin.
+  @DistrLattice_hasRelativeComplement.Build d T rcompl rcomplPmeet rcomplPjoin.
 
 Fact codiffErcompl x y : codiff x y = rcompl x \top y.
 Proof. by rewrite /rcompl join1x meet1x meetx1. Qed.
 
 HB.instance Definition _ :=
-  @hasDualSectionalComplement.Build d T codiff codiffErcompl.
+  @CDistrLattice_hasDualSectionalComplement.Build d T codiff codiffErcompl.
 
 HB.end.
 
@@ -5067,16 +5085,25 @@ HB.factory Record CBDistrLattice_hasComplement d T of
   complEdiff : forall x, compl x = (\top : T) `\` x; (* FIXME *)
 }.
 
+Module hasComplement.
+#[deprecated(since="mathcomp 2.3.0",
+      note="Use CBDistrLattice_hasComplement.Build")]
+Notation Build d T := (CBDistrLattice_hasComplement.Build d T) (only parsing).
+End hasComplement.
+
+#[deprecated(since="mathcomp 2.3.0", note="Use CBDistrLattice_hasComplement")]
+Notation hasComplement d T := (CBDistrLattice_hasComplement d T) (only parsing).
+
 HB.builders Context d T of CBDistrLattice_hasComplement d T.
 
-HB.instance Definition _ := @hasDualSectionalComplement.Build d T
+HB.instance Definition _ := @CDistrLattice_hasDualSectionalComplement.Build d T
   (fun x y => rcompl x \top y) (fun _ _ => erefl).
 
 Fact complEcodiff (x : T) : compl x = codiff (\bot : T) x.
 Proof. by rewrite complEdiff diffErcompl. Qed.
 
 HB.instance Definition _ :=
-  @hasComplement.Build d T compl complEdiff complEcodiff.
+  @CDistrLattice_hasComplement.Build d T compl complEdiff complEcodiff.
 
 HB.end.
 
@@ -5088,14 +5115,14 @@ HB.factory Record CTDistrLattice_hasComplement d T of
 
 HB.builders Context d T of CTDistrLattice_hasComplement d T.
 
-HB.instance Definition _ := @hasSectionalComplement.Build d T
+HB.instance Definition _ := @CDistrLattice_hasSectionalComplement.Build d T
   (fun x y => rcompl (\bot : T) x y) (fun _ _ => erefl).
 
 Fact complEdiff (x : T) : compl x = (\top : T) `\` x.
 Proof. by rewrite complEcodiff codiffErcompl. Qed.
 
 HB.instance Definition _ :=
-  @hasComplement.Build d T compl complEdiff complEcodiff.
+  @CDistrLattice_hasComplement.Build d T compl complEdiff complEcodiff.
 
 HB.end.
 
@@ -5124,13 +5151,13 @@ Fact codiffErcompl x y : codiff x y = rcompl x \top y.
 Proof. by rewrite /rcompl /diff join1x meetx1 meet1x. Qed.
 
 HB.instance Definition _ :=
-  @hasDualSectionalComplement.Build d T codiff codiffErcompl.
+  @CDistrLattice_hasDualSectionalComplement.Build d T codiff codiffErcompl.
 
 Fact complEdiff x : compl x = diff \top x. Proof. exact/esym/meet1x. Qed.
 Fact complEcodiff x : compl x = codiff \bot x. Proof. exact/esym/join0x. Qed.
 
 HB.instance Definition _ :=
-  @hasComplement.Build d T compl complEdiff complEcodiff.
+  @CDistrLattice_hasComplement.Build d T compl complEdiff complEcodiff.
 
 HB.end.
 
@@ -7448,8 +7475,10 @@ HB.instance Definition _ := CDistrLattice.on T2'.
 Definition rcompl x y z := (rcompl x.1 y.1 z.1, rcompl x.2 y.2 z.2).
 
 #[export]
-HB.instance Definition _ := @hasRelativeComplement.Build disp3 (T1 * T2)
-  rcompl (@rcomplPmeet _ _ T1' T2') (fun x y => @rcomplPmeet _ _ T1^d T2^d y x).
+HB.instance Definition _ :=
+  @DistrLattice_hasRelativeComplement.Build disp3 (T1 * T2)
+    rcompl (@rcomplPmeet _ _ T1' T2')
+    (fun x y => @rcomplPmeet _ _ T1^d T2^d y x).
 
 Lemma rcomplEprod x y z :
   rcompl x y z = (Order.rcompl x.1 y.1 z.1, Order.rcompl x.2 y.2 z.2).
@@ -7484,8 +7513,9 @@ HB.instance Definition _ := CBDistrLattice.on T2'.
 Definition diff x y := (diff x.1 y.1, diff x.2 y.2).
 
 #[export]
-HB.instance Definition _ := @hasSectionalComplement.Build disp3 (T1 * T2)
-  diff (@diffErcompl _ _ T1' T2').
+HB.instance Definition _ :=
+  @CDistrLattice_hasSectionalComplement.Build disp3 (T1 * T2)
+    diff (@diffErcompl _ _ T1' T2').
 
 Lemma diffEprod x y : x `\` y = (x.1 `\` y.1, x.2 `\` y.2). Proof. by []. Qed.
 
@@ -7500,8 +7530,9 @@ Implicit Types (x y : T1 * T2).
 Definition codiff x y := (codiff x.1 y.1, codiff x.2 y.2).
 
 #[export]
-HB.instance Definition _ := @hasDualSectionalComplement.Build disp3 (T1 * T2)
-  codiff (@diffErcompl _ _ T1^d T2^d).
+HB.instance Definition _ :=
+  @CDistrLattice_hasDualSectionalComplement.Build disp3 (T1 * T2)
+    codiff (@diffErcompl _ _ T1^d T2^d).
 
 Lemma codiffEprod x y :
   codiff x y = (Order.codiff x.1 y.1, Order.codiff x.2 y.2).
@@ -7536,7 +7567,7 @@ HB.instance Definition _ := CTBDistrLattice.on T2'.
 Definition compl x := (~` x.1, ~` x.2).
 
 #[export]
-HB.instance Definition _ := @hasComplement.Build _ (T1 * T2) compl
+HB.instance Definition _ := @CDistrLattice_hasComplement.Build _ (T1 * T2) compl
   (@complEdiff _ _ T1' T2') (@complEdiff _ _ T1^d T2^d).
 
 Lemma complEprod x : ~` x = (~` x.1, ~` x.2). Proof. by []. Qed.
@@ -8746,7 +8777,8 @@ Proof. by apply: eq_from_tnth => i; rewrite !tnth_mktuple rcomplPjoin. Qed.
 
 #[export]
 HB.instance Definition _ :=
-  @hasRelativeComplement.Build _ (n.-tuple T) rcompl rcomplPmeet rcomplPjoin.
+  @DistrLattice_hasRelativeComplement.Build _ (n.-tuple T)
+    rcompl rcomplPmeet rcomplPjoin.
 
 Lemma tnth_rcompl t1 t2 t3 i :
   tnth (Order.rcompl t1 t2 t3) i =
@@ -8770,7 +8802,7 @@ Fact diffErcompl t1 t2 : diff t1 t2 = rcompl \bot t1 t2.
 Proof. by apply: eq_from_tnth => i; rewrite !tnth_mktuple diffErcompl. Qed.
 
 #[export] HB.instance Definition _ :=
-  @hasSectionalComplement.Build _ (n.-tuple T) diff diffErcompl.
+  @CDistrLattice_hasSectionalComplement.Build _ (n.-tuple T) diff diffErcompl.
 
 Lemma tnth_diff t1 t2 i : tnth (diff t1 t2) i = tnth t1 i `\` tnth t2 i.
 Proof. exact: tnth_mktuple. Qed.
@@ -8795,7 +8827,8 @@ Fact codiffErcompl t1 t2 : codiff t1 t2 = rcompl t1 \top t2.
 Proof. by apply: eq_from_tnth => i; rewrite !tnth_mktuple codiffErcompl. Qed.
 
 #[export] HB.instance Definition _ :=
-  @hasDualSectionalComplement.Build _ (n.-tuple T) codiff codiffErcompl.
+  @CDistrLattice_hasDualSectionalComplement.Build _ (n.-tuple T)
+    codiff codiffErcompl.
 
 Lemma tnth_codiff t1 t2 i :
   tnth (Order.codiff t1 t2) i = Order.codiff (tnth t1 i) (tnth t2 i).
@@ -8824,7 +8857,8 @@ by apply: eq_from_tnth => i; rewrite tnth_map !tnth_mktuple complEcodiff.
 Qed.
 
 #[export] HB.instance Definition _ :=
-  @hasComplement.Build _ (n.-tuple T) compl complEdiff complEcodiff.
+  @CDistrLattice_hasComplement.Build _ (n.-tuple T)
+    compl complEdiff complEcodiff.
 
 Lemma tnth_compl t i : tnth (~` t) i = ~` tnth t i.
 Proof. by rewrite tnth_map. Qed.
