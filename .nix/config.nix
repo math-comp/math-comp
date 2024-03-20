@@ -61,6 +61,15 @@ with builtins; with (import <nixpkgs> {}).lib;
       { name = p; value.override.version = "master"; }))
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
+         # To add an overlay applying to all bundles,
+         # add below a line like
+         #<package>.override.version = "<github_login>:<branch>";
+         # where
+         # * <package> will typically be one of the strings above (without the quotes)
+         #   or look at https://github.com/NixOS/nixpkgs/tree/master/pkgs/development/coq-modules
+         #   for a complete list of Coq packages available in Nix
+         # * <github_login>:<branch> is such that this will use the branch <branch>
+         #   from https://github.com/<github_login>/<repository>
        };
   in {
     "coq-master".push-branches = [ "master" "mathcomp-1" ];

@@ -30,7 +30,11 @@ The list of bundles can be found in `.nix/config.nix`.
 
 ### Test CI Configurations with Overlays
 
-A simple way to test modification of the CI configuration (new version
+For simple overlays, it's enough to add a line in the .nix/config.nix
+file (look for "overlay" there).
+
+For more elaborate overlays (for instance editing package dependencies),
+a simple way to test modification of the CI configuration (new version
 or configuration change of some package for instance) is through
 overlays, see the corresponding paragraph at
 https://github.com/coq-community/coq-nix-toolbox#overlays (for sha256
