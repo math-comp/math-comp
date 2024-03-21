@@ -762,8 +762,7 @@ rewrite (nth_map f0) //; case def_f: (nth _ _ i) => [p e] /=.
 congr (_, _); rewrite [n.+1]prod_prime_decomp //.
 have: (p, e) \in prime_decomp n.+1 by rewrite -def_f mem_nth.
 case/mem_prime_decomp=> pr_p _ _.
-rewrite (big_nth f0) big_mkord.
-rewrite (@bigD1 _ _ _ 'I_(size (prime_decomp n.+1)) (Ordinal lt_i_n) predT) //=.  (* FIXME: extra arg *)
+rewrite (big_nth f0) big_mkord (bigD1 (Ordinal lt_i_n)) //=.
 rewrite def_f mulnC logn_Gauss ?pfactorK //.
 apply big_ind => [|m1 m2 com1 com2| [j ltj] /=]; first exact: coprimen1.
   by rewrite coprimeMr com1.
@@ -783,8 +782,8 @@ have [-> | d_gt0] := posnP d; first by rewrite big_add1 divn0 big1.
 apply: (@addnI (d %| 0)); rewrite -(@big_ltn _ 0 _ 0 _ (dvdn d)) // big_mkord.
 rewrite (partition_big (fun i : 'I_n.+1 => inord (i %/ d)) 'I_(n %/ d).+1) //=.
 rewrite dvdn0 add1n -[_.+1 in LHS]card_ord -sum1_card.
-apply: eq_bigr => [[q j] _].
-rewrite (@bigD1 _ _ _ _ (inord (q * d)) [pred i : 'I_n.+1 | inord (i %/ d) == Ordinal j]) /eq_op /= ?inE !inordK ?ltnS -?leq_divRL ?mulnK //.  (* FIXME: extra arg *)
+apply: eq_bigr => [[q ?] _].
+rewrite (bigD1 (inord (q * d))) /eq_op /= /in_mem/= !inordK ?ltnS -?leq_divRL ?mulnK ?eqnE //.  (* FIXME: inE doesn't work, and why do we need extra eqnE? *)
 rewrite dvdn_mull ?big1 // => [[i /= ?] /andP[/eqP <- /negPf]].
 by rewrite eq_sym dvdn_eq inordK ?ltnS ?leq_div2r // => ->.
 Qed.
@@ -793,8 +792,7 @@ Lemma logn_count_dvd p n : prime p -> logn p n = \sum_(1 <= k < n) (p ^ k %| n).
 Proof.
 rewrite big_add1 => p_prime; case: n => [|n]; first by rewrite logn0 big_geq.
 rewrite big_mkord -big_mkcond (eq_bigl _ _ (fun _ => pfactor_dvdn _ _ _)) //=.
-rewrite big_ord_narrow/= ?(@sum1_card 'I_(logn p n.+1) predT) ?eq_cardT ?size_enum_ord//.  (* FIXME: extra arg *)
-by rewrite -ltnS ltn_logl.
+by rewrite big_ord_narrow ?sum1_card ?card_ord // -ltnS ltn_logl.
 Qed.
 
 (* Truncated real log. *)
@@ -1133,7 +1131,7 @@ case (posnP (logn p n)) => [log0 |].
   by rewrite log0 [n`_p]big1_seq // => q /andP [/eqP ->]; rewrite log0.
 rewrite logn_gt0 mem_primes; case/and3P=> _ n_gt0 dv_p_n.
 have le_p_n: p < n.+1 by rewrite ltnS dvdn_leq.
-by rewrite [n`_p]big_mkord (@big_pred1 _ _ _ _ (Ordinal le_p_n) [pred i in 'I_n.+1 | nat_of_ord i \in nat_pred_of_nat p]).  (* FIXME: extra arg *)
+by rewrite [n`_p]big_mkord (big_pred1 (Ordinal le_p_n)).
 Qed.
 
 Lemma p_part_eq1 p n : (n`_p == 1) = (p \notin \pi(n)).
@@ -1158,7 +1156,7 @@ apply/andP/and3P=> [[p_pr] | [pi_p p_pr dv_p_n]].
   rewrite logn_gt0 mem_primes n_gt0 - andbA /=; case/and3P=> pr_q dv_q_n.
   by rewrite logn_prime //; case: eqP => // ->.
 have le_p_n: p < n.+1 by rewrite ltnS dvdn_leq.
-rewrite [n`_pi]big_mkord (@bigD1 _ _ _ _ (Ordinal le_p_n) [pred i in 'I_n.+1 | nat_of_ord i \in pi]) //= dvdn_mulr //.  (* FIXME: extra arg *)
+rewrite [n`_pi]big_mkord (bigD1 (Ordinal le_p_n)) //= dvdn_mulr //.
 by rewrite lognE p_pr n_gt0 dv_p_n expnS dvdn_mulr.
 Qed.
 
@@ -1602,7 +1600,7 @@ have ->: totient np = #|[pred d : 'I_np | coprime np d]|.
   apply: (@addnI (1 * q)); rewrite -mulnDl [1 + _]prednK // mul1n.
   have def_np: np = p * q by rewrite -expnS prednK // -p_part.
   pose mulp := [fun d : 'I_q => in_mod _ np0 (p * d)].
-  rewrite -def_np -{1}[np]card_ord -(@cardC 'I_np [pred i | i \in codom mulp]).  (* FIXME: extra arg *)
+  rewrite -def_np -{1}[np]card_ord -(cardC (codom mulp)).
   rewrite card_in_image => [|[d1 ltd1] [d2 ltd2] /= _ _ []]; last first.
     move/eqP; rewrite def_np -!muln_modr ?modn_small //.
     by rewrite eqn_pmul2l // => eq_op12; apply/eqP.
@@ -1615,8 +1613,7 @@ have ->: totient np = #|[pred d : 'I_np | coprime np d]|.
   by exists (Ordinal ltr); apply: val_inj; rewrite /= -def_d modn_small.
 pose h (d : 'I_n) := (in_mod _ np0 d, in_mod _ np'0 d).
 pose h' (d : 'I_np * 'I_np') := in_mod _ n0 (chinese np np' d.1 d.2).
-rewrite -!big_mkcond -sum_nat_const /=.
-rewrite (@pair_big nat 0 addn _ _ [pred d : 'I_np | coprime np d] [pred j : 'I_np' | coprime np' j]).  (* FIXME: extra args *)
+rewrite -!big_mkcond -sum_nat_const pair_big /=.
 rewrite (@reindex_onto _ _ _ _ _ h h' [pred p | (p.1 \in [pred d : 'I_np | coprime np d]) && (p.2 \in [pred j : 'I_np' | coprime np' j])]) => [|[d d'] _].  (* FIXME: extra arg *)
   apply: eq_bigl => [[d ltd] /=]; rewrite !inE -val_eqE /= andbC !coprime_modr.
   by rewrite def_n -chinese_mod // -coprimeMl -def_n modn_small ?eqxx.
