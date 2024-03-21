@@ -50,6 +50,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*    the auto-expanding function that maps x = a_i to e_i, and other values  *)
 (*    of x to e0 (resp. f x). In the first form the `: T' is optional and x   *)
 (*    can occur in a_i or e_i                                                 *)
+(*          dfwith f x == fun j => x if j = i, and f j otherwise, given       *)
+(*                        f : forall k, T k and x : T i                       *)
 (*  We also define:                                                           *)
 (*   tagged_as u v == v cast as T_(tag u) if tag v == tag u, else u           *)
 (*  -> We have u == v <=> (tag u == tag v) && (tagged u == tagged_as u v)     *)
@@ -505,6 +507,31 @@ Notation "[ 'eta' f 'with' d1 , .. , dn ]" :=
   (at level 0, format
   "'[hv' [ '[' 'eta' '/ '  f ']' '/'  'with'  '[' d1 , '/'  .. , '/'  dn ']' ] ']'"
   ) : function_scope.
+
+Section DFunWith.
+Variables (I : eqType) (T : I -> Type) (f : forall i, T i).
+
+Definition dfwith i (x : T i) (j : I) : T j :=
+  if (i =P j) is ReflectT ij then ecast j (T j) ij x else f j.
+
+Lemma dfwith_in i x : dfwith x i = x.
+Proof. by rewrite /dfwith; case: eqP => // ii; rewrite eq_axiomK. Qed.
+
+Lemma dfwith_out i (x : T i) j : i != j -> dfwith x j = f j.
+Proof. by rewrite /dfwith; case: eqP. Qed.
+
+Variant dfwith_spec i (x : T i) : forall j, T j -> Type:=
+  | DFunWithIn : dfwith_spec x x
+  | DFunWithOut j : i != j -> dfwith_spec x (f j).
+
+Lemma dfwithP i (x : T i) (j : I) : dfwith_spec x (dfwith x j).
+Proof.
+by case: (eqVneq i j) => [<-|nij];
+   [rewrite dfwith_in|rewrite dfwith_out//]; constructor.
+Qed.
+
+End DFunWith.
+Arguments dfwith {I T} f [i] x.
 
 (* Various EqType constructions.                                         *)
 

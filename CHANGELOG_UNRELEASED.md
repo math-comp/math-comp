@@ -16,6 +16,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssrnum.v`
   + lemma `invf_pgt`, `invf_pge`, `invf_ngt`, `invf_nge`
   + lemma `invf_plt`, `invf_ple`, `invf_nlt`, `invf_nle`
+- in `bigop.v`
+  + lemma `big_ord1`, `big_ord1_cond`, `big_rcons_op`, `big_change_idx`,
+    `big_rcons`, `big_only1`
+
+- in `eqtype.v`
+  + definition `dfwith`
+  + lemmas `dfwith_in`, `dfwith_out`, `dfwithP`
+
+- in `finset.v`
+  + definition `setXn`
+  + lemmas `in_setXn`, `setXnP`, `cardsXn`, `setXnS`, `eq_setXn`
+
+- in `prime.v`
+  + lemmas `primeNsig`, `all_prime_primes`, `primes_eq0`, `totient_gt1`
+
+- in `tuple.v`
+  + lemmas `tnth_lshift`, `tnth_rshift`
 
 ### Changed
 

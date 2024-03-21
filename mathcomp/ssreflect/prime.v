@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
-From mathcomp Require Import fintype div bigop.
+From mathcomp Require Import choice fintype div bigop.
 
 (******************************************************************************)
 (* This file contains the definitions of:                                     *)
@@ -334,6 +334,11 @@ rewrite muln1 !andbT => def_q pr_q lt1q; right=> [[]] // [d].
 by rewrite def_q -mem_index_iota => in_d_2q dv_d_q; case/hasP: pr_q; exists d.
 Qed.
 
+Lemma primeNsig n : ~~ prime n -> 2 <= n -> { d : nat | 1 < d < n & d %| n }.
+Proof.
+by move=> /primePn; case: ltnP => // lt1n nP _; apply/sig2W; case: nP.
+Qed.
+
 Lemma primeP p :
   reflect (p > 1 /\ forall d, d %| p -> xpred2 1 p d) (prime p).
 Proof.
@@ -454,6 +459,9 @@ Proof.
 by case: (posnP n) => [-> // | /prime_decomp_correct[_ _]]; apply: path_sorted.
 Qed.
 
+Lemma all_prime_primes n : all prime (primes n).
+Proof. by apply/allP => p; rewrite mem_primes => /and3P[]. Qed.
+
 Lemma eq_primes m n : (primes m =i primes n) <-> (primes m = primes n).
 Proof.
 split=> [eqpr| -> //].
@@ -551,6 +559,13 @@ Arguments primePns {n}.
 
 Lemma pdivP n : n > 1 -> {p | prime p & p %| n}.
 Proof. by move=> lt1n; exists (pdiv n); rewrite ?pdiv_dvd ?pdiv_prime. Qed.
+ 
+Lemma primes_eq0 n : (primes n == [::]) = (n < 2).
+Proof.
+case: n => [|[|n']]//=; have [//|p pp pn] := @pdivP (n'.+2).
+suff: p \in primes n'.+2 by case: primes.
+by rewrite mem_primes pp pn.
+Qed.
 
 Lemma primesM m n p : m > 0 -> n > 0 ->
   (p \in primes (m * n)) = (p \in primes m) || (p \in primes n).
@@ -566,7 +581,7 @@ apply/eq_primes => /= p; elim: n => [|n IHn]; first by rewrite muln1.
 by rewrite primesM ?(expn_gt0, expnS, IHn, orbb, m_gt0).
 Qed.
 
-Lemma primes_prime p : prime p -> primes p = [::p].
+Lemma primes_prime p : prime p -> primes p = [:: p].
 Proof.
 move=> pr_p; apply: (irr_sorted_eq ltn_trans ltnn) => // [|q].
   exact: sorted_primes.
@@ -1618,4 +1633,22 @@ rewrite -!big_mkcond -sum_nat_const pair_big (reindex_onto h h') => [|[d d'] _].
   by rewrite def_n -chinese_mod // -coprimeMl -def_n modn_small ?eqxx.
 apply/eqP; rewrite /eq_op /= /eq_op /= !modn_dvdm ?dvdn_part //.
 by rewrite chinese_modl // chinese_modr // !modn_small ?eqxx ?ltn_ord.
+Qed.
+
+Lemma totient_gt1 n : (totient n > 1) = (n > 2).
+Proof.
+case: n => [|[|[|[|n']]]]//=; set n := n'.+4; rewrite [RHS]isT.
+wlog [q] : / exists k, k.+3 \in primes n; last first.
+  rewrite mem_primes => /and3P[qp ngt0 qn].
+  have [[|k]// cqk ->] := pfactor_coprime qp ngt0.
+  rewrite totient_coprime 1?coprime_sym ?coprimeXl//.
+  rewrite totient_pfactor// -?pfactor_dvdn// mulnCA/= (@leq_trans q.+2)//.
+  by rewrite leq_pmulr// muln_gt0 totient_gt0 expn_gt0.
+have := @prod_prime_decomp n isT; rewrite prime_decompE big_map/=.
+case: (primes n) (all_prime_primes n) (sorted_primes n) =>
+    [|[|[|p']]// [|[|[|[|q']]] r]]//=; first by rewrite big_nil.
+  case: p' => [_ _|p' _ _ _]; last by apply; exists p'; rewrite ?mem_head.
+  rewrite big_seq1; case: logn => [|[|k]]//= ->.
+  by rewrite totient_pfactor//= mul1n (@leq_pexp2l 2 1)//.
+by move=> _ _ _; apply; exists q'=> //; rewrite !in_cons eqxx orbT.
 Qed.
