@@ -77,7 +77,7 @@ Proof.
 have dfs_id w z: z \notin w -> dfs_path w z z.
   by exists [::]; rewrite ?disjoint_has //= orbF.
 elim: n => [|n IHn] /= in x y v * => le_v'_n not_vy.
-  rewrite addn0 (geq_leqif (subset_leqif_card (subset_predT v))) in le_v'_n.
+  rewrite addn0 (geq_leqif (subset_leqif_card (subset_predT _))) in le_v'_n.
   by rewrite predT_subset in not_vy.
 have [v_x | not_vx] := ifPn.
   by rewrite (negPf not_vy); right=> [] [p _ _]; rewrite disjoint_has /= v_x.
@@ -89,7 +89,7 @@ apply: (@equivP (exists2 x1, x1 \in a & dfs_path v1 x1 y)); last first.
     rewrite disjoint_has has_sym /= has_sym /= => /norP[_ not_pv].
     by exists (x1 :: p); rewrite /= ?a_x1 // disjoint_has negb_or not_vx.
   case=> [_ _ _ eq_yx | x1 p1 /=]; first by case/eqP: neq_yx.
-  case/andP=> a_x1 g_p1 /andP[not_p1x _] /(@subsetP _ (x1 :: p1)) p_p1 p1y not_pv.  (* FIXME: subsetP need extra arg *)
+  case/andP=> a_x1 g_p1 /andP[not_p1x _] /subsetP p_p1 p1y not_pv.
   exists x1 => //; exists p1 => //.
   rewrite disjoint_sym disjoint_cons not_p1x disjoint_sym.
   by move: not_pv; rewrite disjoint_cons => /andP[_ /disjointWl->].
@@ -274,12 +274,11 @@ Qed.
 Lemma eq_n_comp e e' : connect e =2 connect e' -> n_comp_mem e =1 n_comp_mem e'.
 Proof.
 move=> eq_e [a]; apply: eq_card => x /=.
-rewrite !inE /roots /root.
-by rewrite (@eq_pick _ (connect e x : {pred T}) (connect e' x : {pred T}) (eq_e x)).  (* FIXME: need extra args *)
+by rewrite !inE /= /roots /root /= (eq_pick (eq_e x)).
 Qed.
 
 Lemma eq_n_comp_r {e} a a' : a =i a' -> n_comp e a = n_comp e a'.
-Proof. by move=> eq_a; apply: eq_card => x; rewrite /= !inE eq_a. Qed.  (* FIXME: need extra /= *)
+Proof. by move=> eq_a; apply: eq_card => x; rewrite inE /= eq_a. Qed.
 
 Lemma n_compC a e : n_comp e T = n_comp e a + n_comp e [predC a].
 Proof.
@@ -289,7 +288,7 @@ by rewrite -(cardID a); congr (_ + _).
 Qed.
 
 Lemma eq_root e e' : e =2 e' -> root e =1 root e'.
-Proof. by move=> eq_e x; rewrite /root (@eq_pick _ (connect e x : {pred T}) (connect e' x : {pred T}) (eq_connect eq_e x)). Qed.  (* FIXME extra args *)
+Proof. by move=> eq_e x; rewrite /root (eq_pick (eq_connect eq_e x)). Qed.
 
 Lemma eq_roots e e' : e =2 e' -> roots e =1 roots e'.
 Proof. by move=> eq_e x; rewrite /roots (eq_root eq_e). Qed.
@@ -631,7 +630,7 @@ Lemma fcard_gt0P (a : {pred T}) :
   fclosed f a -> reflect (exists x, x \in a) (0 < fcard f a).
 Proof.
 move=> clfA; apply: (iffP card_gt0P) => [[x /andP[]]|[x xA]]; first by exists x.
-exists (froot f x); rewrite /= inE roots_root /=; last exact: fconnect_sym.  (* FIXME: extra /= *)
+exists (froot f x); rewrite inE roots_root /=; last exact: fconnect_sym.
 by rewrite -(closed_connect clfA (connect_root _ x)).
 Qed.
 
@@ -643,7 +642,7 @@ Proof.
 move=> clAf; apply: (iffP card_gt1P) => [|[x xA [y yA not_xfy]]].
   move=> [x [y [/andP [/= rfx xA] /andP[/= rfy yA] xDy]]].
   by exists x; try exists y; rewrite // -root_connect // (eqP rfx) (eqP rfy).
-exists (froot f x), (froot f y); rewrite /= !inE !roots_root ?root_connect //=.  (* FIXME: extra /= *)
+exists (froot f x), (froot f y); rewrite !inE !roots_root ?root_connect //=.
 by split => //; rewrite -(closed_connect clAf (connect_root _ _)).
 Qed.
 
@@ -846,9 +845,9 @@ Lemma orderPcycle x : order_spec_cycle x (fcycle f (orbit x)).
 Proof.
 have [xcycle|Ncycle] := boolP (fcycle f (orbit x)); constructor => //.
   by rewrite order_id_cycle.
-rewrite /order (@eq_card _ (fconnect f x : {pred T}) [predU1 x & fconnect f (f x)] (_ : _ =1 [predU1 x & fconnect f (f x)])).  (* FIXME: extra args *)
-  by rewrite cardU1 (contraNN (all_iffLR orbitPcycle 2 0)).
-by move=> y; rewrite /= !inE [LHS]fconnect_eqVf eq_sym.
+rewrite /order (eq_card (_ : _ =1 [predU1 x & fconnect f (f x)])).
+  by rewrite cardU1 inE (contraNN (all_iffLR orbitPcycle 2 0)).
+by move=> y; rewrite !inE [LHS]fconnect_eqVf eq_sym.
 Qed.
 
 Lemma fconnect_f x : fconnect f (f x) x = fcycle f (orbit x).
@@ -878,7 +877,7 @@ Lemma fconnect_id (x : T) : fconnect id x =1 xpred1 x.
 Proof. by move=> y; rewrite (@fconnect_cycle _ _ [:: x]) //= ?inE ?eqxx. Qed.
 
 Lemma order_id (x : T) : order id x = 1.
-Proof. by rewrite /order (@eq_card _ (fconnect id x : {pred T}) (pred1 x) (fconnect_id x)) card1. Qed.  (* FIXME: extra args *)
+Proof. by rewrite /order (eq_card (fconnect_id x)) card1. Qed.
 
 Lemma orbit_id (x : T) : orbit id x = [:: x].
 Proof. by rewrite /orbit order_id. Qed.
@@ -890,7 +889,7 @@ Lemma froot_id (x : T) : froot id x = x.
 Proof. by apply/eqP; apply: froots_id. Qed.
 
 Lemma fcard_id (a : {pred T}) : fcard id a = #|a|.
-Proof. by apply: eq_card => x; rewrite /= inE froots_id. Qed.  (* FIXME: extra /= *)
+Proof. by apply: eq_card => x; rewrite inE froots_id. Qed.
 
 End FconnectId.
 
@@ -915,7 +914,7 @@ Proof. exact: eq_n_comp eq_fconnect. Qed.
 
 Lemma eq_finv : finv f =1 finv f'.
 Proof.
-by move=> x; rewrite /finv /order (@eq_card _ (fconnect f x : {pred T}) (fconnect f' x : {pred T}) (eq_fconnect x)) (eq_iter eq_f).  (* FIXME: extra args *)
+by move=> x; rewrite /finv /order (eq_card (eq_fconnect x)) (eq_iter eq_f).
 Qed.
 
 Lemma eq_froot : froot f =1 froot f'.
@@ -1007,15 +1006,13 @@ case=> Aee' Ae'e.
 have inj_h: {in predI (roots e') [preim h of a] &, injective (root e \o h)}.
   move=> x' y' /andP[/eqP r_x' /= a_x'] /andP[/eqP r_y' _] /(rootP sym_e).
   by rewrite -Ae'e // => /(rootP sym_e'); rewrite r_x' r_y'.
-rewrite /n_comp_mem -(@card_in_image _ _ (root e \o h) [predI (roots e') & [preim h of a]] inj_h).  (* FIXME: extra arg *)
-apply: eq_card => x.
+rewrite /n_comp_mem -(card_in_image inj_h); apply: eq_card => x.
 apply/andP/imageP=> [[/eqP rx a_x] | [x' /andP[/eqP r_x' a_x'] ->]]; last first.
   by rewrite /= -(ccl_a (connect_root _ _)) roots_root.
 have [y' e_xy]:= Aee' x a_x; pose x' := root e' y'.
 have ay': h y' \in a by rewrite -(ccl_a e_xy).
 have e_yx: connect e (h y') (h x') by rewrite -Ae'e ?connect_root.
-exists x'.
-  by rewrite /= inE -[X in _ && X](ccl_a e_yx) [X in X && _]roots_root.  (* FIXME: extra rew patterns *)
+exists x'; first by rewrite inE /= -(ccl_a e_yx) ?roots_root.
 by rewrite /= -(rootP sym_e e_yx) -(rootP sym_e e_xy).
 Qed.
 
