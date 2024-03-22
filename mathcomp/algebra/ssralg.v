@@ -954,6 +954,8 @@ Local Notation "\prod_ ( m <= i < n ) F" := (\big[*%R/1%R]_(m <= i < n) F%R).
 Definition char (R : semiRingType) : nat_pred :=
   [pred p | prime p & p%:R == 0 :> R].
 
+Local Notation has_char0 L := (char L =i pred0).
+
 (* Converse ring tag. *)
 Definition converse R : Type := R.
 Local Notation "R ^c" := (converse R) (at level 2, format "R ^c") : type_scope.
@@ -1145,6 +1147,26 @@ Proof. by rewrite big_const_nat -iteropE. Qed.
 Lemma prodrXr x I r P (F : I -> nat) :
   \prod_(i <- r | P i) x ^+ F i = x ^+ (\sum_(i <- r | P i) F i).
 Proof. by rewrite (big_morph _ (exprD _) (erefl _)). Qed.
+
+Lemma prodrM_comm {I : eqType} r (P : pred I) (F G : I -> R) :
+    (forall i j, P i -> P j -> comm (F i) (G j)) ->
+  \prod_(i <- r | P i) (F i * G i) =
+    \prod_(i <- r | P i) F i * \prod_(i <- r | P i) G i.
+Proof.
+move=> FG; elim: r => [|i r IHr]; rewrite !(big_nil, big_cons) ?mulr1//.
+case: ifPn => // Pi; rewrite IHr !mulrA; congr (_ * _); rewrite -!mulrA.
+by rewrite commr_prod // => j Pj; apply/commr_sym/FG.
+Qed.
+
+Lemma prodrMl_comm {I : finType} (A : pred I) (x : R) F :
+    (forall i, A i -> comm x (F i)) ->
+  \prod_(i in A) (x * F i) = x ^+ #|A| * \prod_(i in A) F i.
+Proof. by move=> xF; rewrite prodrM_comm ?prodr_const// => i j _ /xF. Qed.
+
+Lemma prodrMr_comm {I : finType} (A : pred I) (x : R) F :
+    (forall i, A i -> comm x (F i)) ->
+  \prod_(i in A) (F i * x) = \prod_(i in A) F i * x ^+ #|A|.
+Proof. by move=> xF; rewrite prodrM_comm ?prodr_const// => i j /xF. Qed.
 
 Lemma prodrMn (I : Type) (s : seq I) (P : pred I) (F : I -> R) (g : I -> nat) :
   \prod_(i <- s | P i) (F i *+ g i) =
@@ -2559,6 +2581,14 @@ Proof. by rewrite (big_morph _ (exprMn n) (expr1n _ n)). Qed.
 Lemma prodr_undup_exp_count (I : eqType) r (P : pred I) (F : I -> R) :
   \prod_(i <- undup r | P i) F i ^+ count_mem i r = \prod_(i <- r | P i) F i.
 Proof. exact: big_undup_iterop_count.  Qed.
+
+Lemma prodrMl {I : finType} (A : pred I) (x : R) F :
+  \prod_(i in A) (x * F i) = x ^+ #|A| * \prod_(i in A) F i.
+Proof. by rewrite big_split ?prodr_const. Qed.
+
+Lemma prodrMr {I : finType} (A : pred I) (x : R) F :
+  \prod_(i in A) (F i * x) = \prod_(i in A) F i * x ^+ #|A|.
+Proof. by rewrite big_split ?prodr_const. Qed.
 
 Lemma exprDn x y n :
   (x + y) ^+ n = \sum_(i < n.+1) (x ^+ (n - i) * y ^+ i) *+ 'C(n, i).
@@ -6141,6 +6171,7 @@ Notation "- 1" := (opp 1) : ring_scope.
 Notation "n %:R" := (natmul 1 n) : ring_scope.
 Arguments GRing.char R%type.
 Notation "[ 'char' R ]" := (GRing.char R) : ring_scope.
+Notation has_char0 R := (GRing.char R =i pred0).
 Notation Frobenius_aut chRp := (Frobenius_aut chRp).
 Notation "*%R" := (@mul _) : function_scope.
 Notation "x * y" := (mul x y) : ring_scope.
