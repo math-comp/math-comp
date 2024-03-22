@@ -17,6 +17,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemma `invf_pgt`, `invf_pge`, `invf_ngt`, `invf_nge`
   + lemma `invf_plt`, `invf_ple`, `invf_nlt`, `invf_nle`
 
+- in `path.v`
+  + lemma `count_sort`
+
 ### Changed
 
 - in `bigop.v`

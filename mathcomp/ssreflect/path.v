@@ -943,6 +943,17 @@ elim: s1 s2 => [|x s1 IHs1] [|y s2]; rewrite ?cats0 //=.
 by rewrite allrel_consl /= -andbA => /and3P [-> _ /IHs1->].
 Qed.
 
+Lemma count_sort (p : pred T) s : count p (sort s) = count p s.
+Proof.
+rewrite sortE -[RHS]/(sumn [seq count p x | x <- [::]] + count p s).
+elim: s [::] => [|x s ihs] ss.
+  rewrite [LHS]/=; elim: ss [::] => //= s ss ihss t.
+  by rewrite ihss count_merge count_cat addnCA addnA.
+rewrite {}ihs -[in RHS]cat1s count_cat addnA; congr addn; rewrite addnC.
+elim: {x s} ss [:: x] => [|[|x s] ss ihss] t //.
+by rewrite [LHS]/= add0n ihss count_merge count_cat -addnA addnCA.
+Qed.
+
 Lemma pairwise_sort s : pairwise leT s -> sort s = s.
 Proof.
 pose catss := foldr (fun x => cat ^~ x) (Nil T).
@@ -1113,15 +1124,7 @@ Lemma merge_uniq s1 s2 : uniq (merge leT s1 s2) = uniq (s1 ++ s2).
 Proof. by apply: perm_uniq; rewrite perm_merge. Qed.
 
 Lemma perm_sort s : perm_eql (sort leT s) s.
-Proof.
-apply/permPl; rewrite sortE perm_sym -{1}[s]/(flatten [::] ++ s).
-elim: s [::] => /= [|x s ihs] ss.
-- elim: ss [::] => //= s ss ihss t.
-  by rewrite -(permPr (ihss _)) -catA perm_catCA perm_cat2l -perm_merge.
-- rewrite -(permPr (ihs _)) -(perm_catCA [:: x]) catA perm_cat2r.
-  elim: {x s ihs} ss [:: x] => [|[|x s] ss ihss] t //.
-  by rewrite -(permPr (ihss _)) catA perm_cat2r perm_catC -perm_merge.
-Qed.
+Proof. by apply/permPl/permP => ?; rewrite count_sort. Qed.
 
 Lemma mem_sort s : sort leT s =i s. Proof. exact/perm_mem/permPl/perm_sort. Qed.
 
@@ -1159,10 +1162,7 @@ by rewrite -(mkseq_nth x s) sort_map !all_map; apply/perm_all/permPl/perm_sort.
 Qed.
 
 Lemma size_sort (T : Type) (leT : rel T) s : size (sort leT s) = size s.
-Proof.
-case: s => // x s; have [s1 pp qq] := perm_iota_sort leT x (x :: s).
-by rewrite qq size_map (perm_size pp) size_iota.
-Qed.
+Proof. exact: (count_sort _ predT). Qed.
 
 Lemma ltn_sorted_uniq_leq s : sorted ltn s = uniq s && sorted leq s.
 Proof.
