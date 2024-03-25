@@ -303,16 +303,6 @@ Module Export ChoiceNamespace.
   End Choice.
 End ChoiceNamespace.
 
-#[deprecated(since="mathcomp 2.0.0", note="Use Choice.on instead.")]
-Notation "[ 'hasChoice' 'of' T ]" := (Choice.on _ : hasChoice T%type)
-  (at level 0, format "[ 'hasChoice'  'of'  T ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use Choice.clone instead.")]
-Notation "[ 'choiceType' 'of' T 'for' C ]" := (Choice.clone T%type C)
-  (at level 0, format "[ 'choiceType'  'of'  T  'for'  C ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use Choice.clone instead.")]
-Notation "[ 'choiceType' 'of' T ]" := (Choice.clone T%type _)
-  (at level 0, format "[ 'choiceType'  'of'  T ]") : form_scope.
-
 Section ChoiceTheory.
 
 Implicit Type T : choiceType.
@@ -492,10 +482,6 @@ HB.instance Definition _ T :=
   Choice.copy (GenTree.tree T) (pcan_type (GenTree.codeK T)).
 
 End ChoiceTheory.
-#[deprecated(since="mathcomp 2.0.0", note="Use Choice.copy with can_type or CanHasChoice.")]
-Notation CanChoiceMixin := CanHasChoice.
-#[deprecated(since="mathcomp 2.0.0", note="Use Choice.copy with pcan_type or PCanHasChoice.")]
-Notation PcanChoiceMixin := PCanHasChoice.
 
 #[short(type="subChoiceType")]
 HB.structure Definition SubChoice T (P : pred T) :=
@@ -504,9 +490,6 @@ HB.structure Definition SubChoice T (P : pred T) :=
 Prenex Implicits xchoose choose.
 Notation "[ 'Choice' 'of' T 'by' <: ]" := (Choice.copy T%type (sub_type T%type))
   (at level 0, format "[ 'Choice'  'of'  T  'by'  <: ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use [Choice of _ by <:] instead.")]
-Notation "[ 'choiceMixin' 'of' T 'by' <: ]" := [Choice of T%type by <:]
-  (at level 0, format "[ 'choiceMixin'  'of'  T  'by'  <: ]") : form_scope.
 
 HB.instance Definition _ (T : choiceType) (P : pred T) :=
   [Choice of {x | P x} by <:].
@@ -520,16 +503,6 @@ Arguments Choice_isCountable.axioms_ T%type_scope.
 
 #[short(type="countType")]
 HB.structure Definition Countable := { T of Choice T & Choice_isCountable T }.
-
-#[deprecated(since="mathcomp 2.0.0", note="Use Countable.on instead.")]
-Notation "[ 'isCountable' 'of' T ]" := (Countable.on T%type : Choice_isCountable T%type)
-  (at level 0, format "[ 'isCountable'  'of'  T ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use Countable.clone instead.")]
-Notation "[ 'countType' 'of' T 'for' cT ]" := (Countable.clone T%type cT)
-(at level 0, format "[ 'countType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use Countable.clone instead.")]
-Notation "[ 'countType' 'of' T ]" := (Countable.clone T%type _)
-  (at level 0, format "[ 'countType'  'of'  T ]") : form_scope.
 
 HB.factory Record isCountable (T : Type) : Type := {
   pickle : T -> nat;
@@ -584,17 +557,10 @@ Proof. by move=> s; rewrite /unpickle_seq CodeSeq.codeK (map_pK pickleK). Qed.
 HB.instance Definition _ := isCountable.Build (seq T) pickle_seqK.
 
 End CountableTheory.
-#[deprecated(since="mathcomp 2.0.0", note="Use Countable.copy with can_type or CanIsCountable.")]
-Notation CanCountMixin := CanIsCountable.
-#[deprecated(since="mathcomp 2.0.0", note="Use Countable.copy with pcan_type or PCanIsCountable")]
-Notation PcanCountMixin := PCanIsCountable.
 
 Notation "[ 'Countable' 'of' T 'by' <: ]" :=
     (Countable.copy T%type (sub_type T%type))
   (at level 0, format "[ 'Countable'  'of'  T  'by'  <: ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use [Countable of _ by <:] instead.")]
-Notation "[ 'countMixin' 'of' T 'by' <: ]" := [Countable of T%type by <:]
-  (at level 0, format "[ 'countMixin'  'of'  T  'by'  <: ]") : form_scope.
 
 Arguments pickle_inv {T} n.
 Arguments pickleK {T} x : rename.
@@ -604,11 +570,6 @@ Arguments pickle_invK {T} n : rename.
 #[short(type="subCountType")]
 HB.structure Definition SubCountable T (P : pred T) :=
   { sT of Countable sT & isSub T P sT}.
-
-(* This assumes that T has both countType and subType structures. *)
-#[deprecated(since="mathcomp 2.0.0", note="Use SubCountable.clone instead.")]
-Notation "[ 'subCountType' 'of' T ]" := (SubCountable.clone _ _ T%type _)
-  (at level 0, format "[ 'subCountType'  'of'  T ]") : form_scope.
 
 Section TagCountType.
 

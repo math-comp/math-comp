@@ -589,10 +589,6 @@ set x := (n, d); rewrite -[n]/x.1 -[d]/x.2 -fracqE.
 by case: fracqP => [_|k fx k_neq0] /=; constructor.
 Qed.
 
-Lemma divq_eq_deprecated (nx dx ny dy : rat) :
-  dx != 0 -> dy != 0 -> (nx / dx == ny / dy) = (nx * dy == ny * dx).
-Proof. exact: eqr_div. Qed.
-
 Variant rat_spec (* (x : rat) *) : rat -> int -> int -> Type :=
   Rat_spec (n : int) (d : nat)  & coprime `|n| d.+1
   : rat_spec (* x  *) (n%:Q / d.+1%:Q) n d.+1.

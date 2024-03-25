@@ -116,14 +116,6 @@ Canonical pi_add_quot_morph zqT := PiMorph2 (@pi_addr _ _ _ _ _ zqT).
 
 End ZModQuotient.
 
-Module ZModQuotientExports.
-#[deprecated(since="mathcomp 2.0.0", note="Use ZmodQuotient.clone instead.")]
-Notation "[ 'zmodQuotType' z , o & a 'of' Q ]" :=
-  (ZmodQuotient.clone _ _ z o%function a%function Q%type _)
-  (at level 0, format "[ 'zmodQuotType'  z ,  o  &  a  'of'  Q ]") : form_scope.
-End ZModQuotientExports.
-HB.export ZModQuotientExports.
-
 Section PiAdditive.
 
 Variables (V : zmodType) (equivV : rel V) (zeroV : V).
@@ -166,13 +158,6 @@ Canonical pi_one_quot_morph rqT := PiMorph (@pi_oner _ _ _ _ _ _ _ rqT).
 Canonical pi_mul_quot_morph rqT := PiMorph2 (@pi_mulr _ _ _ _ _ _ _ rqT).
 
 End ringQuotient.
-Module RingQuotientExports.
-#[deprecated(since="mathcomp 2.0.0", note="Use RingQuotient.clone instead.")]
-Notation "[ 'ringQuotType' o & m 'of' Q ]" :=
-  (RingQuotient.clone _ _ _ _ _ o m%function Q%type _)
-  (at level 0, format "[ 'ringQuotType'  o  &  m  'of'  Q ]") : form_scope.
-End RingQuotientExports.
-HB.export RingQuotientExports.
 
 Section PiRMorphism.
 
@@ -211,14 +196,6 @@ Canonical pi_unit_quot_morph urqT := PiMono1 (@pi_unitr _ _ _ _ _ _ _ _ _ urqT).
 Canonical pi_inv_quot_morph urqT := PiMorph1 (@pi_invr _ _ _ _ _ _ _ _ _ urqT).
 
 End UnitRingQuot.
-
-Module UnitRingQuotientExports.
-#[deprecated(since="mathcomp 2.0.0", note="Use RingQuotient.clone instead.")]
-Notation "[ 'unitRingQuotType' u & i 'of' Q ]" :=
-  (UnitRingQuotient.clone _ _ _ _ _ _ _ u i%function Q%type _)
-  (at level 0, format "[ 'unitRingQuotType'  u  &  i  'of'  Q ]") : form_scope.
-End UnitRingQuotientExports.
-HB.export UnitRingQuotientExports.
 
 Definition proper_ideal (R : ringType) (S : {pred R}) : Prop :=
   1 \notin S /\ forall a, {in S, forall u, a * u \in S}.

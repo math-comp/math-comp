@@ -132,14 +132,6 @@ HB.end.
 
 Module FalgebraExports.
 Bind Scope ring_scope with sort.
-#[deprecated(since="mathcomp 2.0.0", note="Use Falgebra.clone instead.")]
-Notation "[ 'FalgType' F 'of' L ]" := (Falgebra.clone F L%type _)
-  (at level 0, format "[ 'FalgType'  F  'of'  L ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use Falgebra.clone instead.")]
-Notation "[ 'FalgType' F 'of' L 'for' L' ]" := (Falgebra.clone F L%type L')
-  (at level 0, format "[ 'FalgType'  F  'of'  L  'for'  L' ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use Algebra_isFalgebra.Build instead.")]
-Notation FalgUnitRingType T := (Algebra_isFalgebra.Build _ T).
 End FalgebraExports.
 HB.export FalgebraExports.
 
