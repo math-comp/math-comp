@@ -974,10 +974,6 @@ Notation "[ 'seq' x : T <- s | C ]" := (filter (fun x : T => C%B) s)
 Notation "[ 'seq' x : T <- s | C1 & C2 ]" := [seq x : T <- s | C1 && C2]
  (at level 0, x at level 99, only parsing).
 
-#[deprecated(since="mathcomp 1.16",
-             note="Use take_takel or take_min instead")]
-Notation take_take := take_takel.
-
 (* Double induction/recursion. *)
 Lemma seq_ind2 {S T} (P : seq S -> seq T -> Type) :
     P [::] [::] ->

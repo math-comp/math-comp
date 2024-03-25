@@ -330,6 +330,3 @@ Qed.
 Lemma tofrac_eq0 (p : R): (p%:F == 0) = (p == 0).
 Proof. by rewrite tofrac_eq. Qed.
 End FracFieldTheory.
-
-#[deprecated(since="mathcomp 1.17.0", note="Use tofracXn instead.")]
-Notation tofracX := tofracXn.

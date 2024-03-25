@@ -363,15 +363,6 @@ HB.structure Definition SplittingField F :=
 
 Module SplittingFieldExports.
 Bind Scope ring_scope with SplittingField.sort.
-#[deprecated(since="mathcomp 2.0.0", note="Use SplittingField.clone instead.")]
-Notation "[ 'splittingFieldType' F 'of' L 'for' K ]" :=
-  (SplittingField.clone F L%type K)
-  (at level 0, format "[ 'splittingFieldType'  F  'of'  L  'for'  K ]")
-  : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use SplittingField.clone instead.")]
-Notation "[ 'splittingFieldType' F 'of' L ]" :=
-  (SplittingField.clone F L%type _)
-  (at level 0, format "[ 'splittingFieldType'  F  'of'  L ]") : form_scope.
 End SplittingFieldExports.
 HB.export SplittingFieldExports.
 
