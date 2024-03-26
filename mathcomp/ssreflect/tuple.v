@@ -273,6 +273,22 @@ Proof. by case/tupleP: t => x t; rewrite !(tnth_nth x) inordK ?ltnS. Qed.
 Lemma tuple_eta n T (t : n.+1.-tuple T) : t = [tuple of thead t :: behead t].
 Proof. by case/tupleP: t => x t; apply: val_inj. Qed.
 
+Section tnth_shift.
+Context {T : Type} {n1 n2} (t1 : n1.-tuple T) (t2 : n2.-tuple T).
+
+Lemma tnth_lshift i : tnth [tuple of t1 ++ t2] (lshift n2 i) = tnth t1 i.
+Proof.
+have x0 := tnth_default t1 i; rewrite !(tnth_nth x0).
+by rewrite nth_cat size_tuple /= ltn_ord.
+Qed.
+
+Lemma tnth_rshift j : tnth [tuple of t1 ++ t2] (rshift n1 j) = tnth t2 j.
+Proof.
+have x0 := tnth_default t2 j; rewrite !(tnth_nth x0).
+by rewrite nth_cat size_tuple ltnNge leq_addr /= addKn.
+Qed.
+End tnth_shift.
+
 Section TupleQuantifiers.
 
 Variables (n : nat) (T : Type).
