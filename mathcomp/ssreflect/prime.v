@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
-From mathcomp Require Import choice fintype div bigop.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
+From mathcomp Require Import path fintype div bigop.
 
 (******************************************************************************)
 (* This file contains the definitions of:                                     *)
@@ -561,6 +561,13 @@ Lemma pdivP n : n > 1 -> {p | prime p & p %| n}.
 Proof. by move=> lt1n; exists (pdiv n); rewrite ?pdiv_dvd ?pdiv_prime. Qed.
  
 Lemma primes_eq0 n : (primes n == [::]) = (n < 2).
+Proof.
+case: n => [|[|n']]//=; have [//|p pp pn] := @pdivP (n'.+2).
+suff: p \in primes n'.+2 by case: primes.
+by rewrite mem_primes pp pn.
+Qed.
+
+Lemma primes_neq0 n : (primes n == [::]) = (n < 2).
 Proof.
 case: n => [|[|n']]//=; have [//|p pp pn] := @pdivP (n'.+2).
 suff: p \in primes n'.+2 by case: primes.

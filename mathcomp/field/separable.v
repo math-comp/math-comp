@@ -371,7 +371,7 @@ Let sKxK : (K <= <<K; x>>)%VS := subv_adjoin K x.
 Let Kx_x : x \in <<K; x>>%VS := memv_adjoin K x.
 (* end hide *)
 
-Lemma separable_elementP :  
+Lemma separable_elementP :
   reflect (exists f, [/\ f \is a polyOver K, root f x & separable_poly f])
           (separable_element K x).
 Proof.
@@ -524,7 +524,7 @@ Qed.
 
 End ExtendDerivation.
 
-(* Reference: 
+(* Reference:
 http://www.math.uconn.edu/~kconrad/blurbs/galoistheory/separable2.pdf *)
 Lemma Derivation_separableP :
   reflect
@@ -978,7 +978,7 @@ case/strong_Primitive_Element_Theorem => _ _ -> //.
 exact: separable_generatorP.
 Qed.
 
-Lemma separableS K1 K2 E2 E1 : 
+Lemma separableS K1 K2 E2 E1 :
   (K1 <= K2)%VS -> (E2 <= E1)%VS -> separable K1 E1 -> separable K2 E2.
 Proof.
 move=> sK12 /subvP sE21 /separableP sepK1_E1.
@@ -1021,3 +1021,17 @@ Arguments adjoin_separableP {F L K x}.
 Arguments purely_inseparable_elementP {F L K x}.
 Arguments separableP {F L K E}.
 Arguments purely_inseparableP {F L K E}.
+
+Lemma separable_aimg {F : fieldType} {L rL : fieldExtType F}
+  (E K : {subfield L}) (f : 'AHom(L, rL)) :
+   separable (f @: E) (f @: K) = separable E K.
+Proof.
+apply/separableP/separableP => [sepEK x xF|sepEK _ /memv_imgP[x xF ->]].
+  have /separable_elementP[_ [/polyOver_aimgP[p pE ->]]] :=
+    sepEK (f x) (memv_img f xF).
+  rewrite mapf_root separable_map => root_p sep_p.
+  by apply/separable_elementP; exists p; split.
+have /(_ _ xF)/separable_elementP[p [pE rpx sepp]] := sepEK.
+apply/separable_elementP; exists (map_poly f p).
+by rewrite ?mapf_polyOver ?rmorph_root ?separable_map.
+Qed.

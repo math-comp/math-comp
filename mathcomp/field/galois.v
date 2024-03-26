@@ -62,6 +62,164 @@ Qed.
 
 End SplittingFieldFor.
 
+Section SplittingAHom.
+Local Notation "p ^ f" := (map_poly f p) : ring_scope.
+
+Lemma splittingFieldFor_aimg (F : fieldType) (L rL : fieldExtType F)
+    (E K : {subfield L}) p (f : 'AHom(L, rL)) :
+  splittingFieldFor (f @: E) (p ^ f) (f @: K) <-> splittingFieldFor E p K.
+Proof.
+split=> -[rs' pE EK]; last first.
+  by exists (map f rs'); rewrite ?prod_map_poly ?eqp_map -?aimg_adjoin_seq ?EK.
+have /subset_limgP[rs _ rs'E] : {subset rs' <= (f @: K)%VS}.
+  by rewrite -EK; apply: seqv_sub_adjoin.
+exists rs; first by have := pE; rewrite rs'E prod_map_poly ?eqp_map.
+have := EK; rewrite rs'E -aimg_adjoin_seq => /eqP.
+by rewrite eq_limg_ker0 ?AHom_lker0// => /eqP.
+Qed.
+
+Lemma splitting_ahom (F : fieldType) (L L' : fieldExtType F)
+    (p : {poly F}) (E' : {subfield L'}) :
+    splittingFieldFor 1 (p ^ in_alg L) {: L} ->
+    splittingFieldFor 1 (p ^ in_alg L') E' ->
+  {f : 'AHom(L, L') | limg f = E'}.
+Proof.
+do [suff init (p : {poly L}) (k : {subfield L})
+    (K := [FalgType F of subvs_of k]) (f : 'AHom(K, L')) :
+    p \is a polyOver k -> splittingFieldFor k p fullv ->
+    splittingFieldFor (limg f) (p ^ (f \o vsproj k)) E' ->
+      {g : 'AHom(L, L') | limg g = E'}] in p *.
+  move=> pf pE'; pose K := [FalgType F of subvs_of (1%VS : {vspace L})].
+  have [idF idFE] : {f : 'AHom(K, L') | forall x : F, f x%:A = x%:A}.
+    have flr : lrmorphism
+        (fun v : K => in_alg L' (projT1 (sig_eqW (vlineP _ _ (valP v))))).
+      do ![split] => [? ?|? ?||a ?]/=.
+      - case: sig_eqW => x; case: sig_eqW => /= v->; case: sig_eqW => /= w->.
+        by rewrite -!in_algE -raddfB => /fmorph_inj<-//; rewrite raddfB.
+      - case: sig_eqW => x; case: sig_eqW => /= v->; case: sig_eqW => /= w->.
+        by rewrite -!in_algE -rmorphM => /fmorph_inj<-//; rewrite rmorphM.
+      - case: sig_eqW => /= one /esym/eqP; rewrite algid1.
+        by rewrite -in_algE fmorph_eq1 => /eqP->; rewrite scale1r.
+      - case: sig_eqW => x; case: sig_eqW => /= v->.
+        rewrite -mulr_algl -in_algE -rmorphM => /fmorph_inj<-.
+        by rewrite -in_algE rmorphM mulr_algl.
+    exists (linfun_ahom (LRMorphism flr)) => v; rewrite lfunE/=.
+    by case: sig_eqW => /= x; rewrite algid1 -in_algE => /fmorph_inj->.
+  apply: (init (p ^ in_alg L) 1%AS idF) => //.
+    by apply/polyOver1P; exists p.
+  suff -> : limg idF = 1%VS.
+    rewrite -!map_poly_comp/= (@eq_map_poly _ _ _ (in_alg L'))//.
+    move=> v /=; rewrite -[RHS]idFE; congr (idF _).
+    by apply/val_inj; rewrite /= algid1 vsprojK ?rpredZ ?rpred1//.
+  apply/eqP; rewrite eqEsubv sub1v andbT; apply/subvP => _/memv_imgP[v _ ->].
+  suff [u ->] : exists u : F, v = in_alg K u.
+      by rewrite idFE; apply/vlineP; exists u.
+  case: v => u u1; rewrite SubvsE; move: u1 => /vlineP[{}u ->]; exists u.
+  by apply/val_inj; rewrite /= vsprojK ?algid1// rpredZ ?rpred1.
+move=> /polyOver_subvs/sig_eqW[/= {}p ->]; rewrite map_poly_comp/=.
+rewrite -(map_poly_comp _ vsval) (eq_map_poly vsvalK) map_poly_id//.
+move=> /sig2_eqW[rs prs rsf] /sig2_eqW [rs' prs' <-]{E'}; apply/sig_eqW.
+elim: rs => [|x rs IHrs]//= in k @K f p rs' prs rsf prs' *.
+  rewrite ?Fadjoin_nil ?big_nil/= in rsf prs.
+  move=> /(@val_inj _ _ _ k) in rsf; rewrite {k}rsf in K f p prs prs' *.
+  have: p %= 1 by rewrite -(eqp_map [rmorphism of vsval]) rmorph1.
+  rewrite -(eqp_map [rmorphism of f]) rmorph1 (eqp_ltrans prs')//.
+  move=> /eqp_size; rewrite size_prod_XsubC size_poly1 => -[].
+  case: {+}rs' => // _; rewrite Fadjoin_nil/=.
+  exists (linfun_ahom [lrmorphism of f \o vsproj _]).
+  apply/vspaceP => v; apply/memv_imgP/memv_imgP => -[u _ ->]/=.
+    by exists (vsproj fullv u); rewrite ?memvf//= lfunE/=.
+  by exists (val u); rewrite ?memvf//= lfunE/= ?vsvalK.
+have [xk|xNk] := boolP (x \in k).
+  do [rewrite -[x]/(val (Subvs xk)); move: (Subvs xk) => {xk}x] in prs rsf.
+  rewrite adjoin_cons (Fadjoin_idP _) ?subvsP//= in rsf.
+  have xrs' : f x \in rs'.
+    rewrite -root_prod_XsubC -(eqp_root prs') mapf_root.
+    rewrite -(mapf_root [lrmorphism of vsval]) (eqp_root prs).
+    by rewrite root_prod_XsubC mem_head.
+  have -> : <<limg f & rs'>>%VS = <<limg f & rem (f x) rs'>>%VS.
+    rewrite (eq_adjoin _ (perm_mem (perm_to_rem xrs'))).
+    by rewrite adjoin_cons (Fadjoin_idP _)//= memv_img ?memvf.
+  apply: (IHrs k f (p %/ ('X - x%:P))) => //.
+    rewrite map_divp/= (eqp_trans (eqp_divl _ prs))//.
+    by rewrite map_polyXsubC/= big_cons mulKp ?polyXsubC_eq0// eqpxx.
+  rewrite map_divp/= (eqp_trans (eqp_divl _ prs'))// (big_rem _ xrs').
+  by rewrite map_polyXsubC/= mulKp ?polyXsubC_eq0// eqpxx.
+have /polyOver_subvs[q eq_q] := minPolyOver k x.
+have rpx : root (p ^ vsval) x.
+  by rewrite (eqp_root prs) root_prod_XsubC mem_head.
+pose psize := [fun p : {poly _} => size p].
+have q_monic : q \is monic.
+  by have /(congr1 (mem monic))/= := eq_q; rewrite map_monic monic_minPoly.
+have size_q : (size q > 1)%N.
+  have /(congr1 (psize _))/= := eq_q; rewrite size_minPoly size_map_poly => <-.
+  by rewrite ltnS adjoin_degreeE divn_gt0 ?adim_gt0 ?dimvS ?subv_adjoin.
+have [x' x'rs qx'0] : exists2 x', x' \in rs' & root (q ^ f) x'.
+  have : q ^ vsval %| p ^ vsval.
+    by rewrite -eq_q minPoly_dvdp//; apply/polyOver_subvs; exists p.
+  rewrite dvdp_map -(dvdp_map [rmorphism of f]) (eqp_dvdr _ prs').
+  move=> /dvdp_prod_XsubC[m]; rewrite eqp_monic ?map_monic ?monic_prod_XsubC//.
+  move=> /eqP; case rs'_eq : mask => [|x' rs'x].
+    move=> /(congr1 (psize _))/=.
+    by rewrite big_nil size_map_poly size_poly1 => /eqP; rewrite gtn_eqF.
+  rewrite big_cons => q_eq; exists x'.
+    by rewrite (@mem_mask _ _ m)// rs'_eq mem_head.
+  by rewrite q_eq rootE !hornerE subrr mul0r.
+have rpx' : root (p ^ f) x' by rewrite (eqp_root prs') root_prod_XsubC.
+pose Kx := [fieldExtType F of subvs_of <<k; x>>].
+pose mpsI := map_inj_poly subvs_inj (rmorph0 _).
+pose x0 := Subvs (memv_adjoin k x).
+pose KKx :=  vssub (subv_adjoin k x).
+have KxE : forall (v : Kx), exists p, v = (p ^ KKx).[x0].
+  move=> [u ukx]; have /Fadjoin_polyP[_ /polyOver_subvs[p' -> ueq]] := ukx.
+  exists p'; apply/val_inj; rewrite /= -horner_map/=.
+  by rewrite -map_poly_comp (eq_map_poly (vsval_sub (subv_adjoin _ _))).
+suff [h hx0 hC] : {h : 'AHom(Kx, L') | h x0 = x' & h \o KKx =1 f}.
+  have imgfx' : <<limg f; x'>>%VS = limg h.
+    apply/vspaceP => v; apply/idP/idP => [/Fadjoin_polyP|/memv_imgP] [u uP ->].
+      rewrite rpred_horner//=; last by rewrite -hx0 ?memv_img ?memvf.
+      by apply/polyOverS: uP => _/memv_imgP[a _ ->]; rewrite -hC memv_img ?memvf.
+    have [{uP}u->] := KxE u; rewrite -horner_map -map_poly_comp (eq_map_poly hC).
+    rewrite rpred_horner//= ?hx0 ?memv_adjoin//; apply/polyOverP => i.
+    by rewrite coef_map/= (subvP (subv_adjoin _ _))// memv_img ?memvf.
+  rewrite (eq_adjoin _ (perm_mem (perm_to_rem x'rs))) adjoin_cons imgfx'.
+  apply: (IHrs <<k; x>>%AS h (p ^ vssub (subv_adjoin k x) %/ ('X - x0%:P))).
+  - rewrite map_divp -map_poly_comp (eq_map_poly (vsval_sub _)).
+    rewrite map_polyXsubC/= (eqp_trans (eqp_divl _ prs))// big_cons.
+    by rewrite mulKp ?polyXsubC_eq0// eqpxx.
+  - by rewrite -adjoin_cons.
+  rewrite map_divp -map_poly_comp map_polyXsubC/= hx0 (eq_map_poly hC).
+  rewrite (eqp_trans (eqp_divl _ prs'))// (big_rem _ x'rs)/=.
+  by rewrite mulKp ?polyXsubC_eq0// eqpxx.
+have /(_ _)/polyOver_subvs/sig_eqW/=-/all_sig[pol polE] := Fadjoin_polyOver k x.
+have polB (v w : L) : pol (v - w) = pol v - pol w.
+  by apply: mpsI; rewrite raddfB/= -!polE raddfB.
+have polZ (c : F) (v : L) : pol (c *: v) = c%:A *: pol v.
+  by apply: mpsI; rewrite linearZ/= -!polE linearZ/= algid1.
+have polC (c : K) : pol (val c) = c%:P.
+  by apply: mpsI; rewrite -polE/= Fadjoin_polyC ?subvsP// map_polyC.
+have pol1 : pol 1 = 1 by rewrite -[RHS]polC/= algid1.
+have polX : pol x = 'X by apply: mpsI; rewrite map_polyX -polE Fadjoin_polyX.
+have polM (v w : Kx) : pol (val v * val w) = pol (val v) * pol (val w) %% q.
+  apply: mpsI; rewrite map_modp rmorphM/= -!polE/= -eq_q.
+  apply: Fadjoin_poly_unique.
+  - by rewrite modp_polyOver// ?minPolyOver// rpredM ?Fadjoin_polyOver.
+  - by rewrite -ltnS -size_minPoly ltn_modp ?monic_neq0 ?monic_minPoly//.
+  rewrite -Fadjoin_poly_mod ?rpredM ?Fadjoin_polyOver//.
+  by rewrite hornerM !Fadjoin_poly_eq//= ?rpredM ?subvsP.
+have hlr : lrmorphism (fun v : Kx => (pol (val v) ^ f).[x']).
+  do ![split] => [v w|v w||w v]/=.
+  - by rewrite -raddfB/= polB raddfB !hornerE.
+  - by rewrite -rmorphM/= polM map_modp/= horner_mod// rmorphM hornerE.
+  - by rewrite algid1 pol1 rmorph1 hornerE.
+  - by rewrite polZ linearZ/= rmorph_alg hornerE mulr_algl.
+pose h := linfun_ahom (LRMorphism hlr).
+exists h; first by rewrite lfunE/= polX map_polyX hornerX.
+by move=> v; rewrite /comp lfunE/= vsval_sub/= polC map_polyC hornerC.
+Qed.
+
+End SplittingAHom.
+
 Section kHom.
 
 Variables (F : fieldType) (L : fieldExtType F).
@@ -840,6 +998,9 @@ Qed.
 Lemma gal_kHom K E x : (K <= E)%VS -> (x \in 'Gal(E / K)) = kHom K E x.
 Proof. by move/gal_kAut->; rewrite /kAut limg_gal eqxx andbT. Qed.
 
+Lemma gal1 K (g : gal_of K) : g \in 'Gal(K / 1%VS)%g.
+Proof. by rewrite gal_kHom ?sub1v// k1HomE ahomWin. Qed.
+
 Lemma kAut_to_gal K E f :
   kAut K E f -> {x : gal_of E | x \in 'Gal(E / K) & {in E, f =1 x}}.
 Proof.
@@ -855,6 +1016,12 @@ Qed.
 Lemma fixed_gal K E x a :
   (K <= E)%VS -> x \in 'Gal(E / K) -> a \in K -> x a = a.
 Proof. by move/gal_kHom=> -> /kAHomP idKx /idKx. Qed.
+
+Lemma galvv E : ('Gal(E / E) = 1)%g.
+Proof.
+apply/trivgP/subsetP=> u uG; rewrite inE.
+by apply/gal_eqP => x xE; rewrite gal_id (fixed_gal _ uG).
+Qed.
 
 Lemma fixedPoly_gal K E x p :
   (K <= E)%VS -> x \in 'Gal(E / K) -> p \is a polyOver K -> map_poly x p = p.
@@ -1052,6 +1219,13 @@ End TraceAndNormField.
 
 Definition normalField U V := [forall x in kAEndf U, x @: V == V]%VS.
 
+Lemma normalField_refl V : normalField V V.
+Proof.
+apply/forallP => /= u; apply/implyP; rewrite in_set.
+by move=> /andP[/andP[_ /fixedSpace_limg->]].
+Qed.
+Hint Resolve normalField_refl : core.
+
 Lemma normalField_kAut K M E f :
   (K <= M <= E)%VS -> normalField K M -> kAut K E f -> kAut K M f.
 Proof.
@@ -1182,6 +1356,17 @@ by rewrite !big_cons IHr.
 Qed.
 
 Definition galois U V := [&& (U <= V)%VS, separable U V & normalField U V].
+
+Lemma galois_subW U V : galois U V -> (U <= V)%VS. Proof. by case/andP. Qed.
+
+Lemma galois_normalW U V : galois U V -> normalField U V.
+Proof. by case/and3P. Qed.
+
+Lemma galois_separableW U V : galois U V -> separable U V.
+Proof. by case/and3P. Qed.
+
+Lemma galois_refl E : galois E E.
+Proof. by rewrite /galois subvv separable_refl normalField_refl. Qed.
 
 Lemma galoisS K M E : (K <= M <= E)%VS -> galois K E -> galois M E.
 Proof.

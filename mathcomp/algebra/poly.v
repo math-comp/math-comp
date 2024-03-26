@@ -1904,9 +1904,6 @@ Local Notation "p ^f" := (map_poly f p) : ring_scope.
 Lemma map_poly0 : 0^f = 0.
 Proof. by rewrite map_polyE polyseq0. Qed.
 
-Lemma eq_map_poly (g : aR -> rR) : f =1 g -> map_poly f =1 map_poly g.
-Proof. by move=> eq_fg p; rewrite !map_polyE (eq_map eq_fg). Qed.
-
 Lemma map_poly_id g (p : {poly iR}) :
   {in (p : seq iR), g =1 id} -> map_poly g p = p.
 Proof. by move=> g_id; rewrite map_polyE map_id_in ?polyseqK. Qed.
@@ -1915,6 +1912,9 @@ Lemma coef_map_id0 p i : f 0 = 0 -> (p^f)`_i = f p`_i.
 Proof.
 by move=> f0; rewrite coef_poly; case: ltnP => // le_p_i; rewrite nth_default.
 Qed.
+
+Lemma eq_map_poly (g : aR -> rR) : f =1 g -> map_poly f =1 map_poly g.
+Proof. by move=> eq_fg p; rewrite !map_polyE (eq_map eq_fg). Qed.
 
 Lemma map_Poly_id0 s : f 0 = 0 -> (Poly s)^f = Poly (map f s).
 Proof.

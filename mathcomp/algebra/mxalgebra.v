@@ -811,6 +811,14 @@ apply: (iffP idP) => [eqAB u | eqAB]; first by rewrite (eqmxP eqAB).
 by apply/andP; split; apply/rV_subP=> u; rewrite eqAB.
 Qed.
 
+Lemma mulmxP (m n : nat) (A B : 'M[F]_(m, n)) :
+  reflect (forall u : 'rV_m, u *m A = u *m B) (A == B).
+Proof.
+apply: (iffP eqP) => [-> //|eqAB].
+apply: (@row_full_inj _ _ _ 1%:M); first by rewrite row_full_unit unitmx1.
+by apply/row_matrixP => i; rewrite !row_mul eqAB.
+Qed.
+
 Lemma eqmx_refl m1 n (A : 'M_(m1, n)) : (A :=: A)%MS.
 Proof. by []. Qed.
 
