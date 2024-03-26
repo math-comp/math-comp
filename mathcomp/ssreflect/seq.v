@@ -1080,16 +1080,22 @@ Proof. by rewrite -size_eq0 size_filter has_count lt0n. Qed.
 (* mem_seq and index. *)
 (* mem_seq defines a predType for seq. *)
 
-Fixpoint mem_seq (s : seq T) :=
+Fixpoint mem_seq (s : seq T) : {pred T} :=
   if s is y :: s' then xpredU1 y (mem_seq s') else xpred0.
+#[reversible=no, warnings="-uniform-inheritance"]
+Coercion mem_seq : seq >-> pred_sort.
+Canonical seq_predType := PredType mem_seq.
 
+#[deprecated(since="mathcomp 2.4", note="Use seq instead")]
 Definition seq_eqclass := seq T.
-Identity Coercion seq_of_eqclass : seq_eqclass >-> seq.
+#[reversible=no, warnings="-deprecated",
+   deprecated(since="mathcomp 2.4", note="Use mem_seq instead")]
 Coercion pred_of_seq (s : seq_eqclass) : {pred T} := mem_seq s.
-
-Canonical seq_predType := PredType (pred_of_seq : seq T -> pred T).
-(* The line below makes mem_seq a canonical instance of topred. *)
-Canonical mem_seq_predType := PredType mem_seq.
+#[warnings="-ambiguous-paths -deprecated"]
+Identity Coercion seq_of_eqclass : seq_eqclass >-> seq.
+(* The line below makes pred_of_seq a canonical instance of topred. *)
+#[warnings="-deprecated"]
+Canonical seq_eqclass_predType := PredType pred_of_seq.
 
 Lemma in_cons y s x : (x \in y :: s) = (x == y) || (x \in s).
 Proof. by []. Qed.
@@ -1538,10 +1544,10 @@ End RotIndex.
 
 Definition inE := (mem_seq1, in_cons, inE).
 
-Prenex Implicits mem_seq1 constant uniq undup index.
+Prenex Implicits mem_seq mem_seq1 constant uniq undup index.
 
 Arguments eqseq {T} !_ !_.
-Arguments pred_of_seq {T} s x /.
+#[warnings="-deprecated"] Arguments pred_of_seq {T} s x /.
 Arguments eqseqP {T x y}.
 Arguments hasP {T a s}.
 Arguments hasPn {T a s}.
@@ -4724,3 +4730,32 @@ Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" :=
   (all_iff P0 (@cons Prop P1 (.. (@cons Prop Pn nil) ..))) : form_scope.
 
 Ltac tfae := do !apply: AllIffConj.
+
+Section WellOrderedChains.
+
+Lemma wo_chainW (T : eqType) R C : @wo_chain T R C -> chain R C.
+Proof.
+have ne_cons x s: nonempty [mem x :: s : seq T] by exists x; apply: mem_head.
+have all_mem s: all [mem s : seq T] s by apply/allP.
+move=> Rwo; have Rtotal: {in C &, total R}.
+  move=> x y Cx Cy; have /Rwo[] := ne_cons x [::y]; first exact/allP/and3P.
+  by move=> z [] [] /or3P[] // /eqP-> /allP/and3P[] => [_|] ->; rewrite ?orbT.
+have Rxx: {in C, reflexive R} by move=> x Cx; rewrite -[R x x]orbb Rtotal.
+have Ranti: {in C &, antisymmetric R}.
+  move=> x y Cx Cy; have /Rwo[] := ne_cons x [::y]; first exact/allP/and3P.
+  move=> z [_ Uz] /andP[Rxy Ryx]; have /and3P[xy_x xy_y _] := all_mem [:: x; y].
+  by rewrite -(Uz x) ?(Uz y); split=> //; apply/allP; rewrite /= (Rxy, Ryx) Rxx.
+suffices Rtr: {in C & &, transitive R} by apply/total_order_in.
+move=> y x z Cy Cx Cz Rxy Ryz; pose A := [mem [:: x; y; z]].
+have /and4P[Ax Ay Az _]: all A _ := all_mem _.
+have [] := Rwo A; first 1 [exact/allP/and4P | apply: ne_cons].
+move=> _ [[/or4P[]// /eqP-> /allP/and4P[// Ryx Rzy _ _]] _].
+  by rewrite (Ranti x y) ?Rxy.
+by rewrite (Ranti z y) ?Rzy.
+Qed.
+
+Lemma well_order_total (T : eqType) (R : rel T) : well_order R -> total_order R.
+Proof. by move/withinW/wo_chainW/in3T. Qed.
+
+End WellOrderedChains.
+

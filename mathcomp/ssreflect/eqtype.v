@@ -51,7 +51,9 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*    of x to e0 (resp. f x). In the first form the `: T' is optional and x   *)
 (*    can occur in a_i or e_i                                                 *)
 (*  We also define:                                                           *)
-(*   tagged_as u v == v cast as T_(tag u) if tag v == tag u, else u           *)
+(*   tagged_at u == Some y, y = tagged u cast as T_ i if tag u = i, else None *)
+(*   tagged_as u v == tagged v cast as T_(tag u) if tag v = tag u,            *)
+(*                    else tagged u                                           *)
 (*  -> We have u == v <=> (tag u == tag v) && (tagged u == tagged_as u v)     *)
 (*                                                                            *)
 (* The subType interface supports the following operations:                   *)
@@ -116,7 +118,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool.
 (*                                                                            *)
 (* The eqType interface is implemented for most standard datatypes:           *)
 (*  bool, unit, void, option, prod (denoted A * B), sum (denoted A + B),      *)
-(*  sig (denoted {x | P}), sigT (denoted {i : I & T}).                        *)
+(*  sig (denoted {x | P}), sigT (denoted {i : I & T}, and sigT2 (denoted      *)
+(*  {i : I & T1 & T2}).                                                       *)
 (*                                                                            *)
 (*   We add the following to the standard suffixes documented in ssrbool.v:   *)
 (*  1, 2, 3, 4 -- explicit enumeration predicate for 1 (singleton), 2, 3, or  *)
@@ -861,22 +864,27 @@ End OptionEqType.
 
 Arguments opt_eq {T} !u !v.
 
-Section TaggedAs.
+Section TaggedAt.
 
-Variables (I : eqType) (T_ : I -> Type).
-Implicit Types u v : {i : I & T_ i}.
+Context {I : eqType} {i : I} {T_ : I -> Type}.
 
-Definition tagged_as u v :=
-  if tag u =P tag v is ReflectT eq_uv then
-    eq_rect_r T_ (tagged v) eq_uv
-  else tagged u.
+Definition otagged_at (u : {i : I & T_ i}) : option (T_ i) :=
+  if tag u =P i isn't ReflectT Eui then None else
+  ecast j (option (T_ j)) Eui (Some (tagged u)).
 
-Lemma tagged_asE u x : tagged_as u (Tagged T_ x) = x.
-Proof.
-by rewrite /tagged_as /=; case: eqP => // eq_uu; rewrite [eq_uu]eq_axiomK.
-Qed.
+Lemma TaggedK : pcancel (Tagged T_) otagged_at.
+Proof. by unfold otagged_at => y; case: eqP => //= Eii; rewrite eq_axiomK. Qed.
 
-End TaggedAs.
+End TaggedAt.
+
+Lemma Tagged2K {I : eqType} {i T1_ T2_ y1} :
+  pcancel (@Tagged2 I i T1_ T2_ y1) (omap snd \o otagged_at \o tag_of_tag2).
+Proof. by move=> y2; rewrite /= TaggedK. Qed.
+
+Definition tagged_as {I T_} u v := odflt (tagged u) (@otagged_at I _ T_ v).
+
+Lemma tagged_asE {I T_} u x : @tagged_as I T_ u (Tagged T_ x) = x.
+Proof. by rewrite /tagged_as TaggedK. Qed.
 
 Section TagEqType.
 
@@ -899,13 +907,16 @@ Lemma tag_eqE : tag_eq = eq_op. Proof. by []. Qed.
 Lemma eq_tag u v : u == v -> tag u = tag v.
 Proof. by move/eqP->. Qed.
 
-Lemma eq_Tagged u x :(u == Tagged _ x) = (tagged u == x).
+Lemma eq_Tagged u x : (u == Tagged _ x) = (tagged u == x).
 Proof. by rewrite -tag_eqE /tag_eq eqxx tagged_asE. Qed.
 
 End TagEqType.
 
 Arguments tag_eq {I T_} !u !v.
 Arguments tag_eqP {I T_ x y}.
+
+#[hnf] HB.instance Definition _ (I : eqType) (T1_ T2_ : I -> eqType) :=
+   Equality.copy {i : I & T1_ i & T2_ i} (can_type tag_of_tag2K).
 
 Section SumEqType.
 

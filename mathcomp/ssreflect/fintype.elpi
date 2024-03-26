@@ -1,0 +1,2 @@
+  find T P {{finTypeSet lp:P}} :-
+    coq.elaborate-skeleton T {{finType}} _ ok, !.
