@@ -36,6 +36,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `path.v`
   + lemma `count_sort`
+- in `poly.v`
+  + lemmas `coef0M`, `coef0_prod`, `polyseqXaddC`, `lead_coefXaddC`,
+    `lead_coefXnaddC`, `lead_coefXnsubC`, `size_XnaddC`, `size_XnsubC`,
+	 `monicXaddC`, `lead_coef_prod_XsubC`, `monicXnaddC`, `monicXnsubC`,
+	 `prim_root_eq0`, `polyOverXn`, `polyOverXaddC`, `polyOverXnaddC`,
+	 `polyOverXnsubC`, `prim_root_charF`, `char_prim_root`, `prim_root_pi_eq0`,
+	 `prim_root_dvd_eq0`, `prim_root_natf_neq0`, `eq_in_map_poly_id0`,
+	 `eq_in_map_poly`, `map_polyXaddC`, `map_polyXsubC`, `map_prod_XsubC`,
+	 `prod_map_poly`, `mapf_root`, `lead_coef_prod`
+
+- in `ssralg.v`
+  + lemmas `prodM_comm`, `prodMl_comm`, `prodMr_comm`, `prodrMl`, `prodrMr`
+
 
 ### Changed
 
@@ -93,6 +106,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + definition `expn_rec`, use `expn` directly
   + definition `fact_rec`, use `factorial` directly
   + definition `double_rec`, use `double` directly
+
+- in `poly.v`
+  + lemma `size_Xn_sub_1`, use `size_XnsubC` instead
+  + lemma `monic_Xn_sub_1`, use `monic_XnsubC` instead
 
 ### Infrastructure
 
