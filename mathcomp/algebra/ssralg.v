@@ -591,14 +591,6 @@ HB.structure Definition Nmodule := {V of isNmodule V & Choice V}.
 
 Module NmodExports.
 Bind Scope ring_scope with Nmodule.sort.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.Nmodule.clone instead.")]
-Notation "[ 'nmodType' 'of' T 'for' cT ]" := (Nmodule.clone T cT)
-  (at level 0, format "[ 'nmodType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.Nmodule.clone instead.")]
-Notation "[ 'nmodType' 'of' T ]" :=  (Nmodule.clone T _)
-  (at level 0, format "[ 'nmodType'  'of'  T ]") : form_scope.
 End NmodExports.
 HB.export NmodExports.
 
@@ -726,14 +718,6 @@ HB.end.
 
 Module ZmodExports.
 Bind Scope ring_scope with Zmodule.sort.
-#[deprecated(since="mathcomp 2.0.0", note="use GRing.isZmodule.Build instead")]
-Notation ZmodMixin V := (isZmodule.Build V).
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Zmodule.clone instead.")]
-Notation "[ 'zmodType' 'of' T 'for' cT ]" := (Zmodule.clone T cT)
-  (at level 0, format "[ 'zmodType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Zmodule.clone instead.")]
-Notation "[ 'zmodType' 'of' T ]" :=  (Zmodule.clone T _)
-  (at level 0, format "[ 'zmodType'  'of'  T ]") : form_scope.
 End ZmodExports.
 HB.export ZmodExports.
 
@@ -922,12 +906,6 @@ HB.end.
 
 Module SemiRingExports.
 Bind Scope ring_scope with SemiRing.sort.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.SemiRing.clone instead.")]
-Notation "[ 'semiRingType' 'of' T 'for' cT ]" := (SemiRing.clone T cT)
-  (at level 0, format "[ 'semiRingType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.SemiRing.clone instead.")]
-Notation "[ 'semiRingType' 'of' T ]" := (SemiRing.clone T _)
-  (at level 0, format "[ 'semiRingType'  'of'  T ]") : form_scope.
 End SemiRingExports.
 HB.export SemiRingExports.
 
@@ -1350,12 +1328,6 @@ HB.end.
 
 Module RingExports.
 Bind Scope ring_scope with Ring.sort.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Ring.clone instead.")]
-Notation "[ 'ringType' 'of' T 'for' cT ]" := (Ring.clone T cT)
-  (at level 0, format "[ 'ringType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Ring.clone instead.")]
-Notation "[ 'ringType' 'of' T ]" := (Ring.clone T _)
-  (at level 0, format "[ 'ringType'  'of'  T ]") : form_scope.
 End RingExports.
 HB.export RingExports.
 
@@ -1643,12 +1615,6 @@ Arguments scalerA [R s] (a b)%ring_scope v.
 
 Module LmodExports.
 Bind Scope ring_scope with Lmodule.sort.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Lmodule.clone instead.")]
-Notation "[ 'lmodType' R 'of' T 'for' cT ]" := (Lmodule.clone R T%type cT)
-  (at level 0, format "[ 'lmodType'  R  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Lmodule.clone instead.")]
-Notation "[ 'lmodType' R 'of' T ]" := (Lmodule.clone R T%type _)
-  (at level 0, format "[ 'lmodType'  R  'of'  T ]") : form_scope.
 End LmodExports.
 HB.export LmodExports.
 
@@ -1743,12 +1709,6 @@ HB.structure Definition Lalgebra R :=
 
 Module LalgExports.
 Bind Scope ring_scope with Lalgebra.sort.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Lalgebra.clone instead.")]
-Notation "[ 'lalgType' R 'of' T 'for' cT ]" := (Lalgebra.clone R T%type cT)
-  (at level 0, format "[ 'lalgType'  R  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Lalgebra.clone instead.")]
-Notation "[ 'lalgType' R 'of' T ]" := (Lalgebra.clone R T%type _)
-  (at level 0, format "[ 'lalgType'  R  'of'  T ]") : form_scope.
 End LalgExports.
 HB.export LalgExports.
 
@@ -1841,16 +1801,8 @@ Module AdditiveExports.
 Module Additive.
 Definition apply_deprecated (U V : nmodType) (phUV : phant (U -> V)) :=
   @Additive.sort U V.
-#[deprecated(since="mathcomp 2.0", note="Use Additive.sort instead.")]
-Notation apply := apply_deprecated.
 End Additive.
 Notation "{ 'additive' U -> V }" := (Additive.type U%type V%type) : type_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Additive.clone instead.")]
-Notation "[ 'additive' 'of' f 'as' g ]" := (Additive.clone _ _ f%function g)
-  (at level 0, format "[ 'additive'  'of'  f  'as'  g ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Additive.clone instead.")]
-Notation "[ 'additive' 'of' f ]" := (Additive.clone _ _ f%function _)
-  (at level 0, format "[ 'additive'  'of'  f ]") : form_scope.
 End AdditiveExports.
 HB.export AdditiveExports.
 
@@ -2088,13 +2040,6 @@ HB.structure Definition RMorphism (R S : semiRingType) :=
 Module RMorphismExports.
 Notation "{ 'rmorphism' U -> V }" := (RMorphism.type U%type V%type)
   : type_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.RMorphism.clone instead.")]
-Notation "[ 'rmorphism' 'of' f 'as' g ]" := (RMorphism.clone _ _ f%function g)
-  (at level 0, format "[ 'rmorphism'  'of'  f  'as'  g ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.RMorphism.clone instead.")]
-Notation "[ 'rmorphism' 'of' f ]" := (RMorphism.clone _ _ f%function _)
-  (at level 0, format "[ 'rmorphism'  'of'  f ]") : form_scope.
 End RMorphismExports.
 HB.export RMorphismExports.
 
@@ -2292,8 +2237,6 @@ Module Linear.
 Section Linear.
 Variables (R : ringType) (U : lmodType R) (V : zmodType) (s : R -> V -> V).
 Definition apply_deprecated (phUV : phant (U -> V)) := @Linear.sort R U V s.
-#[deprecated(since="mathcomp 2.0", note="Use Linear.sort instead.")]
-Notation apply := apply_deprecated.
 (* Support for right-to-left rewriting with the generic linearZ rule. *)
 Local Notation mapUV := (@Linear.type R U V s).
 Definition map_class := mapUV.
@@ -2310,12 +2253,6 @@ Notation "{ 'linear' U -> V }" := {linear U%type -> V%type | *:%R}
   : type_scope.
 Notation "{ 'scalar' U }" := {linear U -> _ | *%R}
   (at level 0, format "{ 'scalar'  U }") : type_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Linear.clone instead.")]
-Notation "[ 'linear' 'of' f 'as' g ]" := (Linear.clone _ _ _ _ f%function g)
-  (at level 0, format "[ 'linear'  'of'  f  'as'  g ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Linear.clone instead.")]
-Notation "[ 'linear' 'of' f ]" := (Linear.clone _ _ _ _ f%function _)
-  (at level 0, format "[ 'linear'  'of'  f ]") : form_scope.
 (* Support for right-to-left rewriting with the generic linearZ rule. *)
 Coercion Linear.map_for_map : Linear.map_for >-> Linear.type.
 Coercion Linear.unify_map_at : Linear.map_at >-> Linear.map_for.
@@ -2493,17 +2430,11 @@ Module LRMorphismExports.
 Module LRMorphism.
 Definition apply_deprecated (R : ringType) (A : lalgType R) (B : ringType)
   (s : R -> B -> B) (phAB : phant (A -> B)) := @LRMorphism.sort R A B s.
-#[deprecated(since="mathcomp 2.0", note="Use LRMorphism.sort instead.")]
-Notation apply := apply_deprecated.
 End LRMorphism.
 Notation "{ 'lrmorphism' A -> B | s }" := (@LRMorphism.type _ A%type B%type s)
   : type_scope.
 Notation "{ 'lrmorphism' A -> B }" := {lrmorphism A%type -> B%type | *:%R}
   : type_scope.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.LRMorphism.clone instead.")]
-Notation "[ 'lrmorphism' 'of' f ]" := (LRMorphism.clone _ _ _ _ f%function _)
-  (at level 0, format "[ 'lrmorphism'  'of'  f ]") : form_scope.
 End LRMorphismExports.
 HB.export LRMorphismExports.
 
@@ -2529,14 +2460,6 @@ HB.structure Definition ComSemiRing :=
 
 Module ComSemiRingExports.
 Bind Scope ring_scope with ComSemiRing.sort.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.ComSemiRing.clone instead.")]
-Notation "[ 'comSemiRingType' 'of' T 'for' cT ]" := (ComSemiRing.clone T cT)
-  (at level 0, format "[ 'comSemiRingType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.ComSemiRing.clone instead.")]
-Notation "[ 'comSemiRingType' 'of' T ]" := (ComSemiRing.clone T _)
-  (at level 0, format "[ 'comSemiRingType'  'of'  T ]") : form_scope.
 End ComSemiRingExports.
 HB.export ComSemiRingExports.
 
@@ -2628,14 +2551,6 @@ HB.end.
 
 Module ComRingExports.
 Bind Scope ring_scope with ComRing.sort.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.ComSemiRing.clone instead.")]
-Notation "[ 'comRingType' 'of' T 'for' cT ]" := (ComRing.clone T%type cT)
-  (at level 0, format "[ 'comRingType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.ComSemiRing.clone instead.")]
-Notation "[ 'comRingType' 'of' T ]" := (ComRing.clone T%type _)
-  (at level 0, format "[ 'comRingType'  'of'  T ]") : form_scope.
 End ComRingExports.
 HB.export ComRingExports.
 
@@ -2728,13 +2643,6 @@ HB.structure Definition Algebra (R : ringType) :=
 
 Module AlgExports.
 Bind Scope ring_scope with Algebra.sort.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Algebra.clone instead.")]
-Notation "[ 'algType' R 'of' T 'for' cT ]" := (Algebra.clone R T%type cT)
-  (at level 0, format "[ 'algType'  R  'of'  T  'for'  cT ]")
-  : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Algebra.clone instead.")]
-Notation "[ 'algType' R 'of' T ]" := (Algebra.clone R T%type _)
-  (at level 0, format "[ 'algType'  R  'of'  T ]") : form_scope.
 End AlgExports.
 HB.export AlgExports.
 
@@ -2754,10 +2662,6 @@ HB.structure Definition ComAlgebra R := {V of ComRing V & Algebra R V}.
 
 Module ComAlgExports.
 Bind Scope ring_scope with ComAlgebra.sort.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.ComAlgebra.clone instead.")]
-Notation "[ 'comAlgType' R 'of' T ]" := (ComAlgebra.clone R T%type _)
-  (at level 0, format "[ 'comAlgType'  R  'of'  T ]") : form_scope.
 End ComAlgExports.
 HB.export ComAlgExports.
 
@@ -2832,12 +2736,6 @@ HB.structure Definition UnitRing := {R of Ring_hasMulInverse R & Ring R}.
 
 Module UnitRingExports.
 Bind Scope ring_scope with UnitRing.sort.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.UnitRing.clone instead.")]
-Notation "[ 'unitRingType' 'of' T 'for' cT ]" := (UnitRing.clone T%type cT)
-  (at level 0, format "[ 'unitRingType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.UnitRing.clone instead.")]
-Notation "[ 'unitRingType' 'of' T ]" := (UnitRing.clone T%type _)
-  (at level 0, format "[ 'unitRingType'  'of'  T ]") : form_scope.
 End UnitRingExports.
 HB.export UnitRingExports.
 
@@ -3119,10 +3017,6 @@ HB.structure Definition ComUnitRing := {R of ComRing R & UnitRing R}.
 
 Module ComUnitRingExports.
 Bind Scope ring_scope with ComUnitRing.sort.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.ComUnitRing.clone instead.")]
-Notation "[ 'comUnitRingType' 'of' T ]" := (ComUnitRing.clone T%type _)
-  (at level 0, format "[ 'comUnitRingType'  'of'  T ]") : form_scope.
 End ComUnitRingExports.
 HB.export ComUnitRingExports.
 
@@ -3153,10 +3047,6 @@ HB.structure Definition UnitAlgebra R := {V of Algebra R V & UnitRing V}.
 
 Module UnitAlgebraExports.
 Bind Scope ring_scope with UnitAlgebra.sort.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.UnitAlgebra.clone instead.")]
-Notation "[ 'unitAlgType' R 'of' T ]" := (UnitAlgebra.clone R T%type _)
-  (at level 0, format "[ 'unitAlgType'  R  'of'  T ]") : form_scope.
 End UnitAlgebraExports.
 HB.export UnitAlgebraExports.
 
@@ -3165,10 +3055,6 @@ HB.structure Definition ComUnitAlgebra R := {V of ComAlgebra R V & UnitRing V}.
 
 Module ComUnitAlgebraExports.
 Bind Scope ring_scope with UnitAlgebra.sort.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.ComUnitAlgebra.clone instead.")]
-Notation "[ 'comUnitAlgType' R 'of' T ]" := (ComUnitAlgebra.clone R T%type _)
-  (at level 0, format "[ 'comUnitAlgType'  R  'of'  T ]") : form_scope.
 End ComUnitAlgebraExports.
 HB.export ComUnitAlgebraExports.
 
@@ -3948,14 +3834,6 @@ HB.structure Definition IntegralDomain :=
 
 Module IntegralDomainExports.
 Bind Scope ring_scope with IntegralDomain.sort.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.IntegralDomain.clone instead.")]
-Notation "[ 'idomainType' 'of' T 'for' cT ]" := (IntegralDomain.clone T%type cT)
-  (at level 0, format "[ 'idomainType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.IntegralDomain.clone instead.")]
-Notation "[ 'idomainType' 'of' T ]" := (IntegralDomain.clone T%type _)
-  (at level 0, format "[ 'idomainType'  'of'  T ]") : form_scope.
 End IntegralDomainExports.
 HB.export IntegralDomainExports.
 
@@ -4093,12 +3971,6 @@ HB.structure Definition Field := { R of IntegralDomain R & UnitRing_isField R }.
 
 Module FieldExports.
 Bind Scope ring_scope with Field.sort.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Field.clone instead.")]
-Notation "[ 'fieldType' 'of' T 'for' cT ]" := (Field.clone T%type cT)
-  (at level 0, format "[ 'fieldType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use GRing.Field.clone instead.")]
-Notation "[ 'fieldType' 'of' T ]" := (Field.clone T%type _)
-  (at level 0, format "[ 'fieldType'  'of'  T ]") : form_scope.
 End FieldExports.
 HB.export FieldExports.
 
@@ -4331,14 +4203,6 @@ HB.structure Definition DecidableField := { F of Field F & Field_isDecField F }.
 
 Module DecFieldExports.
 Bind Scope ring_scope with DecidableField.sort.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.DecidableField.clone instead.")]
-Notation "[ 'decFieldType' 'of' T 'for' cT ]" := (DecidableField.clone T%type cT)
-  (at level 0, format "[ 'decFieldType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.DecidableField.clone instead.")]
-Notation "[ 'decFieldType' 'of' T ]" := (DecidableField.clone T%type _)
-  (at level 0, format "[ 'decFieldType'  'of'  T ]") : form_scope.
 End DecFieldExports.
 HB.export DecFieldExports.
 
@@ -4532,14 +4396,6 @@ HB.structure Definition ClosedField :=
 
 Module ClosedFieldExports.
 Bind Scope ring_scope with ClosedField.sort.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.ClosedField.clone instead.")]
-Notation "[ 'closedFieldType' 'of' T 'for' cT ]" := (ClosedField.clone T%type cT)
-  (at level 0, format "[ 'closedFieldType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use GRing.ClosedField.clone instead.")]
-Notation "[ 'closedFieldType' 'of' T ]" := (ClosedField.clone T%type _)
-  (at level 0, format "[ 'closedFieldType'  'of'  T ]") : form_scope.
 End ClosedFieldExports.
 HB.export ClosedFieldExports.
 
@@ -6017,8 +5873,6 @@ Definition rmorph_nat := rmorph_nat.
 Definition rmorph_eq_nat := rmorph_eq_nat.
 Definition rmorph_prod := rmorph_prod.
 Definition rmorphXn := rmorphXn.
-#[deprecated(since="mathcomp 1.17.0", note="Use rmorphXn instead.")]
-Notation rmorphX := rmorphXn.
 Definition rmorphN1 := rmorphN1.
 Definition rmorph_sign := rmorph_sign.
 Definition rmorph_char := rmorph_char.

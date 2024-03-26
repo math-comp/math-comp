@@ -94,8 +94,6 @@ Import GRing.Theory.
 #[short(type="falgType")]
 HB.structure Definition Falgebra (R : ringType) :=
   { A of Vector R A & GRing.UnitAlgebra R A }.
-#[deprecated(since="mathcomp 2.0.0", note="Use falgType instead.")]
-Notation FalgType := falgType.
 
 (* Supply a default unitRing mixin for the default unitAlgType base type. *)
 HB.factory Record Algebra_isFalgebra (K : fieldType) A
@@ -132,14 +130,6 @@ HB.end.
 
 Module FalgebraExports.
 Bind Scope ring_scope with sort.
-#[deprecated(since="mathcomp 2.0.0", note="Use Falgebra.clone instead.")]
-Notation "[ 'FalgType' F 'of' L ]" := (Falgebra.clone F L%type _)
-  (at level 0, format "[ 'FalgType'  F  'of'  L ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use Falgebra.clone instead.")]
-Notation "[ 'FalgType' F 'of' L 'for' L' ]" := (Falgebra.clone F L%type L')
-  (at level 0, format "[ 'FalgType'  F  'of'  L  'for'  L' ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use Algebra_isFalgebra.Build instead.")]
-Notation FalgUnitRingType T := (Algebra_isFalgebra.Build _ T).
 End FalgebraExports.
 HB.export FalgebraExports.
 
