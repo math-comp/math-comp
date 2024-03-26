@@ -1030,8 +1030,13 @@ Qed.
 Definition inIntSpan (V : zmodType) m (s : m.-tuple V) v :=
   exists a : int ^ m, v = \sum_(i < m) s`_i *~ a i.
 
-Lemma dec_Qint_span (vT : vectType rat) m (s : m.-tuple vT) v :
-  decidable (inIntSpan s v).
+Lemma solve_Qint_span (vT : vectType rat) m (s : m.-tuple vT) v :
+  {b : int ^ m &
+  {p : seq (int ^ m) &
+  forall a : int ^ m,
+  v = \sum_(i < m) s`_i *~ a i <->
+  exists c : seq int, a = b + \sum_(i < size p) p`_i *~ c`_i}} +
+  (~ inIntSpan s v).
 Proof.
 have s_s (i : 'I_m): s`_i \in <<s>>%VS by rewrite memv_span ?memt_nth.
 have s_Zs a: \sum_(i < m) s`_i *~ a i \in <<s>>%VS.
@@ -1051,7 +1056,8 @@ have [K kerK]: {K : 'M_(k, m) | map_mx intr K == kermx S}%MS.
   by rewrite intr_eq0; apply/prodf_neq0 => i _; apply: denq_neq0.
 have [L _ [G uG [D _ defK]]] := int_Smith_normal_form K.
 pose Gud := castmx (Dm, Em) G; pose G'lr := castmx (Em, Dm) (invmx G).
-have{K L D defK kerK} kerGu: map_mx intr (usubmx Gud) *m S = 0.
+have{K L D defK kerK} [kerGu kerS_sub_Gu]: map_mx intr (usubmx Gud) *m S = 0 /\
+    (kermx S <= map_mx intr (usubmx Gud))%MS.
   pose Kl : 'M[rat]_k:= map_mx intr (lsubmx (castmx (Ek, Dm) (K *m invmx G))).
   have{} defK: map_mx intr K = row_mx Kl 0 *m map_mx intr Gud.
     rewrite -[K](mulmxKV uG) -{2}[G](castmxK Dm Em) -/Gud.
@@ -1061,6 +1067,9 @@ have{K L D defK kerK} kerGu: map_mx intr (usubmx Gud) *m S = 0.
     congr (row_mx _ _ *m _); apply/matrixP=> i j; rewrite !mxE defK mulmxK //=.
     rewrite castmxE mxE big1 //= => j1 _; rewrite mxE /= eqn_leq andbC.
     by rewrite leqNgt (leq_trans (valP j1)) ?mulr0 ?leq_addr.
+  split; last first.
+    rewrite -(eqmxP kerK); apply/submxP; exists Kl.
+    by rewrite defK -{1}[Gud]vsubmxK map_col_mx mul_row_col mul0mx addr0.
   have /row_full_inj: row_full Kl; last apply.
     rewrite /row_full eqn_leq rank_leq_row /= -{1}[k](mxrank_ker S).
     rewrite -(eqmxP kerK) defK map_castmx mxrankMfree; last first.
@@ -1070,7 +1079,7 @@ have{K L D defK kerK} kerGu: map_mx intr (usubmx Gud) *m S = 0.
   rewrite mulmx0 mulmxA (sub_kermxP _) // -(eqmxP kerK) defK.
   by rewrite -{2}[Gud]vsubmxK map_col_mx mul_row_col mul0mx addr0.
 pose T := map_mx intr (dsubmx Gud) *m S.
-have{kerGu} defS: map_mx intr (rsubmx G'lr) *m T = S.
+have defS: map_mx intr (rsubmx G'lr) *m T = S.
   have: G'lr *m Gud = 1%:M by rewrite /G'lr /Gud; case: _ / (Dm); apply: mulVmx.
   rewrite -{1}[G'lr]hsubmxK -[Gud]vsubmxK mulmxA mul_row_col -map_mxM.
   move/(canRL (addKr _))->; rewrite -mulNmx raddfD /= map_mx1 map_mxM /=.
@@ -1084,17 +1093,49 @@ have uS: row_full S.
   by apply: eq_bigr => i _; rewrite !mxE (tnth_nth 0) !linearZ.
 have eqST: (S :=: T)%MS by apply/eqmxP; rewrite -{1}defS !submxMl.
 case Zv: (map_mx denq (vv *m pinvmx T) == const_mx 1).
-  pose a := map_mx numq (vv *m pinvmx T) *m dsubmx Gud.
-  left; exists [ffun j => a 0 j].
-  transitivity (\sum_j (map_mx intr a *m S) 0 j *: (vbasis <<s>>)`_j).
-    rewrite {1}(coord_vbasis s_v); apply: eq_bigr => j _; congr (_ *: _).
-    have ->: map_mx intr a = vv *m pinvmx T *m map_mx intr (dsubmx Gud).
-      rewrite map_mxM /=; congr (_ *m _); apply/rowP=> i; rewrite 2!mxE numqE.
-      by have /eqP/rowP/(_ i)/[!mxE]-> := Zv; rewrite mulr1.
-    by rewrite -(mulmxA _ _ S) mulmxKpV ?mxE // -eqST submx_full.
-  rewrite (coord_vbasis (s_Zs _)); apply: eq_bigr => j _; congr (_ *: _).
-  rewrite linear_sum mxE; apply: eq_bigr => i _.
-  by rewrite -scaler_int linearZ [a]lock !mxE ffunE.
+  pose b := map_mx numq (vv *m pinvmx T) *m dsubmx Gud.
+  left; exists [ffun j => b 0 j], [seq [ffun j => (usubmx Gud) i j] | i : 'I_k].
+  rewrite size_image card_ord => a; rewrite -[a](addNKr [ffun j => b 0 j]).
+  move: (_ + a) => h; under eq_bigr => i _ do rewrite !ffunE mulrzDr_tmp.
+  rewrite big_split /=.
+  have <-: v = \sum_(i < m) s`_i *~ b 0 i.
+    transitivity (\sum_j (map_mx intr b *m S) 0 j *: (vbasis <<s>>)`_j).
+      rewrite {1}(coord_vbasis s_v); apply: eq_bigr => j _; congr (_ *: _).
+      have ->: map_mx intr b = vv *m pinvmx T *m map_mx intr (dsubmx Gud).
+        rewrite map_mxM /=; congr (_ *m _); apply/rowP=> i; rewrite 2!mxE numqE.
+        by have /eqP/rowP/(_ i)/[!mxE]-> := Zv; rewrite mulr1.
+      by rewrite -(mulmxA _ _ S) mulmxKpV ?mxE // -eqST submx_full.
+    rewrite (coord_vbasis (s_Zs _)); apply: eq_bigr => j _; congr (_ *: _).
+    rewrite linear_sum mxE; apply: eq_bigr => i _.
+    by rewrite -scaler_int linearZ [b]lock !mxE.
+  split.
+    rewrite -[LHS]addr0 => /addrI hP; pose c := \row_i h i *m lsubmx G'lr.
+    exists [seq c 0 i | i : 'I_k]; congr (_ + _).
+    have/sub_kermxP: map_mx intr (\row_i h i) *m S = 0.
+      transitivity (\row_j coord (vbasis <<s>>) j (\sum_(i < m) s`_i *~ h i)).
+        apply/rowP=> j; rewrite !mxE linear_sum; apply: eq_bigr => i _.
+        by rewrite !mxE -scaler_int linearZ.
+      by apply/rowP=> j; rewrite !mxE -hP linear0.
+    case/submx_trans/(_ kerS_sub_Gu)/submxP=> c' /[dup].
+    move/(congr1 (mulmx^~ (map_mx intr (lsubmx G'lr)))).
+    rewrite -mulmxA -!map_mxM [in RHS]mulmx_lsub mul_usub_mx -/c /=.
+    have ->: Gud *m G'lr = 1%:M
+      by rewrite /G'lr /Gud; case: _ / (Dm); apply: mulmxV.
+    rewrite scalar_mx_block -/(ulsubmx _) block_mxKul map_scalar_mx mulmx1.
+    move=> {c'}<-; rewrite -map_mxM /= => defh; apply/ffunP=> j.
+    move/rowP/(_ j): defh; rewrite sum_ffunE !mxE; move/intr_inj->.
+    apply: eq_bigr => i _; rewrite ffunMzE mulrzz mulrC.
+    rewrite (nth_map i) ?size_enum_ord // nth_ord_enum ffunE.
+    by rewrite (nth_map i) ?size_enum_ord // nth_ord_enum.
+  case=> c {h}/addrI->; rewrite -[LHS]addr0; congr (_ + _).
+  pose h := \row_(j < k) c`_j *m usubmx Gud.
+  transitivity (\sum_j (map_mx intr h *m S) 0 j *: (vbasis <<s>>)`_j).
+    by rewrite map_mxM -mulmxA kerGu mulmx0 big1 // => j _; rewrite mxE scale0r.
+  rewrite (coord_vbasis (s_Zs _)); apply: eq_bigr => i _; congr (_ *: _).
+  rewrite linear_sum mxE; apply: eq_bigr => j _.
+  rewrite -scaler_int linearZ !mxE sum_ffunE; congr (_%:~R * _).
+  apply: {i} eq_bigr => i _; rewrite mxE ffunMzE mulrzz mulrC.
+  by rewrite (nth_map i) ?size_enum_ord // ffunE nth_ord_enum.
 right=> [[a Dv]]; case/eqP: Zv; apply/rowP.
 have ->: vv = map_mx intr (\row_i a i) *m S.
   apply/rowP=> j; rewrite !mxE Dv linear_sum.
@@ -1103,4 +1144,12 @@ rewrite -defS -2!mulmxA; have ->: T *m pinvmx T = 1%:M.
   have uT: row_free T by rewrite /row_free -eqST.
   by apply: (row_free_inj uT); rewrite mul1mx mulmxKpV.
 by move=> i; rewrite mulmx1 -map_mxM 2!mxE denq_int mxE.
+Qed.
+
+Lemma dec_Qint_span (vT : vectType rat) m (s : m.-tuple vT) v :
+  decidable (inIntSpan s v).
+Proof.
+have [[b [p aP]]|] := solve_Qint_span s v; last by right.
+left; exists b; apply/(aP b); exists [::]; rewrite big1 ?addr0 // => i _.
+by rewrite nth_nil mulr0z.
 Qed.

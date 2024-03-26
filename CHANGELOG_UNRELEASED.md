@@ -50,6 +50,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `prodM_comm`, `prodMl_comm`, `prodMr_comm`, `prodrMl`, `prodrMr`
 
 
+- in `intdiv.v`
+  + lemma `solve_Qint_span`
+
 ### Changed
 
 - in `bigop.v`
