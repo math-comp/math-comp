@@ -70,6 +70,10 @@ with builtins; with (import <nixpkgs> {}).lib;
          #   for a complete list of Coq packages available in Nix
          # * <github_login>:<branch> is such that this will use the branch <branch>
          #   from https://github.com/<github_login>/<repository>
+         mathcomp-analysis.override.version = "math-comp:hb-semilattices";
+         mathcomp-classical.override.version = "math-comp:hb-semilattices";
+         multinomials.override.version = "math-comp:hb-semilattices";
+         deriving.override.version = "pi8027:hb-semilattices";
        };
   in {
     "coq-master".push-branches = [ "master" "mathcomp-1" ];
