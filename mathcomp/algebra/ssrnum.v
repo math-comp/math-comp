@@ -186,7 +186,8 @@ HB.export ArchiNumDomainExports.
 Module Import Def.
 
 Notation normr := norm.
-
+Notation "`| x |" := (norm x) : ring_scope.
+  
 Notation ler := (@Order.le ring_display _) (only parsing).
 Notation "@ 'ler' R" := (@Order.le ring_display R)
   (at level 10, R at level 8, only parsing) : function_scope.
