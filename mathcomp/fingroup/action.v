@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat div seq.
-From mathcomp Require Import fintype bigop finset fingroup morphism perm.
+From mathcomp Require Import prime fintype bigop finset fingroup morphism perm.
 From mathcomp Require Import automorphism quotient.
 
 (******************************************************************************)
@@ -2724,6 +2724,35 @@ Proof. by apply/permP=> x; rewrite permE. Qed.
 Lemma autact_is_groupAction : is_groupAction G aut_action.
 Proof. by move=> a Aa /=; rewrite autactK. Qed.
 Canonical aut_groupAction := GroupAction autact_is_groupAction.
+
+Section prime_orbit.
+Variable (T : finType) (c : {perm T}).
+Hypothesis Tp :  prime #|T|.
+Hypothesis cc : #[c]%g = #|T|.
+Let cp : prime #[c]%g. Proof. by rewrite cc. Qed.
+
+Lemma prime_atrans : [transitive <[c]>, on setT | 'P].
+Proof using c Tp cc.
+apply/imsetP; suff /existsP[x] : [exists x, ~~ (#|orbit 'P <[c]> x| < #[c])].
+  move=> oxT; suff /eqP orbit_x : orbit 'P <[c]> x == setT by exists x.
+  by rewrite eqEcard subsetT cardsT -cc leqNgt.
+apply/forallP => olT; have o1 x : #|orbit 'P <[c]> x| == 1%N.
+  by case/primeP: cp => _ /(_ _ (dvdn_orbit 'P _ x))/orP[]//; rewrite ltn_eqF.
+suff c1 : c = 1%g by rewrite c1 ?order1 in (cp).
+apply/permP => x; rewrite perm1; apply/set1P.
+by rewrite -(card_orbit1 (eqP (o1 _))) (mem_orbit 'P) ?cycle_id.
+Qed.
+
+Lemma prime_orbit x : orbit 'P <[c]> x = [set: T].
+Proof using c Tp cc. by apply: atransP => //; apply: prime_atrans. Qed.
+
+Lemma prime_astab x : 'C_<[c]>[x | 'P]%g = 1%g.
+Proof using c Tp cc.
+by apply/card1_trivg/eqP; rewrite -(@eqn_pmul2l #|orbit 'P <[c]> x|)
+   ?card_orbit_stab ?prime_orbit ?cardsT ?muln1 ?prime_gt0// -cc.
+Qed.
+
+End prime_orbit.
 
 End AutAct.
 
