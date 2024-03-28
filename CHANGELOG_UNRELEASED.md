@@ -63,6 +63,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Renamed
 
+- in `binomial.v`
+  + lemma `triangular_sum` renamed as `bin2_sum`
+
 ### Removed
 
 - in `div.v`
@@ -87,6 +90,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `commutator.v`
   + definition `derived_at_rec`, use `derived_at` directly
 
+- in `binomial.v`
+  + lemma `textbook_triangular_sum`
+
 ### Deprecated
 
 - in `ssreflect.v`
@@ -110,6 +116,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `poly.v`
   + lemma `size_Xn_sub_1`, use `size_XnsubC` instead
   + lemma `monic_Xn_sub_1`, use `monic_XnsubC` instead
+
+- in `binomial.v`
+  + lemma `triangular_sum`, use `bin2_sum` instead
+  + lemma `Pascal`, use `expnDn` instead
 
 ### Infrastructure
 

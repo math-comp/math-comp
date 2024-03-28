@@ -12,7 +12,7 @@ From mathcomp Require Import div fintype tuple finfun bigop prime finset.
 (*               Note that n ^_ m = 0 if m > n, and 'C(n, m) = n ^_ m %/ m`!. *)
 (*                                                                            *)
 (* In additions to the properties of these functions, we prove a few seminal  *)
-(* results such as triangular_sum, Wilson and Pascal; their proofs are good   *)
+(* results such as bin2_sum, Wilson and expnDn; their proofs are good         *)
 (* examples of how to manipulate expressions with bigops.                     *)
 (******************************************************************************)
 
@@ -277,21 +277,26 @@ suffices /Gauss_dvdr<-: coprime p (p - k) by rewrite -mul_bin_down dvdn_mulr.
 by rewrite prime_coprime // dvdn_subr 1?ltnW // gtnNdvd.
 Qed.
 
-Lemma triangular_sum n : \sum_(0 <= i < n) i = 'C(n, 2).
+Lemma bin2_sum n : \sum_(0 <= i < n) i = 'C(n, 2).
 Proof.
 elim: n => [|n IHn]; first by rewrite big_geq.
 by rewrite big_nat_recr // IHn binS bin1.
 Qed.
 
+#[deprecated(since="mathcomp 2.3", note="Use bin2_sum instead.")]
+Definition triangular_sum := bin2_sum.
+
+(* textbook proof of `bin2_sum`. Should be moved out of the main
+  library, to a dedicated "showcase" library.
 Lemma textbook_triangular_sum n : \sum_(0 <= i < n) i = 'C(n, 2).
 Proof.
 rewrite bin2; apply: canRL half_double _.
 rewrite -addnn {1}big_nat_rev -big_split big_mkord /= ?add0n.
 rewrite (eq_bigr (fun _ => n.-1)); first by rewrite sum_nat_const card_ord.
 by case: n => [|n] [i le_i_n] //=; rewrite subSS subnK.
-Qed.
+Qed. *)
 
-Theorem Pascal a b n :
+Theorem expnDn a b n :
   (a + b) ^ n = \sum_(i < n.+1) 'C(n, i) * (a ^ (n - i) * b ^ i).
 Proof.
 elim: n => [|n IHn]; rewrite big_ord_recl muln1 ?big_ord0 //.
@@ -301,7 +306,9 @@ congr (_ + _); rewrite addnA -big_split /=; congr (_ + _).
 apply: eq_bigr => i _; rewrite mulnCA (mulnA a) -expnS subnSK //=.
 by rewrite (mulnC b) -2!mulnA -expnSr -mulnDl.
 Qed.
-Definition expnDn := Pascal.
+
+#[deprecated(since="mathcomp 2.3", note="Use expnDn instead.")]
+Definition Pascal := expnDn.
 
 Lemma Vandermonde k l i :
   \sum_(j < i.+1) 'C(k, j) * 'C(l, i - j) = 'C(k + l , i).
