@@ -2,9 +2,10 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import div fintype tuple tuple bigop prime finset fingroup.
-From mathcomp Require Import morphism perm automorphism quotient action cyclic.
-From mathcomp Require Import pgroup gseries sylow primitive_action.
+From mathcomp Require Import div fintype tuple tuple bigop prime finset ssralg.
+From mathcomp Require Import zmodp fingroup morphism perm automorphism quotient.
+From mathcomp Require Import action cyclic pgroup gseries sylow.
+From mathcomp Require Import primitive_action nilpotent maximal.
 
 (******************************************************************************)
 (*  Definitions of the symmetric and alternate groups, and some properties.   *)
@@ -18,7 +19,7 @@ Unset Printing Implicit Defensive.
 Set Implicit Arguments.
 Unset Strict Implicit.
 
-Import GroupScope.
+Import GroupScope GRing.
 
 HB.instance Definition _ := isMulGroup.Build bool addbA addFb addbb.
 
@@ -514,3 +515,79 @@ case/negP: diff_hgx_z.
 rewrite -HH !mulgA -h_k_com -!mulgA [k * _]mulgA.
 by rewrite -g_k_com -!mulgA mulgV mulg1.
 Qed.
+
+Lemma gen_tperm_cycle (X : finType) x y c : prime #|X| ->
+  x != y -> #[c]%g = #|X| ->
+  <<[set tperm x y; c]>>%g = ('Sym_X)%g.
+Proof.
+move=> Xprime neq_xy ord_c; apply/eqP; rewrite eqEsubset subsetT/=.
+have c_gt1 : (1 < #[c]%g)%N by rewrite ord_c prime_gt1.
+have cppSS : #[c]%g.-2.+2 = #|X| by rewrite ?prednK ?ltn_predRL.
+pose f (i : 'Z_#[c]%g) : X := Zpm i x.
+have [g fK gK] : bijective f.
+  apply: inj_card_bij; rewrite ?cppSS ?card_ord// /f /Zpm => i j cijx.
+  pose stabx := ('C_<[c]>[x | 'P])%g.
+  have cjix : (c ^+ (j - i)%R)%g x = x.
+    by apply: (@perm_inj _ (c ^+ i)%g); rewrite -permM -expgDzmod// addrNK.
+  have : (c ^+ (j - i)%R)%g \in stabx.
+    by rewrite !inE ?groupX ?mem_gen ?sub1set ?inE// ['P%act _ _]cjix eqxx.
+  rewrite [stabx]prime_astab// => /set1gP.
+  move=> /(congr1 (mulg (c ^+ i))); rewrite -expgDzmod// addrC addrNK mulg1.
+  by move=> /eqP; rewrite eq_expg_ord// ?cppSS ?ord_c// => /eqP->.
+pose gsf s := g \o s \o f.
+have gsf_inj (s : {perm X}) : injective (gsf s).
+  apply: inj_comp; last exact: can_inj fK.
+  by apply: inj_comp; [exact: can_inj gK|exact: perm_inj].
+pose fsg s := f \o s \o g.
+have fsg_inj (s : {perm _}) : injective (fsg s).
+  apply: inj_comp; last exact: can_inj gK.
+  by apply: inj_comp; [exact: can_inj fK|exact: perm_inj].
+have gsf_morphic : morphic 'Sym_X (fun s => perm (gsf_inj s)).
+  apply/morphicP => u v _ _; apply/permP => /= i.
+  by rewrite !permE/= !permE /gsf /= gK permM.
+pose phi := morphm gsf_morphic; rewrite /= in phi.
+have phi_inj : ('injm phi)%g.
+  apply/subsetP => /= u /mker/=; rewrite morphmE => gsfu1.
+  apply/set1gP/permP=> z; have /permP/(_ (g z)) := gsfu1.
+  by rewrite !perm1 permE /gsf/= gK => /(can_inj gK).
+have phiT : (phi @* 'Sym_X)%g = [set: {perm 'Z_#[c]%g}].
+  apply/eqP; rewrite eqEsubset subsetT/=; apply/subsetP => /= u _.
+  apply/morphimP; exists (perm (fsg_inj u)); rewrite ?in_setT//.
+  by apply/permP => /= i; rewrite morphmE permE /gsf/fsg/= permE/= !fK.
+have f0 : f 0%R = x by rewrite /f /Zpm permX.
+pose k := g y; have k_gt0 : (k > 0)%N.
+  by rewrite lt0n (val_eqE k 0%R) -(can_eq fK) eq_sym gK f0.
+have phixy : phi (tperm x y) = tperm (0%R : 'Z_#[c]) k.
+  apply/permP => i; rewrite permE/= /gsf/=; apply: (canLR fK).
+  by rewrite !permE/= -f0 -[y]gK !(can_eq fK) -!fun_if.
+have phic : phi c = perm (addrI (1%R : 'Z_#[c])).
+  apply/permP => i; rewrite /phi morphmE !permE /gsf/=; apply: (canLR fK).
+  by rewrite /f /Zpm -permM addrC expgDzmod.
+rewrite -(injmSK phi_inj)//= morphim_gen/= ?subsetT//= -/phi.
+rewrite phiT /morphim !setTI/= -/phi imsetU1 imset_set1/= phixy phic.
+suff /gen_tpermn_cycle<- : coprime #[c]%g.-2.+2 (k - 0)%R by [].
+by rewrite subr0 prime_coprime ?gtnNdvd// ?cppSS.
+Qed.
+
+Section Perm_solvable.
+Local Open Scope nat_scope.
+
+Variable T : finType.
+
+Lemma solvable_AltF : 4 < #|T| -> solvable 'Alt_T = false.
+Proof.
+move=> card_T; apply/negP => Alt_solvable.
+have/simple_Alt5 Alt_simple := card_T.
+have := simple_sol_prime Alt_solvable Alt_simple.
+have lt_T n : n <= 4 -> n < #|T| by move/leq_ltn_trans; apply.
+have -> : #|('Alt_T)%G| = #|T|`! %/ 2 by rewrite -card_Alt ?mulKn ?lt_T.
+move/even_prime => [/eqP|]; apply/negP.
+  rewrite neq_ltn leq_divRL // mulnC -[2 * 3]/(3`!).
+  by apply/orP; right; apply/ltnW/ltn_fact/lt_T.
+by rewrite -dvdn2 dvdn_divRL dvdn_fact //=; apply/ltnW/lt_T.
+Qed.
+
+Lemma solvable_SymF : 4 < #|T| -> solvable 'Sym_T = false.
+Proof. by rewrite (series_sol (Alt_normal T)) => /solvable_AltF->. Qed.
+
+End Perm_solvable.
