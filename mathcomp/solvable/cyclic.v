@@ -103,6 +103,19 @@ move/inj_eq=> eqZ; symmetry; rewrite -(Zp_cast lt1a).
 by rewrite -[_ == _](eqZ (inZp m) (inZp n)) /Zpm /= Zp_cast ?expg_mod_order.
 Qed.
 
+Lemma eq_expg_ord d (m n : 'I_d) :
+  (d <= #[a]%g)%N -> (a ^+ m == a ^+ n) = (m == n).
+Proof.
+by move=> d_leq; rewrite eq_expg_mod_order !modn_small// (leq_trans _ d_leq).
+Qed.
+
+Lemma expgDzmod d (n m : 'Z_d) : (d > 0)%N ->
+  (#[a]%g %| d)%N -> (a ^+ (n + m)%R)%g = (a ^+ n * a ^+ m)%g.
+Proof.
+move=> d_gt0 xdvd; apply/eqP; rewrite -expgD eq_expg_mod_order/= modn_dvdm//.
+by case: d d_gt0 {m n} xdvd => [|[|[]]]//= _; rewrite dvdn1 => /eqP->.
+Qed.
+
 Lemma Zp_isom : isom (Zp #[a]) <[a]> Zpm.
 Proof. by apply/isomP; rewrite injm_Zpm im_Zpm. Qed.
 
