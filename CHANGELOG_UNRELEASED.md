@@ -49,6 +49,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssralg.v`
   + lemmas `prodM_comm`, `prodMl_comm`, `prodMr_comm`, `prodrMl`, `prodrMr`
 
+- in `ssrbool.v`
+  + lemmas `classic_sigW`, `classic_ex`
 
 ### Changed
 

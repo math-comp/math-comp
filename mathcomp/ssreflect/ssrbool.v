@@ -95,3 +95,14 @@ Proof. by case: b1 b2 => [] []. Qed.
 Lemma relpre_trans {T' T : Type} {leT : rel T} {f : T' -> T} :
   transitive leT -> transitive (relpre f leT).
 Proof. by move=> + y x z; apply. Qed.
+
+Lemma classic_sigW T (P : T -> Prop) :
+  classically (exists x, P x) <-> classically ({x | P x}).
+Proof. by split; apply: classic_bind => -[x Px]; apply/classicW; exists x. Qed.
+
+Lemma classic_ex T (P : T -> Prop) :
+  ~ (forall x, ~ P x) -> classically (exists x, P x).
+Proof.
+move=> NfNP; apply/classicP => exPF; apply: NfNP => x Px.
+by apply: exPF; exists x.
+Qed.
