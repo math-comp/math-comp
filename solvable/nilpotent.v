@@ -3,7 +3,8 @@
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import fintype div bigop prime finset fingroup morphism.
 From mathcomp Require Import automorphism quotient commutator gproduct.
-From mathcomp Require Import gfunctor center gseries cyclic.
+From mathcomp Require Import perm gfunctor center gseries cyclic.
+From mathcomp Require finfun.
 
 (******************************************************************************)
 (*   This file defines nilpotent and solvable groups, and give some of their  *)
@@ -749,3 +750,63 @@ by rewrite (series_sol nsKG) !abelian_sol ?cyclic_abelian.
 Qed.
 
 End QuotientSol.
+
+Section setXn.
+Import finfun.
+
+Lemma sol_setXn n (gT : 'I_n -> finGroupType) (G : forall i, {group gT i}) :
+  (forall i, solvable (G i)) -> solvable (setXn G).
+Proof.
+elim: n => [|n IHn] in gT G * => solG; first by rewrite groupX0 solvable1.
+pose gT' (i : 'I_n) := gT (lift ord0 i).
+pose prod_group_gT := [the finGroupType of {dffun forall i, gT i}].
+pose prod_group_gT' := [the finGroupType of {dffun forall i, gT' i}].
+pose f (x : prod_group_gT) : prod_group_gT' := [ffun i => x (lift ord0 i)].
+have fm : morphic (setXn G) f.
+  apply/'forall_implyP => -[a b]; rewrite !inE/=.
+  by move=> /andP[/forallP aG /forallP bG]; apply/eqP/ffunP => i; rewrite !ffunE.
+rewrite (@series_sol _ [group of setXn G] ('ker (morphm fm))) ?ker_normal//=.
+rewrite (isog_sol (first_isog _))/=.
+have -> : (morphm fm @* setXn G)%g = setXn (fun i => G (lift ord0 i)).
+  apply/setP => v; rewrite !inE morphimEdom; apply/idP/forallP => /=.
+    move=> /imsetP[/=x]; rewrite inE => /forallP/= xG ->.
+    by move=> i; rewrite morphmE ffunE xG.
+  move=> vG; apply/imsetP.
+  pose w := [ffun i : 'I_n.+1 =>
+             match unliftP ord0 i return (gT i) : Type with
+             | UnliftSome j i_eq => ecast i (gT i) (esym i_eq) (v j)
+             | UnliftNone i0 => 1%g
+             end].
+  have wl i : w (lift ord0 i) = v i.
+    rewrite ffunE; case: unliftP => //= j elij.
+    have eij : i = j by case: elij; apply/val_inj.
+    by rewrite [elij](eq_irrelevance _ (congr1 _ eij)); case: _ / eij.
+  have w0 : w ord0 = 1%g by rewrite ffunE; case: unliftP.
+  exists w; last by apply/ffunP => i; rewrite morphmE ffunE/= wl.
+  apply/setXnP => i.
+  case: (unliftP ord0 i) => [j|]->; rewrite ?wl ?w0 ?vG//.
+rewrite IHn ?andbT//; last by move=> i; apply: solG.
+pose k (x : gT ord0) : prod_group_gT :=
+  [ffun i : 'I_n.+1 =>
+     match (ord0 =P i) return (gT i) : Type with
+     | ReflectT P => ecast i (gT i) P x
+     | _ => 1%g
+     end].
+have km : morphic (G ord0) k.
+  apply/'forall_implyP => -[a b]; rewrite !inE/= => /andP[aG bG].
+  apply/eqP/ffunP => i; rewrite !ffunE; case: eqP => //; rewrite ?mulg1//.
+  by case: _ /.
+suff -> : ('ker (morphm fm) = morphm km @* G ord0)%g by rewrite morphim_sol.
+apply/setP => x; rewrite morphimEdom; apply/idP/imsetP => [xker|].
+  exists (x ord0).
+     by have := dom_ker xker; rewrite inE => /forallP/(_ ord0).
+  rewrite /= morphmE; apply/ffunP => i; rewrite ffunE; case: eqP => //=.
+    by case: _ /.
+  move/eqP; rewrite eq_sym; have /mker/= := xker; rewrite morphmE => /ffunP.
+  by case: (@unliftP _ ord0 i) => [j|] ->//= /(_ j); rewrite !ffunE.
+move=> [x0 xG0 -> /=]; rewrite morphmE; apply/kerP; rewrite ?inE.
+  by apply/forallP => i; rewrite ffunE; case: eqP => //=; case: _ /.
+by rewrite /= morphmE; apply/ffunP => i; rewrite !ffunE; case: eqP.
+Qed.
+
+End setXn.
