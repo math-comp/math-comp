@@ -136,6 +136,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 	 `monic_algCpfactor`, `monic_algRpfactor`, `poly_algR_pfactor`, 
 	 `algR_rcfMixin`
 
+- in `falgebra.v`
+  + lemmas `prodvEbasis`, `prodv_spanl`, `prodv_spanr`, `prodv_span`,
+    `big_prodv_line`, `memv_prod`, `limg_amull`, `memv_cosetPl`, `memv_mulP`,
+	 `big_prodvE`, `big_prodvP`, `big_prodv_seqP`, `adjoin_cat`, `eq_adjoin`
+
+- in `fieldext.v`
+  + lemmas `subv_Fadjoin2`, `Fadjoin_seq_idP`, `vsproj_is_multiplicative`
+  + definition `vssub`
+  + lemmas `vssub_is_multiplicative`, `vsval_sub`, `prodv_idPl`, `prodv_idPr`,
+    `prodv_Fadjoinl`, `prodv_Fadjoinr`, `dim_aimg`, `sub_aimgP`,
+	 `polyOver_aimgP`, `mapf_polyOver`
+
 ### Changed
 
 - in `bigop.v`

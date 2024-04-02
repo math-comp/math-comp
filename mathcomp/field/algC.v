@@ -1165,13 +1165,14 @@ HB.instance Definition _ := GRing.isMultiplicative.Build algR algC algRval
   algRval_is_multiplicative.
 
 Definition algR_norm (x : algR) : algR := in_algR (normr_real (val x)).
-Lemma algR_ler_norm_add x y : algR_norm (x + y) <= (algR_norm x + algR_norm y).
+Lemma algR_ler_norm_add (x y : algR) :
+  algR_norm (x + y) <= (algR_norm x + algR_norm y).
 Proof. exact: ler_norm_add. Qed.
-Lemma algR_normr0_eq0 x : algR_norm x = 0 -> x = 0.
+Lemma algR_normr0_eq0 (x : algR) : algR_norm x = 0 -> x = 0.
 Proof. by move=> /(congr1 val)/normr0_eq0 ?; apply/val_inj. Qed.
-Lemma algR_normrMn x n : algR_norm (x *+ n) = algR_norm x *+ n.
+Lemma algR_normrMn (x : algR) n : algR_norm (x *+ n) = algR_norm x *+ n.
 Proof. by apply/val_inj; rewrite /= !rmorphMn/= normrMn. Qed.
-Lemma algR_normrN x : algR_norm (- x) = algR_norm x.
+Lemma algR_normrN (x : algR) : algR_norm (- x) = algR_norm x.
 Proof. by apply/val_inj; apply: normrN. Qed.
 
 Section Num.
