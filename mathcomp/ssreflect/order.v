@@ -493,8 +493,6 @@ Reserved Notation "A `\` B" (at level 50, left associativity).
 Reserved Notation "~` A" (at level 35, right associativity).
 
 (* Reserved notation for lattices with bottom/top elements. *)
-Reserved Notation "0%O" (at level 0).  (* deprecated in 1.17.0 *)
-Reserved Notation "1%O" (at level 0).  (* deprecated in 1.17.0 *)
 Reserved Notation "\bot" (at level 0).
 Reserved Notation "\top" (at level 0).
 
@@ -541,8 +539,6 @@ Reserved Notation "A `|^d` B" (at level 52, left associativity).
 Reserved Notation "A `\^d` B" (at level 50, left associativity).
 Reserved Notation "~^d` A" (at level 35, right associativity).
 
-Reserved Notation "0^d%O" (at level 0).  (* deprecated in 1.17.0 *)
-Reserved Notation "1^d%O" (at level 0).  (* deprecated in 1.17.0 *)
 Reserved Notation "\bot^d" (at level 0).
 Reserved Notation "\top^d" (at level 0).
 
@@ -1477,7 +1473,6 @@ End BLatticeExports.
 HB.export BLatticeExports.
 
 Module BLatticeSyntax.
-Notation "0%O" := bottom (only parsing).  (* deprecated in 1.17.0 *)
 Notation "\bot" := bottom : order_scope.
 
 Notation "\join_ ( i <- r | P ) F" :=
@@ -1524,7 +1519,6 @@ HB.structure Definition TBLattice d := { T of BLattice d T & TLattice d T }.
 
 Module TLatticeSyntax.
 
-Notation "1%O" := top (only parsing).  (* deprecated in 1.17.0 *)
 Notation "\top" := top : order_scope.
 
 Notation "\meet_ ( i <- r | P ) F" :=
@@ -1761,8 +1755,6 @@ Notation "x ><^d y" := (~~ (><^d%O x y)) : order_scope.
 Notation "x `&^d` y" := (dual_meet x y) : order_scope.
 Notation "x `|^d` y" := (dual_join x y) : order_scope.
 
-Notation "0^d%O" := dual_bottom (only parsing).  (* deprecated in 1.17.0 *)
-Notation "1^d%O" := dual_top (only parsing).  (* deprecated in 1.17.0 *)
 Notation "\bot^d" := dual_bottom : order_scope.
 Notation "\top^d" := dual_top : order_scope.
 

@@ -5598,9 +5598,6 @@ Proof. by rewrite /mx_faithful rker_gen. Qed.
 
 End GenField.
 
-#[deprecated(since="mathcomp 1.17.0", note="Use mxval_grootXn instead.")]
-Notation mxval_grootX := mxval_grootXn.
-
 Section DecideGenField.
 
 Import MatrixFormula.

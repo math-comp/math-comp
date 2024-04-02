@@ -73,6 +73,105 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Removed
 
+- in `seq.v`
+  + notation `take_take` (deprecated since 1.16)
+
+- in `order.v`
+  + notations `0%O`, `1%O`, `0^d%O` and `1^d%O` (deprecated since 1.17)
+
+- in `ssralg.v`
+  + notation `rmorphX` (deprecated since 1.17)
+
+- in `ssrnum.v`
+  + notations `ler_opp2`, `ltr_opp2`, `lter_opp2`, `ler_oppr`,
+    `ltr_oppr`, `lter_oppr`, `ler_oppl`, `ltr_oppl`, `lter_oppl`,
+    `lteif_opp2`, `ler_add2l`, `ler_add2r`, `ler_add2`, `ltr_add2l`,
+    `ltr_add2r`, `ltr_add2`, `lter_add2`, `ler_add`, `ler_lt_add`,
+    `ltr_le_add`, `ltr_add`, `ler_sub`, `ler_lt_sub`, `ltr_le_sub`,
+    `ltr_sub`, `ler_subl_addr`, `ler_subr_addr`, `ler_sub_addr`,
+    `ltr_subl_addr`, `ltr_subr_addr`, `ltr_sub_addr`, `lter_sub_addr`,
+    `ler_subl_addl`, `ltr_subl_addl`, `ler_subr_addl`,
+    `ltr_subr_addl`, `ler_sub_addl`, `ltr_sub_addl`, `lter_sub_addl`,
+    `ler_addl`, `ltr_addl`, `ler_addr`, `ltr_addr`, `ger_addl`,
+    `gtr_addl`, `ger_addr`, `gtr_addr`, `cpr_add`, `lteif_add2l`,
+    `lteif_add2r`, `lteif_add2`, `lteif_subl_addr`, `lteif_subr_addr`,
+    `lteif_sub_addr`, `lteif_subl_addl`, `lteif_subr_addl`,
+    `lteif_sub_addl`, `leif_add`, `gtr_opp`, `lteif_oppl`,
+    `lteif_oppr`, `lteif_0oppr`, `lteif_oppr0`, `lter_oppE`,
+    `ler_dist_add`, `ler_dist_norm_add`, `ler_sub_norm_add`,
+    `ler_sub_dist`, `ler_sub_real`, `ger_sub_real`, `ltr_expn2r`,
+    `ler_expn2r`, `lter_expn2r`, `ler_pmul`, `ltr_pmul`, `ler_pinv`,
+    `ler_ninv`, `ltr_pinv`, `ltr_ninv`, `ler_pmul2l`, `ltr_pmul2l`,
+    `lter_pmul2l`, `ler_pmul2r`, `ltr_pmul2r`, `lter_pmul2r`,
+    `ler_nmul2l`, `ltr_nmul2l`, `lter_nmul2l`, `ler_nmul2r`,
+    `ltr_nmul2r`, `lter_nmul2r`, `minr_pmulr`, `maxr_pmulr`,
+    `minr_pmull`, `maxr_pmull`, `ltr_wpexpn2r`, `ler_pexpn2r`,
+    `ltr_pexpn2r`, `lter_pexpn2r`, `ger_pmull`, `gtr_pmull`,
+    `ger_pmulr`, `gtr_pmulr`, `ler_pmull`, `ltr_pmull`, `ler_pmulr`,
+    `ltr_pmulr`, `ger_nmull`, `gtr_nmull`, `ger_nmulr`, `gtr_nmulr`,
+    `ler_nmull`, `ltr_nmull`, `ler_nmulr`, `ltr_nmulr`, `leif_pmul`,
+    `leif_nmul`, `eqr_expn2`, `real_maxr_nmulr`, `real_minr_nmulr`,
+    `real_minr_nmull`, `real_maxr_nmull`, `real_ltr_distl_addr`,
+    `real_ler_distl_addr`, `real_ltr_distlC_addr`,
+    `real_ler_distlC_addr`, `real_ltr_distl_subl`,
+    `real_ler_distl_subl`, `real_ltr_distlC_subl`,
+    `real_ler_distlC_subl`, `ler_iexpn2l`, `ltr_iexpn2l`,
+    `lter_iexpn2l`, `ler_eexpn2l`, `ltr_eexpn2l`, `lter_eexpn2l`,
+    `ler_wpmul2l`, `ler_wpmul2r`, `ler_wnmul2l`, `ler_wnmul2r`,
+    `ler_pemull`, `ler_nemull`, `ler_pemulr`, `ler_nemulr`,
+    `ler_iexp`, `ltr_iexpr`, `lter_iexpr`, `ler_eexpr`, `ltr_eexpr`,
+    `lter_eexpr`, `lter_expr`, `ler_wiexpn2l`, `ler_weexpn2l`,
+    `ler_pimull`, `ler_nimull`, `ler_pimulr`, `ler_nimulr`,
+    `ler_pmuln2r`, `ltr_pmuln2r`, `ler_pmuln2l`, `ler_wpmuln2l`,
+    `eqr_pmuln2r`, `ltr_wmuln2r`, `ltr_wpmuln2r`, `ler_wmuln2r`,
+    `ler_wnmuln2l`, `ler_muln2r`, `ltr_muln2r`, `eqr_muln2r`,
+    `ltr_pmuln2l`, `ler_nmuln2l`, `ltr_nmuln2l`, `leif_subLR`,
+    `leif_subRL`, `lteif_pmul2l`, `lteif_pmul2r`, `lteif_nmul2l`,
+    `lteif_nmul2r`, `ler_paddl`, `ltr_paddl`, `ltr_spaddl`,
+    `ltr_spsaddl`, `ler_naddl`, `ltr_naddl`, `ltr_snaddl`,
+    `ltr_snsaddl`, `ler_paddr`, `ltr_paddr`, `ltr_spaddr`,
+    `ltr_spsaddr`, `ler_naddr`, `ltr_naddr`, `ltr_snaddr`,
+    `ltr_snsaddr`, `lef_pinv`, `lef_ninv`, `ltf_pinv`, `ltf_ninv`,
+    `ltef_pinv`, `ltef_ninv`, `lteif_pdivl_mulr`, `lteif_pdivr_mulr`,
+    `lteif_pdivl_mull`, `lteif_pdivr_mull`, `lteif_ndivl_mulr`,
+    `lteif_ndivr_mulr`, `lteif_ndivl_mull`, `lteif_ndivr_mull`,
+    `ler_pdivl_mulr`, `ltr_pdivl_mulr`, `lter_pdivl_mulr`,
+    `ler_pdivr_mulr`, `ltr_pdivr_mulr`, `lter_pdivr_mulr`,
+    `ler_pdivl_mull`, `ltr_pdivl_mull`, `lter_pdivl_mull`,
+    `ler_pdivr_mull`, `ltr_pdivr_mull`, `lter_pdivr_mull`,
+    `ler_ndivl_mulr`, `ltr_ndivl_mulr`, `lter_ndivl_mulr`,
+    `ler_ndivr_mulr`, `ltr_ndivr_mulr`, `lter_ndivr_mulr`,
+    `ler_ndivl_mull`, `ltr_ndivl_mull`, `lter_ndivl_mull`,
+    `ler_ndivr_mull`, `ltr_ndivr_mull`, `lter_ndivr_mull`,
+    `normC_add_eq`, `normC_sub_eq`, `ler_norm_add`, `ler_norm_sub`,
+    `ltr_distl_addr`, `ler_distl_addr`, `ltr_distlC_addr`,
+    `ler_distlC_addr`, `ltr_distl_subl`, `ler_distl_subl`,
+    `ltr_distlC_subl`, `ler_distlC_subl`, `maxr_nmulr`, `minr_nmulr`,
+    `minr_nmull`, `maxr_nmull` (deprecated since 1.17)
+
+- in `ssrint.v`
+  + notations `oppz_add`, `lez_add1r`, `lez_addr1`, `ltz_add1r`,
+    `ltz_addr1`, `ler_pmulz2r`, `ler_pmulz2l`, `ler_wpmulz2r`,
+    `ler_wpmulz2l`, `ler_wnmulz2l`, `ler_nmulz2r`, `ler_nmulz2l`,
+    `ltr_pmulz2r`, `ltr_pmulz2l`, `ltr_nmulz2r`, `ltr_nmulz2l`,
+    `ler_wnmulz2r`, `ler_wpexpz2r`, `ler_wnexpz2r`, `ler_pexpz2r`,
+    `ltr_pexpz2r`, `ler_nexpz2r`, `ltr_nexpz2r`, `ler_wpiexpz2l`,
+    `ler_wniexpz2l`, `ler_wpeexpz2l`, `ler_wneexpz2l`, `ler_weexpz2l`,
+    `ler_piexpz2l`, `ltr_piexpz2l`, `ler_niexpz2l`, `ltr_niexpz2l`,
+    `ler_eexpz2l`, `ltr_eexpz2l`, `eqr_expz2`, `exprz_pmulzl`,
+    `leq_add_dist`, `leqif_add_distz`, `leqif_add_dist` (deprecated
+    since 1.17)
+
+- in `fraction.v`
+  + notation `tofracX` (deprecated since 1.17)
+
+- in `interval.v`
+  + notations `in_segment_addgt0Pr` and `in_segment_addgt0Pl`
+    (deprecated since 1.17)
+
+- in `mxrepresentation.v`
+  + notation `mxval_grootX` (deprecated since 1.17)
+
 - in `div.v`
   + definition `gcdn_rec`, use `gcdn` directly
 
