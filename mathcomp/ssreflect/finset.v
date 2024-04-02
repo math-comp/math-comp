@@ -7,9 +7,9 @@ From mathcomp Require Import choice fintype finfun bigop.
 (******************************************************************************)
 (* This file defines a type for sets over a finite Type, similar to the type  *)
 (* of functions over a finite Type defined in finfun.v (indeed, based in it): *)
-(*  {set T} where T must have a finType structure                             *)
+(* {set T} where T must have a finType structure.                             *)
 (* We equip {set T} itself with a finType structure, hence Leibnitz and       *)
-(* extensional equalities coincide on {set T}, and we can form {set {set T}}  *)
+(* extensional equalities coincide on {set T}, and we can form {set {set T}}. *)
 (*   If A, B : {set T} and P : {set {set T}}, we define:                      *)
 (*           x \in A == x belongs to A (i.e., {set T} implements predType,    *)
 (*                      by coercion to pred_sort)                             *)
@@ -21,7 +21,7 @@ From mathcomp Require Import choice fintype finfun bigop.
 (*      [set x in A] == the set containing the x in a collective predicate A  *)
 (*  [set x in A | P] == the set containing the x in A such that P is true     *)
 (* [set x in A | P & Q] := [set x in A | P && Q]                              *)
-(*  All these have typed variants [set x : T | P], [set x : T in A], etc      *)
+(*  All these have typed variants [set x : T | P], [set x : T in A], etc.     *)
 (*              set0 == the empty set                                         *)
 (*  [set: T] or setT == the full set (the A containing all x : T)             *)
 (*           [set x] == the singleton {x}                                     *)
@@ -72,7 +72,7 @@ From mathcomp Require Import choice fintype finfun bigop.
 (* [set E | x : T in A, y : U], [set E | x : T in A, y : U & P],              *)
 (* [set E | x : T, y : U], [set E | x : T, y : U & P]                         *)
 (*                   == type-ranging versions of the binary comprehensions    *)
-(* [set E | x : T in A], [set E | x in A, y], [set E | x, y & P], etc         *)
+(* [set E | x : T in A], [set E | x in A, y], [set E | x, y & P], etc.        *)
 (*                   == typed and untyped variants of the comprehensions above*)
 (*                      The types may be required as type inference processes *)
 (*                      E before considering A or B. Note that type casts in  *)
@@ -200,7 +200,6 @@ Notation "[ 'set' x 'in' A | P & Q ]" := [set x in A | P && Q]
 Notation "[ 'set' x : T 'in' A | P & Q ]" := [set x : T in A | P && Q]
   (at level 0, x at level 99, only parsing) : set_scope.
 
-(* Set spanned by a sequence. *)
 Notation "[ 'set' :: s ]" := (finset [in pred_of_seq s])
   (at level 0, format "[ 'set' ::  s ]") : set_scope.
 
@@ -1120,7 +1119,7 @@ Notation "[ 'set' E | x 'in' A , y 'in' B & P ]" :=
    "[ '[hv' 'set'  E '/ '  |  x  'in'  A , '/   '  y  'in'  B '/ '  &  P ] ']'"
   ) : set_scope.
 
-(* Typed variants. *)
+(* Typed variants *)
 Notation "[ 'set' E | x : T 'in' A ]" := ((fun x : T => E) @: A)
   (at level 0, E, x at level 99, only parsing) : set_scope.
 Notation "[ 'set' E | x : T 'in' A & P ]" :=
@@ -1133,7 +1132,7 @@ Notation "[ 'set' E | x : T 'in' A , y : U 'in' B & P ]" :=
   [set E | x : T in A, y : U in [set y : U in B | P]]
   (at level 0, E, x, y at level 99, only parsing) : set_scope.
 
-(* Comprehensions over a type. *)
+(* Comprehensions over a type *)
 Local Notation predOfType T := (pred_of_simpl (@pred_of_argType T)).
 Notation "[ 'set' E | x : T ]" := [set E | x : T in predOfType T]
   (at level 0, E, x at level 99,
@@ -1173,7 +1172,7 @@ Notation "[ 'set' E | x : T , y : U & P ]" :=
    "[ '[hv' 'set'  E '/ '  |  x  :  T , '/   '  y  :  U  &  P ] ']'")
    : set_scope.
 
-(* Untyped variants. *)
+(* Untyped variants *)
 Notation "[ 'set' E | x , y 'in' B ]" := [set E | x : _, y : _ in B]
   (at level 0, E, x, y at level 99, only parsing) : set_scope.
 Notation "[ 'set' E | x , y 'in' B & P ]" := [set E | x : _, y : _ in B & P]
@@ -2094,7 +2093,7 @@ have inj_f : {in A &, injective (pblock P)}.
 rewrite -(card_in_imset inj_f); apply: subset_leq_card.
 apply/subsetP => ? /imsetP[x xA ->].
 rewrite !inE pblock_mem ?covP ?subAD ?andbT //.
-by apply: contraTneq AB0 => <-; apply/set0Pn; exists x; rewrite inE APx ?andbT. 
+by apply: contraTneq AB0 => <-; apply/set0Pn; exists x; rewrite inE APx ?andbT.
 Qed.
 
 Section BigOps.
