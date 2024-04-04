@@ -63,6 +63,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `path.v`
   + generalized `count_merge` from `eqType` to `Type`
 
+- in `order.v`
+  + `order_morphism` changed to `homo` from `mono` and renamed `nondecreasing`
+
 ### Renamed
 
 - in `binomial.v`

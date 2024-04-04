@@ -21,7 +21,9 @@ From mathcomp Require Import finset.
 (*   Order.TTheory: totally ordered types including Order.LTheory             *)
 (*    Order.Theory: ordered types including all of the above theory modules   *)
 (* To access the definitions, notations, and the theory from, say,            *)
-(* "Order.Xyz", insert "Import Order.Xyz." at the top of your scripts.        *)
+(* "Order.Xyz", insert "Import Order.Xyz." at the top of your scripts. You can*)
+(* also "Import Order.Def." to enjoy shorter notations (e.g., min instead of  *)
+(* Order.min, nondecreasing instead of Order.nondecreasing, etc.).            *)
 (*                                                                            *)
 (* In order to reason about abstract orders, notations are accessible by      *)
 (* opening the scope "order_scope" bound to the delimiting key "O"; however,  *)
@@ -153,17 +155,18 @@ From mathcomp Require Import finset.
 (*                                                                            *)
 (* Morphisms between the above structures:                                    *)
 (*                                                                            *)
-(* OrderMorphism.type d T d' T' == monotonic function between the two porder  *)
+(* OrderMorphism.type d T d' T' == nondecreasing function between the two     *)
+(*                           porder                                           *)
 (*                        := {omorphism T -> T'}                              *)
 (* MeetLatticeMorphism.type d T d' T',                                        *)
 (* JoinLatticeMorphism.type d T d' T',                                        *)
-(* LatticeMorphism.type d T d' T' == monotonic function between two lattices  *)
-(*                           which are morphism for meet, join, and meet/join *)
-(*                           respectively                                     *)
+(* LatticeMorphism.type d T d' T' == nondecreasing function between two       *)
+(*                           lattices which are morphism for meet, join, and  *)
+(*                           meet/join respectively                           *)
 (* BLatticeMorphism.type d T d' T' := {blmorphism T -> T'},                   *)
 (* TLatticeMorphism.type d T d' T' := {tlmorphism T -> T'},                   *)
 (* TBLatticeMorphism.type d T d' T' := {tblmorphism T -> T'}                  *)
-(*                        == monotonic function between two lattices with     *)
+(*                        == nondecreasing function between two lattices with *)
 (*                           bottom/top which are morphism for bottom/top     *)
 (*                                                                            *)
 (* Closedness predicates for the algebraic structures:                        *)
@@ -195,18 +198,21 @@ From mathcomp Require Import finset.
 (* For x, y of type T, where T is canonically a porderType d:                 *)
 (*            x <= y <-> x is less than or equal to y                         *)
 (*             x < y <-> x is less than y (:= (y != x) && (x <= y))           *)
-(*           min x y <-> if x < y then x else y                               *)
-(*           max x y <-> if x < y then y else x                               *)
+(*           min x y := if x < y then x else y                                *)
+(*           max x y := if x < y then y else x                                *)
 (*            x >= y <-> x is greater than or equal to y (:= y <= x)          *)
 (*             x > y <-> x is greater than y (:= y < x)                       *)
 (*   x <= y ?= iff C <-> x is less than y, or equal iff C is true             *)
 (*    x < y ?<= if C <-> x is smaller than y, and strictly if C is false      *)
 (*           x >=< y <-> x and y are comparable (:= (x <= y) || (y <= x))     *)
 (*            x >< y <-> x and y are incomparable (:= ~~ x >=< y)             *)
-(*          f \min g <-> the function x |-> Order.min (f x) (g x);            *)
-(*                       f \min g simplifies on application                   *)
-(*          f \max g <-> the function x |-> Order.max (f x) (g x);            *)
-(*                       f \max g simplifies on application                   *)
+(*          f \min g == the function x |-> Order.min (f x) (g x);             *)
+(*                      f \min g simplifies on application                    *)
+(*          f \max g == the function x |-> Order.max (f x) (g x);             *)
+(*                      f \max g simplifies on application                    *)
+(*   nondecreasing f <-> the function f : T -> T' is nondecreasing,           *)
+(*                      where T' is a porderType                              *)
+(*                   := {homo f : x y / x <= y}                               *)
 (*                                                                            *)
 (* For x, y of type T, where T is canonically a latticeType d:                *)
 (*           x `&` y == the meet of x and y                                   *)
@@ -432,7 +438,7 @@ From mathcomp Require Import finset.
 (* We also provide specialized versions of some theorems from path.v.         *)
 (*                                                                            *)
 (* We provide Order.enum_val, Order.enum_rank, and Order.enum_rank_in, which  *)
-(* are monotonous variations of enum_val, enum_rank, and enum_rank_in         *)
+(* are monotonic variations of enum_val, enum_rank, and enum_rank_in          *)
 (* whenever the type is porderType, and their monotonicity is provided if     *)
 (* this order is total. The theory is in the module Order (Order.enum_valK,   *)
 (* Order.enum_rank_inK, etc) but Order.Enum can be imported to shorten these. *)
@@ -1219,6 +1225,9 @@ Definition min_fun f g x := min (f x) (g x).
 Definition max_fun f g x := max (f x) (g x).
 End LiftedPOrder.
 
+Definition nondecreasing disp' (T' : porderType disp') (f : T -> T') : Prop :=
+  {homo f : x y / x <= y}.
+
 End POrderDef.
 
 Prenex Implicits lt le leif lteif.
@@ -1229,6 +1238,14 @@ Arguments max {_ _}.
 Arguments comparable {_ _}.
 Arguments min_fun {_ _ _} f g _ /.
 Arguments max_fun {_ _ _} f g _ /.
+
+Module Import Def.
+
+Notation nondecreasing := nondecreasing.
+Notation min := min.
+Notation max := max.
+
+End Def.
 
 Module Import POSyntax.
 
@@ -1818,6 +1835,9 @@ Section POrderTheory.
 Context {disp : unit} {T : porderType disp}.
 
 Implicit Types (x y : T) (s : seq T).
+
+Definition nondecreasing disp' (T' : porderType disp') (f : T -> T') : Prop :=
+  {homo f : x y / x <= y}.
 
 Lemma geE x y : ge x y = (y <= x). Proof. by []. Qed.
 Lemma gtE x y : gt x y = (y < x). Proof. by []. Qed.
@@ -2603,6 +2623,8 @@ End bigminmax.
 End POrderTheory.
 #[global] Hint Resolve comparable_minr comparable_minl : core.
 #[global] Hint Resolve comparable_maxr comparable_maxl : core.
+
+
 
 Section ContraTheory.
 Context {disp1 disp2 : unit} {T1 : porderType disp1} {T2 : porderType disp2}.
@@ -4955,12 +4977,9 @@ Export CanExports.
 
 (* Morphism hierarchy. *)
 
-Definition order_morphism d (T : porderType d) d' (T' : porderType d')
-  (f : T -> T') : Prop := {mono f : x y / x <= y}.
-
 HB.mixin Record isOrderMorphism d (T : porderType d) d' (T' : porderType d')
     (apply : T -> T') := {
-  omorph_le_subproof : order_morphism apply;
+  omorph_le_subproof : {homo apply : x y / x <= y} ;
 }.
 
 HB.structure Definition OrderMorphism d (T : porderType d)
@@ -4980,14 +4999,11 @@ Section Properties.
 Variables (d : unit) (T : porderType d) (d' : unit) (T' : porderType d').
 Variables (f : {omorphism T -> T'}).
 
-Lemma omorph_le : {mono f : x y / x <= y}.
+Lemma omorph_le : {homo f : x y / x <= y}.
 Proof. exact: omorph_le_subproof. Qed.
 
-Lemma omorph_inj : injective f.
-Proof. by move=> x y fxfy; apply: le_anti; rewrite -!omorph_le fxfy lexx. Qed.
-
-Lemma omorph_lt : {mono f : x y / x < y}.
-Proof. move=> x y; rewrite !lt_def omorph_le inj_eq//; exact: omorph_inj. Qed.
+Lemma omorph_lt : injective f -> {homo f : x y / x < y}.
+Proof. by move/inj_homo_lt; apply; apply: omorph_le. Qed.
 
 End Properties.
 
@@ -4997,17 +5013,17 @@ Variables (d : unit) (T : porderType d) (d' : unit) (T' : porderType d').
 Variables (d'' : unit) (T'' : porderType d'').
 Variables (f : {omorphism T' -> T''}) (g : {omorphism T -> T'}).
 
-Fact idfun_is_order_morphism : order_morphism (@idfun T).
+Fact idfun_is_nondecreasing : nondecreasing (@idfun T).
 Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isOrderMorphism.Build d T d T idfun
-  idfun_is_order_morphism.
+  idfun_is_nondecreasing.
 
-Fact comp_is_order_morphism : order_morphism (f \o g).
-Proof. by move=> x y; rewrite /= !omorph_le. Qed.
+Fact comp_is_nondecreasing : nondecreasing (f \o g).
+Proof. by move=> ? ? ?; do 2 apply: omorph_le. Qed.
 #[export]
 HB.instance Definition _ := isOrderMorphism.Build d T d'' T'' (f \o g)
-  comp_is_order_morphism.
+  comp_is_nondecreasing.
 
 End IdCompFun.
 
@@ -5370,7 +5386,7 @@ End LatticePred.
 
 HB.mixin Record isSubPOrder d (T : porderType d) (S : pred T) d' U
     of SubType T S U & POrder d' U := {
-  val_le_subproof : {mono (val : U -> T) : x y / x <= y};
+  le_val : {mono (val : U -> T) : x y / x <= y};
 }.
 
 #[short(type="subPOrder")]
@@ -5382,12 +5398,19 @@ Section SubPOrderTheory.
 Context (d : unit) (T : porderType d) (S : pred T).
 Context (d' : unit) (U : SubPOrder.type S d').
 Local Notation val := (val : U -> T).
-HB.instance Definition _ := isOrderMorphism.Build d' U d T val val_le_subproof.
-Lemma leEsub x y : (x <= y) = (val x <= val y).
-Proof. by rewrite omorph_le. Qed.
-Lemma ltEsub x y : (x < y) = (val x < val y).
-Proof. by rewrite omorph_lt. Qed.
+#[deprecated(since="mathcomp 2.3.0", note="Use le_val instead.")]
+Lemma leEsub x y : (x <= y) = (val x <= val y). Proof. by rewrite le_val. Qed.
+Lemma lt_val : {mono val : x y / x < y}.
+Proof. by move=> x y; rewrite !lt_def (inj_eq val_inj) le_val. Qed.
+#[deprecated(since="mathcomp 2.3.0", note="Use lt_val instead.")]
+Lemma ltEsub x y : (x < y) = (val x < val y). Proof. by rewrite lt_val. Qed.
+Lemma le_wval : {homo val : x y / x <= y}. Proof. exact/mono2W/le_val. Qed.
+Lemma lt_wval : {homo val : x y / x < y}. Proof. exact/mono2W/lt_val. Qed.
+HB.instance Definition _ := isOrderMorphism.Build d' U d T val le_wval.
 End SubPOrderTheory.
+Arguments lt_val {d T S d' U} x y.
+Arguments le_wval {d T S d' U} x y.
+Arguments lt_wval {d T S d' U} x y.
 End SubPOrderTheory.
 
 HB.factory Record SubChoice_isSubPOrder d (T : porderType d) S (d' : unit) U
@@ -5395,7 +5418,7 @@ HB.factory Record SubChoice_isSubPOrder d (T : porderType d) S (d' : unit) U
 
 HB.builders Context d T S d' U of SubChoice_isSubPOrder d T S d' U.
 HB.instance Definition _ : isPOrder d' U := CancelPartial.Pcan d' (@valK _ _ U).
-Fact valD : order_morphism (val : U -> T). Proof. by []. Qed.
+Fact valD : {mono (val : U -> T) : x y / x <= y}. Proof. by []. Qed.
 HB.instance Definition _ := isSubPOrder.Build d T S d' U valD.
 HB.end.
 
@@ -5515,7 +5538,7 @@ Proof. by apply: val_inj; rewrite !SubK joinKI. Qed.
 Let meetUKU y x : joinU x (meetU x y) = x.
 Proof. by apply: val_inj; rewrite !SubK meetKU. Qed.
 Let le_meetU x y : (x <= y) = (meetU x y == x).
-Proof. by rewrite leEsub -(inj_eq val_inj) SubK leEmeet. Qed.
+Proof. by rewrite -le_val -(inj_eq val_inj) SubK leEmeet. Qed.
 HB.instance Definition _ := POrder_isLattice.Build d' U
   meetUC joinUC meetUA joinUA joinUKI meetUKU le_meetU.
 
@@ -5575,7 +5598,7 @@ HB.builders Context d T S d' U of SubPOrder_isBSubLattice d T S d' U.
 Let inU v Sv : U := Sub v Sv.
 Let zeroU : U := inU opred0_subproof.
 
-Fact le0x x : zeroU <= x. Proof. by rewrite leEsub /= SubK le0x. Qed.
+Fact le0x x : zeroU <= x. Proof. by rewrite -le_val /= SubK le0x. Qed.
 HB.instance Definition _ := hasBottom.Build d' U le0x.
 
 Fact val0 : (val : U -> T) \bot = \bot. Proof. by rewrite SubK. Qed.
@@ -5632,7 +5655,7 @@ HB.builders Context d T S d' U of SubPOrder_isTSubLattice d T S d' U.
 Let inU v Sv : U := Sub v Sv.
 Let oneU : U := inU opred1_subproof.
 
-Fact lex1 x : x <= oneU. Proof. by rewrite leEsub /= SubK lex1. Qed.
+Fact lex1 x : x <= oneU. Proof. by rewrite -le_val /= SubK lex1. Qed.
 HB.instance Definition _ := hasTop.Build d' U lex1.
 
 Fact val1 : (val : U -> T) \top = \top. Proof. by rewrite SubK. Qed.
@@ -5698,7 +5721,7 @@ HB.factory Record SubLattice_isSubOrder d (T : orderType d) S d' U
 
 HB.builders Context d T S d' U of SubLattice_isSubOrder d T S d' U.
 Lemma totalU : total (<=%O : rel U).
-Proof. by move=> x y; rewrite !leEsub le_total. Qed.
+Proof. by move=> x y; rewrite -!le_val le_total. Qed.
 HB.instance Definition _ := Lattice_isTotal.Build d' U totalU.
 HB.end.
 
