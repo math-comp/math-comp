@@ -23,7 +23,7 @@ From mathcomp Require Import finset.
 (* To access the definitions, notations, and the theory from, say,            *)
 (* "Order.Xyz", insert "Import Order.Xyz." at the top of your scripts. You can*)
 (* also "Import Order.Def." to enjoy shorter notations (e.g., min instead of  *)
-(* Order.min, monotonic instead of Order.monotonic, etc.).                    *)
+(* Order.min, nondecreasing instead of Order.nondecreasing, etc.).            *)
 (*                                                                            *)
 (* In order to reason about abstract orders, notations are accessible by      *)
 (* opening the scope "order_scope" bound to the delimiting key "O"; however,  *)
@@ -155,17 +155,18 @@ From mathcomp Require Import finset.
 (*                                                                            *)
 (* Morphisms between the above structures:                                    *)
 (*                                                                            *)
-(* OrderMorphism.type d T d' T' == monotonic function between the two porder  *)
+(* OrderMorphism.type d T d' T' == nondecreasing function between the two     *)
+(*                           porder                                           *)
 (*                        := {omorphism T -> T'}                              *)
 (* MeetLatticeMorphism.type d T d' T',                                        *)
 (* JoinLatticeMorphism.type d T d' T',                                        *)
-(* LatticeMorphism.type d T d' T' == monotonic function between two lattices  *)
-(*                           which are morphism for meet, join, and meet/join *)
-(*                           respectively                                     *)
+(* LatticeMorphism.type d T d' T' == nondecreasing function between two       *)
+(*                           lattices which are morphism for meet, join, and  *)
+(*                           meet/join respectively                           *)
 (* BLatticeMorphism.type d T d' T' := {blmorphism T -> T'},                   *)
 (* TLatticeMorphism.type d T d' T' := {tlmorphism T -> T'},                   *)
 (* TBLatticeMorphism.type d T d' T' := {tblmorphism T -> T'}                  *)
-(*                        == monotonic function between two lattices with     *)
+(*                        == nondecreasing function between two lattices with *)
 (*                           bottom/top which are morphism for bottom/top     *)
 (*                                                                            *)
 (* Closedness predicates for the algebraic structures:                        *)
@@ -209,7 +210,7 @@ From mathcomp Require Import finset.
 (*                      f \min g simplifies on application                    *)
 (*          f \max g == the function x |-> Order.max (f x) (g x);             *)
 (*                      f \max g simplifies on application                    *)
-(*       monotonic f <-> the function f : T -> T' is monotonic,               *)
+(*   nondecreasing f <-> the function f : T -> T' is nondecreasing,           *)
 (*                      where T' is a porderType                              *)
 (*                   := {homo f : x y / x <= y}                               *)
 (*                                                                            *)
@@ -437,7 +438,7 @@ From mathcomp Require Import finset.
 (* We also provide specialized versions of some theorems from path.v.         *)
 (*                                                                            *)
 (* We provide Order.enum_val, Order.enum_rank, and Order.enum_rank_in, which  *)
-(* are monotonous variations of enum_val, enum_rank, and enum_rank_in         *)
+(* are monotonic variations of enum_val, enum_rank, and enum_rank_in          *)
 (* whenever the type is porderType, and their monotonicity is provided if     *)
 (* this order is total. The theory is in the module Order (Order.enum_valK,   *)
 (* Order.enum_rank_inK, etc) but Order.Enum can be imported to shorten these. *)
@@ -1224,7 +1225,7 @@ Definition min_fun f g x := min (f x) (g x).
 Definition max_fun f g x := max (f x) (g x).
 End LiftedPOrder.
 
-Definition monotonic disp' (T' : porderType disp') (f : T -> T') : Prop :=
+Definition nondecreasing disp' (T' : porderType disp') (f : T -> T') : Prop :=
   {homo f : x y / x <= y}.
 
 End POrderDef.
@@ -1240,7 +1241,7 @@ Arguments max_fun {_ _ _} f g _ /.
 
 Module Import Def.
 
-Notation monotonic := monotonic.
+Notation nondecreasing := nondecreasing.
 Notation min := min.
 Notation max := max.
 
@@ -1835,7 +1836,7 @@ Context {disp : unit} {T : porderType disp}.
 
 Implicit Types (x y : T) (s : seq T).
 
-Definition monotonic disp' (T' : porderType disp') (f : T -> T') : Prop :=
+Definition nondecreasing disp' (T' : porderType disp') (f : T -> T') : Prop :=
   {homo f : x y / x <= y}.
 
 Lemma geE x y : ge x y = (y <= x). Proof. by []. Qed.
@@ -2622,6 +2623,8 @@ End bigminmax.
 End POrderTheory.
 #[global] Hint Resolve comparable_minr comparable_minl : core.
 #[global] Hint Resolve comparable_maxr comparable_maxl : core.
+
+
 
 Section ContraTheory.
 Context {disp1 disp2 : unit} {T1 : porderType disp1} {T2 : porderType disp2}.
@@ -4976,7 +4979,7 @@ Export CanExports.
 
 HB.mixin Record isOrderMorphism d (T : porderType d) d' (T' : porderType d')
     (apply : T -> T') := {
-  omorph_le_subproof : monotonic apply;
+  omorph_le_subproof : {homo apply : x y / x <= y} ;
 }.
 
 HB.structure Definition OrderMorphism d (T : porderType d)
@@ -5010,17 +5013,17 @@ Variables (d : unit) (T : porderType d) (d' : unit) (T' : porderType d').
 Variables (d'' : unit) (T'' : porderType d'').
 Variables (f : {omorphism T' -> T''}) (g : {omorphism T -> T'}).
 
-Fact idfun_is_monotonic : monotonic (@idfun T).
+Fact idfun_is_nondecreasing : nondecreasing (@idfun T).
 Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isOrderMorphism.Build d T d T idfun
-  idfun_is_monotonic.
+  idfun_is_nondecreasing.
 
-Fact comp_is_monotonic : monotonic (f \o g).
+Fact comp_is_nondecreasing : nondecreasing (f \o g).
 Proof. by move=> ? ? ?; do 2 apply: omorph_le. Qed.
 #[export]
 HB.instance Definition _ := isOrderMorphism.Build d T d'' T'' (f \o g)
-  comp_is_monotonic.
+  comp_is_nondecreasing.
 
 End IdCompFun.
 
@@ -5535,7 +5538,7 @@ Proof. by apply: val_inj; rewrite !SubK joinKI. Qed.
 Let meetUKU y x : joinU x (meetU x y) = x.
 Proof. by apply: val_inj; rewrite !SubK meetKU. Qed.
 Let le_meetU x y : (x <= y) = (meetU x y == x).
-Proof. by rewrite leEsub -(inj_eq val_inj) SubK leEmeet. Qed.
+Proof. by rewrite -le_val -(inj_eq val_inj) SubK leEmeet. Qed.
 HB.instance Definition _ := POrder_isLattice.Build d' U
   meetUC joinUC meetUA joinUA joinUKI meetUKU le_meetU.
 
@@ -5595,7 +5598,7 @@ HB.builders Context d T S d' U of SubPOrder_isBSubLattice d T S d' U.
 Let inU v Sv : U := Sub v Sv.
 Let zeroU : U := inU opred0_subproof.
 
-Fact le0x x : zeroU <= x. Proof. by rewrite leEsub /= SubK le0x. Qed.
+Fact le0x x : zeroU <= x. Proof. by rewrite -le_val /= SubK le0x. Qed.
 HB.instance Definition _ := hasBottom.Build d' U le0x.
 
 Fact val0 : (val : U -> T) \bot = \bot. Proof. by rewrite SubK. Qed.
@@ -5652,7 +5655,7 @@ HB.builders Context d T S d' U of SubPOrder_isTSubLattice d T S d' U.
 Let inU v Sv : U := Sub v Sv.
 Let oneU : U := inU opred1_subproof.
 
-Fact lex1 x : x <= oneU. Proof. by rewrite leEsub /= SubK lex1. Qed.
+Fact lex1 x : x <= oneU. Proof. by rewrite -le_val /= SubK lex1. Qed.
 HB.instance Definition _ := hasTop.Build d' U lex1.
 
 Fact val1 : (val : U -> T) \top = \top. Proof. by rewrite SubK. Qed.
@@ -5718,7 +5721,7 @@ HB.factory Record SubLattice_isSubOrder d (T : orderType d) S d' U
 
 HB.builders Context d T S d' U of SubLattice_isSubOrder d T S d' U.
 Lemma totalU : total (<=%O : rel U).
-Proof. by move=> x y; rewrite !leEsub le_total. Qed.
+Proof. by move=> x y; rewrite -!le_val le_total. Qed.
 HB.instance Definition _ := Lattice_isTotal.Build d' U totalU.
 HB.end.
 
