@@ -2624,8 +2624,6 @@ End POrderTheory.
 #[global] Hint Resolve comparable_minr comparable_minl : core.
 #[global] Hint Resolve comparable_maxr comparable_maxl : core.
 
-
-
 Section ContraTheory.
 Context {disp1 disp2 : unit} {T1 : porderType disp1} {T2 : porderType disp2}.
 Implicit Types (x y : T1) (z t : T2) (b : bool) (m n : nat) (P : Prop).
