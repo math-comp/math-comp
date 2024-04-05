@@ -2469,7 +2469,7 @@ Lemma card_GL n : n > 0 ->
   #|'GL_n[F]| = (#|F| ^ 'C(n, 2) * \prod_(1 <= i < n.+1) (#|F| ^ i - 1))%N.
 Proof.
 case: n => // n' _; set n := n'.+1; set p := #|F|.
-rewrite big_nat_rev big_add1 -triangular_sum expn_sum -big_split /=.
+rewrite big_nat_rev big_add1 -bin2_sum expn_sum -big_split /=.
 pose fr m := [pred A : 'M[F]_(m, n) | \rank A == m].
 set m := n; rewrite [in m.+1]/m; transitivity #|fr m|.
   by rewrite cardsT /= card_sub; apply: eq_card => A; rewrite -row_free_unit.
@@ -2503,7 +2503,7 @@ Lemma LUP_card_GL n : n > 0 ->
   #|'GL_n[F]| = (#|F| ^ 'C(n, 2) * \prod_(1 <= i < n.+1) (#|F| ^ i - 1))%N.
 Proof.
 case: n => // n' _; set n := n'.+1; set p := #|F|.
-rewrite cardsT /= card_sub /GRing.unit /= big_add1 /= -triangular_sum -/n /=.
+rewrite cardsT /= card_sub /GRing.unit /= big_add1 /= -bin2_sum -/n /=.
 elim: {n'}n => [|n IHn].
   rewrite !big_geq // mul1n (@eq_card _ _ predT) ?card_mx //= => M.
   by rewrite {1}[M]flatmx0 -(flatmx0 1%:M) unitmx1.

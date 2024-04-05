@@ -125,7 +125,7 @@ Proof. by rewrite expgM commgX commXg //; apply: commuteX. Qed.
 
 Lemma expMg_Rmul : (y * x) ^+ i = y ^+ i * x ^+ i * [~ x, y] ^+ 'C(i, 2).
 Proof.
-rewrite -triangular_sum; symmetry.
+rewrite -bin2_sum; symmetry.
 elim: i => [|k IHk] /=; first by rewrite big_geq ?mulg1.
 rewrite big_nat_recr //= addnC expgD !expgS -{}IHk !mulgA; congr (_ * _).
 by rewrite -!mulgA commuteX2 // -commgX // [mulg y]lock 3!mulgA -commgC.
