@@ -200,14 +200,6 @@ case: unliftP => [i'|] -> /=.
 by rewrite -(lshift0 n 0) (unsplitK (inl _ _)).
 Qed.
 
-Lemma big_ord1 R idx (op : @Monoid.law R idx) F :
-  \big[op/idx]_(i < 1) F i = F 0.
-Proof. by rewrite big_ord_recl big_ord0 Monoid.mulm1. Qed.
-
-Lemma big_ord1_cond R idx (op : @Monoid.law R idx) P F :
-  \big[op/idx]_(i < 1 | P i) F i = if P 0 then F 0 else idx.
-Proof. by rewrite big_mkcond big_ord1. Qed.
-
 Section ZpRing.
 
 Variable p' : nat.
