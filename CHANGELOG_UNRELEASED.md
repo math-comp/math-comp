@@ -69,7 +69,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Renamed
 
 - in `binomial.v`
-  + lemma `triangular_sum` renamed as `bin2_sum`
+  + `triangular_sum` -> `bin2_sum`
 
 ### Removed
 

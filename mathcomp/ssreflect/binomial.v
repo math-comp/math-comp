@@ -284,7 +284,7 @@ by rewrite big_nat_recr // IHn binS bin1.
 Qed.
 
 #[deprecated(since="mathcomp 2.3", note="Use bin2_sum instead.")]
-Definition triangular_sum := bin2_sum.
+Notation triangular_sum := bin2_sum (only parsing).
 
 (* textbook proof of `bin2_sum`. Should be moved out of the main
   library, to a dedicated "showcase" library.
