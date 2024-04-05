@@ -3,8 +3,9 @@
 <!-- if this PR fixes an issue, use "fixes #XYZ" -->
 
 <!-- you may also explain what remains to do if the fix is incomplete -->
+<!-- you can use tickboxes for clarity -->
 
-##### Things done/to do
+##### Minimal TODO list
 
 <!-- please fill in the following checklist -->
 - [ ] added corresponding entries in `CHANGELOG_UNRELEASED.md`
@@ -15,6 +16,9 @@
 
 - [ ] added corresponding documentation in the headers
 - [ ] tried to abide by the [contribution guide](https://github.com/math-comp/math-comp/blob/master/CONTRIBUTING.md)
+- [ ] this PR contains an optimum number of meaningful commits
+
+See [this Checklist](https://github.com/math-comp/math-comp/wiki/Checklist-for-creating-and-review-PRs) for details.
 
 <!-- Cross-out the above items using ~crossed out item~ if they happen not to be relevant -->
 
@@ -35,4 +39,4 @@
 <!-- leave this note as a reminder to reviewers -->
 ##### Automatic note to reviewers
 
-Read [this Checklist](https://github.com/math-comp/math-comp/wiki/Checklist-for-creating-and-review-PRs) and put a milestone if possible.
+Read [this Checklist](https://github.com/math-comp/math-comp/wiki/Checklist-for-creating-and-review-PRs).
