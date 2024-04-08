@@ -486,17 +486,17 @@ Reserved Notation "x < y ?<= 'if' c" (at level 70, y, c at next level,
 Reserved Notation "x < y ?<= 'if' c :> T" (at level 70, y, c at next level,
   format "x '[hv'  <  y '/'  ?<=  'if'  c  :> T ']'").
 
-(* Reserved notation for lattice operations. *)
+(* Reserved notations for bottom/top elements *)
+Reserved Notation "\bot" (at level 0).
+Reserved Notation "\top" (at level 0).
+
+(* Reserved notations for lattice operations *)
 Reserved Notation "A `&` B"  (at level 48, left associativity).
 Reserved Notation "A `|` B" (at level 52, left associativity).
 Reserved Notation "A `\` B" (at level 50, left associativity).
 Reserved Notation "~` A" (at level 35, right associativity).
 
-(* Reserved notation for lattices with bottom/top elements. *)
-Reserved Notation "\bot" (at level 0).
-Reserved Notation "\top" (at level 0).
-
-(* Notations for dual partial and total order *)
+(* Reserved notations for dual order *)
 Reserved Notation "x <=^d y" (at level 70, y at next level).
 Reserved Notation "x >=^d y" (at level 70, y at next level).
 Reserved Notation "x <^d y" (at level 70, y at next level).
@@ -533,14 +533,13 @@ Reserved Notation "x <^d y ?<= 'if' c" (at level 70, y, c at next level,
 Reserved Notation "x <^d y ?<= 'if' c :> T" (at level 70, y, c at next level,
   format "x '[hv'  <^d  y '/'  ?<=  'if'  c  :> T ']'").
 
-(* Reserved notation for dual lattice operations. *)
+Reserved Notation "\bot^d" (at level 0).
+Reserved Notation "\top^d" (at level 0).
+
 Reserved Notation "A `&^d` B"  (at level 48, left associativity).
 Reserved Notation "A `|^d` B" (at level 52, left associativity).
 Reserved Notation "A `\^d` B" (at level 50, left associativity).
 Reserved Notation "~^d` A" (at level 35, right associativity).
-
-Reserved Notation "\bot^d" (at level 0).
-Reserved Notation "\top^d" (at level 0).
 
 (* Reserved notations for product ordering of prod or seq *)
 Reserved Notation "x <=^p y" (at level 70, y at next level).
@@ -1080,6 +1079,25 @@ HB.mixin Record isPOrder (d : unit) T of Equality T := {
 HB.structure Definition POrder (d : unit) :=
   { T of Choice T & isPOrder d T }.
 
+#[key="T"]
+HB.mixin Record hasBottom d T of POrder d T := {
+  bottom : T;
+  le0x : forall x, le bottom x;
+}.
+
+#[key="T"]
+HB.mixin Record hasTop d T of POrder d T := {
+  top : T;
+  lex1 : forall x, le x top;
+}.
+
+#[short(type="bPOrderType")]
+HB.structure Definition BPOrder d := { T of hasBottom d T & POrder d T }.
+#[short(type="tPOrderType")]
+HB.structure Definition TPOrder d := { T of hasTop d T & POrder d T }.
+#[short(type="tbPOrderType")]
+HB.structure Definition TBPOrder d := { T of hasTop d T & BPOrder d T }.
+
 Module POrderExports.
 Arguments le_trans {d s} [_ _ _].
 End POrderExports.
@@ -1261,6 +1279,9 @@ Notation leRHS := (X in (_ <= X)%O)%pattern.
 Notation ltLHS := (X in (X < _)%O)%pattern.
 Notation ltRHS := (X in (_ < X)%O)%pattern.
 
+Notation "\bot" := bottom : order_scope.
+Notation "\top" := top : order_scope.
+
 End POSyntax.
 HB.export POSyntax.
 
@@ -1317,6 +1338,12 @@ HB.mixin Record POrder_isLattice d (T : Type) of POrder d T := {
 #[short(type="latticeType")]
 HB.structure Definition Lattice d :=
   { T of POrder_isLattice d T & POrder d T }.
+#[short(type="bLatticeType")]
+HB.structure Definition BLattice d := { T of Lattice d T & hasBottom d T }.
+#[short(type="tLatticeType")]
+HB.structure Definition TLattice d := { T of Lattice d T & hasTop d T }.
+#[short(type="tbLatticeType")]
+HB.structure Definition TBLattice d := { T of BLattice d T & hasTop d T }.
 
 Section LatticeDef.
 Context {disp : unit} {T : latticeType disp}.
@@ -1364,18 +1391,7 @@ Notation "x `|` y" := (join x y) : order_scope.
 End LatticeSyntax.
 HB.export LatticeSyntax.
 
-#[key="T"]
-HB.mixin Record hasBottom d (T : Type) of POrder d T := {
-  bottom : T;
-  le0x : forall x, bottom <= x;
-}.
-#[short(type="bPOrderType")]
-HB.structure Definition BPOrder d := { T of hasBottom d T & POrder d T }.
-#[short(type="bLatticeType")]
-HB.structure Definition BLattice d := { T of hasBottom d T & Lattice d T }.
-
 Module BLatticeSyntax.
-Notation "\bot" := bottom : order_scope.
 
 Notation "\join_ ( i <- r | P ) F" :=
   (\big[@join _ _ / \bot]_(i <- r | P%B) F%O) : order_scope.
@@ -1405,23 +1421,7 @@ Notation "\join_ ( i 'in' A ) F" :=
 End BLatticeSyntax.
 HB.export BLatticeSyntax.
 
-#[key="T"]
-HB.mixin Record hasTop d (T : Type) of POrder d T := {
-  top : T;
-  lex1 : forall x, x <= top;
-}.
-#[short(type="tPOrderType")]
-HB.structure Definition TPOrder d := { T of hasTop d T & POrder d T }.
-#[short(type="tbPOrderType")]
-HB.structure Definition TBPOrder d := { T of hasTop d T & BPOrder d T }.
-#[short(type="tLatticeType")]
-HB.structure Definition TLattice d := { T of hasTop d T & Lattice d T }.
-#[short(type="tbLatticeType")]
-HB.structure Definition TBLattice d := { T of BLattice d T & TLattice d T }.
-
 Module TLatticeSyntax.
-
-Notation "\top" := top : order_scope.
 
 Notation "\meet_ ( i <- r | P ) F" :=
   (\big[meet / \top]_(i <- r | P%B) F%O) : order_scope.
@@ -1455,17 +1455,39 @@ HB.export TLatticeSyntax.
 HB.mixin Record Lattice_Meet_isDistrLattice d (T : Type) of Lattice d T := {
   meetUl : @left_distributive T T meet join;
 }.
+
 #[short(type="distrLatticeType")]
 HB.structure Definition DistrLattice d :=
   { T of Lattice_Meet_isDistrLattice d T & Lattice d T }.
 
 #[short(type="bDistrLatticeType")]
 HB.structure Definition BDistrLattice d :=
-  { T of hasBottom d T & DistrLattice d T}.
+  { T of DistrLattice d T & hasBottom d T }.
+
+#[short(type="tDistrLatticeType")]
+HB.structure Definition TDistrLattice d :=
+  { T of DistrLattice d T & hasTop d T }.
 
 #[short(type="tbDistrLatticeType")]
 HB.structure Definition TBDistrLattice d :=
-  { T of TBLattice d T & BDistrLattice d T }.
+  { T of BDistrLattice d T  & hasTop d T }.
+
+#[key="T"]
+HB.mixin Record DistrLattice_isTotal d T of DistrLattice d T :=
+  { le_total : total (<=%O : rel T) }.
+
+#[short(type="orderType")]
+HB.structure Definition Total d :=
+  { T of DistrLattice_isTotal d T & DistrLattice d T }.
+
+#[short(type="bOrderType")]
+HB.structure Definition BTotal d := { T of Total d T & hasBottom d T }.
+
+#[short(type="tOrderType")]
+HB.structure Definition TTotal d := { T of Total d T & hasTop d T }.
+
+#[short(type="tbOrderType")]
+HB.structure Definition TBTotal d := { T of BTotal d T & hasTop d T }.
 
 #[key="T"]
 HB.mixin Record hasRelativeComplement d (T : Type) of BDistrLattice d T := {
@@ -1496,13 +1518,6 @@ HB.structure Definition CTBDistrLattice d :=
 Module Import CTBDistrLatticeSyntax.
 Notation "~` A" := (compl A) : order_scope.
 End CTBDistrLatticeSyntax.
-
-HB.mixin Record DistrLattice_isTotal d T of DistrLattice d T :=
-  { le_total : total (<=%O : rel T) }.
-
-#[short(type="orderType")]
-HB.structure Definition Total d :=
-  { T of DistrLattice_isTotal d T & DistrLattice d T }.
 
 (**********)
 (* FINITE *)
@@ -1694,7 +1709,19 @@ Lemma ltEdual (x y : T) : (x <^d y :> T^d) = (y < x). Proof. by []. Qed.
 
 End DualPOrder.
 
-HB.instance Definition _ d (T : finPOrderType d) := FinPOrder.on T^d.
+HB.instance Definition _ d (T : tPOrderType d) :=
+  hasBottom.Build (dual_display d) T^d lex1.
+
+Lemma botEdual d (T : tPOrderType d) : (dual_bottom : T^d) = \top :> T.
+Proof. by []. Qed.
+
+HB.instance Definition _ d (T : bPOrderType d) :=
+  hasTop.Build (dual_display d) T^d le0x.
+
+Lemma topEdual d (T : bPOrderType d) : (dual_top : T^d) = \bot :> T.
+Proof. by []. Qed.
+
+HB.saturate.
 
 Section DualLattice.
 Context {disp : unit}.
@@ -1740,20 +1767,7 @@ Lemma joinEdual x y : ((x : L^d) `|^d` y) = (x `&` y). Proof. by []. Qed.
 
 End DualLattice.
 
-Section DualTBLattice.
-Context {disp : unit} {L : tbLatticeType disp}.
-
-HB.instance Definition _ := hasBottom.Build _ L^d lex1.
-(* FIXME: BUG? *)
-(* HB.instance Definition _ := TBLattice.on L^d. *)
-HB.instance Definition _ := hasTop.Build _ L^d (@le0x _ L).
-
-Lemma botEdual : (dual_bottom : L^d) = \top :> L. Proof. by []. Qed.
-Lemma topEdual : (dual_top : L^d) = \bot :> L. Proof. by []. Qed.
-
-End DualTBLattice.
-
-HB.instance Definition _ d (T : finLatticeType d) := FinLattice.on T^d.
+HB.saturate.
 
 Section DistrLatticeTheory.
 Context {disp : unit}.
@@ -1771,16 +1785,7 @@ HB.instance Definition _ := Lattice_Meet_isDistrLattice.Build _ L^d
 
 End DistrLatticeTheory.
 
-Section DualTBDistrLattice.
-Context {disp : unit} {L : tbDistrLatticeType disp}.
-
-HB.instance Definition _ := BDistrLattice.on L^d.
-HB.instance Definition _ := TBDistrLattice.on L^d.
-
-End DualTBDistrLattice.
-
-HB.instance Definition _ d (T : finDistrLatticeType d) :=
-  FinDistrLattice.on T^d.
+HB.saturate.
 
 Section DualOrder.
 Context {disp : unit}.
@@ -1794,8 +1799,7 @@ HB.instance Definition _ := DistrLattice_isTotal.Build _ O^d dual_total.
 
 End DualOrder.
 
-#[export]
-HB.instance Definition _ d (T : finOrderType d) := FinTotal.on T^d.
+HB.saturate.
 
 End DualOrder.
 HB.export DualOrder.
@@ -8118,20 +8122,28 @@ Export Order.Exports.
 Export Order.Syntax.
 
 Export Order.POrder.Exports.
-Export Order.FinPOrder.Exports.
+Export Order.BPOrder.Exports.
+Export Order.TPOrder.Exports.
+Export Order.TBPOrder.Exports.
 Export Order.Lattice.Exports.
 Export Order.BLattice.Exports.
+Export Order.TLattice.Exports.
 Export Order.TBLattice.Exports.
-Export Order.FinLattice.Exports.
 Export Order.DistrLattice.Exports.
 Export Order.BDistrLattice.Exports.
+Export Order.TDistrLattice.Exports.
 Export Order.TBDistrLattice.Exports.
-Export Order.FinDistrLattice.Exports.
+Export Order.Total.Exports.
+Export Order.BTotal.Exports.
+Export Order.TTotal.Exports.
+Export Order.TBTotal.Exports.
 Export Order.CBDistrLattice.Exports.
 Export Order.CTBDistrLattice.Exports.
-Export Order.FinCDistrLattice.Exports.
-Export Order.Total.Exports.
+Export Order.FinPOrder.Exports.
+Export Order.FinLattice.Exports.
+Export Order.FinDistrLattice.Exports.
 Export Order.FinTotal.Exports.
+Export Order.FinCDistrLattice.Exports.
 
 (* FIXME: check if covered by Order.Exports *)
 (* Export Order.NatOrder.Exports. *)
