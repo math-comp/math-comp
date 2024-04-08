@@ -1066,7 +1066,7 @@ Reserved Notation "'{' 'tblmorphism' U '->' V '}'"
 
 Module Order.
 
-Definition disp_t := unit.
+#[projections(primitive)] Record disp_t := Disp {d1 : unit; d2 : unit}.
 
 HB.mixin Record isPOrder (d : disp_t) T of Equality T := {
   le       : rel T;
@@ -1566,7 +1566,7 @@ HB.structure Definition FinCTBDistrLattice d :=
 (********)
 
 Definition dual T : Type := T.
-Definition dual_display : disp_t -> disp_t. Proof. exact. Qed.
+Definition dual_display (d : disp_t) := {| d1 := d2 d; d2 := d1 d |}.
 
 Notation dual_le := (@le (dual_display _) _).
 Notation dual_lt := (@lt (dual_display _) _).
