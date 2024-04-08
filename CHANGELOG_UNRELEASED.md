@@ -52,7 +52,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssrbool.v`
   + lemmas `classic_sigW`, `classic_ex`
 - in `intdiv.v`
-  + lemmas `dvdw_charf`, `eisenstein`
+  + lemmas `dvdz_charf`, `eisenstein`
 
 - in `mxalgebra.v`
   + lemma `mulmxP`
@@ -61,26 +61,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `root_dvdP`, `eqpW`, `irredp_XaddC`, `dvdp_exp_XsubCP`, `horner_mod`,
   + definition `mup`
   + lemmas `mup_geq`, `mup_leq`, `mup_ltn`, `XsubC_dvd`, `mup_XsubCX`,
-    `mupNroot`, `mupMl`, `mupM`, `mu_prod_XsubC`, `prod_XsubC_eq`
+    `mupNroot`, `mupMr`, `mupMl`, `mupM`, `mu_prod_XsubC`, `prod_XsubC_eq`
 
 - in `vector.v`
   + lemmas `subset_limgP`, `lker0_img_cap`, `SubvsE`, `span_lfunP`,
     `fullv_lfunP`
-  + definition `rowmxof`
-  + lemmas `rowmxof_linear`, `coord_rowof`
+  + definition `rVof`
+  + lemmas `rVof_linear`, `coord_rVof`
   + definition `vecof`
-  + lemmas `vecof_delta`, `vecof_linear`, `rowmxofK`, `vecofK`, `rowmxofE`,
-    `coord_vecof`, `rowmxof_eq0`, `vecof_eq0`, 
+  + lemmas `vecof_delta`, `vecof_linear`, `rVofK`, `vecofK`, `rVofE`,
+    `coord_vecof`, `rVof_eq0`, `vecof_eq0`, 
   + definition `mxof`
   + lemma `mxof_linear`
   + definition `funmx`
   + lemma `funmx_linear`
   + definition `hommx`
   + lemmas `hommx_linear`, `mxofK`, `hommxK`, `mul_mxof`, `hommxE`,
-    `rowmxof_mul`, `hom_vecof`, `rowmxof_app`, `vecof_mul`, `mxof_eq0`,
+    `rVof_mul`, `hom_vecof`, `rVof_app`, `vecof_mul`, `mxof_eq0`,
 	 `hommx_eq0`, `mxof_comp`, `hommx_mul`
   + definitions `msof`, `vsof`
-  + lemmas `mxof1`, `hommx1`, `msofK`, `mem_vecof`, `rowmxof_sub`, `vsof_sub`,
+  + lemmas `mxof1`, `hommx1`, `msofK`, `mem_vecof`, `rVof_sub`, `vsof_sub`,
     `msof_sub`, `vsofK`, `sub_msof`, `sub_vsof`, `msof0`, `vsof0`, `msof_eq0`,
 	 `vsof_eq0`
   + definitions `leigenspace`, `leigenvalue`
