@@ -37,6 +37,7 @@ From mathcomp Require Import ssralg matrix mxalgebra zmodp.
 (*                         seen as coordinates in the basis e                 *)
 (*             msof e U == matrix whose rows, seen as coordinates in the      *)
 (*                         basis e, generate the subspace U of vT             *)
+(*                         Note that this is the inverse of vsof.             *)
 (*         'Hom(aT, rT) == the type of linear functions (homomorphisms) from  *)
 (*                         aT to rT, where aT and rT are vectType structures  *)
 (*                         Elements of 'Hom(aT, rT) coerce to Coq functions.  *)
