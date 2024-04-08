@@ -200,13 +200,14 @@ case: unliftP => [i'|] -> /=.
 by rewrite -(lshift0 n 0) (unsplitK (inl _ _)).
 Qed.
 
-Lemma big_ord1 R idx (op : @Monoid.law R idx) F :
-  \big[op/idx]_(i < 1) F i = F 0.
-Proof. by rewrite big_ord_recl big_ord0 Monoid.mulm1. Qed.
+(* TODO: bigop is imported after zmodp in matrix.v and intdiv.v to prevent
+  these warnings from triggering. We should restore the order of imports when
+  these are removed. *)
+#[deprecated(since="mathcomp 2.3", note="Use bigop.big_ord1 instead.")]
+Notation big_ord1 := big_ord1 (only parsing).
 
-Lemma big_ord1_cond R idx (op : @Monoid.law R idx) P F :
-  \big[op/idx]_(i < 1 | P i) F i = if P 0 then F 0 else idx.
-Proof. by rewrite big_mkcond big_ord1. Qed.
+#[deprecated(since="mathcomp 2.3", note="Use bigop.big_ord1_cond instead.")]
+Notation big_ord1_cond := big_ord1_cond (only parsing).
 
 Section ZpRing.
 

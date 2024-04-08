@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import fintype finfun bigop finset fingroup perm order.
-From mathcomp Require Import div prime binomial ssralg countalg finalg zmodp.
+From mathcomp Require Import fintype finfun finset fingroup perm order div.
+From mathcomp Require Import prime binomial ssralg countalg finalg zmodp bigop.
 
 (******************************************************************************)
 (* Basic concrete linear algebra : definition of type for matrices, and all   *)
