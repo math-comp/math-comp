@@ -1080,61 +1080,6 @@ HB.mixin Record isPOrder (d : unit) T of Equality T := {
 HB.structure Definition POrder (d : unit) :=
   { T of Choice T & isPOrder d T }.
 
-HB.factory Record Le_isPOrder (d : unit) T of Equality T := {
-  le       : rel T;
-  le_refl  : reflexive     le;
-  le_anti  : antisymmetric le;
-  le_trans : transitive    le;
-}.
-
-HB.builders Context d T of Le_isPOrder d T.
-(* TODO: print nice error message when keyed type is not provided *)
-HB.instance Definition _ := @isPOrder.Build d T
-  le _ (fun _ _ => erefl) le_refl le_anti le_trans.
-HB.end.
-
-HB.factory Record LtLe_isPOrder (d : unit) T of Equality T := {
-  le : rel T;
-  lt : rel T;
-  le_def   : forall x y, le x y = (x == y) || lt x y;
-  lt_irr   : irreflexive lt;
-  lt_trans : transitive lt;
-}.
-HB.builders Context d T of LtLe_isPOrder d T.
-
-Let le_refl : reflexive le. Proof. by move=> x; rewrite le_def eqxx. Qed.
-
-Let le_anti : antisymmetric le.
-Proof.
-move=> x y; rewrite !le_def.
-have [//|_/=] := eqVneq x y => /andP[xy yx].
-by have := lt_trans xy yx; rewrite lt_irr.
-Qed.
-
-Let le_trans : transitive le.
-Proof.
-move=> y x z; rewrite !le_def; have [->|_]//= := eqVneq x y.
-by case: (eqVneq y z) => /= [<- ->|_ /lt_trans yx /yx ->]; rewrite orbT.
-Qed.
-
-Let lt_def x y : lt x y = (y != x) && (le x y).
-Proof. by rewrite le_def; case: eqVneq => //= ->; rewrite lt_irr. Qed.
-
-HB.instance Definition _ := @isPOrder.Build d T
-  le lt lt_def le_refl le_anti le_trans.
-
-HB.end.
-
-HB.factory Record Lt_isPOrder (d : unit) T of Equality T := {
-  lt       : rel T;
-  lt_irr   : irreflexive lt;
-  lt_trans : transitive  lt;
-}.
-HB.builders Context d T of Lt_isPOrder d T.
-HB.instance Definition _ := @LtLe_isPOrder.Build d T
-  _ lt (fun _ _ => erefl) lt_irr lt_trans.
-HB.end.
-
 Module POrderExports.
 Arguments le_trans {d s} [_ _ _].
 End POrderExports.
@@ -4314,6 +4259,146 @@ Proof. by elim/big_rec2: _=> [|i x y ? <-]; rewrite ?compl1 ?complI. Qed.
 End CTBDistrLatticeTheory.
 End CTBDistrLatticeTheory.
 
+(*************)
+(* FACTORIES *)
+(*************)
+
+(* porderType *)
+
+HB.factory Record Le_isPOrder (d : unit) T of Equality T := {
+  le       : rel T;
+  le_refl  : reflexive     le;
+  le_anti  : antisymmetric le;
+  le_trans : transitive    le;
+}.
+
+HB.builders Context d T of Le_isPOrder d T.
+(* TODO: print nice error message when keyed type is not provided *)
+HB.instance Definition _ := @isPOrder.Build d T
+  le _ (fun _ _ => erefl) le_refl le_anti le_trans.
+HB.end.
+
+HB.factory Record LtLe_isPOrder (d : unit) T of Equality T := {
+  le : rel T;
+  lt : rel T;
+  le_def   : forall x y, le x y = (x == y) || lt x y;
+  lt_irr   : irreflexive lt;
+  lt_trans : transitive lt;
+}.
+
+HB.builders Context d T of LtLe_isPOrder d T.
+
+Let le_refl : reflexive le. Proof. by move=> x; rewrite le_def eqxx. Qed.
+
+Let le_anti : antisymmetric le.
+Proof.
+move=> x y; rewrite !le_def.
+have [//|_/=] := eqVneq x y => /andP[xy yx].
+by have := lt_trans xy yx; rewrite lt_irr.
+Qed.
+
+Let le_trans : transitive le.
+Proof.
+move=> y x z; rewrite !le_def; have [->|_]//= := eqVneq x y.
+by case: (eqVneq y z) => /= [<- ->|_ /lt_trans yx /yx ->]; rewrite orbT.
+Qed.
+
+Let lt_def x y : lt x y = (y != x) && (le x y).
+Proof. by rewrite le_def; case: eqVneq => //= ->; rewrite lt_irr. Qed.
+
+HB.instance Definition _ := @isPOrder.Build d T
+  le lt lt_def le_refl le_anti le_trans.
+
+HB.end.
+
+HB.factory Record Lt_isPOrder (d : unit) T of Equality T := {
+  lt       : rel T;
+  lt_irr   : irreflexive lt;
+  lt_trans : transitive  lt;
+}.
+
+HB.builders Context d T of Lt_isPOrder d T.
+HB.instance Definition _ := @LtLe_isPOrder.Build d T
+  _ lt (fun _ _ => erefl) lt_irr lt_trans.
+HB.end.
+
+(* latticeType *)
+
+HB.factory Record POrder_MeetJoin_isLattice d T of POrder d T := {
+  meet : T -> T -> T;
+  join : T -> T -> T;
+  meetP : forall x y z, (x <= meet y z) = (x <= y) && (x <= z);
+  joinP : forall x y z, (join x y <= z) = (x <= z) && (y <= z);
+}.
+
+HB.builders Context d T of POrder_MeetJoin_isLattice d T.
+
+Fact meet_lel x y : meet x y <= meet y x.
+Proof.
+have:= le_refl (meet x y); rewrite meetP => /andP [mlex mley].
+by rewrite meetP mlex mley.
+Qed.
+Fact meetC : commutative meet.
+Proof. by move=> x y; apply: le_anti; rewrite !meet_lel. Qed.
+Fact meet_leL {x y} : (meet x y) <= x.
+Proof. by have:= le_refl (meet x y); rewrite meetP => /andP []. Qed.
+Fact meet_leR {x y} : (meet x y) <= y.
+Proof. by have:= le_refl (meet x y); rewrite meetP => /andP []. Qed.
+
+Fact join_lel x y : join x y <= join y x.
+Proof.
+have:= le_refl (join y x); rewrite joinP => /andP [ylej xlej].
+by rewrite joinP ylej xlej.
+Qed.
+Fact joinC : commutative join.
+Proof. by move=> x y; apply: le_anti; rewrite !join_lel. Qed.
+Fact join_leL {x y} : x <= (join x y).
+Proof. by have:= le_refl (join x y); rewrite joinP => /andP []. Qed.
+Fact join_leR {x y} : y <= (join x y).
+Proof. by have:= le_refl (join x y); rewrite joinP => /andP []. Qed.
+
+Fact meetA : associative meet.
+Proof.
+move=> x y z; apply: le_anti.
+apply/andP; split; rewrite !meetP -?andbA; apply/and3P; split.
+- exact: meet_leL.
+- exact: le_trans meet_leR meet_leL.
+- exact: le_trans meet_leR meet_leR.
+- exact: le_trans meet_leL meet_leL.
+- exact: le_trans meet_leL meet_leR.
+- exact: meet_leR.
+Qed.
+Fact joinA : associative join.
+Proof.
+move=> x y z; apply: le_anti.
+apply/andP; split; rewrite !joinP -?andbA; apply/and3P; split.
+- exact: le_trans join_leL join_leL.
+- exact: le_trans join_leR join_leL.
+- exact: join_leR.
+- exact: join_leL.
+- exact: le_trans join_leL join_leR.
+- exact: le_trans join_leR join_leR.
+Qed.
+Fact joinKI y x : meet x (join x y) = x.
+Proof.
+apply/le_anti/andP; split; first exact: meet_leL.
+by rewrite meetP le_refl join_leL.
+Qed.
+Fact meetKU y x : join x (meet x y) = x.
+Proof.
+apply/le_anti/andP; split; last exact: join_leL.
+by rewrite joinP le_refl meet_leL.
+Qed.
+Fact leEmeet x y : (x <= y) = (meet x y == x).
+Proof. by rewrite eq_le meetP meet_leL le_refl. Qed.
+
+HB.instance Definition _ :=
+  POrder_isLattice.Build d T meetC joinC meetA joinA joinKI meetKU leEmeet.
+
+HB.end.
+
+(* distrLatticeType *)
+
 HB.factory Record POrder_Meet_isDistrLattice d T of POrder d T := {
   meet : T -> T -> T;
   join : T -> T -> T;
@@ -4335,6 +4420,46 @@ HB.instance Definition _ :=
   Lattice_Meet_isDistrLattice.Build d T meetUl.
 
 HB.end.
+
+HB.factory Record isMeetJoinDistrLattice (d : unit) T of Choice T := {
+  le : rel T;
+  lt : rel T;
+  meet : T -> T -> T;
+  join : T -> T -> T;
+  le_def : forall x y : T, le x y = (meet x y == x);
+  lt_def : forall x y : T, lt x y = (y != x) && le x y;
+  meetC : commutative meet;
+  joinC : commutative join;
+  meetA : associative meet;
+  joinA : associative join;
+  joinKI : forall y x : T, meet x (join x y) = x;
+  meetKU : forall y x : T, join x (meet x y) = x;
+  meetUl : left_distributive meet join;
+  meetxx : idempotent meet;
+}.
+
+HB.builders Context d T of isMeetJoinDistrLattice d T.
+
+Fact le_refl : reflexive le. Proof. by move=> x; rewrite le_def meetxx. Qed.
+
+Fact le_anti : antisymmetric le.
+Proof. by move=> x y; rewrite !le_def meetC => /andP [] /eqP {2}<- /eqP ->. Qed.
+
+Fact le_trans : transitive le.
+Proof.
+move=> y x z; rewrite !le_def => /eqP lexy /eqP leyz; apply/eqP.
+by rewrite -[in LHS]lexy -meetA leyz lexy.
+Qed.
+
+HB.instance Definition _ :=
+  @isPOrder.Build d T le lt lt_def le_refl le_anti le_trans.
+
+HB.instance Definition _ := @POrder_Meet_isDistrLattice.Build d T
+  meet join meetC joinC meetA joinA joinKI meetKU le_def meetUl.
+
+HB.end.
+
+(* orderType *)
 
 HB.factory Record Lattice_isTotal d T of Lattice d T := {
   le_total : total (<=%O : rel T)
@@ -4416,117 +4541,6 @@ HB.instance Definition _ := @POrder_isLattice.Build d T
   meet join meetC joinC meetA joinA joinKI meetKU leEmeet.
 HB.instance Definition _ :=
   Lattice_isTotal.Build d T comparableT.
-
-HB.end.
-
-HB.factory Record isMeetJoinDistrLattice (d : unit) T of Choice T := {
-  le : rel T;
-  lt : rel T;
-  meet : T -> T -> T;
-  join : T -> T -> T;
-  le_def : forall x y : T, le x y = (meet x y == x);
-  lt_def : forall x y : T, lt x y = (y != x) && le x y;
-  meetC : commutative meet;
-  joinC : commutative join;
-  meetA : associative meet;
-  joinA : associative join;
-  joinKI : forall y x : T, meet x (join x y) = x;
-  meetKU : forall y x : T, join x (meet x y) = x;
-  meetUl : left_distributive meet join;
-  meetxx : idempotent meet;
-}.
-
-HB.builders Context d T of isMeetJoinDistrLattice d T.
-
-Fact le_refl : reflexive le. Proof. by move=> x; rewrite le_def meetxx. Qed.
-
-Fact le_anti : antisymmetric le.
-Proof. by move=> x y; rewrite !le_def meetC => /andP [] /eqP {2}<- /eqP ->. Qed.
-
-Fact le_trans : transitive le.
-Proof.
-move=> y x z; rewrite !le_def => /eqP lexy /eqP leyz; apply/eqP.
-by rewrite -[in LHS]lexy -meetA leyz lexy.
-Qed.
-
-HB.instance Definition _ :=
-  @isPOrder.Build d T le lt lt_def le_refl le_anti le_trans.
-
-HB.instance Definition _ := @POrder_Meet_isDistrLattice.Build d T
-  meet join meetC joinC meetA joinA joinKI meetKU le_def meetUl.
-
-HB.end.
-
-HB.factory Record POrder_MeetJoin_isLattice d T of POrder d T := {
-  meet : T -> T -> T;
-  join : T -> T -> T;
-  meetP : forall x y z, (x <= meet y z) = (x <= y) && (x <= z);
-  joinP : forall x y z, (join x y <= z) = (x <= z) && (y <= z);
-}.
-
-HB.builders Context d T of POrder_MeetJoin_isLattice d T.
-
-Fact meet_lel x y : meet x y <= meet y x.
-Proof.
-have:= le_refl (meet x y); rewrite meetP => /andP [mlex mley].
-by rewrite meetP mlex mley.
-Qed.
-Fact meetC : commutative meet.
-Proof. by move=> x y; apply: le_anti; rewrite !meet_lel. Qed.
-Fact meet_leL {x y} : (meet x y) <= x.
-Proof. by have:= le_refl (meet x y); rewrite meetP => /andP []. Qed.
-Fact meet_leR {x y} : (meet x y) <= y.
-Proof. by have:= le_refl (meet x y); rewrite meetP => /andP []. Qed.
-
-Fact join_lel x y : join x y <= join y x.
-Proof.
-have:= le_refl (join y x); rewrite joinP => /andP [ylej xlej].
-by rewrite joinP ylej xlej.
-Qed.
-Fact joinC : commutative join.
-Proof. by move=> x y; apply: le_anti; rewrite !join_lel. Qed.
-Fact join_leL {x y} : x <= (join x y).
-Proof. by have:= le_refl (join x y); rewrite joinP => /andP []. Qed.
-Fact join_leR {x y} : y <= (join x y).
-Proof. by have:= le_refl (join x y); rewrite joinP => /andP []. Qed.
-
-Fact meetA : associative meet.
-Proof.
-move=> x y z; apply: le_anti.
-apply/andP; split; rewrite !meetP -?andbA; apply/and3P; split.
-- exact: meet_leL.
-- exact: le_trans meet_leR meet_leL.
-- exact: le_trans meet_leR meet_leR.
-- exact: le_trans meet_leL meet_leL.
-- exact: le_trans meet_leL meet_leR.
-- exact: meet_leR.
-Qed.
-Fact joinA : associative join.
-Proof.
-move=> x y z; apply: le_anti.
-apply/andP; split; rewrite !joinP -?andbA; apply/and3P; split.
-- exact: le_trans join_leL join_leL.
-- exact: le_trans join_leR join_leL.
-- exact: join_leR.
-- exact: join_leL.
-- exact: le_trans join_leL join_leR.
-- exact: le_trans join_leR join_leR.
-Qed.
-Fact joinKI y x : meet x (join x y) = x.
-Proof.
-apply/le_anti/andP; split; first exact: meet_leL.
-by rewrite meetP le_refl join_leL.
-Qed.
-Fact meetKU y x : join x (meet x y) = x.
-Proof.
-apply/le_anti/andP; split; last exact: join_leL.
-by rewrite joinP le_refl meet_leL.
-Qed.
-Fact leEmeet x y : (x <= y) = (meet x y == x).
-Proof. by rewrite eq_le meetP meet_leL le_refl. Qed.
-
-HB.instance Definition _ :=
-  POrder_isLattice.Build d T meetC joinC meetA joinA joinKI meetKU leEmeet.
 
 HB.end.
 
