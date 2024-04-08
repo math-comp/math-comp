@@ -122,10 +122,10 @@ Local Notation intCK := (@intrKfloor algC).
 Lemma C_prim_root_exists n : (n > 0)%N -> {z : algC | n.-primitive_root z}.
 Proof.
 pose p : {poly algC} := 'X^n - 1; have [r Dp] := closed_field_poly_normal p.
-move=> n_gt0; apply/sigW; rewrite (monicP _) ?monic_Xn_sub_1 // scale1r in Dp.
+move=> n_gt0; apply/sigW; rewrite (monicP _) ?monicXnsubC // scale1r in Dp.
 have rn1: all n.-unity_root r by apply/allP=> z; rewrite -root_prod_XsubC -Dp.
 have sz_r: (n < (size r).+1)%N.
-  by rewrite -(size_prod_XsubC r id) -Dp size_Xn_sub_1.
+  by rewrite -(size_prod_XsubC r id) -Dp size_XnsubC.
 have [|z] := hasP (has_prim_root n_gt0 rn1 _ sz_r); last by exists z.
 by rewrite -separable_prod_XsubC -Dp separable_Xn_sub_1 // pnatr_eq0 -lt0n.
 Qed.
@@ -177,7 +177,7 @@ have [r def_zn]: exists r, cyclotomic z n = pZtoC r.
     apply: (map_inj_poly (intr_inj : injective ZtoQ)) => //.
     rewrite map_polyZ mapXn1 Dr0 Dr -scalerAl scalerKV ?intr_eq0 //.
     by rewrite rmorphM.
-  by rewrite zprimitiveZ // zprimitive_monic ?monic_Xn_sub_1 ?mapXn1.
+  by rewrite zprimitiveZ // zprimitive_monic ?monicXnsubC ?mapXn1.
 rewrite floorpK; last by apply/polyOverP=> i; rewrite def_zn coef_map /=.
 pose f e (k : 'I_n) := Ordinal (ltn_pmod (k * e) n_gt0).
 have [e Dz0] := prim_rootP prim_z (prim_expr_order prim_z0).

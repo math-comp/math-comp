@@ -542,7 +542,7 @@ have m_gt0 := ltnW m_gt1; have m1_gt0: m.-1 > 0 by rewrite -ltnS prednK.
 pose q := 'X^m - 'X; have Dq R: q R = ('X^m.-1 - 1) * ('X - 0).
   by rewrite subr0 mulrBl mul1r -exprSr prednK.
 have /FinSplittingFieldFor[/= L splitLq]: q 'F_p != 0.
-  by rewrite Dq monic_neq0 ?rpredM ?monicXsubC ?monic_Xn_sub_1.
+  by rewrite Dq monic_neq0 ?rpredM ?monicXsubC ?monicXnsubC.
 rewrite [_^%:A]rmorphB rmorphXn /= map_polyX -/(q L) in splitLq.
 have charL: p \in [char L] by rewrite char_lalg char_Fp.
 pose Fm := FinFieldExtType L; exists Fm => //.
