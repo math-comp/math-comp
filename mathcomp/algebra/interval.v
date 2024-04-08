@@ -783,8 +783,3 @@ by split=> zxy e /zxy; rewrite [z + _]addrC [_ + x]addrC.
 Qed.
 
 End IntervalField.
-
-#[deprecated(since="mathcomp 1.17.0", note="Use in_segmentDgt0Pr instead.")]
-Notation in_segment_addgt0Pr := in_segmentDgt0Pr.
-#[deprecated(since="mathcomp 1.17.0", note="Use in_segmentDgt0Pl instead.")]
-Notation in_segment_addgt0Pl := in_segmentDgt0Pl.

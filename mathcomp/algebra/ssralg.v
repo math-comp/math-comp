@@ -6017,8 +6017,6 @@ Definition rmorph_nat := rmorph_nat.
 Definition rmorph_eq_nat := rmorph_eq_nat.
 Definition rmorph_prod := rmorph_prod.
 Definition rmorphXn := rmorphXn.
-#[deprecated(since="mathcomp 1.17.0", note="Use rmorphXn instead.")]
-Notation rmorphX := rmorphXn.
 Definition rmorphN1 := rmorphN1.
 Definition rmorph_sign := rmorph_sign.
 Definition rmorph_char := rmorph_char.

@@ -268,8 +268,6 @@ Lemma subzSS (m n : nat) : m.+1%:Z - n.+1%:Z = m%:Z - n%:Z.
 Proof. by elim: n m=> [|n ihn] m //; rewrite !subzn. Qed.
 
 End intZmoduleTheory.
-#[deprecated(since="mathcomp 1.17.0", note="Use oppzD instead.")]
-Notation oppz_add := oppzD.
 
 Module intRing.
 Section intRing.
@@ -508,14 +506,6 @@ Lemma ltzD1 x y : (x < y + 1) = (x <= y).
 Proof. by rewrite -lezD1 lerD2r. Qed.
 
 End intOrderedTheory.
-#[deprecated(since="mathcomp 1.17.0", note="Use lez1D instead.")]
-Notation lez_add1r := lez1D.
-#[deprecated(since="mathcomp 1.17.0", note="Use lezD1 instead.")]
-Notation lez_addr1 := lezD1.
-#[deprecated(since="mathcomp 1.17.0", note="Use ltz1D instead.")]
-Notation ltz_add1r := ltz1D.
-#[deprecated(since="mathcomp 1.17.0", note="Use ltzD1 instead.")]
-Notation ltz_addr1 := ltzD1.
 
 Bind Scope ring_scope with int.
 
@@ -1003,28 +993,6 @@ End PO.
 End NumMorphism.
 
 End MorphTheory.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_pMz2r instead.")]
-Notation ler_pmulz2r := ler_pMz2r.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_pMz2l instead.")]
-Notation ler_pmulz2l := ler_pMz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_wpMz2r instead.")]
-Notation ler_wpmulz2r := ler_wpMz2r.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_wpMz2l instead.")]
-Notation ler_wpmulz2l := ler_wpMz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_wnMz2l instead.")]
-Notation ler_wnmulz2l := ler_wnMz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_nMz2r instead.")]
-Notation ler_nmulz2r := ler_nMz2r.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_nMz2l instead.")]
-Notation ler_nmulz2l := ler_nMz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ltr_pMz2r instead.")]
-Notation ltr_pmulz2r := ltr_pMz2r.
-#[deprecated(since="mathcomp 1.17.0", note="Use ltr_pMz2l instead.")]
-Notation ltr_pmulz2l := ltr_pMz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ltr_nMz2r instead.")]
-Notation ltr_nmulz2r := ltr_nMz2r.
-#[deprecated(since="mathcomp 1.17.0", note="Use ltr_nMz2l instead.")]
-Notation ltr_nmulz2l := ltr_nMz2l.
 
 Arguments intr_inj {R} [x1 x2].
 
@@ -1451,46 +1419,6 @@ Lemma normr_sg x : `|sgr x| = (x != 0)%:~R.
 Proof. by rewrite sgr_def -mulr_natr normrMsign normr_nat. Qed.
 
 End Sgz.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_wnMz2r instead.")]
-Notation ler_wnmulz2r := ler_wnMz2r.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_wpXz2r instead.")]
-Notation ler_wpexpz2r := ler_wpXz2r.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_wnXz2r instead.")]
-Notation ler_wnexpz2r := ler_wnXz2r.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_pXz2r instead.")]
-Notation ler_pexpz2r := ler_pXz2r.
-#[deprecated(since="mathcomp 1.17.0", note="Use ltr_pXz2r instead.")]
-Notation ltr_pexpz2r := ltr_pXz2r.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_nXz2r instead.")]
-Notation ler_nexpz2r := ler_nXz2r.
-#[deprecated(since="mathcomp 1.17.0", note="Use ltr_nXz2r instead.")]
-Notation ltr_nexpz2r := ltr_nXz2r.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_wpiXz2l instead.")]
-Notation ler_wpiexpz2l := ler_wpiXz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_wniXz2l instead.")]
-Notation ler_wniexpz2l := ler_wniXz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_wpeXz2l instead.")]
-Notation ler_wpeexpz2l := ler_wpeXz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_wneXz2l instead.")]
-Notation ler_wneexpz2l := ler_wneXz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_weXz2l instead.")]
-Notation ler_weexpz2l := ler_weXz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_piXz2l instead.")]
-Notation ler_piexpz2l := ler_piXz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ltr_piXz2l instead.")]
-Notation ltr_piexpz2l := ltr_piXz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_niXz2l instead.")]
-Notation ler_niexpz2l := ler_niXz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ltr_niXz2l instead.")]
-Notation ltr_niexpz2l := ltr_niXz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ler_eXz2l instead.")]
-Notation ler_eexpz2l := ler_eXz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use ltr_eXz2l instead.")]
-Notation ltr_eexpz2l := ltr_eXz2l.
-#[deprecated(since="mathcomp 1.17.0", note="Use eqrXz2 instead.")]
-Notation eqr_expz2 := eqrXz2.
-#[deprecated(since="mathcomp 1.17.0", note="Use exprz_pMzl instead.")]
-Notation exprz_pmulzl := exprz_pMzl.
 
 Section MoreSgz.
 
@@ -1786,13 +1714,6 @@ Qed.
 End Distn.
 
 End IntDist.
-
-#[deprecated(since="mathcomp 1.17.0", note="Use leqD_dist instead.")]
-Notation leq_add_dist := leqD_dist.
-#[deprecated(since="mathcomp 1.17.0", note="Use leqifD_distz instead.")]
-Notation leqif_add_distz := leqifD_distz.
-#[deprecated(since="mathcomp 1.17.0", note="Use leqifD_dist instead.")]
-Notation leqif_add_dist := leqifD_dist.
 
 Section NormInt.
 
