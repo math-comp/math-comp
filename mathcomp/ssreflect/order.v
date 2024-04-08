@@ -1665,6 +1665,141 @@ Notation "\meet^d_ ( i 'in' A ) F" :=
 
 End DualSyntax.
 
+Module DualOrder.
+
+HB.instance Definition _ (T : eqType) := Equality.on T^d.
+HB.instance Definition _ (T : choiceType) := Choice.on T^d.
+HB.instance Definition _ (T : countType) := Countable.on T^d.
+HB.instance Definition _ (T : finType) := Finite.on T^d.
+
+Section DualPOrder.
+
+Context {disp : unit}.
+Variable T : porderType disp.
+
+Lemma dual_lt_def (x y : T) : gt x y = (y != x) && ge x y.
+Proof. by rewrite /= lt_def eq_sym. Qed.
+
+Fact dual_le_anti : antisymmetric (@ge _ T).
+Proof. by move=> x y /andP [xy yx]; apply/le_anti/andP; split. Qed.
+
+HB.instance Definition _ :=
+  isPOrder.Build
+    (dual_display disp) (T^d)
+    dual_lt_def le_refl dual_le_anti
+    (fun y z x zy yx => @le_trans _ _ y x z yx zy).
+
+Lemma leEdual (x y : T) : (x <=^d y :> T^d) = (y <= x). Proof. by []. Qed.
+Lemma ltEdual (x y : T) : (x <^d y :> T^d) = (y < x). Proof. by []. Qed.
+
+End DualPOrder.
+
+HB.instance Definition _ d (T : finPOrderType d) := FinPOrder.on T^d.
+
+Section DualLattice.
+Context {disp : unit}.
+Variable L : latticeType disp.
+Implicit Types (x y : L).
+
+Lemma meetC : commutative (@meet _ L). Proof. exact: meetC. Qed.
+Lemma joinC : commutative (@join _ L). Proof. exact: joinC. Qed.
+
+Lemma meetA : associative (@meet _ L). Proof. exact: meetA. Qed.
+Lemma joinA : associative (@join _ L). Proof. exact: joinA. Qed.
+
+Lemma joinKI y x : x `&` (x `|` y) = x. Proof. exact: joinKI. Qed.
+Lemma meetKU y x : x `|` (x `&` y) = x. Proof. exact: meetKU. Qed.
+
+Lemma joinKIC y x : x `&` (y `|` x) = x. Proof. by rewrite joinC joinKI. Qed.
+Lemma meetKUC y x : x `|` (y `&` x) = x. Proof. by rewrite meetC meetKU. Qed.
+
+Lemma meetUK x y : (x `&` y) `|` y = y.
+Proof. by rewrite joinC meetC meetKU. Qed.
+Lemma joinIK x y : (x `|` y) `&` y = y.
+Proof. by rewrite joinC meetC joinKI. Qed.
+
+Lemma meetUKC x y : (y `&` x) `|` y = y. Proof. by rewrite meetC meetUK. Qed.
+Lemma joinIKC x y : (y `|` x) `&` y = y. Proof. by rewrite joinC joinIK. Qed.
+
+Lemma leEmeet x y : (x <= y) = (x `&` y == x).
+Proof. exact: leEmeet. Qed.
+
+Lemma leEjoin x y : (x <= y) = (x `|` y == y).
+Proof. by rewrite leEmeet; apply/eqP/eqP => <-; rewrite (joinKI, meetUK). Qed.
+
+Fact dual_leEmeet (x y : L^d) : (x <= y) = (x `|` y == x).
+Proof. by rewrite [LHS]leEjoin joinC. Qed.
+
+HB.instance Definition _ :=
+  @POrder_isLattice.Build
+    (dual_display disp) L^d
+    join meet joinC meetC joinA meetA meetKU joinKI dual_leEmeet.
+
+Lemma meetEdual x y : ((x : L^d) `&^d` y) = (x `|` y). Proof. by []. Qed.
+Lemma joinEdual x y : ((x : L^d) `|^d` y) = (x `&` y). Proof. by []. Qed.
+
+End DualLattice.
+
+Section DualTBLattice.
+Context {disp : unit} {L : tbLatticeType disp}.
+
+HB.instance Definition _ := hasBottom.Build _ L^d lex1.
+(* FIXME: BUG? *)
+(* HB.instance Definition _ := TBLattice.on L^d. *)
+HB.instance Definition _ := hasTop.Build _ L^d (@le0x _ L).
+
+Lemma botEdual : (dual_bottom : L^d) = \top :> L. Proof. by []. Qed.
+Lemma topEdual : (dual_top : L^d) = \bot :> L. Proof. by []. Qed.
+
+End DualTBLattice.
+
+HB.instance Definition _ d (T : finLatticeType d) := FinLattice.on T^d.
+
+Section DistrLatticeTheory.
+Context {disp : unit}.
+Variable L : distrLatticeType disp.
+Implicit Types (x y : L).
+
+Lemma joinIl_subproof : left_distributive (@join _ L) (@meet _ L).
+Proof.
+move=> x y z.
+by rewrite [RHS]meetC meetUl (meetC y) (meetC z) joinIK meetUl -joinA meetUKC.
+Qed.
+
+HB.instance Definition _ := Lattice_Meet_isDistrLattice.Build _ L^d
+  joinIl_subproof.
+
+End DistrLatticeTheory.
+
+Section DualTBDistrLattice.
+Context {disp : unit} {L : tbDistrLatticeType disp}.
+
+HB.instance Definition _ := BDistrLattice.on L^d.
+HB.instance Definition _ := TBDistrLattice.on L^d.
+
+End DualTBDistrLattice.
+
+HB.instance Definition _ d (T : finDistrLatticeType d) :=
+  FinDistrLattice.on T^d.
+
+Section DualOrder.
+Context {disp : unit}.
+Variable O : orderType disp.
+
+Lemma dual_total : total (<=%O : rel O^d).
+Proof. by move=> x y; exact: le_total. Qed.
+
+#[export]
+HB.instance Definition _ := DistrLattice_isTotal.Build _ O^d dual_total.
+
+End DualOrder.
+
+#[export]
+HB.instance Definition _ d (T : finOrderType d) := FinTotal.on T^d.
+
+End DualOrder.
+HB.export DualOrder.
+
 (**********)
 (* THEORY *)
 (**********)
@@ -2651,84 +2786,6 @@ Arguments max_idPr {disp T x y}.
 Arguments comparable_min_idPr {disp T x y _}.
 Arguments comparable_max_idPl {disp T x y _}.
 
-Module Import DualPOrder.
-Section DualPOrder.
-
-HB.instance Definition _ (T : eqType) := Equality.on T^d.
-HB.instance Definition _ (T : choiceType) := Choice.on T^d.
-HB.instance Definition _ (T : countType) := Countable.on T^d.
-HB.instance Definition _ (T : finType) := Finite.on T^d.
-
-Context {disp : unit}.
-Variable T : porderType disp.
-
-Lemma dual_lt_def (x y : T) : gt x y = (y != x) && ge x y.
-Proof. by apply: lt_neqAle. Qed.
-
-Fact dual_le_anti : antisymmetric (@ge _ T).
-Proof. by move=> x y /andP [xy yx]; apply/le_anti/andP; split. Qed.
-
-HB.instance Definition _ :=
-  isPOrder.Build
-    (dual_display disp) (T^d)
-    dual_lt_def lexx dual_le_anti
-    (fun y z x zy yx => @le_trans _ _ y x z yx zy).
-
-Lemma leEdual (x y : T) : (x <=^d y :> T^d) = (y <= x). Proof. by []. Qed.
-Lemma ltEdual (x y : T) : (x <^d y :> T^d) = (y < x). Proof. by []. Qed.
-
-End DualPOrder.
-
-HB.instance Definition _ d (T : finPOrderType d) := FinPOrder.on T^d.
-
-End DualPOrder.
-
-Module Import DualLattice.
-Section DualLattice.
-Context {disp : unit}.
-Variable L : latticeType disp.
-Implicit Types (x y : L).
-
-Lemma meetC : commutative (@meet _ L). Proof. exact: meetC. Qed.
-Lemma joinC : commutative (@join _ L). Proof. exact: joinC. Qed.
-
-Lemma meetA : associative (@meet _ L). Proof. exact: meetA. Qed.
-Lemma joinA : associative (@join _ L). Proof. exact: joinA. Qed.
-
-Lemma joinKI y x : x `&` (x `|` y) = x. Proof. exact: joinKI. Qed.
-Lemma meetKU y x : x `|` (x `&` y) = x. Proof. exact: meetKU. Qed.
-
-Lemma joinKIC y x : x `&` (y `|` x) = x. Proof. by rewrite joinC joinKI. Qed.
-Lemma meetKUC y x : x `|` (y `&` x) = x. Proof. by rewrite meetC meetKU. Qed.
-
-Lemma meetUK x y : (x `&` y) `|` y = y.
-Proof. by rewrite joinC meetC meetKU. Qed.
-Lemma joinIK x y : (x `|` y) `&` y = y.
-Proof. by rewrite joinC meetC joinKI. Qed.
-
-Lemma meetUKC x y : (y `&` x) `|` y = y. Proof. by rewrite meetC meetUK. Qed.
-Lemma joinIKC x y : (y `|` x) `&` y = y. Proof. by rewrite joinC joinIK. Qed.
-
-Lemma leEmeet x y : (x <= y) = (x `&` y == x).
-Proof. exact: leEmeet. Qed.
-
-Lemma leEjoin x y : (x <= y) = (x `|` y == y).
-Proof. by rewrite leEmeet; apply/eqP/eqP => <-; rewrite (joinKI, meetUK). Qed.
-
-Fact dual_leEmeet (x y : L^d) : (x <= y) = (x `|` y == x).
-Proof. by rewrite [LHS]leEjoin joinC. Qed.
-
-HB.instance Definition _ :=
-  @POrder_isLattice.Build
-    (dual_display disp) L^d
-    join meet joinC meetC joinA meetA meetKU joinKI dual_leEmeet.
-
-Lemma meetEdual x y : ((x : L^d) `&^d` y) = (x `|` y). Proof. by []. Qed.
-Lemma joinEdual x y : ((x : L^d) `|^d` y) = (x `&` y). Proof. by []. Qed.
-
-End DualLattice.
-End DualLattice.
-
 Module Import LatticeTheoryMeet.
 Section LatticeTheoryMeet.
 Context {disp : unit} {L : latticeType disp}.
@@ -2912,8 +2969,6 @@ Proof. by move=> x y z; rewrite meetUr joinIK meetUl -joinA meetUKC. Qed.
 
 Lemma joinIr : right_distributive (@join _ L) (@meet _ L).
 Proof. by move=> x y z; rewrite !(joinC x) -joinIl. Qed.
-
-HB.instance Definition _ := Lattice_Meet_isDistrLattice.Build _ L^d joinIl.
 
 End DistrLatticeTheory.
 End DistrLatticeTheory.
@@ -3800,24 +3855,6 @@ End BLatticeTheory.
 
 End BLatticeTheory.
 
-Module Import DualTBLattice.
-Section DualTBLattice.
-Context {disp : unit} {L : tbLatticeType disp}.
-
-HB.instance Definition _ := hasBottom.Build _ L^d lex1.
-(* FIXME: BUG? *)
-(* HB.instance Definition _ := TBLattice.on L^d. *)
-HB.instance Definition _ := hasTop.Build _ L^d (@le0x _ L).
-
-Lemma botEdual : (dual_bottom : L^d) = \top :> L. Proof. by []. Qed.
-Lemma topEdual : (dual_top : L^d) = \bot :> L. Proof. by []. Qed.
-
-End DualTBLattice.
-
-HB.instance Definition _ d (T : finLatticeType d) := FinLattice.on T^d.
-
-End DualTBLattice.
-
 Module Import TLatticeTheory.
 Section TLatticeTheory.
 Context {disp : unit} {L : tLatticeType disp}.
@@ -3969,20 +4006,6 @@ Qed.
 
 End BDistrLatticeTheory.
 End BDistrLatticeTheory.
-
-Module Import DualTBDistrLattice.
-Section DualTBDistrLattice.
-Context {disp : unit} {L : tbDistrLatticeType disp}.
-
-HB.instance Definition _ := BDistrLattice.on L^d.
-HB.instance Definition _ := TBDistrLattice.on L^d.
-
-End DualTBDistrLattice.
-
-HB.instance Definition _ d (T : finDistrLatticeType d) :=
-  FinDistrLattice.on T^d.
-
-End DualTBDistrLattice.
 
 Module Import TBDistrLatticeTheory.
 Section TBDistrLatticeTheory.
@@ -7655,22 +7678,7 @@ HB.instance Definition _ n (T : finOrderType disp) :=
 End DefaultTupleLexiOrder.
 End DefaultTupleLexiOrder.
 
-Module Import DualOrder.
-Section DualOrder.
-Context {disp : unit}.
-Variable O : orderType disp.
-
-Lemma dual_total : total (<=%O : rel O^d).
-Proof. by move=> x y; exact: le_total. Qed.
-
-#[export]
-HB.instance Definition _ := DistrLattice_isTotal.Build _ O^d dual_total.
-
-End DualOrder.
-
-#[export]
-HB.instance Definition _ d (T : finOrderType d) := FinTotal.on T^d.
-
+Module Import DualOrderTheory.
 Section DualOrderTheory.
 
 Context {disp : unit} {T : orderType disp}.
@@ -7716,8 +7724,7 @@ by rewrite nth_count_le// nth_count_ge// ige (leq_trans ilt (count_size _ _)).
 Qed.
 
 End DualOrderTheory.
-
-End DualOrder.
+End DualOrderTheory.
 
 (*********************************************)
 (* We declare a "copy" of the sets,          *)
@@ -8067,19 +8074,15 @@ End Syntax.
 Module LTheory.
 Export POCoercions.
 Export POrderTheory.
-Export DualPOrder.
-
-Export DualLattice.
 Export LatticeTheoryMeet.
 Export LatticeTheoryJoin.
 Export DistrLatticeTheory.
 Export BLatticeTheory.
 Export TLatticeTheory.
-Export DualTBLattice.
 Export TBLatticeTheory.
 Export BDistrLatticeTheory.
-Export DualTBDistrLattice.
 Export TBDistrLatticeTheory.
+Export DualOrderTheory. (* FIXME? *)
 Export DualOrder. (* FIXME? *)
 
 Export OrderMorphismTheory.
