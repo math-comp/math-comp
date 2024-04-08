@@ -567,7 +567,7 @@ Lemma Aint1 : 1 \in Aint. Proof. exact: Aint_int 1. Qed.
 
 Lemma Aint_unity_root n x : (n > 0)%N -> n.-unity_root x -> x \in Aint.
 Proof.
-move=> n_gt0 xn1; apply: root_monic_Aint xn1 (monic_Xn_sub_1 _ n_gt0) _.
+move=> n_gt0 xn1; apply: root_monic_Aint xn1 (monicXnsubC _ n_gt0) _.
 by apply/polyOverP=> i; rewrite coefB coefC -mulrb coefXn /= rpredB ?rpred_nat.
 Qed.
 
