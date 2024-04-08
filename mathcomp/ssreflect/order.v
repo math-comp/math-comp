@@ -2850,8 +2850,8 @@ End TPOrderTheory.
 #[global] Hint Extern 0 (is_true (\bot <= _)) => exact: le0x : core.
 #[global] Hint Extern 0 (is_true (_ <= \top)) => exact: lex1 : core.
 
-Module Import LatticeTheoryMeet.
-Section LatticeTheoryMeet.
+Module Import MeetTheory.
+Section MeetTheory.
 Context {disp : unit} {L : latticeType disp}.
 Implicit Types (x y : L).
 
@@ -2921,11 +2921,103 @@ Proof. by rewrite meetC eq_meetl. Qed.
 Lemma leI2 x y z t : x <= z -> y <= t -> x `&` y <= z `&` t.
 Proof. by move=> xz yt; rewrite lexI !leIx2 ?xz ?yt ?orbT //. Qed.
 
-End LatticeTheoryMeet.
-End LatticeTheoryMeet.
+End MeetTheory.
+End MeetTheory.
 
-Module Import LatticeTheoryJoin.
-Section LatticeTheoryJoin.
+Arguments meet_idPl {disp L x y}.
+Arguments meet_idPr {disp L x y}.
+
+Module Import BMeetTheory.
+Section BMeetTheory.
+Context {disp : unit} {L : bLatticeType disp}.
+
+Lemma meet0x : left_zero \bot (@meet _ L).
+Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
+
+Lemma meetx0 : right_zero \bot (@meet _ L).
+Proof. by move=> x; rewrite meetC meet0x. Qed.
+
+HB.instance Definition _ := Monoid.isMulLaw.Build L \bot meet meet0x meetx0.
+
+End BMeetTheory.
+End BMeetTheory.
+
+Module Import TMeetTheory.
+Section TMeetTheory.
+Context {disp : unit} {L : tLatticeType disp}.
+Implicit Types (I : finType) (T : eqType) (x y : L).
+
+Lemma meetx1 : right_id \top (@meet _ L).
+Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
+
+Lemma meet1x : left_id \top (@meet _ L).
+Proof. by move=> x; apply/eqP; rewrite meetC meetx1. Qed.
+
+Lemma meet_eq1 x y : (x `&` y == \top) = (x == \top) && (y == \top).
+Proof.
+apply/idP/idP; last by move=> /andP[/eqP-> /eqP->]; rewrite meetx1.
+by move=> /eqP xIy1; rewrite -!le1x -xIy1 leIl leIr.
+Qed.
+
+HB.instance Definition _ := Monoid.isComLaw.Build L \top meet
+  (@meetA _ L) (@meetC _ L) meet1x.
+
+Lemma meets_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
+  x \in r -> P x -> \meet_(i <- r | P i) F i <= F x.
+Proof. by move=> xr Px; rewrite (big_rem x) ?Px //= leIl. Qed.
+
+Lemma meets_max_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (u : L) :
+  x \in r -> P x -> F x <= u -> \meet_(x <- r | P x) F x <= u.
+Proof. by move=> ? ?; apply/le_trans/meets_inf_seq. Qed.
+
+Lemma meets_inf I (j : I) (P : {pred I}) (F : I -> L) :
+   P j -> \meet_(i | P i) F i <= F j.
+Proof. exact: meets_inf_seq. Qed.
+
+Lemma meets_max I (j : I) (u : L) (P : {pred I}) (F : I -> L) :
+   P j -> F j <= u -> \meet_(i | P i) F i <= u.
+Proof. exact: meets_max_seq. Qed.
+
+Lemma meets_ge J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
+  (forall x : J, P x -> u <= F x) -> u <= \meet_(x <- r | P x) F x.
+Proof. by move=> leFm; elim/big_rec: _ => // i x Px xu; rewrite lexI leFm. Qed.
+
+Lemma meetsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (l : L) :
+  reflect (forall x : T, x \in r -> P x -> l <= F x)
+          (l <= \meet_(x <- r | P x) F x).
+Proof.
+apply: (iffP idP) => leFm => [x xr Px|].
+  exact/(le_trans leFm)/meets_inf_seq.
+by rewrite big_seq_cond meets_ge// => x /andP[/leFm].
+Qed.
+
+Lemma meetsP I (l : L) (P : {pred I}) (F : I -> L) :
+   reflect (forall i : I, P i -> l <= F i) (l <= \meet_(i | P i) F i).
+Proof. by apply: (iffP (meetsP_seq _ _ _ _)) => H ? ?; apply: H. Qed.
+
+Lemma le_meets I (A B : {set I}) (F : I -> L) :
+   A \subset B -> \meet_(i in B) F i <= \meet_(i in A) F i.
+Proof. by move=> /subsetP AB; apply/meetsP => i iA; apply/meets_inf/AB. Qed.
+
+Lemma meets_setU I (A B : {set I}) (F : I -> L) :
+   \meet_(i in (A :|: B)) F i = \meet_(i in A) F i `&` \meet_(i in B) F i.
+Proof.
+rewrite -!big_enum; have /= <- := @big_cat _ _ meet.
+apply/eq_big_idem; first exact: meetxx.
+by move=> ?; rewrite mem_cat !mem_enum inE.
+Qed.
+
+Lemma meets_seq I (r : seq I) (F : I -> L) :
+   \meet_(i <- r) F i = \meet_(i in r) F i.
+Proof.
+by rewrite -big_enum; apply/eq_big_idem => ?; rewrite /= ?meetxx ?mem_enum.
+Qed.
+
+End TMeetTheory.
+End TMeetTheory.
+
+Module Import JoinTheory.
+Section JoinTheory.
 Context {disp : unit} {L : latticeType disp}.
 Implicit Types (x y : L).
 
@@ -2985,6 +3077,91 @@ Proof. exact: (@eq_meetr _ L^d). Qed.
 Lemma leU2 x y z t : x <= z -> y <= t -> x `|` y <= z `|` t.
 Proof. exact: (@leI2 _ L^d). Qed.
 
+End JoinTheory.
+End JoinTheory.
+
+Arguments join_idPl {disp L x y}.
+Arguments join_idPr {disp L x y}.
+
+Module Import BJoinTheory.
+Section BJoinTheory.
+Context {disp : unit} {L : bLatticeType disp}.
+Implicit Types (I : finType) (T : eqType) (x y : L).
+
+Lemma joinx0 : right_id \bot (@join _ L).
+Proof. exact: (@meetx1 _ L^d). Qed.
+Lemma join0x : left_id \bot (@join _ L).
+Proof. exact: (@meet1x _ L^d). Qed.
+
+Lemma join_eq0 x y : (x `|` y == \bot) = (x == \bot) && (y == \bot).
+Proof. exact: (@meet_eq1 _ L^d). Qed.
+
+HB.instance Definition _ := Monoid.isComLaw.Build L \bot join
+  (@joinA _ L) (@joinC _ L) join0x.
+
+Lemma joins_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
+  x \in r -> P x -> F x <= \join_(i <- r | P i) F i.
+Proof. exact: (@meets_inf_seq _ L^d). Qed.
+
+Lemma joins_min_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (l : L) :
+  x \in r -> P x -> l <= F x -> l <= \join_(x <- r | P x) F x.
+Proof. exact: (@meets_max_seq _ L^d). Qed.
+
+Lemma joins_sup I (j : I) (P : {pred I}) (F : I -> L) :
+  P j -> F j <= \join_(i | P i) F i.
+Proof. exact: (@meets_inf _ L^d). Qed.
+
+Lemma joins_min I (j : I) (l : L) (P : {pred I}) (F : I -> L) :
+  P j -> l <= F j -> l <= \join_(i | P i) F i.
+Proof. exact: (@meets_max _ L^d). Qed.
+
+Lemma joins_le J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
+  (forall x : J, P x -> F x <= u) -> \join_(x <- r | P x) F x <= u.
+Proof. exact: (@meets_ge _ L^d). Qed.
+
+Lemma joinsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (u : L) :
+  reflect (forall x : T, x \in r -> P x -> F x <= u)
+          (\join_(x <- r | P x) F x <= u).
+Proof. exact: (@meetsP_seq _ L^d). Qed.
+
+Lemma joinsP I (u : L) (P : {pred I}) (F : I -> L) :
+  reflect (forall i : I, P i -> F i <= u) (\join_(i | P i) F i <= u).
+Proof. exact: (@meetsP _ L^d). Qed.
+
+Lemma le_joins I (A B : {set I}) (F : I -> L) :
+  A \subset B -> \join_(i in A) F i <= \join_(i in B) F i.
+Proof. exact: (@le_meets _ L^d). Qed.
+
+Lemma joins_setU I (A B : {set I}) (F : I -> L) :
+  \join_(i in (A :|: B)) F i = \join_(i in A) F i `|` \join_(i in B) F i.
+Proof. exact: (@meets_setU _ L^d). Qed.
+
+Lemma joins_seq I (r : seq I) (F : I -> L) :
+  \join_(i <- r) F i = \join_(i in r) F i.
+Proof. exact: (@meets_seq _ L^d). Qed.
+
+End BJoinTheory.
+End BJoinTheory.
+
+Module Import TJoinTheory.
+Section TJoinTheory.
+Context {disp : unit} {L : tLatticeType disp}.
+
+Lemma joinx1 : right_zero \top (@join _ L). Proof. exact: (@meetx0 _ L^d). Qed.
+Lemma join1x : left_zero \top (@join _ L). Proof. exact: (@meet0x _ L^d). Qed.
+
+HB.instance Definition _ := Monoid.isMulLaw.Build L \top join join1x joinx1.
+
+End TJoinTheory.
+End TJoinTheory.
+
+Module Import LatticeTheory.
+Section LatticeTheory.
+Context {disp : unit} {L : latticeType disp}.
+Implicit Types (x y : L).
+
+(* comparison predicates *)
+
 Lemma lcomparableP x y : incomparel x y
   (min y x) (min x y) (max y x) (max x y)
   (y `&` x) (x `&` y) (y `|` x) (x `|` y)
@@ -3012,11 +3189,8 @@ Lemma lcomparable_ltP x y : x >=< y ->
                  (y `&` x) (x `&` y) (y `|` x) (x `|` y) (y <= x) (x < y).
 Proof. by move=> /lcomparable_ltgtP [xy|/ltW xy|->]; constructor. Qed.
 
-End LatticeTheoryJoin.
-End LatticeTheoryJoin.
-
-Arguments meet_idPl {disp L x y}.
-Arguments join_idPl {disp L x y}.
+End LatticeTheory.
+End LatticeTheory.
 
 Module Import DistrLatticeTheory.
 Section DistrLatticeTheory.
@@ -3034,8 +3208,82 @@ Proof. by move=> x y z; rewrite meetUr joinIK meetUl -joinA meetUKC. Qed.
 Lemma joinIr : right_distributive (@join _ L) (@meet _ L).
 Proof. by move=> x y z; rewrite !(joinC x) -joinIl. Qed.
 
+HB.instance Definition _ := Monoid.isAddLaw.Build L meet join meetUl meetUr.
+HB.instance Definition _ := Monoid.isAddLaw.Build L join meet joinIl joinIr.
+
 End DistrLatticeTheory.
 End DistrLatticeTheory.
+
+Module Import BDistrLatticeTheory.
+Section BDistrLatticeTheory.
+Context {disp : unit} {L : bDistrLatticeType disp}.
+Implicit Types (x y z : L).
+
+Lemma leU2l_le y t x z : x `&` t = \bot -> x `|` y <= z `|` t -> x <= z.
+Proof.
+by move=> xIt0 /(leI2 (lexx x)); rewrite joinKI meetUr xIt0 joinx0 leIidl.
+Qed.
+
+Lemma leU2r_le y t x z : x `&` t = \bot -> y `|` x <= t `|` z -> x <= z.
+Proof. by rewrite joinC [_ `|` z]joinC => /leU2l_le H /H. Qed.
+
+Lemma disjoint_lexUl z x y : x `&` z = \bot -> (x <= y `|` z) = (x <= y).
+Proof.
+move=> xz0; apply/idP/idP=> xy; last by rewrite lexU2 ?xy.
+by apply: (@leU2l_le x z); rewrite ?joinxx.
+Qed.
+
+Lemma disjoint_lexUr z x y : x `&` z = \bot -> (x <= z `|` y) = (x <= y).
+Proof. by move=> xz0; rewrite joinC; rewrite disjoint_lexUl. Qed.
+
+Lemma leU2E x y z t : x `&` t = \bot -> y `&` z = \bot ->
+  (x `|` y <= z `|` t) = (x <= z) && (y <= t).
+Proof.
+move=> dxt dyz; apply/idP/andP; last by case=> ? ?; exact: leU2.
+by move=> lexyzt; rewrite (leU2l_le _ lexyzt) // (leU2r_le _ lexyzt).
+Qed.
+
+Lemma joins_disjoint (I : finType) (d : L) (P : {pred I}) (F : I -> L) :
+   (forall i : I, P i -> d `&` F i = \bot) -> d `&` \join_(i | P i) F i = \bot.
+Proof.
+move=> d_Fi_disj; have : \big[andb/true]_(i | P i) (d `&` F i == \bot).
+  rewrite big_all_cond; apply/allP => i _ /=.
+  by apply/implyP => /d_Fi_disj ->.
+elim/big_rec2: _ => [|i y]; first by rewrite meetx0.
+case; rewrite (andbF, andbT) // => Pi /(_ isT) dy /eqP dFi.
+by rewrite meetUr dy dFi joinxx.
+Qed.
+
+End BDistrLatticeTheory.
+End BDistrLatticeTheory.
+
+Module Import TDistrLatticeTheory.
+Section TDistrLatticeTheory.
+Context {disp : unit} {L : tDistrLatticeType disp}.
+Implicit Types (x y : L).
+
+Lemma leI2l_le y t x z : y `|` z = \top -> x `&` y <= z `&` t -> x <= z.
+Proof. by rewrite joinC; exact: (@leU2l_le _ L^d). Qed.
+
+Lemma leI2r_le y t x z : y `|` z = \top -> y `&` x <= t `&` z -> x <= z.
+Proof. by rewrite joinC; exact: (@leU2r_le _ L^d). Qed.
+
+Lemma cover_leIxl z x y : z `|` y = \top -> (x `&` z <= y) = (x <= y).
+Proof. by rewrite joinC; exact: (@disjoint_lexUl _ L^d). Qed.
+
+Lemma cover_leIxr z x y : z `|` y = \top -> (z `&` x <= y) = (x <= y).
+Proof. by rewrite joinC; exact: (@disjoint_lexUr _ L^d). Qed.
+
+Lemma leI2E x y z t : x `|` t = \top -> y `|` z = \top ->
+  (x `&` y <= z `&` t) = (x <= z) && (y <= t).
+Proof. by move=> ? ?; apply: (@leU2E _ L^d); rewrite meetC. Qed.
+
+Lemma meets_total (I : finType) (d : L) (P : {pred I}) (F : I -> L) :
+   (forall i : I, P i -> d `|` F i = \top) -> d `|` \meet_(i | P i) F i = \top.
+Proof. exact: (@joins_disjoint _ L^d). Qed.
+
+End TDistrLatticeTheory.
+End TDistrLatticeTheory.
 
 Module Import TotalTheory.
 Section TotalTheory.
@@ -3087,9 +3335,9 @@ Lemma leNgt x y : (x <= y) = ~~ (y < x). Proof. exact: comparable_leNgt. Qed.
 
 Lemma ltNge x y : (x < y) = ~~ (y <= x). Proof. exact: comparable_ltNge. Qed.
 
-Definition ltgtP x y := LatticeTheoryJoin.lcomparable_ltgtP (comparableT x y).
-Definition leP x y := LatticeTheoryJoin.lcomparable_leP (comparableT x y).
-Definition ltP x y := LatticeTheoryJoin.lcomparable_ltP (comparableT x y).
+Definition ltgtP x y := LatticeTheory.lcomparable_ltgtP (comparableT x y).
+Definition leP x y := LatticeTheory.lcomparable_leP (comparableT x y).
+Definition ltP x y := LatticeTheory.lcomparable_ltP (comparableT x y).
 
 Lemma wlog_le P :
      (forall x y, P y x -> P x y) -> (forall x y, x <= y -> P x y) ->
@@ -3692,6 +3940,54 @@ Arguments bigmax_eq_arg {disp T I} x j.
 Arguments eq_bigmin {disp T I x} j.
 Arguments eq_bigmax {disp T I x} j.
 
+(* FIXME: some lemmas in the following section should hold for any porderType *)
+Module Import DualTotalTheory.
+Section DualTotalTheory.
+Context {disp : unit} {T : orderType disp}.
+Implicit Type s : seq T.
+
+Lemma sorted_filter_gt x s :
+  sorted <=%O s -> [seq y <- s | x < y] = drop (count (<= x) s) s.
+Proof.
+move=> s_sorted; rewrite count_le_gt -[LHS]revK -filter_rev.
+rewrite (@sorted_filter_lt _ T^d); first by rewrite take_rev revK count_rev.
+by rewrite rev_sorted.
+Qed.
+
+Lemma sorted_filter_ge x s :
+  sorted <=%O s -> [seq y <- s | x <= y] = drop (count (< x) s) s.
+Proof.
+move=> s_sorted; rewrite count_lt_ge -[LHS]revK -filter_rev.
+rewrite (@sorted_filter_le _ T^d); first by rewrite take_rev revK count_rev.
+by rewrite rev_sorted.
+Qed.
+
+Lemma nth_count_ge x x0 s i : sorted <=%O s ->
+  (count (< x) s <= i < size s)%N -> x <= nth x0 s i.
+Proof.
+move=> ss /andP[ige ilt]; rewrite -(subnKC ige) -nth_drop -sorted_filter_ge //.
+apply/(all_nthP _ (filter_all _ _)).
+by rewrite size_filter ltn_subLR // count_lt_ge subnK // count_size.
+Qed.
+
+Lemma nth_count_gt x x0 s i : sorted <=%O s ->
+  (count (<= x) s <= i < size s)%N -> x < nth x0 s i.
+Proof.
+move=> ss /andP[ige ilt]; rewrite -(subnKC ige) -nth_drop -sorted_filter_gt //.
+apply/(all_nthP _ (filter_all _ _)).
+by rewrite size_filter ltn_subLR // count_le_gt subnK // count_size.
+Qed.
+
+Lemma nth_count_eq x x0 s i : sorted <=%O s ->
+  (count (< x) s <= i < count (<= x) s)%N -> nth x0 s i = x.
+Proof.
+move=> ss /andP[ige ilt]; apply/le_anti.
+by rewrite nth_count_le// nth_count_ge// ige (leq_trans ilt (count_size _ _)).
+Qed.
+
+End DualTotalTheory.
+End DualTotalTheory.
+
 (* contra lemmas *)
 
 Section ContraTheory.
@@ -3816,255 +4112,6 @@ Notation le_minr := le_min.
 Notation le_minl := ge_min.
 
 End TotalTheory.
-
-Module Import BLatticeTheory.
-Section BLatticeTheory.
-Context {disp : unit} {L : bLatticeType disp}.
-Implicit Types (I : finType) (T : eqType) (x y z : L).
-Local Notation "\bot" := bottom.
-
-Lemma meet0x : left_zero \bot (@meet _ L).
-Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
-
-Lemma meetx0 : right_zero \bot (@meet _ L).
-Proof. by move=> x; rewrite meetC meet0x. Qed.
-
-Lemma join0x : left_id \bot (@join _ L).
-Proof. by move=> x; apply/eqP; rewrite -leEjoin. Qed.
-
-Lemma joinx0 : right_id \bot (@join _ L).
-Proof. by move=> x; rewrite joinC join0x. Qed.
-
-Lemma join_eq0 x y : (x `|` y == \bot) = (x == \bot) && (y == \bot).
-Proof.
-apply/idP/idP; last by move=> /andP [/eqP-> /eqP->]; rewrite joinx0.
-by move=> /eqP xUy0; rewrite -!lex0 -xUy0 leUl leUr.
-Qed.
-
-HB.instance Definition _ := Monoid.isComLaw.Build L \bot join
-  (@joinA _ L) (@joinC _ L) join0x.
-
-HB.instance Definition _ := Monoid.isMulLaw.Build L \bot meet meet0x meetx0.
-
-Lemma joins_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
-  x \in r -> P x -> F x <= \join_(i <- r | P i) F i.
-Proof. by move=> xr Px; rewrite (big_rem x) ?Px //= leUl. Qed.
-
-Lemma joins_min_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (l : L) :
-  x \in r -> P x -> l <= F x -> l <= \join_(x <- r | P x) F x.
-Proof. by move=> ? ? /le_trans; apply; apply: joins_sup_seq. Qed.
-
-Lemma joins_sup I (j : I) (P : {pred I}) (F : I -> L) :
-  P j -> F j <= \join_(i | P i) F i.
-Proof. exact: joins_sup_seq. Qed.
-
-Lemma joins_min I (j : I) (l : L) (P : {pred I}) (F : I -> L) :
-  P j -> l <= F j -> l <= \join_(i | P i) F i.
-Proof. exact: joins_min_seq. Qed.
-
-Lemma joins_le J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
-  (forall x : J, P x -> F x <= u) -> \join_(x <- r | P x) F x <= u.
-Proof. by move=> leFm; elim/big_rec: _ => // i x Px xu; rewrite leUx leFm. Qed.
-
-Lemma joinsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (u : L) :
-  reflect (forall x : T, x \in r -> P x -> F x <= u)
-          (\join_(x <- r | P x) F x <= u).
-Proof.
-apply: (iffP idP) => leFm => [x xr Px|].
-  exact/(le_trans _ leFm)/joins_sup_seq.
-by rewrite big_seq_cond joins_le// => x /andP[/leFm].
-Qed.
-
-Lemma joinsP I (u : L) (P : {pred I}) (F : I -> L) :
-  reflect (forall i : I, P i -> F i <= u) (\join_(i | P i) F i <= u).
-Proof. by apply: (iffP (joinsP_seq _ _ _ _)) => H ? ?; apply: H. Qed.
-
-Lemma le_joins I (A B : {set I}) (F : I -> L) :
-  A \subset B -> \join_(i in A) F i <= \join_(i in B) F i.
-Proof. by move=> /subsetP AB; apply/joinsP => i iA; apply/joins_sup/AB. Qed.
-
-Lemma joins_setU I (A B : {set I}) (F : I -> L) :
-  \join_(i in (A :|: B)) F i = \join_(i in A) F i `|` \join_(i in B) F i.
-Proof.
-rewrite -!big_enum; have /= <- := @big_cat _ _ join.
-apply/eq_big_idem; first exact: joinxx.
-by move=> ?; rewrite mem_cat !mem_enum inE.
-Qed.
-
-Lemma joins_seq I (r : seq I) (F : I -> L) :
-  \join_(i <- r) F i = \join_(i in r) F i.
-Proof.
-by rewrite -big_enum; apply/eq_big_idem => ?; rewrite /= ?joinxx ?mem_enum.
-Qed.
-
-End BLatticeTheory.
-
-End BLatticeTheory.
-
-Module Import TLatticeTheory.
-Section TLatticeTheory.
-Context {disp : unit} {L : tLatticeType disp}.
-Implicit Types (I : finType) (T : eqType) (x y : L).
-
-Local Notation "\top" := top.
-
-Lemma meetx1 : right_id \top (@meet _ L).
-Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
-
-Lemma meet1x : left_id \top (@meet _ L).
-Proof. by move=> x; apply/eqP; rewrite meetC meetx1. Qed.
-
-Lemma joinx1 : right_zero \top (@join _ L).
-Proof. by move=> x; apply/eqP; rewrite -leEjoin. Qed.
-
-Lemma join1x : left_zero \top (@join _ L).
-Proof. by move=> x; apply/eqP; rewrite joinC joinx1. Qed.
-
-Lemma meet_eq1 x y : (x `&` y == \top) = (x == \top) && (y == \top).
-Proof.
-apply/idP/idP; last by move=> /andP[/eqP-> /eqP->]; rewrite meetx1.
-by move=> /eqP xIy1; rewrite -!le1x -xIy1 leIl leIr.
-Qed.
-
-HB.instance Definition _ := Monoid.isComLaw.Build L \top meet
-  (@meetA _ L) (@meetC _ L) meet1x.
-
-HB.instance Definition _ := Monoid.isMulLaw.Build L \top join join1x joinx1.
-
-Lemma meets_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
-  x \in r -> P x -> \meet_(i <- r | P i) F i <= F x.
-Proof. by move=> xr Px; rewrite (big_rem x) ?Px //= leIl. Qed.
-
-Lemma meets_max_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) (u : L) :
-  x \in r -> P x -> F x <= u -> \meet_(x <- r | P x) F x <= u.
-Proof. move=> ? ?; apply: le_trans; exact: meets_inf_seq. Qed.
-
-Lemma meets_inf I (j : I) (P : {pred I}) (F : I -> L) :
-   P j -> \meet_(i | P i) F i <= F j.
-Proof. exact: meets_inf_seq. Qed.
-
-Lemma meets_max I (j : I) (u : L) (P : {pred I}) (F : I -> L) :
-   P j -> F j <= u -> \meet_(i | P i) F i <= u.
-Proof. exact: meets_max_seq. Qed.
-
-Lemma meets_ge J (r : seq J) (P : {pred J}) (F : J -> L) (u : L) :
-  (forall x : J, P x -> u <= F x) -> u <= \meet_(x <- r | P x) F x.
-Proof. by move=> leFm; elim/big_rec: _ => // i x Px xu; rewrite lexI leFm. Qed.
-
-Lemma meetsP_seq T (r : seq T) (P : {pred T}) (F : T -> L) (l : L) :
-  reflect (forall x : T, x \in r -> P x -> l <= F x)
-          (l <= \meet_(x <- r | P x) F x).
-Proof.
-apply: (iffP idP) => leFm => [x xr Px|].
-  exact/(le_trans leFm)/meets_inf_seq.
-by rewrite big_seq_cond meets_ge// => x /andP[/leFm].
-Qed.
-
-Lemma meetsP I (l : L) (P : {pred I}) (F : I -> L) :
-   reflect (forall i : I, P i -> l <= F i) (l <= \meet_(i | P i) F i).
-Proof. by apply: (iffP (meetsP_seq _ _ _ _)) => H ? ?; apply: H. Qed.
-
-Lemma le_meets I (A B : {set I}) (F : I -> L) :
-   A \subset B -> \meet_(i in B) F i <= \meet_(i in A) F i.
-Proof. by move=> /subsetP AB; apply/meetsP => i iA; apply/meets_inf/AB. Qed.
-
-Lemma meets_setU I (A B : {set I}) (F : I -> L) :
-   \meet_(i in (A :|: B)) F i = \meet_(i in A) F i `&` \meet_(i in B) F i.
-Proof.
-rewrite -!big_enum; have /= <- := @big_cat _ _ meet.
-apply/eq_big_idem; first exact: meetxx.
-by move=> ?; rewrite mem_cat !mem_enum inE.
-Qed.
-
-Lemma meets_seq I (r : seq I) (F : I -> L) :
-   \meet_(i <- r) F i = \meet_(i in r) F i.
-Proof.
-by rewrite -big_enum; apply/eq_big_idem => ?; rewrite /= ?meetxx ?mem_enum.
-Qed.
-
-End TLatticeTheory.
-
-End TLatticeTheory.
-
-Module Import BDistrLatticeTheory.
-Section BDistrLatticeTheory.
-Context {disp : unit} {L : bDistrLatticeType disp}.
-Implicit Types (I : finType) (T : eqType) (x y z : L).
-Local Notation "\bot" := bottom.
-(* Distributive lattice theory with \bot & \top *)
-
-Lemma leU2l_le y t x z : x `&` t = \bot -> x `|` y <= z `|` t -> x <= z.
-Proof.
-by move=> xIt0 /(leI2 (lexx x)); rewrite joinKI meetUr xIt0 joinx0 leIidl.
-Qed.
-
-Lemma leU2r_le y t x z : x `&` t = \bot -> y `|` x <= t `|` z -> x <= z.
-Proof. by rewrite joinC [_ `|` z]joinC => /leU2l_le H /H. Qed.
-
-Lemma disjoint_lexUl z x y : x `&` z = \bot -> (x <= y `|` z) = (x <= y).
-Proof.
-move=> xz0; apply/idP/idP=> xy; last by rewrite lexU2 ?xy.
-by apply: (@leU2l_le x z); rewrite ?joinxx.
-Qed.
-
-Lemma disjoint_lexUr z x y : x `&` z = \bot -> (x <= z `|` y) = (x <= y).
-Proof. by move=> xz0; rewrite joinC; rewrite disjoint_lexUl. Qed.
-
-Lemma leU2E x y z t : x `&` t = \bot -> y `&` z = \bot ->
-  (x `|` y <= z `|` t) = (x <= z) && (y <= t).
-Proof.
-move=> dxt dyz; apply/idP/andP; last by case=> ? ?; exact: leU2.
-by move=> lexyzt; rewrite (leU2l_le _ lexyzt) // (leU2r_le _ lexyzt).
-Qed.
-
-Lemma joins_disjoint I (d : L) (P : {pred I}) (F : I -> L) :
-   (forall i : I, P i -> d `&` F i = \bot) -> d `&` \join_(i | P i) F i = \bot.
-Proof.
-move=> d_Fi_disj; have : \big[andb/true]_(i | P i) (d `&` F i == \bot).
-  rewrite big_all_cond; apply/allP => i _ /=.
-  by apply/implyP => /d_Fi_disj ->.
-elim/big_rec2: _ => [|i y]; first by rewrite meetx0.
-case; rewrite (andbF, andbT) // => Pi /(_ isT) dy /eqP dFi.
-by rewrite meetUr dy dFi joinxx.
-Qed.
-
-End BDistrLatticeTheory.
-End BDistrLatticeTheory.
-
-Module Import TDistrLatticeTheory.
-Section TDistrLatticeTheory.
-Context {disp : unit} {L : tDistrLatticeType disp}.
-Implicit Types (I : finType) (T : eqType) (x y : L).
-
-Local Notation "\top" := top.
-
-Lemma leI2l_le y t x z : y `|` z = \top -> x `&` y <= z `&` t -> x <= z.
-Proof. by rewrite joinC; exact: (@leU2l_le _ L^d). Qed.
-
-Lemma leI2r_le y t x z : y `|` z = \top -> y `&` x <= t `&` z -> x <= z.
-Proof. by rewrite joinC; exact: (@leU2r_le _ L^d). Qed.
-
-Lemma cover_leIxl z x y : z `|` y = \top -> (x `&` z <= y) = (x <= y).
-Proof. by rewrite joinC; exact: (@disjoint_lexUl _ L^d). Qed.
-
-Lemma cover_leIxr z x y : z `|` y = \top -> (z `&` x <= y) = (x <= y).
-Proof. by rewrite joinC; exact: (@disjoint_lexUr _ L^d). Qed.
-
-Lemma leI2E x y z t : x `|` t = \top -> y `|` z = \top ->
-  (x `&` y <= z `&` t) = (x <= z) && (y <= t).
-Proof. by move=> ? ?; apply: (@leU2E _ L^d); rewrite meetC. Qed.
-
-HB.instance Definition _ := Monoid.isAddLaw.Build L meet join
-  (@meetUl _ L) (@meetUr _ _).
-HB.instance Definition _ := Monoid.isAddLaw.Build L join meet
-  (@joinIl _ L) (@joinIr _ _).
-
-Lemma meets_total I (d : L) (P : {pred I}) (F : I -> L) :
-   (forall i : I, P i -> d `|` F i = \top) -> d `|` \meet_(i | P i) F i = \top.
-Proof. exact: (@joins_disjoint _ L^d). Qed.
-
-End TDistrLatticeTheory.
-End TDistrLatticeTheory.
 
 Module Import CBDistrLatticeTheory.
 Section CBDistrLatticeTheory.
@@ -7700,54 +7747,6 @@ HB.instance Definition _ n (T : finTBOrderType disp) :=
 End DefaultTupleLexiOrder.
 End DefaultTupleLexiOrder.
 
-Module Import DualOrderTheory.
-Section DualOrderTheory.
-
-Context {disp : unit} {T : orderType disp}.
-Implicit Type s : seq T.
-
-Lemma sorted_filter_gt x s :
-  sorted <=%O s -> [seq y <- s | x < y] = drop (count (<= x) s) s.
-Proof.
-move=> s_sorted; rewrite count_le_gt -[LHS]revK -filter_rev.
-rewrite (@sorted_filter_lt _ T^d); first by rewrite take_rev revK count_rev.
-by rewrite rev_sorted.
-Qed.
-
-Lemma sorted_filter_ge x s :
-  sorted <=%O s -> [seq y <- s | x <= y] = drop (count (< x) s) s.
-Proof.
-move=> s_sorted; rewrite count_lt_ge -[LHS]revK -filter_rev.
-rewrite (@sorted_filter_le _ T^d); first by rewrite take_rev revK count_rev.
-by rewrite rev_sorted.
-Qed.
-
-Lemma nth_count_ge x x0 s i : sorted <=%O s ->
-  (count (< x) s <= i < size s)%N -> x <= nth x0 s i.
-Proof.
-move=> ss /andP[ige ilt]; rewrite -(subnKC ige) -nth_drop -sorted_filter_ge //.
-apply/(all_nthP _ (filter_all _ _)).
-by rewrite size_filter ltn_subLR // count_lt_ge subnK // count_size.
-Qed.
-
-Lemma nth_count_gt x x0 s i : sorted <=%O s ->
-  (count (<= x) s <= i < size s)%N -> x < nth x0 s i.
-Proof.
-move=> ss /andP[ige ilt]; rewrite -(subnKC ige) -nth_drop -sorted_filter_gt //.
-apply/(all_nthP _ (filter_all _ _)).
-by rewrite size_filter ltn_subLR // count_le_gt subnK // count_size.
-Qed.
-
-Lemma nth_count_eq x x0 s i : sorted <=%O s ->
-  (count (< x) s <= i < count (<= x) s)%N -> nth x0 s i = x.
-Proof.
-move=> ss /andP[ige ilt]; apply/le_anti.
-by rewrite nth_count_le// nth_count_ge// ige (leq_trans ilt (count_size _ _)).
-Qed.
-
-End DualOrderTheory.
-End DualOrderTheory.
-
 (*********************************************)
 (* We declare a "copy" of the sets,          *)
 (* which is canonically ordered by inclusion *)
@@ -8098,14 +8097,17 @@ Export POCoercions.
 Export POrderTheory.
 Export BPOrderTheory.
 Export TPOrderTheory.
-Export LatticeTheoryMeet.
-Export LatticeTheoryJoin.
+Export MeetTheory.
+Export BMeetTheory.
+Export TMeetTheory.
+Export JoinTheory.
+Export BJoinTheory.
+Export TJoinTheory.
+Export LatticeTheory.
 Export DistrLatticeTheory.
-Export BLatticeTheory.
-Export TLatticeTheory.
 Export BDistrLatticeTheory.
 Export TDistrLatticeTheory.
-Export DualOrderTheory. (* FIXME? *)
+Export DualTotalTheory. (* FIXME? *)
 Export DualOrder. (* FIXME? *)
 
 Export OrderMorphismTheory.
