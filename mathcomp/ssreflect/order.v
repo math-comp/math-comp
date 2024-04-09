@@ -2808,6 +2808,48 @@ Arguments max_idPr {disp T x y}.
 Arguments comparable_min_idPr {disp T x y _}.
 Arguments comparable_max_idPl {disp T x y _}.
 
+Module Import BPOrderTheory.
+Section BPOrderTheory.
+Context {disp : unit} {T : bPOrderType disp}.
+Implicit Types (x y : T).
+
+Lemma le0x x : \bot <= x. Proof. exact: le0x. Qed.
+
+Lemma ltx0 x : (x < \bot) = false.
+Proof. exact/le_gtF/le0x. Qed.
+
+Lemma lex0 x : (x <= \bot) = (x == \bot).
+Proof. by rewrite le_eqVlt ltx0 orbF. Qed.
+
+Lemma lt0x x : (\bot < x) = (x != \bot).
+Proof. by rewrite lt_def le0x andbT. Qed.
+
+Variant eq0_xor_gt0 x : bool -> bool -> Set :=
+    Eq0NotPOs : x = \bot -> eq0_xor_gt0 x true false
+  | POsNotEq0 : \bot < x -> eq0_xor_gt0 x false true.
+
+Lemma posxP x : eq0_xor_gt0 x (x == \bot) (\bot < x).
+Proof. by rewrite lt0x; have [] := eqVneq; constructor; rewrite ?lt0x. Qed.
+
+End BPOrderTheory.
+End BPOrderTheory.
+
+Module Import TPOrderTheory.
+Section TPOrderTheory.
+Context {disp : unit} {T : tPOrderType disp}.
+Implicit Types (x y : T).
+
+Lemma lex1 x : x <= \top. Proof. exact: lex1. Qed.
+Lemma lt1x x : (\top < x) = false. Proof. exact: (@ltx0 _ T^d). Qed.
+Lemma le1x x : (\top <= x) = (x == \top). Proof. exact: (@lex0 _ T^d). Qed.
+Lemma ltx1 x : (x < \top) = (x != \top). Proof. exact: (@lt0x _ T^d). Qed.
+
+End TPOrderTheory.
+End TPOrderTheory.
+
+#[global] Hint Extern 0 (is_true (\bot <= _)) => exact: le0x : core.
+#[global] Hint Extern 0 (is_true (_ <= \top)) => exact: lex1 : core.
+
 Module Import LatticeTheoryMeet.
 Section LatticeTheoryMeet.
 Context {disp : unit} {L : latticeType disp}.
@@ -3781,19 +3823,6 @@ Context {disp : unit} {L : bLatticeType disp}.
 Implicit Types (I : finType) (T : eqType) (x y z : L).
 Local Notation "\bot" := bottom.
 
-(* Non-distributive lattice theory with \bot & \top *)
-Lemma le0x x : \bot <= x. Proof. exact: le0x. Qed.
-Hint Resolve le0x : core.
-
-Lemma lex0 x : (x <= \bot) = (x == \bot).
-Proof. by rewrite le_eqVlt (le_gtF (le0x _)) orbF. Qed.
-
-Lemma ltx0 x : (x < \bot) = false.
-Proof. by rewrite lt_neqAle lex0 andNb. Qed.
-
-Lemma lt0x x : (\bot < x) = (x != \bot).
-Proof. by rewrite lt_neqAle le0x andbT eq_sym. Qed.
-
 Lemma meet0x : left_zero \bot (@meet _ L).
 Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
 
@@ -3812,15 +3841,10 @@ apply/idP/idP; last by move=> /andP [/eqP-> /eqP->]; rewrite joinx0.
 by move=> /eqP xUy0; rewrite -!lex0 -xUy0 leUl leUr.
 Qed.
 
-Variant eq0_xor_gt0 x : bool -> bool -> Set :=
-    Eq0NotPOs : x = \bot -> eq0_xor_gt0 x true false
-  | POsNotEq0 : \bot < x -> eq0_xor_gt0 x false true.
-
-Lemma posxP x : eq0_xor_gt0 x (x == \bot) (\bot < x).
-Proof. by rewrite lt0x; have [] := eqVneq; constructor; rewrite ?lt0x. Qed.
-
 HB.instance Definition _ := Monoid.isComLaw.Build L \bot join
   (@joinA _ L) (@joinC _ L) join0x.
+
+HB.instance Definition _ := Monoid.isMulLaw.Build L \bot meet meet0x meetx0.
 
 Lemma joins_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> F x <= \join_(i <- r | P i) F i.
@@ -3884,10 +3908,6 @@ Implicit Types (I : finType) (T : eqType) (x y : L).
 
 Local Notation "\top" := top.
 
-Lemma lex1 (x : L) : x <= top. Proof. exact: lex1. Qed.
-
-Hint Resolve lex1 : core.
-
 Lemma meetx1 : right_id \top (@meet _ L).
 Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
 
@@ -3899,9 +3919,6 @@ Proof. by move=> x; apply/eqP; rewrite -leEjoin. Qed.
 
 Lemma join1x : left_zero \top (@join _ L).
 Proof. by move=> x; apply/eqP; rewrite joinC joinx1. Qed.
-
-Lemma le1x x : (\top <= x) = (x == \top).
-Proof. by rewrite le_eqVlt (le_gtF (lex1 _)) eq_sym; case: eqP. Qed.
 
 Lemma meet_eq1 x y : (x `&` y == \top) = (x == \top) && (y == \top).
 Proof.
@@ -3969,21 +3986,6 @@ End TLatticeTheory.
 
 End TLatticeTheory.
 
-Module Import TBLatticeTheory.
-Section TBLatticeTheory.
-Context {disp : unit} {L : tbLatticeType disp}.
-
-HB.instance Definition _ := Monoid.isComLaw.Build L \top meet
-  (@meetA _ L) (@meetC _ L) meet1x.
-
-HB.instance Definition _ := Monoid.isMulLaw.Build L \bot meet
-  (@meet0x _ L) (@meetx0 _ _).
-HB.instance Definition _ := Monoid.isMulLaw.Build L \top join join1x joinx1.
-
-End TBLatticeTheory.
-
-End TBLatticeTheory.
-
 Module Import BDistrLatticeTheory.
 Section BDistrLatticeTheory.
 Context {disp : unit} {L : bDistrLatticeType disp}.
@@ -4029,9 +4031,9 @@ Qed.
 End BDistrLatticeTheory.
 End BDistrLatticeTheory.
 
-Module Import TBDistrLatticeTheory.
-Section TBDistrLatticeTheory.
-Context {disp : unit} {L : tbDistrLatticeType disp}.
+Module Import TDistrLatticeTheory.
+Section TDistrLatticeTheory.
+Context {disp : unit} {L : tDistrLatticeType disp}.
 Implicit Types (I : finType) (T : eqType) (x y : L).
 
 Local Notation "\top" := top.
@@ -4061,8 +4063,8 @@ Lemma meets_total I (d : L) (P : {pred I}) (F : I -> L) :
    (forall i : I, P i -> d `|` F i = \top) -> d `|` \meet_(i | P i) F i = \top.
 Proof. exact: (@joins_disjoint _ L^d). Qed.
 
-End TBDistrLatticeTheory.
-End TBDistrLatticeTheory.
+End TDistrLatticeTheory.
+End TDistrLatticeTheory.
 
 Module Import CBDistrLatticeTheory.
 Section CBDistrLatticeTheory.
@@ -6676,10 +6678,7 @@ Section FinDistrLattice.
 Variable (T : finTBOrderType disp1) (T' : T -> finTBOrderType disp2).
 
 Fact le0x (x : {t : T & T' t}) : Tagged T' (\bot : T' \bot) <= x.
-Proof.
-rewrite leEsig /=; case: comparableP (le0x (tag x)) => //=.
-by case: x => //= x px x0; rewrite x0 in px *; rewrite tagged_asE le0x.
-Qed.
+Proof. by rewrite leEsig /=; case: comparableP (le0x (tag x)) => /=. Qed.
 #[export]
 HB.instance Definition _ := hasBottom.Build _ {t : T & T' t} le0x.
 
@@ -8097,14 +8096,15 @@ End Syntax.
 Module LTheory.
 Export POCoercions.
 Export POrderTheory.
+Export BPOrderTheory.
+Export TPOrderTheory.
 Export LatticeTheoryMeet.
 Export LatticeTheoryJoin.
 Export DistrLatticeTheory.
 Export BLatticeTheory.
 Export TLatticeTheory.
-Export TBLatticeTheory.
 Export BDistrLatticeTheory.
-Export TBDistrLatticeTheory.
+Export TDistrLatticeTheory.
 Export DualOrderTheory. (* FIXME? *)
 Export DualOrder. (* FIXME? *)
 
