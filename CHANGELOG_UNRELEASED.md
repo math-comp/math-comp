@@ -232,6 +232,145 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `binomial.v`
   + lemma `textbook_triangular_sum`
 
+- in `eqtype.v`
+  + notations `[eqType of T]`, `[eqType of T for C]`, and `[eqMixin of T by <:]`
+  + notations `sub`, `subK`, `sub_spec`, and `subP`
+  + notations `InjEqMixin`, `PcanEqMixin`, and `CanEqMixin`
+
+- in `choice.v`
+  + notations `[hasChoice of T]`, `[choiceType of T]`,
+    `[choiceType of T for C]`, and `[choiceMixin of T by <:]`
+  + notations `[isCountable of T]`, `[countType of T]`,
+    `[countType of T for C]`, `[countMixin of T by <:]`, and
+    `[subCountType of T]`
+  + notations `CanChoiceMixin`, `PcanChoiceMixin`, `CanCountMixin`, and
+    `PcanCountMixin`
+
+- in `fintype.v`
+  + notations `[finType of T]`, `[finType of T for C]`, `[subFinType of T]`,
+    `[finMixin of T by <:]`
+  + notations `EnumMixin`, `UniqMixin`, `CountMixin`, `FinMixin`,
+    `UniqFinMixin`, `PcanFinMixin`, and `CanFinMixin`
+
+- in `generic_quotient.v`
+  + notations `[quotType of Q]` and `[eqQuotType e of Q]`
+
+- in `order.v`
+  + notations `[porderType of T]`, `[porderType of T with disp]`,
+    `[porderType of T for cT]`, and `[porderType of T for cT with disp]`
+  + notations `[latticeType of T]`, `[latticeType of T with disp]`,
+    `[latticeType of T for cT]`, and `[latticeType of T for cT with disp]`
+  + notations `[bLatticeType of T]` and `[bLatticeType of T for cT]`
+  + notation `[bDistrLatticeType of T]`
+  + notation `[tbDistrLatticeType of T]`
+  + notation `[finPOrderType of T]`
+  + notation `[finLatticeType of T]`
+  + notation `[finDistrLatticeType of T]`
+  + notation `[finCDistrLatticeType of T]`
+  + notation `[finOrderType of T]`
+  + notations `sub`, `subKI`, `subIK`, `subxx`, `subKU`, `subUK`, `subUx`,
+    `sub_eq0`, `meet_eq0E_sub`, `eq_sub`, `subxU`, `subx0`, `sub0x`, `subIx`,
+    `subxI`, `subBx`, `subxB`, `disj_subl`, `disj_subr`, `sub1x`, `subE`,
+    `tnth_sub`, and `subEtpred`
+  + notations `PcanPartial`, `CanPartial`, `PcanTotal`, `CanTotal`,
+    `MonoTotalMixin`, `PcanPOrderMixin`, `CanPOrderMixin`, `PcanOrderMixin`,
+    `CanOrderMixin`, `IsoLatticeMixin`, `IsoDistrLatticeMixin`
+
+- in `fingroup.v`
+  + notations `[finGroupType of T]` and `[baseFinGroupType of T]`
+
+- in `ssralg.v`
+  + notations `[nmodType of T for cT]` and `[nmodType of T]`
+  + notation ZmodMixin
+  + notations `[zmodType of T for cT]` and `[zmodType of T]`
+  + notations `[semiRingType of T]` and `[semiRingType of T for cT]`
+  + notations `[ringType of T]` and `[ringType of T for cT]`
+  + notations `[lmodType R of T]` and `[lmodType R of T for cT]`
+  + notations `[lalgType R of T]` and `[lalgType R of T for cT]`
+  + notations `[comSemiRingType of T]` and `[comSemiRingType of T for cT]`
+  + notations `[comRingType of T]` and `[comRingType of T for cT]`
+  + notations `[algType R of T]` and `[algType R of T for cT]`
+  + notation `[comAlgType R of T]`
+  + notations `[unitRingType of T]` and `[unitRingType of T for cT]`
+  + notation `[comUnitRingType of T]`
+  + notation `[unitAlgType R of T]`
+  + notation `[comUnitAlgType R of T]`
+  + notations `[idomainType of T]` and `[idomainType of T for cT]`
+  + notations `[fieldType of T]` and `[fieldType of T for cT]`
+  + notations `[decFieldType of T]` and `[decFieldType of T for cT]`
+  + notations `[closedFieldType of T]` and `[closedFieldType of T for cT]`
+  + definition `Additive.apply_deprecated`
+  + notation `Additive.apply`
+  + notations `[additive of f]` and `[additive of f as g]`
+  + notations `[rmorphism of f]` and `[rmorphism of f as g]`
+  + definition `Linear.apply_deprecated`
+  + notation `Linear.apply`
+  + notations `[linear of f]` and `[linear of f as g]`
+  + definition `LRMorphism.apply_deprecated`
+  + notation `LRMorphism.apply`
+  + notation `[lrmorphism of f]`
+
+- in `ring_quotient.v`
+  + notation `[zmodQuotType z, o & a of Q]`
+  + notation `[ringQuotType o & m of Q]`
+  + notation `[unitRingQuotType u & i of Q]`
+
+- in `countalg.v`
+  + notation `[countNmodType of T]`
+  + notation `[countZmodType of T]`
+  + notation `[countSemiRingType of T]`
+  + notation `[countRingType of T]`
+  + notation `[countComSemiRingType of T]`
+  + notation `[countComRingType of T]`
+  + notation `[countUnitRingType of T]`
+  + notation `[countComUnitRingType of T]`
+  + notation `[countIdomainType of T]`
+  + notation `[countFieldType of T]`
+  + notation `[countDecFieldType of T]`
+  + notation `[countClosedFieldType of T]`
+
+- in `finalg.v`
+  + notation `[finNmodType of T]`
+  + notation `[finZmodType of T]`
+  + notation `[finSemiRingType of T]`
+  + notation `[finRingType of T]`
+  + notation `[finComSemiRingType of T]`
+  + notation `[finComRingType of T]`
+  + notation `[finUnitRingType of T]`
+  + notation `[finComUnitRingType of T]`
+  + notation `[finIntegralDomainType of T]`
+  + notation `[finFieldType of T]`
+  + notation `[finLmodType R of T]`
+  + notation `[finLalgType R of T]`
+  + notation `[finAlgType R of T]`
+  + notation `[finUnitAlgType R of T]`
+
+- in `ssrnum.v`
+  + notations `[numDomainType of T]` and `[numDomainType of T for cT]`
+  + notation `[numFieldType of T]`
+  + notations `[numClosedFieldType of T]` and `[numClosedFieldType of T for cT]`
+  + notation `[realDomainType of T]`
+  + notation `[realFieldType of T]`
+  + notations `[rcfType of T]` and `[rcfType of T for cT]`
+  + notations `[archiFieldType of T]` and `[archiFieldType of T for cT]`
+
+- in `rat.v`
+  + lemma `divq_eq_deprecated`
+
+- in `vector.v`
+  + notations `[vectType R of T]` and `[vectType R of T for cT]`
+
+- in `falgebra.v`
+  + notations `[FalgType F of L]` and `[FalgType F of L for L']`
+  + notation `FalgUnitRingType`
+
+- in `fieldext.v`
+  + notations `[fieldExtType F of L]` and `[fieldExtType F of L for K]`
+
+- in `galois.v`
+  + notations `[splittingFieldType F of L]` and
+    `[splittingFieldType F of L for K]`
+
 ### Deprecated
 
 - in `ssreflect.v`
