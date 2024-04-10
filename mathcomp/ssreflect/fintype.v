@@ -179,19 +179,12 @@ Module Finite.
 HB.lock Definition enum T := isFinite.enum_subdef (Finite.class T).
 
 Notation axiom := finite_axiom.
-#[deprecated(since="mathcomp 2.0.0", note="Use isFinite.Build instead.")]
-Notation EnumMixin m := (@isFinite.Build _ _ m).
 
 Lemma uniq_enumP (T : eqType) e : uniq e -> e =i T -> axiom e.
 Proof. by move=> Ue sT x; rewrite count_uniq_mem ?sT. Qed.
 
 Section WithCountType.
-Variable (T : countType).
-
-Definition UniqMixin_deprecated e Ue (eT : e =i T) :=
-  @isFinite.Build T e (uniq_enumP Ue eT).
-
-Variable n : nat.
+Variable (T : countType) (n : nat).
 
 Definition count_enum := pmap (@pickle_inv T) (iota 0 n).
 
@@ -203,15 +196,7 @@ apply: uniq_enumP (pmap_uniq (@pickle_invK T) (iota_uniq _ _)) _ => x.
 by rewrite mem_pmap -pickleK_inv map_f // mem_iota ubT.
 Qed.
 
-Definition CountMixin_deprecated := @isFinite.Build _ _ count_enumP.
-
 End WithCountType.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use isFinite.Build and Finite.uniq_enumP instead.")]
-Notation UniqMixin := UniqMixin_deprecated.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use isFinite.Build and Finite.count_enumP instead.")]
-Notation CountMixin := CountMixin_deprecated.
 End Finite.
 Canonical finEnum_unlock := Unlockable Finite.enum.unlock.
 End FiniteNES.
@@ -239,18 +224,6 @@ HB.instance Definition _ := isCountable.Build fT fin_pickleK.
 HB.instance Definition _ := isFinite.Build fT f.
 
 End CanonicalFinType.
-
-#[deprecated(since="mathcomp 2.0.0", note="Use isFinite.Build instead.")]
-Notation FinMixin x := (@isFinite.Build _ _ x).
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use isFinite.Build with Finite.uniq_enumP instead.")]
-Notation UniqFinMixin := Finite.UniqMixin_deprecated.
-#[deprecated(since="mathcomp 2.0.0", note="Use Finite.clone instead.")]
-Notation "[ 'finType' 'of' T 'for' cT ]" := (Finite.clone T%type cT)
-  (at level 0, format "[ 'finType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use Finite.clone instead.")]
-Notation "[ 'finType' 'of' T ]" := (Finite.clone T%type _)
-  (at level 0, format "[ 'finType'  'of'  T ]") : form_scope.
 
 (* Workaround for the silly syntactic uniformity restriction on coercions;    *)
 (* this avoids a cross-dependency between finset.v and prime.v for the        *)
@@ -1443,13 +1416,6 @@ Definition CanIsFinite g (fK : cancel f g) := PCanIsFinite (can_pcan fK).
 
 End TransferFinTypeFromCount.
 
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use pcan_type instead or PCanIsFInite.")]
-Notation PcanFinMixin := PCanIsFinite.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use can_type instead or CanIsFinite.")]
-Notation CanFinMixin := CanIsFinite.
-
 Section TransferFinType.
 
 Variables (eT : Type) (fT : finType) (f : eT -> fT).
@@ -1479,10 +1445,6 @@ by apply/codomP/idP=> [[u ->]|Px]; last exists (Sub x Px); rewrite ?valP ?SubK.
 Qed.
 
 End SubFinType.
-
-#[deprecated(since="mathcomp 2.0.0", note="Use SubFinite.clone instead.")]
-Notation "[ 'subFinType' 'of' T ]" := (SubFinite.clone _ _ T%type _)
-  (at level 0, format "[ 'subFinType'  'of'  T ]") : form_scope.
 
 HB.factory Record SubCountable_isFinite (T : finType) P (sT : Type)
   of SubCountable T P sT := { }.
@@ -1516,9 +1478,6 @@ HB.instance Definition _ (T : finType) (P : pred T) (sT : subType P) :=
 
 Notation "[ 'Finite' 'of' T 'by' <: ]" := (Finite.copy T%type (sub_type T%type))
   (at level 0, format "[ 'Finite'  'of'  T  'by'  <: ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use [Finite of _ by <:] instead.")]
-Notation "[ 'finMixin' 'of' T 'by' <: ]" := [Finite of T%type by <:]
-  (at level 0, format "[ 'finMixin'  'of'  T  'by'  <: ]") : form_scope.
 
 Section SubCountable_isFiniteTheory.
 

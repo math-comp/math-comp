@@ -150,12 +150,6 @@ Arguments ger_leVge {_} [x y] : rename.
 
 Module NumDomainExports.
 Bind Scope ring_scope with NumDomain.sort.
-#[deprecated(since="mathcomp 2.0.0", note="Use Num.NumDomain.clone instead.")]
-Notation "[ 'numDomainType' 'of' T 'for' cT ]" := (NumDomain.clone T%type cT)
-  (at level 0, format "[ 'numDomainType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use Num.NumDomain.clone instead.")]
-Notation "[ 'numDomainType' 'of' T ]" := (NumDomain.clone T%type _)
-  (at level 0, format "[ 'numDomainType'  'of'  T ]") : form_scope.
 End NumDomainExports.
 HB.export NumDomainExports.
 
@@ -358,9 +352,6 @@ HB.structure Definition NumField := { R of GRing.UnitRing_isField R &
 
 Module NumFieldExports.
 Bind Scope ring_scope with NumField.sort.
-#[deprecated(since="mathcomp 2.0.0", note="Use Num.NumField.clone instead.")]
-Notation "[ 'numFieldType' 'of' T ]" := (NumField.clone T%type _)
-  (at level 0, format "[ 'numFieldType'  'of'  T ]") : form_scope.
 End NumFieldExports.
 HB.export NumFieldExports.
 
@@ -377,13 +368,6 @@ HB.structure Definition ClosedField :=
 
 Module ClosedFieldExports.
 Bind Scope ring_scope with ClosedField.sort.
-#[deprecated(since="mathcomp 2.0.0", note="Use Num.ClosedField.clone instead.")]
-Notation "[ 'numClosedFieldType' 'of' T 'for' cT ]" := (ClosedField.clone T%type cT)
-  (at level 0, format "[ 'numClosedFieldType'  'of'  T  'for' cT ]") :
-                                                         form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use Num.ClosedField.clone instead.")]
-Notation "[ 'numClosedFieldType' 'of' T ]" := (ClosedField.clone T%type _)
-  (at level 0, format "[ 'numClosedFieldType'  'of'  T ]") : form_scope.
 End ClosedFieldExports.
 HB.export ClosedFieldExports.
 
@@ -393,9 +377,6 @@ HB.structure Definition RealDomain :=
 
 Module RealDomainExports.
 Bind Scope ring_scope with RealDomain.sort.
-#[deprecated(since="mathcomp 2.0.0", note="Use Num.RealDomain.clone instead.")]
-Notation "[ 'realDomainType' 'of' T ]" := (RealDomain.clone T%type _)
-  (at level 0, format "[ 'realDomainType'  'of'  T ]") : form_scope.
 End RealDomainExports.
 HB.export RealDomainExports.
 
@@ -405,9 +386,6 @@ HB.structure Definition RealField :=
 
 Module RealFieldExports.
 Bind Scope ring_scope with RealField.sort.
-#[deprecated(since="mathcomp 2.0.0", note="Use Num.RealField.clone instead.")]
-Notation "[ 'realFieldType' 'of' T ]" := (RealField.clone T%type _)
-  (at level 0, format "[ 'realFieldType'  'of'  T ]") : form_scope.
 End RealFieldExports.
 HB.export RealFieldExports.
 
@@ -421,14 +399,6 @@ HB.structure Definition RealClosedField :=
 
 Module RealClosedFieldExports.
 Bind Scope ring_scope with RealClosedField.sort.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use Num.RealClosedField.clone instead.")]
-Notation "[ 'rcfType' 'of' T 'for' cT ]" := (RealClosedField.clone T%type cT)
-  (at level 0, format "[ 'rcfType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use Num.RealClosedField.clone instead.")]
-Notation "[ 'rcfType' 'of' T ]" :=  (RealClosedField.clone T%type _)
-  (at level 0, format "[ 'rcfType'  'of'  T ]") : form_scope.
 End RealClosedFieldExports.
 HB.export RealClosedFieldExports.
 
@@ -473,14 +443,6 @@ Module ArchiFieldExports.
 Bind Scope ring_scope with ArchiField.sort.
 #[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
 Notation archiFieldType := archiFieldType (only parsing).
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use Num.ArchiField.clone instead.")]
-Notation "[ 'archiFieldType' 'of' T 'for' cT ]" := (ArchiField.clone T%type cT)
-  (at level 0, format "[ 'archiFieldType'  'of'  T  'for'  cT ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use Num.ArchiField.clone instead.")]
-Notation "[ 'archiFieldType' 'of' T ]" := (ArchiField.clone T%type _)
-  (at level 0, format "[ 'archiFieldType'  'of'  T ]") : form_scope.
 End ArchiFieldExports.
 HB.export ArchiFieldExports.
 

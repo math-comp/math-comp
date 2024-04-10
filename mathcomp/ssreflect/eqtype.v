@@ -139,13 +139,6 @@ HB.mixin Record hasDecEq T := { eq_op : rel T; eqP : eq_axiom eq_op }.
 #[mathcomp(axiom="eq_axiom"), short(type="eqType")]
 HB.structure Definition Equality := { T of hasDecEq T }.
 
-#[deprecated(since="mathcomp 2.0.0", note="Use Equality.clone instead.")]
-Notation "[ 'eqType' 'of' T 'for' C ]" := (Equality.clone T%type C)
-  (at level 0, format "[ 'eqType'  'of'  T  'for'  C ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use Equality.clone instead.")]
-Notation "[ 'eqType' 'of' T ]" := (Equality.clone T%type _)
-  (at level 0, format "[ 'eqType'  'of'  T ]") : form_scope.
-
 (* eqE is a generic lemma that can be used to fold back recursive comparisons *)
 (* after using partial evaluation to simplify comparisons on concrete         *)
 (* instances. The eqE lemma can be used e.g. like so: rewrite !eqE /= -!eqE.  *)
@@ -570,9 +563,6 @@ Notation val := (isSub.val_subdef (SubType.on _)).
 Notation "\val" := (isSub.val_subdef (SubType.on _)) (only parsing).
 Notation "\val" := (isSub.val_subdef _) (only printing).
 
-#[deprecated(since="mathcomp 2.0.0", note="Use Sub instead.")]
-Notation sub := Sub.
-
 #[short(type="subEqType")]
 HB.structure Definition SubEquality T (P : pred T) :=
   { sT of Equality sT & isSub T P sT}.
@@ -663,13 +653,6 @@ Qed.
 End Theory.
 
 End SubType.
-
-#[deprecated(since="mathcomp 2.0.0", note="Use SubK instead.")]
-Notation subK := SubK.
-#[deprecated(since="mathcomp 2.0.0", note="Use Sub_spec instead.")]
-Notation sub_spec := Sub_spec.
-#[deprecated(since="mathcomp 2.0.0", note="Use SubP instead.")]
-Notation subP := SubP.
 
 (* Arguments val {T P sT} u : rename. *)
 Arguments Sub {T P sT} x Px : rename.
@@ -792,16 +775,6 @@ Definition deprecated_CanEqMixin g (fK : cancel f g) :=
 
 End TransferEqType.
 
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use Equality.copy T (inj_type f_inj) instead")]
-Notation InjEqMixin := deprecated_InjEqMixin.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use Equality.copy T (pcan_type fK) instead")]
-Notation PcanEqMixin := deprecated_PcanEqMixin.
-#[deprecated(since="mathcomp 2.0.0",
-  note="Use Equality.copy T (can_type fK) instead")]
-Notation CanEqMixin := deprecated_CanEqMixin.
-
 Definition sub_type T (P : pred T) (sT : subType P) : Type := sT.
 HB.instance Definition _ T (P : pred T) (sT : subType P) :=
   SubType.on (sub_type sT).
@@ -825,9 +798,6 @@ Arguments val_eqP {T P sT x y}.
 
 Notation "[ 'Equality' 'of' T 'by' <: ]" := (Equality.copy T%type (sub_type T%type))
   (at level 0, format "[ 'Equality'  'of'  T  'by'  <: ]") : form_scope.
-#[deprecated(since="mathcomp 2.0.0", note="Use [Equality of _ by <:] instead.")]
-Notation "[ 'eqMixin' 'of' T 'by' <: ]" := [Equality of T%type by <:]
-  (at level 0, format "[ 'eqMixin'  'of'  T  'by'  <: ]") : form_scope.
 
 HB.instance Definition _ := Equality.copy void (pcan_type (of_voidK unit)).
 HB.instance Definition _ (T : eqType) (P : pred T) :=
