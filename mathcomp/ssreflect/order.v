@@ -1526,20 +1526,38 @@ End CTBDistrLatticeSyntax.
 #[short(type="finPOrderType")]
 HB.structure Definition FinPOrder d := { T of Finite T & POrder d T }.
 
+#[short(type="finBPOrderType")]
+HB.structure Definition FinBPOrder d := { T of FinPOrder d T & hasBottom d T }.
+
+#[short(type="finTPOrderType")]
+HB.structure Definition FinTPOrder d := { T of FinPOrder d T & hasTop d T }.
+
+#[short(type="finTBPOrderType")]
+HB.structure Definition FinTBPOrder d := { T of FinBPOrder d T & hasTop d T }.
+
 #[short(type="finLatticeType")]
-HB.structure Definition FinLattice d := { T of Finite T & TBLattice d T }. (* FIXME *)
+HB.structure Definition FinLattice d := { T of Finite T & Lattice d T }.
+
+#[short(type="finTBLatticeType")]
+HB.structure Definition FinTBLattice d := { T of Finite T & TBLattice d T }.
 
 #[short(type="finDistrLatticeType")]
 HB.structure Definition FinDistrLattice d :=
+  { T of Finite T & DistrLattice d T }.
+
+#[short(type="finTBDistrLatticeType")]
+HB.structure Definition FinTBDistrLattice d :=
   { T of Finite T & TBDistrLattice d T }.
 
-#[short(type="finCDistrLatticeType")]
-HB.structure Definition FinCDistrLattice d :=
-  { T of Finite T & CTBDistrLattice d T }.
-
 #[short(type="finOrderType")]
-HB.structure Definition FinTotal d :=
-  { T of Total d T & FinDistrLattice d T }.
+HB.structure Definition FinTotal d := { T of Finite T & Total d T }.
+
+#[short(type="finTBOrderType")]
+HB.structure Definition FinTBTotal d := { T of Finite T & TBTotal d T }.
+
+#[short(type="finCTBDistrLatticeType")]
+HB.structure Definition FinCTBDistrLattice d :=
+  { T of Finite T & CTBDistrLattice d T }.
 
 (********)
 (* DUAL *)
@@ -6491,8 +6509,8 @@ HB.instance Definition _ (T : finLatticeType disp1)
 HB.instance Definition _ (T : finDistrLatticeType disp1)
   (T' : finDistrLatticeType disp2) := DistrLattice.on (T * T').
 #[export]
-HB.instance Definition _ (T : finCDistrLatticeType disp1)
-  (T' : finCDistrLatticeType disp2) := CTBDistrLattice.on (T * T').
+HB.instance Definition _ (T : finCTBDistrLatticeType disp1)
+  (T' : finCTBDistrLatticeType disp2) := CTBDistrLattice.on (T * T').
 (* /FIXME *)
 
 End ProdOrder.
@@ -6555,8 +6573,8 @@ HB.instance Definition _
     (T : finDistrLatticeType disp1) (T' : finDistrLatticeType disp2) :=
   FinDistrLattice.copy (T * T')%type (T *p T').
 HB.instance Definition _
-    (T : finCDistrLatticeType disp1) (T' : finCDistrLatticeType disp2) :=
-  FinCDistrLattice.copy (T * T')%type (T *p T').
+    (T : finCTBDistrLatticeType disp1) (T' : finCTBDistrLatticeType disp2) :=
+  FinCTBDistrLattice.copy (T * T')%type (T *p T').
 
 End DefaultProdOrder.
 End DefaultProdOrder.
@@ -6655,7 +6673,7 @@ HB.instance Definition _ := POrder_isTotal.Build _ {t : T & T' t} total.
 End Total.
 
 Section FinDistrLattice.
-Variable (T : finOrderType disp1) (T' : T -> finOrderType disp2).
+Variable (T : finTBOrderType disp1) (T' : T -> finTBOrderType disp2).
 
 Fact le0x (x : {t : T & T' t}) : Tagged T' (\bot : T' \bot) <= x.
 Proof.
@@ -6788,7 +6806,7 @@ HB.instance Definition _ := POrder_isTotal.Build _ (T * T') total.
 End Total.
 
 Section FinDistrLattice.
-Variable (T : finOrderType disp1) (T' : finOrderType disp2).
+Variable (T : finTBOrderType disp1) (T' : finTBOrderType disp2).
 
 Fact le0x (x : T * T') : (\bot, \bot) <= x :> T * T'.
 Proof. by case: x => // x1 x2; rewrite leEprodlexi/= !le0x implybT. Qed.
@@ -6845,8 +6863,9 @@ HB.instance Definition _ (T : porderType disp1) (T' : porderType disp2) :=
   POrder.copy (T * T')%type (T *l T').
 HB.instance Definition _ (T : orderType disp1) (T' : orderType disp2) :=
   Total.copy (T * T')%type (T *l T').
-HB.instance Definition _ (T : finOrderType disp1) (T' : finOrderType disp2) :=
-  FinTotal.copy (T * T')%type (T *l T').
+HB.instance Definition _
+    (T : finTBOrderType disp1) (T' : finTBOrderType disp2) :=
+  FinTBTotal.copy (T * T')%type (T *l T').
 
 End DefaultProdLexiOrder.
 End DefaultProdLexiOrder.
@@ -7435,7 +7454,7 @@ HB.instance Definition _ (n : nat) (T : finLatticeType disp) :=
 HB.instance Definition _ (n : nat) (T : finDistrLatticeType disp) :=
   DistrLattice.on (n.-tuple T).
 #[export]
-HB.instance Definition _ (n : nat) (T : finCDistrLatticeType disp) :=
+HB.instance Definition _ (n : nat) (T : finCTBDistrLatticeType disp) :=
   CTBDistrLattice.on (n.-tuple T).
 (* /FIXME *)
 
@@ -7497,8 +7516,8 @@ HB.instance Definition _ n (T : finLatticeType disp) :=
   FinLattice.copy (n.-tuple T) (n.-tupleprod T).
 HB.instance Definition _ n (T : finDistrLatticeType disp) :=
   FinDistrLattice.copy (n.-tuple T) (n.-tupleprod T).
-HB.instance Definition _ n (T : finCDistrLatticeType disp) :=
-  FinCDistrLattice.copy (n.-tuple T) (n.-tupleprod T).
+HB.instance Definition _ n (T : finCTBDistrLatticeType disp) :=
+  FinCTBDistrLattice.copy (n.-tuple T) (n.-tupleprod T).
 
 End DefaultTupleProdOrder.
 End DefaultTupleProdOrder.
@@ -7601,7 +7620,7 @@ HB.instance Definition _ (n : nat) (T : finPOrderType disp) :=
   [SubChoice_isSubOrder of n.-tuple T by <: with disp'].
 
 Section BDistrLattice.
-Variables (n : nat) (T : finOrderType disp).
+Variables (n : nat) (T : finTBOrderType disp).
 Implicit Types (t : n.-tuple T).
 
 Fact le0x t : [tuple of nseq n \bot] <= t :> n.-tuple T.
@@ -7615,7 +7634,7 @@ Proof. by []. Qed.
 End BDistrLattice.
 
 Section TBDistrLattice.
-Variables (n : nat) (T : finOrderType disp).
+Variables (n : nat) (T : finTBOrderType disp).
 Implicit Types (t : n.-tuple T).
 
 Fact lex1 t : t <= [tuple of nseq n \top].
@@ -7672,12 +7691,12 @@ HB.instance Definition _ n (T : orderType disp) :=
   DistrLattice.copy (n.-tuple T) (n.-tuplelexi T).
 HB.instance Definition _ n (T : orderType disp) :=
   Total.copy (n.-tuple T) (n.-tuplelexi T).
-HB.instance Definition _ n (T : finOrderType disp) :=
+HB.instance Definition _ n (T : finTBOrderType disp) :=
   BLattice.copy (n.-tuple T) (n.-tuplelexi T).
-HB.instance Definition _ n (T : finOrderType disp) :=
+HB.instance Definition _ n (T : finTBOrderType disp) :=
   TBLattice.copy (n.-tuple T) (n.-tuplelexi T).
-HB.instance Definition _ n (T : finOrderType disp) :=
-  FinTotal.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : finTBOrderType disp) :=
+  FinTBTotal.copy (n.-tuple T) (n.-tuplelexi T).
 
 End DefaultTupleLexiOrder.
 End DefaultTupleLexiOrder.
@@ -8140,10 +8159,16 @@ Export Order.TBTotal.Exports.
 Export Order.CBDistrLattice.Exports.
 Export Order.CTBDistrLattice.Exports.
 Export Order.FinPOrder.Exports.
+Export Order.FinBPOrder.Exports.
+Export Order.FinTPOrder.Exports.
+Export Order.FinTBPOrder.Exports.
 Export Order.FinLattice.Exports.
+Export Order.FinTBLattice.Exports.
 Export Order.FinDistrLattice.Exports.
+Export Order.FinTBDistrLattice.Exports.
 Export Order.FinTotal.Exports.
-Export Order.FinCDistrLattice.Exports.
+Export Order.FinTBTotal.Exports.
+Export Order.FinCTBDistrLattice.Exports.
 
 (* FIXME: check if covered by Order.Exports *)
 (* Export Order.NatOrder.Exports. *)
