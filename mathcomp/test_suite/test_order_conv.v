@@ -16,6 +16,30 @@ Let eq_dual_dual_tPOrderType (T : tPOrderType disp) :
 Let eq_dual_dual_tbPOrderType (T : tbPOrderType disp) :
   Order.TBPOrder.on T = Order.TBPOrder.on T^d^d := erefl.
 
+Let eq_dual_dual_meetSemilatticeType (T : meetSemilatticeType disp) :
+  Order.MeetSemilattice.on T = Order.MeetSemilattice.on T^d^d := erefl.
+
+Let eq_dual_dual_bMeetSemilatticeType (T : bMeetSemilatticeType disp) :
+  Order.BMeetSemilattice.on T = Order.BMeetSemilattice.on T^d^d := erefl.
+
+Let eq_dual_dual_tMeetSemilatticeType (T : tMeetSemilatticeType disp) :
+  Order.TMeetSemilattice.on T = Order.TMeetSemilattice.on T^d^d := erefl.
+
+Let eq_dual_dual_tbMeetSemilatticeType (T : tbMeetSemilatticeType disp) :
+  Order.TBMeetSemilattice.on T = Order.TBMeetSemilattice.on T^d^d := erefl.
+
+Let eq_dual_dual_joinSemilatticeType (T : joinSemilatticeType disp) :
+  Order.JoinSemilattice.on T = Order.JoinSemilattice.on T^d^d := erefl.
+
+Let eq_dual_dual_bJoinSemilatticeType (T : bJoinSemilatticeType disp) :
+  Order.BJoinSemilattice.on T = Order.BJoinSemilattice.on T^d^d := erefl.
+
+Let eq_dual_dual_tJoinSemilatticeType (T : tJoinSemilatticeType disp) :
+  Order.TJoinSemilattice.on T = Order.TJoinSemilattice.on T^d^d := erefl.
+
+Let eq_dual_dual_tbJoinSemilatticeType (T : tbJoinSemilatticeType disp) :
+  Order.TBJoinSemilattice.on T = Order.TBJoinSemilattice.on T^d^d := erefl.
+
 Let eq_dual_dual_latticeType (T : latticeType disp) :
   Order.Lattice.on T = Order.Lattice.on T^d^d := erefl.
 
@@ -63,6 +87,18 @@ Let eq_dual_dual_finTPOrderType (T : finTPOrderType disp) :
 
 Let eq_dual_dual_finTBPOrderType (T : finTBPOrderType disp) :
   Order.FinTBPOrder.on T = Order.FinTBPOrder.on T^d^d := erefl.
+
+Let eq_dual_dual_finMeetSemilatticeType (T : finMeetSemilatticeType disp) :
+  Order.FinMeetSemilattice.on T = Order.FinMeetSemilattice.on T^d^d := erefl.
+
+Let eq_dual_dual_finBMeetSemilatticeType (T : finBMeetSemilatticeType disp) :
+  Order.FinBMeetSemilattice.on T = Order.FinBMeetSemilattice.on T^d^d := erefl.
+
+Let eq_dual_dual_finJoinSemilatticeType (T : finJoinSemilatticeType disp) :
+  Order.FinJoinSemilattice.on T = Order.FinJoinSemilattice.on T^d^d := erefl.
+
+Let eq_dual_dual_finTJoinSemilatticeType (T : finTJoinSemilatticeType disp) :
+  Order.FinTJoinSemilattice.on T = Order.FinTJoinSemilattice.on T^d^d := erefl.
 
 Let eq_dual_dual_FinLatticeType (T : finLatticeType disp) :
   Order.FinLattice.on T = Order.FinLattice.on T^d^d := erefl.

@@ -92,6 +92,24 @@ From mathcomp Require Import finset.
 (*                              The HB class is called TPOrder.               *)
 (*            tbPOrderType d == porderType with both a top and a bottom       *)
 (*                              The HB class is called TBPOrder.              *)
+(*     meetSemilatticeType d == the type of meet semilattices                 *)
+(*                              The HB class is called MeetSemilattice.       *)
+(*    bMeetSemilatticeType d == meetSemilatticeType with a bottom element     *)
+(*                              The HB class is called BMeetSemilattice.      *)
+(*    tMeetSemilatticeType d == meetSemilatticeType with a top element        *)
+(*                              The HB class is called TMeetSemilattice.      *)
+(*   tbMeetSemilatticeType d == meetSemilatticeType with both a top and a     *)
+(*                              bottom                                        *)
+(*                              The HB class is called TBMeetSemilattice.     *)
+(*     joinSemilatticeType d == the type of join semilattices                 *)
+(*                              The HB class is called JoinSemilattice.       *)
+(*    bJoinSemilatticeType d == joinSemilatticeType with a bottom element     *)
+(*                              The HB class is called BJoinSemilattice.      *)
+(*    tJoinSemilatticeType d == joinSemilatticeType with a top element        *)
+(*                              The HB class is called TJoinSemilattice.      *)
+(*   tbJoinSemilatticeType d == joinSemilatticeType with both a top and a     *)
+(*                              bottom                                        *)
+(*                              The HB class is called TBJoinSemilattice.     *)
 (*             latticeType d == the type of lattices                          *)
 (*                              The HB class is called Lattice.               *)
 (*            bLatticeType d == latticeType with a bottom element             *)
@@ -135,6 +153,18 @@ From mathcomp Require Import finset.
 (*                              The HB class is called FinTPOrder.            *)
 (*         finTBPOrderType d == finPOrderType with both a top and a bottom    *)
 (*                              The HB class is called FinTBPOrder.           *)
+(*  finMeetSemilatticeType d == the type of finite meet semilattice types     *)
+(*                              The HB class is called FinMeetSemilattice.    *)
+(* finBMeetSemilatticeType d == finMeetSemilatticeType with a bottom element  *)
+(*                              Note that finTMeetSemilatticeType is just     *)
+(*                              finTBLatticeType.                             *)
+(*                              The HB class is called FinBMeetSemilattice.   *)
+(*  finJoinSemilatticeType d == the type of finite join semilattice types     *)
+(*                              The HB class is called FinJoinSemilattice.    *)
+(* finTJoinSemilatticeType d == finJoinSemilatticeType with a top element     *)
+(*                              Note that finBJoinSemilatticeType is just     *)
+(*                              finTBLatticeType.                             *)
+(*                              The HB class is called FinTJoinSemilattice.   *)
 (*          finLatticeType d == the type of finite lattices                   *)
 (*                              The HB class is called FinLattice.            *)
 (*        finTBLatticeType d == the type of nonempty finite lattices          *)
@@ -325,19 +355,19 @@ From mathcomp Require Import finset.
 (*            \top :=  @Order.top d T                                         *)
 (*                 ==  the top element of type T                              *)
 (*                                                                            *)
-(* For T of type latticeType d, and x, y of type T:                           *)
+(* For T of type meetSemilatticeType d, and x, y of type T:                   *)
 (*         x `&` y :=  @Order.meet d T x y                                    *)
 (*                 ==  the meet of x and y                                    *)
-(* For T of type latticeType d, and x, y of type T:                           *)
+(* For T of type joinSemilatticeType d, and x, y of type T:                   *)
 (*         x `|` y :=  @Order.join d T x y                                    *)
 (*                 ==  the join of x and y                                    *)
 (*                                                                            *)
-(* For T of type tLatticeType d:                                              *)
+(* For T of type tMeetSemilatticeType d:                                      *)
 (* \meet_<range> e :=  \big[Order.meet / Order.top]_<range> e                 *)
-(*                 ==  iterated meet of a lattice with a top                  *)
-(* For T of type bLatticeType d:                                              *)
+(*                 ==  iterated meet of a meet-semilattice with a top         *)
+(* For T of type bJoinSemilatticeType d:                                      *)
 (* \join_<range> e :=  \big[Order.join / Order.bottom]_<range> e              *)
-(*                 ==  iterated join of a lattice with a bottom               *)
+(*                 ==  iterated join of a join-semilattice with a bottom      *)
 (*                                                                            *)
 (* For T of type cbDistrLatticeType d, and x, y of type T:                    *)
 (*         x `\` y := @Order.diff d T x y                                     *)
@@ -1349,43 +1379,60 @@ Coercion le_of_leif : leif >-> is_true.
 End POCoercions.
 HB.export POCoercions.
 
-(* HB.mixin Record POrder_isJoinSemiLattice *)
-(*     d (T : indexed Type) of POrder d T := { *)
-(*   join : T -> T -> T; *)
-(*   joinC : commutative join; *)
-(*   joinA : associative join; *)
-(*   le_defU : forall x y, (x <= y) = (join x y == y); *)
-(* }. *)
-(* #[short(type="joinSemiLatticeType")] *)
-(* HB.structure Definition JoinSemiLattice d := *)
-(*   { T of POrder_isJoinSemiLattice d T & POrder d T }. *)
-
-(* HB.mixin Record POrder_isMeetSemiLattice *)
-(*     d (T : indexed Type) of POrder d T := { *)
-(*   meet : T -> T -> T; *)
-(*   meetC : commutative meet; *)
-(*   meetA : associative meet; *)
-(*   le_def : forall x y, (x <= y) = (meet x y == x); *)
-(* }. *)
-(* #[short(type="meetSemiLatticeType")] *)
-(* HB.structure Definition MeetSemiLattice d := *)
-(*   { T of POrder_isMeetSemiLattice d T & POrder d T }. *)
+#[key="T", primitive]
+HB.mixin Record POrder_isMeetSemilattice d T of POrder d T := {
+  meet : T -> T -> T;
+  lexI : forall x y z, (x <= meet y z) = (x <= y) && (x <= z);
+}.
 
 #[key="T", primitive]
-HB.mixin Record POrder_MeetJoin_isLattice d T of POrder d T := {
-  meet : T -> T -> T;
+HB.mixin Record POrder_isJoinSemilattice d T of POrder d T := {
   join : T -> T -> T;
-  lexI : forall x y z, (x <= meet y z) = (x <= y) && (x <= z);
   leUx : forall x y z, (join x y <= z) = (x <= z) && (y <= z);
 }.
 
+#[short(type="meetSemilatticeType")]
+HB.structure Definition MeetSemilattice d :=
+  { T of POrder d T & POrder_isMeetSemilattice d T }.
+
+#[short(type="bMeetSemilatticeType")]
+HB.structure Definition BMeetSemilattice d :=
+  { T of MeetSemilattice d T & hasBottom d T }.
+
+#[short(type="tMeetSemilatticeType")]
+HB.structure Definition TMeetSemilattice d :=
+  { T of MeetSemilattice d T & hasTop d T }.
+
+#[short(type="tbMeetSemilatticeType")]
+HB.structure Definition TBMeetSemilattice d :=
+  { T of BMeetSemilattice d T & hasTop d T }.
+
+#[short(type="joinSemilatticeType")]
+HB.structure Definition JoinSemilattice d :=
+  { T of POrder d T & POrder_isJoinSemilattice d T }.
+
+#[short(type="bJoinSemilatticeType")]
+HB.structure Definition BJoinSemilattice d :=
+  { T of JoinSemilattice d T & hasBottom d T }.
+
+#[short(type="tJoinSemilatticeType")]
+HB.structure Definition TJoinSemilattice d :=
+  { T of JoinSemilattice d T & hasTop d T }.
+
+#[short(type="tbJoinSemilatticeType")]
+HB.structure Definition TBJoinSemilattice d :=
+  { T of BJoinSemilattice d T & hasTop d T }.
+
 #[short(type="latticeType")]
 HB.structure Definition Lattice d :=
-  { T of POrder_MeetJoin_isLattice d T & POrder d T }.
+  { T of JoinSemilattice d T & POrder_isMeetSemilattice d T }.
+
 #[short(type="bLatticeType")]
 HB.structure Definition BLattice d := { T of Lattice d T & hasBottom d T }.
+
 #[short(type="tLatticeType")]
 HB.structure Definition TLattice d := { T of Lattice d T & hasTop d T }.
+
 #[short(type="tbLatticeType")]
 HB.structure Definition TBLattice d := { T of BLattice d T & hasTop d T }.
 
@@ -1580,6 +1627,22 @@ HB.structure Definition FinTPOrder d := { T of FinPOrder d T & hasTop d T }.
 #[short(type="finTBPOrderType")]
 HB.structure Definition FinTBPOrder d := { T of FinBPOrder d T & hasTop d T }.
 
+#[short(type="finMeetSemilatticeType")]
+HB.structure Definition FinMeetSemilattice d :=
+  { T of Finite T & MeetSemilattice d T }.
+
+#[short(type="finBMeetSemilatticeType")]
+HB.structure Definition FinBMeetSemilattice d :=
+  { T of Finite T & BMeetSemilattice d T }.
+
+#[short(type="finJoinSemilatticeType")]
+HB.structure Definition FinJoinSemilattice d :=
+  { T of Finite T & JoinSemilattice d T }.
+
+#[short(type="finTJoinSemilatticeType")]
+HB.structure Definition FinTJoinSemilattice d :=
+  { T of Finite T & TJoinSemilattice d T }.
+
 #[short(type="finLatticeType")]
 HB.structure Definition FinLattice d := { T of Finite T & Lattice d T }.
 
@@ -1743,6 +1806,14 @@ Notation "\meet^d_ ( i 'in' A ) F" :=
 
 End DualSyntax.
 
+(*
+FIXME: we have two issues in the dual instance declarations in the DualOrder
+module below:
+1. HB.saturate is slow, and
+2. if we declare them by HB.instance, some declarations fail because it unfolds
+   [dual] and the generated instance does not typecheck
+   (math-comp/hierarchy-builder#257).
+*)
 Module DualOrder.
 
 HB.instance Definition _ (T : eqType) := Equality.on T^d.
@@ -1773,17 +1844,17 @@ HB.instance Definition _ d (T : bPOrderType d) :=
 Lemma topEdual d (T : bPOrderType d) : (dual_top : T^d) = \bot :> T.
 Proof. by []. Qed.
 
-HB.saturate.
+HB.instance Definition _ d (T : joinSemilatticeType d) :=
+  POrder_isMeetSemilattice.Build (dual_display d) T^d (fun x y z => leUx y z x).
 
-HB.instance Definition _ d (T : latticeType d) :=
-  POrder_MeetJoin_isLattice.Build (dual_display d) T^d
-    (fun x y z => leUx y z x) (fun x y z => lexI z x y).
-
-Lemma meetEdual d (T : latticeType d) (x y : T) :
+Lemma meetEdual d (T : joinSemilatticeType d) (x y : T) :
   ((x : T^d) `&^d` y) = (x `|` y).
 Proof. by []. Qed.
 
-Lemma joinEdual d (T : latticeType d) (x y : T) :
+HB.instance Definition _ d (T : meetSemilatticeType d) :=
+  POrder_isJoinSemilattice.Build (dual_display d) T^d (fun x y z => lexI z x y).
+
+Lemma joinEdual d (T : meetSemilatticeType d) (x y : T) :
   ((x : T^d) `|^d` y) = (x `&` y).
 Proof. by []. Qed.
 
@@ -2830,7 +2901,7 @@ End TPOrderTheory.
 
 Module Import MeetTheory.
 Section MeetTheory.
-Context {disp : disp_t} {L : latticeType disp}.
+Context {disp : disp_t} {L : meetSemilatticeType disp}.
 Implicit Types (x y : L).
 
 (* interaction with order *)
@@ -2917,7 +2988,7 @@ Arguments meet_idPr {disp L x y}.
 
 Module Import BMeetTheory.
 Section BMeetTheory.
-Context {disp : disp_t} {L : bLatticeType disp}.
+Context {disp : disp_t} {L : bMeetSemilatticeType disp}.
 
 Lemma meet0x : left_zero \bot (@meet _ L).
 Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
@@ -2932,7 +3003,7 @@ End BMeetTheory.
 
 Module Import TMeetTheory.
 Section TMeetTheory.
-Context {disp : disp_t} {L : tLatticeType disp}.
+Context {disp : disp_t} {L : tMeetSemilatticeType disp}.
 Implicit Types (I : finType) (T : eqType) (x y : L).
 
 Lemma meetx1 : right_id \top (@meet _ L).
@@ -3006,7 +3077,7 @@ End TMeetTheory.
 
 Module Import JoinTheory.
 Section JoinTheory.
-Context {disp : disp_t} {L : latticeType disp}.
+Context {disp : disp_t} {L : joinSemilatticeType disp}.
 Implicit Types (x y : L).
 
 (* interaction with order *)
@@ -3079,7 +3150,7 @@ Arguments join_idPr {disp L x y}.
 
 Module Import BJoinTheory.
 Section BJoinTheory.
-Context {disp : disp_t} {L : bLatticeType disp}.
+Context {disp : disp_t} {L : bJoinSemilatticeType disp}.
 Implicit Types (I : finType) (T : eqType) (x y : L).
 
 Lemma joinx0 : right_id \bot (@join _ L).
@@ -3139,7 +3210,7 @@ End BJoinTheory.
 
 Module Import TJoinTheory.
 Section TJoinTheory.
-Context {disp : disp_t} {L : tLatticeType disp}.
+Context {disp : disp_t} {L : tJoinSemilatticeType disp}.
 
 Lemma joinx1 : right_zero \top (@join _ L). Proof. exact: (@meetx0 _ L^d). Qed.
 Lemma join1x : left_zero \top (@join _ L). Proof. exact: (@meet0x _ L^d). Qed.
@@ -4443,7 +4514,68 @@ HB.instance Definition _ := @LtLe_isPOrder.Build d T
   _ lt (fun _ _ => erefl) lt_irr lt_trans.
 HB.end.
 
+(* meetSemilatticeType and joinSemilatticeType *)
+
+HB.factory Record POrder_Meet_isSemilattice d T of POrder d T := {
+  meet : T -> T -> T;
+  meetC : commutative meet;
+  meetA : associative meet;
+  leEmeet : forall x y, (x <= y) = (meet x y == x);
+}.
+
+HB.builders Context d T of POrder_Meet_isSemilattice d T.
+
+Fact meetxx : idempotent meet.
+Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
+
+Fact lexI x y z : (x <= meet y z) = (x <= y) && (x <= z).
+Proof.
+rewrite !leEmeet; apply/eqP/andP => [<-|[/eqP<- /eqP<-]].
+  split; apply/eqP; last by rewrite meetA -meetA meetxx.
+  by rewrite -!meetA (meetC z) (meetA y) meetxx.
+by rewrite -!meetA (meetC z) -meetA (meetA y) !meetxx.
+Qed.
+
+HB.instance Definition _ := @POrder_isMeetSemilattice.Build d T meet lexI.
+
+HB.end.
+
+HB.factory Record POrder_Join_isSemilattice d T of POrder d T := {
+  join : T -> T -> T;
+  joinC : commutative join;
+  joinA : associative join;
+  leEjoin : forall x y, (y <= x) = (join x y == x);
+}.
+
+HB.builders Context d T of POrder_Join_isSemilattice d T.
+
+Fact joinxx : idempotent join.
+Proof. by move=> x; apply/eqP; rewrite -leEjoin. Qed.
+
+Fact leUx x y z : (join x y <= z) = (x <= z) && (y <= z).
+rewrite !leEjoin; apply/eqP/andP => [<-|[/eqP<- /eqP<-]].
+  split; apply/eqP; last by rewrite joinA -joinA joinxx.
+  by rewrite -joinA (joinC _ x) (joinA x) joinxx.
+by rewrite -!joinA (joinC y) -joinA (joinA x) !joinxx.
+Qed.
+
+HB.instance Definition _ := @POrder_isJoinSemilattice.Build d T join leUx.
+
+HB.end.
+
 (* latticeType *)
+
+HB.factory Record POrder_MeetJoin_isLattice d T of POrder d T := {
+  meet : T -> T -> T;
+  join : T -> T -> T;
+  meetP : forall x y z, (x <= meet y z) = (x <= y) && (x <= z);
+  joinP : forall x y z, (join x y <= z) = (x <= z) && (y <= z);
+}.
+
+HB.builders Context d T of POrder_MeetJoin_isLattice d T.
+HB.instance Definition _ := @POrder_isMeetSemilattice.Build d T meet meetP.
+HB.instance Definition _ := @POrder_isJoinSemilattice.Build d T join joinP.
+HB.end.
 
 HB.factory Record POrder_isLattice d T of POrder d T := {
   meet : T -> T -> T;
@@ -8165,6 +8297,14 @@ Export Order.POrder.Exports.
 Export Order.BPOrder.Exports.
 Export Order.TPOrder.Exports.
 Export Order.TBPOrder.Exports.
+Export Order.MeetSemilattice.Exports.
+Export Order.BMeetSemilattice.Exports.
+Export Order.TMeetSemilattice.Exports.
+Export Order.TBMeetSemilattice.Exports.
+Export Order.JoinSemilattice.Exports.
+Export Order.BJoinSemilattice.Exports.
+Export Order.TJoinSemilattice.Exports.
+Export Order.TBJoinSemilattice.Exports.
 Export Order.Lattice.Exports.
 Export Order.BLattice.Exports.
 Export Order.TLattice.Exports.
@@ -8183,6 +8323,10 @@ Export Order.FinPOrder.Exports.
 Export Order.FinBPOrder.Exports.
 Export Order.FinTPOrder.Exports.
 Export Order.FinTBPOrder.Exports.
+Export Order.FinMeetSemilattice.Exports.
+Export Order.FinBMeetSemilattice.Exports.
+Export Order.FinJoinSemilattice.Exports.
+Export Order.FinTJoinSemilattice.Exports.
 Export Order.FinLattice.Exports.
 Export Order.FinTBLattice.Exports.
 Export Order.FinDistrLattice.Exports.
