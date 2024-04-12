@@ -100,21 +100,24 @@ This particular example can be problematic if matrix.v is imported because then,
 - Variables/hypotheses with a longer scope (> 5 lines) must have a meaningful name.
 
 ### Naming conventions for lemmas (non exhaustive)
-#### Names in the library usually obey one of the following conventions
+
+Names in the library usually obey one of the following conventions:
  - `(condition_)?mainSymbol_suffixes`
  - `mainSymbol_suffixes(_condition)?`
+
 Or in the presence of a property denoted by an n-ary or unary predicate:
  - `naryPredicate_mainSymbol+`
  - `mainSymbol_unaryPredicate`
-There is an underscore before "suffixes" when "suffixes" starts with a one-letter small identifier (i.e., not a capital letter or a number or a longer identifier such as "if"). Since the intent is to make the "suffixes" readable enough, there are exceptions for short names (e.g., `lern1`).
 
-#### Where:
- - `mainSymbol` is the most meaningful part of the lemma. It generally is the head symbol of the right-hand side of an equation or the head symbol of a theorem. It can also simply be the main object of study, head symbol or not. It is usually either
-   + one of the main symbols of the theory at hand. For example, it will be `opp`, `add`, `mul`, etc., or
+Where:
+ - `mainSymbol` is the most meaningful part of the lemma. It generally is the head symbol of the right-hand side of an equation or the head symbol of a theorem. It can also simply be the main object of study, head symbol or not. It is usually either:
+   + one of the main symbols of the theory at hand (e.g., it will be `opp`, `add`, `mul`, etc.) or
    + a special "canonical" operation, such as a ring morphism or a
-     subtype predicate. e.g. `linear`, `raddf`, `rmorph`, `rpred`, etc.
- - "condition" is used when the lemma applies under some hypothesis.
- - "suffixes" are there to refine what shape and/or what other symbols the lemma has. It can either be the name of a symbol ("add", "mul", etc.), or the (short) name of a predicate ("`inj`" for "`injectivity`", "`id`" for "identity", etc.) or an abbreviation.
+     subtype predicate (e.g. `linear`, `raddf`, `rmorph`, `rpred`, etc.)
+ - `condition` is used when the lemma applies under some hypothesis.
+ - `suffixes` are there to refine what shape and/or what other symbols the lemma has. It can either be the name of a symbol (`add`, `mul`, etc.), or the (short) name of a predicate (`inj` for `injective`, `id` for "identity", etc.) or an abbreviation.
+
+There is an underscore before `suffixes` when `suffixes` starts with a one-letter small identifier (i.e., not a capital letter or a number or a longer identifier such as `if`). Since the intent is to make the `suffixes` readable enough, there are exceptions for short names (e.g., `lern1`).
 
 Abbreviations are in the header of the file which introduces them. We list here the main abbreviations.
   - `A` -- associativity, as in `andbA : associative andb`
