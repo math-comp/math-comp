@@ -134,6 +134,10 @@ From mathcomp Require Import finset.
 (*                              The HB class is called TTotal.                *)
 (*             tbOrderType d == orderType with both a top and a bottom        *)
 (*                              The HB class is called TBTotal.               *)
+(*       cDistrLatticeType d == the type of relatively complemented           *)
+(*                              distributive lattices, where each interval    *)
+(*                              [a, b] is equipped with a complement operation*)
+(*                              The HB class is called CDistrLattice.         *)
 (*      cbDistrLatticeType d == the type of sectionally complemented          *)
 (*                              distributive lattices, equipped with a bottom,*)
 (*                              a relative complement operation, and a        *)
@@ -141,6 +145,13 @@ From mathcomp Require Import finset.
 (*                              operation for each interval of the form       *)
 (*                              [\bot, b]                                     *)
 (*                              The HB class is called CBDistrLattice.        *)
+(*      ctDistrLatticeType d == the type of dually sectionally complemented   *)
+(*                              distributive lattices, equipped with a top,   *)
+(*                              a relative complement operation, and a        *)
+(*                              dual difference operation, i.e. a complement  *)
+(*                              operation for each interval of the form       *)
+(*                              [a, \top]                                     *)
+(*                              The HB class is called CTDistrLattice.        *)
 (*     ctbDistrLatticeType d == the type of complemented distributive         *)
 (*                              lattices, equipped with top, bottom,          *)
 (*                              difference, dual difference, and complement   *)
@@ -179,6 +190,9 @@ From mathcomp Require Import finset.
 (*          finTBOrderType d == the type of nonempty totally ordered finite   *)
 (*                              types                                         *)
 (*                              The HB class is called FinTBTotal.            *)
+(*    finCDistrLatticeType d == the type of finite relatively complemented    *)
+(*                              distributive lattices                         *)
+(*                              The HB class is called FinCDistrLattice.      *)
 (*  finCTBDistrLatticeType d == the type of finite complemented distributive  *)
 (*                              lattices                                      *)
 (*                              The HB class is called FinCTBDistrLattice.    *)
@@ -369,10 +383,17 @@ From mathcomp Require Import finset.
 (* \join_<range> e :=  \big[Order.join / Order.bottom]_<range> e              *)
 (*                 ==  iterated join of a join-semilattice with a bottom      *)
 (*                                                                            *)
+(* For T of type cDistrLatticeType d, and x, y, z of type T:                  *)
+(*    rcompl x y z == the (relative) complement of z in [x, y]                *)
+(*                                                                            *)
 (* For T of type cbDistrLatticeType d, and x, y of type T:                    *)
 (*         x `\` y := @Order.diff d T x y                                     *)
 (*                 == the (sectional) complement of y in [\bot, x],           *)
 (*                    i.e., rcompl \bot x y                                   *)
+(*                                                                            *)
+(* For T of type ctDistrLatticeType d, and x, y of type T:                    *)
+(*      codiff x y == the (dual sectional) complement of y in [x, \top],      *)
+(*                    i.e., rcompl x \top y                                   *)
 (*                                                                            *)
 (* For T of type ctbDistrLatticeType d, and x of type T:                      *)
 (*            ~` x := @Order.compl d T x                                      *)
@@ -1581,31 +1602,60 @@ HB.structure Definition TTotal d := { T of Total d T & hasTop d T }.
 #[short(type="tbOrderType")]
 HB.structure Definition TBTotal d := { T of BTotal d T & hasTop d T }.
 
-#[key="T"]
-HB.mixin Record hasRelativeComplement d (T : Type) of BDistrLattice d T := {
-  diff   : T -> T -> T;
-  diffKI : forall x y, y `&` diff x y = bottom;
-  joinIB : forall x y, (x `&` y) `|` diff x y = x
+#[key="T", primitive]
+HB.mixin Record DistrLattice_hasRelativeComplement d T of DistrLattice d T := {
+  (* rcompl x y z is the complement of z in the interval [x, y]. *)
+  rcompl : T -> T -> T -> T;
+  rcomplPmeet : forall x y z, ((x `&` y) `|` z) `&` rcompl x y z = x `&` y;
+  rcomplPjoin : forall x y z, ((y `|` x) `&` z) `|` rcompl x y z = y `|` x;
+}.
+
+#[short(type="cDistrLatticeType")]
+HB.structure Definition CDistrLattice d :=
+  { T of DistrLattice d T & DistrLattice_hasRelativeComplement d T }.
+
+#[key="T", primitive]
+HB.mixin Record CDistrLattice_hasSectionalComplement d T
+         of CDistrLattice d T & hasBottom d T := {
+  diff : T -> T -> T;
+  (* FIXME: a bug in HB prevents us writing "rcompl \bot x y" *)
+  diffErcompl : forall x y, diff x y = rcompl (\bot : T) x y;
 }.
 
 #[short(type="cbDistrLatticeType")]
 HB.structure Definition CBDistrLattice d :=
-  { T of hasRelativeComplement d T & BDistrLattice d T }.
+  { T of CDistrLattice d T & hasBottom d T &
+         CDistrLattice_hasSectionalComplement d T }.
+
+#[key="T", primitive]
+HB.mixin Record CDistrLattice_hasDualSectionalComplement d T
+         of CDistrLattice d T & hasTop d T := {
+  codiff : T -> T -> T;
+  codiffErcompl : forall x y, codiff x y = rcompl x \top y;
+}.
+
+#[short(type="ctDistrLatticeType")]
+HB.structure Definition CTDistrLattice d :=
+  { T of CDistrLattice d T & hasTop d T &
+         CDistrLattice_hasDualSectionalComplement d T }.
 
 Module Import CBDistrLatticeSyntax.
 Notation "x `\` y" := (diff x y) : order_scope.
 End CBDistrLatticeSyntax.
 
-#[key="T"]
-HB.mixin Record hasComplement d (T : Type) of
-         TBDistrLattice d T & CBDistrLattice d T := {
+#[key="T", primitive]
+HB.mixin Record CDistrLattice_hasComplement d T of
+         CTDistrLattice d T & CBDistrLattice d T := {
   compl : T -> T;
-  complE : forall x : T, compl x = (top : T) `\` x (* FIXME? *)
+  (* FIXME: a bug in HB prevents us writing "\top `\` x" and "codiff \bot x" *)
+  complEdiff : forall x : T, compl x = (\top : T) `\` x;
+  complEcodiff : forall x : T, compl x = codiff (\bot : T) x;
 }.
 
 #[short(type="ctbDistrLatticeType")]
 HB.structure Definition CTBDistrLattice d :=
-  { T of hasComplement d T & TBDistrLattice d T & CBDistrLattice d T }.
+  { T of CBDistrLattice d T & CTDistrLattice d T &
+         CDistrLattice_hasComplement d T }.
 
 Module Import CTBDistrLatticeSyntax.
 Notation "~` A" := (compl A) : order_scope.
@@ -1662,6 +1712,10 @@ HB.structure Definition FinTotal d := { T of Finite T & Total d T }.
 
 #[short(type="finTBOrderType")]
 HB.structure Definition FinTBTotal d := { T of Finite T & TBTotal d T }.
+
+#[short(type="finCDistrLatticeType")]
+HB.structure Definition FinCDistrLattice d :=
+  { T of Finite T & CDistrLattice d T }.
 
 #[short(type="finCTBDistrLatticeType")]
 HB.structure Definition FinCTBDistrLattice d :=
@@ -1865,6 +1919,20 @@ HB.instance Definition _ d (T : distrLatticeType d) :=
 
 HB.instance Definition _ d (T : orderType d) :=
   DistrLattice_isTotal.Build (dual_display d) T^d (fun x y => le_total y x).
+
+HB.saturate.
+
+HB.instance Definition _ d (T : cDistrLatticeType d) :=
+  DistrLattice_hasRelativeComplement.Build (dual_display d) T^d
+    (fun x y => rcomplPjoin y x) (fun x y => rcomplPmeet y x).
+HB.instance Definition _ d (T : ctDistrLatticeType d) :=
+  CDistrLattice_hasSectionalComplement.Build (dual_display d) T^d codiffErcompl.
+HB.instance Definition _ d (T : cbDistrLatticeType d) :=
+  CDistrLattice_hasDualSectionalComplement.Build (dual_display d) T^d
+    diffErcompl.
+HB.instance Definition _ d (T : ctbDistrLatticeType d) :=
+  CDistrLattice_hasComplement.Build (dual_display d) T^d
+    complEcodiff complEdiff.
 
 HB.saturate.
 
@@ -4188,13 +4256,36 @@ Notation le_minl := ge_min.
 
 End TotalTheory.
 
+Module Import CDistrLatticeTheory.
+Section CDistrLatticeTheory.
+Context {disp : disp_t} {L : cDistrLatticeType disp}.
+Implicit Types (x y z : L).
+
+Lemma rcomplPmeet x y z : ((x `&` y) `|` z) `&` rcompl x y z = x `&` y.
+Proof. exact: rcomplPmeet. Qed.
+
+Lemma rcomplPjoin x y z : ((y `|` x) `&` z) `|` rcompl x y z = y `|` x.
+Proof. exact: rcomplPjoin. Qed.
+
+Lemma rcomplKI x y z : x <= y -> (x `|` z) `&` rcompl x y z = x.
+Proof. by move=> lexy; have := rcomplPmeet x y z; rewrite (meet_l lexy). Qed.
+
+Lemma rcomplKU x y z : x <= y -> (y `&` z) `|` rcompl x y z = y.
+Proof. by move=> lexy; have := rcomplPjoin x y z; rewrite (join_l lexy). Qed.
+
+End CDistrLatticeTheory.
+End CDistrLatticeTheory.
+
 Module Import CBDistrLatticeTheory.
 Section CBDistrLatticeTheory.
 Context {disp : disp_t} {L : cbDistrLatticeType disp}.
 Implicit Types (x y z : L).
 
+Lemma diffErcompl x y : x `\` y = rcompl \bot x y.
+Proof. exact: diffErcompl. Qed.
+
 Lemma diffKI x y : y `&` (x `\` y) = \bot.
-Proof. exact: diffKI. Qed.
+Proof. by have := rcomplKI y (le0x x); rewrite join0x diffErcompl. Qed.
 
 Lemma diffIK x y : (x `\` y) `&` y = \bot.
 Proof. by rewrite meetC diffKI. Qed.
@@ -4206,7 +4297,7 @@ Lemma meetBI z x y : (x `\` y) `&` (z `&` y) = \bot.
 Proof. by rewrite meetC meetIB. Qed.
 
 Lemma joinIB y x : (x `&` y) `|` (x `\` y) = x.
-Proof. exact: joinIB. Qed.
+Proof. by rewrite diffErcompl rcomplKU. Qed.
 
 Lemma joinBI y x : (x `\` y) `|` (x `&` y) = x.
 Proof. by rewrite joinC joinIB. Qed.
@@ -4355,22 +4446,41 @@ Proof. by move=> ?; rewrite lt_leAnge le0x leBLR joinx0 /= lt_geF. Qed.
 End CBDistrLatticeTheory.
 End CBDistrLatticeTheory.
 
+Module Import CTDistrLatticeTheory.
+Section CTDistrLatticeTheory.
+Context {disp : disp_t} {L : ctDistrLatticeType disp}.
+Implicit Types (x y z : L).
+
+Lemma codiffErcompl x y : codiff x y = rcompl x \top y.
+Proof. exact: codiffErcompl. Qed.
+
+(* TODO: complete this theory module *)
+
+End CTDistrLatticeTheory.
+End CTDistrLatticeTheory.
+
 Module Import CTBDistrLatticeTheory.
 Section CTBDistrLatticeTheory.
 Context {disp : disp_t} {L : ctbDistrLatticeType disp}.
 Implicit Types (x y z : L).
 
-Lemma complE x : ~` x = \top `\` x.
-Proof. exact: complE. Qed.
+Lemma complEdiff x : ~` x = \top `\` x. Proof. exact: complEdiff. Qed.
+#[deprecated(since="mathcomp 2.3.0", note="Use complEdiff instead.")]
+Notation complE := complEdiff.
+
+Lemma complEcodiff x : ~` x = codiff \bot x. Proof. exact: complEcodiff. Qed.
+
+Lemma complErcompl x : ~` x = rcompl \bot \top x.
+Proof. by rewrite complEdiff diffErcompl. Qed.
 
 Lemma diff1x x : \top `\` x = ~` x.
-Proof. by rewrite complE. Qed.
+Proof. exact/esym/complEdiff. Qed.
 
 Lemma diffE x y : x `\` y = x `&` ~` y.
-Proof. by rewrite complE meetxB meetx1. Qed.
+Proof. by rewrite complEdiff meetxB meetx1. Qed.
 
 Lemma complK : involutive (@compl _ L).
-Proof. by move=> x; rewrite !complE diffxB diffxx meet1x join0x. Qed.
+Proof. by move=> x; rewrite !complEdiff diffxB diffxx meet1x join0x. Qed.
 
 Lemma compl_inj : injective (@compl _ L).
 Proof. exact/inv_inj/complK. Qed.
@@ -4379,40 +4489,40 @@ Lemma disj_leC x y : (x `&` y == \bot) = (x <= ~` y).
 Proof. by rewrite -diff_eq0 diffE complK. Qed.
 
 Lemma leCx x y : (~` x <= y) = (~` y <= x).
-Proof. by rewrite !complE !leBLR joinC. Qed.
+Proof. by rewrite !complEdiff !leBLR joinC. Qed.
 
 Lemma lexC x y : (x <= ~` y) = (y <= ~` x).
-Proof. by rewrite !complE !leBRL !lex1 meetC. Qed.
+Proof. by rewrite -[x in LHS]complK leCx complK. Qed.
 
 Lemma leC x y : (~` x <= ~` y) = (y <= x).
 Proof. by rewrite leCx complK. Qed.
 
 Lemma complU x y : ~` (x `|` y) = ~` x `&` ~` y.
-Proof. by rewrite !complE diffxU. Qed.
+Proof. by rewrite !complEdiff diffxU. Qed.
 
 Lemma complI  x y : ~` (x `&` y) = ~` x `|` ~` y.
-Proof. by rewrite !complE diffxI. Qed.
+Proof. by rewrite !complEdiff diffxI. Qed.
 
 Lemma joinxC  x :  x `|` ~` x = \top.
-Proof. by rewrite complE diffKU joinx1. Qed.
+Proof. by rewrite complEdiff diffKU joinx1. Qed.
 
 Lemma joinCx  x : ~` x `|` x = \top.
 Proof. by rewrite joinC joinxC. Qed.
 
 Lemma meetxC  x :  x `&` ~` x = \bot.
-Proof. by rewrite complE diffKI. Qed.
+Proof. by rewrite complEdiff diffKI. Qed.
 
 Lemma meetCx  x : ~` x `&` x = \bot.
 Proof. by rewrite meetC meetxC. Qed.
 
 Lemma compl1 : ~` \top = \bot :> L.
-Proof. by rewrite complE diffxx. Qed.
+Proof. by rewrite complEdiff diffxx. Qed.
 
 Lemma compl0 : ~` \bot = \top :> L.
-Proof. by rewrite complE diffx0. Qed.
+Proof. by rewrite -compl1 complK. Qed.
 
 Lemma complB x y : ~` (x `\` y) = ~` x `|` y.
-Proof. by rewrite !complE diffxB meet1x. Qed.
+Proof. by rewrite diffE complI complK. Qed.
 
 Lemma leBC x y : x `\` y <= ~` y.
 Proof. by rewrite leBLR joinxC lex1. Qed.
@@ -4699,6 +4809,159 @@ HB.instance Definition _ :=
 
 HB.instance Definition _ := @POrder_Meet_isDistrLattice.Build d T
   meet join meetC joinC meetA joinA joinKI meetKU le_def meetUl.
+
+HB.end.
+
+(* complemented lattices *)
+
+HB.factory Record BDistrLattice_hasSectionalComplement d T
+    of BDistrLattice d T := {
+  diff : T -> T -> T;
+  diffKI : forall x y, y `&` diff x y = \bot;
+  joinIB : forall x y, (x `&` y) `|` diff x y = x;
+}.
+
+Module hasRelativeComplement.
+#[deprecated(since="mathcomp 2.3.0",
+             note="Use BDistrLattice_hasSectionalComplement.Build instead.")]
+Notation Build d T :=
+  (BDistrLattice_hasSectionalComplement.Build d T) (only parsing).
+End hasRelativeComplement.
+
+#[deprecated(since="mathcomp 2.3.0",
+             note="Use BDistrLattice_hasSectionalComplement instead.")]
+Notation hasRelativeComplement d T :=
+  (BDistrLattice_hasSectionalComplement d T) (only parsing).
+
+HB.builders Context d T of BDistrLattice_hasSectionalComplement d T.
+
+Definition rcompl x y z := (x `&` y) `|` diff (y `|` x) z.
+
+Fact rcomplPmeet x y z : ((x `&` y) `|` z) `&` rcompl x y z = x `&` y.
+Proof. by rewrite meetUr joinIKC meetUl diffKI joinx0 meetKU. Qed.
+
+Fact rcomplPjoin x y z : ((y `|` x) `&` z) `|` rcompl x y z = y `|` x.
+Proof. by rewrite joinCA joinIB joinA meetUK joinC. Qed.
+
+HB.instance Definition _ :=
+  @DistrLattice_hasRelativeComplement.Build d T rcompl rcomplPmeet rcomplPjoin.
+
+Fact diffErcompl x y : diff x y = rcompl \bot x y.
+Proof. by rewrite /rcompl meet0x join0x joinx0. Qed.
+
+HB.instance Definition _ :=
+  @CDistrLattice_hasSectionalComplement.Build d T diff diffErcompl.
+
+HB.end.
+
+HB.factory Record TDistrLattice_hasDualSectionalComplement d T
+    of TDistrLattice d T := {
+  codiff : T -> T -> T;
+  codiffKU : forall x y, y `|` codiff x y = \top;
+  meetUB : forall x y, (x `|` y) `&` codiff x y = x;
+}.
+
+HB.builders Context d T of TDistrLattice_hasDualSectionalComplement d T.
+
+Definition rcompl x y z := (y `|` x) `&` codiff (x `&` y) z.
+
+Fact rcomplPmeet x y z : ((x `&` y) `|` z) `&` rcompl x y z = x `&` y.
+Proof. by rewrite meetCA meetUB meetA joinIK. Qed.
+
+Fact rcomplPjoin x y z : ((y `|` x) `&` z) `|` rcompl x y z = y `|` x.
+Proof. by rewrite joinIr meetUKC joinIl codiffKU meetx1 joinKI. Qed.
+
+HB.instance Definition _ :=
+  @DistrLattice_hasRelativeComplement.Build d T rcompl rcomplPmeet rcomplPjoin.
+
+Fact codiffErcompl x y : codiff x y = rcompl x \top y.
+Proof. by rewrite /rcompl join1x meet1x meetx1. Qed.
+
+HB.instance Definition _ :=
+  @CDistrLattice_hasDualSectionalComplement.Build d T codiff codiffErcompl.
+
+HB.end.
+
+HB.factory Record CBDistrLattice_hasComplement d T
+    of CBDistrLattice d T & hasTop d T := {
+  compl : T -> T;
+  complEdiff : forall x, compl x = (\top : T) `\` x; (* FIXME *)
+}.
+
+Module hasComplement.
+#[deprecated(since="mathcomp 2.3.0",
+             note="Use CBDistrLattice_hasComplement.Build instead.")]
+Notation Build d T := (CBDistrLattice_hasComplement.Build d T) (only parsing).
+End hasComplement.
+
+#[deprecated(since="mathcomp 2.3.0",
+             note="Use CBDistrLattice_hasComplement instead.")]
+Notation hasComplement d T := (CBDistrLattice_hasComplement d T) (only parsing).
+
+HB.builders Context d T of CBDistrLattice_hasComplement d T.
+
+HB.instance Definition _ := @CDistrLattice_hasDualSectionalComplement.Build d T
+  (fun x y => rcompl x \top y) (fun _ _ => erefl).
+
+Fact complEcodiff (x : T) : compl x = codiff (\bot : T) x.
+Proof. by rewrite complEdiff diffErcompl. Qed.
+
+HB.instance Definition _ :=
+  @CDistrLattice_hasComplement.Build d T compl complEdiff complEcodiff.
+
+HB.end.
+
+HB.factory Record CTDistrLattice_hasComplement d T
+    of CTDistrLattice d T & hasBottom d T := {
+  compl : T -> T;
+  complEcodiff : forall x, compl x = codiff (\bot : T) x;
+}.
+
+HB.builders Context d T of CTDistrLattice_hasComplement d T.
+
+HB.instance Definition _ := @CDistrLattice_hasSectionalComplement.Build d T
+  (fun x y => rcompl (\bot : T) x y) (fun _ _ => erefl).
+
+Fact complEdiff (x : T) : compl x = (\top : T) `\` x.
+Proof. by rewrite complEcodiff codiffErcompl. Qed.
+
+HB.instance Definition _ :=
+  @CDistrLattice_hasComplement.Build d T compl complEdiff complEcodiff.
+
+HB.end.
+
+HB.factory Record TBDistrLattice_hasComplement d T of TBDistrLattice d T := {
+  compl : T -> T;
+  joinxC : forall x, x `|` compl x = \top;
+  meetxC : forall x, x `&` compl x = \bot;
+}.
+
+HB.builders Context d T of TBDistrLattice_hasComplement d T.
+
+Definition diff x y := x `&` compl y.
+Definition codiff x y := x `|` compl y.
+Definition rcompl x y z := (x `&` y) `|` diff (y `|` x) z.
+
+Fact diffKI x y : y `&` diff x y = \bot.
+Proof. by rewrite meetCA meetxC meetx0. Qed.
+
+Fact joinIB x y : (x `&` y) `|` diff x y = x.
+Proof. by rewrite -meetUr joinxC meetx1. Qed.
+
+HB.instance Definition _ :=
+  @BDistrLattice_hasSectionalComplement.Build d T diff diffKI joinIB.
+
+Fact codiffErcompl x y : codiff x y = rcompl x \top y.
+Proof. by rewrite /rcompl /diff join1x meetx1 meet1x. Qed.
+
+HB.instance Definition _ :=
+  @CDistrLattice_hasDualSectionalComplement.Build d T codiff codiffErcompl.
+
+Fact complEdiff x : compl x = diff \top x. Proof. exact/esym/meet1x. Qed.
+Fact complEcodiff x : compl x = codiff \bot x. Proof. exact/esym/join0x. Qed.
+
+HB.instance Definition _ :=
+  @CDistrLattice_hasComplement.Build d T compl complEdiff complEcodiff.
 
 HB.end.
 
@@ -6302,18 +6565,12 @@ Proof. by case: x y => [] []. Qed.
 Fact anti : antisymmetric (leq : rel bool).
 Proof. by move=> x y /anti_leq /(congr1 odd); rewrite !oddb. Qed.
 
-Definition sub x y := x && ~~ y.
-
-Lemma subKI x y : y && sub x y = false. Proof. by case: x y => [] []. Qed.
-Lemma joinIB x y : (x && y) || sub x y = x. Proof. by case: x y => [] []. Qed.
-
 #[export] HB.instance Definition _ := @isOrder.Build bool_display bool
    _ _ andb orb ltn_def andbE orbE anti leq_trans leq_total.
 #[export] HB.instance Definition _ := @hasBottom.Build _ bool false leq0n.
 #[export] HB.instance Definition _ := @hasTop.Build _ bool true leq_b1.
-#[export] HB.instance Definition _ := @hasRelativeComplement.Build _ bool sub subKI joinIB.
-#[export] HB.instance Definition _ := @hasComplement.Build _ bool
-  negb (fun x => erefl : ~~ x = sub true x).
+#[export] HB.instance Definition _ :=
+  @TBDistrLattice_hasComplement.Build _ bool negb orbN andbN.
 
 Lemma leEbool : le = (leq : rel bool). Proof. by []. Qed.
 Lemma ltEbool x y : (x < y) = (x < y)%N. Proof. by []. Qed.
@@ -6676,7 +6933,8 @@ Lemma joinIB x y : x `&` y `|` diff x y = x.
 Proof. by case: x => ? ?; congr pair; rewrite joinIB. Qed.
 
 #[export]
-HB.instance Definition _ := hasRelativeComplement.Build _ (T * T') diffKI joinIB.
+HB.instance Definition _ :=
+  BDistrLattice_hasSectionalComplement.Build _ (T * T') diffKI joinIB.
 
 Lemma subEprod x y : x `\` y = (x.1 `\` y.1, x.2 `\` y.2). Proof. by []. Qed.
 
@@ -6689,10 +6947,11 @@ Implicit Types (x y : T * T').
 Definition compl x : T * T' := (~` x.1, ~` x.2).
 
 Lemma complE x : compl x = diff \top x.
-Proof. by congr pair; rewrite complE. Qed.
+Proof. by congr pair; rewrite complEdiff. Qed.
 
 #[export]
-HB.instance Definition _ := hasComplement.Build _ (T * T') complE.
+HB.instance Definition _ :=
+  CBDistrLattice_hasComplement.Build _ (T * T') complE.
 
 Lemma complEprod x : ~` x = (~` x.1, ~` x.2). Proof. by []. Qed.
 
@@ -7611,7 +7870,8 @@ Proof.
 by apply: eq_from_tnth => i; rewrite tnth_join tnth_meet tnth_diff joinIB.
 Qed.
 
-#[export] HB.instance Definition _ := hasRelativeComplement.Build _ (n.-tuple T) diffKI joinIB.
+#[export] HB.instance Definition _ :=
+  BDistrLattice_hasSectionalComplement.Build _ (n.-tuple T) diffKI joinIB.
 
 Lemma diffEtprod t1 t2 :
   t1 `\` t2 = [tuple of [seq x.1 `\` x.2 | x <- zip t1 t2]].
@@ -7628,12 +7888,13 @@ Definition compl t : n.-tuple T := map_tuple compl t.
 Fact tnth_compl t i : tnth (compl t) i = ~` tnth t i.
 Proof. by rewrite tnth_map. Qed.
 
-Lemma complE t : compl t = diff \top t.
+Lemma complEdiff t : compl t = diff \top t.
 Proof.
-by apply: eq_from_tnth => i; rewrite tnth_compl tnth_diff complE tnth_nseq.
+by apply: eq_from_tnth => i; rewrite tnth_compl tnth_diff complEdiff tnth_nseq.
 Qed.
 
-#[export] HB.instance Definition _ := hasComplement.Build _ (n.-tuple T) complE.
+#[export] HB.instance Definition _ :=
+  CBDistrLattice_hasComplement.Build _ (n.-tuple T) complEdiff.
 
 Lemma complEtprod t : ~` t = [tuple of [seq ~` x | x <- t]].
 Proof. by []. Qed.
@@ -7943,13 +8204,16 @@ by rewrite !inE => /and3P[->].
 Qed.
 
 #[export]
-HB.instance Definition _ := hasRelativeComplement.Build disp {subset T} setIDv (@setID _).
+HB.instance Definition _ :=
+  @BDistrLattice_hasSectionalComplement.Build disp {subset T}
+    (@setD _) setIDv (@setID _).
 
 Lemma setTDsym A : ~: A = setT :\: A.
 Proof. by rewrite setTD. Qed.
 
 #[export]
-HB.instance Definition _ := hasComplement.Build disp {subset T} setTDsym.
+HB.instance Definition _ :=
+  CBDistrLattice_hasComplement.Build disp {subset T} setTDsym.
 
 Lemma leEsubset A B : (A <= B) = (A \subset B).
 Proof. by []. Qed.
@@ -8273,7 +8537,11 @@ Export SubPOrderTheory.
 End LTheory.
 
 Module CTheory.
-Export LTheory CBDistrLatticeTheory CTBDistrLatticeTheory.
+Export LTheory.
+Export CDistrLatticeTheory.
+Export CBDistrLatticeTheory.
+Export CTDistrLatticeTheory.
+Export CTBDistrLatticeTheory.
 End CTheory.
 
 Module TTheory.
@@ -8317,7 +8585,9 @@ Export Order.Total.Exports.
 Export Order.BTotal.Exports.
 Export Order.TTotal.Exports.
 Export Order.TBTotal.Exports.
+Export Order.CDistrLattice.Exports.
 Export Order.CBDistrLattice.Exports.
+Export Order.CTDistrLattice.Exports.
 Export Order.CTBDistrLattice.Exports.
 Export Order.FinPOrder.Exports.
 Export Order.FinBPOrder.Exports.
@@ -8333,6 +8603,7 @@ Export Order.FinDistrLattice.Exports.
 Export Order.FinTBDistrLattice.Exports.
 Export Order.FinTotal.Exports.
 Export Order.FinTBTotal.Exports.
+Export Order.FinCDistrLattice.Exports.
 Export Order.FinCTBDistrLattice.Exports.
 
 (* FIXME: check if covered by Order.Exports *)

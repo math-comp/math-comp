@@ -64,6 +64,18 @@ Let eq_dual_dual_tDistrLatticeType (T : tDistrLatticeType disp) :
 Let eq_dual_dual_tbDistrLatticeType (T : tbDistrLatticeType disp) :
   Order.TBDistrLattice.on T = Order.TBDistrLattice.on T^d^d := erefl.
 
+Let eq_dual_dual_cDistrLatticeType (T : cDistrLatticeType disp) :
+  Order.CDistrLattice.on T = Order.CDistrLattice.on T^d^d := erefl.
+
+Let eq_dual_dual_cbDistrLatticeType (T : cbDistrLatticeType disp) :
+  Order.CBDistrLattice.on T = Order.CBDistrLattice.on T^d^d := erefl.
+
+Let eq_dual_dual_ctDistrLatticeType (T : ctDistrLatticeType disp) :
+  Order.CTDistrLattice.on T = Order.CTDistrLattice.on T^d^d := erefl.
+
+Let eq_dual_dual_ctbDistrLatticeType (T : ctbDistrLatticeType disp) :
+  Order.CTBDistrLattice.on T = Order.CTBDistrLattice.on T^d^d := erefl.
+
 Let eq_dual_dual_orderType (T : orderType disp) :
   Order.Total.on T = Order.Total.on T^d^d := erefl.
 
@@ -111,6 +123,12 @@ Let eq_dual_dual_FinDistrLatticeType (T : finDistrLatticeType disp) :
 
 Let eq_dual_dual_FinTBDistrLatticeType (T : finTBDistrLatticeType disp) :
   Order.FinTBDistrLattice.on T = Order.FinTBDistrLattice.on T^d^d := erefl.
+
+Let eq_dual_dual_finCDistrLatticeType (T : finCDistrLatticeType disp) :
+  Order.FinCDistrLattice.on T = Order.FinCDistrLattice.on T^d^d := erefl.
+
+Let eq_dual_dual_finCTBDistrLatticeType (T : finCTBDistrLatticeType disp) :
+  Order.FinCTBDistrLattice.on T = Order.FinCTBDistrLattice.on T^d^d := erefl.
 
 Let eq_dual_dual_finOrderType (T : finOrderType disp) :
   Order.FinTotal.on T = Order.FinTotal.on T^d^d := erefl.
