@@ -7179,15 +7179,17 @@ Local Notation "n .-tuple" := (type disp' n) : type_scope.
 Section Basics.
 Context (n : nat).
 #[export] HB.instance Definition _ (T : eqType) := Equality.on (n.-tuple T).
-#[export] HB.instance Definition _ (T : choiceType) := Choice.on (n.-tuple T).
-#[export] HB.instance Definition _ (T : countType) := Countable.on (n.-tuple T).
-#[export] HB.instance Definition _ (T : finType) := Finite.on (n.-tuple T).
+#[export] HB.instance Definition _ (T : choiceType) :=
+  SubChoice.on (n.-tuple T).
+#[export] HB.instance Definition _ (T : countType) :=
+  SubCountable.on (n.-tuple T).
+#[export] HB.instance Definition _ (T : finType) :=
+  SubFinite.on (n.-tuple T).
 End Basics.
 
 Section POrder.
 Implicit Types (n : nat) (T : porderType disp).
 
-#[export] HB.instance Definition _ n T := SubChoice.on (n.-tuple T).
 #[export] HB.instance Definition _ n T :=
   [SubChoice_isSubPOrder of n.-tuple T by <: with disp'].
 
@@ -7477,15 +7479,17 @@ Local Notation "n .-tuple" := (type disp' n) : type_scope.
 Section Basics.
 Context (n : nat).
 #[export] HB.instance Definition _ (T : eqType) := Equality.on (n.-tuple T).
-#[export] HB.instance Definition _ (T : choiceType) := Choice.on (n.-tuple T).
-#[export] HB.instance Definition _ (T : countType) := Countable.on (n.-tuple T).
-#[export] HB.instance Definition _ (T : finType) := Finite.on (n.-tuple T).
+#[export] HB.instance Definition _ (T : choiceType) :=
+  SubChoice.on (n.-tuple T).
+#[export] HB.instance Definition _ (T : countType) :=
+  SubCountable.on (n.-tuple T).
+#[export] HB.instance Definition _ (T : finType) :=
+  SubFinite.on (n.-tuple T).
 End Basics.
 
 Section POrder.
 Implicit Types (n : nat) (T : porderType disp).
 
-#[export] HB.instance Definition _ n T := SubChoice.on (n.-tuple T).
 #[export] HB.instance Definition _ n T :=
   [SubChoice_isSubPOrder of n.-tuple T by <: with disp'].
 
