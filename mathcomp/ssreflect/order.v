@@ -7238,7 +7238,7 @@ elim: n => [|n IHn] in t1 t2 *.
 case: (tupleP t1) (tupleP t2) => [x1 {}t1] [x2 {}t2].
 rewrite [_ <= _]le_cons [t1 <= t2 :> seq _]IHn.
 apply/idP/forallP => [/andP[lex12 /forallP/= let12 i]|lext12].
-  by case: (unliftP ord0 i) => [j ->|->]//; rewrite !tnthS.
+   by case: (unliftP ord0 i) => [j ->|->]//; rewrite !tnthS.
 rewrite (lext12 ord0)/=; apply/forallP=> i.
 by have := lext12 (lift ord0 i); rewrite !tnthS.
 Qed.
@@ -7255,20 +7255,22 @@ Variables (n : nat) (T : latticeType disp).
 Implicit Types (t : n.-tuple T).
 
 Definition meet t1 t2 : n.-tuple T :=
-  [tuple of [seq x.1 `&` x.2 | x <- zip t1 t2]].
+  [seq x.1 `&` x.2 | x <- zip t1 t2].
 Definition join t1 t2 : n.-tuple T :=
-  [tuple of [seq x.1 `|` x.2 | x <- zip t1 t2]].
+  [seq x.1 `|` x.2 | x <- zip t1 t2].
 
 Fact tnth_meet t1 t2 i : tnth (meet t1 t2) i = tnth t1 i `&` tnth t2 i.
 Proof.
-rewrite tnth_map -(tnth_map fst) -(tnth_map snd) -/unzip1 -/unzip2.
-by rewrite !(tnth_nth (tnth_default t1 i))/= unzip1_zip ?unzip2_zip ?size_tuple.
+rewrite tnth_map -(tnth_map fst) -(tnth_map snd).
+rewrite !(tnth_nth (tnth_default t1 i))/=.
+by rewrite -/unzip1 -/unzip2 unzip1_zip ?unzip2_zip ?size_tuple.
 Qed.
 
 Fact tnth_join t1 t2 i : tnth (join t1 t2) i = tnth t1 i `|` tnth t2 i.
 Proof.
-rewrite tnth_map -(tnth_map fst) -(tnth_map snd) -/unzip1 -/unzip2.
-by rewrite !(tnth_nth (tnth_default t1 i))/= unzip1_zip ?unzip2_zip ?size_tuple.
+rewrite tnth_map -(tnth_map fst) -(tnth_map snd).
+rewrite !(tnth_nth (tnth_default t1 i))/=.
+by rewrite -/unzip1 -/unzip2 unzip1_zip ?unzip2_zip ?size_tuple.
 Qed.
 
 Fact meetC : commutative meet.
@@ -7303,12 +7305,10 @@ Qed.
 HB.instance Definition _ := POrder_isLattice.Build
   _ (n.-tuple T) meetC joinC meetA joinA joinKI meetKU leEmeet.
 
-Lemma meetEtprod t1 t2 :
-  t1 `&` t2 = [tuple of [seq x.1 `&` x.2 | x <- zip t1 t2]].
+Lemma meetEtprod t1 t2 : t1 `&` t2 = [seq x.1 `&` x.2 | x <- zip t1 t2].
 Proof. by []. Qed.
 
-Lemma joinEtprod t1 t2 :
-  t1 `|` t2 = [tuple of [seq x.1 `|` x.2 | x <- zip t1 t2]].
+Lemma joinEtprod t1 t2 : t1 `|` t2 = [seq x.1 `|` x.2 | x <- zip t1 t2].
 Proof. by []. Qed.
 
 End Lattice.
@@ -7317,13 +7317,13 @@ Section BLattice.
 Variables (n : nat) (T : bLatticeType disp).
 Implicit Types (t : n.-tuple T).
 
-Fact le0x t : [tuple of nseq n \bot] <= t :> n.-tuple T.
+Fact le0x t : nseq n \bot <= t :> n.-tuple T.
 Proof. by rewrite leEtprod; apply/forallP => i; rewrite tnth_nseq le0x. Qed.
 
 #[export]
 HB.instance Definition _ := hasBottom.Build _ (n.-tuple T) le0x.
 
-Lemma botEtprod : \bot = [tuple of nseq n \bot] :> n.-tuple T.
+Lemma botEtprod : \bot = nseq n \bot :> n.-tuple T.
 Proof. by []. Qed.
 
 End BLattice.
@@ -7332,13 +7332,13 @@ Section TBLattice.
 Variables (n : nat) (T : tbLatticeType disp).
 Implicit Types (t : n.-tuple T).
 
-Fact lex1 t : t <= [tuple of nseq n \top] :> n.-tuple T.
+Fact lex1 t : t <= nseq n \top :> n.-tuple T.
 Proof. by rewrite leEtprod; apply/forallP => i; rewrite tnth_nseq lex1. Qed.
 
 #[export]
 HB.instance Definition _ := hasTop.Build _ (n.-tuple T) lex1.
 
-Lemma topEtprod : \top = [tuple of nseq n \top] :> n.-tuple T.
+Lemma topEtprod : \top = nseq n \top :> n.-tuple T.
 Proof. by []. Qed.
 
 End TBLattice.
@@ -7372,13 +7372,13 @@ Section CBDistrLattice.
 Variables (n : nat) (T : cbDistrLatticeType disp).
 Implicit Types (t : n.-tuple T).
 
-Definition diff t1 t2 : n.-tuple T :=
-  [tuple of [seq x.1 `\` x.2 | x <- zip t1 t2]].
+Definition diff t1 t2 : n.-tuple T := [seq x.1 `\` x.2 | x <- zip t1 t2].
 
 Fact tnth_diff t1 t2 i : tnth (diff t1 t2) i = tnth t1 i `\` tnth t2 i.
 Proof.
-rewrite tnth_map -(tnth_map fst) -(tnth_map snd) -/unzip1 -/unzip2.
-by rewrite !(tnth_nth (tnth_default t1 i))/= unzip1_zip ?unzip2_zip ?size_tuple.
+rewrite tnth_map -(tnth_map fst) -(tnth_map snd).
+rewrite !(tnth_nth (tnth_default t1 i))/=.
+by rewrite -/unzip1 -/unzip2 unzip1_zip ?unzip2_zip ?size_tuple.
 Qed.
 
 Lemma diffKI t1 t2 : t2 `&` diff t1 t2 = \bot.
@@ -7393,8 +7393,7 @@ Qed.
 
 #[export] HB.instance Definition _ := hasRelativeComplement.Build _ (n.-tuple T) diffKI joinIB.
 
-Lemma diffEtprod t1 t2 :
-  t1 `\` t2 = [tuple of [seq x.1 `\` x.2 | x <- zip t1 t2]].
+Lemma diffEtprod t1 t2 : t1 `\` t2 = [seq x.1 `\` x.2 | x <- zip t1 t2].
 Proof. by []. Qed.
 
 End CBDistrLattice.
@@ -7415,8 +7414,7 @@ Qed.
 
 #[export] HB.instance Definition _ := hasComplement.Build _ (n.-tuple T) complE.
 
-Lemma complEtprod t : ~` t = [tuple of [seq ~` x | x <- t]].
-Proof. by []. Qed.
+Lemma complEtprod t : ~` t = [seq ~` x | x <- t]. Proof. by []. Qed.
 
 End CTBDistrLattice.
 
@@ -7598,12 +7596,12 @@ Section BDistrLattice.
 Variables (n : nat) (T : finOrderType disp).
 Implicit Types (t : n.-tuple T).
 
-Fact le0x t : [tuple of nseq n \bot] <= t :> n.-tuple T.
+Fact le0x t : nseq n \bot <= t :> n.-tuple T.
 Proof. by apply: sub_seqprod_lexi; apply: le0x (t : n.-tupleprod T). Qed.
 
 #[export] HB.instance Definition _ := hasBottom.Build _ (n.-tuple T) le0x.
 
-Lemma botEtlexi : \bot = [tuple of nseq n \bot] :> n.-tuple T.
+Lemma botEtlexi : \bot = nseq n \bot :> n.-tuple T.
 Proof. by []. Qed.
 
 End BDistrLattice.
@@ -7612,12 +7610,12 @@ Section TBDistrLattice.
 Variables (n : nat) (T : finOrderType disp).
 Implicit Types (t : n.-tuple T).
 
-Fact lex1 t : t <= [tuple of nseq n \top].
+Fact lex1 t : t <= nseq n \top.
 Proof. by apply: sub_seqprod_lexi; apply: lex1 (t : n.-tupleprod T). Qed.
 
 #[export] HB.instance Definition _ := hasTop.Build _ (n.-tuple T) lex1.
 
-Lemma topEtlexi : \top = [tuple of nseq n \top] :> n.-tuple T.
+Lemma topEtlexi : \top = nseq n \top :> n.-tuple T.
 Proof. by []. Qed.
 
 End TBDistrLattice.

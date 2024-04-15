@@ -216,7 +216,7 @@ Lemma dtuple_on_subset n (S1 S2 : {set sT}) t :
 Proof. by move=> sS12 /[!inE] /andP[-> /subset_trans]; apply. Qed.
 
 Lemma n_act_add n x (t : n.-tuple sT) a :
-  n_act to [tuple of x :: t] a = [tuple of to x a :: n_act to t a].
+  n_act to (x :: t) a = to x a :: n_act to t a.
 Proof. exact: val_inj. Qed.
 
 Lemma ntransitive0 : [transitive^0 G, on S | to].
@@ -240,7 +240,7 @@ have ext_t t: t \in dtuple_on m S ->
   have /subset_leq_card := subset_trans St1 sSt.
   by rewrite !card_uniq_tuple // ltnn.
 case/imsetP: (tr_m1); case/tupleP=> [x t]; rewrite dtuple_on_add.
-case/and3P=> Sx ntx dt; set xt := [tuple of _] => tr_xt.
+case/and3P=> Sx ntx dt; set xt := [tuple of x :: t] => tr_xt.
 apply/imsetP; exists t => //.
 apply/setP=> u; apply/idP/imsetP=> [du | [a Ga ->{u}]].
   case: (ext_t u du) => y; rewrite tr_xt.
@@ -321,7 +321,7 @@ Proof.
 move=> Sx Gtr Gntr.
 have t_to_x t: t \in m.+1.-dtuple(S) ->
   exists2 a, a \in G & exists2 t', t' \in m.-dtuple(S :\ x)
-                                 & t = n_act to [tuple of x :: t'] a.
+                                 & t = n_act to (x :: t') a.
 - case/tupleP: t => y t St.
   have Sy: y \in S by rewrite dtuple_on_add_D1 in St; case/andP: St.
   rewrite -(atransP Gtr _ Sy) in Sx; case/imsetP: Sx => a Ga toya.

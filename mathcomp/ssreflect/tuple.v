@@ -92,12 +92,6 @@ Proof.
 by move/eq_map=> eq_t; apply: val_inj; rewrite /= -!map_tnth_enum eq_t.
 Qed.
 
-Definition tuple t mkT : tuple_of :=
-  mkT (let: Tuple _ tP := t return size t == n in tP).
-
-Lemma tupleE t : tuple (fun sP => @Tuple t sP) = t.
-Proof. by case: t. Qed.
-
 End TupleDef.
 
 Notation "n .-tuple" := (tuple_of n)
@@ -106,7 +100,7 @@ Notation "n .-tuple" := (tuple_of n)
 Notation "{ 'tuple' n 'of' T }" := (n.-tuple T : predArgType)
   (at level 0, only parsing) : type_scope.
 
-Notation "[ 'tuple' 'of' s ]" := (tuple (fun sP => @Tuple _ _ s sP))
+Notation "[ 'tuple' 'of' s ]" := (s : _.-tuple _)
   (at level 0, format "[ 'tuple'  'of'  s ]") : form_scope.
 
 Notation "[ 'tnth' t i ]" := (tnth t (@Ordinal (tsize t) i (erefl true)))
@@ -235,31 +229,31 @@ Canonical sort_tuple r t := Tuple (sort_tupleP r t).
 
 Definition thead (u : n.+1.-tuple T) := tnth u ord0.
 
-Lemma tnth0 x t : tnth [tuple of x :: t] ord0 = x.
+Lemma tnth0 x t : tnth (x :: t) ord0 = x.
 Proof. by []. Qed.
 
-Lemma tnthS x t i : tnth [tuple of x :: t] (lift ord0 i) = tnth t i.
+
+Lemma tnthS x t (i : 'I_n) : tnth (x :: t) i.+1 = tnth t i.
 Proof. by rewrite (tnth_nth (tnth_default t i)). Qed.
 
-Lemma theadE x t : thead [tuple of x :: t] = x.
-Proof. by []. Qed.
+Lemma theadE x t : thead (x :: t) = x. Proof. by []. Qed.
 
-Lemma tuple0 : all_equal_to ([tuple] : 0.-tuple T).
+Lemma tuple0 : all_equal_to ([::] : 0.-tuple T).
 Proof. by move=> t; apply: val_inj; case: t => [[]]. Qed.
 
 Variant tuple1_spec : n.+1.-tuple T -> Type :=
-  Tuple1spec x t : tuple1_spec [tuple of x :: t].
+  Tuple1spec x t : tuple1_spec (x :: t).
 
 Lemma tupleP u : tuple1_spec u.
 Proof.
 case: u => [[|x s] //= sz_s]; pose t := @Tuple n _ s sz_s.
-by rewrite (_ : Tuple _ = [tuple of x :: t]) //; apply: val_inj.
+by rewrite (_ : Tuple _ = x :: t) //; apply: val_inj.
 Qed.
 
-Lemma tnth_map f t i : tnth [tuple of map f t] i = f (tnth t i) :> rT.
+Lemma tnth_map f t i : tnth (map f t) i = f (tnth t i) :> rT.
 Proof. by apply: nth_map; rewrite size_tuple. Qed.
 
-Lemma tnth_nseq x i : tnth [tuple of nseq n x] i = x.
+Lemma tnth_nseq x i : tnth (nseq n x) i = x.
 Proof.
 by rewrite !(tnth_nth (tnth_default (nseq_tuple x) i)) nth_nseq ltn_ord.
 Qed.
@@ -267,10 +261,10 @@ Qed.
 End SeqTuple.
 
 Lemma tnth_behead n T (t : n.+1.-tuple T) i :
-  tnth [tuple of behead t] i = tnth t (inord i.+1).
+  tnth (behead t) i = tnth t (inord i.+1).
 Proof. by case/tupleP: t => x t; rewrite !(tnth_nth x) inordK ?ltnS. Qed.
 
-Lemma tuple_eta n T (t : n.+1.-tuple T) : t = [tuple of thead t :: behead t].
+Lemma tuple_eta n T (t : n.+1.-tuple T) : t = [tuple of thead t :: behead t]. (* BUG *)
 Proof. by case/tupleP: t => x t; apply: val_inj. Qed.
 
 Section tnth_shift.
@@ -426,7 +420,7 @@ Canonical enum_tuple A := Tuple (enum_tupleP A).
 Definition ord_tuple : n.-tuple 'I_n := Tuple (introT eqP (size_enum_ord n)).
 Lemma val_ord_tuple : val ord_tuple = enum 'I_n. Proof. by []. Qed.
 
-Lemma tuple_map_ord U (t : n.-tuple U) : t = [tuple of map (tnth t) ord_tuple].
+Lemma tuple_map_ord U (t : n.-tuple U) : t = map (tnth t) ord_tuple.
 Proof. by apply: val_inj => /=; rewrite map_tnth_enum. Qed.
 
 Lemma tnth_ord_tuple i : tnth ord_tuple i = i.
@@ -439,8 +433,8 @@ Section ImageTuple.
 
 Variables (T' : Type) (f : T -> T') (A : {pred T}).
 
-Canonical image_tuple : #|A|.-tuple T' := [tuple of image f A].
-Canonical codom_tuple : #|T|.-tuple T' := [tuple of codom f].
+Canonical image_tuple : #|A|.-tuple T' := image f A.
+Canonical codom_tuple : #|T|.-tuple T' := codom f.
 
 End ImageTuple.
 
