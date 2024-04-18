@@ -137,3 +137,119 @@ Let eq_dual_dual_finTBOrderType (T : finTBOrderType disp) :
   Order.FinTBTotal.on T = Order.FinTBTotal.on T^d^d := erefl.
 
 End dual_of_dual.
+
+Section dual_of_prod.
+Context (disp1 disp2 : Order.disp_t).
+
+Import DefaultProdOrder.
+
+Let eq_dual_prod_porderType (T1 : porderType disp1) (T2 : porderType disp2) :
+  Order.POrder.on (T1 * T2)^d = Order.POrder.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_bPOrderType (T1 : bPOrderType disp1) (T2 : bPOrderType disp2) :
+  Order.BPOrder.on (T1 * T2)^d = Order.BPOrder.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_tPOrderType (T1 : tPOrderType disp1) (T2 : tPOrderType disp2) :
+  Order.TPOrder.on (T1 * T2)^d = Order.TPOrder.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_tbPOrderType
+  (T1 : tbPOrderType disp1) (T2 : tbPOrderType disp2) :
+  Order.TBPOrder.on (T1 * T2)^d = Order.TBPOrder.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_meetSemilatticeType
+  (T1 : meetSemilatticeType disp1) (T2 : meetSemilatticeType disp2) :
+  Order.MeetSemilattice.on (T1 * T2)^d
+  = Order.MeetSemilattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_bMeetSemilatticeType
+  (T1 : bMeetSemilatticeType disp1) (T2 : bMeetSemilatticeType disp2) :
+  Order.BMeetSemilattice.on (T1 * T2)^d
+  = Order.BMeetSemilattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_tMeetSemilatticeType
+  (T1 : tMeetSemilatticeType disp1) (T2 : tMeetSemilatticeType disp2) :
+  Order.TMeetSemilattice.on (T1 * T2)^d
+  = Order.TMeetSemilattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_tbMeetSemilatticeType
+  (T1 : tbMeetSemilatticeType disp1) (T2 : tbMeetSemilatticeType disp2) :
+  Order.TBMeetSemilattice.on (T1 * T2)^d
+  = Order.TBMeetSemilattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_joinSemilatticeType
+  (T1 : joinSemilatticeType disp1) (T2 : joinSemilatticeType disp2) :
+  Order.JoinSemilattice.on (T1 * T2)^d
+  = Order.JoinSemilattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_bJoinSemilatticeType
+  (T1 : bJoinSemilatticeType disp1) (T2 : bJoinSemilatticeType disp2) :
+  Order.BJoinSemilattice.on (T1 * T2)^d
+  = Order.BJoinSemilattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_tJoinSemilatticeType
+  (T1 : tJoinSemilatticeType disp1) (T2 : tJoinSemilatticeType disp2) :
+  Order.TJoinSemilattice.on (T1 * T2)^d
+  = Order.TJoinSemilattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_tbJoinSemilatticeType
+  (T1 : tbJoinSemilatticeType disp1) (T2 : tbJoinSemilatticeType disp2) :
+  Order.TBJoinSemilattice.on (T1 * T2)^d
+  = Order.TBJoinSemilattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_latticeType (T1 : latticeType disp1) (T2 : latticeType disp2) :
+  Order.Lattice.on (T1 * T2)^d = Order.Lattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_bLatticeType
+  (T1 : bLatticeType disp1) (T2 : bLatticeType disp2) :
+  Order.BLattice.on (T1 * T2)^d = Order.BLattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_tLatticeType
+  (T1 : tLatticeType disp1) (T2 : tLatticeType disp2) :
+  Order.TLattice.on (T1 * T2)^d = Order.TLattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_tbLatticeType
+  (T1 : tbLatticeType disp1) (T2 : tbLatticeType disp2) :
+  Order.TBLattice.on (T1 * T2)^d
+  = Order.TBLattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_distrLatticeType
+  (T1 : distrLatticeType disp1) (T2 : distrLatticeType disp2) :
+  Order.DistrLattice.on (T1 * T2)^d
+  = Order.DistrLattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_bDistrLatticeType
+  (T1 : bDistrLatticeType disp1) (T2 : bDistrLatticeType disp2) :
+  Order.BDistrLattice.on (T1 * T2)^d
+  = Order.BDistrLattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_tDistrLatticeType
+  (T1 : tDistrLatticeType disp1) (T2 : tDistrLatticeType disp2) :
+  Order.TDistrLattice.on (T1 * T2)^d
+  = Order.TDistrLattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_tbDistrLatticeType
+  (T1 : tbDistrLatticeType disp1) (T2 : tbDistrLatticeType disp2) :
+  Order.TBDistrLattice.on (T1 * T2)^d
+  = Order.TBDistrLattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_cDistrLatticeType
+  (T1 : cDistrLatticeType disp1) (T2 : cDistrLatticeType disp2) :
+  Order.CDistrLattice.on (T1 * T2)^d
+  = Order.CDistrLattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_cbDistrLatticeType
+  (T1 : cbDistrLatticeType disp1) (T2 : cbDistrLatticeType disp2) :
+  Order.CBDistrLattice.on (T1 * T2)^d
+  = Order.CBDistrLattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_ctDistrLatticeType
+  (T1 : ctDistrLatticeType disp1) (T2 : ctDistrLatticeType disp2) :
+  Order.CTDistrLattice.on (T1 * T2)^d
+  = Order.CTDistrLattice.on (T1^d * T2^d)%type := erefl.
+
+Let eq_dual_prod_ctbDistrLatticeType
+  (T1 : ctbDistrLatticeType disp1) (T2 : ctbDistrLatticeType disp2) :
+  Order.CTBDistrLattice.on (T1 * T2)^d
+  = Order.CTBDistrLattice.on (T1^d * T2^d)%type := erefl.
+
+End dual_of_prod.
