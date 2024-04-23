@@ -3759,7 +3759,7 @@ Notation lt_maxl := gt_max.
 Notation lt_maxr := lt_max.
 #[deprecated(since="mathcomp 2.1.0", note="Use lt_min instead.")]
 Notation lt_minr := lt_min.
-#[deprecated(since="mathcomp 2.1.0", note="Use gt_max instead.")]
+#[deprecated(since="mathcomp 2.1.0", note="Use gt_min instead.")]
 Notation lt_minl := gt_min.
 #[deprecated(since="mathcomp 2.1.0", note="Use le_min instead.")]
 Notation le_minr := le_min.
