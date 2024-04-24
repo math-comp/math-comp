@@ -991,6 +991,34 @@ Proof. by rewrite -properC setCK. Qed.
 Lemma properCl A B : (~: A \proper B) = (~: B \proper A).
 Proof. by rewrite -properC setCK. Qed.
 
+(* relationship with seq *)
+
+Lemma enum_setU A B : perm_eq (enum (A :|: B)) (undup (enum A ++ enum B)).
+Proof.
+apply: uniq_perm; rewrite ?enum_uniq ?undup_uniq//.
+by move=> i; rewrite mem_undup mem_enum inE mem_cat !mem_enum.
+Qed.
+
+Lemma enum_setI A B : perm_eq (enum (A :&: B)) (filter [in B] (enum A)).
+Proof.
+apply: uniq_perm; rewrite ?enum_uniq// 1?filter_uniq// ?enum_uniq//.
+by move=> x; rewrite /= mem_enum mem_filter inE mem_enum andbC.
+Qed.
+
+Lemma has_set1 pA A a : has pA (enum [set a]) = pA a.
+Proof. by rewrite enum_set1 has_seq1. Qed.
+
+Lemma has_setU pA A B :
+  has pA (enum (A :|: B)) = (has pA (enum A)) || (has pA (enum B)).
+Proof. by rewrite (perm_has _ (enum_setU _ _)) has_undup has_cat. Qed.
+
+Lemma all_set1 pA A a : all pA (enum [set a]) = pA a.
+Proof. by rewrite enum_set1 all_seq1. Qed.
+
+Lemma all_setU pA A B :
+  all pA (enum (A :|: B)) = (all pA (enum A)) && (all pA (enum B)).
+Proof. by rewrite (perm_all _ (enum_setU _ _)) all_undup all_cat. Qed.
+
 End setOps.
 
 Arguments set1P {T x a}.
@@ -1499,6 +1527,38 @@ Qed.
 Lemma big_setU1 a A F : a \notin A ->
   \big[aop/idx]_(i in a |: A) F i = aop (F a) (\big[aop/idx]_(i in A) F i).
 Proof. by move=> notAa; rewrite (@big_setD1 a) ?setU11 //= setU1K. Qed.
+
+Lemma big_subset_idem_cond A B P F :
+    idempotent aop ->
+    A \subset B ->
+  aop (\big[aop/idx]_(i in A | P i) F i) (\big[aop/idx]_(i in B | P i) F i)
+    = \big[aop/idx]_(i in B | P i) F i.
+Proof.
+by move=> idaop /setIidPr <-; rewrite (big_setIDcond B A) Monoid.mulmA /= idaop.
+Qed.
+
+Lemma big_subset_idem A B F :
+    idempotent aop ->
+    A \subset B ->
+  aop (\big[aop/idx]_(i in A) F i) (\big[aop/idx]_(i in B) F i)
+    = \big[aop/idx]_(i in B) F i.
+Proof. by rewrite -2!big_condT; apply: big_subset_idem_cond. Qed.
+
+Lemma big_setU_cond A B P F :
+    idempotent aop ->
+  \big[aop/idx]_(i in A :|: B | P i) F i
+    = aop (\big[aop/idx]_(i in A | P i) F i) (\big[aop/idx]_(i in B | P i) F i).
+Proof.
+move=> idemaop; rewrite (big_setIDcond _ A) setUK setDUl setDv set0U.
+rewrite (big_setIDcond B A) Monoid.mulmCA Monoid.mulmA /=.
+by rewrite (@big_subset_idem_cond (B :&: A)) // subsetIr.
+Qed.
+
+Lemma big_setU A B F :
+    idempotent aop ->
+  \big[aop/idx]_(i in A :|: B) F i
+    = aop (\big[aop/idx]_(i in A) F i) (\big[aop/idx]_(i in B) F i).
+Proof. by rewrite -3!big_condT; apply: big_setU_cond. Qed.
 
 Lemma big_imset h (A : {pred I}) G : {in A &, injective h} ->
   \big[aop/idx]_(j in h @: A) G j = \big[aop/idx]_(i in A) G (h i).

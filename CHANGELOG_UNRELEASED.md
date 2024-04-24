@@ -24,9 +24,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + definition `dfwith`
   + lemmas `dfwith_in`, `dfwith_out`, `dfwithP`
 
+- in `seq.v`
+  + lemmas `has_undup`, `all_undup`
+
 - in `finset.v`
   + definition `setXn`
-  + lemmas `in_setXn`, `setXnP`, `cardsXn`, `setXnS`, `eq_setXn`
+  + lemmas `in_setXn`, `setXnP`, `cardsXn`, `setXnS`, `eq_setXn`, `enum_setU`,
+    `enum_setI`, `has_set1`, `has_setU`, `all_set1`, `all_setU`,
+    `big_subset_idem_cond`, `big_subset_idem`, `big_setU_cond`, `big_setU`
 
 - in `prime.v`
   + lemmas `primeNsig`, `all_prime_primes`, `primes_eq0`, `totient_gt1`
