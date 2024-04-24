@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat div seq.
-From mathcomp Require Import path choice.
+From mathcomp Require Import path choice finpred fintype.
 
 (******************************************************************************)
 (* This file defines a type for sets over a finite Type, similar to the type  *)
@@ -174,32 +174,23 @@ Arguments set_of T%type.
 Notation "{ 'set' T }" := (set_of T)
   (at level 0, format "{ 'set'  T }") : type_scope.
 
-Definition set_predType (T : choiceType) := @PredType T {set T} FinSet.mem.
+Canonical set_predType (T : choiceType) := @PredType T {set T} FinSet.mem.
 Coercion mem_set T : {set T} -> {pred T} := FinSet.mem.
 
-Section ChoiceType.
-
+Section set_pred.
 Variable (T : choiceType).
 
-(* We should take out the proof relevant part *)
-(* We should probably use a partial iso to seq T *)
-Lemma set_type_choice : Choice (set_type T).
-Admitted.
-HB.instance Definition _ := set_type_choice.
+Lemma envelope_of_set_subproof (s : {set T}) : {subset [pred x in s] <= FinSet.enum s}.
+Proof. by move=> x; rewrite inE FinSet.memP. Qed.
 
-End ChoiceType.
-
-Section CountType.
-
-Variable (T : countType).
-
-(* We should take out the proof relevant part *)
-(* We should probably use a partial iso to seq T *)
-Lemma set_type_countable : isCountable (set_type T).
-Admitted.
-HB.instance Definition _ := set_type_countable.
-
-End CountType.
+Definition envelope_of_set (s : {set T}) : finpredEnvelope [pred x in s] :=
+  FinpredEnvelope (@envelope_of_set_subproof s).
+#[warnings="-uniform-inheritance", reversible=yes]
+Coercion finpred_set s := Finpred _ (@envelope_of_set s).
+#[warnings="-uniform-inheritance", reversible=yes]
+Coercion finpredPattern_set s := @CoercedFinpredPattern T (s : {set T}).
+Canonical CoercedFinpred_set (s : {set T}) x := CoercedFinpredApp s x.
+End set_pred.
 
 (* We later define several subtypes that coerce to set; for these it is       *)
 (* preferable to state equalities at the {set _} level, even when comparing   *)
@@ -225,225 +216,10 @@ Notation "A :=P: B" := (A =P B :> {set _})
 (* #[short(type="finPred")] *)
 (* HB.structure Definition FinPred T := {P of @isFinPred T P}. *)
 
-Definition setU T (A B : {set T}) :=
-   FinSet.of_seq (FinSet.enum A ++ FinSet.enum B).
+Definition finset (T : choiceType) (A : finpred T) : {set T} :=
+  FinSet.of_seq (enum A).
 
-Lemma in_setU T (A B : {set T}) :
-  setU A B =i [pred x | (x \in A) || (x \in B)].
-Proof.
-Admitted.
-
-Definition set_comprehension {T : choiceType} (A : {set T}) (P : {pred T}) :=
-   FinSet.of_seq (filter P (FinSet.enum A)).
-
-Lemma set_comprehensionE {T : choiceType} (A : {set T}) (P : {pred T}) :
-  set_comprehension A P =i [pred x | (x \in A) & P x].
-Proof. Admitted.
-
-Definition setI T (A B : {set T}) := set_comprehension A B.
-
-Lemma in_setI T (A B : {set T}) : setI A B =i [pred x in A | (x \in B)].
-Proof.
-Admitted.
-
-Structure finPred (T : choiceType) := FinPred {
-   finpred : {pred T};
-   pred_set : {set T};
-   pred_enumP : pred_set =i finpred
-}.
-(* Structure finPred (T : choiceType) := PackFinPred { *)
-(*    finpred : {pred T}; *)
-(*    pred_eqset :> {A : {set T} | A =i finpred} *)
-(* }. *)
-Coercion finpred_coe := finpred.
-Coercion pred_set : finPred >-> set_type.
-
-Class finPred_aux (T : choiceType) (P : {pred T}) :=
-  OK { proof : {A : {set T} | A =i P} }.
-
-(* Canonical isFinPred T P {h : @finPred_aux T P} := *)
-(*    @PackFinPred T P (@proof _ _ h). *)
-
-Canonical isFinPred T P {h : @finPred_aux T P} :=
-   @FinPred T P (sval (@proof _ _ h)) (svalP (@proof _ _ h)).
-
-Structure apply T (F : finPred T) (x : T) := Apply {apply_val :> bool}.
-
-Canonical applyF T F x := @Apply T F x (finpred_coe F x).
-
-Definition set0 {T} := @FinSet.of_seq T [::].
-Lemma in_set0 T x : x \in @set0 T = false. Admitted.
-Definition FinPred0 T := FinPred (@in_set0 T).
-Canonical apply0 T x := Apply (FinPred0 T) x false.
-
-Definition FinPredU_subproof T (F : finPred T) (G : finPred T) :
-  (fun A : {set T} => A =i [pred x | (x \in F) || (x \in G)]) (setU F G).
-Proof. Admitted.
-Definition FinPredU T (F : finPred T) (G : finPred T) :=
-  @FinPred _[pred x | (x \in F) || (x \in G)] (setU F G)
-           (FinPredU_subproof F G).
-Canonical applyU T F G x (aF : apply F x) (aG : apply G x):=
-    Apply (@FinPredU T F G) x (aF || aG).
-
-Definition FinPredI_subproof T (F : finPred T) (G : pred T) :
-  (fun A : {set T} => A =i [pred x in F | G x]) (set_comprehension F G).
-Proof. Admitted.
-Definition FinPredI T (F : finPred T) (G : pred T) :=
-  @FinPred _ [pred x in F | G x] (set_comprehension F G)
-           (FinPredI_subproof F G).
-Canonical applyI T F G x (aF : apply F x) :=
-    Apply (@FinPredI T F G) x (aF && (G x)).
-
-Definition finpred_target := finPred.
-Canonical FinPredOfSet T (A : {set T}) : finpred_target T := @FinPred _ A A (frefl _).
-Coercion FinPredOfSet : set_type >-> finpred_target.
-(* Notation "A" := (FinPredOfSet A) (at level 9, only printing). *)
-Canonical applyOfSet T A x := Apply (@FinPredOfSet T A) x (FinSet.mem A x).
-
-Definition set1 {T} x := @FinSet.of_seq T [:: x].
-Lemma in_set1 T x y : y \in @set1 T x = (y == x). Admitted.
-Definition FinPred1 T x := FinPred (@in_set1 T x).
-Canonical apply1 T y x := Apply (@FinPred1 T y) x (x == y).
-
-Definition pred_eqset (T : choiceType) (P : finPred T) :
-   {A : {set T} | A =i P} := exist _ (pred_set P) (pred_enumP P).
-
-(**
- The class of formulae that we wish to recognize as canonically
- a finPred is the following:
- P x :=
-      | x \in A,      where A is a finPred (* WrapPred4 *)
-      | P x,          where T is a finType (* WrapPred3 *)
-     (* all the remaining rules are dealt with by WrapPred *)
-      | x \in A,      where A is a finPred
-      | x == y
-      | Qx && (R x),  where Qx is an (application A x)
-      | Qx || Rx,     where Qx and Rx are (application _ x)
-      | Qx (+) Rx,    where Qx and Rx are (application _ x)
-     (* left out *)
-      | if Qx then R x else Tx, where Qx and Tx are (application _ x)
-
-Note: we need to make sure the A inferred by application A x is
-      syntactically equal to A and not "just" convertible to A.
-*)
-Import elpi.
-Elpi Tactic infer.
-Elpi Accumulate File finset.
-Elpi Typecheck.
-
-Hint Extern 0 (finPred_aux _ ) => elpi infer : typeclass_instances.
-(********)
-
-Module Tests.
-
-Definition t1 (T : choiceType) (A : {set T}) : finPred T :=
-  [pred x in A].
-Definition t1' (T : choiceType) (P : finPred T) : finPred T :=
-  [pred x in P] : {pred T}.
-Definition t2 (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
-  [pred x | [in P] x && (Q x)].
-Definition t2' (T : choiceType) (P : finPred T) (Q : pred T) : finPred T :=
-  [pred x | (x \in P) && (Q x)].
-Definition t3 (T : choiceType) (A : {set T}) (Q : pred T) : finPred T :=
-   [pred x | (x \in A) && (Q x)].
-Definition t4 (T : choiceType) (P : finPred T) (Q : finPred T) : finPred T :=
-   [pred x | (x \in P) || (x \in Q)].
-Definition def (T : choiceType) (P Q : {pred T}) : pred T :=
-   [pred x : T | P x && Q x].
-Definition t6 (T : choiceType) (P : finPred T) Q : finPred T :=
-   [pred x : T | def P Q x ].
-End Tests.
-
-Notation enum A := (FinSet.enum (pred_set A)) (only parsing).
-Notation "'enum' A" := (FinSet.enum A) (at level 10, only printing).
-
-(* Notation pred_id := (@id {pred _}) (only parsing). *)
-(* Notation "A" := (pred_id A) (at level 9, only printing). *)
-(* Notation enum A := (FinSet.enum (pred_set (pred_id A))) (only parsing). *)
-(* Notation "'enum' A" := (FinSet.enum A) (at level 10, only printing). *)
-
-Check fun (T : choiceType) (P : finPred T) (Q : pred T) =>
-  enum [pred x in P | Q x].
-
-
-Check fun (T : choiceType) (A : {set T}) => enum A.
-
-Definition set_pick (T : choiceType) (A : {set T}) := ohead (enum A).
-Notation pick A := (set_pick (pred_set A)) (only parsing).
-Notation "'pick' A" := (pick A) (at level 10, only printing).
-
-Notation "[ 'pick' x | P ]" := (pick (fun x => P%B))
-  (at level 0, x name, format "[ 'pick'  x  |  P  ]") : form_scope.
-Notation "[ 'pick' x : T | P ]" := (pick (fun x : T => P%B))
-  (at level 0, x name, only parsing) : form_scope.
-Definition pick_true T (x : T) := true.
-Reserved Notation "[ 'pick' x : T ]"
-  (at level 0, x name, format "[ 'pick'  x : T ]").
-Notation "[ 'pick' x : T ]" := [pick x : T | pick_true x]
-  (only parsing) : form_scope.
-Notation "[ 'pick' x : T ]" := [pick x : T | pick_true _]
-  (only printing) : form_scope.
-Notation "[ 'pick' x ]" := [pick x : _]
-  (at level 0, x name, only parsing) : form_scope.
-Notation "[ 'pick' x | P & Q ]" := [pick x | P && Q ]
-  (at level 0, x name,
-   format "[ '[hv ' 'pick'  x  |  P '/ '   &  Q ] ']'") : form_scope.
-Notation "[ 'pick' x : T | P & Q ]" := [pick x : T | P && Q ]
-  (at level 0, x name, only parsing) : form_scope.
-Notation "[ 'pick' x 'in' A ]" := [pick x | x \in A]
-  (at level 0, x name, format "[ 'pick'  x  'in'  A  ]") : form_scope.
-Notation "[ 'pick' x : T 'in' A ]" := [pick x : T | x \in A]
-  (at level 0, x name, only parsing) : form_scope.
-Notation "[ 'pick' x 'in' A | P ]" := [pick x | x \in A & P ]
-  (at level 0, x name,
-   format "[ '[hv ' 'pick'  x  'in'  A '/ '   |  P ] ']'") : form_scope.
-Notation "[ 'pick' x : T 'in' A | P ]" := [pick x : T | x \in A & P ]
-  (at level 0, x name, only parsing) : form_scope.
-Notation "[ 'pick' x 'in' A | P & Q ]" := [pick x in A | P && Q]
-  (at level 0, x name, format
-  "[ '[hv ' 'pick'  x  'in'  A '/ '   |  P '/ '  &  Q ] ']'") : form_scope.
-Notation "[ 'pick' x : T 'in' A | P & Q ]" := [pick x : T in A | P && Q]
-  (at level 0, x name, only parsing) : form_scope.
-
-
-(* We lock the definitions of card and subset to mitigate divergence of the   *)
-(* Coq term comparison algorithm.                                             *)
-HB.lock Definition card (T : choiceType) (A : {set T}) := size (enum A).
-Canonical card_unlock := Unlockable card.unlock.
-
-(* A is at level 99 to allow the notation #|G : H| in groups. *)
-Reserved Notation "#| A |" (at level 0, A at level 99, format "#| A |").
-Notation "#| A |" := (card (pred_set A)) (only parsing): nat_scope.
-Notation "#| A |" := (card A) (only printing): nat_scope.
-
-Definition pred0b (T : choiceType) (P : finPred T) := #|P| == 0.
-Prenex Implicits pred0b.
-
-Definition disjoint T (A : finPred T) (B : {pred T}) :=
-  @pred0b T [pred x in A | B x].
-Notation "[ 'disjoint' A & B ]" := (disjoint (mem A) (mem B))
-  (at level 0,
-   format "'[hv' [ 'disjoint' '/  '  A '/'  &  B ] ']'") : bool_scope.
-
-HB.lock
-Definition subset (T : choiceType) (A : finPred T) (B : {pred T}) : bool :=
-  pred0b [pred x in A | ~~ B x].
-Canonical subset_unlock := Unlockable subset.unlock.
-
-Definition finset T (A : finPred T) of phantom {pred T} A : {set T} := A.
-
-Reserved Notation "A \subset B" (at level 70, no associativity).
-Notation "A \subset B" := (subset (mem A) [in B]) (only parsing) : bool_scope.
-Notation "A \subset B" := (subset (reverse_coercion _ (mem A)) [in B])
-  (only printing) : bool_scope.
-
-Reserved Notation "A \proper B" (at level 70, no associativity).
-Definition proper T (A B : finPred T) := @subset T A B && ~~ subset B A.
-Notation "A \proper B" := (proper (mem A) (mem B)) (only parsing) : bool_scope.
-Notation "A \proper B" := (subset (reverse_coercion _ (mem A))
-  (reverse_coercion _ (mem B))) (only printing) : bool_scope.
-
-Notation "[ 'set' x : T | P ]" := (finset (Phantom _ (fun x : T => P)))
+Notation "[ 'set' x : T | P ]" := (finset [pred x | P])
   (at level 0, x at level 99, only parsing) : set_scope.
 Notation "[ 'set' x | P ]" := [set x : _ | P]
   (at level 0, x, P at level 99, format "[ 'set'  x  |  P ]") : set_scope.
@@ -465,157 +241,114 @@ Notation "[ 'set' x 'in' A | P & Q ]" := [set x in A | P && Q]
 Notation "[ 'set' x : T 'in' A | P & Q ]" := [set x : T in A | P && Q]
   (at level 0, x at level 99, only parsing) : set_scope.
 
-Check fun (T : choiceType) (P : finPred T) Q R =>
-  [set x : T | (x \in P) && (Q x && R x)].
+Section ChoiceType.
+
+Variable (T : choiceType).
+
+(* We should take out the proof relevant part *)
+(* We should probably use a partial iso to seq T *)
+Lemma set_type_choice : Choice (set_type T).
+Admitted.
+HB.instance Definition _ := set_type_choice.
+
+End ChoiceType.
+
+Section CountType.
+
+Variable (T : countType).
+
+(* We should take out the proof relevant part *)
+(* We should probably use a partial iso to seq T *)
+Lemma set_type_countable : isCountable (set_type T).
+Admitted.
+HB.instance Definition _ := set_type_countable.
+
+End CountType.
+
+Section FinType.
+
+Variable (T : finType).
+
+(* We should take out the proof relevant part *)
+(* We should probably use a partial iso to seq T *)
+Lemma set_type_finite : isFinite (set_type T).
+Admitted.
+HB.instance Definition _ := set_type_finite.
+
+End FinType.
+
+Section BasicSetTheory.
+
+Variable T : choiceType.
+Implicit Types (x : T) (A B : {set T}) (pA : finpred T).
+
+Lemma in_set pA x : x \in finset pA = (x \in pA).
+Proof. Admitted.
+
+Lemma setP A B : A =i B <-> A = B.
+Proof. Admitted.
+
+Lemma eqsVneq A B : eq_xor_neq A B (B == A) (A == B).
+Proof. exact: eqVneq. Qed.
+
+Lemma eq_finset pA pB : pA =i pB -> finset pA = finset pB.
+Proof. by move=> eq_p; apply/setP => x; rewrite !(in_set, inE) eq_p. Qed.
+
+End BasicSetTheory.
+Arguments eqsVneq {T} A B, {T A B}.
+Arguments eq_finset {T} [pA] pB eq_pAB.
+
+Fail Definition set1 {T : choiceType} x := [set x in (pred1 x : finpred T)].
+HB.lock Definition set1 {T : choiceType} (x : T) := finset (pred1 x). (* FIXME *)
+
+Section setOpsDefs_choiceType.
+Context {T : choiceType}.
+Implicit Types (A B D : {set T}) (x : T) (P : {set {set T}}).
+
+Definition set0 : {set T} := [set x in pred0].
 
 
+Fail Definition setU A B := [set x | (x \in A) || (x \in B)]. (* FIXME *)
+Definition setU A B := 
+  [set x in [predU (A : finpred T) & (B : finpred T)]]. (* FIXME *)
 
-(* FIXME as above *)
+Definition setI A B :=
+  [set x in [predI (A : finpred T) & (B : finpred T)]]. (* FIXME *)
+
+Fail Definition setD A B := [set x | x \notin B & x \in A]. (* FIXME *)
+Definition setD A B :=
+  [set x in [predD (A : finpred T) & (B : finpred T)]]. (* FIXME *)
+
+Definition ssetI P D := [set A in (P : finpred {set T}) | A \subset D]. (* FIXME *)
+
+Fail Definition powerset D := [set A : {set T} | A \subset D]. (* FIXME *)
+Definition powerset D : {set {set T}}. Admitted. (* FIXME *)
+
+End setOpsDefs_choiceType.
+
+Section setOpsDefs_finType.
+
+Context {T : finType}.
+Implicit Types (a x : T) (A B D : {set T}) (P : {set {set T}}).
+
+Definition setC A := [set x | x \notin A].
+Definition setTfor : {set T} := [set x : T | true].
+
+Lemma in_setT x : x \in setTfor.
+Proof. by rewrite in_set. Qed.
+
+End setOpsDefs_finType.
+Arguments setTfor T%type.
+#[global] Hint Resolve in_setT : core.
 
 (* Set spanned by a sequence. *)
 Notation "[ 'set' :: s ]" := (finset [in pred_of_seq s])
   (at level 0, format "[ 'set' ::  s ]") : set_scope.
 
-(* This lets us use set and subtypes of set, like group or coset_of, both as  *)
-(* collective predicates and as arguments of the \pi(_) notation.             *)
-Coercion pred_of_set: set_type >-> fin_pred_sort.
-
-(* Declare pred_of_set as a canonical instance of topred, but use the         *)
-(* coercion to resolve mem A to @mem (predPredType T) (pred_of_set A).        *)
-Canonical set_predType T := @PredType _ (unkeyed (set_type T)) (@pred_of_set T).
-
-
-Section ChoiceOpsTheory.
-
-Variable T : choiceType.
-Implicit Types (A B : finPred T) (C D : {pred T}).
-Implicit Types (P Q : pred T) (x y : T) (s : seq T).
-
-Lemma mem_enum A : enum A =i A.
-Proof. Admitted.
-
-Lemma enum_uniq A : uniq (enum A).
-Proof. Admitted.
-
-Lemma enum0 : enum pred0 = Nil T. Proof. Admitted.
-
-Lemma enum1 x : enum (pred1 x) = [:: x].
-Proof. Admitted.
-
-Variant pick_spec P : option T -> Type :=
-  | Pick x of P x         : pick_spec P (Some x)
-  | Nopick of P =i xpred0 : pick_spec P None.
-
-Lemma pickP (A : finPred T) : pick_spec (A : {pred T}) (pick A).
-Proof.
-Admitted.
-
-(* Should we keep it? *)
-Definition set_pickP (A : finPred T) : pick_spec [in A] (pick A) := pickP A.
-
-Lemma eq_enum A B : A =i B -> enum A = enum B.
-Proof. Admitted.
-
-Lemma eq_pick A B : A =i B -> pick A = pick B.
-Proof. Admitted.
-
-Lemma cardE A : #|A| = size (enum A).
-Proof. by rewrite unlock. Qed.
-
-Lemma eq_card A B : A =i B -> #|A| = #|B|.
-Proof. Admitted.
-
-Lemma eq_card_trans A B n : #|A| = n -> B =i A -> #|B| = n.
-Proof. Admitted.
-
-Lemma card0 : #|@pred0 T| = 0. Proof. by rewrite cardE enum0. Qed.
-
-Lemma card1 x : #|pred1 x| = 1.
-Proof. by rewrite cardE enum1. Qed.
-
-Lemma eq_card0 A : A =i pred0 -> #|A| = 0.
-Proof. exact: eq_card_trans card0. Qed.
-
-Lemma eq_card1 x A : A =i pred1 x -> #|A| = 1.
-Proof. exact: eq_card_trans (card1 x). Qed.
-
-Lemma cardsUI A B : #|[predU A & B]| + #|[predI A & B]| = #|A| + #|B|.
-Proof. rewrite !cardE/=. Admitted.
-
-Lemma cardsID B A : #|[predI A & B]| + #|[pred x in A | x \notin B]| = #|A|.
-Proof. Admitted.
-
-Lemma cardsU1 x A : #|[predU1 x & A]| = (x \notin A) + #|A|.
-Proof.
-case Ax: (x \in A).
-  by apply: eq_card => y /[1!inE]/=; case: eqP => // ->.
-rewrite /= -(card1 x) -cardsUI addnC.
-rewrite [#|predI _ _|]eq_card0 => [|y /=].
-  by apply: eq_card => // y; rewrite !inE; admit.
-by rewrite !inE; case: eqP => // ->.
-Admitted.
-
-
-
-End ChoiceOpsTheory.
-
-Section BasicSetTheory.
-
-Variable T : finType.
-Implicit Types (x : T) (A B : {set T}) (pA : pred T).
-
-HB.instance Definition _ := Finite.on {set T}.
-
-Lemma in_set pA x : x \in finset pA = pA x.
-Proof. by rewrite [@finset]unlock unlock [x \in _]ffunE. Qed.
-
-Lemma setP A B : A =i B <-> A = B.
-Proof.
-by split=> [eqAB|-> //]; apply/val_inj/ffunP=> x; have:= eqAB x; rewrite unlock.
-Qed.
-
-Definition set0 := [set x : T | false].
-Definition setTfor := [set x : T | true].
-
-Lemma in_setT x : x \in setTfor.
-Proof. by rewrite in_set. Qed.
-
-Lemma eqsVneq A B : eq_xor_neq A B (B == A) (A == B).
-Proof. exact: eqVneq. Qed.
-
-Lemma eq_finset (pA pB : pred T) : pA =1 pB -> finset pA = finset pB.
-Proof. by move=> eq_p; apply/setP => x; rewrite !(in_set, inE) eq_p. Qed.
-
-End BasicSetTheory.
-
-Arguments eqsVneq {T} A B, {T A B}.
-
-Arguments set0 {T}.
-Arguments setTfor T%type.
-Arguments eq_finset {T} [pA] pB eq_pAB.
-#[global] Hint Resolve in_setT : core.
-
 Notation "[ 'set' : T ]" := (setTfor T)
   (at level 0, format "[ 'set' :  T ]") : set_scope.
 
 Notation setT := [set: _] (only parsing).
-
-HB.lock
-Definition set1 (T : finType) (a : T) := [set x | x == a].
-
-Section setOpsDefs.
-
-Variable T : finType.
-Implicit Types (a x : T) (A B D : {set T}) (P : {set {set T}}).
-
-Definition setU A B := [set x | (x \in A) || (x \in B)].
-Definition setI A B := [set x in A | x \in B].
-Definition setC A := [set x | x \notin A].
-Definition setD A B := [set x | x \notin B & x \in A].
-Definition ssetI P D := [set A in P | A \subset D].
-Definition powerset D := [set A : {set T} | A \subset D].
-
-End setOpsDefs.
 
 Notation "[ 'set' a ]" := (set1 a)
   (at level 0, a at level 99, format "[ 'set'  a ]") : set_scope.
@@ -637,11 +370,20 @@ Notation "P ::&: D" := (ssetI P D) (at level 48) : set_scope.
 
 Section setOps.
 
-Variable T : finType.
+Variable T : choiceType.
 Implicit Types (a x : T) (A B C D : {set T}) (pA pB pC : pred T).
 
 Lemma eqEsubset A B : (A == B) = (A \subset B) && (B \subset A).
-Proof. by apply/eqP/subset_eqP=> /setP. Qed.
+Proof.
+apply/idP/idP.
+move=> ?.
+Set Printing All.
+evar (C : {finpred T}).
+evar (D : {finpred T}).
+Fail apply/subset_eqP.
+Abort.
+
+STOP.
 
 Lemma subEproper A B : A \subset B = (A == B) || (A \proper B).
 Proof. by rewrite eqEsubset -andb_orr orbN andbT. Qed.
