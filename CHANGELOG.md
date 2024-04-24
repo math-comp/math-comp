@@ -233,6 +233,8 @@ Reynald Affeldt, Sophie Bernard, Alessandro Bruni, Fernando Chu, Cyril Cohen, Jo
     `RealDomain_isArchimedean`)
   + lemmas `truncP`, `trunc_itv`
   + lemmas `gerBl`, `gtrBl`
+  + definition `Num.npos` and lemma `nposrE`
+  + lemmas `ger0_le_norm`, `gtr0_le_norm`, `ler0_ge_norm` and `ltr0_ge_norm`
 
 - in `ssrint.v`
   + `RMorphism` instance for `Posz`
