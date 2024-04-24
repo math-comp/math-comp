@@ -991,6 +991,42 @@ Proof. by rewrite -properC setCK. Qed.
 Lemma properCl A B : (~: A \proper B) = (~: B \proper A).
 Proof. by rewrite -properC setCK. Qed.
 
+(* has and all *)
+
+Lemma has_set1 pA A a :
+  has pA (enum [set a]) = pA a.
+Proof. by rewrite enum_set1 has_seq1. Qed.
+
+Lemma has_setU pA A B :
+  has pA (enum (A :|: B)) = (has pA (enum A)) || (has pA (enum B)).
+Proof.
+apply/hasP/orP.
+  move=> [x /[!mem_enum] /[!in_setU] /orP [xinA|xinB] pAx].
+    by left; apply/hasP; exists x; first by rewrite mem_enum.
+  by right; apply/hasP; exists x; first by rewrite mem_enum.
+move=> [/hasP [x /[!mem_enum] xin pAx]|/hasP [x /[!mem_enum] xin pAx]].
+  by exists x => //; rewrite mem_enum in_setU xin.
+by exists x => //; rewrite mem_enum in_setU xin orbT.
+Qed.
+
+Lemma all_set1 pA A a :
+  all pA (enum [set a]) = pA a.
+Proof. by rewrite enum_set1 all_seq1. Qed.
+
+Lemma all_setU pA A B :
+  all pA (enum (A :|: B)) = (all pA (enum A)) && (all pA (enum B)).
+Proof.
+apply/allP/andP.
+  move=> allAUB; split; apply/allP.
+    move=> x /[!mem_enum] xinA; apply: allAUB.
+    by rewrite mem_enum in_setU xinA.
+  move=> x /[!mem_enum] xinB; apply: allAUB.
+  by rewrite mem_enum in_setU xinB orbT.
+move=> [/allP allA /allP allB] x /[!mem_enum] /setUP [xinA | xinB].
+  by apply: allA; rewrite mem_enum.
+by apply: allB; rewrite mem_enum.
+Qed.
+
 End setOps.
 
 Arguments set1P {T x a}.
