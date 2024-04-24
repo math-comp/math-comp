@@ -87,6 +87,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `lker_ker`, `limgE`, `leigenspaceE`
 
 
+- in `order.v`
+  + structures `meetSemilatticeType`, `bMeetSemilatticeType`,
+    `tMeetSemilatticeType`, `tbMeetSemilatticeType`,
+    `joinSemilatticeType`, `bJoinSemilatticeType`,
+    `tJoinSemilatticeType`, `tbJoinSemilatticeType`,
+    `tDistrLatticeType`, `bOrderType`, `tOrderType`, `tbOrderType`,
+    `cDistrLatticeType` (relatively complemented distributive lattices),
+    `ctDistrLatticeType` (dually sectionally complemented distributive lattices),
+    `finBPOrderType`, `finTPOrderType`, `finTBPOrderType`,
+    `finMeetSemilatticeType`, `finBMeetSemilatticeType`,
+    `finJoinSemilatticeType`, and `finTJoinSemilatticeType`.
+  + factories `isDuallyPOrder`, `Lattice_isDistributive`,
+    `POrder_isMeetSemilattice`, `POrder_isJoinSemilattice`,
+    `POrder_Meet_isSemilattice`, `POrder_Join_isSemilattice`,
+    `DistrLattice_hasRelativeComplement`,
+    `CDistrLattice_hasSectionalComplement`,
+    `CDistrLattice_hasDualSectionalComplement`,
+    `CDistrLattice_hasComplement`,
+    `BDistrLattice_hasSectionalComplement`,
+    `TDistrLattice_hasDualSectionalComplement`,
+    `CBDistrLattice_hasComplement`, `CTDistrLattice_hasComplement`,
+    `TBDistrLattice_hasComplement`
+  + `rcompl x y z` is the relative complement of `z` in `[x, y]` defined for any
+    `cDistrLatticeType` instance.
+  + `codiff x y` is the dual sectional complement of `y` in `[x, \top]` defined
+    for any `ctDistrLatticeType` instance.
+  + lemmas `lt1x`, `ltx1`, `rcomplPmeet`, `rcomplPjoin`, `rcomplKI`,
+    `rcomplKU`, `diffErcompl`, `codiffErcompl`, `complEdiff`,
+    `complEcodiff`, `complErcompl`
+
 ### Changed
 
 - in `bigop.v`
@@ -101,10 +131,70 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `order.v`
   + `order_morphism` changed to `homo` from `mono` and renamed `nondecreasing`
 
+- in `order.v`
+  + The dual instances are now definitionally involutive, i.e., canonical
+    instances of an order structure on `T^d^d` and `T` are convertible (the
+    latter instance may require an eta-expansion on the type record for
+    technical reasons). Similarly, canonical instances of an order structure on
+    `(T1 *p T2)^d` and `T1^d *p T2^d` are convertible.
+  + In order to achieve the above definitional properties on displays, the type
+    of display is changed from `unit` to `Order.disp_t`, which is a primitive
+    record type consisting of two fields of type `unit`.
+  + The default displays for product and lexicographic orders are now defined
+    separately for cartesian products and sequences. They take displays of the
+    parameter types as parameters.
+    * `prod_display d1 d2` is the default display for the product order of
+      cartesian products of the form `T1 * T2`, where `T1` and `T2` have
+      canonical orders of displays `d1` and `d2`, respectively.
+    * `seqprod_display d` is the default display for the product order of
+      sequences and tuples.
+    * `lexi_display d1 d2` is the default display for the lexicographic order of
+      cartesian products.
+    * `seqlexi_display d` is the default display for the lexicographic order of
+      sequences and tuples.
+  + The operator notations for `seqprod_display` and `seqlexi_display` now use
+    `^sp` and `^sl` in place of `^p` and `^l`, respectively.
+  + `finLatticeType`, `finDistrLatticeType`, `finOrderType`, and
+    `finCDistrLatticeType` now do not require the existence of top and bottom
+    elements, i.e., their instances are not necessarily inhabited.
+    Their counterparts with top and bottom are now `finTBLatticeType`,
+    `finTBDistrLatticeType`, `finTBOrderType`, and `finCTBDistrLatticeType`,
+    respectively.
+  + lemmas `meetEdual`, `leUx`, `leUr`, `leUl`, `lexUl`, `lexUr`,
+    `lexU2`, `leEjoin`, `eq_joinl`, `eq_joinr`, `join_idPl`,
+    `join_idPr`, `join_l`, `join_r`, `leUidr`, `leU2`, `joinC`,
+    `joinA`, `joinxx`, `joinAC`, `joinCA`, `joinACA`, `joinKU`,
+    `joinUK`, `joinKUC`, `joinUKC` generalized from `latticeType` to
+    `joinSemilatticeType`
+  + lemmas `joinx0`, `join0x`, `join_eq0`, `joins_sup_seq`,
+    `joins_min_seq`, `joins_sup`, `joins_min`, `joins_le`,
+    `joinsP_seq`, `joinsP`, `le_joins`, `joins_setU`, `joins_seq`
+    generalized from `bLatticeType` to `bJoinSemilatticeType`
+  + lemmas `joinx1` and `join1x` generalized from `tLatticeType` to
+    `tJoinSemilatticeType`
+  + lemmas `joinEdual`, `lexI`, `leIr`, `leIl`, `leIxl`, `leIxr`,
+    `leIx2`, `leEmeet`, `eq_meetl`, `eq_meetr`, `meet_idPl`,
+    `meet_idPr`, `meet_l`, `meet_r`, `leIidl`, `leIidr`, `leI2`,
+    `meetC`, `meetA`, `meetxx`, `meetAC`, `meetCA`, `meetACA`,
+    `meetKI`, `meetIK`, `meetIKC` generalized from `latticeType` to
+    `meetSemilatticeType`
+  + lemmas `meet0x` and `meetx0` generalized from `bLatticeType` to
+    `bMeetSemilatticeType`
+  + lemmas `meetx1`, `meet1x`, `meet_eql`, `meets_inf_seq`,
+    `meets_max_seq`, `meets_inf`, `meets_max`, `meets_ge`,
+    `meetsP_seq`, `meetsP`, `le_meets`, `meets_setU`, `meets_seq`
+    generalized from `tLatticeType` to `tMeetSemilatticeType`
+
 ### Renamed
 
 - in `binomial.v`
   + `triangular_sum` -> `bin2_sum`
+
+- in `order.v` (cf. Changed section)
+  + `finLatticeType` -> `finTBLatticeType`
+  + `finDistrLatticeType` -> `finTBDistrLatticeType`
+  + `finOrderType` -> `finTBOrderType`
+  + `finCDistrLatticeType` -> `finCTBDistrLatticeType`
 
 ### Removed
 
@@ -371,6 +461,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + notations `[splittingFieldType F of L]` and
     `[splittingFieldType F of L for K]`
 
+- in `order.v`
+  + lemmas `dual_lt_def`, `dual_le_anti`, `dual_total`,
+    `Order.BoolOrder.subKI`, `Order.BoolOrder.joinIB`
+  + definition `Order.BoolOrder.sub`
+
 ### Deprecated
 
 - in `ssreflect.v`
@@ -400,6 +495,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemma `Pascal`, use `expnDn` instead
 - in `zmodp.v`
   + lemmas `big_ord1`, `big_ord1_cond`
+
+- in `order.v`
+  + lemma `complE`,
+    use `complEdiff` instead
+  + factory `hasRelativeComplement`,
+    use `BDistrLattice_hasSectionalComplement` instead
+  + factory `hasComplement`,
+    use `CBDistrLattice_hasComplement` instead
 
 ### Infrastructure
 

@@ -94,7 +94,7 @@ Local Open Scope order_scope.
 Local Open Scope ring_scope.
 Import Order.TTheory GRing.Theory.
 
-Fact ring_display : unit. Proof. exact: tt. Qed.
+Fact ring_display : Order.disp_t. Proof. exact. Qed.
 
 Module Num.
 
