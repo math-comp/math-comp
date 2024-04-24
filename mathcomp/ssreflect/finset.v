@@ -136,8 +136,11 @@ Definition type := internal.
 HB.instance Definition _ := [isSub for enum].
 HB.instance Definition _ := [Choice of type by <:].
 
+
+Set Search Blacklist "HB_unnamed_mixin_".
 Lemma of_seq_subproof (s : seq T) : sorted prec (sort prec s).
 Proof.
+apply: sort_sorted.
 Admitted.
 
 Definition of_seq (s : seq T) : type := Build (of_seq_subproof s).
@@ -323,7 +326,6 @@ Definition pred_eqset (T : choiceType) (P : finPred T) :
 Note: we need to make sure the A inferred by application A x is
       syntactically equal to A and not "just" convertible to A.
 *)
-From mathcomp.ssreflect Extra Dependency "finset.elpi" as finset.
 Import elpi.
 Elpi Tactic infer.
 Elpi Accumulate File finset.
