@@ -999,8 +999,8 @@ Proof. by rewrite enum_set1 has_seq1. Qed.
 Lemma has_setU pA A B :
   has pA (enum (A :|: B)) = (has pA (enum A)) || (has pA (enum B)).
 Proof.
-  by rewrite -has_cat; apply/hasP/hasP => -[x + pAx] /ltac:(exists x) //;
-     rewrite mem_cat !mem_enum in_setU.
+by rewrite -has_cat; apply/hasP/hasP => -[x + pAx] /ltac:(exists x) //;
+   rewrite mem_cat !mem_enum in_setU.
 Qed.
 
 Lemma all_set1 pA A a : all pA (enum [set a]) = pA a.
@@ -1009,8 +1009,8 @@ Proof. by rewrite enum_set1 all_seq1. Qed.
 Lemma all_setU pA A B :
   all pA (enum (A :|: B)) = (all pA (enum A)) && (all pA (enum B)).
 Proof.
-  by rewrite -all_cat; apply/allP/allP => + x xAB; apply; move: xAB;
-     rewrite mem_cat !mem_enum in_setU.
+by rewrite -all_cat; apply/allP/allP => + x xAB; apply; move: xAB;
+   rewrite mem_cat !mem_enum in_setU.
 Qed.
 
 End setOps.
@@ -1528,9 +1528,7 @@ Lemma big_subset_idem A B F :
   aop (\big[aop/idx]_(i in A) F i) (\big[aop/idx]_(i in B) F i)
     = \big[aop/idx]_(i in B) F i.
 Proof.
-  move=> idemaop /setIidPr <-.
-  rewrite [\big[_/_]_(_ in B) _](big_setID _ A).
-  by rewrite Monoid.mulmA /= idemaop.
+by move=> idemaop /setIidPr <-; rewrite (big_setID B A) Monoid.mulmA /= idemaop.
 Qed.
 
 Lemma big_setU (A B : {set I}) F :
@@ -1538,11 +1536,9 @@ Lemma big_setU (A B : {set I}) F :
   \big[aop/idx]_(i in A :|: B) F i
     = aop (\big[aop/idx]_(i in A) F i) (\big[aop/idx]_(i in B) F i).
 Proof.
-  move=> idemaop.
-  rewrite (big_setID _ A) setUK setDUl setDv set0U.
-  rewrite [\big[_/_]_(_ in B) _](big_setID _ A).
-  rewrite Monoid.mulmCA Monoid.mulmA /=.
-  by rewrite (@big_subset_idem (B :&: A)) // subsetIr.
+move=> idemaop; rewrite (big_setID _ A) setUK setDUl setDv set0U.
+rewrite (big_setID B A) Monoid.mulmCA Monoid.mulmA /=.
+by rewrite (@big_subset_idem (B :&: A)) // subsetIr.
 Qed.
 
 Lemma big_imset h (A : {pred I}) G : {in A &, injective h} ->
