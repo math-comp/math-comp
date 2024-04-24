@@ -991,27 +991,33 @@ Proof. by rewrite -properC setCK. Qed.
 Lemma properCl A B : (~: A \proper B) = (~: B \proper A).
 Proof. by rewrite -properC setCK. Qed.
 
-(* has and all *)
+(* relationship with seq *)
+
+Lemma enum_setU A B : perm_eq (enum (A :|: B)) (undup (enum A ++ enum B)).
+Proof.
+apply: uniq_perm; rewrite ?enum_uniq ?undup_uniq//.
+by move=> i; rewrite mem_undup mem_enum inE mem_cat !mem_enum.
+Qed.
+
+Lemma enum_setI A B : perm_eq (enum (A :&: B)) (filter [in B] (enum A)).
+Proof.
+apply: uniq_perm; rewrite ?enum_uniq// 1?filter_uniq// ?enum_uniq//.
+by move=> x; rewrite /= mem_enum mem_filter inE mem_enum andbC.
+Qed.
 
 Lemma has_set1 pA A a : has pA (enum [set a]) = pA a.
 Proof. by rewrite enum_set1 has_seq1. Qed.
 
 Lemma has_setU pA A B :
   has pA (enum (A :|: B)) = (has pA (enum A)) || (has pA (enum B)).
-Proof.
-by rewrite -has_cat; apply/hasP/hasP => -[x + pAx] /ltac:(exists x) //;
-   rewrite mem_cat !mem_enum in_setU.
-Qed.
+Proof. by rewrite (perm_has _ (enum_setU _ _)) has_undup has_cat. Qed.
 
 Lemma all_set1 pA A a : all pA (enum [set a]) = pA a.
 Proof. by rewrite enum_set1 all_seq1. Qed.
 
 Lemma all_setU pA A B :
   all pA (enum (A :|: B)) = (all pA (enum A)) && (all pA (enum B)).
-Proof.
-by rewrite -all_cat; apply/allP/allP => + x xAB; apply; move: xAB;
-   rewrite mem_cat !mem_enum in_setU.
-Qed.
+Proof. by rewrite (perm_all _ (enum_setU _ _)) all_undup all_cat. Qed.
 
 End setOps.
 

@@ -1387,6 +1387,12 @@ Qed.
 Lemma count_undup s p : count p (undup s) <= count p s.
 Proof. by rewrite -!size_filter filter_undup size_undup. Qed.
 
+Lemma has_undup p s : has p (undup s) = has p s.
+Proof. by apply: eq_has_r => x; rewrite mem_undup. Qed.
+
+Lemma all_undup p s : all p (undup s) = all p s.
+Proof. by apply: eq_all_r => x; rewrite mem_undup. Qed.
+
 (* Lookup *)
 
 Definition index x := find (pred1 x).
