@@ -18,7 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemma `invf_plt`, `invf_ple`, `invf_nlt`, `invf_nle`
 - in `bigop.v`
   + lemma `big_ord1`, `big_ord1_cond`, `big_rcons_op`, `big_change_idx`,
-    `big_rcons`, `big_only1`
+    `big_rcons`, `big_only1`, `big_mknat`
 
 - in `eqtype.v`
   + definition `dfwith`
