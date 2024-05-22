@@ -40,7 +40,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `tnth_lshift`, `tnth_rshift`
 
 - in `path.v`
-  + lemma `count_sort`
+  + lemmas `count_sort`, `sorted_cat_rcons`
+
 - in `poly.v`
   + lemmas `coef0M`, `coef0_prod`, `polyseqXaddC`, `lead_coefXaddC`,
     `lead_coefXnaddC`, `lead_coefXnsubC`, `size_XnaddC`, `size_XnsubC`,
