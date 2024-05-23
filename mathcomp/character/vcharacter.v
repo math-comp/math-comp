@@ -520,7 +520,7 @@ move=> oSS oTT /isometry_of_cfnorm[||tau defT Itau] // Z_T; exists tau => //.
 split=> [|_ /zchar_nth_expansion[u Zu ->]].
   by apply: sub_in2 Itau; apply: zchar_span.
 rewrite big_seq linear_sum rpred_sum // => xi Sxi.
-by rewrite linearZ scale_zchar ?Z_T // -defT map_f ?mem_nth.
+by rewrite linearZ /= scale_zchar ?Z_T // -defT map_f ?mem_nth.
 Qed.
 
 Lemma Zisometry_of_iso f :
@@ -531,7 +531,7 @@ Proof.
 move=> freeS [If Zf]; have [tau Dtau Itau] := isometry_of_free freeS If.
 exists tau => //; split; first by apply: sub_in2 Itau; apply: zchar_span.
 move=> _ /zchar_nth_expansion[a Za ->]; rewrite linear_sum rpred_sum // => i _.
-by rewrite linearZ rpredZ_int ?Dtau ?Zf ?mem_nth.
+by rewrite linearZ /= rpredZ_int ?Dtau ?Zf ?mem_nth.
 Qed.
 
 Lemma Zisometry_inj A nu :

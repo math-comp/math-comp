@@ -332,8 +332,9 @@ move=> a u v; apply/polyP=> i; rewrite coefD coefZ !coef_poly.
 case: ifP => lti; last by rewrite mulr0 addr0.
 by rewrite linearP mulrA -mulrDl mulr_algl.
 Qed.
-HB.instance Definition _ := GRing.isLinear.Build F0 L {poly L} _ Fadjoin_poly
-  Fadjoin_poly_is_linear.
+HB.instance Definition _ :=
+  GRing.isSemilinear.Build F0 F0 idfun L {poly L} _ Fadjoin_poly
+    (GRing.semilinear_linear Fadjoin_poly_is_linear).
 
 Lemma size_minPoly : size minPoly = n.+1.
 Proof. by rewrite size_addl ?size_polyXn // size_opp ltnS size_poly. Qed.
@@ -545,7 +546,7 @@ move=> a p; rewrite -mul_polyC rmorphM /= fieldExt_hornerC.
 by rewrite -scalerAl mul1r.
 Qed.
 HB.instance Definition _ :=
-  GRing.isScalable.Build F0 {poly F0} L *:%R fieldExt_horner
+  GRing.isSemiScalable.Build F0 F0 idfun {poly F0} L *:%R fieldExt_horner
     fieldExt_hornerZ.
 
 End Horner.
@@ -652,11 +653,11 @@ have in_bL i (a : K_F) : val a * (bL`_i : L_F) \in (F * <[bL`_i]>)%VS.
   by rewrite memv_mul ?(valP a) ?memv_line.
 have nz_bLi (i : 'I_n): bL`_i != 0 by rewrite (memPn nz_bL) ?memt_nth.
 pose r2v (v : 'rV[K_F]_n) : L_F := \sum_i v 0 i *: (bL`_i : L_F).
-have r2v_lin: linear r2v.
-  move=> a u v; rewrite /r2v scaler_sumr -big_split /=; apply: eq_bigr => i _.
+have/GRing.semilinear_linear r2v_lin: linear r2v.
+  move=> a u v; rewrite /= scaler_sumr -big_split /=; apply: eq_bigr => i _.
   by rewrite scalerA -scalerDl !mxE.
-pose r2vlM := GRing.isLinear.Build _ _ _ _ r2v r2v_lin.
-pose r2vL : GRing.Linear.type _ _ := HB.pack r2v r2vlM.
+pose r2vlM := GRing.isSemilinear.Build _ _ _ _ _ _ r2v r2v_lin.
+pose r2vL : GRing.Semilinear.type _ _ _ := HB.pack r2v r2vlM.
 have v2rP x: {r : 'rV[K_F]_n | x = r2v r}.
   apply: sig_eqW; have /memv_sumP[y Fy ->]: x \in SbL by rewrite defL memvf.
   have /fin_all_exists[r Dr] i: exists r, y i = r *: (bL`_i : L_F).
@@ -665,7 +666,7 @@ have v2rP x: {r : 'rV[K_F]_n | x = r2v r}.
 pose v2r x := sval (v2rP x).
 have v2rK: cancel v2r r2vL by rewrite /v2r => x; case: (v2rP x).
 suffices r2vK: cancel r2v v2r.
-  by exists n, v2r; [apply: can2_linear v2rK | exists r2v].
+  by exists n, v2r; [apply: can2_semilinear v2rK | exists r2v].
 move=> r; apply/rowP=> i; apply/val_inj/(mulIf (nz_bLi i))/eqP; move: i isT.
 by apply/forall_inP; move/directv_sum_unique: dxSbL => <- //; apply/eqP/v2rK.
 Qed.
@@ -805,7 +806,7 @@ Fact baseField_vectMixin : Lmodule_hasFinDim F0 L0.
 Proof.
 pose bL := vbasis {:L}; set m := \dim {:L} in bL.
 pose v2r (x : L0) := mxvec (\matrix_(i, j) coord bF j (coord bL i x)).
-have v2r_lin: linear v2r.
+have/GRing.semilinear_linear v2r_lin: linear v2r.
   move=> a x y; rewrite -linearP; congr mxvec; apply/matrixP=> i j.
   by rewrite !mxE linearP /= mulr_algl linearP.
 pose r2v r := \sum_(i < m) (\sum_(j < n) vec_mx r i j *: bF`_j) *: bL`_i.
@@ -1225,7 +1226,7 @@ HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build _ subFExtend
 Fact subfx_evalZ : scalable subfx_eval.
 Proof. by move=> a q; rewrite -mul_polyC rmorphM. Qed.
 HB.instance Definition _ :=
-  GRing.isScalable.Build F {poly F} subFExtend *:%R subfx_eval
+  GRing.isSemiScalable.Build F F idfun {poly F} subFExtend *:%R subfx_eval
     subfx_evalZ.
 
 Hypothesis (pz0 : root p^iota z).
@@ -1294,7 +1295,7 @@ have Fz2vK: cancel Fz2v vFz.
   apply: FLinj; rewrite !subfx_inj_eval // {2}(divp_eq q p) rmorphD rmorphM /=.
   by rewrite !hornerE (eqP pz0) mulr0 add0r poly_rV_K // -ltnS Dd ltn_modpN0.
 suffices vFzK: cancel vFz Fz2v.
-  by exists Fz2v; [apply: can2_linear Fz2vK | exists vFz].
+  by exists Fz2v; [apply: can2_semilinear Fz2vK | exists vFz].
 apply: inj_can_sym Fz2vK _ => v1 v2 /(congr1 subfx_inj)/eqP.
 rewrite -subr_eq0 -!raddfB /= subfx_inj_eval // => /min_p/implyP.
 rewrite leqNgt implybNN -Dd ltnS size_poly linearB subr_eq0 /=.
@@ -1376,11 +1377,12 @@ have unitM : GRing.ComUnitRing_isField cuL.
 pose feL : fieldExtType F := HB.pack vL aL cuL unitM.
 exists feL; first by rewrite dimvf; apply: mul1n.
 exists toPF.
-have tol_lin: linear toL by move=> a q1 q2; rewrite -linearP -modpZl -modpD.
+have/GRing.semilinear_linear tol_lin: linear toL.
+  by move=> a q1 q2; rewrite -linearP -modpZl -modpD.
 have tol_mul : multiplicative (toL : {poly F} -> aL).
   by split=> [q r|];
     apply: toPinj; rewrite !toL_K // modp_mul -!(mulrC r) modp_mul.
-pose toLlM := GRing.isLinear.Build _ _ _ _ toL tol_lin.
+pose toLlM := GRing.isSemilinear.Build _ _ _ _ _ _ toL tol_lin.
 pose toLmM := GRing.isMultiplicative.Build _ _ _ tol_mul.
 pose toLLRM : {lrmorphism _ -> feL} := HB.pack toL toLlM toLmM.
 by exists toLLRM.

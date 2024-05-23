@@ -300,7 +300,8 @@ have /isog_isom/=[f /isomP[injf im_f]]: [set: R] \isog [set: 'rV['F_p]_n].
   rewrite (@isog_abelem_card _ _ p) fin_Fp_lmod_abelem //=.
   by rewrite !cardsT card_primeChar card_mx mul1n card_Fp.
 exists f; last by exists (invm injf) => x; rewrite ?invmE ?invmK ?im_f ?inE.
-move=> a x y; rewrite [a *: _]mulr_natl morphM ?morphX ?inE // zmodXgE.
+apply/GRing.semilinear_linear=> a x y.
+rewrite [a *: _]mulr_natl morphM ?morphX ?inE // zmodXgE.
 by congr (_ + _); rewrite -scaler_nat natr_Zp.
 Qed.
 
@@ -399,7 +400,7 @@ have fZ: scalable f.
   by rewrite (idfP _ _) ?mulr_algl ?memvZ // memv_line.
 pose faM := GRing.isAdditive.Build _ _ f fA.
 pose fmM := GRing.isMultiplicative.Build _ _ f fM.
-pose flM := GRing.isScalable.Build _ _ _ _ f fZ.
+pose flM := GRing.isSemiScalable.Build _ _ _ _ _ _ f fZ.
 pose fLRM : {lrmorphism _ -> _} := HB.pack f faM fmM flM.
 have /kAut_to_gal[alpha galLalpha Dalpha]: kAut 1 {:L} (linfun fLRM).
   rewrite kAutfE; apply/kHomP; split=> [x y _ _ | x /idfP]; rewrite !lfunE //=.

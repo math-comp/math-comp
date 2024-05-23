@@ -150,16 +150,18 @@ Qed.
 
 Lemma poly_rV_is_linear : linear poly_rV.
 Proof. by move=> a p q; apply/rowP=> i; rewrite !mxE coefD coefZ. Qed.
-HB.instance Definition _ := GRing.isLinear.Build R {poly R} 'rV_d _ poly_rV
-  poly_rV_is_linear.
+HB.instance Definition _ :=
+  GRing.isSemilinear.Build R R idfun {poly R} 'rV_d _ poly_rV
+    (GRing.semilinear_linear poly_rV_is_linear).
 
 Lemma rVpoly_is_linear : linear rVpoly.
 Proof.
 move=> a u v; apply/polyP=> k; rewrite coefD coefZ !coef_rVpoly.
 by case: insubP => [i _ _ | _]; rewrite ?mxE // mulr0 addr0.
 Qed.
-HB.instance Definition _ := GRing.isLinear.Build R 'rV_d {poly R} _ rVpoly
-  rVpoly_is_linear.
+HB.instance Definition _ :=
+  GRing.isSemilinear.Build R R idfun 'rV_d {poly R} _ rVpoly
+    (GRing.semilinear_linear rVpoly_is_linear).
 
 End RowPoly.
 
@@ -335,8 +337,8 @@ move=> a p /=; rewrite -mul_polyC rmorphM /=.
 by rewrite horner_mx_C [_ * _]mul_scalar_mx.
 Qed.
 
-HB.instance Definition _ := GRing.isScalable.Build R _ _ *:%R horner_mx
-  horner_mxZ.
+HB.instance Definition _ :=
+  GRing.isSemiScalable.Build R R idfun _ _ *:%R horner_mx horner_mxZ.
 
 Definition powers_mx d := \matrix_(i < d) mxvec (A ^+ i).
 
@@ -345,7 +347,7 @@ Lemma horner_rVpoly m (u : 'rV_m) :
 Proof.
 rewrite mulmx_sum_row linear_sum [rVpoly u]poly_def rmorph_sum.
 apply: eq_bigr => i _.
-by rewrite valK /= !linearZ rmorphXn /= horner_mx_X rowK /= mxvecK.
+by rewrite valK /= !linearZ /= rmorphXn /= horner_mx_X rowK mxvecK.
 Qed.
 
 End OneMatrix.
