@@ -1086,6 +1086,11 @@ rewrite /index_iota subn0 -(big_map (@nat_of_ord n)).
 by congr bigop; rewrite /index_enum 2!unlock val_ord_enum.
 Qed.
 
+Lemma big_mknat n (P : pred 'I_n.+1) F :
+  \big[op/idx]_(i < n.+1 | P i) F i
+  = \big[op/idx]_(0 <= i < n.+1 | P (inord i)) F (inord i).
+Proof. by rewrite big_mkord; apply: eq_big => ?; rewrite inord_val. Qed.
+
 Lemma big_nat_widen m n1 n2 (P : pred nat) F :
      n1 <= n2 ->
   \big[op/idx]_(m <= i < n1 | P i) F i
