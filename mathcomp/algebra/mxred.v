@@ -208,12 +208,13 @@ Implicit Types (W : 'M[F]_(k, m)).
 Lemma sub_kermxpoly_conjmx V f p W : stablemx V f -> row_free V ->
   (W <= kermxpoly (conjmx V f) p)%MS = (W *m V <= kermxpoly f p)%MS.
 Proof.
-case: n m => [|n'] [|m']// in V f W * => fV rfV; rewrite ?thinmx0//.
-   by rewrite mul0mx !sub0mx.
-apply/sub_kermxP/sub_kermxP; rewrite horner_mx_conj//; last first.
-  by move=> /(congr1 (mulmxr (pinvmx V)))/=; rewrite mul0mx !mulmxA.
-move=> /(congr1 (mulmxr V))/=; rewrite ![W *m _]mulmxA ?mul0mx mulmxKpV//.
-by rewrite -mulmxA mulmx_sub// horner_mx_stable//.
+move: n m => [|n'] [|m']// in V f W *; rewrite ?thinmx0// => fV rfV.
+- by rewrite /row_free mxrank0 in rfV.
+- by rewrite mul0mx !sub0mx.
+- apply/sub_kermxP/sub_kermxP; rewrite horner_mx_conj//; last first.
+    by move=> /(congr1 (mulmxr (pinvmx V)))/=; rewrite mul0mx !mulmxA.
+  move=> /(congr1 (mulmxr V))/=; rewrite ![W *m _]mulmxA ?mul0mx mulmxKpV//.
+  by rewrite -mulmxA mulmx_sub// horner_mx_stable//.
 Qed.
 
 Lemma sub_eigenspace_conjmx V f a W : stablemx V f -> row_free V ->
@@ -336,7 +337,7 @@ Lemma similar_diag_mxminpoly {n} {p f : 'M[F]_n.+1}
 Proof.
 rewrite /rs => pu /(similar_diagLR pu)[d {f rs}->].
 rewrite mxminpoly_uconj ?unitmx_inv// mxminpoly_diag.
-by rewrite (@eq_map _ _ _ (d 0))// => i; rewrite conjmxVK// mxE eqxx.
+by rewrite [in RHS](@eq_map _ _ _ (d 0))// => i; rewrite conjmxVK// mxE eqxx.
 Qed.
 
 End Similarity.
@@ -471,19 +472,21 @@ split=> [[P Punit /similar_diagPex[d /(similarLR Punit)->]]|].
   rewrite mxminpoly_uconj ?unitmx_inv// mxminpoly_diag.
   by eexists; [|by []]; rewrite undup_uniq.
 rewrite diagonalizablePeigen => -[rs rsu rsP].
-exists rs; rewrite // !(big_nth 0) !big_mkord in rsP *.
-rewrite (eq_bigr _ (fun _ _ => eigenspace_poly _ _)).
-apply: (eqmx_trans (eqmx_sym (kermxpoly_prod _ _)) (kermxpoly_min _)) => //.
-by move=> i j _ _; rewrite coprimep_XsubC root_XsubC nth_uniq.
+exists rs => //.
+rewrite (big_nth 0) big_mkord (eq_bigr _ (fun _ _ => eigenspace_poly _ _)).
+apply: (eqmx_trans (eqmx_sym (kermxpoly_prod _ _)) (kermxpoly_min _)).
+  by move=> i j _ _; rewrite coprimep_XsubC root_XsubC nth_uniq.
+by rewrite (big_nth 0) big_mkord in rsP.
 Qed.
 
 Lemma diagonalizable_conj_diag m n (V : 'M[F]_(m, n)) (d : 'rV[F]_n) :
   stablemx V (diag_mx d) -> row_free V -> diagonalizable (conjmx V (diag_mx d)).
 Proof.
-case: m n => [|m] [|n]// in V d * => Vd rdV; rewrite ?thinmx0//=.
-apply/diagonalizableP; pose u := undup [seq d 0 i | i <- enum 'I_n.+1].
-exists u; first by rewrite undup_uniq.
-by rewrite (dvdp_trans (mxminpoly_conj _ _))// mxminpoly_diag.
+move: m n => [|m] [|n] in V d *; rewrite ?thinmx0; [by []|by []| |] => Vd rdV.
+- by rewrite /row_free mxrank0 in rdV.
+- apply/diagonalizableP; pose u := undup [seq d 0 i | i <- enum 'I_n.+1].
+  exists u; first by rewrite undup_uniq.
+  by rewrite (dvdp_trans (mxminpoly_conj rdV _))// mxminpoly_diag.
 Qed.
 
 Lemma codiagonalizableP n (fs : seq 'M[F]_n) :
