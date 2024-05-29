@@ -446,6 +446,48 @@ HB.structure Definition Hermitian (R : ringType) (U : lmodType R)
     (eps : bool) (theta : R -> R) :=
   {f of ??? & @isHermitian R U eps theta f}.*)
 
+(*Variables (R : ringType) (U : lmodType R) (eps : bool) (theta : R -> R).
+Implicit Types phU : phant U.
+
+Local Coercion GRing.Scale.op : GRing.Scale.law >-> Funclass.
+Definition axiom (f : U -> U -> R) :=
+  forall x y : U, f x y = (-1) ^+ eps * theta (f y x).
+
+Record class_of (f : U -> U -> R) : Prop := Class {
+  base : Bilinear.class_of ( *%R) (theta \; *%R) f;
+  mixin : axiom f
+}.*)
+
+(*Canonical additiver (u : U) := Additive (base class u).
+Canonical linearr (u : U) := Linear (base class u).
+Canonical additivel (u' : U) := @GRing.Additive.Pack _ _ (Phant (U -> R))
+  (applyr cF u') (Bilinear.basel (base class) u').
+Canonical linearl (u' : U) := @GRing.Linear.Pack _ _ _ _ (Phant (U -> R))
+  (applyr cF u') (Bilinear.basel (base class) u').
+Canonical bilinear := @Bilinear.Pack _ _ _ _ _ _ (Phant (U -> U -> R)) cF (base class).*)
+
+(*Module Exports.
+Notation "{ 'hermitian' U 'for' eps & theta }" := (map eps theta (Phant U))
+  (at level 0, format "{ 'hermitian'  U  'for'  eps  &  theta }") : ring_scope.
+Coercion base : class_of >-> bilmorphism_for.
+Coercion apply : map >-> Funclass.
+Notation "[ 'hermitian' 'of' f 'as' g ]" := (@clone _ _ _ _ _ _ f g _ idfun idfun)
+  (at level 0, format "[ 'hermitian'  'of'  f  'as'  g ]") : form_scope.
+Notation "[ 'hermitian' 'of' f ]" := (@clone _ _ _ _ _ _ f f _ idfun idfun)
+  (at level 0, format "[ 'hermitian'  'of'  f ]") : form_scope.
+Notation hermitian_for := Hermitian.axiom.
+Notation Hermitian fM := (pack (Phant _) fM idfun).
+Canonical additiver.
+Canonical linearr.
+Canonical additivel.
+Canonical linearl.
+Canonical bilinear.
+Notation hermapplyr := (@applyr_head _ _ _ _ tt).
+End Exports.
+
+End Hermitian.
+Include Hermitian.Exports.*)
+
 Section Sesquilinear.
 
 Variable R : fieldType.
@@ -640,48 +682,6 @@ Notation "eps_theta .-sesqui" := (sesqui _ eps_theta) : ring_scope.
 Notation symmetric_form := (false, idfun).-sesqui.
 Notation skew := (true, idfun).-sesqui.
 Notation hermitian := (false, @Num.conj_op _).-sesqui.
-
-(*Variables (R : ringType) (U : lmodType R) (eps : bool) (theta : R -> R).
-Implicit Types phU : phant U.
-
-Local Coercion GRing.Scale.op : GRing.Scale.law >-> Funclass.
-Definition axiom (f : U -> U -> R) :=
-  forall x y : U, f x y = (-1) ^+ eps * theta (f y x).
-
-Record class_of (f : U -> U -> R) : Prop := Class {
-  base : Bilinear.class_of ( *%R) (theta \; *%R) f;
-  mixin : axiom f
-}.*)
-
-(*Canonical additiver (u : U) := Additive (base class u).
-Canonical linearr (u : U) := Linear (base class u).
-Canonical additivel (u' : U) := @GRing.Additive.Pack _ _ (Phant (U -> R))
-  (applyr cF u') (Bilinear.basel (base class) u').
-Canonical linearl (u' : U) := @GRing.Linear.Pack _ _ _ _ (Phant (U -> R))
-  (applyr cF u') (Bilinear.basel (base class) u').
-Canonical bilinear := @Bilinear.Pack _ _ _ _ _ _ (Phant (U -> U -> R)) cF (base class).*)
-
-Module Exports.
-Notation "{ 'hermitian' U 'for' eps & theta }" := (map eps theta (Phant U))
-  (at level 0, format "{ 'hermitian'  U  'for'  eps  &  theta }") : ring_scope.
-Coercion base : class_of >-> bilmorphism_for.
-Coercion apply : map >-> Funclass.
-Notation "[ 'hermitian' 'of' f 'as' g ]" := (@clone _ _ _ _ _ _ f g _ idfun idfun)
-  (at level 0, format "[ 'hermitian'  'of'  f  'as'  g ]") : form_scope.
-Notation "[ 'hermitian' 'of' f ]" := (@clone _ _ _ _ _ _ f f _ idfun idfun)
-  (at level 0, format "[ 'hermitian'  'of'  f ]") : form_scope.
-Notation hermitian_for := Hermitian.axiom.
-Notation Hermitian fM := (pack (Phant _) fM idfun).
-Canonical additiver.
-Canonical linearr.
-Canonical additivel.
-Canonical linearl.
-Canonical bilinear.
-Notation hermapplyr := (@applyr_head _ _ _ _ tt).
-End Exports.
-
-End Hermitian.
-Include Hermitian.Exports.
 
 Module Dot.
 
