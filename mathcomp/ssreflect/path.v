@@ -156,9 +156,11 @@ Proof. by case: s => //= y s /andP [->]. Qed.
 Lemma pairwise_sorted s : pairwise e s -> sorted s.
 Proof. by elim: s => //= x s IHs /andP[/path_min_sorted -> /IHs]. Qed.
 
-Lemma sorted_cat_rcons s1 x s2 : sorted ((rcons s1 x) ++ s2) =
-  sorted (rcons s1 x) && path x s2.
-Proof. by case: s1 => [ | e1 s1] //=; rewrite cat_path last_rcons. Qed.
+Lemma sorted_cat_cons s1 x s2 :
+  sorted (s1 ++ x :: s2) = sorted (rcons s1 x) && path x s2.
+Proof.
+by case: s1 => [ | e1 s1] //=; rewrite -cat_rcons cat_path last_rcons.
+Qed.
 
 End Path.
 
