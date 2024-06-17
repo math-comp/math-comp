@@ -2725,14 +2725,14 @@ Lemma autact_is_groupAction : is_groupAction G aut_action.
 Proof. by move=> a Aa /=; rewrite autactK. Qed.
 Canonical aut_groupAction := GroupAction autact_is_groupAction.
 
-Section prime_orbit.
+Section perm_prime_orbit.
 Variable (T : finType) (c : {perm T}).
 Hypothesis Tp :  prime #|T|.
 Hypothesis cc : #[c]%g = #|T|.
 Let cp : prime #[c]%g. Proof. by rewrite cc. Qed.
 
-Lemma prime_atrans : [transitive <[c]>, on setT | 'P].
-Proof using c Tp cc.
+Lemma perm_prime_atrans : [transitive <[c]>, on setT | 'P].
+Proof.
 apply/imsetP; suff /existsP[x] : [exists x, ~~ (#|orbit 'P <[c]> x| < #[c])].
   move=> oxT; suff /eqP orbit_x : orbit 'P <[c]> x == setT by exists x.
   by rewrite eqEcard subsetT cardsT -cc leqNgt.
@@ -2743,16 +2743,16 @@ apply/permP => x; rewrite perm1; apply/set1P.
 by rewrite -(card_orbit1 (eqP (o1 _))) (mem_orbit 'P) ?cycle_id.
 Qed.
 
-Lemma prime_orbit x : orbit 'P <[c]> x = [set: T].
-Proof using c Tp cc. by apply: atransP => //; apply: prime_atrans. Qed.
+Lemma perm_prime_orbit x : orbit 'P <[c]> x = [set: T].
+Proof. by apply: atransP => //; apply: perm_prime_atrans. Qed.
 
-Lemma prime_astab x : 'C_<[c]>[x | 'P]%g = 1%g.
-Proof using c Tp cc.
+Lemma perm_prime_astab x : 'C_<[c]>[x | 'P]%g = 1%g.
+Proof.
 by apply/card1_trivg/eqP; rewrite -(@eqn_pmul2l #|orbit 'P <[c]> x|)
-   ?card_orbit_stab ?prime_orbit ?cardsT ?muln1 ?prime_gt0// -cc.
+   ?card_orbit_stab ?perm_prime_orbit ?cardsT ?muln1 ?prime_gt0// -cc.
 Qed.
 
-End prime_orbit.
+End perm_prime_orbit.
 
 End AutAct.
 

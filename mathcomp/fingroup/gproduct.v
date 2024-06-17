@@ -23,6 +23,8 @@ From mathcomp Require Import quotient action finfun.
 (* ++ External products :                                                     *)
 (* pairg1, pair1g == the isomorphisms aT1 -> aT1 * aT2, aT2 -> aT1 * aT2.     *)
 (*                    (aT1 * aT2 has a direct product group structure.)       *)
+(*       dfung1 i == the morphism gT i -> {dffun forall j, gt j} where        *)
+(*                   gT : I -> finGroupType is a family of finite groups.     *)
 (*   sdprod_by to == the semidirect product defined by to : groupAction H K.  *)
 (*                   This is a finGroupType; the actual semidirect product is *)
 (*                   the total set [set: sdprod_by to] on that type.          *)

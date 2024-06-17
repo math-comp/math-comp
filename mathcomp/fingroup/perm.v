@@ -307,7 +307,7 @@ Proof.
 by apply/permP => z; rewrite -(permKV s z) permJ; apply/inj_tperm/perm_inj.
 Qed.
 
-Lemma tpermJt x y z : x != z -> y != z -> tperm x z ^ tperm x y = tperm y z.
+Lemma tpermJ_tperm x y z : x != z -> y != z -> tperm x z ^ tperm x y = tperm y z.
 Proof. by move=> nxz nyz; rewrite tpermJ tpermL [tperm _ _ z]tpermD. Qed.
 
 End tpermJ.
@@ -561,7 +561,7 @@ apply/eqP; rewrite eqEsubset subsetT/=; apply/subsetP => s _.
 have [ts -> _] := prod_tpermP s; rewrite group_prod// => -[/= y z] _.
 have [<-|Nyz] := eqVneq y z; first by rewrite tperm1 group1.
 have [<-|Nxz] := eqVneq x z; first by rewrite tpermC mem_gen ?imset_f.
-by rewrite -(tpermJt Nxz Nyz) groupJ ?mem_gen ?imset_f.
+by rewrite -(tpermJ_tperm Nxz Nyz) groupJ ?mem_gen ?imset_f.
 Qed.
 
 End PermutationParity.
