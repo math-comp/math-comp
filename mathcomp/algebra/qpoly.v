@@ -121,7 +121,7 @@ Proof. by move=> p /=; rewrite val_insubd [_ \is a _]size_poly rVpolyK. Qed.
 Hint Resolve npoly_rV_K rVnpolyK : core.
 
 Lemma npoly_vect_axiom : Vector.axiom n npoly.
-Proof. by exists npoly_rV; [move=> ???; exact: linearP|exists rVnpoly]. Qed.
+Proof. by exists npoly_rV; [exact:linearPZ | exists rVnpoly]. Qed.
 
 HB.instance Definition _ := Lmodule_hasFinDim.Build R npoly npoly_vect_axiom.
 

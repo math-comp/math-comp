@@ -1540,13 +1540,13 @@ End RingTheory.
 
 Module ConverseRingExports.
 
-HB.instance Definition _ (T : eqType) := Equality.copy T^c T.
+HB.instance Definition _ (T : eqType) := Equality.on T^c.
 
-HB.instance Definition _ (T : choiceType) := Choice.copy T^c T.
+HB.instance Definition _ (T : choiceType) := Choice.on T^c.
 
-HB.instance Definition _ (U : nmodType) := Nmodule.copy U^c U.
+HB.instance Definition _ (U : nmodType) := Nmodule.on U^c.
 
-HB.instance Definition _ (U : zmodType) := Zmodule.copy U^c U.
+HB.instance Definition _ (U : zmodType) := Zmodule.on U^c.
 
 HB.instance Definition _ (R : semiRingType) :=
   let mul' (x y : R) := y * x in
@@ -1556,7 +1556,7 @@ HB.instance Definition _ (R : semiRingType) :=
   Nmodule_isSemiRing.Build R^c
     mulrA' mulr1 mul1r mulrDl' mulrDr' mulr0 mul0r oner_neq0.
 
-HB.instance Definition _ (R : ringType) := SemiRing.copy R^c R.
+HB.instance Definition _ (R : ringType) := SemiRing.on R^c.
 
 End ConverseRingExports.
 HB.export ConverseRingExports.
@@ -6378,12 +6378,10 @@ HB.instance Definition _ := SemiRing_hasCommutativeMul.Build (R1 * R2)%type
 End PairComSemiRing.
 
 #[export]
-HB.instance Definition _ (R1 R2 : ringType) :=
-  SemiRing.copy (R1 * R1)%type (R1 * R1)%type.
+HB.instance Definition _ (R1 R2 : ringType) := SemiRing.on (R1 * R1)%type.
 
 #[export]
-HB.instance Definition _ (R1 R2 : comRingType) :=
-  SemiRing.copy (R1 * R1)%type (R1 * R1)%type.
+HB.instance Definition _ (R1 R2 : comRingType) := SemiRing.on (R1 * R1)%type.
 
 Section PairLmod.
 
@@ -6494,7 +6492,7 @@ End PairUnitRing.
 HB.instance Definition _ (R1 R2 : comUnitRingType) :=
   UnitRing.on (R1 * R2)%type.
 #[export]
-HB.instance Definition _ (R : comUnitRingType) (A1 A2 : unitAlgType R) :=
+HB.instance Definition _ (R : unitRingType) (A1 A2 : unitAlgType R) :=
   UnitRing.on (A1 * A2)%type.
 
 Lemma pairMnE (M1 M2 : zmodType) (x : M1 * M2) n :

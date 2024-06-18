@@ -2002,8 +2002,8 @@ Fact ffun_vect_iso : Vector.axiom (#|I| * dim vT) {ffun I -> vT}.
 Proof.
 pose fr (f : {ffun I -> vT}) := mxvec (\matrix_(i < #|I|) v2r (f (enum_val i))).
 exists fr => /= [k f g|].
-  rewrite /fr -linearP; congr (mxvec _); apply/matrixP=> i j.
-  by rewrite !mxE /= !ffunE linearP !mxE.
+  rewrite -linearP; congr mxvec; apply/matrixP=> i j.
+  by rewrite !mxE !ffunE linearP !mxE.
 exists (fun r => [ffun i => r2v (row (enum_rank i) (vec_mx r)) : vT]) => [g|r].
   by apply/ffunP=> i; rewrite ffunE mxvecK rowK v2rK enum_rankK.
 by apply/(canLR vec_mxK)/matrixP=> i j; rewrite mxE ffunE r2vK enum_valK mxE.

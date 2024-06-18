@@ -294,7 +294,7 @@ Let n := logn p #|R|.
 Lemma card_primeChar : #|R| = (p ^ n)%N.
 Proof. by rewrite /n -cardsT {1}(card_pgroup primeChar_pgroup). Qed.
 
-Lemma primeChar_vectAxiom : {v2r : R -> 'rV_n | linear v2r & bijective v2r}.
+Lemma primeChar_vectAxiom : Vector.axiom n R.
 Proof.
 have /isog_isom/=[f /isomP[injf im_f]]: [set: R] \isog [set: 'rV['F_p]_n].
   rewrite (@isog_abelem_card _ _ p) fin_Fp_lmod_abelem //=.
