@@ -3111,9 +3111,7 @@ Proof. by rewrite scale_col_mx !scale_row_mx. Qed.
 (* Diagonal matrices *)
 
 Lemma diag_mx_is_linear n : linear (@diag_mx R n).
-Proof.
-by move=> a A B; apply/matrixP=> i j; rewrite !mxE mulrnAr mulrnDl.
-Qed.
+Proof. by move=> a A B; apply/matrixP=> i j; rewrite !mxE mulrnAr mulrnDl. Qed.
 HB.instance Definition _ n := GRing.isLinear.Build R 'rV_n 'M_n _ (@diag_mx _ n)
   (@diag_mx_is_linear n).
 
@@ -3453,7 +3451,7 @@ Definition lin_mulmx A : 'M[R]_(n * p, m * p) := lin_mx (mulmx A).
 Lemma lin_mulmx_is_linear : linear lin_mulmx.
 Proof.
 move=> a A B; apply/row_matrixP=> i; rewrite linearP /= !rowE !mul_rV_lin /=.
-by rewrite [_ *m _](linearP (mulmxr (_ : 'M[R]__))) linearP.
+by rewrite -linearP /= scalemxAl mulmxDl.
 Qed.
 HB.instance Definition _ :=
   GRing.isLinear.Build R 'M[R]_(m, n) 'M[R]_(n * p, m * p) _ lin_mulmx

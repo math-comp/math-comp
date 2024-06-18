@@ -1670,7 +1670,7 @@ by rewrite -{1 3}(subnKC le_m_n) eqn_add2l; case: eqP => [->|]; rewrite ?mul0rn.
 Qed.
 
 Lemma derivnMXaddC n p c :
-  (p * 'X + c%:P)^`(n.+1) = p^`(n) *+ n.+1  + p^`(n.+1) * 'X.
+  (p * 'X + c%:P)^`(n.+1) = p^`(n) *+ n.+1 + p^`(n.+1) * 'X.
 Proof.
 elim: n => [|n IHn]; first by rewrite derivn1 derivMXaddC.
 rewrite derivnS IHn derivD derivM derivX mulr1 derivMn -!derivnS.
@@ -1689,7 +1689,7 @@ Proof. by move=> /polySpred->; apply: size_poly. Qed.
 
 (* A normalising version of derivation to get the division by n! in Taylor *)
 
-Definition nderivn n p := \poly_(i < size p - n) (p`_(n + i) *+  'C(n + i, n)).
+Definition nderivn n p := \poly_(i < size p - n) (p`_(n + i) *+ 'C(n + i, n)).
 
 Local Notation "a ^`N ( n )" := (nderivn n a) : ring_scope.
 
@@ -2093,9 +2093,7 @@ Lemma horner_morphX : horner_morph cfu 'X = u.
 Proof. by rewrite /horner_morph map_polyX hornerX. Qed.
 
 Fact horner_is_linear : linear_for (f \; *%R) (horner_morph cfu).
-Proof.
-by move=> c p q; rewrite /horner_morph rmorphD /= hornerD linearZ hornerZ.
-Qed.
+Proof. by move=> c p q; rewrite /horner_morph linearP /= hornerD hornerZ. Qed.
 
 Fact horner_is_multiplicative : multiplicative (horner_morph cfu).
 Proof.

@@ -806,7 +806,7 @@ Proof.
 pose bL := vbasis {:L}; set m := \dim {:L} in bL.
 pose v2r (x : L0) := mxvec (\matrix_(i, j) coord bF j (coord bL i x)).
 have v2r_lin: linear v2r.
-  move=> a x y; rewrite -linearP; congr (mxvec _); apply/matrixP=> i j.
+  move=> a x y; rewrite -linearP; congr mxvec; apply/matrixP=> i j.
   by rewrite !mxE linearP /= mulr_algl linearP.
 pose r2v r := \sum_(i < m) (\sum_(j < n) vec_mx r i j *: bF`_j) *: bL`_i.
 have v2rK: cancel v2r r2v.

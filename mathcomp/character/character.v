@@ -122,8 +122,7 @@ HB.instance Definition _ n1 m2 n2 B :=
 Lemma trow_is_linear n1 m2 n2 (A : 'rV_n1) : linear (@trow n1 A m2 n2).
 Proof.
 elim: n1 A => [|n1 IH] //= A k A1 A2 /=; first by rewrite scaler0 add0r.
-rewrite linearD /= linearZ /=.
-apply/matrixP=> i j; rewrite !mxE.
+rewrite linearP /=; apply/matrixP=> i j; rewrite !mxE.
 by case: split=> a; rewrite ?IH !mxE.
 Qed.
 
