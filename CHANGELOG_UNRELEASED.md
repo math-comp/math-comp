@@ -87,7 +87,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `lker_ker`, `limgE`, `leigenspaceE`
 
 - in `action.v`
-  + lemmas `prime_atrans`, `prime_orbit`, `prime_astab`
+  + lemmas `perm_prime_atrans`, `perm_prime_orbit`, `perm_prime_astab`
 
 - in `fingroup.v`
   + lemma `prod_subG`
@@ -106,7 +106,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 	 `isog_setXn`, `setXn_gen`, `groupX0`
 
 - in `perm.v`
-  + lemmas `tpermJt`, `gen_tperm`
+  + lemmas `tpermJ_tperm`, `gen_tperm`
 
 ### Changed
 
