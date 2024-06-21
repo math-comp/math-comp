@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype bigop finset fingroup morphism.
-From mathcomp Require Import quotient action.
+From mathcomp Require Import quotient action finfun.
 
 (******************************************************************************)
 (*  Partial, semidirect, central, and direct products.                        *)
@@ -23,6 +23,8 @@ From mathcomp Require Import quotient action.
 (* ++ External products :                                                     *)
 (* pairg1, pair1g == the isomorphisms aT1 -> aT1 * aT2, aT2 -> aT1 * aT2.     *)
 (*                    (aT1 * aT2 has a direct product group structure.)       *)
+(*       dfung1 i == the morphism gT i -> {dffun forall j, gt j} where        *)
+(*                   gT : I -> finGroupType is a family of finite groups.     *)
 (*   sdprod_by to == the semidirect product defined by to : groupAction H K.  *)
 (*                   This is a finGroupType; the actual semidirect product is *)
 (*                   the total set [set: sdprod_by to] on that type.          *)
@@ -869,6 +871,16 @@ move/(all_nthP j) in Pr.
 by rewrite !divgrMid // -?defK -?defH ?mem_prodg // => *; rewrite ?Fc ?Fe ?Pr.
 Qed.
 
+Lemma comm_prodG I r (G : I -> {group gT}) (P : {pred I}) :
+  {in P &, forall i j, commute (G i) (G j)} ->
+  (\prod_(i <- r | P i) G i)%G = \prod_(i <- r | P i) G i :> {set gT}.
+Proof.
+elim: r => /= [|i {}r IHr]; rewrite !(big_nil, big_cons)//=.
+case: ifP => //= Pi Gcomm; rewrite comm_joingE {}IHr// /commute.
+elim: r => [|j r IHr]; first by rewrite big_nil mulg1 mul1g.
+by rewrite big_cons; case: ifP => //= Pj; rewrite mulgA Gcomm// -!mulgA IHr.
+Qed.
+
 End InternalProd.
 
 Arguments complP {gT H A B}.
@@ -1112,6 +1124,196 @@ by rewrite morphim_pair1g morphim_pairg1 mul_subG // genS // setXS ?sub1set.
 Qed.
 
 End ExternalDirProd.
+
+Section ExternalDirDepProd.
+
+Variables (I : finType) (gT : I -> finGroupType).
+Notation gTn := {dffun forall i, gT i}.
+Implicit Types (H : forall i, {group gT i}) (x y : {dffun forall i, gT i}).
+
+Definition extnprod_mulg (x y : gTn) : gTn := [ffun i => (x i * y i)%g].
+Definition extnprod_invg (x : gTn) : gTn := [ffun i => (x i)^-1%g].
+
+Lemma extnprod_mul1g : left_id [ffun=> 1%g] extnprod_mulg.
+Proof. by move=> x; apply/ffunP => i; rewrite !ffunE mul1g. Qed.
+
+Lemma extnprod_mulVg : left_inverse [ffun=> 1%g] extnprod_invg extnprod_mulg.
+Proof. by move=> x; apply/ffunP => i; rewrite !ffunE mulVg. Qed.
+
+Lemma extnprod_mulgA : associative extnprod_mulg.
+Proof. by move=> x y z; apply/ffunP => i; rewrite !ffunE mulgA. Qed.
+
+HB.instance Definition _ := isMulGroup.Build {dffun forall i : I, gT i}
+  extnprod_mulgA extnprod_mul1g extnprod_mulVg.
+
+Lemma oneg_ffun i : (1 : gTn) i = 1. Proof. by rewrite ffunE. Qed.
+
+Lemma mulg_ffun i (x y : gTn) : (x * y) i = x i * y i.
+Proof. by rewrite ffunE. Qed.
+
+Lemma invg_ffun i (x : gTn) : x^-1 i = (x i)^-1.
+Proof. by rewrite ffunE. Qed.
+
+Lemma prodg_ffun T (r : seq T) (F : T -> gTn) (P : {pred T}) i :
+  (\prod_(t <- r | P t) F t) i = \prod_(t <- r | P t) F t i.
+Proof. exact: (big_morph _ (@mulg_ffun i) (@oneg_ffun i)). Qed.
+
+Lemma group_setXn H : group_set (setXn H).
+Proof.
+by apply/group_setP; split=> [|x y] /[!inE]/= => [|/forallP xH /forallP yH];
+   apply/forallP => i; rewrite ?ffunE (group1, groupM)// ?xH ?yH.
+Qed.
+
+Canonical setXn_group H := Group (group_setXn H).
+
+Definition dfung1 i (g : gT i) : gTn := finfun (dfwith (fun=> 1 : gT _) g).
+
+Lemma dfung1_id i (g : gT i) : dfung1 g i = g.
+Proof. by rewrite ffunE dfwith_in. Qed.
+
+Lemma dfung1_dflt i (g : gT i) j : i != j -> dfung1 g j = 1.
+Proof. by move=> ij; rewrite ffunE dfwith_out. Qed.
+
+Lemma dfung1_morphM i : {morph @dfung1 i : g h / g * h}.
+Proof.
+move=> g h; apply/ffunP=> j; have [{j}<-|nij] := eqVneq i j.
+  by rewrite !(dfung1_id, ffunE).
+by rewrite !(dfung1_dflt, ffunE)// mulg1.
+Qed.
+Canonical dfung1_morphism i := @Morphism _ _ setT _ (in2W (@dfung1_morphM i)).
+
+Lemma dffunM i : {morph (fun x => x i) : x y / x * y}.
+Proof. by move=> x y; rewrite !ffunE. Qed.
+
+Canonical dffun_morphism i := @Morphism _ _ setT _ (in2W (@dffunM i)).
+
+Lemma injm_dfung1 i : 'injm (@dfung1 i).
+Proof. 
+apply/subsetP => x /morphpreP[_ /set1P /ffunP/=/(_ i)].
+by rewrite !(ffunE, dfung1_id) => ->; apply: set11.
+Qed.
+
+Lemma group_set_dfwith H i (G : {group gT i}) j :
+  group_set (dfwith (H : forall k, {set gT k}) (G : {set _}) j).
+Proof.
+have [<-|ij] := eqVneq i j; first by rewrite !dfwith_in// groupP.
+by rewrite !dfwith_out // groupP.
+Qed.
+
+Canonical group_dfwith H i G j := Group (@group_set_dfwith H i G j).
+
+Lemma group_dfwithE H i G j : @group_dfwith H i G j = dfwith H G j.
+Proof.
+by apply/val_inj; have [<-|nij]/= := eqVneq i j;
+   [rewrite !dfwith_in|rewrite !dfwith_out].
+Qed.
+
+Fact set1gXn_key : unit. Proof. by []. Qed.
+Definition set1gXn {i} (H : {set gT i}) : {set {dffun forall i : I, gT i}} :=
+  locked_with set1gXn_key (setXn (dfwith (fun i0 : I => [1 gT _]%g) H)).
+
+Lemma set1gXnE {i} (H : {set gT i}) :
+  set1gXn H = setXn (dfwith (fun i0 : I => [1 gT _]%g) H).
+Proof. by rewrite /set1gXn unlock. Qed.
+
+Lemma set1gXnP {i} (H : {set gT i}) x :
+  reflect (exists2 h, h \in H & x = dfung1 h) (x \in set1gXn H).
+Proof.
+rewrite set1gXnE/=; apply: (iffP setXnP) => [xP|[h hH ->] j]; last first.
+  by rewrite ffunE; case: dfwithP => [|k ?]; rewrite (dfwith_in, dfwith_out).
+exists (x i); first by have := xP i; rewrite dfwith_in.
+apply/ffunP => j; have := xP j; rewrite ffunE.
+case: dfwithP => // [xiH|k neq_ik]; first by rewrite dfwith_in.
+by move=> /set1gP->; rewrite dfwith_out.
+Qed.
+
+Lemma morphim_dfung1 i (G : {set gT i}) : @dfung1 i @* G = set1gXn G.
+Proof.
+by rewrite morphimEsub//=; apply/setP=> /= x; apply/imsetP/set1gXnP.
+Qed.
+
+Lemma morphim_dffunXn i H : dffun_morphism i @* setXn H = H i.
+Proof.
+apply/eqP; rewrite eqEsubset morphimE setTI /=.
+apply/andP; split; apply/subsetP=> x.
+  by case/imsetP => x0 /[1!inE] /forallP/(_ i)/= ? ->.
+move=> Hx1; apply/imsetP; exists (dfung1 x); last by rewrite dfung1_id.
+by rewrite in_setXn; apply/forallP => j /[!ffunE]; case: dfwithP.
+Qed.
+
+Lemma set1gXn_group_set {i} (H : {group gT i}) : group_set (set1gXn H).
+Proof. by rewrite set1gXnE; exact: group_setXn. Qed.
+
+Canonical groupXn1 {i} (H : {group gT i}) := Group (set1gXn_group_set H).
+
+Lemma setXn_prod H : \prod_i set1gXn (H i) = setXn H.
+Proof.
+apply/setP => /= x; apply/prodsgP /setXnP => [[/= f fH {x}-> i]|xH /=].
+  rewrite prodg_ffun group_prod// => j _.
+  by have /set1gXnP[x xH ->] := fH j isT; rewrite ffunE; case: dfwithP.
+exists (fun i => dfung1 (x i)) => [i _|]; first by apply/set1gXnP; exists (x i).
+apply/ffunP => i; rewrite prodg_ffun (big_only1 i) ?dfung1_id//.
+by move=> j ij _; rewrite dfung1_dflt.
+Qed.
+
+Lemma set1gXn_commute (H : forall i, {group gT i}) i j :
+  commute (set1gXn (H i)) (set1gXn (H j)).
+Proof.
+have [-> //|neqij] := eqVneq j i.
+apply/centC/centsP => _ /set1gXnP [hi hiH ->] _ /set1gXnP [hj hjH ->].
+apply/ffunP => k; rewrite !ffunE.
+by case: dfwithP => [|?]; rewrite ?mulg1 ?mul1g// dfwith_out// mulg1 mul1g.
+Qed.
+
+Lemma setXn_dprod H : \big[dprod/1]_i set1gXn (H i) = setXn H.
+Proof.
+rewrite -setXn_prod//=.
+suff -> : \big[dprod/1]_i groupXn1 (H i) = (\prod_i groupXn1 (H i))%G.
+  by rewrite comm_prodG//=; apply: in2W; apply: set1gXn_commute.
+apply/eqP; apply/bigdprodYP => i //= _; rewrite subsetD.
+apply/andP; split.
+  rewrite comm_prodG; last by apply: in2W; apply: set1gXn_commute.
+  apply/centsP => _ /prodsgP[/= h_ h_P ->] _ /set1gXnP [h hH ->].
+  apply/ffunP => j; rewrite !ffunE/=.
+  rewrite (big_morph _ (@dffunM j) (_ : _ = 1)) ?ffunE//.
+  case: dfwithP => {j} [|? ?]; last by rewrite mulg1 mul1g.
+  rewrite big1 ?mulg1 ?mul1g// => j neq_ji.
+  by have /set1gXnP[? _ ->] := h_P j neq_ji; rewrite ffunE dfwith_out.
+rewrite -setI_eq0 -subset0; apply/subsetP => /= x; rewrite !inE.
+rewrite comm_prodG; last by apply: in2W; apply: set1gXn_commute.
+move=> /and3P[+ + /set1gXnP [h _ x_h]]; rewrite {x}x_h.
+move=> /prodsgP[x_ x_P /ffunP/(_ i)]; rewrite ffunE dfwith_in => {h}->.
+apply: contra_neqT => _; apply/ffunP => j; rewrite !ffunE/=.
+case: dfwithP => // {j}; rewrite (big_morph _ (@dffunM i) (_ : _ = 1)) ?ffunE//.
+rewrite big1// => j neq_ji.
+by have /set1gXnP[g gH /ffunP->] := x_P _ neq_ji; rewrite ffunE dfwith_out.
+Qed.
+
+Lemma isog_setXn i (G : {group gT i}) : G \isog set1gXn G.
+Proof.
+apply/(@isogP _ _ G); exists [morphism of restrm (subsetT G) (@dfung1 i)].
+  by rewrite injm_restrm ?injm_dfung1.
+by rewrite morphim_restrm morphim_dfung1 setIid.
+Qed.
+
+Lemma setXn_gen H : (forall i, 1 \in H i) -> 
+  <<setXn H>> = setXn (fun i => <<H i>>).
+Proof.
+move=> H1; apply/eqP; rewrite eqEsubset gen_subG setXnS/=; last first.
+  by move=> ?; rewrite subset_gen.
+rewrite -[in X in X \subset _]setXn_prod; under eq_bigr do
+   rewrite -morphim_dfung1 morphim_gen ?subsetT// morphim_dfung1.
+rewrite prod_subG// => i; rewrite genS // set1gXnE setXnS // => j.
+by case: dfwithP => // k _; rewrite sub1set.
+Qed.
+
+End ExternalDirDepProd.
+
+Lemma groupX0 (gT : 'I_0 -> finGroupType) (G : forall i, {group gT i}) :
+  setXn G = 1%g.
+Proof.
+by apply/setP => ?; apply/setXnP/set1P => [_|_ []//]; apply/ffunP => -[].
+Qed.
 
 Section ExternalSDirProd.
 

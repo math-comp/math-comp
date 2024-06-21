@@ -298,11 +298,20 @@ Lemma inj_tperm (T T' : finType) (f : T -> T') x y z :
   injective f -> f (tperm x y z) = tperm (f x) (f y) (f z).
 Proof. by move=> injf; rewrite !permE /= !(inj_eq injf) !(fun_if f). Qed.
 
-Lemma tpermJ (T : finType) x y (s : {perm T}) :
-  (tperm x y) ^ s = tperm (s x) (s y).
+Section tpermJ.
+Variables (T : finType).
+Implicit Types (x y z : T) (s : {perm T}).
+
+Lemma tpermJ x y s : (tperm x y) ^ s = tperm (s x) (s y).
 Proof.
 by apply/permP => z; rewrite -(permKV s z) permJ; apply/inj_tperm/perm_inj.
 Qed.
+
+Lemma tpermJ_tperm x y z :
+  x != z -> y != z -> tperm x z ^ tperm x y = tperm y z.
+Proof. by move=> nxz nyz; rewrite tpermJ tpermL [tperm _ _ z]tpermD. Qed.
+
+End tpermJ.
 
 Lemma tuple_permP {T : eqType} {n} {s : seq T} {t : n.-tuple T} :
   reflect (exists p : 'S_n, s = [tuple tnth t (p i) | i < n]) (perm_eq s t).
@@ -546,6 +555,15 @@ Proof. by rewrite -{2}(mulgK s s) !odd_permM -addbA addKb. Qed.
 
 Lemma odd_permJ s1 s2 : odd_perm (s1 ^ s2) = odd_perm s1.
 Proof. by rewrite !odd_permM odd_permV addbC addbK. Qed.
+
+Lemma gen_tperm x : <<[set tperm x y | y in T]>>%g = [set: {perm T}].
+Proof.
+apply/eqP; rewrite eqEsubset subsetT/=; apply/subsetP => s _.
+have [ts -> _] := prod_tpermP s; rewrite group_prod// => -[/= y z] _.
+have [<-|Nyz] := eqVneq y z; first by rewrite tperm1 group1.
+have [<-|Nxz] := eqVneq x z; first by rewrite tpermC mem_gen ?imset_f.
+by rewrite -(tpermJ_tperm Nxz Nyz) groupJ ?mem_gen ?imset_f.
+Qed.
 
 End PermutationParity.
 

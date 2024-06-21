@@ -92,6 +92,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + definitions `leigenspace`, `leigenvalue`
   + lemmas `lker_ker`, `limgE`, `leigenspaceE`
 
+- in `action.v`
+  + lemmas `perm_prime_atrans`, `perm_prime_orbit`, `perm_prime_astab`
+
+- in `fingroup.v`
+  + lemma `prod_subG`
+
+- in `gproduct.v`
+  + lemma `comm_prodG`
+  + definitions `extnprod_mulg`, `extnprod_invg`
+  + lemmas `extnprod_mul1g`, `extnprod_mulVg`, `extnprod_mulgA`, `oneg_ffun`,
+    `mulg_ffun`, `invg_ffun`, `prodg_ffun`, `group_setXn`
+  + definition `dfung1`
+  + lemmas `dfung1_id`, `dfung1_dflt`, `dfung1_morphM`, `dffunM`, `injm_dfung1`,
+    `group_set_dfwith`, `group_dfwithE`
+  + definition `set1gXn`
+  + lemmas `set1gXnE`, `set1gXnP`, `morphim_dfung1`, `morphim_dffunXn`,
+    `set1gXn_group_set`, `setXn_prod`, `set1gXn_commute`, `setXn_dprod`,
+	 `isog_setXn`, `setXn_gen`, `groupX0`
+
+- in `perm.v`
+  + lemmas `tpermJ_tperm`, `gen_tperm`
 
 - in `order.v`
   + structures `meetSemilatticeType`, `bMeetSemilatticeType`,

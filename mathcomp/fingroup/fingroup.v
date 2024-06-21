@@ -1362,6 +1362,13 @@ Qed.
 Lemma mul_subG A B : A \subset G -> B \subset G -> A * B \subset G.
 Proof. by move=> sAG sBG; rewrite -mulGid mulgSS. Qed.
 
+Lemma prod_subG (I : Type) (r : seq I) (P : {pred I}) (F : I -> {set gT}) :
+  (forall i, P i -> F i \subset G) -> \prod_(i <- r | P i) F i \subset G.
+Proof.
+move=> subFG; elim/big_rec: _ => [|/= i A /subFG]; first by rewrite sub1set.
+exact: mul_subG.
+Qed.
+
 (* Membership lemmas *)
 
 Lemma groupM x y : x \in G -> y \in G -> x * y \in G.
