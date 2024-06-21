@@ -307,7 +307,8 @@ Proof.
 by apply/permP => z; rewrite -(permKV s z) permJ; apply/inj_tperm/perm_inj.
 Qed.
 
-Lemma tpermJ_tperm x y z : x != z -> y != z -> tperm x z ^ tperm x y = tperm y z.
+Lemma tpermJ_tperm x y z :
+  x != z -> y != z -> tperm x z ^ tperm x y = tperm y z.
 Proof. by move=> nxz nyz; rewrite tpermJ tpermL [tperm _ _ z]tpermD. Qed.
 
 End tpermJ.
