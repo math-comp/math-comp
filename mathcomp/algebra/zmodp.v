@@ -424,7 +424,7 @@ have [->|kS2N0] := eqVneq (k *+ i.+2) 0; first by rewrite tperm1 group1.
 have kSSneqkS : k *+ i.+2 != k *+ i.+1.
   rewrite -subr_eq0 -mulrnBr// subSnn mulr1n.
   by apply: contraTneq k_unit => ->; rewrite unitr0.
-rewrite -(@tpermJt _ (k *+ i.+1)) 1?eq_sym//.
+rewrite -(@tpermJ_tperm _ (k *+ i.+1)) 1?eq_sym//.
 rewrite groupJ// 1?tpermC// mulrSr 1?tpermC.
 by rewrite mem_gen//; apply/imsetP; exists (k *+ i.+1).
 Qed.

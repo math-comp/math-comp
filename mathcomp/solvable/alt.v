@@ -531,7 +531,7 @@ have [g fK gK] : bijective f.
     by apply: (@perm_inj _ (c ^+ i)%g); rewrite -permM -expgDzmod// addrNK.
   have : (c ^+ (j - i)%R)%g \in stabx.
     by rewrite !inE ?groupX ?mem_gen ?sub1set ?inE// ['P%act _ _]cjix eqxx.
-  rewrite [stabx]prime_astab// => /set1gP.
+  rewrite [stabx]perm_prime_astab// => /set1gP.
   move=> /(congr1 (mulg (c ^+ i))); rewrite -expgDzmod// addrC addrNK mulg1.
   by move=> /eqP; rewrite eq_expg_ord// ?cppSS ?ord_c// => /eqP->.
 pose gsf s := g \o s \o f.
