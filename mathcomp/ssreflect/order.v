@@ -88,11 +88,11 @@ From mathcomp Require Import finset.
 (*                              The HB class is called Preorder.              *)
 (*              porderType d == the type of partially ordered types           *)
 (*                              The HB class is called POrder.                *)
-(*             bPOrderType d == porderType with a bottom element (\bot)       *)
+(*             bPreorderType d == preorderType with a bottom element (\bot)   *)
 (*                              The HB class is called BPOrder.               *)
-(*             tPOrderType d == porderType with a top element (\top)          *)
+(*             tPreorderType d == preorderType with a top element (\top)      *)
 (*                              The HB class is called TPOrder.               *)
-(*            tbPOrderType d == porderType with both a top and a bottom       *)
+(*            tbPreorderType d == preorderType with both a top and a bottom   *)
 (*                              The HB class is called TBPOrder.              *)
 (*     meetSemilatticeType d == the type of meet semilattices                 *)
 (*                              The HB class is called MeetSemilattice.       *)
@@ -1377,7 +1377,12 @@ HB.structure Definition BPreorder d := { T of hasBottom d T & Preorder d T }.
 #[short(type="tPreorderType")]
 HB.structure Definition TPreorder d := { T of hasTop d T & Preorder d T }.
 #[short(type="tbPreorderType")]
-HB.structure Definition TBPreorder d := { T of hasTop d T & BPreorder d T }.
+HB.structure Definition TBPreorder d := { T of hasTop d T & BPreorder d T }.#[short(type="bPOrderType")]
+HB.structure Definition BPOrder d := { T of hasBottom d T & POrder d T }.
+#[short(type="tPOrderType")]
+HB.structure Definition TPOrder d := { T of hasTop d T & POrder d T }.
+#[short(type="tbPOrderType")]
+HB.structure Definition TBPOrder d := { T of hasTop d T & BPOrder d T }.
 
 Section PreorderDef.
 
