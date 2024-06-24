@@ -1827,12 +1827,8 @@ End LiftedSemiRing.
 Section LiftedScale.
 Variables (R : ringType) (U : Type) (V : lmodType R) (A : lalgType R).
 Definition scale_fun a (f : U -> V) x := a *: f x.
-Definition in_alg_head k : A := k%:A.
+Definition in_alg k : A := k%:A.
 End LiftedScale.
-
-(* The real in_alg notation is declared after GRing.Theory so that at least *)
-(* in Coq 8.2 it gets precedence when GRing.Theory is not imported.         *)
-Local Notation in_alg_loc A := (in_alg_head A) (only parsing).
 
 Local Notation "\0" := (null_fun _) : function_scope.
 Local Notation "f \+ g" := (add_fun f g) : function_scope.
@@ -1844,7 +1840,7 @@ Local Notation "x \o* f" := (mulr_fun x f) : function_scope.
 Local Notation "f \* g" := (mul_fun f g) : function_scope.
 
 Arguments null_fun {_} V _ /.
-Arguments in_alg_head {_} A _ /.
+Arguments in_alg {_} A _ /.
 Arguments add_fun {_ _} f g _ /.
 Arguments sub_fun {_ _} f g _ /.
 Arguments opp_fun {_ _} f _ /.
@@ -2122,19 +2118,18 @@ Section InAlgebra.
 
 Variables (R : ringType) (A : lalgType R).
 
-Fact in_alg_is_additive : additive (in_alg_loc A).
+Fact in_alg_is_additive : additive (in_alg A).
 Proof. move=> x y; exact: scalerBl. Qed.
 #[export]
-HB.instance Definition _ := isAdditive.Build R A (in_alg_loc A)
-  in_alg_is_additive.
+HB.instance Definition _ := isAdditive.Build R A (in_alg A) in_alg_is_additive.
 
-Fact in_alg_is_rmorphism : multiplicative (in_alg_loc A).
+Fact in_alg_is_rmorphism : multiplicative (in_alg A).
 Proof. by split=> [x y|] /=; rewrite ?scale1r // -scalerAl mul1r scalerA. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build R A (in_alg_loc A)
+HB.instance Definition _ := isMultiplicative.Build R A (in_alg A)
   in_alg_is_rmorphism.
 
-Lemma in_algE a : in_alg_loc A a = a%:A. Proof. by []. Qed.
+Lemma in_algE a : in_alg A a = a%:A. Proof. by []. Qed.
 
 End InAlgebra.
 
@@ -5951,11 +5946,9 @@ Definition linearE :=
   (linearD, linear0, linearB, linearMNn, linearMn, linearZ).
 
 Notation null_fun V := (null_fun V) (only parsing).
-Notation in_alg A := (in_alg_loc A).
+Notation in_alg A := (in_alg A) (only parsing).
 
 End Theory.
-
-Notation in_alg A := (in_alg_loc A).
 
 Module AllExports. HB.reexport. End AllExports.
 
@@ -6039,7 +6032,7 @@ Notation "x \o* f" := (mulr_fun x f) : ring_scope.
 Notation "f \* g" := (mul_fun f g) : ring_scope.
 
 Arguments null_fun {_} V _ /.
-Arguments in_alg_head {_} A _ /.
+Arguments in_alg {_} A _ /.
 Arguments add_fun {_ _} f g _ /.
 Arguments sub_fun {_ _} f g _ /.
 Arguments opp_fun {_ _} f _ /.
