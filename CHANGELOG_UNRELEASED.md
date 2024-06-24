@@ -144,6 +144,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `rcomplKU`, `diffErcompl`, `codiffErcompl`, `complEdiff`,
     `complEcodiff`, `complErcompl`
 
+- in `intdiv.v`
+  + lemma `irreducible_rat_int`
+
 ### Changed
 
 - in `bigop.v`
