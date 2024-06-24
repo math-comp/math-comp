@@ -148,6 +148,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `floor_itv`, ` ge_floor`, `lt_succ_floor x`, `floor_ge_int`,
     `ceil_itv`, `gt_pred_ceil`, `le_ceil`, `ceil_le_int`, `ceilD`, `ceil_floor`
   + `archiRealDomainType` instance for `int` (moved from `ssrint.v`)
+- in `intdiv.v`
+  + lemma `irreducible_rat_int`
 
 ### Changed
 
