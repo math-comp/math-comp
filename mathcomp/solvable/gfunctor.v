@@ -146,7 +146,7 @@ Definition monotonic :=
 
 (* Self-expanding composition, and modulo *)
 
-Variables (k : unit) (F1 F2 : object_map).
+Variables (F1 F2 : object_map).
 
 Definition comp : object_map := fun gT A => F1 (F2 A).
 
