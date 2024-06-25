@@ -411,9 +411,14 @@ Section Sym.
 
 Import GRing.
 
-Lemma gen_tperm_step n (k : 'I_n.+2) : coprime n.+2 k ->
-  <<[set tperm i (i + k) | i : 'I_n.+2]>>%g = [set: 'S_n.+2].
+Lemma gen_tperm_step n (k : 'I_n.+1) : coprime n.+1 k ->
+  <<[set tperm i (i + k) | i : 'I_n.+1]>>%g = [set: 'S_n.+1].
 Proof.
+case: n k => [|n] k.
+  move=> _; apply/eqP; rewrite eqEsubset subsetT/= -(gen_tperm 0)/= gen_subG.
+  apply/subsetP => s /imsetP[/= [][|//] lt01 _ ->].
+  have ->: (Ordinal lt01) = 0 by apply/val_inj.
+  by rewrite tperm1 group1.
 rewrite -unitZpE// natr_Zp => k_unit.
 apply/eqP; rewrite eqEsubset subsetT/= -(gen_tperm 0)/= gen_subG.
 apply/subsetP => s /imsetP[/= i _ ->].
@@ -429,13 +434,10 @@ rewrite groupJ// 1?tpermC// mulrSr 1?tpermC.
 by rewrite mem_gen//; apply/imsetP; exists (k *+ i.+1).
 Qed.
 
-Lemma gen_tpermS n : <<[set tperm i (i + 1) | i : 'I_n.+2]>>%g = [set: 'S_n.+2].
-Proof. by rewrite gen_tperm_step// coprimen1. Qed.
+Lemma perm_addr1X n m (j k : 'I_n.+1) : (perm (addrI m%R) ^+ j)%g k = m *+ j + k.
+Proof. by rewrite permX (eq_iter (permE _)) iter_addr. Qed.
 
-Lemma perm_add1X n (j k : 'I_n.+2) : (perm (addrI 1%R) ^+ j)%g k = j + k.
-Proof. by rewrite permX (eq_iter (permE _)) iter_addr natr_Zp. Qed.
-
-Lemma gen_tpermn_cycle n (i j : 'I_n.+2)
+Lemma gen_tpermn_circular_shift n (i j : 'I_n.+2)
     (c := perm (addrI 1)) : coprime n.+2 (j - i)%R ->
   <<[set tperm i j ; c]>>%g = [set: 'S_n.+2].
 Proof.
@@ -444,11 +446,7 @@ rewrite -(gen_tperm_step jBi_coprime) gen_subG.
 apply/subsetP => s /imsetP[/= k _ ->].
 suff -> : tperm k (k + (j - i)) = (tperm i j ^ c ^+ (k - i)%R)%g.
   by rewrite groupJ ?groupX ?mem_gen ?inE ?eqxx ?orbT.
-by rewrite tpermJ !perm_add1X addrNK addrAC addrA.
+by rewrite tpermJ !perm_addr1X natr_Zp addrNK addrAC addrA.
 Qed.
-
-Lemma gen_tperm01_cycle n (c := perm (addrI 1)) :
-  <<[set tperm 0 1%R ; c]>>%g = [set: 'S_n.+2].
-Proof. by rewrite gen_tpermn_cycle// subr0 coprimen1. Qed.
 
 End Sym.
