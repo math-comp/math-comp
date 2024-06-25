@@ -58,7 +58,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssrbool.v`
   + lemmas `classic_sigW`, `classic_ex`
 - in `intdiv.v`
-  + lemmas `dvdz_charf`, `eisenstein`
+  + lemmas `dvdz_charf`, `eisenstein_crit`
 
 - in `mxalgebra.v`
   + lemma `mulmxP`
