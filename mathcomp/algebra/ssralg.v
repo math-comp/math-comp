@@ -1857,7 +1857,7 @@ Section AdditiveTheory.
 
 Section Properties.
 
-Variables (U V : nmodType) (k : unit) (f : {additive U -> V}).
+Variables (U V : nmodType) (f : {additive U -> V}).
 
 Lemma raddf0 : f 0 = 0.
 Proof. exact: semi_additive_subproof.1. Qed.
@@ -1945,7 +1945,7 @@ End MulFun.
 
 Section Properties.
 
-Variables (U V : zmodType) (k : unit) (f : {additive U -> V}).
+Variables (U V : zmodType) (f : {additive U -> V}).
 
 Lemma raddfN : {morph f : x / - x}.
 Proof.
@@ -2043,7 +2043,7 @@ Section RmorphismTheory.
 
 Section Properties.
 
-Variables (R S : semiRingType) (k : unit) (f : {rmorphism R -> S}).
+Variables (R S : semiRingType) (f : {rmorphism R -> S}).
 
 Lemma rmorph0 : f 0 = 0. Proof. exact: raddf0. Qed.
 Lemma rmorphD : {morph f : x y / x + y}. Proof. exact: raddfD. Qed.
@@ -2103,7 +2103,7 @@ End Projections.
 
 Section Properties.
 
-Variables (R S : ringType) (k : unit) (f : {rmorphism R -> S}).
+Variables (R S : ringType) (f : {rmorphism R -> S}).
 
 Lemma rmorphN : {morph f : x / - x}. Proof. exact: raddfN. Qed.
 Lemma rmorphB : {morph f: x y / x - y}. Proof. exact: raddfB. Qed.
@@ -2264,7 +2264,7 @@ Variable R : ringType.
 
 Section GenericProperties.
 
-Variables (U : lmodType R) (V : zmodType) (s : R -> V -> V) (k : unit).
+Variables (U : lmodType R) (V : zmodType) (s : R -> V -> V).
 Variable f : {linear U -> V | s}.
 
 Lemma linear0 : f 0 = 0. Proof. exact: raddf0. Qed.
@@ -2432,7 +2432,7 @@ HB.export LRMorphismExports.
 Section LRMorphismTheory.
 
 Variables (R : ringType) (A B : lalgType R) (C : ringType) (s : R -> C -> C).
-Variables (k : unit) (f : {lrmorphism A -> B}) (g : {lrmorphism B -> C | s}).
+Variables (f : {lrmorphism A -> B}) (g : {lrmorphism B -> C | s}).
 
 #[export] HB.instance Definition _ := RMorphism.on (@idfun A).
 #[export] HB.instance Definition _ := RMorphism.on (g \o f).
