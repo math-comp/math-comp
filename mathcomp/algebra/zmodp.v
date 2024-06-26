@@ -63,6 +63,60 @@ Section ZpDef.
 (*                                                                     *)
 (***********************************************************************)
 
+(* Operations on 'I_p without constraint on p. *)
+Section Generic.
+Variable p : nat.
+Implicit Types i j : 'I_p.
+
+Lemma Zp_opp_subproof i : (p - i) %% p < p.
+Proof. by case: p i => [[]//|k] i; apply/ltn_pmod. Qed.
+
+Definition Zp_opp i := Ordinal (Zp_opp_subproof i).
+
+Lemma Zp_add_subproof i j : (i + j) %% p < p.
+Proof. by case: p i j => [[]//|k] i j; apply/ltn_pmod. Qed.
+
+Definition Zp_add i j := Ordinal (Zp_add_subproof i j).
+
+Lemma Zp_mul_subproof i j : (i * j) %% p < p.
+Proof. by case: p i j => [[]//|k] i j; apply/ltn_pmod. Qed.
+
+Definition Zp_mul i j := Ordinal (Zp_mul_subproof i j).
+
+Lemma Zp_inv_subproof i : (egcdn i p).1 %% p < p.
+Proof. by case: p i => [[]//|k] i; apply/ltn_pmod. Qed.
+
+Definition Zp_inv i := if coprime p i then Ordinal (Zp_inv_subproof i) else i.
+
+Lemma Zp_addA : associative Zp_add.
+Proof.
+by move=> x y z; apply: val_inj; rewrite /= modnDml modnDmr addnA.
+Qed.
+
+Lemma Zp_addC : commutative Zp_add.
+Proof. by move=> x y; apply: val_inj; rewrite /= addnC. Qed.
+
+Lemma Zp_mulC : commutative Zp_mul.
+Proof. by move=> x y; apply: val_inj; rewrite /= mulnC. Qed.
+
+Lemma Zp_mulA : associative Zp_mul.
+Proof.
+by move=> x y z; apply: val_inj; rewrite /= modnMml modnMmr mulnA.
+Qed.
+
+Lemma Zp_mul_addr : right_distributive Zp_mul Zp_add.
+Proof.
+by move=> x y z; apply: val_inj; rewrite /= modnMmr modnDm mulnDr.
+Qed.
+
+Lemma Zp_mul_addl : left_distributive Zp_mul Zp_add.
+Proof. by move=> x y z; rewrite -!(Zp_mulC z) Zp_mul_addr. Qed.
+
+Lemma Zp_inv_out i : ~~ coprime p i -> Zp_inv i = i.
+Proof. by rewrite /Zp_inv => /negPf->. Qed.
+
+End Generic.
+
 Variable p' : nat.
 Local Notation p := p'.+1.
 
@@ -78,75 +132,44 @@ Proof. by apply: val_inj; rewrite /= modZp. Qed.
 (* Operations *)
 Definition Zp0 : 'I_p := ord0.
 Definition Zp1 := inZp 1.
-Definition Zp_opp x := inZp (p - x).
-Definition Zp_add x y := inZp (x + y).
-Definition Zp_mul x y := inZp (x * y).
-Definition Zp_inv x := if coprime p x then inZp (egcdn x p).1 else x.
 
 (* Additive group structure. *)
 
-Lemma Zp_add0z : left_id Zp0 Zp_add.
-Proof. exact: valZpK. Qed.
+Lemma Zp_add0z : left_id Zp0 (@Zp_add p).
+Proof. by move=> x; apply: val_inj; rewrite /= modZp. Qed.
 
-Lemma Zp_addNz : left_inverse Zp0 Zp_opp Zp_add.
+Lemma Zp_addNz : left_inverse Zp0 (@Zp_opp p) (@Zp_add p).
 Proof.
 by move=> x; apply: val_inj; rewrite /= modnDml subnK ?modnn // ltnW.
 Qed.
 
-Lemma Zp_addA : associative Zp_add.
-Proof.
-by move=> x y z; apply: val_inj; rewrite /= modnDml modnDmr addnA.
-Qed.
-
-Lemma Zp_addC : commutative Zp_add.
-Proof. by move=> x y; apply: val_inj; rewrite /= addnC. Qed.
-
 HB.instance Definition _ :=
-  GRing.isZmodule.Build 'I_p Zp_addA Zp_addC Zp_add0z Zp_addNz.
+  GRing.isZmodule.Build 'I_p (@Zp_addA p) (@Zp_addC p) Zp_add0z Zp_addNz.
 
 HB.instance Definition _ := [finGroupMixin of 'I_p for +%R].
 
 (* Ring operations *)
 
-Lemma Zp_mul1z : left_id Zp1 Zp_mul.
+Lemma Zp_mul1z : left_id Zp1 (@Zp_mul p).
 Proof. by move=> x; apply: val_inj; rewrite /= modnMml mul1n modZp. Qed.
 
-Lemma Zp_mulC : commutative Zp_mul.
-Proof. by move=> x y; apply: val_inj; rewrite /= mulnC. Qed.
-
-Lemma Zp_mulz1 : right_id Zp1 Zp_mul.
+Lemma Zp_mulz1 : right_id Zp1 (@Zp_mul p).
 Proof. by move=> x; rewrite Zp_mulC Zp_mul1z. Qed.
 
-Lemma Zp_mulA : associative Zp_mul.
-Proof.
-by move=> x y z; apply: val_inj; rewrite /= modnMml modnMmr mulnA.
-Qed.
-
-Lemma Zp_mul_addr : right_distributive Zp_mul Zp_add.
-Proof.
-by move=> x y z; apply: val_inj; rewrite /= modnMmr modnDm mulnDr.
-Qed.
-
-Lemma Zp_mul_addl : left_distributive Zp_mul Zp_add.
-Proof. by move=> x y z; rewrite -!(Zp_mulC z) Zp_mul_addr. Qed.
-
-Lemma Zp_mulVz x : coprime p x -> Zp_mul (Zp_inv x) x = Zp1.
+Lemma Zp_mulVz x : coprime p x -> (@Zp_mul p) (Zp_inv x) x = Zp1.
 Proof.
 move=> co_p_x; apply: val_inj; rewrite /Zp_inv co_p_x /= modnMml.
 by rewrite -(chinese_modl co_p_x 1 0) /chinese addn0 mul1n mulnC.
 Qed.
 
-Lemma Zp_mulzV x : coprime p x -> Zp_mul x (Zp_inv x) = Zp1.
+Lemma Zp_mulzV x : coprime p x -> (@Zp_mul p) x (Zp_inv x) = Zp1.
 Proof. by move=> Ux; rewrite /= Zp_mulC Zp_mulVz. Qed.
 
-Lemma Zp_intro_unit x y : Zp_mul y x = Zp1 -> coprime p x.
+Lemma Zp_intro_unit x y : (@Zp_mul p) y x = Zp1 -> coprime p x.
 Proof.
 case=> yx1; have:= coprimen1 p.
 by rewrite -coprime_modr -yx1 coprime_modr coprimeMr; case/andP.
 Qed.
-
-Lemma Zp_inv_out x : ~~ coprime p x -> Zp_inv x = x.
-Proof. by rewrite /Zp_inv => /negPf->. Qed.
 
 Lemma Zp_mulrn x n : x *+ n = inZp (x * n).
 Proof.
@@ -166,7 +189,10 @@ Lemma Zp_expg x n : x ^+ n = inZp (x * n).
 Proof. exact: Zp_mulrn. Qed.
 
 Lemma Zp1_expgz x : Zp1 ^+ x = x.
-Proof. by rewrite Zp_expg; apply: Zp_mul1z. Qed.
+Proof.
+rewrite Zp_expg; apply/val_inj.
+by move: (Zp_mul1z x) => /(congr1 val).
+Qed.
 
 Lemma Zp_cycle : setT = <[Zp1]>.
 Proof. by apply/setP=> x; rewrite -[x]Zp1_expgz inE groupX ?mem_gen ?set11. Qed.
