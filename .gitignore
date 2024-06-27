@@ -34,3 +34,4 @@ htmldoc/index*.*html
 htmldoc/depend
 htmldoc/depend.js
 htmldoc/*.css
+.DS_store
