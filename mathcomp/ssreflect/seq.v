@@ -3240,6 +3240,24 @@ Proof. by move=> st; elim: l => [//=|n l IH /=]; rewrite nth_zip ?IH ?st. Qed.
 
 End Zip.
 
+Lemma zip_uniql (S T : eqType) (s : seq S) (t : seq T) : 
+  uniq s -> uniq (zip s t).
+Proof.
+elim: s t => [[|]//|a s IH [|b t] //= /andP[aI sU]].
+rewrite IH // andbT.
+elim: s t {sU IH}aI => [[]//|a1 s IH [//|b1 t /=]].
+by rewrite !inE !negb_or /= xpair_eqE negb_and => /andP[->] /IH ->.
+Qed.
+
+Lemma zip_uniqr (S T : eqType) (s : seq S) (t : seq T) : 
+  uniq t -> uniq (zip s t).
+Proof.
+elim: s t => [[|]//|a s IH [|b t] //= /andP[aI sU]].
+rewrite IH // andbT.
+elim: s t {sU IH}aI => [[]//|a1 s IH [//|b1 t /=]].
+by rewrite !inE !negb_or /= xpair_eqE negb_and orbC => /andP[->] /IH ->.
+Qed.
+
 Lemma perm_zip_sym (S T : eqType) (s1 s2 : seq S) (t1 t2 : seq T) : 
   perm_eq (zip s1 t1) (zip s2 t2) -> perm_eq (zip t1 s1) (zip t2 s2).
 Proof.
