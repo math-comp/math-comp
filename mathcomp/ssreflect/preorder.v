@@ -2297,4 +2297,16 @@ Definition t := nat.
 #[export]
 HB.instance Definition _ := Choice.copy t nat.
 
+(* Note that this where the dvd_display is associated with the type NatDvd.t. *)
+#[export]
+HB.instance Definition _ := @Le_isPreorder.Build
+  dvd_display t dvdn dvdnn dvdn_trans.
+(* NatDvd.t is associated below with the notation "natdvd".       :
+
+#[export]
+HB.instance Definition _ := @hasBottom.Build _ t 1 dvd1n.
+
+#[export]
+HB.instance Definition _ := @hasTop.Build _ t 0 dvdn0.
+
 End Preorder.

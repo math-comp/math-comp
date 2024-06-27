@@ -2386,8 +2386,6 @@ Proof. by rewrite meetC meetIK meetC. Qed.
 Lemma meetIKC y x : y `&` x `&` y = x `&` y.
 Proof. by rewrite meetAC meetC meetxx. Qed.
 
-HB.instance Definition _ := SemiGroup.isComLaw.Build L meet meetA meetC.
-
 End MeetTheory.
 End MeetTheory.
 
@@ -2426,7 +2424,8 @@ apply/idP/idP; last by move=> /andP[/eqP-> /eqP->]; rewrite meetx1.
 by move=> /eqP xIy1; rewrite -!le1x -xIy1 leIl leIr.
 Qed.
 
-HB.instance Definition _ := Monoid.isMonoidLaw.Build L \top meet meet1x meetx1.
+HB.instance Definition _ := Monoid.isComLaw.Build L \top meet
+  (@meetA _ L) (@meetC _ L) meet1x.
 
 Lemma meets_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> \meet_(i <- r | P i) F i <= F x.
@@ -2549,8 +2548,6 @@ Proof. exact: (@meetKIC _ L^d). Qed.
 Lemma joinUKC y x : y `|` x `|` y = x `|` y.
 Proof. exact: (@meetIKC _ L^d). Qed.
 
-HB.instance Definition _ := SemiGroup.isComLaw.Build L join joinA joinC.
-
 End JoinTheory.
 End JoinTheory.
 
@@ -2570,7 +2567,8 @@ Proof. exact: (@meet1x _ L^d). Qed.
 Lemma join_eq0 x y : (x `|` y == \bot) = (x == \bot) && (y == \bot).
 Proof. exact: (@meet_eq1 _ L^d). Qed.
 
-HB.instance Definition _ := Monoid.isMonoidLaw.Build L \bot join join0x joinx0.
+HB.instance Definition _ := Monoid.isComLaw.Build L \bot join
+  (@joinA _ L) (@joinC _ L) join0x.
 
 Lemma joins_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> F x <= \join_(i <- r | P i) F i.
@@ -5638,20 +5636,10 @@ Qed.
 Definition t := nat.
 
 #[export]
-HB.instance Definition _ := Choice.copy t nat.
-
-(* Note that this where the dvd_display is associated with the type NatDvd.t. *)
-#[export]
 HB.instance Definition _ := @isMeetJoinDistrLattice.Build
   dvd_display t dvdn _ gcdn lcmn le_def (fun _ _ => erefl)
   gcdnC lcmnC gcdnA lcmnA joinKI meetKU meetUl gcdnn.
 (* NatDvd.t is associated below with the notation "natdvd".                   *)
-
-#[export]
-HB.instance Definition _ := @hasBottom.Build _ t 1 dvd1n.
-
-#[export]
-HB.instance Definition _ := @hasTop.Build _ t 0 dvdn0.
 
 Import DvdSyntax.
 Lemma dvdE : dvd = dvdn :> rel t. Proof. by []. Qed.
