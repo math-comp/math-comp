@@ -21,6 +21,7 @@ tuple.v
 ssrnotations.v
 ssrmatching.v
 order.v
+preorder.v
 
 -I .
 -R . mathcomp.ssreflect

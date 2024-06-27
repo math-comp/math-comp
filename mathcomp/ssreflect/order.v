@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
 From mathcomp Require Import path fintype tuple bigop finset div prime finfun.
-From mathcomp Require Import finset.
+From mathcomp Require Import finset preorder.
 
 (******************************************************************************)
 (*                   Types equipped with order relations                      *)
@@ -1342,12 +1342,7 @@ Reserved Notation "'{' 'tblmorphism' U '->' V '}'"
 
 Module Order.
 
-#[short(type="bPOrderType")]
-HB.structure Definition BPOrder d := { T of hasBottom d T & POrder d T }.
-#[short(type="tPOrderType")]
-HB.structure Definition TPOrder d := { T of hasTop d T & POrder d T }.
-#[short(type="tbPOrderType")]
-HB.structure Definition TBPOrder d := { T of hasTop d T & BPOrder d T }.
+Export Preorder.
 
 HB.mixin Record Preorder_isDuallyPOrder (d : disp_t) T of Preorder d T := {
   le_anti  : antisymmetric (@le d T);
@@ -1674,9 +1669,6 @@ End CTBDistrLatticeSyntax.
 (* FINITE *)
 (**********)
 
-#[short(type="finTBPreorderType")]
-HB.structure Definition FinTBPreorder d := { T of FinBPreorder d T & hasTop d T }.
-
 #[short(type="finPOrderType")]
 HB.structure Definition FinPOrder d := { T of Finite T & POrder d T }.
 
@@ -1864,6 +1856,9 @@ HB.export DualOrder.
 (**********)
 
 Module Import POrderTheory.
+
+Export PreorderTheory.
+
 Section POrderTheory.
 
 Context {disp : disp_t} {T : porderType disp}.
@@ -2273,10 +2268,12 @@ Arguments comparable_min_idPr {disp T x y _}.
 Arguments comparable_max_idPl {disp T x y _}.
 
 Module Import BPOrderTheory.
+
+Export BPreorderTheory.
+
 Section BPOrderTheory.
 Context {disp : disp_t} {T : bPOrderType disp}.
 Implicit Types (x y : T).
-
 
 Lemma lex0 x : (x <= \bot) = (x == \bot).
 Proof. by rewrite le_eqVlt ltx0 orbF. Qed.
@@ -2386,8 +2383,6 @@ Proof. by rewrite meetC meetIK meetC. Qed.
 Lemma meetIKC y x : y `&` x `&` y = x `&` y.
 Proof. by rewrite meetAC meetC meetxx. Qed.
 
-HB.instance Definition _ := SemiGroup.isComLaw.Build L meet meetA meetC.
-
 End MeetTheory.
 End MeetTheory.
 
@@ -2426,7 +2421,8 @@ apply/idP/idP; last by move=> /andP[/eqP-> /eqP->]; rewrite meetx1.
 by move=> /eqP xIy1; rewrite -!le1x -xIy1 leIl leIr.
 Qed.
 
-HB.instance Definition _ := Monoid.isMonoidLaw.Build L \top meet meet1x meetx1.
+HB.instance Definition _ := Monoid.isComLaw.Build L \top meet
+  (@meetA _ L) (@meetC _ L) meet1x.
 
 Lemma meets_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> \meet_(i <- r | P i) F i <= F x.
@@ -2470,13 +2466,13 @@ Lemma meets_setU I (A B : {set I}) (F : I -> L) :
 Proof.
 rewrite -!big_enum; have /= <- := @big_cat _ _ meet.
 apply/eq_big_idem; first exact: meetxx.
-by move=> ?; rewrite mem_cat !mem_enum inE.
+by move=> ?; rewrite mem_cat !fintype.mem_enum inE.
 Qed.
 
 Lemma meets_seq I (r : seq I) (F : I -> L) :
    \meet_(i <- r) F i = \meet_(i in r) F i.
 Proof.
-by rewrite -big_enum; apply/eq_big_idem => ?; rewrite /= ?meetxx ?mem_enum.
+by rewrite -big_enum; apply/eq_big_idem => ?; rewrite /= ?meetxx ?fintype.mem_enum.
 Qed.
 
 End TMeetTheory.
@@ -2549,8 +2545,6 @@ Proof. exact: (@meetKIC _ L^d). Qed.
 Lemma joinUKC y x : y `|` x `|` y = x `|` y.
 Proof. exact: (@meetIKC _ L^d). Qed.
 
-HB.instance Definition _ := SemiGroup.isComLaw.Build L join joinA joinC.
-
 End JoinTheory.
 End JoinTheory.
 
@@ -2570,7 +2564,8 @@ Proof. exact: (@meet1x _ L^d). Qed.
 Lemma join_eq0 x y : (x `|` y == \bot) = (x == \bot) && (y == \bot).
 Proof. exact: (@meet_eq1 _ L^d). Qed.
 
-HB.instance Definition _ := Monoid.isMonoidLaw.Build L \bot join join0x joinx0.
+HB.instance Definition _ := Monoid.isComLaw.Build L \bot join
+  (@joinA _ L) (@joinC _ L) join0x.
 
 Lemma joins_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> F x <= \join_(i <- r | P i) F i.
@@ -3114,12 +3109,12 @@ Lemma sub_bigmax_seq [x0] (I : eqType) r r' P (F : I -> T) : {subset r <= r'} ->
 Proof. exact: (idem_sub_le_big _ _ maxxx). Qed.
 
 Lemma sub_bigmin_cond [x0] (I : eqType) r r' P P' (F : I -> T) :
-    {subset [seq i <- r | P i] <= [seq i <- r' | P' i]} ->
+    {subset ([seq i <- r | P i]) <= ([seq i <- r' | P' i])} ->
   \big[min/x0]_(i <- r' | P' i) F i <= \big[min/x0]_(i <- r | P i) F i.
 Proof. exact: (idem_sub_le_big_cond ge_refl _ minxx). Qed.
 
 Lemma sub_bigmax_cond [x0] (I : eqType) r r' P P' (F : I -> T) :
-    {subset [seq i <- r | P i] <= [seq i <- r' | P' i]} ->
+    {subset ([seq i <- r | P i]) <= ([seq i <- r' | P' i])} ->
   \big[max/x0]_(i <- r | P i) F i <= \big[max/x0]_(i <- r' | P' i) F i.
 Proof. exact: (idem_sub_le_big_cond _ _ maxxx). Qed.
 
@@ -4493,7 +4488,7 @@ Variables (disp : disp_t) (T : Type).
 Variables (disp' : disp_t) (T' : porderType disp') (f : T -> T').
 Variables (f' : T' -> option T) (f_can : pcancel f f').
 
-Fact anti : antisymmetric (@Order.le disp (pcan_type f_can)).
+Fact anti : antisymmetric (@Preorder.le disp (pcan_type f_can)).
 Proof. by move=> ? ? /le_anti; apply: pcan_inj. Qed.
 
 HB.instance Definition _ :=
@@ -4595,6 +4590,8 @@ HB.instance Definition _ := Lattice_Meet_isDistrLattice.Build _ T meetUl.
 HB.end.
 
 (* Morphism hierarchy. *)
+
+Export OrderMorphismTheory.
 
 Lemma omorph_lt (d : disp_t) (T : porderType d) (d' : disp_t) (T' : porderType d')
 (f : {omorphism T -> T'}) : injective f -> {homo f : x y / x < y}.
@@ -5455,14 +5452,28 @@ HB.export DeprecatedSubOrder.Exports.
 Module NatOrder.
 Section NatOrder.
 
+Export NatOrder.
+
 #[export]
 HB.instance Definition _ :=
-  isOrder.Build nat_display nat ltn_def (fun _ _ => erefl) (fun _ _ => erefl)
-                anti_leq leq_trans leq_total.
+  Preorder_isPOrder.Build nat_display nat anti_leq.
+#[export]
+HB.instance Definition _ :=
+  POrder_isTotal.Build nat_display nat leq_total.
 
 End NatOrder.
 
+Module Exports.
+HB.reexport NatOrder.
+End Exports.
+
+End NatOrder.
+HB.export NatOrder.Exports.
+
+Module NatMonotonyTheory.
 Section NatMonotonyTheory.
+
+Export NatMonotonyTheory.
 
 Context {disp : disp_t} {T : porderType disp}.
 Variables (D : {pred nat}) (f : nat -> T).
@@ -5501,15 +5512,14 @@ End NatMonotonyTheory.
 
 Module DvdSyntax.
 
+Export DvdSyntax.
+
 Notation gcd := (@meet dvd_display _).
 Notation "@ 'gcd' T" := (@meet dvd_display T)
   (at level 10, T at level 8, only parsing) : function_scope.
 Notation lcm := (@join dvd_display _).
 Notation "@ 'lcm' T" := (@join dvd_display T)
   (at level 10, T at level 8, only parsing) : function_scope.
-
-Notation nat0 := (@top dvd_display _).
-Notation nat1 := (@bottom dvd_display _).
 
 Notation "\gcd_ ( i <- r | P ) F" :=
   (\big[gcd/nat0]_(i <- r | P%B) F%O) : order_scope.
@@ -5578,8 +5588,11 @@ End DvdSyntax.
 (******************************************************************************)
 
 Module NatDvd.
+
+Export NatDvd.
+
 Section NatDvd.
-Implicit Types (m n p : nat).
+Implicit Types (m n p : natdvd).
 
 Lemma lcmnn n : lcmn n n = n.
 Proof. by case: n => // n; rewrite /lcmn gcdnn mulnK. Qed.
@@ -5602,42 +5615,26 @@ apply: eqn_from_log; rewrite ?(gcdn_gt0, lcmn_gt0)//= => p.
 by rewrite !(logn_gcd, logn_lcm) ?(gcdn_gt0, lcmn_gt0)// minn_maxl.
 Qed.
 
-Definition t := nat.
+Fact dvdn_anti : antisymmetric dvdn.
+Proof. by move=> a b => /andP[] /gcdn_idPl + /gcdn_idPr => ->. Qed.
 
-#[export]
-HB.instance Definition _ := Choice.copy t nat.
+HB.instance Definition _ := Preorder_isPOrder.Build dvd_display t dvdn_anti.
 
-(* Note that this where the dvd_display is associated with the type NatDvd.t. *)
-#[export]
-HB.instance Definition _ := @isMeetJoinDistrLattice.Build
-  dvd_display t dvdn _ gcdn lcmn le_def (fun _ _ => erefl)
-  gcdnC lcmnC gcdnA lcmnA joinKI meetKU meetUl gcdnn.
-(* NatDvd.t is associated below with the notation "natdvd".                   *)
-
-#[export]
-HB.instance Definition _ := @hasBottom.Build _ t 1 dvd1n.
-
-#[export]
-HB.instance Definition _ := @hasTop.Build _ t 0 dvdn0.
+HB.instance Definition _ := @POrder_Meet_isDistrLattice.Build dvd_display t
+  gcdn lcmn gcdnC lcmnC gcdnA lcmnA joinKI meetKU le_def meetUl.
 
 Import DvdSyntax.
-Lemma dvdE : dvd = dvdn :> rel t. Proof. by []. Qed.
-Lemma sdvdE (m n : t) : m %<| n = (n != m) && (m %| n). Proof. by []. Qed.
+Lemma sdvdE (m n : t) : m %<| n = (n != m) && (m %| n).
+Proof. exact/lt_def. Qed.
 Lemma gcdE : gcd = gcdn :> (t -> t -> t). Proof. by []. Qed.
 Lemma lcmE : lcm = lcmn :> (t -> t -> t). Proof. by []. Qed.
-Lemma nat1E : nat1 = 1%N :> t. Proof. by []. Qed.
-Lemma nat0E : nat0 = 0%N :> t. Proof. by []. Qed.
 
 End NatDvd.
 Module Exports.
 HB.reexport NatDvd.
-Notation natdvd := t.
-Definition dvdEnat := dvdE.
 Definition sdvdEnat := sdvdE.
 Definition gcdEnat := gcdE.
 Definition lcmEnat := lcmE.
-Definition nat1E := nat1E.
-Definition nat0E := nat0E.
 End Exports.
 End NatDvd.
 HB.export NatDvd.Exports.
@@ -5647,54 +5644,26 @@ HB.export NatDvd.Exports.
 (************************)
 
 Module OrdinalOrder.
-Section OrdinalOrder.
 
-Fact ord_display : disp_t. Proof. exact. Qed.
-
-Section PossiblyTrivial.
-Context (n : nat).
+Export OrdinalOrder.
 
 #[export]
-HB.instance Definition _ :=
+HB.instance Definition _ (n : nat) :=
   [SubChoice_isSubOrder of 'I_n by <: with ord_display].
 
-Lemma leEord : (le : rel 'I_n) = leq. Proof. by []. Qed.
-Lemma ltEord : (lt : rel 'I_n) = (fun m n => m < n)%N. Proof. by []. Qed.
-End PossiblyTrivial.
-
-Section NonTrivial.
-Context (n' : nat).
-Let n := n'.+1.
-
-#[export] HB.instance Definition _ := @hasBottom.Build _ 'I_n ord0 leq0n.
-#[export] HB.instance Definition _ := @hasTop.Build _ 'I_n ord_max (@leq_ord _).
-
-Lemma botEord : \bot = ord0. Proof. by []. Qed.
-Lemma topEord : \top = ord_max. Proof. by []. Qed.
-
-End NonTrivial.
-
 End OrdinalOrder.
-
-Module Exports.
-HB.reexport OrdinalOrder.
-Definition leEord := leEord.
-Definition ltEord := ltEord.
-Definition botEord := botEord.
-Definition topEord := topEord.
-End Exports.
-End OrdinalOrder.
-HB.export OrdinalOrder.Exports.
+HB.export OrdinalOrder.
 
 (*********************)
 (* Instances on bool *)
 (*********************)
 
 Module BoolOrder.
+
+Export BoolOrder.
+
 Section BoolOrder.
 Implicit Types (x y : bool).
-
-Fact bool_display : disp_t. Proof. exact. Qed.
 
 Fact andbE x y : x && y = if (x < y)%N then x else y.
 Proof. by case: x y => [] []. Qed.
@@ -5702,21 +5671,28 @@ Proof. by case: x y => [] []. Qed.
 Fact orbE x y : x || y = if (x < y)%N then y else x.
 Proof. by case: x y => [] []. Qed.
 
-Fact ltn_def x y : (x < y)%N = (y != x) && (x <= y)%N.
-Proof. by case: x y => [] []. Qed.
-
 Fact anti : antisymmetric (leq : rel bool).
 Proof. by move=> x y /anti_leq /(congr1 odd); rewrite !oddb. Qed.
 
-#[export] HB.instance Definition _ := @isOrder.Build bool_display bool
-   _ _ andb orb ltn_def andbE orbE anti leq_trans leq_total.
-#[export] HB.instance Definition _ := @hasBottom.Build _ bool false leq0n.
-#[export] HB.instance Definition _ := @hasTop.Build _ bool true leq_b1.
+#[export] HB.instance Definition _ := Preorder_isPOrder.Build bool_display bool
+   anti.
+
+Fact orKb b a : a && (a || b) = a.
+Proof. by rewrite orbC orKb. Qed.
+
+Fact andKb y x : x || x && y = x.
+Proof. by rewrite andbC andKb. Qed.
+
+Fact leEmeet x y : (x <= y) = (x && y == x).
+Proof. by case: x; case: y. Qed.
+
+#[export] HB.instance Definition _ := @POrder_Meet_isDistrLattice.Build
+  bool_display bool andb orb andbC orbC andbA orbA orKb andKb leEmeet andb_orl.
+#[export] HB.instance Definition _ := DistrLattice_isTotal.Build bool_display 
+  bool leq_total.
 #[export] HB.instance Definition _ :=
   @TBDistrLattice_hasComplement.Build _ bool negb orbN andbN.
 
-Lemma leEbool : le = (leq : rel bool). Proof. by []. Qed.
-Lemma ltEbool x y : (x < y) = (x < y)%N. Proof. by []. Qed.
 Lemma andEbool : meet = andb. Proof. by []. Qed.
 Lemma orEbool : meet = andb. Proof. by []. Qed.
 Lemma subEbool x y : x `\` y = x && ~~ y. Proof. by []. Qed.
@@ -5739,62 +5715,9 @@ HB.export BoolOrder.Exports.
 (* Definition of prod_display *)
 (******************************)
 
-Fact prod_display_unit (_ _ : unit) : unit. Proof. exact: tt. Qed.
-
-Definition prod_display (displ dispr : disp_t) : disp_t :=
-  Disp (prod_display_unit (d1 displ) (d1 dispr))
-       (prod_display_unit (d2 displ) (d2 dispr)).
-
-Fact seqprod_display (disp : disp_t) : disp_t. Proof. exact: disp. Qed.
-
 Module Import ProdSyntax.
 
-Notation "<=^p%O" := (@le (prod_display _ _) _) : function_scope.
-Notation ">=^p%O" := (@ge (prod_display _ _) _)  : function_scope.
-Notation ">=^p%O" := (@ge (prod_display _ _) _)  : function_scope.
-Notation "<^p%O" := (@lt (prod_display _ _) _) : function_scope.
-Notation ">^p%O" := (@gt (prod_display _ _) _) : function_scope.
-Notation "<?=^p%O" := (@leif (prod_display _ _) _) : function_scope.
-Notation ">=<^p%O" := (@comparable (prod_display _ _) _) : function_scope.
-Notation "><^p%O" := (fun x y => ~~ (@comparable (prod_display _ _) _ x y)) :
-  function_scope.
-
-Notation "<=^p y" := (>=^p%O y) : order_scope.
-Notation "<=^p y :> T" := (<=^p (y : T)) (only parsing) : order_scope.
-Notation ">=^p y"  := (<=^p%O y) : order_scope.
-Notation ">=^p y :> T" := (>=^p (y : T)) (only parsing) : order_scope.
-
-Notation "<^p y" := (>^p%O y) : order_scope.
-Notation "<^p y :> T" := (<^p (y : T)) (only parsing) : order_scope.
-Notation ">^p y" := (<^p%O y) : order_scope.
-Notation ">^p y :> T" := (>^p (y : T)) (only parsing) : order_scope.
-
-Notation "x <=^p y" := (<=^p%O x y) : order_scope.
-Notation "x <=^p y :> T" := ((x : T) <=^p (y : T)) (only parsing) : order_scope.
-Notation "x >=^p y" := (y <=^p x) (only parsing) : order_scope.
-Notation "x >=^p y :> T" := ((x : T) >=^p (y : T)) (only parsing) : order_scope.
-
-Notation "x <^p y"  := (<^p%O x y) : order_scope.
-Notation "x <^p y :> T" := ((x : T) <^p (y : T)) (only parsing) : order_scope.
-Notation "x >^p y"  := (y <^p x) (only parsing) : order_scope.
-Notation "x >^p y :> T" := ((x : T) >^p (y : T)) (only parsing) : order_scope.
-
-Notation "x <=^p y <=^p z" := ((x <=^p y) && (y <=^p z)) : order_scope.
-Notation "x <^p y <=^p z" := ((x <^p y) && (y <=^p z)) : order_scope.
-Notation "x <=^p y <^p z" := ((x <=^p y) && (y <^p z)) : order_scope.
-Notation "x <^p y <^p z" := ((x <^p y) && (y <^p z)) : order_scope.
-
-Notation "x <=^p y ?= 'iff' C" := (<?=^p%O x y C) : order_scope.
-Notation "x <=^p y ?= 'iff' C :> T" := ((x : T) <=^p (y : T) ?= iff C)
-  (only parsing) : order_scope.
-
-Notation ">=<^p y" := [pred x | >=<^p%O x y] : order_scope.
-Notation ">=<^p y :> T" := (>=<^p (y : T)) (only parsing) : order_scope.
-Notation "x >=<^p y" := (>=<^p%O x y) : order_scope.
-
-Notation "><^p y" := [pred x | ~~ (>=<^p%O x y)] : order_scope.
-Notation "><^p y :> T" := (><^p (y : T)) (only parsing) : order_scope.
-Notation "x ><^p y" := (~~ (><^p%O x y)) : order_scope.
+Export ProdSyntax.
 
 (* The following Local Notations are here to define the \join^p_ and \meet^p_ *)
 (* notations later. Do not remove them.                                       *)
@@ -5860,52 +5783,7 @@ End ProdSyntax.
 
 Module Import SeqProdSyntax.
 
-Notation "<=^sp%O" := (@le (seqprod_display _) _) : function_scope.
-Notation ">=^sp%O" := (@ge (seqprod_display _) _)  : function_scope.
-Notation ">=^sp%O" := (@ge (seqprod_display _) _)  : function_scope.
-Notation "<^sp%O" := (@lt (seqprod_display _) _) : function_scope.
-Notation ">^sp%O" := (@gt (seqprod_display _) _) : function_scope.
-Notation "<?=^sp%O" := (@leif (seqprod_display _) _) : function_scope.
-Notation ">=<^sp%O" := (@comparable (seqprod_display _) _) : function_scope.
-Notation "><^sp%O" := (fun x y => ~~ (@comparable (seqprod_display _) _ x y)) :
-  function_scope.
-
-Notation "<=^sp y" := (>=^sp%O y) : order_scope.
-Notation "<=^sp y :> T" := (<=^sp (y : T)) (only parsing) : order_scope.
-Notation ">=^sp y"  := (<=^sp%O y) : order_scope.
-Notation ">=^sp y :> T" := (>=^sp (y : T)) (only parsing) : order_scope.
-
-Notation "<^sp y" := (>^sp%O y) : order_scope.
-Notation "<^sp y :> T" := (<^sp (y : T)) (only parsing) : order_scope.
-Notation ">^sp y" := (<^sp%O y) : order_scope.
-Notation ">^sp y :> T" := (>^sp (y : T)) (only parsing) : order_scope.
-
-Notation "x <=^sp y" := (<=^sp%O x y) : order_scope.
-Notation "x <=^sp y :> T" := ((x : T) <=^sp (y : T)) (only parsing) : order_scope.
-Notation "x >=^sp y" := (y <=^sp x) (only parsing) : order_scope.
-Notation "x >=^sp y :> T" := ((x : T) >=^sp (y : T)) (only parsing) : order_scope.
-
-Notation "x <^sp y"  := (<^sp%O x y) : order_scope.
-Notation "x <^sp y :> T" := ((x : T) <^sp (y : T)) (only parsing) : order_scope.
-Notation "x >^sp y"  := (y <^sp x) (only parsing) : order_scope.
-Notation "x >^sp y :> T" := ((x : T) >^sp (y : T)) (only parsing) : order_scope.
-
-Notation "x <=^sp y <=^sp z" := ((x <=^sp y) && (y <=^sp z)) : order_scope.
-Notation "x <^sp y <=^sp z" := ((x <^sp y) && (y <=^sp z)) : order_scope.
-Notation "x <=^sp y <^sp z" := ((x <=^sp y) && (y <^sp z)) : order_scope.
-Notation "x <^sp y <^sp z" := ((x <^sp y) && (y <^sp z)) : order_scope.
-
-Notation "x <=^sp y ?= 'iff' C" := (<?=^sp%O x y C) : order_scope.
-Notation "x <=^sp y ?= 'iff' C :> T" := ((x : T) <=^sp (y : T) ?= iff C)
-  (only parsing) : order_scope.
-
-Notation ">=<^sp y" := [pred x | >=<^sp%O x y] : order_scope.
-Notation ">=<^sp y :> T" := (>=<^sp (y : T)) (only parsing) : order_scope.
-Notation "x >=<^sp y" := (>=<^sp%O x y) : order_scope.
-
-Notation "><^sp y" := [pred x | ~~ (>=<^sp%O x y)] : order_scope.
-Notation "><^sp y :> T" := (><^sp (y : T)) (only parsing) : order_scope.
-Notation "x ><^sp y" := (~~ (><^sp%O x y)) : order_scope.
+Export SeqProdSyntax.
 
 (* The following Local Notations are here to define the \join^sp_ and         *)
 (* \meet^sp_ notations later. Do not remove them.                             *)
@@ -5969,62 +5847,9 @@ Notation "\meet^sp_ ( i 'in' A ) F" :=
 
 End SeqProdSyntax.
 
-(******************************)
-(* Definition of lexi_display *)
-(******************************)
-
-Fact lexi_display (disp _ : disp_t) : disp_t. Proof. exact: disp. Qed.
-
-Fact seqlexi_display (disp : disp_t) : disp_t. Proof. exact: disp. Qed.
-
 Module Import LexiSyntax.
 
-Notation "<=^l%O" := (@le (lexi_display _ _) _) : function_scope.
-Notation ">=^l%O" := (@ge (lexi_display _ _) _) : function_scope.
-Notation ">=^l%O" := (@ge (lexi_display _ _) _) : function_scope.
-Notation "<^l%O" := (@lt (lexi_display _ _) _) : function_scope.
-Notation ">^l%O" := (@gt (lexi_display _ _) _) : function_scope.
-Notation "<?=^l%O" := (@leif (lexi_display _ _) _) : function_scope.
-Notation ">=<^l%O" := (@comparable (lexi_display _ _) _) : function_scope.
-Notation "><^l%O" := (fun x y => ~~ (@comparable (lexi_display _ _) _ x y)) :
-  function_scope.
-
-Notation "<=^l y" := (>=^l%O y) : order_scope.
-Notation "<=^l y :> T" := (<=^l (y : T)) (only parsing) : order_scope.
-Notation ">=^l y"  := (<=^l%O y) : order_scope.
-Notation ">=^l y :> T" := (>=^l (y : T)) (only parsing) : order_scope.
-
-Notation "<^l y" := (>^l%O y) : order_scope.
-Notation "<^l y :> T" := (<^l (y : T)) (only parsing) : order_scope.
-Notation ">^l y" := (<^l%O y) : order_scope.
-Notation ">^l y :> T" := (>^l (y : T)) (only parsing) : order_scope.
-
-Notation "x <=^l y" := (<=^l%O x y) : order_scope.
-Notation "x <=^l y :> T" := ((x : T) <=^l (y : T)) (only parsing) : order_scope.
-Notation "x >=^l y" := (y <=^l x) (only parsing) : order_scope.
-Notation "x >=^l y :> T" := ((x : T) >=^l (y : T)) (only parsing) : order_scope.
-
-Notation "x <^l y"  := (<^l%O x y) : order_scope.
-Notation "x <^l y :> T" := ((x : T) <^l (y : T)) (only parsing) : order_scope.
-Notation "x >^l y"  := (y <^l x) (only parsing) : order_scope.
-Notation "x >^l y :> T" := ((x : T) >^l (y : T)) (only parsing) : order_scope.
-
-Notation "x <=^l y <=^l z" := ((x <=^l y) && (y <=^l z)) : order_scope.
-Notation "x <^l y <=^l z" := ((x <^l y) && (y <=^l z)) : order_scope.
-Notation "x <=^l y <^l z" := ((x <=^l y) && (y <^l z)) : order_scope.
-Notation "x <^l y <^l z" := ((x <^l y) && (y <^l z)) : order_scope.
-
-Notation "x <=^l y ?= 'iff' C" := (<?=^l%O x y C) : order_scope.
-Notation "x <=^l y ?= 'iff' C :> T" := ((x : T) <=^l (y : T) ?= iff C)
-  (only parsing) : order_scope.
-
-Notation ">=<^l y" := [pred x | >=<^l%O x y] : order_scope.
-Notation ">=<^l y :> T" := (>=<^l (y : T)) (only parsing) : order_scope.
-Notation "x >=<^l y" := (>=<^l%O x y) : order_scope.
-
-Notation "><^l y" := [pred x | ~~ (>=<^l%O x y)] : order_scope.
-Notation "><^l y :> T" := (><^l (y : T)) (only parsing) : order_scope.
-Notation "x ><^l y" := (~~ (><^l%O x y)) : order_scope.
+Export LexiSyntax.
 
 Notation meetlexi := (@meet (lexi_display _ _) _).
 Notation joinlexi := (@join (lexi_display _ _) _).
@@ -6036,52 +5861,7 @@ End LexiSyntax.
 
 Module Import SeqLexiSyntax.
 
-Notation "<=^l%O" := (@le (seqlexi_display _ _) _) : function_scope.
-Notation ">=^l%O" := (@ge (seqlexi_display _ _) _) : function_scope.
-Notation ">=^l%O" := (@ge (seqlexi_display _ _) _) : function_scope.
-Notation "<^l%O" := (@lt (seqlexi_display _ _) _) : function_scope.
-Notation ">^l%O" := (@gt (seqlexi_display _ _) _) : function_scope.
-Notation "<?=^l%O" := (@leif (seqlexi_display _ _) _) : function_scope.
-Notation ">=<^l%O" := (@comparable (seqlexi_display _ _) _) : function_scope.
-Notation "><^l%O" := (fun x y => ~~ (@comparable (seqlexi_display _ _) _ x y)) :
-  function_scope.
-
-Notation "<=^l y" := (>=^l%O y) : order_scope.
-Notation "<=^l y :> T" := (<=^l (y : T)) (only parsing) : order_scope.
-Notation ">=^l y"  := (<=^l%O y) : order_scope.
-Notation ">=^l y :> T" := (>=^l (y : T)) (only parsing) : order_scope.
-
-Notation "<^l y" := (>^l%O y) : order_scope.
-Notation "<^l y :> T" := (<^l (y : T)) (only parsing) : order_scope.
-Notation ">^l y" := (<^l%O y) : order_scope.
-Notation ">^l y :> T" := (>^l (y : T)) (only parsing) : order_scope.
-
-Notation "x <=^l y" := (<=^l%O x y) : order_scope.
-Notation "x <=^l y :> T" := ((x : T) <=^l (y : T)) (only parsing) : order_scope.
-Notation "x >=^l y" := (y <=^l x) (only parsing) : order_scope.
-Notation "x >=^l y :> T" := ((x : T) >=^l (y : T)) (only parsing) : order_scope.
-
-Notation "x <^l y"  := (<^l%O x y) : order_scope.
-Notation "x <^l y :> T" := ((x : T) <^l (y : T)) (only parsing) : order_scope.
-Notation "x >^l y"  := (y <^l x) (only parsing) : order_scope.
-Notation "x >^l y :> T" := ((x : T) >^l (y : T)) (only parsing) : order_scope.
-
-Notation "x <=^l y <=^l z" := ((x <=^l y) && (y <=^l z)) : order_scope.
-Notation "x <^l y <=^l z" := ((x <^l y) && (y <=^l z)) : order_scope.
-Notation "x <=^l y <^l z" := ((x <=^l y) && (y <^l z)) : order_scope.
-Notation "x <^l y <^l z" := ((x <^l y) && (y <^l z)) : order_scope.
-
-Notation "x <=^l y ?= 'iff' C" := (<?=^l%O x y C) : order_scope.
-Notation "x <=^l y ?= 'iff' C :> T" := ((x : T) <=^l (y : T) ?= iff C)
-  (only parsing) : order_scope.
-
-Notation ">=<^l y" := [pred x | >=<^l%O x y] : order_scope.
-Notation ">=<^l y :> T" := (>=<^l (y : T)) (only parsing) : order_scope.
-Notation "x >=<^l y" := (>=<^l%O x y) : order_scope.
-
-Notation "><^l y" := [pred x | ~~ (>=<^l%O x y)] : order_scope.
-Notation "><^l y :> T" := (><^l (y : T)) (only parsing) : order_scope.
-Notation "x ><^l y" := (~~ (><^l%O x y)) : order_scope.
+Export SeqLexiSyntax.
 
 Notation meetlexi := (@meet (seqlexi_display _ _) _).
 Notation joinlexi := (@join (seqlexi_display _ _) _).
@@ -6098,78 +5878,9 @@ End SeqLexiSyntax.
 
 Module ProdOrder.
 
+Export ProdOrder.
+
 Local Open Scope type_scope. (* FIXME *)
-
-Definition type (disp : disp_t) (T T' : Type) := T * T'.
-Definition type_
-  (disp1 disp2 : disp_t) (T : preorderType disp1) (T' : preorderType disp2) :=
-  type (prod_display disp1 disp2) T T'.
-
-Section Basis.
-Context {disp : disp_t}.
-
-Local Notation "T * T'" := (type disp T T') : type_scope.
-
-#[export] HB.instance Definition _ (T T' : eqType) := Equality.on (T * T').
-#[export] HB.instance Definition _ (T T' : choiceType) := Choice.on (T * T').
-#[export] HB.instance Definition _ (T T' : countType) := Countable.on (T * T').
-#[export] HB.instance Definition _ (T T' : finType) := Finite.on (T * T').
-
-End Basis.
-
-Section Preorder.
-Context (disp1 disp2 : disp_t).
-Context (T1 : preorderType disp1) (T2 : preorderType disp2).
-Implicit Types (x y : T1 * T2).
-
-Let le x y := (x.1 <= y.1) && (x.2 <= y.2).
-
-Let lt x y := (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
-
-Fact lt_def x y : lt x y = le x y && ~~ le y x.
-Proof.
-rewrite /lt /le !lt_leAnge -andbA -andb_orr.
-by rewrite [~~ _ && _]andbC -andb_orr andbA negb_and.
-Qed.
-
-Fact refl : reflexive le. Proof. by move=> ?; rewrite /le !lexx. Qed.
-
-Fact trans : transitive le.
-Proof.
-rewrite /le => y x z /andP [] hxy ? /andP [] /(le_trans hxy) ->.
-by apply: le_trans.
-Qed.
-
-End Preorder.
-
-Section Preorder.
-Context (disp1 disp2 disp3 : disp_t).
-Context (T1 : preorderType disp1) (T2 : preorderType disp2).
-Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
-Implicit Types (x y : T1 * T2).
-
-Let T1' : Type := T1.
-HB.instance Definition _ := Preorder.on T1'.
-Let T2' : Type := T2.
-HB.instance Definition _ := Preorder.on T2'.
-
-Definition le x y := (x.1 <= y.1) && (x.2 <= y.2).
-
-Definition lt x y := (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
-
-#[export]
-HB.instance Definition _ := @isDuallyPreorder.Build disp3 (T1 * T2) le lt
-  (@lt_def _ _ T1' T2') (@lt_def _ _ T1^d T2^d)
-  (@refl _ _ T1' T2') (@refl _ _ T1^d T2^d)
-  (@trans _ _ T1' T2') (@trans _ _ T1^d T2^d).
-
-Lemma leEprod x y : (x <= y) = (x.1 <= y.1) && (x.2 <= y.2). Proof. by []. Qed.
-
-Lemma le_pair (x1 y1 : T1) (x2 y2 : T2) :
-  (x1, x2) <= (y1, y2) :> T1 * T2 = (x1 <= y1) && (x2 <= y2).
-Proof. by []. Qed.
-
-End Preorder.
 
 Section POrder.
 Context (disp1 disp2 disp3 : disp_t).
@@ -6207,55 +5918,6 @@ Lemma lt_pair (x1 y1 : T1) (x2 y2 : T2) : (x1, x2) < (y1, y2) :> T1 * T2 =
 Proof. by rewrite ltEprod negb_and. Qed.
 
 End POrder.
-
-Section BPreorder.
-Context (disp1 disp2 : disp_t).
-Context (T1 : bPreorderType disp1) (T2 : bPreorderType disp2).
-Local Notation "T1 * T2" := (type (Disp tt tt) T1 T2) : type_scope.
-Implicit Types (x : T1 * T2).
-
-Fact le0x x : (\bot, \bot) <= x :> T1 * T2.
-Proof. by rewrite leEprod !le0x. Qed.
-
-End BPreorder.
-
-Section BPreorder.
-Context (disp1 disp2 disp3 : disp_t).
-Context (T1 : bPreorderType disp1) (T2 : bPreorderType disp2).
-Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
-
-Let T1' : Type := T1.
-HB.instance Definition _ := BPreorder.on T1'.
-Let T2' : Type := T2.
-HB.instance Definition _ := BPreorder.on T2'.
-
-#[export]
-HB.instance Definition _ :=
-  @hasBottom.Build disp3 (T1 * T2) (\bot, \bot) (@le0x _ _ T1' T2').
-
-Lemma botEprod : \bot = (\bot, \bot) :> T1 * T2. Proof. by []. Qed.
-
-End BPreorder.
-
-Section TPreorder.
-Context (disp1 disp2 disp3 : disp_t).
-Context (T1 : tPreorderType disp1) (T2 : tPreorderType disp2).
-Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
-
-#[export]
-HB.instance Definition _ :=
-  @hasTop.Build disp3 (T1 * T2) (\top, \top) (@le0x _ _ T1^d T2^d).
-
-Lemma topEprod : \top = (\top, \top) :> T1 * T2. Proof. by []. Qed.
-
-End TPreorder.
-
-(* FIXME: use HB.saturate *)
-#[export]
-HB.instance Definition _ (disp1 disp2 disp3 : disp_t)
-  (T1 : tbPreorderType disp1) (T2 : tbPreorderType disp2) :=
-  Preorder.on (type disp3 T1 T2).
-(* /FIXME *)
 
 Section MeetSemilattice.
 Context (disp1 disp2 : disp_t).
@@ -6525,20 +6187,8 @@ Section FinOrder.
 Context (disp1 disp2 disp3 : disp_t).
 
 #[export]
-HB.instance Definition _ (T1 : finPreorderType disp1)
-  (T2 : finPreorderType disp2) := Preorder.on (type disp3 T1 T2).
-#[export]
 HB.instance Definition _ (T1 : finPOrderType disp1)
   (T2 : finPOrderType disp2) := POrder.on (type disp3 T1 T2).
-#[export]
-HB.instance Definition _ (T1 : finBPreorderType disp1)
-  (T2 : finBPreorderType disp2) := Preorder.on (type disp3 T1 T2).
-#[export]
-HB.instance Definition _ (T1 : finTPreorderType disp1)
-  (T2 : finTPreorderType disp2) := Preorder.on (type disp3 T1 T2).
-#[export]
-HB.instance Definition _ (T1 : finTBPreorderType disp1)
-  (T2 : finTBPreorderType disp2) := Preorder.on (type disp3 T1 T2).
 #[export]
 HB.instance Definition _ (T1 : finBPOrderType disp1)
   (T2 : finBPOrderType disp2) := POrder.on (type disp3 T1 T2).
@@ -6584,18 +6234,10 @@ End FinOrder.
 
 Module Exports.
 HB.reexport ProdOrder.
-Notation "T *prod[ d ] T'" := (type d T T')
-  (at level 70, d at next level, format "T  *prod[ d ]  T'") : type_scope.
-Notation "T *p T'" := (type_ T T')
-  (at level 70, format "T  *p  T'") : type_scope.
-Definition leEprod := @leEprod.
 Definition ltEprod := @ltEprod.
-Definition le_pair := @le_pair.
 Definition lt_pair := @lt_pair.
 Definition meetEprod := @meetEprod.
 Definition joinEprod := @joinEprod.
-Definition botEprod := @botEprod.
-Definition topEprod := @topEprod.
 Definition rcomplEprod := @rcomplEprod.
 Definition diffEprod := @diffEprod.
 Definition codiffEprod := @codiffEprod.
@@ -6605,6 +6247,9 @@ End ProdOrder.
 HB.export ProdOrder.Exports.
 
 Module DefaultProdOrder.
+
+Export DefaultProdOrder.
+
 Section DefaultProdOrder.
 Context {disp1 disp2 : disp_t}.
 
@@ -6612,16 +6257,8 @@ Let prod T1 T2 := T1 *prod[prod_display disp1 disp2] T2.
 
 (* FIXME: Scopes of arguments are broken in several places.                   *)
 (* FIXME: Declaring a bunch of copies is still a bit painful.                 *)
-HB.instance Definition _ (T : preorderType disp1) (T' : preorderType disp2) :=
-  Preorder.copy (T * T')%type (T *p T').
 HB.instance Definition _ (T : porderType disp1) (T' : porderType disp2) :=
   POrder.copy (T * T')%type (T *p T').
-HB.instance Definition _ (T1 : bPreorderType disp1) (T2 : bPreorderType disp2) :=
-  BPreorder.copy (T1 * T2)%type (prod T1 T2).
-HB.instance Definition _ (T1 : tPreorderType disp1) (T2 : tPreorderType disp2) :=
-  TPreorder.copy (T1 * T2)%type (prod T1 T2).
-HB.instance Definition _ (T1 : tbPreorderType disp1) (T2 : tbPreorderType disp2) :=
-  TBPreorder.copy (T1 * T2)%type (prod T1 T2).
 HB.instance Definition _ (T : latticeType disp1) (T' : latticeType disp2) :=
   Lattice.copy (T * T')%type (T *p T').
 HB.instance Definition _ (T : bLatticeType disp1) (T' : bLatticeType disp2) :=
@@ -6686,20 +6323,8 @@ HB.instance Definition _
   (T1 : ctbDistrLatticeType disp1) (T2 : ctbDistrLatticeType disp2) :=
   CTBDistrLattice.copy (T1 * T2)%type (prod T1 T2).
 HB.instance Definition _
-  (T1 : finPreorderType disp1) (T2 : finPreorderType disp2) :=
-  FinPreorder.copy (T1 * T2)%type (prod T1 T2).
-HB.instance Definition _
   (T1 : finPOrderType disp1) (T2 : finPOrderType disp2) :=
   FinPOrder.copy (T1 * T2)%type (prod T1 T2).
-HB.instance Definition _
-  (T1 : finBPreorderType disp1) (T2 : finBPreorderType disp2) :=
-  FinBPreorder.copy (T1 * T2)%type (prod T1 T2).
-HB.instance Definition _
-  (T1 : finTPreorderType disp1) (T2 : finTPreorderType disp2) :=
-  FinTPreorder.copy (T1 * T2)%type (prod T1 T2).
-HB.instance Definition _
-  (T1 : finTBPreorderType disp1) (T2 : finTBPreorderType disp2) :=
-  FinTBPreorder.copy (T1 * T2)%type (prod T1 T2).
 HB.instance Definition _
   (T1 : finBPOrderType disp1) (T2 : finBPOrderType disp2) :=
   FinBPOrder.copy (T1 * T2)%type (prod T1 T2).
@@ -6916,89 +6541,9 @@ HB.export SigmaOrder.Exports.
 
 Module ProdLexiOrder.
 
+Export ProdLexiOrder.
+
 Local Open Scope type_scope. (* FIXME *)
-
-Definition type (disp : disp_t) (T T' : Type) := T * T'.
-Definition type_
-  (disp1 disp2 : disp_t) (T : preorderType disp1) (T' : preorderType disp2) :=
-  type (lexi_display disp1 disp2) T T'.
-
-Section Basis.
-Context {disp : disp_t}.
-
-Local Notation "T * T'" := (type disp T T') : type_scope.
-
-#[export] HB.instance Definition _ (T T' : eqType) := Equality.on (T * T').
-#[export] HB.instance Definition _ (T T' : choiceType) := Choice.on (T * T').
-#[export] HB.instance Definition _ (T T' : countType) := Countable.on (T * T').
-#[export] HB.instance Definition _ (T T' : finType) := Finite.on (T * T').
-
-End Basis.
-
-Section Preorder.
-Context (disp1 disp2 : disp_t).
-Context (T1 : preorderType disp1) (T2 : preorderType disp2).
-Implicit Types (x y : T1 * T2).
-
-Let le x y := (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 <= y.2)).
-Let lt x y := (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 < y.2)).
-
-Fact refl : reflexive le.
-Proof. by move=> ?; rewrite /le !lexx. Qed.
-
-Fact trans : transitive le.
-Proof.
-move=> y x z /andP [hxy /implyP hxy'] /andP [hyz /implyP hyz'].
-rewrite /le (le_trans hxy) //=; apply/implyP => hzx.
-by apply/le_trans/hxy'/(le_trans hyz): (hyz' (le_trans hzx hxy)).
-Qed.
-
-Fact lt_le_def x y : lt x y = le x y && ~~ le y x.
-Proof.
-rewrite /lt /le; case: x y => [x1 x2] [y1 y2]/=.
-case/boolP: (x1 <= y1); case/boolP: (y1 <= x1) => //= _ _.
-exact/lt_le_def.
-Qed.
-
-End Preorder.
-
-Section Preorder.
-Context (disp1 disp2 disp3 : disp_t).
-Context (T1 : preorderType disp1) (T2 : preorderType disp2).
-Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
-Implicit Types (x y : T1 * T2).
-
-Let T1' : Type := T1.
-HB.instance Definition _ := Preorder.on T1'.
-Let T2' : Type := T2.
-HB.instance Definition _ := Preorder.on T2'.
-
-Definition le x y := (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 <= y.2)).
-Definition lt x y := (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 < y.2)).
-
-#[export]
-HB.instance Definition _ := @isDuallyPreorder.Build disp3 (T1 * T2) le lt
-  (@lt_le_def _ _ T1' T2') (@lt_le_def _ _ T1^d T2^d)
-  (@refl _ _ T1' T2') (@refl _ _ T1^d T2^d)
-  (@trans _ _ T1' T2') (@trans _ _ T1^d T2^d).
-
-Lemma leEprodlexi x y :
-  (x <= y) = (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 <= y.2)).
-Proof. by []. Qed.
-
-Lemma ltEprodlexi x y :
-  (x < y) = (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 < y.2)).
-Proof. by []. Qed.
-
-Lemma lexi_pair (x1 y1 : T1) (x2 y2 : T2) :
-   (x1, x2) <= (y1, y2) :> T1 * T2 = (x1 <= y1) && ((x1 >= y1) ==> (x2 <= y2)).
-Proof. by []. Qed.
-
-Lemma ltxi_pair (x1 y1 : T1) (x2 y2 : T2) :
-   (x1, x2) < (y1, y2) :> T1 * T2 = (x1 <= y1) && ((x1 >= y1) ==> (x2 < y2)).
-Proof. by []. Qed.
-
-End Preorder.
 
 Section POrder.
 Context (disp1 disp2 disp3 : disp_t).
@@ -7029,55 +6574,6 @@ HB.instance Definition _ :=
 
 End POrder.
 
-Section BPreorder.
-Context (disp1 disp2 : disp_t).
-Context (T1 : bPreorderType disp1) (T2 : bPreorderType disp2).
-Local Notation "T1 * T2" := (type (Disp tt tt) T1 T2) : type_scope.
-Implicit Types (x : T1 * T2).
-
-Fact le0x x : (\bot, \bot) <= x :> T1 * T2.
-Proof. by rewrite leEprodlexi !le0x implybT. Qed.
-
-End BPreorder.
-
-Section BPreorder.
-Context (disp1 disp2 disp3 : disp_t).
-Context (T1 : bPreorderType disp1) (T2 : bPreorderType disp2).
-Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
-
-Let T1' : Type := T1.
-HB.instance Definition _ := BPreorder.on T1'.
-Let T2' : Type := T2.
-HB.instance Definition _ := BPreorder.on T2'.
-
-#[export]
-HB.instance Definition _ :=
-  @hasBottom.Build disp3 (T1 * T2) (\bot, \bot) (@le0x _ _ T1' T2').
-
-Lemma botEprodlexi : \bot = (\bot, \bot) :> T1 * T2. Proof. by []. Qed.
-
-End BPreorder.
-
-Section TPreorder.
-Context (disp1 disp2 disp3 : disp_t).
-Context (T1 : tPreorderType disp1) (T2 : tPreorderType disp2).
-Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
-
-#[export]
-HB.instance Definition _ :=
-  @hasTop.Build disp3 (T1 * T2) (\top, \top) (@le0x _ _ T1^d T2^d).
-
-Lemma topEprodlexi : \top = (\top, \top) :> T1 * T2. Proof. by []. Qed.
-
-End TPreorder.
-
-(* FIXME: use HB.saturate *)
-#[export]
-HB.instance Definition _ (disp1 disp2 disp3 : disp_t)
-  (T1 : tbPreorderType disp1) (T2 : tbPreorderType disp2) :=
-  Preorder.on (type disp3 T1 T2).
-(* /FIXME *)
-
 Section Total.
 Context (disp1 disp2 disp3 : disp_t).
 Context (T1 : orderType disp1) (T2 : orderType disp2).
@@ -7096,42 +6592,13 @@ HB.instance Definition _ := POrder_isTotal.Build _ (T1 * T2) total.
 
 End Total.
 
-Lemma sub_prod_lexi (disp1 disp2 disp3 disp4 : disp_t)
-  (T1 : preorderType disp1) (T2 : preorderType disp2) :
-  subrel (<=%O : rel (T1 *prod[disp3] T2)) (<=%O : rel (type disp4 T1 T2)).
-Proof.
-case=> [x1 x2] [y1 y2]; rewrite leEprod leEprodlexi /= => /andP[] -> ->.
-exact: implybT.
-Qed.
-
 (* FIXME: use HB.saturate *)
 Section ProdLexiOrder.
 Context (disp1 disp2 disp3 : disp_t).
 
 #[export]
-HB.instance Definition _ (T1 : bPreorderType disp1)
-  (T2 : bPreorderType disp2) := Preorder.on (type disp3 T1 T2).
-#[export]
-HB.instance Definition _ (T1 : tPreorderType disp1)
-  (T2 : tPreorderType disp2) := Preorder.on (type disp3 T1 T2).
-#[export]
-HB.instance Definition _ (T1 : tbPreorderType disp1)
-  (T2 : tbPreorderType disp2) := Preorder.on (type disp3 T1 T2).
-#[export]
-HB.instance Definition _ (T1 : finPreorderType disp1)
-  (T2 : finPreorderType disp2) := Preorder.on (type disp3 T1 T2).
-#[export]
 HB.instance Definition _ (T1 : finPOrderType disp1)
   (T2 : finPOrderType disp2) := POrder.on (type disp3 T1 T2).
-#[export]
-HB.instance Definition _ (T1 : finBPreorderType disp1)
-  (T2 : finBPreorderType disp2) := Preorder.on (type disp3 T1 T2).
-#[export]
-HB.instance Definition _ (T1 : finTPreorderType disp1)
-  (T2 : finTPreorderType disp2) := Preorder.on (type disp3 T1 T2).
-#[export]
-HB.instance Definition _ (T1 : finTBPreorderType disp1)
-  (T2 : finTBPreorderType disp2) := Preorder.on (type disp3 T1 T2).
 #[export]
 HB.instance Definition _ (T1 : finBPOrderType disp1)
   (T2 : finBPOrderType disp2) := POrder.on (type disp3 T1 T2).
@@ -7152,27 +6619,15 @@ End ProdLexiOrder.
 (* /FIXME *)
 
 Module Exports.
-
 HB.reexport ProdLexiOrder.
-
-Notation "T *lexi[ d ] T'" := (type d T T')
-  (at level 70, d at next level, format "T  *lexi[ d ]  T'") : type_scope.
-Notation "T *l T'" := (type_ T T')
-  (at level 70, format "T  *l  T'") : type_scope.
-
-Definition leEprodlexi := @leEprodlexi.
-Definition ltEprodlexi := @ltEprodlexi.
-Definition lexi_pair := @lexi_pair.
-Definition ltxi_pair := @ltxi_pair.
-Definition topEprodlexi := @topEprodlexi.
-Definition botEprodlexi := @botEprodlexi.
-Definition sub_prod_lexi := @sub_prod_lexi.
-
 End Exports.
 End ProdLexiOrder.
 HB.export ProdLexiOrder.Exports.
 
 Module DefaultProdLexiOrder.
+
+Export DefaultProdLexiOrder.
+
 Section DefaultProdLexiOrder.
 Context {disp1 disp2 : disp_t}.
 
@@ -7180,33 +6635,13 @@ Let prodlexi T1 T2 := T1 *lexi[lexi_display disp1 disp2] T2.
 
 (* FIXME: Scopes of arguments are broken in several places.                   *)
 (* FIXME: Declaring a bunch of copies is still a bit painful.                 *)
-HB.instance Definition _ (T1 : preorderType disp1) (T2 : preorderType disp2) :=
-  Preorder.copy (T1 * T2)%type (prodlexi T1 T2).
 HB.instance Definition _ (T1 : porderType disp1) (T2 : porderType disp2) :=
   POrder.copy (T1 * T2)%type (prodlexi T1 T2).
-HB.instance Definition _ (T1 : bPreorderType disp1) (T2 : bPreorderType disp2) :=
-  BPreorder.copy (T1 * T2)%type (prodlexi T1 T2).
-HB.instance Definition _ (T1 : tPreorderType disp1) (T2 : tPreorderType disp2) :=
-  TPreorder.copy (T1 * T2)%type (prodlexi T1 T2).
-HB.instance Definition _ (T1 : tbPreorderType disp1) (T2 : tbPreorderType disp2) :=
-  TBPreorder.copy (T1 * T2)%type (prodlexi T1 T2).
 HB.instance Definition _ (T1 : orderType disp1) (T2 : orderType disp2) :=
   Total.copy (T1 * T2)%type (prodlexi T1 T2).
 HB.instance Definition _
-  (T1 : finPreorderType disp1) (T2 : finPreorderType disp2) :=
-  FinPreorder.copy (T1 * T2)%type (prodlexi T1 T2).
-HB.instance Definition _
   (T1 : finPOrderType disp1) (T2 : finPOrderType disp2) :=
   FinPOrder.copy (T1 * T2)%type (prodlexi T1 T2).
-HB.instance Definition _
-  (T1 : finBPreorderType disp1) (T2 : finBPreorderType disp2) :=
-  FinBPreorder.copy (T1 * T2)%type (prodlexi T1 T2).
-HB.instance Definition _
-  (T1 : finTPreorderType disp1) (T2 : finTPreorderType disp2) :=
-  FinTPreorder.copy (T1 * T2)%type (prodlexi T1 T2).
-HB.instance Definition _
-  (T1 : finTBPreorderType disp1) (T2 : finTBPreorderType disp2) :=
-  FinTBPreorder.copy (T1 * T2)%type (prodlexi T1 T2).
 HB.instance Definition _
   (T1 : finBPOrderType disp1) (T2 : finBPOrderType disp2) :=
   FinBPOrder.copy (T1 * T2)%type (prodlexi T1 T2).
@@ -7233,64 +6668,20 @@ End DefaultProdLexiOrder.
 (*****************************************)
 
 Module SeqProdOrder.
-Section SeqProdOrder.
 
-Definition type (disp : disp_t) T := seq T.
-Definition type_ (disp : disp_t) (T : porderType disp) :=
-  type (seqprod_display disp) T.
+Export SeqProdOrder.
+
+Section SeqProdOrder.
 
 Context {disp disp' : disp_t}.
 
 Local Notation seq := (type disp').
 
-#[export] HB.instance Definition _ (T : eqType) := Equality.on (seq T).
-#[export] HB.instance Definition _ (T : choiceType) := Choice.on (seq T).
-#[export] HB.instance Definition _ (T : countType) := Countable.on (seq T).
-
-Section Preorder.
-Context (T : preorderType disp).
-Implicit Types (s : seq T).
-
-Fixpoint le s1 s2 := if s1 isn't x1 :: s1' then true else
-                     if s2 isn't x2 :: s2' then false else
-                     (x1 <= x2) && le s1' s2'.
-
-Fact refl : reflexive le. Proof. by elim=> //= ? ? ?; rewrite !lexx. Qed.
-
-Fact trans : transitive le.
-Proof.
-elim=> [|y ys ihs] [|x xs] [|z zs] //= /andP[xy xys] /andP[yz yzs].
-by rewrite (le_trans xy)// ihs.
-Qed.
-
-#[export]
-HB.instance Definition _ := isPreorder.Build disp' (seq T) (rrefl _) refl trans.
-
-Lemma leEseq s1 s2 : s1 <= s2 = if s1 isn't x1 :: s1' then true else
-                                if s2 isn't x2 :: s2' then false else
-                                (x1 <= x2) && (s1' <= s2' :> seq _).
-Proof. by case: s1. Qed.
-
-Lemma le0s s : [::] <= s :> seq _. Proof. by []. Qed.
-
-Lemma les0 s : s <= [::] = (s == [::]). Proof. by rewrite leEseq. Qed.
-
-Lemma le_cons x1 s1 x2 s2 :
-   x1 :: s1 <= x2 :: s2 :> seq _ = (x1 <= x2) && (s1 <= s2).
-Proof. by []. Qed.
-
-#[export]
-HB.instance Definition _ := hasBottom.Build _ (seq T) le0s.
-
-Lemma botEseq : \bot = [::] :> seq T.
-Proof. by []. Qed.
-End Preorder.
-
 Section POrder.
 Variable T : porderType disp.
 Implicit Types s : seq T.
 
-Fact anti : antisymmetric (@le T).
+Fact anti : antisymmetric (@le disp disp' T).
 Proof.
 by elim=> [|x s ihs] [|y s'] //=; rewrite andbACA => /andP[/le_anti-> /ihs->].
 Qed.
@@ -7382,14 +6773,6 @@ Module Exports.
 
 HB.reexport SeqProdOrder.
 
-Notation seqprod_with := type.
-Notation seqprod := type_.
-
-Definition leEseq := @leEseq.
-Definition le0s := @le0s.
-Definition les0 := @les0.
-Definition le_cons := @le_cons.
-Definition botEseq := @botEseq.
 Definition meetEseq := @meetEseq.
 Definition meet_cons := @meet_cons.
 Definition joinEseq := @joinEseq.
@@ -7399,15 +6782,12 @@ End SeqProdOrder.
 HB.export SeqProdOrder.Exports.
 
 Module DefaultSeqProdOrder.
+
+Export DefaultSeqProdOrder.
+
 Section DefaultSeqProdOrder.
 Context {disp : disp_t}.
 
-Notation seqprod := (seqprod_with (seqprod_display disp)).
-
-HB.instance Definition _ (T : preorderType disp) :=
-  Preorder.copy (seq T) (seqprod T).
-HB.instance Definition _ (T : porderType disp) :=
-  BPreorder.copy (seq T) (seqprod T).
 HB.instance Definition _ (T : porderType disp) :=
   POrder.copy (seq T) (seqprod T).
 HB.instance Definition _ (T : meetSemilatticeType disp) :=
@@ -7428,98 +6808,20 @@ End DefaultSeqProdOrder.
 (*********************************************)
 
 Module SeqLexiOrder.
-Section SeqLexiOrder.
 
-Definition type (disp : disp_t) T := seq T.
-Definition type_ (disp : disp_t) (T : preorderType disp) :=
-  type (seqlexi_display disp) T.
+Export SeqLexiOrder.
+
+Section SeqLexiOrder.
 
 Context {disp disp' : disp_t}.
 
 Local Notation seq := (type disp').
 
-#[export] HB.instance Definition _ (T : eqType) := Equality.on (seq T).
-#[export] HB.instance Definition _ (T : choiceType) := Choice.on (seq T).
-#[export] HB.instance Definition _ (T : countType) := Countable.on (seq T).
-
-Section Preorder.
-Context (T : preorderType disp).
-Implicit Types (s : seq T).
-
-Fixpoint le s1 s2 := if s1 isn't x1 :: s1' then true else
-                     if s2 isn't x2 :: s2' then false else
-                       (x1 <= x2) && ((x1 >= x2) ==> le s1' s2').
-Fixpoint lt s1 s2 := if s2 isn't x2 :: s2' then false else
-                     if s1 isn't x1 :: s1' then true else
-                       (x1 <= x2) && ((x1 >= x2) ==> lt s1' s2').
-
-Fact refl: reflexive le.
-Proof. by elim => [|x s ih] //=; rewrite lexx. Qed.
-
-Fact trans: transitive le.
-Proof.
-elim=> [|y sy ihs] [|x sx] [|z sz] //= /andP[] xy /implyP yx /andP[] yz /implyP zy /=.
-rewrite (le_trans xy yz)/=; apply/implyP => zx.
-apply/ihs; first exact/yx/(le_trans yz zx).
-exact/zy/(le_trans zx xy).
-Qed.
-
-Lemma lt_le_def s1 s2 : lt  s1 s2 = le s1 s2 && ~~ le s2 s1.
-Proof.
-elim: s1 s2 => [|x s1 ihs1] [|y s2]//=; rewrite ihs1.
-by case: (x <= y); case (y <= x).
-Qed.
-
-#[export]
-HB.instance Definition _ := isPreorder.Build disp' (seq T) lt_le_def refl trans.
-
-Lemma leEseqlexi s1 s2 :
-   s1 <= s2 = if s1 isn't x1 :: s1' then true else
-              if s2 isn't x2 :: s2' then false else
-              (x1 <= x2) && ((x1 >= x2) ==> (s1' <= s2' :> seq T)).
-Proof. by case: s1. Qed.
-
-Lemma ltEseqlexi s1 s2 :
-   s1 < s2 = if s2 isn't x2 :: s2' then false else
-              if s1 isn't x1 :: s1' then true else
-              (x1 <= x2) && ((x1 >= x2) ==> (s1' < s2' :> seq T)).
-Proof. by case: s1. Qed.
-
-Lemma lexi0s s : [::] <= s :> seq T. Proof. by []. Qed.
-
-Lemma lexis0 s : s <= [::] = (s == [::]). Proof. by rewrite leEseqlexi. Qed.
-
-Lemma ltxi0s s : ([::] < s :> seq T) = (s != [::]). Proof. by case: s. Qed.
-
-Lemma ltxis0 s : s < [::] = false. Proof. by rewrite ltEseqlexi. Qed.
-
-Lemma lexi_cons x1 s1 x2 s2 :
-  x1 :: s1 <= x2 :: s2 :> seq T = (x1 <= x2) && ((x1 >= x2) ==> (s1 <= s2)).
-Proof. by []. Qed.
-
-Lemma ltxi_cons x1 s1 x2 s2 :
-  x1 :: s1 < x2 :: s2 :> seq T = (x1 <= x2) && ((x1 >= x2) ==> (s1 < s2)).
-Proof. by []. Qed.
-
-Lemma lexi_lehead x s1 y s2 : x :: s1 <= y :: s2 :> seq T -> x <= y.
-Proof. by rewrite lexi_cons => /andP[]. Qed.
-
-Lemma ltxi_lehead x s1 y s2 : x :: s1 < y :: s2 :> seq T -> x <= y.
-Proof. by rewrite ltxi_cons => /andP[]. Qed.
-
-Lemma eqhead_lexiE (x : T) s1 s2 : (x :: s1 <= x :: s2 :> seq _) = (s1 <= s2).
-Proof. by rewrite lexi_cons lexx. Qed.
-
-Lemma eqhead_ltxiE (x : T) s1 s2 : (x :: s1 < x :: s2 :> seq _) = (s1 < s2).
-Proof. by rewrite ltxi_cons lexx. Qed.
-
-End Preorder.
-
 Section POrder.
 Variable T : porderType disp.
 Implicit Types s : seq T.
 
-Fact anti: antisymmetric (@le T).
+Fact anti: antisymmetric (@le disp disp' T).
 Proof.
 move=> x y /andP []; elim: x y => [|x sx ih] [|y sy] //=.
 by case: comparableP => //= -> lesxsy /(ih _ lesxsy) ->.
@@ -7536,9 +6838,6 @@ Lemma neqhead_ltxiE (x y : T) s1 s2 : x != y ->
   (x :: s1 < y :: s2 :> seq _) = (x < y).
 Proof. by rewrite ltxi_cons; case: (comparableP x y). Qed.
 
-#[export]
-HB.instance Definition _ := hasBottom.Build _ (seq T) (@lexi0s T).
-
 End POrder.
 
 Section Total.
@@ -7554,55 +6853,28 @@ HB.instance Definition _ := POrder_isTotal.Build _ (seq T) total.
 
 End Total.
 
-Lemma sub_seqprod_lexi d (T : preorderType disp) :
-   subrel (<=%O : rel (seqprod_with d T)) (<=%O : rel (seq T)).
-Proof.
-elim=> [|x1 s1 ihs1] [|x2 s2]//=; rewrite le_cons lexi_cons /=.
-by move=> /andP[-> /ihs1->]; rewrite implybT.
-Qed.
-
 End SeqLexiOrder.
 
 Module Exports.
 
 HB.reexport SeqLexiOrder.
 
-Notation seqlexi_with := type.
-Notation seqlexi := type_.
-
-Definition leEseqlexi := @leEseqlexi.
-Definition lexi0s := @lexi0s.
-Definition lexis0 := @lexis0.
-Definition lexi_cons := @lexi_cons.
-Definition lexi_lehead := @lexi_lehead.
-Definition eqhead_lexiE := @eqhead_lexiE.
 Definition neqhead_lexiE := @neqhead_lexiE.
-
-Definition ltEseqltxi := @ltEseqlexi.
-Definition ltxi0s := @ltxi0s.
-Definition ltxis0 := @ltxis0.
-Definition ltxi_cons := @ltxi_cons.
-Definition ltxi_lehead := @ltxi_lehead.
-Definition eqhead_ltxiE := @eqhead_ltxiE.
 Definition neqhead_ltxiE := @neqhead_ltxiE.
-Definition sub_seqprod_lexi := @sub_seqprod_lexi.
 
 End Exports.
 End SeqLexiOrder.
 HB.export SeqLexiOrder.Exports.
 
 Module DefaultSeqLexiOrder.
+
+Export DefaultSeqLexiOrder.
+
 Section DefaultSeqLexiOrder.
 Context {disp : disp_t}.
 
-Notation seqlexi := (seqlexi_with (seqlexi_display disp)).
-
-HB.instance Definition _ (T : preorderType disp) :=
-  Preorder.copy (seq T) (seqlexi T).
 HB.instance Definition _ (T : porderType disp) :=
   POrder.copy (seq T) (seqlexi T).
-HB.instance Definition _ (T : porderType disp) :=
-  BPreorder.copy (seq T) (seqlexi T).
 HB.instance Definition _ (T : orderType disp) :=
   BTotal.copy (seq T) (seqlexi T).
 
@@ -7615,51 +6887,15 @@ End DefaultSeqLexiOrder.
 (***************************************)
 
 Module TupleProdOrder.
+
+Export TupleProdOrder.
+
 Import DefaultSeqProdOrder.
 
 Section TupleProdOrder.
 
-Definition type (disp : disp_t) n T := n.-tuple T.
-Definition type_ (disp : disp_t) n (T : preorderType disp) :=
-  type (seqprod_display disp) n T.
-
 Context {disp disp' : disp_t}.
 Local Notation "n .-tuple" := (type disp' n) : type_scope.
-
-Section Basics.
-Context (n : nat).
-#[export] HB.instance Definition _ (T : eqType) := Equality.on (n.-tuple T).
-#[export] HB.instance Definition _ (T : eqType) := SubEquality.on (n.-tuple T).
-#[export] HB.instance Definition _ (T : choiceType) :=
-  SubChoice.on (n.-tuple T).
-#[export] HB.instance Definition _ (T : countType) :=
-  SubCountable.on (n.-tuple T).
-#[export] HB.instance Definition _ (T : finType) := SubFinite.on (n.-tuple T).
-End Basics.
-
-Section Preorder.
-Implicit Types (n : nat) (T : preorderType disp).
-
-(* FIXME: this instance should be dualizable, but then we should not depend   *)
-(* on the subtype mechanism, because the pointwise order on seq cannot be the *)
-(* dual of itself.                                                            *)
-#[export] HB.instance Definition _ n T :=
-  [SubChoice_isSubPreorder of n.-tuple T by <: with disp'].
-
-Lemma leEtprod n T (t1 t2 : n.-tuple T) :
-   t1 <= t2 = [forall i, tnth t1 i <= tnth t2 i].
-Proof.
-elim: n => [|n IHn] in t1 t2 *.
-  by rewrite tuple0 [t2]tuple0/= lexx; symmetry; apply/forallP => [].
-case: (tupleP t1) (tupleP t2) => [x1 {}t1] [x2 {}t2].
-rewrite [_ <= _]le_cons [t1 <= t2 :> seq _]IHn.
-apply/idP/forallP => [/andP[lex12 /forallP/= let12 i]|lext12].
-  by case: (unliftP ord0 i) => [j ->|->]//; rewrite !tnthS.
-rewrite (lext12 ord0)/=; apply/forallP=> i.
-by have := lext12 (lift ord0 i); rewrite !tnthS.
-Qed.
-
-End Preorder.
 
 Section POrder.
 Implicit Types (T : porderType disp).
@@ -7668,55 +6904,17 @@ Implicit Types (T : porderType disp).
 #[export] HB.instance Definition _ n T :=
   [SubChoice_isSubPOrder of n.-tuple T by <: with disp'].
 
-Lemma ltEtprod n T (t1 t2 : n.-tuple T) :
-  t1 < t2 = [exists i, tnth t1 i != tnth t2 i] &&
-            [forall i, tnth t1 i <= tnth t2 i].
-Proof. by rewrite lt_neqAle leEtprod eqEtuple negb_forall. Qed.
-
 End POrder.
-
-Section BPOrder.
-Context (n : nat) (T : bPreorderType disp).
-Implicit Types (t : n.-tuple T).
-
-Fact le0x t : [tuple \bot | _ < n] <= t :> n.-tuple T.
-Proof. by rewrite leEtprod; apply/forallP => i; rewrite tnth_mktuple le0x. Qed.
-
-#[export]
-HB.instance Definition _ := hasBottom.Build _ (n.-tuple T) le0x.
-
-Lemma botEtprod : \bot = [tuple \bot | _ < n] :> n.-tuple T.
-Proof. by []. Qed.
-
-End BPOrder.
 
 (* FIXME: use HB.saturate *)
 #[export]
 HB.instance Definition _ (n : nat) (T : bPOrderType disp) :=
   POrder.on (n.-tuple T).
 
-Section TPOrder.
-Context (n : nat) (T : tPreorderType disp).
-Implicit Types (t : n.-tuple T).
-
-Fact lex1 t : t <= [tuple \top | _ < n] :> n.-tuple T.
-Proof. by rewrite leEtprod; apply/forallP => i; rewrite tnth_mktuple lex1. Qed.
-
-#[export]
-HB.instance Definition _ := hasTop.Build _ (n.-tuple T) lex1.
-
-Lemma topEtprod : \top = [tuple \top | _ < n] :> n.-tuple T.
-Proof. by []. Qed.
-
-End TPOrder.
-
 (* FIXME: use HB.saturate *)
 #[export]
 HB.instance Definition _ (n : nat) (T : tPOrderType disp) :=
   POrder.on (n.-tuple T).
-#[export]
-HB.instance Definition _ (n : nat) (T : tbPreorderType disp) :=
-  Preorder.on (n.-tuple T).
 #[export]
 HB.instance Definition _ (n : nat) (T : tbPOrderType disp) :=
   POrder.on (n.-tuple T).
@@ -7936,23 +7134,8 @@ End CTBDistrLattice.
 
 (* FIXME: use HB.saturate *)
 #[export]
-HB.instance Definition _ (n : nat) (T : finPreorderType disp) :=
-  Preorder.on (n.-tuple T).
-#[export]
-HB.instance Definition _ (n : nat) (T : finPreorderType disp) :=
-  Preorder.on (n.-tuple T).
-#[export]
 HB.instance Definition _ (n : nat) (T : finPOrderType disp) :=
   POrder.on (n.-tuple T).
-#[export]
-HB.instance Definition _ (n : nat) (T : finBPreorderType disp) :=
-  Preorder.on (n.-tuple T).
-#[export]
-HB.instance Definition _ (n : nat) (T : finTPreorderType disp) :=
-  Preorder.on (n.-tuple T).
-#[export]
-HB.instance Definition _ (n : nat) (T : finTBPreorderType disp) :=
-  Preorder.on (n.-tuple T).
 #[export]
 HB.instance Definition _ (n : nat) (T : finBPOrderType disp) :=
   POrder.on (n.-tuple T).
@@ -8000,16 +7183,6 @@ Module Exports.
 
 HB.reexport TupleProdOrder.
 
-Notation "n .-tupleprod[ disp ]" := (type disp n)
-  (at level 2, disp at next level, format "n .-tupleprod[ disp ]") :
-  type_scope.
-Notation "n .-tupleprod" := (type_ n)
-  (at level 2, format "n .-tupleprod") : type_scope.
-
-Definition leEtprod := @leEtprod.
-Definition ltEtprod := @ltEtprod.
-Definition botEtprod := @botEtprod.
-Definition topEtprod := @topEtprod.
 Definition tnth_meet := @tnth_meet.
 Definition meetEtprod := @meetEtprod.
 Definition tnth_join := @tnth_join.
@@ -8028,21 +7201,14 @@ End TupleProdOrder.
 HB.export TupleProdOrder.Exports.
 
 Module DefaultTupleProdOrder.
+
+Export DefaultTupleProdOrder.
+
 Section DefaultTupleProdOrder.
 Context {disp : disp_t}.
 
-Notation "n .-tupleprod" := n.-tupleprod[seqprod_display disp].
-
-HB.instance Definition _ n (T : preorderType disp) :=
-  Preorder.copy (n.-tuple T) (n.-tupleprod T).
 HB.instance Definition _ n (T : porderType disp) :=
   POrder.copy (n.-tuple T) (n.-tupleprod T).
-HB.instance Definition _ n (T : bPreorderType disp) :=
-  BPreorder.copy (n.-tuple T) (n.-tupleprod T).
-HB.instance Definition _ n (T : tPreorderType disp) :=
-  TPreorder.copy (n.-tuple T) (n.-tupleprod T).
-HB.instance Definition _ n (T : tbPreorderType disp) :=
-  TBPreorder.copy (n.-tuple T) (n.-tupleprod T).
 HB.instance Definition _ n (T : bPOrderType disp) :=
   BPOrder.copy (n.-tuple T) (n.-tupleprod T).
 HB.instance Definition _ n (T : tPOrderType disp) :=
@@ -8127,35 +7293,14 @@ End DefaultTupleProdOrder.
 (*********************************************)
 
 Module TupleLexiOrder.
+
+Export TupleLexiOrder.
+
 Section TupleLexiOrder.
 Import DefaultSeqLexiOrder.
 
-Definition type (disp : disp_t) n T := n.-tuple T.
-Definition type_ (disp : disp_t) n (T : porderType disp) :=
-  type (seqlexi_display disp) n T.
-
 Context {disp disp' : disp_t}.
 Local Notation "n .-tuple" := (type disp' n) : type_scope.
-
-Section Basics.
-Context (n : nat).
-#[export] HB.instance Definition _ (T : eqType) := Equality.on (n.-tuple T).
-#[export] HB.instance Definition _ (T : choiceType) :=
-  SubChoice.on (n.-tuple T).
-#[export] HB.instance Definition _ (T : countType) :=
-  SubCountable.on (n.-tuple T).
-#[export] HB.instance Definition _ (T : finType) :=
-  SubFinite.on (n.-tuple T).
-End Basics.
-
-Section Preorder.
-Implicit Types (T : preorderType disp).
-
-#[export] HB.instance Definition _ n T := SubChoice.on (n.-tuple T).
-#[export] HB.instance Definition _ n T :=
-  [SubChoice_isSubPreorder of n.-tuple T by <: with disp'].
-
-End Preorder.
 
 Section POrder.
 Implicit Types (n : nat) (T : porderType disp).
@@ -8218,51 +7363,16 @@ Qed.
 
 End POrder.
 
-Section BPreorder.
-Context (n : nat) (T : bPreorderType disp).
-Implicit Types (t : n.-tuple T).
-
-Fact le0x t : [tuple \bot | _ < n] <= t :> n.-tuple T.
-Proof. by apply: sub_seqprod_lexi; apply: le0x (t : n.-tupleprod T). Qed.
-
-#[export] HB.instance Definition _ := hasBottom.Build _ (n.-tuple T) le0x.
-
-Lemma botEtlexi : \bot = [tuple \bot | _ < n] :> n.-tuple T. Proof. by []. Qed.
-
-End BPreorder.
-
-Section TPreorder.
-Context (n : nat) (T : tPreorderType disp).
-Implicit Types (t : n.-tuple T).
-
-Fact lex1 t : t <= [tuple \top | _ < n].
-Proof. by apply: sub_seqprod_lexi; apply: lex1 (t : n.-tupleprod T). Qed.
-
-#[export] HB.instance Definition _ := hasTop.Build _ (n.-tuple T) lex1.
-
-Lemma topEtlexi : \top = [tuple \top | _ < n] :> n.-tuple T. Proof. by []. Qed.
-
-End TPreorder.
-
 #[export] HB.instance Definition _ n (T : orderType disp) :=
   [SubChoice_isSubOrder of n.-tuple T by <: with disp'].
 
 (* FIXME: use HB.saturate *)
 #[export]
-HB.instance Definition _ (n : nat) (T : bPreorderType disp) :=
-  Preorder.on (n.-tuple T).
-#[export]
 HB.instance Definition _ (n : nat) (T : bPOrderType disp) :=
   POrder.on (n.-tuple T).
 #[export]
-HB.instance Definition _ (n : nat) (T : tPreorderType disp) :=
-  Preorder.on (n.-tuple T).
-#[export]
 HB.instance Definition _ (n : nat) (T : tPOrderType disp) :=
   POrder.on (n.-tuple T).
-#[export]
-HB.instance Definition _ (n : nat) (T : tbPreorderType disp) :=
-  Preorder.on (n.-tuple T).
 #[export]
 HB.instance Definition _ (n : nat) (T : tbPOrderType disp) :=
   POrder.on (n.-tuple T).
@@ -8295,21 +7405,11 @@ HB.instance Definition _ (n : nat) (T : finTBOrderType disp) :=
   POrder.on (n.-tuple T).
 (* /FIXME *)
 
-Lemma sub_tprod_lexi d n (T : preorderType disp) :
-   subrel (<=%O : rel (n.-tupleprod[d] T)) (<=%O : rel (n.-tuple T)).
-Proof. exact: sub_seqprod_lexi. Qed.
-
 End TupleLexiOrder.
 
 Module Exports.
 
 HB.reexport TupleLexiOrder.
-
-Notation "n .-tuplelexi[ disp ]" := (type disp n)
-  (at level 2, disp at next level, format "n .-tuplelexi[ disp ]") :
-  type_scope.
-Notation "n .-tuplelexi" := (type_ n)
-  (at level 2, format "n .-tuplelexi") : type_scope.
 
 Definition lexi_tupleP := @lexi_tupleP.
 Arguments lexi_tupleP {disp disp' n T t1 t2}.
@@ -8317,30 +7417,20 @@ Definition ltxi_tupleP := @ltxi_tupleP.
 Arguments ltxi_tupleP {disp disp' n T t1 t2}.
 Definition ltxi_tuplePlt := @ltxi_tuplePlt.
 Arguments ltxi_tuplePlt {disp disp' n T t1 t2}.
-Definition topEtlexi := @topEtlexi.
-Definition botEtlexi := @botEtlexi.
-Definition sub_tprod_lexi := @sub_tprod_lexi.
 
 End Exports.
 End TupleLexiOrder.
 HB.export TupleLexiOrder.Exports.
 
 Module DefaultTupleLexiOrder.
+
+Export DefaultTupleLexiOrder.
+
 Section DefaultTupleLexiOrder.
 Context {disp : disp_t}.
 
-Notation "n .-tuplelexi" := n.-tuplelexi[seqlexi_display disp].
-
-HB.instance Definition _ n (T : preorderType disp) :=
-  Preorder.copy (n.-tuple T) (n.-tuplelexi T).
 HB.instance Definition _ n (T : porderType disp) :=
   POrder.copy (n.-tuple T) (n.-tuplelexi T).
-HB.instance Definition _ n (T : bPreorderType disp) :=
-  BPreorder.copy (n.-tuple T) (n.-tuplelexi T).
-HB.instance Definition _ n (T : tPreorderType disp) :=
-  TPreorder.copy (n.-tuple T) (n.-tuplelexi T).
-HB.instance Definition _ n (T : tbPreorderType disp) :=
-  TBPreorder.copy (n.-tuple T) (n.-tuplelexi T).
 HB.instance Definition _ n (T : bPOrderType disp) :=
   BPOrder.copy (n.-tuple T) (n.-tuplelexi T).
 HB.instance Definition _ n (T : tPOrderType disp) :=
@@ -8380,18 +7470,14 @@ End DefaultTupleLexiOrder.
 (* which is canonically ordered by inclusion *)
 (*********************************************)
 Module SetSubsetOrder.
+
+Export SetSubsetOrder.
+
 Section SetSubsetOrder.
-
-Fact subset_display : disp_t. Proof. exact. Qed.
-
-Definition type (disp : disp_t) (T : finType) := {set T}.
 
 Context {disp : disp_t} {T : finType}.
 Local Notation "{ 'subset' T }" := (type disp T).
-Implicit Type (A B C : {subset T}).
-
-Lemma le_def A B : A \subset B = (A :&: B == A).
-Proof. exact/setIidPl/eqP. Qed.
+Implicit Type (A B C : type disp T).
 
 Lemma setKUC B A : A :&: (A :|: B) = A.
 Proof. by rewrite setUC setKU. Qed.
@@ -8399,19 +7485,14 @@ Proof. by rewrite setUC setKU. Qed.
 Lemma setKIC B A : A :|: (A :&: B) = A.
 Proof. by rewrite setIC setKI. Qed.
 
-#[export]
-HB.instance Definition _ := Choice.on {subset T}.
+Fact le_anti : antisymmetric (fun A B => A \subset B).
+Proof. by move=> A B ABA; apply/eqP; rewrite eqEsubset. Qed.
 
 #[export]
-HB.instance Definition _ := isMeetJoinDistrLattice.Build disp {subset T}
-  le_def (fun _ _ => erefl) (@setIC _) (@setUC _) (@setIA _) (@setUA _)
-  setKUC setKIC (@setIUl _) (@setIid _).
-
+HB.instance Definition _ := Preorder_isPOrder.Build disp {subset T} le_anti.
 #[export]
-HB.instance Definition _ := hasBottom.Build disp {subset T} (@sub0set _).
-
-#[export]
-HB.instance Definition _ := hasTop.Build disp {subset T} (@subsetT _).
+HB.instance Definition _  := POrder_Meet_isDistrLattice.Build disp {subset T}
+  (@setIC _) (@setUC _) (@setIA _) (@setUA _) setKUC setKIC le_def (@setIUl _).
 
 Lemma setIDv A B : B :&: (A :\: B) = set0.
 Proof.
@@ -8431,8 +7512,6 @@ Proof. by rewrite setTD. Qed.
 HB.instance Definition _ :=
   CBDistrLattice_hasComplement.Build disp {subset T} setTDsym.
 
-Lemma leEsubset A B : (A <= B) = (A \subset B).
-Proof. by []. Qed.
 Lemma meetEsubset A B : A `&` B = A :&: B.
 Proof. by []. Qed.
 Lemma joinEsubset A B : A `|` B = A :|: B.
@@ -8449,15 +7528,9 @@ Proof. by []. Qed.
 End SetSubsetOrder.
 
 Module Exports.
-Arguments type disp T%type.
-Notation "{ 'subset' [ d ] T }" := (type d T)
-  (at level 0, d at next level, format "{ 'subset' [ d ]  T }") : type_scope.
-Notation "{ 'subset' T }" := {subset[subset_display] T}
-  (at level 0, format "{ 'subset' T }") : type_scope.
 
 HB.reexport.
 
-Definition leEsubset := @leEsubset.
 Definition meetEsubset := @meetEsubset.
 Definition joinEsubset := @joinEsubset.
 Definition botEsubset := @botEsubset.
@@ -8471,96 +7544,12 @@ Export SetSubsetOrder.Exports.
 
 Module DefaultSetSubsetOrder.
 
+Export DefaultSetSubsetOrder.
+
 HB.instance Definition _ (T : finType) :=
   CTBDistrLattice.copy {set T} {subset T}.
 
 End DefaultSetSubsetOrder.
-
-Notation enum A := (sort <=%O (enum A)).
-
-Section Enum.
-Variables (d : disp_t) (T : finPOrderType d).
-
-Lemma cardE (A : {pred T}) : #|A| = size (enum A).
-Proof. by rewrite size_sort cardE. Qed.
-
-Lemma mem_enum (A : {pred T}) : enum A =i A.
-Proof. by move=> x; rewrite mem_sort mem_enum. Qed.
-
-Lemma enum_uniq (A : {pred T}) : uniq (enum A).
-Proof. by rewrite sort_uniq enum_uniq. Qed.
-
-Lemma cardT : #|T| = size (enum T).
-Proof. by rewrite cardT size_sort. Qed.
-
-Lemma enumT : enum T = sort <=%O (Finite.enum T).
-Proof. by rewrite enumT. Qed.
-
-Lemma enum0 : enum (pred0 : {pred T}) = [::].
-Proof. by rewrite enum0. Qed.
-
-Lemma enum1 (x : T) : enum (pred1 x) = [:: x].
-Proof. by rewrite enum1. Qed.
-
-Lemma eq_enum (A B : {pred T}) : A =i B -> enum A = enum B.
-Proof. by move=> /eq_enum->. Qed.
-
-Lemma eq_cardT (A : {pred T}) : A =i predT -> #|A| = size (enum T).
-Proof. by move=> /eq_enum<-; rewrite cardE. Qed.
-
-Lemma set_enum (A : {set T}) : [set x in enum A] = A.
-Proof. by apply/setP => x; rewrite inE mem_enum. Qed.
-
-Lemma enum_set0 : enum (set0 : {set T}) = [::].
-Proof. by rewrite enum_set0. Qed.
-
-Lemma enum_setT : enum [set: T] = sort <=%O (Finite.enum T).
-Proof. by rewrite enum_setT. Qed.
-
-Lemma enum_set1 (a : T) : enum [set a] = [:: a].
-Proof. by rewrite enum_set1. Qed.
-
-End Enum.
-
-Section Ordinal.
-Import OrdinalOrder.Exports.
-
-Lemma enum_ord n : enum 'I_n = fintype.enum 'I_n.
-Proof.
-rewrite (sorted_sort le_trans)// -(@sorted_map _ _ (val : 'I_n -> nat))/=.
-by rewrite val_enum_ord iota_sorted.
-Qed.
-
-Lemma val_enum_ord n : [seq val i | i <- enum 'I_n] = iota 0 n.
-Proof. by rewrite enum_ord val_enum_ord. Qed.
-
-Lemma size_enum_ord n : size (enum 'I_n) = n.
-Proof. by rewrite -cardE card_ord. Qed.
-
-Lemma nth_enum_ord (n : nat) (i0 : 'I_n) (m : nat) :
-  (m < n)%N -> nth i0 (enum 'I_n) m = m :> nat.
-Proof. by move=> lemn; rewrite enum_ord nth_enum_ord. Qed.
-
-Lemma nth_ord_enum (n : nat) (i0 i : 'I_n) : nth i0 (enum 'I_n) i = i.
-Proof. by rewrite enum_ord nth_ord_enum. Qed.
-
-Lemma index_enum_ord (n : nat) (i : 'I_n) : index i (enum 'I_n) = i.
-Proof. by rewrite enum_ord index_enum_ord. Qed.
-
-End Ordinal.
-
-Lemma mono_sorted_enum d d' (T : finPOrderType d)
-    (T' : porderType d') (f : T -> T') :
-    total (<=%O : rel T) -> {mono f : x y / (x <= y)%O} ->
-  sorted <=%O [seq f x | x <- Order.enum T].
-Proof.
-move=> /sort_sorted ss_sorted lef; wlog [x0 x'0] : / (T * T')%type.
-  by case: (Order.enum T) => // x ? => /(_ (x, f x)).
-rewrite (sorted_pairwise le_trans).
-apply/(pairwiseP x'0) => i j; rewrite !inE !size_map -!Order.cardT.
-move=> ilt jlt ij; rewrite !(nth_map x0) -?Order.cardT// lef.
-by rewrite (sorted_leq_nth le_trans le_refl) ?inE -?Order.cardT// 1?ltnW.
-Qed.
 
 Lemma mono_unique d (T T' : finPOrderType d) (f g : T -> T') :
     total (<=%O : rel T) -> (#|T'| <= #|T|)%N ->
@@ -8574,99 +7563,32 @@ under eq_map do rewrite ffunE; under [RHS]eq_map do rewrite ffunE.
 have [finj ginj] := (inc_inj lef, inc_inj leg).
 have [f' fK f'K] := inj_card_bij finj leT'T.
 have [g' gK g'K] := inj_card_bij ginj leT'T.
-apply/eqP; have : [seq f i | i <- Order.enum T] = [seq g i | i <- Order.enum T].
+apply/eqP; have : [seq f i | i <- enum T] = [seq g i | i <- enum T].
   apply: (@sorted_eq _ <=%O le_trans le_anti); rewrite ?mono_sorted_enum//.
   apply: uniq_perm; rewrite ?map_inj_uniq ?sort_uniq ?fintype.enum_uniq//.
   move=> x; apply/mapP/mapP => -[y _ ->].
-    by exists (g' (f y)); rewrite ?Order.mem_enum.
-  by exists (f' (g y)); rewrite ?Order.mem_enum.
+    by exists (g' (f y)); rewrite ?mem_enum.
+  by exists (f' (g y)); rewrite ?mem_enum.
 move=> /eqP; rewrite !eq_map_all all_map [in X in _ -> X]all_map.
 by have /permPl/perm_all-> := perm_sort <=%O (fintype.enum T).
 Qed.
 
 (* This module should be exported on demand, as in module tagnat below *)
 Module Import EnumVal.
+
+Export EnumVal.
+
 Section EnumVal.
 Import OrdinalOrder.Exports.
 Variables (d : disp_t) (T : finPOrderType d).
 Implicit Types (x : T) (A : {pred T}).
-
-Definition enum_rank_in x0 A (Ax0 : x0 \in A) x :=
-  insubd (Ordinal (@enum_rank_subproof _ x0 A Ax0)) (index x (enum A)).
-
-Definition enum_rank x := @enum_rank_in x T (erefl true) x.
-
-Definition enum_val A i := nth (@enum_default _ A i) (enum A) i.
-Prenex Implicits enum_val.
-
-Lemma enum_valP A i : @enum_val A i \in A.
-Proof.
-suff: enum_val i \in enum A by rewrite mem_enum.
-by apply: mem_nth; rewrite -cardE.
-Qed.
-
-Lemma enum_val_nth A x i : @enum_val A i = nth x (enum A) i.
-Proof. by apply: set_nth_default; rewrite cardE in i *. Qed.
-
-Lemma nth_enum_rank_in x00 x0 A Ax0 :
-  {in A, cancel (@enum_rank_in x0 A Ax0) (nth x00 (enum A))}.
-Proof.
-move=> x Ax; rewrite /= insubdK ?nth_index ?mem_enum //.
-by rewrite cardE [_ \in _]index_mem mem_enum.
-Qed.
-
-Lemma nth_enum_rank x0 : cancel enum_rank (nth x0 (enum T)).
-Proof. by move=> x; apply: nth_enum_rank_in. Qed.
-
-Lemma enum_rankK_in x0 A Ax0 :
-   {in A, cancel (@enum_rank_in x0 A Ax0) enum_val}.
-Proof. by move=> x; apply: nth_enum_rank_in. Qed.
-
-Lemma enum_rankK : cancel enum_rank enum_val.
-Proof. by move=> x; apply: enum_rankK_in. Qed.
-
-Lemma enum_valK_in x0 A Ax0 : cancel enum_val (@enum_rank_in x0 A Ax0).
-Proof.
-move=> x; apply: ord_inj; rewrite insubdK; last first.
-  by rewrite cardE [_ \in _]index_mem mem_nth // -cardE.
-by rewrite index_uniq ?enum_uniq // -cardE.
-Qed.
-
-Lemma enum_valK : cancel enum_val enum_rank.
-Proof. by move=> x; apply: enum_valK_in. Qed.
-
-Lemma enum_rank_inj : injective enum_rank.
-Proof. exact: can_inj enum_rankK. Qed.
-
-Lemma enum_val_inj A : injective (@enum_val A).
-Proof. by move=> i; apply: can_inj (enum_valK_in (enum_valP i)) (i). Qed.
-
-Lemma enum_val_bij_in x0 A : x0 \in A -> {on A, bijective (@enum_val A)}.
-Proof.
-move=> Ax0; exists (enum_rank_in Ax0) => [i _|]; last exact: enum_rankK_in.
-exact: enum_valK_in.
-Qed.
-
-Lemma eq_enum_rank_in (x0 y0 : T) A (Ax0 : x0 \in A) (Ay0 : y0 \in A) :
-  {in A, enum_rank_in Ax0 =1 enum_rank_in Ay0}.
-Proof. by move=> x xA; apply: enum_val_inj; rewrite !enum_rankK_in. Qed.
-
-Lemma enum_rank_in_inj (x0 y0 : T) A (Ax0 : x0 \in A) (Ay0 : y0 \in A) :
-  {in A &, forall x y, enum_rank_in Ax0 x = enum_rank_in Ay0 y -> x = y}.
-Proof. by move=> x y xA yA /(congr1 enum_val); rewrite !enum_rankK_in. Qed.
-
-Lemma enum_rank_bij : bijective enum_rank.
-Proof. by move: enum_rankK enum_valK; exists (@enum_val T). Qed.
-
-Lemma enum_val_bij : bijective (@enum_val T).
-Proof. by move: enum_rankK enum_valK; exists enum_rank. Qed.
 
 Section total.
 (* We circumvent a shortcoming of finOrderType *)
 (* which requires the type to be nonempty and we do not want to rule this out *)
 Hypothesis (leT_total : total (<=%O : rel T)).
 
-Lemma le_enum_val A : {mono @enum_val A : i j / i <= j}.
+Lemma le_enum_val A : {mono @enum_val _ _ A : i j / i <= j}.
 Proof.
 apply: le_mono => i j le_ij.
 rewrite /enum_val (set_nth_default (enum_default j)) -?cardE//.
@@ -8681,39 +7603,21 @@ apply: can_mono_in (@in2W _ _ predT predT _ (@le_enum_val A)) => //.
 exact/onW_can_in/enum_rankK_in.
 Qed.
 
-Lemma le_enum_rank : {mono enum_rank : i j / i <= j}.
-Proof. exact: can_mono enum_rankK (@le_enum_val predT). Qed.
+Lemma le_enum_rank : {mono @enum_rank d T : i j / i <= j}.
+Proof. exact: (can_mono (@enum_rankK _ _) (@le_enum_val predT)). Qed.
 
 End total.
 End EnumVal.
-Arguments enum_val {d T A}.
-Arguments enum_rank {d T}.
 End EnumVal.
 
-Notation enum_val := enum_val.
-Notation enum_rank_in := enum_rank_in.
-Notation enum_rank := enum_rank.
-Notation enum_valP := enum_valP.
-Notation enum_val_nth := enum_val_nth.
-Notation nth_enum_rank_in := nth_enum_rank_in.
-Notation nth_enum_rank := nth_enum_rank.
-Notation enum_rankK_in := enum_rankK_in.
-Notation enum_rankK := enum_rankK.
-Notation enum_valK_in := enum_valK_in.
-Notation enum_valK := enum_valK.
-Notation enum_rank_inj := enum_rank_inj.
-Notation enum_val_inj := enum_val_inj.
-Notation enum_val_bij_in := enum_val_bij_in.
-Notation eq_enum_rank_in := eq_enum_rank_in.
-Notation enum_rank_in_inj := enum_rank_in_inj.
-Notation enum_rank_bij := enum_rank_bij.
-Notation enum_val_bij := enum_val_bij.
 Notation le_enum_val := le_enum_val.
 Notation le_enum_rank_in := le_enum_rank_in.
 Notation le_enum_rank := le_enum_rank.
 
 Module Syntax.
-Export POSyntax.
+Export PreOSyntax.
+Export DualSyntax.
+Export DvdSyntax.
 Export LatticeSyntax.
 Export BLatticeSyntax.
 Export TLatticeSyntax.
@@ -8724,7 +7628,11 @@ Export DvdSyntax.
 End Syntax.
 
 Module LTheory.
-Export POCoercions.
+Export PreorderTheory.
+Export BPreorderTheory.
+Export TPreorderTheory.
+Export DualPreorder. (* FIXME? *)
+Export PreOCoercions.
 Export PreorderTheory.
 Export POrderTheory.
 Export BPOrderTheory.
@@ -8778,7 +7686,7 @@ Export Order.Exports.
 
 Export Order.Syntax.
 
-Export Order.Preorder.Exports.
+Export Preorder.Exports.
 Export Order.POrder.Exports.
 Export Order.BPOrder.Exports.
 Export Order.TPOrder.Exports.
@@ -8917,7 +7825,7 @@ Lemma le_rank : {mono rank : p q / p <= q}.
 Proof. exact: can_mono le_sig. Qed.
 
 Lemma le_Rank i : {mono @Rank i : j k / j <= k}.
-Proof. by move=> j k; rewrite /Rank le_rank/= leEsig/= tagged_asE Order.PreorderTheory.lexx. Qed.
+Proof. by move=> j k; rewrite /Rank le_rank/= leEsig/= tagged_asE lexx. Qed.
 
 Lemma lt_sig : {mono sig : i j / i < j}.
 Proof. by move=> i j; rewrite !ltNge le_sig. Qed.
