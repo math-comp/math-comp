@@ -25,7 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `dfwith_in`, `dfwith_out`, `dfwithP`
 
 - in `seq.v`
-  + lemmas `has_undup`, `all_undup`
+  + lemmas `has_undup`, `all_undup`, `zip_uniql`, `zip_uniqr`
 
 - in `finset.v`
   + definition `setXn`
