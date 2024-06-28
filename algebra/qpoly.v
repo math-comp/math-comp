@@ -49,14 +49,13 @@ Import Pdiv.Field.
 Import FinRing.Theory.
 Local Open Scope ring_scope.
 
-Reserved Notation "'{poly_' n R }"
-  (at level 0, n at level 2, format "'{poly_' n  R }").
+Reserved Notation "'{poly_' n R }" (n at level 2, format "'{poly_' n  R }").
 Reserved Notation "''nX^' i"  (at level 3, i at level 2, format "''nX^' i").
 Reserved Notation "x .-lagrange" (format "x .-lagrange").
 Reserved Notation "x .-lagrange_" (format "x .-lagrange_").
-Reserved Notation "'qX"  (at level 0).
+Reserved Notation "'qX".
 Reserved Notation "{ 'poly' '%/' p }"
-  (at level 0, p at level 2, format "{ 'poly'  '%/'  p }").
+  (p at level 2, format "{ 'poly'  '%/'  p }").
 
 Section poly_of_size_zmod.
 Context {R : nzRingType}.
