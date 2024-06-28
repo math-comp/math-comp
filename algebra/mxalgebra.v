@@ -143,7 +143,7 @@ Import GRing.Theory.
 Local Open Scope ring_scope.
 
 Reserved Notation "\rank A" (at level 10, A at level 8, format "\rank  A").
-Reserved Notation "A ^C"    (at level 8, format "A ^C").
+Reserved Notation "A ^C"    (format "A ^C").
 
 Notation "''A_' ( m , n )" := 'M_(m, n ^ 2)
   (at level 8, format "''A_' ( m ,  n )") : type_scope.

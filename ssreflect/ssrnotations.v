@@ -31,16 +31,15 @@
 (******************************************************************************)
 
 (* Reserved notation for evaluation *)
-Reserved Notation "e .[ x ]"
-  (at level 2, left associativity, format "e .[ x ]").
+Reserved Notation "e .[ x ]" (left associativity, format "e .[ x ]").
 
-Reserved Notation "e .[ x1 , x2 , .. , xn ]" (at level 2, left associativity,
+Reserved Notation "e .[ x1 , x2 , .. , xn ]" (left associativity,
   format "e '[ ' .[ x1 , '/'  x2 , '/'  .. , '/'  xn ] ']'").
 
 (* Reserved notation for subscripting and superscripting *)
 Reserved Notation "s `_ i" (at level 3, i at level 2, left associativity,
   format "s `_ i").
-Reserved Notation "x ^-1" (at level 3, left associativity, format "x ^-1").
+Reserved Notation "x ^-1" (left associativity, format "x ^-1").
 
 (* Reserved notation for integer multipliers and exponents *)
 Reserved Notation "x *+ n" (at level 40, left associativity).
@@ -53,7 +52,7 @@ Reserved Notation "x *: A" (at level 40).
 Reserved Notation "A :* x" (at level 40).
 
 (* Reserved notation for conjugation and lifting of actions to sets. *)
-Reserved Notation "x ^*" (at level 1, format "x ^*", left associativity).
+Reserved Notation "x ^*" (format "x ^*", left associativity).
 
 (* Reserved notation for set-theoretic operations. *)
 Reserved Notation "A :&: B"  (at level 48, left associativity).
@@ -85,18 +84,22 @@ Reserved Notation "''C_' ( B ) ( A )" (at level 8).
 Reserved Notation "m %/ d" (at level 40, no associativity).
 Reserved Notation "m %% d" (at level 40, no associativity).
 Reserved Notation "m %| d" (at level 70, no associativity).
+#[warning="-postfix-notation-not-level-1"]
 Reserved Notation "m = n %[mod d ]" (at level 70, n at next level,
   format "'[hv ' m '/'  =  n '/'  %[mod  d ] ']'").
+#[warning="-postfix-notation-not-level-1"]
 Reserved Notation "m == n %[mod d ]" (at level 70, n at next level,
   format "'[hv ' m '/'  ==  n '/'  %[mod  d ] ']'").
+#[warning="-postfix-notation-not-level-1"]
 Reserved Notation "m <> n %[mod d ]" (at level 70, n at next level,
   format "'[hv ' m '/'  <>  n '/'  %[mod  d ] ']'").
+#[warning="-postfix-notation-not-level-1"]
 Reserved Notation "m != n %[mod d ]" (at level 70, n at next level,
   format "'[hv ' m '/'  !=  n '/'  %[mod  d ] ']'").
 
 (* Reserved notation for derivatives. *)
-Reserved Notation "a ^` ()" (at level 8, format "a ^` ()").
-Reserved Notation "a ^` ( n )" (at level 8, format "a ^` ( n )").
+Reserved Notation "a ^` ()" (format "a ^` ()").
+Reserved Notation "a ^` ( n )" (format "a ^` ( n )").
 
 (* Reserved notation for absolute value. *)
 Reserved Notation  "`| x |" (at level 0, x at level 99, format "`| x |").
