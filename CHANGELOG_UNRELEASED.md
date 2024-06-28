@@ -58,7 +58,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssrbool.v`
   + lemmas `classic_sigW`, `classic_ex`
 - in `intdiv.v`
-  + lemmas `dvdz_charf`, `eisenstein`
+  + lemmas `dvdz_charf`, `eisenstein_crit`
 
 - in `mxalgebra.v`
   + lemma `mulmxP`
@@ -143,6 +143,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `lt1x`, `ltx1`, `rcomplPmeet`, `rcomplPjoin`, `rcomplKI`,
     `rcomplKU`, `diffErcompl`, `codiffErcompl`, `complEdiff`,
     `complEcodiff`, `complErcompl`
+
+- in `intdiv.v`
+  + lemma `irreducible_rat_int`
 
 ### Changed
 
