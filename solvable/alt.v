@@ -33,7 +33,7 @@ Definition Sym : {set {perm T}} := setT.
 
 Canonical Sym_group := Eval hnf in [group of Sym].
 
-Local Notation "'Sym_T" := Sym (at level 0).
+Local Notation "'Sym_T" := Sym.
 
 Canonical sign_morph := @Morphism _ _ 'Sym_T _ (in2W (@odd_permM _)).
 
@@ -41,7 +41,7 @@ Definition Alt := 'ker (@odd_perm T).
 
 Canonical Alt_group := Eval hnf in [group of Alt].
 
-Local Notation "'Alt_T" := Alt (at level 0).
+Local Notation "'Alt_T" := Alt.
 
 Lemma Alt_even p : (p \in 'Alt_T) = ~~ p.
 Proof. by rewrite !inE /=; case: odd_perm. Qed.

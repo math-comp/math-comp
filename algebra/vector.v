@@ -109,9 +109,9 @@ Declare Scope lfun_scope.
 
 Local Open Scope ring_scope.
 
-Reserved Notation "{ 'vspace' T }" (at level 0, format "{ 'vspace'  T }").
-Reserved Notation "''Hom' ( T , rT )" (at level 8, format "''Hom' ( T ,  rT )").
-Reserved Notation "''End' ( T )" (at level 8, format "''End' ( T )").
+Reserved Notation "{ 'vspace' T }" (format "{ 'vspace'  T }").
+Reserved Notation "''Hom' ( T , rT )" (format "''Hom' ( T ,  rT )").
+Reserved Notation "''End' ( T )" (format "''End' ( T )").
 Reserved Notation "\dim A" (at level 10, A at level 8, format "\dim  A").
 
 Delimit Scope vspace_scope with VS.

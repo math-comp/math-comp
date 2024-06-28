@@ -111,10 +111,10 @@ Notation "G \x H" := (dprod G H)%g
   (at level 40, left associativity) : group_scope.
 
 Notation "[ 'complements' 'to' A 'in' B ]" := (complements_to_in A B)
-  (at level 0, format "[ 'complements'  'to'  A  'in'  B ]") : group_scope.
+  (format "[ 'complements'  'to'  A  'in'  B ]") : group_scope.
 
 Notation "[ 'splits' B , 'over' A ]" := (splits_over B A)
-  (at level 0, format "[ 'splits'  B ,  'over'  A ]") : group_scope.
+  (format "[ 'splits'  B ,  'over'  A ]") : group_scope.
 
 (* Prenex Implicits remgl divgl. *)
 Prenex Implicits remgr divgr.

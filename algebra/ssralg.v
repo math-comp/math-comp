@@ -667,14 +667,14 @@ Declare Scope ring_scope.
 Declare Scope term_scope.
 Declare Scope linear_ring_scope.
 
-Reserved Notation "+%R" (at level 0).
-Reserved Notation "-%R" (at level 0).
-Reserved Notation "*%R" (at level 0, format " *%R").
-Reserved Notation "*:%R" (at level 0, format " *:%R").
+Reserved Notation "+%R".
+Reserved Notation "-%R".
+Reserved Notation "*%R" (format " *%R").
+Reserved Notation "*:%R" (format " *:%R").
 Reserved Notation "n %:R" (left associativity, format "n %:R").
 Reserved Notation "k %:A" (left associativity, format "k %:A").
-Reserved Notation "[ 'pchar' F ]" (at level 0, format "[ 'pchar'  F ]").
-Reserved Notation "[ 'char' F ]" (at level 0, format "[ 'char'  F ]").
+Reserved Notation "[ 'pchar' F ]" (format "[ 'pchar'  F ]").
+Reserved Notation "[ 'char' F ]" (format "[ 'char'  F ]").
 
 Reserved Notation "x %:T" (left associativity, format "x %:T").
 Reserved Notation "''X_' i" (at level 8, i at level 2, format "''X_' i").
@@ -689,7 +689,7 @@ Reserved Notation "''forall' ''X_' i , f"
 
 Reserved Notation "x ^f" (left associativity, format "x ^f").
 
-Reserved Notation "\0" (at level 0).
+Reserved Notation "\0".
 Reserved Notation "f \+ g" (at level 50, left associativity).
 Reserved Notation "f \- g" (at level 50, left associativity).
 Reserved Notation "\- f" (at level 35, f at level 35).
@@ -699,24 +699,19 @@ Reserved Notation "a \*: f" (at level 40).
 Reserved Notation "f \* g" (at level 40, left associativity).
 
 Reserved Notation "'{' 'additive' U '->' V '}'"
-  (at level 0, U at level 98, V at level 99,
-   format "{ 'additive'  U  ->  V }").
+  (U at level 98, V at level 99, format "{ 'additive'  U  ->  V }").
 Reserved Notation "'{' 'rmorphism' U '->' V '}'"
-  (at level 0, U at level 98, V at level 99,
-   format "{ 'rmorphism'  U  ->  V }").
+  (U at level 98, V at level 99, format "{ 'rmorphism'  U  ->  V }").
 Reserved Notation "'{' 'lrmorphism' U '->' V '|' s '}'"
-  (at level 0, U at level 98, V at level 99,
-   format "{ 'lrmorphism'  U  ->  V  |  s }").
+  (U at level 98, V at level 99, format "{ 'lrmorphism'  U  ->  V  |  s }").
 Reserved Notation "'{' 'lrmorphism' U '->' V '}'"
-  (at level 0, U at level 98, V at level 99,
-   format "{ 'lrmorphism'  U  ->  V }").
+  (U at level 98, V at level 99, format "{ 'lrmorphism'  U  ->  V }").
 Reserved Notation "'{' 'linear' U '->' V '|' s '}'"
-  (at level 0, U at level 98, V at level 99,
-   format "{ 'linear'  U  ->  V  |  s }").
+  (U at level 98, V at level 99, format "{ 'linear'  U  ->  V  |  s }").
 Reserved Notation "'{' 'linear' U '->' V '}'"
-  (at level 0, U at level 98, V at level 99,
+  (U at level 98, V at level 99,
    format "{ 'linear'  U  ->  V }").
-Reserved Notation "'{' 'scalar' U '}'" (at level 0, format "{ 'scalar'  U }").
+Reserved Notation "'{' 'scalar' U '}'" (format "{ 'scalar'  U }").
 
 Declare Scope ring_scope.
 Delimit Scope ring_scope with R.
@@ -2902,7 +2897,8 @@ End Linear.
 End Linear.
 Notation "{ 'linear' U -> V | s }" := (@Linear.type _ U V s) : type_scope.
 Notation "{ 'linear' U -> V }" := {linear U -> V | *:%R} : type_scope.
-Notation "{ 'scalar' U }" := {linear U -> _ | *%R} : type_scope.
+Notation "{ 'scalar' U }" := {linear U -> _ | *%R}
+  (format "{ 'scalar'  U }") : type_scope.
 (* Support for right-to-left rewriting with the generic linearZ rule. *)
 Coercion Linear.map_for_map : Linear.map_for >-> Linear.type.
 Coercion Linear.unify_map_at : Linear.map_at >-> Linear.map_for.
@@ -6725,91 +6721,91 @@ Module SubExports.
 
 Notation "[ 'SubChoice_isSubNmodule' 'of' U 'by' <: ]" :=
   (SubChoice_isSubNmodule.Build _ _ U rpred0D)
-  (at level 0, format "[ 'SubChoice_isSubNmodule'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubNmodule'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubZmodule' 'of' U 'by' <: ]" :=
   (SubChoice_isSubZmodule.Build _ _ U (zmodClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubZmodule'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubZmodule'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubNmodule_isSubNzSemiRing' 'of' U 'by' <: ]" :=
   (SubNmodule_isSubNzSemiRing.Build _ _ U (@rpred1M _ _))
-  (at level 0, format "[ 'SubNmodule_isSubNzSemiRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubNmodule_isSubNzSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
              note="Use [ SubNmodule_isSubNzSemiRing of U by <: ] instead.")]
 Notation "[ 'SubNmodule_isSubSemiRing' 'of' U 'by' <: ]" :=
   (SubNmodule_isSubNzSemiRing.Build _ _ U (@rpred1M _ _))
-  (at level 0, format "[ 'SubNmodule_isSubSemiRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubNmodule_isSubSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubNzSemiRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubNzSemiRing.Build _ _ U (semiringClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubNzSemiRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubNzSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
              note="Use [ 'SubChoice_isSubNzSemiRing' of U by <: ] instead.")]
 Notation "[ 'SubChoice_isSubSemiRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubNzSemiRing.Build _ _ U (semiringClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubSemiRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubNzSemiRing_isSubComNzSemiRing' 'of' U 'by' <: ]" :=
   (SubNzSemiRing_isSubComNzSemiRing.Build _ _ U)
-  (at level 0, format "[ 'SubNzSemiRing_isSubComNzSemiRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubNzSemiRing_isSubComNzSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
         note="Use [ 'SubNzSemiRing_isSubComNzSemiRing' of U by <: ] instead.")]
 Notation "[ 'SubSemiRing_isSubComSemiRing' 'of' U 'by' <: ]" :=
   (SubNzSemiRing_isSubComNzSemiRing.Build _ _ U)
-  (at level 0, format "[ 'SubSemiRing_isSubComSemiRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubSemiRing_isSubComSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubComNzSemiRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubComNzSemiRing.Build _ _ U (semiringClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubComNzSemiRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubComNzSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
              note="Use [ 'SubChoice_isSubComNzSemiRing' of U by <: ] instead.")]
 Notation "[ 'SubChoice_isSubComSemiRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubComNzSemiRing.Build _ _ U (semiringClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubComSemiRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubComSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubZmodule_isSubNzRing' 'of' U 'by' <: ]" :=
   (SubZmodule_isSubNzRing.Build _ _ U (subringClosedP _))
-  (at level 0, format "[ 'SubZmodule_isSubNzRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubZmodule_isSubNzRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
              note="Use [ 'SubZmodule_isSubNzRing' of U by <: ] instead.")]
 Notation "[ 'SubZmodule_isSubRing' 'of' U 'by' <: ]" :=
   (SubZmodule_isSubNzRing.Build _ _ U (subringClosedP _))
-  (at level 0, format "[ 'SubZmodule_isSubRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubZmodule_isSubRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubNzRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubNzRing.Build _ _ U (subringClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubNzRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubNzRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
              note="Use [ 'SubChoice_isSubNzRing' of U by <: ] instead.")]
 Notation "[ 'SubChoice_isSubRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubNzRing.Build _ _ U (subringClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubNzRing_isSubComNzRing' 'of' U 'by' <: ]" :=
   (SubNzRing_isSubComNzRing.Build _ _ U)
-  (at level 0, format "[ 'SubNzRing_isSubComNzRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubNzRing_isSubComNzRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
              note="Use [ 'SubNzRing_isSubComNzRing' of U by <: ] instead.")]
 Notation "[ 'SubRing_isSubComRing' 'of' U 'by' <: ]" :=
   (SubNzRing_isSubComNzRing.Build _ _ U)
-  (at level 0, format "[ 'SubRing_isSubComRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubRing_isSubComRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubComNzRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubComNzRing.Build _ _ U (subringClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubComNzRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubComNzRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
              note="Use [ 'SubChoice_isSubComNzRing' of U by <: ] instead.")]
 Notation "[ 'SubChoice_isSubComRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubComNzRing.Build _ _ U (subringClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubComRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubComRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubNmodule_isSubLSemiModule' 'of' U 'by' <: ]" :=
   (SubNmodule_isSubLSemiModule.Build _ _ _ U (subsemimodClosedP _))
@@ -6821,11 +6817,11 @@ Notation "[ 'SubChoice_isSubLSemiModule' 'of' U 'by' <: ]" :=
   : form_scope.
 Notation "[ 'SubZmodule_isSubLmodule' 'of' U 'by' <: ]" :=
   (SubZmodule_isSubLmodule.Build _ _ _ U (submodClosedP _))
-  (at level 0, format "[ 'SubZmodule_isSubLmodule'  'of'  U  'by'  <: ]")
+  (format "[ 'SubZmodule_isSubLmodule'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubLmodule' 'of' U 'by' <: ]" :=
   (SubChoice_isSubLmodule.Build _ _ _ U (submodClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubLmodule'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubLmodule'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra' 'of' U 'by' <: ]" :=
   (SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra.Build _ _ _ U)
@@ -6835,18 +6831,17 @@ Notation "[ 'SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra' 'of' U 'by' <: ]" :
 (* TODO: SubChoice_isSubLSemiAlgebra? *)
 Notation "[ 'SubNzRing_SubLmodule_isSubLalgebra' 'of' U 'by' <: ]" :=
   (SubNzRing_SubLmodule_isSubLalgebra.Build _ _ _ U)
-  (at level 0,
-    format "[ 'SubNzRing_SubLmodule_isSubLalgebra'  'of'  U  'by'  <: ]")
+  (format "[ 'SubNzRing_SubLmodule_isSubLalgebra'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
       note="Use [ 'SubNzRing_SubLmodule_isSubLalgebra' of U by <: ] instead.")]
 Notation "[ 'SubRing_SubLmodule_isSubLalgebra' 'of' U 'by' <: ]" :=
   (SubNzRing_SubLmodule_isSubLalgebra.Build _ _ _ U)
-  (at level 0, format "[ 'SubRing_SubLmodule_isSubLalgebra'  'of'  U  'by'  <: ]")
+  (format "[ 'SubRing_SubLmodule_isSubLalgebra'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubLalgebra' 'of' U 'by' <: ]" :=
   (SubChoice_isSubLalgebra.Build _ _ _ U (subalgClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubLalgebra'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubLalgebra'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubLSemiAlgebra_isSubSemiAlgebra' 'of' U 'by' <: ]" :=
   (SubLSemiAlgebra_isSubSemiAlgebra.Build _ _ _ U)
@@ -6856,42 +6851,41 @@ Notation "[ 'SubLSemiAlgebra_isSubSemiAlgebra' 'of' U 'by' <: ]" :=
 (* TODO: SubChoice_isSubSemiAlgebra? *)
 Notation "[ 'SubLalgebra_isSubAlgebra' 'of' U 'by' <: ]" :=
   (SubLalgebra_isSubAlgebra.Build _ _ _ U)
-  (at level 0, format "[ 'SubLalgebra_isSubAlgebra'  'of'  U  'by'  <: ]")
+  (format "[ 'SubLalgebra_isSubAlgebra'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubAlgebra' 'of' U 'by' <: ]" :=
   (SubChoice_isSubAlgebra.Build _ _ _ U (subalgClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubAlgebra'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubAlgebra'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubNzRing_isSubUnitRing' 'of' U 'by' <: ]" :=
   (SubNzRing_isSubUnitRing.Build _ _ U (divringClosedP _))
-  (at level 0, format "[ 'SubNzRing_isSubUnitRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubNzRing_isSubUnitRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
              note="Use [ 'SubNzRing_isSubUnitRing' of U by <: ] instead.")]
 Notation "[ 'SubRing_isSubUnitRing' 'of' U 'by' <: ]" :=
   (SubNzRing_isSubUnitRing.Build _ _ U (divringClosedP _))
-  (at level 0, format "[ 'SubRing_isSubUnitRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubRing_isSubUnitRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubUnitRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubUnitRing.Build _ _ U (divringClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubUnitRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubUnitRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubComUnitRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubComUnitRing.Build _ _ U (divringClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubComUnitRing'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubComUnitRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubComUnitRing_isSubIntegralDomain' 'of' U 'by' <: ]" :=
   (SubComUnitRing_isSubIntegralDomain.Build _ _ U)
-  (at level 0,
-    format "[ 'SubComUnitRing_isSubIntegralDomain'  'of'  U  'by'  <: ]")
+  (format "[ 'SubComUnitRing_isSubIntegralDomain'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubIntegralDomain' 'of' U 'by' <: ]" :=
   (SubChoice_isSubIntegralDomain.Build _ _ U (divringClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubIntegralDomain'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubIntegralDomain'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubIntegralDomain_isSubField' 'of' U 'by' <: ]" :=
   (SubIntegralDomain_isSubField.Build _ _ U (frefl _))
-  (at level 0, format "[ 'SubIntegralDomain_isSubField'  'of'  U  'by'  <: ]")
+  (format "[ 'SubIntegralDomain_isSubField'  'of'  U  'by'  <: ]")
   : form_scope.
 
 End SubExports.

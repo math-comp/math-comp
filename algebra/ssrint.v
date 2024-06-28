@@ -48,6 +48,8 @@ Declare Scope int_scope.
 Declare Scope distn_scope.
 Declare Scope rat_scope.
 
+Reserved Notation "*~%R" (format " *~%R").
+Reserved Notation "x *~ n" (at level 40, left associativity, format "x  *~  n").
 Reserved Notation "n %:~R" (left associativity, format "n %:~R").
 
 Reserved Notation "n %:Z" (left associativity, format "n %:Z").
@@ -520,9 +522,8 @@ Definition intmul (R : zmodType) (x : R) (n : int) :=
   end.
 Arguments intmul : simpl never.
 
-Notation "*~%R" := (@intmul _) (at level 0, format " *~%R") : function_scope.
-Notation "x *~ n" := (intmul x n)
-  (at level 40, left associativity, format "x  *~  n") : ring_scope.
+Notation "*~%R" := (@intmul _) : function_scope.
+Notation "x *~ n" := (intmul x n) : ring_scope.
 Notation intr := ( *~%R 1).
 
 Notation "n %:~R" := (1 *~ n)%R : ring_scope.

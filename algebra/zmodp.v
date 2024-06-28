@@ -280,9 +280,9 @@ End ZpNzRing.
 Definition Zp_trunc p := p.-2.
 
 Notation "''Z_' p" := 'I_(Zp_trunc p).+2
-  (at level 8, p at level 2, format "''Z_' p") : type_scope.
+  (at level 0, p at level 2, format "''Z_' p") : type_scope.
 Notation "''F_' p" := 'Z_(pdiv p)
-  (at level 8, p at level 2, format "''F_' p") : type_scope.
+  (at level 0, p at level 2, format "''F_' p") : type_scope.
 
 Arguments natr_Zp {p'} x.
 

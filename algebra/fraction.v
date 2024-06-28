@@ -22,8 +22,8 @@ Import GRing.Theory.
 Local Open Scope ring_scope.
 Local Open Scope quotient_scope.
 
-Reserved Notation "{ 'ratio' T }" (at level 0, format "{ 'ratio'  T }").
-Reserved Notation "{ 'fraction' T }" (at level 0, format "{ 'fraction'  T }").
+Reserved Notation "{ 'ratio' T }" (format "{ 'ratio'  T }").
+Reserved Notation "{ 'fraction' T }" (format "{ 'fraction'  T }").
 Reserved Notation "x %:F" (format "x %:F").
 
 Section FracDomain.

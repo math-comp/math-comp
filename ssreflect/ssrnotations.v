@@ -62,23 +62,21 @@ Reserved Notation "A :\: B" (at level 50, left associativity).
 Reserved Notation "A :\ b" (at level 50, left associativity).
 
 (* Reserved notation for generated structures *)
-Reserved Notation "<< A >>"  (at level 0, format "<< A >>").
-Reserved Notation "<[ a ] >"  (at level 0, format "<[ a ] >").
+Reserved Notation "<< A >>"  (format "<< A >>").
+Reserved Notation "<[ a ] >"  (format "<[ a ] >").
 
 (* Reserved notation for the order of an element (group, polynomial, etc)  *)
-Reserved Notation "#[ x ]" (at level 0, format "#[ x ]").
+Reserved Notation "#[ x ]" (format "#[ x ]").
 
 (* Reserved notation for centralisers and centers. *)
-Reserved Notation "''C' [ x ]" (at level 8, format "''C' [ x ]").
-Reserved Notation "''C_' A [ x ]"
-  (at level 8, A at level 2, format "''C_' A [ x ]").
-Reserved Notation "''C' ( A )" (at level 8, format "''C' ( A )").
-Reserved Notation "''C_' B ( A )"
-  (at level 8, B at level 2, format "''C_' B ( A )").
-Reserved Notation "''Z' ( A )" (at level 8, format "''Z' ( A )").
+Reserved Notation "''C' [ x ]" (format "''C' [ x ]").
+Reserved Notation "''C_' A [ x ]" (A at level 2, format "''C_' A [ x ]").
+Reserved Notation "''C' ( A )" (format "''C' ( A )").
+Reserved Notation "''C_' B ( A )" (B at level 2, format "''C_' B ( A )").
+Reserved Notation "''Z' ( A )" (format "''Z' ( A )").
 (* Compatibility with group action centraliser notation. *)
-Reserved Notation "''C_' ( A ) [ x ]" (at level 8).
-Reserved Notation "''C_' ( B ) ( A )" (at level 8).
+Reserved Notation "''C_' ( A ) [ x ]".
+Reserved Notation "''C_' ( B ) ( A )".
 
 (* Reserved notation for Euclidean division and divisibility. *)
 Reserved Notation "m %/ d" (at level 40, no associativity).
@@ -102,7 +100,7 @@ Reserved Notation "a ^` ()" (format "a ^` ()").
 Reserved Notation "a ^` ( n )" (format "a ^` ( n )").
 
 (* Reserved notation for absolute value. *)
-Reserved Notation  "`| x |" (at level 0, x at level 99, format "`| x |").
+Reserved Notation  "`| x |" (x at level 99, format "`| x |").
 
 (* Reserved notation for conditional comparison *)
 Reserved Notation "x <= y ?= 'iff' c" (at level 70, y, c at next level,
@@ -117,6 +115,5 @@ Reserved Notation "x <= y ?= 'iff' c :> T" (at level 70, y, c at next level,
   format "x '[hv'  <=  y '/'  ?=  'iff'  c  :> T ']'").
 
 (* Reserved notation for dot product. *)
-Reserved Notation "'[ u , v ]"
-  (at level 2, format "'[hv' ''[' u , '/ '  v ] ']'").
-Reserved Notation "'[ u ]" (at level 2, format "''[' u ]").
+Reserved Notation "'[ u , v ]" (format "'[hv' ''[' u , '/ '  v ] ']'").
+Reserved Notation "'[ u ]" (format "''[' u ]").

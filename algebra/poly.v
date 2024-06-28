@@ -117,10 +117,10 @@ Declare Scope unity_root_scope.
 Import GRing.Theory.
 Local Open Scope ring_scope.
 
-Reserved Notation "{ 'poly' T }" (at level 0, format "{ 'poly'  T }").
+Reserved Notation "{ 'poly' T }" (format "{ 'poly'  T }").
 Reserved Notation "c %:P" (format "c %:P").
 Reserved Notation "p ^:P" (format "p ^:P").
-Reserved Notation "'X" (at level 0).
+Reserved Notation "'X".
 Reserved Notation "''X^' n" (at level 3, n at level 2, format "''X^' n").
 Reserved Notation "\poly_ ( i < n ) E"
   (at level 36, E at level 36, i, n at level 50,

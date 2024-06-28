@@ -76,8 +76,7 @@ Unset Printing Implicit Defensive.
 Local Open Scope ring_scope.
 Local Open Scope quotient_scope.
 
-Reserved Notation "{ 'ideal_quot' I }"
-  (at level 0, format "{ 'ideal_quot'  I }").
+Reserved Notation "{ 'ideal_quot' I }" (format "{ 'ideal_quot'  I }").
 #[warning="-postfix-notation-not-level-1"]
 Reserved Notation "m = n %[ 'mod_ideal' I ]" (at level 70, n at next level,
   format "'[hv ' m '/'  =  n '/'  %[ 'mod_ideal'  I ] ']'").

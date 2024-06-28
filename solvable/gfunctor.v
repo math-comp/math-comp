@@ -210,32 +210,32 @@ Coercion pcontinuous_is_hereditary : pcontinuous >-> hereditary.
 
 Notation "[ 'igFun' 'by' Fsub & Fcont ]" :=
     (pack_iso (continuous_is_iso_continuous Fcont) (fun gT G => groupP _) Fsub)
-  (at level 0, format "[ 'igFun'  'by'  Fsub  &  Fcont ]") : form_scope.
+  (format "[ 'igFun'  'by'  Fsub  &  Fcont ]") : form_scope.
 
 Notation "[ 'igFun' 'by' Fsub & ! Fcont ]" :=
     (pack_iso Fcont (fun gT G => groupP _) Fsub)
-  (at level 0, format "[ 'igFun'  'by'  Fsub  &  ! Fcont ]") : form_scope.
+  (format "[ 'igFun'  'by'  Fsub  &  ! Fcont ]") : form_scope.
 
 Notation "[ 'igFun' 'of' F ]" := (@clone_iso F _ _ _ _ id id)
-  (at level 0, format "[ 'igFun'  'of'  F ]") : form_scope.
+  (format "[ 'igFun'  'of'  F ]") : form_scope.
 
 Notation "[ 'gFun' 'by' Fcont ]" := (Map Fcont)
-  (at level 0, format "[ 'gFun'  'by'  Fcont ]") : form_scope.
+  (format "[ 'gFun'  'by'  Fcont ]") : form_scope.
 
 Notation "[ 'gFun' 'of' F ]" := (@clone F _ id _ id _ id)
-  (at level 0, format "[ 'gFun'  'of'  F ]") : form_scope.
+  (format "[ 'gFun'  'of'  F ]") : form_scope.
 
 Notation "[ 'pgFun' 'by' Fher ]" := (Pmap Fher)
-  (at level 0, format "[ 'pgFun'  'by'  Fher ]") : form_scope.
+  (format "[ 'pgFun'  'by'  Fher ]") : form_scope.
 
 Notation "[ 'pgFun' 'of' F ]" := (@clone_pmap F _ id _ id _ id)
-  (at level 0, format "[ 'pgFun' 'of'  F ]") : form_scope.
+  (format "[ 'pgFun' 'of'  F ]") : form_scope.
 
 Notation "[ 'mgFun' 'by' Fmon ]" := (MonoMap Fmon)
-  (at level 0, format "[ 'mgFun'  'by'  Fmon ]") : form_scope.
+  (format "[ 'mgFun'  'by'  Fmon ]") : form_scope.
 
 Notation "[ 'mgFun' 'of' F ]" := (@clone_mono F _ id _ id _ id)
-  (at level 0, format "[ 'mgFun' 'of'  F ]") : form_scope.
+  (format "[ 'mgFun' 'of'  F ]") : form_scope.
 
 End Exports.
 

@@ -103,10 +103,9 @@ Unset Printing Implicit Defensive.
 Declare Scope quotient_scope.
 
 Reserved Notation "\pi_ Q" (at level 0, format "\pi_ Q").
-Reserved Notation "\pi" (at level 0, format "\pi").
-Reserved Notation "{pi_ Q a }"
-         (at level 0, Q at next level, format "{pi_ Q  a }").
-Reserved Notation "{pi a }" (at level 0, format "{pi  a }").
+Reserved Notation "\pi" (format "\pi").
+Reserved Notation "{pi_ Q a }" (Q at next level, format "{pi_ Q  a }").
+Reserved Notation "{pi a }" (format "{pi  a }").
 #[warning="-postfix-notation-not-level-1"]
 Reserved Notation "x == y %[mod_eq e ]" (at level 70, y at next level,
   no associativity,   format "'[hv ' x '/'  ==  y '/'  %[mod_eq  e ] ']'").
@@ -119,8 +118,7 @@ Reserved Notation "x != y %[mod_eq e ]" (at level 70, y at next level,
 #[warning="-postfix-notation-not-level-1"]
 Reserved Notation "x <> y %[mod_eq e ]" (at level 70, y at next level,
   no associativity,   format "'[hv ' x '/'  <>  y '/'  %[mod_eq  e ] ']'").
-Reserved Notation "{eq_quot e }"
-  (at level 0, e at level 0, format "{eq_quot  e }").
+Reserved Notation "{eq_quot e }" (e at level 0, format "{eq_quot  e }").
 
 Delimit Scope quotient_scope with qT.
 Local Open Scope quotient_scope.
@@ -366,24 +364,24 @@ HB.instance Definition _ (T : finType) (qT : quotType T) :=
 
 Notation "[ 'Sub' Q 'of' T 'by' %/ ]" :=
   (SubType.copy Q%type (quot_type_of T Q%type))
-  (at level 0, format "[ 'Sub'  Q  'of'  T  'by'  %/ ]") : form_scope.
+  (format "[ 'Sub'  Q  'of'  T  'by'  %/ ]") : form_scope.
 
 Notation "[ 'Sub' Q 'by' %/ ]" :=
   (SubType.copy Q%type (quot_type Q))
-  (at level 0, format "[ 'Sub'  Q  'by'  %/ ]") : form_scope.
+  (format "[ 'Sub'  Q  'by'  %/ ]") : form_scope.
 
 Notation "[ 'Equality' 'of' Q 'by' <:%/ ]" :=
   (Equality.copy Q%type (quot_type Q))
-  (at level 0, format "[ 'Equality'  'of'  Q  'by'  <:%/ ]") : form_scope.
+  (format "[ 'Equality'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 Notation "[ 'Choice' 'of' Q 'by' <:%/ ]" := (Choice.copy Q%type (quot_type Q))
-  (at level 0, format "[ 'Choice'  'of'  Q  'by'  <:%/ ]") : form_scope.
+  (format "[ 'Choice'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 Notation "[ 'Countable' 'of' Q 'by' <:%/ ]" := (Countable.copy Q%type (quot_type Q))
-  (at level 0, format "[ 'Countable'  'of'  Q  'by'  <:%/ ]") : form_scope.
+  (format "[ 'Countable'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 Notation "[ 'Finite' 'of' Q 'by' <:%/ ]" := (Finite.copy Q%type (quot_type Q))
-  (at level 0, format "[ 'Finite'  'of'  Q  'by'  <:%/ ]") : form_scope.
+  (format "[ 'Finite'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 (****************************************************)
 (* Definition of a (decidable) equivalence relation *)
@@ -436,7 +434,7 @@ End EquivRel.
 
 Notation EquivRel r er es et := (@EquivRelPack _ r (EquivClass er es et)).
 Notation "[ 'equiv_rel' 'of' e ]" := (@equiv_pack _ _ e _ id)
- (at level 0, format "[ 'equiv_rel'  'of'  e ]") : form_scope.
+ (format "[ 'equiv_rel'  'of'  e ]") : form_scope.
 
 (**************************************************)
 (* Encoding to another type modulo an equivalence *)

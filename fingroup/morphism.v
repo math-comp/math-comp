@@ -106,12 +106,12 @@ Proof. by rewrite !inE; apply: andP. Qed.
 End MorphismStructure.
 
 Notation "{ 'morphism' D >-> T }" := (morphism_for D (Phant T))
-  (at level 0, format "{ 'morphism'  D  >->  T }") : type_scope.
+  (format "{ 'morphism'  D  >->  T }") : type_scope.
 Notation "[ 'morphism' D 'of' f ]" :=
      (@clone_morphism _ _ D _ (fun fM => @Morphism _ _ D f fM))
-   (at level 0, format "[ 'morphism'  D  'of'  f ]") : form_scope.
+  (format "[ 'morphism'  D  'of'  f ]") : form_scope.
 Notation "[ 'morphism' 'of' f ]" := (clone_morphism (@Morphism _ _ _ f))
-   (at level 0, format "[ 'morphism'  'of'  f ]") : form_scope.
+  (format "[ 'morphism'  'of'  f ]") : form_scope.
 
 Arguments morphimP {aT rT D A y f}.
 Arguments morphpreP {aT rT D R x f}.

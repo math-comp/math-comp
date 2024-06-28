@@ -489,7 +489,7 @@ HB.structure Definition SubChoice T (P : pred T) :=
 
 Prenex Implicits xchoose choose.
 Notation "[ 'Choice' 'of' T 'by' <: ]" := (Choice.copy T%type (sub_type T%type))
-  (at level 0, format "[ 'Choice'  'of'  T  'by'  <: ]") : form_scope.
+  (format "[ 'Choice'  'of'  T  'by'  <: ]") : form_scope.
 
 HB.instance Definition _ (T : choiceType) (P : pred T) :=
   [Choice of {x | P x} by <:].
@@ -560,7 +560,7 @@ End CountableTheory.
 
 Notation "[ 'Countable' 'of' T 'by' <: ]" :=
     (Countable.copy T%type (sub_type T%type))
-  (at level 0, format "[ 'Countable'  'of'  T  'by'  <: ]") : form_scope.
+  (format "[ 'Countable'  'of'  T  'by'  <: ]") : form_scope.
 
 Arguments pickle_inv {T} n.
 Arguments pickleK {T} x : rename.
