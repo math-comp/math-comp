@@ -3251,10 +3251,9 @@ Qed.
 Lemma zip_uniqr (S T : eqType) (s : seq S) (t : seq T) : 
   uniq t -> uniq (zip s t).
 Proof.
-elim: s t => [[|]//|a s IH [|b t] //= /andP[aI sU]].
-rewrite IH // andbT.
-elim: s t {sU IH}aI => [[]//|a1 s IH [//|b1 t /=]].
-by rewrite !inE !negb_or /= xpair_eqE negb_and orbC => /andP[->] /IH ->.
+case: s t => [|s0 s] [|t0 t] //; apply: contraTT => /(uniqPn (s0, t0)) [i [j]].
+case=> o z; rewrite !nth_zip_cond !ifT ?js ?(ltn_trans o)// => -[_ n].
+by apply/(uniqPn t0); exists i, j; rewrite o n (leq_trans z) ?size_zip?geq_minr.
 Qed.
 
 Lemma perm_zip_sym (S T : eqType) (s1 s2 : seq S) (t1 t2 : seq T) : 
