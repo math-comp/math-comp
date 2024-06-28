@@ -87,7 +87,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Reserved Notation "n .-root" (at level 2, format "n .-root").
+Reserved Notation "n .-root" (format "n .-root").
 Reserved Notation "'i" (at level 0).
 Reserved Notation "'Re z" (at level 10, z at level 8).
 Reserved Notation "'Im z" (at level 10, z at level 8).

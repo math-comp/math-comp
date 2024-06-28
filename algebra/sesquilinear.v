@@ -109,11 +109,10 @@ Unset Printing Implicit Defensive.
 
 Reserved Notation "M ^t phi"
   (at level 39, left associativity, format "M  ^t  phi").
-Reserved Notation "A ^!" (at level 2, format "A ^!").
-Reserved Notation "A ^_|_" (at level 8, format "A ^_|_").
+Reserved Notation "A ^!" (format "A ^!").
+Reserved Notation "A ^_|_" (format "A ^_|_").
 Reserved Notation "A ''_|_' B" (at level 69, format "A  ''_|_'  B").
-Reserved Notation "eps_theta .-sesqui"
-  (at level 2, format "eps_theta .-sesqui").
+Reserved Notation "eps_theta .-sesqui" (format "eps_theta .-sesqui").
 
 Local Open Scope ring_scope.
 Import GRing.Theory Order.Theory Num.Theory.
