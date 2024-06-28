@@ -64,6 +64,10 @@ Declare Scope AC_scope.
 
 Delimit Scope AC_scope with AC.
 
+Reserved Notation "op .[ 'ACof' p s ]" (p at level 1, left associativity).
+Reserved Notation "op .[ 'AC' p s ]" (p at level 1, left associativity).
+Reserved Notation "op .[ 'ACl' s ]" (left associativity).
+
 Definition change_type ty ty' (x : ty) (strategy : ty = ty') : ty' :=
  ecast ty ty strategy x.
 Notation simplrefl := (ltac: (simpl; reflexivity)) (only parsing).
@@ -377,12 +381,9 @@ Notation opAC op  p s := (opACof op (AC.pattern p%AC) s%AC) (only parsing).
 Notation opACl op s := (opAC op (AC.Leaf_of_nat (size (AC.serial s%AC))) s%AC)
   (only parsing).
 
-Notation "op .[ 'ACof' p s ]" := (opACof op p%AC s%AC)
-  (at level 2, p at level 1, left associativity, only parsing).
-Notation "op .[ 'AC' p s ]" := (opAC op p%AC s%AC)
-  (at level 2, p at level 1, left associativity, only parsing).
-Notation "op .[ 'ACl' s ]" := (opACl op s%AC)
-  (at level 2, left associativity, only parsing).
+Notation "op .[ 'ACof' p s ]" := (opACof op p%AC s%AC) (only parsing).
+Notation "op .[ 'AC' p s ]" := (opAC op p%AC s%AC) (only parsing).
+Notation "op .[ 'ACl' s ]" := (opACl op s%AC) (only parsing).
 
 Notation AC_strategy :=
   (ltac: (cbv -[Monoid.ComLaw.sort Monoid.Law.sort]; reflexivity))

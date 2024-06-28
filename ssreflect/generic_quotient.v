@@ -107,12 +107,16 @@ Reserved Notation "\pi" (at level 0, format "\pi").
 Reserved Notation "{pi_ Q a }"
          (at level 0, Q at next level, format "{pi_ Q  a }").
 Reserved Notation "{pi a }" (at level 0, format "{pi  a }").
+#[warning="-postfix-notation-not-level-1"]
 Reserved Notation "x == y %[mod_eq e ]" (at level 70, y at next level,
   no associativity,   format "'[hv ' x '/'  ==  y '/'  %[mod_eq  e ] ']'").
+#[warning="-postfix-notation-not-level-1"]
 Reserved Notation "x = y %[mod_eq e ]" (at level 70, y at next level,
   no associativity,   format "'[hv ' x '/'  =  y '/'  %[mod_eq  e ] ']'").
+#[warning="-postfix-notation-not-level-1"]
 Reserved Notation "x != y %[mod_eq e ]" (at level 70, y at next level,
   no associativity,   format "'[hv ' x '/'  !=  y '/'  %[mod_eq  e ] ']'").
+#[warning="-postfix-notation-not-level-1"]
 Reserved Notation "x <> y %[mod_eq e ]" (at level 70, y at next level,
   no associativity,   format "'[hv ' x '/'  <>  y '/'  %[mod_eq  e ] ']'").
 Reserved Notation "{eq_quot e }"

@@ -671,12 +671,12 @@ Reserved Notation "+%R" (at level 0).
 Reserved Notation "-%R" (at level 0).
 Reserved Notation "*%R" (at level 0, format " *%R").
 Reserved Notation "*:%R" (at level 0, format " *:%R").
-Reserved Notation "n %:R" (at level 2, left associativity, format "n %:R").
-Reserved Notation "k %:A" (at level 2, left associativity, format "k %:A").
+Reserved Notation "n %:R" (left associativity, format "n %:R").
+Reserved Notation "k %:A" (left associativity, format "k %:A").
 Reserved Notation "[ 'pchar' F ]" (at level 0, format "[ 'pchar'  F ]").
 Reserved Notation "[ 'char' F ]" (at level 0, format "[ 'char'  F ]").
 
-Reserved Notation "x %:T" (at level 2, left associativity, format "x %:T").
+Reserved Notation "x %:T" (left associativity, format "x %:T").
 Reserved Notation "''X_' i" (at level 8, i at level 2, format "''X_' i").
 (* Patch for recurring Coq parser bug: Coq seg faults when a level 200 *)
 (* notation is used as a pattern.                                      *)
@@ -687,7 +687,7 @@ Reserved Notation "''forall' ''X_' i , f"
   (at level 199, i at level 2, right associativity,
    format "'[hv' ''forall'  ''X_' i , '/ '  f ']'").
 
-Reserved Notation "x ^f" (at level 2, left associativity, format "x ^f").
+Reserved Notation "x ^f" (left associativity, format "x ^f").
 
 Reserved Notation "\0" (at level 0).
 Reserved Notation "f \+ g" (at level 50, left associativity).

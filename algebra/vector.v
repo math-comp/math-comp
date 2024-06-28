@@ -282,7 +282,7 @@ Prenex Implicits subsetv addv capv complv diffv span free basis_of.
 
 Notation "U + V" := (addv U V) : vspace_scope.
 Notation "U :&: V" := (capv U V) : vspace_scope.
-Notation "U ^C" := (complv U) (at level 8, format "U ^C") : vspace_scope.
+Notation "U ^C" := (complv U) : vspace_scope.
 Notation "U :\: V" := (diffv U V) : vspace_scope.
 Notation "{ : vT }" := (@fullv _ vT) (only parsing) : vspace_scope.
 

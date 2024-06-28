@@ -24,7 +24,7 @@ Local Open Scope quotient_scope.
 
 Reserved Notation "{ 'ratio' T }" (at level 0, format "{ 'ratio'  T }").
 Reserved Notation "{ 'fraction' T }" (at level 0, format "{ 'fraction'  T }").
-Reserved Notation "x %:F" (at level 2, format "x %:F").
+Reserved Notation "x %:F" (format "x %:F").
 
 Section FracDomain.
 Variable R : nzRingType.

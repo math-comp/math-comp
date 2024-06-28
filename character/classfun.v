@@ -113,7 +113,7 @@ Reserved Notation "'[ phi , psi ]"
   (at level 2, format "'[hv' ''[' phi , '/ '  psi ] ']'").
 Reserved Notation "'[ phi ]_ G" (at level 2). (* only parsing *)
 Reserved Notation "'[ phi ]" (at level 2, format "''[' phi ]").
-Reserved Notation "phi ^u" (at level 3, format "phi ^u").
+Reserved Notation "phi ^u" (format "phi ^u").
 
 Section AlgC.
 (* Arithmetic properties of group orders in the characteristic 0 field algC. *)
@@ -2442,7 +2442,7 @@ Section FieldAutomorphism.
 Variables (u : {rmorphism algC -> algC}) (gT rT : finGroupType).
 Variables (G K H : {group gT}) (f : {morphism G >-> rT}) (R : {group rT}).
 Implicit Types (phi : 'CF(G)) (S : seq 'CF(G)).
-Local Notation "phi ^u" := (cfAut u phi) (at level 3, format "phi ^u").
+Local Notation "phi ^u" := (cfAut u phi).
 
 Lemma cfAutZ_nat n phi : (n%:R *: phi)^u = n%:R *: phi^u.
 Proof. exact: raddfZnat. Qed.
