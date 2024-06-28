@@ -207,7 +207,7 @@ Unset Printing Implicit Defensive.
 Declare Scope seq_scope.
 
 Reserved Notation "[ '<->' P0 ; P1 ; .. ; Pn ]"
-  (at level 0, format "[ '<->' '['  P0 ;  '/' P1 ;  '/'  .. ;  '/'  Pn ']' ]").
+  (format "[ '<->' '['  P0 ;  '/' P1 ;  '/'  .. ;  '/'  Pn ']' ]").
 
 Delimit Scope seq_scope with SEQ.
 Open Scope seq_scope.
@@ -224,20 +224,19 @@ Notation Nil T := (@nil T) (only parsing).
 (* them here.                                                                 *)
 Infix "::" := cons : seq_scope.
 
-Notation "[ :: ]" := nil (at level 0, format "[ :: ]") : seq_scope.
+Notation "[ :: ]" := nil (format "[ :: ]") : seq_scope.
 
-Notation "[ :: x1 ]" := (x1 :: [::])
-  (at level 0, format "[ ::  x1 ]") : seq_scope.
+Notation "[ :: x1 ]" := (x1 :: [::]) (format "[ ::  x1 ]") : seq_scope.
 
-Notation "[ :: x & s ]" := (x :: s) (at level 0, only parsing) : seq_scope.
+Notation "[ :: x & s ]" := (x :: s) (only parsing) : seq_scope.
 
 Notation "[ :: x1 , x2 , .. , xn & s ]" := (x1 :: x2 :: .. (xn :: s) ..)
-  (at level 0, format
+  (format
   "'[hv' [ :: '['  x1 , '/'  x2 , '/'  .. , '/'  xn ']' '/ '  &  s ] ']'"
   ) : seq_scope.
 
 Notation "[ :: x1 ; x2 ; .. ; xn ]" := (x1 :: x2 :: .. [:: xn] ..)
-  (at level 0, format "[ :: '['  x1 ; '/'  x2 ; '/'  .. ; '/'  xn ']' ]"
+  (format "[ :: '['  x1 ; '/'  x2 ; '/'  .. ; '/'  xn ']' ]"
   ) : seq_scope.
 
 Section Sequences.
@@ -960,21 +959,20 @@ Notation count_mem x := (count (pred_of_simpl (pred1 x))).
 Infix "++" := cat : seq_scope.
 
 Notation "[ 'seq' x <- s | C ]" := (filter (fun x => C%B) s)
- (at level 0, x at level 99,
-  format "[ '[hv' 'seq'  x  <-  s '/ '  |  C ] ']'") : seq_scope.
+ (x at level 99, format "[ '[hv' 'seq'  x  <-  s '/ '  |  C ] ']'") : seq_scope.
 Notation "[ 'seq' x <- s | C1 & C2 ]" := [seq x <- s | C1 && C2]
- (at level 0, x at level 99,
+ (x at level 99,
   format "[ '[hv' 'seq'  x  <-  s '/ '  |  C1 '/ '  &  C2 ] ']'") : seq_scope.
 Notation "[ 'seq' ' x <- s | C ]" := (filter (fun x => C%B) s)
- (at level 0, x strict pattern,
+ (x strict pattern,
   format "[ '[hv' 'seq'  ' x  <-  s '/ '  |  C ] ']'") : seq_scope.
 Notation "[ 'seq' ' x <- s | C1 & C2 ]" := [seq x <- s | C1 && C2]
- (at level 0, x strict pattern,
+ (x strict pattern,
   format "[ '[hv' 'seq'  ' x  <-  s '/ '  |  C1 '/ '  &  C2 ] ']'") : seq_scope.
 Notation "[ 'seq' x : T <- s | C ]" := (filter (fun x : T => C%B) s)
- (at level 0, x at level 99, only parsing).
+ (x at level 99, only parsing).
 Notation "[ 'seq' x : T <- s | C1 & C2 ]" := [seq x : T <- s | C1 && C2]
- (at level 0, x at level 99, only parsing).
+ (x at level 99, only parsing).
 
 (* Double induction/recursion. *)
 Lemma seq_ind2 {S T} (P : seq S -> seq T -> Type) :
@@ -2670,18 +2668,18 @@ Arguments onth_nth {T}.
 Arguments onth_inj {T}.
 
 Notation "[ 'seq' E | i <- s ]" := (map (fun i => E) s)
-  (at level 0, E at level 99, i binder,
+  (E at level 99, i binder,
    format "[ '[hv' 'seq'  E '/ '  |  i  <-  s ] ']'") : seq_scope.
 
 Notation "[ 'seq' E | i <- s & C ]" := [seq E | i <- [seq i <- s | C]]
-  (at level 0, E at level 99, i binder,
+  (E at level 99, i binder,
    format "[ '[hv' 'seq'  E '/ '  |  i  <-  s '/ '  &  C ] ']'") : seq_scope.
 
 Notation "[ 'seq' E : R | i <- s ]" := (@map _ R (fun i => E) s)
-  (at level 0, E at level 99, i binder, only parsing) : seq_scope.
+  (E at level 99, i binder, only parsing) : seq_scope.
 
 Notation "[ 'seq' E : R | i <- s & C ]" := [seq E : R | i <- [seq i <- s | C]]
-  (at level 0, E at level 99, i binder, only parsing) : seq_scope.
+  (E at level 99, i binder, only parsing) : seq_scope.
 
 Lemma filter_mask T a (s : seq T) : filter a s = mask (map a s) s.
 Proof. by elim: s => //= x s <-; case: (a x). Qed.
@@ -3687,12 +3685,12 @@ Arguments flatten_mapP {S T A s y}.
 
 Notation "[ 'seq' E | x <- s , y <- t ]" :=
   (flatten [seq [seq E | y <- t] | x <- s])
-  (at level 0, E at level 99, x binder, y binder,
+  (E at level 99, x binder, y binder,
    format "[ '[hv' 'seq'  E '/ '  |  x  <-  s , '/   '  y  <-  t ] ']'")
    : seq_scope.
 Notation "[ 'seq' E : R | x <- s , y <- t ]" :=
   (flatten [seq [seq E : R | y <- t] | x  <- s])
-  (at level 0, E at level 99, x binder, y binder, only parsing) : seq_scope.
+  (E at level 99, x binder, y binder, only parsing) : seq_scope.
 
 Section PrefixSuffixInfix.
 

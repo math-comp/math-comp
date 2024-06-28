@@ -115,10 +115,10 @@ Identity Coercion unfold_dfinfun_of : dfinfun_of >-> finfun_of.
 Arguments fun_of_fin {aT rT ph} f x.
 
 Notation "{ 'ffun' fT }" := (finfun_of (Phant fT))
-  (at level 0, format "{ 'ffun'  '[hv' fT ']' }") : type_scope.
+  (format "{ 'ffun'  '[hv' fT ']' }") : type_scope.
 
 Notation "{ 'dffun' fT }" := (dfinfun_of (Phant fT))
-  (at level 0, format "{ 'dffun'  '[hv' fT ']' }") : type_scope.
+  (format "{ 'dffun'  '[hv' fT ']' }") : type_scope.
 
 Definition exp_finIndexType n : finType := 'I_n.
 Notation "T ^ n" :=
@@ -132,13 +132,13 @@ Canonical finfun_unlock := Unlockable finfun.unlock.
 Arguments finfun {aT rT} g.
 
 Notation "[ 'ffun' x : aT => E ]" := (finfun (fun x : aT => E))
-  (at level 0, x name) : function_scope.
+  (x name) : function_scope.
 
 Notation "[ 'ffun' x => E ]" := (@finfun _ (fun=> _) (fun x => E))
-  (at level 0, x name, format "[ 'ffun'  x  =>  E ]") : function_scope.
+  (x name, format "[ 'ffun'  x  =>  E ]") : function_scope.
 
 Notation "[ 'ffun' => E ]" := [ffun _ => E]
-  (at level 0, format "[ 'ffun' =>  E ]") : function_scope.
+  (format "[ 'ffun' =>  E ]") : function_scope.
 
 (* Example outcommented.
 (* Examples of using finite functions as containers in recursive inductive    *)

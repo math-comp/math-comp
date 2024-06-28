@@ -107,22 +107,21 @@ Arguments has_Frobenius_action {gT} G%_g H%_g.
 
 Notation "[ 'Frobenius' G 'with' 'complement' H ]" :=
   (Frobenius_group_with_complement G H)
-  (at level 0, G at level 50, H at level 35,
+  (G at level 50, H at level 35,
    format "[ 'Frobenius'  G  'with'  'complement'  H ]") : group_scope.
 
 Notation "[ 'Frobenius' G 'with' 'kernel' K ]" :=
   (Frobenius_group_with_kernel G K)
-  (at level 0, G at level 50, K at level 35,
+  (G at level 50, K at level 35,
    format "[ 'Frobenius'  G  'with'  'kernel'  K ]") : group_scope.
 
 Notation "[ 'Frobenius' G ]" :=
   (Frobenius_group G)
-  (at level 0, G at level 50,
-   format "[ 'Frobenius'  G ]") : group_scope.
+  (G at level 50, format "[ 'Frobenius'  G ]") : group_scope.
 
 Notation "[ 'Frobenius' G = K ><| H ]" :=
   (Frobenius_group_with_kernel_and_complement G K H)
-  (at level 0, G at level 50, K, H at level 35,
+  (G at level 50, K, H at level 35,
    format "[ 'Frobenius'  G  =  K  ><|  H ]") : group_scope.
 
 Section FrobeniusBasics.

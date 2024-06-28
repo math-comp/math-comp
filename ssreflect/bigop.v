@@ -658,7 +658,7 @@ Notation "\big [ op / idx ]_ ( i 'in' A ) F" :=
 Notation BIG_F := (F in \big[_/_]_(i <- _ | _) F i)%pattern.
 Notation BIG_P := (P in \big[_/_]_(i <- _ | P i) _)%pattern.
 
-Local Notation "+%N" := addn (at level 0, only parsing).
+Local Notation "+%N" := addn (only parsing).
 Notation "\sum_ ( i <- r | P ) F" :=
   (\big[+%N/0%N]_(i <- r | P%B) F%N) : nat_scope.
 Notation "\sum_ ( i <- r ) F" :=
@@ -684,7 +684,7 @@ Notation "\sum_ ( i 'in' A | P ) F" :=
 Notation "\sum_ ( i 'in' A ) F" :=
   (\big[+%N/0%N]_(i in A) F%N) : nat_scope.
 
-Local Notation "*%N" := muln (at level 0, only parsing).
+Local Notation "*%N" := muln (only parsing).
 Notation "\prod_ ( i <- r | P ) F" :=
   (\big[*%N/1%N]_(i <- r | P%B) F%N) : nat_scope.
 Notation "\prod_ ( i <- r ) F" :=
@@ -1735,7 +1735,7 @@ Section Plain.
 
 Variable op : Monoid.law 1.
 
-Local Notation "*%M" := op (at level 0).
+Local Notation "*%M" := op.
 Local Notation "x * y" := (op x y).
 
 Lemma foldlE x r : foldl *%M x r = \big[*%M/1]_(y <- x :: r) y.
@@ -2006,7 +2006,7 @@ Section Abelian.
 
 Variable op : Monoid.com_law 1.
 
-Local Notation "'*%M'" := op (at level 0).
+Local Notation "'*%M'" := op.
 Local Notation "x * y" := (op x y).
 
 Lemma big_rem (I : eqType) r x (P : pred I) F :
@@ -2405,10 +2405,10 @@ Variables zero one : R.
 Local Notation "0" := zero.
 Local Notation "1" := one.
 Variable times : Monoid.mul_law 0.
-Local Notation "*%M" := times (at level 0).
+Local Notation "*%M" := times.
 Local Notation "x * y" := (times x y).
 Variable plus : Monoid.add_law 0 *%M.
-Local Notation "+%M" := plus (at level 0).
+Local Notation "+%M" := plus.
 Local Notation "x + y" := (plus x y).
 
 Lemma big_distrl I r a (P : pred I) F :

@@ -113,10 +113,8 @@ Qed.
 End Automorphism.
 
 Arguments Aut _ _%_g.
-Notation "[ 'Aut' G ]" := (Aut_group G)
-  (at level 0, format "[ 'Aut'  G ]") : Group_scope.
-Notation "[ 'Aut' G ]" := (Aut G)
-  (at level 0, only parsing) : group_scope.
+Notation "[ 'Aut' G ]" := (Aut_group G) (format "[ 'Aut'  G ]") : Group_scope.
+Notation "[ 'Aut' G ]" := (Aut G) (only parsing) : group_scope.
 
 Prenex Implicits Aut autm.
 

@@ -40,8 +40,7 @@ Import FinRing.Theory.
 Local Open Scope ring_scope.
 
 Reserved Notation "{ 'poly' '%/' p 'with' mi }"
-  (at level 0, p at level 2, mi at level 10,
-   format "{ 'poly'  '%/'  p  'with'  mi }").
+  (p at level 2, mi at level 10, format "{ 'poly'  '%/'  p  'with'  mi }").
 
 Section DomainDef.
 

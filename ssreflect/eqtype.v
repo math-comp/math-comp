@@ -395,9 +395,9 @@ Arguments predD1P {T x y b}.
 Prenex Implicits pred1 pred2 pred3 pred4 predU1 predC1 predD1.
 
 Notation "[ 'predU1' x & A ]" := (predU1 x [in A])
-  (at level 0, format "[ 'predU1'  x  &  A ]") : function_scope.
+  (format "[ 'predU1'  x  &  A ]") : function_scope.
 Notation "[ 'predD1' A & x ]" := (predD1 [in A] x)
-  (at level 0, format "[ 'predD1'  A  &  x ]") : function_scope.
+  (format "[ 'predD1'  A  &  x ]") : function_scope.
 
 (* Lemmas for reflected equality and functions.   *)
 
@@ -491,19 +491,19 @@ Arguments app_fdelta {aT rT%_type} df%_FUN_DELTA f z.
 Notation "[ 'fun' z : T => F 'with' d1 , .. , dn ]" :=
   (SimplFunDelta (fun z : T =>
      app_fdelta d1%FUN_DELTA .. (app_fdelta dn%FUN_DELTA  (fun _ => F)) ..))
-  (at level 0, z name, only parsing) : function_scope.
+  (z name, only parsing) : function_scope.
 
 Notation "[ 'fun' z => F 'with' d1 , .. , dn ]" :=
   (SimplFunDelta (fun z =>
      app_fdelta d1%FUN_DELTA .. (app_fdelta dn%FUN_DELTA (fun _ => F)) ..))
-  (at level 0, z name, format
+  (z name, format
    "'[hv' [ '[' 'fun'  z  => '/ '  F ']' '/'  'with'  '[' d1 , '/'  .. , '/'  dn ']' ] ']'"
    ) : function_scope.
 
 Notation "[ 'eta' f 'with' d1 , .. , dn ]" :=
   (SimplFunDelta (fun _ =>
      app_fdelta d1%FUN_DELTA .. (app_fdelta dn%FUN_DELTA f) ..))
-  (at level 0, format
+  (format
   "'[hv' [ '[' 'eta' '/ '  f ']' '/'  'with'  '[' d1 , '/'  .. , '/'  dn ']' ] ']'"
   ) : function_scope.
 
@@ -680,7 +680,7 @@ Local Notation inlined_new_rect :=
   (fun K K_S u => let (x) as u return K u := u in K_S x).
 
 Reserved Notation "[ 'isSub' 'for' v ]"
-  (at level 0, format "[ 'isSub'  'for'  v ]").
+  (format "[ 'isSub'  'for'  v ]").
 
 Notation "[ 'isSub' 'for' v ]" :=
   (@isSub.phant_Build _ _ _ v _ inlined_sub_rect vrefl_rect)
@@ -692,13 +692,13 @@ Notation "[ 'isSub' 'of'  T  'for' v ]" :=
 
 Notation "[ 'isSub' 'for' v 'by' rec ]" :=
  (@isSub.phant_Build _ _ _ v _ rec vrefl)
- (at level 0, format "[ 'isSub'  'for'  v  'by'  rec ]") : form_scope.
+ (format "[ 'isSub'  'for'  v  'by'  rec ]") : form_scope.
 
 Notation "[ 'isSub' 'for' v ]" := (@isSub.phant_Build _ _ _ v _ _ _)
-  (only printing, at level 0, format "[ 'isSub'  'for'  v ]") : form_scope.
+  (only printing, format "[ 'isSub'  'for'  v ]") : form_scope.
 
 Reserved Notation "[ 'isNew' 'for' v ]"
-  (at level 0, format "[ 'isNew'  'for'  v ]").
+  (format "[ 'isNew'  'for'  v ]").
 
 Definition NewMixin T U v c Urec sk :=
   let Urec' P IH := Urec P (fun x : T => IH x isT : P _) in
@@ -708,7 +708,7 @@ Notation "[ 'isNew' 'for' v ]" :=
   (@NewMixin _ _ v _ inlined_new_rect vrefl_rect) (only parsing) : form_scope.
 
 Notation "[ 'isNew' 'for' v ]" := (@NewMixin _ _ v _ _ _)
-  (only printing, at level 0, format "[ 'isNew'  'for'  v ]") : form_scope.
+  (only printing, format "[ 'isNew'  'for'  v ]") : form_scope.
 
 Notation "[ 'isNew' 'of'  T  'for' v ]" :=
   (@NewMixin _ T v _ inlined_new_rect vrefl_rect) (only parsing) : form_scope.
@@ -723,19 +723,19 @@ HB.instance Definition _ T (P : pred T) := [isSub of sig P for sval].
 
 (* Shorthand for sigma types over collective predicates. *)
 Notation "{ x 'in' A }" := {x | x \in A}
-  (at level 0, x at level 99, format  "{ x  'in'  A }") : type_scope.
+  (x at level 99, format  "{ x  'in'  A }") : type_scope.
 Notation "{ x 'in' A | P }" := {x | (x \in A) && P}
-  (at level 0, x at level 99, format  "{ x  'in'  A  |  P }") : type_scope.
+  (x at level 99, format  "{ x  'in'  A  |  P }") : type_scope.
 
 (* Shorthand for the return type of insub. *)
 Notation "{ ? x : T | P }" := (option {x : T | is_true P})
-  (at level 0, x at level 99, only parsing) : type_scope.
+  (x at level 99, only parsing) : type_scope.
 Notation "{ ? x | P }" := {? x : _ | P}
-  (at level 0, x at level 99, format  "{ ?  x  |  P }") : type_scope.
+  (x at level 99, format  "{ ?  x  |  P }") : type_scope.
 Notation "{ ? x 'in' A }" := {? x | x \in A}
-  (at level 0, x at level 99, format  "{ ?  x  'in'  A }") : type_scope.
+  (x at level 99, format  "{ ?  x  'in'  A }") : type_scope.
 Notation "{ ? x 'in' A | P }" := {? x | (x \in A) && P}
-  (at level 0, x at level 99, format  "{ ?  x  'in'  A  |  P }") : type_scope.
+  (x at level 99, format  "{ ?  x  'in'  A  |  P }") : type_scope.
 
 (* A variant of injection with default that infers a collective predicate *)
 (* from the membership proof for the default value.                       *)
@@ -803,7 +803,7 @@ Proof. exact/val_eqP/eqP. Qed.
 Arguments val_eqP {T P sT x y}.
 
 Notation "[ 'Equality' 'of' T 'by' <: ]" := (Equality.copy T%type (sub_type T%type))
-  (at level 0, format "[ 'Equality'  'of'  T  'by'  <: ]") : form_scope.
+  (format "[ 'Equality'  'of'  T  'by'  <: ]") : form_scope.
 
 HB.instance Definition _ := Equality.copy void (pcan_type (of_voidK unit)).
 HB.instance Definition _ (T : eqType) (P : pred T) :=
@@ -844,7 +844,7 @@ Definition predX T1 T2 (p1 : pred T1) (p2 : pred T2) :=
   [pred z | p1 z.1 & p2 z.2].
 
 Notation "[ 'predX' A1 & A2 ]" := (predX [in A1] [in A2])
-  (at level 0, format "[ 'predX'  A1  &  A2 ]") : function_scope.
+  (format "[ 'predX'  A1  &  A2 ]") : function_scope.
 
 Section OptionEqType.
 
