@@ -260,9 +260,9 @@ Reserved Notation "\mxdiag_ j E"
 Reserved Notation "\mxdiag_ ( j < n ) E"
   (at level 36, E at level 36, j, n at level 50). (* only parsing *)
 
-Reserved Notation "x %:M"   (at level 8, format "x %:M").
+Reserved Notation "x %:M"   (format "x %:M").
 Reserved Notation "A *m B" (at level 40, left associativity, format "A  *m  B").
-Reserved Notation "A ^T"    (at level 8, format "A ^T").
+Reserved Notation "A ^T"    (format "A ^T").
 Reserved Notation "\tr A"   (at level 10, A at level 8, format "\tr  A").
 Reserved Notation "\det A"  (at level 10, A at level 8, format "\det  A").
 Reserved Notation "\adj A"  (at level 10, A at level 8, format "\adj  A").
