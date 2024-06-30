@@ -9265,9 +9265,9 @@ End SetSubsetOrder.
 Module Exports.
 Arguments type disp T%type.
 Notation "{ 'subset' [ d ] T }" := (type d T)
-  (at level 2, d at next level, format "{ 'subset' [ d ]  T }") : type_scope.
+  (at level 0, d at next level, format "{ 'subset' [ d ]  T }") : type_scope.
 Notation "{ 'subset' T }" := {subset[subset_display] T}
-  (at level 2, format "{ 'subset' T }") : type_scope.
+  (at level 0, format "{ 'subset' T }") : type_scope.
 
 HB.reexport.
 

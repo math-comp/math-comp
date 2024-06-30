@@ -9,3 +9,6 @@
 -arg -w -arg +undeclared-scope
 -arg -w -arg +deprecated-hint-without-locality
 -arg -w -arg +deprecated-hint-rewrite-without-locality
+# handle the two following one when requiring Coq >= 8.20
+-arg -w -arg -closed-notation-not-level-0
+-arg -w -arg -postfix-notation-not-level-1

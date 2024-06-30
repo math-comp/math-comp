@@ -1670,7 +1670,8 @@ by rewrite cfunJ.
 Qed.
 Definition cfQuo phi := Cfun 1 (cfQuo_subproof phi).
 
-Local Notation "phi /  'B'" := (cfQuo phi) (at level 40) : cfun_scope.
+Local Notation "phi /  'B'" := (cfQuo phi)
+  (at level 40, left associativity) : cfun_scope.
 Local Notation "phi %%  'B'" := (cfMod phi) (at level 40) : cfun_scope.
 
 (* We specialize the cfMorph lemmas to cfMod by strengthening the domain      *)

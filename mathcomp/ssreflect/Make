@@ -36,3 +36,6 @@ order.v
 -arg -w -arg -opaque-let
 -arg -w -arg -argument-scope-delimiter
 -arg -w -arg -overwriting-delimiting-key
+# handle the two following one when requiring Coq >= 8.20
+-arg -w -arg -closed-notation-not-level-0
+-arg -w -arg -postfix-notation-not-level-1

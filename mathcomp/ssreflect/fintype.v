@@ -289,6 +289,7 @@ Delimit Scope fin_quant_scope with Q. (* Bogus, only used to declare scope. *)
 Bind Scope fin_quant_scope with quantified.
 
 Notation "F ^*" := (Quantified F) (at level 2).
+#[warning="-notation-incompatible-prefix"]
 Notation "F ^~" := (~~ F) (at level 2).
 
 Section Definitions.
@@ -1122,8 +1123,8 @@ Notation "[ 'seq' F | x ]" :=
     end)]
   (at level 0, F at level 99, x binder, only parsing) : seq_scope.
 Notation "[ 'seq' F | x : T ]" :=
-  [seq F | x : T in pred_of_simpl (@pred_of_argType T)]
-  (at level 0, F at level 99, x name, only printing,
+  [seq F | x in pred_of_simpl (@pred_of_argType T)]
+  (at level 0, F at level 99, x binder, only printing,
    format "'[hv' [ 'seq'  F '/ '  |  x  :  T ] ']'") : seq_scope.
 Notation "[ 'seq' F , x ]" := [seq F | x ]
   (at level 0, F at level 99, x binder, only parsing) : seq_scope.
