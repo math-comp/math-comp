@@ -2392,10 +2392,11 @@ Proof. by rewrite realBC distrC => ? /real_ltr_distlBl; apply. Qed.
 Lemma real_ler_distlCBl x y e : x - y \is real -> `|x - y| <= e -> y - e <= x.
 Proof. by rewrite realBC distrC => ? /real_ler_distlBl; apply. Qed.
 
-Lemma __deprecated__eqr_norm_id x : (`|x| == x) = (0 <= x).
-Proof. by rewrite ger0_def. Qed.
-Lemma __deprecated__eqr_normN x : (`|x| == - x) = (x <= 0).
-Proof. by rewrite ler0_def. Qed.
+#[deprecated(since="mathcomp 2.3.0", note="use `ger0_def` instead")]
+Lemma eqr_norm_id x : (`|x| == x) = (0 <= x). Proof. by rewrite ger0_def. Qed.
+
+#[deprecated(since="mathcomp 2.3.0", note="use `ler0_def` instead")]
+Lemma eqr_normN x : (`|x| == - x) = (x <= 0). Proof. by rewrite ler0_def. Qed.
 
 Definition eqr_norm_idVN := =^~ (ger0_def, ler0_def).
 
@@ -2552,8 +2553,8 @@ Proof. by move=> Rx; rewrite -normrN -oppr_lt0 -realEsign ?rpredN. Qed.
 Lemma real_normrEsign (x : R) (xR : x \is real) : `|x| = (-1) ^+ (x < 0)%R * x.
 Proof. by rewrite {3}[x]realEsign // signrMK. Qed.
 
-Lemma __deprecated__real_mulr_sign_norm x :
-  x \is real -> (-1) ^+ (x < 0)%R * `|x| = x.
+#[deprecated(since="mathcomp 2.3.0", note="use `realEsign` instead")]
+Lemma real_mulr_sign_norm x : x \is real -> (-1) ^+ (x < 0)%R * `|x| = x.
 Proof. by move/realEsign. Qed.
 
 Lemma real_mulr_Nsign_norm x : x \is real -> (-1) ^+ (0 < x)%R * `|x| = - x.
@@ -3354,7 +3355,8 @@ Proof. by case: sgrP; rewrite ?(mul0r, mul1r, mulN1r). Qed.
 Lemma numEsg x : x = sg x * `|x|.
 Proof. by case: sgrP; rewrite !(mul1r, mul0r, mulrNN). Qed.
 
-Lemma __deprecated__mulr_sg_norm x : sg x * `|x| = x. Proof. by rewrite -numEsg. Qed.
+#[deprecated(since="mathcomp 2.3.0", note="use `numEsg` instead")]
+Lemma mulr_sg_norm x : sg x * `|x| = x. Proof. by rewrite -numEsg. Qed.
 
 Lemma sgrM x y : sg (x * y) = sg x * sg y.
 Proof.
@@ -5079,14 +5081,6 @@ Qed.
 End Degle2PolyRealClosedConcave.
 
 End Theory.
-#[deprecated(since="mathcomp 2.3.0", note="use `numEsg` instead")]
-Notation mulr_sg_norm := __deprecated__mulr_sg_norm (only parsing).
-#[deprecated(since="mathcomp 2.3.0", note="use `ger0_def` instead")]
-Notation eqr_norm_id := __deprecated__eqr_norm_id (only parsing).
-#[deprecated(since="mathcomp 2.3.0", note="use `ler0_def` instead")]
-Notation eqr_normN := __deprecated__eqr_normN (only parsing).
-#[deprecated(since="mathcomp 2.3.0", note="use `realEsign` instead")]
-Notation real_mulr_sign_norm := __deprecated__real_mulr_sign_norm (only parsing).
 
 HB.factory Record IntegralDomain_isNumRing R of GRing.IntegralDomain R := {
   Rle : rel R;
