@@ -534,41 +534,31 @@ Implicit Type x : R.
 Definition upper_nthrootP x i : (bound x <= i)%N -> x < 2%:R ^+ i :=
   @ssrnum.Num.Theory.mc_2_0.upper_nthrootP R x i.
 
-#[deprecated(since="mathcomp 2.3.0", note="specialized version of `real_floor_itv`")]
 Lemma floor_itv x : (floor x)%:~R <= x < (floor x + 1)%:~R.
 Proof. exact: real_floor_itv. Qed.
 
-#[deprecated(since="mathcomp 2.3.0", note="specialized version of `real_ge_floor`")]
 Lemma ge_floor x : (floor x)%:~R <= x. Proof. exact: real_ge_floor. Qed.
 
-#[deprecated(since="mathcomp 2.3.0", note="specialized version of `real_lt_succ_floor`")]
 Lemma lt_succ_floor x : x < (floor x + 1)%:~R.
 Proof. exact: real_lt_succ_floor. Qed.
 
-#[deprecated(since="mathcomp 2.3.0", note="specialized version of `real_floor_ge_int`")]
 Lemma floor_ge_int x n : n%:~R <= x = (n <= floor x).
 Proof. exact: real_floor_ge_int. Qed.
 
-#[deprecated(since="mathcomp 2.3.0", note="specialized version of `real_ceil_itv`")]
 Lemma ceil_itv x : (ceil x - 1)%:~R < x <= (ceil x)%:~R.
 Proof. exact: real_ceil_itv. Qed.
 
-#[deprecated(since="mathcomp 2.3.0", note="specialized version of `real_gt_pred_ceil`")]
 Lemma gt_pred_ceil x : (ceil x - 1)%:~R < x.
 Proof. exact: real_gt_pred_ceil. Qed.
 
-#[deprecated(since="mathcomp 2.3.0", note="specialized version of `real_le_ceil`")]
 Lemma le_ceil x : x <= (ceil x)%:~R. Proof. exact: real_le_ceil. Qed.
 
-#[deprecated(since="mathcomp 2.3.0", note="specialized version of `real_ceil_le_int`")]
 Lemma ceil_le_int x n : x <= n%:~R = (ceil x <= n).
 Proof. exact: real_ceil_le_int. Qed.
 
-#[deprecated(since="mathcomp 2.3.0", note="specialized version of `real_ceilD`")]
 Lemma ceilD : {in @int_num R, {morph ceil : x y / x + y}}.
 Proof. by move=> x xi y; rewrite real_ceilD// num_real. Qed.
 
-#[deprecated(since="mathcomp 2.3.0", note="specialized version of `real_ceil_floor`")]
 Lemma ceil_floor x : ceil x = floor x + (~~ (x \is a int_num)).
 Proof. by rewrite real_ceil_floor. Qed.
 
