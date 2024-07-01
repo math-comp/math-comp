@@ -1823,7 +1823,8 @@ Notation polyC_mulrz := polyCMz (only parsing).
 #[deprecated(since="mathcomp 2.1.0",
              note="Require archimedean.v and use Num.nat instead.")]
 Notation Znat := (Num.Def.nat_num : qualifier 1 int) (only parsing).
-#[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
+#[deprecated(since="mathcomp 2.1.0",
+             note="Require archimedean.v and use natrP instead.")]
 Notation Znat_def := mc_2_0.Znat_def (only parsing).
 #[deprecated(since="mathcomp 2.1.0", note="Require archimedean.v.")]
 Notation ZnatP := mc_2_0.ZnatP (only parsing).
