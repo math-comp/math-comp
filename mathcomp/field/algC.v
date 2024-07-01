@@ -938,8 +938,8 @@ Notation truncC := (Num.trunc : algC -> nat) (only parsing).
 Lemma Creal0 : 0 \is Creal. Proof. exact: real0. Qed.
 Lemma Creal1 : 1 \is Creal. Proof. exact: real1. Qed.
 
-Lemma floorC_itv x : x \is Creal -> (floorC x)%:~R <= x < (floorC x + 1)%:~R.
-Proof. exact: floor_itv. Qed.
+Lemma real_floorC_itv x : x \is Creal -> (floorC x)%:~R <= x < (floorC x + 1)%:~R.
+Proof. exact: real_floor_itv. Qed.
 
 Lemma floorC_def x m : m%:~R <= x < (m + 1)%:~R -> floorC x = m.
 Proof. exact: floor_def. Qed.
@@ -1147,8 +1147,8 @@ Notation truncC := (Num.trunc : algC -> nat) (only parsing).
 Notation Creal0 := mc_2_0.Creal0 (only parsing).
 #[deprecated(since="mathcomp 2.1.0", note="Use real1 instead.")]
 Notation Creal1 := mc_2_0.Creal1 (only parsing).
-#[deprecated(since="mathcomp 2.1.0", note="Use floor_itv instead.")]
-Notation floorC_itv := mc_2_0.floorC_itv (only parsing).
+#[deprecated(since="mathcomp 2.1.0", note="Use real_floor_itv instead.")]
+Notation floorC_itv := mc_2_0.real_floorC_itv (only parsing).
 #[deprecated(since="mathcomp 2.1.0", note="Use floor_def instead.")]
 Notation floorC_def := mc_2_0.floorC_def (only parsing).
 #[deprecated(since="mathcomp 2.1.0", note="Use intrKfloor instead.")]
