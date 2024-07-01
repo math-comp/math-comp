@@ -338,7 +338,7 @@ have QtoQ z x: x \in sQ z -> {Qxz : 'AHom(Q x, Q z) | morph_ofQ x z Qxz}.
       rewrite ?rmorph1 ?rmorphM /= ?QxzE.
   have QxzaM := GRing.isAdditive.Build _ _ _ Qxza.
   have QxzmM := GRing.isMultiplicative.Build _ _ _ Qxzm.
-  have QxzlM := GRing.isScalable.Build _ _ _ _ _ (rat_linear Qxza).
+  have QxzlM := GRing.isSemiScalable.Build _ _ _ _ _ _ _ (rat_linear Qxza).
   pose QxzLRM : {lrmorphism _ -> _} := HB.pack Qxz QxzaM QxzmM QxzlM.
   by exists (linfun_ahom QxzLRM) => u; rewrite lfunE QxzE.
 pose sQs z s := all (mem (sQ z)) s.
@@ -707,7 +707,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     pose u : Qz := inQ z z.
     have /QtoQ[Qzt QztE] := t_z; exists (minPoly 1 u ^ Qzt).
       have /polyOver1P[q ->] := minPolyOver 1 u; apply/polyOver_poly=> j _.
-      by rewrite coef_map linearZZ rmorph1 rpredZ ?rpred1.
+      by rewrite coef_map linearZZ /= rmorph1 rpredZ ?rpred1.
     have [s /eqP Ds] := splitting_field_normal 1 u.
     rewrite Ds; exists (map Qzt s); first by rewrite map_rp eqpxx.
     apply/eqP; rewrite eqEsubv; apply/andP; split.

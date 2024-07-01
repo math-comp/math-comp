@@ -117,7 +117,8 @@ by rewrite linearD /= linearZ IH !mxE.
 Qed.
 
 HB.instance Definition _ n1 m2 n2 B :=
-  GRing.isLinear.Build _ _ _ _ (trowb B) (@trowb_is_linear n1 m2 n2 B).
+  GRing.isSemilinear.Build _ _ _ _ _ _ (trowb B)
+    (GRing.semilinear_linear (@trowb_is_linear n1 m2 n2 B)).
 
 Lemma trow_is_linear n1 m2 n2 (A : 'rV_n1) : linear (@trow n1 A m2 n2).
 Proof.
@@ -127,8 +128,8 @@ by case: split=> a; rewrite ?IH !mxE.
 Qed.
 
 HB.instance Definition _ n1 m2 n2 A :=
-  GRing.isLinear.Build _ _ _ _ (@trow n1 A m2 n2)
-    (@trow_is_linear n1 m2 n2 A).
+  GRing.isSemilinear.Build _ _ _ _ _ _ (@trow n1 A m2 n2)
+    (GRing.semilinear_linear (@trow_is_linear n1 m2 n2 A)).
 
 Fixpoint tprod  (m1 : nat) :
   forall n1 (A : 'M[F]_(m1,n1)) m2 n2 (B : 'M[F]_(m2,n2)),

@@ -118,8 +118,9 @@ Proof. by rewrite cfunElock conj1g if_same. Qed.
 
 Fact cfConjg_is_linear y : linear (cfConjg y : 'CF(G) -> 'CF(G)).
 Proof. by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock. Qed.
-HB.instance Definition _ y :=GRing.isLinear.Build _ _ _ _ (cfConjg y)
-  (cfConjg_is_linear y).
+HB.instance Definition _ y :=
+  GRing.isSemilinear.Build _ _ _ _ _ _ (cfConjg y)
+    (GRing.semilinear_linear (cfConjg_is_linear y)).
 
 Lemma cfConjg_cfuniJ A y : y \in 'N(G) -> ('1_A ^ y)%CF = '1_(A :^ y) :> 'CF(G).
 Proof.
@@ -581,7 +582,7 @@ Lemma cfConjgRes_norm phi y :
   y \in 'N(K) -> y \in 'N(H) -> ('Res[K, H] phi ^ y)%CF = 'Res (phi ^ y)%CF.
 Proof.
 move=> nKy nHy; have [sKH | not_sKH] := boolP (K \subset H); last first.
-  by rewrite !cfResEout // linearZ rmorph1 cfConjg1.
+  by rewrite !cfResEout // linearZ /= rmorph1 cfConjg1.
 by apply/cfun_inP=> x Kx; rewrite !(cfConjgE, cfResE) ?memJ_norm ?groupV.
 Qed.
 
@@ -647,7 +648,7 @@ Lemma cfConjgMorph (phi : 'CF(f @* H)) y :
   y \in D -> y \in 'N(H) -> (cfMorph phi ^ y)%CF = cfMorph (phi ^ f y).
 Proof.
 move=> Dy nHy; have [sHD | not_sHD] := boolP (H \subset D); last first.
-  by rewrite !cfMorphEout // linearZ rmorph1 cfConjg1.
+  by rewrite !cfMorphEout // linearZ /= rmorph1 cfConjg1.
 apply/cfun_inP=> x Gx; rewrite !(cfConjgE, cfMorphE) ?memJ_norm ?groupV //.
   by rewrite morphJ ?morphV ?groupV // (subsetP sHD).
 by rewrite (subsetP (morphim_norm _ _)) ?mem_morphim.
@@ -723,7 +724,7 @@ Proof.
 move=> nKy nHy; have keryK: (K \subset cfker (phi ^ y)) = (K \subset cfker phi).
   by rewrite cfker_conjg // -{1}(normP nKy) conjSg.
 have [kerK | not_kerK] := boolP (K \subset cfker phi); last first.
-  by rewrite !cfQuoEout ?linearZ ?rmorph1 ?cfConjg1 ?keryK.
+  by rewrite !cfQuoEout ?linearZ /= ?rmorph1 ?cfConjg1 ?keryK.
 apply/cfun_inP=> _ /morphimP[x nKx Hx ->].
 have nHyb: coset K y \in 'N(H / K) by rewrite inE -morphimJ ?(normP nHy).
 rewrite !(cfConjgE, cfQuoEnorm) ?keryK // ?in_setI ?Hx //.

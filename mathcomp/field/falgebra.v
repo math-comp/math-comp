@@ -236,8 +236,9 @@ move=> a u v; apply/lfunP => w.
 by rewrite !lfunE /= scale_lfunE !lfunE /= mulrDl scalerAl.
 Qed.
 #[hnf]
-HB.instance Definition _ := GRing.isLinear.Build K aT (hom aT aT) _ amull
-  amull_is_linear.
+HB.instance Definition _ :=
+  GRing.isSemilinear.Build K K idfun aT (hom aT aT) _ amull
+    (GRing.semilinear_linear amull_is_linear).
 
 (* amull is a converse ring morphism *)
 Lemma amull1 : amull 1 = \1%VF.
@@ -259,8 +260,9 @@ by apply/lfunP=> w; rewrite comp_lfunE !lfunE /= mulrA.
 Qed.
 
 #[hnf]
-HB.instance Definition _ := GRing.isLinear.Build K aT (hom aT aT) _ amulr
-  amulr_is_linear.
+HB.instance Definition _ :=
+  GRing.isSemilinear.Build K K idfun aT (hom aT aT) _ amulr
+    (GRing.semilinear_linear amulr_is_linear).
 #[hnf]
 HB.instance Definition _ := GRing.isMultiplicative.Build aT (hom aT aT) amulr
   amulr_is_multiplicative.
@@ -1031,7 +1033,9 @@ HB.instance Definition _ := [Equality of ahom by <:].
 HB.instance Definition _ := [Choice of ahom by <:].
 
 Fact linfun_is_ahom (f : {lrmorphism aT -> rT}) : ahom_in {:aT} (linfun f).
-Proof. by apply/ahom_inP; split=> [x y|]; rewrite !lfunE ?rmorphM ?rmorph1. Qed.
+Proof.
+by apply/ahom_inP; split=> [x y|]; rewrite !lfunE /= ?rmorphM ?rmorph1.
+Qed.
 Canonical linfun_ahom f := AHom (linfun_is_ahom f).
 
 End Class_Def.

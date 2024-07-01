@@ -484,7 +484,7 @@ Let body (y : L) (p := Fadjoin_poly E x y) : L :=
   (map_poly D p).[x] + p^`().[x] * Dx E.
 HB.instance Definition _ := @GRing.isAdditive.Build _ _ body
   (extendDerivation_additive_subproof E).
-HB.instance Definition _ := @GRing.isScalable.Build _ _ _ _ body
+HB.instance Definition _ := @GRing.isSemiScalable.Build _ _ _ _ _ _ body
   (extendDerivation_scalable_subproof E).
 Let extendDerivationLinear := Eval hnf in (body : {linear _ -> _}).
 Definition extendDerivation : 'End(L) := linfun extendDerivationLinear.
@@ -541,11 +541,11 @@ apply: (iffP idP) => [sepKx D derD /subvP DK_0 | derKx_0].
   by rewrite horner0 oppr0 mul0r mulr0 addr0.
 apply: wlog_neg; rewrite {1}separable_nz_der negbK => /eqP pKx'_0.
 pose Df := fun y => (Fadjoin_poly K x y)^`().[x].
-have Dlin: linear Df.
+have/GRing.semilinear_linear Dlin: linear Df.
   move=> a u v; rewrite /Df linearP /= -mul_polyC derivD derivM derivC.
   by rewrite mul0r add0r hornerD hornerM hornerC -scalerAl mul1r.
-pose DlinM := GRing.isLinear.Build _ _ _ _ Df Dlin.
-pose DL : GRing.Linear.type _ _ := HB.pack Df DlinM.
+pose DlinM := GRing.isSemilinear.Build _ _ _ _ _ _ Df Dlin.
+pose DL : GRing.Semilinear.type _ _ _ := HB.pack Df DlinM.
 pose D := linfun DL; apply: base_separable.
 have DK_0: (K <= lker D)%VS.
   apply/subvP=> v Kv; rewrite memv_ker lfunE /= /Df Fadjoin_polyC //.

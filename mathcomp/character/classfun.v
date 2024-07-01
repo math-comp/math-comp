@@ -351,7 +351,7 @@ Lemma cfAut_scalable : scalable_for (u \; *:%R) cfAut.
 Proof. by move=> a phi; apply/cfunP=> x; rewrite !cfunE rmorphM. Qed.
 
 HB.instance Definition _ :=
-  GRing.isScalable.Build algC classfun classfun (u \; *:%R) cfAut
+  GRing.isSemiScalable.Build algC algC idfun classfun classfun (u \; *:%R) cfAut
     cfAut_scalable.
 
 Definition cfAut_closed (S : seq classfun) :=
@@ -369,7 +369,8 @@ Definition cfConjC_subset (S1 S2 : seq classfun) :=
 
 Fact cfun_vect_iso : Vector.axiom #|classes G| classfun.
 Proof.
-exists (fun phi => \row_i phi (repr (enum_val i))) => [a phi psi|].
+exists (fun phi => \row_i phi (repr (enum_val i))).
+  apply/GRing.semilinear_linear => a phi psi.
   by apply/rowP=> i; rewrite !(mxE, cfunE).
 set n := #|_|; pose eK x : 'I_n := enum_rank_in (classes1 _) (x ^: G).
 have rV2vP v : is_class_fun G [ffun x => v (eK x) *+ (x \in G)].
@@ -843,8 +844,9 @@ rewrite linear_sum -big_split; apply: eq_bigr => x _ /=.
 by rewrite !cfunE mulrDl -mulrA.
 Qed.
 
-HB.instance Definition _ xi := GRing.isLinear.Build algC _ _ _ (cfdotr xi)
-  (cfdotr_is_linear xi).
+HB.instance Definition _ xi :=
+  GRing.isSemilinear.Build algC algC idfun _ _ _ (cfdotr xi)
+    (GRing.semilinear_linear (cfdotr_is_linear xi)).
 
 Lemma cfdot0l xi : '[0, xi] = 0.
 Proof. by rewrite -cfdotrE linear0. Qed.
@@ -1390,8 +1392,9 @@ Lemma cfRes_is_linear : linear cfRes.
 Proof.
 by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock mulrnAr mulrnDl.
 Qed.
-HB.instance Definition _ := GRing.isLinear.Build algC _ _ _ cfRes
-  cfRes_is_linear.
+HB.instance Definition _ :=
+  GRing.isSemilinear.Build algC algC idfun _ _ _ cfRes
+    (GRing.semilinear_linear cfRes_is_linear).
 
 Lemma cfRes_cfun1 : cfRes 1 = 1.
 Proof.
@@ -1499,8 +1502,9 @@ Fact cfMorph_is_linear : linear cfMorph.
 Proof.
 by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock mulrnAr -mulrnDl.
 Qed.
-HB.instance Definition _ := GRing.isLinear.Build algC _ _ _ cfMorph
-  cfMorph_is_linear.
+HB.instance Definition _ :=
+  GRing.isSemilinear.Build algC algC idfun _ _ _ cfMorph
+    (GRing.semilinear_linear cfMorph_is_linear).
 
 Fact cfMorph_is_multiplicative : multiplicative cfMorph.
 Proof.
@@ -1601,8 +1605,8 @@ Proof. rewrite unlock; exact: linearZ_LR. Qed.
 HB.instance Definition _ := GRing.isAdditive.Build _ _ cfIsom cfIsom_is_additive.
 HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfIsom
   cfIsom_is_multiplicative.
-HB.instance Definition _ := GRing.isScalable.Build _ _ _ _ cfIsom
-  cfIsom_is_scalable.
+HB.instance Definition _ :=
+  GRing.isSemiScalable.Build _ _ _ _ _ _ cfIsom cfIsom_is_scalable.
 
 Lemma cfIsom_cfun1 : cfIsom 1 = 1. Proof. exact: rmorph1. Qed.
 
@@ -1857,8 +1861,8 @@ Proof. rewrite unlock; exact: linearZ_LR. Qed.
 HB.instance Definition _ := GRing.isAdditive.Build _ _ cfSdprod cfSdprod_is_additive.
 HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfSdprod
   cfSdprod_is_multiplicative.
-HB.instance Definition _ := GRing.isScalable.Build _ _ _ _ cfSdprod
-  cfSdprod_is_scalable.
+HB.instance Definition _ :=
+  GRing.isSemiScalable.Build _ _ _ _ _ _ cfSdprod cfSdprod_is_scalable.
 
 Lemma cfSdprod1 phi : cfSdprod phi 1%g = phi 1%g.
 Proof. by rewrite unlock /= cfMorph1 cfIsom1. Qed.
@@ -2228,8 +2232,9 @@ move=> c phi psi; apply/cfunP=> x; rewrite !cfunElock; case: ifP => _.
 rewrite mulrnAr -mulrnDl !(mulrCA c) -!mulrDr [c * _]mulr_sumr -big_split /=.
 by congr (_ * (_ * _) *+ _); apply: eq_bigr => y; rewrite !cfunE mulrA mulrDl.
 Qed.
-HB.instance Definition _ := GRing.isLinear.Build algC _ _ _ cfInd
-  cfInd_is_linear.
+HB.instance Definition _ :=
+  GRing.isSemilinear.Build algC algC idfun _ _ _ cfInd
+    (GRing.semilinear_linear cfInd_is_linear).
 
 End Def.
 

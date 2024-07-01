@@ -203,7 +203,7 @@ by apply/polyP => i; rewrite !(coefZ, coef_map) /= !mulr_algl linearZ.
 Qed.
 HB.instance Definition _ := @GRing.isAdditive.Build _ _ kHomf
   kHomExtend_additive_subproof.
-HB.instance Definition _ := @GRing.isScalable.Build _ _ _ _ kHomf
+HB.instance Definition _ := @GRing.isSemiScalable.Build _ _ _ _ _ _ kHomf
   kHomExtend_scalable_subproof.
 Let kHomExtendLinear := Eval hnf in (kHomf : {linear _ -> _}).
 Definition kHomExtend := linfun kHomExtendLinear.
@@ -535,12 +535,12 @@ have{irr_q} [Lz [inLz [z qz0]]]: {Lz : fieldExtType F &
 - have [Lz0 _ [z qz0 defLz]] := irredp_FAdjoin irr_q.
   pose Lz : fieldExtType _ := baseFieldType Lz0.
   pose inLz : {rmorphism L -> Lz} := in_alg Lz0.
-  have inLzL_linear: linear (locked inLz).
+  have/GRing.semilinear_linear inLzL_linear: linear (locked inLz).
     by move=> a u v; rewrite -[in LHS]mulr_algl rmorphD rmorphM -lock mulr_algl.
-  pose inLzLlM := GRing.isLinear.Build _ _ _ _ _ inLzL_linear.
+  pose inLzLlM := GRing.isSemilinear.Build _ _ _ _ _ _ _ inLzL_linear.
   pose inLzLL : {linear _ -> _} := HB.pack (locked inLz : _ -> _) inLzLlM.
   have ihLzZ: ahom_in {:L} (linfun inLzLL).
-    by apply/ahom_inP; split=> [u v|]; rewrite !lfunE (rmorphM, rmorph1).
+    by apply/ahom_inP; split=> [u v|]; rewrite !lfunE /= (rmorphM, rmorph1).
   exists Lz, (AHom ihLzZ), z; congr (root _ z): qz0.
   by apply: eq_map_poly => y; rewrite lfunE /= -lock.
 pose imL := [aspace of limg inLz]; pose pz := map_poly inLz p.
@@ -567,7 +567,8 @@ have [f homLf fxz]: exists2 f : 'End(Lz), kHom 1 imL f & f (inLz x) = z.
     have [q2 Dq2]: exists q2, q1z = map_poly inLz q2.
       exists (\poly_(i < size q1z) (sval (sig_eqW (F0q1z i)))%:A).
       rewrite -{1}[q1z]coefK; apply/polyP=> i; rewrite coef_map !{1}coef_poly.
-      by case: sig_eqW => a; case: ifP; rewrite /= ?rmorph0 ?linearZ ?rmorph1.
+      case: sig_eqW => a.
+      by case: ifP; rewrite /= ?rmorph0 ?linearZ /= ?rmorph1.
     rewrite Dq2 dvdp_map minPoly_dvdp //.
       apply/polyOverP=> i; have[a] := F0q1z i.
       rewrite -(rmorph1 inLz) -linearZ.
