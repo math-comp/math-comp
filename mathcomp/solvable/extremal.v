@@ -273,7 +273,11 @@ have [cycF ffulF]: cyclic F /\ [faithful F, on 'Ohm_1(G) | [Aut G]].
     by rewrite val_Zp_nat // -Fp_nat_mod // modn_dvdm ?Fp_nat_mod.
   have m0M: {in A &, {morph fm0 : a b / a * b}}.
     move=> a b Aa Ab; apply: val_inj; rewrite /= -natrM mM //.
-    by rewrite -[(_ * _)%R]Zp_nat natZqp.
+    Set Printing All.
+    rewrite -[(_ * _)%R]valZpK.
+    Check valZpK.
+    Check Zp_nat.
+    rewrite Zp_mulrn. -[(_ * _)%R]Zp_nat natZqp.
   pose m0 : {morphism A >-> {unit 'F_p}} := Morphism m0M.
   have im_m0: m0 @* A = [set: {unit 'F_p}].
     apply/setP=> [[/= u Uu]]; rewrite in_setT morphimEdom; apply/imsetP.
