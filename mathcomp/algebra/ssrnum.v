@@ -181,7 +181,7 @@ Module Import Def.
 
 Notation normr := norm.
 Notation "`| x |" := (norm x) : ring_scope.
-  
+
 Notation ler := (@Order.le ring_display _) (only parsing).
 Notation "@ 'ler' R" := (@Order.le ring_display R)
   (at level 10, R at level 8, only parsing) : function_scope.
@@ -807,7 +807,7 @@ Proof. by move=> x y; rewrite !posrE => /ltW x0 /ltW y0; exact: ger0_le_norm. Qe
 
 Lemma ler0_ge_norm :
   {in npos &, {mono (@normr _ R) : x y / x <= y >-> x >= y}}.
-Proof. 
+Proof.
 move=> x y; rewrite !nposrE => x0 y0.
 by rewrite !ler0_norm// -subr_ge0 opprK addrC subr_ge0.
 Qed.
@@ -2392,9 +2392,11 @@ Proof. by rewrite realBC distrC => ? /real_ltr_distlBl; apply. Qed.
 Lemma real_ler_distlCBl x y e : x - y \is real -> `|x - y| <= e -> y - e <= x.
 Proof. by rewrite realBC distrC => ? /real_ler_distlBl; apply. Qed.
 
-(* GG: pointless duplication }-( *)
-Lemma eqr_norm_id x : (`|x| == x) = (0 <= x). Proof. by rewrite ger0_def. Qed.
-Lemma eqr_normN x : (`|x| == - x) = (x <= 0). Proof. by rewrite ler0_def. Qed.
+Lemma __deprecated__eqr_norm_id x : (`|x| == x) = (0 <= x).
+Proof. by rewrite ger0_def. Qed.
+Lemma __deprecated__eqr_normN x : (`|x| == - x) = (x <= 0).
+Proof. by rewrite ler0_def. Qed.
+
 Definition eqr_norm_idVN := =^~ (ger0_def, ler0_def).
 
 Lemma real_exprn_even_ge0 n x : x \is real -> ~~ odd n -> 0 <= x ^+ n.
@@ -2550,8 +2552,8 @@ Proof. by move=> Rx; rewrite -normrN -oppr_lt0 -realEsign ?rpredN. Qed.
 Lemma real_normrEsign (x : R) (xR : x \is real) : `|x| = (-1) ^+ (x < 0)%R * x.
 Proof. by rewrite {3}[x]realEsign // signrMK. Qed.
 
-(* GG: pointless duplication... *)
-Lemma real_mulr_sign_norm x : x \is real -> (-1) ^+ (x < 0)%R * `|x| = x.
+Lemma __deprecated__real_mulr_sign_norm x :
+  x \is real -> (-1) ^+ (x < 0)%R * `|x| = x.
 Proof. by move/realEsign. Qed.
 
 Lemma real_mulr_Nsign_norm x : x \is real -> (-1) ^+ (0 < x)%R * `|x| = - x.
@@ -3272,7 +3274,7 @@ Proof. by rewrite mulr_lt0 signr_lt0 signr_eq0. Qed.
 (* sign & norm *)
 
 Lemma mulr_sign_norm x : (-1) ^+ (x < 0)%R * `|x| = x.
-Proof. by rewrite real_mulr_sign_norm. Qed.
+Proof. by rewrite -realEsign. Qed.
 
 Lemma mulr_Nsign_norm x : (-1) ^+ (0 < x)%R * `|x| = - x.
 Proof. by rewrite real_mulr_Nsign_norm. Qed.
@@ -3352,8 +3354,7 @@ Proof. by case: sgrP; rewrite ?(mul0r, mul1r, mulN1r). Qed.
 Lemma numEsg x : x = sg x * `|x|.
 Proof. by case: sgrP; rewrite !(mul1r, mul0r, mulrNN). Qed.
 
-(* GG: duplicate! *)
-Lemma mulr_sg_norm x : sg x * `|x| = x. Proof. by rewrite -numEsg. Qed.
+Lemma __deprecated__mulr_sg_norm x : sg x * `|x| = x. Proof. by rewrite -numEsg. Qed.
 
 Lemma sgrM x y : sg (x * y) = sg x * sg y.
 Proof.
@@ -5078,6 +5079,14 @@ Qed.
 End Degle2PolyRealClosedConcave.
 
 End Theory.
+#[deprecated(since="mathcomp 2.3.0", note="use `numEsg` instead")]
+Notation mulr_sg_norm := __deprecated__mulr_sg_norm (only parsing).
+#[deprecated(since="mathcomp 2.3.0", note="use `ger0_def` instead")]
+Notation eqr_norm_id := __deprecated__eqr_norm_id (only parsing).
+#[deprecated(since="mathcomp 2.3.0", note="use `ler0_def` instead")]
+Notation eqr_normN := __deprecated__eqr_normN (only parsing).
+#[deprecated(since="mathcomp 2.3.0", note="use `realEsign` instead")]
+Notation real_mulr_sign_norm := __deprecated__real_mulr_sign_norm (only parsing).
 
 HB.factory Record IntegralDomain_isNumRing R of GRing.IntegralDomain R := {
   Rle : rel R;
