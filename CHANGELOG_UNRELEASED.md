@@ -144,6 +144,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `rcomplKU`, `diffErcompl`, `codiffErcompl`, `complEdiff`,
     `complEcodiff`, `complErcompl`
 
+- in `zmodp.v`
+  + lemmas `gen_tperm_stop`, `gen_tpermS`, `perm_add1X`, `gen_tpermn_cycle`,
+    `gen_tperm01_cycle`
+
+- in `cyclic.v`
+  + lemmas `eq_expg_ord`, `expgDzmod`
+
+- in `nilpotent.v`
+  + lemma `sol_setXn`
+
+- in `alt.v`
+  + lemmas `gen_tperm_cycle`, `solvable_AltF`, `solvable_SymF`
+
 ### Changed
 
 - in `bigop.v`
