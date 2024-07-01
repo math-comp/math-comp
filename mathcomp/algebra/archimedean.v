@@ -14,10 +14,6 @@ From mathcomp Require Import fintype bigop order ssralg poly ssrnum ssrint.
 (* "Import Num.Def." before your scripts as in the ssrnum library.            *)
 (* The modules provided by this library subsume those from ssrnum.            *)
 (*                                                                            *)
-(* NB: the Archimedean structures are actually defined in ssrnum, but they    *)
-(* are deprecated in ssrnum and will be relocated to this file in a future    *)
-(* release.                                                                   *)
-(*                                                                            *)
 (* This file defines the following structures:                                *)
 (*                                                                            *)
 (*      archiNumDomainType == numDomainType with the Archimedean axiom        *)
@@ -53,37 +49,96 @@ Local Open Scope ring_scope.
 Import Order.TTheory GRing.Theory Num.Theory.
 
 Module Num.
+Import ssrnum.Num.
 
-Module Import Exports.
+HB.mixin Record NumDomain_isArchimedean R of NumDomain R := {
+  trunc_subdef : R -> nat;
+  nat_num_subdef : pred R;
+  int_num_subdef : pred R;
+  trunc_subproof :
+    forall x,
+      if 0 <= x then (trunc_subdef x)%:R <= x < (trunc_subdef x).+1%:R
+      else trunc_subdef x == 0%N;
+  nat_num_subproof : forall x, nat_num_subdef x = ((trunc_subdef x)%:R == x);
+  int_num_subproof :
+    forall x, int_num_subdef x = nat_num_subdef x || nat_num_subdef (- x);
+}.
 
-Notation archiNumDomainType := Num.ArchiNumDomain.type.
-Notation archiNumFieldType := Num.ArchiNumField.type.
-Notation archiClosedFieldType := Num.ArchiClosedField.type.
-Notation archiDomainType := Num.ArchiDomain.type.
-Notation archiFieldType := Num.ArchiField.type.
-Notation archiRcfType := Num.ArchiRealClosedField.type.
+#[short(type="archiNumDomainType")]
+HB.structure Definition ArchiNumDomain :=
+  { R of NumDomain_isArchimedean R & NumDomain R }.
 
-End Exports.
+Module ArchiNumDomainExports.
+Bind Scope ring_scope with ArchiNumDomain.sort.
+End ArchiNumDomainExports.
+HB.export ArchiNumDomainExports.
 
-Module Import Internals.
+#[short(type="archiNumFieldType")]
+HB.structure Definition ArchiNumField :=
+  { R of NumDomain_isArchimedean R & NumField R }.
 
-Section ArchiNumDomain.
-Variable R : archiNumDomainType.
-Implicit Types x y : R.
+Module ArchiNumFieldExports.
+Bind Scope ring_scope with ArchiNumField.sort.
+End ArchiNumFieldExports.
+HB.export ArchiNumFieldExports.
 
-Local Notation trunc := (@Num.Def.trunc R).
+#[short(type="archiClosedFieldType")]
+HB.structure Definition ArchiClosedField :=
+  { R of NumDomain_isArchimedean R & ClosedField R }.
 
-Definition truncP x :
-  if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N :=
-  Num.Internals.truncP x.
+Module ArchiClosedFieldExports.
+Bind Scope ring_scope with ArchiClosedField.sort.
+End ArchiClosedFieldExports.
+HB.export ArchiClosedFieldExports.
 
-Definition trunc_itv x : 0 <= x -> (trunc x)%:R <= x < (trunc x).+1%:R :=
-  @Num.Internals.trunc_itv R x.
+#[short(type="archiDomainType")]
+HB.structure Definition ArchiDomain :=
+  { R of NumDomain_isArchimedean R & RealDomain R }.
 
-Fact floor_subproof x :
-  {m | if x \is Num.real then m%:~R <= x < (m + 1)%:~R else m == 0}.
+Module ArchiDomainExports.
+Bind Scope ring_scope with ArchiDomain.sort.
+End ArchiDomainExports.
+HB.export ArchiDomainExports.
+
+#[short(type="archiFieldType")]
+HB.structure Definition ArchiField :=
+  { R of NumDomain_isArchimedean R & RealField R }.
+
+Module ArchiFieldExports.
+Bind Scope ring_scope with ArchiField.sort.
+End ArchiFieldExports.
+HB.export ArchiFieldExports.
+
+#[short(type="archiRcfType")]
+HB.structure Definition ArchiRealClosedField :=
+  { R of NumDomain_isArchimedean R & RealClosedField R }.
+
+Module ArchiRealClosedFieldExports.
+Bind Scope ring_scope with ArchiRealClosedField.sort.
+End ArchiRealClosedFieldExports.
+HB.export ArchiRealClosedFieldExports.
+
+Module Import Def.
+Export ssrnum.Num.Def.
+Section Def.
+Context {R : archiNumDomainType}.
+Implicit Types x : R.
+
+Definition trunc : R -> nat := @trunc_subdef R.
+Definition nat_num : qualifier 1 R := [qualify a x : R | nat_num_subdef x].
+Definition int_num : qualifier 1 R := [qualify a x : R | int_num_subdef x].
+
+Local Lemma truncP x :
+  if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N.
+Proof. exact: trunc_subproof. Qed.
+
+Local Lemma trunc_itv x : 0 <= x -> (trunc x)%:R <= x < (trunc x).+1%:R.
+Proof. by move=> x_ge0; move: (truncP x); rewrite x_ge0. Qed.
+
+Local Fact floor_subproof x :
+  {m | if x \is Rreal then m%:~R <= x < (m + 1)%:~R else m == 0}.
 Proof.
-have [Rx | _] := boolP (x \is Num.real); last by exists 0.
+have [Rx | _] := boolP (x \is Rreal); last by exists 0.
 without loss x_ge0: x Rx / x >= 0.
   have [x_ge0 | /ltW x_le0] := real_ge0P Rx; first exact.
   case/(_ (- x)) => [||m]; rewrite ?rpredN ?oppr_ge0 //.
@@ -94,20 +149,45 @@ without loss x_ge0: x Rx / x >= 0.
 by exists (Posz (trunc x)); rewrite addrC -intS -!pmulrn trunc_itv.
 Qed.
 
-End ArchiNumDomain.
+Definition floor x := sval (floor_subproof x).
+Definition ceil x := - floor (- x).
+Definition archi_bound x := (trunc `|x|).+1.
 
-End Internals.
-
-Module Import Def.
-Export ssrnum.Num.Def.
-Definition floor {R : archiNumDomainType} (x : R) := sval (floor_subproof x).
-Definition ceil {R : archiNumDomainType} (x : R) := - floor (- x).
 End Def.
+End Def.
+
+Arguments trunc {R} : simpl never.
+Arguments nat_num {R} : simpl never.
+Arguments int_num {R} : simpl never.
 
 Notation trunc := trunc.
 Notation floor := floor.
 Notation ceil := ceil.
-Notation bound := Num.ExtraDef.archi_bound.
+Notation bound := archi_bound.
+
+Module intArchimedean.
+Section intArchimedean.
+
+Implicit Types n : int.
+
+Let trunc n : nat := if n is Posz n' then n' else 0%N.
+
+Lemma truncP n :
+  if 0 <= n then (trunc n)%:R <= n < (trunc n).+1%:R else trunc n == 0%N.
+Proof. by case: n => //= n; rewrite !natz intS ltz1D lexx. Qed.
+
+Lemma is_natE n : (0 <= n) = ((trunc n)%:R == n).
+Proof. by case: n => //= n; rewrite natz eqxx. Qed.
+
+Lemma is_intE n : true = (0 <= n) || (0 <= - n).
+Proof. by case: n. Qed.
+
+End intArchimedean.
+End intArchimedean.
+
+#[export]
+HB.instance Definition _ := NumDomain_isArchimedean.Build int
+  intArchimedean.truncP intArchimedean.is_natE intArchimedean.is_intE.
 
 Module Import Theory.
 Export ssrnum.Num.Theory.
@@ -117,28 +197,35 @@ Section ArchiNumDomainTheory.
 Variable R : archiNumDomainType.
 Implicit Types x y z : R.
 
-Local Notation trunc := (@Num.trunc R).
-Local Notation floor := (@Num.floor R).
-Local Notation ceil := (@Num.ceil R).
+Local Notation trunc := (@trunc R).
+Local Notation floor := (@floor R).
+Local Notation ceil := (@ceil R).
 Local Notation nat_num := (@nat_num R).
 Local Notation int_num := (@int_num R).
 
 (* trunc and nat_num *)
 
 Definition trunc_itv x : 0 <= x -> (trunc x)%:R <= x < (trunc x).+1%:R :=
-  @trunc_itv R x.
+  @Def.trunc_itv R x.
 
-Definition natrE x : (x \is a nat_num) = ((trunc x)%:R == x) :=
-  @ssrnum.Num.Theory.mc_2_0.natrE R x.
+Lemma natrE x : (x \is a nat_num) = ((trunc x)%:R == x).
+Proof. exact: nat_num_subproof. Qed.
 
-Definition archi_boundP x : 0 <= x -> x < (bound x)%:R :=
-  @ssrnum.Num.Theory.mc_2_0.archi_boundP R x.
+Lemma archi_boundP x : 0 <= x -> x < (archi_bound x)%:R.
+Proof.
+move=> x_ge0; case/trunc_itv/andP: (normr_ge0 x) => _.
+exact/le_lt_trans/real_ler_norm/ger0_real.
+Qed.
 
-Definition trunc_def x n : n%:R <= x < n.+1%:R -> trunc x = n :=
-  @ssrnum.Num.Theory.mc_2_0.trunc_def R x n.
+Lemma trunc_def x n : n%:R <= x < n.+1%:R -> trunc x = n.
+Proof.
+case/andP=> lemx ltxm1; apply/eqP; rewrite eqn_leq -ltnS -[(n <= _)%N]ltnS.
+have/trunc_itv/andP[lefx ltxf1]: 0 <= x by apply: le_trans lemx; apply: ler0n.
+by rewrite -!(ltr_nat R) 2?(@le_lt_trans _ _ x).
+Qed.
 
-Definition natrK : cancel (GRing.natmul 1) trunc :=
-  @ssrnum.Num.Theory.mc_2_0.natrK R.
+Lemma natrK : cancel (GRing.natmul 1) trunc.
+Proof. by move=> m; apply: trunc_def; rewrite ler_nat ltr_nat ltnS leqnn. Qed.
 
 Lemma truncK : {in nat_num, cancel trunc (GRing.natmul 1)}.
 Proof. by move=> x; rewrite natrE => /eqP. Qed.
@@ -147,12 +234,14 @@ Lemma trunc0 : trunc 0 = 0%N. Proof. exact: natrK 0%N. Qed.
 Lemma trunc1 : trunc 1 = 1%N. Proof. exact: natrK 1%N. Qed.
 #[local] Hint Resolve trunc0 trunc1 : core.
 
-Definition natr_nat n : n%:R \is a nat_num :=
-  @ssrnum.Num.Theory.mc_2_0.natr_nat R n.
+Lemma natr_nat n : n%:R \is a nat_num. Proof. by rewrite natrE natrK. Qed.
 #[local] Hint Resolve natr_nat : core.
 
-Definition natrP x : reflect (exists n, x = n%:R) (x \is a nat_num) :=
-  @ssrnum.Num.Theory.mc_2_0.natrP R x.
+Lemma natrP x : reflect (exists n, x = n%:R) (x \is a nat_num).
+Proof.
+apply: (iffP idP) => [|[n ->]]; rewrite // natrE => /eqP <-.
+by exists (trunc x).
+Qed.
 
 Lemma truncD : {in nat_num & Rnneg, {morph trunc : x y / x + y >-> (x + y)%N}}.
 Proof.
@@ -169,14 +258,16 @@ Proof. by move=> _ /natrP[n1 ->]; rewrite -natrX !natrK. Qed.
 Lemma rpred_nat_num (S : semiringClosed R) x : x \is a nat_num -> x \in S.
 Proof. by move=> /natrP[n ->]; apply: rpred_nat. Qed.
 
-Definition nat_num0 : 0 \is a nat_num := @ssrnum.Num.Theory.mc_2_0.nat_num0 R.
-Definition nat_num1 : 1 \is a nat_num := @ssrnum.Num.Theory.mc_2_0.nat_num1 R.
+Lemma nat_num0 : 0 \is a nat_num. Proof. exact: (natr_nat 0). Qed.
+Lemma nat_num1 : 1 \is a nat_num. Proof. exact: (natr_nat 1). Qed.
 #[local] Hint Resolve nat_num0 nat_num1 : core.
 
-Definition nat_num_semiring : semiring_closed nat_num :=
-  @ssrnum.Num.Theory.mc_2_0.nat_num_semiring R.
+Fact nat_num_semiring : semiring_closed nat_num.
+Proof.
+by do 2![split] => //= _ _ /natrP[n ->] /natrP[m ->]; rewrite -(natrD, natrM).
+Qed.
 #[export]
-HB.instance Definition _ := GRing.isSemiringClosed.Build R Num.nat_num_subdef
+HB.instance Definition _ := GRing.isSemiringClosed.Build R nat_num_subdef
   nat_num_semiring.
 
 Lemma Rreal_nat : {subset nat_num <= Rreal}.
@@ -187,7 +278,7 @@ Proof. by move/Rreal_nat/real_normK. Qed.
 
 Lemma trunc_gt0 x : (0 < trunc x)%N = (1 <= x).
 Proof.
-case: ifP (truncP x) => [le0x /andP[lemx ltxm1] | le0x /eqP ->]; last first.
+case: ifP (Def.truncP x) => [le0x /andP[lemx ltxm1] | le0x /eqP ->]; last first.
   by apply/esym; apply/contraFF/le_trans: le0x.
 apply/idP/idP => [m_gt0 | x_ge1]; first by apply: le_trans lemx; rewrite ler1n.
 by rewrite -ltnS -(ltr_nat R) (le_lt_trans x_ge1).
@@ -246,12 +337,11 @@ Qed.
 (* floor and int_num *)
 
 Local Lemma floorP x :
-  if x \is Rreal then
-    (floor x)%:~R <= x < (floor x + 1)%:~R else floor x == 0%N.
-Proof. by rewrite /floor; case: (floor_subproof x). Qed.
+  if x \is Rreal then (floor x)%:~R <= x < (floor x + 1)%:~R else floor x == 0.
+Proof. by rewrite /floor; case: Def.floor_subproof. Qed.
 
-Definition intrE x : (x \is a int_num) = (x \is a nat_num) || (- x \is a nat_num) :=
-  @ssrnum.Num.Theory.mc_2_0.intrE R x.
+Lemma intrE x : (x \is a int_num) = (x \is a nat_num) || (- x \is a nat_num).
+Proof. exact: int_num_subproof. Qed.
 
 Lemma real_floor_itv x : x \is Rreal -> (floor x)%:~R <= x < (floor x + 1)%:~R.
 Proof. by case: (x \is _) (floorP x). Qed.
@@ -398,7 +488,7 @@ Lemma rpred_int_num (S : subringClosed R) x : x \is a int_num -> x \in S.
 Proof. by move=> /intrP[n ->]; rewrite rpred_int. Qed.
 
 Lemma int_num0 : 0 \is a int_num. Proof. by rewrite intrE nat_num0. Qed.
-Definition int_num1 : 1 \is a int_num := @ssrnum.Num.Theory.mc_2_0.int_num1 R.
+Lemma int_num1 : 1 \is a int_num. Proof. by rewrite intrE nat_num1. Qed.
 #[local] Hint Resolve int_num0 int_num1 : core.
 
 Fact int_num_subring : subring_closed int_num.
@@ -406,7 +496,7 @@ Proof.
 by split=> // _ _ /intrP[n ->] /intrP[m ->]; rewrite -?mulrzBr -?intrM intr_int.
 Qed.
 #[export]
-HB.instance Definition _ := GRing.isSubringClosed.Build R Num.int_num_subdef
+HB.instance Definition _ := GRing.isSubringClosed.Build R int_num_subdef
   int_num_subring.
 
 Lemma intr_nat : {subset nat_num <= int_num}.
@@ -514,25 +604,28 @@ Arguments intrP {R x}.
 #[global] Hint Resolve floor0 floor1 : core.
 #[global] Hint Resolve ceil0 ceil1 : core.
 #[global] Hint Extern 0 (is_true (_%:R \is a nat_num)) => apply: natr_nat : core.
-#[global] Hint Extern 0 (is_true (_%:R \in Num.nat_num_subdef)) => apply: natr_nat : core.
+#[global] Hint Extern 0 (is_true (_%:R \in nat_num_subdef)) => apply: natr_nat : core.
 #[global] Hint Extern 0 (is_true (_%:~R \is a int_num)) => apply: intr_int : core.
-#[global] Hint Extern 0 (is_true (_%:~R \in Num.int_num_subdef)) => apply: intr_int : core.
+#[global] Hint Extern 0 (is_true (_%:~R \in int_num_subdef)) => apply: intr_int : core.
 #[global] Hint Extern 0 (is_true (0 \is a nat_num)) => apply: nat_num0 : core.
-#[global] Hint Extern 0 (is_true (0 \in Num.nat_num_subdef)) => apply: nat_num0 : core.
+#[global] Hint Extern 0 (is_true (0 \in nat_num_subdef)) => apply: nat_num0 : core.
 #[global] Hint Extern 0 (is_true (1 \is a nat_num)) => apply: nat_num1 : core.
-#[global] Hint Extern 0 (is_true (1 \in Num.int_num_subdef)) => apply: nat_num1 : core.
+#[global] Hint Extern 0 (is_true (1 \in int_num_subdef)) => apply: nat_num1 : core.
 #[global] Hint Extern 0 (is_true (0 \is a int_num)) => apply: int_num0 : core.
-#[global] Hint Extern 0 (is_true (0 \in Num.int_num_subdef)) => apply: int_num0 : core.
+#[global] Hint Extern 0 (is_true (0 \in int_num_subdef)) => apply: int_num0 : core.
 #[global] Hint Extern 0 (is_true (1 \is a int_num)) => apply: int_num1 : core.
-#[global] Hint Extern 0 (is_true (1 \in Num.int_num_subdef)) => apply: int_num1 : core.
+#[global] Hint Extern 0 (is_true (1 \in int_num_subdef)) => apply: int_num1 : core.
 
 Section ArchiDomainTheory.
 
 Variables (R : archiDomainType).
 Implicit Type x : R.
 
-Definition upper_nthrootP x i : (bound x <= i)%N -> x < 2%:R ^+ i :=
-  @ssrnum.Num.Theory.mc_2_0.upper_nthrootP R x i.
+Lemma upper_nthrootP x i : (archi_bound x <= i)%N -> x < 2%:R ^+ i.
+Proof.
+case/trunc_itv/andP: (normr_ge0 x) => _ /ltr_normlW xlt le_b_i.
+by rewrite (lt_le_trans xlt) // -natrX ler_nat (ltn_trans le_b_i) // ltn_expl.
+Qed.
 
 Lemma floor_itv x : (floor x)%:~R <= x < (floor x + 1)%:~R.
 Proof. exact: real_floor_itv. Qed.
@@ -595,23 +688,57 @@ End ArchiClosedFieldTheory.
 
 Section ZnatPred.
 
-Notation Znat_def := ssrint.mc_2_0.Znat_def.
-Notation ZnatP := ssrint.mc_2_0.ZnatP.
+Lemma Znat_def (n : int) : (n \is a nat_num) = (0 <= n).
+Proof. by []. Qed.
+
+Lemma ZnatP (m : int) : reflect (exists n : nat, m = n) (m \is a nat_num).
+Proof. by case: m => m; constructor; [exists m | case]. Qed.
 
 End ZnatPred.
 
 End Theory.
 
-Module PredInstances.
-HB.reexport.
-End PredInstances.
+HB.factory Record NumDomain_bounded_isArchimedean R of NumDomain R := {
+  archi_bound_subproof : archimedean_axiom R
+}.
 
+HB.builders Context R of NumDomain_bounded_isArchimedean R.
+  Implicit Type x : R.
+
+  Definition bound x := sval (sigW (archi_bound_subproof x)).
+
+  Lemma boundP x : 0 <= x -> x < (bound x)%:R.
+  Proof. by move/ger0_norm=> {1}<-; rewrite /bound; case: (sigW _). Qed.
+
+  Fact trunc_subproof x : {m | 0 <= x -> m%:R <= x < m.+1%:R }.
+  Proof.
+  have [Rx | _] := boolP (0 <= x); last by exists 0%N.
+  have/ex_minnP[n lt_x_n1 min_n]: exists n, x < n.+1%:R.
+    by exists (bound x); rewrite (lt_trans (boundP Rx)) ?ltr_nat.
+  exists n => _; rewrite {}lt_x_n1 andbT; case: n min_n => //= n min_n.
+  rewrite real_leNgt ?rpred_nat ?ger0_real //; apply/negP => /min_n.
+  by rewrite ltnn.
+  Qed.
+
+  Definition trunc x := if 0 <= x then sval (trunc_subproof x) else 0%N.
+
+  Lemma truncP x :
+    if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N.
+  Proof.
+  rewrite /trunc; case: trunc_subproof => // n hn.
+  by case: ifP => x_ge0; rewrite ?(ifT _ _ x_ge0) ?(ifF _ _ x_ge0) // hn.
+  Qed.
+
+  HB.instance Definition _ := NumDomain_isArchimedean.Build R
+    truncP (fun => erefl) (fun => erefl).
+HB.end.
+
+Module Exports. HB.reexport. End Exports.
+
+(* Not to pollute the local namespace, we define Num.nat and Num.int here. *)
 Notation nat := nat_num.
 Notation int := int_num.
 
 End Num.
 
-Export Num.ArchiNumDomain.Exports Num.ArchiNumField.Exports.
-Export Num.ArchiClosedField.Exports Num.ArchiDomain.Exports.
-Export Num.ArchiField.Exports Num.ArchiRealClosedField.Exports.
-Export Num.Exports Num.PredInstances.
+Export Num.Exports.
