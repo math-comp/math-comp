@@ -531,6 +531,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + factory `hasComplement`,
     use `CBDistrLattice_hasComplement` instead
 
+- in `ssrnum.v`:
+  + lemma `mulr_sg_norm` (use `numEsg` instead)
+  + lemma `eqr_norm_id` (use `ger0_def` instead)
+  + lemma `eqr_normN` (use `ler0_def` instead)
+  + lemma `real_mulr_sign_norm` (use `realEsign` instead)
+
 ### Infrastructure
 
 ### Misc
