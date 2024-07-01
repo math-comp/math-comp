@@ -245,8 +245,7 @@ Notation "[ 'pick' x : T ]" := [pick x : T | pick_true x]
   (only parsing) : form_scope.
 Notation "[ 'pick' x : T ]" := [pick x : T | pick_true _]
   (only printing) : form_scope.
-Notation "[ 'pick' x ]" := [pick x : _]
-  (x name, only parsing) : form_scope.
+Notation "[ 'pick' x ]" := [pick x : _] (x name, only parsing) : form_scope.
 Notation "[ 'pick' x | P & Q ]" := [pick x | P && Q ]
   (x name, format "[ '[hv ' 'pick'  x  |  P '/ '   &  Q ] ']'") : form_scope.
 Notation "[ 'pick' x : T | P & Q ]" := [pick x : T | P && Q ]
@@ -314,67 +313,59 @@ Module Exports.
 Notation ", F" := F^* (at level 200, format ", '/ '  F") : fin_quant_scope.
 
 Notation "[ 'forall' x B ]" := [x | all B]
-  (x at level 99, B at level 200,
-   format "[ '[hv' 'forall'  x B ] ']'") : bool_scope.
+  (x at level 99, format "[ '[hv' 'forall'  x B ] ']'") : bool_scope.
 
-Notation "[ 'forall' x : T B ]" := [x : T | all B]
-  (x at level 99, B at level 200, only parsing) : bool_scope.
+Notation "[ 'forall' x : T B ]" := [x : T | all B] (only parsing) : bool_scope.
 Notation "[ 'forall' ( x | C ) B ]" := [x | all_in C B]
-  (x at level 99, B at level 200,
+  (x at level 99,
    format "[ '[hv' '[' 'forall'  ( x '/  '  |  C ) ']' B ] ']'") : bool_scope.
 Notation "[ 'forall' ( x : T | C ) B ]" := [x : T | all_in C B]
-  (x at level 99, B at level 200, only parsing) : bool_scope.
+  (x at level 99, only parsing) : bool_scope.
 Notation "[ 'forall' x 'in' A B ]" := [x | all_in (x \in A) B]
-  (x at level 99, B at level 200,
-   format "[ '[hv' '[' 'forall'  x '/  '  'in'  A ']' B ] ']'") : bool_scope.
+  (format "[ '[hv' '[' 'forall'  x '/  '  'in'  A ']' B ] ']'") : bool_scope.
 Notation "[ 'forall' x : T 'in' A B ]" := [x : T | all_in (x \in A) B]
-  (x at level 99, B at level 200, only parsing) : bool_scope.
+  (only parsing) : bool_scope.
 Notation ", 'forall' x B" := [x | all B]^*
-  (at level 200, x at level 99, B at level 200,
+  (at level 200, x at level 99,
    format ", '/ '  'forall'  x B") : fin_quant_scope.
 Notation ", 'forall' x : T B" := [x : T | all B]^*
-  (at level 200, x at level 99, B at level 200, only parsing) : fin_quant_scope.
+  (only parsing) : fin_quant_scope.
 Notation ", 'forall' ( x | C ) B" := [x | all_in C B]^*
-  (at level 200, x at level 99, B at level 200,
+  (x at level 99,
    format ", '/ '  '[' 'forall'  ( x '/  '  |  C ) ']' B") : fin_quant_scope.
 Notation ", 'forall' ( x : T | C ) B" := [x : T | all_in C B]^*
-  (at level 200, x at level 99, B at level 200, only parsing) : fin_quant_scope.
+  (only parsing) : fin_quant_scope.
 Notation ", 'forall' x 'in' A B" := [x | all_in (x \in A) B]^*
-  (at level 200, x at level 99, B at level 200,
-   format ", '/ '  '[' 'forall'  x '/  '  'in'  A ']' B") : bool_scope.
+  (format ", '/ '  '[' 'forall'  x '/  '  'in'  A ']' B") : bool_scope.
 Notation ", 'forall' x : T 'in' A B" := [x : T | all_in (x \in A) B]^*
-  (at level 200, x at level 99, B at level 200, only parsing) : bool_scope.
+  (only parsing) : bool_scope.
 
 Notation "[ 'exists' x B ]" := [x | ex B]^~
-  (x at level 99, B at level 200,
+  (x at level 99,
    format "[ '[hv' 'exists'  x B ] ']'") : bool_scope.
-Notation "[ 'exists' x : T B ]" := [x : T | ex B]^~
-  (x at level 99, B at level 200, only parsing) : bool_scope.
+Notation "[ 'exists' x : T B ]" := [x : T | ex B]^~ (only parsing) : bool_scope.
 Notation "[ 'exists' ( x | C ) B ]" := [x | ex_in C B]^~
-  (x at level 99, B at level 200,
+  (x at level 99,
    format "[ '[hv' '[' 'exists'  ( x '/  '  |  C ) ']' B ] ']'") : bool_scope.
 Notation "[ 'exists' ( x : T | C ) B ]" := [x : T | ex_in C B]^~
-  (x at level 99, B at level 200, only parsing) : bool_scope.
+  (only parsing) : bool_scope.
 Notation "[ 'exists' x 'in' A B ]" := [x | ex_in (x \in A) B]^~
-  (x at level 99, B at level 200,
-   format "[ '[hv' '[' 'exists'  x '/  '  'in'  A ']' B ] ']'") : bool_scope.
+  (format "[ '[hv' '[' 'exists'  x '/  '  'in'  A ']' B ] ']'") : bool_scope.
 Notation "[ 'exists' x : T 'in' A B ]" := [x : T | ex_in (x \in A) B]^~
-  (x at level 99, B at level 200, only parsing) : bool_scope.
+  (only parsing) : bool_scope.
 Notation ", 'exists' x B" := [x | ex B]^~^*
-  (at level 200, x at level 99, B at level 200,
-   format ", '/ '  'exists'  x B") : fin_quant_scope.
+  (x at level 99, format ", '/ '  'exists'  x B") : fin_quant_scope.
 Notation ", 'exists' x : T B" := [x : T | ex B]^~^*
-  (at level 200, x at level 99, B at level 200, only parsing) : fin_quant_scope.
+  (only parsing) : fin_quant_scope.
 Notation ", 'exists' ( x | C ) B" := [x | ex_in C B]^~^*
-  (at level 200, x at level 99, B at level 200,
+  (x at level 99,
    format ", '/ '  '[' 'exists'  ( x '/  '  |  C ) ']' B") : fin_quant_scope.
 Notation ", 'exists' ( x : T | C ) B" := [x : T | ex_in C B]^~^*
-  (at level 200, x at level 99, B at level 200, only parsing) : fin_quant_scope.
+  (only parsing) : fin_quant_scope.
 Notation ", 'exists' x 'in' A B" := [x | ex_in (x \in A) B]^~^*
-  (at level 200, x at level 99, B at level 200,
-   format ", '/ '  '[' 'exists'  x '/  '  'in'  A ']' B") : bool_scope.
+  (format ", '/ '  '[' 'exists'  x '/  '  'in'  A ']' B") : bool_scope.
 Notation ", 'exists' x : T 'in' A B" := [x : T | ex_in (x \in A) B]^~^*
-  (at level 200, x at level 99, B at level 200, only parsing) : bool_scope.
+  (only parsing) : bool_scope.
 
 End Exports.
 
@@ -383,8 +374,7 @@ Export FiniteQuant.Exports.
 
 Definition disjoint T (A B : mem_pred _) := @pred0b T (predI A B).
 Notation "[ 'disjoint' A & B ]" := (disjoint (mem A) (mem B))
-  (at level 0,
-   format "'[hv' [ 'disjoint' '/  '  A '/'  &  B ] ']'") : bool_scope.
+  (format "'[hv' [ 'disjoint' '/  '  A '/'  &  B ] ']'") : bool_scope.
 
 HB.lock
 Definition subset (T : finType) (A B : mem_pred T) : bool := pred0b (predD A B).
@@ -1113,8 +1103,7 @@ End Injectiveb.
 Definition image_mem T T' f mA : seq T' := map f (@enum_mem T mA).
 Notation image f A := (image_mem f (mem A)).
 Notation "[ 'seq' F | x 'in' A ]" := (image (fun x => F) A)
-  (F at level 99, x binder,
-   format "'[hv' [ 'seq'  F '/ '  |  x  'in'  A ] ']'") : seq_scope.
+  (x binder, format "'[hv' [ 'seq'  F '/ '  |  x  'in'  A ] ']'") : seq_scope.
 Notation "[ 'seq' F | x ]" :=
   [seq F | x in pred_of_simpl (@pred_of_argType
     (* kludge for getting the type of x *)
@@ -1124,13 +1113,13 @@ Notation "[ 'seq' F | x ]" :=
          | _ => T
          end
     end)]
-  (F at level 99, x binder, only parsing) : seq_scope.
+  (x binder, only parsing) : seq_scope.
 Notation "[ 'seq' F | x : T ]" :=
   [seq F | x in pred_of_simpl (@pred_of_argType T)]
-  (F at level 99, x binder, only printing,
+  (x binder, only printing,
    format "'[hv' [ 'seq'  F '/ '  |  x  :  T ] ']'") : seq_scope.
 Notation "[ 'seq' F , x ]" := [seq F | x ]
-  (F at level 99, x binder, only parsing) : seq_scope.
+  (x binder, only parsing) : seq_scope.
 
 Definition codom T T' f := @image_mem T T' f (mem T).
 
@@ -1665,12 +1654,10 @@ Notation "[ 'arg[' ord ]_( i < i0 | P ) F ]" :=
 
 Notation "[ 'arg[' ord ]_( i < i0 'in' A ) F ]" :=
     [arg[ord]_(i < i0 | i \in A) F]
-  (ord, i, i0 at level 10,
-   format "[ 'arg[' ord ]_( i  <  i0  'in'  A )  F ]") : nat_scope.
+  (format "[ 'arg[' ord ]_( i  <  i0  'in'  A )  F ]") : nat_scope.
 
 Notation "[ 'arg[' ord ]_( i < i0 ) F ]" := [arg[ord]_(i < i0 | true) F]
-  (ord, i, i0 at level 10,
-   format "[ 'arg[' ord ]_( i  <  i0 )  F ]") : nat_scope.
+  (format "[ 'arg[' ord ]_( i  <  i0 )  F ]") : nat_scope.
 
 Section ArgMinMax.
 
@@ -1700,12 +1687,10 @@ Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
 
 Notation "[ 'arg' 'min_' ( i < i0 'in' A ) F ]" :=
     [arg min_(i < i0 | i \in A) F]
-  (i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0  'in'  A )  F ]") : nat_scope.
+  (format "[ 'arg'  'min_' ( i  <  i0  'in'  A )  F ]") : nat_scope.
 
 Notation "[ 'arg' 'min_' ( i < i0 ) F ]" := [arg min_(i < i0 | true) F]
-  (i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : nat_scope.
+  (format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : nat_scope.
 
 Notation "[ 'arg' 'max_' ( i > i0 | P ) F ]" :=
      (arg_max i0 (fun i => P%B) (fun i => F))
@@ -1714,12 +1699,10 @@ Notation "[ 'arg' 'max_' ( i > i0 | P ) F ]" :=
 
 Notation "[ 'arg' 'max_' ( i > i0 'in' A ) F ]" :=
     [arg max_(i > i0 | i \in A) F]
-  (i, i0 at level 10,
-   format "[ 'arg'  'max_' ( i  >  i0  'in'  A )  F ]") : nat_scope.
+  (format "[ 'arg'  'max_' ( i  >  i0  'in'  A )  F ]") : nat_scope.
 
 Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
-  (i, i0 at level 10,
-   format "[ 'arg'  'max_' ( i  >  i0 )  F ]") : nat_scope.
+  (format "[ 'arg'  'max_' ( i  >  i0 )  F ]") : nat_scope.
 
 (**********************************************************************)
 (*                                                                    *)

@@ -158,7 +158,7 @@ Reserved Notation "A ^#" (format "A ^#").
 Reserved Notation "A :^ x" (at level 35, right associativity).
 Reserved Notation "x ^: B" (at level 35, right associativity).
 Reserved Notation "A :^: B" (at level 35, right associativity).
-Reserved Notation "#| B : A |" (B, A at level 99, format "#| B  :  A |").
+Reserved Notation "#| B : A |" (A at level 99, format "#| B  :  A |").
 Reserved Notation "''N' ( A )" (format "''N' ( A )").
 Reserved Notation "''N_' G ( A )" (G at level 2, format "''N_' G ( A )").
 Reserved Notation "A <| B" (at level 70, no associativity).

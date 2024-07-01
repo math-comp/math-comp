@@ -83,14 +83,14 @@ Reserved Notation "m %/ d" (at level 40, no associativity).
 Reserved Notation "m %% d" (at level 40, no associativity).
 Reserved Notation "m %| d" (at level 70, no associativity).
 #[warning="-postfix-notation-not-level-1"]
-Reserved Notation "m = n %[mod d ]" (at level 70, n at next level,
-  format "'[hv ' m '/'  =  n '/'  %[mod  d ] ']'").
+Reserved Notation "m = n %[mod d ]"
+  (format "'[hv ' m '/'  =  n '/'  %[mod  d ] ']'").
 #[warning="-postfix-notation-not-level-1"]
 Reserved Notation "m == n %[mod d ]" (at level 70, n at next level,
   format "'[hv ' m '/'  ==  n '/'  %[mod  d ] ']'").
 #[warning="-postfix-notation-not-level-1"]
-Reserved Notation "m <> n %[mod d ]" (at level 70, n at next level,
-  format "'[hv ' m '/'  <>  n '/'  %[mod  d ] ']'").
+Reserved Notation "m <> n %[mod d ]"
+  (format "'[hv ' m '/'  <>  n '/'  %[mod  d ] ']'").
 #[warning="-postfix-notation-not-level-1"]
 Reserved Notation "m != n %[mod d ]" (at level 70, n at next level,
   format "'[hv ' m '/'  !=  n '/'  %[mod  d ] ']'").
@@ -103,15 +103,15 @@ Reserved Notation "a ^` ( n )" (format "a ^` ( n )").
 Reserved Notation  "`| x |" (x at level 99, format "`| x |").
 
 (* Reserved notation for conditional comparison *)
-Reserved Notation "x <= y ?= 'iff' c" (at level 70, y, c at next level,
+Reserved Notation "x <= y ?= 'iff' c" (c at next level,
   format "x '[hv'  <=  y '/'  ?=  'iff'  c ']'").
 
 (* Reserved notation for cast comparison. *)
-Reserved Notation "x <= y :> T" (at level 70, y at next level).
-Reserved Notation "x >= y :> T" (at level 70, y at next level).
-Reserved Notation "x < y :> T" (at level 70, y at next level).
-Reserved Notation "x > y :> T" (at level 70, y at next level).
-Reserved Notation "x <= y ?= 'iff' c :> T" (at level 70, y, c at next level,
+Reserved Notation "x <= y :> T".
+Reserved Notation "x >= y :> T".
+Reserved Notation "x < y :> T".
+Reserved Notation "x > y :> T".
+Reserved Notation "x <= y ?= 'iff' c :> T" (c at next level,
   format "x '[hv'  <=  y '/'  ?=  'iff'  c  :> T ']'").
 
 (* Reserved notation for dot product. *)

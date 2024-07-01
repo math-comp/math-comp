@@ -6809,11 +6809,11 @@ Notation "[ 'SubChoice_isSubComRing' 'of' U 'by' <: ]" :=
   : form_scope.
 Notation "[ 'SubNmodule_isSubLSemiModule' 'of' U 'by' <: ]" :=
   (SubNmodule_isSubLSemiModule.Build _ _ _ U (subsemimodClosedP _))
-  (at level 0, format "[ 'SubNmodule_isSubLSemiModule'  'of'  U  'by'  <: ]")
+  (format "[ 'SubNmodule_isSubLSemiModule'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubLSemiModule' 'of' U 'by' <: ]" :=
   (SubChoice_isSubLSemiModule.Build _ _ _ U (subsemimodClosedP _))
-  (at level 0, format "[ 'SubChoice_isSubLSemiModule'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubLSemiModule'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubZmodule_isSubLmodule' 'of' U 'by' <: ]" :=
   (SubZmodule_isSubLmodule.Build _ _ _ U (submodClosedP _))
@@ -6825,8 +6825,7 @@ Notation "[ 'SubChoice_isSubLmodule' 'of' U 'by' <: ]" :=
   : form_scope.
 Notation "[ 'SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra' 'of' U 'by' <: ]" :=
   (SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra.Build _ _ _ U)
-  (at level 0,
-   format "[ 'SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra'  'of'  U  'by'  <: ]")
+  (format "[ 'SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra'  'of'  U  'by'  <: ]")
   : form_scope.
 (* TODO: SubChoice_isSubLSemiAlgebra? *)
 Notation "[ 'SubNzRing_SubLmodule_isSubLalgebra' 'of' U 'by' <: ]" :=
@@ -6845,8 +6844,7 @@ Notation "[ 'SubChoice_isSubLalgebra' 'of' U 'by' <: ]" :=
   : form_scope.
 Notation "[ 'SubLSemiAlgebra_isSubSemiAlgebra' 'of' U 'by' <: ]" :=
   (SubLSemiAlgebra_isSubSemiAlgebra.Build _ _ _ U)
-  (at level 0,
-   format "[ 'SubLSemiAlgebra_isSubSemiAlgebra'  'of'  U  'by'  <: ]")
+  (format "[ 'SubLSemiAlgebra_isSubSemiAlgebra'  'of'  U  'by'  <: ]")
   : form_scope.
 (* TODO: SubChoice_isSubSemiAlgebra? *)
 Notation "[ 'SubLalgebra_isSubAlgebra' 'of' U 'by' <: ]" :=

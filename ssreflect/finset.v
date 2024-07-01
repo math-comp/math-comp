@@ -186,24 +186,23 @@ Canonical pred_of_set_unlock := Unlockable pred_of_set.unlock.
 Notation "[ 'set' x : T | P ]" := (finset (fun x : T => P%B))
   (x at level 99, only parsing) : set_scope.
 Notation "[ 'set' x | P ]" := [set x : _ | P]
-  (x, P at level 99, format "[ 'set'  x  |  P ]") : set_scope.
+  (P at level 99, format "[ 'set'  x  |  P ]") : set_scope.
 Notation "[ 'set' x 'in' A ]" := [set x | x \in A]
-  (x at level 99, format "[ 'set'  x  'in'  A ]") : set_scope.
+  (format "[ 'set'  x  'in'  A ]") : set_scope.
 Notation "[ 'set' x : T 'in' A ]" := [set x : T | x \in A]
-  (x at level 99, only parsing) : set_scope.
+  (only parsing) : set_scope.
 Notation "[ 'set' x : T | P & Q ]" := [set x : T | P && Q]
-  (x at level 99, only parsing) : set_scope.
+  (only parsing) : set_scope.
 Notation "[ 'set' x | P & Q ]" := [set x | P && Q ]
-  (x, P at level 99, format "[ 'set'  x  |  P  &  Q ]") : set_scope.
+  (P at level 99, format "[ 'set'  x  |  P  &  Q ]") : set_scope.
 Notation "[ 'set' x : T 'in' A | P ]" := [set x : T | x \in A & P]
-  (x at level 99, only parsing) : set_scope.
+  (only parsing) : set_scope.
 Notation "[ 'set' x 'in' A | P ]" := [set x | x \in A & P]
-  (x at level 99, format "[ 'set'  x  'in'  A  |  P ]") : set_scope.
+  (format "[ 'set'  x  'in'  A  |  P ]") : set_scope.
 Notation "[ 'set' x 'in' A | P & Q ]" := [set x in A | P && Q]
-  (x at level 99,
-   format "[ 'set'  x  'in'  A  |  P  &  Q ]") : set_scope.
+  (format "[ 'set'  x  'in'  A  |  P  &  Q ]") : set_scope.
 Notation "[ 'set' x : T 'in' A | P & Q ]" := [set x : T in A | P && Q]
-  (x at level 99, only parsing) : set_scope.
+  (only parsing) : set_scope.
 
 Notation "[ 'set' :: s ]" := (finset [in pred_of_seq s])
   (format "[ 'set' ::  s ]") : set_scope.
@@ -252,8 +251,7 @@ Arguments setTfor T%_type.
 Arguments eq_finset {T} [pA] pB eq_pAB.
 #[global] Hint Resolve in_setT : core.
 
-Notation "[ 'set' : T ]" := (setTfor T)
-  (format "[ 'set' :  T ]") : set_scope.
+Notation "[ 'set' : T ]" := (setTfor T) (format "[ 'set' :  T ]") : set_scope.
 
 Notation setT := [set: _] (only parsing).
 
@@ -282,8 +280,7 @@ Notation "A :|: B" := (setU A B) : set_scope.
 Notation "a |: A" := ([set a] :|: A) : set_scope.
 (* This is left-associative due to historical limitations of the .. Notation. *)
 Notation "[ 'set' a1 ; a2 ; .. ; an ]" := (setU .. (a1 |: [set a2]) .. [set an])
-  (a1 at level 99,
-   format "[ 'set'  a1 ;  a2 ;  .. ;  an ]") : set_scope.
+  (format "[ 'set'  a1 ;  a2 ;  .. ;  an ]") : set_scope.
 Notation "A :&: B" := (setI A B) : set_scope.
 Notation "~: A" := (setC A) (at level 35, right associativity) : set_scope.
 Notation "[ 'set' ~ a ]" := (~: [set a])
@@ -1149,88 +1146,84 @@ Notation "f @2: ( A , B )" := (imset2 f (mem A) (fun _ => mem B))
 
 (* Comprehensions *)
 Notation "[ 'set' E | x 'in' A ]" := ((fun x => E) @: A)
-  (E, x at level 99,
-   format "[ '[hv' 'set'  E '/ '  |  x  'in'  A ] ']'") : set_scope.
+  (format "[ '[hv' 'set'  E '/ '  |  x  'in'  A ] ']'") : set_scope.
 Notation "[ 'set' E | x 'in' A & P ]" := [set E | x in pred_of_set [set x in A | P]]
-  (E, x at level 99,
-   format "[ '[hv' 'set'  E '/ '  |  x  'in'  A '/ '  &  P ] ']'") : set_scope.
+  (format "[ '[hv' 'set'  E '/ '  |  x  'in'  A '/ '  &  P ] ']'") : set_scope.
 Notation "[ 'set' E | x 'in' A , y 'in' B ]" :=
   (imset2 (fun x y => E) (mem A) (fun x => mem B))
-  (E, x, y at level 99, format
+  (y at level 99, format
    "[ '[hv' 'set'  E '/ '  |  x  'in'  A , '/   '  y  'in'  B ] ']'"
   ) : set_scope.
 Notation "[ 'set' E | x 'in' A , y 'in' B & P ]" :=
   [set E | x in A, y in pred_of_set [set y in B | P]]
-  (E, x, y at level 99, format
+  (format
    "[ '[hv' 'set'  E '/ '  |  x  'in'  A , '/   '  y  'in'  B '/ '  &  P ] ']'"
   ) : set_scope.
 
 (* Typed variants *)
 Notation "[ 'set' E | x : T 'in' A ]" := ((fun x : T => E) @: A)
-  (E, x at level 99, only parsing) : set_scope.
+  (only parsing) : set_scope.
 Notation "[ 'set' E | x : T 'in' A & P ]" :=
   [set E | x : T in [set x : T in A | P]]
-  (E, x at level 99, only parsing) : set_scope.
+  (only parsing) : set_scope.
 Notation "[ 'set' E | x : T 'in' A , y : U 'in' B ]" :=
   (imset2 (fun (x : T) (y : U) => E) (mem A) (fun (x : T) => mem B))
-  (E, x, y at level 99, only parsing) : set_scope.
+  (y at level 99, only parsing) : set_scope.
 Notation "[ 'set' E | x : T 'in' A , y : U 'in' B & P ]" :=
   [set E | x : T in A, y : U in [set y : U in B | P]]
-  (E, x, y at level 99, only parsing) : set_scope.
+  (only parsing) : set_scope.
 
 (* Comprehensions over a type *)
 Local Notation predOfType T := (pred_of_simpl (@pred_of_argType T)).
 Notation "[ 'set' E | x : T ]" := [set E | x : T in predOfType T]
-  (E, x at level 99,
-   format "[ '[hv' 'set'  E '/ '  |  x  :  T ] ']'") : set_scope.
+  (format "[ '[hv' 'set'  E '/ '  |  x  :  T ] ']'") : set_scope.
 Notation "[ 'set' E | x : T & P ]" :=
   [set E | x : T in pred_of_set [set x : T | P]]
-  (E, x at level 99,
-   format "[ '[hv' 'set'  E '/ '  |  x  :  T '/ '  &  P ] ']'") : set_scope.
+  (format "[ '[hv' 'set'  E '/ '  |  x  :  T '/ '  &  P ] ']'") : set_scope.
 Notation "[ 'set' E | x : T , y : U 'in' B ]" :=
   [set E | x : T in predOfType T, y : U in B]
-  (E, x, y at level 99, format
+  (y at level 99, format
    "[ '[hv' 'set'  E '/ '  |  x  :  T , '/   '  y  :  U  'in'  B ] ']'")
    : set_scope.
 Notation "[ 'set' E | x : T , y : U 'in' B & P ]" :=
   [set E | x : T, y : U in pred_of_set [set y in B | P]]
-  (E, x, y at level 99, format
+  (format
  "[ '[hv ' 'set'  E '/'  |  x  :  T , '/  '  y  :  U  'in'  B '/'  &  P ] ']'"
   ) : set_scope.
 Notation "[ 'set' E | x : T 'in' A , y : U ]" :=
   [set E | x : T in A, y : U in predOfType U]
-  (E, x, y at level 99, format
+  (format
    "[ '[hv' 'set'  E '/ '  |  x  :  T  'in'  A , '/   '  y  :  U ] ']'")
    : set_scope.
 Notation "[ 'set' E | x : T 'in' A , y : U & P ]" :=
   [set E | x : T in A, y : U in pred_of_set [set y in P]]
-  (E, x, y at level 99, format
+  (format
    "[ '[hv' 'set'  E '/ '  |  x  :  T  'in'  A , '/   '  y  :  U  &  P ] ']'")
    : set_scope.
 Notation "[ 'set' E | x : T , y : U ]" :=
   [set E | x : T, y : U in predOfType U]
-  (E, x, y at level 99, format
+  (format
    "[ '[hv' 'set'  E '/ '  |  x  :  T , '/   '  y  :  U ] ']'")
    : set_scope.
 Notation "[ 'set' E | x : T , y : U & P ]" :=
   [set E | x : T, y : U in pred_of_set [set y in P]]
-  (E, x, y at level 99, format
+  (format
    "[ '[hv' 'set'  E '/ '  |  x  :  T , '/   '  y  :  U  &  P ] ']'")
    : set_scope.
 
 (* Untyped variants *)
 Notation "[ 'set' E | x , y 'in' B ]" := [set E | x : _, y : _ in B]
-  (E, x, y at level 99, only parsing) : set_scope.
+  (y at level 99, only parsing) : set_scope.
 Notation "[ 'set' E | x , y 'in' B & P ]" := [set E | x : _, y : _ in B & P]
-  (E, x, y at level 99, only parsing) : set_scope.
+  (only parsing) : set_scope.
 Notation "[ 'set' E | x 'in' A , y ]" := [set E | x : _ in A, y : _]
-  (E, x, y at level 99, only parsing) : set_scope.
+  (only parsing) : set_scope.
 Notation "[ 'set' E | x 'in' A , y & P ]" := [set E | x : _ in A, y : _ & P]
-  (E, x, y at level 99, only parsing) : set_scope.
+  (only parsing) : set_scope.
 Notation "[ 'set' E | x , y ]" := [set E | x : _, y : _]
-  (E, x, y at level 99, only parsing) : set_scope.
+  (only parsing) : set_scope.
 Notation "[ 'set' E | x , y & P ]" := [set E | x : _, y : _ & P ]
-  (E, x, y at level 99, only parsing) : set_scope.
+  (only parsing) : set_scope.
 
 Section FunImage.
 

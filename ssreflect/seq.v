@@ -959,10 +959,10 @@ Notation count_mem x := (count (pred_of_simpl (pred1 x))).
 Infix "++" := cat : seq_scope.
 
 Notation "[ 'seq' x <- s | C ]" := (filter (fun x => C%B) s)
- (x at level 99, format "[ '[hv' 'seq'  x  <-  s '/ '  |  C ] ']'") : seq_scope.
-Notation "[ 'seq' x <- s | C1 & C2 ]" := [seq x <- s | C1 && C2]
  (x at level 99,
-  format "[ '[hv' 'seq'  x  <-  s '/ '  |  C1 '/ '  &  C2 ] ']'") : seq_scope.
+  format "[ '[hv' 'seq'  x  <-  s '/ '  |  C ] ']'") : seq_scope.
+Notation "[ 'seq' x <- s | C1 & C2 ]" := [seq x <- s | C1 && C2]
+ (format "[ '[hv' 'seq'  x  <-  s '/ '  |  C1 '/ '  &  C2 ] ']'") : seq_scope.
 Notation "[ 'seq' ' x <- s | C ]" := (filter (fun x => C%B) s)
  (x strict pattern,
   format "[ '[hv' 'seq'  ' x  <-  s '/ '  |  C ] ']'") : seq_scope.
@@ -970,9 +970,9 @@ Notation "[ 'seq' ' x <- s | C1 & C2 ]" := [seq x <- s | C1 && C2]
  (x strict pattern,
   format "[ '[hv' 'seq'  ' x  <-  s '/ '  |  C1 '/ '  &  C2 ] ']'") : seq_scope.
 Notation "[ 'seq' x : T <- s | C ]" := (filter (fun x : T => C%B) s)
- (x at level 99, only parsing).
+  (only parsing).
 Notation "[ 'seq' x : T <- s | C1 & C2 ]" := [seq x : T <- s | C1 && C2]
- (x at level 99, only parsing).
+  (only parsing).
 
 (* Double induction/recursion. *)
 Lemma seq_ind2 {S T} (P : seq S -> seq T -> Type) :
@@ -2668,18 +2668,17 @@ Arguments onth_nth {T}.
 Arguments onth_inj {T}.
 
 Notation "[ 'seq' E | i <- s ]" := (map (fun i => E) s)
-  (E at level 99, i binder,
-   format "[ '[hv' 'seq'  E '/ '  |  i  <-  s ] ']'") : seq_scope.
+  (i binder, format "[ '[hv' 'seq'  E '/ '  |  i  <-  s ] ']'") : seq_scope.
 
 Notation "[ 'seq' E | i <- s & C ]" := [seq E | i <- [seq i <- s | C]]
-  (E at level 99, i binder,
+  (i binder,
    format "[ '[hv' 'seq'  E '/ '  |  i  <-  s '/ '  &  C ] ']'") : seq_scope.
 
 Notation "[ 'seq' E : R | i <- s ]" := (@map _ R (fun i => E) s)
-  (E at level 99, i binder, only parsing) : seq_scope.
+  (i binder, only parsing) : seq_scope.
 
 Notation "[ 'seq' E : R | i <- s & C ]" := [seq E : R | i <- [seq i <- s | C]]
-  (E at level 99, i binder, only parsing) : seq_scope.
+  (i binder, only parsing) : seq_scope.
 
 Lemma filter_mask T a (s : seq T) : filter a s = mask (map a s) s.
 Proof. by elim: s => //= x s <-; case: (a x). Qed.
@@ -3685,12 +3684,12 @@ Arguments flatten_mapP {S T A s y}.
 
 Notation "[ 'seq' E | x <- s , y <- t ]" :=
   (flatten [seq [seq E | y <- t] | x <- s])
-  (E at level 99, x binder, y binder,
+  (x binder, y binder,
    format "[ '[hv' 'seq'  E '/ '  |  x  <-  s , '/   '  y  <-  t ] ']'")
    : seq_scope.
 Notation "[ 'seq' E : R | x <- s , y <- t ]" :=
   (flatten [seq [seq E : R | y <- t] | x  <- s])
-  (E at level 99, x binder, y binder, only parsing) : seq_scope.
+  (x binder, y binder, only parsing) : seq_scope.
 
 Section PrefixSuffixInfix.
 

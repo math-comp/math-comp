@@ -164,18 +164,14 @@ Arguments eqP {T x y} : rename.
 Delimit Scope eq_scope with EQ.
 Open Scope eq_scope.
 
-Notation "x == y" := (eq_op x y)
-  (at level 70, no associativity) : bool_scope.
-Notation "x == y :> T" := ((x : T) == (y : T))
-  (at level 70, y at next level) : bool_scope.
-Notation "x != y" := (~~ (x == y))
-  (at level 70, no associativity) : bool_scope.
-Notation "x != y :> T" := (~~ (x == y :> T))
-  (at level 70, y at next level) : bool_scope.
+Notation "x == y" := (eq_op x y) (no associativity) : bool_scope.
+Notation "x == y :> T" := ((x : T) == (y : T)) : bool_scope.
+Notation "x != y" := (~~ (x == y)) (no associativity) : bool_scope.
+Notation "x != y :> T" := (~~ (x == y :> T)) : bool_scope.
 Notation "x =P y" := (eqP : reflect (x = y) (x == y))
   (at level 70, no associativity) : eq_scope.
 Notation "x =P y :> T" := (eqP : reflect (x = y :> T) (x == y :> T))
-  (at level 70, y at next level, no associativity) : eq_scope.
+  (no associativity) : eq_scope.
 
 Notation eqbLHS := (X in (X == _))%pattern.
 Notation eqbRHS := (X in (_ == X))%pattern.
@@ -679,8 +675,7 @@ Local Notation inlined_sub_rect :=
 Local Notation inlined_new_rect :=
   (fun K K_S u => let (x) as u return K u := u in K_S x).
 
-Reserved Notation "[ 'isSub' 'for' v ]"
-  (format "[ 'isSub'  'for'  v ]").
+Reserved Notation "[ 'isSub' 'for' v ]" (format "[ 'isSub'  'for'  v ]").
 
 Notation "[ 'isSub' 'for' v ]" :=
   (@isSub.phant_Build _ _ _ v _ inlined_sub_rect vrefl_rect)
@@ -697,8 +692,7 @@ Notation "[ 'isSub' 'for' v 'by' rec ]" :=
 Notation "[ 'isSub' 'for' v ]" := (@isSub.phant_Build _ _ _ v _ _ _)
   (only printing, format "[ 'isSub'  'for'  v ]") : form_scope.
 
-Reserved Notation "[ 'isNew' 'for' v ]"
-  (format "[ 'isNew'  'for'  v ]").
+Reserved Notation "[ 'isNew' 'for' v ]" (format "[ 'isNew'  'for'  v ]").
 
 Definition NewMixin T U v c Urec sk :=
   let Urec' P IH := Urec P (fun x : T => IH x isT : P _) in

@@ -54,17 +54,13 @@ Reserved Notation "n %:~R" (left associativity, format "n %:~R").
 
 Reserved Notation "n %:Z" (left associativity, format "n %:Z").
 #[warning="-postfix-notation-not-level-1"]
-Reserved Notation "n = m :> 'int'"
-  (at level 70, m at next level, format "n  =  m  :>  'int'").
+Reserved Notation "n = m :> 'int'" (format "n  =  m  :>  'int'").
 #[warning="-postfix-notation-not-level-1"]
-Reserved Notation "n == m :> 'int'"
-  (at level 70, m at next level, format "n  ==  m  :>  'int'").
+Reserved Notation "n == m :> 'int'" (format "n  ==  m  :>  'int'").
 #[warning="-postfix-notation-not-level-1"]
-Reserved Notation "n != m :> 'int'"
-  (at level 70, m at next level, format "n  !=  m  :>  'int'").
+Reserved Notation "n != m :> 'int'" (format "n  !=  m  :>  'int'").
 #[warning="-postfix-notation-not-level-1"]
-Reserved Notation "n <> m :> 'int'"
-  (at level 70, m at next level, format "n  <>  m  :>  'int'").
+Reserved Notation "n <> m :> 'int'" (format "n  <>  m  :>  'int'").
 
 Import Order.TTheory GRing.Theory Num.Theory.
 Delimit Scope int_scope with Z.

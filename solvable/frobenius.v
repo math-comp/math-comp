@@ -112,16 +112,15 @@ Notation "[ 'Frobenius' G 'with' 'complement' H ]" :=
 
 Notation "[ 'Frobenius' G 'with' 'kernel' K ]" :=
   (Frobenius_group_with_kernel G K)
-  (G at level 50, K at level 35,
+  (K at level 35,
    format "[ 'Frobenius'  G  'with'  'kernel'  K ]") : group_scope.
 
-Notation "[ 'Frobenius' G ]" :=
-  (Frobenius_group G)
-  (G at level 50, format "[ 'Frobenius'  G ]") : group_scope.
+Notation "[ 'Frobenius' G ]" := (Frobenius_group G)
+  (format "[ 'Frobenius'  G ]") : group_scope.
 
 Notation "[ 'Frobenius' G = K ><| H ]" :=
   (Frobenius_group_with_kernel_and_complement G K H)
-  (G at level 50, K, H at level 35,
+  (K, H at level 35,
    format "[ 'Frobenius'  G  =  K  ><|  H ]") : group_scope.
 
 Section FrobeniusBasics.

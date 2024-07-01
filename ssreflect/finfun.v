@@ -583,13 +583,13 @@ Arguments to_family_tagged_with {I T_}.
 Arguments of_family_tagged_with {I T_}.
 
 Notation "[ 'fprod' i : I => F ]" := (fprod_of_fun (fun i : I => F))
-  (at level 0, i name, only parsing) : function_scope.
+  (i name, only parsing) : function_scope.
 
 Notation "[ 'fprod' : I => F ]" := (fprod_of_fun (fun _ : I => F))
-  (at level 0, only parsing) : function_scope.
+  (only parsing) : function_scope.
 
 Notation "[ 'fprod' i => F ]" := [fprod i : _ => F]
-  (at level 0, i name, format "[ 'fprod'  i  =>  F ]") : function_scope.
+  (i name, format "[ 'fprod'  i  =>  F ]") : function_scope.
 
 Notation "[ 'fprod' => F ]" := [fprod : _ => F]
-  (at level 0, format "[ 'fprod' =>  F ]") : function_scope.
+  (format "[ 'fprod' =>  F ]") : function_scope.
