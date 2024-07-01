@@ -128,37 +128,37 @@ Reserved Notation "\big [ op / idx ]_ i F"
      right associativity,
            format "'[' \big [ op / idx ]_ i '/  '  F ']'").
 Reserved Notation "\big [ op / idx ]_ ( i <- r | P ) F"
-  (at level 36, F at level 36, op, idx at level 10, i, r at level 50,
+  (F at level 36, i, r at level 50,
            format "'[' \big [ op / idx ]_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\big [ op / idx ]_ ( i <- r ) F"
-  (at level 36, F at level 36, op, idx at level 10, i, r at level 50,
+  (F at level 36,
            format "'[' \big [ op / idx ]_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\big [ op / idx ]_ ( m <= i < n | P ) F"
-  (at level 36, F at level 36, op, idx at level 10, m, i, n at level 50,
+  (F at level 36, m, i, n at level 50,
            format "'[' \big [ op / idx ]_ ( m  <=  i  <  n  |  P )  F ']'").
 Reserved Notation "\big [ op / idx ]_ ( m <= i < n ) F"
-  (at level 36, F at level 36, op, idx at level 10, i, m, n at level 50,
+  (at level 36, F at level 36,
            format "'[' \big [ op / idx ]_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\big [ op / idx ]_ ( i | P ) F"
-  (at level 36, F at level 36, op, idx at level 10, i at level 50,
+  (F at level 36,
            format "'[' \big [ op / idx ]_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\big [ op / idx ]_ ( i : t | P ) F"
-  (at level 36, F at level 36, op, idx at level 10, i at level 50,
+  (F at level 36,
            format "'[' \big [ op / idx ]_ ( i   :  t   |  P ) '/  '  F ']'").
 Reserved Notation "\big [ op / idx ]_ ( i : t ) F"
-  (at level 36, F at level 36, op, idx at level 10, i at level 50,
+  (F at level 36,
            format "'[' \big [ op / idx ]_ ( i   :  t ) '/  '  F ']'").
 Reserved Notation "\big [ op / idx ]_ ( i < n | P ) F"
-  (at level 36, F at level 36, op, idx at level 10, i, n at level 50,
+  (F at level 36, n at level 50,
            format "'[' \big [ op / idx ]_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\big [ op / idx ]_ ( i < n ) F"
-  (at level 36, F at level 36, op, idx at level 10, i, n at level 50,
+  (F at level 36,
            format "'[' \big [ op / idx ]_ ( i  <  n )  F ']'").
 Reserved Notation "\big [ op / idx ]_ ( i 'in' A | P ) F"
-  (at level 36, F at level 36, op, idx at level 10, i, A at level 50,
+  (F at level 36, A at level 50,
            format "'[' \big [ op / idx ]_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\big [ op / idx ]_ ( i 'in' A ) F"
-  (at level 36, F at level 36, op, idx at level 10, i, A at level 50,
+  (F at level 36,
            format "'[' \big [ op / idx ]_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\sum_ i F"
@@ -166,179 +166,179 @@ Reserved Notation "\sum_ i F"
            right associativity,
            format "'[' \sum_ i '/  '  F ']'").
 Reserved Notation "\sum_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 50,
            format "'[' \sum_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\sum_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \sum_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\sum_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 50,
            format "'[' \sum_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\sum_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \sum_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\sum_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \sum_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\sum_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50). (* only parsing *)
+  (F at level 41). (* only parsing *)
 Reserved Notation "\sum_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50). (* only parsing *)
+  (F at level 41). (* only parsing *)
 Reserved Notation "\sum_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 50,
            format "'[' \sum_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\sum_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \sum_ ( i  <  n ) '/  '  F ']'").
 Reserved Notation "\sum_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 50,
            format "'[' \sum_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\sum_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \sum_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\max_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \max_ i '/  '  F ']'").
 Reserved Notation "\max_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 50,
            format "'[' \max_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\max_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \max_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\max_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 50,
            format "'[' \max_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \max_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\max_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \max_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\max_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50). (* only parsing *)
+  (F at level 41). (* only parsing *)
 Reserved Notation "\max_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50). (* only parsing *)
+  (F at level 41). (* only parsing *)
 Reserved Notation "\max_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 50,
            format "'[' \max_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \max_ ( i  <  n )  F ']'").
 Reserved Notation "\max_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 50,
            format "'[' \max_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\max_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \max_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\prod_ i F"
   (at level 36, F at level 36, i at level 0,
            format "'[' \prod_ i '/  '  F ']'").
 Reserved Notation "\prod_ ( i <- r | P ) F"
-  (at level 36, F at level 36, i, r at level 50,
+  (F at level 36, i, r at level 50,
            format "'[' \prod_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\prod_ ( i <- r ) F"
-  (at level 36, F at level 36, i, r at level 50,
+  (F at level 36,
            format "'[' \prod_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\prod_ ( m <= i < n | P ) F"
-  (at level 36, F at level 36, i, m, n at level 50,
+  (F at level 36, i, n at level 50,
            format "'[' \prod_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\prod_ ( m <= i < n ) F"
-  (at level 36, F at level 36, i, m, n at level 50,
+  (F at level 36,
            format "'[' \prod_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\prod_ ( i | P ) F"
-  (at level 36, F at level 36, i at level 50,
+  (F at level 36,
            format "'[' \prod_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\prod_ ( i : t | P ) F"
-  (at level 36, F at level 36, i at level 50). (* only parsing *)
+  (F at level 36). (* only parsing *)
 Reserved Notation "\prod_ ( i : t ) F"
-  (at level 36, F at level 36, i at level 50). (* only parsing *)
+  (F at level 36). (* only parsing *)
 Reserved Notation "\prod_ ( i < n | P ) F"
-  (at level 36, F at level 36, i, n at level 50,
+  (F at level 36, n at level 50,
            format "'[' \prod_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\prod_ ( i < n ) F"
-  (at level 36, F at level 36, i, n at level 50,
+  (F at level 36,
            format "'[' \prod_ ( i  <  n ) '/  '  F ']'").
 Reserved Notation "\prod_ ( i 'in' A | P ) F"
-  (at level 36, F at level 36, i, A at level 50,
+  (F at level 36, A at level 50,
            format "'[' \prod_ ( i  'in'  A  |  P )  F ']'").
 Reserved Notation "\prod_ ( i 'in' A ) F"
-  (at level 36, F at level 36, i, A at level 50,
+  (F at level 36,
            format "'[' \prod_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\bigcup_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \bigcup_ i '/  '  F ']'").
 Reserved Notation "\bigcup_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 50,
            format "'[' \bigcup_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\bigcup_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \bigcup_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\bigcup_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, m, i, n at level 50,
+  (F at level 41, i, n at level 50,
            format "'[' \bigcup_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\bigcup_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \bigcup_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\bigcup_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \bigcup_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\bigcup_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \bigcup_ ( i   :  t   |  P ) '/  '  F ']'").
 Reserved Notation "\bigcup_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \bigcup_ ( i   :  t ) '/  '  F ']'").
 Reserved Notation "\bigcup_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 50,
            format "'[' \bigcup_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\bigcup_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \bigcup_ ( i  <  n ) '/  '  F ']'").
 Reserved Notation "\bigcup_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 50,
            format "'[' \bigcup_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\bigcup_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \bigcup_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\bigcap_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \bigcap_ i '/  '  F ']'").
 Reserved Notation "\bigcap_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 50,
            format "'[' \bigcap_ ( i  <-  r  |  P )  F ']'").
 Reserved Notation "\bigcap_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \bigcap_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\bigcap_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, m, i, n at level 50,
+  (F at level 41, i, n at level 50,
            format "'[' \bigcap_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\bigcap_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \bigcap_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\bigcap_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \bigcap_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\bigcap_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \bigcap_ ( i   :  t   |  P ) '/  '  F ']'").
 Reserved Notation "\bigcap_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \bigcap_ ( i   :  t ) '/  '  F ']'").
 Reserved Notation "\bigcap_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 50,
            format "'[' \bigcap_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\bigcap_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \bigcap_ ( i  <  n ) '/  '  F ']'").
 Reserved Notation "\bigcap_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 50,
            format "'[' \bigcap_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\bigcap_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \bigcap_ ( i  'in'  A ) '/  '  F ']'").
 
 Module SemiGroup.
