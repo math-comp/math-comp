@@ -245,21 +245,21 @@ Notation "''C' ( S | to )" := (astab S to)
   (format "''C' ( S  |  to )") : group_scope.
 
 Notation "''C_' A ( S | to )" := (A :&: 'C(S | to))
-  (A at level 2, format "''C_' A ( S  |  to )") : group_scope.
+  (format "''C_' A ( S  |  to )") : group_scope.
 Notation "''C_' ( A ) ( S | to )" := 'C_A(S | to) (only parsing) : group_scope.
 
 Notation "''C' [ x | to ]" := ('C([set x] | to))
   (format "''C' [ x  |  to ]") : group_scope.
 
 Notation "''C_' A [ x | to ]" := (A :&: 'C[x | to])
-  (A at level 2, format "''C_' A [ x  |  to ]") : group_scope.
+  (format "''C_' A [ x  |  to ]") : group_scope.
 Notation "''C_' ( A ) [ x | to ]" := 'C_A[x | to] (only parsing) : group_scope.
 
 Notation "''N' ( S | to )" := (astabs S to)
   (format "''N' ( S  |  to )") : group_scope.
 
 Notation "''N_' A ( S | to )" := (A :&: 'N(S | to))
-  (A at level 2, format "''N_' A ( S  |  to )") : group_scope.
+  (format "''N_' A ( S  |  to )") : group_scope.
 
 Notation "[ 'acts' A , 'on' S | to ]" := (A \subset pred_of_set 'N(S | to))
   (format "[ 'acts'  A ,  'on'  S  |  to ]") : form_scope.

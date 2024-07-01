@@ -119,10 +119,10 @@ Arguments rank {gT} A%_g.
 Arguments gen_rank {gT} A%_g.
 
 Notation "''Ldiv_' n ()" := (Ldiv _ n)
-  (at level 8, n at level 2, format "''Ldiv_' n ()") : group_scope.
+  (n at level 2, format "''Ldiv_' n ()") : group_scope.
 
 Notation "''Ldiv_' n ( G )" := (G :&: 'Ldiv_n())
-  (at level 8, n at level 2, format "''Ldiv_' n ( G )") : group_scope.
+  (format "''Ldiv_' n ( G )") : group_scope.
 
 Prenex Implicits exponent.
 
@@ -133,7 +133,7 @@ Notation "''E_' p ( G )" := (pElem p G)
   (at level 8, p at level 2, format "''E_' p ( G )") : group_scope.
 
 Notation "''E_' p ^ n ( G )" := (pnElem p n G)
-  (at level 8, p, n at level 2, format "''E_' p ^ n ( G )") : group_scope.
+  (n at level 2, format "''E_' p ^ n ( G )") : group_scope.
 
 Notation "''E' ^ n ( G )" := (nElem n G)
   (at level 8, n at level 2, format "''E' ^ n ( G )") : group_scope.

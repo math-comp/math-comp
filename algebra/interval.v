@@ -58,14 +58,14 @@ Unset Printing Implicit Defensive.
 
 Reserved Notation "'-oo'".
 Reserved Notation "'+oo'".
-Reserved Notation "`[ a , b ]" (a, b at level 9 , format "`[ a ,  b ]").
-Reserved Notation "`] a , b ]" (a, b at level 9 , format "`] a ,  b ]").
-Reserved Notation "`[ a , b [" (a, b at level 9 , format "`[ a ,  b [").
-Reserved Notation "`] a , b [" (a, b at level 9 , format "`] a ,  b [").
-Reserved Notation "`] '-oo' , b ]" (b at level 9 , format "`] '-oo' ,  b ]").
-Reserved Notation "`] '-oo' , b [" (b at level 9 , format "`] '-oo' ,  b [").
-Reserved Notation "`[ a , '+oo' [" (a at level 9 , format "`[ a ,  '+oo' [").
-Reserved Notation "`] a , '+oo' [" (a at level 9 , format "`] a ,  '+oo' [").
+Reserved Notation "`[ a , b ]" (a, b at level 9, format "`[ a ,  b ]").
+Reserved Notation "`] a , b ]" (a, b at level 9, format "`] a ,  b ]").
+Reserved Notation "`[ a , b [" (format "`[ a ,  b [").
+Reserved Notation "`] a , b [" (format "`] a ,  b [").
+Reserved Notation "`] '-oo' , b ]" (b at level 9, format "`] '-oo' ,  b ]").
+Reserved Notation "`] '-oo' , b [" (format "`] '-oo' ,  b [").
+Reserved Notation "`[ a , '+oo' [" (format "`[ a ,  '+oo' [").
+Reserved Notation "`] a , '+oo' [" (format "`] a ,  '+oo' [").
 Reserved Notation "`] -oo , '+oo' [" (format "`] -oo ,  '+oo' [").
 
 Local Open Scope order_scope.

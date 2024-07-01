@@ -107,17 +107,17 @@ Reserved Notation "\pi" (format "\pi").
 Reserved Notation "{pi_ Q a }" (Q at next level, format "{pi_ Q  a }").
 Reserved Notation "{pi a }" (format "{pi  a }").
 #[warning="-postfix-notation-not-level-1"]
-Reserved Notation "x == y %[mod_eq e ]" (at level 70, y at next level,
-  no associativity,   format "'[hv ' x '/'  ==  y '/'  %[mod_eq  e ] ']'").
+Reserved Notation "x == y %[mod_eq e ]"
+  (no associativity,   format "'[hv ' x '/'  ==  y '/'  %[mod_eq  e ] ']'").
 #[warning="-postfix-notation-not-level-1"]
-Reserved Notation "x = y %[mod_eq e ]" (at level 70, y at next level,
-  no associativity,   format "'[hv ' x '/'  =  y '/'  %[mod_eq  e ] ']'").
+Reserved Notation "x = y %[mod_eq e ]"
+  (no associativity,   format "'[hv ' x '/'  =  y '/'  %[mod_eq  e ] ']'").
 #[warning="-postfix-notation-not-level-1"]
-Reserved Notation "x != y %[mod_eq e ]" (at level 70, y at next level,
-  no associativity,   format "'[hv ' x '/'  !=  y '/'  %[mod_eq  e ] ']'").
+Reserved Notation "x != y %[mod_eq e ]"
+  (no associativity,   format "'[hv ' x '/'  !=  y '/'  %[mod_eq  e ] ']'").
 #[warning="-postfix-notation-not-level-1"]
-Reserved Notation "x <> y %[mod_eq e ]" (at level 70, y at next level,
-  no associativity,   format "'[hv ' x '/'  <>  y '/'  %[mod_eq  e ] ']'").
+Reserved Notation "x <> y %[mod_eq e ]"
+  (no associativity,   format "'[hv ' x '/'  <>  y '/'  %[mod_eq  e ] ']'").
 Reserved Notation "{eq_quot e }" (e at level 0, format "{eq_quot  e }").
 
 Delimit Scope quotient_scope with qT.
@@ -434,7 +434,7 @@ End EquivRel.
 
 Notation EquivRel r er es et := (@EquivRelPack _ r (EquivClass er es et)).
 Notation "[ 'equiv_rel' 'of' e ]" := (@equiv_pack _ _ e _ id)
- (format "[ 'equiv_rel'  'of'  e ]") : form_scope.
+  (format "[ 'equiv_rel'  'of'  e ]") : form_scope.
 
 (**************************************************)
 (* Encoding to another type modulo an equivalence *)

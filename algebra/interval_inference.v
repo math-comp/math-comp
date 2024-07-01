@@ -90,11 +90,11 @@ From mathcomp Require Import order ssralg ssrnum ssrint interval.
 (******************************************************************************)
 
 Reserved Notation "{ 'itv' R & i }"
-  (at level 0, R at level 200, i at level 200, format "{ 'itv'  R  &  i }").
+  (R at level 200, i at level 200, format "{ 'itv'  R  &  i }").
 Reserved Notation "{ 'i01' R }"
-  (at level 0, R at level 200, format "{ 'i01'  R }").
-Reserved Notation "{ 'posnum' R }" (at level 0, format "{ 'posnum'  R }").
-Reserved Notation "{ 'nonneg' R }" (at level 0, format "{ 'nonneg'  R }").
+  (R at level 200, format "{ 'i01'  R }").
+Reserved Notation "{ 'posnum' R }" (format "{ 'posnum'  R }").
+Reserved Notation "{ 'nonneg' R }" (format "{ 'nonneg'  R }").
 
 Reserved Notation "x %:itv" (format "x %:itv").
 Reserved Notation "x %:i01" (format "x %:i01").
