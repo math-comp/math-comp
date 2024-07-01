@@ -74,13 +74,16 @@ with builtins; with (import <nixpkgs> {}).lib;
   in {
     "coq-master".push-branches = [ "master" "mathcomp-1" ];
     "coq-master".coqPackages = common-bundles // {
-      coq.override.version = "master";
+      coq.override.version = "herbelin:master+simpl-refold-in-destructor-arg-position";
       bignums.override.version = "master";
       paramcoq.override.version = "master";
       coq-elpi.override.version = "coq-master";
       hierarchy-builder.override.version = "master";
       interval.job = false;
       coquelicot.job = false;
+      mathcomp-abel.override.version = "proux01:mc_1223";
+      graph-theory.override.version = "mc_1223";
+      mathcomp-apery.override.version = "mc_1223";
     };
     "coq-8.19".push-branches = [ "master" "mathcomp-1" ];
     "coq-8.19".coqPackages = common-bundles // {

@@ -588,7 +588,7 @@ suffices{k k_gt0 le_k_n2} defGn2: <[x ^+ p]> \x <[y]> = 'Ohm_(n.-2)(G).
   have:= Ohm_dprod k defGn2; have p_xp := mem_p_elt pG (groupX p Gx).
   rewrite (Ohm_p_cycle _ p_xp) (Ohm_p_cycle _ (mem_p_elt pG Gy)) oxp oy.
   rewrite pfactorK ?(pfactorK 1) // (eqnP k_gt0) expg1 -expgM -expnS.
-  rewrite -subSn // -subSS def_n1 def_n => -> /=; rewrite subnSK // subn2.
+  rewrite -subSn // -subSS def_n1 def_n => -> /=; rewrite ?add1n subnSK // subn2.
   by apply/eqP; rewrite eqEsubset OhmS ?Ohm_sub //= -{1}Ohm_id OhmS ?Ohm_leq.
 rewrite dprodEY //=; last by apply/trivgP; rewrite -tiXY setSI ?cycleX.
 apply/eqP; rewrite eqEsubset join_subG !cycle_subG /= [in y \in _]def_n.
