@@ -203,10 +203,10 @@ Qed.
 (* TODO: bigop is imported after zmodp in matrix.v and intdiv.v to prevent
   these warnings from triggering. We should restore the order of imports when
   these are removed. *)
-#[deprecated(since="mathcomp 2.3", note="Use bigop.big_ord1 instead.")]
+#[deprecated(since="mathcomp 2.3.0", note="Use bigop.big_ord1 instead.")]
 Notation big_ord1 := big_ord1 (only parsing).
 
-#[deprecated(since="mathcomp 2.3", note="Use bigop.big_ord1_cond instead.")]
+#[deprecated(since="mathcomp 2.3.0", note="Use bigop.big_ord1_cond instead.")]
 Notation big_ord1_cond := big_ord1_cond (only parsing).
 
 Section ZpRing.
