@@ -77,11 +77,12 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq.override.version = "master";
       bignums.override.version = "master";
       paramcoq.override.version = "master";
-      coq-elpi.override.version = "coq-master";
+      coq-elpi.override.version = "master";
       hierarchy-builder.override.version = "master";
       interval.job = false;
       coquelicot.job = false;
     };
+    "coq-master".ocamlPackages = { elpi.override.version = "1.19.2"; };
     "coq-8.19".push-branches = [ "master" "mathcomp-1" ];
     "coq-8.19".coqPackages = common-bundles // {
       coq.override.version = "8.19";
