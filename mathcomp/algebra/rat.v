@@ -978,30 +978,3 @@ Notation "[ 'rat' x // y ]" :=
 (* A specialization of vm_compute rewrite rule for pattern _%:Q *)
 Lemma rat_vm_compute n (x : rat) : vm_compute_eq n%:Q x -> n%:Q = x.
 Proof. exact. Qed.
-
-Module mc_2_0.
-
-Local Notation Qint := (Num.int : qualifier 1 rat) (only parsing).
-Local Notation Qnat := (Num.nat : qualifier 1 rat) (only parsing).
-
-Local Lemma QintP (x : rat) : reflect (exists z, x = z%:~R) (x \in Qint).
-Proof. exact: intrP. Qed.
-
-Local Lemma Qnat_def (x : rat) : (x \is a Qnat) = (x \is a Qint) && (0 <= x).
-Proof. exact: natrEint. Qed.
-
-Local Lemma QnatP x : reflect (exists n : nat, x = n%:R) (x \in Qnat).
-Proof. exact: natrP. Qed.
-
-End mc_2_0.
-
-#[deprecated(since="mathcomp 2.1.0", note="Use Num.int instead.")]
-Notation Qint := (Num.int : qualifier 1 rat) (only parsing).
-#[deprecated(since="mathcomp 2.1.0", note="Use Num.nat instead.")]
-Notation Qnat := (Num.nat : qualifier 1 rat) (only parsing).
-#[deprecated(since="mathcomp 2.1.0", note="Use intrP instead.")]
-Notation QintP := mc_2_0.QintP (only parsing).
-#[deprecated(since="mathcomp 2.1.0", note="Use natrEint instead.")]
-Notation Qnat_def := mc_2_0.Qnat_def (only parsing).
-#[deprecated(since="mathcomp 2.1.0", note="Use natrP instead.")]
-Notation QnatP := mc_2_0.QnatP (only parsing).
