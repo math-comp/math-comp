@@ -373,7 +373,7 @@ have galQ x: {z | x \in sQ z & is_Gal z}.
   exists p^@; first exact: alg_polyOver.
   exists (map (inQ z) s); last by apply/vspaceP=> u; rewrite defQz memvf.
   by rewrite -(eqp_map (ofQ z)) pQof Dp map_rp inQsK ?eqpxx.
-pose is_realC x := {R : archiFieldType & {rmorphism Q x -> R}}.
+pose is_realC x := {R : archiRealFieldType & {rmorphism Q x -> R}}.
 pose realC := {x : C & is_realC x}.
 pose has_Rroot (xR : realC) p c (Rx := sQ (tag xR)) :=
   [&& p \is a polyOver Rx, p \is monic, c \in Rx & p.[0] == - c ^+ 2].
@@ -601,7 +601,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   pose Ry : realFieldType := HB.pack (Q y) RyM.
   have QisArchi : Num.NumDomain_bounded_isArchimedean Ry.
     by constructor; apply: (@rat_algebraic_archimedean Ry _ alg_integral).
-  exists (HB.pack_for archiFieldType _ QisArchi); apply: idfun.
+  exists (HB.pack_for archiRealFieldType _ QisArchi); apply: idfun.
 have some_realC: realC.
   suffices /all_sig[f QfK] x: {a | in_alg (Q 0) a = x}.
     have fA : additive f.

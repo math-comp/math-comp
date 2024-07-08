@@ -22,10 +22,10 @@ From mathcomp Require Import fintype bigop order ssralg poly ssrnum ssrint.
 (*                            The HB class is called ArchiNumField.           *)
 (*    archiClosedFieldType == closedFieldType with the Archimedean axiom      *)
 (*                            The HB class is called ArchiClosedField.        *)
-(*         archiDomainType == realDomainType with the Archimedean axiom       *)
-(*                            The HB class is called ArchiDomain.             *)
-(*          archiFieldType == realFieldType with the Archimedean axiom        *)
-(*                            The HB class is called ArchiField.              *)
+(*     archiRealDomainType == realDomainType with the Archimedean axiom       *)
+(*                            The HB class is called ArchiRealDomain.         *)
+(*      archiRealFieldType == realFieldType with the Archimedean axiom        *)
+(*                            The HB class is called ArchiRealField.          *)
 (*            archiRcfType == rcfType with the Archimedean axiom              *)
 (*                            The HB class is called ArchiRealClosedField.    *)
 (*                                                                            *)
@@ -91,23 +91,23 @@ Bind Scope ring_scope with ArchiClosedField.sort.
 End ArchiClosedFieldExports.
 HB.export ArchiClosedFieldExports.
 
-#[short(type="archiDomainType")]
-HB.structure Definition ArchiDomain :=
+#[short(type="archiRealDomainType")]
+HB.structure Definition ArchiRealDomain :=
   { R of NumDomain_isArchimedean R & RealDomain R }.
 
-Module ArchiDomainExports.
-Bind Scope ring_scope with ArchiDomain.sort.
-End ArchiDomainExports.
-HB.export ArchiDomainExports.
+Module ArchiRealDomainExports.
+Bind Scope ring_scope with ArchiRealDomain.sort.
+End ArchiRealDomainExports.
+HB.export ArchiRealDomainExports.
 
-#[short(type="archiFieldType")]
-HB.structure Definition ArchiField :=
+#[short(type="archiRealFieldType")]
+HB.structure Definition ArchiRealField :=
   { R of NumDomain_isArchimedean R & RealField R }.
 
-Module ArchiFieldExports.
-Bind Scope ring_scope with ArchiField.sort.
-End ArchiFieldExports.
-HB.export ArchiFieldExports.
+Module ArchiRealFieldExports.
+Bind Scope ring_scope with ArchiRealField.sort.
+End ArchiRealFieldExports.
+HB.export ArchiRealFieldExports.
 
 #[short(type="archiRcfType")]
 HB.structure Definition ArchiRealClosedField :=
@@ -616,9 +616,9 @@ Arguments intrP {R x}.
 #[global] Hint Extern 0 (is_true (1 \is a int_num)) => apply: int_num1 : core.
 #[global] Hint Extern 0 (is_true (1 \in int_num_subdef)) => apply: int_num1 : core.
 
-Section ArchiDomainTheory.
+Section ArchiRealDomainTheory.
 
-Variables (R : archiDomainType).
+Variables (R : archiRealDomainType).
 Implicit Type x : R.
 
 Lemma upper_nthrootP x i : (archi_bound x <= i)%N -> x < 2%:R ^+ i.
@@ -655,7 +655,7 @@ Proof. by move=> x xi y; rewrite real_ceilD// num_real. Qed.
 Lemma ceil_floor x : ceil x = floor x + (~~ (x \is a int_num)).
 Proof. by rewrite real_ceil_floor. Qed.
 
-End ArchiDomainTheory.
+End ArchiRealDomainTheory.
 
 Section ArchiNumFieldTheory.
 
@@ -739,6 +739,37 @@ Module Exports. HB.reexport. End Exports.
 Notation nat := nat_num.
 Notation int := int_num.
 
+#[deprecated(since="mathcomp 2.3.0", note="Use Num.ArchiRealDomain instead.")]
+Notation ArchiDomain T := (ArchiRealDomain T).
+Module ArchiDomain.
+#[deprecated(since="mathcomp 2.3.0",
+  note="Use Num.ArchiRealDomain.type instead.")]
+Notation type := ArchiRealDomain.type.
+#[deprecated(since="mathcomp 2.3.0",
+  note="Use Num.ArchiRealDomain.copy instead.")]
+Notation copy T C := (ArchiRealDomain.copy T C).
+#[deprecated(since="mathcomp 2.3.0",
+  note="Use Num.ArchiRealDomain.on instead.")]
+Notation on T := (ArchiRealDomain.on T).
+End ArchiDomain.
+#[deprecated(since="mathcomp 2.3.0", note="Use ArchiRealField instead.")]
+Notation ArchiField T := (ArchiRealField T).
+Module ArchiField.
+#[deprecated(since="mathcomp 2.3.0",
+  note="Use Num.ArchiRealField.type instead.")]
+Notation type := ArchiRealField.type.
+#[deprecated(since="mathcomp 2.3.0",
+  note="Use Num.ArchiRealField.copy instead.")]
+Notation copy T C := (ArchiRealField.copy T C).
+#[deprecated(since="mathcomp 2.3.0", note="Use Num.ArchiRealField.on instead.")]
+Notation on T := (ArchiRealField.on T).
+End ArchiField.
+
 End Num.
 
 Export Num.Exports.
+
+#[deprecated(since="mathcomp 2.3.0", note="Use archiRealDomainType instead.")]
+Notation archiDomainType := archiRealDomainType (only parsing).
+#[deprecated(since="mathcomp 2.3.0", note="Use archiRealFieldType instead.")]
+Notation archiFieldType := archiRealFieldType (only parsing).
