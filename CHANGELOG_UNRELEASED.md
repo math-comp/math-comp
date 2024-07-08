@@ -147,7 +147,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `archimedean.v`
   + lemmas `floor_itv`, ` ge_floor`, `lt_succ_floor x`, `floor_ge_int`,
     `ceil_itv`, `gt_pred_ceil`, `le_ceil`, `ceil_le_int`, `ceilD`, `ceil_floor`
-  + `archiDomainType` instance for `int` (moved from `ssrint.v`)
+  + `archiRealDomainType` instance for `int` (moved from `ssrint.v`)
 
 ### Changed
 
@@ -595,6 +595,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemma `eqr_norm_id` (use `ger0_def` instead)
   + lemma `eqr_normN` (use `ler0_def` instead)
   + lemma `real_mulr_sign_norm` (use `realEsign` instead)
+
+- in `archimedean.v`
+  + structure `archiDomainType` and its HB class `Num.ArchiDomain`
+    (use `archiRealDomainType` and `Num.ArchiRealDomain` instead, respectively)
+  + structure `archiFieldType` and its HB class `Num.ArchiField`
+    (use `archiRealFieldType` and `Num.ArchiRealField` instead, respectively)
 
 ### Infrastructure
 
