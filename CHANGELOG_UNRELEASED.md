@@ -147,6 +147,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `archimedean.v`
   + lemmas `floor_itv`, ` ge_floor`, `lt_succ_floor x`, `floor_ge_int`,
     `ceil_itv`, `gt_pred_ceil`, `le_ceil`, `ceil_le_int`, `ceilD`, `ceil_floor`
+  + `archiDomainType` instance for `int` (moved from `ssrint.v`)
 
 ### Changed
 
@@ -320,6 +321,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `ler_distlC_addr`, `ltr_distl_subl`, `ler_distl_subl`,
     `ltr_distlC_subl`, `ler_distlC_subl`, `maxr_nmulr`, `minr_nmulr`,
     `minr_nmull`, `maxr_nmull` (deprecated since 1.17)
+  + structures `archiNumDomainType`, `archiNumFieldType`,
+    `archiClosedFieldType`, `archiDomainType`, `archiFieldType`, `archiRcfType`
+    (deprecated since 2.1 and moved to `archimedean.v`)
+  + factory `NumDomain_bounded_isArchimedean` (deprecated since 2.1 and moved to
+    `archimedean.v`)
+  + notations `Num.Def.trunc`, `Num.trunc`, `Num.Def.nat_num`, `Num.nat`,
+    `Num.Def.int_num`, `Num.int`, `Num.bound` (deprecated since 2.1 and moved to
+    `archimedean.v`)
+  + lemmas `archi_boundP`, `upper_nthrootP`, `truncP`, `trunc_itv`
+    (deprecated since 2.1)
 
 - in `ssrint.v`
   + notations `oppz_add`, `lez_add1r`, `lez_addr1`, `ltz_add1r`,
@@ -334,6 +345,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `leq_add_dist`, `leqif_add_distz`, `leqif_add_dist` (deprecated
     since 1.17)
   + notation `polyC_mulrz` (deprecated since 2.1.0)
+  + definition `Znat` (deprecated since 2.1)
+  + lemmas `Znat_def`, `ZnatP` (deprecated since 2.1)
+  + `archiDomainType` instance for `int` (moved to `archimedean.v`)
 
 - in `fraction.v`
   + notation `tofracX` (deprecated since 1.17)
@@ -501,6 +515,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `rat.v`
   + lemma `divq_eq_deprecated`
+  + definitions `Qint` and `Qnat` (deprecated since 2.1)
+  + lemmas `QintP`, `Qnat_def`, `QnatP` (deprecated since 2.1)
 
 - in `vector.v`
   + notations `[vectType R of T]` and `[vectType R of T for cT]`
@@ -520,6 +536,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `dual_lt_def`, `dual_le_anti`, `dual_total`,
     `Order.BoolOrder.subKI`, `Order.BoolOrder.joinIB`
   + definition `Order.BoolOrder.sub`
+
+- in `algC.v`
+  + notations `Cint`, `Cnat`, `floorC`, `truncC` (deprecated in 2.1)
+  + lemmas `Creal0`, `Creal1`, `floorC_itv`, `floorC_def`, `intCK`, `floorCK`,
+    `floorC0`, `floorC1`, `floorCpK`, `floorCpP`, `Cint_int`, `CintP`,
+    `floorCD`, `floorCN`, `floorCM`, `floorCX`, `rpred_Cint`, `Cint0`, `Cint1`,
+    `Creal_Cint`, `conj_Cint`, `Cint_normK`, `CintEsign`, `truncC_itv`,
+    `truncC_def`, `natCK`, `CnatP`, `truncCK`, `truncC_gt0`, `truncC0Pn`,
+    `truncC0`, `truncC1`, `truncCD`, `truncCM`, `truncCX`, `rpred_Cnat`,
+    `Cnat_nat`, `Cnat0`, `Cnat1`, `Cnat_ge0`, `Cnat_gt0`, `conj_Cnat`,
+    `norm_Cnat`, `Creal_Cnat`, `Cnat_sum_eq1`, `Cnat_mul_eq1`, `Cnat_prod_eq1`,
+    `Cint_Cnat`, `CintE`, `Cnat_norm_Cint`, `CnatEint`, `CintEge0`,
+    `Cnat_exp_even`, `norm_Cint_ge1`, `sqr_Cint_ge1`, `Cint_ler_sqr`,
+    `aut_Cnat`, `aut_Cint`, `Cnat_aut`, `Cint_aut`, `raddfZ_Cnat`,
+    `raddfZ_Cint`, `rpredZ_Cnat`, `rpredZ_Cint` (deprecated in 2.1)
 
 ### Deprecated
 
