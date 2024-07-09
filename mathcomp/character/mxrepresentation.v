@@ -2453,9 +2453,8 @@ have{cBcE} cBncEn A: centgmx rGn A -> A *m Bn = Bn *m A.
   rewrite !rowE !mulmxA -mxvec_delta -(mul_delta_mx (0 : 'I_1)).
   rewrite mul_rV_lin mul_vec_lin /= -mulmxA; apply: (canLR vec_mxK).
   apply/row_matrixP=> i; set dj0 := delta_mx j 0.
-  pose Aij := row i \o vec_mx \o mulmxr A \o mxvec \o mulmx dj0.
-  have defAij := mul_rV_lin1 (GRing.Linear.clone _ _ _ _ Aij _).
-  rewrite /= {2}/Aij /= in defAij.
+  have /= defAij :=
+    mul_rV_lin1 (row i \o vec_mx \o mulmxr A \o mxvec \o mulmx dj0).
   rewrite -defAij row_mul -defAij -!mulmxA (cent_mxP cBcE) {k}//.
   rewrite memmx_cent_envelop; apply/centgmxP=> x Gx; apply/row_matrixP=> k.
   rewrite !row_mul !rowE !{}defAij /= -row_mul mulmxA mul_delta_mx.
