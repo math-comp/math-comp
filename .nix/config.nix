@@ -83,6 +83,10 @@ with builtins; with (import <nixpkgs> {}).lib;
       coquelicot.job = false;
     };
     "coq-master".ocamlPackages = { elpi.override.version = "1.19.2"; };
+    "coq-8.20".coqPackages = common-bundles // {
+      coq.override.version = "8.20";
+      interval.job = false;
+    };
     "coq-8.19".push-branches = [ "master" "mathcomp-1" ];
     "coq-8.19".coqPackages = common-bundles // {
       coq.override.version = "8.19";
