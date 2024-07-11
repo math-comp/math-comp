@@ -2454,9 +2454,6 @@ Arguments gcdp : simpl never.
 #[global] Hint Resolve dvdp_mull dvdp_mulr dvdpp dvdp0 : core.
 Arguments dvdp_exp_XsubCP {R p c n}.
 
-#[deprecated(since="mathcomp 2.1.0", note="Use modp_id instead.")]
-Notation modp_mod := modp_id.
-
 End CommonIdomain.
 
 Module Idomain.

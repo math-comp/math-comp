@@ -555,7 +555,7 @@ Proof. by rewrite !mulrzA_C mulrC. Qed.
 
 Fact mulr1z (x : M) : x *~ 1 = x. Proof. by []. Qed.
 
-Fact mulrzDl_tmp m : {morph ( *~%R^~ m : M -> M) : x y / x + y}.
+Fact mulrzDl m : {morph ( *~%R^~ m : M -> M) : x y / x + y}.
 Proof.
 by elim: m=> [|m _|m _] x y;
   rewrite ?addr0 /intmul //= ?mulrnDl // opprD.
@@ -572,7 +572,7 @@ rewrite -{2}[m](@subnKC n)// mulrnDr addrAC subrr add0r.
 by rewrite subzn.
 Qed.
 
-Fact mulrzDr_tmp x : {morph *~%R x : m n / m + n}.
+Fact mulrzDr x : {morph *~%R x : m n / m + n}.
 Proof.
 elim=> [|m _|m _]; elim=> [|n _|n _]; rewrite /intmul //=;
 rewrite -?(opprD) ?(add0r, addr0, mulrnDr, subn0) //.
@@ -583,7 +583,7 @@ Qed.
 
 HB.instance Definition _ := GRing.Zmodule.on M^z.  (* FIXME, the error message below "nomsg" when we forget this line is not very helpful *)
 HB.instance Definition _ := @GRing.Zmodule_isLmodule.Build _ M^z
-  (fun n x => x *~ n) mulrzA_C mulr1z mulrzDl_tmp mulrzDr_tmp.
+  (fun n x => x *~ n) mulrzA_C mulr1z mulrzDl mulrzDr.
 
 Lemma scalezrE n x : n *: (x : M^z) = x *~ n. Proof. by []. Qed.
 
@@ -625,10 +625,10 @@ HB.instance Definition _ (x : M) := GRing.isAdditive.Build int M ( *~%R x)
 
 End ZintLmod.
 
-#[deprecated(since="mathcomp 2.1.0", note="Use mulrzDr_tmp instead. mulrzDl will be renamed mulrzDr in the future.")]
-Notation mulrzDl := mulrzDr_tmp.
-#[deprecated(since="mathcomp 2.1.0", note="Use mulrzDl_tmp instead. mulrzDr will be renamed mulrzDl in the future.")]
-Notation mulrzDr := mulrzDl_tmp.
+#[deprecated(since="mathcomp 2.3.0", note="Use mulrzDl instead.")]
+Notation mulrzDl_tmp := mulrzDl.
+#[deprecated(since="mathcomp 2.3.0", note="Use mulrzDr instead.")]
+Notation mulrzDr_tmp := mulrzDr.
 
 Lemma ffunMzE (I : finType) (M : zmodType) (f : {ffun I -> M}) z x :
   (f *~ z) x = f x *~ z.
@@ -1818,8 +1818,6 @@ Proof. by case: m => m; constructor; [exists m | case]. Qed.
 
 End mc_2_0.
 
-#[deprecated(since="mathcomp 2.1.0", note="Use polyCMz instead.")]
-Notation polyC_mulrz := polyCMz (only parsing).
 #[deprecated(since="mathcomp 2.1.0",
              note="Require archimedean.v and use Num.nat instead.")]
 Notation Znat := (Num.Def.nat_num : qualifier 1 int) (only parsing).
