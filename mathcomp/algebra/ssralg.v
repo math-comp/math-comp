@@ -21,7 +21,7 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*    semiRingType == non-commutative semi rings                              *)
 (*                    (NModule with a multiplication)                         *)
 (*                    The HB class is called SemiRing.                        *)
-(* comSemiringType == commutative semi rings                                  *)
+(* comSemiRingType == commutative semi rings                                  *)
 (*                    The HB class is called ComSemiRing.                     *)
 (*        ringType == non-commutative rings (semi rings with an opposite)     *)
 (*                    The HB class is called Ring.                            *)
@@ -681,13 +681,8 @@ Proof. by rewrite big_const -iteropE. Qed.
 Lemma sumr_const_nat m n x : \sum_(n <= i < m) x = x *+ (m - n).
 Proof. by rewrite big_const_nat iter_addr_0. Qed.
 
-Section ClosedPredicates.
-
-Variable S : {pred V}.
-
-Definition addr_closed := 0 \in S /\ {in S &, forall u v, u + v \in S}.
-
-End ClosedPredicates.
+Definition addr_closed (S : {pred V}) :=
+  0 \in S /\ {in S &, forall u v, u + v \in S}.
 
 End NmoduleTheory.
 
@@ -1538,16 +1533,16 @@ End ClosedPredicates.
 
 End RingTheory.
 
-Module ConverseRingExports.
-
+Section ConverseRing.
+#[export]
 HB.instance Definition _ (T : eqType) := Equality.on T^c.
-
+#[export]
 HB.instance Definition _ (T : choiceType) := Choice.on T^c.
-
+#[export]
 HB.instance Definition _ (U : nmodType) := Nmodule.on U^c.
-
+#[export]
 HB.instance Definition _ (U : zmodType) := Zmodule.on U^c.
-
+#[export]
 HB.instance Definition _ (R : semiRingType) :=
   let mul' (x y : R) := y * x in
   let mulrA' x y z := esym (mulrA z y x) in
@@ -1555,11 +1550,9 @@ HB.instance Definition _ (R : semiRingType) :=
   let mulrDr' x y z := mulrDl y z x in
   Nmodule_isSemiRing.Build R^c
     mulrA' mulr1 mul1r mulrDl' mulrDr' mulr0 mul0r oner_neq0.
-
+#[export]
 HB.instance Definition _ (R : ringType) := SemiRing.on R^c.
-
-End ConverseRingExports.
-HB.export ConverseRingExports.
+End ConverseRing.
 
 Section SemiRightRegular.
 
@@ -1719,26 +1712,23 @@ Local Notation "k %:A" := (k *: 1) : ring_scope.
 Definition regular R : Type := R.
 Local Notation "R ^o" := (regular R) (at level 2, format "R ^o") : type_scope.
 
-Module RegularLalgExports.
-Section LalgebraTheory.
-
+Section RegularAlgebra.
+#[export]
 HB.instance Definition _ (V : nmodType) := Nmodule.on V^o.
+#[export]
 HB.instance Definition _ (V : zmodType) := Zmodule.on V^o.
+#[export]
 HB.instance Definition _ (R : semiRingType) := SemiRing.on R^o.
-
-Variables (R : ringType) (A : lalgType R).
-
-HB.instance Definition _ := Ring.on R^o.
-
-HB.instance Definition _ := @Zmodule_isLmodule.Build R R^o
-  (@mul R) (@mulrA R) (@mul1r R) (@mulrDr R) (fun v a b => mulrDl a b v).
-
-HB.instance Definition _ : Lmodule_isLalgebra R R^o :=
+#[export]
+HB.instance Definition _ (R : ringType) := Ring.on R^o.
+#[export]
+HB.instance Definition _ (R : ringType) :=
+  @Zmodule_isLmodule.Build R R^o
+    (@mul R) (@mulrA R) (@mul1r R) (@mulrDr R) (fun v a b => mulrDl a b v).
+#[export]
+HB.instance Definition _ (R : ringType) :=
   Lmodule_isLalgebra.Build R R^o mulrA.
-
-End LalgebraTheory.
-End RegularLalgExports.
-HB.export RegularLalgExports.
+End RegularAlgebra.
 
 Section LalgebraTheory.
 
@@ -1784,6 +1774,7 @@ HB.factory Record isAdditive (U V : zmodType) (apply : U -> V) := {
 }.
 
 HB.builders Context U V apply of isAdditive U V apply.
+
 Local Lemma raddf0 : apply 0 = 0.
 Proof. by rewrite -[0]subr0 additive_subproof subrr. Qed.
 
@@ -2506,6 +2497,41 @@ Proof. by rewrite exprDn_comm //; apply: mulrC. Qed.
 Lemma sqrrD x y : (x + y) ^+ 2 = x ^+ 2 + x * y *+ 2 + y ^+ 2.
 Proof. by rewrite exprDn !big_ord_recr big_ord0 /= add0r mulr1 mul1r. Qed.
 
+Section FrobeniusAutomorphism.
+
+Variables (p : nat) (charRp : p \in char R).
+
+Lemma Frobenius_aut_is_semi_additive : semi_additive (Frobenius_aut charRp).
+Proof.
+by split=> [|x y]; [exact: Frobenius_aut0 | exact/Frobenius_autD_comm/mulrC].
+Qed.
+
+Lemma Frobenius_aut_is_multiplicative : multiplicative (Frobenius_aut charRp).
+Proof.
+by split=> [x y|]; [exact/Frobenius_autM_comm/mulrC | exact: Frobenius_aut1].
+Qed.
+
+#[export]
+HB.instance Definition _ := isSemiAdditive.Build R R (Frobenius_aut charRp)
+  Frobenius_aut_is_semi_additive.
+#[export]
+HB.instance Definition _ := isMultiplicative.Build R R (Frobenius_aut charRp)
+  Frobenius_aut_is_multiplicative.
+
+End FrobeniusAutomorphism.
+
+Lemma exprDn_char x y n : (char R).-nat n -> (x + y) ^+ n = x ^+ n + y ^+ n.
+Proof.
+pose p := pdiv n; have [|n_gt1 charRn] := leqP n 1; first by case: (n) => [|[]].
+have charRp: p \in char R by rewrite (pnatPpi charRn) ?pi_pdiv.
+have{charRn} /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (charf_eq charRp)).
+by elim: e => // e IHe; rewrite !expnSr !exprM IHe -Frobenius_autE rmorphD.
+Qed.
+
+Lemma rmorph_comm (S : semiRingType) (f : {rmorphism R -> S}) x y :
+  comm (f x) (f y).
+Proof. by red; rewrite -!rmorphM mulrC. Qed.
+
 End ComSemiRingTheory.
 
 #[short(type="comRingType")]
@@ -2565,40 +2591,6 @@ Proof.
 rewrite sqrrD sqrrB -!(addrAC _ (y ^+ 2)) opprB.
 by rewrite addrC addrA subrK -mulrnDr.
 Qed.
-
-Section FrobeniusAutomorphism.
-
-Variables (p : nat) (charRp : p \in char R).
-
-Lemma Frobenius_aut_is_additive : additive (Frobenius_aut charRp).
-Proof. move=> x y; exact: Frobenius_autB_comm (mulrC _ _). Qed.
-
-Lemma Frobenius_aut_is_multiplicative : multiplicative (Frobenius_aut charRp).
-Proof.
-split=> [x y|]; first exact: Frobenius_autM_comm _ (mulrC _ _).
-exact: Frobenius_aut1.
-Qed.
-
-#[export]
-HB.instance Definition _ := isAdditive.Build R R (Frobenius_aut charRp)
-  Frobenius_aut_is_additive.
-#[export]
-HB.instance Definition _ := isMultiplicative.Build R R (Frobenius_aut charRp)
-  Frobenius_aut_is_multiplicative.
-
-End FrobeniusAutomorphism.
-
-Lemma exprDn_char x y n : (char R).-nat n -> (x + y) ^+ n = x ^+ n + y ^+ n.
-Proof.
-pose p := pdiv n; have [|n_gt1 charRn] := leqP n 1; first by case: (n) => [|[]].
-have charRp: p \in char R by rewrite (pnatPpi charRn) ?pi_pdiv.
-have{charRn} /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (charf_eq charRp)).
-by elim: e => // e IHe; rewrite !expnSr !exprM IHe -Frobenius_autE rmorphD.
-Qed.
-
-Lemma rmorph_comm (S : ringType) (f : {rmorphism R -> S}) x y :
-  comm (f x) (f y).
-Proof. by red; rewrite -!rmorphM mulrC. Qed.
 
 Section ScaleLinear.
 
@@ -2919,30 +2911,22 @@ Proof. by rewrite (inv_eq invrK) invr1. Qed.
 Lemma rev_unitrP (x y : R^c) : y * x = 1 /\ x * y = 1 -> x \is a unit.
 Proof. by case=> [yx1 xy1]; apply/unitrP; exists y. Qed.
 
+#[export]
+HB.instance Definition _ :=
+  Ring_hasMulInverse.Build R^c mulrV mulVr rev_unitrP invr_out.
+
+#[export]
+HB.instance Definition _ := UnitRing.on R^o.
+
 End UnitRingTheory.
 
 Arguments invrK {R}.
 Arguments invr_inj {R} [x1 x2].
 Arguments telescope_prodr_eq {R n m} f u.
 
-Module RegularConverseUnitRingExports.
-Section UnitRingTheory.
-Variable R : unitRingType.
-Implicit Types x y : R.
-
-HB.instance Definition _ :=
-  Ring_hasMulInverse.Build R^c (@mulrV R) (@mulVr R) (@rev_unitrP R) (@invr_out R).
-HB.instance Definition _ := UnitRing.on R^o.
-End UnitRingTheory.
-End RegularConverseUnitRingExports.
-HB.export RegularConverseUnitRingExports.
-
 Section UnitRingClosedPredicates.
 
-Variable R : unitRingType.
-Implicit Types x y : R.
-
-Variables S : {pred R}.
+Variables (R : unitRingType) (S : {pred R}).
 
 Definition invr_closed := {in S, forall x, x^-1 \in S}.
 Definition divr_2closed := {in S &, forall x y, x / y \in S}.
@@ -3070,20 +3054,12 @@ Proof. by move=> Ux y Uy; rewrite /= invrM ?unitrV // invrK mulrC divrK. Qed.
 Lemma expr_div_n x y n : (x / y) ^+ n = x ^+ n / y ^+ n.
 Proof. by rewrite exprMn exprVn. Qed.
 
+(* TODO: HB.saturate *)
+#[export] HB.instance Definition _ := ComUnitRing.on R^c.
+#[export] HB.instance Definition _ := ComUnitRing.on R^o.
+(* /TODO *)
+
 End ComUnitRingTheory.
-
-Module RegularConverseComUnitRingExports.
-Section ComUnitRingTheory.
-
-Variable R : comUnitRingType.
-Implicit Types x y : R.
-
-(* TODO: HB.recover_all_instances (R^o). *)
-HB.instance Definition _ := ComUnitRing.on R^c.
-HB.instance Definition _ := ComUnitRing.on R^o.
-End ComUnitRingTheory.
-End RegularConverseComUnitRingExports.
-HB.export RegularConverseComUnitRingExports.
 
 Section UnitAlgebraTheory.
 
@@ -3936,12 +3912,10 @@ Proof. by apply: (iffP idP) => [/mulfI | /lreg_neq0]. Qed.
 Lemma rregP x : reflect (rreg x) (x != 0).
 Proof. by apply: (iffP idP) => [/mulIf | /rreg_neq0]. Qed.
 
-End IntegralDomainTheory.
+#[export]
+HB.instance Definition _ := IntegralDomain.on R^o.
 
-Module RegularIdomainExports.
-HB.instance Definition _ (R : idomainType) := IntegralDomain.on R^o.
-End RegularIdomainExports.
-HB.export RegularIdomainExports.
+End IntegralDomainTheory.
 
 Arguments lregP {R x}.
 Arguments rregP {R x}.
@@ -6370,11 +6344,12 @@ HB.instance Definition _ := SemiRing_hasCommutativeMul.Build (R1 * R2)%type
 
 End PairComSemiRing.
 
+(* TODO: HB.saturate *)
 #[export]
 HB.instance Definition _ (R1 R2 : ringType) := SemiRing.on (R1 * R1)%type.
-
 #[export]
 HB.instance Definition _ (R1 R2 : comRingType) := SemiRing.on (R1 * R1)%type.
+(* /TODO *)
 
 Section PairLmod.
 
@@ -6400,12 +6375,12 @@ HB.instance Definition _ := Zmodule_isLmodule.Build R (V1 * V2)%type
 
 Fact fst_is_scalable : scalable fst. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isScalable.Build R (V1 * V2)%type V1 *:%R fst
-  fst_is_scalable.
+HB.instance Definition _ :=
+  isScalable.Build R (V1 * V2)%type V1 *:%R fst fst_is_scalable.
 Fact snd_is_scalable : scalable snd. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isScalable.Build R (V1 * V2)%type V2 *:%R snd
-  snd_is_scalable.
+HB.instance Definition _ :=
+  isScalable.Build R (V1 * V2)%type V2 *:%R snd snd_is_scalable.
 
 End PairLmod.
 
@@ -6477,16 +6452,20 @@ HB.instance Definition _ := Ring_hasMulInverse.Build (R1 * R2)%type
 
 End PairUnitRing.
 
-(* TODO *)
-(* HB FEATURE: (hard) complete graph using parameters,...*)
-(* HB FEATURE: (easy) types/defs/anything can be a factory *)
-(*    HB.saturate (R1 R2 : comUnitRingType) (R1 * R2)%type *)
+(* TODO: HB.saturate *)
 #[export]
 HB.instance Definition _ (R1 R2 : comUnitRingType) :=
   UnitRing.on (R1 * R2)%type.
 #[export]
-HB.instance Definition _ (R : unitRingType) (A1 A2 : unitAlgType R) :=
-  UnitRing.on (A1 * A2)%type.
+HB.instance Definition _ (R : ringType) (A1 A2 : comAlgType R) :=
+  Algebra.on (A1 * A2)%type.
+#[export]
+HB.instance Definition _ (R : ringType) (A1 A2 : unitAlgType R) :=
+  Algebra.on (A1 * A2)%type.
+#[export]
+HB.instance Definition _ (R : ringType) (A1 A2 : comUnitAlgType R) :=
+  Algebra.on (A1 * A2)%type.
+(* /TODO *)
 
 Lemma pairMnE (M1 M2 : zmodType) (x : M1 * M2) n :
   x *+ n = (x.1 *+ n, x.2 *+ n).

@@ -1225,8 +1225,7 @@ HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build _ subFExtend
 Fact subfx_evalZ : scalable subfx_eval.
 Proof. by move=> a q; rewrite -mul_polyC rmorphM. Qed.
 HB.instance Definition _ :=
-  GRing.isScalable.Build F {poly F} subFExtend *:%R subfx_eval
-    subfx_evalZ.
+  GRing.isScalable.Build F {poly F} subFExtend *:%R subfx_eval subfx_evalZ.
 
 Hypothesis (pz0 : root p^iota z).
 
