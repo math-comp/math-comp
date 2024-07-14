@@ -22,20 +22,6 @@ See [this Checklist](https://github.com/math-comp/math-comp/wiki/Checklist-for-c
 
 <!-- Cross-out the above items using ~crossed out item~ if they happen not to be relevant -->
 
-##### Compatibility with MathComp 1.X
-
-<!-- If this PR targets `master` and if it is merged, the merged commit may be
-     cherry-picked on the branch `mathcomp-1` if possible.
-
-     In this case, it would be helpful if the author of the PR also prepares a PR
-     for the branch `mathcomp-1` or at least warns maintainers with an issue
-     to delegate the work. -->
-
-<!-- use the tag TODO: MC-1 port to record divergences between `master` and `mathcomp-1` -->
-
-- [ ] I added the label `TODO: MC-1 port` to make sure someone ports this PR to
-      the `mathcomp-1` branch **or** I already opened an issue or PR (please cross reference).
-
 <!-- leave this note as a reminder to reviewers -->
 ##### Automatic note to reviewers
 

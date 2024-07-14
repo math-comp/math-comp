@@ -2405,4 +2405,3 @@ name: Nix CI for bundle coq-8.18
   push:
     branches:
     - master
-    - mathcomp-1

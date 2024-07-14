@@ -72,7 +72,6 @@ with builtins; with (import <nixpkgs> {}).lib;
          #   from https://github.com/<github_login>/<repository>
        };
   in {
-    "coq-master".push-branches = [ "master" "mathcomp-1" ];
     "coq-master".coqPackages = common-bundles // {
       coq.override.version = "master";
       bignums.override.version = "master";
@@ -87,12 +86,10 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq.override.version = "8.20";
       interval.job = false;
     };
-    "coq-8.19".push-branches = [ "master" "mathcomp-1" ];
     "coq-8.19".coqPackages = common-bundles // {
       coq.override.version = "8.19";
       interval.job = false;
     };
-    "coq-8.18".push-branches = [ "master" "mathcomp-1" ];
     "coq-8.18".coqPackages = common-bundles // {
       coq.override.version = "8.18";
     };
