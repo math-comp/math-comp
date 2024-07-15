@@ -2242,4 +2242,3 @@ name: Nix CI for bundle coq-master
   push:
     branches:
     - master
-    - mathcomp-1
