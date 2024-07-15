@@ -57,6 +57,7 @@ stages:
       - schedules
     variables:
       - $CRON_MODE == "nightly"
+      - $CRON_MODE == "minimal"
 
 make-coq-latest:
   extends: .make-build
@@ -149,6 +150,7 @@ coq-dev:
       - schedules
     variables:
       - $CRON_MODE == "nightly"
+      - $CRON_MODE == "minimal"
 
 test-coq-8.18:
   extends: .test-once
@@ -199,6 +201,7 @@ test-coq-dev:
 #       - schedules
 #     variables:
 #       - $CRON_MODE == "nightly"
+#       - $CRON_MODE == "minimal"
 # 
 # # Guidelines to add a library to mathcomp CI:
 # # - Add a hidden job (starting with a .) .ci-lib that extends the .ci job,
