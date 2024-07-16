@@ -299,7 +299,8 @@ have le_q'_dq: size q' <= dq.
   have [-> | nz_q'] := eqVneq q' 0; first by rewrite size_poly0.
   by rewrite /dq -(size_scale q nz_k) q'r size_mul // addnC -def_r leq_addl.
 exists (row_mx (- c *: poly_rV q') (k *: poly_rV p')); last first.
-  rewrite mul_row_col scaleNr mulNmx !mul_rV_lin1 /= 2!linearZ /= !poly_rV_K //.
+  rewrite mul_row_col scaleNr mulNmx !mul_rV_lin1 /=.
+  rewrite 2![rVpoly (_ *: _)]linearZ /= !poly_rV_K //.
   by rewrite !scalerCA p'r q'r mulrCA addNr.
 apply: contraNneq r_nz; rewrite -row_mx0 => /eq_row_mx[/eqP].
 rewrite scaleNr oppr_eq0 gcdp_eq0 -!size_poly_eq0 => /eqP q0 p0.
@@ -342,7 +343,7 @@ Lemma horner_rVpoly m (u : 'rV_m) :
   horner_mx (rVpoly u) = vec_mx (u *m powers_mx m).
 Proof.
 rewrite mulmx_sum_row [rVpoly u]poly_def 2!linear_sum; apply: eq_bigr => i _.
-by rewrite valK /= 2!linearZ rmorphXn/= horner_mx_X rowK mxvecK.
+by rewrite valK /= 2!linearZ/= rmorphXn/= horner_mx_X rowK mxvecK.
 Qed.
 
 End OneMatrix.
@@ -1248,7 +1249,7 @@ Lemma integral_algebraic u : algebraicOver FtoE u <-> integralOver FtoE u.
 Proof.
 split=> [] [p p_nz pu0]; last by exists p; rewrite ?monic_neq0.
 exists (mk_mon p); first by rewrite monicE lead_coefZ mulVf ?lead_coef_eq0.
-by rewrite linearZ rootE hornerZ (rootP pu0) mulr0.
+by rewrite linearZ/= rootE hornerZ (rootP pu0) mulr0.
 Qed.
 
 Lemma algebraic_id a : algebraicOver FtoE (FtoE a).
