@@ -752,7 +752,7 @@ Proof. by rewrite -[*:%R]/scale_poly unlock size_poly. Qed.
 
 HB.instance Definition _ i := GRing.isScalable.Build R {poly R} R *%R (coefp i)
   (fun a => (coefZ a) ^~ i).
-HB.instance Definition _ := GRing.Linear.on (coefp 0).
+HB.instance Definition _ := GRing.Semilinear.on (coefp 0).
 
 (* The indeterminate, at last! *)
 Definition polyX_def := @Poly R [:: 0; 1].
