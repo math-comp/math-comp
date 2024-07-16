@@ -72,9 +72,6 @@ HB.structure Definition ComUnitRing := {R of GRing.ComUnitRing R & Finite R}.
 #[short(type="finIdomainType")]
 HB.structure Definition IntegralDomain :=
   {R of GRing.IntegralDomain R & Finite R}.
-#[deprecated(since="mathcomp 2.1.0",
-  note="Use finIdomainType (not available in mathcomp 2.0.0).")]
-Notation finIntegralDomainType := finIdomainType.
 
 #[short(type="finFieldType")]
 HB.structure Definition Field := {R of GRing.Field R & Finite R}.
@@ -343,10 +340,6 @@ End FinRing.
 
 Import FinRing.
 HB.reexport.
-
-#[deprecated(since="mathcomp 2.1.0",
-  note="Use finIdomainType (not available in mathcomp 2.0.0).")]
-Notation finIntegralDomainType := finIdomainType.
 
 Lemma card_finRing_gt1 (R : finRingType) : 1 < #|R|.
 Proof. by rewrite (cardD1 0) (cardD1 1) !inE GRing.oner_neq0. Qed.

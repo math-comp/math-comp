@@ -239,6 +239,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ceilD` -> `real_ceilD`
   + `ceil_floor` -> `real_ceil_floor`
 
+- in `ssrint.v`
+  + `mulrzDr` -> `mulrzDl`
+  + `mulrzDl` -> `mulrzDr`
+
 ### Removed
 
 - in `seq.v`
@@ -329,6 +333,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `ler_eexpz2l`, `ltr_eexpz2l`, `eqr_expz2`, `exprz_pmulzl`,
     `leq_add_dist`, `leqif_add_distz`, `leqif_add_dist` (deprecated
     since 1.17)
+  + notation `polyC_mulrz` (deprecated since 2.1.0)
 
 - in `fraction.v`
   + notation `tofracX` (deprecated since 1.17)
@@ -354,6 +359,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `polydiv.v`
   + definition `gcdp_rec`, use `gcdp` directly
+  + notation `modp_mod` (deprecated since 2.1.0)
 
 - in `nilpotent.v`
   + definition `lower_central_at_rec`, use `lower_central_at` directly
@@ -408,6 +414,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + notations `PcanPartial`, `CanPartial`, `PcanTotal`, `CanTotal`,
     `MonoTotalMixin`, `PcanPOrderMixin`, `CanPOrderMixin`, `PcanOrderMixin`,
     `CanOrderMixin`, `IsoLatticeMixin`, `IsoDistrLatticeMixin`
+  + notations `comparable_le_minr`, `comparable_le_minl`, `comparable_lt_minl`,
+    `comparable_lt_minr`, `comparable_le_maxr`, `comparable_le_maxl`,
+    `comparable_lt_maxr`, `comparable_lt_maxl`, `le_maxl`, `le_maxr`,
+    `lt_maxl`, `lt_maxr`, `lt_minr`, `lt_minl`, `le_minr`, `le_minl`
+    (deprecated since 2.1.0)
 
 - in `fingroup.v`
   + notations `[finGroupType of T]` and `[baseFinGroupType of T]`
@@ -477,6 +488,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + notation `[finLalgType R of T]`
   + notation `[finAlgType R of T]`
   + notation `[finUnitAlgType R of T]`
+  + notation `finIntegralDomainType` (deprecated since 2.1.0)
 
 - in `ssrnum.v`
   + notations `[numDomainType of T]` and `[numDomainType of T for cT]`
