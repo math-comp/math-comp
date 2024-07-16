@@ -3087,7 +3087,7 @@ HB.instance Definition _ m n p q f g k :=
   GRing.isScalable.Build R 'M[R]_(m, n) 'M[R]_(p, q) *:%R (swizzle_mx f g k)
     (swizzle_mx_is_scalable f g k).
 
-Local Notation SwizzleLin op := (GRing.Linear.copy op (swizzle_mx _ _ _)).
+Local Notation SwizzleLin op := (GRing.Semilinear.copy op (swizzle_mx _ _ _)).
 
 HB.instance Definition _ m n := SwizzleLin (@trmx R m n).
 HB.instance Definition _ m n i := SwizzleLin (@row R m n i).

@@ -358,7 +358,7 @@ Let mem_r2v rv U : (r2v rv \in U) = (rv <= vs2mx U)%MS.
 Proof. by rewrite memvK r2vK. Qed.
 
 Let vs2mx0 : @vs2mx K vT 0 = 0.
-Proof. by rewrite /= linear0 genmx0. Qed.
+Proof. by rewrite /= raddf0 genmx0. Qed.
 
 Let vs2mxD U V : vs2mx (U + V) = (vs2mx U + vs2mx V)%MS.
 Proof. by rewrite /= genmx_adds !gen_vs2mx. Qed.
@@ -396,13 +396,14 @@ Lemma memvE v U : (v \in U) = (<[v]> <= U)%VS. Proof. by []. Qed.
 
 Lemma vlineP v1 v2 : reflect (exists k, v1 = k *: v2) (v1 \in <[v2]>)%VS.
 Proof.
-apply: (iffP idP) => [|[k ->]]; rewrite memvK genmxE ?linearZ ?scalemx_sub //.
-by case/sub_rVP=> k; rewrite -linearZ => /v2r_inj->; exists k.
+rewrite memvK genmxE; apply: (iffP idP) => [/sub_rVP[k]|[k ->]].
+  by rewrite -linearZ => /v2r_inj->; exists k.
+by rewrite linearZ/= scalemx_sub.
 Qed.
 
 Fact memv_submod_closed U : submod_closed U.
 Proof.
-split=> [|a u v]; rewrite !memvK 1?linear0 1?sub0mx // => Uu Uv.
+split=> [|a u v]; rewrite !memvK 1?raddf0 1?sub0mx // => Uu Uv.
 by rewrite linearP addmx_sub ?scalemx_sub.
 Qed.
 HB.instance Definition _ (U : {vspace vT}) :=
@@ -518,7 +519,7 @@ HB.instance Definition _ := Monoid.isComLaw.Build {vspace vT} 0%VS addv
   addvA addvC add0v.
 
 Lemma memv_add u v U V : u \in U -> v \in V -> u + v \in (U + V)%VS.
-Proof. by rewrite !memvK genmxE linearD; apply: addmx_sub_adds. Qed.
+Proof. by rewrite !memvK genmxE raddfD; apply: addmx_sub_adds. Qed.
 
 Lemma memv_addP {w U V} :
   reflect (exists2 u, u \in U & exists2 v, v \in V & w = u + v)
@@ -526,7 +527,7 @@ Lemma memv_addP {w U V} :
 Proof.
 apply: (iffP idP) => [|[u Uu [v Vv ->]]]; last exact: memv_add.
 rewrite memvK genmxE => /sub_addsmxP[r /(canRL v2rK)->].
-rewrite linearD /=; set u := r2v _; set v := r2v _.
+rewrite raddfD /=; set u := r2v _; set v := r2v _.
 by exists u; last exists v; rewrite // mem_r2v submxMl.
 Qed.
 
@@ -678,7 +679,7 @@ Lemma dimv0 : \dim (0%VS : {vspace vT}) = 0.
 Proof. by rewrite /dimv vs2mx0 mxrank0. Qed.
 
 Lemma dimv_eq0 U :  (\dim U == 0) = (U == 0%VS).
-Proof. by rewrite /dimv /= mxrank_eq0 [in RHS]/eq_op /= linear0 genmx0. Qed.
+Proof. by rewrite /dimv /= mxrank_eq0 [in RHS]/eq_op /= raddf0 genmx0. Qed.
 
 Lemma dimvf : \dim {:vT} = dim vT.
 Proof. by rewrite /dimv vs2mxF mxrank1. Qed.
@@ -961,7 +962,7 @@ Qed.
 Lemma coord0 i v : coord [tuple 0] i v = 0.
 Proof.
 rewrite unlock /pinvmx rank_rV; case: negP => [[] | _].
-  by apply/eqP/rowP=> j; rewrite !mxE (tnth_nth 0) /= linear0 mxE.
+  by apply/eqP/rowP=> j; rewrite !mxE (tnth_nth 0) /= raddf0 mxE.
 by rewrite pid_mx_0 !(mulmx0, mul0mx) mxE.
 Qed.
 
@@ -1011,7 +1012,7 @@ Qed.
 Lemma coord_sum_free n (X : n.-tuple vT) k j :
   free X -> coord X j (\sum_(i < n) k i *: X`_i) = k j.
 Proof.
-move=> Xfree; rewrite linear_sum (bigD1 j) 1?linearZ //= coord_free // eqxx.
+move=> Xfree; rewrite linear_sum (bigD1 j) //= linearZ/= coord_free // eqxx.
 rewrite mulr1 big1 ?addr0 // => i /negPf j'i.
 by rewrite linearZ /= coord_free // j'i mulr0.
 Qed.
@@ -1720,7 +1721,7 @@ Hypothesis vT_proper : dim vT > 0.
 Fact lfun1_neq0 : \1%VF != 0 :> 'End(vT).
 Proof.
 apply/eqP=> /lfunP/(_ (r2v (const_mx 1))); rewrite !lfunE /= => /(canRL r2vK).
-by move=> /rowP/(_ (Ordinal vT_proper))/eqP; rewrite linear0 !mxE oner_eq0.
+by move=> /rowP/(_ (Ordinal vT_proper))/eqP; rewrite raddf0 !mxE oner_eq0.
 Qed.
 
 Prenex Implicits comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr.

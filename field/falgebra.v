@@ -1031,7 +1031,9 @@ HB.instance Definition _ := [Equality of ahom by <:].
 HB.instance Definition _ := [Choice of ahom by <:].
 
 Fact linfun_is_ahom (f : {lrmorphism aT -> rT}) : ahom_in {:aT} (linfun f).
-Proof. by apply/ahom_inP; split=> [x y|]; rewrite !lfunE ?rmorphM ?rmorph1. Qed.
+Proof.
+by apply/ahom_inP; split=> [x y|]; rewrite !lfunE /= ?rmorphM ?rmorph1.
+Qed.
 Canonical linfun_ahom f := AHom (linfun_is_ahom f).
 
 End Class_Def.

@@ -634,12 +634,19 @@ Reserved Notation "'{' 'lrmorphism' U '->' V '|' s '}'"
 Reserved Notation "'{' 'lrmorphism' U '->' V '}'"
   (at level 0, U at level 98, V at level 99,
    format "{ 'lrmorphism'  U  ->  V }").
+Reserved Notation "'{' 'linear' U '->' V '/' f '|' s '}'"
+  (at level 0, U at level 98, V at level 39,
+   format "{ 'linear'  U  ->  V  /  f  |  s }").
+Reserved Notation "'{' 'linear' U '->' V '/' f '}'"
+  (at level 0, U at level 98, V at level 39,
+   format "{ 'linear'  U  ->  V  /  f }").
 Reserved Notation "'{' 'linear' U '->' V '|' s '}'"
-  (at level 0, U at level 98, V at level 99,
+  (at level 0, U at level 98, V at level 39,
    format "{ 'linear'  U  ->  V  |  s }").
 Reserved Notation "'{' 'linear' U '->' V '}'"
-  (at level 0, U at level 98, V at level 99,
+  (at level 0, U at level 98, V at level 39,
    format "{ 'linear'  U  ->  V }").
+Reserved Notation "'{' 'scalar' U '}'" (at level 0, format "{ 'scalar'  U }").
 
 Declare Scope ring_scope.
 Delimit Scope ring_scope with R.
@@ -2509,30 +2516,57 @@ End InSemiAlgebra.
 
 End RmorphismTheory.
 
-(* TODO: generalize to semirings and semi-modules? *)
 Module Scale.
 
-HB.mixin Record isLaw (R : pzRingType) (V : zmodType) (op : R -> V -> V) := {
-  N1op_subproof : op (-1) =1 -%R;
-  op_additive_subproof : forall a, additive (op a);
+HB.mixin Record isPreLaw
+    (R : pzSemiRingType) (V : nmodType) (op : R -> V -> V) := {
+  op_semi_additive : forall a, semi_additive (op a);
 }.
 
 #[export]
-HB.structure Definition Law R V := {op of isLaw R V op}.
+HB.structure Definition PreLaw R V := {op of isPreLaw R V op}.
+Definition preLaw := PreLaw.type.
+
+HB.mixin Record isSemiLaw
+    (R : pzSemiRingType) (V : nmodType) (op : R -> V -> V) := {
+  op0v : forall v, op 0 v = 0;
+  op1v : op 1 =1 id;
+  opA : forall a b v, op a (op b v) = op (a * b) v;
+}.
+
+#[export]
+HB.structure Definition SemiLaw R V :=
+  {op of isPreLaw R V op & isSemiLaw R V op}.
+Definition semiLaw := SemiLaw.type.
+
+HB.mixin Record isLaw (R : pzRingType) (V : zmodType) (op : R -> V -> V) :=
+  { N1op : op (-1) =1 -%R }.
+
+#[export]
+HB.structure Definition Law (R : pzRingType) (V : zmodType) :=
+  {op of isPreLaw R V op & isLaw R V op}.
 Definition law := Law.type.
 
-Section ScaleLaw.
+Section CompSemiLaw.
 
-Variables (R : pzRingType) (V : zmodType) (s_law : law R V).
+Context (R : pzSemiRingType) (V : nmodType) (s : semiLaw R V).
+Context (aR : pzSemiRingType) (nu : {rmorphism aR -> R}).
 
-Lemma N1op : s_law (-1) =1 -%R. Proof. exact: N1op_subproof. Qed.
-Fact opB a : additive (s_law a). Proof. exact: op_additive_subproof. Qed.
+Fact comp_op0v v : (nu \; s) 0 v = 0.
+Proof. by rewrite /= rmorph0 op0v. Qed.
 
-Variables (aR : pzRingType) (nu : {rmorphism aR -> R}).
-Fact compN1op : (nu \; s_law) (-1) =1 -%R.
+Fact comp_op1v : (nu \; s) 1 =1 id.
+Proof. by move=> v; rewrite /= rmorph1 op1v. Qed.
+
+Fact comp_opA a b v : (nu \; s) a ((nu \; s) b v) = (nu \; s) (a * b) v.
+Proof. by rewrite /= opA rmorphM. Qed.
+
+End CompSemiLaw.
+
+Fact compN1op
+  (R : pzRingType) (V : zmodType) (s : law R V)
+  (aR : pzRingType) (nu : {rmorphism aR -> R}) : (nu \; s) (-1) =1 -%R.
 Proof. by move=> v; rewrite /= rmorphN1 N1op. Qed.
-
-End ScaleLaw.
 
 Module Exports. HB.reexport. End Exports.
 
@@ -2540,37 +2574,117 @@ End Scale.
 Export Scale.Exports.
 
 #[export]
-HB.instance Definition _ (R : pzRingType) := Scale.isLaw.Build R R *%R
-  (@mulN1r R) (@mulrBr R).
+HB.instance Definition _ (R : pzSemiRingType) :=
+  Scale.isPreLaw.Build R R *%R (fun => mull_fun_is_semi_additive _ idfun).
+
+#[export]
+HB.instance Definition _ (R : pzSemiRingType) :=
+  Scale.isSemiLaw.Build R R *%R mul0r mul1r mulrA.
+
+#[export]
+HB.instance Definition _ (R : pzRingType) :=
+  Scale.isLaw.Build R R *%R (@mulN1r R).
+
+#[export]
+HB.instance Definition _ (R : pzSemiRingType) (V : lSemiModType R) :=
+  Scale.isPreLaw.Build R V *:%R (fun => (scaler0 _ _, scalerDr _)).
+
+#[export]
+HB.instance Definition _ (R : pzSemiRingType) (V : lSemiModType R) :=
+  Scale.isSemiLaw.Build R V *:%R scale0r scale1r (@scalerA _ _).
 
 #[export]
 HB.instance Definition _ (R : pzRingType) (U : lmodType R) :=
-  Scale.isLaw.Build R U *:%R (@scaleN1r R U) (@scalerBr R U).
+  Scale.isLaw.Build R U *:%R (@scaleN1r R U).
 
 #[export]
-HB.instance Definition _ (R : pzRingType) (V : zmodType) (s : Scale.law R V)
+HB.instance Definition _
+    (R : pzSemiRingType) (V : nmodType) (s : Scale.preLaw R V)
+    (aR : pzSemiRingType) (nu : {rmorphism aR -> R}) :=
+  Scale.isPreLaw.Build aR V (nu \; s) (fun => Scale.op_semi_additive _).
+
+#[export]
+HB.instance Definition _
+    (R : pzSemiRingType) (V : nmodType) (s : Scale.semiLaw R V)
+    (aR : pzSemiRingType) (nu : {rmorphism aR -> R}) :=
+  Scale.isSemiLaw.Build aR V (nu \; s)
+    (Scale.comp_op0v s nu) (Scale.comp_op1v s nu) (Scale.comp_opA s nu).
+
+#[export]
+HB.instance Definition _
+    (R : pzRingType) (V : zmodType) (s : Scale.law R V)
     (aR : pzRingType) (nu : {rmorphism aR -> R}) :=
-  Scale.isLaw.Build aR V (nu \; s)
-    (@Scale.compN1op _ _ s _ nu) (fun a => Scale.opB _ _).
+  Scale.isLaw.Build aR V (nu \; s) (Scale.compN1op s nu).
 
 #[export, non_forgetful_inheritance]
-HB.instance Definition _ (R : pzRingType) (V : zmodType) (s : Scale.law R V) a :=
- isAdditive.Build V V (s a) (Scale.opB s a).
+HB.instance Definition _
+  (R : pzSemiRingType) (V : nmodType) (s : Scale.preLaw R V) a :=
+  isSemiAdditive.Build V V (s a) (Scale.op_semi_additive a).
 
-Definition scalable_for (R : pzRingType) (U : lmodType R) (V : zmodType)
+Definition scalable_for (R : pzSemiRingType) (U : lSemiModType R) (V : nmodType)
     (s : R -> V -> V) (f : U -> V) :=
   forall a, {morph f : u / a *: u >-> s a u}.
 
-HB.mixin Record isScalable (R : pzRingType) (U : lmodType R) (V : zmodType)
+HB.mixin Record isSemiScalable
+    (R S : pzSemiRingType) (f : {rmorphism R -> S})
+    (U : lSemiModType R) (V : nmodType) (s : S -> V -> V) (g : U -> V) := {
+  semi_linear_subproof : scalable_for (f \; s) g;
+}.
+
+HB.structure Definition Semilinear
+    (R S : pzSemiRingType) (f : {rmorphism R -> S})
+    (U : lSemiModType R) (V : nmodType) (s : S -> V -> V) :=
+  {g of @Additive U V g & isSemiScalable R S f U V s g}.
+
+Module Linear.
+#[deprecated(since="mathcomp 2.3.0", note="Use Semilinear.type instead.")]
+Notation type := (Semilinear.type idfun).
+#[deprecated(since="mathcomp 2.3.0", note="Use Semilinear.copy instead.")]
+Notation copy T C := (Semilinear.copy T C).
+#[deprecated(since="mathcomp 2.3.0", note="Use Semilinear.on instead.")]
+Notation on T := (Semilinear.on T).
+End Linear.
+
+Definition semilinear_for (R : pzSemiRingType)
+    (U : lSemiModType R) (V : nmodType) (s : R -> V -> V) (f : U -> V) : Type :=
+  scalable_for s f * {morph f : x y / x + y}.
+
+Lemma additive_semilinear (R : pzSemiRingType)
+    (U : lSemiModType R) (V : nmodType) (s : Scale.semiLaw R V) (f : U -> V) :
+  semilinear_for s f -> semi_additive f.
+Proof.
+by case=> sf Df; split => //; rewrite -[0 in LHS](scale0r 0) sf Scale.op0v.
+Qed.
+
+HB.factory Record isScalable (R : pzRingType) (U : lmodType R) (V : zmodType)
     (s : R -> V -> V) (f : U -> V) := {
   linear_subproof : scalable_for s f;
 }.
+HB.builders Context R U V s f of isScalable R U V s f.
+(* TODO: remove idR below (math-comp/hierarchy-builder#432) *)
+Definition idR : {rmorphism R -> R} := idfun.
+HB.instance Definition _ :=
+  isSemiScalable.Build R R idR U V s f linear_subproof.
+HB.end.
 
-HB.structure Definition Linear (R : pzRingType) (U : lmodType R) (V : zmodType)
-    (s : R -> V -> V) :=
-  {f of @Additive U V f & isScalable R U V s f}.
+Lemma scalable_semilinear (R : pzSemiRingType)
+    (U : lSemiModType R) (V : nmodType) (s : Scale.preLaw R V) (f : U -> V) :
+  semilinear_for s f -> scalable_for s f.
+Proof. by case. Qed.
 
-Definition linear_for (R : pzRingType) (U : lmodType R) (V : zmodType)
+HB.factory Record isSemilinear (R S : pzSemiRingType) (f : {rmorphism R -> S})
+  (U : lSemiModType R) (V : nmodType) (s : Scale.semiLaw S V) (g : U -> V) := {
+  linear_subproof : semilinear_for (f \; s) g;
+}.
+HB.builders Context R S f U V s g of isSemilinear R S f U V s g.
+HB.instance Definition _ := isSemiAdditive.Build U V g
+  (additive_semilinear linear_subproof).
+
+HB.instance Definition _ :=
+  isSemiScalable.Build R S f U V s g (scalable_semilinear linear_subproof).
+HB.end.
+
+Definition linear_for (R : pzSemiRingType) (U : lSemiModType R) (V : nmodType)
     (s : R -> V -> V) (f : U -> V) :=
   forall a, {morph f : u v / a *: u + v >-> s a u + v}.
 
@@ -2584,6 +2698,14 @@ Proof.
 by move=> Lsf a v; rewrite -[a *:v](addrK v) (additive_linear Lsf) Lsf addrK.
 Qed.
 
+Lemma semilinear_linear (R : pzRingType) (U : lmodType R) V
+  (s : Scale.law R V) (f : U -> V) : linear_for s f -> semilinear_for s f.
+Proof.
+move=> Lsf; split=> [a x|x y]; first exact: (scalable_linear Lsf).
+have f0: f 0 = 0 by rewrite -[0 in LHS]subr0 (additive_linear Lsf) subrr.
+by rewrite -[y in LHS]opprK -[- y]add0r !(additive_linear Lsf) f0 sub0r opprK.
+Qed.
+
 HB.factory Record isLinear (R : pzRingType) (U : lmodType R) (V : zmodType)
     (s : Scale.law R V) (f : U -> V) := {
   linear_subproof : linear_for s f;
@@ -2591,38 +2713,50 @@ HB.factory Record isLinear (R : pzRingType) (U : lmodType R) (V : zmodType)
 HB.builders Context R U V s f of isLinear R U V s f.
 HB.instance Definition _ := isAdditive.Build U V f
   (additive_linear linear_subproof).
-HB.instance Definition _ := isScalable.Build R U V s f
+(* TODO: remove idR below (math-comp/hierarchy-builder#432) *)
+Definition idR : {rmorphism R -> R} := idfun.
+HB.instance Definition _ := isSemiScalable.Build R R idR U V s f
   (scalable_linear linear_subproof).
 HB.end.
 
 Module LinearExports.
 Notation scalable f := (scalable_for *:%R f).
+Notation semilinear f := (semilinear_for *:%R f).
+Notation semiscalar f := (semilinear_for *%R f).
 Notation linear f := (linear_for *:%R f).
 Notation scalar f := (linear_for *%R f).
 Module Linear.
 Section Linear.
-Variables (R : pzRingType) (U : lmodType R) (V : zmodType) (s : R -> V -> V).
+Variables (R S : pzSemiRingType) (f : {rmorphism R -> S}).
+Variables (U : lSemiModType R) (V : nmodType) (s : S -> V -> V).
 (* Support for right-to-left rewriting with the generic linearZ rule. *)
-Local Notation mapUV := (@Linear.type R U V s).
+Local Notation mapUV := (@Semilinear.type R S f U V s).
 Definition map_class := mapUV.
 Definition map_at (a : R) := mapUV.
-Structure map_for a s_a := MapFor {map_for_map : mapUV; _ : s a = s_a}.
-Definition unify_map_at a (f : map_at a) := MapFor f (erefl (s a)).
+Structure map_for a s_a := MapFor {map_for_map : mapUV; _ : s (f a) = s_a}.
+Definition unify_map_at a (g : map_at a) := MapFor g (erefl (s (f a))).
 Structure wrapped := Wrap {unwrap : mapUV}.
 Definition wrap (f : map_class) := Wrap f.
 End Linear.
 End Linear.
-Notation "{ 'linear' U -> V | s }" := (@Linear.type _ U%type V%type s)
-  : type_scope.
-Notation "{ 'linear' U -> V }" := {linear U%type -> V%type | *:%R}
-  : type_scope.
-Notation "{ 'scalar' U }" := {linear U -> _ | *%R}
-  (at level 0, format "{ 'scalar'  U }") : type_scope.
+Notation "{ 'linear' U -> V / f | s }" :=
+  (@Semilinear.type _ _ f U%type V%type s) : type_scope.
+Notation "{ 'linear' U -> V / f }" := {linear U -> V / f | *:%R} : type_scope.
+Notation "{ 'linear' U -> V | s }" :=
+  {linear U -> V / reverse_coercion _ idfun | s} (only printing) : type_scope.
+Notation "{ 'linear' U -> V | s }" := {linear U -> V / idfun | s} : type_scope.
+Notation "{ 'linear' U -> V }" :=
+  {linear U%type -> V%type / reverse_coercion _ idfun | *:%R}
+  (only printing) : type_scope.
+Notation "{ 'linear' U -> V }" := {linear U%type -> V%type | *:%R} : type_scope.
+Notation "{ 'scalar' U }" :=
+  {linear U -> _ / reverse_coercion _ idfun | *%R} (only printing) : type_scope.
+Notation "{ 'scalar' U }" := {linear U -> _ | *%R} : type_scope.
 (* Support for right-to-left rewriting with the generic linearZ rule. *)
-Coercion Linear.map_for_map : Linear.map_for >-> Linear.type.
+Coercion Linear.map_for_map : Linear.map_for >-> Semilinear.type.
 Coercion Linear.unify_map_at : Linear.map_at >-> Linear.map_for.
 Canonical Linear.unify_map_at.
-Coercion Linear.unwrap : Linear.wrapped >-> Linear.type.
+Coercion Linear.unwrap : Linear.wrapped >-> Semilinear.type.
 Coercion Linear.wrap : Linear.map_class >-> Linear.wrapped.
 Canonical Linear.wrap.
 End LinearExports.
@@ -2630,32 +2764,39 @@ HB.export LinearExports.
 
 Section LinearTheory.
 
-Variable R : pzRingType.
+Section GenericProperties.
+
+Variables (R S : pzSemiRingType) (f : {rmorphism R -> S}).
+Variables (U : lSemiModType R) (V : nmodType) (s : S -> V -> V).
+Variables (g : {linear U -> V / f | s}).
+
+Lemma linear0 : g 0 = 0. Proof. exact: raddf0. Qed.
+Lemma linearD : {morph g : x y / x + y}. Proof. exact: raddfD. Qed.
+Lemma linearMn n : {morph g : x / x *+ n}. Proof. exact: raddfMn. Qed.
+Lemma linear_sum I r (P : pred I) E :
+  g (\sum_(i <- r | P i) E i) = \sum_(i <- r | P i) g (E i).
+Proof. exact: raddf_sum. Qed.
+
+Lemma linearZ_LR : scalable_for (f \; s) g.
+Proof. exact: semi_linear_subproof. Qed.
+Lemma linearP : linear_for (f \; s) g.
+Proof. by move=> a u v /=; rewrite linearD linearZ_LR. Qed.
+
+End GenericProperties.
 
 Section GenericProperties.
 
-Variables (U : lmodType R) (V : zmodType) (s : R -> V -> V).
-Variable f : {linear U -> V | s}.
+Variables (R S : pzRingType) (f : {rmorphism R -> S}).
+Variables (U : lmodType R) (V : zmodType) (s : S -> V -> V).
+Variables (g : {linear U -> V / f | s}).
 
-Lemma linear0 : f 0 = 0. Proof. exact: raddf0. Qed.
-Lemma linearN : {morph f : x / - x}. Proof. exact: raddfN. Qed.
-Lemma linearD : {morph f : x y / x + y}. Proof. exact: raddfD. Qed.
-Lemma linearB : {morph f : x y / x - y}. Proof. exact: raddfB. Qed.
-Lemma linearMn n : {morph f : x / x *+ n}. Proof. exact: raddfMn. Qed.
-Lemma linearMNn n : {morph f : x / x *- n}. Proof. exact: raddfMNn. Qed.
-Lemma linear_sum I r (P : pred I) E :
-  f (\sum_(i <- r | P i) E i) = \sum_(i <- r | P i) f (E i).
-Proof. exact: raddf_sum. Qed.
-
-Lemma linearZ_LR : scalable_for s f. Proof. exact: linear_subproof. Qed.
-Lemma linearP a : {morph f : u v / a *: u + v >-> s a u + v}.
-Proof. by move=> u v /=; rewrite linearD linearZ_LR. Qed.
+Lemma linearN : {morph g : x / - x}. Proof. exact: raddfN. Qed.
+Lemma linearB : {morph g : x y / x - y}. Proof. exact: raddfB. Qed.
+Lemma linearMNn n : {morph g : x / x *- n}. Proof. exact: raddfMNn. Qed.
 
 End GenericProperties.
 
 Section BidirectionalLinearZ.
-
-Variables (U : lmodType R) (V : zmodType) (s : R -> V -> V).
 
 (*   The general form of the linearZ lemma uses some bespoke interfaces to   *)
 (* allow right-to-left rewriting when a composite scaling operation such as  *)
@@ -2683,23 +2824,31 @@ Variables (U : lmodType R) (V : zmodType) (s : R -> V -> V).
 (*   Most of this machinery will be invisible to a casual user, because all  *)
 (* the projections and default instances involved are declared as coercions. *)
 
-Variables (S : pzRingType) (h : Scale.law S V).
-
-Lemma linearZ c a (h_c := h c) (f : Linear.map_for U s a h_c) u :
-  f (a *: u) = h_c (Linear.wrap f u).
-Proof. by rewrite linearZ_LR; case: f => f /= ->. Qed.
+Lemma linearZ
+  (R S : pzSemiRingType) (f : {rmorphism R -> S})
+  (U : lSemiModType R) (V : nmodType) (s : S -> V -> V)
+  (S' : pzSemiRingType) (h : Scale.preLaw S' V)
+  c a (h_c := h c) (g : Linear.map_for f U s a h_c) u :
+  g (a *: u) = h_c (Linear.wrap g u).
+Proof. by rewrite linearZ_LR; case: g => g /= ->. Qed.
 
 End BidirectionalLinearZ.
 
 Section LmodProperties.
 
-Variables (U V : lmodType R) (f : {linear U -> V}).
+Variables (R : pzSemiRingType) (U V : lSemiModType R) (f : {linear U -> V}).
 
 Lemma linearZZ : scalable f. Proof. exact: linearZ_LR. Qed.
-Lemma linearPZ : linear f. Proof. exact: linearP. Qed.
+Lemma linearPZ : semilinear f.
+Proof. by split; [exact: linearZZ | exact: linearD]. Qed.
 
 Lemma can2_scalable f' : cancel f f' -> cancel f' f -> scalable f'.
-Proof. by move=> fK f'K a x; apply: (canLR fK); rewrite linearZ_LR f'K. Qed.
+Proof. by move=> fK f'K a x; apply: (canLR fK); rewrite linearZZ f'K. Qed.
+
+Lemma can2_semilinear f' : cancel f f' -> cancel f' f -> semilinear f'.
+Proof.
+by move=> fK f'K; split=> ? ?; apply: (canLR fK); rewrite linearPZ !f'K.
+Qed.
 
 Lemma can2_linear f' : cancel f f' -> cancel f' f -> linear f'.
 Proof. by move=> fK f'K a x y /=; apply: (canLR fK); rewrite linearP !f'K. Qed.
@@ -2708,86 +2857,115 @@ End LmodProperties.
 
 Section ScalarProperties.
 
-Variable (U : lmodType R) (f : {scalar U}).
+Variable (R : pzSemiRingType) (U : lSemiModType R) (f : {scalar U}).
 
 Lemma scalarZ : scalable_for *%R f. Proof. exact: linearZ_LR. Qed.
-Lemma scalarP : scalar f. Proof. exact: linearP. Qed.
+Lemma scalarP : semiscalar f.
+Proof. by split; [exact: linearZ_LR | exact: linearD]. Qed.
 
 End ScalarProperties.
 
-Section LinearLmod.
+Section LinearLSemiMod.
 
-Variables (W U : lmodType R) (V : zmodType).
+Section Idfun.
 
-Section Plain.
-
-Variable (s : R -> V -> V).
-Variables (f : {linear U -> V | s}) (h : {linear W -> U}).
+Variables (R : pzSemiRingType) (U : lSemiModType R).
 
 Lemma idfun_is_scalable : scalable (@idfun U). Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isScalable.Build R U U *:%R idfun idfun_is_scalable.
+HB.instance Definition _ :=
+  isSemiScalable.Build R R idfun U U *:%R idfun idfun_is_scalable.
+
+End Idfun.
+
+Section Plain.
+
+Variables (R S : pzSemiRingType) (f : {rmorphism R -> S}).
+Variables (W : lSemiModType R) (U : lSemiModType S) (V : nmodType).
+Variables (s : S -> V -> V) (g : {linear U -> V | s}) (h : {linear W -> U / f}).
+
+Lemma comp_is_scalable : scalable_for (f \; s) (g \o h).
+Proof. by move=> a v /=; rewrite !linearZ_LR. Qed.
+
+#[export]
+HB.instance Definition _ :=
+  isSemiScalable.Build R S f W V s (g \o h) comp_is_scalable.
+
+End Plain.
+
+Section SemiScale.
+
+Variables (R S : pzSemiRingType) (f : {rmorphism R -> S}).
+Variables (U : lSemiModType R) (V : nmodType) (s : Scale.preLaw S V).
+Variables (g h : {linear U -> V / f | s}).
+
+Lemma null_fun_is_scalable : scalable_for (f \; s) (\0 : U -> V).
+Proof. by move=> a v /=; rewrite raddf0. Qed.
+#[export]
+HB.instance Definition _ :=
+  isSemiScalable.Build R S f U V s \0 null_fun_is_scalable.
+
+Lemma add_fun_is_scalable : scalable_for (f \; s) (g \+ h).
+Proof. by move=> a u; rewrite /= !linearZ_LR raddfD. Qed.
+#[export]
+HB.instance Definition _ :=
+  isSemiScalable.Build R S f U V s (g \+ h) add_fun_is_scalable.
+
+End SemiScale.
+
+End LinearLSemiMod.
+
+Section LinearLmod.
+
+Variables (R : pzRingType) (U : lmodType R).
 
 Lemma opp_is_scalable : scalable (-%R : U -> U).
 Proof. by move=> a v /=; rewrite scalerN. Qed.
 #[export]
-HB.instance Definition _ := isScalable.Build R U U *:%R -%R opp_is_scalable.
-
-Lemma comp_is_scalable : scalable_for s (f \o h).
-Proof. by move=> a v /=; rewrite !linearZ_LR. Qed.
-#[export]
-HB.instance Definition _ := isScalable.Build R W V s (f \o h) comp_is_scalable.
-
-End Plain.
-
-Section Scale.
-
-Variable (s : Scale.law R V).
-Variables (f : {linear U -> V | s}) (g : {linear U -> V | s}).
-
-Lemma null_fun_is_scalable : scalable_for s (\0 : U -> V).
-Proof. by move=> a v /=; rewrite raddf0. Qed.
-#[export]
-HB.instance Definition _ := isScalable.Build R U V s \0 null_fun_is_scalable.
-
-Lemma add_fun_is_scalable : scalable_for s (f \+ g).
-Proof. by move=> a u; rewrite /= !linearZ_LR raddfD. Qed.
-#[export]
-HB.instance Definition _ := isScalable.Build R U V s (f \+ g) add_fun_is_scalable.
-
-Lemma sub_fun_is_scalable : scalable_for s (f \- g).
-Proof. by move=> a u; rewrite /= !linearZ_LR raddfB. Qed.
-#[export]
-HB.instance Definition _ := isScalable.Build R U V s (f \- g) sub_fun_is_scalable.
-
-Lemma opp_fun_is_scalable : scalable_for s (\- g).
-Proof. by move=> a u; rewrite /= linearZ_LR raddfN. Qed.
-#[export]
-HB.instance Definition _ := isScalable.Build R U V s (\- g) opp_fun_is_scalable.
-
-End Scale.
+HB.instance Definition _ :=
+  isSemiScalable.Build R R idfun U U *:%R -%R opp_is_scalable.
 
 End LinearLmod.
 
-Section LinearLalg.
+Section Scale.
 
-Variables (A : lalgType R) (U : lmodType R).
+Variables (R S : pzRingType) (f : {rmorphism R -> S}).
+Variables (U : lmodType R) (V : zmodType) (s : Scale.preLaw S V).
+Variables (g h : {linear U -> V / f | s}).
+
+Lemma sub_fun_is_scalable : scalable_for (f \; s) (g \- h).
+Proof. by move=> a u; rewrite /= !linearZ_LR raddfB. Qed.
+#[export]
+HB.instance Definition _ :=
+  isSemiScalable.Build R S f U V s (g \- h) sub_fun_is_scalable.
+
+Lemma opp_fun_is_scalable : scalable_for (f \; s) (\- g).
+Proof. by move=> a u; rewrite /= linearZ_LR raddfN. Qed.
+#[export]
+HB.instance Definition _ :=
+  isSemiScalable.Build R S f U V s (\- g) opp_fun_is_scalable.
+
+End Scale.
+
+Section LinearLSemiAlg.
+
+Variables (R : pzSemiRingType) (A : lSemiAlgType R) (U : lSemiModType R).
 
 Variables (a : A) (f : {linear U -> A}).
 
 Fact mulr_fun_is_scalable : scalable (a \o* f).
 Proof. by move=> k x /=; rewrite linearZ scalerAl. Qed.
 #[export]
-HB.instance Definition _ := isScalable.Build R U A *:%R (a \o* f)
-  mulr_fun_is_scalable.
+HB.instance Definition _ :=
+  isSemiScalable.Build R R idfun U A *:%R (a \o* f) mulr_fun_is_scalable.
 
-End LinearLalg.
+End LinearLSemiAlg.
 
 End LinearTheory.
 
-HB.structure Definition LRMorphism (R : pzRingType) (A : lalgType R) (B : pzRingType)
-    (s : R -> B -> B) :=
-  {f of @RMorphism A B f & isScalable R A B s f}.
+HB.structure Definition LRMorphism (R : pzSemiRingType) (A : lSemiAlgType R)
+    (B : pzSemiRingType) (s : R -> B -> B) :=
+  {f of @RMorphism A B f & isSemiScalable R R idfun A B s f}.
 (* FIXME: remove the @ once
    https://github.com/math-comp/hierarchy-builder/issues/319 is fixed *)
 
@@ -2801,18 +2979,17 @@ HB.export LRMorphismExports.
 
 Section LRMorphismTheory.
 
-Variables (R : pzRingType) (A B : lalgType R) (C : pzRingType)
-  (s : R -> C -> C).
+Variables (R : pzSemiRingType) (A B : lSemiAlgType R) (C : pzSemiRingType).
+Variables (s : R -> C -> C).
 Variables (f : {lrmorphism A -> B}) (g : {lrmorphism B -> C | s}).
 
 #[export] HB.instance Definition _ := RMorphism.on (@idfun A).
 #[export] HB.instance Definition _ := RMorphism.on (g \o f).
 
 Lemma rmorph_alg a : f a%:A = a%:A.
-Proof. by rewrite linearZ rmorph1. Qed.
+Proof. by rewrite linearZ /= rmorph1. Qed.
 
 End LRMorphismTheory.
-(* /TODO: generalize to semirings and semi-modules? *)
 
 HB.mixin Record PzSemiRing_hasCommutativeMul R of PzSemiRing R := {
   mulrC : commutative (@mul R)
@@ -2995,6 +3172,24 @@ Lemma rmorph_comm (S : nzSemiRingType) (f : {rmorphism R -> S}) x y :
   comm (f x) (f y).
 Proof. by red; rewrite -!rmorphM mulrC. Qed.
 
+Section ScaleLinear.
+
+Variables (U V : lSemiModType R) (b : R) (f : {linear U -> V}).
+
+Lemma scale_is_scalable : scalable ( *:%R b : V -> V).
+Proof. by move=> a v /=; rewrite !scalerA mulrC. Qed.
+#[export]
+HB.instance Definition _ :=
+  isSemiScalable.Build R R idfun V V *:%R ( *:%R b) scale_is_scalable.
+
+Lemma scale_fun_is_scalable : scalable (b \*: f).
+Proof. by move=> a v /=; rewrite !linearZ. Qed.
+#[export]
+HB.instance Definition _ :=
+  isSemiScalable.Build R R idfun U V *:%R (b \*: f) scale_fun_is_scalable.
+
+End ScaleLinear.
+
 End ComNzSemiRingTheory.
 
 #[short(type="comPzRingType")]
@@ -3118,24 +3313,6 @@ Proof.
 rewrite sqrrD sqrrB -!(addrAC _ (y ^+ 2)) opprB.
 by rewrite addrC addrA subrK -mulrnDr.
 Qed.
-
-Section ScaleLinear.
-
-Variables (U V : lmodType R) (b : R) (f : {linear U -> V}).
-
-Lemma scale_is_scalable : scalable ( *:%R b : V -> V).
-Proof. by move=> a v /=; rewrite !scalerA mulrC. Qed.
-#[export]
-HB.instance Definition _ := isScalable.Build R V V *:%R ( *:%R b)
-  scale_is_scalable.
-
-Lemma scale_fun_is_scalable : scalable (b \*: f).
-Proof. by move=> a v /=; rewrite !linearZ. Qed.
-#[export]
-HB.instance Definition _ := isScalable.Build R U V *:%R (b \*: f)
-  scale_fun_is_scalable.
-
-End ScaleLinear.
 
 End ComPzRingTheory.
 
@@ -3273,13 +3450,13 @@ End SemiAlgebraTheory.
 
 Section AlgebraTheory.
 
-Variables (R : pzRingType) (A : algType R).
-Variables (U : lmodType R) (a : A) (f : {linear U -> A}).
+Variables (R : pzSemiRingType) (A : semiAlgType R).
+Variables (U : lSemiModType R) (a : A) (f : {linear U -> A}).
 
 Lemma mull_fun_is_scalable : scalable (a \*o f).
 Proof. by move=> k x /=; rewrite linearZ scalerAr. Qed.
 #[export]
-HB.instance Definition _ := isScalable.Build R U A *:%R (a \*o f)
+HB.instance Definition _ := isSemiScalable.Build R R idfun U A *:%R (a \*o f)
   mull_fun_is_scalable.
 
 End AlgebraTheory.
@@ -5998,7 +6175,7 @@ Notation SubRing_SubLmodule_isSubLalgebra R V S U :=
 HB.builders Context (R : pzRingType) (V : lalgType R) S W
   of SubNzRing_SubLmodule_isSubLalgebra R V S W.
 Lemma scalerAl (a : R) (u v : W) : a *: (u * v) = a *: u * v.
-Proof. by apply: val_inj; rewrite !(linearZ, rmorphM)/= linearZ scalerAl. Qed.
+Proof. by apply: val_inj; rewrite !(linearZ, rmorphM) /= rmorphM scalerAl. Qed.
 HB.instance Definition _ := Lmodule_isLalgebra.Build R W scalerAl.
 HB.end.
 
@@ -6012,7 +6189,7 @@ HB.factory Record SubLalgebra_isSubAlgebra (R : pzRingType)
 HB.builders Context (R : pzRingType) (V : algType R) S W
   of SubLalgebra_isSubAlgebra R V S W.
 Lemma scalerAr (k : R) (x y : W) : k *: (x * y) = x * (k *: y).
-Proof. by apply: val_inj; rewrite !(linearZ, rmorphM)/= linearZ scalerAr. Qed.
+Proof. by apply: val_inj; rewrite !(linearZ, rmorphM)/= rmorphM scalerAr. Qed.
 HB.instance Definition _ := Lalgebra_isAlgebra.Build R W scalerAr.
 HB.end.
 
@@ -6930,8 +7107,11 @@ Definition raddfZnat := raddfZnat.
 Definition raddfZsign := raddfZsign.
 Definition in_algE := in_algE.
 Definition scalable_for := scalable_for.
+Definition semilinear_for := semilinear_for.
 Definition linear_for := linear_for.
+Definition additive_semilinear := additive_semilinear.
 Definition additive_linear := additive_linear.
+Definition scalable_semilinear := scalable_semilinear.
 Definition scalable_linear := scalable_linear.
 Definition linear0 := linear0.
 Definition linearN := linearN.
@@ -6949,6 +7129,7 @@ Definition scalarP := scalarP.
 Definition scalarZ := scalarZ.
 Definition can2_scalable := can2_scalable.
 Definition can2_linear := can2_linear.
+Definition can2_semilinear := can2_semilinear.
 Definition rmorph_alg := rmorph_alg.
 Definition imaginary_exists := imaginary_exists.
 
@@ -7479,24 +7660,16 @@ Proof. by move=> a b; congr (_, _); apply: scalerDl. Qed.
 HB.instance Definition _ := Nmodule_isLSemiModule.Build R (V1 * V2)%type
   pair_scaleA pair_scale0 pair_scale1 pair_scaleDr pair_scaleDl.
 
-End PairLSemiMod.
-
-Section PairLmod.
-
-Variables (R : pzRingType) (V1 V2 : lmodType R).
-
-HB.instance Definition _ := LSemiModule.on (V1 * V2)%type.
-
 Fact fst_is_scalable : scalable fst. Proof. by []. Qed.
 #[export]
 HB.instance Definition _ :=
-  isScalable.Build R (V1 * V2)%type V1 *:%R fst fst_is_scalable.
+  isSemiScalable.Build R R idfun  (V1 * V2)%type V1 *:%R fst fst_is_scalable.
 Fact snd_is_scalable : scalable snd. Proof. by []. Qed.
 #[export]
 HB.instance Definition _ :=
-  isScalable.Build R (V1 * V2)%type V2 *:%R snd snd_is_scalable.
+  isSemiScalable.Build R R idfun (V1 * V2)%type V2 *:%R snd snd_is_scalable.
 
-End PairLmod.
+End PairLSemiMod.
 
 Section PairLSemiAlg.
 
@@ -7509,21 +7682,14 @@ Proof. by congr (_, _); apply: scalerAl. Qed.
 HB.instance Definition _ := LSemiModule_isLSemiAlgebra.Build R (A1 * A2)%type
   pair_scaleAl.
 
-End PairLSemiAlg.
-
-Section PairLalg.
-
-Variables (R : ringType) (A1 A2 : lalgType R).
-
-#[export]
-HB.instance Definition _ := LSemiModule.on (A1 * A2)%type.
-
+(* TODO: HB.saturate *)
 #[export]
 HB.instance Definition _ := RMorphism.on (@fst A1 A2).
 #[export]
 HB.instance Definition _ := RMorphism.on (@snd A1 A2).
+(* /TODO *)
 
-End PairLalg.
+End PairLSemiAlg.
 
 Section PairSemiAlg.
 
@@ -7581,6 +7747,12 @@ HB.instance Definition _ (R1 R2 : comUnitRingType) :=
 #[export]
 HB.instance Definition _ (R : pzSemiRingType) (A1 A2 : comSemiAlgType R) :=
   SemiAlgebra.on (A1 * A2)%type.
+#[export]
+HB.instance Definition _ (R : pzRingType) (V1 V2 : lmodType R) :=
+  LSemiModule.on (V1 * V2)%type.
+#[export]
+HB.instance Definition _ (R : pzRingType) (A1 A2 : lalgType R) :=
+  LSemiAlgebra.on (A1 * A2)%type.
 #[export]
 HB.instance Definition _ (R : pzRingType) (A1 A2 : algType R) :=
   SemiAlgebra.on (A1 * A2)%type.

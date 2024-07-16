@@ -540,7 +540,7 @@ have{irr_q} [Lz [inLz [z qz0]]]: {Lz : fieldExtType F &
   pose inLzLlM := GRing.isLinear.Build _ _ _ _ _ inLzL_linear.
   pose inLzLL : {linear _ -> _} := HB.pack (locked inLz : _ -> _) inLzLlM.
   have ihLzZ: ahom_in {:L} (linfun inLzLL).
-    by apply/ahom_inP; split=> [u v|]; rewrite !lfunE (rmorphM, rmorph1).
+    by apply/ahom_inP; split=> [u v|]; rewrite !lfunE /= (rmorphM, rmorph1).
   exists Lz, (AHom ihLzZ), z; congr (root _ z): qz0.
   by apply: eq_map_poly => y; rewrite lfunE /= -lock.
 pose imL := [aspace of limg inLz]; pose pz := map_poly inLz p.
