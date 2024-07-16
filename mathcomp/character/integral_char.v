@@ -633,7 +633,7 @@ have /fin_all_exists2[ItoQ inItoQ defItoQ] (k : I):
   have [nuQ DnuQ] := restrict_aut_to_normal_num_field QnC nuC.
   have hom_nu: kHom 1 {:Qn} (linfun nuQ).
     rewrite k1HomE; apply/ahom_inP.
-    by split=> [u v | ]; rewrite !lfunE ?rmorphM ?rmorph1.
+    by split=> [u v | ]; rewrite !lfunE /= ?rmorphM ?rmorph1.
   have [|nu cGnu Dnu] := kHom_to_gal _ (normalFieldf 1) hom_nu.
     by rewrite !subvf.
   exists nu => //; apply: (fmorph_inj QnC).
