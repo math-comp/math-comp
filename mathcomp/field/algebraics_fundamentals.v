@@ -707,7 +707,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     pose u : Qz := inQ z z.
     have /QtoQ[Qzt QztE] := t_z; exists (minPoly 1 u ^ Qzt).
       have /polyOver1P[q ->] := minPolyOver 1 u; apply/polyOver_poly=> j _.
-      by rewrite coef_map linearZZ rmorph1 rpredZ ?rpred1.
+      by rewrite coef_map linearZZ /= rmorph1 rpredZ ?rpred1.
     have [s /eqP Ds] := splitting_field_normal 1 u.
     rewrite Ds; exists (map Qzt s); first by rewrite map_rp eqpxx.
     apply/eqP; rewrite eqEsubv; apply/andP; split.
