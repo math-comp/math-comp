@@ -7,6 +7,7 @@ Require Export polydiv.
 Require Export polyXY.
 Require Export qpoly.
 Require Export ssrint.
+Require Export archimedean.
 Require Export rat.
 Require Export intdiv.
 Require Export interval.
