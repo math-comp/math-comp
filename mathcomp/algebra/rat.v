@@ -957,7 +957,7 @@ split => * //; rat_to_ring;
 by rewrite ?(add0r, addrA, mul1r, mulrA, mulrDl, subrr) // (addrC, mulrC).
 Qed.
 
-Require setoid_ring.Field_theory setoid_ring.Field_tac.
+From Coq.setoid_ring Require Field_theory Field_tac.
 
 Lemma rat_field_theory :
   Field_theory.field_theory 0%Q 1%Q addq mulq subq oppq divq invq eq.
