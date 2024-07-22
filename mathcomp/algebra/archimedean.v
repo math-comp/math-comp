@@ -400,11 +400,14 @@ Lemma floor0 : floor 0 = 0. Proof. exact: intrKfloor 0. Qed.
 Lemma floor1 : floor 1 = 1. Proof. exact: intrKfloor 1. Qed.
 #[local] Hint Resolve floor0 floor1 : core.
 
-Lemma floorD : {in int_num & Rreal, {morph floor : x y / x + y}}.
+Lemma real_floorDzr : {in int_num & Rreal, {morph floor : x y / x + y}}.
 Proof.
 move=> _ y /intrP[m ->] Ry; apply: floor_def.
 by rewrite -addrA 2!rmorphD /= intrKfloor lerD2l ltrD2l real_floor_itv.
 Qed.
+
+Lemma real_floorDrz : {in Rreal & int_num, {morph floor : x y / x + y}}.
+Proof. by move=> x y xr yz; rewrite addrC real_floorDzr // addrC. Qed.
 
 Lemma floorN : {in int_num, {morph floor : x / - x}}.
 Proof. by move=> _ /intrP[m ->]; rewrite -rmorphN !intrKfloor. Qed.
@@ -458,11 +461,14 @@ Lemma ceil0 : ceil 0 = 0. Proof. exact: intrKceil 0. Qed.
 Lemma ceil1 : ceil 1 = 1. Proof. exact: intrKceil 1. Qed.
 #[local] Hint Resolve ceil0 ceil1 : core.
 
-Lemma real_ceilD : {in int_num & Rreal, {morph ceil : x y / x + y}}.
+Lemma real_ceilDzr : {in int_num & Rreal, {morph ceil : x y / x + y}}.
 Proof.
 move=> _ y /intrP[m ->] Ry; apply: ceil_def.
 by rewrite -addrA 3!rmorphD /= intrKceil lerD2l ltrD2l -rmorphD real_ceil_itv.
 Qed.
+
+Lemma real_ceilDrz : {in Rreal & int_num, {morph ceil : x y / x + y}}.
+Proof. by move=> x y xr yz; rewrite addrC real_ceilDzr // addrC. Qed.
 
 Lemma ceilN : {in int_num, {morph ceil : x / - x}}.
 Proof. by move=> _ /intrP[m ->]; rewrite -rmorphN !intrKceil. Qed.
@@ -638,6 +644,12 @@ Proof. exact: real_lt_succ_floor. Qed.
 Lemma floor_ge_int x n : n%:~R <= x = (n <= floor x).
 Proof. exact: real_floor_ge_int. Qed.
 
+Lemma floorDzr : {in @int_num R, {morph floor : x y / x + y}}.
+Proof. by move=> x xz y; apply/real_floorDzr/num_real. Qed.
+
+Lemma floorDrz x y : y \is a int_num -> floor (x + y) = floor x + floor y.
+Proof. by move=> yz; apply/real_floorDrz/yz/num_real. Qed.
+
 Lemma ceil_itv x : (ceil x - 1)%:~R < x <= (ceil x)%:~R.
 Proof. exact: real_ceil_itv. Qed.
 
@@ -649,11 +661,14 @@ Lemma le_ceil x : x <= (ceil x)%:~R. Proof. exact: real_le_ceil. Qed.
 Lemma ceil_le_int x n : x <= n%:~R = (ceil x <= n).
 Proof. exact: real_ceil_le_int. Qed.
 
-Lemma ceilD : {in @int_num R, {morph ceil : x y / x + y}}.
-Proof. by move=> x xi y; rewrite real_ceilD// num_real. Qed.
+Lemma ceilDzr : {in @int_num R, {morph ceil : x y / x + y}}.
+Proof. by move=> x xz y; apply/real_ceilDzr/num_real. Qed.
+
+Lemma ceilDrz x y : y \is a int_num -> ceil (x + y) = ceil x + ceil y.
+Proof. by move=> yz; apply/real_ceilDrz/yz/num_real. Qed.
 
 Lemma ceil_floor x : ceil x = floor x + (~~ (x \is a int_num)).
-Proof. by rewrite real_ceil_floor. Qed.
+Proof. exact: real_ceil_floor. Qed.
 
 End ArchiRealDomainTheory.
 
@@ -764,6 +779,13 @@ Notation copy T C := (ArchiRealField.copy T C).
 #[deprecated(since="mathcomp 2.3.0", note="Use Num.ArchiRealField.on instead.")]
 Notation on T := (ArchiRealField.on T).
 End ArchiField.
+
+#[deprecated(since="mathcomp 2.3.0", note="Use real_floorDzr instead.")]
+Notation floorD := real_floorDzr.
+#[deprecated(since="mathcomp 2.3.0", note="Use real_ceilDzr instead.")]
+Notation ceilD := real_ceilDzr.
+#[deprecated(since="mathcomp 2.3.0", note="Use real_ceilDzr instead.")]
+Notation real_ceilD := real_ceilDzr.
 
 End Num.
 
