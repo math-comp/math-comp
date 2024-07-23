@@ -673,7 +673,7 @@ Proof. by case: b. Qed.
 Lemma intrN n : (- n)%:~R = - n%:~R :> R. Proof. exact: mulrNz. Qed.
 
 Lemma intrD m n : (m + n)%:~R = m%:~R + n%:~R :> R.
-Proof. exact: mulrzDr_tmp. Qed.
+Proof. exact: mulrzDr. Qed.
 
 Lemma intrB m n : (m - n)%:~R = m%:~R - n%:~R :> R.
 Proof. by rewrite intrD intrN. Qed.
@@ -709,8 +709,8 @@ Implicit Types u v w : V.
 Lemma scaler_int n v : n%:~R *: v = v *~ n.
 Proof.
 elim: n=> [|n ihn|n ihn]; first by rewrite scale0r.
-  by rewrite intS !mulrzDr_tmp scalerDl ihn scale1r.
-by rewrite intS opprD !mulrzDr_tmp scalerDl ihn scaleN1r.
+  by rewrite intS !mulrzDr scalerDl ihn scale1r.
+by rewrite intS opprD !mulrzDr scalerDl ihn scaleN1r.
 Qed.
 
 Lemma scalerMzl a v n : (a *: v) *~ n = (a *~ n) *: v.
