@@ -535,8 +535,8 @@ Infix "/" := divq : rat_scope.
 Lemma ratzE n : ratz n = n%:Q.
 Proof.
 elim: n=> [|n ihn|n ihn]; first by rewrite mulr0z ratz_frac.
-  by rewrite intS mulrzDr_tmp ratzD ihn.
-by rewrite intS opprD mulrzDr_tmp ratzD ihn.
+  by rewrite intS mulrzDr ratzD ihn.
+by rewrite intS opprD mulrzDr ratzD ihn.
 Qed.
 
 Lemma numq_int n : numq n%:Q = n. Proof. by rewrite -ratzE. Qed.
