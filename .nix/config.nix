@@ -84,6 +84,8 @@ with builtins; with (import <nixpkgs> {}).lib;
     "coq-master".ocamlPackages = { elpi.override.version = "1.19.2"; };
     "coq-8.20".coqPackages = common-bundles // {
       coq.override.version = "8.20";
+      # check that we compile without warnings on last release of Coq
+      mathcomp-warnings.job = true;
       interval.job = false;
     };
     "coq-8.19".coqPackages = common-bundles // {
