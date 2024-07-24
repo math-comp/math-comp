@@ -2208,25 +2208,33 @@ End RmorphismTheory.
 
 Module Scale.
 
+HB.mixin Record isPreLaw
+    (R : semiRingType) (V : nmodType) (op : R -> V -> V) := {
+  op_semi_additive : forall a, semi_additive (op a);
+}.
+
+#[export]
+HB.structure Definition PreLaw R V := {op of isPreLaw R V op}.
+Definition preLaw := PreLaw.type.
+
 HB.mixin Record isSemiLaw
     (R : semiRingType) (V : nmodType) (op : R -> V -> V) := {
   op0v : forall v, op 0 v = 0;
   op1v : op 1 =1 id;
   opA : forall a b v, op a (op b v) = op (a * b) v;
-  op_semi_additive : forall a, semi_additive (op a);
 }.
 
 #[export]
-HB.structure Definition SemiLaw R V := {op of isSemiLaw R V op}.
+HB.structure Definition SemiLaw R V :=
+  {op of isPreLaw R V op & isSemiLaw R V op}.
 Definition semiLaw := SemiLaw.type.
 
-HB.mixin Record isLaw (R : ringType) (V : zmodType) (op : R -> V -> V) := {
-  N1op : op (-1) =1 -%R;
-  op_additive : forall a, semi_additive (op a);
-}.
+HB.mixin Record isLaw (R : ringType) (V : zmodType) (op : R -> V -> V) :=
+  { N1op : op (-1) =1 -%R }.
 
 #[export]
-HB.structure Definition Law R V := {op of isLaw R V op}.
+HB.structure Definition Law (R : ringType) (V : zmodType) :=
+  {op of isPreLaw R V op & isLaw R V op}.
 Definition law := Law.type.
 
 Section CompSemiLaw.
@@ -2256,45 +2264,52 @@ End Scale.
 Export Scale.Exports.
 
 #[export]
-HB.instance Definition _ (R : semiRingType) := Scale.isSemiLaw.Build R R *%R
-  mul0r mul1r mulrA (fun => mull_fun_is_semi_additive _ idfun).
+HB.instance Definition _ (R : semiRingType) :=
+  Scale.isPreLaw.Build R R *%R (fun => mull_fun_is_semi_additive _ idfun).
 
 #[export]
-HB.instance Definition _ (R : ringType) := Scale.isLaw.Build R R *%R
-  (@mulN1r R) (fun => mull_fun_is_semi_additive _ idfun).
+HB.instance Definition _ (R : semiRingType) :=
+  Scale.isSemiLaw.Build R R *%R mul0r mul1r mulrA.
+
+#[export]
+HB.instance Definition _ (R : ringType) :=
+  Scale.isLaw.Build R R *%R (@mulN1r R).
 
 #[export]
 HB.instance Definition _ (R : semiRingType) (V : lSemiModType R) :=
-  Scale.isSemiLaw.Build R V *:%R
-    scale0r scale1r (@scalerA _ _) (fun => (scaler0 _ _, scalerDr _)).
+  Scale.isPreLaw.Build R V *:%R (fun => (scaler0 _ _, scalerDr _)).
+
+#[export]
+HB.instance Definition _ (R : semiRingType) (V : lSemiModType R) :=
+  Scale.isSemiLaw.Build R V *:%R scale0r scale1r (@scalerA _ _).
 
 #[export]
 HB.instance Definition _ (R : ringType) (U : lmodType R) :=
-  Scale.isLaw.Build R U *:%R (@scaleN1r R U) (fun => (scaler0 _ _, scalerDr _)).
+  Scale.isLaw.Build R U *:%R (@scaleN1r R U).
+
+#[export]
+HB.instance Definition _
+    (R : semiRingType) (V : nmodType) (s : Scale.preLaw R V)
+    (aR : semiRingType) (nu : {rmorphism aR -> R}) :=
+  Scale.isPreLaw.Build aR V (nu \; s) (fun => Scale.op_semi_additive _).
 
 #[export]
 HB.instance Definition _
     (R : semiRingType) (V : nmodType) (s : Scale.semiLaw R V)
     (aR : semiRingType) (nu : {rmorphism aR -> R}) :=
   Scale.isSemiLaw.Build aR V (nu \; s)
-    (Scale.comp_op0v s nu) (Scale.comp_op1v s nu)
-    (Scale.comp_opA s nu) (fun => Scale.op_semi_additive _).
+    (Scale.comp_op0v s nu) (Scale.comp_op1v s nu) (Scale.comp_opA s nu).
 
 #[export]
 HB.instance Definition _
     (R : ringType) (V : zmodType) (s : Scale.law R V)
     (aR : ringType) (nu : {rmorphism aR -> R}) :=
-  Scale.isLaw.Build aR V (nu \; s)
-    (Scale.compN1op s nu) (fun => Scale.op_additive _).
+  Scale.isLaw.Build aR V (nu \; s) (Scale.compN1op s nu).
 
 #[export, non_forgetful_inheritance]
 HB.instance Definition _
-  (R : semiRingType) (V : nmodType) (s : Scale.semiLaw R V) a :=
+  (R : semiRingType) (V : nmodType) (s : Scale.preLaw R V) a :=
   isSemiAdditive.Build V V (s a) (Scale.op_semi_additive a).
-
-#[export, non_forgetful_inheritance]
-HB.instance Definition _ (R : ringType) (V : zmodType) (s : Scale.law R V) a :=
-  isSemiAdditive.Build V V (s a) (Scale.op_additive a).
 
 Definition semi_scalable_for
     (R S : semiRingType) (f : {rmorphism R -> S})
@@ -2350,7 +2365,7 @@ HB.instance Definition _ :=
 HB.end.
 
 Lemma semiscalable_semilinear (R S : semiRingType) (f : {rmorphism R -> S})
-  (U : lSemiModType R) (V : nmodType) (s : Scale.semiLaw S V) (g : U -> V) :
+  (U : lSemiModType R) (V : nmodType) (s : Scale.preLaw S V) (g : U -> V) :
   semilinear_for f s g -> semi_scalable_for f s g.
 Proof. by case. Qed.
 
@@ -2473,9 +2488,6 @@ End GenericProperties.
 
 Section BidirectionalLinearZ.
 
-Variables (R S : semiRingType) (f : {rmorphism R -> S}).
-Variables (U : lSemiModType R) (V : nmodType) (s : S -> V -> V).
-
 (*   The general form of the linearZ lemma uses some bespoke interfaces to   *)
 (* allow right-to-left rewriting when a composite scaling operation such as  *)
 (* conjC \; *%R has been expanded, say in a^* * f u. This redex is matched   *)
@@ -2502,9 +2514,11 @@ Variables (U : lSemiModType R) (V : nmodType) (s : S -> V -> V).
 (*   Most of this machinery will be invisible to a casual user, because all  *)
 (* the projections and default instances involved are declared as coercions. *)
 
-Variables (S' : semiRingType) (h : Scale.semiLaw S' V).
-
-Lemma linearZ c a (h_c := h c) (g : Linear.map_for f U s a h_c) u :
+Lemma linearZ
+  (R S : semiRingType) (f : {rmorphism R -> S})
+  (U : lSemiModType R) (V : nmodType) (s : S -> V -> V)
+  (S' : semiRingType) (h : Scale.preLaw S' V)
+  c a (h_c := h c) (g : Linear.map_for f U s a h_c) u :
   g (a *: u) = h_c (Linear.wrap g u).
 Proof. by rewrite linearZ_LR; case: g => g /= ->. Qed.
 
@@ -2574,7 +2588,7 @@ End Plain.
 Section SemiScale.
 
 Variables (R S : semiRingType) (f : {rmorphism R -> S}).
-Variables (U : lSemiModType R) (V : nmodType) (s : Scale.semiLaw S V).
+Variables (U : lSemiModType R) (V : nmodType) (s : Scale.preLaw S V).
 Variables (g h : @Semilinear.type R S f U V s).
 
 Lemma null_fun_is_scalable : semi_scalable_for f s (\0 : U -> V).
@@ -2608,7 +2622,7 @@ End LinearLmod.
 Section Scale.
 
 Variables (R S : ringType) (f : {rmorphism R -> S}).
-Variables (U : lmodType R) (V : zmodType) (s : Scale.law S V).
+Variables (U : lmodType R) (V : zmodType) (s : Scale.preLaw S V).
 Variables (g h : @Semilinear.type R S f U V s).
 
 Lemma sub_fun_is_scalable : semi_scalable_for f s (g \- h).
