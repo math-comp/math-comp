@@ -175,7 +175,7 @@ have /dvdzP[b Da]: (denq y %| a)%Z.
     by rewrite coprimez_sym coprimezXl //; apply: coprime_num_den.
   pose p1 : {poly int} := a *: 'X^d - p.
   have Dp1: p1 ^ intr = a%:~R *: ('X^d - q).
-    by rewrite rmorphB linearZ /= map_polyXn scalerBr Dq scalerKV ?intr_eq0.
+    by rewrite rmorphB /= linearZ /= map_polyXn scalerBr Dq scalerKV ?intr_eq0.
   apply/dvdzP; exists (\sum_(i < d) p1`_i * numq y ^+ i * denq y ^+ (d - i.+1)).
   apply: ZtoQinj; rewrite /ZtoQ rmorphM mulr_suml rmorph_sum /=.
   transitivity ((p1 ^ intr).[y] * (denq y ^+ d)%:~R).
@@ -707,7 +707,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     pose u : Qz := inQ z z.
     have /QtoQ[Qzt QztE] := t_z; exists (minPoly 1 u ^ Qzt).
       have /polyOver1P[q ->] := minPolyOver 1 u; apply/polyOver_poly=> j _.
-      by rewrite coef_map linearZZ /= rmorph1 rpredZ ?rpred1.
+      by rewrite coef_map linearZZ rmorph1 rpredZ ?rpred1.
     have [s /eqP Ds] := splitting_field_normal 1 u.
     rewrite Ds; exists (map Qzt s); first by rewrite map_rp eqpxx.
     apply/eqP; rewrite eqEsubv; apply/andP; split.
