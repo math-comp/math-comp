@@ -163,7 +163,7 @@ Lemma intP x : int_spec x x. Proof. by move: x=> [] []; constructor. Qed.
 Lemma addzC : commutative addz.
 Proof. by move=> [] m [] n //=; rewrite addnC. Qed.
 
-Lemma add0z : left_id 0 addz. Proof. by move=> [] [|]. Qed.
+Lemma add0z : left_id 0 addz. Proof. by do 2?case. Qed.
 
 Lemma oppzK : involutive oppz. Proof. by do 2?case. Qed.
 
@@ -182,7 +182,7 @@ Proof.
 by apply: (inv_inj oppzK); rewrite addzC !oppzD oppzK [_ - n]addzC add1Pz.
 Qed.
 
-Lemma addSnz (m : nat) (n : int) : (m.+1%N) + n = 1 + (m + n).
+Lemma addSnz (m : nat) (n : int) : m.+1%N + n = 1 + (m + n).
 Proof.
 move: m n=> [|m] [] [|n] //=; rewrite ?add1n ?subn1 // !(ltnS, subSS).
 case: ltngtP=> hnm /=; rewrite ?hnm ?subnn //.
@@ -213,7 +213,7 @@ Qed.
 Lemma addNz : left_inverse (0:int) oppz addz. Proof. by do 3?elim. Qed.
 
 Lemma predn_int (n : nat) : 0 < n -> n.-1%:Z = n - 1.
-Proof. by case: n=> // n _ /=; rewrite subn1. Qed.
+Proof. by case: n => //= n _; rewrite subn1. Qed.
 
 Definition Mixin := GRing.isZmodule.Build int addzA addzC add0z addNz.
 
@@ -375,10 +375,7 @@ Lemma invz_out : {in [predC unitz], invz =1 id}.
 Proof. exact. Qed.
 
 Lemma idomain_axiomz m n : m * n = 0 -> (m == 0) || (n == 0).
-Proof.
-by case: m n => m [] n //= /eqP;
-  rewrite ?(NegzE, mulrN, mulNr) ?oppr_eq0 -PoszM [_ == _]muln_eq0.
-Qed.
+Proof. by case: m n => [[|m]|m] [[|n]|n]. Qed.
 
 Definition comMixin := GRing.ComRing_hasMulInverse.Build int
   mulVz unitzPl invz_out.
@@ -528,7 +525,7 @@ Lemma pmulrn (R : zmodType) (x : R) (n : nat) : x *+ n = x *~ n%:Z.
 Proof. by []. Qed.
 
 Lemma nmulrn (R : zmodType) (x : R) (n : nat) : x *- n = x *~ - n%:Z.
-Proof. by case: n=> [] //; rewrite ?oppr0. Qed.
+Proof. by case: n; rewrite // oppr0. Qed.
 
 Section ZintLmod.
 
@@ -556,29 +553,19 @@ Proof. by rewrite !mulrzA_C mulrC. Qed.
 Fact mulr1z (x : M) : x *~ 1 = x. Proof. by []. Qed.
 
 Fact mulrzDl m : {morph ( *~%R^~ m : M -> M) : x y / x + y}.
-Proof.
-by elim: m=> [|m _|m _] x y;
-  rewrite ?addr0 /intmul //= ?mulrnDl // opprD.
-Qed.
+Proof. by case: m => m x y; rewrite /intmul mulrnDl // opprD. Qed.
 
 Lemma mulrzBl_nat (m n : nat) x : x *~ (m%:Z - n%:Z) = x *~ m - x *~ n.
 Proof.
-case: (leqP m n)=> hmn; rewrite /intmul //=.
-  rewrite addrC -{1}[m:int]opprK -opprD subzn //.
-  rewrite -{2}[n](@subnKC m)// mulrnDr opprD addrA subrr sub0r.
-  by case hdmn: (_ - _)%N=> [|dmn] /=; first by rewrite mulr0n oppr0.
-have hnm := ltnW hmn.
-rewrite -{2}[m](@subnKC n)// mulrnDr addrAC subrr add0r.
-by rewrite subzn.
+wlog/subnK <-: m n / (n <= m)%N; last by rewrite -!pmulrn PoszD mulrnDr !addrK.
+have [hmn|/ltnW hmn] := leqP n m; first exact.
+by rewrite -[in LHS]opprB -[RHS]opprB subzn // -nmulrn pmulrn -subzn // => ->.
 Qed.
 
 Fact mulrzDr x : {morph *~%R x : m n / m + n}.
 Proof.
-elim=> [|m _|m _]; elim=> [|n _|n _]; rewrite /intmul //=;
-rewrite -?(opprD) ?(add0r, addr0, mulrnDr, subn0) //.
-* by rewrite -/(intmul _ _) mulrzBl_nat.
-* by rewrite -/(intmul _ _) addrC mulrzBl_nat addrC.
-* by rewrite -addnS -addSn mulrnDr.
+by case=> []m []n; rewrite ?NegzE /intmul /= -/(intmul _ _) -?opprD;
+  rewrite -?[- _ + _]addrC ?mulrzBl_nat // -mulrnDr // addnS.
 Qed.
 
 HB.instance Definition _ := GRing.Zmodule.on M^z.  (* FIXME, the error message below "nomsg" when we forget this line is not very helpful *)
@@ -649,22 +636,16 @@ Implicit Types m n : int.
 Implicit Types x y z : R.
 
 Lemma mulrzAl n x y : (x *~ n) * y = (x * y) *~ n.
-Proof.
-by elim: n=> //= *; rewrite ?mul0r ?mulr0z // /intmul /= -mulrnAl -?mulNr.
-Qed.
+Proof. by case: n => n; rewrite ?mulNr mulrnAl. Qed.
 
 Lemma mulrzAr n x y : x * (y *~ n) = (x * y) *~ n.
-Proof.
-by elim: n=> //= *; rewrite ?mulr0 ?mulr0z // /intmul /= -mulrnAr -?mulrN.
-Qed.
+Proof. by case: n => n; rewrite ?mulrN mulrnAr. Qed.
 
-Lemma mulrzl x n : n%:~R * x = x *~ n.
-Proof. by rewrite mulrzAl mul1r. Qed.
+Lemma mulrzl x n : n%:~R * x = x *~ n. Proof. by rewrite mulrzAl mul1r. Qed.
 
-Lemma mulrzr x n : x * n%:~R = x *~ n.
-Proof. by rewrite mulrzAr mulr1. Qed.
+Lemma mulrzr x n : x * n%:~R = x *~ n. Proof. by rewrite mulrzAr mulr1. Qed.
 
-Lemma mulNrNz n x : (-x) *~ (-n) = x *~ n.
+Lemma mulNrNz n x : (- x) *~ (- n) = x *~ n.
 Proof. by rewrite mulNrz mulrNz opprK. Qed.
 
 Lemma mulrbz x (b : bool) : x *~ b = (if b then x else 0).
@@ -672,11 +653,9 @@ Proof. by case: b. Qed.
 
 Lemma intrN n : (- n)%:~R = - n%:~R :> R. Proof. exact: mulrNz. Qed.
 
-Lemma intrD m n : (m + n)%:~R = m%:~R + n%:~R :> R.
-Proof. exact: mulrzDr. Qed.
+Lemma intrD m n : (m + n)%:~R = m%:~R + n%:~R :> R. Proof. exact: mulrzDr. Qed.
 
-Lemma intrB m n : (m - n)%:~R = m%:~R - n%:~R :> R.
-Proof. by rewrite intrD intrN. Qed.
+Lemma intrB m n : (m - n)%:~R = m%:~R - n%:~R :> R. Proof. exact: mulrzBr. Qed.
 
 Lemma intrM m n : (m * n)%:~R = m%:~R * n%:~R :> R.
 Proof. by rewrite mulrzA -mulrzr. Qed.
@@ -707,11 +686,7 @@ Implicit Types x y z : R.
 Implicit Types u v w : V.
 
 Lemma scaler_int n v : n%:~R *: v = v *~ n.
-Proof.
-elim: n=> [|n ihn|n ihn]; first by rewrite scale0r.
-  by rewrite intS !mulrzDr scalerDl ihn scale1r.
-by rewrite intS opprD !mulrzDr scalerDl ihn scaleN1r.
-Qed.
+Proof. by case: n => n; rewrite /intmul ?scaleNr scaler_nat. Qed.
 
 Lemma scalerMzl a v n : (a *: v) *~ n = (a *~ n) *: v.
 Proof. by rewrite -mulrzl -scaler_int scalerA. Qed.
@@ -730,10 +705,7 @@ Section Additive.
 Variables (U V : zmodType) (f : {additive U -> V}).
 
 Lemma raddfMz n : {morph f : x / x *~ n}.
-Proof.
-case: n=> n x /=; first exact: raddfMn.
-by rewrite NegzE !mulrNz; apply: raddfMNn.
-Qed.
+Proof. by case: n=> n x; rewrite 1?raddfN raddfMn. Qed.
 
 End Additive.
 
@@ -779,11 +751,11 @@ Variable R : ringType.
 
 Lemma sumMz : forall I r (P : pred I) F,
  (\sum_(i <- r | P i) F i)%N%:~R = \sum_(i <- r | P i) ((F i)%:~R) :> R.
-Proof. by apply: big_morph=> // x y; rewrite !pmulrn -rmorphD. Qed.
+Proof. exact: rmorph_sum. Qed.
 
 Lemma prodMz : forall I r (P : pred I) F,
  (\prod_(i <- r | P i) F i)%N%:~R = \prod_(i <- r | P i) ((F i)%:~R) :> R.
-Proof. by apply: big_morph=> // x y; rewrite pmulrn PoszM -[RHS]rmorphM. Qed.
+Proof. exact: rmorph_prod. Qed.
 
 End ZintBigMorphism.
 
@@ -818,12 +790,7 @@ Implicit Types n m : int.
 Implicit Types x y : R.
 
 Lemma rmorphzP (f : {rmorphism int -> R}) : f =1 ( *~%R 1).
-Proof.
-move=> n; wlog : n / 0 <= n; case: n=> [] n //; do ?exact.
-  by rewrite NegzE !rmorphN=>->.
-move=> _; elim: n=> [|n ihn]; first by rewrite rmorph0.
-by rewrite intS !rmorphD /= !rmorph1 ihn.
-Qed.
+Proof. by move=> n; rewrite -[n in LHS]intz rmorph_int. Qed.
 
 (* intmul and ler/ltr *)
 Lemma ler_pMz2r n (hn : 0 < n) : {mono *~%R^~ n :x y / x <= y :> R}.
