@@ -343,7 +343,7 @@ Lemma horner_rVpoly m (u : 'rV_m) :
   horner_mx (rVpoly u) = vec_mx (u *m powers_mx m).
 Proof.
 rewrite mulmx_sum_row [rVpoly u]poly_def 2!linear_sum; apply: eq_bigr => i _.
-by rewrite valK /= 2!linearZ/= rmorphXn/= horner_mx_X rowK mxvecK.
+by rewrite valK /= 2!linearZ rmorphXn/= horner_mx_X rowK mxvecK.
 Qed.
 
 End OneMatrix.
@@ -1249,7 +1249,7 @@ Lemma integral_algebraic u : algebraicOver FtoE u <-> integralOver FtoE u.
 Proof.
 split=> [] [p p_nz pu0]; last by exists p; rewrite ?monic_neq0.
 exists (mk_mon p); first by rewrite monicE lead_coefZ mulVf ?lead_coef_eq0.
-by rewrite linearZ/= rootE hornerZ (rootP pu0) mulr0.
+by rewrite linearZ rootE hornerZ (rootP pu0) mulr0.
 Qed.
 
 Lemma algebraic_id a : algebraicOver FtoE (FtoE a).

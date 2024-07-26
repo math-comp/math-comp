@@ -739,13 +739,13 @@ Definition group_ring := enveloping_algebra_mx aG.
 Local Notation R_G := group_ring.
 
 Definition gring_row : 'M[R]_nG -> 'rV_nG := row (gring_index 1).
-HB.instance Definition _ := GRing.Semilinear.on gring_row.
+HB.instance Definition _ := GRing.Linear.on gring_row.
 
 Lemma gring_row_mul A B : gring_row (A *m B) = gring_row A *m B.
 Proof. exact: row_mul. Qed.
 
 Definition gring_proj x := row (gring_index x) \o trmx \o gring_row.
-HB.instance Definition _ x := GRing.Semilinear.on (gring_proj x).
+HB.instance Definition _ x := GRing.Linear.on (gring_proj x).
 
 Lemma gring_projE : {in G &, forall x y, gring_proj x (aG y) = (x == y)%:R}.
 Proof.
@@ -767,13 +767,13 @@ Section GringMx.
 Variables (n : nat) (rG : mx_representation G n).
 
 Definition gring_mx := vec_mx \o mulmxr (enveloping_algebra_mx rG).
-HB.instance Definition _ := GRing.Semilinear.on gring_mx.
+HB.instance Definition _ := GRing.Linear.on gring_mx.
 
 Lemma gring_mxJ a x :
   x \in G -> gring_mx (a *m aG x) = gring_mx a *m rG x.
 Proof.
 move=> Gx; rewrite /gring_mx /= ![a *m _]mulmx_sum_row.
-rewrite !(mulmx_suml, linear_sum); apply: eq_bigr => /= i _.
+rewrite !(mulmx_suml, linear_sum); apply: eq_bigr => i _.
 rewrite linearZ -!scalemxAl linearZ /=; congr (_ *: _) => {a}.
 rewrite !rowK /= !mxvecK -rowE rowK mxvecK.
 by rewrite gring_indexK ?groupM ?repr_mxM ?enum_valP.
@@ -793,7 +793,7 @@ Section GringOp.
 Variables (n : nat) (rG : mx_representation G n).
 
 Definition gring_op := gring_mx rG \o gring_row.
-HB.instance Definition _ := GRing.Semilinear.on gring_op.
+HB.instance Definition _ := GRing.Linear.on gring_op.
 
 Lemma gring_opE a : gring_op a = gring_mx rG (gring_row a).
 Proof. by []. Qed.
@@ -1032,8 +1032,8 @@ Variable U : 'M[F]_n.
 Definition val_submod m : 'M_(m, \rank U) -> 'M_(m, n) := mulmxr (row_base U).
 Definition in_submod m : 'M_(m, n) -> 'M_(m, \rank U) :=
    mulmxr (invmx (row_ebase U) *m pid_mx (\rank U)).
-HB.instance Definition _ m := GRing.Semilinear.on (@val_submod m).
-HB.instance Definition _ m := GRing.Semilinear.on (@in_submod m).
+HB.instance Definition _ m := GRing.Linear.on (@val_submod m).
+HB.instance Definition _ m := GRing.Linear.on (@in_submod m).
 
 Lemma val_submodE m W : @val_submod m W = W *m val_submod 1%:M.
 Proof. by rewrite mulmxA mulmx1. Qed.
@@ -1093,8 +1093,8 @@ Qed.
 Definition val_factmod m : _ -> 'M_(m, n) :=
   mulmxr (row_base (cokermx U) *m row_ebase U).
 Definition in_factmod m : 'M_(m, n) -> _ := mulmxr (col_base (cokermx U)).
-HB.instance Definition _ m := GRing.Semilinear.on (@val_factmod m).
-HB.instance Definition _ m := GRing.Semilinear.on (@in_factmod m).
+HB.instance Definition _ m := GRing.Linear.on (@val_factmod m).
+HB.instance Definition _ m := GRing.Linear.on (@in_factmod m).
 
 Lemma val_factmodE m W : @val_factmod m W = W *m val_factmod 1%:M.
 Proof. by rewrite mulmxA mulmx1. Qed.
