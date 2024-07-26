@@ -61,6 +61,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       { name = p; value.override.version = "master"; }))
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
+         mathcomp-analysis.override.version = "mc_1125";
          # To add an overlay applying to all bundles,
          # add below a line like
          #<package>.override.version = "<github_login>:<branch>";
