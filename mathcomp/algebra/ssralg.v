@@ -5677,7 +5677,7 @@ Arguments GRing.one : clear implicits.
 
 Notation "0" := (@zero _) : ring_scope.
 Notation "-%R" := (@opp _) : ring_scope.
-Notation "- x" := (opp x) : ring_scope.
+Notation "- x" := (opp x%R) : ring_scope.
 Notation "+%R" := (@add _) : function_scope.
 Notation "x + y" := (add x y) : ring_scope.
 Notation "x - y" := (add x (- y)) : ring_scope.
