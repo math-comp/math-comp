@@ -1582,7 +1582,7 @@ Lemma derivMNn n p : (p *- n)^`() = p^`() *- n.
 Proof. exact: linearMNn. Qed.
 
 Lemma derivZ c p : (c *: p)^`() = c *: p^`().
-Proof. by rewrite linearZ. Qed.
+Proof. exact: linearZ. Qed.
 
 Lemma deriv_mulC c p : (c%:P * p)^`() = c%:P * p^`().
 Proof. by rewrite !mul_polyC derivZ. Qed.
@@ -2627,7 +2627,7 @@ Proof.
 have cxid: commr_rmorph idfun x by apply: mulrC.
 have evalE : horner_eval x =1 horner_morph cxid.
   by move=> p; congr _.[x]; rewrite map_poly_id.
-by move=> c p q; rewrite !evalE rmorphD /= linearZ.
+by move=> c p q; rewrite !evalE linearP.
 Qed.
 
 Fact horner_eval_is_multiplicative x : multiplicative (horner_eval x).

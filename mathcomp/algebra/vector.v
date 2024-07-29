@@ -2340,11 +2340,8 @@ apply/memv_imgP/submxP => [[u _ ->]|[u /(canRL (rVofK _)) ->//]].
 by exists (vecof e u); rewrite ?memvf// -hom_vecof.
 Qed.
 
-Lemma leigenspaceE f a :
-   leigenspace f a = vsof e (eigenspace (mxof e e f) a).
-Proof.
-by rewrite /leigenspace /eigenspace lker_ker linearB linearZ/= mxof1// scalemx1.
-Qed.
+Lemma leigenspaceE f a : leigenspace f a = vsof e (eigenspace (mxof e e f) a).
+Proof. by rewrite [LHS]lker_ker linearB linearZ/= mxof1// scalemx1. Qed.
 
 End eigen.
 End passmx.

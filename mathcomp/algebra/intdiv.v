@@ -902,12 +902,11 @@ Qed.
 Lemma dvdp_rat_int p q : (pZtoQ p %| pZtoQ q) = (p %| q).
 Proof.
 apply/dvdpP/Pdiv.Idomain.dvdpP=> [[/= r1 Dq] | [[/= a r] nz_a Dq]]; last first.
-  exists (a%:~R^-1 *: pZtoQ r); rewrite -scalerAl -rmorphM -Dq /=.
-  by rewrite -{2}[a]intz scaler_int rmorphMz -scaler_int scalerK ?intr_eq0.
+  exists (a%:~R^-1 *: pZtoQ r).
+  by rewrite -scalerAl -rmorphM -Dq /= linearZ/= scalerK ?intr_eq0.
 have [r [a nz_a Dr1]] := rat_poly_scale r1; exists (a, r) => //=.
 apply: (map_inj_poly _ _ : injective pZtoQ) => //; first exact: intr_inj.
-rewrite -[a]intz scaler_int rmorphMz -scaler_int /= Dq Dr1.
-by rewrite -scalerAl -rmorphM scalerKV ?intr_eq0.
+by rewrite linearZ /= Dq Dr1 -scalerAl -rmorphM scalerKV ?intr_eq0.
 Qed.
 
 Lemma dvdpP_rat_int p q :
@@ -1042,7 +1041,7 @@ Lemma dec_Qint_span (vT : vectType rat) m (s : m.-tuple vT) v :
 Proof.
 have s_s (i : 'I_m): s`_i \in <<s>>%VS by rewrite memv_span ?memt_nth.
 have s_Zs a: \sum_(i < m) s`_i *~ a i \in <<s>>%VS.
-  by rewrite memv_suml // => i _; rewrite -scaler_int memvZ.
+  by apply/rpred_sum => i _; apply/rpredMz.
 case s_v: (v \in <<s>>%VS); last by right=> [[a Dv]]; rewrite Dv s_Zs in s_v.
 pose S := \matrix_(i < m, j < _) coord (vbasis <<s>>) j s`_i.
 pose r := \rank S; pose k := (m - r)%N; pose Em := erefl m; pose Ek := erefl k.
@@ -1100,12 +1099,12 @@ case Zv: (map_mx denq (vv *m pinvmx T) == const_mx 1).
       by have /eqP/rowP/(_ i)/[!mxE]-> := Zv; rewrite mulr1.
     by rewrite -(mulmxA _ _ S) mulmxKpV ?mxE // -eqST submx_full.
   rewrite (coord_vbasis (s_Zs _)); apply: eq_bigr => j _; congr (_ *: _).
-  rewrite linear_sum mxE; apply: eq_bigr => i _.
-  by rewrite -scaler_int linearZ [a]lock !mxE ffunE.
+  rewrite linear_sum mxE; apply: eq_bigr => /= i _.
+  by rewrite mxE mulrzl mxE ffunE raddfMz.
 right=> [[a Dv]]; case/eqP: Zv; apply/rowP.
 have ->: vv = map_mx intr (\row_i a i) *m S.
   apply/rowP=> j; rewrite !mxE Dv linear_sum.
-  by apply: eq_bigr => i _; rewrite -scaler_int linearZ !mxE.
+  by apply: eq_bigr => i _; rewrite !mxE raddfMz mulrzl.
 rewrite -defS -2!mulmxA; have ->: T *m pinvmx T = 1%:M.
   have uT: row_free T by rewrite /row_free -eqST.
   by apply: (row_free_inj uT); rewrite mul1mx mulmxKpV.

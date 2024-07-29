@@ -197,8 +197,7 @@ Proof. by move=> a b; rewrite /kHomf !raddfB hornerD hornerN. Qed.
 
 Fact kHomExtend_scalable_subproof : scalable kHomf.
 Proof.
-move=> k a; rewrite /kHomf !linearZ /=.
-rewrite -[rhs in _ = rhs]mulr_algl -hornerZ; congr _.[_].
+move=> k a; rewrite /kHomf linearZ /= -[RHS]mulr_algl -hornerZ; congr _.[_].
 by apply/polyP => i; rewrite !(coefZ, coef_map) /= !mulr_algl linearZ.
 Qed.
 HB.instance Definition _ := @GRing.isAdditive.Build _ _ kHomf
@@ -567,11 +566,11 @@ have [f homLf fxz]: exists2 f : 'End(Lz), kHom 1 imL f & f (inLz x) = z.
     have [q2 Dq2]: exists q2, q1z = map_poly inLz q2.
       exists (\poly_(i < size q1z) (sval (sig_eqW (F0q1z i)))%:A).
       rewrite -{1}[q1z]coefK; apply/polyP=> i; rewrite coef_map !{1}coef_poly.
-      by case: sig_eqW => a; case: ifP; rewrite /= ?rmorph0 ?linearZ ?rmorph1.
+      by case: sig_eqW => a; case: ifP; rewrite /= ?rmorph0 ?rmorph_alg.
     rewrite Dq2 dvdp_map minPoly_dvdp //.
       apply/polyOverP=> i; have[a] := F0q1z i.
-      rewrite -(rmorph1 inLz) -linearZ.
-      by rewrite Dq2 coef_map => /fmorph_inj->; rewrite rpredZ ?mem1v.
+      rewrite -(rmorph_alg inLz) Dq2 coef_map /= => /fmorph_inj->.
+      exact/rpredZ/mem1v.
     by rewrite -(fmorph_root inLz) -Dq2 root_minPoly.
   have q1z_z: root q1z z.
     rewrite !root_factor_theorem in qz0 *.

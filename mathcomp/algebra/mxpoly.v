@@ -298,17 +298,15 @@ have le_p'_dp: size p' <= dp.
 have le_q'_dq: size q' <= dq.
   have [-> | nz_q'] := eqVneq q' 0; first by rewrite size_poly0.
   by rewrite /dq -(size_scale q nz_k) q'r size_mul // addnC -def_r leq_addl.
-exists (row_mx (- c *: poly_rV q') (k *: poly_rV p')).
-  apply: contraNneq r_nz; rewrite -row_mx0; case/eq_row_mx=> q0 p0.
-  have{} p0: p = 0.
-    apply/eqP; rewrite -size_poly_eq0 -(size_scale p nz_c) p'r.
-    rewrite -(size_scale _ nz_k) scalerAl -(poly_rV_K le_p'_dp) -linearZ p0.
-    by rewrite linear0 mul0r size_poly0.
-  rewrite /r p0 gcd0p -size_poly_eq0 -(size_scale q nz_k) q'r.
-  rewrite -(size_scale _ nz_c) scalerAl -(poly_rV_K le_q'_dq) -linearZ.
-  by rewrite -[c]opprK scaleNr q0 oppr0 linear0 mul0r size_poly0.
-rewrite mul_row_col scaleNr mulNmx !mul_rV_lin1 /= !linearZ /= !poly_rV_K //.
-by rewrite !scalerCA p'r q'r mulrCA addNr.
+exists (row_mx (- c *: poly_rV q') (k *: poly_rV p')); last first.
+  rewrite mul_row_col scaleNr mulNmx !mul_rV_lin1 /= 2!linearZ /= !poly_rV_K //.
+  by rewrite !scalerCA p'r q'r mulrCA addNr.
+apply: contraNneq r_nz; rewrite -row_mx0 => /eq_row_mx[/eqP].
+rewrite scaleNr oppr_eq0 gcdp_eq0 -!size_poly_eq0 => /eqP q0 p0.
+rewrite -(size_scale p nz_c) -(size_scale (c *: p) nz_k) p'r.
+rewrite -(size_scale q nz_k) -(size_scale (k *: q) nz_c) q'r !scalerAl.
+rewrite -(poly_rV_K le_p'_dp) -(poly_rV_K le_q'_dq).
+by rewrite -2![_ *: rVpoly _]linearZ p0 q0 !linear0 mul0r size_poly0.
 Qed.
 
 Section HornerMx.
@@ -345,7 +343,7 @@ Lemma horner_rVpoly m (u : 'rV_m) :
 Proof.
 rewrite mulmx_sum_row linear_sum [rVpoly u]poly_def rmorph_sum.
 apply: eq_bigr => i _.
-by rewrite valK /= !linearZ rmorphXn /= horner_mx_X rowK /= mxvecK.
+by rewrite valK /= !linearZ rmorphXn /= horner_mx_X rowK mxvecK.
 Qed.
 
 End OneMatrix.
