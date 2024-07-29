@@ -600,9 +600,9 @@ Import Monoid.Theory.
 
 Local Notation "0" := (@zero _) : ring_scope.
 Local Notation "+%R" := (@add _) : function_scope.
-Local Notation "x + y" := (add x y) : ring_scope.
+Local Notation "x + y" := (add x%R y%R) : ring_scope.
 
-Local Notation "x *+ n" := (natmul x n) : ring_scope.
+Local Notation "x *+ n" := (natmul x%R n%N) : ring_scope.
 
 Local Notation "\sum_ ( i <- r | P ) F" := (\big[+%R/0]_(i <- r | P) F).
 Local Notation "\sum_ ( m <= i < n ) F" := (\big[+%R/0]_(m <= i < n) F).
