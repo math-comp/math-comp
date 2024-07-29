@@ -2,7 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
-From mathcomp Require Import choice fintype finfun bigop prime binomial monoid.
+From mathcomp Require Import choice fintype finfun bigop prime binomial.
+From mathcomp Require Import monoid comoid.
 
 (******************************************************************************)
 (*                 The base hierarchy of algebraic structures                 *)
@@ -1003,7 +1004,7 @@ Lemma exprMn_n x m n : (x *+ m) ^+ n = x ^+ n *+ (m ^ n) :> R.
 Proof.
 elim: n => [|n IHn]; first by rewrite mulr1n.
 rewrite exprS IHn -mulr_natr -mulrA -commr_nat mulr_natr -mulrnA -expnSr.
-by rewrite -mulr_natr mulrA -exprS mulr_natr.
+by rewrite -mulr_natr exprS -mulrA mulr_natr.
 Qed.
 
 Lemma exprM x m n : x ^+ (m * n) = x ^+ m ^+ n.
@@ -2420,7 +2421,7 @@ Proof. by rewrite subrXX !big_ord_recr big_ord0 /= add0r mulr1 mul1r. Qed.
 Lemma subr_sqrDB x y : (x + y) ^+ 2 - (x - y) ^+ 2 = x * y *+ 4.
 Proof.
 rewrite sqrrD sqrrB -!(addrAC _ (y ^+ 2)) opprB.
-by rewrite addrC addrA subrK -mulrnDr.
+by rewrite [LHS]addrC addrA subrK -mulrnDr.
 Qed.
 
 Section ScaleLinear.
@@ -4419,7 +4420,7 @@ Lemma rpredD : {in S &, forall u v, u + v \in S}.
 Proof. by exact: gpredD. Qed.
 
 Lemma rpred0D : addr_closed S.
-Proof. exact: gpred0D. Qed.
+Proof. exact: nmod_closed_subproof. Qed.
 
 Lemma rpred_sum I r (P : pred I) F :
   (forall i, P i -> F i \in S) -> \sum_(i <- r | P i) F i \in S.

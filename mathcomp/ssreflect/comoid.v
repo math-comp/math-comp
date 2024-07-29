@@ -29,11 +29,18 @@ HB.structure Definition AddMagma := {V of isAddMagma V & Choice V}.
 Local Notation "+%g" := (@add _) : function_scope.
 Local Notation "x + y" := (add x y) : group_scope.
 
+Definition multiplicative := @id Type.
+
+HB.instance Definition _ (V : addMagmaType) := Choice.on (multiplicative V).
+HB.instance Definition _ (V : addMagmaType) := isMagma.Build (multiplicative V) (@add V).
+
 HB.mixin Record AddMagma_isBaseAddUMagma V of AddMagma V := {
   zero : V
 }.
 
 HB.structure Definition BaseAddUMagma := {V of AddMagma_isBaseAddUMagma V & AddMagma V}.
+
+HB.instance Definition _ (V : BaseAddUMagma.type) := Magma_isBaseUMagma.Build (multiplicative V) (@zero V).
 
 HB.mixin Record BaseAddUMagma_isAddUMagma V of BaseAddUMagma V := {
   addgC : commutative (@add V);
@@ -66,10 +73,6 @@ Local Notation "x *+ n" := (natmul x n) : group_scope.
 Lemma addg0 (V : addUMagmaType) : right_id (@zero V) add.
 Proof. by move=> x; rewrite addgC add0g. Qed.
 
-Definition multiplicative := @id Type.
-
-HB.instance Definition _ (V : addUMagmaType) := Choice.on (multiplicative V).
-HB.instance Definition _ (V : addUMagmaType) := isMagma.Build (multiplicative V) (@add V).
 HB.instance Definition _ (V : addUMagmaType) := Magma_isUMagma.Build (multiplicative V) add0g (@addg0 V).
 
 HB.mixin Record AddUMagma_isNmodule V of AddUMagma V := {
@@ -341,30 +344,16 @@ Arguments addIg {V} x [x1 x2].
 Arguments oppgK {V}.
 Arguments oppg_inj {V} [x1 x2].
 
-Definition semi_additive (U V : nmodType) (f : U -> V) : Prop :=
+Definition semi_additive (U V : BaseAddUMagma.type) (f : U -> V) : Prop :=
   (f 0 = 0) * {morph f : x y / x + y}.
 
-HB.mixin Record isSemiAdditive (U V : nmodType) (apply : U -> V) := {
+HB.mixin Record isSemiAdditive (U V : BaseAddUMagma.type) (apply : U -> V) := {
   semi_additive_subproof : semi_additive apply;
 }.
 
 #[mathcomp(axiom="semi_additive")]
-HB.structure Definition Additive (U V : nmodType) :=
+HB.structure Definition Additive (U V : BaseAddUMagma.type) :=
   {f of isSemiAdditive U V f}.
-
-Definition fmultiplicative U V := @id ((multiplicative U) -> (multiplicative V)).
-
-HB.builders Context U V apply of isSemiAdditive U V apply.
-
-Fact gmorphD : {morph apply : x y / x + y}.
-Proof. by case: semi_additive_subproof. Qed.
-Fact gmorph0 : apply 0 = 0.
-Proof. by case: semi_additive_subproof. Qed.
-
-HB.instance Definition _ := isMultiplicative.Build (multiplicative U) (multiplicative V) (fmultiplicative apply) gmorphD.
-HB.instance Definition _ := isUMagmaMorphism.Build (multiplicative U) (multiplicative V) (fmultiplicative apply) gmorph0.
-
-HB.end.
 
 Definition additive (U V : zmodType) (f : U -> V) := {morph f : x y / x - y}.
 
@@ -388,7 +377,7 @@ HB.end.
 
 Module AdditiveExports.
 Module Additive.
-Definition apply_deprecated (U V : nmodType) (phUV : phant (U -> V)) :=
+Definition apply_deprecated (U V : BaseAddUMagma.type) (phUV : phant (U -> V)) :=
   @Additive.sort U V.
 #[deprecated(since="mathcomp 2.0", note="Use Additive.sort instead.")]
 Notation apply := apply_deprecated.
@@ -403,43 +392,20 @@ Notation "[ 'additive' 'of' f ]" := (Additive.clone _ _ f%function _)
 End AdditiveExports.
 HB.export AdditiveExports.
 
-(*
-HB.factory Record isAdditive (U V : nmodType) (f : U -> V) := {
-  gaddfD : {morph f : x y / x + y}
-}.
+Lemma gaddf0 (U V : BaseAddUMagma.type) (f : {additive U -> V}) : f 0 = 0.
+Proof. by case: (@semi_additive_subproof _ _ f). Qed.
 
-HB.builders Context U V apply of isAdditive U V apply.
+Lemma gaddfD (U V : BaseAddUMagma.type) (f : {additive U -> V}) :
+  {morph f : x y / x + y}.
+Proof. by case: (@semi_additive_subproof _ _ f). Qed.
 
-HB.instance Definition _ := isMultiplicative.Build U V apply gaddfD.
+Definition fmultiplicative U V := @id ((multiplicative U) -> (multiplicative V)).
 
-HB.end.
-
-HB.factory Record isNmodMorphism (U V : nmodType) (f : U -> V) := {
-  gaddfD : {morph f : x y / x + y};
-  gaddf0 : f 0 = 0
-}.
-
-Notation "NmodMorphism.type" := (UmagmaMorphism.type).
-
-HB.builders Context U V apply of isNmodMorphism U V apply.
-
-HB.instance Definition _ := isMultiplicative.Build U V apply gaddfD.
-HB.instance Definition _ := isUmagmaMorphism.Build U V apply gaddf0.
-
-HB.end.
-
-HB.factory Record isZmodMorphism (U V : zmodType) (f : U -> V) := {
-  gaddfB : {morph f : x y / x - y}
-}.
-
-HB.builders Context U V apply of isZmodMorphism U V apply.
-
-HB.instance Definition _ := isGroupMorphism.Build U V apply gaddfB.
-
-   HB.end.*)
+HB.instance Definition _ U V (f : Additive.type U V) := isMultiplicative.Build (multiplicative U) (multiplicative V) (fmultiplicative f) (@gaddfD _ _ f).
+HB.instance Definition _ (U V : addUMagmaType) (f : Additive.type U V) := isUMagmaMorphism.Build (multiplicative U) (multiplicative V) (fmultiplicative f) (@gaddf0 _ _ f).
 
 Section LiftedNmod.
-Variables (U : Type) (V : nmodType).
+Variables (U : Type) (V : BaseAddUMagma.type).
 Definition null_fun of U : V := 0.
 Definition add_fun (f g : U -> V) x := f x + g x.
 End LiftedNmod.
@@ -462,54 +428,54 @@ Arguments opp_fun {_ _} f _ /.
 Section Nmod.
 Variables (U V : nmodType) (f : {additive U -> V}).
 
-Lemma gaddf0 : f 0 = 0.
-Proof. exact: gmulf1. Qed.
-
 Lemma gaddf_eq0 x : injective f -> (f x == 0) = (x == 0).
-Proof. exact: gmulf_eq1. Qed.
-
-Lemma gaddfD : {morph f : x y / x + y}.
-Proof. exact: gmulfM. Qed.
+Proof. exact: (@gmulf_eq1 _ _ (fmultiplicative f)). Qed.
 
 Lemma gaddfMn n : {morph f : x / x *+ n}.
-Proof. exact: (@gmulfXn U V f). Qed.
+Proof. exact: (@gmulfXn _ _ (fmultiplicative f)). Qed.
 
 Lemma can2_semi_additive f' : cancel f f' -> cancel f' f -> semi_additive f'.
-Proof. by split; [apply: (@can2_gmulf1 U V f)|apply/can2_gmulfM]. Qed.
+Proof.
+split; first exact/(@can2_gmulf1 _ _ (fmultiplicative f)).
+exact/(@can2_gmulfM _ _ (fmultiplicative f)).
+Qed.
+
 End Nmod.
 
 Section Zmod.
 Variables (U V : zmodType) (f : {additive U -> V}).
 
 Lemma gaddfN : {morph f : x / - x}.
-Proof. exact: (@gmulfV U V f). Qed.
+Proof. exact: (@gmulfV _ _ (fmultiplicative f)). Qed.
 
 Lemma gaddfB : {morph f : x y / x - y}.
-Proof. exact: (@gmulfB U V f). Qed.
+Proof. exact: (@gmulfB _ _ (fmultiplicative f)). Qed.
 
 Lemma gaddf_inj : (forall x, f x = 0 -> x = 0) -> injective f.
-Proof. exact: (@gmulf_inj U V f). Qed.
+Proof. exact: (@gmulf_inj _ _ (fmultiplicative f)). Qed.
 
 Lemma gaddfMNn n : {morph f : x / x *- n}.
-Proof. exact: (@gmulfXVn U V f). Qed.
+Proof. exact: (@gmulfXVn _ _ (fmultiplicative f)). Qed.
 
 Lemma can2_additive f' : cancel f f' -> cancel f' f -> additive f'.
 Proof. by move=> fK f'K x y /=; apply: (canLR fK); rewrite gaddfB !f'K. Qed.
 End Zmod.
 
-Section MorphismTheory.
-Section MulCFun.
-Variables (U : magmaType) (V : nmodType).
-Variables (f g : Multiplicative.type U V).
+Section AdditiveTheory.
+Section AddCFun.
+Variables (U : BaseAddUMagma.type) (V : nmodType).
+Variables (f g : Additive.type U V).
 
-Fact mul_fun_gmulfM : {morph f \* g : x y / x * y}.
-Proof. by move=> x y; rewrite /mul_fun !gmulfM [LHS]addgACA. Qed.
-HB.instance Definition _ := isMultiplicative.Build U V (f \* g) mul_fun_gmulfM.
-End MulCFun.
+Fact add_fun_semi_additive : semi_additive (f \+ g).
+Proof.
+split; first by rewrite /add_fun !gaddf0 addg0.
+by move=> x y; rewrite /add_fun !gaddfD [LHS]addgACA.
+Qed.
+HB.instance Definition _ := isSemiAdditive.Build U V (f \+ g) add_fun_semi_additive.
+End AddCFun.
 
 Section AddFun.
-
-Variables (U V W : nmodType).
+Variables (U V W : BaseAddUMagma.type).
 Variables (f g : {additive V -> W}) (h : {additive U -> V}).
 
 Fact idfun_is_semi_additive : semi_additive (@idfun U).
@@ -524,6 +490,11 @@ Proof. by split=> [|x y]; rewrite /= ?gaddf0// !gaddfD. Qed.
 HB.instance Definition _ := isSemiAdditive.Build U W (f \o h)
   comp_is_semi_additive.
 
+End AddFun.
+Section AddFun.
+Variables (U : BaseAddUMagma.type) (V : addUMagmaType) (W : nmodType).
+Variables (f g : {additive U -> W}).
+
 Fact null_fun_is_semi_additive : semi_additive (\0 : U -> V).
 Proof. by split=> // x y /=; rewrite addg0. Qed.
 #[export]
@@ -535,7 +506,7 @@ Proof.
 by split=> [|x y]; rewrite /= ?gaddf0 ?addg0// !gaddfD addgCA -!addgA addgCA.
 Qed.
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build V W (f \+ g)
+HB.instance Definition _ := isSemiAdditive.Build U W (f \+ g)
   add_fun_is_semi_additive.
 
 End AddFun.
@@ -562,26 +533,17 @@ Proof. by move=> x y /=; rewrite !gaddfB oppgB addgC oppgK. Qed.
 HB.instance Definition _ := isAdditive.Build V W (\- g) opp_fun_is_additive.
 
 End AddVFun.
-End MorphismTheory.
-
-HB.mixin Record isAddClosed (V : nmodType) (S : {pred V}) := {
-  gpred0D : nmod_closed S
-}.
+End AdditiveTheory.
 
 (* Mixins for stability properties *)
 
-HB.builders Context V S of isAddClosed V S.
-HB.instance Definition _ := isMulClosed.Build V S (snd gpred0D).
-HB.instance Definition _ := isMul1Closed.Build V S (fst gpred0D).
-HB.end.
-
-HB.mixin Record isOppClosed (V : zmodType) (S : {pred V}) := {
-  gpredNr : oppg_closed S
+HB.mixin Record isAddClosed (V : nmodType) (S : {pred V}) := {
+  nmod_closed_subproof : nmod_closed S
 }.
 
-HB.builders Context V S of isOppClosed V S.
-HB.instance Definition _ := isInvClosed.Build V S gpredNr.
-HB.end.
+HB.mixin Record isOppClosed (V : zmodType) (S : {pred V}) := {
+  oppg_closed_subproof : oppg_closed S
+}.
 
 (* Structures for stability properties *)
 
@@ -592,7 +554,7 @@ HB.structure Definition AddClosed V := {S of isAddClosed V S}.
 HB.structure Definition OppClosed V := {S of isOppClosed V S}.
 
 #[short(type="zmodClosed")]
-HB.structure Definition ZmodClosed V := {S of OppClosed V S & AddClosed V S & isAddClosed V S}.
+HB.structure Definition ZmodClosed V := {S of OppClosed V S & AddClosed V S}.
 
 (* Factories for stability properties *)
 
@@ -607,6 +569,16 @@ HB.instance Definition _ := isAddClosed.Build V S
   (zmod_closed0D zmod_closed_subproof).
 HB.end.
 
+
+Definition rmultiplicative (T : Type) := @id {pred (multiplicative T)}.
+
+HB.instance Definition _ (U : nmodType) (S : addgClosed U) :=
+  isMulClosed.Build (multiplicative U) (rmultiplicative S) (snd nmod_closed_subproof).
+HB.instance Definition _ (U : nmodType) (S : addgClosed U) :=
+  isMul1Closed.Build (multiplicative U) (rmultiplicative S) (fst nmod_closed_subproof).
+HB.instance Definition _ (U : zmodType) (S : oppgClosed U) :=
+  isInvClosed.Build (multiplicative U) (rmultiplicative S) oppg_closed_subproof.
+
 Section NmodPred.
 Variables (V : nmodType).
 
@@ -614,9 +586,9 @@ Section Nmod.
 Variables S : addgClosed V.
 
 Lemma gpred0 : 0 \in S.
-Proof. by case: (@gpred0D V S). Qed.
+Proof. by case: (@nmod_closed_subproof V S). Qed.
 Lemma gpredD : {in S &, forall u v, u + v \in S}.
-Proof. by case: (@gpred0D V S). Qed.
+Proof. by case: (@nmod_closed_subproof V S). Qed.
 
 Lemma gpredMn n : {in S, forall u, u *+ n \in S}.
 Proof. by move=> x xS; elim: n => [|n IHn]; rewrite /= ?gpred0 // mulgS gpredD. Qed.
@@ -630,6 +602,9 @@ Variables (V : zmodType).
 Section Opp.
 
 Variable S : oppgClosed V.
+
+Lemma gpredNr : {in S, forall u, - u \in S}.
+Proof. exact: oppg_closed_subproof. Qed.
 
 Lemma gpredN : {mono -%g: u / u \in S}.
 Proof. by move=> u; apply/idP/idP=> /gpredNr; rewrite ?oppgK; apply. Qed.
@@ -669,20 +644,22 @@ Proof. by rewrite -[x \in S]gpredN -[LHS]gpredN oppgB; apply: gpredDr. Qed.
 End Zmod.
 End ZmodPred. 
 
+HB.mixin Record isSubAddUMagma (V : BaseAddUMagma.type) (S : pred V) U of SubType V S U & AddUMagma U := {
+  valD0_subproof : semi_additive (val : U -> V)
+}.
+
 #[short(type="subNmodType")]
 HB.structure Definition SubNmodule (V : nmodType) S :=
-  { U of SubMonoid V S U & Nmodule U}.
+  { U of SubChoice V S U & Nmodule U & isSubAddUMagma V S U}.
 
 Section subNmodule.
 Context (V : nmodType) (S : pred V) (U : subNmodType S).
 Notation val := (val : U -> V).
-Fact val_is_semi_additive : semi_additive val.
-Proof. by split; [apply/val1|apply/valM]. Qed.
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build U V val val_is_semi_additive.
+HB.instance Definition _ := isSemiAdditive.Build U V val valD0_subproof.
 Lemma valD : {morph (val : U -> V) : x y / x + y}.
-Proof. exact: valM. Qed.
-Lemma val0 : val 0 = 0. Proof. exact: val1. Qed.
+Proof. exact: gaddfD. Qed.
+Lemma val0 : val 0 = 0. Proof. exact: gaddf0. Qed.
 End subNmodule.
 
 HB.factory Record SubChoice_isSubNmodule (V : nmodType) S U
@@ -694,19 +671,31 @@ HB.builders Context V S U of SubChoice_isSubNmodule V S U.
 
 HB.instance Definition _ := isAddClosed.Build V S nmod_closed_subproof.
 
-HB.instance Definition _ := SubChoice_isSubUMagma.Build V S U nmod_closed_subproof.
-HB.instance Definition _ := SubChoice_isSubSemigroup.Build V S U (snd nmod_closed_subproof).
+Let inU v Sv : U := Sub v Sv.
+Let addU (u1 u2 : U) := inU (gpredD (valP u1) (valP u2)).
+Let oneU := inU (fst nmod_closed_subproof).
 
-Lemma mulgC : commutative (@mul U).
-Proof. by move=> x y; apply/val_inj; rewrite !valM mulgC. Qed.
+Lemma addgA : associative addU.
+Proof. by move=> x y z; apply/val_inj; rewrite !SubK addgA. Qed.
 
-HB.instance Definition _ := Monoid_isNmodule.Build U mulgC.
+Lemma addgC : commutative addU.
+Proof. by move=> x y; apply/val_inj; rewrite !SubK addgC. Qed.
+
+Lemma add0g : left_id oneU addU.
+Proof. by move=> x; apply/val_inj; rewrite !SubK add0g. Qed.
+
+HB.instance Definition _ := isNmodule.Build U addgA addgC add0g.
+
+Lemma valD0 : semi_additive (val : U -> V).
+Proof. by split=> [|x y]; rewrite !SubK. Qed.
+
+HB.instance Definition _ := isSubAddUMagma.Build V S U valD0.
 
 HB.end.
 
 #[short(type="subZmodType")]
 HB.structure Definition SubZmodule (V : zmodType) S :=
-  { U of SubMonoid V S U & Zmodule U}.
+  { U of SubChoice V S U & Zmodule U & isSubAddUMagma V S U}.
 
 Section additive.
 Context (V : zmodType) (S : pred V) (U : SubZmodule.type S).
@@ -722,13 +711,17 @@ HB.factory Record SubChoice_isSubZmodule (V : zmodType) S U
 
 HB.builders Context V S U of SubChoice_isSubZmodule V S U.
 
-HB.instance Definition _ :=
-  SubChoice_isSubGroup.Build V S U zmod_closed_subproof.
+HB.instance Definition _ := isZmodClosed.Build V S zmod_closed_subproof.
+HB.instance Definition _ := SubChoice_isSubNmodule.Build V S U nmod_closed_subproof.
 
-Lemma mulgC : commutative (@mul U).
-Proof. by move=> x y; apply/val_inj; rewrite !valM mulgC. Qed.
+Let inU v Sv : U := Sub v Sv.
+(* TODO: I should not have to write the builder. *)
+Let oppU (u : U) := inU (gpredNr (valP u)).
 
-HB.instance Definition _ := Monoid_isNmodule.Build U mulgC.
+Lemma addNg : left_inverse 0 oppU (@add U).
+Proof. by move=> x; apply/val_inj; rewrite !SubK addNg. Qed.
+
+HB.instance Definition _ := Nmodule_isZmodule.Build U addNg.
 
 HB.end.
 
@@ -737,44 +730,80 @@ Section FinFunNmod.
 Variable (aT : finType) (rT : nmodType).
 Implicit Types f g : {ffun aT -> rT}.
 
-(* TODO: find a way to make the following instance use these definitions. *)
 Definition ffun_add f g := [ffun a => f a + g a].
 Definition ffun_zero := [ffun a : aT => (0 : rT)].
 
+Fact ffun_addgA : associative ffun_add.
+Proof. by move=> f g h; apply/ffunP => a; rewrite !ffunE addgA. Qed.
+
 Fact ffun_addgC : commutative ffun_add.
-Proof. by move=> f1 f2; apply/ffunP=> a; rewrite !ffunE; rewrite addgC. Qed.
+Proof. by move=> f1 f2; apply/ffunP => a; rewrite !ffunE addgC. Qed.
+
+Fact ffun_add0g : left_id ffun_zero ffun_add.
+Proof. by move=> f; apply/ffunP => a; rewrite !ffunE add0g. Qed.
 
 #[export]
-HB.instance Definition _ := Monoid_isNmodule.Build {ffun aT -> rT} ffun_addgC.
+HB.instance Definition _ := isNmodule.Build {ffun aT -> rT} ffun_addgA ffun_addgC ffun_add0g.
 
 Lemma ffunMnE f n x : (f *+ n) x = f x *+ n.
 Proof.
-(* TODO: the `rewrite ffunE` produces a `1` where I would like a `0` (which comes from `ffun_one`). *)
 elim: n => [|n IHn]; first by rewrite ffunE.
 by rewrite !mulgS ffunE IHn.
 Qed.
 
 End FinFunNmod.
 
-(* TODO: HB.saturate *)
-#[export]
-HB.instance Definition _ (aT : finType) (rT : zmodType) := Group_isZmodule.Build {ffun aT -> rT} (@ffun_addgC aT rT).
+Section FinFunZmod.
+
+Variable (aT : finType) (rT : zmodType).
+Implicit Types f g : {ffun aT -> rT}.
+
+Definition ffun_opp f := [ffun a => - (f a)].
+
+Fact ffun_addNg : left_inverse 0 ffun_opp +%g.
+Proof. by move=> f; apply/ffunP => a; rewrite !ffunE addNg. Qed.
+
+HB.instance Definition _ := Nmodule_isZmodule.Build {ffun aT -> rT} ffun_addNg.
+
+End FinFunZmod.
 
 Section PairNmodule.
 Variables U V : nmodType.
 
-Lemma pair_mulgC : commutative (@mul (U * V)%type).
-Proof. by move=> x y; congr (_, _); apply/mulgC. Qed.
+Definition pair_add (a b : U * V) := (a.1 + b.1, a.2 + b.2).
+Definition pair_zero : U * V := (0, 0).
 
-HB.instance Definition _ := Monoid_isNmodule.Build (U * V)%type pair_mulgC.
+Fact pair_addgA : associative pair_add.
+Proof. by move=> [] al ar [] bl br [] cl cr; rewrite /pair_add !addgA. Qed.
 
-HB.instance Definition _ := isSemiAdditive.Build (U * V)%type U (@fst U V) (@fst_is_umagma_morphism U V, @fst_is_multiplicative U V)%PAIR.
-HB.instance Definition _ := isSemiAdditive.Build (U * V)%type V (@snd U V) (@snd_is_umagma_morphism U V, @snd_is_multiplicative U V)%PAIR.
+Fact pair_addgC : commutative pair_add.
+Proof. by move=> [] al ar [] bl br; congr pair; rewrite /pair_add addgC. Qed.
+
+Fact pair_add0g : left_id pair_zero pair_add.
+Proof. by move=> [] al ar; rewrite /pair_add !add0g. Qed.
+
+#[export]
+HB.instance Definition _ := isNmodule.Build (U * V)%type pair_addgA pair_addgC pair_add0g.
+
+Fact fst_is_additive : semi_additive (@fst U V). Proof. by []. Qed.
+Fact snd_is_additive : semi_additive (@snd U V). Proof. by []. Qed.
+
+HB.instance Definition _ := isSemiAdditive.Build (U * V)%type U (@fst U V) fst_is_additive.
+HB.instance Definition _ := isSemiAdditive.Build (U * V)%type V (@snd U V) snd_is_additive.
 
 End PairNmodule.
 
-(* TODO: HB.saturate *)
-HB.instance Definition _ (U V : zmodType) := Group_isZmodule.Build (U * V)%type (@pair_mulgC U V).
+Section PairZmodule.
+Variables U V : zmodType.
+
+Definition pair_opp (a : U * V) := (- a.1, - a.2).
+
+Fact pair_addNg : left_inverse 0 pair_opp +%g.
+Proof. by move=> [] al ar; rewrite /pair_opp; congr pair; apply/addNg. Qed.
+
+HB.instance Definition _ := Nmodule_isZmodule.Build (U * V)%type pair_addNg.
+
+End PairZmodule.
 
 (* zmodType structure on bool *)
 HB.instance Definition _ := isZmodule.Build bool addbA addbC addFb addbb.
