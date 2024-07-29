@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
-From mathcomp Require Import monoid ssralg poly.
+From mathcomp Require Import comoid ssralg poly.
 
 (******************************************************************************)
 (*                            Number structures                               *)
@@ -2948,7 +2948,7 @@ Lemma sgrV x : sgr x^-1 = sgr x.
 Proof. by rewrite /sgr invr_eq0 invr_lt0. Qed.
 
 Lemma splitr x : x = x / 2%:R + x / 2%:R.
-Proof. by rewrite -mulr2n -mulr_natr mulfVK //= pnatr_eq0. Qed.
+Proof. by rewrite -mulr2n -[RHS]mulr_natr mulfVK //= pnatr_eq0. Qed.
 
 (* lteif *)
 
@@ -3793,14 +3793,14 @@ Hint Resolve Creal_Re Creal_Im : core.
 Fact Re_is_additive : additive Re.
 Proof. by move=> x y; rewrite !ReE rmorphB addrACA -opprD mulrBl. Qed.
 #[export]
-HB.instance Definition _ := GRing.isAdditive.Build C C Re Re_is_additive.
+HB.instance Definition _ := isAdditive.Build C C Re Re_is_additive.
 
 Fact Im_is_additive : additive Im.
 Proof.
 by move=> x y; rewrite !ImE rmorphB opprD addrACA -opprD mulrBr mulrBl.
 Qed.
 #[export]
-HB.instance Definition _ := GRing.isAdditive.Build C C Im Im_is_additive.
+HB.instance Definition _ := isAdditive.Build C C Im Im_is_additive.
 
 Lemma Creal_ImP z : reflect ('Im z = 0) (z \is real).
 Proof.

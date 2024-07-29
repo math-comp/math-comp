@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype monoid ssrnat seq.
 From mathcomp Require Import choice fintype bigop finset tuple.
-From mathcomp Require Import div ssralg countalg binomial.
+From mathcomp Require Import div comoid ssralg countalg binomial.
 
 (******************************************************************************)
 (* This file provides a library for univariate polynomials over ring          *)
