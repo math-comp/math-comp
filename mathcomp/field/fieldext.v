@@ -1332,7 +1332,7 @@ suffices [L dimL [toPF [toL toPF_K toL_K]]]:
     by rewrite map_poly0 horner0 linear0 mod0p.
   rewrite rmorphD rmorphM /= map_polyX map_polyC hornerMXaddC linearD /=.
   rewrite linearZ /= -(rmorph1 toL) toL_K -modpZl alg_polyC modpD.
-  congr (_ + _); rewrite -toL_K rmorphM /= -/z; congr (toPF (_ * z)).
+  congr (_ + _); rewrite -toL_K rmorphM -/z; congr (toPF (_ * z)).
   by apply: (can_inj toPF_K); rewrite toL_K.
 pose toL q : vL := poly_rV (q %% p); pose toPF (x : vL) := rVpoly x.
 have toL_K q : toPF (toL q) = q %% p.

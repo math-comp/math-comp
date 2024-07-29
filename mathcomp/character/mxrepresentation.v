@@ -783,9 +783,8 @@ End GringMx.
 
 Lemma gring_mxK : cancel (gring_mx aG) gring_row.
 Proof.
-move=> a; rewrite /gring_mx /= mulmx_sum_row !linear_sum.
-rewrite {2}[a]row_sum_delta; apply: eq_bigr => i _.
-rewrite !linearZ /= /gring_row !(rowK, mxvecK).
+move=> a; rewrite /gring_mx /= mulmx_sum_row !linear_sum /= [RHS]row_sum_delta.
+apply: eq_bigr => i _; rewrite 2!linearZ /= /gring_row !(rowK, mxvecK).
 by rewrite gring_indexK // mul1g gring_valK.
 Qed.
 
@@ -1276,10 +1275,10 @@ Qed.
 
 Lemma envelop_mxM A B : (A \in E_G -> B \in E_G -> A *m B \in E_G)%MS.
 Proof.
-case/envelop_mxP=> a ->{A}; case/envelop_mxP=> b ->{B}.
+move=> {A B} /envelop_mxP[a ->] /envelop_mxP[b ->].
 rewrite mulmx_suml !linear_sum summx_sub //= => x Gx.
 rewrite !linear_sum summx_sub //= => y Gy.
-rewrite -scalemxAl !(linearZ, scalemx_sub) //= -repr_mxM //.
+rewrite -scalemxAl 3!linearZ !scalemx_sub//= -repr_mxM //.
 by rewrite envelop_mx_id ?groupM.
 Qed.
 
@@ -1315,7 +1314,7 @@ Lemma hom_envelop_mxC m f (W : 'M_(m, n)) A :
   (W <= dom_hom_mx f -> A \in E_G -> W *m A *m f = W *m f *m A)%MS.
 Proof.
 move/hom_mxP=> cWfG /envelop_mxP[a ->]; rewrite !linear_sum mulmx_suml.
-by apply: eq_bigr => x Gx; rewrite !linearZ -scalemxAl /= cWfG.
+by apply: eq_bigr => x Gx /=; rewrite -2!scalemxAr -scalemxAl cWfG.
 Qed.
 
 Lemma dom_hom_invmx f :
@@ -2329,7 +2328,7 @@ apply: (iffP row_fullP) => [[E' E'G] | [_ [a_ a_G]]].
   apply: (can_inj mxvecK); rewrite -{1}[mxvec B]mulmx1 -{}E'G mulmxA.
   move: {B E'}(_ *m E') => u; apply/rowP=> j.
   rewrite linear_sum (reindex h) //= mxE summxE.
-  by apply: eq_big => [k| k _]; rewrite ?Gh // enum_valK_in mxE linearZ !mxE.
+  by apply: eq_big => [k| k _]; rewrite ?Gh // enum_valK_in linearZ !mxE.
 exists (\matrix_(j, i) a_ (h i) (vec_mx (row j 1%:M))).
 apply/row_matrixP=> i; rewrite -[row i 1%:M]vec_mxK {}[vec_mx _]a_G.
 apply/rowP=> j; rewrite linear_sum (reindex h) //= 2!mxE summxE.
@@ -2783,8 +2782,7 @@ split=> [] [_ nzU simU].
   rewrite -(in_submodK sVU) -val_submod1 val_submodS.
   rewrite -(genmxE (in_submod U V)) simU ?genmxE ?submx1 //=.
     by rewrite (eqmx_module _ (genmxE _)) in_submod_module.
-  rewrite -submx0 genmxE -val_submodS in_submodK //.
-  by rewrite linear0 eqmx0 submx0.
+  by rewrite -submx0 genmxE -val_submodS in_submodK // linear0 eqmx0 submx0.
 apply/mx_irrP; rewrite lt0n mxrank_eq0; split=> // V modV.
 rewrite -(inj_eq val_submod_inj) linear0 -(eqmx_eq0 (genmxE _)) => nzV.
 rewrite -sub1mx -val_submodS val_submod1 -(genmxE (val_submod V)).
@@ -3974,7 +3972,7 @@ apply/rowP=> k /[1!mxE].
 have [x Gx def_k] := imsetP (enum_valP k).
 transitivity (@gring_proj F _ G x (vec_mx 0) 0 0); last first.
   by rewrite !linear0 !mxE.
-rewrite -{}v0 !linear_sum (bigD1 k) //= !linearZ /= rowK mxvecK def_k.
+rewrite -{}v0 !linear_sum (bigD1 k) //= 2!linearZ /= rowK mxvecK def_k.
 rewrite linear_sum (bigD1 x) ?class_refl //= gring_projE // eqxx.
 rewrite !big1 ?addr0 ?mxE ?mulr1 // => [k' | y /andP[xGy ne_yx]]; first 1 last.
   by rewrite gring_projE ?(groupCl Gx xGy) // eq_sym (negPf ne_yx).
@@ -4007,10 +4005,10 @@ rewrite !linear_sum {xG GxG}def_xG; apply: eq_big  => [y | xy] /=.
 case/imsetP=> y Gy ->{xy}; rewrite linearZ; congr (_ *: _).
 move/(canRL (repr_mxK aG Gy)): (centgmxP cGa y Gy); have Gy' := groupVr Gy.
 move/(congr1 (gring_proj x)); rewrite -mulmxA mulmx_suml !linear_sum.
-rewrite (bigD1 x Gx) big1 => [|z /andP[Gz]]; rewrite !linearZ /=; last first.
+rewrite (bigD1 x Gx) big1 => [|z /andP[Gz]]; rewrite linearZ /=; last first.
   by rewrite eq_sym gring_projE // => /negPf->; rewrite scaler0.
 rewrite gring_projE // eqxx scalemx1 (bigD1 (x ^ y)%g) ?groupJ //=.
-rewrite big1 => [|z /andP[Gz]]; rewrite -scalemxAl !linearZ /=.
+rewrite big1 => [|z /andP[Gz]]; rewrite -scalemxAl 2!linearZ /=.
   rewrite !addr0 -!repr_mxM ?groupM // mulgA mulKVg mulgK => /rowP/(_ 0).
   by rewrite gring_projE // eqxx scalemx1 !mxE.
 rewrite eq_sym -(can_eq (conjgKV y)) conjgK conjgE invgK.
@@ -4055,7 +4053,7 @@ apply/rV_subP=> v /rfix_mxP cGv.
 have /envelop_mxP[a def_v]: (gring_mx aG v \in R_G)%MS.
   by rewrite vec_mxK submxMl.
 suffices ->: v = a 1%g *: gring_row (gset_mx G) by rewrite scalemx_sub.
-rewrite -linearZ  scaler_sumr -[v]gring_mxK def_v; congr (gring_row _).
+rewrite -linearZ scaler_sumr -[v]gring_mxK def_v; congr (gring_row _).
 apply: eq_bigr => x Gx; congr (_ *: _).
 move/rowP/(_ 0): (congr1 (gring_proj x \o gring_mx aG) (cGv x Gx)).
 rewrite /= gring_mxJ // def_v mulmx_suml !linear_sum (bigD1 1%g) //=.
@@ -4268,7 +4266,7 @@ case/mx_rsim_def=> f [f' _ hom_f] ne_iG_j RjA.
 transitivity (f *m in_submod _ (val_submod 1%:M *m A) *m f').
   have{RjA}: (A \in R_G)%MS by rewrite -Wedderburn_sum (sumsmx_sup j).
   case/envelop_mxP=> a ->{A}; rewrite !(linear_sum, mulmx_suml).
-  by apply: eq_bigr => x Gx; rewrite !linearZ /= -scalemxAl -hom_f ?gring_opG.
+  by apply: eq_bigr => x Gx; rewrite 4!linearZ /= -scalemxAl -hom_f ?gring_opG.
 rewrite (_ : _ *m A = 0) ?(linear0, mul0mx) //.
 apply/row_matrixP=> i; rewrite row_mul row0 -[row _ _]gring_mxK -gring_row_mul.
 rewrite (Wedderburn_mulmx0 ne_iG_j) ?linear0 // genmxE mem_gring_mx.
@@ -4340,7 +4338,7 @@ have <-: (gring_mx aG (val_submod (v *m (f *m gring_op rG A *m f')))) = 0.
   by rewrite (eqP opA0) !(mul0mx, linear0).
 have: (A \in R_G)%MS by rewrite -Wedderburn_sum (sumsmx_sup iG).
 case/envelop_mxP=> a ->; rewrite !(linear_sum, mulmx_suml) /=; apply/eqP.
-apply: eq_bigr=> x Gx; rewrite !linearZ -scalemxAl !linearZ /=.
+apply: eq_bigr=> x Gx; rewrite 3!linearZ -scalemxAl 3!linearZ /=.
 by rewrite gring_opG // -hom_f // val_submodJ // gring_mxJ.
 Qed.
 
@@ -4370,7 +4368,7 @@ rewrite -(mxrankMfree _ inj_f); symmetry; rewrite -(eqmxMfull _ inj_f).
 have /envelop_mxP[e ->{i}]: ('e_i \in R_G)%MS.
   by rewrite -Wedderburn_sum (sumsmx_sup i) ?Wedderburn_id_mem.
 congr (\rank _ != _); rewrite !(mulmx_suml, linear_sum); apply: eq_bigr => x Gx.
-by rewrite !linearZ -scalemxAl /= !gring_opG ?hom_f.
+by rewrite 3!linearZ -scalemxAl /= !gring_opG ?hom_f.
 Qed.
 
 Lemma irr_reprK i : irr_comp (irr_repr i) = i.
@@ -5337,7 +5335,7 @@ have ->: A ^+ k *m mxval x^-1 = mxval (groot ^+ k / x).
   by rewrite mxvalM rmorphXn /= mxval_groot.
 rewrite [mxval _]horner_rVpoly; move: {k u x}(val _) => u.
 rewrite (mulmx_sum_row u) !linear_sum summx_sub //= => k _.
-rewrite !linearZ scalemx_sub //= rowK mxvecK -rowE.
+rewrite 2!linearZ scalemx_sub //= rowK mxvecK -rowE.
 by apply: eq_row_sub (mxvec_index i k) _; rewrite rowK mxvecE mxE.
 Qed.
 
@@ -5381,7 +5379,7 @@ Proof. by apply: (canLR in_genK); rewrite in_gen0. Qed.
 Lemma in_genN : {morph in_gen : W / - W}.
 Proof.
 move=> W; apply/matrixP=> i j; apply: val_inj.
-by rewrite !mxE !(mulNmx, linearN).
+by rewrite !mxE 4!(mulNmx, linearN).
 Qed.
 
 Lemma val_genN : {morph val_gen : W / - W}.
@@ -5535,7 +5533,7 @@ apply/row_subP=> i0; rewrite -val_gen_row row_mul; move: {i0 u}(row _ u) => u.
 rewrite mulmx_sum_row val_gen_sum summx_sub // => i _.
 rewrite val_genZ [mxval _]horner_rVpoly [_ *m Ad]mulmx_sum_row.
 rewrite !linear_sum summx_sub // => k _.
-rewrite !linearZ scalemx_sub {u}//= rowK mxvecK val_gen_row.
+rewrite 2!linearZ scalemx_sub {u}//= rowK mxvecK val_gen_row.
 by apply: (eq_row_sub (mxvec_index i k)); rewrite rowK mxvecE mxE.
 Qed.
 

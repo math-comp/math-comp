@@ -3208,7 +3208,7 @@ Variable f : {linear 'rV[R]_m -> 'rV[R]_n}.
 
 Lemma mul_rV_lin1 u : u *m lin1_mx f = f u.
 Proof.
-rewrite {2}[u]matrix_sum_delta big_ord1 linear_sum; apply/rowP=> i.
+rewrite [u in RHS]matrix_sum_delta big_ord1 linear_sum; apply/rowP=> i.
 by rewrite mxE summxE; apply: eq_bigr => j _; rewrite linearZ !mxE.
 Qed.
 

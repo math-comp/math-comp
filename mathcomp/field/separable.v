@@ -469,13 +469,10 @@ Fact extendDerivation_scalable_subproof E (adjEx := Fadjoin_poly E x) :
   let body y (p := adjEx y) := (map_poly D p).[x] + p^`().[x] * Dx E in
   scalable body.
 Proof.
-move: Dx => C /= a u.
-rewrite /adjEx linearZ /= -mul_polyC derivM derivC mul0r add0r -/adjEx.
-rewrite !hornerE /= -scalerAl mul1r raddfD /=.
-have ->: map_poly D (a%:A%:P * adjEx u) = a%:A%:P * map_poly D (adjEx u).
-  apply/polyP=> i; rewrite !mul_polyC !coef_map !coefZ !mulr_algl /= linearZ.
-  by rewrite coef_map.
-by rewrite !hornerE !mulr_algl -scalerAl.
+move: Dx => C /= a u; rewrite /adjEx linearZ /= derivZ -/adjEx.
+rewrite hornerE -[RHS]mulr_algl mulrDr mulrA -[in RHS]hornerZ.
+congr (_.[x] + _); apply/polyP=> i.
+by rewrite coefZ !coef_map coefZ !mulr_algl /= linearZ.
 Qed.
 
 Section DerivationLinear.

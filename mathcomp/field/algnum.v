@@ -420,7 +420,7 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
   have hom_f: kHom 1 (ASpace algK) f.
     apply/kHomP; split=> [_ _ /memK[y1 ->] /memK[y2 ->] |_ /vlineP[a ->]].
       by rewrite -rmorphM !Df !rmorphM.
-    by rewrite -(rmorph1 in01) -linearZ /= Df /= {1}linearZ /= rmorph1.
+    by rewrite -(rmorph_alg in01) Df /= !rmorph_alg.
   pose pr := map_poly (in_alg Qr) p.
   have Qpr: pr \is a polyOver 1%VS.
     by apply/polyOverP=> i; rewrite coef_map memvZ ?memv_line.

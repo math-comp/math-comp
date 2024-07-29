@@ -108,12 +108,8 @@ Proof. by []. Qed.
 Lemma trowb_is_linear n1 m2 n2 (B : 'M_(m2,n2)) : linear (@trowb n1 m2 n2 B).
 Proof.
 elim: n1=> [|n1 IH] //= k A1 A2 /=; first by rewrite scaler0 add0r.
-rewrite linearD /= linearZ.
--apply/matrixP=> i j.
-rewrite !mxE.
-case: split=> a.
-  by rewrite !mxE mulrDl mulrA.
-by rewrite linearD /= linearZ IH !mxE.
+rewrite !linearD /= !linearZ /= IH 2!mxE.
+by rewrite scalerDl -scalerA -add_row_mx -scale_row_mx.
 Qed.
 
 HB.instance Definition _ n1 m2 n2 B :=
@@ -231,10 +227,9 @@ Proof.
 elim: m n A B => [|m IH] n A B //=.
   by rewrite [A]flatmx0 mxtrace0 mul0r.
 rewrite tprod_tr -block_mxEv mxtrace_block IH.
-rewrite linearZ /= -mulrDl; congr (_ * _).
-rewrite -trace_mx11 .
+rewrite linearZ/= -mulrDl -trace_mx11; congr (_ * _).
 pose A1 := A : 'M_(1 + m).
-rewrite -{3}[A](@submxK _ 1 m 1 m A1).
+rewrite -[A in RHS](@submxK _ 1 m 1 m A1).
 by rewrite (@mxtrace_block _ _ _ (ulsubmx A1)).
 Qed.
 
@@ -532,7 +527,7 @@ Lemma xcfun_repr n rG A : xcfun (@cfRepr n rG) A = \tr (gring_op rG A).
 Proof.
 rewrite gring_opE [gring_row A]row_sum_delta !linear_sum /xcfun !mxE.
 apply: eq_bigr => i _; rewrite !mxE /= !linearZ cfunE enum_valP /=.
-by congr (_ * \tr _) => {A} /=; rewrite /gring_mx /= -rowE rowK mxvecK.
+by congr (_ * \tr _); rewrite {A}/gring_mx /= -rowE rowK mxvecK.
 Qed.
 
 End Char.
