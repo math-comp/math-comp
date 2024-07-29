@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import fintype div path tuple bigop prime finset.
+From mathcomp Require Import fintype div path tuple bigop prime finset monoid.
 
 (******************************************************************************)
 (*                               Finite groups                                *)
@@ -134,10 +134,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Declare Scope group_scope.
 Declare Scope Group_scope.
 
-Delimit Scope group_scope with g.
 Delimit Scope Group_scope with G.
 
 (* This module can be imported to open the scope for group element *)
