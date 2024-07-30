@@ -767,7 +767,7 @@ Notation copy T C := (ArchiRealDomain.copy T C).
   note="Use Num.ArchiRealDomain.on instead.")]
 Notation on T := (ArchiRealDomain.on T).
 End ArchiDomain.
-#[deprecated(since="mathcomp 2.3.0", note="Use ArchiRealField instead.")]
+#[deprecated(since="mathcomp 2.3.0", note="Use Num.ArchiRealField instead.")]
 Notation ArchiField T := (ArchiRealField T).
 Module ArchiField.
 #[deprecated(since="mathcomp 2.3.0",
