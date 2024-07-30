@@ -3588,7 +3588,8 @@ Qed.
 
 End RealClosedFieldTheory.
 
-Notation "z ^*" := (conj_op z) (at level 2, format "z ^*") : ring_scope.
+Notation "z ^*" := (conj_op z)
+  (at level 2, format "z ^*", left associativity) : ring_scope.
 Notation "'i" := imaginary (at level 0) : ring_scope.
 
 Section ClosedFieldTheory.
