@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
-From mathcomp Require Import ssrAC choice tuple bigop ssralg poly polydiv.
-From mathcomp Require Import generic_quotient.
+From mathcomp Require Import ssrAC choice tuple bigop comoid ssralg poly.
+From mathcomp Require Import polydiv generic_quotient.
 
 (******************************************************************************)
 (*                  Field of fraction of an integral domain                   *)
@@ -212,7 +212,7 @@ by rewrite mulr1 mulr0 mulNr addNr.
 Qed.
 
 (* fracions form an abelian group *)
-HB.instance Definition _ := GRing.isZmodule.Build type addA addC add0_l addN_l.
+HB.instance Definition _ := isZmodule.Build type addA addC add0_l addN_l.
 
 Lemma mulA : associative mul.
 Proof.
@@ -298,7 +298,7 @@ rewrite -[X in _ = _ + X]pi_opp -[RHS]pi_add.
 by rewrite /addf /oppf /= !numden_Ratio ?(oner_neq0, mul1r, mulr1).
 Qed.
 
-HB.instance Definition _ := GRing.isAdditive.Build R {fraction R} tofrac
+HB.instance Definition _ := isAdditive.Build R {fraction R} tofrac
   tofrac_is_additive.
 
 Lemma tofrac_is_multiplicative: multiplicative tofrac.

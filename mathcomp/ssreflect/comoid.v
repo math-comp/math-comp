@@ -2,7 +2,7 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
 From mathcomp Require Import fintype finfun monoid.
 
-Open Scope group_scope.
+Local Open Scope group_scope.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

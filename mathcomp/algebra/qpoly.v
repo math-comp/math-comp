@@ -2,9 +2,9 @@ From HB Require Import structures.
 From mathcomp
 Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice fintype tuple.
 From mathcomp
-Require Import bigop binomial finset finfun ssralg countalg finalg poly polydiv.
+Require Import bigop binomial finset finfun comoid ssralg countalg finalg poly.
 From mathcomp
-Require Import perm fingroup matrix mxalgebra mxpoly vector countalg.
+Require Import polydiv perm fingroup matrix mxalgebra mxpoly vector countalg.
 
 (******************************************************************************)
 (* This file defines the algebras R[X]/<p> and their theory.                  *)
@@ -642,7 +642,7 @@ Proof. by move=> x y; rewrite qpolyCD qpolyCN. Qed.
 Lemma qpolyC_is_multiplicative : multiplicative (qpolyC h).
 Proof. by split=> // x y; rewrite qpolyCM. Qed.
 
-HB.instance Definition _ := GRing.isAdditive.Build A {poly %/ h} (qpolyC h)
+HB.instance Definition _ := isAdditive.Build A {poly %/ h} (qpolyC h)
   qpolyC_is_additive.
 HB.instance Definition _ :=
   GRing.isMultiplicative.Build A {poly %/ h} (qpolyC h)

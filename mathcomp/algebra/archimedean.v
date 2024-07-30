@@ -2,7 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop order ssralg poly ssrnum ssrint.
+From mathcomp Require Import fintype bigop order comoid ssralg poly ssrnum.
+From mathcomp Require Import ssrint.
 
 (******************************************************************************)
 (*                           Archimedean structures                           *)
@@ -224,10 +225,10 @@ have/trunc_itv/andP[lefx ltxf1]: 0 <= x by apply: le_trans lemx; apply: ler0n.
 by rewrite -!(ltr_nat R) 2?(@le_lt_trans _ _ x).
 Qed.
 
-Lemma natrK : cancel (GRing.natmul 1) trunc.
+Lemma natrK : cancel (natmul 1) trunc.
 Proof. by move=> m; apply: trunc_def; rewrite ler_nat ltr_nat ltnS leqnn. Qed.
 
-Lemma truncK : {in nat_num, cancel trunc (GRing.natmul 1)}.
+Lemma truncK : {in nat_num, cancel trunc (natmul 1)}.
 Proof. by move=> x; rewrite natrE => /eqP. Qed.
 
 Lemma trunc0 : trunc 0 = 0%N. Proof. exact: natrK 0%N. Qed.
@@ -573,7 +574,7 @@ Variables (U V : lmodType R) (f : {additive U -> V}).
 Lemma raddfZ_nat a u : a \is a nat_num -> f (a *: u) = a *: f u.
 Proof. by move=> /natrP[n ->]; apply: raddfZnat. Qed.
 
-Lemma rpredZ_nat (S : addrClosed V) :
+Lemma rpredZ_nat (S : addgClosed V) :
   {in nat_num & S, forall z u, z *: u \in S}.
 Proof. by move=> _ u /natrP[n ->]; apply: rpredZnat. Qed.
 

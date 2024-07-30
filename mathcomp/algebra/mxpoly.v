@@ -2,8 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
-From mathcomp Require Import div fintype tuple finfun bigop fingroup perm.
-From mathcomp Require Import ssralg zmodp matrix mxalgebra poly polydiv.
+From mathcomp Require Import div monoid fintype tuple finfun bigop fingroup.
+From mathcomp Require Import perm comoid ssralg zmodp matrix mxalgebra poly.
+From mathcomp Require Import polydiv.
 
 (******************************************************************************)
 (*   This file provides basic support for formal computation with matrices,   *)
@@ -495,7 +496,7 @@ have bij_phi: bijective phi.
     by case: leqP => // P_le_k; rewrite nth_default ?mxE.
   apply/polyP=> k; apply/matrixP=> i j; rewrite coef_phi mxE coef_poly.
   by case: leqP => // P_le_k; rewrite nth_default ?mxE.
-pose phiaM := GRing.isAdditive.Build _ _ phi phi_is_additive.
+pose phiaM := isAdditive.Build _ _ phi phi_is_additive.
 pose phimM := GRing.isMultiplicative.Build _ _ phi phi_is_multiplicative.
 pose phiRM : GRing.RMorphism.type _ _ := HB.pack phi phiaM phimM.
 exists phiRM; split=> // [p | A]; apply/polyP=> k; apply/matrixP=> i j.

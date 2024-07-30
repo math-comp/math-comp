@@ -1,9 +1,9 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div.
-From mathcomp Require Import fintype bigop prime finset fingroup morphism.
-From mathcomp Require Import perm action quotient gproduct cyclic center.
-From mathcomp Require Import pgroup nilpotent sylow hall abelian.
+From mathcomp Require Import fintype bigop prime finset monoid fingroup.
+From mathcomp Require Import morphism perm action quotient gproduct cyclic.
+From mathcomp Require Import center pgroup nilpotent sylow hall abelian.
 
 (******************************************************************************)
 (*  Definition of Frobenius groups, some basic results, and the Frobenius     *)

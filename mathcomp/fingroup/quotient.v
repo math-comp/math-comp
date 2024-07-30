@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
-From mathcomp Require Import choice fintype prime finset fingroup morphism.
-From mathcomp Require Import automorphism.
+From mathcomp Require Import choice fintype prime finset monoid fingroup.
+From mathcomp Require Import morphism automorphism.
 
 (******************************************************************************)
 (* This file contains the definitions of:                                     *)

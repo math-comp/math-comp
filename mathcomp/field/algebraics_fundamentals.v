@@ -3,10 +3,10 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
 From mathcomp Require Import div fintype path tuple bigop finset prime order.
-From mathcomp Require Import ssralg poly polydiv mxpoly countalg closed_field.
-From mathcomp Require Import ssrnum ssrint archimedean rat intdiv fingroup.
-From mathcomp Require Import finalg zmodp cyclic pgroup sylow vector falgebra.
-From mathcomp Require Import fieldext separable galois.
+From mathcomp Require Import comoid ssralg poly polydiv mxpoly countalg.
+From mathcomp Require Import closed_field ssrnum ssrint archimedean rat intdiv.
+From mathcomp Require Import monoid fingroup finalg zmodp cyclic pgroup sylow.
+From mathcomp Require Import vector falgebra fieldext separable galois.
 
 (******************************************************************************)
 (*   The main result in this file is the existence theorem that underpins the *)
@@ -321,12 +321,13 @@ have ofQ_K z: cancel (ofQ z) (inQ z).
 have sQring z: divring_closed (sQ z).
   have sQ_1: 1 \in sQ z by rewrite -(rmorph1 (ofQ z)) sQof.
   by split=> // x y /inQ_K<- /inQ_K<- /=; rewrite -(rmorphB, fmorph_div) sQof.
-pose sQoM z := GRing.isOppClosed.Build _ _ (sQring z).
-pose sQaM z := GRing.isAddClosed.Build _ _ (sQring z).
+have sQzmod z: zmod_closed (sQ z).
+  by case: (sQring z) => z1 zsub _; split=> //; rewrite -(subrr 1); apply/zsub.
+pose sQzM z := isZmodClosed.Build _ _ (sQzmod z).
 pose sQmM z := GRing.isMulClosed.Build _ _ (sQring z).
 pose sQiM z := GRing.isInvClosed.Build _ _ (sQring z).
 pose sQC z : divringClosed _ := HB.pack (sQ z)
-  (sQaM z) (sQoM z) (sQmM z) (sQiM z).
+  (sQzM z) (sQmM z) (sQiM z).
 pose morph_ofQ x z Qxz := forall u, ofQ z (Qxz u) = ofQ x u.
 have QtoQ z x: x \in sQ z -> {Qxz : 'AHom(Q x, Q z) | morph_ofQ x z Qxz}.
   move=> z_x; pose Qxz u := inQ z (ofQ x u).
@@ -336,7 +337,7 @@ have QtoQ z x: x \in sQ z -> {Qxz : 'AHom(Q x, Q z) | morph_ofQ x z Qxz}.
   have Qxzm : multiplicative Qxz.
     by split=> [u v|]; apply: (canLR (ofQ_K z));
       rewrite ?rmorph1 ?rmorphM /= ?QxzE.
-  have QxzaM := GRing.isAdditive.Build _ _ _ Qxza.
+  have QxzaM := isAdditive.Build _ _ _ Qxza.
   have QxzmM := GRing.isMultiplicative.Build _ _ _ Qxzm.
   have QxzlM := GRing.isScalable.Build _ _ _ _ _ (rat_linear Qxza).
   pose QxzLRM : {lrmorphism _ -> _} := HB.pack Qxz QxzaM QxzmM QxzlM.
@@ -608,7 +609,7 @@ have some_realC: realC.
       exact: can2_additive (inj_can_sym QfK (fmorph_inj _)) QfK.
     have fM : multiplicative f.
       exact: can2_rmorphism (inj_can_sym QfK (fmorph_inj _)) QfK.
-    pose faM := GRing.isAdditive.Build _ _ _ fA.
+    pose faM := isAdditive.Build _ _ _ fA.
     pose fmM := GRing.isMultiplicative.Build _ _ _ fM.
     pose fRM : GRing.RMorphism.type _ _ := HB.pack f faM fmM.
     by exists 0, rat; exact: fRM.
@@ -884,7 +885,7 @@ have conjM : multiplicative conj.
     have [m [le_xm le_ym le_xym]] := maxn3 (n_ x) (n_ y) (n_ (x * y)).
     by rewrite !(conjE m) // (inFTA m x) // (inFTA m y) -?rmorphM /conj_ ?ofQ_K.
   by rewrite /conj -/n1 -(rmorph1 (ofQ (z_ n1))) /conj_ ofQ_K !rmorph1.
-have conjaM := GRing.isAdditive.Build _ _ _ conjA.
+have conjaM := isAdditive.Build _ _ _ conjA.
 have conjmM := GRing.isMultiplicative.Build _ _ _ conjM.
 pose conjRM : GRing.RMorphism.type _ _ := HB.pack conj conjaM conjmM.
 exists conjRM => [z | /(_ i)/eqP/idPn[]] /=.

@@ -2,10 +2,11 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype div tuple bigop prime finset fingroup.
-From mathcomp Require Import ssralg poly polydiv morphism action countalg.
-From mathcomp Require Import finalg zmodp cyclic center pgroup abelian matrix.
-From mathcomp Require Import mxpoly vector falgebra fieldext separable galois.
+From mathcomp Require Import fintype div tuple bigop prime finset monoid.
+From mathcomp Require Import fingroup comoid ssralg poly polydiv morphism.
+From mathcomp Require Import action countalg finalg zmodp cyclic center pgroup.
+From mathcomp Require Import abelian matrix mxpoly vector falgebra fieldext.
+From mathcomp Require Import separable galois.
 From mathcomp Require ssrnum ssrint archimedean algC cyclotomic.
 
 (******************************************************************************)
@@ -397,7 +398,7 @@ have fM : multiplicative f.
 have fZ: scalable f.
   move=> a x; rewrite -[in LHS]mulr_algl fM.
   by rewrite (idfP _ _) ?mulr_algl ?memvZ // memv_line.
-pose faM := GRing.isAdditive.Build _ _ f fA.
+pose faM := isAdditive.Build _ _ f fA.
 pose fmM := GRing.isMultiplicative.Build _ _ f fM.
 pose flM := GRing.isScalable.Build _ _ _ _ f fZ.
 pose fLRM : {lrmorphism _ -> _} := HB.pack f faM fmM flM.

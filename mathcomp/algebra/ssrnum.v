@@ -91,6 +91,7 @@ Reserved Notation "'Re z" (at level 10, z at level 8).
 Reserved Notation "'Im z" (at level 10, z at level 8).
 
 Local Open Scope order_scope.
+Local Open Scope group_scope.
 Local Open Scope ring_scope.
 Import Order.TTheory GRing.Theory.
 
