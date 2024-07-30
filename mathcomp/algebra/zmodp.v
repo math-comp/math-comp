@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool choice eqtype ssrnat seq div.
-From mathcomp Require Import fintype bigop finset prime fingroup.
-From mathcomp Require Import ssralg finalg countalg.
+From mathcomp Require Import fintype bigop finset prime monoid fingroup.
+From mathcomp Require Import comoid ssralg finalg countalg.
 
 (******************************************************************************)
 (*  Definition of the additive group and ring Zp, represented as 'I_p         *)
@@ -149,7 +149,7 @@ by move=> x; apply: val_inj; rewrite /= modnDml subnK ?modnn // ltnW.
 Qed.
 
 HB.instance Definition _ :=
-  GRing.isZmodule.Build 'I_p (@Zp_addA _) (@Zp_addC _) Zp_add0z Zp_addNz.
+  isZmodule.Build 'I_p (@Zp_addA _) (@Zp_addC _) Zp_add0z Zp_addNz.
 
 HB.instance Definition _ := [finGroupMixin of 'I_p for +%R].
 

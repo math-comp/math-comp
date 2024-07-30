@@ -2,9 +2,10 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime.
-From mathcomp Require Import ssralg poly finset fingroup finalg zmodp cyclic.
-From mathcomp Require Import ssrnum ssrint archimedean polydiv intdiv mxpoly.
-From mathcomp Require Import rat vector falgebra fieldext separable galois algC.
+From mathcomp Require Import comoid ssralg poly finset fingroup finalg zmodp.
+From mathcomp Require Import cyclic ssrnum ssrint archimedean polydiv intdiv.
+From mathcomp Require Import mxpoly rat vector falgebra fieldext separable.
+From mathcomp Require Import galois algC.
 
 (******************************************************************************)
 (* This file provides few basic properties of cyclotomic polynomials.         *)
@@ -273,7 +274,7 @@ rewrite prime_coprime // (dvdn_charf (char_Fp p_pr)) => /co_fg {co_fg}.
 have charFpX: p \in [char {poly 'F_p}] by rewrite (rmorph_char polyC) ?char_Fp.
 rewrite -(coprimep_pexpr _ _ (prime_gt0 p_pr)) -(Frobenius_autE charFpX).
 rewrite -[g]comp_polyXr map_comp_poly -horner_map /= Frobenius_autE -rmorphXn.
-rewrite -!map_poly_comp (@eq_map_poly _ _ _ (polyC \o *~%R 1)); last first.
+rewrite -!map_poly_comp (@eq_map_poly _ _ _ (polyC \o *~%R 1%R)); last first.
   by move=> a; rewrite /= !rmorph_int.
 rewrite map_poly_comp -[_.[_]]map_comp_poly /= => co_fg.
 suffices: coprimep (pZtoC f) (pZtoC (g \Po 'X^p)).

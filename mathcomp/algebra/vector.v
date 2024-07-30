@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop finfun tuple.
-From mathcomp Require Import ssralg matrix mxalgebra zmodp.
+From mathcomp Require Import comoid ssralg matrix mxalgebra zmodp.
 
 (******************************************************************************)
 (*                    Finite dimensional vector spaces                        *)
@@ -864,7 +864,8 @@ Lemma directv_sum_independent {Us : I -> {vspace vT}} :
 Proof.
 apply: (iffP directv_sumP) => [dxU us Uu u_0 i Pi | dxU i Pi].
   apply/eqP; rewrite -memv0 -(dxU i Pi) memv_cap Uu //= -memvN -sub0r -{1}u_0.
-  by rewrite (bigD1 i) //= addrC addKr memv_sumr // => j /andP[/Uu].
+  rewrite (bigD1 i) //=.
+  by rewrite addrC addrK memv_sumr // => j /andP[/Uu].
 apply/eqP; rewrite -subv0; apply/subvP=> v.
 rewrite memv_cap memv0 => /andP[Uiv /memv_sumP[us Uu Dv]].
 have: \sum_(j | P j) [eta us with i |-> - v] j = 0.
@@ -1311,7 +1312,7 @@ Proof. by move=> f; apply/lfunP=> v; rewrite lfunE /= lfunE add0r. Qed.
 Lemma lfun_addN : left_inverse zero_lfun opp_lfun add_lfun.
 Proof. by move=> f; apply/lfunP=> v; rewrite !lfunE /= lfunE addNr. Qed.
 
-HB.instance Definition _ := GRing.isZmodule.Build 'Hom(aT, rT)
+HB.instance Definition _ := isZmodule.Build 'Hom(aT, rT)
   lfun_addA lfun_addC lfun_add0 lfun_addN.
 
 Lemma zero_lfunE x : (0 : 'Hom(aT, rT)) x = 0. Proof. exact: lfunE. Qed.

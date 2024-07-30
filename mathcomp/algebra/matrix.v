@@ -2,8 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import fintype finfun finset fingroup perm order div.
-From mathcomp Require Import prime binomial ssralg countalg finalg zmodp bigop.
+From mathcomp Require Import fintype finfun finset monoid fingroup perm order.
+From mathcomp Require Import div prime binomial comoid ssralg countalg finalg .
+From mathcomp Require Import zmodp bigop.
 
 (******************************************************************************)
 (* Basic concrete linear algebra : definition of type for matrices, and all   *)
@@ -1628,7 +1629,7 @@ Definition addmxA : associative addmx := map2_mxA.
 Definition addmxC : commutative addmx := map2_mxC.
 Definition add0mx : left_id (const_mx 0) addmx := map2_1mx.
 
-HB.instance Definition _ := GRing.isNmodule.Build 'M[V]_(m, n)
+HB.instance Definition _ := isNmodule.Build 'M[V]_(m, n)
   addmxA addmxC add0mx.
 
 Lemma mulmxnE A d i j : (A *+ d) i j = A i j *+ d.
@@ -1640,7 +1641,7 @@ Proof. by apply: (big_morph (fun A => A i j)) => [A B|]; rewrite mxE. Qed.
 
 Lemma const_mx_is_semi_additive : semi_additive const_mx.
 Proof. by split=> [|a b]; apply/matrixP => // i j; rewrite !mxE. Qed.
-HB.instance Definition _ := GRing.isSemiAdditive.Build V 'M[V]_(m, n) const_mx
+HB.instance Definition _ := isSemiAdditive.Build V 'M[V]_(m, n) const_mx
   const_mx_is_semi_additive.
 
 End FixedDim.
@@ -1654,12 +1655,12 @@ Definition swizzle_mx k (A : 'M[V]_(m, n)) :=
 
 Lemma swizzle_mx_is_semi_additive k : semi_additive (swizzle_mx k).
 Proof. by split=> [|A B]; apply/matrixP => i j; rewrite !mxE. Qed.
-HB.instance Definition _ k := GRing.isSemiAdditive.Build 'M_(m, n) 'M_(p, q)
+HB.instance Definition _ k := isSemiAdditive.Build 'M_(m, n) 'M_(p, q)
   (swizzle_mx k) (swizzle_mx_is_semi_additive k).
 
 End SemiAdditive.
 
-Local Notation SwizzleAdd op := (GRing.Additive.copy op (swizzle_mx _ _ _)).
+Local Notation SwizzleAdd op := (Additive.copy op (swizzle_mx _ _ _)).
 
 HB.instance Definition _ m n := SwizzleAdd (@trmx V m n).
 HB.instance Definition _ m n i := SwizzleAdd (@row V m n i).
@@ -1676,7 +1677,7 @@ HB.instance Definition _ m n1 n2 := SwizzleAdd (@rsubmx V m n1 n2).
 HB.instance Definition _ m1 m2 n := SwizzleAdd (@usubmx V m1 m2 n).
 HB.instance Definition _ m1 m2 n := SwizzleAdd (@dsubmx V m1 m2 n).
 HB.instance Definition _ m n := SwizzleAdd (@vec_mx V m n).
-HB.instance Definition _ m n := GRing.isSemiAdditive.Build 'M_(m, n) 'rV_(m * n)
+HB.instance Definition _ m n := isSemiAdditive.Build 'M_(m, n) 'rV_(m * n)
   mxvec (can2_semi_additive (@vec_mxK V m n) mxvecK).
 
 Lemma flatmx0 n : all_equal_to (0 : 'M_(0, n)).
@@ -1956,7 +1957,7 @@ Lemma diag_mx_is_semi_additive n : semi_additive (@diag_mx n).
 Proof.
 by split=> [|A B]; apply/matrixP => i j; rewrite !mxE ?mul0rn// mulrnDl.
 Qed.
-HB.instance Definition _ n := GRing.isSemiAdditive.Build 'rV_n 'M_n (@diag_mx n)
+HB.instance Definition _ n := isSemiAdditive.Build 'rV_n 'M_n (@diag_mx n)
   (@diag_mx_is_semi_additive n).
 
 Lemma diag_mx_row m n (l : 'rV_n) (r : 'rV_m) :
@@ -1999,7 +2000,7 @@ Proof. by apply/matrixP=> i j; rewrite !mxE eq_sym. Qed.
 
 Lemma scalar_mx_is_semi_additive : semi_additive scalar_mx.
 Proof. by split=> [|a b]; rewrite -!diag_const_mx ?raddf0// !raddfD. Qed.
-HB.instance Definition _ := GRing.isSemiAdditive.Build V 'M_n scalar_mx
+HB.instance Definition _ := isSemiAdditive.Build V 'M_n scalar_mx
   scalar_mx_is_semi_additive.
 
 Definition is_scalar_mx (A : 'M[V]_n) :=
@@ -2062,7 +2063,7 @@ split=> [|A B].
   by rewrite big_const_idem //= addr0.
 - by rewrite -big_split /=; apply: eq_bigr => i _; rewrite mxE.
 Qed.
-HB.instance Definition _ := GRing.isSemiAdditive.Build 'M_n V mxtrace
+HB.instance Definition _ := isSemiAdditive.Build 'M_n V mxtrace
   mxtrace_is_semi_additive.
 
 Lemma mxtrace0 : \tr 0 = 0. Proof. exact: raddf0. Qed.
@@ -2115,7 +2116,7 @@ Proof. by apply/matrixP=> i j; rewrite !mxE raddfD. Qed.
 Definition map_mx_sum := big_morph _ map_mxD map_mx0.
 
 HB.instance Definition _ :=
-  GRing.isSemiAdditive.Build 'M[aR]_(m, n) 'M[rR]_(m, n) (map_mx f)
+  isSemiAdditive.Build 'M[aR]_(m, n) 'M[rR]_(m, n) (map_mx f)
     (map_mx0, map_mxD).
 
 End MapNmodMatrix.
@@ -2135,12 +2136,12 @@ Definition oppmx := @map_mx V V -%R m n.
 Lemma addNmx : left_inverse (const_mx 0) oppmx (@addmx V m n).
 Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE addNr. Qed.
 
-HB.instance Definition _ := GRing.Nmodule_isZmodule.Build 'M[V]_(m, n)
+HB.instance Definition _ := Nmodule_isZmodule.Build 'M[V]_(m, n)
   addNmx.
 
 Lemma const_mx_is_additive : additive const_mx.
 Proof. by move=> a b; apply/matrixP=> i j; rewrite !mxE. Qed.
-HB.instance Definition _ := GRing.isAdditive.Build V 'M[V]_(m, n) const_mx
+HB.instance Definition _ := isAdditive.Build V 'M[V]_(m, n) const_mx
   const_mx_is_additive.
 
 End FixedDim.
@@ -2151,12 +2152,12 @@ Variables (m n p q : nat) (f : 'I_p -> 'I_q -> 'I_m) (g : 'I_p -> 'I_q -> 'I_n).
 
 Lemma swizzle_mx_is_additive k : additive (swizzle_mx f g k).
 Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE. Qed.
-HB.instance Definition _ k := GRing.isAdditive.Build 'M_(m, n) 'M_(p, q)
+HB.instance Definition _ k := isAdditive.Build 'M_(m, n) 'M_(p, q)
   (swizzle_mx f g k) (swizzle_mx_is_additive k).
 
 End Additive.
 
-Local Notation SwizzleAdd op := (GRing.Additive.copy op (swizzle_mx _ _ _)).
+Local Notation SwizzleAdd op := (Additive.copy op (swizzle_mx _ _ _)).
 
 HB.instance Definition _ m n := SwizzleAdd (@trmx V m n).
 HB.instance Definition _ m n i := SwizzleAdd (@row V m n i).
@@ -2173,7 +2174,7 @@ HB.instance Definition _ m n1 n2 := SwizzleAdd (@rsubmx V m n1 n2).
 HB.instance Definition _ m1 m2 n := SwizzleAdd (@usubmx V m1 m2 n).
 HB.instance Definition _ m1 m2 n := SwizzleAdd (@dsubmx V m1 m2 n).
 HB.instance Definition _ m n := SwizzleAdd (@vec_mx V m n).
-HB.instance Definition _ m n := GRing.isAdditive.Build 'M_(m, n) 'rV_(m * n)
+HB.instance Definition _ m n := isAdditive.Build 'M_(m, n) 'rV_(m * n)
   mxvec (can2_additive (@vec_mxK V m n) mxvecK).
 
 Ltac split_mxE := apply/matrixP=> i j; do ![rewrite mxE | case: split => ?].
@@ -2196,7 +2197,7 @@ Lemma diag_mx_is_additive n : additive (@diag_mx V n).
 Proof.
 by move=>A B; apply/matrixP=>i j; rewrite !mxE mulrnBl.
 Qed.
-HB.instance Definition _ n := GRing.isAdditive.Build 'rV_n 'M_n (@diag_mx V n)
+HB.instance Definition _ n := isAdditive.Build 'rV_n 'M_n (@diag_mx V n)
   (@diag_mx_is_additive n).
 
 (* Scalar matrix : a diagonal matrix with a constant on the diagonal *)
@@ -2206,7 +2207,7 @@ Variable n : nat.
 
 Lemma scalar_mx_is_additive : additive (@scalar_mx V n).
 Proof. by move=> a b; rewrite -!diag_const_mx !raddfB. Qed.
-HB.instance Definition _ := GRing.isAdditive.Build V 'M_n scalar_mx
+HB.instance Definition _ := isAdditive.Build V 'M_n scalar_mx
   scalar_mx_is_additive.
 
 End ScalarMx.
@@ -2221,7 +2222,7 @@ Proof.
 move=>A B; rewrite -sumrN -big_split /=.
 by apply: eq_bigr=> i _; rewrite !mxE.
 Qed.
-HB.instance Definition _ := GRing.isAdditive.Build 'M_n V (@mxtrace V n)
+HB.instance Definition _ := isAdditive.Build 'M_n V (@mxtrace V n)
   mxtrace_is_additive.
 
 End Trace.
@@ -2242,7 +2243,7 @@ Lemma map_mxB A B : (A - B)^f = A^f - B^f.
 Proof. by rewrite map_mxD map_mxN. Qed.
 
 HB.instance Definition _ :=
-  GRing.isAdditive.Build 'M[aR]_(m, n) 'M[rR]_(m, n) (map_mx f) map_mxB.
+  isAdditive.Build 'M[aR]_(m, n) 'M[rR]_(m, n) (map_mx f) map_mxB.
 
 End MapZmodMatrix.
 
@@ -3238,7 +3239,7 @@ Proof. by rewrite mul_rV_lin !mxvecK. Qed.
 
 End LinMatrix.
 HB.instance Definition _ m n p A :=
-  GRing.isAdditive.Build 'M_(n, p) 'M_(m, p) (mulmx A) (mulmxBr A).
+  isAdditive.Build 'M_(n, p) 'M_(m, p) (mulmx A) (mulmxBr A).
 
 Section Mulmxr.
 
@@ -4195,28 +4196,28 @@ Lemma mxOver0 S : 0 \in S -> 0 \is a @mxOver m n _ S.
 Proof. exact: mxOver_const. Qed.
 
 Section mxOverAdd.
-Variable addS : addrClosed M.
+Variable addS : addgClosed M.
 Fact mxOver_add_subproof : addr_closed (@mxOver m n _ addS).
 Proof.
 split=> [|p q Sp Sq]; first by rewrite mxOver0 // ?rpred0.
 by apply/mxOverP=> i j; rewrite mxE rpredD // !(mxOverP _).
 Qed.
 HB.instance Definition _ :=
-  GRing.isAddClosed.Build 'M[M]_(m, n) (mxOver_pred addS)
+  isAddClosed.Build 'M[M]_(m, n) (mxOver_pred addS)
     mxOver_add_subproof.
 End mxOverAdd.
 
 Section mxOverOpp.
-Variable oppS : opprClosed M.
+Variable oppS : oppgClosed M.
 Fact mxOver_opp_subproof : oppr_closed (@mxOver m n _ oppS).
 Proof. by move=> A /mxOverP SA; apply/mxOverP=> i j; rewrite mxE rpredN. Qed.
 HB.instance Definition _ :=
-  GRing.isOppClosed.Build 'M[M]_(m, n) (mxOver_pred oppS)
+  isOppClosed.Build 'M[M]_(m, n) (mxOver_pred oppS)
     mxOver_opp_subproof.
 End mxOverOpp.
 
 HB.instance Definition _ (zmodS : zmodClosed M) :=
-  GRing.OppClosed.on (mxOver_pred zmodS).
+  OppClosed.on (mxOver_pred zmodS).
 
 End mxOverZmodule.
 
@@ -4648,11 +4649,15 @@ Implicit Type (s : 'I_sq).
 
 Lemma mul_mxrow m n' (A : 'M[R]_(m, n')) (R_ : forall j, 'M[R]_(n', q_ j)) :
   A *m \mxrow_j R_ j= \mxrow_j (A *m R_ j).
-Proof. by apply/matrixP=> i s; rewrite !mxE; under eq_bigr do rewrite !mxE. Qed.
+Proof.
+by apply/matrixP=> i s; rewrite !mxE; under [LHS]eq_bigr do rewrite !mxE.
+Qed.
 
 Lemma mul_submxrow m n' (A : 'M[R]_(m, n')) (B : 'M[R]_(n', sq)) j :
   A *m submxrow B j= submxrow (A *m B) j.
-Proof. by apply/matrixP=> i s; rewrite !mxE; under eq_bigr do rewrite !mxE. Qed.
+Proof.
+by apply/matrixP=> i s; rewrite !mxE; under [LHS]eq_bigr do rewrite !mxE.
+Qed.
 
 End BlockRowRing.
 
@@ -4719,11 +4724,15 @@ Implicit Type (s : 'I_sp).
 
 Lemma mxcol_mul n' m (C_ : forall i, 'M[R]_(p_ i, n')) (A : 'M[R]_(n', m)) :
   \mxcol_i C_ i *m A = \mxcol_i (C_ i *m A).
-Proof. by apply/matrixP=> i s; rewrite !mxE; under eq_bigr do rewrite !mxE. Qed.
+Proof.
+by apply/matrixP=> i s; rewrite !mxE; under [LHS]eq_bigr do rewrite !mxE.
+Qed.
 
 Lemma submxcol_mul n' m (B : 'M[R]_(sp, n')) (A : 'M[R]_(n', m)) i :
   submxcol B i *m A = submxcol (B *m A) i.
-Proof. by apply/matrixP=> j s; rewrite !mxE; under eq_bigr do rewrite !mxE. Qed.
+Proof.
+by apply/matrixP=> j s; rewrite !mxE; under [LHS]eq_bigr do rewrite !mxE.
+Qed.
 
 End BlockColRing.
 

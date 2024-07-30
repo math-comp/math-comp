@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat.
-From mathcomp Require Import seq ssralg generic_quotient.
+From mathcomp Require Import seq comoid ssralg generic_quotient.
 
 (******************************************************************************)
 (*                   Quotients of algebraic structures                        *)
@@ -92,7 +92,7 @@ Variable eqT : rel T.
 Variables (zeroT : T) (oppT : T -> T) (addT : T -> T -> T). *)
 
 HB.mixin Record isZmodQuotient T eqT (zeroT : T) (oppT : T -> T) (addT : T -> T -> T)
-(Q : Type) of GRing.Zmodule Q & EqQuotient T eqT Q := {
+(Q : Type) of Zmodule Q & EqQuotient T eqT Q := {
   pi_zeror : \pi_Q zeroT = 0;
   pi_oppr : {morph \pi_Q : x / oppT x >-> - x};
   pi_addr : {morph \pi_Q : x y / addT x y >-> x + y}
@@ -101,7 +101,7 @@ HB.mixin Record isZmodQuotient T eqT (zeroT : T) (oppT : T -> T) (addT : T -> T 
 #[short(type="zmodQuotType")]
 HB.structure Definition ZmodQuotient T eqT zeroT oppT addT :=
   {Q of isZmodQuotient T eqT zeroT oppT addT Q &
-        GRing.Zmodule Q & EqQuotient T eqT Q}.
+        Zmodule Q & EqQuotient T eqT Q}.
 
 Section ZModQuotient.
 
@@ -124,7 +124,7 @@ Variable Q : @zmodQuotType V equivV zeroV -%R +%R.
 Lemma pi_is_additive : additive \pi_Q.
 Proof. by move=> x y /=; rewrite !piE. Qed.
 
-HB.instance Definition _ := GRing.isAdditive.Build V Q \pi_Q pi_is_additive.
+HB.instance Definition _ := isAdditive.Build V Q \pi_Q pi_is_additive.
 
 End PiAdditive.
 
@@ -221,7 +221,7 @@ HB.structure Definition ProperIdeal R := {S of isProperIdeal R S}.
 
 #[short(type="idealr")]
 HB.structure Definition Idealr (R : ringType) :=
-  {S of GRing.ZmodClosed R S & ProperIdeal R S}.
+  {S of ZmodClosed R S & ProperIdeal R S}.
 
 HB.mixin Record isPrimeIdealrClosed (R : ringType) (S : R -> bool) := {
   prime_idealr_closed_subproof : prime_idealr_closed S
@@ -236,7 +236,7 @@ HB.factory Record isIdealr (R : ringType) (S : R -> bool) := {
 }.
 
 HB.builders Context R S of isIdealr R S.
-HB.instance Definition _ := GRing.isZmodClosed.Build R S
+HB.instance Definition _ := isZmodClosed.Build R S
   (idealr_closedB idealr_closed_subproof).
 HB.instance Definition _ := isProperIdeal.Build R S
   (idealr_closed_nontrivial idealr_closed_subproof).
@@ -334,7 +334,7 @@ Lemma addNq: left_inverse zero opp add.
 Proof. by move=> x; rewrite -[x]reprK !piE addNr. Qed.
 
 #[export]
-HB.instance Definition _ := GRing.isZmodule.Build quot addqA addqC add0q addNq.
+HB.instance Definition _ := isZmodule.Build quot addqA addqC add0q addNq.
 #[export]
 HB.instance Definition _ := @isZmodQuotient.Build R equiv 0 -%R +%R quot
   (lock _) pi_opp pi_add.

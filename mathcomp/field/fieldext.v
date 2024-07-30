@@ -2,9 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
-From mathcomp Require Import choice fintype tuple finfun bigop ssralg countalg.
-From mathcomp Require Import finalg zmodp matrix vector falgebra poly polydiv.
-From mathcomp Require Import mxpoly generic_quotient.
+From mathcomp Require Import choice fintype tuple finfun bigop comoid ssralg.
+From mathcomp Require Import countalg finalg zmodp matrix vector falgebra poly.
+From mathcomp Require Import polydiv mxpoly generic_quotient.
 
 (******************************************************************************)
 (*                   Finite dimensional field extensions                      *)
@@ -1045,7 +1045,7 @@ Proof. by move=> x; rewrite -[x]reprK !piE add0r. Qed.
 Fact addfxN : left_inverse subfext0 subfext_opp subfext_add.
 Proof. by move=> x; rewrite -[x]reprK !piE addNr. Qed.
 
-HB.instance Definition _ := GRing.isZmodule.Build subFExtend
+HB.instance Definition _ := isZmodule.Build subFExtend
   addfxA addfxC add0fx addfxN.
 
 Let poly_rV_modp_K q : rVpoly (poly_rV (q %% p0) : 'rV[F]_n) = q %% p0.
@@ -1162,7 +1162,7 @@ elim/quotW=> x; elim/quotW=> y; rewrite !piE /subfx_mul_rep /iotaFz.
 by rewrite poly_rV_modp_K iotaPz_modp rmorphM.
 Qed.
 
-HB.instance Definition _ := GRing.isAdditive.Build subFExtend L subfx_inj
+HB.instance Definition _ := isAdditive.Build subFExtend L subfx_inj
   subfx_inj_is_additive.
 HB.instance Definition _ := GRing.isMultiplicative.Build subFExtend L subfx_inj
   subfx_inj_is_multiplicative.
@@ -1183,7 +1183,7 @@ by rewrite modp_small // size_poly1 -subn_gt0 subn1.
 Qed.
 
 HB.instance Definition _ :=
-  GRing.isAdditive.Build {poly F} subFExtend subfx_eval subfx_eval_is_additive.
+  isAdditive.Build {poly F} subFExtend subfx_eval subfx_eval_is_additive.
 HB.instance Definition _ :=
   GRing.isMultiplicative.Build {poly F} subFExtend subfx_eval
     subfx_eval_is_multiplicative.

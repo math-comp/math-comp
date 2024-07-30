@@ -3,8 +3,8 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun prime order.
-From mathcomp Require Import ssralg poly ssrnum ssrint archimedean rat matrix.
-From mathcomp Require Import polydiv perm zmodp bigop mxalgebra vector.
+From mathcomp Require Import comoid ssralg poly ssrnum ssrint archimedean rat.
+From mathcomp Require Import matrix polydiv perm zmodp bigop mxalgebra vector.
 
 (******************************************************************************)
 (* This file provides various results on divisibility of integers.            *)
@@ -432,7 +432,7 @@ Proof.
 split=> [|_ _ /dvdzP[p ->] /dvdzP[q ->]]; first exact: dvdz0.
 by rewrite -mulrBl dvdz_mull.
 Qed.
-HB.instance Definition _ d := GRing.isZmodClosed.Build int (dvdz d)
+HB.instance Definition _ d := isZmodClosed.Build int (dvdz d)
   (dvdz_zmod_closed d).
 
 Lemma dvdz_exp k d m : (0 < k)%N -> (d %| m -> d %| m ^+ k)%Z.

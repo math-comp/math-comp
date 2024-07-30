@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
 From mathcomp Require Import fintype tuple finfun bigop fingroup perm div.
-From mathcomp Require Import ssralg zmodp matrix mxalgebra.
+From mathcomp Require Import comoid ssralg zmodp matrix mxalgebra.
 From mathcomp Require Import poly polydiv mxpoly binomial.
 
 (******************************************************************************)
@@ -79,7 +79,7 @@ Proof. by rewrite swapXY_polyC map_polyX. Qed.
 Lemma swapXY_is_additive : additive swapXY.
 Proof. by move=> u v; rewrite unlock rmorphB !hornerE. Qed.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build {poly {poly R}} {poly {poly R}} swapXY
+  isAdditive.Build {poly {poly R}} {poly {poly R}} swapXY
     swapXY_is_additive.
 
 Lemma coef_swapXY u i j : (swapXY u)`_i`_j = u`_j`_i.

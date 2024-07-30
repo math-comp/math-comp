@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop order ssralg countalg div ssrnum.
-From mathcomp Require Import ssrint prime archimedean.
+From mathcomp Require Import fintype bigop order comoid ssralg countalg div.
+From mathcomp Require Import ssrnum ssrint prime archimedean.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)
@@ -425,7 +425,7 @@ rewrite !addq_subdefE /oppq_subdef //= mulNr addNr; apply/eqP.
 by rewrite fracq_eq ?mulf_neq0 ?denq_neq0 //= !mul0r.
 Qed.
 
-HB.instance Definition _ := GRing.isZmodule.Build rat addqA addqC add0q addNq.
+HB.instance Definition _ := isZmodule.Build rat addqA addqC add0q addNq.
 
 Definition mulq_subdef (x y : int * int) :=
   let: (x1, x2) := x in
@@ -838,8 +838,8 @@ Implicit Types (U V : lmodType rat) (A B : lalgType rat).
 Lemma rat_linear U V (f : U -> V) : additive f -> scalable f.
 Proof.
 move=> fB a u.
-pose aM := GRing.isAdditive.Build U V f fB.
-pose phi : {additive U -> V} := HB.pack f aM.
+pose aM := isAdditive.Build U V f fB.
+pose phi : Additive.type U V := HB.pack f aM.
 rewrite -[f]/(phi : _ -> _) -{2}[a]divq_num_den mulrC -scalerA.
 apply: canRL (scalerK _) _; first by rewrite intr_eq0 denq_neq0.
 rewrite 2!scaler_int -3!raddfMz /=.
@@ -876,7 +876,7 @@ apply: injZtoQ; rewrite !rmorphM [x * y]lock /= !numqE -lock.
 by rewrite -!mulrA mulrA mulrCA -!mulrA (mulrCA y).
 Qed.
 
-HB.instance Definition _ := GRing.isAdditive.Build rat F (@ratr F)
+HB.instance Definition _ := isAdditive.Build rat F (@ratr F)
   ratr_is_additive.
 HB.instance Definition _ := GRing.isMultiplicative.Build rat F (@ratr F)
   ratr_is_multiplicative.

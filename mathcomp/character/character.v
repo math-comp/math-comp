@@ -3,11 +3,12 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype choice ssrnat seq.
 From mathcomp Require Import path div fintype tuple finfun bigop prime order.
-From mathcomp Require Import ssralg poly finset gproduct fingroup morphism.
-From mathcomp Require Import perm automorphism quotient finalg action zmodp.
-From mathcomp Require Import commutator cyclic center pgroup nilpotent sylow.
-From mathcomp Require Import abelian matrix mxalgebra mxpoly mxrepresentation.
-From mathcomp Require Import vector ssrnum algC classfun archimedean.
+From mathcomp Require Import comoid ssralg poly finset gproduct monoid fingroup.
+From mathcomp Require Import morphism perm automorphism quotient finalg action.
+From mathcomp Require Import zmodp commutator cyclic center pgroup nilpotent.
+From mathcomp Require Import sylow abelian matrix mxalgebra mxpoly.
+From mathcomp Require Import mxrepresentation vector ssrnum algC classfun.
+From mathcomp Require Import archimedean.
 
 (******************************************************************************)
 (* This file contains the basic notions of character theory, based on Isaacs. *)
@@ -498,7 +499,7 @@ Definition xcfun (chi : 'CF(G)) A :=
 Lemma xcfun_is_additive phi : additive (xcfun phi).
 Proof. by move=> A B; rewrite /xcfun [gring_row _]linearB mulmxBl !mxE. Qed.
 HB.instance Definition _ phi :=
-  GRing.isAdditive.Build 'M_(gcard G) _ (xcfun phi) (xcfun_is_additive phi).
+  isAdditive.Build 'M_(gcard G) _ (xcfun phi) (xcfun_is_additive phi).
 
 Lemma xcfunZr a phi A : xcfun phi (a *: A) = a * xcfun phi A.
 Proof. by rewrite /xcfun linearZ -scalemxAl mxE. Qed.
@@ -514,7 +515,7 @@ Proof.
 move=> phi psi; rewrite /= /xcfun !mxE -sumrB; apply: eq_bigr => i _.
 by rewrite !mxE !cfunE mulrBr.
 Qed.
-HB.instance Definition _ A := GRing.isAdditive.Build _ _ (xcfun_r A)
+HB.instance Definition _ A := isAdditive.Build _ _ (xcfun_r A)
   (xcfun_r_is_additive A).
 
 Lemma xcfunZl a phi A : xcfun (a *: phi) A = a * xcfun phi A.
@@ -838,7 +839,7 @@ Proof.
 split=> [|chi xi /forallP-Nchi /forallP-Nxi]; first exact: cfun0_char.
 by apply/forallP=> i; rewrite linearD rpredD /=.
 Qed.
-HB.instance Definition _ := GRing.isAddClosed.Build (classfun G) character_pred
+HB.instance Definition _ := isAddClosed.Build (classfun G) character_pred
   add_char.
 
 Lemma char_sum_irrP {phi} :
@@ -2544,7 +2545,7 @@ have GHx: coset H x \in (G / H)%g by apply: mem_quotient.
 move: (second_orthogonality_relation (coset H x) GHx).
 rewrite mulrb class_refl => <-.
 rewrite -2!(eq_bigr _ (fun _ _ => normCK _)) sum_norm_irr_quo // -subr_ge0.
-rewrite (bigID (fun i => H \subset cfker 'chi[G]_i)) //= addrC addKr.
+rewrite (bigID (fun i => H \subset cfker 'chi[G]_i)) //= addrC addrK.
 by apply: sumr_ge0 => i _; rewrite normCK mul_conjC_ge0.
 Qed.
 
