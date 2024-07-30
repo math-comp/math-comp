@@ -1,8 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat div seq.
-From mathcomp Require Import prime fintype bigop finset fingroup morphism perm.
-From mathcomp Require Import automorphism quotient.
+From mathcomp Require Import ssreflect ssrbool ssrfun ssrnotations eqtype.
+From mathcomp Require Import ssrnat div seq prime fintype bigop finset.
+From mathcomp Require Import fingroup morphism perm automorphism quotient.
 
 (******************************************************************************)
 (* Group action: orbits, stabilisers, transitivity.                           *)
@@ -221,7 +221,7 @@ Arguments acts_on {aT D%g rT} A%g S%g to%act.
 Arguments atrans {aT D%g rT} A%g S%g to%act.
 Arguments faithful {aT D%g rT} A%g S%g to%act.
 
-Notation "to ^*" := (setact to) (at level 2, format "to ^*") : function_scope.
+Notation "to ^*" := (setact to) : function_scope.
 
 Prenex Implicits orbit amove.
 

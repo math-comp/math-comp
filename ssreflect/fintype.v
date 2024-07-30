@@ -1,8 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import path div.
+From mathcomp Require Import ssreflect ssrfun ssrbool ssrnotations eqtype.
+From mathcomp Require Import ssrnat seq choice path div.
 
 (******************************************************************************)
 (*                             Finite types                                   *)
@@ -288,7 +288,7 @@ Variant quantified := Quantified of bool.
 Delimit Scope fin_quant_scope with Q. (* Bogus, only used to declare scope. *)
 Bind Scope fin_quant_scope with quantified.
 
-Notation "F ^*" := (Quantified F) (at level 2).
+Notation "F ^*" := (Quantified F).
 #[warning="-notation-incompatible-prefix"]
 Notation "F ^~" := (~~ F) (at level 2).
 
