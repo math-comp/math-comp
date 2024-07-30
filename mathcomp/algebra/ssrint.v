@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
-From mathcomp Require Import fintype finfun bigop order ssralg countalg ssrnum.
-From mathcomp Require Import poly.
+From mathcomp Require Import fintype finfun bigop order comoid ssralg countalg.
+From mathcomp Require Import ssrnum poly.
 
 (******************************************************************************)
 (* This file develops a basic theory of signed integers, defining:            *)
@@ -215,7 +215,7 @@ Lemma addNz : left_inverse (0:int) oppz addz. Proof. by do 3?elim. Qed.
 Lemma predn_int (n : nat) : 0 < n -> n.-1%:Z = n - 1.
 Proof. by case: n => //= n _; rewrite subn1. Qed.
 
-Definition Mixin := GRing.isZmodule.Build int addzA addzC add0z addNz.
+Definition Mixin := isZmodule.Build int addzA addzC add0z addNz.
 
 End intZmod.
 Arguments oppz : simpl never.
@@ -223,7 +223,7 @@ End intZmod.
 
 HB.instance Definition _ := intZmod.Mixin.
 
-HB.instance Definition _ := GRing.isSemiAdditive.Build nat int Posz
+HB.instance Definition _ := isSemiAdditive.Build nat int Posz
   (erefl, intZmod.PoszD).
 
 Local Open Scope ring_scope.
@@ -388,7 +388,7 @@ HB.instance Definition _ := GRing.ComUnitRing_isIntegral.Build int
   intUnitRing.idomain_axiomz.
 
 Definition absz m := match m with Posz p => p | Negz n => n.+1 end.
-Notation "m - n" := (@GRing.add int m%N (@GRing.opp int n%N)) : distn_scope.
+Notation "m - n" := (@add int m%N (@opp int n%N)) : distn_scope.
 Arguments absz m%distn_scope.
 Local Notation "`| m |" := (absz m) : nat_scope.
 
@@ -568,7 +568,7 @@ by case=> []m []n; rewrite ?NegzE /intmul /= -/(intmul _ _) -?opprD;
   rewrite -?[- _ + _]addrC ?mulrzBl_nat // -mulrnDr // addnS.
 Qed.
 
-HB.instance Definition _ := GRing.Zmodule.on M^z.  (* FIXME, the error message below "nomsg" when we forget this line is not very helpful *)
+HB.instance Definition _ := Zmodule.on M^z.  (* FIXME, the error message below "nomsg" when we forget this line is not very helpful *)
 HB.instance Definition _ := @GRing.Zmodule_isLmodule.Build _ M^z
   (fun n x => x *~ n) mulrzA_C mulr1z mulrzDl mulrzDr.
 
@@ -607,7 +607,7 @@ Lemma mulrz_suml : forall n I r (P : pred I) (F : I -> M),
   (\sum_(i <- r | P i) F i) *~ n= \sum_(i <- r | P i) F i *~ n.
 Proof. by rewrite -/M^z; apply: scaler_sumr. Qed.
 
-HB.instance Definition _ (x : M) := GRing.isAdditive.Build int M ( *~%R x)
+HB.instance Definition _ (x : M) := isAdditive.Build int M ( *~%R x)
   (@mulrzBr x).
 
 End ZintLmod.
@@ -1594,8 +1594,8 @@ Module Export IntDist.
 Local Definition int_nmodType : nmodType := int.
 Local Definition int_zmodType : zmodType := int.
 Notation "m - n" :=
-  (@GRing.add int_nmodType (m%N : int)
-    (@GRing.opp int_zmodType (n%N : int))) : distn_scope.
+  (@add int_nmodType (m%N : int)
+    (@opp int_zmodType (n%N : int))) : distn_scope.
 Arguments absz m%distn_scope.
 Notation "`| m |" := (absz m) : nat_scope.
 Coercion Posz : nat >-> int.

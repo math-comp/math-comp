@@ -3,10 +3,10 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype tuple finfun bigop finset prime.
-From mathcomp Require Import binomial ssralg poly polydiv fingroup perm.
-From mathcomp Require Import morphism quotient gproduct finalg zmodp cyclic.
-From mathcomp Require Import matrix mxalgebra mxpoly polyXY vector falgebra.
-From mathcomp Require Import fieldext.
+From mathcomp Require Import binomial comoid ssralg poly polydiv monoid.
+From mathcomp Require Import fingroup perm morphism quotient gproduct finalg.
+From mathcomp Require Import zmodp cyclic matrix mxalgebra mxpoly polyXY vector.
+From mathcomp Require Import falgebra fieldext.
 
 (******************************************************************************)
 (* This file provides a theory of separable and inseparable field extensions. *)
@@ -479,7 +479,7 @@ Section DerivationLinear.
 Variable (E : {subfield L}).
 Let body (y : L) (p := Fadjoin_poly E x y) : L :=
   (map_poly D p).[x] + p^`().[x] * Dx E.
-HB.instance Definition _ := @GRing.isAdditive.Build _ _ body
+HB.instance Definition _ := @isAdditive.Build _ _ body
   (extendDerivation_additive_subproof E).
 HB.instance Definition _ := @GRing.isScalable.Build _ _ _ _ body
   (extendDerivation_scalable_subproof E).

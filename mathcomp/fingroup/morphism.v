@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import fintype finfun bigop finset fingroup.
+From mathcomp Require Import fintype finfun bigop finset monoid fingroup.
 
 (******************************************************************************)
 (* This file contains the definitions of:                                     *)

@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat.
 From mathcomp Require Import div seq fintype tuple finset.
-From mathcomp Require Import fingroup action gseries.
+From mathcomp Require Import monoid fingroup action gseries.
 
 (******************************************************************************)
 (* n-transitive and primitive actions:                                        *)

@@ -3,10 +3,10 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime.
-From mathcomp Require Import ssralg poly polydiv finset fingroup morphism.
-From mathcomp Require Import perm automorphism quotient finalg action zmodp.
-From mathcomp Require Import commutator cyclic center pgroup matrix mxalgebra.
-From mathcomp Require Import mxpoly.
+From mathcomp Require Import comoid ssralg poly polydiv finset monoid fingroup.
+From mathcomp Require Import morphism perm automorphism quotient finalg action.
+From mathcomp Require Import zmodp commutator cyclic center pgroup matrix.
+From mathcomp Require Import mxalgebra mxpoly.
 
 (******************************************************************************)
 (*  This file provides linkage between classic Group Theory and commutative   *)
@@ -5090,7 +5090,7 @@ Proof. by move=> x; apply: val_inj; rewrite /= add0r. Qed.
 Lemma gen_addNr : left_inverse gen0 genN genD.
 Proof. by move=> x; apply: val_inj; rewrite /= addNr. Qed.
 
-#[export] HB.instance Definition _ := GRing.isZmodule.Build FA
+#[export] HB.instance Definition _ := isZmodule.Build FA
   gen_addA gen_addC gen_add0r gen_addNr.
 
 Definition pval (x : FA) := rVpoly (val x).
@@ -5174,7 +5174,7 @@ Proof. exact: mxval_genM. Qed.
 Lemma mxval_sub : additive mxval.
 Proof. by move=> x y; rewrite mxvalD mxvalN. Qed.
 #[export] HB.instance Definition _ :=
-  GRing.isAdditive.Build FA 'M[F]_n mxval mxval_sub.
+  isAdditive.Build FA 'M[F]_n mxval mxval_sub.
 
 Lemma mxval_is_multiplicative : multiplicative mxval.
 Proof. by split; [apply: mxvalM | apply: mxval1]. Qed.
@@ -5210,7 +5210,7 @@ Proof. by move=> x y; apply: mxval_inj; rewrite genK !rmorphB /= !genK. Qed.
 Lemma gen_is_multiplicative : multiplicative gen.
 Proof. by split=> // x y; apply: mxval_inj; rewrite genK !rmorphM /= !genK. Qed.
 
-#[export] HB.instance Definition _ := GRing.isAdditive.Build F FA gen
+#[export] HB.instance Definition _ := isAdditive.Build F FA gen
   gen_is_additive.
 #[export] HB.instance Definition _ := GRing.isMultiplicative.Build F FA gen
   gen_is_multiplicative.

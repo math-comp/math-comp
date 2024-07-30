@@ -3,9 +3,10 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime.
-From mathcomp Require Import ssralg poly polydiv ssrnum ssrint archimedean rat.
-From mathcomp Require Import finalg zmodp matrix mxalgebra mxpoly vector intdiv.
-From mathcomp Require Import falgebra fieldext separable galois algC cyclotomic.
+From mathcomp Require Import comoid ssralg poly polydiv ssrnum ssrint.
+From mathcomp Require Import archimedean rat finalg zmodp matrix mxalgebra.
+From mathcomp Require Import mxpoly vector intdiv falgebra fieldext separable.
+From mathcomp Require Import galois algC cyclotomic.
 
 (******************************************************************************)
 (* This file provides a few basic results and constructions in algebraic      *)
@@ -159,7 +160,7 @@ split=> [|_ _ /Crat_spanP[x ->] /Crat_spanP[y ->]].
 apply/Crat_spanP; exists (x - y); rewrite -sumrB; apply: eq_bigr => i _.
 by rewrite -mulrBl -rmorphB !ffunE.
 Qed.
-HB.instance Definition _ s := GRing.isZmodClosed.Build _ (Crat_span s)
+HB.instance Definition _ s := isZmodClosed.Build _ (Crat_span s)
   (Crat_span_zmod_closed s).
 
 Section MoreAlgCaut.
@@ -222,7 +223,7 @@ have nu0a : additive nu0.
 have nu0m : multiplicative nu0.
   split=> [x y|]; apply: (fmorph_inj QnC); rewrite ?QnC_nu0 ?rmorph1 //.
   by rewrite !rmorphM /= !QnC_nu0.
-pose nu0aM := GRing.isAdditive.Build Qn Qn nu0 nu0a.
+pose nu0aM := isAdditive.Build Qn Qn nu0 nu0a.
 pose nu0mM := GRing.isMultiplicative.Build Qn Qn nu0 nu0m.
 pose nu0RM : GRing.RMorphism.type _ _ := HB.pack nu0 nu0aM nu0mM.
 pose nu0lM := GRing.isScalable.Build rat Qn Qn *:%R nu0 (fmorph_numZ nu0RM).
@@ -341,7 +342,7 @@ have sP := Cint_spanP (in_tuple s); split=> [|_ _ /sP[x ->] /sP[y ->]].
 apply/sP; exists (x - y); rewrite -sumrB; apply: eq_bigr => i _.
 by rewrite !ffunE raddfB.
 Qed.
-HB.instance Definition _ s := GRing.isZmodClosed.Build _ (Cint_span s)
+HB.instance Definition _ s := isZmodClosed.Build _ (Cint_span s)
   (Cint_span_zmod_closed s).
 
 (* Automorphism extensions. *)
@@ -393,7 +394,7 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
       by split; try move=> ? ?; apply: (fmorph_inj QrC); rewrite !rwM /= ?rwM.
     have in01l : scalable in01.
       by try move=> ? ?; apply: (fmorph_inj QrC); rewrite !rwM.
-    pose in01aM := GRing.isAdditive.Build _ _ in01 in01a.
+    pose in01aM := isAdditive.Build _ _ in01 in01a.
     pose in01mM := GRing.isMultiplicative.Build _ _ in01 in01m.
     pose in01lM := GRing.isScalable.Build _ _  _ _ in01 in01l.
     pose in01LRM : {lrmorphism _ -> _} := HB.pack in01
@@ -475,7 +476,7 @@ have num : multiplicative nu.
   case=> /mem_ext[y Dx] /mem_ext[y1 Dx1] /mem_ext[y2 Dx2].
   rewrite -Dx nu_inj; rewrite -Dx1 -Dx2 -rmorphM in Dx.
   by rewrite (fmorph_inj _ Dx) !rmorphM /= -!nu_inj Dx1 Dx2.
-pose nuaM := GRing.isAdditive.Build _ _ nu nua.
+pose nuaM := isAdditive.Build _ _ nu nua.
 pose numM := GRing.isMultiplicative.Build _ _ nu num.
 pose nuRM : {rmorphism _ -> _} := HB.pack nu nuaM numM.
 by exists nuRM => x; rewrite /= (nu_inj 0).
@@ -699,7 +700,7 @@ rewrite ![(e %| _)%A]unfold_in.
 case: ifP => [_ x0 /eqP-> | _]; first by rewrite subr0.
 by rewrite mulrBl; apply: rpredB.
 Qed.
-HB.instance Definition _ e := GRing.isZmodClosed.Build _ (dvdA e)
+HB.instance Definition _ e := isZmodClosed.Build _ (dvdA e)
   (dvdA_zmod_closed e).
 
 Definition eqAmod (e x y : Algebraics.divisor) := (e %| x - y)%A.
