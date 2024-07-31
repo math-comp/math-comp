@@ -16,6 +16,7 @@ finset.v
 fintype.v
 generic_quotient.v
 monoid.v
+comoid.v
 path.v
 prime.v
 tuple.v
