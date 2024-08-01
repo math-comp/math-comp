@@ -2,7 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import fintype div path tuple bigop prime finset monoid.
+From mathcomp Require Import fintype div path tuple bigop prime finset.
+From mathcomp Require Export monoid.
+
 
 (******************************************************************************)
 (*                               Finite groups                                *)
