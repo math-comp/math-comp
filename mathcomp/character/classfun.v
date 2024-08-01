@@ -245,7 +245,7 @@ Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE add0r. Qed.
 Fact cfun_addN : left_inverse cfun_zero cfun_opp cfun_add.
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE addNr. Qed.
 
-HB.instance Definition _ := isZmodule.Build classfun
+HB.instance Definition _ := GRing.isZmodule.Build classfun
   cfun_addA cfun_addC cfun_add0 cfun_addN.
 
 Lemma muln_cfunE phi n x : (phi *+ n) x = phi x *+ n.
@@ -340,7 +340,7 @@ Proof.
 by split=> [phi psi|]; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE rmorphM.
 Qed.
 
-HB.instance Definition _ := isAdditive.Build classfun classfun cfAut
+HB.instance Definition _ := GRing.isAdditive.Build classfun classfun cfAut
   cfAut_is_additive.
 HB.instance Definition _ := GRing.isMultiplicative.Build classfun classfun cfAut
   cfAut_is_multiplicative.
@@ -875,7 +875,7 @@ Proof. by move=> Aphi /eq_cfdotl eq_dot; rewrite cfdotC eq_dot // -cfdotC. Qed.
 Lemma cfdotBr xi phi psi : '[xi, phi - psi] = '[xi, phi] - '[xi, psi].
 Proof. by rewrite !(cfdotC xi) -rmorphB cfdotBl. Qed.
 HB.instance Definition _ xi :=
-  isAdditive.Build _ _ (cfdot xi) (cfdotBr xi).
+  GRing.isAdditive.Build _ _ (cfdot xi) (cfdotBr xi).
 
 Lemma cfdot0r xi : '[xi, 0] = 0. Proof. exact: raddf0. Qed.
 Lemma cfdotNr xi phi : '[xi, - phi] = - '[xi, phi].
@@ -1598,7 +1598,7 @@ Proof. rewrite unlock; exact: (rmorphM _, rmorph1 _). Qed.
 Lemma cfIsom_is_scalable : scalable cfIsom.
 Proof. rewrite unlock; exact: linearZ_LR. Qed.
 
-HB.instance Definition _ := isAdditive.Build _ _ cfIsom cfIsom_is_additive.
+HB.instance Definition _ := GRing.isAdditive.Build _ _ cfIsom cfIsom_is_additive.
 HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfIsom
   cfIsom_is_multiplicative.
 HB.instance Definition _ := GRing.isScalable.Build _ _ _ _ cfIsom
@@ -1854,7 +1854,7 @@ Proof. rewrite unlock; exact: (rmorphM _, rmorph1 _). Qed.
 Lemma cfSdprod_is_scalable : scalable cfSdprod.
 Proof. rewrite unlock; exact: linearZ_LR. Qed.
 
-HB.instance Definition _ := isAdditive.Build _ _ cfSdprod cfSdprod_is_additive.
+HB.instance Definition _ := GRing.isAdditive.Build _ _ cfSdprod cfSdprod_is_additive.
 HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfSdprod
   cfSdprod_is_multiplicative.
 HB.instance Definition _ := GRing.isScalable.Build _ _ _ _ cfSdprod

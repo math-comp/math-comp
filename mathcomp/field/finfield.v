@@ -398,7 +398,7 @@ have fM : multiplicative f.
 have fZ: scalable f.
   move=> a x; rewrite -[in LHS]mulr_algl fM.
   by rewrite (idfP _ _) ?mulr_algl ?memvZ // memv_line.
-pose faM := isAdditive.Build _ _ f fA.
+pose faM := GRing.isAdditive.Build _ _ f fA.
 pose fmM := GRing.isMultiplicative.Build _ _ f fM.
 pose flM := GRing.isScalable.Build _ _ _ _ f fZ.
 pose fLRM : {lrmorphism _ -> _} := HB.pack f faM fmM flM.

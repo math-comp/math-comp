@@ -64,7 +64,7 @@ move=> phi xi /andP[Aphi /sumboolP[a Da]] /andP[Axi /sumboolP[b Db]].
 rewrite inE rpredB // Da Db -sumrB; apply/sumboolP; exists (a - b).
 by apply: eq_bigr => i _; rewrite -mulrzBr !ffunE.
 Qed.
-HB.instance Definition _ := isZmodClosed.Build (classfun B) Zchar
+HB.instance Definition _ := GRing.isZmodClosed.Build (classfun B) Zchar
   Zchar_zmod.
 
 Lemma scale_zchar a phi : a \in Num.int -> phi \in Zchar -> a *: phi \in Zchar.
@@ -705,7 +705,7 @@ Variables (gT : finGroupType) (G : {group gT}).
 
 Fact dirr_oppr_closed : oppr_closed (dirr G).
 Proof. by move=> xi; rewrite !inE opprK orbC. Qed.
-HB.instance Definition _ := isOppClosed.Build (classfun G) (dirr G)
+HB.instance Definition _ := GRing.isOppClosed.Build (classfun G) (dirr G)
   dirr_oppr_closed.
 
 Lemma dirr_opp v : (- v \in dirr G) = (v \in dirr G). Proof. exact: rpredN. Qed.

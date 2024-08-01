@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
 From mathcomp Require Import choice fintype finfun bigop prime binomial.
-From mathcomp Require Import monoid comoid.
+From mathcomp Require Export comoid.
 
 (******************************************************************************)
 (*                 The base hierarchy of algebraic structures                 *)
@@ -597,13 +597,15 @@ Local Open Scope ring_scope.
 
 Module Import GRing.
 
+Export GRing.
+
 Import Monoid.Theory.
 
 Local Notation "0" := (@zero _) : ring_scope.
 Local Notation "+%R" := (@add _) : function_scope.
-Local Notation "x + y" := (add x%R y%R) : ring_scope.
+Local Notation "x + y" := (add x y) : ring_scope.
 
-Local Notation "x *+ n" := (natmul x%R n%N) : ring_scope.
+Local Notation "x *+ n" := (natmul x n) : ring_scope.
 
 Local Notation "\sum_ ( i <- r | P ) F" := (\big[+%R/0]_(i <- r | P) F).
 Local Notation "\sum_ ( m <= i < n ) F" := (\big[+%R/0]_(m <= i < n) F).
@@ -611,42 +613,6 @@ Local Notation "\sum_ ( i < n ) F" := (\big[+%R/0]_(i < n) F).
 Local Notation "\sum_ ( i 'in' A ) F" := (\big[+%R/0]_(i in A) F).
 
 Local Notation "s `_ i" := (nth 0 s i) : ring_scope.
-
-Module isNmodule.
-Notation Build V := (isNmodule.Build V).
-End isNmodule.
-
-Module isZmodule.
-Notation Build V := (isZmodule.Build V).
-End isZmodule.
-
-Module isAdditive.
-Notation Build U V f := (isAdditive.Build U V f).
-End isAdditive.
-
-Module isAddClosed.
-Notation Build V S := (isAddClosed.Build V S).
-End isAddClosed.
-
-Module isOppClosed.
-Notation Build V S := (isOppClosed.Build V S).
-End isOppClosed.
-
-Module isZmodClosed.
-Notation Build V S := (isZmodClosed.Build V S).
-End isZmodClosed.
-
-Module SubChoice_isSubNmodule.
-Notation Build V S U := (SubChoice_isSubNmodule.Build V S U).
-End SubChoice_isSubNmodule.
-
-Module isSubZmodule.
-Notation Build V S U := (isSubZmodule.Build V S U).
-End isSubZmodule.
-
-Module SubChoice_isSubZmodule.
-Notation Build V S U := (SubChoice_isSubZmodule.Build V S U).
-End SubChoice_isSubZmodule.
 
 Section NmoduleTheory.
 

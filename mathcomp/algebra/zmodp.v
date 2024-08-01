@@ -149,7 +149,7 @@ by move=> x; apply: val_inj; rewrite /= modnDml subnK ?modnn // ltnW.
 Qed.
 
 HB.instance Definition _ :=
-  isZmodule.Build 'I_p (@Zp_addA _) (@Zp_addC _) Zp_add0z Zp_addNz.
+  GRing.isZmodule.Build 'I_p (@Zp_addA _) (@Zp_addC _) Zp_add0z Zp_addNz.
 
 HB.instance Definition _ := [finGroupMixin of 'I_p for +%R].
 

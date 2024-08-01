@@ -79,7 +79,7 @@ Proof. by rewrite swapXY_polyC map_polyX. Qed.
 Lemma swapXY_is_additive : additive swapXY.
 Proof. by move=> u v; rewrite unlock rmorphB !hornerE. Qed.
 HB.instance Definition _ :=
-  isAdditive.Build {poly {poly R}} {poly {poly R}} swapXY
+  GRing.isAdditive.Build {poly {poly R}} {poly {poly R}} swapXY
     swapXY_is_additive.
 
 Lemma coef_swapXY u i j : (swapXY u)`_i`_j = u`_j`_i.
