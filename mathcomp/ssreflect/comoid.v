@@ -12,6 +12,7 @@ Local Open Scope ring_scope.
 
 Reserved Notation "+%R" (at level 0).
 Reserved Notation "-%R" (at level 0).
+Reserved Notation "n %:R" (at level 2, left associativity, format "n %:R").
 Reserved Notation "\0" (at level 0).
 Reserved Notation "f \+ g" (at level 50, left associativity).
 Reserved Notation "f \- g" (at level 50, left associativity).
@@ -21,6 +22,8 @@ Reserved Notation "'{' 'additive' U '->' V '}'"
   (at level 0, U at level 98, V at level 99,
    format "{ 'additive'  U  ->  V }").
 
+Module Import GRing.
+
 HB.mixin Record isAddMagma V := {
   add : V -> V -> V
 }.
@@ -28,12 +31,19 @@ HB.mixin Record isAddMagma V := {
 #[short(type="addMagmaType")]
 HB.structure Definition AddMagma := {V of isAddMagma V & Choice V}.
 
+Module AddMagmaExports.
+Bind Scope ring_scope with AddMagma.sort.
+End AddMagmaExports.
+HB.export AddMagmaExports. 
+
 Local Notation "+%R" := (@add _) : function_scope.
 Local Notation "x + y" := (add x y) : ring_scope.
 
 Definition multiplicative := @id Type.
 
+#[export]
 HB.instance Definition _ (V : addMagmaType) := Choice.on (multiplicative V).
+#[export]
 HB.instance Definition _ (V : addMagmaType) := isMagma.Build (multiplicative V) (@add V).
 
 HB.mixin Record AddMagma_isBaseAddUMagma V of AddMagma V := {
@@ -42,6 +52,12 @@ HB.mixin Record AddMagma_isBaseAddUMagma V of AddMagma V := {
 
 HB.structure Definition BaseAddUMagma := {V of AddMagma_isBaseAddUMagma V & AddMagma V}.
 
+Module BaseAddUMagmaExports.
+Bind Scope ring_scope with BaseAddUMagma.sort.
+End BaseAddUMagmaExports.
+HB.export BaseAddUMagmaExports. 
+
+#[export]
 HB.instance Definition _ (V : BaseAddUMagma.type) := Magma_isBaseUMagma.Build (multiplicative V) (@zero V).
 
 HB.mixin Record BaseAddUMagma_isAddUMagma V of BaseAddUMagma V := {
@@ -65,6 +81,11 @@ HB.end.
 #[short(type="addUMagmaType")]
 HB.structure Definition AddUMagma := {V of isAddUMagma V & Choice V}.
 
+Module AddUMagmaExports.
+Bind Scope ring_scope with AddUMagma.sort.
+End AddUMagmaExports.
+HB.export AddUMagmaExports. 
+
 Local Notation "0" := (@zero _) : ring_scope.
 
 Definition natmul (V : addUMagmaType) (x : V) n := @iterop _ n (add : V -> V -> V) x (@zero V).
@@ -75,6 +96,7 @@ Local Notation "x *+ n" := (natmul x n) : ring_scope.
 Lemma addg0 (V : addUMagmaType) : right_id (@zero V) add.
 Proof. by move=> x; rewrite addgC add0g. Qed.
 
+#[export]
 HB.instance Definition _ (V : addUMagmaType) := Magma_isUMagma.Build (multiplicative V) add0g (@addg0 V).
 
 HB.mixin Record AddUMagma_isNmodule V of AddUMagma V := {
@@ -112,6 +134,7 @@ Notation "[ 'nmodType' 'of' T ]" :=  (Nmodule.clone T _)
 End NmodExports.
 HB.export NmodExports.
 
+#[export]
 HB.instance Definition _ (V : nmodType) := UMagma_isMonoid.Build (multiplicative V) addgA.
 
 Section NmoduleTheory.
@@ -235,6 +258,7 @@ Local Notation "x *- n" := (- (x *+ n)) : ring_scope.
 Lemma addgN (V : zmodType) : @right_inverse V V V 0 -%R +%R.
 Proof. by move=> x; rewrite addgC addNg. Qed.
 
+#[export]
 HB.instance Definition _ (V : zmodType) := Monoid_isGroup.Build (multiplicative V) addNg (@addgN V).
 
 Section ZmoduleTheory.
@@ -403,7 +427,9 @@ Proof. by case: (@semi_additive_subproof _ _ f). Qed.
 
 Definition fmultiplicative U V := @id ((multiplicative U) -> (multiplicative V)).
 
+#[export]
 HB.instance Definition _ U V (f : Additive.type U V) := isMultiplicative.Build (multiplicative U) (multiplicative V) (fmultiplicative f) (@gaddfD _ _ f).
+#[export]
 HB.instance Definition _ (U V : addUMagmaType) (f : Additive.type U V) := isUMagmaMorphism.Build (multiplicative U) (multiplicative V) (fmultiplicative f) (@gaddf0 _ _ f).
 
 Section LiftedNmod.
@@ -574,10 +600,13 @@ HB.end.
 
 Definition rmultiplicative (T : Type) := @id {pred (multiplicative T)}.
 
+#[export]
 HB.instance Definition _ (U : nmodType) (S : addgClosed U) :=
   isMulClosed.Build (multiplicative U) (rmultiplicative S) (snd nmod_closed_subproof).
+#[export]
 HB.instance Definition _ (U : nmodType) (S : addgClosed U) :=
   isMul1Closed.Build (multiplicative U) (rmultiplicative S) (fst nmod_closed_subproof).
+#[export]
 HB.instance Definition _ (U : zmodType) (S : oppgClosed U) :=
   isInvClosed.Build (multiplicative U) (rmultiplicative S) oppg_closed_subproof.
 
@@ -591,6 +620,9 @@ Lemma gpred0 : 0 \in S.
 Proof. by case: (@nmod_closed_subproof V S). Qed.
 Lemma gpredD : {in S &, forall u v, u + v \in S}.
 Proof. by case: (@nmod_closed_subproof V S). Qed.
+
+Lemma gpred0D : nmod_closed S.
+Proof. exact: nmod_closed_subproof. Qed.
 
 Lemma gpredMn n : {in S, forall u, u *+ n \in S}.
 Proof. by move=> x xS; elim: n => [|n IHn]; rewrite /= ?gpred0 // mulgS gpredD. Qed.
@@ -643,6 +675,8 @@ Proof. by rewrite -gpredN; apply: gpredDr. Qed.
 Lemma gpredBl x y : x \in S -> (x - y \in S) = (y \in S).
 Proof. by rewrite -[x \in S]gpredN -[LHS]gpredN oppgB; apply: gpredDr. Qed.
 
+Lemma zmodClosedP : zmod_closed S.
+Proof. split; [ exact: (@gpred0D V S).1 | exact: gpredB ]. Qed.
 End Zmod.
 End ZmodPred. 
 
@@ -745,6 +779,43 @@ Proof. by move=> x; apply/val_inj; rewrite !SubK addNg. Qed.
 HB.instance Definition _ := Nmodule_isZmodule.Build U addNg.
 
 HB.end.
+
+Module SubExports.
+
+Notation "[ 'SubChoice_isSubNmodule' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubNmodule.Build _ _ U gpred0D)
+  (at level 0, format "[ 'SubChoice_isSubNmodule'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubZmodule' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubZmodule.Build _ _ U (zmodClosedP _))
+  (at level 0, format "[ 'SubChoice_isSubZmodule'  'of'  U  'by'  <: ]")
+  : form_scope.
+
+End SubExports.
+HB.export SubExports.
+
+Module AllExports. HB.reexport. End AllExports.
+
+End GRing.
+
+Export AllExports.
+
+Notation "0" := (@zero _) : ring_scope.
+Notation "-%R" := (@opp _) : ring_scope.
+Notation "- x" := (opp x) : ring_scope.
+Notation "+%R" := (@add _) : function_scope.
+Notation "x + y" := (add x y) : ring_scope.
+Notation "x - y" := (add x (- y)) : ring_scope.
+Arguments natmul : simpl never.
+Notation "x *+ n" := (natmul x n) : ring_scope.
+Notation "x *- n" := (opp (x *+ n)) : ring_scope.
+Notation "s `_ i" := (seq.nth 0%R s%R i) : ring_scope.
+Notation support := 0.-support.
+
+Notation "1" := (@one _) : ring_scope.
+Notation "- 1" := (opp 1) : ring_scope.
+
+Notation "n %:R" := (natmul 1 n) : ring_scope.
 
 Section FinFunNmod.
 

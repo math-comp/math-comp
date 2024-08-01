@@ -642,7 +642,7 @@ Proof. by move=> x y; rewrite qpolyCD qpolyCN. Qed.
 Lemma qpolyC_is_multiplicative : multiplicative (qpolyC h).
 Proof. by split=> // x y; rewrite qpolyCM. Qed.
 
-HB.instance Definition _ := isAdditive.Build A {poly %/ h} (qpolyC h)
+HB.instance Definition _ := GRing.isAdditive.Build A {poly %/ h} (qpolyC h)
   qpolyC_is_additive.
 HB.instance Definition _ :=
   GRing.isMultiplicative.Build A {poly %/ h} (qpolyC h)

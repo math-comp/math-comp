@@ -479,7 +479,7 @@ Section DerivationLinear.
 Variable (E : {subfield L}).
 Let body (y : L) (p := Fadjoin_poly E x y) : L :=
   (map_poly D p).[x] + p^`().[x] * Dx E.
-HB.instance Definition _ := @isAdditive.Build _ _ body
+HB.instance Definition _ := @GRing.isAdditive.Build _ _ body
   (extendDerivation_additive_subproof E).
 HB.instance Definition _ := @GRing.isScalable.Build _ _ _ _ body
   (extendDerivation_scalable_subproof E).

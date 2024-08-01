@@ -310,7 +310,7 @@ Proof.
 by move=> p; apply/polyP=> i; rewrite coef_add_poly coefC if_same add0r.
 Qed.
 
-HB.instance Definition _ := isNmodule.Build (polynomial R)
+HB.instance Definition _ := GRing.isNmodule.Build (polynomial R)
   add_polyA add_polyC add_poly0.
 
 (* Properties of the zero polynomial *)
@@ -614,7 +614,7 @@ move=> p; apply/polyP=> i.
 by rewrite coef_add_poly coef_opp_poly coefC if_same addNr.
 Qed.
 
-HB.instance Definition _ := Nmodule_isZmodule.Build (polynomial R)
+HB.instance Definition _ := GRing.Nmodule_isZmodule.Build (polynomial R)
   add_polyN.
 
 (* Size, leading coef, morphism properties of coef *)
@@ -625,7 +625,7 @@ Proof. exact: coef_opp_poly. Qed.
 Lemma coefB p q i : (p - q)`_i = p`_i - q`_i.
 Proof. by rewrite coefD coefN. Qed.
 
-HB.instance Definition _ i := isAdditive.Build {poly R} R (coefp i)
+HB.instance Definition _ i := GRing.isAdditive.Build {poly R} R (coefp i)
   (fun p => (coefB p)^~ i).
 
 Lemma coefMn p n i : (p *+ n)`_i = p`_i *+ n.
@@ -644,7 +644,7 @@ Proof. by move=> c; apply/polyP=> [[|i]]; rewrite coefN !coefC ?oppr0. Qed.
 Lemma polyCB : {morph (@polyC R) : a b / a - b}.
 Proof. by move=> a b; rewrite polyCD polyCN. Qed.
 
-HB.instance Definition _ := isAdditive.Build R {poly R} (@polyC _) polyCB.
+HB.instance Definition _ := GRing.isAdditive.Build R {poly R} (@polyC _) polyCB.
 
 Lemma polyCMn n : {morph (@polyC R) : c / c *+ n}. Proof. exact: raddfMn. Qed.
 
@@ -1447,7 +1447,7 @@ Proof.
 split=> [|p q Sp Sq]; first exact: polyOver0.
 by apply/polyOverP=> i; rewrite coefD rpredD ?(polyOverP _).
 Qed.
-HB.instance Definition _ := isAddClosed.Build {poly R} (polyOver_pred S)
+HB.instance Definition _ := GRing.isAddClosed.Build {poly R} (polyOver_pred S)
   polyOver_addr_closed.
 
 End PolyOverAdd.
@@ -1471,7 +1471,7 @@ Proof.
 by move=> p /polyOverP Sp; apply/polyOverP=> i; rewrite coefN rpredN.
 Qed.
 HB.instance Definition _ (zmodS : zmodClosed R) :=
-  isOppClosed.Build {poly R} (polyOver_pred zmodS) (@polyOverNr _).
+  GRing.isOppClosed.Build {poly R} (polyOver_pred zmodS) (@polyOverNr _).
 
 Section PolyOverSemiring.
 
@@ -1980,7 +1980,7 @@ Section Additive.
 
 Variables (iR : ringType) (f : {additive aR -> rR}).
 
-Local Notation "p ^f" := (map_poly (Additive.sort f) p) : ring_scope.
+Local Notation "p ^f" := (map_poly (GRing.Additive.sort f) p) : ring_scope.
 
 Lemma coef_map p i : p^f`_i = f p`_i.
 Proof. exact: coef_map_id0 (raddf0 f). Qed.
@@ -1995,7 +1995,7 @@ Proof. exact: map_poly_comp_id0 (raddf0 f). Qed.
 Fact map_poly_is_additive : additive (map_poly f).
 Proof. by move=> p q; apply/polyP=> i; rewrite !(coef_map, coefB) raddfB. Qed.
 HB.instance Definition _ :=
-  isAdditive.Build {poly aR} {poly rR} (map_poly f) map_poly_is_additive.
+  GRing.isAdditive.Build {poly aR} {poly rR} (map_poly f) map_poly_is_additive.
 
 Lemma map_polyC a : (a%:P)^f = (f a)%:P.
 Proof. by apply/polyP=> i; rewrite !(coef_map, coefC) -!mulrb raddfMn. Qed.
@@ -2579,7 +2579,7 @@ Proof.
 rewrite coef_prod_XsubC ?leq_pred// => ps0.
 have -> : (size ps - (size ps).-1 = 1)%N.
   by move: ps0; case: (size ps) => // n _; exact: subSnn.
-rewrite expr1 mulN1r; congr opp.
+rewrite expr1 mulN1r; congr GRing.opp.
 set f : 'I_(size ps) -> {set 'I_(size ps)} := fun a => [set a].
 transitivity (\sum_(I in imset f (mem setT)) \prod_(i in I) ps`_i).
   apply: congr_big => // I /=.

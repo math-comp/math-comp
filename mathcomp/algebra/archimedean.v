@@ -225,10 +225,10 @@ have/trunc_itv/andP[lefx ltxf1]: 0 <= x by apply: le_trans lemx; apply: ler0n.
 by rewrite -!(ltr_nat R) 2?(@le_lt_trans _ _ x).
 Qed.
 
-Lemma natrK : cancel (natmul 1) trunc.
+Lemma natrK : cancel (GRing.natmul 1) trunc.
 Proof. by move=> m; apply: trunc_def; rewrite ler_nat ltr_nat ltnS leqnn. Qed.
 
-Lemma truncK : {in nat_num, cancel trunc (natmul 1)}.
+Lemma truncK : {in nat_num, cancel trunc (GRing.natmul 1)}.
 Proof. by move=> x; rewrite natrE => /eqP. Qed.
 
 Lemma trunc0 : trunc 0 = 0%N. Proof. exact: natrK 0%N. Qed.

@@ -5090,7 +5090,7 @@ Proof. by move=> x; apply: val_inj; rewrite /= add0r. Qed.
 Lemma gen_addNr : left_inverse gen0 genN genD.
 Proof. by move=> x; apply: val_inj; rewrite /= addNr. Qed.
 
-#[export] HB.instance Definition _ := isZmodule.Build FA
+#[export] HB.instance Definition _ := GRing.isZmodule.Build FA
   gen_addA gen_addC gen_add0r gen_addNr.
 
 Definition pval (x : FA) := rVpoly (val x).
@@ -5174,7 +5174,7 @@ Proof. exact: mxval_genM. Qed.
 Lemma mxval_sub : additive mxval.
 Proof. by move=> x y; rewrite mxvalD mxvalN. Qed.
 #[export] HB.instance Definition _ :=
-  isAdditive.Build FA 'M[F]_n mxval mxval_sub.
+  GRing.isAdditive.Build FA 'M[F]_n mxval mxval_sub.
 
 Lemma mxval_is_multiplicative : multiplicative mxval.
 Proof. by split; [apply: mxvalM | apply: mxval1]. Qed.
@@ -5210,7 +5210,7 @@ Proof. by move=> x y; apply: mxval_inj; rewrite genK !rmorphB /= !genK. Qed.
 Lemma gen_is_multiplicative : multiplicative gen.
 Proof. by split=> // x y; apply: mxval_inj; rewrite genK !rmorphM /= !genK. Qed.
 
-#[export] HB.instance Definition _ := isAdditive.Build F FA gen
+#[export] HB.instance Definition _ := GRing.isAdditive.Build F FA gen
   gen_is_additive.
 #[export] HB.instance Definition _ := GRing.isMultiplicative.Build F FA gen
   gen_is_multiplicative.

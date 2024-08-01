@@ -499,7 +499,7 @@ Definition xcfun (chi : 'CF(G)) A :=
 Lemma xcfun_is_additive phi : additive (xcfun phi).
 Proof. by move=> A B; rewrite /xcfun linearB mulmxBl !mxE. Qed.
 HB.instance Definition _ phi :=
-  isAdditive.Build 'M_(gcard G) _ (xcfun phi) (xcfun_is_additive phi).
+  GRing.isAdditive.Build 'M_(gcard G) _ (xcfun phi) (xcfun_is_additive phi).
 
 Lemma xcfunZr a phi A : xcfun phi (a *: A) = a * xcfun phi A.
 Proof. by rewrite /xcfun linearZ -scalemxAl mxE. Qed.
@@ -515,7 +515,7 @@ Proof.
 move=> phi psi; rewrite /= /xcfun !mxE -sumrB; apply: eq_bigr => i _.
 by rewrite !mxE !cfunE mulrBr.
 Qed.
-HB.instance Definition _ A := isAdditive.Build _ _ (xcfun_r A)
+HB.instance Definition _ A := GRing.isAdditive.Build _ _ (xcfun_r A)
   (xcfun_r_is_additive A).
 
 Lemma xcfunZl a phi A : xcfun (a *: phi) A = a * xcfun phi A.
@@ -839,7 +839,7 @@ Proof.
 split=> [|chi xi /forallP-Nchi /forallP-Nxi]; first exact: cfun0_char.
 by apply/forallP=> i; rewrite linearD rpredD /=.
 Qed.
-HB.instance Definition _ := isAddClosed.Build (classfun G) character_pred
+HB.instance Definition _ := GRing.isAddClosed.Build (classfun G) character_pred
   add_char.
 
 Lemma char_sum_irrP {phi} :
