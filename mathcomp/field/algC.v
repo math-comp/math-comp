@@ -366,11 +366,11 @@ Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K add0r. Qed.
 Fact addN : left_inverse zero opp add.
 Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K addNr. Qed.
 
-HB.instance Definition _ := isZmodule.Build type addA addC add0 addN.
+HB.instance Definition _ := GRing.isZmodule.Build type addA addC add0 addN.
 
 Fact CtoL_is_additive : additive CtoL.
 Proof. by move=> u v; rewrite !LtoC_K. Qed.
-HB.instance Definition _ := isAdditive.Build type L' CtoL
+HB.instance Definition _ := GRing.isAdditive.Build type L' CtoL
   CtoL_is_additive.
 
 Definition one := LtoC (integral1 _).
@@ -454,7 +454,7 @@ Qed.
 Definition conj : {rmorphism type -> type} :=
   GRing.RMorphism.Pack
     (GRing.RMorphism.Class
-       (isSemiAdditive.Build _ _ _ conj_is_semi_additive)
+       (GRing.isSemiAdditive.Build _ _ _ conj_is_semi_additive)
        (GRing.isMultiplicative.Build _ _ _ conj_is_multiplicative)).
 
 Lemma conjK : involutive conj.
@@ -708,7 +708,7 @@ Proof.
 split=> [| _ _ /dvdCP[y Zy ->] /dvdCP[z Zz ->]]; first exact: dvdC0.
 by rewrite -mulrBl dvdC_mull ?rpredB.
 Qed.
-HB.instance Definition _ x := isZmodClosed.Build _ (dvdC x) (dvdC_zmod x).
+HB.instance Definition _ x := GRing.isZmodClosed.Build _ (dvdC x) (dvdC_zmod x).
 
 Lemma dvdC_nat (p n : nat) : (p %| n)%C = (p %| n)%N.
 Proof.
@@ -904,7 +904,7 @@ Fact algC_invaut_is_rmorphism nu : multiplicative (algC_invaut nu).
 Proof. exact: can2_rmorphism (algC_autK nu) (algC_invautK nu). Qed.
 
 HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=
-  isAdditive.Build algC algC (algC_invaut nu)
+  GRing.isAdditive.Build algC algC (algC_invaut nu)
     (algC_invaut_is_additive nu).
 
 HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=

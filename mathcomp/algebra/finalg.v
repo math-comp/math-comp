@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype finset fingroup morphism perm action.
-From mathcomp Require Import monoid comoid ssralg countalg.
+From mathcomp Require Import monoid ssralg countalg.
 
 (*****************************************************************************)
 (*      The algebraic part of the algebraic hierarchy for finite types       *)
@@ -39,10 +39,10 @@ Module FinRing.
 Import GRing.Theory.
 
 #[short(type="finNmodType")]
-HB.structure Definition Nmodule := {M of Nmodule M & Finite M}.
+HB.structure Definition Nmodule := {M of GRing.Nmodule M & Finite M}.
 
 #[short(type="finZmodType")]
-HB.structure Definition Zmodule := {M of Zmodule M & Finite M}.
+HB.structure Definition Zmodule := {M of GRing.Zmodule M & Finite M}.
 
 Module ZmoduleExports.
 Notation "[ 'finGroupMixin' 'of' R 'for' +%R ]" :=
@@ -108,7 +108,7 @@ Lemma zmod1gE : 1%g = 0 :> U.            Proof. by []. Qed.
 Lemma zmodVgE x : x^-1%g = - x.          Proof. by []. Qed.
 Lemma zmodMgE x y : (x * y)%g = x + y.   Proof. by []. Qed.
 Lemma zmodXgE n x : (x ^+ n)%g = x *+ n. Proof. by []. Qed.
-Lemma zmod_mulgC x y : @commute (comoid.multiplicative U) x y.
+Lemma zmod_mulgC x y : @commute (comoid.GRing.multiplicative U) x y.
 Proof. exact: addrC. Qed.
 Lemma zmod_abelian (A : {set U}) : abelian A.
 Proof. by apply/centsP=> x _ y _; apply: zmod_mulgC. Qed.

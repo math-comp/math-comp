@@ -156,7 +156,7 @@ Qed.
 
 Variable (homKEf : kHom K E f).
 HB.instance Definition _ :=
-  @isAdditive.Build _ _ kHomf (kHom_is_additive homKEf).
+  @GRing.isAdditive.Build _ _ kHomf (kHom_is_additive homKEf).
 HB.instance Definition _ :=
   @GRing.isMultiplicative.Build _ _ kHomf (kHom_is_multiplicative homKEf).
 
@@ -201,7 +201,7 @@ move=> k a; rewrite /kHomf !linearZ /=.
 rewrite -[rhs in _ = rhs]mulr_algl -hornerZ; congr _.[_].
 by apply/polyP => i; rewrite !(coefZ, coef_map) /= !mulr_algl linearZ.
 Qed.
-HB.instance Definition _ := @isAdditive.Build _ _ kHomf
+HB.instance Definition _ := @GRing.isAdditive.Build _ _ kHomf
   kHomExtend_additive_subproof.
 HB.instance Definition _ := @GRing.isScalable.Build _ _ _ _ kHomf
   kHomExtend_scalable_subproof.
@@ -965,7 +965,7 @@ Fact galTrace_is_additive : additive (galTrace U V).
 Proof.
 by move=> a b /=; rewrite -sumrB; apply: eq_bigr => x _; rewrite rmorphB.
 Qed.
-HB.instance Definition _ := isAdditive.Build L L (galTrace U V)
+HB.instance Definition _ := GRing.isAdditive.Build L L (galTrace U V)
   galTrace_is_additive.
 
 Lemma galNorm1 : galNorm U V 1 = 1.

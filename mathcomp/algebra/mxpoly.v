@@ -496,7 +496,7 @@ have bij_phi: bijective phi.
     by case: leqP => // P_le_k; rewrite nth_default ?mxE.
   apply/polyP=> k; apply/matrixP=> i j; rewrite coef_phi mxE coef_poly.
   by case: leqP => // P_le_k; rewrite nth_default ?mxE.
-pose phiaM := isAdditive.Build _ _ phi phi_is_additive.
+pose phiaM := GRing.isAdditive.Build _ _ phi phi_is_additive.
 pose phimM := GRing.isMultiplicative.Build _ _ phi phi_is_multiplicative.
 pose phiRM : GRing.RMorphism.type _ _ := HB.pack phi phiaM phimM.
 exists phiRM; split=> // [p | A]; apply/polyP=> k; apply/matrixP=> i j.
