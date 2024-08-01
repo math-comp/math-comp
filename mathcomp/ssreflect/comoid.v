@@ -2,14 +2,16 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
 From mathcomp Require Import fintype finfun monoid.
 
-Local Open Scope group_scope.
-
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Reserved Notation "+%g" (at level 0).
-Reserved Notation "-%g" (at level 0).
+Declare Scope ring_scope.
+Delimit Scope ring_scope with R.
+Local Open Scope ring_scope.
+
+Reserved Notation "+%R" (at level 0).
+Reserved Notation "-%R" (at level 0).
 Reserved Notation "\0" (at level 0).
 Reserved Notation "f \+ g" (at level 50, left associativity).
 Reserved Notation "f \- g" (at level 50, left associativity).
@@ -26,8 +28,8 @@ HB.mixin Record isAddMagma V := {
 #[short(type="addMagmaType")]
 HB.structure Definition AddMagma := {V of isAddMagma V & Choice V}.
 
-Local Notation "+%g" := (@add _) : function_scope.
-Local Notation "x + y" := (add x y) : group_scope.
+Local Notation "+%R" := (@add _) : function_scope.
+Local Notation "x + y" := (add x y) : ring_scope.
 
 Definition multiplicative := @id Type.
 
@@ -63,12 +65,12 @@ HB.end.
 #[short(type="addUMagmaType")]
 HB.structure Definition AddUMagma := {V of isAddUMagma V & Choice V}.
 
-Local Notation "0" := (@zero _) : group_scope.
+Local Notation "0" := (@zero _) : ring_scope.
 
 Definition natmul (V : addUMagmaType) (x : V) n := @iterop _ n (add : V -> V -> V) x (@zero V).
 Arguments natmul : simpl never.
 
-Local Notation "x *+ n" := (natmul x n) : group_scope.
+Local Notation "x *+ n" := (natmul x n) : ring_scope.
 
 Lemma addg0 (V : addUMagmaType) : right_id (@zero V) add.
 Proof. by move=> x; rewrite addgC add0g. Qed.
@@ -98,7 +100,7 @@ HB.end.
 HB.structure Definition Nmodule := {V of isNmodule V & Choice V}.
 
 Module NmodExports.
-Bind Scope group_scope with Nmodule.sort.
+Bind Scope ring_scope with Nmodule.sort.
 #[deprecated(since="mathcomp 2.0.0",
   note="Use GRing.Nmodule.clone instead.")]
 Notation "[ 'nmodType' 'of' T 'for' cT ]" := (Nmodule.clone T cT)
@@ -120,13 +122,13 @@ Implicit Types x y : V.
 (* addgA, addgC and add0g in the structure *)
 (* addg0 proved above *)
 
-Lemma addgCA : @left_commutative V V +%g.
+Lemma addgCA : @left_commutative V V +%R.
 Proof. by move=> x y z; rewrite !addgA [x + _]addgC. Qed.
 
-Lemma addgAC : @right_commutative V V +%g.
+Lemma addgAC : @right_commutative V V +%R.
 Proof. by move=> x y z; rewrite -!addgA [y + _]addgC. Qed.
 
-Lemma addgACA : @interchange V +%g +%g.
+Lemma addgACA : @interchange V +%R +%R.
 Proof. by move=> x y z t; rewrite -!addgA [y + (z + t)]addgCA. Qed.
 
 Lemma mulg0n x : x *+ 0 = 0. Proof. by []. Qed.
@@ -160,10 +162,10 @@ Proof. exact: (@expgnA (multiplicative V)). Qed.
 Lemma mulgnAC x m n : x *+ m *+ n = x *+ n *+ m.
 Proof. exact: (@expgnAC (multiplicative V)). Qed.
 
-Lemma iter_addg n x y : iter n (+%g x) y = x *+ n + y.
+Lemma iter_addg n x y : iter n (+%R x) y = x *+ n + y.
 Proof. exact: (@iter_mulg (multiplicative V)). Qed.
 
-Lemma iter_addg_0 n x : iter n (+%g x) 0 = x *+ n.
+Lemma iter_addg_0 n x : iter n (+%R x) 0 = x *+ n.
 Proof. exact: (@iter_mulg_1 (multiplicative V)). Qed.
 
 Section ClosedPredicates.
@@ -213,7 +215,7 @@ HB.instance Definition _ := isZmodule.Build V mulgA mulgC mul1g mulVg.
 HB.end.
 
 Module ZmodExports.
-Bind Scope group_scope with Zmodule.sort.
+Bind Scope ring_scope with Zmodule.sort.
 #[deprecated(since="mathcomp 2.0.0", note="use GRing.isZmodule.Build instead")]
 Notation ZmodMixin V := (isZmodule.Build V).
 #[deprecated(since="mathcomp 2.0.0", note="Use GRing.Zmodule.clone instead.")]
@@ -225,12 +227,12 @@ Notation "[ 'zmodType' 'of' T ]" :=  (Zmodule.clone T _)
 End ZmodExports.
 HB.export ZmodExports.
 
-Local Notation "-%g" := (@opp _) : group_scope.
-Local Notation "- x" := (opp x) : group_scope.
-Local Notation "x - y" := (x + - y) : group_scope.
-Local Notation "x *- n" := (- (x *+ n)) : group_scope.
+Local Notation "-%R" := (@opp _) : ring_scope.
+Local Notation "- x" := (opp x) : ring_scope.
+Local Notation "x - y" := (x + - y) : ring_scope.
+Local Notation "x *- n" := (- (x *+ n)) : ring_scope.
 
-Lemma addgN (V : zmodType) : @right_inverse V V V 0 -%g +%g.
+Lemma addgN (V : zmodType) : @right_inverse V V V 0 -%R +%R.
 Proof. by move=> x; rewrite addgC addNg. Qed.
 
 HB.instance Definition _ (V : zmodType) := Monoid_isGroup.Build (multiplicative V) addNg (@addgN V).
@@ -240,30 +242,30 @@ Section ZmoduleTheory.
 Variable V : zmodType.
 Implicit Types x y : V.
 
-Definition subrr := addgN.
+Definition subgg := addgN.
 
-Lemma addKg : @left_loop V V -%g +%g.
+Lemma addKg : @left_loop V V -%R +%R.
 Proof. exact: (@mulKg (multiplicative V)). Qed.
-Lemma addNKg : @rev_left_loop V V -%g +%g.
+Lemma addNKg : @rev_left_loop V V -%R +%R.
 Proof. exact: (@mulVKg (multiplicative V)). Qed.
-Lemma addgK : @right_loop V V -%g +%g.
+Lemma addgK : @right_loop V V -%R +%R.
 Proof. exact: (@mulgK (multiplicative V)). Qed.
-Lemma addgNK : @rev_right_loop V V -%g +%g.
+Lemma addgNK : @rev_right_loop V V -%R +%R.
 Proof. exact: (@mulgVK (multiplicative V)). Qed.
 Definition subgK := addgNK.
 Lemma subKg x : involutive (fun y => x - y).
 Proof. by move=> y; apply: (canLR (addgK _)); rewrite addgC subgK. Qed.
-Lemma addgI : @right_injective V V V +%g.
+Lemma addgI : @right_injective V V V +%R.
 Proof. exact: (@mulgI (multiplicative V)). Qed.
-Lemma addIg : @left_injective V V V +%g.
+Lemma addIg : @left_injective V V V +%R.
 Proof. exact: (@mulIg (multiplicative V)). Qed.
 Lemma subgI : right_injective (fun x y => x - y).
 Proof. exact: (@divgI (multiplicative V)). Qed.
 Lemma subIg : left_injective (fun x y => x - y).
 Proof. exact: (@divIg (multiplicative V)). Qed.
-Lemma oppgK : @involutive V -%g.
+Lemma oppgK : @involutive V -%R.
 Proof. exact: (@invgK (multiplicative V)). Qed.
-Lemma oppg_inj : @injective V V -%g.
+Lemma oppg_inj : @injective V V -%R.
 Proof. exact: (@invg_inj (multiplicative V)). Qed.
 Lemma oppg0 : -0 = 0 :> V.
 Proof. exact: (@invg1 (multiplicative V)). Qed.
@@ -276,7 +278,7 @@ Lemma sub0g x : 0 - x = - x. Proof. exact: (@div1g (multiplicative V)). Qed.
 Lemma oppgB x y : - (x - y) = y - x.
 Proof. exact: (@invgF (multiplicative V)). Qed.
 
-Lemma oppgD : {morph -%g: x y / x + y : V}.
+Lemma oppgD : {morph -%R: x y / x + y : V}.
 Proof. by move=> x y; rewrite -[y in LHS]oppgK oppgB addgC. Qed.
 
 Lemma addgKA z x y : (x + z) - (z + y) = x - y.
@@ -363,7 +365,7 @@ HB.factory Record isAdditive (U V : zmodType) (apply : U -> V) := {
 
 HB.builders Context U V apply of isAdditive U V apply.
 Local Lemma gaddf0 : apply 0 = 0.
-Proof. by rewrite -[0]subg0 additive_subproof subrr. Qed.
+Proof. by rewrite -[0]subg0 additive_subproof subgg. Qed.
 
 Local Lemma gaddfD : {morph apply : x y / x + y}.
 Proof.
@@ -415,10 +417,10 @@ Definition sub_fun (f g : U -> V) x := f x - g x.
 Definition opp_fun (f : U -> V) x := - f x.
 End LiftedZmod.
 
-Local Notation "\0" := (null_fun _) : group_scope.
-Local Notation "f \+ g" := (add_fun f g) : group_scope.
-Local Notation "f \- g" := (sub_fun f g) : group_scope.
-Local Notation "\- f" := (opp_fun f) : group_scope.
+Local Notation "\0" := (null_fun _) : ring_scope.
+Local Notation "f \+ g" := (add_fun f g) : ring_scope.
+Local Notation "f \- g" := (sub_fun f g) : ring_scope.
+Local Notation "\- f" := (opp_fun f) : ring_scope.
 
 Arguments null_fun {_} V _ /.
 Arguments add_fun {_ _} f g _ /.
@@ -606,7 +608,7 @@ Variable S : oppgClosed V.
 Lemma gpredNr : {in S, forall u, - u \in S}.
 Proof. exact: oppg_closed_subproof. Qed.
 
-Lemma gpredN : {mono -%g: u / u \in S}.
+Lemma gpredN : {mono -%R: u / u \in S}.
 Proof. by move=> u; apply/idP/idP=> /gpredNr; rewrite ?oppgK; apply. Qed.
 
 End Opp.
@@ -704,6 +706,25 @@ Lemma valB : {morph val : x y / x - y}. Proof. exact: gaddfB. Qed.
 Lemma valN : {morph val : x / - x}. Proof. exact: gaddfN. Qed.
 End additive.
 
+HB.factory Record isSubZmodule (V : zmodType) S U
+    of SubChoice V S U & Zmodule U := {
+  valB_subproof : additive (val : U -> V)
+}.
+
+HB.builders Context V S U of isSubZmodule V S U.
+
+Fact valD0 : semi_additive (val : U -> V).
+Proof.
+have val0: (val : U -> V) 0 = 0.
+  by rewrite -[X in val X](subg0 0) valB_subproof subgg.
+split=> // x y; apply/(@subIg _ (val y)).
+by rewrite -valB_subproof -!addgA !subgg !addg0.
+Qed.
+
+HB.instance Definition _ := isSubAddUMagma.Build V S U valD0.
+
+HB.end.
+
 HB.factory Record SubChoice_isSubZmodule (V : zmodType) S U
     of SubChoice V S U := {
   zmod_closed_subproof : zmod_closed S
@@ -760,7 +781,7 @@ Implicit Types f g : {ffun aT -> rT}.
 
 Definition ffun_opp f := [ffun a => - (f a)].
 
-Fact ffun_addNg : left_inverse 0 ffun_opp +%g.
+Fact ffun_addNg : left_inverse 0 ffun_opp +%R.
 Proof. by move=> f; apply/ffunP => a; rewrite !ffunE addNg. Qed.
 
 HB.instance Definition _ := Nmodule_isZmodule.Build {ffun aT -> rT} ffun_addNg.
@@ -798,7 +819,7 @@ Variables U V : zmodType.
 
 Definition pair_opp (a : U * V) := (- a.1, - a.2).
 
-Fact pair_addNg : left_inverse 0 pair_opp +%g.
+Fact pair_addNg : left_inverse 0 pair_opp +%R.
 Proof. by move=> [] al ar; rewrite /pair_opp; congr pair; apply/addNg. Qed.
 
 HB.instance Definition _ := Nmodule_isZmodule.Build (U * V)%type pair_addNg.
