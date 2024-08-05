@@ -1429,7 +1429,7 @@ Qed.
 
 Section PolyOverAdd.
 
-Variable S : GRing.addrClosed R.
+Variable S : addrClosed R.
 
 Lemma polyOverP {p} : reflect (forall i, p`_i \in S) (p \in polyOver S).
 Proof.
@@ -1964,7 +1964,7 @@ Proof.
 by move=> gK f_0 p; rewrite /= -map_poly_comp_id0 ?map_poly_id // => x _ //=.
 Qed.
 
-Lemma eq_in_map_poly_id0 (f g : aR -> rR) (S : GRing.addrClosed aR) :
+Lemma eq_in_map_poly_id0 (f g : aR -> rR) (S : addrClosed aR) :
     f 0 = 0 -> g 0 = 0 -> {in S, f =1 g} ->
   {in polyOver S, map_poly f =1 map_poly g}.
 Proof.
@@ -1972,7 +1972,7 @@ move=> f0 g0 eq_fg p pP; apply/polyP => i.
 by rewrite !coef_map_id0// eq_fg// (polyOverP _).
 Qed.
 
-Lemma eq_in_map_poly (f g : {additive aR -> rR}) (S : GRing.addrClosed aR) :
+Lemma eq_in_map_poly (f g : {additive aR -> rR}) (S : addrClosed aR) :
   {in S, f =1 g} -> {in polyOver S, map_poly f =1 map_poly g}.
 Proof. by move=> /eq_in_map_poly_id0; apply; rewrite //?raddf0. Qed.
 

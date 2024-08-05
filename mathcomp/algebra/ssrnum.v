@@ -2357,7 +2357,6 @@ Lemma signr_inj : injective (fun b : bool => (-1) ^+ b : R).
 Proof. exact: can_inj (fun x => 0 >= x) signr_le0. Qed.
 
 (* Ternary sign (sg). *)
-HB.graph graph.dot.
 Lemma sgr_def x : sg x = (-1) ^+ (x < 0)%R *+ (x != 0).
 Proof. by rewrite /sg; do 2!case: ifP => //. Qed.
 
