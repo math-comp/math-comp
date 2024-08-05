@@ -1512,7 +1512,7 @@ HB.export DualOrder.
 
 Module Import POrderTheory.
 
-Export PreorderTheory.
+Include PreorderTheory.
 
 Section POrderTheory.
 
@@ -1562,12 +1562,6 @@ have -> : count (predI (pred1 x) (< x)) s = 0%N.
   by rewrite lt_neqAle; case: eqP => //= ->; rewrite eqxx.
 have /eq_count-> : [predU1 x & < x] =1 (<= x) by move=> y /=; rewrite le_eqVlt.
 by rewrite addn0 => ->; rewrite -add1n leq_add2r -has_count has_pred1.
-Qed.
-
-Lemma comparable_leNgt x y : x >=< y -> (x <= y) = ~~ (y < x).
-Proof.
-move=> c_xy; apply/idP/idP => [/le_gtF/negP/negP//|]; rewrite lt_neqAle.
-by move: c_xy => /orP [] -> //; rewrite andbT negbK => /eqP ->.
 Qed.
 
 Lemma comparable_ltgtP x y : x >=< y ->
@@ -2754,6 +2748,10 @@ Lemma sub_bigmax [x0] I r (P P' : {pred I}) (F : I -> T) :
     (forall i, P i -> P' i) ->
   \big[max/x0]_(i <- r | P i) F i <= \big[max/x0]_(i <- r | P' i) F i.
 Proof. exact: sub_le_big. Qed.
+
+(* FIXME: Remove that. *)
+Local Notation "'{subset' x '<=' y '}'" :=
+  (sub_mem (mem x) (mem y)) (at level 0, x, y at level 1).
 
 Lemma sub_bigmin_seq [x0] (I : eqType) r r' P (F : I -> T) : {subset r' <= r} ->
   \big[min/x0]_(i <- r | P i) F i <= \big[min/x0]_(i <- r' | P i) F i.
