@@ -3,7 +3,8 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
 From mathcomp Require Import path fintype tuple bigop finset div prime finfun.
-From mathcomp Require Import finset preorder.
+From mathcomp Require Import finset.
+From mathcomp Require Export preorder.
 
 (******************************************************************************)
 (*                   Types equipped with order relations                      *)
@@ -583,32 +584,6 @@ Declare Scope order_scope.
 Delimit Scope order_scope with O.
 Local Open Scope order_scope.
 
-Reserved Notation "<= y" (at level 35).
-Reserved Notation ">= y" (at level 35).
-Reserved Notation "< y" (at level 35).
-Reserved Notation "> y" (at level 35).
-Reserved Notation "<= y :> T" (at level 35, y at next level).
-Reserved Notation ">= y :> T" (at level 35, y at next level).
-Reserved Notation "< y :> T" (at level 35, y at next level).
-Reserved Notation "> y :> T" (at level 35, y at next level).
-Reserved Notation "x >=< y" (at level 70, no associativity).
-Reserved Notation ">=< y" (at level 35).
-Reserved Notation ">=< y :> T" (at level 35, y at next level).
-Reserved Notation "x >< y" (at level 70, no associativity).
-Reserved Notation ">< x" (at level 35).
-Reserved Notation ">< y :> T" (at level 35, y at next level).
-Reserved Notation "f \min g" (at level 50, left associativity).
-Reserved Notation "f \max g" (at level 50, left associativity).
-
-Reserved Notation "x < y ?<= 'if' c" (at level 70, y, c at next level,
-  format "x '[hv'  <  y '/'  ?<=  'if'  c ']'").
-Reserved Notation "x < y ?<= 'if' c :> T" (at level 70, y, c at next level,
-  format "x '[hv'  <  y '/'  ?<=  'if'  c  :> T ']'").
-
-(* Reserved notations for bottom/top elements *)
-Reserved Notation "\bot" (at level 0).
-Reserved Notation "\top" (at level 0).
-
 (* Reserved notations for lattice operations *)
 Reserved Notation "A `&` B"  (at level 48, left associativity).
 Reserved Notation "A `|` B" (at level 52, left associativity).
@@ -616,216 +591,36 @@ Reserved Notation "A `\` B" (at level 50, left associativity).
 Reserved Notation "~` A" (at level 35, right associativity).
 
 (* Reserved notations for dual order *)
-Reserved Notation "x <=^d y" (at level 70, y at next level).
-Reserved Notation "x >=^d y" (at level 70, y at next level).
-Reserved Notation "x <^d y" (at level 70, y at next level).
-Reserved Notation "x >^d y" (at level 70, y at next level).
-Reserved Notation "x <=^d y :> T" (at level 70, y at next level).
-Reserved Notation "x >=^d y :> T" (at level 70, y at next level).
-Reserved Notation "x <^d y :> T" (at level 70, y at next level).
-Reserved Notation "x >^d y :> T" (at level 70, y at next level).
-Reserved Notation "<=^d y" (at level 35).
-Reserved Notation ">=^d y" (at level 35).
-Reserved Notation "<^d y" (at level 35).
-Reserved Notation ">^d y" (at level 35).
-Reserved Notation "<=^d y :> T" (at level 35, y at next level).
-Reserved Notation ">=^d y :> T" (at level 35, y at next level).
-Reserved Notation "<^d y :> T" (at level 35, y at next level).
-Reserved Notation ">^d y :> T" (at level 35, y at next level).
-Reserved Notation "x >=<^d y" (at level 70, no associativity).
-Reserved Notation ">=<^d y" (at level 35).
-Reserved Notation ">=<^d y :> T" (at level 35, y at next level).
-Reserved Notation "x ><^d y" (at level 70, no associativity).
-Reserved Notation "><^d x" (at level 35).
-Reserved Notation "><^d y :> T" (at level 35, y at next level).
-
-Reserved Notation "x <=^d y <=^d z" (at level 70, y, z at next level).
-Reserved Notation "x <^d y <=^d z" (at level 70, y, z at next level).
-Reserved Notation "x <=^d y <^d z" (at level 70, y, z at next level).
-Reserved Notation "x <^d y <^d z" (at level 70, y, z at next level).
-Reserved Notation "x <=^d y ?= 'iff' c" (at level 70, y, c at next level,
-  format "x '[hv'  <=^d  y '/'  ?=  'iff'  c ']'").
-Reserved Notation "x <=^d y ?= 'iff' c :> T" (at level 70, y, c at next level,
-  format "x '[hv'  <=^d  y '/'  ?=  'iff'  c  :> T ']'").
-Reserved Notation "x <^d y ?<= 'if' c" (at level 70, y, c at next level,
-  format "x '[hv'  <^d  y '/'  ?<=  'if'  c ']'").
-Reserved Notation "x <^d y ?<= 'if' c :> T" (at level 70, y, c at next level,
-  format "x '[hv'  <^d  y '/'  ?<=  'if'  c  :> T ']'").
-
-Reserved Notation "\bot^d" (at level 0).
-Reserved Notation "\top^d" (at level 0).
-
 Reserved Notation "A `&^d` B"  (at level 48, left associativity).
 Reserved Notation "A `|^d` B" (at level 52, left associativity).
 Reserved Notation "A `\^d` B" (at level 50, left associativity).
 Reserved Notation "~^d` A" (at level 35, right associativity).
 
 (* Reserved notations for product ordering of prod *)
-Reserved Notation "x <=^p y" (at level 70, y at next level).
-Reserved Notation "x >=^p y" (at level 70, y at next level).
-Reserved Notation "x <^p y" (at level 70, y at next level).
-Reserved Notation "x >^p y" (at level 70, y at next level).
-Reserved Notation "x <=^p y :> T" (at level 70, y at next level).
-Reserved Notation "x >=^p y :> T" (at level 70, y at next level).
-Reserved Notation "x <^p y :> T" (at level 70, y at next level).
-Reserved Notation "x >^p y :> T" (at level 70, y at next level).
-Reserved Notation "<=^p y" (at level 35).
-Reserved Notation ">=^p y" (at level 35).
-Reserved Notation "<^p y" (at level 35).
-Reserved Notation ">^p y" (at level 35).
-Reserved Notation "<=^p y :> T" (at level 35, y at next level).
-Reserved Notation ">=^p y :> T" (at level 35, y at next level).
-Reserved Notation "<^p y :> T" (at level 35, y at next level).
-Reserved Notation ">^p y :> T" (at level 35, y at next level).
-Reserved Notation "x >=<^p y" (at level 70, no associativity).
-Reserved Notation ">=<^p x" (at level 35).
-Reserved Notation ">=<^p y :> T" (at level 35, y at next level).
-Reserved Notation "x ><^p y" (at level 70, no associativity).
-Reserved Notation "><^p x" (at level 35).
-Reserved Notation "><^p y :> T" (at level 35, y at next level).
-
-Reserved Notation "x <=^p y <=^p z" (at level 70, y, z at next level).
-Reserved Notation "x <^p y <=^p z" (at level 70, y, z at next level).
-Reserved Notation "x <=^p y <^p z" (at level 70, y, z at next level).
-Reserved Notation "x <^p y <^p z" (at level 70, y, z at next level).
-Reserved Notation "x <=^p y ?= 'iff' c" (at level 70, y, c at next level,
-  format "x '[hv'  <=^p  y '/'  ?=  'iff'  c ']'").
-Reserved Notation "x <=^p y ?= 'iff' c :> T" (at level 70, y, c at next level,
-  format "x '[hv'  <=^p  y '/'  ?=  'iff'  c  :> T ']'").
-
-Reserved Notation "\bot^p" (at level 0).
-Reserved Notation "\top^p" (at level 0).
-
 Reserved Notation "A `&^p` B"  (at level 48, left associativity).
 Reserved Notation "A `|^p` B" (at level 52, left associativity).
 Reserved Notation "A `\^p` B" (at level 50, left associativity).
 Reserved Notation "~^p` A" (at level 35, right associativity).
 
 (* Reserved notations for product ordering of seq *)
-Reserved Notation "x <=^sp y" (at level 70, y at next level).
-Reserved Notation "x >=^sp y" (at level 70, y at next level).
-Reserved Notation "x <^sp y" (at level 70, y at next level).
-Reserved Notation "x >^sp y" (at level 70, y at next level).
-Reserved Notation "x <=^sp y :> T" (at level 70, y at next level).
-Reserved Notation "x >=^sp y :> T" (at level 70, y at next level).
-Reserved Notation "x <^sp y :> T" (at level 70, y at next level).
-Reserved Notation "x >^sp y :> T" (at level 70, y at next level).
-Reserved Notation "<=^sp y" (at level 35).
-Reserved Notation ">=^sp y" (at level 35).
-Reserved Notation "<^sp y" (at level 35).
-Reserved Notation ">^sp y" (at level 35).
-Reserved Notation "<=^sp y :> T" (at level 35, y at next level).
-Reserved Notation ">=^sp y :> T" (at level 35, y at next level).
-Reserved Notation "<^sp y :> T" (at level 35, y at next level).
-Reserved Notation ">^sp y :> T" (at level 35, y at next level).
-Reserved Notation "x >=<^sp y" (at level 70, no associativity).
-Reserved Notation ">=<^sp x" (at level 35).
-Reserved Notation ">=<^sp y :> T" (at level 35, y at next level).
-Reserved Notation "x ><^sp y" (at level 70, no associativity).
-Reserved Notation "><^sp x" (at level 35).
-Reserved Notation "><^sp y :> T" (at level 35, y at next level).
-
-Reserved Notation "x <=^sp y <=^sp z" (at level 70, y, z at next level).
-Reserved Notation "x <^sp y <=^sp z" (at level 70, y, z at next level).
-Reserved Notation "x <=^sp y <^sp z" (at level 70, y, z at next level).
-Reserved Notation "x <^sp y <^sp z" (at level 70, y, z at next level).
-Reserved Notation "x <=^sp y ?= 'iff' c" (at level 70, y, c at next level,
-  format "x '[hv'  <=^sp  y '/'  ?=  'iff'  c ']'").
-Reserved Notation "x <=^sp y ?= 'iff' c :> T" (at level 70, y, c at next level,
-  format "x '[hv'  <=^sp  y '/'  ?=  'iff'  c  :> T ']'").
-
-Reserved Notation "\bot^sp" (at level 0).
-Reserved Notation "\top^sp" (at level 0).
-
 Reserved Notation "A `&^sp` B"  (at level 48, left associativity).
 Reserved Notation "A `|^sp` B" (at level 52, left associativity).
 Reserved Notation "A `\^sp` B" (at level 50, left associativity).
 Reserved Notation "~^sp` A" (at level 35, right associativity).
 
 (* Reserved notations for lexicographic ordering of prod *)
-Reserved Notation "x <=^l y" (at level 70, y at next level).
-Reserved Notation "x >=^l y" (at level 70, y at next level).
-Reserved Notation "x <^l y" (at level 70, y at next level).
-Reserved Notation "x >^l y" (at level 70, y at next level).
-Reserved Notation "x <=^l y :> T" (at level 70, y at next level).
-Reserved Notation "x >=^l y :> T" (at level 70, y at next level).
-Reserved Notation "x <^l y :> T" (at level 70, y at next level).
-Reserved Notation "x >^l y :> T" (at level 70, y at next level).
-Reserved Notation "<=^l y" (at level 35).
-Reserved Notation ">=^l y" (at level 35).
-Reserved Notation "<^l y" (at level 35).
-Reserved Notation ">^l y" (at level 35).
-Reserved Notation "<=^l y :> T" (at level 35, y at next level).
-Reserved Notation ">=^l y :> T" (at level 35, y at next level).
-Reserved Notation "<^l y :> T" (at level 35, y at next level).
-Reserved Notation ">^l y :> T" (at level 35, y at next level).
-Reserved Notation "x >=<^l y" (at level 70, no associativity).
-Reserved Notation ">=<^l x" (at level 35).
-Reserved Notation ">=<^l y :> T" (at level 35, y at next level).
-Reserved Notation "x ><^l y" (at level 70, no associativity).
-Reserved Notation "><^l x" (at level 35).
-Reserved Notation "><^l y :> T" (at level 35, y at next level).
-
-Reserved Notation "x <=^l y <=^l z" (at level 70, y, z at next level).
-Reserved Notation "x <^l y <=^l z" (at level 70, y, z at next level).
-Reserved Notation "x <=^l y <^l z" (at level 70, y, z at next level).
-Reserved Notation "x <^l y <^l z" (at level 70, y, z at next level).
-Reserved Notation "x <=^l y ?= 'iff' c" (at level 70, y, c at next level,
-  format "x '[hv'  <=^l  y '/'  ?=  'iff'  c ']'").
-Reserved Notation "x <=^l y ?= 'iff' c :> T" (at level 70, y, c at next level,
-  format "x '[hv'  <=^l  y '/'  ?=  'iff'  c  :> T ']'").
-
-Reserved Notation "\bot^l" (at level 0).
-Reserved Notation "\top^l" (at level 0).
-
 Reserved Notation "A `&^l` B"  (at level 48, left associativity).
 Reserved Notation "A `|^l` B" (at level 52, left associativity).
 Reserved Notation "A `\^l` B" (at level 50, left associativity).
 Reserved Notation "~^l` A" (at level 35, right associativity).
 
 (* Reserved notations for lexicographic ordering of seq *)
-Reserved Notation "x <=^sl y" (at level 70, y at next level).
-Reserved Notation "x >=^sl y" (at level 70, y at next level).
-Reserved Notation "x <^sl y" (at level 70, y at next level).
-Reserved Notation "x >^sl y" (at level 70, y at next level).
-Reserved Notation "x <=^sl y :> T" (at level 70, y at next level).
-Reserved Notation "x >=^sl y :> T" (at level 70, y at next level).
-Reserved Notation "x <^sl y :> T" (at level 70, y at next level).
-Reserved Notation "x >^sl y :> T" (at level 70, y at next level).
-Reserved Notation "<=^sl y" (at level 35).
-Reserved Notation ">=^sl y" (at level 35).
-Reserved Notation "<^sl y" (at level 35).
-Reserved Notation ">^sl y" (at level 35).
-Reserved Notation "<=^sl y :> T" (at level 35, y at next level).
-Reserved Notation ">=^sl y :> T" (at level 35, y at next level).
-Reserved Notation "<^sl y :> T" (at level 35, y at next level).
-Reserved Notation ">^sl y :> T" (at level 35, y at next level).
-Reserved Notation "x >=<^sl y" (at level 70, no associativity).
-Reserved Notation ">=<^sl x" (at level 35).
-Reserved Notation ">=<^sl y :> T" (at level 35, y at next level).
-Reserved Notation "x ><^sl y" (at level 70, no associativity).
-Reserved Notation "><^sl x" (at level 35).
-Reserved Notation "><^sl y :> T" (at level 35, y at next level).
-
-Reserved Notation "x <=^sl y <=^sl z" (at level 70, y, z at next level).
-Reserved Notation "x <^sl y <=^sl z" (at level 70, y, z at next level).
-Reserved Notation "x <=^sl y <^sl z" (at level 70, y, z at next level).
-Reserved Notation "x <^sl y <^sl z" (at level 70, y, z at next level).
-Reserved Notation "x <=^sl y ?= 'iff' c" (at level 70, y, c at next level,
-  format "x '[hv'  <=^sl  y '/'  ?=  'iff'  c ']'").
-Reserved Notation "x <=^sl y ?= 'iff' c :> T" (at level 70, y, c at next level,
-  format "x '[hv'  <=^sl  y '/'  ?=  'iff'  c  :> T ']'").
-
-Reserved Notation "\bot^sl" (at level 0).
-Reserved Notation "\top^sl" (at level 0).
-
 Reserved Notation "A `&^sl` B"  (at level 48, left associativity).
 Reserved Notation "A `|^sl` B" (at level 52, left associativity).
 Reserved Notation "A `\^sl` B" (at level 50, left associativity).
 Reserved Notation "~^sl` A" (at level 35, right associativity).
 
 (* Reserved notations for divisibility *)
-Reserved Notation "x %<| y"  (at level 70, no associativity).
 
 Reserved Notation "\gcd_ i F"
   (at level 41, F at level 41, i at level 0,
@@ -968,76 +763,6 @@ Reserved Notation "\join_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
            format "'[' \join_ ( i  'in'  A ) '/  '  F ']'").
 
-Reserved Notation "\min_ i F"
-  (at level 41, F at level 41, i at level 0,
-           format "'[' \min_ i '/  '  F ']'").
-Reserved Notation "\min_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \min_ ( i  <-  r  |  P ) '/  '  F ']'").
-Reserved Notation "\min_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \min_ ( i  <-  r ) '/  '  F ']'").
-Reserved Notation "\min_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \min_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\min_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \min_ ( m  <=  i  <  n ) '/  '  F ']'").
-Reserved Notation "\min_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           format "'[' \min_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\min_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\min_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\min_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \min_ ( i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\min_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \min_ ( i  <  n )  F ']'").
-Reserved Notation "\min_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \min_ ( i  'in'  A  |  P ) '/  '  F ']'").
-Reserved Notation "\min_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \min_ ( i  'in'  A ) '/  '  F ']'").
-
-Reserved Notation "\max_ i F"
-  (at level 41, F at level 41, i at level 0,
-           format "'[' \max_ i '/  '  F ']'").
-Reserved Notation "\max_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \max_ ( i  <-  r  |  P ) '/  '  F ']'").
-Reserved Notation "\max_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \max_ ( i  <-  r ) '/  '  F ']'").
-Reserved Notation "\max_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \max_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\max_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \max_ ( m  <=  i  <  n ) '/  '  F ']'").
-Reserved Notation "\max_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           format "'[' \max_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\max_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\max_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\max_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \max_ ( i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\max_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \max_ ( i  <  n )  F ']'").
-Reserved Notation "\max_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \max_ ( i  'in'  A  |  P ) '/  '  F ']'").
-Reserved Notation "\max_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \max_ ( i  'in'  A ) '/  '  F ']'").
-
 Reserved Notation "\meet^d_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \meet^d_ i '/  '  F ']'").
@@ -1107,76 +832,6 @@ Reserved Notation "\join^d_ ( i 'in' A | P ) F"
 Reserved Notation "\join^d_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
            format "'[' \join^d_ ( i  'in'  A ) '/  '  F ']'").
-
-Reserved Notation "\min^d_ i F"
-  (at level 41, F at level 41, i at level 0,
-           format "'[' \min^d_ i '/  '  F ']'").
-Reserved Notation "\min^d_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \min^d_ ( i  <-  r  |  P ) '/  '  F ']'").
-Reserved Notation "\min^d_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \min^d_ ( i  <-  r ) '/  '  F ']'").
-Reserved Notation "\min^d_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \min^d_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\min^d_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \min^d_ ( m  <=  i  <  n ) '/  '  F ']'").
-Reserved Notation "\min^d_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           format "'[' \min^d_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\min^d_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\min^d_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\min^d_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \min^d_ ( i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\min^d_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \min^d_ ( i  <  n )  F ']'").
-Reserved Notation "\min^d_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \min^d_ ( i  'in'  A  |  P ) '/  '  F ']'").
-Reserved Notation "\min^d_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \min^d_ ( i  'in'  A ) '/  '  F ']'").
-
-Reserved Notation "\max^d_ i F"
-  (at level 41, F at level 41, i at level 0,
-           format "'[' \max^d_ i '/  '  F ']'").
-Reserved Notation "\max^d_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \max^d_ ( i  <-  r  |  P ) '/  '  F ']'").
-Reserved Notation "\max^d_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \max^d_ ( i  <-  r ) '/  '  F ']'").
-Reserved Notation "\max^d_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \max^d_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\max^d_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \max^d_ ( m  <=  i  <  n ) '/  '  F ']'").
-Reserved Notation "\max^d_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           format "'[' \max^d_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\max^d_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\max^d_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\max^d_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \max^d_ ( i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\max^d_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \max^d_ ( i  <  n )  F ']'").
-Reserved Notation "\max^d_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \max^d_ ( i  'in'  A  |  P ) '/  '  F ']'").
-Reserved Notation "\max^d_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \max^d_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\meet^p_ i F"
   (at level 41, F at level 41, i at level 0,
@@ -1342,7 +997,7 @@ Reserved Notation "'{' 'tblmorphism' U '->' V '}'"
 
 Module Order.
 
-Export Preorder.
+Export Order.
 
 HB.mixin Record Preorder_isDuallyPOrder (d : disp_t) T of Preorder d T := {
   le_anti  : antisymmetric (@le d T);
@@ -4488,7 +4143,7 @@ Variables (disp : disp_t) (T : Type).
 Variables (disp' : disp_t) (T' : porderType disp') (f : T -> T').
 Variables (f' : T' -> option T) (f_can : pcancel f f').
 
-Fact anti : antisymmetric (@Preorder.le disp (pcan_type f_can)).
+Fact anti : antisymmetric (@Order.le disp (pcan_type f_can)).
 Proof. by move=> ? ? /le_anti; apply: pcan_inj. Qed.
 
 HB.instance Definition _ :=
@@ -7686,7 +7341,7 @@ Export Order.Exports.
 
 Export Order.Syntax.
 
-Export Preorder.Exports.
+Export order.Order.Exports.
 Export Order.POrder.Exports.
 Export Order.BPOrder.Exports.
 Export Order.TPOrder.Exports.

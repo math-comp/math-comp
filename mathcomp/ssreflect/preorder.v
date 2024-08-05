@@ -347,12 +347,6 @@ Reserved Notation "x < y ?<= 'if' c :> T" (at level 70, y, c at next level,
 Reserved Notation "\bot" (at level 0).
 Reserved Notation "\top" (at level 0).
 
-(* Reserved notations for lattice operations *)
-Reserved Notation "A `&` B"  (at level 48, left associativity).
-Reserved Notation "A `|` B" (at level 52, left associativity).
-Reserved Notation "A `\` B" (at level 50, left associativity).
-Reserved Notation "~` A" (at level 35, right associativity).
-
 (* Reserved notations for dual order *)
 Reserved Notation "x <=^d y" (at level 70, y at next level).
 Reserved Notation "x >=^d y" (at level 70, y at next level).
@@ -393,11 +387,6 @@ Reserved Notation "x <^d y ?<= 'if' c :> T" (at level 70, y, c at next level,
 Reserved Notation "\bot^d" (at level 0).
 Reserved Notation "\top^d" (at level 0).
 
-Reserved Notation "A `&^d` B"  (at level 48, left associativity).
-Reserved Notation "A `|^d` B" (at level 52, left associativity).
-Reserved Notation "A `\^d` B" (at level 50, left associativity).
-Reserved Notation "~^d` A" (at level 35, right associativity).
-
 (* Reserved notations for product ordering of prod *)
 Reserved Notation "x <=^p y" (at level 70, y at next level).
 Reserved Notation "x >=^p y" (at level 70, y at next level).
@@ -433,11 +422,6 @@ Reserved Notation "x <=^p y ?= 'iff' c :> T" (at level 70, y, c at next level,
 
 Reserved Notation "\bot^p" (at level 0).
 Reserved Notation "\top^p" (at level 0).
-
-Reserved Notation "A `&^p` B"  (at level 48, left associativity).
-Reserved Notation "A `|^p` B" (at level 52, left associativity).
-Reserved Notation "A `\^p` B" (at level 50, left associativity).
-Reserved Notation "~^p` A" (at level 35, right associativity).
 
 (* Reserved notations for product ordering of seq *)
 Reserved Notation "x <=^sp y" (at level 70, y at next level).
@@ -475,11 +459,6 @@ Reserved Notation "x <=^sp y ?= 'iff' c :> T" (at level 70, y, c at next level,
 Reserved Notation "\bot^sp" (at level 0).
 Reserved Notation "\top^sp" (at level 0).
 
-Reserved Notation "A `&^sp` B"  (at level 48, left associativity).
-Reserved Notation "A `|^sp` B" (at level 52, left associativity).
-Reserved Notation "A `\^sp` B" (at level 50, left associativity).
-Reserved Notation "~^sp` A" (at level 35, right associativity).
-
 (* Reserved notations for lexicographic ordering of prod *)
 Reserved Notation "x <=^l y" (at level 70, y at next level).
 Reserved Notation "x >=^l y" (at level 70, y at next level).
@@ -515,11 +494,6 @@ Reserved Notation "x <=^l y ?= 'iff' c :> T" (at level 70, y, c at next level,
 
 Reserved Notation "\bot^l" (at level 0).
 Reserved Notation "\top^l" (at level 0).
-
-Reserved Notation "A `&^l` B"  (at level 48, left associativity).
-Reserved Notation "A `|^l` B" (at level 52, left associativity).
-Reserved Notation "A `\^l` B" (at level 50, left associativity).
-Reserved Notation "~^l` A" (at level 35, right associativity).
 
 (* Reserved notations for lexicographic ordering of seq *)
 Reserved Notation "x <=^sl y" (at level 70, y at next level).
@@ -557,83 +531,8 @@ Reserved Notation "x <=^sl y ?= 'iff' c :> T" (at level 70, y, c at next level,
 Reserved Notation "\bot^sl" (at level 0).
 Reserved Notation "\top^sl" (at level 0).
 
-Reserved Notation "A `&^sl` B"  (at level 48, left associativity).
-Reserved Notation "A `|^sl` B" (at level 52, left associativity).
-Reserved Notation "A `\^sl` B" (at level 50, left associativity).
-Reserved Notation "~^sl` A" (at level 35, right associativity).
-
 (* Reserved notations for divisibility *)
 Reserved Notation "x %<| y"  (at level 70, no associativity).
-
-Reserved Notation "\gcd_ i F"
-  (at level 41, F at level 41, i at level 0,
-           format "'[' \gcd_ i '/  '  F ']'").
-Reserved Notation "\gcd_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \gcd_ ( i  <-  r  |  P ) '/  '  F ']'").
-Reserved Notation "\gcd_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \gcd_ ( i  <-  r ) '/  '  F ']'").
-Reserved Notation "\gcd_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \gcd_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\gcd_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \gcd_ ( m  <=  i  <  n ) '/  '  F ']'").
-Reserved Notation "\gcd_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           format "'[' \gcd_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\gcd_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\gcd_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\gcd_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \gcd_ ( i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\gcd_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \gcd_ ( i  <  n )  F ']'").
-Reserved Notation "\gcd_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \gcd_ ( i  'in'  A  |  P ) '/  '  F ']'").
-Reserved Notation "\gcd_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \gcd_ ( i  'in'  A ) '/  '  F ']'").
-
-Reserved Notation "\lcm_ i F"
-  (at level 41, F at level 41, i at level 0,
-           format "'[' \lcm_ i '/  '  F ']'").
-Reserved Notation "\lcm_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \lcm_ ( i  <-  r  |  P ) '/  '  F ']'").
-Reserved Notation "\lcm_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
-           format "'[' \lcm_ ( i  <-  r ) '/  '  F ']'").
-Reserved Notation "\lcm_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \lcm_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\lcm_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
-           format "'[' \lcm_ ( m  <=  i  <  n ) '/  '  F ']'").
-Reserved Notation "\lcm_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
-           format "'[' \lcm_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\lcm_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\lcm_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
-Reserved Notation "\lcm_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \lcm_ ( i  <  n  |  P ) '/  '  F ']'").
-Reserved Notation "\lcm_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
-           format "'[' \lcm_ ( i  <  n )  F ']'").
-Reserved Notation "\lcm_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \lcm_ ( i  'in'  A  |  P ) '/  '  F ']'").
-Reserved Notation "\lcm_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
-           format "'[' \lcm_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\min_ i F"
   (at level 41, F at level 41, i at level 0,
@@ -779,7 +678,7 @@ Reserved Notation "'{' 'omorphism' U '->' V '}'"
   (at level 0, U at level 98, V at level 99,
    format "{ 'omorphism'  U  ->  V }").
 
-Module Preorder.
+Module Order.
 
 #[projections(primitive)] Record disp_t := Disp {d1 : unit; d2 : unit}.
 
@@ -3839,38 +3738,38 @@ Module Exports.
 HB.reexport.
 End Exports.
 
-End Preorder.
+End Order.
 
-Export Preorder.Exports.
+Export Order.Exports.
 
-Export Preorder.Syntax.
+Export Order.Syntax.
 
-Export Preorder.Preorder.Exports.
-Export Preorder.BPreorder.Exports.
-Export Preorder.TPreorder.Exports.
-Export Preorder.TBPreorder.Exports.
-Export Preorder.FinPreorder.Exports.
-Export Preorder.FinBPreorder.Exports.
-Export Preorder.FinTPreorder.Exports.
-Export Preorder.FinTBPreorder.Exports.
+Export Order.Preorder.Exports.
+Export Order.BPreorder.Exports.
+Export Order.TPreorder.Exports.
+Export Order.TBPreorder.Exports.
+Export Order.FinPreorder.Exports.
+Export Order.FinBPreorder.Exports.
+Export Order.FinTPreorder.Exports.
+Export Order.FinTBPreorder.Exports.
 
 (* FIXME: check if covered by Order.Exports *)
-(* Export Preorder.NatOrder.Exports. *)
-(* Export Preorder.NatMonotonyTheory. *)
-(* Export Preorder.NatDvd.Exports. *)
-(* Export Preorder.OrdinalOrder.Exports. *)
-(* Export Preorder.BoolOrder.Exports. *)
-(* Export Preorder.ProdOrder.Exports. *)
-(* Export Preorder.SigmaOrder.Exports. *)
-(* Export Preorder.ProdLexiOrder.Exports. *)
-(* Export Preorder.SeqProdOrder.Exports. *)
-(* Export Preorder.SeqLexiOrder.Exports. *)
-(* Export Preorder.TupleProdOrder.Exports. *)
-(* Export Preorder.TupleLexiOrder.Exports. *)
+(* Export Order.NatOrder.Exports. *)
+(* Export Order.NatMonotonyTheory. *)
+(* Export Order.NatDvd.Exports. *)
+(* Export Order.OrdinalOrder.Exports. *)
+(* Export Order.BoolOrder.Exports. *)
+(* Export Order.ProdOrder.Exports. *)
+(* Export Order.SigmaOrder.Exports. *)
+(* Export Order.ProdLexiOrder.Exports. *)
+(* Export Order.SeqProdOrder.Exports. *)
+(* Export Order.SeqLexiOrder.Exports. *)
+(* Export Order.TupleProdOrder.Exports. *)
+(* Export Order.TupleLexiOrder.Exports. *)
 
-Module DefaultProdOrder := Preorder.DefaultProdOrder.
-Module DefaultSeqProdOrder := Preorder.DefaultSeqProdOrder.
-Module DefaultTupleProdOrder := Preorder.DefaultTupleProdOrder.
-Module DefaultProdLexiOrder := Preorder.DefaultProdLexiOrder.
-Module DefaultSeqLexiOrder := Preorder.DefaultSeqLexiOrder.
-Module DefaultTupleLexiOrder := Preorder.DefaultTupleLexiOrder.
+Module DefaultProdOrder := Order.DefaultProdOrder.
+Module DefaultSeqProdOrder := Order.DefaultSeqProdOrder.
+Module DefaultTupleProdOrder := Order.DefaultTupleProdOrder.
+Module DefaultProdLexiOrder := Order.DefaultProdLexiOrder.
+Module DefaultSeqLexiOrder := Order.DefaultSeqLexiOrder.
+Module DefaultTupleLexiOrder := Order.DefaultTupleLexiOrder.
