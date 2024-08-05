@@ -146,7 +146,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `archimedean.v`
   + lemmas `floor_itv`, ` ge_floor`, `lt_succ_floor x`, `floor_ge_int`,
-    `ceil_itv`, `gt_pred_ceil`, `le_ceil`, `ceil_le_int`, `ceilD`, `ceil_floor`
+    `ceil_itv`, `gt_pred_ceil`, `le_ceil`, `ceil_le_int`, `ceil_floor`
+  + lemmas `real_floorDrz`, `real_ceilDrz`, `floorDzr`, `floorDrz`, `ceilDzr`,
+    `ceilDrz`
   + `archiRealDomainType` instance for `int` (moved from `ssrint.v`)
 
 ### Changed
@@ -233,11 +235,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `ge_floor` -> `real_ge_floor`
   + `lt_succ_floor` -> `real_lt_succ_floor`
   + `floor_ge_int` -> `real_floor_ge_int`
+  + `floorD` -> `real_floorDzr`
   + `ceil_itv` -> `real_ceil_itv`
   + `gt_pred_ceil` -> `real_gt_pred_ceil`
   + `le_ceil` -> `real_le_ceil`
   + `ceil_le_int` -> `real_ceil_le_int`
-  + `ceilD` -> `real_ceilD`
+  + `ceilD` -> `real_ceilDzr`
   + `ceil_floor` -> `real_ceil_floor`
 
 - in `ssrint.v`
