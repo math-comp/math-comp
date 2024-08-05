@@ -4309,8 +4309,8 @@ HB.mixin Record isScaleClosed (R : ringType) (V : lmodType R)
 
 (* Structures for stability properties *)
 
-Definition addrClosed := addgClosed.
-Definition opprClosed := oppgClosed.
+Local Notation addrClosed := addgClosed.
+Local Notation opprClosed := oppgClosed.
 
 #[short(type="mulr2Closed")]
 HB.structure Definition Mul2Closed R := {S of isMul2Closed R S}.
@@ -5714,6 +5714,9 @@ End GRing.
 Export AllExports.
 Export Scale.Exports.
 Export ClosedExports.
+
+Notation addrClosed := addgClosed.
+Notation opprClosed := oppgClosed.
 
 Variant Ione := IOne : Ione.
 Inductive Inatmul :=
