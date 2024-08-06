@@ -275,11 +275,11 @@ have enum_pairK j: {in predT, cancel (rank2 j) val21}.
 have Qz_Zs a: inQzs (\sum_(i < m) s`_i *~ a i).
   apply/forallP=> j; apply/Crat_spanP; rewrite /in_Crat_span size_map -cardE.
   exists [ffun ij => (a (val21 ij))%:Q *+ ((enum_val ij).2 == j)].
-  rewrite linear_sum {1}(reindex_onto _ _ (enum_pairK j)).
-  rewrite big_mkcond; apply: eq_bigr => ij _ /=; rewrite nth_image (tnth_nth 0).
-  rewrite (can2_eq (@enum_rankK _) (@enum_valK _)) ffunE -scaler_int /val21.
-  case Dij: (enum_val ij) => [i j1]; rewrite xpair_eqE eqxx /= eq_sym -mulrb.
-  by rewrite linearZ rmorphMn /= rmorph_int mulrnAl; case: eqP => // ->.
+  rewrite linear_sum {1}(reindex_onto _ _ (enum_pairK j)) big_mkcond /=.
+  apply: eq_bigr => ij _ /=; rewrite nth_image (tnth_nth 0) ffunE /val21.
+  rewrite raddfMz rmorphMn rmorph_int mulrnAl mulrzl /=.
+  rewrite (can2_eq (@enum_rankK _) (@enum_valK _)).
+  by case: (enum_val ij) => i j1; rewrite xpair_eqE eqxx; have [->|] := eqVneq.
 case Qz_v: (inQzs v); last by right=> [[a Dv]]; rewrite Dv Qz_Zs in Qz_v.
 have [Qz [QzC [z1s Dz_s _]]] := num_field_exists z_s.
 have sz_z1s: size z1s = #|IzT| by rewrite -(size_map QzC) Dz_s size_map cardE.
