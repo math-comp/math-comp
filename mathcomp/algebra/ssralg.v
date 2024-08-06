@@ -561,11 +561,17 @@ Reserved Notation "'{' 'lrmorphism' U '->' V '|' s '}'"
 Reserved Notation "'{' 'lrmorphism' U '->' V '}'"
   (at level 0, U at level 98, V at level 99,
    format "{ 'lrmorphism'  U  ->  V }").
+Reserved Notation "'{' 'linear' U '->' V '/' f '|' s '}'"
+  (at level 0, U at level 98, V at level 39,
+   format "{ 'linear'  U  ->  V  /  f  |  s }").
+Reserved Notation "'{' 'linear' U '->' V '/' f '}'"
+  (at level 0, U at level 98, V at level 39,
+   format "{ 'linear'  U  ->  V  /  f }").
 Reserved Notation "'{' 'linear' U '->' V '|' s '}'"
-  (at level 0, U at level 98, V at level 99,
+  (at level 0, U at level 98, V at level 39,
    format "{ 'linear'  U  ->  V  |  s }").
 Reserved Notation "'{' 'linear' U '->' V '}'"
-  (at level 0, U at level 98, V at level 99,
+  (at level 0, U at level 98, V at level 39,
    format "{ 'linear'  U  ->  V }").
 
 Declare Scope ring_scope.
@@ -2436,10 +2442,11 @@ Structure wrapped := Wrap {unwrap : mapUV}.
 Definition wrap (f : map_class) := Wrap f.
 End Linear.
 End Linear.
-Notation "{ 'linear' U -> V | s }" :=
-  (@Semilinear.type _ _ idfun U%type V%type s) : type_scope.
-Notation "{ 'linear' U -> V }" := {linear U%type -> V%type | *:%R}
-  : type_scope.
+Notation "{ 'linear' U -> V / f | s }" :=
+  (@Semilinear.type _ _ f U%type V%type s) : type_scope.
+Notation "{ 'linear' U -> V / f }" := {linear U -> V / f | *:%R} : type_scope.
+Notation "{ 'linear' U -> V | s }" := {linear U -> V / idfun | s} : type_scope.
+Notation "{ 'linear' U -> V }" := {linear U%type -> V%type | *:%R} : type_scope.
 Notation "{ 'scalar' U }" := {linear U -> _ | *%R}
   (at level 0, format "{ 'scalar'  U }") : type_scope.
 (* Support for right-to-left rewriting with the generic linearZ rule. *)
@@ -2458,7 +2465,7 @@ Section GenericProperties.
 
 Variables (R S : semiRingType) (f : {rmorphism R -> S}).
 Variables (U : lSemiModType R) (V : nmodType) (s : S -> V -> V).
-Variables (g : @Semilinear.type R S f U V s).
+Variables (g : {linear U -> V / f | s}).
 
 Lemma linear0 : g 0 = 0. Proof. exact: raddf0. Qed.
 Lemma linearD : {morph g : x y / x + y}. Proof. exact: raddfD. Qed.
@@ -2478,7 +2485,7 @@ Section GenericProperties.
 
 Variables (R S : ringType) (f : {rmorphism R -> S}).
 Variables (U : lmodType R) (V : zmodType) (s : S -> V -> V).
-Variables (g : @Semilinear.type R S f U V s).
+Variables (g : {linear U -> V / f | s}).
 
 Lemma linearN : {morph g : x / - x}. Proof. exact: raddfN. Qed.
 Lemma linearB : {morph g : x y / x - y}. Proof. exact: raddfB. Qed.
@@ -2572,9 +2579,7 @@ Section Plain.
 
 Variables (R S : semiRingType) (f : {rmorphism R -> S}).
 Variables (W : lSemiModType R) (U : lSemiModType S) (V : nmodType).
-Variables (s : S -> V -> V).
-Variables (g : @Semilinear.type S S idfun U V s).
-Variables (h : @Semilinear.type R S f W U *:%R).
+Variables (s : S -> V -> V) (g : {linear U -> V | s}) (h : {linear W -> U / f}).
 
 Lemma comp_is_scalable : semi_scalable_for f s (g \o h).
 Proof. by move=> a v /=; rewrite !linearZ_LR. Qed.
@@ -2589,7 +2594,7 @@ Section SemiScale.
 
 Variables (R S : semiRingType) (f : {rmorphism R -> S}).
 Variables (U : lSemiModType R) (V : nmodType) (s : Scale.preLaw S V).
-Variables (g h : @Semilinear.type R S f U V s).
+Variables (g h : {linear U -> V / f | s}).
 
 Lemma null_fun_is_scalable : semi_scalable_for f s (\0 : U -> V).
 Proof. by move=> a v /=; rewrite raddf0. Qed.
@@ -2623,7 +2628,7 @@ Section Scale.
 
 Variables (R S : ringType) (f : {rmorphism R -> S}).
 Variables (U : lmodType R) (V : zmodType) (s : Scale.preLaw S V).
-Variables (g h : @Semilinear.type R S f U V s).
+Variables (g h : {linear U -> V / f | s}).
 
 Lemma sub_fun_is_scalable : semi_scalable_for f s (g \- h).
 Proof. by move=> a u; rewrite /= !linearZ_LR raddfB. Qed.
