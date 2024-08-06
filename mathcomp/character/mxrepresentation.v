@@ -1285,8 +1285,8 @@ Qed.
 Lemma mxmodule_envelop m1 m2 (U : 'M_(m1, n)) (W : 'M_(m2, n)) A :
   (mxmodule U -> mxvec A <= E_G -> W <= U -> W *m A <= U)%MS.
 Proof.
-move=> modU /envelop_mxP[a ->] sWU; rewrite linear_sum summx_sub // => x Gx.
-by rewrite linearZ scalemx_sub ?mxmodule_trans.
+move=> modU /envelop_mxP[a ->] sWU; rewrite linear_sum summx_sub //= => x Gx.
+by rewrite -scalemxAr scalemx_sub ?mxmodule_trans.
 Qed.
 
 (* Module homomorphisms; any square matrix f defines a module homomorphism   *)
@@ -2355,7 +2355,7 @@ case/rowV0Pn=> u Uu; rewrite -mxrank_eq0 -lt0n row_leq_rank -sub1mx.
 case/submxP: Uu => v ->{u} /row_freeP[u' vK]; apply/row_subP=> i.
 rewrite rowE scalar_mxC -{}vK -2![_ *m _]mulmxA; move: {u' i}(u' *m _) => A.
 rewrite mulmx_sub {v}// [A]a_G linear_sum summx_sub //= => x Gx.
-by rewrite linearZ /= scalemx_sub // (mxmoduleP Umod).
+by rewrite -scalemxAr scalemx_sub // (mxmoduleP Umod).
 Qed.
 
 Lemma linear_mx_abs_irr : n = 1 -> mx_absolutely_irreducible.
@@ -3976,7 +3976,7 @@ rewrite -{}v0 !linear_sum (bigD1 k) //= 2!linearZ /= rowK mxvecK def_k.
 rewrite linear_sum (bigD1 x) ?class_refl //= gring_projE // eqxx.
 rewrite !big1 ?addr0 ?mxE ?mulr1 // => [k' | y /andP[xGy ne_yx]]; first 1 last.
   by rewrite gring_projE ?(groupCl Gx xGy) // eq_sym (negPf ne_yx).
-rewrite rowK !linearZ /= mxvecK -(inj_eq enum_val_inj) def_k eq_sym.
+rewrite rowK 2!linearZ /= mxvecK -(inj_eq enum_val_inj) def_k eq_sym.
 have [z Gz ->] := imsetP (enum_valP k').
 move/eqP=> not_Gxz; rewrite linear_sum big1 ?scaler0 //= => y zGy.
 rewrite gring_projE ?(groupCl Gz zGy) //.
@@ -5377,18 +5377,14 @@ Lemma val_gen0 : val_gen 0 = 0.
 Proof. by apply: (canLR in_genK); rewrite in_gen0. Qed.
 
 Lemma in_genN : {morph in_gen : W / - W}.
-Proof.
-move=> W; apply/matrixP=> i j; apply: val_inj.
-by rewrite !mxE 4!(mulNmx, linearN).
-Qed.
+Proof. by move=> W; apply/matrixP=> i j; rewrite !mxE 4!(mulNmx, linearN). Qed.
 
 Lemma val_genN : {morph val_gen : W / - W}.
 Proof. by move=> W; apply: (canLR in_genK); rewrite in_genN val_genK. Qed.
 
 Lemma in_genD : {morph in_gen : U V / U + V}.
 Proof.
-move=> U V; apply/matrixP=> i j; apply: val_inj.
-by rewrite !mxE !(mulmxDl, linearD).
+by move=> U V; apply/matrixP=> i j; rewrite !mxE 4!(mulmxDl, linearD).
 Qed.
 
 Lemma val_genD : {morph val_gen : U V / U + V}.

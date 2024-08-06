@@ -2670,7 +2670,7 @@ Lemma mem_mulsmx m1 m2 n (R1 : 'A_(m1, n)) (R2 : 'A_(m2, n)) A1 A2 :
 Proof.
 move=> R_A1 R_A2; rewrite -[A2]mxvecK; case/submxP: R_A2 => a ->{A2}.
 rewrite mulmx_sum_row !linear_sum summx_sub // => i _.
-rewrite !linearZ scalemx_sub {a}//= (sumsmx_sup i) // genmxE.
+rewrite 3!linearZ scalemx_sub {a}//= (sumsmx_sup i) // genmxE.
 rewrite -[A1]mxvecK; case/submxP: R_A1 => a ->{A1}.
 by apply/submxP; exists a; rewrite mulmxA mul_rV_lin.
 Qed.
@@ -2856,7 +2856,7 @@ Proof.
 apply: (iffP cent_rowP) => cEB => [A sAE | i A].
   rewrite -[A]mxvecK -(mulmxKpV sAE); move: (mxvec A *m _) => u.
   rewrite !mulmx_sum_row !linear_sum mulmx_suml; apply: eq_bigr => i _ /=.
-  by rewrite !linearZ -scalemxAl /= cEB.
+  by rewrite 2!linearZ -scalemxAl /= cEB.
 by rewrite cEB // vec_mxK row_sub.
 Qed.
 Arguments cent_mxP {m n B R}.

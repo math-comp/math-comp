@@ -3468,7 +3468,7 @@ Definition lin_mul_row u : 'M[R]_(m * n, n) := lin1_mx (mulmx u \o vec_mx).
 Lemma lin_mul_row_is_linear : linear lin_mul_row.
 Proof.
 move=> a u v; apply/row_matrixP=> i; rewrite linearP /= !rowE !mul_rV_lin1 /=.
-by rewrite [_ *m _](linearP (mulmxr (_ : 'M[R]__))).
+by rewrite mulmxDl scalemxAl.
 Qed.
 HB.instance Definition _ :=
   GRing.isLinear.Build R _ _ _ lin_mul_row lin_mul_row_is_linear.
