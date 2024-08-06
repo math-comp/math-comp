@@ -923,6 +923,19 @@ exists ((zcontents p)%:~R / a%:~R).
 by rewrite mulrC -scalerA -map_polyZ -zpolyEprim.
 Qed.
 
+Lemma irreducible_rat_int p :
+  irreducible_poly (pZtoQ p) <-> irreducible_poly p.
+Proof.
+rewrite /irreducible_poly size_rat_int_poly; split=> -[] p1 p_irr; split=> //.
+  move=> q q1; rewrite /eqp -!dvdp_rat_int => rq.
+  by apply/p_irr => //; rewrite size_rat_int_poly.
+move=> q + /dvdpP_rat_int [] r [] c c0 qE [] s sE.
+rewrite qE size_scale// size_rat_int_poly => r1.
+apply/(eqp_trans (eqp_scale _ c0)).
+rewrite /eqp !dvdp_rat_int; apply/p_irr => //.
+by rewrite sE dvdp_mulIl.
+Qed.
+
 End ZpolyScale.
 
 (* Integral spans. *)
@@ -1111,12 +1124,13 @@ rewrite -defS -2!mulmxA; have ->: T *m pinvmx T = 1%:M.
 by move=> i; rewrite mulmx1 -map_mxM 2!mxE denq_int mxE.
 Qed.
 
-Lemma eisenstein (p : nat) (q : {poly int}) : prime p -> (size q != 1)%N ->
+Lemma eisenstein_crit (p : nat) (q : {poly int}) : prime p -> (size q != 1)%N ->
   ~~ (p %| lead_coef q)%Z -> ~~ (p ^+ 2 %| q`_0)%Z ->
   (forall i, (i < (size q).-1)%N -> p %| q`_i)%Z ->
-  irreducible_poly (map_poly (intr : int -> rat) q).
+  irreducible_poly q.
 Proof.
 move=> p_prime qN1 Ndvd_pql Ndvd_pq0 dvd_pq.
+apply/irreducible_rat_int.
 have qN0 : q != 0 by rewrite -lead_coef_eq0; apply: contraNneq Ndvd_pql => ->.
 split.
   rewrite size_map_poly_id0 ?intr_eq0 ?lead_coef_eq0//.
