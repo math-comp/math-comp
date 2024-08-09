@@ -52,6 +52,9 @@ Reserved Notation "x ^- n" (at level 29, left associativity).
 Reserved Notation "x *: A" (at level 40).
 Reserved Notation "A :* x" (at level 40).
 
+(* Reserved notation for conjugation and lifting of actions to sets. *)
+Reserved Notation "x ^*" (av level 1, format "x ^*", left associativity).
+
 (* Reserved notation for set-theoretic operations. *)
 Reserved Notation "A :&: B"  (at level 48, left associativity).
 Reserved Notation "A :|: B" (at level 52, left associativity).
@@ -70,7 +73,7 @@ Reserved Notation "#[ x ]" (at level 0, format "#[ x ]").
 Reserved Notation "''C' [ x ]" (at level 8, format "''C' [ x ]").
 Reserved Notation "''C_' A [ x ]"
   (at level 8, A at level 2, format "''C_' A [ x ]").
-Reserved Notation "''C' ( A )" (at level 8, format "''C' ( A )").
+Reserved Notation "''test releaseC' ( A )" (at level 8, format "''C' ( A )").
 Reserved Notation "''C_' B ( A )"
   (at level 8, B at level 2, format "''C_' B ( A )").
 Reserved Notation "''Z' ( A )" (at level 8, format "''Z' ( A )").
