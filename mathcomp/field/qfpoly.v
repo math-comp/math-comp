@@ -2,10 +2,10 @@ From HB Require Import structures.
 From mathcomp
 Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice fintype tuple.
 From mathcomp
-Require Import div bigop binomial finset finfun ssralg countalg finalg.
+Require Import div bigop binomial finset finfun comoid ssralg countalg finalg.
 From mathcomp
-Require Import poly polydiv qpoly perm fingroup falgebra fieldext finfield
-               galois.
+Require Import poly polydiv qpoly perm monoid fingroup falgebra fieldext
+               finfield galois.
 From mathcomp
 Require Import finalg zmodp matrix vector.
 

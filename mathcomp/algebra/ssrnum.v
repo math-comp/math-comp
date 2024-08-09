@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
-From mathcomp Require Import ssralg poly.
+From mathcomp Require Import comoid ssralg poly.
 
 (******************************************************************************)
 (*                            Number structures                               *)
@@ -91,6 +91,7 @@ Reserved Notation "'Re z" (at level 10, z at level 8).
 Reserved Notation "'Im z" (at level 10, z at level 8).
 
 Local Open Scope order_scope.
+Local Open Scope group_scope.
 Local Open Scope ring_scope.
 Import Order.TTheory GRing.Theory.
 
@@ -2356,7 +2357,6 @@ Lemma signr_inj : injective (fun b : bool => (-1) ^+ b : R).
 Proof. exact: can_inj (fun x => 0 >= x) signr_le0. Qed.
 
 (* Ternary sign (sg). *)
-
 Lemma sgr_def x : sg x = (-1) ^+ (x < 0)%R *+ (x != 0).
 Proof. by rewrite /sg; do 2!case: ifP => //. Qed.
 
@@ -2780,8 +2780,6 @@ End NumDomainMonotonyTheoryForReals.
 
 Section FinGroup.
 
-Import GroupScope.
-
 Variables (R : numDomainType) (gT : finGroupType).
 Implicit Types G : {group gT}.
 
@@ -2950,7 +2948,7 @@ Lemma sgrV x : sgr x^-1 = sgr x.
 Proof. by rewrite /sgr invr_eq0 invr_lt0. Qed.
 
 Lemma splitr x : x = x / 2%:R + x / 2%:R.
-Proof. by rewrite -mulr2n -mulr_natr mulfVK //= pnatr_eq0. Qed.
+Proof. by rewrite -mulr2n -[RHS]mulr_natr mulfVK //= pnatr_eq0. Qed.
 
 (* lteif *)
 
@@ -4246,7 +4244,7 @@ have [->|nz_x] := eqVneq x 0; first by exists (u y); rewrite uE ?normr0 ?mul0r.
 exists (u x); rewrite uE // /u (negPf nz_x); congr (_ , _).
 have{lin_xy} def2xy: `|x| * `|y| *+ 2 = x * y ^* + y * x ^*.
   apply/(addrI (x * x^* ))/(addIr (y * y^* )); rewrite -2!{1}normCK -sqrrD.
-  by rewrite addrA -addrA -!mulrDr -mulrDl -rmorphD -normCK lin_xy.
+  by rewrite addrA -[RHS]addrA -!mulrDr -mulrDl -rmorphD -normCK lin_xy.
 have def_xy: x * y^* = y * x^*.
   apply/eqP; rewrite -subr_eq0 -[_ == 0](@expf_eq0 _ _ 2).
   rewrite (canRL (subrK _) (subr_sqrDB _ _)) opprK -def2xy exprMn_n exprMn.

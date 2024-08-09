@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
 From mathcomp Require Import fintype tuple finfun bigop fingroup perm div.
-From mathcomp Require Import ssralg zmodp matrix mxalgebra.
+From mathcomp Require Import comoid ssralg zmodp matrix mxalgebra.
 From mathcomp Require Import poly polydiv mxpoly binomial.
 
 (******************************************************************************)

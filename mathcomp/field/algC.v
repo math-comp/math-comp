@@ -2,10 +2,10 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
-From mathcomp Require Import div fintype path bigop finset prime order ssralg.
-From mathcomp Require Import poly polydiv mxpoly generic_quotient countalg.
-From mathcomp Require Import ssrnum closed_field ssrint archimedean rat intdiv.
-From mathcomp Require Import algebraics_fundamentals.
+From mathcomp Require Import div fintype path bigop finset prime order comoid.
+From mathcomp Require Import ssralg poly polydiv mxpoly generic_quotient.
+From mathcomp Require Import countalg ssrnum closed_field ssrint archimedean.
+From mathcomp Require Import rat intdiv algebraics_fundamentals.
 
 (******************************************************************************)
 (* This file provides an axiomatic construction of the algebraic numbers.     *)
@@ -241,7 +241,7 @@ Proof.
   rewrite addrA addrC !addrA -(addrC (y * conj y)) !addrA.
   move: (y * _ + _) => u; rewrite -!addrA leB opprD addrACA {u}subrr add0r -leB.
   rewrite {}le_sqr ?posD //.
-    by rewrite rmorphD !rmorphM /= !conjK addrC mulrC (mulrC y).
+    by rewrite rmorphD !rmorphM /= !conjK addrC mulrC (mulrC x).
   rewrite -mulr2n -mulr_natr exprMn normK -natrX mulr_natr sqrrD mulrACA.
   rewrite -rmorphM (mulrC y x) addrAC leB mulrnA mulr2n opprD addrACA.
   rewrite subrr addr0 {2}(mulrC x) rmorphM mulrACA -opprB addrAC -sqrrB -sqrMi.

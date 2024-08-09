@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
-From mathcomp Require Import choice fintype div tuple finfun bigop ssralg.
-From mathcomp Require Import finalg zmodp matrix vector poly.
+From mathcomp Require Import choice fintype div tuple finfun bigop comoid.
+From mathcomp Require Import ssralg finalg zmodp matrix vector poly.
 
 (******************************************************************************)
 (*        Finite dimensional free algebras, usually known as F-algebras       *)

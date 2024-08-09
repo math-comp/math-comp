@@ -3,8 +3,8 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun prime order.
-From mathcomp Require Import ssralg poly ssrnum ssrint archimedean rat matrix.
-From mathcomp Require Import polydiv perm zmodp bigop mxalgebra vector.
+From mathcomp Require Import comoid ssralg poly ssrnum ssrint archimedean rat.
+From mathcomp Require Import matrix polydiv perm zmodp bigop mxalgebra vector.
 
 (******************************************************************************)
 (* This file provides various results on divisibility of integers.            *)

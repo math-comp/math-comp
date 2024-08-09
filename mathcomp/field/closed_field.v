@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
-From mathcomp Require Import fintype generic_quotient bigop ssralg poly.
+From mathcomp Require Import fintype generic_quotient bigop comoid ssralg poly.
 From mathcomp Require Import polydiv matrix mxpoly countalg ring_quotient.
 
 (******************************************************************************)
@@ -701,10 +701,9 @@ have I_ideal : idealr_closed I.
   apply/memI; exists (maxn (pickle q1).+1 (pickle q2).+1); apply: dvdp_add.
     by apply: dvdp_mull; apply: dvdp_trans Iq1; apply/dv_d/leq_maxl.
   by apply: dvdp_trans Iq2; apply/dv_d/leq_maxr.
-pose IaM := GRing.isAddClosed.Build _ I (idealr_closedB I_ideal).
-pose IoM := GRing.isOppClosed.Build _ I (idealr_closedB I_ideal).
+pose IaM := GRing.isZmodClosed.Build _ I (idealr_closedB I_ideal).
 pose IpM := isProperIdeal.Build _ I (idealr_closed_nontrivial I_ideal).
-pose Iid : idealr _ := HB.pack I IaM IoM IpM.
+pose Iid : idealr _ := HB.pack I IaM IpM.
 pose EMixin := GRing.Ring_hasCommutativeMul.Build _ (@Quotient.mulqC _ Iid).
 pose E : comRingType := HB.pack _ EMixin.
 pose PtoE : {rmorphism {poly F} -> E} := \pi_E%qT.

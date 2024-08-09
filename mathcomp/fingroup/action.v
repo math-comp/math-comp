@@ -1,8 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat div seq.
-From mathcomp Require Import prime fintype bigop finset fingroup morphism perm.
-From mathcomp Require Import automorphism quotient.
+From mathcomp Require Import prime fintype bigop finset monoid fingroup.
+From mathcomp Require Import morphism perm automorphism quotient.
 
 (******************************************************************************)
 (* Group action: orbits, stabilisers, transitivity.                           *)

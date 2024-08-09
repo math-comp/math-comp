@@ -2,7 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop order ssralg poly ssrnum ssrint.
+From mathcomp Require Import fintype bigop order comoid ssralg poly ssrnum.
+From mathcomp Require Import ssrint.
 
 (******************************************************************************)
 (*                           Archimedean structures                           *)
@@ -579,7 +580,7 @@ Variables (U V : lmodType R) (f : {additive U -> V}).
 Lemma raddfZ_nat a u : a \is a nat_num -> f (a *: u) = a *: f u.
 Proof. by move=> /natrP[n ->]; apply: raddfZnat. Qed.
 
-Lemma rpredZ_nat (S : addrClosed V) :
+Lemma rpredZ_nat (S : addgClosed V) :
   {in nat_num & S, forall z u, z *: u \in S}.
 Proof. by move=> _ u /natrP[n ->]; apply: rpredZnat. Qed.
 

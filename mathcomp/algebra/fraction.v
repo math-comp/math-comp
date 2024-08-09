@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
-From mathcomp Require Import ssrAC choice tuple bigop ssralg poly polydiv.
-From mathcomp Require Import generic_quotient.
+From mathcomp Require Import ssrAC choice tuple bigop comoid ssralg poly.
+From mathcomp Require Import polydiv generic_quotient.
 
 (******************************************************************************)
 (*                  Field of fraction of an integral domain                   *)
