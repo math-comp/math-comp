@@ -2211,6 +2211,8 @@ Arguments big_ord_recl [R idx op].
 Arguments big_ord_recr [R idx op].
 Arguments big_nat_recl [R idx op].
 Arguments big_nat_recr [R idx op].
+Arguments big_cat_nat_idem [R op x] opxx [n m p P F].
+Arguments big_cat_nat [R idx op n m p P F].
 Arguments big_pmap [R idx op J I] h [r].
 Arguments telescope_big [R idx op] f [n m].
 
