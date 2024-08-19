@@ -545,6 +545,7 @@ Variables (f g : {additive V -> W}) (h : {additive U -> V}).
 
 Fact opp_is_semi_additive : semi_additive (@opp U).
 Proof. by split; [apply/oppg0|apply/oppgD]. Qed.
+#[export]
 HB.instance Definition _ :=
   isSemiAdditive.Build U U (@opp U) opp_is_semi_additive.
 
@@ -552,6 +553,7 @@ Fact sub_fun_is_additive : additive (f \- g).
 Proof.
 by move=> x y /=; rewrite !gaddfB addgAC -!addgA -!oppgD addgAC addgA.
 Qed.
+#[export]
 HB.instance Definition _ :=
   isAdditive.Build V W (f \- g) sub_fun_is_additive.
 
@@ -909,3 +911,4 @@ HB.instance Definition _ (V : nmodType) (x : V) :=
 Lemma natg0E : 0 = 0%N. Proof. by []. Qed.
 Lemma natgDE n m : n + m = (n + m)%N. Proof. by []. Qed.
 Definition natgE := (natg0E, natgDE).
+
