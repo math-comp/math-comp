@@ -1734,6 +1734,7 @@ Local Notation "x \*o f" := (mull_fun x f) : function_scope.
 Local Notation "x \o* f" := (mulr_fun x f) : function_scope.
 Local Notation "f \* g" := (mul_fun f g) : function_scope.
 
+Arguments in_alg  {_} A _ /.
 Arguments mull_fun {_ _}  a f _ /.
 Arguments mulr_fun {_ _} a f _ /.
 Arguments scale_fun {_ _ _} a f _ /.
