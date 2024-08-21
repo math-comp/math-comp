@@ -1744,23 +1744,11 @@ Section AdditiveTheory.
 
 Section Properties.
 
-Variables (U V : nmodType) (f : {additive U -> V}).
-
-Lemma raddf0 : f 0 = 0.
-Proof. exact: gaddf0. Qed.
-
-Lemma raddf_eq0 x : injective f -> (f x == 0) = (x == 0).
-Proof. exact: gaddf_eq0. Qed.
-
-Lemma raddfD : {morph f : x y / x + y}.
-Proof. exact: gaddfD. Qed.
-
-Lemma raddfMn n : {morph f : x / x *+ n}.
-Proof. exact: gaddfMn. Qed.
+Variables (U V : baseAddUMagmaType) (f : {additive U -> V}).
 
 Lemma raddf_sum I r (P : pred I) E :
   f (\sum_(i <- r | P i) E i) = \sum_(i <- r | P i) f (E i).
-Proof. exact: (big_morph f raddfD raddf0). Qed.
+Proof. exact: (big_morph f (raddfD f) (raddf0 f)). Qed.
 
 End Properties.
 
@@ -1796,16 +1784,16 @@ Section Properties.
 Variables (U V : zmodType) (f : {additive U -> V}).
 
 Lemma raddfN : {morph f : x / - x}.
-Proof. exact: gaddfN. Qed.
+Proof. exact: raddfN. Qed.
 
 Lemma raddfB : {morph f : x y / x - y}.
-Proof. exact: gaddfB. Qed.
+Proof. exact: raddfB. Qed.
 
 Lemma raddf_inj : (forall x, f x = 0 -> x = 0) -> injective f.
-Proof. exact: gaddf_inj. Qed.
+Proof. exact: raddf_inj. Qed.
 
 Lemma raddfMNn n : {morph f : x / x *- n}.
-Proof. exact: gaddfMNn. Qed.
+Proof. exact: raddfMNn. Qed.
 
 End Properties.
 
@@ -4416,21 +4404,12 @@ Section Add.
 
 Variable S : addrClosed V.
 
-Lemma rpred0 : 0 \in S.
-Proof. exact: gpred0. Qed.
-
-Lemma rpredD : {in S &, forall u v, u + v \in S}.
-Proof. by exact: gpredD. Qed.
-
 Lemma rpred0D : addr_closed S.
 Proof. exact: nmod_closed_subproof. Qed.
 
 Lemma rpred_sum I r (P : pred I) F :
   (forall i, P i -> F i \in S) -> \sum_(i <- r | P i) F i \in S.
 Proof. by move=> IH; elim/big_ind: _; [apply: rpred0 | apply: rpredD |]. Qed.
-
-Lemma rpredMn n : {in S, forall u, u *+ n \in S}.
-Proof. exact: gpredMn. Qed.
 
 End Add.
 
@@ -4444,35 +4423,11 @@ Section Opp.
 
 Variable S : opprClosed V.
 
-Lemma rpredN : {mono -%R: u / u \in S}.
-Proof. exact: gpredN. Qed.
-
 End Opp.
 
 Section Sub.
 
 Variable S : zmodClosed V.
-
-Lemma rpredB : {in S &, forall u v, u - v \in S}.
-Proof. exact: gpredB. Qed.
-
-Lemma rpredBC u v : u - v \in S = (v - u \in S).
-Proof. exact: gpredBC. Qed.
-
-Lemma rpredMNn n : {in S, forall u, u *- n \in S}.
-Proof. exact: gpredMNn. Qed.
-
-Lemma rpredDr x y : x \in S -> (y + x \in S) = (y \in S).
-Proof. exact: gpredDr. Qed.
-
-Lemma rpredDl x y : x \in S -> (x + y \in S) = (y \in S).
-Proof. exact: gpredDl. Qed.
-
-Lemma rpredBr x y : x \in S -> (y - x \in S) = (y \in S).
-Proof. exact: gpredBr. Qed.
-
-Lemma rpredBl x y : x \in S -> (x - y \in S) = (y \in S).
-Proof. exact: gpredBl. Qed.
 
 Lemma zmodClosedP : zmod_closed S.
 Proof. split; [ exact: (@rpred0D V S).1 | exact: rpredB ]. Qed.
@@ -5410,7 +5365,7 @@ Definition divr_signM := divr_signM.
 Definition rpred0D := @rpred0D.
 Definition rpred0 := rpred0.
 Definition rpredD := rpredD.
-Definition rpredNr := @gpredNr.
+Definition rpredNr := @rpredNr.
 Definition rpred_sum := rpred_sum.
 Definition rpredMn := rpredMn.
 Definition rpredN := rpredN.
