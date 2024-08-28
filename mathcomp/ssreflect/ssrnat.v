@@ -1203,12 +1203,18 @@ Proof. by move=> lt1n m_gt0; rewrite -[ltnLHS]mul1n ltn_pmul2r. Qed.
 Lemma ltn_Pmulr m n : 1 < n -> 0 < m -> m < m * n.
 Proof. by move=> lt1n m_gt0; rewrite mulnC ltn_Pmull. Qed.
 
-Lemma ltn_mul m1 m2 n1 n2 : m1 < n1 -> m2 < n2 -> m1 * m2 < n1 * n2.
+Lemma ltn_mull m1 m2 n1 n2 : 0 < n2 -> m1 < n1 -> m2 <= n2 -> m1 * m2 < n1 * n2.
 Proof.
-move=> lt_mn1 lt_mn2; apply (@leq_ltn_trans (m1 * n2)).
-  by rewrite leq_mul2l orbC ltnW.
-by rewrite ltn_pmul2r // (leq_trans _ lt_mn2).
+move=> n20 lt_mn1 le_mn2.
+rewrite (@leq_ltn_trans (m1 * n2)) ?leq_mul2l ?le_mn2 ?orbT//.
+by rewrite ltn_mul2r lt_mn1 n20.
 Qed.
+
+Lemma ltn_mulr m1 m2 n1 n2 : 0 < n1 -> m1 <= n1 -> m2 < n2 -> m1 * m2 < n1 * n2.
+Proof. by move=> ? ? ?; rewrite mulnC [ltnRHS]mulnC ltn_mull. Qed.
+
+Lemma ltn_mul m1 m2 n1 n2 : m1 < n1 -> m2 < n2 -> m1 * m2 < n1 * n2.
+Proof. by move=> ? lt2; rewrite ltn_mull ?(leq_ltn_trans _ lt2)// ltnW. Qed.
 
 Lemma maxnMr : right_distributive muln maxn.
 Proof. by case=> // m n1 n2; rewrite /maxn (fun_if (muln _)) ltn_pmul2l. Qed.

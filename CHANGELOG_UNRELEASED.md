@@ -10,6 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- in `ssrnat.v`
+  + lemmas `ltn_mull`, `ltn_mulr`
+
 - in `ssrint.v`
   + lemmas `intrN`, `intrB`
 
