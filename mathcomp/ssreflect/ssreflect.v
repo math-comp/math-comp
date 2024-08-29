@@ -45,3 +45,31 @@ Hint Extern 0 (@vm_compute_eq _ _ _) =>
 
 #[deprecated(since="mathcomp 2.3.0", note="Use `Arguments def : simpl never` instead (should work fine since Coq 8.18).")]
 Notation nosimpl t := (nosimpl t).
+
+Ltac fast_done :=
+  solve
+    [ eassumption
+    | symmetry; eassumption
+    | reflexivity ].
+
+Ltac done_gen tac :=
+  solve
+  [ repeat first
+    (* 1. eassumption + refl => no intro *)
+    [ fast_done
+    (* 2. intro + assumption +  *)
+    | solve [trivial]
+    | solve [symmetry; trivial]
+    (* | solve [apply not_symmetry; trivial] *)
+    (* | progress (hnf; intros)   or  *)
+    | progress (repeat (intros ?))
+    (* 3. Inconsistencies *)
+    | contradiction  (* (P, ~P) or (~True) *)
+    | match goal with H : ~ _ |- _ => solve [case H; reflexivity || trivial] end
+    | tac            (* inversion scheme *)
+    (* 4. Change goal *)
+    | split
+    ]
+  ].
+
+Ltac done ::= done_gen discriminate.
