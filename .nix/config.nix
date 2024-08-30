@@ -69,6 +69,7 @@ with builtins; with (import <nixpkgs> {}).lib;
          gaia.override.version = "thomas-lamiaux:common_done";
          coqeal.override.version = "thomas-lamiaux:common_done";
          QuickChick.override.version = "thomas-lamiaux:common_done";
+         coquelicot.override.version = "tlamiaux:common_done";
          # where
          # * <package> will typically be one of the strings above (without the quotes)
          #   or look at https://github.com/NixOS/nixpkgs/tree/master/pkgs/development/coq-modules
