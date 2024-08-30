@@ -4,13 +4,13 @@ From mathcomp Require Import choice fintype tuple bigop ssralg finset fingroup.
 From mathcomp Require Import zmodp poly order ssrnum matrix mxalgebra vector.
 
 (******************************************************************************)
-(* {bilinear fUV | s & s'} == the type of bilinear forms                      *)
-(*                            f has type U -> U' -> V                         *)
-(*                            f u is linear, f ^~ u' is linear                *)
-(*                            s and s' are two scaling operations             *)
-(*     {bilinear fUV | s } := {bilinear fUV | s.1 & s.2}                      *)
-(*         {bilinear fUV}  := {bilinear fUV | *:%R & *:%R }                   *)
-(*           {biscalar U}  := {bilinear U -> U -> _ | *%R & *%R }             *)
+(* {bilinear U -> V -> W | s & s'} == the type of bilinear forms which are    *)
+(*                                    essentially functions of type           *)
+(*                                    U -> V -> W                             *)
+(*                                    s and s' are two scaling operations     *)
+(*     {bilinear U -> V -> W | s } := {bilinear U -> V -> W | s.1 & s.2}      *)
+(*         {bilinear U -> V -> W}  := {bilinear U -> V -> W | *:%R & *:%R }   *)
+(*                   {biscalar U}  := {bilinear U -> U -> _ | *%R & *%R }     *)
 (*                                                                            *)
 (* {hermitian U for eps & theta} == hermitian/skew-hermitian form             *)
 (*                            eps is a boolean flag (false -> hermitian form, *)
@@ -1222,7 +1222,7 @@ apply/pairwise_orthogonalP; rewrite /= (contra (sS12 0)) //.
 by split=> //; apply: sub_in2 oS2.
 Qed.
 
-Lemma orthogonal_free S : pairwise_orthogonal form S -> free  S.
+Lemma orthogonal_free S : pairwise_orthogonal form S -> free S.
 Proof.
 case/pairwise_orthogonalP=> [/=/andP[notS0 uniqS] oSS].
 rewrite -(in_tupleE S); apply/freeP => a aS0 i.
@@ -1509,9 +1509,10 @@ split=> [u'|u] a x y /=.
 Qed.
 
 HB.instance Definition _ :=
-  bilinear_isBilinear.Build R
-    _ _
-    _ _ _ _
+  bilinear_isBilinear.Build R _ _ _
+    (GRing.Scale.Law.clone _ _ ( *%R ) _)
+    (GRing.Scale.Law.clone _ _ (theta \; *%R ) _)
+    (@form_of_matrix theta m M)
     form_of_matrix_is_bilinear.
 (*Canonical form_of_matrix_is_bilinear := [the @bilinear _ _ _ _ of form_of_matrix theta M].*)
 
@@ -1712,4 +1713,5 @@ End MatrixForms.
 
 Notation symmetricmx := (hermitianmx _ false idfun).
 Notation skewmx := (hermitianmx _ true idfun).
-Notation hermsymmx := (hermitianmx _ false (fun x => x^* (*NB: was @conjC _*) )).
+Definition conjC {C : numClosedFieldType} (c : C) : C := c^*.
+Notation hermsymmx := (hermitianmx _ false conjC).

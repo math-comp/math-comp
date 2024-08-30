@@ -1,7 +1,8 @@
+From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat.
 From mathcomp Require Import seq div fintype bigop ssralg finset fingroup zmodp.
 From mathcomp Require Import poly polydiv order ssrnum matrix mxalgebra vector.
-From mathcomp Require Import mxpoly mxred forms.
+From mathcomp Require Import mxpoly mxred sesquilinear.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -18,11 +19,12 @@ Variable (C : numClosedFieldType).
 Set Default Proof Using "C".
 
 Local Notation "M ^ phi" := (map_mx phi M).
-Local Notation "M ^t*" := (map_mx (GRing.RMorphism.apply conjC) (M ^T)) (at level 30).
+Local Notation "M ^t*" := (map_mx conjC (M ^T)) (at level 30).
 
 Lemma realmxC m n (A : 'M[C]_(m, n)) : A \is a mxOver Num.real -> A ^ conjC = A.
 Proof.
-by move=> ?; apply/matrixP => x y; rewrite mxE (CrealP _) ?(mxOverP _).
+move=> ?; apply/matrixP => x y; rewrite mxE.
+exact/CrealP/mxOverP.
 Qed.
 
 Lemma Remx_rect m n :
@@ -51,10 +53,10 @@ by rewrite !Remx_rect// !Immx_rect// => -> ->.
 Qed.
 
 Lemma map_mxCK m n (M : 'M[C]_(m, n)) : (M ^ conjC) ^ conjC = M.
-Proof. by apply/matrixP=> i j; rewrite !mxE conjCK. Qed.
+Proof. by apply/matrixP=> i j; rewrite !mxE /conjC conjCK. Qed.
 
 Lemma trmxCK m n (M : 'M[C]_(m, n)) : M ^t* ^t* = M.
-Proof. by apply/matrixP=> i j; rewrite !mxE conjCK. Qed.
+Proof. by apply/matrixP=> i j; rewrite !mxE /conjC conjCK. Qed.
 
 Definition unitarymx {m n} := [qualify M : 'M[C]_(m, n) | M *m M ^t* == 1%:M].
 Fact unitarymx_key m n : pred_key (@unitarymx m n). Proof. by []. Qed.
@@ -70,10 +72,11 @@ Proof. exact: eqP. Qed.
 
 Definition conjCfun (C : numClosedFieldType) := conjC : C -> C.
 Arguments conjCfun _ _ /.
-Canonical conjCfun_rmorphism (C : numClosedFieldType) :=
-  [rmorphism of (@conjCfun C)].
-Canonical conjCfun_involutive (C : numClosedFieldType) :=
-  InvolutiveRMorphism (@conjCK C : involutive (@conjCfun C)).
+HB.instance Definition _ := GRing.RMorphism.on (@conjCfun C).
+Let conjCfun_involutive : involutive (@conjCfun C).
+Proof. exact: conjCK. Qed.
+HB.instance Definition _ :=
+  isInvolutive.Build _ (@conjCfun C) conjCfun_involutive.
 
 Notation dotmx_def := (form_of_matrix (@conjCfun _) 1%:M).
 Definition dotmx n (u v : 'rV[C]_n) := dotmx_def u%R v%R.
@@ -86,22 +89,26 @@ Proof.
 by rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx conjC1.
 Qed.
 Canonical hermitian1mx n := HermitianMx (dotmx_is_hermitian n).
+
+(* TODO
 Canonical dotmx_bilinear n := [bilinear of @dotmx n as dotmx_def].
 Canonical dotmx_hermsym n := [hermitian of (@dotmx n) as dotmx_def].
+*)
 
 Lemma dotmxE n (u v : 'rV_n) : '[u, v] = (u *m v ^t*) 0 0.
 Proof. by rewrite /dotmx /form_of_matrix mulmx1 /= trace_mx11. Qed.
 
-Fact dotmx_is_dotmx n : is_dot (@dotmx n).
+Fact dotmx_is_dotmx n :forall u, u != 0 -> 0 < (@dotmx n) u u.
 Proof.
 move=> /= u u_neq0; rewrite dotmxE mxE.
 suff /existsP[i ui_neq0] : [exists i, u 0 i != 0].
-  rewrite (bigD1 i) //= ltr_paddr// ?sumr_ge0// ?mxE ?mul_conjC_gt0//.
+  rewrite (bigD1 i) //= ltr_wpDr// ?sumr_ge0// ?mxE ?mul_conjC_gt0//.
   by move=> j _; rewrite !mxE mul_conjC_ge0.
 apply: contraNT u_neq0; rewrite negb_exists => /forallP uNN0.
 by apply/eqP/rowP=> j; rewrite mxE; apply/eqP; rewrite -[_ == _]negbK uNN0.
 Qed.
-Canonical dotmx_dot n := Dot (@dotmx_is_dotmx n).
+(* TODO: probably that failed *)
+HB.instance Definition _ n := isDotProduct.Build _ _ _ (@dotmx_is_dotmx n).
 
 Local Notation "B ^!" :=
   (orthomx (@conjCfun C) (mx_of_hermitian (hermitian1mx _)) B) : matrix_set_scope.
