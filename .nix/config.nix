@@ -61,12 +61,13 @@ with builtins; with (import <nixpkgs> {}).lib;
       { name = p; value.override.version = "master"; }))
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
+         # vscoq-language-server.override.version = "v2.1.7";
          # To add an overlay applying to all bundles,
          # add below a line like
          #<package>.override.version = "<github_login>:<branch>";
-         # coq-bits.override.version = "thomas-lamiaux:common_done";
-         # gaia.override.version = "thomas-lamiaux:common_done";
-         # reglang.override.version = "thomas-lamiaux:common_done";
+         coq-bits.override.version = "thomas-lamiaux:common_done";
+         gaia.override.version = "thomas-lamiaux:common_done";
+         coqeal.override.version = "thomas-lamiaux:common_done";
          # where
          # * <package> will typically be one of the strings above (without the quotes)
          #   or look at https://github.com/NixOS/nixpkgs/tree/master/pkgs/development/coq-modules
