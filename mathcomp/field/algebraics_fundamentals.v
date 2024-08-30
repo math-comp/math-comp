@@ -321,9 +321,7 @@ have ofQ_K z: cancel (ofQ z) (inQ z).
 have sQring z: divring_closed (sQ z).
   have sQ_1: 1 \in sQ z by rewrite -(rmorph1 (ofQ z)) sQof.
   by split=> // x y /inQ_K<- /inQ_K<- /=; rewrite -(rmorphB, fmorph_div) sQof.
-have sQzmod z: zmod_closed (sQ z).
-  by case: (sQring z) => z1 zsub _; split=> //; rewrite -(subrr 1); apply/zsub.
-pose sQzM z := GRing.isZmodClosed.Build _ _ (sQzmod z).
+pose sQzM z := GRing.isZmodClosed.Build _ _ (sQring z : zmod_closed _).
 pose sQmM z := GRing.isMulClosed.Build _ _ (sQring z).
 pose sQiM z := GRing.isInvClosed.Build _ _ (sQring z).
 pose sQC z : divringClosed _ := HB.pack (sQ z)

@@ -634,30 +634,20 @@ Proof. exact: addg0. Qed.
 #[export]
 HB.instance Definition _ := Monoid.isComLaw.Build V 0 +%R addrA addrC add0r.
 
-Lemma addrCA : @left_commutative V V +%R.
-Proof. exact: addgCA. Qed.
-
-Lemma addrAC : @right_commutative V V +%R.
-Proof. exact: addgAC. Qed.
-
-Lemma addrACA : @interchange V +%R +%R.
-Proof. exact: addgACA. Qed.
+Lemma addrCA : @left_commutative V V +%R. Proof. exact: addgCA. Qed.
+Lemma addrAC : @right_commutative V V +%R. Proof. exact: addgAC. Qed.
+Lemma addrACA : @interchange V +%R +%R. Proof. exact: addgACA. Qed.
 
 Lemma mulr0n x : x *+ 0 = 0. Proof. exact: mulg0n. Qed.
 Lemma mulr1n x : x *+ 1 = x. Proof. exact: mulg1n. Qed.
 Lemma mulr2n x : x *+ 2 = x + x. Proof. exact: mulg2n. Qed.
-
-Lemma mulrS x n : x *+ n.+1 = x + (x *+ n).
-Proof. exact: mulgS. Qed.
-
-Lemma mulrSr x n : x *+ n.+1 = x *+ n + x.
-Proof. exact: mulgSr. Qed.
+Lemma mulrS x n : x *+ n.+1 = x + (x *+ n). Proof. exact: mulgS. Qed.
+Lemma mulrSr x n : x *+ n.+1 = x *+ n + x. Proof. exact: mulgSr. Qed.
 
 Lemma mulrb x (b : bool) : x *+ b = (if b then x else 0).
 Proof. exact: mulgb. Qed.
 
-Lemma mul0rn n : 0 *+ n = 0 :> V.
-Proof. exact: mul0gn. Qed.
+Lemma mul0rn n : 0 *+ n = 0 :> V. Proof. exact: mul0gn. Qed.
 
 Lemma mulrnDl n : {morph (fun x => x *+ n) : x y / x + y}.
 Proof. exact: mulgnDl. Qed.
@@ -665,11 +655,9 @@ Proof. exact: mulgnDl. Qed.
 Lemma mulrnDr x m n : x *+ (m + n) = x *+ m + x *+ n.
 Proof. exact: mulgnDr. Qed.
 
-Lemma mulrnA x m n : x *+ (m * n) = x *+ m *+ n.
-Proof. exact: mulgnA. Qed.
+Lemma mulrnA x m n : x *+ (m * n) = x *+ m *+ n. Proof. exact: mulgnA. Qed.
 
-Lemma mulrnAC x m n : x *+ m *+ n = x *+ n *+ m.
-Proof. exact: mulgnAC. Qed.
+Lemma mulrnAC x m n : x *+ m *+ n = x *+ n *+ m. Proof. exact: mulgnAC. Qed.
 
 Lemma iter_addr n x y : iter n (+%R x) y = x *+ n + y.
 Proof. exact: iter_addg. Qed.
@@ -706,77 +694,40 @@ Section ZmoduleTheory.
 Variable V : zmodType.
 Implicit Types x y : V.
 
-Lemma addNr : @left_inverse V V V 0 -%R +%R.
-Proof. exact: addNg. Qed.
-Lemma addrN : @right_inverse V V V 0 -%R +%R.
-Proof. exact: addgN. Qed.
+Lemma addNr : @left_inverse V V V 0 -%R +%R. Proof. exact: addNg. Qed.
+Lemma addrN : @right_inverse V V V 0 -%R +%R. Proof. exact: addgN. Qed.
 Definition subrr := addrN.
 
-Lemma addKr : @left_loop V V -%R +%R.
-Proof. exact: addKg. Qed.
-Lemma addNKr : @rev_left_loop V V -%R +%R.
-Proof. exact: addNKg. Qed.
-Lemma addrK : @right_loop V V -%R +%R.
-Proof. exact: addgK. Qed.
-Lemma addrNK : @rev_right_loop V V -%R +%R.
-Proof. exact: addgNK. Qed.
+Lemma addKr : @left_loop V V -%R +%R. Proof. exact: addKg. Qed.
+Lemma addNKr : @rev_left_loop V V -%R +%R. Proof. exact: addNKg. Qed.
+Lemma addrK : @right_loop V V -%R +%R. Proof. exact: addgK. Qed.
+Lemma addrNK : @rev_right_loop V V -%R +%R. Proof. exact: addgNK. Qed.
 Definition subrK := addrNK.
-Lemma subKr x : involutive (fun y => x - y).
-Proof. exact: subKg. Qed.
-Lemma addrI : @right_injective V V V +%R.
-Proof. exact: addgI. Qed.
-Lemma addIr : @left_injective V V V +%R.
-Proof. exact: addIg. Qed.
-Lemma subrI : right_injective (fun x y => x - y).
-Proof. exact: subgI. Qed.
-Lemma subIr : left_injective (fun x y => x - y).
-Proof. exact: subIg. Qed.
-Lemma opprK : @involutive V -%R.
-Proof. exact: oppgK. Qed.
-Lemma oppr_inj : @injective V V -%R.
-Proof. exact: oppg_inj. Qed.
-Lemma oppr0 : -0 = 0 :> V.
-Proof. exact: oppg0. Qed.
-Lemma oppr_eq0 x : (- x == 0) = (x == 0).
-Proof. exact: oppg_eq0. Qed.
+Lemma subKr x : involutive (fun y => x - y). Proof. exact: subKg. Qed.
+Lemma addrI : @right_injective V V V +%R. Proof. exact: addgI. Qed.
+Lemma addIr : @left_injective V V V +%R. Proof. exact: addIg. Qed.
+Lemma subrI : right_injective (fun x y => x - y). Proof. exact: subgI. Qed.
+Lemma subIr : left_injective (fun x y => x - y). Proof. exact: subIg. Qed.
+Lemma opprK : @involutive V -%R. Proof. exact: oppgK. Qed.
+Lemma oppr_inj : @injective V V -%R. Proof. exact: oppg_inj. Qed.
+Lemma oppr0 : -0 = 0 :> V. Proof. exact: oppg0. Qed.
+Lemma oppr_eq0 x : (- x == 0) = (x == 0). Proof. exact: oppg_eq0. Qed.
 
 Lemma subr0 x : x - 0 = x. Proof. exact: subg0. Qed.
 Lemma sub0r x : 0 - x = - x. Proof. exact: sub0g. Qed.
 
-Lemma opprB x y : - (x - y) = y - x.
-Proof. exact: oppgB. Qed.
-
-Lemma opprD : {morph -%R: x y / x + y : V}.
-Proof. exact: oppgD. Qed.
-
-Lemma addrKA z x y : (x + z) - (z + y) = x - y.
-Proof. exact: addgKA. Qed.
-
-Lemma subrKA z x y : (x - z) + (z + y) = x + y.
-Proof. exact: subgKA. Qed.
-
-Lemma addr0_eq x y : x + y = 0 -> - x = y.
-Proof. exact: addg0_eq. Qed.
-
+Lemma opprB x y : - (x - y) = y - x. Proof. exact: oppgB. Qed.
+Lemma opprD : {morph -%R: x y / x + y : V}. Proof. exact: oppgD. Qed.
+Lemma addrKA z x y : (x + z) - (z + y) = x - y. Proof. exact: addgKA. Qed.
+Lemma subrKA z x y : (x - z) + (z + y) = x + y. Proof. exact: subgKA. Qed.
+Lemma addr0_eq x y : x + y = 0 -> - x = y. Proof. exact: addg0_eq. Qed.
 Lemma subr0_eq x y : x - y = 0 -> x = y. Proof. exact: subg0_eq. Qed.
-
-Lemma subr_eq x y z : (x - z == y) = (x == y + z).
-Proof. exact: subg_eq. Qed.
-
-Lemma subr_eq0 x y : (x - y == 0) = (x == y).
-Proof. exact: subg_eq0. Qed.
-
-Lemma addr_eq0 x y : (x + y == 0) = (x == - y).
-Proof. exact: addg_eq0. Qed.
-
-Lemma eqr_opp x y : (- x == - y) = (x == y).
-Proof. exact: eqg_opp. Qed.
-
-Lemma eqr_oppLR x y : (- x == y) = (x == - y).
-Proof. exact: eqg_oppLR. Qed.
-
-Lemma mulNrn x n : (- x) *+ n = x *- n.
-Proof. exact: mulNgn. Qed.
+Lemma subr_eq x y z : (x - z == y) = (x == y + z). Proof. exact: subg_eq. Qed.
+Lemma subr_eq0 x y : (x - y == 0) = (x == y). Proof. exact: subg_eq0. Qed.
+Lemma addr_eq0 x y : (x + y == 0) = (x == - y). Proof. exact: addg_eq0. Qed.
+Lemma eqr_opp x y : (- x == - y) = (x == y). Proof. exact: eqg_opp. Qed.
+Lemma eqr_oppLR x y : (- x == y) = (x == - y). Proof. exact: eqg_oppLR. Qed.
+Lemma mulNrn x n : (- x) *+ n = x *- n. Proof. exact: mulNgn. Qed.
 
 Lemma mulrnBl n : {morph (fun x => x *+ n) : x y / x - y}.
 Proof. exact: mulgnBl. Qed.
@@ -812,14 +763,14 @@ Section ClosedPredicates.
 
 Variable S : {pred V}.
 
-Definition oppr_closed := {in S, forall u, - u \in S}.
-Definition subr_2closed := {in S &, forall u v, u - v \in S}.
-Definition zmod_closed := 0 \in S /\ subr_2closed.
-
+Definition oppr_closed := oppg_closed S.
+Definition subr_2closed := subg_2closed S.
+Definition zmod_closed := zmod_closed S.
+ 
 Lemma zmod_closedN : zmod_closed -> oppr_closed.
 Proof. exact: zmod_closedN. Qed.
 
-Lemma zmod_closedD : zmod_closed -> addr_closed S.
+Lemma zmod_closedD : zmod_closed -> nmod_closed S.
 Proof. by move=> z; split; [case: z|apply/zmod_closedD]. Qed.
 
 End ClosedPredicates.
@@ -940,11 +891,8 @@ Proof. by rewrite mulrnAl mul1r. Qed.
 Lemma mulr_natr x n : x * n%:R = x *+ n.
 Proof. by rewrite mulrnAr mulr1. Qed.
 
-Lemma natrD m n : (m + n)%:R = m%:R + n%:R :> R.
-Proof. exact: mulrnDr. Qed.
-
+Lemma natrD m n : (m + n)%:R = m%:R + n%:R :> R. Proof. exact: mulrnDr. Qed.
 Lemma natr1 n : n%:R + 1 = n.+1%:R :> R. Proof. by rewrite mulrSr. Qed.
-
 Lemma nat1r n : 1 + n%:R = n.+1%:R :> R. Proof. by rewrite mulrS. Qed.
 
 Definition natr_sum := big_morph (natmul 1) natrD (mulr0n 1).
@@ -1007,8 +955,7 @@ Lemma commr_prod (I : Type) (s : seq I) (P : pred I) (F : I -> R) x :
   (forall i, P i -> comm x (F i)) -> comm x (\prod_(i <- s | P i) F i).
 Proof. exact: (big_ind _ (commr1 x) (@commrM x)). Qed.
 
-Lemma commr_nat x n : comm x n%:R.
-Proof. exact/commrMn/commr1. Qed.
+Lemma commr_nat x n : comm x n%:R. Proof. exact/commrMn/commr1. Qed.
 
 Lemma commrX x y n : comm x y -> comm x (y ^+ n).
 Proof.
@@ -1331,8 +1278,7 @@ Proof. exact: mulrnBr. Qed.
 Lemma commrN x y : comm x y -> comm x (- y).
 Proof. by move=> com_xy; rewrite /comm mulrN com_xy mulNr. Qed.
 
-Lemma commrN1 x : comm x (-1).
-Proof. exact/commrN/commr1. Qed.
+Lemma commrN1 x : comm x (-1). Proof. exact/commrN/commr1. Qed.
 
 Lemma commrB x y z : comm x y -> comm x z -> comm x (y - z).
 Proof. by move=> com_xy com_xz; apply: commrD => //; apply: commrN. Qed.
@@ -1370,8 +1316,7 @@ Qed.
 Lemma exprNn x n : (- x) ^+ n = (-1) ^+ n * x ^+ n :> R.
 Proof. by rewrite -mulN1r exprMn_comm // /comm mulN1r mulrN mulr1. Qed.
 
-Lemma sqrrN x : (- x) ^+ 2 = x ^+ 2.
-Proof. exact: mulrNN. Qed.
+Lemma sqrrN x : (- x) ^+ 2 = x ^+ 2. Proof. exact: mulrNN. Qed.
 
 Lemma sqrr_sign n : ((-1) ^+ n) ^+ 2 = 1 :> R.
 Proof. by rewrite exprAC sqrrN !expr1n. Qed.
@@ -1540,11 +1485,9 @@ Implicit Types x y : R.
 Lemma mulIr_eq0 x y : rreg x -> (y * x == 0) = (y == 0).
 Proof. exact: (@mulrI_eq0 R^c). Qed.
 
-Lemma rreg_neq0 x : rreg x -> x != 0.
-Proof. exact: (@lreg_neq0 R^c). Qed.
+Lemma rreg_neq0 x : rreg x -> x != 0. Proof. exact: (@lreg_neq0 R^c). Qed.
 
-Lemma rreg1 : rreg (1 : R).
-Proof. exact: (@lreg1 R^c). Qed.
+Lemma rreg1 : rreg (1 : R). Proof. exact: (@lreg1 R^c). Qed.
 
 Lemma rregM x y : rreg x -> rreg y -> rreg (x * y).
 Proof. by move=> reg_x reg_y; apply: (@lregM R^c). Qed.
@@ -1565,8 +1508,7 @@ Implicit Types x y : R.
 Lemma mulIr0_rreg x : (forall y, y * x = 0 -> y = 0) -> rreg x.
 Proof. exact: (@mulrI0_lreg R^c). Qed.
 
-Lemma rregN x : rreg x -> rreg (- x).
-Proof. exact: (@lregN R^c). Qed.
+Lemma rregN x : rreg x -> rreg (- x). Proof. exact: (@lregN R^c). Qed.
 
 End RightRegular.
 
@@ -1808,17 +1750,13 @@ Section Properties.
 
 Variables (U V : zmodType) (f : {additive U -> V}).
 
-Lemma raddfN : {morph f : x / - x}.
-Proof. exact: raddfN. Qed.
-
-Lemma raddfB : {morph f : x y / x - y}.
-Proof. exact: raddfB. Qed.
+Lemma raddfN : {morph f : x / - x}. Proof. exact: raddfN. Qed.
+Lemma raddfB : {morph f : x y / x - y}. Proof. exact: raddfB. Qed.
 
 Lemma raddf_inj : (forall x, f x = 0 -> x = 0) -> injective f.
 Proof. exact: raddf_inj. Qed.
 
-Lemma raddfMNn n : {morph f : x / x *- n}.
-Proof. exact: raddfMNn. Qed.
+Lemma raddfMNn n : {morph f : x / x *- n}. Proof. exact: raddfMNn. Qed.
 
 End Properties.
 
@@ -2651,8 +2589,7 @@ rewrite -(mulrK Ux _^-1) -mulrA commrV ?mulKr //.
 by apply/unitrP; exists x; rewrite divrr ?mulVr.
 Qed.
 
-Lemma invr_inj : injective (@inv R).
-Proof. exact: inv_inj invrK. Qed.
+Lemma invr_inj : injective (@inv R). Proof. exact: inv_inj invrK. Qed.
 
 Lemma unitrV x : (x^-1 \in unit) = (x \in unit).
 Proof. by rewrite !unitrE invrK commrV. Qed.
@@ -3013,7 +2950,7 @@ Notation subalg_closed := subalg_closed.
 Notation divring_closed := divring_closed.
 Notation divalg_closed := divalg_closed.
 
-Coercion zmod_closedD : zmod_closed >-> addr_closed.
+Coercion zmod_closedD : zmod_closed >-> nmod_closed.
 Coercion zmod_closedN : zmod_closed >-> oppr_closed.
 Coercion smulr_closedN : smulr_closed >-> oppr_closed.
 Coercion smulr_closedM : smulr_closed >-> mulr_closed.
@@ -4468,8 +4405,7 @@ Section Add.
 
 Variable S : addrClosed V.
 
-Lemma rpred0D : addr_closed S.
-Proof. exact: nmod_closed_subproof. Qed.
+Lemma rpred0D : addr_closed S. Proof. exact: nmod_closed_subproof. Qed.
 
 Lemma rpred_sum I r (P : pred I) F :
   (forall i, P i -> F i \in S) -> \sum_(i <- r | P i) F i \in S.

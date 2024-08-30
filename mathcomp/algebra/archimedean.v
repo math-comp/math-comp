@@ -580,7 +580,7 @@ Variables (U V : lmodType R) (f : {additive U -> V}).
 Lemma raddfZ_nat a u : a \is a nat_num -> f (a *: u) = a *: f u.
 Proof. by move=> /natrP[n ->]; apply: raddfZnat. Qed.
 
-Lemma rpredZ_nat (S : addgClosed V) :
+Lemma rpredZ_nat (S : addrClosed V) :
   {in nat_num & S, forall z u, z *: u \in S}.
 Proof. by move=> _ u /natrP[n ->]; apply: rpredZnat. Qed.
 
