@@ -64,9 +64,9 @@ with builtins; with (import <nixpkgs> {}).lib;
          # To add an overlay applying to all bundles,
          # add below a line like
          #<package>.override.version = "<github_login>:<branch>";
-         coq-bits.override.version = "thomas-lamiaux:common_done";
-         gaia.override.version = "thomas-lamiaux:common_done";
-         reglang.override.version = "thomas-lamiaux:common_done";
+         # coq-bits.override.version = "thomas-lamiaux:common_done";
+         # gaia.override.version = "thomas-lamiaux:common_done";
+         # reglang.override.version = "thomas-lamiaux:common_done";
          # where
          # * <package> will typically be one of the strings above (without the quotes)
          #   or look at https://github.com/NixOS/nixpkgs/tree/master/pkgs/development/coq-modules

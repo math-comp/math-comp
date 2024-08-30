@@ -636,7 +636,7 @@ have i1 : perm_eq (mksrepr G N1 :: mkfactors N1 st1)
   apply: asimpleI => //.
     by apply: subset_trans (normal_norm nN2G); apply: normal_sub.
   rewrite -quotientMidl (maxainvM _ _ maxN_2) //.
-    by apply: maxainv_asimple_quo.
+  by apply: maxainv_asimple_quo.
 have i2 : perm_eq (mksrepr G N2 :: mkfactors N2 st2)
                   [:: mksrepr G N2, mksrepr N2 N & mkfactors N sN].
   rewrite perm_cons -[mksrepr _ _ :: _]/(mkfactors N2 [:: N & sN]).

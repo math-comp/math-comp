@@ -61,8 +61,8 @@ Ltac done_gen tac :=
     | solve [trivial]
     | solve [symmetry; trivial]
     (* | solve [apply not_symmetry; trivial] *)
-    (* | progress (hnf; intros)   or  *)
-    | progress (repeat (intros ?))
+    | progress (hnf; intros)
+    (* | progress (repeat (intros ?)) *)
     (* 3. Inconsistencies *)
     | contradiction  (* (P, ~P) or (~True) *)
     | match goal with H : ~ _ |- _ => solve [case H; reflexivity || trivial] end
