@@ -52,6 +52,8 @@ Ltac fast_done :=
     | symmetry; eassumption
     | reflexivity ].
 
+Ltac ssrdone0 ::= fast_done.
+
 Ltac done_gen tac :=
   solve
   [ repeat first
