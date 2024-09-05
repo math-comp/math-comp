@@ -1302,11 +1302,11 @@ Proof.
 apply: (iffP row_subP) => [cGf x Gx | cGf i].
   apply/row_matrixP=> i; apply/eqP; rewrite -subr_eq0 -!mulmxA -!linearB /=.
   have:= sub_kermxP (cGf i); rewrite mul_rV_lin1 /=.
-  move/(canRL mxvecK)/row_matrixP/(_ (enum_rank_in Gx x))/eqP; rewrite !raddf0.
+  move/(canRL mxvecK)/row_matrixP/(_ (enum_rank_in Gx x))/eqP; rewrite !linear0.
   by rewrite !row_mul rowK mul_vec_lin /= mul_vec_lin_row enum_rankK_in.
 apply/sub_kermxP; rewrite mul_rV_lin1 /=; apply: (canLR vec_mxK).
 apply/row_matrixP=> j; rewrite !row_mul rowK mul_vec_lin /= mul_vec_lin_row.
-by rewrite -!row_mul mulmxBr !mulmxA cGf ?enum_valP // subrr !raddf0.
+by rewrite -!row_mul mulmxBr !mulmxA cGf ?enum_valP // subrr !linear0.
 Qed.
 Arguments hom_mxP {m f W}.
 
@@ -1380,11 +1380,11 @@ rewrite /rfix_mx; set C := \matrix_i _.
 apply: (iffP row_subP) => [cHW x Hx | cHW j].
   apply/row_matrixP=> j; apply/eqP; rewrite -subr_eq0 row_mul.
   move/sub_kermxP: {cHW}(cHW j); rewrite mul_rV_lin1 /=; move/(canRL mxvecK).
-  move/row_matrixP/(_ (enum_rank_in Hx x)); rewrite row_mul rowK !raddf0.
+  move/row_matrixP/(_ (enum_rank_in Hx x)); rewrite row_mul rowK !linear0.
   by rewrite enum_rankK_in // mul_vec_lin_row mulmxBr mulmx1 => ->.
 apply/sub_kermxP; rewrite mul_rV_lin1 /=; apply: (canLR vec_mxK).
 apply/row_matrixP=> i; rewrite row_mul rowK mul_vec_lin_row -row_mul.
-by rewrite mulmxBr mulmx1 cHW ?enum_valP // subrr !raddf0.
+by rewrite mulmxBr mulmx1 cHW ?enum_valP // subrr !linear0.
 Qed.
 Arguments rfix_mxP {m W}.
 
@@ -1512,7 +1512,7 @@ apply: (iffP sub_bigcapmxP) => [iso_uv | [f hom_uf <-] i _].
   pose f := pinvmx U *m V.
   have hom_uv_f x: x \in G -> u *m rG x *m f = v *m rG x.
     move=> Gx; apply/eqP; rewrite 2!mulmxA mul_rV_lin1 -subr_eq0 -mulmxBr /=.
-    rewrite uv0 // raddfB /= mulmxBr vec_mxK; split. (* FIXME: slow *)
+    rewrite uv0 // linearB /= mulmxBr vec_mxK; split. (* FIXME: slow *)
       by rewrite addmx_sub ?submxMl // eqmx_opp envelop_mx_id.
     have Uux: (u *m rG x <= U)%MS.
       by rewrite -(genmxE U) mxmodule_trans ?cyclic_mx_id ?cyclic_mx_module.
@@ -4979,7 +4979,7 @@ exists (in_submod _ (in_factmod U^f valUV^f)) => [||x Gx].
   rewrite -mulmxA -!map_mxM //; do 2!rewrite mulmxA -in_factmodE -in_submodE.
   rewrite val_factmodK val_submodK map_mx1 mulmx1.
   have ->: in_factmod U U = 0 by apply/eqP; rewrite in_factmod_eq0.
-  by rewrite raddf0 map_mx0 eqmx0 submx0.
+  by rewrite linear0 map_mx0 eqmx0 submx0.
 rewrite {1}in_submodE mulmxA -in_submodE -in_submodJ; last first.
   by rewrite genmxE -(in_factmod_addsK _ V^f) submxMr.
 congr (in_submod _ _); rewrite -in_factmodJ // in_factmodE mulmxA -in_factmodE.
@@ -5375,22 +5375,19 @@ Proof. by apply/matrixP=> i j; rewrite !mxE !(mul0mx, linear0). Qed.
 Lemma val_gen0 : val_gen 0 = 0.
 Proof. by apply: (canLR in_genK); rewrite in_gen0. Qed.
 
-Lemma in_genN : {morph in_gen : W / - W}.
-Proof.
-(* FIXME: slow *)
-by move=> W; apply/matrixP=> i j; rewrite !mxE raddfN mulNmx 2!raddfN.
-Qed.
-
-Lemma val_genN : {morph val_gen : W / - W}.
-Proof. by move=> W; apply: (canLR in_genK); rewrite in_genN val_genK. Qed.
-
 Lemma in_genD : {morph in_gen : U V / U + V}.
 Proof.
-by move=> U V; apply/matrixP=> i j; rewrite !mxE raddfD mulmxDl 2!raddfD.
+by move=> U V; apply/matrixP=> i j; rewrite !mxE 4!(mulmxDl, linearD).
 Qed.
 
 Lemma val_genD : {morph val_gen : U V / U + V}.
 Proof. by move=> U V; apply: (canLR in_genK); rewrite in_genD !val_genK. Qed.
+
+Lemma in_genN : {morph in_gen : W / - W}.
+Proof. by move=> W; apply/esym/addr0_eq; rewrite -in_genD subrr in_gen0. Qed.
+
+Lemma val_genN : {morph val_gen : W / - W}.
+Proof. by move=> W; apply: (canLR in_genK); rewrite in_genN val_genK. Qed.
 
 Definition in_gen_sum := big_morph in_gen in_genD in_gen0.
 Definition val_gen_sum := big_morph val_gen val_genD val_gen0.

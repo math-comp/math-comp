@@ -150,16 +150,16 @@ Qed.
 
 Lemma poly_rV_is_linear : linear poly_rV.
 Proof. by move=> a p q; apply/rowP=> i; rewrite !mxE coefD coefZ. Qed.
-HB.instance Definition _ := GRing.isLinear.Build R {poly R} 'rV_d _ poly_rV
-  poly_rV_is_linear.
+HB.instance Definition _ := GRing.isSemilinear.Build R {poly R} 'rV_d _ poly_rV
+  (GRing.semilinear_linear poly_rV_is_linear).
 
 Lemma rVpoly_is_linear : linear rVpoly.
 Proof.
 move=> a u v; apply/polyP=> k; rewrite coefD coefZ !coef_rVpoly.
 by case: insubP => [i _ _ | _]; rewrite ?mxE // mulr0 addr0.
 Qed.
-HB.instance Definition _ := GRing.isLinear.Build R 'rV_d {poly R} _ rVpoly
-  rVpoly_is_linear.
+HB.instance Definition _ := GRing.isSemilinear.Build R 'rV_d {poly R} _ rVpoly
+  (GRing.semilinear_linear rVpoly_is_linear).
 
 End RowPoly.
 
@@ -299,8 +299,7 @@ have le_q'_dq: size q' <= dq.
   have [-> | nz_q'] := eqVneq q' 0; first by rewrite size_poly0.
   by rewrite /dq -(size_scale q nz_k) q'r size_mul // addnC -def_r leq_addl.
 exists (row_mx (- c *: poly_rV q') (k *: poly_rV p')); last first.
-  rewrite mul_row_col scaleNr mulNmx !mul_rV_lin1 /=.
-  rewrite 2![rVpoly (_ *: _)]linearZ /= !poly_rV_K //.
+  rewrite mul_row_col scaleNr mulNmx !mul_rV_lin1 /= 2!linearZ /= !poly_rV_K //.
   by rewrite !scalerCA p'r q'r mulrCA addNr.
 apply: contraNneq r_nz; rewrite -row_mx0 => /eq_row_mx[/eqP].
 rewrite scaleNr oppr_eq0 gcdp_eq0 -!size_poly_eq0 => /eqP q0 p0.
