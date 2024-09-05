@@ -332,8 +332,9 @@ move=> a u v; apply/polyP=> i; rewrite coefD coefZ !coef_poly.
 case: ifP => lti; last by rewrite mulr0 addr0.
 by rewrite linearP mulrA -mulrDl mulr_algl.
 Qed.
-HB.instance Definition _ := GRing.isLinear.Build F0 L {poly L} _ Fadjoin_poly
-  Fadjoin_poly_is_linear.
+HB.instance Definition _ :=
+  GRing.isSemilinear.Build F0 L {poly L} _ Fadjoin_poly
+    (GRing.semilinear_linear Fadjoin_poly_is_linear).
 
 Lemma size_minPoly : size minPoly = n.+1.
 Proof. by rewrite size_polyDl ?size_polyXn // size_polyN ltnS size_poly. Qed.
@@ -1092,12 +1093,12 @@ Qed.
 Fact mulfx_addl : left_distributive subfext_mul subfext_add.
 Proof.
 elim/quotW=> x; elim/quotW=> y; elim/quotW=> w.
-by rewrite !piE /subfx_mul_rep raddfD /= mulrDl modpD raddfD.
+by rewrite !piE /subfx_mul_rep linearD /= mulrDl modpD linearD.
 Qed.
 
 Fact nonzero1fx : subfext1 != subfext0.
 Proof.
-rewrite !piE /equiv_subfext /iotaFz !raddf0.
+rewrite !piE /equiv_subfext /iotaFz !linear0.
 by rewrite poly_rV_K ?rmorph1 ?oner_eq0 // size_poly1.
 Qed.
 
@@ -1136,15 +1137,15 @@ Canonical pi_subfext_inv_morph := PiMorph1 pi_subfext_inv.
 
 Fact subfx_fieldAxiom : forall x, x != 0 -> subfext_inv x * x = 1.
 Proof.
-elim/quotW=> x; apply: contraNeq; rewrite !piE /equiv_subfext /iotaFz !raddf0.
+elim/quotW=> x; apply: contraNeq; rewrite !piE /equiv_subfext /iotaFz !linear0.
 apply: contraR => nz_x; rewrite poly_rV_K ?size_poly1 // !poly_rV_modp_K.
 by rewrite iotaPz_modp rmorph1 rmorphM /= iotaPz_modp subfx_poly_invE mulVf.
 Qed.
 
 Fact subfx_inv0 : subfext_inv (0 : subFExtend) = (0 : subFExtend).
 Proof.
-apply/eqP; rewrite !piE /equiv_subfext /iotaFz /subfx_inv_rep !raddf0.
-by rewrite /subfx_poly_inv rmorph0 eqxx mod0p !raddf0.
+apply/eqP; rewrite !piE /equiv_subfext /iotaFz /subfx_inv_rep !linear0.
+by rewrite /subfx_poly_inv rmorph0 eqxx mod0p !linear0.
 Qed.
 
 HB.instance Definition _ := GRing.ComNzRing_isField.Build subFExtend
