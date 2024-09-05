@@ -236,8 +236,8 @@ move=> a u v; apply/lfunP => w.
 by rewrite !lfunE /= scale_lfunE !lfunE /= mulrDl scalerAl.
 Qed.
 #[hnf]
-HB.instance Definition _ := GRing.isLinear.Build K aT (hom aT aT) _ amull
-  amull_is_linear.
+HB.instance Definition _ := GRing.isSemilinear.Build K aT (hom aT aT) _ amull
+  (GRing.semilinear_linear amull_is_linear).
 
 (* amull is a converse ring morphism *)
 Lemma amull1 : amull 1 = \1%VF.
@@ -259,8 +259,8 @@ by apply/lfunP=> w; rewrite comp_lfunE !lfunE /= mulrA.
 Qed.
 
 #[hnf]
-HB.instance Definition _ := GRing.isLinear.Build K aT (hom aT aT) _ amulr
-  amulr_is_linear.
+HB.instance Definition _ := GRing.isSemilinear.Build K aT (hom aT aT) _ amulr
+  (GRing.semilinear_linear amulr_is_linear).
 #[hnf]
 HB.instance Definition _ := GRing.isMultiplicative.Build aT (hom aT aT) amulr
   amulr_is_multiplicative.
