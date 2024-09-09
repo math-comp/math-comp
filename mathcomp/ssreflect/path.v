@@ -1170,10 +1170,57 @@ Qed.
 Lemma size_sort (T : Type) (leT : rel T) s : size (sort leT s) = size s.
 Proof. exact: (count_sort _ predT). Qed.
 
+Section ReflClosure.
+
+Variable (T : eqType) (r : rel T).
+
+Definition refl_closure := [rel x y : T | (x == y) || r x y].
+
+Lemma refl_closure_reflexive : reflexive refl_closure.
+Proof. by move=> ?/=; rewrite eq_refl orTb. Qed.
+
+Lemma refl_closure_symmetric : symmetric r -> symmetric refl_closure.
+Proof.
+move=> sr x y/=.
+have [/eqP ->|] := boolP (x == y); first by rewrite eq_refl.
+by rewrite sr eq_sym => /negPf ->.
+Qed.
+
+Lemma refl_closure_trans : transitive r -> transitive refl_closure.
+Proof. 
+by move=> tr x ? ?/= /orP [/eqP ->//|] ? /orP [/eqP <- //|?]; 
+  rewrite (@tr x) ?orbT.
+Qed.
+
+Lemma refl_closure_total : total r -> total refl_closure.
+Proof. 
+by move=> tr x y/=; rewrite -orbA (orbC (y == x)) (orbA (r x y)) tr orbT.
+Qed.
+
+End ReflClosure.
+
+Lemma refl_closure_sorted_uniq (T : eqType) (r : rel T) (s : seq T) : 
+  transitive r -> 
+  irreflexive r -> 
+  sorted r s = uniq s && sorted (refl_closure r) s.
+Proof.
+move=> rt ri.
+rewrite (sorted_pairwise (refl_closure_trans rt)) (sorted_pairwise rt). 
+rewrite uniq_pairwise -pairwise_relI; apply/eq_pairwise => ? ? /=. 
+by case: eqP => // ->; rewrite ri.
+Qed.
+
 Lemma ltn_sorted_uniq_leq s : sorted ltn s = uniq s && sorted leq s.
 Proof.
-rewrite (sorted_pairwise leq_trans) (sorted_pairwise ltn_trans) uniq_pairwise.
-by rewrite -pairwise_relI; apply/eq_pairwise => ? ?; rewrite ltn_neqAle.
+rewrite refl_closure_sorted_uniq ?(@eq_sorted _ _ leq)// => [? ?/=||];
+  [by rewrite [in RHS]leq_eqVlt| exact: ltn_trans| exact: ltnn].
+Qed.
+
+Lemma gtn_sorted_uniq_geq s : sorted gtn s = uniq s && sorted geq s.
+Proof.
+rewrite refl_closure_sorted_uniq ?(@eq_sorted _ _ geq)// => 
+          [? ?/=|? ? ? /[swap]|];
+  [by rewrite [in RHS]leq_eqVlt eq_sym| exact: ltn_trans| exact: ltnn].
 Qed.
 
 Lemma iota_sorted i n : sorted leq (iota i n).
