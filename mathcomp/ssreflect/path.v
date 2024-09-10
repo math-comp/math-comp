@@ -1177,9 +1177,7 @@ by rewrite -pairwise_relI; apply/eq_pairwise => ? ?; rewrite ltn_neqAle.
 Qed.
 
 Lemma gtn_sorted_uniq_geq s : sorted gtn s = uniq s && sorted geq s.
-Proof. 
-by rewrite -rev_sorted -[in RHS]rev_sorted -rev_uniq ltn_sorted_uniq_leq.
-Qed.
+Proof. by rewrite -rev_sorted ltn_sorted_uniq_leq rev_sorted rev_uniq. Qed.
 
 Lemma iota_sorted i n : sorted leq (iota i n).
 Proof. by elim: n i => // [[|n] //= IHn] i; rewrite IHn leqW. Qed.
