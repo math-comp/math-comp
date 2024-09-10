@@ -6104,38 +6104,61 @@ HB.builders Context R S U of SubNzRing_isSubComNzRing R S U.
 HB.instance Definition _ := SubPzRing_isSubComPzRing.Build R S U.
 HB.end.
 
-HB.mixin Record isSubLmodule (R : pzRingType) (V : lmodType R) (S : pred V)
-   W of SubZmodule V S W & Lmodule R W := {
- valZ : scalable (val : W -> V);
+HB.mixin Record isSubLSemiModule (R : pzSemiRingType) (V : lSemiModType R)
+  (S : pred V) W of SubNmodule V S W & LSemiModule R W := {
+  valZ : scalable (val : W -> V);
 }.
+
+#[short(type="subLSemiModType")]
+HB.structure Definition SubLSemiModule (R : pzSemiRingType) (V : lSemiModType R)
+    (S : pred V) :=
+  { W of SubNmodule V S W &
+         Nmodule_isLSemiModule R W & isSubLSemiModule R V S W}.
 
 #[short(type="subLmodType")]
 HB.structure Definition SubLmodule (R : pzRingType) (V : lmodType R)
     (S : pred V) :=
-  { W of SubZmodule V S W & Zmodule_isLmodule R W & isSubLmodule R V S W}.
+  { W of SubZmodule V S W &
+         Nmodule_isLSemiModule R W & isSubLSemiModule R V S W}.
 
 Section linear.
-Context (R : pzRingType) (V : lmodType R) (S : pred V) (W : SubLmodule.type S).
+Context (R : pzSemiRingType) (V : lSemiModType R).
+Context (S : pred V) (W : subLSemiModType S).
 Notation val := (val : W -> V).
 #[export]
-HB.instance Definition _ := isScalable.Build R W V *:%R val valZ.
+HB.instance Definition _ := isSemiScalable.Build R R idfun W V *:%R val valZ.
 End linear.
 
-HB.factory Record SubZmodule_isSubLmodule (R : pzRingType) (V : lmodType R) S W
-    of SubZmodule V S W := {
-  submod_closed_subproof : submod_closed S
+HB.factory Record isSubLmodule (R : pzRingType) (V : lmodType R) (S : pred V)
+   W of SubZmodule V S W & Lmodule R W := {
+ valZ : scalable (val : W -> V);
 }.
 
-HB.builders Context (R : pzRingType) (V : lmodType R) S W
-  of SubZmodule_isSubLmodule R V S W.
+HB.builders Context (R : pzRingType) (V : lmodType R) S W of
+  isSubLmodule R V S W.
 
-HB.instance Definition _ := isSubmodClosed.Build R V S submod_closed_subproof.
+HB.instance Definition _ := isSubLSemiModule.Build R V S W valZ.
+
+HB.end.
+
+HB.factory Record SubNmodule_isSubLSemiModule
+    (R : pzSemiRingType) (V : lSemiModType R) S W of SubNmodule V S W := {
+  submod_closed_subproof : subsemimod_closed S
+}.
+
+HB.builders Context (R : pzSemiRingType) (V : lSemiModType R) S W
+  of SubNmodule_isSubLSemiModule R V S W.
+
+HB.instance Definition _ :=
+  isSubSemiModClosed.Build R V S submod_closed_subproof.
 
 Let inW v Sv : W := Sub v Sv.
 Let scaleW a (w : W) := inW (rpredZ a _ (valP w)).
 
 Lemma scalerA' a b v : scaleW a (scaleW b v) = scaleW (a * b) v.
 Proof. by apply: val_inj; rewrite !SubK scalerA. Qed.
+Lemma scale0r v : scaleW 0 v = 0.
+Proof. by apply: val_inj; rewrite SubK scale0r raddf0. Qed.
 Lemma scale1r : left_id 1 scaleW.
 Proof. by move=> x; apply: val_inj; rewrite SubK scale1r. Qed.
 Lemma scalerDr : right_distributive scaleW +%R.
@@ -6146,16 +6169,43 @@ Lemma scalerDl v : {morph scaleW^~ v : a b / a + b}.
 Proof.
 by move=> a b; apply: val_inj; rewrite !(SubK, raddfD)/= !SubK scalerDl.
 Qed.
-HB.instance Definition _ := Zmodule_isLmodule.Build R W
-  scalerA' scale1r scalerDr scalerDl.
+HB.instance Definition _ := Nmodule_isLSemiModule.Build R W
+  scalerA' scale0r scale1r scalerDr scalerDl.
 
 Fact valZ : scalable (val : W -> _). Proof. by move=> k w; rewrite SubK. Qed.
-HB.instance Definition _ := isSubLmodule.Build R V S W valZ.
+HB.instance Definition _ := isSubLSemiModule.Build R V S W valZ.
 HB.end.
+
+HB.factory Record SubZmodule_isSubLmodule (R : pzRingType) (V : lmodType R) S W
+    of SubZmodule V S W := {
+  submod_closed_subproof : submod_closed S
+}.
+
+HB.builders Context (R : pzRingType) (V : lmodType R) S W
+  of SubZmodule_isSubLmodule R V S W.
+HB.instance Definition _ := SubNmodule_isSubLSemiModule.Build R V S W
+  (submod_closed_semi submod_closed_subproof).
+HB.end.
+
+#[short(type="subLSemiAlgType")]
+HB.structure Definition SubLSemiAlgebra
+    (R : pzSemiRingType) (V : lSemiAlgType R) S :=
+  {W of SubNzSemiRing V S W & @SubLSemiModule R V S W & LSemiAlgebra R W}.
 
 #[short(type="subLalgType")]
 HB.structure Definition SubLalgebra (R : pzRingType) (V : lalgType R) S :=
   {W of SubNzRing V S W & @SubLmodule R V S W & Lalgebra R W}.
+
+HB.factory Record SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra
+  (R : pzSemiRingType) (V : lSemiAlgType R) S W
+  of SubNzSemiRing V S W & @SubLSemiModule R V S W := {}.
+
+HB.builders Context (R : pzSemiRingType) (V : lSemiAlgType R) S W
+  of SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra R V S W.
+Lemma scalerAl (a : R) (u v : W) : a *: (u * v) = a *: u * v.
+Proof. by apply: val_inj; rewrite !(linearZ, rmorphM) /= rmorphM scalerAl. Qed.
+HB.instance Definition _ := LSemiModule_isLSemiAlgebra.Build R W scalerAl.
+HB.end.
 
 HB.factory Record SubNzRing_SubLmodule_isSubLalgebra (R : pzRingType)
     (V : lalgType R) S W of SubNzRing V S W & @SubLmodule R V S W := {}.
@@ -6174,23 +6224,35 @@ Notation SubRing_SubLmodule_isSubLalgebra R V S U :=
 
 HB.builders Context (R : pzRingType) (V : lalgType R) S W
   of SubNzRing_SubLmodule_isSubLalgebra R V S W.
-Lemma scalerAl (a : R) (u v : W) : a *: (u * v) = a *: u * v.
-Proof. by apply: val_inj; rewrite !(linearZ, rmorphM) /= rmorphM scalerAl. Qed.
-HB.instance Definition _ := Lmodule_isLalgebra.Build R W scalerAl.
+HB.instance Definition _ :=
+  SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra.Build R V S W.
 HB.end.
+
+#[short(type="subSemiAlgType")]
+HB.structure Definition SubSemiAlgebra (R : pzSemiRingType) (V : semiAlgType R)
+    S :=
+  {W of @SubLSemiAlgebra R V S W & SemiAlgebra R W}.
 
 #[short(type="subAlgType")]
 HB.structure Definition SubAlgebra (R : pzRingType) (V : algType R) S :=
   {W of @SubLalgebra R V S W & Algebra R W}.
+
+HB.factory Record SubLSemiAlgebra_isSubSemiAlgebra (R : pzSemiRingType)
+    (V : semiAlgType R) S W of @SubLSemiAlgebra R V S W := {}.
+
+HB.builders Context (R : pzSemiRingType) (V : semiAlgType R) S W
+  of SubLSemiAlgebra_isSubSemiAlgebra R V S W.
+Lemma scalerAr (k : R) (x y : W) : k *: (x * y) = x * (k *: y).
+Proof. by apply: val_inj; rewrite !(linearZ, rmorphM)/= rmorphM scalerAr. Qed.
+HB.instance Definition _ := LSemiAlgebra_isSemiAlgebra.Build R W scalerAr.
+HB.end.
 
 HB.factory Record SubLalgebra_isSubAlgebra (R : pzRingType)
     (V : algType R) S W of @SubLalgebra R V S W := {}.
 
 HB.builders Context (R : pzRingType) (V : algType R) S W
   of SubLalgebra_isSubAlgebra R V S W.
-Lemma scalerAr (k : R) (x y : W) : k *: (x * y) = x * (k *: y).
-Proof. by apply: val_inj; rewrite !(linearZ, rmorphM)/= rmorphM scalerAr. Qed.
-HB.instance Definition _ := Lalgebra_isAlgebra.Build R W scalerAr.
+HB.instance Definition _ := SubLSemiAlgebra_isSubSemiAlgebra.Build R V S W.
 HB.end.
 
 #[short(type="subUnitRingType")]
@@ -6404,6 +6466,19 @@ HB.instance Definition _ := SubChoice_isSubNzRing.Build R S U
 HB.instance Definition _ := SubNzRing_isSubComNzRing.Build R S U.
 HB.end.
 
+HB.factory Record SubChoice_isSubLSemiModule
+    (R : pzSemiRingType) (V : lSemiModType R) S W of SubChoice V S W := {
+  subsemimod_closed_subproof : subsemimod_closed S
+}.
+
+HB.builders Context (R : pzSemiRingType) (V : lSemiModType R) S W
+  of SubChoice_isSubLSemiModule R V S W.
+HB.instance Definition _ := SubChoice_isSubNmodule.Build V S W
+  (subsemimod_closedD subsemimod_closed_subproof).
+HB.instance Definition _ := SubNmodule_isSubLSemiModule.Build R V S W
+  subsemimod_closed_subproof.
+HB.end.
+
 HB.factory Record SubChoice_isSubLmodule (R : pzRingType) (V : lmodType R) S W
     of SubChoice V S W := {
   submod_closed_subproof : submod_closed S
@@ -6416,6 +6491,8 @@ HB.instance Definition _ := SubChoice_isSubZmodule.Build V S W
 HB.instance Definition _ := SubZmodule_isSubLmodule.Build R V S W
   submod_closed_subproof.
 HB.end.
+
+(* TODO: SubChoice_isSubLSemiAlgebra? *)
 
 HB.factory Record SubChoice_isSubLalgebra (R : pzRingType) (A : lalgType R) S W
     of SubChoice A S W := {
@@ -6430,6 +6507,8 @@ HB.instance Definition _ := SubZmodule_isSubLmodule.Build R A S W
   (subalg_closedZ subalg_closed_subproof).
 HB.instance Definition _ := SubNzRing_SubLmodule_isSubLalgebra.Build R A S W.
 HB.end.
+
+(* TODO: SubChoice_isSubSemiAlgebra? *)
 
 HB.factory Record SubChoice_isSubAlgebra (R : pzRingType) (A : algType R) S W
     of SubChoice A S W := {
@@ -6570,6 +6649,14 @@ Notation "[ 'SubChoice_isSubComRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubComNzRing.Build _ _ U (subringClosedP _))
   (at level 0, format "[ 'SubChoice_isSubComRing'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubNmodule_isSubLSemiModule' 'of' U 'by' <: ]" :=
+  (SubNmodule_isSubLSemiModule.Build _ _ _ U (subsemimodClosedP _))
+  (at level 0, format "[ 'SubNmodule_isSubLSemiModule'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubLSemiModule' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubLSemiModule.Build _ _ _ U (subsemimodClosedP _))
+  (at level 0, format "[ 'SubChoice_isSubLSemiModule'  'of'  U  'by'  <: ]")
+  : form_scope.
 Notation "[ 'SubZmodule_isSubLmodule' 'of' U 'by' <: ]" :=
   (SubZmodule_isSubLmodule.Build _ _ _ U (submodClosedP _))
   (at level 0, format "[ 'SubZmodule_isSubLmodule'  'of'  U  'by'  <: ]")
@@ -6578,6 +6665,12 @@ Notation "[ 'SubChoice_isSubLmodule' 'of' U 'by' <: ]" :=
   (SubChoice_isSubLmodule.Build _ _ _ U (submodClosedP _))
   (at level 0, format "[ 'SubChoice_isSubLmodule'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra' 'of' U 'by' <: ]" :=
+  (SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra.Build _ _ _ U)
+  (at level 0,
+   format "[ 'SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+(* TODO: SubChoice_isSubLSemiAlgebra? *)
 Notation "[ 'SubNzRing_SubLmodule_isSubLalgebra' 'of' U 'by' <: ]" :=
   (SubNzRing_SubLmodule_isSubLalgebra.Build _ _ _ U)
   (at level 0,
@@ -6593,6 +6686,12 @@ Notation "[ 'SubChoice_isSubLalgebra' 'of' U 'by' <: ]" :=
   (SubChoice_isSubLalgebra.Build _ _ _ U (subalgClosedP _))
   (at level 0, format "[ 'SubChoice_isSubLalgebra'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubLSemiAlgebra_isSubSemiAlgebra' 'of' U 'by' <: ]" :=
+  (SubLSemiAlgebra_isSubSemiAlgebra.Build _ _ _ U)
+  (at level 0,
+   format "[ 'SubLSemiAlgebra_isSubSemiAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+(* TODO: SubChoice_isSubSemiAlgebra? *)
 Notation "[ 'SubLalgebra_isSubAlgebra' 'of' U 'by' <: ]" :=
   (SubLalgebra_isSubAlgebra.Build _ _ _ U)
   (at level 0, format "[ 'SubLalgebra_isSubAlgebra'  'of'  U  'by'  <: ]")
