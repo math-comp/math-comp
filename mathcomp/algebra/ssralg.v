@@ -2158,7 +2158,9 @@ Proof. by move=> a u; rewrite /= !linearZ_LR raddfD. Qed.
 HB.instance Definition _ := isScalable.Build R U V s (f \+ g) add_fun_is_scalable.
 
 Lemma sub_fun_is_scalable : scalable_for s (f \- g).
-Proof. by move=> a u; rewrite /= !linearZ_LR raddfB. Qed.
+Proof.
+by move=> a u; rewrite -[LHS]/(f (a *: u) - g (a *: u)) !linearZ_LR raddfB.
+Qed.
 #[export]
 HB.instance Definition _ := isScalable.Build R U V s (f \- g) sub_fun_is_scalable.
 
