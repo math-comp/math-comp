@@ -24,12 +24,14 @@ Reserved Notation "'{' 'additive' U '->' V '}'"
 
 Module Import GRing.
 
-HB.mixin Record isBaseAddMagma V := {
+HB.mixin Record hasAdd V := {
   add : V -> V -> V
 }.
 
 #[short(type="baseAddMagmaType")]
-HB.structure Definition BaseAddMagma := {V of isBaseAddMagma V & Choice V}.
+HB.structure Definition BaseAddMagma := {V of hasAdd V}.
+
+HB.structure Definition ChoiceBaseAddMagma := {V of BaseAddMagma V & Choice V}.
 
 Module BaseAddMagmaExports.
 Bind Scope ring_scope with BaseAddMagma.sort.
@@ -41,13 +43,11 @@ Local Notation "x + y" := (add x y) : ring_scope.
 
 Definition multiplicative := @id Type.
 
-Ltac exact_multiplicative H := exact: (@H (multiplicative _)).
-
 #[export]
 HB.instance Definition _ (V : choiceType) := Choice.on (multiplicative V).
 #[export]
 HB.instance Definition _ (V : baseAddMagmaType) :=
-  isMagma.Build (multiplicative V) (@add V).
+  hasMul.Build (multiplicative V) (@add V).
 
 Section BaseAddMagmaTheory.
 Variables V : baseAddMagmaType.
@@ -67,7 +67,7 @@ HB.mixin Record BaseAddMagma_isAddMagma V of BaseAddMagma V := {
 
 #[short(type="addMagmaType")]
 HB.structure Definition AddMagma :=
-  {V of BaseAddMagma_isAddMagma V & BaseAddMagma V}.
+  {V of BaseAddMagma_isAddMagma V & BaseAddMagma V & Choice V}.
 
 HB.factory Record isAddMagma V of Choice V := {
   add : V -> V -> V;
@@ -75,7 +75,7 @@ HB.factory Record isAddMagma V of Choice V := {
 }.
 
 HB.builders Context V of isAddMagma V.
-HB.instance Definition _ := isBaseAddMagma.Build V add.
+HB.instance Definition _ := hasAdd.Build V add.
 HB.instance Definition _ := BaseAddMagma_isAddMagma.Build V addgC.
 HB.end.
 
@@ -124,13 +124,16 @@ Proof. by move=> x y z t; rewrite -!addgA [y + (z + t)]addgCA. Qed.
 
 End AddSemigroupTheory.
 
-HB.mixin Record BaseAddMagma_isBaseAddUMagma V of BaseAddMagma V := {
+HB.mixin Record hasZero V := {
   zero : V
 }.
 
 #[short(type="baseAddUMagmaType")]
 HB.structure Definition BaseAddUMagma :=
-  {V of BaseAddMagma_isBaseAddUMagma V & BaseAddMagma V}.
+  {V of hasZero V & BaseAddMagma V}.
+
+HB.structure Definition ChoiceBaseAddUMagma :=
+  {V of BaseAddUMagma V & Choice V}.
 
 Module BaseAddUMagmaExports.
 Bind Scope ring_scope with BaseAddUMagma.sort.
@@ -145,7 +148,8 @@ Arguments natmul : simpl never.
 Local Notation "x *+ n" := (natmul x n) : ring_scope.
 
 #[export]
-HB.instance Definition _ (V : baseAddUMagmaType) := Magma_isBaseUMagma.Build (multiplicative V) (@zero V).
+HB.instance Definition _ (V : baseAddUMagmaType) :=
+  hasOne.Build (multiplicative V) (@zero V).
 
 Section BaseAddUMagmaTheory.
 Variable V : baseAddUMagmaType.
@@ -155,7 +159,7 @@ Lemma mulg0n x : x *+ 0 = 0. Proof. by []. Qed.
 Lemma mulg1n x : x *+ 1 = x. Proof. by []. Qed.
 Lemma mulg2n x : x *+ 2 = x + x. Proof. by []. Qed.
 Lemma mulgb x (b : bool) : x *+ b = (if b then x else 0).
-Proof. exact_multiplicative expgb. Qed.
+Proof. exact: (@expgb (multiplicative V)). Qed.
 Lemma mulgSS x n : x *+ n.+2 = x + x *+ n.+1. Proof. by []. Qed.
 
 Section ClosedPredicates.
@@ -181,7 +185,7 @@ HB.factory Record isAddUMagma V of Choice V := {
 
 HB.builders Context V of isAddUMagma V.
 HB.instance Definition _ := isAddMagma.Build V addgC.
-HB.instance Definition _ := BaseAddMagma_isBaseAddUMagma.Build V zero.
+HB.instance Definition _ := hasZero.Build V zero.
 HB.instance Definition _ := BaseAddUMagma_isAddUMagma.Build V add0g.
 HB.end.
 
@@ -197,7 +201,8 @@ Lemma addg0 (V : addUMagmaType) : right_id (@zero V) add.
 Proof. by move=> x; rewrite addgC add0g. Qed.
 
 #[export]
-HB.instance Definition _ (V : addUMagmaType) := Magma_isUMagma.Build (multiplicative V) add0g (@addg0 V).
+HB.instance Definition _ (V : addUMagmaType) :=
+  Magma_isUMagma.Build (multiplicative V) add0g (@addg0 V).
 
 HB.factory Record isNmodule V of Choice V := {
   zero : V;
@@ -221,42 +226,45 @@ End NmodExports.
 HB.export NmodExports.
 
 #[export]
-HB.instance Definition _ (V : nmodType) := UMagma_isMonoid.Build (multiplicative V) addgA.
+HB.instance Definition _ (V : nmodType) :=
+  UMagma_isMonoid.Build (multiplicative V) addgA.
 
 Section NmoduleTheory.
 
 Variable V : nmodType.
 Implicit Types x y : V.
 
+Let G := multiplicative V.
+
 (* addgA, addgC and add0g in the structure *)
 (* addg0 proved above *)
 
 Lemma mulgS x n : x *+ n.+1 = x + (x *+ n).
-Proof. exact_multiplicative expgS. Qed.
+Proof. exact: (@expgS G). Qed.
 
 Lemma mulgSr x n : x *+ n.+1 = x *+ n + x.
 Proof. by rewrite addgC mulgS. Qed.
 
 Lemma mul0gn n : 0 *+ n = 0 :> V.
-Proof. exact_multiplicative exp1gn. Qed.
+Proof. exact: (@exp1gn G). Qed.
 
 Lemma mulgnDl n : {morph (fun x => x *+ n) : x y / x + y}.
 Proof. by move=> x y; apply/(@expgMn (multiplicative V))/commuteT. Qed.
 
 Lemma mulgnDr x m n : x *+ (m + n) = x *+ m + x *+ n.
-Proof. exact_multiplicative expgnDr. Qed.
+Proof. exact: (@expgnDr G). Qed.
 
 Lemma mulgnA x m n : x *+ (m * n) = x *+ m *+ n.
-Proof. exact_multiplicative expgnA. Qed.
+Proof. exact: (@expgnA G). Qed.
 
 Lemma mulgnAC x m n : x *+ m *+ n = x *+ n *+ m.
-Proof. exact_multiplicative expgnAC. Qed.
+Proof. exact: (@expgnAC G). Qed.
 
 Lemma iter_addg n x y : iter n (+%R x) y = x *+ n + y.
-Proof. exact_multiplicative iter_mulg. Qed.
+Proof. exact: (@iter_mulg G). Qed.
 
 Lemma iter_addg_0 n x : iter n (+%R x) 0 = x *+ n.
-Proof. exact_multiplicative iter_mulg_1. Qed.
+Proof. exact: (@iter_mulg_1 G). Qed.
 
 Section ClosedPredicates.
 
@@ -268,13 +276,30 @@ End ClosedPredicates.
 
 End NmoduleTheory.
 
-HB.mixin Record Nmodule_isZmodule V of Nmodule V := {
+HB.mixin Record hasOpp V := {
+  opp : V -> V
+}.
+
+#[short(type="baseZmodType")]
+HB.structure Definition BaseZmodule := {V of hasOpp V & BaseAddUMagma V}.
+
+HB.mixin Record BaseZmoduleNmodule_isZmodule V of BaseZmodule V := {
+  addNg : left_inverse zero opp (@add V)
+}.
+
+#[short(type="zmodType")]
+HB.structure Definition Zmodule :=
+  {V of BaseZmoduleNmodule_isZmodule V & BaseZmodule V & Nmodule V}.
+
+HB.factory Record Nmodule_isZmodule V of Nmodule V := {
   opp : V -> V;
   addNg : left_inverse zero opp add
 }.
 
-#[short(type="zmodType")]
-HB.structure Definition Zmodule := {V of Nmodule_isZmodule V & Nmodule V}.
+HB.builders Context V of Nmodule_isZmodule V.
+HB.instance Definition _ := hasOpp.Build V opp.
+HB.instance Definition _ := BaseZmoduleNmodule_isZmodule.Build V addNg.
+HB.end.
 
 HB.factory Record isZmodule V of Choice V := {
   zero : V;
@@ -317,48 +342,54 @@ Lemma addgN (V : zmodType) : @right_inverse V V V 0 -%R +%R.
 Proof. by move=> x; rewrite addgC addNg. Qed.
 
 #[export]
-HB.instance Definition _ (V : zmodType) := Monoid_isGroup.Build (multiplicative V) addNg (@addgN V).
+HB.instance Definition _ (V : baseZmodType) :=
+  hasInv.Build (multiplicative V) (@opp V).
+#[export]
+HB.instance Definition _ (V : zmodType) :=
+  Monoid_isGroup.Build (multiplicative V) addNg (@addgN V).
 
 Section ZmoduleTheory.
 
 Variable V : zmodType.
 Implicit Types x y : V.
 
+Let G := multiplicative V.
+
 Definition subgg := addgN.
 
 Lemma addKg : @left_loop V V -%R +%R.
-Proof. exact_multiplicative mulKg. Qed.
+Proof. exact: (@mulKg G). Qed.
 Lemma addNKg : @rev_left_loop V V -%R +%R.
-Proof. exact_multiplicative mulVKg. Qed.
+Proof. exact: (@mulVKg G). Qed.
 Lemma addgK : @right_loop V V -%R +%R.
-Proof. exact_multiplicative mulgK. Qed.
+Proof. exact: (@mulgK G). Qed.
 Lemma addgNK : @rev_right_loop V V -%R +%R.
-Proof. exact_multiplicative mulgVK. Qed.
+Proof. exact: (@mulgVK G). Qed.
 Definition subgK := addgNK.
 Lemma subKg x : involutive (fun y => x - y).
 Proof. by move=> y; exact/(@divKg (multiplicative V))/commuteT. Qed.
 Lemma addgI : @right_injective V V V +%R.
-Proof. exact_multiplicative mulgI. Qed.
+Proof. exact: (@mulgI G). Qed.
 Lemma addIg : @left_injective V V V +%R.
-Proof. exact_multiplicative mulIg. Qed.
+Proof. exact: (@mulIg G). Qed.
 Lemma subgI : right_injective (fun x y => x - y).
-Proof. exact_multiplicative divgI. Qed.
+Proof. exact: (@divgI G). Qed.
 Lemma subIg : left_injective (fun x y => x - y).
-Proof. exact_multiplicative divIg. Qed.
+Proof. exact: (@divIg G). Qed.
 Lemma oppgK : @involutive V -%R.
-Proof. exact_multiplicative invgK. Qed.
+Proof. exact: (@invgK G). Qed.
 Lemma oppg_inj : @injective V V -%R.
-Proof. exact_multiplicative invg_inj. Qed.
+Proof. exact: (@invg_inj G). Qed.
 Lemma oppg0 : -0 = 0 :> V.
-Proof. exact_multiplicative invg1. Qed.
+Proof. exact: (@invg1 G). Qed.
 Lemma oppg_eq0 x : (- x == 0) = (x == 0).
-Proof. exact_multiplicative invg_eq1. Qed.
+Proof. exact: (@invg_eq1 G). Qed.
 
-Lemma subg0 x : x - 0 = x. Proof. exact_multiplicative divg1. Qed.
-Lemma sub0g x : 0 - x = - x. Proof. exact_multiplicative div1g. Qed.
+Lemma subg0 x : x - 0 = x. Proof. exact: (@divg1 G). Qed.
+Lemma sub0g x : 0 - x = - x. Proof. exact: (@div1g G). Qed.
 
 Lemma oppgB x y : - (x - y) = y - x.
-Proof. exact_multiplicative invgF. Qed.
+Proof. exact: (@invgF G). Qed.
 
 Lemma oppgD : {morph -%R: x y / x + y : V}.
 Proof. by move=> x y; rewrite -[y in LHS]oppgK oppgB addgC. Qed.
@@ -367,37 +398,37 @@ Lemma addgKA z x y : (x + z) - (z + y) = x - y.
 Proof. by rewrite oppgD addgA addgK. Qed.
 
 Lemma subgKA z x y : (x - z) + (z + y) = x + y.
-Proof. exact_multiplicative divgKA. Qed.
+Proof. exact: (@divgKA G). Qed.
 
 Lemma addg0_eq x y : x + y = 0 -> - x = y.
-Proof. exact_multiplicative mulg1_eq. Qed.
+Proof. exact: (@mulg1_eq G). Qed.
 
 Lemma subg0_eq x y : x - y = 0 -> x = y.
-Proof. exact_multiplicative divg1_eq. Qed.
+Proof. exact: (@divg1_eq G). Qed.
 
 Lemma subg_eq x y z : (x - z == y) = (x == y + z).
-Proof. exact_multiplicative divg_eq. Qed.
+Proof. exact: (@divg_eq G). Qed.
 
 Lemma subg_eq0 x y : (x - y == 0) = (x == y).
-Proof. exact_multiplicative divg_eq1. Qed.
+Proof. exact: (@divg_eq1 G). Qed.
 
 Lemma addg_eq0 x y : (x + y == 0) = (x == - y).
-Proof. exact_multiplicative mulg_eq1. Qed.
+Proof. exact: (@mulg_eq1 G). Qed.
 
 Lemma eqg_opp x y : (- x == - y) = (x == y).
-Proof. exact_multiplicative eqg_inv. Qed.
+Proof. exact: (@eqg_inv G). Qed.
 
 Lemma eqg_oppLR x y : (- x == y) = (x == - y).
-Proof. exact_multiplicative eqg_invLR. Qed.
+Proof. exact: (@eqg_invLR G). Qed.
 
 Lemma mulNgn x n : (- x) *+ n = x *- n.
-Proof. exact_multiplicative expVgn. Qed.
+Proof. exact: (@expVgn G). Qed.
 
 Lemma mulgnBl n : {morph (fun x => x *+ n) : x y / x - y}.
 Proof. by move=> x y; exact/(@expgnBl (multiplicative V))/commuteT. Qed.
 
 Lemma mulgnBr x m n : n <= m -> x *+ (m - n) = x *+ m - x *+ n.
-Proof. exact_multiplicative expgnBr. Qed.
+Proof. exact: (@expgnBr G). Qed.
 
 Section ClosedPredicates.
 
@@ -408,10 +439,10 @@ Definition subg_2closed := {in S &, forall u v, u - v \in S}.
 Definition zmod_closed := 0 \in S /\ subg_2closed.
 
 Lemma zmod_closedN : zmod_closed -> oppg_closed.
-Proof. exact_multiplicative group_closedV. Qed.
+Proof. exact: (@group_closedV G). Qed.
 
 Lemma zmod_closedD : zmod_closed -> addg_closed S.
-Proof. exact_multiplicative group_closedM. Qed.
+Proof. exact: (@group_closedM G). Qed.
 
 Lemma zmod_closed0D : zmod_closed -> nmod_closed S.
 Proof. by move=> z; split; [case: z|apply: zmod_closedD]. Qed.
@@ -468,39 +499,42 @@ Lemma raddfD (U V : baseAddUMagmaType) (f : {additive U -> V}) :
   {morph f : x y / x + y}.
 Proof. by case: (@semi_additive_subproof _ _ f). Qed.
 
-Definition fmultiplicative U V := @id ((multiplicative U) -> (multiplicative V)).
+Definition fmultiplicative U V :=
+  @id ((multiplicative U) -> (multiplicative V)).
 
 #[export]
-HB.instance Definition _ U V (f : {additive U -> V}) := isMultiplicative.Build (multiplicative U) (multiplicative V) (fmultiplicative f) (@raddfD _ _ f).
+HB.instance Definition _ U V (f : {additive U -> V}) :=
+  isMultiplicative.Build (multiplicative U) (multiplicative V)
+    (fmultiplicative f) (@raddfD _ _ f).
 #[export]
-HB.instance Definition _ (U V : baseAddUMagmaType) (f : {additive U -> V}) := isUMagmaMorphism.Build (multiplicative U) (multiplicative V) (fmultiplicative f) (@raddf0 _ _ f).
+HB.instance Definition _ (U V : baseAddUMagmaType) (f : {additive U -> V}) :=
+  isUMagmaMorphism.Build (multiplicative U) (multiplicative V)
+    (fmultiplicative f) (@raddf0 _ _ f).
 
 Section LiftedAddMagma.
-Variables (U : Type) (V : addMagmaType).
-Definition add_fun (f g : U -> V) x := f x + g x.
+Variables (U : Type) (V : U -> baseAddMagmaType).
+Definition add_fun (f g : forall u, V u) x := f x + g x.
+HB.instance Definition _ := hasAdd.Build (forall u, V u) add_fun.
 End LiftedAddMagma.
 Section LiftedNmod.
-Variables (U : Type) (V : baseAddUMagmaType).
-Definition null_fun of U : V := 0.
+Variables (U : Type) (V : U -> baseAddUMagmaType).
+Definition null_fun u : V u := 0.
+HB.instance Definition _ := hasZero.Build (forall u, V u) null_fun.
 End LiftedNmod.
 Section LiftedZmod.
-Variables (U : Type) (V : zmodType).
-Definition sub_fun (f g : U -> V) x := f x - g x.
-Definition opp_fun (f : U -> V) x := - f x.
+Variables (U : Type) (V : U -> baseZmodType).
+Definition opp_fun (f : forall u, V u) x := - f x.
+HB.instance Definition _ := hasOpp.Build (forall u, V u) opp_fun.
+Definition sub_fun (f g : forall u, V u) := f - g.
 End LiftedZmod.
-
-Local Notation "\0" := (null_fun _) : ring_scope.
-Local Notation "f \+ g" := (add_fun f g) : ring_scope.
-Local Notation "f \- g" := (sub_fun f g) : ring_scope.
-Local Notation "\- f" := (opp_fun f) : ring_scope.
 
 Arguments null_fun {_} V _ /.
 Arguments add_fun {_ _} f g _ /.
-Arguments sub_fun {_ _} f g _ /.
 Arguments opp_fun {_ _} f _ /.
+Arguments sub_fun {_ _} f g _ /.
 
 Section Nmod.
-Variables (U V : baseAddUMagmaType) (f : {additive U -> V}).
+Variables (U V : addUMagmaType) (f : {additive U -> V}).
 
 Lemma raddf_eq0 x : injective f -> (f x == 0) = (x == 0).
 Proof.
@@ -541,19 +575,25 @@ End Zmod.
 Section AdditiveTheory.
 Section AddCFun.
 Variables (U : baseAddUMagmaType) (V : nmodType).
-Variables (f g : {additive U -> V}).
+Implicit Types (f g : {additive U -> V}).
 
-Fact add_fun_semi_additive : semi_additive (f \+ g).
+Fact add_fun_semi_additive f g : semi_additive ((f : U -> V) + g).
 Proof.
-split; first by rewrite /add_fun !raddf0 addg0.
-by move=> x y; rewrite /add_fun !raddfD [LHS]addgACA.
+split; first by rewrite -[LHS]/(f 0 + g 0) !raddf0 addg0.
+by move=> x y; rewrite -[LHS]/(f (x + y) + g (x + y)) !raddfD [LHS]addgACA.
 Qed.
-HB.instance Definition _ := isSemiAdditive.Build U V (f \+ g) add_fun_semi_additive.
+#[export]
+HB.instance Definition _ f g :=
+  isSemiAdditive.Build U V ((f : U -> V) + g) (add_fun_semi_additive f g).
+
+#[export]
+HB.instance Definition _ :=
+  hasAdd.Build {additive U -> V} (fun f g => (f : U -> V) + g).
 End AddCFun.
 
 Section AddFun.
 Variables (U V W : baseAddUMagmaType).
-Variables (f g : {additive V -> W}) (h : {additive U -> V}).
+Variables (f : {additive V -> W}) (g : {additive U -> V}).
 
 Fact idfun_is_semi_additive : semi_additive (@idfun U).
 Proof. by []. Qed.
@@ -561,55 +601,68 @@ Proof. by []. Qed.
 HB.instance Definition _ := isSemiAdditive.Build U U idfun
   idfun_is_semi_additive.
 
-Fact comp_is_semi_additive : semi_additive (f \o h).
+Fact comp_is_semi_additive : semi_additive (f \o g).
 Proof. by split=> [|x y]; rewrite /= ?raddf0// !raddfD. Qed.
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build U W (f \o h)
+HB.instance Definition _ := isSemiAdditive.Build U W (f \o g)
   comp_is_semi_additive.
 
 End AddFun.
 Section AddFun.
-Variables (U : baseAddUMagmaType) (V : addUMagmaType) (W : nmodType).
-Variables (f g : {additive U -> W}).
+Variables (U : baseAddUMagmaType) (V : addUMagmaType).
 
-Fact null_fun_is_semi_additive : semi_additive (\0 : U -> V).
+Fact null_fun_is_semi_additive : semi_additive (0 : U -> V).
 Proof. by split=> // x y /=; rewrite addg0. Qed.
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build U V \0
-  null_fun_is_semi_additive.
+HB.instance Definition _ :=
+  isSemiAdditive.Build U V 0 null_fun_is_semi_additive.
 
-Fact add_fun_is_semi_additive : semi_additive (f \+ g).
-Proof.
-by split=> [|x y]; rewrite /= ?raddf0 ?addg0// !raddfD addgCA -!addgA addgCA.
-Qed.
+(* TODO: HB does not declare the AddUMagma structure on {additive U -> V}. *)
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build U W (f \+ g)
-  add_fun_is_semi_additive.
-
+HB.instance Definition _ := hasZero.Build {additive U -> V} (0 : U -> V).
 End AddFun.
 
 Section AddVFun.
-Variables (U V W : zmodType).
-Variables (f g : {additive V -> W}) (h : {additive U -> V}).
 
-Fact opp_is_semi_additive : semi_additive (@opp U).
+Fact opp_is_semi_additive (U : zmodType) : semi_additive (@opp U).
 Proof. by split; [apply/oppg0|apply/oppgD]. Qed.
 #[export]
-HB.instance Definition _ :=
-  isSemiAdditive.Build U U (@opp U) opp_is_semi_additive.
+HB.instance Definition _ (U : zmodType) :=
+  isSemiAdditive.Build U U (@opp U) (opp_is_semi_additive U).
 
-Fact sub_fun_is_additive : additive (f \- g).
+Fact opp_fun_is_additive (U : baseAddUMagmaType) (V : zmodType)
+    (f : {additive U -> V}) :
+  semi_additive (- (f : U -> V)).
 Proof.
-by move=> x y /=; rewrite !raddfB addgAC -!addgA -!oppgD addgAC addgA.
+split=> [|x y]; first by rewrite -[LHS]/(- (f 0)) raddf0 oppg0.
+by rewrite -[LHS]/(- (f (x + y))) !raddfD/=.
+Qed.
+(* TODO: I can not declare this instance because it has the same key as the
+  preceding one.
+#[export]
+HB.instance Definition _ (U : baseAddUMagmaType) (V : zmodType)
+    (f : {additive U -> V}) :=
+  isSemiAdditive.Build U V (- (f : U -> V)) (opp_fun_is_additive f).
+ *)
+
+(* TODO: HB does not declare the AddUMagma structure on {additive U -> V}. *)
+#[export]
+HB.instance Definition _ (U : baseAddUMagmaType) (V : zmodType) :=
+  hasOpp.Build {additive U -> V} (comp opp).
+
+Fact sub_fun_is_additive (U : baseAddUMagmaType) (V : zmodType)
+    (f g : {additive U -> V}) :
+  semi_additive ((f : U -> V) - (g : U -> V)).
+Proof.
+split=> [|x y]; first by rewrite -[LHS]/(f 0 - g 0) !raddf0 addg0.
+rewrite -[LHS]/(f (x + y) - g (x + y)) !raddfD/=.
+by rewrite addgAC -!addgA [-g y + _]addgC.
 Qed.
 #[export]
-HB.instance Definition _ :=
-  isAdditive.Build V W (f \- g) sub_fun_is_additive.
-
-Fact opp_fun_is_additive : additive (\- g).
-Proof. by move=> x y /=; rewrite !raddfB oppgB addgC oppgK. Qed.
-#[export]
-HB.instance Definition _ := isAdditive.Build V W (\- g) opp_fun_is_additive.
+HB.instance Definition _ (U : baseAddUMagmaType) (V : zmodType)
+    (f g : {additive U -> V}) :=
+  isSemiAdditive.Build U V ((f : U -> V) - (g : U -> V))
+    (sub_fun_is_additive f g).
 
 End AddVFun.
 End AdditiveTheory.
@@ -854,6 +907,8 @@ Let inU v Sv : U := Sub v Sv.
 (* TODO: I should not have to write the builder. *)
 Let oppU (u : U) := inU (rpredNr (valP u)).
 
+HB.instance Definition _ := hasOpp.Build U oppU.
+
 Lemma addNg : left_inverse 0 oppU (@add U).
 Proof. by move=> x; apply/val_inj; rewrite !SubK addNg. Qed.
 
@@ -904,8 +959,7 @@ Implicit Types f g : {ffun aT -> rT}.
 
 Definition ffun_add f g := [ffun a => f a + g a].
 
-#[export]
-HB.instance Definition _ := isBaseAddMagma.Build {ffun aT -> rT} ffun_add.
+HB.instance Definition _ := hasAdd.Build {ffun aT -> rT} ffun_add.
 
 End FinFunBaseAddMagma.
 
@@ -916,7 +970,6 @@ Implicit Types f g : {ffun aT -> rT}.
 Fact ffun_addgC : commutative (@ffun_add aT rT).
 Proof. by move=> f1 f2; apply/ffunP => a; rewrite !ffunE addgC. Qed.
 
-#[export]
 HB.instance Definition _ :=
   BaseAddMagma_isAddMagma.Build {ffun aT -> rT} ffun_addgC.
 
@@ -929,7 +982,6 @@ Implicit Types f g : {ffun aT -> rT}.
 Fact ffun_addgA : associative (@ffun_add aT rT).
 Proof. by move=> f g h; apply/ffunP => a; rewrite !ffunE addgA. Qed.
 
-#[export]
 HB.instance Definition _ :=
   AddMagma_isAddSemigroup.Build {ffun aT -> rT} ffun_addgA.
 
@@ -941,9 +993,7 @@ Implicit Types f g : {ffun aT -> rT}.
 
 Definition ffun_zero := [ffun a : aT => (0 : rT)].
 
-#[export]
-HB.instance Definition _ :=
-  BaseAddMagma_isBaseAddUMagma.Build {ffun aT -> rT} ffun_zero.
+HB.instance Definition _ := hasZero.Build {ffun aT -> rT} ffun_zero.
 
 End FinFunBaseAddUMagma.
 
@@ -954,7 +1004,6 @@ Implicit Types f g : {ffun aT -> rT}.
 Fact ffun_add0g : left_id (@ffun_zero aT rT) (@ffun_add aT rT).
 Proof. by move=> f; apply/ffunP => a; rewrite !ffunE add0g. Qed.
 
-#[export]
 HB.instance Definition _ :=
   BaseAddUMagma_isAddUMagma.Build {ffun aT -> rT} ffun_add0g.
 
@@ -964,9 +1013,7 @@ Section FinFunNmod.
 Variable (aT : finType) (rT : nmodType).
 Implicit Types f g : {ffun aT -> rT}.
 
-#[export]
-HB.instance Definition _ :=
-  AddSemigroup.on {ffun aT -> rT}.
+HB.instance Definition _ := AddSemigroup.on {ffun aT -> rT}.
 
 Lemma ffunMnE f n x : (f *+ n) x = f x *+ n.
 Proof.
@@ -983,6 +1030,8 @@ Implicit Types f g : {ffun aT -> rT}.
 
 Definition ffun_opp f := [ffun a => - f a].
 
+HB.instance Definition _ := hasOpp.Build {ffun aT -> rT} ffun_opp.
+
 Fact ffun_addNg : left_inverse 0 ffun_opp +%R.
 Proof. by move=> f; apply/ffunP => a; rewrite !ffunE addNg. Qed.
 
@@ -995,8 +1044,7 @@ Variables U V : baseAddMagmaType.
 
 Definition pair_add (a b : U * V) := (a.1 + b.1, a.2 + b.2).
 
-#[export]
-HB.instance Definition _ := isBaseAddMagma.Build (U * V)%type pair_add.
+HB.instance Definition _ := hasAdd.Build (U * V)%type pair_add.
 
 End PairBaseAddMagma.
 
@@ -1004,9 +1052,8 @@ Section PairAddMagma.
 Variables U V : addMagmaType.
 
 Fact pair_addgC : commutative (@pair_add U V).
-Proof. by move=> [] al ar [] bl br; congr pair; rewrite /pair_add addgC. Qed.
+Proof. by move=> a b; congr pair; exact: addgC. Qed.
 
-#[export]
 HB.instance Definition _ :=
   BaseAddMagma_isAddMagma.Build (U * V)%type pair_addgC.
 
@@ -1018,7 +1065,6 @@ Variables U V : addSemigroupType.
 Fact pair_addgA : associative (@pair_add U V).
 Proof. by move=> [] al ar [] bl br [] cl cr; rewrite /pair_add !addgA. Qed.
 
-#[export]
 HB.instance Definition _ :=
   AddMagma_isAddSemigroup.Build (U * V)%type pair_addgA.
 
@@ -1029,15 +1075,13 @@ Variables U V : baseAddUMagmaType.
 
 Definition pair_zero : U * V := (0, 0).
 
-#[export]
-HB.instance Definition _ :=
-  BaseAddMagma_isBaseAddUMagma.Build (U * V)%type pair_zero.
+HB.instance Definition _ := hasZero.Build (U * V)%type pair_zero.
 
 Fact fst_is_additive : semi_additive (@fst U V). Proof. by []. Qed.
 Fact snd_is_additive : semi_additive (@snd U V). Proof. by []. Qed.
 
-HB.instance Definition _ := isSemiAdditive.Build (U * V)%type U (@fst U V) fst_is_additive.
-HB.instance Definition _ := isSemiAdditive.Build (U * V)%type V (@snd U V) snd_is_additive.
+HB.instance Definition _ := isSemiAdditive.Build _ _ (@fst U V) fst_is_additive.
+HB.instance Definition _ := isSemiAdditive.Build _ _ (@snd U V) snd_is_additive.
 
 End PairBaseAddUMagma.
 
@@ -1047,7 +1091,6 @@ Variables U V : addUMagmaType.
 Fact pair_add0g : left_id (@pair_zero U V) (@pair_add U V).
 Proof. by move=> [] al ar; rewrite /pair_add !add0g. Qed.
 
-#[export]
 HB.instance Definition _ :=
   BaseAddUMagma_isAddUMagma.Build (U * V)%type pair_add0g.
 
@@ -1056,7 +1099,6 @@ End PairAddUMagma.
 Section PairNmodule.
 Variables U V : nmodType.
 
-#[export]
 HB.instance Definition _ := AddSemigroup.on (U * V)%type.
 
 End PairNmodule.
@@ -1065,6 +1107,8 @@ Section PairZmodule.
 Variables U V : zmodType.
 
 Definition pair_opp (a : U * V) := (- a.1, - a.2).
+
+HB.instance Definition _ := hasOpp.Build (U * V)%type pair_opp.
 
 Fact pair_addNg : left_inverse 0 pair_opp +%R.
 Proof. by move=> [] al ar; rewrite /pair_opp; congr pair; apply/addNg. Qed.
@@ -1085,4 +1129,3 @@ HB.instance Definition _ (V : nmodType) (x : V) :=
 Lemma natg0E : 0 = 0%N. Proof. by []. Qed.
 Lemma natgDE n m : n + m = (n + m)%N. Proof. by []. Qed.
 Definition natgE := (natg0E, natgDE).
-

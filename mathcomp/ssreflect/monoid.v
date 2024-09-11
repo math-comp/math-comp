@@ -124,12 +124,14 @@ Declare Scope group_scope.
 Delimit Scope group_scope with g.
 Local Open Scope group_scope.
 
-HB.mixin Record isMagma G := {
+HB.mixin Record hasMul G := {
   mul : G -> G -> G
 }.
 
 #[short(type="magmaType")]
-HB.structure Definition Magma := {G of isMagma G & Choice G}.
+HB.structure Definition Magma := {G of hasMul G}.
+
+HB.structure Definition ChoiceMagma := {G of Magma G & Choice G}.
 
 Local Notation "*%g" := (@mul _) : function_scope.
 Local Notation "x * y" := (mul x y) : group_scope.
@@ -162,7 +164,7 @@ HB.mixin Record Magma_isSemigroup G of Magma G := {
 }.
 
 #[short(type="semigroupType")]
-HB.structure Definition Semigroup := {G of Magma_isSemigroup G & Magma G}.
+HB.structure Definition Semigroup := {G of Magma_isSemigroup G & Magma G & Choice G}.
 
 HB.factory Record isSemigroup G of Choice G := {
   mul : G -> G -> G;
@@ -171,7 +173,7 @@ HB.factory Record isSemigroup G of Choice G := {
 
 HB.builders Context G of isSemigroup G.
 
-HB.instance Definition _ := isMagma.Build G mul.
+HB.instance Definition _ := hasMul.Build G mul.
 HB.instance Definition _ := Magma_isSemigroup.Build G mulgA.
 
 HB.end.
@@ -185,12 +187,14 @@ Proof. by move=> cxy cxz; rewrite /commute -mulgA -cxz !mulgA cxy. Qed.
 
 End SemigroupTheory.
 
-HB.mixin Record Magma_isBaseUMagma G of Magma G := {
+HB.mixin Record hasOne G := {
   one : G
 }.
 
 #[short(type="baseUMagmaType")]
-HB.structure Definition BaseUMagma := {G of Magma_isBaseUMagma G & Magma G}.
+HB.structure Definition BaseUMagma := {G of hasOne G & Magma G}.
+
+HB.structure Definition ChoiceBaseUMagma := {G of BaseUMagma G & Choice G}.
 
 Local Notation "1" := (@one _) : group_scope.
 Local Notation "s `_ i" := (nth 1 s i) : group_scope.
@@ -236,12 +240,12 @@ HB.factory Record Magma_isUMagma G of Magma G := {
 }.
 
 HB.builders Context G of Magma_isUMagma G.
-HB.instance Definition _ := Magma_isBaseUMagma.Build G one.
+HB.instance Definition _ := hasOne.Build G one.
 HB.instance Definition _ := BaseUMagma_isUMagma.Build G mul1g mulg1.
 HB.end.
 
 #[short(type="umagmaType")]
-HB.structure Definition UMagma := {G of Magma_isUMagma G & Magma G}.
+HB.structure Definition UMagma := {G of Magma_isUMagma G & Magma G & Choice G}.
 
 Section UMagmaTheory.
 
@@ -295,7 +299,7 @@ HB.factory Record isMonoid G of Choice G := {
 
 HB.builders Context G of isMonoid G.
 
-HB.instance Definition _ := isMagma.Build G mul.
+HB.instance Definition _ := hasMul.Build G mul.
 HB.instance Definition _ := Magma_isSemigroup.Build G mulgA.
 HB.instance Definition _ := Magma_isUMagma.Build G mul1g mulg1.
 
@@ -350,14 +354,20 @@ End MonoidTheory.
 
 Notation monoid_closed := umagma_closed.
 
-HB.mixin Record Monoid_isGroup G of Monoid G := {
-  inv : G -> G;
-  mulVg : left_inverse one inv mul;
-  mulgV : right_inverse one inv mul
+HB.mixin Record hasInv G := {
+  inv : G -> G
+}.
+
+#[short(type="baseGroupType")]
+HB.structure Definition BaseGroup := {G of hasInv G & BaseUMagma G}.
+
+HB.mixin Record Monoid_isGroup G of BaseGroup G := {
+  mulVg : left_inverse one inv (@mul G);
+  mulgV : right_inverse one inv (@mul G)
 }.
 
 #[short(type="groupType")]
-HB.structure Definition Group := {G of Monoid_isGroup G & Monoid G}.
+HB.structure Definition Group := {G of Monoid_isGroup G & BaseGroup G & Monoid G}.
 
 HB.factory Record isGroup G of Choice G := {
   one : G;
@@ -372,9 +382,10 @@ HB.factory Record isGroup G of Choice G := {
 
 HB.builders Context G of isGroup G.
 
-HB.instance Definition _ := isMagma.Build G mul.
+HB.instance Definition _ := hasMul.Build G mul.
 HB.instance Definition _ := Magma_isSemigroup.Build G mulgA.
 HB.instance Definition _ := Magma_isUMagma.Build G mul1g mulg1.
+HB.instance Definition _ := hasInv.Build G inv.
 HB.instance Definition _ := Monoid_isGroup.Build G mulVg mulgV.
 
 HB.end.
@@ -443,14 +454,14 @@ Lemma invgM : {morph (@inv G): x y / x * y >-> y * x : G}.
 Proof. by move=> x y; rewrite -[y in LHS] invgK invgF. Qed.
 
 Lemma divKg x y : commute x y -> x / (x / y) = y.
-Proof. by move=> xyC; rewrite invgM invgK mulgA xyC -mulgA divgg mulg1. Qed.
+Proof. by move=> xyC; rewrite invgF mulgA xyC mulgK. Qed.
 
 (* TOTHINK : This does not have the same form as addrKA in ssralg.v *)
 Lemma mulgKA z x y : (x * z) / (y * z) = x / y.
-Proof. by rewrite invgM mulgA -[_ / z]mulgA divgg mulg1. Qed.
+Proof. by rewrite invgM mulgA mulgK. Qed.
 
 Lemma divgKA z x y : (x / z) * (z * y) = x * y.
-Proof. by rewrite mulgA -[_ * z]mulgA mulVg mulg1. Qed.
+Proof. by rewrite mulgA mulgVK. Qed.
 
 Lemma mulg1_eq x y : x * y = 1 -> x^-1 = y.
 Proof. by rewrite -[x^-1]mulg1 => <-; rewrite mulKg. Qed.
@@ -473,31 +484,20 @@ Proof. exact: can_eq invgK x y. Qed.
 Lemma eqg_invLR x y : (x^-1 == y) = (x == y^-1).
 Proof. exact: inv_eq invgK x y. Qed.
 
-Lemma expVgn x n : (x^-1) ^+ n = x ^- n.
-Proof.
-elim: n => [|n IHn]; first by rewrite !expg0n invg1.
-by rewrite expgS IHn -invgM -expgSr.
-Qed.
-
-Lemma expgnBr x m n : n <= m -> x ^+ (m - n) = x ^+ m / x ^+ n.
-Proof.
-elim: m n => [|m IHm] [|n]; rewrite ?divg1 => // /IHm ->.
-by rewrite 2!expgSr mulgKA.
-Qed.
-
 Lemma commuteV x y : commute x y -> commute x y^-1.
 Proof. by move=> cxy; apply: (@mulIg y); rewrite mulgVK -mulgA cxy mulKg. Qed.
 
-Lemma expgnBl x y n : commute x y -> (x / y) ^+ n = x ^+ n / y ^+ n.
+Lemma expVgn x n : (x^-1) ^+ n = x ^- n.
 Proof.
-move=> xyC.
-elim: n => [|n IHn]; first by rewrite divg1.
-rewrite !expgS IHn -!mulgA; congr (x * _).
-rewrite invgM [RHS]mulgA.
-apply/commuteM.
-  exact/commuteX/commute_sym/commuteV.
-by rewrite -expVgn; apply/commuteX.
+apply/esym/mulg1_eq; rewrite -expgMn; first by rewrite divgg exp1gn.
+exact/commuteV.
 Qed.
+
+Lemma expgnBr x m n : n <= m -> x ^+ (m - n) = x ^+ m / x ^+ n.
+Proof. by move=> lenm; rewrite -[in RHS](subnK lenm) expgnDr mulgK. Qed.
+
+Lemma expgnBl x y n : commute x y -> (x / y) ^+ n = x ^+ n / y ^+ n.
+Proof. by move=> xyC; rewrite expgMn 1?expVgn; last exact/commuteV. Qed.
 
 Lemma conjgE x y : x ^ y = y^-1 * (x * y). Proof. by []. Qed.
 
@@ -652,21 +652,21 @@ End MultiplicativeExports.
 HB.export MultiplicativeExports.
 
 
-(* Lifted operations *)
-(* TODO: declare `forall x : T, G x` as a magma for `T : Type`
-   and `G : magmaType` when HB allows it.
-   Idem for umagmas and (base) groups (to be defined). *)
 Section LiftedMagma.
-Variables (T : Type) (G : magmaType).
-Definition mul_fun (f g : T -> G) x := f x * g x.
+Variables (T : Type) (G : T -> magmaType).
+Definition mul_fun (f g : forall t, G t) x := f x * g x.
+
+HB.instance Definition _ := hasMul.Build (forall t, G t) mul_fun.
+
+Lemma mul_funE f g x : (f * g) x = f x * g x. Proof. by []. Qed.
+
 End LiftedMagma.
 Section LiftedBaseUMagma.
-Variables (T : Type) (G : baseUMagmaType).
-Definition one_fun of T : G := 1.
-End LiftedBaseUMagma.
+Variables (T : Type) (G : T -> baseUMagmaType).
+Definition one_fun t : G t := 1.
 
-Local Notation "\1" := (one_fun _) : group_scope.
-Local Notation "f \* g" := (mul_fun f g) : group_scope.
+HB.instance Definition _ := hasOne.Build (forall t, G t) one_fun.
+End LiftedBaseUMagma.
 
 Arguments one_fun {_} G _ /.
 Arguments mul_fun {_ _} f g _ /.
@@ -685,7 +685,7 @@ Proof. by move=> xy; rewrite /commute -!gmulfM xy. Qed.
 End Magma.
 
 Section UMagma.
-Variables (G H : baseUMagmaType) (f : UMagmaMorphism.type G H).
+Variables (G H : umagmaType) (f : UMagmaMorphism.type G H).
 
 Lemma gmulf_eq1 x : injective f -> (f x == 1) = (x == 1).
 Proof. by move=> /inj_eq <-; rewrite gmulf1. Qed.
@@ -706,7 +706,6 @@ Section Group.
 Variables (G H : groupType) (f : UMagmaMorphism.type G H).
 
 Lemma gmulfV : {morph f : x / x^-1}.
-Proof.
 Proof. by move=> x; apply/divg1_eq; rewrite invgK -gmulfM mulVg/= gmulf1. Qed.
 
 Lemma gmulfB : {morph f : x y / x / y}.
@@ -731,12 +730,10 @@ Variables (f g : {multiplicative H -> K}) (h : {multiplicative G -> H}).
 
 Fact idfun_gmulfM : {morph @idfun G : x y / x * y}.
 Proof. by []. Qed.
-#[export]
 HB.instance Definition _ := isMultiplicative.Build G G idfun idfun_gmulfM.
 
 Fact comp_gmulfM : {morph f \o h : x y / x * y}.
 Proof. by move=> x y /=; rewrite !gmulfM. Qed.
-#[export]
 HB.instance Definition _ := isMultiplicative.Build G K (f \o h) comp_gmulfM.
 End MulFun.
 
@@ -747,10 +744,10 @@ Fact idfun_gmulf1 : idfun 1 = 1 :> H.
 Proof. by []. Qed.
 HB.instance Definition _ := isUMagmaMorphism.Build H H idfun idfun_gmulf1.
 
-Fact one_fun_gmulfM : {morph @one_fun G H : x y / x * y}.
+Fact one_fun_gmulfM : {morph @one_fun G (fun=> H) : x y / x * y}.
 Proof. by move=> x y; rewrite mulg1. Qed.
 HB.instance Definition _ :=
-  isMultiplicative.Build G H (@one_fun G H) one_fun_gmulfM.
+  isMultiplicative.Build G H (@one_fun G (fun=> H)) one_fun_gmulfM.
 End Mul1Fun.
 
 Section Mul11Fun.
@@ -761,14 +758,16 @@ Fact comp_gmulf1 : (f \o h) 1 = 1.
 Proof. by rewrite /= !gmulf1. Qed.
 HB.instance Definition _ := isUMagmaMorphism.Build G K (f \o h) comp_gmulf1.
 
-Fact one_fun_gmulf1 : @one_fun G H 1 = 1.
+Fact one_fun_gmulf1 : @one_fun G (fun=> H) 1 = 1.
 Proof. by []. Qed.
 HB.instance Definition _ :=
-  isUMagmaMorphism.Build G H (@one_fun G H) one_fun_gmulf1.
+  isUMagmaMorphism.Build G H (@one_fun G (fun=> H)) one_fun_gmulf1.
 
-Fact mul_fun_gmulf1 : (f \* g) 1 = 1.
-Proof. by rewrite /mul_fun /= !gmulf1 mulg1. Qed.
-HB.instance Definition _ := isUMagmaMorphism.Build H K (f \* g) mul_fun_gmulf1.
+Fact mul_fun_gmulf1 : ((f : H -> K) * g) 1 = 1.
+Proof. by rewrite -[LHS]/(f 1 * g 1) !gmulf1 mulg1. Qed.
+
+HB.instance Definition _ :=
+  isUMagmaMorphism.Build H K ((f : H -> K) * g) mul_fun_gmulf1.
 End Mul11Fun.
 End MorphismTheory.
 
@@ -874,7 +873,6 @@ HB.structure Definition SubMagma (G : magmaType) S :=
 Section subMagma.
 Context (G : magmaType) (S : pred G) (H : subMagmaType S).
 Notation val := (val : H -> G).
-#[export]
 HB.instance Definition _ := isMultiplicative.Build H G val valM_subproof.
 Lemma valM : {morph val : x y / x * y}. Proof. exact: gmulfM. Qed.
 End subMagma.
@@ -891,7 +889,7 @@ HB.instance Definition _ := isMulClosed.Build G S mulg_closed_subproof.
 Let inH v Sv : H := Sub v Sv.
 Let mulH (u1 u2 : H) := inH (gpredM _ _ (valP u1) (valP u2)).
 
-HB.instance Definition _ := isMagma.Build H mulH.
+HB.instance Definition _ := hasMul.Build H mulH.
 
 Lemma valM : {morph (val : H -> G) : x y / x * y}.
 Proof. by move=> x y; rewrite SubK. Qed.
@@ -937,7 +935,6 @@ HB.structure Definition SubUMagma (G : umagmaType) S :=
 Section subUMagma.
 Context (G : umagmaType) (S : pred G) (H : subUMagmaType S).
 Notation val := (val : H -> G).
-#[export]
 HB.instance Definition _ := isUMagmaMorphism.Build H G val val1_subproof.
 Lemma val1 : val 1 = 1. Proof. exact: gmulf1. Qed.
 End subUMagma.
@@ -955,7 +952,7 @@ HB.instance Definition _ :=
 Let inH v Sv : H := Sub v Sv.
 Let oneH := inH (fst umagma_closed_subproof).
 
-HB.instance Definition _ := Magma_isBaseUMagma.Build H oneH.
+HB.instance Definition _ := hasOne.Build H oneH.
 
 Lemma val1 : (val : H -> G) 1 = 1. 
 Proof. exact/SubK. Qed.
@@ -1012,6 +1009,8 @@ HB.instance Definition _ :=
 Let inH v Sv : H := Sub v Sv.
 Let invH (u : H) := inH (gpredVr _ (valP u)).
 
+HB.instance Definition _ := hasInv.Build H invH.
+
 Lemma mulVg : left_inverse 1%g invH *%g.
 Proof. by move=> x; apply/val_inj; rewrite valM SubK mulVg val1. Qed.
 Lemma mulgV : right_inverse 1%g invH *%g.
@@ -1028,7 +1027,7 @@ Implicit Types f g : {ffun aT -> rT}.
 
 Definition ffun_mul f g := [ffun a => f a * g a].
 
-HB.instance Definition _ := isMagma.Build {ffun aT -> rT} ffun_mul.
+HB.instance Definition _ := hasMul.Build {ffun aT -> rT} ffun_mul.
 
 End FinFunMagma.
 
@@ -1050,7 +1049,7 @@ Implicit Types f g : {ffun aT -> rT}.
 Definition ffun_one := [ffun a : aT => (1 : rT)].
 
 HB.instance Definition _ :=
-  Magma_isBaseUMagma.Build {ffun aT -> rT} ffun_one.
+  hasOne.Build {ffun aT -> rT} ffun_one.
 
 End FinFunBaseUMagma.
 
@@ -1069,21 +1068,31 @@ HB.instance Definition _ :=
 End FinFunUMagma.
 
 HB.instance Definition _ (aT : finType) (rT : monoidType) :=
-  UMagma_isMonoid.Build {ffun aT -> rT} (@ffun_mulgA aT rT).
+  UMagma.on {ffun aT -> rT}.
+
+Section FinFunBaseGroup.
+
+Variable (aT : finType) (rT : baseGroupType).
+Implicit Types f g : {ffun aT -> rT}.
+
+Definition ffun_inv f := [ffun a => (f a)^-1].
+
+HB.instance Definition _ := hasInv.Build {ffun aT -> rT} ffun_inv.
+
+End FinFunBaseGroup.
 
 Section FinFunGroup.
 
 Variable (aT : finType) (rT : groupType).
 Implicit Types f g : {ffun aT -> rT}.
 
-Definition ffun_inv f := [ffun a => (f a)^-1].
-
-Fact ffun_addNg : left_inverse (@ffun_one _ _) ffun_inv (@ffun_mul _ _).
+Fact ffun_addNg :
+  left_inverse (@ffun_one aT rT) (@ffun_inv _ _) (@ffun_mul _ _).
 Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE mulVg. Qed.
-Fact ffun_addgN : right_inverse (@ffun_one _ _) ffun_inv (@ffun_mul _ _).
+Fact ffun_addgN :
+  right_inverse (@ffun_one aT rT) (@ffun_inv _ _) (@ffun_mul _ _).
 Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE mulgV. Qed.
 
-#[export]
 HB.instance Definition _ := Monoid_isGroup.Build {ffun aT -> rT}
   ffun_addNg ffun_addgN.
 
@@ -1095,16 +1104,15 @@ Variables G H : magmaType.
 
 Definition mul_pair (x y : G * H) := (x.1 * y.1, x.2 * y.2).
 
-#[export]
-HB.instance Definition _ := isMagma.Build (G * H)%type mul_pair.
+HB.instance Definition _ := hasMul.Build (G * H)%type mul_pair.
 
 Fact fst_is_multiplicative : {morph fst : x y / x * y}. Proof. by []. Qed.
-#[export]
-HB.instance Definition _ := isMultiplicative.Build _ _ _ fst_is_multiplicative.
+HB.instance Definition _ :=
+  isMultiplicative.Build _ _ fst fst_is_multiplicative.
 
 Fact snd_is_multiplicative : {morph snd : x y / x * y}. Proof. by []. Qed.
-#[export]
-HB.instance Definition _ := isMultiplicative.Build _ _ _ snd_is_multiplicative.
+HB.instance Definition _ :=
+  isMultiplicative.Build _ _ snd snd_is_multiplicative.
 
 End PairMagma.
 
@@ -1123,16 +1131,15 @@ Variables G H : baseUMagmaType.
 
 Definition one_pair : G * H := (1, 1).
 
-#[export]
-HB.instance Definition _ := Magma_isBaseUMagma.Build (G * H)%type one_pair.
+HB.instance Definition _ := hasOne.Build (G * H)%type one_pair.
 
-Fact fst_is_umagma_morphism : fst (1 : (G * H)%type) = 1. Proof. by []. Qed.
-#[export]
-HB.instance Definition _ := isUMagmaMorphism.Build _ _ _ fst_is_umagma_morphism.
+Fact fst_is_umagma_morphism : fst (1 : G * H) = 1. Proof. by []. Qed.
+HB.instance Definition _ :=
+  isUMagmaMorphism.Build _ _ fst fst_is_umagma_morphism.
 
-Fact snd_is_umagma_morphism : snd (1 : (G * H)%type) = 1. Proof. by []. Qed.
-#[export]
-HB.instance Definition _ := isUMagmaMorphism.Build _ _ _ snd_is_umagma_morphism.
+Fact snd_is_umagma_morphism : snd (1 : G * H) = 1. Proof. by []. Qed.
+HB.instance Definition _ :=
+  isUMagmaMorphism.Build _ _ snd snd_is_umagma_morphism.
 
 End PairBaseUMagma.
 
@@ -1144,22 +1151,28 @@ Proof. by move=> [x y]; congr (_, _); rewrite mul1g. Qed.
 Lemma pair_mulg1 : right_id (@one_pair G H) *%g.
 Proof. by move=> [x y]; congr (_, _); rewrite mulg1. Qed.
 
-#[export]
 HB.instance Definition _ :=
   BaseUMagma_isUMagma.Build (G * H)%type pair_mul1g pair_mulg1.
 
 End PairUMagma.
 
-HB.instance Definition _ (U V : monoidType) := Semigroup.on (U * V)%type.
+HB.instance Definition _ (G H : monoidType) := Semigroup.on (G * H)%type.
+
+Section PairBaseGroup.
+Variables G H : baseGroupType.
+
+Definition inv_pair (u : G * H) := (u.1 ^-1, u.2 ^-1).
+
+HB.instance Definition _ := hasInv.Build (G * H)%type inv_pair.
+
+End PairBaseGroup.
 
 Section PairGroup.
 Variables G H : groupType.
 
-Definition inv_pair (u : G * H) := (u.1 ^-1, u.2 ^-1).
-
-Lemma pair_mulVg : left_inverse one inv_pair mul.
+Lemma pair_mulVg : left_inverse one (@inv_pair G H) mul.
 Proof. by move=> x; congr (_, _); apply/mulVg. Qed.
-Lemma pair_mulgV : right_inverse one inv_pair mul.
+Lemma pair_mulgV : right_inverse one (@inv_pair G H) mul.
 Proof. by move=> x; congr (_, _); apply/mulgV. Qed.
 
 HB.instance Definition _ :=
