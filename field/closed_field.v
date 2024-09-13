@@ -923,6 +923,6 @@ have{z} [q ->] := ext1gen _ _ z; set pn := tagged (E_ _) _.
 apply: integral_horner.
   by apply/integral_poly=> i; rewrite coef_map; apply: integral_rmorph.
 apply: integral_root (ext1root _ _) _.
-  by rewrite map_poly_eq0 -size_poly_gt0 ltnW.
+  by rewrite map_poly_eq0 -size_poly_gt0 ltnW ?minXp_gt1.
 by apply/integral_poly=> i; rewrite coef_map; apply: integral_rmorph.
 Qed.
