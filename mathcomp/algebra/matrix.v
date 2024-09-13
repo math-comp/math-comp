@@ -2271,6 +2271,9 @@ Definition delta_mx i0 j0 : 'M[R]_(m, n) :=
 
 Local Notation "x *m: A" := (scalemx x A) (at level 40) : ring_scope.
 
+Lemma scale0mx A : 0 *m: A = 0.
+Proof. by apply/matrixP=> i j; rewrite !mxE mul0r. Qed.
+
 Lemma scale1mx A : 1 *m: A = A.
 Proof. by apply/matrixP=> i j; rewrite !mxE mul1r. Qed.
 
@@ -2282,6 +2285,22 @@ Proof. by apply/matrixP=> i j; rewrite !mxE mulrDr. Qed.
 
 Lemma scalemxA x y A : x *m: (y *m: A) = (x * y) *m: A.
 Proof. by apply/matrixP=> i j; rewrite !mxE mulrA. Qed.
+
+HB.instance Definition _ :=
+  GRing.Nmodule_isLSemiModule.Build R 'M[R]_(m, n)
+  scalemxA scale0mx scale1mx scalemxDr scalemxDl.
+
+Lemma scalemx_const a b : a *: const_mx b = const_mx (a * b).
+Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
+
+Lemma matrix_sum_delta A : A = \sum_(i < m) \sum_(j < n) A i j *: delta_mx i j.
+Proof.
+apply/matrixP=> i j.
+rewrite summxE (bigD1_ord i) // summxE (bigD1_ord j) //= !mxE !eqxx mulr1.
+rewrite !big1 ?addr0 //= => [i' | j'] _.
+  by rewrite summxE big1// => j' _; rewrite !mxE eq_liftF mulr0.
+by rewrite !mxE eqxx eq_liftF mulr0.
+Qed.
 
 End SemiRingModule.
 
@@ -2710,7 +2729,120 @@ Local Notation "'\tr' A" := (mxtrace A) : ring_scope.
 
 Lemma mxtrace1 : \tr (1%:M : 'M[R]_n) = n%:R. Proof. exact: mxtrace_scalar. Qed.
 
+Lemma mxtraceZ a (A : 'M_n) : \tr (a *: A) = a * \tr A.
+Proof. by rewrite mulr_sumr; apply: eq_bigr=> i _; rewrite mxE. Qed.
+
+Lemma mxtrace_is_scalar : semiscalar (@mxtrace R n).
+Proof. by split; [exact: mxtraceZ | exact: mxtraceD]. Qed.
+HB.instance Definition _ :=
+  GRing.isSemilinear.Build R 'M_n R _ (@mxtrace _ n) mxtrace_is_scalar.
+
 End Trace.
+
+Section StructuralLinear.
+
+Lemma swizzle_mx_is_scalable m n p q f g k :
+  scalable (@swizzle_mx R m n p q f g k).
+Proof. by move=> a A; apply/matrixP=> i j; rewrite !mxE. Qed.
+
+HB.instance Definition _ m n p q f g k :=
+  GRing.isScalable.Build R 'M[R]_(m, n) 'M[R]_(p, q) *:%R (swizzle_mx f g k)
+    (swizzle_mx_is_scalable f g k).
+
+Local Notation SwizzleLin op := (GRing.Linear.copy op (swizzle_mx _ _ _)).
+
+HB.instance Definition _ m n := SwizzleLin (@trmx R m n).
+HB.instance Definition _ m n i := SwizzleLin (@row R m n i).
+HB.instance Definition _ m n j := SwizzleLin (@col R m n j).
+HB.instance Definition _ m n i := SwizzleLin (@row' R m n i).
+HB.instance Definition _ m n j := SwizzleLin (@col' R m n j).
+HB.instance Definition _ m n m' n' f g := SwizzleLin (@mxsub R m n m' n' f g).
+HB.instance Definition _ m n s := SwizzleLin (@row_perm R m n s).
+HB.instance Definition _ m n s := SwizzleLin (@col_perm R m n s).
+HB.instance Definition _ m n i1 i2 := SwizzleLin (@xrow R m n i1 i2).
+HB.instance Definition _ m n j1 j2 := SwizzleLin (@xcol R m n j1 j2).
+HB.instance Definition _ m n1 n2 := SwizzleLin (@lsubmx R m n1 n2).
+HB.instance Definition _ m n1 n2 := SwizzleLin (@rsubmx R m n1 n2).
+HB.instance Definition _ m1 m2 n := SwizzleLin (@usubmx R m1 m2 n).
+HB.instance Definition _ m1 m2 n := SwizzleLin (@dsubmx R m1 m2 n).
+
+HB.instance Definition _ m n := SwizzleLin (@vec_mx R m n).
+Definition mxvec_is_scalable m n := can2_scalable (@vec_mxK R m n) mxvecK.
+HB.instance Definition _ m n :=
+  GRing.isScalable.Build R 'M_(m, n) 'rV_(m * n) *:%R mxvec
+    (@mxvec_is_scalable m n).
+
+End StructuralLinear.
+
+Lemma row_sum_delta n (u : 'rV_n) : u = \sum_(j < n) u 0 j *: delta_mx 0 j.
+Proof. by rewrite {1}[u]matrix_sum_delta big_ord1. Qed.
+
+Lemma scale_row_mx m n1 n2 a (A1 : 'M_(m, n1)) (A2 : 'M_(m, n2)) :
+  a *: row_mx A1 A2 = row_mx (a *: A1) (a *: A2).
+Proof. by split_mxE. Qed.
+
+Lemma scale_col_mx m1 m2 n a (A1 : 'M_(m1, n)) (A2 : 'M_(m2, n)) :
+  a *: col_mx A1 A2 = col_mx (a *: A1) (a *: A2).
+Proof. by split_mxE. Qed.
+
+Lemma scale_block_mx m1 m2 n1 n2 a (Aul : 'M_(m1, n1)) (Aur : 'M_(m1, n2))
+                                   (Adl : 'M_(m2, n1)) (Adr : 'M_(m2, n2)) :
+  a *: block_mx Aul Aur Adl Adr
+     = block_mx (a *: Aul) (a *: Aur) (a *: Adl) (a *: Adr).
+Proof. by rewrite scale_col_mx !scale_row_mx. Qed.
+
+(* Diagonal matrices *)
+
+Lemma diag_mx_is_linear n : semilinear (@diag_mx R n).
+Proof.
+by split=> [a A|A B]; apply/matrixP=> i j; rewrite !mxE (mulrnAr, mulrnDl).
+Qed.
+HB.instance Definition _ n :=
+  GRing.isSemilinear.Build R 'rV_n 'M_n _ (@diag_mx _ n) (@diag_mx_is_linear n).
+
+Lemma diag_mx_sum_delta n (d : 'rV_n) :
+  diag_mx d = \sum_i d 0 i *: delta_mx i i.
+Proof.
+apply/matrixP=> i j; rewrite summxE (bigD1_ord i) //= !mxE eqxx /=.
+by rewrite eq_sym mulr_natr big1 ?addr0 // => i'; rewrite !mxE eq_liftF mulr0.
+Qed.
+
+Lemma row_diag_mx n (d : 'rV_n) i :
+  row i (diag_mx d) = d 0 i *: delta_mx 0 i.
+Proof. by apply/rowP => j; rewrite !mxE eqxx eq_sym mulr_natr. Qed.
+
+(* Scalar matrix *)
+
+Lemma scale_scalar_mx n a1 a2 : a1 *: a2%:M = (a1 * a2)%:M :> 'M_n.
+Proof. by apply/matrixP=> i j; rewrite !mxE mulrnAr. Qed.
+
+Lemma scalemx1 n a : a *: 1%:M = a%:M :> 'M_n.
+Proof. by rewrite scale_scalar_mx mulr1. Qed.
+
+Lemma scalar_mx_sum_delta n a : a%:M = \sum_i a *: delta_mx i i :> 'M_n.
+Proof.
+by rewrite -diag_const_mx diag_mx_sum_delta; under eq_bigr do rewrite mxE.
+Qed.
+
+Lemma mx1_sum_delta n : 1%:M = \sum_i delta_mx i i :> 'M[R]_n.
+Proof. by rewrite [1%:M]scalar_mx_sum_delta -scaler_sumr scale1r. Qed.
+
+Lemma scalemxAl m n p a (A : 'M_(m, n)) (B : 'M_(n, p)) :
+  a *: (A *m B) = (a *: A) *m B.
+Proof.
+apply/matrixP=> i k; rewrite !mxE big_distrr /=.
+by apply: eq_bigr => j _; rewrite mulrA mxE.
+Qed.
+(* Right scaling associativity requires a commutative ring *)
+
+Lemma mulmx_sum_row m n (u : 'rV_m) (A : 'M_(m, n)) :
+  u *m A = \sum_i u 0 i *: row i A.
+Proof. by apply/rowP => j /[!(mxE, summxE)]; apply: eq_bigr => i _ /[!mxE]. Qed.
+
+Lemma mul_scalar_mx m n a (A : 'M_(m, n)) : a%:M *m A = a *: A.
+Proof.
+by rewrite -diag_const_mx mul_diag_mx; apply/matrixP=> i j; rewrite !mxE.
+Qed.
 
 (* The matrix ring structure requires a structural condition (dimension of *)
 (* the form n.+1) to satisfy the nontriviality condition we have imposed.  *)
@@ -2735,7 +2867,91 @@ Proof. by split=> //; apply: scalar_mxM. Qed.
 HB.instance Definition _ := GRing.isMultiplicative.Build R 'M_n (@scalar_mx _ n)
   scalar_mx_is_multiplicative.
 
+HB.instance Definition _ := GRing.LSemiModule_isLSemiAlgebra.Build R 'M[R]_n
+  (@scalemxAl n n n).
+
+HB.instance Definition _ := GRing.RMorphism.on (@scalar_mx R n).
+
 End MatrixSemiRing.
+
+(* Correspondence between matrices and linear function on row vectors. *)
+Section LinRowVector.
+
+Variables m n : nat.
+
+Fact lin1_mx_key : unit. Proof. by []. Qed.
+Definition lin1_mx (f : 'rV[R]_m -> 'rV[R]_n) :=
+  \matrix[lin1_mx_key]_(i, j) f (delta_mx 0 i) 0 j.
+
+Variable f : {linear 'rV[R]_m -> 'rV[R]_n}.
+
+Lemma mul_rV_lin1 u : u *m lin1_mx f = f u.
+Proof.
+rewrite [u in RHS]matrix_sum_delta big_ord1 linear_sum; apply/rowP=> i.
+by rewrite mxE summxE; apply: eq_bigr => j _; rewrite linearZ !mxE.
+Qed.
+
+End LinRowVector.
+
+(* Correspondence between matrices and linear function on matrices. *)
+Section LinMatrix.
+
+Variables m1 n1 m2 n2 : nat.
+
+Definition lin_mx (f : 'M[R]_(m1, n1) -> 'M[R]_(m2, n2)) :=
+  lin1_mx (mxvec \o f \o vec_mx).
+
+Variable f : {linear 'M[R]_(m1, n1) -> 'M[R]_(m2, n2)}.
+
+Lemma mul_rV_lin u : u *m lin_mx f = mxvec (f (vec_mx u)).
+Proof. exact: mul_rV_lin1. Qed.
+
+Lemma mul_vec_lin A : mxvec A *m lin_mx f = mxvec (f A).
+Proof. by rewrite mul_rV_lin mxvecK. Qed.
+
+Lemma mx_rV_lin u : vec_mx (u *m lin_mx f) = f (vec_mx u).
+Proof. by rewrite mul_rV_lin mxvecK. Qed.
+
+Lemma mx_vec_lin A : vec_mx (mxvec A *m lin_mx f) = f A.
+Proof. by rewrite mul_rV_lin !mxvecK. Qed.
+
+End LinMatrix.
+HB.instance Definition _ m n p A :=
+  GRing.isSemiAdditive.Build 'M_(n, p) 'M_(m, p) (mulmx A)
+    (mulmx0 _ A, mulmxDr A).
+
+Section Mulmxr.
+
+Variables m n p : nat.
+Implicit Type A : 'M[R]_(m, n).
+Implicit Type B : 'M[R]_(n, p).
+
+Definition mulmxr B A := mulmx A B.
+Arguments mulmxr B A /.
+
+Definition lin_mulmxr B := lin_mx (mulmxr B).
+
+Lemma mulmxr_is_linear B : semilinear (mulmxr B).
+Proof. by split=> [a A|A1 A2]; rewrite /= (mulmxDl, scalemxAl). Qed.
+HB.instance Definition _ B :=
+  GRing.isSemilinear.Build R 'M_(m, n) 'M_(m, p) _ (mulmxr B)
+    (mulmxr_is_linear B).
+
+Lemma lin_mulmxr_is_linear : semilinear lin_mulmxr.
+Proof.
+split=> [a A|A B]; apply/row_matrixP; case/mxvec_indexP=> i j;
+  rewrite (linearZ, linearD) /= !rowE !mul_rV_lin /= vec_mx_delta;
+  rewrite -(linearZ, linearD) 1?mulmxDr //=.
+congr mxvec; apply/row_matrixP=> k.
+rewrite linearZ /= !row_mul rowE mul_delta_mx_cond.
+by case: (k == i); [rewrite -!rowE linearZ | rewrite !mul0mx raddf0].
+Qed.
+HB.instance Definition _ :=
+  GRing.isSemilinear.Build R 'M_(n, p) 'M_(m * n, m * p) _ lin_mulmxr
+    lin_mulmxr_is_linear.
+
+End Mulmxr.
+Arguments mulmxr {_ _ _} B A /.
 
 Section LiftPerm.
 
@@ -3028,120 +3244,8 @@ Section MatrixAlgebra.
 
 Variable R : ringType.
 
-Section RingModule.
-
-(* The ring module/vector space structure *)
-
-Variables m n : nat.
-Implicit Types A B : 'M[R]_(m, n).
-
-Local Notation "x *m: A" := (scalemx x A) (at level 40) : ring_scope.
-
-HB.instance Definition _ := GRing.Zmodule_isLmodule.Build R 'M[R]_(m, n)
-  (@scalemxA R m n) (@scale1mx R m n) (@scalemxDr R m n) (@scalemxDl R m n).
-
-Lemma scalemx_const a b : a *: const_mx b = const_mx (a * b).
-Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
-
-Lemma matrix_sum_delta A :
-  A = \sum_(i < m) \sum_(j < n) A i j *: delta_mx i j.
-Proof.
-apply/matrixP=> i j.
-rewrite summxE (bigD1_ord i) // summxE (bigD1_ord j) //= !mxE !eqxx mulr1.
-rewrite !big1 ?addr0 //= => [i' | j'] _.
-  by rewrite summxE big1// => j' _; rewrite !mxE eq_liftF mulr0.
-by rewrite !mxE eqxx eq_liftF mulr0.
-Qed.
-
-End RingModule.
-
-Section StructuralLinear.
-
-Lemma swizzle_mx_is_scalable m n p q f g k :
-  scalable (@swizzle_mx R m n p q f g k).
-Proof. by move=> a A; apply/matrixP=> i j; rewrite !mxE. Qed.
-HB.instance Definition _ m n p q f g k :=
-  GRing.isScalable.Build R 'M[R]_(m, n) 'M[R]_(p, q) *:%R (swizzle_mx f g k)
-    (swizzle_mx_is_scalable f g k).
-
-Local Notation SwizzleLin op := (GRing.Linear.copy op (swizzle_mx _ _ _)).
-
-HB.instance Definition _ m n := SwizzleLin (@trmx R m n).
-HB.instance Definition _ m n i := SwizzleLin (@row R m n i).
-HB.instance Definition _ m n j := SwizzleLin (@col R m n j).
-HB.instance Definition _ m n i := SwizzleLin (@row' R m n i).
-HB.instance Definition _ m n j := SwizzleLin (@col' R m n j).
-HB.instance Definition _ m n m' n' f g := SwizzleLin (@mxsub R m n m' n' f g).
-HB.instance Definition _ m n s := SwizzleLin (@row_perm R m n s).
-HB.instance Definition _ m n s := SwizzleLin (@col_perm R m n s).
-HB.instance Definition _ m n i1 i2 := SwizzleLin (@xrow R m n i1 i2).
-HB.instance Definition _ m n j1 j2 := SwizzleLin (@xcol R m n j1 j2).
-HB.instance Definition _ m n1 n2 := SwizzleLin (@lsubmx R m n1 n2).
-HB.instance Definition _ m n1 n2 := SwizzleLin (@rsubmx R m n1 n2).
-HB.instance Definition _ m1 m2 n := SwizzleLin (@usubmx R m1 m2 n).
-HB.instance Definition _ m1 m2 n := SwizzleLin (@dsubmx R m1 m2 n).
-
-HB.instance Definition _ m n := SwizzleLin (@vec_mx R m n).
-Definition mxvec_is_scalable m n := can2_scalable (@vec_mxK R m n) mxvecK.
-HB.instance Definition _ m n :=
-  GRing.isScalable.Build R 'M_(m, n) 'rV_(m * n) *:%R mxvec
-    (@mxvec_is_scalable m n).
-
-End StructuralLinear.
-
-Lemma row_sum_delta n (u : 'rV_n) : u = \sum_(j < n) u 0 j *: delta_mx 0 j.
-Proof. by rewrite {1}[u]matrix_sum_delta big_ord1. Qed.
-
-Ltac split_mxE := apply/matrixP=> i j; do ![rewrite mxE | case: split => ?].
-
-Lemma scale_row_mx m n1 n2 a (A1 : 'M_(m, n1)) (A2 : 'M_(m, n2)) :
-  a *: row_mx A1 A2 = row_mx (a *: A1) (a *: A2).
-Proof. by split_mxE. Qed.
-
-Lemma scale_col_mx m1 m2 n a (A1 : 'M_(m1, n)) (A2 : 'M_(m2, n)) :
-  a *: col_mx A1 A2 = col_mx (a *: A1) (a *: A2).
-Proof. by split_mxE. Qed.
-
-Lemma scale_block_mx m1 m2 n1 n2 a (Aul : 'M_(m1, n1)) (Aur : 'M_(m1, n2))
-                                   (Adl : 'M_(m2, n1)) (Adr : 'M_(m2, n2)) :
-  a *: block_mx Aul Aur Adl Adr
-     = block_mx (a *: Aul) (a *: Aur) (a *: Adl) (a *: Adr).
-Proof. by rewrite scale_col_mx !scale_row_mx. Qed.
-
-(* Diagonal matrices *)
-
-Lemma diag_mx_is_linear n : linear (@diag_mx R n).
-Proof. by move=> a A B; apply/matrixP=> i j; rewrite !mxE mulrnAr mulrnDl. Qed.
-HB.instance Definition _ n :=
-  GRing.isSemilinear.Build R 'rV_n 'M_n _ (@diag_mx _ n)
-    (GRing.semilinear_linear (@diag_mx_is_linear n)).
-
-Lemma diag_mx_sum_delta n (d : 'rV_n) :
-  diag_mx d = \sum_i d 0 i *: delta_mx i i.
-Proof.
-apply/matrixP=> i j; rewrite summxE (bigD1_ord i) //= !mxE eqxx /=.
-by rewrite eq_sym mulr_natr big1 ?addr0 // => i'; rewrite !mxE eq_liftF mulr0.
-Qed.
-
-Lemma row_diag_mx n (d : 'rV_n) i :
-  row i (diag_mx d) = d 0 i *: delta_mx 0 i.
-Proof. by apply/rowP => j; rewrite !mxE eqxx eq_sym mulr_natr. Qed.
-
-(* Scalar matrix *)
-
-Lemma scale_scalar_mx n a1 a2 : a1 *: a2%:M = (a1 * a2)%:M :> 'M_n.
-Proof. by apply/matrixP=> i j; rewrite !mxE mulrnAr. Qed.
-
-Lemma scalemx1 n a : a *: 1%:M = a%:M :> 'M_n.
-Proof. by rewrite scale_scalar_mx mulr1. Qed.
-
-Lemma scalar_mx_sum_delta n a : a%:M = \sum_i a *: delta_mx i i :> 'M_n.
-Proof.
-by rewrite -diag_const_mx diag_mx_sum_delta; under eq_bigr do rewrite mxE.
-Qed.
-
-Lemma mx1_sum_delta n : 1%:M = \sum_i delta_mx i i :> 'M[R]_n.
-Proof. by rewrite [1%:M]scalar_mx_sum_delta -scaler_sumr scale1r. Qed.
+(* TODO: HB.saturate *)
+HB.instance Definition _ m n := GRing.LSemiModule.on 'M[R]_(m, n).
 
 Lemma mulmxN m n p (A : 'M[R]_(m, n)) (B : 'M_(n, p)) : A *m (- B) = - (A *m B).
 Proof.
@@ -3161,23 +3265,6 @@ Lemma mulmxBr m n p (A : 'M[R]_(m, n)) (B1 B2 : 'M_(n, p)) :
   A *m (B1 - B2) = A *m B1 - A *m B2.
 Proof. by rewrite mulmxDr mulmxN. Qed.
 
-Lemma scalemxAl m n p a (A : 'M_(m, n)) (B : 'M_(n, p)) :
-  a *: (A *m B) = (a *: A) *m B.
-Proof.
-apply/matrixP=> i k; rewrite !mxE big_distrr /=.
-by apply: eq_bigr => j _; rewrite mulrA mxE.
-Qed.
-(* Right scaling associativity requires a commutative ring *)
-
-Lemma mulmx_sum_row m n (u : 'rV_m) (A : 'M_(m, n)) :
-  u *m A = \sum_i u 0 i *: row i A.
-Proof. by apply/rowP => j /[!(mxE, summxE)]; apply: eq_bigr => i _ /[!mxE]. Qed.
-
-Lemma mul_scalar_mx m n a (A : 'M_(m, n)) : a%:M *m A = a *: A.
-Proof.
-by rewrite -diag_const_mx mul_diag_mx; apply/matrixP=> i j; rewrite !mxE.
-Qed.
-
 (* Partial identity matrix (used in rank decomposition). *)
 
 Definition copid_mx {n} r : 'M[R]_n := 1%:M - pid_mx r.
@@ -3190,108 +3277,10 @@ Lemma mul_pid_mx_copid m n r :
   r <= n -> pid_mx r *m copid_mx r = 0 :> 'M_(m, n).
 Proof. by move=> le_r_n; rewrite mulmxBr mulmx1 pid_mx_id ?subrr. Qed.
 
-Lemma copid_mx_id n r :
-  r <= n -> copid_mx r *m copid_mx r = copid_mx r :> 'M_n.
+Lemma copid_mx_id n r : r <= n -> copid_mx r *m copid_mx r = copid_mx r :> 'M_n.
 Proof.
 by move=> le_r_n; rewrite mulmxBl mul1mx mul_pid_mx_copid // oppr0 addr0.
 Qed.
-
-(* Correspondence between matrices and linear function on row vectors. *)
-Section LinRowVector.
-
-Variables m n : nat.
-
-Fact lin1_mx_key : unit. Proof. by []. Qed.
-Definition lin1_mx (f : 'rV[R]_m -> 'rV[R]_n) :=
-  \matrix[lin1_mx_key]_(i, j) f (delta_mx 0 i) 0 j.
-
-Variable f : {linear 'rV[R]_m -> 'rV[R]_n}.
-
-Lemma mul_rV_lin1 u : u *m lin1_mx f = f u.
-Proof.
-rewrite [u in RHS]matrix_sum_delta big_ord1 linear_sum; apply/rowP=> i.
-by rewrite mxE summxE; apply: eq_bigr => j _; rewrite linearZ !mxE.
-Qed.
-
-End LinRowVector.
-
-(* Correspondence between matrices and linear function on matrices. *)
-Section LinMatrix.
-
-Variables m1 n1 m2 n2 : nat.
-
-Definition lin_mx (f : 'M[R]_(m1, n1) -> 'M[R]_(m2, n2)) :=
-  lin1_mx (mxvec \o f \o vec_mx).
-
-Variable f : {linear 'M[R]_(m1, n1) -> 'M[R]_(m2, n2)}.
-
-Lemma mul_rV_lin u : u *m lin_mx f = mxvec (f (vec_mx u)).
-Proof. exact: mul_rV_lin1. Qed.
-
-Lemma mul_vec_lin A : mxvec A *m lin_mx f = mxvec (f A).
-Proof. by rewrite mul_rV_lin mxvecK. Qed.
-
-Lemma mx_rV_lin u : vec_mx (u *m lin_mx f) = f (vec_mx u).
-Proof. by rewrite mul_rV_lin mxvecK. Qed.
-
-Lemma mx_vec_lin A : vec_mx (mxvec A *m lin_mx f) = f A.
-Proof. by rewrite mul_rV_lin !mxvecK. Qed.
-
-End LinMatrix.
-HB.instance Definition _ m n p A :=
-  GRing.isAdditive.Build 'M_(n, p) 'M_(m, p) (mulmx A) (mulmxBr A).
-
-Section Mulmxr.
-
-Variables m n p : nat.
-Implicit Type A : 'M[R]_(m, n).
-Implicit Type B : 'M[R]_(n, p).
-
-Definition mulmxr B A := mulmx A B.
-Arguments mulmxr B A /.
-
-Definition lin_mulmxr B := lin_mx (mulmxr B).
-
-Lemma mulmxr_is_linear B : linear (mulmxr B).
-Proof. by move=> a A1 A2; rewrite /= mulmxDl scalemxAl. Qed.
-HB.instance Definition _ B :=
-  GRing.isSemilinear.Build R 'M_(m, n) 'M_(m, p) _ (mulmxr B)
-    (GRing.semilinear_linear (mulmxr_is_linear B)).
-
-Lemma lin_mulmxr_is_linear : linear lin_mulmxr.
-Proof.
-move=> a A B; apply/row_matrixP; case/mxvec_indexP=> i j.
-rewrite linearP /= !rowE !mul_rV_lin /= vec_mx_delta -linearP mulmxDr.
-congr (mxvec (_ + _)); apply/row_matrixP=> k.
-rewrite linearZ /= !row_mul rowE mul_delta_mx_cond.
-by case: (k == i); [rewrite -!rowE linearZ | rewrite !mul0mx raddf0].
-Qed.
-HB.instance Definition _ :=
-  GRing.isSemilinear.Build R 'M_(n, p) 'M_(m * n, m * p) _ lin_mulmxr
-    (GRing.semilinear_linear lin_mulmxr_is_linear).
-
-End Mulmxr.
-Arguments mulmxr {_ _ _} B A /.
-
-(* The trace *)
-
-Section Trace.
-
-Variable n : nat.
-Local Notation "'\tr' A" := (mxtrace A) : ring_scope.
-
-Lemma mxtrace_is_scalar : scalar (@mxtrace R n).
-Proof.
-move=> a A B; rewrite mulr_sumr -big_split /=.
-by apply: eq_bigr=> i _; rewrite !mxE.
-Qed.
-HB.instance Definition _ := GRing.isSemilinear.Build R 'M_n R _ (@mxtrace _ n)
-  (GRing.semilinear_linear mxtrace_is_scalar).
-
-Lemma mxtraceZ a (A : 'M_n) : \tr (a *: A) = a * \tr A.
-Proof. exact: scalarZ. Qed.
-
-End Trace.
 
 (* The matrix ring structure requires a structural condition (dimension of *)
 (* the form n.+1) to satisfy the nontriviality condition we have imposed.  *)
@@ -3300,10 +3289,10 @@ Section MatrixRing.
 Variable n' : nat.
 Local Notation n := n'.+1.
 
+(* TODO: HB.saturate *)
 HB.instance Definition _ := GRing.SemiRing.on 'M[R]_n.
-HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build R 'M[R]_n
-  (@scalemxAl n n n).
 
+(* FIXME: no-op? *)
 HB.instance Definition _ := GRing.RMorphism.on (@scalar_mx R n).
 
 End MatrixRing.
@@ -3428,9 +3417,9 @@ Proof. by move=> fg fg'; apply/comm_mxD => //; apply/comm_mxN. Qed.
 
 End CommMx.
 
-Section ComMatrix.
-(* Lemmas for matrices with coefficients in a commutative ring *)
-Variable R : comRingType.
+Section ComSemiMatrix.
+(* Lemmas for matrices with coefficients in a commutative semiring *)
+Variable R : comSemiRingType.
 
 Section AssocLeft.
 
@@ -3449,14 +3438,14 @@ HB.instance Definition _ A :=
 
 Definition lin_mulmx A : 'M[R]_(n * p, m * p) := lin_mx (mulmx A).
 
-Lemma lin_mulmx_is_linear : linear lin_mulmx.
+Lemma lin_mulmx_is_linear : semilinear lin_mulmx.
 Proof.
-move=> a A B; apply/row_matrixP=> i; rewrite linearP /= !rowE !mul_rV_lin /=.
-by rewrite -linearP /= scalemxAl mulmxDl.
+by split=> [a A|A B]; apply/row_matrixP=> i; rewrite (linearZ, linearD) /=;
+  rewrite !rowE !mul_rV_lin /= -(linearZ, linearD) /= (scalemxAl, mulmxDl).
 Qed.
 HB.instance Definition _ :=
   GRing.isSemilinear.Build R 'M[R]_(m, n) 'M[R]_(n * p, m * p) _ lin_mulmx
-    (GRing.semilinear_linear lin_mulmx_is_linear).
+    lin_mulmx_is_linear.
 
 End AssocLeft.
 
@@ -3466,13 +3455,13 @@ Variables m n : nat.
 
 Definition lin_mul_row u : 'M[R]_(m * n, n) := lin1_mx (mulmx u \o vec_mx).
 
-Lemma lin_mul_row_is_linear : linear lin_mul_row.
+Lemma lin_mul_row_is_linear : semilinear lin_mul_row.
 Proof.
-move=> a u v; apply/row_matrixP=> i; rewrite linearP /= !rowE !mul_rV_lin1 /=.
-by rewrite mulmxDl scalemxAl.
+by split=> [a u|u v]; apply/row_matrixP=> i; rewrite (linearZ, linearD) /=;
+  rewrite !rowE !mul_rV_lin1 /= (mulmxDl, scalemxAl).
 Qed.
-HB.instance Definition _ := GRing.isSemilinear.Build R _ _ _ lin_mul_row
-  (GRing.semilinear_linear lin_mul_row_is_linear).
+HB.instance Definition _ :=
+  GRing.isSemilinear.Build R _ _ _ lin_mul_row lin_mul_row_is_linear.
 
 Lemma mul_vec_lin_row A u : mxvec A *m lin_mul_row u = u *m A.
 Proof. by rewrite mul_rV_lin1 /= mxvecK. Qed.
@@ -3495,13 +3484,19 @@ Section MatrixAlgType.
 Variable n' : nat.
 Local Notation n := n'.+1.
 
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build R 'M[R]_n
+HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build R 'M[R]_n
   (fun k => scalemxAr k).
 
 End MatrixAlgType.
 
 Lemma mul_mx_scalar m n a (A : 'M[R]_(m, n)) : A *m a%:M = a *: A.
 Proof. by rewrite scalar_mxC mul_scalar_mx. Qed.
+
+End ComSemiMatrix.
+
+Section ComMatrix.
+(* Lemmas for matrices with coefficients in a commutative ring *)
+Variable R : comRingType.
 
 (* The theory of determinants *)
 
