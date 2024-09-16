@@ -118,7 +118,7 @@ Import Pdiv.Idomain.
 (* Row vector <-> bounded degree polynomial bijection *)
 Section RowPoly.
 
-Variables (R : nzRingType) (d : nat).
+Variables (R : nzSemiRingType) (d : nat).
 Implicit Types u v : 'rV[R]_d.
 Implicit Types p q : {poly R}.
 
@@ -148,18 +148,19 @@ case: insubP => [i _ <- | ]; first by rewrite mxE.
 by rewrite -ltnNge => le_d_l; rewrite nth_default ?(leq_trans le_p_d).
 Qed.
 
-Lemma poly_rV_is_linear : linear poly_rV.
-Proof. by move=> a p q; apply/rowP=> i; rewrite !mxE coefD coefZ. Qed.
+Lemma poly_rV_is_linear : semilinear poly_rV.
+Proof. by split=> [a p|p q]; apply/rowP=> i; rewrite !mxE (coefZ, coefD). Qed.
 HB.instance Definition _ := GRing.isSemilinear.Build R {poly R} 'rV_d _ poly_rV
-  (GRing.semilinear_linear poly_rV_is_linear).
+  poly_rV_is_linear.
 
-Lemma rVpoly_is_linear : linear rVpoly.
+Lemma rVpoly_is_linear : semilinear rVpoly.
 Proof.
-move=> a u v; apply/polyP=> k; rewrite coefD coefZ !coef_rVpoly.
-by case: insubP => [i _ _ | _]; rewrite ?mxE // mulr0 addr0.
+split=> [a u|u v]; apply/polyP=> k; rewrite (coefZ, coefD) !coef_rVpoly.
+  by case: insubP => [i _ _|_]; rewrite ?mxE // mulr0.
+by case: insubP=> [i _ _|_]; rewrite ?mxE ?addr0.
 Qed.
 HB.instance Definition _ := GRing.isSemilinear.Build R 'rV_d {poly R} _ rVpoly
-  (GRing.semilinear_linear rVpoly_is_linear).
+  rVpoly_is_linear.
 
 End RowPoly.
 
@@ -311,7 +312,7 @@ Qed.
 
 Section HornerMx.
 
-Variables (R : comNzRingType) (n' : nat).
+Variables (R : comNzSemiRingType) (n' : nat).
 Local Notation n := n'.+1.
 Implicit Types (A B : 'M[R]_n) (p q : {poly R}).
 
@@ -460,7 +461,7 @@ End CharPoly.
 
 Prenex Implicits char_poly_mx char_poly.
 
-Lemma mx_poly_ring_isom (R : nzRingType) n' (n := n'.+1) :
+Lemma mx_poly_ring_isom (R : nzSemiRingType) n' (n := n'.+1) :
   exists phi : {rmorphism 'M[{poly R}]_n -> {poly 'M[R]_n}},
   [/\ bijective phi,
       forall p, phi p%:M = map_poly scalar_mx p,
@@ -473,11 +474,11 @@ pose phi (A : M_RX) := \poly_(k < Msize A) \matrix_(i, j) (A i j)`_k.
 have coef_phi A i j k: (phi A)`_k i j = (A i j)`_k.
   rewrite coef_poly; case: (ltnP k _) => le_m_k; rewrite mxE // nth_default //.
   by apply: leq_trans (leq_trans (leq_bigmax i) le_m_k); apply: (leq_bigmax j).
-have phi_is_zmod_morphism : zmod_morphism phi.
-  move=> A B; apply/polyP => k; apply/matrixP => i j.
-  by rewrite !(coef_phi, mxE, coefD, coefN).
+have phi_is_nmod_morphism : nmod_morphism phi.
+  by split=> [|A B]; apply/polyP => k; apply/matrixP => i j;
+    rewrite !(coef_phi, mxE, coef0, coefD).
 have phi_is_monoid_morphism : monoid_morphism phi.
-  split=> [|A B]; apply/polyP => k; apply/matrixP => i j.
+  split=> [A B|]; apply/polyP => k; apply/matrixP => i j; last first.
     by rewrite coef_phi mxE coefMn !coefC; case: (k == _); rewrite ?mxE ?mul0rn.
   rewrite !coef_phi !mxE !coefM summxE coef_sum.
   pose F k1 k2 := (A i k1)`_k2 * (B k1 j)`_(k - k2).
@@ -492,7 +493,7 @@ have bij_phi: bijective phi.
     by case: leqP => // P_le_k; rewrite nth_default ?mxE.
   apply/polyP=> k; apply/matrixP=> i j; rewrite coef_phi mxE coef_poly.
   by case: leqP => // P_le_k; rewrite nth_default ?mxE.
-pose phiaM := GRing.isZmodMorphism.Build _ _ phi phi_is_zmod_morphism.
+pose phiaM := GRing.isNmodMorphism.Build _ _ phi phi_is_nmod_morphism.
 pose phimM := GRing.isMonoidMorphism.Build _ _ phi phi_is_monoid_morphism.
 pose phiRM : {rmorphism _ -> _} := HB.pack phi phiaM phimM.
 exists phiRM; split=> // [p | A]; apply/polyP=> k; apply/matrixP=> i j.
@@ -776,9 +777,9 @@ Arguments mx_inv_hornerK {F n' A} [B] AnB.
 Arguments horner_rVpoly_inj {F n' A} [u1 u2] eq_u12A : rename.
 
 (* Parametricity. *)
-Section MapRingMatrix.
+Section MapSemiRingMatrix.
 
-Variables (aR rR : nzRingType) (f : {rmorphism aR -> rR}).
+Variables (aR rR : nzSemiRingType) (f : {rmorphism aR -> rR}).
 Local Notation "A ^f" := (map_mx (GRing.RMorphism.sort f) A) : ring_scope.
 Local Notation fp := (map_poly (GRing.RMorphism.sort f)).
 Variables (d n : nat) (A : 'M[aR]_n).
@@ -792,6 +793,15 @@ Qed.
 Lemma map_poly_rV p : (poly_rV p)^f = poly_rV (fp p) :> 'rV_d.
 Proof. by apply/rowP=> j; rewrite !mxE coef_map. Qed.
 
+End MapSemiRingMatrix.
+
+Section MapSemiRingMatrix.
+
+Variables (aR rR : nzRingType) (f : {rmorphism aR -> rR}).
+Local Notation "A ^f" := (map_mx (GRing.RMorphism.sort f) A) : ring_scope.
+Local Notation fp := (map_poly (GRing.RMorphism.sort f)).
+Variables (d n : nat) (A : 'M[aR]_n).
+
 Lemma map_char_poly_mx : map_mx fp (char_poly_mx A) = char_poly_mx A^f.
 Proof.
 rewrite raddfB /= map_scalar_mx /= map_polyX; congr (_ - _).
@@ -801,7 +811,7 @@ Qed.
 Lemma map_char_poly : fp (char_poly A) = char_poly A^f.
 Proof. by rewrite -det_map_mx map_char_poly_mx. Qed.
 
-End MapRingMatrix.
+End MapSemiRingMatrix.
 
 Section MapResultant.
 
@@ -818,7 +828,7 @@ End MapResultant.
 
 Section MapComRing.
 
-Variables (aR rR : comNzRingType) (f : {rmorphism aR -> rR}).
+Variables (aR rR : comNzSemiRingType) (f : {rmorphism aR -> rR}).
 Local Notation "A ^f" := (map_mx f A) : ring_scope.
 Local Notation fp := (map_poly f).
 Variables (n' : nat) (A : 'M[aR]_n'.+1).
