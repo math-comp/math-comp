@@ -3,10 +3,10 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
 From mathcomp Require Import div fintype path tuple bigop finset prime order.
-From mathcomp Require Import comoid ssralg poly polydiv mxpoly countalg.
-From mathcomp Require Import closed_field ssrnum ssrint archimedean rat intdiv.
-From mathcomp Require Import monoid fingroup finalg zmodp cyclic pgroup sylow.
-From mathcomp Require Import vector falgebra fieldext separable galois.
+From mathcomp Require Import ssralg poly polydiv mxpoly countalg closed_field.
+From mathcomp Require Import ssrnum ssrint archimedean rat intdiv monoid.
+From mathcomp Require Import fingroup finalg zmodp cyclic pgroup sylow vector.
+From mathcomp Require Import falgebra fieldext separable galois.
 
 (******************************************************************************)
 (*   The main result in this file is the existence theorem that underpins the *)

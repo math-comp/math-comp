@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop finfun tuple.
-From mathcomp Require Import comoid ssralg matrix mxalgebra zmodp.
+From mathcomp Require Import fintype bigop finfun tuple ssralg matrix mxalgebra.
+From mathcomp Require Import zmodp.
 
 (******************************************************************************)
 (*                    Finite dimensional vector spaces                        *)

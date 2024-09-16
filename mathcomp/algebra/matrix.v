@@ -3,8 +3,8 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
 From mathcomp Require Import fintype finfun finset monoid fingroup perm order.
-From mathcomp Require Import div prime binomial comoid ssralg countalg finalg .
-From mathcomp Require Import zmodp bigop.
+From mathcomp Require Import div prime binomial ssralg countalg finalg zmodp.
+From mathcomp Require Import bigop.
 
 (******************************************************************************)
 (* Basic concrete linear algebra : definition of type for matrices, and all   *)

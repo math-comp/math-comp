@@ -2,10 +2,10 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
-From mathcomp Require Import div fintype path bigop finset prime order comoid.
-From mathcomp Require Import ssralg poly polydiv mxpoly generic_quotient.
-From mathcomp Require Import countalg ssrnum closed_field ssrint archimedean.
-From mathcomp Require Import rat intdiv algebraics_fundamentals.
+From mathcomp Require Import div fintype path bigop finset prime order ssralg.
+From mathcomp Require Import poly polydiv mxpoly generic_quotient countalg.
+From mathcomp Require Import ssrnum closed_field ssrint archimedean rat intdiv.
+From mathcomp Require Import algebraics_fundamentals.
 
 (******************************************************************************)
 (* This file provides an axiomatic construction of the algebraic numbers.     *)
