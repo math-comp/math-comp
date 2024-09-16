@@ -1422,6 +1422,12 @@ Proof. by rewrite -?has_pred1; apply: has_take. Qed.
 Lemma in_take_leq x s i : i <= size s -> (x \in take i s) = (index x s < i).
 Proof. by rewrite -?has_pred1; apply: has_take_leq. Qed.
 
+Lemma index_nth i s : i < size s -> index (nth s i) s <= i.
+Proof.
+move=> lti; rewrite -ltnS index_ltn// -(@nth_take i.+1)// mem_nth // size_take.
+by case: ifP.
+Qed.
+
 Lemma nthK s: uniq s -> {in gtn (size s), cancel (nth s) (index^~ s)}.
 Proof.
 elim: s => //= x s IHs /andP[s'x Us] i; rewrite inE ltnS eq_sym -if_neg.
