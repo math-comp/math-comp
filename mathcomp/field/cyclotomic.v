@@ -2,10 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime.
-From mathcomp Require Import comoid ssralg poly finset fingroup finalg zmodp.
-From mathcomp Require Import cyclic ssrnum ssrint archimedean polydiv intdiv.
-From mathcomp Require Import mxpoly rat vector falgebra fieldext separable.
-From mathcomp Require Import galois algC.
+From mathcomp Require Import ssralg poly finset fingroup finalg zmodp cyclic.
+From mathcomp Require Import ssrnum ssrint archimedean polydiv intdiv mxpoly.
+From mathcomp Require Import rat vector falgebra fieldext separable galois algC.
 
 (******************************************************************************)
 (* This file provides few basic properties of cyclotomic polynomials.         *)

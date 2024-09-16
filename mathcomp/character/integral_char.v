@@ -3,14 +3,13 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
-From mathcomp Require Import comoid ssralg poly finset monoid fingroup morphism.
-From mathcomp Require Import perm automorphism quotient action countalg finalg.
-From mathcomp Require Import zmodp commutator cyclic center pgroup sylow.
-From mathcomp Require Import gseries nilpotent abelian ssrnum ssrint.
-From mathcomp Require Import archimedean polydiv rat matrix mxalgebra intdiv.
-From mathcomp Require Import mxpoly vector falgebra fieldext separable galois.
-From mathcomp Require Import algC cyclotomic algnum mxrepresentation classfun.
-From mathcomp Require Import character.
+From mathcomp Require Import ssralg poly finset monoid fingroup morphism perm.
+From mathcomp Require Import automorphism quotient action countalg finalg zmodp.
+From mathcomp Require Import commutator cyclic center pgroup sylow gseries.
+From mathcomp Require Import nilpotent abelian ssrnum ssrint archimedean.
+From mathcomp Require Import polydiv rat matrix mxalgebra intdiv mxpoly vector.
+From mathcomp Require Import falgebra fieldext separable galois algC cyclotomic.
+From mathcomp Require Import algnum mxrepresentation classfun character.
 
 (******************************************************************************)
 (* This file provides some standard results based on integrality properties   *)

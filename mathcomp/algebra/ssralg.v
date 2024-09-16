@@ -2144,32 +2144,31 @@ End Plain.
 
 Section Scale.
 
-Variable (s : Scale.law R V).
-Variables (f : {linear U -> V | s}) (g : {linear U -> V | s}).
+Variable (s : Scale.law R V) (f g : {linear U -> V | s}).
 
-Lemma null_fun_is_scalable : scalable_for s (\0 : U -> V).
+Lemma null_fun_is_scalable : scalable_for s (null_fun (fun _ : U => V)).
 Proof. by move=> a v /=; rewrite raddf0. Qed.
 #[export]
-HB.instance Definition _ := isScalable.Build R U V s \0 null_fun_is_scalable.
+HB.instance Definition _ :=
+  isScalable.Build R U V s (null_fun (fun _ : U => V)) null_fun_is_scalable.
 
-Lemma add_fun_is_scalable : scalable_for s (f \+ g).
+Lemma add_fun_is_scalable : scalable_for s (add_fun f g).
 Proof. by move=> a u; rewrite /= !linearZ_LR raddfD. Qed.
 #[export]
-HB.instance Definition _ := isScalable.Build R U V s (f \+ g) add_fun_is_scalable.
+HB.instance Definition _ :=
+  isScalable.Build R U V s (add_fun f g) add_fun_is_scalable.
 
-Lemma sub_fun_is_scalable : scalable_for s (f \- g).
-Proof.
-by move=> a u; rewrite -[LHS]/(f (a *: u) - g (a *: u)) !linearZ_LR raddfB.
-Qed.
-#[export]
-HB.instance Definition _ := isScalable.Build R U V s (f \- g) sub_fun_is_scalable.
-
-Lemma opp_fun_is_scalable : scalable_for s (\- g).
+Lemma opp_fun_is_scalable : scalable_for s (opp_fun g).
 Proof. by move=> a u; rewrite /= linearZ_LR raddfN. Qed.
 #[export]
-HB.instance Definition _ := isScalable.Build R U V s (\- g) opp_fun_is_scalable.
+HB.instance Definition _ :=
+  isScalable.Build R U V s (opp_fun g) opp_fun_is_scalable.
 
 End Scale.
+
+#[export]
+HB.instance Definition _ (s : Scale.law R V) (f g : {linear U -> V | s}) :=
+  Linear.on (sub_fun f g).
 
 End LinearLmod.
 

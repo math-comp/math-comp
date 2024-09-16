@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype choice ssrnat seq.
 From mathcomp Require Import path div fintype tuple finfun bigop prime order.
-From mathcomp Require Import comoid ssralg poly finset gproduct monoid fingroup.
+From mathcomp Require Import ssralg poly finset gproduct monoid fingroup.
 From mathcomp Require Import morphism perm automorphism quotient finalg action.
 From mathcomp Require Import zmodp commutator cyclic center pgroup nilpotent.
 From mathcomp Require Import sylow abelian matrix mxalgebra mxpoly.

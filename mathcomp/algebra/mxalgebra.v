@@ -3,8 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
 From mathcomp Require Import fintype finfun bigop finset fingroup perm order.
-From mathcomp Require Import div prime binomial comoid ssralg finalg zmodp.
-From mathcomp Require Import matrix.
+From mathcomp Require Import div prime binomial ssralg finalg zmodp matrix.
 
 (*****************************************************************************)
 (* In this file we develop the rank and row space theory of matrices, based  *)
@@ -2847,7 +2846,7 @@ apply: (iffP sub_kermxP); rewrite mul_vec_lin => cBE.
   rewrite row_mul mul_rV_lin -/A; move/(canRL mxvecK).
   by move/(canRL (subrK _)); rewrite !linear0 add0r.
 apply: (canLR vec_mxK); apply/row_matrixP=> i.
-by rewrite row_mul mul_rV_lin /= cBE subrr !linear0.
+by rewrite row_mul mul_rV_lin /= GRing.sub_funE -cBE subrr !linear0.
 Qed.
 Arguments cent_rowP {m n B R}.
 
