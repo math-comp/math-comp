@@ -651,6 +651,9 @@ Notation "{ 'multiplicative' U -> V }" :=
 End MultiplicativeExports.
 HB.export MultiplicativeExports.
 
+#[non_forgetful_inheritance]
+HB.instance Definition _ G H (f : UMagmaMorphism.type G H) :=
+  UMagmaMorphism.on (Multiplicative.sort f).
 
 Section LiftedMagma.
 Variables (T : Type) (G : T -> magmaType).
@@ -697,7 +700,7 @@ Lemma gmulfXn n : {morph f : x / x ^+ n}.
 Proof.
 elim: n => [|n IHn] x /=; first exact: gmulf1.
 case: n IHn => [//|n] IHn.
-by rewrite gmulfM [X in _ * X]IHn.
+by rewrite gmulfM IHn.
 Qed.
 
 End UMagma.
@@ -709,7 +712,7 @@ Lemma gmulfV : {morph f : x / x^-1}.
 Proof. by move=> x; apply/divg1_eq; rewrite invgK -gmulfM mulVg/= gmulf1. Qed.
 
 Lemma gmulfB : {morph f : x y / x / y}.
-Proof. by move=> x y; rewrite gmulfM -gmulfV. Qed.
+Proof. by move=> x y; rewrite gmulfM gmulfV. Qed.
 
 Lemma gmulf_inj : (forall x, f x = 1 -> x = 1) -> injective f.
 Proof. by move=> fI x y xy; apply/divg1_eq/fI; rewrite gmulfB xy divgg. Qed.
