@@ -94,6 +94,8 @@ with builtins; with (import <nixpkgs> {}).lib;
     };
     "coq-8.18".coqPackages = common-bundles // {
       coq.override.version = "8.18";
+      mathcomp-classical.job = false;
+      mathcomp-analysis.job = false;
     };
   };
 }
