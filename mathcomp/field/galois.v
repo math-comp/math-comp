@@ -3,8 +3,8 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype tuple finfun bigop ssralg poly.
-From mathcomp Require Import polydiv finset fingroup morphism quotient perm.
-From mathcomp Require Import action zmodp cyclic matrix mxalgebra vector.
+From mathcomp Require Import polydiv finset monoid fingroup morphism quotient.
+From mathcomp Require Import perm action zmodp cyclic matrix mxalgebra vector.
 From mathcomp Require Import falgebra fieldext separable.
 
 (******************************************************************************)

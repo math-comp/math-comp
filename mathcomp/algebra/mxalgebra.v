@@ -2846,7 +2846,7 @@ apply: (iffP sub_kermxP); rewrite mul_vec_lin => cBE.
   rewrite row_mul mul_rV_lin -/A; move/(canRL mxvecK).
   by move/(canRL (subrK _)); rewrite !linear0 add0r.
 apply: (canLR vec_mxK); apply/row_matrixP=> i.
-by rewrite row_mul mul_rV_lin /= cBE subrr !linear0.
+by rewrite row_mul mul_rV_lin /= GRing.sub_funE -cBE subrr !linear0.
 Qed.
 Arguments cent_rowP {m n B R}.
 

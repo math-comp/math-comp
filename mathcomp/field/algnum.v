@@ -3,9 +3,10 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime.
-From mathcomp Require Import ssralg poly polydiv ssrnum ssrint archimedean rat.
-From mathcomp Require Import finalg zmodp matrix mxalgebra mxpoly vector intdiv.
-From mathcomp Require Import falgebra fieldext separable galois algC cyclotomic.
+From mathcomp Require Import ssralg poly polydiv ssrnum ssrint archimedean.
+From mathcomp Require Import rat finalg zmodp matrix mxalgebra mxpoly vector.
+From mathcomp Require Import intdiv falgebra fieldext separable galois algC.
+From mathcomp Require Import cyclotomic.
 
 (******************************************************************************)
 (* This file provides a few basic results and constructions in algebraic      *)
@@ -289,7 +290,8 @@ have xv j: {x | coord b j v = QzC x}.
   apply: eq_bigr => ij _; rewrite mulrAC.
   apply: canLR (mulfK _) _; first by rewrite intr_eq0 denq_neq0.
   rewrite mulrzr -rmorphMz scalerMzl -(mulrzr (x _)) -numqE scaler_int.
-  by rewrite rmorphMz mulrzl -(nth_map _ 0) ?Dz_s // -(size_map QzC) Dz_s.
+  rewrite rmorphMz mulrzl -[in RHS](nth_map _ 0) ?Dz_s // -(size_map QzC).
+  by rewrite Dz_s.
 pose sz := [tuple [ffun j => z1s`_(rank2 j i)] | i < m].
 have [Zsv | Zs'v] := dec_Qint_span sz [ffun j => sval (xv j)].
   left; have{Zsv} [a Dv] := Zsv; exists a.

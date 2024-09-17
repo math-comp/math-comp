@@ -3,6 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
 From mathcomp Require Import choice fintype finfun bigop prime binomial.
+From mathcomp Require Export comoid.
 
 (******************************************************************************)
 (*                 The base hierarchy of algebraic structures                 *)
@@ -576,30 +577,13 @@ Local Open Scope ring_scope.
 
 Module Import GRing.
 
+Export GRing.
+
 Import Monoid.Theory.
-
-HB.mixin Record isNmodule V := {
-  zero : V;
-  add : V -> V -> V;
-  addrA : associative add;
-  addrC : commutative add;
-  add0r : left_id zero add;
-}.
-
-#[short(type="nmodType")]
-HB.structure Definition Nmodule := {V of isNmodule V & Choice V}.
-
-Module NmodExports.
-Bind Scope ring_scope with Nmodule.sort.
-End NmodExports.
-HB.export NmodExports.
 
 Local Notation "0" := (@zero _) : ring_scope.
 Local Notation "+%R" := (@add _) : function_scope.
 Local Notation "x + y" := (add x y) : ring_scope.
-
-Definition natmul V x n := iterop n +%R x (@zero V).
-Arguments natmul : simpl never.
 
 Local Notation "x *+ n" := (natmul x n) : ring_scope.
 
@@ -615,61 +599,55 @@ Section NmoduleTheory.
 Variable V : nmodType.
 Implicit Types x y : V.
 
-Lemma addr0 : @right_id V V 0 +%R.
-Proof. by move=> x; rewrite addrC add0r. Qed.
+Lemma addrA : associative (@add V).
+Proof. exact: addgA. Qed.
+
+Lemma addrC : commutative (@add V).
+Proof. exact: addgC. Qed.
+
+Lemma add0r : left_id (@zero V) add.
+Proof. exact: add0g. Qed.
+
+Lemma addr0 : right_id (@zero V) add.
+Proof. exact: addg0. Qed.
 
 #[export]
 HB.instance Definition _ := Monoid.isComLaw.Build V 0 +%R addrA addrC add0r.
 
-Lemma addrCA : @left_commutative V V +%R. Proof. exact: mulmCA. Qed.
-Lemma addrAC : @right_commutative V V +%R. Proof. exact: mulmAC. Qed.
-Lemma addrACA : @interchange V +%R +%R. Proof. exact: mulmACA. Qed.
+Lemma addrCA : @left_commutative V V +%R. Proof. exact: addgCA. Qed.
+Lemma addrAC : @right_commutative V V +%R. Proof. exact: addgAC. Qed.
+Lemma addrACA : @interchange V +%R +%R. Proof. exact: addgACA. Qed.
 
-Lemma mulr0n x : x *+ 0 = 0. Proof. by []. Qed.
-Lemma mulr1n x : x *+ 1 = x. Proof. by []. Qed.
-Lemma mulr2n x : x *+ 2 = x + x. Proof. by []. Qed.
-
-Lemma mulrS x n : x *+ n.+1 = x + x *+ n.
-Proof. by case: n => //=; rewrite addr0. Qed.
-
-Lemma mulrSr x n : x *+ n.+1 = x *+ n + x.
-Proof. by rewrite addrC mulrS. Qed.
+Lemma mulr0n x : x *+ 0 = 0. Proof. exact: mulg0n. Qed.
+Lemma mulr1n x : x *+ 1 = x. Proof. exact: mulg1n. Qed.
+Lemma mulr2n x : x *+ 2 = x + x. Proof. exact: mulg2n. Qed.
+Lemma mulrS x n : x *+ n.+1 = x + (x *+ n). Proof. exact: mulgS. Qed.
+Lemma mulrSr x n : x *+ n.+1 = x *+ n + x. Proof. exact: mulgSr. Qed.
 
 Lemma mulrb x (b : bool) : x *+ b = (if b then x else 0).
-Proof. by case: b. Qed.
+Proof. exact: mulgb. Qed.
 
-Lemma mul0rn n : 0 *+ n = 0 :> V.
-Proof. by elim: n => // n IHn; rewrite mulrS add0r. Qed.
+Lemma mul0rn n : 0 *+ n = 0 :> V. Proof. exact: mul0gn. Qed.
 
 Lemma mulrnDl n : {morph (fun x => x *+ n) : x y / x + y}.
-Proof.
-move=> x y; elim: n => [|n IHn]; rewrite ?addr0 // !mulrS.
-by rewrite addrCA -!addrA -IHn -addrCA.
-Qed.
+Proof. exact: mulgnDl. Qed.
 
 Lemma mulrnDr x m n : x *+ (m + n) = x *+ m + x *+ n.
-Proof.
-elim: m => [|m IHm]; first by rewrite add0r.
-by rewrite !mulrS IHm addrA.
-Qed.
+Proof. exact: mulgnDr. Qed.
 
-Lemma mulrnA x m n : x *+ (m * n) = x *+ m *+ n.
-Proof.
-by rewrite mulnC; elim: n => //= n IHn; rewrite mulrS mulrnDr IHn.
-Qed.
+Lemma mulrnA x m n : x *+ (m * n) = x *+ m *+ n. Proof. exact: mulgnA. Qed.
 
-Lemma mulrnAC x m n : x *+ m *+ n = x *+ n *+ m.
-Proof. by rewrite -!mulrnA mulnC. Qed.
+Lemma mulrnAC x m n : x *+ m *+ n = x *+ n *+ m. Proof. exact: mulgnAC. Qed.
 
 Lemma iter_addr n x y : iter n (+%R x) y = x *+ n + y.
-Proof. by elim: n => [|n ih]; rewrite ?add0r //= ih mulrS addrA. Qed.
+Proof. exact: iter_addg. Qed.
 
 Lemma iter_addr_0 n x : iter n (+%R x) 0 = x *+ n.
-Proof. by rewrite iter_addr addr0. Qed.
+Proof. exact: iter_addg_0. Qed.
 
 Lemma sumrMnl I r P (F : I -> V) n :
   \sum_(i <- r | P i) F i *+ n = (\sum_(i <- r | P i) F i) *+ n.
-Proof. by rewrite (big_morph _ (mulrnDl n) (mul0rn _)). Qed.
+Proof. by rewrite (big_morph _ (mulrnDl n) (@mul0gn V _)). Qed.
 
 Lemma sumrMnr x I r P (F : I -> nat) :
   \sum_(i <- r | P i) x *+ F i = x *+ (\sum_(i <- r | P i) F i).
@@ -681,40 +659,9 @@ Proof. by rewrite big_const -iteropE. Qed.
 Lemma sumr_const_nat m n x : \sum_(n <= i < m) x = x *+ (m - n).
 Proof. by rewrite big_const_nat iter_addr_0. Qed.
 
-Definition addr_closed (S : {pred V}) :=
-  0 \in S /\ {in S &, forall u v, u + v \in S}.
+Definition addr_closed := nmod_closed.
 
 End NmoduleTheory.
-
-HB.mixin Record Nmodule_isZmodule V of Nmodule V := {
-  opp : V -> V;
-  addNr : left_inverse zero opp add
-}.
-
-#[short(type="zmodType")]
-HB.structure Definition Zmodule := {V of Nmodule_isZmodule V & Nmodule V}.
-
-HB.factory Record isZmodule V of Choice V := {
-  zero : V;
-  opp : V -> V;
-  add : V -> V -> V;
-  addrA : associative add;
-  addrC : commutative add;
-  add0r : left_id zero add;
-  addNr : left_inverse zero opp add
-}.
-
-HB.builders Context V of isZmodule V.
-
-HB.instance Definition _ := isNmodule.Build V addrA addrC add0r.
-HB.instance Definition _ := Nmodule_isZmodule.Build V addNr.
-
-HB.end.
-
-Module ZmodExports.
-Bind Scope ring_scope with Zmodule.sort.
-End ZmodExports.
-HB.export ZmodExports.
 
 Local Notation "-%R" := (@opp _) : ring_scope.
 Local Notation "- x" := (opp x) : ring_scope.
@@ -727,87 +674,46 @@ Section ZmoduleTheory.
 Variable V : zmodType.
 Implicit Types x y : V.
 
-Lemma addrN : @right_inverse V V V 0 -%R +%R.
-Proof. by move=> x; rewrite addrC addNr. Qed.
+Lemma addNr : @left_inverse V V V 0 -%R +%R. Proof. exact: addNg. Qed.
+Lemma addrN : @right_inverse V V V 0 -%R +%R. Proof. exact: addgN. Qed.
 Definition subrr := addrN.
 
-Lemma addKr : @left_loop V V -%R +%R.
-Proof. by move=> x y; rewrite addrA addNr add0r. Qed.
-Lemma addNKr : @rev_left_loop V V -%R +%R.
-Proof. by move=> x y; rewrite addrA addrN add0r. Qed.
-Lemma addrK : @right_loop V V -%R +%R.
-Proof. by move=> x y; rewrite -addrA addrN addr0. Qed.
-Lemma addrNK : @rev_right_loop V V -%R +%R.
-Proof. by move=> x y; rewrite -addrA addNr addr0. Qed.
+Lemma addKr : @left_loop V V -%R +%R. Proof. exact: addKg. Qed.
+Lemma addNKr : @rev_left_loop V V -%R +%R. Proof. exact: addNKg. Qed.
+Lemma addrK : @right_loop V V -%R +%R. Proof. exact: addgK. Qed.
+Lemma addrNK : @rev_right_loop V V -%R +%R. Proof. exact: addgNK. Qed.
 Definition subrK := addrNK.
-Lemma subKr x : involutive (fun y => x - y).
-Proof. by move=> y; apply: (canLR (addrK _)); rewrite addrC subrK. Qed.
-Lemma addrI : @right_injective V V V +%R.
-Proof. by move=> x; apply: can_inj (addKr x). Qed.
-Lemma addIr : @left_injective V V V +%R.
-Proof. by move=> y; apply: can_inj (addrK y). Qed.
-Lemma subrI : right_injective (fun x y => x - y).
-Proof. by move=> x; apply: can_inj (subKr x). Qed.
-Lemma subIr : left_injective (fun x y => x - y).
-Proof. by move=> y; apply: addIr. Qed.
-Lemma opprK : @involutive V -%R.
-Proof. by move=> x; apply: (@subIr x); rewrite addNr addrN. Qed.
-Lemma oppr_inj : @injective V V -%R.
-Proof. exact: inv_inj opprK. Qed.
-Lemma oppr0 : -0 = 0 :> V.
-Proof. by rewrite -[-0]add0r subrr. Qed.
-Lemma oppr_eq0 x : (- x == 0) = (x == 0).
-Proof. by rewrite (inv_eq opprK) oppr0. Qed.
+Lemma subKr x : involutive (fun y => x - y). Proof. exact: subKg. Qed.
+Lemma addrI : @right_injective V V V +%R. Proof. exact: addgI. Qed.
+Lemma addIr : @left_injective V V V +%R. Proof. exact: addIg. Qed.
+Lemma subrI : right_injective (fun x y => x - y). Proof. exact: subgI. Qed.
+Lemma subIr : left_injective (fun x y => x - y). Proof. exact: subIg. Qed.
+Lemma opprK : @involutive V -%R. Proof. exact: oppgK. Qed.
+Lemma oppr_inj : @injective V V -%R. Proof. exact: oppg_inj. Qed.
+Lemma oppr0 : -0 = 0 :> V. Proof. exact: oppg0. Qed.
+Lemma oppr_eq0 x : (- x == 0) = (x == 0). Proof. exact: oppg_eq0. Qed.
 
-Lemma subr0 x : x - 0 = x. Proof. by rewrite oppr0 addr0. Qed.
-Lemma sub0r x : 0 - x = - x. Proof. by rewrite add0r. Qed.
+Lemma subr0 x : x - 0 = x. Proof. exact: subg0. Qed.
+Lemma sub0r x : 0 - x = - x. Proof. exact: sub0g. Qed.
 
-Lemma opprB x y : - (x - y) = y - x.
-Proof. by apply: (canRL (addrK x)); rewrite addrC subKr. Qed.
-
-Lemma opprD : {morph -%R: x y / x + y : V}.
-Proof. by move=> x y; rewrite -[y in LHS]opprK opprB addrC. Qed.
-
-Lemma addrKA z x y : (x + z) - (z + y) = x - y.
-Proof. by rewrite opprD addrA addrK. Qed.
-
-Lemma subrKA z x y : (x - z) + (z + y) = x + y.
-Proof. by rewrite addrA addrNK. Qed.
-
-Lemma addr0_eq x y : x + y = 0 -> - x = y.
-Proof. by rewrite -[-x]addr0 => <-; rewrite addKr. Qed.
-
-Lemma subr0_eq x y : x - y = 0 -> x = y. Proof. by move/addr0_eq/oppr_inj. Qed.
-
-Lemma subr_eq x y z : (x - z == y) = (x == y + z).
-Proof. exact: can2_eq (subrK z) (addrK z) x y. Qed.
-
-Lemma subr_eq0 x y : (x - y == 0) = (x == y).
-Proof. by rewrite subr_eq add0r. Qed.
-
-Lemma addr_eq0 x y : (x + y == 0) = (x == - y).
-Proof. by rewrite -[y in LHS]opprK subr_eq0. Qed.
-
-Lemma eqr_opp x y : (- x == - y) = (x == y).
-Proof. exact: can_eq opprK x y. Qed.
-
-Lemma eqr_oppLR x y : (- x == y) = (x == - y).
-Proof. exact: inv_eq opprK x y. Qed.
-
-Lemma mulNrn x n : (- x) *+ n = x *- n.
-Proof. by elim: n => [|n IHn]; rewrite ?oppr0 // !mulrS opprD IHn. Qed.
+Lemma opprB x y : - (x - y) = y - x. Proof. exact: oppgB. Qed.
+Lemma opprD : {morph -%R: x y / x + y : V}. Proof. exact: oppgD. Qed.
+Lemma addrKA z x y : (x + z) - (z + y) = x - y. Proof. exact: addgKA. Qed.
+Lemma subrKA z x y : (x - z) + (z + y) = x + y. Proof. exact: subgKA. Qed.
+Lemma addr0_eq x y : x + y = 0 -> - x = y. Proof. exact: addg0_eq. Qed.
+Lemma subr0_eq x y : x - y = 0 -> x = y. Proof. exact: subg0_eq. Qed.
+Lemma subr_eq x y z : (x - z == y) = (x == y + z). Proof. exact: subg_eq. Qed.
+Lemma subr_eq0 x y : (x - y == 0) = (x == y). Proof. exact: subg_eq0. Qed.
+Lemma addr_eq0 x y : (x + y == 0) = (x == - y). Proof. exact: addg_eq0. Qed.
+Lemma eqr_opp x y : (- x == - y) = (x == y). Proof. exact: eqg_opp. Qed.
+Lemma eqr_oppLR x y : (- x == y) = (x == - y). Proof. exact: eqg_oppLR. Qed.
+Lemma mulNrn x n : (- x) *+ n = x *- n. Proof. exact: mulNgn. Qed.
 
 Lemma mulrnBl n : {morph (fun x => x *+ n) : x y / x - y}.
-Proof.
-move=> x y; elim: n => [|n IHn]; rewrite ?subr0 // !mulrS -!addrA; congr(_ + _).
-by rewrite addrC IHn -!addrA opprD [_ - y]addrC.
-Qed.
+Proof. exact: mulgnBl. Qed.
 
 Lemma mulrnBr x m n : n <= m -> x *+ (m - n) = x *+ m - x *+ n.
-Proof.
-elim: m n => [|m IHm] [|n le_n_m]; rewrite ?subr0 // {}IHm //.
-by rewrite mulrSr mulrS opprD addrA addrK.
-Qed.
+Proof. exact: mulgnBr. Qed.
 
 Lemma sumrN I r P (F : I -> V) :
   (\sum_(i <- r | P i) - F i = - (\sum_(i <- r | P i) F i)).
@@ -837,17 +743,15 @@ Section ClosedPredicates.
 
 Variable S : {pred V}.
 
-Definition oppr_closed := {in S, forall u, - u \in S}.
-Definition subr_2closed := {in S &, forall u v, u - v \in S}.
-Definition zmod_closed := 0 \in S /\ subr_2closed.
-
+Definition oppr_closed := oppg_closed S.
+Definition subr_2closed := subg_2closed S.
+Definition zmod_closed := zmod_closed S.
+ 
 Lemma zmod_closedN : zmod_closed -> oppr_closed.
-Proof. by case=> S0 SB y Sy; rewrite -sub0r !SB. Qed.
+Proof. exact: zmod_closedN. Qed.
 
-Lemma zmod_closedD : zmod_closed -> addr_closed S.
-Proof.
-by case=> S0 SB; split=> // y z Sy Sz; rewrite -[z]opprK -[- z]sub0r !SB.
-Qed.
+Lemma zmod_closedD : zmod_closed -> nmod_closed S.
+Proof. by move=> z; split; [case: z|apply/zmod_closedD]. Qed.
 
 End ClosedPredicates.
 
@@ -967,11 +871,8 @@ Proof. by rewrite mulrnAl mul1r. Qed.
 Lemma mulr_natr x n : x * n%:R = x *+ n.
 Proof. by rewrite mulrnAr mulr1. Qed.
 
-Lemma natrD m n : (m + n)%:R = m%:R + n%:R :> R.
-Proof. exact: mulrnDr. Qed.
-
+Lemma natrD m n : (m + n)%:R = m%:R + n%:R :> R. Proof. exact: mulrnDr. Qed.
 Lemma natr1 n : n%:R + 1 = n.+1%:R :> R. Proof. by rewrite mulrSr. Qed.
-
 Lemma nat1r n : 1 + n%:R = n.+1%:R :> R. Proof. by rewrite mulrS. Qed.
 
 Definition natr_sum := big_morph (natmul 1) natrD (mulr0n 1).
@@ -1034,8 +935,7 @@ Lemma commr_prod (I : Type) (s : seq I) (P : pred I) (F : I -> R) x :
   (forall i, P i -> comm x (F i)) -> comm x (\prod_(i <- s | P i) F i).
 Proof. exact: (big_ind _ (commr1 x) (@commrM x)). Qed.
 
-Lemma commr_nat x n : comm x n%:R.
-Proof. exact/commrMn/commr1. Qed.
+Lemma commr_nat x n : comm x n%:R. Proof. exact/commrMn/commr1. Qed.
 
 Lemma commrX x y n : comm x y -> comm x (y ^+ n).
 Proof.
@@ -1053,7 +953,7 @@ Lemma exprMn_n x m n : (x *+ m) ^+ n = x ^+ n *+ (m ^ n) :> R.
 Proof.
 elim: n => [|n IHn]; first by rewrite mulr1n.
 rewrite exprS IHn -mulr_natr -mulrA -commr_nat mulr_natr -mulrnA -expnSr.
-by rewrite -mulr_natr mulrA -exprS mulr_natr.
+by rewrite -mulr_natr exprS -mulrA mulr_natr.
 Qed.
 
 Lemma exprM x m n : x ^+ (m * n) = x ^+ m ^+ n.
@@ -1358,8 +1258,7 @@ Proof. exact: mulrnBr. Qed.
 Lemma commrN x y : comm x y -> comm x (- y).
 Proof. by move=> com_xy; rewrite /comm mulrN com_xy mulNr. Qed.
 
-Lemma commrN1 x : comm x (-1).
-Proof. exact/commrN/commr1. Qed.
+Lemma commrN1 x : comm x (-1). Proof. exact/commrN/commr1. Qed.
 
 Lemma commrB x y z : comm x y -> comm x z -> comm x (y - z).
 Proof. by move=> com_xy com_xz; apply: commrD => //; apply: commrN. Qed.
@@ -1397,8 +1296,7 @@ Qed.
 Lemma exprNn x n : (- x) ^+ n = (-1) ^+ n * x ^+ n :> R.
 Proof. by rewrite -mulN1r exprMn_comm // /comm mulN1r mulrN mulr1. Qed.
 
-Lemma sqrrN x : (- x) ^+ 2 = x ^+ 2.
-Proof. exact: mulrNN. Qed.
+Lemma sqrrN x : (- x) ^+ 2 = x ^+ 2. Proof. exact: mulrNN. Qed.
 
 Lemma sqrr_sign n : ((-1) ^+ n) ^+ 2 = 1 :> R.
 Proof. by rewrite exprAC sqrrN !expr1n. Qed.
@@ -1562,11 +1460,9 @@ Implicit Types x y : R.
 Lemma mulIr_eq0 x y : rreg x -> (y * x == 0) = (y == 0).
 Proof. exact: (@mulrI_eq0 R^c). Qed.
 
-Lemma rreg_neq0 x : rreg x -> x != 0.
-Proof. exact: (@lreg_neq0 R^c). Qed.
+Lemma rreg_neq0 x : rreg x -> x != 0. Proof. exact: (@lreg_neq0 R^c). Qed.
 
-Lemma rreg1 : rreg (1 : R).
-Proof. exact: (@lreg1 R^c). Qed.
+Lemma rreg1 : rreg (1 : R). Proof. exact: (@lreg1 R^c). Qed.
 
 Lemma rregM x y : rreg x -> rreg y -> rreg (x * y).
 Proof. by move=> reg_x reg_y; apply: (@lregM R^c). Qed.
@@ -1587,8 +1483,7 @@ Implicit Types x y : R.
 Lemma mulIr0_rreg x : (forall y, y * x = 0 -> y = 0) -> rreg x.
 Proof. exact: (@mulrI0_lreg R^c). Qed.
 
-Lemma rregN x : rreg x -> rreg (- x).
-Proof. exact: (@lregN R^c). Qed.
+Lemma rregN x : rreg x -> rreg (- x). Proof. exact: (@lregN R^c). Qed.
 
 End RightRegular.
 
@@ -1756,55 +1651,6 @@ End LalgebraTheory.
 
 (* Morphism hierarchy. *)
 
-Definition semi_additive (U V : nmodType) (f : U -> V) : Prop :=
-  (f 0 = 0) * {morph f : x y / x + y}.
-
-HB.mixin Record isSemiAdditive (U V : nmodType) (apply : U -> V) := {
-  semi_additive_subproof : semi_additive apply;
-}.
-
-#[mathcomp(axiom="semi_additive")]
-HB.structure Definition Additive (U V : nmodType) :=
-  {f of isSemiAdditive U V f}.
-
-Definition additive (U V : zmodType) (f : U -> V) := {morph f : x y / x - y}.
-
-HB.factory Record isAdditive (U V : zmodType) (apply : U -> V) := {
-  additive_subproof : additive apply;
-}.
-
-HB.builders Context U V apply of isAdditive U V apply.
-
-Local Lemma raddf0 : apply 0 = 0.
-Proof. by rewrite -[0]subr0 additive_subproof subrr. Qed.
-
-Local Lemma raddfD : {morph apply : x y / x + y}.
-Proof.
-move=> x y; rewrite -[y in LHS]opprK -[- y]add0r.
-by rewrite !additive_subproof raddf0 sub0r opprK.
-Qed.
-
-HB.instance Definition _ := isSemiAdditive.Build U V apply (conj raddf0 raddfD).
-
-HB.end.
-
-Module AdditiveExports.
-Notation "{ 'additive' U -> V }" := (Additive.type U%type V%type) : type_scope.
-End AdditiveExports.
-HB.export AdditiveExports.
-
-(* Lifted additive operations. *)
-Section LiftedNmod.
-Variables (U : Type) (V : nmodType).
-Definition null_fun of U : V := 0.
-Definition add_fun (f g : U -> V) x := f x + g x.
-End LiftedNmod.
-Section LiftedZmod.
-Variables (U : Type) (V : zmodType).
-Definition sub_fun (f g : U -> V) x := f x - g x.
-Definition opp_fun (f : U -> V) x := - f x.
-End LiftedZmod.
-
 (* Lifted multiplication. *)
 Section LiftedSemiRing.
 Variables (R : semiRingType) (T : Type).
@@ -1830,11 +1676,7 @@ Local Notation "x \*o f" := (mull_fun x f) : function_scope.
 Local Notation "x \o* f" := (mulr_fun x f) : function_scope.
 Local Notation "f \* g" := (mul_fun f g) : function_scope.
 
-Arguments null_fun {_} V _ /.
-Arguments in_alg {_} A _ /.
-Arguments add_fun {_ _} f g _ /.
-Arguments sub_fun {_ _} f g _ /.
-Arguments opp_fun {_ _} f _ /.
+Arguments in_alg  {_} A _ /.
 Arguments mull_fun {_ _}  a f _ /.
 Arguments mulr_fun {_ _} a f _ /.
 Arguments scale_fun {_ _ _} a f _ /.
@@ -1844,29 +1686,11 @@ Section AdditiveTheory.
 
 Section Properties.
 
-Variables (U V : nmodType) (f : {additive U -> V}).
-
-Lemma raddf0 : f 0 = 0.
-Proof. exact: semi_additive_subproof.1. Qed.
-
-Lemma raddf_eq0 x : injective f -> (f x == 0) = (x == 0).
-Proof. by move=> /inj_eq <-; rewrite raddf0. Qed.
-
-Lemma raddfD : {morph f : x y / x + y}.
-Proof. exact: semi_additive_subproof.2. Qed.
-
-Lemma raddfMn n : {morph f : x / x *+ n}.
-Proof. by elim: n => [|n IHn] x /=; rewrite ?raddf0 // !mulrS raddfD IHn. Qed.
+Variables (U V : baseAddUMagmaType) (f : {additive U -> V}).
 
 Lemma raddf_sum I r (P : pred I) E :
   f (\sum_(i <- r | P i) E i) = \sum_(i <- r | P i) f (E i).
-Proof. exact: (big_morph f raddfD raddf0). Qed.
-
-Lemma can2_semi_additive f' : cancel f f' -> cancel f' f -> semi_additive f'.
-Proof.
-move=> fK f'K.
-by split=> [|x y]; apply: (canLR fK); rewrite ?raddf0// raddfD !f'K.
-Qed.
+Proof. exact: (big_morph f (raddfD f) (raddf0 f)). Qed.
 
 End Properties.
 
@@ -1878,39 +1702,6 @@ Lemma raddfMnat n x : f (n%:R * x) = n%:R * f x.
 Proof. by rewrite !mulr_natl raddfMn. Qed.
 
 End SemiRingProperties.
-
-Section AddFun.
-
-Variables (U V W : nmodType).
-Variables (f g : {additive V -> W}) (h : {additive U -> V}).
-
-Fact idfun_is_semi_additive : semi_additive (@idfun U).
-Proof. by []. Qed.
-#[export]
-HB.instance Definition _ := isSemiAdditive.Build U U idfun
-  idfun_is_semi_additive.
-
-Fact comp_is_semi_additive : semi_additive (f \o h).
-Proof. by split=> [|x y]; rewrite /= ?raddf0// !raddfD. Qed.
-#[export]
-HB.instance Definition _ := isSemiAdditive.Build U W (f \o h)
-  comp_is_semi_additive.
-
-Fact null_fun_is_semi_additive : semi_additive (\0 : U -> V).
-Proof. by split=> // x y /=; rewrite addr0. Qed.
-#[export]
-HB.instance Definition _ := isSemiAdditive.Build U V \0
-  null_fun_is_semi_additive.
-
-Fact add_fun_is_semi_additive : semi_additive (f \+ g).
-Proof.
-by split=> [|x y]; rewrite /= ?raddf0 ?addr0// !raddfD addrCA -!addrA addrCA.
-Qed.
-#[export]
-HB.instance Definition _ := isSemiAdditive.Build V W (f \+ g)
-  add_fun_is_semi_additive.
-
-End AddFun.
 
 Section MulFun.
 
@@ -1934,23 +1725,13 @@ Section Properties.
 
 Variables (U V : zmodType) (f : {additive U -> V}).
 
-Lemma raddfN : {morph f : x / - x}.
-Proof.
-move=> x.
-by rewrite -[LHS]addr0 -(subrr (f x)) addrA -raddfD addNr raddf0 sub0r.
-Qed.
-
-Lemma raddfB : {morph f : x y / x - y}.
-Proof. by move=> x y; rewrite raddfD -raddfN. Qed.
+Lemma raddfN : {morph f : x / - x}. Proof. exact: raddfN. Qed.
+Lemma raddfB : {morph f : x y / x - y}. Proof. exact: raddfB. Qed.
 
 Lemma raddf_inj : (forall x, f x = 0 -> x = 0) -> injective f.
-Proof. by move=> fI x y eqxy; apply/subr0_eq/fI; rewrite raddfB eqxy subrr. Qed.
+Proof. exact: raddf_inj. Qed.
 
-Lemma raddfMNn n : {morph f : x / x *- n}.
-Proof. by move=> x /=; rewrite raddfN raddfMn. Qed.
-
-Lemma can2_additive f' : cancel f f' -> cancel f' f -> additive f'.
-Proof. by move=> fK f'K x y /=; apply: (canLR fK); rewrite raddfB !f'K. Qed.
+Lemma raddfMNn n : {morph f : x / x *- n}. Proof. exact: raddfMNn. Qed.
 
 End Properties.
 
@@ -1970,29 +1751,6 @@ Lemma raddfZsign n u : h ((-1) ^+ n *: u) = (-1) ^+ n *: h u.
 Proof. by rewrite !(scaler_sign, =^~ signr_odd) (fun_if h) raddfN. Qed.
 
 End RingProperties.
-
-Section AddFun.
-
-Variables (U V W : zmodType) (f g : {additive V -> W}) (h : {additive U -> V}).
-
-Fact opp_is_additive : additive (-%R : U -> U).
-Proof. by move=> x y; rewrite /= opprD. Qed.
-#[export]
-HB.instance Definition _ := isAdditive.Build U U -%R opp_is_additive.
-
-Fact sub_fun_is_additive : additive (f \- g).
-Proof.
-by move=> x y /=; rewrite !raddfB addrAC -!addrA -!opprD addrAC addrA.
-Qed.
-#[export]
-HB.instance Definition _ := isAdditive.Build V W (f \- g) sub_fun_is_additive.
-
-Fact opp_fun_is_additive : additive (\- g).
-Proof. by move=> x y /=; rewrite !raddfB opprB addrC opprK. Qed.
-#[export]
-HB.instance Definition _ := isAdditive.Build V W (\- g) opp_fun_is_additive.
-
-End AddFun.
 
 Section ScaleFun.
 
@@ -2115,7 +1873,10 @@ Proof. move=> x y; exact: scalerBl. Qed.
 HB.instance Definition _ := isAdditive.Build R A (in_alg A) in_alg_is_additive.
 
 Fact in_alg_is_rmorphism : multiplicative (in_alg A).
-Proof. by split=> [x y|] /=; rewrite ?scale1r // -scalerAl mul1r scalerA. Qed.
+Proof.
+split=> [x y|] /=; last exact/scale1r.
+by rewrite -scalerAl mul1r scalerA.
+Qed.
 #[export]
 HB.instance Definition _ := isMultiplicative.Build R A (in_alg A)
   in_alg_is_rmorphism.
@@ -2358,30 +2119,31 @@ End Plain.
 
 Section Scale.
 
-Variable (s : Scale.law R V).
-Variables (f : {linear U -> V | s}) (g : {linear U -> V | s}).
+Variable (s : Scale.law R V) (f g : {linear U -> V | s}).
 
-Lemma null_fun_is_scalable : scalable_for s (\0 : U -> V).
+Lemma null_fun_is_scalable : scalable_for s (null_fun (fun _ : U => V)).
 Proof. by move=> a v /=; rewrite raddf0. Qed.
 #[export]
-HB.instance Definition _ := isScalable.Build R U V s \0 null_fun_is_scalable.
+HB.instance Definition _ :=
+  isScalable.Build R U V s (null_fun (fun _ : U => V)) null_fun_is_scalable.
 
-Lemma add_fun_is_scalable : scalable_for s (f \+ g).
+Lemma add_fun_is_scalable : scalable_for s (add_fun f g).
 Proof. by move=> a u; rewrite /= !linearZ_LR raddfD. Qed.
 #[export]
-HB.instance Definition _ := isScalable.Build R U V s (f \+ g) add_fun_is_scalable.
+HB.instance Definition _ :=
+  isScalable.Build R U V s (add_fun f g) add_fun_is_scalable.
 
-Lemma sub_fun_is_scalable : scalable_for s (f \- g).
-Proof. by move=> a u; rewrite /= !linearZ_LR raddfB. Qed.
-#[export]
-HB.instance Definition _ := isScalable.Build R U V s (f \- g) sub_fun_is_scalable.
-
-Lemma opp_fun_is_scalable : scalable_for s (\- g).
+Lemma opp_fun_is_scalable : scalable_for s (opp_fun g).
 Proof. by move=> a u; rewrite /= linearZ_LR raddfN. Qed.
 #[export]
-HB.instance Definition _ := isScalable.Build R U V s (\- g) opp_fun_is_scalable.
+HB.instance Definition _ :=
+  isScalable.Build R U V s (opp_fun g) opp_fun_is_scalable.
 
 End Scale.
+
+#[export]
+HB.instance Definition _ (s : Scale.law R V) (f g : {linear U -> V | s}) :=
+  Linear.on (sub_fun f g).
 
 End LinearLmod.
 
@@ -2589,7 +2351,7 @@ Proof. by rewrite subrXX !big_ord_recr big_ord0 /= add0r mulr1 mul1r. Qed.
 Lemma subr_sqrDB x y : (x + y) ^+ 2 - (x - y) ^+ 2 = x * y *+ 4.
 Proof.
 rewrite sqrrD sqrrB -!(addrAC _ (y ^+ 2)) opprB.
-by rewrite addrC addrA subrK -mulrnDr.
+by rewrite [LHS]addrC addrA subrK -mulrnDr.
 Qed.
 
 Section ScaleLinear.
@@ -2803,8 +2565,7 @@ rewrite -(mulrK Ux _^-1) -mulrA commrV ?mulKr //.
 by apply/unitrP; exists x; rewrite divrr ?mulVr.
 Qed.
 
-Lemma invr_inj : injective (@inv R).
-Proof. exact: inv_inj invrK. Qed.
+Lemma invr_inj : injective (@inv R). Proof. exact: inv_inj invrK. Qed.
 
 Lemma unitrV x : (x^-1 \in unit) = (x \in unit).
 Proof. by rewrite !unitrE invrK commrV. Qed.
@@ -3126,7 +2887,7 @@ Notation subalg_closed := subalg_closed.
 Notation divring_closed := divring_closed.
 Notation divalg_closed := divalg_closed.
 
-Coercion zmod_closedD : zmod_closed >-> addr_closed.
+Coercion zmod_closedD : zmod_closed >-> nmod_closed.
 Coercion zmod_closedN : zmod_closed >-> oppr_closed.
 Coercion smulr_closedN : smulr_closed >-> oppr_closed.
 Coercion smulr_closedM : smulr_closed >-> mulr_closed.
@@ -4392,14 +4153,6 @@ Qed.
 
 (* Mixins for stability properties *)
 
-HB.mixin Record isAddClosed (V : nmodType) (S : {pred V}) := {
-  rpred0D : addr_closed S
-}.
-
-HB.mixin Record isOppClosed (V : zmodType) (S : {pred V}) := {
-  rpredNr : oppr_closed S
-}.
-
 HB.mixin Record isMul2Closed (R : semiRingType) (S : {pred R}) := {
   rpredM : mulr_2closed S
 }.
@@ -4419,14 +4172,8 @@ HB.mixin Record isScaleClosed (R : ringType) (V : lmodType R)
 
 (* Structures for stability properties *)
 
-#[short(type="opprClosed")]
-HB.structure Definition OppClosed V := {S of isOppClosed V S}.
-
-#[short(type="addrClosed")]
-HB.structure Definition AddClosed V := {S of isAddClosed V S}.
-
-#[short(type="zmodClosed")]
-HB.structure Definition ZmodClosed V := {S of OppClosed V S & AddClosed V S}.
+Local Notation addrClosed := addgClosed.
+Local Notation opprClosed := oppgClosed.
 
 #[short(type="mulr2Closed")]
 HB.structure Definition Mul2Closed R := {S of isMul2Closed R S}.
@@ -4475,17 +4222,6 @@ HB.structure Definition DivalgClosed (R : ringType) (A : unitAlgType R) :=
   {S of DivringClosed A S & isScaleClosed R A S}.
 
 (* Factories for stability properties *)
-
-HB.factory Record isZmodClosed (V : zmodType) (S : V -> bool) := {
-  zmod_closed_subproof : zmod_closed S
-}.
-
-HB.builders Context V S of isZmodClosed V S.
-HB.instance Definition _ := isOppClosed.Build V S
-  (zmod_closedN zmod_closed_subproof).
-HB.instance Definition _ := isAddClosed.Build V S
-  (zmod_closedD zmod_closed_subproof).
-HB.end.
 
 HB.factory Record isMulClosed (R : semiRingType) (S : {pred R}) := {
   rpred1M : mulr_closed S
@@ -4606,18 +4342,11 @@ Section Add.
 
 Variable S : addrClosed V.
 
-Lemma rpred0 : 0 \in S.
-Proof. by case: (@rpred0D _ S). Qed.
-
-Lemma rpredD : {in S &, forall u v, u + v \in S}.
-Proof. by case: (@rpred0D _ S). Qed.
+Lemma rpred0D : addr_closed S. Proof. exact: nmod_closed_subproof. Qed.
 
 Lemma rpred_sum I r (P : pred I) F :
   (forall i, P i -> F i \in S) -> \sum_(i <- r | P i) F i \in S.
 Proof. by move=> IH; elim/big_ind: _; [apply: rpred0 | apply: rpredD |]. Qed.
-
-Lemma rpredMn n : {in S, forall u, u *+ n \in S}.
-Proof. by move=> u Su; rewrite -(card_ord n) -sumr_const rpred_sum. Qed.
 
 End Add.
 
@@ -4631,41 +4360,14 @@ Section Opp.
 
 Variable S : opprClosed V.
 
-Lemma rpredN : {mono -%R: u / u \in S}.
-Proof. by move=> u; apply/idP/idP=> /rpredNr; rewrite ?opprK; apply. Qed.
-
 End Opp.
 
 Section Sub.
 
 Variable S : zmodClosed V.
 
-Lemma rpredB : {in S &, forall u v, u - v \in S}.
-Proof. by move=> u v Su Sv; rewrite /= rpredD ?rpredN. Qed.
-
-Lemma rpredBC u v : u - v \in S = (v - u \in S).
-Proof. by rewrite -rpredN opprB. Qed.
-
-Lemma rpredMNn n : {in S, forall u, u *- n \in S}.
-Proof. by move=> u Su; rewrite /= rpredN rpredMn. Qed.
-
-Lemma rpredDr x y : x \in S -> (y + x \in S) = (y \in S).
-Proof.
-move=> Sx; apply/idP/idP=> [Sxy | /rpredD-> //].
-by rewrite -(addrK x y) rpredB.
-Qed.
-
-Lemma rpredDl x y : x \in S -> (x + y \in S) = (y \in S).
-Proof. by rewrite addrC; apply: rpredDr. Qed.
-
-Lemma rpredBr x y : x \in S -> (y - x \in S) = (y \in S).
-Proof. by rewrite -rpredN; apply: rpredDr. Qed.
-
-Lemma rpredBl x y : x \in S -> (x - y \in S) = (y \in S).
-Proof. by rewrite -(rpredN _ y); apply: rpredDl. Qed.
-
 Lemma zmodClosedP : zmod_closed S.
-Proof. split; [ exact: rpred0D.1 | exact: rpredB ]. Qed.
+Proof. split; [ exact: (@rpred0D V S).1 | exact: rpredB ]. Qed.
 
 End Sub.
 
@@ -4731,7 +4433,7 @@ Proof. by move=> u Su; rewrite /= scaler_nat rpredMn. Qed.
 
 Lemma submodClosedP (modS : submodClosed V) : submod_closed modS.
 Proof.
-split; first exact rpred0D.1.
+split; first exact (@rpred0D V modS).1.
 by move=> a u v uS vS; apply: rpredD; first exact: rpredZ.
 Qed.
 
@@ -4859,103 +4561,6 @@ End Predicates.
 
 End FieldPred.
 
-HB.mixin Record isSubNmodule (V : nmodType) (S : pred V) U
-    of SubType V S U & Nmodule U := {
-  valD_subproof : semi_additive (val : U -> V);
-}.
-
-#[short(type="subNmodType")]
-HB.structure Definition SubNmodule (V : nmodType) S :=
-  { U of SubChoice V S U & Nmodule U & isSubNmodule V S U }.
-
-Section additive.
-Context (V : nmodType) (S : pred V) (U : SubNmodule.type S).
-Notation val := (val : U -> V).
-#[export]
-HB.instance Definition _ := isSemiAdditive.Build U V val valD_subproof.
-Lemma valD : {morph val : x y / x + y}. Proof. exact: raddfD. Qed.
-Lemma val0 : val 0 = 0. Proof. exact: raddf0. Qed.
-End additive.
-
-HB.factory Record SubChoice_isSubNmodule (V : nmodType) S U
-    of SubChoice V S U := {
-  addr_closed_subproof : addr_closed S
-}.
-
-HB.builders Context V S U of SubChoice_isSubNmodule V S U.
-
-HB.instance Definition _ := isAddClosed.Build V S addr_closed_subproof.
-
-Let inU v Sv : U := Sub v Sv.
-Let zeroU := inU (rpred0 (AddClosed.clone V S _)).
-Let addU (u1 u2 : U) := inU (rpredD (valP u1) (valP u2)).
-
-Lemma addUA : associative addU.
-Proof. by move=> x y z; apply/val_inj; rewrite !SubK addrA. Qed.
-
-Lemma addUC : commutative addU.
-Proof. by move=> x y; apply/val_inj; rewrite !SubK addrC. Qed.
-
-Lemma add0U : left_id zeroU addU.
-Proof. by move=> x; apply/val_inj; rewrite !SubK add0r. Qed.
-
-HB.instance Definition _ := @isNmodule.Build U zeroU addU addUA addUC add0U.
-
-Lemma val0 : (val : U -> V) 0 = 0. Proof. by rewrite !SubK. Qed.
-Lemma valD : semi_additive (val : U -> V).
-Proof. by split=> [|x y]; rewrite !SubK. Qed.
-HB.instance Definition _ := isSubNmodule.Build V S U valD.
-HB.end.
-
-Implicit Type V : zmodType.
-
-HB.mixin Record isSubZmodule V (S : pred V) U
-    of SubNmodule V S U & Zmodule U := {
-  valB_subproof : additive (val : U -> V);
-}.
-
-#[short(type="subZmodType")]
-HB.structure Definition SubZmodule V S :=
-  { U of SubNmodule V S U & Zmodule U & isSubZmodule V S U }.
-
-Section additive.
-Context V (S : pred V) (U : SubZmodule.type S).
-Notation val := (val : U -> V).
-#[export]
-HB.instance Definition _ := isAdditive.Build U V val valB_subproof.
-Lemma valB : {morph val : x y / x - y}. Proof. exact: raddfB. Qed.
-Lemma valN : {morph val : x / - x}. Proof. exact: raddfN. Qed.
-End additive.
-
-HB.factory Record SubChoice_isSubZmodule V S U of SubChoice V S U := {
-  zmod_closed_subproof : zmod_closed S
-}.
-
-HB.builders Context V S U of SubChoice_isSubZmodule V S U.
-
-HB.instance Definition _ := isZmodClosed.Build V S zmod_closed_subproof.
-
-Let inU v Sv : U := Sub v Sv.
-Let zeroU := inU (rpred0 (AddClosed.clone V S _)).
-Let oppU (u : U) := inU (rpredNr _ (valP u)).
-Let addU (u1 u2 : U) := inU (rpredD (valP u1) (valP u2)).
-
-HB.instance Definition _ := SubChoice_isSubNmodule.Build V S U
-  (zmod_closedD zmod_closed_subproof).
-
-Lemma addNr : left_inverse zeroU oppU addU.
-Proof. by move=> x; apply: val_inj; rewrite !SubK addNr. Qed.
-HB.instance Definition _ := Nmodule_isZmodule.Build U addNr.
-
-Lemma valD : semi_additive (val : U -> V).
-Proof. by split=> [|x y]; rewrite !SubK. Qed.
-HB.instance Definition _ := isSubNmodule.Build V S U valD.
-
-Lemma valB : additive (val : U -> V).
-Proof. by move=> x y; rewrite !SubK. Qed.
-HB.instance Definition _ := isSubZmodule.Build V S U valB.
-HB.end.
-
 HB.mixin Record isSubSemiRing (R : semiRingType) (S : pred R) U
     of SubNmodule R S U & SemiRing U := {
   valM_subproof : multiplicative (val : U -> R);
@@ -5031,7 +4636,7 @@ HB.end.
 
 #[short(type="subRingType")]
 HB.structure Definition SubRing (R : ringType) (S : pred R) :=
-  { U of SubSemiRing R S U & Ring U & isSubZmodule R S U }.
+  { U of SubSemiRing R S U & Ring U & SubZmodule R S U }.
 
 HB.factory Record SubZmodule_isSubRing (R : ringType) S U
     of SubZmodule R S U := {
@@ -5932,6 +5537,9 @@ Export AllExports.
 Export Scale.Exports.
 Export ClosedExports.
 
+Notation addrClosed := addgClosed.
+Notation opprClosed := oppgClosed.
+
 Variant Ione := IOne : Ione.
 Inductive Inatmul :=
   | INatmul : Ione -> nat -> Inatmul
@@ -5960,7 +5568,7 @@ Definition print (x : Inatmul) : option Number.int :=
 Arguments GRing.one {_}.
 Set Warnings "-via-type-remapping,-via-type-mismatch".
 Number Notation Idummy_placeholder parse print (via Inatmul
-  mapping [[GRing.natmul] => INatmul, [GRing.opp] => IOpp, [GRing.one] => IOne])
+  mapping [[natmul] => INatmul, [opp] => IOpp, [one] => IOne])
   : ring_scope.
 Set Warnings "via-type-remapping,via-type-mismatch".
 Arguments GRing.one : clear implicits.
@@ -6005,11 +5613,6 @@ Notation "x \*o f" := (mull_fun x f) : ring_scope.
 Notation "x \o* f" := (mulr_fun x f) : ring_scope.
 Notation "f \* g" := (mul_fun f g) : ring_scope.
 
-Arguments null_fun {_} V _ /.
-Arguments in_alg {_} A _ /.
-Arguments add_fun {_ _} f g _ /.
-Arguments sub_fun {_ _} f g _ /.
-Arguments opp_fun {_ _} f _ /.
 Arguments mull_fun {_ _}  a f _ /.
 Arguments mulr_fun {_ _} a f _ /.
 Arguments scale_fun {_ _ _} a f _ /.
@@ -6094,28 +5697,10 @@ Notation "''exists' ''X_' i , f" := (Exists i f) : term_scope.
 Notation "''forall' ''X_' i , f" := (Forall i f) : term_scope.
 
 (* Lifting Structure from the codomain of finfuns. *)
-Section FinFunNmod.
-
-Variable (aT : finType) (rT : nmodType).
-Implicit Types f g : {ffun aT -> rT}.
-
-Definition ffun_zero := [ffun a : aT => (0 : rT)].
-Definition ffun_add f g := [ffun a => f a + g a].
-
-Fact ffun_addA : associative ffun_add.
-Proof. by move=> f1 f2 f3; apply/ffunP=> a; rewrite !ffunE addrA. Qed.
-Fact ffun_addC : commutative ffun_add.
-Proof. by move=> f1 f2; apply/ffunP=> a; rewrite !ffunE addrC. Qed.
-Fact ffun_add0 : left_id ffun_zero ffun_add.
-Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE add0r. Qed.
-
-#[export]
-HB.instance Definition _ := isNmodule.Build {ffun aT -> rT}
-  ffun_addA ffun_addC ffun_add0.
 
 Section Sum.
 
-Variables (I : Type) (r : seq I) (P : pred I) (F : I -> {ffun aT -> rT}).
+Variables (aT : finType) (rT : nmodType) (I : Type) (r : seq I) (P : pred I) (F : I -> {ffun aT -> rT}).
 
 Lemma sum_ffunE x : (\sum_(i <- r | P i) F i) x = \sum_(i <- r | P i) F i x.
 Proof. by elim/big_rec2: _ => // [|i _ y _ <-]; rewrite !ffunE. Qed.
@@ -6125,27 +5710,6 @@ Lemma sum_ffun :
 Proof. by apply/ffunP=> i; rewrite sum_ffunE ffunE. Qed.
 
 End Sum.
-
-Lemma ffunMnE f n x : (f *+ n) x = f x *+ n.
-Proof. by rewrite -[n]card_ord -!sumr_const sum_ffunE. Qed.
-
-End FinFunNmod.
-
-Section FinFunZmod.
-
-Variable (aT : finType) (rT : zmodType).
-Implicit Types f g : {ffun aT -> rT}.
-
-Definition ffun_opp f := [ffun a => - f a].
-
-Fact ffun_addN : left_inverse (@ffun_zero _ _) ffun_opp (@ffun_add _ _).
-Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE addNr. Qed.
-
-#[export]
-HB.instance Definition _ := Nmodule_isZmodule.Build {ffun aT -> rT}
-  ffun_addN.
-
-End FinFunZmod.
 
 Section FinFunSemiRing.
 
@@ -6240,50 +5804,6 @@ HB.instance Definition _ := Zmodule_isLmodule.Build R {ffun aT -> rT}
 End FinFunLmod.
 
 (* External direct product. *)
-Section PairNmod.
-
-Variables U V : nmodType.
-
-Definition add_pair (x y : U * V) := (x.1 + y.1, x.2 + y.2).
-
-Fact pair_addA : associative add_pair.
-Proof. by move=> x y z; congr (_, _); apply: addrA. Qed.
-
-Fact pair_addC : commutative add_pair.
-Proof. by move=> x y; congr (_, _); apply: addrC. Qed.
-
-Fact pair_add0 : left_id (0, 0) add_pair.
-Proof. by case=> x1 x2; congr (_, _); apply: add0r. Qed.
-
-#[export]
-HB.instance Definition _ := isNmodule.Build (U * V)%type
-  pair_addA pair_addC pair_add0.
-
-Fact fst_is_semi_additive : semi_additive fst. Proof. by []. Qed.
-#[export]
-HB.instance Definition _ := isSemiAdditive.Build (U * V)%type U fst
-  fst_is_semi_additive.
-
-Fact snd_is_semi_additive : semi_additive snd. Proof. by []. Qed.
-#[export]
-HB.instance Definition _ := isSemiAdditive.Build (U * V)%type V snd
-  snd_is_semi_additive.
-
-End PairNmod.
-
-Section PairZmod.
-
-Variables U V : zmodType.
-
-Definition opp_pair (x : U * V) := (- x.1, - x.2).
-
-Fact pair_addN : left_inverse (0, 0) opp_pair (@add_pair U V).
-Proof. by move=> x; congr (_, _); apply: addNr. Qed.
-
-#[export]
-HB.instance Definition _ := Nmodule_isZmodule.Build (U * V)%type pair_addN.
-
-End PairZmod.
 
 Section PairSemiRing.
 
@@ -6520,7 +6040,6 @@ End Test3.
 
 (* Algebraic structure of bool *)
 
-HB.instance Definition _ := isZmodule.Build bool addbA addbC addFb addbb.
 HB.instance Definition _ := Zmodule_isComRing.Build bool
   andbA andbC andTb andb_addl isT.
 
@@ -6539,12 +6058,8 @@ HB.instance Definition _ := ComUnitRing_isField.Build bool bool_fieldP.
 
 (* Algebraic structure of nat *)
 
-HB.instance Definition _ := isNmodule.Build nat addnA addnC add0n.
 HB.instance Definition _ := Nmodule_isComSemiRing.Build nat
   mulnA mulnC mul1n mulnDl mul0n erefl.
-
-HB.instance Definition _ (V : nmodType) (x : V) :=
-  isSemiAdditive.Build nat V (natmul x) (mulr0n x, mulrnDr x).
 
 HB.instance Definition _ (R : semiRingType) :=
   isMultiplicative.Build nat R (natmul 1) (natrM R, mulr1n 1).

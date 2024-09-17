@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
-From mathcomp Require Import fintype generic_quotient bigop ssralg poly.
-From mathcomp Require Import polydiv matrix mxpoly countalg ring_quotient.
+From mathcomp Require Import fintype generic_quotient bigop ssralg poly polydiv.
+From mathcomp Require Import matrix mxpoly countalg ring_quotient.
 
 (******************************************************************************)
 (*         A quantifier elimination for algebraically closed fields           *)
@@ -701,12 +701,10 @@ have I_ideal : idealr_closed I.
   apply/memI; exists (maxn (pickle q1).+1 (pickle q2).+1); apply: dvdp_add.
     by apply: dvdp_mull; apply: dvdp_trans Iq1; apply/dv_d/leq_maxl.
   by apply: dvdp_trans Iq2; apply/dv_d/leq_maxr.
-pose IaM := GRing.isAddClosed.Build _ I (idealr_closedB I_ideal).
-pose IoM := GRing.isOppClosed.Build _ I (idealr_closedB I_ideal).
+pose IaM := GRing.isZmodClosed.Build _ I (idealr_closedB I_ideal).
 pose IpM := isProperIdeal.Build _ I (idealr_closed_nontrivial I_ideal).
-pose Iid : idealr _ := HB.pack I IaM IoM IpM.
-pose EMixin := GRing.Ring_hasCommutativeMul.Build _ (@Quotient.mulqC _ Iid).
-pose E : comRingType := HB.pack _ EMixin.
+pose Iid : idealr _ := HB.pack I IaM IpM.
+pose E : comRingType := {ideal_quot Iid}.
 pose PtoE : {rmorphism {poly F} -> E} := \pi_E%qT.
 have PtoEd i: PtoE (d i) = 0.
   by apply/eqP; rewrite piE Quotient.equivE subr0; apply/memI; exists i.
@@ -762,7 +760,7 @@ pose incEp E i j :=
   if decode j is [:: i1; k] then
     if i1 == i then odflt v (unpickle k) else v
   else v.
-pose fix E_ i := if i is i1.+1 then MkExt _ (incEp (E_ i1) i1) else MkExt F \0.
+pose fix E_ i := if i is i1.+1 then MkExt _ (incEp (E_ i1) i1) else MkExt F 0.
 pose E i := tag (E_ i); pose Krep := {i : nat & E i}.
 pose fix toEadd i k : {rmorphism E i -> E (k + i)%N} :=
   if k isn't k1.+1 then idfun else EtoInc _ (k1 + i)%N \o toEadd _ _.

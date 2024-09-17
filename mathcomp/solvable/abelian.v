@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path choice.
 From mathcomp Require Import div fintype finfun bigop finset prime binomial.
-From mathcomp Require Import fingroup morphism perm automorphism action.
+From mathcomp Require Import monoid fingroup morphism perm automorphism action.
 From mathcomp Require Import quotient gfunctor gproduct ssralg countalg finalg zmodp.
 From mathcomp Require Import cyclic pgroup gseries nilpotent sylow.
 
