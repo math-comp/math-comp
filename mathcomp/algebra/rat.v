@@ -931,7 +931,9 @@ move=> x; apply: floor_def; apply/andP; split.
 Qed.
 
 Lemma ceil_rat : {mono (@ratr F) : x / Num.ceil x}.
-Proof. by move=> x; rewrite /Num.ceil -rmorphN floor_rat. Qed.
+Proof.
+by move=> x; rewrite !archimedean.Num.Theory.ceilEfloor -rmorphN floor_rat.
+Qed.
 
 End InParchiField.
 
