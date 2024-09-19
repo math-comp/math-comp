@@ -150,16 +150,16 @@ Qed.
 
 Lemma poly_rV_is_linear : linear poly_rV.
 Proof. by move=> a p q; apply/rowP=> i; rewrite !mxE coefD coefZ. Qed.
-HB.instance Definition _ := GRing.isSemilinear.Build R {poly R} 'rV_d _ poly_rV
-  (GRing.semilinear_linear poly_rV_is_linear).
+HB.instance Definition _ := GRing.isLinear.Build R {poly R} 'rV_d _ poly_rV
+  poly_rV_is_linear.
 
 Lemma rVpoly_is_linear : linear rVpoly.
 Proof.
 move=> a u v; apply/polyP=> k; rewrite coefD coefZ !coef_rVpoly.
 by case: insubP => [i _ _ | _]; rewrite ?mxE // mulr0 addr0.
 Qed.
-HB.instance Definition _ := GRing.isSemilinear.Build R 'rV_d {poly R} _ rVpoly
-  (GRing.semilinear_linear rVpoly_is_linear).
+HB.instance Definition _ := GRing.isLinear.Build R 'rV_d {poly R} _ rVpoly
+  rVpoly_is_linear.
 
 End RowPoly.
 
