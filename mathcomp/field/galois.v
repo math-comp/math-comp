@@ -193,7 +193,7 @@ Variables (K E : {subfield L}) (f : 'End(L)) (x y : L).
 Let kHomf z := (map_poly f (Fadjoin_poly E x z)).[y].
 
 Fact kHomExtend_additive_subproof : additive kHomf.
-Proof. by move=> a b; rewrite /kHomf !raddfB hornerD hornerN. Qed.
+Proof. by move=> a b; rewrite /kHomf 2!raddfB hornerD hornerN. Qed.
 
 Fact kHomExtend_scalable_subproof : scalable kHomf.
 Proof.

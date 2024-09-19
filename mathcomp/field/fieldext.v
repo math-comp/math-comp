@@ -545,8 +545,7 @@ move=> a p; rewrite -mul_polyC rmorphM /= fieldExt_hornerC.
 by rewrite -scalerAl mul1r.
 Qed.
 HB.instance Definition _ :=
-  GRing.isScalable.Build F0 {poly F0} L *:%R fieldExt_horner
-    fieldExt_hornerZ.
+  GRing.isScalable.Build F0 {poly F0} L *:%R fieldExt_horner fieldExt_hornerZ.
 
 End Horner.
 

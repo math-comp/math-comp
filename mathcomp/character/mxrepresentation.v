@@ -4352,8 +4352,7 @@ Qed.
 
 Lemma rank_irr_comp : \rank 'R_iG = \rank E_G.
 Proof.
-symmetry; rewrite -{1}irr_comp_envelop; apply/mxrank_injP.
-by rewrite ker_irr_comp_op.
+by rewrite -irr_comp_envelop; apply/esym/mxrank_injP; rewrite ker_irr_comp_op.
 Qed.
 
 End IrrComponent.

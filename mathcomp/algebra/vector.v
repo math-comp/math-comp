@@ -402,7 +402,7 @@ Qed.
 
 Fact memv_submod_closed U : submod_closed U.
 Proof.
-split=> [|a u v]; rewrite !memvK ?linear0 ?sub0mx // => Uu Uv.
+split=> [|a u v]; rewrite !memvK 1?linear0 1?sub0mx // => Uu Uv.
 by rewrite linearP addmx_sub ?scalemx_sub.
 Qed.
 HB.instance Definition _ (U : {vspace vT}) :=
@@ -1011,7 +1011,7 @@ Qed.
 Lemma coord_sum_free n (X : n.-tuple vT) k j :
   free X -> coord X j (\sum_(i < n) k i *: X`_i) = k j.
 Proof.
-move=> Xfree; rewrite linear_sum (bigD1 j) ?linearZ //= coord_free // eqxx.
+move=> Xfree; rewrite linear_sum (bigD1 j) 1?linearZ //= coord_free // eqxx.
 rewrite mulr1 big1 ?addr0 // => i /negPf j'i.
 by rewrite linearZ /= coord_free // j'i mulr0.
 Qed.
