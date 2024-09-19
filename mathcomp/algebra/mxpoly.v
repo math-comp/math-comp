@@ -341,9 +341,8 @@ Definition powers_mx d := \matrix_(i < d) mxvec (A ^+ i).
 Lemma horner_rVpoly m (u : 'rV_m) :
   horner_mx (rVpoly u) = vec_mx (u *m powers_mx m).
 Proof.
-rewrite mulmx_sum_row linear_sum [rVpoly u]poly_def rmorph_sum.
-apply: eq_bigr => i _.
-by rewrite valK /= !linearZ rmorphXn /= horner_mx_X rowK mxvecK.
+rewrite mulmx_sum_row [rVpoly u]poly_def 2!linear_sum; apply: eq_bigr => i _.
+by rewrite valK /= 2!linearZ rmorphXn/= horner_mx_X rowK mxvecK.
 Qed.
 
 End OneMatrix.
@@ -354,8 +353,8 @@ Proof.
 apply/matrixP => i j; rewrite !mxE.
 elim/poly_ind: p => [|p c ihp]; first by rewrite rmorph0 horner0 mxE mul0rn.
 rewrite !hornerE mulrnDl rmorphD rmorphM /= horner_mx_X horner_mx_C !mxE.
-rewrite (bigD1 j)//= ihp mxE ?eqxx mulr1n -mulrnAl big1 ?addr0//.
-  by case: (altP (i =P j)) => [->|]; rewrite /= !(mulr1n, addr0, mul0r).
+rewrite (bigD1 j)//= ihp mxE eqxx mulr1n -mulrnAl big1 ?addr0.
+  by have [->|_] := eqVneq; rewrite /= !(mulr1n, addr0, mul0r).
 by move=> k /negPf nkF; rewrite mxE nkF mulr0.
 Qed.
 

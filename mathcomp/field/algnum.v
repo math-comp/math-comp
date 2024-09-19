@@ -59,6 +59,23 @@ Local Notation pQtoC := (map_poly ratr).
 Local Definition intr_inj_ZtoC := (intr_inj : injective ZtoC).
 #[local] Hint Resolve intr_inj_ZtoC : core.
 
+Section MoreAlgCaut.
+
+Implicit Type rR : unitRingType.
+
+Lemma alg_num_field (Qz : fieldExtType rat) a : a%:A = ratr a :> Qz.
+Proof. by rewrite -in_algE fmorph_eq_rat. Qed.
+
+Lemma rmorphZ_num (Qz : fieldExtType rat) rR (f : {rmorphism Qz -> rR}) a x :
+  f (a *: x) = ratr a * f x.
+Proof. by rewrite -mulr_algl rmorphM alg_num_field fmorph_rat. Qed.
+
+Lemma fmorph_numZ (Qz1 Qz2 : fieldExtType rat) (f : {rmorphism Qz1 -> Qz2}) :
+  scalable f.
+Proof. by move=> a x; rewrite rmorphZ_num -alg_num_field mulr_algl. Qed.
+
+End MoreAlgCaut.
+
 (* Number fields and rational spans. *)
 Lemma algC_PET (s : seq algC) :
   {z | exists a : nat ^ size s, z = \sum_(i < size s) s`_i *+ a i
@@ -97,10 +114,7 @@ suffices [Qs [QsC [z1 z1C z1gen]]]:
 - set inQs := fieldExt_horner z1 in z1gen *; pose s1 := map inQs ps.
   have inQsK p: QsC (inQs p) = (pQtoC p).[z].
     rewrite /= -horner_map z1C -map_poly_comp; congr _.[z].
-    apply: eq_map_poly => b /=; apply: canRL (mulfK _) _.
-      by rewrite intr_eq0 denq_eq0.
-    rewrite /= mulrzr -rmorphMz scalerMzl -{1}[b]divq_num_den -mulrzr.
-    by rewrite divfK ?intr_eq0 ?denq_eq0 // scaler_int rmorph_int.
+    by apply: eq_map_poly => b /=; rewrite alg_num_field fmorph_rat.
   exists Qs, QsC, s1; first by rewrite -map_comp Ds (eq_map inQsK).
   have sz_ps: size ps = size s by rewrite Ds size_map.
   apply/vspaceP=> x; rewrite memvf; have [p {x}<-] := z1gen x.
@@ -126,16 +140,13 @@ Definition in_Crat_span s x :=
 Fact Crat_span_subproof s x : decidable (in_Crat_span s x).
 Proof.
 have [Qxs [QxsC [[|x1 s1] // [<- <-] {x s} _]]] := num_field_exists (x :: s).
-have QxsC_Z a zz: QxsC (a *: zz) = QtoC a * QxsC zz.
-  rewrite mulrAC; apply: (canRL (mulfK _)); first by rewrite intr_eq0 denq_eq0.
-  by rewrite mulrzr mulrzl -!rmorphMz scalerMzl -mulrzr -numqE scaler_int.
 apply: decP (x1 \in <<in_tuple s1>>%VS) _; rewrite /in_Crat_span size_map.
 apply: (iffP idP) => [/coord_span-> | [a Dx]].
   move: (coord _) => a; exists [ffun i => a i x1]; rewrite rmorph_sum /=.
-  by apply: eq_bigr => i _; rewrite ffunE (nth_map 0).
+  by apply: eq_bigr => i _; rewrite ffunE rmorphZ_num (nth_map 0).
 have{Dx} ->: x1 = \sum_i a i *: s1`_i.
   apply: (fmorph_inj QxsC); rewrite Dx rmorph_sum /=.
-  by apply: eq_bigr => i _; rewrite QxsC_Z (nth_map 0).
+  by apply: eq_bigr => i _; rewrite rmorphZ_num (nth_map 0).
 by apply: memv_suml => i _; rewrite memvZ ?memv_span ?mem_nth.
 Qed.
 
@@ -161,23 +172,6 @@ by rewrite -mulrBl -rmorphB !ffunE.
 Qed.
 HB.instance Definition _ s := GRing.isZmodClosed.Build _ (Crat_span s)
   (Crat_span_zmod_closed s).
-
-Section MoreAlgCaut.
-
-Implicit Type rR : unitRingType.
-
-Lemma alg_num_field (Qz : fieldExtType rat) a : a%:A = ratr a :> Qz.
-Proof. by rewrite -in_algE fmorph_eq_rat. Qed.
-
-Lemma rmorphZ_num (Qz : fieldExtType rat) rR (f : {rmorphism Qz -> rR}) a x :
-  f (a *: x) = ratr a * f x.
-Proof. by rewrite -mulr_algl rmorphM /= alg_num_field fmorph_rat. Qed.
-
-Lemma fmorph_numZ (Qz1 Qz2 : fieldExtType rat) (f : {rmorphism Qz1 -> Qz2}) :
-  scalable f.
-Proof. by move=> a x; rewrite rmorphZ_num -alg_num_field mulr_algl. Qed.
-
-End MoreAlgCaut.
 
 Section NumFieldProj.
 
@@ -249,11 +243,9 @@ case: (splitting_field_normal 1%AS x) => rs /eqP Hrs.
 have: root (map_poly (nu \o QnC) (minPoly 1%AS x)) (nu (QnC x)).
   by rewrite fmorph_root root_minPoly.
 rewrite map_Qnum_poly ?minPolyOver // Hrs.
-rewrite [map_poly _ _](_:_ = \prod_(y <- map QnC rs) ('X - y%:P)); last first.
-  rewrite big_map rmorph_prod /=; apply: eq_bigr => i _.
-  by rewrite rmorphB /= map_polyX map_polyC.
-rewrite root_prod_XsubC.
-by case/mapP => y _ ?; exists y.
+rewrite [map_poly _ _](_:_ = \prod_(y <- map QnC rs) ('X - y%:P)).
+  by rewrite root_prod_XsubC; case/mapP => y _ ?; exists y.
+by rewrite big_map rmorph_prod /=; apply: eq_bigr => i _; rewrite map_polyXsubC.
 Qed.
 
 (* Integral spans. *)
@@ -275,21 +267,18 @@ have enum_pairK j: {in predT, cancel (rank2 j) val21}.
 have Qz_Zs a: inQzs (\sum_(i < m) s`_i *~ a i).
   apply/forallP=> j; apply/Crat_spanP; rewrite /in_Crat_span size_map -cardE.
   exists [ffun ij => (a (val21 ij))%:Q *+ ((enum_val ij).2 == j)].
-  rewrite linear_sum {1}(reindex_onto _ _ (enum_pairK j)).
-  rewrite big_mkcond; apply: eq_bigr => ij _ /=; rewrite nth_image (tnth_nth 0).
-  rewrite (can2_eq (@enum_rankK _) (@enum_valK _)) ffunE -scaler_int /val21.
-  case Dij: (enum_val ij) => [i j1]; rewrite xpair_eqE eqxx /= eq_sym -mulrb.
-  by rewrite linearZ rmorphMn /= rmorph_int mulrnAl; case: eqP => // ->.
+  rewrite linear_sum {1}(reindex_onto _ _ (enum_pairK j)) big_mkcond /=.
+  apply: eq_bigr => ij _ /=; rewrite nth_image (tnth_nth 0) ffunE /val21.
+  rewrite raddfMz rmorphMn rmorph_int mulrnAl mulrzl /=.
+  rewrite (can2_eq (@enum_rankK _) (@enum_valK _)).
+  by case: (enum_val ij) => i j1; rewrite xpair_eqE eqxx; have [->|] := eqVneq.
 case Qz_v: (inQzs v); last by right=> [[a Dv]]; rewrite Dv Qz_Zs in Qz_v.
 have [Qz [QzC [z1s Dz_s _]]] := num_field_exists z_s.
 have sz_z1s: size z1s = #|IzT| by rewrite -(size_map QzC) Dz_s size_map cardE.
 have xv j: {x | coord b j v = QzC x}.
   apply: sig_eqW; have /Crat_spanP[x ->] := forallP Qz_v j.
-  exists (\sum_ij x ij *: z1s`_ij); rewrite rmorph_sum.
-  apply: eq_bigr => ij _; rewrite mulrAC.
-  apply: canLR (mulfK _) _; first by rewrite intr_eq0 denq_neq0.
-  rewrite mulrzr -rmorphMz scalerMzl -(mulrzr (x _)) -numqE scaler_int.
-  by rewrite rmorphMz mulrzl -(nth_map _ 0) ?Dz_s // -(size_map QzC) Dz_s.
+  exists (\sum_ij x ij *: z1s`_ij); rewrite rmorph_sum; apply: eq_bigr => ij _.
+  by rewrite rmorphZ_num -[in RHS](nth_map _ 0) ?Dz_s // -(size_map QzC) Dz_s.
 pose sz := [tuple [ffun j => z1s`_(rank2 j i)] | i < m].
 have [Zsv | Zs'v] := dec_Qint_span sz [ffun j => sval (xv j)].
   left; have{Zsv} [a Dv] := Zsv; exists a.
@@ -355,15 +344,10 @@ pose SubAut := existT _ _ (_, _) : subAut.
 pose Sdom (mu : subAut) := projT1 mu.
 pose Sinj (mu : subAut) : {rmorphism Sdom mu -> algC} := (projT2 mu).1.
 pose Saut (mu : subAut) : {rmorphism Sdom mu -> Sdom mu} := (projT2 mu).2.
-have SinjZ Qr (QrC : numF_inj Qr) a x: QrC (a *: x) = QtoC a * QrC x.
-  rewrite mulrAC; apply: canRL (mulfK _) _.
-    by rewrite intr_eq0 denq_neq0.
-  by rewrite mulrzr mulrzl -!rmorphMz scalerMzl -[x *~ _]scaler_int -mulrzr
-             -numqE.
 have Sinj_poly Qr (QrC : numF_inj Qr) p:
   map_poly QrC (map_poly (in_alg Qr) p) = pQtoC p.
 - rewrite -map_poly_comp; apply: eq_map_poly => a.
-  by rewrite /= SinjZ rmorph1 mulr1.
+  by rewrite /= rmorphZ_num rmorph1 mulr1.
 have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
   & exists2 in01 : {lrmorphism _ -> _}, Sinj mu0 =1 Sinj mu1 \o in01
   & {morph in01: y / Saut mu0 y >-> Saut mu1 y}}.
@@ -381,12 +365,12 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     have in01P y: {yy | Sinj mu0 y = QrC yy}.
       exists (\sum_i coord b0 i y *: (map_poly (in_alg Qr) ps`_i).[zz]).
       rewrite {1}(coord_vbasis (memvf y)) !rmorph_sum /=; apply: eq_bigr => i _.
-      rewrite !SinjZ; congr (_ * _); rewrite -(nth_map _ 0) ?size_tuple // Ds.
+      rewrite 2!rmorphZ_num -(nth_map _ 0) ?size_tuple // Ds.
       rewrite -horner_map Dz Sinj_poly (nth_map 0) //.
       by have:= congr1 size Ds; rewrite !size_map size_tuple => <-.
     pose in01 y := sval (in01P y).
     have Din01 y: Sinj mu0 y = QrC (in01 y) by rewrite /in01; case: (in01P y).
-    pose rwM := (=^~ Din01, SinjZ, rmorph1, rmorphB, rmorphM).
+    pose rwM := (=^~ Din01, rmorphZ_num, rmorph1, rmorphB, rmorphM).
     have in01a : additive in01.
       by move=> ? ?; apply: (fmorph_inj QrC); rewrite !rwM.
     have in01m : multiplicative in01.
@@ -428,15 +412,14 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     apply: splittingFieldForS (sub1v (Sub K algK)) (subvf _) _; exists rr => //.
     congr (_ %= _): (eqpxx pr); apply/(map_poly_inj QrC).
     rewrite Sinj_poly Dr -Drr big_map rmorph_prod /=; apply: eq_bigr => zz _.
-    by rewrite rmorphB /= map_polyX map_polyC.
+    by rewrite map_polyXsubC.
   have [f1 aut_f1 Df1]:= kHom_extends (sub1v (ASpace algK)) hom_f Qpr splitQr.
   pose f1mM := GRing.isMultiplicative.Build _ _ f1 (kHom_lrmorphism aut_f1).
   pose nu : {lrmorphism _ -> _} := HB.pack (fun_of_lfun f1) f1mM.
   exists (SubAut Qr QrC nu) => //; exists in01 => //= y.
   by rewrite -Df -Df1 //; apply/memK; exists y.
 have phiZ: scalable phi.
-  move=> a y; do 2!rewrite -mulr_algl -in_algE; rewrite -[a]divq_num_den.
-  by rewrite fmorph_div rmorphM [X in X * _]fmorph_div !rmorph_int.
+  by move=> a y; rewrite rmorphZ_num -alg_num_field mulr_algl.
 pose philM := GRing.isScalable.Build _ _ _ _ phi phiZ.
 pose phiLRM : {lrmorphism _ -> _} := HB.pack (GRing.RMorphism.sort phi) philM.
 pose fix ext n :=
@@ -503,8 +486,7 @@ have pzn_zk0: root (map_poly \1%VF (minPoly 1 zn)) (zn ^+ k).
     exists (\poly_(i < size (minPoly 1 zn)) sval (a_ i)).
     apply/polyP=> i; rewrite coef_poly coef_map coef_poly /=.
     case: ifP => _; rewrite ?rmorph0 //; case: (a_ i) => a /= ->.
-    apply: canRL (mulfK _) _; first by rewrite intr_eq0 denq_eq0.
-    by rewrite mulrzr -rmorphMz scalerMzl -mulrzr -numqE scaler_int rmorph_int.
+    by rewrite alg_num_field fmorph_rat.
   have: root p1 z by rewrite -Dz fmorph_root root_minPoly.
   rewrite Dp1; have [q2 [Dq2 _] ->] := minCpolyP z.
   case/dvdpP=> r1 ->; rewrite rmorphM rootM /= -Dq2; apply/orP; right.

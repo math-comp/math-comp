@@ -126,7 +126,7 @@ HB.instance Definition _ n1 m2 n2 A :=
   GRing.isLinear.Build _ _ _ _ (@trow n1 A m2 n2)
     (@trow_is_linear n1 m2 n2 A).
 
-Fixpoint tprod  (m1 : nat) :
+Fixpoint tprod (m1 : nat) :
   forall n1 (A : 'M[F]_(m1,n1)) m2 n2 (B : 'M[F]_(m2,n2)),
         'M[F]_(m1 * m2,n1 * n2) :=
   if m1 is m'1.+1
@@ -496,7 +496,7 @@ Definition xcfun (chi : 'CF(G)) A :=
   (gring_row A *m (\col_(i < #|G|) chi (enum_val i))) 0 0.
 
 Lemma xcfun_is_additive phi : additive (xcfun phi).
-Proof. by move=> A B; rewrite /xcfun linearB mulmxBl !mxE. Qed.
+Proof. by move=> A B; rewrite /xcfun [gring_row _]linearB mulmxBl !mxE. Qed.
 HB.instance Definition _ phi :=
   GRing.isAdditive.Build 'M_(gcard G) _ (xcfun phi) (xcfun_is_additive phi).
 
