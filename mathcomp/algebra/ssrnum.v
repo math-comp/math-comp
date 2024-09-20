@@ -1,9 +1,9 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
-From mathcomp Require Import ssralg poly.
+From mathcomp Require Import ssreflect ssrfun ssrbool ssrnotations eqtype.
+From mathcomp Require Import ssrnat seq choice ssrAC div fintype path bigop.
+From mathcomp Require Import order finset fingroup ssralg poly.
 
 (******************************************************************************)
 (*                            Number structures                               *)
@@ -3588,7 +3588,7 @@ Qed.
 
 End RealClosedFieldTheory.
 
-Notation "z ^*" := (conj_op z) (at level 2, format "z ^*") : ring_scope.
+Notation "z ^*" := (conj_op z) : ring_scope.
 Notation "'i" := imaginary (at level 0) : ring_scope.
 
 Section ClosedFieldTheory.
