@@ -1874,6 +1874,8 @@ Proof.
 move=> le_mn le_np; rewrite -big_cat -{2}(subnKC le_mn) -iotaD subnDA.
 by rewrite subnKC // leq_sub.
 Qed.
+Global Arguments big_cat_nat : clear implicits.
+Global Arguments big_cat_nat _ [_ _ _ _].
 
 Lemma big_nat_widenl (m1 m2 n : nat) (P : pred nat) F :
   m2 <= m1 ->
@@ -1883,7 +1885,7 @@ Proof.
 move=> le_m21; have [le_nm1|lt_m1n] := leqP n m1.
   rewrite big_geq// big_nat_cond big1//.
   by move=> i /and3P[/andP[_ /leq_trans/(_ le_nm1)/ltn_geF->]].
-rewrite big_mkcond big_mkcondl (big_cat_nat _ _ le_m21) 1?ltnW//.
+rewrite big_mkcond big_mkcondl (big_cat_nat _ le_m21) 1?ltnW//.
 rewrite [X in op X]big_nat_cond [X in op X]big_pred0; last first.
   by move=> k; case: ltnP; rewrite andbF.
 by rewrite Monoid.mul1m; apply: congr_big_nat => // k /andP[].
