@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `ssrnum.v`
   + lemma `invf_pgt`, `invf_pge`, `invf_ngt`, `invf_nge`
   + lemma `invf_plt`, `invf_ple`, `invf_nlt`, `invf_nle`
+
 - in `bigop.v`
   + lemma `big_ord1`, `big_ord1_cond`, `big_rcons_op`, `big_change_idx`,
     `big_rcons`, `big_only1`, `big_mknat`
@@ -57,6 +58,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `ssralg.v`
   + lemmas `prodM_comm`, `prodMl_comm`, `prodMr_comm`, `prodrMl`, `prodrMr`
+    `rev_prodr`, `unitr_prod`, `unitr_prod_in`, `rev_prodrV`,
+    `unitr_prodP`, `prodrV`
 
 - in `ssrbool.v`
   + lemmas `classic_sigW`, `classic_ex`
