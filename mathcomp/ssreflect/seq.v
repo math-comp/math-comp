@@ -1196,11 +1196,6 @@ Proof. by apply: (iffP allP) => a_s x /a_s/aP. Qed.
 
 End Filters.
 
-Notation "'has_ view" := (hasPP _ (fun _ => view))
-  (at level 4, right associativity, format "''has_' view").
-Notation "'all_ view" := (allPP _ (fun _ => view))
-  (at level 4, right associativity, format "''all_' view").
-
 Section EqIn.
 
 Variables a1 a2 : pred T.
@@ -1522,6 +1517,11 @@ Proof. by move=> ?; rewrite eq_sym uniq_eqseq_pivotl//; case: eqVneq => /=. Qed.
 
 End EqSeq.
 Arguments eqseq : simpl nomatch.
+
+Notation "'has_ view" := (hasPP _ (fun _ => view))
+  (at level 4, right associativity, format "''has_' view").
+Notation "'all_ view" := (allPP _ (fun _ => view))
+  (at level 4, right associativity, format "''all_' view").
 
 Section RotIndex.
 Variables (T : eqType).

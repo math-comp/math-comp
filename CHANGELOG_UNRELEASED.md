@@ -23,6 +23,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `bigop.v`
   + lemma `big_ord1`, `big_ord1_cond`, `big_rcons_op`, `big_change_idx`,
     `big_rcons`, `big_only1`, `big_mknat`
+  + lemmas `big_rev`, `rev_big_rev` and `big_morph_in`
 
 - in `eqtype.v`
   + definition `dfwith`
@@ -160,6 +161,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemma `irreducible_rat_int`
 
 ### Changed
+
+- in `seq.v`
+  + fix incorrectly exported notations `'all_view` and `'has_view`
 
 - in `bigop.v`
   + weaken hypothesis of lemma `telescope_sumn_in`

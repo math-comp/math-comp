@@ -1554,16 +1554,10 @@ HB.instance Definition _ (R : semiRingType) :=
 HB.instance Definition _ (R : ringType) := SemiRing.on R^c.
 End ConverseRing.
 
-
 Lemma rev_prodr (R : semiRingType)
   (I : Type) (r : seq I) (P : pred I) (E : I -> R) :
   \prod_(i <- r | P i) (E i : R^c) = \prod_(i <- rev r | P i) E i.
-Proof.
-elim: r => [|x r IHr]; first by rewrite !big_nil.
-rewrite big_cons rev_cons big_rcons /= {}IHr.
-by case: (P x); rewrite ?mulr1.
-Qed.
-
+Proof. by rewrite rev_big_rev. Qed.
 
 Section SemiRightRegular.
 
@@ -2949,18 +2943,15 @@ Arguments invrK {R}.
 Arguments invr_inj {R} [x1 x2].
 Arguments telescope_prodr_eq {R n m} f u.
 
-
 Lemma rev_prodrV (R : unitRingType)
   (I : Type) (r : seq I) (P : pred I) (E : I -> R) :
   (forall i, P i -> E i \is a GRing.unit) ->
   \prod_(i <- r | P i) (E i)^-1 = ((\prod_(i <- r | P i) (E i : R^c))^-1).
 Proof.
-move=> Eunit.
-have := unitr_prod r (Eunit : forall i, P i -> (E i : R^c) \is a GRing.unit).
-elim/big_rec2: _ => [|i x y Pi]; first by rewrite invr1.
-by rewrite unitrMr ?Eunit// => + yunit => ->//; rewrite invrM// ?Eunit.
+move=> Eunit; symmetry.
+apply: (big_morph_in GRing.unit _ _ (unitr1 R^c) (@invrM _) (invr1 _)) Eunit.
+by move=> x y xunit; rewrite unitrMr.
 Qed.
-
 
 Section UnitRingClosedPredicates.
 
@@ -3096,20 +3087,15 @@ Lemma unitr_prodP (I : eqType) (r : seq I) (P : pred I) (E : I -> R) :
   reflect {in r, forall i, P i -> E i \is a GRing.unit}
     (\prod_(i <- r | P i) E i \is a GRing.unit).
 Proof.
-apply (iffP idP); last exact: unitr_prod_in.
-elim: r => [|r0 r IHr] //; rewrite big_cons.
-case: (boolP (P r0)) => [Pr0 | /negbTE nPr0].
-  rewrite unitrM => /andP[unitEr0 {}/IHr unitr].
-  by move=> i /[!inE]/orP[/eqP->{i} // | ]; last exact: unitr.
-by move=> {}/IHr unitr i /[!inE]/orP[/eqP->{i} // /[!nPr0]|]; last exact: unitr.
+rewrite (big_morph [in unit] unitrM (@unitr1 _) ) big_all_cond.
+exact: 'all_implyP.
 Qed.
 
 Lemma prodrV (I : eqType) (r : seq I) (P : pred I) (E : I -> R) :
   (forall i, P i -> E i \is a GRing.unit) ->
   \prod_(i <- r | P i) (E i)^-1 = (\prod_(i <- r | P i) E i)^-1.
 Proof.
-move/rev_prodrV => ->; rewrite rev_prodr; congr _^-1 => /=.
-by apply: perm_big; rewrite perm_rev.
+by move=> /rev_prodrV->; rewrite rev_prodr (perm_big r)// perm_rev.
 Qed.
 
 (* TODO: HB.saturate *)
