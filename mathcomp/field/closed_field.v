@@ -882,7 +882,7 @@ have EtoKMul i : multiplicative (EtoK i : E i -> Kfield).
   by split=> [x y|]; rewrite ?EtoK_M ?EtoK_1.
 pose EtoKMa i := GRing.isAdditive.Build _ _ _ (EtoKAdd i).
 pose EtoKMm i := GRing.isMultiplicative.Build _ _ _ (EtoKMul i).
-pose EtoKM i : GRing.RMorphism.type _ _ :=
+pose EtoKM i : {rmorphism _ -> _} :=
   HB.pack (EtoK i : E i -> Kfield) (EtoKMa i) (EtoKMm i).
 have EtoK_E: EtoK _ = EtoKM _ by [].
 have toEtoKp := @eq_map_poly _ Kring _ _(toEtoK _ _ _).

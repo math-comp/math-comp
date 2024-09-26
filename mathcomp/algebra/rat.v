@@ -839,7 +839,7 @@ Lemma rat_linear U V (f : U -> V) : additive f -> scalable f.
 Proof.
 move=> fB a u.
 pose aM := GRing.isAdditive.Build U V f fB.
-pose phi : GRing.Additive.type U V := HB.pack f aM.
+pose phi : {additive U -> V} := HB.pack f aM.
 rewrite -[f]/(phi : _ -> _) -{2}[a]divq_num_den mulrC -scalerA.
 apply: canRL (scalerK _) _; first by rewrite intr_eq0 denq_neq0.
 rewrite 2!scaler_int -3!raddfMz /=.
