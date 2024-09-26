@@ -218,7 +218,7 @@ have nu0m : multiplicative nu0.
   by rewrite !rmorphM /= !QnC_nu0.
 pose nu0aM := GRing.isAdditive.Build Qn Qn nu0 nu0a.
 pose nu0mM := GRing.isMultiplicative.Build Qn Qn nu0 nu0m.
-pose nu0RM : GRing.RMorphism.type _ _ := HB.pack nu0 nu0aM nu0mM.
+pose nu0RM : {rmorphism _ -> _} := HB.pack nu0 nu0aM nu0mM.
 pose nu0lM := GRing.isScalable.Build rat Qn Qn *:%R nu0 (fmorph_numZ nu0RM).
 pose nu0LRM : {lrmorphism _ -> _} := HB.pack nu0 nu0aM nu0mM nu0lM.
 by exists nu0LRM.
@@ -496,7 +496,7 @@ have pzn_zk0: root (map_poly \1%VF (minPoly 1 zn)) (zn ^+ k).
 have phim : multiplicative phi.
   by apply/kHom_lrmorphism; rewrite -genQn span_seq1 /= kHomExtendP.
 pose phimM := GRing.isMultiplicative.Build _ _ phi phim.
-pose phiRM : GRing.RMorphism.type _ _ := HB.pack (fun_of_lfun phi) phimM.
+pose phiRM : {rmorphism _ -> _} := HB.pack (fun_of_lfun phi) phimM.
 have [nu Dnu] := extend_algC_subfield_aut QnC phiRM.
 exists nu => _ /(prim_rootP prim_z)[i ->].
 rewrite rmorphXn /= exprAC -Dz -Dnu /= -{1}[zn]hornerX /phi.

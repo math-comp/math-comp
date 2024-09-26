@@ -278,7 +278,7 @@ Lemma kAutf_lker0 K f : kHom K {:L} f -> lker f == 0%VS.
 Proof.
 move/(kHomSl (sub1v _))/kHom_lrmorphism=> fM.
 pose fmM := GRing.isMultiplicative.Build _ _ _ fM.
-pose fRM : GRing.RMorphism.type _ _ := HB.pack (fun_of_lfun f) fmM.
+pose fRM : {rmorphism _ -> _} := HB.pack (fun_of_lfun f) fmM.
 by apply/lker0P; apply: (fmorph_inj fRM).
 Qed.
 
@@ -496,7 +496,7 @@ rewrite -DhomEz; apply/kAHomP => _ /Fadjoin_polyP[q Eq ->].
 have homLfj: kHom E {:L} fj := comp_kHom (inv_kHomf homLfi) homLf.
 have /kHom_lrmorphism fjM := kHomSl (sub1v _) homLfj.
 pose fjmM := GRing.isMultiplicative.Build _ _ _ fjM.
-pose fjRM : GRing.RMorphism.type _ _ := HB.pack (fun_of_lfun fj) fjmM.
+pose fjRM : {rmorphism _ -> _} := HB.pack (fun_of_lfun fj) fjmM.
 rewrite -[fj _](horner_map fjRM) (kHom_poly_id homLfj) //=.
 by rewrite (@lfunE _ _ L) /= Dfz -fi_z lker0_lfunK.
 Qed.

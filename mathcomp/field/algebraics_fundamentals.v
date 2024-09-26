@@ -610,7 +610,7 @@ have some_realC: realC.
       exact: can2_rmorphism (inj_can_sym QfK (fmorph_inj _)) QfK.
     pose faM := GRing.isAdditive.Build _ _ _ fA.
     pose fmM := GRing.isMultiplicative.Build _ _ _ fM.
-    pose fRM : GRing.RMorphism.type _ _ := HB.pack f faM fmM.
+    pose fRM : {rmorphism _ -> _} := HB.pack f faM fmM.
     by exists 0, rat; exact: fRM.
   have /Fadjoin1_polyP/sig_eqW[q]: x \in <<1; 0>>%VS by rewrite -sQof2 rmorph0.
   by exists q.[0]; rewrite -horner_map rmorph0.
@@ -886,7 +886,7 @@ have conjM : multiplicative conj.
   by rewrite /conj -/n1 -(rmorph1 (ofQ (z_ n1))) /conj_ ofQ_K !rmorph1.
 have conjaM := GRing.isAdditive.Build _ _ _ conjA.
 have conjmM := GRing.isMultiplicative.Build _ _ _ conjM.
-pose conjRM : GRing.RMorphism.type _ _ := HB.pack conj conjaM conjmM.
+pose conjRM : {rmorphism _ -> _} := HB.pack conj conjaM conjmM.
 exists conjRM => [z | /(_ i)/eqP/idPn[]] /=.
   by have [n [/conjE-> /(conjK (n_ z))->]] := maxn3 (n_ (conj z)) (n_ z) 0.
 rewrite /conj/conj_ cj_i rmorphN inQ_K // eq_sym -addr_eq0 -mulr2n -mulr_natl.
