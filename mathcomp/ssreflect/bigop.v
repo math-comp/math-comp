@@ -2020,7 +2020,7 @@ Qed.
 Lemma big_rev I (r : seq I) P F :
   \big[*%M/1]_(i <- rev r | P i) F i = \big[*%M/1]_(i <- r | P i) F i.
 Proof.
-by rewrite rev_big_rev; apply: eq_big_op => //= x y _ _; apply: mulmC.
+by rewrite rev_big_rev; apply: (eq_big_op (fun=> True)) => // *; apply: mulmC.
 Qed.
 
 Lemma eq_big_idem (I : eqType) (r1 r2 : seq I) (P : pred I) F :
