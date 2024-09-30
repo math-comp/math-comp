@@ -20,8 +20,8 @@ ssrint.v
 ssrnum.v
 vector.v
 zmodp.v
+sesquilinear.v
 spectral.v
-forms.v
 
 -R . mathcomp.algebra
 
