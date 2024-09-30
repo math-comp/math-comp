@@ -4,56 +4,110 @@ From mathcomp Require Import choice fintype tuple bigop ssralg finset fingroup.
 From mathcomp Require Import zmodp poly order ssrnum matrix mxalgebra vector.
 
 (******************************************************************************)
-(* {bilinear U -> V -> W | s & s'} == the type of bilinear forms which are    *)
-(*                                    essentially functions of type           *)
-(*                                    U -> V -> W                             *)
-(*                                    s and s' are two scaling operations     *)
-(*     {bilinear U -> V -> W | s } := {bilinear U -> V -> W | s.1 & s.2}      *)
-(*         {bilinear U -> V -> W}  := {bilinear U -> V -> W | *:%R & *:%R }   *)
-(*                   {biscalar U}  := {bilinear U -> U -> _ | *%R & *%R }     *)
+(*                            Sesquilinear forms                              *)
+(*                                                                            *)
+(*                u ``_ i := u 0 i                                            *)
+(*                   e_ j := the row matrix with a 1 in column j              *)
+(*                M ^ phi := map_mx phi M                                     *)
+(*                           Notation in scope form_scope.                    *)
+(*               M ^t phi := (M ^T) ^ phi                                     *)
+(*                           Notation in scope form_scope.                    *)
+(* involutive_rmorphism R == the type of involutive functions                 *)
+(*                           R has type ringType.                             *)
+(*                           The HB class is InvolutiveRMorphism.             *)
+(*                                                                            *)
+(* {bilinear U -> U' -> V | s & s'} == the type of bilinear forms which are   *)
+(*                           essentially functions of type U -> U' -> V       *)
+(*                           U and U' are lmodType's, V is a zmodType, s and  *)
+(*                           s' are scaling operations of type R -> V -> V.   *)
+(*                           The HB class is Bilinear.                        *)
+(*                           The factory bilinear_isBilinear provides a way   *)
+(*                           to instantiate a bilinear form from two          *)
+(*                           GRing.linear_for proofs.                         *)
+(* {bilinear U -> V -> W | s } := {bilinear U -> V -> W | s.1 & s.2}          *)
+(* {bilinear U -> V -> W} := {bilinear U -> V -> W | *:%R & *:%R }            *)
+(*           {biscalar U} := {bilinear U -> U -> _ | *%R & *%R }              *)
+(*                                                                            *)
+(*             applyr f x := f ^~ x with f : U -> U' -> V                     *)
+(*       form theta M u v == form defined from a matrix M                     *)
+(*                        := (u *m M *m (v ^t theta)) 0 0                     *)
+(*                           u and v are row vectors, M is a square matrix,   *)
+(*                           coefficients have type R : fieldType,            *)
+(*                           theta is a morphism                              *)
 (*                                                                            *)
 (* {hermitian U for eps & theta} == hermitian/skew-hermitian form             *)
-(*                            eps is a boolean flag (false -> hermitian form, *)
-(*                            true -> skew-hermitian form)                    *)
-(*                            theta is a function R -> R (R : ringType)       *)
-(*                            it is precomposed before *%R and used as        *)
-(*                            the second scaling operation of the bilinear    *)
-(*                            form                                            *)
-(*                            The archetypal case is theta being the complex  *)
-(*                            conjugate.                                      *)
+(*                           eps is a boolean flag,                           *)
+(*                           (false -> hermitian, true -> skew-hermitian),    *)
+(*                           theta is a function R -> R (R : ringType).       *)
+(*                           The HB class is Hermitian.                       *)
+(*                           *%R is used as a the first scaling operator.     *)
+(*                           theta \; *R is used as the second scaling        *)
+(*                           operation of the bilinear form.                  *)
+(*                           The archetypal case is theta being the complex   *)
+(*                           conjugate.                                       *)
 (*                                                                            *)
-(*           {dot U for theta} == type of positive definite forms             *)
-(*               {symmetric U} == symmetric form                              *)
-(*                             := {hermitian U for false & idfun}             *)
-(*          {skew_symmetric U} == skew-symmetric form                         *)
-(*                             := {hermitian U for true & idfun}              *)
+(* M \is (eps, theta).-sesqui == M is a sesquilinear form                     *)
+(*                                                                            *)
+(*      orthomx theta M B == M-orthogonal completement of B                   *)
+(*                        := kermx (M *m B ^t theta)                          *)
+(*                           M is a square matrix representing a sesquilinear *)
+(*                           form, B is a rectangle matrix representing a     *)
+(*                           subspace                                         *)
+(*                           (local notation: B ^_|_)                         *)
+(*        ortho theta M B == orthomx theta M B with theta a morphism          *)
+(*                A _|_ B := (A%MS <= B^_|_)%MS                               *)
+(*                           This is a local notation.                        *)
+(*            rad theta M := ortho theta M 1%:M                               *)
+(*                           (local notation: 1%:M^_|_)                       *)
+(*                                                                            *)
+(*          {symmetric U} == symmetric form                                   *)
+(*                        := {hermitian U for false & idfun}                  *)
+(*     {skew_symmetric U} == skew-symmetric form                              *)
+(*                        := {hermitian U for true & idfun}                   *)
 (* {hermitian_sym U for theta} := hermitian form using theta (eps = false)    *)
+(*      {dot U for theta} == type of positive definite forms                  *)
+(*                           The HB class is Dot.                             *)
 (*                                                                            *)
-(*      is_skew eps theta form := eps = true /\ theta = idfun                 *)
-(*       is_sym eps theta form := eps = false /\ theta = idfun                *)
-(*   is_hermsym eps theta form := eps = false                                 *)
+(*    is_skew eps theta form := eps = true /\ theta = idfun                   *)
+(*     is_sym eps theta form := eps = false /\ theta = idfun                  *)
+(* is_hermsym eps theta form := eps = false                                   *)
 (*                                                                            *)
-(*       pairwise_orthogonal S == elements of S are pairwise orthogonal and   *)
-(*                                S does not contain 0                        *)
-(*               orthonormal S == S is an orthonormal set of "vectors"        *)
-(*            orthogonal S1 S2 == the inner product of an element of S1 and   *)
-(*                                an element of S2 is 0                       *)
+(*        ortho_rec s1 s2 := elements of s1 and s2 are pairwise orthogonal    *)
+(*  pairwise_orthogonal s == elements of s are pairwise orthogonal and        *)
+(*                           s does not contain 0                             *)
+(*       orthogonal s1 s2 == the inner product of an element of S1 and        *)
+(*                           an element of S2 is 0                            *)
+(*                        := ortho_rec s1 s2                                  *)
+(*          orthonormal s == s is an orthonormal set of unit vectors          *)
 (*                                                                            *)
-(*    isometry form1 form2 tau == tau is an isometry from form1 to form2      *)
-(*  {in D, isometry tau, to R} == TODO: this notation is local for now        *)
-(*                    orthov V == the space orthogonal to V                   *)
+(*  isometry form1 form2 tau == tau is an isometry from form1 to form2        *)
+(*                              form1 and form2 are hermitian forms.          *)
+(*  {in D, isometry tau, to R} == local notation for now                      *)
+(*                                                                            *)
+(*  orthov (V : {vspace vT}) == the space orthogonal to V                     *)
+(*                                                                            *)
+(* In the following definitions, we have f : {hermitian vT for eps & theta}   *)
+(* with vT : vectType F (F : fieldType):                                      *)
+(*        nondegenerate f == f is non-degenerated                             *)
+(*        is_symplectic f == f is a symplectic bilinear form                  *)
+(*        is_orthogonal f == f is an orthogonal form                          *)
+(*           is_unitary f == f is a unitary form                              *)
+(*                                                                            *)
+(* form_of_matrix theta M U V := \tr (U *m M *m (V ^t theta))                 *)
+(*       matrix_of_form f := \matrix_(i, j) form 'e_i 'e_j                    *)
+(* M \is hermitianmx eps theta == same as M \is (eps, theta).-sesqui          *)
+(*                           without the constraint that theta is a morphism  *)
+(*                                                                            *)
+(*            symmetricmx := hermitianmx _ false idfun                        *)
+(*                 skewmx := hermitianmx _ true idfun                         *)
+(*              hermsymmx := hermitianmx _ false conjC                        *)
+(*                                                                            *)
 (******************************************************************************)
 
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Local Open Scope ring_scope.
-Import GRing.Theory Order.Theory Num.Theory.
-
-Reserved Notation "'[ u , v ]_ M"
-         (at level 2, format "'[hv' ''[' u , '/ '  v ]_ M ']'").
-Reserved Notation "'[ u ]_ M" (at level 2, format "''[' u ]_ M").
 Reserved Notation "u '``_' i"
     (at level 3, i at level 2, left associativity, format "u '``_' i").
 Reserved Notation "A ^!"    (at level 2, format "A ^!").
@@ -61,45 +115,33 @@ Reserved Notation "A ^_|_"    (at level 8, format "A ^_|_").
 Reserved Notation "A _|_ B" (at level 69, format "A  _|_  B").
 Reserved Notation "eps_theta .-sesqui" (at level 2, format "eps_theta .-sesqui").
 
-Notation "''e_' i" := (delta_mx 0 i)
- (format "''e_' i", at level 3) : ring_scope.
+Local Open Scope ring_scope.
+Import GRing.Theory Order.Theory Num.Theory.
 
-Local Notation "M ^ phi" := (map_mx phi M).
-Local Notation "M ^t phi" := (map_mx phi (M ^T)) (phi at level 30, at level 30).
+Notation "u '``_' i" := (u 0%R i) : ring_scope.
 
-Lemma eq_map_mx_id (R : ringType) m n (M : 'M[R]_(m,n)) (f : R -> R) :
+Notation "''e_' j" := (delta_mx 0 j)
+ (format "''e_' j", at level 8, j at level 2) : ring_scope.
+
+Notation "M ^ phi" := (map_mx phi M) : form_scope.
+Notation "M ^t phi" := ((M ^T) ^ phi)
+  (phi at level 30, at level 30) : form_scope.
+
+(* TODO: move? *)
+Lemma eq_map_mx_id (R : ringType) m n (M : 'M[R]_(m, n)) (f : R -> R) :
   f =1 id -> M ^ f = M.
 Proof. by move=> /eq_map_mx->; rewrite map_mx_id. Qed.
 
-HB.mixin Record isInvolutive (R : ringType) (f : R -> R) := {
-  involutive_subproof : involutive f
-}.
+HB.mixin Record isInvolutive (R : ringType) (f : R -> R) :=
+  { involutive_subproof : involutive f }.
 
+(* TODO: move? *)
 #[short(type="involutive_rmorphism")]
 HB.structure Definition InvolutiveRMorphism (R : ringType) :=
   { f of @GRing.RMorphism R R f & @isInvolutive R f }.
 
-(*Record class_of (f : R -> R) : Type :=
-  Class {base : rmorphism f; mixin : involutive f}.
-Local Coercion base : class_of >-> rmorphism.
-
-Canonical additive := GRing.Additive.Pack (Phant (R -> R)) class.
-Canonical rmorphism := GRing.RMorphism.Pack (Phant (R -> R)) class.*)
-
-(*Notation "{ 'involutive_rmorphism' fRS }" := (map (Phant fRS))
-  (at level 0, format "{ 'involutive_rmorphism'  fRS }") : ring_scope.
-Notation "[ 'involutive_rmorphism' 'of' f 'as' g ]" := (@clone _ _ f g _ _ idfun id)
-  (at level 0, format "[ 'involutive_rmorphism'  'of'  f  'as'  g ]") : form_scope.
-Notation "[ 'involutive_rmorphism' 'of' f ]" := (@clone _ _ f f _ _ id id)
-  (at level 0, format "[ 'involutive_rmorphism'  'of'  f ]") : form_scope.
-Coercion additive : map >-> GRing.Additive.map.
-Canonical additive.
-Coercion rmorphism : map >-> GRing.RMorphism.map.
-Canonical rmorphism.*)
-
 Section InvolutiveTheory.
-
-Variable (R : ringType).
+Variable R : ringType.
 
 Let idfunK : involutive (@idfun R). Proof. by []. Qed.
 
@@ -110,15 +152,32 @@ Proof. by move: f => [? [? ? []]]. Qed.
 
 End InvolutiveTheory.
 
-(** Contents *)
+Definition conjC {C : numClosedFieldType} (c : C) : C := c^*.
 
-Structure revop X Y Z (f : Y -> X -> Z) := RevOp {
+HB.instance Definition _ (C : numClosedFieldType) :=
+  GRing.RMorphism.on (@conjC C).
+
+Section conjC_involutive.
+Variable C : numClosedFieldType.
+
+Let conjCfun_involutive : involutive (@conjC C). Proof. exact: conjCK. Qed.
+
+HB.instance Definition _ :=
+  isInvolutive.Build _ (@conjC C) conjCfun_involutive.
+
+End conjC_involutive.
+
+Lemma map_mxCK {C : numClosedFieldType}  m n (A : 'M[C]_(m, n)) :
+  (A ^ conjC) ^ conjC = A.
+Proof. by apply/matrixP=> i j; rewrite !mxE conjCK. Qed.
+
+(*Structure revop X Y Z (f : Y -> X -> Z) := RevOp {
   fun_of_revop :> X -> Y -> Z;
   _ : forall x, f x =1 fun_of_revop^~ x
 }.
 Notation "[ 'revop' revop 'of' op ]" :=
   (@RevOp _ _ _ revop op (fun _ _ => erefl))
-  (at level 0, format "[ 'revop'  revop  'of'  op ]") : form_scope.
+  (at level 0, format "[ 'revop'  revop  'of'  op ]") : form_scope.*)
 
 HB.mixin Record isBilinear (R : ringType) (U U' : lmodType R) (V : zmodType)
     (s : R -> V -> V) (s' : R -> V -> V) (f : U -> U' -> V) := {
@@ -153,33 +212,13 @@ HB.instance Definition _ := isBilinear.Build R U U' V s s' f
 HB.end.
 
 Module BilinearExports.
+
 Module Bilinear.
 Section bilinear.
 Variables (R : ringType) (U U' : lmodType R) (V : zmodType) (s s' : R -> V -> V).
-Implicit Type phUU'V : phant (U -> U' -> V).
 
-Notation bilinear f := (bilinear_for *:%R *:%R f).
-Notation biscalar f := (bilinear_for *%R *%R f).
-
-(*Definition map (R : ringType) (U U' : lmodType R) (V : zmodType)
-    (s : R -> V -> V) (s' : R -> V -> V)
-    (phUU'V : phant (U -> U' -> V)) := Bilinear.type U U' s s'.*)
-
-(*Local Coercion GRing.Scale.op : GRing.Scale.law >-> Funclass.*)
-(*Definition axiom (f : U -> U' -> V) (s_law : GRing.Scale.law s) (eqs : s = s_law)
-                                    (s'_law : GRing.Scale.law s') (eqs' : s' = s'_law) :=
-  ((forall u', GRing.Linear.axiom (f^~ u') eqs)
-  * (forall u, GRing.Linear.axiom (f u) eqs'))%type.
-
-Record class_of (f : U -> U' -> V) : Prop := Class {
-  basel : forall u', GRing.Linear.class_of s (f^~ u');
-  baser : forall u, GRing.Linear.class_of s' (f u)
-}.*)
-
-(*Canonical additiver phU'V phUU'V (u : U) cF := GRing.Additive.Pack phU'V
-  (baser (@class phUU'V cF) u).
-Canonical linearr phU'V  phUU'V (u : U) cF := GRing.Linear.Pack phU'V
-  (baser (@class phUU'V cF) u).*)
+Local Notation bilinear f := (bilinear_for *:%R *:%R f).
+Local Notation biscalar f := (bilinear_for *%R *%R f).
 
 (* Support for right-to-left rewriting with the generic linearZ rule. *)
 
@@ -188,34 +227,36 @@ Definition map_class := mapUUV.
 Definition map_at_left (a : R) := mapUUV.
 Definition map_at_right (b : R) := mapUUV.
 Definition map_at_both (a b : R) := mapUUV.
-Structure map_for_left a s_a := MapForLeft {map_for_left_map : mapUUV; _ : s a = s_a }.
-Structure map_for_right b s'_b := MapForRight {map_for_right_map : mapUUV; _ : s' b = s'_b }.
+Structure map_for_left a s_a :=
+  MapForLeft {map_for_left_map : mapUUV; _ : s a = s_a }.
+Structure map_for_right b s'_b :=
+  MapForRight {map_for_right_map : mapUUV; _ : s' b = s'_b }.
 Structure map_for_both a b s_a s'_b :=
   MapForBoth {map_for_both_map : mapUUV; _ : s a = s_a ; _ : s' b = s'_b }.
-Definition unify_map_at_left a (f : map_at_left a) := MapForLeft f (erefl (s a)).
-Definition unify_map_at_right b (f : map_at_right b) := MapForRight f (erefl (s' b)).
+Definition unify_map_at_left a (f : map_at_left a) :=
+  MapForLeft f (erefl (s a)).
+Definition unify_map_at_right b (f : map_at_right b) :=
+  MapForRight f (erefl (s' b)).
 Definition unify_map_at_both a b (f : map_at_both a b) :=
    MapForBoth f (erefl (s a)) (erefl (s' b)).
 Structure wrapped := Wrap {unwrap : mapUUV}.
 Definition wrap (f : map_class) := Wrap f.
 End bilinear.
 End Bilinear.
-Notation "{ 'bilinear' U -> V -> W | s & t }" := (@Bilinear.type _ U%type V%type W%type s t)
-  (at level 0, U at level 98, V at level 98, W at level 99,
-   format "{ 'bilinear'  U  ->  V  ->  W  |  s  &  t }") : ring_scope.
-Notation "{ 'bilinear' U -> V -> W | s }" := ({bilinear U -> V -> W | s.1 & s.2})
-(* (@Bilinear.type _ U%type V%type W%type s.1 s.2)*)
-  (at level 0, U at level 98, V at level 98, W at level 99,
-   format "{ 'bilinear'  U  ->  V  ->  W  |  s }") : ring_scope.
+
+Notation "{ 'bilinear' U -> V -> W | s & t }" :=
+  (@Bilinear.type _ U%type V%type W%type s t)
+    (at level 0, U at level 98, V at level 98, W at level 99,
+     format "{ 'bilinear'  U  ->  V  ->  W  |  s  &  t }") : ring_scope.
+Notation "{ 'bilinear' U -> V -> W | s }" :=
+  ({bilinear U -> V -> W | s.1 & s.2})
+    (at level 0, U at level 98, V at level 98, W at level 99,
+     format "{ 'bilinear'  U  ->  V  ->  W  |  s }") : ring_scope.
 Notation "{ 'bilinear' U -> V -> W }" := {bilinear U -> V -> W  | *:%R & *:%R}
   (at level 0, U at level 98, V at level 98, W at level 99,
-  format "{ 'bilinear'  U  ->  V  -> W }") : ring_scope.
+   format "{ 'bilinear'  U  ->  V  -> W }") : ring_scope.
 Notation "{ 'biscalar' U }" := {bilinear U%type -> U%type -> _ | *%R & *%R}
   (at level 0, format "{ 'biscalar'  U }") : ring_scope.
-(*Notation "[ 'bilinear' 'of' f 'as' g ]" := (Bilinear.clone _ _ _ _ _ _ f g)
-  (at level 0, format "[ 'bilinear'  'of'  f  'as'  g ]") : form_scope.
-Notation "[ 'bilinear' 'of' f ]" := (Bilinear.clone _ _ _ _ _ _ f _)
-  (at level 0, format "[ 'bilinear'  'of'  f ]") : form_scope.*)
 End BilinearExports.
 
 Export BilinearExports.
@@ -223,71 +264,22 @@ Export BilinearExports.
 #[non_forgetful_inheritance]
 HB.instance Definition _ (R : ringType) (U U' : lmodType R) (V : zmodType)
     (s : R -> V -> V) (s' : R -> V -> V)
-  (f : {bilinear U -> U' -> V | s & s'}) (u : U) :=
-  @GRing.isAdditive.Build U' V (f u) (@additiver_subproof _ _ _ _ _ _ f u).
+  (f : {bilinear U -> U' -> V | s & s'}) (u : U)
+  := @GRing.isAdditive.Build U' V (f u) (@additiver_subproof _ _ _ _ _ _ f u).
 
 #[non_forgetful_inheritance]
 HB.instance Definition _ (R : ringType) (U U' : lmodType R) (V : zmodType)
-    (s : R -> V -> V) (s' : R -> V -> V) (f : @bilinear R U U' V s s') (u : U) :=
-  @GRing.isScalable.Build _ _ _ _ (f u) (@linearr_subproof _ _ _ _ _ _ f u).
+    (s : R -> V -> V) (s' : R -> V -> V) (f : @bilinear R U U' V s s') (u : U)
+  := @GRing.isScalable.Build _ _ _ _ (f u) (@linearr_subproof _ _ _ _ _ _ f u).
 
-(*Module BilinearExports.
-Notation "{ 'bilinear' fUV | s & s' }" := (Bilinear.map s s' (Phant fUV))
-  (at level 0, format "{ 'bilinear'  fUV  |  s  &  s' }") : ring_scope.
-Notation "{ 'bilinear' fUV | s }" := (Bilinear.map s.1 s.2 (Phant fUV))
-  (at level 0, format "{ 'bilinear'  fUV  |  s }") : ring_scope.
-Notation "{ 'bilinear' fUV }" := {bilinear fUV | *:%R & *:%R}
-  (at level 0, format "{ 'bilinear'  fUV }") : ring_scope.
-Notation "{ 'biscalar' U }" := {bilinear U -> U -> _ | *%R & *%R}
-  (at level 0, format "{ 'biscalar'  U }") : ring_scope.
-Notation "[ 'bilinear' 'of' f 'as' g ]" := (Bilinear.clone _ _ _ _ _ _ f g)
-  (at level 0, format "[ 'bilinear'  'of'  f  'as'  g ]") : form_scope.
-Notation "[ 'bilinear' 'of' f ]" := (Bilinear.clone _ _ _ _ _ _ f _)
-  (at level 0, format "[ 'bilinear'  'of'  f ]") : form_scope.
-End BilinearExports.*)
-
-Export BilinearExports.
-
-(* Fact applyr_key : unit. Proof. exact. Qed. *)
-(*Definition applyr_head U U' V t (f : U -> U' -> V) u v := let: tt := t in f v u.
-Notation applyr := (@applyr_head _ _ _ tt).*)
 Section applyr.
-
 Variables (R : ringType) (U U' : lmodType R) (V : zmodType) (s s' : R -> V -> V).
 
-(* Fact applyr_key : unit. Proof. exact. Qed. *)
 Definition applyr_head t (f : U -> U' -> V) u v := let: tt := t in f v u.
 
 End applyr.
 
 Notation applyr := (applyr_head tt).
-
-(*Module Exports.
-Notation bilinear_for s s' f := (axiom f (erefl s) (erefl s')).
-Notation bilinear f := (bilinear_for *:%R *:%R f).
-Notation biscalar f := (bilinear_for *%R *%R f).
-Notation bilmorphism_for s s' f := (class_of s s' f).
-Notation bilmorphism f := (bilmorphism_for *:%R *:%R f).
-Coercion baser : bilmorphism_for >-> Funclass.
-Coercion apply : map >-> Funclass.
-Notation "{ 'bilinear' fUV | s & s' }" := (map s s' (Phant fUV))
-  (at level 0, format "{ 'bilinear'  fUV  |  s  &  s' }") : ring_scope.
-Notation "{ 'bilinear' fUV | s }" := (map s.1 s.2 (Phant fUV))
-  (at level 0, format "{ 'bilinear'  fUV  |  s }") : ring_scope.
-Notation "{ 'bilinear' fUV }" := {bilinear fUV | *:%R & *:%R}
-  (at level 0, format "{ 'bilinear'  fUV }") : ring_scope.
-Notation "{ 'biscalar' U }" := {bilinear U -> U -> _ | *%R & *%R}
-  (at level 0, format "{ 'biscalar'  U }") : ring_scope.
-Notation "[ 'bilinear' 'of' f 'as' g ]" :=
-  (@pack  _ _ _ _ _ _ _ _ _ _ f g erefl _ _
-         (fun=> erefl) (fun=> idfun) _ _ (fun=> erefl) (fun=> idfun)).
-Notation "[ 'bilinear' 'of' f ]" :=  [bilinear of f as f]
-  (at level 0, format "[ 'bilinear'  'of'  f ]") : form_scope.*)
-(*Canonical additiver.
-Canonical linearr.
-Canonical additivel.
-Canonical linearl.
-Notation biapplyr := (@applyr_head _ _ _ _ tt).*)
 
 Coercion Bilinear.map_for_left_map : Bilinear.map_for_left >-> Bilinear.type.
 Coercion Bilinear.map_for_right_map : Bilinear.map_for_right >-> Bilinear.type.
@@ -303,16 +295,13 @@ Coercion Bilinear.wrap : Bilinear.map_class >-> Bilinear.wrapped.
 Canonical Bilinear.wrap.
 
 Section BilinearTheory.
-
 Variable R : ringType.
 
 Section GenericProperties.
-
 Variables (U U' : lmodType R) (V : zmodType) (s : R -> V -> V) (s' : R -> V -> V).
 Variable f : {bilinear U -> U' -> V | s & s'}.
 
 Section GenericPropertiesr.
-
 Variable z : U.
 
 #[local, non_forgetful_inheritance]
@@ -377,24 +366,23 @@ Section BidirectionalLinearZ.
 
 Variables (U U' : lmodType R) (V : zmodType) (s s' : R -> V -> V).
 Variables (S : ringType) (h : GRing.Scale.law S V) (h' : GRing.Scale.law S V).
-(*Variables (h_law : GRing.Scale.law h) (h'_law : GRing.Scale.law h').*)
 
-Lemma linearZl z (c : S) (a : R) (h_c := (*GRing.Scale.op h_law*) h c)
+Lemma linearZl z (c : S) (a : R) (h_c := h c)
     (f : Bilinear.map_for_left U U' s s' a h_c) u :
   f (a *: u) z = h_c (Bilinear.wrap f u z).
 Proof. by rewrite linearZl_LR; case: f => f /= ->. Qed.
 
-Lemma linearZr z c' b (h'_c' := (*GRing.Scale.op h'_law c*) h' c')
+Lemma linearZr z c' b (h'_c' := h' c')
     (f : Bilinear.map_for_right U U' s s' b h'_c') u :
   f z (b *: u) = h'_c' (Bilinear.wrap f z u).
 Proof. by rewrite linearZr_LR; case: f => f /= ->. Qed.
 
-Lemma linearZlr c c' a b (h_c := (*GRing.Scale.op h_law*) h c) (h'_c' := (*GRing.Scale.op h'_law*) h' c')
+Lemma linearZlr c c' a b (h_c := h c) (h'_c' := h' c')
     (f : Bilinear.map_for_both U U' s s' a b h_c h'_c') u v :
   f (a *: u) (b *: v) = h_c (h'_c' (Bilinear.wrap f u v)).
 Proof. by rewrite linearZl_LR linearZ_LR; case: f => f /= -> ->. Qed.
 
-Lemma linearZrl c c' a b (h_c := (*GRing.Scale.op h_law*) h c) (h'_c' := (*GRing.Scale.op h'_law c'*) h' c')
+Lemma linearZrl c c' a b (h_c := h c) (h'_c' := h' c')
     (f : Bilinear.map_for_both U U' s s' a b h_c h'_c') u v :
   f (a *: u) (b *: v) = h'_c' (h_c (Bilinear.wrap f u v)).
 Proof. by rewrite linearZ_LR/= linearZl_LR; case: f => f /= -> ->. Qed.
@@ -408,21 +396,19 @@ Canonical rev_mulmx (R : ringType) m n p := [revop mulmxr of @mulmx R m n p].
 *)
 
 (*Canonical mulmx_bilinear (R : comRingType) m n p := [bilinear of @mulmx R m n p].*)
-Lemma mulmx_is_bilinear (R : comRingType) m n p :
-  bilinear_for
-    (GRing.Scale.Law.clone _ _ *:%R _) (GRing.Scale.Law.clone _ _ *:%R _)
-    (@mulmx R m n p).
+Lemma mulmx_is_bilinear (R : comRingType) m n p : bilinear_for
+  (GRing.Scale.Law.clone _ _ *:%R _) (GRing.Scale.Law.clone _ _ *:%R _)
+  (@mulmx R m n p).
 Proof.
 split=> [u'|u] a x y /=.
 - by rewrite mulmxDl scalemxAl.
 - by rewrite mulmxDr scalemxAr.
 Qed.
 
-HB.instance Definition _ (R : comRingType) m n p :=
-  bilinear_isBilinear.Build R
-    [the lmodType R of 'M[R]_(m, n)] [the lmodType R of 'M[R]_(n, p)]
-    [the zmodType of 'M[R]_(m, p)] _ _ (@mulmx R m n p)
-    (mulmx_is_bilinear R m n p).
+HB.instance Definition _ (R : comRingType) m n p := bilinear_isBilinear.Build R
+  [the lmodType R of 'M[R]_(m, n)] [the lmodType R of 'M[R]_(n, p)]
+  [the zmodType of 'M[R]_(m, p)] _ _ (@mulmx R m n p)
+  (mulmx_is_bilinear R m n p).
 
 Section BilinearForms.
 Variables (R : fieldType) (theta : {rmorphism R -> R}).
@@ -434,8 +420,7 @@ Definition form u v := (u *m M *m (v ^t theta)) 0 0.
 Local Notation "''[' u , v ]" := (form u%R v%R) : ring_scope.
 Local Notation "''[' u ]" := '[u, u] : ring_scope.
 
-Lemma form0l u : '[0, u] = 0.
-Proof. by rewrite /form !mul0mx mxE. Qed.
+Lemma form0l u : '[0, u] = 0. Proof. by rewrite /form !mul0mx mxE. Qed.
 
 Lemma form0r u : '[u, 0] = 0.
 Proof. by rewrite /form trmx0 map_mx0 mulmx0 mxE. Qed.
@@ -478,7 +463,8 @@ HB.mixin Record isHermitianSesquilinear (R : ringType) (U : lmodType R)
 
 HB.structure Definition Hermitian (R : ringType) (U : lmodType R)
     (eps : bool) (theta : R -> R) :=
-  {f of @Bilinear R U U _ ( *%R ) (theta \; *%R) f & @isHermitianSesquilinear R U eps theta f}.
+  {f of @Bilinear R U U _ ( *%R ) (theta \; *%R) f &
+        @isHermitianSesquilinear R U eps theta f}.
 
 Notation "{ 'hermitian' U 'for' eps & theta }" := (@Hermitian.type _ U eps theta)
   (at level 0, format "{ 'hermitian'  U  'for'  eps  &  theta }") : ring_scope.
@@ -536,13 +522,15 @@ End Exports.
 End Hermitian.
 Include Hermitian.Exports.*)
 
+Definition orthomx {R : fieldType} (theta : R -> R) n m M (B : 'M_(m, n)) : 'M_n :=
+  kermx (M *m (B ^t theta)).
+
 Section Sesquilinear.
-Variable R : fieldType.
-Variable n : nat.
+Variables (R : fieldType) (n : nat).
 Implicit Types (a b : R) (u v : 'rV[R]_n) (N P Q : 'M[R]_n).
 
 Section Def.
-Variable eps_theta : (bool * {rmorphism R -> R}).
+Variable eps_theta : bool * {rmorphism R -> R}.
 
 Definition sesqui :=
   [qualify M : 'M_n | M == ((-1) ^+ eps_theta.1) *: M ^t eps_theta.2].
@@ -552,20 +540,18 @@ End Def.
 
 Local Notation "eps_theta .-sesqui" := (sesqui eps_theta).
 
-Variables (eps : bool) (theta : {rmorphism R -> R}).
-Variables (M : 'M[R]_n).
+Variables (eps : bool) (theta : {rmorphism R -> R}) (M : 'M[R]_n).
 Local Notation "''[' u , v ]" := (form theta M u%R v%R) : ring_scope.
 Local Notation "''[' u ]" := '[u, u] : ring_scope.
 
-Lemma sesquiE : (M \is (eps,theta).-sesqui) = (M == (-1) ^+ eps *: M ^t theta).
+Lemma sesquiE : (M \is (eps, theta).-sesqui) = (M == (-1) ^+ eps *: M ^t theta).
 Proof. by rewrite qualifE. Qed.
 
 Lemma sesquiP : reflect (M = (-1) ^+ eps *: M ^t theta)
-                        (M \is (eps,theta).-sesqui).
-Proof. by rewrite sesquiE; apply/eqP. Qed.
+                        (M \is (eps, theta).-sesqui).
+Proof. by rewrite sesquiE; exact/eqP. Qed.
 
-Hypothesis (thetaK : involutive theta).
-Hypothesis (M_sesqui : M \is (eps, theta).-sesqui).
+Hypotheses (thetaK : involutive theta) (M_sesqui : M \is (eps, theta).-sesqui).
 
 Lemma trmx_sesqui : M^T = (-1) ^+ eps *: M ^ theta.
 Proof.
@@ -589,7 +575,7 @@ Qed.
 Lemma form_eq0C u v : ('[u, v] == 0) = ('[v, u] == 0).
 Proof. by rewrite formC mulf_eq0 signr_eq0 /= fmorph_eq0. Qed.
 
-Definition ortho m (B : 'M_(m,n)) := (kermx (M *m (B ^t theta))).
+Definition ortho m (B : 'M_(m, n)) := orthomx theta M B.
 Local Notation "B ^_|_" := (ortho B) : ring_scope.
 Local Notation "A _|_ B" := (A%MS <= B^_|_)%MS : ring_scope.
 
@@ -621,7 +607,7 @@ apply: (can_inj (@trmxK _ _ _)); rewrite trmx0 trmx_mul trmxK.
 by rewrite -(map_delta_mx theta) map_trmx Hv.
 Qed.
 
-Lemma normalC p q (A : 'M_(p, n)) (B :'M_(q, n)) : (A _|_ B) = (B _|_ A).
+Lemma normalC p q (A : 'M_(p, n)) (B : 'M_(q, n)) : (A _|_ B) = (B _|_ A).
 Proof.
 gen have nC : p q A B / A _|_ B -> B _|_ A; last by apply/idP/idP; apply/nC.
 move=> AnB; apply/normalP => u v ? ?; rewrite normalE.
@@ -644,9 +630,9 @@ Qed.
 Definition rad := 1%:M^_|_.
 
 Lemma rad_ker : rad = kermx M.
-Proof. by rewrite /rad /ortho trmx1 map_mx1 mulmx1. Qed.
+Proof. by rewrite /rad /ortho /orthomx trmx1 map_mx1 mulmx1. Qed.
 
-(* Pythagore *)
+(* Pythagoras *)
 Theorem formDd u v : u _|_ v -> '[u + v] = '[u] + '[v].
 Proof.
 move=> uNv; rewrite formDl !formDr ['[v, u]]formC.
@@ -723,18 +709,17 @@ Qed.
 (* Qed. *)
 
 End Sesquilinear.
-
 Notation "eps_theta .-sesqui" := (sesqui _ eps_theta) : ring_scope.
 
 Notation symmetric_form := (false, idfun).-sesqui.
 Notation skew := (true, idfun).-sesqui.
 Notation hermitian := (false, @Num.conj_op _).-sesqui.
 
-HB.mixin Record isDotProduct (R : numDomainType) (U : lmodType R) (op : U -> U -> R) := {
-  neq0_dnorm_gt0 : forall u, u != 0 -> 0 < op u u
-}.
+HB.mixin Record isDotProduct (R : numDomainType) (U : lmodType R)
+  (op : U -> U -> R) := { neq0_dnorm_gt0 : forall u, u != 0 -> 0 < op u u }.
 
-HB.structure Definition Dot (R : numDomainType) (U : lmodType R) (theta : R -> R) :=
+HB.structure Definition Dot (R : numDomainType) (U : lmodType R)
+    (theta : R -> R) :=
   {op of isDotProduct R U op & @Hermitian R U false theta op}.
 
 Notation "{ 'dot' U 'for' theta }" := (@Dot.type _ U theta)
@@ -763,11 +748,11 @@ Notation Dot fM := (pack fM idfun).
 Notation is_dot := Dot.axiom.
 *)
 
-Notation "{ 'symmetric' U }" := (@Hermitian.type _ U false idfun)
+Notation "{ 'symmetric' U }" := ({hermitian U for false & idfun})
   (at level 0, format "{ 'symmetric'  U }") : ring_scope.
-Notation "{ 'skew_symmetric' U }" := (@Hermitian.type _ U true idfun)
+Notation "{ 'skew_symmetric' U }" := ({hermitian U for true & idfun})
   (at level 0, format "{ 'skew_symmetric'  U }") : ring_scope.
-Notation "{ 'hermitian_sym' U 'for' theta }" := (@Hermitian.type _ U false theta)
+Notation "{ 'hermitian_sym' U 'for' theta }" := ({hermitian U for false & theta})
   (at level 0, format "{ 'hermitian_sym'  U  'for'  theta }") : ring_scope.
 Definition is_skew (R : ringType) (eps : bool) (theta : R -> R)
   (U : lmodType R) (form : {hermitian U for eps & theta}) :=
@@ -781,7 +766,7 @@ Definition is_hermsym  (R : ringType) (eps : bool) (theta : R -> R)
 
 Section HermitianModuleTheory.
 Variables (R : ringType) (eps : bool) (theta : {rmorphism R -> R}).
-Variable (U : lmodType R) (form : {hermitian U for eps & theta}).
+Variables (U : lmodType R) (form : {hermitian U for eps & theta}).
 
 Local Notation "''[' u , v ]" := (form u%R v%R) : ring_scope.
 Local Notation "''[' u ]" := '[u, u]%R : ring_scope.
@@ -790,36 +775,19 @@ Lemma hermC u v : '[u, v] = (-1) ^+ eps * theta '[v, u].
 Proof. by move: form => [? [[? ? ? ?] []]] /=. Qed.
 
 Lemma hnormN u : '[- u] = '[u].
-Proof.
-rewrite linearNl.
-rewrite linearNr.
-by rewrite opprK.
-Qed.
+Proof. by rewrite linearNl linearNr opprK. Qed.
 
 Lemma hnorm_sign n u : '[(-1) ^+ n *: u] = '[u].
 Proof. by rewrite -signr_odd scaler_sign; case: (odd n); rewrite ?hnormN. Qed.
 
 Lemma hnormD u v :
   let d := '[u, v] in '[u + v] = '[u] + '[v] + (d + (-1) ^+ eps * theta d).
-Proof.
-rewrite /=.
-rewrite addrAC.
-rewrite -hermC.
-rewrite linearDl.
-rewrite linearDr.
-rewrite linearDr.
-by rewrite !addrA.
-Qed.
+Proof. by rewrite /= addrAC -hermC linearDl 2!linearDr !addrA. Qed.
 
 Lemma hnormB u v :
   let d := '[u, v] in '[u - v] = '[u] + '[v] - (d + (-1) ^+ eps * theta d).
 Proof.
-rewrite /= hnormD hnormN.
-rewrite linearNr.
-rewrite addrA opprD.
-rewrite rmorphN.
-rewrite mulrN.
-by rewrite addrA.
+by rewrite /= hnormD hnormN linearNr addrA rmorphN mulrN opprD addrA.
 Qed.
 
 Lemma hnormDd u v : '[u, v] = 0 -> '[u + v] = '[u] + '[v].
@@ -827,31 +795,28 @@ Proof. by move=> ouv; rewrite hnormD ouv rmorph0 mulr0 !addr0. Qed.
 
 Lemma hnormBd u v : '[u, v] = 0 -> '[u - v] = '[u] + '[v].
 Proof.
-move=> ouv;
-rewrite hnormDd; last first.
-  rewrite linearNr.
-  by rewrite [X in - X]ouv oppr0.
-by rewrite hnormN.
+by move=> ouv; rewrite hnormDd ?hnormN// linearNr [X in - X]ouv oppr0.
 Qed.
 
 Local Notation "u _|_ v" := ('[u, v] == 0) : ring_scope.
 
-Definition ortho_rec S1 S2 :=
-  all [pred u | all [pred v | u _|_ v] S2] S1.
+Definition ortho_rec (s1 s2 : seq U) :=
+  all [pred u | all [pred v | u _|_ v] s2] s1.
 
-Fixpoint pair_ortho_rec S :=
-  if S is v :: S' then ortho_rec [:: v] S' && pair_ortho_rec S' else true.
+Fixpoint pair_ortho_rec (s : seq U) :=
+  if s is v :: s' then ortho_rec [:: v] s' && pair_ortho_rec s' else true.
 
 (* We exclude 0 from pairwise orthogonal sets. *)
-Definition pairwise_orthogonal S := (0 \notin S) && pair_ortho_rec S.
+Definition pairwise_orthogonal s := (0 \notin s) && pair_ortho_rec s.
 
-Definition orthonormal S := all [pred v | '[v] == 1] S && pair_ortho_rec S.
-
-Definition orthogonal S1 S2 := nosimpl (@ortho_rec S1 S2).
+Definition orthogonal s1 s2 := (@ortho_rec s1 s2).
+Arguments orthogonal : simpl never.
 
 Lemma orthogonal_cons u us vs :
   orthogonal (u :: us) vs = orthogonal [:: u] vs && orthogonal us vs.
 Proof. by rewrite /orthogonal /= andbT. Qed.
+
+Definition orthonormal s := all [pred v | '[v] == 1] s && pair_ortho_rec s.
 
 Lemma orthonormal_not0 S : orthonormal S -> 0 \notin S.
 Proof.
@@ -865,15 +830,14 @@ Proof. by rewrite -(andb_idl (@orthonormal_not0 S)) andbCA. Qed.
 Lemma orthonormal_orthogonal S : orthonormal S -> pairwise_orthogonal S.
 Proof. by rewrite orthonormalE => /andP[_]. Qed.
 
-
 End HermitianModuleTheory.
-Arguments orthogonal {R eps theta U} form S1 S2.
-Arguments pairwise_orthogonal {R eps theta U} form S.
-Arguments orthonormal {R eps theta U} form S.
+Arguments orthogonal {R eps theta U} form s1 s2.
+Arguments pairwise_orthogonal {R eps theta U} form s.
+Arguments orthonormal {R eps theta U} form s.
 
 Section HermitianIsometry.
 Variables (R : ringType) (eps : bool) (theta : {rmorphism R -> R}).
-Variables (U1 U2: lmodType R) (form1 : {hermitian U1 for eps & theta})
+Variables (U1 U2 : lmodType R) (form1 : {hermitian U1 for eps & theta})
           (form2 : {hermitian U2 for eps & theta}).
 
 Local Notation "''[' u , v ]_1" := (form1 u%R v%R) : ring_scope.
@@ -881,13 +845,13 @@ Local Notation "''[' u , v ]_2" := (form2 u%R v%R) : ring_scope.
 Local Notation "''[' u ]_1" := (form1 u%R u%R)  : ring_scope.
 Local Notation "''[' u ]_2" := (form2 u%R u%R): ring_scope.
 
-Definition isometry tau := forall u v, (form1 (tau u) (tau v)) = (form2 u%R v%R).
+Definition isometry tau := forall u v, form1 (tau u) (tau v) = form2 u%R v%R.
 
 Definition isometry_from_to mD tau mR :=
   prop_in2 mD (inPhantom (isometry tau)) /\
   prop_in1 mD (inPhantom (forall u, in_mem (tau u) mR)).
 
-Notation "{ 'in' D , 'isometry' tau , 'to' R }" :=
+Local Notation "{ 'in' D , 'isometry' tau , 'to' R }" :=
     (isometry_from_to (mem D) tau (mem R))
   (at level 0, format "{ 'in'  D ,  'isometry'  tau ,  'to'  R }")
      : type_scope.
@@ -908,7 +872,7 @@ End HermitianVectTheory.
 
 Section HermitianFinVectTheory.
 Variables (F : fieldType) (eps : bool) (theta : {rmorphism F -> F}).
-Variable (vT : vectType F) (form : {hermitian vT for eps & theta}).
+Variables (vT : vectType F) (form : {hermitian vT for eps & theta}).
 Let n := \dim {:vT}.
 Implicit Types (u v : vT) (U V : {vspace vT}).
 
@@ -927,9 +891,7 @@ apply: (iffP idP) => [u_orthovV|[v /coord_vbasis-> uvNorthov]]; last first.
   apply/subv_bigcapP => uP.
   rewrite linear_sumr big1 ?eqxx//= in uvNorthov.
   move=> i _; have := uP i isT.
-  rewrite -memvE memv_ker.
-  rewrite lfunE/=.
-  by rewrite linearZr/= => /eqP/=->; rewrite mulr0.
+  by rewrite -memvE memv_ker lfunE/= linearZr/= => /eqP/= ->; rewrite mulr0.
 suff /existsP [i ui_neq0] : [exists i : 'I_(\dim V), '[u, (vbasis V)`_i] != 0].
   by exists (vbasis V)`_i => //; rewrite vbasis_mem ?mem_nth ?size_tuple.
 apply: contraNT u_orthovV; rewrite negb_exists => /forallP ui_eq0.
@@ -1015,7 +977,7 @@ by case: (\dim _) V_gt0.
 Qed.
 
 Lemma leqif_dim_orthov1 u V : (\dim V > 0)%N ->
-   ((\dim V).-1 <= \dim (V :&: orthov <[u]>) ?= iff (u \notin orthov V))%N.
+  ((\dim V).-1 <= \dim (V :&: orthov <[u]>) ?= iff (u \notin orthov V))%N.
 Proof.
 move=> Vr_gt0; apply/leqifP.
 by case: (boolP (u \in _)) => /= [/neq_dim_orthov1->|/eq_dim_orthov1->].
@@ -1082,7 +1044,6 @@ Arguments mem_orthovP {F eps theta vT form V u}.
 
 Section DotVectTheory.
 Variables (C : numClosedFieldType).
-Let conjC (c : C) : C := c^*.
 Variable (U : lmodType C) (form : {dot U for conjC}).
 
 Local Notation "''[' u , v ]" := (form u%R v%R) : ring_scope.
@@ -1111,12 +1072,7 @@ Lemma sqrt_dnorm_gt0 u : (sqrtC '[u] > 0) = (u != 0).
 Proof. by rewrite sqrtC_gt0 dnorm_gt0. Qed.
 
 Lemma dnormZ a u : '[a *: u]= `|a| ^+ 2 * '[u].
-Proof.
-rewrite linearZl_LR.
-rewrite linearZr_LR/=.
-rewrite mulrA.
-by rewrite normCK.
-Qed.
+Proof. by rewrite linearZl_LR linearZr_LR/= mulrA normCK. Qed.
 
 Lemma dnormD u v : let d := '[u, v] in '[u + v] = '[u] + '[v] + (d + d^*).
 Proof. by rewrite hnormD mul1r. Qed.
@@ -1132,7 +1088,6 @@ Hint Extern 0 (is_true (0 <= Dot.sort _ _ _
 
 Section HermitianTheory.
 Variables (C : numClosedFieldType) (eps : bool) (theta : {rmorphism C -> C}).
-Let conjC (c : C) : C := c^*.
 Variable (U : lmodType C)  (form : {dot U for conjC}).
 Local Notation "''[' u , v ]" := (form u%R v%R) : ring_scope.
 Local Notation "''[' u ]" := '[u, u]%R : ring_scope.
@@ -1163,7 +1118,7 @@ Lemma pairwise_orthogonal_cat R S :
   [&& pairwise_orthogonal form R, pairwise_orthogonal form  S & orthogonal form R S].
 Proof.
 rewrite /pairwise_orthogonal mem_cat negb_or -!andbA; do !bool_congr.
-elim: R => [|phi R /= ->]; rewrite ?andbT // orthogonal_cons all_cat -!andbA /=.
+elim: R => [|phi R /= ->]; rewrite ?andbT// all_cat -!andbA /=.
 by do !bool_congr.
 Qed.
 
@@ -1206,9 +1161,8 @@ Qed.
 End HermitianTheory.
 
 Section DotFinVectTheory.
-Variables (C : numClosedFieldType).
-Let conjC (c : C) : C := c^*.
-Variable (U : vectType C) (form : {dot U for conjC}).
+Variable C : numClosedFieldType.
+Variables (U : vectType C) (form : {dot U for conjC}).
 
 Local Notation "''[' u , v ]" := (form u%R v%R) : ring_scope.
 Local Notation "''[' u ]" := '[u, u]%R : ring_scope.
@@ -1351,8 +1305,8 @@ by rewrite linearZlr/= oS12 ?mem_nth ?mulr0.
 Qed.
 
 Lemma orthogonal_split S beta :
-  {X: U  & X \in <<S>>%VS &
-      {Y:U | [/\ beta = X + Y, '[X, Y] = 0 & orthogonal form  [:: Y]  S]}}.
+  {X : U  & X \in <<S>>%VS &
+      {Y :U | [/\ beta = X + Y, '[X, Y] = 0 & orthogonal form [:: Y] S]}}.
 Proof.
 suffices [X S_X [Y -> oYS]]:
   {X : _ & X \in <<S>>%VS & {Y | beta = X + Y & orthogonal form [:: Y] S}}.
@@ -1380,17 +1334,8 @@ Arguments orthonormalP {C U form S}.
 Arguments orthoPl {C U form phi S}.
 Arguments orthoPr {C U form S psi}.
 
-Notation "u '``_' i" := (u (GRing.zero ((*Zp_zmodType O*) 0)) i) : ring_scope.
-Notation "''e_' i" := (delta_mx 0 i)
-  (format "''e_' i", at level 3) : ring_scope.
-
-Notation "M ^ phi" := (map_mx phi M).
-Notation "M ^t phi" := (map_mx phi (M ^T)) (phi at level 30, at level 30).
-
 Section BuildIsometries.
-Variables (C : numClosedFieldType).
-Variables (U U1 U2: vectType C).
-Let conjC (c : C) : C := c^*.
+Variables (C : numClosedFieldType) (U U1 U2 : vectType C).
 Variables (form : {dot U for conjC}) (form1 : {dot U1 for conjC})
                                      (form2 : {dot U2 for conjC}).
 
@@ -1444,21 +1389,20 @@ End BuildIsometries.
 
 Section MatrixForms.
 Variables (R : fieldType) (n : nat).
-Implicit Types (a b : R) (u v : 'rV[R]_n).
-Implicit Types (M N P Q : 'M[R]_n).
+Implicit Types (a b : R) (u v : 'rV[R]_n) (M N P Q : 'M[R]_n).
 
 Section Def.
-Variable (theta : R -> R).
+Variable theta : R -> R.
 
-Definition form_of_matrix m M (U  V : 'M_(m, n)) := \tr (U *m M *m (V ^t theta)).
+Definition form_of_matrix m M (U V : 'M_(m, n)) := \tr (U *m M *m (V ^t theta)).
 Definition matrix_of_form (form : 'rV[R]_n -> 'rV[R]_n -> R) : 'M[R]_n :=
   \matrix_(i, j) form 'e_i 'e_j.
-Definition orthomx m M (B : 'M_(m,n)) : 'M_n := (kermx (M *m (B ^t theta))).
 
 Implicit Type form : {bilinear 'rV[R]_n -> 'rV[R]_n -> R | *%R & theta \; *%R}.
 
 Lemma matrix_of_formE form i j : matrix_of_form form i j = form 'e_i 'e_j.
 Proof. by rewrite mxE. Qed.
+
 End Def.
 
 Section FormOfMatrix.
@@ -1525,7 +1469,6 @@ Variables (theta : {rmorphism R -> R}).
 Local Notation "''[' u , v ]" := (form_of_matrix theta M u%R v%R) : ring_scope.
 Local Notation "''[' u ]" := '[u, u]%R : ring_scope.
 
-(* TODO: was called formee before, prefixed with rV_ *)
 Lemma rV_formee i j : '['e_i :'rV__, 'e_j] = M i j.
 Proof.
 rewrite /form_of_matrix -rowE -map_trmx map_delta_mx -[M in LHS]trmxK.
@@ -1559,10 +1502,10 @@ Qed.
 End MatrixOfForm.
 
 Section HermitianMx.
-Variable (eps : bool).
+Variable eps : bool.
 
 Section HermitianMxDef.
-Variable (theta : R -> R).
+Variable theta : R -> R.
 
 Definition hermitianmx :=
   [qualify M : 'M_n | M == ((-1) ^+ eps) *: M ^t theta].
@@ -1571,15 +1514,14 @@ Canonical hermitianmx_keyed := KeyedQualifier hermitianmx_key.
 
 Structure hermitian_matrix := HermitianMx {
   mx_of_hermitian :> 'M[R]_n;
-  _ : mx_of_hermitian \is hermitianmx
-}.
+  _ : mx_of_hermitian \is hermitianmx }.
 
 Lemma is_hermitianmxE M :
   (M \is hermitianmx) = (M == (-1) ^+ eps *: M ^t theta).
 Proof. by rewrite qualifE. Qed.
 
 Lemma is_hermitianmxP M :
-   reflect (M = (-1) ^+ eps *: M ^t theta) (M \is hermitianmx).
+  reflect (M = (-1) ^+ eps *: M ^t theta) (M \is hermitianmx).
 Proof. by rewrite is_hermitianmxE; apply/eqP. Qed.
 
 Lemma hermitianmxE (M : hermitian_matrix) :
@@ -1602,7 +1544,8 @@ by rewrite (map_mx_id (rmorphK _)).
 Qed.
 
 Lemma form_of_matrix_is_hermitian m x y :
-  (@form_of_matrix theta m M) x y = (-1) ^+ eps * theta ((@form_of_matrix theta m M) y x).
+  (@form_of_matrix theta m M) x y =
+  (-1) ^+ eps * theta ((@form_of_matrix theta m M) y x).
 Proof.
 rewrite {1}hermitianmxE /form_of_matrix.
 rewrite -!(scalemxAr, scalemxAl) linearZ/=; congr (_ * _).
@@ -1656,8 +1599,7 @@ rewrite hermC mulf_eq0 ?fmorph_eq0 ?signr_eq0 /=.
 by rewrite -orthomxE (orthomxP _ _ AnB).
 Qed.
 
-Lemma ortho_ortho_mx p (A : 'M_(p, n)) : (A^! _|_ A)%MS.
-Proof. by []. Qed.
+Lemma ortho_ortho_mx p (A : 'M_(p, n)) : (A^! _|_ A)%MS. Proof. by []. Qed.
 
 Lemma ortho_mx_ortho p (A : 'M_(p, n)) : (A _|_ A^!)%MS.
 Proof. by rewrite orthomx_sym. Qed.
@@ -1713,5 +1655,12 @@ End MatrixForms.
 
 Notation symmetricmx := (hermitianmx _ false idfun).
 Notation skewmx := (hermitianmx _ true idfun).
-Definition conjC {C : numClosedFieldType} (c : C) : C := c^*.
 Notation hermsymmx := (hermitianmx _ false conjC).
+
+Lemma hermitian1mx_subproof {C : numClosedFieldType} n : (1%:M : 'M[C]_n) \is hermsymmx.
+Proof.
+by rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx conjC1.
+Qed.
+
+Canonical hermitian1mx {C : numClosedFieldType} n :=
+  HermitianMx (@hermitian1mx_subproof C n).
