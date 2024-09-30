@@ -8,6 +8,7 @@ algebra/interval.v
 algebra/matrix.v
 algebra/mxalgebra.v
 algebra/mxpoly.v
+algebra/mxred.v
 algebra/polydiv.v
 algebra/poly.v
 algebra/polyXY.v
@@ -19,6 +20,8 @@ algebra/ssrint.v
 algebra/ssrnum.v
 algebra/vector.v
 algebra/zmodp.v
+algebra/sesquilinear.v
+algebra/spectral.v
 all/all.v
 character/all_character.v
 character/character.v
