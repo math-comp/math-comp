@@ -283,7 +283,7 @@ Notation ">< y" := [pred x | ~~ comparable x y] : ring_scope.
 Notation ">< y :> T" := (>< (y : T)) (only parsing) : ring_scope.
 Notation "x >< y" := (~~ (comparable x y)) : ring_scope.
 
-Export Order.POCoercions.
+Export Order.PreOCoercions.
 
 End Syntax.
 
