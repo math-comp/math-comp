@@ -1,4 +1,4 @@
-ARG coq_image="coqorg/coq:dev"
+ARG coq_image="coqorg/coq:dev-ocaml-4.14"
 # hadolint ignore=DL3006
 FROM ${coq_image} as builder
 
