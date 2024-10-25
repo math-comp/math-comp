@@ -80,6 +80,8 @@ with builtins; with (import <nixpkgs> {}).lib;
       hierarchy-builder.override.version = "master";
       interval.job = false;
       coquelicot.job = false;
+      coqeal.job = false;  # currently broken by https://github.com/coq/coq/pull/19228
+      mathcomp-apery.job = false;  # reverse dependency of coqeal
     };
     "coq-master".ocamlPackages = { elpi.override.version = "1.19.2"; };
     "coq-8.20".coqPackages = common-bundles // {
