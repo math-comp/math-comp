@@ -6,4 +6,3 @@ Require Export morphism.
 Require Export perm.
 Require Export presentation.
 Require Export quotient.
-
