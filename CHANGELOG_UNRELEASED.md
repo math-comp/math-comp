@@ -155,30 +155,55 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `archiRealDomainType` instance for `int` (moved from `ssrint.v`)
 - in `intdiv.v`
   + lemma `irreducible_rat_int`
-- new file `mxred.v` which contains the theory of diagonalization. To
-  that effect, we define `conjmx`, `restrictmx`, `similar_to`,
-  `similar`, `similar_in`, `similar_in_to`, `all_similar_to`,
-  `similar_diag`, `diagonalizable_in`, `diagonalizable`,
-  `codiagonalizable_in`, `codiagonalizable`, `similar_trig`,
-  `trigonalizable_in`, `trigonalizable`, `cotrigonalizable_in`, and
-  `cotrigonalizable`; and their theory: `stablemx_comp`,
-  `stablemx_restrict`, `conjmxM`, `conjMmx`, `conjuMmx`, `conjMumx`,
-  `conjuMumx`, `conjmx_scalar`, `conj0mx`, `conjmx0`, `conjumx`,
-  `conj1mx`, `conjVmx`, `conjmxK`, `conjmxVK`, `horner_mx_conj`,
-  `horner_mx_uconj`, `horner_mx_uconjC`, `mxminpoly_conj`,
-  `mxminpoly_uconj`, `sub_kermxpoly_conjmx`, `sub_eigenspace_conjmx`,
-  `eigenpoly_conjmx`, `eigenvalue_conjmx`, `conjmx_eigenvalue`,
-  `similarPp`, `similarW`, `similarP`, `similarRL`, `similarLR`,
-  `similar_mxminpoly`, `similar_diag_row_base`, `similar_diagPp`,
-  `similar_diagP`, `similar_diagPex`, `similar_diagLR`,
-  `similar_diag_mxminpoly`, `similar_diag_sum`, `codiagonalizable1`,
-  `codiagonalizable_on`, `diagonalizable_diag`,
-  `diagonalizable_scalar`, `diagonalizable0`, `diagonalizablePeigen`,
-  `diagonalizableP`, `diagonalizable_conj_diag`, and
-  `codiagonalizableP`.
 
-Remark that even though `trigonalization` is defined, its theory is
-not here yet.
+- new file `mxred.v`
+  + definition `conjmx`
+  + lemmas `stablemx_comp`, `stablemx_restrict`, `conjmxM`, `conjMmx`,
+    `conjuMmx`, `conjMumx`, `conjuMumx`, `conjmx_scalar`, `conj0mx`,
+    `conjmx0`, `conjumx`, `conj1mx`, `conjVmx`, `conjmxK`, `conjmxVK`,
+    `horner_mx_conj`, `horner_mx_uconj`, `horner_mx_uconjC`, `mxminpoly_conj`,
+    `mxminpoly_uconj`, `sub_kermxpoly_conjmx`, `sub_eigenspace_conjmx`,
+    `eigenpoly_conjmx`, `eigenvalue_conjmx`, `conjmx_eigenvalue`
+  + notation `restrictmx`
+  + definition `similar_to`
+  + notations `similar`, `similar_in`, `similar_in_to`, `all_similar_to`,
+    `similar_diag`, `diagonalizable_in`, `diagonalizable`,
+    `codiagonalizable_in`, `codiagonalizable`, `similar_trig`,
+    `trigonalizable_in`, `trigonalizable`, `cotrigonalizable_in`,
+    `cotrigonalizable`
+  + lemmas `similarPp`, `similarW`, `similarP`, `similarRL`, `similarLR`,
+    `similar_mxminpoly`, `similar_diag_row_base`, `similar_diagPp`,
+    `similar_diagP`, `similar_diagPex`, `similar_diagLR`,
+    `similar_diag_mxminpoly`, `similar_diag_sum`, `codiagonalizable1`,
+    `codiagonalizablePfull`, `codiagonalizable_on`, `diagonalizable_diag`,
+    `diagonalizable_scalar`, `diagonalizable0`, `diagonalizablePeigen`,
+    `diagonalizableP`, `diagonalizable_conj_diag`, `codiagonalizableP`.
+
+- new file `sesquilinear.v`
+  + notations ``` ``_ ```, `e_`, `^`, `^t`
+  + lemma `eq_map_mx_id`
+  + mixin `InvolutiveRMorphism`
+  + lemma `rmorphK`
+  + definition `conjC`
+  + lemma `map_mxCK`
+  + mixin `isBilinear`
+  + structure `Bilinear`
+  + definition `bilinear_for`
+  + factory `bilinear_isBilinear`
+  + module `Bilinear` (contents not documented in the changelog)
+  + notations `{bilinear _ -> _ -> _ | _ & _}`,
+    `{bilinear _ -> _ -> _ | _}`, `{bilinear _ -> _ -> _}`,
+    `{biscalar _}`
+  + definition `applyr_head`, notation `applyr`
+  + (coercions and canonicals not documented in the changelog)
+  + lemmas `linear0r`, `linearNr`, `linearDr`, `linearBr`, `linearMnr`,
+    `linearMNnr`, `linear_sumr`, `linearZr_LR`, `linearPr`
+  + lemma `applyrE`
+  + lemmas `linear0l`, `linearNl`, `linearDl`, `linearBl`, `linearMnl`,
+    `linearMNnl`, `linear_sumlz`, `linearZl_LR`, `linearPl`, `linearZl`,
+    `linearZr`, `linearZlr`, `linearZrl`
+  
+- new file `spectral.v`
 
 ### Changed
 

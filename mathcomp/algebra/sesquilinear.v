@@ -273,7 +273,8 @@ HB.instance Definition _ (R : ringType) (U U' : lmodType R) (V : zmodType)
   := @GRing.isScalable.Build _ _ _ _ (f u) (@linearr_subproof _ _ _ _ _ _ f u).
 
 Section applyr.
-Variables (R : ringType) (U U' : lmodType R) (V : zmodType) (s s' : R -> V -> V).
+Variables (R : ringType) (U U' : lmodType R) (V : zmodType)
+  (s s' : R -> V -> V).
 
 Definition applyr_head t (f : U -> U' -> V) u v := let: tt := t in f v u.
 
@@ -330,7 +331,6 @@ End GenericPropertiesr.
 Lemma applyrE x : applyr f x =1 f^~ x. Proof. by []. Qed.
 
 Section GenericPropertiesl.
-
 Variable z : U'.
 
 HB.instance Definition _ :=
@@ -363,7 +363,6 @@ End GenericPropertiesl.
 End GenericProperties.
 
 Section BidirectionalLinearZ.
-
 Variables (U U' : lmodType R) (V : zmodType) (s s' : R -> V -> V).
 Variables (S : ringType) (h : GRing.Scale.law S V) (h' : GRing.Scale.law S V).
 

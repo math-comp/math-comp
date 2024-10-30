@@ -5,7 +5,7 @@ From mathcomp Require Import choice fintype finfun bigop fingroup perm order.
 From mathcomp Require Import ssralg zmodp matrix mxalgebra poly polydiv mxpoly.
 
 (*****************************************************************************)
-(* In this file, we prove diagonalization theorems, for this purpose, we     *)
+(* In this file, we prove diagonalization theorems. For this purpose, we     *)
 (* define conjugation, similarity and diagonalizability.                     *)
 (*                                                                           *)
 (*      conjmx V f  := V *m f *m pinvmx V                                    *)
@@ -195,9 +195,7 @@ by rewrite -[f in X in X %| _](conjmxK _ Vu) mxminpoly_conj ?simp.
 Qed.
 
 Section fixed_stablemx_space.
-
 Variables (m n : nat).
-
 Implicit Types (V : 'M[F]_(m, n)) (f : 'M[F]_n).
 Implicit Types (a : F) (p : {poly F}).
 
@@ -246,8 +244,8 @@ End fixed_stablemx_space.
 End ConjMx.
 Notation restrictmx V := (conjmx (row_base V)).
 
-Definition similar_to {F : fieldType} {m n} (P : 'M_(m, n)) A (C : {pred 'M[F]_m}) :=
-   C (conjmx P A).
+Definition similar_to {F : fieldType} {m n} (P : 'M_(m, n)) A
+  (C : {pred 'M[F]_m}) := C (conjmx P A).
 
 Notation similar P A B := (similar_to P A (PredOfSimpl.coerce (pred1 B))).
 Notation similar_in D A B := (exists2 P, P \in D & similar P A B).
@@ -371,7 +369,7 @@ Lemma codiagonalizable1 n (A : 'M[F]_n) :
   codiagonalizable [:: A] <-> diagonalizable A.
 Proof. by split=> -[P Punit PA]; exists P; move: PA; rewrite //= andbT. Qed.
 
-Definition codiagonalizablePfull n (As : seq 'M[F]_n) :
+Lemma codiagonalizablePfull n (As : seq 'M[F]_n) :
   codiagonalizable As <-> exists m,
     exists2 P : 'M_(m, n), row_full P & all [pred A | similar_diag P A] As.
 Proof.
