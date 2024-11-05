@@ -202,8 +202,80 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemmas `linear0l`, `linearNl`, `linearDl`, `linearBl`, `linearMnl`,
     `linearMNnl`, `linear_sumlz`, `linearZl_LR`, `linearPl`, `linearZl`,
     `linearZr`, `linearZlr`, `linearZrl`
-  
+  + lemma `mulmx_is_bilinear`
+  + definition `form`
+  + lemmas `form0l`, `form0r`, `formDl`, `formDr`, `formZr`, `formZl`,
+    `formNl`, `formNr`, `formee`, `form0_eq0`
+  + mixin `isHermitianSesquilinear`, structure `Hermitian`, notation `{hermitian _ fo _ & _}`
+  + definitions `orthomx`, `sesqui`, fact `sesqui_key`, canonical `sesqui_keyed`, notation `_.-sesqui`
+  + lemmas `sesquiE`, `sesquiP`, `trmx_sesqui`, `maptrmx_sesqui`, `formC`, `form_eq0C`
+  + definition `ortho`
+  + lemmas `normalE`, `form_eq0P`, `normalP`, `normalC`, `normal_ortho_mx`,
+    `normal_mx_ortho`, `rank_normal`
+  + defintion `rad`
+  + lemmas `rad_ker`, `formDd`, `formZ`, `formN`, `form_sign`, `formD`, `formB`, `formBd`
+  + notations `symmetric_form`, `skew`, `hermitian`
+  + mixin `isDotProduct`, structure `Dot`, notation `{dot _ for theta _}`
+  + notations `{symmetric _}`, `{skew_symmetric _}`, `{hermitian_sym _ for _}`
+  + definitions `is_skew`, `is_sym`, `is_hermsym`
+  + lemmas `hermC`, `hnormN`, `hnorm_sign`, `hnormD`, `hnormB`, `hnormDd`, `hnormBd`
+  + definition `ortho_rec`, fixpoint `pair_ortho_rec`, defintions `pairwise_orthogonal`, `orthogonal`,
+    `orthonormal`
+  + lemmas `orthogonal_cons`, `orthonormal_not0`, `orthonormalE`, `orthonormal_orthogonal`
+  + definitions `isometry`, `isometry_from_to`
+  + lemma `herm_eq0C`
+  + definition `orthov`
+  + lemmass `mem_orthovPn`, `mem_orthovP`, `orthov1E`, `orthovP`, `orthov_sym`, `mem_orthov1`,
+    `orthov11`, `mem_orthov1_sym`, `orthov0`, `mem_orthov_sym`, `leq_dim_orthov1`, `dim_img_form_eq1`,
+    `eq_dim_orthov1`, `dim_img_form_eq0`, `neq_dim_orthov1`, `leqif_dim_orthov1`, `leqif_dim_orthov1_full`,
+    `orthogonal1P`, `orthogonalP`, `orthogonal_oppr`, `orthogonalE`, `orthovE`, `orthoDv`,
+    `orthovD`
+  + definitons `nondegenerate`, `is_symplectic`, `is_orthogonal`, `is_unitary`
+  + lemmas `dnorm_geiff0`, `dnorm_ge0`, `dnorm_eq0`, `dnorm_gt0`, `sqrt_dnorm_ge0`,
+    `sqrt_dnorm_eq0`, `sqrt_dnorm_gt0`, `dnormZ`, `dnormD`, `dnormB`, `pairwise_orthogonalP`,
+    `pairwise_orthogonal_cat`, `orthonormal_cat`, `orthonormalP`, `sub_orthonormal`,
+    `orthonormal2P`, `orthonormal2P`, `orthogonal_free`, `filter_pairwise_orthogonal`,
+    `orthonormal_free`, `CauchySchwarzP`, `CauchySchwarz_sqrt`, `orthoP`, `orthoPl`,
+    `orthogonal_sym`, `orthoPr`, `orthogonal_catl`, `orthogonal_catr`, `eq_pairwise_orthogonal`,
+    `eq_orthonormal`, `orthogonal_oppl`, `triangle_lerif`, `span_orthogonal`, `orthogonal_split`,
+  + definitions `normf1`, `normf2`
+  + lemmas `isometry_of_dnorm`, `isometry_of_free`, `isometry_raddf_inj`
+  + definitons `form_of_matrix`, `matrix_of_form`, `form_of_matrixr`
+  + lemma `matrix_of_formE`, `form_of_matrix_is_bilinear`, `rV_formee`, `rV_form0_eq0`, `matrix_of_formK`
+  + definition `hermitianmx`, fact `hermitianmx_key`, canonical `hermitianmx_keyed`, structure `hermitian_matrix`
+  + lemmas `is_hermitianmxE`, `is_hermitianmxP`, `hermitianmxE`, `trmx_hermitian`, `maptrmx_hermitian`,
+    `form_of_matrix_is_hermitian`, `orthomxE`, `hermmx_eq0P`, `orthomxP`, `orthomx_sym`,
+    `ortho_ortho_mx`, `ortho_mx_ortho`, `rank_orthomx`, `radmxE`, `orthoNmx`, `orthomxN`, `orthoDmx`,
+    `orthomxD`, `orthoZmx`, `orthomxZ`, `eqmx_ortho`, `genmx_ortho`
+  + notations `symmetricmx`, `skewmx`, `hermsymmx`
+  + lemma `hermitian1mx_subproof`, canonical `hermitian1mx`
+
 - new file `spectral.v`
+  + lemmas `eigenvalue_closed`, `common_eigenvector`, `common_eigenvector2`
+  + notation `^t*`, `realmx`
+  + lemmas `trmxCK`, `realmxC`, `realmxD`, `Remx_rect`, `Immx_rect`, `eqmx_ReiIm`,
+    `realsym_hermsym`, `real_similar`
+  + definition `unitarymx`, fact `unitarymx_key`, canonical `unitarymx_keyed`
+  + lemmas `unitarymxP`, `mulmxtVK`, `unitarymx_unit`, `invmx_unitary`, `mulmxKtV`,
+    `mxrank_unitary`, `mul_unitarymx`, `pinvmx_unitary`, `conjymx`, `trmx_unitary`,
+    `conjC_unitary`, `trmxC_unitary`
+  + definition `normalmx`, fact `normalmx_key`, canonical `normalmx_keyed`
+  + lemmas `normalmxP`, `hermitian_normalmx`, `symmetric_normalmx`
+  + definition `dotmx`
+  + lemmas `dotmxE`, `row_unitarymxP`, `dotmx_is_dotmx`, `orthomx1E`, `orthomx1P`,
+    `orthomx_disj`, `orthomx_ortho_disj`, `rank_ortho`, `add_rank_ortho`, `addsmx_ortho`,
+    `ortho_id`, `submx_ortho`
+  + definition `proj_ortho`
+  + lemmas `sub_adds_genmx_ortho`, `cap_genmx_ortho`, `proj_ortho_sub`, `proj_ortho_compl_sub`,
+    `proj_ortho_id`, `proj_ortho_0`, `add_proj_ortho`, `proj_ortho_proj`, `proj_orthoE`,
+    `orthomx_proj_mx_ortho`
+  + lemma `schmidt_subproof`, definition `schmidt`
+  + lemmas `schmidt_unitarymx`, `row_schmidt_sub`, `form1_row_schmidt`, `schmidt_sub`,
+    `eqmx_schmidt_full`, `eqmx_schmidt_free`
+  + definiton `schmidt_complete`
+  + lemmas `schmidt_complete_unitarymx`, `cotrigonalization`, `Schur`, `cotrigonalization2`
+  + lemma `orthomx_spectral_subproof`, definitions `spectralmx`, `spectral_diag
+  + lemmas `spectral_unitarymx`, `spectral_unit`, `orthomx_spectralP`, `hermitian_spectral_diag_real`
 
 ### Changed
 

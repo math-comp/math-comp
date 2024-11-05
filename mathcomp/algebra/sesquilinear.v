@@ -534,7 +534,9 @@ Variable eps_theta : bool * {rmorphism R -> R}.
 Definition sesqui :=
   [qualify M : 'M_n | M == ((-1) ^+ eps_theta.1) *: M ^t eps_theta.2].
 Fact sesqui_key : pred_key sesqui. Proof. by []. Qed.
+
 Canonical sesqui_keyed := KeyedQualifier sesqui_key.
+
 End Def.
 
 Local Notation "eps_theta .-sesqui" := (sesqui eps_theta).
@@ -753,6 +755,7 @@ Notation "{ 'skew_symmetric' U }" := ({hermitian U for true & idfun})
   (at level 0, format "{ 'skew_symmetric'  U }") : ring_scope.
 Notation "{ 'hermitian_sym' U 'for' theta }" := ({hermitian U for false & theta})
   (at level 0, format "{ 'hermitian_sym'  U  'for'  theta }") : ring_scope.
+
 Definition is_skew (R : ringType) (eps : bool) (theta : R -> R)
   (U : lmodType R) (form : {hermitian U for eps & theta}) :=
   (eps = true) /\ (theta =1 id).
@@ -1375,7 +1378,7 @@ rewrite !{1}linear_sumr; apply/eq_big_seq=> xi2 Sxi2 /=.
 by rewrite !linearZ /= !linearZl !Dtau //= If.
 Qed.
 
-Lemma isometry_raddf_inj  (tau : {additive U1 -> U2}) :
+Lemma isometry_raddf_inj (tau : {additive U1 -> U2}) :
     {in U1 &, isometry form2 form1 tau} ->
     {in U1 &, forall u v, u - v \in U1} ->
   {in U1 &, injective tau}.
@@ -1609,7 +1612,7 @@ rewrite mxrank_ker -subn1 leq_sub2l //.
 by rewrite (leq_trans (mxrankM_maxr  _ _)) // rank_leq_col.
 Qed.
 
-Notation radmx := (1%:M^!)%MS.
+Local Notation radmx := (1%:M^!)%MS.
 
 Lemma radmxE : radmx = kermx M.
 Proof. by rewrite /orthomx /orthomx trmx1 map_mx1 mulmx1. Qed.

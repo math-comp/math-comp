@@ -267,7 +267,7 @@ Section Spectral.
 Variable (C : numClosedFieldType).
 Set Default Proof Using "C".
 
-Notation dotmx_def := (form_of_matrix (@conjC _) 1%:M).
+Local Notation dotmx_def := (form_of_matrix (@conjC _) 1%:M).
 Definition dotmx n (u v : 'rV[C]_n) := dotmx_def u%R v%R.
 
 (*
@@ -426,8 +426,8 @@ elim: m A => [|m IHm].
   exists (pid_mx n); first by rewrite qualifE !thinmx0.
   by apply/forallP=> -[].
 rewrite -addn1 => A leq_Sm_n.
-have lemSm: (m <= m + 1)%N by rewrite addn1.
-have ltmSm: (m < m + 1)%N by rewrite addn1.
+have lemSm : (m <= m + 1)%N by rewrite addn1.
+have ltmSm : (m < m + 1)%N by rewrite addn1.
 have lemn : (m <= n)%N by rewrite ltnW // -addn1.
 have [B Bortho] := IHm (usubmx A) lemn.
 move=> /forallP /= subAB.
