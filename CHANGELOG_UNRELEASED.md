@@ -167,6 +167,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `bigop.v`
   + weaken hypothesis of lemma `telescope_sumn_in`
+  + change the implicit arguments of the lemma `big_cat_nat`
 
 - in `zmodp.v`
   + simpler statement of `Fp_Zcast`
