@@ -231,6 +231,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     `meetsP_seq`, `meetsP`, `le_meets`, `meets_setU`, `meets_seq`
     generalized from `tLatticeType` to `tMeetSemilatticeType`
 
+- in `zmodp.v`
+  + definitions `Zp_opp`, `Zp_add`, `Zp_mul`, `Zp_inv`
+	 generalized from `'I_p.+1` to `'I_p`.
+  + lemmas `Zp_addA`, `Zp_addC`, `Zp_mulC`, `Zp_mulA`, `Zp_mul_addr`,
+	 `Zp_mul_addl`, `Zp_inv_out`
+	 generalized from `'I_p.+1` to `'I_p`.
+
 ### Renamed
 
 - in `binomial.v`
