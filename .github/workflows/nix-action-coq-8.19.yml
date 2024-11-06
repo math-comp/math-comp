@@ -6,23 +6,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -40,10 +40,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target QuickChick
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"QuickChick\" \\\n   --dry-run 2>&1 >\
-        \ /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
-        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"QuickChick\" \\\n   --dry-run 2>&1 > /dev/null)\n
+        echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
+        s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -71,23 +71,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -105,10 +105,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target async-test
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"async-test\" \\\n   --dry-run 2>&1 >\
-        \ /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
-        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"async-test\" \\\n   --dry-run 2>&1 > /dev/null)\n
+        echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
+        s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -136,23 +136,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -170,8 +170,8 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target autosubst
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"autosubst\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"autosubst\" \\\n   --dry-run 2>&1 > /dev/null)\n
         echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
         s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
@@ -191,23 +191,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -225,8 +225,8 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target coq
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"coq\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"coq\" \\\n   --dry-run 2>&1 > /dev/null)\n
         echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
         s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
@@ -240,23 +240,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -274,8 +274,8 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target coq-bits
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"coq-bits\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"coq-bits\" \\\n   --dry-run 2>&1 > /dev/null)\n
         echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
         s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
@@ -299,23 +299,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -333,8 +333,8 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target coqeal
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"coqeal\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"coqeal\" \\\n   --dry-run 2>&1 > /dev/null)\n
         echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
         s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
@@ -372,23 +372,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -406,10 +406,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target coquelicot
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"coquelicot\" \\\n   --dry-run 2>&1 >\
-        \ /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
-        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"coquelicot\" \\\n   --dry-run 2>&1 > /dev/null)\n
+        echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
+        s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -429,23 +429,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -463,8 +463,8 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target deriving
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"deriving\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"deriving\" \\\n   --dry-run 2>&1 > /dev/null)\n
         echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
         s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
@@ -487,23 +487,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -521,10 +521,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target extructures
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"extructures\" \\\n   --dry-run 2>&1 >\
-        \ /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
-        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"extructures\" \\\n   --dry-run 2>&1 > /dev/null)\n
+        echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
+        s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -550,23 +550,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -584,8 +584,8 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target fourcolor
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"fourcolor\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"fourcolor\" \\\n   --dry-run 2>&1 > /dev/null)\n
         echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
         s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
@@ -617,23 +617,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -651,8 +651,8 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target gaia
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"gaia\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"gaia\" \\\n   --dry-run 2>&1 > /dev/null)\n
         echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
         s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
@@ -685,23 +685,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -719,10 +719,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target graph-theory
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"graph-theory\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"graph-theory\" \\\n   --dry-run 2>&1 >
+        /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -759,23 +759,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -793,8 +793,8 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target http
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"http\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"http\" \\\n   --dry-run 2>&1 > /dev/null)\n
         echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
         s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
@@ -825,23 +825,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -859,8 +859,8 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp\" \\\n   --dry-run 2>&1 > /dev/null)\n
         echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
         s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
@@ -907,23 +907,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -941,10 +941,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-abel
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-abel\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-abel\" \\\n   --dry-run 2>&1 >
+        /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -969,23 +969,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -1003,10 +1003,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-algebra
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-algebra\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-algebra\" \\\n   --dry-run 2>&1
+        > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -1035,23 +1035,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -1069,10 +1069,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-algebra-tactics
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-algebra-tactics\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-algebra-tactics\" \\\n   --dry-run
+        2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep
+        \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -1093,72 +1093,6 @@ jobs:
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
         --argstr job "mathcomp-algebra-tactics"
-  mathcomp-altreals:
-    needs:
-    - coq
-    - mathcomp-reals
-    - mathcomp-bigenough
-    runs-on: ubuntu-latest
-    steps:
-    - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
-    - name: Git checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        ref: ${{ env.target_commit }}
-    - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
-    - name: Git checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        ref: ${{ env.tested_commit }}
-    - name: Cachix install
-      uses: cachix/install-nix-action@v27
-      with:
-        nix_path: nixpkgs=channel:nixpkgs-unstable
-    - name: Cachix setup math-comp
-      uses: cachix/cachix-action@v15
-      with:
-        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-        extraPullNames: coq, coq-community
-        name: math-comp
-    - id: stepCheck
-      name: Checking presence of CI target mathcomp-altreals
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-altreals\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: coq'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
-        --argstr job "coq"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: mathcomp-reals'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
-        --argstr job "mathcomp-reals"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: mathcomp-bigenough'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
-        --argstr job "mathcomp-bigenough"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: hierarchy-builder'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
-        --argstr job "hierarchy-builder"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: Building/fetching current CI target
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
-        --argstr job "mathcomp-altreals"
   mathcomp-analysis:
     needs:
     - coq
@@ -1168,23 +1102,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -1202,10 +1136,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-analysis
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-analysis\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-analysis\" \\\n   --dry-run 2>&1
+        > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -1238,23 +1172,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -1272,10 +1206,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-analysis-stdlib
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-analysis-stdlib\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-analysis-stdlib\" \\\n   --dry-run
+        2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep
+        \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -1308,23 +1242,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -1342,10 +1276,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-apery
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-apery\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-apery\" \\\n   --dry-run 2>&1
+        > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -1385,23 +1319,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -1419,10 +1353,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-bigenough
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-bigenough\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-bigenough\" \\\n   --dry-run 2>&1
+        > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -1446,23 +1380,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -1480,10 +1414,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-character
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-character\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-character\" \\\n   --dry-run 2>&1
+        > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -1524,23 +1458,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -1558,10 +1492,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-classical
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-classical\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-classical\" \\\n   --dry-run 2>&1
+        > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -1588,23 +1522,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -1622,10 +1556,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-doc
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-doc\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-doc\" \\\n   --dry-run 2>&1 >
+        /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -1638,6 +1572,72 @@ jobs:
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
         --argstr job "mathcomp-doc"
+  mathcomp-experimental-reals:
+    needs:
+    - coq
+    - mathcomp-reals
+    - mathcomp-bigenough
+    runs-on: ubuntu-latest
+    steps:
+    - name: Determine which commit to initially checkout
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
+    - name: Git checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        ref: ${{ env.target_commit }}
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
+    - name: Git checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        ref: ${{ env.tested_commit }}
+    - name: Cachix install
+      uses: cachix/install-nix-action@v27
+      with:
+        nix_path: nixpkgs=channel:nixpkgs-unstable
+    - name: Cachix setup math-comp
+      uses: cachix/cachix-action@v15
+      with:
+        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
+        name: math-comp
+    - id: stepCheck
+      name: Checking presence of CI target mathcomp-experimental-reals
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-experimental-reals\" \\\n   --dry-run
+        2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep
+        \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: coq'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
+        --argstr job "coq"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: mathcomp-reals'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
+        --argstr job "mathcomp-reals"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: mathcomp-bigenough'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
+        --argstr job "mathcomp-bigenough"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: hierarchy-builder'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
+        --argstr job "hierarchy-builder"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: Building/fetching current CI target
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
+        --argstr job "mathcomp-experimental-reals"
   mathcomp-field:
     needs:
     - coq
@@ -1648,23 +1648,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -1682,10 +1682,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-field
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-field\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-field\" \\\n   --dry-run 2>&1
+        > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -1721,23 +1721,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -1755,10 +1755,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-fingroup
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-fingroup\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-fingroup\" \\\n   --dry-run 2>&1
+        > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -1782,23 +1782,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -1816,10 +1816,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-finmap
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-finmap\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-finmap\" \\\n   --dry-run 2>&1
+        > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -1844,23 +1844,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -1878,10 +1878,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-real-closed
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-real-closed\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-real-closed\" \\\n   --dry-run
+        2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep
+        \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -1921,23 +1921,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -1955,10 +1955,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-reals
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-reals\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-reals\" \\\n   --dry-run 2>&1
+        > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -1982,23 +1982,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -2016,10 +2016,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-reals-stdlib
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-reals-stdlib\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-reals-stdlib\" \\\n   --dry-run
+        2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep
+        \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -2041,23 +2041,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -2075,10 +2075,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-single
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-single\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-single\" \\\n   --dry-run 2>&1
+        > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -2092,23 +2092,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -2126,10 +2126,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-solvable
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-solvable\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-solvable\" \\\n   --dry-run 2>&1
+        > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -2160,23 +2160,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -2194,10 +2194,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-ssreflect
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-ssreflect\" \\\n   --dry-run\
-        \ 2>&1 > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep\
-        \ \"built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-ssreflect\" \\\n   --dry-run 2>&1
+        > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -2218,23 +2218,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -2252,10 +2252,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-tarjan
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-tarjan\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-tarjan\" \\\n   --dry-run 2>&1
+        > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -2281,23 +2281,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -2315,10 +2315,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target mathcomp-zify
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"mathcomp-zify\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"mathcomp-zify\" \\\n   --dry-run 2>&1 >
+        /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -2350,23 +2350,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -2384,10 +2384,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target multinomials
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"multinomials\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"multinomials\" \\\n   --dry-run 2>&1 >
+        /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -2429,23 +2429,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -2463,8 +2463,8 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target odd-order
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"odd-order\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"odd-order\" \\\n   --dry-run 2>&1 > /dev/null)\n
         echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
         s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
@@ -2510,23 +2510,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -2544,8 +2544,8 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target reglang
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"reglang\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"reglang\" \\\n   --dry-run 2>&1 > /dev/null)\n
         echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
         s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
@@ -2567,23 +2567,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -2601,10 +2601,10 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target relation-algebra
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"relation-algebra\" \\\n   --dry-run 2>&1\
-        \ > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"\
-        built:\" | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"relation-algebra\" \\\n   --dry-run 2>&1
+        > /dev/null)\necho $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\"\
+        \ | sed \"s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
@@ -2627,23 +2627,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha\
-        \ }}\" >> $GITHUB_ENV\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
-      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{\
-        \ github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{\
-        \ github.event.repository.html_url }} refs/pull/${{ github.event.number }}/merge\
-        \ | cut -f1)\n  mergeable=$(git merge --no-commit --no-ff ${{ github.event.pull_request.base.sha\
-        \ }} > /dev/null 2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n\
-        \  if [ -z \"$merge_commit\" -o \"x$mergeable\" != \"x0\" ]; then\n    echo\
-        \ \"tested_commit=${{ github.event.pull_request.head.sha }}\" >> $GITHUB_ENV\n\
-        \  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n  fi\nfi\n"
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
     - name: Git checkout
       uses: actions/checkout@v4
       with:
@@ -2661,8 +2661,8 @@ jobs:
         name: math-comp
     - id: stepCheck
       name: Checking presence of CI target vcfloat
-      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr\
-        \ bundle \"coq-8.19\" --argstr job \"vcfloat\" \\\n   --dry-run 2>&1 > /dev/null)\n\
+      run: "nb_dry_run=$(NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr
+        bundle \"coq-8.19\" --argstr job \"vcfloat\" \\\n   --dry-run 2>&1 > /dev/null)\n
         echo $nb_dry_run\necho status=$(echo $nb_dry_run | grep \"built:\" | sed \"\
         s/.*/built/\") >> $GITHUB_OUTPUT\n"
     - if: steps.stepCheck.outputs.status == 'built'
@@ -2690,7 +2690,7 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-8.19"
         --argstr job "vcfloat"
 name: Nix CI for bundle coq-8.19
-'on':
+on:
   pull_request:
     paths:
     - .github/workflows/nix-action-coq-8.19.yml
