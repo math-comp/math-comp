@@ -841,6 +841,22 @@ Arguments big_ind [R] K [idx op] _ _ [I r P F].
 Arguments eq_big_op [R] K [idx op] op' _ _ _ [I].
 Arguments big_endo [R] f [idx op] _ _ [I].
 
+Lemma big_morph_in (R1 R2 : Type) (Q : {pred R2}) (f : R2 -> R1)
+    (id1 : R1) (op1 : R1 -> R1 -> R1)
+    (id2 : R2) (op2 : R2 -> R2 -> R2) :
+    {in Q &, forall x y, op2 x y \in Q} ->
+    id2 \in Q ->
+    {in Q &, {morph f : x y / op2 x y >-> op1 x y}} ->
+    f id2 = id1 ->
+    forall [I : Type] (r : seq I) (P : pred I) (F : I -> R2),
+      (forall i, P i -> F i \in Q) ->
+  f (\big[op2/id2]_(i <- r | P i) F i) = \big[op1/id1]_(i <- r | P i) f (F i).
+Proof.
+move=> Qop Qid fop fid I r P F QF; elim/(big_load Q): _.
+by elim/big_rec2: _ => // j x y Pj [Qx <-]; rewrite [Q _]Qop ?fop ?QF.
+Qed.
+Arguments big_morph_in [R1 R2] Q f [id1 op1 id2 op2].
+
 Section oAC.
 
 Variables (T : Type) (op : T -> T -> T).
@@ -1826,6 +1842,14 @@ Lemma big_allpairs I1 I2 (r1 : seq I1) (r2 : seq I2) F :
     \big[*%M/1]_(i1 <- r1) \big[op/idx]_(i2 <- r2) F (i1, i2).
 Proof. exact: big_allpairs_dep. Qed.
 
+Lemma rev_big_rev I (r : seq I) P F :
+  \big[*%M/1]_(i <- rev r | P i) F i =
+  \big[(fun x y => y * x)/1]_(i <- r | P i) F i.
+Proof.
+elim: r => [|i r IHr]; rewrite ?big_nil// big_cons rev_cons big_rcons IHr.
+by case: (P i); rewrite ?mulm1.
+Qed.
+
 Lemma big_only1 (I : finType) (i : I) (P : pred I) (F : I -> R) : P i ->
     (forall j, j != i -> P j -> F j = idx) ->
   \big[op/idx]_(j | P j) F j = F i.
@@ -1991,6 +2015,12 @@ Lemma big_rem (I : eqType) r x (P : pred I) F :
     = (if P x then F x else 1) * \big[*%M/1]_(y <- rem x r | P y) F y.
 Proof.
 by move/perm_to_rem/(perm_big _)->; rewrite !(big_mkcond _ _ P) big_cons.
+Qed.
+
+Lemma big_rev I (r : seq I) P F :
+  \big[*%M/1]_(i <- rev r | P i) F i = \big[*%M/1]_(i <- r | P i) F i.
+Proof.
+by rewrite rev_big_rev; apply: (eq_big_op (fun=> True)) => // *; apply: mulmC.
 Qed.
 
 Lemma eq_big_idem (I : eqType) (r1 r2 : seq I) (P : pred I) F :

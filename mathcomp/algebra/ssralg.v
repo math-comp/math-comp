@@ -1574,6 +1574,11 @@ HB.instance Definition _ (R : semiRingType) :=
 HB.instance Definition _ (R : ringType) := SemiRing.on R^c.
 End ConverseRing.
 
+Lemma rev_prodr (R : semiRingType)
+  (I : Type) (r : seq I) (P : pred I) (E : I -> R) :
+  \prod_(i <- r | P i) (E i : R^c) = \prod_(i <- rev r | P i) E i.
+Proof. by rewrite rev_big_rev. Qed.
+
 Section SemiRightRegular.
 
 Variable R : semiRingType.
@@ -2879,6 +2884,20 @@ move=> Ux; apply/idP/idP=> [Uxy | Uy]; last by rewrite unitrMl.
 by rewrite -(mulKr Ux y) unitrMl ?unitrV.
 Qed.
 
+Lemma unitr_prod {I : Type} (P : pred I) (E : I -> R) (r : seq I) :
+  (forall i, P i -> E i \is a GRing.unit) ->
+    (\prod_(i <- r | P i) E i \is a GRing.unit).
+Proof.
+by move=> Eunit; elim/big_rec: _ => [/[!unitr1] |i x /Eunit/unitrMr->].
+Qed.
+
+Lemma unitr_prod_in {I : eqType} (P : pred I) (E : I -> R) (r : seq I) :
+  {in r, forall i, P i -> E i \is a GRing.unit} ->
+    (\prod_(i <- r | P i) E i \is a GRing.unit).
+Proof.
+by rewrite big_seq_cond => H; apply: unitr_prod => i /andP[]; exact: H.
+Qed.
+
 Lemma invrM : {in unit &, forall x y, (x * y)^-1 = y^-1 * x^-1}.
 Proof.
 move=> x y Ux Uy; have Uxy: (x * y \in unit) by rewrite unitrMl.
@@ -2943,6 +2962,16 @@ End UnitRingTheory.
 Arguments invrK {R}.
 Arguments invr_inj {R} [x1 x2].
 Arguments telescope_prodr_eq {R n m} f u.
+
+Lemma rev_prodrV (R : unitRingType)
+  (I : Type) (r : seq I) (P : pred I) (E : I -> R) :
+  (forall i, P i -> E i \is a GRing.unit) ->
+  \prod_(i <- r | P i) (E i)^-1 = ((\prod_(i <- r | P i) (E i : R^c))^-1).
+Proof.
+move=> Eunit; symmetry.
+apply: (big_morph_in GRing.unit _ _ (unitr1 R^c) (@invrM _) (invr1 _)) Eunit.
+by move=> x y xunit; rewrite unitrMr.
+Qed.
 
 Section UnitRingClosedPredicates.
 
@@ -3073,6 +3102,21 @@ Proof. by move=> Ux y Uy; rewrite /= invrM ?unitrV // invrK mulrC divrK. Qed.
 
 Lemma expr_div_n x y n : (x / y) ^+ n = x ^+ n / y ^+ n.
 Proof. by rewrite exprMn exprVn. Qed.
+
+Lemma unitr_prodP (I : eqType) (r : seq I) (P : pred I) (E : I -> R) :
+  reflect {in r, forall i, P i -> E i \is a GRing.unit}
+    (\prod_(i <- r | P i) E i \is a GRing.unit).
+Proof.
+rewrite (big_morph [in unit] unitrM (@unitr1 _) ) big_all_cond.
+exact: 'all_implyP.
+Qed.
+
+Lemma prodrV (I : eqType) (r : seq I) (P : pred I) (E : I -> R) :
+  (forall i, P i -> E i \is a GRing.unit) ->
+  \prod_(i <- r | P i) (E i)^-1 = (\prod_(i <- r | P i) E i)^-1.
+Proof.
+by move=> /rev_prodrV->; rewrite rev_prodr (perm_big r)// perm_rev.
+Qed.
 
 (* TODO: HB.saturate *)
 #[export] HB.instance Definition _ := ComUnitRing.on R^c.
@@ -5704,9 +5748,13 @@ Definition invr_sign := invr_sign.
 Definition unitrMl := unitrMl.
 Definition unitrMr := unitrMr.
 Definition invrM := invrM.
+Definition unitr_prod := unitr_prod.
+Definition unitr_prod_in := unitr_prod_in.
 Definition invr_eq0 := invr_eq0.
 Definition invr_eq1 := invr_eq1.
 Definition invr_neq0 := invr_neq0.
+Definition rev_unitrP := rev_unitrP.
+Definition rev_prodrV := rev_prodrV.
 Definition unitrM_comm := unitrM_comm.
 Definition unitrX := unitrX.
 Definition unitrX_pos := unitrX_pos.
@@ -5761,6 +5809,8 @@ Definition eval_tsubst := eval_tsubst.
 Definition eq_holds := eq_holds.
 Definition holds_fsubst := holds_fsubst.
 Definition unitrM := unitrM.
+Definition unitr_prodP := unitr_prodP.
+Definition prodrV := prodrV.
 Definition unitrPr {R x} := @unitrPr R x.
 Definition expr_div_n := expr_div_n.
 Definition mulr1_eq := mulr1_eq.
@@ -5834,6 +5884,7 @@ Definition raddfMn := raddfMn.
 Definition raddfMNn := raddfMNn.
 Definition raddfMnat := raddfMnat.
 Definition raddfMsign := raddfMsign.
+Definition rev_prodr := rev_prodr.
 Definition can2_semi_additive := can2_semi_additive.
 Definition can2_additive := can2_additive.
 Definition multiplicative := multiplicative.
