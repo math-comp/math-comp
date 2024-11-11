@@ -521,9 +521,17 @@ Definition fprod_of_dffun (f : {dffun forall i : I, T_ i}) : fprod :=
 
 Lemma dffun_of_fprodK : cancel dffun_of_fprod fprod_of_dffun.
 Proof. by move=> f; apply/fprodP=> i; rewrite fprodE ffunE. Qed.
+#[local] Hint Resolve dffun_of_fprodK : core.
 
 Lemma fprod_of_dffunK : cancel fprod_of_dffun dffun_of_fprod.
 Proof. by move=> f; apply/ffunP => i; rewrite !ffunE fprodE. Qed.
+#[local] Hint Resolve fprod_of_dffunK : core.
+
+Lemma dffun_of_fprod_bij : bijective dffun_of_fprod.
+Proof. by exists fprod_of_dffun. Qed.
+
+Lemma fprod_of_dffun_bij : bijective fprod_of_dffun.
+Proof. by exists dffun_of_fprod. Qed.
 
 Definition to_family_tagged_with (f : fprod) : {x in family (tagged_with T_)} :=
   exist _ (fprod_fun f) (fprod_prop f).
@@ -546,6 +554,10 @@ Proof. by exists of_family_tagged_with. Qed.
 
 Lemma of_family_tagged_with_bij : bijective of_family_tagged_with.
 Proof. by exists to_family_tagged_with. Qed.
+
+Lemma etaggedE (a : fprod) (i : I) (e : tag (fprod_fun a i) = i) :
+  etagged e = a i.
+Proof. by case: a e => //= f fP e; congr etagged; apply: eq_irrelevance. Qed.
 
 End DependentFiniteProduct.
 

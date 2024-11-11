@@ -2725,10 +2725,6 @@ Proof.
 by rewrite card_fprod => /[swap] i /gt0_prodn/(_ i isT) /card_gt0P/sigW[].
 Qed.
 
-Lemma etaggedE (a : fprod T_) (i : I) (e : tag (fprod_fun a i) = i) :
-  etagged e = a i.
-Proof. by case: a e => //= f fP e; congr etagged; apply: eq_irrelevance. Qed.
-
 Definition ftagged (T_gt0 : 0 < #|fprod T_|)
   (f : {ffun I -> {i : I & T_ i}}) (i : I) :=
     @untag I T_ (T_ i) (fprod_pick T_gt0 i) i id (f i).
