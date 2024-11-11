@@ -1634,34 +1634,6 @@ rewrite (reindex_omap set1 unset1) => [|A /cards1P[i ->] /[!set1K]//].
 by apply: eq_bigl => i; rewrite set1K cards1 !eqxx.
 Qed.
 
-(* Too specific ? *)
-Lemma big_setI_distrl (P : pred {set I}) (h : {set I} -> {set I}) f g :
-  \big[plus/idx]_(A : {set I} | P (h A)) times (g A) (f (h A))
-  = \big[plus/idx]_(B : {set I} | P B)
-      times (\big[plus/idx]_(A : {set I} | h A == B) g A) (f B).
-Proof.
-under [RHS]eq_bigr do rewrite big_distrl /=.
-rewrite [LHS](partition_big h P) => //; apply: eq_bigr => B PB.
-apply: eq_big => [A|A /andP[_ /eqP->] //].
-by rewrite andbC; case: eqVneq=> // ->.
-Qed.
-
-(* TODO: remove? *)
-Lemma big_partitionS (f : {set I} -> I -> R) :
-  \big[aop/idx]_(A : {set I}) (\big[aop/idx]_(i in A) f A i)
-  = \big[aop/idx]_(i : I) \big[aop/idx]_(A : {set I} | i \in A) f A i.
-Proof. by rewrite (exchange_big_dep xpredT). Qed.
-
-(* Backport to ssrfun? *)
-Definition xpair {T1 T2} (x : T1 * T2) := (x.2, x.1).
-
-(* TODO: swap equalities sides and rename ? *)
-Lemma big_memS (f : {set I} -> R) (P : pred {set I}):
-  \big[aop/idx]_(i : I) \big[aop/idx]_(A : {set I} | P A && (i \in A)) f A
-  = \big[aop/idx]_(A | P A) \big[aop/idx]_(w in A) f A.
-Proof. by rewrite !pair_big_dep (reindex xpair)//=; exists xpair; case. Qed.
-
-
 End BigOps.
 
 Lemma bigA_distr (R : Type) (zero one : R) (mul : Monoid.mul_law zero)
@@ -2781,18 +2753,6 @@ rewrite (reindex (tag_with i)); last exact/onW_bij/tag_with_bij.
 by apply: eq_big => [x|x Qix]; rewrite ?untagE.
 Qed.
 
-(* No link with `fprod`, it's weird to introduce it *)
-(* Note that the new version `big_tag_cond` not depend on `T_gt0` *)
-Lemma big_tag_cond_old (T_gt0 : 0 < #|fprod T_|)
-    (Q_ : forall i, {pred T_ i}) (P_ : forall i : I, T_ i -> R) (i : I) :
-  \big[op/idx]_(j in Q_ i) P_ i j =
-  \big[op/idx]_(j in tagged_with T_ i | Q_ i (untag (fprod_pick T_gt0 i) id j))
-    untag idx (P_ i) j.
-Proof.
-rewrite big_tag_cond; apply: eq_bigl => t /[!inE].
-by case: eqVneq => // tag_t; rewrite ?untagE.
-Qed.
-
 Lemma big_tag (P_ : forall i : I, T_ i -> R) (i : I) :
   \big[op/idx]_(j : T_ i) P_ i j =
   \big[op/idx]_(j in tagged_with T_ i) untag idx (P_ i) j.
@@ -2801,7 +2761,6 @@ Proof. by rewrite big_tag_cond; under eq_bigl do rewrite untag_cst ?andbT. Qed.
 End BigTag.
 
 Arguments big_tag_cond [R idx op I T_] _ _ _.
-Arguments big_tag_cond_old [R idx op I T_] _ _ _ _.
 Arguments big_tag [R idx op I T_] _ _.
 
 Section BigFProd.
