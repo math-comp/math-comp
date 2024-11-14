@@ -2033,17 +2033,30 @@ End ScaleFun.
 
 End AdditiveTheory.
 
-Definition multiplicative (R S : semiRingType) (f : R -> S) : Prop :=
+#[deprecated(since="mathcomp 2.3.0", note="use `multiplicative1first` instead")]
+  Definition multiplicative (R S : semiRingType) (f : R -> S) : Prop :=
   {morph f : x y / x * y}%R * (f 1 = 1).
+Definition multiplicative1first (R S : semiRingType) (f : R -> S) : Prop :=
+   (f 1 = 1) * {morph f : x y / x * y}%R.
 
-HB.mixin Record isMultiplicative (R S : semiRingType) (f : R -> S) := {
-  rmorphism_subproof : multiplicative f
+HB.mixin Record isMultiplicative1first (R S : semiRingType) (f : R -> S) := {
+  rmorphism_1_first_subproof : multiplicative1first f
 }.
 
 HB.structure Definition RMorphism (R S : semiRingType) :=
-  {f of @Additive R S f & isMultiplicative R S f}.
+  {f of @Additive R S f & isMultiplicative1first R S f}.
 (* FIXME: remove the @ once
    https://github.com/math-comp/hierarchy-builder/issues/319 is fixed *)
+
+HB.factory Record isMultiplicative (R S : semiRingType) (f : R -> S) := {
+  rmorphism_subproof : multiplicative f
+}.
+HB.builders Context R S f of isMultiplicative R S f.
+
+HB.instance Definition _ := isMultiplicative1first.Build R S f
+                              (rmorphism_subproof.2, rmorphism_subproof.1).
+
+HB.end.
 
 Module RMorphismExports.
 Notation "{ 'rmorphism' U -> V }" := (RMorphism.type U%type V%type)
@@ -2064,7 +2077,8 @@ Lemma rmorph_sum I r (P : pred I) E :
   f (\sum_(i <- r | P i) E i) = \sum_(i <- r | P i) f (E i).
 Proof. exact: raddf_sum. Qed.
 
-Lemma rmorphismMP : multiplicative f. Proof. exact: rmorphism_subproof. Qed.
+Lemma rmorphismMP : multiplicative1first f.
+Proof. exact: rmorphism_1_first_subproof. Qed.
 Lemma rmorph1 : f 1 = 1. Proof. by case: rmorphismMP. Qed.
 Lemma rmorphM : {morph f: x y  / x * y}. Proof. by case: rmorphismMP. Qed.
 
@@ -2099,16 +2113,16 @@ Section Projections.
 Variables (R S T : semiRingType).
 Variables (f : {rmorphism S -> T}) (g : {rmorphism R -> S}).
 
-Fact idfun_is_multiplicative : multiplicative (@idfun R).
+Fact idfun_is_multiplicative : multiplicative1first (@idfun R).
 Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build R R idfun
+HB.instance Definition _ := isMultiplicative1first.Build R R idfun
   idfun_is_multiplicative.
 
-Fact comp_is_multiplicative : multiplicative (f \o g).
-Proof. by split=> [x y|] /=; rewrite ?rmorph1 ?rmorphM. Qed.
+Fact comp_is_multiplicative : multiplicative1first (f \o g).
+Proof. by split=> [|x y] /=; rewrite ?rmorph1 ?rmorphM. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build R T (f \o g)
+HB.instance Definition _ := isMultiplicative1first.Build R T (f \o g)
   comp_is_multiplicative.
 
 End Projections.
@@ -2139,10 +2153,10 @@ Proof. move=> x y; exact: scalerBl. Qed.
 #[export]
 HB.instance Definition _ := isAdditive.Build R A (in_alg A) in_alg_is_additive.
 
-Fact in_alg_is_rmorphism : multiplicative (in_alg A).
-Proof. by split=> [x y|] /=; rewrite ?scale1r // -scalerAl mul1r scalerA. Qed.
+Fact in_alg_is_rmorphism : multiplicative1first (in_alg A).
+Proof. by split=> [|x y] /=; rewrite ?scale1r // -scalerAl mul1r scalerA. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build R A (in_alg A)
+HB.instance Definition _ := isMultiplicative1first.Build R A (in_alg A)
   in_alg_is_rmorphism.
 
 Lemma in_algE a : in_alg A a = a%:A. Proof. by []. Qed.
