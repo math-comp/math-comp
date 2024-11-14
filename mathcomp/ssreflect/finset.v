@@ -1477,7 +1477,7 @@ by move=> /subsetP AP; apply: sub_le_big => // i; have /[!inE] := AP i.
 Qed.
 
 Lemma big_imset_idem [I J : finType] (h : I -> J) (A : pred I) F :
-    idempotent op ->
+    idempotent_op op ->
   \big[op/x]_(j in h @: A) F j = \big[op/x]_(i in A) F (h i).
 Proof.
 rewrite -!big_image => op_idem; rewrite -big_undup// -[RHS]big_undup//.
@@ -1529,7 +1529,7 @@ Lemma big_setU1 a A F : a \notin A ->
 Proof. by move=> notAa; rewrite (@big_setD1 a) ?setU11 //= setU1K. Qed.
 
 Lemma big_subset_idem_cond A B P F :
-    idempotent aop ->
+    idempotent_op aop ->
     A \subset B ->
   aop (\big[aop/idx]_(i in A | P i) F i) (\big[aop/idx]_(i in B | P i) F i)
     = \big[aop/idx]_(i in B | P i) F i.
@@ -1538,14 +1538,14 @@ by move=> idaop /setIidPr <-; rewrite (big_setIDcond B A) Monoid.mulmA /= idaop.
 Qed.
 
 Lemma big_subset_idem A B F :
-    idempotent aop ->
+    idempotent_op aop ->
     A \subset B ->
   aop (\big[aop/idx]_(i in A) F i) (\big[aop/idx]_(i in B) F i)
     = \big[aop/idx]_(i in B) F i.
 Proof. by rewrite -2!big_condT; apply: big_subset_idem_cond. Qed.
 
 Lemma big_setU_cond A B P F :
-    idempotent aop ->
+    idempotent_op aop ->
   \big[aop/idx]_(i in A :|: B | P i) F i
     = aop (\big[aop/idx]_(i in A | P i) F i) (\big[aop/idx]_(i in B | P i) F i).
 Proof.
@@ -1555,7 +1555,7 @@ by rewrite (@big_subset_idem_cond (B :&: A)) // subsetIr.
 Qed.
 
 Lemma big_setU A B F :
-    idempotent aop ->
+    idempotent_op aop ->
   \big[aop/idx]_(i in A :|: B) F i
     = aop (\big[aop/idx]_(i in A) F i) (\big[aop/idx]_(i in B) F i).
 Proof. by rewrite -3!big_condT; apply: big_setU_cond. Qed.

@@ -746,7 +746,7 @@ Proof. by rewrite -subn_eq0 -(eqn_add2l m) addn0 -maxnE; apply: eqP. Qed.
 Lemma maxn_idPr {m n} : reflect (maxn m n = n) (m <= n).
 Proof. by rewrite maxnC; apply: maxn_idPl. Qed.
 
-Lemma maxnn : idempotent maxn.
+Lemma maxnn : idempotent_op maxn.
 Proof. by move=> n; apply/maxn_idPl. Qed.
 
 Lemma leq_max m n1 n2 : (m <= maxn n1 n2) = (m <= n1) || (m <= n2).
@@ -815,7 +815,7 @@ Qed.
 Lemma minn_idPr {m n} : reflect (minn m n = n) (m >= n).
 Proof. by rewrite minnC; apply: minn_idPl. Qed.
 
-Lemma minnn : idempotent minn.
+Lemma minnn : idempotent_op minn.
 Proof. by move=> n; apply/minn_idPl. Qed.
 
 Lemma leq_min m n1 n2 : (m <= minn n1 n2) = (m <= n1) && (m <= n2).

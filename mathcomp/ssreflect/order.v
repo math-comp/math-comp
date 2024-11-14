@@ -2578,10 +2578,10 @@ Lemma min_r x y : y <= x -> min x y = y. Proof. by case: comparableP. Qed.
 Lemma max_l x y : y <= x -> max x y = x. Proof. by case: comparableP. Qed.
 Lemma max_r x y : x <= y -> max x y = y. Proof. by case: comparableP. Qed.
 
-Lemma minxx : idempotent (min : T -> T -> T).
+Lemma minxx : idempotent_op (min : T -> T -> T).
 Proof. by rewrite /min => x; rewrite ltxx. Qed.
 
-Lemma maxxx : idempotent (max : T -> T -> T).
+Lemma maxxx : idempotent_op (max : T -> T -> T).
 Proof. by rewrite /max => x; rewrite ltxx. Qed.
 
 Lemma eq_minl x y : (min x y == x) = (x <= y).
@@ -3197,7 +3197,7 @@ rewrite ![_ `&` (_ `&` _) <= _]leIxr ?(leIr, leIl) //=.
 by rewrite leIxl ?leIl // leIxl // leIr.
 Qed.
 
-Lemma meetxx : idempotent (@meet _ L).
+Lemma meetxx : idempotent_op (@meet _ L).
 Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
 Lemma meetAC : right_commutative (@meet _ L).
 Proof. by move=> x y z; rewrite -!meetA [X in _ `&` X]meetC. Qed.
@@ -3360,7 +3360,7 @@ Proof. exact: (@leI2 _ L^d). Qed.
 Lemma joinC : commutative (@join _ L). Proof. exact: (@meetC _ L^d). Qed.
 Lemma joinA : associative (@join _ L). Proof. exact: (@meetA _ L^d). Qed.
 
-Lemma joinxx : idempotent (@join _ L).
+Lemma joinxx : idempotent_op (@join _ L).
 Proof. exact: (@meetxx _ L^d). Qed.
 Lemma joinAC : right_commutative (@join _ L).
 Proof. exact: (@meetAC _ L^d). Qed.
@@ -4771,7 +4771,7 @@ HB.factory Record POrder_Meet_isSemilattice d T of POrder d T := {
 
 HB.builders Context d T of POrder_Meet_isSemilattice d T.
 
-Fact meetxx : idempotent meet.
+Fact meetxx : idempotent_op meet.
 Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
 
 Fact lexI x y z : (x <= meet y z) = (x <= y) && (x <= z).
@@ -4795,7 +4795,7 @@ HB.factory Record POrder_Join_isSemilattice d T of POrder d T := {
 
 HB.builders Context d T of POrder_Join_isSemilattice d T.
 
-Fact joinxx : idempotent join.
+Fact joinxx : idempotent_op join.
 Proof. by move=> x; apply/eqP; rewrite -leEjoin. Qed.
 
 Fact leUx x y z : (join x y <= z) = (x <= z) && (y <= z).
@@ -4844,7 +4844,7 @@ rewrite leEmeet; apply/eqP/eqP => <-.
 by rewrite joinC joinKI.
 Qed.
 
-Fact meetxx : idempotent meet.
+Fact meetxx : idempotent_op meet.
 Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
 
 Fact lexI x y z : (x <= meet y z) = (x <= y) && (x <= z).
@@ -4855,7 +4855,7 @@ rewrite !leEmeet; apply/eqP/andP => [<-|[/eqP<- /eqP<-]].
 by rewrite -!meetA (meetC z) -meetA (meetA y) !meetxx.
 Qed.
 
-Fact joinxx : idempotent join.
+Fact joinxx : idempotent_op join.
 Proof. by move=> x; apply/eqP; rewrite -leEjoin. Qed.
 
 Fact leUx x y z : (join x y <= z) = (x <= z) && (y <= z).
@@ -4924,7 +4924,7 @@ HB.factory Record isMeetJoinDistrLattice (d : disp_t) T of Choice T := {
   joinKI : forall y x : T, meet x (join x y) = x;
   meetKU : forall y x : T, join x (meet x y) = x;
   meetUl : left_distributive meet join;
-  meetxx : idempotent meet;
+  meetxx : idempotent_op meet;
 }.
 
 HB.builders Context d T of isMeetJoinDistrLattice d T.
@@ -5230,7 +5230,7 @@ Fact meetKU y x : join x (meet x y) = x.
 Proof. by rewrite meetE joinE meetKU. Qed.
 Fact meetUl : left_distributive meet join.
 Proof. by move=> *; rewrite !meetE !joinE meetUl. Qed.
-Fact meetxx : idempotent meet.
+Fact meetxx : idempotent_op meet.
 Proof. by move=> *; rewrite meetE meetxx. Qed.
 Fact le_def x y : x <= y = (meet x y == x).
 Proof. by rewrite meetE (eq_meetl x y). Qed.
