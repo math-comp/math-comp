@@ -125,7 +125,7 @@ Notation "''e_' j" := (delta_mx 0 j)
 
 Notation "M ^ phi" := (map_mx phi M) : form_scope.
 Notation "M ^t phi" := ((M ^T) ^ phi)
-  (phi at level 30, at level 30) : form_scope.
+  (phi at level 39, at level 39) : form_scope.
 
 (* TODO: move? *)
 Lemma eq_map_mx_id (R : ringType) m n (M : 'M[R]_(m, n)) (f : R -> R) :
