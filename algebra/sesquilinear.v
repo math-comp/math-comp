@@ -182,8 +182,8 @@ Notation "[ 'revop' revop 'of' op ]" :=
 
 HB.mixin Record isBilinear (R : nzRingType) (U U' : lmodType R) (V : zmodType)
     (s : R -> V -> V) (s' : R -> V -> V) (f : U -> U' -> V) := {
-  additivel_subproof : forall u', additive (f ^~ u') ;
-  additiver_subproof : forall u, additive (f u) ;
+  zmod_morphisml_subproof : forall u', zmod_morphism (f ^~ u') ;
+  zmod_morphismr_subproof : forall u, zmod_morphism (f u) ;
   linearl_subproof : forall u', scalable_for s (f ^~ u') ;
   linearr_subproof : forall u, scalable_for s' (f u)
 }.
@@ -206,8 +206,8 @@ HB.factory Record bilinear_isBilinear (R : nzRingType) (U U' : lmodType R)
 
 HB.builders Context R U U' V s s' f of bilinear_isBilinear R U U' V s s' f.
 HB.instance Definition _ := isBilinear.Build R U U' V s s' f
-    (fun u' => additive_linear (bilinear_subproof.1 u'))
-    (fun u => additive_linear (bilinear_subproof.2 u))
+    (fun u' => zmod_morphism_linear (bilinear_subproof.1 u'))
+    (fun u => zmod_morphism_linear (bilinear_subproof.2 u))
     (fun u' => scalable_linear (bilinear_subproof.1 u'))
     (fun u => scalable_linear (bilinear_subproof.2 u)).
 HB.end.
@@ -266,7 +266,7 @@ Export BilinearExports.
 HB.instance Definition _ (R : nzRingType) (U U' : lmodType R) (V : zmodType)
     (s : R -> V -> V) (s' : R -> V -> V)
   (f : {bilinear U -> U' -> V | s & s'}) (u : U)
-  := @GRing.isAdditive.Build U' V (f u) (@additiver_subproof _ _ _ _ _ _ f u).
+  := @GRing.isZmodMorphism.Build U' V (f u) (@zmod_morphismr_subproof _ _ _ _ _ _ f u).
 
 #[non_forgetful_inheritance]
 HB.instance Definition _ (R : nzRingType) (U U' : lmodType R) (V : zmodType)
@@ -308,7 +308,7 @@ Variable z : U.
 
 #[local, non_forgetful_inheritance, warning="-HB.no-new-instance"]
 HB.instance Definition _ :=
-  GRing.isAdditive.Build _ _ (f z) (@additiver_subproof _ _ _ _ _ _ f z).
+  GRing.isZmodMorphism.Build _ _ (f z) (@zmod_morphismr_subproof _ _ _ _ _ _ f z).
 #[local, non_forgetful_inheritance]
 HB.instance Definition _ :=
   GRing.isScalable.Build _ _ _ _ (f z) (@linearr_subproof _ _ _ _ _ _ f z).
@@ -335,7 +335,7 @@ Section GenericPropertiesl.
 Variable z : U'.
 
 HB.instance Definition _ :=
-  GRing.isAdditive.Build _ _ (applyr f z) (@additivel_subproof _ _ _ _ _ _ f z).
+  GRing.isZmodMorphism.Build _ _ (applyr f z) (@zmod_morphisml_subproof _ _ _ _ _ _ f z).
 HB.instance Definition _ :=
   GRing.isScalable.Build _ _ _ _ (applyr f z) (@linearl_subproof _ _ _ _ _ _ f z).
 
@@ -473,7 +473,7 @@ Notation "{ 'hermitian' U 'for' eps & theta }" := (@Hermitian.type _ U eps theta
 #[non_forgetful_inheritance]
 HB.instance Definition _ (R : nzRingType) (U : lmodType R)
     (eps : bool) (theta : R -> R) (f : {hermitian U for eps & theta}) (u : U) :=
-  @GRing.isAdditive.Build _ _ (f u) (@additiver_subproof _ _ _ _ _ _ f u).
+  @GRing.isZmodMorphism.Build _ _ (f u) (@zmod_morphismr_subproof _ _ _ _ _ _ f u).
 
 #[non_forgetful_inheritance]
 HB.instance Definition _ (R : nzRingType) (U : lmodType R)
@@ -731,7 +731,7 @@ Notation "{ 'dot' U 'for' theta }" := (@Dot.type _ U theta)
 #[non_forgetful_inheritance]
 HB.instance Definition _ (R : numDomainType) (U : lmodType R)
     (theta : R -> R) (f : {dot U for theta}) (u : U) :=
-  @GRing.isAdditive.Build _ _ (f u) (@additiver_subproof _ _ _ _ _ _ f u).
+  @GRing.isZmodMorphism.Build _ _ (f u) (@zmod_morphismr_subproof _ _ _ _ _ _ f u).
 
 #[non_forgetful_inheritance]
 HB.instance Definition _ (R : numDomainType) (U : lmodType R)

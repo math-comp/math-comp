@@ -180,10 +180,14 @@ Proof. by apply/(polyOverS (subvP (sub1v _)))/polyOver1P; exists p. Qed.
 Lemma sub_adjoin1v x E : (<<1; x>> <= E)%VS = (x \in E)%VS.
 Proof. by rewrite (sameP FadjoinP andP) sub1v. Qed.
 
-Fact vsval_multiplicative K : multiplicative (vsval : subvs_of K -> L).
+Fact vsval_monoid_morphism K : monoid_morphism (vsval : subvs_of K -> L).
 Proof. by split => //=; apply: algid1. Qed.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `subfx_eval_is_monoid_morphism` instead")]
+Definition vsval_is_multiplicative K :=
+  (fun g => (g.2,g.1)) (vsval_monoid_morphism K).
 HB.instance Definition _ (K : {subfield L}) :=
-  GRing.isMultiplicative.Build (subvs_of K) L vsval (vsval_multiplicative K).
+  GRing.isMonoidMorphism.Build (subvs_of K) L vsval (vsval_monoid_morphism K).
 
 Lemma vsval_invf K (w : subvs_of K) : val w^-1 = (vsval w)^-1.
 Proof.
@@ -198,7 +202,7 @@ HB.instance Definition _ K :=
 
 HB.instance Definition _ (K : {subfield L}) :=
   GRing.isSubPzSemiRing.Build L (pred_of_vspace K) (subvs_of K)
-    (rmorphM _, rmorph1 _).
+    (rmorph1 _, rmorphM _).
 (* Note that the nzRingType structure was built in the SubFalgType
    section of falgebra.v but the SubRing structure did not stand
    there, it is thus built only here *)
@@ -1151,43 +1155,55 @@ Qed.
 HB.instance Definition _ := GRing.ComNzRing_isField.Build subFExtend
   subfx_fieldAxiom subfx_inv0.
 
-Fact subfx_inj_is_additive : additive subfx_inj.
+Fact subfx_inj_is_zmod_morphism : zmod_morphism subfx_inj.
 Proof.
 by elim/quotW => x; elim/quotW => y; rewrite !piE /iotaFz linearB rmorphB.
 Qed.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `subfx_inj_is_zmod_morphism` instead")]
+Definition subfx_inj_is_additive := subfx_inj_is_zmod_morphism.
 
-Fact subfx_inj_is_multiplicative : multiplicative subfx_inj.
+Fact subfx_inj_is_monoid_morphism : monoid_morphism subfx_inj.
 Proof.
-split; last by rewrite piE /iotaFz poly_rV_K ?rmorph1 ?size_poly1.
+split; first by rewrite piE /iotaFz poly_rV_K ?rmorph1 ?size_poly1.
 elim/quotW=> x; elim/quotW=> y; rewrite !piE /subfx_mul_rep /iotaFz.
 by rewrite poly_rV_modp_K iotaPz_modp rmorphM.
 Qed.
-
-HB.instance Definition _ := GRing.isAdditive.Build subFExtend L subfx_inj
-  subfx_inj_is_additive.
-HB.instance Definition _ := GRing.isMultiplicative.Build subFExtend L subfx_inj
-  subfx_inj_is_multiplicative.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `subfx_inj_is_monoid_morphism` instead")]
+Definition subfx_inj_is_multiplicative :=
+  (fun g => (g.2,g.1)) subfx_inj_is_monoid_morphism.
+HB.instance Definition _ := GRing.isZmodMorphism.Build subFExtend L subfx_inj
+  subfx_inj_is_zmod_morphism.
+HB.instance Definition _ := GRing.isMonoidMorphism.Build subFExtend L subfx_inj
+  subfx_inj_is_monoid_morphism.
 
 Definition subfx_eval := lift_embed subFExtend (fun q => poly_rV (q %% p0)).
 Canonical subfx_eval_morph := PiEmbed subfx_eval.
 
 Definition subfx_root := subfx_eval 'X.
 
-Lemma subfx_eval_is_additive : additive subfx_eval.
+Lemma subfx_eval_is_zmod_morphism : zmod_morphism subfx_eval.
 Proof. by move=> x y; apply/eqP; rewrite piE -linearB modpD modNp. Qed.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `subfx_eval_is_zmod_morphism` instead")]
+Definition subfx_eval_is_additive := subfx_eval_is_zmod_morphism.
 
-Lemma subfx_eval_is_multiplicative : multiplicative subfx_eval.
+Lemma subfx_eval_is_monoid_morphism : monoid_morphism subfx_eval.
 Proof.
-split=> [x y|]; apply/eqP; rewrite piE.
-  by rewrite /subfx_mul_rep !poly_rV_modp_K !(modp_mul, mulrC _ y).
-by rewrite modp_small // size_poly1 -subn_gt0 subn1.
+split=> [|x y]; apply/eqP; rewrite piE.
+  by rewrite modp_small // size_poly1 -subn_gt0 subn1.
+by rewrite /subfx_mul_rep !poly_rV_modp_K !(modp_mul, mulrC _ y).
 Qed.
-
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `subfx_eval_is_monoid_morphism` instead")]
+Definition subfx_eval_is_multiplicative :=
+  (fun g => (g.2,g.1)) subfx_eval_is_monoid_morphism.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build {poly F} subFExtend subfx_eval subfx_eval_is_additive.
+  GRing.isZmodMorphism.Build {poly F} subFExtend subfx_eval subfx_eval_is_zmod_morphism.
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build {poly F} subFExtend subfx_eval
-    subfx_eval_is_multiplicative.
+  GRing.isMonoidMorphism.Build {poly F} subFExtend subfx_eval
+    subfx_eval_is_monoid_morphism.
 
 Definition inj_subfx := (subfx_eval \o polyC).
 HB.instance Definition _ := GRing.RMorphism.on inj_subfx.
@@ -1376,11 +1392,11 @@ pose feL : fieldExtType F := HB.pack vL aL cuL unitM.
 exists feL; first by rewrite dimvf; apply: mul1n.
 exists toPF.
 have tol_lin: linear toL by move=> a q1 q2; rewrite -linearP -modpZl -modpD.
-have tol_mul : multiplicative (toL : {poly F} -> aL).
-  by split=> [q r|];
+have tol_mul : monoid_morphism (toL : {poly F} -> aL).
+  by split=> [|q r];
     apply: toPinj; rewrite !toL_K // modp_mul -!(mulrC r) modp_mul.
 pose toLlM := GRing.isLinear.Build _ _ _ _ toL tol_lin.
-pose toLmM := GRing.isMultiplicative.Build _ _ _ tol_mul.
+pose toLmM := GRing.isMonoidMorphism.Build _ _ _ tol_mul.
 pose toLLRM : {lrmorphism _ -> feL} := HB.pack toL toLlM toLmM.
 by exists toLLRM.
 Qed.

@@ -252,18 +252,22 @@ move=> a u v; apply/lfunP => w.
 by rewrite !lfunE /= !lfunE /= lfunE mulrDr /= scalerAr.
 Qed.
 
-Lemma amulr_is_multiplicative : multiplicative amulr.
+Lemma amulr_is_monoid_morphism : monoid_morphism amulr.
 Proof.
-split=> [x y|]; last by apply/lfunP => w; rewrite id_lfunE !lfunE /= mulr1.
+split=> [|x y]; first by apply/lfunP => w; rewrite id_lfunE !lfunE /= mulr1.
 by apply/lfunP=> w; rewrite comp_lfunE !lfunE /= mulrA.
 Qed.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `amulr_is_monoid_morphism` instead")]
+Definition amulr_is_multiplicative :=
+  (fun p => (p.2, p.1)) amulr_is_monoid_morphism.
 
 #[hnf]
 HB.instance Definition _ := GRing.isSemilinear.Build K aT (hom aT aT) _ amulr
   (GRing.semilinear_linear amulr_is_linear).
 #[hnf]
-HB.instance Definition _ := GRing.isMultiplicative.Build aT (hom aT aT) amulr
-  amulr_is_multiplicative.
+HB.instance Definition _ := GRing.isMonoidMorphism.Build aT (hom aT aT) amulr
+  amulr_is_monoid_morphism.
 
 Lemma lker0_amull u : u \is a GRing.unit -> lker (amull u) == 0%VS.
 Proof. by move=> Uu; apply/lker0P=> v w; rewrite !lfunE; apply: mulrI. Qed.
@@ -1017,12 +1021,16 @@ rewrite !linearZ -!scalerAr -!scalerAl 2!linearZ /=; congr (_ *: (_ *: _)).
 by apply/eqP/fM; apply: memt_nth.
 Qed.
 
-Lemma ahomP {f : 'Hom(aT, rT)} : reflect (multiplicative f) (ahom_in {:aT} f).
+Lemma ahomP_tmp {f : 'Hom(aT, rT)} : reflect (monoid_morphism f) (ahom_in {:aT} f).
 Proof.
 apply: (iffP ahom_inP) => [[fM f1] | fRM_P]; last first.
-  by split=> [x y|]; [rewrite fRM_P.1|rewrite fRM_P.2].
+  by split=> [x y|]; [rewrite fRM_P.2|rewrite fRM_P.1].
 by split=> // x y; rewrite fM ?memvf.
 Qed.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `ahomP_tmp` instead")]
+Lemma ahomP {f : 'Hom(aT, rT)} : reflect (multiplicative f) (ahom_in {:aT} f).
+Proof. by apply: (iffP ahomP_tmp) => [][]. Qed.
 
 Structure ahom := AHom {ahval :> 'Hom(aT, rT); _ : ahom_in {:aT} ahval}.
 
@@ -1038,17 +1046,24 @@ End Class_Def.
 
 Arguments ahom_in [aT rT].
 Arguments ahom_inP {aT rT f U}.
+#[warning="-deprecated-since-mathcomp-2.5.0"]
 Arguments ahomP {aT rT f}.
+Arguments ahomP_tmp {aT rT f}.
 
 Section LRMorphism.
 
 Variables aT rT sT : falgType K.
 
-Fact ahom_is_multiplicative (f : ahom aT rT) : multiplicative f.
-Proof. by apply/ahomP; case: f. Qed.
+Fact ahom_is_monoid_morphism (f : ahom aT rT) : monoid_morphism f.
+Proof. by apply/ahomP_tmp; case: f. Qed.
 #[hnf]
 HB.instance Definition _ (f : ahom aT rT) :=
-  GRing.isMultiplicative.Build aT rT f (ahom_is_multiplicative f).
+  GRing.isMonoidMorphism.Build aT rT f (ahom_is_monoid_morphism f).
+
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `ahom_is_monoid_morphism` instead")]
+Definition ahom_is_multiplicative (f : ahom aT rT) : multiplicative f :=
+  (fun p => (p.2, p.1)) (ahom_is_monoid_morphism f).
 
 Lemma ahomWin (f : ahom aT rT) U : ahom_in U f.
 Proof.

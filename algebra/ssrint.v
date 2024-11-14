@@ -223,7 +223,7 @@ End intZmod.
 
 HB.instance Definition _ := intZmod.Mixin.
 
-HB.instance Definition _ := GRing.isSemiAdditive.Build nat int Posz
+HB.instance Definition _ := GRing.isNmodMorphism.Build nat int Posz
   (erefl, intZmod.PoszD).
 
 Local Open Scope ring_scope.
@@ -348,8 +348,8 @@ Proof. exact: intZmod.predn_int. Qed.
 
 End intRingTheory.
 
-HB.instance Definition _ := GRing.isMultiplicative.Build nat int Posz
-  (PoszM, erefl).
+HB.instance Definition _ := GRing.isMonoidMorphism.Build nat int Posz
+  (erefl, PoszM).
 
 Module intUnitRing.
 Section intUnitRing.
@@ -607,7 +607,7 @@ Lemma mulrz_suml : forall n I r (P : pred I) (F : I -> M),
   (\sum_(i <- r | P i) F i) *~ n= \sum_(i <- r | P i) F i *~ n.
 Proof. by rewrite -/M^z; apply: scaler_sumr. Qed.
 
-HB.instance Definition _ (x : M) := GRing.isAdditive.Build int M ( *~%R x)
+HB.instance Definition _ (x : M) := GRing.isZmodMorphism.Build int M ( *~%R x)
   (@mulrzBr x).
 
 End ZintLmod.
@@ -660,10 +660,14 @@ Lemma intrB m n : (m - n)%:~R = m%:~R - n%:~R :> R. Proof. exact: mulrzBr. Qed.
 Lemma intrM m n : (m * n)%:~R = m%:~R * n%:~R :> R.
 Proof. by rewrite mulrzA -mulrzr. Qed.
 
-Lemma intmul1_is_multiplicative : multiplicative ( *~%R (1 : R)).
+Lemma intmul1_is_monoid_morphism : monoid_morphism ( *~%R (1 : R)).
 Proof. by split; move=> // x y /=; rewrite ?intrD ?mulrNz ?intrM. Qed.
-HB.instance Definition _ := GRing.isMultiplicative.Build int R ( *~%R 1)
-  intmul1_is_multiplicative.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `intmul1_is_monoid_morphism` instead")]
+Definition intmul1_is_multiplicative :=
+  (fun g => (g.2,g.1)) intmul1_is_monoid_morphism.
+HB.instance Definition _ := GRing.isMonoidMorphism.Build int R ( *~%R 1)
+  intmul1_is_monoid_morphism.
 
 Lemma mulr2z n : n *~ 2 = n + n. Proof. exact: mulr2n. Qed.
 

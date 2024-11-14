@@ -5256,15 +5256,24 @@ Lemma mxval1 : mxval 1 = 1%:M. Proof. exact: mxval_gen1. Qed.
 Lemma mxvalM : {morph mxval : x y / x * y >-> x *m y}.
 Proof. exact: mxval_genM. Qed.
 
-Lemma mxval_sub : additive mxval.
+Lemma mxval_is_zmod_morphism : zmod_morphism mxval.
 Proof. by move=> x y; rewrite mxvalD mxvalN. Qed.
-#[export] HB.instance Definition _ :=
-  GRing.isAdditive.Build FA 'M[F]_n mxval mxval_sub.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `mxval_is_zmod_morphism` instead")]
+Definition mxval_sub := mxval_is_zmod_morphism.
 
-Lemma mxval_is_multiplicative : multiplicative mxval.
-Proof. by split; [apply: mxvalM | apply: mxval1]. Qed.
 #[export] HB.instance Definition _ :=
-  GRing.isMultiplicative.Build FA 'M[F]_n mxval mxval_is_multiplicative.
+  GRing.isZmodMorphism.Build FA 'M[F]_n mxval mxval_is_zmod_morphism.
+
+Lemma mxval_is_monoid_morphism : monoid_morphism mxval.
+Proof. by split; [apply: mxval1 | apply: mxvalM]. Qed.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `mxval_is_monoid_morphism` instead")]
+Definition mxval_is_multiplicative :=
+  (fun g => (g.2,g.1)) mxval_is_monoid_morphism.
+
+#[export] HB.instance Definition _ :=
+  GRing.isMonoidMorphism.Build FA 'M[F]_n mxval mxval_is_monoid_morphism.
 
 Lemma mxval_centg x : centgmx rG (mxval x).
 Proof.
@@ -5289,16 +5298,23 @@ Proof. by apply: mxval_inj; rewrite mxval_genV !mxval0 -{2}invr0. Qed.
 Lemma mxvalV : {morph mxval : x / x^-1 >-> invmx x}.
 Proof. exact: mxval_genV. Qed.
 
-Lemma gen_is_additive : additive gen.
+Lemma gen_is_zmod_morphism : zmod_morphism gen.
 Proof. by move=> x y; apply: mxval_inj; rewrite genK !rmorphB /= !genK. Qed.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `gen_is_zmod_morphism` instead")]
+Definition gen_is_additive := gen_is_zmod_morphism.
 
-Lemma gen_is_multiplicative : multiplicative gen.
+Lemma gen_is_monoid_morphism : monoid_morphism gen.
 Proof. by split=> // x y; apply: mxval_inj; rewrite genK !rmorphM /= !genK. Qed.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `gen_is_monoid_morphism` instead")]
+Definition gen_is_multiplicative :=
+  (fun g => (g.2,g.1)) gen_is_monoid_morphism.
 
-#[export] HB.instance Definition _ := GRing.isAdditive.Build F FA gen
-  gen_is_additive.
-#[export] HB.instance Definition _ := GRing.isMultiplicative.Build F FA gen
-  gen_is_multiplicative.
+#[export] HB.instance Definition _ := GRing.isZmodMorphism.Build F FA gen
+  gen_is_zmod_morphism.
+#[export] HB.instance Definition _ := GRing.isMonoidMorphism.Build F FA gen
+  gen_is_monoid_morphism.
 
 (* The generated field contains a root of the minimal polynomial (in some  *)
 (* cases we want to use the construction solely for that purpose).         *)

@@ -464,11 +464,11 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (* parallel hierarchy for morphisms linking these structures:                 *)
 (*                                                                            *)
 (* * Additive (semiadditive or additive functions):                           *)
-(*        semi_additive f <-> f of type U -> V is semiadditive, i.e., f maps  *)
+(*        nmod_morphism f <-> f of type U -> V is semi additive, i.e., f maps *)
 (*                           the Nmodule structure of U to that of V, 0 to 0  *)
 (*                           and + to +                                       *)
 (*                        := (f 0 = 0) * {morph f : x y / x + y}              *)
-(*             additive f <-> f of type U -> V is additive, i.e., f maps the  *)
+(*        zmod_morphism f <-> f of type U -> V is additive, i.e., f maps the  *)
 (*                           Zmodule structure of U to that of V, 0 to 0,     *)
 (*                           - to - and + to + (equivalently, binary - to -)  *)
 (*                        := {morph f : u v / u - v}                          *)
@@ -481,10 +481,10 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                        := GRing.Additive.type U V                          *)
 (*                                                                            *)
 (* * RMorphism (semiring or ring morphisms):                                  *)
-(*       multiplicative f <-> f of type R -> S is multiplicative, i.e., f     *)
-(*                           maps 1 and * in R to 1 and * in S, respectively  *)
-(*                           R and S must have canonical pzSemiRingType       *)
-(*                           instances                                        *)
+(*      monoid_morphism f <-> f of type R -> S is a multiplicative monoid     *)
+(*                           morphism, i.e., f maps 1 and * in R to 1 and *   *)
+(*                           in S, respectively. R and S must have canonical  *)
+(*                           pzSemiRingType instances.                        *)
 (*     {rmorphism R -> S} == the interface type for semiring morphisms; both  *)
 (*                           R and S must have pzSemiRingType instances       *)
 (*                           When both R and S have pzRingType instances, it  *)
@@ -2266,37 +2266,54 @@ End LalgebraTheory.
 
 (* Morphism hierarchy. *)
 
-Definition semi_additive (U V : nmodType) (f : U -> V) : Prop :=
+Definition nmod_morphism (U V : nmodType) (f : U -> V) : Prop :=
   (f 0 = 0) * {morph f : x y / x + y}.
+#[deprecated(since="mathcomp 2.5.0", note="use `nmod_morphism` instead")]
+Definition semi_additive := nmod_morphism.
 
-HB.mixin Record isSemiAdditive (U V : nmodType) (apply : U -> V) := {
-  semi_additive_subproof : semi_additive apply;
+HB.mixin Record isNmodMorphism (U V : nmodType) (apply : U -> V) := {
+  nmod_morphism_subproof : nmod_morphism apply;
 }.
 
-#[mathcomp(axiom="semi_additive")]
+#[mathcomp(axiom="nmod_morphism")]
 HB.structure Definition Additive (U V : nmodType) :=
-  {f of isSemiAdditive U V f}.
+  {f of isNmodMorphism U V f}.
 
-Definition additive (U V : zmodType) (f : U -> V) := {morph f : x y / x - y}.
+Definition zmod_morphism (U V : zmodType) (f : U -> V) := {morph f : x y / x - y}.
 
-HB.factory Record isAdditive (U V : zmodType) (apply : U -> V) := {
-  additive_subproof : additive apply;
+HB.factory Record isZmodMorphism (U V : zmodType) (apply : U -> V) := {
+  zmod_morphism_subproof : zmod_morphism apply;
 }.
 
-HB.builders Context U V apply of isAdditive U V apply.
+HB.builders Context U V apply of isZmodMorphism U V apply.
 
 Local Lemma raddf0 : apply 0 = 0.
-Proof. by rewrite -[0]subr0 additive_subproof subrr. Qed.
+Proof. by rewrite -[0]subr0 zmod_morphism_subproof subrr. Qed.
 
 Local Lemma raddfD : {morph apply : x y / x + y}.
 Proof.
 move=> x y; rewrite -[y in LHS]opprK -[- y]add0r.
-by rewrite !additive_subproof raddf0 sub0r opprK.
+by rewrite !zmod_morphism_subproof raddf0 sub0r opprK.
 Qed.
 
-HB.instance Definition _ := isSemiAdditive.Build U V apply (conj raddf0 raddfD).
+HB.instance Definition _ := isNmodMorphism.Build U V apply (conj raddf0 raddfD).
 
 HB.end.
+
+#[deprecated(since="mathcomp 2.5.0", note="use `zmod_morphism` instead")]
+Definition additive := zmod_morphism.
+
+Module isSemiAdditive.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use isNmodMorphism.Build instead.")]
+Notation Build U V apply := (isNmodMorphism.Build U V apply) (only parsing).
+End isSemiAdditive.
+
+Module isAdditive.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use isZmodMorphism.Build instead.")]
+Notation Build U V apply := (isZmodMorphism.Build U V apply) (only parsing).
+End isAdditive.
 
 Module AdditiveExports.
 Notation "{ 'additive' U -> V }" := (Additive.type U%type V%type) : type_scope.
@@ -2358,13 +2375,13 @@ Section Properties.
 Variables (U V : nmodType) (f : {additive U -> V}).
 
 Lemma raddf0 : f 0 = 0.
-Proof. exact: semi_additive_subproof.1. Qed.
+Proof. exact: nmod_morphism_subproof.1. Qed.
 
 Lemma raddf_eq0 x : injective f -> (f x == 0) = (x == 0).
 Proof. by move=> /inj_eq <-; rewrite raddf0. Qed.
 
 Lemma raddfD : {morph f : x y / x + y}.
-Proof. exact: semi_additive_subproof.2. Qed.
+Proof. exact: nmod_morphism_subproof.2. Qed.
 
 Lemma raddfMn n : {morph f : x / x *+ n}.
 Proof. by elim: n => [|n IHn] x /=; rewrite ?raddf0 // !mulrS raddfD IHn. Qed.
@@ -2373,11 +2390,13 @@ Lemma raddf_sum I r (P : pred I) E :
   f (\sum_(i <- r | P i) E i) = \sum_(i <- r | P i) f (E i).
 Proof. exact: (big_morph f raddfD raddf0). Qed.
 
-Lemma can2_semi_additive f' : cancel f f' -> cancel f' f -> semi_additive f'.
+Lemma can2_nmod_morphism f' : cancel f f' -> cancel f' f -> nmod_morphism f'.
 Proof.
 move=> fK f'K.
 by split=> [|x y]; apply: (canLR fK); rewrite ?raddf0// raddfD !f'K.
 Qed.
+#[deprecated(since="mathcomp 2.5.0", note="use `can2_nmod_morphism` instead")]
+Definition can2_semi_additive := can2_nmod_morphism.
 
 End Properties.
 
@@ -2400,31 +2419,31 @@ Section AddFun.
 Variables (U V W : nmodType).
 Variables (f g : {additive V -> W}) (h : {additive U -> V}).
 
-Fact idfun_is_semi_additive : semi_additive (@idfun U).
+Fact idfun_is_nmod_morphism : nmod_morphism (@idfun U).
 Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build U U idfun
-  idfun_is_semi_additive.
+HB.instance Definition _ := isNmodMorphism.Build U U idfun
+  idfun_is_nmod_morphism.
 
-Fact comp_is_semi_additive : semi_additive (f \o h).
+Fact comp_is_nmod_morphism : nmod_morphism (f \o h).
 Proof. by split=> [|x y]; rewrite /= ?raddf0// !raddfD. Qed.
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build U W (f \o h)
-  comp_is_semi_additive.
+HB.instance Definition _ := isNmodMorphism.Build U W (f \o h)
+  comp_is_nmod_morphism.
 
-Fact null_fun_is_semi_additive : semi_additive (\0 : U -> V).
+Fact null_fun_is_nmod_morphism : nmod_morphism (\0 : U -> V).
 Proof. by split=> // x y /=; rewrite addr0. Qed.
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build U V \0
-  null_fun_is_semi_additive.
+HB.instance Definition _ := isNmodMorphism.Build U V \0
+  null_fun_is_nmod_morphism.
 
-Fact add_fun_is_semi_additive : semi_additive (f \+ g).
+Fact add_fun_is_nmod_morphism : nmod_morphism (f \+ g).
 Proof.
 by split=> [|x y]; rewrite /= ?raddf0 ?addr0// !raddfD addrCA -!addrA addrCA.
 Qed.
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build V W (f \+ g)
-  add_fun_is_semi_additive.
+HB.instance Definition _ := isNmodMorphism.Build V W (f \+ g)
+  add_fun_is_nmod_morphism.
 
 End AddFun.
 
@@ -2432,17 +2451,17 @@ Section MulFun.
 
 Variables (R : pzSemiRingType) (U : nmodType) (a : R) (f : {additive U -> R}).
 
-Fact mull_fun_is_semi_additive : semi_additive (a \*o f).
+Fact mull_fun_is_nmod_morphism : nmod_morphism (a \*o f).
 Proof. by split=> [|x y]; rewrite /= ?raddf0 ?mulr0// raddfD mulrDr. Qed.
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build U R (a \*o f)
-  mull_fun_is_semi_additive.
+HB.instance Definition _ := isNmodMorphism.Build U R (a \*o f)
+  mull_fun_is_nmod_morphism.
 
-Fact mulr_fun_is_semi_additive : semi_additive (a \o* f).
+Fact mulr_fun_is_nmod_morphism : nmod_morphism (a \o* f).
 Proof. by split=> [|x y]; rewrite /= ?raddf0 ?mul0r// raddfD mulrDl. Qed.
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build U R (a \o* f)
-  mulr_fun_is_semi_additive.
+HB.instance Definition _ := isNmodMorphism.Build U R (a \o* f)
+  mulr_fun_is_nmod_morphism.
 
 End MulFun.
 
@@ -2465,8 +2484,12 @@ Proof. by move=> fI x y eqxy; apply/subr0_eq/fI; rewrite raddfB eqxy subrr. Qed.
 Lemma raddfMNn n : {morph f : x / x *- n}.
 Proof. by move=> x /=; rewrite raddfN raddfMn. Qed.
 
-Lemma can2_additive f' : cancel f f' -> cancel f' f -> additive f'.
+Lemma can2_zmod_morphism f' : cancel f f' -> cancel f' f -> zmod_morphism f'.
 Proof. by move=> fK f'K x y /=; apply: (canLR fK); rewrite raddfB !f'K. Qed.
+
+#[warning="-deprecated-since-mathcomp-2.5.0",
+    deprecated(since="mathcomp 2.5.0", note="use `can2_zmod_morphism` instead")]
+Definition can2_additive := can2_zmod_morphism.
 
 End Properties.
 
@@ -2488,22 +2511,23 @@ Section AddFun.
 
 Variables (U V W : zmodType) (f g : {additive V -> W}) (h : {additive U -> V}).
 
-Fact opp_is_additive : additive (-%R : U -> U).
+Fact opp_is_zmod_morphism : zmod_morphism (-%R : U -> U).
 Proof. by move=> x y; rewrite /= opprD. Qed.
 #[export]
-HB.instance Definition _ := isAdditive.Build U U -%R opp_is_additive.
+HB.instance Definition _ := isZmodMorphism.Build U U -%R opp_is_zmod_morphism.
 
-Fact sub_fun_is_additive : additive (f \- g).
+Fact sub_fun_is_zmod_morphism : zmod_morphism (f \- g).
 Proof.
 by move=> x y /=; rewrite !raddfB addrAC -!addrA -!opprD addrAC addrA.
 Qed.
 #[export]
-HB.instance Definition _ := isAdditive.Build V W (f \- g) sub_fun_is_additive.
+HB.instance Definition _ :=
+  isZmodMorphism.Build V W (f \- g) sub_fun_is_zmod_morphism.
 
-Fact opp_fun_is_additive : additive (\- g).
+Fact opp_fun_is_zmod_morphism : zmod_morphism (\- g).
 Proof. by move=> x y /=; rewrite !raddfB opprB addrC opprK. Qed.
 #[export]
-HB.instance Definition _ := isAdditive.Build V W (\- g) opp_fun_is_additive.
+HB.instance Definition _ := isZmodMorphism.Build V W (\- g) opp_fun_is_zmod_morphism.
 
 End AddFun.
 
@@ -2514,7 +2538,7 @@ Variables (a : R) (f : {additive U -> V}).
 
 #[export]
 HB.instance Definition _ :=
-  isSemiAdditive.Build V V ( *:%R a) (conj (scaler0 _ a) (scalerDr a)).
+  isNmodMorphism.Build V V ( *:%R a) (conj (scaler0 _ a) (scalerDr a)).
 #[export]
 HB.instance Definition _ := Additive.copy (a \*: f) (f \; *:%R a).
 
@@ -2522,17 +2546,32 @@ End ScaleFun.
 
 End AdditiveTheory.
 
+#[deprecated(since="mathcomp 2.5.0", note="use `monoid_morphism` instead")]
 Definition multiplicative (R S : pzSemiRingType) (f : R -> S) : Prop :=
   {morph f : x y / x * y}%R * (f 1 = 1).
+Definition monoid_morphism (R S : pzSemiRingType) (f : R -> S) : Prop :=
+   (f 1 = 1) * {morph f : x y / x * y}%R.
 
-HB.mixin Record isMultiplicative (R S : pzSemiRingType) (f : R -> S) := {
-  rmorphism_subproof : multiplicative f
+HB.mixin Record isMonoidMorphism (R S : pzSemiRingType) (f : R -> S) := {
+  monoid_morphism_subproof : monoid_morphism f
 }.
 
 HB.structure Definition RMorphism (R S : pzSemiRingType) :=
-  {f of @Additive R S f & isMultiplicative R S f}.
+  {f of @isNmodMorphism R S f & isMonoidMorphism R S f}.
 (* FIXME: remove the @ once
    https://github.com/math-comp/hierarchy-builder/issues/319 is fixed *)
+
+#[warning="-deprecated-since-mathcomp-2.5.0"]
+HB.factory Record isMultiplicative (R S : pzSemiRingType) (f : R -> S) := {
+      rmorphism_subproof : multiplicative f
+}.
+HB.builders Context R S f of isMultiplicative R S f.
+
+#[warning="-HB.no-new-instance"]
+HB.instance Definition _ := isMonoidMorphism.Build R S f
+                              (rmorphism_subproof.2, rmorphism_subproof.1).
+
+HB.end.
 
 Module RMorphismExports.
 Notation "{ 'rmorphism' U -> V }" := (RMorphism.type U%type V%type)
@@ -2553,9 +2592,15 @@ Lemma rmorph_sum I r (P : pred I) E :
   f (\sum_(i <- r | P i) E i) = \sum_(i <- r | P i) f (E i).
 Proof. exact: raddf_sum. Qed.
 
-Lemma rmorphismMP : multiplicative f. Proof. exact: rmorphism_subproof. Qed.
-Lemma rmorph1 : f 1 = 1. Proof. by case: rmorphismMP. Qed.
-Lemma rmorphM : {morph f: x y  / x * y}. Proof. by case: rmorphismMP. Qed.
+Lemma rmorphism_monoidP : monoid_morphism f.
+Proof. exact: monoid_morphism_subproof. Qed.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `rmorphism_monoidP` instead")]
+Definition rmorphismMP : multiplicative f :=
+  (fun p => (p.2, p.1)) rmorphism_monoidP.
+
+Lemma rmorph1 : f 1 = 1. Proof. by case: rmorphism_monoidP. Qed.
+Lemma rmorphM : {morph f: x y  / x * y}. Proof. by case: rmorphism_monoidP. Qed.
 
 Lemma rmorph_prod I r (P : pred I) E :
   f (\prod_(i <- r | P i) E i) = \prod_(i <- r | P i) f (E i).
@@ -2572,11 +2617,15 @@ Proof. by move/inj_eq <-; rewrite rmorph_nat. Qed.
 Lemma rmorph_eq1 x : injective f -> (f x == 1) = (x == 1).
 Proof. exact: rmorph_eq_nat 1%N. Qed.
 
-Lemma can2_rmorphism f' : cancel f f' -> cancel f' f -> multiplicative f'.
+Lemma can2_monoid_morphism f' : cancel f f' -> cancel f' f -> monoid_morphism f'.
 Proof.
 move=> fK f'K.
-by split=> [x y|]; apply: (canLR fK); rewrite /= (rmorphM, rmorph1) ?f'K.
+by split=> [|x y]; apply: (canLR fK); rewrite /= (rmorph1, rmorphM) ?f'K.
 Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `can2_monoid_morphism` instead")]
+Definition can2_rmorphism f' (cff' : cancel f f') :=
+  (fun p => (p.2, p.1)) \o (can2_monoid_morphism cff').
 
 End Properties.
 
@@ -2591,17 +2640,17 @@ Section Projections.
 Variables (R S T : pzSemiRingType).
 Variables (f : {rmorphism S -> T}) (g : {rmorphism R -> S}).
 
-Fact idfun_is_multiplicative : multiplicative (@idfun R).
+Fact idfun_is_monoid_morphism : monoid_morphism (@idfun R).
 Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build R R idfun
-  idfun_is_multiplicative.
+HB.instance Definition _ := isMonoidMorphism.Build R R idfun
+  idfun_is_monoid_morphism.
 
-Fact comp_is_multiplicative : multiplicative (f \o g).
-Proof. by split=> [x y|] /=; rewrite ?rmorph1 ?rmorphM. Qed.
+Fact comp_is_monoid_morphism : monoid_morphism (f \o g).
+Proof. by split=> [|x y] /=; rewrite ?rmorph1 ?rmorphM. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build R T (f \o g)
-  comp_is_multiplicative.
+HB.instance Definition _ := isMonoidMorphism.Build R T (f \o g)
+  comp_is_monoid_morphism.
 
 End Projections.
 
@@ -2626,18 +2675,18 @@ Section InSemiAlgebra.
 
 Variables (R : pzSemiRingType) (A : lSemiAlgType R).
 
-Fact in_alg_is_semi_additive : semi_additive (in_alg A).
+Fact in_alg_is_nmod_morphism : nmod_morphism (in_alg A).
 Proof. by split; [exact: scale0r | exact: scalerDl]. Qed.
 
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build R A (in_alg A)
-  in_alg_is_semi_additive.
+HB.instance Definition _ :=
+  isNmodMorphism.Build R A (in_alg A) in_alg_is_nmod_morphism.
 
-Fact in_alg_is_rmorphism : multiplicative (in_alg A).
-Proof. by split=> [x y|]; rewrite /= ?scale1r // mulr_algl scalerA. Qed.
+Fact in_alg_is_monoid_morphism : monoid_morphism (in_alg A).
+Proof. by split=> [|x y]; rewrite /= ?scale1r // mulr_algl scalerA. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build R A (in_alg A)
-  in_alg_is_rmorphism.
+HB.instance Definition _ := isMonoidMorphism.Build R A (in_alg A)
+  in_alg_is_monoid_morphism.
 
 Lemma in_algE a : in_alg A a = a%:A. Proof. by []. Qed.
 
@@ -2652,7 +2701,7 @@ Module Scale.
 
 HB.mixin Record isPreLaw
     (R : pzSemiRingType) (V : nmodType) (op : R -> V -> V) := {
-  op_semi_additive : forall a, semi_additive (op a);
+  op_nmod_morphism : forall a, nmod_morphism (op a);
 }.
 
 #[export]
@@ -2707,7 +2756,7 @@ Export Scale.Exports.
 
 #[export]
 HB.instance Definition _ (R : pzSemiRingType) :=
-  Scale.isPreLaw.Build R R *%R (fun => mull_fun_is_semi_additive _ idfun).
+  Scale.isPreLaw.Build R R *%R (fun => mull_fun_is_nmod_morphism _ idfun).
 
 #[export]
 HB.instance Definition _ (R : pzSemiRingType) :=
@@ -2733,7 +2782,7 @@ HB.instance Definition _ (R : pzRingType) (U : lmodType R) :=
 HB.instance Definition _
     (R : pzSemiRingType) (V : nmodType) (s : Scale.preLaw R V)
     (aR : pzSemiRingType) (nu : {rmorphism aR -> R}) :=
-  Scale.isPreLaw.Build aR V (nu \; s) (fun => Scale.op_semi_additive _).
+  Scale.isPreLaw.Build aR V (nu \; s) (fun => Scale.op_nmod_morphism _).
 
 #[export]
 HB.instance Definition _
@@ -2751,7 +2800,7 @@ HB.instance Definition _
 #[export, non_forgetful_inheritance]
 HB.instance Definition _
   (R : pzSemiRingType) (V : nmodType) (s : Scale.preLaw R V) a :=
-  isSemiAdditive.Build V V (s a) (Scale.op_semi_additive a).
+  isNmodMorphism.Build V V (s a) (Scale.op_nmod_morphism a).
 
 Definition scalable_for (R : pzSemiRingType) (U : lSemiModType R) (V : nmodType)
     (s : R -> V -> V) (f : U -> V) :=
@@ -2764,18 +2813,19 @@ HB.mixin Record isScalable (R : pzSemiRingType) (U : lSemiModType R)
 
 HB.structure Definition Linear (R : pzSemiRingType)
     (U : lSemiModType R) (V : nmodType) (s : R -> V -> V) :=
-  {f of @Additive U V f & isScalable R U V s f}.
+  {f of @isNmodMorphism U V f & isScalable R U V s f}.
 
 Definition semilinear_for (R : pzSemiRingType)
     (U : lSemiModType R) (V : nmodType) (s : R -> V -> V) (f : U -> V) : Type :=
   scalable_for s f * {morph f : x y / x + y}.
 
-Lemma additive_semilinear (R : pzSemiRingType)
+Lemma nmod_morphism_semilinear (R : pzSemiRingType)
     (U : lSemiModType R) (V : nmodType) (s : Scale.semiLaw R V) (f : U -> V) :
-  semilinear_for s f -> semi_additive f.
+  semilinear_for s f -> nmod_morphism f.
 Proof.
 by case=> sf Df; split => //; rewrite -[0 in LHS](scale0r 0) sf Scale.op0v.
 Qed.
+Definition additive_semilinear := nmod_morphism_semilinear.
 
 Lemma scalable_semilinear (R : pzSemiRingType)
     (U : lSemiModType R) (V : nmodType) (s : Scale.preLaw R V) (f : U -> V) :
@@ -2787,7 +2837,7 @@ HB.factory Record isSemilinear (R : pzSemiRingType) (U : lSemiModType R)
   linear_subproof : semilinear_for s f;
 }.
 HB.builders Context R U V s f of isSemilinear R U V s f.
-HB.instance Definition _ := isSemiAdditive.Build U V f
+HB.instance Definition _ := isNmodMorphism.Build U V f
   (additive_semilinear linear_subproof).
 
 HB.instance Definition _ :=
@@ -2798,22 +2848,25 @@ Definition linear_for (R : pzSemiRingType) (U : lSemiModType R) (V : nmodType)
     (s : R -> V -> V) (f : U -> V) :=
   forall a, {morph f : u v / a *: u + v >-> s a u + v}.
 
-Lemma additive_linear (R : pzRingType) (U : lmodType R) V
-  (s : Scale.law R V) (f : U -> V) : linear_for s f -> additive f.
+Lemma zmod_morphism_linear (R : pzRingType) (U : lmodType R) V
+  (s : Scale.law R V) (f : U -> V) : linear_for s f -> zmod_morphism f.
 Proof. by move=> Lsf x y; rewrite -scaleN1r addrC Lsf Scale.N1op addrC. Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `zmod_morphism_linear` instead")]
+Definition additive_linear := zmod_morphism_linear.
 
 Lemma scalable_linear (R : pzRingType) (U : lmodType R) V
   (s : Scale.law R V) (f : U -> V) : linear_for s f -> scalable_for s f.
 Proof.
-by move=> Lsf a v; rewrite -[a *:v](addrK v) (additive_linear Lsf) Lsf addrK.
+by move=> Lsf a v; rewrite -[a *:v](addrK v) (zmod_morphism_linear Lsf) Lsf addrK.
 Qed.
 
 Lemma semilinear_linear (R : pzRingType) (U : lmodType R) V
   (s : Scale.law R V) (f : U -> V) : linear_for s f -> semilinear_for s f.
 Proof.
 move=> Lsf; split=> [a x|x y]; first exact: (scalable_linear Lsf).
-have f0: f 0 = 0 by rewrite -[0 in LHS]subr0 (additive_linear Lsf) subrr.
-by rewrite -[y in LHS]opprK -[- y]add0r !(additive_linear Lsf) f0 sub0r opprK.
+have f0: f 0 = 0 by rewrite -[0 in LHS]subr0 (zmod_morphism_linear Lsf) subrr.
+by rewrite -[y in LHS]opprK -[- y]add0r !(zmod_morphism_linear Lsf) f0 sub0r opprK.
 Qed.
 
 HB.factory Record isLinear (R : pzRingType) (U : lmodType R) (V : zmodType)
@@ -2821,8 +2874,8 @@ HB.factory Record isLinear (R : pzRingType) (U : lmodType R) (V : zmodType)
   linear_subproof : linear_for s f;
 }.
 HB.builders Context R U V s f of isLinear R U V s f.
-HB.instance Definition _ := isAdditive.Build U V f
-  (additive_linear linear_subproof).
+HB.instance Definition _ := isZmodMorphism.Build U V f
+  (zmod_morphism_linear linear_subproof).
 HB.instance Definition _ := isScalable.Build R U V s f
   (scalable_linear linear_subproof).
 HB.end.
@@ -3226,22 +3279,22 @@ Section FrobeniusAutomorphism.
 
 Variables (p : nat) (pcharRp : p \in pchar R).
 
-Lemma pFrobenius_aut_is_semi_additive : semi_additive (pFrobenius_aut pcharRp).
+Lemma pFrobenius_aut_is_nmod_morphism : nmod_morphism (pFrobenius_aut pcharRp).
 Proof.
 by split=> [|x y]; [exact: pFrobenius_aut0 | exact/pFrobenius_autD_comm/mulrC].
 Qed.
 
-Lemma pFrobenius_aut_is_multiplicative : multiplicative (pFrobenius_aut pcharRp).
+Lemma pFrobenius_aut_is_monoid_morphism : monoid_morphism (pFrobenius_aut pcharRp).
 Proof.
-by split=> [x y|]; [exact/pFrobenius_autM_comm/mulrC | exact: pFrobenius_aut1].
+by split=> [|x y]; [exact: pFrobenius_aut1 | exact/pFrobenius_autM_comm/mulrC].
 Qed.
 
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build R R (pFrobenius_aut pcharRp)
-  pFrobenius_aut_is_semi_additive.
+HB.instance Definition _ := isNmodMorphism.Build R R (pFrobenius_aut pcharRp)
+  pFrobenius_aut_is_nmod_morphism.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build R R (pFrobenius_aut pcharRp)
-  pFrobenius_aut_is_multiplicative.
+HB.instance Definition _ := isMonoidMorphism.Build R R (pFrobenius_aut pcharRp)
+  pFrobenius_aut_is_monoid_morphism.
 
 End FrobeniusAutomorphism.
 
@@ -3322,8 +3375,10 @@ Bind Scope ring_scope with ComPzRing.sort.
 End ComPzRingExports.
 HB.export ComPzRingExports.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut_is_multiplicative instead.")]
-Notation Frobenius_aut_is_multiplicative := pFrobenius_aut_is_multiplicative (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+      note="Use pFrobenius_aut_is_monoid_morphism instead.")]
+Notation pFrobenius_aut_is_multiplicative :=
+  (fun p => (p.2, p.1) \o pFrobenius_aut_is_monoid_morphism) (only parsing).
 #[deprecated(since="mathcomp 2.4.0", note="Use exprDn_pchar instead.")]
 Notation exprDn_char := exprDn_pchar (only parsing).
 
@@ -5829,21 +5884,21 @@ End FieldPred.
 
 HB.mixin Record isSubNmodule (V : nmodType) (S : pred V) U
     of SubType V S U & Nmodule U := {
-  valD_subproof : semi_additive (val : U -> V);
+  valD_subproof : nmod_morphism (val : U -> V);
 }.
 
 #[short(type="subNmodType")]
 HB.structure Definition SubNmodule (V : nmodType) S :=
   { U of SubChoice V S U & Nmodule U & isSubNmodule V S U }.
 
-Section additive.
+Section nmod_morphism.
 Context (V : nmodType) (S : pred V) (U : SubNmodule.type S).
 Notation val := (val : U -> V).
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build U V val valD_subproof.
+HB.instance Definition _ := isNmodMorphism.Build U V val valD_subproof.
 Lemma valD : {morph val : x y / x + y}. Proof. exact: raddfD. Qed.
 Lemma val0 : val 0 = 0. Proof. exact: raddf0. Qed.
-End additive.
+End nmod_morphism.
 
 HB.factory Record SubChoice_isSubNmodule (V : nmodType) S U
     of SubChoice V S U := {
@@ -5870,7 +5925,7 @@ Proof. by move=> x; apply/val_inj; rewrite !SubK add0r. Qed.
 HB.instance Definition _ := @isNmodule.Build U zeroU addU addUA addUC add0U.
 
 Lemma val0 : (val : U -> V) 0 = 0. Proof. by rewrite !SubK. Qed.
-Lemma valD : semi_additive (val : U -> V).
+Lemma valD : nmod_morphism (val : U -> V).
 Proof. by split=> [|x y]; rewrite !SubK. Qed.
 HB.instance Definition _ := isSubNmodule.Build V S U valD.
 HB.end.
@@ -5879,21 +5934,21 @@ Implicit Type V : zmodType.
 
 HB.mixin Record isSubZmodule V (S : pred V) U
     of SubNmodule V S U & Zmodule U := {
-  valB_subproof : additive (val : U -> V);
+  valB_subproof : zmod_morphism (val : U -> V);
 }.
 
 #[short(type="subZmodType")]
 HB.structure Definition SubZmodule V S :=
   { U of SubNmodule V S U & Zmodule U & isSubZmodule V S U }.
 
-Section additive.
+Section zmod_morphism.
 Context V (S : pred V) (U : SubZmodule.type S).
 Notation val := (val : U -> V).
 #[export, warning="-HB.no-new-instance"]
-HB.instance Definition _ := isAdditive.Build U V val valB_subproof.
+HB.instance Definition _ := isZmodMorphism.Build U V val valB_subproof.
 Lemma valB : {morph val : x y / x - y}. Proof. exact: raddfB. Qed.
 Lemma valN : {morph val : x / - x}. Proof. exact: raddfN. Qed.
-End additive.
+End zmod_morphism.
 
 HB.factory Record SubChoice_isSubZmodule V S U of SubChoice V S U := {
   zmod_closed_subproof : zmod_closed S
@@ -5915,19 +5970,19 @@ Lemma addNr : left_inverse zeroU oppU addU.
 Proof. by move=> x; apply: val_inj; rewrite !SubK addNr. Qed.
 HB.instance Definition _ := Nmodule_isZmodule.Build U addNr.
 
-Lemma valD : semi_additive (val : U -> V).
+Lemma valD : nmod_morphism (val : U -> V).
 Proof. by split=> [|x y]; rewrite !SubK. Qed.
 #[warning="-HB.no-new-instance"]
 HB.instance Definition _ := isSubNmodule.Build V S U valD.
 
-Lemma valB : additive (val : U -> V).
+Lemma valB : zmod_morphism (val : U -> V).
 Proof. by move=> x y; rewrite !SubK. Qed.
 HB.instance Definition _ := isSubZmodule.Build V S U valB.
 HB.end.
 
 HB.mixin Record isSubPzSemiRing (R : pzSemiRingType) (S : pred R) U
     of SubNmodule R S U & PzSemiRing U := {
-  valM_subproof : multiplicative (val : U -> R);
+  valM_subproof : monoid_morphism (val : U -> R);
 }.
 
 Module isSubSemiRing.
@@ -5968,10 +6023,10 @@ Section multiplicative.
 Context (R : pzSemiRingType) (S : pred R) (U : SubPzSemiRing.type S).
 Notation val := (val : U -> R).
 #[export]
-HB.instance Definition _ := isMultiplicative.Build U R val valM_subproof.
+HB.instance Definition _ := isMonoidMorphism.Build U R val valM_subproof.
 Lemma val1 : val 1 = 1. Proof. exact: rmorph1. Qed.
 Lemma valM : {morph val : x y / x * y}. Proof. exact: rmorphM. Qed.
-Lemma valM1 : multiplicative val. Proof. exact: valM_subproof. Qed.
+Lemma valM1 : monoid_morphism val. Proof. exact: valM_subproof. Qed.
 End multiplicative.
 
 HB.factory Record SubNmodule_isSubPzSemiRing (R : pzSemiRingType) S U
@@ -6008,8 +6063,8 @@ Proof. by move=> x; apply: val_inj; rewrite SubK val0 mulr0. Qed.
 HB.instance Definition _ := Nmodule_isPzSemiRing.Build U
   mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0.
 
-Lemma valM : multiplicative (val : U -> R).
-Proof. by split=> [x y|] /=; rewrite !SubK. Qed.
+Lemma valM : monoid_morphism (val : U -> R).
+Proof. by split=> [|x y] /=; rewrite !SubK. Qed.
 HB.instance Definition _ := isSubPzSemiRing.Build R S U valM.
 HB.end.
 
@@ -7281,8 +7336,14 @@ Definition solP {F n f} := @solP F n f.
 Definition eq_sol := eq_sol.
 Definition size_sol := size_sol.
 Definition solve_monicpoly := @solve_monicpoly.
+#[warning="-deprecated-since-mathcomp-2.5.0",
+    deprecated(since="mathcomp 2.5.0", note="use `nmod_morphism` instead")]
 Definition semi_additive := semi_additive.
+Definition nmod_morphism := nmod_morphism.
+#[warning="-deprecated-since-mathcomp-2.5.0",
+    deprecated(since="mathcomp 2.5.0", note="use `zmod_morphism` instead")]
 Definition additive := additive.
+Definition zmod_morphism := zmod_morphism.
 Definition raddf0 := raddf0.
 Definition raddf_eq0 := raddf_eq0.
 Definition raddf_inj := raddf_inj.
@@ -7294,9 +7355,18 @@ Definition raddfMn := raddfMn.
 Definition raddfMNn := raddfMNn.
 Definition raddfMnat := raddfMnat.
 Definition raddfMsign := raddfMsign.
+#[warning="-deprecated-since-mathcomp-2.5.0",
+    deprecated(since="mathcomp 2.5.0", note="use `can2_nmod_morphism` instead")]
 Definition can2_semi_additive := can2_semi_additive.
+Definition can2_nmod_morphism := can2_nmod_morphism.
+#[warning="-deprecated-since-mathcomp-2.5.0",
+    deprecated(since="mathcomp 2.5.0", note="use `can2_zmod_morphism` instead")]
 Definition can2_additive := can2_additive.
+Definition can2_zmod_morphism := can2_zmod_morphism.
+#[warning="-deprecated-since-mathcomp-2.5.0",
+    deprecated(since="mathcomp 2.5.0", note="use `monoid_morphism` instead")]
 Definition multiplicative := multiplicative.
+Definition monoid_morphism := monoid_morphism.
 Definition rmorph0 := rmorph0.
 Definition rmorphN := rmorphN.
 Definition rmorphD := rmorphD.
@@ -7304,7 +7374,10 @@ Definition rmorphB := rmorphB.
 Definition rmorph_sum := rmorph_sum.
 Definition rmorphMn := rmorphMn.
 Definition rmorphMNn := rmorphMNn.
+#[warning="-deprecated-since-mathcomp-2.5.0",
+    deprecated(since="mathcomp 2.5.0", note="use `rmorphism_monoidP` instead")]
 Definition rmorphismMP := rmorphismMP.
+Definition rmorphism_monoidP := rmorphism_monoidP.
 Definition rmorph1 := rmorph1.
 Definition rmorph_eq1 := rmorph_eq1.
 Definition rmorphM := rmorphM.
@@ -7318,7 +7391,10 @@ Definition rmorph_sign := rmorph_sign.
 Definition rmorph_pchar := rmorph_pchar.
 #[deprecated(since="mathcomp 2.4.0", note="Use rmorph_pchar instead.")]
 Definition rmorph_char := rmorph_pchar.
+#[warning="-deprecated-since-mathcomp-2.5.0",
+    deprecated(since="mathcomp 2.5.0", note="use `can2_monoid_morphism` instead")]
 Definition can2_rmorphism := can2_rmorphism.
+Definition can2_monoid_morphism := can2_monoid_morphism.
 Definition rmorph_comm := rmorph_comm.
 Definition rmorph_unit := rmorph_unit.
 Definition rmorphV := rmorphV.
@@ -7375,8 +7451,14 @@ Definition in_algE := in_algE.
 Definition scalable_for := scalable_for.
 Definition semilinear_for := semilinear_for.
 Definition linear_for := linear_for.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+        note="use `nmod_morphism_semilinear` instead")]
 Definition additive_semilinear := additive_semilinear.
+Definition nmod_morphism_semilinear := nmod_morphism_semilinear.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `zmod_morphism_linear` instead")]
 Definition additive_linear := additive_linear.
+Definition zmod_morphism_linear := zmod_morphism_linear.
 Definition scalable_semilinear := scalable_semilinear.
 Definition scalable_linear := scalable_linear.
 Definition linear0 := linear0.
@@ -7802,15 +7884,15 @@ Proof. by case=> x1 x2; congr (_, _); apply: add0r. Qed.
 HB.instance Definition _ := isNmodule.Build (U * V)%type
   pair_addA pair_addC pair_add0.
 
-Fact fst_is_semi_additive : semi_additive fst. Proof. by []. Qed.
+Fact fst_is_nmod_morphism : nmod_morphism fst. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build (U * V)%type U fst
-  fst_is_semi_additive.
+HB.instance Definition _ := isNmodMorphism.Build (U * V)%type U fst
+  fst_is_nmod_morphism.
 
-Fact snd_is_semi_additive : semi_additive snd. Proof. by []. Qed.
+Fact snd_is_nmod_morphism : nmod_morphism snd. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build (U * V)%type V snd
-  snd_is_semi_additive.
+HB.instance Definition _ := isNmodMorphism.Build (U * V)%type V snd
+  snd_is_nmod_morphism.
 
 End PairNmod.
 
@@ -7859,14 +7941,14 @@ Proof. by move=> x; congr (_, _); apply: mulr0. Qed.
 HB.instance Definition _ := Nmodule_isPzSemiRing.Build (R1 * R2)%type
   pair_mulA pair_mul1l pair_mul1r pair_mulDl pair_mulDr pair_mul0r pair_mulr0.
 
-Fact fst_is_multiplicative : multiplicative fst. Proof. by []. Qed.
+Fact fst_is_monoid_morphism : monoid_morphism fst. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build (R1 * R2)%type R1 fst
-  fst_is_multiplicative.
-Fact snd_is_multiplicative : multiplicative snd. Proof. by []. Qed.
+HB.instance Definition _ := isMonoidMorphism.Build (R1 * R2)%type R1 fst
+  fst_is_monoid_morphism.
+Fact snd_is_monoid_morphism : monoid_morphism snd. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build (R1 * R2)%type R2 snd
-  snd_is_multiplicative.
+HB.instance Definition _ := isMonoidMorphism.Build (R1 * R2)%type R2 snd
+  snd_is_monoid_morphism.
 
 End PairSemiRing.
 
@@ -8119,10 +8201,10 @@ HB.instance Definition _ := Nmodule_isComNzSemiRing.Build nat
   mulnA mulnC mul1n mulnDl mul0n erefl.
 
 HB.instance Definition _ (V : nmodType) (x : V) :=
-  isSemiAdditive.Build nat V (natmul x) (mulr0n x, mulrnDr x).
+  isNmodMorphism.Build nat V (natmul x) (mulr0n x, mulrnDr x).
 
 HB.instance Definition _ (R : pzSemiRingType) :=
-  isMultiplicative.Build nat R (natmul 1) (natrM R, mulr1n 1).
+  isMonoidMorphism.Build nat R (natmul 1) (mulr1n 1, natrM R).
 
 Lemma natr0E : 0 = 0%N. Proof. by []. Qed.
 Lemma natr1E : 1 = 1%N. Proof. by []. Qed.

@@ -498,10 +498,13 @@ Qed.
 Definition xcfun (chi : 'CF(G)) A :=
   (gring_row A *m (\col_(i < #|G|) chi (enum_val i))) 0 0.
 
-Lemma xcfun_is_additive phi : additive (xcfun phi).
+Lemma xcfun_is_zmod_morphism phi : zmod_morphism (xcfun phi).
 Proof. by move=> A B; rewrite /xcfun [gring_row _]linearB mulmxBl !mxE. Qed.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `xcfun_is_zmod_morphism` instead")]
+Definition xcfun_is_additive := xcfun_is_zmod_morphism.
 HB.instance Definition _ phi :=
-  GRing.isAdditive.Build 'M_(gcard G) _ (xcfun phi) (xcfun_is_additive phi).
+  GRing.isZmodMorphism.Build 'M_(gcard G) _ (xcfun phi) (xcfun_is_zmod_morphism phi).
 
 Lemma xcfunZr a phi A : xcfun phi (a *: A) = a * xcfun phi A.
 Proof. by rewrite /xcfun linearZ -scalemxAl mxE. Qed.
@@ -512,13 +515,16 @@ Arguments xcfun_r A phi /.
 
 Lemma xcfun_rE A chi : xcfun_r A chi = xcfun chi A. Proof. by []. Qed.
 
-Fact xcfun_r_is_additive A : additive (xcfun_r A).
+Fact xcfun_r_is_zmod_morphism A : zmod_morphism (xcfun_r A).
 Proof.
 move=> phi psi; rewrite /= /xcfun !mxE -sumrB; apply: eq_bigr => i _.
 by rewrite !mxE !cfunE mulrBr.
 Qed.
-HB.instance Definition _ A := GRing.isAdditive.Build _ _ (xcfun_r A)
-  (xcfun_r_is_additive A).
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `xcfun_r_is_zmod_morphism` instead")]
+Definition xcfun_r_is_additive := xcfun_r_is_zmod_morphism.
+HB.instance Definition _ A := GRing.isZmodMorphism.Build _ _ (xcfun_r A)
+  (xcfun_r_is_zmod_morphism A).
 
 Lemma xcfunZl a phi A : xcfun (a *: phi) A = a * xcfun phi A.
 Proof.

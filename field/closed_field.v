@@ -876,12 +876,12 @@ have KmulV: forall x : Kring, x != 0 -> (Kinv x : Kring) * x = 1.
 have Kinv0: Kinv (FtoK 0) = FtoK 0 by rewrite -EtoK_V invr0.
 pose KfieldMixin := GRing.ComNzRing_isField.Build _ KmulV Kinv0.
 pose Kfield : fieldType := HB.pack K Kring KfieldMixin.
-have EtoKAdd i : additive (EtoK i : E i -> Kfield).
+have EtoKAdd i : zmod_morphism (EtoK i : E i -> Kfield).
   by move=> x y; rewrite EtoK_D EtoK_N.
-have EtoKMul i : multiplicative (EtoK i : E i -> Kfield).
-  by split=> [x y|]; rewrite ?EtoK_M ?EtoK_1.
-pose EtoKMa i := GRing.isAdditive.Build _ _ _ (EtoKAdd i).
-pose EtoKMm i := GRing.isMultiplicative.Build _ _ _ (EtoKMul i).
+have EtoKMul i : monoid_morphism (EtoK i : E i -> Kfield).
+  by split=> [|x y]; rewrite ?EtoK_M ?EtoK_1.
+pose EtoKMa i := GRing.isZmodMorphism.Build _ _ _ (EtoKAdd i).
+pose EtoKMm i := GRing.isMonoidMorphism.Build _ _ _ (EtoKMul i).
 pose EtoKM i : {rmorphism _ -> _} :=
   HB.pack (EtoK i : E i -> Kfield) (EtoKMa i) (EtoKMm i).
 have EtoK_E: EtoK _ = EtoKM _ by [].

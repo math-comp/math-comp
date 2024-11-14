@@ -292,24 +292,30 @@ Proof. exact: FracField.Ratio_numden. Qed.
 Local Notation tofrac := (@FracField.tofrac R).
 Local Notation "x %:F" := (tofrac x).
 
-Lemma tofrac_is_additive: additive tofrac.
+Lemma tofrac_is_zmod_morphism: zmod_morphism tofrac.
 Proof.
 move=> p q /=; unlock tofrac.
 rewrite -[X in _ = _ + X]pi_opp -[RHS]pi_add.
 by rewrite /addf /oppf /= !numden_Ratio ?(oner_neq0, mul1r, mulr1).
 Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `tofrac_is_zmod_morphism` instead")]
+Definition tofrac_is_additive := tofrac_is_zmod_morphism.
 
-HB.instance Definition _ := GRing.isAdditive.Build R {fraction R} tofrac
-  tofrac_is_additive.
+HB.instance Definition _ := GRing.isZmodMorphism.Build R {fraction R} tofrac
+  tofrac_is_zmod_morphism.
 
-Lemma tofrac_is_multiplicative: multiplicative tofrac.
+Lemma tofrac_is_monoid_morphism: monoid_morphism tofrac.
 Proof.
-split=> [p q|//]; unlock tofrac; rewrite -[RHS]pi_mul.
+split=> [//|p q]; unlock tofrac; rewrite -[RHS]pi_mul.
 by rewrite /mulf /= !numden_Ratio ?(oner_neq0, mul1r, mulr1).
 Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `tofrac_is_monoid_morphism` instead")]
+Definition tofrac_is_multiplicative := tofrac_is_monoid_morphism.
 
-HB.instance Definition _ := GRing.isMultiplicative.Build R {fraction R} tofrac
-  tofrac_is_multiplicative.
+HB.instance Definition _ := GRing.isMonoidMorphism.Build R {fraction R} tofrac
+  tofrac_is_monoid_morphism.
 
 (* tests *)
 Lemma tofrac0 : 0%:F = 0. Proof. exact: rmorph0. Qed.
