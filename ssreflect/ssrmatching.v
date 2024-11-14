@@ -1,1 +1,1 @@
-From Corelib Require Export ssrmatching.
+From Coq Require Export ssrmatching.

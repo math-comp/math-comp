@@ -3844,17 +3844,17 @@ by rewrite conjCi -opprB mulrNN.
 Qed.
 Hint Resolve Creal_Re Creal_Im : core.
 
-Fact Re_is_additive : additive Re.
+Fact Re_is_zmod_morphism : zmod_morphism Re.
 Proof. by move=> x y; rewrite !ReE rmorphB addrACA -opprD mulrBl. Qed.
 #[export]
-HB.instance Definition _ := GRing.isAdditive.Build C C Re Re_is_additive.
+HB.instance Definition _ := GRing.isZmodMorphism.Build C C Re Re_is_zmod_morphism.
 
-Fact Im_is_additive : additive Im.
+Fact Im_is_zmod_morphism : zmod_morphism Im.
 Proof.
 by move=> x y; rewrite !ImE rmorphB opprD addrACA -opprD mulrBr mulrBl.
 Qed.
 #[export]
-HB.instance Definition _ := GRing.isAdditive.Build C C Im Im_is_additive.
+HB.instance Definition _ := GRing.isZmodMorphism.Build C C Im Im_is_zmod_morphism.
 
 Lemma Creal_ImP z : reflect ('Im z = 0) (z \is real).
 Proof.

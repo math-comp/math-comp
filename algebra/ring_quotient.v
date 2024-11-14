@@ -121,10 +121,10 @@ Section PiAdditive.
 Variables (V : zmodType) (equivV : rel V) (zeroV : V).
 Variable Q : @zmodQuotType V equivV zeroV -%R +%R.
 
-Lemma pi_is_additive : additive \pi_Q.
+Lemma pi_is_zmod_morphism : zmod_morphism \pi_Q.
 Proof. by move=> x y /=; rewrite !piE. Qed.
 
-HB.instance Definition _ := GRing.isAdditive.Build V Q \pi_Q pi_is_additive.
+HB.instance Definition _ := GRing.isZmodMorphism.Build V Q \pi_Q pi_is_zmod_morphism.
 
 End PiAdditive.
 
@@ -181,11 +181,11 @@ Variables (R : nzRingType) (equivR : rel R) (zeroR : R).
 
 Variable Q : @nzRingQuotType R equivR zeroR -%R +%R 1 *%R.
 
-Lemma pi_is_multiplicative : multiplicative \pi_Q.
+Lemma pi_is_monoid_morphism : monoid_morphism \pi_Q.
 Proof. by split; do ?move=> x y /=; rewrite !piE. Qed.
 
-HB.instance Definition _ := GRing.isMultiplicative.Build R Q \pi_Q
-  pi_is_multiplicative.
+HB.instance Definition _ := GRing.isMonoidMorphism.Build R Q \pi_Q
+  pi_is_monoid_morphism.
 
 End PiRMorphism.
 

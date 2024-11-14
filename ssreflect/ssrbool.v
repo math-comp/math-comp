@@ -1,5 +1,5 @@
 From mathcomp Require Import ssreflect ssrfun.
-From Corelib Require Export ssrbool.
+From Coq Require Export ssrbool.
 
 (******************************************************************************)
 (* Local additions:                                                           *)

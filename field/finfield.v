@@ -432,18 +432,18 @@ have idfP x: reflect (f x = x) (x \in 1%VS).
     rewrite /q finField_genPoly rmorph_prod big_image /=.
     by apply: eq_bigr => b _; rewrite rmorphB /= map_polyX map_polyC.
   by rewrite root_prod_XsubC => /mapP[a]; exists a.
-have fA : additive f.
+have fA : zmod_morphism f.
   rewrite /f => x y; rewrite ?exprMn ?expr1n //.
   have [p _ pcharFp] := finPcharP F; rewrite (card_pprimeChar pcharFp).
   elim: (logn _ _) => // n IHn; rewrite expnSr !exprM {}IHn.
   by rewrite -(pchar_lalg L) in pcharFp; rewrite -pFrobenius_autE rmorphB.
-have fM : multiplicative f.
-  by rewrite /f; split=> [x y|]; rewrite ?exprMn ?expr1n //.
+have fM : monoid_morphism f.
+  by rewrite /f; split=> [|x y]; rewrite ?exprMn ?expr1n //.
 have fZ: scalable f.
   move=> a x; rewrite -[in LHS]mulr_algl fM.
   by rewrite (idfP _ _) ?mulr_algl ?memvZ // memv_line.
-pose faM := GRing.isAdditive.Build _ _ f fA.
-pose fmM := GRing.isMultiplicative.Build _ _ f fM.
+pose faM := GRing.isZmodMorphism.Build _ _ f fA.
+pose fmM := GRing.isMonoidMorphism.Build _ _ f fM.
 pose flM := GRing.isScalable.Build _ _ _ _ f fZ.
 pose fLRM : {lrmorphism _ -> _} := HB.pack f faM fmM flM.
 have /kAut_to_gal[alpha galLalpha Dalpha]: kAut 1 {:L} (linfun fLRM).

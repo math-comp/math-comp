@@ -373,10 +373,10 @@ Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K addNr. Qed.
 
 HB.instance Definition _ := GRing.isZmodule.Build type addA addC add0 addN.
 
-Fact CtoL_is_additive : additive CtoL.
+Fact CtoL_is_zmod_morphism : zmod_morphism CtoL.
 Proof. by move=> u v; rewrite !LtoC_K. Qed.
-HB.instance Definition _ := GRing.isAdditive.Build type L' CtoL
-  CtoL_is_additive.
+HB.instance Definition _ := GRing.isZmodMorphism.Build type L' CtoL
+  CtoL_is_zmod_morphism.
 
 Definition one := LtoC (integral1 _).
 Definition mul u v := LtoC (integral_mul (CtoL_P u) (CtoL_P v)).
@@ -400,10 +400,10 @@ Proof. by rewrite -(inj_eq CtoL_inj) !LtoC_K oner_eq0. Qed.
 HB.instance Definition _ :=
   GRing.Zmodule_isComNzRing.Build type mulA mulC mul1 mulD one_nz.
 
-Fact CtoL_is_multiplicative : multiplicative CtoL.
-Proof. by split=> [u v|]; rewrite !LtoC_K. Qed.
-HB.instance Definition _ := GRing.isMultiplicative.Build type L' CtoL
-  CtoL_is_multiplicative.
+Fact CtoL_is_monoid_morphism : monoid_morphism CtoL.
+Proof. by split=> [|u v]; rewrite !LtoC_K. Qed.
+HB.instance Definition _ := GRing.isMonoidMorphism.Build type L' CtoL
+  CtoL_is_monoid_morphism.
 
 Fact mulVf u :  u != 0 -> inv u * u = 1.
 Proof.
@@ -442,25 +442,25 @@ rewrite -(fmorph_root conjL) conjL_K map_poly_id // => _ /(nthP 0)[j _ <-].
 by rewrite coef_map fmorph_rat.
 Qed.
 
-Fact conj_is_semi_additive : semi_additive (fun u => LtoC (conj_subproof u)).
+Fact conj_is_nmod_morphism : nmod_morphism (fun u => LtoC (conj_subproof u)).
 Proof.
 by split=> [|u v]; apply: CtoL_inj; rewrite LtoC_K ?raddf0// !rmorphD/= !LtoC_K.
 Qed.
 
-Fact conj_is_additive : {morph (fun u => LtoC (conj_subproof u)) : x / - x}.
+Fact conj_is_zmod_morphism : {morph (fun u => LtoC (conj_subproof u)) : x / - x}.
 Proof. by move=> u; apply: CtoL_inj; rewrite LtoC_K !raddfN /= LtoC_K. Qed.
 
-Fact conj_is_multiplicative : multiplicative (fun u => LtoC (conj_subproof u)).
+Fact conj_is_monoid_morphism : monoid_morphism (fun u => LtoC (conj_subproof u)).
 Proof.
-split=> [u v|]; apply: CtoL_inj; last by rewrite !LtoC_K rmorph1.
+split=> [|u v]; apply: CtoL_inj; first by rewrite !LtoC_K rmorph1.
 by rewrite LtoC_K 3!{1}rmorphM /= !LtoC_K.
 Qed.
 
 Definition conj : {rmorphism type -> type} :=
   GRing.RMorphism.Pack
     (GRing.RMorphism.Class
-       (GRing.isSemiAdditive.Build _ _ _ conj_is_semi_additive)
-       (GRing.isMultiplicative.Build _ _ _ conj_is_multiplicative)).
+       (GRing.isNmodMorphism.Build _ _ _ conj_is_nmod_morphism)
+       (GRing.isMonoidMorphism.Build _ _ _ conj_is_monoid_morphism)).
 
 Lemma conjK : involutive conj.
 Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K conjL_K. Qed.
@@ -905,18 +905,18 @@ Proof. by move=> x; rewrite /algC_invaut; case: algC_invaut_subproof. Qed.
 Lemma algC_autK nu : cancel nu (algC_invaut nu).
 Proof. exact: inj_can_sym (algC_invautK nu) (fmorph_inj nu). Qed.
 
-Fact algC_invaut_is_additive nu : additive (algC_invaut nu).
-Proof. exact: can2_additive (algC_autK nu) (algC_invautK nu). Qed.
+Fact algC_invaut_is_zmod_morphism nu : zmod_morphism (algC_invaut nu).
+Proof. exact: can2_zmod_morphism (algC_autK nu) (algC_invautK nu). Qed.
 
-Fact algC_invaut_is_rmorphism nu : multiplicative (algC_invaut nu).
+Fact algC_invaut_is_rmorphism nu : monoid_morphism (algC_invaut nu).
 Proof. exact: can2_rmorphism (algC_autK nu) (algC_invautK nu). Qed.
 
 HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=
-  GRing.isAdditive.Build algC algC (algC_invaut nu)
-    (algC_invaut_is_additive nu).
+  GRing.isZmodMorphism.Build algC algC (algC_invaut nu)
+    (algC_invaut_is_zmod_morphism nu).
 
 HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=
-  GRing.isMultiplicative.Build algC algC (algC_invaut nu)
+  GRing.isMonoidMorphism.Build algC algC (algC_invaut nu)
     (algC_invaut_is_rmorphism nu).
 
 Lemma minCpoly_aut nu x : minCpoly (nu x) = minCpoly x.
@@ -953,12 +953,12 @@ Lemma total_algR : total (<=%O : rel (algR : porderType _)).
 Proof. by move=> x y; apply/real_leVge/valP/valP. Qed.
 HB.instance Definition _ := Order.POrder_isTotal.Build _ algR total_algR.
 
-Lemma algRval_is_additive : additive algRval. Proof. by []. Qed.
-Lemma algRval_is_multiplicative : multiplicative algRval. Proof. by []. Qed.
-HB.instance Definition _ := GRing.isAdditive.Build algR algC algRval
-  algRval_is_additive.
-HB.instance Definition _ := GRing.isMultiplicative.Build algR algC algRval
-  algRval_is_multiplicative.
+Lemma algRval_is_zmod_morphism : zmod_morphism algRval. Proof. by []. Qed.
+Lemma algRval_is_monoid_morphism : monoid_morphism algRval. Proof. by []. Qed.
+HB.instance Definition _ := GRing.isZmodMorphism.Build algR algC algRval
+  algRval_is_zmod_morphism.
+HB.instance Definition _ := GRing.isMonoidMorphism.Build algR algC algRval
+  algRval_is_monoid_morphism.
 
 Definition algR_norm (x : algR) : algR := in_algR (normr_real (val x)).
 Lemma algR_ler_normD x y : algR_norm (x + y) <= (algR_norm x + algR_norm y).

@@ -582,11 +582,11 @@ apply/val_eqP => /=.
 by rewrite rmodp_mulml ?rmodp_mulmr // monic_mk_monic.
 Qed.
 
-Fact in_qpoly_multiplicative : multiplicative (in_qpoly h).
-Proof. by split; [ apply: in_qpolyM | apply: in_qpoly1]. Qed.
+Fact in_qpoly_multiplicative : monoid_morphism (in_qpoly h).
+Proof. by split; [ apply: in_qpoly1 | apply: in_qpolyM]. Qed.
 
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build {poly A} {poly %/ h} (in_qpoly h)
+  GRing.isMonoidMorphism.Build {poly A} {poly %/ h} (in_qpoly h)
     in_qpoly_multiplicative.
 
 Lemma poly_of_qpoly_sum I (r : seq I) (P1 : pred I) (F : I -> {poly %/ h}) :
@@ -637,17 +637,17 @@ have := qpolyC_proof h (a * b).
 by rewrite qualifE/= -ltnS prednK // size_mk_monic_gt0.
 Qed.
 
-Lemma qpolyC_is_additive : additive (qpolyC h).
+Lemma qpolyC_is_zmod_morphism : zmod_morphism (qpolyC h).
 Proof. by move=> x y; rewrite qpolyCD qpolyCN. Qed.
 
-Lemma qpolyC_is_multiplicative : multiplicative (qpolyC h).
+Lemma qpolyC_is_monoid_morphism : monoid_morphism (qpolyC h).
 Proof. by split=> // x y; rewrite qpolyCM. Qed.
 
-HB.instance Definition _ := GRing.isAdditive.Build A {poly %/ h} (qpolyC h)
-  qpolyC_is_additive.
+HB.instance Definition _ := GRing.isZmodMorphism.Build A {poly %/ h} (qpolyC h)
+  qpolyC_is_zmod_morphism.
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build A {poly %/ h} (qpolyC h)
-    qpolyC_is_multiplicative.
+  GRing.isMonoidMorphism.Build A {poly %/ h} (qpolyC h)
+    qpolyC_is_monoid_morphism.
 
 Definition qpoly_scale k (p : {poly %/ h}) : {poly %/ h} := (k *: p)%R.
 
