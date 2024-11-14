@@ -348,8 +348,8 @@ Proof. exact: intZmod.predn_int. Qed.
 
 End intRingTheory.
 
-HB.instance Definition _ := GRing.isMultiplicative.Build nat int Posz
-  (PoszM, erefl).
+HB.instance Definition _ := GRing.isMultiplicative1first.Build nat int Posz
+  (erefl, PoszM).
 
 Module intUnitRing.
 Section intUnitRing.
@@ -660,9 +660,9 @@ Lemma intrB m n : (m - n)%:~R = m%:~R - n%:~R :> R. Proof. exact: mulrzBr. Qed.
 Lemma intrM m n : (m * n)%:~R = m%:~R * n%:~R :> R.
 Proof. by rewrite mulrzA -mulrzr. Qed.
 
-Lemma intmul1_is_multiplicative : multiplicative ( *~%R (1 : R)).
+Lemma intmul1_is_multiplicative : multiplicative1first ( *~%R (1 : R)).
 Proof. by split; move=> // x y /=; rewrite ?intrD ?mulrNz ?intrM. Qed.
-HB.instance Definition _ := GRing.isMultiplicative.Build int R ( *~%R 1)
+HB.instance Definition _ := GRing.isMultiplicative1first.Build int R ( *~%R 1)
   intmul1_is_multiplicative.
 
 Lemma mulr2z n : n *~ 2 = n + n. Proof. exact: mulr2n. Qed.

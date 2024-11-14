@@ -137,12 +137,12 @@ Proof.
 by rewrite -cfuniG; have [/cfConjg_cfuni|/cfConjgEout] := boolP (y \in 'N(G)).
 Qed.
 
-Fact cfConjg_is_multiplicative y : multiplicative (cfConjg y : _ -> 'CF(G)).
+Fact cfConjg_is_multiplicative y : multiplicative1first (cfConjg y : _ -> 'CF(G)).
 Proof.
-split=> [phi psi|]; last exact: cfConjg_cfun1.
+split=> [|phi psi]; first exact: cfConjg_cfun1.
 by apply/cfunP=> x; rewrite !cfunElock.
 Qed.
-HB.instance Definition _ y := GRing.isMultiplicative.Build _ _ (cfConjg y)
+HB.instance Definition _ y := GRing.isMultiplicative1first.Build _ _ (cfConjg y)
   (cfConjg_is_multiplicative y).
 
 Lemma cfConjg_eq1 phi y : ((phi ^ y)%CF == 1) = (phi == 1).

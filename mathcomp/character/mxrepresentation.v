@@ -5175,10 +5175,10 @@ Proof. by move=> x y; rewrite mxvalD mxvalN. Qed.
 #[export] HB.instance Definition _ :=
   GRing.isAdditive.Build FA 'M[F]_n mxval mxval_sub.
 
-Lemma mxval_is_multiplicative : multiplicative mxval.
-Proof. by split; [apply: mxvalM | apply: mxval1]. Qed.
+Lemma mxval_is_multiplicative : multiplicative1first mxval.
+Proof. by split; [apply: mxval1 | apply: mxvalM]. Qed.
 #[export] HB.instance Definition _ :=
-  GRing.isMultiplicative.Build FA 'M[F]_n mxval mxval_is_multiplicative.
+  GRing.isMultiplicative1first.Build FA 'M[F]_n mxval mxval_is_multiplicative.
 
 Lemma mxval_centg x : centgmx rG (mxval x).
 Proof.
@@ -5206,12 +5206,12 @@ Proof. exact: mxval_genV. Qed.
 Lemma gen_is_additive : additive gen.
 Proof. by move=> x y; apply: mxval_inj; rewrite genK !rmorphB /= !genK. Qed.
 
-Lemma gen_is_multiplicative : multiplicative gen.
+Lemma gen_is_multiplicative : multiplicative1first gen.
 Proof. by split=> // x y; apply: mxval_inj; rewrite genK !rmorphM /= !genK. Qed.
 
 #[export] HB.instance Definition _ := GRing.isAdditive.Build F FA gen
   gen_is_additive.
-#[export] HB.instance Definition _ := GRing.isMultiplicative.Build F FA gen
+#[export] HB.instance Definition _ := GRing.isMultiplicative1first.Build F FA gen
   gen_is_multiplicative.
 
 (* The generated field contains a root of the minimal polynomial (in some  *)

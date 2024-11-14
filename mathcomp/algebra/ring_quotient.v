@@ -165,10 +165,10 @@ Variables (R : ringType) (equivR : rel R) (zeroR : R).
 
 Variable Q : @ringQuotType R equivR zeroR -%R +%R 1 *%R.
 
-Lemma pi_is_multiplicative : multiplicative \pi_Q.
+Lemma pi_is_multiplicative : multiplicative1first \pi_Q.
 Proof. by split; do ?move=> x y /=; rewrite !piE. Qed.
 
-HB.instance Definition _ := GRing.isMultiplicative.Build R Q \pi_Q
+HB.instance Definition _ := GRing.isMultiplicative1first.Build R Q \pi_Q
   pi_is_multiplicative.
 
 End PiRMorphism.

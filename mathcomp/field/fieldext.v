@@ -180,10 +180,10 @@ Proof. by apply/(polyOverS (subvP (sub1v _)))/polyOver1P; exists p. Qed.
 Lemma sub_adjoin1v x E : (<<1; x>> <= E)%VS = (x \in E)%VS.
 Proof. by rewrite (sameP FadjoinP andP) sub1v. Qed.
 
-Fact vsval_multiplicative K : multiplicative (vsval : subvs_of K -> L).
+Fact vsval_multiplicative K : multiplicative1first (vsval : subvs_of K -> L).
 Proof. by split => //=; apply: algid1. Qed.
 HB.instance Definition _ (K : {subfield L}) :=
-  GRing.isMultiplicative.Build (subvs_of K) L vsval (vsval_multiplicative K).
+  GRing.isMultiplicative1first.Build (subvs_of K) L vsval (vsval_multiplicative K).
 
 Lemma vsval_invf K (w : subvs_of K) : val w^-1 = (vsval w)^-1.
 Proof.
@@ -198,7 +198,7 @@ HB.instance Definition _ K :=
 
 HB.instance Definition _ (K : {subfield L}) :=
   GRing.isSubSemiRing.Build L (pred_of_vspace K) (subvs_of K)
-    (rmorphM _, rmorph1 _).
+    (rmorph1 _, rmorphM _).
 (* Note that the ringType structure was built in the SubFalgType
    section of falgebra.v but the SubRing structure did not stand
    there, it is thus built only here *)
@@ -1155,16 +1155,16 @@ Proof.
 by elim/quotW => x; elim/quotW => y; rewrite !piE /iotaFz linearB rmorphB.
 Qed.
 
-Fact subfx_inj_is_multiplicative : multiplicative subfx_inj.
+Fact subfx_inj_is_multiplicative : multiplicative1first subfx_inj.
 Proof.
-split; last by rewrite piE /iotaFz poly_rV_K ?rmorph1 ?size_poly1.
+split; first by rewrite piE /iotaFz poly_rV_K ?rmorph1 ?size_poly1.
 elim/quotW=> x; elim/quotW=> y; rewrite !piE /subfx_mul_rep /iotaFz.
 by rewrite poly_rV_modp_K iotaPz_modp rmorphM.
 Qed.
 
 HB.instance Definition _ := GRing.isAdditive.Build subFExtend L subfx_inj
   subfx_inj_is_additive.
-HB.instance Definition _ := GRing.isMultiplicative.Build subFExtend L subfx_inj
+HB.instance Definition _ := GRing.isMultiplicative1first.Build subFExtend L subfx_inj
   subfx_inj_is_multiplicative.
 
 Definition subfx_eval := lift_embed subFExtend (fun q => poly_rV (q %% p0)).
@@ -1175,17 +1175,17 @@ Definition subfx_root := subfx_eval 'X.
 Lemma subfx_eval_is_additive : additive subfx_eval.
 Proof. by move=> x y; apply/eqP; rewrite piE -linearB modpD modNp. Qed.
 
-Lemma subfx_eval_is_multiplicative : multiplicative subfx_eval.
+Lemma subfx_eval_is_multiplicative : multiplicative1first subfx_eval.
 Proof.
-split=> [x y|]; apply/eqP; rewrite piE.
-  by rewrite /subfx_mul_rep !poly_rV_modp_K !(modp_mul, mulrC _ y).
-by rewrite modp_small // size_poly1 -subn_gt0 subn1.
+split=> [|x y]; apply/eqP; rewrite piE.
+  by rewrite modp_small // size_poly1 -subn_gt0 subn1.
+by rewrite /subfx_mul_rep !poly_rV_modp_K !(modp_mul, mulrC _ y).
 Qed.
 
 HB.instance Definition _ :=
   GRing.isAdditive.Build {poly F} subFExtend subfx_eval subfx_eval_is_additive.
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build {poly F} subFExtend subfx_eval
+  GRing.isMultiplicative1first.Build {poly F} subFExtend subfx_eval
     subfx_eval_is_multiplicative.
 
 Definition inj_subfx := (subfx_eval \o polyC).
@@ -1375,11 +1375,11 @@ pose feL : fieldExtType F := HB.pack vL aL cuL unitM.
 exists feL; first by rewrite dimvf; apply: mul1n.
 exists toPF.
 have tol_lin: linear toL by move=> a q1 q2; rewrite -linearP -modpZl -modpD.
-have tol_mul : multiplicative (toL : {poly F} -> aL).
-  by split=> [q r|];
+have tol_mul : multiplicative1first (toL : {poly F} -> aL).
+  by split=> [|q r];
     apply: toPinj; rewrite !toL_K // modp_mul -!(mulrC r) modp_mul.
 pose toLlM := GRing.isLinear.Build _ _ _ _ toL tol_lin.
-pose toLmM := GRing.isMultiplicative.Build _ _ _ tol_mul.
+pose toLmM := GRing.isMultiplicative1first.Build _ _ _ tol_mul.
 pose toLLRM : {lrmorphism _ -> feL} := HB.pack toL toLlM toLmM.
 by exists toLLRM.
 Qed.
