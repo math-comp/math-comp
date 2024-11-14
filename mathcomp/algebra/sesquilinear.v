@@ -55,7 +55,7 @@ From mathcomp Require Import zmodp poly order ssrnum matrix mxalgebra vector.
 (*                           subspace                                         *)
 (*                           (local notation: B ^_|_)                         *)
 (*        ortho theta M B == orthomx theta M B with theta a morphism          *)
-(*                A _|_ B := (A%MS <= B^_|_)%MS                               *)
+(*               A '_|_ B := (A%MS <= B^_|_)%MS                               *)
 (*                           This is a local notation.                        *)
 (*            rad theta M := ortho theta M 1%:M                               *)
 (*                           (local notation: 1%:M^_|_)                       *)
@@ -109,11 +109,14 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Reserved Notation "u '``_' i"
-    (at level 3, i at level 2, left associativity, format "u '``_' i").
-Reserved Notation "A ^!"    (at level 2, format "A ^!").
-Reserved Notation "A ^_|_"    (at level 8, format "A ^_|_").
+  (at level 3, i at level 2, left associativity, format "u '``_' i").
+Reserved Notation "M ^t phi"
+  (at level 39, left associativity, format "M  ^t  phi").
+Reserved Notation "A ^!" (at level 2, format "A ^!").
+Reserved Notation "A ^_|_" (at level 8, format "A ^_|_").
 Reserved Notation "A ''_|_' B" (at level 69, format "A  ''_|_'  B").
-Reserved Notation "eps_theta .-sesqui" (at level 2, format "eps_theta .-sesqui").
+Reserved Notation "eps_theta .-sesqui"
+  (at level 2, format "eps_theta .-sesqui").
 
 Local Open Scope ring_scope.
 Import GRing.Theory Order.Theory Num.Theory.
@@ -124,8 +127,7 @@ Notation "''e_' j" := (delta_mx 0 j)
  (format "''e_' j", at level 8, j at level 2) : ring_scope.
 
 Notation "M ^ phi" := (map_mx phi M) : form_scope.
-Notation "M ^t phi" := ((M ^T) ^ phi)
-  (phi at level 39, at level 39) : form_scope.
+Notation "M ^t phi" := ((M ^T) ^ phi) : form_scope.
 
 (* TODO: move? *)
 Lemma eq_map_mx_id (R : ringType) m n (M : 'M[R]_(m, n)) (f : R -> R) :
@@ -746,8 +748,7 @@ Notation "[ 'dot' 'of' f 'as' g ]" := (@clone _ _ _ _ _ f g _ idfun idfun)
 Notation "[ 'dot' 'of' f ]" := (@clone _ _ _ _ _ f f _ idfun idfun)
   (at level 0, format "[ 'dot'  'of'  f ]") : form_scope.
 Notation Dot fM := (pack fM idfun).
-Notation is_dot := Dot.axiom.
-*)
+Notation is_dot := Dot.axiom.*)
 
 Notation "{ 'symmetric' U }" := ({hermitian U for false & idfun})
   (at level 0, format "{ 'symmetric'  U }") : ring_scope.
