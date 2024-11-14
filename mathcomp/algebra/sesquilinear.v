@@ -112,7 +112,7 @@ Reserved Notation "u '``_' i"
     (at level 3, i at level 2, left associativity, format "u '``_' i").
 Reserved Notation "A ^!"    (at level 2, format "A ^!").
 Reserved Notation "A ^_|_"    (at level 8, format "A ^_|_").
-Reserved Notation "A _|_ B" (at level 69, format "A  _|_  B").
+Reserved Notation "A ''_|_' B" (at level 69, format "A  ''_|_'  B").
 Reserved Notation "eps_theta .-sesqui" (at level 2, format "eps_theta .-sesqui").
 
 Local Open Scope ring_scope.
@@ -578,19 +578,19 @@ Proof. by rewrite formC mulf_eq0 signr_eq0 /= fmorph_eq0. Qed.
 
 Definition ortho m (B : 'M_(m, n)) := orthomx theta M B.
 Local Notation "B ^_|_" := (ortho B) : ring_scope.
-Local Notation "A _|_ B" := (A%MS <= B^_|_)%MS : ring_scope.
+Local Notation "A '_|_ B" := (A%MS <= B^_|_)%MS : ring_scope.
 
-Lemma normalE u v : (u _|_ v) = ('[u, v] == 0).
+Lemma normalE u v : (u '_|_ v) = ('[u, v] == 0).
 Proof.
 by rewrite (sameP sub_kermxP eqP) mulmxA [_ *m _^t _]mx11_scalar fmorph_eq0.
 Qed.
 
-Lemma form_eq0P {u v} : reflect ('[u, v] = 0) (u _|_ v).
+Lemma form_eq0P {u v} : reflect ('[u, v] = 0) (u '_|_ v).
 Proof. by rewrite normalE; apply/eqP. Qed.
 
 Lemma normalP p q (A : 'M_(p, n)) (B :'M_(q, n)) :
-  reflect (forall (u v : 'rV_n), (u <= A)%MS -> (v <= B)%MS -> u _|_ v)
-          (A _|_ B).
+  reflect (forall (u v : 'rV_n), (u <= A)%MS -> (v <= B)%MS -> u '_|_ v)
+          (A '_|_ B).
 Proof.
 apply: (iffP idP) => AnB.
   move=> u v uA vB; rewrite (submx_trans uA) // (submx_trans AnB) //.
@@ -608,18 +608,18 @@ apply: (can_inj (@trmxK _ _ _)); rewrite trmx0 trmx_mul trmxK.
 by rewrite -(map_delta_mx theta) map_trmx Hv.
 Qed.
 
-Lemma normalC p q (A : 'M_(p, n)) (B : 'M_(q, n)) : (A _|_ B) = (B _|_ A).
+Lemma normalC p q (A : 'M_(p, n)) (B : 'M_(q, n)) : (A '_|_ B) = (B '_|_ A).
 Proof.
-gen have nC : p q A B / A _|_ B -> B _|_ A; last by apply/idP/idP; apply/nC.
+gen have nC : p q A B / A '_|_ B -> B '_|_ A; last by apply/idP/idP; apply/nC.
 move=> AnB; apply/normalP => u v ? ?; rewrite normalE.
 rewrite formC mulf_eq0 ?fmorph_eq0 ?signr_eq0 /=.
 by rewrite -normalE (normalP _ _ AnB).
 Qed.
 
-Lemma normal_ortho_mx p (A : 'M_(p, n)) : ((A^_|_) _|_ A).
+Lemma normal_ortho_mx p (A : 'M_(p, n)) : ((A^_|_) '_|_ A).
 Proof. by []. Qed.
 
-Lemma normal_mx_ortho p (A : 'M_(p, n)) : (A _|_ (A^_|_)).
+Lemma normal_mx_ortho p (A : 'M_(p, n)) : (A '_|_ (A^_|_)).
 Proof. by rewrite normalC. Qed.
 
 Lemma rank_normal u : (\rank (u ^_|_) >= n.-1)%N.
@@ -634,7 +634,7 @@ Lemma rad_ker : rad = kermx M.
 Proof. by rewrite /rad /ortho /orthomx trmx1 map_mx1 mulmx1. Qed.
 
 (* Pythagoras *)
-Theorem formDd u v : u _|_ v -> '[u + v] = '[u] + '[v].
+Theorem formDd u v : u '_|_ v -> '[u + v] = '[u] + '[v].
 Proof.
 move=> uNv; rewrite formDl !formDr ['[v, u]]formC.
 by rewrite ['[u, v]](form_eq0P _) // rmorph0 mulr0 addr0 add0r.
@@ -657,7 +657,7 @@ Lemma formB u v : let d := '[u, v] in
   '[u - v] = '[u] + '[v] - (d + (-1) ^+ eps * theta d).
 Proof. by rewrite formD formN !formNr rmorphN mulrN -opprD. Qed.
 
-Lemma formBd u v : u _|_ v -> '[u - v] = '[u] + '[v].
+Lemma formBd u v : u '_|_ v -> '[u - v] = '[u] + '[v].
 Proof.
 by move=> uTv; rewrite formDd ?formN // normalE formNr oppr_eq0 -normalE.
 Qed.
@@ -800,10 +800,10 @@ Proof.
 by move=> ouv; rewrite hnormDd ?hnormN// linearNr [X in - X]ouv oppr0.
 Qed.
 
-Local Notation "u _|_ v" := ('[u, v] == 0) : ring_scope.
+Local Notation "u '_|_ v" := ('[u, v] == 0) : ring_scope.
 
 Definition ortho_rec (s1 s2 : seq U) :=
-  all [pred u | all [pred v | u _|_ v] s2] s1.
+  all [pred u | all [pred v | u '_|_ v] s2] s1.
 
 Fixpoint pair_ortho_rec (s : seq U) :=
   if s is v :: s' then ortho_rec [:: v] s' && pair_ortho_rec s' else true.
@@ -885,7 +885,7 @@ Let alpha v := (linfun (applyr form v : vT -> F^o)).
 
 Definition orthov V := (\bigcap_(i < \dim V) lker (alpha (vbasis V)`_i))%VS.
 
-Local Notation "U _|_ V" := (U <= orthov V)%VS : vspace_scope.
+Local Notation "U '_|_ V" := (U <= orthov V)%VS : vspace_scope.
 
 Lemma mem_orthovPn V u : reflect (exists2 v, v \in V & '[u, v] != 0) (u \notin orthov V).
 Proof.
@@ -917,19 +917,19 @@ move=> vu_eq0; apply/mem_orthovP => w /vlineP[k->].
 by apply/eqP; rewrite linearZ mulf_eq0 vu_eq0 orbT.
 Qed.
 
-Lemma orthovP U V : reflect {in U & V, forall u v, '[u, v] = 0} (U _|_ V)%VS.
+Lemma orthovP U V : reflect {in U & V, forall u v, '[u, v] = 0} (U '_|_ V)%VS.
 Proof.
 apply: (iffP subvP); last by move=> H ??; apply/mem_orthovP=> ??; apply: H.
 by move=> /(_ _ _)/mem_orthovP; move=> H ????; apply: H.
 Qed.
 
-Lemma orthov_sym U V : (U _|_ V)%VS = (V _|_ U)%VS.
+Lemma orthov_sym U V : (U '_|_ V)%VS = (V '_|_ U)%VS.
 Proof. by apply/orthovP/orthovP => eq0 ????; apply/eqP; rewrite herm_eq0C eq0. Qed.
 
 Lemma mem_orthov1 v u : (u \in orthov <[v]>) = ('[u, v] == 0).
 Proof. by rewrite orthov1E memv_ker lfunE. Qed.
 
-Lemma orthov11 u v : (<[u]> _|_ <[v]>)%VS = ('[u, v] == 0).
+Lemma orthov11 u v : (<[u]> '_|_ <[v]>)%VS = ('[u, v] == 0).
 Proof. exact: mem_orthov1. Qed.
 
 Lemma mem_orthov1_sym v u : (u \in orthov <[v]>) = (v \in orthov <[u]>).
@@ -1010,7 +1010,7 @@ move/orthogonalP=> oSR; apply/orthogonalP=> xi1 _ Sxi1 /mapP[xi2 Rxi2 ->].
 by rewrite linearNr /= oSR ?oppr0.
 Qed.
 
-Lemma orthogonalE us vs : (orthogonal form us vs) = (<<us>> _|_ <<vs>>)%VS.
+Lemma orthogonalE us vs : (orthogonal form us vs) = (<<us>> '_|_ <<vs>>)%VS.
 Proof.
 apply/orthogonalP/orthovP => uvsP u v; last first.
   by move=> uus vvs; rewrite uvsP // memv_span.
@@ -1020,16 +1020,16 @@ rewrite linear_sumlz big1 //= => j _.
 by rewrite linearZlr/= uvsP ?mulr0// mem_nth.
 Qed.
 
-Lemma orthovE U V : (U _|_ V)%VS = orthogonal form (vbasis U) (vbasis V).
+Lemma orthovE U V : (U '_|_ V)%VS = orthogonal form (vbasis U) (vbasis V).
 Proof. by rewrite orthogonalE !(span_basis (vbasisP _)). Qed.
 
 Notation radv := (orthov fullv).
 
-Lemma orthoDv U V W : (U + V _|_ W)%VS = (U _|_ W)%VS && (V _|_ W)%VS.
+Lemma orthoDv U V W : (U + V '_|_ W)%VS = (U '_|_ W)%VS && (V '_|_ W)%VS.
 Proof. by rewrite subv_add. Qed.
 
-Lemma orthovD U V W : (U _|_ V + W)%VS = (U _|_ V)%VS && (U _|_ W)%VS.
-Proof. by rewrite ![(U _|_ _)%VS]orthov_sym orthoDv. Qed.
+Lemma orthovD U V W : (U '_|_ V + W)%VS = (U '_|_ V)%VS && (U '_|_ W)%VS.
+Proof. by rewrite ![(U '_|_ _)%VS]orthov_sym orthoDv. Qed.
 
 Definition nondegenerate := radv == 0%VS.
 Definition is_symplectic := [/\ nondegenerate, is_skew form &
@@ -1561,20 +1561,20 @@ HB.instance Definition _ m := @isHermitianSesquilinear.Build _ _ _ _ _
 Local Notation "''[' u , v ]" := (form_of_matrix theta M u%R v%R) : ring_scope.
 Local Notation "''[' u ]" := '[u, u]%R : ring_scope.
 Local Notation "B ^!" := (orthomx theta M B) : matrix_set_scope.
-Local Notation "A _|_ B" := (A%MS <= B%MS^!)%MS : matrix_set_scope.
+Local Notation "A '_|_ B" := (A%MS <= B%MS^!)%MS : matrix_set_scope.
 
-Lemma orthomxE u v : (u _|_ v)%MS = ('[u, v] == 0).
+Lemma orthomxE u v : (u '_|_ v)%MS = ('[u, v] == 0).
 Proof.
 rewrite (sameP sub_kermxP eqP) mulmxA.
 by rewrite [_ *m _^t _]mx11_scalar -trace_mx11 fmorph_eq0.
 Qed.
 
-Lemma hermmx_eq0P {u v} : reflect ('[u, v] = 0) (u _|_ v)%MS.
+Lemma hermmx_eq0P {u v} : reflect ('[u, v] = 0) (u '_|_ v)%MS.
 Proof. by rewrite orthomxE; apply/eqP. Qed.
 
 Lemma orthomxP p q (A : 'M_(p, n)) (B :'M_(q, n)) :
-  reflect (forall (u v : 'rV_n), u <= A -> v <= B -> u _|_ v)%MS
-          (A _|_ B)%MS.
+  reflect (forall (u v : 'rV_n), u <= A -> v <= B -> u '_|_ v)%MS
+          (A '_|_ B)%MS.
 Proof.
 apply: (iffP idP) => AnB.
   move=> u v uA vB; rewrite (submx_trans uA) // (submx_trans AnB) //.
@@ -1593,17 +1593,17 @@ by rewrite -(map_delta_mx theta) map_trmx Hv.
 Qed.
 
 Lemma orthomx_sym p q (A : 'M_(p, n)) (B :'M_(q, n)) :
-  (A _|_ B)%MS = (B _|_ A)%MS.
+  (A '_|_ B)%MS = (B '_|_ A)%MS.
 Proof.
-gen have nC : p q A B / (A _|_ B -> B _|_ A)%MS; last by apply/idP/idP; apply/nC.
+gen have nC : p q A B / (A '_|_ B -> B '_|_ A)%MS; last by apply/idP/idP; apply/nC.
 move=> AnB; apply/orthomxP => u v ? ?; rewrite orthomxE.
 rewrite hermC mulf_eq0 ?fmorph_eq0 ?signr_eq0 /=.
 by rewrite -orthomxE (orthomxP _ _ AnB).
 Qed.
 
-Lemma ortho_ortho_mx p (A : 'M_(p, n)) : (A^! _|_ A)%MS. Proof. by []. Qed.
+Lemma ortho_ortho_mx p (A : 'M_(p, n)) : (A^! '_|_ A)%MS. Proof. by []. Qed.
 
-Lemma ortho_mx_ortho p (A : 'M_(p, n)) : (A _|_ A^!)%MS.
+Lemma ortho_mx_ortho p (A : 'M_(p, n)) : (A '_|_ A^!)%MS.
 Proof. by rewrite orthomx_sym. Qed.
 
 Lemma rank_orthomx u : (\rank (u ^!) >= n.-1)%N.
@@ -1618,28 +1618,28 @@ Lemma radmxE : radmx = kermx M.
 Proof. by rewrite /orthomx /orthomx trmx1 map_mx1 mulmx1. Qed.
 
 Lemma orthoNmx k m (A : 'M[R]_(k, n)) (B : 'M[R]_(m, n)) :
-  ((- A) _|_ B)%MS = (A _|_ B)%MS.
+  ((- A) '_|_ B)%MS = (A '_|_ B)%MS.
 Proof. by rewrite eqmx_opp. Qed.
 
 Lemma orthomxN k m (A : 'M[R]_(k, n)) (B : 'M[R]_(m, n)) :
-  (A _|_ (- B))%MS = (A _|_ B)%MS.
-Proof. by rewrite ![(A _|_ _)%MS]orthomx_sym orthoNmx. Qed.
+  (A '_|_ (- B))%MS = (A '_|_ B)%MS.
+Proof. by rewrite ![(A '_|_ _)%MS]orthomx_sym orthoNmx. Qed.
 
 Lemma orthoDmx k m p (A : 'M[R]_(k, n)) (B : 'M[R]_(m, n)) (C : 'M[R]_(p, n)) :
-  (A + B _|_ C)%MS = (A _|_ C)%MS && (B _|_ C)%MS.
+  (A + B '_|_ C)%MS = (A '_|_ C)%MS && (B '_|_ C)%MS.
 Proof. by rewrite addsmxE !(sameP sub_kermxP eqP) mul_col_mx col_mx_eq0. Qed.
 
 Lemma orthomxD  k m p (A : 'M[R]_(k, n)) (B : 'M[R]_(m, n)) (C : 'M[R]_(p, n)) :
-  (A _|_ B + C)%MS = (A _|_ B)%MS && (A _|_ C)%MS.
-Proof. by rewrite ![(A _|_ _)%MS]orthomx_sym orthoDmx. Qed.
+  (A '_|_ B + C)%MS = (A '_|_ B)%MS && (A '_|_ C)%MS.
+Proof. by rewrite ![(A '_|_ _)%MS]orthomx_sym orthoDmx. Qed.
 
 Lemma orthoZmx p m a (A : 'M[R]_(p, n)) (B : 'M[R]_(m, n)) : a != 0 ->
-  (a *: A _|_ B)%MS = (A _|_ B)%MS.
+  (a *: A '_|_ B)%MS = (A '_|_ B)%MS.
 Proof. by move=> a_neq0; rewrite eqmx_scale. Qed.
 
 Lemma orthomxZ p m a (A : 'M[R]_(p, n)) (B : 'M[R]_(m, n)) : a != 0 ->
-  (A _|_ (a *: B))%MS = (A _|_ B)%MS.
-Proof. by move=> a_neq0; rewrite ![(A _|_ _)%MS]orthomx_sym orthoZmx. Qed.
+  (A '_|_ (a *: B))%MS = (A '_|_ B)%MS.
+Proof. by move=> a_neq0; rewrite ![(A '_|_ _)%MS]orthomx_sym orthoZmx. Qed.
 
 Lemma eqmx_ortho p m (A : 'M[R]_(p, n)) (B : 'M[R]_(m, n)) :
   (A :=: B)%MS -> (A^! :=: B^!)%MS.

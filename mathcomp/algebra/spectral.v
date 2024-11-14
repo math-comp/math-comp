@@ -312,18 +312,18 @@ HB.instance Definition _ n := isDotProduct.Build _ _ (@dotmx n)
 
 Local Notation "B ^!" :=
   (orthomx (@conjC C) (mx_of_hermitian (hermitian1mx _)) B) : matrix_set_scope.
-Local Notation "A _|_ B" := (A%MS <= B^!)%MS : bool_scope.
+Local Notation "A '_|_ B" := (A%MS <= B^!)%MS : bool_scope.
 
 Lemma orthomx1E m n p (A : 'M[C]_(m, n)) (B : 'M_(p, n)) :
-  (A _|_ B)%MS = (A *m B^t* == 0).
+  (A '_|_ B)%MS = (A *m B^t* == 0).
 Proof. by apply/sub_kermxP/eqP; rewrite !mul1mx. Qed.
 
 Lemma orthomx1P m n p {A : 'M[C]_(m, n)} {B : 'M_(p, n)} :
-  reflect (A *m B^t* = 0) (A _|_ B).
+  reflect (A *m B^t* = 0) (A '_|_ B).
 Proof. by rewrite orthomx1E; exact/eqP. Qed.
 
 Lemma orthomx_disj n p q (A : 'M[C]_(p, n)) (B :'M_(q, n)) :
-  A _|_ B -> (A :&: B = 0)%MS.
+  A '_|_ B -> (A :&: B = 0)%MS.
 Proof.
 move=> nAB; apply/eqP/rowV0Pn => [[v]]; rewrite sub_capmx => /andP [vA vB].
 apply/negP; rewrite negbK.
@@ -410,7 +410,7 @@ Qed.
 Lemma orthomx_proj_mx_ortho p p' m m' n
   (A : 'M_(p, n)) (A' : 'M_(p', n))
   (W : 'M_(m, n)) (W' : 'M_(m', n)) :
-  A _|_ A' -> W *m proj_ortho A _|_ W' *m proj_ortho A'.
+  A '_|_ A' -> W *m proj_ortho A '_|_ W' *m proj_ortho A'.
 Proof.
 rewrite orthomx_sym => An.
 rewrite mulmx_sub // orthomx_sym (eqmx_ortho _ (proj_orthoE _)).
@@ -432,7 +432,7 @@ have lemn : (m <= n)%N by rewrite ltnW // -addn1.
 have [B Bortho] := IHm (usubmx A) lemn.
 move=> /forallP /= subAB.
 have [v /and4P [vBn v_neq0 dAv_ge0 dAsub]] :
-  exists v, [&& B _|_ v, v != 0, '[dsubmx A, v] >= 0 & (dsubmx A <= B + v)%MS].
+  exists v, [&& B '_|_ v, v != 0, '[dsubmx A, v] >= 0 & (dsubmx A <= B + v)%MS].
   have := add_proj_ortho B (dsubmx A).
   set BoSn := (_ *m proj_ortho _^!%MS) => pBE.
   have [BoSn_eq0|BoSn_neq0] := eqVneq BoSn 0.
