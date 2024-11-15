@@ -402,9 +402,9 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     transitivity (f (lin01 y)); first by rewrite !lfunE.
     by do 4!rewrite lfunE /=; rewrite lker0_lfunK.
   have hom_f: kHom 1 (ASpace algK) f.
-    apply/kHomP; split=> [_ _ /memK[y1 ->] /memK[y2 ->] |_ /vlineP[a ->]].
-      by rewrite -rmorphM !Df !rmorphM.
-    by rewrite -(rmorph_alg in01) Df /= !rmorph_alg.
+    apply/kHomP; split=> [_ /vlineP[a ->] | _ _ /memK[y1 ->] /memK[y2 ->]].
+      by rewrite -(rmorph_alg in01) Df /= !rmorph_alg.
+    by rewrite -rmorphM !Df !rmorphM.
   pose pr := map_poly (in_alg Qr) p.
   have Qpr: pr \is a polyOver 1%VS.
     by apply/polyOverP=> i; rewrite coef_map memvZ ?memv_line.
