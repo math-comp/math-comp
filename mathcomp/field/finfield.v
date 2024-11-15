@@ -402,7 +402,7 @@ pose fmM := GRing.isMultiplicative1first.Build _ _ f fM.
 pose flM := GRing.isScalable.Build _ _ _ _ f fZ.
 pose fLRM : {lrmorphism _ -> _} := HB.pack f faM fmM flM.
 have /kAut_to_gal[alpha galLalpha Dalpha]: kAut 1 {:L} (linfun fLRM).
-  rewrite kAutfE; apply/kHomP; split=> [x y _ _ | x /idfP]; rewrite !lfunE //=.
+  rewrite kAutfE; apply/kHomP; split=> [x /idfP | x y _ _]; rewrite !lfunE //=.
   exact: (rmorphM fLRM).
 have{} Dalpha: alpha =1 f by move=> a; rewrite -Dalpha ?memvf ?lfunE.
 suffices <-: fixedField [set alpha] = 1%AS.
