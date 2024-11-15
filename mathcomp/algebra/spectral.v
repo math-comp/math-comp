@@ -284,7 +284,7 @@ Local Notation "''[' u ]" := '[u, u]%R : ring_scope.
 
 HB.instance Definition _ n := Hermitian.copy (@dotmx n) dotmx_def.
 
-Lemma dotmxE n (u v : 'rV[C]_n) : '[u, v] = (u *m v ^t*) 0 0.
+Lemma dotmxE n (u v : 'rV[C]_n) : '[u, v] = ( u *m v ^t* ) 0 0.
 Proof. by rewrite /dotmx /form_of_matrix mulmx1 /= trace_mx11. Qed.
 
 Lemma row_unitarymxP m n {M : 'M[C]_(m, n)} :
@@ -563,7 +563,7 @@ have /andP [n_gt0 n_small] : (n > 0)%N && (n - 1 <= N)%N.
 move=> As As_comm;
 have [v vN0 /allP /= vP] := common_eigenvector n_gt0 As_comm.
 suff: exists2 P : 'M[C]_(\rank v + \rank v^!, n), P \is unitarymx &
-  all (fun A => is_trig_mx (P *m A *m (P^t*))) As.
+  all (fun A => is_trig_mx (P *m A *m ( P^t* ))) As.
   rewrite add_rank_ortho // => -[P P_unitary] /=; rewrite -invmx_unitary//.
   by under eq_all do rewrite -conjumx ?unitarymx_unit//; exists P.
 pose S := schmidt_complete v.
@@ -700,7 +700,7 @@ Lemma hermitian_spectral_diag_real n (A : 'M[C]_n) : A \is hermsymmx ->
   spectral_diag A \is a realmx.
 Proof.
 move=> Ahermi; have /hermitian_normalmx /orthomx_spectralP A_eq := Ahermi.
-have /(congr1 (fun X => X^t*)) := A_eq.
+have /(congr1 ( fun X => X^t* )) := A_eq.
 rewrite invmx_unitary ?spectral_unitarymx //.
 rewrite !trmx_mul !map_mxM map_trmx trmxK -map_mx_comp.
 rewrite tr_diag_mx map_diag_mx (map_mx_id (@conjCK _)).
