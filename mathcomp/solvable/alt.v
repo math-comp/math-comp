@@ -516,7 +516,7 @@ rewrite -HH !mulgA -h_k_com -!mulgA [k * _]mulgA.
 by rewrite -g_k_com -!mulgA mulgV mulg1.
 Qed.
 
-Lemma gen_tperm_cycle (X : finType) x y c : prime #|X| ->
+Lemma gen_tperm_circular_shift (X : finType) x y c : prime #|X| ->
   x != y -> #[c]%g = #|X| ->
   <<[set tperm x y; c]>>%g = ('Sym_X)%g.
 Proof.
@@ -565,7 +565,7 @@ have phic : phi c = perm (addrI (1%R : 'Z_#[c])).
   by rewrite /f /Zpm -permM addrC expgDzmod.
 rewrite -(injmSK phi_inj)//= morphim_gen/= ?subsetT//= -/phi.
 rewrite phiT /morphim !setTI/= -/phi imsetU1 imset_set1/= phixy phic.
-suff /gen_tpermn_cycle<- : coprime #[c]%g.-2.+2 (k - 0)%R by [].
+suff /gen_tpermn_circular_shift<- : coprime #[c]%g.-2.+2 (k - 0)%R by [].
 by rewrite subr0 prime_coprime ?gtnNdvd// ?cppSS.
 Qed.
 

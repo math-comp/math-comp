@@ -160,8 +160,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - in `intdiv.v`
   + lemma `irreducible_rat_int`
 - in `zmodp.v`
-  + lemmas `gen_tperm_stop`, `gen_tpermS`, `perm_add1X`, `gen_tpermn_cycle`,
-    `gen_tperm01_cycle`
+  + lemmas `gen_tperm_step`, `perm_addr1X`, `gen_tpermn_circular_shift`
 
 - in `cyclic.v`
   + lemmas `eq_expg_ord`, `expgDzmod`
@@ -170,7 +169,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemma `sol_setXn`
 
 - in `alt.v`
-  + lemmas `gen_tperm_cycle`, `solvable_AltF`, `solvable_SymF`
+  + lemmas `gen_tperm_circular_shift`, `solvable_AltF`, `solvable_SymF`
 
 ### Changed
 
