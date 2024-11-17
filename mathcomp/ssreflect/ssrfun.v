@@ -80,3 +80,32 @@ Proof. by move=> Ef [?|] //=; rewrite Ef. Qed.
 Lemma omapK {aT rT : Type} (f : aT -> rT) (g : rT -> aT) :
   cancel f g -> cancel (omap f) (omap g).
 Proof. by move=> fK [?|] //=; rewrite fK. Qed.
+
+Lemma oapp_comp aT rT sT (f : aT -> rT) (g : rT -> sT) x :
+  oapp (g \o f) x =1 (@oapp _ _)^~ x g \o omap f.
+Proof. by case. Qed.
+
+Lemma oapp_comp_f {aT rT sT} (f : aT -> rT) (g : rT -> sT) (x : rT) :
+  oapp (g \o f) (g x) =1 g \o oapp f x.
+Proof. by case. Qed.
+
+Lemma olift_comp aT rT sT (f : aT -> rT) (g : rT -> sT) :
+  olift (g \o f) = olift g \o f.
+Proof. by []. Qed.
+
+Lemma compA {A B C D : Type} (f : B -> A) (g : C -> B) (h : D -> C) :
+  f \o (g \o h) = (f \o g) \o h.
+Proof. by []. Qed.
+
+Lemma ocan_comp [A B C : Type] [f : B -> option A] [h : C -> option B]
+    [f' : A -> B] [h' : B -> C] :
+  ocancel f f' -> ocancel h h' -> ocancel (obind f \o h) (h' \o f').
+Proof.
+move=> fK hK c /=; rewrite -[RHS]hK/=; case hcE : (h c) => [b|]//=.
+by rewrite -[b in RHS]fK; case: (f b) => //=; have := hK c; rewrite hcE.
+Qed.
+
+Lemma taggedK T P (s : {x : T & P x}) : Tagged P (tagged s) = s.
+Proof. by case: s. Qed.
+
+Definition xpair {T1 T2} (x : T1 * T2) := (x.2, x.1).

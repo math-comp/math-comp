@@ -2097,6 +2097,19 @@ Lemma big_enum_rank (I : finType) (A : pred I) x (xA : x \in A) F
 Proof. by rewrite (big_enum_rank_cond xA) big_mkcondr. Qed.
 Arguments big_enum_rank [I A x] xA F.
 
+Lemma big_sub_cond (I : finType) (A P : {pred I}) (F : I -> R) :
+  \big[*%M/1]_(i in A | P i) F i =
+  \big[*%M/1]_(x : {x in A} | P (val x)) F (val x).
+Proof.
+rewrite (reindex_omap (val : {x in A} -> I) insub); last first.
+  by move=> i /andP[iA Pi]; rewrite insubT.
+by apply: eq_bigl=> -[i iA]/=; rewrite insubT ?iA /= eqxx andbT.
+Qed.
+
+Lemma big_sub (I : finType) (A : {pred I}) (F : I -> R) :
+  \big[*%M/1]_(i in A) F i = \big[*%M/1]_(x : {x in A}) F (val x).
+Proof. by rewrite -(big_sub_cond A xpredT) big_mkcondr. Qed.
+
 Lemma sig_big_dep (I : finType) (J : I -> finType)
     (P : pred I) (Q : forall {i}, pred (J i)) (F : forall {i}, J i -> R) :
   \big[op/idx]_(i | P i) \big[op/idx]_(j : J i | Q j) F j =
@@ -2200,6 +2213,8 @@ Arguments big_enum_val_cond [R op x I A] P F.
 Arguments big_enum_rank_cond [R op x I A z] zA P F.
 Arguments big_enum_val [R idx op I A] F.
 Arguments big_enum_rank [R idx op I A x] xA F.
+Arguments big_sub_cond [R idx op I].
+Arguments big_sub [R idx op I].
 Arguments sig_big_dep [R idx op I J].
 Arguments pair_big_dep [R idx op I J].
 Arguments pair_big [R idx op I J].
@@ -2669,6 +2684,17 @@ Proof. by move=> Fpos; elim/big_ind: _ => // n1 n2; rewrite muln_gt0 => ->. Qed.
 Lemma prodn_gt0 I r (P : pred I) F :
   (forall i, 0 < F i) -> 0 < \prod_(i <- r | P i) F i.
 Proof. by move=> Fpos; apply: prodn_cond_gt0. Qed.
+
+Lemma gt0_prodn_seq (I : eqType) r (P : pred I) F :
+  0 < \prod_(i <- r | P i) F i -> forall i, i \in r -> P i -> 0 < F i.
+Proof.
+move=> + i ri Pi; rewrite !lt0n; apply: contra_neq => Fi_eq0.
+by case: (path.splitP ri) => *; rewrite big_cat big_rcons Pi Fi_eq0/= muln0.
+Qed.
+
+Lemma gt0_prodn (I : finType) (P : pred I) F :
+  0 < \prod_(i | P i) F i -> forall i, P i -> 0 < F i.
+Proof. by move=> /gt0_prodn_seq + i => /[apply]; apply. Qed.
 
 Lemma leq_bigmax_seq (I : eqType) r (P : pred I) F i0 :
   i0 \in r -> P i0 -> F i0 <= \max_(i <- r | P i) F i.

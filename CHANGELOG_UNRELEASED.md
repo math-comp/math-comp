@@ -10,6 +10,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
+- in `ssrfun.v`
+  + lemmas `oapp_comp`, `oapp_comp_f`, `olift_comp`, `compA`, `ocan_comp`,
+    `taggedK`, `xpair`
+
 - in `ssrnat.v`
   + lemmas `ltn_mull`, `ltn_mulr`
 
@@ -24,19 +28,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemma `big_ord1`, `big_ord1_cond`, `big_rcons_op`, `big_change_idx`,
     `big_rcons`, `big_only1`, `big_mknat`
   + lemmas `big_rev`, `rev_big_rev` and `big_morph_in`
+  + lemmas `big_sup_cond`, `big_sub`, `gt0_prodn_seq`, `gt0_prodn`
 
 - in `eqtype.v`
   + definition `dfwith`
   + lemmas `dfwith_in`, `dfwith_out`, `dfwithP`
+  + definitions `etagged`, `untag`, `tagged_with`, `tag_with`, `untag_with`
+  + lemmas `eq_from_Tagged`, `etaggedK`, `untagE`, `untag_dflt`, `untag_cst`,
+    `tag_withK`, `untag_withK`, `tag_with_bij`, `untag_with_bij`
 
 - in `seq.v`
   + lemmas `has_undup`, `all_undup`, `zip_uniql`, `zip_uniqr`
 
+- in `finfun.v`
+  + definition `fprod` (a record with projections `fprod_fun` and `fprod_prod`)
+  + definitions `fprod_type_of_fprod`, `fprod_of_fprod_type`,
+    `dffun_of_fprod`, `fprod_of_dffun`,
+    `to_family_tagged_with`, `of_family_tagged_with`
+  + lemmas `tag_fprod_fun`, `fprodK`, `fprodE`, `fprodP`, `etaggedE`
+    `dffun_of_fprodK`, `fprod_of_dffunK`,
+    `dffun_of_fprod_bij`, `fprod_of_dffun_bij`,
+    `to_family_tagged_withK`, `of_family_tagged_withK`,
+    `to_family_tagged_with_bij`, `of_family_tagged_with_bij`
+
 - in `finset.v`
-  + definition `setXn`
+  + definitions `setXn`, `unset1`, `fprod_pick`, `ftagged`
   + lemmas `in_setXn`, `setXnP`, `cardsXn`, `setXnS`, `eq_setXn`, `enum_setU`,
     `enum_setI`, `has_set1`, `has_setU`, `all_set1`, `all_setU`,
-    `big_subset_idem_cond`, `big_subset_idem`, `big_setU_cond`, `big_setU`
+    `big_subset_idem_cond`, `big_subset_idem`, `big_setU_cond`, `big_setU`,
+    `set0_existsF`, `subset_eq0`, `subsetC_disjoint`,
+    `pick_set1`, `set1K`, `omap_unset1K`, `unset10`, `unset1N1`, `unset1K`,
+    `big_cards1`, `big_tag_cond`, `big_tag`, `big_fprod_dep`, `big_fprod`,
+    `card_fprod`, `ftaggedE`
+
+- in `fintype.v`
+  + lemmas `existsbWl`, `existsbWr`
 
 - in `prime.v`
   + lemmas `primeNsig`, `all_prime_primes`, `primes_eq0`, `totient_gt1`
