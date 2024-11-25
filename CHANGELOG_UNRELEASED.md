@@ -281,6 +281,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemma `orthomx_spectral_subproof`, definitions `spectralmx`, `spectral_diag
   + lemmas `spectral_unitarymx`, `spectral_unit`, `orthomx_spectralP`, `hermitian_spectral_diag_real`
 
+- in `order.v`
+	+ notations `\min<range> e`, `\max<range> e`, `\min^d<range> e`,
+		`\max^d<range> e`, `\min^p<range> e`, `\max^p<range> e`, `\min^sp<range> e`,
+		`\max^sp<range> e`, `\meet^l<range> e`, `\join^l<range> e`,
+		`\min^l<range> e`, `\max^l<range> e`
+
+
 ### Changed
 
 - in `seq.v`
