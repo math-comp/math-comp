@@ -879,7 +879,7 @@ Variable K : fieldType.
 
 (* convertible to kermx (horner_mx g p) when n = n.+1 *)
 Definition kermxpoly n (g : 'M_n) (p : {poly K}) : 'M_n :=
-  kermx ((if n is n.+1 then horner_mx^~ p : 'M_n.+1 -> 'M_n.+1 else 0) g).
+  kermx ((if n is n.+1 then horner_mx^~ p : 'M_n.+1 -> 'M_n.+1 else \0) g).
 
 Lemma kermxpolyC n (g : 'M_n) c : c != 0 -> kermxpoly g c%:P = 0.
 Proof.

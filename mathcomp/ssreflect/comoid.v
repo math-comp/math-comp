@@ -502,33 +502,28 @@ HB.instance Definition _ (U V : baseAddUMagmaType) (f : {additive U -> V}) :=
     (fmultiplicative f) (@raddf0 _ _ f).
 
 Section LiftedAddMagma.
-Variables (U : Type) (V : U -> baseAddMagmaType).
-Definition add_fun (f g : forall u, V u) x := f x + g x.
-#[export]
-HB.instance Definition _ := hasAdd.Build (forall u, V u) add_fun.
-Lemma add_funE f g x : (f + g) x = f x + g x. Proof. by []. Qed.
+Variables (U : Type) (V : baseAddMagmaType).
+Definition add_fun (f g :U -> V) x := f x + g x.
 End LiftedAddMagma.
 Section LiftedNmod.
-Variables (U : Type) (V : U -> baseAddUMagmaType).
-Definition null_fun u : V u := 0.
-#[export]
-HB.instance Definition _ := hasZero.Build (forall u, V u) null_fun.
-Lemma null_funE x : 0 x = 0. Proof. by []. Qed.
+Variables (U : Type) (V : baseAddUMagmaType).
+Definition null_fun of U : V := 0.
 End LiftedNmod.
 Section LiftedZmod.
-Variables (U : Type) (V : U -> baseZmodType).
-Definition opp_fun (f : forall u, V u) x := - f x.
-#[export]
-HB.instance Definition _ := hasOpp.Build (forall u, V u) opp_fun.
-Lemma opp_funE f x : (- f) x = - f x. Proof. by []. Qed.
-Definition sub_fun (f g : forall u, V u) := f - g.
-Lemma sub_funE f g x : (f - g) x = f x - g x. Proof. by []. Qed.
+Variables (U : Type) (V : baseZmodType).
+Definition opp_fun (f : U -> V) x := - f x.
+Definition sub_fun (f g : U -> V) x := f x - g x.
 End LiftedZmod.
 
 Arguments null_fun {_} V _ /.
 Arguments add_fun {_ _} f g _ /.
 Arguments opp_fun {_ _} f _ /.
 Arguments sub_fun {_ _} f g _ /.
+
+Local Notation "\0" := (null_fun _) : function_scope.
+Local Notation "f \+ g" := (add_fun f g) : function_scope.
+Local Notation "\- f" := (opp_fun f) : function_scope.
+Local Notation "f \- g" := (sub_fun f g) : function_scope.
 
 Section Nmod.
 Variables (U V : addUMagmaType) (f : {additive U -> V}).
@@ -576,16 +571,15 @@ Implicit Types (f g : {additive U -> V}).
 
 Fact add_fun_semi_additive f g : semi_additive (add_fun f g).
 Proof.
-split; first by rewrite -[LHS]/(f 0 + g 0) !raddf0 addg0.
-by move=> x y; rewrite -[LHS]/(f (x + y) + g (x + y)) !raddfD [LHS]addgACA.
+split; first by rewrite /= !raddf0 addg0.
+by move=> x y; rewrite /= !raddfD [LHS]addgACA.
 Qed.
 #[export]
 HB.instance Definition _ f g :=
   isSemiAdditive.Build U V (add_fun f g) (add_fun_semi_additive f g).
 
-#[export]
-HB.instance Definition _ :=
-  hasAdd.Build {additive U -> V} (fun f g => add_fun f g).
+
+
 End AddCFun.
 
 Section AddFun.
@@ -608,17 +602,13 @@ End AddFun.
 Section AddFun.
 Variables (U : baseAddUMagmaType) (V : addUMagmaType).
 
-Fact null_fun_is_semi_additive : semi_additive (null_fun (fun _ : U => V)).
+Fact null_fun_is_semi_additive : semi_additive (\0 : U -> V).
 Proof. by split=> // x y /=; rewrite addg0. Qed.
 #[export]
 HB.instance Definition _ :=
-  isSemiAdditive.Build U V (null_fun (fun _ : U => V))
+  isSemiAdditive.Build U V (\0 : U -> V)
     null_fun_is_semi_additive.
 
-(* TODO: HB does not declare the AddUMagma structure on {additive U -> V}. *)
-#[export]
-HB.instance Definition _ :=
-  hasZero.Build {additive U -> V} (null_fun (fun _ : U => V)).
 End AddFun.
 
 Section AddVFun.
@@ -641,15 +631,18 @@ HB.instance Definition _ (U : baseAddUMagmaType) (V : zmodType)
     (f : {additive U -> V}) :=
   isSemiAdditive.Build U V (opp_fun f) (opp_fun_is_additive f).
 
-(* TODO: HB does not declare the AddUMagma structure on {additive U -> V}. *)
-#[export]
-HB.instance Definition _ (U : baseAddUMagmaType) (V : zmodType) :=
-  hasOpp.Build {additive U -> V} (comp opp).
-
+Fact sub_fun_is_additive (U : baseAddUMagmaType) (V : zmodType)
+    (f g : {additive U -> V}) :
+  semi_additive (f \- g).
+Proof.
+split=> [|x y]/=; first by rewrite !raddf0 addg0.
+by rewrite !raddfD/= addgACA.
+Qed.
 #[export]
 HB.instance Definition _ (U : baseAddUMagmaType) (V : zmodType)
     (f g : {additive U -> V}) :=
-  Additive.on (sub_fun f g).
+  isSemiAdditive.Build U V (f \- g) (sub_fun_is_additive f g).
+
 
 End AddVFun.
 End AdditiveTheory.

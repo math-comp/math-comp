@@ -656,21 +656,18 @@ HB.instance Definition _ G H (f : UMagmaMorphism.type G H) :=
   UMagmaMorphism.on (Multiplicative.sort f).
 
 Section LiftedMagma.
-Variables (T : Type) (G : T -> magmaType).
-Definition mul_fun (f g : forall t, G t) x := f x * g x.
-
-HB.instance Definition _ := hasMul.Build (forall t, G t) mul_fun.
-
-Lemma mul_funE f g x : (f * g) x = f x * g x. Proof. by []. Qed.
+Variables (T : Type) (G : magmaType).
+Definition mul_fun (f g : T -> G) x := f x * g x.
 
 End LiftedMagma.
 Section LiftedBaseUMagma.
-Variables (T : Type) (G : T -> baseUMagmaType).
-Definition one_fun t : G t := 1.
+Variables (T : Type) (G : baseUMagmaType).
+Definition one_fun : T -> G := fun=> 1.
 
-HB.instance Definition _ := hasOne.Build (forall t, G t) one_fun.
 End LiftedBaseUMagma.
 
+Local Notation "\1" := (one_fun _) : function_scope.
+Local Notation "f \* g" := (mul_fun f g) : function_scope.
 Arguments one_fun {_} G _ /.
 Arguments mul_fun {_ _} f g _ /.
 
@@ -747,10 +744,10 @@ Fact idfun_gmulf1 : idfun 1 = 1 :> H.
 Proof. by []. Qed.
 HB.instance Definition _ := isUMagmaMorphism.Build H H idfun idfun_gmulf1.
 
-Fact one_fun_gmulfM : {morph @one_fun G (fun=> H) : x y / x * y}.
+Fact one_fun_gmulfM : {morph @one_fun G H : x y / x * y}.
 Proof. by move=> x y; rewrite mulg1. Qed.
 HB.instance Definition _ :=
-  isMultiplicative.Build G H (@one_fun G (fun=> H)) one_fun_gmulfM.
+  isMultiplicative.Build G H (@one_fun G H) one_fun_gmulfM.
 End Mul1Fun.
 
 Section Mul11Fun.
@@ -761,16 +758,16 @@ Fact comp_gmulf1 : (f \o h) 1 = 1.
 Proof. by rewrite /= !gmulf1. Qed.
 HB.instance Definition _ := isUMagmaMorphism.Build G K (f \o h) comp_gmulf1.
 
-Fact one_fun_gmulf1 : @one_fun G (fun=> H) 1 = 1.
+Fact one_fun_gmulf1 : @one_fun G H 1 = 1.
 Proof. by []. Qed.
 HB.instance Definition _ :=
-  isUMagmaMorphism.Build G H (@one_fun G (fun=> H)) one_fun_gmulf1.
+  isUMagmaMorphism.Build G H (@one_fun G H) one_fun_gmulf1.
 
-Fact mul_fun_gmulf1 : ((f : H -> K) * g) 1 = 1.
-Proof. by rewrite -[LHS]/(f 1 * g 1) !gmulf1 mulg1. Qed.
+Fact mul_fun_gmulf1 : (f \* g) 1 = 1.
+Proof. by rewrite /= !gmulf1 mulg1. Qed.
 
 HB.instance Definition _ :=
-  isUMagmaMorphism.Build H K ((f : H -> K) * g) mul_fun_gmulf1.
+  isUMagmaMorphism.Build H K (f \* g) mul_fun_gmulf1.
 End Mul11Fun.
 End MorphismTheory.
 
