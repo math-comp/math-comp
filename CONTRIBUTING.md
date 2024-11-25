@@ -216,8 +216,8 @@ Definitions and lemmas should never be removed or renamed without warning users:
 they should be deprecated first, during at least one release.
 We use the pragma `deprecated` to implement deprecation of definitions and lemmas;
 see the many examples in the source code.
-We try to keep deprecation warnings for at least two years unless impossible
-(for example because of a name clash); after this period, deprecation warnings
+We try to keep deprecation warnings for at least two years unless we need to remove them
+(for example because of a name clash, and in any case after at least one release); after this period, deprecation warnings
 might disappear at any moment, making the deletion or the renaming definitive.
 
 ## Doc style
