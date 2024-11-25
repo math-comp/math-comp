@@ -213,7 +213,7 @@ Abbreviations are in the header of the file which introduces them. We list here 
 #### Deprecations
 
 Definitions and lemmas should never be removed or renamed without warning users:
-they should be deprecated first, by at least one release.
+they should be deprecated first, during at least one release.
 We use the pragma `deprecated` to implement deprecation of definitions and lemmas;
 see the many examples in the source code.
 We try to keep deprecation warnings for at least two years unless impossible
