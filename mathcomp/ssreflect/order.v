@@ -365,9 +365,15 @@ From mathcomp Require Import finset.
 (* For T of type bPOrderType d:                                               *)
 (*            \bot :=  @Order.bottom d T                                      *)
 (*                 ==  the bottom element of type T                           *)
+(* \max_<range> e :=  \big[Order.max / Order.bottom]_<range> e                *)
+(*                 ==  iterated max of a preorder with a bottom               *)
+(*                     the possible <range>s are documented in bigop.v        *)
 (* For T of type tPOrderType d:                                               *)
 (*            \top :=  @Order.top d T                                         *)
 (*                 ==  the top element of type T                              *)
+(* \min_<range> e :=  \big[Order.max / Order.top]_<range> e                   *)
+(*                 ==  iterated min of a preorder with a top                  *)
+(*                     the possible <range>s are documented in bigop.v        *)
 (*                                                                            *)
 (* For T of type meetSemilatticeType d, and x, y of type T:                   *)
 (*         x `&` y :=  @Order.meet d T x y                                    *)
@@ -379,9 +385,11 @@ From mathcomp Require Import finset.
 (* For T of type tMeetSemilatticeType d:                                      *)
 (* \meet_<range> e :=  \big[Order.meet / Order.top]_<range> e                 *)
 (*                 ==  iterated meet of a meet-semilattice with a top         *)
+(*                     the possible <range>s are documented in bigop.v        *)
 (* For T of type bJoinSemilatticeType d:                                      *)
 (* \join_<range> e :=  \big[Order.join / Order.bottom]_<range> e              *)
 (*                 ==  iterated join of a join-semilattice with a bottom      *)
+(*                     the possible <range>s are documented in bigop.v        *)
 (*                                                                            *)
 (* For T of type cDistrLatticeType d, and x, y, z of type T:                  *)
 (*    rcompl x y z == the (relative) complement of z in [x, y]                *)
@@ -1242,6 +1250,76 @@ Reserved Notation "\join^p_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
            format "'[' \join^p_ ( i  'in'  A ) '/  '  F ']'").
 
+Reserved Notation "\min^p_ i F"
+  (at level 41, F at level 41, i at level 0,
+           format "'[' \min^p_ i '/  '  F ']'").
+Reserved Notation "\min^p_ ( i <- r | P ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \min^p_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\min^p_ ( i <- r ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \min^p_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\min^p_ ( m <= i < n | P ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \min^p_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\min^p_ ( m <= i < n ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \min^p_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\min^p_ ( i | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           format "'[' \min^p_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\min^p_ ( i : t | P ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\min^p_ ( i : t ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\min^p_ ( i < n | P ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \min^p_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\min^p_ ( i < n ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \min^p_ ( i  <  n )  F ']'").
+Reserved Notation "\min^p_ ( i 'in' A | P ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \min^p_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\min^p_ ( i 'in' A ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \min^p_ ( i  'in'  A ) '/  '  F ']'").
+
+Reserved Notation "\max^p_ i F"
+  (at level 41, F at level 41, i at level 0,
+           format "'[' \max^p_ i '/  '  F ']'").
+Reserved Notation "\max^p_ ( i <- r | P ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \max^p_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\max^p_ ( i <- r ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \max^p_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\max^p_ ( m <= i < n | P ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \max^p_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\max^p_ ( m <= i < n ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \max^p_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\max^p_ ( i | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           format "'[' \max^p_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\max^p_ ( i : t | P ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\max^p_ ( i : t ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\max^p_ ( i < n | P ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \max^p_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\max^p_ ( i < n ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \max^p_ ( i  <  n )  F ']'").
+Reserved Notation "\max^p_ ( i 'in' A | P ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \max^p_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\max^p_ ( i 'in' A ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \max^p_ ( i  'in'  A ) '/  '  F ']'").
+
 Reserved Notation "\meet^sp_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \meet^sp_ i '/  '  F ']'").
@@ -1311,6 +1389,216 @@ Reserved Notation "\join^sp_ ( i 'in' A | P ) F"
 Reserved Notation "\join^sp_ ( i 'in' A ) F"
   (at level 41, F at level 41, i, A at level 50,
            format "'[' \join^sp_ ( i  'in'  A ) '/  '  F ']'").
+
+Reserved Notation "\min^sp_ i F"
+  (at level 41, F at level 41, i at level 0,
+           format "'[' \min^sp_ i '/  '  F ']'").
+Reserved Notation "\min^sp_ ( i <- r | P ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \min^sp_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\min^sp_ ( i <- r ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \min^sp_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\min^sp_ ( m <= i < n | P ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \min^sp_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\min^sp_ ( m <= i < n ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \min^sp_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\min^sp_ ( i | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           format "'[' \min^sp_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\min^sp_ ( i : t | P ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\min^sp_ ( i : t ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\min^sp_ ( i < n | P ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \min^sp_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\min^sp_ ( i < n ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \min^sp_ ( i  <  n )  F ']'").
+Reserved Notation "\min^sp_ ( i 'in' A | P ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \min^sp_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\min^sp_ ( i 'in' A ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \min^sp_ ( i  'in'  A ) '/  '  F ']'").
+
+Reserved Notation "\max^sp_ i F"
+  (at level 41, F at level 41, i at level 0,
+           format "'[' \max^sp_ i '/  '  F ']'").
+Reserved Notation "\max^sp_ ( i <- r | P ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \max^sp_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\max^sp_ ( i <- r ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \max^sp_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\max^sp_ ( m <= i < n | P ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \max^sp_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\max^sp_ ( m <= i < n ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \max^sp_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\max^sp_ ( i | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           format "'[' \max^sp_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\max^sp_ ( i : t | P ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\max^sp_ ( i : t ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\max^sp_ ( i < n | P ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \max^sp_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\max^sp_ ( i < n ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \max^sp_ ( i  <  n )  F ']'").
+Reserved Notation "\max^sp_ ( i 'in' A | P ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \max^sp_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\max^sp_ ( i 'in' A ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \max^sp_ ( i  'in'  A ) '/  '  F ']'").
+
+Reserved Notation "\meet^l_ i F"
+  (at level 41, F at level 41, i at level 0,
+           format "'[' \meet^l_ i '/  '  F ']'").
+Reserved Notation "\meet^l_ ( i <- r | P ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \meet^l_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\meet^l_ ( i <- r ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \meet^l_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\meet^l_ ( m <= i < n | P ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \meet^l_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\meet^l_ ( m <= i < n ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \meet^l_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\meet^l_ ( i | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           format "'[' \meet^l_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\meet^l_ ( i : t | P ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\meet^l_ ( i : t ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\meet^l_ ( i < n | P ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \meet^l_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\meet^l_ ( i < n ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \meet^l_ ( i  <  n )  F ']'").
+Reserved Notation "\meet^l_ ( i 'in' A | P ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \meet^l_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\meet^l_ ( i 'in' A ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \meet^l_ ( i  'in'  A ) '/  '  F ']'").
+
+Reserved Notation "\join^l_ i F"
+  (at level 41, F at level 41, i at level 0,
+           format "'[' \join^l_ i '/  '  F ']'").
+Reserved Notation "\join^l_ ( i <- r | P ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \join^l_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\join^l_ ( i <- r ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \join^l_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\join^l_ ( m <= i < n | P ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \join^l_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\join^l_ ( m <= i < n ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \join^l_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\join^l_ ( i | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           format "'[' \join^l_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\join^l_ ( i : t | P ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\join^l_ ( i : t ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\join^l_ ( i < n | P ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \join^l_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\join^l_ ( i < n ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \join^l_ ( i  <  n )  F ']'").
+Reserved Notation "\join^l_ ( i 'in' A | P ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \join^l_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\join^l_ ( i 'in' A ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \join^l_ ( i  'in'  A ) '/  '  F ']'").
+
+Reserved Notation "\min^l_ i F"
+  (at level 41, F at level 41, i at level 0,
+           format "'[' \min^l_ i '/  '  F ']'").
+Reserved Notation "\min^l_ ( i <- r | P ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \min^l_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\min^l_ ( i <- r ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \min^l_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\min^l_ ( m <= i < n | P ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \min^l_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\min^l_ ( m <= i < n ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \min^l_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\min^l_ ( i | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           format "'[' \min^l_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\min^l_ ( i : t | P ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\min^l_ ( i : t ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\min^l_ ( i < n | P ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \min^l_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\min^l_ ( i < n ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \min^l_ ( i  <  n )  F ']'").
+Reserved Notation "\min^l_ ( i 'in' A | P ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \min^l_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\min^l_ ( i 'in' A ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \min^l_ ( i  'in'  A ) '/  '  F ']'").
+
+Reserved Notation "\max^l_ i F"
+  (at level 41, F at level 41, i at level 0,
+           format "'[' \max^l_ i '/  '  F ']'").
+Reserved Notation "\max^l_ ( i <- r | P ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \max^l_ ( i  <-  r  |  P ) '/  '  F ']'").
+Reserved Notation "\max^l_ ( i <- r ) F"
+  (at level 41, F at level 41, i, r at level 50,
+           format "'[' \max^l_ ( i  <-  r ) '/  '  F ']'").
+Reserved Notation "\max^l_ ( m <= i < n | P ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \max^l_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\max^l_ ( m <= i < n ) F"
+  (at level 41, F at level 41, i, m, n at level 50,
+           format "'[' \max^l_ ( m  <=  i  <  n ) '/  '  F ']'").
+Reserved Notation "\max^l_ ( i | P ) F"
+  (at level 41, F at level 41, i at level 50,
+           format "'[' \max^l_ ( i  |  P ) '/  '  F ']'").
+Reserved Notation "\max^l_ ( i : t | P ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\max^l_ ( i : t ) F"
+  (at level 41, F at level 41, i at level 50).
+Reserved Notation "\max^l_ ( i < n | P ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \max^l_ ( i  <  n  |  P ) '/  '  F ']'").
+Reserved Notation "\max^l_ ( i < n ) F"
+  (at level 41, F at level 41, i, n at level 50,
+           format "'[' \max^l_ ( i  <  n )  F ']'").
+Reserved Notation "\max^l_ ( i 'in' A | P ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \max^l_ ( i  'in'  A  |  P ) '/  '  F ']'").
+Reserved Notation "\max^l_ ( i 'in' A ) F"
+  (at level 41, F at level 41, i, A at level 50,
+           format "'[' \max^l_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "'{' 'omorphism' U '->' V '}'"
   (at level 0, U at level 98, V at level 99,
@@ -1558,6 +1846,56 @@ Notation ltRHS := (X in (_ < X)%O)%pattern.
 
 Notation "\bot" := bottom : order_scope.
 Notation "\top" := top : order_scope.
+
+Notation "\min_ i F" :=
+  (\big[min/top]_i F) : order_scope.
+Notation "\min_ ( i <- r | P ) F" :=
+  (\big[min/top]_(i <- r | P%B) F%O) : order_scope.
+Notation "\min_ ( i < r ) F" :=
+  (\big[min/top]_(i <- r) F%O) : order_scope.
+Notation "\min_ ( m <= i < n | P ) F" :=
+  (\big[min/top]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\min_ ( m <= i < n ) F" :=
+  (\big[min/top]_(m <= i < n) F%O) : order_scope.
+Notation "\min_ ( i | P ) F" :=
+  (\big[min/top]_(i | P%B) F%O) : order_scope.
+Notation "\min_ ( i : t | P ) F" :=
+  (\big[min/top]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\min_ ( i : t ) F" :=
+  (\big[min/top]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\min_ ( i < n | P ) F" :=
+  (\big[min/top]_(i < n | P%B) F%O) : order_scope.
+Notation "\min_ ( i < n ) F" :=
+  (\big[min/top]_(i < n) F%O) : order_scope.
+Notation "\min_ ( i 'in' A | P ) F" :=
+  (\big[min/top]_(i in A | P%B) F%O) : order_scope.
+Notation "\min_ ( i 'in' A ) F" :=
+  (\big[min/top]_(i in A) F%O) : order_scope.
+
+Notation "\max_ i F" :=
+  (\big[max/bottom]_i F%O) : order_scope.
+Notation "\max_ ( i <- r | P ) F" :=
+  (\big[max/bottom]_(i <- r | P%B) F%O) : order_scope.
+Notation "\max_ ( i < r ) F" :=
+  (\big[max/bottom]_(i <- r) F%O) : order_scope.
+Notation "\max_ ( m <= i < n | P ) F" :=
+  (\big[max/bottom]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\max_ ( m <= i < n ) F" :=
+  (\big[max/bottom]_(m <= i < n) F%O) : order_scope.
+Notation "\max_ ( i | P ) F" :=
+  (\big[max/bottom]_(i | P%B) F%O) : order_scope.
+Notation "\max_ ( i : t | P ) F" :=
+  (\big[max/bottom]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\max_ ( i : t ) F" :=
+  (\big[max/bottom]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\max_ ( i < n | P ) F" :=
+  (\big[max/bottom]_(i < n | P%B) F%O) : order_scope.
+Notation "\max_ ( i < n ) F" :=
+  (\big[max/bottom]_(i < n) F%O) : order_scope.
+Notation "\max_ ( i 'in' A | P ) F" :=
+  (\big[max/bottom]_(i in A | P%B) F%O) : order_scope.
+Notation "\max_ ( i 'in' A ) F" :=
+  (\big[max/bottom]_(i in A) F%O) : order_scope.
 
 End POSyntax.
 HB.export POSyntax.
@@ -1974,6 +2312,8 @@ Local Notation "\bot" := dual_bottom.
 Local Notation "\top" := dual_top.
 Local Notation join := dual_join.
 Local Notation meet := dual_meet.
+Local Notation min := dual_min.
+Local Notation max := dual_max.
 
 Notation "\join^d_ ( i <- r | P ) F" :=
   (\big[join / \bot]_(i <- r | P%B) F%O) : order_scope.
@@ -2024,6 +2364,81 @@ Notation "\meet^d_ ( i 'in' A | P ) F" :=
  (\big[meet / \top]_(i in A | P%B) F%O) : order_scope.
 Notation "\meet^d_ ( i 'in' A ) F" :=
  (\big[meet / \top]_(i in A) F%O) : order_scope.
+
+Notation "\meet^d_ ( i <- r | P ) F" :=
+  (\big[meet / \top]_(i <- r | P%B) F%O) : order_scope.
+Notation "\meet^d_ ( i <- r ) F" :=
+  (\big[meet / \top]_(i <- r) F%O) : order_scope.
+Notation "\meet^d_ ( i | P ) F" :=
+  (\big[meet / \top]_(i | P%B) F%O) : order_scope.
+Notation "\meet^d_ i F" :=
+  (\big[meet / \top]_i F%O) : order_scope.
+Notation "\meet^d_ ( i : I | P ) F" :=
+  (\big[meet / \top]_(i : I | P%B) F%O) (only parsing) : order_scope.
+Notation "\meet^d_ ( i : I ) F" :=
+  (\big[meet / \top]_(i : I) F%O) (only parsing) : order_scope.
+Notation "\meet^d_ ( m <= i < n | P ) F" :=
+ (\big[meet / \top]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\meet^d_ ( m <= i < n ) F" :=
+ (\big[meet / \top]_(m <= i < n) F%O) : order_scope.
+Notation "\meet^d_ ( i < n | P ) F" :=
+ (\big[meet / \top]_(i < n | P%B) F%O) : order_scope.
+Notation "\meet^d_ ( i < n ) F" :=
+ (\big[meet / \top]_(i < n) F%O) : order_scope.
+Notation "\meet^d_ ( i 'in' A | P ) F" :=
+ (\big[meet / \top]_(i in A | P%B) F%O) : order_scope.
+Notation "\meet^d_ ( i 'in' A ) F" :=
+ (\big[meet / \top]_(i in A) F%O) : order_scope.
+
+Notation "\min^d_ i F" :=
+  (\big[min/top]_i F) : order_scope.
+Notation "\min^d_ ( i <- r | P ) F" :=
+  (\big[min/top]_(i <- r | P%B) F%O) : order_scope.
+Notation "\min^d_ ( i < r ) F" :=
+  (\big[min/top]_(i <- r) F%O) : order_scope.
+Notation "\min^d_ ( m <= i < n | P ) F" :=
+  (\big[min/top]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\min^d_ ( m <= i < n ) F" :=
+  (\big[min/top]_(m <= i < n) F%O) : order_scope.
+Notation "\min^d_ ( i | P ) F" :=
+  (\big[min/top]_(i | P%B) F%O) : order_scope.
+Notation "\min^d_ ( i : t | P ) F" :=
+  (\big[min/top]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\min^d_ ( i : t ) F" :=
+  (\big[min/top]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\min^d_ ( i < n | P ) F" :=
+  (\big[min/top]_(i < n | P%B) F%O) : order_scope.
+Notation "\min^d_ ( i < n ) F" :=
+  (\big[min/top]_(i < n) F%O) : order_scope.
+Notation "\min^d_ ( i 'in' A | P ) F" :=
+  (\big[min/top]_(i in A | P%B) F%O) : order_scope.
+Notation "\min^d_ ( i 'in' A ) F" :=
+  (\big[min/top]_(i in A) F%O) : order_scope.
+
+Notation "\max^d_ i F" :=
+  (\big[max/bottom]_i F%O) : order_scope.
+Notation "\max^d_ ( i <- r | P ) F" :=
+  (\big[max/bottom]_(i <- r | P%B) F%O) : order_scope.
+Notation "\max^d_ ( i < r ) F" :=
+  (\big[max/bottom]_(i <- r) F%O) : order_scope.
+Notation "\max^d_ ( m <= i < n | P ) F" :=
+  (\big[max/bottom]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\max^d_ ( m <= i < n ) F" :=
+  (\big[max/bottom]_(m <= i < n) F%O) : order_scope.
+Notation "\max^d_ ( i | P ) F" :=
+  (\big[max/bottom]_(i | P%B) F%O) : order_scope.
+Notation "\max^d_ ( i : t | P ) F" :=
+  (\big[max/bottom]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\max^d_ ( i : t ) F" :=
+  (\big[max/bottom]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\max^d_ ( i < n | P ) F" :=
+  (\big[max/bottom]_(i < n | P%B) F%O) : order_scope.
+Notation "\max^d_ ( i < n ) F" :=
+  (\big[max/bottom]_(i < n) F%O) : order_scope.
+Notation "\max^d_ ( i 'in' A | P ) F" :=
+  (\big[max/bottom]_(i in A | P%B) F%O) : order_scope.
+Notation "\max^d_ ( i 'in' A ) F" :=
+  (\big[max/bottom]_(i in A) F%O) : order_scope.
 
 End DualSyntax.
 
@@ -6795,6 +7210,8 @@ Local Notation "\bot" := (@bottom (prod_display _ _) _).
 Local Notation "\top" := (@top (prod_display _ _) _).
 Local Notation meet := (@meet (prod_display _ _) _).
 Local Notation join := (@join (prod_display _ _) _).
+Local Notation min := (@min (prod_display _ _) _).
+Local Notation max := (@max (prod_display _ _) _).
 
 Notation "x `&^p` y" :=  (meet x y) : order_scope.
 Notation "x `|^p` y" := (join x y) : order_scope.
@@ -6848,6 +7265,56 @@ Notation "\meet^p_ ( i 'in' A | P ) F" :=
  (\big[meet / \top]_(i in A | P%B) F%O) : order_scope.
 Notation "\meet^p_ ( i 'in' A ) F" :=
  (\big[meet / \top]_(i in A) F%O) : order_scope.
+
+Notation "\min^p_ i F" :=
+  (\big[min/top]_i F) : order_scope.
+Notation "\min^p_ ( i <- r | P ) F" :=
+  (\big[min/top]_(i <- r | P%B) F%O) : order_scope.
+Notation "\min^p_ ( i < r ) F" :=
+  (\big[min/top]_(i <- r) F%O) : order_scope.
+Notation "\min^p_ ( m <= i < n | P ) F" :=
+  (\big[min/top]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\min^p_ ( m <= i < n ) F" :=
+  (\big[min/top]_(m <= i < n) F%O) : order_scope.
+Notation "\min^p_ ( i | P ) F" :=
+  (\big[min/top]_(i | P%B) F%O) : order_scope.
+Notation "\min^p_ ( i : t | P ) F" :=
+  (\big[min/top]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\min^p_ ( i : t ) F" :=
+  (\big[min/top]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\min^p_ ( i < n | P ) F" :=
+  (\big[min/top]_(i < n | P%B) F%O) : order_scope.
+Notation "\min^p_ ( i < n ) F" :=
+  (\big[min/top]_(i < n) F%O) : order_scope.
+Notation "\min^p_ ( i 'in' A | P ) F" :=
+  (\big[min/top]_(i in A | P%B) F%O) : order_scope.
+Notation "\min^p_ ( i 'in' A ) F" :=
+  (\big[min/top]_(i in A) F%O) : order_scope.
+
+Notation "\max^p_ i F" :=
+  (\big[max/bottom]_i F%O) : order_scope.
+Notation "\max^p_ ( i <- r | P ) F" :=
+  (\big[max/bottom]_(i <- r | P%B) F%O) : order_scope.
+Notation "\max^p_ ( i < r ) F" :=
+  (\big[max/bottom]_(i <- r) F%O) : order_scope.
+Notation "\max^p_ ( m <= i < n | P ) F" :=
+  (\big[max/bottom]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\max^p_ ( m <= i < n ) F" :=
+  (\big[max/bottom]_(m <= i < n) F%O) : order_scope.
+Notation "\max^p_ ( i | P ) F" :=
+  (\big[max/bottom]_(i | P%B) F%O) : order_scope.
+Notation "\max^p_ ( i : t | P ) F" :=
+  (\big[max/bottom]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\max^p_ ( i : t ) F" :=
+  (\big[max/bottom]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\max^p_ ( i < n | P ) F" :=
+  (\big[max/bottom]_(i < n | P%B) F%O) : order_scope.
+Notation "\max^p_ ( i < n ) F" :=
+  (\big[max/bottom]_(i < n) F%O) : order_scope.
+Notation "\max^p_ ( i 'in' A | P ) F" :=
+  (\big[max/bottom]_(i in A | P%B) F%O) : order_scope.
+Notation "\max^p_ ( i 'in' A ) F" :=
+  (\big[max/bottom]_(i in A) F%O) : order_scope.
 
 End ProdSyntax.
 
@@ -6906,6 +7373,8 @@ Local Notation "\bot" := (@bottom (seqprod_display _) _).
 Local Notation "\top" := (@top (seqprod_display _) _).
 Local Notation meet := (@meet (seqprod_display _) _).
 Local Notation join := (@join (seqprod_display _) _).
+Local Notation min := (@min (seqprod_display _) _).
+Local Notation max := (@max (seqprod_display _) _).
 
 Notation "x `&^sp` y" :=  (meet x y) : order_scope.
 Notation "x `|^sp` y" := (join x y) : order_scope.
@@ -6959,6 +7428,56 @@ Notation "\meet^sp_ ( i 'in' A | P ) F" :=
  (\big[meet / \top]_(i in A | P%B) F%O) : order_scope.
 Notation "\meet^sp_ ( i 'in' A ) F" :=
  (\big[meet / \top]_(i in A) F%O) : order_scope.
+
+Notation "\min^sp_ i F" :=
+  (\big[min/top]_i F) : order_scope.
+Notation "\min^sp_ ( i <- r | P ) F" :=
+  (\big[min/top]_(i <- r | P%B) F%O) : order_scope.
+Notation "\min^sp_ ( i < r ) F" :=
+  (\big[min/top]_(i <- r) F%O) : order_scope.
+Notation "\min^sp_ ( m <= i < n | P ) F" :=
+  (\big[min/top]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\min^sp_ ( m <= i < n ) F" :=
+  (\big[min/top]_(m <= i < n) F%O) : order_scope.
+Notation "\min^sp_ ( i | P ) F" :=
+  (\big[min/top]_(i | P%B) F%O) : order_scope.
+Notation "\min^sp_ ( i : t | P ) F" :=
+  (\big[min/top]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\min^sp_ ( i : t ) F" :=
+  (\big[min/top]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\min^sp_ ( i < n | P ) F" :=
+  (\big[min/top]_(i < n | P%B) F%O) : order_scope.
+Notation "\min^sp_ ( i < n ) F" :=
+  (\big[min/top]_(i < n) F%O) : order_scope.
+Notation "\min^sp_ ( i 'in' A | P ) F" :=
+  (\big[min/top]_(i in A | P%B) F%O) : order_scope.
+Notation "\min^sp_ ( i 'in' A ) F" :=
+  (\big[min/top]_(i in A) F%O) : order_scope.
+
+Notation "\max^sp_ i F" :=
+  (\big[max/bottom]_i F%O) : order_scope.
+Notation "\max^sp_ ( i <- r | P ) F" :=
+  (\big[max/bottom]_(i <- r | P%B) F%O) : order_scope.
+Notation "\max^sp_ ( i < r ) F" :=
+  (\big[max/bottom]_(i <- r) F%O) : order_scope.
+Notation "\max^sp_ ( m <= i < n | P ) F" :=
+  (\big[max/bottom]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\max^sp_ ( m <= i < n ) F" :=
+  (\big[max/bottom]_(m <= i < n) F%O) : order_scope.
+Notation "\max^sp_ ( i | P ) F" :=
+  (\big[max/bottom]_(i | P%B) F%O) : order_scope.
+Notation "\max^sp_ ( i : t | P ) F" :=
+  (\big[max/bottom]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\max^sp_ ( i : t ) F" :=
+  (\big[max/bottom]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\max^sp_ ( i < n | P ) F" :=
+  (\big[max/bottom]_(i < n | P%B) F%O) : order_scope.
+Notation "\max^sp_ ( i < n ) F" :=
+  (\big[max/bottom]_(i < n) F%O) : order_scope.
+Notation "\max^sp_ ( i 'in' A | P ) F" :=
+  (\big[max/bottom]_(i in A | P%B) F%O) : order_scope.
+Notation "\max^sp_ ( i 'in' A ) F" :=
+  (\big[max/bottom]_(i in A) F%O) : order_scope.
 
 End SeqProdSyntax.
 
@@ -7025,6 +7544,115 @@ Notation joinlexi := (@join (lexi_display _ _) _).
 Notation "x `&^l` y" :=  (meetlexi x y) : order_scope.
 Notation "x `|^l` y" := (joinlexi x y) : order_scope.
 
+(* The following Local Notations are here to define the \join^l_ and \meet^l_ *)
+(* notations later. Do not remove them.                                       *)
+Local Notation "\bot" := (@bottom (lexi_display _ _) _).
+Local Notation "\top" := (@top (lexi_display _ _) _).
+Local Notation meet := (@meet (lexi_display _ _) _).
+Local Notation join := (@join (lexi_display _ _) _).
+Local Notation min := (@min (lexi_display _ _) _).
+Local Notation max := (@max (lexi_display _ _) _).
+
+Notation "\join^l_ ( i <- r | P ) F" :=
+  (\big[join / \bot]_(i <- r | P%B) F%O) : order_scope.
+Notation "\join^l_ ( i <- r ) F" :=
+  (\big[join / \bot]_(i <- r) F%O) : order_scope.
+Notation "\join^l_ ( i | P ) F" :=
+  (\big[join / \bot]_(i | P%B) F%O) : order_scope.
+Notation "\join^l_ i F" :=
+  (\big[join / \bot]_i F%O) : order_scope.
+Notation "\join^l_ ( i : I | P ) F" :=
+  (\big[join / \bot]_(i : I | P%B) F%O) (only parsing) : order_scope.
+Notation "\join^l_ ( i : I ) F" :=
+  (\big[join / \bot]_(i : I) F%O) (only parsing) : order_scope.
+Notation "\join^l_ ( m <= i < n | P ) F" :=
+ (\big[join / \bot]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\join^l_ ( m <= i < n ) F" :=
+ (\big[join / \bot]_(m <= i < n) F%O) : order_scope.
+Notation "\join^l_ ( i < n | P ) F" :=
+ (\big[join / \bot]_(i < n | P%B) F%O) : order_scope.
+Notation "\join^l_ ( i < n ) F" :=
+ (\big[join / \bot]_(i < n) F%O) : order_scope.
+Notation "\join^l_ ( i 'in' A | P ) F" :=
+ (\big[join / \bot]_(i in A | P%B) F%O) : order_scope.
+Notation "\join^l_ ( i 'in' A ) F" :=
+ (\big[join / \bot]_(i in A) F%O) : order_scope.
+
+Notation "\meet^l_ ( i <- r | P ) F" :=
+  (\big[meet / \top]_(i <- r | P%B) F%O) : order_scope.
+Notation "\meet^l_ ( i <- r ) F" :=
+  (\big[meet / \top]_(i <- r) F%O) : order_scope.
+Notation "\meet^l_ ( i | P ) F" :=
+  (\big[meet / \top]_(i | P%B) F%O) : order_scope.
+Notation "\meet^l_ i F" :=
+  (\big[meet / \top]_i F%O) : order_scope.
+Notation "\meet^l_ ( i : I | P ) F" :=
+  (\big[meet / \top]_(i : I | P%B) F%O) (only parsing) : order_scope.
+Notation "\meet^l_ ( i : I ) F" :=
+  (\big[meet / \top]_(i : I) F%O) (only parsing) : order_scope.
+Notation "\meet^l_ ( m <= i < n | P ) F" :=
+ (\big[meet / \top]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\meet^l_ ( m <= i < n ) F" :=
+ (\big[meet / \top]_(m <= i < n) F%O) : order_scope.
+Notation "\meet^l_ ( i < n | P ) F" :=
+ (\big[meet / \top]_(i < n | P%B) F%O) : order_scope.
+Notation "\meet^l_ ( i < n ) F" :=
+ (\big[meet / \top]_(i < n) F%O) : order_scope.
+Notation "\meet^l_ ( i 'in' A | P ) F" :=
+ (\big[meet / \top]_(i in A | P%B) F%O) : order_scope.
+Notation "\meet^l_ ( i 'in' A ) F" :=
+ (\big[meet / \top]_(i in A) F%O) : order_scope.
+
+Notation "\min^l_ i F" :=
+  (\big[min/top]_i F) : order_scope.
+Notation "\min^l_ ( i <- r | P ) F" :=
+  (\big[min/top]_(i <- r | P%B) F%O) : order_scope.
+Notation "\min^l_ ( i < r ) F" :=
+  (\big[min/top]_(i <- r) F%O) : order_scope.
+Notation "\min^l_ ( m <= i < n | P ) F" :=
+  (\big[min/top]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\min^l_ ( m <= i < n ) F" :=
+  (\big[min/top]_(m <= i < n) F%O) : order_scope.
+Notation "\min^l_ ( i | P ) F" :=
+  (\big[min/top]_(i | P%B) F%O) : order_scope.
+Notation "\min^l_ ( i : t | P ) F" :=
+  (\big[min/top]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\min^l_ ( i : t ) F" :=
+  (\big[min/top]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\min^l_ ( i < n | P ) F" :=
+  (\big[min/top]_(i < n | P%B) F%O) : order_scope.
+Notation "\min^l_ ( i < n ) F" :=
+  (\big[min/top]_(i < n) F%O) : order_scope.
+Notation "\min^l_ ( i 'in' A | P ) F" :=
+  (\big[min/top]_(i in A | P%B) F%O) : order_scope.
+Notation "\min^l_ ( i 'in' A ) F" :=
+  (\big[min/top]_(i in A) F%O) : order_scope.
+
+Notation "\max^l_ i F" :=
+  (\big[max/bottom]_i F%O) : order_scope.
+Notation "\max^l_ ( i <- r | P ) F" :=
+  (\big[max/bottom]_(i <- r | P%B) F%O) : order_scope.
+Notation "\max^l_ ( i < r ) F" :=
+  (\big[max/bottom]_(i <- r) F%O) : order_scope.
+Notation "\max^l_ ( m <= i < n | P ) F" :=
+  (\big[max/bottom]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\max^l_ ( m <= i < n ) F" :=
+  (\big[max/bottom]_(m <= i < n) F%O) : order_scope.
+Notation "\max^l_ ( i | P ) F" :=
+  (\big[max/bottom]_(i | P%B) F%O) : order_scope.
+Notation "\max^l_ ( i : t | P ) F" :=
+  (\big[max/bottom]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\max^l_ ( i : t ) F" :=
+  (\big[max/bottom]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\max^l_ ( i < n | P ) F" :=
+  (\big[max/bottom]_(i < n | P%B) F%O) : order_scope.
+Notation "\max^l_ ( i < n ) F" :=
+  (\big[max/bottom]_(i < n) F%O) : order_scope.
+Notation "\max^l_ ( i 'in' A | P ) F" :=
+  (\big[max/bottom]_(i in A | P%B) F%O) : order_scope.
+Notation "\max^l_ ( i 'in' A ) F" :=
+  (\big[max/bottom]_(i in A) F%O) : order_scope.
+
 End LexiSyntax.
 
 Module Import SeqLexiSyntax.
@@ -7081,6 +7709,115 @@ Notation joinlexi := (@join (seqlexi_display _ _) _).
 
 Notation "x `&^l` y" :=  (meetlexi x y) : order_scope.
 Notation "x `|^l` y" := (joinlexi x y) : order_scope.
+
+(* The following Local Notations are here to define the \join^l_ and \meet^l_ *)
+(* notations later. Do not remove them.                                       *)
+Local Notation "\bot" := (@bottom (lexi_display _ _) _).
+Local Notation "\top" := (@top (lexi_display _ _) _).
+Local Notation meet := (@meet (lexi_display _ _) _).
+Local Notation join := (@join (lexi_display _ _) _).
+Local Notation min := (@min (lexi_display _ _) _).
+Local Notation max := (@max (lexi_display _ _) _).
+
+Notation "\join^l_ ( i <- r | P ) F" :=
+  (\big[join / \bot]_(i <- r | P%B) F%O) : order_scope.
+Notation "\join^l_ ( i <- r ) F" :=
+  (\big[join / \bot]_(i <- r) F%O) : order_scope.
+Notation "\join^l_ ( i | P ) F" :=
+  (\big[join / \bot]_(i | P%B) F%O) : order_scope.
+Notation "\join^l_ i F" :=
+  (\big[join / \bot]_i F%O) : order_scope.
+Notation "\join^l_ ( i : I | P ) F" :=
+  (\big[join / \bot]_(i : I | P%B) F%O) (only parsing) : order_scope.
+Notation "\join^l_ ( i : I ) F" :=
+  (\big[join / \bot]_(i : I) F%O) (only parsing) : order_scope.
+Notation "\join^l_ ( m <= i < n | P ) F" :=
+ (\big[join / \bot]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\join^l_ ( m <= i < n ) F" :=
+ (\big[join / \bot]_(m <= i < n) F%O) : order_scope.
+Notation "\join^l_ ( i < n | P ) F" :=
+ (\big[join / \bot]_(i < n | P%B) F%O) : order_scope.
+Notation "\join^l_ ( i < n ) F" :=
+ (\big[join / \bot]_(i < n) F%O) : order_scope.
+Notation "\join^l_ ( i 'in' A | P ) F" :=
+ (\big[join / \bot]_(i in A | P%B) F%O) : order_scope.
+Notation "\join^l_ ( i 'in' A ) F" :=
+ (\big[join / \bot]_(i in A) F%O) : order_scope.
+
+Notation "\meet^l_ ( i <- r | P ) F" :=
+  (\big[meet / \top]_(i <- r | P%B) F%O) : order_scope.
+Notation "\meet^l_ ( i <- r ) F" :=
+  (\big[meet / \top]_(i <- r) F%O) : order_scope.
+Notation "\meet^l_ ( i | P ) F" :=
+  (\big[meet / \top]_(i | P%B) F%O) : order_scope.
+Notation "\meet^l_ i F" :=
+  (\big[meet / \top]_i F%O) : order_scope.
+Notation "\meet^l_ ( i : I | P ) F" :=
+  (\big[meet / \top]_(i : I | P%B) F%O) (only parsing) : order_scope.
+Notation "\meet^l_ ( i : I ) F" :=
+  (\big[meet / \top]_(i : I) F%O) (only parsing) : order_scope.
+Notation "\meet^l_ ( m <= i < n | P ) F" :=
+ (\big[meet / \top]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\meet^l_ ( m <= i < n ) F" :=
+ (\big[meet / \top]_(m <= i < n) F%O) : order_scope.
+Notation "\meet^l_ ( i < n | P ) F" :=
+ (\big[meet / \top]_(i < n | P%B) F%O) : order_scope.
+Notation "\meet^l_ ( i < n ) F" :=
+ (\big[meet / \top]_(i < n) F%O) : order_scope.
+Notation "\meet^l_ ( i 'in' A | P ) F" :=
+ (\big[meet / \top]_(i in A | P%B) F%O) : order_scope.
+Notation "\meet^l_ ( i 'in' A ) F" :=
+ (\big[meet / \top]_(i in A) F%O) : order_scope.
+
+Notation "\min^l_ i F" :=
+  (\big[min/top]_i F) : order_scope.
+Notation "\min^l_ ( i <- r | P ) F" :=
+  (\big[min/top]_(i <- r | P%B) F%O) : order_scope.
+Notation "\min^l_ ( i < r ) F" :=
+  (\big[min/top]_(i <- r) F%O) : order_scope.
+Notation "\min^l_ ( m <= i < n | P ) F" :=
+  (\big[min/top]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\min^l_ ( m <= i < n ) F" :=
+  (\big[min/top]_(m <= i < n) F%O) : order_scope.
+Notation "\min^l_ ( i | P ) F" :=
+  (\big[min/top]_(i | P%B) F%O) : order_scope.
+Notation "\min^l_ ( i : t | P ) F" :=
+  (\big[min/top]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\min^l_ ( i : t ) F" :=
+  (\big[min/top]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\min^l_ ( i < n | P ) F" :=
+  (\big[min/top]_(i < n | P%B) F%O) : order_scope.
+Notation "\min^l_ ( i < n ) F" :=
+  (\big[min/top]_(i < n) F%O) : order_scope.
+Notation "\min^l_ ( i 'in' A | P ) F" :=
+  (\big[min/top]_(i in A | P%B) F%O) : order_scope.
+Notation "\min^l_ ( i 'in' A ) F" :=
+  (\big[min/top]_(i in A) F%O) : order_scope.
+
+Notation "\max^l_ i F" :=
+  (\big[max/bottom]_i F%O) : order_scope.
+Notation "\max^l_ ( i <- r | P ) F" :=
+  (\big[max/bottom]_(i <- r | P%B) F%O) : order_scope.
+Notation "\max^l_ ( i < r ) F" :=
+  (\big[max/bottom]_(i <- r) F%O) : order_scope.
+Notation "\max^l_ ( m <= i < n | P ) F" :=
+  (\big[max/bottom]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\max^l_ ( m <= i < n ) F" :=
+  (\big[max/bottom]_(m <= i < n) F%O) : order_scope.
+Notation "\max^l_ ( i | P ) F" :=
+  (\big[max/bottom]_(i | P%B) F%O) : order_scope.
+Notation "\max^l_ ( i : t | P ) F" :=
+  (\big[max/bottom]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\max^l_ ( i : t ) F" :=
+  (\big[max/bottom]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\max^l_ ( i < n | P ) F" :=
+  (\big[max/bottom]_(i < n | P%B) F%O) : order_scope.
+Notation "\max^l_ ( i < n ) F" :=
+  (\big[max/bottom]_(i < n) F%O) : order_scope.
+Notation "\max^l_ ( i 'in' A | P ) F" :=
+  (\big[max/bottom]_(i in A | P%B) F%O) : order_scope.
+Notation "\max^l_ ( i 'in' A ) F" :=
+  (\big[max/bottom]_(i in A) F%O) : order_scope.
 
 End SeqLexiSyntax.
 
