@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool choice eqtype ssrnat seq div.
-From mathcomp Require Import fintype bigop finset prime fingroup.
+From mathcomp Require Import fintype bigop finset prime fingroup perm.
 From mathcomp Require Import ssralg finalg countalg.
 
 (******************************************************************************)
@@ -406,3 +406,47 @@ HB.instance Definition _ := Fp_fieldMixin.
 HB.instance Definition _ := FinRing.isField.Build 'F_p.
 
 End PrimeField.
+
+Section Sym.
+
+Import GRing.
+
+Lemma gen_tperm_step n (k : 'I_n.+1) : coprime n.+1 k ->
+  <<[set tperm i (i + k) | i : 'I_n.+1]>>%g = [set: 'S_n.+1].
+Proof.
+case: n k => [|n] k.
+  move=> _; apply/eqP; rewrite eqEsubset subsetT/= -(gen_tperm 0)/= gen_subG.
+  apply/subsetP => s /imsetP[/= [][|//] lt01 _ ->].
+  have ->: (Ordinal lt01) = 0 by apply/val_inj.
+  by rewrite tperm1 group1.
+rewrite -unitZpE// natr_Zp => k_unit.
+apply/eqP; rewrite eqEsubset subsetT/= -(gen_tperm 0)/= gen_subG.
+apply/subsetP => s /imsetP[/= i _ ->].
+rewrite -[i](mulVKr k_unit) -[_ * i]natr_Zp mulr_natr.
+elim: (val _) => //= {i} [|[|i] IHi]; first by rewrite tperm1 group1.
+  by rewrite mulrSr mem_gen//; apply/imsetP; exists 0.
+have [->|kS2N0] := eqVneq (k *+ i.+2) 0; first by rewrite tperm1 group1.
+have kSSneqkS : k *+ i.+2 != k *+ i.+1.
+  rewrite -subr_eq0 -mulrnBr// subSnn mulr1n.
+  by apply: contraTneq k_unit => ->; rewrite unitr0.
+rewrite -(@tpermJ_tperm _ (k *+ i.+1)) 1?eq_sym//.
+rewrite groupJ// 1?tpermC// mulrSr 1?tpermC.
+by rewrite mem_gen//; apply/imsetP; exists (k *+ i.+1).
+Qed.
+
+Lemma perm_addr1X n m (j k : 'I_n.+1) : (perm (addrI m%R) ^+ j)%g k = m *+ j + k.
+Proof. by rewrite permX (eq_iter (permE _)) iter_addr. Qed.
+
+Lemma gen_tpermn_circular_shift n (i j : 'I_n.+2)
+    (c := perm (addrI 1)) : coprime n.+2 (j - i)%R ->
+  <<[set tperm i j ; c]>>%g = [set: 'S_n.+2].
+Proof.
+move=> jBi_coprime; apply/eqP; rewrite eqEsubset subsetT/=.
+rewrite -(gen_tperm_step jBi_coprime) gen_subG.
+apply/subsetP => s /imsetP[/= k _ ->].
+suff -> : tperm k (k + (j - i)) = (tperm i j ^ c ^+ (k - i)%R)%g.
+  by rewrite groupJ ?groupX ?mem_gen ?inE ?eqxx ?orbT.
+by rewrite tpermJ !perm_addr1X natr_Zp addrNK addrAC addrA.
+Qed.
+
+End Sym.
