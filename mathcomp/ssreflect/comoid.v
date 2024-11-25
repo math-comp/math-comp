@@ -31,12 +31,17 @@ HB.mixin Record hasAdd V := {
 #[short(type="baseAddMagmaType")]
 HB.structure Definition BaseAddMagma := {V of hasAdd V}.
 
-HB.structure Definition ChoiceBaseAddMagma := {V of BaseAddMagma V & Choice V}.
-
 Module BaseAddMagmaExports.
 Bind Scope ring_scope with BaseAddMagma.sort.
 End BaseAddMagmaExports.
 HB.export BaseAddMagmaExports. 
+
+HB.structure Definition ChoiceBaseAddMagma := {V of BaseAddMagma V & Choice V}.
+
+Module ChoiceBaseAddMagmaExports.
+Bind Scope ring_scope with ChoiceBaseAddMagma.sort.
+End ChoiceBaseAddMagmaExports.
+HB.export ChoiceBaseAddMagmaExports. 
 
 Local Notation "+%R" := (@add _) : function_scope.
 Local Notation "x + y" := (add x y) : ring_scope.
@@ -79,6 +84,11 @@ HB.instance Definition _ := hasAdd.Build V add.
 HB.instance Definition _ := BaseAddMagma_isAddMagma.Build V addgC.
 HB.end.
 
+Module AddMagmaExports.
+Bind Scope ring_scope with AddMagma.sort.
+End AddMagmaExports.
+HB.export AddMagmaExports.
+
 Section AddMagmaTheory.
 Variables V : addMagmaType.
 
@@ -106,6 +116,11 @@ HB.instance Definition _ := isAddMagma.Build V addgC.
 HB.instance Definition _ := AddMagma_isAddSemigroup.Build V addgA.
 HB.end.
 
+Module AddSemigroupExports.
+Bind Scope ring_scope with AddSemigroup.sort.
+End AddSemigroupExports.
+HB.export AddSemigroupExports.
+
 #[export]
 HB.instance Definition _ (V : addSemigroupType) :=
   Magma_isSemigroup.Build (multiplicative V) addgA.
@@ -132,13 +147,18 @@ HB.mixin Record hasZero V := {
 HB.structure Definition BaseAddUMagma :=
   {V of hasZero V & BaseAddMagma V}.
 
-HB.structure Definition ChoiceBaseAddUMagma :=
-  {V of BaseAddUMagma V & Choice V}.
-
 Module BaseAddUMagmaExports.
 Bind Scope ring_scope with BaseAddUMagma.sort.
 End BaseAddUMagmaExports.
-HB.export BaseAddUMagmaExports. 
+HB.export BaseAddUMagmaExports.
+
+HB.structure Definition ChoiceBaseAddUMagma :=
+  {V of BaseAddUMagma V & Choice V}.
+
+Module ChoiceBaseAddUMagmaExports.
+Bind Scope ring_scope with ChoiceBaseAddUMagma.sort.
+End ChoiceBaseAddUMagmaExports.
+HB.export ChoiceBaseAddUMagmaExports.
 
 Local Notation "0" := (@zero _) : ring_scope.
 
@@ -212,8 +232,18 @@ HB.instance Definition _ := isAddUMagma.Build V addgC add0g.
 HB.instance Definition _ := AddMagma_isAddSemigroup.Build V addgA.
 HB.end.
 
+Module AddUMagmaExports.
+Bind Scope ring_scope with AddUMagma.sort.
+End AddUMagmaExports.
+HB.export AddUMagmaExports.
+
 #[short(type="nmodType")]
 HB.structure Definition Nmodule := {V of isNmodule V & Choice V}.
+
+Module NmoduleExports.
+Bind Scope ring_scope with Nmodule.sort.
+End NmoduleExports.
+HB.export NmoduleExports.
 
 #[export]
 HB.instance Definition _ (V : nmodType) :=
@@ -327,6 +357,11 @@ HB.builders Context V of Group_isZmodule V.
 HB.instance Definition _ := isZmodule.Build V mulgA mulgC mul1g mulVg.
 
 HB.end.
+
+Module ZmoduleExports.
+Bind Scope ring_scope with Zmodule.sort.
+End ZmoduleExports.
+HB.export ZmoduleExports.
 
 Lemma addgN (V : zmodType) : @right_inverse V V V 0 -%R +%R.
 Proof. by move=> x; rewrite addgC addNg. Qed.

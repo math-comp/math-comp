@@ -131,7 +131,17 @@ HB.mixin Record hasMul G := {
 #[short(type="magmaType")]
 HB.structure Definition Magma := {G of hasMul G}.
 
+Module MagmaExports.
+Bind Scope group_scope with Magma.sort.
+End MagmaExports.
+HB.export MagmaExports.
+
 HB.structure Definition ChoiceMagma := {G of Magma G & Choice G}.
+
+Module ChoiceMagmaExports.
+Bind Scope group_scope with ChoiceMagma.sort.
+End ChoiceMagmaExports.
+HB.export ChoiceMagmaExports.
 
 Local Notation "*%g" := (@mul _) : function_scope.
 Local Notation "x * y" := (mul x y) : group_scope.
@@ -178,6 +188,11 @@ HB.instance Definition _ := Magma_isSemigroup.Build G mulgA.
 
 HB.end.
 
+Module SemigroupExports.
+Bind Scope group_scope with Semigroup.sort.
+End SemigroupExports.
+HB.export SemigroupExports.
+
 Section SemigroupTheory.
 Variable G : semigroupType.
 Implicit Types x y : G.
@@ -194,7 +209,17 @@ HB.mixin Record hasOne G := {
 #[short(type="baseUMagmaType")]
 HB.structure Definition BaseUMagma := {G of hasOne G & Magma G}.
 
+Module BaseUMagmaExports.
+Bind Scope group_scope with BaseUMagma.sort.
+End BaseUMagmaExports.
+HB.export BaseUMagmaExports.
+
 HB.structure Definition ChoiceBaseUMagma := {G of BaseUMagma G & Choice G}.
+
+Module ChoiceBaseUMagmaExports.
+Bind Scope group_scope with ChoiceBaseUMagma.sort.
+End ChoiceBaseUMagmaExports.
+HB.export ChoiceBaseUMagmaExports.
 
 Local Notation "1" := (@one _) : group_scope.
 Local Notation "s `_ i" := (nth 1 s i) : group_scope.
@@ -246,6 +271,11 @@ HB.end.
 
 #[short(type="umagmaType")]
 HB.structure Definition UMagma := {G of Magma_isUMagma G & Magma G & Choice G}.
+
+Module UMagmaExports.
+Bind Scope group_scope with UMagma.sort.
+End UMagmaExports.
+HB.export UMagmaExports.
 
 Section UMagmaTheory.
 
@@ -305,6 +335,11 @@ HB.instance Definition _ := Magma_isUMagma.Build G mul1g mulg1.
 
 HB.end.
 
+Module MonoidExports.
+Bind Scope group_scope with Monoid.sort.
+End MonoidExports.
+HB.export MonoidExports.
+
 Section MonoidTheory.
 
 Variable G : monoidType.
@@ -361,6 +396,11 @@ HB.mixin Record hasInv G := {
 #[short(type="baseGroupType")]
 HB.structure Definition BaseGroup := {G of hasInv G & BaseUMagma G}.
 
+Module BaseGroupExports.
+Bind Scope group_scope with BaseGroup.sort.
+End BaseGroupExports.
+HB.export BaseGroupExports.
+
 HB.mixin Record Monoid_isGroup G of BaseGroup G := {
   mulVg : left_inverse one inv (@mul G);
   mulgV : right_inverse one inv (@mul G)
@@ -389,6 +429,11 @@ HB.instance Definition _ := hasInv.Build G inv.
 HB.instance Definition _ := Monoid_isGroup.Build G mulVg mulgV.
 
 HB.end.
+
+Module GroupExports.
+Bind Scope group_scope with Group.sort.
+End GroupExports.
+HB.export GroupExports.
 
 Local Notation "x ^-1" := (inv x) : group_scope.
 Local Notation "x / y" := (x * y^-1) : group_scope.
