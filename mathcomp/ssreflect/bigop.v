@@ -1355,7 +1355,7 @@ by case: eqP => [-> //|]; rewrite ih// big_cons; case: ifPn; case: ifPn.
 Qed.
 
 Lemma big_undup (I : eqType) (r : seq I) (P : pred I) F :
-    idempotent op ->
+    idempotent_op op ->
   \big[op/x]_(i <- undup r | P i) F i = \big[op/x]_(i <- r | P i) F i.
 Proof.
 move=> opxx; rewrite -!(big_filter _ _ _ P) filter_undup.
@@ -2024,7 +2024,7 @@ by rewrite rev_big_rev; apply: (eq_big_op (fun=> True)) => // *; apply: mulmC.
 Qed.
 
 Lemma eq_big_idem (I : eqType) (r1 r2 : seq I) (P : pred I) F :
-    idempotent *%M -> r1 =i r2 ->
+    idempotent_op *%M -> r1 =i r2 ->
   \big[*%M/1]_(i <- r1 | P i) F i = \big[*%M/1]_(i <- r2 | P i) F i.
 Proof.
 move=> idM eq_r; rewrite -big_undup // -(big_undup r2) //; apply/perm_big.
@@ -2267,7 +2267,7 @@ Proof. by move=> u v /(uniq_sub_le_big xpredT F u v); rewrite !big_filter. Qed.
 
 Section Id.
 
-Hypothesis opK : idempotent op.
+Hypothesis opK : idempotent_op op.
 
 Lemma idem_sub_le_big (I : eqType) s s' P (F : I -> R) :
     {subset s <= s'} ->

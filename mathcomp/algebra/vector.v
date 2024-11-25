@@ -499,7 +499,7 @@ Proof. by rewrite /subV (sameP addsmx_idPl eqmxP) -vs2mxD; apply: vs2mxP. Qed.
 Lemma addv_idPr {U V} : reflect (U + V = V)%VS (U <= V)%VS.
 Proof. by rewrite addvC; apply: addv_idPl. Qed.
 
-Lemma addvv : idempotent addV.
+Lemma addvv : idempotent_op addV.
 Proof. by move=> U; apply/addv_idPl. Qed.
 
 Lemma add0v : left_id 0%VS addV.
@@ -591,7 +591,7 @@ Proof. by rewrite /subV(sameP capmx_idPl eqmxP) -vs2mxI; apply: vs2mxP. Qed.
 Lemma capv_idPr {U V} : reflect (U :&: V = V)%VS (V <= U)%VS.
 Proof. by rewrite capvC; apply: capv_idPl. Qed.
 
-Lemma capvv : idempotent capV.
+Lemma capvv : idempotent_op capV.
 Proof. by move=> U; apply/capv_idPl. Qed.
 
 Lemma cap0v : left_zero 0%VS capV.

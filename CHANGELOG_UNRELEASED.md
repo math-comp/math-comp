@@ -281,6 +281,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + lemma `orthomx_spectral_subproof`, definitions `spectralmx`, `spectral_diag
   + lemmas `spectral_unitarymx`, `spectral_unit`, `orthomx_spectralP`, `hermitian_spectral_diag_real`
 
+- in `ssrfun.v`:
+  + definitions `idempotent_op`, `idempotent_fun`
+
 ### Changed
 
 - in `seq.v`
@@ -744,6 +747,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     (use `archiRealDomainType` and `Num.ArchiRealDomain` instead, respectively)
   + structure `archiFieldType` and its HB class `Num.ArchiField`
     (use `archiRealFieldType` and `Num.ArchiRealField` instead, respectively)
+
+- in `ssrfun.v`:
+  + definition `idempotent` (is now `idempotent_op`)
 
 ### Infrastructure
 

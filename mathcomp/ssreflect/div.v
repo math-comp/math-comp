@@ -588,7 +588,7 @@ rewrite {}IHm // subn_if_gt ltnW //=; congr gcdn.
 by rewrite -(subnK (ltnW lt_pm)) modnDr.
 Qed.
 
-Lemma gcdnn : idempotent gcdn.
+Lemma gcdnn : idempotent_op gcdn.
 Proof. by case=> // n; rewrite gcdnE modnn. Qed.
 
 Lemma gcdnC : commutative gcdn.

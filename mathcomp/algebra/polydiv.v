@@ -1666,7 +1666,7 @@ rewrite gcdpE size_polyC oner_eq0 /= modp1 ltnS; case: leqP.
 by rewrite gcd0p size_polyC oner_eq0.
 Qed.
 
-Lemma gcdpp : idempotent gcdp.
+Lemma gcdpp : idempotent_op gcdp.
 Proof. by move=> p; rewrite gcdpE ltnn modpp gcd0p. Qed.
 
 Lemma dvdp_gcdlr p q : (gcdp p q %| p) && (gcdp p q %| q).
