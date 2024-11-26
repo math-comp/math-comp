@@ -301,13 +301,13 @@ Qed.
 HB.instance Definition _ := GRing.isAdditive.Build R {fraction R} tofrac
   tofrac_is_additive.
 
-Lemma tofrac_is_multiplicative: multiplicative tofrac.
+Lemma tofrac_is_multiplicative: multiplicative1first tofrac.
 Proof.
-split=> [p q|//]; unlock tofrac; rewrite -[RHS]pi_mul.
+split=> [//|p q]; unlock tofrac; rewrite -[RHS]pi_mul.
 by rewrite /mulf /= !numden_Ratio ?(oner_neq0, mul1r, mulr1).
 Qed.
 
-HB.instance Definition _ := GRing.isMultiplicative.Build R {fraction R} tofrac
+HB.instance Definition _ := GRing.isMultiplicative1first.Build R {fraction R} tofrac
   tofrac_is_multiplicative.
 
 (* tests *)

@@ -2033,17 +2033,31 @@ End ScaleFun.
 
 End AdditiveTheory.
 
-Definition multiplicative (R S : semiRingType) (f : R -> S) : Prop :=
+#[deprecated(since="mathcomp 2.3.0", note="use `multiplicative1first` instead")]
+  Definition multiplicative (R S : semiRingType) (f : R -> S) : Prop :=
   {morph f : x y / x * y}%R * (f 1 = 1).
+Definition multiplicative1first (R S : semiRingType) (f : R -> S) : Prop :=
+   (f 1 = 1) * {morph f : x y / x * y}%R.
 
-HB.mixin Record isMultiplicative (R S : semiRingType) (f : R -> S) := {
-  rmorphism_subproof : multiplicative f
+HB.mixin Record isMultiplicative1first (R S : semiRingType) (f : R -> S) := {
+  rmorphism_1_first_subproof : multiplicative1first f
 }.
 
 HB.structure Definition RMorphism (R S : semiRingType) :=
-  {f of @Additive R S f & isMultiplicative R S f}.
+  {f of @Additive R S f & isMultiplicative1first R S f}.
 (* FIXME: remove the @ once
    https://github.com/math-comp/hierarchy-builder/issues/319 is fixed *)
+
+#[warnings="-deprecated"]
+HB.factory Record isMultiplicative (R S : semiRingType) (f : R -> S) := {
+      rmorphism_subproof : multiplicative f
+}.
+HB.builders Context R S f of isMultiplicative R S f.
+
+HB.instance Definition _ := isMultiplicative1first.Build R S f
+                              (rmorphism_subproof.2, rmorphism_subproof.1).
+
+HB.end.
 
 Module RMorphismExports.
 Notation "{ 'rmorphism' U -> V }" := (RMorphism.type U%type V%type)
@@ -2064,7 +2078,8 @@ Lemma rmorph_sum I r (P : pred I) E :
   f (\sum_(i <- r | P i) E i) = \sum_(i <- r | P i) f (E i).
 Proof. exact: raddf_sum. Qed.
 
-Lemma rmorphismMP : multiplicative f. Proof. exact: rmorphism_subproof. Qed.
+Lemma rmorphismMP : multiplicative1first f.
+Proof. exact: rmorphism_1_first_subproof. Qed.
 Lemma rmorph1 : f 1 = 1. Proof. by case: rmorphismMP. Qed.
 Lemma rmorphM : {morph f: x y  / x * y}. Proof. by case: rmorphismMP. Qed.
 
@@ -2086,10 +2101,10 @@ Proof. by move/inj_eq <-; rewrite rmorph_nat. Qed.
 Lemma rmorph_eq1 x : injective f -> (f x == 1) = (x == 1).
 Proof. exact: rmorph_eq_nat 1%N. Qed.
 
-Lemma can2_rmorphism f' : cancel f f' -> cancel f' f -> multiplicative f'.
+Lemma can2_rmorphism f' : cancel f f' -> cancel f' f -> multiplicative1first f'.
 Proof.
 move=> fK f'K.
-by split=> [x y|]; apply: (canLR fK); rewrite /= (rmorphM, rmorph1) ?f'K.
+by split=> [|x y]; apply: (canLR fK); rewrite /= (rmorph1, rmorphM) ?f'K.
 Qed.
 
 End Properties.
@@ -2099,16 +2114,16 @@ Section Projections.
 Variables (R S T : semiRingType).
 Variables (f : {rmorphism S -> T}) (g : {rmorphism R -> S}).
 
-Fact idfun_is_multiplicative : multiplicative (@idfun R).
+Fact idfun_is_multiplicative : multiplicative1first (@idfun R).
 Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build R R idfun
+HB.instance Definition _ := isMultiplicative1first.Build R R idfun
   idfun_is_multiplicative.
 
-Fact comp_is_multiplicative : multiplicative (f \o g).
-Proof. by split=> [x y|] /=; rewrite ?rmorph1 ?rmorphM. Qed.
+Fact comp_is_multiplicative : multiplicative1first (f \o g).
+Proof. by split=> [|x y] /=; rewrite ?rmorph1 ?rmorphM. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build R T (f \o g)
+HB.instance Definition _ := isMultiplicative1first.Build R T (f \o g)
   comp_is_multiplicative.
 
 End Projections.
@@ -2139,10 +2154,10 @@ Proof. move=> x y; exact: scalerBl. Qed.
 #[export]
 HB.instance Definition _ := isAdditive.Build R A (in_alg A) in_alg_is_additive.
 
-Fact in_alg_is_rmorphism : multiplicative (in_alg A).
-Proof. by split=> [x y|] /=; rewrite ?scale1r // -scalerAl mul1r scalerA. Qed.
+Fact in_alg_is_rmorphism : multiplicative1first (in_alg A).
+Proof. by split=> [|x y] /=; rewrite ?scale1r // -scalerAl mul1r scalerA. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build R A (in_alg A)
+HB.instance Definition _ := isMultiplicative1first.Build R A (in_alg A)
   in_alg_is_rmorphism.
 
 Lemma in_algE a : in_alg A a = a%:A. Proof. by []. Qed.
@@ -2531,16 +2546,16 @@ Proof.
 by split=> [|x y]; [exact: Frobenius_aut0 | exact/Frobenius_autD_comm/mulrC].
 Qed.
 
-Lemma Frobenius_aut_is_multiplicative : multiplicative (Frobenius_aut charRp).
+Lemma Frobenius_aut_is_multiplicative : multiplicative1first (Frobenius_aut charRp).
 Proof.
-by split=> [x y|]; [exact/Frobenius_autM_comm/mulrC | exact: Frobenius_aut1].
+by split=> [|x y]; [exact: Frobenius_aut1 | exact/Frobenius_autM_comm/mulrC].
 Qed.
 
 #[export]
 HB.instance Definition _ := isSemiAdditive.Build R R (Frobenius_aut charRp)
   Frobenius_aut_is_semi_additive.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build R R (Frobenius_aut charRp)
+HB.instance Definition _ := isMultiplicative1first.Build R R (Frobenius_aut charRp)
   Frobenius_aut_is_multiplicative.
 
 End FrobeniusAutomorphism.
@@ -5022,7 +5037,7 @@ HB.end.
 
 HB.mixin Record isSubSemiRing (R : semiRingType) (S : pred R) U
     of SubNmodule R S U & SemiRing U := {
-  valM_subproof : multiplicative (val : U -> R);
+  valM_subproof : multiplicative1first (val : U -> R);
 }.
 
 #[short(type="subSemiRingType")]
@@ -5033,10 +5048,10 @@ Section multiplicative.
 Context (R : semiRingType) (S : pred R) (U : SubSemiRing.type S).
 Notation val := (val : U -> R).
 #[export]
-HB.instance Definition _ := isMultiplicative.Build U R val valM_subproof.
+HB.instance Definition _ := isMultiplicative1first.Build U R val valM_subproof.
 Lemma val1 : val 1 = 1. Proof. exact: rmorph1. Qed.
 Lemma valM : {morph val : x y / x * y}. Proof. exact: rmorphM. Qed.
-Lemma valM1 : multiplicative val. Proof. exact: valM_subproof. Qed.
+Lemma valM1 : multiplicative1first val. Proof. exact: valM_subproof. Qed.
 End multiplicative.
 
 HB.factory Record SubNmodule_isSubSemiRing (R : semiRingType) S U
@@ -5075,8 +5090,8 @@ Proof. by rewrite -(inj_eq val_inj) SubK raddf0 oner_neq0. Qed.
 HB.instance Definition _ := Nmodule_isSemiRing.Build U
   mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0 oner_neq0.
 
-Lemma valM : multiplicative (val : U -> R).
-Proof. by split=> [x y|] /=; rewrite !SubK. Qed.
+Lemma valM : multiplicative1first (val : U -> R).
+Proof. by split=> [|x y] /=; rewrite !SubK. Qed.
 HB.instance Definition _ := isSubSemiRing.Build R S U valM.
 HB.end.
 
@@ -5887,7 +5902,10 @@ Definition raddfMsign := raddfMsign.
 Definition rev_prodr := rev_prodr.
 Definition can2_semi_additive := can2_semi_additive.
 Definition can2_additive := can2_additive.
+#[warnings="-deprecated",
+    deprecated(since="mathcomp 2.3.0", note="use `multiplicative1first` instead")]
 Definition multiplicative := multiplicative.
+Definition multiplicative1first := multiplicative1first.
 Definition rmorph0 := rmorph0.
 Definition rmorphN := rmorphN.
 Definition rmorphD := rmorphD.
@@ -6391,13 +6409,13 @@ HB.instance Definition _ := Nmodule_isSemiRing.Build (R1 * R2)%type
   pair_mulA pair_mul1l pair_mul1r pair_mulDl pair_mulDr pair_mul0r pair_mulr0
   pair_one_neq0.
 
-Fact fst_is_multiplicative : multiplicative fst. Proof. by []. Qed.
+Fact fst_is_multiplicative : multiplicative1first fst. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build (R1 * R2)%type R1 fst
+HB.instance Definition _ := isMultiplicative1first.Build (R1 * R2)%type R1 fst
   fst_is_multiplicative.
-Fact snd_is_multiplicative : multiplicative snd. Proof. by []. Qed.
+Fact snd_is_multiplicative : multiplicative1first snd. Proof. by []. Qed.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build (R1 * R2)%type R2 snd
+HB.instance Definition _ := isMultiplicative1first.Build (R1 * R2)%type R2 snd
   snd_is_multiplicative.
 
 End PairSemiRing.
@@ -6618,7 +6636,7 @@ HB.instance Definition _ (V : nmodType) (x : V) :=
   isSemiAdditive.Build nat V (natmul x) (mulr0n x, mulrnDr x).
 
 HB.instance Definition _ (R : semiRingType) :=
-  isMultiplicative.Build nat R (natmul 1) (natrM R, mulr1n 1).
+  isMultiplicative1first.Build nat R (natmul 1) (mulr1n 1, natrM R).
 
 Lemma natr0E : 0 = 0%N. Proof. by []. Qed.
 Lemma natr1E : 1 = 1%N. Proof. by []. Qed.

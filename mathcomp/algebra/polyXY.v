@@ -99,16 +99,16 @@ Proof. by rewrite -swapXY_polyC swapXYK. Qed.
 Lemma swapXY_eq0 u : (swapXY u == 0) = (u == 0).
 Proof. by rewrite (inv_eq swapXYK) raddf0. Qed.
 
-Lemma swapXY_is_multiplicative : multiplicative swapXY.
+Lemma swapXY_is_multiplicative : multiplicative1first swapXY.
 Proof.
-split=> [u v|]; last by rewrite swapXY_polyC map_polyC.
+split=> [|u v]; first by rewrite swapXY_polyC map_polyC.
 apply/polyP=> i; apply/polyP=> j; rewrite coef_swapXY !coefM !coef_sum.
 rewrite (eq_bigr _ (fun _ _ => coefM _ _ _)) exchange_big /=.
 apply: eq_bigr => j1 _; rewrite coefM; apply: eq_bigr=> i1 _.
 by rewrite !coef_swapXY.
 Qed.
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build {poly {poly R}} {poly {poly R}} swapXY
+  GRing.isMultiplicative1first.Build {poly {poly R}} {poly {poly R}} swapXY
     swapXY_is_multiplicative.
 
 Lemma swapXY_is_scalable : scalable_for (map_poly polyC \; *%R) swapXY.

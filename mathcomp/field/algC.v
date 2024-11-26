@@ -395,9 +395,9 @@ Proof. by rewrite -(inj_eq CtoL_inj) !LtoC_K oner_eq0. Qed.
 HB.instance Definition _ :=
   GRing.Zmodule_isComRing.Build type mulA mulC mul1 mulD one_nz.
 
-Fact CtoL_is_multiplicative : multiplicative CtoL.
-Proof. by split=> [u v|]; rewrite !LtoC_K. Qed.
-HB.instance Definition _ := GRing.isMultiplicative.Build type L' CtoL
+Fact CtoL_is_multiplicative : multiplicative1first CtoL.
+Proof. by split=> [|u v]; rewrite !LtoC_K. Qed.
+HB.instance Definition _ := GRing.isMultiplicative1first.Build type L' CtoL
   CtoL_is_multiplicative.
 
 Fact mulVf u :  u != 0 -> inv u * u = 1.
@@ -445,9 +445,9 @@ Qed.
 Fact conj_is_additive : {morph (fun u => LtoC (conj_subproof u)) : x / - x}.
 Proof. by move=> u; apply: CtoL_inj; rewrite LtoC_K !raddfN /= LtoC_K. Qed.
 
-Fact conj_is_multiplicative : multiplicative (fun u => LtoC (conj_subproof u)).
+Fact conj_is_multiplicative : multiplicative1first (fun u => LtoC (conj_subproof u)).
 Proof.
-split=> [u v|]; apply: CtoL_inj; last by rewrite !LtoC_K rmorph1.
+split=> [|u v]; apply: CtoL_inj; first by rewrite !LtoC_K rmorph1.
 by rewrite LtoC_K 3!{1}rmorphM /= !LtoC_K.
 Qed.
 
@@ -455,7 +455,7 @@ Definition conj : {rmorphism type -> type} :=
   GRing.RMorphism.Pack
     (GRing.RMorphism.Class
        (GRing.isSemiAdditive.Build _ _ _ conj_is_semi_additive)
-       (GRing.isMultiplicative.Build _ _ _ conj_is_multiplicative)).
+       (GRing.isMultiplicative1first.Build _ _ _ conj_is_multiplicative)).
 
 Lemma conjK : involutive conj.
 Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K conjL_K. Qed.
@@ -900,7 +900,7 @@ Proof. exact: inj_can_sym (algC_invautK nu) (fmorph_inj nu). Qed.
 Fact algC_invaut_is_additive nu : additive (algC_invaut nu).
 Proof. exact: can2_additive (algC_autK nu) (algC_invautK nu). Qed.
 
-Fact algC_invaut_is_rmorphism nu : multiplicative (algC_invaut nu).
+Fact algC_invaut_is_rmorphism nu : multiplicative1first (algC_invaut nu).
 Proof. exact: can2_rmorphism (algC_autK nu) (algC_invautK nu). Qed.
 
 HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=
@@ -908,7 +908,7 @@ HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=
     (algC_invaut_is_additive nu).
 
 HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=
-  GRing.isMultiplicative.Build algC algC (algC_invaut nu)
+  GRing.isMultiplicative1first.Build algC algC (algC_invaut nu)
     (algC_invaut_is_rmorphism nu).
 
 Lemma minCpoly_aut nu x : minCpoly (nu x) = minCpoly x.

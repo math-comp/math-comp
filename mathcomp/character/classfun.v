@@ -335,14 +335,14 @@ Proof.
 by move=> phi psi; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE /= rmorphB.
 Qed.
 
-Lemma cfAut_is_multiplicative : multiplicative cfAut.
+Lemma cfAut_is_multiplicative : multiplicative1first cfAut.
 Proof.
-by split=> [phi psi|]; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE rmorphM.
+by split=> [|phi psi]; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE rmorphM.
 Qed.
 
 HB.instance Definition _ := GRing.isAdditive.Build classfun classfun cfAut
   cfAut_is_additive.
-HB.instance Definition _ := GRing.isMultiplicative.Build classfun classfun cfAut
+HB.instance Definition _ := GRing.isMultiplicative1first.Build classfun classfun cfAut
   cfAut_is_multiplicative.
 
 Lemma cfAut_cfun1 : cfAut 1 = 1. Proof. exact: rmorph1. Qed.
@@ -1399,12 +1399,12 @@ apply: cfun_in_genP => x Hx; rewrite cfunElock Hx !cfun1Egen Hx.
 by case: subsetP => [-> // | _]; rewrite group1.
 Qed.
 
-Lemma cfRes_is_multiplicative : multiplicative cfRes.
+Lemma cfRes_is_multiplicative : multiplicative1first cfRes.
 Proof.
-split=> [phi psi|]; [apply/cfunP=> x | exact: cfRes_cfun1].
+split=> [|phi psi]; [exact: cfRes_cfun1 | apply/cfunP=> x].
 by rewrite !cfunElock mulrnAr mulrnAl -mulrnA mulnb andbb.
 Qed.
-HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfRes
+HB.instance Definition _ := GRing.isMultiplicative1first.Build _ _ cfRes
   cfRes_is_multiplicative.
 
 End Restrict.
@@ -1502,12 +1502,12 @@ Qed.
 HB.instance Definition _ := GRing.isLinear.Build algC _ _ _ cfMorph
   cfMorph_is_linear.
 
-Fact cfMorph_is_multiplicative : multiplicative cfMorph.
+Fact cfMorph_is_multiplicative : multiplicative1first cfMorph.
 Proof.
-split=> [phi psi|]; [apply/cfunP=> x | exact: cfMorph_cfun1].
+split=> [|phi psi]; [exact: cfMorph_cfun1 | apply/cfunP=> x].
 by rewrite !cfunElock mulrnAr mulrnAl -mulrnA mulnb andbb.
 Qed.
-HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfMorph
+HB.instance Definition _ := GRing.isMultiplicative1first.Build _ _ cfMorph
   cfMorph_is_multiplicative.
 
 Hypothesis sGD : G \subset D.
@@ -1592,14 +1592,14 @@ Proof. by rewrite -(morph1 f) cfIsomE. Qed.
 Lemma cfIsom_is_additive : additive cfIsom.
 Proof. rewrite unlock; exact: raddfB. Qed.
 
-Lemma cfIsom_is_multiplicative : multiplicative cfIsom.
-Proof. rewrite unlock; exact: (rmorphM _, rmorph1 _). Qed.
+Lemma cfIsom_is_multiplicative : multiplicative1first cfIsom.
+Proof. rewrite unlock; exact: (rmorph1 _, rmorphM _). Qed.
 
 Lemma cfIsom_is_scalable : scalable cfIsom.
 Proof. rewrite unlock; exact: linearZ_LR. Qed.
 
 HB.instance Definition _ := GRing.isAdditive.Build _ _ cfIsom cfIsom_is_additive.
-HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfIsom
+HB.instance Definition _ := GRing.isMultiplicative1first.Build _ _ cfIsom
   cfIsom_is_multiplicative.
 HB.instance Definition _ := GRing.isScalable.Build _ _ _ _ cfIsom
   cfIsom_is_scalable.
@@ -1848,14 +1848,14 @@ Canonical cfSdprod_unlockable := [unlockable of cfSdprod].
 Lemma cfSdprod_is_additive : additive cfSdprod.
 Proof. rewrite unlock; exact: raddfB. Qed.
 
-Lemma cfSdprod_is_multiplicative : multiplicative cfSdprod.
-Proof. rewrite unlock; exact: (rmorphM _, rmorph1 _). Qed.
+Lemma cfSdprod_is_multiplicative : multiplicative1first cfSdprod.
+Proof. rewrite unlock; exact: (rmorph1 _, rmorphM _). Qed.
 
 Lemma cfSdprod_is_scalable : scalable cfSdprod.
 Proof. rewrite unlock; exact: linearZ_LR. Qed.
 
 HB.instance Definition _ := GRing.isAdditive.Build _ _ cfSdprod cfSdprod_is_additive.
-HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfSdprod
+HB.instance Definition _ := GRing.isMultiplicative1first.Build _ _ cfSdprod
   cfSdprod_is_multiplicative.
 HB.instance Definition _ := GRing.isScalable.Build _ _ _ _ cfSdprod
   cfSdprod_is_scalable.
