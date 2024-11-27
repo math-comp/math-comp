@@ -359,6 +359,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 	 `Zp_mul_addl`, `Zp_inv_out`
 	 generalized from `'I_p.+1` to `'I_p`.
 
+- in `ssrfun.v`
+	+ generalized `eqfun` and `eqrel` to dependent function typesk
+
 ### Renamed
 
 - in `binomial.v`

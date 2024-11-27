@@ -286,7 +286,7 @@ by apply: eq_card => x; rewrite !inE andbC.
 Qed.
 
 Lemma eq_root e e' : e =2 e' -> root e =1 root e'.
-Proof. by move=> eq_e x; rewrite /root (eq_pick (eq_connect eq_e x)). Qed.
+Proof. by move=> eq_e x; rewrite /root (eq_pick (@eq_connect _ _ eq_e x)). Qed.
 
 Lemma eq_roots e e' : e =2 e' -> roots e =1 roots e'.
 Proof. by move=> eq_e x; rewrite /roots (eq_root eq_e). Qed.
@@ -902,7 +902,7 @@ Proof. exact: eq_n_comp eq_fconnect. Qed.
 
 Lemma eq_finv : finv f =1 finv f'.
 Proof.
-by move=> x; rewrite /finv /order (eq_card (eq_fconnect x)) (eq_iter eq_f).
+by move=> x; rewrite /finv /order (eq_card (@eq_fconnect x)) (eq_iter eq_f).
 Qed.
 
 Lemma eq_froot : froot f =1 froot f'.
@@ -922,7 +922,7 @@ Lemma finv_inv : finv (finv f) =1 f.
 Proof. exact: (finv_eq_can (f_finv injf)). Qed.
 
 Lemma order_finv : order (finv f) =1 order f.
-Proof. by move=> x; apply: eq_card (same_fconnect_finv injf x). Qed.
+Proof. by move=> x; apply: eq_card (@same_fconnect_finv _ _ injf x). Qed.
 
 Lemma order_set_finv n : order_set (finv f) n =i order_set f n.
 Proof. by move=> x; rewrite !inE order_finv. Qed.
