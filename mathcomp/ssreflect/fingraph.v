@@ -222,7 +222,7 @@ Definition closure_mem m_a : pred T :=
   fun x => ~~ disjoint (mem (connect x)) m_a.
 
 End Connect.
-
+Arguments rgraphK [T].
 #[global] Hint Resolve connect0 : core.
 
 Notation n_comp e a := (n_comp_mem e (mem a)).
@@ -269,6 +269,7 @@ Proof.
 move=> eq_e x y; apply/connectP/connectP=> [] [p e_p ->];
   by exists p; rewrite // (eq_path eq_e) in e_p *.
 Qed.
+Arguments eq_connect [e e'].
 
 Lemma eq_n_comp e e' : connect e =2 connect e' -> n_comp_mem e =1 n_comp_mem e'.
 Proof.
@@ -304,6 +305,8 @@ Lemma sym_connect_sym e : symmetric e -> connect_sym e.
 Proof. by move=> sym_e x y; rewrite (eq_connect sym_e) connect_rev. Qed.
 
 End EqConnect.
+Arguments eq_connect [T e e'].
+Arguments connect_rev [T].
 
 Section Closure.
 
@@ -364,6 +367,7 @@ by rewrite inE connect_root roots_root.
 Qed.
 
 End Closure.
+Arguments same_connect_rev [T e].
 
 Section Orbit.
 
@@ -856,6 +860,7 @@ End Orbit.
 #[global] Hint Resolve in_orbit mem_orbit order_gt0 orbit_uniq : core.
 Prenex Implicits order orbit findex finv order_set.
 Arguments orbitPcycle {T f x}.
+Arguments same_fconnect_finv [T f].
 
 Section FconnectId.
 
@@ -902,7 +907,7 @@ Proof. exact: eq_n_comp eq_fconnect. Qed.
 
 Lemma eq_finv : finv f =1 finv f'.
 Proof.
-by move=> x; rewrite /finv /order (eq_card (eq_fconnect x)) (eq_iter eq_f).
+by move=> x; rewrite /finv /order (eq_card (@eq_fconnect x)) (eq_iter eq_f).
 Qed.
 
 Lemma eq_froot : froot f =1 froot f'.
@@ -912,6 +917,7 @@ Lemma eq_froots : froots f =1 froots f'.
 Proof. exact: eq_roots eq_rf. Qed.
 
 End FconnectEq.
+Arguments eq_fconnect [T f f'].
 
 Section FinvEq.
 
@@ -922,7 +928,7 @@ Lemma finv_inv : finv (finv f) =1 f.
 Proof. exact: (finv_eq_can (f_finv injf)). Qed.
 
 Lemma order_finv : order (finv f) =1 order f.
-Proof. by move=> x; apply: eq_card (same_fconnect_finv injf x). Qed.
+Proof. by move=> x; apply: eq_card (@same_fconnect_finv _ _ injf x). Qed.
 
 Lemma order_set_finv n : order_set (finv f) n =i order_set f n.
 Proof. by move=> x; rewrite !inE order_finv. Qed.
