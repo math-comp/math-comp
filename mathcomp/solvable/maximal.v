@@ -1324,7 +1324,7 @@ Proof.
 have /cyclicP[z defZ]: cyclic 'Z(S) by rewrite prime_cyclic ?oZ.
 have oz: #[z] = p by rewrite orderE -defZ.
 rewrite coprime_sym -unitZpE ?prime_gt1 // -oz => u_k.
-pose g := Zp_unitm (FinRing.unit 'Z_#[z] u_k).
+pose g := Zp_unitm (FinNzRing.unit 'Z_#[z] u_k).
 have AutZg: g \in Aut 'Z(S) by rewrite defZ -im_Zp_unitm mem_morphim ?inE.
 have ZSfull := Aut_sub_fullP (center_sub S) Aut_extraspecial_full.
 have [f [injf fS fZ]] := ZSfull _ (injm_autm AutZg) (im_autm AutZg).

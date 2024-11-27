@@ -11,10 +11,10 @@ From mathcomp Require Import fintype bigop ssralg.
 (* not cover the left module / algebra interfaces, providing only            *)
 (*          countNmodType == countable nmodType interface                    *)
 (*          countZmodType == countable zmodType interface                    *)
-(*      countSemiRingType == countable semiRingType interface                *)
-(*          countRingType == countable ringType interface                    *)
-(*   countComSemiRingType == countable comSemiRingType interface             *)
-(*       countComRingType == countable comRingType interface                 *)
+(*    countNzSemiRingType == countable nzSemiRingType interface              *)
+(*        countNzRingType == countable nzRingType interface                  *)
+(* countComNzSemiRingType == countable comNzSemiRingType interface           *)
+(*     countComNzRingType == countable comNzRingType interface               *)
 (*      countUnitRingType == countable unitRingType interface                *)
 (*   countComUnitRingType == countable comUnitRingType interface             *)
 (*       countIdomainType == countable idomainType interface                 *)
@@ -43,17 +43,17 @@ HB.structure Definition Nmodule := {M of GRing.Nmodule M & Countable M}.
 #[short(type="countZmodType")]
 HB.structure Definition Zmodule := {M of GRing.Zmodule M & Countable M}.
 
-#[short(type="countSemiRingType")]
-HB.structure Definition SemiRing := {R of GRing.SemiRing R & Countable R}.
+#[short(type="countNzSemiRingType")]
+HB.structure Definition NzSemiRing := {R of GRing.NzSemiRing R & Countable R}.
 
-#[short(type="countRingType")]
-HB.structure Definition Ring := {R of GRing.Ring R & Countable R}.
+#[short(type="countNzRingType")]
+HB.structure Definition NzRing := {R of GRing.NzRing R & Countable R}.
 
-#[short(type="countComSemiRingType")]
-HB.structure Definition ComSemiRing := {R of GRing.ComSemiRing R & Countable R}.
+#[short(type="countComNzSemiRingType")]
+HB.structure Definition ComNzSemiRing := {R of GRing.ComNzSemiRing R & Countable R}.
 
-#[short(type="countComRingType")]
-HB.structure Definition ComRing := {R of GRing.ComRing R & Countable R}.
+#[short(type="countComNzRingType")]
+HB.structure Definition ComNzRing := {R of GRing.ComNzRing R & Countable R}.
 
 #[short(type="countUnitRingType")]
 HB.structure Definition UnitRing := {R of GRing.UnitRing R & Countable R}.
@@ -80,9 +80,9 @@ HB.instance Definition _ (R : countNmodType) := Nmodule.on R^o.
 #[export]
 HB.instance Definition _ (R : countZmodType) := Zmodule.on R^o.
 #[export]
-HB.instance Definition _ (R : countSemiRingType) := SemiRing.on R^o.
+HB.instance Definition _ (R : countNzSemiRingType) := NzSemiRing.on R^o.
 #[export]
-HB.instance Definition _ (R : countRingType) := Ring.on R^o.
+HB.instance Definition _ (R : countNzRingType) := NzRing.on R^o.
 
 End CountRing.
 

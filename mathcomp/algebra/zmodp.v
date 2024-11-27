@@ -188,7 +188,7 @@ Lemma Zp_mulgC : @commutative 'I_p _ mulg.
 Proof. exact: Zp_addC. Qed.
 
 Lemma Zp_abelian : abelian [set: 'I_p].
-Proof. exact: FinRing.zmod_abelian. Qed.
+Proof. exact: FinNzRing.zmod_abelian. Qed.
 
 Lemma Zp_expg x n : x ^+ n = inZp (x * n).
 Proof. exact: Zp_mulrn. Qed.
@@ -240,7 +240,7 @@ Notation big_ord1 := big_ord1 (only parsing).
 #[deprecated(since="mathcomp 2.3.0", note="Use bigop.big_ord1_cond instead.")]
 Notation big_ord1_cond := big_ord1_cond (only parsing).
 
-Section ZpRing.
+Section ZpNzRing.
 
 Variable p' : nat.
 Local Notation p := p'.+2.
@@ -248,10 +248,10 @@ Local Notation p := p'.+2.
 Lemma Zp_nontrivial : Zp1 != 0 :> 'I_p. Proof. by []. Qed.
 
 HB.instance Definition _ :=
-  GRing.Zmodule_isComRing.Build 'I_p
+  GRing.Zmodule_isComNzRing.Build 'I_p
     (@Zp_mulA _) (@Zp_mulC _) (@Zp_mul1z _) (@Zp_mul_addl _) Zp_nontrivial.
 HB.instance Definition _ :=
-  GRing.ComRing_hasMulInverse.Build 'I_p
+  GRing.ComNzRing_hasMulInverse.Build 'I_p
     (@Zp_mulVz _) (@Zp_intro_unit _) (@Zp_inv_out _).
 
 Lemma Zp_nat n : n%:R = inZp n :> 'I_p.
@@ -275,7 +275,7 @@ apply: val_inj => /=; elim: n => [|n IHn] //.
 by rewrite expgS /= IHn expnS modnMmr.
 Qed.
 
-End ZpRing.
+End ZpNzRing.
 
 Definition Zp_trunc p := p.-2.
 
@@ -286,7 +286,7 @@ Notation "''F_' p" := 'Z_(pdiv p)
 
 Arguments natr_Zp {p'} x.
 
-Section ZpRing.
+Section ZpNzRing.
 
 Import GRing.Theory.
 
@@ -302,7 +302,7 @@ Proof. by apply: (addIr 1); rewrite addrNK add_Zp_1 ord_predK. Qed.
 Lemma add_N1_Zp p (x : 'Z_p) : -1 + x = ord_pred x.
 Proof. by rewrite addrC sub_Zp_1. Qed.
 
-End ZpRing.
+End ZpNzRing.
 
 Section Groups.
 
@@ -403,6 +403,6 @@ by rewrite Zp_cast ?prime_gt1 ?pdiv_prime.
 Qed.
 
 HB.instance Definition _ := Fp_fieldMixin.
-HB.instance Definition _ := FinRing.isField.Build 'F_p.
+HB.instance Definition _ := FinNzRing.isField.Build 'F_p.
 
 End PrimeField.

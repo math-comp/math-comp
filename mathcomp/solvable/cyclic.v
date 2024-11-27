@@ -298,7 +298,7 @@ Theorem Euler_exp_totient a n : coprime a n -> a ^ totient n  = 1 %[mod n].
 Proof.
 case: n => [|[|n']] //; [by rewrite !modn1 | set n := n'.+2] => co_a_n.
 have{co_a_n} Ua: coprime n (inZp a : 'I_n) by rewrite coprime_sym coprime_modl.
-have: FinRing.unit 'Z_n Ua ^+ totient n == 1.
+have: FinNzRing.unit 'Z_n Ua ^+ totient n == 1.
   by rewrite -card_units_Zp // -order_dvdn order_dvdG ?inE.
 by rewrite -2!val_eqE unit_Zp_expg /= -/n modnXm => /eqP.
 Qed.
@@ -645,7 +645,7 @@ have def_n: a ^+ n = f a.
   by rewrite -/(Zpm n) invmK // im_Zpm a_fa cycle_id.
 have co_a_n: coprime #[a].-2.+2 n.
   by rewrite {1}Zp_cast ?order_gt1 // -generator_coprime def_n; apply/eqP.
-exists (FinRing.unit 'Z_#[a] co_a_n); rewrite ?inE //.
+exists (FinNzRing.unit 'Z_#[a] co_a_n); rewrite ?inE //.
 apply: eq_Aut (Af) (Aut_aut _ _) _ => x ax.
 rewrite autE //= /cyclem; case/cycleP: ax => k ->{x}.
 by rewrite -(autmE Af) morphX ?cycle_id //= autmE -def_n -!expgM mulnC.
@@ -797,7 +797,7 @@ End FieldMulCyclic.
 Lemma field_unit_group_cyclic (F : finFieldType) (G : {group {unit F}}) :
   cyclic G.
 Proof.
-apply: field_mul_group_cyclic FinRing.uval _ _ => // u _.
+apply: field_mul_group_cyclic FinNzRing.uval _ _ => // u _.
 by split=> /eqP ?; apply/eqP.
 Qed.
 

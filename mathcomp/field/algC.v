@@ -393,7 +393,7 @@ Fact one_nz : one != 0 :> type.
 Proof. by rewrite -(inj_eq CtoL_inj) !LtoC_K oner_eq0. Qed.
 
 HB.instance Definition _ :=
-  GRing.Zmodule_isComRing.Build type mulA mulC mul1 mulD one_nz.
+  GRing.Zmodule_isComNzRing.Build type mulA mulC mul1 mulD one_nz.
 
 Fact CtoL_is_multiplicative : multiplicative CtoL.
 Proof. by split=> [u v|]; rewrite !LtoC_K. Qed.
@@ -408,7 +408,7 @@ Qed.
 
 Fact inv0 : inv 0 = 0. Proof. by apply: CtoL_inj; rewrite !LtoC_K invr0. Qed.
 
-HB.instance Definition _ := GRing.ComRing_isField.Build type mulVf inv0.
+HB.instance Definition _ := GRing.ComNzRing_isField.Build type mulVf inv0.
 
 Fact closedFieldAxiom : GRing.closed_field_axiom type.
 Proof.
@@ -549,7 +549,7 @@ Delimit Scope C_expanded_scope with Cx.
 Open Scope C_core_scope.
 Notation algCeq := (type : eqType).
 Notation algCzmod := (type : zmodType).
-Notation algCring := (type : ringType).
+Notation algCring := (type : nzRingType).
 Notation algCuring := (type : unitRingType).
 Notation algCnum := (type : numDomainType).
 Notation algCfield := (type : fieldType).
