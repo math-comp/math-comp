@@ -19,6 +19,14 @@ Unset Printing Implicit Defensive.
 
 Open Scope function_scope.
 
+Definition eqfun (B : Type) (A : B -> Type) (f g : forall b, A b) : Prop :=
+  forall x, f x = g x.
+Definition eqrel (C : Type) (B : C -> Type) (A : forall c, B c -> Type)
+    (f g : forall c (b : B c), A c b) : Prop :=
+  forall x y, f x y = g x y.
+
+Global Typeclasses Opaque eqfun eqrel.
+
 Notation "f ^~ y" := (fun x => f x y) : function_scope.
 Notation "@^~ x" := (fun f => f x) : function_scope.
 
