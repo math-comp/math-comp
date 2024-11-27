@@ -705,8 +705,8 @@ pose IaM := GRing.isAddClosed.Build _ I (idealr_closedB I_ideal).
 pose IoM := GRing.isOppClosed.Build _ I (idealr_closedB I_ideal).
 pose IpM := isProperIdeal.Build _ I (idealr_closed_nontrivial I_ideal).
 pose Iid : idealr _ := HB.pack I IaM IoM IpM.
-pose EMixin := GRing.Ring_hasCommutativeMul.Build _ (@Quotient.mulqC _ Iid).
-pose E : comRingType := HB.pack _ EMixin.
+pose EMixin := GRing.NzRing_hasCommutativeMul.Build _ (@Quotient.mulqC _ Iid).
+pose E : comNzRingType := HB.pack _ EMixin.
 pose PtoE : {rmorphism {poly F} -> E} := \pi_E%qT.
 have PtoEd i: PtoE (d i) = 0.
   by apply/eqP; rewrite piE Quotient.equivE subr0; apply/memI; exists i.
@@ -726,7 +726,7 @@ have EmulV : forall x, x != 0 -> Einv x * x = 1.
   rewrite piE /= -[z]reprK -(rmorphM PtoE) -Quotient.idealrBE.
   rewrite -[X in _ - X]uv1 opprD addNKr -mulNr.
   by apply/memI; exists i; apply: dvdp_mull.
-pose EfieldMixin := GRing.ComRing_isField.Build _ EmulV Einv0.
+pose EfieldMixin := GRing.ComNzRing_isField.Build _ EmulV Einv0.
 pose Efield : fieldType := HB.pack E EfieldMixin.
 pose EIsCountable := isCountable.Build E (pcan_pickleK (can_pcan (reprK))).
 pose Ecount : countFieldType := HB.pack E Efield EIsCountable.
@@ -741,10 +741,10 @@ Qed.
 Lemma countable_algebraic_closure (F : countFieldType) :
   {K : countClosedFieldType & {FtoK : {rmorphism F -> K} | integralRange FtoK}}.
 Proof.
-pose minXp (R : ringType) (p : {poly R}) := if size p > 1 then p else 'X.
+pose minXp (R : nzRingType) (p : {poly R}) := if size p > 1 then p else 'X.
 have minXp_gt1 R p: size (minXp R p) > 1.
   by rewrite /minXp; case: ifP => // _; rewrite size_polyX.
-have minXpE (R : ringType) (p : {poly R}) : size p > 1 -> minXp R p = p.
+have minXpE (R : nzRingType) (p : {poly R}) : size p > 1 -> minXp R p = p.
   by rewrite /minXp => ->.
 have ext1 p := countable_field_extension (minXp_gt1 _ p).
 pose ext1fT E p := tag (ext1 E p).
@@ -867,14 +867,14 @@ have KmulD: left_distributive Kmul Kadd.
   move=> u v w; have [i [x ->] [[y ->] [z ->]]] := KtoE3 u v w.
   by rewrite -!(EtoK_M, EtoK_D) mulrDl.
 have Kone_nz: FtoK 1 != FtoK 0 by rewrite EtoKeq0 oner_neq0.
-pose KringMixin := GRing.Zmodule_isComRing.Build _
+pose KringMixin := GRing.Zmodule_isComNzRing.Build _
   KmulA KmulC Kmul1 KmulD Kone_nz.
-pose Kring : comRingType := HB.pack K Kzmod KringMixin cntK.
+pose Kring : comNzRingType := HB.pack K Kzmod KringMixin cntK.
 have KmulV: forall x : Kring, x != 0 -> (Kinv x : Kring) * x = 1.
   move=> u; have [i [x ->]] := KtoE u; rewrite EtoKeq0 => nz_x.
   by rewrite -EtoK_V -[_ * _]EtoK_M mulVf ?EtoK_1.
 have Kinv0: Kinv (FtoK 0) = FtoK 0 by rewrite -EtoK_V invr0.
-pose KfieldMixin := GRing.ComRing_isField.Build _ KmulV Kinv0.
+pose KfieldMixin := GRing.ComNzRing_isField.Build _ KmulV Kinv0.
 pose Kfield : fieldType := HB.pack K Kring KfieldMixin.
 have EtoKAdd i : additive (EtoK i : E i -> Kfield).
   by move=> x y; rewrite EtoK_D EtoK_N.

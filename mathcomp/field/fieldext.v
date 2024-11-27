@@ -81,8 +81,8 @@ Local Open Scope ring_scope.
 Import GRing.Theory.
 
 #[short(type="fieldExtType")]
-HB.structure Definition FieldExt (R : ringType) := {T of Falgebra R T &
-  GRing.Ring_hasCommutativeMul T & GRing.Field T}.
+HB.structure Definition FieldExt (R : nzRingType) := {T of Falgebra R T &
+  GRing.NzRing_hasCommutativeMul T & GRing.Field T}.
 
 Module FieldExtExports.
 Bind Scope ring_scope with FieldExt.sort.
@@ -197,14 +197,14 @@ HB.instance Definition _ K :=
   GRing.isDivClosed.Build L (pred_of_vspace K) (aspace_divr_closed K).
 
 HB.instance Definition _ (K : {subfield L}) :=
-  GRing.isSubSemiRing.Build L (pred_of_vspace K) (subvs_of K)
+  GRing.isSubNzSemiRing.Build L (pred_of_vspace K) (subvs_of K)
     (rmorphM _, rmorph1 _).
-(* Note that the ringType structure was built in the SubFalgType
+(* Note that the nzRingType structure was built in the SubFalgType
    section of falgebra.v but the SubRing structure did not stand
    there, it is thus built only here *)
 
 HB.instance Definition _ (K : {subfield L}) :=
-  [SubRing_isSubComRing of subvs_of K by <:].
+  [SubNzRing_isSubComNzRing of subvs_of K by <:].
 HB.instance Definition _ (K : {subfield L}) :=
   [SubComUnitRing_isSubIntegralDomain of subvs_of K by <:].
 
@@ -1101,7 +1101,7 @@ rewrite !piE /equiv_subfext /iotaFz !linear0.
 by rewrite poly_rV_K ?rmorph1 ?oner_eq0 // size_poly1.
 Qed.
 
-HB.instance Definition _ := GRing.Zmodule_isComRing.Build subFExtend
+HB.instance Definition _ := GRing.Zmodule_isComNzRing.Build subFExtend
   mulfxA mulfxC mul1fx mulfx_addl nonzero1fx.
 
 Definition subfx_poly_inv (q : {poly F}) : {poly F} :=
@@ -1147,7 +1147,7 @@ apply/eqP; rewrite !piE /equiv_subfext /iotaFz /subfx_inv_rep !linear0.
 by rewrite /subfx_poly_inv rmorph0 eqxx mod0p !linear0.
 Qed.
 
-HB.instance Definition _ := GRing.ComRing_isField.Build subFExtend
+HB.instance Definition _ := GRing.ComNzRing_isField.Build subFExtend
   subfx_fieldAxiom subfx_inv0.
 
 Fact subfx_inj_is_additive : additive subfx_inj.
@@ -1350,8 +1350,8 @@ have mulD: left_distributive mul +%R.
   move=> x y z; apply: toPinj; rewrite /toPF raddfD /= -!/(toPF _).
   by rewrite !toL_K /toPF raddfD mulrDl modpD.
 have nzL1: L1 != 0 by rewrite -(inj_eq toPinj) L1K /toPF raddf0 oner_eq0.
-pose mulM := GRing.Zmodule_isComRing.Build _ mulA mulC mul1 mulD nzL1.
-pose rL : comRingType := HB.pack vL mulM.
+pose mulM := GRing.Zmodule_isComNzRing.Build _ mulA mulC mul1 mulD nzL1.
+pose rL : comNzRingType := HB.pack vL mulM.
 have mulZlM : GRing.Lmodule_isLalgebra F rL.
   constructor => a x y; apply: toPinj.
   by rewrite toL_K /toPF !linearZ /= -!/(toPF _) toL_K -scalerAl modpZl.
@@ -1411,8 +1411,8 @@ Qed.
 (*   move=> x y z; apply: canLR rVpolyK _. *)
 (*   by rewrite !raddfD mulrDl /= !toL_K /toL modpD. *)
 (* have nzL1: L1 != 0 by rewrite -(can_eq rVpolyK) L1K raddf0 oner_eq0. *)
-(* pose mulM := GRing.Zmodule_isComRing.Build vL mulA mulC mul1 mulD nzL1. *)
-(* pose rL := ComRingType vL mulM. *)
+(* pose mulM := GRing.Zmodule_isComNzRing.Build vL mulA mulC mul1 mulD nzL1. *)
+(* pose rL := ComNzRingType vL mulM. *)
 (* have mulZlM : GRing.Lmodule_isLalgebra F rL. *)
 (*   constructor => a x y; apply: canRL rVpolyK _. *)
 (*   by rewrite !linearZ /= toL_K -scalerAl modpZl. *)
