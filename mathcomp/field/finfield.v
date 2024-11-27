@@ -21,15 +21,15 @@ From mathcomp Require ssrnum ssrint archimedean algC cyclotomic.
 (*                              an F with a finFieldType structure; this      *)
 (*                              should not be made canonical                  *)
 (*           finvect_type vT == alias of vT : vecType R equipped with         *)
-(*                              canonical instances for finType, finRing,     *)
+(*                              canonical instances for finType, finNzRing,   *)
 (*                              etc structures (including FinFieldExtType     *)
 (*                              above) for abstract vectType, falgType and    *)
 (*                              fieldExtType over a finFieldType              *)
-(*      PrimeCharType charRp == the carrier of a ringType R such that         *)
+(*      PrimeCharType charRp == the carrier of a nzRingType R such that       *)
 (*                              charRp : p \in [char R] holds. This type has  *)
-(*                              canonical ringType, ..., fieldType structures *)
-(*                              compatible with those of R, as well as        *)
-(*                              canonical lmodType 'F_p, ..., algType 'F_p    *)
+(*                              canonical nzRingType, ..., fieldType          *)
+(*                              structures compatible with those of R, as well*)
+(*                              as canonical lmodType 'F_p, ..., algType 'F_p *)
 (*                              structures, plus an falgType structure if R   *)
 (*                              is a finUnitRingType and a splittingFieldType *)
 (*                              structure if R is a finFieldType              *)
@@ -60,17 +60,25 @@ Unset Printing Implicit Defensive.
 Import GroupScope GRing.Theory FinRing.Theory.
 Local Open Scope ring_scope.
 
-Section FinRing.
+Section FinNzRing.
 
-Variable R : finRingType.
+Variable R : finNzRingType.
 
-Lemma finRing_nontrivial : [set: R] != 1%g.
+Lemma finNzRing_nontrivial : [set: R] != 1%g.
 Proof. by apply/trivgPn; exists 1; rewrite ?inE ?oner_neq0. Qed.
 
-Lemma finRing_gt1 : 1 < #|R|.
-Proof. by rewrite -cardsT cardG_gt1 finRing_nontrivial. Qed.
+Lemma finNzRing_gt1 : 1 < #|R|.
+Proof. by rewrite -cardsT cardG_gt1 finNzRing_nontrivial. Qed.
 
-End FinRing.
+End FinNzRing.
+
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use finNzRing_nontrivial instead.")]
+Notation finRing_nontrivial := (finNzRing_nontrivial) (only parsing).
+
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use finNzRing_gt1 instead.")]
+Notation finRing_gt1 := (finNzRing_gt1) (only parsing).
 
 Section FinField.
 
@@ -86,7 +94,7 @@ Definition finField_unit x (nz_x : x != 0) :=
 
 Lemma expf_card x : x ^+ #|F| = x :> F.
 Proof.
-rewrite -[RHS]mulr1 -(ltn_predK (finRing_gt1 F)) exprS.
+rewrite -[RHS]mulr1 -(ltn_predK (finNzRing_gt1 F)) exprS.
 apply/eqP; rewrite -subr_eq0 -mulrBr mulf_eq0 subr_eq0 -implyNb -unitfE.
 apply/implyP=> Ux; rewrite -(val_unitX _ (Sub x _)) -val_unit1 val_eqE.
 by rewrite -order_dvdn -card_finField_unit order_dvdG ?inE.
@@ -95,7 +103,7 @@ Qed.
 Lemma finField_genPoly : 'X^#|F| - 'X = \prod_x ('X - x%:P) :> {poly F}.
 Proof.
 set n := #|F|; set oppX := - 'X; set pF := LHS.
-have le_oppX_n: size oppX <= n by rewrite size_opp size_polyX finRing_gt1.
+have le_oppX_n: size oppX <= n by rewrite size_opp size_polyX finNzRing_gt1.
 have: size pF = (size (enum F)).+1 by rewrite -cardE size_addl size_polyXn.
 move/all_roots_prod_XsubC->; last by rewrite uniq_rootsE enum_uniq.
   by rewrite big_enum lead_coefDl ?size_polyXn // lead_coefXn scale1r.
@@ -119,7 +127,7 @@ Lemma card_finCharP p n : #|F| = (p ^ n)%N -> prime p -> p \in [char F].
 Proof.
 move=> oF pr_p; rewrite inE pr_p -order_dvdn.
 rewrite (abelem_order_p finField_is_abelem) ?inE ?oner_neq0 //=.
-have n_gt0: n > 0 by rewrite -(ltn_exp2l _ _ (prime_gt1 pr_p)) -oF finRing_gt1.
+have n_gt0: n > 0 by rewrite -(ltn_exp2l _ _ (prime_gt1 pr_p)) -oF finNzRing_gt1.
 by rewrite cardsT oF -(prednK n_gt0) pdiv_pfactor.
 Qed.
 
@@ -163,7 +171,7 @@ End CardVspace.
 Definition finvect_type (vT : Type) : predArgType := vT.
 
 Section FinVector.
-Variables (R : finRingType) (vT : vectType R).
+Variables (R : finNzRingType) (vT : vectType R).
 Local Notation fvT := (finvect_type vT).
 
 HB.instance Definition _ := Vector.on fvT.
@@ -209,7 +217,7 @@ Variable p : nat.
 
 Section PrimeCharRing.
 
-Variable R0 : ringType.
+Variable R0 : nzRingType.
 
 Definition PrimeCharType of p \in [char R0] : predArgType := R0.
 
@@ -217,7 +225,7 @@ Hypothesis charRp : p \in [char R0].
 Local Notation R := (PrimeCharType charRp).
 Implicit Types (a b : 'F_p) (x y : R).
 
-HB.instance Definition _ := GRing.Ring.on R.
+HB.instance Definition _ := GRing.NzRing.on R.
 
 Definition primeChar_scale a x := a%:R * x.
 Local Infix "*p:" := primeChar_scale (at level 40).
@@ -262,8 +270,8 @@ Local Notation type := @PrimeCharType.
 (* TODO: automatize parameter inference to do all of these *)
 HB.instance Definition _ (R : unitRingType) charRp :=
   GRing.UnitRing.on (type R charRp).
-HB.instance Definition _ (R : comRingType) charRp :=
-  GRing.ComRing.on (type R charRp).
+HB.instance Definition _ (R : comNzRingType) charRp :=
+  GRing.ComNzRing.on (type R charRp).
 HB.instance Definition _ (R : comUnitRingType) charRp :=
   GRing.ComUnitRing.on (type R charRp).
 HB.instance Definition _ (R : idomainType) charRp :=
@@ -271,9 +279,9 @@ HB.instance Definition _ (R : idomainType) charRp :=
 HB.instance Definition _ (R : fieldType) charRp :=
   GRing.Field.on (type R charRp).
 
-Section FinRing.
+Section FinNzRing.
 
-Variables (R0 : finRingType) (charRp : p \in [char R0]).
+Variables (R0 : finNzRingType) (charRp : p \in [char R0]).
 Local Notation R := (type _ charRp).
 
 HB.instance Definition _ := FinGroup.on R.
@@ -310,7 +318,7 @@ HB.instance Definition _ := Lmodule_hasFinDim.Build 'F_p R
 Lemma primeChar_dimf : \dim {: R : vectType 'F_p } = n.
 Proof. by rewrite dimvf. Qed.
 
-End FinRing.
+End FinNzRing.
 
 HB.instance Definition _ (R : finUnitRingType) charRp :=
   FinRing.UnitRing.on (type R charRp).
@@ -318,8 +326,8 @@ HB.instance Definition _ (R : finUnitRingType) charRp :=
   FinRing.UnitAlgebra.on (type R charRp).
 HB.instance Definition _ (R : finUnitRingType) charRp :=
   Falgebra.on (type R charRp).
-HB.instance Definition _ (R : finComRingType) charRp :=
-  FinRing.ComRing.on (type R charRp).
+HB.instance Definition _ (R : finComNzRingType) charRp :=
+  FinRing.ComNzRing.on (type R charRp).
 HB.instance Definition _ (R : finComUnitRingType) charRp :=
   FinRing.ComUnitRing.on (type R charRp).
 HB.instance Definition _ (R : finIdomainType) charRp :=
@@ -684,7 +692,7 @@ by rewrite -[aq d]expr1 -exprB ?leq_b1 ?unitfE ?rpredX.
 Qed.
 
 Definition FinDomainFieldType : finFieldType :=
- let cC := GRing.Ring_hasCommutativeMul.Build R finDomain_mulrC in
+ let cC := GRing.NzRing_hasCommutativeMul.Build R finDomain_mulrC in
  let cR : comUnitRingType := HB.pack R cC in
  let iC := GRing.ComUnitRing_isIntegral.Build cR domR in
  let iR : finIdomainType := HB.pack cR iC in
