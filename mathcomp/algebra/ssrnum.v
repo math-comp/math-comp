@@ -127,7 +127,7 @@ Notation "[ 'normedZmodType' R 'of' T ]" := (@clone _ (Phant R) T _ _ id)
 End NormedZmoduleExports.
 HB.export NormedZmoduleExports.
 
-HB.mixin Record isNumRing R of GRing.Ring R & POrderedZmodule R
+HB.mixin Record isNumRing R of GRing.NzRing R & POrderedZmodule R
   & NormedZmodule (POrderedZmodule.clone R _) R := {
  addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
  ger_leVge : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
@@ -1458,10 +1458,14 @@ Proof. by move=> x_lt0; rewrite -(mulr0n x) ler_nMn2l. Qed.
 
 (* x positive and y right *)
 Lemma pmulr_rlt0 x y : 0 < x -> (x * y < 0) = (y < 0).
-Proof. by move=> x_gt0; rewrite -oppr_gt0 -mulrN pmulr_rgt0 // oppr_gt0. Qed.
+Proof.
+by move=> x_gt0; rewrite -[LHS]oppr_gt0 -mulrN pmulr_rgt0 // oppr_gt0.
+Qed.
 
 Lemma pmulr_rle0 x y : 0 < x -> (x * y <= 0) = (y <= 0).
-Proof. by move=> x_gt0; rewrite -oppr_ge0 -mulrN pmulr_rge0 // oppr_ge0. Qed.
+Proof.
+by move=> x_gt0; rewrite -[LHS]oppr_ge0 -mulrN pmulr_rge0 // oppr_ge0.
+Qed.
 
 (* x positive and y left *)
 Lemma pmulr_lgt0 x y : 0 < x -> (0 < y * x) = (0 < y).
@@ -2499,7 +2503,7 @@ have y1_gt0: 0 < y1 by rewrite lt_def y1nz (le_trans _ le_xy1).
 have [x2_0 | x2nz] := eqVneq x2 0.
   apply/leifP; rewrite -le_xy2 x2_0 eq_sym (negPf y2nz) andbF mulr0.
   by rewrite mulr_gt0 // lt_def y2nz -x2_0 le_xy2.
-have:= le_xy2; rewrite -(mono_leif (ler_pM2l y1_gt0)).
+have:= le_xy2; rewrite -[X in X -> _](mono_leif (ler_pM2l y1_gt0)).
 by apply: leif_trans; rewrite (mono_leif (ler_pM2r _)) // lt_def x2nz.
 Qed.
 

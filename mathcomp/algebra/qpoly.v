@@ -59,7 +59,7 @@ Reserved Notation "{ 'poly' '%/' p }"
   (at level 0, p at level 2, format "{ 'poly'  '%/'  p }").
 
 Section poly_of_size_zmod.
-Context {R : ringType}.
+Context {R : nzRingType}.
 Implicit Types (n : nat).
 
 Section poly_of_size.
@@ -138,14 +138,14 @@ Hint Resolve size_npoly npoly_is_a_poly_of_size : core.
 Arguments poly_of_size_pred _ _ _ /.
 Arguments npoly : clear implicits.
 
-HB.instance Definition _ (R : countRingType) n :=
+HB.instance Definition _ (R : countNzRingType) n :=
   [Countable of {poly_n R} by <:].
 
-HB.instance Definition _  (R : finRingType) n : isFinite {poly_n R} :=
+HB.instance Definition _  (R : finNzRingType) n : isFinite {poly_n R} :=
   CanIsFinite (@npoly_rV_K R n).
 
 Section npoly_theory.
-Context (R : ringType) {n : nat}.
+Context (R : nzRingType) {n : nat}.
 
 Lemma polyn_is_linear : linear (@polyn _ _ : {poly_n R} -> _).
 Proof. by []. Qed.
@@ -194,7 +194,7 @@ Arguments npolyp {R} n p.
 
 Section fin_npoly.
 
-Variable R : finRingType.
+Variable R : finNzRingType.
 Variable n : nat.
 Implicit Types p q : {poly_n R}.
 
@@ -411,7 +411,7 @@ Notation "x .-lagrange_" := (tnth x.-lagrange) : ring_scope.
 
 Section Qpoly.
 
-Variable R : ringType.
+Variable R : nzRingType.
 Variable h : {poly R}.
 
 Definition mk_monic := 
@@ -424,7 +424,7 @@ Notation "{ 'poly' '%/' p }" := (qpoly p) : type_scope.
  
 Section QpolyProp.
 
-Variable R : ringType.
+Variable R : nzRingType.
 Variable h : {poly R}.
 
 Lemma monic_mk_monic : (mk_monic h) \is monic.
@@ -526,23 +526,23 @@ End QpolyProp.
 
 Notation "'qX" := (qpolyX _) : ring_scope.
 
-Lemma mk_monic_X (R : ringType) : mk_monic 'X = 'X :> {poly R}.
+Lemma mk_monic_X (R : nzRingType) : mk_monic 'X = 'X :> {poly R}.
 Proof. by rewrite /mk_monic size_polyX monicX. Qed.
 
-Lemma mk_monic_Xn (R : ringType) n : mk_monic 'X^n = 'X^n.-1.+1 :> {poly R}.
+Lemma mk_monic_Xn (R : nzRingType) n : mk_monic 'X^n = 'X^n.-1.+1 :> {poly R}.
 Proof. by case: n => [|n]; rewrite /mk_monic size_polyXn monicXn /= ?expr1. Qed.
 
-Lemma card_qpoly (R : finRingType) (h : {poly R}):
+Lemma card_qpoly (R : finNzRingType) (h : {poly R}):
    #|{poly %/ h}| = #|R| ^ (size (mk_monic h)).-1.
 Proof. by rewrite card_npoly. Qed.
 
-Lemma card_monic_qpoly (R : finRingType) (h : {poly R}):
+Lemma card_monic_qpoly (R : finNzRingType) (h : {poly R}):
   1 < size h -> h \is monic ->  #|{poly %/ h}| = #|R| ^ (size h).-1.
 Proof. by move=> sh_gt1 hM; rewrite card_qpoly /mk_monic sh_gt1 hM. Qed.
 
 Section QRing.
 
-Variable A : comRingType.
+Variable A : comNzRingType.
 Variable h : {poly A}.
 
 (* Ring operations *)
@@ -565,9 +565,9 @@ Qed.
 Lemma qpoly_mul_addl : left_distributive (@qpoly_mul A h) +%R.
 Proof. by move=> p q r; rewrite -!(qpoly_mulC r) qpoly_mul_addr. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_isComRing.Build {poly__ A} qpoly_mulA
+HB.instance Definition _ := GRing.Zmodule_isComNzRing.Build {poly__ A} qpoly_mulA
   qpoly_mulC (@qpoly_mul1z _ h) qpoly_mul_addl (@qpoly_nontrivial _ h).
-HB.instance Definition _ := GRing.ComRing.on {poly %/ h}.
+HB.instance Definition _ := GRing.ComNzRing.on {poly %/ h}.
 
 Lemma in_qpoly1 : in_qpoly h 1 = 1.
 Proof.
@@ -735,7 +735,7 @@ Qed.
 Lemma qpoly_inv_out (p : {poly %/ h}) : ~~ coprimep hQ p -> qpoly_inv p = p.
 Proof. by rewrite /qpoly_inv => /negPf->. Qed.
 
-HB.instance Definition _ := GRing.ComRing_hasMulInverse.Build {poly__ _}
+HB.instance Definition _ := GRing.ComNzRing_hasMulInverse.Build {poly__ _}
   qpoly_mulVz qpoly_intro_unit qpoly_inv_out.
 HB.instance Definition _ := GRing.ComUnitAlgebra.on {poly %/ h}.
 

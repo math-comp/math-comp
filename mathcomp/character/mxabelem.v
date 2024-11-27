@@ -61,7 +61,7 @@ Local Open Scope ring_scope.
 (* (this is only surjective when F is a prime field 'F_p), with moduleules    *)
 (* corresponding to subgroups stabilized by the external action.              *)
 
-Section FinRingRepr.
+Section FinNzRingRepr.
 
 Variable (R : finComUnitRingType) (gT : finGroupType).
 Variables (G : {group gT}) (n : nat) (rG : mx_representation R G n).
@@ -85,7 +85,7 @@ by apply/morphicP=> /= u v _ _; rewrite !actpermE /= /mx_repr_act mulmxDl.
 Qed.
 Canonical Structure mx_repr_groupAction := GroupAction mx_repr_is_groupAction.
 
-End FinRingRepr.
+End FinNzRingRepr.
 
 Notation "''MR' rG" := (mx_repr_action rG)
   (at level 10, rG at level 8) : action_scope.

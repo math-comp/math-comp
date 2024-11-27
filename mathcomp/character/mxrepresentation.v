@@ -5162,7 +5162,7 @@ Qed.
 Lemma gen_ntriv : gen1 != 0.
 Proof. by rewrite -(inj_eq mxval_inj) mxval_gen1 mxval0 oner_eq0. Qed.
 
-#[export] HB.instance Definition _ := GRing.Zmodule_isComRing.Build FA
+#[export] HB.instance Definition _ := GRing.Zmodule_isComNzRing.Build FA
     gen_mulA gen_mulC gen_mul1r gen_mulDr gen_ntriv.
 
 Lemma mxval1 : mxval 1 = 1%:M. Proof. exact: mxval_gen1. Qed.
@@ -5197,7 +5197,7 @@ Qed.
 Lemma gen_invr0 : genV 0 = 0.
 Proof. by apply: mxval_inj; rewrite mxval_genV !mxval0 -{2}invr0. Qed.
 
-#[export] HB.instance Definition _ := GRing.ComRing_isField.Build FA
+#[export] HB.instance Definition _ := GRing.ComNzRing_isField.Build FA
   gen_mulVr gen_invr0.
 
 Lemma mxvalV : {morph mxval : x / x^-1 >-> invmx x}.
