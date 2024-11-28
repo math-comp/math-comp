@@ -58,7 +58,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 	 `prod_map_poly`, `mapf_root`, `lead_coef_prod`
 
 - in `ssralg.v`
-  + lemmas `prodM_comm`, `prodMl_comm`, `prodMr_comm`, `prodrMl`, `prodrMr`
+  + lemmas `prodrM_comm`, `prodrMl_comm`, `prodrMr_comm`, `prodrMl`, `prodrMr`
     `rev_prodr`, `unitr_prod`, `unitr_prod_in`, `rev_prodrV`,
     `unitr_prodP`, `prodrV`
 
