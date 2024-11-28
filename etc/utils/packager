@@ -50,8 +50,7 @@ then
 else
   ARCHIVE=$(mktemp)
   PREFIX=$(echo math-comp-$TAG | sed "s/\+/-/")
-  git archive --format=tgz --output=$ARCHIVE \
-      --prefix=$PREFIX/ $TAG # reproduce github archive
+  wget -O $ARCHIVE $ARCHIVEURL
   SUM=$(sha256sum $ARCHIVE | cut -d " " -f 1)
   EXTRACTED=$(mktemp -d)
   tar -C $EXTRACTED -zxvf $ARCHIVE
@@ -83,6 +82,3 @@ do pkgdir="$PKGPREFIX/coq-mathcomp-$pkg/coq-mathcomp-$pkg.$VERSION"
    fi
    echo "}" >> $pkgdir/opam
 done
-
-# finally test the existence of the archive
-wget --spider $ARCHIVEURL
