@@ -452,9 +452,9 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     rewrite expnSr natrM invfM mulrA -{}Dcd /narrow /= -[mid _]/e.
     have [qe_ge0 // | /ltW qe_le0] := lerP 0 q.[e].
       do ?split=> //=; [exact: (le_trans le_ed) | apply: canRL (mulfK nz2) _].
-      by rewrite mulrBl divfK // mulr_natr opprD addrACA subrr add0r.
+      by rewrite mulrBl divfK // mulr_natr [c + d]addrC addrKA.
     do ?split=> //=; [exact: (le_trans le_ac) | apply: canRL (mulfK nz2) _].
-    by rewrite mulrBl divfK // mulr_natr opprD addrACA subrr addr0.
+    by rewrite mulrBl divfK // mulr_natr [c + d]addrC addrKA.
   have find_root r q ab:
     xup q ab -> {n | forall x, x \in itv (find n q ab) ->`|(r * q).[x]| < h2}.
   - move=> xab; have ub_ab := poly_itv_bound _ ab.1 ab.2.

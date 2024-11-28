@@ -1076,7 +1076,7 @@ have [[U S_U [V -> oVS]] [X S_X [Y -> oYS]]] := (IHS phi, IHS beta).
 pose Z := '[Y, V] / '[V] *: V; exists (X + Z).
   rewrite /Z -{4}(addKr U V) scalerDr scalerN addrA addrC span_cons.
   by rewrite memv_add ?memvB ?memvZ ?memv_line.
-exists (Y - Z); first by rewrite addrCA !addrA addrK addrC.
+exists (Y - Z); first by rewrite -addrA subrKC.
 apply/orthoPl=> psi /[!inE] /predU1P[-> | Spsi]; last first.
   by rewrite cfdotBl cfdotZl (orthoPl oVS _ Spsi) mulr0 subr0 (orthoPl oYS).
 rewrite cfdotBl !cfdotDr (span_orthogonal oYS) // ?memv_span ?mem_head //.

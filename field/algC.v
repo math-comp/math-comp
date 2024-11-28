@@ -91,9 +91,8 @@ Proof.
   have /eqP[] := oner_eq0 L; apply: (addrI b); rewrite addr0 -{2}bJ.
   have: (b + e) * (b + conj e) == 0.
     (* FIX ME : had to add pattern selection *)
-    rewrite mulrDl 2![_ * (b + _)]mulrDr -/a.
-    rewrite addrA addr_eq0 opp_id (mulrC e) -addrA.
-    by rewrite -mulrDr eJ addrAC -{2}[e]opp_id subrr add0r mulr1 Db2.
+    rewrite mulrDl -[e * _]opp_id [e * _]mulrDr -/a eJ.
+    by rewrite addrCA 2!mulrDr mulr1 Db2 mulrC subrr.
   rewrite mulf_eq0 !addr_eq0 !opp_id => /pred2P[] -> //.
   by rewrite {2}eJ rmorphD rmorph1.
 Qed.
@@ -140,9 +139,9 @@ Proof.
     exists ((y - conj y) / (z *+ 2)).
       rewrite fmorph_div rmorphMn /= zJ mulNrn invrN mulrN -mulNr rmorphB opprB.
       by rewrite conjK.
-    rewrite -(mulr_natl z) invfM (mulrC z) !mulrA divfK // -mulrDl addrACA.
+    rewrite -(mulr_natl z) invfM (mulrC z) !mulrA divfK // -mulrDl.
     (* FIX ME : had to add the explicit pattern *)
-    by rewrite subrr addr0 -mulr2n -[_ *+ 2]mulr_natr mulfK ?Neq0 ?sqrtK.
+    by rewrite -addrA subrKC -mulr2n -[_ *+ 2]mulr_natr mulfK ?Neq0 ?sqrtK.
   suff u0: u = 0 by rewrite -Dz u0 add0r rmorphXn rmorphM /= Rv zJ mulNr sqrrN.
   suff [b Du]: exists b : bool, u = (-1) ^+ b * i * z * v.
     apply: mul2I; rewrite mul0rn mulr2n -{2}Ru.
@@ -219,7 +218,7 @@ Proof.
   apply/andP; split; last by apply/posP; exists w.
   rewrite -normK expf_eq0 //=; apply: contraNneq nz_x => /norm_eq0 w0.
   rewrite -[x]sqrtK expf_eq0 /= -/u -(inj_eq mul2I) !mulr2n -{2}(rmorph0 conj).
-  by rewrite -w0 rmorphD rmorphM /= iJ uJ vJ mulNr addrACA subrr addr0.
+  by rewrite -w0 rmorphD rmorphM /= iJ uJ vJ mulNr -addrA subrKC.
 Qed.
 
 Lemma sposD x y : lt 0 x -> lt 0 y -> lt 0 (x + y).
@@ -244,7 +243,7 @@ Proof.
   have pos_norm z: le 0 (norm z) by apply/posP; exists (sqrt z).
   rewrite le_sqr ?posJ ?posD // sqrrD !normK -normM rmorphD mulrDl !mulrDr.
   rewrite addrA addrC !addrA -(addrC (y * conj y)) !addrA.
-  move: (y * _ + _) => u; rewrite -!addrA leB opprD addrACA {u}subrr add0r -leB.
+  move: (y * _ + _) => u; rewrite -!addrA leB [u + _]addrC addrKA -leB.
   rewrite {}le_sqr ?posD //.
     by rewrite rmorphD !rmorphM /= !conjK addrC (mulrC x) (mulrC y).
   rewrite -mulr2n -mulr_natr exprMn normK -natrX mulr_natr sqrrD mulrACA.

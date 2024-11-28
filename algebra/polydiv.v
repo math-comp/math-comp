@@ -367,7 +367,7 @@ elim: (size m) 0%N 0 {1 4 6}m (leqnn (size m)) => [|n IHn] k q r Hr /=.
   by rewrite size_poly0 size_poly_gt0.
 case: ltnP => Hlt Heq; first by constructor.
 apply/IHn=> [|Cda]; last first.
-  rewrite mulrDl addrAC -addrA subrK exprSr polyCM mulrA Heq //.
+  rewrite mulrDl -addrA subrKC exprSr polyCM mulrA Heq //.
   by rewrite mulrDl -mulrA Cda mulrA.
 apply/leq_sizeP => j Hj; rewrite coefB coefMC -scalerAl coefZ coefXnM.
 rewrite ltn_subRL ltnNge (leq_trans Hr) /=; last first.
@@ -431,8 +431,7 @@ move=> /(_ dn0) Hs.
 have eC : q * d * (lead_coef d ^+ k)%:P = q * (lead_coef d ^+ k)%:P * d.
   by rewrite -mulrA polyC_exp (commrX k Cdl) mulrA.
 suff e1 : q1 = q * (lead_coef d ^+ k)%:P.
-  congr (_, _, _) => //=; move/eqP: Heq.
-  by rewrite [_ + r1]addrC -subr_eq e1 mulrDl addrAC eC subrr add0r; move/eqP.
+  by congr (_, _, _) => //=; move: Heq; rewrite e1 mulrDl eC => /addrI.
 have : (q1 - q * (lead_coef d ^+ k)%:P) * d = r * (lead_coef d ^+ k)%:P - r1.
   apply: (@addIr _ r1); rewrite subrK.
   apply: (@addrI _ ((q * (lead_coef d ^+ k)%:P) * d)).
@@ -774,7 +773,7 @@ Lemma rdvdp_eq q p :
   rdvdp q p = (lead_coef q ^+ rscalp p q *: p == rdivp p q * q).
 Proof.
 rewrite rdivp_eq; apply/rmodp_eq0P/eqP => [->|/eqP]; first by rewrite addr0.
-by rewrite eq_sym addrC -subr_eq subrr; move/eqP<-.
+by rewrite addrC -subr_eq0 addrK => /eqP.
 Qed.
 
 End CommutativeRingPseudoDivision.
@@ -1192,8 +1191,8 @@ Proof.
 move=> cn0; case: (eqVneq p 0) => [->|nz_quo def_quo] //.
 pose p1 : {poly R} := lead_coef q ^+ scalp p q *: quo - c *: (p %/ q).
 have E1: c *: (p %% q) = p1 * q.
-  rewrite mulrDl mulNr -scalerAl -def_quo scalerA mulrC -scalerA.
-  by rewrite -scalerAl -scalerBr divp_eq addrAC subrr add0r.
+  rewrite mulrBl -scalerAl -def_quo scalerA mulrC -scalerA -scalerAl -scalerBr.
+  by rewrite divp_eq [_ + _ %% _]addrC addrK.
 rewrite /dvdp; apply/idPn=> m_nz.
 have: p1 * q != 0 by rewrite -E1 -mul_polyC mulf_neq0 // polyC_eq0.
 rewrite mulf_eq0; case/norP=> p1_nz q_nz.
@@ -1963,7 +1962,7 @@ case: (egcdp_rec _ _)=> u v /= => [[ihn'1 ihn'2 ihn'3]].
 rewrite gcdpE ltnNge qsp //= (eqp_ltrans (gcdpC _ _)); split; last first.
 - apply: (eqp_trans ihn'3).
   rewrite mulrBl addrCA -scalerAl scalerAr -mulrA -mulrBr.
-  by rewrite divp_eq addrAC subrr add0r eqpxx.
+  by rewrite divp_eq [_ + p %% q]addrC addrK.
 - apply: (leq_trans (size_polyD _ _)).
   have [-> | vn0] := eqVneq v 0.
     rewrite mul0r size_polyN size_poly0 maxn0; apply: leq_trans ihn'1 _.
@@ -2086,8 +2085,7 @@ Lemma modp_coprime k u n : k != 0 -> (k * u) %% n %= 1 -> coprimep k n.
 Proof.
 move=> kn0 hmod; apply/Bezout_coprimepP.
 exists (((lead_coef n)^+(scalp (k * u) n) *: u), (- (k * u %/ n))).
-rewrite -scalerAl mulrC (divp_eq (u * k) n) mulNr -addrAC subrr add0r.
-by rewrite mulrC.
+by rewrite -scalerAl mulrC (divp_eq (u * k) n) mulNr addrC addKr mulrC.
 Qed.
 
 Lemma coprimep_pexpl k m n : 0 < k -> coprimep (m ^+ k) n = coprimep m n.

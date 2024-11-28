@@ -445,7 +445,7 @@ have ->: pid_mx (1 + r) = block_mx 1 0 0 (pid_mx r) :> 'M[F]_(1 + m, 1 + n).
   by rewrite block_mxA castmx_id col_mx0 row_mx0 -scalar_mx_block -pid_mx_block.
 rewrite xcolE xrowE mulmxA -xcolE -!mulmxA.
 rewrite !(addr0, add0r, mulmx0, mul0mx, mulmx_block, mul1mx) mulmxA defB.
-rewrite addrC subrK mul_mx_scalar scalerA divff // scale1r.
+rewrite subrKC mul_mx_scalar scalerA divff // scale1r.
 have ->: a%:M = ulsubmx A1 by rewrite [_ A1]mx11_scalar !mxE !lshift0 !tpermR.
 rewrite submxK /A1 xrowE !xcolE -!mulmxA mulmxA -!perm_mxM !tperm2 !perm_mx1.
 by rewrite mulmx1 mul1mx.

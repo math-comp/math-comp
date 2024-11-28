@@ -249,7 +249,7 @@ Qed.
 Lemma modzMDl p m d : (p * d + m = m %[mod d])%Z.
 Proof.
 have [-> | d_nz] := eqVneq d 0; first by rewrite mulr0 add0r.
-by rewrite /modz divzMDl // mulrDl opprD addrACA subrr add0r.
+by rewrite /modz divzMDl // mulrDl [_ + m]addrC addrKA.
 Qed.
 
 Lemma mulz_modr {p m d} : 0 < p -> p * (m %% d)%Z = ((p * m) %% (p * d))%Z.

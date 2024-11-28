@@ -1632,7 +1632,7 @@ Lemma distnC m1 m2 : `|m1 - m2| = `|m2 - m1|.
 Proof. by rewrite -opprB abszN. Qed.
 
 Lemma distnDl d n1 n2 : `|d + n1 - (d + n2)| = `|n1 - n2|.
-Proof. by rewrite !PoszD opprD addrCA -addrA addKr. Qed.
+Proof. by rewrite addnC !PoszD addrKA. Qed.
 
 Lemma distnDr d n1 n2 : `|n1 + d - (n2 + d)| = `|n1 - n2|.
 Proof. by rewrite -!(addnC d) distnDl. Qed.
