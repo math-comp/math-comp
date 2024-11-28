@@ -276,8 +276,7 @@ Proof. by rewrite /commute mulg1 mul1g. Qed.
 End UMagmaTheory.
 
 #[short(type="monoidType")]
-HB.structure Definition Monoid :=
-  {G of Magma_isUMagma G & Semigroup G}.
+HB.structure Definition Monoid := {G of Magma_isUMagma G & Semigroup G}.
 
 HB.factory Record Semigroup_isMonoid G of Semigroup G := {
   one : G;
@@ -337,9 +336,7 @@ by rewrite 2!expgS IHm mulgA.
 Qed.
 
 Lemma expgnA x m n : x ^+ (m * n) = x ^+ m ^+ n.
-Proof.
-by rewrite mulnC; elim: n => //= n IHn; rewrite expgS expgnDr IHn.
-Qed.
+Proof. by rewrite mulnC; elim: n => //= n IHn; rewrite expgS expgnDr IHn. Qed.
 
 Lemma expgnAC x m n : x ^+ m ^+ n = x ^+ n ^+ m.
 Proof. by rewrite -2!expgnA mulnC. Qed.
@@ -444,7 +441,7 @@ Lemma mulIg : @left_injective G G G *%g.
 Proof. by move=> x; apply: can_inj (mulgK x). Qed.
 
 Lemma invgK : @involutive G (@inv G).
-Proof. by move=> x; rewrite -[LHS]mulg1 -(mulVg x) mulgA mulVg mul1g. Qed.
+Proof. by move=> x; rewrite -[LHS](mulVKg x) divgg mulg1. Qed.
 
 Lemma invg_inj : @injective G G (@inv G).
 Proof. exact: inv_inj invgK. Qed.
@@ -465,14 +462,14 @@ Lemma divg1 x : x / 1 = x. Proof. by rewrite invg1 mulg1. Qed.
 
 Lemma div1g x : 1 / x = x^-1. Proof. by rewrite mul1g. Qed.
 
-Lemma invgF x y : (x / y)^-1 = y / x.
+Lemma invg_div x y : (x / y)^-1 = y / x.
 Proof. by apply/(canRL (mulgK x))/(@divIg y); rewrite -mulgA mulVg divgg. Qed.
 
 Lemma invgM : {morph (@inv G): x y / x * y >-> y * x : G}.
-Proof. by move=> x y; rewrite -[y in LHS] invgK invgF. Qed.
+Proof. by move=> x y; rewrite -[y in LHS]invgK invg_div. Qed.
 
 Lemma divKg x y : commute x y -> x / (x / y) = y.
-Proof. by move=> xyC; rewrite invgF mulgA xyC mulgK. Qed.
+Proof. by move=> xyC; rewrite invg_div mulgA xyC mulgK. Qed.
 
 (* TOTHINK : This does not have the same form as addrKA in ssralg.v *)
 Lemma mulgKA z x y : (x * z) / (y * z) = x / y.
@@ -644,18 +641,18 @@ HB.structure Definition UMagmaMorphism (G H : baseUMagmaType) :=
   {f of isUMagmaMorphism G H f & isMultiplicative G H f}.
 
 HB.factory Record isGroupMorphism (G H : groupType) (f : G -> H) := {
-  gmulfB : {morph f : x y / x / y}
+  gmulf_div : {morph f : x y / x / y}
 }.
 
 HB.builders Context G H apply of isGroupMorphism G H apply.
 
 Local Lemma gmulf1 : apply 1 = 1.
-Proof. by rewrite -[1]divg1 gmulfB divgg. Qed.
+Proof. by rewrite -[1]divg1 gmulf_div divgg. Qed.
 
 Local Lemma gmulfM : {morph apply : x y / x * y}.
 Proof.
 move=> x y; rewrite -[y in LHS] invgK -[y^-1]mul1g.
-by rewrite !gmulfB gmulf1 div1g invgK.
+by rewrite !gmulf_div gmulf1 div1g invgK.
 Qed.
 
 HB.instance Definition _ := isMultiplicative.Build G H apply gmulfM.
@@ -669,6 +666,7 @@ Notation "{ 'multiplicative' U -> V }" :=
 End MultiplicativeExports.
 HB.export MultiplicativeExports.
 
+(* FIXME: HB should do this automatically. *)
 #[non_forgetful_inheritance]
 HB.instance Definition _ G H (f : UMagmaMorphism.type G H) :=
   UMagmaMorphism.on (Multiplicative.sort f).
@@ -712,11 +710,7 @@ Lemma can2_gmulf1 f' : cancel f f' -> cancel f' f -> f' 1 = 1.
 Proof. by move=> fK f'K; apply: (canLR fK); rewrite gmulf1. Qed.
 
 Lemma gmulfXn n : {morph f : x / x ^+ n}.
-Proof.
-elim: n => [|n IHn] x /=; first exact: gmulf1.
-case: n IHn => [//|n] IHn.
-by rewrite gmulfM IHn.
-Qed.
+Proof. by elim: n => [|[|n] IHn] x /=; rewrite ?(gmulf1, gmulfM) // IHn. Qed.
 
 End UMagma.
 
@@ -724,13 +718,13 @@ Section Group.
 Variables (G H : groupType) (f : UMagmaMorphism.type G H).
 
 Lemma gmulfV : {morph f : x / x^-1}.
-Proof. by move=> x; apply/divg1_eq; rewrite invgK -gmulfM mulVg/= gmulf1. Qed.
+Proof. by move=> x; apply/divg1_eq; rewrite invgK -gmulfM mulVg gmulf1. Qed.
 
-Lemma gmulfB : {morph f : x y / x / y}.
+Lemma gmulf_div : {morph f : x y / x / y}.
 Proof. by move=> x y; rewrite gmulfM gmulfV. Qed.
 
 Lemma gmulf_inj : (forall x, f x = 1 -> x = 1) -> injective f.
-Proof. by move=> fI x y xy; apply/divg1_eq/fI; rewrite gmulfB xy divgg. Qed.
+Proof. by move=> fI x y xy; apply/divg1_eq/fI; rewrite gmulf_div xy divgg. Qed.
 
 Lemma gmulfXVn n : {morph f : x / x ^- n}.
 Proof. by move=> x /=; rewrite gmulfV gmulfXn. Qed.
@@ -827,8 +821,7 @@ Variables S : umagmaClosed G.
 
 Lemma gpredXn n : {in S, forall u, u ^+ n \in S}.
 Proof.
-move=> x xS; elim: n => [|n IHn]; first exact: gpred1.
-by case: n IHn => [//|n] IHn; apply/gpredM.
+by move=> x xS; elim: n => [|[//|n] IHn]; [exact: gpred1 | exact: gpredM].
 Qed.
 
 End UMagma.
@@ -837,17 +830,17 @@ End UMagmaPred.
 Section GroupPred.
 Variables (G : groupType).
 
+Lemma gpredV (S : invgClosed G) : {mono (@inv G): u / u \in S}.
+Proof. by move=> u; apply/idP/idP=> /gpredVr; rewrite ?invgK; apply. Qed.
+
 Section Group.
 Variables S : groupClosed G.
-
-Lemma gpredV : {mono (@inv G): u / u \in S}.
-Proof. by move=> u; apply/idP/idP=> /gpredVr; rewrite ?invgK; apply. Qed.
 
 Lemma gpredF : {in S &, forall u v, u / v \in S}.
 Proof. by move=> x y xS yS; rewrite gpredM// gpredV. Qed.
 
 Lemma gpredFC u v : u / v \in S = (v / u \in S).
-Proof. by rewrite -gpredV invgF. Qed.
+Proof. by rewrite -gpredV invg_div. Qed.
 
 Lemma gpredXNn n: {in S, forall u, u ^- n \in S}.
 Proof. by move=> x xS; apply/gpredVr/gpredXn. Qed.
@@ -861,14 +854,14 @@ Qed.
 Lemma gpredMl x y : x \in S -> (x * y \in S) = (y \in S).
 Proof.
 move=> Sx; apply/idP/idP => [Sxy|/(gpredM x y Sx)//].
-by rewrite -[y]mul1g -(mulVg x) -mulgA gpredM// gpredV.
+by rewrite -(mulKg x y) gpredM// gpredV.
 Qed.
 
 Lemma gpredFr x y : x \in S -> (y / x \in S) = (y \in S).
 Proof. by rewrite -gpredV; apply: gpredMr. Qed.
 
 Lemma gpredFl x y : x \in S -> (x / y \in S) = (y \in S).
-Proof. by rewrite -(gpredV y); apply: gpredMl. Qed.
+Proof. by rewrite -(gpredV S y); apply: gpredMl. Qed.
 
 Lemma gpred_conj x y : x \in S -> y \in S -> x ^ y \in S.
 Proof. by move=> xS yS; apply/gpredM; [apply/gpredVr|apply/gpredM]. Qed.
@@ -1017,8 +1010,8 @@ HB.builders Context G S H of SubChoice_isSubGroup G S H.
 
 Lemma umagma_closed : umagma_closed S.
 Proof.
-by split;
-  [apply/(fst group_closed_subproof)|apply/group_closedM/group_closed_subproof].
+split; first exact/(fst group_closed_subproof).
+exact/group_closedM/group_closed_subproof.
 Qed.
 HB.instance Definition _ := SubChoice_isSubMonoid.Build G S H umagma_closed.
 HB.instance Definition _ :=
