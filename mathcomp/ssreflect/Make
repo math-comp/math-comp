@@ -12,6 +12,7 @@ choice.v
 div.v
 finfun.v
 fingraph.v
+finmap.v
 finset.v
 fintype.v
 generic_quotient.v
