@@ -602,11 +602,10 @@ Proof. by elim: p => //= p IH; rewrite !mulrS poly_of_qpolyD IH. Qed.
 
 Lemma char_qpoly : [char {poly %/ h}] =i [char A].
 Proof.
-move=> p; rewrite !inE; congr (_ && _).
-apply/eqP/eqP=> [/(congr1 val) /=|pE]; last first.
-  by apply: val_inj => //=; rewrite qpolyC_natr /= -polyC_natr pE.
-rewrite !qpolyC_natr -!polyC_natr => /(congr1 val) /=.
-by rewrite polyseqC polyseq0; case: eqP.
+move=> p; rewrite !inE.
+rewrite -(inj_eq val_inj)/= qpolyC_natr -polyC_natr  polyC_eq0.
+by under eq_forallb do rewrite
+  -(inj_eq val_inj)/= qpolyC_natr -polyC_natr polyC_eq0.
 Qed.
 
 Lemma poly_of_qpolyM (p q : {poly %/ h}) :

@@ -945,7 +945,8 @@ Local Notation "\prod_ ( m <= i < n ) F" := (\big[*%R/1%R]_(m <= i < n) F%R).
 (* has to apply to rings as well; indeed, we need the Frobenius automorphism *)
 (* results for a non commutative ring in the proof of Gorenstein 2.6.3.      *)
 Definition char (R : semiRingType) : nat_pred :=
-  [pred p | prime p & p%:R == 0 :> R].
+  [pred p | (0 < p)%N && (p%:R == 0 :> R) &&
+      [forall q : 'I_p, (q%:R == 0 :> R) == (q == 0%N :> nat)]].
 
 Local Notation has_char0 L := (char L =i pred0).
 
@@ -1206,9 +1207,10 @@ Section FrobeniusAutomorphism.
 Variable p : nat.
 Hypothesis charFp : p \in char R.
 
-Lemma charf0 : p%:R = 0 :> R. Proof. by apply/eqP; case/andP: charFp. Qed.
-Lemma charf_prime : prime p. Proof. by case/andP: charFp. Qed.
-Hint Resolve charf_prime : core.
+Lemma charf0 : p%:R = 0 :> R.
+Proof.
+by apply/eqP; case/andP: charFp => /andP[].
+Qed.
 
 Lemma mulrn_char x : x *+ p = 0. Proof. by rewrite -mulr_natl charf0 mul0r. Qed.
 
@@ -1217,21 +1219,34 @@ Proof. by rewrite {2}(divn_eq n p) natrD mulrnA mulrn_char add0r. Qed.
 
 Lemma dvdn_charf n : (p %| n)%N = (n%:R == 0 :> R).
 Proof.
-apply/idP/eqP=> [/dvdnP[n' ->]|n0]; first by rewrite natrM charf0 mulr0.
-apply/idPn; rewrite -prime_coprime // => /eqnP pn1.
-have [a _ /dvdnP[b]] := Bezoutl n (prime_gt0 charf_prime).
-move/(congr1 (fun m => m%:R : R))/eqP.
-by rewrite natrD !natrM charf0 n0 !mulr0 pn1 addr0 oner_eq0.
+apply/idP/eqP=> [/dvdnP[n' ->]|]; first by rewrite natrM charf0 mulr0.
+case/andP: charFp => /andP[] /(ltn_pmod n) np /eqP p0.
+move=> /forallP/(_ (Ordinal np))/eqP/= np0.
+rewrite (divn_eq n p) natrD natrM p0 mulr0 add0r.
+move=> /eqP; rewrite np0 => /eqP ->.
+by rewrite addn0 dvdn_mull.
 Qed.
 
 Lemma charf_eq : char R =i (p : nat_pred).
 Proof.
-move=> q; apply/andP/eqP=> [[q_pr q0] | ->]; last by rewrite charf0.
-by apply/eqP; rewrite eq_sym -dvdn_prime2 // dvdn_charf.
+move=> q; apply/idP/eqP => [/andP[] /andP[] q0 qr0 /forallP qmin | -> //].
+case/andP: charFp => /andP[] p0 pr0 /forallP pmin.
+case: (ltngtP q p) => [qp|pq|//].
+  move: pmin q0 => /(_ (Ordinal qp)) /eqP/= /esym.
+  by rewrite qr0 => /eqP => ->.
+move: qmin p0 => /(_ (Ordinal pq)) /eqP/= /esym.
+by rewrite pr0 => /eqP ->.
 Qed.
 
-Lemma bin_lt_charf_0 k : 0 < k < p -> 'C(p, k)%:R = 0 :> R.
-Proof. by move=> lt0kp; apply/eqP; rewrite -dvdn_charf prime_dvd_bin. Qed.
+Lemma natf0_char n : n > 0 -> n%:R == 0 :> R -> exists p, p \in char R.
+Proof.
+have [k] := ubnP n; elim: k n => [//|] k IHk n /[!ltnS] nk n0 nr0.
+case/boolP: (n \in char R) => [nR|]; first by exists n.
+rewrite inE n0 nr0/= negb_forall => /existsP[]/= [] [|m] mn/=.
+  by rewrite !eqxx.
+rewrite eqbF_neg negbK => m0.
+by apply: (IHk m.+1) => //; apply: (leq_trans mn).
+Qed.
 
 Local Notation "x ^f" := (Frobenius_aut charFp x).
 
@@ -1239,27 +1254,10 @@ Lemma Frobenius_autE x : x^f = x ^+ p. Proof. by []. Qed.
 Local Notation fE := Frobenius_autE.
 
 Lemma Frobenius_aut0 : 0^f = 0.
-Proof. by rewrite fE -(prednK (prime_gt0 charf_prime)) exprS mul0r. Qed.
+Proof. by rewrite fE expr0n -leqn0 leqNgt; case/andP: charFp => /andP[] ->. Qed.
 
 Lemma Frobenius_aut1 : 1^f = 1.
 Proof. by rewrite fE expr1n. Qed.
-
-Lemma Frobenius_autD_comm x y (cxy : comm x y) : (x + y)^f = x^f + y^f.
-Proof.
-have defp := prednK (prime_gt0 charf_prime).
-rewrite !fE exprDn_comm // big_ord_recr subnn -defp big_ord_recl /= defp.
-rewrite subn0 mulr1 mul1r bin0 binn big1 ?addr0 // => i _.
-by rewrite -mulr_natl bin_lt_charf_0 ?mul0r //= -{2}defp ltnS (valP i).
-Qed.
-
-Lemma Frobenius_autMn x n : (x *+ n)^f = x^f *+ n.
-Proof.
-elim: n => [|n IHn]; first exact: Frobenius_aut0.
-by rewrite !mulrS Frobenius_autD_comm ?IHn //; apply: commrMn.
-Qed.
-
-Lemma Frobenius_aut_nat n : (n%:R)^f = n%:R.
-Proof. by rewrite Frobenius_autMn Frobenius_aut1. Qed.
 
 Lemma Frobenius_autM_comm x y : comm x y -> (x * y)^f = x^f * y^f.
 Proof. exact: exprMn_comm. Qed.
@@ -1268,6 +1266,52 @@ Lemma Frobenius_autX x n : (x ^+ n)^f = x^f ^+ n.
 Proof. by rewrite !fE -!exprM mulnC. Qed.
 
 End FrobeniusAutomorphism.
+
+Lemma charf_prime0 p : prime p -> p%:R = 0 :> R -> p \in char R.
+Proof.
+move=> /[dup] p_pr /prime_gt0 p0 /eqP pr0.
+have [q qR] := (natf0_char p0 pr0).
+move: (dvdn_charf qR p); rewrite pr0 => /prime_nt_dvdP-/(_ p_pr)/(_ _)/wrap[].
+  by apply/eqP => q1; case/andP: qR => /andP[] _; rewrite q1 oner_eq0.
+by move: qR => /[swap] ->.
+Qed.
+
+Lemma charf0P : char R =i pred0 <-> (forall n, (n%:R == 0 :> R) = (n == 0)%N).
+Proof.
+split=> charF0 n; last by rewrite !inE charF0 lt0n andNb. 
+have [-> | n_gt0] := posnP; first exact: eqxx.
+by apply/negP; case/natf0_char=> // p; rewrite charF0.
+Qed.
+
+Lemma bin_lt_charf_0 p : prime p -> p \in char R ->
+  forall k, 0 < k < p -> 'C(p, k)%:R = 0 :> R.
+Proof.
+by move=> p_pr pR k lt0kp; apply/eqP; rewrite -(dvdn_charf pR) prime_dvd_bin.
+Qed.
+
+Section PrimeFrobeniusAutomophism.
+Variables (p : nat) (p_pr : prime p) (charRp : p \in char R).
+
+Local Notation "x ^f" := (Frobenius_aut charRp x).
+
+Lemma Frobenius_autD_prime_comm x y (cxy : comm x y) : (x + y)^f = x^f + y^f.
+Proof.
+have defp := prednK (prime_gt0 p_pr).
+rewrite !Frobenius_autE exprDn_comm // big_ord_recr subnn -defp big_ord_recl /=.
+rewrite defp subn0 mulr1 mul1r bin0 binn big1 ?addr0 // => i _.
+by rewrite -mulr_natl bin_lt_charf_0 ?mul0r //= -{2}defp ltnS (valP i).
+Qed.
+
+Lemma Frobenius_autMn_prime x n : (x *+ n)^f = x^f *+ n.
+Proof.
+elim: n => [|n IHn]; first exact: Frobenius_aut0.
+by rewrite !mulrS Frobenius_autD_prime_comm ?IHn //; apply: commrMn.
+Qed.
+
+Lemma Frobenius_aut_nat_prime n : (n%:R)^f = n%:R.
+Proof. by rewrite Frobenius_autMn_prime Frobenius_aut1. Qed.
+
+End PrimeFrobeniusAutomophism.
 
 Section Char2.
 
@@ -1475,36 +1519,24 @@ Proof. by rewrite -sqrrN opprB addrC sqrrD1 sqrrN mulNrn. Qed.
 Lemma subr_sqr_1 x : x ^+ 2 - 1 = (x - 1) * (x + 1).
 Proof. by rewrite subrX1 !big_ord_recr big_ord0 /= addrAC add0r. Qed.
 
-Section FrobeniusAutomorphism.
+Section PrimeFrobeniusAutomorphism.
+Variables (p : nat) (p_pr : prime p) (charRp : p \in char R).
 
-Variable p : nat.
-Hypothesis charFp : p \in char R.
+Local Notation "x ^f" := (Frobenius_aut charRp x).
 
-Hint Resolve charf_prime : core.
-
-Local Notation "x ^f" := (Frobenius_aut charFp x).
-
-Lemma Frobenius_autN x : (- x)^f = - x^f.
+Lemma Frobenius_autN_prime x : (- x)^f = - x^f.
 Proof.
 apply/eqP; rewrite -subr_eq0 opprK addrC.
-by rewrite -(Frobenius_autD_comm _ (commrN _)) // subrr Frobenius_aut0.
+rewrite -Frobenius_autD_prime_comm//; last exact: commrN.
+by rewrite subrr Frobenius_aut0.
 Qed.
 
-Lemma Frobenius_autB_comm x y : comm x y -> (x - y)^f = x^f - y^f.
+Lemma Frobenius_autB_prime_comm x y : comm x y -> (x - y)^f = x^f - y^f.
 Proof.
-by move/commrN/Frobenius_autD_comm->; rewrite Frobenius_autN.
+by move/commrN/Frobenius_autD_prime_comm-> => //; rewrite Frobenius_autN_prime.
 Qed.
 
-End FrobeniusAutomorphism.
-
-Lemma exprNn_char x n : (char R).-nat n -> (- x) ^+ n = - (x ^+ n).
-Proof.
-pose p := pdiv n; have [|n_gt1 charRn] := leqP n 1; first by case: (n) => [|[]].
-have charRp: p \in char R by rewrite (pnatPpi charRn) // pi_pdiv.
-have /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (charf_eq charRp)).
-elim: e => // e IHe; rewrite expnSr !exprM {}IHe.
-by rewrite -Frobenius_autE Frobenius_autN.
-Qed.
+End PrimeFrobeniusAutomorphism.
 
 Section Char2.
 
@@ -2077,14 +2109,19 @@ Proof. by elim: n => [|n IHn] x; rewrite ?rmorph1 // !exprS rmorphM IHn. Qed.
 
 Lemma rmorph_nat n : f n%:R = n%:R. Proof. by rewrite rmorphMn rmorph1. Qed.
 
-Lemma rmorph_char p : p \in char R -> p \in char S.
-Proof. by rewrite !inE -rmorph_nat => /andP[-> /= /eqP->]; rewrite rmorph0. Qed.
-
 Lemma rmorph_eq_nat x n : injective f -> (f x == n%:R) = (x == n%:R).
 Proof. by move/inj_eq <-; rewrite rmorph_nat. Qed.
 
 Lemma rmorph_eq1 x : injective f -> (f x == 1) = (x == 1).
 Proof. exact: rmorph_eq_nat 1%N. Qed.
+
+Lemma rmorph_char p : injective f -> p \in char R -> p \in char S.
+Proof.
+move=> finj /andP[] /andP[] p0 /eqP pr0 /forallP pmin.
+apply/andP; split.
+  by apply/andP; split=> //; rewrite -rmorph_nat pr0 rmorph0.
+by apply/forallP => q; rewrite -rmorph_nat (rmorph_eq_nat _ 0).
+Qed.
 
 Lemma can2_rmorphism f' : cancel f f' -> cancel f' f -> multiplicative f'.
 Proof.
@@ -2521,37 +2558,6 @@ Proof. by rewrite exprDn_comm //; apply: mulrC. Qed.
 
 Lemma sqrrD x y : (x + y) ^+ 2 = x ^+ 2 + x * y *+ 2 + y ^+ 2.
 Proof. by rewrite exprDn !big_ord_recr big_ord0 /= add0r mulr1 mul1r. Qed.
-
-Section FrobeniusAutomorphism.
-
-Variables (p : nat) (charRp : p \in char R).
-
-Lemma Frobenius_aut_is_semi_additive : semi_additive (Frobenius_aut charRp).
-Proof.
-by split=> [|x y]; [exact: Frobenius_aut0 | exact/Frobenius_autD_comm/mulrC].
-Qed.
-
-Lemma Frobenius_aut_is_multiplicative : multiplicative (Frobenius_aut charRp).
-Proof.
-by split=> [x y|]; [exact/Frobenius_autM_comm/mulrC | exact: Frobenius_aut1].
-Qed.
-
-#[export]
-HB.instance Definition _ := isSemiAdditive.Build R R (Frobenius_aut charRp)
-  Frobenius_aut_is_semi_additive.
-#[export]
-HB.instance Definition _ := isMultiplicative.Build R R (Frobenius_aut charRp)
-  Frobenius_aut_is_multiplicative.
-
-End FrobeniusAutomorphism.
-
-Lemma exprDn_char x y n : (char R).-nat n -> (x + y) ^+ n = x ^+ n + y ^+ n.
-Proof.
-pose p := pdiv n; have [|n_gt1 charRn] := leqP n 1; first by case: (n) => [|[]].
-have charRp: p \in char R by rewrite (pnatPpi charRn) ?pi_pdiv.
-have{charRn} /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (charf_eq charRp)).
-by elim: e => // e IHe; rewrite !expnSr !exprM IHe -Frobenius_autE rmorphD.
-Qed.
 
 Lemma rmorph_comm (S : semiRingType) (f : {rmorphism R -> S}) x y :
   comm (f x) (f y).
@@ -3913,19 +3919,34 @@ Lemma sqrf_eq0 x : (x ^+ 2 == 0) = (x == 0). Proof. exact: expf_eq0. Qed.
 Lemma expf_neq0 x m : x != 0 -> x ^+ m != 0.
 Proof. by move=> x_nz; rewrite expf_eq0; apply/nandP; right. Qed.
 
+Lemma charf_prime p : p \in char R -> prime p.
+Proof.
+move=> /andP[] /andP[] p0 pr0 /forallP pmin.
+rewrite -[prime p]negbK; apply/negP => /primePn[|[q] /andP[] q1 qp].
+  rewrite ltnS => p1.
+  move: pr0; have /eqP ->: p == 1%N by rewrite eqn_leq p1.
+  apply/negP/oner_neq0.
+move=> /dvdnP[] r pE.
+move: {p0} pr0 pmin qp; rewrite {}pE natrM mulf_eq0 => rq0 rqmin qlt.
+have r0: 0 < r by case: r {rq0 rqmin} qlt.
+have rlt := ltn_Pmulr q1 r0.
+move: q1 => /ltnW q0.
+wlog: r q rq0 r0 q0 rlt qlt rqmin / (r%:R == 0 :> R) => [rr0|].
+  case/orP: (rq0) => rqr0; first exact: (rr0 r q).
+  by (apply: (rr0 q r) => //; first by rewrite orbC); rewrite mulnC.
+by move: rqmin r0 => /(_ (Ordinal rlt))/= /eqP -> /[swap] /eqP ->.
+Qed.
+
+Hint Resolve charf_prime : core.
+
 Lemma natf_neq0 n : (n%:R != 0 :> R) = (char R)^'.-nat n.
 Proof.
 have [-> | /prod_prime_decomp->] := posnP n; first by rewrite eqxx.
 rewrite !big_seq; elim/big_rec: _ => [|[p e] s /=]; first by rewrite oner_eq0.
-case/mem_prime_decomp=> p_pr _ _; rewrite pnatM pnatX eqn0Ngt orbC => <-.
-by rewrite natrM natrX mulf_eq0 expf_eq0 negb_or negb_and pnatE ?inE p_pr.
-Qed.
-
-Lemma natf0_char n : n > 0 -> n%:R == 0 :> R -> exists p, p \in char R.
-Proof.
-move=> n_gt0 nR_0; exists (pdiv n`_(char R)).
-apply: pnatP (pdiv_dvd _); rewrite ?part_pnat // ?pdiv_prime //.
-by rewrite ltn_neqAle eq_sym partn_eq1 // -natf_neq0 nR_0 /=.
+case/mem_prime_decomp=> p_pr e0 _.
+rewrite pnatM pnatX eqn0Ngt natrM natrX mulf_eq0 expf_eq0 e0 orbF negb_or => ->.
+congr andb; rewrite pnatE//= !inE prime_gt0//=; congr negb.
+by case/boolP: (_ == 0) => //= /eqP/(charf_prime0 p_pr) /andP[_]/esym.
 Qed.
 
 Lemma charf'_nat n : (char R)^'.-nat n = (n%:R != 0 :> R).
@@ -3935,14 +3956,66 @@ apply/idP/idP => [|nz_n]; last first.
   by apply/pnatP=> // p p_pr p_dvd_n; apply: contra nz_n => /dvdn_charf <-.
 apply: contraL => n0; have [// | p charRp] := natf0_char _ n0.
 have [p_pr _] := andP charRp; rewrite (eq_pnat _ (eq_negn (charf_eq charRp))).
-by rewrite p'natE // (dvdn_charf charRp) n0.
+(* FIXME: `charf_prime` is declared as a Hint above, why do I have to rewrite
+  it? *)
+by rewrite p'natE ?charf_prime // (dvdn_charf charRp) n0.
 Qed.
 
-Lemma charf0P : char R =i pred0 <-> (forall n, (n%:R == 0 :> R) = (n == 0)%N).
+Section FrobeniusAutomorphism.
+
+Variables (p : nat) (charRp : p \in char R).
+
+Local Notation "x ^f" := (Frobenius_aut charRp x).
+
+Lemma Frobenius_autD_comm x y (cxy : comm x y) : (x + y)^f = x^f + y^f.
+Proof. by apply/Frobenius_autD_prime_comm => //; apply/charf_prime. Qed.
+
+Lemma Frobenius_autMn x n : (x *+ n)^f = x^f *+ n.
+Proof. by apply/Frobenius_autMn_prime => //; apply/charf_prime. Qed.
+
+Lemma Frobenius_aut_nat n : (n%:R)^f = n%:R.
+Proof. by apply/Frobenius_aut_nat_prime => //; apply/charf_prime. Qed.
+
+Lemma Frobenius_autN x : (- x)^f = - x^f.
+Proof. by apply/Frobenius_autN_prime => //; apply/charf_prime. Qed.
+
+Lemma Frobenius_autB_comm x y : comm x y -> (x - y)^f = x^f - y^f.
+Proof. by apply/Frobenius_autB_prime_comm => //; apply/charf_prime. Qed.
+
+Lemma Frobenius_aut_is_semi_additive : semi_additive (Frobenius_aut charRp).
 Proof.
-split=> charF0 n; last by rewrite !inE charF0 andbC; case: eqP => // ->.
-have [-> | n_gt0] := posnP; first exact: eqxx.
-by apply/negP; case/natf0_char=> // p; rewrite charF0.
+by split=> [|x y]; [exact: Frobenius_aut0 | exact/Frobenius_autD_comm/mulrC].
+Qed.
+
+Lemma Frobenius_aut_is_multiplicative : multiplicative (Frobenius_aut charRp).
+Proof.
+by split=> [x y|]; [exact/Frobenius_autM_comm/mulrC | exact: Frobenius_aut1].
+Qed.
+
+#[export]
+HB.instance Definition _ := isSemiAdditive.Build R R (Frobenius_aut charRp)
+  Frobenius_aut_is_semi_additive.
+#[export]
+HB.instance Definition _ := isMultiplicative.Build R R (Frobenius_aut charRp)
+  Frobenius_aut_is_multiplicative.
+
+End FrobeniusAutomorphism.
+
+Lemma exprDn_char x y n : (char R).-nat n -> (x + y) ^+ n = x ^+ n + y ^+ n.
+Proof.
+pose p := pdiv n; have [|n_gt1 charRn] := leqP n 1; first by case: (n) => [|[]].
+have charRp: p \in char R by rewrite (pnatPpi charRn) ?pi_pdiv.
+have{charRn} /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (charf_eq charRp)).
+by elim: e => // e IHe; rewrite !expnSr !exprM IHe -Frobenius_autE rmorphD.
+Qed.
+
+Lemma exprNn_char x n : (char R).-nat n -> (- x) ^+ n = - (x ^+ n).
+Proof.
+pose p := pdiv n; have [|n_gt1 charRn] := leqP n 1; first by case: (n) => [|[]].
+have charRp: p \in char R by rewrite (pnatPpi charRn) // pi_pdiv.
+have /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (charf_eq charRp)).
+elim: e => // e IHe; rewrite expnSr !exprM {}IHe.
+by rewrite -Frobenius_autE Frobenius_autN.
 Qed.
 
 Lemma eqf_sqr x y : (x ^+ 2 == y ^+ 2) = (x == y) || (x == - y).
@@ -4158,7 +4231,10 @@ Lemma fmorph_eq1 x : (f x == 1) = (x == 1).
 Proof. by rewrite -(inj_eq fmorph_inj) rmorph1. Qed.
 
 Lemma fmorph_char : char R =i char F.
-Proof. by move=> p; rewrite !inE -fmorph_eq0 rmorph_nat. Qed.
+Proof.
+move=> p; rewrite !inE -fmorph_eq0 rmorph_nat.
+by under [in RHS]eq_forallb do rewrite -fmorph_eq0 rmorph_nat.
+Qed.
 
 End FieldMorphismInj.
 
@@ -4206,7 +4282,10 @@ Qed.
 End ModuleTheory.
 
 Lemma char_lalg (A : lalgType F) : char A =i char F.
-Proof. by move=> p; rewrite inE -scaler_nat scaler_eq0 oner_eq0 orbF. Qed.
+Proof.
+move=> p; rewrite inE -scaler_nat scaler_eq0 oner_eq0 orbF.
+by under eq_forallb do rewrite -scaler_nat scaler_eq0 oner_eq0 orbF.
+Qed.
 
 End FieldTheory.
 
