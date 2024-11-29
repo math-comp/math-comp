@@ -1,8 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat.
-From mathcomp Require Import seq ssralg generic_quotient.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
+From mathcomp Require Import ssralg generic_quotient.
 
 (******************************************************************************)
 (*                   Quotients of algebraic structures                        *)
