@@ -13,7 +13,7 @@ depends: [
   "coq" {(>= "8.18" & < "8.21~") | (= "dev")}
   # Please keep the "dev" above as it is required for the coq-dev Docker images
   "elpi" {>= "1.17.0"}
-  "coq-hierarchy-builder" { >= "1.5.0"}
+  "coq-hierarchy-builder" { >= "1.7.0"}
 ]
 
 tags: [
