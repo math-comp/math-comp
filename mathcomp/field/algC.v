@@ -70,7 +70,7 @@ Proof.
   apply/eqP=> char2; apply: conj_nt => e; apply/eqP/idPn=> eJ.
   have opp_id x: - x = x :> L.
     by apply/esym/eqP; rewrite -addr_eq0 -mulr2n -mulr_natl char2 mul0r.
-  have{} char2: 2%N \in [char L] by apply/eqP.
+  have{} char2: 2%N \in [char L] by apply/GRing.charf_prime0.
   without loss{eJ} eJ: e / conj e = e + 1.
     move/(_ (e / (e + conj e))); apply.
     rewrite fmorph_div rmorphD /= conjK -{1}[conj e](addNKr e) mulrDl.
