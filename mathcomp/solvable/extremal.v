@@ -268,7 +268,7 @@ have [cycF ffulF]: cyclic F /\ [faithful F, on 'Ohm_1(G) | [Aut G]].
   have Um0 a: ((m a)%:R : 'F_p) \in GRing.unit.
     have: m a \in GRing.unit by apply: valP.
     by rewrite -{1}[m a]natr_Zp unitFpE ?unitZpE // {1}/q oG coprime_pexpl.
-  pose fm0 a := FinRing.unit 'F_p (Um0 a).
+  pose fm0 a := FinNzRing.unit 'F_p (Um0 a).
   have natZqp u: (u%:R : 'Z_q)%:R = u %:R :> 'F_p.
     by rewrite val_Zp_nat // -Fp_nat_mod // modn_dvdm ?Fp_nat_mod.
   have m0M: {in A &, {morph fm0 : a b / a * b}}.
@@ -641,7 +641,7 @@ suffices isoED: ED \isog Grp (x : y : x ^+ q, y ^+ p, x ^ y = x ^+ q.-1).
   congr (_ && _); apply: andb_id2l; move/eqP=> xq1; congr (_ && (_ == _)).
   by apply/eqP; rewrite eq_sym eq_invg_mul -expgS (ltn_predK q_gt1) xq1.
 have unitrN1 : (- 1)%R \in GRing.unit by move=> R; rewrite unitrN unitr1.
-pose uN1 := FinRing.unit ('Z_#[Zp1 : 'Z_q]) (unitrN1 _).
+pose uN1 := FinNzRing.unit ('Z_#[Zp1 : 'Z_q]) (unitrN1 _).
 apply: Extremal.Grp => //; exists (Zp_unitm uN1).
 rewrite Aut_aut order_injm ?injm_Zp_unitm ?in_setT //; split=> //.
   by rewrite (dvdn_trans _ even_p) // order_dvdn -val_eqE /= mulrNN.

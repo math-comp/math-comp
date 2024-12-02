@@ -466,7 +466,7 @@ Qed.
 Lemma Qnat_dvd (m d : nat) : (d %| m)%N -> (m%:R / d%:R : rat) \is a Num.nat.
 Proof. by move=> h; rewrite natrEint divr_ge0 ?ler0n // !pmulrn Qint_dvdz. Qed.
 
-Lemma dvdz_charf (R : ringType) p : p \in [char R] ->
+Lemma dvdz_charf (R : nzRingType) p : p \in [char R] ->
   forall n : int, (p %| n)%Z = (n%:~R == 0 :> R).
 Proof.
 move=> charRp [] n; rewrite [LHS](dvdn_charf charRp)//.

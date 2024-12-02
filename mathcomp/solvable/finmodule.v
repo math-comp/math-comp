@@ -47,7 +47,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope GRing.Theory FinRing.Theory.
+Import GroupScope GRing.Theory FinNzRing.Theory.
 Local Open Scope ring_scope.
 
 Module FiniteModule.
