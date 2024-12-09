@@ -46,15 +46,51 @@ HB.structure Definition Zmodule := {M of GRing.Zmodule M & Countable M}.
 #[short(type="countNzSemiRingType")]
 HB.structure Definition NzSemiRing := {R of GRing.NzSemiRing R & Countable R}.
 
+Module SemiRing.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use NzSemiRing.on instead.")]
+Notation on R := (NzSemiRing.on R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use NzSemiRing.copy instead.")]
+Notation copy T U := (NzSemiRing.copy T U) (only parsing).
+End SemiRing.
+
 #[short(type="countNzRingType")]
 HB.structure Definition NzRing := {R of GRing.NzRing R & Countable R}.
+
+Module Ring.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use NzRing.on instead.")]
+Notation on R := (NzRing.on R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use NzRing.copy instead.")]
+Notation copy T U := (NzRing.copy T U) (only parsing).
+End Ring.
 
 #[short(type="countComNzSemiRingType")]
 HB.structure Definition ComNzSemiRing :=
   {R of GRing.ComNzSemiRing R & Countable R}.
 
+Module ComSemiRing.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use ComNzSemiRing.on instead.")]
+Notation on R := (ComNzSemiRing.on R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use ComNzSemiRing.copy instead.")]
+Notation copy T U := (ComNzSemiRing.copy T U) (only parsing).
+End ComSemiRing.
+
 #[short(type="countComNzRingType")]
 HB.structure Definition ComNzRing := {R of GRing.ComNzRing R & Countable R}.
+
+Module ComSemiRing.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use ComNzSemiRing.on instead.")]
+Notation on R := (ComNzSemiRing.on R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use ComNzSemiRing.copy instead.")]
+Notation copy T U := (ComNzSemiRing.copy T U) (only parsing).
+End ComSemiRing.
 
 #[short(type="countUnitRingType")]
 HB.structure Definition UnitRing := {R of GRing.UnitRing R & Countable R}.

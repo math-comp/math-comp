@@ -911,6 +911,15 @@ Notation Nmodule_isSemiRing R := (Nmodule_isNzSemiRing R) (only parsing).
 HB.structure Definition NzSemiRing :=
   { R of Nmodule_isNzSemiRing R & Nmodule R }.
 
+Module SemiRing.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use NzSemiRing.on instead.")]
+Notation on R := (NzSemiRing.on R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use NzSemiRing.copy instead.")]
+Notation copy T U := (NzSemiRing.copy T U) (only parsing).
+End SemiRing.
+
 HB.factory Record isNzSemiRing R of Choice R := {
   zero : R;
   add : R -> R -> R;
@@ -1323,6 +1332,15 @@ End NzSemiRingTheory.
 
 #[short(type="nzRingType")]
 HB.structure Definition NzRing := { R of NzSemiRing R & Zmodule R }.
+
+Module Ring.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use NzRing.on instead.")]
+Notation on R := (NzRing.on R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use NzRing.copy instead.")]
+Notation copy T U := (NzRing.copy T U) (only parsing).
+End Ring.
 
 HB.factory Record Zmodule_isNzRing R of Zmodule R := {
   one : R;
@@ -2523,6 +2541,15 @@ Notation SemiRing_hasCommutativeMul R :=
 HB.structure Definition ComNzSemiRing :=
   {R of NzSemiRing R & NzSemiRing_hasCommutativeMul R}.
 
+Module ComSemiRing.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use ComNzSemiRing.on instead.")]
+Notation on R := (ComNzSemiRing.on R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use ComNzSemiRing.copy instead.")]
+Notation copy T U := (ComNzSemiRing.copy T U) (only parsing).
+End ComSemiRing.
+
 Module ComNzSemiRingExports.
 Bind Scope ring_scope with ComNzSemiRing.sort.
 End ComNzSemiRingExports.
@@ -2635,6 +2662,15 @@ End ComSemiRingTheory.
 
 #[short(type="comNzRingType")]
 HB.structure Definition ComNzRing := {R of NzRing R & ComNzSemiRing R}.
+
+Module ComRing.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use ComNzRing.on instead.")]
+Notation on R := (ComNzRing.on R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use ComNzRing.copy instead.")]
+Notation copy T U := (ComNzRing.copy T U) (only parsing).
+End ComRing.
 
 HB.factory Record NzRing_hasCommutativeMul R of NzRing R := {
   mulrC : commutative (@mul R)
@@ -5168,6 +5204,15 @@ Notation isSubSemiRing R S U := (isSubNzSemiRing R S U) (only parsing).
 HB.structure Definition SubNzSemiRing (R : nzSemiRingType) (S : pred R) :=
   { U of SubNmodule R S U & NzSemiRing U & isSubNzSemiRing R S U }.
 
+Module SubSemiRing.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use SubNzSemiRing.on instead.")]
+Notation on R := (SubNzSemiRing.on R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use SubNzSemiRing.copy instead.")]
+Notation copy T U := (SubNzSemiRing.copy T U) (only parsing).
+End SubSemiRing.
+
 Section multiplicative.
 Context (R : nzSemiRingType) (S : pred R) (U : SubNzSemiRing.type S).
 Notation val := (val : U -> R).
@@ -5234,6 +5279,15 @@ HB.end.
 HB.structure Definition SubComNzSemiRing (R : nzSemiRingType) S :=
   {U of SubNzSemiRing R S U & ComNzSemiRing U}.
 
+Module SubComSemiRing.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use SubComNzSemiRing.on instead.")]
+Notation on R := (SubComNzSemiRing.on R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use SubComNzSemiRing.copy instead.")]
+Notation copy T U := (SubComNzSemiRing.copy T U) (only parsing).
+End SubComSemiRing.
+
 HB.factory Record SubNzSemiRing_isSubComNzSemiRing (R : comNzSemiRingType) S U
     of SubNzSemiRing R S U := {}.
 
@@ -5258,6 +5312,15 @@ HB.end.
 #[short(type="nzSubRingType")]
 HB.structure Definition SubNzRing (R : nzRingType) (S : pred R) :=
   { U of SubNzSemiRing R S U & NzRing U & isSubZmodule R S U }.
+
+Module SubRing.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use SubNzRing.on instead.")]
+Notation on R := (SubNzRing.on R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use SubNzRing.copy instead.")]
+Notation copy T U := (SubNzRing.copy T U) (only parsing).
+End SubRing.
 
 HB.factory Record SubZmodule_isSubNzRing (R : nzRingType) S U
     of SubZmodule R S U := {
@@ -5290,6 +5353,15 @@ HB.end.
 #[short(type="subComNzRingType")]
 HB.structure Definition SubComNzRing (R : nzRingType) S :=
   {U of SubNzRing R S U & ComNzRing U}.
+
+Module SubComRing.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use SubComNzRing.on instead.")]
+Notation on R := (SubComNzRing.on R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use SubComNzRing.copy instead.")]
+Notation copy T U := (SubComNzRing.copy T U) (only parsing).
+End SubComRing.
 
 HB.factory Record SubNzRing_isSubComNzRing (R : comNzRingType) S U
     of SubNzRing R S U := {}.
