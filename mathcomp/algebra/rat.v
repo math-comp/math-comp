@@ -497,7 +497,7 @@ Qed.
 Fact nonzero1q : oneq != zeroq. Proof. by []. Qed.
 
 HB.instance Definition _ :=
-  GRing.Zmodule_isComRing.Build rat mulqA mulqC mul1q mulq_addl nonzero1q.
+  GRing.Zmodule_isComNzRing.Build rat mulqA mulqC mul1q mulq_addl nonzero1q.
 
 Fact mulVq x : x != 0 -> mulq (invq x) x = 1.
 Proof.
@@ -508,7 +508,7 @@ Qed.
 
 Fact invq0 : invq 0 = 0. Proof. exact/eqP. Qed.
 
-HB.instance Definition _ := GRing.ComRing_isField.Build rat mulVq invq0.
+HB.instance Definition _ := GRing.ComNzRing_isField.Build rat mulVq invq0.
 
 Lemma numq_eq0 x : (numq x == 0) = (x == 0).
 Proof.

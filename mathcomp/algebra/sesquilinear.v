@@ -13,7 +13,7 @@ From mathcomp Require Import zmodp poly order ssrnum matrix mxalgebra vector.
 (*               M ^t phi := (M ^T) ^ phi                                     *)
 (*                           Notation in scope form_scope.                    *)
 (* involutive_rmorphism R == the type of involutive functions                 *)
-(*                           R has type ringType.                             *)
+(*                           R has type nzRingType.                           *)
 (*                           The HB class is InvolutiveRMorphism.             *)
 (*                                                                            *)
 (* {bilinear U -> U' -> V | s & s'} == the type of bilinear forms which are   *)
@@ -38,7 +38,7 @@ From mathcomp Require Import zmodp poly order ssrnum matrix mxalgebra vector.
 (* {hermitian U for eps & theta} == hermitian/skew-hermitian form             *)
 (*                           eps is a boolean flag,                           *)
 (*                           (false -> hermitian, true -> skew-hermitian),    *)
-(*                           theta is a function R -> R (R : ringType).       *)
+(*                           theta is a function R -> R (R : nzRingType).     *)
 (*                           The HB class is Hermitian.                       *)
 (*                           *%R is used as a the first scaling operator.     *)
 (*                           theta \; *R is used as the second scaling        *)
@@ -130,20 +130,20 @@ Notation "M ^ phi" := (map_mx phi M) : form_scope.
 Notation "M ^t phi" := ((M ^T) ^ phi) : form_scope.
 
 (* TODO: move? *)
-Lemma eq_map_mx_id (R : ringType) m n (M : 'M[R]_(m, n)) (f : R -> R) :
+Lemma eq_map_mx_id (R : nzRingType) m n (M : 'M[R]_(m, n)) (f : R -> R) :
   f =1 id -> M ^ f = M.
 Proof. by move=> /eq_map_mx->; rewrite map_mx_id. Qed.
 
-HB.mixin Record isInvolutive (R : ringType) (f : R -> R) :=
+HB.mixin Record isInvolutive (R : nzRingType) (f : R -> R) :=
   { involutive_subproof : involutive f }.
 
 (* TODO: move? *)
 #[short(type="involutive_rmorphism")]
-HB.structure Definition InvolutiveRMorphism (R : ringType) :=
+HB.structure Definition InvolutiveRMorphism (R : nzRingType) :=
   { f of @GRing.RMorphism R R f & @isInvolutive R f }.
 
 Section InvolutiveTheory.
-Variable R : ringType.
+Variable R : nzRingType.
 
 Let idfunK : involutive (@idfun R). Proof. by []. Qed.
 
@@ -181,7 +181,7 @@ Notation "[ 'revop' revop 'of' op ]" :=
   (@RevOp _ _ _ revop op (fun _ _ => erefl))
   (at level 0, format "[ 'revop'  revop  'of'  op ]") : form_scope.*)
 
-HB.mixin Record isBilinear (R : ringType) (U U' : lmodType R) (V : zmodType)
+HB.mixin Record isBilinear (R : nzRingType) (U U' : lmodType R) (V : zmodType)
     (s : R -> V -> V) (s' : R -> V -> V) (f : U -> U' -> V) := {
   additivel_subproof : forall u', additive (f ^~ u') ;
   additiver_subproof : forall u, additive (f u) ;
@@ -190,16 +190,16 @@ HB.mixin Record isBilinear (R : ringType) (U U' : lmodType R) (V : zmodType)
 }.
 
 #[short(type="bilinear")]
-HB.structure Definition Bilinear (R : ringType) (U U' : lmodType R)
+HB.structure Definition Bilinear (R : nzRingType) (U U' : lmodType R)
     (V : zmodType) (s : R -> V -> V) (s' : R -> V -> V) :=
   {f of isBilinear R U U' V s s' f}.
 
-Definition bilinear_for (R : ringType) (U U' : lmodType R) (V : zmodType)
+Definition bilinear_for (R : nzRingType) (U U' : lmodType R) (V : zmodType)
     (s : GRing.Scale.law R V) (s' : GRing.Scale.law R V) (f : U -> U' -> V) :=
   ((forall u', GRing.linear_for (s : R -> V -> V) (f ^~ u'))
   * (forall u, GRing.linear_for s' (f u)))%type.
 
-HB.factory Record bilinear_isBilinear (R : ringType) (U U' : lmodType R)
+HB.factory Record bilinear_isBilinear (R : nzRingType) (U U' : lmodType R)
     (V : zmodType) (s : GRing.Scale.law R V) (s' : GRing.Scale.law R V)
     (f : U -> U' -> V) := {
   bilinear_subproof : bilinear_for s s' f
@@ -217,7 +217,7 @@ Module BilinearExports.
 
 Module Bilinear.
 Section bilinear.
-Variables (R : ringType) (U U' : lmodType R) (V : zmodType) (s s' : R -> V -> V).
+Variables (R : nzRingType) (U U' : lmodType R) (V : zmodType) (s s' : R -> V -> V).
 
 Local Notation bilinear f := (bilinear_for *:%R *:%R f).
 Local Notation biscalar f := (bilinear_for *%R *%R f).
@@ -264,18 +264,18 @@ End BilinearExports.
 Export BilinearExports.
 
 #[non_forgetful_inheritance]
-HB.instance Definition _ (R : ringType) (U U' : lmodType R) (V : zmodType)
+HB.instance Definition _ (R : nzRingType) (U U' : lmodType R) (V : zmodType)
     (s : R -> V -> V) (s' : R -> V -> V)
   (f : {bilinear U -> U' -> V | s & s'}) (u : U)
   := @GRing.isAdditive.Build U' V (f u) (@additiver_subproof _ _ _ _ _ _ f u).
 
 #[non_forgetful_inheritance]
-HB.instance Definition _ (R : ringType) (U U' : lmodType R) (V : zmodType)
+HB.instance Definition _ (R : nzRingType) (U U' : lmodType R) (V : zmodType)
     (s : R -> V -> V) (s' : R -> V -> V) (f : @bilinear R U U' V s s') (u : U)
   := @GRing.isScalable.Build _ _ _ _ (f u) (@linearr_subproof _ _ _ _ _ _ f u).
 
 Section applyr.
-Variables (R : ringType) (U U' : lmodType R) (V : zmodType)
+Variables (R : nzRingType) (U U' : lmodType R) (V : zmodType)
   (s s' : R -> V -> V).
 
 Definition applyr_head t (f : U -> U' -> V) u v := let: tt := t in f v u.
@@ -298,7 +298,7 @@ Coercion Bilinear.wrap : Bilinear.map_class >-> Bilinear.wrapped.
 Canonical Bilinear.wrap.
 
 Section BilinearTheory.
-Variable R : ringType.
+Variable R : nzRingType.
 
 Section GenericProperties.
 Variables (U U' : lmodType R) (V : zmodType) (s : R -> V -> V) (s' : R -> V -> V).
@@ -366,7 +366,7 @@ End GenericProperties.
 
 Section BidirectionalLinearZ.
 Variables (U U' : lmodType R) (V : zmodType) (s s' : R -> V -> V).
-Variables (S : ringType) (h : GRing.Scale.law S V) (h' : GRing.Scale.law S V).
+Variables (S : nzRingType) (h : GRing.Scale.law S V) (h' : GRing.Scale.law S V).
 
 Lemma linearZl z (c : S) (a : R) (h_c := h c)
     (f : Bilinear.map_for_left U U' s s' a h_c) u :
@@ -393,11 +393,11 @@ End BidirectionalLinearZ.
 End BilinearTheory.
 
 (* TODO
-Canonical rev_mulmx (R : ringType) m n p := [revop mulmxr of @mulmx R m n p].
+Canonical rev_mulmx (R : nzRingType) m n p := [revop mulmxr of @mulmx R m n p].
 *)
 
-(*Canonical mulmx_bilinear (R : comRingType) m n p := [bilinear of @mulmx R m n p].*)
-Lemma mulmx_is_bilinear (R : comRingType) m n p : bilinear_for
+(*Canonical mulmx_bilinear (R : comNzRingType) m n p := [bilinear of @mulmx R m n p].*)
+Lemma mulmx_is_bilinear (R : comNzRingType) m n p : bilinear_for
   (GRing.Scale.Law.clone _ _ *:%R _) (GRing.Scale.Law.clone _ _ *:%R _)
   (@mulmx R m n p).
 Proof.
@@ -406,7 +406,7 @@ split=> [u'|u] a x y /=.
 - by rewrite mulmxDr scalemxAr.
 Qed.
 
-HB.instance Definition _ (R : comRingType) m n p := bilinear_isBilinear.Build R
+HB.instance Definition _ (R : comNzRingType) m n p := bilinear_isBilinear.Build R
   [the lmodType R of 'M[R]_(m, n)] [the lmodType R of 'M[R]_(n, p)]
   [the zmodType of 'M[R]_(m, p)] _ _ (@mulmx R m n p)
   (mulmx_is_bilinear R m n p).
@@ -457,12 +457,12 @@ Proof. by rewrite/form=> -> u v; rewrite mulmx0 mul0mx mxE. Qed.
 
 End BilinearForms.
 
-HB.mixin Record isHermitianSesquilinear (R : ringType) (U : lmodType R)
+HB.mixin Record isHermitianSesquilinear (R : nzRingType) (U : lmodType R)
     (eps : bool) (theta : R -> R) (f : U -> U -> R) := {
   hermitian_subproof : forall x y : U, f x y = (-1) ^+ eps * theta (f y x)
 }.
 
-HB.structure Definition Hermitian (R : ringType) (U : lmodType R)
+HB.structure Definition Hermitian (R : nzRingType) (U : lmodType R)
     (eps : bool) (theta : R -> R) :=
   {f of @Bilinear R U U _ ( *%R ) (theta \; *%R) f &
         @isHermitianSesquilinear R U eps theta f}.
@@ -472,16 +472,16 @@ Notation "{ 'hermitian' U 'for' eps & theta }" := (@Hermitian.type _ U eps theta
 
 (* duplicate to trick HB *)
 #[non_forgetful_inheritance]
-HB.instance Definition _ (R : ringType) (U : lmodType R)
+HB.instance Definition _ (R : nzRingType) (U : lmodType R)
     (eps : bool) (theta : R -> R) (f : {hermitian U for eps & theta}) (u : U) :=
   @GRing.isAdditive.Build _ _ (f u) (@additiver_subproof _ _ _ _ _ _ f u).
 
 #[non_forgetful_inheritance]
-HB.instance Definition _ (R : ringType) (U : lmodType R)
+HB.instance Definition _ (R : nzRingType) (U : lmodType R)
     (eps : bool) (theta : R -> R) (f : {hermitian U for eps & theta}) (u : U) :=
   @GRing.isScalable.Build _ _ _ _ (f u) (@linearr_subproof _ _ _ _ _ _ f u).
 
-(*Variables (R : ringType) (U : lmodType R) (eps : bool) (theta : R -> R).
+(*Variables (R : nzRingType) (U : lmodType R) (eps : bool) (theta : R -> R).
 Implicit Types phU : phant U.
 
 Local Coercion GRing.Scale.op : GRing.Scale.law >-> Funclass.
@@ -757,18 +757,18 @@ Notation "{ 'skew_symmetric' U }" := ({hermitian U for true & idfun})
 Notation "{ 'hermitian_sym' U 'for' theta }" := ({hermitian U for false & theta})
   (at level 0, format "{ 'hermitian_sym'  U  'for'  theta }") : ring_scope.
 
-Definition is_skew (R : ringType) (eps : bool) (theta : R -> R)
+Definition is_skew (R : nzRingType) (eps : bool) (theta : R -> R)
   (U : lmodType R) (form : {hermitian U for eps & theta}) :=
   (eps = true) /\ (theta =1 id).
-Definition is_sym (R : ringType) (eps : bool) (theta : R -> R)
+Definition is_sym (R : nzRingType) (eps : bool) (theta : R -> R)
   (U : lmodType R) (form : {hermitian U for eps & theta}) :=
   (eps = false) /\ (theta =1 id).
-Definition is_hermsym  (R : ringType) (eps : bool) (theta : R -> R)
+Definition is_hermsym  (R : nzRingType) (eps : bool) (theta : R -> R)
   (U : lmodType R) (form : {hermitian U for eps & theta}) :=
   (eps = false).
 
 Section HermitianModuleTheory.
-Variables (R : ringType) (eps : bool) (theta : {rmorphism R -> R}).
+Variables (R : nzRingType) (eps : bool) (theta : {rmorphism R -> R}).
 Variables (U : lmodType R) (form : {hermitian U for eps & theta}).
 
 Local Notation "''[' u , v ]" := (form u%R v%R) : ring_scope.
@@ -839,7 +839,7 @@ Arguments pairwise_orthogonal {R eps theta U} form s.
 Arguments orthonormal {R eps theta U} form s.
 
 Section HermitianIsometry.
-Variables (R : ringType) (eps : bool) (theta : {rmorphism R -> R}).
+Variables (R : nzRingType) (eps : bool) (theta : {rmorphism R -> R}).
 Variables (U1 U2 : lmodType R) (form1 : {hermitian U1 for eps & theta})
           (form2 : {hermitian U2 for eps & theta}).
 
