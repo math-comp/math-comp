@@ -668,7 +668,7 @@ Lemma polyC_exp n : {morph (@polyC R) : c / c ^+ n}. Proof. exact: rmorphXn. Qed
 Lemma polyC_natr n : n%:R%:P = n%:R :> {poly R}.
 Proof. by rewrite rmorph_nat. Qed.
 
-Lemma char_poly : [char {poly R}] =i [char R].
+Lemma char'_poly : [char' {poly R}] =i [char' R].
 Proof.
 move=> p; rewrite !inE; congr (_ && _).
 apply/eqP/eqP=> [/(congr1 val) /=|]; last by rewrite -polyC_natr => ->.
@@ -1808,6 +1808,9 @@ Proof. by move=> E; rewrite !poly_def; apply: eq_bigr => i _; rewrite E. Qed.
 
 End PolynomialTheory.
 
+#[deprecated(since="mathcomp 2.4.0", note="Use char'_poly instead.")]
+Notation char_poly := char'_poly (only parsing).
+
 Prenex Implicits polyC polyCK Poly polyseqK lead_coef root horner polyOver.
 Arguments monic {R}.
 Notation "\poly_ ( i < n ) E" := (poly n (fun i => E)) : ring_scope.
@@ -1838,24 +1841,24 @@ Hypothesis prim_z : n.-primitive_root z.
 Import prime.
 Let n_gt0 := prim_order_gt0 prim_z.
 
-Lemma prim_root_charF p : (p %| n)%N -> p \in [char R] = false.
+Lemma prim_root_char'F p : (p %| n)%N -> p \in [char' R] = false.
 Proof.
-move=> pn; apply: contraTF isT => char_p; have p_prime := charf_prime char_p.
+move=> pn; apply: contraTF isT => char'_p; have p_prime := char'f_prime char'_p.
 have /dvdnP[[|k] n_eq_kp] := pn; first by rewrite n_eq_kp in (n_gt0).
 have /eqP := prim_expr_order prim_z; rewrite n_eq_kp exprM.
-rewrite -Frobenius_autE -(Frobenius_aut1 char_p) -subr_eq0 -rmorphB/=.
-rewrite Frobenius_autE expf_eq0// prime_gt0//= subr_eq0 => /eqP.
+rewrite -Frobenius_aut'E -(Frobenius_aut'1 char'_p) -subr_eq0 -rmorphB/=.
+rewrite Frobenius_aut'E expf_eq0// prime_gt0//= subr_eq0 => /eqP.
 move=> /eqP; rewrite -(prim_order_dvd prim_z) n_eq_kp.
 rewrite -[X in _ %| X]muln1 dvdn_pmul2l ?dvdn1// => /eqP peq1.
 by rewrite peq1 in p_prime.
 Qed.
 
-Lemma char_prim_root : [char R]^'.-nat n.
-Proof. by apply/pnatP=> // p pp pn; rewrite inE/= prim_root_charF. Qed.
+Lemma char'_prim_root : [char' R]^'.-nat n.
+Proof. by apply/pnatP=> // p pp pn; rewrite inE/= prim_root_char'F. Qed.
 
 Lemma prim_root_pi_eq0 m : \pi(n).-nat m -> m%:R != 0 :> R.
 Proof.
-by rewrite natf_neq0; apply: sub_in_pnat => p _; apply: pnatPpi char_prim_root.
+by rewrite natf_neq0'; apply: sub_in_pnat => p _; apply: pnatPpi char'_prim_root.
 Qed.
 
 Lemma prim_root_dvd_eq0 m : (m %| n)%N -> m%:R != 0 :> R.
@@ -1868,6 +1871,11 @@ Lemma prim_root_natf_neq0 : n%:R != 0 :> R.
 Proof. by rewrite prim_root_dvd_eq0. Qed.
 
 End IdomainPrimRoot.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use prim_root_char'F instead.")]
+Notation prim_root_charF := prim_root_char'F (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use char'_prim_root instead.")]
+Notation char_prim_root := char'_prim_root (only parsing).
 
 (* Container morphism. *)
 Section MapPoly.

@@ -16,7 +16,7 @@ From mathcomp Require Import fieldext.
 (*         separable K E <=> every member of E is separable over K.           *)
 (* separable_generator K E == some x \in E that generates the largest         *)
 (*                           subfield K[x] that is separable over K.          *)
-(* purely_inseparable_element K x <=> there is a [char L].-nat n such that    *)
+(* purely_inseparable_element K x <=> there is a [char' L].-nat n such that    *)
 (*                           x ^+ n \in K.                                    *)
 (* purely_inseparable K E <=> every member of E is purely inseparable over K. *)
 (*                                                                            *)
@@ -248,11 +248,11 @@ exists (- (r3`_0 / r3`_1)); rewrite [kappa _]rmorphN fmorph_div -!coef_map Dr3.
 by rewrite !coefZ polyseqXsubC mulr1 mulrC mulKf ?opprK.
 Qed.
 
-Lemma char0_PET (q : {poly F}) :
-    q != 0 -> root (q ^ iota) y -> [char F] =i pred0 ->
+Lemma char'0_PET (q : {poly F}) :
+    q != 0 -> root (q ^ iota) y -> [char' F] =i pred0 ->
   exists n, let z := y *+ n - x in inFz z x /\ inFz z y.
 Proof.
-move=> nz_q qy_0 /charf0P charF0.
+move=> nz_q qy_0 /char'f0P char'F0.
 without loss{nz_q} sep_q: q qy_0 / separable_poly q.
   move=> IHq; apply: IHq (make_separable nz_q).
   have /dvdpP[q1 Dq] := dvdp_gcdl q q^`().
@@ -264,7 +264,7 @@ without loss{nz_q} sep_q: q qy_0 / separable_poly q.
   rewrite Dq rmorphM /= gcdp_map -(eqp_dvdr _ (gcdp_mul2l _ _ _)) -deriv_map Dr.
   rewrite dvdp_gcd derivM deriv_exp derivXsubC mul1r !mulrA dvdp_mulIr /=.
   rewrite mulrDr mulrA dvdp_addr ?dvdp_mulIr // exprS -scaler_nat -!scalerAr.
-  rewrite dvdpZr -?(rmorph_nat iota) ?fmorph_eq0 ?charF0 //.
+  rewrite dvdpZr -?(rmorph_nat iota) ?fmorph_eq0 ?char'F0 //.
   rewrite mulrA dvdp_mul2r ?expf_neq0 ?polyXsubC_eq0 //.
   by rewrite Gauss_dvdpl ?dvdp_XsubCl // coprimep_sym coprimep_XsubC.
 have [r nz_r PETxy] := large_field_PET qy_0 sep_q.
@@ -273,12 +273,15 @@ have /(max_ring_poly_roots nz_r)/=/implyP: uniq_roots ts.
   rewrite uniq_rootsE mkseq_uniq // => m n eq_mn; apply/eqP; rewrite eqn_leq.
   wlog suffices: m n eq_mn / m <= n by move=> IHmn; rewrite !IHmn.
   move/fmorph_inj/eqP: eq_mn; rewrite -subr_eq0 leqNgt; apply: contraL => lt_mn.
-  by rewrite -natrB ?(ltnW lt_mn) // charF0 -lt0n subn_gt0.
+  by rewrite -natrB ?(ltnW lt_mn) // char'F0 -lt0n subn_gt0.
 rewrite size_mkseq ltnn implybF all_map => /allPn[n _ /= /PETxy].
 by rewrite rmorph_nat mulr_natl; exists n.
 Qed.
 
 End InfinitePrimitiveElementTheorem.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use char'0_PET instead.")]
+Notation char0_PET := (char'0_PET) (only parsing).
 
 Section Separable.
 
@@ -399,30 +402,30 @@ rewrite dvdp_gcd dvdpp /= => /(dvdp_leq nzPx')/leq_trans/(_ (size_poly _ _)).
 by rewrite size_minPoly ltnn.
 Qed.
 
-Lemma separablePn :
-  reflect (exists2 p, p \in [char L] &
+Lemma separablePn' :
+  reflect (exists2 p, p \in [char' L] &
             exists2 g, g \is a polyOver K & minPoly K x = g \Po 'X^p)
           (~~ separable_element K x).
 Proof.
 rewrite separable_nz_der negbK; set f := minPoly K x.
 apply: (iffP eqP) => [f'0 | [p Hp [g _ ->]]]; last first.
-  by rewrite deriv_comp derivXn -scaler_nat (charf0 Hp) scale0r mulr0.
+  by rewrite deriv_comp derivXn -scaler_nat (char'f0 Hp) scale0r mulr0.
 pose n := adjoin_degree K x; have sz_f: size f = n.+1 := size_minPoly K x.
 have fn1: f`_n = 1 by rewrite -(monicP (monic_minPoly K x)) lead_coefE sz_f.
 have dimKx: (adjoin_degree K x)%:R == 0 :> L.
   by rewrite -(coef0 _ n.-1) -f'0 coef_deriv fn1.
-have /natf0_char[// | p charLp] := dimKx.
-have /dvdnP[r Dn]: (p %| n)%N by rewrite (dvdn_charf charLp).
+have /natf0_char'[// | p char'Lp] := dimKx.
+have /dvdnP[r Dn]: (p %| n)%N by rewrite (dvdn_char'f char'Lp).
 exists p => //; exists (\poly_(i < r.+1) f`_(i * p)).
   by apply: polyOver_poly => i _; rewrite (polyOverP _) ?minPolyOver.
 rewrite comp_polyE size_poly_eq -?Dn ?fn1 ?oner_eq0 //.
-have pr_p := charf_prime charLp; have p_gt0 := prime_gt0 pr_p.
+have pr_p := char'f_prime char'Lp; have p_gt0 := prime_gt0 pr_p.
 apply/polyP=> i; rewrite coef_sum.
 have [[{}i ->] | p'i] := altP (@dvdnP p i); last first.
   rewrite big1 => [|j _]; last first.
     rewrite coefZ -exprM coefXn [_ == _](contraNF _ p'i) ?mulr0 // => /eqP->.
     by rewrite dvdn_mulr.
-  rewrite (dvdn_charf charLp) in p'i; apply: mulfI p'i _ _ _.
+  rewrite (dvdn_char'f char'Lp) in p'i; apply: mulfI p'i _ _ _.
   by rewrite mulr0 mulr_natl; case: i => // i; rewrite -coef_deriv f'0 coef0.
 have [ltri | leir] := leqP r.+1 i.
   rewrite nth_default ?sz_f ?Dn ?ltn_pmul2r ?big1 // => j _.
@@ -563,6 +566,9 @@ Qed.
 
 End SeparableElement.
 
+#[deprecated(since="mathcomp 2.4.0", note="Use separablePn' instead.")]
+Notation separablePn := (separablePn') (only parsing).
+
 Arguments separable_elementP {K x}.
 
 Lemma separable_elementS K E x :
@@ -597,15 +603,15 @@ rewrite (Derivation_separable derDx sepKx) -/Dx_p Dx_p_0 ?polyOver_comp //.
 by rewrite add0r mulrCA Dx_p_0 ?minPolyOver ?oppr0 ?mul0r.
 Qed.
 
-Lemma separable_exponent K x :
-  exists n, [char L].-nat n && separable_element K (x ^+ n).
+Lemma separable_exponent' K x :
+  exists n, [char' L].-nat n && separable_element K (x ^+ n).
 Proof.
 pose d := adjoin_degree K x; move: {2}d.+1 (ltnSn d) => n.
 elim: n => // n IHn in x @d *; rewrite ltnS => le_d_n.
-have [[p charLp]|] := altP (separablePn K x); last by rewrite negbK; exists 1.
-case=> g Kg defKx; have p_pr := charf_prime charLp.
-suffices /IHn[m /andP[charLm sepKxpm]]: adjoin_degree K (x ^+ p) < n.
-  by exists (p * m)%N; rewrite pnatM pnatE // charLp charLm exprM.
+have [[p char'Lp]|] := altP (separablePn' K x); last by rewrite negbK; exists 1.
+case=> g Kg defKx; have p_pr := char'f_prime char'Lp.
+suffices /IHn[m /andP[char'Lm sepKxpm]]: adjoin_degree K (x ^+ p) < n.
+  by exists (p * m)%N; rewrite pnatM pnatE // char'Lp char'Lm exprM.
 apply: leq_trans le_d_n; rewrite -ltnS -!size_minPoly.
 have nzKx: minPoly K x != 0 by rewrite monic_neq0 ?monic_minPoly.
 have nzg: g != 0 by apply: contra_eqN defKx => /eqP->; rewrite comp_poly0.
@@ -617,18 +623,24 @@ apply: contra_eqT (size_minPoly K x); rewrite defKx -leqNgt => /size1_polyC->.
 by rewrite comp_polyC size_polyC; case: (_ != 0).
 Qed.
 
-Lemma charf0_separable K : [char L] =i pred0 -> forall x, separable_element K x.
+#[deprecated(since="mathcomp 2.4.0", note="Use separable_exponent' instead.")]
+Notation separable_exponent := (separable_exponent') (only parsing).
+
+Lemma char'f0_separable K : [char' L] =i pred0 -> forall x, separable_element K x.
 Proof.
-move=> charL0 x; have [n /andP[charLn]] := separable_exponent K x.
-by rewrite (pnat_1 charLn (sub_in_pnat _ charLn)) // => p _; rewrite charL0.
+move=> char'L0 x; have [n /andP[char'Ln]] := separable_exponent' K x.
+by rewrite (pnat_1 char'Ln (sub_in_pnat _ char'Ln)) // => p _; rewrite char'L0.
 Qed.
 
-Lemma charf_p_separable K x e p :
-  p \in [char L] -> separable_element K x = (x \in <<K; x ^+ (p ^ e.+1)>>%VS).
+#[deprecated(since="mathcomp 2.4.0", note="Use char'f0_separable instead.")]
+Notation charf0_separable := (char'f0_separable) (only parsing).
+
+Lemma char'f_p_separable K x e p :
+  p \in [char' L] -> separable_element K x = (x \in <<K; x ^+ (p ^ e.+1)>>%VS).
 Proof.
-move=> charLp; apply/idP/idP=> [sepKx | /Fadjoin_poly_eq]; last first.
+move=> char'Lp; apply/idP/idP=> [sepKx | /Fadjoin_poly_eq]; last first.
   set m := p ^ _; set f := Fadjoin_poly K _ x => Dx; apply/separable_elementP.
-  have mL0: m%:R = 0 :> L by apply/eqP; rewrite -(dvdn_charf charLp) dvdn_exp.
+  have mL0: m%:R = 0 :> L by apply/eqP; rewrite -(dvdn_char'f char'Lp) dvdn_exp.
   exists ('X - (f \Po 'X^m)); split.
   - by rewrite rpredB ?polyOver_comp ?rpredX ?polyOverX ?Fadjoin_polyOver.
   - by rewrite rootE !hornerE horner_comp hornerXn Dx subrr.
@@ -644,8 +656,8 @@ have [K'g]: g \is a polyOver K' /\ q \is a polyOver K'.
   by rewrite minPolyOver rpredB ?rpredX ?polyOverX // polyOverC memv_adjoin.
 have /dvdpP[c Dq]: 'X - x%:P %| q by rewrite dvdp_XsubCl root_minPoly.
 have co_c_g: coprimep c g.
-  have charPp: p \in [char {poly L}] := rmorph_char polyC charLp.
-  rewrite /g polyC_exp -!(Frobenius_autE charPp) -rmorphB coprimep_expr //.
+  have char'Pp: p \in [char' {poly L}] := rmorph_char' polyC char'Lp.
+  rewrite /g polyC_exp -!(Frobenius_aut'E char'Pp) -rmorphB coprimep_expr //.
   have: separable_poly q := separable_elementS sKK' sepKx.
   by rewrite Dq separable_mul => /and3P[].
 have{g K'g co_c_g} /size_poly1P[a nz_a Dc]: size c == 1.
@@ -656,35 +668,44 @@ rewrite {q}Dq {c}Dc mulrBr -rmorphM -rmorphN -cons_poly_def qualifE /=.
 by rewrite polyseq_cons !polyseqC nz_a /= rpredN andbCA => /and3P[/fpredMl->].
 Qed.
 
-Lemma charf_n_separable K x n :
-  [char L].-nat n -> 1 < n -> separable_element K x = (x \in <<K; x ^+ n>>%VS).
+#[deprecated(since="mathcomp 2.4.0", note="Use char'f_p_separable instead.")]
+Notation charf_p_separable := (char'f_p_separable) (only parsing).
+
+Lemma char'f_n_separable K x n :
+  [char' L].-nat n -> 1 < n -> separable_element K x = (x \in <<K; x ^+ n>>%VS).
 Proof.
-rewrite -pi_pdiv; set p := pdiv n => charLn pi_n_p.
-have charLp: p \in [char L] := pnatPpi charLn pi_n_p.
-have <-: (n`_p)%N = n by rewrite -(eq_partn n (charf_eq charLp)) part_pnat_id.
-by rewrite p_part lognE -mem_primes pi_n_p -charf_p_separable.
+rewrite -pi_pdiv; set p := pdiv n => char'Ln pi_n_p.
+have char'Lp: p \in [char' L] := pnatPpi char'Ln pi_n_p.
+have <-: (n`_p)%N = n by rewrite -(eq_partn n (char'f_eq char'Lp)) part_pnat_id.
+by rewrite p_part lognE -mem_primes pi_n_p -char'f_p_separable.
 Qed.
 
-Definition purely_inseparable_element U x :=
-  x ^+ ex_minn (separable_exponent <<U>> x) \in U.
+#[deprecated(since="mathcomp 2.4.0", note="Use char'f_n_separable instead.")]
+Notation charf_n_separable := (char'f_n_separable) (only parsing).
 
-Lemma purely_inseparable_elementP {K x} :
-  reflect (exists2 n, [char L].-nat n & x ^+ n \in K)
+Definition purely_inseparable_element U x :=
+  x ^+ ex_minn (separable_exponent' <<U>> x) \in U.
+
+Lemma purely_inseparable_elementP' {K x} :
+  reflect (exists2 n, [char' L].-nat n & x ^+ n \in K)
           (purely_inseparable_element K x).
 Proof.
 rewrite /purely_inseparable_element.
-case: ex_minnP => n /andP[charLn /=]; rewrite subfield_closed => sepKxn min_xn.
-apply: (iffP idP) => [Kxn | [m charLm Kxm]]; first by exists n.
-have{min_xn}: n <= m by rewrite min_xn ?charLm ?base_separable.
+case: ex_minnP => n /andP[char'Ln /=]; rewrite subfield_closed => sepKxn min_xn.
+apply: (iffP idP) => [Kxn | [m char'Lm Kxm]]; first by exists n.
+have{min_xn}: n <= m by rewrite min_xn ?char'Lm ?base_separable.
 rewrite leq_eqVlt => /predU1P[-> // | ltnm]; pose p := pdiv m.
-have m_gt1: 1 < m by have [/leq_ltn_trans->] := andP charLn.
-have charLp: p \in [char L] by rewrite (pnatPpi charLm) ?pi_pdiv.
+have m_gt1: 1 < m by have [/leq_ltn_trans->] := andP char'Ln.
+have char'Lp: p \in [char' L] by rewrite (pnatPpi char'Lm) ?pi_pdiv.
 have [/p_natP[em Dm] /p_natP[en Dn]]: p.-nat m /\ p.-nat n.
-  by rewrite -!(eq_pnat _ (charf_eq charLp)).
+  by rewrite -!(eq_pnat _ (char'f_eq char'Lp)).
 rewrite Dn Dm ltn_exp2l ?prime_gt1 ?pdiv_prime // in ltnm.
 rewrite -(Fadjoin_idP Kxm) Dm -(subnKC ltnm) addSnnS expnD exprM -Dn.
-by rewrite -charf_p_separable.
+by rewrite -char'f_p_separable.
 Qed.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use purely_inseparable_elementP' instead.")]
+Notation purely_inseparable_elementP := (purely_inseparable_elementP') (only parsing).
 
 Lemma separable_inseparable_element K x :
   separable_element K x && purely_inseparable_element K x = (x \in K).
@@ -701,8 +722,8 @@ Lemma sub_inseparable K E x :
     (K <= E)%VS -> purely_inseparable_element K x ->
  purely_inseparable_element E x.
 Proof.
-move/subvP=> sKE /purely_inseparable_elementP[n charLn /sKE Exn].
-by apply/purely_inseparable_elementP; exists n.
+move/subvP=> sKE /purely_inseparable_elementP'[n char'Ln /sKE Exn].
+by apply/purely_inseparable_elementP'; exists n.
 Qed.
 
 Section PrimitiveElementTheorem.
@@ -822,15 +843,15 @@ Lemma strong_Primitive_Element_Theorem K x y :
   exists2 z : L, (<< <<K; y>>; x>> = <<K; z>>)%VS
                & separable_element K x -> separable_element K y.
 Proof.
-move=> sepKx_y; have [n /andP[charLn sepKyn]] := separable_exponent K y.
+move=> sepKx_y; have [n /andP[char'Ln sepKyn]] := separable_exponent' K y.
 have adjK_C z t: (<<<<K; z>>; t>> = <<<<K; t>>; z>>)%VS.
   by rewrite !agenv_add_id -!addvA (addvC <[_]>%VS).
 have [z defKz] := Primitive_Element_Theorem x sepKyn.
 exists z => [|/adjoin_separable->]; rewrite ?sepKx_y // -defKz.
-have [|n_gt1|-> //] := ltngtP n 1; first by case: (n) charLn.
+have [|n_gt1|-> //] := ltngtP n 1; first by case: (n) char'Ln.
 apply/eqP; rewrite !(adjK_C _ x) eqEsubv; apply/andP.
 split; apply/FadjoinP/andP; rewrite subv_adjoin ?rpredX ?memv_adjoin //=.
-by rewrite -charf_n_separable ?sepKx_y.
+by rewrite -char'f_n_separable ?sepKx_y.
 Qed.
 
 Definition separable U W : bool :=
@@ -862,10 +883,10 @@ Lemma inseparable_add K x y :
     purely_inseparable_element K x -> purely_inseparable_element K y ->
   purely_inseparable_element K (x + y).
 Proof.
-have insepP := purely_inseparable_elementP.
-move=> /insepP[n charLn Kxn] /insepP[m charLm Kym]; apply/insepP.
-have charLnm: [char L].-nat (n * m)%N by rewrite pnatM charLn.
-by exists (n * m)%N; rewrite ?exprDn_char // {2}mulnC !exprM memvD // rpredX.
+have insepP := purely_inseparable_elementP'.
+move=> /insepP[n char'Ln Kxn] /insepP[m char'Lm Kym]; apply/insepP.
+have char'Lnm: [char' L].-nat (n * m)%N by rewrite pnatM char'Ln.
+by exists (n * m)%N; rewrite ?exprDn_char' // {2}mulnC !exprM memvD // rpredX.
 Qed.
 
 Lemma inseparable_sum I r (P : pred I) (v_ : I -> L) K :
@@ -892,8 +913,8 @@ Proof.
 apply/(iffP idP)=> [/allP|] sep'K_E; last by apply/allP=> x /vbasis_mem/sep'K_E.
 move=> y /coord_vbasis->; apply/inseparable_sum=> i _.
 have: purely_inseparable_element K (vbasis E)`_i by apply/sep'K_E/memt_nth.
-case/purely_inseparable_elementP=> n charLn K_Ein.
-by apply/purely_inseparable_elementP; exists n; rewrite // exprZn rpredZ.
+case/purely_inseparable_elementP'=> n char'Ln K_Ein.
+by apply/purely_inseparable_elementP'; exists n; rewrite // exprZn rpredZ.
 Qed.
 
 Lemma adjoin_separable_eq K x : separable_element K x = separable K <<K; x>>%VS.
@@ -907,7 +928,7 @@ without loss sKE: K / (K <= E)%VS.
   exists x; first by split; last exact/(separable_elementS _ sepKEx)/capvSl.
   apply/purely_inseparableP=> y /sep'KExE; apply: sub_inseparable.
   exact/adjoinSl/capvSl.
-pose E_ i := (vbasis E)`_i; pose fP i := separable_exponent K (E_ i).
+pose E_ i := (vbasis E)`_i; pose fP i := separable_exponent' K (E_ i).
 pose f i := E_ i ^+ ex_minn (fP i); pose s := mkseq f (\dim E).
 pose K' := <<K & s>>%VS.
 have sepKs: all (separable_element K) s.
@@ -928,7 +949,7 @@ have [x sepKx defKx]: {x | x \in E /\ separable_element K x & K' = <<K; x>>%VS}.
   apply: adjoin_separable sepKy _; apply: adjoin_separableP Kyt_z.
   exact: separable_elementS (subv_adjoin K y) sepKt.
 exists x; rewrite // -defKx; apply/(all_nthP 0)=> i; rewrite size_tuple => ltiE.
-apply/purely_inseparable_elementP.
+apply/purely_inseparable_elementP'.
 exists (ex_minn (fP i)); first by case: ex_minnP => n /andP[].
 by apply/seqv_sub_adjoin/map_f; rewrite mem_iota.
 Qed.
@@ -1004,17 +1025,17 @@ Lemma purely_inseparable_trans M K E :
   purely_inseparable K M -> purely_inseparable M E -> purely_inseparable K E.
 Proof.
 have insepP := purely_inseparableP => /insepP insepK_M /insepP insepM_E.
-have insepPe := purely_inseparable_elementP.
-apply/insepP=> x /insepM_E/insepPe[n charLn /insepK_M/insepPe[m charLm Kxnm]].
-by apply/insepPe; exists (n * m)%N; rewrite ?exprM // pnatM charLn charLm.
+have insepPe := purely_inseparable_elementP'.
+apply/insepP=> x /insepM_E/insepPe[n char'Ln /insepK_M/insepPe[m char'Lm Kxnm]].
+by apply/insepPe; exists (n * m)%N; rewrite ?exprM // pnatM char'Ln char'Lm.
 Qed.
 
 End Separable.
 
 Arguments separable_elementP {F L K x}.
-Arguments separablePn {F L K x}.
+Arguments separablePn' {F L K x}.
 Arguments Derivation_separableP {F L K x}.
 Arguments adjoin_separableP {F L K x}.
-Arguments purely_inseparable_elementP {F L K x}.
+Arguments purely_inseparable_elementP' {F L K x}.
 Arguments separableP {F L K E}.
 Arguments purely_inseparableP {F L K E}.
