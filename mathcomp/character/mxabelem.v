@@ -783,7 +783,7 @@ have{Gregular} ntG: G :!=: 1%g.
   apply: contraL n_gt0; move/eqP=> G1; rewrite -leqNgt -(mxrank1 F n).
   rewrite -(mxrank0 F n n) -Gregular mxrankS //; apply/rfix_mxP=> x.
   by rewrite {1}G1 mul1mx => /set1P->; rewrite repr_mx1.
-have p_pr: prime p by case/andP: charFp.
+have p_pr := charf_prime charFp.
 have{ntG pG} [z]: {z | z \in 'Z(G) & #[z] = p}; last case/setIP=> Gz cGz ozp.
   apply: Cauchy => //; apply: contraR ntG; rewrite -p'natE // => p'Z.
   have pZ: p.-group 'Z(G) by rewrite (pgroupS (center_sub G)).
@@ -797,9 +797,11 @@ have{irrG faithfulG cGz1} Urz1: rG z - 1%:M \in unitmx.
   by rewrite !inE Gz mul1mx -order_eq1 ozp -implybNN neq_ltn orbC prime_gt1.
 do [case: n n_gt0 => // n' _; set n := n'.+1] in rG Urz1 *.
 have charMp: p \in [char 'M[F]_n].
-  exact: (rmorph_char (@scalar_mx F n)).
+  apply: (@rmorph_char _ _ (@scalar_mx F n)) => // x y.
+  move=> /(congr1 (fun m : 'M[F]_n => m 0 0)).
+  by rewrite !mxE !mulr1n.
 have{Urz1}: Frobenius_aut charMp (rG z - 1) \in GRing.unit by rewrite unitrX.
-rewrite (Frobenius_autB_comm _ (commr1 _)) Frobenius_aut1.
+rewrite (GRing.Frobenius_autB_prime_comm _ _ (commr1 _))// Frobenius_aut1.
 by rewrite -[_ (rG z)](repr_mxX rG) // -ozp expg_order repr_mx1 subrr unitr0.
 Qed.
 
