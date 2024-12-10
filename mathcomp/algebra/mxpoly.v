@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
-From mathcomp Require Import div fintype tuple finfun bigop fingroup perm.
-From mathcomp Require Import ssralg zmodp matrix mxalgebra poly polydiv.
+From mathcomp Require Import div monoid fintype tuple finfun bigop fingroup.
+From mathcomp Require Import perm ssralg zmodp matrix mxalgebra poly polydiv.
 
 (******************************************************************************)
 (*   This file provides basic support for formal computation with matrices,   *)
@@ -1183,7 +1183,7 @@ have [i_lt_m1 | m1_le_i] := ltnP i m1.
 rewrite -(subnK m1_le_i) exprD -[x ^+ m1]subr0 -(rootP px0) horner_coef.
 rewrite polySpred ?monic_neq0 // -/m1 big_ord_recr /= -lead_coefE.
 rewrite opprD addrC (monicP mon_p) mul1r subrK !mulrN -mulNr !mulr_sumr.
-apply: Msum => j _; rewrite mulrA mulrACA -exprD; apply: IHn.
+apply: Msum => j _; rewrite [X in M X]mulrA mulrACA -exprD; apply: IHn.
   by rewrite -addnS addnC addnBA // leq_subLR leq_add.
 by rewrite -mulN1r; do 2!apply: (genM) => //; apply: genR.
 Qed.

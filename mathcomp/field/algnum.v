@@ -3,9 +3,10 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime.
-From mathcomp Require Import ssralg poly polydiv ssrnum ssrint archimedean rat.
-From mathcomp Require Import finalg zmodp matrix mxalgebra mxpoly vector intdiv.
-From mathcomp Require Import falgebra fieldext separable galois algC cyclotomic.
+From mathcomp Require Import ssralg poly polydiv ssrnum ssrint archimedean.
+From mathcomp Require Import rat finalg zmodp matrix mxalgebra mxpoly vector.
+From mathcomp Require Import intdiv falgebra fieldext separable galois algC.
+From mathcomp Require Import cyclotomic.
 
 (******************************************************************************)
 (* This file provides a few basic results and constructions in algebraic      *)

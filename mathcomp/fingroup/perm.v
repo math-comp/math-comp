@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
 From mathcomp Require Import choice fintype tuple finfun bigop finset binomial.
-From mathcomp Require Import fingroup morphism.
+From mathcomp Require Import monoid fingroup morphism.
 
 (******************************************************************************)
 (* This file contains the definition and properties associated to the group   *)

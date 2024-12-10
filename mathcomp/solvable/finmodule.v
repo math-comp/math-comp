@@ -2,9 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype bigop ssralg finset fingroup.
-From mathcomp Require Import morphism perm finalg action gproduct commutator.
-From mathcomp Require Import cyclic.
+From mathcomp Require Import div choice fintype bigop ssralg finset monoid.
+From mathcomp Require Import fingroup morphism perm finalg action gproduct.
+From mathcomp Require Import commutator cyclic.
 
 (******************************************************************************)
 (*  This file regroups constructions and results that are based on the most   *)
@@ -298,7 +298,7 @@ have cocycle_mu: {in G & &, forall x y z,
   mu (x * y)%g z + mu x y ^@ z = mu y z + mu x (y * z)%g}%R.
 - move=> x y z Gx Gy Gz; apply: val_inj.
   apply: (mulgI (rH x * rH y * rH z)).
-  rewrite -(actrH _ _ Gz) addrC fmvalA fmvalJ ?nHG ?GrH //.
+  rewrite -(actrH _ _ Gz) addrC [in LHS]fmvalA fmvalJ ?nHG ?GrH //.
   rewrite mulgA -(mulgA _ (rH z)) -conjgC mulgA -!rHmul ?groupM //.
   by rewrite mulgA -mulgA -2!(mulgA (rH x)) -!rHmul ?groupM.
 move: mu => mu in rHmul mu_Pmul cocycle_mu nu nu_Hmul.
