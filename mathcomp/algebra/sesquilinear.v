@@ -1033,13 +1033,19 @@ Lemma orthovD U V W : (U '_|_ V + W)%VS = (U '_|_ V)%VS && (U '_|_ W)%VS.
 Proof. by rewrite ![(U '_|_ _)%VS]orthov_sym orthoDv. Qed.
 
 Definition nondegenerate := radv == 0%VS.
-Definition is_symplectic := [/\ nondegenerate, is_skew form &
-                                2 \in [char F] -> forall u, '[u, u] = 0].
-Definition is_orthogonal := [/\ nondegenerate, is_sym form &
-                                2 \in [char F] -> forall u, '[u, u] = 0].
+Definition is_symplectic' := [/\ nondegenerate, is_skew form &
+                                2 \in [char' F] -> forall u, '[u, u] = 0].
+Definition is_orthogonal' := [/\ nondegenerate, is_sym form &
+                                2 \in [char' F] -> forall u, '[u, u] = 0].
 Definition is_unitary := nondegenerate /\ (is_hermsym form).
 
 End HermitianFinVectTheory.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use is_symplectic' instead.")]
+Notation is_symplectic := is_symplectic' (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use is_orthogonal' instead.")]
+Notation is_orthogonal := is_orthogonal' (only parsing).
+
 Arguments orthogonalP {F eps theta vT form us vs}.
 Arguments orthovP {F eps theta vT form U V}.
 Arguments mem_orthovPn {F eps theta vT form V u}.

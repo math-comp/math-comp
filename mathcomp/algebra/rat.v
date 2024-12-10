@@ -799,7 +799,7 @@ Lemma numqK : {in Num.int, cancel (fun x => numq x) intr}.
 Proof. by move=> _ /intrP [x ->]; rewrite numq_int. Qed.
 
 Lemma natq_div m n : n %| m -> (m %/ n)%:R = m%:R / n%:R :> rat.
-Proof. exact/char0_natf_div/char_num. Qed.
+Proof. exact/char'0_natf_div/char'_num. Qed.
 
 Section InRing.
 
