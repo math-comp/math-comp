@@ -269,10 +269,10 @@ have [|k_gt1] := leqP k 1; last have [p p_pr /dvdnP[k1 Dk]] := pdivP k_gt1.
   rewrite -(size_map_inj_poly (can_inj intCK)) // -Df -Dpf.
   by rewrite -(subnKC g_gt1) -(subnKC (size_minCpoly z)) !addnS.
 move: cokn; rewrite Dk coprimeMl => /andP[cok1n].
-rewrite prime_coprime // (dvdn_charf (char_Fp p_pr)) => /co_fg {co_fg}.
-have charFpX: p \in [char {poly 'F_p}] by rewrite (rmorph_char polyC) ?char_Fp.
-rewrite -(coprimep_pexpr _ _ (prime_gt0 p_pr)) -(Frobenius_autE charFpX).
-rewrite -[g]comp_polyXr map_comp_poly -horner_map /= Frobenius_autE -rmorphXn.
+rewrite prime_coprime // (dvdn_pcharf (pchar_Fp p_pr)) => /co_fg {co_fg}.
+have pcharFpX: p \in [pchar {poly 'F_p}] by rewrite (rmorph_pchar polyC) ?pchar_Fp.
+rewrite -(coprimep_pexpr _ _ (prime_gt0 p_pr)) -(pFrobenius_autE pcharFpX).
+rewrite -[g]comp_polyXr map_comp_poly -horner_map /= pFrobenius_autE -rmorphXn.
 rewrite -!map_poly_comp (@eq_map_poly _ _ _ (polyC \o *~%R 1)); last first.
   by move=> a; rewrite /= !rmorph_int.
 rewrite map_poly_comp -[_.[_]]map_comp_poly /= => co_fg.
