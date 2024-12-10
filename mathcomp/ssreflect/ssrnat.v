@@ -138,10 +138,8 @@ Notation "m > n" := (gt m n) : coq_nat_scope.
 (* i.e., unprotected version of operators.                             *)
 
 Delimit Scope N_scope with num.
-(* use #[warning="-hiding-delimiting-key"] attribute once we require Coq 8.18 *)
-Set Warnings "-hiding-delimiting-key".
+#[warning="-hiding-delimiting-key"]
 Delimit Scope nat_scope with N.
-Set Warnings "hiding-delimiting-key".
 
 (* Postfix notation for the successor and predecessor functions.  *)
 (* SSreflect uses "pred" for the generic predicate type, and S as *)
