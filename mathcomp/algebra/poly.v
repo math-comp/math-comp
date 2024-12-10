@@ -658,9 +658,9 @@ Proof. by rewrite /lead_coef size_opp coefN. Qed.
 
 (* Polynomial ring structure. *)
 
-Fact polyC_multiplicative : multiplicative (@polyC R).
-Proof. by split; first apply: polyCM. Qed.
-HB.instance Definition _ := GRing.isMultiplicative.Build R {poly R} (@polyC R)
+Fact polyC_multiplicative : multiplicative1first (@polyC R).
+Proof. by split; last apply: polyCM. Qed.
+HB.instance Definition _ := GRing.isMultiplicative1first.Build R {poly R} (@polyC R)
   polyC_multiplicative.
 
 Lemma polyC_exp n : {morph (@polyC R) : c / c ^+ n}. Proof. exact: rmorphXn. Qed.
@@ -680,13 +680,13 @@ Proof.
 by rewrite -signr_odd; case: (odd n); rewrite ?mul1r // mulN1r size_opp.
 Qed.
 
-Fact coefp0_multiplicative : multiplicative (coefp 0 : {poly R} -> R).
+Fact coefp0_multiplicative : multiplicative1first (coefp 0 : {poly R} -> R).
 Proof.
-split=> [p q|]; last by rewrite polyCK.
+split=> [|p q]; first by rewrite polyCK.
 by rewrite [coefp 0 _]coefM big_ord_recl big_ord0 addr0.
 Qed.
 
-HB.instance Definition _ := GRing.isMultiplicative.Build {poly R} R (coefp 0)
+HB.instance Definition _ := GRing.isMultiplicative1first.Build {poly R} R (coefp 0)
   coefp0_multiplicative.
 
 (* Algebra structure of polynomials. *)
@@ -2011,16 +2011,16 @@ Implicit Types p : {poly aR}.
 
 Local Notation "p ^f" := (map_poly (GRing.RMorphism.sort f) p) : ring_scope.
 
-Fact map_poly_is_multiplicative : multiplicative (map_poly f).
+Fact map_poly_is_multiplicative : multiplicative1first (map_poly f).
 Proof.
-split=> [p q|]; apply/polyP=> i; last first.
+split=> [|p q]; apply/polyP=> i.
   by rewrite !(coef_map, coef1) /= rmorph_nat.
 rewrite coef_map /= !coefM /= !rmorph_sum; apply: eq_bigr => j _.
 by rewrite !coef_map rmorphM.
 Qed.
 
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build {poly aR} {poly rR} (map_poly f)
+  GRing.isMultiplicative1first.Build {poly aR} {poly rR} (map_poly f)
     map_poly_is_multiplicative.
 
 Lemma map_polyZ c p : (c *: p)^f = f c *: p^f.
@@ -2095,9 +2095,9 @@ Proof. by rewrite /horner_morph map_polyX hornerX. Qed.
 Fact horner_is_linear : linear_for (f \; *%R) (horner_morph cfu).
 Proof. by move=> c p q; rewrite /horner_morph linearP /= hornerD hornerZ. Qed.
 
-Fact horner_is_multiplicative : multiplicative (horner_morph cfu).
+Fact horner_is_multiplicative : multiplicative1first (horner_morph cfu).
 Proof.
-split=> [p q|]; last by rewrite /horner_morph rmorph1 hornerC.
+split=> [|p q]; first by rewrite /horner_morph rmorph1 hornerC.
 rewrite /horner_morph rmorphM /= hornerM_comm //.
 by apply: comm_coef_poly => i; rewrite coef_map cfu.
 Qed.
@@ -2107,7 +2107,7 @@ HB.instance Definition _ :=
     horner_is_linear.
 
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build {poly aR} rR (horner_morph cfu)
+  GRing.isMultiplicative1first.Build {poly aR} rR (horner_morph cfu)
     horner_is_multiplicative.
 
 End HornerMorph.
@@ -2630,12 +2630,12 @@ have evalE : horner_eval x =1 horner_morph cxid.
 by move=> c p q; rewrite !evalE linearP.
 Qed.
 
-Fact horner_eval_is_multiplicative x : multiplicative (horner_eval x).
+Fact horner_eval_is_multiplicative x : multiplicative1first (horner_eval x).
 Proof.
 have cxid: commr_rmorph idfun x by apply: mulrC.
 have evalE : horner_eval x =1 horner_morph cxid.
   by move=> p; congr _.[x]; rewrite map_poly_id.
-by split=> [p q|]; rewrite !evalE ?rmorph1// rmorphM.
+by split=> [|p q]; rewrite !evalE ?rmorph1// rmorphM.
 Qed.
 
 HB.instance Definition _ x :=
@@ -2643,7 +2643,7 @@ HB.instance Definition _ x :=
     (horner_eval_is_linear x).
 
 HB.instance Definition _ x :=
-  GRing.isMultiplicative.Build {poly R} R (horner_eval x)
+  GRing.isMultiplicative1first.Build {poly R} R (horner_eval x)
     (horner_eval_is_multiplicative x).
 
 Section HornerAlg.
@@ -2680,12 +2680,12 @@ Qed.
 
 End HornerAlg.
 
-Fact comp_poly_multiplicative q : multiplicative (comp_poly q).
+Fact comp_poly_multiplicative q : multiplicative1first (comp_poly q).
 Proof.
-split=> [p1 p2|]; last by rewrite comp_polyC.
+split=> [|p1 p2]; first by rewrite comp_polyC.
 by rewrite /comp_poly rmorphM hornerM_comm //; apply: mulrC.
 Qed.
-HB.instance Definition _ q := GRing.isMultiplicative.Build _ _ (comp_poly q)
+HB.instance Definition _ q := GRing.isMultiplicative1first.Build _ _ (comp_poly q)
   (comp_poly_multiplicative q).
 
 Lemma comp_polyM p q r : (p * q) \Po r = (p \Po r) * (q \Po r).

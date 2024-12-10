@@ -90,7 +90,7 @@ Proof. by apply/kAHomP => u _; rewrite lfunE. Qed.
 Lemma k1HomE V f : kHom 1 V f = ahom_in V f.
 Proof. by apply: andb_idr => /ahom_inP[_ f1]; apply/fixedSpaceP. Qed.
 
-Lemma kHom_lrmorphism (f : 'End(L)) : reflect (multiplicative f) (kHom 1 {:L} f).
+Lemma kHom_lrmorphism (f : 'End(L)) : reflect (multiplicative1first f) (kHom 1 {:L} f).
 Proof. by rewrite k1HomE; apply: ahomP. Qed.
 
 (* Lemma kHom_lrmorphism (f : 'End(L)) : reflect (lrmorphism f) (kHom 1 {:L} f). *)
@@ -148,17 +148,17 @@ Let kHomf : subvs_of E -> L := f \o vsval.
 Lemma kHom_is_additive : kHom K E f -> additive kHomf.
 Proof. by case/kHomP => fM idKf; apply: raddfB. Qed.
 
-Lemma kHom_is_multiplicative : kHom K E f -> multiplicative kHomf.
+Lemma kHom_is_multiplicative : kHom K E f -> multiplicative1first kHomf.
 Proof.
 case/kHomP=> fM idKf; rewrite /kHomf.
-by split=> [a b|] /=; [rewrite /= fM ?subvsP | rewrite algid1 idKf // mem1v].
+by split=> [|a b] /=; [rewrite algid1 idKf // mem1v | rewrite /= fM ?subvsP].
 Qed.
 
 Variable (homKEf : kHom K E f).
 HB.instance Definition _ :=
   @GRing.isAdditive.Build _ _ kHomf (kHom_is_additive homKEf).
 HB.instance Definition _ :=
-  @GRing.isMultiplicative.Build _ _ kHomf (kHom_is_multiplicative homKEf).
+  @GRing.isMultiplicative1first.Build _ _ kHomf (kHom_is_multiplicative homKEf).
 
 Definition kHom_rmorphism := Eval hnf in (kHomf : {rmorphism _ -> _}).
 
@@ -277,7 +277,7 @@ Proof. by rewrite kAutE k1AHom. Qed.
 Lemma kAutf_lker0 K f : kHom K {:L} f -> lker f == 0%VS.
 Proof.
 move/(kHomSl (sub1v _))/kHom_lrmorphism=> fM.
-pose fmM := GRing.isMultiplicative.Build _ _ _ fM.
+pose fmM := GRing.isMultiplicative1first.Build _ _ _ fM.
 pose fRM : {rmorphism _ -> _} := HB.pack (fun_of_lfun f) fmM.
 by apply/lker0P; apply: (fmorph_inj fRM).
 Qed.
@@ -495,7 +495,7 @@ set fj := (fi ^-1 \o f)%AF; suffices Hfj : fj \in homEz.
 rewrite -DhomEz; apply/kAHomP => _ /Fadjoin_polyP[q Eq ->].
 have homLfj: kHom E {:L} fj := comp_kHom (inv_kHomf homLfi) homLf.
 have /kHom_lrmorphism fjM := kHomSl (sub1v _) homLfj.
-pose fjmM := GRing.isMultiplicative.Build _ _ _ fjM.
+pose fjmM := GRing.isMultiplicative1first.Build _ _ _ fjM.
 pose fjRM : {rmorphism _ -> _} := HB.pack (fun_of_lfun fj) fjmM.
 rewrite -[fj _](horner_map fjRM) (kHom_poly_id homLfj) //=.
 by rewrite (@lfunE _ _ L) /= Dfz -fi_z lker0_lfunK.

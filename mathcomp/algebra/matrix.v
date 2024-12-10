@@ -2730,9 +2730,9 @@ HB.instance Definition _ := GRing.Nmodule_isSemiRing.Build 'M[R]_n
 Lemma mulmxE : mulmx = *%R. Proof. by []. Qed.
 Lemma idmxE : 1%:M = 1 :> 'M_n. Proof. by []. Qed.
 
-Lemma scalar_mx_is_multiplicative : multiplicative (@scalar_mx R n).
+Lemma scalar_mx_is_multiplicative : multiplicative1first (@scalar_mx R n).
 Proof. by split=> //; apply: scalar_mxM. Qed.
-HB.instance Definition _ := GRing.isMultiplicative.Build R 'M_n (@scalar_mx _ n)
+HB.instance Definition _ := GRing.isMultiplicative1first.Build R 'M_n (@scalar_mx _ n)
   scalar_mx_is_multiplicative.
 
 End MatrixSemiRing.
@@ -2883,11 +2883,11 @@ Proof. by rewrite rmorph_sum; apply: eq_bigr => i _; rewrite mxE. Qed.
 End FixedSize.
 
 Lemma map_mx_is_multiplicative n' (n := n'.+1) :
-  multiplicative (map_mx f : 'M_n -> 'M_n).
-Proof. by split; [apply: map_mxM | apply: map_mx1]. Qed.
+  multiplicative1first (map_mx f : 'M_n -> 'M_n).
+Proof. by split; [apply: map_mx1 | apply: map_mxM]. Qed.
 
 HB.instance Definition _ n' :=
-  GRing.isMultiplicative.Build 'M[aR]_n'.+1 'M[rR]_n'.+1 (map_mx f)
+  GRing.isMultiplicative1first.Build 'M[aR]_n'.+1 'M[rR]_n'.+1 (map_mx f)
     (map_mx_is_multiplicative n').
 
 End MapSemiRingMatrix.

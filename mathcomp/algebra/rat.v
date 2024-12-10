@@ -865,11 +865,11 @@ rewrite !(rmorphM, rmorphB) /= [_ - _]lock /= -lock !numqE.
 by rewrite (mulrAC y) -!mulrBl -mulrA mulrAC !mulrA.
 Qed.
 
-Fact ratr_is_multiplicative : multiplicative (@ratr F).
+Fact ratr_is_multiplicative : multiplicative1first (@ratr F).
 Proof.
 have injZtoQ: @injective rat int intr by apply: intr_inj.
 have nz_den x: (denq x)%:~R != 0 :> F by rewrite intr_eq0 denq_eq0.
-split=> [x y|]; last by rewrite /ratr divr1.
+split=> [|x y]; first by rewrite /ratr divr1.
 rewrite /ratr mulrC mulrAC; apply: canLR (mulKf (nz_den _)) _; rewrite !mulrA.
 do 2!apply: canRL (mulfK (nz_den _)) _; rewrite -!rmorphM; congr _%:~R.
 apply: injZtoQ; rewrite !rmorphM [x * y]lock /= !numqE -lock.
@@ -878,7 +878,7 @@ Qed.
 
 HB.instance Definition _ := GRing.isAdditive.Build rat F (@ratr F)
   ratr_is_additive.
-HB.instance Definition _ := GRing.isMultiplicative.Build rat F (@ratr F)
+HB.instance Definition _ := GRing.isMultiplicative1first.Build rat F (@ratr F)
   ratr_is_multiplicative.
 
 Lemma ler_rat : {mono (@ratr F) : x y / x <= y}.
