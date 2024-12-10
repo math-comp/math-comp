@@ -600,7 +600,7 @@ Proof. by []. Qed.
 Lemma qpolyC_natr p : (p%:R : {poly %/ h}) = p%:R :> {poly A}.
 Proof. by elim: p => //= p IH; rewrite !mulrS poly_of_qpolyD IH. Qed.
 
-Lemma char_qpoly : [char {poly %/ h}] =i [char A].
+Lemma pchar_qpoly : [pchar {poly %/ h}] =i [pchar A].
 Proof.
 move=> p; rewrite !inE; congr (_ && _).
 apply/eqP/eqP=> [/(congr1 val) /=|pE]; last first.
@@ -682,6 +682,9 @@ Lemma poly_of_qpolyZ (p : {poly %/ h}) a :
 Proof. by []. Qed.
 
 End QRing.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use pchar_qpoly instead.")]
+Notation char_qpoly := (pchar_qpoly) (only parsing).
 
 Section Field.
 
