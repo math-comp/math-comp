@@ -416,6 +416,11 @@ Definition unit_actE := unit_actE.
 
 End Theory.
 
+End FinRing.
+
+Import FinRing.
+HB.reexport.
+
 #[deprecated(since="mathcomp 2.4.0",
              note="Use finNzSemiRingType instead.")]
 Notation finSemiRingType := (finNzSemiRingType) (only parsing).
@@ -428,11 +433,6 @@ Notation finComSemiRingType := (finComNzSemiRingType) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
              note="Use finComNzRingType instead.")]
 Notation finComRingType := (finComNzRingType) (only parsing).
-
-End FinRing.
-
-Import FinRing.
-HB.reexport.
 
 Lemma card_finNzRing_gt1 (R : finNzRingType) : 1 < #|R|.
 Proof. by rewrite (cardD1 0) (cardD1 1) !inE GRing.oner_neq0. Qed.

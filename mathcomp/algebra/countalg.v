@@ -149,6 +149,11 @@ HB.instance Definition _ (R : countNzSemiRingType) := NzSemiRing.on R^o.
 #[export]
 HB.instance Definition _ (R : countNzRingType) := NzRing.on R^o.
 
+End CountRing.
+
+Import CountRing.
+HB.reexport.
+
 #[deprecated(since="mathcomp 2.4.0",
              note="Use countNzSemiRingType instead.")]
 Notation countSemiRingType := (countNzSemiRingType) (only parsing).
@@ -161,8 +166,3 @@ Notation countComSemiRingType := (countComNzSemiRingType) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
              note="Use countComNzRingType instead.")]
 Notation countComRingType := (countComNzRingType) (only parsing).
-
-End CountRing.
-
-Import CountRing.
-HB.reexport.
