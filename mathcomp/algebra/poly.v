@@ -13,10 +13,11 @@ From mathcomp Require Import div ssralg countalg binomial.
 (*           {poly R} == the type of polynomials with coefficients of type R, *)
 (*                       represented as lists with a non zero last element    *)
 (*                       (big endian representation); the coefficient type R  *)
-(*                       must have a canonical ringType structure cR. In fact *)
-(*                       {poly R} denotes the concrete type polynomial cR; R  *)
-(*                       is just a phantom argument that lets type inference  *)
-(*                       reconstruct the (hidden) ringType structure cR.      *)
+(*                       must have a canonical nzRingType structure cR. In    *)
+(*                       fact {poly R} denotes the concrete type polynomial   *)
+(*                       cR; R is just a phantom argument that lets type      *)
+(*                       inferencereconstruct the (hidden) nzRingType         *)
+(*                       structure cR.                                        *)
 (*          p : seq R == the big-endian sequence of coefficients of p, via    *)
 (*                       the coercion polyseq : polynomial >-> seq.           *)
 (*             Poly s == the polynomial with coefficient sequence s (ignoring *)
@@ -24,7 +25,7 @@ From mathcomp Require Import div ssralg countalg binomial.
 (* \poly_(i < n) E(i) == the polynomial of degree at most n - 1 whose         *)
 (*                       coefficients are given by the general term E(i)      *)
 (*  0, 1, - p, p + q, == the usual ring operations: {poly R} has a canonical  *)
-(* p * q, p ^+ n, ...    ringType structure, which is commutative / integral  *)
+(* p * q, p ^+ n, ...    nzRingType structure, which is commutative / integral*)
 (*                       when R is commutative / integral, respectively.      *)
 (*      polyC c, c%:P == the constant polynomial c                            *)
 (*                 'X == the (unique) variable                                *)
@@ -134,7 +135,7 @@ Local Notation simp := Monoid.simpm.
 
 Section Polynomial.
 
-Variable R : semiRingType.
+Variable R : nzSemiRingType.
 
 (* Defines a polynomial as a sequence with <> 0 last element *)
 Record polynomial := Polynomial {polyseq :> seq R; _ : last 1 polyseq != 0}.
@@ -159,7 +160,7 @@ Notation "{ 'poly' T }" := (polynomial T) : type_scope.
 
 Section SemiPolynomialTheory.
 
-Variable R : semiRingType.
+Variable R : nzSemiRingType.
 Implicit Types (a b c x y z : R) (p q r d : {poly R}).
 
 Definition lead_coef p := p`_(size p).-1.
@@ -491,7 +492,7 @@ Qed.
 Fact poly1_neq0 : 1%:P != 0 :> {poly R}.
 Proof. by rewrite polyC_eq0 oner_neq0. Qed.
 
-HB.instance Definition _ := GRing.Nmodule_isSemiRing.Build (polynomial R)
+HB.instance Definition _ := GRing.Nmodule_isNzSemiRing.Build (polynomial R)
   mul_polyA mul_1poly mul_poly1 mul_polyDl mul_polyDr mul_0poly mul_poly0
   poly1_neq0.
 
@@ -589,7 +590,7 @@ End SemiPolynomialTheory.
 
 Section PolynomialTheory.
 
-Variable R : ringType.
+Variable R : nzRingType.
 Implicit Types (a b c x y z : R) (p q r d : {poly R}).
 
 Local Notation "c %:P" := (polyC c).
@@ -1874,7 +1875,7 @@ Section MapPoly.
 
 Section Definitions.
 
-Variables (aR rR : ringType) (f : aR -> rR).
+Variables (aR rR : nzRingType) (f : aR -> rR).
 
 Definition map_poly (p : {poly aR}) := \poly_(i < size p) f p`_i.
 
@@ -1894,11 +1895,11 @@ Definition horner_morph u of commr_rmorph u := fun p => (map_poly p).[u].
 
 End Definitions.
 
-Variables aR rR : ringType.
+Variables aR rR : nzRingType.
 
 Section Combinatorial.
 
-Variables (iR : ringType) (f : aR -> rR).
+Variables (iR : nzRingType) (f : aR -> rR).
 Local Notation "p ^f" := (map_poly f p) : ring_scope.
 
 Lemma map_poly0 : 0^f = 0.
@@ -1978,7 +1979,7 @@ Proof. by move=> /eq_in_map_poly_id0; apply; rewrite //?raddf0. Qed.
 
 Section Additive.
 
-Variables (iR : ringType) (f : {additive aR -> rR}).
+Variables (iR : nzRingType) (f : {additive aR -> rR}).
 
 Local Notation "p ^f" := (map_poly (GRing.Additive.sort f) p) : ring_scope.
 
@@ -2123,7 +2124,7 @@ Proof. by apply/polyP => i; rewrite !(coef_map, coef_nderivn) //= rmorphMn. Qed.
 
 End MapPoly.
 
-Lemma mapf_root (F : fieldType) (R : ringType) (f : {rmorphism F -> R})
+Lemma mapf_root (F : fieldType) (R : nzRingType) (f : {rmorphism F -> R})
   (p : {poly F}) (x : F) : root (map_poly f p) (f x) = root p x.
 Proof. by rewrite !rootE horner_map fmorph_eq0. Qed.
 
@@ -2131,7 +2132,7 @@ Proof. by rewrite !rootE horner_map fmorph_eq0. Qed.
 (* with respect to these.                                                 *)
 Section MorphPoly.
 
-Variable (aR rR : ringType) (pf : {rmorphism {poly aR} -> rR}).
+Variable (aR rR : nzRingType) (pf : {rmorphism {poly aR} -> rR}).
 
 Lemma poly_morphX_comm : commr_rmorph (pf \o polyC) (pf 'X).
 Proof. by move=> a; rewrite /GRing.comm /= -!rmorphM // commr_polyX. Qed.
@@ -2148,7 +2149,7 @@ Notation "p ^:P" := (map_poly polyC p) : ring_scope.
 
 Section PolyCompose.
 
-Variable R : ringType.
+Variable R : nzRingType.
 Implicit Types p q : {poly R}.
 
 Definition comp_poly q p := p^:P.[q].
@@ -2263,7 +2264,7 @@ End PolyCompose.
 
 Notation "p \Po q" := (comp_poly q p) : ring_scope.
 
-Lemma map_comp_poly (aR rR : ringType) (f : {rmorphism aR -> rR}) p q :
+Lemma map_comp_poly (aR rR : nzRingType) (f : {rmorphism aR -> rR}) p q :
   map_poly f (p \Po q) = map_poly f p \Po map_poly f q.
 Proof.
 elim/poly_ind: p => [|p a IHp]; first by rewrite !raddf0.
@@ -2273,7 +2274,7 @@ Qed.
 
 Section Surgery.
 
-Variable R : ringType.
+Variable R : nzRingType.
 
 Implicit Type p q : {poly R}.
 
@@ -2535,9 +2536,9 @@ Definition coefE :=
    coef_deriv, coef_nderivn, coef_derivn, coef_map, coef_sum,
    coef_comp_poly_Xn, coef_comp_poly).
 
-Section PolynomialComRing.
+Section PolynomialComNzRing.
 
-Variable R : comRingType.
+Variable R : comNzRingType.
 Implicit Types p q : {poly R}.
 
 Fact poly_mul_comm p q : p * q = q * p.
@@ -2546,7 +2547,7 @@ apply/polyP=> i; rewrite coefM coefMr.
 by apply: eq_bigr => j _; rewrite mulrC.
 Qed.
 
-HB.instance Definition _ := GRing.Ring_hasCommutativeMul.Build (polynomial R)
+HB.instance Definition _ := GRing.NzRing_hasCommutativeMul.Build (polynomial R)
   poly_mul_comm.
 HB.instance Definition _ := GRing.Lalgebra_isComAlgebra.Build R (polynomial R).
 
@@ -2718,7 +2719,7 @@ Qed.
 
 Definition derivCE := (derivE, deriv_exp).
 
-End PolynomialComRing.
+End PolynomialComNzRing.
 
 Section PolynomialIdomain.
 
@@ -2764,7 +2765,7 @@ Qed.
 Fact poly_inv_out : {in [predC poly_unit], poly_inv =1 id}.
 Proof. by rewrite /poly_inv => p /negbTE/= ->. Qed.
 
-HB.instance Definition _ := GRing.ComRing_hasMulInverse.Build (polynomial R)
+HB.instance Definition _ := GRing.ComNzRing_hasMulInverse.Build (polynomial R)
   poly_mulVp poly_intro_unit poly_inv_out.
 
 HB.instance Definition _ := GRing.ComUnitRing_isIntegral.Build (polynomial R)
@@ -2948,9 +2949,9 @@ End PolynomialIdomain.
 
 (* FIXME: these are seamingly artificial ways to close the inheritance graph *)
 (*    We make parameters more and more precise to trigger completion by HB   *)
-HB.instance Definition _ (R : countRingType) :=
+HB.instance Definition _ (R : countNzRingType) :=
   [Countable of polynomial R by <:].
-HB.instance Definition _ (R : countComRingType) :=
+HB.instance Definition _ (R : countComNzRingType) :=
   [Countable of polynomial R by <:].
 HB.instance Definition _ (R : countUnitRingType) :=
   [Countable of polynomial R by <:].
@@ -2961,7 +2962,7 @@ HB.instance Definition _ (R : countIdomainType) :=
 
 Section MapFieldPoly.
 
-Variables (F : fieldType) (R : ringType) (f : {rmorphism F -> R}).
+Variables (F : fieldType) (R : nzRingType) (f : {rmorphism F -> R}).
 
 Local Notation "p ^f" := (map_poly f p) : ring_scope.
 

@@ -12,7 +12,7 @@ From mathcomp Require Import ssralg matrix mxalgebra zmodp.
 (*                                                                            *)
 (*           vectType R == interface structure for finite dimensional (more   *)
 (*                         precisely, detachable) vector spaces over R, which *)
-(*                         should be at least a ringType                      *)
+(*                         should be at least a nzRingType                    *)
 (*                         The HB class is called Vector.                     *)
 (*     Vector.axiom n M <-> type M is linearly isomorphic to 'rV_n            *)
 (*                         := {v2r : M -> 'rV_n| linear v2r & bijective v2r}  *)
@@ -119,16 +119,16 @@ Delimit Scope vspace_scope with VS.
 Import GRing.Theory.
 
 (* Finite dimension vector space *)
-Definition vector_axiom_def (R : ringType) n (V : lmodType R) :=
+Definition vector_axiom_def (R : nzRingType) n (V : lmodType R) :=
   {v2r : V -> 'rV[R]_n | linear v2r & bijective v2r}.
 Arguments vector_axiom_def [R] n%N V%type.
 
-HB.mixin Record Lmodule_hasFinDim (R : ringType) (V : Type) of GRing.Lmodule R V :=
+HB.mixin Record Lmodule_hasFinDim (R : nzRingType) (V : Type) of GRing.Lmodule R V :=
   { dim : nat;
     vector_subdef : vector_axiom_def dim V }.
 
 #[mathcomp(axiom="vector_axiom_def"), short(type="vectType")]
-HB.structure Definition Vector (R : ringType) :=
+HB.structure Definition Vector (R : nzRingType) :=
   { V of Lmodule_hasFinDim R V & GRing.Lmodule R V }.
 
 #[deprecated(since="mathcomp 2.2.0", note="Use Vector.axiom instead.")]
@@ -141,7 +141,7 @@ Section OtherDefs.
 Local Coercion dim : Vector.type >-> nat.
 Inductive space (K : fieldType) (vT : Vector.type K) :=
   Space (mx : 'M[K]_vT) & <<mx>>%MS == mx.
-Inductive hom (R : ringType) (vT wT : Vector.type R) :=
+Inductive hom (R : nzRingType) (vT wT : Vector.type R) :=
   Hom of 'M[R]_(vT, wT).
 End OtherDefs.
 (* /FIXME *)
@@ -169,7 +169,7 @@ End VectorExports.
 Module VectorInternalTheory.
 
 Section Iso.
-Variables (R : ringType) (vT rT : vectType R).
+Variables (R : nzRingType) (vT rT : vectType R).
 Local Coercion dim : Vector.type >-> nat.
 
 Fact v2r_subproof : Vector.axiom vT vT. Proof. exact: vector_subdef. Qed.
@@ -219,7 +219,7 @@ Proof. exact: genmxE. Qed.
 End Vspace.
 
 Section Hom.
-Variables (R : ringType) (aT rT : vectType R).
+Variables (R : nzRingType) (aT rT : vectType R).
 Definition f2mx (f : 'Hom(aT, rT)) := let: Hom A := f in A.
 HB.instance Definition _ : isSub _ _ 'Hom(aT, rT) := [isNew for f2mx].
 End Hom.
@@ -1222,7 +1222,7 @@ Notation directv S := (directv_def (Phantom _ S%VS)).
 (* Linear functions over a vectType *)
 Section LfunDefs.
 
-Variable R : ringType.
+Variable R : nzRingType.
 Implicit Types aT vT rT : vectType R.
 
 Fact lfun_key : unit. Proof. by []. Qed.
@@ -1270,7 +1270,7 @@ Notation limg f := (lfun_img f fullv).
 
 Section LfunZmodType.
 
-Variables (R : ringType) (aT rT : vectType R).
+Variables (R : nzRingType) (aT rT : vectType R).
 Implicit Types f g h : 'Hom(aT, rT).
 
 HB.instance Definition _ := [Choice of 'Hom(aT, rT) by <:].
@@ -1327,7 +1327,7 @@ Arguments fun_of_lfunK {R aT rT}.
 
 Section LfunVectType.
 
-Variables (R : comRingType) (aT rT : vectType R).
+Variables (R : comNzRingType) (aT rT : vectType R).
 Implicit Types f : 'Hom(aT, rT).
 
 Definition scale_lfun k f := linfun (k \*: f).
@@ -1368,7 +1368,7 @@ End LfunVectType.
 
 Section CompLfun.
 
-Variables (R : ringType) (wT aT vT rT : vectType R).
+Variables (R : nzRingType) (wT aT vT rT : vectType R).
 Implicit Types (f : 'Hom(vT, rT)) (g : 'Hom(aT, vT)) (h : 'Hom(wT, aT)).
 
 Lemma id_lfunE u: \1%VF u = u :> aT. Proof. exact: lfunE. Qed.
@@ -1408,7 +1408,7 @@ Definition lfun_simp :=
 
 Section ScaleCompLfun.
 
-Variables (R : comRingType) (aT vT rT : vectType R).
+Variables (R : comNzRingType) (aT vT rT : vectType R).
 Implicit Types (f : 'Hom(vT, rT)) (g : 'Hom(aT, vT)).
 
 Lemma comp_lfunZl k f g : (k *: (f \o g) = (k *: f) \o g)%VF.
@@ -1714,7 +1714,7 @@ Section LfunAlgebra.
 (* of the algebra library (there is currently no actual use of the End(vT)    *)
 (* algebra structure). Also note that the unit ring structure is missing.     *)
 
-Variables (R : comRingType) (vT : vectType R).
+Variables (R : comNzRingType) (vT : vectType R).
 Hypothesis vT_proper : dim vT > 0.
 
 Fact lfun1_neq0 : \1%VF != 0 :> 'End(vT).
@@ -1729,18 +1729,31 @@ Prenex Implicits comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr.
  * as canonical, so mixins and structures are built separately, and we        *
  * don't use HB.instance Definition _ := ...                                  *
  *  This is ok, but maybe we could introduce an alias                         *)
-Definition lfun_comp_ringMixin := GRing.Zmodule_isRing.Build 'End(vT)
+Definition lfun_comp_nzRingMixin := GRing.Zmodule_isNzRing.Build 'End(vT)
   comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr lfun1_neq0.
-Definition lfun_comp_ringType : ringType :=
-  HB.pack 'End(vT) lfun_comp_ringMixin.
+
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use lfun_comp_nzRingMixin instead.")]
+Notation lfun_comp_ringMixin := (lfun_comp_nzRingMixin) (only parsing).
+
+Definition lfun_comp_nzRingType : nzRingType :=
+  HB.pack 'End(vT) lfun_comp_nzRingMixin.
+
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use lfun_comp_nzRingType instead.")]
+Notation lfun_comp_ringType := (lfun_comp_nzRingType) (only parsing).
 
 (* In the standard endomorphism ring product is categorical composition. *)
-Definition lfun_ringType : ringType := lfun_comp_ringType^c.
+Definition lfun_nzRingType : nzRingType := lfun_comp_nzRingType^c.
 
-Definition lfun_lalgMixin := GRing.Lmodule_isLalgebra.Build R lfun_ringType
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use lfun_nzRingType instead.")]
+Notation lfun_ringType := (lfun_nzRingType) (only parsing).
+
+Definition lfun_lalgMixin := GRing.Lmodule_isLalgebra.Build R lfun_nzRingType
   (fun k x y => comp_lfunZr k y x).
 Definition lfun_lalgType : lalgType R :=
-  HB.pack 'End(vT) lfun_ringType lfun_lalgMixin.
+  HB.pack 'End(vT) lfun_nzRingType lfun_lalgMixin.
 
 Definition lfun_algMixin := GRing.Lalgebra_isAlgebra.Build R lfun_lalgType
   (fun k x y => comp_lfunZl k y x).
@@ -1941,7 +1954,7 @@ Arguments vsprojK {K vT U} [x] Ux.
 
 Section MatrixVectType.
 
-Variables (R : ringType) (m n : nat).
+Variables (R : nzRingType) (m n : nat).
 
 (* The apparently useless => /= in line 1 of the proof performs some evar     *)
 (* expansions that the Ltac interpretation of exists is incapable of doing.   *)
@@ -1960,7 +1973,7 @@ End MatrixVectType.
 (* A ring is a one-dimension vector space *)
 Section RegularVectType.
 
-Variable R : ringType.
+Variable R : nzRingType.
 
 Fact regular_vect_iso : Vector.axiom 1 R^o.
 Proof.
@@ -1974,7 +1987,7 @@ End RegularVectType.
 (* External direct product of two vectTypes. *)
 Section ProdVector.
 
-Variables (R : ringType) (vT1 vT2 : vectType R).
+Variables (R : nzRingType) (vT1 vT2 : vectType R).
 
 Fact pair_vect_iso : Vector.axiom (dim vT1 + dim vT2) (vT1 * vT2).
 Proof.
@@ -1995,7 +2008,7 @@ End ProdVector.
 (* Function from a finType into a ring form a vectype. *)
 Section FunVectType.
 
-Variable (I : finType) (R : ringType) (vT : vectType R).
+Variable (I : finType) (R : nzRingType) (vT : vectType R).
 
 (* Type unification with exist is again a problem in this proof. *)
 Fact ffun_vect_iso : Vector.axiom (#|I| * dim vT) {ffun I -> vT}.
