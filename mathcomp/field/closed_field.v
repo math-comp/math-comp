@@ -878,10 +878,10 @@ pose KfieldMixin := GRing.ComRing_isField.Build _ KmulV Kinv0.
 pose Kfield : fieldType := HB.pack K Kring KfieldMixin.
 have EtoKAdd i : additive (EtoK i : E i -> Kfield).
   by move=> x y; rewrite EtoK_D EtoK_N.
-have EtoKMul i : multiplicative (EtoK i : E i -> Kfield).
-  by split=> [x y|]; rewrite ?EtoK_M ?EtoK_1.
+have EtoKMul i : multiplicative1first (EtoK i : E i -> Kfield).
+  by split=> [|x y]; rewrite ?EtoK_M ?EtoK_1.
 pose EtoKMa i := GRing.isAdditive.Build _ _ _ (EtoKAdd i).
-pose EtoKMm i := GRing.isMultiplicative.Build _ _ _ (EtoKMul i).
+pose EtoKMm i := GRing.isMultiplicative1first.Build _ _ _ (EtoKMul i).
 pose EtoKM i : {rmorphism _ -> _} :=
   HB.pack (EtoK i : E i -> Kfield) (EtoKMa i) (EtoKMm i).
 have EtoK_E: EtoK _ = EtoKM _ by [].

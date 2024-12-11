@@ -476,8 +476,8 @@ have coef_phi A i j k: (phi A)`_k i j = (A i j)`_k.
 have phi_is_additive : additive phi.
   move=> A B; apply/polyP => k; apply/matrixP => i j.
   by rewrite !(coef_phi, mxE, coefD, coefN).
-have phi_is_multiplicative : multiplicative phi.
-  split=> [A B|]; apply/polyP => k; apply/matrixP => i j; last first.
+have phi_is_multiplicative : multiplicative1first phi.
+  split=> [|A B]; apply/polyP => k; apply/matrixP => i j.
     by rewrite coef_phi mxE coefMn !coefC; case: (k == _); rewrite ?mxE ?mul0rn.
   rewrite !coef_phi !mxE !coefM summxE coef_sum.
   pose F k1 k2 := (A i k1)`_k2 * (B k1 j)`_(k - k2).
@@ -493,7 +493,7 @@ have bij_phi: bijective phi.
   apply/polyP=> k; apply/matrixP=> i j; rewrite coef_phi mxE coef_poly.
   by case: leqP => // P_le_k; rewrite nth_default ?mxE.
 pose phiaM := GRing.isAdditive.Build _ _ phi phi_is_additive.
-pose phimM := GRing.isMultiplicative.Build _ _ phi phi_is_multiplicative.
+pose phimM := GRing.isMultiplicative1first.Build _ _ phi phi_is_multiplicative.
 pose phiRM : {rmorphism _ -> _} := HB.pack phi phiaM phimM.
 exists phiRM; split=> // [p | A]; apply/polyP=> k; apply/matrixP=> i j.
   by rewrite coef_phi coef_map !mxE coefMn.
