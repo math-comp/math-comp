@@ -74,6 +74,7 @@ with builtins; with (import <nixpkgs> {}).lib;
   in {
     "coq-master".coqPackages = common-bundles // {
       coq.override.version = "master";
+      stdlib.override.version = "master";
       bignums.override.version = "master";
       paramcoq.override.version = "master";
       coq-elpi.override.version = "master";
