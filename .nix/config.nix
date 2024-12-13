@@ -23,7 +23,7 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   ## select an entry to build in the following `bundles` set
   ## defaults to "default"
-  default-bundle = "coq-8.18";
+  default-bundle = "coq-8.20";
 
   ## write one `bundles.name` attribute set per
   ## alternative configuration, the can be used to
@@ -74,6 +74,7 @@ with builtins; with (import <nixpkgs> {}).lib;
   in {
     "coq-master".coqPackages = common-bundles // {
       coq.override.version = "master";
+      stdlib.override.version = "master";
       bignums.override.version = "master";
       paramcoq.override.version = "master";
       coq-elpi.override.version = "master";
@@ -93,11 +94,6 @@ with builtins; with (import <nixpkgs> {}).lib;
     "coq-8.19".coqPackages = common-bundles // {
       coq.override.version = "8.19";
       interval.job = false;
-    };
-    "coq-8.18".coqPackages = common-bundles // {
-      coq.override.version = "8.18";
-      mathcomp-classical.job = false;
-      mathcomp-analysis.job = false;
     };
   };
 }
