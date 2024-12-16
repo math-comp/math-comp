@@ -670,9 +670,8 @@ Proof. by rewrite rmorph_nat. Qed.
 
 Lemma char_poly : [char {poly R}] =i [char R].
 Proof.
-move=> p; rewrite !inE; congr (_ && _).
-apply/eqP/eqP=> [/(congr1 val) /=|]; last by rewrite -polyC_natr => ->.
-by rewrite polyseq0 -polyC_natr polyseqC; case: eqP.
+move=> p; rewrite !inE -polyC_natr polyC_eq0.
+by under eq_forallb do rewrite -polyC_natr polyC_eq0.
 Qed.
 
 Lemma size_Msign p n : size ((-1) ^+ n * p) = size p.

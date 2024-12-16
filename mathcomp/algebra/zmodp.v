@@ -384,7 +384,7 @@ Lemma Fp_nat_mod m : (m %% p)%:R = m%:R :> 'F_p.
 Proof. by apply: ord_inj; rewrite !val_Fp_nat // modn_mod. Qed.
 
 Lemma char_Fp : p \in [char 'F_p].
-Proof. by rewrite !inE -Fp_nat_mod p_pr ?modnn. Qed.
+Proof. by apply/GRing.charf_prime0 => //; rewrite -Fp_nat_mod modnn. Qed.
 
 Lemma char_Fp_0 : p%:R = 0 :> 'F_p.
 Proof. exact: GRing.charf0 char_Fp. Qed.

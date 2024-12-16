@@ -117,7 +117,7 @@ Qed.
 
 Lemma card_finCharP p n : #|F| = (p ^ n)%N -> prime p -> p \in [char F].
 Proof.
-move=> oF pr_p; rewrite inE pr_p -order_dvdn.
+move=> oF pr_p; apply/GRing.charf_prime0 => //; apply/eqP; rewrite -order_dvdn.
 rewrite (abelem_order_p finField_is_abelem) ?inE ?oner_neq0 //=.
 have n_gt0: n > 0 by rewrite -(ltn_exp2l _ _ (prime_gt1 pr_p)) -oF finRing_gt1.
 by rewrite cardsT oF -(prednK n_gt0) pdiv_pfactor.
@@ -207,7 +207,7 @@ Section PrimeChar.
 
 Variable p : nat.
 
-Section PrimeCharRing.
+Section CharRing.
 
 Variable R0 : ringType.
 
@@ -222,38 +222,36 @@ HB.instance Definition _ := GRing.Ring.on R.
 Definition primeChar_scale a x := a%:R * x.
 Local Infix "*p:" := primeChar_scale (at level 40).
 
-Let natrFp n : (inZp n : 'F_p)%:R = n%:R :> R.
-Proof.
-rewrite [in RHS](divn_eq n p) natrD mulrnA (mulrn_char charRp) add0r.
-by rewrite /= (Fp_cast (charf_prime charRp)).
-Qed.
-
-Lemma primeChar_scaleA a b x : a *p: (b *p: x) = (a * b) *p: x.
-Proof. by rewrite /primeChar_scale mulrA -natrM natrFp. Qed.
-
 Lemma primeChar_scale1 : left_id 1 primeChar_scale.
 Proof. by move=> x; rewrite /primeChar_scale mul1r. Qed.
 
 Lemma primeChar_scaleDr : right_distributive primeChar_scale +%R.
 Proof. by move=> a x y /=; rewrite /primeChar_scale mulrDr. Qed.
 
-Lemma primeChar_scaleDl x : {morph primeChar_scale^~ x: a b / a + b}.
-Proof. by move=> a b; rewrite /primeChar_scale natrFp natrD mulrDl. Qed.
+End CharRing.
 
-HB.instance Definition _ := GRing.Zmodule_isLmodule.Build 'F_p R
-  primeChar_scaleA primeChar_scale1 primeChar_scaleDr primeChar_scaleDl.
+Section PrimeCharRing.
 
-Lemma primeChar_scaleAl (a : 'F_p) (u v : R) :  a *: (u * v) = (a *: u) * v.
-Proof. by apply: mulrA. Qed.
+Variable R0 : ringType.
 
-HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build 'F_p R
-  primeChar_scaleAl.
+Hypothesis p_pr : prime p.
+Hypothesis charRp : p \in [char R0].
+Local Notation R := (PrimeCharType charRp).
+Implicit Types (a b : 'F_p) (x y : R).
+Local Infix "*p:" := primeChar_scale (at level 40).
 
-Lemma primeChar_scaleAr (a : 'F_p) (x y : R) : a *: (x * y) = x * (a *: y).
-Proof. by rewrite ![a *: _]mulr_natl mulrnAr. Qed.
+Let natrFp_prime n : (inZp n : 'F_p)%:R = n%:R :> R.
+Proof.
+rewrite [in RHS](divn_eq n p) natrD mulrnA (mulrn_char charRp) add0r.
+by rewrite /= Fp_cast.
+Qed.
 
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build 'F_p R
-  primeChar_scaleAr.
+Lemma primeChar_scaleA_prime a b x : a *p: (b *p: x) = (a * b) *p: x.
+Proof. by rewrite /primeChar_scale mulrA -natrM natrFp_prime. Qed.
+
+Lemma primeChar_scaleDl_prime x :
+  {morph (@primeChar_scale _ charRp)^~ x: a b / a + b}.
+Proof. by move=> a b; rewrite /primeChar_scale natrFp_prime// natrD mulrDl. Qed.
 
 End PrimeCharRing.
 
@@ -271,17 +269,49 @@ HB.instance Definition _ (R : idomainType) charRp :=
 HB.instance Definition _ (R : fieldType) charRp :=
   GRing.Field.on (type R charRp).
 
+Section PrimeCharIdomain.
+
+Variable R0 : idomainType.
+
+Hypothesis charRp : p \in [char R0].
+Local Notation R := (PrimeCharType charRp).
+Implicit Types (a b : 'F_p) (x y : R).
+Local Infix "*p:" := primeChar_scale (at level 40).
+
+Lemma primeChar_scaleA a b x : a *p: (b *p: x) = (a * b) *p: x.
+Proof. exact/primeChar_scaleA_prime/charf_prime/charRp. Qed.
+
+Lemma primeChar_scaleDl x :
+  {morph (@primeChar_scale _ charRp)^~ x: a b / a + b}.
+Proof. exact/primeChar_scaleDl_prime/charf_prime/charRp. Qed.
+
+HB.instance Definition _ := GRing.Zmodule_isLmodule.Build 'F_p R
+  primeChar_scaleA (@primeChar_scale1 _ charRp)
+  (@primeChar_scaleDr _ charRp) primeChar_scaleDl.
+
+Lemma primeChar_scaleAl (a : 'F_p) (u v : R) :  a *: (u * v) = (a *: u) * v.
+Proof. by apply: mulrA. Qed.
+
+HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build 'F_p R
+  primeChar_scaleAl.
+
+Lemma primeChar_scaleAr (a : 'F_p) (x y : R) : a *: (x * y) = x * (a *: y).
+Proof. by rewrite ![a *: _]mulr_natl mulrnAr. Qed.
+
+HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build 'F_p R
+  primeChar_scaleAr.
+
+End PrimeCharIdomain.
+
 Section FinRing.
 
-Variables (R0 : finRingType) (charRp : p \in [char R0]).
+Variables (R0 : finIdomainType) (charRp : p \in [char R0]).
 Local Notation R := (type _ charRp).
 
 HB.instance Definition _ := FinGroup.on R.
 
-Let pr_p : prime p. Proof. exact: charf_prime charRp. Qed.
-
 Lemma primeChar_abelem : p.-abelem [set: R].
-Proof. exact: fin_Fp_lmod_abelem. Qed.
+Proof. exact/fin_Fp_lmod_abelem/charf_prime/charRp. Qed.
 
 Lemma primeChar_pgroup : p.-group [set: R].
 Proof. by case/and3P: primeChar_abelem. Qed.
@@ -297,8 +327,10 @@ Proof. by rewrite /n -cardsT {1}(card_pgroup primeChar_pgroup). Qed.
 Lemma primeChar_vectAxiom : Vector.axiom n R.
 Proof.
 have /isog_isom/=[f /isomP[injf im_f]]: [set: R] \isog [set: 'rV['F_p]_n].
-  rewrite (@isog_abelem_card _ _ p) fin_Fp_lmod_abelem //=.
-  by rewrite !cardsT card_primeChar card_mx mul1n card_Fp.
+  rewrite (@isog_abelem_card _ _ p)
+    (fin_Fp_lmod_abelem _ (charf_prime charRp))//.
+  rewrite !cardsT card_primeChar card_mx mul1n card_Fp ?eqxx//.
+  exact: (charf_prime charRp).
 exists f; last by exists (invm injf) => x; rewrite ?invmE ?invmK ?im_f ?inE.
 move=> a x y; rewrite [a *: _]mulr_natl morphM ?morphX ?inE // zmodXgE.
 by congr (_ + _); rewrite -scaler_nat natr_Zp.
@@ -314,9 +346,9 @@ End FinRing.
 
 HB.instance Definition _ (R : finUnitRingType) charRp :=
   FinRing.UnitRing.on (type R charRp).
-HB.instance Definition _ (R : finUnitRingType) charRp :=
+HB.instance Definition _ (R : finIdomainType) charRp :=
   FinRing.UnitAlgebra.on (type R charRp).
-HB.instance Definition _ (R : finUnitRingType) charRp :=
+HB.instance Definition _ (R : finIdomainType) charRp :=
   Falgebra.on (type R charRp).
 HB.instance Definition _ (R : finComRingType) charRp :=
   FinRing.ComRing.on (type R charRp).
@@ -574,10 +606,12 @@ Section FinDomain.
 Import order ssrnum ssrint archimedean algC cyclotomic Order.TTheory Num.Theory.
 Local Infix "%|" := dvdn. (* Hide polynomial divisibility. *)
 
-Variable R : finUnitRingType.
+Variable R : finIdomainType.
 
-Hypothesis domR : GRing.integral_domain_axiom R.
 Implicit Types x y : R.
+
+Let domR : GRing.integral_domain_axiom R.
+Proof. by move=> x y /eqP; rewrite mulf_eq0. Qed.
 
 Let lregR x : x != 0 -> GRing.lreg x.
 Proof. by move=> xnz; apply: mulrI0_lreg => y /domR/orP[/idPn | /eqP]. Qed.
@@ -598,7 +632,7 @@ have [p p_pr charRp]: exists2 p, prime p & p \in [char R].
   rewrite big_seq; elim/big_rec: _ => [|[p m] /= n]; first by rewrite oner_eq0.
   case/mem_prime_decomp=> p_pr _ _ IHn.
   elim: m => [|m IHm]; rewrite ?mul1n {IHn}// expnS -mulnA natrM.
-  by case/eqP/domR/orP=> //; exists p; last apply/andP.
+  by case/eqP/domR/orP=> // /eqP; exists p; last exact/GRing.charf_prime0.
 pose Rp := PrimeCharType charRp; pose L : {vspace Rp} := fullv.
 pose G := [set: {unit R}]; pose ofG : {unit R} -> Rp := val.
 pose projG (E : {vspace Rp}) := [preim ofG of E].

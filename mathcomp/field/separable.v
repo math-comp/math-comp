@@ -644,7 +644,7 @@ have [K'g]: g \is a polyOver K' /\ q \is a polyOver K'.
   by rewrite minPolyOver rpredB ?rpredX ?polyOverX // polyOverC memv_adjoin.
 have /dvdpP[c Dq]: 'X - x%:P %| q by rewrite dvdp_XsubCl root_minPoly.
 have co_c_g: coprimep c g.
-  have charPp: p \in [char {poly L}] := rmorph_char polyC charLp.
+  have charPp: p \in [char {poly L}] := rmorph_char polyC_inj charLp.
   rewrite /g polyC_exp -!(Frobenius_autE charPp) -rmorphB coprimep_expr //.
   have: separable_poly q := separable_elementS sKK' sepKx.
   by rewrite Dq separable_mul => /and3P[].

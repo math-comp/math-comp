@@ -759,9 +759,32 @@ Proof. exact: rmorph_prod. Qed.
 
 End ZintBigMorphism.
 
-Section Frobenius.
+Section PrimeFrobenius.
 
 Variable R : ringType.
+Implicit Types x y : R.
+
+Variable p : nat.
+Hypothesis p_pr : prime.prime p.
+Hypothesis charFp : p \in [char R].
+
+Local Notation "x ^f" := (Frobenius_aut charFp x).
+
+Lemma Frobenius_autMz_prime x n : (x *~ n)^f = x^f *~ n.
+Proof.
+case: n=> n /=; first exact: GRing.Frobenius_autMn_prime.
+rewrite !NegzE !mulrNz GRing.Frobenius_autN_prime//.
+by rewrite GRing.Frobenius_autMn_prime.
+Qed.
+
+Lemma Frobenius_aut_int_prime n : (n%:~R)^f = n%:~R.
+Proof. by rewrite Frobenius_autMz_prime Frobenius_aut1. Qed.
+
+End PrimeFrobenius.
+
+Section Frobenius.
+
+Variable R : idomainType.
 Implicit Types x y : R.
 
 Variable p : nat.
@@ -770,13 +793,10 @@ Hypothesis charFp : p \in [char R].
 Local Notation "x ^f" := (Frobenius_aut charFp x).
 
 Lemma Frobenius_autMz x n : (x *~ n)^f = x^f *~ n.
-Proof.
-case: n=> n /=; first exact: Frobenius_autMn.
-by rewrite !NegzE !mulrNz Frobenius_autN Frobenius_autMn.
-Qed.
+Proof. exact/Frobenius_autMz_prime/charf_prime/charFp. Qed.
 
 Lemma Frobenius_aut_int n : (n%:~R)^f = n%:~R.
-Proof. by rewrite Frobenius_autMz Frobenius_aut1. Qed.
+Proof. exact/Frobenius_aut_int_prime/charf_prime/charFp. Qed.
 
 End Frobenius.
 
