@@ -3,11 +3,11 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime.
-From mathcomp Require Import ssralg poly finset fingroup morphism perm.
-From mathcomp Require Import automorphism quotient gproduct action finalg.
-From mathcomp Require Import zmodp commutator cyclic center pgroup gseries.
-From mathcomp Require Import nilpotent sylow maximal abelian matrix.
-From mathcomp Require Import mxalgebra mxrepresentation.
+From mathcomp Require Import ssralg poly finset monoid fingroup morphism perm.
+From mathcomp Require Import automorphism quotient gproduct action finalg zmodp.
+From mathcomp Require Import commutator cyclic center pgroup gseries nilpotent.
+From mathcomp Require Import sylow maximal abelian matrix mxalgebra.
+From mathcomp Require Import mxrepresentation.
 
 (******************************************************************************)
 (*   This file completes the theory developed in mxrepresentation.v with the  *)
