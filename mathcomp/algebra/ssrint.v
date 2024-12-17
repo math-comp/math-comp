@@ -326,7 +326,7 @@ Qed.
 
 Lemma nonzero1z : 1%Z != 0. Proof. by []. Qed.
 
-Definition comMixin := GRing.Zmodule_isComRing.Build int
+Definition comMixin := GRing.Zmodule_isComNzRing.Build int
   mulzA mulzC mul1z mulz_addl nonzero1z.
 
 End intRing.
@@ -377,7 +377,7 @@ Proof. exact. Qed.
 Lemma idomain_axiomz m n : m * n = 0 -> (m == 0) || (n == 0).
 Proof. by case: m n => [[|m]|m] [[|n]|n]. Qed.
 
-Definition comMixin := GRing.ComRing_hasMulInverse.Build int
+Definition comMixin := GRing.ComNzRing_hasMulInverse.Build int
   mulVz unitzPl invz_out.
 
 End intUnitRing.
@@ -630,7 +630,7 @@ Proof. by rewrite pmulrn intz. Qed.
 Section RintMod.
 
 Local Coercion Posz : nat >-> int.
-Variable R : ringType.
+Variable R : nzRingType.
 
 Implicit Types m n : int.
 Implicit Types x y z : R.
@@ -677,7 +677,7 @@ Lemma mul2z n : 2%:Z * n = n + n. Proof. by rewrite mulrC -mulrzz. Qed.
 
 Section LMod.
 
-Variable R : ringType.
+Variable R : nzRingType.
 Variable V : (lmodType R).
 Local Coercion Posz : nat >-> int.
 
@@ -711,7 +711,7 @@ End Additive.
 
 Section Multiplicative.
 
-Variables (R S : ringType) (f : {rmorphism R -> S}).
+Variables (R S : nzRingType) (f : {rmorphism R -> S}).
 
 Lemma rmorphMz : forall n, {morph f : x / x *~ n}. Proof. exact: raddfMz. Qed.
 
@@ -722,7 +722,7 @@ End Multiplicative.
 
 Section Linear.
 
-Variable R : ringType.
+Variable R : nzRingType.
 Variables (U V : lmodType R) (f : {linear U -> V}).
 
 Lemma linearMn : forall n, {morph f : x / x *~ n}. Proof. exact: raddfMz. Qed.
@@ -735,7 +735,7 @@ Proof. by move=> z u; rewrite -[z]intz !scaler_int raddfMz. Qed.
 
 Section Zintmul1rMorph.
 
-Variable R : ringType.
+Variable R : nzRingType.
 
 Lemma commrMz (x y : R) n : GRing.comm x y -> GRing.comm x (y *~ n).
 Proof. by rewrite /GRing.comm=> com_xy; rewrite mulrzAr mulrzAl com_xy. Qed.
@@ -747,7 +747,7 @@ End Zintmul1rMorph.
 
 Section ZintBigMorphism.
 
-Variable R : ringType.
+Variable R : nzRingType.
 
 Lemma sumMz : forall I r (P : pred I) F,
  (\sum_(i <- r | P i) F i)%N%:~R = \sum_(i <- r | P i) ((F i)%:~R) :> R.
@@ -761,7 +761,7 @@ End ZintBigMorphism.
 
 Section Frobenius.
 
-Variable R : ringType.
+Variable R : nzRingType.
 Implicit Types x y : R.
 
 Variable p : nat.
@@ -1498,7 +1498,7 @@ Lemma sgz_eq (R R' : realDomainType) (x : R) (y : R') :
   (sgz x == sgz y) = ((x == 0) == (y == 0)) && ((0 < x) == (0 < y)).
 Proof. by do 2!case: sgzP. Qed.
 
-Lemma intr_sign (R : ringType) s : ((-1) ^+ s)%:~R = (-1) ^+ s :> R.
+Lemma intr_sign (R : nzRingType) s : ((-1) ^+ s)%:~R = (-1) ^+ s :> R.
 Proof. exact: rmorph_sign. Qed.
 
 Section Absz.
@@ -1702,7 +1702,7 @@ End NormInt.
 
 Section PolyZintRing.
 
-Variable R : ringType.
+Variable R : nzRingType.
 Implicit Types x y z: R.
 Implicit Types m n : int.
 Implicit Types i j k : nat.
@@ -1734,10 +1734,10 @@ Lemma rpredMz (M : zmodType) (S : zmodClosed M) m :
   {in S, forall u, u *~ m \in S}.
 Proof. by case: m => n u Su; rewrite ?rpredN ?rpredMn. Qed.
 
-Lemma rpred_int (R : ringType) (S : subringClosed R) m : m%:~R \in S.
+Lemma rpred_int (R : nzRingType) (S : subringClosed R) m : m%:~R \in S.
 Proof. by rewrite rpredMz ?rpred1. Qed.
 
-Lemma rpredZint (R : ringType) (M : lmodType R) (S : zmodClosed M) m :
+Lemma rpredZint (R : nzRingType) (M : lmodType R) (S : zmodClosed M) m :
   {in S, forall u, m%:~R *: u \in S}.
 Proof. by move=> u Su; rewrite /= scaler_int rpredMz. Qed.
 

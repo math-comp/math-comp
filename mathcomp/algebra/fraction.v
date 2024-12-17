@@ -27,7 +27,7 @@ Reserved Notation "{ 'fraction' T }" (at level 0, format "{ 'fraction'  T }").
 Reserved Notation "x %:F" (at level 2, format "x %:F").
 
 Section FracDomain.
-Variable R : ringType.
+Variable R : nzRingType.
 
 (* ratios are pairs of R, such that the second member is nonzero *)
 Inductive ratio := mkRatio { frac :> R * R; _ : frac.2 != 0 }.
@@ -245,7 +245,7 @@ Proof. by rewrite piE equivfE !numden_Ratio ?mul1r ?oner_eq0. Qed.
 
 (* fractions form a commutative ring *)
 HB.instance Definition _ :=
-  GRing.Zmodule_isComRing.Build type mulA mulC mul1_l mul_addl nonzero1.
+  GRing.Zmodule_isComNzRing.Build type mulA mulC mul1_l mul_addl nonzero1.
 
 Lemma mulV_l : forall a, a != 0%:F -> mul (inv a) a = 1%:F.
 Proof.
@@ -264,7 +264,7 @@ Qed.
 
 (* fractions form a ring with explicit unit *)
 (* fractions form a field *)
-HB.instance Definition _ := GRing.ComRing_isField.Build type mulV_l inv0.
+HB.instance Definition _ := GRing.ComNzRing_isField.Build type mulV_l inv0.
 
 End FracField.
 End FracField.

@@ -51,9 +51,9 @@ Notation "p ^:P" := (p ^ polyC) (at level 2, format "p ^:P") : ring_scope.
 Notation "p .[ x , y ]" := (p.[x%:P].[y])
   (at level 2, left associativity, format "p .[ x ,  y ]") : ring_scope.
 
-Section PolyXY_Ring.
+Section PolyXY_NzRing.
 
-Variable R : ringType.
+Variable R : nzRingType.
 Implicit Types (u : {poly {poly R}}) (p q : {poly R}) (x : R).
 
 Fact swapXY_key : unit. Proof. by []. Qed.
@@ -178,20 +178,20 @@ Proof. by rewrite /poly_XaY rmorph0 comp_poly0. Qed.
 Lemma poly_XmY0 : poly_XmY 0 = 0.
 Proof. by rewrite /poly_XmY rmorph0 comp_poly0. Qed.
 
-End PolyXY_Ring.
+End PolyXY_NzRing.
 
 Prenex Implicits swapXY sizeY poly_XaY poly_XmY sub_annihilant div_annihilant.
 Prenex Implicits swapXYK.
 
-Lemma swapXY_map (R S : ringType) (f : {additive R -> S}) u :
+Lemma swapXY_map (R S : nzRingType) (f : {additive R -> S}) u :
   swapXY (u ^ map_poly f) = swapXY u ^ map_poly f.
 Proof.
 by apply/polyP=> i; apply/polyP=> j; rewrite !(coef_map, coef_swapXY).
 Qed.
 
-Section PolyXY_ComRing.
+Section PolyXY_ComNzRing.
 
-Variable R : comRingType.
+Variable R : comNzRingType.
 Implicit Types (u : {poly {poly R}}) (p : {poly R}) (x y : R).
 
 Lemma horner_swapXY u x : (swapXY u).[x%:P] = u ^ eval x.
@@ -213,7 +213,7 @@ Proof. by rewrite horner_comp !hornerE. Qed.
 Lemma horner_poly_XmY p v : (poly_XmY p).[v] = p \Po (v * 'X).
 Proof. by rewrite horner_comp !hornerE. Qed.
 
-End PolyXY_ComRing.
+End PolyXY_ComNzRing.
 
 Section PolyXY_Idomain.
 

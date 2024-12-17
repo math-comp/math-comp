@@ -118,7 +118,7 @@ Import Pdiv.Idomain.
 (* Row vector <-> bounded degree polynomial bijection *)
 Section RowPoly.
 
-Variables (R : ringType) (d : nat).
+Variables (R : nzRingType) (d : nat).
 Implicit Types u v : 'rV[R]_d.
 Implicit Types p q : {poly R}.
 
@@ -169,7 +169,7 @@ Arguments poly_rV_K {R d} [p] le_p_d.
 
 Section Resultant.
 
-Variables (R : ringType) (p q : {poly R}).
+Variables (R : nzRingType) (p q : {poly R}).
 
 Let dS := ((size q).-1 + (size p).-1)%N.
 Local Notation band r := (lin1_mx (poly_rV \o r \o* rVpoly)).
@@ -190,7 +190,7 @@ End Resultant.
 
 Prenex Implicits Sylvester_mx resultant.
 
-Lemma resultant_in_ideal (R : comRingType) (p q : {poly R}) :
+Lemma resultant_in_ideal (R : comNzRingType) (p q : {poly R}) :
     size p > 1 -> size q > 1 ->
   {uv : {poly R} * {poly R} | size uv.1 < size q /\ size uv.2 < size p
   & (resultant p q)%:P = uv.1 * p + uv.2 * q}.
@@ -311,7 +311,7 @@ Qed.
 
 Section HornerMx.
 
-Variables (R : comRingType) (n' : nat).
+Variables (R : comNzRingType) (n' : nat).
 Local Notation n := n'.+1.
 Implicit Types (A B : 'M[R]_n) (p q : {poly R}).
 
@@ -385,7 +385,7 @@ Prenex Implicits horner_mx powers_mx.
 
 Section CharPoly.
 
-Variables (R : ringType) (n : nat) (A : 'M[R]_n).
+Variables (R : nzRingType) (n : nat) (A : 'M[R]_n).
 Implicit Types p q : {poly R}.
 
 Definition char_poly_mx := 'X%:M - map_mx (@polyC R) A.
@@ -460,7 +460,7 @@ End CharPoly.
 
 Prenex Implicits char_poly_mx char_poly.
 
-Lemma mx_poly_ring_isom (R : ringType) n' (n := n'.+1) :
+Lemma mx_poly_ring_isom (R : nzRingType) n' (n := n'.+1) :
   exists phi : {rmorphism 'M[{poly R}]_n -> {poly 'M[R]_n}},
   [/\ bijective phi,
       forall p, phi p%:M = map_poly scalar_mx p,
@@ -500,7 +500,7 @@ exists phiRM; split=> // [p | A]; apply/polyP=> k; apply/matrixP=> i j.
 by rewrite coef_phi !mxE !coefC; case k; last rewrite /= mxE.
 Qed.
 
-Theorem Cayley_Hamilton (R : comRingType) n' (A : 'M[R]_n'.+1) :
+Theorem Cayley_Hamilton (R : comNzRingType) n' (A : 'M[R]_n'.+1) :
   horner_mx A (char_poly A) = 0.
 Proof.
 have [phi [_ phiZ phiC _]] := mx_poly_ring_isom R n'.
@@ -521,7 +521,7 @@ rewrite (big_morph _ (fun p q => hornerM p q a) (hornerC 1 a)).
 by apply: eq_bigr => i _; rewrite !mxE !(hornerE, hornerMn).
 Qed.
 
-Lemma char_poly_trig {R : comRingType} n (A : 'M[R]_n) : is_trig_mx A ->
+Lemma char_poly_trig {R : comNzRingType} n (A : 'M[R]_n) : is_trig_mx A ->
   char_poly A = \prod_(i < n) ('X - (A i i)%:P).
 Proof.
 move=> /is_trig_mxP Atrig; rewrite /char_poly det_trig.
@@ -529,11 +529,11 @@ move=> /is_trig_mxP Atrig; rewrite /char_poly det_trig.
 by apply/is_trig_mxP => i j lt_ij; rewrite !mxE -val_eqE ltn_eqF ?Atrig ?subrr.
 Qed.
 
-Definition companionmx {R : ringType} (p : seq R) (d := (size p).-1) :=
+Definition companionmx {R : nzRingType} (p : seq R) (d := (size p).-1) :=
   \matrix_(i < d, j < d)
     if (i == d.-1 :> nat) then - p`_j else (i.+1 == j :> nat)%:R.
 
-Lemma companionmxK {R : comRingType} (p : {poly R}) :
+Lemma companionmxK {R : comNzRingType} (p : {poly R}) :
    p \is monic -> char_poly (companionmx p) = p.
 Proof.
 pose D n : 'M[{poly R}]_n := \matrix_(i, j)
@@ -573,7 +573,7 @@ apply/matrixP=> i j; rewrite !mxE -!val_eqE /= /bump /=.
 by rewrite leqNgt ltn_ord add0n add1n [_ == _.-2.+1]ltn_eqF.
 Qed.
 
-Lemma mulmx_delta_companion (R : ringType) (p : seq R)
+Lemma mulmx_delta_companion (R : nzRingType) (p : seq R)
   (i: 'I_(size p).-1) (i_small : i.+1 < (size p).-1):
   delta_mx 0 i *m companionmx p = delta_mx 0 (Ordinal i_small) :> 'rV__.
 Proof.
@@ -583,11 +583,11 @@ rewrite ltn_eqF ?big1 ?addr0 1?eq_sym //; last first.
 by move=> k /negPf ki_eqF; rewrite !mxE eqxx ki_eqF mul0r.
 Qed.
 
-Lemma row'_col'_char_poly_mx {R : ringType} m i (M : 'M[R]_m) :
+Lemma row'_col'_char_poly_mx {R : nzRingType} m i (M : 'M[R]_m) :
   row' i (col' i (char_poly_mx M)) = char_poly_mx (row' i (col' i M)).
 Proof. by apply/matrixP => k l; rewrite !mxE (inj_eq lift_inj). Qed.
 
-Lemma char_block_diag_mx {R : ringType} m n (A : 'M[R]_m) (B : 'M[R]_n) :
+Lemma char_block_diag_mx {R : nzRingType} m n (A : 'M[R]_m) (B : 'M[R]_n) :
   char_poly_mx (block_mx A 0 0 B) =
   block_mx (char_poly_mx A) 0 0 (char_poly_mx B).
 Proof.
@@ -778,7 +778,7 @@ Arguments horner_rVpoly_inj {F n' A} [u1 u2] eq_u12A : rename.
 (* Parametricity. *)
 Section MapRingMatrix.
 
-Variables (aR rR : ringType) (f : {rmorphism aR -> rR}).
+Variables (aR rR : nzRingType) (f : {rmorphism aR -> rR}).
 Local Notation "A ^f" := (map_mx (GRing.RMorphism.sort f) A) : ring_scope.
 Local Notation fp := (map_poly (GRing.RMorphism.sort f)).
 Variables (d n : nat) (A : 'M[aR]_n).
@@ -805,7 +805,7 @@ End MapRingMatrix.
 
 Section MapResultant.
 
-Lemma map_resultant (aR rR : ringType) (f : {rmorphism {poly aR} -> rR}) p q :
+Lemma map_resultant (aR rR : nzRingType) (f : {rmorphism {poly aR} -> rR}) p q :
     f (lead_coef p) != 0 -> f (lead_coef q) != 0 ->
   f (resultant p q)= resultant (map_poly f p) (map_poly f q).
 Proof.
@@ -818,7 +818,7 @@ End MapResultant.
 
 Section MapComRing.
 
-Variables (aR rR : comRingType) (f : {rmorphism aR -> rR}).
+Variables (aR rR : comNzRingType) (f : {rmorphism aR -> rR}).
 Local Notation "A ^f" := (map_mx f A) : ring_scope.
 Local Notation fp := (map_poly f).
 Variables (n' : nat) (A : 'M[aR]_n'.+1).
@@ -1037,12 +1037,12 @@ End MapKermxPoly.
 
 Section IntegralOverRing.
 
-Definition integralOver (R K : ringType) (RtoK : R -> K) (z : K) :=
+Definition integralOver (R K : nzRingType) (RtoK : R -> K) (z : K) :=
   exists2 p, p \is monic & root (map_poly RtoK p) z.
 
 Definition integralRange R K RtoK := forall z, @integralOver R K RtoK z.
 
-Variables (B R K : ringType) (BtoR : B -> R) (RtoK : {rmorphism R -> K}).
+Variables (B R K : nzRingType) (BtoR : B -> R) (RtoK : {rmorphism R -> K}).
 
 Lemma integral_rmorph x :
   integralOver BtoR x -> integralOver (RtoK \o BtoR) (RtoK x).
@@ -1069,7 +1069,7 @@ End IntegralOverRing.
 
 Section IntegralOverComRing.
 
-Variables (R K : comRingType) (RtoK : {rmorphism R -> K}).
+Variables (R K : comNzRingType) (RtoK : {rmorphism R -> K}).
 
 Lemma integral_horner_root w (p q : {poly K}) :
     p \is monic -> root p w ->

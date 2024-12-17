@@ -27,9 +27,9 @@ Local Open Scope ring_scope.
 
 Section CyclotomicPoly.
 
-Section Ring.
+Section NzRing.
 
-Variable R : ringType.
+Variable R : nzRingType.
 
 Definition cyclotomic (z : R) n :=
   \prod_(k < n | coprime k n) ('X - (z ^+ k)%:P).
@@ -45,7 +45,7 @@ rewrite totient_count_coprime -big_mkcond big_mkord -sum1_card.
 by apply: eq_bigl => k; rewrite coprime_sym.
 Qed.
 
-End Ring.
+End NzRing.
 
 Lemma separable_Xn_sub_1 (R : idomainType) n :
   n%:R != 0 :> R -> @separable_poly R ('X^n - 1).
@@ -160,7 +160,7 @@ have defXn1: cyclotomic z n * pZtoC q = 'X^n - 1.
   rewrite divnn n_gt0 rmorph_prod /=; congr (_ * _).
   apply: eq_big_seq => d; rewrite mem_rem_uniq ?inE //= inDn => /andP[n'd ddvn].
   by rewrite -IHn ?dvdn_prim_root // ltn_neqAle n'd dvdn_leq.
-have mapXn1 (R1 R2 : ringType) (f : {rmorphism R1 -> R2}):
+have mapXn1 (R1 R2 : nzRingType) (f : {rmorphism R1 -> R2}):
   map_poly f ('X^n - 1) = 'X^n - 1.
 - by rewrite rmorphB /= rmorph1 map_polyXn.
 have nz_q: pZtoC q != 0.

@@ -66,7 +66,7 @@ Variable R : idomainType.
 Variable h : {poly R}.
 Hypothesis hI : monic_irreducible_poly h.
 
-HB.instance Definition _ := GRing.Ring.on {poly %/ h with hI}.
+HB.instance Definition _ := GRing.NzRing.on {poly %/ h with hI}.
 
 End iDomain.
 
@@ -137,13 +137,13 @@ Lemma card_qfpoly : #|{poly %/ h with hI}| = #|R| ^ (size h).-1.
 Proof. by rewrite card_monic_qpoly ?hI. Qed.
 
 Lemma card_qfpoly_gt1 : 1 < #|{poly %/ h with hI}|.
-Proof. by have := card_finRing_gt1 {poly %/ h with hI}. Qed.
+Proof. by have := card_finNzRing_gt1 {poly %/ h with hI}. Qed.
 
 End FinField.
 
 Section inPoly.
 
-Variable R : comRingType.
+Variable R : comNzRingType.
 Variable h : {poly R}.
 
 Lemma in_qpoly_comp_horner (p q : {poly R}) :
@@ -259,7 +259,7 @@ Definition gX : {unit qT} := FinRing.unit _ qX_in_unit.
 Lemma dvdp_order n : (h %| 'X^n - 1) = (gX ^+ n == 1)%g.
 Proof.
 have [hM hI] := primitive_mi.
-have eqr_add2r (r : ringType) (a b c : r) : (a + c == b + c) = (a == b).
+have eqr_add2r (r : nzRingType) (a b c : r) : (a + c == b + c) = (a == b).
   by apply/eqP/eqP => [H|->//]; rewrite -(addrK c a) H addrK.
 rewrite -val_eqE /= val_unitX /= -val_eqE /=.
 rewrite (poly_of_qpolyX) qpolyXE // mk_monicE //.
@@ -420,7 +420,7 @@ Proof.
 move=> /ltnW size_gt1.
 rewrite /plogp.
 case (boolP (primitive_poly p)) => // Hh; first by apply: qlogp_lt.
-by rewrite ltn_predRL (card_finRing_gt1 {poly %/ p}).
+by rewrite ltn_predRL (card_finNzRing_gt1 {poly %/ p}).
 Qed.
 
 Lemma plogp_X (p q : {poly F}) :

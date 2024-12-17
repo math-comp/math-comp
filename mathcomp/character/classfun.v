@@ -270,10 +270,14 @@ Proof.
 by apply/eqP=> /cfunP/(_ 1%g)/eqP; rewrite cfun1Egen cfunE group1 oner_eq0.
 Qed.
 
-HB.instance Definition _ := GRing.Zmodule_isComRing.Build classfun
+HB.instance Definition _ := GRing.Zmodule_isComNzRing.Build classfun
   cfun_mulA cfun_mulC cfun_mul1 cfun_mulD cfun_nz1.
 
-Definition cfun_ringType : ringType := classfun.
+Definition cfun_nzRingType : nzRingType := classfun.
+
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use cfun_nzRingType instead.")]
+Notation cfun_ringType := (cfun_nzRingType) (only parsing).
 
 Lemma expS_cfunE phi n x : (phi ^+ n.+1) x = phi x ^+ n.+1.
 Proof. by elim: n => //= n IHn; rewrite !cfunE IHn. Qed.
@@ -292,7 +296,7 @@ Fact cfun_inv0id : {in [predC cfun_unit], cfun_inv =1 id}.
 Proof. by rewrite /cfun_inv => phi /negbTE/= ->. Qed.
 
 HB.instance Definition _ :=
-   GRing.ComRing_hasMulInverse.Build classfun cfun_mulV cfun_unitP cfun_inv0id.
+   GRing.ComNzRing_hasMulInverse.Build classfun cfun_mulV cfun_unitP cfun_inv0id.
 
 Fact cfun_scaleA a b phi :
   cfun_scale a (cfun_scale b phi) = cfun_scale (a * b) phi.
@@ -417,7 +421,7 @@ Notation "''CF' ( G )" := (classfun G) : type_scope.
 Notation "''CF' ( G )" := (@fullv _ (cfun_vectType G)) : vspace_scope.
 Notation "''1_' A" := (cfun_indicator _ A) : ring_scope.
 Notation "''CF' ( G , A )" := (classfun_on G A) : ring_scope.
-Notation "1" := (@GRing.one (cfun_ringType _)) (only parsing) : cfun_scope.
+Notation "1" := (@GRing.one (cfun_nzRingType _)) (only parsing) : cfun_scope.
 
 (* FIX ME this has changed *)
 Notation conjC := Num.conj_op.
@@ -574,7 +578,7 @@ Arguments cfun_onP {A phi}.
 Lemma cfun_on0 A phi x : phi \in 'CF(G, A) -> x \notin A -> phi x = 0.
 Proof. by move/cfun_onP; apply. Qed.
 
-Lemma sum_by_classes (R : ringType) (F : gT -> R) :
+Lemma sum_by_classes (R : nzRingType) (F : gT -> R) :
     {in G &, forall g h, F (g ^ h) = F g} ->
   \sum_(g in G) F g = \sum_(xG in classes G) #|xG|%:R * F (repr xG).
 Proof.

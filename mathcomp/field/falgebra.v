@@ -11,7 +11,7 @@ From mathcomp Require Import finalg zmodp matrix vector poly.
 (*       falgType K   == the interface type for F-algebras over K; it simply  *)
 (*                       joins the unitAlgType K and vectType K interfaces    *)
 (*                       The HB class is called Falgebra.                     *)
-(*   Any aT with an falgType structure inherits all the Vector, Ring and      *)
+(*   Any aT with an falgType structure inherits all the Vector, NzRing and    *)
 (* Algebra operations, and supports the following additional operations:      *)
 (*           \dim_A M == (\dim M %/ dim A)%N -- free module dimension         *)
 (*            amull u == the linear function v |-> u * v, for u, v : aT       *)
@@ -92,7 +92,7 @@ Import GRing.Theory.
 
 (* Finite dimensional algebra *)
 #[short(type="falgType")]
-HB.structure Definition Falgebra (R : ringType) :=
+HB.structure Definition Falgebra (R : nzRingType) :=
   { A of Vector R A & GRing.UnitAlgebra R A }.
 #[deprecated(since="mathcomp 2.0.0", note="Use falgType instead.")]
 Notation FalgType := falgType.
@@ -126,7 +126,7 @@ HB.builders Context K A of Algebra_isFalgebra K A.
   Lemma invr_out : {in [predC uam], vam =1 id}.
   Proof. by move=> u /negbTE/= ->. Qed.
 
-  HB.instance Definition _ := GRing.Ring_hasMulInverse.Build A
+  HB.instance Definition _ := GRing.NzRing_hasMulInverse.Build A
     mulVr divrr unitrP invr_out.
 HB.end.
 
@@ -149,7 +149,7 @@ Proof. by apply/esym/eqP; rewrite eqEdim subvf dim_vline oner_eq0 dimvf. Qed.
 
 Section Proper.
 
-Variables (R : ringType) (aT : falgType R).
+Variables (R : nzRingType) (aT : falgType R).
 
 Import VectorInternalTheory.
 
@@ -165,7 +165,7 @@ Module FalgLfun.
 
 Section FalgLfun.
 
-Variable (R : comRingType) (aT : falgType R).
+Variable (R : comNzRingType) (aT : falgType R).
 Implicit Types f g : 'End(aT).
 
 HB.instance Definition _ := GRing.Algebra.copy 'End(aT)
@@ -204,7 +204,7 @@ Qed.
 Lemma lfun_invr_out f : lker f != 0%VS -> lfun_invr f = f.
 Proof. by rewrite /lfun_invr => /negPf->. Qed.
 
-HB.instance Definition _ := GRing.Ring_hasMulInverse.Build 'End(aT)
+HB.instance Definition _ := GRing.NzRing_hasMulInverse.Build 'End(aT)
   lfun_mulRVr lfun_mulrRV lfun_unitrP lfun_invr_out.
 
 Lemma lfun_invE f : lker f == 0%VS -> f^-1%VF = f^-1.
@@ -960,7 +960,7 @@ Proof. move=> x y z; apply/val_inj/mulrDl. Qed.
 Fact subvs_mulDr : right_distributive subvs_mul +%R.
 Proof. move=> x y z; apply/val_inj/mulrDr. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_isRing.Build (subvs_of A)
+HB.instance Definition _ := GRing.Zmodule_isNzRing.Build (subvs_of A)
   subvs_mulA subvs_mu1l subvs_mul1 subvs_mulDl subvs_mulDr (algid_neq0 _).
 
 Lemma subvs_scaleAl k (x y : subvs_of A) : k *: (x * y) = (k *: x) * y.
