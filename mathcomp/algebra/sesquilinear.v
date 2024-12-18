@@ -9,9 +9,9 @@ From mathcomp Require Import zmodp poly order ssrnum matrix mxalgebra vector.
 (*                u ``_ i := u 0 i                                            *)
 (*                   e_ j := the row matrix with a 1 in column j              *)
 (*                M ^ phi := map_mx phi M                                     *)
-(*                           Notation in scope form_scope.                    *)
+(*                           Notation in scope sesquilinear_scope.            *)
 (*               M ^t phi := (M ^T) ^ phi                                     *)
-(*                           Notation in scope form_scope.                    *)
+(*                           Notation in scope sesquilinear_scope.            *)
 (* involutive_rmorphism R == the type of involutive functions                 *)
 (*                           R has type nzRingType.                           *)
 (*                           The HB class is InvolutiveRMorphism.             *)
@@ -126,8 +126,12 @@ Notation "u '``_' i" := (u 0%R i) : ring_scope.
 Notation "''e_' j" := (delta_mx 0 j)
  (format "''e_' j", at level 8, j at level 2) : ring_scope.
 
-Notation "M ^ phi" := (map_mx phi M) : form_scope.
-Notation "M ^t phi" := ((M ^T) ^ phi) : form_scope.
+Declare Scope sesquilinear_scope.
+Delimit Scope sesquilinear_scope with sesqui.
+Local Open Scope sesquilinear_scope.
+
+Notation "M ^ phi" := (map_mx phi M) : sesquilinear_scope.
+Notation "M ^t phi" := ((M ^T) ^ phi) : sesquilinear_scope.
 
 (* TODO: move? *)
 Lemma eq_map_mx_id (R : nzRingType) m n (M : 'M[R]_(m, n)) (f : R -> R) :
