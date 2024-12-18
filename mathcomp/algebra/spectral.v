@@ -11,7 +11,7 @@ From mathcomp Require Import mxpoly mxred sesquilinear.
 (* Schur decomposition, etc.                                                   *)
 (*                                                                            *)
 (*                 M ^t* := M ^t conjC                                        *)
-(*                                                                            *)
+(*                           Notation in scope sesquilinear_scope.            *)
 (*       M \is unitarymx == M is a unitary matrix                             *)
 (*                          M : 'M[C]_(m, n) with C : numClosedFieldType      *)
 (*        M \is normalmx == M is a normal matrix                              *)
@@ -37,6 +37,7 @@ Unset Printing Implicit Defensive.
 
 Import GRing.Theory Order.Theory Num.Theory.
 Local Open Scope ring_scope.
+Local Open Scope sesquilinear_scope.
 
 (* TODO: move? *)
 Lemma eigenvalue_closed {C : numClosedFieldType} n (A : 'M[C]_n) : (n > 0)%N ->
@@ -84,7 +85,7 @@ move=> n_gt0 AB_comm; have [] := @common_eigenvector _ _ [:: A; B] n_gt0.
 by move=> v v_neq0 /allP vP; exists v; rewrite ?vP ?(mem_head, in_cons, orbT).
 Qed.
 
-Notation "M ^t*" := (M ^t conjC) (at level 30).
+Notation "M ^t*" := (M ^t conjC) (at level 30) : sesquilinear_scope.
 Notation realmx := (mxOver Num.real).
 
 Lemma trmxCK {C : numClosedFieldType} m n (A : 'M[C]_(m, n)) : A ^t* ^t* = A.

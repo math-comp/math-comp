@@ -18,6 +18,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 
+- in `sesquilinear.v`,
+  + notations `_ ^ _` and `_ ^t _` are now in the dedicated scope `sesquilinear_scope`.
+
+- in `spectral.v`,
+  + notations `_ ^t*` is now in the dedicated scope `sesquilinear_scope`.
+
 ### Renamed
 
 - in `ssralg.v`
