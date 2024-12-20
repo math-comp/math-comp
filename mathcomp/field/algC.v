@@ -67,10 +67,10 @@ HB.builders Context L of isComplex L.
 
 Lemma nz2: 2 != 0 :> L.
 Proof.
-  apply/eqP=> char2; apply: conj_nt => e; apply/eqP/idPn=> eJ.
+  apply/eqP=> pchar2; apply: conj_nt => e; apply/eqP/idPn=> eJ.
   have opp_id x: - x = x :> L.
-    by apply/esym/eqP; rewrite -addr_eq0 -mulr2n -mulr_natl char2 mul0r.
-  have{} char2: 2%N \in [char L] by apply/eqP.
+    by apply/esym/eqP; rewrite -addr_eq0 -mulr2n -mulr_natl pchar2 mul0r.
+  have{} pchar2: 2%N \in [pchar L] by apply/eqP.
   without loss{eJ} eJ: e / conj e = e + 1.
     move/(_ (e / (e + conj e))); apply.
     rewrite fmorph_div rmorphD /= conjK -{1}[conj e](addNKr e) mulrDl.
@@ -81,7 +81,7 @@ Proof.
     by rewrite Dw !big_ord_recl big_ord0 /= mulr1 mulN1r addr0 subrK.
   pose b := w + conj w; have bJ: conj b = b by rewrite rmorphD /= conjK addrC.
   have Db2: b ^+ 2 + b = a.
-    rewrite -Frobenius_autE // rmorphD addrACA Dw /= Frobenius_autE -rmorphXn.
+    rewrite -pFrobenius_autE // rmorphD addrACA Dw /= pFrobenius_autE -rmorphXn.
     by rewrite -rmorphD Dw rmorphM /= aJ eJ -mulrDl -{1}[e]opp_id addKr mul1r.
   have /eqP[] := oner_eq0 L; apply: (addrI b); rewrite addr0 -{2}bJ.
   have: (b + e) * (b + conj e) == 0.
@@ -617,7 +617,7 @@ Let intr_inj_ZtoC := (intr_inj : injective ZtoC).
 Definition eqC_nat n p : (n%:R == p%:R :> algC) = (n == p) := eqr_nat _ n p.
 Definition leC_nat n p : (n%:R <= p%:R :> algC) = (n <= p)%N := ler_nat _ n p.
 Definition ltC_nat n p : (n%:R < p%:R :> algC) = (n < p)%N := ltr_nat _ n p.
-Definition Cchar : [char algC] =i pred0 := @char_num _.
+Definition Cpchar : [pchar algC] =i pred0 := @pchar_num _.
 
 (* This can be used in the converse direction to evaluate assertions over     *)
 (* manifest rationals, such as 3^-1 + 7%:%^-1 < 2%:%^-1 :> algC.              *)
@@ -927,4 +927,8 @@ Qed.
 End AutC.
 
 End AlgebraicsTheory.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use Cpchar instead.")]
+Notation Cchar := (Cpchar) (only parsing).
+
 #[global] Hint Resolve Crat0 Crat1 dvdC0 dvdC_refl eqCmod_refl eqCmodm0 : core.
