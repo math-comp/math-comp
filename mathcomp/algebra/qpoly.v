@@ -72,7 +72,7 @@ Definition poly_of_size := [qualify a p | poly_of_size_pred p].
 Lemma npoly_submod_closed : submod_closed poly_of_size.
 Proof.
 split=> [|x p q sp sq]; rewrite qualifE/= ?size_polyC ?eqxx//.
-rewrite (leq_trans (size_add _ _)) // geq_max.
+rewrite (leq_trans (size_polyD _ _)) // geq_max.
 by rewrite (leq_trans (size_scale_leq _ _)).
 Qed.
 

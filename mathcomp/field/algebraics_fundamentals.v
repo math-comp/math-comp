@@ -160,7 +160,7 @@ move=> algC x; have /sig2_eqW[q mon_q qx0] := algC x; pose d := (size q).-1.
 have [n ub_n]: {n | forall y, root q y -> `|y| < n}.
   have [n1 ub_n1] := monic_Cauchy_bound mon_q.
   have /monic_Cauchy_bound[n2 ub_n2]: (-1) ^+ d *: (q \Po - 'X) \is monic.
-    rewrite monicE lead_coefZ lead_coef_comp ?size_opp ?size_polyX // -/d.
+    rewrite monicE lead_coefZ lead_coef_comp ?size_polyN ?size_polyX // -/d.
     by rewrite lead_coefN lead_coefX (monicP mon_q) (mulrC 1) signrMK.
   exists (Num.max n1 n2) => y; rewrite ltNge ler_normr !leUx rootE.
   apply: contraL => /orP[]/andP[] => [/ub_n1/gt_eqF->// | _ /ub_n2/gt_eqF].
@@ -648,7 +648,7 @@ have R'i n: i \notin sQ (x_ n).
   rewrite -rmorphXn -rmorphN fmorph_eq1 -(fmorph_eq1 (ofQ x)) rmorphN eqr_oppLR.
   by rewrite rmorphXn /= Di Di2.
 have szX2_1: size ('X^2 + 1) = 3%N.
-  by move=> R; rewrite size_addl ?size_polyXn ?size_poly1.
+  by move=> R; rewrite size_polyDl ?size_polyXn ?size_poly1.
 have minp_i n (p_i := minPoly (R_ n) (i_ n)): p_i = 'X^2 + 1.
   have p_dv_X2_1: p_i %| 'X^2 + 1.
     rewrite minPoly_dvdp ?rpredD ?rpredX ?rpred1 ?polyOverX //.
@@ -748,7 +748,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     have mon_p: p \is monic.
       have mon_pw: pw \is monic := monic_minPoly _ _.
       rewrite map_monic mulNr -mulrN monicMl // monicE.
-      rewrite !(lead_coefN, lead_coef_comp) ?size_opp ?size_polyX //.
+      rewrite !(lead_coefN, lead_coef_comp) ?size_polyN ?size_polyX //.
       by rewrite lead_coefX sz_pw -signr_odd odd_2'nat oddPG mulrN1 opprK.
     have Dp0: p.[0] = - ofQ t pw.[0] ^+ 2.
       rewrite -(rmorph0 (ofQ t)) horner_map hornerM rmorphM.

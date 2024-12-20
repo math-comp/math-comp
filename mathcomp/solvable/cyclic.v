@@ -763,7 +763,8 @@ suff{y Gy yn} ->: <[x]> = G :&: [set z | #[z] %| n] by rewrite !inE Gy yn /=.
 apply/eqP; rewrite eqEcard subsetI cycle_subG {}Gx /= cardE; set rs := enum _.
 apply/andP; split; first by apply/subsetP=> y xy; rewrite inE order_dvdG.
 pose P : {poly R} := ('X^n - 1)%R; have n_gt0: n > 0 by apply: order_gt0.
-have szP: size P = n.+1 by rewrite size_addl size_polyXn ?size_opp ?size_poly1.
+have szP : size P = n.+1.
+  by rewrite size_polyDl size_polyXn ?size_polyN ?size_poly1.
 rewrite -ltnS -szP -(size_map f) max_ring_poly_roots -?size_poly_eq0 ?{}szP //.
   apply/allP=> fy /mapP[y]; rewrite mem_enum !inE order_dvdn => /andP[Gy].
   move/eqP=> yn1 ->{fy}; apply/eqP.

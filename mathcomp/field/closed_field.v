@@ -904,7 +904,7 @@ have Kclosed: GRing.closed_field_axiom Kfield.
   suffices Dpj: map_poly (toE m j lemj) p = pj.
     apply/eqP; rewrite EtoKeq0 (eq_map_poly (toEleS _ _ _ _)) map_poly_comp Dpj.
     rewrite -rootE -[pj]minXpE ?ext1root // -Dpj size_map_poly.
-    by rewrite size_addl ?size_polyXn ltnS ?size_opp ?size_poly.
+    by rewrite size_polyDl ?size_polyXn ltnS ?size_polyN ?size_poly.
   rewrite {w}/pj; set j0 := (j in tagged (E_ _) j).
   elim: {+}j lemj => // k IHk lemSk; rewrite {}/j0 in IHk *.
   have:= lemSk; rewrite leq_eqVlt ltnS => /predU1P[Dm | lemk].

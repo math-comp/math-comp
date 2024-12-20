@@ -413,13 +413,13 @@ HB.instance Definition _ := GRing.ComNzRing_isField.Build type mulVf inv0.
 Fact closedFieldAxiom : GRing.closed_field_axiom type.
 Proof.
 move=> n a n_gt0; pose p := 'X^n - \poly_(i < n) CtoL (a i).
-have Ap: {in p : seq L, integralRange QtoL}.
+have Ap : {in p : seq L, integralRange QtoL}.
   move=> _ /(nthP 0)[j _ <-]; rewrite coefB coefXn coef_poly.
   apply: integral_sub; first exact: integral_nat.
   by case: ifP => _; [apply: CtoL_P | apply: integral0].
-have sz_p: size p = n.+1.
-  by rewrite size_addl size_polyXn // size_opp ltnS size_poly.
-have [z pz0]: exists z, root p z by apply/closed_rootP; rewrite sz_p eqSS -lt0n.
+have sz_p : size p = n.+1.
+  by rewrite size_polyDl size_polyXn // size_polyN ltnS size_poly.
+have [z pz0] : exists z, root p z by apply/closed_rootP; rewrite sz_p eqSS -lt0n.
 have Az: integralOver ratr z.
   by apply: integral_root Ap; rewrite // -size_poly_gt0 sz_p.
 exists (LtoC Az); apply/CtoL_inj; rewrite -[CtoL _]subr0 -(rootP pz0).

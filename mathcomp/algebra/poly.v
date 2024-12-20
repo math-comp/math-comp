@@ -388,10 +388,10 @@ Proof. exact: coef_add_poly. Qed.
 Lemma polyCD : {morph polyC : a b / a + b}.
 Proof. by move=> a b; apply/polyP=> [[|i]]; rewrite coefD !coefC ?addr0. Qed.
 
-Lemma size_add p q : size (p + q) <= maxn (size p) (size q).
-Proof. by rewrite -[+%R]/add_poly unlock; apply: size_poly. Qed.
+Lemma size_polyD p q : size (p + q) <= maxn (size p) (size q).
+Proof. by rewrite -[+%R]/add_poly unlock; exact: size_poly. Qed.
 
-Lemma size_addl p q : size p > size q -> size (p + q) = size p.
+Lemma size_polyDl p q : size p > size q -> size (p + q) = size p.
 Proof.
 move=> ltqp; rewrite -[+%R]/add_poly unlock size_poly_eq (maxn_idPl (ltnW _))//.
 by rewrite addrC nth_default ?simp ?nth_last //; case: p ltqp => [[]].
@@ -401,12 +401,12 @@ Lemma size_sum I (r : seq I) (P : pred I) (F : I -> {poly R}) :
   size (\sum_(i <- r | P i) F i) <= \max_(i <- r | P i) size (F i).
 Proof.
 elim/big_rec2: _ => [|i p q _ IHp]; first by rewrite size_poly0.
-by rewrite -(maxn_idPr IHp) maxnA leq_max size_add.
+by rewrite -(maxn_idPr IHp) maxnA leq_max size_polyD.
 Qed.
 
 Lemma lead_coefDl p q : size p > size q -> lead_coef (p + q) = lead_coef p.
 Proof.
-move=> ltqp; rewrite /lead_coef coefD size_addl //.
+move=> ltqp; rewrite /lead_coef coefD size_polyDl //.
 by rewrite addrC nth_default ?simp // -ltnS (ltn_predK ltqp).
 Qed.
 
@@ -522,7 +522,7 @@ Lemma coef0_prod I rI (F : I -> {poly R}) P :
   (\prod_(i <- rI| P i) F i)`_0 = \prod_(i <- rI | P i) (F i)`_0.
 Proof. by apply: (big_morph _ coef0M); rewrite coef1 eqxx. Qed.
 
-Lemma size_mul_leq p q : size (p * q) <= (size p + size q).-1.
+Lemma size_polyM_leq p q : size (p * q) <= (size p + size q).-1.
 Proof. by rewrite -[*%R]/mul_poly unlock size_poly. Qed.
 
 Lemma mul_lead_coef p q :
@@ -544,7 +544,7 @@ Qed.
 Lemma size_proper_mul p q :
   lead_coef p * lead_coef q != 0 -> size (p * q) = (size p + size q).-1.
 Proof.
-apply: contraNeq; rewrite mul_lead_coef eqn_leq size_mul_leq -ltnNge => lt_pq.
+apply: contraNeq; rewrite mul_lead_coef eqn_leq size_polyM_leq -ltnNge => lt_pq.
 by rewrite nth_default // -subn1 -(leq_add2l 1) -leq_subLR leq_sub2r.
 Qed.
 
@@ -558,7 +558,7 @@ Proof.
 rewrite -sum1_card.
 elim/big_rec3: _ => [|i n m p _ IHp]; first by rewrite size_poly1.
 have [-> | nz_p] := eqVneq p 0; first by rewrite mulr0 size_poly0.
-rewrite (leq_trans (size_mul_leq _ _)) // subnS -!subn1 leq_sub2r //.
+rewrite (leq_trans (size_polyM_leq _ _)) // subnS -!subn1 leq_sub2r //.
 rewrite -addnS -addnBA ?leq_add2l // ltnW // -subn_gt0 (leq_trans _ IHp) //.
 by rewrite polySpred.
 Qed.
@@ -582,11 +582,17 @@ Lemma size_exp_leq p n : size (p ^+ n) <= ((size p).-1 * n).+1.
 Proof.
 elim: n => [|n IHn]; first by rewrite size_poly1.
 have [-> | nzp] := poly0Vpos p; first by rewrite exprS mul0r size_poly0.
-rewrite exprS (leq_trans (size_mul_leq _ _)) //.
+rewrite exprS (leq_trans (size_polyM_leq _ _)) //.
 by rewrite -{1}(prednK nzp) mulnS -addnS leq_add2l.
 Qed.
 
 End SemiPolynomialTheory.
+#[deprecated(since="mathcomp 2.4.0", note="renamed to `size_polyD`")]
+Notation size_add := size_polyD (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="renamed to `size_polyDl`")]
+Notation size_addl := size_polyDl (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="renamed to `size_polyM_leq`")]
+Notation size_mul_leq := size_polyM_leq (only parsing).
 
 Section PolynomialTheory.
 
@@ -649,13 +655,13 @@ HB.instance Definition _ := GRing.isAdditive.Build R {poly R} (@polyC _) polyCB.
 
 Lemma polyCMn n : {morph (@polyC R) : c / c *+ n}. Proof. exact: raddfMn. Qed.
 
-Lemma size_opp p : size (- p) = size p.
+Lemma size_polyN p : size (- p) = size p.
 Proof.
 by apply/eqP; rewrite eqn_leq -{3}(opprK p) -[-%R]/opp_poly unlock !size_poly.
 Qed.
 
 Lemma lead_coefN p : lead_coef (- p) = - lead_coef p.
-Proof. by rewrite /lead_coef size_opp coefN. Qed.
+Proof. by rewrite /lead_coef size_polyN coefN. Qed.
 
 (* Polynomial ring structure. *)
 
@@ -678,7 +684,7 @@ Qed.
 
 Lemma size_Msign p n : size ((-1) ^+ n * p) = size p.
 Proof.
-by rewrite -signr_odd; case: (odd n); rewrite ?mul1r // mulN1r size_opp.
+by rewrite -signr_odd; case: (odd n); rewrite ?mul1r// mulN1r size_polyN.
 Qed.
 
 Fact coefp0_multiplicative : multiplicative (coefp 0 : {poly R} -> R).
@@ -870,7 +876,9 @@ Lemma lead_coefXnsubC n c : 0 < n -> lead_coef ('X^n - c%:P) = 1.
 Proof. by move=> n_gt0; rewrite -polyCN lead_coefXnaddC. Qed.
 
 Lemma size_XnaddC n c : 0 < n -> size ('X^n + c%:P) = n.+1.
-Proof. by move=> *; rewrite size_addl ?size_polyXn// size_polyC; case: eqP. Qed.
+Proof.
+by move=> *; rewrite size_polyDl ?size_polyXn// size_polyC; case: eqP.
+Qed.
 
 Lemma size_XnsubC n c : 0 < n -> size ('X^n - c%:P) = n.+1.
 Proof. by move=> *; rewrite -polyCN size_XnaddC. Qed.
@@ -1053,7 +1061,7 @@ Lemma rreg_div0 q r d :
 Proof.
 move=> reg_d lt_r_d; rewrite addrC addr_eq0.
 have [-> | nz_q] := eqVneq q 0; first by rewrite mul0r oppr0.
-apply: contraTF lt_r_d => /eqP->; rewrite -leqNgt size_opp.
+apply: contraTF lt_r_d => /eqP->; rewrite -leqNgt size_polyN.
 rewrite size_proper_mul ?mulIr_eq0 ?lead_coef_eq0 //.
 by rewrite (polySpred nz_q) leq_addl.
 Qed.
@@ -1386,6 +1394,8 @@ by rewrite z0 expr0n gtn_eqF//= oner_eq0.
 Qed.
 
 End OnePrimitive.
+#[deprecated(since="mathcomp 2.4.0", note="renamed to `sizeN`")]
+Notation size_opp := size_polyN (only parsing).
 
 Lemma prim_root_exp_coprime n z k :
   n.-primitive_root z -> n.-primitive_root (z ^+ k) = coprime k n.
@@ -2894,7 +2904,7 @@ have [/size1_polyC-> | nc_q] := leqP (size q) 1.
   by rewrite comp_polyCr !size_polyC -!sub1b -!subnS muln0.
 have nz_q: q != 0 by rewrite -size_poly_eq0 -(subnKC nc_q).
 rewrite mulnC comp_polyE (polySpred nz_p) /= big_ord_recr /= addrC.
-rewrite size_addl size_scale ?lead_coef_eq0 ?size_exp //=.
+rewrite size_polyDl size_scale ?lead_coef_eq0 ?size_exp //=.
 rewrite [ltnRHS]polySpred ?expf_neq0 // ltnS size_exp.
 rewrite (leq_trans (size_sum _ _ _)) //; apply/bigmax_leqP => i _.
 rewrite (leq_trans (size_scale_leq _ _)) // polySpred ?expf_neq0 //.
