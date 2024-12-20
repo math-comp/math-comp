@@ -75,6 +75,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 	+ `countComSemiRingType` -> `countComNzSemiRingType`
 	+ `countComRingType` -> `countComNzRingType`
 
+- in `poly.v`:
+  + `size_opp` -> `sizeN`
 
 ### Removed
 

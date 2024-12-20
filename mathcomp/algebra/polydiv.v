@@ -182,7 +182,7 @@ apply: ihn => //.
 - apply: leq_trans (size_add _ _) _; rewrite geq_max; apply/andP; split.
     apply: leq_trans (size_mul_leq _ _) _.
     by rewrite size_polyC lead_coef_eq0 q0 /= addn1.
-  rewrite size_opp; apply: leq_trans (size_mul_leq _ _) _.
+  rewrite sizeN; apply: leq_trans (size_mul_leq _ _) _.
   apply: leq_trans hr; rewrite -subn1 leq_subLR -[in (1 + _)%N](subnK hqr).
   by rewrite addnA leq_add2r add1n -(@size_polyXn R) size_scale_leq.
 apply: leq_trans (size_add _ _) _; rewrite geq_max; apply/andP; split.
@@ -439,7 +439,7 @@ have : (q1 - q * (lead_coef d ^+ k)%:P) * d = r * (lead_coef d ^+ k)%:P - r1.
   by rewrite mulrDl mulNr !addrA [_ + (q1 * d)]addrC addrK -eC -mulrDl.
 move/eqP; rewrite -[_ == _ - _]subr_eq0 rreg_div0 //.
   by case/andP; rewrite subr_eq0; move/eqP.
-rewrite size_opp; apply: (leq_ltn_trans (size_add _ _)); rewrite size_opp.
+rewrite sizeN; apply: (leq_ltn_trans (size_add _ _)); rewrite sizeN.
 rewrite gtn_max Hs (leq_ltn_trans (size_mul_leq _ _)) //.
 rewrite size_polyC; case: (_ == _); last by rewrite addnS addn0.
 by rewrite addn0; apply: leq_ltn_trans lt_rd; case: size.
@@ -599,7 +599,7 @@ Qed.
 Lemma rmodpN p : rmodp (- p) d = - (rmodp p d).
 Proof.
 rewrite {1}(rdivp_eq p) opprD // -mulNr rmodp_addl_mul_small //.
-by rewrite size_opp ltn_rmodp // monic_neq0.
+by rewrite sizeN ltn_rmodp // monic_neq0.
 Qed.
 
 Lemma rmodpB p q : rmodp (p - q) d = rmodp p d - rmodp q d.
@@ -1966,12 +1966,12 @@ rewrite gcdpE ltnNge qsp //= (eqp_ltrans (gcdpC _ _)); split; last first.
   by rewrite divp_eq addrAC subrr add0r eqpxx.
 - apply: (leq_trans (size_add _ _)).
   have [-> | vn0] := eqVneq v 0.
-    rewrite mul0r size_opp size_poly0 maxn0; apply: leq_trans ihn'1 _.
+    rewrite mul0r sizeN size_poly0 maxn0; apply: leq_trans ihn'1 _.
     exact: leq_modp.
   have [-> | qqn0] := eqVneq (p %/ q) 0.
-    rewrite mulr0 size_opp size_poly0 maxn0; apply: leq_trans ihn'1 _.
+    rewrite mulr0 sizeN size_poly0 maxn0; apply: leq_trans ihn'1 _.
     exact: leq_modp.
-  rewrite geq_max (leq_trans ihn'1) ?leq_modp //= size_opp size_mul //.
+  rewrite geq_max (leq_trans ihn'1) ?leq_modp //= sizeN size_mul //.
   move: (ihn'2); rewrite (polySpred vn0) (polySpred qn0).
   rewrite -(ltn_add2r (size (p %/ q))) !addSn /= ltnS; move/leq_trans; apply.
   rewrite size_divp // addnBA ?addKn //.
@@ -2320,7 +2320,7 @@ Lemma root_gdco p q x : p != 0 -> root (gdcop q p) x = root p x && ~~(root q x).
 Proof.
 move=> p0 /=; rewrite !root_factor_theorem.
 apply: size2_dvdp_gdco; rewrite ?p0 //.
-by rewrite size_addl size_polyX // size_opp size_polyC ltnS; case: (x != 0).
+by rewrite size_addl size_polyX // sizeN size_polyC ltnS; case: (x != 0).
 Qed.
 
 Lemma dvdp_comp_poly r p q : (p %| q) -> (p \Po r) %| (q \Po r).
@@ -2554,7 +2554,7 @@ have hleq : size d <= size ((p %/ d - q) * d).
   by move: abs; rewrite -subr_eq0; move/polySpred->; rewrite addSn /= leq_addl.
 have hlt : size (r - p %% d) < size d.
   apply: leq_ltn_trans (size_add _ _) _.
-  by rewrite gtn_max srd size_opp ltn_modp -lead_coef_eq0.
+  by rewrite gtn_max srd sizeN ltn_modp -lead_coef_eq0.
 by move=> e; have:= leq_trans hlt hleq; rewrite e ltnn.
 Qed.
 
@@ -3354,14 +3354,14 @@ Section closed.
 
 Variable F : closedFieldType.
 
-Lemma root_coprimep (p q : {poly F}):
+Lemma root_coprimep (p q : {poly F}) :
   (forall x, root p x -> q.[x] != 0) -> coprimep p q.
 Proof.
 move=> Ncmn; rewrite -gcdp_eqp1 -size_poly_eq1; apply/closed_rootP.
 by case=> r; rewrite root_gcd !rootE=> /andP [/Ncmn/negPf->].
 Qed.
 
-Lemma coprimepP (p q : {poly F}):
+Lemma coprimepP (p q : {poly F}) :
   reflect (forall x, root p x -> q.[x] != 0) (coprimep p q).
 Proof. by apply: (iffP idP)=> [/coprimep_root|/root_coprimep]. Qed.
 
