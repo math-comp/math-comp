@@ -83,6 +83,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       coquelicot.job = false;
       coqeal.job = false;  # currently broken by https://github.com/coq/coq/pull/19228
       mathcomp-apery.job = false;  # reverse dependency of coqeal
+      mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
     };
     "coq-master".ocamlPackages = { elpi.override.version = "2.0.6"; };
     "coq-8.20".coqPackages = common-bundles // {
