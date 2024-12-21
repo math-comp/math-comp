@@ -5857,7 +5857,7 @@ have [a]: exists a, eigenvalue A a.
   have d_gt0: d > 0 := mxminpoly_nonconstant A.
   have [a def_ad] := solve_monicpoly (nth 0 (- P)) d_gt0.
   exists a; rewrite eigenvalue_root_min -/P /root -oppr_eq0 -hornerN.
-  rewrite horner_coef size_opp size_mxminpoly -/d big_ord_recr -def_ad.
+  rewrite horner_coef sizeN size_mxminpoly -/d big_ord_recr -def_ad.
   by rewrite coefN Pd1 mulN1r /= subrr.
 case/negP; rewrite kermx_eq0 row_free_unit (mx_Schur irrG) ?subr_eq0 //.
   by rewrite -memmx_cent_envelop -raddfN linearD addmx_sub ?scalar_mx_cent.

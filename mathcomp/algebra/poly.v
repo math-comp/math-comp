@@ -649,13 +649,13 @@ HB.instance Definition _ := GRing.isAdditive.Build R {poly R} (@polyC _) polyCB.
 
 Lemma polyCMn n : {morph (@polyC R) : c / c *+ n}. Proof. exact: raddfMn. Qed.
 
-Lemma size_opp p : size (- p) = size p.
+Lemma sizeN p : size (- p) = size p.
 Proof.
 by apply/eqP; rewrite eqn_leq -{3}(opprK p) -[-%R]/opp_poly unlock !size_poly.
 Qed.
 
 Lemma lead_coefN p : lead_coef (- p) = - lead_coef p.
-Proof. by rewrite /lead_coef size_opp coefN. Qed.
+Proof. by rewrite /lead_coef sizeN coefN. Qed.
 
 (* Polynomial ring structure. *)
 
@@ -677,9 +677,7 @@ by rewrite polyseq0 -polyC_natr polyseqC; case: eqP.
 Qed.
 
 Lemma size_Msign p n : size ((-1) ^+ n * p) = size p.
-Proof.
-by rewrite -signr_odd; case: (odd n); rewrite ?mul1r // mulN1r size_opp.
-Qed.
+Proof. by rewrite -signr_odd; case: (odd n); rewrite ?mul1r// mulN1r sizeN. Qed.
 
 Fact coefp0_multiplicative : multiplicative (coefp 0 : {poly R} -> R).
 Proof.
@@ -1053,7 +1051,7 @@ Lemma rreg_div0 q r d :
 Proof.
 move=> reg_d lt_r_d; rewrite addrC addr_eq0.
 have [-> | nz_q] := eqVneq q 0; first by rewrite mul0r oppr0.
-apply: contraTF lt_r_d => /eqP->; rewrite -leqNgt size_opp.
+apply: contraTF lt_r_d => /eqP->; rewrite -leqNgt sizeN.
 rewrite size_proper_mul ?mulIr_eq0 ?lead_coef_eq0 //.
 by rewrite (polySpred nz_q) leq_addl.
 Qed.
@@ -1386,6 +1384,8 @@ by rewrite z0 expr0n gtn_eqF//= oner_eq0.
 Qed.
 
 End OnePrimitive.
+#[deprecated(since="mathcomp 2.4.0", note="renamed to `sizeN`")]
+Notation size_opp := sizeN (only parsing).
 
 Lemma prim_root_exp_coprime n z k :
   n.-primitive_root z -> n.-primitive_root (z ^+ k) = coprime k n.

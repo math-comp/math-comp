@@ -412,7 +412,7 @@ apply: leq_trans (_ : #|[pred j | s j == j]|.+1 <= n.-1).
   - apply: leq_trans (size_mul_leq _ _) _.
     by rewrite -subn1 -addnS leq_subLR addnA leq_add.
   rewrite !mxE eq_sym !inE; case: (s j == j); first by rewrite polyseqXsubC.
-  by rewrite sub0r size_opp size_polyC leq_b1.
+  by rewrite sub0r sizeN size_polyC leq_b1.
 rewrite -[n in n.-1]card_ord -(cardC (pred2 (s i) i)) card2 nfix_i !ltnS.
 apply/subset_leq_card/subsetP=> j /(_ =P j) fix_j.
 rewrite !inE -{1}fix_j (inj_eq perm_inj) orbb.
@@ -669,7 +669,7 @@ Definition mxminpoly := 'X^d - mx_inv_horner (A ^+ d).
 Local Notation p_A := mxminpoly.
 
 Lemma size_mxminpoly : size p_A = d.+1.
-Proof. by rewrite size_addl ?size_polyXn // size_opp ltnS size_poly. Qed.
+Proof. by rewrite size_addl ?size_polyXn // sizeN ltnS size_poly. Qed.
 
 Lemma mxminpoly_monic : p_A \is monic.
 Proof.
