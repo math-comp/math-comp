@@ -135,14 +135,14 @@ Proof. by rewrite lead_coefE max_size_coefXY. Qed.
 Lemma max_size_evalX u : size u.['X] <= sizeY u + (size u).-1.
 Proof.
 rewrite horner_coef (leq_trans (size_sum _ _ _)) //; apply/bigmax_leqP=> i _.
-rewrite (leq_trans (size_mul_leq _ _)) // size_polyXn addnS.
+rewrite (leq_trans (size_polyM_leq _ _)) // size_polyXn addnS.
 by rewrite leq_add ?max_size_coefXY //= -ltnS (leq_trans _ (leqSpred _)).
 Qed.
 
 Lemma max_size_evalC u x : size u.[x%:P] <= sizeY u.
 Proof.
 rewrite horner_coef (leq_trans (size_sum _ _ _)) //; apply/bigmax_leqP=> i _.
-rewrite (leq_trans (size_mul_leq _ _)) // -polyC_exp size_polyC addnC -subn1.
+rewrite (leq_trans (size_polyM_leq _ _)) // -polyC_exp size_polyC addnC -subn1.
 by rewrite (leq_trans _ (max_size_coefXY _ i)) // leq_subLR leq_add2r leq_b1.
 Qed.
 

@@ -3636,8 +3636,8 @@ have argCle_trans : transitive argCle.
   move=> u v w /implyP geZuv /implyP geZvw; apply/implyP.
   by case/geZvw/andP=> /geZuv/andP[-> geRuv] /le_trans->.
 pose p := 'X^n - (x *+ (n > 0))%:P; have [r0 Dp] := closed_field_poly_normal p.
-have sz_p: size p = n.+1.
-  rewrite size_addl ?size_polyXn // ltnS size_opp size_polyC mulrn_eq0.
+have sz_p : size p = n.+1.
+  rewrite size_polyDl ?size_polyXn // ltnS size_polyN size_polyC mulrn_eq0.
   by case: posnP => //; case: negP.
 pose r := sort argCle r0; have r_arg: sorted argCle r by apply: sort_sorted.
 have{} Dp: p = \prod_(z <- r) ('X - z%:P).
@@ -4470,7 +4470,7 @@ Hypothesis ale0 : a <= 0.
 
 Let delta := b ^+ 2 - 4 * a * c.
 
-Let degpN : size (- p) = 3. Proof. by rewrite size_opp. Qed.
+Let degpN : size (- p) = 3. Proof. by rewrite size_polyN. Qed.
 Let b2a : - (- p)`_1 / (2 * (- p)`_2) = - b / (2 * a).
 Proof. by rewrite !coefN mulrN divrNN. Qed.
 Let deltaN : (- p)`_1 ^+ 2 - 4 * (- p)`_2 * (- p)`_0 = delta.
@@ -4541,7 +4541,7 @@ apply/(iffP idP) => [dlt0 x | /(_ r1)].
   case: ltgtP aneq0 => [agt0 _|alt0 _|//]; rewrite rootE; last first.
     exact/lt0r_neq0/(deg2_poly_gt0 degp (ltW alt0)).
   rewrite -oppr_eq0 -hornerN.
-  apply/lt0r_neq0/deg2_poly_gt0; rewrite ?size_opp ?coefN ?oppr_ge0 ?ltW//.
+  apply/lt0r_neq0/deg2_poly_gt0; rewrite ?size_polyN ?coefN ?oppr_ge0 ?ltW//.
   by rewrite sqrrN -mulrA mulrNN mulrA.
 by rewrite ltNge; apply: contraNN => ?; apply: deg2_poly_root1.
 Qed.
@@ -4632,7 +4632,7 @@ Let r2 := (- b - sqrt delta) / (2 * a).
 
 Hypothesis ale0 : a <= 0.
 
-Let degpN : size (- p) = 3. Proof. by rewrite size_opp. Qed.
+Let degpN : size (- p) = 3. Proof. by rewrite size_polyN. Qed.
 Let aNge0 : 0 <= (- p)`_2. Proof. by rewrite coefN oppr_ge0. Qed.
 Let deltaN : (- p)`_1 ^+ 2 - 4 * (- p)`_2 * (- p)`_0 = delta.
 Proof. by rewrite !coefN sqrrN -mulrN opprK mulrN mulNr. Qed.
@@ -4813,7 +4813,7 @@ Let delta := b ^+ 2 - 4 * a * c.
 Lemma deg_le2_poly_delta_le0 : a <= 0 -> (forall x, p.[x] <= 0) -> delta <= 0.
 Proof.
 move=> ale0 ple0; rewrite /delta -sqrrN -[c]opprK mulrN -mulNr -[-(4 * a)]mulrN.
-rewrite -!coefN deg_le2_poly_delta_ge0 ?size_opp ?coefN ?oppr_ge0// => x.
+rewrite -!coefN deg_le2_poly_delta_ge0 ?size_polyN ?coefN ?oppr_ge0// => x.
 by rewrite hornerN oppr_ge0.
 Qed.
 
@@ -4860,7 +4860,7 @@ Let delta := b ^+ 2 - 4 * a * c.
 Lemma deg_le2_poly_le0 : (forall x, p.[x] <= 0) -> delta <= 0.
 Proof.
 move=> ple0; rewrite /delta -sqrrN -[c]opprK mulrN -mulNr -[-(4 * a)]mulrN.
-by rewrite -!coefN deg_le2_poly_ge0 ?size_opp// => x; rewrite hornerN oppr_ge0.
+by rewrite -!coefN deg_le2_poly_ge0 ?size_polyN// => x; rewrite hornerN oppr_ge0.
 Qed.
 
 End Degle2PolyRealClosedConcave.

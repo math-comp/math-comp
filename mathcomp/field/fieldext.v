@@ -336,7 +336,7 @@ HB.instance Definition _ := GRing.isLinear.Build F0 L {poly L} _ Fadjoin_poly
   Fadjoin_poly_is_linear.
 
 Lemma size_minPoly : size minPoly = n.+1.
-Proof. by rewrite size_addl ?size_polyXn // size_opp ltnS size_poly. Qed.
+Proof. by rewrite size_polyDl ?size_polyXn // size_polyN ltnS size_poly. Qed.
 
 Lemma monic_minPoly : minPoly \is monic.
 Proof.

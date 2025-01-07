@@ -103,8 +103,8 @@ Qed.
 Lemma finField_genPoly : 'X^#|F| - 'X = \prod_x ('X - x%:P) :> {poly F}.
 Proof.
 set n := #|F|; set oppX := - 'X; set pF := LHS.
-have le_oppX_n: size oppX <= n by rewrite size_opp size_polyX finNzRing_gt1.
-have: size pF = (size (enum F)).+1 by rewrite -cardE size_addl size_polyXn.
+have le_oppX_n: size oppX <= n by rewrite size_polyN size_polyX finNzRing_gt1.
+have: size pF = (size (enum F)).+1 by rewrite -cardE size_polyDl size_polyXn.
 move/all_roots_prod_XsubC->; last by rewrite uniq_rootsE enum_uniq.
   by rewrite big_enum lead_coefDl ?size_polyXn // lead_coefXn scale1r.
 by apply/allP=> x _; rewrite rootE !hornerE expf_card subrr.
@@ -564,7 +564,7 @@ have Uzs: uniq zs.
   by rewrite natrX charf0 // expr0n gtn_eqF // eq_sym oner_eq0.
 suffices /eq_card->: Fm =i zs.
   apply: succn_inj; rewrite (card_uniqP _) //= -(size_prod_XsubC _ id).
-  by rewrite -(eqp_size DqL) size_addl size_polyXn // size_opp size_polyX.
+  by rewrite -(eqp_size DqL) size_polyDl size_polyXn // size_polyN size_polyX.
 have in_zs: zs =i Em.
   move=> z; rewrite -root_prod_XsubC -(eqp_root DqL) (sameP fixedSpaceP eqP).
   rewrite /root !hornerE subr_eq0 /= /m; congr (_ == z).

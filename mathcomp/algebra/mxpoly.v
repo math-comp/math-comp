@@ -209,7 +209,7 @@ exists (u _ (lshift dp), u _ ((rshift dq) _)).
   have ->: cofactor Ss (s i) j0 = (cofactor S (s i) j0)%:P.
     rewrite rmorphM /= rmorph_sign -det_map_mx; congr (_ * \det _).
     by apply/matrixP=> i' j'; rewrite !mxE.
-  apply: leq_trans (size_mul_leq _ _) (leq_trans _ (valP i)).
+  apply: leq_trans (size_polyM_leq _ _) (leq_trans _ (valP i)).
   by rewrite size_polyC size_polyXn addnS /= -add1n leq_add2r leq_b1.
 transitivity (\det Ss); last first.
   rewrite (expand_det_col Ss j0) big_split_ord !big_distrl /=.
@@ -267,8 +267,8 @@ apply/det0P/idP=> [[uv nz_uv] | r_nonC].
   set u := rVpoly _; set v := rVpoly _; pose m := gcdp (v * p) (v * q).
   have lt_vp: size v < size p by rewrite (polySpred p_nz) ltnS size_poly.
   move/(congr1 rVpoly)/eqP; rewrite -linearD linear0 poly_rV_K; last first.
-    rewrite (leq_trans (size_add _ _)) // geq_max.
-    rewrite !(leq_trans (size_mul_leq _ _)) // -subn1 leq_subLR.
+    rewrite (leq_trans (size_polyD _ _)) // geq_max.
+    rewrite !(leq_trans (size_polyM_leq _ _)) // -subn1 leq_subLR.
       by rewrite addnC addnA leq_add ?leqSpred ?size_poly.
     by rewrite addnCA leq_add ?leqSpred ?size_poly.
   rewrite addrC addr_eq0 => /eqP vq_up.
@@ -409,10 +409,10 @@ apply: leq_trans (_ : #|[pred j | s j == j]|.+1 <= n.-1).
   rewrite -sum1_card (@big_mkcond nat) /= size_Msign.
   apply: (big_ind2 (fun p m => size p <= m.+1)) => [| p mp q mq IHp IHq | j _].
   - by rewrite size_poly1.
-  - apply: leq_trans (size_mul_leq _ _) _.
+  - apply: leq_trans (size_polyM_leq _ _) _.
     by rewrite -subn1 -addnS leq_subLR addnA leq_add.
   rewrite !mxE eq_sym !inE; case: (s j == j); first by rewrite polyseqXsubC.
-  by rewrite sub0r size_opp size_polyC leq_b1.
+  by rewrite sub0r size_polyN size_polyC leq_b1.
 rewrite -[n in n.-1]card_ord -(cardC (pred2 (s i) i)) card2 nfix_i !ltnS.
 apply/subset_leq_card/subsetP=> j /(_ =P j) fix_j.
 rewrite !inE -{1}fix_j (inj_eq perm_inj) orbb.
@@ -422,7 +422,7 @@ Qed.
 Lemma size_char_poly : size char_poly = n.+1.
 Proof.
 have [q <- lt_q_n] := split_diagA; have le_q_n := leq_trans lt_q_n (leq_pred n).
-by rewrite size_addl size_prod_XsubC size_diagA.
+by rewrite size_polyDl size_prod_XsubC size_diagA.
 Qed.
 
 Lemma char_poly_monic : char_poly \is monic.
@@ -669,7 +669,7 @@ Definition mxminpoly := 'X^d - mx_inv_horner (A ^+ d).
 Local Notation p_A := mxminpoly.
 
 Lemma size_mxminpoly : size p_A = d.+1.
-Proof. by rewrite size_addl ?size_polyXn // size_opp ltnS size_poly. Qed.
+Proof. by rewrite size_polyDl ?size_polyXn // size_polyN ltnS size_poly. Qed.
 
 Lemma mxminpoly_monic : p_A \is monic.
 Proof.
