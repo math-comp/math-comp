@@ -1394,8 +1394,6 @@ by rewrite z0 expr0n gtn_eqF//= oner_eq0.
 Qed.
 
 End OnePrimitive.
-#[deprecated(since="mathcomp 2.4.0", note="renamed to `sizeN`")]
-Notation size_opp := size_polyN (only parsing).
 
 Lemma prim_root_exp_coprime n z k :
   n.-primitive_root z -> n.-primitive_root (z ^+ k) = coprime k n.
@@ -1818,6 +1816,8 @@ Lemma eq_poly n E1 E2 : (forall i, i < n -> E1 i = E2 i) ->
 Proof. by move=> E; rewrite !poly_def; apply: eq_bigr => i _; rewrite E. Qed.
 
 End PolynomialTheory.
+#[deprecated(since="mathcomp 2.4.0", note="renamed to `size_polyN`")]
+Notation size_opp := size_polyN (only parsing).
 
 Prenex Implicits polyC polyCK Poly polyseqK lead_coef root horner polyOver.
 Arguments monic {R}.
