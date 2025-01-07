@@ -522,7 +522,7 @@ Lemma coef0_prod I rI (F : I -> {poly R}) P :
   (\prod_(i <- rI| P i) F i)`_0 = \prod_(i <- rI | P i) (F i)`_0.
 Proof. by apply: (big_morph _ coef0M); rewrite coef1 eqxx. Qed.
 
-Lemma size_polyM_leq p q : size (p * q) <= (size p + size q).-1.
+Lemma size_polyMleq p q : size (p * q) <= (size p + size q).-1.
 Proof. by rewrite -[*%R]/mul_poly unlock size_poly. Qed.
 
 Lemma mul_lead_coef p q :
@@ -544,7 +544,7 @@ Qed.
 Lemma size_proper_mul p q :
   lead_coef p * lead_coef q != 0 -> size (p * q) = (size p + size q).-1.
 Proof.
-apply: contraNeq; rewrite mul_lead_coef eqn_leq size_polyM_leq -ltnNge => lt_pq.
+apply: contraNeq; rewrite mul_lead_coef eqn_leq size_polyMleq -ltnNge => lt_pq.
 by rewrite nth_default // -subn1 -(leq_add2l 1) -leq_subLR leq_sub2r.
 Qed.
 
@@ -552,13 +552,13 @@ Lemma lead_coef_proper_mul p q :
   let c := lead_coef p * lead_coef q in c != 0 -> lead_coef (p * q) = c.
 Proof. by move=> /= nz_c; rewrite mul_lead_coef -size_proper_mul. Qed.
 
-Lemma size_prod_leq (I : finType) (P : pred I) (F : I -> {poly R}) :
+Lemma size_poly_prod_leq (I : finType) (P : pred I) (F : I -> {poly R}) :
   size (\prod_(i | P i) F i) <= (\sum_(i | P i) size (F i)).+1 - #|P|.
 Proof.
 rewrite -sum1_card.
 elim/big_rec3: _ => [|i n m p _ IHp]; first by rewrite size_poly1.
 have [-> | nz_p] := eqVneq p 0; first by rewrite mulr0 size_poly0.
-rewrite (leq_trans (size_polyM_leq _ _)) // subnS -!subn1 leq_sub2r //.
+rewrite (leq_trans (size_polyMleq _ _)) // subnS -!subn1 leq_sub2r //.
 rewrite -addnS -addnBA ?leq_add2l // ltnW // -subn_gt0 (leq_trans _ IHp) //.
 by rewrite polySpred.
 Qed.
@@ -578,11 +578,11 @@ Qed.
 Lemma polyCM : {morph polyC : a b / a * b}.
 Proof. by move=> a b; apply/polyP=> [[|i]]; rewrite coefCM !coefC ?simp. Qed.
 
-Lemma size_exp_leq p n : size (p ^+ n) <= ((size p).-1 * n).+1.
+Lemma size_poly_exp_leq p n : size (p ^+ n) <= ((size p).-1 * n).+1.
 Proof.
 elim: n => [|n IHn]; first by rewrite size_poly1.
 have [-> | nzp] := poly0Vpos p; first by rewrite exprS mul0r size_poly0.
-rewrite exprS (leq_trans (size_polyM_leq _ _)) //.
+rewrite exprS (leq_trans (size_polyMleq _ _)) //.
 by rewrite -{1}(prednK nzp) mulnS -addnS leq_add2l.
 Qed.
 
@@ -591,8 +591,12 @@ End SemiPolynomialTheory.
 Notation size_add := size_polyD (only parsing).
 #[deprecated(since="mathcomp 2.4.0", note="renamed to `size_polyDl`")]
 Notation size_addl := size_polyDl (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="renamed to `size_polyM_leq`")]
-Notation size_mul_leq := size_polyM_leq (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="renamed to `size_polyMleq`")]
+Notation size_mul_leq := size_polyMleq (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="renamed to `size_poly_prod_leq`")]
+Notation size_prod_leq := size_poly_prod_leq (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="renamed to `size_poly_exp_leq`")]
+Notation size_exp_leq := size_poly_exp_leq (only parsing).
 
 Section PolynomialTheory.
 
@@ -2245,7 +2249,8 @@ Lemma size_comp_poly_leq p q :
   size (p \Po q) <= ((size p).-1 * (size q).-1).+1.
 Proof.
 rewrite comp_polyE (leq_trans (size_sum _ _ _)) //; apply/bigmax_leqP => i _.
-rewrite (leq_trans (size_scale_leq _ _)) // (leq_trans (size_exp_leq _ _)) //.
+rewrite (leq_trans (size_scale_leq _ _))//.
+rewrite (leq_trans (size_poly_exp_leq _ _))//.
 by rewrite ltnS mulnC leq_mul // -{2}(subnKC (valP i)) leq_addr.
 Qed.
 
@@ -2918,7 +2923,7 @@ move=> q_gt1; rewrite !lead_coefE coef_comp_poly size_comp_poly.
 have [->|nz_p] := eqVneq p 0; first by rewrite size_poly0 big_ord0 coef0 mul0r.
 rewrite polySpred //= big_ord_recr /= big1 ?add0r => [|i _].
   by rewrite -!lead_coefE -lead_coef_exp !lead_coefE size_exp mulnC.
-rewrite [X in _ * X]nth_default ?mulr0 ?(leq_trans (size_exp_leq _ _)) //.
+rewrite [X in _ * X]nth_default ?mulr0 ?(leq_trans (size_poly_exp_leq _ _)) //.
 by rewrite mulnC ltn_mul2r -subn1 subn_gt0 q_gt1 /=.
 Qed.
 

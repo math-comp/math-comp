@@ -79,7 +79,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   + `size_opp` -> `size_polyN`
   + `size_add` -> `size_polyD`
   + `size_addl` -> `size_polyDl`
-  + `size_mul_leq` -> `size_polyM_leq`
+  + `size_mul_leq` -> `size_polyMleq`
+  + `size_prod_leq` -> `size_poly_prod_leq`
+  + `size_exp_leq` -> `size_poly_exp_leq`
 
 ### Removed
 

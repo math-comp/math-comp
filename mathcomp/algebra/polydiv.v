@@ -180,13 +180,13 @@ apply: ihn => //.
     by rewrite subnBA // leq_psubRL // leq_add2r.
   by move/leq_sizeP: (hj) => -> //; rewrite mul0r mulr0 subr0.
 - apply: leq_trans (size_polyD _ _) _; rewrite geq_max; apply/andP; split.
-    apply: leq_trans (size_polyM_leq _ _) _.
+    apply: leq_trans (size_polyMleq _ _) _.
     by rewrite size_polyC lead_coef_eq0 q0 /= addn1.
-  rewrite size_polyN; apply: leq_trans (size_polyM_leq _ _) _.
+  rewrite size_polyN; apply: leq_trans (size_polyMleq _ _) _.
   apply: leq_trans hr; rewrite -subn1 leq_subLR -[in (1 + _)%N](subnK hqr).
   by rewrite addnA leq_add2r add1n -(@size_polyXn R) size_scale_leq.
 apply: leq_trans (size_polyD _ _) _; rewrite geq_max; apply/andP; split.
-  apply: leq_trans (size_polyM_leq _ _) _.
+  apply: leq_trans (size_polyMleq _ _) _.
   by rewrite size_polyC lead_coef_eq0 q0 /= addnS addn0.
 apply: leq_trans (size_scale_leq _ _) _.
 by rewrite size_polyXn -subSn // leq_subLR -add1n leq_add.
@@ -440,7 +440,7 @@ have : (q1 - q * (lead_coef d ^+ k)%:P) * d = r * (lead_coef d ^+ k)%:P - r1.
 move/eqP; rewrite -[_ == _ - _]subr_eq0 rreg_div0 //.
   by case/andP; rewrite subr_eq0; move/eqP.
 rewrite size_polyN; apply: (leq_ltn_trans (size_polyD _ _)); rewrite size_polyN.
-rewrite gtn_max Hs (leq_ltn_trans (size_polyM_leq _ _)) //.
+rewrite gtn_max Hs (leq_ltn_trans (size_polyMleq _ _)) //.
 rewrite size_polyC; case: (_ == _); last by rewrite addnS addn0.
 by rewrite addn0; apply: leq_ltn_trans lt_rd; case: size.
 Qed.
@@ -611,7 +611,7 @@ case: (altP (a =P 0%R)) => [-> | cn0]; first by rewrite !scale0r rmod0p.
 have -> : ((a *: p) = (a *: (rdivp p d)) * d + a *: (rmodp p d))%R.
   by rewrite -scalerAl -scalerDr -rdivp_eq.
 rewrite  rmodp_addl_mul_small //.
-rewrite -mul_polyC; apply: leq_ltn_trans (size_polyM_leq _ _) _.
+rewrite -mul_polyC; apply: leq_ltn_trans (size_polyMleq _ _) _.
   rewrite size_polyC cn0 addSn add0n /= ltn_rmodp.
 exact: monic_neq0.
 Qed.
@@ -2595,7 +2595,7 @@ have [-> | cn0] := eqVneq c 0; first by rewrite !scale0r mod0p.
 have e : (c *: p) = (c *: (p %/ d)) * d + c *: (p %% d).
   by rewrite -scalerAl -scalerDr -divp_eq.
 suff s: size (c *: (p %% d)) < size d by case: (edivpP e s) => _ ->.
-rewrite -mul_polyC; apply: leq_ltn_trans (size_polyM_leq _ _) _.
+rewrite -mul_polyC; apply: leq_ltn_trans (size_polyMleq _ _) _.
 rewrite size_polyC cn0 addSn add0n /= ltn_modp -lead_coef_eq0.
 by apply: contraTneq ulcd => ->; rewrite unitr0.
 Qed.
@@ -2606,7 +2606,7 @@ have [-> | cn0] := eqVneq c 0; first by rewrite !scale0r div0p.
 have e : (c *: p) = (c *: (p %/ d)) * d + c *: (p %% d).
   by rewrite -scalerAl -scalerDr -divp_eq.
 suff s: size (c *: (p %% d)) < size d by case: (edivpP e s) => ->.
-rewrite -mul_polyC; apply: leq_ltn_trans (size_polyM_leq _ _) _.
+rewrite -mul_polyC; apply: leq_ltn_trans (size_polyMleq _ _) _.
 rewrite size_polyC cn0 addSn add0n /= ltn_modp -lead_coef_eq0.
 by apply: contraTneq ulcd => ->; rewrite unitr0.
 Qed.
