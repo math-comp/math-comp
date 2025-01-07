@@ -82,7 +82,7 @@ Import GRing.Theory.
 
 #[short(type="fieldExtType")]
 HB.structure Definition FieldExt (R : nzRingType) := {T of Falgebra R T &
-  GRing.NzRing_hasCommutativeMul T & GRing.Field T}.
+  GRing.PzRing_hasCommutativeMul T & GRing.Field T}.
 
 Module FieldExtExports.
 Bind Scope ring_scope with FieldExt.sort.
@@ -197,7 +197,7 @@ HB.instance Definition _ K :=
   GRing.isDivClosed.Build L (pred_of_vspace K) (aspace_divr_closed K).
 
 HB.instance Definition _ (K : {subfield L}) :=
-  GRing.isSubNzSemiRing.Build L (pred_of_vspace K) (subvs_of K)
+  GRing.isSubPzSemiRing.Build L (pred_of_vspace K) (subvs_of K)
     (rmorphM _, rmorph1 _).
 (* Note that the nzRingType structure was built in the SubFalgType
    section of falgebra.v but the SubRing structure did not stand

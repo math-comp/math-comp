@@ -2562,7 +2562,7 @@ apply/polyP=> i; rewrite coefM coefMr.
 by apply: eq_bigr => j _; rewrite mulrC.
 Qed.
 
-HB.instance Definition _ := GRing.NzRing_hasCommutativeMul.Build (polynomial R)
+HB.instance Definition _ := GRing.PzRing_hasCommutativeMul.Build (polynomial R)
   poly_mul_comm.
 HB.instance Definition _ := GRing.Lalgebra_isComAlgebra.Build R (polynomial R).
 

@@ -694,7 +694,7 @@ by rewrite -[aq d]expr1 -exprB ?leq_b1 ?unitfE ?rpredX.
 Qed.
 
 Definition FinDomainFieldType : finFieldType :=
- let cC := GRing.NzRing_hasCommutativeMul.Build R finDomain_mulrC in
+ let cC := GRing.PzRing_hasCommutativeMul.Build R finDomain_mulrC in
  let cR : comUnitRingType := HB.pack R cC in
  let iC := GRing.ComUnitRing_isIntegral.Build cR domR in
  let iR : finIdomainType := HB.pack cR iC in
