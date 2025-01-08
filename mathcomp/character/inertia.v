@@ -926,8 +926,7 @@ have [sHG sTG]: H \subset G /\ T \subset G by rewrite subsetIl normal_sub.
 have nsHT : H <| T := normal_Inertia theta sHG; have sHT := normal_sub nsHT.
 have AtoB_P s (psi := 'chi_s) (chi := 'Ind[G] psi): s \in calA ->
   [/\ chi \in irr G, AtoB s \in calB & '['Res psi, theta] = '['Res chi, theta]].
-- rewrite constt_Ind_Res => sHt; have [r sGr] := constt_cfInd_irr s sTG.
-  rewrite constt_Ind_Res.
+- rewrite !constt_Ind_Res => sHt; have [r sGr] := constt_cfInd_irr s sTG.
   have rTs: s \in irr_constt ('Res[T] 'chi_r) by rewrite -constt_Ind_Res.
   have NrT: 'Res[T] 'chi_r \is a character by rewrite cfRes_char ?irr_char.
   have rHt: t \in irr_constt ('Res[H] 'chi_r).

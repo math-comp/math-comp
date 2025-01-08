@@ -145,9 +145,7 @@ rewrite [@gtype _]unlock; apply: intro_isoGrp => [|rT H].
   have Gy: y \in G by rewrite -cycle_subG joing_subr.
   rewrite eqEsubset subsetT -im_sdpair mulG_subG /= -/G; apply/andP; split.
     apply/subsetP=> u /morphimP[[i j] _ _ def_u].
-    suffices ->: u = z ^+ i * x ^+ j. 
-      rewrite groupMl; apply/groupX; first exact: Gx.
-      by apply/groupR; first exact: Gx.
+    suffices ->: u = z ^+ i * x ^+ j by rewrite groupMl groupX ?groupR.
     rewrite def_zi def_xi !natr_Zp -morphM ?inE // def_u.
     by congr (sdpair1 _ (_, _)); rewrite ?mulg1 ?mul1g.
   apply/subsetP=> v /morphimP[k _ _ def_v].
@@ -609,9 +607,7 @@ have oQ: #|'Q_(2 ^ 3)| = 8 by rewrite card_quaternion.
 have pQ: 2.-group 'Q_8 by rewrite /pgroup oQ.
 case: DnQ_P => gz isoZ.
 rewrite -im_cpair cardMg_divn setI_im_cpair cpair_center_id.
-rewrite -injm_center//; last exact: injm_cpair1g.
-rewrite (card_injm (injm_cpairg1 _))// (card_injm (injm_cpair1g _))//.
-rewrite (card_injm (injm_cpair1g _))//; last exact: center_sub.
+rewrite -injm_center 3?{1}card_injm ?injm_cpairg1 ?injm_cpair1g ?center_sub //.
 rewrite oQ card_pX1p2n // (card_center_extraspecial pQ Q8_extraspecial).
 by rewrite -muln_divA // mulnC -(expnD 2 2).
 Qed.

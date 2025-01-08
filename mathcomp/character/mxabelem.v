@@ -732,14 +732,13 @@ Qed.
 
 Lemma rsim_abelem_subg : mx_rsim rHG rH.
 Proof.
-exists 1%:M => [//| |x Hx]; first by rewrite row_free_unit unitmx1.
+exists 1%:M => // [|x Hx]; first by rewrite row_free_unit unitmx1.
 by rewrite mul1mx mulmx1 eq_abelem_subg_repr.
 Qed.
 
 Lemma mxmodule_abelem_subg m (U : 'M_(m, n)) : mxmodule rHG U = mxmodule rH U.
 Proof.
-apply: eq_subset_r => x.
-rewrite [LHS]inE inE; apply: andb_id2l => Hx.
+apply: eq_subset_r => x /[!inE]; apply: andb_id2l => Hx.
 by rewrite eq_abelem_subg_repr.
 Qed.
 

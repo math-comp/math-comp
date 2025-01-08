@@ -2271,8 +2271,7 @@ move=> Nchi; without loss kerH: / H \subset cfker chi.
   by apply/cfunP=> x; rewrite cfunE cfun1E mulr_natr cfunElock IHchi.
 without loss nsHG: G chi Nchi kerH / H <| G.
   move=> IHchi; have nsHN := normalSG (subset_trans kerH (cfker_sub chi)).
-  rewrite cfQuoInorm//; apply/cfRes_char/IHchi => //; first exact: cfRes_char. 
-  by apply: sub_cfker_Res => //; apply: normal_sub.
+  by rewrite cfQuoInorm ?(cfRes_char, IHchi) ?sub_cfker_Res // ?normal_sub.
 have [rG Dchi] := char_reprP Nchi; rewrite Dchi cfker_repr in kerH.
 apply/char_reprP; exists (Representation (quo_repr kerH (normal_norm nsHG))).
 apply/cfun_inP=> _ /morphimP[x nHx Gx ->]; rewrite Dchi cfQuoE ?cfker_repr //=.

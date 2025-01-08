@@ -206,7 +206,7 @@ Proof. by rewrite cards2 diff_id_sh. Qed.
 Lemma group_set_iso2 : group_set isometries2.
 Proof.
 apply/group_setP; split => [|x y]; rewrite !inE ?eqxx //.
-do 2![case/orP; move/eqP->]; rewrite ?(mul1g, mulg1) ?eqxx ?orbT//.
+do 2![case/orP; move/eqP->]; gsimpl; rewrite ?(eqxx, orbT) //.
 by rewrite -/sh -{1}sh_inv mulVg eqxx.
 Qed.
 Canonical iso2_group := Group group_set_iso2.
