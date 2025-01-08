@@ -1113,9 +1113,9 @@ suffices [m [X [[u [_ Du]] idealM]]]: exists m,
   have: (\det B *: (u *m X^T)) 0 0 == 0.
     rewrite scalemxAr -linearZ -mul_mx_scalar -mul_mx_adj mulmxA XB0 /=.
     by rewrite mul0mx trmx0 mulmx0 mxE.
-  rewrite mxE -Du mulr1 rootE -horner_evalE -!det_map_mx; congr (\det _ == 0).
-  rewrite !raddfB /= !map_scalar_mx /= map_polyX horner_evalE hornerX.
-  by apply/matrixP=> i j; rewrite !mxE map_polyC /horner_eval hornerC.
+  rewrite mxE -Du mulr1 rootE -horner_evalE -2!det_map_mx; congr (\det _ == 0).
+  rewrite raddfB/= map_scalar_mx; apply/matrixP=> i j.
+  by rewrite !mxE raddfB raddfMn/= map_polyX map_polyC /horner_eval !hornerE.
 pose gen1 x E y := exists2 r, pXin E r & y = r.[x]; pose gen := foldr gen1 memR.
 have gen1S (E : K -> Prop) x y: E 0 -> E y -> gen1 x E y.
   by exists y%:P => [i|]; rewrite ?hornerC ?coefC //; case: ifP.
@@ -1889,7 +1889,9 @@ apply/(codiagonalizable_on _ mxdirect_eigenspaces) => // i/=.
     by rewrite thinmx0 sub0mx.
   by rewrite comm_mx_stable_eigenspace.
 rewrite codiagonalizable1.
-by rewrite (@conjmx_eigenvalue _ _ _ rs`_i) ?eq_row_base ?row_base_free.
+rewrite (@conjmx_eigenvalue _ _ _ rs`_i); first exact: diagonalizable_scalar.
+  by rewrite eq_row_base.
+by rewrite row_base_free.
 Qed.
 
 Lemma diagonalizableP n' (n := n'.+1) (A : 'M[F]_n) :
@@ -1909,8 +1911,10 @@ Qed.
 Lemma diagonalizable_conj_diag m n (V : 'M[F]_(m, n)) (d : 'rV[F]_n) :
   stablemx V (diag_mx d) -> row_free V -> diagonalizable (conjmx V (diag_mx d)).
 Proof.
-case: m n => [|m] [|n] in V d * => Vd rdV; rewrite ?thinmx0//=.
-  by rewrite /row_free mxrank.unlock in rdV.
+case: m n => [|m] [|n] in V d * => Vd rdV; rewrite ?thinmx0.
+- by [].
+- by [].
+- by exfalso; move: rdV; rewrite /row_free mxrank.unlock eqxx orbT.
 apply/diagonalizableP; pose u := undup [seq d 0 i | i <- enum 'I_n.+1].
 exists u; first by rewrite undup_uniq.
 by rewrite (dvdp_trans (mxminpoly_conj (f:=diag_mx d) _ _))// mxminpoly_diag.
@@ -1944,7 +1948,7 @@ rewrite (@conjmx_eigenvalue _ _ _ rs`_i) ?eq_row_base ?row_base_free//.
 set Bs := map _ _; suff [P Punit /= PBs] : codiagonalizable Bs.
   exists P; rewrite /= ?PBs ?andbT// /(diagonalizable_for _ _).
   by rewrite conjmx_scalar ?mx_scalar_is_diag// row_free_unit.
-apply: IHk; rewrite ?size_map/= ?ltnS//; split.
+apply: IHk; rewrite ?size_map//=; split.
   apply/all_comm_mxP => _ _ /mapP[/= B BAs ->] /mapP[/= h hAs ->].
   rewrite -!conjmxM ?inE ?stablemx_row_base ?eAB ?inE ?BAs ?hAs ?orbT//.
   by rewrite (all_comm_mxP _ AsC).
