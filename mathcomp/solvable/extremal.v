@@ -132,7 +132,8 @@ have def_s: aut_of = s.
   by rewrite !autmE // sb (eqP tb).
 apply: intro_isoGrp => [|gT G].
   apply/existsP; exists (sdpair1 _ b, sdpair2 _ a); rewrite /= !xpair_eqE.
-  rewrite -!morphim_cycle ?norm_joinEr ?im_sdpair ?im_sdpair_norm ?eqxx //=.
+  apply/andP; split.
+    by rewrite -!morphim_cycle ?norm_joinEr ?im_sdpair ?im_sdpair_norm ?eqxx //=.
   rewrite -!order_dvdn !order_injm ?injm_sdpair1 ?injm_sdpair2 // oa ob !dvdnn.
   by rewrite -sdpair_act // [act _ _ _]apermE /= eltm_id -morphX // -sb -def_s.
 case/existsP=> -[x y] /= /eqP[defG xq1 yp1 xy].
