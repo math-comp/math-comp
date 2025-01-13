@@ -1432,8 +1432,9 @@ Lemma ler10 : 1 <= 0 :> R = false. Proof. by rewrite lt_geF. Qed.
 Lemma ltr0N1 : 0 < -1 :> R = false. Proof. by rewrite le_gtF // lerN10. Qed.
 Lemma ler0N1 : 0 <= -1 :> R = false. Proof. by rewrite lt_geF // ltrN10. Qed.
 
+#[deprecated(since="mathcomp 2.4.0", note="use `mulrn_wgt0` instead")]
 Lemma pmulrn_rgt0 x n : 0 < x -> 0 < x *+ n = (0 < n)%N.
-Proof. by move=> x_gt0; rewrite -(mulr0n x) ltr_pMn2l. Qed.
+Proof. exact: mulrn_wgt0. Qed.
 
 Lemma pmulrn_rlt0 x n : 0 < x -> x *+ n < 0 = false.
 Proof. by move=> x_gt0; rewrite -(mulr0n x) ltr_pMn2l. Qed.
