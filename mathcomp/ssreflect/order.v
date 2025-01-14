@@ -7657,14 +7657,14 @@ End LexiSyntax.
 
 Module Import SeqLexiSyntax.
 
-Notation "<=^l%O" := (@le (seqlexi_display _ _) _) : function_scope.
-Notation ">=^l%O" := (@ge (seqlexi_display _ _) _) : function_scope.
-Notation ">=^l%O" := (@ge (seqlexi_display _ _) _) : function_scope.
-Notation "<^l%O" := (@lt (seqlexi_display _ _) _) : function_scope.
-Notation ">^l%O" := (@gt (seqlexi_display _ _) _) : function_scope.
-Notation "<?=^l%O" := (@leif (seqlexi_display _ _) _) : function_scope.
-Notation ">=<^l%O" := (@comparable (seqlexi_display _ _) _) : function_scope.
-Notation "><^l%O" := (fun x y => ~~ (@comparable (seqlexi_display _ _) _ x y)) :
+Notation "<=^l%O" := (@le (seqlexi_display _) _) : function_scope.
+Notation ">=^l%O" := (@ge (seqlexi_display _) _) : function_scope.
+Notation ">=^l%O" := (@ge (seqlexi_display _) _) : function_scope.
+Notation "<^l%O" := (@lt (seqlexi_display _) _) : function_scope.
+Notation ">^l%O" := (@gt (seqlexi_display _) _) : function_scope.
+Notation "<?=^l%O" := (@leif (seqlexi_display _) _) : function_scope.
+Notation ">=<^l%O" := (@comparable (seqlexi_display _) _) : function_scope.
+Notation "><^l%O" := (fun x y => ~~ (@comparable (seqlexi_display _) _ x y)) :
   function_scope.
 
 Notation "<=^l y" := (>=^l%O y) : order_scope.
@@ -7704,8 +7704,8 @@ Notation "><^l y" := [pred x | ~~ (>=<^l%O x y)] : order_scope.
 Notation "><^l y :> T" := (><^l (y : T)) (only parsing) : order_scope.
 Notation "x ><^l y" := (~~ (><^l%O x y)) : order_scope.
 
-Notation meetlexi := (@meet (seqlexi_display _ _) _).
-Notation joinlexi := (@join (seqlexi_display _ _) _).
+Notation meetlexi := (@meet (seqlexi_display _) _).
+Notation joinlexi := (@join (seqlexi_display _) _).
 
 Notation "x `&^l` y" :=  (meetlexi x y) : order_scope.
 Notation "x `|^l` y" := (joinlexi x y) : order_scope.
