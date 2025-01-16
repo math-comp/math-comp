@@ -414,6 +414,42 @@ Proof. by move=> lt_mn /ltnW; apply: leq_trans. Qed.
 Lemma leq_total m n : (m <= n) || (m >= n).
 Proof. by rewrite -implyNb -ltnNge; apply/implyP; apply: ltnW. Qed.
 
+Lemma leq_leP {m n} : reflect (forall k, n <= k -> m <= k) (m <= n).
+Proof. by apply: (iffP idP) => [mn k /(leq_trans _)->//|]; apply. Qed.
+
+Lemma ltn_gtP {m n} : reflect (forall k, k <= m -> k < n) (m < n).
+Proof. by apply: (iffP idP) => [mn k /leq_ltn_trans->//|]; apply. Qed.
+
+Lemma leq_geP {m n} : reflect (forall k, k <= m -> k <= n) (m <= n).
+Proof. by rewrite -ltnS; apply: (iffP ltn_gtP). Qed.
+
+Lemma leq_ltP {m n} : reflect (forall k, n < k -> m < k) (m <= n).
+Proof. by apply: (iffP idP) => [mn k|/(_ n.+1)]; [exact: leq_trans|exact]. Qed.
+
+Lemma leq_gtP {m n} : reflect (forall k, k < m -> k < n) (m <= n).
+Proof. by case: m => [|m]; [constructor|apply: (iffP ltn_gtP)]. Qed.
+
+Lemma ltn_ltP {m n} : reflect (forall k, n <= k -> m < k) (m < n).
+Proof. exact: leq_leP. Qed.
+
+Lemma eqn_geP {m n} : reflect (forall k, (k <= m) = (k <= n)) (m == n).
+Proof. by apply: (iffP idP) => [/eqP->//|/[dup]/[!eqn_leq]-> <- /[!leqnn]]. Qed.
+
+Lemma eqn_leP {m n} : reflect (forall k, (m <= k) = (n <= k)) (m == n).
+Proof. by apply: (iffP idP) => [/eqP->//|/[dup]/[!eqn_leq]<- -> /[!leqnn]]. Qed.
+
+Lemma eqn_gtP {m n} : reflect (forall k, (k < m) = (k < n)) (m == n).
+Proof.
+apply: (iffP eqn_leP) => + k => /(_ k);
+by rewrite !ltnNge => /(congr1 negb); rewrite ?negbK.
+Qed.
+
+Lemma eqn_ltP {m n} : reflect (forall k, (m < k) = (n < k)) (m == n).
+Proof.
+apply: (iffP eqn_geP) => + k => /(_ k);
+by rewrite !ltnNge => /(congr1 negb); rewrite ?negbK.
+Qed.
+
 (* Helper lemmas to support generalized induction over a nat measure.         *)
 (* The idiom for a proof by induction over a measure Mxy : nat involving      *)
 (* variables x, y, ... (e.g., size x + size y) is                             *)
