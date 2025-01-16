@@ -4,8 +4,8 @@
   bundle ? null, job ? null, inNixShell ? null, src ? ./.,
 }@args:
 let auto = fetchGit {
-  url = "https://github.com/proux01/coq-nix-toolbox.git";
-  ref = "rocq-master";
+  url = "https://github.com/coq-community/coq-nix-toolbox.git";
+  ref = "master";
 # putting a ref here is strongly advised
   rev = import .nix/coq-nix-toolbox.nix;
 };
