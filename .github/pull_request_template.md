@@ -8,7 +8,7 @@
 ##### Minimal TODO list
 
 <!-- please fill in the following checklist -->
-- [ ] added corresponding entries in `CHANGELOG_UNRELEASED.md`
+- [ ] added changelog entries with `doc/changelog/make-entry.sh`
 
 <!-- only append to minimize problems when merging/rebasing -->
 <!-- consider the use of `changelog/changes.sh` from
