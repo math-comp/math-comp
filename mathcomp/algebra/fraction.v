@@ -276,6 +276,7 @@ Notation "{ 'fraction' T }" := (FracField.type T).
 Notation equivf := (@FracField.equivf _).
 #[global] Hint Resolve denom_ratioP : core.
 
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ (R : idomainType) := GRing.Field.on {fraction R}.
 
 Section FracFieldTheory.

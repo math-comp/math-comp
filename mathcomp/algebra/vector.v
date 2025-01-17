@@ -2027,6 +2027,7 @@ HB.instance Definition _ := Lmodule_hasFinDim.Build _ {ffun I -> vT}
 
 End FunVectType.
 
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ (K : fieldType) (vT : vectType K) n :=
   Vector.on (vT ^ n)%type.
 

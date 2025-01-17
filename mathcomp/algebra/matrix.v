@@ -2140,6 +2140,7 @@ HB.instance Definition _ := GRing.Nmodule_isZmodule.Build 'M[V]_(m, n)
 
 Lemma const_mx_is_additive : additive const_mx.
 Proof. by move=> a b; apply/matrixP=> i j; rewrite !mxE. Qed.
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ := GRing.isAdditive.Build V 'M[V]_(m, n) const_mx
   const_mx_is_additive.
 
@@ -2151,6 +2152,7 @@ Variables (m n p q : nat) (f : 'I_p -> 'I_q -> 'I_m) (g : 'I_p -> 'I_q -> 'I_n).
 
 Lemma swizzle_mx_is_additive k : additive (swizzle_mx f g k).
 Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE. Qed.
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ k := GRing.isAdditive.Build 'M_(m, n) 'M_(p, q)
   (swizzle_mx f g k) (swizzle_mx_is_additive k).
 
@@ -2158,21 +2160,37 @@ End Additive.
 
 Local Notation SwizzleAdd op := (GRing.Additive.copy op (swizzle_mx _ _ _)).
 
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m n := SwizzleAdd (@trmx V m n).
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m n i := SwizzleAdd (@row V m n i).
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m n j := SwizzleAdd (@col V m n j).
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m n i := SwizzleAdd (@row' V m n i).
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m n j := SwizzleAdd (@col' V m n j).
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m n m' n' f g := SwizzleAdd (@mxsub V m n m' n' f g).
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m n s := SwizzleAdd (@row_perm V m n s).
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m n s := SwizzleAdd (@col_perm V m n s).
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m n i1 i2 := SwizzleAdd (@xrow V m n i1 i2).
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m n j1 j2 := SwizzleAdd (@xcol V m n j1 j2).
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m n1 n2 := SwizzleAdd (@lsubmx V m n1 n2).
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m n1 n2 := SwizzleAdd (@rsubmx V m n1 n2).
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m1 m2 n := SwizzleAdd (@usubmx V m1 m2 n).
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m1 m2 n := SwizzleAdd (@dsubmx V m1 m2 n).
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m n := SwizzleAdd (@vec_mx V m n).
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ m n := GRing.isAdditive.Build 'M_(m, n) 'rV_(m * n)
   mxvec (can2_additive (@vec_mxK V m n) mxvecK).
 
@@ -2196,6 +2214,7 @@ Lemma diag_mx_is_additive n : additive (@diag_mx V n).
 Proof.
 by move=>A B; apply/matrixP=>i j; rewrite !mxE mulrnBl.
 Qed.
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ n := GRing.isAdditive.Build 'rV_n 'M_n (@diag_mx V n)
   (@diag_mx_is_additive n).
 
@@ -2206,6 +2225,7 @@ Variable n : nat.
 
 Lemma scalar_mx_is_additive : additive (@scalar_mx V n).
 Proof. by move=> a b; rewrite -!diag_const_mx !raddfB. Qed.
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ := GRing.isAdditive.Build V 'M_n scalar_mx
   scalar_mx_is_additive.
 
@@ -2221,6 +2241,7 @@ Proof.
 move=>A B; rewrite -sumrN -big_split /=.
 by apply: eq_bigr=> i _; rewrite !mxE.
 Qed.
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ := GRing.isAdditive.Build 'M_n V (@mxtrace V n)
   mxtrace_is_additive.
 
@@ -2241,6 +2262,7 @@ Proof. by apply/matrixP=> i j; rewrite !mxE raddfN. Qed.
 Lemma map_mxB A B : (A - B)^f = A^f - B^f.
 Proof. by rewrite map_mxD map_mxN. Qed.
 
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ :=
   GRing.isAdditive.Build 'M[aR]_(m, n) 'M[rR]_(m, n) (map_mx f) map_mxB.
 
@@ -2831,7 +2853,7 @@ HB.instance Definition _ := [Finite of MV by <:].
 
 End FinNmodMatrix.
 
-#[compress_coercions]
+#[compress_coercions, warning="-HB.no-new-instance"]
 HB.instance Definition _ (R : finNzSemiRingType) (m n : nat) :=
   FinRing.Nmodule.on 'M[R]_(m, n).
 
@@ -3019,6 +3041,7 @@ Arguments comm_mx_scalar {R n}.
 Arguments comm_scalar_mx {R n}.
 Arguments diag_mx_comm {R n}.
 
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ (R : finComNzSemiRingType) (n' : nat) :=
   [Finite of 'M[R]_n'.+1 by <:].
 
@@ -3303,6 +3326,7 @@ HB.instance Definition _ := GRing.NzSemiRing.on 'M[R]_n.
 HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build R 'M[R]_n
   (@scalemxAl n n n).
 
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ := GRing.RMorphism.on (@scalar_mx R n).
 
 End MatrixRing.
@@ -3389,6 +3413,7 @@ End FixedSize.
 Lemma map_copid_mx n r : (copid_mx r)^f = copid_mx r :> 'M_n.
 Proof. by rewrite map_mxB map_mx1 map_pid_mx. Qed.
 
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ n' := GRing.RMorphism.on (@map_mx _ _ f n'.+1 n'.+1).
 
 Lemma map_lin1_mx m n (g : 'rV_m -> 'rV_n) gf :

@@ -311,7 +311,7 @@ Variable f : {bilinear U -> U' -> V | s & s'}.
 Section GenericPropertiesr.
 Variable z : U.
 
-#[local, non_forgetful_inheritance]
+#[local, non_forgetful_inheritance, warning="-HB.no-new-instance"]
 HB.instance Definition _ :=
   GRing.isAdditive.Build _ _ (f z) (@additiver_subproof _ _ _ _ _ _ f z).
 #[local, non_forgetful_inheritance]
