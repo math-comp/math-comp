@@ -2968,8 +2968,10 @@ HB.instance Definition _ (R : countNzRingType) :=
   [Countable of polynomial R by <:].
 HB.instance Definition _ (R : countComNzRingType) :=
   [Countable of polynomial R by <:].
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ (R : countUnitRingType) :=
   [Countable of polynomial R by <:].
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ (R : countComUnitRingType) :=
   [Countable of polynomial R by <:].
 HB.instance Definition _ (R : countIdomainType) :=

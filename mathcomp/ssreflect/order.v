@@ -3935,6 +3935,7 @@ Proof. exact: joinIl. Qed.
 Lemma joinIr : right_distributive (@join _ L) (@meet _ L).
 Proof. by move=> x y z; rewrite ![x `|` _]joinC joinIl. Qed.
 
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ := Monoid.isAddLaw.Build L meet join meetUl meetUr.
 HB.instance Definition _ := Monoid.isAddLaw.Build L join meet joinIl joinIr.
 
@@ -5112,6 +5113,7 @@ Proof. by rewrite lt_def eq_sym. Qed.
 Fact ge_anti : antisymmetric (fun x y => le y x).
 Proof. by move=> ? ? /le_anti ->. Qed.
 
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ := @isDuallyPOrder.Build d T
   le lt lt_def gt_def le_refl le_refl le_anti ge_anti
   le_trans (fun _ _ _ Hxy Hyz => le_trans Hyz Hxy).
@@ -5127,6 +5129,7 @@ HB.factory Record Le_isPOrder (d : disp_t) T of Equality T := {
 
 HB.builders Context d T of Le_isPOrder d T.
 (* TODO: print nice error message when keyed type is not provided *)
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ := @isPOrder.Build d T
   le _ (fun _ _ => erefl) le_refl le_anti le_trans.
 HB.end.
@@ -5159,6 +5162,7 @@ Qed.
 Let lt_def x y : lt x y = (y != x) && (le x y).
 Proof. by rewrite le_def; case: eqVneq => //= ->; rewrite lt_irr. Qed.
 
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ := @isPOrder.Build d T
   le lt lt_def le_refl le_anti le_trans.
 
@@ -5171,6 +5175,7 @@ HB.factory Record Lt_isPOrder (d : disp_t) T of Equality T := {
 }.
 
 HB.builders Context d T of Lt_isPOrder d T.
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ := @LtLe_isPOrder.Build d T
   _ lt (fun _ _ => erefl) lt_irr lt_trans.
 HB.end.
@@ -6472,6 +6477,7 @@ Fact le0x x : zeroU <= x. Proof. by rewrite -le_val /= SubK le0x. Qed.
 HB.instance Definition _ := hasBottom.Build d' U le0x.
 
 Fact val0 : (val : U -> T) \bot = \bot. Proof. by rewrite SubK. Qed.
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ := isBSubLattice.Build d T S d' U val0.
 HB.end.
 
@@ -6529,6 +6535,7 @@ Fact lex1 x : x <= oneU. Proof. by rewrite -le_val /= SubK lex1. Qed.
 HB.instance Definition _ := hasTop.Build d' U lex1.
 
 Fact val1 : (val : U -> T) \top = \top. Proof. by rewrite SubK. Qed.
+#[warning="-HB.no-new-instance"]
 HB.instance Definition _ := isTSubLattice.Build d T S d' U val1.
 HB.end.
 
