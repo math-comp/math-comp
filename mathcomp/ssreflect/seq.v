@@ -128,6 +128,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 (*               rev s == the (linear time) reversal of s.                    *)
 (*        catrev s1 s2 == the reversal of s1 followed by s2 (this is the      *)
 (*                        recursive form of rev).                             *)
+(*    seq_subst l x y  == the list l where every occurrence of x is replaced  *)
+(*                        by y (the type of elements must be an eqType)       *)
 (*  ** Dependent iterator: for s : seq S and t : S -> seq T                   *)
 (* [seq E | x <- s, y <- t] := flatten [seq [seq E | x <- t] | y <- s]        *)
 (*                == the sequence of all the f x y, with x and y drawn from   *)
@@ -320,11 +322,15 @@ Fixpoint rcons s z := if s is x :: s' then x :: rcons s' z else [:: z].
 Lemma rcons_cons x s z : rcons (x :: s) z = x :: rcons s z.
 Proof. by []. Qed.
 
+Lemma rcons_nilp  s x: nilp (rcons s x) = false.
+Proof. by case: s. Qed.
+
 Lemma cats1 s z : s ++ [:: z] = rcons s z.
 Proof. by elim: s => //= x s ->. Qed.
 
 Fixpoint last x s := if s is x' :: s' then last x' s' else x.
 Fixpoint belast x s := if s is x' :: s' then x :: (belast x' s') else [::].
+Definition cutlast s := if s is x :: s' then belast x s' else [::].
 
 Lemma lastI x s : x :: s = rcons (belast x s) (last x s).
 Proof. by elim: s x => [|y s IHs] x //=; rewrite IHs. Qed.
@@ -477,6 +483,9 @@ Fixpoint count s := if s is x :: s' then a x + count s' else 0.
 Fixpoint has s := if s is x :: s' then a x || has s' else false.
 
 Fixpoint all s := if s is x :: s' then a x && all s' else true.
+
+Lemma all_cons x s : all (x :: s) = a x && all s.
+Proof. by []. Qed.
 
 Lemma size_filter s : size (filter s) = count s.
 Proof. by elim: s => //= x s <-; case (a x). Qed.
@@ -937,6 +946,11 @@ Proof. by elim: n => // n IHn; rewrite -[in LHS]addn1 nseqD rev_cat IHn. Qed.
 
 End Sequences.
 
+(* This lemma cannot be stored in the section because the default value
+   changes. *)
+Lemma head_rcons [T : Type] x (s : seq T) y : head x (rcons s y) = head y s.
+Proof. by case: s. Qed.
+
 Prenex Implicits size ncons nseq head ohead behead last rcons belast.
 Arguments seqn {T} n.
 Prenex Implicits cat take drop rot rotr catrev.
@@ -1070,6 +1084,10 @@ Proof. exact: (sameP nilP eqP). Qed.
 
 Lemma nilpE s : nilp s = (s == [::]). Proof. by case: s. Qed.
 
+Lemma middle_cat_non0 {A : eqType} s1 s2 s3 :
+  s2 != [::] -> s1 ++ s2 ++ s3 != [::].
+Proof. by rewrite -!nilpE !cat_nilp=> /negbTE ->; rewrite andbF. Qed.
+
 Lemma has_filter a s : has a s = (filter a s != [::]).
 Proof. by rewrite -size_eq0 size_filter has_count lt0n. Qed.
 
@@ -1131,8 +1149,14 @@ Proof. by move=> x; rewrite -cats1 /= mem_cat mem_seq1 orbC in_cons. Qed.
 Lemma mem_head x s : x \in x :: s.
 Proof. exact: predU1l. Qed.
 
+Lemma mem_head_non0 x s : s != [::] -> head x s \in s.
+Proof. by case: s=> [// | y ?] /= _; rewrite inE eqxx. Qed.
+
 Lemma mem_last x s : last x s \in x :: s.
 Proof. by rewrite lastI mem_rcons mem_head. Qed.
+
+Lemma mem_last_non0 x s : s != [::] -> last x s \in s.
+Proof. by case: s => [// | c q] /= _; rewrite mem_last. Qed.
 
 Lemma mem_behead s : {subset behead s <= s}.
 Proof. by case: s => // y s x; apply: predU1r. Qed.
@@ -1445,6 +1469,15 @@ Lemma nth_uniq s i j :
   i < size s -> j < size s -> uniq s -> (nth s i == nth s j) = (i == j).
 Proof. by move=> lti ltj /nthK/can_in_eq->. Qed.
 
+Lemma uniq_index_cat x s1 s2 :
+  uniq (s1 ++ x :: s2) -> index x (s1 ++ x :: s2) = size s1.
+Proof.
+elim: s1 => [ | a s1 Ih]; first by rewrite /= eqxx.
+rewrite /= => /andP[].
+case: ifP => [/eqP -> | _ _ /Ih -> //].
+by rewrite mem_cat inE eqxx orbT.
+Qed.
+
 Lemma uniqPn s :
   reflect (exists i j, [/\ i < j, j < size s & nth s i = nth s j]) (~~ uniq s).
 Proof.
@@ -1528,6 +1561,9 @@ Notation "'has_ view" := (hasPP _ (fun _ => view))
   (at level 4, right associativity, format "''has_' view").
 Notation "'all_ view" := (allPP _ (fun _ => view))
   (at level 4, right associativity, format "''all_' view").
+
+Lemma rcons_non0 [A : eqType] (s : seq A) x : rcons s x != [::].
+Proof. by case: s. Qed.
 
 Section RotIndex.
 Variables (T : eqType).
@@ -2507,7 +2543,14 @@ move=> injf; elim=> [|x s IHs] [|y t] //= /andP[Ax As] /andP[Ay At].
 by case=> /injf-> // /IHs->.
 Qed.
 
+Lemma map_nilp s : nilp (map s) = nilp s.
+Proof. by case: s. Qed.
+
 End Map.
+
+Lemma map_eq0 {A B : eqType} (f : A -> B) (s : seq A) :
+  (map f s == [::]) = (s == [::]).
+Proof. by case: s. Qed.
 
 Notation "[ 'seq' E | i <- s ]" := (map (fun i => E) s)
   (at level 0, E at level 99, i binder,
@@ -4705,6 +4748,29 @@ by move=> u; rewrite !mem_permutations (permPr Est).
 Qed.
 
 End Permutations.
+
+Section SeqSubst.
+
+Variable (T : eqType).
+
+Definition seq_subst (s : seq T) x y := map [eta id with x |-> y] s.
+
+Lemma mem_seq_subst (s : seq T) x y z :
+  z \in (seq_subst s x y) -> (z \in s) || (z == y).
+Proof.
+elim: s => [// | a s Ih] /=.
+by case: ifP => [] ?; rewrite !inE=> /orP[ | /Ih /orP[] ] ->; rewrite ?orbT.
+Qed.
+
+Lemma seq_subst_eq0 s x y :
+  (seq_subst s x y == [::]) = (s == [::]).
+Proof. exact: map_eq0. Qed.
+
+Lemma seq_subst_cat s1 s2  x y :
+  seq_subst (s1 ++ s2) x y = seq_subst s1 x y ++ seq_subst s2 x y.
+Proof. exact: map_cat. Qed.
+
+End SeqSubst.
 
 Section AllIff.
 (* The Following Are Equivalent *)
