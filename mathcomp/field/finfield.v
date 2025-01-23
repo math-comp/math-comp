@@ -110,7 +110,7 @@ move/all_roots_prod_XsubC->; last by rewrite uniq_rootsE enum_uniq.
 by apply/allP=> x _; rewrite rootE !hornerE expf_card subrr.
 Qed.
 
-Lemma finCharP' : {p | prime p & p \in [pchar F]}.
+Lemma finPcharP' : {p | prime p & p \in [pchar F]}.
 Proof.
 pose e := exponent [set: F]; have e_gt0: e > 0 by apply: exponent_gt0.
 have: e%:R == 0 :> F by rewrite -zmodXgE expg_exponent // inE.
@@ -119,11 +119,11 @@ Qed.
 
 Lemma finField_is_abelem : is_abelem [set: F].
 Proof.
-have [p pr_p pcharFp] := finCharP'.
+have [p pr_p pcharFp] := finPcharP'.
 by apply/is_abelemP; exists p; last apply: fin_ring_pchar_abelem.
 Qed.
 
-Lemma card_finCharP' p n : #|F| = (p ^ n)%N -> prime p -> p \in [pchar F].
+Lemma card_finPcharP' p n : #|F| = (p ^ n)%N -> prime p -> p \in [pchar F].
 Proof.
 move=> oF pr_p; rewrite inE pr_p -order_dvdn.
 rewrite (abelem_order_p finField_is_abelem) ?inE ?oner_neq0 //=.
@@ -133,10 +133,10 @@ Qed.
 
 End FinField.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use finCharP' instead.")]
-Notation finCharP := (finCharP') (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use card_finCharP' instead.")]
-Notation card_finCharP := (card_finCharP') (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use finPcharP' instead.")]
+Notation finCharP := (finPcharP') (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use card_finPcharP' instead.")]
+Notation card_finCharP := (card_finPcharP') (only parsing).
 
 Section CardVspace.
 
@@ -434,7 +434,7 @@ have idfP x: reflect (f x = x) (x \in 1%VS).
   by rewrite root_prod_XsubC => /mapP[a]; exists a.
 have fA : additive f.
   rewrite /f => x y; rewrite ?exprMn ?expr1n //.
-  have [p _ pcharFp] := finCharP' F; rewrite (card_pprimeChar pcharFp).
+  have [p _ pcharFp] := finPcharP' F; rewrite (card_pprimeChar pcharFp).
   elim: (logn _ _) => // n IHn; rewrite expnSr !exprM {}IHn.
   by rewrite -(pchar_lalg L) in pcharFp; rewrite -pFrobenius_autE rmorphB.
 have fM : multiplicative f.
@@ -579,7 +579,7 @@ exists (x%:A :: zs); rewrite big_cons; set rhs := _ * _.
 by rewrite Dp mulrC [_^%:A]rmorphM /= mapXsubC /= eqp_mull.
 Qed.
 
-Lemma PrimePowerField' p k (m := (p ^ k)%N) :
+Lemma pPrimePowerField p k (m := (p ^ k)%N) :
   prime p -> 0 < k -> {Fm : finFieldType | p \in [pchar Fm] & #|Fm| = m}.
 Proof.
 move=> pr_p k_gt0; have m_gt1: m > 1 by rewrite (ltn_exp2l 0) ?prime_gt1.
@@ -614,8 +614,8 @@ Qed.
 
 End FinFieldExists.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use PrimePowerField' instead.")]
-Notation PrimePowerField := (PrimePowerField') (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pPrimePowerField instead.")]
+Notation PrimePowerField := (pPrimePowerField) (only parsing).
 
 Section FinDomain.
 
