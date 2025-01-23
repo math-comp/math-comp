@@ -78,6 +78,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       bignums.override.version = "master";
       paramcoq.override.version = "master";
       coq-elpi.override.version = "master";
+      coq-elpi.override.elpi-version = "2.0.7";
       hierarchy-builder.override.version = "master";
       interval.job = false;
       coquelicot.job = false;
@@ -85,7 +86,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       mathcomp-apery.job = false;  # reverse dependency of coqeal
       mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
     };
-    "coq-master".ocamlPackages = { elpi.override.version = "2.0.7"; };
     "coq-8.20".coqPackages = common-bundles // {
       coq.override.version = "8.20";
       # check that we compile without warnings on last release of Coq
