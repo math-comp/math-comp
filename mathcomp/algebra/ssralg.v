@@ -981,6 +981,26 @@ HB.mixin Record PzSemiRing_isNonZero R of PzSemiRing R := {
   oner_neq0 : @one R != 0
 }.
 
+#[short(type="nzSemiRingType")]
+HB.structure Definition NzSemiRing :=
+  { R of PzSemiRing_isNonZero R & PzSemiRing R }.
+
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use NzSemiRing instead.")]
+Notation SemiRing R := (NzSemiRing R) (only parsing).
+
+Module SemiRing.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use NzSemiRing.sort instead.")]
+Notation sort := (NzSemiRing.sort) (only parsing).
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use NzSemiRing.on instead.")]
+Notation on R := (NzSemiRing.on R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use NzSemiRing.copy instead.")]
+Notation copy T U := (NzSemiRing.copy T U) (only parsing).
+End SemiRing.
+
 HB.factory Record Nmodule_isNzSemiRing R of Nmodule R := {
   one : R;
   mul : R -> R -> R;
@@ -1009,26 +1029,6 @@ End Nmodule_isSemiRing.
 #[deprecated(since="mathcomp 2.4.0",
              note="Use Nmodule_isNzSemiRing instead.")]
 Notation Nmodule_isSemiRing R := (Nmodule_isNzSemiRing R) (only parsing).
-
-#[short(type="nzSemiRingType")]
-HB.structure Definition NzSemiRing :=
-  { R of Nmodule_isNzSemiRing R & Nmodule R }.
-
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing instead.")]
-Notation SemiRing R := (NzSemiRing R) (only parsing).
-
-Module SemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing.sort instead.")]
-Notation sort := (NzSemiRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing.on instead.")]
-Notation on R := (NzSemiRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing.copy instead.")]
-Notation copy T U := (NzSemiRing.copy T U) (only parsing).
-End SemiRing.
 
 HB.factory Record isNzSemiRing R of Choice R := {
   zero : R;
@@ -2011,10 +2011,6 @@ HB.instance Definition _ (R : pzRingType) :=
 HB.instance Definition _ (R : nzSemiRingType) := NzSemiRing.on R^o.
 #[export]
 HB.instance Definition _ (R : nzRingType) := NzRing.on R^o.
-#[export]
-HB.instance Definition _ (R : nzRingType) :=
-  @Zmodule_isLmodule.Build R R^o
-    (@mul R) (@mulrA R) (@mul1r R) (@mulrDr R) (fun v a b => mulrDl a b v).
 #[export]
 HB.instance Definition _ (R : nzRingType) :=
   Lmodule_isLalgebra.Build R R^o mulrA.
