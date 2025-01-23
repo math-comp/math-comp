@@ -466,12 +466,15 @@ Qed.
 Lemma Qnat_dvd (m d : nat) : (d %| m)%N -> (m%:R / d%:R : rat) \is a Num.nat.
 Proof. by move=> h; rewrite natrEint divr_ge0 ?ler0n // !pmulrn Qint_dvdz. Qed.
 
-Lemma dvdz_charf (R : nzRingType) p : p \in [char R] ->
+Lemma dvdz_pcharf (R : nzRingType) p : p \in [pchar R] ->
   forall n : int, (p %| n)%Z = (n%:~R == 0 :> R).
 Proof.
-move=> charRp [] n; rewrite [LHS](dvdn_charf charRp)//.
+move=> pcharRp [] n; rewrite [LHS](dvdn_pcharf pcharRp)//.
 by rewrite NegzE abszN rmorphN// oppr_eq0.
 Qed.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use dvdz_pcharf  instead.")]
+Notation dvdz_charf chRp := (dvdz_pcharf chRp).
 
 (* Greatest common divisor *)
 
@@ -1143,14 +1146,14 @@ rewrite size_map_poly_id0 ?intr_eq0 ?lead_coef_eq0// in fN1.
 have [/eqP/size_poly1P[c cN0 ->]|gN1] := eqVneq (size g) 1%N.
   by rewrite mulrC mul_polyC map_polyZ/= eqp_sym eqp_scale// intr_eq0.
 have c_neq0 : (lead_coef q)%:~R != 0 :> 'F_p
-   by rewrite -(dvdz_charf (char_Fp _)).
+   by rewrite -(dvdz_pcharf (pchar_Fp _)).
 have : map_poly (intr : int -> 'F_p) q = (lead_coef q)%:~R *: 'X^(size q).-1.
   apply/val_inj/(@eq_from_nth _ 0) => [|i]; rewrite size_map_poly_id0//.
     by rewrite size_scale// size_polyXn -polySpred.
   move=> i_small; rewrite coef_poly i_small coefZ coefXn lead_coefE.
   move: i_small; rewrite polySpred// ltnS/=.
   case: ltngtP => // [i_lt|->]; rewrite (mulr1, mulr0)//= => _.
-  by apply/eqP; rewrite -(dvdz_charf (char_Fp _))// dvd_pq.
+  by apply/eqP; rewrite -(dvdz_pcharf (pchar_Fp _))// dvd_pq.
 rewrite [in LHS]q_eq rmorphM/=.
 set c := (X in X *: _); set n := (_.-1).
 set pf := map_poly _ f; set pg := map_poly _ g => pfMpg.
@@ -1169,5 +1172,5 @@ have pfN1 : size pf != 1%N by rewrite size_map_poly_id0.
 have pgN1 : size pg != 1%N by rewrite size_map_poly_id0.
 have /(dvdXn _ pgN1) /eqP : pg %| c *: 'X^n by rewrite -pfMpg dvdp_mull.
 have /(dvdXn _ pfN1) /eqP : pf %| c *: 'X^n by rewrite -pfMpg dvdp_mulr.
-by rewrite !coef_map// -!(dvdz_charf (char_Fp _))//; apply: dvdz_mul.
+by rewrite !coef_map// -!(dvdz_pcharf (pchar_Fp _))//; apply: dvdz_mul.
 Qed.
