@@ -7,8 +7,8 @@ bug-reports: "https://github.com/math-comp/math-comp/issues"
 dev-repo: "git+https://github.com/math-comp/math-comp.git"
 license: "CECILL-B"
 
-build: [ make "-C" "mathcomp/algebra" "-j" "%{jobs}%" ]
-install: [ make "-C" "mathcomp/algebra" "install" ]
+build: [ make "-C" "algebra" "-j" "%{jobs}%" ]
+install: [ make "-C" "algebra" "install" ]
 depends: [ "coq-mathcomp-fingroup" { = version } ]
 
 tags: [

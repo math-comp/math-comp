@@ -7,8 +7,8 @@ bug-reports: "https://github.com/math-comp/math-comp/issues"
 dev-repo: "git+https://github.com/math-comp/math-comp.git"
 license: "CECILL-B"
 
-build: [ make "-C" "mathcomp/fingroup" "-j" "%{jobs}%" ]
-install: [ make "-C" "mathcomp/fingroup" "install" ]
+build: [ make "-C" "fingroup" "-j" "%{jobs}%" ]
+install: [ make "-C" "fingroup" "install" ]
 depends: [ "coq-mathcomp-ssreflect" { = version } ]
 
 tags: [
