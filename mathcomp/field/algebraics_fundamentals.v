@@ -132,7 +132,7 @@ rewrite ger0_norm // real_ltNge ?rpred_nat ?ger0_real //.
 apply: contraL px0 => lb_x; rewrite rootE gt_eqF // horner_coef size_map_poly.
 have x_gt0 k: 0 < x ^+ k by rewrite exprn_gt0 // lt_def nz_x.
 move: lb_x; rewrite polySpred ?monic_neq0 // !big_ord_recr coef_map /=.
-rewrite -lead_coefE (monicP mon_p) natrD rmorph1 mul1r => lb_x.
+rewrite -lead_coefE (monicP mon_p) natrD [QtoC _]rmorph1 mul1r => lb_x.
 case: _.-1 (lb_x) => [|n]; first by rewrite !big_ord0 !add0r ltr01.
 rewrite -ltrBlDl add0r -(ler_pM2r (x_gt0 n)) -exprS.
 apply: lt_le_trans; rewrite mulrDl mul1r ltr_pwDr // -sumrN.
