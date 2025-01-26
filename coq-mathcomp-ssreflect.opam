@@ -7,8 +7,8 @@ bug-reports: "https://github.com/math-comp/math-comp/issues"
 dev-repo: "git+https://github.com/math-comp/math-comp.git"
 license: "CECILL-B"
 
-build: [ make "-C" "mathcomp/ssreflect" "-j" "%{jobs}%" ]
-install: [ make "-C" "mathcomp/ssreflect" "install" ]
+build: [ make "-C" "ssreflect" "-j" "%{jobs}%" ]
+install: [ make "-C" "ssreflect" "install" ]
 depends: [
   "coq" {(>= "8.19" & < "8.21~") | (= "dev")}
   # Please keep the "dev" above as it is required for the coq-dev Docker images
