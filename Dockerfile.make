@@ -20,10 +20,10 @@ RUN set -x \
   && opam config list && opam repo list && opam list && coqc --version \
   && opam clean -a -c -s --logs \
   && sudo chown -R coq:coq /home/coq/mathcomp \
-  && make -C mathcomp Makefile.coq \
-  && make -C mathcomp -f Makefile.coq -j "${NJOBS}" all \
-  && make -C mathcomp -f Makefile.coq install \
-  && make -C mathcomp test-suite
+  && make Makefile.coq \
+  && make -f Makefile.coq -j "${NJOBS}" all \
+  && make -f Makefile.coq install \
+  && make test-suite
 
 # Restore default shell to fully preserve backward compatibility
 SHELL ["/bin/sh", "-c"]

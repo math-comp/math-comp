@@ -135,7 +135,6 @@ coq-dev:
     - git describe --all --long --abbrev=40 --always --dirty
     - pwd
   script:
-    - cd mathcomp
     - make test-suite TEST_SKIP_BUILD=1
   except:
     refs:
