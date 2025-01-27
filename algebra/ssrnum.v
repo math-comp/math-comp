@@ -20,6 +20,8 @@ From mathcomp Require Import ssralg poly.
 (*                                                                            *)
 (*  porderZmodType == join of Order.POrder and GRing.Zmodule                  *)
 (*                    The HB class is called POrderedZmodule.                 *)
+(*  semiNormedZmodType == Zmodule with a semi-norm                            *)
+(*                        The HB class is called SemiNormedZmodule.           *)
 (*  normedZmodType == Zmodule with a norm                                     *)
 (*                    The HB class is called NormedZmodule.                   *)
 (*   numDomainType == Integral domain with an order and a norm                *)
@@ -102,7 +104,24 @@ Module Num.
 HB.structure Definition POrderedZmodule :=
   { R of Order.isPOrder ring_display R & GRing.Zmodule R }.
 
-HB.mixin Record Zmodule_isNormed (R : POrderedZmodule.type) M
+HB.mixin Record Zmodule_isSemiNormed (R : POrderedZmodule.type) M
+         of GRing.Zmodule M := {
+  norm : M -> R;
+  ler_normD : forall x y, norm (x + y) <= norm x + norm y;
+  normrMn : forall x n, norm (x *+ n) = norm x *+ n;
+  normrN : forall x, norm (- x) = norm x;
+}.
+
+#[short(type="semiNormedZmodType")]
+HB.structure Definition SemiNormedZmodule (R : porderZmodType) :=
+  { M of Zmodule_isSemiNormed R M & GRing.Zmodule M }.
+
+HB.mixin Record SemiNormedZmodule_isPositiveDefinite
+    (R : POrderedZmodule.type) M of @SemiNormedZmodule R M := {
+  normr0_eq0 : forall x : M, norm x = 0 -> x = 0;
+}.
+
+HB.factory Record Zmodule_isNormed (R : POrderedZmodule.type) M
          of GRing.Zmodule M := {
   norm : M -> R;
   ler_normD : forall x y, norm (x + y) <= norm x + norm y;
@@ -110,6 +129,12 @@ HB.mixin Record Zmodule_isNormed (R : POrderedZmodule.type) M
   normrMn : forall x n, norm (x *+ n) = norm x *+ n;
   normrN : forall x, norm (- x) = norm x;
 }.
+HB.builders Context (R : POrderedZmodule.type) M of Zmodule_isNormed R M.
+  HB.instance Definition _ :=
+    Zmodule_isSemiNormed.Build R M ler_normD normrMn normrN.
+  HB.instance Definition _ :=
+    SemiNormedZmodule_isPositiveDefinite.Build R M normr0_eq0.
+HB.end.
 
 #[short(type="normedZmodType")]
 HB.structure Definition NormedZmodule (R : porderZmodType) :=
@@ -515,15 +540,16 @@ Module Import Theory.
 Section NumIntegralDomainTheory.
 
 Variable R : numDomainType.
-Implicit Types (V : normedZmodType R) (x y z t : R).
+
+Implicit Types (V : semiNormedZmodType R) (x y z t : R).
+Implicit Types (W : normedZmodType R).
 
 (* Lemmas from the signature (reexported). *)
 
 Definition ler_normD V (x y : V) : `|x + y| <= `|x| + `|y| :=
   ler_normD x y.
 Definition addr_gt0 x y : 0 < x -> 0 < y -> 0 < x + y := @addr_gt0 R x y.
-Definition normr0_eq0 V (x : V) : `|x| = 0 -> x = 0 :=
-  @normr0_eq0 R V x.
+Definition normr0_eq0 W (x : W) : `|x| = 0 -> x = 0 := @normr0_eq0 R W x.
 Definition ger_leVge x y : 0 <= x -> 0 <= y -> (x <= y) || (y <= x) :=
   @ger_leVge R x y.
 Definition normrM : {morph norm : x y / (x : R) * y} := @normrM R.
@@ -624,18 +650,13 @@ Lemma prod_real I (P : pred I) (F : I -> R) (s : seq I) :
   {in P, forall i, F i \is real} -> \prod_(i <- s | P i) F i \is real.
 Proof. by apply/big_real; [apply: rpredM | apply: rpred1]. Qed.
 
-Section NormedZmoduleTheory.
+Section SemiNormedZmoduleTheory.
 
-Variable V : normedZmodType R.
+Variable V : semiNormedZmodType R.
 Implicit Types (v w : V).
 
 Lemma normr0 : `|0 : V| = 0.
 Proof. by rewrite -(mulr0n 0) normrMn mulr0n. Qed.
-
-Lemma normr0P v : reflect (`|v| = 0) (v == 0).
-Proof. by apply: (iffP eqP)=> [->|/normr0_eq0 //]; apply: normr0. Qed.
-
-Definition normr_eq0 v := sameP (`|v| =P 0) (normr0P v).
 
 Lemma distrC v w : `|v - w| = `|w - v|.
 Proof. by rewrite -opprB normrN. Qed.
@@ -649,19 +670,37 @@ Qed.
 
 Lemma normr_ge0 v : 0 <= `|v|. Proof. by rewrite ger0_def normr_id. Qed.
 
+Lemma normr_lt0 v : `|v| < 0 = false.
+Proof. by rewrite le_gtF// normr_ge0. Qed.
+
+Lemma gtr0_norm_neq0 v : `|v| > 0 -> (v != 0).
+Proof. by apply: contra_ltN => /eqP->; rewrite normr0. Qed.
+
+Lemma gtr0_norm_eq0F v : `|v| > 0 -> (v == 0) = false.
+Proof. by move=> /gtr0_norm_neq0/negPf->. Qed.
+
+End SemiNormedZmoduleTheory.
+
+Section NormedZmoduleTheory.
+
+Variable V : normedZmodType R.
+Implicit Types (v w : V).
+
+Lemma normr0P v : reflect (`|v| = 0) (v == 0).
+Proof. by apply: (iffP eqP)=> [->|/normr0_eq0 //]; apply: normr0. Qed.
+
+Definition normr_eq0 v := sameP (`|v| =P 0) (normr0P v).
+
 Lemma normr_le0 v : `|v| <= 0 = (v == 0).
 Proof. by rewrite -normr_eq0 eq_le normr_ge0 andbT. Qed.
-
-Lemma normr_lt0 v : `|v| < 0 = false.
-Proof. by rewrite lt_neqAle normr_le0 normr_eq0 andNb. Qed.
 
 Lemma normr_gt0 v : `|v| > 0 = (v != 0).
 Proof. by rewrite lt_def normr_eq0 normr_ge0 andbT. Qed.
 
+End NormedZmoduleTheory.
+
 Definition normrE := (normr_id, normr0, normr1, normrN1, normr_ge0, normr_eq0,
   normr_lt0, normr_le0, normr_gt0, normrN).
-
-End NormedZmoduleTheory.
 
 Lemma ler0_def x : (x <= 0) = (`|x| == - x).
 Proof. by rewrite ler_def sub0r normrN. Qed.
@@ -684,7 +723,7 @@ Lemma ler0_ge_norm :
   {in npos &, {mono (@normr _ R) : x y / x <= y >-> x >= y}}.
 Proof.
 move=> x y; rewrite !nposrE => x0 y0.
-by rewrite !ler0_norm// -subr_ge0 opprK addrC subr_ge0.
+by rewrite !ler0_norm// -[LHS]subr_ge0 opprK addrC subr_ge0.
 Qed.
 
 Lemma ltr0_ge_norm :
@@ -2109,7 +2148,7 @@ Qed.
 
 Section NormedZmoduleTheory.
 
-Variable V : normedZmodType R.
+Variable V : semiNormedZmodType R.
 Implicit Types (u v w : V).
 
 Lemma normr_real v : `|v| \is real. Proof. by apply/ger0_real. Qed.
