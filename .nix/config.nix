@@ -61,6 +61,8 @@ with builtins; with (import <nixpkgs> {}).lib;
       { name = p; value.override.version = "master"; }))
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
+         coqeal.job = false;  # currently broken by https://github.com/coq/coq/pull/19228
+         mathcomp-apery.job = false;  # reverse dependency of coqeal
          # To add an overlay applying to all bundles,
          # add below a line like
          #<package>.override.version = "<github_login>:<branch>";
@@ -82,9 +84,12 @@ with builtins; with (import <nixpkgs> {}).lib;
       hierarchy-builder.override.version = "master";
       interval.job = false;
       coquelicot.job = false;
-      coqeal.job = false;  # currently broken by https://github.com/coq/coq/pull/19228
-      mathcomp-apery.job = false;  # reverse dependency of coqeal
       mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
+    };
+    "coq-9.0".coqPackages = common-bundles // {
+      coq.override.version = "9.0";
+      mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
+      interval.job = false;
     };
     "coq-8.20".coqPackages = common-bundles // {
       coq.override.version = "8.20";
