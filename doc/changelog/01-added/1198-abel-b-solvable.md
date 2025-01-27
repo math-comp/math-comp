@@ -1,0 +1,13 @@
+- in `zmodp.v`
+  + lemmas `gen_tperm_step`, `perm_addr1X`, `gen_tpermn_circular_shift`
+
+- in `cyclic.v`
+  + lemmas `eq_expg_ord`, `expgDzmod`
+
+- in `nilpotent.v`
+  + lemma `sol_setXn`
+
+- in `alt.v`
+  + lemmas `gen_tperm_circular_shift`, `solvable_AltF`, `solvable_SymF`
+    (`#1198 <https://github.com/coq/stdlib/pull/1198>`_,
+    by Tragicus).
