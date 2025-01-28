@@ -61,8 +61,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       { name = p; value.override.version = "master"; }))
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
-         coqeal.job = false;  # currently broken by https://github.com/coq/coq/pull/19228
-         mathcomp-apery.job = false;  # reverse dependency of coqeal
          # To add an overlay applying to all bundles,
          # add below a line like
          #<package>.override.version = "<github_login>:<branch>";
@@ -88,11 +86,16 @@ with builtins; with (import <nixpkgs> {}).lib;
     };
     "coq-9.0".coqPackages = common-bundles // {
       coq.override.version = "9.0";
+      coq-elpi.override.version = "master";  # required by CoqEAL
+      coq-elpi.override.elpi-version = "2.0.7";
       mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
       interval.job = false;
     };
     "coq-8.20".coqPackages = common-bundles // {
       coq.override.version = "8.20";
+      coq-elpi.override.version = "master";  # required by CoqEAL
+      coq-elpi.override.elpi-version = "2.0.7";
+      hierarchy-builder.override.version = "1.8.1";  # required by elpi master
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
       interval.job = false;
@@ -100,6 +103,8 @@ with builtins; with (import <nixpkgs> {}).lib;
     "coq-8.19".coqPackages = common-bundles // {
       coq.override.version = "8.19";
       interval.job = false;
+      coqeal.job = false;  # CoqEAL requires Coq >= 8.20
+      mathcomp-apery.job = false;  # reverse dependency of coqeal
     };
   };
 }
