@@ -13,6 +13,8 @@ algebra/mxred.v
 algebra/num_theory/orderedzmod.v
 algebra/num_theory/numdomain.v
 algebra/num_theory/numfield.v
+algebra/num_theory/zmodext.v
+algebra/num_theory/numext.v
 algebra/num_theory/ssrnum.v
 algebra/polydiv.v
 algebra/poly.v
