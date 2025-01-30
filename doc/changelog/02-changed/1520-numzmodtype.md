@@ -33,4 +33,15 @@
     `ltrD2`, `lterD2`, `lerBDr`, `ltrBDr`, `lterBDr`, `lerBDl`,
     `ltrBDl`, `lterBDl`, `cprD`, `lteifD2`, `lteifBDr` and `lteifBDl`
     generalized from `numDomainType` to `porderedZmodType`
+  + lemmas `sum_real`, `comparabler_trans`, `ler_leVge`, `real_leVge`,
+    `real_comparable`, `realB`, `realN`, `realBC`, `realD`,
+    `real_ltNge`, `real_leNgt`, `max_real`, `min_real`, `bigmax_real`,
+    `bigmin_real`, `real_neqr_lt`, `lerB_real`, `gerB_real`,
+    `ler_real`, `ger_real`, `Nreal_leF`, `Nreal_geF`, `Nreal_ltF`,
+    `Nreal_gtF`, `real_wlog_ler`, `real_wlog_ltr`, `real_mono`,
+    `real_nmono`, `real_mono_in`, `real_nmono_in`, `realn_mono`,
+    `realn_nmono`, `realn_mono_in`, `realn_nmono_in`, `ger_leVge`,
+    `real_oppr_max`, `real_oppr_min`, `real_addr_minl`,
+    `real_addr_minr`, `real_addr_maxl` and `real_addr_maxr`
+    generalized from `numDomainType` to `numZmodType`
     ([#1520](https://github.com/math-comp/math-comp/pull/1520)).

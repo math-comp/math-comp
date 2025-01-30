@@ -300,7 +300,6 @@ Export Order.PreOCoercions.
 End Syntax.
 
 Module Export Theory.
-
 Section porderZmodTypeTheory.
 Variable (R : porderedZmodType).
 Implicit Types (x y : R).
@@ -830,6 +829,289 @@ Arguments real0 {R}.
 Arguments lerN2 {R}.
 Arguments ltrN2 {R}.
 
+Section NumZmoduleTheory.
+Variable (R : numZmodType).
+Implicit Types (x y : R).
+
+Lemma comparabler_trans : transitive (Num.comparable : rel R).
+Proof. exact: comparabler_trans. Qed.
+
+Lemma ger_leVge x y : 0 <= x -> 0 <= y -> (x <= y) || (y <= x).
+Proof.
+by move=> /ge_comparable + /le_comparable => /comparabler_trans/[apply].
+Qed.
+
+Fact real_addr_closed : addr_closed (@Num.real R).
+Proof.
+split=> [|x y Rx Ry]; first by rewrite realE lexx.
+without loss{Rx} x_ge0: x y Ry / 0 <= x.
+  case/orP: Rx => [? | x_le0]; first exact.
+  by rewrite -rpredN opprD; apply; rewrite ?rpredN ?oppr_ge0.
+case/orP: Ry => [y_ge0 | y_le0]; first by rewrite realE -nnegrE rpredD.
+by rewrite realE -[y]opprK orbC -oppr_ge0 opprB !subr_ge0 ger_leVge ?oppr_ge0.
+Qed.
+HB.instance Definition _ := GRing.isAddClosed.Build R real_num_pred
+  real_addr_closed.
+
+Lemma ler_leVge x y : x <= 0 -> y <= 0 -> (x <= y) || (y <= x).
+Proof. by rewrite -!oppr_ge0 => /(ger_leVge _) /[apply]; rewrite !lerN2. Qed.
+
+Lemma real_leVge x y : x \is Num.real -> y \is Num.real -> (x <= y) || (y <= x).
+Proof. by rewrite -comparabler0 -comparable0r => /comparabler_trans P/P. Qed.
+
+Lemma real_comparable x y : x \is Num.real -> y \is Num.real -> x >=< y.
+Proof. exact: real_leVge. Qed.
+
+Lemma realB : {in Num.real &, forall x y, x - y \is Num.real}.
+Proof. exact: rpredB. Qed.
+
+Lemma realN : {mono (@GRing.opp R) : x / x \is Num.real}.
+Proof. exact: rpredN. Qed.
+
+Lemma realBC x y : (x - y \is Num.real) = (y - x \is Num.real).
+Proof. exact: rpredBC. Qed.
+
+Lemma realD : {in Num.real &, forall x y, x + y \is Num.real}.
+Proof. exact: rpredD. Qed.
+
+(* TODO: should work for semiring *)
+(* Lemma real1 : 1%R \is @real R. Proof. exact: rpred1. Qed. *)
+(* Lemma realn n : n%:R \is @real R. Proof. exact: rpred_nat. Qed. *)
+(* #[local] Hint Resolve real0 real1 : core. *)
+
+Lemma sum_real I (P : pred I) (F : I -> R) (s : seq I) :
+  {in P, forall i, F i \is Num.real} -> \sum_(i <- s | P i) F i \is Num.real.
+Proof. by apply/big_real; [apply: rpredD | apply: rpred0]. Qed.
+
+(* dichotomy and trichotomy *)
+
+Lemma zmod_leP x y : x \is Num.real -> y \is Num.real ->
+  Order.le_xor_gt x y (min y x) (min x y) (max y x) (max x y)
+                 (x <= y) (y < x).
+Proof. by move=> xR yR; apply: comparable_leP; exact: real_leVge. Qed.
+
+Lemma zmod_ltP x y : x \is Num.real -> y \is Num.real ->
+  Order.lt_xor_ge x y (min y x) (min x y) (max y x) (max x y)
+             (y <= x) (x < y).
+Proof. by move=> xR yR; apply: comparable_ltP; exact: real_leVge. Qed.
+
+Lemma zmod_ltgtP x y : x \is Num.real -> y \is Num.real ->
+  Order.compare x y (min y x) (min x y) (max y x) (max x y)
+               (y == x) (x == y) (x >= y) (x <= y) (x > y) (x < y).
+Proof. by move=> xR yR; apply: comparable_ltgtP; exact: real_leVge. Qed.
+
+Lemma real_ltNge : {in real &, forall x y, (x < y) = ~~ (y <= x)}.
+Proof. by move=> x y xR yR /=; case: zmod_leP. Qed.
+
+Lemma real_leNgt : {in real &, forall x y, (x <= y) = ~~ (y < x)}.
+Proof. by move=> x y xR yR /=; case: zmod_leP. Qed.
+
+Variant ger0_xor_lt0 (x : R) : R -> R -> R -> R ->
+    bool -> bool -> Set :=
+  | Ger0NotLt0 of 0 <= x : ger0_xor_lt0 x 0 0 x x false true
+  | Ltr0NotGe0 of x < 0  : ger0_xor_lt0 x x x 0 0 true false.
+
+Variant ler0_xor_gt0 (x : R) : R -> R -> R -> R ->
+   bool -> bool -> Set :=
+  | Ler0NotLe0 of x <= 0 : ler0_xor_gt0 x x x 0 0 false true
+  | Gtr0NotGt0 of 0 < x  : ler0_xor_gt0 x 0 0 x x true false.
+
+Variant comparer0 x : R -> R -> R -> R ->
+    bool -> bool -> bool -> bool -> bool -> bool -> Set :=
+  | ComparerGt0 of 0 < x : comparer0 x 0 0 x x false false false true false true
+  | ComparerLt0 of x < 0 : comparer0 x x x 0 0 false false true false true false
+  | ComparerEq0 of x = 0 : comparer0 x 0 0 0 0 true true true true false false.
+
+Lemma zmod_ge0P x : x \is Num.real -> ger0_xor_lt0 x
+   (min 0 x) (min x 0) (max 0 x) (max x 0) (x < 0) (0 <= x).
+Proof.
+move=> hx; case: comparable_leP;
+by rewrite ?subr0 ?sub0r //; constructor.
+Qed.
+
+Lemma zmod_le0P x : x \is Num.real -> ler0_xor_gt0 x
+  (min 0 x) (min x 0) (max 0 x) (max x 0)
+  (0 < x) (x <= 0).
+Proof.
+move=> hx; case: comparable_ltP;
+by rewrite ?subr0 ?sub0r //; constructor.
+Qed.
+
+Lemma zmod_ltgt0P x : x \is Num.real ->
+  comparer0 x (min 0 x) (min x 0) (max 0 x) (max x 0)
+            (0 == x) (x == 0) (x <= 0) (0 <= x) (x < 0) (x > 0).
+Proof.
+move=> hx; case: (@comparable_ltgtP _ _ 0 x);
+by rewrite ?subr0 ?sub0r //; constructor.
+Qed.
+
+Lemma max_real : {in real &, forall x y, max x y \is Num.real}.
+Proof. exact: comparable_maxr. Qed.
+
+Lemma min_real : {in real &, forall x y, min x y \is Num.real}.
+Proof. exact: comparable_minr. Qed.
+
+Lemma bigmax_real I x0 (r : seq I) (P : pred I) (f : I -> R):
+  x0 \is Num.real -> {in P, forall i : I, f i \is Num.real} ->
+  \big[max/x0]_(i <- r | P i) f i \is Num.real.
+Proof. exact/big_real/max_real. Qed.
+
+Lemma bigmin_real I x0 (r : seq I) (P : pred I) (f : I -> R):
+  x0 \is Num.real -> {in P, forall i : I, f i \is Num.real} ->
+  \big[min/x0]_(i <- r | P i) f i \is Num.real.
+Proof. exact/big_real/min_real. Qed.
+
+Lemma real_neqr_lt : {in real &, forall x y, (x != y) = (x < y) || (y < x)}.
+Proof. by move=> * /=; case: zmod_ltgtP. Qed.
+
+Lemma lerB_real x y : x <= y -> y - x \is Num.real.
+Proof. by move=> le_xy; rewrite ger0_real // subr_ge0. Qed.
+
+Lemma gerB_real x y : x <= y -> x - y \is Num.real.
+Proof. by move=> le_xy; rewrite ler0_real // subr_le0. Qed.
+
+Lemma ler_real y x : x <= y -> (x \is Num.real) = (y \is Num.real).
+Proof. by move=> le_xy; rewrite -(addrNK x y) rpredDl ?lerB_real. Qed.
+
+Lemma ger_real x y : y <= x -> (x \is Num.real) = (y \is Num.real).
+Proof. by move=> le_yx; rewrite -(ler_real le_yx). Qed.
+
+Lemma Nreal_leF x y : y \is Num.real -> x \notin real -> (x <= y) = false.
+Proof. by move=> yR; apply: contraNF=> /ler_real->. Qed.
+
+Lemma Nreal_geF x y : y \is Num.real -> x \notin real -> (y <= x) = false.
+Proof. by move=> yR; apply: contraNF=> /ger_real->. Qed.
+
+Lemma Nreal_ltF x y : y \is Num.real -> x \notin real -> (x < y) = false.
+Proof. by move=> yR xNR; rewrite lt_def Nreal_leF ?andbF. Qed.
+
+Lemma Nreal_gtF x y : y \is Num.real -> x \notin real -> (y < x) = false.
+Proof. by move=> yR xNR; rewrite lt_def Nreal_geF ?andbF. Qed.
+
+(* real wlog *)
+
+Lemma real_wlog_ler P :
+    (forall a b, P b a -> P a b) -> (forall a b, a <= b -> P a b) ->
+  forall a b : R, a \is Num.real -> b \is Num.real -> P a b.
+Proof.
+move=> sP hP a b ha hb; wlog: a b ha hb / a <= b => [hwlog|]; last exact: hP.
+by case: (@zmod_leP a b)=> // [/hP //|/ltW hba]; apply/sP/hP.
+Qed.
+
+Lemma real_wlog_ltr P :
+    (forall a, P a a) -> (forall a b, (P b a -> P a b)) ->
+    (forall a b, a < b -> P a b) ->
+  forall a b : R, a \is Num.real -> b \is Num.real -> P a b.
+Proof.
+move=> rP sP hP; apply: real_wlog_ler=> // a b.
+by rewrite le_eqVlt; case: eqVneq => [->|] //= _ /hP.
+Qed.
+
+Lemma real_oppr_max : {in real &, {morph -%R : x y / max x y >-> min x y : R}}.
+Proof.
+by move=> x y xr yr; rewrite !(fun_if, if_arg) ltrN2; case: zmod_ltgtP => // ->.
+Qed.
+
+Lemma real_oppr_min : {in real &, {morph -%R : x y / min x y >-> max x y : R}}.
+Proof.
+by move=> x y xr yr; rewrite -[RHS]opprK real_oppr_max ?realN// !opprK.
+Qed.
+
+Lemma real_addr_minl : {in real & real & real, @left_distributive R R +%R min}.
+Proof.
+by move=> x y z xr yr zr; case: (@zmod_leP (_ + _)); rewrite ?rpredD//;
+   rewrite lterD2; case: zmod_leP.
+Qed.
+
+Lemma real_addr_minr : {in real & real & real, @right_distributive R R +%R min}.
+Proof. by move=> x y z xr yr zr; rewrite !(addrC x) real_addr_minl. Qed.
+
+Lemma real_addr_maxl : {in real & real & real, @left_distributive R R +%R max}.
+Proof.
+by move=> x y z xr yr zr; case: (@zmod_leP (_ + _)); rewrite ?realD//;
+   rewrite lterD2; case: zmod_leP.
+Qed.
+
+Lemma real_addr_maxr : {in real & real & real, @right_distributive R R +%R max}.
+Proof. by move=> x y z xr yr zr; rewrite !(addrC x) real_addr_maxl. Qed.
+
+End NumZmoduleTheory.
+
+Arguments comparabler_trans {_ _ _ _}.
+
+Section OrderedZmodMonotonyTheoryForReals.
+Local Open Scope order_scope.
+
+Variables (R R' : numZmodType) (D : pred R) (f : R -> R') (f' : R -> nat).
+Implicit Types (m n p : nat) (x y z : R) (u v w : R').
+
+Lemma real_mono :
+  {homo f : x y / x < y} -> {in real &, {mono f : x y / x <= y}}.
+Proof.
+move=> mf x y xR yR /=; have [lt_xy | le_yx] := zmod_leP xR yR.
+  by rewrite ltW_homo.
+by rewrite lt_geF ?mf.
+Qed.
+
+Lemma real_nmono :
+  {homo f : x y /~ x < y} -> {in real &, {mono f : x y /~ x <= y}}.
+Proof.
+move=> mf x y xR yR /=; have [lt_xy|le_yx] := zmod_ltP xR yR.
+  by rewrite lt_geF ?mf.
+by rewrite ltW_nhomo.
+Qed.
+
+Lemma real_mono_in :
+    {in D &, {homo f : x y / x < y}} ->
+  {in [pred x in D | x \is real] &, {mono f : x y / x <= y}}.
+Proof.
+move=> Dmf x y /andP[hx xR] /andP[hy yR] /=.
+have [lt_xy|le_yx] := zmod_leP xR yR; first by rewrite (ltW_homo_in Dmf).
+by rewrite lt_geF ?Dmf.
+Qed.
+
+Lemma real_nmono_in :
+    {in D &, {homo f : x y /~ x < y}} ->
+  {in [pred x in D | x \is real] &, {mono f : x y /~ x <= y}}.
+Proof.
+move=> Dmf x y /andP[hx xR] /andP[hy yR] /=.
+have [lt_xy|le_yx] := zmod_ltP xR yR; last by rewrite (ltW_nhomo_in Dmf).
+by rewrite lt_geF ?Dmf.
+Qed.
+
+Lemma realn_mono : {homo f' : x y / x < y >-> (x < y)} ->
+  {in real &, {mono f' : x y / x <= y >-> (x <= y)}}.
+Proof.
+move=> mf x y xR yR /=; have [lt_xy | le_yx] := zmod_leP xR yR.
+  by rewrite ltW_homo.
+by rewrite lt_geF ?mf.
+Qed.
+
+Lemma realn_nmono : {homo f' : x y / y < x >-> (x < y)} ->
+  {in real &, {mono f' : x y / y <= x >-> (x <= y)}}.
+Proof.
+move=> mf x y xR yR /=; have [lt_xy|le_yx] := zmod_ltP xR yR.
+  by rewrite lt_geF ?mf.
+by rewrite ltW_nhomo.
+Qed.
+
+Lemma realn_mono_in : {in D &, {homo f' : x y / x < y >-> (x < y)}} ->
+  {in [pred x in D | x \is real] &, {mono f' : x y / x <= y >-> (x <= y)}}.
+Proof.
+move=> Dmf x y /andP[hx xR] /andP[hy yR] /=.
+have [lt_xy|le_yx] := zmod_leP xR yR; first by rewrite (ltW_homo_in Dmf).
+by rewrite lt_geF ?Dmf.
+Qed.
+
+Lemma realn_nmono_in : {in D &, {homo f' : x y / y < x >-> (x < y)}} ->
+  {in [pred x in D | x \is real] &, {mono f' : x y / y <= x >-> (x <= y)}}.
+Proof.
+move=> Dmf x y /andP[hx xR] /andP[hy yR] /=.
+have [lt_xy|le_yx] := zmod_ltP xR yR; last by rewrite (ltW_nhomo_in Dmf).
+by rewrite lt_geF ?Dmf.
+Qed.
+
+End OrderedZmodMonotonyTheoryForReals.
 End Theory.
 
 Module Exports. HB.reexport. End Exports.
