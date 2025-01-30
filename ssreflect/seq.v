@@ -2565,22 +2565,28 @@ Fixpoint onth s n {struct n} : option T :=
   if s isn't x :: s then None else
   if n isn't n.+1 then Some x else onth s n.
 
+Lemma odflt_onth x0 s n : odflt x0 (onth s n) = nth x0 s n.
+Proof. by elim: n s => [|? ?] []. Qed.
+
 Lemma onthE s : onth s =1 nth None (map Some s).
 Proof. by move=> n; elim: n s => [|? ?] []. Qed.
+
+Lemma onth_nth x0 x t n : onth t n = Some x -> nth x0 t n = x.
+Proof. by move=> tn; rewrite -odflt_onth tn. Qed.
 
 Lemma onth0n n : onth [::] n = None. Proof. by case: n. Qed.
 
 Lemma onth1P x y n : onth [:: x] n = Some y <-> n = 0 /\ x = y.
 Proof. by case: n => [|[]]; split=> // -[] // _ ->. Qed.
 
-Lemma onth_default n s : size s <= n -> onth s n = None.
-Proof. by move=> n_ge; rewrite onthE nth_default ?size_map. Qed.
-
 Lemma onthTE s n : onth s n = (n < size s) :> bool.
 Proof. by elim: n s => [|? ?] []. Qed.
 
 Lemma onthNE s n: ~~ onth s n = (size s <= n).
 Proof. by rewrite onthTE -leqNgt. Qed.
+
+Lemma onth_default n s : size s <= n -> onth s n = None.
+Proof. by rewrite -onthNE; case: onth. Qed.
 
 Lemma onth_cat s1 s2 n :
   onth (s1 ++ s2) n = if n < size s1 then onth s1 n else onth s2 (n - size s1).
@@ -2658,7 +2664,8 @@ End onthEqType.
 
 Arguments onthP {T s x}.
 Arguments onthPn {T s x}.
-Arguments uniq_onth {T}.
+Arguments onth_nth {T}.
+Arguments onth_inj {T}.
 
 Notation "[ 'seq' E | i <- s ]" := (map (fun i => E) s)
   (at level 0, E at level 99, i binder,
