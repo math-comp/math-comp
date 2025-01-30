@@ -55,6 +55,24 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Reserved Notation "n .-root" (format "n .-root").
+Reserved Notation "'i".
+Reserved Notation "'Re z" (at level 10, z at level 8).
+Reserved Notation "'Im z" (at level 10, z at level 8).
+
+Reserved Notation "x %:E" (at level 1, format "x %:E").
+Reserved Notation "x %:dE" (at level 1, format "x %:dE").
+Reserved Notation "x +? y" (at level 50, format "x  +?  y").
+Reserved Notation "x *? y" (at level 50, format "x  *?  y").
+Reserved Notation "'\bar' x" (at level 2, format "'\bar'  x").
+Reserved Notation "'\bar' '^d' x" (at level 2, format "'\bar' '^d'  x").
+Reserved Notation "{ 'posnum' '\bar' R }" (at level 0,
+  format "{ 'posnum'  '\bar'  R }").
+Reserved Notation "{ 'nonneg' '\bar' R }" (at level 0,
+  format "{ 'nonneg'  '\bar'  R }").
+
+Declare Scope ereal_dual_scope.
+Declare Scope ereal_scope.
 Local Open Scope order_scope.
 Local Open Scope group_scope.
 Local Open Scope ring_scope.

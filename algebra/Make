@@ -21,6 +21,8 @@ num_theory/numfield.v
 num_theory/ssrint.v
 num_theory/interval.v
 num_theory/interval_inference.v
+num_theory/zmodext.v
+num_theory/numext.v
 num_theory/ssrnum.v
 vector.v
 zmodp.v
