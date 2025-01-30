@@ -14,10 +14,19 @@ From mathcomp Require Import ssralg poly.
 (*                                                                            *)
 (* This file defines the following number structures:                         *)
 (*                                                                            *)
-(*  porderNmodType == join of Order.POrder and GRing.Nmodule                  *)
-(*                    The HB class is called POrderNmodule.                   *)
-(*  porderZmodType == join of Order.POrder and GRing.Zmodule                  *)
-(*                    The HB class is called POrderZmodule.                   *)
+(*    porderNmodType == join of Order.POrder and GRing.Nmodule                *)
+(*                      The HB class is called POrderNmodule.                 *)
+(*    porderZmodType == join of Order.POrder and GRing.Zmodule                *)
+(*                      The HB class is called POrderZmodule.                 *)
+(*  porderedNmodType == porderNmodType such that                              *)
+(*                      the order is translation invariant.                   *)
+(*                      The HB class is called POrderedNmodule.               *)
+(*  porderedZmodType == porderZmodType such that                              *)
+(*                      the order is translation invariant.                   *)
+(*                      The HB class is called POrderedZmodule.               *)
+(*       numZmodType == porderedZmodType such that                            *)
+(*                      the real line (i.e. the comparable to 0)              *)
+(*                      is totally ordered                                    *)
 (*                                                                            *)
 (* The ordering symbols and notations (<, <=, >, >=, _ <= _ ?= iff _,         *)
 (* _ < _ ?<= if _, >=<, and ><) and lattice operations (meet and join)        *)
@@ -73,6 +82,75 @@ Module POrderZmoduleExports.
 Bind Scope ring_scope with POrderZmodule.sort.
 End POrderZmoduleExports.
 HB.export POrderZmoduleExports.
+
+HB.mixin Record Add_isHomo R of POrderNmodule R := {
+  ler_wD2l : forall x : R, {homo +%R x : y z / y <= z}
+}.
+
+#[short(type="porderedNmodType")]
+HB.structure Definition POrderedNmodule :=
+  { R of POrderNmodule R & Add_isHomo R}.
+
+Module POrderedNmoduleExports.
+Bind Scope ring_scope with POrderedNmodule.sort.
+End POrderedNmoduleExports.
+HB.export POrderedNmoduleExports.
+
+#[short(type="porderedZmodType")]
+HB.structure Definition POrderedZmodule :=
+  { R of GRing.Zmodule R & POrderedNmodule R}.
+
+Module POrderedZmoduleExports.
+Bind Scope ring_scope with POrderedZmodule.sort.
+End POrderedZmoduleExports.
+HB.export POrderedZmoduleExports.
+
+HB.factory Record ZmodulePositiveCone R of GRing.Zmodule R := {
+  nonneg : {pred R};
+  nonneg0 : nonneg 0;
+  nonnegD : forall x y, nonneg x -> nonneg y -> nonneg (x + y);
+  nonneg_definite : forall x, nonneg x -> nonneg (- x) -> x = 0;
+}.
+
+HB.builders Context R of ZmodulePositiveCone R.
+
+Definition le x y := nonneg (y - x).
+
+Fact le_refl : reflexive le.
+Proof. by move=> x; rewrite /le subrr nonneg0. Qed.
+
+Fact le_anti : antisymmetric le.
+Proof.
+by move=> x y /andP[xy yx]; apply/subr0_eq/nonneg_definite; rewrite ?opprB.
+Qed.
+
+Fact le_trans : transitive le.
+Proof.
+by move=> x y z => /nonnegD /[apply]; rewrite addrCA [_ - x]addrAC subrr add0r.
+Qed.
+
+Fact ler_wD2l : forall x, {homo +%R x : y z / le y z}.
+Proof. by move=> x y z; rewrite /le [x + _]addrC addrKA. Qed.
+
+HB.instance Definition _ := Order.Le_isPOrder.Build ring_display R
+  le_refl le_anti le_trans.
+HB.instance Definition _ := Add_isHomo.Build R ler_wD2l.
+
+HB.end.
+
+HB.mixin Record POrderedZmodule_hasTransCmp R of GRing.Nmodule R
+    & Order.isPOrder ring_display R := {
+  comparabler_trans : transitive (Order.comparable : rel R)
+}.
+
+#[short(type="numZmodType")]
+HB.structure Definition NumZmodule :=
+  {R of POrderedZmodule_hasTransCmp R & POrderedZmodule R}.
+
+Module NumZmoduleExports.
+Bind Scope ring_scope with NumZmodule.sort.
+End NumZmoduleExports.
+HB.export NumZmoduleExports.
 
 Module Export Def.
 

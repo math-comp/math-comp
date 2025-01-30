@@ -74,7 +74,7 @@ HB.structure Definition NormedZmodule (R : porderZmodType) :=
   { M of SemiNormedZmodule_isPositiveDefinite R M & SemiNormedZmodule R M }.
 Arguments norm {R M} x : rename.
 
-HB.factory Record Zmodule_isNormed (R : POrderZmodule.type) M
+HB.factory Record Zmodule_isNormed (R : porderZmodType) M
          of GRing.Zmodule M := {
   norm : M -> R;
   ler_normD : forall x y, norm (x + y) <= norm x + norm y;
@@ -100,7 +100,7 @@ Notation "[ 'normedZmodType' R 'of' T ]" := (@clone _ (Phant R) T _ _ id)
 End NormedZmoduleExports.
 HB.export NormedZmoduleExports.
 
-HB.mixin Record isNumRing R of GRing.NzRing R & POrderZmodule R
+HB.mixin Record NumZmod_isNumRing R of GRing.NzRing R & POrderZmodule R
   & NormedZmodule (POrderZmodule.clone R _) R := {
  addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
  ger_leVge : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
@@ -111,20 +111,109 @@ HB.mixin Record isNumRing R of GRing.NzRing R & POrderZmodule R
 #[short(type="numDomainType")]
 HB.structure Definition NumDomain := { R of
      GRing.IntegralDomain R &
-     POrderZmodule R &
+     NumZmodule R &
      NormedZmodule (POrderZmodule.clone R _) R &
-     isNumRing R
+     NumZmod_isNumRing R
   }.
 Arguments addr_gt0 {_} [x y] : rename.
 Arguments ger_leVge {_} [x y] : rename.
 
-(* TODO: make isNumDomain depend on intermediate structures *)
-(* TODO: make isNumDomain.sort canonically a NumDomain *)
+HB.factory Record isNumRing R of GRing.NzRing R & POrderZmodule R
+  & GRing.IntegralDomain R
+  & NormedZmodule (POrderZmodule.clone R _) R := {
+ addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
+ ger_leVge : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
+ normrM : {morph (norm : R -> R) : x y / x * y};
+ ler_def : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
+}.
+HB.builders Context R of isNumRing R.
+
+Fact ler_wD2l (x : R) : {homo +%R x : y z / y <= z}.
+Proof. by move=> y z; rewrite !ler_def ![_ + z]addrC addrKA. Qed.
+
+HB.instance Definition _ := Add_isHomo.Build R ler_wD2l.
+
+Lemma le0r (x : R) : (0 <= x) = (x == 0) || (0 < x).
+Proof. by rewrite le_eqVlt eq_sym. Qed.
+
+Lemma addr_ge0 (x y : R) : 0 <= x -> 0 <= y -> 0 <= x + y.
+Proof.
+rewrite le0r; case/predU1P=> [-> | x_pos]; rewrite ?add0r // le0r.
+by case/predU1P=> [-> | y_pos]; rewrite ltW ?addr0 ?addr_gt0.
+Qed.
+
+Fact nneg_addr_closed : addr_closed (@nneg R).
+Proof. by split; [apply: lexx | apply: addr_ge0]. Qed.
+HB.instance Definition _ := GRing.isAddClosed.Build R Rnneg_pred
+  nneg_addr_closed.
+
+Lemma nnegrE (x : R) : (x \is nneg) = (0 <= x). Proof. by []. Qed.
+Lemma realE (x : R) : (x \is real) = (0 <= x) || (x <= 0). Proof. by []. Qed.
+
+Lemma ger0_def (x : R) : (0 <= x) = (norm x == x).
+Proof. by rewrite ler_def subr0. Qed.
+
+Lemma subr_ge0 (x y : R) : (0 <= x - y) = (y <= x).
+Proof. by rewrite ger0_def -ler_def. Qed.
+
+Lemma oppr_ge0 (x : R) : (0 <= - x) = (x <= 0).
+Proof. by rewrite -sub0r subr_ge0. Qed.
+
+Fact real_oppr_closed : oppr_closed (@real R).
+Proof. by move=> x; rewrite /= !realE oppr_ge0 orbC -!oppr_ge0 opprK. Qed.
+HB.instance Definition _ := GRing.isOppClosed.Build R Rreal_pred
+  real_oppr_closed.
+
+Fact real_addr_closed : addr_closed (@Num.real R).
+Proof.
+split=> [|x y Rx Ry]; first by rewrite realE lexx.
+without loss{Rx} x_ge0: x y Ry / 0 <= x.
+  case/orP: Rx => [? | x_le0]; first exact.
+  by rewrite -rpredN opprD; apply; rewrite ?rpredN ?oppr_ge0.
+case/orP: Ry => [y_ge0 | y_le0]; first by rewrite realE -nnegrE rpredD.
+by rewrite realE -[y]opprK orbC -oppr_ge0 opprB !subr_ge0 ger_leVge ?oppr_ge0.
+Qed.
+HB.instance Definition _ := GRing.isAddClosed.Build R Num.real
+  real_addr_closed.
+
+Lemma comparabler0 (x : R) : (x >=< 0)%R = (x \is Num.real).
+Proof. by rewrite comparable_sym. Qed.
+
+Lemma subr_le0 (x y : R) : (y - x <= 0) = (y <= x).
+Proof. by rewrite -[LHS]subr_ge0 opprB add0r subr_ge0. Qed.  (* FIXME: rewrite pattern *)
+
+Lemma subr_comparable0 (x y : R) : (x - y >=< 0)%R = (x >=< y)%R.
+Proof. by rewrite /Num.comparable subr_ge0 subr_le0. Qed.
+
+Lemma comparablerE (x y : R) : (x >=< y)%R = (x - y \is Num.real).
+Proof. by rewrite -comparabler0 subr_comparable0. Qed.
+
+Fact comparabler_trans : transitive (Num.comparable : rel R).
+Proof.
+move=> y x z; rewrite !comparablerE => xBy_real yBz_real.
+by have := rpredD xBy_real yBz_real; rewrite addrA addrNK.
+Qed.
+
+HB.instance Definition _ :=
+  POrderedZmodule_hasTransCmp.Build R comparabler_trans.
+
+HB.instance Definition _ :=
+  NumZmod_isNumRing.Build R addr_gt0 ger_leVge normrM ler_def.
+HB.end.
 
 Module NumDomainExports.
 Bind Scope ring_scope with NumDomain.sort.
 End NumDomainExports.
 HB.export NumDomainExports.
+
+#[short(type="realDomainType")]
+HB.structure Definition RealDomain :=
+  { R of Order.Total ring_display R & NumDomain R }.
+
+Module RealDomainExports.
+Bind Scope ring_scope with RealDomain.sort.
+End RealDomainExports.
+HB.export RealDomainExports.
 
 Module Export Def.
 
@@ -166,15 +255,6 @@ Definition real_closed_axiom : Prop :=
 End ExtensionAxioms.
 
 (* The rest of the numbers interface hierarchy. *)
-
-#[short(type="realDomainType")]
-HB.structure Definition RealDomain :=
-  { R of Order.Total ring_display R & NumDomain R }.
-
-Module RealDomainExports.
-Bind Scope ring_scope with RealDomain.sort.
-End RealDomainExports.
-HB.export RealDomainExports.
 
 (* The elementary theory needed to support the definition of the derived      *)
 (* operations for the extensions described above.                             *)
@@ -3072,7 +3152,6 @@ Qed.
 End PolyBounds.
 
 End RealDomainOperations.
-
 End Theory.
 
 HB.factory Record IntegralDomain_isNumRing R of GRing.IntegralDomain R := {
@@ -3161,7 +3240,7 @@ HB.builders Context R of IntegralDomain_isNumRing R.
     Order.LtLe_isPOrder.Build ring_display R le_def' ltrr lt_trans.
 
   HB.instance Definition _ :=
-    Zmodule_isNormed.Build _ R normD norm_eq0 normrMn normrN.
+    @Zmodule_isNormed.Build _ R norm normD norm_eq0 normrMn normrN.
 
   HB.instance Definition _ :=
     isNumRing.Build R addr_gt0 ger_total normM le_def.
