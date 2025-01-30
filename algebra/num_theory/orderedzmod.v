@@ -18,8 +18,19 @@ From mathcomp Require Import ssralg poly.
 (*                                                                            *)
 (* This file defines the following number structures:                         *)
 (*                                                                            *)
-(*  porderZmodType == join of Order.POrder and GRing.Zmodule                  *)
-(*                    The HB class is called POrderedZmodule.                 *)
+(*    porderNmodType == join of Order.POrder and GRing.Nmodule                *)
+(*                      The HB class is called POrderNmodule.                 *)
+(*    porderZmodType == join of Order.POrder and GRing.Zmodule                *)
+(*                      The HB class is called POrderZmodule.                 *)
+(*  porderedNmodType == porderNmodType such that                              *)
+(*                      the order is translation invariant.                   *)
+(*                      The HB class is called POrderedNmodule.               *)
+(*  porderedZmodType == porderZmodType such that                              *)
+(*                      the order is translation invariant.                   *)
+(*                      The HB class is called POrderedZmodule.               *)
+(*       numZmodType == porderedZmodType such that                            *)
+(*                      the real line (i.e. the comparable to 0)              *)
+(*                      is totally ordered                                    *)
 (*                                                                            *)
 (* The ordering symbols and notations (<, <=, >, >=, _ <= _ ?= iff _,         *)
 (* _ < _ ?<= if _, >=<, and ><) and lattice operations (meet and join)        *)
@@ -62,9 +73,44 @@ Fact ring_display : Order.disp_t. Proof. exact. Qed.
 
 Module Num.
 
+#[short(type="porderNmodType")]
+HB.structure Definition POrderNmodule :=
+  { R of Order.isPOrder ring_display R & GRing.Nmodule R}.
 #[short(type="porderZmodType")]
+HB.structure Definition POrderZmodule :=
+  { R of Order.isPOrder ring_display R & GRing.Zmodule R}.
+
+HB.mixin Record Add_isMono R of POrderNmodule R := {
+  lerD2l : forall x : R, {mono +%R x : y z / y <= z}
+}.
+
+(* TODO provide the positive cone definition of porderZmodType *)
+(* HB.factory Record ZmodulePositiveCone_isPOrdered of GRing.Zmodule R *)
+(*    & Order.isPOrder ring_display R := { *)
+(*   (* TODO: is posnum the right name? *) *)
+(*   posnum : {pred R}; *)
+(*   posnum0 :  *)
+
+#[short(type="porderedNmodType")]
+HB.structure Definition POrderedNmodule :=
+  { R of POrderNmodule R & Add_isMono R}.
+#[short(type="porderedZmodType")]
 HB.structure Definition POrderedZmodule :=
-  { R of Order.isPOrder ring_display R & GRing.Zmodule R }.
+  { R of GRing.Zmodule R & POrderedNmodule R}.
+
+HB.mixin Record POrderedZmodule_hasTransCmp R of GRing.Nmodule R
+    & Order.isPOrder ring_display R := {
+  comparabler_trans : transitive (Order.comparable : rel R)
+}.
+#[short(type="numZmodType")]
+HB.structure Definition NumZmodule :=
+  {R of POrderedZmodule_hasTransCmp R & POrderedZmodule R}.
+
+Bind Scope ring_scope with POrderNmodule.sort.
+Bind Scope ring_scope with POrderZmodule.sort.
+Bind Scope ring_scope with POrderedZmodule.sort.
+Bind Scope ring_scope with POrderedZmodule.sort.
+Bind Scope ring_scope with NumZmodule.sort.
 
 Notation ler := (@Order.le ring_display _) (only parsing).
 Notation "@ 'ler' R" := (@Order.le ring_display R)
@@ -96,7 +142,7 @@ Notation "@ 'minr' R" := (@Order.min ring_display R)
 
 Module Export Def.
 Section Def.
-Context {R : porderZmodType}.
+Context {R : porderNmodType}.
 
 Definition Rpos_pred := fun x : R => 0 < x.
 Definition Rpos : qualifier 0 R := [qualify x | Rpos_pred x].
