@@ -983,6 +983,49 @@ Proof.
 by move=> Pnil Pcons; elim=> [|x s IHs] [|y t] //= [eq_sz]; apply/Pcons/IHs.
 Qed.
 
+Section AllIff.
+(* The Following Are Equivalent *)
+
+(* We introduce a specific conjunction, used to chain the consecutive *)
+(* items in a circular list of implications *)
+Inductive all_iff_and (P Q : Prop) : Prop := AllIffConj of P & Q.
+
+Definition all_iff (P0 : Prop) (Ps : seq Prop) : Prop :=
+  let fix loop (P : Prop) (Qs : seq Prop) : Prop :=
+    if Qs is Q :: Qs then all_iff_and (P -> Q) (loop Q Qs) else P -> P0 in
+  loop P0 Ps.
+
+Lemma all_iffLR P0 Ps : all_iff P0 Ps ->
+  forall m n, nth P0 (P0 :: Ps) m -> nth P0 (P0 :: Ps) n.
+Proof.
+move=> iffPs; have PsS n: nth P0 Ps n -> nth P0 Ps n.+1.
+  elim: n P0 Ps iffPs => [|n IHn] P0 [|P [|Q Ps]] //= [iP0P] //; first by case.
+    by rewrite nth_nil.
+  by case=> iPQ iffPs; apply: IHn; split=> // /iP0P.
+have{PsS} lePs: {homo nth P0 Ps : m n / m <= n >-> (m -> n)}.
+  by move=> m n /subnK<-; elim: {n}(n - m) => // n IHn /IHn; apply: PsS.
+move=> m n P_m; have{m P_m} hP0: P0.
+  case: m P_m => //= m /(lePs m _ (leq_maxl m (size Ps))).
+  by rewrite nth_default ?leq_maxr.
+case: n =>// n; apply: lePs 0 n (leq0n n) _.
+by case: Ps iffPs hP0 => // P Ps [].
+Qed.
+
+Lemma all_iffP P0 Ps :
+   all_iff P0 Ps -> forall m n, nth P0 (P0 :: Ps) m <-> nth P0 (P0 :: Ps) n.
+Proof. by move=> /all_iffLR-iffPs m n; split => /iffPs. Qed.
+
+End AllIff.
+Arguments all_iffLR {P0 Ps}.
+Arguments all_iffP {P0 Ps}.
+Coercion all_iffP : all_iff >-> Funclass.
+
+(* This means "the following are all equivalent: P0, ... Pn" *)
+Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" :=
+  (all_iff P0 (@cons Prop P1 (.. (@cons Prop Pn nil) ..))) : form_scope.
+
+Ltac tfae := do !apply: AllIffConj.
+
 Section FindSpec.
 Variable (T : Type) (a : {pred T}) (s : seq T).
 
@@ -2508,6 +2551,121 @@ by case=> /injf-> // /IHs->.
 Qed.
 
 End Map.
+
+(* Sequence indexing with error. *)
+Section onth.
+
+Variable T : Type.
+
+Implicit Types x y z : T.
+Implicit Types m n : nat.
+Implicit Type s : seq T.
+
+Fixpoint onth s n {struct n} : option T :=
+  if s isn't x :: s then None else
+  if n isn't n.+1 then Some x else onth s n.
+
+Lemma odflt_onth x0 s n : odflt x0 (onth s n) = nth x0 s n.
+Proof. by elim: n s => [|? ?] []. Qed.
+
+Lemma onthE s : onth s =1 nth None (map Some s).
+Proof. by move=> n; elim: n s => [|? ?] []. Qed.
+
+Lemma onth_nth x0 x t n : onth t n = Some x -> nth x0 t n = x.
+Proof. by move=> tn; rewrite -odflt_onth tn. Qed.
+
+Lemma onth0n n : onth [::] n = None. Proof. by case: n. Qed.
+
+Lemma onth1P x y n : onth [:: x] n = Some y <-> n = 0 /\ x = y.
+Proof. by case: n => [|[]]; split=> // -[] // _ ->. Qed.
+
+Lemma onthTE s n : onth s n = (n < size s) :> bool.
+Proof. by elim: n s => [|? ?] []. Qed.
+
+Lemma onthNE s n: ~~ onth s n = (size s <= n).
+Proof. by rewrite onthTE -leqNgt. Qed.
+
+Lemma onth_default n s : size s <= n -> onth s n = None.
+Proof. by rewrite -onthNE; case: onth. Qed.
+
+Lemma onth_cat s1 s2 n :
+  onth (s1 ++ s2) n = if n < size s1 then onth s1 n else onth s2 (n - size s1).
+Proof. by elim: n s1 => [|? ?] []. Qed.
+
+Lemma onth_nseq x n m : onth (nseq n x) m = if m < n then Some x else None.
+Proof. by rewrite onthE/= -nth_nseq map_nseq. Qed.
+
+Lemma eq_onthP {s1 s2} :
+  [<-> s1 = s2;
+   forall i : nat, i < maxn (size s1) (size s2) -> onth s1 i = onth s2 i;
+   forall i : nat, onth s1 i = onth s2 i].
+Proof.
+tfae=> [->//|eqs12 i|eqs12].
+  have := eqs12 i; case: ltnP => [_ ->//|].
+  by rewrite geq_max => /andP[is1 is2] _; rewrite !onth_default.
+have /eqP eq_size_12 : size s1 == size s2.
+  by rewrite eqn_leq -!onthNE eqs12 onthNE -eqs12 onthNE !leqnn.
+apply/(inj_map Some_inj)/(@eq_from_nth _ None); rewrite !size_map//.
+by move=> i _; rewrite -!onthE eqs12.
+Qed.
+
+Lemma eq_from_onth [s1 s2 : seq T] :
+  (forall i : nat, onth s1 i = onth s2 i) -> s1 = s2.
+Proof. by move/(eq_onthP 0 2). Qed.
+
+Lemma eq_from_onth_le [s1 s2 : seq T] :
+    (forall i : nat, i < maxn (size s1) (size s2) -> onth s1 i = onth s2 i) ->
+  s1 = s2.
+Proof. by move/(eq_onthP 0 1). Qed.
+
+End onth.
+
+Lemma onth_map {T S} n (s : seq T) (f : T -> S) :
+  onth (map f s) n = omap f (onth s n).
+Proof. by elim: s n => [|x s IHs] []. Qed.
+
+Lemma inj_onth_map {T S} n (s : seq T) (f : T -> S) x :
+  injective f -> onth (map f s) n = Some (f x) -> onth s n = Some x.
+Proof. by rewrite onth_map => /inj_omap + fs; apply. Qed.
+
+Section onthEqType.
+
+Variables T : eqType.
+
+Implicit Types x y z : T.
+Implicit Types i m n : nat.
+Implicit Type s : seq T.
+
+Lemma onthP s x : reflect (exists i, onth s i = Some x) (x \in s).
+Proof.
+elim: s => [|y s IHs]; first by constructor=> -[] [].
+rewrite in_cons; case: eqVneq => [->|/= Nxy]; first by constructor; exists 0.
+apply: (iffP idP) => [/IHs[i <-]|[[|i]//=]]; first by exists i.+1.
+  by move=> [eq_xy]; rewrite eq_xy eqxx in Nxy.
+by move=> six; apply/IHs; exists i.
+Qed.
+
+Lemma onthPn s x : reflect (forall i, onth s i != Some x) (x \notin s).
+Proof.
+apply: (iffP idP); first by move=> /onthP + i; apply: contra_not_neq; exists i.
+by move=> nsix; apply/onthP => -[n /eqP/negPn]; rewrite nsix.
+Qed.
+
+Lemma onth_inj s n m : uniq s -> minn m n < size s ->
+  onth s n = onth s m -> n = m.
+Proof.
+elim: s m n => [|x s IHs]//= [|m] [|n]//=; rewrite ?minnSS !ltnS.
+- by move=> /andP[+ _] _ /eqP => /onthPn/(_ _)/negPf->.
+- by move=> /andP[+ _] _ /esym /eqP => /onthPn/(_ _)/negPf->.
+by move=> /andP[xNs /IHs]/[apply]/[apply]->.
+Qed.
+
+End onthEqType.
+
+Arguments onthP {T s x}.
+Arguments onthPn {T s x}.
+Arguments onth_nth {T}.
+Arguments onth_inj {T}.
 
 Notation "[ 'seq' E | i <- s ]" := (map (fun i => E) s)
   (at level 0, E at level 99, i binder,
@@ -4705,46 +4863,3 @@ by move=> u; rewrite !mem_permutations (permPr Est).
 Qed.
 
 End Permutations.
-
-Section AllIff.
-(* The Following Are Equivalent *)
-
-(* We introduce a specific conjunction, used to chain the consecutive *)
-(* items in a circular list of implications *)
-Inductive all_iff_and (P Q : Prop) : Prop := AllIffConj of P & Q.
-
-Definition all_iff (P0 : Prop) (Ps : seq Prop) : Prop :=
-  let fix loop (P : Prop) (Qs : seq Prop) : Prop :=
-    if Qs is Q :: Qs then all_iff_and (P -> Q) (loop Q Qs) else P -> P0 in
-  loop P0 Ps.
-
-Lemma all_iffLR P0 Ps : all_iff P0 Ps ->
-  forall m n, nth P0 (P0 :: Ps) m -> nth P0 (P0 :: Ps) n.
-Proof.
-move=> iffPs; have PsS n: nth P0 Ps n -> nth P0 Ps n.+1.
-  elim: n P0 Ps iffPs => [|n IHn] P0 [|P [|Q Ps]] //= [iP0P] //; first by case.
-    by rewrite nth_nil.
-  by case=> iPQ iffPs; apply: IHn; split=> // /iP0P.
-have{PsS} lePs: {homo nth P0 Ps : m n / m <= n >-> (m -> n)}.
-  by move=> m n /subnK<-; elim: {n}(n - m) => // n IHn /IHn; apply: PsS.
-move=> m n P_m; have{m P_m} hP0: P0.
-  case: m P_m => //= m /(lePs m _ (leq_maxl m (size Ps))).
-  by rewrite nth_default ?leq_maxr.
-case: n =>// n; apply: lePs 0 n (leq0n n) _.
-by case: Ps iffPs hP0 => // P Ps [].
-Qed.
-
-Lemma all_iffP P0 Ps :
-   all_iff P0 Ps -> forall m n, nth P0 (P0 :: Ps) m <-> nth P0 (P0 :: Ps) n.
-Proof. by move=> /all_iffLR-iffPs m n; split => /iffPs. Qed.
-
-End AllIff.
-Arguments all_iffLR {P0 Ps}.
-Arguments all_iffP {P0 Ps}.
-Coercion all_iffP : all_iff >-> Funclass.
-
-(* This means "the following are all equivalent: P0, ... Pn" *)
-Notation "[ '<->' P0 ; P1 ; .. ; Pn ]" :=
-  (all_iff P0 (@cons Prop P1 (.. (@cons Prop Pn nil) ..))) : form_scope.
-
-Ltac tfae := do !apply: AllIffConj.

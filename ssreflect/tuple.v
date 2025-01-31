@@ -77,6 +77,12 @@ Definition tnth t i := nth (tnth_default t i) t i.
 Lemma tnth_nth x t i : tnth t i = nth x t i.
 Proof. by apply: set_nth_default; rewrite size_tuple. Qed.
 
+Lemma tnth_onth x t i : tnth t i = x <-> onth t i = Some x.
+Proof.
+rewrite (tnth_nth x) onthE (nth_map x) ?size_tuple//.
+by split; [move->|case].
+Qed.
+
 Lemma map_tnth_enum t : map (tnth t) (enum 'I_n) = t.
 Proof.
 case def_t: {-}(val t) => [|x0 t'].
