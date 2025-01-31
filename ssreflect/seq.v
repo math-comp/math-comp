@@ -53,6 +53,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 (*                       not have at least i+1 items (i.e., size x <= i)      *)
 (*               s`_i == standard notation for nth x0 s i for a default x0,   *)
 (*                       e.g., 0 for rings.                                   *)
+(*           onth s i == Some x if x is the i^th idem of s (numbered from 0), *)
+(*                       or None if size s <= i)                              *)
 (*   set_nth x0 s i y == s where item i has been changed to y; if s does not  *)
 (*                       have an item i, it is first padded with copies of x0 *)
 (*                       to size i+1.                                         *)
