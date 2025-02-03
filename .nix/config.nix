@@ -76,7 +76,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq.override.version = "master";
       stdlib.override.version = "master";
       bignums.override.version = "master";
-      paramcoq.override.version = "master";
       coq-elpi.override.version = "master";
       coq-elpi.override.elpi-version = "2.0.7";
       hierarchy-builder.override.version = "master";
