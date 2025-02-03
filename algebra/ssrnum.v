@@ -91,6 +91,7 @@ Reserved Notation "'Re z" (at level 10, z at level 8).
 Reserved Notation "'Im z" (at level 10, z at level 8).
 
 Local Open Scope order_scope.
+Local Open Scope group_scope.
 Local Open Scope ring_scope.
 Import Order.TTheory GRing.Theory.
 
@@ -2785,8 +2786,6 @@ End NumDomainMonotonyTheoryForReals.
 
 Section FinGroup.
 
-Import GroupScope.
-
 Variables (R : numDomainType) (gT : finGroupType).
 Implicit Types G : {group gT}.
 
@@ -2955,7 +2954,7 @@ Lemma sgrV x : sgr x^-1 = sgr x.
 Proof. by rewrite /sgr invr_eq0 invr_lt0. Qed.
 
 Lemma splitr x : x = x / 2%:R + x / 2%:R.
-Proof. by rewrite -mulr2n -mulr_natr mulfVK //= pnatr_eq0. Qed.
+Proof. by rewrite -mulr2n -[RHS]mulr_natr mulfVK //= pnatr_eq0. Qed.
 
 (* lteif *)
 
@@ -4251,7 +4250,7 @@ have [->|nz_x] := eqVneq x 0; first by exists (u y); rewrite uE ?normr0 ?mul0r.
 exists (u x); rewrite uE // /u (negPf nz_x); congr (_ , _).
 have{lin_xy} def2xy: `|x| * `|y| *+ 2 = x * y ^* + y * x ^*.
   apply/(addrI (x * x^* ))/(addIr (y * y^* )); rewrite -2!{1}normCK -sqrrD.
-  by rewrite addrA -addrA -!mulrDr -mulrDl -rmorphD -normCK lin_xy.
+  by rewrite addrA -[RHS]addrA -!mulrDr -mulrDl -rmorphD -normCK lin_xy.
 have def_xy: x * y^* = y * x^*.
   apply/eqP; rewrite -subr_eq0 -[_ == 0](@expf_eq0 _ _ 2).
   rewrite (canRL (subrK _) (subr_sqrDB _ _)) opprK -def2xy exprMn_n exprMn.

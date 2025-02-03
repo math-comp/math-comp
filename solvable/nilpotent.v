@@ -1,8 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
-From mathcomp Require Import fintype div bigop prime finset fingroup morphism.
-From mathcomp Require Import automorphism quotient commutator gproduct.
+From mathcomp Require Import fintype div bigop prime finset monoid fingroup.
+From mathcomp Require Import morphism automorphism quotient commutator gproduct.
 From mathcomp Require Import gfunctor center gseries cyclic.
 
 (******************************************************************************)

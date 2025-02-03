@@ -1,8 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrfun ssrbool choice eqtype ssrnat seq div.
-From mathcomp Require Import fintype bigop finset prime fingroup.
+From mathcomp Require Import ssreflect ssrfun ssrbool choice eqtype ssrnat seq.
+From mathcomp Require Import div fintype bigop finset prime monoid fingroup.
 From mathcomp Require Import ssralg finalg countalg.
 
 (******************************************************************************)

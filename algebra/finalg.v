@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype finset fingroup morphism perm action.
-From mathcomp Require Import ssralg countalg.
+From mathcomp Require Import monoid ssralg countalg.
 
 (*****************************************************************************)
 (*      The algebraic part of the algebraic hierarchy for finite types       *)
@@ -175,7 +175,8 @@ Lemma zmod1gE : 1%g = 0 :> U.            Proof. by []. Qed.
 Lemma zmodVgE x : x^-1%g = - x.          Proof. by []. Qed.
 Lemma zmodMgE x y : (x * y)%g = x + y.   Proof. by []. Qed.
 Lemma zmodXgE n x : (x ^+ n)%g = x *+ n. Proof. by []. Qed.
-Lemma zmod_mulgC x y : commute x y.      Proof. exact: addrC. Qed.
+Lemma zmod_mulgC x y : @commute (comoid.GRing.to_multiplicative U) x y.
+Proof. exact: addrC. Qed.
 Lemma zmod_abelian (A : {set U}) : abelian A.
 Proof. by apply/centsP=> x _ y _; apply: zmod_mulgC. Qed.
 

@@ -2,8 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import fintype finfun finset fingroup perm order div.
-From mathcomp Require Import prime binomial ssralg countalg finalg zmodp bigop.
+From mathcomp Require Import fintype finfun finset monoid fingroup perm order.
+From mathcomp Require Import div prime binomial ssralg countalg finalg zmodp.
+From mathcomp Require Import bigop.
 
 (******************************************************************************)
 (* Basic concrete linear algebra : definition of type for matrices, and all   *)
@@ -4673,11 +4674,15 @@ Implicit Type (s : 'I_sq).
 
 Lemma mul_mxrow m n' (A : 'M[R]_(m, n')) (R_ : forall j, 'M[R]_(n', q_ j)) :
   A *m \mxrow_j R_ j= \mxrow_j (A *m R_ j).
-Proof. by apply/matrixP=> i s; rewrite !mxE; under eq_bigr do rewrite !mxE. Qed.
+Proof.
+by apply/matrixP=> i s; rewrite !mxE; under [LHS]eq_bigr do rewrite !mxE.
+Qed.
 
 Lemma mul_submxrow m n' (A : 'M[R]_(m, n')) (B : 'M[R]_(n', sq)) j :
   A *m submxrow B j= submxrow (A *m B) j.
-Proof. by apply/matrixP=> i s; rewrite !mxE; under eq_bigr do rewrite !mxE. Qed.
+Proof.
+by apply/matrixP=> i s; rewrite !mxE; under [LHS]eq_bigr do rewrite !mxE.
+Qed.
 
 End BlockRowRing.
 
@@ -4744,11 +4749,15 @@ Implicit Type (s : 'I_sp).
 
 Lemma mxcol_mul n' m (C_ : forall i, 'M[R]_(p_ i, n')) (A : 'M[R]_(n', m)) :
   \mxcol_i C_ i *m A = \mxcol_i (C_ i *m A).
-Proof. by apply/matrixP=> i s; rewrite !mxE; under eq_bigr do rewrite !mxE. Qed.
+Proof.
+by apply/matrixP=> i s; rewrite !mxE; under [LHS]eq_bigr do rewrite !mxE.
+Qed.
 
 Lemma submxcol_mul n' m (B : 'M[R]_(sp, n')) (A : 'M[R]_(n', m)) i :
   submxcol B i *m A = submxcol (B *m A) i.
-Proof. by apply/matrixP=> j s; rewrite !mxE; under eq_bigr do rewrite !mxE. Qed.
+Proof.
+by apply/matrixP=> j s; rewrite !mxE; under [LHS]eq_bigr do rewrite !mxE.
+Qed.
 
 End BlockColRing.
 
