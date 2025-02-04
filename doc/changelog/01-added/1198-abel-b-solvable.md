@@ -2,7 +2,7 @@
   + lemmas `gen_tperm_step`, `perm_addr1X`, `gen_tpermn_circular_shift`
 
 - in `cyclic.v`
-  + lemmas `eq_expg_ord`, `expgDzmod`
+  + lemmas `eq_expg_ord`, `expgD_Zp`
 
 - in `nilpotent.v`
   + lemma `sol_setXn`

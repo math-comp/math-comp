@@ -528,11 +528,11 @@ have [g fK gK] : bijective f.
   apply: inj_card_bij; rewrite ?cppSS ?card_ord// /f /Zpm => i j cijx.
   pose stabx := ('C_<[c]>[x | 'P])%g.
   have cjix : (c ^+ (j - i)%R)%g x = x.
-    by apply: (@perm_inj _ (c ^+ i)%g); rewrite -permM -expgDzmod// addrNK.
+    by apply: (@perm_inj _ (c ^+ i)%g); rewrite -permM -expgD_Zp// addrNK.
   have : (c ^+ (j - i)%R)%g \in stabx.
     by rewrite !inE ?groupX ?mem_gen ?sub1set ?inE// ['P%act _ _]cjix eqxx.
   rewrite [stabx]perm_prime_astab// => /set1gP.
-  move=> /(congr1 (mulg (c ^+ i))); rewrite -expgDzmod// addrC addrNK mulg1.
+  move=> /(congr1 (mulg (c ^+ i))); rewrite -expgD_Zp// addrC addrNK mulg1.
   by move=> /eqP; rewrite eq_expg_ord// ?cppSS ?ord_c// => /eqP->.
 pose gsf s := g \o s \o f.
 have gsf_inj (s : {perm X}) : injective (gsf s).
@@ -562,7 +562,7 @@ have phixy : phi (tperm x y) = tperm (0%R : 'Z_#[c]) k.
   by rewrite !permE/= -f0 -[y]gK !(can_eq fK) -!fun_if.
 have phic : phi c = perm (addrI (1%R : 'Z_#[c])).
   apply/permP => i; rewrite /phi morphmE !permE /gsf/=; apply: (canLR fK).
-  by rewrite /f /Zpm -permM addrC expgDzmod.
+  by rewrite /f /Zpm -permM addrC expgD_Zp.
 rewrite -(injmSK phi_inj)//= morphim_gen/= ?subsetT//= -/phi.
 rewrite phiT /morphim !setTI/= -/phi imsetU1 imset_set1/= phixy phic.
 suff /gen_tpermn_circular_shift<- : coprime #[c]%g.-2.+2 (k - 0)%R by [].
