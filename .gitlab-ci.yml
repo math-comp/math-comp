@@ -137,7 +137,7 @@ rocq-prover_dev:
     - opam config list
     - opam repo list
     - opam list
-    - 'which coqc || opam install -y coq'
+    - 'which coqc || opam install -y -v coq'
     - coqc --version
     - echo "${COQ_VERSION}"
     # adapt to Git's patch for CVE-2022-24765 that is off-topic here
