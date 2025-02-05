@@ -15,7 +15,7 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   ## Indicate the relative location of your _CoqProject
   ## If not specified, it defaults to "_CoqProject"
-  coqproject = "mathcomp/_CoqProject";
+  coqproject = "_CoqProject";
 
   cachix.coq = {};
   cachix.coq-community = {};
