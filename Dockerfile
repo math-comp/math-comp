@@ -5,7 +5,7 @@ FROM ${coq_image} as builder
 ENV MATHCOMP_VERSION="dev"
 ENV MATHCOMP_PACKAGE="coq-mathcomp-character"
 
-WORKDIR /home/coq/mathcomp
+WORKDIR /home/mathcomp
 
 COPY . .
 
@@ -19,9 +19,9 @@ RUN set -x \
   && opam repository add --all-switches --set-default coq-core-dev https://coq.inria.fr/opam/core-dev \
   && opam update -y \
   && opam config list && opam repo list && opam list \
+  && if [ -d /home/coq ]; then sudo chown -R coq:coq /home/mathcomp; else sudo chown -R rocq:rocq /home/mathcomp; fi \
   && ( which coqc || opam install -y -v coq ) \
   && coqc --version \
-  && sudo chown -R coq:coq /home/coq/mathcomp \
   && opam pin add -n -k path coq-mathcomp-ssreflect . \
   && opam pin add -n -k path coq-mathcomp-fingroup . \
   && opam pin add -n -k path coq-mathcomp-algebra . \
