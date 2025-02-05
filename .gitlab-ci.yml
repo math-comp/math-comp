@@ -82,10 +82,10 @@ make-coq-latest:
     - echo "${OPAM_SWITCH}"
     - echo "${CI_JOB_TOKEN}" | docker login -u "${CI_REGISTRY_USER}" --password-stdin "${CI_REGISTRY}"
   script: |
-    if [ "${CI_JOB_NAME%-*}" = "coq" ]; then
-      docker build --pull --build-arg=coq_image="coqorg/${CI_JOB_NAME//-/:}-ocaml-${OCAML_VERSION}" --build-arg=compiler="${OPAM_SWITCH}" -t "${IMAGE}" .
+    if [ "${CI_JOB_NAME%%_*}" = "coq" ]; then
+      docker build --pull --build-arg=coq_image="coqorg/${CI_JOB_NAME//_/:}-ocaml-${OCAML_VERSION}" --build-arg=compiler="${OPAM_SWITCH}" -t "${IMAGE}" .
     else
-      docker build --pull --build-arg=coq_image="rocq/${CI_JOB_NAME//-/:}-ocaml-${OCAML_VERSION}" --build-arg=compiler="${OPAM_SWITCH}" -t "${IMAGE}" .
+      docker build --pull --build-arg=coq_image="rocq/${CI_JOB_NAME//_/:}-ocaml-${OCAML_VERSION}" --build-arg=compiler="${OPAM_SWITCH}" -t "${IMAGE}" .
     fi
     docker push "${IMAGE}"
     docker logout "${CI_REGISTRY}"
@@ -106,21 +106,21 @@ make-coq-latest:
     variables:
       - $CRON_MODE == "nightly"
 
-coq-8.19:
+coq_8.19:
   extends: .opam-build-once
 
-coq-8.20:
+coq_8.20:
   extends: .opam-build-once
 
-rocq-prover-9.0:
+rocq-prover_9.0:
   # to be replaced with .opam-build-once when 9.0.0 available
   extends: .opam-build
 
-# rocq-prover-9.1: # to uncomment when 9.1+rc1 available
+# rocq-prover_9.1: # to uncomment when 9.1+rc1 available
 #   # to be replaced with .opam-build-once when 9.1.0 available
 #   extends: .opam-build
 
-rocq-prover-dev:
+rocq-prover_dev:
   extends: .opam-build
 
 ################
