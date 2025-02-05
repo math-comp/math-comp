@@ -754,7 +754,7 @@ End QuotientSol.
 Section setXn.
 Import finfun.
 
-Lemma sol_setXn n (gT : 'I_n -> finGroupType) (G : forall i, {group gT i}) :
+Lemma setXn_sol n (gT : 'I_n -> finGroupType) (G : forall i, {group gT i}) :
   (forall i, solvable (G i)) -> solvable (setXn G).
 Proof.
 elim: n => [|n IHn] in gT G * => solG; first by rewrite groupX0 solvable1.

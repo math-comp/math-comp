@@ -5,7 +5,7 @@
   + lemmas `eq_expg_ord`, `expgD_Zp`
 
 - in `nilpotent.v`
-  + lemma `sol_setXn`
+  + lemma `setXn_sol`
 
 - in `alt.v`
   + lemmas `gen_tperm_circular_shift`, `solvable_AltF`, `solvable_SymF`
