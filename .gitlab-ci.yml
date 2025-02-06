@@ -32,7 +32,7 @@ stages:
   - test
 
 variables:
-  # cf. https://hub.docker.com/r/coqorg/coq#supported-tags
+  # cf. https://hub.docker.com/r/rocq/rocq-prover#supported-tags
   OCAML_VERSION: "4.14-flambda"
 
 ################
@@ -47,11 +47,13 @@ variables:
     - docker:dind
   variables:
     # This image will be built locally only (not pushed)
-    IMAGE: "mathcomp-dev:make_coq-${COQ_VERSION}"
+    IMAGE: "mathcomp-dev:make_coq_${COQ_VERSION}"
   before_script:
     - echo "${OPAM_SWITCH}"
     - echo "${COQ_VERSION}"
   script:
+    # TODO: update this when 9.0.0 goes live
+    # if [ "${COQ_VERSION%.*}" = "8" ]; then ...
     - docker build -f Dockerfile.make --pull --build-arg=coq_image="coqorg/coq:${COQ_VERSION}-ocaml-${OCAML_VERSION}" -t "${IMAGE}" .
   except:
     refs:
@@ -75,14 +77,19 @@ make-coq-latest:
   services:
     - docker:dind
   variables:
-    IMAGE: "${CI_REGISTRY_IMAGE}:${CI_PIPELINE_IID}_${CI_COMMIT_REF_SLUG}_${CI_JOB_NAME}"
+    IMAGE_PREFIX: "${CI_REGISTRY_IMAGE}:${CI_PIPELINE_IID}_${CI_COMMIT_REF_SLUG}"
   before_script:
     - echo "${OPAM_SWITCH}"
     - echo "${CI_JOB_TOKEN}" | docker login -u "${CI_REGISTRY_USER}" --password-stdin "${CI_REGISTRY}"
-  script:
-    - docker build --pull --build-arg=coq_image="coqorg/${CI_JOB_NAME//-/:}-ocaml-${OCAML_VERSION}" --build-arg=compiler="${OPAM_SWITCH}" -t "${IMAGE}" .
-    - docker push "${IMAGE}"
-    - docker logout "${CI_REGISTRY}"
+  script: |
+    export IMAGE="${IMAGE_PREFIX}_${CI_JOB_NAME//_/-}"
+    if [ "${CI_JOB_NAME%%_*}" = "coq" ]; then
+      docker build --pull --build-arg=coq_image="coqorg/${CI_JOB_NAME//_/:}-ocaml-${OCAML_VERSION}" --build-arg=compiler="${OPAM_SWITCH}" -t "${IMAGE}" .
+    else
+      docker build --pull --build-arg=coq_image="rocq/${CI_JOB_NAME//_/:}-ocaml-${OCAML_VERSION}" --build-arg=compiler="${OPAM_SWITCH}" -t "${IMAGE}" .
+    fi
+    docker push "${IMAGE}"
+    docker logout "${CI_REGISTRY}"
   except:
     refs:
       # - /^pr-.*$/
@@ -100,17 +107,21 @@ make-coq-latest:
     variables:
       - $CRON_MODE == "nightly"
 
-coq-8.19:
+coq_8.19:
   extends: .opam-build-once
 
-coq-8.20:
+coq_8.20:
   extends: .opam-build-once
 
-# coq-8.21: # to uncomment when 8.21+rc1 available
-#   # to be replaced with .opam-build-once when 8.21.0 available
+rocq-prover_9.0:
+  # to be replaced with .opam-build-once when 9.0.0 available
+  extends: .opam-build
+
+# rocq-prover_9.1: # to uncomment when 9.1+rc1 available
+#   # to be replaced with .opam-build-once when 9.1.0 available
 #   extends: .opam-build
 
-coq-dev:
+rocq-prover_dev:
   extends: .opam-build
 
 ################
@@ -127,6 +138,7 @@ coq-dev:
     - opam config list
     - opam repo list
     - opam list
+    - 'which coqc || opam install -y -v coq'
     - coqc --version
     - echo "${COQ_VERSION}"
     # adapt to Git's patch for CVE-2022-24765 that is off-topic here
@@ -155,6 +167,15 @@ coq-dev:
       - $CRON_MODE == "nightly"
       - $CRON_MODE == "minimal"
 
+.test-rocq:
+  extends: .test
+  image: "${CI_REGISTRY_IMAGE}:${CI_PIPELINE_IID}_${CI_COMMIT_REF_SLUG}_rocq-prover-${COQ_VERSION}"
+
+# run "make test-suite" only for push pipelines (not for scheduled pipelines)
+.test-rocq-once:
+  extends: .test-once
+  image: "${CI_REGISTRY_IMAGE}:${CI_PIPELINE_IID}_${CI_COMMIT_REF_SLUG}_rocq-prover-${COQ_VERSION}"
+
 test-coq-8.19:
   extends: .test-once
   variables:
@@ -165,14 +186,20 @@ test-coq-8.20:
   variables:
     COQ_VERSION: "8.20"
 
-# test-coq-8.21: # to uncomment when 8.21+rc1 available
-#   # to be replaced with .test-once when 8.21.0 available
-#   extends: .test
-#   variables:
-#     COQ_VERSION: "8.21"
+test-rocq-prover-9.0:
+  # to be replaced with .test-rocq-once when 9.0.0 available
+  extends: .test-rocq
+  variables:
+    COQ_VERSION: "9.0"
 
-test-coq-dev:
-  extends: .test
+# test-rocq-prover-9.1: # to uncomment when 9.1+rc1 available
+#   # to be replaced with .test-rocq-once when 9.1.0 available
+#   extends: .test-rocq
+#   variables:
+#     COQ_VERSION: "9.1"
+
+test-rocq-prover-dev:
+  extends: .test-rocq
   variables:
     COQ_VERSION: "dev"
 
@@ -405,9 +432,13 @@ mathcomp-dev_coq-8.19:
 mathcomp-dev_coq-8.20:
   extends: .docker-deploy-once
 
-# mathcomp-dev_coq-8.21: # to uncomment when 8.21+rc1 available
-#   # to be replaced with .docker-deploy-once when 8.21.0 available
+mathcomp-dev_rocq-prover-9.0:
+  # to be replaced with .docker-deploy-once when 9.0.0 available
+  extends: .docker-deploy
+
+# mathcomp-dev_rocq-prover-9.1: # to uncomment when 9.1+rc1 available
+#   # to be replaced with .docker-deploy-once when 9.1.0 available
 #   extends: .docker-deploy
 
-mathcomp-dev_coq-dev:
+mathcomp-dev_rocq-prover-dev:
   extends: .docker-deploy

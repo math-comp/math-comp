@@ -1,7 +1,8 @@
-ARG coq_image="coqorg/coq:dev"
+ARG coq_image="rocq/rocq-prover:dev-ocaml-4.14"
 # hadolint ignore=DL3006
 FROM ${coq_image}
 
+# TODO: update this when 9.0.0 goes live
 WORKDIR /home/coq/mathcomp
 
 COPY . .
