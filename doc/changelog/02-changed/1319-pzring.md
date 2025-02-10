@@ -78,6 +78,8 @@
   + `exprBn`, `subrXX`, `sqrrB`, `subr_sqr`, `subr_sqrDB`,
     `scale_is_scalable`, `scale_fun_is_scalable`, `comRingMixin`,
     `ffun_mulC`, `pair_mulC` generalized to `comPzRingType`
+    ([#1319](https://github.com/coq/stdlib/pull/1319),
+     by Tragicus).
 		
 - in `ssrint.v`
   + `mulrzAl`, `mulrzAr`, `mulrzl`, `mulrzr`, `mulNrNz`, `mulrbz`,
@@ -86,5 +88,5 @@
     `rmorph_int`, `linearMn`, `commrMz`, `commr_int`, `sumMz`,
     `prodMz`, `intr_sign`, `rpred_int`, `rpredZint` generalized to
     `pzRingType`
-    (`#1319 <https://github.com/coq/stdlib/pull/1319>`_,
+    ([#1319](https://github.com/coq/stdlib/pull/1319),
      by Tragicus).

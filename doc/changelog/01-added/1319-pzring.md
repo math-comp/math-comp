@@ -21,5 +21,5 @@
   + factories `SubPzRing_isSubComPzRing`, `SubChoice_isSubPzSemiRing`,
     `SubChoice_isSubComPzSemiRing`, `SubChoice_isSubPzRing`,
     `SubChoice_isSubComPzRing`
-    (`#1319 <https://github.com/coq/stdlib/pull/1319>`_,
+    ([#1319](https://github.com/coq/stdlib/pull/1319),
     by Tragicus).
