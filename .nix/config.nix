@@ -61,6 +61,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       { name = p; value.override.version = "master"; }))
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
+         stdlib.job = true;
          # To add an overlay applying to all bundles,
          # add below a line like
          #<package>.override.version = "<github_login>:<branch>";
@@ -70,6 +71,7 @@ with builtins; with (import <nixpkgs> {}).lib;
          #   for a complete list of Coq packages available in Nix
          # * <github_login>:<branch> is such that this will use the branch <branch>
          #   from https://github.com/<github_login>/<repository>
+         deriving.override.version = "proux01:mc1343";
        };
   in {
     "coq-master" = { rocqPackages = {
@@ -92,6 +94,7 @@ with builtins; with (import <nixpkgs> {}).lib;
     "coq-9.0".coqPackages = common-bundles // {
       coq.override.version = "9.0";
       coq-elpi.job = true;
+      hierarchy-builder.job = true;
       mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;

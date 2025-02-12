@@ -1,5 +1,5 @@
 From HB Require Import structures.
-From Coq Require Import BinPos BinNat.
+From Corelib Require Import PosDef.
 (* use #[warning="-hiding-delimiting-key"] attribute once we require Coq 8.18 *)
 Set Warnings "-hiding-delimiting-key".
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq bigop.
@@ -70,6 +70,144 @@ Notation simplrefl := (ltac: (simpl; reflexivity)) (only parsing).
 Notation cbvrefl := (ltac: (cbv; reflexivity)) (only parsing).
 Notation vmrefl := (ltac: (vm_compute; reflexivity)) (only parsing).
 
+(* From stdlib *)
+Module Pos.
+
+Import Pos.
+
+(** ** Conversion with a decimal representation for printing/parsing *)
+
+Local Notation ten := (xO (xI (xO xH))).
+
+Fixpoint of_uint_acc (d:Decimal.uint) (acc:positive) :=
+  match d with
+  | Decimal.Nil => acc
+  | Decimal.D0 l => of_uint_acc l (mul ten acc)
+  | Decimal.D1 l => of_uint_acc l (add 1 (mul ten acc))
+  | Decimal.D2 l => of_uint_acc l (add 1~0 (mul ten acc))
+  | Decimal.D3 l => of_uint_acc l (add 1~1 (mul ten acc))
+  | Decimal.D4 l => of_uint_acc l (add 1~0~0 (mul ten acc))
+  | Decimal.D5 l => of_uint_acc l (add 1~0~1 (mul ten acc))
+  | Decimal.D6 l => of_uint_acc l (add 1~1~0 (mul ten acc))
+  | Decimal.D7 l => of_uint_acc l (add 1~1~1 (mul ten acc))
+  | Decimal.D8 l => of_uint_acc l (add 1~0~0~0 (mul ten acc))
+  | Decimal.D9 l => of_uint_acc l (add 1~0~0~1 (mul ten acc))
+  end.
+
+Fixpoint of_uint (d:Decimal.uint) : N :=
+  match d with
+  | Decimal.Nil => N0
+  | Decimal.D0 l => of_uint l
+  | Decimal.D1 l => Npos (of_uint_acc l 1)
+  | Decimal.D2 l => Npos (of_uint_acc l 1~0)
+  | Decimal.D3 l => Npos (of_uint_acc l 1~1)
+  | Decimal.D4 l => Npos (of_uint_acc l 1~0~0)
+  | Decimal.D5 l => Npos (of_uint_acc l 1~0~1)
+  | Decimal.D6 l => Npos (of_uint_acc l 1~1~0)
+  | Decimal.D7 l => Npos (of_uint_acc l 1~1~1)
+  | Decimal.D8 l => Npos (of_uint_acc l 1~0~0~0)
+  | Decimal.D9 l => Npos (of_uint_acc l 1~0~0~1)
+  end.
+
+Local Notation sixteen := (xO (xO (xO (xO xH)))).
+
+Fixpoint of_hex_uint_acc (d:Hexadecimal.uint) (acc:positive) :=
+  match d with
+  | Hexadecimal.Nil => acc
+  | Hexadecimal.D0 l => of_hex_uint_acc l (mul sixteen acc)
+  | Hexadecimal.D1 l => of_hex_uint_acc l (add 1 (mul sixteen acc))
+  | Hexadecimal.D2 l => of_hex_uint_acc l (add 1~0 (mul sixteen acc))
+  | Hexadecimal.D3 l => of_hex_uint_acc l (add 1~1 (mul sixteen acc))
+  | Hexadecimal.D4 l => of_hex_uint_acc l (add 1~0~0 (mul sixteen acc))
+  | Hexadecimal.D5 l => of_hex_uint_acc l (add 1~0~1 (mul sixteen acc))
+  | Hexadecimal.D6 l => of_hex_uint_acc l (add 1~1~0 (mul sixteen acc))
+  | Hexadecimal.D7 l => of_hex_uint_acc l (add 1~1~1 (mul sixteen acc))
+  | Hexadecimal.D8 l => of_hex_uint_acc l (add 1~0~0~0 (mul sixteen acc))
+  | Hexadecimal.D9 l => of_hex_uint_acc l (add 1~0~0~1 (mul sixteen acc))
+  | Hexadecimal.Da l => of_hex_uint_acc l (add 1~0~1~0 (mul sixteen acc))
+  | Hexadecimal.Db l => of_hex_uint_acc l (add 1~0~1~1 (mul sixteen acc))
+  | Hexadecimal.Dc l => of_hex_uint_acc l (add 1~1~0~0 (mul sixteen acc))
+  | Hexadecimal.Dd l => of_hex_uint_acc l (add 1~1~0~1 (mul sixteen acc))
+  | Hexadecimal.De l => of_hex_uint_acc l (add 1~1~1~0 (mul sixteen acc))
+  | Hexadecimal.Df l => of_hex_uint_acc l (add 1~1~1~1 (mul sixteen acc))
+  end.
+
+Fixpoint of_hex_uint (d:Hexadecimal.uint) : N :=
+  match d with
+  | Hexadecimal.Nil => N0
+  | Hexadecimal.D0 l => of_hex_uint l
+  | Hexadecimal.D1 l => Npos (of_hex_uint_acc l 1)
+  | Hexadecimal.D2 l => Npos (of_hex_uint_acc l 1~0)
+  | Hexadecimal.D3 l => Npos (of_hex_uint_acc l 1~1)
+  | Hexadecimal.D4 l => Npos (of_hex_uint_acc l 1~0~0)
+  | Hexadecimal.D5 l => Npos (of_hex_uint_acc l 1~0~1)
+  | Hexadecimal.D6 l => Npos (of_hex_uint_acc l 1~1~0)
+  | Hexadecimal.D7 l => Npos (of_hex_uint_acc l 1~1~1)
+  | Hexadecimal.D8 l => Npos (of_hex_uint_acc l 1~0~0~0)
+  | Hexadecimal.D9 l => Npos (of_hex_uint_acc l 1~0~0~1)
+  | Hexadecimal.Da l => Npos (of_hex_uint_acc l 1~0~1~0)
+  | Hexadecimal.Db l => Npos (of_hex_uint_acc l 1~0~1~1)
+  | Hexadecimal.Dc l => Npos (of_hex_uint_acc l 1~1~0~0)
+  | Hexadecimal.Dd l => Npos (of_hex_uint_acc l 1~1~0~1)
+  | Hexadecimal.De l => Npos (of_hex_uint_acc l 1~1~1~0)
+  | Hexadecimal.Df l => Npos (of_hex_uint_acc l 1~1~1~1)
+  end.
+
+Definition of_int (d:Decimal.int) : option positive :=
+  match d with
+  | Decimal.Pos d =>
+    match of_uint d with
+    | N0 => None
+    | Npos p => Some p
+    end
+  | Decimal.Neg _ => None
+  end.
+
+Definition of_hex_int (d:Hexadecimal.int) : option positive :=
+  match d with
+  | Hexadecimal.Pos d =>
+    match of_hex_uint d with
+    | N0 => None
+    | Npos p => Some p
+    end
+  | Hexadecimal.Neg _ => None
+  end.
+
+Definition of_num_int (d:Number.int) : option positive :=
+  match d with
+  | Number.IntDecimal d => of_int d
+  | Number.IntHexadecimal d => of_hex_int d
+  end.
+
+Fixpoint to_little_uint p :=
+  match p with
+  | xH => Decimal.D1 Decimal.Nil
+  | xI p => Decimal.Little.succ_double (to_little_uint p)
+  | xO p => Decimal.Little.double (to_little_uint p)
+  end.
+
+Definition to_uint p := Decimal.rev (to_little_uint p).
+
+Definition to_num_uint p := Number.UIntDecimal (to_uint p).
+
+(** ** Successor *)
+
+Definition Nsucc n :=
+  match n with
+  | N0 => Npos xH
+  | Npos p => Npos (Pos.succ p)
+  end.
+
+Lemma nat_of_succ_bin b : nat_of_bin (Nsucc b) = 1 + nat_of_bin b :> nat.
+Proof. by case: b => [//|p /=]; rewrite nat_of_succ_pos. Qed.
+
+Theorem eqb_eq p q : Pos.eqb p q = true <-> p=q.
+Proof.
+by elim: p q => [p IHp|p IHp|] [q|q|] //=; split=> [/IHp->//|]; case=> /IHp.
+Qed.
+
+End Pos.
+
 Module AC.
 
 HB.instance Definition _ := hasDecEq.Build positive
@@ -89,7 +227,7 @@ elim: s1 (loop [::] s2) => [n|s11 IHs1 s12 IHs2] //= l.
 by rewrite IHs1 [in RHS]IHs1 IHs2 catA.
 Qed.
 
-Definition Leaf_of_nat n := Leaf ((pos_of_nat n n) - 1)%positive.
+Definition Leaf_of_nat n := Leaf (Pos.sub (pos_of_nat n n) xH).
 
 Module Import Syntax.
 Bind Scope AC_scope with syntax.
@@ -103,7 +241,7 @@ Definition pattern (s : syntax) := ((fix loop n s :=
   match s with
   | Leaf 1%positive => (Leaf n, Pos.succ n)
   | Leaf m => Pos.iter (fun oi => (Op oi.1 (Leaf oi.2), Pos.succ oi.2))
-                       (Leaf n, Pos.succ n) (m - 1)%positive
+                       (Leaf n, Pos.succ n) (Pos.sub m xH)
   | Op s s' => let: (p, n') := loop n s in
                let: (p', n'') := loop n' s' in
                (Op p p', n'')
@@ -163,18 +301,20 @@ Arguments Empty {T}.
 
 Definition content := (fix loop (acc : env N) s :=
   match s with
-  | Leaf n => set_pos_trec 0%num N.succ [::] acc n
+  | Leaf n => set_pos_trec N0 Pos.Nsucc [::] acc n
   | Op s s' => loop (loop acc s') s
   end) Empty.
 
-Lemma count_memE x (t : syntax) : count_mem x t = pos 0%num (content t) x.
+Lemma count_memE x (t : syntax) :
+  count_mem x t = nat_of_bin (pos N0 (content t) x).
 Proof.
 rewrite /content; set loop := (X in X Empty); rewrite -/loop.
-rewrite -[LHS]addn0; have <- : pos 0%num Empty x = 0 :> nat by elim: x.
+rewrite -[LHS]addn0.
+have <- : nat_of_bin (pos N0 Empty x) = 0 :> nat by elim: x.
 elim: t Empty => [n|s IHs s' IHs'] e //=; last first.
   by rewrite serial_Op count_cat -addnA IHs' IHs.
 rewrite ?addn0 set_pos_trecE pos_set_pos; case: (altP eqP) => [->|] //=.
-by rewrite -N.add_1_l nat_of_add_bin //=.
+by rewrite Pos.nat_of_succ_bin.
 Qed.
 
 Definition cforall N T : env N -> (env T -> Type) -> Type := env_rect (@^~ Empty)

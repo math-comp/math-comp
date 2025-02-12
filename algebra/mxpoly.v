@@ -1883,12 +1883,12 @@ split=> [df|[rs urs rsP]].
 have mxdirect_eigenspaces : mxdirect (\sum_(i < size rs) eigenspace A rs`_i).
   apply: mxdirect_sum_eigenspace => i j _ _ rsij; apply/val_inj.
   by apply: uniqP rsij; rewrite ?inE.
-rewrite (big_nth 0) big_mkord in rsP; rewrite -codiagonalizable1.
+rewrite (big_nth 0) big_mkord in rsP; apply/codiagonalizable1.
 apply/(codiagonalizable_on _ mxdirect_eigenspaces) => // i/=.
   case: n => [|n] in A {mxdirect_eigenspaces} rsP *.
     by rewrite thinmx0 sub0mx.
   by rewrite comm_mx_stable_eigenspace.
-rewrite codiagonalizable1.
+apply/codiagonalizable1.
 rewrite (@conjmx_eigenvalue _ _ _ rs`_i); first exact: diagonalizable_scalar.
   by rewrite eq_row_base.
 by rewrite row_base_free.
@@ -1901,7 +1901,7 @@ Proof.
 split=> [[P Punit /diagonalizable_forPex[d /(simmxLR Punit)->]]|].
   rewrite mxminpoly_uconj ?unitmx_inv// mxminpoly_diag.
   by eexists; [|by []]; rewrite undup_uniq.
-rewrite diagonalizablePeigen => -[rs rsu rsP]; exists rs => //.
+move=> + /ltac:(apply/diagonalizablePeigen) => -[rs rsu rsP]; exists rs => //.
 rewrite (big_nth 0) [X in (X :=: _)%MS](big_nth 0) !big_mkord in rsP *.
 rewrite (eq_bigr _ (fun _ _ => eigenspace_poly _ _)).
 apply: (eqmx_trans (eqmx_sym (kermxpoly_prod _ _)) (kermxpoly_min _)) => //.
@@ -1929,10 +1929,10 @@ split => [cdAs|[P Punit /allP/= AsD]]/=; last first.
   move=> A B AAs BAs; move=> /(_ _ _)/diagonalizable_forPex/sigW in AsD.
   have [[dA /simmxLR->//] [dB /simmxLR->//]] := (AsD _ AAs, AsD _ BAs).
   by rewrite /comm_mx -!conjmxM 1?diag_mxC// inE stablemx_unit ?unitmx_inv.
-move: cdAs; rewrite (rwP (all_comm_mxP _)) => cdAs.
-have [k] := ubnP (size As); elim: k => [|k IHk]//= in n As cdAs *.
-case: As cdAs => [|A As]//=; first by exists 1%:M; rewrite ?unitmx1.
-rewrite ltnS all_comm_mx_cons => -[/andP[/allP/(_ _ _)/eqP AAsC AsC dAAs]] Ask.
+move: cdAs => -[]; move/(rwP (all_comm_mxP _)) => cdAs cdAs'.
+have [k] := ubnP (size As); elim: k => [|k IHk]//= in n As cdAs cdAs' *.
+case: As cdAs cdAs' => [|A As]//=; first by exists 1%:M; rewrite ?unitmx1.
+rewrite ltnS all_comm_mx_cons => /andP[/allP/(_ _ _)/eqP AAsC AsC dAAs] Ask.
 have /diagonalizablePeigen [rs urs rs1] := dAAs _ (mem_head _ _).
 rewrite (big_nth 0) big_mkord in rs1.
 have eAB (i : 'I_(size rs)) B : B \in A :: As -> stablemx (eigenspace A rs`_i) B.
@@ -1948,7 +1948,7 @@ rewrite (@conjmx_eigenvalue _ _ _ rs`_i) ?eq_row_base ?row_base_free//.
 set Bs := map _ _; suff [P Punit /= PBs] : codiagonalizable Bs.
   exists P; rewrite /= ?PBs ?andbT// /(diagonalizable_for _ _).
   by rewrite conjmx_scalar ?mx_scalar_is_diag// row_free_unit.
-apply: IHk; rewrite ?size_map//=; split.
+apply: IHk; rewrite ?size_map/= ?ltnS//.
   apply/all_comm_mxP => _ _ /mapP[/= B BAs ->] /mapP[/= h hAs ->].
   rewrite -!conjmxM ?inE ?stablemx_row_base ?eAB ?inE ?BAs ?hAs ?orbT//.
   by rewrite (all_comm_mxP _ AsC).

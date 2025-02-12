@@ -13,6 +13,7 @@
 !Make.test-suite
 !Makefile
 !Makefile.common
+!Makefile.coq.local
 !Makefile.test-suite.coq.local
 
 !*.opam
