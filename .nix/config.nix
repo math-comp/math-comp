@@ -88,6 +88,8 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq-elpi.override.version = "master";  # required by CoqEAL
       coq-elpi.override.elpi-version = "2.0.7";
       mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
+      # check that we compile without warnings on last release of Coq
+      mathcomp-warnings.job = true;
       interval.job = false;
     };
     "coq-8.20".coqPackages = common-bundles // {
@@ -95,8 +97,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq-elpi.override.version = "master";  # required by CoqEAL
       coq-elpi.override.elpi-version = "2.0.7";
       hierarchy-builder.override.version = "1.8.1";  # required by elpi master
-      # check that we compile without warnings on last release of Coq
-      mathcomp-warnings.job = true;
       interval.job = false;
     };
     "coq-8.19".coqPackages = common-bundles // {
