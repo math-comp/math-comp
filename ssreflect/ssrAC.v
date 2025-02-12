@@ -1,5 +1,5 @@
 From HB Require Import structures.
-Require Import BinPos BinNat.
+From Coq Require Import BinPos BinNat.
 (* use #[warning="-hiding-delimiting-key"] attribute once we require Coq 8.18 *)
 Set Warnings "-hiding-delimiting-key".
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq bigop.

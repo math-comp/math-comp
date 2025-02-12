@@ -2,9 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype.
-Require Import BinNat.
-Require BinPos Ndec.
-Require Export Ring.
+From Coq Require Import BinNat.
+From Coq Require BinPos Ndec.
+From Coq Require Export Ring.
 #[export] Set Warnings "-overwriting-delimiting-key".
 (* because there is some Set Warnings "overwriting-delimiting-key".
    somewhere in the above *)
