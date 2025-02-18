@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype tuple finfun bigop finset fingroup.
-From mathcomp Require Import action perm primitive_action.
+From mathcomp Require Import action perm primitive_action ssrAC.
 
 (*   Application of the Burside formula to count the number of distinct       *)
 (* colorings of the vertices of a square and a cube.                          *)
@@ -413,7 +413,7 @@ rewrite (burnside_formula [:: id1; r1; r2; r3]) => [||p]; last first.
 - by rewrite !inE !orbA.
 - by apply: map_uniq (fun p : {perm square} => p c0) _ _; rewrite /= !permE.
 rewrite !big_cons big_nil /= addn0 {1}card_Fid F_r1 F_r2 F_r3.
-by rewrite card_n card_n2 //=; ring.
+by rewrite card_n card_n2 //= [n + _]addnC !addnA addn0.
 Qed.
 
 Lemma F_Sd1 : 'Fix_to[sd1] = [set x | coin1 x == coin3 x].
@@ -460,7 +460,8 @@ rewrite (burnside_formula iso_list) => [||p]; last first.
 - apply: map_uniq (fun p : {perm square} => (p c0, p c1)) _ _.
   by rewrite /= !permE.
 rewrite !big_cons big_nil {1}card_Fid F_r1 F_r2 F_r3 F_Sh F_Sv F_Sd1 F_Sd2.
-by rewrite card_n !card_n3 // !card_n2 //=; ring.
+rewrite card_n !card_n3 // !card_n2 //= !addnA !addn0.
+by rewrite [LHS]addn.[ACl 1 * 7 * 8 * 3 * 5 * 6 * 2 * 4].
 Qed.
 
 End square_colouring.
@@ -1253,7 +1254,8 @@ rewrite (burnside_formula iso_list); last first.
 rewrite !big_cons big_nil {1}card_Fid3 /= F_s05 F_s14 F_s23 F_r05 F_r14 F_r23
   F_r50 F_r41 F_r32 F_r024 F_r042 F_r012 F_r021 F_r031 F_r013 F_r043  F_r034
   F_s1  F_s2 F_s3 F_s4 F_s5 F_s6.
-by rewrite !card_n4 // !card_n3_3 // !card_n2_3 // !card_n3s //; ring.
+rewrite !card_n4 // !card_n3_3 // !card_n2_3 // !card_n3s //.
+by rewrite [RHS]addn.[ACl 1 * 3 * 2 * 4 * 5] !addnA !addn0.
 Qed.
 
 End cube_colouring.

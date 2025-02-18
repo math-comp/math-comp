@@ -2732,8 +2732,8 @@ Lemma count_subseqP s1 s2 :
   (forall x, count_mem x s1 <= count_mem x s2) <->
     exists2 s, subseq s s2 & perm_eq s1 s.
 Proof.
-rewrite count_maskP; split=> [[m _]|[_/subseqP[m sm ->]]]; last by exists m.
-by exists (mask m s2); rewrite ?mask_subseq.
+split=> [/count_maskP[m _]|]; first by exists (mask m s2); rewrite ?mask_subseq.
+by move=> -[_/subseqP[m sm ->] ?]; apply/count_maskP; exists m.
 Qed.
 
 End MiscMask.
@@ -2919,7 +2919,8 @@ End MapComp.
 Lemma eq_in_map (S : eqType) T (f g : S -> T) (s : seq S) :
   {in s, f =1 g} <-> map f s = map g s.
 Proof.
-by elim: s => //= x s IHs; rewrite forall_cons IHs; split => -[-> ->].
+elim: s => //= x s IHs; split=> [/forall_cons[-> ?]|]; first by rewrite IHs.1.
+by move=> -[? ?]; apply/forall_cons; split=> [//|]; apply: IHs.2.
 Qed.
 
 Lemma map_id_in (T : eqType) f (s : seq T) : {in s, f =1 id} -> map f s = s.

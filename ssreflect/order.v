@@ -3006,10 +3006,10 @@ Lemma eq_maxr x y : (max x y == y) = (x <= y).
 Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP. Qed.
 
 Lemma min_idPl x y : reflect (min x y = x) (x <= y).
-Proof. by apply: (iffP idP); rewrite (rwP eqP) eq_minl. Qed.
+Proof. by rewrite -eq_minl; apply/eqP. Qed.
 
 Lemma max_idPr x y : reflect (max x y = y) (x <= y).
-Proof. by apply: (iffP idP); rewrite (rwP eqP) eq_maxr. Qed.
+Proof. by rewrite -eq_maxr; apply/eqP. Qed.
 
 Lemma min_minKx x y : min (min x y) y = min x y.
 Proof. by rewrite !(fun_if, if_arg) ltxx/=; case: comparableP. Qed.
@@ -3051,10 +3051,10 @@ Lemma comparable_eq_maxl : (max x y == x) = (y <= x).
 Proof. by rewrite !(fun_if, if_arg) eqxx; case: comparableP cmp_xy. Qed.
 
 Lemma comparable_min_idPr : reflect (min x y = y) (y <= x).
-Proof. by apply: (iffP idP); rewrite (rwP eqP) comparable_eq_minr. Qed.
+Proof. by rewrite -comparable_eq_minr; apply/eqP. Qed.
 
 Lemma comparable_max_idPl : reflect (max x y = x) (y <= x).
-Proof. by apply: (iffP idP); rewrite (rwP eqP) comparable_eq_maxl. Qed.
+Proof. by rewrite -comparable_eq_maxl; apply/eqP. Qed.
 
 Lemma comparable_le_min : (z <= min x y) = (z <= x) && (z <= y).
 Proof.

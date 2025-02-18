@@ -1,5 +1,5 @@
 From mathcomp Require Import ssreflect.
-From Coq Require Export ssrfun.
+From Corelib Require Export ssrfun.
 From mathcomp Require Export ssrnotations.
 #[export] Set Warnings "-overwriting-delimiting-key".
 (* because there is some Set Warnings "overwriting-delimiting-key".
