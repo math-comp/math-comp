@@ -119,6 +119,8 @@ jobs:
     needs:
     - coq
     - mathcomp-algebra
+    - mathcomp-algebra-tactics
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -175,13 +177,20 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-algebra"
     - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: mathcomp-algebra-tactics'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "mathcomp-algebra-tactics"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
+    - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "coq-bits"
   coq-elpi:
     needs:
     - coq
-    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -233,10 +242,6 @@ jobs:
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "coq"
-    - if: steps.stepCheck.outputs.status == 'built'
-      name: 'Building/fetching previous CI target: stdlib'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
-        --argstr job "stdlib"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
@@ -323,6 +328,7 @@ jobs:
     needs:
     - coq
     - mathcomp-ssreflect
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -378,6 +384,10 @@ jobs:
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-ssreflect"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
@@ -456,6 +466,7 @@ jobs:
     - mathcomp-algebra
     - mathcomp-ssreflect
     - mathcomp-fingroup
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -520,6 +531,10 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-fingroup"
     - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
+    - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "fourcolor"
@@ -529,6 +544,7 @@ jobs:
     - mathcomp-ssreflect
     - mathcomp-algebra
     - mathcomp-fingroup
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -593,6 +609,10 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-fingroup"
     - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
+    - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "gaia"
@@ -602,6 +622,7 @@ jobs:
     - mathcomp-algebra
     - mathcomp-finmap
     - mathcomp-fingroup
+    - mathcomp-algebra-tactics
     - fourcolor
     - hierarchy-builder
     runs-on: ubuntu-latest
@@ -668,6 +689,10 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-fingroup"
     - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: mathcomp-algebra-tactics'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "mathcomp-algebra-tactics"
+    - if: steps.stepCheck.outputs.status == 'built'
       name: 'Building/fetching previous CI target: fourcolor'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "fourcolor"
@@ -683,6 +708,7 @@ jobs:
     needs:
     - coq
     - coq-elpi
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -739,6 +765,10 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "coq-elpi"
     - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
+    - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "hierarchy-builder"
@@ -753,6 +783,7 @@ jobs:
     - mathcomp-field
     - mathcomp-character
     - hierarchy-builder
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -837,6 +868,10 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "hierarchy-builder"
     - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
+    - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp"
@@ -915,6 +950,7 @@ jobs:
     - mathcomp-ssreflect
     - mathcomp-fingroup
     - hierarchy-builder
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -982,6 +1018,10 @@ jobs:
       name: 'Building/fetching previous CI target: hierarchy-builder'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "hierarchy-builder"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
@@ -1371,6 +1411,7 @@ jobs:
     - mathcomp-solvable
     - mathcomp-field
     - hierarchy-builder
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -1450,6 +1491,10 @@ jobs:
       name: 'Building/fetching previous CI target: hierarchy-builder'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "hierarchy-builder"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
@@ -1609,6 +1654,7 @@ jobs:
     - mathcomp-algebra
     - mathcomp-solvable
     - hierarchy-builder
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -1685,6 +1731,10 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "hierarchy-builder"
     - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
+    - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-field"
@@ -1694,6 +1744,7 @@ jobs:
     - stdlib
     - mathcomp-ssreflect
     - hierarchy-builder
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -1758,6 +1809,10 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "hierarchy-builder"
     - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
+    - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-fingroup"
@@ -1765,6 +1820,7 @@ jobs:
     needs:
     - coq
     - mathcomp-ssreflect
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -1821,6 +1877,10 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
+    - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-finmap"
@@ -1833,6 +1893,7 @@ jobs:
     - mathcomp-fingroup
     - mathcomp-solvable
     - mathcomp-bigenough
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -1908,6 +1969,10 @@ jobs:
       name: 'Building/fetching previous CI target: mathcomp-bigenough'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-bigenough"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
@@ -2109,6 +2174,7 @@ jobs:
     - mathcomp-fingroup
     - mathcomp-algebra
     - hierarchy-builder
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -2181,6 +2247,10 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "hierarchy-builder"
     - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
+    - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-solvable"
@@ -2189,6 +2259,7 @@ jobs:
     - coq
     - stdlib
     - hierarchy-builder
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -2249,6 +2320,10 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "hierarchy-builder"
     - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
+    - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-ssreflect"
@@ -2257,6 +2332,7 @@ jobs:
     - coq
     - mathcomp-ssreflect
     - mathcomp-fingroup
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -2317,6 +2393,10 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-fingroup"
     - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
+    - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-tarjan"
@@ -2326,6 +2406,7 @@ jobs:
     - mathcomp-algebra
     - mathcomp-ssreflect
     - mathcomp-fingroup
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -2389,6 +2470,10 @@ jobs:
       name: 'Building/fetching previous CI target: mathcomp-fingroup'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-fingroup"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
@@ -2486,6 +2571,7 @@ jobs:
     - mathcomp-solvable
     - mathcomp-field
     - mathcomp
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -2566,6 +2652,10 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp"
     - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
+    - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "odd-order"
@@ -2573,6 +2663,7 @@ jobs:
     needs:
     - coq
     - mathcomp-ssreflect
+    - stdlib
     runs-on: ubuntu-latest
     steps:
     - name: Determine which commit to initially checkout
@@ -2628,6 +2719,10 @@ jobs:
       name: 'Building/fetching previous CI target: mathcomp-ssreflect'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
         --argstr job "mathcomp-ssreflect"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: stdlib'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"
+        --argstr job "stdlib"
     - if: steps.stepCheck.outputs.status == 'built'
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-master"

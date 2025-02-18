@@ -72,7 +72,13 @@ with builtins; with (import <nixpkgs> {}).lib;
          #   from https://github.com/<github_login>/<repository>
        };
   in {
-    "coq-master".coqPackages = common-bundles // {
+    "coq-master" = { rocqPackages = {
+      rocq-core.override.version = "master";
+      stdlib.override.version = "master";
+      bignums.override.version = "master";
+      rocq-elpi.override.version = "master";
+      rocq-elpi.override.elpi-version = "2.0.7";
+    }; coqPackages = common-bundles // {
       coq.override.version = "master";
       stdlib.override.version = "master";
       bignums.override.version = "master";
@@ -82,11 +88,10 @@ with builtins; with (import <nixpkgs> {}).lib;
       interval.job = false;
       coquelicot.job = false;
       mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
-    };
+    }; };
     "coq-9.0".coqPackages = common-bundles // {
       coq.override.version = "9.0";
-      coq-elpi.override.version = "master";  # required by CoqEAL
-      coq-elpi.override.elpi-version = "2.0.7";
+      coq-elpi.job = true;
       mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
@@ -94,9 +99,9 @@ with builtins; with (import <nixpkgs> {}).lib;
     };
     "coq-8.20".coqPackages = common-bundles // {
       coq.override.version = "8.20";
-      coq-elpi.override.version = "master";  # required by CoqEAL
+      coq-elpi.override.version = "2.5.0";  # required by CoqEAL
       coq-elpi.override.elpi-version = "2.0.7";
-      hierarchy-builder.override.version = "1.8.1";  # required by elpi master
+      hierarchy-builder.override.version = "1.8.1";  # required by elpi
       interval.job = false;
     };
     "coq-8.19".coqPackages = common-bundles // {
