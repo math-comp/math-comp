@@ -41,6 +41,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "gaia"
       "graph-theory"
       "interval"
+      "jasmin"
       "mathcomp-abel"
       "mathcomp-algebra-tactics"
       "mathcomp-analysis"
@@ -49,6 +50,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "mathcomp-classical"
       "mathcomp-finmap"
       "mathcomp-real-closed"
+      "mathcomp-word"
       "mathcomp-zify"
       "multinomials"
       "odd-order"
@@ -72,6 +74,7 @@ with builtins; with (import <nixpkgs> {}).lib;
          # * <github_login>:<branch> is such that this will use the branch <branch>
          #   from https://github.com/<github_login>/<repository>
          deriving.override.version = "proux01:mc1343";
+         jasmin.override.version = "proux01:mc1343";
        };
   in {
     "coq-master" = { rocqPackages = {
