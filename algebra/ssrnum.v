@@ -598,7 +598,7 @@ Hint Extern 0 (is_true (@Order.lt ring_display _ _ _)) =>
 Lemma pnatr_eq0 n : (n%:R == 0 :> R) = (n == 0)%N.
 Proof. by case: n => [|n]; rewrite ?mulr0n ?eqxx // gt_eqF. Qed.
 
-Lemma char_num : [char R] =i pred0.
+Lemma pchar_num : [pchar R] =i pred0.
 Proof. by case=> // p /=; rewrite !inE pnatr_eq0 andbF. Qed.
 
 (* Properties of the norm. *)
@@ -770,6 +770,9 @@ Lemma addr_ge0 x y : 0 <= x -> 0 <= y -> 0 <= x + y.
 Proof. exact: addr_ge0. Qed.
 
 End NumIntegralDomainTheory.
+
+#[deprecated(since="mathcomp 2.4.0",note="Use pchar_num instead.")]
+Notation char_num := pchar_num (only parsing).
 
 Arguments ler01 {R}.
 Arguments ltr01 {R}.
@@ -2975,7 +2978,7 @@ Proof. by move=> z_lt0; rewrite mulrC ltr_ndivrMr ?[z * _]mulrC. Qed.
 Definition lter_ndivrMl := (ler_ndivrMl, ltr_ndivrMl).
 
 Lemma natf_div m d : (d %| m)%N -> (m %/ d)%:R = m%:R / d%:R :> F.
-Proof. by apply: char0_natf_div; apply: (@char_num F). Qed.
+Proof. by apply: pchar0_natf_div; apply: (@pchar_num F). Qed.
 
 Lemma normfV : {morph (norm : F -> F) : x / x ^-1}.
 Proof.

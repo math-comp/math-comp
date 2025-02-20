@@ -758,11 +758,11 @@ Arguments rVabelem_inj {p%N gT E%G} abelE ntE [v1%R v2%R] : rename.
 Section ModularRepresentation.
 
 Variables (F : fieldType) (p : nat) (gT : finGroupType).
-Hypothesis charFp : p \in [char F].
+Hypothesis pcharFp : p \in [pchar F].
 Implicit Types G H : {group gT}.
 
 (* This is Gorenstein, Lemma 2.6.3. *)
-Lemma rfix_pgroup_char G H n (rG : mx_representation F G n) :
+Lemma rfix_pgroup_pchar G H n (rG : mx_representation F G n) :
   n > 0 -> p.-group H -> H \subset G -> rfix_mx rG H != 0.
 Proof.
 move=> n_gt0 pH sHG; rewrite -(rfix_subg rG sHG).
@@ -784,7 +784,7 @@ have{Gregular} ntG: G :!=: 1%g.
   apply: contraL n_gt0; move/eqP=> G1; rewrite -leqNgt -(mxrank1 F n).
   rewrite -(mxrank0 F n n) -Gregular mxrankS //; apply/rfix_mxP=> x.
   by rewrite {1}G1 mul1mx => /set1P->; rewrite repr_mx1.
-have p_pr: prime p by case/andP: charFp.
+have p_pr: prime p by case/andP: pcharFp.
 have{ntG pG} [z]: {z | z \in 'Z(G) & #[z] = p}; last case/setIP=> Gz cGz ozp.
   apply: Cauchy => //; apply: contraR ntG; rewrite -p'natE // => p'Z.
   have pZ: p.-group 'Z(G) by rewrite (pgroupS (center_sub G)).
@@ -797,16 +797,16 @@ have{irrG faithfulG cGz1} Urz1: rG z - 1%:M \in unitmx.
   move/implyP: (subsetP faithfulG z).
   by rewrite !inE Gz mul1mx -order_eq1 ozp -implybNN neq_ltn orbC prime_gt1.
 do [case: n n_gt0 => // n' _; set n := n'.+1] in rG Urz1 *.
-have charMp: p \in [char 'M[F]_n].
-  exact: (rmorph_char (@scalar_mx F n)).
-have{Urz1}: Frobenius_aut charMp (rG z - 1) \in GRing.unit by rewrite unitrX.
-rewrite (Frobenius_autB_comm _ (commr1 _)) Frobenius_aut1.
+have pcharMp: p \in [pchar 'M[F]_n].
+  exact: (rmorph_pchar (@scalar_mx F n)).
+have{Urz1}: pFrobenius_aut pcharMp (rG z - 1) \in GRing.unit by rewrite unitrX.
+rewrite (pFrobenius_autB_comm _ (commr1 _)) pFrobenius_aut1.
 by rewrite -[_ (rG z)](repr_mxX rG) // -ozp expg_order repr_mx1 subrr unitr0.
 Qed.
 
 Variables (G : {group gT}) (n : nat) (rG : mx_representation F G n).
 
-Lemma pcore_sub_rstab_mxsimple M : mxsimple rG M -> 'O_p(G) \subset rstab rG M.
+Lemma pcore_sub_rstab_mxsimple_pchar M : mxsimple rG M -> 'O_p(G) \subset rstab rG M.
 Proof.
 case=> modM nzM simM; have sGpG := pcore_sub p G.
 rewrite rfix_mx_rstabC //; set U := rfix_mx _ _.
@@ -814,29 +814,38 @@ have:= simM (M :&: U)%MS; rewrite sub_capmx submx_refl.
 apply; rewrite ?capmxSl //.
   by rewrite capmx_module // normal_rfix_mx_module ?pcore_normal.
 rewrite -(in_submodK (capmxSl _ _)) val_submod_eq0 -submx0.
-rewrite -(rfix_submod modM) // submx0 rfix_pgroup_char ?pcore_pgroup //.
+rewrite -(rfix_submod modM) // submx0 rfix_pgroup_pchar ?pcore_pgroup //.
 by rewrite lt0n mxrank_eq0.
 Qed.
 
-Lemma pcore_sub_rker_mx_irr : mx_irreducible rG -> 'O_p(G) \subset rker rG.
-Proof. exact: pcore_sub_rstab_mxsimple. Qed.
+Lemma pcore_sub_rker_mx_irr_pchar : mx_irreducible rG -> 'O_p(G) \subset rker rG.
+Proof. exact: pcore_sub_rstab_mxsimple_pchar. Qed.
 
 (* This is Gorenstein, Lemma 3.1.3. *)
-Lemma pcore_faithful_mx_irr :
+Lemma pcore_faithful_mx_irr_pchar :
   mx_irreducible rG -> mx_faithful rG -> 'O_p(G) = 1%g.
 Proof.
 move=> irrG ffulG; apply/trivgP; apply: subset_trans ffulG.
-exact: pcore_sub_rstab_mxsimple.
+exact: pcore_sub_rstab_mxsimple_pchar.
 Qed.
 
 End ModularRepresentation.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use rfix_pgroup_pchar instead.")]
+Notation rfix_pgroup_char := (rfix_pgroup_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pcore_sub_rstab_mxsimple_pchar instead.")]
+Notation pcore_sub_rstab_mxsimple := (pcore_sub_rstab_mxsimple_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pcore_sub_rker_mx_irr_pchar instead.")]
+Notation pcore_sub_rker_mx_irr := (pcore_sub_rker_mx_irr_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pcore_faithful_mx_irr_pchar instead.")]
+Notation pcore_faithful_mx_irr := (pcore_faithful_mx_irr_pchar) (only parsing).
 
 Section Extraspecial.
 
 Variables (F : fieldType) (gT : finGroupType) (S : {group gT}) (p n : nat).
 Hypotheses (pS : p.-group S) (esS : extraspecial S).
 Hypothesis oSpn : #|S| = (p ^ n.*2.+1)%N.
-Hypotheses (splitF : group_splitting_field F S) (F'S : [char F]^'.-group S).
+Hypotheses (splitF : group_splitting_field F S) (F'S : [pchar F]^'.-group S).
 
 Let p_pr := extraspecial_prime pS esS.
 Let p_gt0 := prime_gt0 p_pr.
@@ -847,7 +856,7 @@ Let modIp' (i : 'I_p.-1) : (i.+1 %% p = i.+1)%N.
 Proof. by case: i => i; rewrite /= -ltnS prednK //; apply: modn_small. Qed.
 
 (* This is Aschbacher (34.9), parts (1)-(4). *)
-Theorem extraspecial_repr_structure (sS : irrType F S) :
+Theorem extraspecial_repr_structure_pchar (sS : irrType F S) :
   [/\ #|linear_irr sS| = (p ^ n.*2)%N,
       exists iphi : 'I_p.-1 -> sS, let phi i := irr_repr (iphi i) in
         [/\ injective iphi,
@@ -886,7 +895,7 @@ have nb_irr: #|sS| = (p ^ n.*2 + p.-1)%N.
   rewrite sum1dep_card setIdE (setIidPr _) 1?cardsE ?cardZcl; last first.
     by apply/subsetP=> zS /[!inE] /andP[].
   have pn_gt0: p ^ n.*2 > 0 by rewrite expn_gt0 p_gt0.
-  rewrite card_irr // oSpn expnS -(prednK pn_gt0) mulnS eqn_add2l.
+  rewrite card_irr' // oSpn expnS -(prednK pn_gt0) mulnS eqn_add2l.
   rewrite (eq_bigr (fun _ => p)) => [|xS]; last first.
     case/andP=> SxS; rewrite inE SxS; case/imsetP: SxS => x Sx ->{xS} notZxS.
     have [y Sy ->] := repr_class S x; apply: p_maximal_index => //.
@@ -958,7 +967,7 @@ pose iphi i := irr_comp sS (rphi i); pose phi_ i := irr_repr (iphi i).
 have{} phi_ze i e: phi_ i (z ^+ e)%g = (w ^+ (e * i.+1)%N)%:M.
   rewrite /phi_ !{1}irr_center_scalar ?groupX ?irr_modeX //.
   suffices ->: irr_mode (iphi i) z = w ^+ i.+1 by rewrite mulnC exprM.
-  have:= mx_rsim_sym (rsim_irr_comp sS F'S (rphi_irr i)).
+  have:= mx_rsim_sym (rsim_irr_comp' sS F'S (rphi_irr i)).
   case/mx_rsim_def=> B [B' _ homB]; rewrite /irr_mode homB // rphi_z.
   rewrite -{1}scalemx1 -scalemxAr -scalemxAl -{1}(repr_mx1 (rphi i)).
   by rewrite -homB // repr_mx1 scalemx1 mxE.
@@ -968,14 +977,14 @@ have inj_iphi: injective iphi.
   rewrite /irr_mode !{1}[irr_repr _ _]phi_ze !{1}mxE !mul1n.
   by rewrite (eq_prim_root_expr (prim_w 1 p_gt1)) !modIp'.
 have deg_phi i: irr_degree (iphi i) = irr_degree i0.
-  by case: (rsim_irr_comp sS F'S (rphi_irr i)).
+  by case: (rsim_irr_comp' sS F'S (rphi_irr i)).
 have im_iphi: codom iphi =i ~: linS.
   apply/subset_cardP; last apply/subsetP=> _ /codomP[i ->].
     by rewrite card_image // card_ord cardsCs setCK nb_irr nb_lin addKn.
   by rewrite !inE /= (deg_phi i) in nlin_i0 *.
 split=> //; exists iphi; rewrite -/phi_.
 split=> // [i | ze | i].
-- have sim_i := rsim_irr_comp sS F'S (rphi_irr i).
+- have sim_i := rsim_irr_comp' sS F'S (rphi_irr i).
   by rewrite -(mx_rsim_faithful sim_i) rphi_fful.
 - rewrite {1}defZ 2!inE andbC; case/andP.
   case/cyclePmin=> e; rewrite ozp => lt_e_p ->{ze}.
@@ -983,7 +992,7 @@ split=> // [i | ze | i].
   exists (w ^+ e) => [|i]; first by rewrite prim_w ?e_gt0.
   by rewrite phi_ze exprM.
 rewrite deg_phi {i}; set d := irr_degree i0.
-apply/eqP; move/eqP: (sum_irr_degree sS F'S splitF).
+apply/eqP; move/eqP: (sum_irr_degree' sS F'S splitF).
 rewrite (bigID [in linS]) /= -/irr_degree.
 rewrite (eq_bigr (fun=> 1)) => [|i]; last by rewrite !inE; move/eqP->.
 rewrite sum1_card nb_lin.
@@ -1005,7 +1014,7 @@ Hypotheses (simU :  mxsimple rS U) (ffulU : rstab rS U == 1%g).
 Let sZS := center_sub S.
 Let rZ := subg_repr rS sZS.
 
-Lemma faithful_repr_extraspecial :
+Lemma faithful_repr_extraspecial_pchar :
  \rank U = (p ^ n)%N /\
    (forall V, mxsimple rS V -> mx_iso rZ U V -> mx_iso rS U V).
 Proof.
@@ -1017,20 +1026,20 @@ suffices IH V: mxsimple rS V -> mx_iso rZ U V ->
 move=> simV isoUV; wlog sS: / irrType F S by apply: socle_exists.
 have [[_ defS'] prZ] := esS.
 have{prZ} ntZ: 'Z(S) :!=: 1%g by case: eqP prZ => // ->; rewrite cards1.
-have [_ [iphi]] := extraspecial_repr_structure sS.
+have [_ [iphi]] := extraspecial_repr_structure_pchar sS.
 set phi := fun i => _ => [] [inj_phi im_phi _ phiZ dim_phi] _.
 have [modU nzU _]:= simU; pose rU := submod_repr modU.
 have nlinU: \rank U != 1.
   apply/eqP=> /(rker_linear rU); apply/negP; rewrite /rker rstab_submod.
   by rewrite (eqmx_rstab _ (val_submod1 _)) (eqP ffulU) defS' subG1.
 have irrU: mx_irreducible rU by apply/submod_mx_irr.
-have rsimU := rsim_irr_comp sS F'S irrU.
+have rsimU := rsim_irr_comp' sS F'S irrU.
 set iU := irr_comp sS rU in rsimU; have [_ degU _ _]:= rsimU.
 have phiUP: iU \in codom iphi by rewrite im_phi !inE -degU.
 rewrite degU -(f_iinv phiUP) dim_phi eqxx /=; apply/(mxsimple_isoP simU).
 have [modV _ _]:= simV; pose rV := submod_repr modV.
 have irrV: mx_irreducible rV by apply/submod_mx_irr.
-have rsimV := rsim_irr_comp sS F'S irrV.
+have rsimV := rsim_irr_comp' sS F'S irrV.
 set iV := irr_comp sS rV in rsimV; have [_ degV _ _]:= rsimV.
 have phiVP: iV \in codom iphi by rewrite im_phi !inE -degV -(mxrank_iso isoUV).
 pose jU := iinv phiUP; pose jV := iinv phiVP.
@@ -1057,3 +1066,8 @@ by rewrite mxE (eq_prim_root_expr prim_w) !modIp'.
 Qed.
 
 End Extraspecial.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use extraspecial_repr_structure_pchar instead.")]
+Notation extraspecial_repr_structure := (extraspecial_repr_structure_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use faithful_repr_extraspecial_pchar instead.")]
+Notation faithful_repr_extraspecial := (faithful_repr_extraspecial_pchar) (only parsing).
