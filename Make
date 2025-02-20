@@ -9,6 +9,13 @@ algebra/matrix.v
 algebra/mxalgebra.v
 algebra/mxpoly.v
 algebra/mxred.v
+algebra/num_theory/zmodext.v
+algebra/num_theory/numext.v
+algebra/num_theory/orderedzmod.v
+algebra/num_theory/itv.v
+algebra/num_theory/numdomain.v
+algebra/num_theory/numfield.v
+algebra/num_theory/ssrnum.v
 algebra/polydiv.v
 algebra/poly.v
 algebra/polyXY.v
@@ -17,7 +24,6 @@ algebra/rat.v
 algebra/ring_quotient.v
 algebra/ssralg.v
 algebra/ssrint.v
-algebra/ssrnum.v
 algebra/vector.v
 algebra/zmodp.v
 algebra/sesquilinear.v

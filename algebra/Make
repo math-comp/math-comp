@@ -17,7 +17,13 @@ rat.v
 ring_quotient.v
 ssralg.v
 ssrint.v
-ssrnum.v
+num_theory/zmodext.v
+num_theory/numext.v
+num_theory/orderedzmod.v
+num_theory/itv.v
+num_theory/numdomain.v
+num_theory/numfield.v
+num_theory/ssrnum.v
 vector.v
 zmodp.v
 sesquilinear.v
