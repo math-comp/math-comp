@@ -8,11 +8,11 @@
   + definition `extend_number` (was a coercion)
   + tactic `nat_litteral`
   + ring instance for `nat` (use algebra-tactics instead)
-    ([#1343](https://github.com/coq/stdlib/pull/1343),
+    ([#1343](https://github.com/math-comp/math-comp/pull/1343),
     by Pierre Roux).
 
 - in `rat.v`
   + lemmas `rat_ring_theory` and `rat_field_theory`
   + ring and field instances for `rat` (use algebra-tactics instead)
-    ([#1343](https://github.com/coq/stdlib/pull/1343),
+    ([#1343](https://github.com/math-comp/math-comp/pull/1343),
     by Pierre Roux).

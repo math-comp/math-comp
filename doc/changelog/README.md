@@ -28,9 +28,9 @@ Here is a summary of the structure of a changelog entry in
 - in `SomeFile.v`
 
   + lemmas `lem1`, `lem2` and `lem3`
-  (`#PRNUM <https://github.com/coq/stdlib/pull/PRNUM>`_,
-  [fixes `#ISSUE1 <https://github.com/coq/stdlib/issues/ISSUE1>`_
-  [ and `#ISSUE2 <https://github.com/coq/stdlib/issues/ISSUE2>`_],]
+  (`#PRNUM <https://github.com/math-comp/math-comp/pull/PRNUM>`_,
+  [fixes `#ISSUE1 <https://github.com/math-comp/math-comp/issues/ISSUE1>`_
+  [ and `#ISSUE2 <https://github.com/math-comp/math-comp/issues/ISSUE2>`_],]
   by Full Name[, with help / review of Full Name]).
 ```
 

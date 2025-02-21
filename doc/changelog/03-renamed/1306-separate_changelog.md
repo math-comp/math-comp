@@ -28,13 +28,13 @@
   + `subComSemiRingType` -> `subComNzSemiRingType`
   + `subRingType` -> `nzSubRingType`
   + ``subComNzRingType` -> `subComNzRingType`
-  ([#1306](https://github.com/coq/stdlib/pull/1306),
+  ([#1306](https://github.com/math-comp/math-comp/pull/1306),
   by Quentin Vermande).
 
 - in `ring_quotient.v`
   + `isRingQuotient` -> `isNzRingQuotient`
   + `ringQuotType` -> `nzRingQuotType`
-  ([#1306](https://github.com/coq/stdlib/pull/1306),
+  ([#1306](https://github.com/math-comp/math-comp/pull/1306),
   by Quentin Vermande).
 
 - in `finalg.v`
@@ -44,7 +44,7 @@
   + `finComSemiRingType` -> `finComNzSemiRingType`
   + `finComRingType` -> `finComNzRingType`
   + `card_finRing_gt1` -> `card_finNzRing_gt1`
-  ([#1306](https://github.com/coq/stdlib/pull/1306),
+  ([#1306](https://github.com/math-comp/math-comp/pull/1306),
   by Quentin Vermande).
 
 - in `countalg.v`
@@ -52,5 +52,5 @@
   + `countRingType` -> `countNzRingType`
   + `countComSemiRingType` -> `countComNzSemiRingType`
   + `countComRingType` -> `countComNzRingType`
-  ([#1306](https://github.com/coq/stdlib/pull/1306),
+  ([#1306](https://github.com/math-comp/math-comp/pull/1306),
   by Quentin Vermande).
