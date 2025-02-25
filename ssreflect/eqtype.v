@@ -132,6 +132,12 @@ Unset Printing Implicit Defensive.
 Declare Scope eq_scope.
 Declare Scope fun_delta_scope.
 
+Add Search Blacklist "Builders_".
+Add Search Blacklist "__canonical__".
+Add Search Blacklist "__to__".
+Add Search Blacklist "_between_".
+Add Search Blacklist "_mixin".
+
 Definition eq_axiom T (e : rel T) := forall x y, reflect (x = y) (e x y).
 
 HB.mixin Record hasDecEq T := { eq_op : rel T; eqP : eq_axiom eq_op }.

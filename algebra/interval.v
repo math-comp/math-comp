@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import div fintype bigop order ssralg finset fingroup.
-From mathcomp Require Import ssrnum.
+From mathcomp Require Import orderedzmod numdomain numfield.
 
 (******************************************************************************)
 (*                         Intervals in ordered types                         *)
@@ -58,6 +58,7 @@ Unset Printing Implicit Defensive.
 
 Local Open Scope order_scope.
 Import Order.TTheory.
+Import orderedzmod.Num.Theory numdomain.Num.Theory numfield.Num.Theory.
 
 Variant itv_bound (T : Type) : Type := BSide of bool & T | BInfty of bool.
 Notation BLeft := (BSide true).
