@@ -41,7 +41,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       "gaia"
       "graph-theory"
       "interval"
-      "jasmin"
       "mathcomp-abel"
       "mathcomp-algebra-tactics"
       "mathcomp-analysis"
@@ -64,6 +63,7 @@ with builtins; with (import <nixpkgs> {}).lib;
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
          stdlib.job = true;
+         jasmin.override.version = "main";
          # To add an overlay applying to all bundles,
          # add below a line like
          #<package>.override.version = "<github_login>:<branch>";
@@ -73,8 +73,6 @@ with builtins; with (import <nixpkgs> {}).lib;
          #   for a complete list of Coq packages available in Nix
          # * <github_login>:<branch> is such that this will use the branch <branch>
          #   from https://github.com/<github_login>/<repository>
-         deriving.override.version = "proux01:mc1343";
-         jasmin.override.version = "proux01:mc1343";
        };
   in {
     "coq-master" = { rocqPackages = {
