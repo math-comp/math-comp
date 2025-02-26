@@ -1,3 +1,7 @@
+(* N.B. interval_inference is not exported here.
+To enjoys the automation it provides,
+you need to explictly "Import interval_inference". *)
+
 Require Export ssralg.
 Require Export ssrnum.
 Require Export finalg.
@@ -11,6 +15,7 @@ Require Export archimedean.
 Require Export rat.
 Require Export intdiv.
 Require Export interval.
+Require Import interval_inference.
 Require Export matrix.
 Require Export mxpoly.
 Require Export mxalgebra.
