@@ -5,6 +5,7 @@ algebra/finalg.v
 algebra/fraction.v
 algebra/intdiv.v
 algebra/interval.v
+algebra/interval_inference.v
 algebra/matrix.v
 algebra/mxalgebra.v
 algebra/mxpoly.v
