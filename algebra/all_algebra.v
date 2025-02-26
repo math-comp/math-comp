@@ -11,6 +11,7 @@ Require Export archimedean.
 Require Export rat.
 Require Export intdiv.
 Require Export interval.
+Require Export interval_inference.
 Require Export matrix.
 Require Export mxpoly.
 Require Export mxalgebra.
