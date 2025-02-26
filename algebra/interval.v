@@ -267,6 +267,14 @@ Definition bnd_simp := (BLeft_ltE, BRight_leE,
   BInfty_le_eqE, BInfty_ge_eqE, BInfty_ltE, BInfty_gtE, BInfty_ltF, BInfty_gtF,
   @lexx _ T, @ltxx _ T, @eqxx T).
 
+Lemma comparable_BSide_min s (x y : T) : (x >=< y)%O ->
+  BSide s (Order.min x y) = Order.min (BSide s x) (BSide s y).
+Proof. by rewrite !minEle bnd_simp => /comparable_leP[]. Qed.
+
+Lemma comparable_BSide_max s (x y : T) : (x >=< y)%O ->
+  BSide s (Order.max x y) = Order.max (BSide s x) (BSide s y).
+Proof. by rewrite !maxEle bnd_simp => /comparable_leP[]. Qed.
+
 Definition subitv i1 i2 :=
   let: Interval b1l b1r := i1 in
   let: Interval b2l b2r := i2 in (b2l <= b1l) && (b1r <= b2r).
@@ -595,6 +603,14 @@ Section IntervalTotal.
 Variable (disp : Order.disp_t) (T : orderType disp).
 Implicit Types (a b c : itv_bound T) (x y z : T) (i : interval T).
 
+Lemma BSide_min s (x y : T) :
+  BSide s (Order.min x y) = Order.min (BSide s x) (BSide s y).
+Proof. exact: comparable_BSide_min. Qed.
+
+Lemma BSide_max s (x y : T) :
+  BSide s (Order.max x y) = Order.max (BSide s x) (BSide s y).
+Proof. exact: comparable_BSide_max. Qed.
+
 Lemma itv_bound_total : total (<=%O : rel (itv_bound T)).
 Proof. by move=> [[]?|[]][[]?|[]]; rewrite /<=%O //=; case: ltgtP. Qed.
 
@@ -691,6 +707,14 @@ Section IntervalNumDomain.
 
 Variable R : numDomainType.
 Implicit Types x : R.
+
+Lemma real_BSide_min b x y : x \in Num.real -> y \in Num.real ->
+  BSide b (Order.min x y) = Order.min (BSide b x) (BSide b y).
+Proof. by move=> xr yr; apply/comparable_BSide_min/real_comparable. Qed.
+
+Lemma real_BSide_max b x y : x \in Num.real -> y \in Num.real ->
+  BSide b (Order.max x y) = Order.max (BSide b x) (BSide b y).
+Proof. by move=> xr yr; apply/comparable_BSide_max/real_comparable. Qed.
 
 Lemma mem0_itvcc_xNx x : (0 \in `[- x, x]) = (0 <= x).
 Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_le0 andbb. Qed.
