@@ -6261,7 +6261,7 @@ End LatticePred.
 
 HB.mixin Record isSubPOrder d (T : porderType d) (S : pred T) d' U
     of SubType T S U & POrder d' U := {
-  le_val : {mono (val : U -> T) : x y / x <= y};
+  le_val_subproof : {mono (val : U -> T) : x y / x <= y};
 }.
 
 #[short(type="subPOrder")]
@@ -6273,6 +6273,7 @@ Section SubPOrderTheory.
 Context (d : disp_t) (T : porderType d) (S : pred T).
 Context (d' : disp_t) (U : SubPOrder.type S d').
 Local Notation val := (val : U -> T).
+Lemma le_val : {mono val : x y / x <= y}. Proof. exact: le_val_subproof. Qed.
 #[deprecated(since="mathcomp 2.3.0", note="Use le_val instead.")]
 Lemma leEsub x y : (x <= y) = (val x <= val y). Proof. by rewrite le_val. Qed.
 Lemma lt_val : {mono val : x y / x < y}.
@@ -6283,6 +6284,7 @@ Lemma le_wval : {homo val : x y / x <= y}. Proof. exact/mono2W/le_val. Qed.
 Lemma lt_wval : {homo val : x y / x < y}. Proof. exact/mono2W/lt_val. Qed.
 HB.instance Definition _ := isOrderMorphism.Build d' U d T val le_wval.
 End SubPOrderTheory.
+Arguments le_val {d T S d' U} x y.
 Arguments lt_val {d T S d' U} x y.
 Arguments le_wval {d T S d' U} x y.
 Arguments lt_wval {d T S d' U} x y.
