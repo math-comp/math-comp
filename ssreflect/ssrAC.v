@@ -1,6 +1,7 @@
 From HB Require Import structures.
 From Corelib Require Import PosDef.
 (* use #[warning="-hiding-delimiting-key"] attribute once we require Coq 8.18 *)
+(* (the warning was completely removed in 9.0) *)
 Set Warnings "-hiding-delimiting-key".
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq bigop.
 Set Warnings "hiding-delimiting-key".
