@@ -226,20 +226,20 @@ Notation "to ^*" := (setact to) : function_scope.
 Prenex Implicits orbit amove.
 
 Notation "''Fix_' to ( A )" := (afix to A)
- (at level 8, to at level 2, format "''Fix_' to ( A )") : group_scope.
+  (at level 8, to at level 2, format "''Fix_' to ( A )") : group_scope.
 
 (* camlp4 grammar factoring *)
 Notation "''Fix_' ( to ) ( A )" := 'Fix_to(A)
   (at level 8, only parsing) : group_scope.
 
 Notation "''Fix_' ( S | to ) ( A )" := (S :&: 'Fix_to(A))
- (at level 8, format "''Fix_' ( S  |  to ) ( A )") : group_scope.
+  (at level 8, format "''Fix_' ( S  |  to ) ( A )") : group_scope.
 
 Notation "''Fix_' to [ a ]" := ('Fix_to([set a]))
- (at level 8, to at level 2, format "''Fix_' to [ a ]") : group_scope.
+  (at level 8, to at level 2, format "''Fix_' to [ a ]") : group_scope.
 
 Notation "''Fix_' ( S | to ) [ a ]" := (S :&: 'Fix_to[a])
- (at level 8, format "''Fix_' ( S  |  to ) [ a ]") : group_scope.
+  (at level 8, format "''Fix_' ( S  |  to ) [ a ]") : group_scope.
 
 Notation "''C' ( S | to )" := (astab S to)
   (format "''C' ( S  |  to )") : group_scope.

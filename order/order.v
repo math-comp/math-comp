@@ -640,10 +640,8 @@ Reserved Notation "\gcd_ ( m <= i < n ) F"
 Reserved Notation "\gcd_ ( i | P ) F"
   (F at level 41,
            format "'[' \gcd_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\gcd_ ( i : t | P ) F"
-  (F at level 41).
-Reserved Notation "\gcd_ ( i : t ) F"
-  (F at level 41).
+Reserved Notation "\gcd_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\gcd_ ( i : t ) F" (F at level 41).
 Reserved Notation "\gcd_ ( i < n | P ) F"
   (F at level 41, n at level 50,
            format "'[' \gcd_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -675,10 +673,8 @@ Reserved Notation "\lcm_ ( m <= i < n ) F"
 Reserved Notation "\lcm_ ( i | P ) F"
   (F at level 41,
            format "'[' \lcm_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\lcm_ ( i : t | P ) F"
-  (F at level 41).
-Reserved Notation "\lcm_ ( i : t ) F"
-  (F at level 41).
+Reserved Notation "\lcm_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\lcm_ ( i : t ) F" (F at level 41).
 Reserved Notation "\lcm_ ( i < n | P ) F"
   (F at level 41, n at level 50,
            format "'[' \lcm_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -711,10 +707,8 @@ Reserved Notation "\meet_ ( m <= i < n ) F"
 Reserved Notation "\meet_ ( i | P ) F"
   (F at level 41,
            format "'[' \meet_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\meet_ ( i : t | P ) F"
-  (F at level 41).
-Reserved Notation "\meet_ ( i : t ) F"
-  (F at level 41).
+Reserved Notation "\meet_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\meet_ ( i : t ) F" (F at level 41).
 Reserved Notation "\meet_ ( i < n | P ) F"
   (F at level 41, n at level 50,
            format "'[' \meet_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -746,10 +740,8 @@ Reserved Notation "\join_ ( m <= i < n ) F"
 Reserved Notation "\join_ ( i | P ) F"
   (F at level 41,
            format "'[' \join_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\join_ ( i : t | P ) F"
-  (F at level 41).
-Reserved Notation "\join_ ( i : t ) F"
-  (F at level 41).
+Reserved Notation "\join_ ( i : t | P ) F" (F at level 41).
+Reserved Notation "\join_ ( i : t ) F" (F at level 41).
 Reserved Notation "\join_ ( i < n | P ) F"
   (F at level 41, n at level 50,
            format "'[' \join_ ( i  <  n  |  P ) '/  '  F ']'").
