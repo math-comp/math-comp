@@ -146,27 +146,21 @@ Delimit Scope nat_scope with N.
 Notation succn := Datatypes.S.
 Notation predn := Peano.pred.
 
-Notation "n .+1" := (succn n) (at level 2, left associativity,
-  format "n .+1") : nat_scope.
-Notation "n .+2" := n.+1.+1 (at level 2, left associativity,
-  format "n .+2") : nat_scope.
-Notation "n .+3" := n.+2.+1 (at level 2, left associativity,
-  format "n .+3") : nat_scope.
-Notation "n .+4" := n.+2.+2 (at level 2, left associativity,
-  format "n .+4") : nat_scope.
+Notation "n .+1" := (succn n) (left associativity, format "n .+1") : nat_scope.
+Notation "n .+2" := n.+1.+1 (left associativity, format "n .+2") : nat_scope.
+Notation "n .+3" := n.+2.+1 (left associativity, format "n .+3") : nat_scope.
+Notation "n .+4" := n.+2.+2 (left associativity, format "n .+4") : nat_scope.
 
-Notation "n .-1" := (predn n) (at level 2, left associativity,
-  format "n .-1") : nat_scope.
-Notation "n .-2" := n.-1.-1 (at level 2, left associativity,
-  format "n .-2") : nat_scope.
+Notation "n .-1" := (predn n) (left associativity, format "n .-1") : nat_scope.
+Notation "n .-2" := n.-1.-1 (left associativity, format "n .-2") : nat_scope.
 
 Lemma succnK : cancel succn predn. Proof. by []. Qed.
 Lemma succn_inj : injective succn. Proof. by move=> n m []. Qed.
 
 (* Predeclare postfix doubling/halving operators. *)
 
-Reserved Notation "n .*2" (at level 2, left associativity, format "n .*2").
-Reserved Notation "n ./2" (at level 2, left associativity, format "n ./2").
+Reserved Notation "n .*2" (left associativity, format "n .*2").
+Reserved Notation "n ./2" (left associativity, format "n ./2").
 
 (* Canonical comparison and eqType for nat.                                *)
 
@@ -2080,7 +2074,7 @@ HB.instance Definition _ := number_subType.
 HB.instance Definition _ := [Equality of number by <:].
 
 Notation "[ 'Num' 'of' e ]" := (Num (bin_of_nat e))
-  (at level 0, format "[ 'Num'  'of'  e ]") : nat_scope.
+  (format "[ 'Num'  'of'  e ]") : nat_scope.
 
 (* A congruence tactic, similar to the boolean one, along with an .+1/+  *)
 (* normalization tactic.                                                 *)

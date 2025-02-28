@@ -49,7 +49,7 @@ HB.structure Definition Zmodule := {M of GRing.Zmodule M & Finite M}.
 Module ZmoduleExports.
 Notation "[ 'finGroupMixin' 'of' R 'for' +%R ]" :=
     (isMulGroup.Build R (@addrA _) (@add0r _) (@addNr _))
-  (at level 0, format "[ 'finGroupMixin'  'of'  R  'for'  +%R ]") : form_scope.
+  (format "[ 'finGroupMixin'  'of'  R  'for'  +%R ]") : form_scope.
 End ZmoduleExports.
 HB.export ZmoduleExports.
 
@@ -441,11 +441,10 @@ Proof. by rewrite (cardD1 0) (cardD1 1) !inE GRing.oner_neq0. Qed.
              note="Use card_finNzRing_gt1 instead.")]
 Notation card_finRing_gt1 := (card_finNzRing_gt1) (only parsing).
 
-Notation "{ 'unit' R }" := (unit_of R)
-  (at level 0, format "{ 'unit'  R }") : type_scope.
+Notation "{ 'unit' R }" := (unit_of R) (format "{ 'unit'  R }") : type_scope.
 Prenex Implicits FinRing.uval.
-Notation "''U'" := (unit_action _) (at level 8) : action_scope.
-Notation "''U'" := (unit_groupAction _) (at level 8) : groupAction_scope.
+Notation "''U'" := (unit_action _) : action_scope.
+Notation "''U'" := (unit_groupAction _) : groupAction_scope.
 
 Lemma card_finField_unit (F : finFieldType) : #|[set: {unit F}]| = #|F|.-1.
 Proof.

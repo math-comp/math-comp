@@ -1671,8 +1671,7 @@ Notation "A ~_ P '{' 'in' S '}'" := (simmx_to_for P A S)
   ring_scope.
 
 Notation simmx_for P A B := (A ~_P {in PredOfSimpl.coerce (pred1 B)}).
-Notation "A ~_ P B" :=  (simmx_for P A B)
-  (at level 70, P at level 0, format "A  ~_ P  B").
+Notation "A ~_ P B" :=  (simmx_for P A B) (format "A  ~_ P  B").
 
 Notation simmx_in S A B := (exists2 P, P \in S & A ~_P B).
 Notation "A '~_{in' S '}' B" := (simmx_in S A B)
@@ -1680,7 +1679,7 @@ Notation "A '~_{in' S '}' B" := (simmx_in S A B)
 
 Notation simmx_in_to S A S' := (exists2 P, P \in S & A ~_P {in S'}).
 Notation "A '~_{in' S '}' '{' 'in' S' '}'" := (simmx_in_to S A S')
-  (at level 70, format "A '~_{in'  S '}'  '{' 'in'  S' '}'").
+  (format "A '~_{in'  S '}'  '{' 'in'  S' '}'").
 
 Notation all_simmx_in S As S' :=
   (exists2 P, P \in S & all [pred A | A ~_P {in S'}] As).

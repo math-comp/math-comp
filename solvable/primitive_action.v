@@ -43,7 +43,7 @@ Arguments imprimitivity_system {aT sT} A%g S%g to%act Q%g.
 Arguments primitive {aT sT} A%g S%g to%act.
 
 Notation "[ 'primitive' A , 'on' S | to ]" := (primitive A S to)
-  (at level 0, format "[ 'primitive'  A ,  'on'  S  |  to ]") : form_scope.
+  (format "[ 'primitive'  A ,  'on'  S  |  to ]") : form_scope.
 
 Section Primitive.
 
@@ -180,10 +180,10 @@ Arguments ntransitive {gT sT} n%N A%g S%g to%act.
 Arguments n_act {gT sT} to {n} t a.
 
 Notation "n .-dtuple ( S )" := (dtuple_on n S)
-  (at level 8, format "n .-dtuple ( S )") : set_scope.
+  (format "n .-dtuple ( S )") : set_scope.
 
 Notation "[ 'transitive' ^ n A , 'on' S | to ]" := (ntransitive n A S to)
-  (at level 0, n at level 8,
+  (n at level 8,
    format "[ 'transitive' ^ n  A ,  'on'  S  |  to ]") : form_scope.
 
 Section NTransitveProp.

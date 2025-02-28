@@ -63,8 +63,7 @@ Qed.
 End PermDefSection.
 Arguments perm_of T%type.
 
-Notation "{ 'perm' T }" := (perm_of T)
-  (at level 0, format "{ 'perm'  T }") : type_scope.
+Notation "{ 'perm' T }" := (perm_of T) (format "{ 'perm'  T }") : type_scope.
 
 Arguments pval _ _%g.
 
