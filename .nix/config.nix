@@ -110,13 +110,5 @@ with builtins; with (import <nixpkgs> {}).lib;
       hierarchy-builder.override.version = "1.8.1";  # required by elpi
       interval.job = false;
     };
-    "coq-8.19".coqPackages = common-bundles // {
-      coq.override.version = "8.19";
-      interval.job = false;
-      coqeal.job = false;  # CoqEAL requires Coq >= 8.20
-      mathcomp-apery.job = false;  # reverse dependency of coqeal
-      mathcomp-finmap.override.version = "2.1.0";
-      jasmin.job = false;
-    };
   };
 }
