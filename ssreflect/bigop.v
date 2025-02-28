@@ -180,10 +180,8 @@ Reserved Notation "\sum_ ( m <= i < n ) F"
 Reserved Notation "\sum_ ( i | P ) F"
   (F at level 41,
            format "'[' \sum_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\sum_ ( i : t | P ) F"
-  (F at level 41). (* only parsing *)
-Reserved Notation "\sum_ ( i : t ) F"
-  (F at level 41). (* only parsing *)
+Reserved Notation "\sum_ ( i : t | P ) F" (F at level 41). (* only parsing *)
+Reserved Notation "\sum_ ( i : t ) F" (F at level 41). (* only parsing *)
 Reserved Notation "\sum_ ( i < n | P ) F"
   (F at level 41, n at level 50,
            format "'[' \sum_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -215,10 +213,8 @@ Reserved Notation "\max_ ( m <= i < n ) F"
 Reserved Notation "\max_ ( i | P ) F"
   (F at level 41,
            format "'[' \max_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\max_ ( i : t | P ) F"
-  (F at level 41). (* only parsing *)
-Reserved Notation "\max_ ( i : t ) F"
-  (F at level 41). (* only parsing *)
+Reserved Notation "\max_ ( i : t | P ) F" (F at level 41). (* only parsing *)
+Reserved Notation "\max_ ( i : t ) F" (F at level 41). (* only parsing *)
 Reserved Notation "\max_ ( i < n | P ) F"
   (F at level 41, n at level 50,
            format "'[' \max_ ( i  <  n  |  P ) '/  '  F ']'").
@@ -250,10 +246,8 @@ Reserved Notation "\prod_ ( m <= i < n ) F"
 Reserved Notation "\prod_ ( i | P ) F"
   (F at level 36,
            format "'[' \prod_ ( i  |  P ) '/  '  F ']'").
-Reserved Notation "\prod_ ( i : t | P ) F"
-  (F at level 36). (* only parsing *)
-Reserved Notation "\prod_ ( i : t ) F"
-  (F at level 36). (* only parsing *)
+Reserved Notation "\prod_ ( i : t | P ) F" (F at level 36). (* only parsing *)
+Reserved Notation "\prod_ ( i : t ) F" (F at level 36). (* only parsing *)
 Reserved Notation "\prod_ ( i < n | P ) F"
   (F at level 36, n at level 50,
            format "'[' \prod_ ( i  <  n  |  P ) '/  '  F ']'").
