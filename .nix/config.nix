@@ -63,7 +63,7 @@ with builtins; with (import <nixpkgs> {}).lib;
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
          stdlib.job = true;
-         jasmin.override.version = "main";
+         # jasmin.override.version = "main";
          # To add an overlay applying to all bundles,
          # add below a line like
          #<package>.override.version = "<github_login>:<branch>";
@@ -73,6 +73,11 @@ with builtins; with (import <nixpkgs> {}).lib;
          #   for a complete list of Coq packages available in Nix
          # * <github_login>:<branch> is such that this will use the branch <branch>
          #   from https://github.com/<github_login>/<repository>
+         fourcolor.override.version = "mc1354";
+         odd-order.override.version = "proux01:mc1354";
+         jasmin.override.version = "proux01:mc1354";
+         mathcomp-classical.override.version = "proux01:mc1354";
+         mathcomp-analysis.override.version = "proux01:mc1354";
        };
   in {
     "coq-master" = { rocqPackages = {
@@ -107,12 +112,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq-elpi.override.elpi-version = "2.0.7";
       hierarchy-builder.override.version = "1.8.1";  # required by elpi
       interval.job = false;
-    };
-    "coq-8.19".coqPackages = common-bundles // {
-      coq.override.version = "8.19";
-      interval.job = false;
-      coqeal.job = false;  # CoqEAL requires Coq >= 8.20
-      mathcomp-apery.job = false;  # reverse dependency of coqeal
     };
   };
 }

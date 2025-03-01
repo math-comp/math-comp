@@ -88,7 +88,7 @@ Module FieldExtExports.
 Bind Scope ring_scope with FieldExt.sort.
 Notation "{ 'subfield' L }" := (aspace L)
   (* NB: was (@aspace_of _ (FalgType _) (Phant L)) *)
-  (at level 0, format "{ 'subfield'  L }") : type_scope.
+  (format "{ 'subfield'  L }") : type_scope.
 End FieldExtExports.
 HB.export FieldExtExports.
 
