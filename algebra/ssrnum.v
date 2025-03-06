@@ -2016,6 +2016,12 @@ Definition invr_cp1 := (invr_gte1, invr_lte1).
 
 (* max and min *)
 
+Lemma natr_min (m n : nat) : (Order.min m n)%:R = Order.min m%:R n%:R :> R.
+Proof. by rewrite !minElt ltr_nat /Order.lt/= -fun_if. Qed.
+
+Lemma natr_max (m n : nat) : (Order.max m n)%:R = Order.max m%:R n%:R :> R.
+Proof. by rewrite !maxElt ltr_nat /Order.lt/= -fun_if. Qed.
+
 Lemma addr_min_max x y : min x y + max x y = x + y.
 Proof. by rewrite /min /max; case: ifP => //; rewrite addrC. Qed.
 
@@ -4251,6 +4257,9 @@ Lemma sqrtC_inj : injective sqrtC.
 Proof. exact: rootC_inj. Qed.
 Lemma sqrtCM : {in Num.nneg &, {morph sqrtC : x y / x * y}}.
 Proof. by move=> x y _; apply: rootCMr. Qed.
+
+Lemma sqrtC_real x : 0 <= x -> sqrtC x \in Num.real.
+Proof. by rewrite -sqrtC_ge0; apply: ger0_real. Qed.
 
 Lemma sqrCK_P x : reflect (sqrtC (x ^+ 2) = x) ((0 <= 'Im x) && ~~ (x < 0)).
 Proof.

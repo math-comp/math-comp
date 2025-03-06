@@ -3181,6 +3181,27 @@ Qed.
 
 End Comparable3.
 
+Section Comparable4.
+Context (x y z w : T) (cmp_xy : x >=< y) (cmp_zw : z >=< w).
+
+Lemma comparable_le_min2 : x <= z -> y <= w ->
+  Order.min x y <= Order.min z w.
+Proof.
+move: cmp_xy cmp_zw => /comparable_leP[] xy /comparable_leP[] zw // xz yw.
+- exact: le_trans xy yw.
+- exact: le_trans (ltW xy) xz.
+Qed.
+
+Lemma comparable_le_max2 : x <= z -> y <= w ->
+  Order.max x y <= Order.max z w.
+Proof.
+move: cmp_xy cmp_zw => /comparable_leP[] xy /comparable_leP[] zw // xz yw.
+- exact: le_trans yw (ltW zw).
+- exact: le_trans xz zw.
+Qed.
+
+End Comparable4.
+
 Lemma comparable_minAC x y z : x >=< y -> x >=< z -> y >=< z ->
   min (min x y) z = min (min x z) y.
 Proof.
@@ -4218,6 +4239,12 @@ Definition ltexI := (@lexI _ T, ltxI).
 Definition lteIx := (leIx, ltIx).
 Definition ltexU := (lexU, ltxU).
 Definition lteUx := (@leUx _ T, ltUx).
+
+Lemma le_min2 x y z t : x <= z -> y <= t -> Order.min x y <= Order.min z t.
+Proof. exact: comparable_le_min2. Qed.
+
+Lemma le_max2 x y z t : x <= z -> y <= t -> Order.max x y <= Order.max z t.
+Proof. exact: comparable_le_max2. Qed.
 
 (* lteif *)
 
