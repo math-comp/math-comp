@@ -4,8 +4,6 @@ algebra/countalg.v
 algebra/finalg.v
 algebra/fraction.v
 algebra/intdiv.v
-algebra/interval.v
-algebra/interval_inference.v
 algebra/matrix.v
 algebra/mxalgebra.v
 algebra/mxpoly.v
@@ -13,6 +11,9 @@ algebra/mxred.v
 algebra/num_theory/orderedzmod.v
 algebra/num_theory/numdomain.v
 algebra/num_theory/numfield.v
+algebra/num_theory/interval.v
+algebra/num_theory/ssrint.v
+algebra/num_theory/interval_inference.v
 algebra/num_theory/ssrnum.v
 algebra/polydiv.v
 algebra/poly.v
@@ -21,7 +22,6 @@ algebra/qpoly.v
 algebra/rat.v
 algebra/ring_quotient.v
 algebra/ssralg.v
-algebra/ssrint.v
 algebra/vector.v
 algebra/zmodp.v
 algebra/sesquilinear.v
