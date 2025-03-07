@@ -472,7 +472,7 @@ End UseFinTuple.
 
 Notation "[ 'tuple' F | i < n ]" := (mktuple (fun i : 'I_n => F))
   (at level 0, i at level 0,
-   format "[ '[hv' 'tuple'  F '/'   |  i  <  n ] ']'") : form_scope.
+   format "[ '[hv' 'tuple'  F '/'  |  i  <  n ] ']'") : form_scope.
 
 Arguments eq_mktuple {n T'} [f1] f2 eq_f12.
 
