@@ -5,6 +5,7 @@ finalg.v
 fraction.v
 intdiv.v
 interval.v
+interval_inference.v
 matrix.v
 mxalgebra.v
 mxpoly.v
