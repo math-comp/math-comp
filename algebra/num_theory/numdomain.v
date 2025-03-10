@@ -1467,7 +1467,7 @@ Hint Extern 0 (is_true (norm _ \is real)) => apply: normr_real : core.
 Lemma real_ler_norml x y : x \is real -> (`|x| <= y) = (- y <= x <= y).
 Proof.
 move=> xR; wlog x_ge0 : x xR / 0 <= x => [hwlog|].
-  move: (xR) => /(@real_leVge _ 0) /orP [|/hwlog->|hx] //.
+  have /orP[/hwlog->|hx]// := real_leVge real0 xR.
   by rewrite -[x]opprK normrN lerN2 andbC lerNl hwlog ?realN ?oppr_ge0.
 rewrite ger0_norm //; have [le_xy|] := boolP (x <= y); last by rewrite andbF.
 by rewrite (le_trans _ x_ge0) // oppr_le0 (le_trans x_ge0).
@@ -1499,8 +1499,8 @@ Qed.
 
 Lemma real_ltr_norml x y : x \is real -> (`|x| < y) = (- y < x < y).
 Proof.
-move=> Rx; wlog x_ge0 : x Rx / 0 <= x => [hwlog|].
-  move: (Rx) => /(@real_leVge _ 0) /orP [|/hwlog->|hx] //.
+move=> xR; wlog x_ge0 : x xR / 0 <= x => [hwlog|].
+  have /orP[/hwlog->|hx]// := real_leVge real0 xR.
   by rewrite -[x]opprK normrN ltrN2 andbC ltrNl hwlog ?realN ?oppr_ge0.
 rewrite ger0_norm //; have [le_xy|] := boolP (x < y); last by rewrite andbF.
 by rewrite (lt_le_trans _ x_ge0) // oppr_lt0 (le_lt_trans x_ge0).
