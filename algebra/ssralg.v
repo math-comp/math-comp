@@ -230,16 +230,16 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*         GRing.comm x y <-> x and y commute, i.e., x * y = y * x            *)
 (*           GRing.lreg x <-> x if left-regular, i.e., *%R x is injective     *)
 (*           GRing.rreg x <-> x if right-regular, i.e., *%R^~ x is injective  *)
-(*               [char R] == the characteristic of R, defined as the set of   *)
+(*               [pchar R] == the characteristic of R, defined as the set of  *)
 (*                           prime numbers p such that p%:R = 0 in R          *)
-(*                           The set [char R] has at most one element, and is *)
+(*                           The set [pchar R] has at most one element, and is*)
 (*                           implemented as a pred_nat collective predicate   *)
-(*                           (see prime.v); thus the statement p \in [char R] *)
+(*                           (see prime.v); thus the statement p \in [pchar R]*)
 (*                           can be read as `R has characteristic p', while   *)
-(*                           [char R] =i pred0 means `R has characteristic 0' *)
+(*                           [pchar R] =i pred0 means `R has characteristic 0'*)
 (*                           when R is a field.                               *)
-(*     Frobenius_aut chRp == the Frobenius automorphism mapping x in R to     *)
-(*                           x ^+ p, where chRp : p \in [char R] is a proof   *)
+(*     pFrobenius_aut chRp == the Frobenius automorphism mapping x in R to    *)
+(*                           x ^+ p, where chRp : p \in [pchar R] is a proof  *)
 (*                           that R has (non-zero) characteristic p           *)
 (*          mulr_closed S <-> collective predicate S is closed under finite   *)
 (*                           products (1 and x * y in S for x, y in S)        *)
@@ -598,6 +598,7 @@ Reserved Notation "*%R" (at level 0, format " *%R").
 Reserved Notation "*:%R" (at level 0, format " *:%R").
 Reserved Notation "n %:R" (at level 2, left associativity, format "n %:R").
 Reserved Notation "k %:A" (at level 2, left associativity, format "k %:A").
+Reserved Notation "[ 'pchar' F ]" (at level 0, format "[ 'pchar'  F ]").
 Reserved Notation "[ 'char' F ]" (at level 0, format "[ 'char'  F ]").
 
 Reserved Notation "x %:T" (at level 2, left associativity, format "x %:T").
@@ -1091,10 +1092,16 @@ Local Notation "\prod_ ( m <= i < n ) F" := (\big[*%R/1%R]_(m <= i < n) F%R).
 (* The ``field'' characteristic; the definition, and many of the theorems,   *)
 (* has to apply to rings as well; indeed, we need the Frobenius automorphism *)
 (* results for a non commutative ring in the proof of Gorenstein 2.6.3.      *)
-Definition char (R : pzSemiRingType) : nat_pred :=
+Definition pchar (R : nzSemiRingType) : nat_pred :=
   [pred p | prime p & p%:R == 0 :> R].
 
-Local Notation has_char0 L := (char L =i pred0).
+#[deprecated(since="mathcomp 2.4.0", note="Use pchar instead.")]
+Notation char := pchar (only parsing).
+
+Local Notation has_pchar0 L := (pchar L =i pred0).
+
+#[deprecated(since="mathcomp 2.4.0", note="Use has_pchar0 instead.")]
+Notation has_char0 L := (has_pchar0 L) (only parsing).
 
 (* Converse ring tag. *)
 Definition converse R : Type := R.
@@ -1338,7 +1345,7 @@ rewrite exprD1n !big_ord_recr big_ord0 /= add0r.
 by rewrite addrC addrA addrAC.
 Qed.
 
-Definition Frobenius_aut p of p \in char R := fun x => x ^+ p.
+Definition pFrobenius_aut p of p \in pchar R := fun x => x ^+ p.
 
 Section ClosedPredicates.
 
@@ -1374,76 +1381,77 @@ Proof. by move=> reg_x; rewrite -[x]mulr1 mulrI_eq0 ?oner_eq0. Qed.
 Section FrobeniusAutomorphism.
 
 Variable p : nat.
-Hypothesis charFp : p \in char R.
+Hypothesis pcharFp : p \in pchar R.
 
-Lemma charf0 : p%:R = 0 :> R. Proof. by apply/eqP; case/andP: charFp. Qed.
-Lemma charf_prime : prime p. Proof. by case/andP: charFp. Qed.
-Hint Resolve charf_prime : core.
+Lemma pcharf0 : p%:R = 0 :> R. Proof. by apply/eqP; case/andP: pcharFp. Qed.
 
-Lemma mulrn_char x : x *+ p = 0. Proof. by rewrite -mulr_natl charf0 mul0r. Qed.
+Lemma pcharf_prime : prime p. Proof. by case/andP: pcharFp. Qed.
+Hint Resolve pcharf_prime : core.
 
-Lemma natr_mod_char n : (n %% p)%:R = n%:R :> R.
-Proof. by rewrite {2}(divn_eq n p) natrD mulrnA mulrn_char add0r. Qed.
+Lemma mulrn_pchar x : x *+ p = 0. Proof. by rewrite -mulr_natl pcharf0 mul0r. Qed.
 
-Lemma dvdn_charf n : (p %| n)%N = (n%:R == 0 :> R).
+Lemma natr_mod_pchar n : (n %% p)%:R = n%:R :> R.
+Proof. by rewrite {2}(divn_eq n p) natrD mulrnA mulrn_pchar add0r. Qed.
+
+Lemma dvdn_pcharf n : (p %| n)%N = (n%:R == 0 :> R).
 Proof.
-apply/idP/eqP=> [/dvdnP[n' ->]|n0]; first by rewrite natrM charf0 mulr0.
+apply/idP/eqP=> [/dvdnP[n' ->]|n0]; first by rewrite natrM pcharf0 mulr0.
 apply/idPn; rewrite -prime_coprime // => /eqnP pn1.
-have [a _ /dvdnP[b]] := Bezoutl n (prime_gt0 charf_prime).
+have [a _ /dvdnP[b]] := Bezoutl n (prime_gt0 pcharf_prime).
 move/(congr1 (fun m => m%:R : R))/eqP.
-by rewrite natrD !natrM charf0 n0 !mulr0 pn1 addr0 oner_eq0.
+by rewrite natrD !natrM pcharf0 n0 !mulr0 pn1 addr0 oner_eq0.
 Qed.
 
-Lemma charf_eq : char R =i (p : nat_pred).
+Lemma pcharf_eq : pchar R =i (p : nat_pred).
 Proof.
-move=> q; apply/andP/eqP=> [[q_pr q0] | ->]; last by rewrite charf0.
-by apply/eqP; rewrite eq_sym -dvdn_prime2 // dvdn_charf.
+move=> q; apply/andP/eqP=> [[q_pr q0] | ->]; last by rewrite pcharf0.
+by apply/eqP; rewrite eq_sym -dvdn_prime2 // dvdn_pcharf.
 Qed.
 
-Lemma bin_lt_charf_0 k : 0 < k < p -> 'C(p, k)%:R = 0 :> R.
-Proof. by move=> lt0kp; apply/eqP; rewrite -dvdn_charf prime_dvd_bin. Qed.
+Lemma bin_lt_pcharf_0 k : 0 < k < p -> 'C(p, k)%:R = 0 :> R.
+Proof. by move=> lt0kp; apply/eqP; rewrite -dvdn_pcharf prime_dvd_bin. Qed.
 
-Local Notation "x ^f" := (Frobenius_aut charFp x).
+Local Notation "x ^f" := (pFrobenius_aut pcharFp x).
 
-Lemma Frobenius_autE x : x^f = x ^+ p. Proof. by []. Qed.
-Local Notation fE := Frobenius_autE.
+Lemma pFrobenius_autE x : x^f = x ^+ p. Proof. by []. Qed.
+Local Notation f'E := pFrobenius_autE.
 
-Lemma Frobenius_aut0 : 0^f = 0.
-Proof. by rewrite fE -(prednK (prime_gt0 charf_prime)) exprS mul0r. Qed.
+Lemma pFrobenius_aut0 : 0^f = 0.
+Proof. by rewrite f'E -(prednK (prime_gt0 pcharf_prime)) exprS mul0r. Qed.
 
-Lemma Frobenius_aut1 : 1^f = 1.
-Proof. by rewrite fE expr1n. Qed.
+Lemma pFrobenius_aut1 : 1^f = 1.
+Proof. by rewrite f'E expr1n. Qed.
 
-Lemma Frobenius_autD_comm x y (cxy : comm x y) : (x + y)^f = x^f + y^f.
+Lemma pFrobenius_autD_comm x y (cxy : comm x y) : (x + y)^f = x^f + y^f.
 Proof.
-have defp := prednK (prime_gt0 charf_prime).
-rewrite !fE exprDn_comm // big_ord_recr subnn -defp big_ord_recl /= defp.
+have defp := prednK (prime_gt0 pcharf_prime).
+rewrite !f'E exprDn_comm // big_ord_recr subnn -defp big_ord_recl /= defp.
 rewrite subn0 mulr1 mul1r bin0 binn big1 ?addr0 // => i _.
-by rewrite -mulr_natl bin_lt_charf_0 ?mul0r //= -{2}defp ltnS (valP i).
+by rewrite -mulr_natl bin_lt_pcharf_0 ?mul0r //= -{2}defp ltnS (valP i).
 Qed.
 
-Lemma Frobenius_autMn x n : (x *+ n)^f = x^f *+ n.
+Lemma pFrobenius_autMn x n : (x *+ n)^f = x^f *+ n.
 Proof.
-elim: n => [|n IHn]; first exact: Frobenius_aut0.
-by rewrite !mulrS Frobenius_autD_comm ?IHn //; apply: commrMn.
+elim: n => [|n IHn]; first exact: pFrobenius_aut0.
+by rewrite !mulrS pFrobenius_autD_comm ?IHn //; apply: commrMn.
 Qed.
 
-Lemma Frobenius_aut_nat n : (n%:R)^f = n%:R.
-Proof. by rewrite Frobenius_autMn Frobenius_aut1. Qed.
+Lemma pFrobenius_aut_nat n : (n%:R)^f = n%:R.
+Proof. by rewrite pFrobenius_autMn pFrobenius_aut1. Qed.
 
-Lemma Frobenius_autM_comm x y : comm x y -> (x * y)^f = x^f * y^f.
+Lemma pFrobenius_autM_comm x y : comm x y -> (x * y)^f = x^f * y^f.
 Proof. exact: exprMn_comm. Qed.
 
-Lemma Frobenius_autX x n : (x ^+ n)^f = x^f ^+ n.
-Proof. by rewrite !fE -!exprM mulnC. Qed.
+Lemma pFrobenius_autX x n : (x ^+ n)^f = x^f ^+ n.
+Proof. by rewrite !f'E -!exprM mulnC. Qed.
 
 End FrobeniusAutomorphism.
 
 Section Char2.
 
-Hypothesis charR2 : 2 \in char R.
+Hypothesis pcharR2 : 2 \in pchar R.
 
-Lemma addrr_char2 x : x + x = 0. Proof. by rewrite -mulr2n mulrn_char. Qed.
+Lemma addrr_pchar2 x : x + x = 0. Proof. by rewrite -mulr2n mulrn_pchar. Qed.
 
 End Char2.
 
@@ -1502,9 +1510,43 @@ Bind Scope ring_scope with PzRing.sort.
 End PzRingExports.
 HB.export PzRingExports.
 
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut instead.")]
+Notation Frobenius_aut := pFrobenius_aut (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pcharf0 instead.")]
+Notation charf0 := pcharf0 (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pcharf_prime instead.")]
+Notation charf_prime := pcharf_prime (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use mulrn_pchar instead.")]
+Notation mulrn_char := mulrn_pchar (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use natr_mod_pchar instead.")]
+Notation natr_mod_char := natr_mod_pchar (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use dvdn_pcharf instead.")]
+Notation dvdn_charf := dvdn_pcharf (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pcharf_eq instead.")]
+Notation charf_eq := pcharf_eq (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use bin_lt_pcharf_0 instead.")]
+Notation bin_lt_charf_0 := bin_lt_pcharf_0 (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autE instead.")]
+Notation Frobenius_autE := pFrobenius_autE (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut0 instead.")]
+Notation Frobenius_aut0 := pFrobenius_aut0 (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut1 instead.")]
+Notation Frobenius_aut1 := pFrobenius_aut1 (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autD_comm instead.")]
+Notation Frobenius_autD_comm := pFrobenius_autD_comm (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autMn instead.")]
+Notation Frobenius_autMn := pFrobenius_autMn (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut_nat instead.")]
+Notation Frobenius_aut_nat := pFrobenius_aut_nat (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autM_comm instead.")]
+Notation Frobenius_autM_comm := pFrobenius_autM_comm (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autX instead.")]
+Notation Frobenius_autX := pFrobenius_autX (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use addrr_pchar2 instead.")]
+Notation addrr_char2 := addrr_pchar2 (only parsing).
+
 #[short(type="nzRingType")]
 HB.structure Definition NzRing := { R of NzSemiRing R & Zmodule R }.
-
 #[deprecated(since="mathcomp 2.4.0",
              note="Use NzRing instead.")]
 Notation Ring R := (NzRing R) (only parsing).
@@ -1757,52 +1799,67 @@ Proof. by rewrite -signr_odd; case: odd; rewrite ?oppr_eq0 oner_eq0. Qed.
 Section FrobeniusAutomorphism.
 
 Variable p : nat.
-Hypothesis charFp : p \in char R.
+Hypothesis pcharFp : p \in pchar R.
 
-Hint Resolve charf_prime : core.
+Hint Resolve pcharf_prime : core.
 
-Local Notation "x ^f" := (Frobenius_aut charFp x).
+Local Notation "x ^f" := (pFrobenius_aut pcharFp x).
 
-Lemma Frobenius_autN x : (- x)^f = - x^f.
+Lemma pFrobenius_autN x : (- x)^f = - x^f.
 Proof.
 apply/eqP; rewrite -subr_eq0 opprK addrC.
-by rewrite -(Frobenius_autD_comm _ (commrN _)) // subrr Frobenius_aut0.
+by rewrite -(pFrobenius_autD_comm _ (commrN _)) // subrr pFrobenius_aut0.
 Qed.
 
-Lemma Frobenius_autB_comm x y : comm x y -> (x - y)^f = x^f - y^f.
+Lemma pFrobenius_autB_comm x y : comm x y -> (x - y)^f = x^f - y^f.
 Proof.
-by move/commrN/Frobenius_autD_comm->; rewrite Frobenius_autN.
+by move/commrN/pFrobenius_autD_comm->; rewrite pFrobenius_autN.
 Qed.
 
 End FrobeniusAutomorphism.
 
-Lemma exprNn_char x n : (char R).-nat n -> (- x) ^+ n = - (x ^+ n).
+Lemma exprNn_pchar x n : (pchar R).-nat n -> (- x) ^+ n = - (x ^+ n).
 Proof.
-pose p := pdiv n; have [|n_gt1 charRn] := leqP n 1; first by case: (n) => [|[]].
-have charRp: p \in char R by rewrite (pnatPpi charRn) // pi_pdiv.
-have /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (charf_eq charRp)).
+pose p := pdiv n; have [|n_gt1 pcharRn] := leqP n 1; first by case: (n) => [|[]].
+have pcharRp: p \in pchar R by rewrite (pnatPpi pcharRn) // pi_pdiv.
+have /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (pcharf_eq pcharRp)).
 elim: e => // e IHe; rewrite expnSr !exprM {}IHe.
-by rewrite -Frobenius_autE Frobenius_autN.
+by rewrite -pFrobenius_autE pFrobenius_autN.
 Qed.
 
 Section Char2.
 
-Hypothesis charR2 : 2 \in char R.
+Hypothesis pcharR2 : 2 \in pchar R.
 
-Lemma oppr_char2 x : - x = x.
-Proof. by apply/esym/eqP; rewrite -addr_eq0 addrr_char2. Qed.
+Lemma oppr_pchar2 x : - x = x.
+Proof. by apply/esym/eqP; rewrite -addr_eq0 addrr_pchar2. Qed.
 
-Lemma subr_char2 x y : x - y = x + y. Proof. by rewrite oppr_char2. Qed.
+Lemma subr_pchar2 x y : x - y = x + y. Proof. by rewrite oppr_pchar2. Qed.
 
-Lemma addrK_char2 x : involutive (+%R^~ x).
-Proof. by move=> y; rewrite /= -subr_char2 addrK. Qed.
+Lemma addrK_pchar2 x : involutive (+%R^~ x).
+Proof. by move=> y; rewrite /= -subr_pchar2 addrK. Qed.
 
-Lemma addKr_char2 x : involutive (+%R x).
-Proof. by move=> y; rewrite -{1}[x]oppr_char2 addKr. Qed.
+Lemma addKr_pchar2 x : involutive (+%R x).
+Proof. by move=> y; rewrite -{1}[x]oppr_pchar2 addKr. Qed.
 
 End Char2.
 
 End NzRingTheory.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autN instead.")]
+Notation Frobenius_autN := pFrobenius_autN (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autB_comm instead.")]
+Notation Frobenius_autB_comm := pFrobenius_autB_comm (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use exprNn_pchar instead.")]
+Notation exprNn_char := exprNn_pchar (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use oppr_pchar2 instead.")]
+Notation oppr_char2 := oppr_pchar2 (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use subr_pchar2 instead.")]
+Notation subr_char2 := subr_pchar2 (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use addrK_pchar2 instead.")]
+Notation addrK_char2 := addrK_pchar2 (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use addKr_pchar2 instead.")]
+Notation addKr_char2 := addKr_pchar2 (only parsing).
 
 Section ConverseRing.
 #[export]
@@ -2338,7 +2395,7 @@ Proof. by elim: n => [|n IHn] x; rewrite ?rmorph1 // !exprS rmorphM IHn. Qed.
 
 Lemma rmorph_nat n : f n%:R = n%:R. Proof. by rewrite rmorphMn rmorph1. Qed.
 
-Lemma rmorph_char p : p \in char R -> p \in char S.
+Lemma rmorph_pchar p : p \in pchar R -> p \in pchar S.
 Proof. by rewrite !inE -rmorph_nat => /andP[-> /= /eqP->]; rewrite rmorph0. Qed.
 
 Lemma rmorph_eq_nat x n : injective f -> (f x == n%:R) = (x == n%:R).
@@ -2411,6 +2468,9 @@ Lemma in_algE a : in_alg A a = a%:A. Proof. by []. Qed.
 End InAlgebra.
 
 End RmorphismTheory.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use rmorph_pchar instead.")]
+Notation rmorph_char := rmorph_pchar (only parsing).
 
 Module Scale.
 
@@ -2861,33 +2921,33 @@ Implicit Types x y : R.
 
 Section FrobeniusAutomorphism.
 
-Variables (p : nat) (charRp : p \in char R).
+Variables (p : nat) (pcharRp : p \in pchar R).
 
-Lemma Frobenius_aut_is_semi_additive : semi_additive (Frobenius_aut charRp).
+Lemma pFrobenius_aut_is_semi_additive : semi_additive (pFrobenius_aut pcharRp).
 Proof.
-by split=> [|x y]; [exact: Frobenius_aut0 | exact/Frobenius_autD_comm/mulrC].
+by split=> [|x y]; [exact: pFrobenius_aut0 | exact/pFrobenius_autD_comm/mulrC].
 Qed.
 
-Lemma Frobenius_aut_is_multiplicative : multiplicative (Frobenius_aut charRp).
+Lemma pFrobenius_aut_is_multiplicative : multiplicative (pFrobenius_aut pcharRp).
 Proof.
-by split=> [x y|]; [exact/Frobenius_autM_comm/mulrC | exact: Frobenius_aut1].
+by split=> [x y|]; [exact/pFrobenius_autM_comm/mulrC | exact: pFrobenius_aut1].
 Qed.
 
 #[export]
-HB.instance Definition _ := isSemiAdditive.Build R R (Frobenius_aut charRp)
-  Frobenius_aut_is_semi_additive.
+HB.instance Definition _ := isSemiAdditive.Build R R (pFrobenius_aut pcharRp)
+  pFrobenius_aut_is_semi_additive.
 #[export]
-HB.instance Definition _ := isMultiplicative.Build R R (Frobenius_aut charRp)
-  Frobenius_aut_is_multiplicative.
+HB.instance Definition _ := isMultiplicative.Build R R (pFrobenius_aut pcharRp)
+  pFrobenius_aut_is_multiplicative.
 
 End FrobeniusAutomorphism.
 
-Lemma exprDn_char x y n : (char R).-nat n -> (x + y) ^+ n = x ^+ n + y ^+ n.
+Lemma exprDn_pchar x y n : (pchar R).-nat n -> (x + y) ^+ n = x ^+ n + y ^+ n.
 Proof.
-pose p := pdiv n; have [|n_gt1 charRn] := leqP n 1; first by case: (n) => [|[]].
-have charRp: p \in char R by rewrite (pnatPpi charRn) ?pi_pdiv.
-have{charRn} /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (charf_eq charRp)).
-by elim: e => // e IHe; rewrite !expnSr !exprM IHe -Frobenius_autE rmorphD.
+pose p := pdiv n; have [|n_gt1 pcharRn] := leqP n 1; first by case: (n) => [|[]].
+have pcharRp: p \in pchar R by rewrite (pnatPpi pcharRn) ?pi_pdiv.
+have{pcharRn} /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (pcharf_eq pcharRp)).
+by elim: e => // e IHe; rewrite !expnSr !exprM IHe -pFrobenius_autE rmorphD.
 Qed.
 
 Lemma rmorph_comm (S : nzSemiRingType) (f : {rmorphism R -> S}) x y :
@@ -2939,6 +2999,11 @@ Module ComPzRingExports.
 Bind Scope ring_scope with ComPzRing.sort.
 End ComPzRingExports.
 HB.export ComPzRingExports.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut_is_multiplicative instead.")]
+Notation Frobenius_aut_is_multiplicative := pFrobenius_aut_is_multiplicative (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use exprDn_pchar instead.")]
+Notation exprDn_char := exprDn_pchar (only parsing).
 
 #[short(type="comNzRingType")]
 HB.structure Definition ComNzRing := {R of NzRing R & ComNzSemiRing R}.
@@ -4335,7 +4400,7 @@ Lemma sqrf_eq0 x : (x ^+ 2 == 0) = (x == 0). Proof. exact: expf_eq0. Qed.
 Lemma expf_neq0 x m : x != 0 -> x ^+ m != 0.
 Proof. by move=> x_nz; rewrite expf_eq0; apply/nandP; right. Qed.
 
-Lemma natf_neq0 n : (n%:R != 0 :> R) = (char R)^'.-nat n.
+Lemma natf_neq0_pchar n : (n%:R != 0 :> R) = (pchar R)^'.-nat n.
 Proof.
 have [-> | /prod_prime_decomp->] := posnP n; first by rewrite eqxx.
 rewrite !big_seq; elim/big_rec: _ => [|[p e] s /=]; first by rewrite oner_eq0.
@@ -4343,28 +4408,28 @@ case/mem_prime_decomp=> p_pr _ _; rewrite pnatM pnatX eqn0Ngt orbC => <-.
 by rewrite natrM natrX mulf_eq0 expf_eq0 negb_or negb_and pnatE ?inE p_pr.
 Qed.
 
-Lemma natf0_char n : n > 0 -> n%:R == 0 :> R -> exists p, p \in char R.
+Lemma natf0_pchar n : n > 0 -> n%:R == 0 :> R -> exists p, p \in pchar R.
 Proof.
-move=> n_gt0 nR_0; exists (pdiv n`_(char R)).
+move=> n_gt0 nR_0; exists (pdiv n`_(pchar R)).
 apply: pnatP (pdiv_dvd _); rewrite ?part_pnat // ?pdiv_prime //.
-by rewrite ltn_neqAle eq_sym partn_eq1 // -natf_neq0 nR_0 /=.
+by rewrite ltn_neqAle eq_sym partn_eq1 // -natf_neq0_pchar nR_0 /=.
 Qed.
 
-Lemma charf'_nat n : (char R)^'.-nat n = (n%:R != 0 :> R).
+Lemma pcharf'_nat n : (pchar R)^'.-nat n = (n%:R != 0 :> R).
 Proof.
 have [-> | n_gt0] := posnP n; first by rewrite eqxx.
 apply/idP/idP => [|nz_n]; last first.
-  by apply/pnatP=> // p p_pr p_dvd_n; apply: contra nz_n => /dvdn_charf <-.
-apply: contraL => n0; have [// | p charRp] := natf0_char _ n0.
-have [p_pr _] := andP charRp; rewrite (eq_pnat _ (eq_negn (charf_eq charRp))).
-by rewrite p'natE // (dvdn_charf charRp) n0.
+  by apply/pnatP=> // p p_pr p_dvd_n; apply: contra nz_n => /dvdn_pcharf <-.
+apply: contraL => n0; have [// | p pcharRp] := natf0_pchar _ n0.
+have [p_pr _] := andP pcharRp; rewrite (eq_pnat _ (eq_negn (pcharf_eq pcharRp))).
+by rewrite p'natE // (dvdn_pcharf pcharRp) n0.
 Qed.
 
-Lemma charf0P : char R =i pred0 <-> (forall n, (n%:R == 0 :> R) = (n == 0)%N).
+Lemma pcharf0P : pchar R =i pred0 <-> (forall n, (n%:R == 0 :> R) = (n == 0)%N).
 Proof.
-split=> charF0 n; last by rewrite !inE charF0 andbC; case: eqP => // ->.
+split=> pcharF0 n; last by rewrite !inE pcharF0 andbC; case: eqP => // ->.
 have [-> | n_gt0] := posnP; first exact: eqxx.
-by apply/negP; case/natf0_char=> // p; rewrite charF0.
+by apply/negP; case/natf0_pchar=> // p; rewrite pcharF0.
 Qed.
 
 Lemma eqf_sqr x y : (x ^+ 2 == y ^+ 2) = (x == y) || (x == - y).
@@ -4402,6 +4467,15 @@ Proof. by apply: (iffP idP) => [/mulIf | /rreg_neq0]. Qed.
 HB.instance Definition _ := IntegralDomain.on R^o.
 
 End IntegralDomainTheory.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use natf_neq0_pchar instead.")]
+Notation natf_neq0 := natf_neq0_pchar (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use natf0_pchar instead.")]
+Notation natf0_char := natf0_pchar (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pcharf'_nat instead.")]
+Notation charf'_nat := pcharf'_nat (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pcharf0P instead.")]
+Notation charf0P := pcharf0P (only parsing).
 
 Arguments lregP {R x}.
 Arguments rregP {R x}.
@@ -4563,11 +4637,11 @@ Proof.
 by move=> ?; rewrite -mulr_suml -(divr1 a) eqr_div ?oner_eq0// mulr1 divr1.
 Qed.
 
-Lemma char0_natf_div :
-  char F =i pred0 -> forall m d, d %| m -> (m %/ d)%:R = m%:R / d%:R :> F.
+Lemma pchar0_natf_div :
+  pchar F =i pred0 -> forall m d, d %| m -> (m %/ d)%:R = m%:R / d%:R :> F.
 Proof.
-move/charf0P=> char0F m [|d] d_dv_m; first by rewrite divn0 invr0 mulr0.
-by rewrite natr_div // unitfE char0F.
+move/pcharf0P=> pchar0F m [|d] d_dv_m; first by rewrite divn0 invr0 mulr0.
+by rewrite natr_div // unitfE pchar0F.
 Qed.
 
 Section FieldMorphismInj.
@@ -4590,7 +4664,7 @@ Proof. exact: inj_eq fmorph_inj. Qed.
 Lemma fmorph_eq1 x : (f x == 1) = (x == 1).
 Proof. by rewrite -(inj_eq fmorph_inj) rmorph1. Qed.
 
-Lemma fmorph_char : char R =i char F.
+Lemma fmorph_pchar : pchar R =i pchar F.
 Proof. by move=> p; rewrite !inE -fmorph_eq0 rmorph_nat. Qed.
 
 End FieldMorphismInj.
@@ -4638,10 +4712,17 @@ Qed.
 
 End ModuleTheory.
 
-Lemma char_lalg (A : lalgType F) : char A =i char F.
+Lemma pchar_lalg (A : lalgType F) : pchar A =i pchar F.
 Proof. by move=> p; rewrite inE -scaler_nat scaler_eq0 oner_eq0 orbF. Qed.
 
 End FieldTheory.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use pchar0_natf_div instead.")]
+Notation char0_natf_div := pchar0_natf_div (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use fmorph_pchar instead.")]
+Notation fmorph_char := fmorph_pchar (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pchar_lalg instead.")]
+Notation char_lalg := pchar_lalg (only parsing).
 
 Arguments fmorph_inj {F R} f [x1 x2].
 Arguments telescope_prodf_eq {F n m} f u.
@@ -6445,27 +6526,69 @@ Definition subrX1 := subrX1.
 Definition sqrrD1 := sqrrD1.
 Definition sqrrB1 := sqrrB1.
 Definition subr_sqr_1 := subr_sqr_1.
-Definition charf0 := charf0.
-Definition charf_prime := charf_prime.
-Definition mulrn_char := mulrn_char.
-Definition dvdn_charf := dvdn_charf.
-Definition charf_eq := charf_eq.
-Definition bin_lt_charf_0 := bin_lt_charf_0.
-Definition Frobenius_autE := Frobenius_autE.
-Definition Frobenius_aut0 := Frobenius_aut0.
-Definition Frobenius_aut1 := Frobenius_aut1.
-Definition Frobenius_autD_comm := Frobenius_autD_comm.
-Definition Frobenius_autMn := Frobenius_autMn.
-Definition Frobenius_aut_nat := Frobenius_aut_nat.
-Definition Frobenius_autM_comm := Frobenius_autM_comm.
-Definition Frobenius_autX := Frobenius_autX.
-Definition Frobenius_autN := Frobenius_autN.
-Definition Frobenius_autB_comm := Frobenius_autB_comm.
-Definition exprNn_char := exprNn_char.
-Definition addrr_char2 := addrr_char2.
-Definition oppr_char2 := oppr_char2.
-Definition addrK_char2 := addrK_char2.
-Definition addKr_char2 := addKr_char2.
+Definition pcharf0 := pcharf0.
+#[deprecated(since="mathcomp 2.4.0", note="Use pcharf0 instead.")]
+Definition charf0 := pcharf0.
+Definition pcharf_prime := pcharf_prime.
+#[deprecated(since="mathcomp 2.4.0", note="Use pcharf_prime instead.")]
+Definition charf_prime := pcharf_prime.
+Definition mulrn_pchar := mulrn_pchar.
+#[deprecated(since="mathcomp 2.4.0", note="Use mulrn_pchar instead.")]
+Definition mulrn_char := mulrn_pchar.
+Definition dvdn_pcharf := dvdn_pcharf.
+#[deprecated(since="mathcomp 2.4.0", note="Use dvdn_pcharf instead.")]
+Definition dvdn_charf := dvdn_pcharf.
+Definition pcharf_eq := pcharf_eq.
+#[deprecated(since="mathcomp 2.4.0", note="Use pcharf_eq instead.")]
+Definition charf_eq := pcharf_eq.
+Definition bin_lt_pcharf_0 := bin_lt_pcharf_0.
+#[deprecated(since="mathcomp 2.4.0", note="Use bin_lt_pcharf_0 instead.")]
+Definition bin_lt_charf_0 := bin_lt_pcharf_0.
+Definition pFrobenius_autE := pFrobenius_autE.
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autE instead.")]
+Definition Frobenius_autE := pFrobenius_autE.
+Definition pFrobenius_aut0 := pFrobenius_aut0.
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut0 instead.")]
+Definition Frobenius_aut0 := pFrobenius_aut0.
+Definition pFrobenius_aut1 := pFrobenius_aut1.
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut1 instead.")]
+Definition Frobenius_aut1 := pFrobenius_aut1.
+Definition pFrobenius_autD_comm := pFrobenius_autD_comm.
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autD_comm instead.")]
+Definition Frobenius_autD_comm := pFrobenius_autD_comm.
+Definition pFrobenius_autMn := pFrobenius_autMn.
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autMn instead.")]
+Definition Frobenius_autMn := pFrobenius_autMn.
+Definition pFrobenius_aut_nat := pFrobenius_aut_nat.
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut_nat instead.")]
+Definition Frobenius_aut_nat := pFrobenius_aut_nat.
+Definition pFrobenius_autM_comm := pFrobenius_autM_comm.
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autM_comm instead.")]
+Definition Frobenius_autM_comm := pFrobenius_autM_comm.
+Definition pFrobenius_autX := pFrobenius_autX.
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autX instead.")]
+Definition Frobenius_autX := pFrobenius_autX.
+Definition pFrobenius_autN := pFrobenius_autN.
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autN instead.")]
+Definition Frobenius_autN := pFrobenius_autN.
+Definition pFrobenius_autB_comm := pFrobenius_autB_comm.
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autB_comm instead.")]
+Definition Frobenius_autB_comm := pFrobenius_autB_comm.
+Definition exprNn_pchar := exprNn_pchar.
+#[deprecated(since="mathcomp 2.4.0", note="Use exprNn_pchar instead.")]
+Definition exprNn_char := exprNn_pchar.
+Definition addrr_pchar2 := addrr_pchar2.
+#[deprecated(since="mathcomp 2.4.0", note="Use addrr_pchar2 instead.")]
+Definition addrr_char2 := addrr_pchar2.
+Definition oppr_pchar2 := oppr_pchar2.
+#[deprecated(since="mathcomp 2.4.0", note="Use oppr_pchar2 instead.")]
+Definition oppr_char2 := oppr_pchar2.
+Definition addrK_pchar2 := addrK_pchar2.
+#[deprecated(since="mathcomp 2.4.0", note="Use addrK_pchar2 instead.")]
+Definition addrK_char2 := addrK_pchar2.
+Definition addKr_pchar2 := addKr_pchar2.
+#[deprecated(since="mathcomp 2.4.0", note="Use addKr_pchar2 instead.")]
+Definition addKr_char2 := addKr_pchar2.
 Definition iter_mulr := iter_mulr.
 Definition iter_mulr_1 := iter_mulr_1.
 Definition prodr_const := prodr_const.
@@ -6495,7 +6618,9 @@ Definition sqrrD := sqrrD.
 Definition sqrrB := sqrrB.
 Definition subr_sqr := subr_sqr.
 Definition subr_sqrDB := subr_sqrDB.
-Definition exprDn_char := exprDn_char.
+Definition exprDn_pchar := exprDn_pchar.
+#[deprecated(since="mathcomp 2.4.0", note="Use exprDn_pchar instead.")]
+Definition exprDn_char := exprDn_pchar.
 Definition mulrV := mulrV.
 Definition divrr := divrr.
 Definition mulVr := mulVr.
@@ -6587,7 +6712,9 @@ Definition rpredV := rpredV.
 Definition rpred_div := rpred_div.
 Definition rpredXN := rpredXN.
 Definition rpredZeq := rpredZeq.
-Definition char_lalg := char_lalg.
+Definition pchar_lalg := pchar_lalg.
+#[deprecated(since="mathcomp 2.4.0", note="Use pchar_lalg instead.")]
+Definition char_lalg := pchar_lalg.
 Definition rpredMr := rpredMr.
 Definition rpredMl := rpredMl.
 Definition rpred_divr := rpred_divr.
@@ -6614,10 +6741,18 @@ Definition prodf_seq_neq0 := prodf_seq_neq0.
 Definition expf_eq0 := expf_eq0.
 Definition sqrf_eq0 := sqrf_eq0.
 Definition expf_neq0 := expf_neq0.
-Definition natf_neq0 := natf_neq0.
-Definition natf0_char := natf0_char.
-Definition charf'_nat := charf'_nat.
-Definition charf0P := charf0P.
+Definition natf_neq0_pchar := natf_neq0_pchar.
+#[deprecated(since="mathcomp 2.4.0", note="Use natf_neq0_pchar instead.")]
+Definition natf_neq0 := natf_neq0_pchar.
+Definition natf0_pchar := natf0_pchar.
+#[deprecated(since="mathcomp 2.4.0", note="Use natf0_pchar instead.")]
+Definition natf0_char := natf0_pchar.
+Definition pcharf'_nat := pcharf'_nat.
+#[deprecated(since="mathcomp 2.4.0", note="Use pcharf'_nat instead.")]
+Definition charf'_nat := pcharf'_nat.
+Definition pcharf0P := pcharf0P.
+#[deprecated(since="mathcomp 2.4.0", note="Use pcharf0P instead.")]
+Definition charf0P := pcharf0P.
 Definition eqf_sqr := eqf_sqr.
 Definition mulfI := mulfI.
 Definition mulIf := mulIf.
@@ -6649,7 +6784,9 @@ Definition addf_div := addf_div.
 Definition mulf_div := mulf_div.
 Definition eqr_div := eqr_div.
 Definition eqr_sum_div := eqr_sum_div.
-Definition char0_natf_div := char0_natf_div.
+Definition pchar0_natf_div := pchar0_natf_div.
+#[deprecated(since="mathcomp 2.4.0", note="Use pchar0_natf_div instead.")]
+Definition char0_natf_div := pchar0_natf_div.
 Definition fpredMr := fpredMr.
 Definition fpredMl := fpredMl.
 Definition fpred_divr := fpred_divr.
@@ -6694,7 +6831,9 @@ Definition rmorph_prod := rmorph_prod.
 Definition rmorphXn := rmorphXn.
 Definition rmorphN1 := rmorphN1.
 Definition rmorph_sign := rmorph_sign.
-Definition rmorph_char := rmorph_char.
+Definition rmorph_pchar := rmorph_pchar.
+#[deprecated(since="mathcomp 2.4.0", note="Use rmorph_pchar instead.")]
+Definition rmorph_char := rmorph_pchar.
 Definition can2_rmorphism := can2_rmorphism.
 Definition rmorph_comm := rmorph_comm.
 Definition rmorph_unit := rmorph_unit.
@@ -6705,7 +6844,9 @@ Definition fmorph_inj := @fmorph_inj.
 Arguments fmorph_inj {F R} f [x1 x2].
 Definition fmorph_eq := fmorph_eq.
 Definition fmorph_eq1 := fmorph_eq1.
-Definition fmorph_char := fmorph_char.
+Definition fmorph_pchar := fmorph_pchar.
+#[deprecated(since="mathcomp 2.4.0", note="Use fmorph_pchar instead.")]
+Definition fmorph_char := fmorph_pchar.
 Definition fmorph_unit := fmorph_unit.
 Definition fmorphV := fmorphV.
 Definition fmorph_div := fmorph_div.
@@ -6865,10 +7006,16 @@ Notation "1" := (@one _) : ring_scope.
 Notation "- 1" := (opp 1) : ring_scope.
 
 Notation "n %:R" := (natmul 1 n) : ring_scope.
-Arguments GRing.char R%type.
-Notation "[ 'char' R ]" := (GRing.char R) : ring_scope.
-Notation has_char0 R := (GRing.char R =i pred0).
-Notation Frobenius_aut chRp := (Frobenius_aut chRp).
+Arguments GRing.pchar R%type.
+Notation "[ 'pchar' R ]" := (GRing.pchar R) : ring_scope.
+#[deprecated(since="mathcomp 2.4.0", note="Use [pchar R] instead.")]
+Notation "[ 'char' R ]" := (GRing.pchar R) : ring_scope.
+Notation has_pchar0 R := (GRing.pchar R =i pred0).
+#[deprecated(since="mathcomp 2.4.0", note="Use has_pchar0 instead.")]
+Notation has_char0 R := (GRing.pchar R =i pred0).
+Notation pFrobenius_aut chRp := (pFrobenius_aut chRp).
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut instead.")]
+Notation Frobenius_aut chRp := (pFrobenius_aut chRp).
 Notation "*%R" := (@mul _) : function_scope.
 Notation "x * y" := (mul x y) : ring_scope.
 Arguments exp : simpl never.

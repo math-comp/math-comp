@@ -25,8 +25,8 @@ From mathcomp Require ssrnum ssrint archimedean algC cyclotomic.
 (*                              etc structures (including FinFieldExtType     *)
 (*                              above) for abstract vectType, falgType and    *)
 (*                              fieldExtType over a finFieldType              *)
-(*      PrimeCharType charRp == the carrier of a nzRingType R such that       *)
-(*                              charRp : p \in [char R] holds. This type has  *)
+(*    pPrimeCharType pcharRp == the carrier of a nzRingType R such that       *)
+(*                              pcharRp : p \in [pchar R] holds. This type has*)
 (*                              canonical nzRingType, ..., fieldType          *)
 (*                              structures compatible with those of R, as well*)
 (*                              as canonical lmodType 'F_p, ..., algType 'F_p *)
@@ -49,7 +49,7 @@ From mathcomp Require ssrnum ssrint archimedean algC cyclotomic.
 (*                              finDomain_fieldP domR to prove commutativity  *)
 (*                              and field axioms (the former is Wedderburn's  *)
 (*                              little theorem).                              *)
-(* FinDomainSplittingFieldType domR charRp == a splittingFieldType structure  *)
+(* FinDomainSplittingFieldType domR pcharRp == a splittingFieldType structure *)
 (*                              that repackages the two constructions above   *)
 (******************************************************************************)
 
@@ -110,20 +110,20 @@ move/all_roots_prod_XsubC->; last by rewrite uniq_rootsE enum_uniq.
 by apply/allP=> x _; rewrite rootE !hornerE expf_card subrr.
 Qed.
 
-Lemma finCharP : {p | prime p & p \in [char F]}.
+Lemma finPcharP : {p | prime p & p \in [pchar F]}.
 Proof.
 pose e := exponent [set: F]; have e_gt0: e > 0 by apply: exponent_gt0.
 have: e%:R == 0 :> F by rewrite -zmodXgE expg_exponent // inE.
-by case/natf0_char/sigW=> // p charFp; exists p; rewrite ?(charf_prime charFp).
+by case/natf0_pchar/sigW=> // p pcharFp; exists p; rewrite ?(pcharf_prime pcharFp).
 Qed.
 
 Lemma finField_is_abelem : is_abelem [set: F].
 Proof.
-have [p pr_p charFp] := finCharP.
-by apply/is_abelemP; exists p; last apply: fin_ring_char_abelem.
+have [p pr_p pcharFp] := finPcharP.
+by apply/is_abelemP; exists p; last apply: fin_ring_pchar_abelem.
 Qed.
 
-Lemma card_finCharP p n : #|F| = (p ^ n)%N -> prime p -> p \in [char F].
+Lemma card_finPcharP p n : #|F| = (p ^ n)%N -> prime p -> p \in [pchar F].
 Proof.
 move=> oF pr_p; rewrite inE pr_p -order_dvdn.
 rewrite (abelem_order_p finField_is_abelem) ?inE ?oner_neq0 //=.
@@ -132,6 +132,11 @@ by rewrite cardsT oF -(prednK n_gt0) pdiv_pfactor.
 Qed.
 
 End FinField.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use finPcharP instead.")]
+Notation finCharP := (finPcharP) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use card_finPcharP instead.")]
+Notation card_finCharP := (card_finPcharP) (only parsing).
 
 Section CardVspace.
 
@@ -219,126 +224,126 @@ Section PrimeCharRing.
 
 Variable R0 : nzRingType.
 
-Definition PrimeCharType of p \in [char R0] : predArgType := R0.
+Definition pPrimeCharType of p \in [pchar R0] : predArgType := R0.
 
-Hypothesis charRp : p \in [char R0].
-Local Notation R := (PrimeCharType charRp).
+Hypothesis pcharRp : p \in [pchar R0].
+Local Notation R := (pPrimeCharType pcharRp).
 Implicit Types (a b : 'F_p) (x y : R).
 
 HB.instance Definition _ := GRing.NzRing.on R.
 
-Definition primeChar_scale a x := a%:R * x.
-Local Infix "*p:" := primeChar_scale (at level 40).
+Definition pprimeChar_scale a x := a%:R * x.
+Local Infix "*p':" := pprimeChar_scale (at level 40).
 
 Let natrFp n : (inZp n : 'F_p)%:R = n%:R :> R.
 Proof.
-rewrite [in RHS](divn_eq n p) natrD mulrnA (mulrn_char charRp) add0r.
-by rewrite /= (Fp_cast (charf_prime charRp)).
+rewrite [in RHS](divn_eq n p) natrD mulrnA (mulrn_pchar pcharRp) add0r.
+by rewrite /= (Fp_cast (pcharf_prime pcharRp)).
 Qed.
 
-Lemma primeChar_scaleA a b x : a *p: (b *p: x) = (a * b) *p: x.
-Proof. by rewrite /primeChar_scale mulrA -natrM natrFp. Qed.
+Lemma pprimeChar_scaleA a b x : a *p': (b *p': x) = (a * b) *p': x.
+Proof. by rewrite /pprimeChar_scale mulrA -natrM natrFp. Qed.
 
-Lemma primeChar_scale1 : left_id 1 primeChar_scale.
-Proof. by move=> x; rewrite /primeChar_scale mul1r. Qed.
+Lemma pprimeChar_scale1 : left_id 1 pprimeChar_scale.
+Proof. by move=> x; rewrite /pprimeChar_scale mul1r. Qed.
 
-Lemma primeChar_scaleDr : right_distributive primeChar_scale +%R.
-Proof. by move=> a x y /=; rewrite /primeChar_scale mulrDr. Qed.
+Lemma pprimeChar_scaleDr : right_distributive pprimeChar_scale +%R.
+Proof. by move=> a x y /=; rewrite /pprimeChar_scale mulrDr. Qed.
 
-Lemma primeChar_scaleDl x : {morph primeChar_scale^~ x: a b / a + b}.
-Proof. by move=> a b; rewrite /primeChar_scale natrFp natrD mulrDl. Qed.
+Lemma pprimeChar_scaleDl x : {morph pprimeChar_scale^~ x: a b / a + b}.
+Proof. by move=> a b; rewrite /pprimeChar_scale natrFp natrD mulrDl. Qed.
 
 HB.instance Definition _ := GRing.Zmodule_isLmodule.Build 'F_p R
-  primeChar_scaleA primeChar_scale1 primeChar_scaleDr primeChar_scaleDl.
+  pprimeChar_scaleA pprimeChar_scale1 pprimeChar_scaleDr pprimeChar_scaleDl.
 
-Lemma primeChar_scaleAl (a : 'F_p) (u v : R) :  a *: (u * v) = (a *: u) * v.
+Lemma pprimeChar_scaleAl (a : 'F_p) (u v : R) :  a *: (u * v) = (a *: u) * v.
 Proof. by apply: mulrA. Qed.
 
 HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build 'F_p R
-  primeChar_scaleAl.
+  pprimeChar_scaleAl.
 
-Lemma primeChar_scaleAr (a : 'F_p) (x y : R) : a *: (x * y) = x * (a *: y).
+Lemma pprimeChar_scaleAr (a : 'F_p) (x y : R) : a *: (x * y) = x * (a *: y).
 Proof. by rewrite ![a *: _]mulr_natl mulrnAr. Qed.
 
 HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build 'F_p R
-  primeChar_scaleAr.
+  pprimeChar_scaleAr.
 
 End PrimeCharRing.
 
-Local Notation type := @PrimeCharType.
+Local Notation type := @pPrimeCharType.
 
 (* TODO: automatize parameter inference to do all of these *)
-HB.instance Definition _ (R : unitRingType) charRp :=
-  GRing.UnitRing.on (type R charRp).
-HB.instance Definition _ (R : comNzRingType) charRp :=
-  GRing.ComNzRing.on (type R charRp).
-HB.instance Definition _ (R : comUnitRingType) charRp :=
-  GRing.ComUnitRing.on (type R charRp).
-HB.instance Definition _ (R : idomainType) charRp :=
-  GRing.IntegralDomain.on (type R charRp).
-HB.instance Definition _ (R : fieldType) charRp :=
-  GRing.Field.on (type R charRp).
+HB.instance Definition _ (R : unitRingType) pcharRp :=
+  GRing.UnitRing.on (type R pcharRp).
+HB.instance Definition _ (R : comNzRingType) pcharRp :=
+  GRing.ComNzRing.on (type R pcharRp).
+HB.instance Definition _ (R : comUnitRingType) pcharRp :=
+  GRing.ComUnitRing.on (type R pcharRp).
+HB.instance Definition _ (R : idomainType) pcharRp :=
+  GRing.IntegralDomain.on (type R pcharRp).
+HB.instance Definition _ (R : fieldType) pcharRp :=
+  GRing.Field.on (type R pcharRp).
 
 Section FinNzRing.
 
-Variables (R0 : finNzRingType) (charRp : p \in [char R0]).
-Local Notation R := (type _ charRp).
+Variables (R0 : finNzRingType) (pcharRp : p \in [pchar R0]).
+Local Notation R := (type _ pcharRp).
 
 HB.instance Definition _ := FinGroup.on R.
 
-Let pr_p : prime p. Proof. exact: charf_prime charRp. Qed.
+Let pr_p : prime p. Proof. exact: pcharf_prime pcharRp. Qed.
 
-Lemma primeChar_abelem : p.-abelem [set: R].
+Lemma pprimeChar_abelem : p.-abelem [set: R].
 Proof. exact: fin_Fp_lmod_abelem. Qed.
 
-Lemma primeChar_pgroup : p.-group [set: R].
-Proof. by case/and3P: primeChar_abelem. Qed.
+Lemma pprimeChar_pgroup : p.-group [set: R].
+Proof. by case/and3P: pprimeChar_abelem. Qed.
 
-Lemma order_primeChar x : x != 0 :> R -> #[x]%g = p.
-Proof. by apply: (abelem_order_p primeChar_abelem); rewrite inE. Qed.
+Lemma order_pprimeChar x : x != 0 :> R -> #[x]%g = p.
+Proof. by apply: (abelem_order_p pprimeChar_abelem); rewrite inE. Qed.
 
 Let n := logn p #|R|.
 
-Lemma card_primeChar : #|R| = (p ^ n)%N.
-Proof. by rewrite /n -cardsT {1}(card_pgroup primeChar_pgroup). Qed.
+Lemma card_pprimeChar : #|R| = (p ^ n)%N.
+Proof. by rewrite /n -cardsT {1}(card_pgroup pprimeChar_pgroup). Qed.
 
-Lemma primeChar_vectAxiom : Vector.axiom n R.
+Lemma pprimeChar_vectAxiom : Vector.axiom n R.
 Proof.
 have /isog_isom/=[f /isomP[injf im_f]]: [set: R] \isog [set: 'rV['F_p]_n].
   rewrite (@isog_abelem_card _ _ p) fin_Fp_lmod_abelem //=.
-  by rewrite !cardsT card_primeChar card_mx mul1n card_Fp.
+  by rewrite !cardsT card_pprimeChar card_mx mul1n card_Fp.
 exists f; last by exists (invm injf) => x; rewrite ?invmE ?invmK ?im_f ?inE.
 move=> a x y; rewrite [a *: _]mulr_natl morphM ?morphX ?inE // zmodXgE.
 by congr (_ + _); rewrite -scaler_nat natr_Zp.
 Qed.
 
 HB.instance Definition _ := Lmodule_hasFinDim.Build 'F_p R
-  primeChar_vectAxiom.
+  pprimeChar_vectAxiom.
 
-Lemma primeChar_dimf : \dim {: R : vectType 'F_p } = n.
+Lemma pprimeChar_dimf : \dim {: R : vectType 'F_p } = n.
 Proof. by rewrite dimvf. Qed.
 
 End FinNzRing.
 
-HB.instance Definition _ (R : finUnitRingType) charRp :=
-  FinRing.UnitRing.on (type R charRp).
+HB.instance Definition _ (R : finUnitRingType) pcharRp :=
+  FinRing.UnitRing.on (type R pcharRp).
 #[warning="-HB.no-new-instance"]
-HB.instance Definition _ (R : finUnitRingType) charRp :=
-  FinRing.UnitAlgebra.on (type R charRp).
+HB.instance Definition _ (R : finUnitRingType) pcharRp :=
+  FinRing.UnitAlgebra.on (type R pcharRp).
 #[warning="-HB.no-new-instance"]
-HB.instance Definition _ (R : finUnitRingType) charRp :=
-  Falgebra.on (type R charRp).
-HB.instance Definition _ (R : finComNzRingType) charRp :=
-  FinRing.ComNzRing.on (type R charRp).
-HB.instance Definition _ (R : finComUnitRingType) charRp :=
-  FinRing.ComUnitRing.on (type R charRp).
-HB.instance Definition _ (R : finIdomainType) charRp :=
-  FinRing.IntegralDomain.on (type R charRp).
+HB.instance Definition _ (R : finUnitRingType) pcharRp :=
+  Falgebra.on (type R pcharRp).
+HB.instance Definition _ (R : finComNzRingType) pcharRp :=
+  FinRing.ComNzRing.on (type R pcharRp).
+HB.instance Definition _ (R : finComUnitRingType) pcharRp :=
+  FinRing.ComUnitRing.on (type R pcharRp).
+HB.instance Definition _ (R : finIdomainType) pcharRp :=
+  FinRing.IntegralDomain.on (type R pcharRp).
 
 Section FinField.
 
-Variables (F0 : finFieldType) (charFp : p \in [char F0]).
-Local Notation F := (type _ charFp).
+Variables (F0 : finFieldType) (pcharFp : p \in [pchar F0]).
+Local Notation F := (type _ pcharFp).
 
 HB.instance Definition _ := Finite.on F.
 HB.instance Definition _ := SplittingField.copy F (finvect_type F).
@@ -346,6 +351,36 @@ HB.instance Definition _ := SplittingField.copy F (finvect_type F).
 End FinField.
 
 End PrimeChar.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use pPrimeCharType instead.")]
+Notation PrimeCharType := (pPrimeCharType) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scale instead.")]
+Notation primeChar_scale := (pprimeChar_scale) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scaleA instead.")]
+Notation primeChar_scaleA := (pprimeChar_scaleA) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scale1 instead.")]
+Notation primeChar_scale1 := (pprimeChar_scale1) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scaleDr instead.")]
+Notation primeChar_scaleDr := (pprimeChar_scaleDr) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scaleDl instead.")]
+Notation primeChar_scaleDl := (pprimeChar_scaleDl) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scaleAl instead.")]
+Notation primeChar_scaleAl := (pprimeChar_scaleAl) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scaleAr instead.")]
+Notation primeChar_scaleAr := (pprimeChar_scaleAr) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_abelem instead.")]
+Notation primeChar_abelem := (pprimeChar_abelem) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_pgroup instead.")]
+Notation primeChar_pgroup := (pprimeChar_pgroup) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use order_pprimeChar instead.")]
+Notation order_primeChar := (order_pprimeChar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use card_pprimeChar instead.")]
+Notation card_primeChar := (card_pprimeChar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_vectAxiom instead.")]
+Notation primeChar_vectAxiom := (pprimeChar_vectAxiom) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_dimf instead.")]
+Notation primeChar_dimf := (pprimeChar_dimf) (only parsing).
+
 
 Section FinSplittingField.
 
@@ -399,9 +434,9 @@ have idfP x: reflect (f x = x) (x \in 1%VS).
   by rewrite root_prod_XsubC => /mapP[a]; exists a.
 have fA : additive f.
   rewrite /f => x y; rewrite ?exprMn ?expr1n //.
-  have [p _ charFp] := finCharP F; rewrite (card_primeChar charFp).
+  have [p _ pcharFp] := finPcharP F; rewrite (card_pprimeChar pcharFp).
   elim: (logn _ _) => // n IHn; rewrite expnSr !exprM {}IHn.
-  by rewrite -(char_lalg L) in charFp; rewrite -Frobenius_autE rmorphB.
+  by rewrite -(pchar_lalg L) in pcharFp; rewrite -pFrobenius_autE rmorphB.
 have fM : multiplicative f.
   by rewrite /f; split=> [x y|]; rewrite ?exprMn ?expr1n //.
 have fZ: scalable f.
@@ -544,8 +579,8 @@ exists (x%:A :: zs); rewrite big_cons; set rhs := _ * _.
 by rewrite Dp mulrC [_^%:A]rmorphM /= mapXsubC /= eqp_mull.
 Qed.
 
-Lemma PrimePowerField p k (m := (p ^ k)%N) :
-  prime p -> 0 < k -> {Fm : finFieldType | p \in [char Fm] & #|Fm| = m}.
+Lemma pPrimePowerField p k (m := (p ^ k)%N) :
+  prime p -> 0 < k -> {Fm : finFieldType | p \in [pchar Fm] & #|Fm| = m}.
 Proof.
 move=> pr_p k_gt0; have m_gt1: m > 1 by rewrite (ltn_exp2l 0) ?prime_gt1.
 have m_gt0 := ltnW m_gt1; have m1_gt0: m.-1 > 0 by rewrite -ltnS prednK.
@@ -554,7 +589,7 @@ pose q := 'X^m - 'X; have Dq R: q R = ('X^m.-1 - 1) * ('X - 0).
 have /FinSplittingFieldFor[/= L splitLq]: q 'F_p != 0.
   by rewrite Dq monic_neq0 ?rpredM ?monicXsubC ?monicXnsubC.
 rewrite [_^%:A]rmorphB rmorphXn /= map_polyX -/(q L) in splitLq.
-have charL: p \in [char L] by rewrite char_lalg char_Fp.
+have pcharL: p \in [pchar L] by rewrite pchar_lalg pchar_Fp.
 pose Fm := FinFieldExtType L; exists Fm => //.
 have /finField_galois_generator[/= a _ Da]: (1 <= {:L})%VS by apply: sub1v.
 pose Em := fixedSpace (a ^+ k)%g; rewrite card_Fp //= dimv1 expn1 in Da.
@@ -563,7 +598,7 @@ have Uzs: uniq zs.
   rewrite -separable_prod_XsubC -(eqp_separable DqL) Dq separable_root andbC.
   rewrite /root !hornerE subr_eq0 eq_sym expr0n gtn_eqF ?oner_eq0 //=.
   rewrite cyclotomic.separable_Xn_sub_1 // -subn1 natrB // subr_eq0.
-  by rewrite natrX charf0 // expr0n gtn_eqF // eq_sym oner_eq0.
+  by rewrite natrX pcharf0 // expr0n gtn_eqF // eq_sym oner_eq0.
 suffices /eq_card->: Fm =i zs.
   apply: succn_inj; rewrite (card_uniqP _) //= -(size_prod_XsubC _ id).
   by rewrite -(eqp_size DqL) size_polyDl size_polyXn // size_polyN size_polyX.
@@ -578,6 +613,9 @@ by rewrite subv_add sub1v; apply/span_subvP=> z; rewrite in_zs.
 Qed.
 
 End FinFieldExists.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use pPrimePowerField instead.")]
+Notation PrimePowerField := (pPrimePowerField) (only parsing).
 
 Section FinDomain.
 
@@ -602,14 +640,14 @@ Qed.
 Theorem finDomain_mulrC : @commutative R R *%R.
 Proof.
 have fieldR := finDomain_field.
-have [p p_pr charRp]: exists2 p, prime p & p \in [char R].
+have [p p_pr pcharRp]: exists2 p, prime p & p \in [pchar R].
   have [e /prod_prime_decomp->]: {e | (e > 0)%N & e%:R == 0 :> R}.
     by exists #|[set: R]%G|; rewrite // -order_dvdn order_dvdG ?inE.
   rewrite big_seq; elim/big_rec: _ => [|[p m] /= n]; first by rewrite oner_eq0.
   case/mem_prime_decomp=> p_pr _ _ IHn.
   elim: m => [|m IHm]; rewrite ?mul1n {IHn}// expnS -mulnA natrM.
   by case/eqP/domR/orP=> //; exists p; last apply/andP.
-pose Rp := PrimeCharType charRp; pose L : {vspace Rp} := fullv.
+pose Rp := pPrimeCharType pcharRp; pose L : {vspace Rp} := fullv.
 pose G := [set: {unit R}]; pose ofG : {unit R} -> Rp := val.
 pose projG (E : {vspace Rp}) := [preim ofG of E].
 have inG t nzt: Sub t (finDomain_field nzt) \in G by rewrite inE.
@@ -701,7 +739,10 @@ Definition FinDomainFieldType : finFieldType :=
  let fC := GRing.UnitRing_isField.Build iR finDomain_field in
  HB.pack iR fC.
 
-Definition FinDomainSplittingFieldType p (charRp : p \in [char R]) :=
-  SplittingField.clone 'F_p R (@PrimeCharType p FinDomainFieldType charRp).
+Definition FinDomainSplittingFieldType_pchar p (pcharRp : p \in [pchar R]) :=
+  SplittingField.clone 'F_p R (@pPrimeCharType p FinDomainFieldType pcharRp).
 
 End FinDomain.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use FinDomainSplittingFieldType_pchar  instead.")]
+Notation FinDomainSplittingFieldType := (FinDomainSplittingFieldType_pchar) (only parsing).
