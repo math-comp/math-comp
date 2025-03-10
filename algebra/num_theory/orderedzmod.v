@@ -301,6 +301,535 @@ End Syntax.
 
 Module Export Theory.
 
+Section porderZmodTypeTheory.
+Variable (R : porderedZmodType).
+Implicit Types (x y : R).
+
+(* Monotony of addition *)
+
+Lemma lerD2l x : {mono +%R x : y z / y <= z}.
+Proof. exact: homo_mono (addKr _) (ler_wD2l _) (ler_wD2l _). Qed.
+
+Lemma lerD2r x : {mono +%R^~ x : y z / y <= z}.
+Proof. by move=> y z; rewrite ![_ + x]addrC lerD2l. Qed.
+
+Lemma ltrD2r x : {mono +%R^~ x : y z / y < z}.
+Proof. by move=> y z; rewrite !lt_neqAle lerD2r (inj_eq (addIr _)). Qed.
+
+Lemma ltrD2l x : {mono +%R x : y z / y < z}.
+Proof. by move=> y z; rewrite !lt_neqAle lerD2l (inj_eq (addrI _)). Qed.
+
+Definition lerD2 := (lerD2l, lerD2r).
+Definition ltrD2 := (ltrD2l, ltrD2r).
+Definition lterD2 := (lerD2, ltrD2).
+
+(* Comparison and negation / opposite. *)
+
+Lemma subr_ge0 x y : (0 <= y - x) = (x <= y).
+Proof. by rewrite -(@lerD2r x) addrNK add0r. Qed.
+
+Lemma oppr_ge0 x : (0 <= - x) = (x <= 0).
+Proof. by rewrite -sub0r subr_ge0. Qed.
+
+Lemma subr_gt0 x y : (0 < y - x) = (x < y).
+Proof. by rewrite !lt_def subr_eq0 subr_ge0. Qed.
+
+Lemma subr_le0  x y : (y - x <= 0) = (y <= x).
+Proof. by rewrite -[LHS]subr_ge0 opprB add0r subr_ge0. Qed.  (* FIXME: rewrite pattern *)
+
+Lemma subr_lt0  x y : (y - x < 0) = (y < x).
+Proof. by rewrite -[LHS]subr_gt0 opprB add0r subr_gt0. Qed.  (* FIXME: rewrite pattern *)
+
+Lemma lerN2 : {mono -%R : x y /~ x <= y :> R}.
+Proof. by move=> x y /=; rewrite -subr_ge0 opprK addrC subr_ge0. Qed.
+Hint Resolve lerN2 : core.
+Lemma ltrN2 : {mono -%R : x y /~ x < y :> R}.
+Proof. by move=> x y /=; rewrite leW_nmono. Qed.
+Hint Resolve ltrN2 : core.
+Definition lterN2 := (lerN2, ltrN2).
+
+Lemma lerNr x y : (x <= - y) = (y <= - x).
+Proof. by rewrite (monoRL opprK lerN2). Qed.
+
+Lemma ltrNr x y : (x < - y) = (y < - x).
+Proof. by rewrite (monoRL opprK (leW_nmono _)). Qed.
+
+Definition lterNr := (lerNr, ltrNr).
+
+Lemma lerNl x y : (- x <= y) = (- y <= x).
+Proof. by rewrite (monoLR opprK lerN2). Qed.
+
+Lemma ltrNl x y : (- x < y) = (- y < x).
+Proof. by rewrite (monoLR opprK (leW_nmono _)). Qed.
+
+Definition lterNl := (lerNl, ltrNl).
+
+Definition subr_lte0 := (subr_le0, subr_lt0).
+Definition subr_gte0 := (subr_ge0, subr_gt0).
+Definition subr_cp0 := (subr_lte0, subr_gte0).
+
+(* Addition, subtraction and transitivity *)
+
+Lemma lerD x y z t : x <= y -> z <= t -> x + z <= y + t.
+Proof. by move=> lxy lzt; rewrite (@le_trans _ _ (y + z)) ?lterD2. Qed.
+
+Lemma ler_ltD x y z t : x <= y -> z < t -> x + z < y + t.
+Proof. by move=> lxy lzt; rewrite (@le_lt_trans _ _ (y + z)) ?lterD2. Qed.
+
+Lemma ltr_leD x y z t : x < y -> z <= t -> x + z < y + t.
+Proof. by move=> lxy lzt; rewrite (@lt_le_trans _ _ (y + z)) ?lterD2. Qed.
+
+Lemma ltrD x y z t : x < y -> z < t -> x + z < y + t.
+Proof. by move=> lxy lzt; rewrite ltr_leD // ltW. Qed.
+
+Lemma lerB x y z t : x <= y -> t <= z -> x - z <= y - t.
+Proof. by move=> lxy ltz; rewrite lerD // lterN2. Qed.
+
+Lemma ler_ltB x y z t : x <= y -> t < z -> x - z < y - t.
+Proof. by move=> lxy lzt; rewrite ler_ltD // lterN2. Qed.
+
+Lemma ltr_leB x y z t : x < y -> t <= z -> x - z < y - t.
+Proof. by move=> lxy lzt; rewrite ltr_leD // lterN2. Qed.
+
+Lemma ltrB x y z t : x < y -> t < z -> x - z < y - t.
+Proof. by move=> lxy lzt; rewrite ltrD // lterN2. Qed.
+
+Lemma lerBlDr x y z : (x - y <= z) = (x <= z + y).
+Proof. by rewrite (monoLR (addrK _) (lerD2r _)). Qed.
+
+Lemma ltrBlDr x y z : (x - y < z) = (x < z + y).
+Proof. by rewrite (monoLR (addrK _) (ltrD2r _)). Qed.
+
+Lemma lerBrDr x y z : (x <= y - z) = (x + z <= y).
+Proof. by rewrite (monoLR (addrNK _) (lerD2r _)). Qed.
+
+Lemma ltrBrDr x y z : (x < y - z) = (x + z < y).
+Proof. by rewrite (monoLR (addrNK _) (ltrD2r _)). Qed.
+
+Definition lerBDr := (lerBlDr, lerBrDr).
+Definition ltrBDr := (ltrBlDr, ltrBrDr).
+Definition lterBDr := (lerBDr, ltrBDr).
+
+Lemma lerBlDl x y z : (x - y <= z) = (x <= y + z).
+Proof. by rewrite lterBDr addrC. Qed.
+
+Lemma ltrBlDl x y z : (x - y < z) = (x < y + z).
+Proof. by rewrite lterBDr addrC. Qed.
+
+Lemma lerBrDl x y z : (x <= y - z) = (z + x <= y).
+Proof. by rewrite lerBrDr addrC. Qed.
+
+Lemma ltrBrDl x y z : (x < y - z) = (z + x < y).
+Proof. by rewrite lterBDr addrC. Qed.
+
+Definition lerBDl := (lerBlDl, lerBrDl).
+Definition ltrBDl := (ltrBlDl, ltrBrDl).
+Definition lterBDl := (lerBDl, ltrBDl).
+
+Lemma lerDl x y : (x <= x + y) = (0 <= y).
+Proof. by rewrite -{1}[x]addr0 lterD2. Qed.
+
+Lemma ltrDl x y : (x < x + y) = (0 < y).
+Proof. by rewrite -{1}[x]addr0 lterD2. Qed.
+
+Lemma lerDr x y : (x <= y + x) = (0 <= y).
+Proof. by rewrite -{1}[x]add0r lterD2. Qed.
+
+Lemma ltrDr x y : (x < y + x) = (0 < y).
+Proof. by rewrite -{1}[x]add0r lterD2. Qed.
+
+Lemma gerDl x y : (x + y <= x) = (y <= 0).
+Proof. by rewrite -{2}[x]addr0 lterD2. Qed.
+
+Lemma gerBl x y : (x - y <= x) = (0 <= y).
+Proof. by rewrite lerBlDl lerDr. Qed.
+
+Lemma gtrDl x y : (x + y < x) = (y < 0).
+Proof. by rewrite -{2}[x]addr0 lterD2. Qed.
+
+Lemma gtrBl x y : (x - y < x) = (0 < y).
+Proof. by rewrite ltrBlDl ltrDr. Qed.
+
+Lemma gerDr x y : (y + x <= x) = (y <= 0).
+Proof. by rewrite -{2}[x]add0r lterD2. Qed.
+
+Lemma gtrDr x y : (y + x < x) = (y < 0).
+Proof. by rewrite -{2}[x]add0r lterD2. Qed.
+
+Definition cprD := (lerDl, lerDr, gerDl, gerDl,
+                    ltrDl, ltrDr, gtrDl, gtrDl).
+
+Lemma addr_ge0 x y : 0 <= x -> 0 <= y -> 0 <= x + y.
+Proof.
+move=> x_ge0 y_ge0; have := lerD2r y 0 x.
+by rewrite add0r x_ge0 => /(le_trans y_ge0).
+Qed.
+
+Lemma addr_gt0 x y : 0 < x -> 0 < y -> 0 < x + y.
+Proof.
+move=> x_gt0 y_gt0; have := ltrD2r y 0 x.
+by rewrite add0r x_gt0 => /(lt_trans y_gt0).
+Qed.
+
+(* Predicate definitions. *)
+
+Lemma posrE x : (x \is Num.pos) = (0 < x). Proof. by []. Qed.
+Lemma nnegrE x : (x \is Num.nneg) = (0 <= x). Proof. by []. Qed.
+Lemma realE x : (x \is Num.real) = (0 <= x) || (x <= 0). Proof. by []. Qed.
+Lemma negrE x : (x \is Num.neg) = (x < 0). Proof. by []. Qed.
+Lemma nposrE x : (x \is Num.npos) = (x <= 0). Proof. by []. Qed.
+
+(* General properties of <= and < *)
+
+Lemma le0r x : (0 <= x) = (x == 0) || (0 < x).
+Proof. by rewrite le_eqVlt eq_sym. Qed.
+Lemma lt0r x : (0 < x) = (x != 0) && (0 <= x). Proof. exact: lt_def. Qed.
+
+Lemma lt0r_neq0 (x : R) : 0 < x -> x != 0. Proof. by move=> /gt_eqF ->. Qed.
+Lemma ltr0_neq0 (x : R) : x < 0 -> x != 0. Proof. by move=> /lt_eqF ->. Qed.
+
+(* Comparison and opposite. *)
+
+Lemma oppr_gt0 x : (0 < - x) = (x < 0). Proof. by rewrite ltrNr oppr0. Qed.
+
+Definition oppr_gte0 := (oppr_ge0, oppr_gt0).
+
+Lemma oppr_le0 x : (- x <= 0) = (0 <= x). Proof. by rewrite lerNl oppr0. Qed.
+
+Lemma oppr_lt0 x : (- x < 0) = (0 < x). Proof. by rewrite ltrNl oppr0. Qed.
+
+Lemma gtrN x : 0 < x -> - x < x.
+Proof. by move=> n0; rewrite -subr_lt0 -opprD oppr_lt0 addr_gt0. Qed.
+
+Definition oppr_lte0 := (oppr_le0, oppr_lt0).
+Definition oppr_cp0 := (oppr_gte0, oppr_lte0).
+Definition lterNE := (oppr_cp0, lterN2).
+
+Lemma ge0_cp x : 0 <= x -> (- x <= 0) * (- x <= x).
+Proof. by move=> hx; rewrite oppr_cp0 hx (@le_trans _ _ 0) ?oppr_cp0. Qed.
+
+Lemma gerN x : 0 <= x -> - x <= x. Proof. by move=> x0; rewrite ge0_cp. Qed.
+
+Lemma gt0_cp x : 0 < x ->
+  (0 <= x) * (- x <= 0) * (- x <= x) * (- x < 0) * (- x < x).
+Proof.
+move=> hx; move: (ltW hx) => hx'; rewrite !ge0_cp hx' //.
+by rewrite oppr_cp0 hx // (@lt_trans _ _ 0) ?oppr_cp0.
+Qed.
+
+Lemma le0_cp x : x <= 0 -> (0 <= - x) * (x <= - x).
+Proof. by move=> hx; rewrite oppr_cp0 hx (@le_trans _ _ 0) ?oppr_cp0. Qed.
+
+Lemma lt0_cp x :
+  x < 0 -> (x <= 0) * (0 <= - x) * (x <= - x) * (0 < - x) * (x < - x).
+Proof.
+move=> hx; move: (ltW hx) => hx'; rewrite !le0_cp // hx'.
+by rewrite oppr_cp0 hx // (@lt_trans _ _ 0) ?oppr_cp0.
+Qed.
+
+(* Addition with left member known to be positive/negative *)
+
+Lemma ler_wpDl y x z : 0 <= x -> y <= z -> y <= x + z.
+Proof. by move=> *; rewrite -[y]add0r lerD. Qed.
+
+Lemma ltr_wpDl y x z : 0 <= x -> y < z -> y < x + z.
+Proof. by move=> *; rewrite -[y]add0r ler_ltD. Qed.
+
+Lemma ltr_pwDl y x z : 0 < x -> y <= z -> y < x + z.
+Proof. by move=> *; rewrite -[y]add0r ltr_leD. Qed.
+
+Lemma ltr_pDl y x z : 0 < x -> y < z -> y < x + z.
+Proof. by move=> *; rewrite -[y]add0r ltrD. Qed.
+
+Lemma ler_wnDl y x z : x <= 0 -> y <= z -> x + y <= z.
+Proof. by move=> *; rewrite -[z]add0r lerD. Qed.
+
+Lemma ltr_wnDl y x z : x <= 0 -> y < z -> x + y < z.
+Proof. by move=> *; rewrite -[z]add0r ler_ltD. Qed.
+
+Lemma ltr_nwDl y x z : x < 0 -> y <= z -> x + y < z.
+Proof. by move=> *; rewrite -[z]add0r ltr_leD. Qed.
+
+Lemma ltr_nDl y x z : x < 0 -> y < z -> x + y < z.
+Proof. by move=> *; rewrite -[z]add0r ltrD. Qed.
+
+(* Addition with right member we know positive/negative *)
+
+Lemma ler_wpDr y x z : 0 <= x -> y <= z -> y <= z + x.
+Proof. by move=> *; rewrite addrC ler_wpDl. Qed.
+
+Lemma ltr_wpDr y x z : 0 <= x -> y < z -> y < z + x.
+Proof. by move=> *; rewrite addrC ltr_wpDl. Qed.
+
+Lemma ltr_pwDr y x z : 0 < x -> y <= z -> y < z + x.
+Proof. by move=> *; rewrite addrC ltr_pwDl. Qed.
+
+Lemma ltr_pDr y x z : 0 < x -> y < z -> y < z + x.
+Proof. by move=> *; rewrite addrC ltr_pDl. Qed.
+
+Lemma ler_wnDr y x z : x <= 0 -> y <= z -> y + x <= z.
+Proof. by move=> *; rewrite addrC ler_wnDl. Qed.
+
+Lemma ltr_wnDr y x z : x <= 0 -> y < z -> y + x < z.
+Proof. by move=> *; rewrite addrC ltr_wnDl. Qed.
+
+Lemma ltr_nwDr y x z : x < 0 -> y <= z -> y + x < z.
+Proof. by move=> *; rewrite addrC ltr_nwDl. Qed.
+
+Lemma ltr_nDr y x z : x < 0 -> y < z -> y + x < z.
+Proof. by move=> *; rewrite addrC ltr_nDl. Qed.
+
+(* x and y have the same sign and their sum is null *)
+Lemma paddr_eq0 (x y : R) :
+  0 <= x -> 0 <= y -> (x + y == 0) = (x == 0) && (y == 0).
+Proof.
+rewrite le0r; case/orP=> [/eqP->|hx]; first by rewrite add0r eqxx.
+by rewrite (gt_eqF hx) /= => hy; rewrite gt_eqF // ltr_pwDl.
+Qed.
+
+Lemma naddr_eq0 (x y : R) :
+  x <= 0 -> y <= 0 -> (x + y == 0) = (x == 0) && (y == 0).
+Proof.
+by move=> lex0 ley0; rewrite -oppr_eq0 opprD paddr_eq0 ?oppr_cp0 // !oppr_eq0.
+Qed.
+
+Lemma addr_ss_eq0 (x y : R) :
+    (0 <= x) && (0 <= y) || (x <= 0) && (y <= 0) ->
+  (x + y == 0) = (x == 0) && (y == 0).
+Proof. by case/orP=> /andP []; [apply: paddr_eq0 | apply: naddr_eq0]. Qed.
+
+(* big sum and ler *)
+Lemma sumr_ge0 I (r : seq I) (P : pred I) (F : I -> R) :
+  (forall i, P i -> (0 <= F i)) -> 0 <= \sum_(i <- r | P i) (F i).
+Proof. exact: (big_ind _ _ (@ler_wpDl 0)). Qed.
+
+Lemma sumr_le0 I (r : seq I) (P : pred I) (F : I -> R) :
+  (forall i, P i -> F i <= 0) -> \sum_(i <- r | P i) F i <= 0.
+Proof. by move=> F0; elim/big_ind : _ => // i x Pi; exact/ler_wnDl. Qed.
+
+Lemma ler_sum I (r : seq I) (P : pred I) (F G : I -> R) :
+    (forall i, P i -> F i <= G i) ->
+  \sum_(i <- r | P i) F i <= \sum_(i <- r | P i) G i.
+Proof. exact: (big_ind2 _ (lexx _) lerD). Qed.
+
+Lemma ler_sum_nat (m n : nat) (F G : nat -> R) :
+  (forall i, (m <= i < n)%N -> F i <= G i) ->
+  \sum_(m <= i < n) F i <= \sum_(m <= i < n) G i.
+Proof. by move=> le_FG; rewrite !big_nat ler_sum. Qed.
+
+Lemma ltr_sum I (r : seq I) (P : pred I) (F G : I -> R) :
+  has P r -> (forall i, P i -> F i < G i) ->
+  \sum_(i <- r | P i) F i < \sum_(i <- r | P i) G i.
+Proof.
+rewrite -big_filter -[ltRHS]big_filter -size_filter_gt0.
+case: filter (filter_all P r) => //= x {}r /andP[Px Pr] _ ltFG.
+rewrite !big_cons ltr_leD// ?ltFG// -(all_filterP Pr) !big_filter.
+by rewrite ler_sum => // i Pi; rewrite ltW ?ltFG.
+Qed.
+
+Lemma ltr_sum_nat (m n : nat) (F G : nat -> R) :
+  (m < n)%N -> (forall i, (m <= i < n)%N -> F i < G i) ->
+  \sum_(m <= i < n) F i < \sum_(m <= i < n) G i.
+Proof.
+move=> lt_mn i; rewrite big_nat [ltRHS]big_nat ltr_sum//.
+by apply/hasP; exists m; rewrite ?mem_index_iota leqnn lt_mn.
+Qed.
+
+Lemma psumr_eq0 (I : eqType) (r : seq I) (P : pred I) (F : I -> R) :
+    (forall i, P i -> 0 <= F i) ->
+  (\sum_(i <- r | P i) (F i) == 0) = (all (fun i => (P i) ==> (F i == 0)) r).
+Proof.
+elim: r=> [|a r ihr hr] /=; rewrite (big_nil, big_cons); first by rewrite eqxx.
+by case: ifP=> pa /=; rewrite ?paddr_eq0 ?ihr ?hr // sumr_ge0.
+Qed.
+
+(* :TODO: Cyril : See which form to keep *)
+Lemma psumr_eq0P (I : finType) (P : pred I) (F : I -> R) :
+     (forall i, P i -> 0 <= F i) -> \sum_(i | P i) F i = 0 ->
+  (forall i, P i -> F i = 0).
+Proof.
+move=> F_ge0 /eqP; rewrite psumr_eq0 // -big_all big_andE => /forallP hF i Pi.
+by move: (hF i); rewrite implyTb Pi /= => /eqP.
+Qed.
+
+Lemma psumr_neq0 (I : eqType) (r : seq I) (P : pred I) (F : I -> R) :
+    (forall i, P i -> 0 <= F i) ->
+  (\sum_(i <- r | P i) (F i) != 0) = (has (fun i => P i && (0 < F i)) r).
+Proof.
+move=> F_ge0; rewrite psumr_eq0// -has_predC; apply: eq_has => x /=.
+by case Px: (P x); rewrite //= lt_def F_ge0 ?andbT.
+Qed.
+
+Lemma psumr_neq0P (I : finType) (P : pred I) (F : I -> R) :
+     (forall i, P i -> 0 <= F i) -> \sum_(i | P i) F i <> 0 ->
+  (exists i, P i && (0 < F i)).
+Proof. by move=> ? /eqP; rewrite psumr_neq0// => /hasP[x _ ?]; exists x. Qed.
+
+Lemma ltr_wpMn2r n : (0 < n)%N -> {homo (@GRing.natmul R)^~ n : x y / x < y}.
+Proof.
+elim: n => // -[|n] IHn _ x y ltxy//.
+by rewrite mulrS [in ltRHS]mulrS ltrD// IHn.
+Qed.
+
+Lemma ler_wMn2r n : {homo (@GRing.natmul R)^~ n : x y / x <= y}.
+Proof. by case: n => // n; exact/ltW_homo/ltr_wpMn2r. Qed.
+
+Lemma mulrn_wge0 x n : 0 <= x -> 0 <= x *+ n.
+Proof. by move=> /(ler_wMn2r n); rewrite mul0rn. Qed.
+
+Lemma mulrn_wle0 x n : x <= 0 -> x *+ n <= 0.
+Proof. by move=> /(ler_wMn2r n); rewrite mul0rn. Qed.
+
+Lemma ler_wpMn2l x :
+  0 <= x -> {homo (@GRing.natmul R x) : m n / (m <= n)%N >-> m <= n}.
+Proof. by move=> xge0 m n /subnK <-; rewrite mulrnDr ler_wpDl ?mulrn_wge0. Qed.
+
+Lemma ler_wnMn2l x :
+  x <= 0 -> {homo (@GRing.natmul R x) : m n / (n <= m)%N >-> m <= n}.
+Proof.
+by move=> xle0 m n hmn /=; rewrite -lerN2 -!mulNrn ler_wpMn2l // oppr_cp0.
+Qed.
+
+(* TODO negative versions *)
+Lemma mulrn_lgt0 x n : (0 < n)%N -> (0 < x) -> (0 < x *+ n).
+Proof.
+move=> + xgt0; elim: n => // n IHn _; rewrite mulrS (lt_le_trans xgt0)// lerDl.
+by case: n IHn => // n /(_ _)/ltW->.
+Qed.
+
+Lemma pmulrIn x : x > 0 -> injective (GRing.natmul x).
+Proof.
+move=> x_neq0 m n /eqP; wlog lt_mn : m n / (m < n)%N => [hwlog|].
+  by case: (ltngtP m n) => // [|+ /eqP/esym/eqP] => /hwlog/[apply].
+by rewrite eq_sym -subr_eq0 -mulrnBr 1?ltnW// gt_eqF// mulrn_lgt0// subn_gt0.
+Qed.
+
+Lemma ler_pMn2l x :
+  0 < x -> {mono (@GRing.natmul R x) : m n / (m <= n)%N >-> m <= n}.
+Proof.
+move=> x_gt0; apply: le_mono; elim=> [|m IHm] [|n]//= lt_mn.
+ by rewrite mulr0n mulrn_lgt0.
+by rewrite !mulrS ler_ltD// IHm.
+Qed.
+
+Lemma ltr_pMn2l x :
+  0 < x -> {mono (@GRing.natmul R x) : m n / (m < n)%N >-> m < n}.
+Proof. by move=> x_gt0; apply: leW_mono (ler_pMn2l _). Qed.
+
+Lemma ler_nMn2l x :
+  x < 0 -> {mono (@GRing.natmul R x) : m n / (n <= m)%N >-> m <= n}.
+Proof. by move=> xlt0 m n /=; rewrite -lerN2 -!mulNrn ler_pMn2l// oppr_gt0. Qed.
+
+Lemma ltr_nMn2l x :
+  x < 0 -> {mono (@GRing.natmul R x) : m n / (n < m)%N >-> m < n}.
+Proof. by move=> x_lt0; apply: leW_nmono (ler_nMn2l _). Qed.
+
+Fact nneg_addr_closed : addr_closed (@Num.nneg R).
+Proof. by split; [apply: lexx | apply: addr_ge0]. Qed.
+HB.instance Definition _ := GRing.isAddClosed.Build R nneg_num_pred
+  nneg_addr_closed.
+
+Fact real_oppr_closed : oppr_closed (@Num.real R).
+Proof. by move=> x; rewrite /= !realE oppr_ge0 orbC -!oppr_ge0 opprK. Qed.
+HB.instance Definition _ := GRing.isOppClosed.Build R real_num_pred
+  real_oppr_closed.
+
+Lemma real0 : 0%R \is @Num.real R. Proof. by rewrite qualifE/= lexx. Qed.
+#[local] Hint Resolve real0 : core.
+
+(* Comparability in a numDomain *)
+
+Lemma comparable0r x : (0 >=< x)%R = (x \is Num.real). Proof. by []. Qed.
+
+Lemma comparabler0 x : (x >=< 0)%R = (x \is Num.real).
+Proof. by rewrite comparable_sym. Qed.
+
+Lemma subr_comparable0 x y : (x - y >=< 0)%R = (x >=< y)%R.
+Proof. by rewrite /Num.comparable subr_ge0 subr_le0. Qed.
+
+Lemma comparablerE x y : (x >=< y)%R = (x - y \is Num.real).
+Proof. by rewrite -comparabler0 subr_comparable0. Qed.
+
+(* Properties of the real subset. *)
+
+Lemma ger0_real x : 0 <= x -> x \is Num.real.
+Proof. by rewrite realE => ->. Qed.
+
+Lemma ler0_real x : x <= 0 -> x \is Num.real.
+Proof. by rewrite realE orbC => ->. Qed.
+
+Lemma gtr0_real x : 0 < x -> x \is Num.real. Proof. by move=> /ltW/ger0_real. Qed.
+
+Lemma ltr0_real x : x < 0 -> x \is Num.real. Proof. by move=> /ltW/ler0_real. Qed.
+
+Lemma big_real x0 op I (P : pred I) F (s : seq I) :
+  {in Num.real &, forall x y, op x y \is Num.real} -> x0 \is Num.real ->
+  {in P, forall i, F i \is Num.real} -> \big[op/x0]_(i <- s | P i) F i \is Num.real.
+Proof. exact: comparable_bigr. Qed.
+
+Lemma addr_min_max x y : min x y + max x y = x + y.
+Proof. by rewrite /min /max; case: ifP => //; rewrite addrC. Qed.
+
+Lemma addr_max_min x y : max x y + min x y = x + y.
+Proof. by rewrite addrC addr_min_max. Qed.
+
+Lemma minr_to_max x y : min x y = x + y - max x y.
+Proof. by rewrite -[x + y]addr_min_max addrK. Qed.
+
+Lemma maxr_to_min x y : max x y = x + y - min x y.
+Proof. by rewrite -[x + y]addr_max_min addrK. Qed.
+
+Lemma lteifNl C x y : (- x < y ?<= if C) = (- y < x ?<= if C).
+Proof. by case: C; rewrite /= lterNl. Qed.
+
+Lemma lteifNr C x y : (x < - y ?<= if C) = (y < - x ?<= if C).
+Proof. by case: C; rewrite /= lterNr. Qed.
+
+Lemma lteif0Nr C x : (0 < - x ?<= if C) = (x < 0 ?<= if C).
+Proof. by case: C; rewrite /= (oppr_ge0, oppr_gt0). Qed.
+
+Lemma lteifNr0 C x : (- x < 0 ?<= if C) = (0 < x ?<= if C).
+Proof. by case: C; rewrite /= (oppr_le0, oppr_lt0). Qed.
+
+Lemma lteifN2 C : {mono -%R : x y /~ x < y ?<= if C :> R}.
+Proof. by case: C => ? ?; rewrite /= lterN2. Qed.
+
+Definition lteif_oppE := (lteif0Nr, lteifNr0, lteifN2).
+
+Lemma lteifD2l C x : {mono +%R x : y z / y < z ?<= if C}.
+Proof. by case: C => ? ?; rewrite /= lterD2. Qed.
+
+Lemma lteifD2r C x : {mono +%R^~ x : y z / y < z ?<= if C}.
+Proof. by case: C => ? ?; rewrite /= lterD2. Qed.
+
+Definition lteifD2 := (lteifD2l, lteifD2r).
+
+Lemma lteifBlDr C x y z : (x - y < z ?<= if C) = (x < z + y ?<= if C).
+Proof. by case: C; rewrite /= lterBDr. Qed.
+
+Lemma lteifBrDr C x y z : (x < y - z ?<= if C) = (x + z < y ?<= if C).
+Proof. by case: C; rewrite /= lterBDr. Qed.
+
+Definition lteifBDr := (lteifBlDr, lteifBrDr).
+
+Lemma lteifBlDl C x y z : (x - y < z ?<= if C) = (x < y + z ?<= if C).
+Proof. by case: C; rewrite /= lterBDl. Qed.
+
+Lemma lteifBrDl C x y z : (x < y - z ?<= if C) = (z + x < y ?<= if C).
+Proof. by case: C; rewrite /= lterBDl. Qed.
+
+Definition lteifBDl := (lteifBlDl, lteifBrDl).
+
+End porderZmodTypeTheory.
+
+#[global]
+Hint Extern 0 (is_true (0 \is Num.real)) => solve [apply: real0] : core.
+#[global] Hint Resolve lerN2 ltrN2 : core.
+
+Arguments real0 {R}.
+Arguments lerN2 {R}.
+Arguments ltrN2 {R}.
+
 End Theory.
 
 Module Exports. HB.reexport. End Exports.
