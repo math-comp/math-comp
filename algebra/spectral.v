@@ -264,29 +264,41 @@ Proof. by move=> Asym Areal; rewrite hermitian_normalmx// realsym_hermsym. Qed.
 
 End normalmx.
 
+Local Notation dotmx_def := (form_of_matrix (@conjC _) 1%:M).
+Definition dotmx (C : numClosedFieldType) n (u v : 'rV[C]_n) :=
+  dotmx_def u%R v%R.
+
 Section Spectral.
 Variable (C : numClosedFieldType).
 Set Default Proof Using "C".
 
-Local Notation dotmx_def := (form_of_matrix (@conjC _) 1%:M).
-Definition dotmx n (u v : 'rV[C]_n) := dotmx_def u%R v%R.
-
 (*
 TODO: bug report
-we were expecting
+without the lock we were expecting
 HB.instance Definition _ n := Bilinear.on (@dotmx n).
 to be sufficient to equip dotmx with the bilinear structure
 but needed to use .copy in the end as in:
+
+TODO: feature request
+implement copy modulo lock
 *)
-HB.instance Definition _ n := Bilinear.copy (@dotmx n) dotmx_def.
+(* Lemma dotmx_bilinear n : isBilinear _ _ _ _ *%R (conjC \; *%R) (@dotmx C n). *)
+(* Proof. *)
+(* rewrite unlock; constructor => /= ?. *)
+(* - exact: linearBl. *)
+(* - exact: linearBr. *)
+(* - exact: linearZl_LR. *)
+(* - exact: linearZr_LR. *)
+(* Qed. *)
+(* HB.instance Definition _ n := dotmx_bilinear n. *)
+
+HB.instance Definition _ n := Bilinear.copy (@dotmx C n) (@dotmx C n).
 
 Local Notation "''[' u , v ]" := (dotmx u v) : ring_scope.
 Local Notation "''[' u ]" := '[u, u]%R : ring_scope.
 
-HB.instance Definition _ n := Hermitian.copy (@dotmx n) dotmx_def.
-
 Lemma dotmxE n (u v : 'rV[C]_n) : '[u, v] = ( u *m v ^t* ) 0 0.
-Proof. by rewrite /dotmx /form_of_matrix mulmx1 /= trace_mx11. Qed.
+Proof. by rewrite /dotmx unlock  mulmx1 /= trace_mx11. Qed.
 
 Lemma row_unitarymxP m n {M : 'M[C]_(m, n)} :
   reflect (forall i j, '[row i M, row j M] = (i == j)%:R) (M \is unitarymx).
@@ -298,18 +310,24 @@ apply/matrixP=> i j; rewrite !mxE; have := Mo i j; rewrite dotmxE !mxE => <-.
 by apply: eq_bigr => /= k _; rewrite !mxE.
 Qed.
 
-Fact dotmx_is_dotmx n (u : 'rV[C]_n) : u != 0 -> 0 < '[u].
+Fact dotmx_is_hermitian n : isHermitianSesquilinear _ _ false conjC (@dotmx C n).
 Proof.
-move=> u_neq0; rewrite dotmxE mxE.
+split=> /= u v; rewrite !dotmxE/= expr0 mul1r.
+suff -> : u *m v ^t* = ((v *m u ^t*) ^t*) by rewrite !mxE.
+by rewrite !trmx_mul map_mxM/= trmxCK.
+Qed.
+HB.instance Definition _ n := @dotmx_is_hermitian n.
+
+Fact dotmx_is_dot n : isDotProduct _ _ (@dotmx C n).
+Proof.
+split => /= u u_neq0; rewrite dotmxE mxE.
 suff /existsP[i ui_neq0] : [exists i, u ``_ i != 0].
   rewrite (bigD1 i) //= ltr_wpDr// ?sumr_ge0// ?mxE ?mul_conjC_gt0//.
   by move=> j _; rewrite !mxE mul_conjC_ge0.
 apply: contraNT u_neq0; rewrite negb_exists => /forallP uNN0.
 by apply/eqP/rowP=> j; rewrite mxE; apply/eqP; rewrite -[_ == _]negbK uNN0.
 Qed.
-
-HB.instance Definition _ n := isDotProduct.Build _ _ (@dotmx n)
-  (@dotmx_is_dotmx n).
+HB.instance Definition _ n := (@dotmx_is_dot n).
 
 Local Notation "B ^!" :=
   (orthomx (@conjC C) (mx_of_hermitian (hermitian1mx _)) B) : matrix_set_scope.
@@ -327,8 +345,8 @@ Lemma orthomx_disj n p q (A : 'M[C]_(p, n)) (B :'M_(q, n)) :
   A '_|_ B -> (A :&: B = 0)%MS.
 Proof.
 move=> nAB; apply/eqP/rowV0Pn => [[v]]; rewrite sub_capmx => /andP [vA vB].
-apply/negP; rewrite negbK.
-by rewrite -(dnorm_eq0 (@dotmx n)) -orthomxE (orthomxP _ _ _ nAB).
+apply/negP; rewrite negbK -(dnorm_eq0 (@dotmx C n)).
+by rewrite -orthomxE (orthomxP _ _ _ nAB).
 Qed.
 
 Lemma orthomx_ortho_disj n p (A : 'M[C]_(p, n)) : (A :&: A^! = 0)%MS.
@@ -442,7 +460,7 @@ have [v /and4P [vBn v_neq0 dAv_ge0 dAsub]] :
       rewrite -mxrank_eq0 rank_ortho -lt0n subn_gt0.
       by rewrite mxrank_unitary // -addn1.
     rewrite orthomx_sym in vBn.
-    exists v; rewrite vBn v_neq0 -pBE.
+    exists v; rewrite vBn v_neq0 -pBE/=.
       rewrite ['[_, _]](hermmx_eq0P _ _) ?lexx //=.
       rewrite (submx_trans (proj_ortho_sub _ _)) //.
       by rewrite -{1}[B]addr0 addmx_sub_adds ?sub0mx.
@@ -451,7 +469,7 @@ have [v /and4P [vBn v_neq0 dAv_ge0 dAsub]] :
     by rewrite invr_gt0 sqrtC_gt0 lt_def ?dnorm_eq0 ?dnorm_ge0 BoSn_neq0.
   exists BoSn; apply/and4P; split => //.
   - by rewrite orthomx_sym ?proj_ortho_sub // /gtr_eqF.
-  - rewrite -pBE linearDl //.
+  - rewrite -pBE linearDl/=.
     rewrite [X in X + '[_]](hermmx_eq0P _ _) ?add0r ?dnorm_ge0 //.
     by rewrite orthomx_proj_mx_ortho // orthomx_sym.
   - by rewrite -pBE addmx_sub_adds // proj_ortho_sub.
