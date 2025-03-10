@@ -203,6 +203,8 @@ Qed.
 
 Lemma ltr01 : 0 < 1 :> R. Proof. by rewrite lt_def oner_neq0 ler01. Qed.
 
+Definition lter01 := (ler01, ltr01).
+
 Lemma le0r x : (0 <= x) = (x == 0) || (0 < x).
 Proof. by rewrite le_eqVlt eq_sym. Qed.
 
@@ -346,6 +348,7 @@ Proof. by move=> x_gt0; rewrite !le0r mulf_eq0 pmulr_rgt0 // gt_eqF. Qed.
 (* Integer comparisons and characteristic 0. *)
 Lemma ler01 : 0 <= 1 :> R. Proof. exact: ler01. Qed.
 Lemma ltr01 : 0 < 1 :> R. Proof. exact: ltr01. Qed.
+Definition lter01 := lter01.
 Lemma ler0n n : 0 <= n%:R :> R. Proof. by rewrite -nnegrE rpred_nat. Qed.
 Hint Extern 0 (is_true (@Order.le ring_display _ _ _)) =>
   (apply: ler01) : core.
@@ -528,8 +531,6 @@ by have := rpredD xBy_real yBz_real; rewrite addrA addrNK.
 Qed.
 
 (* Ordered ring properties. *)
-
-Definition lter01 := (ler01, ltr01).
 
 Lemma addr_ge0 x y : 0 <= x -> 0 <= y -> 0 <= x + y.
 Proof. exact: addr_ge0. Qed.
