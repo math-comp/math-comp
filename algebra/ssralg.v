@@ -7254,9 +7254,16 @@ End PairComSemiRing.
 
 (* TODO: HB.saturate *)
 #[export]
-HB.instance Definition _ (R1 R2 : nzRingType) := NzSemiRing.on (R1 * R1)%type.
+HB.instance Definition _ (R1 R2 : comNzSemiRingType) :=
+  NzSemiRing.on (R1 * R2)%type.
 #[export]
-HB.instance Definition _ (R1 R2 : comNzRingType) := NzSemiRing.on (R1 * R1)%type.
+HB.instance Definition _ (R1 R2 : pzRingType) := PzSemiRing.on (R1 * R2)%type.
+#[export]
+HB.instance Definition _ (R1 R2 : nzRingType) := NzSemiRing.on (R1 * R2)%type.
+#[export]
+HB.instance Definition _ (R1 R2 : comPzRingType) := PzRing.on (R1 * R2)%type.
+#[export]
+HB.instance Definition _ (R1 R2 : comNzRingType) := NzRing.on (R1 * R2)%type.
 (* /TODO *)
 
 Section PairLmod.
