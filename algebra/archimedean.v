@@ -247,6 +247,45 @@ apply: (iffP idP) => [|[n ->]]; rewrite // natrEtruncn => /eqP <-.
 by exists (truncn x).
 Qed.
 
+Lemma truncn_le x : (truncn x)%:R <= x = (0 <= x).
+Proof. by have := Def.truncnP x; case: ifP => [+ /andP[] | + /eqP->//]. Qed.
+
+Lemma real_truncnS_gt x : x \is Rreal -> x < (truncn x).+1%:R.
+Proof. by move/real_ge0P => [/truncn_itv/andP[]|/lt_le_trans->]. Qed.
+
+Lemma truncn_ge_nat x n : 0 <= x -> (n <= truncn x)%N = (n%:R <= x).
+Proof.
+move=> /truncn_itv /andP[letx ltxt1]; apply/idP/idP => lenx.
+  by apply: le_trans letx; rewrite ler_nat.
+by rewrite -ltnS -(ltr_nat R); apply: le_lt_trans ltxt1.
+Qed.
+
+Lemma truncn_gt_nat x n : (n < truncn x)%N = (n.+1%:R <= x).
+Proof.
+have := Def.truncnP x; case: ifP => [x0 _ | x0 /eqP->].
+  by rewrite truncn_ge_nat.
+by rewrite ltn0; apply/esym/(contraFF _ x0)/le_trans.
+Qed.
+
+Lemma truncn_lt_nat x n : 0 <= x -> (truncn x < n)%N = (x < n%:R).
+Proof. by move=> ?; rewrite real_ltNge ?ger0_real// ltnNge truncn_ge_nat. Qed.
+
+Lemma real_truncn_le_nat x n : x \is real -> (truncn x <= n)%N = (x < n.+1%:R).
+Proof. by move=> ?; rewrite real_ltNge// leqNgt truncn_gt_nat. Qed.
+
+Lemma truncn_eq x n : 0 <= x -> (truncn x == n) = (n%:R <= x < n.+1%:R).
+Proof.
+by move=> xr; apply/eqP/idP => [<-|]; [exact: truncn_itv|exact: truncn_def].
+Qed.
+
+Lemma le_truncn : {homo truncn : x y / x <= y >-> (x <= y)%N}.
+Proof.
+move=> x y lexy; move: (Def.truncnP x) (Def.truncnP y).
+case: ifP => [x0 /andP[letx _] | x0 /eqP->//].
+case: ifP => [y0 /andP[_] | y0 /eqP->]; [|by rewrite (le_trans x0 lexy) in y0].
+by move=> /(le_lt_trans lexy) /(le_lt_trans letx); rewrite ltr_nat ltnS.
+Qed.
+
 Lemma truncnD :
   {in nat_num & Rnneg, {morph truncn : x y / x + y >-> (x + y)%N}}.
 Proof.
@@ -283,10 +322,9 @@ Proof. by move/Rreal_nat/real_normK. Qed.
 
 Lemma truncn_gt0 x : (0 < truncn x)%N = (1 <= x).
 Proof.
-case: ifP (Def.truncnP x) => [le0x /andP[lemx ltxm1] | le0x /eqP ->]; last first.
-  by apply/esym; apply/contraFF/le_trans: le0x.
-apply/idP/idP => [m_gt0 | x_ge1]; first by apply: le_trans lemx; rewrite ler1n.
-by rewrite -ltnS -(ltr_nat R) (le_lt_trans x_ge1).
+have := Def.truncnP x; case: ifP => [x0 | x0 /eqP<-].
+  by rewrite truncn_ge_nat.
+by rewrite ltnn; apply/esym/(contraFF _ x0)/le_trans.
 Qed.
 
 Lemma truncn0Pn x : reflect (truncn x = 0%N) (~~ (1 <= x)).
@@ -377,6 +415,17 @@ Qed.
 Lemma real_floor_ge_int x n : x \is Rreal -> (n%:~R <= x) = (n <= floor x).
 Proof. by move=> ?; rewrite real_floor_ge_int_tmp. Qed.
 
+Lemma real_floor_lt_int x n : x \is Rreal -> (floor x < n) = (x < n%:~R).
+Proof.
+by move=> ?; rewrite [RHS]real_ltNge ?realz -?real_floor_ge_int_tmp -?ltNge.
+Qed.
+
+Lemma real_floor_eq x n : x \is Rreal ->
+  (floor x == n) = (n%:~R <= x < (n + 1)%:~R).
+Proof.
+by move=> xr; apply/eqP/idP => [<-|]; [exact: real_floor_itv|exact: floor_def].
+Qed.
+
 Lemma le_floor : {homo floor : x y / x <= y}.
 Proof.
 move=> x y lexy; move: (floorP x) (floorP y); rewrite (ger_real lexy).
@@ -435,6 +484,33 @@ Qed.
 Lemma floorX n : {in int_num, {morph floor : x / x ^+ n}}.
 Proof. by move=> _ /intrP[m ->]; rewrite -rmorphXn !intrKfloor. Qed.
 
+Lemma real_floor_ge0 x : x \is Rreal -> (0 <= floor x) = (0 <= x).
+Proof. by move=> ?; rewrite real_floor_ge_int_tmp. Qed.
+
+Lemma floor_lt0 x : (floor x < 0) = (x < 0).
+Proof.
+have := floorP x; case: ifP => [xr _ | xr /eqP<-].
+  by rewrite real_floor_lt_int.
+by rewrite ltxx; apply/esym/(contraFF _ xr)/ltr0_real.
+Qed.
+
+Lemma real_floor_le0 x : x \is Rreal -> (floor x <= 0) = (x < 1).
+Proof. by move=> ?; rewrite -ltzD1 add0r real_floor_lt_int. Qed.
+
+Lemma floor_gt0 x : (floor x > 0) = (x >= 1).
+Proof.
+have := floorP x; case: ifP => [xr _ | xr /eqP->].
+  by rewrite gtz0_ge1 real_floor_ge_int_tmp.
+by rewrite ltxx; apply/esym/(contraFF _ xr)/ger1_real.
+Qed.
+
+Lemma floor_neq0 x : (floor x != 0) = (x < 0) || (x >= 1).
+Proof.
+have := floorP x; case: ifP => [xr _ | xr /eqP->]; rewrite ?eqxx/=.
+  by rewrite neq_lt floor_lt0 floor_gt0.
+by apply/esym/(contraFF _ xr) => /orP[]; [exact: ltr0_real|exact: ger1_real].
+Qed.
+
 (* ceil and int_num *)
 
 Lemma real_ceil_itv x : x \is Rreal -> (ceil x - 1)%:~R < x <= (ceil x)%:~R.
@@ -465,6 +541,17 @@ Qed.
 #[deprecated(since="mathcomp 2.4.0", note="Use real_ceil_le_int_tmp instead.")]
 Lemma real_ceil_le_int x n : x \is Rreal -> x <= n%:~R = (ceil x <= n).
 Proof. by move=> ?; rewrite real_ceil_le_int_tmp. Qed.
+
+Lemma real_ceil_gt_int x n : x \is Rreal -> (n < ceil x) = (n%:~R < x).
+Proof.
+by move=> ?; rewrite [RHS]real_ltNge ?realz -?real_ceil_le_int_tmp ?ltNge.
+Qed.
+
+Lemma real_ceil_eq x n : x \is Rreal ->
+  (ceil x == n) = ((n - 1)%:~R < x <= n%:~R).
+Proof.
+by move=> xr; apply/eqP/idP => [<-|]; [exact: real_ceil_itv|exact: ceil_def].
+Qed.
 
 (* TODO: rename to le_ceil,
    once the currently deprecated one has been removed *)
@@ -503,6 +590,21 @@ Qed.
 
 Lemma ceilX n : {in int_num, {morph ceil : x / x ^+ n}}.
 Proof. by move=> _ /intrP[m ->]; rewrite -rmorphXn !intrKceil. Qed.
+
+Lemma real_ceil_ge0 x : x \is Rreal -> (0 <= ceil x) = (-1 < x).
+Proof. by move=> ?; rewrite oppr_ge0 real_floor_le0 ?realN// ltrNl. Qed.
+
+Lemma ceil_lt0 x : (ceil x < 0) = (x <= -1).
+Proof. by rewrite oppr_lt0 floor_gt0 lerNr. Qed.
+
+Lemma real_ceil_le0 x : x \is Rreal -> (ceil x <= 0) = (x <= 0).
+Proof. by move=> ?; rewrite real_ceil_le_int_tmp. Qed.
+
+Lemma ceil_gt0 x : (ceil x > 0) = (x > 0).
+Proof. by rewrite oppr_gt0 floor_lt0 oppr_lt0. Qed.
+
+Lemma ceil_neq0 x : (ceil x != 0) = (x <= -1) || (x > 0).
+Proof. by rewrite oppr_eq0 floor_neq0 oppr_lt0 lerNr orbC. Qed.
 
 Lemma real_ceil_floor x : x \is Rreal ->
   ceil x = floor x + (~~ (x \is a int_num)).
@@ -699,6 +801,12 @@ case/truncn_itv/andP: (normr_ge0 x) => _ /ltr_normlW xlt le_b_i.
 by rewrite (lt_le_trans xlt) // -natrX ler_nat (ltn_trans le_b_i) // ltn_expl.
 Qed.
 
+Lemma truncnS_gt x : x < (truncn x).+1%:R.
+Proof. exact: real_truncnS_gt. Qed.
+
+Lemma truncn_le_nat x n : (truncn x <= n)%N = (x < n.+1%:R).
+Proof. exact: real_truncn_le_nat. Qed.
+
 Lemma floor_itv x : (floor x)%:~R <= x < (floor x + 1)%:~R.
 Proof. exact: real_floor_itv. Qed.
 
@@ -717,11 +825,23 @@ Proof. by rewrite real_floor_ge_int_tmp. Qed.
 Lemma floor_ge_int_tmp x n : (n <= floor x) = (n%:~R <= x).
 Proof. exact: real_floor_ge_int_tmp. Qed.
 
+Lemma floor_lt_int x n : (floor x < n) = (x < n%:~R).
+Proof. exact: real_floor_lt_int. Qed.
+
+Lemma floor_eq x n : (floor x == n) = (n%:~R <= x < (n + 1)%:~R).
+Proof. exact: real_floor_eq. Qed.
+
 Lemma floorDzr : {in @int_num R, {morph floor : x y / x + y}}.
 Proof. by move=> x xz y; apply/real_floorDzr/num_real. Qed.
 
 Lemma floorDrz x y : y \is a int_num -> floor (x + y) = floor x + floor y.
 Proof. by move=> yz; apply/real_floorDrz/yz/num_real. Qed.
+
+Lemma floor_ge0 x : (0 <= floor x) = (0 <= x).
+Proof. exact: real_floor_ge0. Qed.
+
+Lemma floor_le0 x : (floor x <= 0) = (x < 1).
+Proof. exact: real_floor_le0. Qed.
 
 Lemma ceil_itv x : (ceil x - 1)%:~R < x <= (ceil x)%:~R.
 Proof. exact: real_ceil_itv. Qed.
@@ -740,11 +860,23 @@ Proof. by rewrite real_ceil_le_int_tmp. Qed.
 Lemma ceil_le_int_tmp x n : (ceil x <= n) = (x <= n%:~R).
 Proof. exact: real_ceil_le_int_tmp. Qed.
 
+Lemma ceil_gt_int x n : (n < ceil x) = (n%:~R < x).
+Proof. exact: real_ceil_gt_int. Qed.
+
+Lemma ceil_eq x n : (ceil x == n) = ((n - 1)%:~R < x <= n%:~R).
+Proof. exact: real_ceil_eq. Qed.
+
 Lemma ceilDzr : {in @int_num R, {morph ceil : x y / x + y}}.
 Proof. by move=> x xz y; apply/real_ceilDzr/num_real. Qed.
 
 Lemma ceilDrz x y : y \is a int_num -> ceil (x + y) = ceil x + ceil y.
 Proof. by move=> yz; apply/real_ceilDrz/yz/num_real. Qed.
+
+Lemma ceil_ge0 x : (0 <= ceil x) = (-1 < x).
+Proof. exact: real_ceil_ge0. Qed.
+
+Lemma ceil_le0 x : (ceil x <= 0) = (x <= 0).
+Proof. exact: real_ceil_le0. Qed.
 
 Lemma ceil_floor x : ceil x = floor x + (~~ (x \is a int_num)).
 Proof. exact: real_ceil_floor. Qed.
