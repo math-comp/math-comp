@@ -391,6 +391,10 @@ Lemma intr_int m : m%:~R \is a int_num.
 Proof. by rewrite intrE; case: m => n; rewrite ?opprK natr_nat ?orbT. Qed.
 #[local] Hint Resolve intr_int : core.
 
+Lemma natr_int n : n%:R \is a int_num.
+Proof. by rewrite intrE natr_nat. Qed.
+#[local] Hint Resolve natr_int : core.
+
 Lemma intrP x : reflect (exists m, x = m%:~R) (x \is a int_num).
 Proof.
 apply: (iffP idP) => [x_int | [m -> //]].
@@ -673,6 +677,8 @@ Arguments intrP {R x}.
 #[global] Hint Extern 0 (is_true (_%:R \in nat_num_subdef)) => apply: natr_nat : core.
 #[global] Hint Extern 0 (is_true (_%:~R \is a int_num)) => apply: intr_int : core.
 #[global] Hint Extern 0 (is_true (_%:~R \in int_num_subdef)) => apply: intr_int : core.
+#[global] Hint Extern 0 (is_true (_%:R \is a int_num)) => apply: natr_int : core.
+#[global] Hint Extern 0 (is_true (_%:R \in int_num_subdef)) => apply: natr_int : core.
 #[global] Hint Extern 0 (is_true (0 \is a nat_num)) => apply: nat_num0 : core.
 #[global] Hint Extern 0 (is_true (0 \in nat_num_subdef)) => apply: nat_num0 : core.
 #[global] Hint Extern 0 (is_true (1 \is a nat_num)) => apply: nat_num1 : core.
