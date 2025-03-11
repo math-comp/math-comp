@@ -13,6 +13,6 @@
     `real_ceil_le0`, `ceil_gt0`, `ceil_neq0`, `real_abs_ceil_ge`,
     `floor_lt_int`, `floor_eq`, `floor_ge0`, `floor_le0`,
     `abs_floor_ge`, `ceil_gt_int`, `ceil_eq`, `ceil_ge0`, `ceil_le0`,
-    `abs_ceil_ge` `lt_succ_trunc`, `trunc_le_nat`
+    `abs_ceil_ge` `lt_succ_trunc`, `trunc_le_nat` and `natr_int`
     ([#1359](https://github.com/math-comp/math-comp/pull/1359),
     by Pierre Roux).
