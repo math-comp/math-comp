@@ -26,7 +26,7 @@
   + `comRingType` -> `comNzRingType`
   + `subSemiRingType` -> `subNzSemiRingType`
   + `subComSemiRingType` -> `subComNzSemiRingType`
-  + `subRingType` -> `nzSubRingType`
+  + `subRingType` -> `subNzRingType`
   + ``subComNzRingType` -> `subComNzRingType`
   ([#1306](https://github.com/math-comp/math-comp/pull/1306),
   by Quentin Vermande).

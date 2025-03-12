@@ -197,7 +197,7 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                           sums (0 and x + y in S, for x, y in S)           *)
 (* [SubChoice_isSubNmodule of U by <:] == nmodType mixin for a subType whose  *)
 (*                          base type is a nmodType and whose predicate's is  *)
-(*                          a nmodClosed                                      *)
+(*                          an addrClosed                                     *)
 (*                                                                            *)
 (*  * Zmodule (additive abelian groups):                                      *)
 (*                   - x == the opposite (additive inverse) of x              *)
@@ -214,7 +214,7 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                                                                            *)
 (*  * PzSemiRing (non-commutative semirings):                                 *)
 (*                    R^c == the converse (semi)ring for R: R^c is convertible*)
-(*                           to R but when R has a canonical (semi)NzRingType *)
+(*                           to R but when R has a canonical (semi)ring       *)
 (*                           structure R^c has the converse one:              *)
 (*                           if x y : R^c, then x * y = (y : R) * (x : R)     *)
 (*                      1 == the multiplicative identity element of a semiring*)
@@ -250,14 +250,14 @@ From mathcomp Require Import choice fintype finfun bigop prime binomial.
 (*                           subType whose base type is a pzSemiRingType and  *)
 (*                           whose predicate's is a semiringClosed            *)
 (*                                                                            *)
-(*  * PzSemiRing (non-commutative non-trivial semirings):                     *)
+(*  * NzSemiRing (non-commutative non-trivial semirings):                     *)
 (* [SubNmodule_isSubNzSemiRing of R by <:] ==                                 *)
 (* [SubChoice_isSubNzSemiRing of R by <:] == semiNzRingType mixin for a       *)
 (*                           subType whose base type is a nzSemiRingType and  *)
 (*                           whose predicate's is a semiringClosed            *)
 (*                                                                            *)
 (*  * PzRing (non-commutative rings):                                         *)
-(*         GRing.sign R b := (-1) ^+ b in R : nzRingType, with b : bool       *)
+(*         GRing.sign R b := (-1) ^+ b in R : pzRingType, with b : bool       *)
 (*                           This is a parsing-only helper notation, to be    *)
 (*                           used for defining more specific instances.       *)
 (*         smulr_closed S <-> collective predicate S is closed under products *)
@@ -5623,7 +5623,7 @@ Proof. by move=> x y; apply: val_inj; rewrite !rmorphM mulrC. Qed.
 HB.instance Definition _ := PzSemiRing_hasCommutativeMul.Build U mulrC.
 HB.end.
 
-#[short(type="pzSubRingType")]
+#[short(type="subPzRingType")]
 HB.structure Definition SubPzRing (R : pzRingType) (S : pred R) :=
   { U of SubPzSemiRing R S U & PzRing U & isSubZmodule R S U }.
 
@@ -5644,7 +5644,7 @@ HB.instance Definition _ := SubNmodule_isSubPzSemiRing.Build R S U
   (smulr_closedM (subring_closedM subring_closed_subproof)).
 HB.end.
 
-#[short(type="nzSubRingType")]
+#[short(type="subNzRingType")]
 HB.structure Definition SubNzRing (R : nzRingType) (S : pred R) :=
   { U of SubNzSemiRing R S U & NzRing U & isSubZmodule R S U }.
 
@@ -6810,8 +6810,8 @@ Notation subSemiRingType := (subNzSemiRingType) (only parsing).
              note="Use subComNzSemiRingType instead.")]
 Notation subComSemiRingType := (subComNzSemiRingType) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use nzSubRingType instead.")]
-Notation subRingType := (nzSubRingType) (only parsing).
+             note="Use subNzRingType instead.")]
+Notation subRingType := (subNzRingType) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
              note="Use subComNzRingType instead.")]
 Notation subComNzRingType := (subComNzRingType) (only parsing).
@@ -7254,9 +7254,16 @@ End PairComSemiRing.
 
 (* TODO: HB.saturate *)
 #[export]
-HB.instance Definition _ (R1 R2 : nzRingType) := NzSemiRing.on (R1 * R1)%type.
+HB.instance Definition _ (R1 R2 : comNzSemiRingType) :=
+  NzSemiRing.on (R1 * R2)%type.
 #[export]
-HB.instance Definition _ (R1 R2 : comNzRingType) := NzSemiRing.on (R1 * R1)%type.
+HB.instance Definition _ (R1 R2 : pzRingType) := PzSemiRing.on (R1 * R2)%type.
+#[export]
+HB.instance Definition _ (R1 R2 : nzRingType) := NzSemiRing.on (R1 * R2)%type.
+#[export]
+HB.instance Definition _ (R1 R2 : comPzRingType) := PzRing.on (R1 * R2)%type.
+#[export]
+HB.instance Definition _ (R1 R2 : comNzRingType) := NzRing.on (R1 * R2)%type.
 (* /TODO *)
 
 Section PairLmod.

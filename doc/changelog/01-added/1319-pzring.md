@@ -15,7 +15,7 @@
   + factory `SubNmodule_isSubPzSemiRing`
   + definition `subComPzSemiRingType`
   + factory `SubPzSemiRing_isSubComPzSemiRing`
-  + definition `pzSubRingType`
+  + definition `subPzRingType`
   + factory `subZmodule_isSubPzRing`
   + definition `subComPzRingType`
   + factories `SubPzRing_isSubComPzRing`, `SubChoice_isSubPzSemiRing`,
