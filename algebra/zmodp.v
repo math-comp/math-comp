@@ -320,7 +320,7 @@ Proof. by rewrite Zp_nat /= Zp_cast. Qed.
 Lemma Zp_nat_mod (p_gt1 : p > 1)m : (m %% p)%:R = m%:R :> 'Z_p.
 Proof. by apply: ord_inj; rewrite !val_Zp_nat // modn_mod. Qed.
 
-Lemma char_Zp : p > 1 -> p%:R = 0 :> 'Z_p.
+Lemma pchar_Zp : p > 1 -> p%:R = 0 :> 'Z_p.
 Proof. by move=> p_gt1; rewrite -Zp_nat_mod ?modnn. Qed.
 
 Lemma unitZpE x : p > 1 -> ((x%:R : 'Z_p) \is a GRing.unit) = coprime p x.
@@ -356,6 +356,9 @@ Proof. by apply/centsP=> u _ v _; apply: unit_Zp_mulgC. Qed.
 
 End Groups.
 
+#[deprecated(since="mathcomp 2.4.0", note="Use pchar_Zp instead.")]
+Notation char_Zp := (pchar_Zp) (only parsing).
+
 (* Field structure for primes. *)
 
 Section PrimeField.
@@ -383,11 +386,11 @@ Proof. by rewrite Zp_nat /= Fp_cast. Qed.
 Lemma Fp_nat_mod m : (m %% p)%:R = m%:R :> 'F_p.
 Proof. by apply: ord_inj; rewrite !val_Fp_nat // modn_mod. Qed.
 
-Lemma char_Fp : p \in [char 'F_p].
+Lemma pchar_Fp : p \in [pchar 'F_p].
 Proof. by rewrite !inE -Fp_nat_mod p_pr ?modnn. Qed.
 
-Lemma char_Fp_0 : p%:R = 0 :> 'F_p.
-Proof. exact: GRing.charf0 char_Fp. Qed.
+Lemma pchar_Fp_0 : p%:R = 0 :> 'F_p.
+Proof. exact: GRing.pcharf0 pchar_Fp. Qed.
 
 Lemma unitFpE x : ((x%:R : 'F_p) \is a GRing.unit) = coprime p x.
 Proof. by rewrite pdiv_id // unitZpE // prime_gt1. Qed.
@@ -450,3 +453,9 @@ by rewrite tpermJ !perm_addr1X natr_Zp addrNK addrAC addrA.
 Qed.
 
 End Sym.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use pchar_Fp instead.")]
+Notation char_Fp := (pchar_Fp) (only parsing).
+
+#[deprecated(since="mathcomp 2.4.0", note="Use pchar_Fp_0 instead.")]
+Notation char_Fp_0 := (pchar_Fp_0) (only parsing).

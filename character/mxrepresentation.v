@@ -1849,9 +1849,9 @@ exists (W :&: U)%MS; first exact: capmx_module.
 by apply/mxdirect_addsP; rewrite capmxA (mxdirect_addsP dxU1W) cap0mx.
 Qed.
 
-Lemma mx_Maschke : [char F]^'.-group G -> mx_completely_reducible 1%:M.
+Lemma mx_Maschke_pchar : [pchar F]^'.-group G -> mx_completely_reducible 1%:M.
 Proof.
-rewrite /pgroup charf'_nat; set nG := _%:R => nzG U => /mxmoduleP Umod _.
+rewrite /pgroup pcharf'_nat; set nG := _%:R => nzG U => /mxmoduleP Umod _.
 pose phi := nG^-1 *: (\sum_(x in G) rG x^-1 *m pinvmx U *m U *m rG x).
 have phiG x: x \in G -> phi *m rG x = rG x *m phi.
   move=> Gx; rewrite -scalemxAl -scalemxAr; congr (_ *: _).
@@ -3943,13 +3943,13 @@ have [i simVU] := mx_JordanHolder_max compU lastU irrV.
 by exists i; apply: mx_rsim_trans simGV simVU.
 Qed.
 
-Hypothesis F'G : [char F]^'.-group G.
+Hypothesis F'G : [pchar F]^'.-group G.
 
-Lemma rsim_regular_submod :
+Lemma rsim_regular_submod_pchar :
   {U : 'M_nG & {modU : mxmodule aG U & mx_rsim rG (submod_repr modU)}}.
 Proof.
 have [V [modV eqG'V]] := rsim_regular_factmod.
-have [U modU defVU dxVU] := mx_Maschke F'G modV (submx1 V).
+have [U modU defVU dxVU] := mx_Maschke_pchar F'G modV (submx1 V).
 exists U; exists modU; apply: mx_rsim_trans eqG'V _.
 by apply: mx_rsim_factmod; rewrite ?mxdirectE /= addsmxC // addnC.
 Qed.
@@ -4162,24 +4162,24 @@ move=> ne_ij RiA RjB; apply: memmx0.
 by rewrite -(Wedderburn_annihilate ne_ij) mem_mulsmx.
 Qed.
 
-Hypothesis F'G : [char F]^'.-group G.
+Hypothesis F'G : [pchar F]^'.-group G.
 
-Lemma irr_mx_sum : (\sum_(i : sG) i = 1%:M)%MS.
-Proof. by apply: reducible_Socle1; apply: mx_Maschke. Qed.
+Lemma irr_mx_sum_pchar : (\sum_(i : sG) i = 1%:M)%MS.
+Proof. by apply: reducible_Socle1; apply: mx_Maschke_pchar. Qed.
 
-Lemma Wedderburn_sum : (\sum_i 'R_i :=: R_G)%MS.
-Proof. by apply: eqmx_trans sums_R _; rewrite /Socle irr_mx_sum mul1mx. Qed.
+Lemma Wedderburn_sum_pchar : (\sum_i 'R_i :=: R_G)%MS.
+Proof. by apply: eqmx_trans sums_R _; rewrite /Socle irr_mx_sum_pchar mul1mx. Qed.
 
 Definition Wedderburn_id i :=
   vec_mx (mxvec 1%:M *m proj_mx 'R_i (\sum_(j | j != i) 'R_j)%MS).
 
 Local Notation "''e_' i" := (Wedderburn_id i) : group_ring_scope.
 
-Lemma Wedderburn_sum_id : \sum_i 'e_i = 1%:M.
+Lemma Wedderburn_sum_id_pchar : \sum_i 'e_i = 1%:M.
 Proof.
 rewrite -linear_sum; apply: canLR mxvecK _.
 have: (1%:M \in R_G)%MS := envelop_mx1 aG.
-rewrite -Wedderburn_sum; case/(sub_dsumsmx Wedderburn_direct) => e Re -> _.
+rewrite -Wedderburn_sum_pchar; case/(sub_dsumsmx Wedderburn_direct) => e Re -> _.
 apply: eq_bigr => i _; have dxR := mxdirect_sumsP Wedderburn_direct i (erefl _).
 rewrite (bigD1 i) // mulmxDl proj_mx_id ?Re // proj_mx_0 ?addr0 //=.
 by rewrite summx_sub // => j ne_ji; rewrite (sumsmx_sup j) ?Re.
@@ -4188,38 +4188,38 @@ Qed.
 Lemma Wedderburn_id_mem i : ('e_i \in 'R_i)%MS.
 Proof. by rewrite vec_mxK proj_mx_sub. Qed.
 
-Lemma Wedderburn_is_id i : mxring_id 'R_i 'e_i.
+Lemma Wedderburn_is_id_pchar i : mxring_id 'R_i 'e_i.
 Proof.
 have ideRi A: (A \in 'R_i)%MS -> 'e_i *m A = A.
-  move=> RiA; rewrite -{2}[A]mul1mx -Wedderburn_sum_id mulmx_suml.
+  move=> RiA; rewrite -{2}[A]mul1mx -Wedderburn_sum_id' mulmx_suml.
   rewrite (bigD1 i) //= big1 ?addr0 // => j ne_ji.
   by rewrite (Wedderburn_mulmx0 ne_ji) ?Wedderburn_id_mem.
   split=> // [||A RiA]; first 2 [exact: Wedderburn_id_mem].
   apply: contraNneq (nz_socle i) => e0.
   apply/rowV0P=> v; rewrite -mem_gring_mx -(genmxE (i *m _)) => /ideRi.
   by rewrite e0 mul0mx => /(canLR gring_mxK); rewrite linear0.
-rewrite -{2}[A]mulmx1 -Wedderburn_sum_id mulmx_sumr (bigD1 i) //=.
+rewrite -{2}[A]mulmx1 -Wedderburn_sum_id' mulmx_sumr (bigD1 i) //=.
 rewrite big1 ?addr0 // => j; rewrite eq_sym => ne_ij.
 by rewrite (Wedderburn_mulmx0 ne_ij) ?Wedderburn_id_mem.
 Qed.
 
-Lemma Wedderburn_closed i : ('R_i * 'R_i = 'R_i)%MS.
+Lemma Wedderburn_closed_pchar i : ('R_i * 'R_i = 'R_i)%MS.
 Proof.
 rewrite -{3}['R_i]genmx_id -/'R_i -genmx_muls; apply/genmxP.
 have [idlRi idrRi] := andP (Wedderburn_ideal i).
 apply/andP; split.
   by apply: submx_trans idrRi; rewrite mulsmxS // genmxE submxMl.
-have [_ Ri_e ideRi _] := Wedderburn_is_id i.
+have [_ Ri_e ideRi _] := Wedderburn_is_id' i.
 by apply/memmx_subP=> A RiA; rewrite -[A]ideRi ?mem_mulsmx.
 Qed.
 
-Lemma Wedderburn_is_ring i : mxring 'R_i.
+Lemma Wedderburn_is_ring_pchar i : mxring 'R_i.
 Proof.
-rewrite /mxring /left_mx_ideal Wedderburn_closed submx_refl.
-by apply/mxring_idP; exists 'e_i; apply: Wedderburn_is_id.
+rewrite /mxring /left_mx_ideal Wedderburn_closed' submx_refl.
+by apply/mxring_idP; exists 'e_i; apply: Wedderburn_is_id'.
 Qed.
 
-Lemma Wedderburn_min_ideal m i (E : 'A_(m, nG)) :
+Lemma Wedderburn_min_ideal_pchar m i (E : 'A_(m, nG)) :
   E != 0 -> (E <= 'R_i)%MS -> mx_ideal R_G E -> (E :=: 'R_i)%MS.
 Proof.
 move=> nzE sE_Ri /andP[idlE idrE]; apply/eqmxP; rewrite sE_Ri.
@@ -4233,7 +4233,7 @@ apply/sumsmx_subP=> j _.
 have simW := mx_iso_simple (isoW j) simSi; have [modW _ minW] := simW.
 have [{minW}dxWE | nzWE] := eqVneq (W j :&: M)%MS 0; last first.
   by rewrite (sameP capmx_idPl eqmxP) minW ?capmxSl ?capmx_module.
-have [_ Rei ideRi _] := Wedderburn_is_id i.
+have [_ Rei ideRi _] := Wedderburn_is_id' i.
 have:= nzE; rewrite -submx0 => /memmx_subP[A E_A].
 rewrite -(ideRi _ (memmx_subP sE_Ri _ E_A)).
 have:= E_A; rewrite defE mem_sub_gring => /andP[R_A M_A].
@@ -4258,13 +4258,13 @@ Section IrrComponent.
 Variables (n : nat) (rG : mx_representation F G n).
 Local Notation E_G := (enveloping_algebra_mx rG).
 
-Let not_rsim_op0 (iG j : sG) A :
+Let not_rsim_op0_pchar  (iG j : sG) A :
     mx_rsim rG (socle_repr iG) -> iG != j -> (A \in 'R_j)%MS ->
   gring_op rG A = 0.
 Proof.
 case/mx_rsim_def=> f [f' _ hom_f] ne_iG_j RjA.
 transitivity (f *m in_submod _ (val_submod 1%:M *m A) *m f').
-  have{RjA}: (A \in R_G)%MS by rewrite -Wedderburn_sum (sumsmx_sup j).
+  have{RjA}: (A \in R_G)%MS by rewrite -Wedderburn_sum_pchar (sumsmx_sup j).
   case/envelop_mxP=> a ->{A}; rewrite !(linear_sum, mulmx_suml).
   by apply: eq_bigr => x Gx; rewrite 4!linearZ /= -scalemxAl -hom_f ?gring_opG.
 rewrite (_ : _ *m A = 0) ?(linear0, mul0mx) //.
@@ -4278,9 +4278,9 @@ Local Notation iG := irr_comp.
 
 Hypothesis irrG : mx_irreducible rG.
 
-Lemma rsim_irr_comp : mx_rsim rG (irr_repr iG).
+Lemma rsim_irr_comp_pchar : mx_rsim rG (irr_repr iG).
 Proof.
-have [M [modM rsimM]] := rsim_regular_submod irrG F'G.
+have [M [modM rsimM]] := rsim_regular_submod_pchar irrG F'G.
 have simM: mxsimple aG M.
   case/mx_irrP: irrG => n_gt0 minG.
   have [f def_n injf homf] := mx_rsim_sym rsimM.
@@ -4297,34 +4297,34 @@ have{modM} rsimM: mx_rsim rG (socle_repr i).
   by rewrite [component_mx _ _]PackSocleK component_mx_id.
 have [<- // | ne_i_iG] := eqVneq i iG.
 suffices {i M simM ne_i_iG rsimM}: gring_op rG 'e_iG != 0.
-  by rewrite (not_rsim_op0 rsimM ne_i_iG) ?Wedderburn_id_mem ?eqxx.
+  by rewrite (not_rsim_op0_pchar rsimM ne_i_iG) ?Wedderburn_id_mem ?eqxx.
 rewrite /iG; case: pickP => //= G0.
 suffices: rG 1%g == 0.
   by case/idPn; rewrite -mxrank_eq0 repr_mx1 mxrank1 -lt0n; case/mx_irrP: irrG.
-rewrite -gring_opG // repr_mx1 -Wedderburn_sum_id linear_sum big1 // => j _.
+rewrite -gring_opG // repr_mx1 -Wedderburn_sum_id' linear_sum big1 // => j _.
 by move/eqP: (G0 j).
 Qed.
 
-Lemma irr_comp'_op0 j A : j != iG -> (A \in 'R_j)%MS -> gring_op rG A = 0.
-Proof. by rewrite eq_sym; apply: not_rsim_op0 rsim_irr_comp. Qed.
+Lemma irr_comp'_op0_pchar j A : j != iG -> (A \in 'R_j)%MS -> gring_op rG A = 0.
+Proof. by rewrite eq_sym; apply: not_rsim_op0_pchar rsim_irr_comp_pchar. Qed.
 
-Lemma irr_comp_envelop : ('R_iG *m lin_mx (gring_op rG) :=: E_G)%MS.
+Lemma irr_comp_envelop_pchar : ('R_iG *m lin_mx (gring_op rG) :=: E_G)%MS.
 Proof.
 apply/eqmxP/andP; split; apply/row_subP=> i.
   by rewrite row_mul mul_rV_lin gring_mxP.
 rewrite rowK /= -gring_opG ?enum_valP // -mul_vec_lin -gring_opG ?enum_valP //.
-rewrite vec_mxK /= -mulmxA mulmx_sub {i}//= -(eqmxMr _ Wedderburn_sum).
+rewrite vec_mxK /= -mulmxA mulmx_sub {i}//= -(eqmxMr _ Wedderburn_sum_pchar).
 rewrite (bigD1 iG) //= addsmxMr addsmxC [_ *m _](sub_kermxP _) ?adds0mx //=.
 apply/sumsmx_subP => j ne_j_iG; apply/memmx_subP=> A RjA; apply/sub_kermxP.
-by rewrite mul_vec_lin /= (irr_comp'_op0 ne_j_iG RjA) linear0.
+by rewrite mul_vec_lin /= (irr_comp'_op0_pchar ne_j_iG RjA) linear0.
 Qed.
 
-Lemma ker_irr_comp_op : ('R_iG :&: kermx (lin_mx (gring_op rG)))%MS = 0.
+Lemma ker_irr_comp_op_pchar : ('R_iG :&: kermx (lin_mx (gring_op rG)))%MS = 0.
 Proof.
 apply/eqP; rewrite -submx0; apply/memmx_subP=> A.
 rewrite sub_capmx /= submx0 mxvec_eq0 => /andP[R_A].
 rewrite (sameP sub_kermxP eqP) mul_vec_lin mxvec_eq0 /= => opA0.
-have [_ Re ideR _] := Wedderburn_is_id iG; rewrite -[A]ideR {ideR}//.
+have [_ Re ideR _] := Wedderburn_is_id' iG; rewrite -[A]ideR {ideR}//.
 move: Re; rewrite genmxE mem_sub_gring /socle_val => /andP[Re].
 rewrite -{2}(gring_rowK Re) -submx0.
 pose simMi := socle_simple iG; have [J [M isoM ->]] := component_mx_def simMi.
@@ -4332,32 +4332,32 @@ case/sub_sumsmxP=> e ->; rewrite linear_sum mulmx_suml summx_sub // => j _.
 rewrite -(in_submodK (submxMl _ (M j))); move: (in_submod _ _) => v.
 have modMj: mxmodule aG (M j) by apply: mx_iso_module (isoM j) _; case: simMi.
 have rsimMj: mx_rsim rG (submod_repr modMj).
-  by apply: mx_rsim_trans rsim_irr_comp _; apply/mx_rsim_iso.
+  by apply: mx_rsim_trans rsim_irr_comp_pchar _; apply/mx_rsim_iso.
 have [f [f' _ hom_f]] := mx_rsim_def (mx_rsim_sym rsimMj); rewrite submx0.
 have <-: (gring_mx aG (val_submod (v *m (f *m gring_op rG A *m f')))) = 0.
   by rewrite (eqP opA0) !(mul0mx, linear0).
-have: (A \in R_G)%MS by rewrite -Wedderburn_sum (sumsmx_sup iG).
+have: (A \in R_G)%MS by rewrite -Wedderburn_sum_pchar (sumsmx_sup iG).
 case/envelop_mxP=> a ->; rewrite !(linear_sum, mulmx_suml) /=; apply/eqP.
 apply: eq_bigr=> x Gx; rewrite 3!linearZ -scalemxAl 3!linearZ /=.
 by rewrite gring_opG // -hom_f // val_submodJ // gring_mxJ.
 Qed.
 
-Lemma regular_op_inj :
+Lemma regular_op_inj_pchar :
   {in [pred A | (A \in 'R_iG)%MS] &, injective (gring_op rG)}.
 Proof.
 move=> A B RnA RnB /= eqAB; apply/eqP; rewrite -subr_eq0 -mxvec_eq0 -submx0.
-rewrite -ker_irr_comp_op sub_capmx (sameP sub_kermxP eqP) mul_vec_lin.
+rewrite -ker_irr_comp_op_pchar sub_capmx (sameP sub_kermxP eqP) mul_vec_lin.
 by rewrite 2!linearB /= eqAB subrr linear0 addmx_sub ?eqmx_opp /=.
 Qed.
 
-Lemma rank_irr_comp : \rank 'R_iG = \rank E_G.
+Lemma rank_irr_comp_pchar : \rank 'R_iG = \rank E_G.
 Proof.
-by rewrite -irr_comp_envelop; apply/esym/mxrank_injP; rewrite ker_irr_comp_op.
+by rewrite -irr_comp_envelop_pchar; apply/esym/mxrank_injP; rewrite ker_irr_comp_op_pchar.
 Qed.
 
 End IrrComponent.
 
-Lemma irr_comp_rsim n1 n2 rG1 rG2 :
+Lemma irr_comp_rsim_pchar n1 n2 rG1 rG2 :
   @mx_rsim _ G n1 rG1 n2 rG2 -> irr_comp rG1 = irr_comp rG2.
 Proof.
 case=> f eq_n12; rewrite -eq_n12 in rG2 f * => inj_f hom_f.
@@ -4365,35 +4365,35 @@ rewrite /irr_comp; apply/f_equal/eq_pick => i; rewrite -!mxrank_eq0.
 (* [congr (odflt 1%irr _)] works but is very slow *)
 rewrite -(mxrankMfree _ inj_f); symmetry; rewrite -(eqmxMfull _ inj_f).
 have /envelop_mxP[e ->{i}]: ('e_i \in R_G)%MS.
-  by rewrite -Wedderburn_sum (sumsmx_sup i) ?Wedderburn_id_mem.
+  by rewrite -Wedderburn_sum_pchar (sumsmx_sup i) ?Wedderburn_id_mem.
 congr (\rank _ != _); rewrite !(mulmx_suml, linear_sum); apply: eq_bigr => x Gx.
 by rewrite 3!linearZ -scalemxAl /= !gring_opG ?hom_f.
 Qed.
 
-Lemma irr_reprK i : irr_comp (irr_repr i) = i.
+Lemma irr_reprK_pchar  i : irr_comp (irr_repr i) = i.
 Proof.
 apply/eqP; apply/component_mx_isoP; try exact: socle_simple.
-by move/mx_rsim_iso: (rsim_irr_comp (socle_irr i)); apply: mx_iso_sym.
+by move/mx_rsim_iso: (rsim_irr_comp_pchar (socle_irr i)); apply: mx_iso_sym.
 Qed.
 
-Lemma irr_repr'_op0 i j A :
+Lemma irr_repr'_op0_pchar i j A :
   j != i -> (A \in 'R_j)%MS -> gring_op (irr_repr i) A = 0.
 Proof.
-by move=> neq_ij /irr_comp'_op0->; [|apply: socle_irr|rewrite irr_reprK].
+by move=> neq_ij /(irr_comp'_op0_pchar _)->; [|apply: socle_irr|rewrite irr_reprK_pchar].
 Qed.
 
-Lemma op_Wedderburn_id i : gring_op (irr_repr i) 'e_i = 1%:M.
+Lemma op_Wedderburn_id_pchar i : gring_op (irr_repr i) 'e_i = 1%:M.
 Proof.
-rewrite -(gring_op1 (irr_repr i)) -Wedderburn_sum_id.
+rewrite -(gring_op1 (irr_repr i)) -Wedderburn_sum_id'. 
 rewrite linear_sum (bigD1 i) //= addrC big1 ?add0r // => j neq_ji.
-exact: irr_repr'_op0 (Wedderburn_id_mem j).
+exact: irr_repr'_op0_pchar (Wedderburn_id_mem j).
 Qed.
 
-Lemma irr_comp_id (M : 'M_nG) (modM : mxmodule aG M) (iM : sG) :
+Lemma irr_comp_id_pchar (M : 'M_nG) (modM : mxmodule aG M) (iM : sG) :
   mxsimple aG M -> (M <= iM)%MS -> irr_comp (submod_repr modM) = iM.
 Proof.
-move=> simM sMiM; rewrite -[iM]irr_reprK.
-apply/esym/irr_comp_rsim/mx_rsim_iso/component_mx_iso => //.
+move=> simM sMiM; rewrite -[iM]irr_reprK_pchar.
+apply/esym/irr_comp_rsim_pchar/mx_rsim_iso/component_mx_iso => //.
 exact: socle_simple.
 Qed.
 
@@ -4406,31 +4406,31 @@ Qed.
 
 Hypothesis splitG : group_splitting_field G.
 
-Lemma rank_Wedderburn_subring i : \rank 'R_i = ('n_i ^ 2)%N.
+Lemma rank_Wedderburn_subring_pchar i : \rank 'R_i = ('n_i ^ 2)%N.
 Proof.
-apply/eqP; rewrite -{1}[i]irr_reprK; have irrSi := socle_irr i.
-by case/andP: (splitG irrSi) => _; rewrite rank_irr_comp.
+apply/eqP; rewrite -{1}[i]irr_reprK_pchar; have irrSi := socle_irr i.
+by case/andP: (splitG irrSi) => _; rewrite rank_irr_comp_pchar.
 Qed.
 
-Lemma sum_irr_degree : (\sum_i 'n_i ^ 2 = nG)%N.
+Lemma sum_irr_degree_pchar : (\sum_i 'n_i ^ 2 = nG)%N.
 Proof.
 apply: etrans (eqnP gring_free).
-rewrite -Wedderburn_sum (mxdirectP Wedderburn_direct) /=.
-by apply: eq_bigr => i _; rewrite rank_Wedderburn_subring.
+rewrite -Wedderburn_sum_pchar (mxdirectP Wedderburn_direct) /=.
+by apply: eq_bigr => i _; rewrite rank_Wedderburn_subring_pchar.
 Qed.
 
-Lemma irr_mx_mult i : socle_mult i = 'n_i.
+Lemma irr_mx_mult_pchar i : socle_mult i = 'n_i.
 Proof.
 rewrite /socle_mult -(mxrankMfree _ gring_free) -genmxE.
-by rewrite rank_Wedderburn_subring mulKn ?irr_degree_gt0.
+by rewrite rank_Wedderburn_subring_pchar mulKn ?irr_degree_gt0.
 Qed.
 
-Lemma mxtrace_regular :
+Lemma mxtrace_regular_pchar :
   {in G, forall x, \tr (aG x) = \sum_i \tr (socle_repr i x) *+ 'n_i}.
 Proof.
-move=> x Gx; have soc1: (Socle sG :=: 1%:M)%MS by rewrite -irr_mx_sum.
+move=> x Gx; have soc1: (Socle sG :=: 1%:M)%MS by rewrite -irr_mx_sum_pchar.
 rewrite -(mxtrace_submod1 (Socle_module sG) soc1) // mxtrace_Socle //.
-by apply: eq_bigr => i _; rewrite irr_mx_mult.
+by apply: eq_bigr => i _; rewrite irr_mx_mult_pchar.
 Qed.
 
 Definition linear_irr := [set i | 'n_i == 1].
@@ -4438,16 +4438,16 @@ Definition linear_irr := [set i | 'n_i == 1].
 Lemma irr_degree_abelian : abelian G -> forall i, 'n_i = 1.
 Proof. by move=> cGG i; apply: mxsimple_abelian_linear (socle_simple i). Qed.
 
-Lemma linear_irr_comp i : 'n_i = 1 -> (i :=: socle_base i)%MS.
+Lemma linear_irr_comp_pchar i : 'n_i = 1 -> (i :=: socle_base i)%MS.
 Proof.
 move=> ni1; apply/eqmxP; rewrite andbC -mxrank_leqif_eq -/'n_i.
-  by rewrite -(mxrankMfree _ gring_free) -genmxE rank_Wedderburn_subring ni1.
+  by rewrite -(mxrankMfree _ gring_free) -genmxE rank_Wedderburn_subring_pchar ni1.
 exact: component_mx_id (socle_simple i).
 Qed.
 
-Lemma Wedderburn_subring_center i : ('Z('R_i) :=: mxvec 'e_i)%MS.
+Lemma Wedderburn_subring_center_pchar i : ('Z('R_i) :=: mxvec 'e_i)%MS.
 Proof.
-have [nz_e Re ideR idRe] := Wedderburn_is_id i.
+have [nz_e Re ideR idRe] := Wedderburn_is_id' i.
 have Ze: (mxvec 'e_i <= 'Z('R_i))%MS.
   rewrite sub_capmx [(_ <= _)%MS]Re.
   by apply/cent_mxP=> A R_A; rewrite ideR // idRe.
@@ -4457,43 +4457,43 @@ apply/eqmxP; rewrite andbC -(geq_leqif (mxrank_leqif_eq Ze)).
 have ->: \rank (mxvec 'e_i) = (0 + 1)%N.
   by apply/eqP; rewrite eqn_leq rank_leq_row lt0n mxrank_eq0 mxvec_eq0.
 rewrite -(mxrank_mul_ker _ (lin_mx (gring_op rG))) addnC leq_add //.
-  rewrite leqn0 mxrank_eq0 -submx0 -(ker_irr_comp_op irrG) capmxS //.
-  by rewrite irr_reprK capmxSl.
+  rewrite leqn0 mxrank_eq0 -submx0 -(ker_irr_comp_op_pchar irrG) capmxS //.
+  by rewrite irr_reprK_pchar capmxSl.
 apply: leq_trans (mxrankS _) (rank_leq_row (mxvec 1%:M)).
 apply/memmx_subP=> Ar; case/submxP=> a ->{Ar}.
 rewrite mulmxA mul_rV_lin /=; set A := vec_mx _.
 rewrite memmx1 (mx_abs_irr_cent_scalar absG) // -memmx_cent_envelop.
-apply/cent_mxP=> Br; rewrite -(irr_comp_envelop irrG) irr_reprK.
+apply/cent_mxP=> Br; rewrite -(irr_comp_envelop_pchar irrG) irr_reprK_pchar.
 case/submxP=> b /(canRL mxvecK) ->{Br}; rewrite mulmxA mx_rV_lin /=.
 set B := vec_mx _; have RiB: (B \in 'R_i)%MS by rewrite vec_mxK submxMl.
-have sRiR: ('R_i <= R_G)%MS by rewrite -Wedderburn_sum (sumsmx_sup i).
+have sRiR: ('R_i <= R_G)%MS by rewrite -Wedderburn_sum_pchar (sumsmx_sup i).
 have: (A \in 'Z('R_i))%MS by rewrite vec_mxK submxMl.
 rewrite sub_capmx => /andP[RiA /cent_mxP cRiA].
 by rewrite -!gring_opM ?(memmx_subP sRiR) 1?cRiA.
 Qed.
 
-Lemma Wedderburn_center :
+Lemma Wedderburn_center_pchar :
   ('Z(R_G) :=: \matrix_(i < #|sG|) mxvec 'e_(enum_val i))%MS.
 Proof.
-have:= mxdirect_sums_center Wedderburn_sum Wedderburn_direct Wedderburn_ideal.
+have:= mxdirect_sums_center Wedderburn_sum_pchar Wedderburn_direct Wedderburn_ideal.
 move/eqmx_trans; apply; apply/eqmxP/andP; split.
-  apply/sumsmx_subP=> i _; rewrite Wedderburn_subring_center.
+  apply/sumsmx_subP=> i _; rewrite Wedderburn_subring_center_pchar.
   by apply: (eq_row_sub (enum_rank i)); rewrite rowK enum_rankK.
-apply/row_subP=> i; rewrite rowK -Wedderburn_subring_center.
+apply/row_subP=> i; rewrite rowK -Wedderburn_subring_center_pchar.
 by rewrite (sumsmx_sup (enum_val i)).
 Qed.
 
-Lemma card_irr : #|sG| = tG.
+Lemma card_irr_pchar : #|sG| = tG.
 Proof.
 rewrite -(eqnP classg_base_free) classg_base_center.
-have:= mxdirect_sums_center Wedderburn_sum Wedderburn_direct Wedderburn_ideal.
+have:= mxdirect_sums_center Wedderburn_sum_pchar Wedderburn_direct Wedderburn_ideal.
 move->; rewrite (mxdirectP _) /=; last first.
   apply/mxdirect_sumsP=> i _; apply/eqP; rewrite -submx0.
   rewrite -{2}(mxdirect_sumsP Wedderburn_direct i) // capmxS ?capmxSl //=.
   by apply/sumsmx_subP=> j neji; rewrite (sumsmx_sup j) ?capmxSl.
 rewrite -sum1_card; apply: eq_bigr => i _; apply/eqP.
-rewrite Wedderburn_subring_center eqn_leq rank_leq_row lt0n mxrank_eq0.
-by rewrite andbT mxvec_eq0; case: (Wedderburn_is_id i).
+rewrite Wedderburn_subring_center_pchar eqn_leq rank_leq_row lt0n mxrank_eq0.
+by rewrite andbT mxvec_eq0; case: (Wedderburn_is_id' i).
 Qed.
 
 Section CenterMode.
@@ -4556,22 +4556,22 @@ Section LinearIrr.
 Variables (gT : finGroupType) (G : {group gT}).
 
 Lemma card_linear_irr (sG : irrType G) :
-    [char F]^'.-group G -> group_splitting_field G ->
+    [pchar F]^'.-group G -> group_splitting_field G ->
   #|linear_irr sG| = #|G : G^`(1)|%g.
 Proof.
 move=> F'G splitG; apply/eqP.
 wlog sGq: / irrType (G / G^`(1))%G by apply: socle_exists.
 have [_ nG'G] := andP (der_normal 1 G); apply/eqP; rewrite -card_quotient //.
 have cGqGq: abelian (G / G^`(1))%g by apply: sub_der1_abelian.
-have F'Gq: [char F]^'.-group (G / G^`(1))%g by apply: morphim_pgroup.
+have F'Gq: [pchar F]^'.-group (G / G^`(1))%g by apply: morphim_pgroup.
 have splitGq: group_splitting_field (G / G^`(1))%G.
   exact: quotient_splitting_field.
-rewrite -(sum_irr_degree sGq) // -sum1_card.
+rewrite -(sum_irr_degree_pchar sGq) // -sum1_card.
 pose rG (j : sGq) := morphim_repr (socle_repr j) nG'G.
 have irrG j: mx_irreducible (rG j) by apply/morphim_mx_irr; apply: socle_irr.
 rewrite (reindex (fun j => irr_comp sG (rG j))) /=.
   apply: eq_big => [j | j _]; last by rewrite irr_degree_abelian.
-  have [_ lin_j _ _] := rsim_irr_comp sG F'G (irrG j).
+  have [_ lin_j _ _] := rsim_irr_comp_pchar sG F'G (irrG j).
   by rewrite inE -lin_j -irr_degreeE irr_degree_abelian.
 pose sGlin := {i | i \in linear_irr sG}.
 have sG'k (i : sGlin) : G^`(1)%g \subset rker (irr_repr (val i)).
@@ -4581,13 +4581,13 @@ have irrGq u: mx_irreducible (quo_repr (sG'k u) nG'G).
   by apply/quo_mx_irr; apply: socle_irr.
 exists (fun i => oapp h' [1 sGq]%irr (insub i)) => [j | i] lin_i.
   rewrite (insubT [in _] lin_i) /=; apply/esym/eqP/socle_rsimP.
-  apply: mx_rsim_trans (rsim_irr_comp sGq F'Gq (irrGq _)).
-  have [g lin_g inj_g hom_g] := rsim_irr_comp sG F'G (irrG j).
+  apply: mx_rsim_trans (rsim_irr_comp_pchar sGq F'Gq (irrGq _)).
+  have [g lin_g inj_g hom_g] := rsim_irr_comp_pchar sG F'G (irrG j).
   exists g => [||G'x]; last 1 [case/morphimP=> x _ Gx ->] || by [].
   by rewrite quo_repr_coset ?hom_g.
 rewrite (insubT (mem _) lin_i) /=; apply/esym/eqP/socle_rsimP.
-set u := Sub i lin_i; apply: mx_rsim_trans (rsim_irr_comp sG F'G (irrG _)).
-have [g lin_g inj_g hom_g] := rsim_irr_comp sGq F'Gq (irrGq u).
+set u := Sub i lin_i; apply: mx_rsim_trans (rsim_irr_comp_pchar sG F'G (irrG _)).
+have [g lin_g inj_g hom_g] := rsim_irr_comp_pchar sGq F'Gq (irrGq u).
 exists g => [||x Gx]; last 1 [have:= hom_g (coset _ x)] || by [].
 by rewrite quo_repr_coset; first by apply; rewrite mem_quotient.
 Qed.
@@ -4619,8 +4619,8 @@ apply: linear_mx_abs_irr; apply/eqP; rewrite eq_sym -linM.
 by case/mx_irrP: irrG => _; apply; rewrite // -mxrank_eq0 linM.
 Qed.
 
-Lemma cycle_repr_structure x (sG : irrType G) :
-    G :=: <[x]> -> [char F]^'.-group G -> group_splitting_field G ->
+Lemma cycle_repr_structure_pchar x (sG : irrType G) :
+    G :=: <[x]> -> [pchar F]^'.-group G -> group_splitting_field G ->
   exists2 w : F, #|G|.-primitive_root w &
   exists iphi : 'I_#|G| -> sG,
   [/\ bijective iphi,
@@ -4631,15 +4631,15 @@ Proof.
 move=> defG; rewrite {defG}(group_inj defG) -/#[x] in sG * => F'X splitF.
 have Xx := cycle_id x; have cXX := cycle_abelian x.
 have card_sG: #|sG| = #[x].
-  by rewrite card_irr //; apply/eqP; rewrite -card_classes_abelian.
+  by rewrite card_irr_pchar //; apply/eqP; rewrite -card_classes_abelian.
 have linX := irr_degree_abelian splitF cXX (_ : sG).
 pose r (W : sG) := irr_mode W x.
 have scalX W: irr_repr W x = (r W)%:M.
   by apply: irr_center_scalar; rewrite ?(center_idP _).
 have inj_r: injective r.
-  move=> V W eqVW; rewrite -(irr_reprK F'X V) -(irr_reprK F'X W).
+  move=> V W eqVW; rewrite -(irr_reprK_pchar F'X V) -(irr_reprK_pchar F'X W).
   move: (irr_repr V) (irr_repr W) (scalX V) (scalX W).
-  rewrite !linX {}eqVW => rV rW <- rWx; apply: irr_comp_rsim => //.
+  rewrite !linX {}eqVW => rV rW <- rWx; apply: irr_comp_rsim_pchar => //.
   exists 1%:M; rewrite ?row_free_unit ?unitmx1 // => xk; case/cycleP=> k ->{xk}.
   by rewrite mulmx1 mul1mx !repr_mxX // rWx.
 have rx1 W: r W ^+ #[x] = 1.
@@ -4661,13 +4661,13 @@ split=> // [|i]; last by rewrite scalX r_iphi.
 by exists iphi' => // W; rewrite /iphi iinv_f.
 Qed.
 
-Lemma splitting_cyclic_primitive_root :
-    cyclic G -> [char F]^'.-group G -> group_splitting_field G ->
+Lemma splitting_cyclic_primitive_root_pchar :
+    cyclic G -> [pchar F]^'.-group G -> group_splitting_field G ->
   classically {z : F | #|G|.-primitive_root z}.
 Proof.
 case/cyclicP=> x defG F'G splitF; case=> // IH.
 wlog sG: / irrType G by apply: socle_exists.
-have [w prim_w _] := cycle_repr_structure sG defG F'G splitF.
+have [w prim_w _] := cycle_repr_structure_pchar sG defG F'G splitF.
 by apply: IH; exists w.
 Qed.
 
@@ -4675,6 +4675,67 @@ End LinearIrr.
 
 End FieldRepr.
 
+#[deprecated(since="mathcomp 2.4.0", note="Use mx_Maschke_pchar instead.")]
+Notation mx_Maschke := (mx_Maschke_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use rsim_regular_submod_pchar instead.")]
+Notation rsim_regular_submod := (rsim_regular_submod_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use irr_mx_sum_pchar instead.")]
+Notation irr_mx_sum := (irr_mx_sum_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use Wedderburn_sum_pchar instead.")]
+Notation Wedderburn_sum := (Wedderburn_sum_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use Wedderburn_sum_id' instead.")]
+Notation Wedderburn_sum_id := (Wedderburn_sum_id') (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use Wedderburn_is_id' instead.")]
+Notation Wedderburn_is_id:= (Wedderburn_is_id') (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use Wedderburn_closed' instead.")]
+Notation Wedderburn_closed := (Wedderburn_closed') (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use Wedderburn_is_ring' instead.")]
+Notation Wedderburn_is_ring := (Wedderburn_is_ring') (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use Wedderburn_min_ideal' instead.")]
+Notation Wedderburn_min_ideal := (Wedderburn_min_ideal') (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use rsim_irr_comp_pchar instead.")]
+Notation rsim_irr_comp := (rsim_irr_comp_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use irr_comp'_op0_pchar instead.")]
+Notation irr_comp'_op0 := (irr_comp'_op0_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use irr_comp_envelop_pchar instead.")]
+Notation irr_comp_envelop := (irr_comp_envelop_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use ker_irr_comp_op_pchar instead.")]
+Notation ker_irr_comp_op := (ker_irr_comp_op_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use regular_op_inj_pchar instead.")]
+Notation regular_op_inj := (regular_op_inj_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use rank_irr_comp_pchar instead.")]
+Notation rank_irr_comp := (rank_irr_comp_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use irr_comp_rsim_pchar instead.")]
+Notation irr_comp_rsim := (irr_comp_rsim_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use irr_reprK_pchar instead.")]
+Notation irr_reprK := (irr_reprK_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use irr_repr'_op0_pchar instead.")]
+Notation irr_repr'_op0 := (irr_repr'_op0_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use op_Wedderburn_id_pchar instead.")]
+Notation op_Wedderburn_id := (op_Wedderburn_id_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use irr_comp_id_pchar instead.")]
+Notation irr_comp_id := (irr_comp_id_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use rank_Wedderburn_subring_pchar instead.")]
+Notation rank_Wedderburn_subring := (rank_Wedderburn_subring_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use sum_irr_degree_pchar instead.")]
+Notation sum_irr_degree := (sum_irr_degree_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use irr_mx_mult_pchar instead.")]
+Notation irr_mx_mult := (irr_mx_mult_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use mxtrace_regular_pchar instead.")]
+Notation mxtrace_regular := (mxtrace_regular_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use linear_irr_comp_pchar instead.")]
+Notation linear_irr_comp := (linear_irr_comp_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use Wedderburn_subring_center_pchar instead.")]
+Notation Wedderburn_subring_center := (Wedderburn_subring_center_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use Wedderburn_center_pchar instead.")]
+Notation Wedderburn_center := (Wedderburn_center_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use card_irr_pchar instead.")]
+Notation card_irr := (card_irr_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use cycle_repr_structure_pchar instead.")]
+Notation cycle_repr_structure := (cycle_repr_structure_pchar) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use splitting_cyclic_primitive_root_pchar instead.")]
+Notation splitting_cyclic_primitive_root := (splitting_cyclic_primitive_root_pchar) (only parsing).
+ 
 Arguments rfix_mx {F gT G%g n%N} rG H%g.
 Arguments gset_mx F {gT} G%g A%g.
 Arguments classg_base F {gT} G%g _%g : extra scopes.
@@ -4683,7 +4744,7 @@ Arguments irrType F {gT} G%g.
 Arguments mxmoduleP {F gT G n rG m U}.
 Arguments envelop_mxP {F gT G n rG A}.
 Arguments hom_mxP {F gT G n rG m f W}.
-Arguments mx_Maschke [F gT G n] rG _ [U].
+Arguments mx_Maschke_pchar [F gT G n] rG _ [U].
 Arguments rfix_mxP {F gT G n rG m W}.
 Arguments cyclic_mxP {F gT G n rG u v}.
 Arguments annihilator_mxP {F gT G n rG u A}.

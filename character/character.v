@@ -439,21 +439,21 @@ Definition standard_grepr :=
 Lemma mx_rsim_standard : mx_rsim rG standard_grepr.
 Proof.
 pose W i := oapp val 0 (soc i); pose S := (\sum_i W i)%MS.
-have C'G: [char algC]^'.-group G := algC'G G.
+have C'G: [pchar algC]^'.-group G := algC'G' G.
 have [defS dxS]: (S :=: 1%:M)%MS /\ mxdirect S.
   rewrite /S mxdirectE /= !(bigID soc xpredT) /=.
   rewrite addsmxC big1 => [|i]; last by rewrite /W; case (soc i).
   rewrite adds0mx_id addnC (@big1 nat) ?add0n => [|i]; last first.
     by rewrite /W; case: (soc i); rewrite ?mxrank0.
-  have <-: Socle sG = 1%:M := reducible_Socle1 sG (mx_Maschke rG C'G).
+  have <-: Socle sG = 1%:M := reducible_Socle1 sG (mx_Maschke' rG C'G).
   have [W0 _ | noW] := pickP sG; last first.
     suff no_i: (soc : pred iG) =1 xpred0 by rewrite /Socle !big_pred0 ?mxrank0.
     by move=> i; rewrite /soc; case: pickP => // W0; have:= noW W0.
   have irrK Wi: soc (standard_irr Wi) = Some Wi.
     rewrite /soc; case: pickP => [W' | /(_ Wi)] /= /eqP // eqWi.
     apply/eqP/socle_rsimP.
-    apply: mx_rsim_trans (rsim_irr_comp iG C'G (socle_irr _)) (mx_rsim_sym _).
-    by rewrite [irr_comp _ _]eqWi; apply: rsim_irr_comp (socle_irr _).
+    apply: mx_rsim_trans (rsim_irr_comp' iG C'G (socle_irr _)) (mx_rsim_sym _).
+    by rewrite [irr_comp _ _]eqWi; apply: rsim_irr_comp' (socle_irr _).
   have bij_irr: {on [pred i | soc i], bijective standard_irr}.
     exists (odflt W0 \o soc) => [Wi _ | i]; first by rewrite /= irrK.
     by rewrite inE /soc /=; case: pickP => //= Wi; move/eqP.
@@ -472,7 +472,7 @@ apply: mx_rsim_dsum (modW) _ defS dxS _ => i.
 rewrite /W /standard_irr_coef /modW /soc; case: pickP => [Wi|_] /=; last first.
   rewrite /muln_grepr big_ord0.
   by exists 0 => [||x _]; rewrite /row_free ?mxrank0 ?mulmx0 ?mul0mx.
-by move/eqP=> <-; apply: mx_rsim_socle; apply: rsim_irr_comp (socle_irr Wi).
+by move/eqP=> <-; apply: mx_rsim_socle; apply: rsim_irr_comp' (socle_irr Wi).
 Qed.
 
 End StandardRepr.
@@ -549,7 +549,7 @@ Lemma NirrE : Nirr G = #|classes G|.
 Proof. by rewrite /pred_Nirr (cardD1 [1]) classes1. Qed.
 
 Fact Iirr_cast : Nirr G = #|sG|.
-Proof. by rewrite NirrE ?card_irr ?algC'G //; apply: groupC. Qed.
+Proof. by rewrite NirrE ?card_irr' ?algC'G' //; apply: groupC. Qed.
 
 Let offset := cast_ord (esym Iirr_cast) (enum_rank [1 sG]%irr).
 
@@ -633,7 +633,7 @@ by exists (Ordinal lt_i_G); rewrite (tnth_nth 0).
 Qed.
 
 Let sG := DecSocleType (regular_repr algC G).
-Let C'G := algC'G G.
+Let C'G := algC'G' G.
 Let closG := @groupC _ G.
 Local Notation W i := (@socle_of_Iirr _ G i).
 Local Notation "''n_' i" := 'n_(W i).
@@ -673,14 +673,14 @@ Proof. by move=> irr_f j /irr_f; apply: cfIirrE. Qed.
 (* This is Isaacs, Corollary (2.7). *)
 Corollary irr_sum_square : \sum_i ('chi[G]_i 1%g) ^+ 2 = #|G|%:R.
 Proof.
-rewrite -(sum_irr_degree sG) // natr_sum (reindex _ (socle_of_Iirr_bij _)) /=.
+rewrite -(sum_irr_degree' sG) // natr_sum (reindex _ (socle_of_Iirr_bij _)) /=.
 by apply: eq_bigr => i _; rewrite irr1_degree natrX.
 Qed.
 
 (* This is Isaacs, Lemma (2.11). *)
 Lemma cfReg_sum : cfReg G = \sum_i 'chi_i 1%g *: 'chi_i.
 Proof.
-apply/cfun_inP=> x Gx; rewrite -cfReprReg cfunE Gx (mxtrace_regular sG) //=.
+apply/cfun_inP=> x Gx; rewrite -cfReprReg cfunE Gx (mxtrace_regular' sG) //=.
 rewrite sum_cfunE (reindex _ (socle_of_Iirr_bij _)); apply: eq_bigr => i _.
 by rewrite -irrRepr cfRepr1 !cfunE Gx mulr_natl.
 Qed.
@@ -691,7 +691,7 @@ Let R_G := group_ring algC G.
 Lemma xcfun_annihilate i j A : i != j -> (A \in 'R_j)%MS -> ('chi_i).[A]%CF = 0.
 Proof.
 move=> neq_ij RjA; rewrite -irrRepr xcfun_repr.
-by rewrite (irr_repr'_op0 _ _ RjA) ?raddf0 // eq_sym (can_eq socle_of_IirrK).
+by rewrite (irr_repr'_op0' _ _ RjA) ?raddf0 // eq_sym (can_eq socle_of_IirrK).
 Qed.
 
 Lemma xcfunG phi x : x \in G -> phi.[aG x]%CF = phi x.
@@ -703,7 +703,7 @@ Lemma xcfun_mul_id i A :
   (A \in R_G)%MS -> ('chi_i).['e_i *m A]%CF = ('chi_i).[A]%CF.
 Proof.
 move=> RG_A; rewrite -irrRepr !xcfun_repr gring_opM //.
-by rewrite op_Wedderburn_id ?mul1mx.
+by rewrite op_Wedderburn_id' ?mul1mx.
 Qed.
 
 Lemma xcfun_id i j : ('chi_i).['e_j]%CF = 'chi_i 1%g *+ (i == j).
@@ -780,7 +780,7 @@ Proof.
 apply: (iffP (irrP xi)) => [[i ->] | [[n rG] irr_rG ->]].
   by exists (Representation 'Chi_i); [apply: socle_irr | rewrite irrRepr].
 exists (irr_of_socle (irr_comp sG rG)); rewrite -irrRepr irr_of_socleK /=.
-exact/cfRepr_sim/rsim_irr_comp.
+exact/cfRepr_sim/rsim_irr_comp'.
 Qed.
 
 (* This is Isaacs, Theorem (2.12). *)
@@ -1128,7 +1128,7 @@ move=> Gx; without loss cGG: G rG Gx / abelian G.
   move/(_ _ (subg_repr rG sXG) (cycle_id x) (cycle_abelian x)).
   by rewrite /= !cfunE !groupV Gx (cycle_id x) !group1.
 have [I U W simU W1 dxW]: mxsemisimple rG 1%:M.
-  rewrite -(reducible_Socle1 (DecSocleType rG) (mx_Maschke _ (algC'G G))).
+  rewrite -(reducible_Socle1 (DecSocleType rG) (mx_Maschke' _ (algC'G' G))).
   exact: Socle_semisimple.
 have linU i: \rank (U i) = 1.
   by apply: mxsimple_abelian_linear cGG (simU i); apply: groupC.
@@ -1257,7 +1257,7 @@ apply/matrixP=> i j; rewrite !mxE -first_orthogonality_relation mulr_sumr.
 rewrite sum_by_classes => [|u v Gu Gv]; last by rewrite -conjVg !cfunJ.
 rewrite reindex_irr_class /=; apply/esym/eq_bigr=> k _.
 rewrite !mxE irr_inv // -/(g k) -divg_index -indexgI /=.
-rewrite (char0_natf_div Cchar) ?dvdn_indexg // index_cent1 invfM invrK.
+rewrite (pchar0_natf_div Cpchar) ?dvdn_indexg // index_cent1 invfM invrK.
 by rewrite repr_irr_classK mulrCA mulrA mulrCA.
 Qed.
 
