@@ -121,7 +121,7 @@ Proof. by move=> p /=; rewrite val_insubd [_ \is a _]size_poly rVpolyK. Qed.
 Hint Resolve npoly_rV_K rVnpolyK : core.
 
 Lemma npoly_vect_axiom : Vector.axiom n npoly.
-Proof. by exists npoly_rV; [exact:linearPZ | exists rVnpoly]. Qed.
+Proof. by exists npoly_rV; [exact:linearP | exists rVnpoly]. Qed.
 
 HB.instance Definition _ := Lmodule_hasFinDim.Build R npoly npoly_vect_axiom.
 
@@ -150,7 +150,8 @@ Context (R : nzRingType) {n : nat}.
 Lemma polyn_is_linear : linear (@polyn _ _ : {poly_n R} -> _).
 Proof. by []. Qed.
 HB.instance Definition _ :=
-  GRing.isLinear.Build R {poly_n R} {poly R} _ (polyn (n:=n)) polyn_is_linear.
+  GRing.isSemilinear.Build R {poly_n R} {poly R} _ (polyn (n:=n))
+    (GRing.semilinear_linear polyn_is_linear).
 
 Canonical mk_npoly (E : nat -> R) : {poly_n R} :=
   @NPoly R _ (\poly_(i < n) E i) (size_poly _ _).
@@ -477,8 +478,8 @@ Fact in_qpoly_is_linear : linear in_qpoly.
 Proof. by move=> k p q; rewrite in_qpolyD in_qpolyZ. Qed.
 
 HB.instance Definition _ :=
-  GRing.isLinear.Build R {poly R} {poly_(size (mk_monic h)).-1 R} _ in_qpoly
-    in_qpoly_is_linear.
+  GRing.isSemilinear.Build R {poly R} {poly_(size (mk_monic h)).-1 R} _ in_qpoly
+    (GRing.semilinear_linear in_qpoly_is_linear).
 
 Lemma qpolyC_proof k :
   (k%:P : {poly R}) \is a poly_of_size (size (mk_monic h)).-1.
