@@ -1,6 +1,6 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
-From mathcomp Require Import fintype finfun.
+From mathcomp Require Import bigop fintype finfun.
 
 (******************************************************************************)
 (*                          Group-like structures                             *)
@@ -221,6 +221,10 @@ Bind Scope group_scope with ChoiceBaseUMagma.sort.
 
 Local Notation "1" := (@one _) : group_scope.
 Local Notation "s `_ i" := (nth 1 s i) : group_scope.
+Local Notation "\prod_ ( i <- r | P ) F" := (\big[*%g/1]_(i <- r | P) F).
+Local Notation "\prod_ ( i | P ) F" := (\big[*%g/1]_(i | P) F).
+Local Notation "\prod_ ( i 'in' A ) F" := (\big[*%g/1]_(i in A) F).
+Local Notation "\prod_ ( m <= i < n ) F" := (\big[*%g/1%g]_(m <= i < n) F%g).
 
 Definition natexp (G : baseUMagmaType) (x : G) n : G := iterop n *%g x 1.
 Arguments natexp : simpl never.
@@ -330,6 +334,9 @@ HB.instance Definition _ := Magma_isUMagma.Build G mul1g mulg1.
 
 HB.end.
 
+#[export]
+HB.instance Definition _ (G : monoidType) := Monoid.isLaw.Build G 1 *%g mulgA mul1g mulg1.
+
 Bind Scope group_scope with Monoid.sort.
 
 Section MonoidTheory.
@@ -360,6 +367,40 @@ Proof. by elim: n => [|n IHn]; rewrite ?mul1g //= IHn expgS mulgA. Qed.
 
 Lemma iter_mulg_1 n x : iter n ( *%g x) 1 = x ^+ n.
 Proof. by rewrite iter_mulg mulg1. Qed.
+
+Lemma prodg_const (I : finType) (A : pred I) x : \prod_(i in A) x = x ^+ #|A|.
+Proof. by rewrite big_const -Monoid.iteropE. Qed.
+
+Lemma prodg_const_nat n m x : \prod_(n <= i < m) x = x ^+ (m - n).
+Proof. by rewrite big_const_nat -Monoid.iteropE. Qed.
+
+Lemma prodgXr x I r P (F : I -> nat) :
+  \prod_(i <- r | P i) x ^+ F i = x ^+ (\sum_(i <- r | P i) F i).
+Proof. by rewrite (big_morph _ (expgnDr _) (erefl _)). Qed.
+
+Lemma commute_prod (I : Type) (s : seq I) (P : pred I) (F : I -> G) x :
+  (forall i, P i -> commute x (F i)) -> commute x (\prod_(i <- s | P i) F i).
+Proof. exact: (big_ind _ (commute1 x) (@commuteM _ x)). Qed.
+
+Lemma prodgM_commute {I : eqType} r (P : pred I) (F H : I -> G) :
+    (forall i j, P i -> P j -> commute (F i) (H j)) ->
+  \prod_(i <- r | P i) (F i * H i) =
+    \prod_(i <- r | P i) F i * \prod_(i <- r | P i) H i.
+Proof.
+move=> FH; elim: r => [|i r IHr]; rewrite !(big_nil, big_cons) ?mulg1//.
+case: ifPn => // Pi; rewrite IHr !mulgA; congr (_ * _); rewrite -!mulgA.
+by rewrite commute_prod // => j Pj; apply/commute_sym/FH.
+Qed.
+
+Lemma prodgMl_commute {I : finType} (A : pred I) (x : G) F :
+    (forall i, A i -> commute x (F i)) ->
+  \prod_(i in A) (x * F i) = x ^+ #|A| * \prod_(i in A) F i.
+Proof. by move=> xF; rewrite prodgM_commute ?prodg_const// => i j _ /xF. Qed.
+
+Lemma prodgMr_commute {I : finType} (A : pred I) (x : G) F :
+    (forall i, A i -> commute x (F i)) ->
+  \prod_(i in A) (F i * x) = \prod_(i in A) F i * x ^+ #|A|.
+Proof. by move=> xF; rewrite prodgM_commute ?prodg_const// => i j /xF. Qed.
 
 Lemma commuteX x y n : commute x y -> commute x (y ^+ n).
 Proof.
@@ -481,6 +522,14 @@ Proof. by apply/(canRL (mulgK x))/(@divIg y); rewrite -mulgA mulVg divgg. Qed.
 
 Lemma invgM : {morph (@inv G): x y / x * y >-> y * x : G}.
 Proof. by move=> x y; rewrite -[y in LHS]invgK invgF. Qed.
+
+Lemma prodgV I r (P : pred I) (E : I -> G) :
+  \prod_(i <- r | P i) (E i)^-1 = (\prod_(i <- rev r | P i) E i)^-1.
+Proof.
+elim: r => [|x r IHr]; first by rewrite !big_nil invg1.
+rewrite big_cons rev_cons big_rcons/= IHr.
+by case: ifP => _; rewrite ?mulg1// invgM.
+Qed.
 
 Lemma divKg x y : commute x y -> x / (x / y) = y.
 Proof. by move=> xyC; rewrite invgF mulgA xyC mulgK. Qed.
@@ -726,6 +775,10 @@ Proof. by move=> fK f'K; apply: (canLR fK); rewrite gmulf1. Qed.
 Lemma gmulfXn n : {morph f : x / x ^+ n}.
 Proof. by elim: n => [|[|n] IHn] x /=; rewrite ?(gmulf1, gmulfM) // IHn. Qed.
 
+Lemma gmulf_prod I r (P : pred I) E :
+  f (\prod_(i <- r | P i) E i) = \prod_(i <- r | P i) f (E i).
+Proof. exact: (big_morph f gmulfM gmulf1). Qed.
+
 End UMagma.
 
 Section Group.
@@ -831,6 +884,10 @@ Variables (G : baseUMagmaType).
 
 Section UMagma.
 Variables S : umagmaClosed G.
+
+Lemma rpred_prod I r (P : pred I) F :
+  (forall i, P i -> F i \in S) -> \prod_(i <- r | P i) F i \in S.
+Proof. by move=> IH; elim/big_ind: _; [apply: gpred1 | apply: gpredM |]. Qed.
 
 Lemma gpredXn n : {in S, forall u, u ^+ n \in S}.
 Proof.
