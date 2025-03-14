@@ -75,7 +75,7 @@ From mathcomp Require Import bigop fintype finfun monoid.
 (*                x *+ n == n times x, with n in nat (non-negative),          *)
 (*                          i.e. x + (x + .. (x + x)..) (n terms); x *+ 1 is  *)
 (*                          thus convertible to x, and x *+ 2 to x + x        *)
-(*        \sum_<range> e == iterated sum for an addUMagmaType (cf bigop.v)    *)
+(*        \sum_<range> e == iterated sum for a baseAddUMagmaType (cf bigop.v)*)
 (*                  e`_i == nth 0 e i, when e : seq M and M has an            *)
 (*                          addUMagmaType structure                           *)
 (*             support f == 0.-support f, i.e., [pred x | f x != 0]           *)

@@ -81,6 +81,7 @@ From mathcomp Require Import bigop fintype finfun.
 (*                x ^+ n == x to the power n, with n in nat (non-negative),   *)
 (*                          i.e. x * (x * .. (x * x)..) (n terms); x ^+ 1 is  *)
 (*                          thus convertible to x, and x ^+ 2 to x * x        *)
+(*        \prod<range> e == iterated product for a baseUMagmaType (cf bigop.v)*)
 (*       umagma_closed S <-> collective predicate S is closed under           *)
 (*                          multiplication and contains 1                     *)
 (*                                                                            *)
