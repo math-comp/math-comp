@@ -889,7 +889,7 @@ Variables (G : baseUMagmaType).
 Section UMagma.
 Variables S : umagmaClosed G.
 
-Lemma rpred_prod I r (P : pred I) F :
+Lemma gpred_prod I r (P : pred I) F :
   (forall i, P i -> F i \in S) -> \prod_(i <- r | P i) F i \in S.
 Proof. by move=> IH; elim/big_ind: _; [apply: gpred1 | apply: gpredM |]. Qed.
 
