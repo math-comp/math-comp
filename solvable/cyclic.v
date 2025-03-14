@@ -2,9 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice div.
-From mathcomp Require Import fintype bigop prime finset fingroup morphism.
-From mathcomp Require Import perm automorphism quotient gproduct ssralg.
-From mathcomp Require Import finalg zmodp poly.
+From mathcomp Require Import fintype bigop prime finset monoid fingroup.
+From mathcomp Require Import morphism perm automorphism quotient gproduct.
+From mathcomp Require Import ssralg finalg zmodp poly.
 
 (******************************************************************************)
 (*  Properties of cyclic groups.                                              *)

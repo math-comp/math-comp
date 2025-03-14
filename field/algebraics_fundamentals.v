@@ -4,9 +4,9 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
 From mathcomp Require Import div fintype path tuple bigop finset prime order.
 From mathcomp Require Import ssralg poly polydiv mxpoly countalg closed_field.
-From mathcomp Require Import ssrnum ssrint archimedean rat intdiv fingroup.
-From mathcomp Require Import finalg zmodp cyclic pgroup sylow vector falgebra.
-From mathcomp Require Import fieldext separable galois.
+From mathcomp Require Import ssrnum ssrint archimedean rat intdiv monoid.
+From mathcomp Require Import fingroup finalg zmodp cyclic pgroup sylow vector.
+From mathcomp Require Import falgebra fieldext separable galois.
 
 (******************************************************************************)
 (*   The main result in this file is the existence theorem that underpins the *)
@@ -321,12 +321,11 @@ have ofQ_K z: cancel (ofQ z) (inQ z).
 have sQring z: divring_closed (sQ z).
   have sQ_1: 1 \in sQ z by rewrite -(rmorph1 (ofQ z)) sQof.
   by split=> // x y /inQ_K<- /inQ_K<- /=; rewrite -(rmorphB, fmorph_div) sQof.
-pose sQoM z := GRing.isOppClosed.Build _ _ (sQring z).
-pose sQaM z := GRing.isAddClosed.Build _ _ (sQring z).
+pose sQzM z := GRing.isZmodClosed.Build _ _ (sQring z : zmod_closed _).
 pose sQmM z := GRing.isMulClosed.Build _ _ (sQring z).
 pose sQiM z := GRing.isInvClosed.Build _ _ (sQring z).
 pose sQC z : divringClosed _ := HB.pack (sQ z)
-  (sQaM z) (sQoM z) (sQmM z) (sQiM z).
+  (sQzM z) (sQmM z) (sQiM z).
 pose morph_ofQ x z Qxz := forall u, ofQ z (Qxz u) = ofQ x u.
 have QtoQ z x: x \in sQ z -> {Qxz : 'AHom(Q x, Q z) | morph_ofQ x z Qxz}.
   move=> z_x; pose Qxz u := inQ z (ofQ x u).
