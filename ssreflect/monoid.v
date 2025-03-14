@@ -109,7 +109,7 @@ From mathcomp Require Import bigop fintype finfun.
 (*  Mn -- ring by nat multiplication, as in expgMn :                          *)
 (*        (x * y) ^+ n = x ^+ n * y ^+ n                                      *)
 (*   V -- group inverse, as in expVgn : (x^-1) ^+ n = x ^- n                  *)
-(*   F -- group division, as in expgnFr : x ^+ (m - n) = x ^+ m / x ^+ n      *)
+(*   F -- group division, as in invgF : (x / y)^-1 = y / x                    *)
 (*   X -- unitary magma exponentiation, as in conjXg :                        *)
 (*        (x ^+ n) ^ y = (x ^ y) ^+ n                                         *)
 (*   J -- group conjugation, as in conjJg : (x ^ y) ^ z = (x ^ z) ^ y ^ z     *)
@@ -181,7 +181,7 @@ HB.mixin Record Magma_isSemigroup G of Magma G := {
 }.
 
 #[short(type="semigroupType")]
-HB.structure Definition Semigroup := {G of Magma_isSemigroup G & Magma G & Choice G}.
+HB.structure Definition Semigroup := {G of Magma_isSemigroup G & ChoiceMagma G}.
 
 HB.factory Record isSemigroup G of Choice G := {
   mul : G -> G -> G;
@@ -273,7 +273,7 @@ HB.instance Definition _ := BaseUMagma_isUMagma.Build G mul1g mulg1.
 HB.end.
 
 #[short(type="umagmaType")]
-HB.structure Definition UMagma := {G of Magma_isUMagma G & Magma G & Choice G}.
+HB.structure Definition UMagma := {G of Magma_isUMagma G & ChoiceMagma G}.
 
 Bind Scope group_scope with UMagma.sort.
 
@@ -435,7 +435,8 @@ HB.mixin Record Monoid_isGroup G of BaseGroup G := {
 }.
 
 #[short(type="groupType")]
-HB.structure Definition Group := {G of Monoid_isGroup G & BaseGroup G & Monoid G}.
+HB.structure Definition Group :=
+  {G of Monoid_isGroup G & BaseGroup G & Monoid G}.
 
 HB.factory Record isGroup G of Choice G := {
   one : G;
@@ -729,7 +730,9 @@ Notation "{ 'multiplicative' U -> V }" :=
 End MultiplicativeExports.
 HB.export MultiplicativeExports.
 
-(* FIXME: HB should do this automatically. *)
+(* FIXME: The instance below makes sure that the join instance between        *)
+(* Multiplicative.type and UMagmaMorphism.type is declared in both directions.*)
+(* HB should do this automatically.                                           *)
 #[non_forgetful_inheritance]
 HB.instance Definition _ G H (f : UMagmaMorphism.type G H) :=
   UMagmaMorphism.on (Multiplicative.sort f).
@@ -1112,6 +1115,10 @@ HB.instance Definition _ := hasMul.Build {ffun aT -> rT} ffun_mul.
 
 End FinFunMagma.
 
+(* FIXME: HB.saturate *)
+HB.instance Definition _ (aT : finType) (rT : ChoiceMagma.type) :=
+  Magma.on {ffun aT -> rT}.
+
 Section FinFunSemigroup.
 Variable (aT : finType) (rT : semigroupType).
 Implicit Types f g : {ffun aT -> rT}.
@@ -1134,6 +1141,10 @@ HB.instance Definition _ :=
 
 End FinFunBaseUMagma.
 
+(* FIXME: HB.saturate *)
+HB.instance Definition _ (aT : finType) (rT : ChoiceBaseUMagma.type) :=
+  BaseUMagma.on {ffun aT -> rT}.
+
 Section FinFunUMagma.
 Variable (aT : finType) (rT : umagmaType).
 Implicit Types f g : {ffun aT -> rT}.
@@ -1148,6 +1159,7 @@ HB.instance Definition _ :=
 
 End FinFunUMagma.
 
+(* FIXME: HB.saturate *)
 HB.instance Definition _ (aT : finType) (rT : monoidType) :=
   UMagma.on {ffun aT -> rT}.
 
@@ -1237,7 +1249,12 @@ HB.instance Definition _ :=
 
 End PairUMagma.
 
+(* FIXME: HB.saturate *)
+HB.instance Definition _ (G H : ChoiceMagma.type) := Magma.on (G * H)%type.
+HB.instance Definition _ (G H : ChoiceBaseUMagma.type) :=
+  BaseUMagma.on (G * H)%type.
 HB.instance Definition _ (G H : monoidType) := Semigroup.on (G * H)%type.
+(* /FIXME *)
 
 Section PairBaseGroup.
 Variables G H : baseGroupType.

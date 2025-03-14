@@ -68,13 +68,17 @@ From mathcomp Require Import bigop fintype finfun monoid.
 (* Canonical properties of the algebraic structures:                          *)
 (*  * addMagmaType (additive magmas):                                         *)
 (*                 x + y == the addition of x and y                           *)
-(*         addg_closed S <-> collective predicate S is closed under addition  *)
+(*         addr_closed S <-> collective predicate S is closed under addition  *)
 (*                                                                            *)
 (*  * baseAddUMagmaType (pointed additive magmas):                            *)
 (*                     0 == the zero of a unitary additive magma              *)
 (*                x *+ n == n times x, with n in nat (non-negative),          *)
 (*                          i.e. x + (x + .. (x + x)..) (n terms); x *+ 1 is  *)
 (*                          thus convertible to x, and x *+ 2 to x + x        *)
+(*        \sum_<range> e == iterated sum for an addUMagmaType (cf bigop.v)    *)
+(*                  e`_i == nth 0 e i, when e : seq M and M has an            *)
+(*                          addUMagmaType structure                           *)
+(*             support f == 0.-support f, i.e., [pred x | f x != 0]           *)
 (*    addumagma_closed S <-> collective predicate S is closed under           *)
 (*                          addition and contains 0                           *)
 (*                                                                            *)
@@ -85,8 +89,8 @@ From mathcomp Require Import bigop fintype finfun monoid.
 (*                   - x == the opposite of x                                 *)
 (*                 x - y == x + (- y)                                         *)
 (*                x *- n == - (x *+ n)                                        *)
-(*         oppg_closed S <-> collective predicate S is closed under opposite  *)
-(*         subg_closed S <-> collective predicate S is closed under           *)
+(*         oppr_closed S <-> collective predicate S is closed under opposite  *)
+(*         subr_closed S <-> collective predicate S is closed under           *)
 (*                           subtraction                                      *)
 (*         zmod_closed S <-> collective predicate S is closed under           *)
 (*                           subtraction and contains 1                       *)
@@ -175,6 +179,10 @@ HB.instance Definition _ (V : choiceType) := Choice.on (to_multiplicative V).
 #[export]
 HB.instance Definition _ (V : baseAddMagmaType) :=
   hasMul.Build (to_multiplicative V) (@add V).
+(* FIXME: HB.saturate *)
+#[export]
+HB.instance Definition _ (V : ChoiceBaseAddMagma.type) :=
+  Magma.on (to_multiplicative V).
 
 Section BaseAddMagmaTheory.
 Variables V : baseAddMagmaType.
@@ -194,7 +202,7 @@ HB.mixin Record BaseAddMagma_isAddMagma V of BaseAddMagma V := {
 
 #[short(type="addMagmaType")]
 HB.structure Definition AddMagma :=
-  {V of BaseAddMagma_isAddMagma V & BaseAddMagma V & Choice V}.
+  {V of BaseAddMagma_isAddMagma V & ChoiceBaseAddMagma V}.
 
 HB.factory Record isAddMagma V of Choice V := {
   add : V -> V -> V;
@@ -292,6 +300,11 @@ Local Notation "x *+ n" := (natmul x n) : ring_scope.
 #[export]
 HB.instance Definition _ (V : baseAddUMagmaType) :=
   hasOne.Build (to_multiplicative V) (@zero V).
+
+(* FIXME: HB.saturate *)
+#[export]
+HB.instance Definition _ (V : ChoiceBaseAddUMagma.type) :=
+  BaseUMagma.on (to_multiplicative V).
 
 Section BaseAddUMagmaTheory.
 Variable V : baseAddUMagmaType.
@@ -434,15 +447,8 @@ Proof. by rewrite big_const -iteropE. Qed.
 Lemma sumr_const_nat m n x : \sum_(n <= i < m) x = x *+ (m - n).
 Proof. by rewrite big_const_nat iter_addr_0. Qed.
 
-Section ClosedPredicates.
-
-Variable S : {pred V}.
-
-Definition nmod_closed := addumagma_closed S.
-
-End ClosedPredicates.
-
 End NmoduleTheory.
+Notation nmod_closed := addumagma_closed.
 
 HB.mixin Record hasOpp V := {
   opp : V -> V
@@ -503,16 +509,6 @@ HB.builders Context V of isZmodule V.
 
 HB.instance Definition _ := isNmodule.Build V addrA addrC add0r.
 HB.instance Definition _ := Nmodule_isZmodule.Build V addNr.
-
-HB.end.
-
-HB.factory Record Group_isZmodule V of Group V := {
-  mulgC : commutative (@mul V)
-}.
-
-HB.builders Context V of Group_isZmodule V.
-
-HB.instance Definition _ := isZmodule.Build V mulgA mulgC mul1g mulVg.
 
 HB.end.
 
@@ -711,7 +707,8 @@ Proof. exact: (big_morph f raddfD raddf0). Qed.
 
 End AdditiveTheory.
 
-Definition to_fmultiplicative U V := @id (to_multiplicative U -> to_multiplicative V).
+Definition to_fmultiplicative U V :=
+  @id (to_multiplicative U -> to_multiplicative V).
 
 #[export]
 HB.instance Definition _ U V (f : {additive U -> V}) :=
@@ -916,7 +913,8 @@ HB.instance Definition _ (U : baseAddUMagmaType) (S : addrClosed U) :=
     (fst nmod_closed_subproof).
 #[export]
 HB.instance Definition _ (U : zmodType) (S : opprClosed U) :=
-  isInvClosed.Build (to_multiplicative U) (to_pmultiplicative S) oppr_closed_subproof.
+  isInvClosed.Build (to_multiplicative U) (to_pmultiplicative S)
+    oppr_closed_subproof.
 
 (* FIXME: HB.saturate *)
 #[export]
@@ -1341,17 +1339,13 @@ HB.instance Definition _ :=
 
 End PairAddUMagma.
 
+(* FIXME: HB.saturate *)
 HB.instance Definition _ (U V : ChoiceBaseAddMagma.type) :=
   BaseAddMagma.on (U * V)%type.
 HB.instance Definition _ (U V : ChoiceBaseAddUMagma.type) :=
   BaseAddMagma.on (U * V)%type.
-
-Section PairNmodule.
-Variables U V : nmodType.
-
-HB.instance Definition _ := AddSemigroup.on (U * V)%type.
-
-End PairNmodule.
+HB.instance Definition _ (U V : nmodType) := AddSemigroup.on (U * V)%type.
+(* /FIXME *)
 
 Section PairZmodule.
 Variables U V : zmodType.
