@@ -2737,8 +2737,10 @@ Lemma linear_sum I r (P : pred I) E :
 Proof. exact: raddf_sum. Qed.
 
 Lemma linearZ_LR : scalable_for s f. Proof. exact: semi_linear_subproof. Qed.
+Lemma semilinearP : semilinear_for s f.
+Proof. split; [exact: linearZ_LR | exact: linearD]. Qed.
 Lemma linearP : linear_for s f.
-Proof. by move=> a u v /=; rewrite linearD linearZ_LR. Qed.
+Proof. by move=> a u v /=; rewrite !semilinearP. Qed.
 
 End GenericProperties.
 
@@ -2794,15 +2796,15 @@ Section LmodProperties.
 Variables (R : pzSemiRingType) (U V : lSemiModType R) (f : {linear U -> V}).
 
 Lemma linearZZ : scalable f. Proof. exact: linearZ_LR. Qed.
-Lemma linearPZ : semilinear f.
-Proof. by split; [exact: linearZZ | exact: linearD]. Qed.
+Lemma semilinearPZ : semilinear f. Proof. exact: semilinearP. Qed.
+Lemma linearPZ : linear f. Proof. exact: linearP. Qed.
 
 Lemma can2_scalable f' : cancel f f' -> cancel f' f -> scalable f'.
 Proof. by move=> fK f'K a x; apply: (canLR fK); rewrite linearZZ f'K. Qed.
 
 Lemma can2_semilinear f' : cancel f f' -> cancel f' f -> semilinear f'.
 Proof.
-by move=> fK f'K; split=> ? ?; apply: (canLR fK); rewrite linearPZ !f'K.
+by move=> fK f'K; split=> ? ?; apply: (canLR fK); rewrite semilinearPZ !f'K.
 Qed.
 
 Lemma can2_linear f' : cancel f f' -> cancel f' f -> linear f'.
@@ -2815,8 +2817,8 @@ Section ScalarProperties.
 Variable (R : pzSemiRingType) (U : lSemiModType R) (f : {scalar U}).
 
 Lemma scalarZ : scalable_for *%R f. Proof. exact: linearZ_LR. Qed.
-Lemma scalarP : semiscalar f.
-Proof. by split; [exact: linearZ_LR | exact: linearD]. Qed.
+Lemma semiscalarP : semiscalar f. Proof. exact: semilinearP. Qed.
+Lemma scalarP : scalar f. Proof. exact: linearP. Qed.
 
 End ScalarProperties.
 
@@ -7165,11 +7167,14 @@ Definition linearB := linearB.
 Definition linear_sum := linear_sum.
 Definition linearMn := linearMn.
 Definition linearMNn := linearMNn.
+Definition semilinearP := semilinearP.
 Definition linearP := linearP.
 Definition linearZ_LR := linearZ_LR.
 Definition linearZ := linearZ.
+Definition semilinearPZ := semilinearPZ.
 Definition linearPZ := linearPZ.
 Definition linearZZ := linearZZ.
+Definition semiscalarP := semiscalarP.
 Definition scalarP := scalarP.
 Definition scalarZ := scalarZ.
 Definition can2_scalable := can2_scalable.
