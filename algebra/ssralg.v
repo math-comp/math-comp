@@ -618,9 +618,13 @@ Declare Scope term_scope.
 Delimit Scope term_scope with T.
 Local Open Scope ring_scope.
 
+Module Export Dummy.
+Module GRing := Algebra.
+End Dummy.
+
 Module Import GRing.
 
-Export GRing.
+Export Algebra.
 
 Import Monoid.Theory.
 
@@ -699,6 +703,8 @@ Proof. exact: sumr_const. Qed.
 Lemma sumr_const_nat m n x : \sum_(n <= i < m) x = x *+ (m - n).
 Proof. exact: sumr_const_nat. Qed.
 
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use Algebra.nmod_closed instead.")]
 Definition addr_closed := nmod_closed.
 
 End NmoduleTheory.

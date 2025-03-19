@@ -113,7 +113,7 @@ From mathcomp Require Import bigop fintype finfun monoid.
 (*                           canonical baseAddUMagmaType instances            *)
 (*                           When both U and V have zmodType instances, it is *)
 (*                           an additive function.                            *)
-(*                        := GRing.Additive.type U V                          *)
+(*                        := Algebra.Additive.type U V                        *)
 (*                                                                            *)
 (*   Notations are defined in scope ring_scope (delimiter %R)                 *)
 (*   This library also extends the conventional suffixes described in library *)
@@ -148,7 +148,7 @@ Reserved Notation "'{' 'additive' U '->' V '}'"
   (at level 0, U at level 98, V at level 99,
    format "{ 'additive'  U  ->  V }").
 
-Module Import GRing.
+Module Import Algebra.
 
 HB.mixin Record hasAdd V := {
   add : V -> V -> V
@@ -1130,7 +1130,7 @@ HB.export SubExports.
 
 Module AllExports. HB.reexport. End AllExports.
 
-End GRing.
+End Algebra.
 
 Export AllExports.
 
