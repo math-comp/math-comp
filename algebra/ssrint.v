@@ -660,6 +660,12 @@ Lemma intrB m n : (m - n)%:~R = m%:~R - n%:~R :> R. Proof. exact: mulrzBr. Qed.
 Lemma intrM m n : (m * n)%:~R = m%:~R * n%:~R :> R.
 Proof. by rewrite mulrzA -mulrzr. Qed.
 
+Lemma intr1 n : n%:~R + 1 = (n + 1)%:~R :> R.
+Proof. by rewrite intrD. Qed.
+
+Lemma int1r n : 1 + n%:~R = (1 + n)%:~R :> R.
+Proof. by rewrite intrD. Qed.
+
 Lemma intmul1_is_multiplicative : multiplicative ( *~%R (1 : R)).
 Proof. by split; move=> // x y /=; rewrite ?intrD ?mulrNz ?intrM. Qed.
 HB.instance Definition _ := GRing.isMultiplicative.Build int R ( *~%R 1)
