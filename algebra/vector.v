@@ -358,7 +358,7 @@ Let mem_r2v rv U : (r2v rv \in U) = (rv <= vs2mx U)%MS.
 Proof. by rewrite memvK r2vK. Qed.
 
 Let vs2mx0 : @vs2mx K vT 0 = 0.
-Proof. by rewrite /= linear0 genmx0. Qed.
+Proof. by rewrite /= linear0 genmx0. Qed. (* slow *)
 
 Let vs2mxD U V : vs2mx (U + V) = (vs2mx U + vs2mx V)%MS.
 Proof. by rewrite /= genmx_adds !gen_vs2mx. Qed.
@@ -396,14 +396,14 @@ Lemma memvE v U : (v \in U) = (<[v]> <= U)%VS. Proof. by []. Qed.
 
 Lemma vlineP v1 v2 : reflect (exists k, v1 = k *: v2) (v1 \in <[v2]>)%VS.
 Proof.
-apply: (iffP idP) => [|[k ->]]; rewrite memvK genmxE ?linearZ ?scalemx_sub //.
+apply: (iffP idP) => [|[k ->]]; rewrite memvK genmxE ?linearZ ?scalemx_sub //. (* slow *)
 by case/sub_rVP=> k; rewrite -linearZ => /v2r_inj->; exists k.
 Qed.
 
 Fact memv_submod_closed U : submod_closed U.
 Proof.
-split=> [|a u v]; rewrite !memvK 1?linear0 1?sub0mx // => Uu Uv.
-by rewrite linearP addmx_sub ?scalemx_sub.
+split=> [|a u v]; rewrite !memvK 1?linear0 1?sub0mx // => Uu Uv. (* slow *)
+by rewrite linearP addmx_sub ?scalemx_sub. (* slow *)
 Qed.
 HB.instance Definition _ (U : {vspace vT}) :=
   GRing.isSubmodClosed.Build K vT (pred_of_vspace U) (memv_submod_closed U).
@@ -518,7 +518,7 @@ HB.instance Definition _ := Monoid.isComLaw.Build {vspace vT} 0%VS addv
   addvA addvC add0v.
 
 Lemma memv_add u v U V : u \in U -> v \in V -> u + v \in (U + V)%VS.
-Proof. by rewrite !memvK genmxE linearD; apply: addmx_sub_adds. Qed.
+Proof. by rewrite !memvK genmxE linearD; apply: addmx_sub_adds. Qed. (* slow *)
 
 Lemma memv_addP {w U V} :
   reflect (exists2 u, u \in U & exists2 v, v \in V & w = u + v)
@@ -678,7 +678,7 @@ Lemma dimv0 : \dim (0%VS : {vspace vT}) = 0.
 Proof. by rewrite /dimv vs2mx0 mxrank0. Qed.
 
 Lemma dimv_eq0 U :  (\dim U == 0) = (U == 0%VS).
-Proof. by rewrite /dimv /= mxrank_eq0 [in RHS]/eq_op /= linear0 genmx0. Qed.
+Proof. by rewrite /dimv /= mxrank_eq0 [in RHS]/eq_op /= linear0 genmx0. Qed. (* slow *)
 
 Lemma dimvf : \dim {:vT} = dim vT.
 Proof. by rewrite /dimv vs2mxF mxrank1. Qed.
@@ -947,7 +947,7 @@ Definition coord := locked_with span_key coord_expanded_def.
 Canonical coord_unlockable := [unlockable fun coord].
 
 Fact coord_is_scalar n (X : n.-tuple vT) i : scalar (coord X i).
-Proof. by move=> k u v; rewrite unlock linearP mulmxDl -scalemxAl !mxE. Qed.
+Proof. by move=> k u v; rewrite unlock linearP mulmxDl -scalemxAl !mxE. Qed. (* slow *)
 HB.instance Definition _ n Xn i :=
   GRing.isLinear.Build K vT K _ (coord Xn i) (@coord_is_scalar n Xn i).
 
@@ -961,7 +961,7 @@ Qed.
 Lemma coord0 i v : coord [tuple 0] i v = 0.
 Proof.
 rewrite unlock /pinvmx rank_rV; case: negP => [[] | _].
-  by apply/eqP/rowP=> j; rewrite !mxE (tnth_nth 0) /= linear0 mxE.
+  by apply/eqP/rowP=> j; rewrite !mxE (tnth_nth 0) /= linear0 mxE. (* slow *)
 by rewrite pid_mx_0 !(mulmx0, mul0mx) mxE.
 Qed.
 
@@ -1720,7 +1720,7 @@ Hypothesis vT_proper : dim vT > 0.
 Fact lfun1_neq0 : \1%VF != 0 :> 'End(vT).
 Proof.
 apply/eqP=> /lfunP/(_ (r2v (const_mx 1))); rewrite !lfunE /= => /(canRL r2vK).
-by move=> /rowP/(_ (Ordinal vT_proper))/eqP; rewrite linear0 !mxE oner_eq0.
+by move=> /rowP/(_ (Ordinal vT_proper))/eqP; rewrite linear0 !mxE oner_eq0. (* slow *)
 Qed.
 
 Prenex Implicits comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr.
@@ -2016,7 +2016,7 @@ Proof.
 pose fr (f : {ffun I -> vT}) := mxvec (\matrix_(i < #|I|) v2r (f (enum_val i))).
 exists fr => /= [k f g|].
   rewrite -linearP; congr mxvec; apply/matrixP=> i j.
-  by rewrite !mxE !ffunE linearP !mxE.
+  by rewrite !mxE !ffunE linearP !mxE. (* slow *)
 exists (fun r => [ffun i => r2v (row (enum_rank i) (vec_mx r)) : vT]) => [g|r].
   by apply/ffunP=> i; rewrite ffunE mxvecK rowK v2rK enum_rankK.
 by apply/(canLR vec_mxK)/matrixP=> i j; rewrite mxE ffunE r2vK enum_valK mxE.

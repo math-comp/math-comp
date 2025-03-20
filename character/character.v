@@ -496,7 +496,7 @@ Definition xcfun (chi : 'CF(G)) A :=
   (gring_row A *m (\col_(i < #|G|) chi (enum_val i))) 0 0.
 
 Lemma xcfun_is_additive phi : additive (xcfun phi).
-Proof. by move=> A B; rewrite /xcfun [gring_row _]linearB mulmxBl !mxE. Qed.
+Proof. by move=> A B; rewrite /xcfun [gring_row _]linearB mulmxBl !mxE. Qed. (* slow *)
 HB.instance Definition _ phi :=
   GRing.isAdditive.Build 'M_(gcard G) _ (xcfun phi) (xcfun_is_additive phi).
 
