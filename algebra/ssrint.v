@@ -1181,19 +1181,19 @@ Proof. by case: n => n x; rewrite ?fmorphV rmorphXn. Qed.
 
 End ExprzField.
 
-Section ExprzOrder.
+Section ExprzNumDomain.
 
-Variable R : realFieldType.
+Variable R : numDomainType.
 Implicit Types x y : R.
 Implicit Types m n : int.
 Local Coercion Posz : nat >-> int.
 
 (* ler and exprz *)
 Lemma exprz_ge0 n x (hx : 0 <= x) : (0 <= x ^ n).
-Proof. by case: n=> n; rewrite ?NegzE -?invr_expz ?invr_ge0 ?exprn_ge0. Qed.
+Proof. by case: n => n; rewrite ?invr_ge0 ?exprn_ge0. Qed.
 
 Lemma exprz_gt0 n x (hx : 0 < x) : (0 < x ^ n).
-Proof. by case: n=> n; rewrite ?NegzE -?invr_expz ?invr_gt0 ?exprn_gt0. Qed.
+Proof. by case: n => n; rewrite ?invr_gt0 ?exprn_gt0. Qed.
 
 Definition exprz_gte0 := (exprz_ge0, exprz_gt0).
 
@@ -1204,6 +1204,32 @@ move=> [] m [] n; rewrite -!topredE /= ?oppr_cp0 ?ltz_nat // => _ _.
 by rewrite lez_nat -?exprnP => /ler_wiXn2l; apply.
 Qed.
 
+Fact ler_wpeXz2l x (x1 : 1 <= x) : {in >= 0 &, {homo exprz x : x y / x <= y}}.
+Proof.
+move=> [] m [] n; rewrite -!topredE /= ?oppr_cp0 ?ltz_nat // => _ _.
+by rewrite lez_nat -?exprnP=> /ler_weXn2l; apply.
+Qed.
+
+Lemma pexprz_eq1 x n (x0 : 0 <= x) : (x ^ n == 1) = ((n == 0) || (x == 1)).
+Proof.
+case: n=> n; rewrite ?NegzE -?exprz_inv ?oppr_eq0 pexprn_eq1 // ?invr_eq1 //.
+by rewrite invr_ge0.
+Qed.
+
+Lemma ler_wpXz2r n (hn : 0 <= n) :
+  {in >= 0 & , {homo (@exprz R)^~ n : x y / x <= y}}.
+Proof. by case: n hn=> // n _; exact: lerXn2r. Qed.
+
+End ExprzNumDomain.
+
+Section ExprzOrder.
+
+Variable R : realFieldType.
+Implicit Types x y : R.
+Implicit Types m n : int.
+Local Coercion Posz : nat >-> int.
+
+(* ler and exprz *)
 Lemma ler_wniXz2l x (x0 : 0 <= x) (x1 : x <= 1) :
   {in < 0 &, {homo exprz x : x y /~ x <= y}}.
 Proof.
@@ -1211,12 +1237,6 @@ move=> [] m [] n; rewrite ?NegzE -!topredE /= ?oppr_cp0 ?ltz_nat // => _ _.
 rewrite lerN2 lez_nat -?invr_expz=> hmn; have := x0.
 rewrite le0r=> /predU1P [->|lx0]; first by rewrite !exp0rz invr0.
 by rewrite lef_pV2 -?topredE /= ?exprz_gt0 // ler_wiXn2l.
-Qed.
-
-Fact ler_wpeXz2l x (x1 : 1 <= x) : {in >= 0 &, {homo exprz x : x y / x <= y}}.
-Proof.
-move=> [] m [] n; rewrite -!topredE /= ?oppr_cp0 ?ltz_nat // => _ _.
-by rewrite lez_nat -?exprnP=> /ler_weXn2l; apply.
 Qed.
 
 Fact ler_wneXz2l x (x1 : 1 <= x) : {in <= 0 &, {homo exprz x : x y / x <= y}}.
@@ -1234,12 +1254,6 @@ case: (lerP n 0)=> [|/ltW] hn.
   by rewrite ler_wneXz2l // [_ \in _](le_trans hmn).
 apply: (@le_trans _ _ (x ^ 0)); first by rewrite ler_wneXz2l.
 by rewrite ler_wpeXz2l.
-Qed.
-
-Lemma pexprz_eq1 x n (x0 : 0 <= x) : (x ^ n == 1) = ((n == 0) || (x == 1)).
-Proof.
-case: n=> n; rewrite ?NegzE -?exprz_inv ?oppr_eq0 pexprn_eq1 // ?invr_eq1 //.
-by rewrite invr_ge0.
 Qed.
 
 Lemma ieexprIz x (x0 : 0 < x) (nx1 : x != 1) : injective (exprz x).
@@ -1283,10 +1297,6 @@ Qed.
 
 Lemma ltr_eXz2l x (x1 : 1 < x) : {mono exprz x : x y / x < y}.
 Proof. exact: (leW_mono (ler_eXz2l _)). Qed.
-
-Lemma ler_wpXz2r n (hn : 0 <= n) :
-  {in >= 0 & , {homo (@exprz R)^~ n : x y / x <= y}}.
-Proof. by case: n hn=> // n _; exact: lerXn2r. Qed.
 
 Lemma ler_wnXz2r n (hn : n <= 0) :
   {in > 0 & , {homo (@exprz R)^~ n : x y /~ x <= y}}.
