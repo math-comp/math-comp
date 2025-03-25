@@ -319,13 +319,20 @@ Arguments inv /.
 
 Definition exprn_le1_bound b1 b2 :=
   if b2 isn't BSide _ 1%Z then +oo
-  else if (BLeft 0%Z <= b1)%O then BRight 1%Z else +oo.
+  else if (BLeft (-1)%Z <= b1)%O then BRight 1%Z else +oo.
 Arguments exprn_le1_bound /.
 
 Definition exprn i :=
   let: Interval l u := i in
   Interval (keep_pos_bound l) (exprn_le1_bound l u).
 Arguments exprn /.
+
+Definition exprz i1 i2 :=
+  let: Interval l2 _ := i2 in
+  if l2 is BSide _ (Posz _) then exprn i1 else
+    let: Interval l u := i1 in
+    Interval (keep_pos_bound l) +oo.
+Arguments exprz /.
 
 Definition keep_sign i :=
   let: Interval l u := i in
@@ -1105,12 +1112,24 @@ case: i => [//| [l u]]; rewrite /= /Itv.num_sem realn/=; congr (_ && _).
 - by case: u => [[] u |//]; rewrite !bnd_simp ?pmulrn ?ler_int ?ltr_int.
 Qed.
 
+Definition natmul_itv (i1 i2 : Itv.t) : Itv.t :=
+  match i1, i2 with
+  | Itv.Top, _ => Itv.Top
+  | _, Itv.Top => Itv.Real `]-oo, +oo[
+  | Itv.Real i1, Itv.Real i2 => Itv.Real (mul i1 i2)
+  end.
+Arguments natmul_itv /.
+
 Lemma num_spec_natmul (xi ni : Itv.t) (x : num_def R xi) (n : nat_def ni)
-    (r := Itv.real2 mul xi ni) :
+    (r := natmul_itv xi ni) :
   num_spec r (x%:num *+ n%:num).
 Proof.
-have Pn : num_spec ni (n%:num%:R : R) by case: n => /= n; rewrite nat_num_spec.
-by rewrite -mulr_natr -[n%:num%:R]/((Itv.Def Pn)%:num) num_spec_mul.
+rewrite {}/r; case: xi x ni n => [//| xi] x [| ni] n.
+  by apply/and3P; case: n%:num => [|?]; rewrite ?mulr0n ?realrMn.
+have Pn : num_spec (Itv.Real ni) (n%:num%:R : R).
+  by case: n => /= n; rewrite [Itv.nat_sem ni n](nat_num_spec (Itv.Real ni)).
+rewrite -mulr_natr -[n%:num%:R]/((Itv.Def Pn)%:num).
+by rewrite (@num_spec_mul (Itv.Real xi) (Itv.Real ni)).
 Qed.
 
 Canonical natmul_inum (xi ni : Itv.t) (x : num_def R xi) (n : nat_def ni) :=
@@ -1126,11 +1145,15 @@ congr (andb _ _).
 Qed.
 
 Lemma num_spec_intmul (xi ii : Itv.t) (x : num_def R xi) (i : num_def int ii)
-    (r := Itv.real2 mul xi ii) :
+    (r := natmul_itv xi ii) :
   num_spec r (x%:num *~ i%:num).
 Proof.
-have Pi : num_spec ii (i%:num%:~R : R) by case: i => /= i; rewrite num_spec_int.
-by rewrite -mulrzr -[i%:num%:~R]/((Itv.Def Pi)%:num) num_spec_mul.
+rewrite {}/r; case: xi x ii i => [//| xi] x [| ii] i.
+  by apply/and3P; case: i%:inum => [[|n] | n]; rewrite ?mulr0z ?realN ?realrMn.
+have Pi : num_spec (Itv.Real ii) (i%:num%:~R : R).
+  by case: i => /= i; rewrite [Itv.num_sem ii i](num_spec_int (Itv.Real ii)).
+rewrite -mulrzr -[i%:num%:~R]/((Itv.Def Pi)%:num).
+by rewrite (@num_spec_mul (Itv.Real xi) (Itv.Real ii)).
 Qed.
 
 Canonical intmul_inum (xi ni : Itv.t) (x : num_def R xi) (n : num_def int ni) :=
@@ -1183,11 +1206,20 @@ Lemma num_itv_bound_exprn_le1 (x : R) n l u :
 Proof.
 case: u => [bu [[//|[|//]] |//] | []//].
 rewrite /exprn_le1_bound; case: (leP _ l) => [lge1 /= |//] lx xu.
-rewrite bnd_simp; case: n => [| n]; rewrite ?expr0// expr_le1//.
-  by case: bu xu; rewrite bnd_simp//; apply: ltW.
-case: l lge1 lx => [[] l | []//]; rewrite !bnd_simp -(@ler_int R).
-- exact: le_trans.
-- by move=> + /ltW; apply: le_trans.
+rewrite bnd_simp; case: n => [| n]; rewrite ?expr0//.
+have xN1 : -1 <= x.
+  case: l lge1 lx => [[] l | []//]; rewrite !bnd_simp -(@ler_int R).
+  - exact: le_trans.
+  - by move=> + /ltW; apply: le_trans.
+have x1 : x <= 1 by case: bu xu; rewrite bnd_simp// => /ltW.
+have xr : x \is Num.real by exact: ler1_real.
+case: (real_ge0P xr) => x0; first by rewrite expr_le1.
+rewrite -[x]opprK exprNn; apply: le_trans (ler_piMl _ _) _.
+- by rewrite exprn_ge0 ?oppr_ge0 1?ltW.
+- suff: -1 <= (-1) ^+ n.+1 :> R /\ (-1) ^+ n.+1 <= 1 :> R => [[]//|].
+  elim: n => [|n [IHn1 IHn2]]; rewrite ?expr1// ![_ ^+ n.+2]exprS !mulN1r.
+  by rewrite lerNl opprK lerNl.
+- by rewrite expr_le1 ?oppr_ge0 1?lerNl// ltW.
 Qed.
 
 Lemma num_spec_exprn (i : Itv.t) (x : num_def R i) n (r := Itv.real1 exprn i) :
@@ -1204,6 +1236,30 @@ Qed.
 
 Canonical exprn_inum (i : Itv.t) (x : num_def R i) n :=
   Itv.mk (num_spec_exprn x n).
+
+Lemma num_spec_exprz (xi ki : Itv.t) (x : num_def R xi) (k : num_def int ki)
+    (r := Itv.real2 exprz xi ki) :
+  num_spec r (x%:num ^ k%:num).
+Proof.
+rewrite {}/r; case: ki k => [|[lk uk]] k; first by case: xi x.
+case: xi x => [//|xi x]; rewrite /Itv.real2.
+have P : Itv.num_sem
+    (let 'Interval l _ := xi in Interval (keep_pos_bound l) +oo)
+    (x%:num ^ k%:num).
+  case: xi x => lx ux x; apply/and3P; split=> [||//].
+    have xr : x%:num \is Num.real by case: x => x /=/andP[].
+    by case: k%:num => n; rewrite ?realV realX.
+  apply: (@num_itv_bound_keep_pos (fun x => x ^ k%:num));
+    [exact: exprz_ge0 | exact: exprz_gt0 |].
+  by case: x => x /=/and3P[].
+case: lk k P => [slk [lk | lk] | slk] k P; [|exact: P..].
+case: k P => -[k | k] /= => [_ _|]; rewrite -/(exprn xi); last first.
+  by move=> /and3P[_ /=]; case: slk; rewrite bnd_simp -pmulrn natz.
+exact: (@num_spec_exprn (Itv.Real xi)).
+Qed.
+
+Canonical exprz_inum (xi ki : Itv.t) (x : num_def R xi) (k : num_def int ki) :=
+  Itv.mk (num_spec_exprz x k).
 
 Lemma num_spec_norm {V : normedZmodType R} (x : V) :
   num_spec (Itv.Real `[0, +oo[) `|x|.
@@ -1280,10 +1336,6 @@ Lemma nat_spec_zero : nat_spec (Itv.Real `[0, 0]%Z) 0. Proof. by []. Qed.
 
 Canonical zeron_inum := Itv.mk nat_spec_zero.
 
-Lemma nat_spec_succ n : nat_spec (Itv.Real `[1, +oo[%Z) n.+1. Proof. by []. Qed.
-
-Canonical succn_inum n := Itv.mk (nat_spec_succ n).
-
 Lemma nat_spec_add (xi yi : Itv.t) (x : nat_def xi) (y : nat_def yi)
     (r := Itv.real2 add xi yi) :
   nat_spec r (x%:num + y%:num).
@@ -1299,6 +1351,16 @@ Qed.
 
 Canonical addn_inum (xi yi : Itv.t) (x : nat_def xi) (y : nat_def yi) :=
   Itv.mk (nat_spec_add x y).
+
+Lemma nat_spec_succ (i : Itv.t) (n : nat_def i)
+    (r := Itv.real2 add i (Itv.Real `[1, 1]%Z)) :
+  nat_spec r (S n%:num).
+Proof.
+pose i1 := Itv.Real `[1, 1]%Z; have P1 : nat_spec i1 1 by [].
+by rewrite -addn1 -[1%N]/((Itv.Def P1)%:num); apply: nat_spec_add.
+Qed.
+
+Canonical succn_inum (i : Itv.t) (n : nat_def i) := Itv.mk (nat_spec_succ n).
 
 Lemma nat_spec_double (i : Itv.t) (n : nat_def i) (r := Itv.real2 add i i) :
   nat_spec r (n%:num.*2).
@@ -1366,6 +1428,11 @@ Canonical maxn_inum (xi yi : Itv.t) (x : nat_def xi) (y : nat_def yi) :=
   Itv.mk (nat_spec_max x y).
 
 Canonical nat_min_max_typ := MinMaxTyp nat_spec_min nat_spec_max.
+
+Lemma nat_spec_factorial (n : nat) : nat_spec (Itv.Real `[1%Z, +oo[) n`!.
+Proof. by apply/andP; rewrite bnd_simp lez_nat fact_gt0. Qed.
+
+Canonical factorial_inum n := Itv.mk (nat_spec_factorial n).
 
 End NatInstances.
 
