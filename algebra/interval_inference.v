@@ -1105,12 +1105,24 @@ case: i => [//| [l u]]; rewrite /= /Itv.num_sem realn/=; congr (_ && _).
 - by case: u => [[] u |//]; rewrite !bnd_simp ?pmulrn ?ler_int ?ltr_int.
 Qed.
 
+Definition natmul_itv (i1 i2 : Itv.t) : Itv.t :=
+  match i1, i2 with
+  | Itv.Top, _ => Itv.Top
+  | _, Itv.Top => Itv.Real `]-oo, +oo[
+  | Itv.Real i1, Itv.Real i2 => Itv.Real (mul i1 i2)
+  end.
+Arguments natmul_itv /.
+
 Lemma num_spec_natmul (xi ni : Itv.t) (x : num_def R xi) (n : nat_def ni)
-    (r := Itv.real2 mul xi ni) :
+    (r := natmul_itv xi ni) :
   num_spec r (x%:num *+ n%:num).
 Proof.
-have Pn : num_spec ni (n%:num%:R : R) by case: n => /= n; rewrite nat_num_spec.
-by rewrite -mulr_natr -[n%:num%:R]/((Itv.Def Pn)%:num) num_spec_mul.
+rewrite {}/r; case: xi x ni n => [//| xi] x [| ni] n.
+  by apply/and3P; case: n%:num => [|?]; rewrite ?mulr0n ?realrMn.
+have Pn : num_spec (Itv.Real ni) (n%:num%:R : R).
+  by case: n => /= n; rewrite [Itv.nat_sem ni n](nat_num_spec (Itv.Real ni)).
+rewrite -mulr_natr -[n%:num%:R]/((Itv.Def Pn)%:num).
+by rewrite (@num_spec_mul (Itv.Real xi) (Itv.Real ni)).
 Qed.
 
 Canonical natmul_inum (xi ni : Itv.t) (x : num_def R xi) (n : nat_def ni) :=
@@ -1126,11 +1138,15 @@ congr (andb _ _).
 Qed.
 
 Lemma num_spec_intmul (xi ii : Itv.t) (x : num_def R xi) (i : num_def int ii)
-    (r := Itv.real2 mul xi ii) :
+    (r := natmul_itv xi ii) :
   num_spec r (x%:num *~ i%:num).
 Proof.
-have Pi : num_spec ii (i%:num%:~R : R) by case: i => /= i; rewrite num_spec_int.
-by rewrite -mulrzr -[i%:num%:~R]/((Itv.Def Pi)%:num) num_spec_mul.
+rewrite {}/r; case: xi x ii i => [//| xi] x [| ii] i.
+  by apply/and3P; case: i%:inum => [[|n] | n]; rewrite ?mulr0z ?realN ?realrMn.
+have Pi : num_spec (Itv.Real ii) (i%:num%:~R : R).
+  by case: i => /= i; rewrite [Itv.num_sem ii i](num_spec_int (Itv.Real ii)).
+rewrite -mulrzr -[i%:num%:~R]/((Itv.Def Pi)%:num).
+by rewrite (@num_spec_mul (Itv.Real xi) (Itv.Real ii)).
 Qed.
 
 Canonical intmul_inum (xi ni : Itv.t) (x : num_def R xi) (n : num_def int ni) :=
