@@ -1429,6 +1429,11 @@ Canonical maxn_inum (xi yi : Itv.t) (x : nat_def xi) (y : nat_def yi) :=
 
 Canonical nat_min_max_typ := MinMaxTyp nat_spec_min nat_spec_max.
 
+Lemma nat_spec_factorial (n : nat) : nat_spec (Itv.Real `[1%Z, +oo[) n`!.
+Proof. by apply/andP; rewrite bnd_simp lez_nat fact_gt0. Qed.
+
+Canonical factorial_inum n := Itv.mk (nat_spec_factorial n).
+
 End NatInstances.
 
 Section IntInstances.
