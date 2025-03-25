@@ -327,6 +327,13 @@ Definition exprn i :=
   Interval (keep_pos_bound l) (exprn_le1_bound l u).
 Arguments exprn /.
 
+Definition exprz i1 i2 :=
+  let: Interval l2 _ := i2 in
+  if l2 is BSide _ (Posz _) then exprn i1 else
+    let: Interval l u := i1 in
+    Interval (keep_pos_bound l) +oo.
+Arguments exprz /.
+
 Definition keep_sign i :=
   let: Interval l u := i in
   Interval (keep_nonneg_bound l) (keep_nonpos_bound u).
@@ -1229,6 +1236,30 @@ Qed.
 
 Canonical exprn_inum (i : Itv.t) (x : num_def R i) n :=
   Itv.mk (num_spec_exprn x n).
+
+Lemma num_spec_exprz (xi ki : Itv.t) (x : num_def R xi) (k : num_def int ki)
+    (r := Itv.real2 exprz xi ki) :
+  num_spec r (x%:num ^ k%:num).
+Proof.
+rewrite {}/r; case: ki k => [|[lk uk]] k; first by case: xi x.
+case: xi x => [//|xi x]; rewrite /Itv.real2.
+have P : Itv.num_sem
+    (let 'Interval l _ := xi in Interval (keep_pos_bound l) +oo)
+    (x%:num ^ k%:num).
+  case: xi x => lx ux x; apply/and3P; split=> [||//].
+    have xr : x%:num \is Num.real by case: x => x /=/andP[].
+    by case: k%:num => n; rewrite ?realV realX.
+  apply: (@num_itv_bound_keep_pos (fun x => x ^ k%:num));
+    [exact: exprz_ge0 | exact: exprz_gt0 |].
+  by case: x => x /=/and3P[].
+case: lk k P => [slk [lk | lk] | slk] k P; [|exact: P..].
+case: k P => -[k | k] /= => [_ _|]; rewrite -/(exprn xi); last first.
+  by move=> /and3P[_ /=]; case: slk; rewrite bnd_simp -pmulrn natz.
+exact: (@num_spec_exprn (Itv.Real xi)).
+Qed.
+
+Canonical exprz_inum (xi ki : Itv.t) (x : num_def R xi) (k : num_def int ki) :=
+  Itv.mk (num_spec_exprz x k).
 
 Lemma num_spec_norm {V : normedZmodType R} (x : V) :
   num_spec (Itv.Real `[0, +oo[) `|x|.
