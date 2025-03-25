@@ -319,7 +319,7 @@ Arguments inv /.
 
 Definition exprn_le1_bound b1 b2 :=
   if b2 isn't BSide _ 1%Z then +oo
-  else if (BLeft 0%Z <= b1)%O then BRight 1%Z else +oo.
+  else if (BLeft (-1)%Z <= b1)%O then BRight 1%Z else +oo.
 Arguments exprn_le1_bound /.
 
 Definition exprn i :=
@@ -1199,11 +1199,20 @@ Lemma num_itv_bound_exprn_le1 (x : R) n l u :
 Proof.
 case: u => [bu [[//|[|//]] |//] | []//].
 rewrite /exprn_le1_bound; case: (leP _ l) => [lge1 /= |//] lx xu.
-rewrite bnd_simp; case: n => [| n]; rewrite ?expr0// expr_le1//.
-  by case: bu xu; rewrite bnd_simp//; apply: ltW.
-case: l lge1 lx => [[] l | []//]; rewrite !bnd_simp -(@ler_int R).
-- exact: le_trans.
-- by move=> + /ltW; apply: le_trans.
+rewrite bnd_simp; case: n => [| n]; rewrite ?expr0//.
+have xN1 : -1 <= x.
+  case: l lge1 lx => [[] l | []//]; rewrite !bnd_simp -(@ler_int R).
+  - exact: le_trans.
+  - by move=> + /ltW; apply: le_trans.
+have x1 : x <= 1 by case: bu xu; rewrite bnd_simp// => /ltW.
+have xr : x \is Num.real by exact: ler1_real.
+case: (real_ge0P xr) => x0; first by rewrite expr_le1.
+rewrite -[x]opprK exprNn; apply: le_trans (ler_piMl _ _) _.
+- by rewrite exprn_ge0 ?oppr_ge0 1?ltW.
+- suff: -1 <= (-1) ^+ n.+1 :> R /\ (-1) ^+ n.+1 <= 1 :> R => [[]//|].
+  elim: n => [|n [IHn1 IHn2]]; rewrite ?expr1// ![_ ^+ n.+2]exprS !mulN1r.
+  by rewrite lerNl opprK lerNl.
+- by rewrite expr_le1 ?oppr_ge0 1?lerNl// ltW.
 Qed.
 
 Lemma num_spec_exprn (i : Itv.t) (x : num_def R i) n (r := Itv.real1 exprn i) :
