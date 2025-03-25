@@ -1280,10 +1280,6 @@ Lemma nat_spec_zero : nat_spec (Itv.Real `[0, 0]%Z) 0. Proof. by []. Qed.
 
 Canonical zeron_inum := Itv.mk nat_spec_zero.
 
-Lemma nat_spec_succ n : nat_spec (Itv.Real `[1, +oo[%Z) n.+1. Proof. by []. Qed.
-
-Canonical succn_inum n := Itv.mk (nat_spec_succ n).
-
 Lemma nat_spec_add (xi yi : Itv.t) (x : nat_def xi) (y : nat_def yi)
     (r := Itv.real2 add xi yi) :
   nat_spec r (x%:num + y%:num).
@@ -1299,6 +1295,16 @@ Qed.
 
 Canonical addn_inum (xi yi : Itv.t) (x : nat_def xi) (y : nat_def yi) :=
   Itv.mk (nat_spec_add x y).
+
+Lemma nat_spec_succ (i : Itv.t) (n : nat_def i)
+    (r := Itv.real2 add i (Itv.Real `[1, 1]%Z)) :
+  nat_spec r (S n%:num).
+Proof.
+pose i1 := Itv.Real `[1, 1]%Z; have P1 : nat_spec i1 1 by [].
+by rewrite -addn1 -[1%N]/((Itv.Def P1)%:num); apply: nat_spec_add.
+Qed.
+
+Canonical succn_inum (i : Itv.t) (n : nat_def i) := Itv.mk (nat_spec_succ n).
 
 Lemma nat_spec_double (i : Itv.t) (n : nat_def i) (r := Itv.real2 add i i) :
   nat_spec r (n%:num.*2).
