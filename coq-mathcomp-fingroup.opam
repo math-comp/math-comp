@@ -7,20 +7,7 @@ bug-reports: "https://github.com/math-comp/math-comp/issues"
 dev-repo: "git+https://github.com/math-comp/math-comp.git"
 license: "CECILL-B"
 
-build: [ make "-C" "fingroup" "-j" "%{jobs}%" ]
-install: [ make "-C" "fingroup" "install" ]
-depends: [ "coq-mathcomp-ssreflect" { = version } ]
-
-tags: [
-  "keyword:small scale reflection"
-  "keyword:mathematical components"
-  "keyword:finite groups"
-  "logpath:mathcomp.fingroup"
-]
+depends: [ "rocq-mathcomp-fingroup" {= version} ]
 authors: [ "The Mathematical Components team" ]
 
-synopsis: "Mathematical Components Library on finite groups"
-description: """
-This library contains definitions and theorems about finite groups,
-group quotients, group morphisms, group presentation, group action...
-"""
+synopsis: "Compatibility package for rocq-mathcomp-fingroup"
