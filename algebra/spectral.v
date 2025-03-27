@@ -8,8 +8,10 @@ From mathcomp Require Import mxpoly mxred sesquilinear.
 (*                             Spectral theory                                *)
 (*                                                                            *)
 (* This file provides a formalization of Gram-Schmidt orthonormalization,     *)
-(* Schur decomposition, etc.                                                   *)
+(* Schur decomposition, etc.                                                  *)
 (*                                                                            *)
+(*               u ``_ i := u 0 i                                             *)
+(*                          The notation is Reserved but only used locally.   *)
 (*                 M ^t* := M ^t conjC                                        *)
 (*                           Notation in scope sesquilinear_scope.            *)
 (*       M \is unitarymx == M is a unitary matrix                             *)
@@ -34,6 +36,9 @@ From mathcomp Require Import mxpoly mxred sesquilinear.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
+
+Reserved Notation "u '``_' i"
+  (at level 3, i at level 2, left associativity, format "u '``_' i").
 
 Import GRing.Theory Order.Theory Num.Theory.
 Local Open Scope ring_scope.
@@ -297,6 +302,8 @@ apply: (iffP eqP) => [Mo i j|Mo].
 apply/matrixP=> i j; rewrite !mxE; have := Mo i j; rewrite dotmxE !mxE => <-.
 by apply: eq_bigr => /= k _; rewrite !mxE.
 Qed.
+
+Local Notation "u '``_' i" := (u 0%R i).
 
 Fact dotmx_is_dotmx n (u : 'rV[C]_n) : u != 0 -> 0 < '[u].
 Proof.

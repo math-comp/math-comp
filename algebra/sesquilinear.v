@@ -6,7 +6,6 @@ From mathcomp Require Import zmodp poly order ssrnum matrix mxalgebra vector.
 (******************************************************************************)
 (*                            Sesquilinear forms                              *)
 (*                                                                            *)
-(*                u ``_ i := u 0 i                                            *)
 (*                   e_ j := the row matrix with a 1 in column j              *)
 (*                M ^ phi := map_mx phi M                                     *)
 (*                           Notation in scope sesquilinear_scope.            *)
@@ -108,8 +107,6 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Reserved Notation "u '``_' i"
-  (at level 3, i at level 2, left associativity, format "u '``_' i").
 Reserved Notation "M ^t phi"
   (at level 39, left associativity, format "M  ^t  phi").
 Reserved Notation "A ^!" (at level 2, format "A ^!").
@@ -120,8 +117,6 @@ Reserved Notation "eps_theta .-sesqui"
 
 Local Open Scope ring_scope.
 Import GRing.Theory Order.Theory Num.Theory.
-
-Notation "u '``_' i" := (u 0%R i) : ring_scope.
 
 Notation "''e_' j" := (delta_mx 0 j)
  (format "''e_' j", at level 8, j at level 2) : ring_scope.
