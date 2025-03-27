@@ -7,21 +7,7 @@ bug-reports: "https://github.com/math-comp/math-comp/issues"
 dev-repo: "git+https://github.com/math-comp/math-comp.git"
 license: "CECILL-B"
 
-build: [ make "-C" "field" "-j" "%{jobs}%" ]
-install: [ make "-C" "field" "install" ]
-depends: [ "coq-mathcomp-solvable" { = version } ]
-
-tags: [
-  "keyword:small scale reflection"
-  "keyword:mathematical components"
-  "keyword:algebra"
-  "keyword:field"
-  "logpath:mathcomp.field"
-]
+depends: [ "rocq-mathcomp-field" { = version } ]
 authors: [ "The Mathematical Components team" ]
 
-synopsis: "Mathematical Components Library on Fields"
-description:"""
-This library contains definitions and theorems about field extensions,
-galois theory, algebraic numbers, cyclotomic polynomials...
-"""
+synopsis: "Compatibility package for rocq-mathcomp-field"

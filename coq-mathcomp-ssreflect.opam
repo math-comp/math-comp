@@ -7,45 +7,10 @@ bug-reports: "https://github.com/math-comp/math-comp/issues"
 dev-repo: "git+https://github.com/math-comp/math-comp.git"
 license: "CECILL-B"
 
-build: [ make "-C" "ssreflect" "-j" "%{jobs}%" ]
-install: [ make "-C" "ssreflect" "install" ]
 depends: [
-  ("coq" {>= "8.19" & < "8.21~"}
-  | "rocq-core" {>= "9.0" | = "dev"})
-  # Please keep the "dev" above as it is required for the coq-dev Docker images
-  "elpi" {>= "1.17.0"}
-  "coq-hierarchy-builder" { >= "1.7.0"}
-]
-
-tags: [
-  "keyword:small scale reflection"
-  "keyword:mathematical components"
-  "keyword:bigop"
-  "keyword:big operators"
-  "keyword:biomial coefficient"
-  "keyword:integer division theory"
-  "keyword:finite sets"
-  "keyword:functions with finite domain"
-  "keyword:finite graphs"
-  "keyword:quotient types"
-  "keyword:order theory"
-  "keyword:partial order"
-  "keyword:lattices"
-  "keyword:lists"
-  "keyword:ordering and sorting lists"
-  "keyword:prime numbers"
-  "keyword:tuples"
-  "keyword:bounded lists"
-  "logpath:mathcomp.ssreflect"
+  "coq-core"
+  "rocq-mathcomp-ssreflect" {= version}
 ]
 authors: [ "The Mathematical Components team" ]
 
-synopsis: "Small Scale Reflection"
-description: """
-This library includes the small scale reflection proof language
-extension and the minimal set of libraries to take advantage of it.
-This includes libraries on lists (seq), boolean and boolean
-predicates, natural numbers and types with decidable equality,
-finite types, finite sets, finite functions, finite graphs, basic arithmetics
-and prime numbers, big operators
-"""
+synopsis: "Compatibility package for rocq-mathcomp-ssreflect"

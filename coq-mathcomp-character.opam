@@ -7,21 +7,7 @@ bug-reports: "https://github.com/math-comp/math-comp/issues"
 dev-repo: "git+https://github.com/math-comp/math-comp.git"
 license: "CECILL-B"
 
-build: [ make "-C" "character" "-j" "%{jobs}%" ]
-install: [ make "-C" "character" "install" ]
-depends: [ "coq-mathcomp-field" { = version } ]
-
-tags: [
-  "keyword:small scale reflection"
-  "keyword:mathematical components"
-  "keyword:algebra"
-  "keyword:character"
-  "logpath:mathcomp.character"
-]
+depends: [ "rocq-mathcomp-character" { = version } ]
 authors: [ "The Mathematical Components team" ]
 
-synopsis: "Mathematical Components Library on character theory"
-description:"""
-This library contains definitions and theorems about group
-representations, characters and class functions.
-"""
+synopsis: "Compatibility package for rocq-mathcomp-character"

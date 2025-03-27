@@ -7,20 +7,7 @@ bug-reports: "https://github.com/math-comp/math-comp/issues"
 dev-repo: "git+https://github.com/math-comp/math-comp.git"
 license: "CECILL-B"
 
-build: [ make "-C" "solvable" "-j" "%{jobs}%" ]
-install: [ make "-C" "solvable"  "install" ]
-depends: [ "coq-mathcomp-algebra" { = version } ]
-
-tags: [
-  "keyword:small scale reflection"
-  "keyword:mathematical components"
-  "keyword:finite groups"
-  "logpath:mathcomp.solvable"
-]
+depends: [ "rocq-mathcomp-solvable" { = version } ]
 authors: [ "The Mathematical Components team" ]
 
-synopsis: "Mathematical Components Library on finite groups (II)"
-
-description:"""
-This library contains more definitions and theorems about finite groups.
-"""
+synopsis: "Compatibility package for rocq-mathcomp-solvable"
