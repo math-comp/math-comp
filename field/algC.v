@@ -271,7 +271,7 @@ Parameter conjMixin : Num.ClosedField type.
 Parameter isCountable : Countable type.
 
 (* Note that this cannot be included in conjMixin since a few proofs
-   depend from nat_num being definitionally equal to (trunc x)%:R == x *)
+   depend from nat_num being definitionally equal to (truncn x)%:R == x *)
 Axiom archimedean : Num.archimedean_axiom (Num.ClosedField.Pack conjMixin).
 
 Axiom algebraic : integralRange (@ratr (Num.ClosedField.Pack conjMixin)).

@@ -764,21 +764,21 @@ Section ratArchimedean.
 
 Implicit Types x : rat.
 
-Let trunc x : nat := if 0 <= x then (`|numq x| %/ `|denq x|)%N else 0%N.
+Let truncn x : nat := if 0 <= x then (`|numq x| %/ `|denq x|)%N else 0%N.
 
-Lemma truncP x :
-  if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N.
+Lemma truncnP x :
+  if 0 <= x then (truncn x)%:R <= x < (truncn x).+1%:R else truncn x == 0%N.
 Proof.
-rewrite /trunc -numq_ge0; case: (ratP x) => -[] //= n d _.
+rewrite /truncn -numq_ge0; case: (ratP x) => -[] //= n d _.
 rewrite ler_pdivlMr ?ltr_pdivrMr ?ltr0z // -!natrM ler_nat ltr_nat.
 by rewrite leq_divM ltn_ceil.
 Qed.
 
 Let is_nat x := (0 <= x) && (denq x == 1).
 
-Lemma is_natE x : is_nat x = ((trunc x)%:R == x).
+Lemma is_natE x : is_nat x = ((truncn x)%:R == x).
 Proof.
-rewrite /is_nat /trunc -numq_ge0 !rat_eq; case: (ratP x) => -[] //= n d pnd.
+rewrite /is_nat /truncn -numq_ge0 !rat_eq; case: (ratP x) => -[] //= n d pnd.
 rewrite pmulrn numq_int denq_int mulr1 -PoszM !eqz_nat -dvdn_eq.
 apply/eqP/idP => [->|/dvdnP[k nE]] //.
 by move/eqP: pnd; rewrite nE gcdnC gcdnMl.
@@ -788,10 +788,12 @@ Lemma is_intE x : (denq x == 1) = is_nat x || is_nat (- x).
 Proof. by rewrite /is_nat denqN oppr_ge0 -andb_orl le_total. Qed.
 
 End ratArchimedean.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncnP.")]
+Notation truncP := truncnP.
 End ratArchimedean.
 
 HB.instance Definition _ := Num.NumDomain_isArchimedean.Build rat
-  ratArchimedean.truncP ratArchimedean.is_natE ratArchimedean.is_intE.
+  ratArchimedean.truncnP ratArchimedean.is_natE ratArchimedean.is_intE.
 
 Lemma Qint_def (x : rat) : (x \is a Num.int) = (denq x == 1). Proof. by []. Qed.
 
