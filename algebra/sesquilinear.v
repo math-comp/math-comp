@@ -47,7 +47,7 @@ From mathcomp Require Import zmodp poly order ssrnum matrix mxalgebra vector.
 (*                                                                            *)
 (* M \is (eps, theta).-sesqui == M is a sesquilinear form                     *)
 (*                                                                            *)
-(*      orthomx theta M B == M-orthogonal completement of B                   *)
+(*      orthomx theta M B == M-orthogonal complement of B                     *)
 (*                        := kermx (M *m B ^t theta)                          *)
 (*                           M is a square matrix representing a sesquilinear *)
 (*                           form, B is a rectangle matrix representing a     *)
