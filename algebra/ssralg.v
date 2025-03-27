@@ -6792,28 +6792,28 @@ Export Scale.Exports.
 Export ClosedExports.
 
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use nzSemiRingType instead.")]
+             note="Try pzSemiRingType (the potentially-zero counterpart) first, or use nzSemiRingType instead.")]
 Notation semiRingType := (nzSemiRingType) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use nzRingType instead.")]
+             note="Try pzRingType (the potentially-zero counterpart) first, or use nzRingType instead.")]
 Notation ringType := (nzRingType) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use comNzSemiRingType instead.")]
+             note="Try comPzSemiRingType (the potentially-zero counterpart) first, or use comNzSemiRingType instead.")]
 Notation comSemiRingType := (comNzSemiRingType) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use comNzRingType instead.")]
+             note="Try comPzRingType (the potentially-zero counterpart) first, or use comNzRingType instead.")]
 Notation comRingType := (comNzRingType) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use subNzSemiRingType instead.")]
+             note="Try subPzSemiRingType (the potentially-zero counterpart) first, or use subNzSemiRingType instead.")]
 Notation subSemiRingType := (subNzSemiRingType) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use subComNzSemiRingType instead.")]
+             note="Try subComPzSemiRingType (the potentially-zero counterpart) first, or use subComNzSemiRingType instead.")]
 Notation subComSemiRingType := (subComNzSemiRingType) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use subNzRingType instead.")]
+             note="Try subPzRingType (the potentially-zero counterpart) first, or use subNzRingType instead.")]
 Notation subRingType := (subNzRingType) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use subComNzRingType instead.")]
+             note="Try subComPzRingType (the potentially-zero counterpart) first, or use subComNzRingType instead.")]
 Notation subComNzRingType := (subComNzRingType) (only parsing).
 
 Variant Ione := IOne : Ione.
