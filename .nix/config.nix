@@ -114,6 +114,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       coqeal.job = false;  # CoqEAL requires Coq >= 8.20
       mathcomp-apery.job = false;  # reverse dependency of coqeal
       mathcomp-finmap.override.version = "2.1.0";
+      jasmin.job = false;
     };
   };
 }
