@@ -364,12 +364,18 @@ move: (ger_real lemx); rewrite realz => /real_floor_itv/andP[lefx ltxf1].
 by rewrite -!(ltr_int R) 2?(@le_lt_trans _ _ x).
 Qed.
 
-Lemma real_floor_ge_int x n : x \is Rreal -> n%:~R <= x = (n <= floor x).
+(* TODO: rename to real_floor_ge_int,
+   once the currently deprecated one has been removed *)
+Lemma real_floor_ge_int_tmp x n : x \is Rreal -> (n <= floor x) = (n%:~R <= x).
 Proof.
 move=> /real_floor_itv /andP[lefx ltxf1]; apply/idP/idP => lenx.
-  by rewrite -ltzD1 -(ltr_int R); apply: le_lt_trans ltxf1.
-by apply: le_trans lefx; rewrite ler_int.
+  by apply: le_trans lefx; rewrite ler_int.
+by rewrite -ltzD1 -(ltr_int R); apply: le_lt_trans ltxf1.
 Qed.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use real_floor_ge_int_tmp instead.")]
+Lemma real_floor_ge_int x n : x \is Rreal -> (n%:~R <= x) = (n <= floor x).
+Proof. by move=> ?; rewrite real_floor_ge_int_tmp. Qed.
 
 Lemma floor_le : {homo floor : x y / x <= y}.
 Proof.
@@ -444,11 +450,17 @@ move=> Hx; apply/eqP; rewrite eqr_oppLR; apply/eqP/floor_def.
 by rewrite lerNr ltrNl andbC -!mulrNz opprD opprK.
 Qed.
 
-Lemma real_ceil_le_int x n : x \is Rreal -> x <= n%:~R = (ceil x <= n).
+(* TODO: rename to real_ceil_le_int,
+   once the currently deprecated one has been removed *)
+Lemma real_ceil_le_int_tmp x n : x \is Rreal -> (ceil x <= n) = (x <= n%:~R).
 Proof.
-rewrite -realN; move=> /(real_floor_ge_int (- n)).
-by rewrite mulrNz lerNl opprK => ->; rewrite lerNl.
+rewrite -realN; move=> /(real_floor_ge_int_tmp (- n)).
+by rewrite mulrNz lerNl => ->; rewrite lerN2.
 Qed.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use real_ceil_le_int_tmp instead.")]
+Lemma real_ceil_le_int x n : x \is Rreal -> x <= n%:~R = (ceil x <= n).
+Proof. by move=> ?; rewrite real_ceil_le_int_tmp. Qed.
 
 Lemma ceil_le : {homo ceil : x y / x <= y}.
 Proof. by move=> x y lexy; rewrite /ceil lerN2 floor_le ?lerN2. Qed.
@@ -673,8 +685,14 @@ Lemma ge_floor x : (floor x)%:~R <= x. Proof. exact: real_ge_floor. Qed.
 Lemma lt_succ_floor x : x < (floor x + 1)%:~R.
 Proof. exact: real_lt_succ_floor. Qed.
 
+#[deprecated(since="mathcomp 2.4.0", note="Use floor_ge_int_tmp instead.")]
 Lemma floor_ge_int x n : n%:~R <= x = (n <= floor x).
-Proof. exact: real_floor_ge_int. Qed.
+Proof. by rewrite real_floor_ge_int_tmp. Qed.
+
+(* TODO: rename to floor_ge_int,
+   once the currently deprecated one has been removed *)
+Lemma floor_ge_int_tmp x n : (n <= floor x) = (n%:~R <= x).
+Proof. exact: real_floor_ge_int_tmp. Qed.
 
 Lemma floorDzr : {in @int_num R, {morph floor : x y / x + y}}.
 Proof. by move=> x xz y; apply/real_floorDzr/num_real. Qed.
@@ -690,8 +708,14 @@ Proof. exact: real_gt_pred_ceil. Qed.
 
 Lemma le_ceil x : x <= (ceil x)%:~R. Proof. exact: real_le_ceil. Qed.
 
+#[deprecated(since="mathcomp 2.4.0", note="Use ceil_le_int_tmp instead.")]
 Lemma ceil_le_int x n : x <= n%:~R = (ceil x <= n).
-Proof. exact: real_ceil_le_int. Qed.
+Proof. by rewrite real_ceil_le_int_tmp. Qed.
+
+(* TODO: rename to ceil_le_int,
+   once the currently deprecated one has been removed *)
+Lemma ceil_le_int_tmp x n : (ceil x <= n) = (x <= n%:~R).
+Proof. exact: real_ceil_le_int_tmp. Qed.
 
 Lemma ceilDzr : {in @int_num R, {morph ceil : x y / x + y}}.
 Proof. by move=> x xz y; apply/real_ceilDzr/num_real. Qed.
