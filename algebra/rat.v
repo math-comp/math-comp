@@ -771,7 +771,7 @@ Lemma truncP x :
 Proof.
 rewrite /trunc -numq_ge0; case: (ratP x) => -[] //= n d _.
 rewrite ler_pdivlMr ?ltr_pdivrMr ?ltr0z // -!natrM ler_nat ltr_nat.
-by rewrite leq_trunc_div ltn_ceil.
+by rewrite leq_divM ltn_ceil.
 Qed.
 
 Let is_nat x := (0 <= x) && (denq x == 1).
