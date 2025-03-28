@@ -36,7 +36,7 @@ From mathcomp Require Import fintype bigop order ssralg poly ssrnum ssrint.
 (*                     when x \is a Num.real, otherwise 0%Z                   *)
 (*       Num.ceil x == the m : int such that (m - 1)%:~R < x <= m%:~R         *)
 (*                     when x \is a Num.real, otherwise 0%Z                   *)
-(*      Num.trunc x == the n : nat such that n%:R <= x < n.+1%:R              *)
+(*     Num.truncn x == the n : nat such that n%:R <= x < n.+1%:R              *)
 (*                     when 0 <= n, otherwise 0%N                             *)
 (*      Num.bound x == an upper bound for x, i.e., an n such that `|x| < n%:R *)
 (******************************************************************************)
@@ -52,14 +52,14 @@ Module Num.
 Import ssrnum.Num.
 
 HB.mixin Record NumDomain_isArchimedean R of NumDomain R := {
-  trunc_subdef : R -> nat;
+  truncn_subdef : R -> nat;
   nat_num_subdef : pred R;
   int_num_subdef : pred R;
-  trunc_subproof :
+  truncn_subproof :
     forall x,
-      if 0 <= x then (trunc_subdef x)%:R <= x < (trunc_subdef x).+1%:R
-      else trunc_subdef x == 0%N;
-  nat_num_subproof : forall x, nat_num_subdef x = ((trunc_subdef x)%:R == x);
+      if 0 <= x then (truncn_subdef x)%:R <= x < (truncn_subdef x).+1%:R
+      else truncn_subdef x == 0%N;
+  nat_num_subproof : forall x, nat_num_subdef x = ((truncn_subdef x)%:R == x);
   int_num_subproof :
     forall x, int_num_subdef x = nat_num_subdef x || nat_num_subdef (- x);
 }.
@@ -124,16 +124,16 @@ Section Def.
 Context {R : archiNumDomainType}.
 Implicit Types x : R.
 
-Definition trunc : R -> nat := @trunc_subdef R.
+Definition truncn : R -> nat := @truncn_subdef R.
 Definition nat_num : qualifier 1 R := [qualify a x : R | nat_num_subdef x].
 Definition int_num : qualifier 1 R := [qualify a x : R | int_num_subdef x].
 
-Local Lemma truncP x :
-  if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N.
-Proof. exact: trunc_subproof. Qed.
+Local Lemma truncnP x :
+  if 0 <= x then (truncn x)%:R <= x < (truncn x).+1%:R else truncn x == 0%N.
+Proof. exact: truncn_subproof. Qed.
 
-Local Lemma trunc_itv x : 0 <= x -> (trunc x)%:R <= x < (trunc x).+1%:R.
-Proof. by move=> x_ge0; move: (truncP x); rewrite x_ge0. Qed.
+Local Lemma truncn_itv x : 0 <= x -> (truncn x)%:R <= x < (truncn x).+1%:R.
+Proof. by move=> x_ge0; move: (truncnP x); rewrite x_ge0. Qed.
 
 Local Fact floor_subproof x :
   {m | if x \is Rreal then m%:~R <= x < (m + 1)%:~R else m == 0}.
@@ -146,21 +146,25 @@ without loss x_ge0: x Rx / x >= 0.
   case: eqP => [-> _ | _ /andP[lt_x_m lt_m_x]].
     by exists (- m); rewrite lexx rmorphD ltrDl ltr01.
   by exists (- m - 1); rewrite (ltW lt_m_x) subrK.
-by exists (Posz (trunc x)); rewrite addrC -intS -!pmulrn trunc_itv.
+by exists (Posz (truncn x)); rewrite addrC -intS -!pmulrn truncn_itv.
 Qed.
 
 Definition floor x := sval (floor_subproof x).
 Definition ceil x := - floor (- x).
-Definition archi_bound x := (trunc `|x|).+1.
+Definition archi_bound x := (truncn `|x|).+1.
 
 End Def.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn.")]
+Notation trunc := truncn.
 End Def.
 
-Arguments trunc {R} : simpl never.
+Arguments truncn {R} : simpl never.
 Arguments nat_num {R} : simpl never.
 Arguments int_num {R} : simpl never.
 
-Notation trunc := trunc.
+Notation truncn := truncn.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn.")]
+Notation trunc := truncn.
 Notation floor := floor.
 Notation ceil := ceil.
 Notation bound := archi_bound.
@@ -170,13 +174,13 @@ Section intArchimedean.
 
 Implicit Types n : int.
 
-Let trunc n : nat := if n is Posz n' then n' else 0%N.
+Let truncn n : nat := if n is Posz n' then n' else 0%N.
 
-Lemma truncP n :
-  if 0 <= n then (trunc n)%:R <= n < (trunc n).+1%:R else trunc n == 0%N.
+Lemma truncnP n :
+  if 0 <= n then (truncn n)%:R <= n < (truncn n).+1%:R else truncn n == 0%N.
 Proof. by case: n => //= n; rewrite !natz intS ltz1D lexx. Qed.
 
-Lemma is_natE n : (0 <= n) = ((trunc n)%:R == n).
+Lemma is_natE n : (0 <= n) = ((truncn n)%:R == n).
 Proof. by case: n => //= n; rewrite natz eqxx. Qed.
 
 Lemma is_intE n : true = (0 <= n) || (0 <= - n).
@@ -187,7 +191,7 @@ End intArchimedean.
 
 #[export]
 HB.instance Definition _ := NumDomain_isArchimedean.Build int
-  intArchimedean.truncP intArchimedean.is_natE intArchimedean.is_intE.
+  intArchimedean.truncnP intArchimedean.is_natE intArchimedean.is_intE.
 
 Module Import Theory.
 Export ssrnum.Num.Theory.
@@ -197,42 +201,42 @@ Section ArchiNumDomainTheory.
 Variable R : archiNumDomainType.
 Implicit Types x y z : R.
 
-Local Notation trunc := (@trunc R).
+Local Notation truncn := (@truncn R).
 Local Notation floor := (@floor R).
 Local Notation ceil := (@ceil R).
 Local Notation nat_num := (@nat_num R).
 Local Notation int_num := (@int_num R).
 
-(* trunc and nat_num *)
+(* truncn and nat_num *)
 
-Definition trunc_itv x : 0 <= x -> (trunc x)%:R <= x < (trunc x).+1%:R :=
-  @Def.trunc_itv R x.
+Definition truncn_itv x : 0 <= x -> (truncn x)%:R <= x < (truncn x).+1%:R :=
+  @Def.truncn_itv R x.
 
-Lemma natrE x : (x \is a nat_num) = ((trunc x)%:R == x).
+Lemma natrE x : (x \is a nat_num) = ((truncn x)%:R == x).
 Proof. exact: nat_num_subproof. Qed.
 
 Lemma archi_boundP x : 0 <= x -> x < (archi_bound x)%:R.
 Proof.
-move=> x_ge0; case/trunc_itv/andP: (normr_ge0 x) => _.
+move=> x_ge0; case/truncn_itv/andP: (normr_ge0 x) => _.
 exact/le_lt_trans/real_ler_norm/ger0_real.
 Qed.
 
-Lemma trunc_def x n : n%:R <= x < n.+1%:R -> trunc x = n.
+Lemma truncn_def x n : n%:R <= x < n.+1%:R -> truncn x = n.
 Proof.
 case/andP=> lemx ltxm1; apply/eqP; rewrite eqn_leq -ltnS -[(n <= _)%N]ltnS.
-have/trunc_itv/andP[lefx ltxf1]: 0 <= x by apply: le_trans lemx; apply: ler0n.
+have/truncn_itv/andP[lefx ltxf1]: 0 <= x by apply: le_trans lemx; apply: ler0n.
 by rewrite -!(ltr_nat R) 2?(@le_lt_trans _ _ x).
 Qed.
 
-Lemma natrK : cancel (GRing.natmul 1) trunc.
-Proof. by move=> m; apply: trunc_def; rewrite ler_nat ltr_nat ltnS leqnn. Qed.
+Lemma natrK : cancel (GRing.natmul 1) truncn.
+Proof. by move=> m; apply: truncn_def; rewrite ler_nat ltr_nat ltnS leqnn. Qed.
 
-Lemma truncK : {in nat_num, cancel trunc (GRing.natmul 1)}.
+Lemma truncnK : {in nat_num, cancel truncn (GRing.natmul 1)}.
 Proof. by move=> x; rewrite natrE => /eqP. Qed.
 
-Lemma trunc0 : trunc 0 = 0%N. Proof. exact: natrK 0%N. Qed.
-Lemma trunc1 : trunc 1 = 1%N. Proof. exact: natrK 1%N. Qed.
-#[local] Hint Resolve trunc0 trunc1 : core.
+Lemma truncn0 : truncn 0 = 0%N. Proof. exact: natrK 0%N. Qed.
+Lemma truncn1 : truncn 1 = 1%N. Proof. exact: natrK 1%N. Qed.
+#[local] Hint Resolve truncn0 truncn1 : core.
 
 Lemma natr_nat n : n%:R \is a nat_num. Proof. by rewrite natrE natrK. Qed.
 #[local] Hint Resolve natr_nat : core.
@@ -240,19 +244,20 @@ Lemma natr_nat n : n%:R \is a nat_num. Proof. by rewrite natrE natrK. Qed.
 Lemma natrP x : reflect (exists n, x = n%:R) (x \is a nat_num).
 Proof.
 apply: (iffP idP) => [|[n ->]]; rewrite // natrE => /eqP <-.
-by exists (trunc x).
+by exists (truncn x).
 Qed.
 
-Lemma truncD : {in nat_num & Rnneg, {morph trunc : x y / x + y >-> (x + y)%N}}.
+Lemma truncnD :
+  {in nat_num & Rnneg, {morph truncn : x y / x + y >-> (x + y)%N}}.
 Proof.
-move=> _ y /natrP[n ->] y_ge0; apply: trunc_def.
-by rewrite -addnS !natrD !natrK lerD2l ltrD2l trunc_itv.
+move=> _ y /natrP[n ->] y_ge0; apply: truncn_def.
+by rewrite -addnS !natrD !natrK lerD2l ltrD2l truncn_itv.
 Qed.
 
-Lemma truncM : {in nat_num &, {morph trunc : x y / x * y >-> (x * y)%N}}.
+Lemma truncnM : {in nat_num &, {morph truncn : x y / x * y >-> (x * y)%N}}.
 Proof. by move=> _ _ /natrP[n1 ->] /natrP[n2 ->]; rewrite -natrM !natrK. Qed.
 
-Lemma truncX n : {in nat_num, {morph trunc : x / x ^+ n >-> (x ^ n)%N}}.
+Lemma truncnX n : {in nat_num, {morph truncn : x / x ^+ n >-> (x ^ n)%N}}.
 Proof. by move=> _ /natrP[n1 ->]; rewrite -natrX !natrK. Qed.
 
 Lemma rpred_nat_num (S : semiringClosed R) x : x \is a nat_num -> x \in S.
@@ -276,16 +281,16 @@ Proof. by move=> _ /natrP[m ->]. Qed.
 Lemma natr_normK x : x \is a nat_num -> `|x| ^+ 2 = x ^+ 2.
 Proof. by move/Rreal_nat/real_normK. Qed.
 
-Lemma trunc_gt0 x : (0 < trunc x)%N = (1 <= x).
+Lemma truncn_gt0 x : (0 < truncn x)%N = (1 <= x).
 Proof.
-case: ifP (Def.truncP x) => [le0x /andP[lemx ltxm1] | le0x /eqP ->]; last first.
+case: ifP (Def.truncnP x) => [le0x /andP[lemx ltxm1] | le0x /eqP ->]; last first.
   by apply/esym; apply/contraFF/le_trans: le0x.
 apply/idP/idP => [m_gt0 | x_ge1]; first by apply: le_trans lemx; rewrite ler1n.
 by rewrite -ltnS -(ltr_nat R) (le_lt_trans x_ge1).
 Qed.
 
-Lemma trunc0Pn x : reflect (trunc x = 0%N) (~~ (1 <= x)).
-Proof. by rewrite -trunc_gt0 -eqn0Ngt; apply: eqP. Qed.
+Lemma truncn0Pn x : reflect (truncn x = 0%N) (~~ (1 <= x)).
+Proof. by rewrite -truncn_gt0 -eqn0Ngt; apply: eqP. Qed.
 
 Lemma natr_ge0 x : x \is a nat_num -> 0 <= x.
 Proof. by move=> /natrP[n ->]; apply: ler0n. Qed.
@@ -296,41 +301,41 @@ Proof. by move=> /natrP[n ->]; rewrite pnatr_eq0 ltr0n lt0n. Qed.
 Lemma norm_natr x : x \is a nat_num -> `|x| = x.
 Proof. by move/natr_ge0/ger0_norm. Qed.
 
-Lemma sum_truncK I r (P : pred I) F : (forall i, P i -> F i \is a nat_num) ->
-  (\sum_(i <- r | P i) trunc (F i))%:R = \sum_(i <- r | P i) F i.
+Lemma sum_truncnK I r (P : pred I) F : (forall i, P i -> F i \is a nat_num) ->
+  (\sum_(i <- r | P i) truncn (F i))%:R = \sum_(i <- r | P i) F i.
 Proof.
-by move=> natr; rewrite -sumrMnr; apply: eq_bigr => i Pi; rewrite truncK ?natr.
+by move=> natr; rewrite -sumrMnr; apply: eq_bigr => i Pi; rewrite truncnK ?natr.
 Qed.
 
-Lemma prod_truncK I r (P : pred I) F : (forall i, P i -> F i \is a nat_num) ->
-  (\prod_(i <- r | P i) trunc (F i))%:R = \prod_(i <- r | P i) F i.
+Lemma prod_truncnK I r (P : pred I) F : (forall i, P i -> F i \is a nat_num) ->
+  (\prod_(i <- r | P i) truncn (F i))%:R = \prod_(i <- r | P i) F i.
 Proof.
-by move=> natr; rewrite natr_prod; apply: eq_bigr => i Pi; rewrite truncK ?natr.
+by move=> natr; rewrite natr_prod; apply: eq_bigr => i Pi; rewrite truncnK ?natr.
 Qed.
 
 Lemma natr_sum_eq1 (I : finType) (P : pred I) (F : I -> R) :
      (forall i, P i -> F i \is a nat_num) -> \sum_(i | P i) F i = 1 ->
    {i : I | [/\ P i, F i = 1 & forall j, j != i -> P j -> F j = 0]}.
 Proof.
-move=> natF /eqP; rewrite -sum_truncK// -[1]/1%:R eqr_nat => /sum_nat_eq1 exi.
-have [i /and3P[Pi /eqP f1 /forallP a]] : {i : I | [&& P i, trunc (F i) == 1
-    & [forall j : I, ((j != i) ==> P j ==> (trunc (F j) == 0))]]}.
+move=> natF /eqP; rewrite -sum_truncnK// -[1]/1%:R eqr_nat => /sum_nat_eq1 exi.
+have [i /and3P[Pi /eqP f1 /forallP a]] : {i : I | [&& P i, truncn (F i) == 1
+    & [forall j : I, ((j != i) ==> P j ==> (truncn (F j) == 0))]]}.
   apply/sigW; have [i [Pi /eqP f1 a]] := exi; exists i; apply/and3P; split=> //.
   by apply/forallP => j; apply/implyP => ji; apply/implyP => Pj; apply/eqP/a.
-exists i; split=> [//||j ji Pj]; rewrite -[LHS]truncK ?natF ?f1//; apply/eqP.
+exists i; split=> [//||j ji Pj]; rewrite -[LHS]truncnK ?natF ?f1//; apply/eqP.
 by rewrite -[0]/0%:R eqr_nat; apply: implyP Pj; apply: implyP ji; apply: a.
 Qed.
 
 Lemma natr_mul_eq1 x y :
   x \is a nat_num -> y \is a nat_num -> (x * y == 1) = (x == 1) && (y == 1).
-Proof. by do 2!move/truncK <-; rewrite -natrM !pnatr_eq1 muln_eq1. Qed.
+Proof. by do 2!move/truncnK <-; rewrite -natrM !pnatr_eq1 muln_eq1. Qed.
 
 Lemma natr_prod_eq1 (I : finType) (P : pred I) (F : I -> R) :
     (forall i, P i -> F i \is a nat_num) -> \prod_(i | P i) F i = 1 ->
   forall i, P i -> F i = 1.
 Proof.
-move=> natF /eqP; rewrite -prod_truncK// -[1]/1%:R eqr_nat prod_nat_seq_eq1.
-move/allP => a i Pi; apply/eqP; rewrite -[F i]truncK ?natF// eqr_nat.
+move=> natF /eqP; rewrite -prod_truncnK// -[1]/1%:R eqr_nat prod_nat_seq_eq1.
+move/allP => a i Pi; apply/eqP; rewrite -[F i]truncnK ?natF// eqr_nat.
 by apply: implyP Pi; apply: a; apply: mem_index_enum.
 Qed.
 
@@ -565,11 +570,11 @@ Proof. by exists (map_poly floor p); rewrite floorpK. Qed.
 
 (* Relating Cnat and oldCnat. *)
 
-Lemma trunc_floor x : trunc x = if 0 <= x then `|floor x|%N else 0%N.
+Lemma truncn_floor x : truncn x = if 0 <= x then `|floor x|%N else 0%N.
 Proof.
 case: ifP => [x_ge0 | x_ge0F]; last first.
-  by apply/trunc0Pn; apply/contraFN: x_ge0F; apply/le_trans.
-apply/trunc_def; rewrite !pmulrn intS addrC abszE; have/floor_le := x_ge0.
+  by apply/truncn0Pn; apply/contraFN: x_ge0F; apply/le_trans.
+apply/truncn_def; rewrite !pmulrn intS addrC abszE; have/floor_le := x_ge0.
 by rewrite floor0 => /normr_idP ->; exact/real_floor_itv/ger0_real.
 Qed.
 
@@ -601,12 +606,39 @@ Proof. by move=> _ /intrP[m ->]; apply: rmorph_int. Qed.
 
 End ArchiNumDomainTheory.
 
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn_itv.")]
+Notation trunc_itv := truncn_itv.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn_def.")]
+Notation trunc_def := truncn_def.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncnK.")]
+Notation truncK := truncnK.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn0.")]
+Notation trunc0 := truncn0.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn1.")]
+Notation trunc1 := truncn1.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncnD.")]
+Notation truncD := truncnD.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncnM.")]
+Notation truncM := truncnM.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncnX.")]
+Notation truncX := truncnX.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn_gt0.")]
+Notation trunc_gt0 := truncn_gt0.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn0Pn.")]
+Notation trunc0Pn := truncn0Pn.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to sum_truncnK.")]
+Notation sum_truncK := sum_truncnK.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to prod_truncnK.")]
+Notation prod_truncK := prod_truncnK.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn_floor.")]
+Notation trunc_floor := truncn_floor.
+
 Arguments natrK {R} _%N.
 Arguments intrKfloor {R}.
 Arguments intrKceil {R}.
 Arguments natrP {R x}.
 Arguments intrP {R x}.
-#[global] Hint Resolve trunc0 trunc1 : core.
+#[global] Hint Resolve truncn0 truncn1 : core.
 #[global] Hint Resolve floor0 floor1 : core.
 #[global] Hint Resolve ceil0 ceil1 : core.
 #[global] Hint Extern 0 (is_true (_%:R \is a nat_num)) => apply: natr_nat : core.
@@ -629,7 +661,7 @@ Implicit Type x : R.
 
 Lemma upper_nthrootP x i : (archi_bound x <= i)%N -> x < 2%:R ^+ i.
 Proof.
-case/trunc_itv/andP: (normr_ge0 x) => _ /ltr_normlW xlt le_b_i.
+case/truncn_itv/andP: (normr_ge0 x) => _ /ltr_normlW xlt le_b_i.
 by rewrite (lt_le_trans xlt) // -natrX ler_nat (ltn_trans le_b_i) // ltn_expl.
 Qed.
 
@@ -725,7 +757,7 @@ HB.builders Context R of NumDomain_bounded_isArchimedean R.
   Lemma boundP x : 0 <= x -> x < (bound x)%:R.
   Proof. by move/ger0_norm=> {1}<-; rewrite /bound; case: (sigW _). Qed.
 
-  Fact trunc_subproof x : {m | 0 <= x -> m%:R <= x < m.+1%:R }.
+  Fact truncn_subproof x : {m | 0 <= x -> m%:R <= x < m.+1%:R }.
   Proof.
   have [Rx | _] := boolP (0 <= x); last by exists 0%N.
   have/ex_minnP[n lt_x_n1 min_n]: exists n, x < n.+1%:R.
@@ -735,17 +767,17 @@ HB.builders Context R of NumDomain_bounded_isArchimedean R.
   by rewrite ltnn.
   Qed.
 
-  Definition trunc x := if 0 <= x then sval (trunc_subproof x) else 0%N.
+  Definition truncn x := if 0 <= x then sval (truncn_subproof x) else 0%N.
 
-  Lemma truncP x :
-    if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0%N.
+  Lemma truncnP x :
+    if 0 <= x then (truncn x)%:R <= x < (truncn x).+1%:R else truncn x == 0%N.
   Proof.
-  rewrite /trunc; case: trunc_subproof => // n hn.
+  rewrite /truncn; case: truncn_subproof => // n hn.
   by case: ifP => x_ge0; rewrite ?(ifT _ _ x_ge0) ?(ifF _ _ x_ge0) // hn.
   Qed.
 
   HB.instance Definition _ := NumDomain_isArchimedean.Build R
-    truncP (fun => erefl) (fun => erefl).
+    truncnP (fun => erefl) (fun => erefl).
 HB.end.
 
 Module Exports. HB.reexport. End Exports.

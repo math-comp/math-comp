@@ -262,12 +262,12 @@ Qed.
 
 (* This is Isaacs, Theorem (3.8). *)
 Theorem coprime_degree_support_cfcenter g :
-    coprime (Num.trunc ('chi_i 1%g)) #|g ^: G| -> g \notin ('Z('chi_i))%CF ->
+    coprime (Num.truncn ('chi_i 1%g)) #|g ^: G| -> g \notin ('Z('chi_i))%CF ->
   'chi_i g = 0.
 Proof.
-set m := Num.trunc _ => co_m_gG notZg.
+set m := Num.truncn _ => co_m_gG notZg.
 have [Gg | /cfun0-> //] := boolP (g \in G).
-have Dm: 'chi_i 1%g = m%:R by rewrite truncK ?Cnat_irr1.
+have Dm: 'chi_i 1%g = m%:R by rewrite truncnK ?Cnat_irr1.
 have m_gt0: (0 < m)%N by rewrite -ltC_nat -Dm irr1_gt0.
 have nz_m: m%:R != 0 :> algC by rewrite pnatr_eq0 -lt0n.
 pose alpha := 'chi_i g / m%:R.
@@ -571,7 +571,7 @@ Qed.
 
 (* This is Isaacs, Theorem (3.13). *)
 Theorem faithful_degree_p_part gT (p : nat) (G P : {group gT}) i :
-    cfaithful 'chi[G]_i -> p.-nat (Num.trunc ('chi_i 1%g)) ->
+    cfaithful 'chi[G]_i -> p.-nat (Num.truncn ('chi_i 1%g)) ->
     p.-Sylow(G) P -> abelian P ->
   'chi_i 1%g = (#|G : 'Z(G)|`_p)%:R.
 Proof.

@@ -137,15 +137,18 @@ Proof. by case: d => // d; rewrite modn_def; case: edivnP. Qed.
 Lemma ltn_pmod m d : 0 < d -> m %% d < d.
 Proof. by rewrite ltn_mod. Qed.
 
-Lemma leq_trunc_div m d : m %/ d * d <= m.
+Lemma leq_divM m d : m %/ d * d <= m.
 Proof. by rewrite [leqRHS](divn_eq m d) leq_addr. Qed.
+
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to leq_divM.")]
+Notation leq_trunc_div := leq_divM.
 
 Lemma leq_mod m d : m %% d <= m.
 Proof. by rewrite [leqRHS](divn_eq m d) leq_addl. Qed.
 
 Lemma leq_div m d : m %/ d <= m.
 Proof.
-by case: d => // d; apply: leq_trans (leq_pmulr _ _) (leq_trunc_div _ _).
+by case: d => // d; apply: leq_trans (leq_pmulr _ _) (leq_divM _ _).
 Qed.
 
 Lemma ltn_ceil m d : 0 < d -> m < (m %/ d).+1 * d.
@@ -158,7 +161,7 @@ Proof.
 move=> d_gt0; apply/idP/idP.
   by rewrite -(leq_pmul2r d_gt0); apply: leq_trans (ltn_ceil _ _).
 rewrite !ltnNge -(@leq_pmul2r d n) //; apply: contra => le_nd_floor.
-exact: leq_trans le_nd_floor (leq_trunc_div _ _).
+exact: leq_trans le_nd_floor (leq_divM _ _).
 Qed.
 
 Lemma leq_divRL m n d : d > 0 -> (m <= n %/ d) = (m * d <= n).
@@ -179,7 +182,7 @@ Qed.
 Lemma leq_div2l m d e : 0 < d -> d <= e -> m %/ e <= m %/ d.
 Proof.
 move/leq_divRL=> -> le_de.
-by apply: leq_trans (leq_trunc_div m e); apply: leq_mul.
+by apply: leq_trans (leq_divM m e); apply: leq_mul.
 Qed.
 
 Lemma edivnD m n d (offset := m %% d + n %% d >= d) : 0 < d ->

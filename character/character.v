@@ -846,7 +846,7 @@ Lemma char_sum_irrP {phi} :
 Proof.
 apply: (iffP idP)=> [/forallP-Nphi | [n ->]]; last first.
   by apply: rpred_sum => i _; rewrite scaler_nat rpredMn // irr_char.
-do [have [a ->] := cfun_irr_sum phi] in Nphi *; exists (Num.trunc \o a).
+do [have [a ->] := cfun_irr_sum phi] in Nphi *; exists (Num.truncn \o a).
 apply: eq_bigr => i _; congr (_ *: _); have:= eqP (Nphi i).
 by rewrite eq_sum_nth_irr coord_sum_free ?irr_free.
 Qed.
@@ -2579,7 +2579,7 @@ End DetRepr.
 
 HB.lock
 Definition cfDet (gT : finGroupType) (G : {group gT}) phi :=
-  \prod_i detRepr 'Chi_i ^+ Num.trunc '[phi, 'chi[G]_i].
+  \prod_i detRepr 'Chi_i ^+ Num.truncn '[phi, 'chi[G]_i].
 Canonical cfDet_unlockable := Unlockable cfDet.unlock.
 
 Section DetOrder.
@@ -2595,11 +2595,11 @@ Lemma cfDetD :
   {in character &, {morph cfDet : phi psi / phi + psi >-> phi * psi}}.
 Proof.
 move=> phi psi Nphi Npsi; rewrite unlock /= -big_split; apply: eq_bigr => i _ /=.
-by rewrite -exprD cfdotDl truncD ?nnegrE ?natr_ge0 // Cnat_cfdot_char_irr.
+by rewrite -exprD cfdotDl truncnD ?nnegrE ?natr_ge0 // Cnat_cfdot_char_irr.
 Qed.
 
 Lemma cfDet0 : cfDet 0 = 1.
-Proof. by rewrite unlock big1 // => i _; rewrite cfdot0l trunc0. Qed.
+Proof. by rewrite unlock big1 // => i _; rewrite cfdot0l truncn0. Qed.
 
 Lemma cfDetMn k :
   {in character, {morph cfDet : phi / phi *+ k >-> phi ^+ k}}.
@@ -2695,7 +2695,7 @@ Qed.
 
 Lemma cfDet_mul_lin gT (G : {group gT}) (lambda phi : 'CF(G)) :
     lambda \is a linear_char -> phi \is a character ->
-  cfDet (lambda * phi) = lambda ^+ Num.trunc (phi 1%g) * cfDet phi.
+  cfDet (lambda * phi) = lambda ^+ Num.truncn (phi 1%g) * cfDet phi.
 Proof.
 case/andP=> /char_reprP[[n1 rG1] ->] /= n1_1 /char_reprP[[n2 rG2] ->] /=.
 do [rewrite !cfRepr1 pnatr_eq1 natrK; move/eqP] in n1_1 *.
