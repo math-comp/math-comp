@@ -3,11 +3,12 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype choice ssrnat seq.
 From mathcomp Require Import path div fintype tuple finfun bigop prime order.
-From mathcomp Require Import ssralg poly finset gproduct fingroup morphism.
-From mathcomp Require Import perm automorphism quotient finalg action zmodp.
-From mathcomp Require Import commutator cyclic center pgroup nilpotent sylow.
-From mathcomp Require Import abelian matrix mxalgebra mxpoly mxrepresentation.
-From mathcomp Require Import vector ssrnum algC classfun archimedean.
+From mathcomp Require Import ssralg poly finset gproduct monoid fingroup.
+From mathcomp Require Import morphism perm automorphism quotient finalg action.
+From mathcomp Require Import zmodp commutator cyclic center pgroup nilpotent.
+From mathcomp Require Import sylow abelian matrix mxalgebra mxpoly.
+From mathcomp Require Import mxrepresentation vector ssrnum algC classfun.
+From mathcomp Require Import archimedean.
 
 (******************************************************************************)
 (* This file contains the basic notions of character theory, based on Isaacs. *)
@@ -2545,7 +2546,7 @@ have GHx: coset H x \in (G / H)%g by apply: mem_quotient.
 move: (second_orthogonality_relation (coset H x) GHx).
 rewrite mulrb class_refl => <-.
 rewrite -2!(eq_bigr _ (fun _ _ => normCK _)) sum_norm_irr_quo // -subr_ge0.
-rewrite (bigID (fun i => H \subset cfker 'chi[G]_i)) //= addrC addKr.
+rewrite (bigID (fun i => H \subset cfker 'chi[G]_i)) //= addrC addrK.
 by apply: sumr_ge0 => i _; rewrite normCK mul_conjC_ge0.
 Qed.
 

@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
-From mathcomp Require Import choice fintype bigop finset fingroup morphism.
-From mathcomp Require Import automorphism quotient action gseries.
+From mathcomp Require Import choice fintype bigop finset monoid fingroup.
+From mathcomp Require Import morphism automorphism quotient action gseries.
 
 (******************************************************************************)
 (* This files establishes Jordan-Holder theorems for finite groups. These     *)
