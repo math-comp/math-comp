@@ -9,5 +9,6 @@
   + `le_ceil` -> `ceil_ge`
   + `floor_le` -> `le_floor`
   + `ceil_le` -> `le_ceil_tmp`
+  + `natrE` -> `natrEtruncn`
     ([#1359](https://github.com/math-comp/math-comp/pull/1359),
     by Pierre Roux).

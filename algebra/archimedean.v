@@ -212,7 +212,7 @@ Local Notation int_num := (@int_num R).
 Definition truncn_itv x : 0 <= x -> (truncn x)%:R <= x < (truncn x).+1%:R :=
   @Def.truncn_itv R x.
 
-Lemma natrE x : (x \is a nat_num) = ((truncn x)%:R == x).
+Lemma natrEtruncn x : (x \is a nat_num) = ((truncn x)%:R == x).
 Proof. exact: nat_num_subproof. Qed.
 
 Lemma archi_boundP x : 0 <= x -> x < (archi_bound x)%:R.
@@ -232,18 +232,18 @@ Lemma natrK : cancel (GRing.natmul 1) truncn.
 Proof. by move=> m; apply: truncn_def; rewrite ler_nat ltr_nat ltnS leqnn. Qed.
 
 Lemma truncnK : {in nat_num, cancel truncn (GRing.natmul 1)}.
-Proof. by move=> x; rewrite natrE => /eqP. Qed.
+Proof. by move=> x; rewrite natrEtruncn => /eqP. Qed.
 
 Lemma truncn0 : truncn 0 = 0%N. Proof. exact: natrK 0%N. Qed.
 Lemma truncn1 : truncn 1 = 1%N. Proof. exact: natrK 1%N. Qed.
 #[local] Hint Resolve truncn0 truncn1 : core.
 
-Lemma natr_nat n : n%:R \is a nat_num. Proof. by rewrite natrE natrK. Qed.
+Lemma natr_nat n : n%:R \is a nat_num. Proof. by rewrite natrEtruncn natrK. Qed.
 #[local] Hint Resolve natr_nat : core.
 
 Lemma natrP x : reflect (exists n, x = n%:R) (x \is a nat_num).
 Proof.
-apply: (iffP idP) => [|[n ->]]; rewrite // natrE => /eqP <-.
+apply: (iffP idP) => [|[n ->]]; rewrite // natrEtruncn => /eqP <-.
 by exists (truncn x).
 Qed.
 
@@ -658,6 +658,8 @@ Notation real_le_ceil := real_ceil_ge.
 Notation floor_le := le_floor.
 #[deprecated(since="mathcomp 2.4.0", note="Renamed to le_ceil.")]
 Notation ceil_le := le_ceil_tmp.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to natrEtruncn.")]
+Notation natrE := natrEtruncn.
 
 Arguments natrK {R} _%N.
 Arguments intrKfloor {R}.
