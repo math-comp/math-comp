@@ -2666,7 +2666,7 @@ Proof. by rewrite divpD mulpK. Qed.
 
 Lemma divpp : d %/ d = 1. Proof. by rewrite -[d in d %/ _]mul1r mulpK. Qed.
 
-Lemma leq_trunc_divp m : size (m %/ d * d) <= size m.
+Lemma leq_divMp m : size (m %/ d * d) <= size m.
 Proof.
 case: (eqVneq d 0) ulcd => [->|dn0 _]; first by rewrite lead_coef0 unitr0.
 have [->|q0] := eqVneq (m %/ d) 0; first by rewrite mul0r size_poly0 leq0n.
@@ -2713,6 +2713,9 @@ Lemma modp_mul p q : (p * (q %% d)) %% d = (p * q) %% d.
 Proof. by rewrite [q in RHS]divp_eq mulrDr modpD mulrA modp_mull add0r. Qed.
 
 End UnitDivisor.
+
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to leq_divMp.")]
+Notation leq_trunc_divp := leq_divMp.
 
 Section MoreUnitDivisor.
 
@@ -2986,10 +2989,10 @@ Proof.
 by move=> dn0; apply: IdomainUnit.divpp; rewrite unitfE lead_coef_eq0.
 Qed.
 
-Lemma leq_trunc_divp d m : size (m %/ d * d) <= size m.
+Lemma leq_divMp d m : size (m %/ d * d) <= size m.
 Proof.
 have [-> | dn0] := eqVneq d 0; first by rewrite mulr0 size_poly0.
-by apply: IdomainUnit.leq_trunc_divp; rewrite unitfE lead_coef_eq0.
+by apply: IdomainUnit.leq_divMp; rewrite unitfE lead_coef_eq0.
 Qed.
 
 Lemma divpK d p : d %| p -> p %/ d * d = p.
@@ -3343,6 +3346,9 @@ Proof. by rewrite /gdcop gdcop_rec_map !size_map_poly. Qed.
 End FieldMap.
 
 End FieldDivision.
+
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to leq_divMp.")]
+Notation leq_trunc_divp := leq_divMp.
 
 End Field.
 
