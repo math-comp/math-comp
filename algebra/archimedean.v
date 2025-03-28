@@ -351,10 +351,10 @@ Proof. exact: int_num_subproof. Qed.
 Lemma real_floor_itv x : x \is Rreal -> (floor x)%:~R <= x < (floor x + 1)%:~R.
 Proof. by case: (x \is _) (floorP x). Qed.
 
-Lemma real_ge_floor x : x \is Rreal -> (floor x)%:~R <= x.
+Lemma real_floor_le x : x \is Rreal -> (floor x)%:~R <= x.
 Proof. by move=> /real_floor_itv /andP[]. Qed.
 
-Lemma real_lt_succ_floor x : x \is Rreal -> x < (floor x + 1)%:~R.
+Lemma real_floorD1_gt x : x \is Rreal -> x < (floor x + 1)%:~R.
 Proof. by move=> /real_floor_itv /andP[]. Qed.
 
 Lemma floor_def x m : m%:~R <= x < (m + 1)%:~R -> floor x = m.
@@ -438,10 +438,10 @@ Proof.
 by move=> Rx; rewrite -opprD !mulrNz ltrNl lerNr andbC real_floor_itv ?realN.
 Qed.
 
-Lemma real_gt_pred_ceil x : x \is Rreal -> (ceil x - 1)%:~R < x.
+Lemma real_ceilB1_lt x : x \is Rreal -> (ceil x - 1)%:~R < x.
 Proof. by move=> /real_ceil_itv /andP[]. Qed.
 
-Lemma real_le_ceil x : x \is Rreal -> x <= (ceil x)%:~R.
+Lemma real_ceil_ge x : x \is Rreal -> x <= (ceil x)%:~R.
 Proof. by move=> /real_ceil_itv /andP[]. Qed.
 
 Lemma ceil_def x m : (m - 1)%:~R < x <= m%:~R -> ceil x = m.
@@ -644,6 +644,14 @@ Notation sum_truncK := sum_truncnK.
 Notation prod_truncK := prod_truncnK.
 #[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn_floor.")]
 Notation trunc_floor := truncn_floor.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to real_floor_le.")]
+Notation real_ge_floor := real_floor_le.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to real_floorD1_gt.")]
+Notation real_lt_succ_floor := real_floorD1_gt.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to real_ceilB1_lt.")]
+Notation real_gt_pred_ceil := real_floorD1_gt.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to real_ceil_ge.")]
+Notation real_le_ceil := real_ceil_ge.
 
 Arguments natrK {R} _%N.
 Arguments intrKfloor {R}.
@@ -680,10 +688,11 @@ Qed.
 Lemma floor_itv x : (floor x)%:~R <= x < (floor x + 1)%:~R.
 Proof. exact: real_floor_itv. Qed.
 
-Lemma ge_floor x : (floor x)%:~R <= x. Proof. exact: real_ge_floor. Qed.
+(* TODO: rename to floor_le, once the deprecated one has been removed *)
+Lemma floor_le_tmp x : (floor x)%:~R <= x. Proof. exact: real_floor_le. Qed.
 
-Lemma lt_succ_floor x : x < (floor x + 1)%:~R.
-Proof. exact: real_lt_succ_floor. Qed.
+Lemma floorD1_gt x : x < (floor x + 1)%:~R.
+Proof. exact: real_floorD1_gt. Qed.
 
 #[deprecated(since="mathcomp 2.4.0", note="Use floor_ge_int_tmp instead.")]
 Lemma floor_ge_int x n : n%:~R <= x = (n <= floor x).
@@ -703,10 +712,10 @@ Proof. by move=> yz; apply/real_floorDrz/yz/num_real. Qed.
 Lemma ceil_itv x : (ceil x - 1)%:~R < x <= (ceil x)%:~R.
 Proof. exact: real_ceil_itv. Qed.
 
-Lemma gt_pred_ceil x : (ceil x - 1)%:~R < x.
-Proof. exact: real_gt_pred_ceil. Qed.
+Lemma ceilB1_lt x : (ceil x - 1)%:~R < x.
+Proof. exact: real_ceilB1_lt. Qed.
 
-Lemma le_ceil x : x <= (ceil x)%:~R. Proof. exact: real_le_ceil. Qed.
+Lemma ceil_ge x : x <= (ceil x)%:~R. Proof. exact: real_ceil_ge. Qed.
 
 #[deprecated(since="mathcomp 2.4.0", note="Use ceil_le_int_tmp instead.")]
 Lemma ceil_le_int x n : x <= n%:~R = (ceil x <= n).
@@ -727,6 +736,15 @@ Lemma ceil_floor x : ceil x = floor x + (~~ (x \is a int_num)).
 Proof. exact: real_ceil_floor. Qed.
 
 End ArchiRealDomainTheory.
+
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to floor_le_tmp.")]
+Notation ge_floor := floor_le_tmp.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to floorD1_gt.")]
+Notation lt_succ_floor := floorD1_gt.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to ceilB1_lt.")]
+Notation gt_pred_ceil := ceilB1_lt.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to ceil_ge.")]
+Notation le_ceil := ceil_ge.
 
 Section ArchiNumFieldTheory.
 
