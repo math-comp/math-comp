@@ -377,7 +377,7 @@ Qed.
 Lemma real_floor_ge_int x n : x \is Rreal -> (n%:~R <= x) = (n <= floor x).
 Proof. by move=> ?; rewrite real_floor_ge_int_tmp. Qed.
 
-Lemma floor_le : {homo floor : x y / x <= y}.
+Lemma le_floor : {homo floor : x y / x <= y}.
 Proof.
 move=> x y lexy; move: (floorP x) (floorP y); rewrite (ger_real lexy).
 case: ifP => [_ /andP[lefx _] /andP[_] | _ /eqP-> /eqP-> //].
@@ -462,8 +462,10 @@ Qed.
 Lemma real_ceil_le_int x n : x \is Rreal -> x <= n%:~R = (ceil x <= n).
 Proof. by move=> ?; rewrite real_ceil_le_int_tmp. Qed.
 
-Lemma ceil_le : {homo ceil : x y / x <= y}.
-Proof. by move=> x y lexy; rewrite /ceil lerN2 floor_le ?lerN2. Qed.
+(* TODO: rename to le_ceil,
+   once the currently deprecated one has been removed *)
+Lemma le_ceil_tmp : {homo ceil : x y / x <= y}.
+Proof. by move=> x y lexy; rewrite /ceil lerN2 le_floor ?lerN2. Qed.
 
 Lemma intrKceil : cancel intr ceil.
 Proof. by move=> m; apply/eqP; rewrite eqr_oppLR -mulrNz intrKfloor. Qed.
@@ -586,7 +588,7 @@ Lemma truncn_floor x : truncn x = if 0 <= x then `|floor x|%N else 0%N.
 Proof.
 case: ifP => [x_ge0 | x_ge0F]; last first.
   by apply/truncn0Pn; apply/contraFN: x_ge0F; apply/le_trans.
-apply/truncn_def; rewrite !pmulrn intS addrC abszE; have/floor_le := x_ge0.
+apply/truncn_def; rewrite !pmulrn intS addrC abszE; have/le_floor := x_ge0.
 by rewrite floor0 => /normr_idP ->; exact/real_floor_itv/ger0_real.
 Qed.
 
@@ -652,6 +654,10 @@ Notation real_lt_succ_floor := real_floorD1_gt.
 Notation real_gt_pred_ceil := real_floorD1_gt.
 #[deprecated(since="mathcomp 2.4.0", note="Renamed to real_ceil_ge.")]
 Notation real_le_ceil := real_ceil_ge.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to le_floor.")]
+Notation floor_le := le_floor.
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to le_ceil.")]
+Notation ceil_le := le_ceil_tmp.
 
 Arguments natrK {R} _%N.
 Arguments intrKfloor {R}.

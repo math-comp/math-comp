@@ -7,5 +7,7 @@
   + `lt_succ_floor` -> `floorD1_gt`
   + `gt_pred_ceil` -> `ceilB1_lt`
   + `le_ceil` -> `ceil_ge`
+  + `floor_le` -> `le_floor`
+  + `ceil_le` -> `le_ceil_tmp`
     ([#1359](https://github.com/math-comp/math-comp/pull/1359),
     by Pierre Roux).
