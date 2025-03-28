@@ -64,6 +64,7 @@ with builtins; with (import <nixpkgs> {}).lib;
          mathcomp-doc.job = true;
          stdlib.job = true;
          jasmin.override.version = "main";
+         ssprove.override.version = "main";
          # To add an overlay applying to all bundles,
          # add below a line like
          #<package>.override.version = "<github_login>:<branch>";
@@ -91,6 +92,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       interval.job = false;
       coquelicot.job = false;
       mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
+      ssprove.job = false;
     }; };
     "coq-9.0".coqPackages = common-bundles // {
       coq.override.version = "9.0";

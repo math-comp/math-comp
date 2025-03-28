@@ -2984,6 +2984,93 @@ jobs:
       name: Building/fetching current CI target
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-9.0"
         --argstr job "reglang"
+  ssprove:
+    needs:
+    - coq
+    - mathcomp-ssreflect
+    - mathcomp-analysis
+    - mathcomp-experimental-reals
+    - extructures
+    - deriving
+    runs-on: ubuntu-latest
+    steps:
+    - name: Determine which commit to initially checkout
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"target_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\nfi\n"
+    - name: Git checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        ref: ${{ env.target_commit }}
+    - name: Determine which commit to test
+      run: "if [ ${{ github.event_name }} = \"push\" ]; then\n  echo \"tested_commit=${{
+        github.sha }}\" >> $GITHUB_ENV\nelse\n  merge_commit=$(git ls-remote ${{ github.event.repository.html_url
+        }} refs/pull/${{ github.event.number }}/merge | cut -f1)\n  mergeable=$(git
+        merge --no-commit --no-ff ${{ github.event.pull_request.base.sha }} > /dev/null
+        2>&1; echo $?; git merge --abort > /dev/null 2>&1 || true)\n  if [ -z \"$merge_commit\"\
+        \ -o \"x$mergeable\" != \"x0\" ]; then\n    echo \"tested_commit=${{ github.event.pull_request.head.sha
+        }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
+        \  fi\nfi\n"
+    - name: Git checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        ref: ${{ env.tested_commit }}
+    - name: Cachix install
+      uses: cachix/install-nix-action@v30
+      with:
+        nix_path: nixpkgs=channel:nixpkgs-unstable
+    - name: Cachix setup math-comp
+      uses: cachix/cachix-action@v15
+      with:
+        authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+        extraPullNames: coq, coq-community
+        name: math-comp
+    - id: stepGetDerivation
+      name: Getting derivation for current job (ssprove)
+      run: "NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link \\\n   --argstr bundle
+        \"coq-9.0\" --argstr job \"ssprove\" \\\n   --dry-run 2> err > out || (touch
+        fail; true)\n"
+    - name: Error reporting
+      run: "echo \"out=\"; cat out\necho \"err=\"; cat err\n"
+    - name: Failure check
+      run: if [ -e fail ]; then exit 1; else exit 0; fi;
+    - id: stepCheck
+      name: Checking presence of CI target for current job
+      run: (echo -n status=; cat out err | grep "built:" | sed "s/.*/built/") >> $GITHUB_OUTPUT
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: coq'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-9.0"
+        --argstr job "coq"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: equations'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-9.0"
+        --argstr job "equations"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: mathcomp-ssreflect'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-9.0"
+        --argstr job "mathcomp-ssreflect"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: mathcomp-analysis'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-9.0"
+        --argstr job "mathcomp-analysis"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: mathcomp-experimental-reals'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-9.0"
+        --argstr job "mathcomp-experimental-reals"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: extructures'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-9.0"
+        --argstr job "extructures"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: 'Building/fetching previous CI target: deriving'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-9.0"
+        --argstr job "deriving"
+    - if: steps.stepCheck.outputs.status == 'built'
+      name: Building/fetching current CI target
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle "coq-9.0"
+        --argstr job "ssprove"
   stdlib:
     needs:
     - coq
