@@ -98,8 +98,8 @@ suffices /sig_eqW[[n [|px [|pz []]]]// [Dpx Dpz]]:
   by rewrite map_comp_poly horner_comp -Dpz.
 have [rx nz_rx rx0] := r_exists x.
 have [rz nz_rz rz0] := r_exists (- z).
-have char0_Q: [char rat] =i pred0 by apply: char_num.
-have [n [[pz Dpz] [px Dpx]]] := char0_PET nz_rz rz0 nz_rx rx0 char0_Q.
+have pchar0_Q: [pchar rat] =i pred0 by apply: pchar_num.
+have [n [[pz Dpz] [px Dpx]]] := pchar0_PET nz_rz rz0 nz_rx rx0 pchar0_Q.
 by exists (n, [:: px; - pz]); rewrite /= !raddfN hornerN -[z]opprK Dpz Dpx.
 Qed.
 

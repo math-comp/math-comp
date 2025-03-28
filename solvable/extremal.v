@@ -351,10 +351,10 @@ have [ms0 os0]: m s0 = (p ^ n).+1%:R /\ #[s0] = p.
     by rewrite bin2odd // mulnAC dvdn_mulr.
   have [[|d]] := m_se (n - e0.+1)%N; first by rewrite mod0n modn_small.
   move/eqP; rewrite -/s0 eqn_mod_dvd ?subn1 //=; case/dvdnP=> f -> {d}.
-  rewrite subnK // mulSn -mulnA -expnS -addSn natrD natrM -oG char_Zp //.
+  rewrite subnK // mulSn -mulnA -expnS -addSn natrD natrM -oG pchar_Zp //.
   rewrite mulr0 addr0 => m_s0; split => //.
   have [d _] := m_se (n - e0)%N; rewrite -subnSK // expnSr expgM -/s0.
-  rewrite addSn subnK // -oG  mulrS natrM char_Zp // {d}mulr0 addr0.
+  rewrite addSn subnK // -oG  mulrS natrM pchar_Zp // {d}mulr0 addr0.
   move/eqP; rewrite -m1 (inj_in_eq inj_m) ?group1 ?groupX // -order_dvdn.
   move/min_p; rewrite order_eq1; case/predU1P=> [s0_1 | ]; last by move/eqP.
   move/eqP: m_s0; rewrite eq_sym s0_1 m1 -subr_eq0 mulrSr addrK -val_eqE /=.
@@ -386,7 +386,7 @@ rewrite {+}/e0 p2 subn1 /= in s0 os0 ms0 os ms G4 defS1 lt_e0_n *.
 rewrite G4; exists s; split=> //; last first.
   exists s0; split; rewrite ?groupX //; apply/eqP; rewrite mM ?groupX //.
   rewrite ms0 mt eq_sym mulrN1 -subr_eq0 opprK -natrD -addSnnS.
-  by rewrite prednK ?expn_gt0 // addnn -mul2n -expnS -p2 -oG char_Zp.
+  by rewrite prednK ?expn_gt0 // addnn -mul2n -expnS -p2 -oG pchar_Zp.
 suffices TIst: <[s]> :&: <[t]> = 1.
   rewrite dprodE //; last by rewrite (sub_abelian_cent2 cAA) ?cycle_subG.
   apply/eqP; rewrite eqEcard mulG_subG !cycle_subG As At oA.

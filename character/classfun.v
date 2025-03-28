@@ -127,10 +127,13 @@ Proof. exact: natr_indexg_neq0. Qed.
 Lemma gt0CG G : 0 < #|G|%:R :> algC. Proof. exact: natrG_gt0. Qed.
 Lemma gt0CiG G B : 0 < #|G : B|%:R :> algC. Proof. exact: natr_indexg_gt0. Qed.
 
-Lemma algC'G G : [char algC]^'.-group G.
-Proof. by apply/pgroupP=> p _; rewrite inE /= char_num. Qed.
+Lemma algC'G_pchar G : [pchar algC]^'.-group G.
+Proof. by apply/pgroupP=> p _; rewrite inE /= pchar_num. Qed.
 
 End AlgC.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use algC'G_pchar instead.")]
+Notation algC'G := (algC'G_pchar) (only parsing).
 
 Section Defs.
 
