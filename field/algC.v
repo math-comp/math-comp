@@ -988,7 +988,7 @@ End Num.
 
 Definition algR_archiFieldMixin : Num.archimedean_axiom algR.
 Proof.
-move=> /= x; have := real_lt_succ_floor (valP `|x|).
+move=> /= x; have := real_floorD1_gt (valP `|x|).
 set n := Num.floor _ + 1 => x_lt.
 exists (`|(n + 1)%R|%N); apply: (lt_le_trans x_lt _).
 by rewrite /= rmorphMn/= pmulrn ler_int (le_trans _ (lez_abs _))// lerDl.
