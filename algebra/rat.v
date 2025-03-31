@@ -2,8 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop order ssralg countalg div ssrnum.
-From mathcomp Require Import ssrint prime archimedean.
+From mathcomp Require Import prime fintype finfun bigop order tuple ssralg.
+From mathcomp Require Import countalg div ssrnum ssrint archimedean poly zmodp.
+From mathcomp Require Import polydiv intdiv matrix mxalgebra vector.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)
@@ -20,6 +21,9 @@ From mathcomp Require Import ssrint prime archimedean.
 (* [rat x // y] == smart constructor for rationals, definitionally equal      *)
 (*                 to x / y for concrete values, intended for printing only   *)
 (*                 of normal forms. The parsable notation is for debugging.   *)
+(* inIntSpan X v <-> v is an integral linear combination of elements of       *)
+(*                 X : seq V, where V is a zmodType. We prove that this is a  *)
+(*                 decidable property for Q-vector spaces.                    *)
 (******************************************************************************)
 
 Import Order.TTheory GRing.Theory Num.Theory.
@@ -800,7 +804,7 @@ Lemma Qint_def (x : rat) : (x \is a Num.int) = (denq x == 1). Proof. by []. Qed.
 Lemma numqK : {in Num.int, cancel (fun x => numq x) intr}.
 Proof. by move=> _ /intrP [x ->]; rewrite numq_int. Qed.
 
-Lemma natq_div m n : n %| m -> (m %/ n)%:R = m%:R / n%:R :> rat.
+Lemma natq_div m n : (n %| m)%N -> (m %/ n)%:R = m%:R / n%:R :> rat.
 Proof. exact/char0_natf_div/char_num. Qed.
 
 Section InRing.
@@ -938,6 +942,244 @@ Proof. by move=> x; rewrite !ceilNfloor -rmorphN floor_rat. Qed.
 End InParchiField.
 
 Arguments ratr {R}.
+
+Lemma Qint_dvdz (m d : int) : (d %| m)%Z -> (m%:~R / d%:~R : rat) \is a Num.int.
+Proof.
+case/dvdzP=> z ->; rewrite rmorphM /=; have [->|dn0] := eqVneq d 0.
+  by rewrite mulr0 mul0r.
+by rewrite mulfK ?intr_eq0.
+Qed.
+
+Lemma Qnat_dvd (m d : nat) : (d %| m)%N -> (m%:R / d%:R : rat) \is a Num.nat.
+Proof. by move=> h; rewrite natrEint divr_ge0 ?ler0n // !pmulrn Qint_dvdz. Qed.
+
+Section ZpolyScale.
+
+Local Notation pZtoQ := (map_poly (intr : int -> rat)).
+
+Lemma size_rat_int_poly p : size (pZtoQ p) = size p.
+Proof. by apply: size_map_inj_poly; first apply: intr_inj. Qed.
+
+Lemma rat_poly_scale (p : {poly rat}) :
+  {q : {poly int} & {a | a != 0 & p = a%:~R^-1 *: pZtoQ q}}.
+Proof.
+pose a := \prod_(i < size p) denq p`_i.
+have nz_a: a != 0 by apply/prodf_neq0=> i _; apply: denq_neq0.
+exists (map_poly numq (a%:~R *: p)), a => //.
+apply: canRL (scalerK _) _; rewrite ?intr_eq0 //.
+apply/polyP=> i; rewrite !(coefZ, coef_map_id0) // numqK // Qint_def mulrC.
+have [ltip | /(nth_default 0)->] := ltnP i (size p); last by rewrite mul0r.
+by rewrite [a](bigD1 (Ordinal ltip)) // rmorphM mulrA -numqE -rmorphM denq_int.
+Qed.
+
+Lemma dvdp_rat_int p q : (pZtoQ p %| pZtoQ q) = (p %| q).
+Proof.
+apply/dvdpP/Pdiv.Idomain.dvdpP=> [[/= r1 Dq] | [[/= a r] nz_a Dq]]; last first.
+  exists (a%:~R^-1 *: pZtoQ r).
+  by rewrite -scalerAl -rmorphM -Dq /= linearZ/= scalerK ?intr_eq0.
+have [r [a nz_a Dr1]] := rat_poly_scale r1; exists (a, r) => //=.
+apply: (map_inj_poly _ _ : injective pZtoQ) => //; first exact: intr_inj.
+by rewrite linearZ /= Dq Dr1 -scalerAl -rmorphM scalerKV ?intr_eq0.
+Qed.
+
+Lemma dvdpP_rat_int p q :
+    p %| pZtoQ q ->
+  {p1 : {poly int} & {a | a != 0 & p = a *: pZtoQ p1} & {r | q = p1 * r}}.
+Proof.
+have{p} [p [a nz_a ->]] := rat_poly_scale p.
+rewrite dvdpZl ?invr_eq0 ?intr_eq0 // dvdp_rat_int => dv_p_q.
+exists (zprimitive p); last exact: dvdpP_int.
+have [-> | nz_p] := eqVneq p 0.
+  by exists 1; rewrite ?oner_eq0 // zprimitive0 map_poly0 !scaler0.
+exists ((zcontents p)%:~R / a%:~R).
+  by rewrite mulf_neq0 ?invr_eq0 ?intr_eq0 ?zcontents_eq0.
+by rewrite mulrC -scalerA -map_polyZ -zpolyEprim.
+Qed.
+
+Lemma irreducible_rat_int p :
+  irreducible_poly (pZtoQ p) <-> irreducible_poly p.
+Proof.
+rewrite /irreducible_poly size_rat_int_poly; split=> -[] p1 p_irr; split=> //.
+  move=> q q1; rewrite /eqp -!dvdp_rat_int => rq.
+  by apply/p_irr => //; rewrite size_rat_int_poly.
+move=> q + /dvdpP_rat_int [] r [] c c0 qE [] s sE.
+rewrite qE size_scale// size_rat_int_poly => r1.
+apply/(eqp_trans (eqp_scale _ c0)).
+rewrite /eqp !dvdp_rat_int; apply/p_irr => //.
+by rewrite sE dvdp_mulIl.
+Qed.
+
+End ZpolyScale.
+
+(* Integral spans. *)
+
+Definition inIntSpan (V : zmodType) m (s : m.-tuple V) v :=
+  exists a : int ^ m, v = \sum_(i < m) s`_i *~ a i.
+
+Lemma solve_Qint_span (vT : vectType rat) m (s : m.-tuple vT) v :
+  {b : int ^ m &
+  {p : seq (int ^ m) &
+  forall a : int ^ m,
+  v = \sum_(i < m) s`_i *~ a i <->
+  exists c : seq int, a = b + \sum_(i < size p) p`_i *~ c`_i}} +
+  (~ inIntSpan s v).
+Proof.
+have s_s (i : 'I_m): s`_i \in <<s>>%VS by rewrite memv_span ?memt_nth.
+have s_Zs a: \sum_(i < m) s`_i *~ a i \in <<s>>%VS.
+  by apply/rpred_sum => i _; apply/rpredMz.
+case s_v: (v \in <<s>>%VS); last by right=> [[a Dv]]; rewrite Dv s_Zs in s_v.
+move SE : (\matrix_(i < m, j < _) coord (vbasis <<s>>) j s`_i) => S.
+move rE : (\rank S) => r; move kE : (m - r)%N => k.
+have Dm: (m = k + r)%N by rewrite -kE -rE subnK ?rank_leq_row.
+rewrite Dm in s s_s s_Zs s_v S SE rE kE *.
+move=> {Dm m}; pose m := (k + r)%N.
+have [K kerK]: {K : 'M_(k, m) | map_mx intr K == kermx S}%MS.
+  move: (mxrank_ker S); rewrite rE kE => krk.
+  pose B := row_base (kermx S); pose d := \prod_ij denq (B ij.1 ij.2).
+  exists (castmx (krk, erefl m) (map_mx numq (intr d *: B))).
+  rewrite map_castmx !eqmx_cast -map_mx_comp map_mx_id_in => [|i j]; last first.
+    rewrite mxE mulrC [d](bigD1 (i, j)) //= rmorphM mulrA.
+    by rewrite -numqE -rmorphM numq_int.
+  suff nz_d: d%:Q != 0 by rewrite !eqmx_scale // !eq_row_base andbb.
+  by rewrite intr_eq0; apply/prodf_neq0 => i _; apply: denq_neq0.
+have [L _ [G uG [D _ defK]]] := int_Smith_normal_form K.
+have {K L D defK kerK} [kerGu kerS_sub_Gu]: map_mx intr (usubmx G) *m S = 0 /\
+    (kermx S <= map_mx intr (usubmx G))%MS.
+  pose Kl : 'M[rat]_k := map_mx intr (lsubmx (K *m invmx G)).
+  have {}defK: map_mx intr K = Kl *m map_mx intr (usubmx G).
+    rewrite /Kl -map_mxM; congr map_mx.
+    rewrite -[LHS](mulmxKV uG) -{2}[G]vsubmxK -{1}[K *m _]hsubmxK.
+    rewrite mul_row_col -[RHS]addr0; congr (_ + _).
+    rewrite defK mulmxK //= -[RHS](mul0mx _ (dsubmx G)); congr (_ *m _).
+    apply/matrixP => i j; rewrite !mxE big1 //= => j1 _.
+    rewrite mxE /= eqn_leq andbC.
+    by rewrite leqNgt (leq_trans (valP j1)) ?mulr0 ?leq_addr.
+  split; last by rewrite -(eqmxP kerK); apply/submxP; exists Kl.
+  suff /row_full_inj: row_full Kl.
+    by apply; rewrite mulmx0 mulmxA (sub_kermxP _) // -(eqmxP kerK) defK.
+  rewrite /row_full eqn_leq rank_leq_row /= -{1}kE -{2}rE -(mxrank_ker S).
+  by rewrite -(eqmxP kerK) defK mxrankM_maxl.
+pose T := map_mx intr (dsubmx G) *m S.
+have defS: map_mx intr (rsubmx (invmx G)) *m T = S.
+  rewrite mulmxA -map_mxM /=; move: (mulVmx uG).
+  rewrite -{2}[G]vsubmxK -{1}[invmx G]hsubmxK mul_row_col.
+  move/(canRL (addKr _)) ->; rewrite -mulNmx raddfD /= map_mx1 map_mxM /=.
+  by rewrite mulmxDl -mulmxA kerGu mulmx0 add0r mul1mx.
+pose vv := \row_j coord (vbasis <<s>>) j v.
+have uS: row_full S.
+  apply/row_fullP; exists (\matrix_(i, j) coord s j (vbasis <<s>>)`_i).
+  apply/matrixP => j1 j2; rewrite !mxE.
+  rewrite -(coord_free _ _ (basis_free (vbasisP _))).
+  rewrite -!tnth_nth (coord_span (vbasis_mem (mem_tnth j1 _))) linear_sum.
+  by apply: eq_bigr => /= i _; rewrite -SE !mxE (tnth_nth 0) !linearZ.
+have eqST: (S :=: T)%MS by apply/eqmxP; rewrite -{1}defS !submxMl.
+case Zv: (map_mx denq (vv *m pinvmx T) == const_mx 1); last first.
+  right=> [[a Dv]]; case/eqP: Zv; apply/rowP.
+  have ->: vv = map_mx intr (\row_i a i) *m S.
+    apply/rowP => j; rewrite !mxE Dv linear_sum.
+    by apply: eq_bigr => i _; rewrite -SE -scaler_int linearZ !mxE.
+  rewrite -defS -2!mulmxA; have ->: T *m pinvmx T = 1%:M.
+    have uT: row_free T by rewrite /row_free -eqST rE.
+    by apply: (row_free_inj uT); rewrite mul1mx mulmxKpV.
+  by move=> i; rewrite mulmx1 -map_mxM 2!mxE denq_int mxE.
+pose b := map_mx numq (vv *m pinvmx T) *m dsubmx G.
+left; exists [ffun j => b 0 j], [seq [ffun j => (usubmx G) i j] | i : 'I_k].
+rewrite size_image card_ord => a; rewrite -[a](addNKr [ffun j => b 0 j]).
+move: (_ + a) => h; under eq_bigr => i _ do rewrite !ffunE mulrzDr.
+rewrite big_split /=.
+have <-: v = \sum_(i < m) s`_i *~ b 0 i.
+  transitivity (\sum_j (map_mx intr b *m S) 0 j *: (vbasis <<s>>)`_j).
+    rewrite {1}(coord_vbasis s_v); apply: eq_bigr => j _; congr (_ *: _).
+    suff ->: map_mx intr b = vv *m pinvmx T *m map_mx intr (dsubmx G).
+      by rewrite -(mulmxA _ _ S) mulmxKpV ?mxE // -eqST submx_full.
+    rewrite map_mxM /=; congr (_ *m _); apply/rowP => i; rewrite 2!mxE numqE.
+    by have /eqP/rowP/(_ i)/[!mxE] -> := Zv; rewrite mulr1.
+  rewrite (coord_vbasis (s_Zs _)); apply: eq_bigr => j _; congr (_ *: _).
+  rewrite linear_sum mxE; apply: eq_bigr => i _.
+  by rewrite -SE -scaler_int linearZ [b]lock !mxE.
+split.
+  rewrite -[LHS]addr0 => /addrI hP; pose c := \row_i h i *m lsubmx (invmx G).
+  exists [seq c 0 i | i : 'I_k]; congr (_ + _).
+  have/sub_kermxP: map_mx intr (\row_i h i) *m S = 0.
+    transitivity (\row_j coord (vbasis <<s>>) j (\sum_(i < m) s`_i *~ h i)).
+      apply/rowP => j; rewrite !mxE linear_sum; apply: eq_bigr => i _.
+      by rewrite -SE !mxE -scaler_int linearZ.
+    by apply/rowP => j; rewrite !mxE -hP linear0.
+  case/submx_trans/(_ kerS_sub_Gu)/submxP => c' /[dup].
+  move/(congr1 (mulmx^~ (map_mx intr (lsubmx (invmx G))))).
+  rewrite -mulmxA -!map_mxM [in RHS]mulmx_lsub mul_usub_mx -/c mulmxV //=.
+  rewrite scalar_mx_block -/(ulsubmx _) block_mxKul map_scalar_mx mulmx1.
+  move=> <- {c'}; rewrite -map_mxM /= => defh; apply/ffunP => j.
+  move/rowP/(_ j): defh; rewrite sum_ffunE !mxE => /intr_inj ->.
+  apply: eq_bigr => i _; rewrite ffunMzE mulrzz mulrC.
+  rewrite (nth_map i) ?size_enum_ord // nth_ord_enum ffunE.
+  by rewrite (nth_map i) ?size_enum_ord // nth_ord_enum.
+case=> c /addrI -> {h}; rewrite -[LHS]addr0; congr (_ + _).
+pose h := \row_(j < k) c`_j *m usubmx G.
+transitivity (\sum_j (map_mx intr h *m S) 0 j *: (vbasis <<s>>)`_j).
+  by rewrite map_mxM -mulmxA kerGu mulmx0 big1 // => j _; rewrite mxE scale0r.
+rewrite (coord_vbasis (s_Zs _)); apply: eq_bigr => i _; congr (_ *: _).
+rewrite linear_sum -SE mxE; apply: eq_bigr => j _.
+rewrite -scaler_int linearZ !mxE sum_ffunE; congr (_%:~R * _).
+apply: {i} eq_bigr => i _; rewrite mxE ffunMzE mulrzz mulrC.
+by rewrite (nth_map i) ?size_enum_ord // ffunE nth_ord_enum.
+Qed.
+
+Lemma dec_Qint_span (vT : vectType rat) m (s : m.-tuple vT) v :
+  decidable (inIntSpan s v).
+Proof.
+have [[b [p aP]]|] := solve_Qint_span s v; last by right.
+left; exists b; apply/(aP b); exists [::]; rewrite big1 ?addr0 // => i _.
+by rewrite nth_nil mulr0z.
+Qed.
+
+Lemma eisenstein_crit (p : nat) (q : {poly int}) : prime p -> (size q != 1)%N ->
+  ~~ (p %| lead_coef q)%Z -> ~~ (p ^+ 2 %| q`_0)%Z ->
+  (forall i, (i < (size q).-1)%N -> p %| q`_i)%Z ->
+  irreducible_poly q.
+Proof.
+move=> p_prime qN1 Ndvd_pql Ndvd_pq0 dvd_pq.
+apply/irreducible_rat_int.
+have qN0 : q != 0 by rewrite -lead_coef_eq0; apply: contraNneq Ndvd_pql => ->.
+split.
+  rewrite size_map_poly_id0 ?intr_eq0 ?lead_coef_eq0//.
+  by rewrite ltn_neqAle eq_sym qN1 size_poly_gt0.
+move=> f' +/dvdpP_rat_int[f [d dN0 feq]]; rewrite {f'}feq size_scale// => fN1.
+move=> /= [g q_eq]; rewrite q_eq (eqp_trans (eqp_scale _ _))//.
+have fN0 : f != 0 by apply: contra_neq qN0; rewrite q_eq => ->; rewrite mul0r.
+have gN0 : g != 0 by apply: contra_neq qN0; rewrite q_eq => ->; rewrite mulr0.
+rewrite size_map_poly_id0 ?intr_eq0 ?lead_coef_eq0// in fN1.
+have [/eqP/size_poly1P[c cN0 ->]|gN1] := eqVneq (size g) 1%N.
+  by rewrite mulrC mul_polyC map_polyZ/= eqp_sym eqp_scale// intr_eq0.
+have c_neq0 : (lead_coef q)%:~R != 0 :> 'F_p
+   by rewrite -(dvdz_charf (char_Fp _)).
+have : map_poly (intr : int -> 'F_p) q = (lead_coef q)%:~R *: 'X^(size q).-1.
+  apply/val_inj/(@eq_from_nth _ 0) => [|i]; rewrite size_map_poly_id0//.
+    by rewrite size_scale// size_polyXn -polySpred.
+  move=> i_small; rewrite coef_poly i_small coefZ coefXn lead_coefE.
+  move: i_small; rewrite polySpred// ltnS/=.
+  case: ltngtP => // [i_lt|->]; rewrite (mulr1, mulr0)//= => _.
+  by apply/eqP; rewrite -(dvdz_charf (char_Fp _))// dvd_pq.
+rewrite [in LHS]q_eq rmorphM/=.
+set c := (X in X *: _); set n := (_.-1).
+set pf := map_poly _ f; set pg := map_poly _ g => pfMpg.
+have dvdXn (r : {poly _}) : size r != 1%N -> r %| c *: 'X^n -> r`_0 = 0.
+  move=> rN1; rewrite (eqp_dvdr _ (eqp_scale _ _))//.
+  rewrite -['X]subr0; move=> /dvdp_exp_XsubCP[k lekn]; rewrite subr0.
+  move=> /eqpP[u /andP[u1N0 u2N0]]; have [->|k_gt0] := posnP k.
+    move=> /(congr1 (size \o val))/eqP.
+    by rewrite /= !size_scale// size_polyXn (negPf rN1).
+  move=> /(congr1 (fun p : {poly _} => p`_0))/eqP.
+  by rewrite !coefZ coefXn ltn_eqF// mulr0 mulf_eq0 (negPf u1N0) => /eqP.
+suff : ((p : int) ^+ 2 %| q`_0)%Z by rewrite (negPf Ndvd_pq0).
+have := c_neq0; rewrite q_eq coefM big_ord1.
+rewrite lead_coefM rmorphM mulf_eq0 negb_or => /andP[lpfN0 qfN0].
+have pfN1 : size pf != 1%N by rewrite size_map_poly_id0.
+have pgN1 : size pg != 1%N by rewrite size_map_poly_id0.
+have /(dvdXn _ pgN1) /eqP : pg %| c *: 'X^n by rewrite -pfMpg dvdp_mull.
+have /(dvdXn _ pfN1) /eqP : pf %| c *: 'X^n by rewrite -pfMpg dvdp_mulr.
+by rewrite !coef_map// -!(dvdz_charf (char_Fp _))//; apply: dvdz_mul.
+Qed.
 
 (* Connecting rationals to the ring and field tactics *)
 
