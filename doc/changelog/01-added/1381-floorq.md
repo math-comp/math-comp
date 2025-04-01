@@ -4,9 +4,6 @@
     `rat_poly_scale`, `dvdp_rat_int`, `dvdpP_rat_int`,
     `irreductible_rat_int`, `solve_QInt_span`, `dec_Qint_span`,
     `eisenstein_crit` (from `intdiv.v`)
-  + definitions `floorq`, `ceilq`, `truncnq`
-  + lemmas `ratArchimedean.floorP`, `ratArchimedean.ceilP`,
-    `ratArchimedean.truncnP`, `ratArchimedean.intrP`,
-    `ratArchimedean.natrP`
+  + lemmas `floorErat`, `ceilErat`
     ([#1381](https://github.com/math-comp/math-comp/pull/1381),
-    by Pierre Roux).
+    by Pierre Roux and Kazuhiko Sakaguchi).

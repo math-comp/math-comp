@@ -763,65 +763,46 @@ Proof. by case: b; rewrite ?(mul1r, mulN1r) // denqN. Qed.
 Lemma denq_norm x : denq `|x| = denq x.
 Proof. by rewrite normrEsign denq_mulr_sign. Qed.
 
-Definition floorq (x : rat) : int :=
-  if 0 <= x then (numq x %/ (denq x))%Z
-  else - ((- numq x + denq x - 1) %/ denq x)%Z.
-
-Definition ceilq (x : rat) : int :=
-  if 0 <= x then ((numq x + denq x - 1) %/ (denq x))%Z
-  else - (- numq x %/ denq x)%Z.
-
-Definition truncnq (x : rat) : nat :=
-  if 0 <= x then (`|numq x| %/ `|denq x|)%N else 0%N.
-
 Module ratArchimedean.
 Section ratArchimedean.
 
 Implicit Types x : rat.
 
+Definition floor x : int := (numq x %/ denq x)%Z.
+
+Definition ceil x : int := - (- numq x %/ denq x)%Z.
+
+Definition truncn x : nat :=
+  if 0 <= x then (`|numq x| %/ `|denq x|)%N else 0%N.
+
 Let is_int x := denq x == 1.
 
 Let is_nat x := (0 <= x) && (denq x == 1).
 
-Lemma floorP x :
-  if x \is Num.real then (floorq x)%:~R <= x < (floorq x + 1)%:~R
-  else floorq x == 0.
+Fact floorP x :
+  if x \is Num.real then (floor x)%:~R <= x < (floor x + 1)%:~R
+  else floor x == 0.
 Proof.
-rewrite num_real /floorq; case: (ratP x) => n d _ {x}.
-rewrite !ler_pdivlMr// mul0r ltr_pdivrMr//; case: n => n.
-  by rewrite -pmulrn ler0n -!intrM pmulrn ler_int ltr_int lez_floor ?ltz_ceil.
-rewrite NegzE mulrNz oppr_ge0 -pmulrn opprK lern0/= pmulrn -!intrM.
-rewrite [_ + 1]addrC -[1 - _]opprB !mulNr !mulrNz lerN2 ltrN2 ler_int ltr_int.
-apply/andP; split.
-- rewrite -(lerD2r (Posz d.+1 -1 + 1)) !addrA lezD1 addrK.
-  by rewrite -[X in _ * _ + X]mul1r -mulrDl ltz_ceil.
-- by rewrite mulrDl mulNr mul1r ltrBlDr -lezD1 -lerBrDr lez_floor.
+rewrite num_real /floor; case: (ratP x) => n d _ {x}; rewrite ler_pdivlMr//.
+by rewrite ltr_pdivrMr// -!intrM ler_int ltr_int lez_floor ?ltz_ceil.
 Qed.
 
-Lemma ceilP x : ceilq x = - floorq (- x).
+Fact ceilP x : ceil x = - floor (- x).
+Proof. by rewrite /ceil /floor numqN denqN. Qed.
+
+Fact truncnP x : truncn x = if floor x is Posz n then n else 0.
 Proof.
-rewrite /ceilq /floorq; have [xlt0 | xgt0 |->//] := ltgtP x 0.
-- by congr (- _); rewrite oppr_ge0 (ltW xlt0) numqN denqN.
-- by rewrite oppr_ge0 leNgt xgt0/= numqN denqN !opprK.
+rewrite /truncn /floor; case: (ratP x) => n d _ {x} /=.
+by rewrite !ler_pdivlMr// mul0r; case: n => n; rewrite ler0z//= mul1n.
 Qed.
 
-Lemma truncnP x : truncnq x = if floorq x is Posz n then n else 0.
-Proof.
-rewrite /truncnq /floorq; case: (ratP x) => n d _ {x} /=.
-rewrite !ler_pdivlMr// mul0r; case: n => n.
-  by rewrite -pmulrn ler0n absz_nat divz_nat.
-rewrite NegzE mulrNz oppr_ge0 -pmulrn opprK lern0/=.
-set nd := (_ %/ _)%Z; suff: 1 <= nd by case: nd => -[].
-by rewrite /nd -addrA addrCA -[X in X + _]mul1r divzMDl.
-Qed.
-
-Lemma intrP x : reflect (exists n, x = n%:~R) (is_int x).
+Fact intrP x : reflect (exists n, x = n%:~R) (is_int x).
 Proof.
 apply: (iffP idP) => [/eqP d1 | [i ->]]; [|by rewrite /is_int denq_int].
 by exists (numq x); case: (ratP x) d1 => n d _ ->; rewrite divr1.
 Qed.
 
-Lemma natrP x : reflect (exists n, x = n%:R) (is_nat x).
+Fact natrP x : reflect (exists n, x = n%:R) (is_nat x).
 Proof.
 apply: (iffP idP) => [/andP[]/[swap]/intrP[i ->]|[n ->]].
   by rewrite ler0z; case: i => [n _|//]; exists n.
@@ -835,6 +816,12 @@ HB.instance Definition _ :=
   Num.NumDomain_hasFloorCeilTruncn.Build rat
     ratArchimedean.floorP ratArchimedean.ceilP ratArchimedean.truncnP
     ratArchimedean.intrP ratArchimedean.natrP.
+
+Lemma floorErat (x : rat) : Num.floor x = (numq x %/ denq x)%Z.
+Proof. by []. Qed.
+
+Lemma ceilErat (x : rat) : Num.ceil x = - (- numq x %/ denq x)%Z.
+Proof. by []. Qed.
 
 Lemma Qint_def (x : rat) : (x \is a Num.int) = (denq x == 1). Proof. by []. Qed.
 
