@@ -34,9 +34,10 @@ spectral.v
 -arg -w -arg +undeclared-scope
 -arg -w -arg +deprecated-hint-without-locality
 -arg -w -arg +deprecated-hint-rewrite-without-locality
--arg -w -arg -overwriting-delimiting-key
 # handle the two following one when requiring Coq >= 8.20
 -arg -w -arg -closed-notation-not-level-0
 -arg -w -arg -postfix-notation-not-level-1
-# handle the following ones when requiring Rocq >= 9.0
+# handle the following one when requiring Rocq >= 9.0
 -arg -w -arg -deprecated-from-Coq
+# remove this one when requiring Rocq >= 9.0
+-arg -w -arg -overwriting-delimiting-key
