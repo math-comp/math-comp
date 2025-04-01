@@ -230,9 +230,9 @@ Definition submx F m1 m2 n (A : 'M[F]_(m1, n)) (B : 'M_(m2, n)) :=
   A *m cokermx B == 0.
 Canonical submx_unlockable := Unlockable submx.unlock.
 
-Arguments mxrank {F} {m%N n%N} A%MS.
-Arguments complmx {F} {m%N n%N} A%MS.
-Arguments submx {F} {m1%N m2%N n%N} A%MS B%MS : rename.
+Arguments mxrank {F} {m%_N n%_N} A%_MS.
+Arguments complmx {F} {m%_N n%_N} A%_MS.
+Arguments submx {F} {m1%_N m2%_N n%_N} A%_MS B%_MS : rename.
 
 Local Notation "\rank A" := (mxrank A) : nat_scope.
 
@@ -244,7 +244,7 @@ Local Notation "A == B" := (A <= B <= A)%MS : matrix_set_scope.
 
 Definition ltmx F m1 m2 n (A : 'M[F]_(m1, n)) (B : 'M_(m2, n)) :=
   (A <= B)%MS && ~~ (B <= A)%MS.
-Arguments ltmx {F} {m1%N m2%N n%N} A%MS B%MS.
+Arguments ltmx {F} {m1%_N m2%_N n%_N} A%_MS B%_MS.
 
 Local Notation "A < B" := (ltmx A B) : matrix_set_scope.
 
@@ -252,7 +252,7 @@ Definition eqmx F m1 m2 n (A : 'M[F]_(m1, n)) (B : 'M_(m2, n)) :=
   prod (\rank A = \rank B)
        (forall m3 (C : 'M_(m3, n)),
             ((A <= C) = (B <= C)) * ((C <= A) = (C <= B)))%MS.
-Arguments eqmx {F} {m1%N m2%N n%N} A%MS B%MS.
+Arguments eqmx {F} {m1%_N m2%_N n%_N} A%_MS B%_MS.
 
 Local Notation "A :=: B" := (eqmx A%MS B%MS) : matrix_set_scope.
 
@@ -305,7 +305,7 @@ Definition genmx F m n (A : 'M[F]_(m, n)) : 'M_n :=
    choose (equivmx A (row_full A)) (genmx_witness A).
 Canonical genmx_unlockable := Unlockable genmx.unlock.
 
-Arguments genmx {F} {n m}%N A%MS : rename.
+Arguments genmx {F} {n m}%_N A%_MS : rename.
 
 Local Notation "<< A >>" := (genmx A%MS) : matrix_set_scope.
 
@@ -321,7 +321,7 @@ Definition addsmx F m1 m2 n (A : 'M[F]_(m1, n)) (B : 'M_(m2, n)) : 'M_n :=
   <<col_mx A B>>%MS.
 Canonical addsmx_unlockable := Unlockable addsmx.unlock.
 
-Arguments addsmx {F} {m1%N m2%N n%N} A%MS B%MS : rename.
+Arguments addsmx {F} {m1%_N m2%_N n%_N} A%_MS B%_MS : rename.
 Local Notation "A + B" := (addsmx A B) : matrix_set_scope.
 
 Local Notation "\sum_ ( i | P ) B" := (\big[addsmx/0]_(i | P) B%MS)
@@ -358,7 +358,7 @@ Definition capmx F m1 m2 n (A : 'M[F]_(m1, n)) (B : 'M_(m2, n)) : 'M_n :=
   if row_full B then capmx_norm A else capmx_norm (capmx_gen A B).
 Canonical capmx_unlockable := Unlockable capmx.unlock.
 
-Arguments capmx {F} {m1%N m2%N n%N} A%MS B%MS : rename.
+Arguments capmx {F} {m1%_N m2%_N n%_N} A%_MS B%_MS : rename.
 
 Local Notation "A :&: B" := (capmx A B) : matrix_set_scope.
 Local Notation "\bigcap_ ( i | P ) B" := (\big[capmx/1%:M]_(i | P) B)
@@ -369,7 +369,7 @@ Definition diffmx F m1 m2 n (A : 'M[F]_(m1, n)) (B : 'M_(m2, n)) : 'M_n :=
   <<capmx_gen A (capmx_gen A B)^C>>%MS.
 Canonical diffmx_unlockable := Unlockable diffmx.unlock.
 
-Arguments diffmx {F} {m1%N m2%N n%N} A%MS B%MS : rename.
+Arguments diffmx {F} {m1%_N m2%_N n%_N} A%_MS B%_MS : rename.
 Local Notation "A :\: B" := (diffmx A B) : matrix_set_scope.
 
 Section RowSpaceTheory.
@@ -2016,7 +2016,7 @@ Inductive mxsum_spec n : forall m, 'M[F]_(m, n) -> nat -> Prop :=
  | ProperMxsum m1 m2 T1 T2 r1 r2 of
       @mxsum_spec n m1 T1 r1 & @mxsum_spec n m2 T2 r2
     : mxsum_spec (T1 + T2)%MS (r1 + r2)%N.
-Arguments mxsum_spec {n%N m%N} T%MS r%N.
+Arguments mxsum_spec {n%_N m%_N} T%_MS r%_N.
 
 Structure mxsum_expr m n := Mxsum {
   mxsum_val :> wrapped 'M_(m, n);
@@ -2292,16 +2292,16 @@ Arguments eigenvalueP {F n g a}.
 Arguments submx_rowsub [F m1 m2 m3 n] h [f g A] _ : rename.
 Arguments eqmx_rowsub [F m1 m2 m3 n] h [f g A] _ : rename.
 
-Arguments mxrank {F m%N n%N} A%MS.
-Arguments complmx {F m%N n%N} A%MS.
-Arguments row_full {F m%N n%N} A%MS.
-Arguments submx {F m1%N m2%N n%N} A%MS B%MS : rename.
-Arguments ltmx {F m1%N m2%N n%N} A%MS B%MS.
-Arguments eqmx {F m1%N m2%N n%N} A%MS B%MS.
-Arguments addsmx {F m1%N m2%N n%N} A%MS B%MS : rename.
-Arguments capmx {F m1%N m2%N n%N} A%MS B%MS : rename.
-Arguments diffmx {F m1%N m2%N n%N} A%MS B%MS : rename.
-Arguments genmx {F m%N n%N} A%R : rename.
+Arguments mxrank {F m%_N n%_N} A%_MS.
+Arguments complmx {F m%_N n%_N} A%_MS.
+Arguments row_full {F m%_N n%_N} A%_MS.
+Arguments submx {F m1%_N m2%_N n%_N} A%_MS B%_MS : rename.
+Arguments ltmx {F m1%_N m2%_N n%_N} A%_MS B%_MS.
+Arguments eqmx {F m1%_N m2%_N n%_N} A%_MS B%_MS.
+Arguments addsmx {F m1%_N m2%_N n%_N} A%_MS B%_MS : rename.
+Arguments capmx {F m1%_N m2%_N n%_N} A%_MS B%_MS : rename.
+Arguments diffmx {F m1%_N m2%_N n%_N} A%_MS B%_MS : rename.
+Arguments genmx {F m%_N n%_N} A%_R : rename.
 Notation "\rank A" := (mxrank A) : nat_scope.
 Notation "<< A >>" := (genmx A) : matrix_set_scope.
 Notation "A ^C" := (complmx A) : matrix_set_scope.
@@ -2657,7 +2657,7 @@ Qed.
 Definition mulsmx m1 m2 n (R1 : 'A[F]_(m1, n)) (R2 : 'A_(m2, n)) :=
   (\sum_i <<R1 *m lin_mx (mulmxr (vec_mx (row i R2)))>>)%MS.
 
-Arguments mulsmx {m1%N m2%N n%N} R1%MS R2%MS.
+Arguments mulsmx {m1%_N m2%_N n%_N} R1%_MS R2%_MS.
 
 Local Notation "R1 * R2" := (mulsmx R1 R2) : matrix_set_scope.
 
@@ -2968,15 +2968,15 @@ Qed.
 
 End MatrixAlgebra.
 
-Arguments mulsmx {F m1%N m2%N n%N} R1%MS R2%MS.
-Arguments left_mx_ideal {F m1%N m2%N n%N} R%MS S%MS : rename.
-Arguments right_mx_ideal {F m1%N m2%N n%N} R%MS S%MS : rename.
-Arguments mx_ideal {F m1%N m2%N n%N} R%MS S%MS : rename.
-Arguments mxring_id {F m%N n%N} R%MS e%R.
-Arguments has_mxring_id {F m%N n%N} R%MS.
-Arguments mxring {F m%N n%N} R%MS.
-Arguments cent_mx {F m%N n%N} R%MS.
-Arguments center_mx {F m%N n%N} R%MS.
+Arguments mulsmx {F m1%_N m2%_N n%_N} R1%_MS R2%_MS.
+Arguments left_mx_ideal {F m1%_N m2%_N n%_N} R%_MS S%_MS : rename.
+Arguments right_mx_ideal {F m1%_N m2%_N n%_N} R%_MS S%_MS : rename.
+Arguments mx_ideal {F m1%_N m2%_N n%_N} R%_MS S%_MS : rename.
+Arguments mxring_id {F m%_N n%_N} R%_MS e%_R.
+Arguments has_mxring_id {F m%_N n%_N} R%_MS.
+Arguments mxring {F m%_N n%_N} R%_MS.
+Arguments cent_mx {F m%_N n%_N} R%_MS.
+Arguments center_mx {F m%_N n%_N} R%_MS.
 
 Notation "A \in R" := (submx (mxvec A) R) : matrix_set_scope.
 Notation "R * S" := (mulsmx R S) : matrix_set_scope.

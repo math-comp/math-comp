@@ -337,7 +337,7 @@ Proof. by move=> sHG; rewrite gacentE // setTI afix_repr. Qed.
 
 End FinFieldRepr.
 
-Arguments rowg_mx {F n%N} L%g.
+Arguments rowg_mx {F n%_N} L%_g.
 Notation "''Zm'" := (scale_action _ _ _) (at level 8) : action_scope.
 Notation "''Zm'" := (scale_groupAction _ _ _) : groupAction_scope.
 
@@ -402,7 +402,7 @@ Open Scope abelem_scope.
 
 Definition abelem_dim' (gT : finGroupType) (E : {set gT}) :=
   (logn (pdiv #|E|) #|E|).-1.
-Arguments abelem_dim' {gT} E%g.
+Arguments abelem_dim' {gT} E%_g.
 Notation "''dim' E" := (abelem_dim' E).+1
   (at level 10, E at level 8, format "''dim'  E") : abelem_scope.
 
@@ -753,7 +753,7 @@ End SubGroup.
 
 End AbelemRepr.
 
-Arguments rVabelem_inj {p%N gT E%G} abelE ntE [v1%R v2%R] : rename.
+Arguments rVabelem_inj {p%_N gT E%_G} abelE ntE [v1%_R v2%_R] : rename.
 
 Section ModularRepresentation.
 

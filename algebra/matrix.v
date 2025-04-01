@@ -3939,8 +3939,8 @@ Coercion GLval R (u : GLtype R) : 'M[R]_n.-1.+1 :=
 End FinUnitMatrix.
 
 Bind Scope group_scope with GLtype.
-Arguments GLtype n%N R%type.
-Arguments GLval {n%N R} u%g.
+Arguments GLtype n%_N R%_type.
+Arguments GLval {n%_N R} u%_g.
 
 Notation "{ ''GL_' n [ R ] }" := (GLtype n R)
   (at level 0, n at level 2, format "{ ''GL_' n [ R ] }") : type_scope.
@@ -3978,8 +3978,8 @@ Qed.
 
 End GL_unit.
 
-Arguments GLgroup n%N R%type.
-Arguments GLgroup_group n%N R%type.
+Arguments GLgroup n%_N R%_type.
+Arguments GLgroup_group n%_N R%_type.
 
 Notation "''GL_' n [ R ]" := (GLgroup n R)
   (at level 8, n at level 2, format "''GL_' n [ R ]") : group_scope.

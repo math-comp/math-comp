@@ -357,7 +357,7 @@ HB.instance Definition _ := @isZmodQuotient.Build R equiv 0 -%R +%R quot
 
 End ZmodQuotient.
 
-Arguments quot R%type I%type.
+Arguments quot R%_type I%_type.
 Notation "{ 'quot' I }" := (quot I) : type_scope.
 
 Section RingQuotient.

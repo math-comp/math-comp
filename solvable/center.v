@@ -53,7 +53,7 @@ Canonical center_group (G : {group gT}) : {group gT} :=
 
 End Defs.
 
-Arguments center {gT} A%g.
+Arguments center {gT} A%_g.
 Notation "''Z' ( A )" := (center A) : group_scope.
 Notation "''Z' ( H )" := (center_group H) : Group_scope.
 

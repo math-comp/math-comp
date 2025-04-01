@@ -110,7 +110,6 @@ ssreflect/tuple.v
 -arg -w -arg +deprecated-hint-without-locality
 -arg -w -arg +deprecated-hint-rewrite-without-locality
 -arg -w -arg -elpi.add-const-for-axiom-or-sectionvar
--arg -w -arg -argument-scope-delimiter
 -arg -w -arg -overwriting-delimiting-key
 # handle the two following one when requiring Coq >= 8.20
 -arg -w -arg -closed-notation-not-level-0

@@ -10003,7 +10003,7 @@ Proof. by []. Qed.
 End SetSubsetOrder.
 
 Module Exports.
-Arguments type disp T%type.
+Arguments type disp T%_type.
 Notation "{ 'subset' [ d ] T }" := (type d T)
   (at level 0, d at next level, format "{ 'subset' [ d ]  T }") : type_scope.
 Notation "{ 'subset' T }" := {subset[subset_display] T}

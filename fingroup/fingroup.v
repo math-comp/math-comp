@@ -718,24 +718,24 @@ Definition centralised A := forall x, centralises x A.
 
 End GroupSetMulDef.
 
-Arguments lcoset _ _%g _%g.
-Arguments rcoset _ _%g _%g.
-Arguments rcosets _ _%g _%g.
-Arguments lcosets _ _%g _%g.
-Arguments indexg _ _%g _%g.
-Arguments conjugate _ _%g _%g.
-Arguments conjugates _ _%g _%g.
-Arguments class _ _%g _%g.
-Arguments classes _ _%g.
-Arguments class_support _ _%g _%g.
-Arguments commg_set _ _%g _%g.
-Arguments normaliser _ _%g.
-Arguments centraliser _ _%g.
-Arguments abelian _ _%g.
-Arguments normal _ _%g _%g.
-Arguments normalised _ _%g.
-Arguments centralises _ _%g _%g.
-Arguments centralised _ _%g.
+Arguments lcoset _ _%_g _%_g.
+Arguments rcoset _ _%_g _%_g.
+Arguments rcosets _ _%_g _%_g.
+Arguments lcosets _ _%_g _%_g.
+Arguments indexg _ _%_g _%_g.
+Arguments conjugate _ _%_g _%_g.
+Arguments conjugates _ _%_g _%_g.
+Arguments class _ _%_g _%_g.
+Arguments classes _ _%_g.
+Arguments class_support _ _%_g _%_g.
+Arguments commg_set _ _%_g _%_g.
+Arguments normaliser _ _%_g.
+Arguments centraliser _ _%_g.
+Arguments abelian _ _%_g.
+Arguments normal _ _%_g _%_g.
+Arguments normalised _ _%_g.
+Arguments centralises _ _%_g _%_g.
+Arguments centralised _ _%_g.
 
 Notation "[ 1 gT ]" := (1 : {set gT}) : group_scope.
 Notation "[ 1 ]" := [1 FinGroup.sort _] : group_scope.
@@ -1203,13 +1203,13 @@ Canonical setT_group := group group_setT.
 
 End GroupSetMulProp.
 
-Arguments group_of gT%type.
+Arguments group_of gT%_type.
 Arguments lcosetP {gT A x y}.
 Arguments lcosetsP {gT A B C}.
 Arguments rcosetP {gT A x y}.
 Arguments rcosetsP {gT A B C}.
 Arguments group_setP {gT A}.
-Arguments setT_group gT%type.
+Arguments setT_group gT%_type.
 Prenex Implicits group_set mulsgP set1gP.
 
 Notation "{ 'group' gT }" := (group_of gT)
@@ -1236,9 +1236,9 @@ Definition commutator (gT : finGroupType) (A B : {set gT}) := generated (commg_s
 Definition cycle (gT : finGroupType) (x : gT) := generated [set x].
 Definition order (gT : finGroupType) (x : gT) := #|cycle x|.
 
-Arguments commutator _ _%g _%g.
-Arguments joing _ _%g _%g.
-Arguments generated _ _%g.
+Arguments commutator _ _%_g _%_g.
+Arguments joing _ _%_g _%_g.
+Arguments generated _ _%_g.
 
 (* Helper notation for defining new groups that need a bespoke finGroupType. *)
 (* The actual group for such a type (say, my_gT) will be the full group,     *)
@@ -1813,9 +1813,9 @@ End GroupInter.
 
 #[global] Hint Resolve order_gt0 : core.
 
-Arguments generated_group _ _%g.
-Arguments joing_group _ _%g _%g.
-Arguments subgroups _ _%g.
+Arguments generated_group _ _%_g.
+Arguments joing_group _ _%_g _%_g.
+Arguments subgroups _ _%_g.
 
 Notation "G :&: H" := (setI_group G H) : Group_scope.
 Notation "<< A >>"  := (generated_group A) : Group_scope.
@@ -2890,8 +2890,8 @@ Arguments normalP {gT A B}.
 Arguments centsP {gT A B}.
 Arguments commG1P {gT A B}.
 
-Arguments normaliser_group _ _%g.
-Arguments centraliser_group _ _%g.
+Arguments normaliser_group _ _%_g.
+Arguments centraliser_group _ _%_g.
 
 Notation "''N' ( A )" := (normaliser_group A) : Group_scope.
 Notation "''C' ( A )" := (centraliser_group A) : Group_scope.
@@ -2916,7 +2916,7 @@ Definition maxgroup A gP := maxset (fun A => group_set A && gP <<A>>%G) A.
 Definition mingroup A gP := minset (fun A => group_set A && gP <<A>>%G) A.
 
 Variable gP : pred {group gT}.
-Arguments gP _%G.
+Arguments gP _%_G.
 
 Lemma ex_maxgroup : (exists G, gP G) -> {G : {group gT} | maxgroup G gP}.
 Proof.
@@ -2974,8 +2974,8 @@ Qed.
 
 End MinMaxGroup.
 
-Arguments mingroup {gT} A%g gP.
-Arguments maxgroup {gT} A%g gP.
+Arguments mingroup {gT} A%_g gP.
+Arguments maxgroup {gT} A%_g gP.
 Arguments mingroupP {gT gP G}.
 Arguments maxgroupP {gT gP G}.
 

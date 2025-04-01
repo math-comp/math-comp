@@ -44,8 +44,8 @@ Definition upper_central_at := iter n (fun B => coset B @*^-1 'Z(A / B)) 1.
 
 End SeriesDefs.
 
-Arguments lower_central_at n%N {gT} A%g.
-Arguments upper_central_at n%N {gT} A%g : simpl never.
+Arguments lower_central_at n%_N {gT} A%_g.
+Arguments upper_central_at n%_N {gT} A%_g : simpl never.
 
 Notation "''L_' n ( G )" := (lower_central_at n G)
   (at level 8, n at level 2, format "''L_' n ( G )") : group_scope.
@@ -67,9 +67,9 @@ Definition solvable :=
 
 End PropertiesDefs.
 
-Arguments nilpotent {gT} A%g.
-Arguments nil_class {gT} A%g.
-Arguments solvable {gT} A%g.
+Arguments nilpotent {gT} A%_g.
+Arguments nil_class {gT} A%_g.
+Arguments solvable {gT} A%_g.
 
 Section NilpotentProps.
 

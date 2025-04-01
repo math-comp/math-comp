@@ -142,8 +142,8 @@ Delimit Scope set_scope with SET.
 Bind Scope set_scope with set_type.
 Bind Scope set_scope with set_of.
 Open Scope set_scope.
-Arguments set_of T%type.
-Arguments finfun_of_set {T} A%SET.
+Arguments set_of T%_type.
+Arguments finfun_of_set {T} A%_SET.
 
 Notation "{ 'set' T }" := (set_of T)
   (at level 0, format "{ 'set'  T }") : type_scope.
@@ -243,7 +243,7 @@ End BasicSetTheory.
 Arguments eqsVneq {T} A B, {T A B}.
 
 Arguments set0 {T}.
-Arguments setTfor T%type.
+Arguments setTfor T%_type.
 Arguments eq_finset {T} [pA] pB eq_pAB.
 #[global] Hint Resolve in_setT : core.
 

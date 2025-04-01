@@ -407,14 +407,14 @@ End Defs.
 
 Bind Scope cfun_scope with classfun.
 
-Arguments classfun {gT} B%g.
-Arguments classfun_on {gT} B%g A%g.
-Arguments cfun_indicator {gT} B%g.
-Arguments cfAut {gT B%g} u phi%CF.
-Arguments cfReal {gT B%g} phi%CF.
-Arguments cfdot {gT B%g} phi%CF psi%CF.
-Arguments cfdotr {gT B%g} psi%CF phi%CF /.
-Arguments cfnorm {gT B%g} phi%CF /.
+Arguments classfun {gT} B%_g.
+Arguments classfun_on {gT} B%_g A%_g.
+Arguments cfun_indicator {gT} B%_g.
+Arguments cfAut {gT B%_g} u phi%_CF.
+Arguments cfReal {gT B%_g} phi%_CF.
+Arguments cfdot {gT B%_g} phi%_CF psi%_CF.
+Arguments cfdotr {gT B%_g} psi%_CF phi%_CF /.
+Arguments cfnorm {gT B%_g} phi%_CF /.
 
 Notation "''CF' ( G )" := (classfun G) : type_scope.
 
@@ -469,12 +469,12 @@ Definition isometry_from_to mCFD tau mCFR :=
 End Predicates.
 Arguments orthogonal : simpl never.
 
-Arguments cfker {gT D%g} phi%CF.
-Arguments cfaithful {gT D%g} phi%CF.
-Arguments orthogonal {gT D%g} S1%CF S2%CF.
-Arguments pairwise_orthogonal {gT D%g} S%CF.
-Arguments orthonormal {gT D%g} S%CF.
-Arguments isometry {gT rT D%g R%g} tau%CF.
+Arguments cfker {gT D%_g} phi%_CF.
+Arguments cfaithful {gT D%_g} phi%_CF.
+Arguments orthogonal {gT D%_g} S1%_CF S2%_CF.
+Arguments pairwise_orthogonal {gT D%_g} S%_CF.
+Arguments orthonormal {gT D%_g} S%_CF.
+Arguments isometry {gT rT D%_g R%_g} tau%_CF.
 
 Notation "{ 'in' CFD , 'isometry' tau , 'to' CFR }" :=
     (isometry_from_to (mem CFD) tau (mem CFR))
@@ -772,7 +772,7 @@ Proof. by []. Qed.
 
 End ClassFun.
 
-Arguments classfun_on {gT} B%g A%g.
+Arguments classfun_on {gT} B%_g A%_g.
 Notation "''CF' ( G , A )" := (classfun_on G A) : ring_scope.
 
 Arguments cfun_onP {gT G A phi}.
@@ -1413,7 +1413,7 @@ HB.instance Definition _ := GRing.isMultiplicative.Build _ _ cfRes
 
 End Restrict.
 
-Arguments cfRes {gT} A%g {B%g} phi%CF.
+Arguments cfRes {gT} A%_g {B%_g} phi%_CF.
 Notation "''Res[' H , G ]" := (@cfRes _ H G) (only parsing) : ring_scope.
 Notation "''Res[' H ]" := 'Res[H, _] : ring_scope.
 Notation "''Res'" := 'Res[_] (only parsing) : ring_scope.
@@ -1755,8 +1755,8 @@ Proof. by move=> nsBG kerH; rewrite -cfMod_eq1 // cfQuoK. Qed.
 
 End Coset.
 
-Arguments cfQuo {gT G%G} B%g phi%CF.
-Arguments cfMod {gT G%G B%g} phi%CF.
+Arguments cfQuo {gT G%_G} B%_g phi%_CF.
+Arguments cfMod {gT G%_G B%_g} phi%_CF.
 Notation "phi / H" := (cfQuo H phi) : cfun_scope.
 Notation "phi %% H" := (@cfMod _ _ H phi) : cfun_scope.
 
@@ -2354,7 +2354,7 @@ Qed.
 
 End Induced.
 
-Arguments cfInd {gT} B%g {A%g} phi%CF.
+Arguments cfInd {gT} B%_g {A%_g} phi%_CF.
 Notation "''Ind[' G , H ]" := (@cfInd _ G H) (only parsing) : ring_scope.
 Notation "''Ind[' G ]" := 'Ind[G, _] : ring_scope.
 Notation "''Ind'" := 'Ind[_] (only parsing) : ring_scope.

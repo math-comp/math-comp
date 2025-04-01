@@ -310,7 +310,7 @@ Structure mx_representation G n :=
   MxRepresentation { repr_mx :> gT -> 'M_n; _ : mx_repr G repr_mx }.
 
 Variables (G : {group gT}) (n : nat) (rG : mx_representation G n).
-Arguments rG _%group_scope : extra scopes.
+Arguments rG _%_group_scope : extra scopes.
 
 Lemma repr_mx1 : rG 1 = 1%:M.
 Proof. by case: rG => r []. Qed.
@@ -830,18 +830,18 @@ End Regular.
 
 End RingRepr.
 
-Arguments mx_representation R {gT} G%g n%N.
-Arguments mx_repr {R gT} G%g {n%N} r.
-Arguments group_ring R {gT} G%g.
-Arguments regular_repr R {gT} G%g.
+Arguments mx_representation R {gT} G%_g n%_N.
+Arguments mx_repr {R gT} G%_g {n%_N} r.
+Arguments group_ring R {gT} G%_g.
+Arguments regular_repr R {gT} G%_g.
 
 Arguments centgmxP {R gT G n rG f}.
 Arguments rkerP {R gT G n rG x}.
-Arguments repr_mxK {R gT G%G n%N} rG {m%N} [x%g] Gx.
-Arguments repr_mxKV {R gT G%G n%N} rG {m%N} [x%g] Gx.
-Arguments gring_valK {gT G%G} i%R : rename.
-Arguments gring_indexK {gT G%G} x%g.
-Arguments gring_mxK {R gT G%G} v%R : rename.
+Arguments repr_mxK {R gT G%_G n%_N} rG {m%_N} [x%_g] Gx.
+Arguments repr_mxKV {R gT G%_G n%_N} rG {m%_N} [x%_g] Gx.
+Arguments gring_valK {gT G%_G} i%_R : rename.
+Arguments gring_indexK {gT G%_G} x%_g.
+Arguments gring_mxK {R gT G%_G} v%_R : rename.
 
 Section ChangeOfRing.
 
@@ -911,7 +911,7 @@ Section OneRepresentation.
 Variable gT : finGroupType.
 
 Variables (G : {group gT}) (n : nat) (rG : mx_representation F G n).
-Arguments rG _%group_scope : extra scopes.
+Arguments rG _%_group_scope : extra scopes.
 
 Local Notation E_G := (enveloping_algebra_mx rG).
 
@@ -4675,10 +4675,10 @@ End LinearIrr.
 
 End FieldRepr.
 
-Arguments rfix_mx {F gT G%g n%N} rG H%g.
-Arguments gset_mx F {gT} G%g A%g.
-Arguments classg_base F {gT} G%g _%g : extra scopes.
-Arguments irrType F {gT} G%g.
+Arguments rfix_mx {F gT G%_g n%_N} rG H%_g.
+Arguments gset_mx F {gT} G%_g A%_g.
+Arguments classg_base F {gT} G%_g _%_g : extra scopes.
+Arguments irrType F {gT} G%_g.
 
 Arguments mxmoduleP {F gT G n rG m U}.
 Arguments envelop_mxP {F gT G n rG A}.
@@ -4713,9 +4713,9 @@ Arguments gring_rowK {F gT G} [A] RG_A.
 
 Bind Scope irrType_scope with socle_sort.
 Notation "[ 1 sG ]" := (principal_comp sG) : irrType_scope.
-Arguments irr_degree {F gT G%G sG} i%irr.
-Arguments irr_repr {F gT G%G sG} i%irr _%g : extra scopes.
-Arguments irr_mode {F gT G%G sG} i%irr z%g : rename.
+Arguments irr_degree {F gT G%_G sG} i%_irr.
+Arguments irr_repr {F gT G%_G sG} i%_irr _%_g : extra scopes.
+Arguments irr_mode {F gT G%_G sG} i%_irr z%_g : rename.
 Notation "''n_' i" := (irr_degree i) : group_ring_scope.
 Notation "''R_' i" := (Wedderburn_subring i) : group_ring_scope.
 Notation "''e_' i" := (Wedderburn_id i) : group_ring_scope.
@@ -5050,7 +5050,7 @@ Record gen_of {F : fieldType} {gT : finGroupType} {G : {group gT}} {n' : nat}
               (irrG : mx_irreducible rG) (cGA : centgmx rG A) :=
    Gen {rVval : 'rV[F]_(degree_mxminpoly A)}.
 
-Local Arguments rVval {F gT G%G n'%N rG A%R irrG cGA} x%R : rename.
+Local Arguments rVval {F gT G%_G n'%_N rG A%_R irrG cGA} x%_R : rename.
 Bind Scope ring_scope with gen_of.
 
 Section GenField.
@@ -5759,7 +5759,7 @@ End MatrixGenFieldExports.
 Export MatrixGenFieldExports.
 
 Bind Scope ring_scope with gen_of.
-Arguments rVval {F gT G%G n'%N rG A%R irrG cGA} x%R : rename.
+Arguments rVval {F gT G%_G n'%_N rG A%_R irrG cGA} x%_R : rename.
 Prenex Implicits gen_of Gen rVval pval mxval gen groot.
 Arguments subbase {F n'} A {nA}.
 Prenex Implicits gen_dim gen_base base val_gen gen_mx rowval_gen.

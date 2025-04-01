@@ -480,7 +480,7 @@ Notation "x |-> y" := (FunDelta x y)
    format "'[hv' x '/ '  |->  y ']'") : fun_delta_scope.
 
 Delimit Scope fun_delta_scope with FUN_DELTA.
-Arguments app_fdelta {aT rT%type} df%FUN_DELTA f z.
+Arguments app_fdelta {aT rT%_type} df%_FUN_DELTA f z.
 
 Notation "[ 'fun' z : T => F 'with' d1 , .. , dn ]" :=
   (SimplFunDelta (fun z : T =>

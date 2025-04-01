@@ -121,7 +121,7 @@ Import GRing.Theory.
 (* Finite dimension vector space *)
 Definition vector_axiom_def (R : nzRingType) n (V : lmodType R) :=
   {v2r : V -> 'rV[R]_n | linear v2r & bijective v2r}.
-Arguments vector_axiom_def [R] n%N V%type.
+Arguments vector_axiom_def [R] n%_N V%_type.
 
 HB.mixin Record Lmodule_hasFinDim (R : nzRingType) (V : Type) of GRing.Lmodule R V :=
   { dim : nat;
@@ -149,7 +149,7 @@ End OtherDefs.
 Module Import VectorExports.
 Bind Scope ring_scope with Vector.sort.
 
-Arguments space [K] vT%type.
+Arguments space [K] vT%_type.
 
 Notation "{ 'vspace' vT }" := (space vT) : type_scope.
 Notation "''Hom' ( aT , rT )" := (hom aT rT) : type_scope.
@@ -224,7 +224,7 @@ Definition f2mx (f : 'Hom(aT, rT)) := let: Hom A := f in A.
 HB.instance Definition _ : isSub _ _ 'Hom(aT, rT) := [isNew for f2mx].
 End Hom.
 
-Arguments mx2vs {K vT m%N} A%MS.
+Arguments mx2vs {K vT m%_N} A%_MS.
 Prenex Implicits v2r r2v v2rK r2vK b2mx vs2mx vs2mxK f2mx.
 
 End VectorInternalTheory.

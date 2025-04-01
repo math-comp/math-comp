@@ -763,7 +763,7 @@ Notation ceil_le := le_ceil_tmp.
 #[deprecated(since="mathcomp 2.4.0", note="Renamed to natrEtruncn.")]
 Notation natrE := natrEtruncn.
 
-Arguments natrK {R} _%N.
+Arguments natrK {R} _%_N.
 Arguments intrKfloor {R}.
 Arguments intrKceil {R}.
 Arguments natrP {R x}.
