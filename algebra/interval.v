@@ -329,26 +329,35 @@ Proof. by rewrite !itv_boundlr andbT. Qed.
 Lemma subitvP i1 i2 : i1 <= i2 -> {subset i1 <= i2}.
 Proof. by move=> ? ? /le_trans; exact. Qed.
 
-Lemma subset_itv (r s u v : bool) x y : r <= u -> v <= s ->
+(* Remove the line below when requiring Coq >= 8.20 *)
+#[warning="-unsupported-attributes"]
+#[warn(note="The lemma subset_itv was generalized in MathComp 2.4.0 and the original was renamed to subset_itv_bound.",
+  cats="mathcomp-subset-itv")]
+Lemma subset_itv (x y z u : itv_bound T) : x <= y -> z <= u ->
+  {subset Interval y z <= Interval x u}.
+Proof. by move=> xy zu; apply: subitvP; rewrite subitvE xy zu. Qed.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use subset_itv instead.")]
+Lemma subset_itv_bound (r s u v : bool) x y : r <= u -> v <= s ->
   {subset Interval (BSide r x) (BSide s y) <= Interval (BSide u x) (BSide v y)}.
 Proof.
-by move: r s u v=> [] [] [] []// *; apply: subitvP; rewrite subitvE !bound_lexx.
+by move: r s u v=> [] [] [] []// *; apply: subset_itv; rewrite bnd_simp.
 Qed.
 
 Lemma subset_itv_oo_cc x y : {subset `]x, y[ <= `[x, y]}.
-Proof. exact: subset_itv. Qed.
+Proof. by apply: subset_itv; rewrite bnd_simp. Qed.
 
 Lemma subset_itv_oo_oc x y : {subset `]x, y[ <= `]x, y]}.
-Proof. exact: subset_itv. Qed.
+Proof. by apply: subset_itv; rewrite bnd_simp. Qed.
 
 Lemma subset_itv_oo_co x y : {subset `]x, y[ <= `[x, y[}.
-Proof. exact: subset_itv. Qed.
+Proof. by apply: subset_itv; rewrite bnd_simp. Qed.
 
 Lemma subset_itv_oc_cc x y : {subset `]x, y] <= `[x, y]}.
-Proof. exact: subset_itv. Qed.
+Proof. by apply: subset_itv; rewrite bnd_simp. Qed.
 
 Lemma subset_itv_co_cc x y : {subset `[x, y[ <= `[x, y]}.
-Proof. exact: subset_itv. Qed.
+Proof. by apply: subset_itv; rewrite bnd_simp. Qed.
 
 Lemma itvxx x : `[x, x] =i pred1 x.
 Proof. by move=> y; rewrite in_itv/= -eq_le eq_sym. Qed.
