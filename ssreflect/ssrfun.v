@@ -2,8 +2,7 @@ From mathcomp Require Import ssreflect.
 From Corelib Require Export ssrfun.
 From mathcomp Require Export ssrnotations.
 #[export] Set Warnings "-overwriting-delimiting-key".
-(* because there is some Set Warnings "overwriting-delimiting-key".
-   somewhere in the above *)
+(* remove above line when requiring Rocq >= 9.0 *)
 
 Set Implicit Arguments.
 Unset Strict Implicit.

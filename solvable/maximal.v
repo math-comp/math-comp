@@ -97,14 +97,14 @@ Definition SCN_at n B := [set A in SCN B | n <= 'r(A)].
 
 End Defs.
 
-Arguments charsimple {gT} A%g.
-Arguments Frattini {gT} A%g.
-Arguments Fitting {gT} A%g.
-Arguments critical {gT} A%g B%g.
-Arguments special {gT} A%g.
-Arguments extraspecial {gT} A%g.
-Arguments SCN {gT} B%g.
-Arguments SCN_at {gT} n%N B%g.
+Arguments charsimple {gT} A%_g.
+Arguments Frattini {gT} A%_g.
+Arguments Fitting {gT} A%_g.
+Arguments critical {gT} A%_g B%_g.
+Arguments special {gT} A%_g.
+Arguments extraspecial {gT} A%_g.
+Arguments SCN {gT} B%_g.
+Arguments SCN_at {gT} n%_N B%_g.
 
 Notation "''Phi' ( A )" := (Frattini A)
   (at level 8, format "''Phi' ( A )") : group_scope.

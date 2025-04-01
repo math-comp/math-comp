@@ -215,8 +215,8 @@ Open Scope seq_scope.
 (* Inductive seq (T : Type) : Type := Nil | Cons of T & seq T. *)
 Notation seq := list.
 Bind Scope seq_scope with list.
-Arguments cons {T%type} x s%SEQ : rename.
-Arguments nil {T%type} : rename.
+Arguments cons {T%_type} x s%_SEQ : rename.
+Arguments nil {T%_type} : rename.
 Notation Cons T := (@cons T) (only parsing).
 Notation Nil T := (@nil T) (only parsing).
 

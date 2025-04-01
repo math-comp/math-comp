@@ -80,15 +80,15 @@ Definition Sylow A B := p_group B && Hall A B.
 
 End PgroupDefs.
 
-Arguments pgroup {gT} pi%N A%g.
-Arguments psubgroup {gT} pi%N A%g B%g.
-Arguments p_group {gT} A%g.
-Arguments p_elt {gT} pi%N x.
-Arguments constt {gT} x%g pi%N.
-Arguments Hall {gT} A%g B%g.
-Arguments pHall {gT} pi%N A%g B%g.
-Arguments Syl {gT} p%N A%g.
-Arguments Sylow {gT} A%g B%g.
+Arguments pgroup {gT} pi%_N A%_g.
+Arguments psubgroup {gT} pi%_N A%_g B%_g.
+Arguments p_group {gT} A%_g.
+Arguments p_elt {gT} pi%_N x.
+Arguments constt {gT} x%_g pi%_N.
+Arguments Hall {gT} A%_g B%_g.
+Arguments pHall {gT} pi%_N A%_g B%_g.
+Arguments Syl {gT} p%_N A%_g.
+Arguments Sylow {gT} A%_g B%_g.
 
 Notation "pi .-group" := (pgroup pi)
   (at level 2, format "pi .-group") : group_scope.
@@ -857,8 +857,8 @@ Canonical pcore_group : {group gT} := Eval hnf in [group of pcore].
 
 End PcoreDef.
 
-Arguments pcore pi%N {gT} A%g.
-Arguments pcore_group pi%N {gT} A%G.
+Arguments pcore pi%_N {gT} A%_g.
+Arguments pcore_group pi%_N {gT} A%_G.
 Notation "''O_' pi ( G )" := (pcore pi G)
   (at level 8, pi at level 2, format "''O_' pi ( G )") : group_scope.
 Notation "''O_' pi ( G )" := (pcore_group pi G) : Group_scope.
@@ -880,7 +880,7 @@ Canonical pseries_group : {group gT} := group pseries_group_set.
 
 End PseriesDefs.
 
-Arguments pseries pis%SEQ {gT} _%g.
+Arguments pseries pis%_SEQ {gT} _%_g.
 Local Notation ConsPred p := (@Cons nat_pred p%N) (only parsing).
 Notation "''O_{' p1 , .. , pn } ( A )" :=
   (pseries (ConsPred p1 .. (ConsPred pn [::]) ..) A)

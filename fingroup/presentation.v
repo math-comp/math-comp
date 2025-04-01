@@ -157,8 +157,8 @@ Notation "x" := x (in custom group_presentation at level 0, x ident).
 Notation "x : p" := (Generator (fun x => Cast p))
   (in custom group_presentation, x ident, p custom group_presentation at level 200).
 
-Arguments hom _ _%group_scope.
-Arguments iso _ _%group_scope.
+Arguments hom _ _%_group_scope.
+Arguments iso _ _%_group_scope.
 
 Notation "H \homg 'Grp' p" := (hom H p)
   (at level 70, p at level 0, format "H  \homg  'Grp'  p") : group_scope.

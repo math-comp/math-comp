@@ -100,21 +100,22 @@ ssreflect/tuple.v
 -I .
 -R . mathcomp
 
--arg -w -arg -projection-no-head-constant
--arg -w -arg -redundant-canonical-projection
--arg -w -arg -notation-overridden
+# Warnings set as error to avoid (re)introducing them
 -arg -w -arg +duplicate-clear
--arg -w -arg -ambiguous-paths
 -arg -w -arg +non-primitive-record
 -arg -w -arg +undeclared-scope
 -arg -w -arg +deprecated-hint-without-locality
 -arg -w -arg +deprecated-hint-rewrite-without-locality
+# Warnings we don't really know how to handle
+-arg -w -arg -projection-no-head-constant
+-arg -w -arg -redundant-canonical-projection
+-arg -w -arg -notation-overridden
+-arg -w -arg -ambiguous-paths
 -arg -w -arg -elpi.add-const-for-axiom-or-sectionvar
--arg -w -arg -opaque-let
--arg -w -arg -argument-scope-delimiter
--arg -w -arg -overwriting-delimiting-key
 # handle the two following one when requiring Coq >= 8.20
 -arg -w -arg -closed-notation-not-level-0
 -arg -w -arg -postfix-notation-not-level-1
-# handle the following ones when requiring Rocq >= 9.0
+# handle the following one when requiring Rocq >= 9.0
 -arg -w -arg -deprecated-from-Coq
+# remove this one when requiring Rocq >= 9.0
+-arg -w -arg -overwriting-delimiting-key

@@ -1895,7 +1895,7 @@ HB.structure Definition Lmodule (R : pzRingType) :=
   {M of Zmodule M & Zmodule_isLmodule R M}.
 
 (* FIXME: see #1126 and #1127 *)
-Arguments scalerA [R s] (a b)%ring_scope v.
+Arguments scalerA [R s] (a b)%_ring_scope v.
 
 Module LmodExports.
 Bind Scope ring_scope with Lmodule.sort.
@@ -3677,20 +3677,20 @@ End TermDef.
 
 Bind Scope term_scope with term.
 Bind Scope term_scope with formula.
-Arguments Add {R} t1%T t2%T.
-Arguments Opp {R} t1%T.
-Arguments NatMul {R} t1%T n%N.
-Arguments Mul {R} t1%T t2%T.
-Arguments Inv {R} t1%T.
-Arguments Exp {R} t1%T n%N.
-Arguments Equal {R} t1%T t2%T.
-Arguments Unit {R} t1%T.
-Arguments And {R} f1%T f2%T.
-Arguments Or {R} f1%T f2%T.
-Arguments Implies {R} f1%T f2%T.
-Arguments Not {R} f1%T.
-Arguments Exists {R} i%N f1%T.
-Arguments Forall {R} i%N f1%T.
+Arguments Add {R} t1%_T t2%_T.
+Arguments Opp {R} t1%_T.
+Arguments NatMul {R} t1%_T n%_N.
+Arguments Mul {R} t1%_T t2%_T.
+Arguments Inv {R} t1%_T.
+Arguments Exp {R} t1%_T n%_N.
+Arguments Equal {R} t1%_T t2%_T.
+Arguments Unit {R} t1%_T.
+Arguments And {R} f1%_T f2%_T.
+Arguments Or {R} f1%_T f2%_T.
+Arguments Implies {R} f1%_T f2%_T.
+Arguments Not {R} f1%_T.
+Arguments Exists {R} i%_N f1%_T.
+Arguments Forall {R} i%_N f1%_T.
 
 Arguments Bool {R} b.
 Arguments Const {R} x.
@@ -6875,7 +6875,7 @@ Notation "1" := (@one _) : ring_scope.
 Notation "- 1" := (opp 1) : ring_scope.
 
 Notation "n %:R" := (natmul 1 n) : ring_scope.
-Arguments GRing.char R%type.
+Arguments GRing.char R%_type.
 Notation "[ 'char' R ]" := (GRing.char R) : ring_scope.
 Notation has_char0 R := (GRing.char R =i pred0).
 Notation Frobenius_aut chRp := (Frobenius_aut chRp).

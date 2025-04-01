@@ -184,10 +184,10 @@ Lemma quotientE : quotient = coset @* Q. Proof. by []. Qed.
 
 End Cosets.
 
-Arguments coset_of {gT} H%g : rename.
-Arguments coset {gT} H%g x%g : rename.
-Arguments quotient {gT} A%g H%g : rename.
-Arguments coset_reprK {gT H%g} xbar%g : rename.
+Arguments coset_of {gT} H%_g : rename.
+Arguments coset {gT} H%_g x%_g : rename.
+Arguments quotient {gT} A%_g H%_g : rename.
+Arguments coset_reprK {gT H%_g} xbar%_g : rename.
 
 Bind Scope group_scope with coset_of.
 

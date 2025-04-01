@@ -499,7 +499,7 @@ HB.mixin Record Choice_isCountable (T : Type) : Type := {
     unpickle : nat -> option T;
     pickleK : pcancel pickle unpickle
 }.
-Arguments Choice_isCountable.axioms_ T%type_scope.
+Arguments Choice_isCountable.axioms_ T%_type_scope.
 
 #[short(type="countType")]
 HB.structure Definition Countable := { T of Choice T & Choice_isCountable T }.
@@ -514,7 +514,7 @@ HB.builders Context T of isCountable T.
   HB.instance Definition _ := PCanHasChoice pickleK.
   HB.instance Definition _ := Choice_isCountable.Build T pickleK.
 HB.end.
-Arguments isCountable.axioms_ T%type_scope.
+Arguments isCountable.axioms_ T%_type_scope.
 
 Section CountableTheory.
 

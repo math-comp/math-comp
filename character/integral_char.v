@@ -150,7 +150,7 @@ End GenericClassSums.
 HB.lock Definition gring_irr_mode  (gT : finGroupType) (G : {group gT})
   (i : Iirr G) := ('chi_i 1%g)^-1 *: 'chi_i.
 Canonical gring_irr_mode_unlockable := Unlockable gring_irr_mode.unlock.
-Arguments gring_irr_mode {gT G%G} i%R _%g : extra scopes.
+Arguments gring_irr_mode {gT G%_G} i%_R _%_g : extra scopes.
 
 Notation "''K_' i" := (gring_class_sum _ i)
   (at level 8, i at level 2, format "''K_' i") : ring_scope.

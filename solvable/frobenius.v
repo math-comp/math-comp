@@ -95,15 +95,15 @@ Variant has_Frobenius_action G H : Prop :=
 
 End Definitions.
 
-Arguments semiregular {gT} K%g H%g.
-Arguments semiprime {gT} K%g H%g.
-Arguments normedTI {gT} A%g G%g L%g.
-Arguments Frobenius_group_with_complement {gT} G%g H%g.
-Arguments Frobenius_group {gT} G%g.
-Arguments Frobenius_group_with_kernel {gT} G%g K%g.
-Arguments Frobenius_group_with_kernel_and_complement {gT} G%g K%g H%g.
-Arguments Frobenius_action {gT} G%g H%g {sT} S%g to%act.
-Arguments has_Frobenius_action {gT} G%g H%g.
+Arguments semiregular {gT} K%_g H%_g.
+Arguments semiprime {gT} K%_g H%_g.
+Arguments normedTI {gT} A%_g G%_g L%_g.
+Arguments Frobenius_group_with_complement {gT} G%_g H%_g.
+Arguments Frobenius_group {gT} G%_g.
+Arguments Frobenius_group_with_kernel {gT} G%_g K%_g.
+Arguments Frobenius_group_with_kernel_and_complement {gT} G%_g K%_g H%_g.
+Arguments Frobenius_action {gT} G%_g H%_g {sT} S%_g to%_act.
+Arguments has_Frobenius_action {gT} G%_g H%_g.
 
 Notation "[ 'Frobenius' G 'with' 'complement' H ]" :=
   (Frobenius_group_with_complement G H)

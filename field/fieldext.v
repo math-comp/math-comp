@@ -866,7 +866,7 @@ Canonical baseAspace E := ASpace (baseAspace_suproof E).
 
 End BaseField.
 
-Arguments baseFieldType [F0 F]%type L%type.
+Arguments baseFieldType [F0 F]%_type L%_type.
 
 HB.lock Definition refBaseField (F0 : fieldType) (F : fieldExtType F0)
   (L : fieldExtType F) := baseAspace (1%AS : {aspace L}).

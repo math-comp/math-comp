@@ -66,7 +66,7 @@ Proof. by rewrite /Ratio /insubd; case: insubP; rewrite //= eqxx. Qed.
 
 End FracDomain.
 
-Arguments ratio R%type.
+Arguments ratio R%_type.
 
 Notation "{ 'ratio' T }" := (ratio T) : type_scope.
 
@@ -270,7 +270,7 @@ End FracField.
 End FracField.
 HB.export FracField.
 
-Arguments FracField.type R%type.
+Arguments FracField.type R%_type.
 
 Notation "{ 'fraction' T }" := (FracField.type T).
 Notation equivf := (@FracField.equivf _).

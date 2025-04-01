@@ -90,13 +90,13 @@ Definition divgr A B x := x * (remgr A B x)^-1.
 
 End Defs.
 
-Arguments partial_product _ _%g _%g : clear implicits.
-Arguments semidirect_product _ _%g _%g : clear implicits.
-Arguments central_product _ _%g _%g : clear implicits.
-Arguments complements_to_in _ _%g _%g.
-Arguments splits_over _ _%g _%g.
-Arguments remgr _ _%g _%g _%g.
-Arguments divgr _ _%g _%g _%g.
+Arguments partial_product _ _%_g _%_g : clear implicits.
+Arguments semidirect_product _ _%_g _%_g : clear implicits.
+Arguments central_product _ _%_g _%_g : clear implicits.
+Arguments complements_to_in _ _%_g _%_g.
+Arguments splits_over _ _%_g _%_g.
+Arguments remgr _ _%_g _%_g _%_g.
+Arguments divgr _ _%_g _%_g _%_g.
 Arguments direct_product : clear implicits.
 Notation pprod := (partial_product _).
 Notation sdprod := (semidirect_product _).

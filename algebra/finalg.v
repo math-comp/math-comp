@@ -296,7 +296,7 @@ End UnitsGroup.
 
 Module Import UnitsGroupExports.
 Bind Scope group_scope with unit_of.
-Arguments unit_of R%type.
+Arguments unit_of R%_type.
 Canonical unit_action.
 Canonical unit_groupAction.
 End UnitsGroupExports.

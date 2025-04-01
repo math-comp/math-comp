@@ -535,7 +535,7 @@ Arguments xcfun_r {_ _} A phi /.
 Notation "phi .[ A ]" := (xcfun phi A) : cfun_scope.
 
 Definition pred_Nirr gT B := #|@classes gT B|.-1.
-Arguments pred_Nirr {gT} B%g.
+Arguments pred_Nirr {gT} B%_g.
 Notation Nirr G := (pred_Nirr G).+1.
 Notation Iirr G := 'I_(Nirr G).
 
@@ -578,7 +578,7 @@ Proof. by apply: onW_bij; exists irr_of_socle. Qed.
 End IrrClassDef.
 
 Prenex Implicits socle_of_IirrK irr_of_socleK.
-Arguments socle_of_Iirr {gT G%G} i%R.
+Arguments socle_of_Iirr {gT G%_G} i%_R.
 
 Notation "''Chi_' i" := (irr_repr (socle_of_Iirr i))
   (at level 8, i at level 2, format "''Chi_' i").
@@ -586,7 +586,7 @@ Notation "''Chi_' i" := (irr_repr (socle_of_Iirr i))
 HB.lock Definition irr gT B : (Nirr B).-tuple 'CF(B) :=
    let irr_of i := 'Res[B, <<B>>] (@cfRepr gT _ _ 'Chi_(inord i)) in
    [tuple of mkseq irr_of (Nirr B)].
-Arguments irr {gT} B%g.
+Arguments irr {gT} B%_g.
 
 Notation "''chi_' i" :=  (tnth (irr _) i%R)
   (at level 8, i at level 2, format "''chi_' i") : ring_scope.
@@ -806,7 +806,7 @@ Qed.
 
 End IrrClass.
 
-Arguments cfReg {gT} B%g.
+Arguments cfReg {gT} B%_g.
 Prenex Implicits cfIirr irrK.
 Arguments irrP {gT G xi}.
 Arguments irr_reprP {gT G xi}.
@@ -1328,8 +1328,8 @@ Qed.
 End OrthogonalityRelations.
 
 Prenex Implicits irr_class class_Iirr irr_classK.
-Arguments class_IirrK {gT G%G} [xG%g] GxG : rename.
-Arguments character_table {gT} G%g.
+Arguments class_IirrK {gT G%_G} [xG%_g] GxG : rename.
+Arguments character_table {gT} G%_g.
 
 Section InnerProduct.
 
@@ -1560,7 +1560,7 @@ Qed.
 
 End IrrConstt.
 
-Arguments irr_constt {gT B%g} phi%CF.
+Arguments irr_constt {gT B%_g} phi%_CF.
 
 Section Kernel.
 
@@ -1728,7 +1728,7 @@ Qed.
 
 End Restrict.
 
-Arguments Res_Iirr {gT A%g} B%g i%R.
+Arguments Res_Iirr {gT A%_g} B%_g i%_R.
 
 Section MoreConstt.
 
@@ -2995,4 +2995,4 @@ Proof. by move/cfker_Ind->; rewrite ?irr_neq0 ?irr_char. Qed.
 
 End Induced.
 
-Arguments Ind_Iirr {gT A%g} B%g i%R.
+Arguments Ind_Iirr {gT A%_g} B%_g i%_R.

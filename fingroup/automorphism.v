@@ -112,7 +112,7 @@ Qed.
 
 End Automorphism.
 
-Arguments Aut _ _%g.
+Arguments Aut _ _%_g.
 Notation "[ 'Aut' G ]" := (Aut_group G)
   (at level 0, format "[ 'Aut'  G ]") : Group_scope.
 Notation "[ 'Aut' G ]" := (Aut G)
@@ -337,7 +337,7 @@ Proof. by apply/subsetP=> _ /imsetP[x _ ->]; apply: Aut_aut. Qed.
 
 End ConjugationMorphism.
 
-Arguments conjgm _ _%g.
+Arguments conjgm _ _%_g.
 Prenex Implicits conjgm conj_aut.
 
 Reserved Notation "G \char H" (at level 70).
@@ -444,7 +444,7 @@ Qed.
 
 End Characteristicity.
 
-Arguments characteristic _ _%g _%g.
+Arguments characteristic _ _%_g _%_g.
 Notation "H \char G" := (characteristic H G) : group_scope.
 #[global] Hint Resolve char_refl : core.
 

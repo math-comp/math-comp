@@ -152,10 +152,10 @@ End Polynomial.
 (* We need to break off the section here to let the Bind Scope directives     *)
 (* take effect.                                                               *)
 Bind Scope ring_scope with polynomial.
-Arguments polynomial R%type.
-Arguments polyseq {R} p%R.
-Arguments poly_inj {R} [p1%R p2%R] : rename.
-Arguments coefp {R} i%N / p%R.
+Arguments polynomial R%_type.
+Arguments polyseq {R} p%_R.
+Arguments poly_inj {R} [p1%_R p2%_R] : rename.
+Arguments coefp {R} i%_N / p%_R.
 Notation "{ 'poly' T }" := (polynomial T) : type_scope.
 
 Section SemiPolynomialTheory.

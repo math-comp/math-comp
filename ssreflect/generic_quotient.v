@@ -160,7 +160,7 @@ HB.lock Definition repr := repr_of.
 (* Fancy Notations *)
 (*******************)
 
-Arguments pi.body [T]%type qT%type.
+Arguments pi.body [T]%_type qT%_type.
 Notation "\pi_ Q" := (@pi _ Q) : quotient_scope.
 Notation "\pi" := (@pi _ _)  (only parsing) : quotient_scope.
 Notation "x == y %[mod Q ]" := (\pi_Q x == \pi_Q y) : quotient_scope.
@@ -320,7 +320,7 @@ Canonical pi_eq_quot_mono T eq_quot_op eqT :=
 (**************************************************************************)
 
 Definition quot_type_of T (qT : quotType T) : Type := qT.
-Arguments quot_type_of T%type qT%type : clear implicits.
+Arguments quot_type_of T%_type qT%_type : clear implicits.
 Notation quot_type Q := (quot_type_of _ Q).
 HB.instance Definition _ T (qT : quotType T) := Quotient.on (quot_type qT).
 

@@ -116,10 +116,10 @@ Qed.
 
 End SymAltDef.
 
-Arguments Sym T%type.
-Arguments Sym_group T%type.
-Arguments Alt T%type.
-Arguments Alt_group T%type.
+Arguments Sym T%_type.
+Arguments Sym_group T%_type.
+Arguments Alt T%_type.
+Arguments Alt_group T%_type.
 
 Notation "''Sym_' T" := (Sym T)
   (at level 8, T at level 2, format "''Sym_' T") : group_scope.

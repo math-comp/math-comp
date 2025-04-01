@@ -138,8 +138,8 @@ Definition ker mph := morphpre mph 1.
 
 End MorphismOps1.
 
-Arguments morphim _ _ _%g _ _ _%g.
-Arguments morphpre _ _ _%g _ _ _%g.
+Arguments morphim _ _ _%_g _ _ _%_g.
+Arguments morphpre _ _ _%_g _ _ _%_g.
 
 Notation "''dom' f" := (dom (MorPhantom f))
   (at level 10, f at level 8, format "''dom'  f") : group_scope.
@@ -902,7 +902,7 @@ Proof. exact: morphim_idm. Qed.
 
 End IdentityMorphism.
 
-Arguments idm {_} _%g _%g.
+Arguments idm {_} _%_g _%_g.
 
 Section RestrictedMorphism.
 
@@ -960,7 +960,7 @@ Proof. by move <-; exists f. Qed.
 
 End RestrictedMorphism.
 
-Arguments restrm {_ _ _%g _%g} _ _%g.
+Arguments restrm {_ _ _%_g _%_g} _ _%_g.
 Arguments restrmP {aT rT A D}.
 Arguments domP {aT rT A D}.
 
@@ -986,7 +986,7 @@ Proof. by apply/setIidPl/subsetP=> x _; rewrite !inE /=. Qed.
 
 End TrivMorphism.
 
-Arguments trivm {aT rT} _%g _%g.
+Arguments trivm {aT rT} _%_g _%_g.
 
 (* The composition of two morphisms is a Canonical morphism instance. *)
 Section MorphismComposition.
@@ -1316,10 +1316,10 @@ Proof. exact: restr_isom_to. Qed.
 
 End ReflectProp.
 
-Arguments isom {_ _} _%g _%g _.
-Arguments morphic {_ _} _%g _.
-Arguments misom _ _ _%g _%g _.
-Arguments isog {_ _} _%g _%g.
+Arguments isom {_ _} _%_g _%_g _.
+Arguments morphic {_ _} _%_g _.
+Arguments misom _ _ _%_g _%_g _.
+Arguments isog {_ _} _%_g _%_g.
 
 Arguments morphicP {aT rT A f}.
 Arguments misomP {aT rT A B f}.
@@ -1470,7 +1470,7 @@ Qed.
 
 End Homg.
 
-Arguments homg _ _ _%g _%g.
+Arguments homg _ _ _%_g _%_g.
 Notation "G \homg H" := (homg G H)
   (at level 70, no associativity) : group_scope.
 

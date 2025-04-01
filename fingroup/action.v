@@ -149,10 +149,10 @@ End ActionDef.
 (* Need to close the Section here to avoid re-declaring all Argument Scopes *)
 Delimit Scope action_scope with act.
 Bind Scope action_scope with action.
-Arguments act_morph {aT rT%type} to x%g.
-Arguments is_action {aT} D%g {rT} to.
-Arguments act {aT D%g rT%type} to%act x%g a%g : rename.
-Arguments clone_action [aT D%g rT%type to%act] _.
+Arguments act_morph {aT rT%_type} to x%_g.
+Arguments is_action {aT} D%_g {rT} to.
+Arguments act {aT D%_g rT%_type} to%_act x%_g a%_g : rename.
+Arguments clone_action [aT D%_g rT%_type to%_act] _.
 
 Notation "{ 'action' aT &-> T }" := (action [set: aT] T)
   (at level 0, format "{ 'action'  aT  &->  T }") : type_scope.
@@ -211,15 +211,15 @@ Definition faithful A S to := A :&: astab S to \subset [1].
 
 End ActionDefs.
 
-Arguments setact {aT D%g rT} to%act S%g a%g.
-Arguments orbit {aT D%g rT} to%act A%g x%g.
-Arguments amove {aT D%g rT} to%act A%g x%g y%g.
-Arguments afix {aT D%g rT} to%act A%g.
-Arguments astab {aT D%g rT} S%g to%act.
-Arguments astabs {aT D%g rT} S%g to%act.
-Arguments acts_on {aT D%g rT} A%g S%g to%act.
-Arguments atrans {aT D%g rT} A%g S%g to%act.
-Arguments faithful {aT D%g rT} A%g S%g to%act.
+Arguments setact {aT D%_g rT} to%_act S%_g a%_g.
+Arguments orbit {aT D%_g rT} to%_act A%_g x%_g.
+Arguments amove {aT D%_g rT} to%_act A%_g x%_g y%_g.
+Arguments afix {aT D%_g rT} to%_act A%_g.
+Arguments astab {aT D%_g rT} S%_g to%_act.
+Arguments astabs {aT D%_g rT} S%_g to%_act.
+Arguments acts_on {aT D%_g rT} A%_g S%_g to%_act.
+Arguments atrans {aT D%_g rT} A%_g S%_g to%_act.
+Arguments faithful {aT D%_g rT} A%_g S%_g to%_act.
 
 Notation "to ^*" := (setact to) : function_scope.
 
@@ -872,7 +872,7 @@ Qed.
 
 End PartialAction.
 
-Arguments orbit_transversal {aT D%g rT} to%act A%g S%g.
+Arguments orbit_transversal {aT D%_g rT} to%_act A%_g S%_g.
 Arguments orbit_in_eqP {aT D rT to G x y}.
 Arguments orbit1P {aT D rT to G x}.
 Arguments contra_orbit [aT D rT] to G [x y].
@@ -1760,7 +1760,7 @@ Qed.
 
 End AutIn.
 
-Arguments Aut_in {gT} A%g B%g.
+Arguments Aut_in {gT} A%_g B%_g.
 
 Section InjmAutIn.
 
@@ -1839,9 +1839,9 @@ End GroupAction.
 Delimit Scope groupAction_scope with gact.
 Bind Scope groupAction_scope with groupAction.
 
-Arguments is_groupAction {aT rT D%g} R%g to%act.
-Arguments groupAction {aT rT} D%g R%g.
-Arguments gact {aT rT D%g R%g} to%gact : rename.
+Arguments is_groupAction {aT rT D%_g} R%_g to%_act.
+Arguments groupAction {aT rT} D%_g R%_g.
+Arguments gact {aT rT D%_g R%_g} to%_gact : rename.
 
 Notation "[ 'groupAction' 'of' to ]" :=
      (clone_groupAction (@GroupAction _ _ _ _ to))
@@ -1868,9 +1868,9 @@ Definition acts_irreducibly A S to :=
 
 End GroupActionDefs.
 
-Arguments gacent {aT rT D%g R%g} to%gact A%g.
-Arguments acts_on_group {aT rT D%g R%g} A%g S%g to%gact.
-Arguments acts_irreducibly {aT rT D%g R%g} A%g S%g to%gact.
+Arguments gacent {aT rT D%_g R%_g} to%_gact A%_g.
+Arguments acts_on_group {aT rT D%_g R%_g} A%_g S%_g to%_gact.
+Arguments acts_irreducibly {aT rT D%_g R%_g} A%_g S%_g to%_gact.
 
 Notation "''C_' ( | to ) ( A )" := (gacent to A)
   (at level 8, format "''C_' ( | to ) ( A )") : group_scope.
@@ -2756,8 +2756,8 @@ End perm_prime_orbit.
 
 End AutAct.
 
-Arguments autact {gT} G%g.
-Arguments aut_action {gT} G%g.
-Arguments aut_groupAction {gT} G%g.
+Arguments autact {gT} G%_g.
+Arguments aut_action {gT} G%_g.
+Arguments aut_groupAction {gT} G%_g.
 Notation "[ 'Aut' G ]" := (aut_action G) : action_scope.
 Notation "[ 'Aut' G ]" := (aut_groupAction G) : groupAction_scope.

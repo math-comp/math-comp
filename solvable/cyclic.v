@@ -300,9 +300,9 @@ Proof. by rewrite /order => /(<[a]> =P _)->. Qed.
 
 End Cyclic.
 
-Arguments cyclic {gT} A%g.
-Arguments generator {gT} A%g a%g.
-Arguments expg_invn {gT} A%g k%N.
+Arguments cyclic {gT} A%_g.
+Arguments generator {gT} A%_g a%_g.
+Arguments expg_invn {gT} A%_g k%_N.
 Arguments cyclicP {gT A}.
 Prenex Implicits cyclic Zpm.
 
@@ -567,7 +567,7 @@ Qed.
 
 End Metacyclic.
 
-Arguments metacyclic {gT} A%g.
+Arguments metacyclic {gT} A%_g.
 Arguments metacyclicP {gT A}.
 
 (* Automorphisms of cyclic groups. *)

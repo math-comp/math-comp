@@ -61,12 +61,12 @@ by move=> f_inj; apply/injectiveP; apply: eq_inj f_inj _ => x; rewrite ffunE.
 Qed.
 
 End PermDefSection.
-Arguments perm_of T%type.
+Arguments perm_of T%_type.
 
 Notation "{ 'perm' T }" := (perm_of T)
   (at level 0, format "{ 'perm'  T }") : type_scope.
 
-Arguments pval _ _%g.
+Arguments pval _ _%_g.
 
 Bind Scope group_scope with perm_type.
 Bind Scope group_scope with perm_of.

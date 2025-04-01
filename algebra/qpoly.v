@@ -128,7 +128,7 @@ HB.instance Definition _ := Lmodule_hasFinDim.Build R npoly npoly_vect_axiom.
 End npoly.
 End poly_of_size_zmod.
 
-Arguments npoly {R}%type n%N.
+Arguments npoly {R}%_type n%_N.
 
 Notation "'{poly_' n R }" := (@npoly R n) : type_scope.
 
