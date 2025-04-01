@@ -928,8 +928,8 @@ Variable F : archiNumFieldType.
 Lemma floor_rat : {mono (@ratr F) : x / Num.floor x}.
 Proof.
 move=> x; apply: floor_def; apply/andP; split.
-- by rewrite -ratr_int ler_rat ge_floor.
-- by rewrite -ratr_int ltr_rat lt_succ_floor.
+- by rewrite -ratr_int ler_rat floor_le_tmp.
+- by rewrite -ratr_int ltr_rat floorD1_gt.
 Qed.
 
 Lemma ceil_rat : {mono (@ratr F) : x / Num.ceil x}.
