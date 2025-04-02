@@ -20,6 +20,9 @@ HB=0
 IMPORT=0
 DIFF=0
 
+TEMP=$(mktemp)
+TEMP2=$(mktemp)
+
 while [ True ]; do
 	if [ "$1" = "--hb" ]; then
 		HB=1
@@ -42,34 +45,34 @@ while [ True ]; do
 done
 
 filter () {
-	cat $1 | nl -s ' ' | grep secs > temp2
+	cat $1 | nl -s ' ' | grep secs > TEMP2
 
 	if [ "$HB" = "0" ]; then
-		cat temp2 > temp
+		cat TEMP2 > TEMP
 	elif [ "$HB" = "1" ]; then
-		cat temp2 | grep -e 'HB' -e 'type=' > temp
+		cat TEMP2 | grep -e 'HB' -e 'type=' > TEMP
 	elif [ "$HB" = "2" ]; then
-		cat temp2 | sed -E '/HB|type=/d'  > temp
+		cat TEMP2 | sed -E '/HB|type=/d'  > TEMP
 	else
 		echo "Internal error 1"
 	fi
 
 	if [ "$IMPORT" = "0" ]; then
-		cat temp > temp2
+		cat TEMP > TEMP2
 	elif [ "$IMPORT" = "1" ]; then
-		cat temp | grep -e 'Import' -e 'Export' > temp2
+		cat TEMP | grep -e 'Import' -e 'Export' > TEMP2
 	elif [ "$IMPORT" = "2" ]; then
-		cat temp | sed -E '/Import|Export/d'  > temp2
+		cat TEMP | sed -E '/Import|Export/d'  > TEMP2
 	else
 		echo "Internal error 1"
 	fi
 
-	cat temp2 | sed 's/^ *\([0-9]*\).* \([0-9]*\)\.\([0-9]*\) secs.*$/\1 \2.\3000/' > temp
+	cat TEMP2 | sed 's/^ *\([0-9]*\).* \([0-9]*\)\.\([0-9]*\) secs.*$/\1 \2.\3000/' > TEMP
 }
 
 if [ "$DIFF" = "0" ]; then
 	filter $1
-	cat temp | sed 's/^\([0-9]*\) \([0-9]*\)\.\(...\).*$/\1\
+	cat TEMP | sed 's/^\([0-9]*\) \([0-9]*\)\.\(...\).*$/\1\
 \2\3/' | python3 -c "import sys;
 data=list(map(int, sys.stdin));
 times=[(data[i+1], data[i]) for i in range(0, len(data), 2)];
@@ -78,12 +81,13 @@ times.reverse();
 print(sum([i for i, _ in times]));
 print(times)"
 else
+  TEMP3=$(mktemp)
 
 	filter $2
-	mv temp temp3
+	mv TEMP TEMP3
 	filter $1
 
-	paste temp temp3 | sed 's/^ *\([0-9]*\) \([0-9]*\).\(...\)[0-9]*\t[0-9]* \([0-9]*\).\(...\).*$/\1\
+	paste TEMP TEMP3 | sed 's/^ *\([0-9]*\) \([0-9]*\).\(...\)[0-9]*\t[0-9]* \([0-9]*\).\(...\).*$/\1\
 \2\3\
 \4\5/' |
 python3 -c "import sys;
