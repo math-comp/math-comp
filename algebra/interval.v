@@ -329,6 +329,7 @@ Proof. by rewrite !itv_boundlr andbT. Qed.
 Lemma subitvP i1 i2 : i1 <= i2 -> {subset i1 <= i2}.
 Proof. by move=> ? ? /le_trans; exact. Qed.
 
+#[deprecated(since="mathcomp 2.4.0", note="Renamed to subset_itv_bound.")]
 Lemma subset_itv (x y z u : itv_bound T) : x <= y -> z <= u ->
   {subset Interval y z <= Interval x u}.
 Proof. by move=> xy zu; apply: subitvP; rewrite subitvE xy zu. Qed.
