@@ -453,12 +453,15 @@ Lemma divzDr m n d :
   (d %| n)%Z -> ((m + n) %/ d)%Z = (m %/ d)%Z + (n %/ d)%Z.
 Proof. by move=> dv_n; rewrite addrC divzDl // addrC. Qed.
 
-Lemma dvdz_charf (R : nzRingType) p : p \in [char R] ->
+Lemma dvdz_pcharf (R : nzRingType) p : p \in [pchar R] ->
   forall n : int, (p %| n)%Z = (n%:~R == 0 :> R).
 Proof.
-move=> charRp [] n; rewrite [LHS](dvdn_charf charRp)//.
+move=> pcharRp [] n; rewrite [LHS](dvdn_pcharf pcharRp)//.
 by rewrite NegzE abszN rmorphN// oppr_eq0.
 Qed.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use dvdz_pcharf  instead.")]
+Notation dvdz_charf chRp := (dvdz_pcharf chRp).
 
 (* Greatest common divisor *)
 
