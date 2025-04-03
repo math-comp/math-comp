@@ -407,8 +407,7 @@ Proof. by move=> ?; rewrite real_floor_ge_int_tmp. Qed.
 
 Lemma floor_lt0 x : (floor x < 0) = (x < 0).
 Proof.
-have := floorP x; case: ifP => [xr _ | xr /eqP<-].
-  by rewrite real_floor_lt_int.
+case: ifP (floorP x) => [xr _ | xr /eqP <-]; first by rewrite real_floor_lt_int.
 by rewrite ltxx; apply/esym/(contraFF _ xr)/ltr0_real.
 Qed.
 
@@ -417,16 +416,16 @@ Proof. by move=> ?; rewrite -ltzD1 add0r real_floor_lt_int. Qed.
 
 Lemma floor_gt0 x : (floor x > 0) = (x >= 1).
 Proof.
-have := floorP x; case: ifP => [xr _ | xr /eqP->].
+case: ifP (floorP x) => [xr _ | xr /eqP->].
   by rewrite gtz0_ge1 real_floor_ge_int_tmp.
 by rewrite ltxx; apply/esym/(contraFF _ xr)/ger1_real.
 Qed.
 
 Lemma floor_neq0 x : (floor x != 0) = (x < 0) || (x >= 1).
 Proof.
-have := floorP x; case: ifP => [xr _ | xr /eqP->]; rewrite ?eqxx/=.
+case: ifP (floorP x) => [xr _ | xr /eqP->]; rewrite ?eqxx/=.
   by rewrite neq_lt floor_lt0 floor_gt0.
-by apply/esym/(contraFF _ xr) => /orP[]; [exact: ltr0_real|exact: ger1_real].
+by apply/esym/(contraFF _ xr) => /orP[/ltr0_real|/ger1_real].
 Qed.
 
 Lemma floorpK : {in polyOver int_num, cancel (map_poly floor) (map_poly intr)}.
@@ -539,7 +538,7 @@ Lemma ceil_neq0 x : (ceil x != 0) = (x <= -1) || (x > 0).
 Proof. by rewrite ceilNfloor oppr_eq0 floor_neq0 oppr_lt0 lerNr orbC. Qed.
 
 Lemma real_ceil_floor x : x \is Rreal ->
-  ceil x = floor x + (~~ (x \is a int_num)).
+  ceil x = floor x + (x \isn't a int_num).
 Proof.
 case Ix: (x \is a int_num) => Rx /=.
   by apply/eqP; rewrite addr0 ceilNfloor eqr_oppLR floorN.
@@ -570,7 +569,7 @@ Lemma truncn_itv x : 0 <= x -> (truncn x)%:R <= x < (truncn x).+1%:R.
 Proof. by move=> x_ge0; move: (truncnP x); rewrite x_ge0. Qed.
 
 Lemma truncn_le x : (truncn x)%:R <= x = (0 <= x).
-Proof. by have := (truncnP x); case: ifP => [+ /andP[] | + /eqP->//]. Qed.
+Proof. by case: ifP (truncnP x) => [+ /andP[] | + /eqP->//]. Qed.
 
 Lemma real_truncnS_gt x : x \is Rreal -> x < (truncn x).+1%:R.
 Proof. by move/real_ge0P => [/truncn_itv/andP[]|/lt_le_trans->]. Qed.
@@ -591,8 +590,7 @@ Qed.
 
 Lemma truncn_gt_nat x n : (n < truncn x)%N = (n.+1%:R <= x).
 Proof.
-have := truncnP x; case: ifP => [x0 _ | x0 /eqP->].
-  by rewrite truncn_ge_nat.
+case: ifP (truncnP x) => [x0 _ | x0 /eqP->]; first by rewrite truncn_ge_nat.
 by rewrite ltn0; apply/esym/(contraFF _ x0)/le_trans.
 Qed.
 
@@ -651,10 +649,8 @@ Proof. by move=> _ /natrP[n1 ->]; rewrite -natrX !natrK. Qed.
 
 Lemma truncn_gt0 x : (0 < truncn x)%N = (1 <= x).
 Proof.
-case: ifP (truncnP x) => [le0x /andP[lemx ltxm1] | le0x /eqP ->]; last first.
-  by apply/esym; apply/contraFF/le_trans: le0x.
-apply/idP/idP => [m_gt0 | x_ge1]; first by apply: le_trans lemx; rewrite ler1n.
-by rewrite -ltnS -(ltr_nat R) (le_lt_trans x_ge1).
+case: ifP (truncnP x) => [x0 | x0 /eqP<-]; first by rewrite truncn_ge_nat.
+by rewrite ltnn; apply/esym/(contraFF _ x0)/le_trans.
 Qed.
 
 Lemma truncn0Pn x : reflect (truncn x = 0%N) (~~ (1 <= x)).
@@ -874,7 +870,7 @@ Proof. exact: real_ceil_ge0. Qed.
 Lemma ceil_le0 x : (ceil x <= 0) = (x <= 0).
 Proof. exact: real_ceil_le0. Qed.
 
-Lemma ceil_floor x : ceil x = floor x + (~~ (x \is a int_num)).
+Lemma ceil_floor x : ceil x = floor x + (x \isn't a int_num).
 Proof. exact: real_ceil_floor. Qed.
 
 End ArchiRealDomainTheory.
@@ -939,8 +935,14 @@ HB.factory Record NumDomain_hasTruncn R of Num.NumDomain R := {
   intrE : forall x, int_num x = nat_num x || nat_num (- x);
 }.
 
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use NumDomain_hasTruncn instead.")]
+Notation NumDomain_isArchimedean R := (NumDomain_hasTruncn R) (only parsing).
+
 Module NumDomain_isArchimedean.
-Notation Build R := (NumDomain_hasTruncn.Build R).
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use NumDomain_hasTruncn.Build instead.")]
+Notation Build T U := (NumDomain_hasTruncn.Build T U) (only parsing).
 End NumDomain_isArchimedean.
 
 HB.builders Context R of NumDomain_hasTruncn R.
