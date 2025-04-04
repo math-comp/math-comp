@@ -189,10 +189,10 @@ Lemma r2v_inj : injective r2v. Proof. exact: can_inj r2vK. Qed.
 Lemma v2rK : cancel v2r r2v.   Proof. by have/bij_can_sym:= r2vK; apply. Qed.
 Lemma v2r_inj : injective v2r. Proof. exact: can_inj v2rK. Qed.
 
-HB.instance Definition _ := GRing.isSemilinear.Build R vT 'rV_vT _ v2r
-  (GRing.semilinear_linear (s2valP v2r_subproof)).
-HB.instance Definition _ := GRing.isSemilinear.Build R 'rV_vT vT _ r2v
-  (GRing.semilinear_linear (can2_linear v2rK r2vK)).
+HB.instance Definition _ := GRing.isLinear.Build R vT 'rV_vT _ v2r
+  (s2valP v2r_subproof).
+HB.instance Definition _ := GRing.isLinear.Build R 'rV_vT vT _ r2v
+  (can2_linear v2rK r2vK).
 End Iso.
 
 Section Vspace.
@@ -358,7 +358,7 @@ Let mem_r2v rv U : (r2v rv \in U) = (rv <= vs2mx U)%MS.
 Proof. by rewrite memvK r2vK. Qed.
 
 Let vs2mx0 : @vs2mx K vT 0 = 0.
-Proof. by rewrite /= linear0 genmx0. Qed.
+Proof. by rewrite /= linear0 genmx0. Qed. (* slow *)
 
 Let vs2mxD U V : vs2mx (U + V) = (vs2mx U + vs2mx V)%MS.
 Proof. by rewrite /= genmx_adds !gen_vs2mx. Qed.
@@ -396,14 +396,14 @@ Lemma memvE v U : (v \in U) = (<[v]> <= U)%VS. Proof. by []. Qed.
 
 Lemma vlineP v1 v2 : reflect (exists k, v1 = k *: v2) (v1 \in <[v2]>)%VS.
 Proof.
-apply: (iffP idP) => [|[k ->]]; rewrite memvK genmxE ?linearZ ?scalemx_sub //.
+apply: (iffP idP) => [|[k ->]]; rewrite memvK genmxE ?linearZ ?scalemx_sub //. (* slow *)
 by case/sub_rVP=> k; rewrite -linearZ => /v2r_inj->; exists k.
 Qed.
 
 Fact memv_submod_closed U : submod_closed U.
 Proof.
-split=> [|a u v]; rewrite !memvK 1?linear0 1?sub0mx // => Uu Uv.
-by rewrite linearP addmx_sub ?scalemx_sub.
+split=> [|a u v]; rewrite !memvK 1?linear0 1?sub0mx // => Uu Uv. (* slow *)
+by rewrite linearP addmx_sub ?scalemx_sub. (* slow *)
 Qed.
 HB.instance Definition _ (U : {vspace vT}) :=
   GRing.isSubmodClosed.Build K vT (pred_of_vspace U) (memv_submod_closed U).
@@ -518,7 +518,7 @@ HB.instance Definition _ := Monoid.isComLaw.Build {vspace vT} 0%VS addv
   addvA addvC add0v.
 
 Lemma memv_add u v U V : u \in U -> v \in V -> u + v \in (U + V)%VS.
-Proof. by rewrite !memvK genmxE linearD; apply: addmx_sub_adds. Qed.
+Proof. by rewrite !memvK genmxE linearD; apply: addmx_sub_adds. Qed. (* slow *)
 
 Lemma memv_addP {w U V} :
   reflect (exists2 u, u \in U & exists2 v, v \in V & w = u + v)
@@ -678,7 +678,7 @@ Lemma dimv0 : \dim (0%VS : {vspace vT}) = 0.
 Proof. by rewrite /dimv vs2mx0 mxrank0. Qed.
 
 Lemma dimv_eq0 U :  (\dim U == 0) = (U == 0%VS).
-Proof. by rewrite /dimv /= mxrank_eq0 [in RHS]/eq_op /= linear0 genmx0. Qed.
+Proof. by rewrite /dimv /= mxrank_eq0 [in RHS]/eq_op /= linear0 genmx0. Qed. (* slow *)
 
 Lemma dimvf : \dim {:vT} = dim vT.
 Proof. by rewrite /dimv vs2mxF mxrank1. Qed.
@@ -947,10 +947,9 @@ Definition coord := locked_with span_key coord_expanded_def.
 Canonical coord_unlockable := [unlockable fun coord].
 
 Fact coord_is_scalar n (X : n.-tuple vT) i : scalar (coord X i).
-Proof. by move=> k u v; rewrite unlock linearP mulmxDl -scalemxAl !mxE. Qed.
+Proof. by move=> k u v; rewrite unlock linearP mulmxDl -scalemxAl !mxE. Qed. (* slow *)
 HB.instance Definition _ n Xn i :=
-  GRing.isSemilinear.Build K vT K _ (coord Xn i)
-    (GRing.semilinear_linear (@coord_is_scalar n Xn i)).
+  GRing.isLinear.Build K vT K _ (coord Xn i) (@coord_is_scalar n Xn i).
 
 Lemma coord_span n (X : n.-tuple vT) v :
   v \in span X -> v = \sum_i coord X i v *: X`_i.
@@ -962,7 +961,7 @@ Qed.
 Lemma coord0 i v : coord [tuple 0] i v = 0.
 Proof.
 rewrite unlock /pinvmx rank_rV; case: negP => [[] | _].
-  by apply/eqP/rowP=> j; rewrite !mxE (tnth_nth 0) /= linear0 mxE.
+  by apply/eqP/rowP=> j; rewrite !mxE (tnth_nth 0) /= linear0 mxE. (* slow *)
 by rewrite pid_mx_0 !(mulmx0, mul0mx) mxE.
 Qed.
 
@@ -1278,8 +1277,8 @@ HB.instance Definition _ := [Choice of 'Hom(aT, rT) by <:].
 
 Fact lfun_is_linear f : linear f.
 Proof. by rewrite unlock; apply: linearP. Qed.
-HB.instance Definition _ (f : hom aT rT) := GRing.isSemilinear.Build R aT rT _ f
-  (GRing.semilinear_linear (lfun_is_linear f)).
+HB.instance Definition _ (f : hom aT rT) :=
+  GRing.isLinear.Build R aT rT _ f (lfun_is_linear f).
 
 Lemma lfunE (ff : {linear aT -> rT}) : linfun ff =1 ff.
 Proof. by move=> v; rewrite 2!unlock /= mul_rV_lin1 /= !v2rK. Qed.
@@ -1721,7 +1720,7 @@ Hypothesis vT_proper : dim vT > 0.
 Fact lfun1_neq0 : \1%VF != 0 :> 'End(vT).
 Proof.
 apply/eqP=> /lfunP/(_ (r2v (const_mx 1))); rewrite !lfunE /= => /(canRL r2vK).
-by move=> /rowP/(_ (Ordinal vT_proper))/eqP; rewrite linear0 !mxE oner_eq0.
+by move=> /rowP/(_ (Ordinal vT_proper))/eqP; rewrite linear0 !mxE oner_eq0. (* slow *)
 Qed.
 
 Prenex Implicits comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr.
@@ -1913,8 +1912,8 @@ Lemma subvs_inj : injective vsval. Proof. exact: val_inj. Qed.
 Lemma congr_subvs u v : u = v -> vsval u = vsval v. Proof. exact: congr1. Qed.
 
 Lemma vsval_is_linear : linear vsval. Proof. by []. Qed.
-HB.instance Definition _ := GRing.isSemilinear.Build K subvs_of vT _ vsval
-  (GRing.semilinear_linear vsval_is_linear).
+HB.instance Definition _ := GRing.isLinear.Build K subvs_of vT _ vsval
+  vsval_is_linear.
 
 Fact vsproj_key : unit. Proof. by []. Qed.
 Definition vsproj_def u := Subvs (memv_proj U u).
@@ -1928,8 +1927,8 @@ Proof. by move=> w; apply/val_inj/vsprojK/subvsP. Qed.
 
 Lemma vsproj_is_linear : linear vsproj.
 Proof. by move=> k w1 w2; apply: val_inj; rewrite unlock /= linearP. Qed.
-HB.instance Definition _ := GRing.isSemilinear.Build K vT subvs_of _ vsproj
-  (GRing.semilinear_linear vsproj_is_linear).
+HB.instance Definition _ := GRing.isLinear.Build K vT subvs_of _ vsproj
+  vsproj_is_linear.
 
 Fact subvs_vect_iso : Vector.axiom (\dim U) subvs_of.
 Proof.
@@ -2017,7 +2016,7 @@ Proof.
 pose fr (f : {ffun I -> vT}) := mxvec (\matrix_(i < #|I|) v2r (f (enum_val i))).
 exists fr => /= [k f g|].
   rewrite -linearP; congr mxvec; apply/matrixP=> i j.
-  by rewrite !mxE !ffunE linearP !mxE.
+  by rewrite !mxE !ffunE linearP !mxE. (* slow *)
 exists (fun r => [ffun i => r2v (row (enum_rank i) (vec_mx r)) : vT]) => [g|r].
   by apply/ffunP=> i; rewrite ffunE mxvecK rowK v2rK enum_rankK.
 by apply/(canLR vec_mxK)/matrixP=> i j; rewrite mxE ffunE r2vK enum_valK mxE.
@@ -2089,8 +2088,7 @@ Variables (e : n.-tuple vT).
 Definition rVof (v : vT) := \row_i coord e i v.
 Lemma rVof_linear : linear rVof.
 Proof. by move=> x v1 v2; apply/rowP=> i; rewrite !mxE linearP. Qed.
-HB.instance Definition _ := GRing.isSemilinear.Build F _ _ _ rVof
-  (GRing.semilinear_linear rVof_linear).
+HB.instance Definition _ := GRing.isLinear.Build F _ _ _ rVof rVof_linear.
 
 Lemma coord_rVof i v : coord e i v = rVof v 0 i.
 Proof. by rewrite !mxE. Qed.
@@ -2108,8 +2106,7 @@ Proof.
 move=> x v1 v2; rewrite linear_sum -big_split/=.
 by apply: eq_bigr => i _/=; rewrite !mxE scalerDl scalerA.
 Qed.
-HB.instance Definition _ := GRing.isSemilinear.Build F _ _ _ vecof
-  (GRing.semilinear_linear vecof_linear).
+HB.instance Definition _ := GRing.isLinear.Build F _ _ _ vecof vecof_linear.
 
 Variable e_basis : basis_of {:vT} e.
 
@@ -2156,8 +2153,7 @@ Proof.
 move=> x h1 h2; apply/matrixP=> i j; do !rewrite ?lfunE/= ?mxE.
 by rewrite linearP.
 Qed.
-HB.instance Definition _ := GRing.isSemilinear.Build F _ _ _ mxof
-  (GRing.semilinear_linear mxof_linear).
+HB.instance Definition _ := GRing.isLinear.Build F _ _ _ mxof mxof_linear.
 
 Definition funmx (M : 'M[F]_(m, n)) u := vecof e' (rVof e u *m M).
 
@@ -2165,8 +2161,8 @@ Lemma funmx_linear M : linear (funmx M).
 Proof.
 by rewrite /funmx => x u v; rewrite linearP mulmxDl -scalemxAl linearP.
 Qed.
-HB.instance Definition _ M := GRing.isSemilinear.Build F _ _ _ (funmx M)
-  (GRing.semilinear_linear (funmx_linear M)).
+HB.instance Definition _ M :=
+  GRing.isLinear.Build F _ _ _ (funmx M) (funmx_linear M).
 
 Definition hommx M : 'Hom(uT, vT) := linfun (funmx M).
 
@@ -2175,8 +2171,7 @@ Proof.
 rewrite /hommx; move=> x A B; apply/lfunP=> u; do !rewrite lfunE/=.
 by rewrite /funmx mulmxDr -scalemxAr linearP.
 Qed.
-HB.instance Definition _ M := GRing.isSemilinear.Build F _ _ _ hommx
-  (GRing.semilinear_linear hommx_linear).
+HB.instance Definition _ M := GRing.isLinear.Build F _ _ _ hommx hommx_linear.
 
 Hypothesis e_basis: basis_of {:uT} e.
 Hypothesis f_basis: basis_of {:vT} e'.
