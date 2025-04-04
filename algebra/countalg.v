@@ -47,18 +47,18 @@ HB.structure Definition Zmodule := {M of GRing.Zmodule M & Countable M}.
 HB.structure Definition NzSemiRing := {R of GRing.NzSemiRing R & Countable R}.
 
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use CountNzSemiRing  instead.")]
+             note="Use CountRing.NzSemiRing instead.")]
 Notation SemiRing R := (NzSemiRing R) (only parsing).
 
 Module SemiRing.
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing.sort instead.")]
+             note="Use CountRing.NzSemiRing.sort instead.")]
 Notation sort := (NzSemiRing.sort) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing.on instead.")]
+             note="Use CountRing.NzSemiRing.on instead.")]
 Notation on R := (NzSemiRing.on R) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing.copy instead.")]
+             note="Use CountRing.NzSemiRing.copy instead.")]
 Notation copy T U := (NzSemiRing.copy T U) (only parsing).
 End SemiRing.
 
@@ -66,18 +66,18 @@ End SemiRing.
 HB.structure Definition NzRing := {R of GRing.NzRing R & Countable R}.
 
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use CountNzRing  instead.")]
+             note="Use CountRing.NzRing instead.")]
 Notation Ring R := (NzRing R) (only parsing).
 
 Module Ring.
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing.sort instead.")]
+             note="Use CountRing.NzRing.sort instead.")]
 Notation sort := (NzRing.sort) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing.on instead.")]
+             note="Use CountRing.NzRing.on instead.")]
 Notation on R := (NzRing.on R) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing.copy instead.")]
+             note="Use CountRing.NzRing.copy instead.")]
 Notation copy T U := (NzRing.copy T U) (only parsing).
 End Ring.
 
@@ -86,18 +86,18 @@ HB.structure Definition ComNzSemiRing :=
   {R of GRing.ComNzSemiRing R & Countable R}.
 
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use CountComNzSemiRing  instead.")]
+             note="Use CountRing.ComNzSemiRing instead.")]
 Notation ComSemiRing R := (ComNzSemiRing R) (only parsing).
 
 Module ComSemiRing.
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzSemiRing.sort instead.")]
+             note="Use CountRing.ComNzSemiRing.sort instead.")]
 Notation sort := (ComNzSemiRing.sort) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzSemiRing.on instead.")]
+             note="Use CountRing.ComNzSemiRing.on instead.")]
 Notation on R := (ComNzSemiRing.on R) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzSemiRing.copy instead.")]
+             note="Use CountRing.ComNzSemiRing.copy instead.")]
 Notation copy T U := (ComNzSemiRing.copy T U) (only parsing).
 End ComSemiRing.
 
@@ -105,18 +105,18 @@ End ComSemiRing.
 HB.structure Definition ComNzRing := {R of GRing.ComNzRing R & Countable R}.
 
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use CountComNzRing  instead.")]
+             note="Use CountRing.ComNzRing instead.")]
 Notation ComRing R := (ComNzRing R) (only parsing).
 
 Module ComRing.
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing.sort instead.")]
+             note="Use CountRing.ComNzRing.sort instead.")]
 Notation sort := (ComNzRing.sort) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing.on instead.")]
+             note="Use CountRing.ComNzRing.on instead.")]
 Notation on R := (ComNzRing.on R) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing.copy instead.")]
+             note="Use CountRing.ComNzRing.copy instead.")]
 Notation copy T U := (ComNzRing.copy T U) (only parsing).
 End ComRing.
 

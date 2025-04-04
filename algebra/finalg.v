@@ -57,18 +57,18 @@ HB.export ZmoduleExports.
 HB.structure Definition NzSemiRing := {R of GRing.NzSemiRing R & Finite R}.
 
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use FinNzSemiRing instead.")]
+             note="Use FinRing.NzSemiRing instead.")]
 Notation SemiRing R := (NzSemiRing R) (only parsing).
 
 Module SemiRing.
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing.sort instead.")]
+             note="Use FinRing.NzSemiRing.sort instead.")]
 Notation sort := (NzSemiRing.sort) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing.on instead.")]
+             note="Use FinRing.NzSemiRing.on instead.")]
 Notation on R := (NzSemiRing.on R) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing.copy instead.")]
+             note="Use FinRing.NzSemiRing.copy instead.")]
 Notation copy T U := (NzSemiRing.copy T U) (only parsing).
 End SemiRing.
 
@@ -76,18 +76,18 @@ End SemiRing.
 HB.structure Definition NzRing := {R of GRing.NzRing R & Finite R}.
 
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use FinNzRing instead.")]
+             note="Use FinRing.NzRing instead.")]
 Notation Ring R := (NzRing R) (only parsing).
 
 Module Ring.
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing.sort instead.")]
+             note="Use FinRing.NzRing.sort instead.")]
 Notation sort := (NzRing.sort) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing.on instead.")]
+             note="Use FinRing.NzRing.on instead.")]
 Notation on R := (NzRing.on R) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing.copy instead.")]
+             note="Use FinRing.NzRing.copy instead.")]
 Notation copy T U := (NzRing.copy T U) (only parsing).
 End Ring.
 
@@ -96,18 +96,18 @@ HB.structure Definition ComNzSemiRing :=
   {R of GRing.ComNzSemiRing R & Finite R}.
 
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use FinComNzSemiRing instead.")]
+             note="Use FinRing.ComNzSemiRing instead.")]
 Notation ComSemiRing R := (ComNzSemiRing R) (only parsing).
 
 Module ComSemiRing.
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzSemiRing.sort instead.")]
+             note="Use FinRing.ComNzSemiRing.sort instead.")]
 Notation sort := (ComNzSemiRing.sort) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzSemiRing.on instead.")]
+             note="Use FinRing.ComNzSemiRing.on instead.")]
 Notation on R := (ComNzSemiRing.on R) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzSemiRing.copy instead.")]
+             note="Use FinRing.ComNzSemiRing.copy instead.")]
 Notation copy T U := (ComNzSemiRing.copy T U) (only parsing).
 End ComSemiRing.
 
@@ -115,18 +115,18 @@ End ComSemiRing.
 HB.structure Definition ComNzRing := {R of GRing.ComNzRing R & Finite R}.
 
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use FinComNzRing instead.")]
+             note="Use FinRing.ComNzRing instead.")]
 Notation ComRing R := (ComNzRing R) (only parsing).
 
 Module ComRing.
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing.sort instead.")]
+             note="Use FinRing.ComNzRing.sort instead.")]
 Notation sort := (ComNzRing.sort) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing.on instead.")]
+             note="Use FinRing.ComNzRing.on instead.")]
 Notation on R := (ComNzRing.on R) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing.copy instead.")]
+             note="Use FinRing.ComNzRing.copy instead.")]
 Notation copy T U := (ComNzRing.copy T U) (only parsing).
 End ComRing.
 
@@ -190,12 +190,12 @@ HB.factory Record isNzRing R of NzRing R := {}.
 
 Module isRing.
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use isNzRing.Build instead.")]
+             note="Use FinRing.isNzRing.Build instead.")]
 Notation Build R := (isNzRing.Build R) (only parsing).
 End isRing.
 
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use isNzRing instead.")]
+             note="Use FinRing.isNzRing instead.")]
 Notation isRing R := (isNzRing R) (only parsing).
 
 HB.builders Context R of isNzRing R.
