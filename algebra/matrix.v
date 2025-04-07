@@ -2138,61 +2138,7 @@ Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE addNr. Qed.
 HB.instance Definition _ := GRing.Nmodule_isZmodule.Build 'M[V]_(m, n)
   addNmx.
 
-Lemma const_mx_is_additive : additive const_mx.
-Proof. by move=> a b; apply/matrixP=> i j; rewrite !mxE. Qed.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ := GRing.isAdditive.Build V 'M[V]_(m, n) const_mx
-  const_mx_is_additive.
-
 End FixedDim.
-
-Section Additive.
-
-Variables (m n p q : nat) (f : 'I_p -> 'I_q -> 'I_m) (g : 'I_p -> 'I_q -> 'I_n).
-
-Lemma swizzle_mx_is_additive k : additive (swizzle_mx f g k).
-Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE. Qed.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ k := GRing.isAdditive.Build 'M_(m, n) 'M_(p, q)
-  (swizzle_mx f g k) (swizzle_mx_is_additive k).
-
-End Additive.
-
-Local Notation SwizzleAdd op := (GRing.Additive.copy op (swizzle_mx _ _ _)).
-
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n := SwizzleAdd (@trmx V m n).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n i := SwizzleAdd (@row V m n i).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n j := SwizzleAdd (@col V m n j).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n i := SwizzleAdd (@row' V m n i).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n j := SwizzleAdd (@col' V m n j).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n m' n' f g := SwizzleAdd (@mxsub V m n m' n' f g).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n s := SwizzleAdd (@row_perm V m n s).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n s := SwizzleAdd (@col_perm V m n s).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n i1 i2 := SwizzleAdd (@xrow V m n i1 i2).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n j1 j2 := SwizzleAdd (@xcol V m n j1 j2).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n1 n2 := SwizzleAdd (@lsubmx V m n1 n2).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n1 n2 := SwizzleAdd (@rsubmx V m n1 n2).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m1 m2 n := SwizzleAdd (@usubmx V m1 m2 n).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m1 m2 n := SwizzleAdd (@dsubmx V m1 m2 n).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n := SwizzleAdd (@vec_mx V m n).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n := GRing.isAdditive.Build 'M_(m, n) 'rV_(m * n)
-  mxvec (can2_additive (@vec_mxK V m n) mxvecK).
 
 Ltac split_mxE := apply/matrixP=> i j; do ![rewrite mxE | case: split => ?].
 
@@ -2208,45 +2154,6 @@ Lemma opp_block_mx m1 m2 n1 n2 (Aul : 'M_(m1, n1)) Aur Adl (Adr : 'M_(m2, n2)) :
   - block_mx Aul Aur Adl Adr = block_mx (- Aul) (- Aur) (- Adl) (- Adr).
 Proof. by rewrite opp_col_mx !opp_row_mx. Qed.
 
-(* Diagonal matrices *)
-
-Lemma diag_mx_is_additive n : additive (@diag_mx V n).
-Proof.
-by move=>A B; apply/matrixP=>i j; rewrite !mxE mulrnBl.
-Qed.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ n := GRing.isAdditive.Build 'rV_n 'M_n (@diag_mx V n)
-  (@diag_mx_is_additive n).
-
-(* Scalar matrix : a diagonal matrix with a constant on the diagonal *)
-Section ScalarMx.
-
-Variable n : nat.
-
-Lemma scalar_mx_is_additive : additive (@scalar_mx V n).
-Proof. by move=> a b; rewrite -!diag_const_mx !raddfB. Qed.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ := GRing.isAdditive.Build V 'M_n scalar_mx
-  scalar_mx_is_additive.
-
-End ScalarMx.
-
-(* The trace. *)
-Section Trace.
-
-Variable n : nat.
-
-Lemma mxtrace_is_additive : additive (@mxtrace V n).
-Proof.
-move=>A B; rewrite -sumrN -big_split /=.
-by apply: eq_bigr=> i _; rewrite !mxE.
-Qed.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ := GRing.isAdditive.Build 'M_n V (@mxtrace V n)
-  mxtrace_is_additive.
-
-End Trace.
-
 End MatrixZmodule.
 
 (* Parametricity over the additive structure. *)
@@ -2257,14 +2164,10 @@ Local Notation "A ^f" := (map_mx f A) : ring_scope.
 Implicit Type A : 'M[aR]_(m, n).
 
 Lemma map_mxN A : (- A)^f = - A^f.
-Proof. by apply/matrixP=> i j; rewrite !mxE raddfN. Qed.
+Proof. exact: raddfN. Qed.
 
 Lemma map_mxB A B : (A - B)^f = A^f - B^f.
-Proof. by rewrite map_mxD map_mxN. Qed.
-
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ :=
-  GRing.isAdditive.Build 'M[aR]_(m, n) 'M[rR]_(m, n) (map_mx f) map_mxB.
+Proof. exact: raddfB. Qed.
 
 End MapZmodMatrix.
 
