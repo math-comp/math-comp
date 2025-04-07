@@ -94,3 +94,7 @@ Definition idempotent_op (S : Type) (op : S -> S -> S) := forall x, op x x = x.
 Notation idempotent:= idempotent_op (only parsing).
 
 Definition idempotent_fun (U : Type) (f : U -> U) := f \o f =1 f.
+
+Lemma inr_inj {A B} : injective (@inr A B). Proof. by move=> ? ? []. Qed.
+
+Lemma inl_inj {A B} : injective (@inl A B). Proof. by move=> ? ? []. Qed.
