@@ -1,10 +1,12 @@
 - in `matrix.v`
   + definition `mxdiag` generalized to `nmodType`
-  + definitions `lin1_mx`, `lin_mx`, `lin_mulmxr` generalized to
+  + definitions `lin1_mx`, `lin_mx`, `mulmxr`, `lin_mulmxr` generalized to
     `pzSemiRingType`
   + definitions `lin_mulmx`, `lin_mul_row` generalized to `comPzSemiRingType`
   + `lSemiModType` instance on matrices generalized to `pzSemiRingType`
   + `lSemiAlgType` instance on square matrices generalized to `nzSemiRingType`
+  + `pzSemiRingType` and `pzRingType` instance on square matrices generalized to
+    arbitrary size
   + `semiAlgType` instance on square matrices generalized to `comNzSemiRingType`
   + semilinear function instances on `mulmxr`, `lin_mulmxr`, `mxtrace`, `trmx`,
     `row`, `col`, `row'`, `col'`, `mxsub`, `row_perm`, `col_perm`, `xrow`,
@@ -18,9 +20,9 @@
     `mxblock_const`, `mxblock_sum`, `submxblockD`, `submxblock0`,
     `submxblock_sum`, `is_trig_mxblockP`, `is_trig_mxblock`, `is_diag_mxblockP`,
     `is_diag_mxblock`, `submxblock_diag`, `eq_mxdiagP`, `eq_mxdiag`, `mxdiagD`,
-    `mxdiag_sum`, `tr_mxdiag`, `row_mxdiag`, `row_mxdiag` generalized to
+    `mxdiag_sum`, `tr_mxdiag`, `row_mxdiag`, `col_mxdiag` generalized to
     `nmodType`
-  + lemmas `scalemx_const`, `scalemx_const`, `scalemxAl`, `mxtraceZ`,
+  + lemmas `scalemx_const`, `matrix_sum_delta`, `scalemxAl`, `mxtraceZ`,
     `row_sum_delta`, `scale_row_mx`, `scale_col_mx`, `scale_block_mx`,
     `diag_mx_sum_delta`, `row_diag_mx`, `scale_scalar_mx`, `scalemx1`,
     `scalar_mx_sum_delta`, `mx1_sum_delta`, `mulmx_sum_row`, `mul_scalar_mx`,
