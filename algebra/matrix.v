@@ -2158,14 +2158,12 @@ Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE addNr. Qed.
 HB.instance Definition _ := GRing.Nmodule_isZmodule.Build 'M[V]_(m, n)
   addNmx.
 
-Lemma const_mx_is_zmod_morphism : zmod_morphism const_mx.
-Proof. by move=> a b; apply/matrixP=> i j; rewrite !mxE. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `const_mx_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+Fact const_mx_is_zmod_morphism : zmod_morphism const_mx.
+Proof. exact: raddfB. Qed.
+#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead"),
+  warning="-deprecated"]
 Definition const_mx_is_additive := const_mx_is_zmod_morphism.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ := GRing.isZmodMorphism.Build V 'M[V]_(m, n) const_mx
-  const_mx_is_zmod_morphism.
 
 End FixedDim.
 
@@ -2173,52 +2171,14 @@ Section Additive.
 
 Variables (m n p q : nat) (f : 'I_p -> 'I_q -> 'I_m) (g : 'I_p -> 'I_q -> 'I_n).
 
+#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
 Lemma swizzle_mx_is_zmod_morphism k : zmod_morphism (swizzle_mx f g k).
-Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `swizzle_mx_is_zmod_morphism` instead")]
+Proof. exact: raddfB. Qed.
+#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead"),
+  warning="-deprecated"]
 Definition swizzle_mx_is_additive := swizzle_mx_is_zmod_morphism.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ k := GRing.isZmodMorphism.Build 'M_(m, n) 'M_(p, q)
-  (swizzle_mx f g k) (swizzle_mx_is_zmod_morphism k).
 
 End Additive.
-
-Local Notation SwizzleAdd op := (GRing.Additive.copy op (swizzle_mx _ _ _)).
-
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n := SwizzleAdd (@trmx V m n).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n i := SwizzleAdd (@row V m n i).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n j := SwizzleAdd (@col V m n j).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n i := SwizzleAdd (@row' V m n i).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n j := SwizzleAdd (@col' V m n j).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n m' n' f g := SwizzleAdd (@mxsub V m n m' n' f g).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n s := SwizzleAdd (@row_perm V m n s).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n s := SwizzleAdd (@col_perm V m n s).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n i1 i2 := SwizzleAdd (@xrow V m n i1 i2).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n j1 j2 := SwizzleAdd (@xcol V m n j1 j2).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n1 n2 := SwizzleAdd (@lsubmx V m n1 n2).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n1 n2 := SwizzleAdd (@rsubmx V m n1 n2).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m1 m2 n := SwizzleAdd (@usubmx V m1 m2 n).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m1 m2 n := SwizzleAdd (@dsubmx V m1 m2 n).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n := SwizzleAdd (@vec_mx V m n).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n := GRing.isZmodMorphism.Build 'M_(m, n) 'rV_(m * n)
-  mxvec (can2_zmod_morphism (@vec_mxK V m n) mxvecK).
 
 Ltac split_mxE := apply/matrixP=> i j; do ![rewrite mxE | case: split => ?].
 
@@ -2236,30 +2196,24 @@ Proof. by rewrite opp_col_mx !opp_row_mx. Qed.
 
 (* Diagonal matrices *)
 
-Lemma diag_mx_is_zmod_morphism n : zmod_morphism (@diag_mx V n).
-Proof.
-by move=>A B; apply/matrixP=>i j; rewrite !mxE mulrnBl.
-Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `diag_mx_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+Fact diag_mx_is_zmod_morphism n : zmod_morphism (@diag_mx V n).
+Proof. exact: raddfB. Qed.
+#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead"),
+  warning="-deprecated"]
 Definition diag_mx_is_additive := diag_mx_is_zmod_morphism.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ n := GRing.isZmodMorphism.Build 'rV_n 'M_n (@diag_mx V n)
-  (@diag_mx_is_zmod_morphism n).
 
 (* Scalar matrix : a diagonal matrix with a constant on the diagonal *)
 Section ScalarMx.
 
 Variable n : nat.
 
-Lemma scalar_mx_is_zmod_morphism : zmod_morphism (@scalar_mx V n).
-Proof. by move=> a b; rewrite -!diag_const_mx !raddfB. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `scalar_mx_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+Fact scalar_mx_is_zmod_morphism : zmod_morphism (@scalar_mx V n).
+Proof. exact: raddfB. Qed.
+#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead"),
+  warning="-deprecated"]
 Definition scalar_mx_is_additive := scalar_mx_is_zmod_morphism.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ := GRing.isZmodMorphism.Build V 'M_n scalar_mx
-  scalar_mx_is_zmod_morphism.
 
 End ScalarMx.
 
@@ -2268,17 +2222,12 @@ Section Trace.
 
 Variable n : nat.
 
-Lemma mxtrace_is_zmod_morphism : zmod_morphism (@mxtrace V n).
-Proof.
-move=>A B; rewrite -sumrN -big_split /=.
-by apply: eq_bigr=> i _; rewrite !mxE.
-Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `mxtrace_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+Fact mxtrace_is_zmod_morphism : zmod_morphism (@mxtrace V n).
+Proof. exact: raddfB. Qed.
+#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead"),
+  warning="-deprecated"]
 Definition mxtrace_is_additive := mxtrace_is_zmod_morphism.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ := GRing.isZmodMorphism.Build 'M_n V (@mxtrace V n)
-  mxtrace_is_zmod_morphism.
 
 End Trace.
 
@@ -2292,14 +2241,10 @@ Local Notation "A ^f" := (map_mx f A) : ring_scope.
 Implicit Type A : 'M[aR]_(m, n).
 
 Lemma map_mxN A : (- A)^f = - A^f.
-Proof. by apply/matrixP=> i j; rewrite !mxE raddfN. Qed.
+Proof. exact: raddfN. Qed.
 
 Lemma map_mxB A B : (A - B)^f = A^f - B^f.
-Proof. by rewrite map_mxD map_mxN. Qed.
-
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ :=
-  GRing.isZmodMorphism.Build 'M[aR]_(m, n) 'M[rR]_(m, n) (map_mx f) map_mxB.
+Proof. exact: raddfB. Qed.
 
 End MapZmodMatrix.
 
