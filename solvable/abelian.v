@@ -2160,8 +2160,8 @@ Section FimModAbelem.
 
 Import GRing.Theory FinRing.Theory.
 
-Lemma fin_lmod_char_abelem p (R : nzRingType) (V : finLmodType R):
-  p \in [char R]%R -> p.-abelem [set: V].
+Lemma fin_lmod_pchar_abelem p (R : nzRingType) (V : finLmodType R):
+  p \in [pchar R]%R -> p.-abelem [set: V].
 Proof.
 case/andP=> p_pr /eqP-pR0; apply/abelemP=> //.
 by split=> [|v _]; rewrite ?zmod_abelian // zmodXgE -scaler_nat pR0 scale0r.
@@ -2169,10 +2169,15 @@ Qed.
 
 Lemma fin_Fp_lmod_abelem p (V : finLmodType 'F_p) :
   prime p -> p.-abelem [set: V].
-Proof. by move/char_Fp/fin_lmod_char_abelem->. Qed.
+Proof. by move/pchar_Fp/fin_lmod_pchar_abelem->. Qed.
 
-Lemma fin_ring_char_abelem p (R : finNzRingType) :
-  p \in [char R]%R -> p.-abelem [set: R].
-Proof. exact: fin_lmod_char_abelem R^o. Qed.
+Lemma fin_ring_pchar_abelem p (R : finNzRingType) :
+  p \in [pchar R]%R -> p.-abelem [set: R].
+Proof. exact: fin_lmod_pchar_abelem R^o. Qed.
 
 End FimModAbelem.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use fin_lmod_pchar_abelem instead.")]
+Notation fin_lmod_char_abelem := (fin_lmod_pchar_abelem) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", note="Use fin_ring_pchar_abelem instead.")]
+Notation fin_ring_char_abelem := (fin_ring_pchar_abelem) (only parsing).

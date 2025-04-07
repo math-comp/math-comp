@@ -268,9 +268,9 @@ have [C [/= QtoC algC]] := countable_algebraic_closure rat.
 exists C; have [i Di2] := GRing.imaginary_exists C.
 pose Qfield := fieldExtType rat.
 pose Cmorph (L : Qfield) := {rmorphism L -> C}.
-have charQ (L : Qfield): [char L] =i pred0 := ftrans (char_lalg L) (char_num _).
+have pcharQ (L : Qfield): [pchar L] =i pred0 := ftrans (pchar_lalg L) (pchar_num _).
 have sepQ  (L : Qfield) (K E : {subfield L}): separable K E.
-  by apply/separableP=> u _; apply: charf0_separable.
+  by apply/separableP=> u _; apply: pcharf0_separable.
 pose genQfield z L := {LtoC : Cmorph L & {u | LtoC u = z & <<1; u>> = fullv}}.
 have /all_tag[Q /all_tag[ofQ genQz]] z: {Qz : Qfield & genQfield z Qz}.
   have [|p [/monic_neq0 nzp pz0 irr_p]] := minPoly_decidable_closure _ (algC z).
@@ -293,7 +293,7 @@ have PET2 x y: {z | gen z x & gen z y}.
   suffices [[[p q] z] []]: {w | Gxy w} by exists z; [exists p | exists q].
   apply/sig_eqW; have /integral_algebraic[px nz_px pxx0] := algC x.
   have /integral_algebraic[py nz_py pyy0] := algC y.
-  have [n [[p Dx] [q Dy]]] := char0_PET nz_px pxx0 nz_py pyy0 (char_num _).
+  have [n [[p Dx] [q Dy]]] := pchar0_PET nz_px pxx0 nz_py pyy0 (pchar_num _).
   by exists (p, q, y *+ n - x); congr (_, _).
 have gen_inQ z x: gen z x -> {u | ofQ z u = x}.
   have [u Dz _] := genQz z => /sig_eqW[q ->].
@@ -797,7 +797,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     rewrite adjoin_degreeE -iPG -dim_fixed_galois // -defQw; congr (\dim_Cn _).
     apply/esym/eqP; rewrite eqEsubv adjoinSl ?sub1v //=; apply/FadjoinP.
     by rewrite memv_adjoin /= defQw -galois_connection.
-  have nz2: 2 != 0 :> Qt by move/charf0P: (charQ (Q t)) => ->.
+  have nz2: 2 != 0 :> Qt by move/pcharf0P: (pcharQ (Q t)) => ->.
   without loss{deg_w} [C'w Cw2]: w Rz_w / w \notin Cn /\ w ^+ 2 \in Cn.
     pose p := minPoly Cn w; pose v := p`_1 / 2.
     have /polyOverP Cp: p \is a polyOver Cn := minPolyOver Cn w.
@@ -891,5 +891,5 @@ exists conjRM => [z | /(_ i)/eqP/idPn[]] /=.
   by have [n [/conjE-> /(conjK (n_ z))->]] := maxn3 (n_ (conj z)) (n_ z) 0.
 rewrite /conj/conj_ cj_i rmorphN inQ_K // eq_sym -addr_eq0 -mulr2n -mulr_natl.
 rewrite mulf_neq0 ?(memPnC (R'i 0)) ?(rpred0 (sQC _)) //.
-by have /charf0P-> := ftrans (fmorph_char QtoC) (char_num _).
+by have /pcharf0P-> := ftrans (fmorph_pchar QtoC) (pchar_num _).
 Qed.

@@ -765,20 +765,26 @@ Variable R : nzRingType.
 Implicit Types x y : R.
 
 Variable p : nat.
-Hypothesis charFp : p \in [char R].
+Hypothesis pcharFp : p \in [pchar R].
 
-Local Notation "x ^f" := (Frobenius_aut charFp x).
+Local Notation "x ^f" := (pFrobenius_aut pcharFp x).
 
-Lemma Frobenius_autMz x n : (x *~ n)^f = x^f *~ n.
+Lemma pFrobenius_autMz x n : (x *~ n)^f = x^f *~ n.
 Proof.
-case: n=> n /=; first exact: Frobenius_autMn.
-by rewrite !NegzE !mulrNz Frobenius_autN Frobenius_autMn.
+case: n=> n /=; first exact: pFrobenius_autMn.
+by rewrite !NegzE !mulrNz pFrobenius_autN pFrobenius_autMn.
 Qed.
 
-Lemma Frobenius_aut_int n : (n%:~R)^f = n%:~R.
-Proof. by rewrite Frobenius_autMz Frobenius_aut1. Qed.
+Lemma pFrobenius_aut_int n : (n%:~R)^f = n%:~R.
+Proof. by rewrite pFrobenius_autMz pFrobenius_aut1. Qed.
 
 End Frobenius.
+
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autMz instead.")]
+Notation Frobenius_autMz := (pFrobenius_autMz) (only parsing).
+
+#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut_int instead.")]
+Notation Frobenius_aut_int := (pFrobenius_aut_int) (only parsing).
 
 Section NumMorphism.
 
