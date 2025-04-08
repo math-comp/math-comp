@@ -61,9 +61,9 @@ Notation "@ 'id' T" := (fun x : T => x)
 Notation "@ 'sval'" := (@proj1_sig) (at level 10, only parsing) :
   function_scope.
 
-(**********************)
-(* not yet backported *)
-(**********************)
+(******************)
+(* v9.1 additions *)
+(******************)
 
 #[export] Set Warnings "-hiding-delimiting-key".
 Delimit Scope function_scope with FUN.
@@ -99,3 +99,7 @@ Definition idempotent_fun (U : Type) (f : U -> U) := f \o f =1 f.
 Lemma inr_inj {A B} : injective (@inr A B). Proof. by move=> ? ? []. Qed.
 
 Lemma inl_inj {A B} : injective (@inl A B). Proof. by move=> ? ? []. Qed.
+
+(**********************)
+(* not yet backported *)
+(**********************)
