@@ -67,6 +67,7 @@ Notation "@ 'sval'" := (@proj1_sig) (at level 10, only parsing) :
 
 #[export] Set Warnings "-hiding-delimiting-key".
 Delimit Scope function_scope with FUN.
+Declare Scope fun_scope.
 Close Scope fun_scope.
 
 Definition injective2 (rT aT1 aT2 : Type) (f : aT1 -> aT2 -> rT) :=
