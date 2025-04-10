@@ -2678,14 +2678,17 @@ Lemma leq_prod I r (P : pred I) (E1 E2 : I -> nat) :
     (forall i, P i -> E1 i <= E2 i) ->
   \prod_(i <- r | P i) E1 i <= \prod_(i <- r | P i) E2 i.
 Proof. by move=> leE12; elim/big_ind2: _ => // m1 m2 n1 n2; apply: leq_mul. Qed.
+Arguments leq_prod [I r P E1 E2].
 
 Lemma prodn_cond_gt0 I r (P : pred I) F :
   (forall i, P i -> 0 < F i) -> 0 < \prod_(i <- r | P i) F i.
 Proof. by move=> Fpos; elim/big_ind: _ => // n1 n2; rewrite muln_gt0 => ->. Qed.
+Arguments prodn_cond_gt0 [I r P F].
 
 Lemma prodn_gt0 I r (P : pred I) F :
   (forall i, 0 < F i) -> 0 < \prod_(i <- r | P i) F i.
 Proof. by move=> Fpos; apply: prodn_cond_gt0. Qed.
+Arguments prodn_gt0 [I r P F].
 
 Lemma gt0_prodn_seq (I : eqType) r (P : pred I) F :
   0 < \prod_(i <- r | P i) F i -> forall i, i \in r -> P i -> 0 < F i.
@@ -2693,10 +2696,12 @@ Proof.
 move=> + i ri Pi; rewrite !lt0n; apply: contra_neq => Fi_eq0.
 by case: (path.splitP ri) => *; rewrite big_cat big_rcons Pi Fi_eq0/= muln0.
 Qed.
+Arguments gt0_prodn_seq [I r P F].
 
 Lemma gt0_prodn (I : finType) (P : pred I) F :
   0 < \prod_(i | P i) F i -> forall i, P i -> 0 < F i.
 Proof. by move=> /gt0_prodn_seq + i => /[apply]; apply. Qed.
+Arguments gt0_prodn [I P F].
 
 Lemma leq_bigmax_seq (I : eqType) r (P : pred I) F i0 :
   i0 \in r -> P i0 -> F i0 <= \max_(i <- r | P i) F i.
