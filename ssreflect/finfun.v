@@ -467,3 +467,111 @@ Lemma card_ffun : #|fT| = #|rT| ^ #|aT|.
 Proof. by rewrite -card_ffun_on; apply/esym/eq_card=> f; apply/forallP. Qed.
 
 End FinFunTheory.
+
+Section DependentFiniteProduct.
+
+Variables (I : finType) (T_ : I -> finType).
+Notation fprod_type := (forall i : I, T_ i) (only parsing).
+
+(* Definition of [fprod] := dependent product of finTypes *)
+Record fprod : predArgType := FProd
+  { fprod_fun : {ffun I -> {i : I & T_ i}} ;
+    fprod_prop : [forall i : I, tag (fprod_fun i) == i] }.
+
+Lemma tag_fprod_fun (f : fprod) i : tag (fprod_fun f i) = i.
+Proof. by have /'forall_eqP/(_ i) := fprod_prop f. Qed.
+
+Definition fprod_type_of_fprod (f : fprod) : fprod_type :=
+  fun i => etagged ('forall_eqP (fprod_prop f) i).
+Coercion fprod_type_of_fprod : fprod >-> Funclass.
+
+#[hnf] HB.instance Definition _ := [isSub for fprod_fun].
+#[hnf] HB.instance Definition _ := [Finite of fprod by <:].
+
+Lemma fprod_of_prod_type_subproof (f : fprod_type) :
+   [forall i : I, tag ([ffun i => Tagged T_ (f i)] i) == i].
+Proof. by apply/'forall_eqP => i /=; rewrite ffunE. Qed.
+
+Definition fprod_of_fprod_type (f : fprod_type) : fprod :=
+  FProd (fprod_of_prod_type_subproof f).
+
+Lemma fprodK : cancel fprod_type_of_fprod fprod_of_fprod_type.
+Proof.
+rewrite /fprod_type_of_fprod /fprod_of_fprod_type; case=> f fP.
+by apply/val_inj/ffunP => i /=; rewrite !ffunE etaggedK.
+Qed.
+
+Lemma fprodE g i : fprod_of_fprod_type g i = g i.
+Proof.
+rewrite /fprod_of_fprod_type /fprod_type_of_fprod/=.
+by move: ('forall_eqP _ _); rewrite ffunE/= => e; rewrite eq_axiomK.
+Qed.
+
+Lemma fprodP (f1 f2 : fprod) : (forall x, f1 x = f2 x) <-> f1 = f2.
+Proof.
+split=> [eq_f12|->//]; rewrite -[f1]fprodK -[f2]fprodK.
+by apply/val_inj/ffunP => i; rewrite !ffunE eq_f12.
+Qed.
+
+Definition dffun_of_fprod (f : fprod) : {dffun forall i : I, T_ i} :=
+  [ffun x => f x].
+
+Definition fprod_of_dffun (f : {dffun forall i : I, T_ i}) : fprod :=
+  fprod_of_fprod_type f.
+
+Lemma dffun_of_fprodK : cancel dffun_of_fprod fprod_of_dffun.
+Proof. by move=> f; apply/fprodP=> i; rewrite fprodE ffunE. Qed.
+#[local] Hint Resolve dffun_of_fprodK : core.
+
+Lemma fprod_of_dffunK : cancel fprod_of_dffun dffun_of_fprod.
+Proof. by move=> f; apply/ffunP => i; rewrite !ffunE fprodE. Qed.
+#[local] Hint Resolve fprod_of_dffunK : core.
+
+Lemma dffun_of_fprod_bij : bijective dffun_of_fprod.
+Proof. by exists fprod_of_dffun. Qed.
+
+Lemma fprod_of_dffun_bij : bijective fprod_of_dffun.
+Proof. by exists dffun_of_fprod. Qed.
+
+Definition to_family_tagged_with (f : fprod) : {x in family (tagged_with T_)} :=
+  exist _ (fprod_fun f) (fprod_prop f).
+
+Definition of_family_tagged_with (f : {x in family (tagged_with T_)}) : fprod :=
+  FProd (valP f).
+
+Lemma to_family_tagged_withK :
+  cancel to_family_tagged_with of_family_tagged_with.
+Proof. by case=> f fP; apply/val_inj. Qed.
+#[local] Hint Resolve to_family_tagged_withK : core.
+
+Lemma of_family_tagged_withK :
+  cancel of_family_tagged_with to_family_tagged_with.
+Proof. by case=> f fP; apply/val_inj. Qed.
+#[local] Hint Resolve of_family_tagged_withK : core.
+
+Lemma to_family_tagged_with_bij : bijective to_family_tagged_with.
+Proof. by exists of_family_tagged_with. Qed.
+
+Lemma of_family_tagged_with_bij : bijective of_family_tagged_with.
+Proof. by exists to_family_tagged_with. Qed.
+
+Lemma etaggedE (a : fprod) (i : I) (e : tag (fprod_fun a i) = i) :
+  etagged e = a i.
+Proof. by case: a e => //= f fP e; congr etagged; apply: eq_irrelevance. Qed.
+
+End DependentFiniteProduct.
+
+Arguments to_family_tagged_with {I T_}.
+Arguments of_family_tagged_with {I T_}.
+
+Notation "[ 'fprod' i : I => F ]" := (fprod_of_fprod_type (fun i : I => F))
+  (at level 0, i name, only parsing) : function_scope.
+
+Notation "[ 'fprod' : I => F ]" := (fprod_of_fprod_type (fun _ : I => F))
+  (at level 0, only parsing) : function_scope.
+
+Notation "[ 'fprod' i => F ]" := [fprod i : _ => F]
+  (at level 0, i name, format "[ 'fprod'  i  =>  F ]") : function_scope.
+
+Notation "[ 'fprod' => F ]" := [fprod : _ => F]
+  (at level 0, format "[ 'fprod' =>  F ]") : function_scope.
