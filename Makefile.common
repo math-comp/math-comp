@@ -121,7 +121,7 @@ install: __always__ Makefile.coq
 # counting lines of Coq code -----------------------------------------
 .PHONY: count
 
-COQFILES = $(shell grep '.v$$' $(COQPROJECT))
+COQFILES = $(shell grep '[.]v$$' $(COQPROJECT))
 
 count:
 	@coqwc $(COQFILES) | tail -1 | \
