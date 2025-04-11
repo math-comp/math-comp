@@ -744,7 +744,7 @@ Proof. by rewrite (eq_sym A) eqEcard sub0set cards0 leqn0. Qed.
 Lemma set0Pn A : reflect (exists x, x \in A) (A != set0).
 Proof. by rewrite -cards_eq0; apply: existsP. Qed.
 
-Lemma set0_existsF A : (A == set0) = ~~ [exists x, x \in A].
+Lemma set0_Nexists A : (A == set0) = ~~ [exists x, x \in A].
 Proof. by rewrite -(sameP (set0Pn _) existsP) negbK.  Qed.
 
 Lemma card_gt0 A : (0 < #|A|) = (A != set0).
@@ -937,7 +937,7 @@ Proof. by rewrite -subset0 subDset setU0. Qed.
 Lemma setI_eq0 A B : (A :&: B == set0) = [disjoint A & B].
 Proof. by rewrite disjoints_subset -setD_eq0 setDE setCK. Qed.
 
-Lemma subset_eq0 B A : (A \subset B) && (A \subset ~: B) = (A == set0).
+Lemma eq0_subset B A : (A == set0) = (A \subset B) && (A \subset ~: B).
 Proof. by rewrite -subsetI setICr subset0. Qed.
 
 Lemma disjoint_setI0 A B : [disjoint A & B] -> A :&: B = set0.
