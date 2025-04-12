@@ -99,7 +99,7 @@ From mathcomp Require Import zmodp poly order ssrnum matrix mxalgebra vector.
 (*                                                                            *)
 (*            symmetricmx := hermitianmx _ false idfun                        *)
 (*                 skewmx := hermitianmx _ true idfun                         *)
-(*              hermsymmx := hermitianmx _ false conjC                        *)
+(*              hermsymmx := hermitianmx _ false conj_op                      *)
 (*                                                                            *)
 (******************************************************************************)
 
@@ -152,11 +152,6 @@ Lemma rmorphK (f : involutive_rmorphism R) : involutive f.
 Proof. by move: f => [? [? ? []]]. Qed.
 
 End InvolutiveTheory.
-
-Definition conjC {C : numClosedFieldType} (c : C) : C := c^*.
-
-HB.instance Definition _ (C : numClosedFieldType) :=
-  GRing.RMorphism.on (@conjC C).
 
 Section conjC_involutive.
 Variable C : numClosedFieldType.
@@ -1667,7 +1662,7 @@ Notation hermsymmx := (hermitianmx _ false conjC).
 
 Lemma hermitian1mx_subproof {C : numClosedFieldType} n : (1%:M : 'M[C]_n) \is hermsymmx.
 Proof.
-by rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx conjC1.
+by rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx/= conjC1.
 Qed.
 
 Canonical hermitian1mx {C : numClosedFieldType} n :=
