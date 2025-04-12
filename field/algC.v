@@ -580,7 +580,7 @@ Notation algCfield := (type : fieldType).
 Notation algCnumField := (type : numFieldType).
 Notation algCnumClosedField := (type : numClosedFieldType).
 
-Notation Creal := (@Num.Def.Rreal algCnum).
+Notation Creal := (@Num.real algCnum).
 
 Definition getCrat := let: GetCrat_spec CtoQ _ := getCrat_subproof in CtoQ.
 Definition Crat : {pred algC} := fun x => ratr (getCrat x) == x.
@@ -1136,7 +1136,7 @@ elim: n r => // n IHn [|x r]/= in p pr *.
 rewrite ltnS => r_lt.
 have xJxr : x^* \in x :: r.
   rewrite -root_prod_XsubC -pr.
-  have /eq_map_poly-> : algRval =1 Num.conj_op \o algRval.
+  have /eq_map_poly-> : algRval =1 Num.conj \o algRval.
     by move=> a /=; rewrite (CrealP (algRvalP _)).
   by rewrite map_poly_comp mapf_root pr root_prod_XsubC mem_head.
 have xJr : (x \isn't Creal) ==> (x^* \in r) by rewrite implyNb CrealE.
