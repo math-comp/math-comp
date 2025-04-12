@@ -99,7 +99,7 @@ From mathcomp Require Import zmodp poly order ssrnum matrix mxalgebra vector.
 (*                                                                            *)
 (*            symmetricmx := hermitianmx _ false idfun                        *)
 (*                 skewmx := hermitianmx _ true idfun                         *)
-(*              hermsymmx := hermitianmx _ false conj_op                      *)
+(*              hermsymmx := hermitianmx _ false conjC                        *)
 (*                                                                            *)
 (******************************************************************************)
 
