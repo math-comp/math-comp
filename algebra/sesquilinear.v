@@ -99,7 +99,7 @@ From mathcomp Require Import zmodp poly order ssrnum matrix mxalgebra vector.
 (*                                                                            *)
 (*            symmetricmx := hermitianmx _ false idfun                        *)
 (*                 skewmx := hermitianmx _ true idfun                         *)
-(*              hermsymmx := hermitianmx _ false conjC                        *)
+(*              hermsymmx := hermitianmx _ false Num.conj                     *)
 (*                                                                            *)
 (******************************************************************************)
 
@@ -152,23 +152,18 @@ Proof. by move: f => [? [? ? []]]. Qed.
 
 End InvolutiveTheory.
 
-Definition conjC {C : numClosedFieldType} (c : C) : C := c^*.
-
-HB.instance Definition _ (C : numClosedFieldType) :=
-  GRing.RMorphism.on (@conjC C).
-
 Section conjC_involutive.
 Variable C : numClosedFieldType.
 
-Let conjCfun_involutive : involutive (@conjC C). Proof. exact: conjCK. Qed.
+Let conjCfun_involutive : involutive (@Num.conj C). Proof. exact: conjCK. Qed.
 
 HB.instance Definition _ :=
-  isInvolutive.Build _ (@conjC C) conjCfun_involutive.
+  isInvolutive.Build _ (@Num.conj C) conjCfun_involutive.
 
 End conjC_involutive.
 
 Lemma map_mxCK {C : numClosedFieldType}  m n (A : 'M[C]_(m, n)) :
-  (A ^ conjC) ^ conjC = A.
+  (A ^ Num.conj) ^ Num.conj = A.
 Proof. by apply/matrixP=> i j; rewrite !mxE conjCK. Qed.
 
 (*Structure revop X Y Z (f : Y -> X -> Z) := RevOp {
@@ -707,7 +702,7 @@ Notation "eps_theta .-sesqui" := (sesqui _ eps_theta) : ring_scope.
 
 Notation symmetric_form := (false, idfun).-sesqui.
 Notation skew := (true, idfun).-sesqui.
-Notation hermitian := (false, @Num.conj_op _).-sesqui.
+Notation hermitian := (false, Num.conj).-sesqui.
 
 HB.mixin Record isDotProduct (R : numDomainType) (U : lmodType R)
   (op : U -> U -> R) := { neq0_dnorm_gt0 : forall u, u != 0 -> 0 < op u u }.
@@ -1044,7 +1039,7 @@ Arguments mem_orthovP {F eps theta vT form V u}.
 
 Section DotVectTheory.
 Variables (C : numClosedFieldType).
-Variable (U : lmodType C) (form : {dot U for conjC}).
+Variable (U : lmodType C) (form : {dot U for Num.conj}).
 
 Local Notation "''[' u , v ]" := (form u%R v%R) : ring_scope.
 Local Notation "''[' u ]" := '[u, u]%R : ring_scope.
@@ -1088,7 +1083,7 @@ Hint Extern 0 (is_true (0 <= Dot.sort _ _ _
 
 Section HermitianTheory.
 Variables (C : numClosedFieldType) (eps : bool) (theta : {rmorphism C -> C}).
-Variable (U : lmodType C)  (form : {dot U for conjC}).
+Variable (U : lmodType C)  (form : {dot U for Num.conj}).
 Local Notation "''[' u , v ]" := (form u%R v%R) : ring_scope.
 Local Notation "''[' u ]" := '[u, u]%R : ring_scope.
 
@@ -1162,7 +1157,7 @@ End HermitianTheory.
 
 Section DotFinVectTheory.
 Variable C : numClosedFieldType.
-Variables (U : vectType C) (form : {dot U for conjC}).
+Variables (U : vectType C) (form : {dot U for Num.conj}).
 
 Local Notation "''[' u , v ]" := (form u%R v%R) : ring_scope.
 Local Notation "''[' u ]" := '[u, u]%R : ring_scope.
@@ -1336,8 +1331,8 @@ Arguments orthoPr {C U form S psi}.
 
 Section BuildIsometries.
 Variables (C : numClosedFieldType) (U U1 U2 : vectType C).
-Variables (form : {dot U for conjC}) (form1 : {dot U1 for conjC})
-                                     (form2 : {dot U2 for conjC}).
+Variables (form : {dot U for Num.conj}) (form1 : {dot U1 for Num.conj})
+                                        (form2 : {dot U2 for Num.conj}).
 
 Definition normf1 := fun u => form1 u u.
 Definition normf2 := fun u => form2 u u.
@@ -1655,11 +1650,11 @@ End MatrixForms.
 
 Notation symmetricmx := (hermitianmx _ false idfun).
 Notation skewmx := (hermitianmx _ true idfun).
-Notation hermsymmx := (hermitianmx _ false conjC).
+Notation hermsymmx := (hermitianmx _ false Num.conj).
 
 Lemma hermitian1mx_subproof {C : numClosedFieldType} n : (1%:M : 'M[C]_n) \is hermsymmx.
 Proof.
-by rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx conjC1.
+by rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx/= conjC1.
 Qed.
 
 Canonical hermitian1mx {C : numClosedFieldType} n :=
