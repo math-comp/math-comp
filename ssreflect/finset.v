@@ -2775,7 +2775,7 @@ Section BigFProd.
   rewrite (reindex (@of_family_tagged_with _ T_)); last first.
     exact/onW_bij/of_family_tagged_with_bij.
   rewrite [in RHS]big_sub_cond; apply/esym/eq_bigr => -[/= f fP] Qf.
-  apply: eq_bigr => i _; rewrite /fprod_type_of_fprod/=.
+  apply: eq_bigr => i _; rewrite /fun_of_fprod/=.
   by case: (f i) ('forall_eqP _ _) => //= j t; case: _ /; rewrite untagE.
   Qed.
 

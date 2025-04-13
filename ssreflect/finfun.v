@@ -65,12 +65,12 @@ From mathcomp Require Import fintype tuple.
 (*                     fprod_prop : [forall i : I, tag (fprod_fun i) == i] }. *)
 (* fprod I T_ is endowed with a finType structure and allow these operations: *)
 (* [fprod i : I => F] == the dependent fprod function built from fun i:I => F *)
-(*                    := fprod_of_fprod_type (fun i : I => F)                 *)
+(*                    := fprod_of_fun (fun i : I => F)                        *)
 (*   [fprod : I => F] == [fprod _ : I => F]                                   *)
 (*     [fprod i => F] == [fprod i : _ => F]                                   *)
 (*       [fprod => F] == [fprod _ : _ => F]                                   *)
 (* These fprod terms coerce into vanilla dependent functions via the coercion *)
-(* fprod_type_of_fprod I T_ : fprod I T_ -> (forall i : I, T_ i).             *)
+(*        fun_of_fprod I T_ : fprod I T_ -> (forall i : I, T_ i).             *)
 (* We also define the mutual bijections:                                      *)
 (*           fprod_of_dffun : {dffun forall i : I, T_ i} -> fprod I T_        *)
 (*           dffun_of_fprod : fprod I T_ -> {dffun forall i : I, T_ i}        *)
@@ -499,9 +499,9 @@ Record fprod : predArgType := FProd
 Lemma tag_fprod_fun (f : fprod) i : tag (fprod_fun f i) = i.
 Proof. by have /'forall_eqP/(_ i) := fprod_prop f. Qed.
 
-Definition fprod_type_of_fprod (f : fprod) : fprod_type :=
+Definition fun_of_fprod (f : fprod) : fprod_type :=
   fun i => etagged ('forall_eqP (fprod_prop f) i).
-Coercion fprod_type_of_fprod : fprod >-> Funclass.
+Coercion fun_of_fprod : fprod >-> Funclass.
 
 #[hnf] HB.instance Definition _ := [isSub for fprod_fun].
 #[hnf] HB.instance Definition _ := [Finite of fprod by <:].
@@ -510,18 +510,18 @@ Lemma fprod_of_prod_type_subproof (f : fprod_type) :
    [forall i : I, tag ([ffun i => Tagged T_ (f i)] i) == i].
 Proof. by apply/'forall_eqP => i /=; rewrite ffunE. Qed.
 
-Definition fprod_of_fprod_type (f : fprod_type) : fprod :=
+Definition fprod_of_fun (f : fprod_type) : fprod :=
   FProd (fprod_of_prod_type_subproof f).
 
-Lemma fprodK : cancel fprod_type_of_fprod fprod_of_fprod_type.
+Lemma fprodK : cancel fun_of_fprod fprod_of_fun.
 Proof.
-rewrite /fprod_type_of_fprod /fprod_of_fprod_type; case=> f fP.
+rewrite /fun_of_fprod /fprod_of_fun; case=> f fP.
 by apply/val_inj/ffunP => i /=; rewrite !ffunE etaggedK.
 Qed.
 
-Lemma fprodE g i : fprod_of_fprod_type g i = g i.
+Lemma fprodE g i : fprod_of_fun g i = g i.
 Proof.
-rewrite /fprod_of_fprod_type /fprod_type_of_fprod/=.
+rewrite /fprod_of_fun /fun_of_fprod/=.
 by move: ('forall_eqP _ _); rewrite ffunE/= => e; rewrite eq_axiomK.
 Qed.
 
@@ -535,7 +535,7 @@ Definition dffun_of_fprod (f : fprod) : {dffun forall i : I, T_ i} :=
   [ffun x => f x].
 
 Definition fprod_of_dffun (f : {dffun forall i : I, T_ i}) : fprod :=
-  fprod_of_fprod_type f.
+  fprod_of_fun f.
 
 Lemma dffun_of_fprodK : cancel dffun_of_fprod fprod_of_dffun.
 Proof. by move=> f; apply/fprodP=> i; rewrite fprodE ffunE. Qed.
@@ -582,10 +582,10 @@ End DependentFiniteProduct.
 Arguments to_family_tagged_with {I T_}.
 Arguments of_family_tagged_with {I T_}.
 
-Notation "[ 'fprod' i : I => F ]" := (fprod_of_fprod_type (fun i : I => F))
+Notation "[ 'fprod' i : I => F ]" := (fprod_of_fun (fun i : I => F))
   (at level 0, i name, only parsing) : function_scope.
 
-Notation "[ 'fprod' : I => F ]" := (fprod_of_fprod_type (fun _ : I => F))
+Notation "[ 'fprod' : I => F ]" := (fprod_of_fun (fun _ : I => F))
   (at level 0, only parsing) : function_scope.
 
 Notation "[ 'fprod' i => F ]" := [fprod i : _ => F]
