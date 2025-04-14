@@ -22,4 +22,4 @@
     `SubChoice_isSubComPzSemiRing`, `SubChoice_isSubPzRing`,
     `SubChoice_isSubComPzRing`
     ([#1319](https://github.com/math-comp/math-comp/pull/1319),
-    by Tragicus).
+    by Quentin Vermande).

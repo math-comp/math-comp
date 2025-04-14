@@ -13,4 +13,4 @@
 	  `monic_algC_pfactor`, `monic_algR_pfactor`, `poly_algR_pfactor`, 
  	  `algR_rcfMixin`
    (`#1199 <https://github.com/coq/stdlib/pull/1199>`_,
-    by Tragicus).
+    by Quentin Vermande).

@@ -79,7 +79,7 @@
     `scale_is_scalable`, `scale_fun_is_scalable`, `comRingMixin`,
     `ffun_mulC`, `pair_mulC` generalized to `comPzRingType`
     ([#1319](https://github.com/math-comp/math-comp/pull/1319),
-     by Tragicus).
+     by Quentin Vermande).
 		
 - in `ssrint.v`
   + `mulrzAl`, `mulrzAr`, `mulrzl`, `mulrzr`, `mulNrNz`, `mulrbz`,
@@ -89,4 +89,4 @@
     `prodMz`, `intr_sign`, `rpred_int`, `rpredZint` generalized to
     `pzRingType`
     ([#1319](https://github.com/math-comp/math-comp/pull/1319),
-     by Tragicus).
+     by Quentin Vermande).
