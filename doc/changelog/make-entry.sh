@@ -18,13 +18,13 @@ printf "Fixes? (space separated list of bug numbers)\n"
 read -r fixes_list
 
 fixes_string="$(echo $fixes_list | sed 's/ /~    and /g; s,\([0-9][0-9]*\),[#\1](https://github.com/math-comp/math-comp/issues/\1),g' | tr '~' '\n')"
-if [ ! -z "$fixes_string" ]; then fixes_string="$(printf '\n    fixes %s,' "$fixes_string")"; fi
+if [ ! -z "$fixes_string" ]; then fixes_string="$(printf ',\n    fixes %s' "$fixes_string")"; fi
 
 # shellcheck disable=SC2016
 # the ` are regular strings, this is intended
 # use %s for the leading - to avoid looking like an option (not sure
 # if necessary but doesn't hurt)
-printf '%s in `%s`\n  + Describe your change here but do not end with a period\n    for instance: lemmas `lem1`, `lem2` and `lem3`\n    ([#%s](https://github.com/math-comp/math-comp/pull/%s),%s\n    by %s).\n' - "$in_file" "$PR" "$PR" "$fixes_string" "$(git config user.name)" > "$where"
+printf '%s in `%s`\n  + Describe your change here but do not end with a period\n    for instance: lemmas `lem1`, `lem2` and `lem3`\n    ([#%s](https://github.com/math-comp/math-comp/pull/%s)%s).\n' - "$in_file" "$PR" "$PR" "$fixes_string" > "$where"
 
 printf 'Name of created changelog file:\n'
 printf '%s\n' "$where"
