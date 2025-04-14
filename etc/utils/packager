@@ -44,7 +44,7 @@ if [ $VERSION == "dev" ]
 then
 # variables useful for package construction
   URLLINE="src: \"git+https://github.com/math-comp/math-comp.git\""
-  PKGS=$(sed -r "s/.*mathcomp\.([^\.]*)*.*/\1/" $GITROOT/mathcomp/all/all.v \
+  PKGS=$(sed -r "s/.*mathcomp\.([^\.]*)*.*/\1/" $GITROOT/all/all.v \
         | paste -sd " " -)
   PKGPREFIX="$GITROOT/opam/extra-dev/packages"
 else
