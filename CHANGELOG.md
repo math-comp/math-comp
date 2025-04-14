@@ -1,9 +1,839 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-Last releases: [[2.3.0] - 2024-11-28](#230---2024-11-28), [[2.2.0] - 2024-01-17](#220---2024-01-17), [[2.1.0] - 2023-10-24](#210---2023-10-24), [[2.0.0] - 2023-05-10](#200---2023-05-10)
+Last releases: [[2.4.0] - 2025-04-14](#240---2025-04-14), [[2.3.0] - 2024-11-28](#230---2024-11-28), [[2.2.0] - 2024-01-17](#220---2024-01-17)
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## [2.4.0] - 2025-04-14
+
+This release is compatible with Coq versions 8.19, 8.20 and Rocq version 9.0.
+
+The contributors to this version are:
+
+Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguchi, Kimaya Bedarkar, Laurent Théry, Pierre Pomeret-Coquot, Pierre Roux, Quentin Vermande, Reynald Affeldt, Mitsuharu Yamamoto, Yves Bertot
+
+### Added
+
+- in `ssralg.v`
+  + Semimodule and semialgebra structures `lSemiModType`, `lSemiAlgType`, `semiAlgType`, `comSemiAlgType`, `subLSemiModType`, `subLSemiAlgType`, and `subSemiAlgType`.
+  + Scaling-morphism structures `GRing.Scale.preLaw` and `GRing.Scale.semiLaw`.
+  + Mixins `Nmodule_isLSemiModule`, `LSemiModule_isLSemiAlgebra`, `GRing.Scale.isPreLaw`, `GRing.Scale.isSemiLaw`, `LSemiAlgebra_isSemiAlgebra`, `isSubLSemiModule`
+  + Factories `LSemiModule_isLmodule`, `isSemilinear`, `LSemiAlgebra_isComSemiAlgebra`, `SubNmodule_isSubLSemiModule`, `SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra`, `SubLSemiAlgebra_isSubSemiAlgebra`, `SubChoice_isSubLSemiModule`
+  + Definitions `semilinear_for`, `subsemimod_closed`
+  + Notations `semilinear`, `semiscalar`, `[SubNmodule_isSubLSemiModule of V by <:]`, `[SubChoice_isSubLSemiModule of V by <:]`, `[SubSemiRing_SubLSemiModule_isSubLSemiAlgebra of V by <:]`, `[SubLSemiAlgebra_isSubSemiAlgebra of V by <:]`
+  + Lemmas `subsemimod_closedD`, `subsemimod_closedZ`, `submod_closed_semi`, `additive_semilinear`, `scalable_semilinear`, `semilinear_linear`, `semilinearP`, `semilinearPZ`, `can2_semilinear`, `semiscalarP`, `subsemimodClosedP`
+    ([#1125](https://github.com/math-comp/math-comp/pull/1125),
+    by Kazuhiko Sakaguchi).
+  + mixin `Nmodule_isPzSemiRing`
+  + definition `pzSemiRingType`
+  + factory `isPzSemiRing`
+  + mixin `PzSemiRing_isNonZero`
+  + definition `pzRingType`
+  + factories `Zmodule_isPzRing`, `isPzRing`
+  + mixin `PzSemiRing_hasCommutativeMul`
+  + definition `comPzSemiRingType`
+  + factory `Nmodule_isComPzSemiRing`
+  + definition `comPzRingType`
+  + factories `PzRing_hasCommutativeMul`, `Zmodule_isComPzRing`
+  + mixin `isSubPzSemiRing`
+  + definition `subPzSemiRingType`
+  + factory `SubNmodule_isSubPzSemiRing`
+  + definition `subComPzSemiRingType`
+  + factory `SubPzSemiRing_isSubComPzSemiRing`
+  + definition `subPzRingType`
+  + factory `subZmodule_isSubPzRing`
+  + definition `subComPzRingType`
+  + factories `SubPzRing_isSubComPzRing`, `SubChoice_isSubPzSemiRing`,
+    `SubChoice_isSubComPzSemiRing`, `SubChoice_isSubPzRing`,
+    `SubChoice_isSubComPzRing`
+    ([#1319](https://github.com/math-comp/math-comp/pull/1319),
+    by Tragicus).
+
+- in `intdiv.v`
+  + lemma `solve_Qint_span`
+    ([#1191](https://github.com/math-comp/math-comp/pull/1191),
+    by mituharu).
+
+- in `zmodp.v`
+  + lemmas `gen_tperm_step`, `perm_addr1X`, `gen_tpermn_circular_shift`
+    ([#1198](https://github.com/math-comp/math-comp/pull/1198),
+    by Tragicus).
+
+- in `cyclic.v`
+  + lemmas `eq_expg_ord`, `expgD_Zp`
+    ([#1198](https://github.com/math-comp/math-comp/pull/1198),
+    by Tragicus).
+
+- in `nilpotent.v`
+  + lemma `setXn_sol`
+    ([#1198](https://github.com/math-comp/math-comp/pull/1198),
+    by Tragicus).
+
+- in `alt.v`
+  + lemmas `gen_tperm_circular_shift`, `solvable_AltF`, `solvable_SymF`
+    ([#1198](https://github.com/math-comp/math-comp/pull/1198),
+    by Tragicus).
+
+- in `algC.v`
+  + record `algR` with projections `algRval`, `algRvalP`
+  + lemmas `total_algR`, `algRval_is_additive`, `algRval_is_multiplicative`,
+  + definition `algR_norm`
+  + lemmas `algR_ler_normD`, `algR_normr0_eq0`, `algR_normrMn`,
+    `algR_normrN`, `algR_addr_gt0`, `algR_ger_leVge`, `algR_normrM`,
+	  `algR_ler_def`, `algR_archiFieldMixin`
+  + definition `algR_pfactor`
+  + notation `algC_pfactor`
+  + lemmas `algR_pfactorRE`, `algC_pfactorRE`, `algR_pfactorCE`, `algC_pfactorCE`,
+    `algC_pfactorE`, `size_algC_pfactor`, `size_algR_pfactor`, `algC_pfactor_eq0`,
+	  `algR_pfactor_eq0`, `algC_pfactorCgt0`, `algR_pfactorR_mul_gt0`,
+	  `monic_algC_pfactor`, `monic_algR_pfactor`, `poly_algR_pfactor`, 
+ 	  `algR_rcfMixin`
+   (`#1199 <https://github.com/coq/stdlib/pull/1199>`_,
+    by Tragicus).
+
+- in `archimedean.v`
+  + lemmas `floorNceil`, `ceilNfloor`, `truncEfloor`, `intrP`
+  + mixin `Num.NumDomain_hasFloorCeilTruncn`
+    ([#1250](https://github.com/math-comp/math-comp/pull/1250),
+    by Kazuhiko Sakaguchi).
+  + lemmas `real_floor_ge_int_tmp`, `real_ceil_le_int_tmp`,
+    `floor_ge_int_tmp` and `ceil_le_int_tmp`
+  + lemmas `truncn_le`, `real_truncnS_gt`, `truncn_ge_nat`,
+    `truncn_gt_nat`, `truncn_lt_nat`, `real_truncn_le_nat`,
+    `truncn_eq`, `le_truncn`, `natrEtruncn` `real_floor_lt_int`,
+    `real_floor_eq`, `real_floor_ge0`, `floor_lt0`, `real_floor_le0`,
+    `floor_gt0`, `floor_neq0`, `real_ceil_gt_int`, `real_ceil_eq`,
+    `real_ceil_ge0`, `ceil_lt0`, `real_ceil_le0`, `ceil_gt0`,
+    `ceil_neq0`, `floor_lt_int`, `floor_eq`, `floor_ge0`, `floor_le0`,
+    `ceil_gt_int`, `ceil_eq`, `ceil_ge0`, `ceil_le0`, `truncnS_gt`,
+    `truncn_le_nat` and `natr_int`
+    ([#1359](https://github.com/math-comp/math-comp/pull/1359), by
+    Pierre Roux).
+
+- in `order.v`
+  + notations `\min_<range> e`, `\max_<range> e`, `\min^d_<range> e`,
+    `\max^d_<range> e`, `\min^p_<range> e`, `\max^p_<range> e`,
+    `\min^sp_<range> e`, `\max^sp_<range> e`, `\meet^l_<range> e`,
+    `\join^l_<range> e`, `\min^l_<range> e`, `\max^l_<range> e`
+    ([#1298](https://github.com/math-comp/math-comp/pull/1298),
+    by Quentin Vermande).
+  + lemmas `comparable_le_min2`, `comparable_le_max2`,
+    `le_min2` and `le_max2` (backport from
+    https://github.com/math-comp/analysis/pull/1410 )
+    ([#1351](https://github.com/math-comp/math-comp/pull/1351),
+    by Pierre Roux).
+  + export `le_val` in `Order.SubPOrderTheory` (included in
+    `Order.Theory`) to avoid being forced to type `Order.le_val`
+    ([#1353](https://github.com/math-comp/math-comp/pull/1353),
+    by Pierre Roux).
+
+- in `seq.v`,
+  + new lemmas `odflt_onth`, `onthE`, `onth_nth`, `onth0n`, `onth1P`,
+    `onthTE`, `onthNE`, `onth_default`, `onth_cat`, `onth_nseq`, `eq_onthP`,
+    `eq_from_onth`, `eq_from_onth_le`, `onth_map`, `inj_onth_map`, `onthP`,
+    `onthPn`, and `onth_inj`.
+    ([#1318](https://github.com/math-comp/math-comp/pull/1318),
+    by Cyril Cohen, KimayaBedarkar, Pierre Roux, and Quentin Vermande).
+
+- in `tuple.v`
+  + new lemma `tnth_onth`
+    ([#1318](https://github.com/math-comp/math-comp/pull/1318),
+    by Cyril Cohen).
+
+- in `ssrnum.v`
+  + Mixin `Zmodule_isSemiNormed` and class `SemiNormedZmodule` with
+    associated structure `semiNormedZmodType`.
+    ([#1333](https://github.com/math-comp/math-comp/pull/1333),
+    by Alessandro Bruni and Cyril Cohen).
+  + lemmas `gtr0_norm_neq0`, and `gtr0_norm_eq0F`
+    ([#1333](https://github.com/math-comp/math-comp/pull/1333),
+    by Alessandro Bruni and Cyril Cohen).
+  + lemmas `natr_min`, `natr_max` and `sqrtC_real` (backport from
+    https://github.com/math-comp/analysis/pull/1410 )
+    ([#1351](https://github.com/math-comp/math-comp/pull/1351),
+    by Pierre Roux).
+
+- in `ssrnat.v`
+  + definition `N_eqb`
+    ([#1343](https://github.com/math-comp/math-comp/pull/1343),
+    by Pierre Roux).
+
+- in `interval.v`
+  + lemmas `comparable_BSide_min`, `comparable_BSide_max`,
+    `BSide_min`, `BSide_max`, `real_BSide_min` and `real_BSide_max`
+    (backport from https://github.com/math-comp/analysis/pull/1410 )
+    ([#1351](https://github.com/math-comp/math-comp/pull/1351),
+    by Pierre Roux).
+  + lemma `subset_itv_bound`, matching previous `subset_itv`
+    ([#1380](https://github.com/math-comp/math-comp/pull/1380),
+    by Alessandro Bruni).
+  + lemma `subset_itv` has been generalized
+    (previous version is now `subset_itv_bound`)
+    ([#1380](https://github.com/math-comp/math-comp/pull/1380),
+    by Alessandro Bruni).
+
+- new file `interval_inference.v`
+  added to `all_algebra.v`, this can solve automatically a few more
+  goals, making some proofs fail (with subgoals no longer existing)
+  (backported from https://github.com/math-comp/analysis/pull/1410 )
+  ([#1352](https://github.com/math-comp/math-comp/pull/1352),
+  by Pierre Roux).
+
+- in `interval_inference.v`
+  + definitions `map_iv_bound`, `map_itv`, `Itv.t`, `Itv.sub`,
+    `Itv.spec`, `Itv.mk`, `Itv.from`, `fromP`, `Itv.num_sem`,
+    `Itv.nat_sem`, `Itv.posnum`, `Itv.nonneg`, `Itv.real1`,
+    `Itv.real2`, `empty_itv`, `widen_itv`, `ItvNum`, `ItvReal`,
+    `Itv01`, `PosNum`, `NngNum`, `posnum_spec`, `nonneg_spec`
+  + module `IntItv` with
+    * definitions `opp_bound`, `opp`, `add_boundl`, `add_boundr`,
+      `add`, `signb`, `sign_boundl`, `sign_boundr`, `signi`, `sign`,
+      `mul_boundl`, `mul_boundr`, `mul`, `min`, `max`,
+      `keep_nonneg_bound`, `keep_pos_bound`, `keep_nonpos_bound`,
+      `keep_neg_bound`, `inv`, `exprn_le1_bound`, `exprn`,
+      `keep_sign`, `keep_nonpos`, `keep_nonneg`
+    * lemmas `opp_bound_ge0`, `opp_bound_gt0`, `mul_boundrC`,
+      `mul_boundr_gt0`
+  + module `Instances` with
+    * definitions `sign_spec`, `Instances.sqrt_itv`,
+      `Instances.sqrtC_itv`
+    * lemmas `num_spec_zero`, `num_spec_one`, `opp_boundr`,
+      `opp_boundl`, `num_spec_opp`, `num_itv_add_boundl`,
+      `num_itv_add_boundr`, `num_spec_add`, `signP`,
+      `num_itv_mul_boundl`, `num_itv_mul_boundr`,
+      `BRight_le_mul_boundr`, `comparable_num_itv_bound`,
+      `num_itv_bound_min`, `num_itv_bound_max`, `num_spec_mul`,
+      `num_spec_min`, `num_spec_max`, `nat_num_spec`,
+      `num_spec_natmul`, `num_spec_int`, `num_spec_intmul`,
+      `num_itv_bound_keep_pos`, `num_itv_bound_keep_neg`,
+      `num_spec_inv`, `num_itv_bound_exprn_le1`, `num_spec_exprn`,
+      `num_spec_norm`, `num_spec_sqrt`, `num_spec_sqrtC`,
+      `nat_spec_zero`, `nat_spec_succ`, `nat_spec_add`,
+      `nat_spec_double`, `nat_spec_mul`, `nat_spec_exp`,
+      `nat_spec_min`, `nat_spec_max`, `num_spec_Posz`, `num_spec_Negz`
+    * canonical instances `zero_inum`, `one_inum`, `opp_inum`,
+      `add_inum`, `mul_inum`, `min_typ_inum`, `max_typ_inum`,
+      `num_min_max_typ`, `natmul_inum`, `intmul_inum`, `inv_inum`,
+      `exprn_inum`, `norm_inum`, `sqrt_inum`, `sqrtC_inum`,
+      `zeron_inum`, `succn_inum`, `addn_inum`, `double_inum`,
+      `muln_inum`, `expn_inum`, `minn_inum`, `maxn_inum`,
+      `nat_min_max_typ`, `Posz_inum`, `Negz_inum`
+  + lemmas `map_itv_bound_comp`, `map_itv_comp`, `Itv.spec_real1`,
+    `Itv.spec_real2`, `itv_le_total_subproof`,
+    `TypInstances.top_typ_spec`, `TypInstances.real_domain_typ_spec`,
+    `TypInstances.real_field_typ_spec`, `TypInstances.nat_typ_spec`,
+    `TypInstances.typ_inum_spec`, `le_num_itv_bound`,
+    `num_itv_bound_le_BLeft`, `BRight_le_num_itv_bound`,
+    `num_spec_sub`, `bottom`, `gt0`, `le0F`, `lt0`, `ge0F`, `ge0`,
+    `lt0F`, `le0`, `gt0F`, `cmp0`, `neq0`, `eq0F`, `lt1`, `ge1F`,
+    `le1`, `gt1F`, `widen_itv_subproof`, `widen_itvE`, `posE`, `nngE`,
+    `num_eq`, `num_le`, `num_lt`, `num_min`, `num_max`, `num_abs_eq0`,
+    `num_le_max`, `num_ge_max`, `num_le_min`, `num_ge_min`,
+    `num_lt_max`, `num_gt_max`, `num_lt_min`, `num_gt_min`,
+    `num_abs_le`, `num_abs_lt`, `itvnum_subdef`, `itvreal_subdef`,
+    `itv01_subdef`, `Itv01.`, `posnum_subdef`, `nngnum_subdef`,
+    `posnumP`, `nonnegP`
+  + canonical instances `TypInstances.top_typ`,
+    `TypInstances.real_domain_typ`, `TypInstances.real_field`,
+    `TypInstances.nat_typ`, `TypInstances.typ_inum`
+  + notations `{itv R & i}`, `{i01 R}`, `{posnum R}`, `{nonneg R}`,
+    `x%:itv`, `[itv of x]`, `num`, `x%:inum`, `x%:num`, `x%:posnum`,
+    `x%:nngnum`, `unify_itv`, `[gt0 of x]`, `[lt0 of x]`,
+    `[ge0 of x]`, `[le0 of x]`, `[cmp0 of x]`, `[neq0 of x]`,
+    `x%:i01`, `x%:pos`, `x%:nng`
+    (backported from https://github.com/math-comp/analysis/pull/1410 )
+    ([#1352](https://github.com/math-comp/math-comp/pull/1352),
+    by Pierre Roux).
+  + definition `Instances.natmul_itv` and `IntItv.exprz`
+  + lemmas `Instances.num_spec_exprz` and `Instances.nat_spec_factorial`
+  + instances `Instances.exprz_inum` and `Instances.facorial_inum`
+    ([#1368](https://github.com/math-comp/math-comp/pull/1368),
+    by Pierre Roux).
+
+- in `rat.v`
+  + definition `inIntSpan` (from `intdiv.v`)
+  + lemmas `Qint_dvdz`, `Qnat_dvd`, `size_rat_int_poly`,
+    `rat_poly_scale`, `dvdp_rat_int`, `dvdpP_rat_int`,
+    `irreductible_rat_int`, `solve_QInt_span`, `dec_Qint_span`,
+    `eisenstein_crit` (from `intdiv.v`)
+  + lemmas `floorErat`, `ceilErat`
+    ([#1381](https://github.com/math-comp/math-comp/pull/1381),
+    by Pierre Roux and Kazuhiko Sakaguchi).
+
+- in `ssrfun.v`
+  + lemmas `inr_inj`, `inl_inj`
+    ([#1397](https://github.com/math-comp/math-comp/pull/1397),
+    by Reynald Affeldt).
+  + lemmas `taggedK`, `swap_pair` and `swap_pairK`
+    ([#931](https://github.com/math-comp/math-comp/pull/931),
+    by Erik Martin-Dorel and Cyril Cohen).
+
+- in `bigop.v`
+  + lemmas `big_sup_cond`, `big_sub`, `gt0_prodn_seq` and `gt0_prodn`
+    ([#931](https://github.com/math-comp/math-comp/pull/931),
+    by Pierre Pomeret-Coquot and Erik Martin-Dorel, with help of Cyril Cohen).
+
+- in `eqtype.v`
+  + definitions `etagged`, `untag`, `tagged_with`, `tag_with` and `untag_with`
+  + lemmas `eq_from_Tagged`, `etaggedK`, `untagE`, `untag_dflt`, `untag_cst`,
+    `tag_withK`, `untag_withK`, `tag_with_bij` and `untag_with_bij`
+    ([#931](https://github.com/math-comp/math-comp/pull/931),
+    by Pierre Pomeret-Coquot and Erik Martin-Dorel, with help of Cyril Cohen).
+
+- in `finfun.v`
+  + definition `fprod` (a record with projections `fprod_fun` and `fprod_prod`)
+  + definitions `fun_of_fprod`, `fprod_of_fun`,
+    `dffun_of_fprod`, `fprod_of_dffun`,
+    `to_family_tagged_with` and `of_family_tagged_with`
+  + lemmas `tag_fprod_fun`, `fprodK`, `fprodE`, `fprodP`, `etaggedE`,
+    `dffun_of_fprodK`, `fprod_of_dffunK`,
+    `dffun_of_fprod_bij`, `fprod_of_dffun_bij`,
+    `to_family_tagged_withK`, `of_family_tagged_withK`,
+    `to_family_tagged_with_bij` and `of_family_tagged_with_bij`
+    ([#931](https://github.com/math-comp/math-comp/pull/931),
+    by Pierre Pomeret-Coquot and Erik Martin-Dorel, with help of Cyril Cohen).
+
+- in `finset.v`
+  + definitions `unset1`, `fprod_pick` and `ftagged`
+  + lemmas `set0_Nexists`, `eq0_subset`, `subsetC_disjoint`,
+    `pick_set1`, `set1K`, `omap_unset1K`, `unset10`, `unset1N1`, `unset1K`,
+    `big_cards1`, `card_fprod`, `ftaggedE`, `big_tag_cond`, `big_tag`,
+    `big_fprod_dep` and `big_fprod`
+    ([#931](https://github.com/math-comp/math-comp/pull/931),
+    by Pierre Pomeret-Coquot and Erik Martin-Dorel, with help of Cyril Cohen).
+
+- in `fintype.v`
+  + lemmas `existsbWl` and `existsbWr`
+    ([#931](https://github.com/math-comp/math-comp/pull/931),
+    by Pierre Pomeret-Coquot and Erik Martin-Dorel, with review of Cyril Cohen).
+
+### Changed
+
+- in `ssralg.v`
+  + `{linear U -> V | s}` and `{linear U -> V}`, generalized from modules to semimodules, now represent semilinear and linear functions
+  + `{scalar U}`, generalized from rings and modules to semirings and semimodules, now represents semiscalar and scalar functions
+  + `{lrmorphism A -> B | s}` and `{lrmorphism A -> B}`, generalized from algebras to semialgebras, now represent semialgebra and algebra morphisms
+  + Mixins `Zmodule_isLmodule`, `Lmodule_isLalgebra`, `Lalgebra_isAlgebra`, `isSubLmodule` are now factories
+  + `GRing.scale`, `scalerA`, `scale0r`, `scale1r`, `scalerDr`, `scalerDl`, `scaler0`, `scaler_nat`, `scalerMnl`, `scalerMnr`, `scaler_suml`, `scaler_sumr`, `scaler_closed`, `scale_fun`, `raddfZnat`, `scalable_for`, `isScalable`, `linear_for`, `rpredZnat`, `submodClosed` generalized to `lSemiModType`
+  + `linear0`, `linearD`, `linearMn`, `linear_sum`, `linearZ_LR`, `linearP`, `linearZ`, `linearZZ`, `linearPZ`, `can2_scalable`, `can2_linear`, `scalarZ`, `scalarP` generalized to `lSemiModType` and semilinear functions
+  + `scalerAl`, `mulr_algl`, `in_alg`, `subalgClosed` generalized to `lSemiAlgType`
+  + `rmorph_alg` generalized to `lSemiAlgType` and semialgebra morphisms
+    ([#1125](https://github.com/math-comp/math-comp/pull/1125),
+    by Kazuhiko Sakaguchi).
+  + `Nmodule_isNzSemiRing` is now a factory
+  + `char`, `mulr_sumr`, `mulrnAl`, `mulrnAr`, `mulr_natl`,
+    `mulr_natr`, `natrD`, `natr1`, `nat1r`, `natr_sum`, `natrM`,
+    `expr0`, `expr1`, `expr2`, `exprS`, `expr0n`, `expr1n`, `exprD`,
+    `exprSr`, `expr_sum`, `commr_sym`, `commr_refl`, `commr0`,
+    `commr1`, `commrD`, `commr_sum`, `commrMn`, `commrM`,
+    `commr_prod`, `commr_nat`, `commrX`, `exprMn_comm`, `exprMn_n`,
+    `exprM`, `exprAC`, `expr_mod`, `expr_dvd`, `natrX`, `mulrI_eq0`,
+    `lreg1`, `lregM`, `lregMl`, `rregMr`, `lregX`, `iter_mulr`,
+    `iter_mulr_1`, `prodr_const`, `prodr_const_nat`, `prodrXr`,
+    `prodrM_comm`, `prodrMl_comm`, `prodrMr_comm`, `prodrMn`,
+    `prodrMn_const`, `natr_prod`, `exprDn_comm`, `exprD1n`, `sqrrD1`,
+    `Frobenius_aut`, `mulr_2closed`, `mulr_closed`, `semiring_closed`,
+    `semiring_closedD`, `semiring_closedM`, `rev_prodr`, `mulIr_eq0`,
+    `rreg1`, `rregM`, `revrX`, `rregX`, `mull_fun`, `mulr_fun`,
+    `mul_fun`, `raddfMnat`, `mull_fun_is_semi_additive`,
+    `mulr_fun_is_semi_additive`, `multiplicative`, `isMultiplicative`,
+    `RMorphism.type`, `rmorph0`, `rmorphD`, `rmorphMn`, `rmorph_sum`,
+    `rmorphismMP`, `rmorph1`, `rmorphM`, `rmorph_prod`, `rmorphXn`,
+    `rmorph_nat`, `rmorph_char`, `rmorph_eq_nat`, `rmorph_eq1`,
+    `can2_rmorphism`, `idfun_is_multiplicative`,
+    `comp_is_multiplicative`, `isMul2Closed`, `isMul2Closed`,
+    `mulr2Closed`, `mulrClosed`, `semiring2Closed`, `semiringClosed`,
+    `isMulClosed`, `isSemiringClosed`, `rpred1M`, `rpred_prod`,
+    `rpredX`, `rpred_nat`, `semiringClosedP`, `val1`, `valM`, `valM1`,
+    `ffun_one`, `ffun_mul`, `ffun_mulA`, `ffun_mul_1l`, `ffun_mul_1r`,
+    `ffun_mul_addl`, `ffun_mul_addr`, `ffun_mul_0l`, `ffun_mul_0r`,
+    `mul_pair`, `pair_mulA`, `pair_mul1l`, `pair_mul1r`, `pair_mulDl`,
+    `pair_mulDr`, `pair_mul0r`, `pair_mulr0`, `fst_is_multiplicative`,
+    `snd_is_multiplicative` generalized to `pzSemiRingType`
+  + `mulrN`, `mulNr`, `mulrNN`, `mulN1r`, `mulrN1`, `mulrBl`,
+    `mulrBr`, `natrB`, `commrN`, `commrN1`, `commrB`, `commr_sign`,
+    `signr_add`, `mulr_sign`, `signr_addb`, `signrE`, `signrN`,
+    `mulr_signM`, `exprNn`, `sqrrN`, `sqrr_sign`, `signrMK`,
+    `mulrI0_lreg`, `lregN`, `lreg_sign`, `prodrN`, `exprBn_comm`,
+    `subrXX_comm`, `subrX1`, `sqrrB1`, `subr_sqr_1`, `smulr_closed`,
+    `subring_closed`, `smulr_closedM`, `smulr_closedN`,
+    `subring_closedB`, `subring_closedM`, `subring_closed_semi`,
+    `mulIr0_rreg`, `rregN`, `Zmodule_isLmodule`, `lmodType`,
+    `scale0r`, `scaler0`, `scaleNr`, `scaleN1r`, `scalerN`,
+    `scalerBl`, `scalerBr`, `scaler_nat`, `scaler_sign`, `signrZK`,
+    `scalerMnl`, `scalerMnr`, `scaler_suml`, `scaler_sumr`,
+    `scalr_closed`, `linear_closed`, `submod_closed`,
+    `linear_closedB`, `submod_closedB`, `submod_closedZ`, `mulr_algl`,
+    `subalg_closed`, `subalg_closedZ`, `subalg_closedBM`, `scale_fun`,
+    `in_alg`, `raddfMsign`, `raddfZnat`, `raddfZsign`, `rmorphN`,
+    `rmorphB`, `rmorphMNn`, `rmorphMsign`, `in_alg_is_additive`,
+    `in_alg_is_rmorphism`, `isLaw`, `Law.type`, `N1op`, `compN1op`,
+    `scalable_for`, `isScalable`, `Linear.type`, `linear_for`,
+    `additive_linear`, `scalable_linear`, `isLinear`, `scalable`,
+    `linear`, `scalar`, `linear0`, `linearN`, `linearD`, `linearB`,
+    `linearMn`, `linearMNn`, `linear_sum`, `linearZ_LR`, `linearP`,
+    `linearZ`, `linearZZ`, `linearPZ`, `can2_scalable`, `can2_linear`,
+    `scalarZ`, `scalarP`, `idfun_is_scalable`, `opp_is_scalable`,
+    `comp_is_scalable`, `null_fun_is_scalable`, `add_fun_is_scalable`,
+    `sub_fun_is_scalable`, `opp_fun_is_scalable`,
+    `mulr_fun_is_scalable`, `LRMorphism.type`, `rmorph_alg`,
+    `Lalgebra_isAlgebra`, `Lalgebra_isComAlgebra`, `scaleAr`,
+    `lalgebra_is_algebra`, `comAlgType`, `scalerCA`, `mulr_algr`,
+    `comm_alg`, `exprZn`, `scaler_prod`, `scaler_prodl`,
+    `scaler_prodr`, `mull_fun_is_scalable`, `integral_domain_axiom`,
+    `closed_field_axiom`, `lalgMixin`, `algMixin`, `isScaleClosed`,
+    `smulClosed`, `subringClosed`, `submodClosed`, `subalgClosed`,
+    `divalgClosed`, `isSmulClosed`, `isSubringClosed`,
+    `isSubmodClosed`, `isSubalgClosed`, `rpredMsign`, `rpredN1`,
+    `rpred_sign`, `subringClosedP`, `rpredZsign`, `rpredZnat`,
+    `submodClosedP`, `subalgClosedP`, `SubZmodule_isSubLmodule`,
+    `subLalgType`, `SubNzRing_SubLmodule_isSubLalgebra`, `subAlgType`,
+    `SubLalgebra_isSubAlgebra`, `SubChoice_isSubLalgebra`,
+    `SubChoice_isSubAlgebra`, `ffun_scale`, `ffun_scaleA`,
+    `ffun_scale1`, `ffun_scale_addr`, `ffun_scale_addl`, `scale_pair`,
+    `pair_scaleA`, `pair_scale1`, `pair_scaleDr`, `pair_scaleDl`,
+    `fst_is_scalable`, `snd_is_scalable`, `pair_scaleAl` generalized
+    to `pzRingType`
+  + `exprMn`, `prodrXl`, `prodr_undup_exp_count`, `prodrMl`,
+    `prodrMr`, `exprDn`, `sqrrD` generalized to `comPzSemiRingType`
+  + `exprBn`, `subrXX`, `sqrrB`, `subr_sqr`, `subr_sqrDB`,
+    `scale_is_scalable`, `scale_fun_is_scalable`, `comRingMixin`,
+    `ffun_mulC`, `pair_mulC` generalized to `comPzRingType`
+    ([#1319](https://github.com/math-comp/math-comp/pull/1319),
+     by Tragicus).
+
+- in `archimedean.v`
+  + the definition of archimedean structures now include `Num.floor` and `Num.ceil`
+  + as its consequence, `Num.ceil x = - Num.floor (- x)` does not hold definitionally anymore (use lemma `ceilNfloor` instead)
+    ([#1250](https://github.com/math-comp/math-comp/pull/1250),
+    by Kazuhiko Sakaguchi).
+
+- in `bigop.v`
+  + change the implicit arguments of lemmas `big_cat_nat_idem` and
+    `big_cat_nat`
+    ([#1261](https://github.com/math-comp/math-comp/pull/1261),
+    by Kimaya Bedarkar).
+  + change the implicit arguments of lemmas `leq_prod`,
+    `prodn_cond_gt0` and `prodn_gt0`
+    ([#931](https://github.com/math-comp/math-comp/pull/931),
+    by Erik Martin-Dorel).
+
+- in `sesquilinear.v`
+  + notations `_ ^ _` and `_ ^t _` are now in the dedicated scope `sesquilinear_scope`.
+  ([#1314](https://github.com/math-comp/math-comp/pull/1314),
+  by Cyril Cohen).
+  + move notation ``` ``_ ``` to `spectral.v` and make it local
+    ([#1363](https://github.com/math-comp/math-comp/pull/1363),
+    by Reynald Affeldt).
+
+- in `spectral.v`
+  + notations `_ ^t*` is now in the dedicated scope `sesquilinear_scope`.
+  ([#1314](https://github.com/math-comp/math-comp/pull/1314),
+  by Cyril Cohen).
+
+- in `ssrint.v`
+  + `mulrzAl`, `mulrzAr`, `mulrzl`, `mulrzr`, `mulNrNz`, `mulrbz`,
+    `intrN`, `intrD`, `intrB`, `intrM`, `intmul1_is_multiplicative`,
+    `mulr2z`, `scaler_int`, `scalerMzl`, `scalerMzr`, `rmorphMz`,
+    `rmorph_int`, `linearMn`, `commrMz`, `commr_int`, `sumMz`,
+    `prodMz`, `intr_sign`, `rpred_int`, `rpredZint` generalized to
+    `pzRingType`
+    ([#1319](https://github.com/math-comp/math-comp/pull/1319),
+     by Tragicus).
+  + lemmas `exprz_ge0`, `exprz_gt0`, `exprz_gte0`, `ler_wpiXz2l`,
+    `ler_wpeXz2l`, `pexprz_eq1` and `ler_wpXz2r` generalized from
+    `realFieldType` to `numDomainType`
+    ([#1367](https://github.com/math-comp/math-comp/pull/1367),
+    by Pierre Roux).
+
+- in `ssrnum.v`
+  + Mixin `Zmodule_isNormed` is now a factory building a
+    `SemiNormedZmodule` and a `SemiNormedZmodule_isPositiveDefinite`.
+    ([#1333](https://github.com/math-comp/math-comp/pull/1333),
+    by  Alessandro Bruni and Cyril Cohen).
+  + Generalized lemmas from the theory of `normedZmodType` to
+    `semiNormedZmodType`: `normr0`, `distrC`, `normr_id`, and
+    `normr_ge0`, `normr_real`, `ler_norm_sum`, `ler_normB`,
+    `ler_distD`, `lerB_normD`, `lerB_dist`, `ler_dist_dist`,
+    `ler_dist_normD`, `ler_nnorml`, `ltr_nnorml`, `lter_nnormr`.
+    ([#1333](https://github.com/math-comp/math-comp/pull/1333),
+    by Alessandro Bruni and Cyril Cohen).
+
+- in `ssrnat.v`
+  + lemma `eq_binP` changed from Stdlib's `N.eqb` to new `N_eqb`
+  + eqtype instance on `nat` changed from Stdlib's `N.eqb`
+    to new `N_eqb`
+    ([#1343](https://github.com/math-comp/math-comp/pull/1343),
+    by Pierre Roux).
+
+- in `rat.v`
+  + `Num.floor`, `Num.ceil` and `Num.truncn` on `rat` now compute
+    ([#1381](https://github.com/math-comp/math-comp/pull/1381), by
+    Pierre Roux and Kazuhiko Sakaguchi).
+
+- in `matrix.v`
+  + Definitions `mulmx`, `perm_mx`, `tperm_mx`, `is_perm_mx`, `pid_mx`,
+    `lift0_perm`, `lift0_mx`, `comm_mx`, `comm_mxb` generalized to
+    `pzSemiRingType`
+  + Definitions `copid_mx`, `lin1_mx`, `lin_mx`, `mulmxr`, `lin_mulmxr`,
+    `mxtrace`, `determinant`, `cofactor`, `adjugate`, `Vandermonde` generalized
+    to `pzRingType`
+  + Definition `lin_mul_row` generalized to `comPzRingType`
+  + The `pzSemiRingType` and `pzRingType` instances on square matrices
+    generalized to the case where the size is potentially zero
+  + The `lmodType` instance on matrices generalized to `pzRingType`
+  + The ring morphism instances on `scalar_mx` and `map_mx` generalized to
+    `pzSemiRingType` and the case where the size is potentially zero
+  + The linear function instances on `swizzle_mx`, `trmx`, `row`, `col`, `row'`,
+    `col'`, `mxsub`, `row_perm`, `col_perm`, `xrow`, `xcol`, `lsubmx`, `rsubmx`,
+    `usubmx`, `dsubmx`, `vec_mx`, `mxvec`, `diag_mx`, `mxtrace` generalized to
+    `pzRingType`
+  + The additive function instances on `mulmx`, `mulmxr`, `lin_mulmxr`
+    generalized to `pzRingType`
+  + The linear function instances on `mulmx`, `lin_mulmx`, `lin_mul_row`
+    generalized to `comPzRingType`
+  + The `semiringClosed` instance on `mxOver` generalized to `pzRingType`
+  + Lemmas `trmx_delta`, `delta_mx_lshift`, `delta_mx_rshift`,
+    `delta_mx_ushift`, `delta_mx_dshift`, `vec_mx_delta`, `mxvec_delta`,
+    `trmx1`, `row1`, `col1`, `mulmxA`, `mul0mx`, `mulmx0`, `mulmxDl`, `mulmxDr`,
+    `mulmx_suml`, `mulmx_sumr`, `rowE`, `colE`, `mul_rVP`, `row_mul`,
+    `mxsub_mul`, `mul_rowsub_mx`, `mulmx_colsub`, `mul_delta_mx_cond`,
+    `mul_delta_mx`, `mul_delta_mx_0`, `mul_diag_mx`, `mul_mx_diag`,
+    `mulmx_diag`, `scalar_mxM`, `mul1mx`, `mulmx1`, `rowsubE`, `mul_col_perm`,
+    `mul_row_perm`, `mul_xcol`, `col_permE`, `row_permE`, `xcolE`, `xrowE`,
+    `perm_mxEsub`, `tperm_mxEsub`, `tr_perm_mx`, `tr_tperm_mx`, `perm_mx1`,
+    `perm_mxM`, `is_perm_mxP`, `perm_mx_is_perm`, `is_perm_mx1`, `is_perm_mxMl`,
+    `is_perm_mx_tr`, `is_perm_mxMr`, `pid_mx_0`, `pid_mx_1`, `pid_mx_row`,
+    `pid_mx_col`, `pid_mx_block`, `tr_pid_mx`, `pid_mx_minv`, `pid_mx_minh`,
+    `mul_pid_mx`, `pid_mx_id`, `pid_mxErow`, `pid_mxEcol`, `mul_mx_row`,
+    `mul_col_mx`, `mul_row_col`, `mul_col_row`, `mul_row_block`,
+    `mul_block_col`, `mulmx_block`, `mulmx_lsub`, `mulmx_rsub`, `mul_usub_mx`,
+    `mul_dsub_mx`, `mxtrace1`, `mulmxE`, `idmxE`, `lift0_perm0`,
+    `lift0_perm_lift`, `lift0_permK`, `lift0_perm_eq0`, `lift0_mx_perm`,
+    `lift0_mx_is_perm`, `exp_block_diag_mx`, `trmx_mul_rev`, `map_mxM`,
+    `map_delta_mx`, `map_diag_mx`, `map_scalar_mx`, `map_mx1`, `map_perm_mx`,
+    `map_tperm_mx`, `map_pid_mx`, `trace_map_mx`, `comm_mx_sym`, `comm_mx_refl`,
+    `comm_mx0`, `comm0mx`, `comm_mx1`, `comm1mx`, `comm_mxD`, `comm_mxM`,
+    `comm_mx_sum`, `comm_mxP`, `all_comm_mxP`, `all_comm_mx1`, `all_comm_mx2P`,
+    `all_comm_mx_cons`, `comm_mxE` generalized to `pzSemiRingType`
+  + Lemmas `trmx_mul`, `diag_mxC`, `diag_mx_comm`, `scalar_mxC`,
+    `comm_mx_scalar`, `comm_scalar_mx`, `mxtrace_mulC` generalized to
+    `comPzSemiRingType`
+  + Lemams `scalemx_const`, `matrix_sum_delta`, `row_sum_delta`, `scale_row_mx`,
+    `scale_col_mx`, `scale_block_mx`, `diag_mx_sum_delta`, `row_diag_mx`,
+    `scale_scalar_mx`, `scalemx1`, `scalar_mx_sum_delta`, `mx1_sum_delta`,
+    `mulmxN`, `mulNmx`, `mulmxBl`, `mulmxBr`, `scalemxAl`, `mulmx_sum_row`,
+    `mul_scalar_mx`, `mul_copid_mx_pid`, `mul_pid_mx_copid`, `copid_mx_id`,
+    `mul_rV_lin1`, `mul_rV_lin`, `mul_vec_lin`, `mx_rV_lin`, `mx_vec_lin`,
+    `mxtraceZ`, `map_mxZ`, `det_map_mx`, `cofactor_map_mx`, `map_mx_adj`,
+    `map_copid_mx`, `map_lin1_mx`, `map_lin_mx`, `comm_mxN`, `comm_mxN1`,
+    `comm_mxB`, `mul_mxrow`, `mul_submxrow`, `mxcol_mul`, `submxcol_mul`,
+    `mul_mxrow_mxcol`, `mul_mxcol_mxrow`, `mul_mxrow_mxblock`,
+    `mul_mxblock_mxrow`, `mul_mxblock`, `mxtrace_mxblock`, `mxdiagZ`,
+    `diag_mxrow`, `mxtrace_mxdiag`, `mul_mxdiag_mxcol`, `mul_mxrow_mxdiag`,
+    `mul_mxblock_mxdiag`, `mul_mxdiag_mxblock` generalized to `pzRingType`
+  + Lemmas `scalemxAr`, `mul_vec_lin_row`, `mxvec_dotmul`, `mul_mx_scalar`,
+    `determinant_multilinear`, `determinant_alternate`, `det_tr`, `det_perm`,
+    `det1`, `det_mx00`, `detZ`, `det0`, `det_scalar`, `det_scalar1`, `det_mx11`,
+    `det_mulmx`, `detM`, `expand_cofactor`, `expand_det_row`, `cofactor_tr`,
+    `cofactorZ`, `expand_det_col`, `trmx_adj`, `adjZ`, `mul_mx_adj`,
+    `mul_adj_mx`, `adj1`, `mulmx1C`, `det_ublock`, `det_lblock`, `det_trig`,
+    `det_diag`, `mxOver_scalar`, `mxOver_scalarE`, `mxOverZ`, `mxOver_diag`,
+    `mxOver_diagE`, `mxOverM`, `det_Vandermonde` generalized to `comPzRingType`
+    ([#1385](https://github.com/math-comp/math-comp/pull/1385),
+    by Kazuhiko Sakaguchi).
+
+### Renamed
+
+- in `archimedean.v`
+  + `NumDomain_isArchimedean.Build` -> `NumDomain_hasTruncn.Build`
+    ([#1250](https://github.com/math-comp/math-comp/pull/1250),
+    by Kazuhiko Sakaguchi).
+  + `real_ge_floor` -> `real_floor_le`
+  + `real_lt_succ_floor` -> `real_floorD1_gt`
+  + `real_gt_pred_ceil` -> `real_ceilB1_lt`
+  + `real_le_ceil` -> `real_ceil_ge`
+  + `ge_floor` -> `floor_le_tmp`
+  + `lt_succ_floor` -> `floorD1_gt`
+  + `gt_pred_ceil` -> `ceilB1_lt`
+  + `le_ceil` -> `ceil_ge`
+  + `floor_le` -> `le_floor`
+  + `ceil_le` -> `le_ceil_tmp`
+  + `natrE` -> `natrEtruncn`
+    ([#1359](https://github.com/math-comp/math-comp/pull/1359),
+    by Pierre Roux).
+
+- in `ssrfun.v`
+	+ `eqfun` now has type
+			`forall [B] [A : B -> Type] (f g : forall b, A b), Prop`
+	+ `eqrel` now has type
+			`forall [C] [B : C -> Type] [A : forall c, B c -> Type]
+				(f g : forall c b, A c b), Prop`
+    (`#1300 <https://github.com/math-comp/math-comp/pull/1300>`_,
+    by Tragicus).
+
+- in `ssralg.v`
+  + `Nmodule_isSemiRing` -> `Nmodule_isNzSemiRing`
+  + `isSemiRing` -> `isNzSemiRing`
+  + `Zmodule_isRing` -> `Zmodule_isNzRing`
+  + `isRing` -> `isNzRing`
+  + `SemiRing_hasCommutativeMul` -> `SemiRing_hasCommutativeMul`
+  + `Nmodule_isComSemiRing` -> `Nmodule_isComNzSemiRing`
+  + `Ring_hasCommutativeMul` -> `NzRing_hasCommutativeMul`
+  + `Zmodule_isComRing` -> `Zmodule_isComNzRing`
+  + `Ring_hasMulInverse` -> `NzRing_hasMulInverse`
+  + `ComRing_hasMulInverse` -> `ComNzRing_hasMulInverse`
+  + `ComRing_isField` -> `ComNzRing_isField`
+  + `isSubSemiRing` -> `isSubNzSemiRing`
+  + `SubNmodule_isSubSemiRing` -> `SubNmodule_isSubNzSemiRing`
+  + `SubSemiRing_isSubComSemiRing` -> `SubNzSemiRing_isSubComNzSemiRing`
+  + `SubZmodule_isSubRing` -> `SubZmodule_isSubNzRing`
+  + `SubRing_isSubComRing` -> `SubNzRing_isSubComNzRing`
+  + `SubRing_SubLmodule_isSubLalgebra` -> `SubNzRing_SubLmodule_isSubLalgebra`
+  + `SubChoice_isSubSemiRing` -> `SubChoice_isSubNzSemiRing`
+  + `SubChoice_isSubComSemiRing` -> `SubChoice_isSubComNzSemiRing`
+  + `SubChoice_isSubRing` -> `SubChoice_isSubNzRing`
+  + `SubChoice_isSubComRing` -> `SubChoice_isSubComNzRing`
+  + `semiRingType` -> `nzSemiRingType`
+  + `ringType` -> `nzRingType`
+  + `comSemiRingType` -> `comNzSemiRingType`
+  + `comRingType` -> `comNzRingType`
+  + `subSemiRingType` -> `subNzSemiRingType`
+  + `subComSemiRingType` -> `subComNzSemiRingType`
+  + `subRingType` -> `subNzRingType`
+  + ``subComNzRingType` -> `subComNzRingType`
+  ([#1306](https://github.com/math-comp/math-comp/pull/1306),
+  by Quentin Vermande).
+  + `char` -> `pchar`
+  + `[char _]` -> `[pchar _]`
+  + `has_char0` -> `has_pchar0`
+  + `Frobenius_aut` -> `pFrobenius_aut`
+  + `charf0` -> `pcharf0`
+  + `charf_prime` -> `pcharf_prime`
+  + `mulrn_char` -> `mulrn_pchar`
+  + `natr_mod_char` -> `natr_mod_pchar`
+  + `dvdn_charf` -> `dvdn_pcharf`
+  + `charf_eq` -> `pcharf_eq`
+  + `bin_lt_charf_0` -> `bin_lt_pcharf_0`
+  + `Frobenius_autE` -> `pFrobenius_autE`
+  + `Frobenius_aut0` -> `pFrobenius_aut0`
+  + `Frobenius_aut1` -> `pFrobenius_aut1`
+  + `Frobenius_autMn` -> `pFrobenius_autMn`
+  + `Frobenius_aut_nat` -> `pFrobenius_aut_nat`
+  + `Frobenius_autM_comm` -> `pFrobenius_autM_comm`
+  + `Frobenius_autX` -> `pFrobenius_autX`
+  + `addrr_char2` -> `addrr_pchar2`
+  + `Frobenius_autN` -> `pFrobenius_autN`
+  + `Frobenius_autB_comm` -> `pFrobenius_autB_comm`
+  + `exprNn_char` -> `exprNn_pchar`
+  + `oppr_char2` -> `oppr_pchar2`
+  + `subr_char2` -> `subr_pchar2`
+  + `addrK_char2` -> `addrK_pchar2`
+  + `rmorph_char` -> `rmorph_pchar`
+  + `Frobenius_aut_is_semi_additive` -> `pFrobenius_aut_is_semi_additive`
+  + `Frobenius_aut_is_multiplicative` -> `pFrobenius_aut_is_multiplicative`
+  + `exprDn_char` -> `exprDn_pchar`
+  + `natf_neq0` -> `natf_neq0_pchar`
+  + `natf0_char` -> `natf0_pchar`
+  + `charf'_nat` -> `pcharf'_nat`
+  + `charf0P` -> `pcharf0P`
+  + `char0_natf_div` -> `pchar0_natf_div`
+  + `fmorph_char` -> `fmorph_pchar`
+  + `char_lalg` -> `pchar_lalg`
+
+- in `ring_quotient.v`
+  + `isRingQuotient` -> `isNzRingQuotient`
+  + `ringQuotType` -> `nzRingQuotType`
+  ([#1306](https://github.com/math-comp/math-comp/pull/1306),
+  by Quentin Vermande).
+
+- in `finalg.v`
+  + `isRing` -> `isNzRing`
+  + `finSemiRingType`-> `finNzSemiRingType`
+  + `finRingType` -> `finNzRingType`
+  + `finComSemiRingType` -> `finComNzSemiRingType`
+  + `finComRingType` -> `finComNzRingType`
+  + `card_finRing_gt1` -> `card_finNzRing_gt1`
+  ([#1306](https://github.com/math-comp/math-comp/pull/1306),
+  by Quentin Vermande).
+
+- in `countalg.v`
+  + `countSemiRingType`-> `countNzSemiRingType`
+  + `countRingType` -> `countNzRingType`
+  + `countComSemiRingType` -> `countComNzSemiRingType`
+  + `countComRingType` -> `countComNzRingType`
+  ([#1306](https://github.com/math-comp/math-comp/pull/1306),
+  by Quentin Vermande).
+
+- in `intdiv.v`
+  + `dvdz_charf` -> `dvdz_pcharf`
+
+- in `poly.v`
+  + `char_poly` -> `pchar_poly`
+  + `prim_root_charF` -> `prim_root_pcharF`
+  + `char_prim_root` -> `pchar_prim_root`
+  + `size_opp` -> `size_polyN`
+  + `size_add` -> `size_polyD`
+  + `size_addl` -> `size_polyDl`
+  + `size_mul_leq` -> `size_polyM_leq`
+  ([#1315](https://github.com/math-comp/math-comp/pull/1315),
+  by Reynald Affeldt).
+
+- in `qpoly.v`
+  + `char_qpoly` -> `pchar_qpoly`
+
+- in `sesquilinear.v`
+  + `is_symplectic` -> `is_psymplectic`
+  + `is_orthogonal` -> `is_porthogonal`
+
+- in `ssrint.v`
+  + `Frobenius_autMz` -> `pFrobenius_autMz`
+  + `Frobenius_aut_int` -> `pFrobenius_aut_int`
+
+- in `ssrnum.v`
+  + `char_num` -> `pchar_num`
+
+- in `zmodp.v`
+  + `char_Zp` -> `pchar_Zp`
+  + `char_Fp` -> `pchar_Fp`
+  + `char_Fp_0` -> `pchar_Fp_0`
+
+- in `classfun.v`
+  + `algC'G` -> `algC'G_pchar`
+
+- in `mxabelem.v`
+  + `rfix_pgroup_char` -> `rfix_pgroup_pchar`
+  + `pcore_sub_rstab_mxsimple` -> `pcore_sub_rstab_mxsimple_pchar`
+  + `pcore_sub_rker_mx_irr` -> `pcore_sub_rker_mx_irr_pchar`
+  + `pcore_faithful_mx_irr` -> `pcore_faithful_mx_irr_pchar`
+  + `extraspecial_repr_structure` -> `extraspecial_repr_structure_pchar`
+  + `faithful_repr_extraspecial` -> `faithful_repr_extraspecial_pchar`
+
+- in `mxrepresentation.v`
+  + `mx_Maschke` -> `mx_Maschke_pchar`
+  + `rsim_regular_submod` -> `rsim_regular_submod_pchar`
+  + `irr_mx_sum` -> `irr_mx_sum_pchar`
+  + `Wedderburn_sum` -> `Wedderburn_sum_pchar`
+  + `Wedderburn_sum_id` -> `Wedderburn_sum_id_pchar`
+  + `Wedderburn_is_id` -> `Wedderburn_is_id_pchar`
+  + `Wedderburn_closed` -> `Wedderburn_closed_pchar`
+  + `Wedderburn_is_ring` -> `Wedderburn_is_ring_pchar`
+  + `Wedderburn_min_ideal` -> `Wedderburn_min_ideal_pchar`
+  + `not_rsim_op0` -> `not_rsim_op0_pchar`
+  + `rsim_irr_comp` -> `rsim_irr_comp_pchar`
+  + `irr_comp'_op0` -> `irr_comp'_op0_pchar`
+  + `irr_comp_envelop` -> `irr_comp_envelop_pchar`
+  + `ker_irr_comp_op` -> `ker_irr_comp_op_pchar`
+  + `regular_op_inj` -> `regular_op_inj_pchar`
+  + `rank_irr_comp` -> `rank_irr_comp_pchar`
+  + `irr_comp_rsim` -> `irr_comp_rsim_pchar`
+  + `irr_reprK` -> `irr_reprK_pchar`
+  + `irr_repr'_op0` -> `irr_repr'_op0_pchar`
+  + `op_Wedderburn_id` -> `op_Wedderburn_id_pchar`
+  + `irr_comp_id` -> `irr_comp_id_pchar`
+  + `rank_Wedderburn_subring` -> `rank_Wedderburn_subring_pchar`
+  + `sum_irr_degree` -> `sum_irr_degree_pchar`
+  + `irr_mx_mult` -> `irr_mx_mult_pchar`
+  + `mxtrace_regular` -> `mxtrace_regular_pchar`
+  + `linear_irr_comp` -> `linear_irr_comp_pchar`
+  + `Wedderburn_subring_center` -> `Wedderburn_subring_center_pchar`
+  + `Wedderburn_center` -> `Wedderburn_center_pchar`
+  + `card_irr` -> `card_irr_pchar`
+  + `cycle_repr_structure` -> `cycle_repr_structure_pchar`
+  + `splitting_cyclic_primitive_root` -> `splitting_cyclic_primitive_root_pchar`
+
+- in `algC.v`
+  + `Cchar` -> `Cpchar`
+
+- in `finfield.v`
+  + `finCharP` -> `finPcharP`
+  + `card_finCharP` -> `card_finPcharP`
+  + `PrimeCharType` -> `pPrimeCharType`
+  + `primeChar_scale` -> `pprimeChar_scale`
+  + `primeChar_scaleA` -> `pprimeChar_scaleA`
+  + `primeChar_scale1` -> `pprimeChar_scale1`
+  + `primeChar_scaleDr` -> `pprimeChar_scaleDr`
+  + `primeChar_scaleDl` -> `pprimeChar_scaleDl`
+  + `primeChar_scaleAl` -> `pprimeChar_scaleAl`
+  + `primeChar_scaleAr` -> `pprimeChar_scaleAr`
+  + `primeChar_abelem` -> `pprimeChar_abelem`
+  + `primeChar_pgroup` -> `pprimeChar_pgroup`
+  + `order_primeChar` -> `order_pprimeChar`
+  + `card_primeChar` -> `card_pprimeChar`
+  + `primeChar_vectAxiom` -> `pprimeChar_vectAxiom`
+  + `primeChar_dimf` -> `pprimeChar_dimf`
+  + `PrimePowerField` -> pPrimePowerField`
+  + `FinDomainSplittingFieldType` -> `FinDomainSplittingFieldType_pchar`
+
+- in `separable.v`
+  + `char0_PET` -> `pchar0_PET`
+  + `separablePn` -> `separablePn_pchar`
+  + `separable_exponent` -> `separable_exponent_pchar`
+  + `charf0_separable` -> `pcharf0_separable`
+  + `charf_p_separable` -> `pcharf_p_separable`
+  + `charf_n_separable` -> `pcharf_n_separable`
+  + `purely_inseparable_elementP` -> `purely_inseparable_elementP_pchar`
+
+- in `abelian.v`
+	+ `fin_lmod_char_abelem` -> `fin_lmod_pchar_abelem`
+	+ `fin_lmod_char_abelem` -> `fin_lmod_pchar_abelem`
+    (`#1311 <https://github.com/coq/stdlib/pull/1311>`_,
+    by Tragicus).
+
+### Removed
+
+- in `ssralg.v`
+  + mixin `NzSemiRing_hasCommutativeMul`
+  + factory `NzRing_hasCommutativeMul`
+    ([#1319](https://github.com/math-comp/math-comp/pull/1319),
+    by Tragicus).
+
+- in `ssrnat.v`
+  + requirements for `BinNat`, `Ndec` and `Ring` from Stdlib. You may
+    need to add some explicit requirements, the most common one being
+    `From Coq Require Setoid`, but we also observed `BinPos`, `Pnat`,
+    `Ring_theory`, `RelationClasses`, `Wf_nat` and `List`
+  + lemmas `nat_of_add_bin`, `nat_of_mul_bin`, `nat_of_exp_bin`,
+    `nat_semi_ring`, `nat_semi_morph` and `nat_power_theory`
+  + definition `extend_number` (was a coercion)
+  + tactic `nat_litteral`
+  + ring instance for `nat` (use algebra-tactics instead)
+    ([#1343](https://github.com/math-comp/math-comp/pull/1343),
+    by Pierre Roux).
+
+- in `rat.v`
+  + lemmas `rat_ring_theory` and `rat_field_theory`
+  + ring and field instances for `rat` (use algebra-tactics instead)
+    ([#1343](https://github.com/math-comp/math-comp/pull/1343),
+    by Pierre Roux).
+  + definition `inIntSpan` (moved to `rat.v`)
+  + lemmas `Qint_dvdz`, `Qnat_dvd`, `size_rat_int_poly`,
+    `rat_poly_scale`, `dvdp_rat_int`, `dvdpP_rat_int`,
+    `irreductible_rat_int`, `solve_QInt_span`, `dec_Qint_span`,
+    `eisenstein_crit` (moved to `rat.v`)
+    ([#1381](https://github.com/math-comp/math-comp/pull/1381),
+    by Pierre Roux).
+
+### Deprecated
+
+- in `ssrnum.v`
+  + lemma `pmulrn_rgt0`
+    ([#1324](https://github.com/math-comp/math-comp/pull/1324),
+    by Reynald Affeldt).
+
+- in `archimedean.v`
+  + lemma `real_floor_ge_int` (use `real_floor_ge_int_tmp` instead)
+  + lemma `real_ceil_le_int` (use `real_ceil_le_int_tmp` instead)
+  + lemma `floor_ge_int` (use `floor_ge_int_tmp` instead)
+  + lemma `ceil_le_int` (use `ceil_le_int_tmp` instead)
+    ([#1359](https://github.com/math-comp/math-comp/pull/1359),
+    by Pierre Roux).
+
+- in `interval.v`
+  + lemma `subset_itv_bound`, use `subset_itv` instead
+    ([#1380](https://github.com/math-comp/math-comp/pull/1380),
+    by Alessandro Bruni).
 
 ## [2.3.0] - 2024-11-28
 
