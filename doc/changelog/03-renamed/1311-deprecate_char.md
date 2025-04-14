@@ -143,4 +143,4 @@
 	+ `fin_lmod_char_abelem` -> `fin_lmod_pchar_abelem`
 	+ `fin_lmod_char_abelem` -> `fin_lmod_pchar_abelem`
     (`#1311 <https://github.com/coq/stdlib/pull/1311>`_,
-    by Tragicus).
+    by Quentin Vermande).
