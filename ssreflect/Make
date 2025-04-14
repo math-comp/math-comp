@@ -35,9 +35,6 @@ order.v
 -arg -w -arg -redundant-canonical-projection
 -arg -w -arg -notation-overridden
 -arg -w -arg -ambiguous-paths
-# handle the two following one when requiring Coq >= 8.20
--arg -w -arg -closed-notation-not-level-0
--arg -w -arg -postfix-notation-not-level-1
 # handle the following ones when requiring Rocq >= 9.0
 -arg -w -arg -deprecated-from-Coq
 # remove this one when requiring Rocq >= 9.0

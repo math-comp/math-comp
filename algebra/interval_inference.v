@@ -90,20 +90,20 @@ From mathcomp Require Import order ssralg ssrnum ssrint interval.
 (******************************************************************************)
 
 Reserved Notation "{ 'itv' R & i }"
-  (at level 0, R at level 200, i at level 200, format "{ 'itv'  R  &  i }").
+  (R at level 200, i at level 200, format "{ 'itv'  R  &  i }").
 Reserved Notation "{ 'i01' R }"
-  (at level 0, R at level 200, format "{ 'i01'  R }").
-Reserved Notation "{ 'posnum' R }" (at level 0, format "{ 'posnum'  R }").
-Reserved Notation "{ 'nonneg' R }" (at level 0, format "{ 'nonneg'  R }").
+  (R at level 200, format "{ 'i01'  R }").
+Reserved Notation "{ 'posnum' R }" (format "{ 'posnum'  R }").
+Reserved Notation "{ 'nonneg' R }" (format "{ 'nonneg'  R }").
 
-Reserved Notation "x %:itv" (at level 2, format "x %:itv").
-Reserved Notation "x %:i01" (at level 2, format "x %:i01").
-Reserved Notation "x %:pos" (at level 2, format "x %:pos").
-Reserved Notation "x %:nng" (at level 2, format "x %:nng").
-Reserved Notation "x %:inum" (at level 2, format "x %:inum").
-Reserved Notation "x %:num" (at level 2, format "x %:num").
-Reserved Notation "x %:posnum" (at level 2, format "x %:posnum").
-Reserved Notation "x %:nngnum" (at level 2, format "x %:nngnum").
+Reserved Notation "x %:itv" (format "x %:itv").
+Reserved Notation "x %:i01" (format "x %:i01").
+Reserved Notation "x %:pos" (format "x %:pos").
+Reserved Notation "x %:nng" (format "x %:nng").
+Reserved Notation "x %:inum" (format "x %:inum").
+Reserved Notation "x %:num" (format "x %:num").
+Reserved Notation "x %:posnum" (format "x %:posnum").
+Reserved Notation "x %:nngnum" (format "x %:nngnum").
 
 Reserved Notation "[ 'itv' 'of' x ]" (format "[ 'itv' 'of'  x ]").
 Reserved Notation "[ 'gt0' 'of' x ]" (format "[ 'gt0' 'of'  x ]").

@@ -110,24 +110,22 @@ Notation "n .-tuple" := (tuple_of n)
   (at level 2, format "n .-tuple") : type_scope.
 
 Notation "{ 'tuple' n 'of' T }" := (n.-tuple T : predArgType)
-  (at level 0, only parsing) : type_scope.
+  (only parsing) : type_scope.
 
 Notation "[ 'tuple' 'of' s ]" := (tuple (fun sP => @Tuple _ _ s sP))
-  (at level 0, format "[ 'tuple'  'of'  s ]") : form_scope.
+  (format "[ 'tuple'  'of'  s ]") : form_scope.
 
 Notation "[ 'tnth' t i ]" := (tnth t (@Ordinal (tsize t) i (erefl true)))
-  (at level 0, t, i at level 8, format "[ 'tnth'  t  i ]") : form_scope.
+  (t, i at level 8, format "[ 'tnth'  t  i ]") : form_scope.
 
 Canonical nil_tuple T := Tuple (isT : @size T [::] == 0).
 Canonical cons_tuple n T x (t : n.-tuple T) :=
   Tuple (valP t : size (x :: t) == n.+1).
 
 Notation "[ 'tuple' x1 ; .. ; xn ]" := [tuple of x1 :: .. [:: xn] ..]
-  (at level 0, format "[ 'tuple' '['  x1 ; '/'  .. ; '/'  xn ']' ]")
-  : form_scope.
+  (format "[ 'tuple' '['  x1 ; '/'  .. ; '/'  xn ']' ]") : form_scope.
 
-Notation "[ 'tuple' ]" := [tuple of [::]]
-  (at level 0, format "[ 'tuple' ]") : form_scope.
+Notation "[ 'tuple' ]" := [tuple of [::]] (format "[ 'tuple' ]") : form_scope.
 
 Section CastTuple.
 
@@ -471,7 +469,7 @@ Proof. by move=> eq_f; apply eq_from_tnth=> i; rewrite !tnth_map eq_f. Qed.
 End UseFinTuple.
 
 Notation "[ 'tuple' F | i < n ]" := (mktuple (fun i : 'I_n => F))
-  (at level 0, i at level 0,
+  (i at level 0,
    format "[ '[hv' 'tuple'  F '/'  |  i  <  n ] ']'") : form_scope.
 
 Arguments eq_mktuple {n T'} [f1] f2 eq_f12.
@@ -505,17 +503,15 @@ Notation "n .-bseq" := (bseq_of n)
   (at level 2, format "n .-bseq") : type_scope.
 
 Notation "{ 'bseq' n 'of' T }" := (n.-bseq T : predArgType)
-  (at level 0, only parsing) : type_scope.
+  (only parsing) : type_scope.
 
 Notation "[ 'bseq' 'of' s ]" := (bseq (fun sP => @Bseq _ _ s sP))
-  (at level 0, format "[ 'bseq'  'of'  s ]") : form_scope.
+  (format "[ 'bseq'  'of'  s ]") : form_scope.
 
 Notation "[ 'bseq' x1 ; .. ; xn ]" := [bseq of x1 :: .. [:: xn] ..]
-  (at level 0, format "[ 'bseq' '['  x1 ; '/'  .. ; '/'  xn ']' ]")
-  : form_scope.
+  (format "[ 'bseq' '['  x1 ; '/'  .. ; '/'  xn ']' ]") : form_scope.
 
-Notation "[ 'bseq' ]" := [bseq of [::]]
-  (at level 0, format "[ 'bseq' ]") : form_scope.
+Notation "[ 'bseq' ]" := [bseq of [::]] (format "[ 'bseq' ]") : form_scope.
 
 Coercion bseq_of_tuple n T (t : n.-tuple T) : n.-bseq T :=
   Bseq (eq_leq (size_tuple t)).

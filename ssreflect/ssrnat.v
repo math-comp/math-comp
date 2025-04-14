@@ -164,8 +164,8 @@ Lemma succn_inj : injective succn. Proof. by move=> n m []. Qed.
 
 (* Predeclare postfix doubling/halving operators. *)
 
-Reserved Notation "n .*2" (at level 2, left associativity, format "n .*2").
-Reserved Notation "n ./2" (at level 2, left associativity, format "n ./2").
+Reserved Notation "n .*2" (left associativity, format "n .*2").
+Reserved Notation "n ./2" (left associativity, format "n ./2").
 
 (* Canonical comparison and eqType for nat.                                *)
 
@@ -2079,7 +2079,7 @@ HB.instance Definition _ := number_subType.
 HB.instance Definition _ := [Equality of number by <:].
 
 Notation "[ 'Num' 'of' e ]" := (Num (bin_of_nat e))
-  (at level 0, format "[ 'Num'  'of'  e ]") : nat_scope.
+  (format "[ 'Num'  'of'  e ]") : nat_scope.
 
 (* A congruence tactic, similar to the boolean one, along with an .+1/+  *)
 (* normalization tactic.                                                 *)

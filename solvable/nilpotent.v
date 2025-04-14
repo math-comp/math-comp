@@ -48,10 +48,10 @@ Arguments lower_central_at n%_N {gT} A%_g.
 Arguments upper_central_at n%_N {gT} A%_g : simpl never.
 
 Notation "''L_' n ( G )" := (lower_central_at n G)
-  (at level 8, n at level 2, format "''L_' n ( G )") : group_scope.
+  (n at level 2, format "''L_' n ( G )") : group_scope.
 
 Notation "''Z_' n ( G )" := (upper_central_at n G)
-  (at level 8, n at level 2, format "''Z_' n ( G )") : group_scope.
+  (n at level 2, format "''Z_' n ( G )") : group_scope.
 
 Section PropertiesDefs.
 

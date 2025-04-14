@@ -602,14 +602,14 @@ Reserved Notation ">< y :> T" (at level 35, y at next level).
 Reserved Notation "f \min g" (at level 50, left associativity).
 Reserved Notation "f \max g" (at level 50, left associativity).
 
-Reserved Notation "x < y ?<= 'if' c" (at level 70, y, c at next level,
+Reserved Notation "x < y ?<= 'if' c" (c at next level,
   format "x '[hv'  <  y '/'  ?<=  'if'  c ']'").
-Reserved Notation "x < y ?<= 'if' c :> T" (at level 70, y, c at next level,
+Reserved Notation "x < y ?<= 'if' c :> T" (
   format "x '[hv'  <  y '/'  ?<=  'if'  c  :> T ']'").
 
 (* Reserved notations for bottom/top elements *)
-Reserved Notation "\bot" (at level 0).
-Reserved Notation "\top" (at level 0).
+Reserved Notation "\bot".
+Reserved Notation "\top".
 
 (* Reserved notations for lattice operations *)
 Reserved Notation "A `&` B"  (at level 48, left associativity).
@@ -654,8 +654,8 @@ Reserved Notation "x <^d y ?<= 'if' c" (at level 70, y, c at next level,
 Reserved Notation "x <^d y ?<= 'if' c :> T" (at level 70, y, c at next level,
   format "x '[hv'  <^d  y '/'  ?<=  'if'  c  :> T ']'").
 
-Reserved Notation "\bot^d" (at level 0).
-Reserved Notation "\top^d" (at level 0).
+Reserved Notation "\bot^d".
+Reserved Notation "\top^d".
 
 Reserved Notation "A `&^d` B"  (at level 48, left associativity).
 Reserved Notation "A `|^d` B" (at level 52, left associativity).
@@ -695,8 +695,8 @@ Reserved Notation "x <=^p y ?= 'iff' c" (at level 70, y, c at next level,
 Reserved Notation "x <=^p y ?= 'iff' c :> T" (at level 70, y, c at next level,
   format "x '[hv'  <=^p  y '/'  ?=  'iff'  c  :> T ']'").
 
-Reserved Notation "\bot^p" (at level 0).
-Reserved Notation "\top^p" (at level 0).
+Reserved Notation "\bot^p".
+Reserved Notation "\top^p".
 
 Reserved Notation "A `&^p` B"  (at level 48, left associativity).
 Reserved Notation "A `|^p` B" (at level 52, left associativity).
@@ -736,8 +736,8 @@ Reserved Notation "x <=^sp y ?= 'iff' c" (at level 70, y, c at next level,
 Reserved Notation "x <=^sp y ?= 'iff' c :> T" (at level 70, y, c at next level,
   format "x '[hv'  <=^sp  y '/'  ?=  'iff'  c  :> T ']'").
 
-Reserved Notation "\bot^sp" (at level 0).
-Reserved Notation "\top^sp" (at level 0).
+Reserved Notation "\bot^sp".
+Reserved Notation "\top^sp".
 
 Reserved Notation "A `&^sp` B"  (at level 48, left associativity).
 Reserved Notation "A `|^sp` B" (at level 52, left associativity).
@@ -777,8 +777,8 @@ Reserved Notation "x <=^l y ?= 'iff' c" (at level 70, y, c at next level,
 Reserved Notation "x <=^l y ?= 'iff' c :> T" (at level 70, y, c at next level,
   format "x '[hv'  <=^l  y '/'  ?=  'iff'  c  :> T ']'").
 
-Reserved Notation "\bot^l" (at level 0).
-Reserved Notation "\top^l" (at level 0).
+Reserved Notation "\bot^l".
+Reserved Notation "\top^l".
 
 Reserved Notation "A `&^l` B"  (at level 48, left associativity).
 Reserved Notation "A `|^l` B" (at level 52, left associativity).
@@ -818,8 +818,8 @@ Reserved Notation "x <=^sl y ?= 'iff' c" (at level 70, y, c at next level,
 Reserved Notation "x <=^sl y ?= 'iff' c :> T" (at level 70, y, c at next level,
   format "x '[hv'  <=^sl  y '/'  ?=  'iff'  c  :> T ']'").
 
-Reserved Notation "\bot^sl" (at level 0).
-Reserved Notation "\top^sl" (at level 0).
+Reserved Notation "\bot^sl".
+Reserved Notation "\top^sl".
 
 Reserved Notation "A `&^sl` B"  (at level 48, left associativity).
 Reserved Notation "A `|^sl` B" (at level 52, left associativity).
@@ -833,70 +833,70 @@ Reserved Notation "\gcd_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \gcd_ i '/  '  F ']'").
 Reserved Notation "\gcd_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 50,
            format "'[' \gcd_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\gcd_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \gcd_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\gcd_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 50,
            format "'[' \gcd_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\gcd_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \gcd_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\gcd_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \gcd_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\gcd_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
+  (F at level 41).
 Reserved Notation "\gcd_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+  (F at level 41).
 Reserved Notation "\gcd_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 50,
            format "'[' \gcd_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\gcd_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \gcd_ ( i  <  n )  F ']'").
 Reserved Notation "\gcd_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 50,
            format "'[' \gcd_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\gcd_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \gcd_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\lcm_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \lcm_ i '/  '  F ']'").
 Reserved Notation "\lcm_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 50,
            format "'[' \lcm_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\lcm_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41,
            format "'[' \lcm_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\lcm_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 50,
            format "'[' \lcm_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\lcm_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \lcm_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\lcm_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \lcm_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\lcm_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
+  (F at level 41).
 Reserved Notation "\lcm_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+  (F at level 41).
 Reserved Notation "\lcm_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 50,
            format "'[' \lcm_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\lcm_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \lcm_ ( i  <  n )  F ']'").
 Reserved Notation "\lcm_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 50,
            format "'[' \lcm_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\lcm_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \lcm_ ( i  'in'  A ) '/  '  F ']'").
 
 (* Reserved notations for iterative meet and join *)
@@ -904,70 +904,70 @@ Reserved Notation "\meet_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \meet_ i '/  '  F ']'").
 Reserved Notation "\meet_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 50,
            format "'[' \meet_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\meet_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, r at level 50,
            format "'[' \meet_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\meet_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 50,
            format "'[' \meet_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\meet_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \meet_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\meet_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \meet_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\meet_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
+  (F at level 41).
 Reserved Notation "\meet_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+  (F at level 41).
 Reserved Notation "\meet_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 50,
            format "'[' \meet_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\meet_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \meet_ ( i  <  n )  F ']'").
 Reserved Notation "\meet_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 50,
            format "'[' \meet_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\meet_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \meet_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\join_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \join_ i '/  '  F ']'").
 Reserved Notation "\join_ ( i <- r | P ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 50,
            format "'[' \join_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\join_ ( i <- r ) F"
-  (at level 41, F at level 41, i, r at level 50,
+  (F at level 41, r at level 50,
            format "'[' \join_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\join_ ( m <= i < n | P ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41, i, n at level 50,
            format "'[' \join_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\join_ ( m <= i < n ) F"
-  (at level 41, F at level 41, i, m, n at level 50,
+  (F at level 41,
            format "'[' \join_ ( m  <=  i  <  n ) '/  '  F ']'").
 Reserved Notation "\join_ ( i | P ) F"
-  (at level 41, F at level 41, i at level 50,
+  (F at level 41,
            format "'[' \join_ ( i  |  P ) '/  '  F ']'").
 Reserved Notation "\join_ ( i : t | P ) F"
-  (at level 41, F at level 41, i at level 50).
+  (F at level 41).
 Reserved Notation "\join_ ( i : t ) F"
-  (at level 41, F at level 41, i at level 50).
+  (F at level 41).
 Reserved Notation "\join_ ( i < n | P ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41, n at level 50,
            format "'[' \join_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\join_ ( i < n ) F"
-  (at level 41, F at level 41, i, n at level 50,
+  (F at level 41,
            format "'[' \join_ ( i  <  n )  F ']'").
 Reserved Notation "\join_ ( i 'in' A | P ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41, A at level 50,
            format "'[' \join_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\join_ ( i 'in' A ) F"
-  (at level 41, F at level 41, i, A at level 50,
+  (F at level 41,
            format "'[' \join_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\min_ i F"
@@ -1601,26 +1601,19 @@ Reserved Notation "\max^l_ ( i 'in' A ) F"
            format "'[' \max^l_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "'{' 'omorphism' U '->' V '}'"
-  (at level 0, U at level 98, V at level 99,
-   format "{ 'omorphism'  U  ->  V }").
+  (U at level 98, V at level 99, format "{ 'omorphism'  U  ->  V }").
 Reserved Notation "'{' 'mlmorphism' U '->' V '}'"
-  (at level 0, U at level 98, V at level 99,
-   format "{ 'mlmorphism'  U  ->  V }").
+  (U at level 98, V at level 99, format "{ 'mlmorphism'  U  ->  V }").
 Reserved Notation "'{' 'jlmorphism' U '->' V '}'"
-  (at level 0, U at level 98, V at level 99,
-   format "{ 'jlmorphism'  U  ->  V }").
+  (U at level 98, V at level 99, format "{ 'jlmorphism'  U  ->  V }").
 Reserved Notation "'{' 'lmorphism' U '->' V '}'"
-  (at level 0, U at level 98, V at level 99,
-   format "{ 'lmorphism'  U  ->  V }").
+  (U at level 98, V at level 99, format "{ 'lmorphism'  U  ->  V }").
 Reserved Notation "'{' 'blmorphism' U '->' V '}'"
-  (at level 0, U at level 98, V at level 99,
-   format "{ 'blmorphism'  U  ->  V }").
+  (U at level 98, V at level 99, format "{ 'blmorphism'  U  ->  V }").
 Reserved Notation "'{' 'tlmorphism' U '->' V '}'"
-  (at level 0, U at level 98, V at level 99,
-   format "{ 'tlmorphism'  U  ->  V }").
+  (U at level 98, V at level 99, format "{ 'tlmorphism'  U  ->  V }").
 Reserved Notation "'{' 'tblmorphism' U '->' V '}'"
-  (at level 0, U at level 98, V at level 99,
-   format "{ 'tblmorphism'  U  ->  V }").
+  (U at level 98, V at level 99, format "{ 'tblmorphism'  U  ->  V }").
 
 Module Order.
 
@@ -1810,30 +1803,28 @@ Notation "x >< y" := (~~ (comparable x y)) : order_scope.
 
 Notation "[ 'arg' 'min_' ( i < i0 | P ) F ]" :=
     (arg_min i0 (fun i => P%B) (fun i => F))
-  (at level 0, i, i0 at level 10,
+  (i, i0 at level 10,
    format "[ 'arg'  'min_' ( i  <  i0  |  P )  F ]") : order_scope.
 
 Notation "[ 'arg' 'min_' ( i < i0 'in' A ) F ]" :=
     [arg min_(i < i0 | i \in A) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0  'in'  A )  F ]") : order_scope.
+  (format "[ 'arg'  'min_' ( i  <  i0  'in'  A )  F ]") : order_scope.
 
 Notation "[ 'arg' 'min_' ( i < i0 ) F ]" := [arg min_(i < i0 | true) F]
-  (at level 0, i, i0 at level 10,
-   format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : order_scope.
+  (format "[ 'arg'  'min_' ( i  <  i0 )  F ]") : order_scope.
 
 Notation "[ 'arg' 'max_' ( i > i0 | P ) F ]" :=
      (arg_max i0 (fun i => P%B) (fun i => F))
-  (at level 0, i, i0 at level 10,
+  (i0 at level 10,
    format "[ 'arg'  'max_' ( i  >  i0  |  P )  F ]") : order_scope.
 
 Notation "[ 'arg' 'max_' ( i > i0 'in' A ) F ]" :=
     [arg max_(i > i0 | i \in A) F]
-  (at level 0, i, i0 at level 10,
+  (i, i0 at level 10,
    format "[ 'arg'  'max_' ( i  >  i0  'in'  A )  F ]") : order_scope.
 
 Notation "[ 'arg' 'max_' ( i > i0 ) F ]" := [arg max_(i > i0 | true) F]
-  (at level 0, i, i0 at level 10,
+  (i, i0 at level 10,
    format "[ 'arg'  'max_' ( i  >  i0 )  F ]") : order_scope.
 
 Notation "f \min g" := (min_fun f g) : function_scope.
@@ -5978,22 +5969,22 @@ Notation "{ 'lmorphism' T -> T' }" :=
   (@LatticeMorphism.type _ T%type _ T'%type) : type_scope.
 Notation "[ 'mlmorphism' 'of' f 'as' g ]" :=
   (MeetLatticeMorphism.clone _ _ _ _ f%function g)
-  (at level 0, format "[ 'mlmorphism'  'of'  f  'as'  g ]") : form_scope.
+  (format "[ 'mlmorphism'  'of'  f  'as'  g ]") : form_scope.
 Notation "[ 'mlmorphism' 'of' f ]" :=
   (MeetLatticeMorphism.clone _ _ _ _ f%function _)
-  (at level 0, format "[ 'mlmorphism'  'of'  f ]") : form_scope.
+  (format "[ 'mlmorphism'  'of'  f ]") : form_scope.
 Notation "[ 'jlmorphism' 'of' f 'as' g ]" :=
   (JoinLatticeMorphism.clone _ _ _ _ f%function g)
-  (at level 0, format "[ 'jlmorphism'  'of'  f  'as'  g ]") : form_scope.
+  (format "[ 'jlmorphism'  'of'  f  'as'  g ]") : form_scope.
 Notation "[ 'jlmorphism' 'of' f ]" :=
   (JoinLatticeMorphism.clone _ _ _ _ f%function _)
-  (at level 0, format "[ 'jlmorphism'  'of'  f ]") : form_scope.
+  (format "[ 'jlmorphism'  'of'  f ]") : form_scope.
 Notation "[ 'lmorphism' 'of' f 'as' g ]" :=
   (LatticeMorphism.clone _ _ _ _ f%function g)
-  (at level 0, format "[ 'lmorphism'  'of'  f  'as'  g ]") : form_scope.
+  (format "[ 'lmorphism'  'of'  f  'as'  g ]") : form_scope.
 Notation "[ 'lmorphism' 'of' f ]" :=
   (LatticeMorphism.clone _ _ _ _ f%function _)
-  (at level 0, format "[ 'lmorphism'  'of'  f ]") : form_scope.
+  (format "[ 'lmorphism'  'of'  f ]") : form_scope.
 End LatticeMorphismExports.
 HB.export LatticeMorphismExports.
 
@@ -6655,105 +6646,105 @@ Module SubOrderExports.
 
 Notation "[ 'SubChoice_isSubPOrder' 'of' U 'by' <: ]" :=
   (SubChoice_isSubPOrder.Build _ _ _ _ U)
-  (at level 0, format "[ 'SubChoice_isSubPOrder'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubPOrder'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubPOrder' 'of' U 'by' <: 'with' disp ]" :=
   (SubChoice_isSubPOrder.Build _ _ _ disp U)
-  (at level 0, format "[ 'SubChoice_isSubPOrder'  'of'  U  'by'  <:  'with'  disp ]")
+  (format "[ 'SubChoice_isSubPOrder'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
 Notation "[ 'SubPOrder_isSubLattice' 'of' U 'by' <: ]" :=
   (SubPOrder_isSubLattice.Build _ _ _ _ U (@opredI _ _ _) (@opredU _ _ _))
-  (at level 0, format "[ 'SubPOrder_isSubLattice'  'of'  U  'by'  <: ]")
+  (format "[ 'SubPOrder_isSubLattice'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubPOrder_isSubLattice' 'of' U 'by' <: 'with' disp ]" :=
   (SubPOrder_isSubLattice.Build _ _ _ disp U (@opredI _ _ _) (@opredU _ _ _))
-  (at level 0, format "[ 'SubPOrder_isSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
+  (format "[ 'SubPOrder_isSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubLattice' 'of' U 'by' <: ]" :=
   (SubChoice_isSubLattice.Build _ _ _ _ U (@opredI _ _ _) (@opredU _ _ _))
-  (at level 0, format "[ 'SubChoice_isSubLattice'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubLattice'  'of'  U  'by'  <: ]")
     : form_scope.
 Notation "[ 'SubChoice_isSubLattice' 'of' U 'by' <: 'with' disp ]" :=
   (SubChoice_isSubLattice.Build _ _ _ disp U (@opredI _ _ _) (@opredU _ _ _))
-  (at level 0, format "[ 'SubChoice_isSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
+  (format "[ 'SubChoice_isSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
     : form_scope.
 Notation "[ 'SubPOrder_isBSubLattice' 'of' U 'by' <: ]" :=
   (SubPOrder_isBSubLattice.Build _ _ _ _ U (opred0 _))
-  (at level 0, format "[ 'SubPOrder_isBSubLattice'  'of'  U  'by'  <: ]")
+  (format "[ 'SubPOrder_isBSubLattice'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubPOrder_isBSubLattice' 'of' U 'by' <: 'with' disp ]" :=
   (SubPOrder_isBSubLattice.Build _ _ _ disp U (opred0 _))
-  (at level 0, format "[ 'SubPOrder_isBSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
+  (format "[ 'SubPOrder_isBSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
 Notation "[ 'SubChoice_isBSubLattice' 'of' U 'by' <: ]" :=
   (SubChoice_isBSubLattice.Build _ _ _ _ U
      (@opredI _ _ _) (@opredU _ _ _) (opred0 _))
-  (at level 0, format "[ 'SubChoice_isBSubLattice'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isBSubLattice'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isBSubLattice' 'of' U 'by' <: 'with' disp ]" :=
   (SubChoice_isBSubLattice.Build _ _ _ disp U
      (@opredI _ _ _) (@opredU _ _ _) (opred0 _))
-  (at level 0, format "[ 'SubChoice_isBSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
+  (format "[ 'SubChoice_isBSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
 Notation "[ 'SubPOrder_isTSubLattice' 'of' U 'by' <: ]" :=
   (SubPOrder_isTSubLattice.Build _ _ _ _ U (opred1 _))
-  (at level 0, format "[ 'SubPOrder_isTSubLattice'  'of'  U  'by'  <: ]")
+  (format "[ 'SubPOrder_isTSubLattice'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubPOrder_isTSubLattice' 'of' U 'by' <: 'with' disp ]" :=
   (SubPOrder_isTSubLattice.Build _ _ _ disp U (opred1 _))
-  (at level 0, format "[ 'SubPOrder_isTSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
+  (format "[ 'SubPOrder_isTSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
 Notation "[ 'SubChoice_isTSubLattice' 'of' U 'by' <: ]" :=
   (SubChoice_isTSubLattice.Build _ _ _ _ U
      (@opredI _ _ _) (@opredU _ _ _) (opred1 _))
-  (at level 0, format "[ 'SubChoice_isTSubLattice'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isTSubLattice'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isTSubLattice' 'of' U 'by' <: 'with' disp ]" :=
   (SubChoice_isTSubLattice.Build _ _ _ disp U
      (@opredI _ _ _) (@opredU _ _ _) (opred1 _))
-  (at level 0, format "[ 'SubChoice_isTSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
+  (format "[ 'SubChoice_isTSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
 Notation "[ 'SubPOrder_isTBSubLattice' 'of' U 'by' <: ]" :=
   (SubPOrder_isTBSubLattice.Build _ _ _ _ U (opred0 _) (opred1 _))
-  (at level 0, format "[ 'SubPOrder_isTBSubLattice'  'of'  U  'by'  <: ]")
+  (format "[ 'SubPOrder_isTBSubLattice'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubPOrder_isTBSubLattice' 'of' U 'by' <: 'with' disp ]" :=
   (SubPOrder_isTBSubLattice.Build _ _ _ disp U (opred0 _) (opred1 _))
-  (at level 0, format "[ 'SubPOrder_isTBSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
+  (format "[ 'SubPOrder_isTBSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
 Notation "[ 'SubChoice_isTBSubLattice' 'of' U 'by' <: ]" :=
   (SubChoice_isTBSubLattice.Build _ _ _ _ U
      (@opredI _ _ _) (@opredU _ _ _) (opred0 _) (opred1 _))
-  (at level 0, format "[ 'SubChoice_isTBSubLattice'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isTBSubLattice'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isTBSubLattice' 'of' U 'by' <: 'with' disp ]" :=
   (SubChoice_isTBSubLattice.Build _ _ _ disp U
      (@opredI _ _ _) (@opredU _ _ _) (opred0 _) (opred1 _))
-  (at level 0, format "[ 'SubChoice_isTBSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
+  (format "[ 'SubChoice_isTBSubLattice'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
 Notation "[ 'SubLattice_isSubOrder' 'of' U 'by' <: ]" :=
   (SubLattice_isSubOrder.Build _ _ _ _ U)
-  (at level 0, format "[ 'SubLattice_isSubOrder'  'of'  U  'by'  <: ]")
+  (format "[ 'SubLattice_isSubOrder'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubLattice_isSubOrder' 'of' U 'by' <: 'with' disp ]" :=
   (SubLattice_isSubOrder.Build _ _ _ disp U)
-  (at level 0, format "[ 'SubLattice_isSubOrder'  'of'  U  'by'  <:  'with'  disp ]")
+  (format "[ 'SubLattice_isSubOrder'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
 Notation "[ 'SubPOrder_isSubOrder' 'of' U 'by' <: ]" :=
   (SubPOrder_isSubOrder.Build _ _ _ _ U)
-  (at level 0, format "[ 'SubPOrder_isSubOrder'  'of'  U  'by'  <: ]")
+  (format "[ 'SubPOrder_isSubOrder'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubPOrder_isSubOrder' 'of' U 'by' <: 'with' disp ]" :=
   (SubPOrder_isSubOrder.Build _ _ _ disp U)
-  (at level 0, format "[ 'SubPOrder_isSubOrder'  'of'  U  'by'  <:  'with'  disp ]")
+  (format "[ 'SubPOrder_isSubOrder'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubOrder' 'of' U 'by' <: ]" :=
   (SubChoice_isSubOrder.Build _ _ _ _ U)
-  (at level 0, format "[ 'SubChoice_isSubOrder'  'of'  U  'by'  <: ]")
+  (format "[ 'SubChoice_isSubOrder'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubOrder' 'of' U 'by' <: 'with' disp ]" :=
   (SubChoice_isSubOrder.Build _ _ _ disp U)
-  (at level 0, format "[ 'SubChoice_isSubOrder'  'of'  U  'by'  <:  'with'  disp ]")
+  (format "[ 'SubChoice_isSubOrder'  'of'  U  'by'  <:  'with'  disp ]")
   : form_scope.
 
 End SubOrderExports.
@@ -6774,10 +6765,10 @@ Module Exports.
 HB.reexport DeprecatedSubOrder.
 Notation "[ 'POrder' 'of' T 'by' <: ]" :=
   (POrder.copy T%type (sub_type T%type))
-  (at level 0, format "[ 'POrder'  'of'  T  'by'  <: ]") : form_scope.
+  (format "[ 'POrder'  'of'  T  'by'  <: ]") : form_scope.
 Notation "[ 'Order' 'of' T 'by' <: ]" :=
   (Total.copy T%type (sub_type T%type))
-  (at level 0, only parsing) : form_scope.
+  (only parsing) : form_scope.
 End Exports.
 End DeprecatedSubOrder.
 HB.export DeprecatedSubOrder.Exports.
@@ -10005,9 +9996,9 @@ End SetSubsetOrder.
 Module Exports.
 Arguments type disp T%_type.
 Notation "{ 'subset' [ d ] T }" := (type d T)
-  (at level 0, d at next level, format "{ 'subset' [ d ]  T }") : type_scope.
+  (d at next level, format "{ 'subset' [ d ]  T }") : type_scope.
 Notation "{ 'subset' T }" := {subset[subset_display] T}
-  (at level 0, format "{ 'subset' T }") : type_scope.
+  (format "{ 'subset' T }") : type_scope.
 
 HB.reexport.
 

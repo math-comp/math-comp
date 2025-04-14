@@ -87,8 +87,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Reserved Notation "n .-root" (at level 2, format "n .-root").
-Reserved Notation "'i" (at level 0).
+Reserved Notation "n .-root" (format "n .-root").
+Reserved Notation "'i".
 Reserved Notation "'Re z" (at level 10, z at level 8).
 Reserved Notation "'Im z" (at level 10, z at level 8).
 
@@ -145,10 +145,10 @@ Module NormedZmoduleExports.
 Bind Scope ring_scope with NormedZmodule.sort.
 (* Notation "[ 'normedZmodType' R 'of' T 'for' cT ]" :=
   (@clone _ (Phant R) T cT _ idfun)
-  (at level 0, format "[ 'normedZmodType'  R  'of'  T  'for'  cT ]") :
+  (format "[ 'normedZmodType'  R  'of'  T  'for'  cT ]") :
   form_scope.
 Notation "[ 'normedZmodType' R 'of' T ]" := (@clone _ (Phant R) T _ _ id)
-  (at level 0, format "[ 'normedZmodType'  R  'of'  T ]") : form_scope. *)
+  (format "[ 'normedZmodType'  R  'of'  T ]") : form_scope. *)
 End NormedZmoduleExports.
 HB.export NormedZmoduleExports.
 
@@ -3641,7 +3641,7 @@ Qed.
 End RealClosedFieldTheory.
 
 Notation "z ^*" := (conj_op z) : ring_scope.
-Notation "'i" := imaginary (at level 0) : ring_scope.
+Notation "'i" := imaginary : ring_scope.
 
 Section ClosedFieldTheory.
 
