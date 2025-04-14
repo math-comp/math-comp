@@ -75,7 +75,7 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
     ([#1198](https://github.com/math-comp/math-comp/pull/1198),
     by Tragicus).
 
-- in `field/algC.v`
+- in `algC.v`
   + record `algR` with projections `algRval`, `algRvalP`
   + lemmas `total_algR`, `algRval_is_additive`, `algRval_is_multiplicative`,
   + definition `algR_norm`
