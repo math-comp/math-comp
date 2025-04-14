@@ -23,8 +23,7 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
   + Definitions `semilinear_for`, `subsemimod_closed`
   + Notations `semilinear`, `semiscalar`, `[SubNmodule_isSubLSemiModule of V by <:]`, `[SubChoice_isSubLSemiModule of V by <:]`, `[SubSemiRing_SubLSemiModule_isSubLSemiAlgebra of V by <:]`, `[SubLSemiAlgebra_isSubSemiAlgebra of V by <:]`
   + Lemmas `subsemimod_closedD`, `subsemimod_closedZ`, `submod_closed_semi`, `additive_semilinear`, `scalable_semilinear`, `semilinear_linear`, `semilinearP`, `semilinearPZ`, `can2_semilinear`, `semiscalarP`, `subsemimodClosedP`
-    ([#1125](https://github.com/math-comp/math-comp/pull/1125),
-    by Kazuhiko Sakaguchi).
+    ([#1125](https://github.com/math-comp/math-comp/pull/1125)).
   + mixin `Nmodule_isPzSemiRing`
   + definition `pzSemiRingType`
   + factory `isPzSemiRing`
@@ -47,33 +46,23 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
   + factories `SubPzRing_isSubComPzRing`, `SubChoice_isSubPzSemiRing`,
     `SubChoice_isSubComPzSemiRing`, `SubChoice_isSubPzRing`,
     `SubChoice_isSubComPzRing`
-    ([#1319](https://github.com/math-comp/math-comp/pull/1319),
-    by Tragicus).
-
-- in `intdiv.v`
-  + lemma `solve_Qint_span`
-    ([#1191](https://github.com/math-comp/math-comp/pull/1191),
-    by mituharu).
+    ([#1319](https://github.com/math-comp/math-comp/pull/1319)).
 
 - in `zmodp.v`
   + lemmas `gen_tperm_step`, `perm_addr1X`, `gen_tpermn_circular_shift`
-    ([#1198](https://github.com/math-comp/math-comp/pull/1198),
-    by Tragicus).
+    ([#1198](https://github.com/math-comp/math-comp/pull/1198)).
 
 - in `cyclic.v`
   + lemmas `eq_expg_ord`, `expgD_Zp`
-    ([#1198](https://github.com/math-comp/math-comp/pull/1198),
-    by Tragicus).
+    ([#1198](https://github.com/math-comp/math-comp/pull/1198)).
 
 - in `nilpotent.v`
   + lemma `setXn_sol`
-    ([#1198](https://github.com/math-comp/math-comp/pull/1198),
-    by Tragicus).
+    ([#1198](https://github.com/math-comp/math-comp/pull/1198)).
 
 - in `alt.v`
   + lemmas `gen_tperm_circular_shift`, `solvable_AltF`, `solvable_SymF`
-    ([#1198](https://github.com/math-comp/math-comp/pull/1198),
-    by Tragicus).
+    ([#1198](https://github.com/math-comp/math-comp/pull/1198)).
 
 - in `algC.v`
   + record `algR` with projections `algRval`, `algRvalP`
@@ -89,14 +78,12 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
 	  `algR_pfactor_eq0`, `algC_pfactorCgt0`, `algR_pfactorR_mul_gt0`,
 	  `monic_algC_pfactor`, `monic_algR_pfactor`, `poly_algR_pfactor`, 
  	  `algR_rcfMixin`
-   (`#1199 <https://github.com/coq/stdlib/pull/1199>`_,
-    by Tragicus).
+   ([#1199](https://github.com/coq/stdlib/pull/1199)).
 
 - in `archimedean.v`
   + lemmas `floorNceil`, `ceilNfloor`, `truncEfloor`, `intrP`
   + mixin `Num.NumDomain_hasFloorCeilTruncn`
-    ([#1250](https://github.com/math-comp/math-comp/pull/1250),
-    by Kazuhiko Sakaguchi).
+    ([#1250](https://github.com/math-comp/math-comp/pull/1250)).
   + lemmas `real_floor_ge_int_tmp`, `real_ceil_le_int_tmp`,
     `floor_ge_int_tmp` and `ceil_le_int_tmp`
   + lemmas `truncn_le`, `real_truncnS_gt`, `truncn_ge_nat`,
@@ -108,77 +95,62 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
     `ceil_neq0`, `floor_lt_int`, `floor_eq`, `floor_ge0`, `floor_le0`,
     `ceil_gt_int`, `ceil_eq`, `ceil_ge0`, `ceil_le0`, `truncnS_gt`,
     `truncn_le_nat` and `natr_int`
-    ([#1359](https://github.com/math-comp/math-comp/pull/1359), by
-    Pierre Roux).
+    ([#1359](https://github.com/math-comp/math-comp/pull/1359)).
 
 - in `order.v`
   + notations `\min_<range> e`, `\max_<range> e`, `\min^d_<range> e`,
     `\max^d_<range> e`, `\min^p_<range> e`, `\max^p_<range> e`,
     `\min^sp_<range> e`, `\max^sp_<range> e`, `\meet^l_<range> e`,
     `\join^l_<range> e`, `\min^l_<range> e`, `\max^l_<range> e`
-    ([#1298](https://github.com/math-comp/math-comp/pull/1298),
-    by Quentin Vermande).
+    ([#1298](https://github.com/math-comp/math-comp/pull/1298)).
   + lemmas `comparable_le_min2`, `comparable_le_max2`,
     `le_min2` and `le_max2` (backport from
     https://github.com/math-comp/analysis/pull/1410 )
-    ([#1351](https://github.com/math-comp/math-comp/pull/1351),
-    by Pierre Roux).
+    ([#1351](https://github.com/math-comp/math-comp/pull/1351)).
   + export `le_val` in `Order.SubPOrderTheory` (included in
     `Order.Theory`) to avoid being forced to type `Order.le_val`
-    ([#1353](https://github.com/math-comp/math-comp/pull/1353),
-    by Pierre Roux).
+    ([#1353](https://github.com/math-comp/math-comp/pull/1353)).
 
 - in `seq.v`,
   + new lemmas `odflt_onth`, `onthE`, `onth_nth`, `onth0n`, `onth1P`,
     `onthTE`, `onthNE`, `onth_default`, `onth_cat`, `onth_nseq`, `eq_onthP`,
     `eq_from_onth`, `eq_from_onth_le`, `onth_map`, `inj_onth_map`, `onthP`,
     `onthPn`, and `onth_inj`.
-    ([#1318](https://github.com/math-comp/math-comp/pull/1318),
-    by Cyril Cohen, KimayaBedarkar, Pierre Roux, and Quentin Vermande).
+    ([#1318](https://github.com/math-comp/math-comp/pull/1318)).
 
 - in `tuple.v`
   + new lemma `tnth_onth`
-    ([#1318](https://github.com/math-comp/math-comp/pull/1318),
-    by Cyril Cohen).
+    ([#1318](https://github.com/math-comp/math-comp/pull/1318)).
 
 - in `ssrnum.v`
   + Mixin `Zmodule_isSemiNormed` and class `SemiNormedZmodule` with
     associated structure `semiNormedZmodType`.
-    ([#1333](https://github.com/math-comp/math-comp/pull/1333),
-    by Alessandro Bruni and Cyril Cohen).
   + lemmas `gtr0_norm_neq0`, and `gtr0_norm_eq0F`
-    ([#1333](https://github.com/math-comp/math-comp/pull/1333),
-    by Alessandro Bruni and Cyril Cohen).
+    ([#1333](https://github.com/math-comp/math-comp/pull/1333)).
   + lemmas `natr_min`, `natr_max` and `sqrtC_real` (backport from
     https://github.com/math-comp/analysis/pull/1410 )
-    ([#1351](https://github.com/math-comp/math-comp/pull/1351),
-    by Pierre Roux).
+    ([#1351](https://github.com/math-comp/math-comp/pull/1351)).
 
 - in `ssrnat.v`
   + definition `N_eqb`
-    ([#1343](https://github.com/math-comp/math-comp/pull/1343),
-    by Pierre Roux).
+    ([#1343](https://github.com/math-comp/math-comp/pull/1343)).
 
 - in `interval.v`
   + lemmas `comparable_BSide_min`, `comparable_BSide_max`,
     `BSide_min`, `BSide_max`, `real_BSide_min` and `real_BSide_max`
-    (backport from https://github.com/math-comp/analysis/pull/1410 )
-    ([#1351](https://github.com/math-comp/math-comp/pull/1351),
-    by Pierre Roux).
+    (backport from [#1410](https://github.com/math-comp/analysis/pull/1410) )
+    ([#1351](https://github.com/math-comp/math-comp/pull/1351)).
   + lemma `subset_itv_bound`, matching previous `subset_itv`
-    ([#1380](https://github.com/math-comp/math-comp/pull/1380),
-    by Alessandro Bruni).
+    ([#1380](https://github.com/math-comp/math-comp/pull/1380)).
   + lemma `subset_itv` has been generalized
     (previous version is now `subset_itv_bound`)
-    ([#1380](https://github.com/math-comp/math-comp/pull/1380),
-    by Alessandro Bruni).
+    ([#1380](https://github.com/math-comp/math-comp/pull/1380)).
 
 - new file `interval_inference.v`
   added to `all_algebra.v`, this can solve automatically a few more
   goals, making some proofs fail (with subgoals no longer existing)
-  (backported from https://github.com/math-comp/analysis/pull/1410 )
-  ([#1352](https://github.com/math-comp/math-comp/pull/1352),
-  by Pierre Roux).
+  (backported from [#1410](https://github.com/math-comp/analysis/pull/1410) )
+  ([#1352](https://github.com/math-comp/math-comp/pull/1352)).
 
 - in `interval_inference.v`
   + definitions `map_iv_bound`, `map_itv`, `Itv.t`, `Itv.sub`,
@@ -242,44 +214,39 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
     `x%:nngnum`, `unify_itv`, `[gt0 of x]`, `[lt0 of x]`,
     `[ge0 of x]`, `[le0 of x]`, `[cmp0 of x]`, `[neq0 of x]`,
     `x%:i01`, `x%:pos`, `x%:nng`
-    (backported from https://github.com/math-comp/analysis/pull/1410 )
-    ([#1352](https://github.com/math-comp/math-comp/pull/1352),
-    by Pierre Roux).
+    (backported from [#1410](https://github.com/math-comp/analysis/pull/1410) )
+    ([#1352](https://github.com/math-comp/math-comp/pull/1352)).
   + definition `Instances.natmul_itv` and `IntItv.exprz`
   + lemmas `Instances.num_spec_exprz` and `Instances.nat_spec_factorial`
   + instances `Instances.exprz_inum` and `Instances.facorial_inum`
-    ([#1368](https://github.com/math-comp/math-comp/pull/1368),
-    by Pierre Roux).
+    ([#1368](https://github.com/math-comp/math-comp/pull/1368)).
 
 - in `rat.v`
+  + lemma `solve_Qint_span`
+    ([#1191](https://github.com/math-comp/math-comp/pull/1191)).
   + definition `inIntSpan` (from `intdiv.v`)
   + lemmas `Qint_dvdz`, `Qnat_dvd`, `size_rat_int_poly`,
     `rat_poly_scale`, `dvdp_rat_int`, `dvdpP_rat_int`,
     `irreductible_rat_int`, `solve_QInt_span`, `dec_Qint_span`,
     `eisenstein_crit` (from `intdiv.v`)
   + lemmas `floorErat`, `ceilErat`
-    ([#1381](https://github.com/math-comp/math-comp/pull/1381),
-    by Pierre Roux and Kazuhiko Sakaguchi).
+    ([#1381](https://github.com/math-comp/math-comp/pull/1381)).
 
 - in `ssrfun.v`
   + lemmas `inr_inj`, `inl_inj`
-    ([#1397](https://github.com/math-comp/math-comp/pull/1397),
-    by Reynald Affeldt).
+    ([#1397](https://github.com/math-comp/math-comp/pull/1397)).
   + lemmas `taggedK`, `swap_pair` and `swap_pairK`
-    ([#931](https://github.com/math-comp/math-comp/pull/931),
-    by Erik Martin-Dorel and Cyril Cohen).
+    ([#931](https://github.com/math-comp/math-comp/pull/931)).
 
 - in `bigop.v`
   + lemmas `big_sup_cond`, `big_sub`, `gt0_prodn_seq` and `gt0_prodn`
-    ([#931](https://github.com/math-comp/math-comp/pull/931),
-    by Pierre Pomeret-Coquot and Erik Martin-Dorel, with help of Cyril Cohen).
+    ([#931](https://github.com/math-comp/math-comp/pull/931)).
 
 - in `eqtype.v`
   + definitions `etagged`, `untag`, `tagged_with`, `tag_with` and `untag_with`
   + lemmas `eq_from_Tagged`, `etaggedK`, `untagE`, `untag_dflt`, `untag_cst`,
     `tag_withK`, `untag_withK`, `tag_with_bij` and `untag_with_bij`
-    ([#931](https://github.com/math-comp/math-comp/pull/931),
-    by Pierre Pomeret-Coquot and Erik Martin-Dorel, with help of Cyril Cohen).
+    ([#931](https://github.com/math-comp/math-comp/pull/931)).
 
 - in `finfun.v`
   + definition `fprod` (a record with projections `fprod_fun` and `fprod_prod`)
@@ -291,8 +258,7 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
     `dffun_of_fprod_bij`, `fprod_of_dffun_bij`,
     `to_family_tagged_withK`, `of_family_tagged_withK`,
     `to_family_tagged_with_bij` and `of_family_tagged_with_bij`
-    ([#931](https://github.com/math-comp/math-comp/pull/931),
-    by Pierre Pomeret-Coquot and Erik Martin-Dorel, with help of Cyril Cohen).
+    ([#931](https://github.com/math-comp/math-comp/pull/931)).
 
 - in `finset.v`
   + definitions `unset1`, `fprod_pick` and `ftagged`
@@ -300,13 +266,11 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
     `pick_set1`, `set1K`, `omap_unset1K`, `unset10`, `unset1N1`, `unset1K`,
     `big_cards1`, `card_fprod`, `ftaggedE`, `big_tag_cond`, `big_tag`,
     `big_fprod_dep` and `big_fprod`
-    ([#931](https://github.com/math-comp/math-comp/pull/931),
-    by Pierre Pomeret-Coquot and Erik Martin-Dorel, with help of Cyril Cohen).
+    ([#931](https://github.com/math-comp/math-comp/pull/931)).
 
 - in `fintype.v`
   + lemmas `existsbWl` and `existsbWr`
-    ([#931](https://github.com/math-comp/math-comp/pull/931),
-    by Pierre Pomeret-Coquot and Erik Martin-Dorel, with review of Cyril Cohen).
+    ([#931](https://github.com/math-comp/math-comp/pull/931)).
 
 ### Changed
 
@@ -319,8 +283,7 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
   + `linear0`, `linearD`, `linearMn`, `linear_sum`, `linearZ_LR`, `linearP`, `linearZ`, `linearZZ`, `linearPZ`, `can2_scalable`, `can2_linear`, `scalarZ`, `scalarP` generalized to `lSemiModType` and semilinear functions
   + `scalerAl`, `mulr_algl`, `in_alg`, `subalgClosed` generalized to `lSemiAlgType`
   + `rmorph_alg` generalized to `lSemiAlgType` and semialgebra morphisms
-    ([#1125](https://github.com/math-comp/math-comp/pull/1125),
-    by Kazuhiko Sakaguchi).
+    ([#1125](https://github.com/math-comp/math-comp/pull/1125)).
   + `Nmodule_isNzSemiRing` is now a factory
   + `char`, `mulr_sumr`, `mulrnAl`, `mulrnAr`, `mulr_natl`,
     `mulr_natr`, `natrD`, `natr1`, `nat1r`, `natr_sum`, `natrM`,
@@ -400,37 +363,30 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
   + `exprBn`, `subrXX`, `sqrrB`, `subr_sqr`, `subr_sqrDB`,
     `scale_is_scalable`, `scale_fun_is_scalable`, `comRingMixin`,
     `ffun_mulC`, `pair_mulC` generalized to `comPzRingType`
-    ([#1319](https://github.com/math-comp/math-comp/pull/1319),
-     by Tragicus).
+    ([#1319](https://github.com/math-comp/math-comp/pull/1319)).
 
 - in `archimedean.v`
   + the definition of archimedean structures now include `Num.floor` and `Num.ceil`
   + as its consequence, `Num.ceil x = - Num.floor (- x)` does not hold definitionally anymore (use lemma `ceilNfloor` instead)
-    ([#1250](https://github.com/math-comp/math-comp/pull/1250),
-    by Kazuhiko Sakaguchi).
+    ([#1250](https://github.com/math-comp/math-comp/pull/1250)).
 
 - in `bigop.v`
   + change the implicit arguments of lemmas `big_cat_nat_idem` and
     `big_cat_nat`
-    ([#1261](https://github.com/math-comp/math-comp/pull/1261),
-    by Kimaya Bedarkar).
+    ([#1261](https://github.com/math-comp/math-comp/pull/1261)).
   + change the implicit arguments of lemmas `leq_prod`,
     `prodn_cond_gt0` and `prodn_gt0`
-    ([#931](https://github.com/math-comp/math-comp/pull/931),
-    by Erik Martin-Dorel).
+    ([#931](https://github.com/math-comp/math-comp/pull/931)).
 
 - in `sesquilinear.v`
   + notations `_ ^ _` and `_ ^t _` are now in the dedicated scope `sesquilinear_scope`.
-  ([#1314](https://github.com/math-comp/math-comp/pull/1314),
-  by Cyril Cohen).
+    ([#1314](https://github.com/math-comp/math-comp/pull/1314)).
   + move notation ``` ``_ ``` to `spectral.v` and make it local
-    ([#1363](https://github.com/math-comp/math-comp/pull/1363),
-    by Reynald Affeldt).
+    ([#1363](https://github.com/math-comp/math-comp/pull/1363)).
 
 - in `spectral.v`
   + notations `_ ^t*` is now in the dedicated scope `sesquilinear_scope`.
-  ([#1314](https://github.com/math-comp/math-comp/pull/1314),
-  by Cyril Cohen).
+  ([#1314](https://github.com/math-comp/math-comp/pull/1314)).
 
 - in `ssrint.v`
   + `mulrzAl`, `mulrzAr`, `mulrzl`, `mulrzr`, `mulNrNz`, `mulrbz`,
@@ -439,38 +395,32 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
     `rmorph_int`, `linearMn`, `commrMz`, `commr_int`, `sumMz`,
     `prodMz`, `intr_sign`, `rpred_int`, `rpredZint` generalized to
     `pzRingType`
-    ([#1319](https://github.com/math-comp/math-comp/pull/1319),
-     by Tragicus).
+    ([#1319](https://github.com/math-comp/math-comp/pull/1319)).
   + lemmas `exprz_ge0`, `exprz_gt0`, `exprz_gte0`, `ler_wpiXz2l`,
     `ler_wpeXz2l`, `pexprz_eq1` and `ler_wpXz2r` generalized from
     `realFieldType` to `numDomainType`
-    ([#1367](https://github.com/math-comp/math-comp/pull/1367),
-    by Pierre Roux).
+    ([#1367](https://github.com/math-comp/math-comp/pull/1367)).
 
 - in `ssrnum.v`
   + Mixin `Zmodule_isNormed` is now a factory building a
     `SemiNormedZmodule` and a `SemiNormedZmodule_isPositiveDefinite`.
-    ([#1333](https://github.com/math-comp/math-comp/pull/1333),
-    by  Alessandro Bruni and Cyril Cohen).
+    ([#1333](https://github.com/math-comp/math-comp/pull/1333)).
   + Generalized lemmas from the theory of `normedZmodType` to
     `semiNormedZmodType`: `normr0`, `distrC`, `normr_id`, and
     `normr_ge0`, `normr_real`, `ler_norm_sum`, `ler_normB`,
     `ler_distD`, `lerB_normD`, `lerB_dist`, `ler_dist_dist`,
     `ler_dist_normD`, `ler_nnorml`, `ltr_nnorml`, `lter_nnormr`.
-    ([#1333](https://github.com/math-comp/math-comp/pull/1333),
-    by Alessandro Bruni and Cyril Cohen).
+    ([#1333](https://github.com/math-comp/math-comp/pull/1333)).
 
 - in `ssrnat.v`
   + lemma `eq_binP` changed from Stdlib's `N.eqb` to new `N_eqb`
   + eqtype instance on `nat` changed from Stdlib's `N.eqb`
     to new `N_eqb`
-    ([#1343](https://github.com/math-comp/math-comp/pull/1343),
-    by Pierre Roux).
+    ([#1343](https://github.com/math-comp/math-comp/pull/1343)).
 
 - in `rat.v`
   + `Num.floor`, `Num.ceil` and `Num.truncn` on `rat` now compute
-    ([#1381](https://github.com/math-comp/math-comp/pull/1381), by
-    Pierre Roux and Kazuhiko Sakaguchi).
+    ([#1381](https://github.com/math-comp/math-comp/pull/1381)).
 
 - in `matrix.v`
   + Definitions `mulmx`, `perm_mx`, `tperm_mx`, `is_perm_mx`, `pid_mx`,
@@ -541,15 +491,13 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
     `mul_adj_mx`, `adj1`, `mulmx1C`, `det_ublock`, `det_lblock`, `det_trig`,
     `det_diag`, `mxOver_scalar`, `mxOver_scalarE`, `mxOverZ`, `mxOver_diag`,
     `mxOver_diagE`, `mxOverM`, `det_Vandermonde` generalized to `comPzRingType`
-    ([#1385](https://github.com/math-comp/math-comp/pull/1385),
-    by Kazuhiko Sakaguchi).
+    ([#1385](https://github.com/math-comp/math-comp/pull/1385)).
 
 ### Renamed
 
 - in `archimedean.v`
   + `NumDomain_isArchimedean.Build` -> `NumDomain_hasTruncn.Build`
-    ([#1250](https://github.com/math-comp/math-comp/pull/1250),
-    by Kazuhiko Sakaguchi).
+    ([#1250](https://github.com/math-comp/math-comp/pull/1250)).
   + `real_ge_floor` -> `real_floor_le`
   + `real_lt_succ_floor` -> `real_floorD1_gt`
   + `real_gt_pred_ceil` -> `real_ceilB1_lt`
@@ -561,17 +509,15 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
   + `floor_le` -> `le_floor`
   + `ceil_le` -> `le_ceil_tmp`
   + `natrE` -> `natrEtruncn`
-    ([#1359](https://github.com/math-comp/math-comp/pull/1359),
-    by Pierre Roux).
+    ([#1359](https://github.com/math-comp/math-comp/pull/1359)).
 
 - in `ssrfun.v`
-	+ `eqfun` now has type
-			`forall [B] [A : B -> Type] (f g : forall b, A b), Prop`
-	+ `eqrel` now has type
-			`forall [C] [B : C -> Type] [A : forall c, B c -> Type]
-				(f g : forall c b, A c b), Prop`
-    (`#1300 <https://github.com/math-comp/math-comp/pull/1300>`_,
-    by Tragicus).
+  + `eqfun` now has type
+    `forall [B] [A : B -> Type] (f g : forall b, A b), Prop`
+  + `eqrel` now has type
+    `forall [C] [B : C -> Type] [A : forall c, B c -> Type]
+       (f g : forall c b, A c b), Prop`
+  ([#1300](https://github.com/math-comp/math-comp/pull/1300)).
 
 - in `ssralg.v`
   + `Nmodule_isSemiRing` -> `Nmodule_isNzSemiRing`
@@ -602,9 +548,8 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
   + `subSemiRingType` -> `subNzSemiRingType`
   + `subComSemiRingType` -> `subComNzSemiRingType`
   + `subRingType` -> `subNzRingType`
-  + ``subComNzRingType` -> `subComNzRingType`
-  ([#1306](https://github.com/math-comp/math-comp/pull/1306),
-  by Quentin Vermande).
+  + `subComNzRingType` -> `subComNzRingType`
+  ([#1306](https://github.com/math-comp/math-comp/pull/1306)).
   + `char` -> `pchar`
   + `[char _]` -> `[pchar _]`
   + `has_char0` -> `has_pchar0`
@@ -645,8 +590,7 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
 - in `ring_quotient.v`
   + `isRingQuotient` -> `isNzRingQuotient`
   + `ringQuotType` -> `nzRingQuotType`
-  ([#1306](https://github.com/math-comp/math-comp/pull/1306),
-  by Quentin Vermande).
+  ([#1306](https://github.com/math-comp/math-comp/pull/1306)).
 
 - in `finalg.v`
   + `isRing` -> `isNzRing`
@@ -655,16 +599,14 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
   + `finComSemiRingType` -> `finComNzSemiRingType`
   + `finComRingType` -> `finComNzRingType`
   + `card_finRing_gt1` -> `card_finNzRing_gt1`
-  ([#1306](https://github.com/math-comp/math-comp/pull/1306),
-  by Quentin Vermande).
+  ([#1306](https://github.com/math-comp/math-comp/pull/1306)).
 
 - in `countalg.v`
   + `countSemiRingType`-> `countNzSemiRingType`
   + `countRingType` -> `countNzRingType`
   + `countComSemiRingType` -> `countComNzSemiRingType`
   + `countComRingType` -> `countComNzRingType`
-  ([#1306](https://github.com/math-comp/math-comp/pull/1306),
-  by Quentin Vermande).
+  ([#1306](https://github.com/math-comp/math-comp/pull/1306)).
 
 - in `intdiv.v`
   + `dvdz_charf` -> `dvdz_pcharf`
@@ -677,8 +619,7 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
   + `size_add` -> `size_polyD`
   + `size_addl` -> `size_polyDl`
   + `size_mul_leq` -> `size_polyM_leq`
-  ([#1315](https://github.com/math-comp/math-comp/pull/1315),
-  by Reynald Affeldt).
+  ([#1315](https://github.com/math-comp/math-comp/pull/1315)).
 
 - in `qpoly.v`
   + `char_qpoly` -> `pchar_qpoly`
@@ -763,7 +704,7 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
   + `card_primeChar` -> `card_pprimeChar`
   + `primeChar_vectAxiom` -> `pprimeChar_vectAxiom`
   + `primeChar_dimf` -> `pprimeChar_dimf`
-  + `PrimePowerField` -> pPrimePowerField`
+  + `PrimePowerField` -> `pPrimePowerField`
   + `FinDomainSplittingFieldType` -> `FinDomainSplittingFieldType_pchar`
 
 - in `separable.v`
@@ -778,16 +719,14 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
 - in `abelian.v`
 	+ `fin_lmod_char_abelem` -> `fin_lmod_pchar_abelem`
 	+ `fin_lmod_char_abelem` -> `fin_lmod_pchar_abelem`
-    (`#1311 <https://github.com/coq/stdlib/pull/1311>`_,
-    by Tragicus).
+    ([#1311](https://github.com/coq/stdlib/pull/1311)).
 
 ### Removed
 
 - in `ssralg.v`
   + mixin `NzSemiRing_hasCommutativeMul`
   + factory `NzRing_hasCommutativeMul`
-    ([#1319](https://github.com/math-comp/math-comp/pull/1319),
-    by Tragicus).
+    ([#1319](https://github.com/math-comp/math-comp/pull/1319)).
 
 - in `ssrnat.v`
   + requirements for `BinNat`, `Ndec` and `Ring` from Stdlib. You may
@@ -799,41 +738,35 @@ Alessandro Bruni, Cyril Cohen, Enrico Tassi, Erik Martin-Dorel, Kazuhiko Sakaguc
   + definition `extend_number` (was a coercion)
   + tactic `nat_litteral`
   + ring instance for `nat` (use algebra-tactics instead)
-    ([#1343](https://github.com/math-comp/math-comp/pull/1343),
-    by Pierre Roux).
+    ([#1343](https://github.com/math-comp/math-comp/pull/1343)).
 
 - in `rat.v`
   + lemmas `rat_ring_theory` and `rat_field_theory`
   + ring and field instances for `rat` (use algebra-tactics instead)
-    ([#1343](https://github.com/math-comp/math-comp/pull/1343),
-    by Pierre Roux).
+    ([#1343](https://github.com/math-comp/math-comp/pull/1343)).
   + definition `inIntSpan` (moved to `rat.v`)
   + lemmas `Qint_dvdz`, `Qnat_dvd`, `size_rat_int_poly`,
     `rat_poly_scale`, `dvdp_rat_int`, `dvdpP_rat_int`,
     `irreductible_rat_int`, `solve_QInt_span`, `dec_Qint_span`,
     `eisenstein_crit` (moved to `rat.v`)
-    ([#1381](https://github.com/math-comp/math-comp/pull/1381),
-    by Pierre Roux).
+    ([#1381](https://github.com/math-comp/math-comp/pull/1381)).
 
 ### Deprecated
 
 - in `ssrnum.v`
   + lemma `pmulrn_rgt0`
-    ([#1324](https://github.com/math-comp/math-comp/pull/1324),
-    by Reynald Affeldt).
+    ([#1324](https://github.com/math-comp/math-comp/pull/1324)).
 
 - in `archimedean.v`
   + lemma `real_floor_ge_int` (use `real_floor_ge_int_tmp` instead)
   + lemma `real_ceil_le_int` (use `real_ceil_le_int_tmp` instead)
   + lemma `floor_ge_int` (use `floor_ge_int_tmp` instead)
   + lemma `ceil_le_int` (use `ceil_le_int_tmp` instead)
-    ([#1359](https://github.com/math-comp/math-comp/pull/1359),
-    by Pierre Roux).
+    ([#1359](https://github.com/math-comp/math-comp/pull/1359)).
 
 - in `interval.v`
   + lemma `subset_itv_bound`, use `subset_itv` instead
-    ([#1380](https://github.com/math-comp/math-comp/pull/1380),
-    by Alessandro Bruni).
+    ([#1380](https://github.com/math-comp/math-comp/pull/1380)).
 
 ## [2.3.0] - 2024-11-28
 
