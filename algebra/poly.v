@@ -669,10 +669,13 @@ Proof. by rewrite /lead_coef size_polyN coefN. Qed.
 
 (* Polynomial ring structure. *)
 
-Fact polyC_multiplicative : monoid_morphism (@polyC R).
+Fact polyC_is_monoid_morphism : monoid_morphism (@polyC R).
 Proof. by split; last apply: polyCM. Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `polyC_is_monoid_morphism` instead")]
+Definition polyC_multiplicative := polyC_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build R {poly R} (@polyC R)
-  polyC_multiplicative.
+  polyC_is_monoid_morphism.
 
 Lemma polyC_exp n : {morph (@polyC R) : c / c ^+ n}. Proof. exact: rmorphXn. Qed.
 
@@ -691,14 +694,16 @@ Proof.
 by rewrite -signr_odd; case: (odd n); rewrite ?mul1r// mulN1r size_polyN.
 Qed.
 
-Fact coefp0_multiplicative : monoid_morphism (coefp 0 : {poly R} -> R).
+Fact coefp0_is_monoid_morphism : monoid_morphism (coefp 0 : {poly R} -> R).
 Proof.
 split=> [|p q]; first by rewrite polyCK.
 by rewrite [coefp 0 _]coefM big_ord_recl big_ord0 addr0.
 Qed.
-
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `coefp0_is_monoid_morphism` instead")]
+Definition coefp0_multiplicative := coefp0_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build {poly R} R (coefp 0)
-  coefp0_multiplicative.
+  coefp0_is_monoid_morphism.
 
 (* Algebra structure of polynomials. *)
 Definition scale_poly_def a (p : {poly R}) := \poly_(i < size p) (a * p`_i).
@@ -2017,6 +2022,9 @@ Proof. exact: map_poly_comp_id0 (raddf0 f). Qed.
 
 Fact map_poly_is_zmod_morphism : zmod_morphism (map_poly f).
 Proof. by move=> p q; apply/polyP=> i; rewrite !(coef_map, coefB) raddfB. Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `map_poly_is_zmod_morphism` instead")]
+Definition map_poly_is_additive := map_poly_is_zmod_morphism.
 HB.instance Definition _ :=
   GRing.isZmodMorphism.Build {poly aR} {poly rR} (map_poly f)
     map_poly_is_zmod_morphism.
@@ -2042,7 +2050,9 @@ split=> [|p q]; apply/polyP=> i.
 rewrite coef_map /= !coefM /= !rmorph_sum; apply: eq_bigr => j _.
 by rewrite !coef_map rmorphM.
 Qed.
-
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `map_poly_is_monoid_morphism` instead")]
+Definition map_poly_is_multiplicative := map_poly_is_monoid_morphism.
 HB.instance Definition _ :=
   GRing.isMonoidMorphism.Build {poly aR} {poly rR} (map_poly f)
     map_poly_is_monoid_morphism.
@@ -2125,7 +2135,9 @@ split=> [|p q]; first by rewrite /horner_morph rmorph1 hornerC.
 rewrite /horner_morph rmorphM /= hornerM_comm //.
 by apply: comm_coef_poly => i; rewrite coef_map cfu.
 Qed.
-
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `horner_is_monoid_morphism` instead")]
+Definition horner_is_multiplicative := horner_is_monoid_morphism.
 HB.instance Definition _ :=
   GRing.isSemilinear.Build aR {poly aR} rR _ (horner_morph cfu)
     (GRing.semilinear_linear horner_is_linear).
@@ -2664,7 +2676,9 @@ have evalE : horner_eval x =1 horner_morph cxid.
   by move=> p; congr _.[x]; rewrite map_poly_id.
 by split=> [|p q]; rewrite !evalE ?rmorph1// rmorphM.
 Qed.
-
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `horner_eval_is_monoid_morphism` instead")]
+Definition horner_eval_is_multiplicative := horner_eval_is_monoid_morphism.
 HB.instance Definition _ x :=
   GRing.isSemilinear.Build R {poly R} R _ (horner_eval x)
     (GRing.semilinear_linear (horner_eval_is_linear x)).
@@ -2707,11 +2721,14 @@ Qed.
 
 End HornerAlg.
 
-Fact comp_poly_multiplicative q : monoid_morphism (comp_poly q).
+Fact comp_poly_is_monoid_morphism q : monoid_morphism (comp_poly q).
 Proof.
 split=> [|p1 p2]; first by rewrite comp_polyC.
 by rewrite /comp_poly rmorphM hornerM_comm //; apply: mulrC.
 Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `comp_poly_is_monoid_morphism` instead")]
+Definition comp_poly_multiplicative := comp_poly_is_monoid_morphism.
 HB.instance Definition _ q := GRing.isMonoidMorphism.Build _ _ (comp_poly q)
   (comp_poly_multiplicative q).
 

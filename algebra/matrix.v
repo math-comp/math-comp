@@ -1640,6 +1640,9 @@ Proof. by apply: (big_morph (fun A => A i j)) => [A B|]; rewrite mxE. Qed.
 
 Lemma const_mx_is_nmod_morphism : nmod_morphism const_mx.
 Proof. by split=> [|a b]; apply/matrixP => // i j; rewrite !mxE. Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `const_mx_is_nmod_morphism` instead")]
+Definition const_mx_is_semi_additive := const_mx_is_nmod_morphism.
 HB.instance Definition _ := GRing.isNmodMorphism.Build V 'M[V]_(m, n) const_mx
   const_mx_is_nmod_morphism.
 
@@ -1654,6 +1657,9 @@ Definition swizzle_mx k (A : 'M[V]_(m, n)) :=
 
 Lemma swizzle_mx_is_nmod_morphism k : nmod_morphism (swizzle_mx k).
 Proof. by split=> [|A B]; apply/matrixP => i j; rewrite !mxE. Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `swizzle_mx_is_nmod_morphism` instead")]
+Definition swizzle_mx_is_semi_additive := swizzle_mx_is_nmod_morphism.
 HB.instance Definition _ k := GRing.isNmodMorphism.Build 'M_(m, n) 'M_(p, q)
   (swizzle_mx k) (swizzle_mx_is_nmod_morphism k).
 
@@ -1956,6 +1962,9 @@ Lemma diag_mx_is_nmod_morphism n : nmod_morphism (@diag_mx n).
 Proof.
 by split=> [|A B]; apply/matrixP => i j; rewrite !mxE ?mul0rn// mulrnDl.
 Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `diag_mx_is_nmod_morphism` instead")]
+Definition diag_mx_is_semi_additive := diag_mx_is_nmod_morphism.
 HB.instance Definition _ n := GRing.isNmodMorphism.Build 'rV_n 'M_n (@diag_mx n)
   (@diag_mx_is_nmod_morphism n).
 
@@ -1999,6 +2008,9 @@ Proof. by apply/matrixP=> i j; rewrite !mxE eq_sym. Qed.
 
 Lemma scalar_mx_is_nmod_morphism : nmod_morphism scalar_mx.
 Proof. by split=> [|a b]; rewrite -!diag_const_mx ?raddf0// !raddfD. Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `scalar_mx_is_nmod_morphism` instead")]
+Definition scalar_mx_is_semi_additive := scalar_mx_is_nmod_morphism.
 HB.instance Definition _ := GRing.isNmodMorphism.Build V 'M_n scalar_mx
   scalar_mx_is_nmod_morphism.
 
@@ -2062,6 +2074,9 @@ split=> [|A B].
   by rewrite big_const_idem //= addr0.
 - by rewrite -big_split /=; apply: eq_bigr => i _; rewrite mxE.
 Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `mxtrace_is_nmod_morphism` instead")]
+Definition mxtrace_is_semi_additive := mxtrace_is_nmod_morphism.
 HB.instance Definition _ := GRing.isNmodMorphism.Build 'M_n V mxtrace
   mxtrace_is_nmod_morphism.
 
@@ -2140,7 +2155,9 @@ HB.instance Definition _ := GRing.Nmodule_isZmodule.Build 'M[V]_(m, n)
 
 Lemma const_mx_is_zmod_morphism : zmod_morphism const_mx.
 Proof. by move=> a b; apply/matrixP=> i j; rewrite !mxE. Qed.
-
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `const_mx_is_zmod_morphism` instead")]
+Definition const_mx_is_additive := const_mx_is_zmod_morphism.
 #[warning="-HB.no-new-instance"]
 HB.instance Definition _ := GRing.isZmodMorphism.Build V 'M[V]_(m, n) const_mx
   const_mx_is_zmod_morphism.
@@ -2153,6 +2170,9 @@ Variables (m n p q : nat) (f : 'I_p -> 'I_q -> 'I_m) (g : 'I_p -> 'I_q -> 'I_n).
 
 Lemma swizzle_mx_is_zmod_morphism k : zmod_morphism (swizzle_mx f g k).
 Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE. Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `swizzle_mx_is_zmod_morphism` instead")]
+Definition swizzle_mx_is_additive := swizzle_mx_is_zmod_morphism.
 #[warning="-HB.no-new-instance"]
 HB.instance Definition _ k := GRing.isZmodMorphism.Build 'M_(m, n) 'M_(p, q)
   (swizzle_mx f g k) (swizzle_mx_is_zmod_morphism k).
@@ -2215,6 +2235,9 @@ Lemma diag_mx_is_zmod_morphism n : zmod_morphism (@diag_mx V n).
 Proof.
 by move=>A B; apply/matrixP=>i j; rewrite !mxE mulrnBl.
 Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `diag_mx_is_zmod_morphism` instead")]
+Definition diag_mx_is_additive := diag_mx_is_zmod_morphism.
 #[warning="-HB.no-new-instance"]
 HB.instance Definition _ n := GRing.isZmodMorphism.Build 'rV_n 'M_n (@diag_mx V n)
   (@diag_mx_is_zmod_morphism n).
@@ -2226,6 +2249,9 @@ Variable n : nat.
 
 Lemma scalar_mx_is_zmod_morphism : zmod_morphism (@scalar_mx V n).
 Proof. by move=> a b; rewrite -!diag_const_mx !raddfB. Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `scalar_mx_is_zmod_morphism` instead")]
+Definition scalar_mx_is_additive := scalar_mx_is_zmod_morphism.
 #[warning="-HB.no-new-instance"]
 HB.instance Definition _ := GRing.isZmodMorphism.Build V 'M_n scalar_mx
   scalar_mx_is_zmod_morphism.
@@ -2242,6 +2268,9 @@ Proof.
 move=>A B; rewrite -sumrN -big_split /=.
 by apply: eq_bigr=> i _; rewrite !mxE.
 Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `mxtrace_is_zmod_morphism` instead")]
+Definition mxtrace_is_additive := mxtrace_is_zmod_morphism.
 #[warning="-HB.no-new-instance"]
 HB.instance Definition _ := GRing.isZmodMorphism.Build 'M_n V (@mxtrace V n)
   mxtrace_is_zmod_morphism.
@@ -2748,6 +2777,9 @@ Lemma idmxE : 1%:M = 1 :> 'M_n. Proof. by []. Qed.
 
 Lemma scalar_mx_is_monoid_morphism : monoid_morphism (@scalar_mx R n).
 Proof. by split=> //; apply: scalar_mxM. Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `scalar_mx_is_monoid_morphism` instead")]
+Definition scalar_mx_is_multiplicative := scalar_mx_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build R 'M_n (@scalar_mx _ n)
   scalar_mx_is_monoid_morphism.
 
@@ -2911,7 +2943,9 @@ End FixedSize.
 
 Lemma map_mx_is_monoid_morphism n : monoid_morphism (map_mx f : 'M_n -> 'M_n).
 Proof. by split; [apply: map_mx1 | apply: map_mxM]. Qed.
-
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `map_mx_is_monoid_morphism` instead")]
+Definition map_mx_is_multiplicative := map_mx_is_monoid_morphism.
 HB.instance Definition _ n :=
   GRing.isMonoidMorphism.Build 'M[aR]_n 'M[rR]_n (map_mx f)
     (map_mx_is_monoid_morphism n).
