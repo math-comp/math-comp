@@ -2730,7 +2730,7 @@ Qed.
       note="use `comp_poly_is_monoid_morphism` instead")]
 Definition comp_poly_multiplicative := comp_poly_is_monoid_morphism.
 HB.instance Definition _ q := GRing.isMonoidMorphism.Build _ _ (comp_poly q)
-  (comp_poly_multiplicative q).
+  (comp_poly_is_monoid_morphism q).
 
 Lemma comp_polyM p q r : (p * q) \Po r = (p \Po r) * (q \Po r).
 Proof. exact: rmorphM. Qed.
