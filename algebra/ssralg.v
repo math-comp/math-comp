@@ -2268,7 +2268,7 @@ End LalgebraTheory.
 
 Definition nmod_morphism (U V : nmodType) (f : U -> V) : Prop :=
   (f 0 = 0) * {morph f : x y / x + y}.
-#[deprecated(since="mathcomp 2.4.0", note="use `nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", note="use `nmod_morphism` instead")]
 Definition semi_additive := nmod_morphism.
 
 HB.mixin Record isNmodMorphism (U V : nmodType) (apply : U -> V) := {
@@ -2300,19 +2300,14 @@ HB.instance Definition _ := isNmodMorphism.Build U V apply (conj raddf0 raddfD).
 
 HB.end.
 
-#[deprecated(since="mathcomp 2.4.0", note="use `zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", note="use `zmod_morphism` instead")]
 Definition additive := zmod_morphism.
 
-HB.factory Record isAdditive (U V : zmodType) (apply : U -> V) := {
-  additive_subproof : zmod_morphism apply;
-}.
-
-HB.builders Context U V apply of isAdditive U V apply.
-
-HB.instance Definition _ := isZmodMorphism.Build U V apply additive_subproof.
-
-HB.end.
-
+Module isAdditive.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use isNmodMorphism.Build instead.")]
+Notation Build U V apply := (isNmodMorphism.Build U V apply) (only parsing).
+End isAdditive.
 
 Module AdditiveExports.
 Notation "{ 'additive' U -> V }" := (Additive.type U%type V%type) : type_scope.
@@ -2394,6 +2389,8 @@ Proof.
 move=> fK f'K.
 by split=> [|x y]; apply: (canLR fK); rewrite ?raddf0// raddfD !f'K.
 Qed.
+#[deprecated(since="mathcomp 2.5.0", note="use `can2_nmod_morphism` instead")]
+Definition can2_semi_additive := can2_nmod_morphism.
 
 End Properties.
 
@@ -2484,6 +2481,10 @@ Proof. by move=> x /=; rewrite raddfN raddfMn. Qed.
 Lemma can2_zmod_morphism f' : cancel f f' -> cancel f' f -> zmod_morphism f'.
 Proof. by move=> fK f'K x y /=; apply: (canLR fK); rewrite raddfB !f'K. Qed.
 
+#[warnings="-deprecated",
+    deprecated(since="mathcomp 2.5.0", note="use `can2_zmod_morphism` instead")]
+Definition can2_additive := can2_zmod_morphism.
+
 End Properties.
 
 Section RingProperties.
@@ -2539,14 +2540,14 @@ End ScaleFun.
 
 End AdditiveTheory.
 
-#[deprecated(since="mathcomp 2.4.0", note="use `monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", note="use `monoid_morphism` instead")]
 Definition multiplicative (R S : pzSemiRingType) (f : R -> S) : Prop :=
   {morph f : x y / x * y}%R * (f 1 = 1).
 Definition monoid_morphism (R S : pzSemiRingType) (f : R -> S) : Prop :=
    (f 1 = 1) * {morph f : x y / x * y}%R.
 
 HB.mixin Record isMonoidMorphism (R S : pzSemiRingType) (f : R -> S) := {
-  rmorphism_1_first_subproof : monoid_morphism f
+  monoid_morphism_subproof : monoid_morphism f
 }.
 
 HB.structure Definition RMorphism (R S : pzSemiRingType) :=
@@ -2586,7 +2587,7 @@ Lemma rmorph_sum I r (P : pred I) E :
 Proof. exact: raddf_sum. Qed.
 
 Lemma rmorphismMP : monoid_morphism f.
-Proof. exact: rmorphism_1_first_subproof. Qed.
+Proof. exact: monoid_morphism_subproof. Qed.
 Lemma rmorph1 : f 1 = 1. Proof. by case: rmorphismMP. Qed.
 Lemma rmorphM : {morph f: x y  / x * y}. Proof. by case: rmorphismMP. Qed.
 
@@ -2803,12 +2804,13 @@ Definition semilinear_for (R : pzSemiRingType)
     (U : lSemiModType R) (V : nmodType) (s : R -> V -> V) (f : U -> V) : Type :=
   scalable_for s f * {morph f : x y / x + y}.
 
-Lemma additive_semilinear (R : pzSemiRingType)
+Lemma nmod_morphism_semilinear (R : pzSemiRingType)
     (U : lSemiModType R) (V : nmodType) (s : Scale.semiLaw R V) (f : U -> V) :
   semilinear_for s f -> nmod_morphism f.
 Proof.
 by case=> sf Df; split => //; rewrite -[0 in LHS](scale0r 0) sf Scale.op0v.
 Qed.
+Definition additive_semilinear := nmod_morphism_semilinear.
 
 Lemma scalable_semilinear (R : pzSemiRingType)
     (U : lSemiModType R) (V : nmodType) (s : Scale.preLaw R V) (f : U -> V) :
@@ -2834,6 +2836,9 @@ Definition linear_for (R : pzSemiRingType) (U : lSemiModType R) (V : nmodType)
 Lemma zmod_morphism_linear (R : pzRingType) (U : lmodType R) V
   (s : Scale.law R V) (f : U -> V) : linear_for s f -> zmod_morphism f.
 Proof. by move=> Lsf x y; rewrite -scaleN1r addrC Lsf Scale.N1op addrC. Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `zmod_morphism_linear` instead")]
+Definition additive_linear := zmod_morphism_linear.
 
 Lemma scalable_linear (R : pzRingType) (U : lmodType R) V
   (s : Scale.law R V) (f : U -> V) : linear_for s f -> scalable_for s f.
@@ -7315,11 +7320,11 @@ Definition eq_sol := eq_sol.
 Definition size_sol := size_sol.
 Definition solve_monicpoly := @solve_monicpoly.
 #[warnings="-deprecated",
-    deprecated(since="mathcomp 2.4.0", note="use `nmod_morphism` instead")]
+    deprecated(since="mathcomp 2.5.0", note="use `nmod_morphism` instead")]
 Definition semi_additive := semi_additive.
 Definition nmod_morphism := nmod_morphism.
 #[warnings="-deprecated",
-    deprecated(since="mathcomp 2.4.0", note="use `zmod_morphism` instead")]
+    deprecated(since="mathcomp 2.5.0", note="use `zmod_morphism` instead")]
 Definition additive := additive.
 Definition zmod_morphism := zmod_morphism.
 Definition raddf0 := raddf0.
@@ -7333,10 +7338,16 @@ Definition raddfMn := raddfMn.
 Definition raddfMNn := raddfMNn.
 Definition raddfMnat := raddfMnat.
 Definition raddfMsign := raddfMsign.
+#[warnings="-deprecated",
+    deprecated(since="mathcomp 2.5.0", note="use `can2_nmod_morphism` instead")]
+Definition can2_semi_additive := can2_semi_additive.
 Definition can2_nmod_morphism := can2_nmod_morphism.
+#[warnings="-deprecated",
+    deprecated(since="mathcomp 2.5.0", note="use `can2_zmod_morphism` instead")]
+Definition can2_additive := can2_additive.
 Definition can2_zmod_morphism := can2_zmod_morphism.
 #[warnings="-deprecated",
-    deprecated(since="mathcomp 2.4.0", note="use `monoid_morphism` instead")]
+    deprecated(since="mathcomp 2.5.0", note="use `monoid_morphism` instead")]
 Definition multiplicative := multiplicative.
 Definition monoid_morphism := monoid_morphism.
 Definition rmorph0 := rmorph0.
@@ -7417,7 +7428,13 @@ Definition in_algE := in_algE.
 Definition scalable_for := scalable_for.
 Definition semilinear_for := semilinear_for.
 Definition linear_for := linear_for.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `nmod_morphism_semilinear` instead")]
 Definition additive_semilinear := additive_semilinear.
+Definition nmod_morphism_semilinear := nmod_morphism_semilinear.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `zmod_morphism_linear` instead")]
+Definition additive_linear := additive_linear.
 Definition zmod_morphism_linear := zmod_morphism_linear.
 Definition scalable_semilinear := scalable_semilinear.
 Definition scalable_linear := scalable_linear.
