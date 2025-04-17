@@ -14,7 +14,8 @@ depends: [
   | "rocq-core" {>= "9.0" | = "dev"})
   # Please keep the "dev" above as it is required for the coq-dev Docker images
   "elpi" {>= "1.17.0"}
-  "coq-hierarchy-builder" { >= "1.7.0"}
+  ("coq-hierarchy-builder" { >= "1.7.0"}
+  | "rocq-hierarchy-builder" { >= "1.9.0" | = "dev" })
 ]
 
 tags: [
