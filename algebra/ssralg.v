@@ -2303,10 +2303,16 @@ HB.end.
 #[deprecated(since="mathcomp 2.5.0", note="use `zmod_morphism` instead")]
 Definition additive := zmod_morphism.
 
-Module isAdditive.
+Module isSemiAdditive.
 #[deprecated(since="mathcomp 2.5.0",
              note="Use isNmodMorphism.Build instead.")]
 Notation Build U V apply := (isNmodMorphism.Build U V apply) (only parsing).
+End isSemiAdditive.
+
+Module isAdditive.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use isZmodMorphism.Build instead.")]
+Notation Build U V apply := (isZmodMorphism.Build U V apply) (only parsing).
 End isAdditive.
 
 Module AdditiveExports.
