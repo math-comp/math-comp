@@ -607,7 +607,7 @@ have some_realC: realC.
     have fA : zmod_morphism f.
       exact: can2_zmod_morphism (inj_can_sym QfK (fmorph_inj _)) QfK.
     have fM : monoid_morphism f.
-      exact: can2_rmorphism (inj_can_sym QfK (fmorph_inj _)) QfK.
+      exact: can2_monoid_morphism (inj_can_sym QfK (fmorph_inj _)) QfK.
     pose faM := GRing.isZmodMorphism.Build _ _ _ fA.
     pose fmM := GRing.isMonoidMorphism.Build _ _ _ fM.
     pose fRM : {rmorphism _ -> _} := HB.pack f faM fmM.

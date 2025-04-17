@@ -2612,11 +2612,15 @@ Proof. by move/inj_eq <-; rewrite rmorph_nat. Qed.
 Lemma rmorph_eq1 x : injective f -> (f x == 1) = (x == 1).
 Proof. exact: rmorph_eq_nat 1%N. Qed.
 
-Lemma can2_rmorphism f' : cancel f f' -> cancel f' f -> monoid_morphism f'.
+Lemma can2_monoid_morphism f' : cancel f f' -> cancel f' f -> monoid_morphism f'.
 Proof.
 move=> fK f'K.
 by split=> [|x y]; apply: (canLR fK); rewrite /= (rmorph1, rmorphM) ?f'K.
 Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `can2_monoid_morphism` instead")]
+Definition can2_rmorphism f' (cff' : cancel f f') :=
+  (fun p => (p.2, p.1)) \o (can2_monoid_morphism cff').
 
 End Properties.
 
@@ -2673,11 +2677,11 @@ Proof. by split; [exact: scale0r | exact: scalerDl]. Qed.
 HB.instance Definition _ :=
   isNmodMorphism.Build R A (in_alg A) in_alg_is_nmod_morphism.
 
-Fact in_alg_is_rmorphism : monoid_morphism (in_alg A).
+Fact in_alg_is_monoid_morphism : monoid_morphism (in_alg A).
 Proof. by split=> [|x y]; rewrite /= ?scale1r // mulr_algl scalerA. Qed.
 #[export]
 HB.instance Definition _ := isMonoidMorphism.Build R A (in_alg A)
-  in_alg_is_rmorphism.
+  in_alg_is_monoid_morphism.
 
 Lemma in_algE a : in_alg A a = a%:A. Proof. by []. Qed.
 
@@ -3366,8 +3370,10 @@ Bind Scope ring_scope with ComPzRing.sort.
 End ComPzRingExports.
 HB.export ComPzRingExports.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut_is_monoid_morphism instead.")]
-Notation Frobenius_aut_is_multiplicative := pFrobenius_aut_is_monoid_morphism (only parsing).
+#[deprecated(since="mathcomp 2.4.0",
+      note="Use pFrobenius_aut_is_monoid_morphism instead.")]
+Notation pFrobenius_aut_is_multiplicative :=
+  (fun p => (p.2, p.1) \o pFrobenius_aut_is_monoid_morphism) (only parsing).
 #[deprecated(since="mathcomp 2.4.0", note="Use exprDn_pchar instead.")]
 Notation exprDn_char := exprDn_pchar (only parsing).
 
@@ -7377,7 +7383,10 @@ Definition rmorph_sign := rmorph_sign.
 Definition rmorph_pchar := rmorph_pchar.
 #[deprecated(since="mathcomp 2.4.0", note="Use rmorph_pchar instead.")]
 Definition rmorph_char := rmorph_pchar.
+#[warnings="-deprecated",
+    deprecated(since="mathcomp 2.5.0", note="use `can2_monoid_morphism` instead")]
 Definition can2_rmorphism := can2_rmorphism.
+Definition can2_monoid_morphism := can2_monoid_morphism.
 Definition rmorph_comm := rmorph_comm.
 Definition rmorph_unit := rmorph_unit.
 Definition rmorphV := rmorphV.
@@ -7434,11 +7443,11 @@ Definition in_algE := in_algE.
 Definition scalable_for := scalable_for.
 Definition semilinear_for := semilinear_for.
 Definition linear_for := linear_for.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `nmod_morphism_semilinear` instead")]
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
+        note="use `nmod_morphism_semilinear` instead")]
 Definition additive_semilinear := additive_semilinear.
 Definition nmod_morphism_semilinear := nmod_morphism_semilinear.
-#[deprecated(since="mathcomp 2.5.0",
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
       note="use `zmod_morphism_linear` instead")]
 Definition additive_linear := additive_linear.
 Definition zmod_morphism_linear := zmod_morphism_linear.

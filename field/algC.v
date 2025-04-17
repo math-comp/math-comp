@@ -908,8 +908,8 @@ Proof. exact: inj_can_sym (algC_invautK nu) (fmorph_inj nu). Qed.
 Fact algC_invaut_is_zmod_morphism nu : zmod_morphism (algC_invaut nu).
 Proof. exact: can2_zmod_morphism (algC_autK nu) (algC_invautK nu). Qed.
 
-Fact algC_invaut_is_rmorphism nu : monoid_morphism (algC_invaut nu).
-Proof. exact: can2_rmorphism (algC_autK nu) (algC_invautK nu). Qed.
+Fact algC_invaut_is_monoid_morphism nu : monoid_morphism (algC_invaut nu).
+Proof. exact: can2_monoid_morphism (algC_autK nu) (algC_invautK nu). Qed.
 
 HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=
   GRing.isZmodMorphism.Build algC algC (algC_invaut nu)
@@ -917,7 +917,7 @@ HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=
 
 HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=
   GRing.isMonoidMorphism.Build algC algC (algC_invaut nu)
-    (algC_invaut_is_rmorphism nu).
+    (algC_invaut_is_monoid_morphism nu).
 
 Lemma minCpoly_aut nu x : minCpoly (nu x) = minCpoly x.
 Proof.

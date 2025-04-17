@@ -673,7 +673,8 @@ Fact polyC_is_monoid_morphism : monoid_morphism (@polyC R).
 Proof. by split; last apply: polyCM. Qed.
 #[deprecated(since="mathcomp 2.5.0",
       note="use `polyC_is_monoid_morphism` instead")]
-Definition polyC_multiplicative := polyC_is_monoid_morphism.
+Definition polyC_multiplicative :=
+  (fun g => (g.2, g.1)) polyC_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build R {poly R} (@polyC R)
   polyC_is_monoid_morphism.
 
@@ -701,7 +702,8 @@ by rewrite [coefp 0 _]coefM big_ord_recl big_ord0 addr0.
 Qed.
 #[deprecated(since="mathcomp 2.5.0",
       note="use `coefp0_is_monoid_morphism` instead")]
-Definition coefp0_multiplicative := coefp0_is_monoid_morphism.
+Definition coefp0_multiplicative :=
+  (fun g => (g.2, g.1)) coefp0_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build {poly R} R (coefp 0)
   coefp0_is_monoid_morphism.
 
@@ -2052,7 +2054,8 @@ by rewrite !coef_map rmorphM.
 Qed.
 #[deprecated(since="mathcomp 2.5.0",
       note="use `map_poly_is_monoid_morphism` instead")]
-Definition map_poly_is_multiplicative := map_poly_is_monoid_morphism.
+Definition map_poly_is_multiplicative :=
+  (fun g => (g.2, g.1)) map_poly_is_monoid_morphism.
 HB.instance Definition _ :=
   GRing.isMonoidMorphism.Build {poly aR} {poly rR} (map_poly f)
     map_poly_is_monoid_morphism.
@@ -2137,7 +2140,8 @@ by apply: comm_coef_poly => i; rewrite coef_map cfu.
 Qed.
 #[deprecated(since="mathcomp 2.5.0",
       note="use `horner_is_monoid_morphism` instead")]
-Definition horner_is_multiplicative := horner_is_monoid_morphism.
+Definition horner_is_multiplicative :=
+  (fun g => (g.2, g.1)) horner_is_monoid_morphism.
 HB.instance Definition _ :=
   GRing.isSemilinear.Build aR {poly aR} rR _ (horner_morph cfu)
     (GRing.semilinear_linear horner_is_linear).
@@ -2678,7 +2682,8 @@ by split=> [|p q]; rewrite !evalE ?rmorph1// rmorphM.
 Qed.
 #[deprecated(since="mathcomp 2.5.0",
       note="use `horner_eval_is_monoid_morphism` instead")]
-Definition horner_eval_is_multiplicative := horner_eval_is_monoid_morphism.
+Definition horner_eval_is_multiplicative x :=
+  (fun g => (g.2, g.1)) (horner_eval_is_monoid_morphism x).
 HB.instance Definition _ x :=
   GRing.isSemilinear.Build R {poly R} R _ (horner_eval x)
     (GRing.semilinear_linear (horner_eval_is_linear x)).
@@ -2728,7 +2733,8 @@ by rewrite /comp_poly rmorphM hornerM_comm //; apply: mulrC.
 Qed.
 #[deprecated(since="mathcomp 2.5.0",
       note="use `comp_poly_is_monoid_morphism` instead")]
-Definition comp_poly_multiplicative := comp_poly_is_monoid_morphism.
+Definition comp_poly_multiplicative q :=
+  (fun g => (g.2, g.1)) (comp_poly_is_monoid_morphism q).
 HB.instance Definition _ q := GRing.isMonoidMorphism.Build _ _ (comp_poly q)
   (comp_poly_is_monoid_morphism q).
 
