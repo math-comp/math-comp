@@ -1,5 +1,6 @@
 From mathcomp Require Import
-  all_ssreflect
+  all_base
+  all_order
   all_algebra
   all_field
   all_character

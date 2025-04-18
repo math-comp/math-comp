@@ -1,20 +1,5 @@
-Require Export ssreflect.
-Require Export ssrbool.
-Require Export ssrfun.
-Require Export eqtype.
-Require Export ssrnat.
-Require Export seq.
-Require Export choice.
-Require Export path.
-Require Export div.
-Require Export fintype.
-Require Export fingraph.
-Require Export tuple.
-Require Export finfun.
-Require Export bigop.
-Require Export prime.
-Require Export finset.
-Require Export order.
-Require Export binomial.
-Require Export generic_quotient.
-Require Export ssrAC.
+Attributes deprecated(since="mathcomp 2.5.0",
+  note="Use 'all_base' and/or 'all_order' instead.").
+
+From mathcomp Require Export all_base.
+From mathcomp Require Export all_order.
