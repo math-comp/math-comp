@@ -2594,7 +2594,7 @@ Proof. exact: raddf_sum. Qed.
 
 Lemma rmorphism_monoidP : monoid_morphism f.
 Proof. exact: monoid_morphism_subproof. Qed.
-#[deprecated(since="mathcomp 2.5.0",
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
       note="use `rmorphism_monoidP` instead")]
 Definition rmorphismMP : multiplicative f :=
   (fun p => (p.2, p.1)) rmorphism_monoidP.
