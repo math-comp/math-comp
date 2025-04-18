@@ -540,7 +540,7 @@ suffices [L [ys Dp]]: {L : fieldExtType F & splits L p^%:A}.
     suffices: map_poly toL lhs %= map_poly toL rhs by rewrite eqp_map.
     rewrite -Dys big_map in Dp; apply: etrans Dp; apply: congr2.
       by rewrite -map_poly_comp; apply/eq_map_poly=> x; apply: rmorph_alg.
-    by rewrite rmorph_prod; apply/eq_bigr=> z _; apply mapXsubC.
+    by rewrite rmorph_prod; apply/eq_bigr=> z _; apply: mapXsubC.
   set Lzs := LHS; pose Lys := (toL @: Lzs)%VS; apply/vspaceP=> u.
   have: val u \in Lys by rewrite /Lys aimg_adjoin_seq aimg1 Dys (valP u).
   by case/memv_imgP=> v Lzs_v; rewrite memvf lfunE => /val_inj->.
