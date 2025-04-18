@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     + `can2_additive` -> `can2_zmod_morphism`.
     + `additive_semilinear` -> `nmod_morphism_semilinear`.
     + `additive_linear` -> `zmod_morphism_linear`.
+    + `rmorphismMP` -> `rmorphism_monoidP`.
 
 - in `ring_quotient.v`
 	+ `isRingQuotient` -> `isNzRingQuotient`

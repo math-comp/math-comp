@@ -2592,10 +2592,15 @@ Lemma rmorph_sum I r (P : pred I) E :
   f (\sum_(i <- r | P i) E i) = \sum_(i <- r | P i) f (E i).
 Proof. exact: raddf_sum. Qed.
 
-Lemma rmorphismMP : monoid_morphism f.
+Lemma rmorphism_monoidP : monoid_morphism f.
 Proof. exact: monoid_morphism_subproof. Qed.
-Lemma rmorph1 : f 1 = 1. Proof. by case: rmorphismMP. Qed.
-Lemma rmorphM : {morph f: x y  / x * y}. Proof. by case: rmorphismMP. Qed.
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `rmorphism_monoidP` instead")]
+Definition rmorphismMP : multiplicative f :=
+  (fun p => (p.2, p.1)) rmorphism_monoidP.
+
+Lemma rmorph1 : f 1 = 1. Proof. by case: rmorphism_monoidP. Qed.
+Lemma rmorphM : {morph f: x y  / x * y}. Proof. by case: rmorphism_monoidP. Qed.
 
 Lemma rmorph_prod I r (P : pred I) E :
   f (\prod_(i <- r | P i) E i) = \prod_(i <- r | P i) f (E i).
@@ -7369,7 +7374,10 @@ Definition rmorphB := rmorphB.
 Definition rmorph_sum := rmorph_sum.
 Definition rmorphMn := rmorphMn.
 Definition rmorphMNn := rmorphMNn.
+#[warnings="-deprecated",
+    deprecated(since="mathcomp 2.5.0", note="use `rmorphism_monoidP` instead")]
 Definition rmorphismMP := rmorphismMP.
+Definition rmorphism_monoidP := rmorphism_monoidP.
 Definition rmorph1 := rmorph1.
 Definition rmorph_eq1 := rmorph_eq1.
 Definition rmorphM := rmorphM.
