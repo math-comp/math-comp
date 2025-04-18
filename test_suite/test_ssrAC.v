@@ -1,4 +1,4 @@
-From mathcomp Require Import all_ssreflect ssralg.
+From mathcomp Require Import all_boot ssralg.
 
 Section Tests.
 Lemma test_orb (a b c d : bool) : (a || b) || (c || d) = (a || c) || (b || d).

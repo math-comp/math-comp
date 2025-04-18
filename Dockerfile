@@ -22,7 +22,8 @@ RUN set -x \
   && if [ -d /home/coq ]; then sudo chown -R coq:coq /home/mathcomp; else sudo chown -R rocq:rocq /home/mathcomp; fi \
   && ( which coqc || opam install -y -v coq ) \
   && coqc --version \
-  && opam pin add -n -y -k path rocq-mathcomp-ssreflect . \
+  && opam pin add -n -y -k path rocq-mathcomp-boot . \
+  && opam pin add -n -y -k path rocq-mathcomp-order . \
   && opam pin add -n -y -k path rocq-mathcomp-fingroup . \
   && opam pin add -n -y -k path rocq-mathcomp-algebra . \
   && opam pin add -n -y -k path rocq-mathcomp-solvable . \

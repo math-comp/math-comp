@@ -63,8 +63,9 @@ with builtins; with (import <nixpkgs> {}).lib;
     ];
     common-bundles = listToAttrs (forEach master (p:
       { name = p; value.override.version = "master"; }))
-    // { mathcomp-ssreflect.main-job = true;
+    // { mathcomp-boot.main-job = true;
          mathcomp-doc.job = true;
+         mathcomp.job = false;
          stdlib.job = true;
          # jasmin.override.version = "main";
          jasmin.job = false;  # broken since https://github.com/math-comp/math-comp/pull/1256
@@ -87,6 +88,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       bignums.override.version = "master";
       rocq-elpi.override.version = "master";
       rocq-elpi.override.elpi-version = "2.0.7";
+      mathcomp.job = false;
     }; coqPackages = common-bundles // {
       coq.override.version = "master";
       stdlib.override.version = "master";
@@ -112,8 +114,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq.override.version = "8.20";
       coq-elpi.override.version = "2.5.0";  # required by CoqEAL
       coq-elpi.override.elpi-version = "2.0.7";
-      hierarchy-builder.override.version = "1.8.1";  # required by elpi
-      interval.job = false;
     };
   };
 }

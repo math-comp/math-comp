@@ -7,13 +7,10 @@ bug-reports: "https://github.com/math-comp/math-comp/issues"
 dev-repo: "git+https://github.com/math-comp/math-comp.git"
 license: "CECILL-B"
 
-build: [ make "-C" "ssreflect" "-j" "%{jobs}%" ]
-install: [ make "-C" "ssreflect" "install" ]
 depends: [
-  "rocq-mathcomp-boot" { = version }
-  "rocq-mathcomp-order" { = version }
+  "coq-core"
+  "rocq-mathcomp-boot" {= version}
 ]
-
 authors: [ "The Mathematical Components team" ]
 
-synopsis: "Compatibility package for rocq-mathcomp-boot and rocq-mathcomp-order"
+synopsis: "Compatibility package for rocq-mathcomp-boot"

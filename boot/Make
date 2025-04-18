@@ -1,6 +1,30 @@
-all_ssreflect.v
+all_boot.v
+eqtype.v
+seq.v
+ssrAC.v
+ssrbool.v
+ssreflect.v
+ssrfun.v
+ssrnat.v
+bigop.v
+binomial.v
+choice.v
+div.v
+finfun.v
+fingraph.v
+finset.v
+fintype.v
+generic_quotient.v
+monoid.v
+nmodule.v
+path.v
+prime.v
+tuple.v
+ssrnotations.v
+ssrmatching.v
 
--R . mathcomp.ssreflect
+-I .
+-R . mathcomp.boot
 
 # Warnings set as error to avoid (re)introducing them
 -arg -w -arg +duplicate-clear

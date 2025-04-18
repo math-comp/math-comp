@@ -13,7 +13,6 @@
 Make*.coq
 Make*.coq.bak
 Make*.coq.conf
-ssreflect/ssrmatching.v
 test_suite/test_hierarchy_all.v
 test_suite/*.v.out.new
 *#

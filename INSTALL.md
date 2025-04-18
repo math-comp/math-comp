@@ -20,15 +20,15 @@ you can install any math-comp package via
 opam repo add coq-released https://coq.inria.fr/opam/released
 opam pin add -n coq -k version 8.20.0
 opam install coq -j3
-opam install coq-mathcomp-ssreflect -j3
+opam install coq-mathcomp-boot -j3
 ```
-Replace `ssreflect` here by the package you want, the dependencies will be
+Replace `boot` here by the package you want, the dependencies will be
 installed automatically. We recommend pinning a particular version of Coq
 (we give `8.20.0` as an example, see `CHANGELOG.md` for the supported versions).
 To get the latest development version you need to execute the following:
 ```
 opam repo add coq-extra-dev https://coq.inria.fr/opam/extra-dev
-opam install coq-mathcomp-ssreflect.dev -j3
+opam install coq-mathcomp-boot.dev -j3
 ```
 You can learn more about OPAM by reading its [user manual](https://opam.ocaml.org/doc/Usage.html).
 
@@ -65,7 +65,7 @@ The files can be edited using CoqIDE or Proof General, or any
 other editor that understands the `_CoqProject` file, with no
 further configuration from the `mathcomp` directory.
 ```
-coqide ssreflect/div.v
+coqide boot/div.v
 ```
 Note that you may need to enable `_CoqProject` processing in your
 editor (e.g. the default for CoqIDE is to ignore it).
@@ -86,7 +86,7 @@ opam pin add -n coq -k version 8.20.0
 
 Then for each math-comp package, pin the `opam` file:
 ```
-opam pin add -n -k path coq-mathcomp-ssreflect .
+opam pin add -n -k path coq-mathcomp-boot .
 ```
 
 This can be achieved in one go as follows:
