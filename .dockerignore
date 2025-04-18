@@ -18,6 +18,8 @@
 
 !*.opam
 
+!base
+!order
 !ssreflect
 !fingroup
 !algebra

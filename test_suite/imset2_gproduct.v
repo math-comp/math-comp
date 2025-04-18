@@ -1,4 +1,4 @@
-From mathcomp Require Import all_ssreflect all_fingroup.
+From mathcomp Require Import all_base all_fingroup.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
