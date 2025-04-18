@@ -74,6 +74,8 @@ with builtins; with (import <nixpkgs> {}).lib;
          #   for a complete list of Coq packages available in Nix
          # * <github_login>:<branch> is such that this will use the branch <branch>
          #   from https://github.com/<github_login>/<repository>
+         mathcomp-classical.override.version = "proux01:mc1169";
+         mathcomp-analysis.override.version = "proux01:mc1169";
        };
   in {
     "coq-master" = { rocqPackages = {
