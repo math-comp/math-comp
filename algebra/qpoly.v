@@ -1,10 +1,8 @@
 From HB Require Import structures.
-From mathcomp
-Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice fintype tuple.
-From mathcomp
-Require Import bigop binomial finset finfun ssralg countalg finalg poly polydiv.
-From mathcomp
-Require Import perm fingroup matrix mxalgebra mxpoly vector countalg.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
+From mathcomp Require Import fintype tuple bigop binomial finset finfun ssralg.
+From mathcomp Require Import countalg finalg poly polydiv perm fingroup matrix.
+From mathcomp Require Import mxalgebra mxpoly vector countalg.
 
 (******************************************************************************)
 (* This file defines the algebras R[X]/<p> and their theory.                  *)

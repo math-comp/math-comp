@@ -3,7 +3,7 @@
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
 From mathcomp Require Import div fintype finfun bigop finset prime binomial.
 From mathcomp Require Import fingroup morphism perm automorphism quotient.
-From mathcomp Require Import action commutator gproduct gfunctor ssralg.
+From mathcomp Require Import action commutator gproduct gfunctor ssralg .
 From mathcomp Require Import countalg finalg zmodp cyclic pgroup center gseries.
 From mathcomp Require Import nilpotent sylow abelian finmodule.
 
