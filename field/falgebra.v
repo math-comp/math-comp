@@ -257,6 +257,10 @@ Proof.
 split=> [|x y]; first by apply/lfunP => w; rewrite id_lfunE !lfunE /= mulr1.
 by apply/lfunP=> w; rewrite comp_lfunE !lfunE /= mulrA.
 Qed.
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
+      note="use `amulr_is_monoid_morphism` instead")]
+Definition amulr_is_multiplicative :=
+  (fun p => (p.2, p.1)) amulr_is_monoid_morphism.
 
 #[hnf]
 HB.instance Definition _ := GRing.isSemilinear.Build K aT (hom aT aT) _ amulr
@@ -1017,12 +1021,16 @@ rewrite !linearZ -!scalerAr -!scalerAl 2!linearZ /=; congr (_ *: (_ *: _)).
 by apply/eqP/fM; apply: memt_nth.
 Qed.
 
-Lemma ahomP {f : 'Hom(aT, rT)} : reflect (monoid_morphism f) (ahom_in {:aT} f).
+Lemma ahom'P {f : 'Hom(aT, rT)} : reflect (monoid_morphism f) (ahom_in {:aT} f).
 Proof.
 apply: (iffP ahom_inP) => [[fM f1] | fRM_P]; last first.
   by split=> [x y|]; [rewrite fRM_P.2|rewrite fRM_P.1].
 by split=> // x y; rewrite fM ?memvf.
 Qed.
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
+      note="use `ahom'P` instead")]
+Lemma ahomP {f : 'Hom(aT, rT)} : reflect (multiplicative f) (ahom_in {:aT} f).
+Proof. by apply: (iffP ahom'P) => [][]. Qed.
 
 Structure ahom := AHom {ahval :> 'Hom(aT, rT); _ : ahom_in {:aT} ahval}.
 
@@ -1038,17 +1046,24 @@ End Class_Def.
 
 Arguments ahom_in [aT rT].
 Arguments ahom_inP {aT rT f U}.
+#[warnings="-deprecated"]
 Arguments ahomP {aT rT f}.
+Arguments ahom'P {aT rT f}.
 
 Section LRMorphism.
 
 Variables aT rT sT : falgType K.
 
 Fact ahom_is_monoid_morphism (f : ahom aT rT) : monoid_morphism f.
-Proof. by apply/ahomP; case: f. Qed.
+Proof. by apply/ahom'P; case: f. Qed.
 #[hnf]
 HB.instance Definition _ (f : ahom aT rT) :=
   GRing.isMonoidMorphism.Build aT rT f (ahom_is_monoid_morphism f).
+
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
+      note="use `ahom_is_monoid_morphism` instead")]
+Definition ahom_is_multiplicative (f : ahom aT rT) : multiplicative f :=
+  (fun p => (p.2, p.1)) (ahom_is_monoid_morphism f).
 
 Lemma ahomWin (f : ahom aT rT) U : ahom_in U f.
 Proof.

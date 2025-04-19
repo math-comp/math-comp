@@ -73,6 +73,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - in `galois.v`
     + `kHomP` -> `kHom'P`
+    + `kHom_is_additive` -> 'kHom_is_zmod_morphism'
+    + `kHom_is_multiplicative` -> `kHom_is_monoid_morphism`
+    + `kHom_kHom_lrmorphism` -> `kHom_monoid_morphism`
+    + `galTrace_is_additive` -> `galTrace_is_zmod_morphism`
+
+- in `falgebra.v`
+    + `amulr_is_multiplicative` -> `amulr_is_monoid_morphism`
+    + `ahomP` -> `ahom'P`
+    + `hom_is_multiplicative f` -> `ahom_is_monoid_morphism f`
+
 
 - TODO:
 

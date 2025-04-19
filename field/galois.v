@@ -97,8 +97,13 @@ Proof. by apply/kAHomP => u _; rewrite lfunE. Qed.
 Lemma k1HomE V f : kHom 1 V f = ahom_in V f.
 Proof. by apply: andb_idr => /ahom_inP[_ f1]; apply/fixedSpaceP. Qed.
 
-Lemma kHom_lrmorphism (f : 'End(L)) : reflect (monoid_morphism f) (kHom 1 {:L} f).
-Proof. by rewrite k1HomE; apply: ahomP. Qed.
+Lemma kHom_monoid_morphism (f : 'End(L)) :
+  reflect (monoid_morphism f) (kHom 1 {:L} f).
+Proof. by rewrite k1HomE; apply: ahom'P. Qed.
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
+      note="use `kHom_monoid_morphism` instead")]
+Lemma kHom_lrmorphism (f : 'End(L)) : reflect (multiplicative f) (kHom 1 {:L} f).
+Proof. #[warnings="-deprecated"] by rewrite k1HomE; apply: ahomP. Qed.
 
 (* Lemma kHom_lrmorphism (f : 'End(L)) : reflect (lrmorphism f) (kHom 1 {:L} f). *)
 (* Proof. by rewrite k1HomE; apply: ahomP. Qed. *)
@@ -154,12 +159,17 @@ Let kHomf : subvs_of E -> L := f \o vsval.
 
 Lemma kHom_is_zmod_morphism : kHom K E f -> zmod_morphism kHomf.
 Proof. by case/kHom'P => idKf fM; apply: raddfB. Qed.
+#[deprecated(since="mathcomp 2.5.0", note="use `kHom_is_zmod_morphism` instead")]
+Definition kHom_is_additive := kHom_is_zmod_morphism.
 
 Lemma kHom_is_monoid_morphism : kHom K E f -> monoid_morphism kHomf.
 Proof.
 case/kHom'P=> idKf fM; rewrite /kHomf.
 by split=> [|a b] /=; [rewrite algid1 idKf // mem1v | rewrite /= fM ?subvsP].
 Qed.
+#[deprecated(since="mathcomp 2.5.0", note="use `kHom_is_monoid_morphism` instead")]
+Definition kHom_is_multiplicative :=
+  (fun p => (p.1, p.2)) \o kHom_is_monoid_morphism.
 
 Variable (homKEf : kHom K E f).
 HB.instance Definition _ :=
@@ -283,7 +293,7 @@ Proof. by rewrite kAutE k1AHom. Qed.
 
 Lemma kAutf_lker0 K f : kHom K {:L} f -> lker f == 0%VS.
 Proof.
-move/(kHomSl (sub1v _))/kHom_lrmorphism=> fM.
+move/(kHomSl (sub1v _))/kHom_monoid_morphism => fM.
 pose fmM := GRing.isMonoidMorphism.Build _ _ _ fM.
 pose fRM : {rmorphism _ -> _} := HB.pack (fun_of_lfun f) fmM.
 by apply/lker0P; apply: (fmorph_inj fRM).
@@ -300,8 +310,8 @@ Qed.
 
 Lemma inv_is_ahom (f : 'AEnd(L)) : ahom_in {:L} f^-1.
 Proof.
-have /ahomP/kHom_lrmorphism hom1f := valP f.
-exact/ahomP/kHom_lrmorphism/inv_kHomf.
+have /ahom'P/kHom_monoid_morphism hom1f := valP f.
+exact/ahom'P/kHom_monoid_morphism/inv_kHomf.
 Qed.
 
 Canonical inv_ahom (f : 'AEnd(L)) : 'AEnd(L) := AHom (inv_is_ahom f).
@@ -355,7 +365,9 @@ Notation "f ^-1" := (inv_ahom f) : lrfun_scope.
 Arguments kHomP {F L K V f}.
 Arguments kHom'P {F L K V f}.
 Arguments kAHomP {F L U V f}.
+#[warnings="-deprecated"]
 Arguments kHom_lrmorphism {F L f}.
+Arguments kHom_monoid_morphism {F L f}.
 
 Definition splitting_field_axiom (F : fieldType) (L : fieldExtType F) :=
   exists2 p : {poly L}, p \is a polyOver 1%VS & splittingFieldFor 1 p {:L}.
@@ -504,7 +516,7 @@ set fj := (fi ^-1 \o f)%AF; suffices Hfj : fj \in homEz.
   by apply/val_inj; rewrite {}Dfi /= (lker0_compVKf kerfi0).
 rewrite -DhomEz; apply/kAHomP => _ /Fadjoin_polyP[q Eq ->].
 have homLfj: kHom E {:L} fj := comp_kHom (inv_kHomf homLfi) homLf.
-have /kHom_lrmorphism fjM := kHomSl (sub1v _) homLfj.
+have /kHom_monoid_morphism fjM := kHomSl (sub1v _) homLfj.
 pose fjmM := GRing.isMonoidMorphism.Build _ _ _ fjM.
 pose fjRM : {rmorphism _ -> _} := HB.pack (fun_of_lfun fj) fjmM.
 rewrite -[fj _](horner_map fjRM) (kHom_poly_id homLfj) //=.
@@ -631,7 +643,7 @@ Proof.
 move=> homKf; have{homKf} [homFf sFE] := (kHomSl (sub1v K) homKf, sub1v E).
 have [p Fp /(splittingFieldForS sFE (subvf E))splitLp] := splittingPoly.
 have [g0 homLg0 eq_fg] := kHom_extends sFE homFf Fp splitLp.
-by apply: exist (Sub g0 _) _ =>  //; apply/ahomP/kHom_lrmorphism.
+by apply: exist (Sub g0 _) _ =>  //; apply/ahom'P/kHom_monoid_morphism.
 Qed.
 
 End SplittingFieldTheory.
@@ -974,6 +986,8 @@ Fact galTrace_is_zmod_morphism : zmod_morphism (galTrace U V).
 Proof.
 by move=> a b /=; rewrite -sumrB; apply: eq_bigr => x _; rewrite rmorphB.
 Qed.
+#[deprecated(since="mathcomp 2.5.0", note="use `galTrace_is_zmod_morphism` instead")]
+Definition galTrace_is_additive := galTrace_is_zmod_morphism.
 HB.instance Definition _ := GRing.isZmodMorphism.Build L L (galTrace U V)
   galTrace_is_zmod_morphism.
 

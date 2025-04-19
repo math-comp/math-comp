@@ -414,7 +414,7 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     rewrite Sinj_poly Dr -Drr big_map rmorph_prod /=; apply: eq_bigr => zz _.
     by rewrite map_polyXsubC.
   have [f1 aut_f1 Df1]:= kHom_extends (sub1v (ASpace algK)) hom_f Qpr splitQr.
-  pose f1mM := GRing.isMonoidMorphism.Build _ _ f1 (kHom_lrmorphism aut_f1).
+  pose f1mM := GRing.isMonoidMorphism.Build _ _ f1 (kHom_monoid_morphism aut_f1).
   pose nu : {lrmorphism _ -> _} := HB.pack (fun_of_lfun f1) f1mM.
   exists (SubAut Qr QrC nu) => //; exists in01 => //= y.
   by rewrite -Df -Df1 //; apply/memK; exists y.
@@ -494,7 +494,7 @@ have pzn_zk0: root (map_poly \1%VF (minPoly 1 zn)) (zn ^+ k).
   rewrite (bigD1 (Ordinal (ltn_pmod k n_gt0))) ?coprime_modl //=.
   by rewrite rootM root_XsubC prim_expr_mod ?eqxx.
 have phim : monoid_morphism phi.
-  by apply/kHom_lrmorphism; rewrite -genQn span_seq1 /= kHomExtendP.
+  by apply/kHom_monoid_morphism; rewrite -genQn span_seq1 /= kHomExtendP.
 pose phimM := GRing.isMonoidMorphism.Build _ _ phi phim.
 pose phiRM : {rmorphism _ -> _} := HB.pack (fun_of_lfun phi) phimM.
 have [nu Dnu] := extend_algC_subfield_aut QnC phiRM.
