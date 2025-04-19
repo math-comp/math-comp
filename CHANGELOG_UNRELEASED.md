@@ -83,25 +83,68 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     + `ahomP` -> `ahom'P`
     + `hom_is_multiplicative f` -> `ahom_is_monoid_morphism f`
 
+- in `polyXY.v`
+    + `swapXY_is_additive` -> `swapXY_is_zmod_morphism`
+    + `swapXY_is_multiplicative` -> `swapXY_is_monoid_morphism`
 
-- TODO:
+- in `qpoly.v`
+    + `in_qpoly_is_multiplicative` -> `in_qpoly_monoid_morphism`
+    + `qpolyC_is_additive` -> `qpolyC_is_zmod_morphism`
+    + `qpolyC_is_multiplicative` -> `qpolyC_is_monoid_morphism`
 
-polyXY.v
-qpoly.v
-rat.v
-ring_quotient.v
-ssrint.v
-ssrnum.v
-character.v
-classfun.v
-inertia.v
-mxrepresentation.v
-algC.v
-algebraics_fundamentals.v
-algnum.v
-closed_field.v
-falgebra.v
-fieldext.v
+- in `rat.v`
+    + `ratr_is_additive` -> `ratr_is_zmod_morphism`
+    + `ratr_is_multiplicative` -> `ratr_is_monoid_morphism`
+
+- in `ring_quotient.v`
+    + `pi_is_additive` -> `pi_is_zmod_morphism`
+    + `pi_is_multiplicative` -> `pi_is_monoid_morphism`
+
+- in `ssrint.v`
+    + `intmul1_is_multiplicative` -> `intmul1_is_monoid_morphism`
+
+- in `ssrnum.v`
+    + `Re_is_additive` -> `Re_is_zmod_morphism`
+    + `Im_is_additive` -> `Im_is_zmod_morphism`
+
+- in `fieldext.v`
+    + `vsval_is_multiplicative K` -> `vsval_monoid_morphism`
+    + `subfx_inj_is_zmod_additive` -> `subfx_inj_is_zmod_morphism`
+    + `subfx_eval_is_zmod_additive` -> `subfx_eval_is_zmod_morphism`
+
+- in `algC.v`
+    + `CtoL_is_zmod_additive` -> `CtoL_is_zmod_morphism`
+    + `CtoL_is_multiplicative` -> `CtoL_is_monoid_morphism`
+    + `conj_is_semi_additive` -> `conj_is_nmod_morphism`
+    + `conj_is_additive` -> `conj_is_zmod_morphism`
+    + `conj_is_multiplicative` -> `conj_is_monoid_morphism`
+    + `algC_invaut_is_additive` -> `algC_invaut_is_zmod_morphism`
+    + `algC_invaut_is_multiplicative nu` -> `algC_invaut_is_monoid_morphism nu`
+    + `algRval_is_additive` -> `algRval_is_zmod_morphism`
+    + `algRval_is_multiplicative` -> `algRval_is_monoid_morphism`
+
+- in `classfun.v`
+    + `cfAut_is_additive` -> `cfAut_is_zmod_morphism`
+    + `cfAut_is_multiplicative` -> `cfAut_is_monoid_morphism`
+    + `cfRes_is_multiplicative` -> `cfRes_is_monoid_morphism`
+    + `cfIsom_is_additive` -> `cfIsom_is_zmod_morphism`
+    + `cfIsom_is_multiplicative` -> `cfIsom_is_monoid_morphism`
+    + `cfSdprod_is_additive` -> `cfSdprod_is_zmod_morphism`
+    + `cfSdprod_is_multiplicative` -> `cfSdprod_is_monoid_morphism`
+
+- in `character.v`
+    + `xcfun_is_additive` -> `xcfun_is_zmod_morphism`
+    + `xcfun_r_is_additive` -> `xcfun_r_is_zmod_morphism`
+
+- in `mxrepresentation.v`
+    + `mxval_sub` -> `mxval_is_zmod_morphism`
+    + `mxval_is_multiplicative` -> `mxval_is_monoid_morphism`
+
+- in `inertia.v`
+    + `cfConjg_is_multiplicative y` -> `cfConjg_is_monoid_morphism y`
+
+
+
 
 
 ### Removed

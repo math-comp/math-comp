@@ -500,6 +500,9 @@ Definition xcfun (chi : 'CF(G)) A :=
 
 Lemma xcfun_is_zmod_morphism phi : zmod_morphism (xcfun phi).
 Proof. by move=> A B; rewrite /xcfun [gring_row _]linearB mulmxBl !mxE. Qed.
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
+      note="use `xcfun_is_zmod_morphism` instead")]
+Definition xcfun_is_additive := xcfun_is_zmod_morphism.
 HB.instance Definition _ phi :=
   GRing.isZmodMorphism.Build 'M_(gcard G) _ (xcfun phi) (xcfun_is_zmod_morphism phi).
 
@@ -517,6 +520,9 @@ Proof.
 move=> phi psi; rewrite /= /xcfun !mxE -sumrB; apply: eq_bigr => i _.
 by rewrite !mxE !cfunE mulrBr.
 Qed.
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
+      note="use `xcfun_r_is_zmod_morphism` instead")]
+Definition xcfun_r_is_additive := xcfun_r_is_zmod_morphism.
 HB.instance Definition _ A := GRing.isZmodMorphism.Build _ _ (xcfun_r A)
   (xcfun_r_is_zmod_morphism A).
 

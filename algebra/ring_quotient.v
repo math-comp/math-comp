@@ -123,6 +123,9 @@ Variable Q : @zmodQuotType V equivV zeroV -%R +%R.
 
 Lemma pi_is_zmod_morphism : zmod_morphism \pi_Q.
 Proof. by move=> x y /=; rewrite !piE. Qed.
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
+      note="use `pi_is_monoid_morphism` instead")]
+Definition pi_is_additive := pi_is_zmod_morphism.
 
 HB.instance Definition _ := GRing.isZmodMorphism.Build V Q \pi_Q pi_is_zmod_morphism.
 
@@ -183,7 +186,10 @@ Variable Q : @nzRingQuotType R equivR zeroR -%R +%R 1 *%R.
 
 Lemma pi_is_monoid_morphism : monoid_morphism \pi_Q.
 Proof. by split; do ?move=> x y /=; rewrite !piE. Qed.
-
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
+      note="use `pi_is_monoid_morphism` instead")]
+Definition pi_is_multiplicative :=
+  (fun g => (g.2,g.1)) pi_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build R Q \pi_Q
   pi_is_monoid_morphism.
 

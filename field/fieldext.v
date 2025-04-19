@@ -180,10 +180,14 @@ Proof. by apply/(polyOverS (subvP (sub1v _)))/polyOver1P; exists p. Qed.
 Lemma sub_adjoin1v x E : (<<1; x>> <= E)%VS = (x \in E)%VS.
 Proof. by rewrite (sameP FadjoinP andP) sub1v. Qed.
 
-Fact vsval_multiplicative K : monoid_morphism (vsval : subvs_of K -> L).
+Fact vsval_monoid_morphism K : monoid_morphism (vsval : subvs_of K -> L).
 Proof. by split => //=; apply: algid1. Qed.
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
+      note="use `subfx_eval_is_monoid_morphism` instead")]
+Definition vsval_is_multiplicative K :=
+  (fun g => (g.2,g.1)) (vsval_monoid_morphism K).
 HB.instance Definition _ (K : {subfield L}) :=
-  GRing.isMonoidMorphism.Build (subvs_of K) L vsval (vsval_multiplicative K).
+  GRing.isMonoidMorphism.Build (subvs_of K) L vsval (vsval_monoid_morphism K).
 
 Lemma vsval_invf K (w : subvs_of K) : val w^-1 = (vsval w)^-1.
 Proof.
@@ -1155,6 +1159,9 @@ Fact subfx_inj_is_zmod_morphism : zmod_morphism subfx_inj.
 Proof.
 by elim/quotW => x; elim/quotW => y; rewrite !piE /iotaFz linearB rmorphB.
 Qed.
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
+      note="use `subfx_inj_is_zmod_morphism` instead")]
+Definition subfx_inj_is_additive := subfx_inj_is_zmod_morphism.
 
 Fact subfx_inj_is_monoid_morphism : monoid_morphism subfx_inj.
 Proof.
@@ -1162,7 +1169,10 @@ split; first by rewrite piE /iotaFz poly_rV_K ?rmorph1 ?size_poly1.
 elim/quotW=> x; elim/quotW=> y; rewrite !piE /subfx_mul_rep /iotaFz.
 by rewrite poly_rV_modp_K iotaPz_modp rmorphM.
 Qed.
-
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
+      note="use `subfx_inj_is_monoid_morphism` instead")]
+Definition subfx_inj_is_multiplicative :=
+  (fun g => (g.2,g.1)) subfx_inj_is_monoid_morphism.
 HB.instance Definition _ := GRing.isZmodMorphism.Build subFExtend L subfx_inj
   subfx_inj_is_zmod_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build subFExtend L subfx_inj
@@ -1175,6 +1185,9 @@ Definition subfx_root := subfx_eval 'X.
 
 Lemma subfx_eval_is_zmod_morphism : zmod_morphism subfx_eval.
 Proof. by move=> x y; apply/eqP; rewrite piE -linearB modpD modNp. Qed.
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
+      note="use `subfx_eval_is_zmod_morphism` instead")]
+Definition subfx_eval_is_additive := subfx_eval_is_zmod_morphism.
 
 Lemma subfx_eval_is_monoid_morphism : monoid_morphism subfx_eval.
 Proof.
@@ -1182,7 +1195,10 @@ split=> [|x y]; apply/eqP; rewrite piE.
   by rewrite modp_small // size_poly1 -subn_gt0 subn1.
 by rewrite /subfx_mul_rep !poly_rV_modp_K !(modp_mul, mulrC _ y).
 Qed.
-
+#[warnings="-deprecated", deprecated(since="mathcomp 2.5.0",
+      note="use `subfx_eval_is_monoid_morphism` instead")]
+Definition subfx_eval_is_multiplicative :=
+  (fun g => (g.2,g.1)) subfx_eval_is_monoid_morphism.
 HB.instance Definition _ :=
   GRing.isZmodMorphism.Build {poly F} subFExtend subfx_eval subfx_eval_is_zmod_morphism.
 HB.instance Definition _ :=
