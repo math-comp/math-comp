@@ -71,6 +71,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
     + `horner_eval_is_multiplicative` -> `horner_eval_is_monoid_morphism`
     + `comp_poly_multiplicative` -> `comp_poly_is_monoid_morphism`
 
+- in `galois.v`
+    + `kHomP` -> `kHom'P`
+
 - TODO:
 
 polyXY.v
@@ -89,7 +92,6 @@ algnum.v
 closed_field.v
 falgebra.v
 fieldext.v
-galois.v
 
 
 ### Removed
