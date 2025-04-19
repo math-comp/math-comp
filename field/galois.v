@@ -351,6 +351,7 @@ End kHom.
 
 Notation "f ^-1" := (inv_ahom f) : lrfun_scope.
 
+#[warnings="-deprecated"]
 Arguments kHomP {F L K V f}.
 Arguments kHom'P {F L K V f}.
 Arguments kAHomP {F L U V f}.
