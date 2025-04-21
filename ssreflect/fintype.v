@@ -77,7 +77,7 @@ From mathcomp Require Import ssrnat seq choice path div.
 (*      A \proper B <=> all x \in A satisfy x \in B but not the converse      *)
 (* [disjoint A & B] <=> no x \in A satisfies x \in B                          *)
 (*        image f A == the sequence of f x for all x : T such that x \in A    *)
-(*                     (where A is an applicative predicate), of length #|P|. *)
+(*                     (where A is an applicative predicate), of length #|A|. *)
 (*                     The codomain of F can be any type, but image f A can   *)
 (*                     only be used as a collective predicate if it is an     *)
 (*                     eqType                                                 *)
