@@ -459,9 +459,9 @@ Variable D : 'End(L).
 
 Let Dx E := - (map_poly D (minPoly E x)).[x] / ((minPoly E x)^`()).[x].
 
-Fact extendDerivation_additive_subproof E (adjEx := Fadjoin_poly E x) :
+Fact extendDerivation_zmod_morphism_subproof E (adjEx := Fadjoin_poly E x) :
   let body y (p := adjEx y) := (map_poly D p).[x] + p^`().[x] * Dx E in
-  additive body.
+  zmod_morphism body.
 Proof.
 move: Dx => C /= u v; rewrite /adjEx.
 rewrite raddfB /= derivB -/adjEx !hornerE /= raddfB /= !hornerE.
@@ -482,8 +482,8 @@ Section DerivationLinear.
 Variable (E : {subfield L}).
 Let body (y : L) (p := Fadjoin_poly E x y) : L :=
   (map_poly D p).[x] + p^`().[x] * Dx E.
-HB.instance Definition _ := @GRing.isAdditive.Build _ _ body
-  (extendDerivation_additive_subproof E).
+HB.instance Definition _ := @GRing.isZmodMorphism.Build _ _ body
+  (extendDerivation_zmod_morphism_subproof E).
 HB.instance Definition _ := @GRing.isScalable.Build _ _ _ _ body
   (extendDerivation_scalable_subproof E).
 Let extendDerivationLinear := Eval hnf in (body : {linear _ -> _}).

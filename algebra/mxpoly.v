@@ -473,11 +473,11 @@ pose phi (A : M_RX) := \poly_(k < Msize A) \matrix_(i, j) (A i j)`_k.
 have coef_phi A i j k: (phi A)`_k i j = (A i j)`_k.
   rewrite coef_poly; case: (ltnP k _) => le_m_k; rewrite mxE // nth_default //.
   by apply: leq_trans (leq_trans (leq_bigmax i) le_m_k); apply: (leq_bigmax j).
-have phi_is_additive : additive phi.
+have phi_is_zmod_morphism : zmod_morphism phi.
   move=> A B; apply/polyP => k; apply/matrixP => i j.
   by rewrite !(coef_phi, mxE, coefD, coefN).
-have phi_is_multiplicative : multiplicative phi.
-  split=> [A B|]; apply/polyP => k; apply/matrixP => i j; last first.
+have phi_is_monoid_morphism : monoid_morphism phi.
+  split=> [|A B]; apply/polyP => k; apply/matrixP => i j.
     by rewrite coef_phi mxE coefMn !coefC; case: (k == _); rewrite ?mxE ?mul0rn.
   rewrite !coef_phi !mxE !coefM summxE coef_sum.
   pose F k1 k2 := (A i k1)`_k2 * (B k1 j)`_(k - k2).
@@ -492,8 +492,8 @@ have bij_phi: bijective phi.
     by case: leqP => // P_le_k; rewrite nth_default ?mxE.
   apply/polyP=> k; apply/matrixP=> i j; rewrite coef_phi mxE coef_poly.
   by case: leqP => // P_le_k; rewrite nth_default ?mxE.
-pose phiaM := GRing.isAdditive.Build _ _ phi phi_is_additive.
-pose phimM := GRing.isMultiplicative.Build _ _ phi phi_is_multiplicative.
+pose phiaM := GRing.isZmodMorphism.Build _ _ phi phi_is_zmod_morphism.
+pose phimM := GRing.isMonoidMorphism.Build _ _ phi phi_is_monoid_morphism.
 pose phiRM : {rmorphism _ -> _} := HB.pack phi phiaM phimM.
 exists phiRM; split=> // [p | A]; apply/polyP=> k; apply/matrixP=> i j.
   by rewrite coef_phi coef_map !mxE coefMn.

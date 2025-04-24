@@ -137,13 +137,17 @@ Proof.
 by rewrite -cfuniG; have [/cfConjg_cfuni|/cfConjgEout] := boolP (y \in 'N(G)).
 Qed.
 
-Fact cfConjg_is_multiplicative y : multiplicative (cfConjg y : _ -> 'CF(G)).
+Fact cfConjg_is_monoid_morphism y : monoid_morphism (cfConjg y : _ -> 'CF(G)).
 Proof.
-split=> [phi psi|]; last exact: cfConjg_cfun1.
+split=> [|phi psi]; first exact: cfConjg_cfun1.
 by apply/cfunP=> x; rewrite !cfunElock.
 Qed.
-HB.instance Definition _ y := GRing.isMultiplicative.Build _ _ (cfConjg y)
-  (cfConjg_is_multiplicative y).
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `cfConjg_is_monoid_morphism` instead")]
+Definition cfConjg_is_multiplicative y :=
+  (fun g => (g.2,g.1)) (cfConjg_is_monoid_morphism y).
+HB.instance Definition _ y := GRing.isMonoidMorphism.Build _ _ (cfConjg y)
+  (cfConjg_is_monoid_morphism y).
 
 Lemma cfConjg_eq1 phi y : ((phi ^ y)%CF == 1) = (phi == 1).
 Proof. by apply: rmorph_eq1; apply: can_inj (cfConjgK y). Qed.

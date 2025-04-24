@@ -211,13 +211,13 @@ Proof.
 move=> Qn_nu; pose nu0 x := sval (sig_eqW (Qn_nu x)).
 have QnC_nu0: {morph QnC : x / nu0 x >-> nu x}.
   by rewrite /nu0 => x; case: (sig_eqW _).
-have nu0a : additive nu0.
+have nu0a : zmod_morphism nu0.
   by move=> x y; apply: (fmorph_inj QnC); rewrite !(QnC_nu0, rmorphB).
-have nu0m : multiplicative nu0.
-  split=> [x y|]; apply: (fmorph_inj QnC); rewrite ?QnC_nu0 ?rmorph1 //.
+have nu0m : monoid_morphism nu0.
+  split=> [|x y]; apply: (fmorph_inj QnC); rewrite ?QnC_nu0 ?rmorph1 //.
   by rewrite !rmorphM /= !QnC_nu0.
-pose nu0aM := GRing.isAdditive.Build Qn Qn nu0 nu0a.
-pose nu0mM := GRing.isMultiplicative.Build Qn Qn nu0 nu0m.
+pose nu0aM := GRing.isZmodMorphism.Build Qn Qn nu0 nu0a.
+pose nu0mM := GRing.isMonoidMorphism.Build Qn Qn nu0 nu0m.
 pose nu0RM : {rmorphism _ -> _} := HB.pack nu0 nu0aM nu0mM.
 pose nu0lM := GRing.isScalable.Build rat Qn Qn *:%R nu0 (fmorph_numZ nu0RM).
 pose nu0LRM : {lrmorphism _ -> _} := HB.pack nu0 nu0aM nu0mM nu0lM.
@@ -371,14 +371,14 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     pose in01 y := sval (in01P y).
     have Din01 y: Sinj mu0 y = QrC (in01 y) by rewrite /in01; case: (in01P y).
     pose rwM := (=^~ Din01, rmorphZ_num, rmorph1, rmorphB, rmorphM).
-    have in01a : additive in01.
+    have in01a : zmod_morphism in01.
       by move=> ? ?; apply: (fmorph_inj QrC); rewrite !rwM.
-    have in01m : multiplicative in01.
+    have in01m : monoid_morphism in01.
       by split; try move=> ? ?; apply: (fmorph_inj QrC); rewrite !rwM /= ?rwM.
     have in01l : scalable in01.
       by try move=> ? ?; apply: (fmorph_inj QrC); rewrite !rwM.
-    pose in01aM := GRing.isAdditive.Build _ _ in01 in01a.
-    pose in01mM := GRing.isMultiplicative.Build _ _ in01 in01m.
+    pose in01aM := GRing.isZmodMorphism.Build _ _ in01 in01a.
+    pose in01mM := GRing.isMonoidMorphism.Build _ _ in01 in01m.
     pose in01lM := GRing.isScalable.Build _ _  _ _ in01 in01l.
     pose in01LRM : {lrmorphism _ -> _} := HB.pack in01
       in01aM in01mM in01lM.
@@ -402,9 +402,9 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     transitivity (f (lin01 y)); first by rewrite !lfunE.
     by do 4!rewrite lfunE /=; rewrite lker0_lfunK.
   have hom_f: kHom 1 (ASpace algK) f.
-    apply/kHomP; split=> [_ _ /memK[y1 ->] /memK[y2 ->] |_ /vlineP[a ->]].
-      by rewrite -rmorphM !Df !rmorphM.
-    by rewrite -(rmorph_alg in01) Df /= !rmorph_alg.
+    apply/kHomP_tmp; split=> [_ /vlineP[a ->] | _ _ /memK[y1 ->] /memK[y2 ->]].
+      by rewrite -(rmorph_alg in01) Df /= !rmorph_alg.
+    by rewrite -rmorphM !Df !rmorphM.
   pose pr := map_poly (in_alg Qr) p.
   have Qpr: pr \is a polyOver 1%VS.
     by apply/polyOverP=> i; rewrite coef_map memvZ ?memv_line.
@@ -414,7 +414,7 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     rewrite Sinj_poly Dr -Drr big_map rmorph_prod /=; apply: eq_bigr => zz _.
     by rewrite map_polyXsubC.
   have [f1 aut_f1 Df1]:= kHom_extends (sub1v (ASpace algK)) hom_f Qpr splitQr.
-  pose f1mM := GRing.isMultiplicative.Build _ _ f1 (kHom_lrmorphism aut_f1).
+  pose f1mM := GRing.isMonoidMorphism.Build _ _ f1 (kHom_monoid_morphism aut_f1).
   pose nu : {lrmorphism _ -> _} := HB.pack (fun_of_lfun f1) f1mM.
   exists (SubAut Qr QrC nu) => //; exists in01 => //= y.
   by rewrite -Df -Df1 //; apply/memK; exists y.
@@ -447,19 +447,19 @@ pose le_nu (x : algC) n := (pickle x < n)%N.
 have max3 x1 x2 x3: exists n, [/\ le_nu x1 n, le_nu x2 n & le_nu x3 n].
   exists (maxn (pickle x1) (maxn (pickle x2) (pickle x3))).+1.
   by apply/and3P; rewrite /le_nu !ltnS -!geq_max.
-have nua : additive nu.
+have nua : zmod_morphism nu.
   move=> x1 x2; have [n] := max3 (x1 - x2) x1 x2.
   case=> /mem_ext[y Dx] /mem_ext[y1 Dx1] /mem_ext[y2 Dx2].
   rewrite -Dx nu_inj; rewrite -Dx1 -Dx2 -rmorphB in Dx.
   by rewrite (fmorph_inj _ Dx) !rmorphB -!nu_inj Dx1 Dx2.
-have num : multiplicative nu.
-  split=> [x1 x2|]; last by rewrite -(rmorph1 QsC) (nu_inj 0) !rmorph1.
+have num : monoid_morphism nu.
+  split=> [|x1 x2]; first by rewrite -(rmorph1 QsC) (nu_inj 0) !rmorph1.
   have [n] := max3 (x1 * x2) x1 x2.
   case=> /mem_ext[y Dx] /mem_ext[y1 Dx1] /mem_ext[y2 Dx2].
   rewrite -Dx nu_inj; rewrite -Dx1 -Dx2 -rmorphM in Dx.
   by rewrite (fmorph_inj _ Dx) !rmorphM /= -!nu_inj Dx1 Dx2.
-pose nuaM := GRing.isAdditive.Build _ _ nu nua.
-pose numM := GRing.isMultiplicative.Build _ _ nu num.
+pose nuaM := GRing.isZmodMorphism.Build _ _ nu nua.
+pose numM := GRing.isMonoidMorphism.Build _ _ nu num.
 pose nuRM : {rmorphism _ -> _} := HB.pack nu nuaM numM.
 by exists nuRM => x; rewrite /= (nu_inj 0).
 Qed.
@@ -493,9 +493,9 @@ have pzn_zk0: root (map_poly \1%VF (minPoly 1 zn)) (zn ^+ k).
   rewrite (minCpoly_cyclotomic prim_z) /cyclotomic.
   rewrite (bigD1 (Ordinal (ltn_pmod k n_gt0))) ?coprime_modl //=.
   by rewrite rootM root_XsubC prim_expr_mod ?eqxx.
-have phim : multiplicative phi.
-  by apply/kHom_lrmorphism; rewrite -genQn span_seq1 /= kHomExtendP.
-pose phimM := GRing.isMultiplicative.Build _ _ phi phim.
+have phim : monoid_morphism phi.
+  by apply/kHom_monoid_morphism; rewrite -genQn span_seq1 /= kHomExtendP.
+pose phimM := GRing.isMonoidMorphism.Build _ _ phi phim.
 pose phiRM : {rmorphism _ -> _} := HB.pack (fun_of_lfun phi) phimM.
 have [nu Dnu] := extend_algC_subfield_aut QnC phiRM.
 exists nu => _ /(prim_rootP prim_z)[i ->].

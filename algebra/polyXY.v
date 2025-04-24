@@ -76,11 +76,14 @@ Proof. by rewrite unlock map_polyX hornerX. Qed.
 Lemma swapXY_Y : swapXY 'Y = 'X.
 Proof. by rewrite swapXY_polyC map_polyX. Qed.
 
-Lemma swapXY_is_additive : additive swapXY.
+Lemma swapXY_is_zmod_morphism : zmod_morphism swapXY.
 Proof. by move=> u v; rewrite unlock rmorphB !hornerE. Qed.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `swapXY_is_zmod_morphism` instead")]
+Definition swapXY_is_additive := swapXY_is_zmod_morphism.
 HB.instance Definition _ :=
-  GRing.isAdditive.Build {poly {poly R}} {poly {poly R}} swapXY
-    swapXY_is_additive.
+  GRing.isZmodMorphism.Build {poly {poly R}} {poly {poly R}} swapXY
+    swapXY_is_zmod_morphism.
 
 Lemma coef_swapXY u i j : (swapXY u)`_i`_j = u`_j`_i.
 Proof.
@@ -99,17 +102,21 @@ Proof. by rewrite -swapXY_polyC swapXYK. Qed.
 Lemma swapXY_eq0 u : (swapXY u == 0) = (u == 0).
 Proof. by rewrite (inv_eq swapXYK) raddf0. Qed.
 
-Lemma swapXY_is_multiplicative : multiplicative swapXY.
+Lemma swapXY_is_monoid_morphism : monoid_morphism swapXY.
 Proof.
-split=> [u v|]; last by rewrite swapXY_polyC map_polyC.
+split=> [|u v]; first by rewrite swapXY_polyC map_polyC.
 apply/polyP=> i; apply/polyP=> j; rewrite coef_swapXY !coefM !coef_sum.
 rewrite (eq_bigr _ (fun _ _ => coefM _ _ _)) exchange_big /=.
 apply: eq_bigr => j1 _; rewrite coefM; apply: eq_bigr=> i1 _.
 by rewrite !coef_swapXY.
 Qed.
+#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
+      note="use `swapXY_is_monoid_morphism` instead")]
+Definition swapXY_is_multiplicative :=
+  (fun g => (g.2,g.1)) swapXY_is_monoid_morphism.
 HB.instance Definition _ :=
-  GRing.isMultiplicative.Build {poly {poly R}} {poly {poly R}} swapXY
-    swapXY_is_multiplicative.
+  GRing.isMonoidMorphism.Build {poly {poly R}} {poly {poly R}} swapXY
+    swapXY_is_monoid_morphism.
 
 Lemma swapXY_is_scalable : scalable_for (map_poly polyC \; *%R) swapXY.
 Proof. by move=> p u /=; rewrite -mul_polyC rmorphM /= swapXY_polyC. Qed.
