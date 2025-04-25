@@ -342,14 +342,17 @@ HB.export NumFieldExports.
 
 HB.mixin Record NumField_isImaginary R of NumField R := {
   imaginary : R;
-  conj_op : {rmorphism R -> R};
+  conj_op_subdef : {rmorphism R -> R};
   sqrCi : imaginary ^+ 2 = - 1;
-  normCK : forall x, `|x| ^+ 2 = x * conj_op x;
+  normCK : forall x, `|x| ^+ 2 = x * conj_op_subdef x;
 }.
 
 #[short(type="numClosedFieldType")]
 HB.structure Definition ClosedField :=
   { R of NumField_isImaginary R & GRing.ClosedField R & NumField R }.
+
+Definition conj_op {C : numClosedFieldType} : C -> C := @conj_op_subdef C.
+#[export] HB.instance Definition _ C := GRing.RMorphism.on (@conj_op C).
 
 Module ClosedFieldExports.
 Bind Scope ring_scope with ClosedField.sort.
@@ -3640,6 +3643,7 @@ Qed.
 
 End RealClosedFieldTheory.
 
+Notation conjC := conj_op.
 Notation "z ^*" := (conj_op z) : ring_scope.
 Notation "'i" := imaginary (at level 0) : ring_scope.
 
@@ -3839,7 +3843,7 @@ Proof. by rewrite ReE CrealE fmorph_div rmorph_nat rmorphD /= conjCK addrC. Qed.
 
 Lemma Creal_Im x : 'Im x \is real.
 Proof.
-rewrite ImE CrealE fmorph_div rmorph_nat rmorphM /= rmorphB conjCK.
+rewrite ImE CrealE fmorph_div rmorph_nat rmorphM /= rmorphB/= conjCK.
 by rewrite conjCi -opprB mulrNN.
 Qed.
 Hint Resolve Creal_Re Creal_Im : core.

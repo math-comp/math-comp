@@ -608,12 +608,12 @@ move=> P' P'_unitary /allP /= P'P.
 exists ((block_mx 1%:M 0 0 P') *m S).
   rewrite mul_unitarymx ?schmidt_complete_unitarymx //.
   apply/unitarymxP; rewrite tr_block_mx map_block_mx mulmx_block.
-  rewrite !trmx0 !(@map_mx0 _ _ conjC) !tr_scalar_mx !map_scalar_mx ?conjC1.
+  rewrite !trmx0 !(@map_mx0 _ _ conjC) !tr_scalar_mx !map_scalar_mx/= ?conjC1.
   rewrite !(mulmx1, mul1mx, mulmx0, mul0mx, addr0, add0r).
-  by rewrite (unitarymxP _) -?scalar_mx_block //.
+  by rewrite (unitarymxP _) -?scalar_mx_block.
 apply/allP => /= A A_in.
 rewrite trmx_mul map_mxM tr_block_mx map_block_mx.
-rewrite !trmx0 !map_mx0 !tr_scalar_mx !map_scalar_mx ?conjC1.
+rewrite !trmx0 !map_mx0 !tr_scalar_mx !map_scalar_mx/= ?conjC1.
 rewrite mulmxA -[_ *m S *m _]mulmxA -[_ *m _ *m S^t*]mulmxA.
 rewrite /S ![schmidt_complete _ *m _]mul_col_mx.
 rewrite !tr_col_mx !map_row_mx !mul_col_row !mulmx_block.
