@@ -1,5 +1,5 @@
 pre-all::
-	if command -v coqc > /dev/null && (coqc --version | grep -q '8.18\|8.19\|8.20') ; then \
+	if command -v coqc > /dev/null && (coqc --version | grep -q '8.20') ; then \
 	  for f in $(shell grep "From Corelib" $$(find . -name "*.v") | cut -d: -f1) ; do \
 	     sed -i.bak 's/From Corelib/From Coq/' $${f} ; \
 	     sed -i.bak 's/PosDef/PArith/' $${f} ; \

@@ -56,57 +56,51 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+Reserved Notation "'-oo'".
+Reserved Notation "'+oo'".
+Reserved Notation "`[ a , b ]" (a, b at level 9, format "`[ a ,  b ]").
+Reserved Notation "`] a , b ]" (a, b at level 9, format "`] a ,  b ]").
+Reserved Notation "`[ a , b [" (format "`[ a ,  b [").
+Reserved Notation "`] a , b [" (format "`] a ,  b [").
+Reserved Notation "`] '-oo' , b ]" (b at level 9, format "`] '-oo' ,  b ]").
+Reserved Notation "`] '-oo' , b [" (format "`] '-oo' ,  b [").
+Reserved Notation "`[ a , '+oo' [" (format "`[ a ,  '+oo' [").
+Reserved Notation "`] a , '+oo' [" (format "`] a ,  '+oo' [").
+Reserved Notation "`] -oo , '+oo' [" (format "`] -oo ,  '+oo' [").
+
 Local Open Scope order_scope.
 Import Order.TTheory.
 
 Variant itv_bound (T : Type) : Type := BSide of bool & T | BInfty of bool.
 Notation BLeft := (BSide true).
 Notation BRight := (BSide false).
-Notation "'-oo'" := (BInfty _ true) (at level 0) : order_scope.
-Notation "'+oo'" := (BInfty _ false) (at level 0) : order_scope.
+Notation "'-oo'" := (BInfty _ true) : order_scope.
+Notation "'+oo'" := (BInfty _ false) : order_scope.
 Variant interval (T : Type) := Interval of itv_bound T & itv_bound T.
 
 Coercion pair_of_interval T (I : interval T) : itv_bound T * itv_bound T :=
   let: Interval b1 b2 := I in (b1, b2).
 
 (* We provide the 9 following notations to help writing formal intervals *)
-Notation "`[ a , b ]" := (Interval (BLeft a) (BRight b))
-  (at level 0, a, b at level 9 , format "`[ a ,  b ]") : order_scope.
-Notation "`] a , b ]" := (Interval (BRight a) (BRight b))
-  (at level 0, a, b at level 9 , format "`] a ,  b ]") : order_scope.
-Notation "`[ a , b [" := (Interval (BLeft a) (BLeft b))
-  (at level 0, a, b at level 9 , format "`[ a ,  b [") : order_scope.
-Notation "`] a , b [" := (Interval (BRight a) (BLeft b))
-  (at level 0, a, b at level 9 , format "`] a ,  b [") : order_scope.
-Notation "`] '-oo' , b ]" := (Interval -oo (BRight b))
-  (at level 0, b at level 9 , format "`] '-oo' ,  b ]") : order_scope.
-Notation "`] '-oo' , b [" := (Interval -oo (BLeft b))
-  (at level 0, b at level 9 , format "`] '-oo' ,  b [") : order_scope.
-Notation "`[ a , '+oo' [" := (Interval (BLeft a) +oo)
-  (at level 0, a at level 9 , format "`[ a ,  '+oo' [") : order_scope.
-Notation "`] a , '+oo' [" := (Interval (BRight a) +oo)
-  (at level 0, a at level 9 , format "`] a ,  '+oo' [") : order_scope.
-Notation "`] -oo , '+oo' [" := (Interval -oo +oo)
-  (at level 0, format "`] -oo ,  '+oo' [") : order_scope.
+Notation "`[ a , b ]" := (Interval (BLeft a) (BRight b)) : order_scope.
+Notation "`] a , b ]" := (Interval (BRight a) (BRight b)) : order_scope.
+Notation "`[ a , b [" := (Interval (BLeft a) (BLeft b)) : order_scope.
+Notation "`] a , b [" := (Interval (BRight a) (BLeft b)) : order_scope.
+Notation "`] '-oo' , b ]" := (Interval -oo (BRight b)) : order_scope.
+Notation "`] '-oo' , b [" := (Interval -oo (BLeft b)) : order_scope.
+Notation "`[ a , '+oo' [" := (Interval (BLeft a) +oo) : order_scope.
+Notation "`] a , '+oo' [" := (Interval (BRight a) +oo) : order_scope.
+Notation "`] -oo , '+oo' [" := (Interval -oo +oo) : order_scope.
 
-Notation "`[ a , b ]" := (Interval (BLeft a) (BRight b))
-  (at level 0, a, b at level 9 , format "`[ a ,  b ]") : ring_scope.
-Notation "`] a , b ]" := (Interval (BRight a) (BRight b))
-  (at level 0, a, b at level 9 , format "`] a ,  b ]") : ring_scope.
-Notation "`[ a , b [" := (Interval (BLeft a) (BLeft b))
-  (at level 0, a, b at level 9 , format "`[ a ,  b [") : ring_scope.
-Notation "`] a , b [" := (Interval (BRight a) (BLeft b))
-  (at level 0, a, b at level 9 , format "`] a ,  b [") : ring_scope.
-Notation "`] '-oo' , b ]" := (Interval -oo (BRight b))
-  (at level 0, b at level 9 , format "`] '-oo' ,  b ]") : ring_scope.
-Notation "`] '-oo' , b [" := (Interval -oo (BLeft b))
-  (at level 0, b at level 9 , format "`] '-oo' ,  b [") : ring_scope.
-Notation "`[ a , '+oo' [" := (Interval (BLeft a) +oo)
-  (at level 0, a at level 9 , format "`[ a ,  '+oo' [") : ring_scope.
-Notation "`] a , '+oo' [" := (Interval (BRight a) +oo)
-  (at level 0, a at level 9 , format "`] a ,  '+oo' [") : ring_scope.
-Notation "`] -oo , '+oo' [" := (Interval -oo +oo)
-  (at level 0, format "`] -oo ,  '+oo' [") : ring_scope.
+Notation "`[ a , b ]" := (Interval (BLeft a) (BRight b)) : ring_scope.
+Notation "`] a , b ]" := (Interval (BRight a) (BRight b)) : ring_scope.
+Notation "`[ a , b [" := (Interval (BLeft a) (BLeft b)) : ring_scope.
+Notation "`] a , b [" := (Interval (BRight a) (BLeft b)) : ring_scope.
+Notation "`] '-oo' , b ]" := (Interval -oo (BRight b)) : ring_scope.
+Notation "`] '-oo' , b [" := (Interval -oo (BLeft b)) : ring_scope.
+Notation "`[ a , '+oo' [" := (Interval (BLeft a) +oo) : ring_scope.
+Notation "`] a , '+oo' [" := (Interval (BRight a) +oo) : ring_scope.
+Notation "`] -oo , '+oo' [" := (Interval -oo +oo) : ring_scope.
 
 Fact itv_bound_display (disp : Order.disp_t) : Order.disp_t. Proof. exact. Qed.
 Fact interval_display (disp : Order.disp_t) : Order.disp_t. Proof. exact. Qed.

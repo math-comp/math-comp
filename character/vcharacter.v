@@ -72,10 +72,8 @@ Proof. by case/intrP=> m -> Zphi; rewrite scaler_int rpredMz. Qed.
 
 End Basics.
 
-Notation "''Z[' S , A ]" := (Zchar S A)
-  (at level 8, format "''Z[' S ,  A ]") : group_scope.
-Notation "''Z[' S ]" := 'Z[S, setT]
-  (at level 8, format "''Z[' S ]") : group_scope.
+Notation "''Z[' S , A ]" := (Zchar S A) (format "''Z[' S ,  A ]") : group_scope.
+Notation "''Z[' S ]" := 'Z[S, setT] (format "''Z[' S ]") : group_scope.
 
 Section Zchar.
 

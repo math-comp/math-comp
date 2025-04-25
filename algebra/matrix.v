@@ -201,32 +201,32 @@ Import GroupScope.
 Import GRing.Theory.
 Local Open Scope ring_scope.
 
-Reserved Notation "''M_' n"     (at level 8, n at level 2, format "''M_' n").
-Reserved Notation "''rV_' n"    (at level 8, n at level 2, format "''rV_' n").
-Reserved Notation "''cV_' n"    (at level 8, n at level 2, format "''cV_' n").
-Reserved Notation "''M_' ( n )" (at level 8). (* only parsing *)
-Reserved Notation "''M_' ( m , n )" (at level 8, format "''M_' ( m ,  n )").
-Reserved Notation "''M[' R ]_ n"    (at level 8, n at level 2). (* only parsing *)
-Reserved Notation "''rV[' R ]_ n"   (at level 8, n at level 2). (* only parsing *)
-Reserved Notation "''cV[' R ]_ n"   (at level 8, n at level 2). (* only parsing *)
-Reserved Notation "''M[' R ]_ ( n )"     (at level 8). (* only parsing *)
-Reserved Notation "''M[' R ]_ ( m , n )" (at level 8). (* only parsing *)
+Reserved Notation "''M_' n"     (at level 0, n at level 2, format "''M_' n").
+Reserved Notation "''rV_' n"    (at level 0, n at level 2, format "''rV_' n").
+Reserved Notation "''cV_' n"    (at level 0, n at level 2, format "''cV_' n").
+Reserved Notation "''M_' ( n )". (* only parsing *)
+Reserved Notation "''M_' ( m , n )" (format "''M_' ( m ,  n )").
+Reserved Notation "''M[' R ]_ n"    (at level 0, n at level 2). (* only parsing *)
+Reserved Notation "''rV[' R ]_ n"   (at level 0, n at level 2). (* only parsing *)
+Reserved Notation "''cV[' R ]_ n"   (at level 0, n at level 2). (* only parsing *)
+Reserved Notation "''M[' R ]_ ( n )". (* only parsing *)
+Reserved Notation "''M[' R ]_ ( m , n )". (* only parsing *)
 
 Reserved Notation "\matrix_ i E"
   (at level 36, E at level 36, i at level 2,
    format "\matrix_ i  E").
 Reserved Notation "\matrix_ ( i < n ) E"
-  (at level 36, E at level 36, i, n at level 50). (* only parsing *)
+  (E at level 36, i, n at level 50). (* only parsing *)
 Reserved Notation "\matrix_ ( i , j ) E"
-  (at level 36, E at level 36, i, j at level 50,
+  (E at level 36, j at level 50,
    format "\matrix_ ( i ,  j )  E").
 Reserved Notation "\matrix[ k ]_ ( i , j ) E"
   (at level 36, E at level 36, i, j at level 50,
    format "\matrix[ k ]_ ( i ,  j )  E").
 Reserved Notation "\matrix_ ( i < m , j < n ) E"
-  (at level 36, E at level 36, i, m, j, n at level 50). (* only parsing *)
+  (E at level 36, j, n at level 50). (* only parsing *)
 Reserved Notation "\matrix_ ( i , j < n ) E"
-  (at level 36, E at level 36, i, j, n at level 50). (* only parsing *)
+  (E at level 36, j, n at level 50). (* only parsing *)
 Reserved Notation "\row_ j E"
   (at level 36, E at level 36, j at level 2,
    format "\row_ j  E").
@@ -241,31 +241,36 @@ Reserved Notation "\mxblock_ ( i , j ) E"
   (at level 36, E at level 36, i, j at level 50,
    format "\mxblock_ ( i ,  j )  E").
 Reserved Notation "\mxblock_ ( i < m , j < n ) E"
-  (at level 36, E at level 36, i, m, j, n at level 50). (* only parsing *)
+  (E at level 36, i, m, j, n at level 50). (* only parsing *)
 Reserved Notation "\mxblock_ ( i , j < n ) E"
-  (at level 36, E at level 36, i, j, n at level 50). (* only parsing *)
+  (E at level 36, i, j, n at level 50). (* only parsing *)
 Reserved Notation "\mxrow_ j E"
   (at level 36, E at level 36, j at level 2,
    format "\mxrow_ j  E").
 Reserved Notation "\mxrow_ ( j < n ) E"
-  (at level 36, E at level 36, j, n at level 50). (* only parsing *)
+  (E at level 36, j, n at level 50). (* only parsing *)
 Reserved Notation "\mxcol_ j E"
   (at level 36, E at level 36, j at level 2,
    format "\mxcol_ j  E").
 Reserved Notation "\mxcol_ ( j < n ) E"
-  (at level 36, E at level 36, j, n at level 50). (* only parsing *)
+  (E at level 36, j, n at level 50). (* only parsing *)
 Reserved Notation "\mxdiag_ j E"
   (at level 36, E at level 36, j at level 2,
    format "\mxdiag_ j  E").
 Reserved Notation "\mxdiag_ ( j < n ) E"
-  (at level 36, E at level 36, j, n at level 50). (* only parsing *)
+  (E at level 36, j, n at level 50). (* only parsing *)
 
-Reserved Notation "x %:M"   (at level 8, format "x %:M").
+Reserved Notation "x %:M"   (format "x %:M").
 Reserved Notation "A *m B" (at level 40, left associativity, format "A  *m  B").
-Reserved Notation "A ^T"    (at level 8, format "A ^T").
+Reserved Notation "A ^T"    (format "A ^T").
 Reserved Notation "\tr A"   (at level 10, A at level 8, format "\tr  A").
 Reserved Notation "\det A"  (at level 10, A at level 8, format "\det  A").
 Reserved Notation "\adj A"  (at level 10, A at level 8, format "\adj  A").
+
+Reserved Notation "{ ''GL_' n [ R ] }"
+  (n at level 2, format "{ ''GL_' n [ R ] }").
+Reserved Notation "{ ''GL_' n ( p ) }"
+  (p at level 10, format "{ ''GL_' n ( p ) }").
 
 Local Notation simp := (Monoid.Theory.simpm, oppr0).
 
@@ -3966,11 +3971,9 @@ Bind Scope group_scope with GLtype.
 Arguments GLtype n%_N R%_type.
 Arguments GLval {n%_N R} u%_g.
 
-Notation "{ ''GL_' n [ R ] }" := (GLtype n R)
-  (at level 0, n at level 2, format "{ ''GL_' n [ R ] }") : type_scope.
-Notation "{ ''GL_' n ( p ) }" := {'GL_n['F_p]}
-  (at level 0, n at level 2, p at level 10,
-    format "{ ''GL_' n ( p ) }") : type_scope.
+Notation "{ ''GL_' n [ R ] }" := (GLtype n R) : type_scope.
+
+Notation "{ ''GL_' n ( p ) }" := {'GL_n['F_p]} : type_scope.
 
 HB.instance Definition _ (n : nat) (R : finComUnitRingType) :=
   [isSub of {'GL_n[R]} for GLval].
@@ -4008,8 +4011,7 @@ Arguments GLgroup_group n%_N R%_type.
 Notation "''GL_' n [ R ]" := (GLgroup n R)
   (at level 8, n at level 2, format "''GL_' n [ R ]") : group_scope.
 Notation "''GL_' n ( p )" := 'GL_n['F_p]
-  (at level 8, n at level 2, p at level 10,
-   format "''GL_' n ( p )") : group_scope.
+  (p at level 10, format "''GL_' n ( p )") : group_scope.
 Notation "''GL_' n [ R ]" := (GLgroup_group n R) : Group_scope.
 Notation "''GL_' n ( p )" := (GLgroup_group n 'F_p) : Group_scope.
 

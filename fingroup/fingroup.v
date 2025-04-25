@@ -149,40 +149,38 @@ End GroupScope.
 Import GroupScope.
 
 (* These are the operation notations introduced by this file. *)
-Reserved Notation "[ ~ x1 , x2 , .. , xn ]" (at level 0,
-  format  "'[ ' [ ~  x1 , '/'  x2 , '/'  .. , '/'  xn ] ']'").
-Reserved Notation "[ 1 gT ]" (at level 0, format "[ 1  gT ]").
-Reserved Notation "[ 1 ]" (at level 0, format "[ 1 ]").
-Reserved Notation "[ 'subg' G ]" (at level 0, format "[ 'subg'  G ]").
-Reserved Notation "A ^#" (at level 2, format "A ^#").
+Reserved Notation "[ ~ x1 , x2 , .. , xn ]"
+  (format  "'[ ' [ ~  x1 , '/'  x2 , '/'  .. , '/'  xn ] ']'").
+Reserved Notation "[ 1 gT ]" (format "[ 1  gT ]").
+Reserved Notation "[ 1 ]" (format "[ 1 ]").
+Reserved Notation "[ 'subg' G ]" (format "[ 'subg'  G ]").
+Reserved Notation "A ^#" (format "A ^#").
 Reserved Notation "A :^ x" (at level 35, right associativity).
 Reserved Notation "x ^: B" (at level 35, right associativity).
 Reserved Notation "A :^: B" (at level 35, right associativity).
-Reserved Notation "#| B : A |" (at level 0, B, A at level 99,
-  format "#| B  :  A |").
-Reserved Notation "''N' ( A )" (at level 8, format "''N' ( A )").
-Reserved Notation "''N_' G ( A )" (at level 8, G at level 2,
-  format "''N_' G ( A )").
+Reserved Notation "#| B : A |" (A at level 99, format "#| B  :  A |").
+Reserved Notation "''N' ( A )" (format "''N' ( A )").
+Reserved Notation "''N_' G ( A )" (G at level 2, format "''N_' G ( A )").
 Reserved Notation "A <| B" (at level 70, no associativity).
 Reserved Notation "A <*> B" (at level 40, left associativity).
-Reserved Notation "[ ~: A1 , A2 , .. , An ]" (at level 0,
-  format "[ ~: '['  A1 , '/'  A2 , '/'  .. , '/'  An ']' ]").
-Reserved Notation "[ 'max' A 'of' G | gP ]" (at level 0,
-  format "[ '[hv' 'max'  A  'of'  G '/ '  |  gP ']' ]").
-Reserved Notation "[ 'max' G | gP ]" (at level 0,
-  format "[ '[hv' 'max'  G '/ '  |  gP ']' ]").
-Reserved Notation "[ 'max' A 'of' G | gP & gQ ]" (at level 0,
-  format "[ '[hv' 'max'  A  'of'  G '/ '  |  gP '/ '  &  gQ ']' ]").
-Reserved Notation "[ 'max' G | gP & gQ ]" (at level 0,
-  format "[ '[hv' 'max'  G '/ '  |  gP '/ '  &  gQ ']' ]").
-Reserved Notation "[ 'min' A 'of' G | gP ]" (at level 0,
-  format "[ '[hv' 'min'  A  'of'  G '/ '  |  gP ']' ]").
-Reserved Notation "[ 'min' G | gP ]" (at level 0,
-  format "[ '[hv' 'min'  G '/ '  |  gP ']' ]").
-Reserved Notation "[ 'min' A 'of' G | gP & gQ ]" (at level 0,
-  format "[ '[hv' 'min'  A  'of'  G '/ '  |  gP '/ '  &  gQ ']' ]").
-Reserved Notation "[ 'min' G | gP & gQ ]" (at level 0,
-  format "[ '[hv' 'min'  G '/ '  |  gP '/ '  &  gQ ']' ]").
+Reserved Notation "[ ~: A1 , A2 , .. , An ]"
+  (format "[ ~: '['  A1 , '/'  A2 , '/'  .. , '/'  An ']' ]").
+Reserved Notation "[ 'max' A 'of' G | gP ]"
+  (format "[ '[hv' 'max'  A  'of'  G '/ '  |  gP ']' ]").
+Reserved Notation "[ 'max' G | gP ]"
+  (format "[ '[hv' 'max'  G '/ '  |  gP ']' ]").
+Reserved Notation "[ 'max' A 'of' G | gP & gQ ]"
+  (format "[ '[hv' 'max'  A  'of'  G '/ '  |  gP '/ '  &  gQ ']' ]").
+Reserved Notation "[ 'max' G | gP & gQ ]"
+  (format "[ '[hv' 'max'  G '/ '  |  gP '/ '  &  gQ ']' ]").
+Reserved Notation "[ 'min' A 'of' G | gP ]"
+  (format "[ '[hv' 'min'  A  'of'  G '/ '  |  gP ']' ]").
+Reserved Notation "[ 'min' G | gP ]"
+  (format "[ '[hv' 'min'  G '/ '  |  gP ']' ]").
+Reserved Notation "[ 'min' A 'of' G | gP & gQ ]"
+  (format "[ '[hv' 'min'  A  'of'  G '/ '  |  gP '/ '  &  gQ ']' ]").
+Reserved Notation "[ 'min' G | gP & gQ ]"
+  (format "[ '[hv' 'min'  G '/ '  |  gP '/ '  &  gQ ']' ]").
 
 (* We split the group axiomatisation in two. We define a  *)
 (* class of "base groups", which are basically monoids    *)
@@ -1213,10 +1211,10 @@ Arguments setT_group gT%_type.
 Prenex Implicits group_set mulsgP set1gP.
 
 Notation "{ 'group' gT }" := (group_of gT)
-  (at level 0, format "{ 'group'  gT }") : type_scope.
+  (format "{ 'group'  gT }") : type_scope.
 
 Notation "[ 'group' 'of' G ]" := (clone_group (@group _ G))
-  (at level 0, format "[ 'group'  'of'  G ]") : form_scope.
+  (format "[ 'group'  'of'  G ]") : form_scope.
 
 Bind Scope Group_scope with group_type.
 Bind Scope Group_scope with group_of.

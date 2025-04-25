@@ -39,7 +39,7 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Reserved Notation "''Gal' ( A / B )"
-  (at level 8, A at level 35, format "''Gal' ( A  /  B )").
+  (A at level 35, format "''Gal' ( A  /  B )").
 
 Import GroupScope GRing.Theory.
 Local Open Scope ring_scope.

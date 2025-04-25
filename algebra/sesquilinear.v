@@ -109,11 +109,10 @@ Unset Printing Implicit Defensive.
 
 Reserved Notation "M ^t phi"
   (at level 39, left associativity, format "M  ^t  phi").
-Reserved Notation "A ^!" (at level 2, format "A ^!").
-Reserved Notation "A ^_|_" (at level 8, format "A ^_|_").
+Reserved Notation "A ^!" (format "A ^!").
+Reserved Notation "A ^_|_" (format "A ^_|_").
 Reserved Notation "A ''_|_' B" (at level 69, format "A  ''_|_'  B").
-Reserved Notation "eps_theta .-sesqui"
-  (at level 2, format "eps_theta .-sesqui").
+Reserved Notation "eps_theta .-sesqui" (format "eps_theta .-sesqui").
 
 Local Open Scope ring_scope.
 Import GRing.Theory Order.Theory Num.Theory.
@@ -178,7 +177,7 @@ Proof. by apply/matrixP=> i j; rewrite !mxE conjCK. Qed.
 }.
 Notation "[ 'revop' revop 'of' op ]" :=
   (@RevOp _ _ _ revop op (fun _ _ => erefl))
-  (at level 0, format "[ 'revop'  revop  'of'  op ]") : form_scope.*)
+  (format "[ 'revop'  revop  'of'  op ]") : form_scope.*)
 
 HB.mixin Record isBilinear (R : nzRingType) (U U' : lmodType R) (V : zmodType)
     (s : R -> V -> V) (s' : R -> V -> V) (f : U -> U' -> V) := {
@@ -247,17 +246,17 @@ End Bilinear.
 
 Notation "{ 'bilinear' U -> V -> W | s & t }" :=
   (@Bilinear.type _ U%type V%type W%type s t)
-    (at level 0, U at level 98, V at level 98, W at level 99,
+    (U at level 98, V at level 98, W at level 99,
      format "{ 'bilinear'  U  ->  V  ->  W  |  s  &  t }") : ring_scope.
 Notation "{ 'bilinear' U -> V -> W | s }" :=
   ({bilinear U -> V -> W | s.1 & s.2})
-    (at level 0, U at level 98, V at level 98, W at level 99,
+    (U at level 98, V at level 98, W at level 99,
      format "{ 'bilinear'  U  ->  V  ->  W  |  s }") : ring_scope.
 Notation "{ 'bilinear' U -> V -> W }" := {bilinear U -> V -> W  | *:%R & *:%R}
-  (at level 0, U at level 98, V at level 98, W at level 99,
+  (U at level 98, V at level 98, W at level 99,
    format "{ 'bilinear'  U  ->  V  -> W }") : ring_scope.
 Notation "{ 'biscalar' U }" := {bilinear U%type -> U%type -> _ | *%R & *%R}
-  (at level 0, format "{ 'biscalar'  U }") : ring_scope.
+  (format "{ 'biscalar'  U }") : ring_scope.
 End BilinearExports.
 
 Export BilinearExports.
@@ -467,7 +466,7 @@ HB.structure Definition Hermitian (R : nzRingType) (U : lmodType R)
         @isHermitianSesquilinear R U eps theta f}.
 
 Notation "{ 'hermitian' U 'for' eps & theta }" := (@Hermitian.type _ U eps theta)
-  (at level 0, format "{ 'hermitian'  U  'for'  eps  &  theta }") : ring_scope.
+  (format "{ 'hermitian'  U  'for'  eps  &  theta }") : ring_scope.
 
 (* duplicate to trick HB *)
 #[non_forgetful_inheritance]
@@ -502,13 +501,13 @@ Canonical bilinear := @Bilinear.Pack _ _ _ _ _ _ (Phant (U -> U -> R)) cF (base 
 
 (*Module Exports.
 Notation "{ 'hermitian' U 'for' eps & theta }" := (map eps theta (Phant U))
-  (at level 0, format "{ 'hermitian'  U  'for'  eps  &  theta }") : ring_scope.
+  (format "{ 'hermitian'  U  'for'  eps  &  theta }") : ring_scope.
 Coercion base : class_of >-> bilmorphism_for.
 Coercion apply : map >-> Funclass.
 Notation "[ 'hermitian' 'of' f 'as' g ]" := (@clone _ _ _ _ _ _ f g _ idfun idfun)
-  (at level 0, format "[ 'hermitian'  'of'  f  'as'  g ]") : form_scope.
+  (format "[ 'hermitian'  'of'  f  'as'  g ]") : form_scope.
 Notation "[ 'hermitian' 'of' f ]" := (@clone _ _ _ _ _ _ f f _ idfun idfun)
-  (at level 0, format "[ 'hermitian'  'of'  f ]") : form_scope.
+  (format "[ 'hermitian'  'of'  f ]") : form_scope.
 Notation hermitian_for := Hermitian.axiom.
 Notation Hermitian fM := (pack (Phant _) fM idfun).
 Canonical additiver.
@@ -725,7 +724,7 @@ HB.structure Definition Dot (R : numDomainType) (U : lmodType R)
   {op of isDotProduct R U op & @Hermitian R U false theta op}.
 
 Notation "{ 'dot' U 'for' theta }" := (@Dot.type _ U theta)
-  (at level 0, format "{ 'dot'  U  'for'  theta }") : ring_scope.
+  (format "{ 'dot'  U  'for'  theta }") : ring_scope.
 
 (* duplicate to trick HB *)
 #[non_forgetful_inheritance]
@@ -739,22 +738,22 @@ HB.instance Definition _ (R : numDomainType) (U : lmodType R)
   @GRing.isScalable.Build _ _ _ _ (f u) (@linearr_subproof _ _ _ _ _ _ f u).
 
 (*Notation "{ 'dot' U 'for' theta }" := (map theta (Phant U))
-  (at level 0, format "{ 'dot'  U  'for'  theta }") : ring_scope.
+  (format "{ 'dot'  U  'for'  theta }") : ring_scope.
 Coercion base : class_of >-> Hermitian.class_of.
 Coercion apply : map >-> Funclass.
 Notation "[ 'dot' 'of' f 'as' g ]" := (@clone _ _ _ _ _ f g _ idfun idfun)
-  (at level 0, format "[ 'dot'  'of'  f  'as'  g ]") : form_scope.
+  (format "[ 'dot'  'of'  f  'as'  g ]") : form_scope.
 Notation "[ 'dot' 'of' f ]" := (@clone _ _ _ _ _ f f _ idfun idfun)
-  (at level 0, format "[ 'dot'  'of'  f ]") : form_scope.
+  (format "[ 'dot'  'of'  f ]") : form_scope.
 Notation Dot fM := (pack fM idfun).
 Notation is_dot := Dot.axiom.*)
 
 Notation "{ 'symmetric' U }" := ({hermitian U for false & idfun})
-  (at level 0, format "{ 'symmetric'  U }") : ring_scope.
+  (format "{ 'symmetric'  U }") : ring_scope.
 Notation "{ 'skew_symmetric' U }" := ({hermitian U for true & idfun})
-  (at level 0, format "{ 'skew_symmetric'  U }") : ring_scope.
+  (format "{ 'skew_symmetric'  U }") : ring_scope.
 Notation "{ 'hermitian_sym' U 'for' theta }" := ({hermitian U for false & theta})
-  (at level 0, format "{ 'hermitian_sym'  U  'for'  theta }") : ring_scope.
+  (format "{ 'hermitian_sym'  U  'for'  theta }") : ring_scope.
 
 Definition is_skew (R : nzRingType) (eps : bool) (theta : R -> R)
   (U : lmodType R) (form : {hermitian U for eps & theta}) :=
@@ -855,7 +854,7 @@ Definition isometry_from_to mD tau mR :=
 
 Local Notation "{ 'in' D , 'isometry' tau , 'to' R }" :=
     (isometry_from_to (mem D) tau (mem R))
-  (at level 0, format "{ 'in'  D ,  'isometry'  tau ,  'to'  R }")
+  (format "{ 'in'  D ,  'isometry'  tau ,  'to'  R }")
      : type_scope.
 
 End HermitianIsometry.

@@ -78,12 +78,11 @@ Declare Scope lrfun_scope.
 
 Local Open Scope ring_scope.
 
-Reserved Notation "{ 'aspace' T }" (at level 0, format "{ 'aspace'  T }").
-Reserved Notation "<< U & vs >>" (at level 0, format "<< U  &  vs >>").
-Reserved Notation "<< U ; x >>" (at level 0, format "<< U ;  x >>").
-Reserved Notation "''AHom' ( T , rT )"
-  (at level 8, format "''AHom' ( T ,  rT )").
-Reserved Notation "''AEnd' ( T )" (at level 8, format "''AEnd' ( T )").
+Reserved Notation "{ 'aspace' T }" (format "{ 'aspace'  T }").
+Reserved Notation "<< U & vs >>" (format "<< U  &  vs >>").
+Reserved Notation "<< U ; x >>" (format "<< U ;  x >>").
+Reserved Notation "''AHom' ( T , rT )" (format "''AHom' ( T ,  rT )").
+Reserved Notation "''AEnd' ( T )" (format "''AEnd' ( T )").
 
 Notation "\dim_ E V" := (divn (\dim V) (\dim E))
   (at level 10, E at level 2, V at level 8, format "\dim_ E  V") : nat_scope.
@@ -568,9 +567,9 @@ Notation "'Z ( V )" := (center_vspace V) : vspace_scope.
 Notation "1" := (aspace1 _) : aspace_scope.
 Notation "{ : aT }" := (aspacef aT) : aspace_scope.
 Notation "[ 'aspace' 'of' U ]" := (@clone_aspace _ _ U _ _ id)
-  (at level 0, format "[ 'aspace'  'of'  U ]") : form_scope.
+  (format "[ 'aspace'  'of'  U ]") : form_scope.
 Notation "[ 'aspace' 'of' U 'for' A ]" := (@clone_aspace _ _ U A _ idfun)
-  (at level 0, format "[ 'aspace'  'of'  U  'for'  A ]") : form_scope.
+  (format "[ 'aspace'  'of'  U  'for'  A ]") : form_scope.
 
 Arguments prodvP {K aT U V W}.
 Arguments cent1vP {K aT u v}.
