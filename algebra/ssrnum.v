@@ -3514,14 +3514,32 @@ End PolyBounds.
 End RealDomainOperations.
 
 Section RealField.
+Variable F : realFieldType.
+Implicit Type x y : F.
 
-Variables (F : realFieldType) (x y : F).
-
-Lemma leif_mean_square : x * y <= (x ^+ 2 + y ^+ 2) / 2 ?= iff (x == y).
+Lemma leif_mean_square x y : x * y <= (x ^+ 2 + y ^+ 2) / 2 ?= iff (x == y).
 Proof. by apply: real_leif_mean_square; apply: num_real. Qed.
 
-Lemma leif_AGM2 : x * y <= ((x + y) / 2)^+ 2 ?= iff (x == y).
+Lemma leif_AGM2 x y : x * y <= ((x + y) / 2)^+ 2 ?= iff (x == y).
 Proof. by apply: real_leif_AGM2; apply: num_real. Qed.
+
+Section MinMax.
+
+Lemma maxr_absE x y : Num.max x y = (x + y + `|x - y|) / 2.
+Proof.
+apply: canRL (mulfK _) _ => //; rewrite ?pnatr_eq0//.
+case: lerP => _; rewrite [2]mulr2n mulrDr mulr1.
+  by rewrite addrCA addrK.
+by rewrite addrCA addrAC subrr add0r.
+Qed.
+
+Lemma minr_absE x y : Num.min x y = (x + y - `|x - y|) / 2.
+Proof.
+apply: (addrI (Num.max x y)); rewrite addr_max_min maxr_absE.
+by rewrite -mulrDl addrCA addrK mulrDl -splitr.
+Qed.
+
+End MinMax.
 
 End RealField.
 
