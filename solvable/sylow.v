@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import fintype prime bigop finset fingroup morphism.
-From mathcomp Require Import automorphism quotient action cyclic gproduct.
+From mathcomp Require Import automorphism quotient action cyclic gproduct .
 From mathcomp Require Import gfunctor commutator pgroup center nilpotent.
 
 (******************************************************************************)

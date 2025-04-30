@@ -2558,7 +2558,7 @@ have GHx: coset H x \in (G / H)%g by apply: mem_quotient.
 move: (second_orthogonality_relation (coset H x) GHx).
 rewrite mulrb class_refl => <-.
 rewrite -2!(eq_bigr _ (fun _ _ => normCK _)) sum_norm_irr_quo // -subr_ge0.
-rewrite (bigID (fun i => H \subset cfker 'chi[G]_i)) //= addrC addKr.
+rewrite (bigID (fun i => H \subset cfker 'chi[G]_i)) //= addrC addrK.
 by apply: sumr_ge0 => i _; rewrite normCK mul_conjC_ge0.
 Qed.
 

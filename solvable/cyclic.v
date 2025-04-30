@@ -1,8 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice div.
-From mathcomp Require Import fintype bigop prime finset fingroup morphism.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
+From mathcomp Require Import div fintype bigop prime finset fingroup morphism.
 From mathcomp Require Import perm automorphism quotient gproduct ssralg.
 From mathcomp Require Import finalg zmodp poly.
 
