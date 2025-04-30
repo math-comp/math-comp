@@ -327,12 +327,6 @@ End FinNzRing.
 
 HB.instance Definition _ (R : finUnitRingType) pcharRp :=
   FinRing.UnitRing.on (type R pcharRp).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ (R : finUnitRingType) pcharRp :=
-  FinRing.UnitAlgebra.on (type R pcharRp).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ (R : finUnitRingType) pcharRp :=
-  Falgebra.on (type R pcharRp).
 HB.instance Definition _ (R : finComNzRingType) pcharRp :=
   FinRing.ComNzRing.on (type R pcharRp).
 HB.instance Definition _ (R : finComUnitRingType) pcharRp :=

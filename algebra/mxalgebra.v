@@ -3010,7 +3010,7 @@ set pAnz := [pred k | A k.1 k.2 != 0].
 rewrite (@eq_pick _ _ pAnz) => [|k]; last by rewrite /= mxE fmorph_eq0.
 case: {+}(pick _) => [[i j]|]; last by rewrite !map_mx1.
 rewrite mxE -fmorphV  -map_xcol -map_xrow -map_dlsubmx -map_drsubmx.
-rewrite -map_ursubmx -map_mxZ -map_mxM -map_mxB {}IHm /=.
+rewrite -map_ursubmx -map_mxZ -map_mxM -raddfB {}IHm /=.
 case: {+}(Gaussian_elimination_ _) => [[L U] r] /=; rewrite map_xrow map_xcol.
 by rewrite !(@map_block_mx _ _ f 1 _ 1) !map_mx0 ?map_mx1 ?map_scalar_mx.
 Qed.
@@ -3105,7 +3105,7 @@ by rewrite -!map_capmx !map_submx -!diffmxE andbb.
 Qed.
 
 Lemma map_eigenspace n (g : 'M_n) a : (eigenspace g a)^f = eigenspace g^f (f a).
-Proof. by rewrite map_kermx map_mxB ?map_scalar_mx. Qed.
+Proof. by rewrite map_kermx raddfB/= ?map_scalar_mx. Qed.
 
 Lemma eigenvalue_map n (g : 'M_n) a : eigenvalue g^f (f a) = eigenvalue g a.
 Proof. by rewrite /eigenvalue -map_eigenspace map_mx_eq0. Qed.
@@ -3126,7 +3126,7 @@ Qed.
 Lemma map_cent_mx m n (E : 'A_(m, n)) : ('C(E)%MS)^f = 'C(E^f)%MS.
 Proof.
 rewrite map_kermx; congr kermx; apply: map_lin_mx => A; rewrite map_mxM.
-by congr (_ *m _); apply: map_lin_mx => B; rewrite map_mxB ?map_mxM.
+by congr (_ *m _); apply: map_lin_mx => B; rewrite raddfB/= ?map_mxM.
 Qed.
 
 Lemma map_center_mx m n (E : 'A_(m, n)) : (('Z(E))^f :=: 'Z(E^f))%MS.

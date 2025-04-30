@@ -305,13 +305,6 @@ Variable f : {bilinear U -> U' -> V | s & s'}.
 Section GenericPropertiesr.
 Variable z : U.
 
-#[local, non_forgetful_inheritance, warning="-HB.no-new-instance"]
-HB.instance Definition _ :=
-  GRing.isZmodMorphism.Build _ _ (f z) (@zmod_morphismr_subproof _ _ _ _ _ _ f z).
-#[local, non_forgetful_inheritance]
-HB.instance Definition _ :=
-  GRing.isScalable.Build _ _ _ _ (f z) (@linearr_subproof _ _ _ _ _ _ f z).
-
 Lemma linear0r : f z 0 = 0. Proof. by rewrite raddf0. Qed.
 Lemma linearNr : {morph f z : x / - x}. Proof. exact: raddfN. Qed.
 Lemma linearDr : {morph f z : x y / x + y}. Proof. exact: raddfD. Qed.

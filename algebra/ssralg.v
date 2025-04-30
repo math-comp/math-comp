@@ -5531,11 +5531,10 @@ HB.factory Record isDivClosed (R : unitRingType) (S : R -> bool) := {
 }.
 
 HB.builders Context R S of isDivClosed R S.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ := isInvClosed.Build R S
-  (divr_closedV divr_closed_subproof).
 HB.instance Definition _ := isMulClosed.Build R S
   (divr_closedM divr_closed_subproof).
+HB.instance Definition _ := isInvClosed.Build R S
+  (divr_closedV divr_closed_subproof).
 HB.end.
 
 HB.factory Record isSdivClosed (R : unitRingType) (S : R -> bool) := {
@@ -5940,8 +5939,6 @@ HB.structure Definition SubZmodule V S :=
 Section zmod_morphism.
 Context V (S : pred V) (U : SubZmodule.type S).
 Notation val := (val : U -> V).
-#[export, warning="-HB.no-new-instance"]
-HB.instance Definition _ := isZmodMorphism.Build U V val valB_subproof.
 Lemma valB : {morph val : x y / x - y}. Proof. exact: raddfB. Qed.
 Lemma valN : {morph val : x / - x}. Proof. exact: raddfN. Qed.
 End zmod_morphism.
@@ -5968,9 +5965,6 @@ HB.instance Definition _ := Nmodule_isZmodule.Build U addNr.
 
 Lemma valD : nmod_morphism (val : U -> V).
 Proof. by split=> [|x y]; rewrite !SubK. Qed.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ := isSubNmodule.Build V S U valD.
-
 Lemma valB : zmod_morphism (val : U -> V).
 Proof. by move=> x y; rewrite !SubK. Qed.
 HB.instance Definition _ := isSubZmodule.Build V S U valB.
