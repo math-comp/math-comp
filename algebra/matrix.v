@@ -2163,9 +2163,6 @@ Proof. by move=> a b; apply/matrixP=> i j; rewrite !mxE. Qed.
 #[deprecated(since="mathcomp 2.5.0",
       note="use `const_mx_is_zmod_morphism` instead")]
 Definition const_mx_is_additive := const_mx_is_zmod_morphism.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ := GRing.isZmodMorphism.Build V 'M[V]_(m, n) const_mx
-  const_mx_is_zmod_morphism.
 
 End FixedDim.
 
@@ -2178,47 +2175,10 @@ Proof. by move=> A B; apply/matrixP=> i j; rewrite !mxE. Qed.
 #[deprecated(since="mathcomp 2.5.0",
       note="use `swizzle_mx_is_zmod_morphism` instead")]
 Definition swizzle_mx_is_additive := swizzle_mx_is_zmod_morphism.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ k := GRing.isZmodMorphism.Build 'M_(m, n) 'M_(p, q)
-  (swizzle_mx f g k) (swizzle_mx_is_zmod_morphism k).
 
 End Additive.
 
 Local Notation SwizzleAdd op := (GRing.Additive.copy op (swizzle_mx _ _ _)).
-
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n := SwizzleAdd (@trmx V m n).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n i := SwizzleAdd (@row V m n i).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n j := SwizzleAdd (@col V m n j).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n i := SwizzleAdd (@row' V m n i).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n j := SwizzleAdd (@col' V m n j).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n m' n' f g := SwizzleAdd (@mxsub V m n m' n' f g).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n s := SwizzleAdd (@row_perm V m n s).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n s := SwizzleAdd (@col_perm V m n s).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n i1 i2 := SwizzleAdd (@xrow V m n i1 i2).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n j1 j2 := SwizzleAdd (@xcol V m n j1 j2).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n1 n2 := SwizzleAdd (@lsubmx V m n1 n2).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n1 n2 := SwizzleAdd (@rsubmx V m n1 n2).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m1 m2 n := SwizzleAdd (@usubmx V m1 m2 n).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m1 m2 n := SwizzleAdd (@dsubmx V m1 m2 n).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n := SwizzleAdd (@vec_mx V m n).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ m n := GRing.isZmodMorphism.Build 'M_(m, n) 'rV_(m * n)
-  mxvec (can2_zmod_morphism (@vec_mxK V m n) mxvecK).
 
 Ltac split_mxE := apply/matrixP=> i j; do ![rewrite mxE | case: split => ?].
 
@@ -2241,11 +2201,8 @@ Proof.
 by move=>A B; apply/matrixP=>i j; rewrite !mxE mulrnBl.
 Qed.
 #[deprecated(since="mathcomp 2.5.0",
-      note="use `diag_mx_is_zmod_morphism` instead")]
+      note="use `raddfB` instead")]
 Definition diag_mx_is_additive := diag_mx_is_zmod_morphism.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ n := GRing.isZmodMorphism.Build 'rV_n 'M_n (@diag_mx V n)
-  (@diag_mx_is_zmod_morphism n).
 
 (* Scalar matrix : a diagonal matrix with a constant on the diagonal *)
 Section ScalarMx.
@@ -2255,11 +2212,8 @@ Variable n : nat.
 Lemma scalar_mx_is_zmod_morphism : zmod_morphism (@scalar_mx V n).
 Proof. by move=> a b; rewrite -!diag_const_mx !raddfB. Qed.
 #[deprecated(since="mathcomp 2.5.0",
-      note="use `scalar_mx_is_zmod_morphism` instead")]
+      note="use `raddfB` instead")]
 Definition scalar_mx_is_additive := scalar_mx_is_zmod_morphism.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ := GRing.isZmodMorphism.Build V 'M_n scalar_mx
-  scalar_mx_is_zmod_morphism.
 
 End ScalarMx.
 
@@ -2274,11 +2228,8 @@ move=>A B; rewrite -sumrN -big_split /=.
 by apply: eq_bigr=> i _; rewrite !mxE.
 Qed.
 #[deprecated(since="mathcomp 2.5.0",
-      note="use `mxtrace_is_zmod_morphism` instead")]
+      note="use `raddfB` instead")]
 Definition mxtrace_is_additive := mxtrace_is_zmod_morphism.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ := GRing.isZmodMorphism.Build 'M_n V (@mxtrace V n)
-  mxtrace_is_zmod_morphism.
 
 End Trace.
 
@@ -2291,15 +2242,15 @@ Variables (aR rR : zmodType) (f : {additive aR -> rR}) (m n : nat).
 Local Notation "A ^f" := (map_mx f A) : ring_scope.
 Implicit Type A : 'M[aR]_(m, n).
 
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `raddfN` instead")]
 Lemma map_mxN A : (- A)^f = - A^f.
 Proof. by apply/matrixP=> i j; rewrite !mxE raddfN. Qed.
 
+#[deprecated(since="mathcomp 2.5.0",
+      note="use `raddfB` instead")]
 Lemma map_mxB A B : (A - B)^f = A^f - B^f.
-Proof. by rewrite map_mxD map_mxN. Qed.
-
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ :=
-  GRing.isZmodMorphism.Build 'M[aR]_(m, n) 'M[rR]_(m, n) (map_mx f) map_mxB.
+Proof. by rewrite map_mxD raddfN. Qed.
 
 End MapZmodMatrix.
 
@@ -2895,8 +2846,8 @@ HB.instance Definition _ := [Finite of MV by <:].
 
 End FinNmodMatrix.
 
-#[compress_coercions, warning="-HB.no-new-instance"]
-HB.instance Definition _ (R : finNzSemiRingType) (m n : nat) :=
+#[compress_coercions]
+HB.instance Definition _ (R : finZmodType) (m n : nat) :=
   FinRing.Nmodule.on 'M[R]_(m, n).
 
 #[compress_coercions]
@@ -3081,10 +3032,6 @@ End ComMatrix.
 Arguments comm_mx_scalar {R n}.
 Arguments comm_scalar_mx {R n}.
 Arguments diag_mx_comm {R n}.
-
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ (R : finComNzSemiRingType) (n' : nat) :=
-  [Finite of 'M[R]_n'.+1 by <:].
 
 #[global] Hint Resolve comm_mx_scalar comm_scalar_mx : core.
 
@@ -3391,16 +3338,12 @@ HB.instance Definition _ (R : nzRingType) n := GRing.NzSemiRing.on 'M[R]_n.+1.
 HB.instance Definition _ (R : nzRingType) n :=
   GRing.Lmodule_isLalgebra.Build R 'M[R]_n.+1 (@scalemxAl R n.+1 n.+1 n.+1).
 
-HB.instance Definition _ (M : countZmodType) m n :=
-  [Countable of 'M[M]_(m, n) by <:].
 HB.instance Definition _ (R : countNzRingType) n :=
   [Countable of 'M[R]_n.+1 by <:].
 
 Section FinZmodMatrix.
 Variables (V : finZmodType) (m n : nat).
 Local Notation MV := 'M[V]_(m, n).
-
-HB.instance Definition _ := [Finite of MV by <:].
 
 #[compress_coercions]
 HB.instance Definition _ := [finGroupMixin of MV for +%R].
@@ -3445,7 +3388,7 @@ Proof. by apply/matrixP=> i j; rewrite !mxE cofactor_map_mx. Qed.
 End FixedSize.
 
 Lemma map_copid_mx n r : (copid_mx r)^f = copid_mx r :> 'M_n.
-Proof. by rewrite map_mxB map_mx1 map_pid_mx. Qed.
+Proof. by rewrite raddfB/= map_mx1 map_pid_mx. Qed.
 
 Lemma map_lin1_mx m n (g : 'rV_m -> 'rV_n) gf :
   (forall v, (g v)^f = gf v^f) -> (lin1_mx g)^f = lin1_mx gf.

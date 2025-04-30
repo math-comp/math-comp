@@ -422,9 +422,6 @@ HB.instance Definition _ := FieldExt_isSplittingField.Build F L
   (normal_field_splitting normal_field_splitting_axiom).
 HB.end.
 
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ (F : fieldType) := GRing.Field.on (F^o).
-
 Fact regular_splittingAxiom (F : fieldType) : SplittingField.axiom F^o.
 Proof.
 exists 1; first exact: rpred1.
