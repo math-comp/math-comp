@@ -5202,11 +5202,10 @@ HB.factory Record isDivClosed (R : unitRingType) (S : R -> bool) := {
 }.
 
 HB.builders Context R S of isDivClosed R S.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ := isInvClosed.Build R S
-  (divr_closedV divr_closed_subproof).
 HB.instance Definition _ := isMulClosed.Build R S
   (divr_closedM divr_closed_subproof).
+HB.instance Definition _ := isInvClosed.Build R S
+  (divr_closedV divr_closed_subproof).
 HB.end.
 
 HB.factory Record isSdivClosed (R : unitRingType) (S : R -> bool) := {
