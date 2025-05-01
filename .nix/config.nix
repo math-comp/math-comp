@@ -63,7 +63,9 @@ with builtins; with (import <nixpkgs> {}).lib;
     // { mathcomp-ssreflect.main-job = true;
          mathcomp-doc.job = true;
          stdlib.job = true;
-         jasmin.override.version = "main";
+         # jasmin.override.version = "main";
+         jasmin.job = false;  # broken since https://github.com/math-comp/math-comp/pull/1256
+         # (see https://github.com/jasmin-lang/jasmin/pull/1093 for details)
          ssprove.override.version = "main";
          # To add an overlay applying to all bundles,
          # add below a line like
