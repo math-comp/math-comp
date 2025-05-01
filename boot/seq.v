@@ -485,6 +485,9 @@ Proof. by elim: s => //= x s <-; case (a x). Qed.
 Lemma has_count s : has s = (0 < count s).
 Proof. by elim: s => //= x s ->; case (a x). Qed.
 
+Lemma size_filter_gt0 s : (size (filter s) > 0) = (has s).
+Proof. by rewrite size_filter -has_count. Qed.
+
 Lemma count_size s : count s <= size s.
 Proof. by elim: s => //= x s; case: (a x); last apply: leqW. Qed.
 
