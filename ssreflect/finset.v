@@ -336,6 +336,9 @@ Proof. by rewrite eqEsubset sub0set andbT. Qed.
 Lemma proper0 A : (set0 \proper A) = (A != set0).
 Proof. by rewrite properE sub0set subset0. Qed.
 
+Lemma proper0E A : A \proper set0 = false.
+Proof. by rewrite properE sub0set andbF. Qed.
+
 Lemma subset_neq0 A B : A \subset B -> A != set0 -> B != set0.
 Proof. by rewrite -!proper0 => sAB /proper_sub_trans->. Qed.
 
@@ -390,6 +393,13 @@ Proof. by rewrite !inE; apply: predU1P. Qed.
 Lemma in_setU1 x a B : (x \in a |: B) = (x == a) || (x \in B).
 Proof. by rewrite !inE. Qed.
 
+Lemma setU1_eq x A : (x \in A) = (x |: A == A).
+Proof.
+case (boolP (x \in A))=>Hx/=; symmetry; apply/eqP/setP=>y.
+- by rewrite !inE; case (boolP (y==x))=>///eqP->.
+- by move: (y x); rewrite in_setU1 eqxx (negbTE Hx).
+Qed.
+
 Lemma set_nil : [set:: nil] = @set0 T. Proof. by rewrite -enum_set0 set_enum. Qed.
 
 Lemma set_seq1 a : [set:: [:: a]] = [set a].
@@ -434,6 +444,12 @@ Lemma setU1K a B : a \notin B -> (a |: B) :\ a = B.
 Proof.
 by move/negPf=> nBa; apply/setP=> x /[!inE]; case: eqP => // ->.
 Qed.
+
+Lemma pick_set1E a : [pick x in [set a]] = Some a.
+Proof. by case: pickP=>[t'|/(_ a)] ; rewrite inE ?eqxx=>///eqP->. Qed.
+
+Lemma set10F a : [set a] != set0.
+Proof. by apply/eqP => /setP/(_ a); rewrite !inE eqxx. Qed.
 
 Lemma set2P x a b : reflect (x = a \/ x = b) (x \in [set a; b]).
 Proof. by rewrite !inE; apply: pred2P. Qed.
@@ -682,6 +698,15 @@ Proof. by rewrite !setDE setCI setCK. Qed.
 Lemma setID A B : A :&: B :|: A :\: B = A.
 Proof. by rewrite setDE -setIUr setUCr setIT. Qed.
 
+Lemma setUD A B : A :|: B :\: A = A :|: B.
+Proof. apply/setP=>t; rewrite !inE; by case (t \in A) ; case (t \in B). Qed.
+
+Lemma setDU A B : (A :|: B) :\: A = B :\: A.
+Proof. apply/setP=>t; rewrite !inE; by case (t \in A) ; case (t \in B). Qed.
+
+Lemma setUDD A B : (A :|: B) :\: (B :\: A) = A.
+Proof. apply/setP=>t; rewrite !inE; by case (t \in A) ; case (t \in B). Qed.
+
 Lemma setDUl A B C : (A :|: B) :\: C = (A :\: C) :|: (B :\: C).
 Proof. by rewrite !setDE setIUl. Qed.
 
@@ -719,6 +744,9 @@ Qed.
 
 Lemma powerset0 : powerset set0 = [set set0] :> {set {set T}}.
 Proof. by apply/setP=> A; rewrite set1.unlock !inE subset0. Qed.
+
+Lemma set0_powerset A : set0 \in powerset A.
+Proof. by rewrite inE sub0set. Qed.
 
 Lemma powersetT : powerset [set: T] = [set: {set T}].
 Proof. by apply/setP=> A; rewrite !inE subsetT. Qed.
@@ -796,6 +824,9 @@ Proof.
 by rewrite (cardD1 a); congr (_ + _); apply: eq_card => x; rewrite !inE.
 Qed.
 
+Lemma subsets_card_gt0 : #|{set T}| > 0.
+Proof. by apply/card_gt0P; exists set0. Qed.
+
 (* other inclusions *)
 
 Lemma subsetIl A B : A :&: B \subset A.
@@ -810,6 +841,9 @@ Proof. by apply/subsetP=> x /[!inE] ->. Qed.
 Lemma subsetUr A B : B \subset A :|: B.
 Proof. by apply/subsetP=> x; rewrite inE orbC => ->. Qed.
 
+Lemma subsetIU A B : A :&: B \subset A :|: B.
+Proof. by apply/subsetP=>t; rewrite in_setI in_setU=>/andP[-> ->]. Qed.
+
 Lemma subsetU1 x A : A \subset x |: A.
 Proof. exact: subsetUr. Qed.
 
@@ -821,6 +855,41 @@ Proof. by rewrite subsetDl. Qed.
 
 Lemma subsetDr A B : A :\: B \subset ~: B.
 Proof. by rewrite setDE subsetIr. Qed.
+
+Lemma subset_set0 A B : (A \subset B) && (A \subset ~:B) = (A == set0).
+Proof.
+case (boolP (A==set0))=> [/eqP->|/set0Pn[t Ht]]; rewrite ?sub0set//.
+case (boolP (A \subset B)); case (boolP (A \subset ~:B))=>//.
+rewrite !subsetE=> /pred0P H1 /pred0P H2.
+move: (H1 t) (H2 t).
+rewrite/= Ht !andbT=> Ht1 /negP/negP Ht2.
+by rewrite -in_setC setCK Ht2 in Ht1.
+Qed.
+
+Lemma subsetF A B : A \subset B -> A \subset ~:B -> forall t, t \in A -> False.
+Proof.
+move => H1 H2 t Ht.
+have HA : A = set0 by apply/eqP; rewrite -(subset_set0 _ B) H1 H2.
+by rewrite HA in_set0 in Ht.
+Qed.
+
+Lemma subset0F_disjoint A B :
+  [disjoint A & B] -> forall C, C != set0 -> C \subset A -> ~~ (C \subset B).
+Proof.
+move=> HAB C HC /subsetP/= H; apply/subsetPn.
+case (pickP [pred t in C])=>[t/=Ht|H0];
+  last by rewrite (cards0_eq (eq_card0 H0)) eqxx in HC.
+by exists t; rewrite// (disjointFr HAB (H t Ht)).
+Qed.
+
+Lemma subset_neq A B C : B \subset A -> ~~ (C \subset A) -> B != C.
+Proof.
+move=>/subsetP HBA /subsetPn [t HtC HtA].
+apply/negP=>/eqP/setP Hcontra.
+move: (Hcontra t) (HBA t)=>->.
+rewrite HtC (negbTE HtA)=>Hcontra2.
+by have := (Hcontra2 is_true_true).
+Qed.
 
 Lemma sub1set A x : ([set x] \subset A) = (x \in A).
 Proof. by rewrite -subset_pred1; apply: eq_subset=> y; rewrite !inE. Qed.
@@ -851,6 +920,14 @@ Lemma subset1 A x : (A \subset [set x]) = (A == [set x]) || (A == set0).
 Proof.
 rewrite eqEcard cards1 -cards_eq0 orbC andbC.
 by case: posnP => // A0; rewrite (cards0_eq A0) sub0set.
+Qed.
+
+Lemma proper1 A x : (A \proper [set x]) = (A == set0).
+Proof.
+rewrite properEneq subset1.
+case (boolP (A == set0)) => H; last by case (A == [set x]).
+rewrite orbT andbT (eqP H) eq_sym; apply/set0Pn.
+by exists x; rewrite in_set1.
 Qed.
 
 Lemma powerset1 x : powerset [set x] = [set set0; [set x]].
@@ -952,8 +1029,20 @@ move=> dAB C + CA; apply: contra_neqN => CB.
 by apply/eqP; rewrite -subset0 -(disjoint_setI0 dAB) subsetI CA CB.
 Qed.
 
+Lemma disjointDl A B : [disjoint A & B :\: A].
+Proof. by rewrite -setI_eq0 setIDA setD_eq0 subsetIl. Qed.
+
+Lemma disjointDr A B : [disjoint B :\: A & A].
+Proof. by rewrite -setI_eq0 setIDAC setD_eq0 subsetIr. Qed.
+
+Lemma disjoints0 A : [disjoint A & set0].
+Proof. by rewrite -setI_eq0 setI0 eqxx. Qed.
+
 Lemma disjoints1 A x : [disjoint [set x] & A] = (x \notin A).
 Proof. by rewrite (@eq_disjoint1 _ x) // => y; rewrite !inE. Qed.
+
+Lemma disjointsT A : [disjoint A & setT] = (A == set0).
+Proof. by apply/setDidPl/eqP; rewrite ?setDT=>->. Qed.
 
 Lemma subsetD1 A B x : (A \subset B :\ x) = (A \subset B) && (x \notin A).
 Proof. by rewrite setDE subsetI subsetC sub1set inE. Qed.
@@ -1033,6 +1122,30 @@ Proof. by rewrite enum_set1 all_seq1. Qed.
 Lemma all_setU pA A B :
   all pA (enum (A :|: B)) = (all pA (enum A)) && (all pA (enum B)).
 Proof. by rewrite (perm_all _ (enum_setU _ _)) all_undup all_cat. Qed.
+
+Lemma setT0 : ([set: T] == set0) = [forall A : {set T}, A == set0].
+Proof.
+case (boolP ([set: T] == set0)) => H ; symmetry.
+- apply/forallP => A; apply/negP => /negP/set0Pn [x Hx].
+  have : exists y, y \in [set: T] by exists x ; have := subsetT A => /subsetP -> //.
+  by move=>/card_gt0P ; rewrite (eqP H) cards0 ltnn.
+- by apply/negP/negP/forallPn ; exists setT.
+Qed.
+
+Lemma setT0F x : [set: T] != set0.
+Proof.
+apply/negP; rewrite setT0; apply/negP/forallPn.
+by exists [set x]; apply: set10F.
+Qed.
+
+Lemma set0_exists A : (A == set0) = (~~ [exists t, t \in A]).
+Proof.
+case (boolP [exists t, t \in A])=> /existsP/set0Pn => [H|-> //].
+by rewrite (negbTE H).
+Qed.
+
+Lemma set0_forall A : (A == set0) = [forall t, t \notin A].
+Proof. by rewrite -negb_exists; exact: set0_exists. Qed.
 
 End setOps.
 
