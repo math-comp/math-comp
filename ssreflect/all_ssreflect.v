@@ -1,22 +1,22 @@
-Require Export ssreflect.
-Require Export ssrbool.
-Require Export ssrfun.
-Require Export eqtype.
-Require Export ssrnat.
-Require Export seq.
-Require Export choice.
-Require Export monoid.
-Require Export nmodule.
-Require Export path.
-Require Export div.
-Require Export fintype.
-Require Export fingraph.
-Require Export tuple.
-Require Export finfun.
-Require Export bigop.
-Require Export prime.
-Require Export finset.
-Require Export order.
-Require Export binomial.
-Require Export generic_quotient.
-Require Export ssrAC.
+From mathcomp Require Export ssreflect.
+From mathcomp Require Export ssrbool.
+From mathcomp Require Export ssrfun.
+From mathcomp Require Export eqtype.
+From mathcomp Require Export ssrnat.
+From mathcomp Require Export seq.
+From mathcomp Require Export choice.
+From mathcomp Require Export monoid.
+From mathcomp Require Export nmodule.
+From mathcomp Require Export path.
+From mathcomp Require Export div.
+From mathcomp Require Export fintype.
+From mathcomp Require Export fingraph.
+From mathcomp Require Export tuple.
+From mathcomp Require Export finfun.
+From mathcomp Require Export bigop.
+From mathcomp Require Export prime.
+From mathcomp Require Export finset.
+From mathcomp Require Export order.
+From mathcomp Require Export binomial.
+From mathcomp Require Export generic_quotient.
+From mathcomp Require Export ssrAC.

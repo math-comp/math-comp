@@ -1,6 +1,6 @@
-Require Export mathcomp.ssreflect.all_ssreflect.
-Require Export mathcomp.algebra.all_algebra.
-Require Export mathcomp.field.all_field.
-Require Export mathcomp.character.all_character.
-Require Export mathcomp.fingroup.all_fingroup.
-Require Export mathcomp.solvable.all_solvable.
+From mathcomp Require Export all_ssreflect.
+From mathcomp Require Export all_fingroup.
+From mathcomp Require Export all_algebra.
+From mathcomp Require Export all_solvable.
+From mathcomp Require Export all_field.
+From mathcomp Require Export all_character.
