@@ -1,19 +1,19 @@
-Require Export abelian.
-Require Export alt.
-Require Export burnside_app.
-Require Export center.
-Require Export commutator.
-Require Export cyclic.
-Require Export extraspecial.
-Require Export extremal.
-Require Export finmodule.
-Require Export frobenius.
-Require Export gfunctor.
-Require Export gseries.
-Require Export hall.
-Require Export jordanholder.
-Require Export maximal.
-Require Export nilpotent.
-Require Export pgroup.
-Require Export primitive_action.
-Require Export sylow.
+From mathcomp Require Export abelian.
+From mathcomp Require Export alt.
+From mathcomp Require Export burnside_app.
+From mathcomp Require Export center.
+From mathcomp Require Export commutator.
+From mathcomp Require Export cyclic.
+From mathcomp Require Export extraspecial.
+From mathcomp Require Export extremal.
+From mathcomp Require Export finmodule.
+From mathcomp Require Export frobenius.
+From mathcomp Require Export gfunctor.
+From mathcomp Require Export gseries.
+From mathcomp Require Export hall.
+From mathcomp Require Export jordanholder.
+From mathcomp Require Export maximal.
+From mathcomp Require Export nilpotent.
+From mathcomp Require Export pgroup.
+From mathcomp Require Export primitive_action.
+From mathcomp Require Export sylow.
