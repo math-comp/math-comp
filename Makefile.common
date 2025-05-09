@@ -67,7 +67,8 @@ endif
 
 test_suite/test_hierarchy_all.v: $(TEST_DEP)
 	COQBIN=$(COQBIN) ocaml etc/utils/hierarchy.ml -verify $(MATHCOMP_PATH) \
-		-lib all_ssreflect \
+		-lib all_boot \
+		-lib all_order \
 		-lib all_algebra \
 		-lib all_field \
 		-lib all_character \

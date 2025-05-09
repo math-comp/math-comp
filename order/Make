@@ -1,6 +1,9 @@
-all_ssreflect.v
+all_order.v
+preorder.v
+order.v
 
--R . mathcomp.ssreflect
+-I .
+-R . mathcomp.order
 
 # Warnings set as error to avoid (re)introducing them
 -arg -w -arg +duplicate-clear

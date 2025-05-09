@@ -1,4 +1,4 @@
-From mathcomp Require Import all_ssreflect.
+From mathcomp Require Import all_boot all_order.
 Import Order.Theory.
 
 Section dual_of_dual.

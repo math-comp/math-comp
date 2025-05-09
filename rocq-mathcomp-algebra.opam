@@ -9,7 +9,10 @@ license: "CECILL-B"
 
 build: [ make "-C" "algebra" "-j" "%{jobs}%" ]
 install: [ make "-C" "algebra" "install" ]
-depends: [ "rocq-mathcomp-fingroup" { = version } ]
+depends: [
+  "rocq-mathcomp-order" { = version }
+  "rocq-mathcomp-fingroup" { = version }
+]
 
 tags: [
   "keyword:small scale reflection"

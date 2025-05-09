@@ -233,7 +233,7 @@ From HB Require Import structures.
 
 The structure names can be found in the header comments, for instance,
 the `eqType` structure is defined in
-[`eqtype.v`](https://github.com/math-comp/math-comp/blob/master/ssreflect/eqtype.v).
+[`eqtype.v`](https://github.com/math-comp/math-comp/blob/master/boot/eqtype.v).
 Basic information about structures can be obtained via `HB.about`, for
 instance
 

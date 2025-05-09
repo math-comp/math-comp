@@ -16,12 +16,12 @@ These formal theories cover a wide spectrum of topics, ranging from the formal t
 If you already have OPAM installed (a fresh or up to date version of opam 2 is required):
 
 ```
-opam repo add coq-released https://coq.inria.fr/opam/released
-opam install coq-mathcomp-ssreflect
+opam repo add rocq-released https://rocq-prover.org/opam/released
+opam install rocq-mathcomp-boot
 ```
 
-Additional packages go by the name of `coq-mathcomp-algebra`,
-`coq-mathcomp-field`, etc... See [INSTALL](INSTALL.md) for detailed
+Additional packages go by the name of `rocq-mathcomp-algebra`,
+`rocq-mathcomp-field`, etc... See [INSTALL](INSTALL.md) for detailed
 installation instructions in other scenarios.
 
 ## How to get help
@@ -36,7 +36,7 @@ installation instructions in other scenarios.
   [StackOverflow](https://stackoverflow.com/questions/tagged/ssreflect)
   listening to the `ssreflect` and `coq` tags.
 - The primary venue for help and questions about the library nowadays
-  is [Zulip](https://coq.zulipchat.com/).
+  is [Zulip](https://rocq-prover.zulipchat.com/).
 - Developers and users can also be reached via
   the [ssreflect mailing list](https://sympa.inria.fr/sympa/info/ssreflect) (low volume).
 
@@ -45,8 +45,8 @@ installation instructions in other scenarios.
 - The MathComp library has been regularly released since 2008.
   Recently, we have been releasing a new version twice a year,
   in line with the released of the [Coq/Rocq](http://coq.inria.fr) proof assistant.
-- Changes are documented systematically in [CHANGELOG.md](CHANGELOG.md) and
-  [CHANGELOG_UNRELEASED.md](CHANGELOG_UNRELEASED.md).
+- Changes are documented systematically in [CHANGELOG.md](CHANGELOG.md) for releases
+  and [doc/changelog](doc/changelog) for unreleased changes.
 - We use deprecation warnings to help transitioning to new versions
   (see [CONTRIBUTING.md](CONTRIBUTING.md#Deprecations) for details about the deprecation policy).
 
