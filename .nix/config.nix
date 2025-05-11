@@ -89,6 +89,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       rocq-elpi.override.version = "master";
       rocq-elpi.override.elpi-version = "2.0.7";
       mathcomp.job = false;
+      graph-theory.job = false;  # currently broken on Rocq master (c.f., https://github.com/rocq-community/graph-theory/issues/45 )
     }; coqPackages = common-bundles // {
       coq.override.version = "master";
       stdlib.override.version = "master";
