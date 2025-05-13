@@ -1447,6 +1447,11 @@ Proof. by rewrite -has_pred1 => /hasNfind. Qed.
 Lemma nth_index x s : x \in s -> nth s (index x s) = x.
 Proof. by rewrite -has_pred1 => /(nth_find x0)/eqP. Qed.
 
+Lemma index_inj s : {in s &, injective (index ^~ s)}.
+Proof.
+by move=> x y x_s y_s eidx; rewrite -(nth_index x_s) eidx nth_index.
+Qed.
+
 Lemma index_cat x s1 s2 :
  index x (s1 ++ s2) = if x \in s1 then index x s1 else size s1 + index x s2.
 Proof. by rewrite /index find_cat has_pred1. Qed.
