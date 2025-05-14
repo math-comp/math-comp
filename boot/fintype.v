@@ -1053,16 +1053,16 @@ Notation "'forall_in_ view" := (forall_inPP _ (fun _ => view))
 
 Section Injectiveb.
 
-Variables (aT : finType) (rT : eqType) (f : aT -> rT).
-Implicit Type D : {pred aT}.
+Variables (aT : finType) (rT : eqType).
+Implicit Type (f : aT -> rT) (D : {pred aT}).
 
-Definition dinjectiveb D := uniq (map f (enum D)).
+Definition dinjectiveb f D := uniq (map f (enum D)).
 
-Definition injectiveb := dinjectiveb aT.
+Definition injectiveb f := dinjectiveb f aT.
 
-Lemma dinjectivePn D :
+Lemma dinjectivePn f D :
   reflect (exists2 x, x \in D & exists2 y, y \in [predD1 D & x] & f x = f y)
-          (~~ dinjectiveb D).
+          (~~ dinjectiveb f D).
 Proof.
 apply: (iffP idP) => [injf | [x Dx [y Dxy eqfxy]]]; last first.
   move: Dx; rewrite -(mem_enum D) => /rot_to[i E defE].
@@ -1078,9 +1078,9 @@ apply: contraNeq (negbT (no_p x)) => ne_xy /=; rewrite -mem_enum Dx.
 by apply/existsP; exists y; rewrite /= !inE eq_sym ne_xy -mem_enum Dy eqfxy /=.
 Qed.
 
-Lemma dinjectiveP D : reflect {in D &, injective f} (dinjectiveb D).
+Lemma dinjectiveP f D : reflect {in D &, injective f} (dinjectiveb f D).
 Proof.
-rewrite -[dinjectiveb D]negbK.
+rewrite -[dinjectiveb f D]negbK.
 case: dinjectivePn=> [noinjf | injf]; constructor.
   case: noinjf => x Dx [y /andP[neqxy /= Dy] eqfxy] injf.
   by case/eqP: neqxy; apply: injf.
@@ -1088,15 +1088,27 @@ move=> x y Dx Dy /= eqfxy; apply/eqP; apply/idPn=> nxy; case: injf.
 by exists x => //; exists y => //=; rewrite inE /= eq_sym nxy.
 Qed.
 
-Lemma injectivePn :
-  reflect (exists x, exists2 y, x != y & f x = f y) (~~ injectiveb).
+Lemma eq_dinjectiveb f1 f2 D1 D2 :
+  f1 =1 f2 -> D1 =i D2 -> dinjectiveb f1 D1 = dinjectiveb f2 D2.
 Proof.
-apply: (iffP (dinjectivePn _)) => [[x _ [y nxy eqfxy]] | [x [y nxy eqfxy]]];
+move=> ef eD; rewrite /dinjectiveb (eq_enum eD).
+by under eq_map => x do rewrite ef.
+Qed.
+
+Lemma injectivePn f :
+  reflect (exists x, exists2 y, x != y & f x = f y) (~~ injectiveb f).
+Proof.
+apply: (iffP (dinjectivePn _ _)) => [[x _ [y nxy eqfxy]] | [x [y nxy eqfxy]]];
  by exists x => //; exists y => //; rewrite inE /= andbT eq_sym in nxy *.
 Qed.
 
-Lemma injectiveP : reflect (injective f) injectiveb.
-Proof. by apply: (iffP (dinjectiveP _)) => injf x y => [|_ _]; apply: injf. Qed.
+Lemma injectiveP f : reflect (injective f) (injectiveb f).
+Proof.
+by apply: (iffP (dinjectiveP _ _)) => injf x y => [|_ _]; apply: injf.
+Qed.
+
+Lemma eq_injectiveb f1 f2 : f1 =1 f2 -> injectiveb f1 = injectiveb f2.
+Proof. move=> ?; exact: eq_dinjectiveb. Qed.
 
 End Injectiveb.
 
