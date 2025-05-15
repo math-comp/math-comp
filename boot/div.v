@@ -335,6 +335,9 @@ Qed.
 Lemma modnXm m n a : (a %% n) ^ m = a ^ m %[mod n].
 Proof. by elim: m => // m IHm; rewrite !expnS -modnMmr IHm modnMml modnMmr. Qed.
 
+Lemma modnMDXl p m n d : (p * d + m) ^ n  = m ^ n %[mod d].
+Proof. by elim: n => // n IH; rewrite !expnS -modnMm IH modnMDl modnMm. Qed.
+
 (** Divisibility **)
 
 Definition dvdn d m := m %% d == 0.
