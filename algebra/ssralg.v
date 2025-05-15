@@ -4853,6 +4853,8 @@ Bind Scope ring_scope with DecidableField.sort.
 End DecFieldExports.
 HB.export DecFieldExports.
 
+#[export] HB.instance Definition _ (F : decFieldType) := DecidableField.on F^o.
+
 Section DecidableFieldTheory.
 
 Variable F : decFieldType.
@@ -5045,6 +5047,8 @@ Module ClosedFieldExports.
 Bind Scope ring_scope with ClosedField.sort.
 End ClosedFieldExports.
 HB.export ClosedFieldExports.
+
+#[export] HB.instance Definition _ (F : closedFieldType) := ClosedField.on F^o.
 
 Section ClosedFieldTheory.
 
