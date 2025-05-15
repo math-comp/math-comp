@@ -700,180 +700,17 @@ Export Algebra.
 
 Import Monoid.Theory.
 
-Local Notation "0" := (@zero _) : ring_scope.
-Local Notation "+%R" := (@add _) : function_scope.
-Local Notation "x + y" := (add x y) : ring_scope.
-
-Local Notation "x *+ n" := (natmul x n) : ring_scope.
-
-Local Notation "\sum_ ( i <- r | P ) F" := (\big[+%R/0]_(i <- r | P) F).
-Local Notation "\sum_ ( m <= i < n ) F" := (\big[+%R/0]_(m <= i < n) F).
-Local Notation "\sum_ ( i < n ) F" := (\big[+%R/0]_(i < n) F).
-Local Notation "\sum_ ( i 'in' A ) F" := (\big[+%R/0]_(i in A) F).
-
-Local Notation "s `_ i" := (nth 0 s i) : ring_scope.
-
-Section NmoduleTheory.
-
-Variable V : nmodType.
-Implicit Types x y : V.
-
-Lemma addrA : associative (@add V).
-Proof. exact: addrA. Qed.
-
-Lemma addrC : commutative (@add V).
-Proof. exact: addrC. Qed.
-
-Lemma add0r : left_id (@zero V) add.
-Proof. exact: add0r. Qed.
-
-Lemma addr0 : right_id (@zero V) add.
-Proof. exact: addr0. Qed.
-
-Lemma addrCA : @left_commutative V V +%R. Proof. exact: addrCA. Qed.
-Lemma addrAC : @right_commutative V V +%R. Proof. exact: addrAC. Qed.
-Lemma addrACA : @interchange V +%R +%R. Proof. exact: addrACA. Qed.
-
-Lemma mulr0n x : x *+ 0 = 0. Proof. exact: mulr0n. Qed.
-Lemma mulr1n x : x *+ 1 = x. Proof. exact: mulr1n. Qed.
-Lemma mulr2n x : x *+ 2 = x + x. Proof. exact: mulr2n. Qed.
-Lemma mulrS x n : x *+ n.+1 = x + (x *+ n). Proof. exact: mulrS. Qed.
-Lemma mulrSr x n : x *+ n.+1 = x *+ n + x. Proof. exact: mulrSr. Qed.
-
-Lemma mulrb x (b : bool) : x *+ b = (if b then x else 0).
-Proof. exact: mulrb. Qed.
-
-Lemma mul0rn n : 0 *+ n = 0 :> V. Proof. exact: mul0rn. Qed.
-
-Lemma mulrnDl n : {morph (fun x => x *+ n) : x y / x + y}.
-Proof. exact: mulrnDl. Qed.
-
-Lemma mulrnDr x m n : x *+ (m + n) = x *+ m + x *+ n.
-Proof. exact: mulrnDr. Qed.
-
-Lemma mulrnA x m n : x *+ (m * n) = x *+ m *+ n. Proof. exact: mulrnA. Qed.
-
-Lemma mulrnAC x m n : x *+ m *+ n = x *+ n *+ m. Proof. exact: mulrnAC. Qed.
-
-Lemma iter_addr n x y : iter n (+%R x) y = x *+ n + y.
-Proof. exact: iter_addr. Qed.
-
-Lemma iter_addr_0 n x : iter n (+%R x) 0 = x *+ n.
-Proof. exact: iter_addr_0. Qed.
-
-Lemma sumrMnl I r P (F : I -> V) n :
-  \sum_(i <- r | P i) F i *+ n = (\sum_(i <- r | P i) F i) *+ n.
-Proof. exact: sumrMnl. Qed.
-
-Lemma sumrMnr x I r P (F : I -> nat) :
-  \sum_(i <- r | P i) x *+ F i = x *+ (\sum_(i <- r | P i) F i).
-Proof. exact: sumrMnr. Qed.
-
-Lemma sumr_const (I : finType) (A : pred I) x : \sum_(i in A) x = x *+ #|A|.
-Proof. exact: sumr_const. Qed.
-
-Lemma sumr_const_nat m n x : \sum_(n <= i < m) x = x *+ (m - n).
-Proof. exact: sumr_const_nat. Qed.
-
 #[deprecated(since="mathcomp 2.4.0",
              note="Use Algebra.nmod_closed instead.")]
 Definition addr_closed := nmod_closed.
 
-End NmoduleTheory.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use Algebra.zmod_closed0D instead.")]
+Definition zmod_closedD := zmod_closed0D.
 
-Local Notation "-%R" := (@opp _) : ring_scope.
-Local Notation "- x" := (opp x) : ring_scope.
-Local Notation "x - y" := (x + - y) : ring_scope.
-
-Local Notation "x *- n" := (- (x *+ n)) : ring_scope.
-
-Section ZmoduleTheory.
-
-Variable V : zmodType.
-Implicit Types x y : V.
-
-Lemma addNr : @left_inverse V V V 0 -%R +%R. Proof. exact: addNr. Qed.
-Lemma addrN : @right_inverse V V V 0 -%R +%R. Proof. exact: addrN. Qed.
-Definition subrr := addrN.
-
-Lemma addKr : @left_loop V V -%R +%R. Proof. exact: addKr. Qed.
-Lemma addNKr : @rev_left_loop V V -%R +%R. Proof. exact: addNKr. Qed.
-Lemma addrK : @right_loop V V -%R +%R. Proof. exact: addrK. Qed.
-Lemma addrNK : @rev_right_loop V V -%R +%R. Proof. exact: addrNK. Qed.
-Definition subrK := addrNK.
-Lemma subKr x : involutive (fun y => x - y). Proof. exact: subKr. Qed.
-Lemma addrI : @right_injective V V V +%R. Proof. exact: addrI. Qed.
-Lemma addIr : @left_injective V V V +%R. Proof. exact: addIr. Qed.
-Lemma subrI : right_injective (fun x y => x - y). Proof. exact: subrI. Qed.
-Lemma subIr : left_injective (fun x y => x - y). Proof. exact: subIr. Qed.
-Lemma opprK : @involutive V -%R. Proof. exact: opprK. Qed.
-Lemma oppr_inj : @injective V V -%R. Proof. exact: oppr_inj. Qed.
-Lemma oppr0 : -0 = 0 :> V. Proof. exact: oppr0. Qed.
-Lemma oppr_eq0 x : (- x == 0) = (x == 0). Proof. exact: oppr_eq0. Qed.
-
-Lemma subr0 x : x - 0 = x. Proof. exact: subr0. Qed.
-Lemma sub0r x : 0 - x = - x. Proof. exact: sub0r. Qed.
-
-Lemma opprB x y : - (x - y) = y - x. Proof. exact: opprB. Qed.
-Lemma opprD : {morph -%R: x y / x + y : V}. Proof. exact: opprD. Qed.
-Lemma addrKA z x y : (x + z) - (z + y) = x - y. Proof. exact: addrKA. Qed.
-Lemma subrKA z x y : (x - z) + (z + y) = x + y. Proof. exact: subrKA. Qed.
-Lemma addr0_eq x y : x + y = 0 -> - x = y. Proof. exact: addr0_eq. Qed.
-Lemma subr0_eq x y : x - y = 0 -> x = y. Proof. exact: subr0_eq. Qed.
-Lemma subr_eq x y z : (x - z == y) = (x == y + z). Proof. exact: subr_eq. Qed.
-Lemma subr_eq0 x y : (x - y == 0) = (x == y). Proof. exact: subr_eq0. Qed.
-Lemma addr_eq0 x y : (x + y == 0) = (x == - y). Proof. exact: addr_eq0. Qed.
-Lemma eqr_opp x y : (- x == - y) = (x == y). Proof. exact: eqr_opp. Qed.
-Lemma eqr_oppLR x y : (- x == y) = (x == - y). Proof. exact: eqr_oppLR. Qed.
-Lemma mulNrn x n : (- x) *+ n = x *- n. Proof. exact: mulNrn. Qed.
-
-Lemma mulrnBl n : {morph (fun x => x *+ n) : x y / x - y}.
-Proof. exact: mulrnBl. Qed.
-
-Lemma mulrnBr x m n : n <= m -> x *+ (m - n) = x *+ m - x *+ n.
-Proof. exact: mulrnBr. Qed.
-
-Lemma sumrN I r P (F : I -> V) :
-  (\sum_(i <- r | P i) - F i = - (\sum_(i <- r | P i) F i)).
-Proof. exact: sumrN. Qed.
-
-Lemma sumrB I r (P : pred I) (F1 F2 : I -> V) :
-  \sum_(i <- r | P i) (F1 i - F2 i)
-     = \sum_(i <- r | P i) F1 i - \sum_(i <- r | P i) F2 i.
-Proof. exact: sumrB. Qed.
-
-Lemma telescope_sumr n m (f : nat -> V) : n <= m ->
-  \sum_(n <= k < m) (f k.+1 - f k) = f m - f n.
-Proof. exact: telescope_sumr. Qed.
-
-Lemma telescope_sumr_eq n m (f u : nat -> V) : n <= m ->
-    (forall k, (n <= k < m)%N -> u k = f k.+1 - f k) ->
-  \sum_(n <= k < m) u k = f m - f n.
-Proof. exact: telescope_sumr_eq. Qed.
-
-Section ClosedPredicates.
-
-Variable S : {pred V}.
-
-Definition oppr_closed := oppr_closed S.
-Definition subr_2closed := subr_closed S.
-Definition zmod_closed := zmod_closed S.
- 
-Lemma zmod_closedN : zmod_closed -> oppr_closed.
-Proof. exact: zmod_closedN. Qed.
-
-Lemma zmod_closedD : zmod_closed -> nmod_closed S.
-Proof. by move=> z; split; [case: z|apply/zmod_closedD]. Qed.
-
-End ClosedPredicates.
-
-End ZmoduleTheory.
-
-Arguments addrI {V} y [x1 x2].
-Arguments addIr {V} x [x1 x2].
-Arguments opprK {V}.
-Arguments oppr_inj {V} [x1 x2].
-Arguments telescope_sumr_eq {V n m} f u.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use Algebra.subr_closed instead.")]
+Definition subr_2closed := subr_closed.
 
 HB.mixin Record Nmodule_isPzSemiRing R of Nmodule R := {
   one : R;
@@ -1696,7 +1533,7 @@ Section ClosedPredicates.
 Variable S : {pred R}.
 
 Definition smulr_closed := -1 \in S /\ mulr_2closed S.
-Definition subring_closed := [/\ 1 \in S, subr_2closed S & mulr_2closed S].
+Definition subring_closed := [/\ 1 \in S, subr_closed S & mulr_2closed S].
 
 Lemma smulr_closedM : smulr_closed -> mulr_closed S.
 Proof. by case=> SN1 SM; split=> //; rewrite -[1]mulr1 -mulrNN SM. Qed.
@@ -1714,7 +1551,7 @@ Qed.
 
 Lemma subring_closed_semi : subring_closed -> semiring_closed S.
 Proof.
-by move=> ringS; split; [apply/zmod_closedD/subring_closedB | case: ringS].
+by move=> ringS; split; [apply/zmod_closed0D/subring_closedB | case: ringS].
 Qed.
 
 End ClosedPredicates.
@@ -2015,7 +1852,7 @@ Variable S : {pred V}.
 Definition linear_closed := forall a, {in S &, forall u v, a *: u + v \in S}.
 Definition submod_closed := 0 \in S /\ linear_closed.
 
-Lemma linear_closedB : linear_closed -> subr_2closed S.
+Lemma linear_closedB : linear_closed -> subr_closed S.
 Proof. by move=> Slin u v Su Sv; rewrite addrC -scaleN1r Slin. Qed.
 
 Lemma submod_closedB : submod_closed -> zmod_closed S.
@@ -2023,7 +1860,7 @@ Proof. by case=> S0 /linear_closedB. Qed.
 
 Lemma submod_closed_semi : submod_closed -> subsemimod_closed S.
 Proof.
-move=> /[dup] /submod_closedB /zmod_closedD SD [S0 Slin]; split => // a v Sv.
+move=> /[dup] /submod_closedB /zmod_closed0D SD [S0 Slin]; split => // a v Sv.
 by rewrite -[a *: v]addr0 Slin.
 Qed.
 
@@ -3562,7 +3399,7 @@ Definition invr_closed := {in S, forall x, x^-1 \in S}.
 Definition divr_2closed := {in S &, forall x y, x / y \in S}.
 Definition divr_closed := 1 \in S /\ divr_2closed.
 Definition sdivr_closed := -1 \in S /\ divr_2closed.
-Definition divring_closed := [/\ 1 \in S, subr_2closed S & divr_2closed].
+Definition divring_closed := [/\ 1 \in S, subr_closed S & divr_2closed].
 
 Lemma divr_closedV : divr_closed -> invr_closed.
 Proof. by case=> S1 Sdiv x Sx; rewrite -[x^-1]mul1r Sdiv. Qed.
@@ -3783,7 +3620,7 @@ Notation sdivr_closed := sdivr_closed.
 Notation divring_closed := divring_closed.
 Notation divalg_closed := divalg_closed.
 
-Coercion zmod_closedD : zmod_closed >-> nmod_closed.
+Coercion zmod_closed0D : zmod_closed >-> nmod_closed.
 Coercion zmod_closedN : zmod_closed >-> oppr_closed.
 Coercion semiring_closedD : semiring_closed >-> addr_closed.
 Coercion semiring_closedM : semiring_closed >-> mulr_closed.
@@ -3794,7 +3631,7 @@ Coercion subring_closedM : subring_closed >-> smulr_closed.
 Coercion subring_closed_semi : subring_closed >-> semiring_closed.
 Coercion subsemimod_closedD : subsemimod_closed >-> addr_closed.
 Coercion subsemimod_closedZ : subsemimod_closed >-> scaler_closed.
-Coercion linear_closedB : linear_closed >-> subr_2closed.
+Coercion linear_closedB : linear_closed >-> subr_closed.
 Coercion submod_closedB : submod_closed >-> zmod_closed.
 Coercion submod_closed_semi : submod_closed >-> subsemimod_closed.
 Coercion subalg_closedZ : subalg_closed >-> submod_closed.

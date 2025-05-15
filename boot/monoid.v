@@ -446,6 +446,26 @@ HB.structure Definition BaseGroup := {G of hasInv G & BaseUMagma G}.
 
 Bind Scope group_scope with BaseGroup.sort.
 
+Local Notation "x ^-1" := (inv x) : group_scope.
+Local Notation "x / y" := (x * y^-1) : group_scope.
+Local Notation "x ^- n" := ((x ^+ n)^-1) : group_scope.
+
+Definition conjg (G : baseGroupType) (x y : G) := y^-1 * (x * y).
+Local Notation "x ^ y" := (conjg x y) : group_scope.
+
+Definition commg (G : baseGroupType) (x y : G) := x^-1 * (conjg x y).
+Local Notation "[~ x , y ]" := (commg x y) : group_scope.
+
+Section ClosedPredicates.
+
+Variable (G : baseGroupType) (S : {pred G}).
+
+Definition invg_closed := {in S, forall u, u^-1 \in S}.
+Definition divg_closed := {in S &, forall u v, u / v \in S}.
+Definition group_closed := 1 \in S /\ divg_closed.
+
+End ClosedPredicates.
+
 HB.mixin Record Monoid_isGroup G of BaseGroup G := {
   mulVg : left_inverse one inv (@mul G);
   mulgV : right_inverse one inv (@mul G)
@@ -477,16 +497,6 @@ HB.instance Definition _ := Monoid_isGroup.Build G mulVg mulgV.
 HB.end.
 
 Bind Scope group_scope with Group.sort.
-
-Local Notation "x ^-1" := (inv x) : group_scope.
-Local Notation "x / y" := (x * y^-1) : group_scope.
-Local Notation "x ^- n" := ((x ^+ n)^-1) : group_scope.
-
-Definition conjg (G : groupType) (x y : G) := y^-1 * (x * y).
-Local Notation "x ^ y" := (conjg x y) : group_scope.
-
-Definition commg (G : groupType) (x y : G) := x^-1 * (conjg x y).
-Local Notation "[~ x , y ]" := (commg x y) : group_scope.
 
 Section GroupTheory.
 Variable G : groupType.
@@ -687,14 +697,10 @@ Section ClosedPredicates.
 
 Variable S : {pred G}.
 
-Definition invg_closed := {in S, forall u, u^-1 \in S}.
-Definition divg_closed := {in S &, forall u v, u / v \in S}.
-Definition group_closed := 1 \in S /\ divg_closed.
-
-Lemma group_closedV : group_closed -> invg_closed.
+Lemma group_closedV : group_closed S -> invg_closed S.
 Proof. by move=> [S1 SB] x /(SB 1)-/(_ S1); rewrite div1g. Qed.
 
-Lemma group_closedM : group_closed -> mulg_closed S.
+Lemma group_closedM : group_closed S -> mulg_closed S.
 Proof.
 move=> /[dup]-[S1 SB] /group_closedV SV x y xS /SV yS.
 rewrite -[y]invgK; exact: SB.

@@ -655,6 +655,7 @@ Arguments addrI {V} y [x1 x2].
 Arguments addIr {V} x [x1 x2].
 Arguments opprK {V}.
 Arguments oppr_inj {V} [x1 x2].
+Arguments telescope_sumr_eq {V n m} f u.
 
 Definition nmod_morphism (U V : baseAddUMagmaType) (f : U -> V) : Prop :=
   (f 0 = 0) * {morph f : x y / x + y}.
