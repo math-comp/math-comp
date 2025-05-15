@@ -168,12 +168,6 @@ From mathcomp Require Export nmodule.
 (*                                                                            *)
 (* Closedness predicates for the algebraic structures:                        *)
 (*                                                                            *)
-(*  addrClosed V == predicate closed under addition on V : nmodType           *)
-(*                  The HB class is called AddClosed.                         *)
-(*  opprClosed V == predicate closed under opposite on V : zmodType           *)
-(*                  The HB class is called OppClosed.                         *)
-(*  zmodClosed V == predicate closed under opposite and addition on V         *)
-(*                  The HB class is called ZmodClosed.                        *)
 (* mulr2Closed R == predicate closed under multiplication on                  *)
 (*                  R : semiPzRingType                                        *)
 (*                  The HB class is called Mul2Closed.                        *)
@@ -205,41 +199,9 @@ From mathcomp Require Export nmodule.
 (* This stability is crucial for constructing and reasoning about             *)
 (* substructures within algebraic hierarchies. For example:                   *)
 (*                                                                            *)
-(* - rpred0: Concludes 0 \in S if S is addrClosed.                            *)
-(* - rpredD: Concludes x + y \in S if x \in S and y \in S and S is addrClosed.*)
-(* - rpredN: Concludes -x \in S if x \in S and S is opprClosed.               *)
 (* - rpredZ: Concludes a *: v \in S if v \in S and S is scalerClosed.         *)
 (*                                                                            *)
 (* Canonical properties of the algebraic structures:                          *)
-(*  * Nmodule (additive abelian monoids):                                     *)
-(*                     0 == the zero (additive identity) of a Nmodule         *)
-(*                 x + y == the sum of x and y (in a Nmodule)                 *)
-(*                x *+ n == n times x, with n in nat (non-negative), i.e.,    *)
-(*                          x + (x + .. (x + x)..) (n terms); x *+ 1 is thus  *)
-(*                          convertible to x, and x *+ 2 to x + x             *)
-(*        \sum_<range> e == iterated sum for a Nmodule (cf bigop.v)           *)
-(*                  e`_i == nth 0 e i, when e : seq M and M has a nmodType    *)
-(*                          structure                                         *)
-(*             support f == 0.-support f, i.e., [pred x | f x != 0]           *)
-(*         addr_closed S <-> collective predicate S is closed under finite    *)
-(*                           sums (0 and x + y in S, for x, y in S)           *)
-(* [SubChoice_isSubNmodule of U by <:] == nmodType mixin for a subType whose  *)
-(*                          base type is a nmodType and whose predicate's is  *)
-(*                          an addrClosed                                     *)
-(*                                                                            *)
-(*  * Zmodule (additive abelian groups):                                      *)
-(*                   - x == the opposite (additive inverse) of x              *)
-(*                 x - y == the difference of x and y; this is only notation  *)
-(*                          for x + (- y)                                     *)
-(*                x *- n == notation for - (x *+ n), the opposite of x *+ n   *)
-(*         oppr_closed S <-> collective predicate S is closed under opposite  *)
-(*         zmod_closed S <-> collective predicate S is closed under zmodType  *)
-(*                          operations (0 and x - y in S, for x, y in S)      *)
-(*                          This property coerces to oppr_pred and addr_pred. *)
-(* [SubChoice_isSubZmodule of U by <:] == zmodType mixin for a subType whose  *)
-(*                          base type is a zmodType and whose predicate's     *)
-(*                          is a zmodClosed                                   *)
-(*                                                                            *)
 (*  * PzSemiRing (non-commutative semirings):                                 *)
 (*                    R^c == the converse (semi)ring for R: R^c is convertible*)
 (*                           to R but when R has a canonical (semi)ring       *)
@@ -5112,41 +5074,6 @@ HB.instance Definition _ := isSubalgClosed.Build R A S
   (divalg_closedZ divalg_closed_subproof).
 HB.end.
 
-Section NmodulePred.
-
-Variables (V : nmodType).
-
-Section Add.
-
-Variable S : addrClosed V.
-
-Lemma rpred0D : nmod_closed S. Proof. exact: nmod_closed_subproof. Qed.
-
-End Add.
-
-End NmodulePred.
-
-Section ZmodulePred.
-
-Variables (V : zmodType).
-
-Section Opp.
-
-Variable S : opprClosed V.
-
-End Opp.
-
-Section Sub.
-
-Variable S : zmodClosed V.
-
-Lemma zmodClosedP : zmod_closed S.
-Proof. split; [ exact: (@rpred0D V S).1 | exact: rpredB ]. Qed.
-
-End Sub.
-
-End ZmodulePred.
-
 Section SemiRingPred.
 
 Variables (R : pzSemiRingType).
@@ -6889,9 +6816,6 @@ Notation subRingType := (subNzRingType) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
              note="Try subComPzRingType (the potentially-zero counterpart) first, or use subComNzRingType instead.")]
 Notation subComNzRingType := (subComNzRingType) (only parsing).
-
-Notation addrClosed := addrClosed.
-Notation opprClosed := opprClosed.
 
 Variant Ione := IOne : Ione.
 Inductive Inatmul :=

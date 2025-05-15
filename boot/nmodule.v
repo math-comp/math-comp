@@ -54,16 +54,22 @@ From mathcomp Require Import bigop fintype finfun monoid.
 (*                                                                            *)
 (* Closedness predicates for the algebraic structures:                        *)
 (*                                                                            *)
-(*    mulgClosed V == predicate closed under multiplication on G : magmaType  *)
-(*                    The HB class is called MulClosed.                       *)
-(*  umagmaClosed V == predicate closed under multiplication and containing 1  *)
-(*                    on G : baseUMagmaType                                   *)
-(*                    The HB class is called UMagmaClosed.                    *)
-(*    invgClosed V == predicate closed under inversion on G : baseGroupType   *)
-(*                    The HB class is called InvClosed.                       *)
-(*   groupClosed V == predicate closed under multiplication and inversion and *)
-(*                    containing 1 on G : baseGroupType                       *)
-(*                    The HB class is called InvClosed.                       *)
+(*    addrClosed V == predicate closed under addition on V : basAddUMagmaType *)
+(*                    The HB class is called AddClosed.                       *)
+(*    opprClosed V == predicate closed under opposite on V : baseZmodType     *)
+(*                    The HB class is called OppClosed.                       *)
+(*    zmodClosed V == predicate closed under addition and opposite and        *)
+(*                    containing 0 on V : baseZmodType                        *)
+(*                    The HB class is called ZmodClosed.                      *)
+(*                                                                            *)
+(* The rpred* lemmas ensure that the set S remains stable under the specified *)
+(* operations, provided the corresponding closedness predicate is satisfied.  *)
+(* This stability is crucial for constructing and reasoning about             *)
+(* substructures within algebraic hierarchies. For example:                   *)
+(*                                                                            *)
+(* - rpred0: Concludes 0 \in S if S is addrClosed.                            *)
+(* - rpredD: Concludes x + y \in S if x \in S and y \in S and S is addrClosed.*)
+(* - rpredN: Concludes -x \in S if x \in S and S is opprClosed.               *)
 (*                                                                            *)
 (* Canonical properties of the algebraic structures:                          *)
 (*  * addMagmaType (additive magmas):                                         *)
@@ -892,7 +898,7 @@ HB.mixin Record isAddClosed (V : baseAddUMagmaType) (S : {pred V}) := {
   nmod_closed_subproof : addumagma_closed S
 }.
 
-HB.mixin Record isOppClosed (V : zmodType) (S : {pred V}) := {
+HB.mixin Record isOppClosed (V : baseZmodType) (S : {pred V}) := {
   oppr_closed_subproof : oppr_closed S
 }.
 
