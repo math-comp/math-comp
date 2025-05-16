@@ -7126,14 +7126,14 @@ Notation "x / y" := (mul x y^-1) : ring_scope.
 Notation "*:%R" := (@scale _ _) : function_scope.
 Notation "a *: m" := (scale a m) : ring_scope.
 Notation "k %:A" := (scale k 1) : ring_scope.
-Notation "\0" := (null_fun _) : ring_scope.
-Notation "f \+ g" := (add_fun f g) : ring_scope.
-Notation "f \- g" := (sub_fun f g) : ring_scope.
-Notation "\- f" := (opp_fun f) : ring_scope.
-Notation "a \*: f" := (scale_fun a f) : ring_scope.
-Notation "x \*o f" := (mull_fun x f) : ring_scope.
-Notation "x \o* f" := (mulr_fun x f) : ring_scope.
-Notation "f \* g" := (mul_fun f g) : ring_scope.
+Notation "\0" := (null_fun _) : function_scope.
+Notation "f \+ g" := (add_fun f g) : function_scope.
+Notation "f \- g" := (sub_fun f g) : function_scope.
+Notation "\- f" := (opp_fun f) : function_scope.
+Notation "a \*: f" := (scale_fun a f) : function_scope.
+Notation "x \*o f" := (mull_fun x f) : function_scope.
+Notation "x \o* f" := (mulr_fun x f) : function_scope.
+Notation "f \* g" := (mul_fun f g) : function_scope.
 
 Arguments mull_fun {_ _}  a f _ /.
 Arguments mulr_fun {_ _} a f _ /.
