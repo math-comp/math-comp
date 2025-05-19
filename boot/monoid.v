@@ -193,12 +193,21 @@ End ClosedPredicates.
 
 End MagmaTheory.
 
-HB.mixin Record Magma_isSemigroup G of Magma G := {
-  mulgA : associative (@mul G)
+(*TODO: use autowrap: *)
+(* #[short(type="semigroupType")]
+HB.structure Definition Semigroup
+  := {G of ChoiceMagma G
+        &  SemiGroup.isLaw _ (@mul G)}. *)
+#[wrapper]
+HB.mixin Record SemiGroupisLaw__on__Magma_mul G ( _ : Magma G) := {
+  private : SemiGroup.isLaw G mul
 }.
 
 #[short(type="semigroupType")]
-HB.structure Definition Semigroup := {G of Magma_isSemigroup G & ChoiceMagma G}.
+HB.structure Definition Semigroup := {G of ChoiceMagma G & SemiGroupisLaw__on__Magma_mul G }.
+
+Lemma mulgA {G: Semigroup.type} : associative (@mul G).
+Proof. exact SemiGroup.opA. Qed.
 
 HB.factory Record isSemigroup G of Choice G := {
   mul : G -> G -> G;
@@ -208,7 +217,18 @@ HB.factory Record isSemigroup G of Choice G := {
 HB.builders Context G of isSemigroup G.
 
 HB.instance Definition _ := hasMul.Build G mul.
-HB.instance Definition _ := Magma_isSemigroup.Build G mulgA.
+
+HB.instance Definition _ := SemiGroup.isLaw.Build G monoid.mul mulgA.
+
+HB.end.
+
+HB.factory Record Magma_isSemigroup G of Magma G := {
+  mulgA : associative (@mul G)
+}.
+
+HB.builders Context G of Magma_isSemigroup G.
+
+HB.instance Definition _ := SemiGroup.isLaw.Build G _ mulgA.
 
 HB.end.
 
@@ -272,10 +292,24 @@ End ClosedPredicates.
 
 End baseUMagmaTheory.
 
-HB.mixin Record BaseUMagma_isUMagma G of BaseUMagma G := {
+#[wrapper] 
+HB.mixin Record isMonoidLaw__on__BaseUMagma_MulOne G of BaseUMagma G := {
+  private: Monoid.isMonoidLaw G (@one G) (@mul G) 
+}.
+
+#[short(type="umagmaType")]
+HB.structure Definition UMagma := {G of ChoiceMagma G & isMonoidLaw__on__BaseUMagma_MulOne G & hasOne G}.
+
+HB.factory Record BaseUMagma_isUMagma G of BaseUMagma G := {
   mul1g : left_id one (@mul G);
   mulg1 : right_id one (@mul G)
 }.
+
+HB.builders Context G of BaseUMagma_isUMagma G.
+
+HB.instance Definition _ := Monoid.isMonoidLaw.Build G _ _ mul1g mulg1.
+
+HB.end.
 
 HB.factory Record Magma_isUMagma G of Magma G := {
   one : G;
@@ -284,13 +318,20 @@ HB.factory Record Magma_isUMagma G of Magma G := {
 }.
 
 HB.builders Context G of Magma_isUMagma G.
+
+(* BUG: the following does not work:*)
+(* HB.instance Definition _ := BaseUMagma_isUMagma.Build G mul1g mulg1. *)
+
 HB.instance Definition _ := hasOne.Build G one.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ := BaseUMagma_isUMagma.Build G mul1g mulg1.
+(*WORKAROUND*)
+HB.instance Definition _ := Monoid.isMonoidLaw.Build G 1 *%g mul1g mulg1.
+(*\WORKAROUND*)
 HB.end.
 
-#[short(type="umagmaType")]
-HB.structure Definition UMagma := {G of Magma_isUMagma G & ChoiceMagma G}.
+Lemma mul1g {G:umagmaType} : left_id one (@mul G).
+Proof. exact Monoid.op1m. Qed.
+Lemma mulg1 {G:umagmaType} : right_id one (@mul G).
+Proof. exact Monoid.opm1. Qed.
 
 Bind Scope group_scope with UMagma.sort.
 
@@ -311,7 +352,7 @@ Proof. by rewrite /commute mulg1 mul1g. Qed.
 End UMagmaTheory.
 
 #[short(type="monoidType")]
-HB.structure Definition Monoid := {G of Magma_isUMagma G & Semigroup G}.
+HB.structure Definition Monoid := {G of UMagma G & Semigroup G}.
 
 HB.factory Record Semigroup_isMonoid G of Semigroup G := {
   one : G;
@@ -351,8 +392,17 @@ HB.instance Definition _ := Magma_isUMagma.Build G mul1g mulg1.
 
 HB.end.
 
-#[export]
-HB.instance Definition _ (G : monoidType) := Monoid.isLaw.Build G 1 *%g mulgA mul1g mulg1.
+(*BUG: this should be inferred automatically*)
+(* Print Canonical Projections mul. *)
+Definition monoid_mul__canonical__Monoid_Law (G : monoidType) : Monoid.Law.type (@one G).
+Proof.
+  apply (@Monoid.Law.Pack _ _ (@mul G)).
+  constructor.
+  apply (@mul G : SemiGroup.Law.type G).
+  apply (@mul G : Monoid.PreLaw.type one).
+Defined.
+Canonical monoid_mul__canonical__Monoid_Law.
+(* Print Canonical Projections mul. *)
 
 Bind Scope group_scope with Monoid.sort.
 
