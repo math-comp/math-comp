@@ -2349,6 +2349,8 @@ rewrite ![_ `&` (_ `&` _) <= _]leIxr ?(leIr, leIl) //=.
 by rewrite leIxl ?leIl // leIxl // leIr.
 Qed.
 
+HB.instance Definition _ := SemiGroup.isComLaw.Build L meet meetA meetC.
+
 Lemma meetxx : idempotent_op (@meet _ L).
 Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
 Lemma meetAC : right_commutative (@meet _ L).
@@ -2405,8 +2407,7 @@ apply/idP/idP; last by move=> /andP[/eqP-> /eqP->]; rewrite meetx1.
 by move=> /eqP xIy1; rewrite -!le1x -xIy1 leIl leIr.
 Qed.
 
-HB.instance Definition _ := Monoid.isComLaw.Build L \top meet
-  (@meetA _ L) (@meetC _ L) meet1x.
+HB.instance Definition _ := Monoid.isMonoidLaw.Build L \top meet meet1x meetx1.
 
 Lemma meets_inf_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> \meet_(i <- r | P i) F i <= F x.
@@ -2511,6 +2512,8 @@ Proof. exact: (@leI2 _ L^d). Qed.
 Lemma joinC : commutative (@join _ L). Proof. exact: (@meetC _ L^d). Qed.
 Lemma joinA : associative (@join _ L). Proof. exact: (@meetA _ L^d). Qed.
 
+HB.instance Definition _ := SemiGroup.isComLaw.Build L join joinA joinC.
+
 Lemma joinxx : idempotent_op (@join _ L).
 Proof. exact: (@meetxx _ L^d). Qed.
 Lemma joinAC : right_commutative (@join _ L).
@@ -2548,8 +2551,7 @@ Proof. exact: (@meet1x _ L^d). Qed.
 Lemma join_eq0 x y : (x `|` y == \bot) = (x == \bot) && (y == \bot).
 Proof. exact: (@meet_eq1 _ L^d). Qed.
 
-HB.instance Definition _ := Monoid.isComLaw.Build L \bot join
-  (@joinA _ L) (@joinC _ L) join0x.
+HB.instance Definition _ := Monoid.isMonoidLaw.Build L \bot join join0x joinx0.
 
 Lemma joins_sup_seq T (r : seq T) (P : {pred T}) (F : T -> L) (x : T) :
   x \in r -> P x -> F x <= \join_(i <- r | P i) F i.
