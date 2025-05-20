@@ -11,9 +11,13 @@ From mathcomp Require Import fintype bigop ssralg.
 (* not cover the left module / algebra interfaces, providing only            *)
 (*          countNmodType == countable nmodType interface                    *)
 (*          countZmodType == countable zmodType interface                    *)
+(*    countPzSemiRingType == countable pzSemiRingType interface              *)
 (*    countNzSemiRingType == countable nzSemiRingType interface              *)
+(*        countPzRingType == countable pzRingType interface                  *)
 (*        countNzRingType == countable nzRingType interface                  *)
+(* countComPzSemiRingType == countable comPzSemiRingType interface           *)
 (* countComNzSemiRingType == countable comNzSemiRingType interface           *)
+(*     countComPzRingType == countable comPzRingType interface               *)
 (*     countComNzRingType == countable comNzRingType interface               *)
 (*      countUnitRingType == countable unitRingType interface                *)
 (*   countComUnitRingType == countable comUnitRingType interface             *)
@@ -43,6 +47,9 @@ HB.structure Definition Nmodule := {M of GRing.Nmodule M & Countable M}.
 #[short(type="countZmodType")]
 HB.structure Definition Zmodule := {M of GRing.Zmodule M & Countable M}.
 
+#[short(type="countPzSemiRingType")]
+HB.structure Definition PzSemiRing := {R of GRing.PzSemiRing R & Countable R}.
+
 #[short(type="countNzSemiRingType")]
 HB.structure Definition NzSemiRing := {R of GRing.NzSemiRing R & Countable R}.
 
@@ -61,6 +68,9 @@ Notation on R := (NzSemiRing.on R) (only parsing).
              note="Use CountRing.NzSemiRing.copy instead.")]
 Notation copy T U := (NzSemiRing.copy T U) (only parsing).
 End SemiRing.
+
+#[short(type="countPzRingType")]
+HB.structure Definition PzRing := {R of GRing.PzRing R & Countable R}.
 
 #[short(type="countNzRingType")]
 HB.structure Definition NzRing := {R of GRing.NzRing R & Countable R}.
@@ -81,6 +91,10 @@ Notation on R := (NzRing.on R) (only parsing).
 Notation copy T U := (NzRing.copy T U) (only parsing).
 End Ring.
 
+#[short(type="countComPzSemiRingType")]
+HB.structure Definition ComPzSemiRing :=
+  {R of GRing.ComPzSemiRing R & Countable R}.
+
 #[short(type="countComNzSemiRingType")]
 HB.structure Definition ComNzSemiRing :=
   {R of GRing.ComNzSemiRing R & Countable R}.
@@ -100,6 +114,9 @@ Notation on R := (ComNzSemiRing.on R) (only parsing).
              note="Use CountRing.ComNzSemiRing.copy instead.")]
 Notation copy T U := (ComNzSemiRing.copy T U) (only parsing).
 End ComSemiRing.
+
+#[short(type="countComPzRingType")]
+HB.structure Definition ComPzRing := {R of GRing.ComPzRing R & Countable R}.
 
 #[short(type="countComNzRingType")]
 HB.structure Definition ComNzRing := {R of GRing.ComNzRing R & Countable R}.
@@ -140,14 +157,26 @@ HB.structure Definition DecidableField :=
 #[short(type="countClosedFieldType")]
 HB.structure Definition ClosedField := {R of GRing.ClosedField R & Countable R}.
 
-#[export]
+Module ReguralExports.
+HB.instance Definition _ (R : countType) := Countable.on R^o.
 HB.instance Definition _ (R : countNmodType) := Nmodule.on R^o.
-#[export]
 HB.instance Definition _ (R : countZmodType) := Zmodule.on R^o.
-#[export]
+HB.instance Definition _ (R : countPzSemiRingType) := PzSemiRing.on R^o.
 HB.instance Definition _ (R : countNzSemiRingType) := NzSemiRing.on R^o.
-#[export]
+HB.instance Definition _ (R : countPzRingType) := PzRing.on R^o.
 HB.instance Definition _ (R : countNzRingType) := NzRing.on R^o.
+HB.instance Definition _ (R : countComPzSemiRingType) := ComPzSemiRing.on R^o.
+HB.instance Definition _ (R : countComNzSemiRingType) := ComNzSemiRing.on R^o.
+HB.instance Definition _ (R : countComPzRingType) := ComPzRing.on R^o.
+HB.instance Definition _ (R : countComNzRingType) := ComNzRing.on R^o.
+HB.instance Definition _ (R : countUnitRingType) := UnitRing.on R^o.
+HB.instance Definition _ (R : countComUnitRingType) := ComUnitRing.on R^o.
+HB.instance Definition _ (R : countIdomainType) := IntegralDomain.on R^o.
+HB.instance Definition _ (R : countFieldType) := Field.on R^o.
+HB.instance Definition _ (R : countDecFieldType) := DecidableField.on R^o.
+HB.instance Definition _ (R : countClosedFieldType) := ClosedField.on R^o.
+End ReguralExports.
+HB.export ReguralExports.
 
 End CountRing.
 
