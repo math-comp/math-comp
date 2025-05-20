@@ -392,17 +392,7 @@ HB.instance Definition _ := Magma_isUMagma.Build G mul1g mulg1.
 
 HB.end.
 
-(*BUG: this should be inferred automatically*)
-(* Print Canonical Projections mul. *)
-Definition monoid_mul__canonical__Monoid_Law (G : monoidType) : Monoid.Law.type (@one G).
-Proof.
-  apply (@Monoid.Law.Pack _ _ (@mul G)).
-  constructor.
-  apply (@mul G : SemiGroup.Law.type G).
-  apply (@mul G : Monoid.PreLaw.type one).
-Defined.
-Canonical monoid_mul__canonical__Monoid_Law.
-(* Print Canonical Projections mul. *)
+HB.saturate (@mul _).
 
 Bind Scope group_scope with Monoid.sort.
 

@@ -450,32 +450,7 @@ HB.instance Definition _ := SemiGroup.isLaw.Build V +%R addrA.
 (*\WORKAROUND*)
 HB.end.
 
-(*BUG: this should be inferred automatically*)
-(* Print Canonical Projections add. *)
-Definition nmodule_add__canonical__Monoid_Law (V : nmodType)
-  : Monoid.Law.type (@zero V).
-Proof.
-  apply (@Monoid.Law.Pack _ _ (@add V)).
-  constructor.
-  apply (@add V : SemiGroup.Law.type V).
-  apply (@add V : Monoid.PreLaw.type zero).
-Defined.
-Canonical nmodule_add__canonical__Monoid_Law.
-(* Print Canonical Projections add. *)
-
-(*BUG: this should be inferred automatically*)
-(* Print Canonical Projections add. *)
-Definition nmodule_add__canonical__Monoid_ComLaw (V : nmodType)
-  : Monoid.ComLaw.type (@zero V).
-Proof.
-  apply (@Monoid.ComLaw.Pack _ _ (@add V)).
-  constructor.
-  apply (@add V : SemiGroup.Law.type V).
-  apply (@add V : Monoid.PreLaw.type zero).
-  apply (@add V : SemiGroup.Com.type V).
-Defined.
-Canonical nmodule_add__canonical__Monoid_ComLaw.
-(* Print Canonical Projections add. *)
+HB.saturate (@add _).
 
 Module AddUMagmaExports.
 Bind Scope ring_scope with AddUMagma.sort.
@@ -497,8 +472,9 @@ HB.instance Definition _ (V : nmodType) :=
 #[export]
 HB.instance Definition _ (V : nmodType) :=
   Magma_isSemigroup.Build (to_multiplicative V) (addrA).
-
-(*BUG?: why a section is needed here?*)
+ 
+(*BUG: This should work. In earlier version of HB a workaround was to put this
+into a section *)
 (* #[export]
 HB.instance Definition _ (V : nmodType) :=
   SemiGroup.isCommutativeLaw.Build
@@ -506,8 +482,8 @@ HB.instance Definition _ (V : nmodType) :=
 
 Section workaround. 
   Variable (V : nmodType).
-
-  #[export]
+  (*TODO: fix*)
+  Fail #[export]
   HB.instance Definition _ :=
   SemiGroup.isCommutativeLaw.Build
     (to_multiplicative V) (@add (to_multiplicative V)) addrC.
