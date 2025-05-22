@@ -1511,8 +1511,8 @@ apply: (iffP sub_bigcapmxP) => [iso_uv | [f hom_uf <-] i _].
   pose U := E_G *m lin_mul_row u; pose V :=  E_G *m lin_mul_row v.
   pose f := pinvmx U *m V.
   have hom_uv_f x: x \in G -> u *m rG x *m f = v *m rG x.
-    move=> Gx; apply/eqP; rewrite 2!mulmxA mul_rV_lin1 -subr_eq0 -mulmxBr /=.
-    rewrite uv0 // linearB /= mulmxBr vec_mxK; split. (* FIXME: slow *)
+    move=> Gx; apply/eqP; rewrite 2!mulmxA mul_rV_lin1 -subr_eq0 -mulmxBr.
+    rewrite uv0 // 2!linearB /= vec_mxK; split. (* slow *)
       by rewrite addmx_sub ?submxMl // eqmx_opp envelop_mx_id.
     have Uux: (u *m rG x <= U)%MS.
       by rewrite -(genmxE U) mxmodule_trans ?cyclic_mx_id ?cyclic_mx_module.
@@ -4350,7 +4350,7 @@ Lemma regular_op_inj_pchar :
 Proof.
 move=> A B RnA RnB /= eqAB; apply/eqP; rewrite -subr_eq0 -mxvec_eq0 -submx0.
 rewrite -ker_irr_comp_op_pchar sub_capmx (sameP sub_kermxP eqP) mul_vec_lin.
-by rewrite 2!raddfB /= eqAB subrr linear0 addmx_sub ?eqmx_opp /=.
+by rewrite 2!linearB /= eqAB subrr linear0 addmx_sub ?eqmx_opp /=. (* slow *)
 Qed.
 
 Lemma rank_irr_comp_pchar : \rank 'R_iG = \rank E_G.
@@ -4616,7 +4616,7 @@ case: (pickP [pred x in G | ~~ is_scalar_mx (rG x)]) => [x | scalG].
   rewrite row_free_unit rmorphB /= horner_mx_X horner_mx_C.
   rewrite (mx_Schur irrG) ?subr_eq0 //; last first.
     by apply: contraNneq nscal_rGx => ->; apply: scalar_mx_is_scalar.
-  rewrite -memmx_cent_envelop raddfB.
+  rewrite -memmx_cent_envelop linearB. (* slow *)
   rewrite addmx_sub ?eqmx_opp ?scalar_mx_cent //= memmx_cent_envelop.
   by apply/centgmxP=> j Zh_j; rewrite -!repr_mxM // (centsP cGG).
 pose M := <<delta_mx 0 0 : 'rV[F]_n.+1>>%MS.
@@ -5477,6 +5477,12 @@ Proof. by apply/matrixP=> i j; rewrite !mxE !(mul0mx, linear0). Qed.
 Lemma val_gen0 : val_gen 0 = 0.
 Proof. by apply: (canLR in_genK); rewrite in_gen0. Qed.
 
+Lemma in_genN : {morph in_gen : W / - W}.
+Proof. by move=> W; apply/matrixP=> i j; rewrite !mxE 4!(mulNmx, linearN). Qed. (* slow *)
+
+Lemma val_genN : {morph val_gen : W / - W}.
+Proof. by move=> W; apply: (canLR in_genK); rewrite in_genN val_genK. Qed.
+
 Lemma in_genD : {morph in_gen : U V / U + V}.
 Proof.
 by move=> U V; apply/matrixP=> i j; rewrite !mxE 4!(mulmxDl, linearD).
@@ -5484,12 +5490,6 @@ Qed.
 
 Lemma val_genD : {morph val_gen : U V / U + V}.
 Proof. by move=> U V; apply: (canLR in_genK); rewrite in_genD !val_genK. Qed.
-
-Lemma in_genN : {morph in_gen : W / - W}.
-Proof. by move=> W; apply/esym/addr0_eq; rewrite -in_genD subrr in_gen0. Qed.
-
-Lemma val_genN : {morph val_gen : W / - W}.
-Proof. by move=> W; apply: (canLR in_genK); rewrite in_genN val_genK. Qed.
 
 Definition in_gen_sum := big_morph in_gen in_genD in_gen0.
 Definition val_gen_sum := big_morph val_gen val_genD val_gen0.

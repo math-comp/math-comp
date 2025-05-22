@@ -1576,8 +1576,8 @@ Proof.
 move=> k p q; apply/polyP=> i.
 by rewrite !(coef_deriv, coefD, coefZ) mulrnDl mulrnAr.
 Qed.
-HB.instance Definition _ := GRing.isSemilinear.Build R {poly R} {poly R} _ deriv
-  (GRing.semilinear_linear deriv_is_linear).
+HB.instance Definition _ := GRing.isLinear.Build R {poly R} {poly R} _ deriv
+  deriv_is_linear.
 
 Lemma deriv0 : 0^`() = 0.
 Proof. exact: linear0. Qed.
@@ -1656,8 +1656,8 @@ Qed.
 Fact derivn_is_linear n : linear (derivn n).
 Proof. by elim: n => // n IHn a p q; rewrite derivnS IHn linearP. Qed.
 HB.instance Definition _ n :=
-  GRing.isSemilinear.Build R {poly R} {poly R} _ (derivn n)
-    (GRing.semilinear_linear (derivn_is_linear n)).
+  GRing.isLinear.Build R {poly R} {poly R} _ (derivn n)
+    (derivn_is_linear n).
 
 Lemma derivnC c n : c%:P^`(n) = if n == 0 then c%:P else 0.
 Proof. by case: n => // n; rewrite derivSn derivC linear0. Qed.
@@ -1757,8 +1757,8 @@ move=> k p q; apply/polyP=> i.
 by rewrite !(coef_nderivn, coefD, coefZ) mulrnDl mulrnAr.
 Qed.
 HB.instance Definition _ n :=
-  GRing.isSemilinear.Build R {poly R} {poly R} _ (nderivn n)
-    (GRing.semilinear_linear (nderivn_is_linear n)).
+  GRing.isLinear.Build R {poly R} {poly R} _ (nderivn n)
+    (nderivn_is_linear n).
 
 Lemma nderivnD n : {morph nderivn n : p q / p + q}.
 Proof. exact: linearD. Qed.
@@ -2142,8 +2142,8 @@ Qed.
 Definition horner_is_multiplicative :=
   (fun g => (g.2, g.1)) horner_is_monoid_morphism.
 HB.instance Definition _ :=
-  GRing.isSemilinear.Build aR {poly aR} rR _ (horner_morph cfu)
-    (GRing.semilinear_linear horner_is_linear).
+  GRing.isLinear.Build aR {poly aR} rR _ (horner_morph cfu)
+    horner_is_linear.
 
 HB.instance Definition _ :=
   GRing.isMonoidMorphism.Build {poly aR} rR (horner_morph cfu)
@@ -2234,8 +2234,8 @@ move=> a q r.
 by rewrite /comp_poly rmorphD /= map_polyZ !hornerE_comm mul_polyC.
 Qed.
 HB.instance Definition _ p :=
-  GRing.isSemilinear.Build R {poly R} {poly R} _ (comp_poly p)
-    (GRing.semilinear_linear (comp_poly_is_linear p)).
+  GRing.isLinear.Build R {poly R} {poly R} _ (comp_poly p)
+    (comp_poly_is_linear p).
 
 Lemma comp_poly0 p : 0 \Po p = 0.
 Proof. exact: raddf0. Qed.
@@ -2349,9 +2349,8 @@ Proof. by apply/polyP => i; rewrite !(coefZ, coef_even_poly). Qed.
 Fact even_poly_is_linear : linear even_poly.
 Proof. by move=> k p q; rewrite even_polyD even_polyZ. Qed.
 
-HB.instance Definition _ :=
-  GRing.isSemilinear.Build R {poly R} {poly R} _ even_poly
-    (GRing.semilinear_linear even_poly_is_linear).
+HB.instance Definition _ := GRing.isLinear.Build R {poly R} {poly R} _ even_poly
+  even_poly_is_linear.
 
 Lemma even_polyC (c : R) : even_poly c%:P = c%:P.
 Proof. by apply/polyP => i; rewrite coef_even_poly !coefC; case: i. Qed.
@@ -2385,9 +2384,8 @@ Proof. by apply/polyP => i; rewrite !(coefZ, coef_odd_poly). Qed.
 Fact odd_poly_is_linear : linear odd_poly.
 Proof. by move=> k p q; rewrite odd_polyD odd_polyZ. Qed.
 
-HB.instance Definition _ :=
-  GRing.isSemilinear.Build R {poly R} {poly R} _ odd_poly
-    (GRing.semilinear_linear odd_poly_is_linear).
+HB.instance Definition _ := GRing.isLinear.Build R {poly R} {poly R} _ odd_poly
+  odd_poly_is_linear.
 
 Lemma size_odd_poly_eq p : ~~ odd (size p) -> size (odd_poly p) = (size p)./2.
 Proof.
@@ -2464,8 +2462,8 @@ Fact take_poly_is_linear m : linear (take_poly m).
 Proof. by move=> k p q; rewrite take_polyD take_polyZ. Qed.
 
 HB.instance Definition _ m :=
-  GRing.isSemilinear.Build R {poly R} {poly R} _ (take_poly m)
-    (GRing.semilinear_linear (take_poly_is_linear m)).
+  GRing.isLinear.Build R {poly R} {poly R} _ (take_poly m)
+    (take_poly_is_linear m).
 
 Lemma take_poly_sum m I r P (p : I -> {poly R}) :
   take_poly m (\sum_(i <- r | P i) p i) = \sum_(i <- r| P i) take_poly m (p i).
@@ -2527,8 +2525,8 @@ Fact drop_poly_is_linear m : linear (drop_poly m).
 Proof. by move=> k p q; rewrite drop_polyD drop_polyZ. Qed.
 
 HB.instance Definition _ m :=
-  GRing.isSemilinear.Build R {poly R} {poly R} _ (drop_poly m)
-    (GRing.semilinear_linear (drop_poly_is_linear m)).
+  GRing.isLinear.Build R {poly R} {poly R} _ (drop_poly m)
+    (drop_poly_is_linear m).
 
 Lemma drop_poly_sum m I r P (p : I -> {poly R}) :
   drop_poly m (\sum_(i <- r | P i) p i) = \sum_(i <- r | P i) drop_poly m (p i).
@@ -2684,8 +2682,8 @@ Qed.
 Definition horner_eval_is_multiplicative x :=
   (fun g => (g.2, g.1)) (horner_eval_is_monoid_morphism x).
 HB.instance Definition _ x :=
-  GRing.isSemilinear.Build R {poly R} R _ (horner_eval x)
-    (GRing.semilinear_linear (horner_eval_is_linear x)).
+  GRing.isLinear.Build R {poly R} R _ (horner_eval x)
+    (horner_eval_is_linear x).
 
 HB.instance Definition _ x :=
   GRing.isMonoidMorphism.Build {poly R} R (horner_eval x)
