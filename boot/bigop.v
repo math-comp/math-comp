@@ -460,6 +460,7 @@ HB.instance Definition _ := isCommutativeLaw.Build T op opC.
 
 HB.end.
 
+(*TODO: consider renamening (eg. "isAnnihilating")*)
 HB.mixin Record isMulLaw T (zero : T) (mul : T -> T -> T) := {
   mul_zerol : left_zero zero mul;
   mul_zeror : right_zero zero mul;
@@ -469,6 +470,7 @@ HB.mixin Record isMulLaw T (zero : T) (mul : T -> T -> T) := {
 HB.structure Definition MulLaw T zero := {mul of isMulLaw T zero mul}.
 Notation mul_law := MulLaw.type.
 
+(*TODO: consider renamening (eg. "isDistributive")*)
 HB.mixin Record isAddLaw T (mul : T -> T -> T) (op : T -> T -> T) := {
   mul_op_Dl : left_distributive mul op;
   mul_op_Dr : right_distributive mul op;

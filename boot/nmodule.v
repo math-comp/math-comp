@@ -311,9 +311,19 @@ HB.mixin Record hasZero V := {
   zero : V
 }.
 
+(*Pointed type structure (with point representing a zero)*)
+(*WORKAROUND: defining this structure is necessary to avoid an error
+in ssralg.v
+"the first structure declared in this hierarchy containing 
+Algebra_hasZero is Algebra_BaseAddUMagma which also contains 
+[Algebra_hasAdd] ." *)
+#[short(type="zPointedType")]
+HB.structure Definition ZPointed :=
+  {V of hasZero V}.
+
 #[short(type="baseAddUMagmaType")]
 HB.structure Definition BaseAddUMagma :=
-  {V of hasZero V & BaseAddMagma V}.
+  {V of ZPointed V & BaseAddMagma V}.
 
 Module BaseAddUMagmaExports.
 Bind Scope ring_scope with BaseAddUMagma.sort.
@@ -472,9 +482,11 @@ HB.instance Definition _ (V : nmodType) :=
 #[export]
 HB.instance Definition _ (V : nmodType) :=
   Magma_isSemigroup.Build (to_multiplicative V) (addrA).
- 
+
 (*BUG: This should work. In earlier version of HB a workaround was to put this
-into a section *)
+into a section.
+NOTE: the code above may be outright deleted, a call to saturate above already generated the commutativity
+*)
 (* #[export]
 HB.instance Definition _ (V : nmodType) :=
   SemiGroup.isCommutativeLaw.Build
@@ -487,6 +499,8 @@ Section workaround.
   HB.instance Definition _ :=
   SemiGroup.isCommutativeLaw.Build
     (to_multiplicative V) (@add (to_multiplicative V)) addrC.
+
+  Check (@add (to_multiplicative V)) : SemiGroup.Com.type _.
 End workaround.
 
 Section NmoduleTheory.
