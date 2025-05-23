@@ -311,6 +311,8 @@ HB.instance Definition _ := Monoid.isMonoidLaw.Build G _ _ mul1g mulg1.
 
 HB.end.
 
+(*TODO: consider renaming, this name is misleading
+  since the factory does not make G an UMagma (it misses Choice and DecEq)*)
 HB.factory Record Magma_isUMagma G of Magma G := {
   one : G;
   mul1g : left_id one (@mul G);
@@ -318,14 +320,8 @@ HB.factory Record Magma_isUMagma G of Magma G := {
 }.
 
 HB.builders Context G of Magma_isUMagma G.
-
-(* BUG: the following does not work:*)
-(* HB.instance Definition _ := BaseUMagma_isUMagma.Build G mul1g mulg1. *)
-
 HB.instance Definition _ := hasOne.Build G one.
-(*WORKAROUND*)
-HB.instance Definition _ := Monoid.isMonoidLaw.Build G 1 *%g mul1g mulg1.
-(*\WORKAROUND*)
+HB.instance Definition _ := BaseUMagma_isUMagma.Build G mul1g mulg1.
 HB.end.
 
 Lemma mul1g {G:umagmaType} : left_id one (@mul G).
