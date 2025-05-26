@@ -483,26 +483,6 @@ HB.instance Definition _ (V : nmodType) :=
 HB.instance Definition _ (V : nmodType) :=
   Magma_isSemigroup.Build (to_multiplicative V) (addrA).
 
-(*BUG: This should work. In earlier version of HB a workaround was to put this
-into a section.
-NOTE: the code above may be outright deleted, a call to saturate above already generated the commutativity
-*)
-(* #[export]
-HB.instance Definition _ (V : nmodType) :=
-  SemiGroup.isCommutativeLaw.Build
-    (to_multiplicative V) (@add (to_multiplicative V)) addrC. *)
-
-Section workaround. 
-  Variable (V : nmodType).
-  (*TODO: fix*)
-  Fail #[export]
-  HB.instance Definition _ :=
-  SemiGroup.isCommutativeLaw.Build
-    (to_multiplicative V) (@add (to_multiplicative V)) addrC.
-
-  Check (@add (to_multiplicative V)) : SemiGroup.Com.type _.
-End workaround.
-
 Section NmoduleTheory.
 
 Variable V : nmodType.
