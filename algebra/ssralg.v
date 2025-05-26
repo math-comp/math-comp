@@ -2529,15 +2529,15 @@ Module Exports. HB.reexport. End Exports.
 End Scale.
 Export Scale.Exports.
 
-#[export]
+#[export, wrapper = off]
 HB.instance Definition _ (R : pzSemiRingType) :=
   Scale.isPreLaw.Build R R *%R (fun => mull_fun_is_nmod_morphism _ idfun).
 
-#[export]
+#[export, wrapper = off]
 HB.instance Definition _ (R : pzSemiRingType) :=
   Scale.isSemiLaw.Build R R *%R mul0r mul1r mulrA.
 
-#[export]
+#[export, wrapper = off]
 HB.instance Definition _ (R : pzRingType) :=
   Scale.isLaw.Build R R *%R (@mulN1r R).
 
