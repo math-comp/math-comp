@@ -951,14 +951,8 @@ HB.factory Record Nmodule_isPzSemiRing R of Nmodule R := {
 HB.builders Context R of Nmodule_isPzSemiRing R.
 
 HB.instance Definition _ := isMonoid.Build R mulrA mul1r mulr1.
-
-(*BUG*)
-(* HB.instance Definition _ := NmoduleMonoid_isPzSemiRing.Build R mulrDl mulrDr mul0r mulr0 . *)
-(*WORKAROUND*)
-HB.instance Definition _ := Monoid.isMulLaw.Build R zero monoid.mul mul0r mulr0.
-(*BUG (another): this fail if the structure BiMagma is not defined*)
-HB.instance Definition _ := Monoid.isAddLaw.Build R monoid.mul add mulrDl mulrDr.
-(*\WORKAROUND*)
+HB.instance Definition _
+  := NmoduleMonoid_isPzSemiRing.Build R mulrDl mulrDr mul0r mulr0 .
 
 HB.end.
 
@@ -996,16 +990,11 @@ HB.factory Record isPzSemiRing R of Choice R := {
 }.
 
 HB.builders Context R of isPzSemiRing R.
+
 HB.instance Definition _ := @isNmodule.Build R
   zero add addrA addrC add0r.
-(*BUG:*)
-(* HB.instance Definition _ := @Nmodule_isPzSemiRing.Build R
-  one mul mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0. *)
-(*WORKAROUND*)
-HB.instance Definition _ := isMonoid.Build R mulrA mul1r mulr1.
-HB.instance Definition _ := Monoid.isMulLaw.Build R zero monoid.mul mul0r mulr0.
-HB.instance Definition _ := Monoid.isAddLaw.Build R monoid.mul Algebra.add mulrDl mulrDr.
-(*\WORKAROUND*)
+HB.instance Definition _ := @Nmodule_isPzSemiRing.Build R
+  one mul mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0.
 
 HB.end.
 
@@ -1052,15 +1041,11 @@ HB.factory Record Nmodule_isNzSemiRing R of Nmodule R := {
 }.
 
 HB.builders Context R of Nmodule_isNzSemiRing R.
-  (*BUG:*)
-  (* HB.instance Definition _ :=
-    Nmodule_isPzSemiRing.Build R mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0. *)
-  (*WORKAROUND*)
-  HB.instance Definition _ := isMonoid.Build R mulrA mul1r mulr1.
-  HB.instance Definition _ := Monoid.isMulLaw.Build R zero monoid.mul mul0r mulr0.
-  HB.instance Definition _ := Monoid.isAddLaw.Build R monoid.mul Algebra.add mulrDl mulrDr.
-  (*\WORKAROUND*)
+
+  HB.instance Definition _ :=
+    Nmodule_isPzSemiRing.Build R mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0.
   HB.instance Definition _ := PzSemiRing_isNonZero.Build R oner_neq0.
+  
 HB.end.
 
 Module Nmodule_isSemiRing.
@@ -1105,15 +1090,8 @@ Notation isSemiRing R := (isNzSemiRing R) (only parsing).
 HB.builders Context R of isNzSemiRing R.
   HB.instance Definition _ := @isNmodule.Build R
     zero add addrA addrC add0r.
-  (*BUG:*)  
-  (* HB.instance Definition _ := @Nmodule_isNzSemiRing.Build R
-    one mul mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0 oner_neq0. *)
-  (*WORKAROUND*)
-  HB.instance Definition _ := isMonoid.Build R mulrA mul1r mulr1.
-  HB.instance Definition _ := Monoid.isMulLaw.Build R zero monoid.mul mul0r mulr0.
-  HB.instance Definition _ := Monoid.isAddLaw.Build R monoid.mul Algebra.add mulrDl mulrDr.
-  HB.instance Definition _ := PzSemiRing_isNonZero.Build R oner_neq0.
-  (*\WORKAROUND*) 
+  HB.instance Definition _ := @Nmodule_isNzSemiRing.Build R
+    one mul mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0 oner_neq0.
 HB.end.
 
 Module NzSemiRingExports.
@@ -1516,14 +1494,8 @@ HB.builders Context R of Zmodule_isPzRing R.
   Proof. by move=> x; apply: (addIr (1 * x)); rewrite -mulrDl !add0r mul1r. Qed.
   Lemma mulr0 : @right_zero R R 0 mul.
   Proof. by move=> x; apply: (addIr (x * 1)); rewrite -mulrDr !add0r mulr1. Qed.
-  (*BUG:*)
-  (* HB.instance Definition _ :=
-    Nmodule_isPzSemiRing.Build R mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0. *)
-  (*WORKAROUND*)
-  HB.instance Definition _ := isMonoid.Build R mulrA mul1r mulr1.
-  HB.instance Definition _ := Monoid.isMulLaw.Build R zero monoid.mul mul0r mulr0.
-  HB.instance Definition _ := Monoid.isAddLaw.Build R monoid.mul Algebra.add mulrDl mulrDr.
-  (*\WORKAROUND*)
+  HB.instance Definition _ :=
+    Nmodule_isPzSemiRing.Build R mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0.
 HB.end.
 
 HB.factory Record isPzRing R of Choice R := {
@@ -1544,39 +1516,10 @@ HB.factory Record isPzRing R of Choice R := {
 }.
 
 HB.builders Context R of isPzRing R.
-  (*BUG (Zmodule_isPzRing fail to instantiate):*)
-  (* HB.instance Definition _ := @isZmodule.Build R
+  HB.instance Definition _ := @isZmodule.Build R
     zero opp add addrA addrC add0r addNr.
   HB.instance Definition _ := @Zmodule_isPzRing.Build R
-    one mul mulrA mul1r mulr1 mulrDl mulrDr. *)
-  (*WORKAROUND*)
-  HB.instance Definition _ := isNmodule.Build R addrA addrC add0r.
-  HB.instance Definition _ := hasOpp.Build R opp.
-  HB.instance Definition _ := BaseZmoduleNmodule_isZmodule.Build R addNr.
-  Lemma mul0r : @left_zero R R zero mul.
-  Proof.
-  by move=> x; apply: (@addIr R (mul one x) _ zero);
-    cbn; (*is it normal cbn is needed her?*)
-    rewrite -mulrDl !add0r mul1r.
-  Qed.
-  (* Proof.
-  by move=> x; apply: (@addIr R (mul one x) _ zero);
-    cbn;(*is it normal cbn is needed her?*)
-    rewrite -mulrDl !add0r mul1r.
-  Qed. *)
-  Lemma mulr0 : @right_zero R R zero mul.
-  Proof.
-   by move=> x; apply: (@addIr R (mul x one) (mul x zero) zero);
-    cbn;
-    rewrite -mulrDr !add0r mulr1.
-  Qed.
-  HB.instance Definition _ := @isPzSemiRing.Build R 
-    zero add one mul
-    addrA addrC add0r
-    mulrA mul1r mulr1
-    mulrDl mulrDr
-    mul0r mulr0.
-  (*\WORKAROUND*)
+    one mul mulrA mul1r mulr1 mulrDl mulrDr.
 HB.end.
 
 Module PzRingExports.
@@ -1659,20 +1602,8 @@ End Zmodule_isRing.
 Notation Zmodule_isRing R := (Zmodule_isNzRing R) (only parsing).
 
 HB.builders Context R of Zmodule_isNzRing R.
-  (*BUG*)
-  (* HB.instance Definition _ := Zmodule_isPzRing.Build R 
-    mulrA mul1r mulr1 mulrDl mulrDr. *)
-  (*WORKAROUND*)
-  Local Notation "1" := one.
-  Local Notation "x * y" := (mul x y).
-  Lemma mul0r : @left_zero R R 0 mul.
-  Proof. by move=> x; apply: (addIr (1 * x)); rewrite -mulrDl !add0r mul1r. Qed.
-  Lemma mulr0 : @right_zero R R 0 mul.
-  Proof. by move=> x; apply: (addIr (x * 1)); rewrite -mulrDr !add0r mulr1. Qed.
-  HB.instance Definition _ := isMonoid.Build R mulrA mul1r mulr1.
-  HB.instance Definition _ := Monoid.isMulLaw.Build R zero monoid.mul mul0r mulr0.
-  HB.instance Definition _ := Monoid.isAddLaw.Build R monoid.mul Algebra.add mulrDl mulrDr.
-  (*\WORKAROUND*)  
+  HB.instance Definition _ := Zmodule_isPzRing.Build R 
+    mulrA mul1r mulr1 mulrDl mulrDr.
   HB.instance Definition _ := PzSemiRing_isNonZero.Build R oner_neq0.
 HB.end.
 
@@ -1704,40 +1635,12 @@ End isRing.
              note="Use isNzRing instead.")]
 Notation isRing R := (isNzRing R) (only parsing).
 
-(*BUG (instantiating Zmodule_isNzRing.Build fails)*)
-(* HB.builders Context R of isNzRing R.
+HB.builders Context R of isNzRing R.
   HB.instance Definition _ := @isZmodule.Build R
     zero opp add addrA addrC add0r addNr.
   HB.instance Definition _ := @Zmodule_isNzRing.Build R
     one mul mulrA mul1r mulr1 mulrDl mulrDr oner_neq0.
-HB.end. *)
-(*WORKAROUND*)
-HB.builders Context R of isNzRing R.
-HB.instance Definition _ := isNmodule.Build R addrA addrC add0r.
-HB.instance Definition _ := hasOpp.Build R opp.
-HB.instance Definition _ := BaseZmoduleNmodule_isZmodule.Build R addNr.
-Lemma mul0r : @left_zero R R zero mul.
-Proof.
-by move=> x; apply: (@addIr R (mul one x) _ zero);
-  cbn;(*is it normal cbn is needed her?*)
-  rewrite -mulrDl !add0r mul1r.
-Qed.
-Lemma mulr0 : @right_zero R R zero mul.
-Proof.
- by move=> x; apply: (@addIr R (mul x one) (mul x zero) zero);
-  cbn;
-  rewrite -mulrDr !add0r mulr1.
-Qed.
-HB.instance Definition _ := @isPzSemiRing.Build R 
-  zero add one mul
-  addrA addrC add0r
-  mulrA mul1r mulr1
-  mulrDl mulrDr
-  mul0r mulr0.
-
-HB.instance Definition _ := PzSemiRing_isNonZero.Build R oner_neq0.
 HB.end.
-(*\WORKAROUND*)
 
 Module NzRingExports.
 Bind Scope ring_scope with NzRing.sort.
@@ -1989,30 +1892,14 @@ HB.instance Definition _ (U : zmodType)
         (@Algebra.addrA U) (@Algebra.addrC U)
         (@Algebra.add0r U) (@Algebra.addNr U).
 
-(*BUG:*)
-(* #[export]
+#[export]
 HB.instance Definition _ (R : pzSemiRingType) :=
   let mul' (x y : R) := y * x in
   let mulrA' x y z := esym (mulrA z y x) in
   let mulrDl' x y z := mulrDr z x y in
   let mulrDr' x y z := mulrDl y z x in
   Nmodule_isPzSemiRing.Build R^c
-    mulrA' mulr1 mul1r mulrDl' mulrDr' mulr0 mul0r. *)
-(*WORKAROUND*)
-#[export]
-HB.instance Definition _ (R : pzSemiRingType)
-  := 
-  let mul' (x y : R) := y * x in
-  let mulrA' x y z := esym (mulrA z y x) in
-  let mulrDl' x y z := mulrDr z x y in
-  let mulrDr' x y z := mulrDl y z x in
-  @isPzSemiRing.Build R^c _ _ _ mul'
-        (@Algebra.addrA R) (@Algebra.addrC R) (@Algebra.add0r R)
-        mulrA' 
-        mulr1 mul1r
-        mulrDl' mulrDr'
-        mulr0 mul0r.
-(*\WORKAROUND*)
+    mulrA' mulr1 mul1r mulrDl' mulrDr' mulr0 mul0r.
 #[export]
 HB.instance Definition _ (R : pzRingType) := PzSemiRing.on R^c.
 #[export]
@@ -2127,12 +2014,7 @@ move=> v; suff : scale (-1 + 1) v = 0 by rewrite scalerDl scale1r.
 by rewrite addNr scale0r.
 Qed.
 
-(* BUG: This fails *)
-(* HB.instance Definition _ := Nmodule_isZmodule.Build V addNr. *)
-(*WORKAROUND*)
-HB.instance Definition _ := hasOpp.Build V opp.
-HB.instance Definition _ := BaseZmoduleNmodule_isZmodule.Build V addNr.
-(*\WORKAROUND*)
+HB.instance Definition _ := Nmodule_isZmodule.Build V addNr.
 
 HB.end.
 
