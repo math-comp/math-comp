@@ -932,6 +932,7 @@ HB.builders Context R of NmoduleMonoid_isPzSemiRing R.
 
 (*BUG: this fail if the structure BaseZMagma is not defined*)
 HB.instance Definition _ := Monoid.isMulLaw.Build R zero mul mul0r mulr0.
+HB.instance Definition _ := Monoid.isAddLaw.Build R mul (@add R) mulrDl mulrDr.
 
 HB.end.
 
