@@ -116,8 +116,8 @@ Proof. by rewrite cfunElock conj1g if_same. Qed.
 
 Fact cfConjg_is_linear y : linear (cfConjg y : 'CF(G) -> 'CF(G)).
 Proof. by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock. Qed.
-HB.instance Definition _ y := GRing.isSemilinear.Build _ _ _ _ (cfConjg y)
-  (GRing.semilinear_linear (cfConjg_is_linear y)).
+HB.instance Definition _ y :=GRing.isLinear.Build _ _ _ _ (cfConjg y)
+  (cfConjg_is_linear y).
 
 Lemma cfConjg_cfuniJ A y : y \in 'N(G) -> ('1_A ^ y)%CF = '1_(A :^ y) :> 'CF(G).
 Proof.

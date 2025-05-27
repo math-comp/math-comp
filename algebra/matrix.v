@@ -3174,9 +3174,8 @@ Proof. by rewrite scale_col_mx !scale_row_mx. Qed.
 
 Lemma diag_mx_is_linear n : linear (@diag_mx R n).
 Proof. by move=> a A B; apply/matrixP=> i j; rewrite !mxE mulrnAr mulrnDl. Qed.
-HB.instance Definition _ n :=
-  GRing.isSemilinear.Build R 'rV_n 'M_n _ (@diag_mx _ n)
-    (GRing.semilinear_linear (@diag_mx_is_linear n)).
+HB.instance Definition _ n := GRing.isLinear.Build R 'rV_n 'M_n _ (@diag_mx _ n)
+  (@diag_mx_is_linear n).
 
 Lemma diag_mx_sum_delta n (d : 'rV_n) :
   diag_mx d = \sum_i d 0 i *: delta_mx i i.
@@ -3315,8 +3314,8 @@ Definition lin_mulmxr B := lin_mx (mulmxr B).
 Lemma mulmxr_is_linear B : linear (mulmxr B).
 Proof. by move=> a A1 A2; rewrite /= mulmxDl scalemxAl. Qed.
 HB.instance Definition _ B :=
-  GRing.isSemilinear.Build R 'M_(m, n) 'M_(m, p) _ (mulmxr B)
-    (GRing.semilinear_linear (mulmxr_is_linear B)).
+  GRing.isLinear.Build R 'M_(m, n) 'M_(m, p) _ (mulmxr B)
+    (mulmxr_is_linear B).
 
 Lemma lin_mulmxr_is_linear : linear lin_mulmxr.
 Proof.
@@ -3327,8 +3326,8 @@ rewrite linearZ /= !row_mul rowE mul_delta_mx_cond.
 by case: (k == i); [rewrite -!rowE linearZ | rewrite !mul0mx raddf0].
 Qed.
 HB.instance Definition _ :=
-  GRing.isSemilinear.Build R 'M_(n, p) 'M_(m * n, m * p) _ lin_mulmxr
-    (GRing.semilinear_linear lin_mulmxr_is_linear).
+  GRing.isLinear.Build R 'M_(n, p) 'M_(m * n, m * p) _ lin_mulmxr
+    lin_mulmxr_is_linear.
 
 End Mulmxr.
 Arguments mulmxr {_ _ _} B A /.
@@ -3345,8 +3344,8 @@ Proof.
 move=> a A B; rewrite mulr_sumr -big_split /=.
 by apply: eq_bigr=> i _; rewrite !mxE.
 Qed.
-HB.instance Definition _ := GRing.isSemilinear.Build R 'M_n R _ (@mxtrace _ n)
-  (GRing.semilinear_linear mxtrace_is_scalar).
+HB.instance Definition _ := GRing.isLinear.Build R 'M_n R _ (@mxtrace _ n)
+  mxtrace_is_scalar.
 
 Lemma mxtraceZ a (A : 'M_n) : \tr (a *: A) = a * \tr A.
 Proof. exact: scalarZ. Qed.
@@ -3510,8 +3509,8 @@ move=> a A B; apply/row_matrixP=> i; rewrite linearP /= !rowE !mul_rV_lin /=.
 by rewrite -linearP /= scalemxAl mulmxDl.
 Qed.
 HB.instance Definition _ :=
-  GRing.isSemilinear.Build R 'M[R]_(m, n) 'M[R]_(n * p, m * p) _ lin_mulmx
-    (GRing.semilinear_linear lin_mulmx_is_linear).
+  GRing.isLinear.Build R 'M[R]_(m, n) 'M[R]_(n * p, m * p) _ lin_mulmx
+    lin_mulmx_is_linear.
 
 End AssocLeft.
 
@@ -3526,8 +3525,8 @@ Proof.
 move=> a u v; apply/row_matrixP=> i; rewrite linearP /= !rowE !mul_rV_lin1 /=.
 by rewrite mulmxDl scalemxAl.
 Qed.
-HB.instance Definition _ := GRing.isSemilinear.Build R _ _ _ lin_mul_row
-  (GRing.semilinear_linear lin_mul_row_is_linear).
+HB.instance Definition _ :=
+  GRing.isLinear.Build R _ _ _ lin_mul_row lin_mul_row_is_linear.
 
 Lemma mul_vec_lin_row A u : mxvec A *m lin_mul_row u = u *m A.
 Proof. by rewrite mul_rV_lin1 /= mxvecK. Qed.
