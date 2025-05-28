@@ -3328,9 +3328,22 @@ HB.instance Definition _ (R : comPzSemiRingType) := ComPzSemiRing.on R^o.
 HB.instance Definition _ (R : comNzSemiRingType) := ComNzSemiRing.on R^c.
 #[export]
 HB.instance Definition _ (R : comNzSemiRingType) := ComNzSemiRing.on R^o.
-#[export]
+
+(*Unknown BUG*)
+(* #[export]
 HB.instance Definition _ (R : comNzSemiRingType) :=
-  LSemiAlgebra_isComSemiAlgebra.Build R R^o.
+  LSemiAlgebra_isComSemiAlgebra.Build R R^o. *)
+(*WORKAROUND*)
+Section workaround.
+Variable (R : comNzSemiRingType).
+Local Lemma scalarAr_regular k (x y : R^o) : k *: (x * y) = x * (k *: y).
+Proof. by rewrite mulrC scalerAl mulrC. Qed.
+  #[export]
+  HB.instance Definition _ := LSemiAlgebra_isSemiAlgebra.Build R R^o scalarAr_regular.
+(* Check R^o : SemiAlgebra.type _ . *)
+End workaround.
+(*\WORKAROUND*)
+
 End SemiAlgebraTheory.
 
 #[short(type="comAlgType")]
