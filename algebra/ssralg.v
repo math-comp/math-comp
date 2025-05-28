@@ -2914,9 +2914,21 @@ Proof. by rewrite linearZ /= rmorph1. Qed.
 
 End LRMorphismTheory.
 
-HB.mixin Record PzSemiRing_hasCommutativeMul R of PzSemiRing R := {
+#[wrapper]
+HB.mixin Record SemiGroupIsCommutativeLaw__on__PzSemiRing_mul
+  R of PzSemiRing R := {
+  private : SemiGroup.isCommutativeLaw R (@mul R)
+}.
+
+HB.factory Record PzSemiRing_hasCommutativeMul R of PzSemiRing R := {
   mulrC : commutative (@mul R)
 }.
+
+HB.builders Context R of PzSemiRing_hasCommutativeMul R.
+
+HB.instance Definition _ := SemiGroup.isCommutativeLaw.Build R (@mul R) mulrC.
+
+HB.end.
 
 Module SemiRing_hasCommutativeMul.
 #[deprecated(since="mathcomp 2.4.0",
@@ -2932,6 +2944,9 @@ Notation SemiRing_hasCommutativeMul R :=
 #[short(type="comPzSemiRingType")]
 HB.structure Definition ComPzSemiRing :=
   {R of PzSemiRing R & PzSemiRing_hasCommutativeMul R}.
+
+Lemma mulrC {R:comPzSemiRingType} : commutative (@mul R).
+Proof. exact SemiGroup.opC. Qed.
 
 Module ComPzSemiRingExports.
 Bind Scope ring_scope with ComPzSemiRing.sort.
