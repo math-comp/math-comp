@@ -2324,13 +2324,19 @@ End AdditiveTheory.
 #[deprecated(since="mathcomp 2.5.0", note="use `monoid_morphism` instead")]
 Definition multiplicative (R S : pzSemiRingType) (f : R -> S) : Prop :=
   {morph f : x y / x * y}%R * (f 1 = 1).
-(* FIXME: remove once PzSemiRing extends Monoid. *)
-Definition monoid_morphism (R S : pzSemiRingType) (f : R -> S) : Prop :=
-   (f 1 = 1) * {morph f : x y / x * y}%R.
 
-HB.mixin Record isMonoidMorphism (R S : pzSemiRingType) (f : R -> S) := {
-  monoid_morphism_subproof : monoid_morphism f
+(*TODO: Consider to remove this factory,
+it is essentially a duplicate of the factory isUMagmaMorphism
+(the latter can be called on pzSemiRingType) *)
+HB.factory Record isMonoidMorphism (R S : pzSemiRingType) (f : R -> S) := {
+  rmorphism_subproof : monoid_morphism f
 }.
+HB.builders Context R S f of isMonoidMorphism R S f.
+
+HB.about isUMagmaMorphism.Build.
+HB.instance Definition _ := isUMagmaMorphism.Build R S f rmorphism_subproof. 
+
+HB.end.
 
 HB.structure Definition RMorphism (R S : pzSemiRingType) :=
   {f of @isNmodMorphism R S f & isMonoidMorphism R S f}.
