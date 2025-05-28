@@ -3033,8 +3033,6 @@ Section ComSemiRingTheory.
 Variable R : comPzSemiRingType.
 Implicit Types x y : R.
 
-#[export]
-HB.instance Definition _ := SemiGroup.isCommutativeLaw.Build R *%R mulrC.
 Lemma mulrCA : @left_commutative R R *%R. Proof. exact: mulmCA. Qed.
 Lemma mulrAC : @right_commutative R R *%R. Proof. exact: mulmAC. Qed.
 Lemma mulrACA : @interchange R *%R *%R. Proof. exact: mulmACA. Qed.
