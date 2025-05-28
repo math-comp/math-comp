@@ -7385,10 +7385,34 @@ Proof. by move=> f; apply/ffunP=> i; rewrite !ffunE mul0r. Qed.
 Fact ffun_mul_0r :  right_zero (@ffun_zero _ _) ffun_mul.
 Proof. by move=> f; apply/ffunP=> i; rewrite !ffunE mulr0. Qed.
 
+(*BUG*)
+(*
 #[export]
 HB.instance Definition _ := Nmodule_isPzSemiRing.Build {ffun aT -> R}
   ffun_mulA ffun_mul_1l ffun_mul_1r ffun_mul_addl ffun_mul_addr
   ffun_mul_0l ffun_mul_0r.
+*)
+(*WORKAROUND*)
+
+HB.saturate finfun_of.
+(*BUG: This builds the BaseZMagma structure,
+but it fails to build the BasePzSemiRingType structure.
+I build it by hand *)
+Definition finfun_finfun_of__canonical__BasePzSemiRing
+  : GRing.BasePzSemiRing.type.
+Proof.
+  simple refine (@BasePzSemiRing.Pack {ffun aT -> R} _).
+  econstructor.
+  all: try apply Nmodule.class.
+  all: try apply Monoid.class.
+Defined.
+Canonical finfun_finfun_of__canonical__BasePzSemiRing.
+
+#[export]
+HB.instance Definition _ := NmoduleMonoid_isPzSemiRing.Build {ffun aT -> R}   
+  ffun_mul_addl ffun_mul_addr ffun_mul_0l ffun_mul_0r.
+
+(*\WORKAROUND*)
 Definition ffun_semiring : pzSemiRingType := {ffun aT -> R}.
 End FinFunSemiRing.
 
@@ -7502,9 +7526,21 @@ Proof. by move=> x; congr (_, _); apply: mul0r. Qed.
 Fact pair_mulr0 : right_zero 0 mul_pair.
 Proof. by move=> x; congr (_, _); apply: mulr0. Qed.
 
+(*BUG*)
+(* 
 #[export]
 HB.instance Definition _ := Nmodule_isPzSemiRing.Build (R1 * R2)%type
   pair_mulA pair_mul1l pair_mul1r pair_mulDl pair_mulDr pair_mul0r pair_mulr0.
+*)
+
+(*WORKAROUND*)
+#[export]
+HB.instance Definition _ := NmoduleMonoid_isPzSemiRing.Build (R1 * R2)%type
+  pair_mulDl pair_mulDr pair_mul0r pair_mulr0.
+(*\WORKAROUND*)
+
+(*BUG*)
+(* Fail Check (R1 * R2)%type : BasePzSemiRing.type. *)
 
 Fact fst_is_monoid_morphism : monoid_morphism fst. Proof. by []. Qed.
 #[export]
