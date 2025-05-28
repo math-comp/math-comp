@@ -7542,11 +7542,15 @@ HB.instance Definition _ := NmoduleMonoid_isPzSemiRing.Build (R1 * R2)%type
 (*BUG*)
 (* Fail Check (R1 * R2)%type : BasePzSemiRing.type. *)
 
-Fact fst_is_monoid_morphism : monoid_morphism fst. Proof. by []. Qed.
+Fact fst_is_monoid_morphism : monoid_morphism (fst : (R1 * R2)%type -> R1).
+(*BUG(?): the type of fst should be inferred autoamtically?*)
+Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isMonoidMorphism.Build (R1 * R2)%type R1 fst
   fst_is_monoid_morphism.
-Fact snd_is_monoid_morphism : monoid_morphism snd. Proof. by []. Qed.
+Fact snd_is_monoid_morphism : monoid_morphism (snd : (R1 * R2)%type -> R2).
+(*BUG(?): the type of snd should be inferred autoamtically?*)
+Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isMonoidMorphism.Build (R1 * R2)%type R2 snd
   snd_is_monoid_morphism.
