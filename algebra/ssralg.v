@@ -5672,7 +5672,7 @@ Notation val := (val : U -> R).
 HB.instance Definition _ := isMonoidMorphism.Build U R val (gmulfM1 val).
 Lemma val1 : val 1 = 1. Proof. exact: rmorph1. Qed.
 Lemma valM : {morph val : x y / x * y}. Proof. exact: rmorphM. Qed.
-Lemma valM1 : monoid_morphism val. Proof. exact: valM_subproof. Qed.
+Lemma valM1 : monoid_morphism val. Proof. exact: rmorphism_monoidP. Qed.
 End multiplicative.
 
 HB.factory Record SubNmodule_isSubPzSemiRing (R : pzSemiRingType) S U
