@@ -254,7 +254,7 @@ Lemma sub_annihilant_in_ideal p q :
 Proof.
 rewrite -size_poly_XaY -(size_map_polyC q) => p1_gt1 q1_gt1.
 have [uv /= [ub_u ub_v Dr]] := resultant_in_ideal p1_gt1 q1_gt1.
-exists uv => // x y; rewrite -[r in r.[y]](hornerC _ x%:P) Dr.
+exists uv => // x y; rewrite -[r in r.[y] = _](hornerC _ x%:P) Dr.
 by rewrite !(hornerE, horner_comp).
 Qed.
 
@@ -294,13 +294,14 @@ Lemma div_annihilant_in_ideal p q :
 Proof.
 rewrite -size_poly_XmY -(size_map_polyC q) => p1_gt1 q1_gt1.
 have [uv /= [ub_u ub_v Dr]] := resultant_in_ideal p1_gt1 q1_gt1.
-exists uv => // x y; rewrite -[r in r.[y]](hornerC _ x%:P) Dr.
+exists uv => // x y; rewrite -[r in r.[y] = _](hornerC _ x%:P) Dr.
 by rewrite !(hornerE, horner_comp).
 Qed.
 
 Lemma div_annihilant_neq0 p q : p != 0 -> q.[0] != 0 -> div_annihilant p q != 0.
 Proof.
-have factorX u: u != 0 -> root u 0 -> exists2 v, v != 0 & u = v * 'X.
+have factorX (S : nzRingType) (u : {poly S}) :
+    u != 0 -> root u 0 -> exists2 v, v != 0 & u = v * 'X.
   move=> nz_u /factor_theorem[v]; rewrite subr0 => Du; exists v => //.
   by apply: contraNneq nz_u => v0; rewrite Du v0 mul0r.
 have nzX: 'X != 0 := monic_neq0 (monicX _); have rootC0 := root_polyC _ 0.
