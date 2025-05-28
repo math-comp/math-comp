@@ -2333,7 +2333,6 @@ HB.factory Record isMonoidMorphism (R S : pzSemiRingType) (f : R -> S) := {
 }.
 HB.builders Context R S f of isMonoidMorphism R S f.
 
-HB.about isUMagmaMorphism.Build.
 HB.instance Definition _ := isUMagmaMorphism.Build R S f rmorphism_subproof. 
 
 HB.end.
