@@ -2374,7 +2374,7 @@ Lemma rmorph_sum I r (P : pred I) E :
 Proof. exact: raddf_sum. Qed.
 
 Lemma rmorphism_monoidP : monoid_morphism f.
-Proof. exact: monoid_morphism_subproof. Qed.
+Proof. exact: gmulfM1. Qed.
 #[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
       note="use `rmorphism_monoidP` instead")]
 Definition rmorphismMP : multiplicative f :=
@@ -5669,7 +5669,7 @@ Section multiplicative.
 Context (R : pzSemiRingType) (S : pred R) (U : SubPzSemiRing.type S).
 Notation val := (val : U -> R).
 #[export]
-HB.instance Definition _ := isMonoidMorphism.Build U R val valM_subproof.
+HB.instance Definition _ := isMonoidMorphism.Build U R val (gmulfM1 val).
 Lemma val1 : val 1 = 1. Proof. exact: rmorph1. Qed.
 Lemma valM : {morph val : x y / x * y}. Proof. exact: rmorphM. Qed.
 Lemma valM1 : monoid_morphism val. Proof. exact: valM_subproof. Qed.

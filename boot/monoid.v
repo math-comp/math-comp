@@ -761,6 +761,10 @@ HB.structure Definition UMagmaMorphism (G H : baseUMagmaType) :=
 Definition monoid_morphism (G H : baseUMagmaType) (f : G -> H) : Prop :=
    (f 1 = 1) * {morph f : x y / x * y}.
 
+Lemma gmulfM1
+  {G H : baseUMagmaType} (f : UMagmaMorphism.type G H) : monoid_morphism f.
+Proof. exact (gmulf1 , gmulfM). Qed.
+
 HB.factory Record isUMagmaMorphism (G H : baseUMagmaType) (f : G -> H) := {
   monoid_morphism_subproof : monoid_morphism f
 }.
