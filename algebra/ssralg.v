@@ -5626,10 +5626,22 @@ End Predicates.
 
 End FieldPred.
 
-HB.mixin Record isSubPzSemiRing (R : pzSemiRingType) (S : pred R) U
+#[short(type="subPzSemiRingType")]
+HB.structure Definition SubPzSemiRing (R:pzSemiRingType) (S : pred R) :=
+  {U of SubNmodule R S U & SubMonoid R S U & PzSemiRing U}.
+
+HB.factory Record isSubPzSemiRing (R : pzSemiRingType) (S : pred R) U
     of SubNmodule R S U & PzSemiRing U := {
   valM_subproof : monoid_morphism (val : U -> R);
 }.
+
+HB.builders
+  Context (R : pzSemiRingType) (S : pred R) U of isSubPzSemiRing R S U.
+
+HB.instance Definition _ := isSubMagma.Build R S U valM_subproof.2.
+HB.instance Definition _ := isSubBaseUMagma.Build R S U valM_subproof.1.
+
+HB.end.
 
 Module isSubSemiRing.
 #[deprecated(since="mathcomp 2.4.0",
@@ -5641,9 +5653,6 @@ End isSubSemiRing.
              note="Use isSubPzSemiRing instead.")]
 Notation isSubSemiRing R S U := (isSubPzSemiRing R S U) (only parsing).
 
-#[short(type="subPzSemiRingType")]
-HB.structure Definition SubPzSemiRing (R : pzSemiRingType) (S : pred R) :=
-  { U of SubNmodule R S U & PzSemiRing U & isSubPzSemiRing R S U }.
 
 #[short(type="subNzSemiRingType")]
 HB.structure Definition SubNzSemiRing (R : nzSemiRingType) (S : pred R) :=
