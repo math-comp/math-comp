@@ -903,21 +903,22 @@ HB.structure Definition ZMagma :=
   {V of BaseZMagma V & MonoidisMulLaw__on__BaseZMagma_zeroMul V}.
 *)
 
-(*WORKAROUND: defining this structure is necessary to avoid the bug exposed in
-HB#wrapping tests/MinimalWrapBugs/structVS2mixin.v*)
-#[short(type="biMagmaType")]
-HB.structure Definition BiMagma :=
-  {V of Magma V & BaseAddMagma V}.
+(* WORKAROUND: defining this structure is necessary to avoid the bug exposed in
+HB#wrapping tests/MinimalWrapBugs/structVS2mixin.v. Moreover doing this directly at the Nmodule&Monoid level avoid a bug (possibly the same?) while defining substructure *)
+
+#[short(type="BasePzSemiRingType")]
+HB.structure Definition BasePzSemiRing :=
+  {R of Nmodule R & Monoid R}.
 
 #[wrapper]
 HB.mixin Record MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd
-  V of BiMagma V := {
+  V of BasePzSemiRing V := {
   private : Monoid.isAddLaw V mul add
 }.
 
 #[short(type="pzSemiRingType")]
 HB.structure Definition PzSemiRing :=
-  { R of Nmodule R & Monoid R
+  { R of BasePzSemiRing R
        & MonoidisMulLaw__on__BaseZMagma_zeroMul R
        & MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd R}.
 
