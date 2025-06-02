@@ -204,7 +204,7 @@ HB.mixin Record SemiGroupisCommutativeLaw__on__BaseAddMagma_add
   private : SemiGroup.isCommutativeLaw V add
 }.
 
-#[short(type="addMagmaType")]
+#[export, short(type="addMagmaType")]
 HB.structure Definition AddMagma :=
   { V of BaseAddMagma V
       &  SemiGroupisCommutativeLaw__on__BaseAddMagma_add V}.
@@ -254,7 +254,7 @@ HB.mixin Record SemiGroupisLaw__on__BaseAddMagma_add V of BaseAddMagma V := {
   private : SemiGroup.isLaw V add
 }.
 
-#[short(type="addSemigroupType")]
+#[export, short(type="addSemigroupType")]
 HB.structure Definition AddSemigroup :=
   {V of AddMagma V & SemiGroupisLaw__on__BaseAddMagma_add V}.
 
@@ -383,7 +383,7 @@ HB.mixin Record MonoidisMonoidLaw__on__BaseAddUMagma_addZero
   private : Monoid.isMonoidLaw V zero add
 }.
 
-#[short(type="addUMagmaType")]
+#[export, short(type="addUMagmaType")]
 HB.structure Definition AddUMagma
   :={V of Choice V
         & AddMagma V
@@ -456,7 +456,11 @@ HB.instance Definition _ := AddMagma_isAddSemigroup.Build V addrA.
 
 HB.end.
 
+(*BUG(?): How do I export the canonical projection this generate?
+Workaround in AllExports*)
 HB.saturate (@add _).
+
+
 
 Module AddUMagmaExports.
 Bind Scope ring_scope with AddUMagma.sort.
@@ -1225,7 +1229,11 @@ Notation "[ 'SubChoice_isSubZmodule' 'of' U 'by' <: ]" :=
 End SubExports.
 HB.export SubExports.
 
-Module AllExports. HB.reexport. End AllExports.
+Module AllExports.
+  HB.reexport.
+  Canonical Algebra_add__canonical__Monoid_Law.
+  Canonical Algebra_add__canonical__Monoid_ComLaw.
+End AllExports.
 
 End Algebra.
 

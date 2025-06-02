@@ -916,7 +916,7 @@ HB.mixin Record MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd
   private : Monoid.isAddLaw V mul add
 }.
 
-#[short(type="pzSemiRingType")]
+#[export, short(type="pzSemiRingType")]
 HB.structure Definition PzSemiRing :=
   { R of BasePzSemiRing R
        & MonoidisMulLaw__on__BaseZMagma_zeroMul R
@@ -1008,7 +1008,7 @@ HB.mixin Record PzSemiRing_isNonZero R of PzSemiRing R := {
   oner_neq0 : @one R != 0
 }.
 
-#[short(type="nzSemiRingType")]
+#[export, short(type="nzSemiRingType")]
 HB.structure Definition NzSemiRing :=
   { R of PzSemiRing_isNonZero R & PzSemiRing R }.
 
@@ -2913,7 +2913,7 @@ Proof. by rewrite linearZ /= rmorph1. Qed.
 
 End LRMorphismTheory.
 
-#[wrapper]
+#[export, wrapper]
 HB.mixin Record SemiGroupIsCommutativeLaw__on__PzSemiRing_mul
   R of PzSemiRing R := {
   private : SemiGroup.isCommutativeLaw R (@mul R)
@@ -2940,7 +2940,7 @@ End SemiRing_hasCommutativeMul.
 Notation SemiRing_hasCommutativeMul R :=
   (PzSemiRing_hasCommutativeMul R) (only parsing).
 
-#[short(type="comPzSemiRingType")]
+#[export, short(type="comPzSemiRingType")]
 HB.structure Definition ComPzSemiRing :=
   {R of PzSemiRing R & PzSemiRing_hasCommutativeMul R}.
 
@@ -2972,7 +2972,7 @@ HB.builders Context R of Nmodule_isComPzSemiRing R.
   HB.instance Definition _ := PzSemiRing_hasCommutativeMul.Build R mulrC.
 HB.end.
 
-#[short(type="comNzSemiRingType")]
+#[export, short(type="comNzSemiRingType")]
 HB.structure Definition ComNzSemiRing :=
   {R of NzSemiRing R & PzSemiRing_hasCommutativeMul R}.
 

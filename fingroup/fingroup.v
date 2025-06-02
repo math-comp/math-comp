@@ -193,6 +193,7 @@ Reserved Notation "[ 'min' G | gP & gQ ]"
 (* be to define a class for infinite groups, which could  *)
 (* share all of the algebraic laws.                       *)
 
+(*TODO: use wrappers?*)
 HB.mixin Record isMulBaseGroup G := {
   mulg_subdef : G -> G -> G;
   oneg_subdef : G;
