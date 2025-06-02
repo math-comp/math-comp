@@ -555,7 +555,7 @@ Lemma size_poly_prod_leq (I : finType) (P : pred I) (F : I -> {poly R}) :
   size (\prod_(i | P i) F i) <= (\sum_(i | P i) size (F i)).+1 - #|P|.
 Proof.
 rewrite -sum1_card.
-elim/big_rec3: _ => [|i n m p _ IHp]; first by rewrite size_poly1.
+elim/big_rec3: _ => [|i n p m _ IHp]; first by rewrite size_poly1.
 have [-> | nz_p] := eqVneq p 0; first by rewrite mulr0 size_poly0.
 rewrite (leq_trans (size_polyMleq _ _)) // subnS -!subn1 leq_sub2r //.
 rewrite -addnS -addnBA ?leq_add2l // ltnW // -subn_gt0 (leq_trans _ IHp) //.
@@ -1206,7 +1206,7 @@ Lemma hornerM_comm p q x : comm_poly q x -> (p * q).[x] = p.[x] * q.[x].
 Proof.
 move=> comm_qx.
 elim/poly_ind: p => [|p c IHp]; first by rewrite !(simp, horner0).
-rewrite mulrDl hornerD hornerCM -mulrA -commr_polyX mulrA hornerMX.
+rewrite mulrDl [in LHS]hornerD [in LHS]hornerCM -mulrA -commr_polyX mulrA hornerMX.
 by rewrite {}IHp -mulrA -comm_qx mulrA -mulrDl hornerMXaddC.
 Qed.
 
@@ -1615,7 +1615,7 @@ Qed.
 Lemma derivM p q : (p * q)^`() = p^`() * q + p * q^`().
 Proof.
 elim/poly_ind: p => [|p b IHp]; first by rewrite !(mul0r, add0r, derivC).
-rewrite mulrDl -mulrA -commr_polyX mulrA -[_ * 'X]addr0 raddfD /= !derivMXaddC.
+rewrite mulrDl -mulrA -commr_polyX mulrA -[_ * 'X in LHS]addr0 raddfD /= !derivMXaddC.
 by rewrite deriv_mulC IHp !mulrDl -!mulrA !commr_polyX !addrA.
 Qed.
 
@@ -2637,7 +2637,7 @@ Lemma coef0_prod_XsubC (ps : seq R) :
   (\prod_(p <- ps) ('X - p%:P))`_0 =
   (-1) ^+ (size ps) * \prod_(p <- ps) p.
 Proof.
-rewrite coef_prod_XsubC// subn0; congr GRing.mul.
+rewrite coef_prod_XsubC// subn0; congr mul.
 transitivity (\sum_(I in [set setT : {set 'I_(size ps)}]) \prod_(i in I) ps`_i).
   apply: congr_big =>// i/=.
   apply/idP/set1P => [/eqP cardE | ->]; last by rewrite cardsT card_ord.
@@ -2755,7 +2755,7 @@ Proof. by rewrite !rootE horner_comp. Qed.
 Lemma deriv_comp p q : (p \Po q) ^`() = (p ^`() \Po q) * q^`().
 Proof.
 elim/poly_ind: p => [|p c IHp]; first by rewrite !(deriv0, comp_poly0) mul0r.
-rewrite comp_poly_MXaddC derivD derivC derivM IHp derivMXaddC comp_polyD.
+rewrite comp_poly_MXaddC [in LHS]derivD [in LHS]derivC derivM IHp derivMXaddC comp_polyD.
 by rewrite comp_polyM comp_polyX addr0 addrC mulrAC -mulrDl.
 Qed.
 
@@ -2879,7 +2879,7 @@ Lemma size_prod_seq (I : eqType)  (s : seq I) (F : I -> {poly R}) :
     (forall i, i \in s -> F i != 0) ->
   size (\prod_(i <- s) F i) = ((\sum_(i <- s) size (F i)).+1 - size s)%N.
 Proof.
-move=> nzF; rewrite big_tnth size_prod; last by move=> i; rewrite nzF ?mem_tnth.
+move=> nzF; rewrite [in LHS]big_tnth size_prod; last by move=> i; rewrite nzF ?mem_tnth.
 by rewrite cardT /= size_enum_ord [in RHS]big_tnth.
 Qed.
 
