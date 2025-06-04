@@ -1411,7 +1411,7 @@ Proof.
 case/SCN_P: SCN_A => /andP[sAG nAG] {4} <-.
 rewrite subsetI {1}setICA comm_subG ?subsetIl //= gen_subG.
 apply/subsetP=> w /imset2P[u v].
-rewrite -groupV -(groupV _ v) /= astabQR //= -/Z !inE groupV.
+rewrite /= -groupV -(groupV _ v) /= astabQR //= -/Z !inE /= (groupV 'C(Z)).
 case/and4P=> cZu _ _ sRuZ /and4P[cZv' _ _ sRvZ] ->{w}.
 apply/centP=> a Aa; rewrite /commute -!mulgA (commgCV v) (mulgA u).
 rewrite (centP cZu); last by rewrite (subsetP sRvZ) ?mem_commg ?set11 ?groupV.

@@ -976,7 +976,7 @@ have invUV: {in <[u]> & <[u]> :* v, forall z t, z ^ t = z^-1}.
   by rewrite conjgM {2}/conjg commuteX2 // mulKg conjXg uv expgVn.
 have oU': {in <[u]> :* v, forall t, #[t] = 2}.
   move=> t Uvt; apply: nt_prime_order => //; last first.
-    by case: eqP Uvt => // ->; rewrite defUv !inE group1.
+    by case: eqP Uvt => // ->; rewrite defUv !inE !group1.
   case/rcosetP: Uvt => z Uz ->{t}; rewrite expgS {1}(conjgC z) -mulgA.
   by rewrite invUV ?rcoset_refl // mulKg -(expgS v 1) -ov expg_order.
 have defU: n > 2 -> {in G, forall z, #[z] = q -> <[z]> = <[u]>}.
@@ -1345,7 +1345,7 @@ have defU: {in G, forall z, #[z] = q -> <[z]> = <[u]>}.
   apply: contraLR (n_gt3) => notUz; rewrite -leqNgt -(ltn_predK n_gt3) ltnS.
   rewrite -(@dvdn_Pexp2l 2) // -/q -{}oz order_dvdn expgM (expgS z).
   have{Gz notUz} [z' Uz' ->{z}]: exists2 z', z' \in <[u]> & z = z' * v.
-    by apply/rcosetP; rewrite defUv inE -cycle_subG notUz Gz.
+    by apply/rcosetP; rewrite defUv inE -(cycle_subG _ <[u]>) notUz Gz.
   rewrite {2}(conjgC z') invUV ?rcoset_refl // mulgA -{2}vV mulgK -expgS.
   by rewrite prednK // -expgM mulnC def2r -order_dvdn /q -ou order_dvdG.
 have{invUV} invXX': {in X & G :\: X, forall z t, z ^ t = z ^+ r.-1}.
