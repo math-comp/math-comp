@@ -13,6 +13,10 @@ with builtins; with (import <nixpkgs> {}).lib;
   ## to serve as a basis for nix-shell edit this
   shell-attribute = "mathcomp-single";
 
+  ## Set this when the package has no rocqPackages version yet
+  ## (either in nixpkgs or in .nix/rocq-overlays)
+  no-rocq-yet = true;
+
   ## Indicate the relative location of your _CoqProject
   ## If not specified, it defaults to "_CoqProject"
   coqproject = "_CoqProject";
@@ -89,6 +93,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       bignums.override.version = "master";
       rocq-elpi.override.version = "master";
       rocq-elpi.override.elpi-version = "2.0.7";
+      hierarchy-builder.override.version = "master";
       mathcomp.job = false;
     }; coqPackages = common-bundles // {
       coq.override.version = "master";
