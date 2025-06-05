@@ -483,7 +483,7 @@ rewrite -imset_coset; apply/imsetP; exists (x * y^-1); last first.
 rewrite /= inE groupMl // ?(groupV, subsetP sRG) //=.
 apply/centP=> z Az; apply/commgP/eqP/set1P.
 rewrite -[[set 1]](coprime_TIg coRA) inE {1}commgEl commgEr /= -/R.
-rewrite invMg -mulgA invgK groupMl // conjMg mulgA -commgEl.
+rewrite invMg -mulgA invgK (@groupMl _ R) // conjMg mulgA -commgEl.
 rewrite groupMl ?cAxR // memJ_norm ?(groupV, subsetP nRA) // Ry /=.
 by rewrite groupMr // conjVg groupV conjgM -mem_conjg -def_Ax memJ_conjg.
 Qed.

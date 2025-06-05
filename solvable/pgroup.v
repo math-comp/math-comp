@@ -1173,7 +1173,7 @@ Lemma pseries_catr_id pi1s pi2s gT (G : {group gT}) :
 Proof.
 elim/last_ind: pi2s => [//|pi2s pi IHpi] in G *.
 have Epis: pseries pi2s (pseries (pi1s ++ rcons pi2s pi) G) = pseries pi2s G.
-  by rewrite -cats1 catA -2!IHpi pseries_catl_id.
+  by rewrite -cats1 catA -2!IHpi /= pseries_catl_id.
 apply: (@quotient_inj _ (pseries_group pi2s G)).
 - by rewrite /= -Epis /(_ <| _) pseries_norm2 -cats1 pseries_sub_catl.
 - by rewrite /= /(_ <| _) pseries_norm2 -cats1 pseries_sub_catl.
