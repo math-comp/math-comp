@@ -853,8 +853,8 @@ rewrite linear_sum -big_split; apply: eq_bigr => x _ /=.
 by rewrite !cfunE mulrDl -mulrA.
 Qed.
 
-HB.instance Definition _ xi := GRing.isSemilinear.Build algC _ _ _ (cfdotr xi)
-  (GRing.semilinear_linear (cfdotr_is_linear xi)).
+HB.instance Definition _ xi := GRing.isLinear.Build algC _ _ _ (cfdotr xi)
+  (cfdotr_is_linear xi).
 
 Lemma cfdot0l xi : '[0, xi] = 0.
 Proof. by rewrite -cfdotrE linear0. Qed.
@@ -1400,8 +1400,8 @@ Lemma cfRes_is_linear : linear cfRes.
 Proof.
 by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock mulrnAr mulrnDl.
 Qed.
-HB.instance Definition _ := GRing.isSemilinear.Build algC _ _ _ cfRes
-  (GRing.semilinear_linear cfRes_is_linear).
+HB.instance Definition _ := GRing.isLinear.Build algC _ _ _ cfRes
+  cfRes_is_linear.
 
 Lemma cfRes_cfun1 : cfRes 1 = 1.
 Proof.
@@ -1513,8 +1513,8 @@ Fact cfMorph_is_linear : linear cfMorph.
 Proof.
 by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock mulrnAr -mulrnDl.
 Qed.
-HB.instance Definition _ := GRing.isSemilinear.Build algC _ _ _ cfMorph
-  (GRing.semilinear_linear cfMorph_is_linear).
+HB.instance Definition _ := GRing.isLinear.Build algC _ _ _ cfMorph
+  cfMorph_is_linear.
 
 Fact cfMorph_is_monoid_morphism : monoid_morphism cfMorph.
 Proof.
@@ -2256,8 +2256,8 @@ move=> c phi psi; apply/cfunP=> x; rewrite !cfunElock; case: ifP => _.
 rewrite mulrnAr -mulrnDl !(mulrCA c) -!mulrDr [c * _]mulr_sumr -big_split /=.
 by congr (_ * (_ * _) *+ _); apply: eq_bigr => y; rewrite !cfunE mulrA mulrDl.
 Qed.
-HB.instance Definition _ := GRing.isSemilinear.Build algC _ _ _ cfInd
-  (GRing.semilinear_linear cfInd_is_linear).
+HB.instance Definition _ := GRing.isLinear.Build algC _ _ _ cfInd
+  cfInd_is_linear.
 
 End Def.
 

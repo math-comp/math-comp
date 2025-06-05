@@ -336,9 +336,8 @@ move=> a u v; apply/polyP=> i; rewrite coefD coefZ !coef_poly.
 case: ifP => lti; last by rewrite mulr0 addr0.
 by rewrite linearP mulrA -mulrDl mulr_algl.
 Qed.
-HB.instance Definition _ :=
-  GRing.isSemilinear.Build F0 L {poly L} _ Fadjoin_poly
-    (GRing.semilinear_linear Fadjoin_poly_is_linear).
+HB.instance Definition _ := GRing.isLinear.Build F0 L {poly L} _ Fadjoin_poly
+  Fadjoin_poly_is_linear.
 
 Lemma size_minPoly : size minPoly = n.+1.
 Proof. by rewrite size_polyDl ?size_polyXn // size_polyN ltnS size_poly. Qed.
