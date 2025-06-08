@@ -340,7 +340,8 @@ Lemma compl_pHall pi K H G :
 Proof.
 move=> hallK; apply/complP/idP=> [[tiKH mulKH] | hallH].
   have [_] := andP hallK; rewrite /pHall pnatNK -{3}(invGid G) -mulKH mulG_subr.
-  by rewrite invMG !indexMg -indexgI andbC -indexgI setIC tiKH !indexg1.
+  rewrite invMG !indexMg -indexgI andbC.
+  by rewrite -[#|K : H|]indexgI setIC tiKH !indexg1.
 have [[sKG piK _] [sHG pi'H _]] := (and3P hallK, and3P hallH).
 have tiKH: K :&: H = 1 := coprime_TIg (pnat_coprime piK pi'H).
 split=> //; apply/eqP; rewrite eqEcard mul_subG //= TI_cardMg //.
@@ -1173,7 +1174,7 @@ Lemma pseries_catr_id pi1s pi2s gT (G : {group gT}) :
 Proof.
 elim/last_ind: pi2s => [//|pi2s pi IHpi] in G *.
 have Epis: pseries pi2s (pseries (pi1s ++ rcons pi2s pi) G) = pseries pi2s G.
-  by rewrite -cats1 catA -2!IHpi pseries_catl_id.
+  by rewrite -cats1 catA -[RHS]IHpi -[LHS]IHpi /= [pseries (_ ++ _) _]pseries_catl_id.
 apply: (@quotient_inj _ (pseries_group pi2s G)).
 - by rewrite /= -Epis /(_ <| _) pseries_norm2 -cats1 pseries_sub_catl.
 - by rewrite /= /(_ <| _) pseries_norm2 -cats1 pseries_sub_catl.

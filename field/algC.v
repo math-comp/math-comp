@@ -246,12 +246,12 @@ Proof.
   rewrite addrA addrC !addrA -(addrC (y * conj y)) !addrA.
   move: (y * _ + _) => u; rewrite -!addrA leB opprD addrACA {u}subrr add0r -leB.
   rewrite {}le_sqr ?posD //.
-    by rewrite rmorphD !rmorphM /= !conjK addrC mulrC (mulrC x).
+    by rewrite rmorphD !rmorphM /= !conjK addrC (mulrC x) (mulrC y).
   rewrite -mulr2n -mulr_natr exprMn normK -natrX mulr_natr sqrrD mulrACA.
   rewrite -rmorphM (mulrC y x) addrAC leB mulrnA mulr2n opprD addrACA.
   rewrite subrr addr0 {2}(mulrC x) rmorphM mulrACA -opprB addrAC -sqrrB -sqrMi.
   apply/posP; exists (i * (x * conj y - y * conj x)); congr (_ * _).
-  rewrite !(rmorphM, rmorphB) iJ !conjK mulNr -mulrN opprB.
+  rewrite !(rmorphM, rmorphB) iJ !conjK mulNr -[in RHS]mulrN opprB.
   by rewrite (mulrC x) (mulrC y).
 Qed.
 

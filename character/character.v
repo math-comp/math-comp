@@ -1290,7 +1290,7 @@ have [Gx | notGx] := boolP (x \in G); last first.
 transitivity ((#|'C_G[repr (y ^: G)]|%:R *: (X' *m X)) i_y i_x).
   rewrite scalemxAl !mxE; apply: eq_bigr => k _; rewrite !mxE mulrC -!mulrA.
   by rewrite !class_IirrK ?mem_classes // !cfun_repr mulVKf ?neq0CG.
-rewrite mulmx1C // !mxE -!divg_index !(index_cent1, =^~ indexgI).
+rewrite mulmx1C // !mxE -!divg_index; do 2!rewrite -indexgI index_cent1.
 rewrite (class_eqP (mem_repr y _)) ?class_refl // mulr_natr.
 rewrite (can_in_eq class_IirrK) ?mem_classes //.
 have [-> | not_yGx] := eqVneq; first by rewrite class_refl.
@@ -2558,7 +2558,7 @@ have GHx: coset H x \in (G / H)%g by apply: mem_quotient.
 move: (second_orthogonality_relation (coset H x) GHx).
 rewrite mulrb class_refl => <-.
 rewrite -2!(eq_bigr _ (fun _ _ => normCK _)) sum_norm_irr_quo // -subr_ge0.
-rewrite (bigID (fun i => H \subset cfker 'chi[G]_i)) //= addrC addrK.
+rewrite (bigID (fun i => H \subset cfker 'chi[G]_i)) //= [X in X + _]addrC addrK.
 by apply: sumr_ge0 => i _; rewrite normCK mul_conjC_ge0.
 Qed.
 
