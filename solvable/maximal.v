@@ -1411,7 +1411,7 @@ Proof.
 case/SCN_P: SCN_A => /andP[sAG nAG] {4} <-.
 rewrite subsetI {1}setICA comm_subG ?subsetIl //= gen_subG.
 apply/subsetP=> w /imset2P[u v].
-rewrite -groupV -(groupV _ v) /= astabQR //= -/Z !inE groupV.
+rewrite /= -groupV -(groupV _ v) /= astabQR //= -/Z !inE (groupV 'C(Z)).
 case/and4P=> cZu _ _ sRuZ /and4P[cZv' _ _ sRvZ] ->{w}.
 apply/centP=> a Aa; rewrite /commute -!mulgA (commgCV v) (mulgA u).
 rewrite (centP cZu); last by rewrite (subsetP sRvZ) ?mem_commg ?set11 ?groupV.
@@ -1429,7 +1429,7 @@ have [-> | ntG] := eqsVneq G 1; first by rewrite !(setIidPl (sub1G _)) Ohm1.
 move=> p_odd pG; have{ntG} [p_pr _ _] := pgroup_pdiv pG ntG.
 case/SCN_P: SCN_A => /andP[sAG nAG] _; have pA := pgroupS sAG pG.
 have pCGZ : p.-group 'C_G(Z) by rewrite (pgroupS _ pG) // subsetIl.
-rewrite {pCGZ}(OhmE 1 pCGZ) gen_subG; apply/subsetP=> x; rewrite 3!inE -andbA.
+rewrite {pCGZ}(OhmE 1 pCGZ) gen_subG; apply/subsetP=> x; rewrite /= 3!inE -andbA.
 rewrite -!cycle_subG => /and3P[sXG cZX xp1] /=; have cXX := cycle_abelian x.
 have nZX := cents_norm cZX; have{nAG} nAX := subset_trans sXG nAG.
 pose XA := <[x]> <*> A; pose C := 'C(<[x]> / Z | 'Q); pose CA := A :&: C.

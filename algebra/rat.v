@@ -31,6 +31,7 @@ Import Order.TTheory GRing.Theory Num.Theory.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
+Set SsrMatching LegacyFoUnif.
 
 Reserved Notation "[ 'rat' x // y ]" (format "[ 'rat'  x  //  y ]").
 Reserved Notation "n %:Q" (left associativity, format "n %:Q").

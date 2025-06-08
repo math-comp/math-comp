@@ -398,7 +398,7 @@ have sDFf: G \subset 'dom (coset (F2 _ (f @* G)) \o f).
   by rewrite -sub_morphim_pre ?subsetIl // nF2.
 pose K := 'ker (restrm sDFf (coset (F2 _ (f @* G)) \o f)).
 have sFK: 'ker (restrm sDF (coset (F2 _ G))) \subset K.
-  rewrite {}/K !ker_restrm ker_comp /= subsetI subsetIl !ker_coset /=.
+  rewrite {}/K (ker_restrm sDF) (ker_restrm sDFf) ker_comp /= subsetI subsetIl !ker_coset /=.
   by rewrite -sub_morphim_pre ?subsetIl // morphimIdom ?morphimF.
 have sOF := gFsub F1 (G / F2 _ G); have sGG: G \subset G by [].
 rewrite -sub_quotient_pre; last first.
@@ -406,11 +406,11 @@ rewrite -sub_quotient_pre; last first.
 suffices im_fact H : F2 _ G \subset gval H -> H \subset G ->
   factm sFK sGG @* (H / F2 _ G) = f @* H / F2 _ (f @* G).
 - rewrite -2?im_fact ?gFmod_closed ?gFsub //.
-    by rewrite cosetpreK morphimF /= ?morphim_restrm ?setIid.
+    by rewrite cosetpreK morphimF /= 1?morphim_restrm 1?setIid.
   by rewrite -sub_quotient_pre ?normG //= trivg_quotient sub1G.
-move=> sFH sHG; rewrite -(morphimIdom _ (H / _)) /= {2}morphim_restrm setIid.
-rewrite -morphimIG ?ker_coset // -(morphim_restrm sDF) morphim_factm.
-by rewrite morphim_restrm morphim_comp -quotientE morphimIdom.
+move=> sFH sHG; rewrite -(morphimIdom _ (H / _)) /= {2}(morphim_restrm sDF) /= setIid.
+rewrite -morphimIG ?ker_coset // -(morphim_restrm sDF) morphim_factm /=.
+by rewrite (morphim_restrm sDFf) morphim_comp -quotientE morphimIdom.
 Qed.
 
 Canonical gFmod_igFun := [igFun by gFmod_closed & gFmod_cont].

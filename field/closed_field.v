@@ -276,6 +276,8 @@ Fixpoint redivp_rec_loop (q : {poly F}) sq cq
       if n is n1.+1 then redivp_rec_loop q sq cq k.+1 qq1 r1 n1 else
         (k.+1, qq1, r1).
 
+Set SsrMatching LegacyFoUnif.
+
 Lemma redivp_rec_loopTP (k : nat * polyF * polyF -> fF) :
   (forall c qq r e,  qf_eval e (k (c,qq,r))
     = qf_eval e (k (c, lift (eval_poly e qq), lift (eval_poly e r))))
@@ -302,6 +304,9 @@ symmetry; rewrite Pn; last by move=> *; rewrite Pk.
 rewrite Pk ?(eval_lift,eval_mulpT,eval_amulXnT,eval_sumpT,eval_opppT).
 by rewrite mul_polyC ?(mul0r,add0r).
 Qed.
+
+Unset SsrMatching LegacyFoUnif.
+
 
 Lemma redivp_rec_loopT_qf (q : polyF) (sq : nat) (cq : tF)
   (c : nat) (qq r : polyF) (n : nat) :
