@@ -33,3 +33,5 @@ sylow.v
 -arg -w -arg -ambiguous-paths
 # remove this one when requiring Rocq >= 9.0
 -arg -w -arg -overwriting-delimiting-key
+# handle the following one when requiring Rocq >= 9.2
+-arg -w -arg -unknown-option
