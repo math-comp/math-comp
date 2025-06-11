@@ -88,7 +88,7 @@ with builtins; with (import <nixpkgs> {}).lib;
        };
   in {
     "coq-master" = { rocqPackages = {
-      rocq-core.override.version = "master";
+      rocq-core.override.version = "gares:ssrpat-FO-ignore-imparg";
       stdlib.override.version = "master";
       bignums.override.version = "master";
       rocq-elpi.override.version = "master";
