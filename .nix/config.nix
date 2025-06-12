@@ -107,6 +107,9 @@ with builtins; with (import <nixpkgs> {}).lib;
       mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
       ssprove.job = false;
       mathcomp-infotheo.job = false;  # not compatible with master
+      mathcomp-analysis.override.version = "gares:ssrpat-FO-ignore-imparg";
+      mathcomp-classical.override.version = "gares:ssrpat-FO-ignore-imparg";
+      odd-order.override.version = "gares:ssrpat-FO-ignore-imparg";
     }; };
     "coq-9.0".coqPackages = common-bundles // {
       coq.override.version = "9.0";
