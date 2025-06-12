@@ -96,7 +96,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       hierarchy-builder.override.version = "master";
       mathcomp.job = false;
     }; coqPackages = common-bundles // {
-      coq.override.version = "master";
+      coq.override.version = "gares:ssrpat-FO-ignore-imparg";
       stdlib.override.version = "master";
       bignums.override.version = "master";
       coq-elpi.override.version = "master";
