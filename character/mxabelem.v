@@ -590,8 +590,8 @@ rewrite rVabelemD rVabelemZ conjMg conjXg.
 by rewrite abelem_rV_M ?abelem_rV_X ?groupX ?memJ_norm // natr_Zp.
 Qed.
 HB.instance Definition _ (g : [subg G]) :=
-  GRing.isSemilinear.Build 'F_p rVn rVn _ (abelem_mx_fun g)
-    (GRing.semilinear_linear (abelem_mx_linear_proof g)).
+  GRing.isLinear.Build 'F_p rVn rVn _ (abelem_mx_fun g)
+    (abelem_mx_linear_proof g).
 
 Let rVabelemJmx v x : x \in G -> rV_E (v *m r x) = (rV_E v) ^ x.
 Proof.
