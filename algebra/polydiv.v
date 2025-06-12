@@ -2339,7 +2339,7 @@ apply/andP; split.
 case: (Bezoutp p q) => [[u v]] /andP [].
 move/(dvdp_comp_poly r) => Huv _.
 rewrite (dvdp_trans _ Huv) // comp_polyD !comp_polyM.
-by rewrite dvdp_add // dvdp_mull // (dvdp_gcdl, dvdp_gcdr).
+by rewrite dvdp_add // dvdp_mull //; [ exact: dvdp_gcdl | exact: dvdp_gcdr].
 Qed.
 
 Lemma coprimep_comp_poly r p q : coprimep p q -> coprimep (p \Po r) (q \Po r).
