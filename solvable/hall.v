@@ -198,7 +198,7 @@ have sylR: q.-Sylow(K) R.
   by rewrite group_modr ?joing_subr ?(setIidPl _) // defBG join_subG sM_AG.
 have [mx] := Sylow_trans sylM sylR.
 rewrite /= -/K defK; case/imset2P=> m x Mm Gx ->{mx}.
-rewrite conjsgM conjGid {m Mm}// => defR.
+rewrite conjsgM (conjGid Mm) {m Mm} => defR.
 have sNG: N \subset G := subsetIl _ _.
 have pNG: N \proper G by rewrite /proper sNG subsetI subxx nMG.
 have nNA: A \subset 'N(N) by rewrite normsI ?norms_norm.
@@ -483,7 +483,7 @@ rewrite -imset_coset; apply/imsetP; exists (x * y^-1); last first.
 rewrite /= inE groupMl // ?(groupV, subsetP sRG) //=.
 apply/centP=> z Az; apply/commgP/eqP/set1P.
 rewrite -[[set 1]](coprime_TIg coRA) inE {1}commgEl commgEr /= -/R.
-rewrite invMg -mulgA invgK groupMl // conjMg mulgA -commgEl.
+rewrite invMg -mulgA invgK (@groupMl _ R) // conjMg mulgA -commgEl.
 rewrite groupMl ?cAxR // memJ_norm ?(groupV, subsetP nRA) // Ry /=.
 by rewrite groupMr // conjVg groupV conjgM -mem_conjg -def_Ax memJ_conjg.
 Qed.

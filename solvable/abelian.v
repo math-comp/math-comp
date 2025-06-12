@@ -1051,7 +1051,7 @@ Lemma isog_abelem p : p.-abelem G = p.-abelem H.
 Proof. by case/isogP: isoGH => f injf <-; rewrite injm_abelem. Qed.
 
 Lemma isog_grank : 'm(G) = 'm(H).
-Proof. by case/isogP: isoGH => f injf <-; rewrite injm_grank. Qed.
+Proof. by case/isogP: isoGH => f injf  <-; rewrite [RHS]injm_grank. Qed.
 
 Lemma isog_p_rank p : 'r_p(G) = 'r_p(H).
 Proof. by case/isogP: isoGH => f injf <-; rewrite injm_p_rank. Qed.
@@ -1855,6 +1855,7 @@ Qed.
 
 Definition homocyclic A := abelian A && constant (abelian_type A).
 
+
 Lemma homocyclic_Ohm_Mho n p G :
   p.-group G -> homocyclic G -> 'Ohm_n(G) = 'Mho^(logn p (exponent G) - n)(G).
 Proof.
@@ -1868,7 +1869,7 @@ move: e => e in p_e *; elim: b => /= [|x b IHb] in G defG *.
   by rewrite -defG big_nil (trivgP (Ohm_sub _ _)) (trivgP (Mho_sub _ _)).
 case/andP=> /eqP ox e_b; rewrite big_cons in defG.
 rewrite -(Ohm_dprod _ defG) -(Mho_dprod _ defG).
-case/dprodP: defG => [[_ H _ defH] _ _ _]; rewrite defH IHb //; congr (_ \x _).
+case/dprodP: defG => [[_ H _ defH] _ _ _]; rewrite defH (IHb H) //; congr (_ \x _).
 by rewrite -ox in p_e *; rewrite (Ohm_p_cycle _ p_e) (Mho_p_cycle _ p_e).
 Qed.
 

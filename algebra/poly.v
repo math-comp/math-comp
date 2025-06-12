@@ -1458,7 +1458,7 @@ Qed.
 
 Lemma polyOverC c : (c%:P \in polyOver S) = (c \in S).
 Proof.
-by rewrite qualifE /= polyseqC; case: eqP => [->|] /=; rewrite ?andbT ?rpred0.
+by rewrite [LHS]qualifE /= polyseqC; case: eqP => [->|] /=; rewrite ?andbT ?rpred0.
 Qed.
 
 Fact polyOver_addr_closed : addr_closed (polyOver S).

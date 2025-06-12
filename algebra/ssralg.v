@@ -3995,7 +3995,7 @@ elim: f e => //=; do [
 case eq_ji: (j == i); first rewrite (eqP eq_ji).
   by split=> [] f_ x; move: (f_ x); rewrite set_set_nth eqxx.
 split=> [] f_ x; move: (IHf (set_nth 0 e j x)) (f_ x);
-  by rewrite set_set_nth eq_sym eq_ji; tauto.
+  by rewrite set_set_nth 1?[i == j]eq_sym eq_ji; tauto.
 Qed.
 
 (* Boolean test selecting terms in the language of rings *)

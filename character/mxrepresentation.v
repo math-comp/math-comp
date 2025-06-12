@@ -2671,7 +2671,7 @@ Lemma morphim_mx_abs_irr :
   mx_absolutely_irreducible rG = mx_absolutely_irreducible rGf.
 Proof.
 have fG_onto: f @* G \subset restrm sGD f @* G.
-  by rewrite morphim_restrm setIid.
+  by rewrite (morphim_restrm sGD) setIid.
 rewrite -(morphpre_mx_abs_irr _ fG_onto); congr (_ && (_ == _)).
 by rewrite /enveloping_algebra_mx /= morphpre_restrm (setIidPl _).
 Qed.
@@ -5345,7 +5345,7 @@ Proof.
 rewrite ltnNge mxminpoly_linear_is_scalar => Anscal.
 pose Af := map_mx gen A; exists (kermx (Af - groot%:M)).
 rewrite submx1 kermx_centg_module /=; last first.
-  apply/centgmxP=> z Gz; rewrite mulmxBl mulmxBr scalar_mxC.
+  apply/centgmxP=> z Gz; rewrite mulmxBl [RHS]mulmxBr [in RHS]scalar_mxC.
   by rewrite -!map_mxM 1?(centgmxP cGA).
 rewrite andbC mxrank_ker -subn_gt0 mxrank1 subKn ?rank_leq_row // lt0n.
 rewrite mxrank_eq0 subr_eq0; case: eqP => [defAf | _].

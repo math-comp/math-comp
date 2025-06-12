@@ -466,7 +466,7 @@ rewrite mulq_def !mulq_subdefE; case: (fracqP x) => /= [|u fx u_neq0].
   by rewrite !mul0r !mul1r fracq0 frac0q.
 case: (fracqP y) => /= [|v fy v_neq0].
   by rewrite !mulr0 !mulr1 fracq0 frac0q.
-by rewrite ![_ * (v * _)]mulrACA fracqMM ?mulf_neq0.
+by rewrite ![_ * (v * _)]mulrACA [RHS]fracqMM ?mulf_neq0.
 Qed.
 
 Fact ratzM : {morph ratz : x y / x * y >-> mulq x y}.
@@ -1201,7 +1201,7 @@ have dvdXn (r : {poly _}) : size r != 1%N -> r %| c *: 'X^n -> r`_0 = 0.
     move=> /(congr1 (size \o val))/eqP.
     by rewrite /= !size_scale// size_polyXn (negPf rN1).
   move=> /(congr1 (fun p : {poly _} => p`_0))/eqP.
-  by rewrite !coefZ coefXn ltn_eqF// mulr0 mulf_eq0 (negPf u1N0) => /eqP.
+  by rewrite !coefZ coefXn [0 == _]ltn_eqF// mulr0 mulf_eq0 (negPf u1N0)=> /eqP.
 suff : ((p : int) ^+ 2 %| q`_0)%Z by rewrite (negPf Ndvd_pq0).
 have := c_neq0; rewrite q_eq coefM big_ord1.
 rewrite lead_coefM rmorphM mulf_eq0 negb_or => /andP[lpfN0 qfN0].
