@@ -68,7 +68,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import Order.TTheory GroupScope GRing.Theory Num.Theory.
+Local Open Scope group_scope.
+Import Order.TTheory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 Section AlgC.

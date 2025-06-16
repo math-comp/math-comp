@@ -52,7 +52,8 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Local Notation "n %:R" := (n %:R%R).
-Import GroupScope GRing.Theory.
+Local Open Scope group_scope.
+Import GRing.Theory.
 
 Reserved Notation "''Mod_' m" (at level 8, m at level 2, format "''Mod_' m").
 Reserved Notation "''D_' m" (at level 8, m at level 2, format "''D_' m").

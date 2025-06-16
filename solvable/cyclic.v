@@ -38,7 +38,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope GRing.Theory.
+Local Open Scope group_scope.
+Import GRing.Theory.
 
 (***********************************************************************)
 (*  Cyclic groups.                                                     *)
