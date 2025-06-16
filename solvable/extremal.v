@@ -782,7 +782,7 @@ have sqrB i j: (u ^+ i * v ^+ j) ^+ 2 = (if odd j then v ^+ 2 else u ^+ i.*2).
   rewrite expgS; case: ifP => odd_j.
     rewrite {1}(conjgC (u ^+ i)) conjXg uvj odd_j expgVn -mulgA mulKg.
     rewrite -expgD addnn -(odd_double_half j) odd_j doubleD addnC /=.
-    by rewrite -(expg_mod _ v4) -!muln2 -mulnA modnMDl.
+    by rewrite -[LHS](expg_mod _ v4) -!muln2 -mulnA modnMDl.
   rewrite {2}(conjgC (u ^+ i)) conjXg uvj odd_j mulgA -(mulgA (u ^+ i)).
   rewrite -expgD addnn -(odd_double_half j) odd_j -2!mul2n mulnA.
   by rewrite expgM v4 expg1n mulg1 -expgD addnn.

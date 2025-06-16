@@ -137,7 +137,7 @@ Lemma cycleMsub a b :
 Proof.
 move=> cab co_ab; apply/subsetP=> _ /cycleP[k ->].
 apply/cycleP; exists (chinese #[a] #[b] k 0); symmetry.
-rewrite expgMn // -expg_mod_order chinese_modl // expg_mod_order.
+rewrite expgMn // -[in LHS]expg_mod_order chinese_modl // expg_mod_order.
 by rewrite /chinese addn0 -mulnA mulnCA expgM expg_order expg1n mulg1.
 Qed.
 
@@ -848,7 +848,7 @@ Lemma has_prim_root_subproof (F : fieldType) (n : nat) (rs : seq F)
     (sG_Vg : left_inverse sG_1 sG_V sG_M) :
   has n.-primitive_root rs.
 Proof.
-pose ssMG : isMulGroup (seq_sub rs) := isMulGroup.Build (seq_sub rs) sG_Ag sG_1g sG_Vg.
+pose ssMG : Finite_isGroup (seq_sub rs) := isMulGroup.Build (seq_sub rs) sG_Ag sG_1g sG_Vg.
 pose gT : finGroupType := HB.pack (seq_sub rs) ssMG.
 have /cyclicP[x gen_x]: @cyclic gT setT.
   apply: (@field_mul_group_cyclic gT [set: _] F r) => // x _.

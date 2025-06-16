@@ -49,7 +49,7 @@ Fact cfConjg_subproof :
 Proof.
 apply: intro_class_fun => [x z _ Gz | x notGx].
   have [nGy | _] := ifP; last by rewrite cfunJgen.
-  by rewrite -conjgM conjgC conjgM cfunJgen // memJ_norm ?groupV.
+  by rewrite -conjgM conjgC conjgM [LHS]cfunJgen // memJ_norm ?groupV.
 by rewrite cfun0gen //; case: ifP => // nGy; rewrite memJ_norm ?groupV.
 Qed.
 Definition cfConjg := Cfun 1 cfConjg_subproof.

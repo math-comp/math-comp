@@ -73,11 +73,12 @@ Proof. by rewrite commgMJ conjg_mulR mulgA. Qed.
 
 Lemma Hall_Witt_identity x y z :
   [~ x, y^-1, z] ^ y * [~ y, z^-1, x] ^ z * [~ z, x^-1, y] ^ x = 1.
-Proof. (* gsimpl *)
+Proof.
+  (* gsimpl *)
 pose a x y z : gT := x * z * y ^ x.
 suffices{x y z} hw_aux x y z: [~ x, y^-1, z] ^ y = (a x y z)^-1 * (a y z x).
-  by rewrite !hw_aux 2!mulgA !mulgK mulVg.
-by rewrite commgEr conjMg -conjgM -conjg_Rmul 2!invMg conjgE !mulgA.
+  by rewrite !hw_aux; move: a {hw_aux} => a; rewrite 2!mulgA !mulgK mulVg.
+by rewrite commgEr conjMg -conjgM -conjg_Rmul conjgE !invMg !mulgA.
 Qed.
 
 (* the following properties are useful for studying p-groups of class 2 *)
@@ -279,8 +280,8 @@ Lemma commgAC G x y z : x \in G -> y \in G -> z \in G ->
 Proof.
 move=> Gx Gy Gz cyz /centsP cRxG; pose cx' u := [~ x^-1, u].
 have xR3 u v: [~ x, u, v] = x^-1 * (cx' u * cx' v) * x ^ (u * v).
-  rewrite mulgA -conjg_mulR conjVg [cx' v]commgEl mulgA -invMg.
-  by rewrite -mulgA conjgM -conjMg -!commgEl.
+  rewrite [X in X * _]mulgA -conjg_mulR conjVg [cx' v]commgEl.
+  by rewrite [X in X * _]mulgA -invMg -mulgA conjgM -conjMg -!commgEl.
 suffices RxGcx' u: u \in G -> cx' u \in [~: [set x], G].
   by rewrite !xR3 {}cyz; congr (_ * _ * _); rewrite cRxG ?RxGcx'.
 move=> Gu; suffices/groupMl <-: [~ x, u] ^ x^-1 \in [~: [set x], G].
@@ -296,7 +297,7 @@ Proof.
 move=> nGH /centsP cKH nKG; rewrite commGC gen_subG centsC.
 apply/centsP=> x Kx _ /imset2P[y z Hy Gz ->]; red.
 rewrite mulgA -[x * _]cKH ?groupV // -!mulgA; congr (_ * _).
-rewrite (mulgA x) (conjgC x) (conjgCV z) 3!mulgA; congr (_ * _).
+rewrite (mulgA x) (conjgC x) (conjgCV z) 2!mulgA [in RHS]mulgA; congr (_ * _).
 by rewrite -2!mulgA (cKH y) // -mem_conjg (normsP nKG).
 Qed.
 
