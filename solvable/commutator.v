@@ -260,7 +260,8 @@ Proof.
 move/eqP/comm3G1P=> cGHK /eqP/comm3G1P cHKG.
 apply/eqP/comm3G1P=> x y z Kx Gy Hz; symmetry.
 rewrite -(conj1g y) -(Hall_Witt_identity y^-1 z x) invgK.
-by rewrite cGHK ?groupV // cHKG ?groupV // !conj1g !mul1g conjgKV.
+rewrite [X in X ^ z]cGHK ?groupV // [X in X ^ x]cHKG ?groupV //.
+by rewrite !conj1g !mul1g conjgKV.
 Qed.
 
 Lemma der1_joing_cycles (x y : gT) : 
