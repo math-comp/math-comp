@@ -290,7 +290,7 @@ have [cycF ffulF]: cyclic F /\ [faithful F, on 'Ohm_1(G) | [Aut G]].
     rewrite 3!inE /= -2!val_eqE /= val_Fp_nat // [1 %% _]modn_small // defG1.
     apply/idP/subsetP=> [ma1 x1i | ma1].
       case/cycleP=> i ->{x1i}; rewrite inE gactX // -[_ a]def_m //.
-      by rewrite -(expg_mod_order x1) ox1 (eqP ma1).
+      by rewrite -[in eqbLHS](expg_mod_order x1) ox1 (eqP ma1).
     have:= ma1 x1 (cycle_id x1); rewrite inE -[_ a]def_m //.
     by rewrite (eq_expg_mod_order x1 _ 1) ox1 (modn_small p_gt1).
   have card_units_Fp: #|[set: {unit 'F_p}]| = p.-1.
