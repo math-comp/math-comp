@@ -199,8 +199,34 @@ End BaseFinGroup_isGroup.
              note="Use Algebra.StarMonoid_isGroup instead.")]
 Notation BaseFinGroup_isGroup G := (StarMonoid_isGroup G) (only parsing).
 
-#[arg_sort, short(type="baseFinGroupType")]
-HB.structure Definition BaseFinGroup := { G of StarMonoid G & Finite G }.
+#[arg_sort, short(type="finStarMonoidType")]
+HB.structure Definition FinStarMonoid := { G of StarMonoid G & Finite G }.
+
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.finStarMonoidType instead.")]
+Notation baseFinGroupType := finStarMonoidType (only parsing).
+
+Module BaseFinGroup.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.FinStarMonoid.sort instead.")]
+Notation sort := (FinStarMonoid.sort) (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.FinStarMonoid.arg_sort instead.")]
+Notation arg_sort := (FinStarMonoid.arg_sort) (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.FinStarMonoid.on instead.")]
+Notation on M := (FinStarMonoid.on M) (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.FinStarMonoid.copy instead.")]
+Notation copy M N := (FinStarMonoid.copy M N) (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.FinStarMonoid.clone instead.")]
+Notation clone M N := (FinStarMonoid.clone M N) (only parsing).
+End BaseFinGroup.
+
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use FinStarMonoid instead.")]
+Notation BaseFinGroup R := (FinStarMonoid R) (only parsing).
 
 Module BaseFinGroupExports.
 Bind Scope group_scope with BaseFinGroup.arg_sort.
@@ -244,6 +270,9 @@ Module isMulGroup.
              note="Use Finite_isGroup.Build instead.")]
 Notation Build G := (Finite_isGroup.Build G) (only parsing).
 End isMulGroup.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Finite_isGroup instead.")]
+Notation isMulGroup G := (Finite_isGroup G) (only parsing).
 
 HB.builders Context G of Finite_isGroup G.
 
@@ -570,20 +599,36 @@ Definition sort (gT : baseFinGroupType) := {set gT}.
 End GroupSet.
 Identity Coercion GroupSet_of_sort : GroupSet.sort >-> set_of.
 
-Module Type GroupSetBaseGroupSig.
+Module Type GroupSetBaseFinGroupSig.
 Definition sort (gT : baseFinGroupType) := BaseFinGroup.arg_sort {set gT}.
+End GroupSetBaseFinGroupSig.
+
+Module MakeGroupSetBaseFinGroup (Gset_base : GroupSetBaseFinGroupSig).
+Identity Coercion of_sort : Gset_base.sort >-> BaseFinGroup.arg_sort.
+End MakeGroupSetBaseFinGroup.
+
+Module Export GroupSetBaseFinGroup := MakeGroupSetBaseFinGroup GroupSet.
+
+Module Type GroupSetMagmaSig.
+Definition sort (gT : baseFinGroupType) := Magma.sort {set gT}.
+End GroupSetMagmaSig.
+
+Module MakeGroupSetMagma (Gset_base : GroupSetMagmaSig).
+Identity Coercion of_sort : Gset_base.sort >-> Magma.sort.
+End MakeGroupSetMagma.
+
+Module Export GroupSetMagma := MakeGroupSetMagma GroupSet.
+
+Module Type GroupSetBaseGroupSig.
+Definition sort (gT : baseFinGroupType) := BaseGroup.sort {set gT}.
 End GroupSetBaseGroupSig.
 
 Module MakeGroupSetBaseGroup (Gset_base : GroupSetBaseGroupSig).
-Identity Coercion of_sort : Gset_base.sort >-> BaseFinGroup.arg_sort.
-Definition of_sort_magma (gT : baseFinGroupType) (G : Gset_base.sort gT) := G : Magma.sort {set gT}.
-Coercion of_sort_magma : Gset_base.sort >-> Magma.sort.
-
-Definition of_sort_baseGroup (gT : baseFinGroupType) (G : Gset_base.sort gT) := G : BaseGroup.sort {set gT}.
-Coercion of_sort_baseGroup : Gset_base.sort >-> BaseGroup.sort.
+Identity Coercion of_sort : Gset_base.sort >-> BaseGroup.sort.
 End MakeGroupSetBaseGroup.
 
 Module Export GroupSetBaseGroup := MakeGroupSetBaseGroup GroupSet.
+
 HB.instance Definition _ gT : Finite (GroupSet.sort gT) :=
    Finite.class {set gT}.
 
@@ -1248,7 +1293,7 @@ Proof. exact: mulg_subl group1. Qed.
 Lemma mulG_subr A : A \subset (G * A).
 Proof. exact: mulg_subr group1. Qed.
 
-Lemma mulGid : G * G = G :> {set gT}.
+Lemma mulGid : G * G = G.
 Proof.
 by apply/eqP; rewrite eqEsubset mulG_subr andbT; case/andP: (valP G).
 Qed.
@@ -1321,7 +1366,7 @@ Proof. by move=> G_P; elim/big_ind: _ => //; apply: groupM. Qed.
 
 (* Inverse is an anti-morphism. *)
 
-Lemma invGid : G^-1 = G :> {set gT}.
+Lemma invGid : G^-1 = G.
 Proof. by apply/setP=> x; rewrite inE groupV. Qed.
 
 Lemma inv_subG A : (A^-1 \subset G) = (A \subset G).
@@ -1607,16 +1652,16 @@ Proof. by move/(congr1 (setU 1)); rewrite !setD1K. Qed.
 Lemma invMG G H : (G * H)^-1 = H * G.
 Proof. by rewrite invMg !invGid. Qed.
 
-Lemma mulSGid G H : H \subset G -> H * G = G :> {set gT}.
+Lemma mulSGid G H : H \subset G -> H * G = G.
 Proof. exact: mulSgGid (group1 H). Qed.
 
-Lemma mulGSid G H : H \subset G -> G * H = G :> {set gT}.
+Lemma mulGSid G H : H \subset G -> G * H = G.
 Proof. exact: mulGSgid (group1 H). Qed.
 
-Lemma mulGidPl G H : reflect (G * H = G :> {set gT}) (H \subset G).
+Lemma mulGidPl G H : reflect (G * H = G) (H \subset G).
 Proof. by apply: (iffP idP) => [|<-]; [apply: mulGSid | apply: mulG_subr]. Qed.
 
-Lemma mulGidPr G H : reflect (G * H = H :> {set gT}) (G \subset H).
+Lemma mulGidPr G H : reflect (G * H = H) (G \subset H).
 Proof. by apply: (iffP idP) => [|<-]; [apply: mulSGid | apply: mulG_subl]. Qed.
 
 Lemma comm_group_setP G H : reflect (commute G H) (group_set (G * H)).
