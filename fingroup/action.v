@@ -125,7 +125,7 @@ Unset Printing Implicit Defensive.
 Declare Scope action_scope.
 Declare Scope groupAction_scope.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Section ActionDef.
 
@@ -501,10 +501,10 @@ Implicit Types S : {set rT}.
 Lemma act1 x : to x 1 = x.
 Proof. by apply: (act_inj to 1); rewrite -actMin ?mulg1. Qed.
 
-Lemma actKin : {in D, right_loop invg to}.
+Lemma actKin : {in D, right_loop inv to}.
 Proof. by move=> a Da /= x; rewrite -actMin ?groupV // mulgV act1. Qed.
 
-Lemma actKVin : {in D, rev_right_loop invg to}.
+Lemma actKVin : {in D, rev_right_loop inv to}.
 Proof. by move=> a Da /= x; rewrite -{2}(invgK a) actKin ?groupV. Qed.
 
 Lemma setactVin S a : a \in D -> to^* S a^-1 = to^~ a @^-1: S.
@@ -894,10 +894,10 @@ Implicit Type S : {set rT}.
 Lemma actM x a b : to x (a * b) = to (to x a) b.
 Proof. by rewrite actMin ?inE. Qed.
 
-Lemma actK : right_loop invg to.
+Lemma actK : right_loop inv to.
 Proof. by move=> a; apply: actKin; rewrite inE. Qed.
 
-Lemma actKV : rev_right_loop invg to.
+Lemma actKV : rev_right_loop inv to.
 Proof. by move=> a; apply: actKVin; rewrite inE. Qed.
 
 Lemma actX x a n : to x (a ^+ n) = iter n (to^~ a) x.

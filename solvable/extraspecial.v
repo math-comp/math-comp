@@ -44,7 +44,8 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Local Notation "n %:R" := (n %:R%R).
-Import GroupScope GRing.Theory.
+Local Open Scope group_scope.
+Import GRing.Theory.
 
 Reserved Notation "p ^{1+2}" (format "p ^{1+2}").
 Reserved Notation "p ^{1+2* n }" (n at level 2, format "p ^{1+2* n }").

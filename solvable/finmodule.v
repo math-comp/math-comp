@@ -47,7 +47,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope GRing.Theory FinRing.Theory.
+Import GRing.Theory FinRing.Theory.
+Local Open Scope group_scope.
 Local Open Scope ring_scope.
 
 Module FiniteModule.
@@ -61,10 +62,14 @@ Bind Scope ring_scope with fmod_of.
 
 Section OneFinMod.
 
-(* TODO: understand why FinGroup has to be changed to BaseFinGroup here. *)
-Let f2sub (gT : finGroupType) (A : {group gT}) (abA : abelian A) :=
-  fun u : fmod_of abA => let : Fmod x Ax := u in Subg Ax : BaseFinGroup.arg_sort _.
-Local Coercion f2sub : fmod_of >-> BaseFinGroup.arg_sort.
+(* TODO: understand why FinGroup has to be changed to Magma here. *)
+Let f2sub_magma (gT : finGroupType) (A : {group gT}) (abA : abelian A) :=
+  fun u : fmod_of abA => let : Fmod x Ax := u in Subg Ax : Magma.sort _.
+Local Coercion f2sub_magma : fmod_of >-> Magma.sort.
+
+Let f2sub_baseGroup (gT : finGroupType) (A : {group gT}) (abA : abelian A) :=
+  fun u : fmod_of abA => let : Fmod x Ax := u in Subg Ax : BaseGroup.sort _.
+Local Coercion f2sub_baseGroup : fmod_of >-> BaseGroup.sort.
 
 Variables (gT : finGroupType) (A : {group gT}) (abelA : abelian A).
 Local Notation fmodA := (fmod_of abelA).
@@ -72,7 +77,7 @@ Implicit Types (x y z : gT) (u v w : fmodA).
 
 Let sub2f (s : [subg A]) := Fmod abelA (valP s).
 
-Definition fmval u := val (f2sub u).
+Definition fmval u := val (f2sub_magma u).
 #[export]
 HB.instance Definition _ := [isSub for fmval].
 Local Notation valA := (val: fmodA -> gT) (only parsing).
@@ -234,7 +239,8 @@ Arguments FiniteModule.actrK {gT A abelA} x.
 Arguments FiniteModule.actrKV {gT A abelA} x.
 
 (* Still allow ring notations, but give priority to groups now. *)
-Import FiniteModule GroupScope.
+Local Open Scope group_scope.
+Import FiniteModule .
 
 Section Gaschutz.
 
@@ -286,10 +292,11 @@ have actrH a x: x \in G -> (a ^@ rH x = a ^@ x)%R.
   case/rcosetP: (HrH x) => b /(fmodK abelH) <- ->; rewrite conjgM.
   by congr (_ ^ _); rewrite conjgE -fmvalN -!fmvalA (addrC a) addKr.
 have mu_Pmul x y z: x \in P -> mu (x * y) z = mu y z.
-  move=> Px; congr fmod; rewrite -mulgA !(rH_Pmul x) ?rPmul //.
+  move=> Px; congr fmod; rewrite -(mulgA x) !(rH_Pmul x) ?rPmul //.
   by rewrite -mulgA invMg -mulgA mulKg.
 have mu_Hmul x y z: x \in G -> y \in H -> mu x (y * z) = mu x z.
-  move=> Gx Hy; congr fmod; rewrite (mulgA x) (conjgCV x) -mulgA 2?rH_Hmul //.
+  move=> Gx Hy; congr fmod; rewrite (mulgA x) (conjgCV x) -(mulgA _ x).
+  rewrite rH_Hmul // [in LHS]rH_Hmul //.
   by rewrite -mem_conjg (normP _) ?nHG.
 have{mu_Hmul} nu_Hmul y z: y \in H -> nu (y * z) = nu z.
   move=> Hy; apply: eq_bigr => _ /rcosetsP[x Gx ->]; apply: mu_Hmul y z _ Hy.
@@ -300,7 +307,7 @@ have cocycle_mu: {in G & &, forall x y z,
   apply: (mulgI (rH x * rH y * rH z)).
   rewrite -(actrH _ _ Gz) addrC [in LHS]fmvalA fmvalJ ?nHG ?GrH //.
   rewrite mulgA -(mulgA _ (rH z)) -conjgC mulgA -!rHmul ?groupM //.
-  by rewrite mulgA -mulgA -2!(mulgA (rH x)) -!rHmul ?groupM.
+  by rewrite mulgA -(mulgA x) -2!(mulgA (rH x)) -!rHmul ?groupM.
 move: mu => mu in rHmul mu_Pmul cocycle_mu nu nu_Hmul.
 have{cocycle_mu} cocycle_nu: {in G &, forall y z,
   nu z + nu y ^@ z = mu y z *+ #|G : P| + nu (y * z)%g}%R.
@@ -317,8 +324,8 @@ have{cocycle_mu} cocycle_nu: {in G &, forall y z,
 move: nu => nu in nu_Hmul cocycle_nu.
 pose f x := rH x * val (nu x *+ m)%R.
 have{cocycle_nu} fM: {in G &, {morph f : x y / x * y}}.
-  move=> x y Gx Gy; rewrite /f ?rHmul // -3!mulgA; congr (_ * _).
-  rewrite (mulgA _ (rH y)) (conjgC _ (rH y)) -mulgA; congr (_ * _).
+  move=> x y Gx Gy; rewrite /f ?rHmul // -2!mulgA -[RHS]mulgA; congr (_ * _).
+  rewrite (mulgA _ (rH y)) (conjgC _ (rH y)) -[RHS]mulgA; congr (_ * _).
   rewrite -fmvalJ ?actrH ?nHG ?GrH // -!fmvalA actZr -mulrnDl.
   rewrite -(addrC (nu y)) cocycle_nu // mulrnDl !fmvalA; congr (_ * _).
   by rewrite !fmvalZ expgK ?fmodP.
@@ -452,7 +459,8 @@ case: repr_rcosetP => h1 Hh1; case: repr_rcosetP => h2 Hh2.
 have: H :* (x * g) \in rcosets H G by rewrite -rcosetE imset_f ?groupM.
 have: H :* x \in rcosets H G by rewrite -rcosetE imset_f.
 case/mem_rX/rcosetP=> h3 Hh3 -> /mem_rX/rcosetP[h4 Hh4 ->].
-rewrite -!(mulgA h1) -!(mulgA h2) -!(mulgA h3) !(mulKVg, invMg).
+rewrite -!(mulgA h1) -!(mulgA h2) -!(mulgA h3).
+do 3 rewrite invMg mulKVg.
 by rewrite addrC -!zmodMgE -!morphM ?groupM ?groupV // -!mulgA !mulKg.
 Qed.
 
