@@ -1008,6 +1008,25 @@ Lemma ler_sum_nat (m n : nat) (F G : nat -> R) :
   \sum_(m <= i < n) F i <= \sum_(m <= i < n) G i.
 Proof. by move=> le_FG; rewrite !big_nat ler_sum. Qed.
 
+Lemma ltr_sum I (r : seq I) (P : pred I) (F G : I -> R) :
+  has P r ->
+  (forall i : I, P i -> F i < G i) ->
+  \sum_(i <- r | P i) F i < \sum_(i <- r | P i) G i.
+Proof.
+rewrite -big_filter -[ltRHS]big_filter -size_filter_gt0.
+case: filter (filter_all P r) => //= x {}r /andP[Px Pr] _ ltFG.
+rewrite !big_cons ltr_leD// ?ltFG// -(all_filterP Pr) !big_filter.
+by rewrite ler_sum => // i Pi; rewrite ltW ?ltFG.
+Qed.
+
+Lemma ltr_sum_nat (m n : nat) (F G : nat -> R) :
+  (m < n)%N -> (forall i, (m <= i < n)%N -> F i < G i) ->
+  \sum_(m <= i < n) F i < \sum_(m <= i < n) G i.
+Proof.
+move=> lt_mn i; rewrite big_nat [ltRHS]big_nat ltr_sum//.
+by apply/hasP; exists m; rewrite ?mem_index_iota leqnn lt_mn.
+Qed.
+
 Lemma psumr_eq0 (I : eqType) (r : seq I) (P : pred I) (F : I -> R) :
     (forall i, P i -> 0 <= F i) ->
   (\sum_(i <- r | P i) (F i) == 0) = (all (fun i => (P i) ==> (F i == 0)) r).
@@ -1473,6 +1492,17 @@ Proof. by move=> hx hy; rewrite -{1}[y]mulr1 ler_wnM2l. Qed.
 
 Lemma mulr_ile1 x y : 0 <= x -> 0 <= y -> x <= 1 -> y <= 1 -> x * y <= 1.
 Proof. by move=> *; rewrite (@le_trans _ _ y) ?ler_piMl. Qed.
+
+Lemma prodr_ile1 (s : seq R) :
+  (forall x, x \in s -> 0 <= x <= 1) -> \prod_(j <- s) j <= 1.
+Proof.
+elim: s => [_ | y s ih xs01]; rewrite ?big_nil// big_cons.
+have /andP[y0 y1] : 0 <= y <= 1 by rewrite xs01// mem_head.
+rewrite mulr_ile1 ?andbT//; last first.
+  by rewrite ih// => e xs; rewrite xs01// in_cons xs orbT.
+rewrite big_seq prodr_ge0// => x xs.
+by have := xs01 x; rewrite inE xs orbT => /(_ _)/andP[].
+Qed.
 
 Lemma mulr_ilt1 x y : 0 <= x -> 0 <= y -> x < 1 -> y < 1 -> x * y < 1.
 Proof. by move=> *; rewrite (@le_lt_trans _ _ y) ?ler_piMl // ltW. Qed.
