@@ -37,7 +37,7 @@ From mathcomp Require Export monoid.
 (*      group_scope (delimiter %g) for point operations and set constructs.   *)
 (*      Group_scope (delimiter %G) for explicit {group gT} structures.        *)
 (* These scopes should not be opened globally, although group_scope is often  *)
-(* opened locally in group-theory files (via Import GroupScope).              *)
+(* opened locally in group-theory files.                                      *)
 (*   As {group gT} is both a subtype and an interface structure for {set gT}, *)
 (* the fact that a given G : {set gT} is a group can (and usually should) be  *)
 (* inferred by type inference with canonical structures. This means that all  *)
@@ -139,9 +139,6 @@ Declare Scope Group_scope.
 
 Delimit Scope Group_scope with G.
 
-(* This module can be imported to open the scope for group element *)
-(* operations locally to a file, without exporting the Open to     *)
-(* clients of that file (as Open would do).                        *)
 Module GroupScope.
 Open Scope group_scope.
 End GroupScope.
@@ -181,49 +178,28 @@ Reserved Notation "[ 'min' A 'of' G | gP & gQ ]"
 Reserved Notation "[ 'min' G | gP & gQ ]"
   (format "[ '[hv' 'min'  G '/ '  |  gP '/ '  &  gQ ']' ]").
 
-(* We split the group axiomatisation in two. We define a  *)
-(* class of "base groups", which are basically monoids    *)
-(* with an involutive antimorphism, from which we derive  *)
-(* the class of groups proper. This allows us to reuse    *)
-(* much of the group notation and algebraic axioms for    *)
-(* group subsets, by defining a base group class on them. *)
-(*   We use class/mixins here rather than telescopes to   *)
-(* be able to interoperate with the type coercions.       *)
-(* Another potential benefit (not exploited here) would   *)
-(* be to define a class for infinite groups, which could  *)
-(* share all of the algebraic laws.                       *)
+Module isMulBaseGroup.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.isStarMonoid.Build instead.")]
+Notation Build G := (isStarMonoid.Build G) (only parsing).
+End isMulBaseGroup.
 
-HB.mixin Record isMulBaseGroup G := {
-  mulg_subdef : G -> G -> G;
-  oneg_subdef : G;
-  invg_subdef : G -> G;
-  mulgA_subproof : associative mulg_subdef ;
-  mul1g_subproof : left_id oneg_subdef  mulg_subdef ;
-  invgK_subproof : involutive invg_subdef ;
-  invMg_subproof : {morph invg_subdef  : x y / mulg_subdef  x y >-> mulg_subdef  y x}
-}.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.isStarMonoid instead.")]
+Notation isMulBaseGroup G := (isStarMonoid G) (only parsing).
 
-(* We want to use sort as a coercion class, both to infer         *)
-(* argument scopes properly, and to allow groups and cosets to    *)
-(* coerce to the base group of group subsets.                     *)
-(*   However, the return type of group operations should NOT be a *)
-(* coercion class, since this would trump the real (head-normal)  *)
-(* coercion class for concrete group types, thus spoiling the     *)
-(* coercion of A * B to pred_sort in x \in A * B, or rho * tau to *)
-(* ffun and Funclass in (rho * tau) x, when rho tau : perm T.     *)
-(*   Therefore we define an alias of sort for argument types, and *)
-(* make it the default coercion FinGroup.base_type >-> Sortclass  *)
-(* so that arguments of a functions whose parameters are of type, *)
-(* say, gT : finGroupType, can be coerced to the coercion class   *)
-(* of arg_sort. Care should be taken, however, to declare the     *)
-(* return type of functions and operators as FinGroup.sort gT     *)
-(* rather than gT, e.g., mulg : gT -> gT -> FinGroup.sort gT.     *)
-(* Note that since we do this here and in quotient.v for all the  *)
-(* basic functions, the inferred return type should generally be  *)
-(* correct.                                                       *)
+Module BaseFinGroup_isGroup.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.StarMonoid_isGroup.Build instead.")]
+Notation Build G := (StarMonoid_isGroup.Build G) (only parsing).
+End BaseFinGroup_isGroup.
+
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.StarMonoid_isGroup instead.")]
+Notation BaseFinGroup_isGroup G := (StarMonoid_isGroup G) (only parsing).
 
 #[arg_sort, short(type="baseFinGroupType")]
-HB.structure Definition BaseFinGroup := { G of isMulBaseGroup G & Finite G }.
+HB.structure Definition BaseFinGroup := { G of StarMonoid G & Finite G }.
 
 Module BaseFinGroupExports.
 Bind Scope group_scope with BaseFinGroup.arg_sort.
@@ -231,72 +207,65 @@ Bind Scope group_scope with BaseFinGroup.sort.
 End BaseFinGroupExports.
 HB.export BaseFinGroupExports.
 
-Module Notations.
-Section ElementOps.
-
-Variable T : baseFinGroupType.
-Notation rT := (BaseFinGroup.sort T).
-
-Definition oneg : rT := Eval unfold oneg_subdef in @oneg_subdef T.
-Definition mulg : T -> T -> rT := Eval unfold mulg_subdef in @mulg_subdef T.
-Definition invg : T -> rT := Eval unfold invg_subdef in @invg_subdef T.
-Definition expgn (x : T) n : rT := iterop n mulg x oneg.
-
-End ElementOps.
-Arguments expgn : simpl never.
-
-Notation "1" := (@oneg _) : group_scope.
-Notation "x1 * x2" := (mulg x1 x2) : group_scope.
-Notation "x ^-1" := (invg x) : group_scope.
-Notation "x ^+ n" := (expgn x n) : group_scope.
-Notation "x ^- n" := (x ^+ n)^-1 : group_scope.
-End Notations.
-HB.export Notations.
-
-HB.mixin Record BaseFinGroup_isGroup G of BaseFinGroup G := {
-  mulVg_subproof : left_inverse (@oneg G) (@invg _) (@mulg _)
-}.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.one instead.")]
+Notation oneg := one (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.mul instead.")]
+Notation mulg := mul (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.inv instead.")]
+Notation invg := inv (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.natexp instead.")]
+Notation expgn := natexp (only parsing).
 
 #[short(type="finGroupType")]
 HB.structure Definition FinGroup :=
-  { G of BaseFinGroup_isGroup G & BaseFinGroup G }.
+  { G of Group G & Finite G }.
 
 Module FinGroupExports.
 Bind Scope group_scope with FinGroup.sort.
 End FinGroupExports.
 HB.export FinGroupExports.
 
-HB.factory Record isMulGroup G of Finite G := {
-  mulg : G -> G -> G;
-  oneg : G;
-  invg : G -> G;
-  mulgA : associative mulg;
-  mul1g : left_id oneg mulg;
-  mulVg : left_inverse oneg invg mulg;
+HB.factory Record Finite_isGroup G of Finite G := {
+  mul : G -> G -> G;
+  one : G;
+  inv : G -> G;
+  mulgA : associative mul;
+  mul1g : left_id one mul;
+  mulVg : left_inverse one inv mul;
 }.
 
-HB.builders Context G of isMulGroup G.
+Module isMulGroup.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Finite_isGroup.Build instead.")]
+Notation Build G := (Finite_isGroup.Build G) (only parsing).
+End isMulGroup.
 
-Notation "1" := oneg.
-Infix "*" := mulg.
-Notation "x ^-1" := (invg x).
+HB.builders Context G of Finite_isGroup G.
 
-Lemma mk_invgK : involutive invg.
+Notation "1" := one.
+Infix "*" := mul.
+Notation "x ^-1" := (inv x).
+
+Lemma invgK : involutive inv.
 Proof.
 have mulV21 x: x^-1^-1 * 1 = x by rewrite -(mulVg x) mulgA mulVg mul1g.
 by move=> x; rewrite -[_ ^-1]mulV21 -(mul1g 1) mulgA !mulV21.
 Qed.
 
-Lemma mk_invMg : {morph invg : x y / x * y >-> y * x}.
+Lemma invMg : {morph inv : x y / x * y >-> y * x}.
 Proof.
-have mulgV x: x * x^-1 = 1 by rewrite -{1}[x]mk_invgK mulVg.
+have mulgV x: x * x^-1 = 1 by rewrite -{1}[x]invgK mulVg.
 move=> x y /=; rewrite -[y^-1 * _]mul1g -(mulVg (x * y)) -2!mulgA (mulgA y).
 by rewrite mulgV mul1g mulgV -(mulgV (x * y)) mulgA mulVg mul1g.
 Qed.
 
 HB.instance Definition _ :=
-  isMulBaseGroup.Build G mulgA mul1g mk_invgK mk_invMg.
-HB.instance Definition _ := BaseFinGroup_isGroup.Build G mulVg.
+  isStarMonoid.Build G mulgA mul1g invgK invMg.
+HB.instance Definition _ := StarMonoid_isGroup.Build G mulVg.
 
 HB.end.
 
@@ -304,282 +273,216 @@ HB.end.
 HB.instance Definition _ (T : baseFinGroupType) :
     Finite (BaseFinGroup.arg_sort T) := Finite.class T.
 
-(* Arguments of conjg are restricted to true groups to avoid an *)
-(* improper interpretation of A ^ B with A and B sets, namely:  *)
-(*       {x^-1 * (y * z) | y \in A, x, z \in B}                 *)
-Definition conjg (T : finGroupType) (x y : T) := y^-1 * (x * y).
-Notation "x1 ^ x2" := (conjg x1 x2) : group_scope.
-
-Definition commg (T : finGroupType) (x y : T) := x^-1 * x ^ y.
-Notation "[ ~ x1 , x2 , .. , xn ]" := (commg .. (commg x1 x2) .. xn)
-  : group_scope.
-
-Prenex Implicits mulg invg expgn conjg commg.
-
-Notation "\prod_ ( i <- r | P ) F" :=
-  (\big[mulg/1]_(i <- r | P%B) F%g) : group_scope.
-Notation "\prod_ ( i <- r ) F" :=
-  (\big[mulg/1]_(i <- r) F%g) : group_scope.
-Notation "\prod_ ( m <= i < n | P ) F" :=
-  (\big[mulg/1]_(m <= i < n | P%B) F%g) : group_scope.
-Notation "\prod_ ( m <= i < n ) F" :=
-  (\big[mulg/1]_(m <= i < n) F%g) : group_scope.
-Notation "\prod_ ( i | P ) F" :=
-  (\big[mulg/1]_(i | P%B) F%g) : group_scope.
-Notation "\prod_ i F" :=
-  (\big[mulg/1]_i F%g) : group_scope.
-Notation "\prod_ ( i : t | P ) F" :=
-  (\big[mulg/1]_(i : t | P%B) F%g) (only parsing) : group_scope.
-Notation "\prod_ ( i : t ) F" :=
-  (\big[mulg/1]_(i : t) F%g) (only parsing) : group_scope.
-Notation "\prod_ ( i < n | P ) F" :=
-  (\big[mulg/1]_(i < n | P%B) F%g) : group_scope.
-Notation "\prod_ ( i < n ) F" :=
-  (\big[mulg/1]_(i < n) F%g) : group_scope.
-Notation "\prod_ ( i 'in' A | P ) F" :=
-  (\big[mulg/1]_(i in A | P%B) F%g) : group_scope.
-Notation "\prod_ ( i 'in' A ) F" :=
-  (\big[mulg/1]_(i in A) F%g) : group_scope.
-
-Section PreGroupIdentities.
-
-Variable T : baseFinGroupType.
-Implicit Types x y z : T.
-Local Notation mulgT := (@mulg T).
-
-Lemma mulgA : associative mulgT.  Proof. exact: mulgA_subproof. Qed.
-Lemma mul1g : left_id 1 mulgT.  Proof. exact: mul1g_subproof. Qed.
-Lemma invgK : @involutive T invg. Proof. exact: invgK_subproof. Qed.
-Lemma invMg x y : (x * y)^-1 = y^-1 * x^-1. Proof. exact: invMg_subproof. Qed.
-
-Lemma invg_inj : @injective T T invg. Proof. exact: can_inj invgK. Qed.
-
-Lemma eq_invg_sym x y : (x^-1 == y) = (x == y^-1).
-Proof. by apply: (inv_eq invgK). Qed.
-
-Lemma invg1 : 1^-1 = 1 :> T.
-Proof. by apply: invg_inj; rewrite -{1}[1^-1]mul1g invMg invgK mul1g. Qed.
-
-Lemma eq_invg1 x : (x^-1 == 1) = (x == 1).
-Proof. by rewrite eq_invg_sym invg1. Qed.
-
-Lemma mulg1 : right_id 1 mulgT.
-Proof. by move=> x; apply: invg_inj; rewrite invMg invg1 mul1g. Qed.
-
-HB.instance Definition _ := Monoid.isLaw.Build T 1 mulgT mulgA mul1g mulg1.
-
-Lemma expgnE x n : x ^+ n = iterop n mulg x 1. Proof. by []. Qed.
-
-Lemma expg0 x : x ^+ 0 = 1. Proof. by []. Qed.
-Lemma expg1 x : x ^+ 1 = x. Proof. by []. Qed.
-
-Lemma expgS x n : x ^+ n.+1 = x * x ^+ n.
-Proof. by case: n => //; rewrite mulg1. Qed.
-
-Lemma expg1n n : 1 ^+ n = 1 :> T.
-Proof. by elim: n => // n IHn; rewrite expgS mul1g. Qed.
-
-Lemma expgD x n m : x ^+ (n + m) = x ^+ n * x ^+ m.
-Proof. by elim: n => [|n IHn]; rewrite ?mul1g // !expgS IHn mulgA. Qed.
-
-Lemma expgSr x n : x ^+ n.+1 = x ^+ n * x.
-Proof. by rewrite -addn1 expgD expg1. Qed.
-
-Lemma expgM x n m : x ^+ (n * m) = x ^+ n ^+ m.
-Proof.
-elim: m => [|m IHm]; first by rewrite muln0 expg0.
-by rewrite mulnS expgD IHm expgS.
-Qed.
-
-Lemma expgAC x m n : x ^+ m ^+ n = x ^+ n ^+ m.
-Proof. by rewrite -!expgM mulnC. Qed.
-
-Definition commute x y := x * y = y * x.
-
-Lemma commute_refl x : commute x x.
-Proof. by []. Qed.
-
-Lemma commute_sym x y : commute x y -> commute y x.
-Proof. by []. Qed.
-
-Lemma commute1 x : commute x 1.
-Proof. by rewrite /commute mulg1 mul1g. Qed.
-
-Lemma commuteM x y z : commute x y ->  commute x z ->  commute x (y * z).
-Proof. by move=> cxy cxz; rewrite /commute -mulgA -cxz !mulgA cxy. Qed.
-
-Lemma commuteX x y n : commute x y ->  commute x (y ^+ n).
-Proof.
-by move=> cxy; case: n; [apply: commute1 | elim=> // n; apply: commuteM].
-Qed.
-
-Lemma commuteX2 x y m n : commute x y -> commute (x ^+ m) (y ^+ n).
-Proof. by move=> cxy; apply/commuteX/commute_sym/commuteX. Qed.
-
-Lemma expgVn x n : x^-1 ^+ n = x ^- n.
-Proof. by elim: n => [|n IHn]; rewrite ?invg1 // expgSr expgS invMg IHn. Qed.
-
-Lemma expgMn x y n : commute x y -> (x * y) ^+ n  = x ^+ n * y ^+ n.
-Proof.
-move=> cxy; elim: n => [|n IHn]; first by rewrite mulg1.
-by rewrite !expgS IHn -mulgA (mulgA y) (commuteX _ (commute_sym cxy)) !mulgA.
-Qed.
-
-End PreGroupIdentities.
-
-#[global] Hint Resolve commute1 : core.
-Arguments invg_inj {T} [x1 x2].
-Prenex Implicits commute invgK.
-
-Section GroupIdentities.
-
-Variable T : finGroupType.
-Implicit Types x y z : T.
-Local Notation mulgT := (@mulg T).
-
-Lemma mulVg : left_inverse 1 invg mulgT. Proof. exact: mulVg_subproof. Qed.
-
-Lemma mulgV : right_inverse 1 invg mulgT.
-Proof. by move=> x; rewrite -{1}(invgK x) mulVg. Qed.
-
-Lemma mulKg : left_loop invg mulgT.
-Proof. by move=> x y; rewrite mulgA mulVg mul1g. Qed.
-
-Lemma mulKVg : rev_left_loop invg mulgT.
-Proof. by move=> x y; rewrite mulgA mulgV mul1g. Qed.
-
-Lemma mulgI : right_injective mulgT.
-Proof. by move=> x; apply: can_inj (mulKg x). Qed.
-
-Lemma mulgK : right_loop invg mulgT.
-Proof. by move=> x y; rewrite -mulgA mulgV mulg1. Qed.
-
-Lemma mulgKV : rev_right_loop invg mulgT.
-Proof. by move=> x y; rewrite -mulgA mulVg mulg1. Qed.
-
-Lemma mulIg : left_injective mulgT.
-Proof. by move=> x; apply: can_inj (mulgK x). Qed.
-
-Lemma eq_invg_mul x y : (x^-1 == y :> T) = (x * y == 1 :> T).
-Proof. by rewrite -(inj_eq (@mulgI x)) mulgV eq_sym. Qed.
-
-Lemma eq_mulgV1 x y : (x == y) = (x * y^-1 == 1 :> T).
-Proof. by rewrite -(inj_eq invg_inj) eq_invg_mul. Qed.
-
-Lemma eq_mulVg1 x y : (x == y) = (x^-1 * y == 1 :> T).
-Proof. by rewrite -eq_invg_mul invgK. Qed.
-
-Lemma commuteV x y : commute x y -> commute x y^-1.
-Proof. by move=> cxy; apply: (@mulIg y); rewrite mulgKV -mulgA cxy mulKg. Qed.
-
-Lemma conjgE x y : x ^ y = y^-1 * (x * y). Proof. by []. Qed.
-
-Lemma conjgC x y : x * y = y * x ^ y.
-Proof. by rewrite mulKVg. Qed.
-
-Lemma conjgCV x y : x * y = y ^ x^-1 * x.
-Proof. by rewrite -mulgA mulgKV invgK. Qed.
-
-Lemma conjg1 x : x ^ 1 = x.
-Proof. by rewrite conjgE commute1 mulKg. Qed.
-
-Lemma conj1g x : 1 ^ x = 1.
-Proof. by rewrite conjgE mul1g mulVg. Qed.
-
-Lemma conjMg x y z : (x * y) ^ z = x ^ z * y ^ z.
-Proof. by rewrite !conjgE !mulgA mulgK. Qed.
-
-Lemma conjgM x y z : x ^ (y * z) = (x ^ y) ^ z.
-Proof. by rewrite !conjgE invMg !mulgA. Qed.
-
-Lemma conjVg x y : x^-1 ^ y = (x ^ y)^-1.
-Proof. by rewrite !conjgE !invMg invgK mulgA. Qed.
-
-Lemma conjJg x y z : (x ^ y) ^ z = (x ^ z) ^ y ^ z.
-Proof. by rewrite 2!conjMg conjVg. Qed.
-
-Lemma conjXg x y n : (x ^+ n) ^ y = (x ^ y) ^+ n.
-Proof. by elim: n => [|n IHn]; rewrite ?conj1g // !expgS conjMg IHn. Qed.
-
-Lemma conjgK : @right_loop T T invg conjg.
-Proof. by move=> y x; rewrite -conjgM mulgV conjg1. Qed.
-
-Lemma conjgKV : @rev_right_loop T T invg conjg.
-Proof. by move=> y x; rewrite -conjgM mulVg conjg1. Qed.
-
-Lemma conjg_inj : @left_injective T T T conjg.
-Proof. by move=> y; apply: can_inj (conjgK y). Qed.
-
-Lemma conjg_eq1 x y : (x ^ y == 1) = (x == 1).
-Proof. by rewrite (canF_eq (conjgK _)) conj1g. Qed.
-
-Lemma conjg_prod I r (P : pred I) F z :
-  (\prod_(i <- r | P i) F i) ^ z = \prod_(i <- r | P i) (F i ^ z).
-Proof.
-by apply: (big_morph (conjg^~ z)) => [x y|]; rewrite ?conj1g ?conjMg.
-Qed.
-
-Lemma commgEl x y : [~ x, y] = x^-1 * x ^ y. Proof. by []. Qed.
-
-Lemma commgEr x y : [~ x, y] = y^-1 ^ x * y.
-Proof. by rewrite -!mulgA. Qed.
-
-Lemma commgC x y : x * y = y * x * [~ x, y].
-Proof. by rewrite -mulgA !mulKVg. Qed.
-
-Lemma commgCV x y : x * y = [~ x^-1, y^-1] * (y * x).
-Proof. by rewrite commgEl !mulgA !invgK !mulgKV. Qed.
-
-Lemma conjRg x y z : [~ x, y] ^ z = [~ x ^ z, y ^ z].
-Proof. by rewrite !conjMg !conjVg. Qed.
-
-Lemma invg_comm x y : [~ x, y]^-1 = [~ y, x].
-Proof. by rewrite commgEr conjVg invMg invgK. Qed.
-
-Lemma commgP x y : reflect (commute x y) ([~ x, y] == 1 :> T).
-Proof. by rewrite [[~ x, y]]mulgA -invMg -eq_mulVg1 eq_sym; apply: eqP. Qed.
-
-Lemma conjg_fixP x y : reflect (x ^ y = x) ([~ x, y] == 1 :> T).
-Proof. by rewrite -eq_mulVg1 eq_sym; apply: eqP. Qed.
-
-Lemma commg1_sym x y : ([~ x, y] == 1 :> T) = ([~ y, x] == 1 :> T).
-Proof. by rewrite -invg_comm (inv_eq invgK) invg1. Qed.
-
-Lemma commg1 x : [~ x, 1] = 1.
-Proof. exact/eqP/commgP. Qed.
-
-Lemma comm1g x : [~ 1, x] = 1.
-Proof. by rewrite -invg_comm commg1 invg1. Qed.
-
-Lemma commgg x : [~ x, x] = 1.
-Proof. exact/eqP/commgP. Qed.
-
-Lemma commgXg x n : [~ x, x ^+ n] = 1.
-Proof. exact/eqP/commgP/commuteX. Qed.
-
-Lemma commgVg x : [~ x, x^-1] = 1.
-Proof. exact/eqP/commgP/commuteV. Qed.
-
-Lemma commgXVg x n : [~ x, x ^- n] = 1.
-Proof. exact/eqP/commgP/commuteV/commuteX. Qed.
-
-(* Other commg identities should slot in here. *)
-
-End GroupIdentities.
-
-#[global] Hint Rewrite mulg1 @mul1g invg1 @mulVg mulgV (@invgK) mulgK mulgKV
-             @invMg @mulgA : gsimpl.
-
-Ltac gsimpl := autorewrite with gsimpl; try done.
-
-Definition gsimp := (@mulg1, @mul1g, (@invg1, @invgK), (@mulgV, @mulVg)).
-Definition gnorm := (gsimp, (@mulgK, @mulgKV, (@mulgA, @invMg))).
-
-Arguments mulgI [T].
-Arguments mulIg [T].
-Arguments conjg_inj {T} x [x1 x2].
-Arguments commgP {T x y}.
-Arguments conjg_fixP {T x y}.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjg instead.")]
+Notation conjg := conjg (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commg instead.")]
+Notation commg := commg (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.mulgA instead.")]
+Notation mulgA := mulgA (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.mul1g instead.")]
+Notation mul1g := mul1g (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.invgK instead.")]
+Notation invgK := invgK (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.invgM instead.")]
+Notation invMg := invgM (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.invg_inj instead.")]
+Notation invg_inj := invg_inj (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.eqg_invLR instead.")]
+Notation eq_invg_sym := eqg_invLR (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.invg1 instead.")]
+Notation invg1 := invg1 (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.invg_eq1 instead.")]
+Notation eq_invg1 := invg_eq1 (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.mulg1 instead.")]
+Notation mulg1 := mulg1 (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.expgnE instead.")]
+Notation expgnE := expgnE (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.expg0 instead.")]
+Notation expg0 := expg0 (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.expg1 instead.")]
+Notation expg1 := expg1 (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.expg1n instead.")]
+Notation expg1n := expg1n (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.expgnDr instead.")]
+Notation expgD := expgnDr (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.expgSr instead.")]
+Notation expgSr := expgSr (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.expgnA instead.")]
+Notation expgM := expgnA (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.expgnAC instead.")]
+Notation expgAC := expgnAC (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commute instead.")]
+Notation commute := commute (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commute_refl instead.")]
+Notation commute_refl := commute_refl (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commute_sym instead.")]
+Notation commute_sym := commute_sym (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commute1 instead.")]
+Notation commute1 := commute1 (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commuteM instead.")]
+Notation commuteM := commuteM (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commuteX instead.")]
+Notation commuteX := commuteX (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commuteX2 instead.")]
+Notation commuteX2 := commuteX2 (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.expVgn instead.")]
+Notation expgVn := expVgn (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.expgMn instead.")]
+Notation expgMn := expgMn (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.mulVg instead.")]
+Notation mulVg := mulVg (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.mulgV instead.")]
+Notation mulgV := mulgV (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.mulKg instead.")]
+Notation mulKg := mulKg (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.mulVKg instead.")]
+Notation mulKVg := mulVKg (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.mulgI instead.")]
+Notation mulgI := mulgI (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.mulgK instead.")]
+Notation mulgK := mulgK (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.mulgVK instead.")]
+Notation mulgKV := mulgVK (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.mulg_eq1 instead.")]
+Lemma eq_invg_mul (T : finGroupType) x y : (x^-1 == y :> T) = (x * y == 1).
+Proof. by rewrite mulg_eq1 eqg_invLR. Qed.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.divg_eq1 instead.")]
+Lemma eq_mulgV1 (T : finGroupType) x y : (x == y) = (x * y^-1 == 1 :> T).
+Proof. exact/esym/divg_eq1. Qed.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.divg_eq1 instead.")]
+Lemma eq_mulVg1 (T : finGroupType) x y : (x == y) = (x^-1 * y == 1 :> T).
+Proof. by rewrite mulg_eq1 eqg_inv. Qed.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commuteV instead.")]
+Notation commuteV := commuteV (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjgE instead.")]
+Notation conjgE := conjgE (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjgC instead.")]
+Notation conjgC := conjgC (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjgCV instead.")]
+Notation conjgCV := conjgCV (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjg1 instead.")]
+Notation conjg1 := conjg1 (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conj1g instead.")]
+Notation conj1g := conj1g (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjMg instead.")]
+Notation conjMg := conjMg (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjgM instead.")]
+Notation conjgM := conjgM (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjVg instead.")]
+Notation conjVg := conjVg (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjJg instead.")]
+Notation conjJg := conjJg (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjXg instead.")]
+Notation conjXg := conjXg (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjgK instead.")]
+Notation conjgK := conjgK (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjgKV instead.")]
+Notation conjgKV := conjgKV (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjg_inj instead.")]
+Notation conjg_inj := conjg_inj (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjg_eq1 instead.")]
+Notation conjg_eq1 := conjg_eq1 (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjg_prod instead.")]
+Notation conjg_prod := conjg_prod (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commgEl instead.")]
+Notation commgEl := commgEl (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commgEr instead.")]
+Notation commgEr := commgEr (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commgC instead.")]
+Notation commgC := commgC (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commgCV instead.")]
+Notation commgCV := commgCV (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjRg instead.")]
+Notation conjRg := conjRg (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.invgR instead.")]
+Notation invg_comm := invgR (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commgP instead.")]
+Notation commgP := commgP (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.conjg_fixP instead.")]
+Notation conjg_fixP := conjg_fixP (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commg1_sym instead.")]
+Notation commg1_sym := commg1_sym (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commg1 instead.")]
+Notation commg1 := commg1 (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.comm1g instead.")]
+Notation comm1g := comm1g (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commgg instead.")]
+Notation commgg := commgg (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commgXg instead.")]
+Notation commgXg := commgXg (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commgVg instead.")]
+Notation commgVg := commgVg (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.commgXVg instead.")]
+Notation commgXVg := commgXVg (only parsing).
 
 Section Repr.
 (* Plucking a set representative. *)
@@ -672,6 +575,11 @@ End GroupSetBaseGroupSig.
 
 Module MakeGroupSetBaseGroup (Gset_base : GroupSetBaseGroupSig).
 Identity Coercion of_sort : Gset_base.sort >-> BaseFinGroup.arg_sort.
+Definition of_sort_magma (gT : baseFinGroupType) (G : Gset_base.sort gT) := G : Magma.sort {set gT}.
+Coercion of_sort_magma : Gset_base.sort >-> Magma.sort.
+
+Definition of_sort_baseGroup (gT : baseFinGroupType) (G : Gset_base.sort gT) := G : BaseGroup.sort {set gT}.
+Coercion of_sort_baseGroup : Gset_base.sort >-> BaseGroup.sort.
 End MakeGroupSetBaseGroup.
 
 Module Export GroupSetBaseGroup := MakeGroupSetBaseGroup GroupSet.
@@ -1336,10 +1244,10 @@ Proof. by move=> G1; rewrite card_le1_trivg ?G1. Qed.
 Lemma mulG_subl A : A \subset A * G.
 Proof. exact: mulg_subl group1. Qed.
 
-Lemma mulG_subr A : A \subset ((G : {set gT}) * A ).
+Lemma mulG_subr A : A \subset (G * A).
 Proof. exact: mulg_subr group1. Qed.
 
-Lemma mulGid : (G : {set gT}) * G = G.
+Lemma mulGid : G * G = G :> {set gT}.
 Proof.
 by apply/eqP; rewrite eqEsubset mulG_subr andbT; case/andP: (valP G).
 Qed.
@@ -1412,7 +1320,8 @@ Proof. by move=> G_P; elim/big_ind: _ => //; apply: groupM. Qed.
 
 (* Inverse is an anti-morphism. *)
 
-Lemma invGid : G^-1 = G. Proof. by apply/setP=> x; rewrite inE groupV. Qed.
+Lemma invGid : G^-1 = G :> {set gT}.
+Proof. by apply/setP=> x; rewrite inE groupV. Qed.
 
 Lemma inv_subG A : (A^-1 \subset G) = (A \subset G).
 Proof. by rewrite -{1}invGid invSg. Qed.
@@ -1697,16 +1606,16 @@ Proof. by move/(congr1 (setU 1)); rewrite !setD1K. Qed.
 Lemma invMG G H : (G * H)^-1 = H * G.
 Proof. by rewrite invMg !invGid. Qed.
 
-Lemma mulSGid G H : H \subset G -> H * G = G.
+Lemma mulSGid G H : H \subset G -> H * G = G :> {set gT}.
 Proof. exact: mulSgGid (group1 H). Qed.
 
-Lemma mulGSid G H : H \subset G -> G * H = G.
+Lemma mulGSid G H : H \subset G -> G * H = G :> {set gT}.
 Proof. exact: mulGSgid (group1 H). Qed.
 
-Lemma mulGidPl G H : reflect (G * H = G) (H \subset G).
+Lemma mulGidPl G H : reflect (G * H = G :> {set gT}) (H \subset G).
 Proof. by apply: (iffP idP) => [|<-]; [apply: mulGSid | apply: mulG_subr]. Qed.
 
-Lemma mulGidPr G H : reflect (G * H = H) (G \subset H).
+Lemma mulGidPr G H : reflect (G * H = H :> {set gT}) (G \subset H).
 Proof. by apply: (iffP idP) => [|<-]; [apply: mulSGid | apply: mulG_subl]. Qed.
 
 Lemma comm_group_setP G H : reflect (commute G H) (group_set (G * H)).
@@ -2763,7 +2672,8 @@ Proof. by move=> cGH; apply: norm_joinEr (cents_norm cGH). Qed.
 Lemma centJ A x : 'C(A :^ x) = 'C(A) :^ x.
 Proof.
 apply/setP=> y; rewrite mem_conjg; apply/centP/centP=> cAy z Az.
-  by apply: (conjg_inj x); rewrite 2!conjMg conjgKV cAy ?memJ_conjg.
+  apply: (conjg_inj x).
+  by rewrite conjMg [in RHS]conjMg conjgKV cAy ?memJ_conjg.
 by apply: (conjg_inj x^-1); rewrite 2!conjMg cAy -?mem_conjg.
 Qed.
 
