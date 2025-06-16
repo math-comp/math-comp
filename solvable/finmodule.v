@@ -47,7 +47,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope GRing.Theory FinRing.Theory.
+Local Open Scope group_scope.
+Import GRing.Theory FinRing.Theory.
 Local Open Scope ring_scope.
 
 Module FiniteModule.
@@ -234,7 +235,8 @@ Arguments FiniteModule.actrK {gT A abelA} x.
 Arguments FiniteModule.actrKV {gT A abelA} x.
 
 (* Still allow ring notations, but give priority to groups now. *)
-Import FiniteModule GroupScope.
+Local Open Scope group_scope.
+Import FiniteModule .
 
 Section Gaschutz.
 

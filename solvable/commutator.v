@@ -22,7 +22,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Definition derived_at n (gT : finGroupType) (A : {set gT}) :=
   iter n (fun B => [~: B, B]) A.

@@ -35,7 +35,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import Order.TTheory GroupScope GRing.Theory Num.Theory.
+Local Open Scope group_scope.
+Import Order.TTheory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 Lemma group_num_field_exists (gT : finGroupType) (G : {group gT}) :

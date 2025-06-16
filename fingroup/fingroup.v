@@ -139,10 +139,11 @@ Declare Scope Group_scope.
 
 Delimit Scope Group_scope with G.
 
+(* FIXME: Do we have a way to deprecate this? *)
 Module GroupScope.
 Open Scope group_scope.
 End GroupScope.
-Import GroupScope.
+Local Open Scope group_scope.
 
 (* These are the operation notations introduced by this file. *)
 Reserved Notation "[ ~ x1 , x2 , .. , xn ]"

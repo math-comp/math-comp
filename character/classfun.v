@@ -94,7 +94,8 @@ Unset Printing Implicit Defensive.
 
 Declare Scope cfun_scope.
 
-Import Order.TTheory GroupScope GRing.Theory Num.Theory.
+Local Open Scope group_scope.
+Import Order.TTheory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 Delimit Scope cfun_scope with CF.
 

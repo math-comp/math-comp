@@ -22,7 +22,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Section Hall.
 

@@ -19,7 +19,8 @@ Unset Printing Implicit Defensive.
 Set Implicit Arguments.
 Unset Strict Implicit.
 
-Import GroupScope GRing.
+Local Open Scope group_scope.
+Import GRing.
 
 HB.instance Definition _ := isMulGroup.Build bool addbA addFb addbb.
 
