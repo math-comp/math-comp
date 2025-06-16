@@ -1215,8 +1215,10 @@ HB.instance Definition _ := hasInv.Build H invH.
 
 Lemma mulVg : left_inverse 1%g invH *%g.
 Proof. by move=> x; apply/val_inj; rewrite valM SubK mulVg val1. Qed.
+Lemma mulgV : right_inverse 1%g invH *%g.
+Proof. by move=> x; apply/val_inj; rewrite valM SubK mulgV val1. Qed.
 
-HB.instance Definition _ := StarMonoid_isGroup.Build H mulVg.
+HB.instance Definition _ := Monoid_isGroup.Build H mulVg mulgV.
 
 HB.end.
 
