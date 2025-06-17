@@ -1841,7 +1841,7 @@ Lemma gcdp_def d m n :
   gcdp m n %= d.
 Proof.
 move=> dm dn h; rewrite /eqp dvdp_gcd dm dn !andbT.
-by apply: h; [apply: dvdp_gcdl | apply: dvdp_gcdr].
+by apply: h; rewrite (dvdp_gcdl, dvdp_gcdr).
 Qed.
 
 Definition coprimep p q := size (gcdp p q) == 1%N.
@@ -2339,7 +2339,7 @@ apply/andP; split.
 case: (Bezoutp p q) => [[u v]] /andP [].
 move/(dvdp_comp_poly r) => Huv _.
 rewrite (dvdp_trans _ Huv) // comp_polyD !comp_polyM.
-by rewrite dvdp_add // dvdp_mull //; [ exact: dvdp_gcdl | exact: dvdp_gcdr].
+by rewrite dvdp_add // dvdp_mull // (dvdp_gcdl, dvdp_gcdr).
 Qed.
 
 Lemma coprimep_comp_poly r p q : coprimep p q -> coprimep (p \Po r) (q \Po r).
