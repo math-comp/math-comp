@@ -56,7 +56,7 @@ Unset Printing Implicit Defensive.
 
 Declare Scope section_scope.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Inductive section (gT : finGroupType) := GSection of {group gT} * {group gT}.
 

@@ -22,7 +22,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Section Hall.
 
@@ -162,7 +162,7 @@ have sA_AG: A \subset AG := joing_subl _ _.
 have sG_AG: G \subset AG := joing_subr _ _.
 have sM_AG := subset_trans sMA sA_AG.
 have oAG: #|AG| = (#|A| * #|G|)%N by rewrite defAG coprime_cardMg 1?coprime_sym.
-have q'G: #|G|`_q = 1%N.
+have q'G: (#|G|`_q = 1)%N.
   rewrite part_p'nat ?p'natE -?prime_coprime // coprime_sym.
   have [_ _ [k oM]] := pgroup_pdiv qM ntM.
   by rewrite -(@coprime_pexpr k.+1) // -oM (coprimegS sMA).

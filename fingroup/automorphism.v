@@ -32,7 +32,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 (***********************************************************************)
 (* A group automorphism, defined as a permutation on a subset of a     *)
