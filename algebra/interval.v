@@ -58,11 +58,11 @@ Unset Printing Implicit Defensive.
 
 Reserved Notation "'-oo'".
 Reserved Notation "'+oo'".
-Reserved Notation "`[ a , b ]" (a, b at level 9, format "`[ a ,  b ]").
-Reserved Notation "`] a , b ]" (a, b at level 9, format "`] a ,  b ]").
+Reserved Notation "`[ a , b ]" (format "`[ a ,  b ]").
+Reserved Notation "`] a , b ]" (format "`] a ,  b ]").
 Reserved Notation "`[ a , b [" (format "`[ a ,  b [").
 Reserved Notation "`] a , b [" (format "`] a ,  b [").
-Reserved Notation "`] '-oo' , b ]" (b at level 9, format "`] '-oo' ,  b ]").
+Reserved Notation "`] '-oo' , b ]" (format "`] '-oo' ,  b ]").
 Reserved Notation "`] '-oo' , b [" (format "`] '-oo' ,  b [").
 Reserved Notation "`[ a , '+oo' [" (format "`[ a ,  '+oo' [").
 Reserved Notation "`] a , '+oo' [" (format "`] a ,  '+oo' [").
@@ -719,10 +719,10 @@ Lemma real_BSide_max b x y : x \in Num.real -> y \in Num.real ->
   BSide b (Order.max x y) = Order.max (BSide b x) (BSide b y).
 Proof. by move=> xr yr; apply/comparable_BSide_max/real_comparable. Qed.
 
-Lemma mem0_itvcc_xNx x : (0 \in `[(- x), x]) = (0 <= x).
+Lemma mem0_itvcc_xNx x : (0 \in `[- x, x]) = (0 <= x).
 Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_le0 andbb. Qed.
 
-Lemma mem0_itvoo_xNx x : 0 \in `](- x), x[ = (0 < x).
+Lemma mem0_itvoo_xNx x : 0 \in `]- x, x[ = (0 < x).
 Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_lt0 andbb. Qed.
 
 Lemma oppr_itv ba bb (xa xb x : R) :
@@ -732,16 +732,16 @@ Proof.
 by rewrite !itv_boundlr /<=%O /= !implybF negbK andbC lteifNl lteifNr.
 Qed.
 
-Lemma oppr_itvoo (a b x : R) : (- x \in `]a, b[) = (x \in `](- b), (- a)[).
+Lemma oppr_itvoo (a b x : R) : (- x \in `]a, b[) = (x \in `]- b, - a[).
 Proof. exact: oppr_itv. Qed.
 
-Lemma oppr_itvco (a b x : R) : (- x \in `[a, b[) = (x \in `](- b), (- a)]).
+Lemma oppr_itvco (a b x : R) : (- x \in `[a, b[) = (x \in `]- b, - a]).
 Proof. exact: oppr_itv. Qed.
 
-Lemma oppr_itvoc (a b x : R) : (- x \in `]a, b]) = (x \in `[(- b), (- a)[).
+Lemma oppr_itvoc (a b x : R) : (- x \in `]a, b]) = (x \in `[- b, - a[).
 Proof. exact: oppr_itv. Qed.
 
-Lemma oppr_itvcc (a b x : R) : (- x \in `[a, b]) = (x \in `[(- b), (- a)]).
+Lemma oppr_itvcc (a b x : R) : (- x \in `[a, b]) = (x \in `[- b, - a]).
 Proof. exact: oppr_itv. Qed.
 
 Definition miditv (R : numDomainType) (i : interval R) : R :=
@@ -794,7 +794,7 @@ by move=> /le_trans; apply; rewrite !bnd_simp.
 Qed.
 
 Lemma in_segmentDgt0Pr x y z :
-  reflect (forall e, e > 0 -> y \in `[(x - e), (z + e)]) (y \in `[x, z]).
+  reflect (forall e, e > 0 -> y \in `[x - e, z + e]) (y \in `[x, z]).
 Proof.
 apply/(iffP idP)=> [xyz e /[dup] e_gt0 /ltW e_ge0 | xyz_e].
   by rewrite in_itv /= lerBDr !ler_wpDr// (itvP xyz).
@@ -803,7 +803,7 @@ by rewrite in_itv /= ; apply/andP; split; apply/ler_addgt0Pr => ? /xyz_e;
 Qed.
 
 Lemma in_segmentDgt0Pl x y z :
-  reflect (forall e, e > 0 -> y \in `[(- e + x), (e + z)]) (y \in `[x, z]).
+  reflect (forall e, e > 0 -> y \in `[- e + x, e + z]) (y \in `[x, z]).
 Proof.
 apply/(equivP (in_segmentDgt0Pr x y z)).
 by split=> zxy e /zxy; rewrite [z + _]addrC [_ + x]addrC.
