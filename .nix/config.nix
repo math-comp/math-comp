@@ -85,19 +85,19 @@ with builtins; with (import <nixpkgs> {}).lib;
          #   for a complete list of Coq packages available in Nix
          # * <github_login>:<branch> is such that this will use the branch <branch>
          #   from https://github.com/<github_login>/<repository>
+         mathcomp-abel.override.version = "proux01:mc1110";
+         mathcomp-infotheo.override.version = "proux01:mc1110";
        };
   in {
     "coq-master" = { rocqPackages = {
-      rocq-core.override.version = "master";
-      stdlib.override.version = "master";
+      rocq-core.override.version = "herbelin:master+gramlib-support-for-non-assoc-and-non-recovery";
       bignums.override.version = "master";
       rocq-elpi.override.version = "master";
       rocq-elpi.override.elpi-version = "2.0.7";
       hierarchy-builder.override.version = "master";
       mathcomp.job = false;
     }; coqPackages = common-bundles // {
-      coq.override.version = "master";
-      stdlib.override.version = "master";
+      coq.override.version = "herbelin:master+gramlib-support-for-non-assoc-and-non-recovery";
       bignums.override.version = "master";
       coq-elpi.override.version = "master";
       coq-elpi.override.elpi-version = "2.0.7";
