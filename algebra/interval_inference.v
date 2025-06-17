@@ -1600,7 +1600,7 @@ Goal 0%:i01 = 1%:i01 :> {i01 R}.
 Proof.
 Abort.
 
-Goal (- x%:num)%:itv = (- x%:num)%:itv :> {itv R & `[(-1), 0]}.
+Goal (- x%:num)%:itv = (- x%:num)%:itv :> {itv R & `[-1, 0]}.
 Proof.
 Abort.
 
