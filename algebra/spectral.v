@@ -10,8 +10,6 @@ From mathcomp Require Import mxpoly mxred sesquilinear.
 (* This file provides a formalization of Gram-Schmidt orthonormalization,     *)
 (* Schur decomposition, etc.                                                  *)
 (*                                                                            *)
-(*               u ``_ i := u 0 i                                             *)
-(*                          The notation is Reserved but only used locally.   *)
 (*                 M ^t* := M ^t conjC                                        *)
 (*                           Notation in scope sesquilinear_scope.            *)
 (*       M \is unitarymx == M is a unitary matrix                             *)
@@ -36,9 +34,6 @@ From mathcomp Require Import mxpoly mxred sesquilinear.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
-
-Reserved Notation "u '``_' i"
-  (at level 3, i at level 2, left associativity, format "u '``_' i").
 
 Import GRing.Theory Order.Theory Num.Theory.
 Local Open Scope ring_scope.
@@ -303,12 +298,10 @@ apply/matrixP=> i j; rewrite !mxE; have := Mo i j; rewrite dotmxE !mxE => <-.
 by apply: eq_bigr => /= k _; rewrite !mxE.
 Qed.
 
-Local Notation "u '``_' i" := (u 0%R i).
-
 Fact dotmx_is_dotmx n (u : 'rV[C]_n) : u != 0 -> 0 < '[u].
 Proof.
 move=> u_neq0; rewrite dotmxE mxE.
-suff /existsP[i ui_neq0] : [exists i, u ``_ i != 0].
+suff /existsP[i ui_neq0] : [exists i, u 0 i != 0].
   rewrite (bigD1 i) //= ltr_wpDr// ?sumr_ge0// ?mxE ?mul_conjC_gt0//.
   by move=> j _; rewrite !mxE mul_conjC_ge0.
 apply: contraNT u_neq0; rewrite negb_exists => /forallP uNN0.
