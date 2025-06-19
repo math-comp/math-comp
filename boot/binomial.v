@@ -89,7 +89,7 @@ have eqFp (i j : 'I_p): (i == j) = (p %| p + i - j).
 have vFpId i: (vFp i == i :> nat) = xpred2 Fp1 Fpn1 i.
   have [->{i} | ni0] := eqVneq i Fp0.
     by rewrite -!val_eqE /= egcd0n modn_small //= -(subnKC lt1p).
-  rewrite 2!eqFp -Euclid_dvdM // -[_ - p.-1]subSS prednK //.
+  rewrite 2![i == _]eqFp -Euclid_dvdM // -[_ - p.-1]subSS prednK //.
   have lt0i: 0 < i by rewrite lt0n.
   rewrite -addnS addKn -addnBA // mulnDl -{2}(addn1 i) -subn_sqr.
   rewrite addnBA ?leq_sqr // mulnS -addnA -mulnn -mulnDl.

@@ -354,8 +354,8 @@ Local Notation CK := (mfun cpair1g @* gval K).
 Lemma injm_cpairg1 : 'injm cpairg1.
 Proof.
 rewrite /cpairg1; case: restrmP => _ [_ -> _ _].
-rewrite ker_comp ker_in_cprod; apply/subsetP=> x; rewrite 5!inE /=.
-by case/and3P=> _ Zx; rewrite inE eq_sym (inv_eq invgK) invg1 morph_injm_eq1.
+rewrite ker_comp ker_in_cprod; apply/subsetP=> x; rewrite !inE /=.
+by case/and3P=> _ Zx; rewrite eq_sym (inv_eq invgK) invg1 morph_injm_eq1.
 Qed.
 Let injH := injm_cpairg1.
 

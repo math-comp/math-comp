@@ -88,7 +88,7 @@ with builtins; with (import <nixpkgs> {}).lib;
        };
   in {
     "coq-master" = { rocqPackages = {
-      rocq-core.override.version = "master";
+      rocq-core.override.version = "gares:ssrpat-FO-ignore-imparg";
       stdlib.override.version = "master";
       bignums.override.version = "master";
       rocq-elpi.override.version = "master";
@@ -96,7 +96,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       hierarchy-builder.override.version = "master";
       mathcomp.job = false;
     }; coqPackages = common-bundles // {
-      coq.override.version = "master";
+      coq.override.version = "gares:ssrpat-FO-ignore-imparg";
       stdlib.override.version = "master";
       bignums.override.version = "master";
       coq-elpi.override.version = "master";
@@ -107,6 +107,9 @@ with builtins; with (import <nixpkgs> {}).lib;
       mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
       ssprove.job = false;
       mathcomp-infotheo.job = false;  # not compatible with master
+      mathcomp-analysis.override.version = "gares:ssrpat-FO-ignore-imparg";
+      mathcomp-classical.override.version = "gares:ssrpat-FO-ignore-imparg";
+      odd-order.override.version = "gares:ssrpat-FO-ignore-imparg";
     }; };
     "coq-9.0".coqPackages = common-bundles // {
       coq.override.version = "9.0";
