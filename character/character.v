@@ -113,8 +113,7 @@ by rewrite scalerDl -scalerA -add_row_mx -scale_row_mx.
 Qed.
 
 HB.instance Definition _ n1 m2 n2 B :=
-  GRing.isSemilinear.Build _ _ _ _ (trowb B)
-    (GRing.semilinear_linear (@trowb_is_linear n1 m2 n2 B)).
+  GRing.isLinear.Build _ _ _ _ (trowb B) (@trowb_is_linear n1 m2 n2 B).
 
 Lemma trow_is_linear n1 m2 n2 (A : 'rV_n1) : linear (@trow n1 A m2 n2).
 Proof.
@@ -124,8 +123,8 @@ by case: split=> a; rewrite ?IH !mxE.
 Qed.
 
 HB.instance Definition _ n1 m2 n2 A :=
-  GRing.isSemilinear.Build _ _ _ _ (@trow n1 A m2 n2)
-    (GRing.semilinear_linear (@trow_is_linear n1 m2 n2 A)).
+  GRing.isLinear.Build _ _ _ _ (@trow n1 A m2 n2)
+    (@trow_is_linear n1 m2 n2 A).
 
 Fixpoint tprod (m1 : nat) :
   forall n1 (A : 'M[F]_(m1,n1)) m2 n2 (B : 'M[F]_(m2,n2)),
@@ -499,7 +498,7 @@ Definition xcfun (chi : 'CF(G)) A :=
   (gring_row A *m (\col_(i < #|G|) chi (enum_val i))) 0 0.
 
 Lemma xcfun_is_zmod_morphism phi : zmod_morphism (xcfun phi).
-Proof. by move=> A B; rewrite /xcfun [gring_row _]linearB mulmxBl !mxE. Qed.
+Proof. by move=> A B; rewrite /xcfun [gring_row _]linearB mulmxBl !mxE. Qed. (* slow *)
 #[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
       note="use `xcfun_is_zmod_morphism` instead")]
 Definition xcfun_is_additive := xcfun_is_zmod_morphism.
