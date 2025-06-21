@@ -1184,7 +1184,7 @@ have [/eqP/size_poly1P[c cN0 ->]|gN1] := eqVneq (size g) 1%N.
   by rewrite mulrC mul_polyC map_polyZ/= eqp_sym eqp_scale// intr_eq0.
 have c_neq0 : (lead_coef q)%:~R != 0 :> 'F_p
    by rewrite -(dvdz_pcharf (pchar_Fp _)).
-have : map_poly (intr : int -> 'F_p) q = (lead_coef q)%:~R *: 'X^(size q).-1.
+have : map_poly (intr : int -> 'F_p) q = (lead_coef q)%:~R *: 'X^((size q).-1).
   apply/val_inj/(@eq_from_nth _ 0) => [|i]; rewrite size_map_poly_id0//.
     by rewrite size_scale// size_polyXn -polySpred.
   move=> i_small; rewrite coef_poly i_small coefZ coefXn lead_coefE.

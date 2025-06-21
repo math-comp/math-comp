@@ -362,7 +362,7 @@ Lemma supportE x y f : (x \in support_for y f) = (f x != y). Proof. by []. Qed.
 End Support.
 
 Notation "y .-support" := (support_for y)
-  (at level 2, format "y .-support") : function_scope.
+  (at level 1, format "y .-support") : function_scope.
 
 Section EqTheory.
 
@@ -373,7 +373,7 @@ Implicit Types (y : rT) (D : {pred aT}) (R : {pred rT}) (f : fT).
 Lemma supportP y D g :
   reflect (forall x, x \notin D -> g x = y) (y.-support g \subset D).
 Proof.
-by apply: (iffP subsetP) => Dg x; [apply: contraNeq | apply: contraR] => /Dg->.
+by (apply: (iffP subsetP) => Dg x; [apply: contraNeq|apply: contraR]) => /Dg->.
 Qed.
 
 Definition pfamily_mem y mD (mF : aT -> mem_pred rT) :=

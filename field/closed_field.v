@@ -61,7 +61,7 @@ Definition bind T1 T2 (x : cps T1) (f : T1 -> cps T2) : cps T2 :=
   fun k => x (fun x => f x k).
 Arguments bind {T1 T2} x f k /.
 Notation "''let' x <- y ; z" :=
-  (bind y (fun x => z)) (at level 99, x at level 0, y at level 0,
+  (bind y (fun x => z)) (at level 99, x at level 0, z at level 200,
     format "'[hv' ''let'  x  <-  y ;  '/' z ']'").
 
 Definition cpsif T (c : fF) (t : T) (e : T) : cps T :=

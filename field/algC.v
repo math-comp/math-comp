@@ -308,7 +308,7 @@ Notation pQtoL := (map_poly QtoL).
 
 Definition rootQtoL p_j :=
   if p_j.1 == 0 then 0 else
-  (sval (closed_field_poly_normal (pQtoL p_j.1)))`_p_j.2.
+  (sval (closed_field_poly_normal (pQtoL p_j.1)))`_(p_j.2).
 
 Definition eq_root p_j q_k := rootQtoL p_j == rootQtoL q_k.
 

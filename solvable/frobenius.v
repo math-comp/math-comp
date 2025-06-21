@@ -107,13 +107,12 @@ Arguments has_Frobenius_action {gT} G%_g H%_g.
 
 Notation "[ 'Frobenius' G 'with' 'complement' H ]" :=
   (Frobenius_group_with_complement G H)
-  (G at level 50, H at level 35,
+  (G at level 50,
    format "[ 'Frobenius'  G  'with'  'complement'  H ]") : group_scope.
 
 Notation "[ 'Frobenius' G 'with' 'kernel' K ]" :=
   (Frobenius_group_with_kernel G K)
-  (K at level 35,
-   format "[ 'Frobenius'  G  'with'  'kernel'  K ]") : group_scope.
+  (format "[ 'Frobenius'  G  'with'  'kernel'  K ]") : group_scope.
 
 Notation "[ 'Frobenius' G ]" := (Frobenius_group G)
   (format "[ 'Frobenius'  G ]") : group_scope.
@@ -724,7 +723,7 @@ apply: dvdn_sum => _ /imsetP[x /setIP[Gx Ax] ->].
 set y := x.`_p; have oy: #[y] = (n`_p * p)%N by rewrite order_constt pA.
 rewrite (partition_big (fun x => x.`_p) [in y ^: G]) /= => [|z]; last first.
   by case/andP=> _ /eqP <-; rewrite /= class_refl.
-pose G' := ('C_G[y] / <[y]>)%G; pose n' := gcdn #|G'| n`_p^'.
+pose G' := ('C_G[y] / <[y]>)%G; pose n' := gcdn #|G'| n`_(p^').
 have n'_gt0: 0 < n' by rewrite gcdn_gt0 cardG_gt0.
 rewrite (eq_bigr (fun _ => #|'Ldiv_n'(G')|)) => [|_ /imsetP[a Ga ->]].
   rewrite sum_nat_const -index_cent1 indexgI.
@@ -736,7 +735,7 @@ rewrite (eq_bigr (fun _ => #|'Ldiv_n'(G')|)) => [|_ /imsetP[a Ga ->]].
     rewrite muln_lcmr -oCy order_constt pA // mulnAC partnC // dvdn_lcm.
     by rewrite cardSg ?subsetIl // mulnC oG dvdn_pmul2r ?pdiv_dvd.
   apply: IHm; [exact: dvdn_gcdl | apply: leq_ltn_trans lt_qp_mq].
-  rewrite -(@divnMr n`_p^') // -muln_lcm_gcd mulnC divnMl //.
+  rewrite -(@divnMr n`_(p^')) // -muln_lcm_gcd mulnC divnMl //.
   rewrite leq_divRL // divn_mulAC ?leq_divLR ?dvdn_mulr ?dvdn_lcmr //.
   rewrite dvdn_leq ?muln_gt0 ?q_gt0 //= mulnC muln_lcmr dvdn_lcm.
   rewrite -(@dvdn_pmul2l n`_p) // mulnA -oy -oCy mulnCA partnC // -oG.

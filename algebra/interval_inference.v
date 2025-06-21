@@ -1443,7 +1443,7 @@ Proof. by apply/and3P; rewrite /= num_real !bnd_simp. Qed.
 
 Canonical Posz_inum n := Itv.mk (num_spec_Posz n).
 
-Lemma num_spec_Negz n : num_spec (Itv.Real `]-oo, -1]) (Negz n).
+Lemma num_spec_Negz n : num_spec (Itv.Real `]-oo, (-1)]) (Negz n).
 Proof. by apply/and3P; rewrite /= num_real !bnd_simp. Qed.
 
 Canonical Negz_inum n := Itv.mk (num_spec_Negz n).

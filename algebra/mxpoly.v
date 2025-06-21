@@ -433,11 +433,11 @@ have [q <- lt_q_n] := split_diagA; have le_q_n := leq_trans lt_q_n (leq_pred n).
 by rewrite size_prod_XsubC size_diagA coefD (nth_default 0 le_q_n) addr0.
 Qed.
 
-Lemma char_poly_trace : n > 0 -> char_poly`_n.-1 = - \tr A.
+Lemma char_poly_trace : n > 0 -> char_poly`_(n.-1) = - \tr A.
 Proof.
 move=> n_gt0; have [q <- lt_q_n] := split_diagA; set p := \prod_(x <- _) _.
 rewrite coefD {q lt_q_n}(nth_default 0 lt_q_n) addr0.
-have{n_gt0} ->: p`_n.-1 = ('X * p)`_n by rewrite coefXM eqn0Ngt n_gt0.
+have{n_gt0} ->: p`_(n.-1) = ('X * p)`_n by rewrite coefXM eqn0Ngt n_gt0.
 have ->: \tr A = \sum_(x <- diagA) x by rewrite big_map big_filter.
 rewrite -size_diagA {}/p; elim: diagA => [|x d IHd].
   by rewrite !big_nil mulr1 coefX oppr0.
