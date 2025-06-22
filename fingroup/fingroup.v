@@ -14,12 +14,10 @@ From mathcomp Require Export monoid.
 (*          finGroupType == the structure for finite types with a group law   *)
 (*                          The HB class is called FinGroup.                  *)
 (*           {group gT}  == type of groups with elements of type gT           *)
-(*      baseFinGroupType == the structure for finite types with a monoid law  *)
-(*                          and an involutive antimorphism; finGroupType is   *)
-(*                          derived from baseFinGroupType                     *)
-(*                          The HB class is called BaseFinGroup.              *)
+(*     finStarMonoidType == the structure for finite star-monoids             *)
+(*                          The HB class is called FinStarMonoid.             *)
 (*    FinGroupType mulVg == the finGroupType structure for an existing        *)
-(*                          baseFinGroupType structure, built from a proof of *)
+(*                          finStarMonoidType structure, built from a proof of*)
 (*                          the left inverse group axiom for that structure's *)
 (*                          operations                                        *)
 (*          [group of G] == a clone for an existing {group gT} structure on   *)
@@ -28,7 +26,7 @@ From mathcomp Require Export monoid.
 (* If gT implements finGroupType, then we can form {set gT}, the type of      *)
 (* finite sets with elements of type gT (as finGroupType extends finType).    *)
 (* The group law extends pointwise to {set gT}, which thus implements a sub-  *)
-(* interface baseFinGroupType of finGroupType. To be consistent with the      *)
+(* interface finStarMonoidType of finGroupType. To be consistent with the     *)
 (* predType interface, this is done by coercion to FinGroup.arg_sort, an      *)
 (* alias for FinGroup.sort. Accordingly, all pointwise group operations below *)
 (* have arguments of type (FinGroup.arg_sort) gT and return results of type   *)
@@ -74,7 +72,7 @@ From mathcomp Require Export monoid.
 (*          subg, sgval == the projection into and injection from [subg G]    *)
 (*                  H^# == the set H minus the unit element                   *)
 (*               repr H == some element of H if 1 \notin H != set0, else 1    *)
-(*                         (repr is defined over sets of a baseFinGroupType,  *)
+(*                         (repr is defined over sets of a finStarMonoidType, *)
 (*                         so it can be used, e.g., to pick right cosets.)    *)
 (*               x *: H == left coset of H by x                               *)
 (*          lcosets H G == the set of the left cosets of H by elements of G   *)
@@ -302,7 +300,7 @@ HB.instance Definition _ := StarMonoid_isGroup.Build G mulVg.
 HB.end.
 
 #[compress_coercions]
-HB.instance Definition _ (T : baseFinGroupType) :
+HB.instance Definition _ (T : finStarMonoidType) :
     Finite (BaseFinGroup.arg_sort T) := Finite.class T.
 
 #[deprecated(since="mathcomp 2.5.0",
@@ -519,7 +517,7 @@ Notation commgXVg := commgXVg (only parsing).
 Section Repr.
 (* Plucking a set representative. *)
 
-Variable gT : baseFinGroupType.
+Variable gT : finStarMonoidType.
 Implicit Type A : {set gT}.
 
 Definition repr A := if 1 \in A then 1 else odflt 1 [pick x in A].
@@ -543,8 +541,8 @@ End Repr.
 Arguments mem_repr [gT A].
 
 Section BaseSetMulDef.
-(* We only assume a baseFinGroupType to allow this construct to be iterated. *)
-Variable gT : baseFinGroupType.
+(* We only assume a finStarMonoidType to allow this construct to be iterated. *)
+Variable gT : finStarMonoidType.
 Implicit Types A B : {set gT}.
 
 (* Set-lifted group operations. *)
@@ -597,12 +595,12 @@ End BaseSetMulDef.
 (* system to declare two different identity coercions on an alias class.  *)
 
 Module GroupSet.
-Definition sort (gT : baseFinGroupType) := {set gT}.
+Definition sort (gT : finStarMonoidType) := {set gT}.
 End GroupSet.
 Identity Coercion GroupSet_of_sort : GroupSet.sort >-> set_of.
 
 Module Type GroupSetBaseFinGroupSig.
-Definition sort (gT : baseFinGroupType) := BaseFinGroup.arg_sort {set gT}.
+Definition sort (gT : finStarMonoidType) := BaseFinGroup.arg_sort {set gT}.
 End GroupSetBaseFinGroupSig.
 
 Module MakeGroupSetBaseFinGroup (Gset_base : GroupSetBaseFinGroupSig).
@@ -612,7 +610,7 @@ End MakeGroupSetBaseFinGroup.
 Module Export GroupSetBaseFinGroup := MakeGroupSetBaseFinGroup GroupSet.
 
 Module Type GroupSetMagmaSig.
-Definition sort (gT : baseFinGroupType) := Magma.sort {set gT}.
+Definition sort (gT : finStarMonoidType) := Magma.sort {set gT}.
 End GroupSetMagmaSig.
 
 Module MakeGroupSetMagma (Gset_base : GroupSetMagmaSig).
@@ -622,7 +620,7 @@ End MakeGroupSetMagma.
 Module Export GroupSetMagma := MakeGroupSetMagma GroupSet.
 
 Module Type GroupSetBaseGroupSig.
-Definition sort (gT : baseFinGroupType) := BaseGroup.sort {set gT}.
+Definition sort (gT : finStarMonoidType) := BaseGroup.sort {set gT}.
 End GroupSetBaseGroupSig.
 
 Module MakeGroupSetBaseGroup (Gset_base : GroupSetBaseGroupSig).
@@ -635,7 +633,7 @@ HB.instance Definition _ gT : Finite (GroupSet.sort gT) :=
    Finite.class {set gT}.
 
 Section GroupSetMulDef.
-(* Some of these constructs could be defined on a baseFinGroupType. *)
+(* Some of these constructs could be defined on a finStarMonoidType. *)
 (* We restrict them to proper finGroupType because we only develop  *)
 (* the theory for that case.                                        *)
 Variable gT : finGroupType.
@@ -724,7 +722,7 @@ Prenex Implicits commg_set normalised centralised abelian.
 
 Section BaseSetMulProp.
 (* Properties of the purely multiplicative structure. *)
-Variable gT : baseFinGroupType.
+Variable gT : finStarMonoidType.
 Implicit Types A B C D : {set gT}.
 Implicit Type x y z : gT.
 
@@ -1125,8 +1123,8 @@ Identity Coercion type_of_group : group_of >-> group_type.
 HB.instance Definition _ := [isSub for gval].
 #[hnf] HB.instance Definition _ := [Finite of group_type by <:].
 
-(* No predType or baseFinGroupType structures, as these would hide the *)
-(* group-to-set coercion and thus spoil unification.                  *)
+(* No predType or finStarMonoidType structures, as these would hide the *)
+(* group-to-set coercion and thus spoil unification.                    *)
 HB.instance Definition _ := SubFinite.copy groupT group_type.
 
 Definition group (A : {set gT}) gA : groupT := @Group A gA.
