@@ -1031,12 +1031,11 @@ suffices im_fact (H : {group gT}) : F _ G \subset H -> H \subset G ->
 - rewrite -2?im_fact ?pcore_mod_sub ?gFsub //;
     try by rewrite -{1}[F _ G]ker_coset morphpreS ?sub1G.
   by rewrite quotient_pcore_mod morphim_pcore.
-move=> sFH sHG; rewrite -(morphimIdom _ (H / _)) /= {2}(morphim_restrm sDF) setIid.
+move=> sFH sHG; rewrite -(morphimIdom _ (H / _)) /= {2}morphim_restrm setIid.
 rewrite -morphimIG ?ker_coset //.
-rewrite -(morphim_restrm sDF) morphim_factm (morphim_restrm sDFf).
+rewrite -(morphim_restrm sDF) morphim_factm morphim_restrm.
 by rewrite morphim_comp -quotientE -setIA morphimIdom (setIidPr _).
 Qed.
-
 
 Lemma pcore_mod_res pi gT rT (D : {group gT}) (f : {morphism D >-> rT}) :
   f @* pcore_mod D pi (F _ D) \subset pcore_mod (f @* D) pi (F _ (f @* D)).

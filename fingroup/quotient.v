@@ -809,7 +809,7 @@ Lemma homg_quotientS (A : {set gT}) :
 Proof.
 rewrite -!(gen_subG A) /=; set L := <<A>> => nHL nKL sKH.
 have sub_ker: 'ker (restrm nHL (coset H)) \subset 'ker (restrm nKL (coset K)).
-  by rewrite (ker_restrm nHL) (ker_restrm nKL) !ker_coset setIS.
+  by rewrite !ker_restrm !ker_coset setIS.
 have sAL: A \subset L := subset_gen A; rewrite -(setIidPr sAL).
 rewrite -[_ / H](morphim_restrm nHL) -[_ / K](morphim_restrm nKL) /=.
 by rewrite -(morphim_factm sub_ker (subxx L)) morphim_homg ?morphimS.

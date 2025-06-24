@@ -144,10 +144,7 @@ Arguments morphpre _ _ _%_g _ _ _%_g.
 Notation "''dom' f" := (dom (MorPhantom f))
   (at level 10, f at level 8, format "''dom'  f") : group_scope.
 
-Arguments ker [aT rT][D]%_set_scope [f] _,
-              [aT rT][D]             _  _.
-
-Notation "''ker' f" := (ker _ (MorPhantom f))
+Notation "''ker' f" := (ker (MorPhantom f))
   (at level 10, f at level 8, format "''ker'  f") : group_scope.
 
 Notation "''ker_' H f" := (H :&: 'ker f)
