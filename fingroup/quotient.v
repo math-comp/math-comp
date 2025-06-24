@@ -921,7 +921,7 @@ Qed.
 Lemma index_morphpre L M :
   L \subset f @* D -> #|f @*^-1 L : f @*^-1 M| = #|L : M|.
 Proof.
-move=> dL; rewrite -!divgI -morphpreI card_morphpre //.
+move=> dL; rewrite -!divgI -morphpreI /= card_morphpre //.
 have: L :&: M \subset f @* D by rewrite subIset ?dL.
 by move/card_morphpre->; rewrite divnMl ?cardG_gt0.
 Qed.

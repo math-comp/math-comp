@@ -331,7 +331,7 @@ have /factorX[|v2 nz_v2 Dv1]: root (swapXY v1) 0; rewrite ?swapXY_eq0 //.
   suffices: root (swapXY v1 * 'Y) 0 by rewrite mulrC mul_polyC rootZ ?polyX_eq0.
   have: root (swapXY (q *: v)) 0.
     by rewrite Dvu rmorphM rootM /= swapXY_poly_XmY Dp0 p0_0 orbT.
-  by rewrite linearZ rootM rootC0 (negPf nz_q0) /= Dv rmorphM /= swapXY_X.
+  by rewrite linearZ /= rootM rootC0 (negPf nz_q0) /= Dv rmorphM /= swapXY_X.
 rewrite ltnS (canRL swapXYK Dv1) -sizeYE sizeY_mulX sizeYE in ltvn.
 have [p1 nz_p1 Dp] := factorX _ _ nz_p p0_0.
 apply: IHn nz_u _ _ nz_p1 ltvn; first by rewrite swapXY_eq0.

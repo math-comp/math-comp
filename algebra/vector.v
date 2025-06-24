@@ -1021,7 +1021,7 @@ Qed.
 Lemma cat_free X Y :
   free (X ++ Y) = [&& free X, free Y & directv (<<X>> + <<Y>>)].
 Proof.
-rewrite !free_directv mem_cat directvE /= !big_cat -directvE directv_addE /=.
+rewrite !free_directv mem_cat directvE /= !big_cat -directvE /= directv_addE /=.
 rewrite negb_or -!andbA; do !bool_congr; rewrite -!span_def.
 by rewrite (sameP eqP directv_addP).
 Qed.
