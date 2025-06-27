@@ -1651,7 +1651,8 @@ Lemma ltrXn2r n x y : 0 <= x -> x < y -> x ^+ n < y ^+ n = (n != 0).
 Proof.
 move=> xge0 xlty; case: n; first by rewrite ltxx.
 elim=> [|n IHn]; rewrite ?[_ ^+ _.+2]exprS //.
-rewrite (@le_lt_trans _ _ (x * y ^+ n.+1)) ?ler_wpM2l ?ltr_pM2r ?IHn //.
+(*TODO: need to add "%R" by hand here, scopes does not seem to be setted propperly*)
+rewrite (@le_lt_trans _ _ (x * (y ^+ n.+1)%R)) ?ler_wpM2l ?ltr_pM2r ?IHn //.
   by rewrite ltW.
 by rewrite exprn_gt0 // (le_lt_trans xge0).
 Qed.
