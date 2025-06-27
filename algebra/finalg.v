@@ -12,9 +12,10 @@ From mathcomp Require Import ssralg countalg.
 (* allows type inference to function properly on expressions that mix        *)
 (* combinatorial and algebraic operators, e.g., [set x + y | x in A, y in A].*)
 (*                                                                           *)
-(*   finNmodType, finZmodType, finNzSemiRingType, finNzRingType,             *)
-(*   finComNzRingType, finComNzSemiRingType, finUnitRingType,                *)
-(*   finComUnitRingType, finIdomType, finFieldType, finLmodType,             *)
+(*   finNmodType, finZmodType, finPzSemiRingType, finNzSemiRingType,         *)
+(*   finPzRingType, finNzRingType, finComPzRingType, finComNzRingType,       *)
+(*   finComPzSemiRingType, finComNzSemiRingType, finUnitRingType,            *)
+(*   finComUnitRingType, finIdomainType, finFieldType, finLmodType,          *)
 (*   finLalgType, finAlgType, finUnitAlgType                                 *)
 (*      == the finite counterparts of nmodType, etc                          *)
 (* Note that a finFieldType is canonically decidable.                        *)
@@ -53,6 +54,9 @@ Notation "[ 'finGroupMixin' 'of' R 'for' +%R ]" :=
 End ZmoduleExports.
 HB.export ZmoduleExports.
 
+#[short(type="finPzSemiRingType")]
+HB.structure Definition PzSemiRing := {R of GRing.PzSemiRing R & Finite R}.
+
 #[short(type="finNzSemiRingType")]
 HB.structure Definition NzSemiRing := {R of GRing.NzSemiRing R & Finite R}.
 
@@ -71,6 +75,9 @@ Notation on R := (NzSemiRing.on R) (only parsing).
              note="Use FinRing.NzSemiRing.copy instead.")]
 Notation copy T U := (NzSemiRing.copy T U) (only parsing).
 End SemiRing.
+
+#[short(type="finPzRingType")]
+HB.structure Definition PzRing := {R of GRing.PzRing R & Finite R}.
 
 #[short(type="finNzRingType")]
 HB.structure Definition NzRing := {R of GRing.NzRing R & Finite R}.
@@ -91,6 +98,10 @@ Notation on R := (NzRing.on R) (only parsing).
 Notation copy T U := (NzRing.copy T U) (only parsing).
 End Ring.
 
+#[short(type="finComPzSemiRingType")]
+HB.structure Definition ComPzSemiRing :=
+  {R of GRing.ComPzSemiRing R & Finite R}.
+
 #[short(type="finComNzSemiRingType")]
 HB.structure Definition ComNzSemiRing :=
   {R of GRing.ComNzSemiRing R & Finite R}.
@@ -110,6 +121,9 @@ Notation on R := (ComNzSemiRing.on R) (only parsing).
              note="Use FinRing.ComNzSemiRing.copy instead.")]
 Notation copy T U := (ComNzSemiRing.copy T U) (only parsing).
 End ComSemiRing.
+
+#[short(type="finComPzRingType")]
+HB.structure Definition ComPzRing := {R of GRing.ComPzRing R & Finite R}.
 
 #[short(type="finComNzRingType")]
 HB.structure Definition ComNzRing := {R of GRing.ComNzRing R & Finite R}.
@@ -391,8 +405,16 @@ Coercion UnitAlgebra_to_finGroup (R : unitRingType) (M : UnitAlgebra.type R) :=
   FinGroup.clone M _.
 
 Module RegularExports.
+HB.instance Definition _ (R : finType) := Finite.on R^o.
+HB.instance Definition _ (R : finNmodType) := Nmodule.on R^o.
 HB.instance Definition _ (R : finZmodType) := Zmodule.on R^o.
+HB.instance Definition _ (R : finPzSemiRingType) := PzSemiRing.on R^o.
+HB.instance Definition _ (R : finPzRingType) := PzRing.on R^o.
+HB.instance Definition _ (R : finNzSemiRingType) := NzSemiRing.on R^o.
 HB.instance Definition _ (R : finNzRingType) := NzRing.on R^o.
+HB.instance Definition _ (R : finComPzSemiRingType) := PzSemiRing.on R^o.
+HB.instance Definition _ (R : finComPzRingType) := PzRing.on R^o.
+HB.instance Definition _ (R : finComNzSemiRingType) := NzSemiRing.on R^o.
 HB.instance Definition _ (R : finComNzRingType) := NzRing.on R^o.
 HB.instance Definition _ (R : finUnitRingType) := NzRing.on R^o.
 HB.instance Definition _ (R : finComUnitRingType) := NzRing.on R^o.

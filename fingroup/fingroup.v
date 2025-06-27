@@ -1918,7 +1918,7 @@ by rewrite mulnA !Lagrange // (subset_trans sKH).
 Qed.
 
 Lemma indexgI G H : #|G : G :&: H| = #|G : H|.
-Proof. by rewrite -divgI divgS ?subsetIl. Qed.
+Proof. by rewrite -[RHS]divgI divgS ?subsetIl. Qed.
 
 Lemma indexgS G H K : H \subset K -> #|G : K| %| #|G : H|.
 Proof.

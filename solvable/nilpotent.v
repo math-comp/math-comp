@@ -490,7 +490,7 @@ Lemma ucn_nilpotent n G : nilpotent 'Z_n(G).
 Proof. by apply/ucnP; exists n; rewrite ucn_id. Qed.
 
 Lemma nil_class_ucn n G : nil_class 'Z_n(G) <= n.
-Proof. by apply/ucn_nil_classP; rewrite ?ucn_nilpotent ?ucn_id. Qed.
+Proof. by apply/ucn_nil_classP; rewrite ?ucn_nilpotent // ucn_id. Qed.
 
 End UpperCentral.
 

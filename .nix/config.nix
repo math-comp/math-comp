@@ -13,6 +13,10 @@ with builtins; with (import <nixpkgs> {}).lib;
   ## to serve as a basis for nix-shell edit this
   shell-attribute = "mathcomp-single";
 
+  ## Set this when the package has no rocqPackages version yet
+  ## (either in nixpkgs or in .nix/rocq-overlays)
+  no-rocq-yet = true;
+
   ## Indicate the relative location of your _CoqProject
   ## If not specified, it defaults to "_CoqProject"
   coqproject = "_CoqProject";
@@ -49,6 +53,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "mathcomp-bigenough"
       "mathcomp-classical"
       "mathcomp-finmap"
+      "mathcomp-infotheo"
       "mathcomp-real-closed"
       "mathcomp-word"
       "mathcomp-zify"
@@ -80,18 +85,28 @@ with builtins; with (import <nixpkgs> {}).lib;
          #   for a complete list of Coq packages available in Nix
          # * <github_login>:<branch> is such that this will use the branch <branch>
          #   from https://github.com/<github_login>/<repository>
+         mathcomp-analysis.override.version = "gares:ssrpat-FO-ignore-imparg";
+         mathcomp-classical.override.version = "gares:ssrpat-FO-ignore-imparg";
+         odd-order.override.version = "gares:ssrpat-FO-ignore-imparg";
+         multinomials.override.version = "proux01:ssrpat-FO-ignore-imparg";
+         mathcomp-real-closed.override.version = "proux01:ssrpat-FO-ignore-imparg";
+         coqeal.override.version = "proux01:ssrpat-FO-ignore-imparg";
+         mathcomp-abel.override.version = "proux01:ssrpat-FO-ignore-imparg";
+         gaia.override.version = "ssrpat-FO-ignore-imparg";
+         mathcomp-apery.override.version = "ssrpat-FO-ignore-imparg";
+         graph-theory.override.version = "ssrpat-FO-ignore-imparg";
        };
   in {
     "coq-master" = { rocqPackages = {
-      rocq-core.override.version = "master";
+      rocq-core.override.version = "gares:ssrpat-FO-ignore-imparg";
       stdlib.override.version = "master";
       bignums.override.version = "master";
       rocq-elpi.override.version = "master";
       rocq-elpi.override.elpi-version = "2.0.7";
+      hierarchy-builder.override.version = "master";
       mathcomp.job = false;
-      graph-theory.job = false;  # currently broken on Rocq master (c.f., https://github.com/rocq-community/graph-theory/issues/45 )
     }; coqPackages = common-bundles // {
-      coq.override.version = "master";
+      coq.override.version = "gares:ssrpat-FO-ignore-imparg";
       stdlib.override.version = "master";
       bignums.override.version = "master";
       coq-elpi.override.version = "master";
@@ -101,6 +116,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       coquelicot.job = false;
       mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
       ssprove.job = false;
+      mathcomp-infotheo.job = false;  # not compatible with master
     }; };
     "coq-9.0".coqPackages = common-bundles // {
       coq.override.version = "9.0";
@@ -109,7 +125,8 @@ with builtins; with (import <nixpkgs> {}).lib;
       mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
-      interval.job = false;
+      interval.job = false;  # not yet compatible with 9.0
+      mathcomp-infotheo.job = false;  # not yet compatible with 9.0
     };
     "coq-8.20".coqPackages = common-bundles // {
       coq.override.version = "8.20";

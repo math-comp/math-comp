@@ -608,7 +608,7 @@ have pQ: 2.-group 'Q_8 by rewrite /pgroup oQ.
 case: DnQ_P => gz isoZ.
 rewrite -im_cpair cardMg_divn setI_im_cpair cpair_center_id.
 rewrite -injm_center//; last exact: injm_cpair1g.
-rewrite (card_injm (injm_cpairg1 _))// (card_injm (injm_cpair1g _))//.
+rewrite (card_injm (injm_cpairg1 _))//= (card_injm (injm_cpair1g _))//.
 rewrite (card_injm (injm_cpair1g _))//; last exact: center_sub.
 rewrite oQ card_pX1p2n // (card_center_extraspecial pQ Q8_extraspecial).
 by rewrite -muln_divA // mulnC -(expnD 2 2).

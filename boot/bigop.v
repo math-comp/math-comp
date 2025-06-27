@@ -2271,7 +2271,7 @@ Lemma sub_le_big_seq (I : eqType) s s' P (F : I -> R) :
   le (\big[op/x]_(i <- s | P i) F i) (\big[op/x]_(i <- s' | P i) F i).
 Proof.
 rewrite (big_AC_mk_monoid opA opC) => /count_subseqP[_ /subseqP[m sm ->]].
-move/(perm_big _)->; rewrite big_mask big_tnth.
+move/(perm_big _)->; rewrite big_mask [X in le _ X]big_tnth.
 by rewrite -!(big_AC_mk_monoid opA opC) sub_le_big // => j /andP[].
 Qed.
 

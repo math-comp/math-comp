@@ -335,6 +335,8 @@ Proof.
 by move=> defG; rewrite (coprime_sdprod_Hall_l defG) (sdprod_Hall defG).
 Qed.
 
+Set SsrMatching LegacyFoUnif.
+
 Lemma compl_pHall pi K H G :
   pi.-Hall(G) K -> (H \in [complements to K in G]) = pi^'.-Hall(G) H.
 Proof.
@@ -346,6 +348,8 @@ have tiKH: K :&: H = 1 := coprime_TIg (pnat_coprime piK pi'H).
 split=> //; apply/eqP; rewrite eqEcard mul_subG //= TI_cardMg //.
 by rewrite (card_Hall hallK) (card_Hall hallH) partnC.
 Qed.
+
+Unset SsrMatching LegacyFoUnif.
 
 Lemma compl_p'Hall pi K H G :
   pi^'.-Hall(G) K -> (H \in [complements to K in G]) = pi.-Hall(G) H.
@@ -1173,7 +1177,7 @@ Lemma pseries_catr_id pi1s pi2s gT (G : {group gT}) :
 Proof.
 elim/last_ind: pi2s => [//|pi2s pi IHpi] in G *.
 have Epis: pseries pi2s (pseries (pi1s ++ rcons pi2s pi) G) = pseries pi2s G.
-  by rewrite -cats1 catA -2!IHpi pseries_catl_id.
+  by rewrite -cats1 catA -[RHS]IHpi -[LHS]IHpi /= [pseries (_ ++ _) _]pseries_catl_id.
 apply: (@quotient_inj _ (pseries_group pi2s G)).
 - by rewrite /= -Epis /(_ <| _) pseries_norm2 -cats1 pseries_sub_catl.
 - by rewrite /= /(_ <| _) pseries_norm2 -cats1 pseries_sub_catl.
