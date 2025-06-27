@@ -719,7 +719,7 @@ pose Einv (z : E) (q := repr z) (dq := d (pickle q).+1) :=
 have Einv0 : Einv 0 = 0.
   rewrite /Einv; case: Bezout_eq1_coprimepP => // ex_uv.
   case/negP: (oner_neq0 E); rewrite [X in X == _]piE.
-  rewrite -[_ 1]/(PtoE 1); have [uv <-] := ex_uv.
+  rewrite /= -[_ 1]/(PtoE 1); have [uv <-] := ex_uv.
   by rewrite rmorphD !rmorphM [X in _ + _ * X]PtoEd /= reprK !mulr0 addr0.
 have EmulV : forall x, x != 0 -> Einv x * x = 1.
   rewrite /Einv=> z nz_z; case: Bezout_eq1_coprimepP => [ex_uv |]; last first.

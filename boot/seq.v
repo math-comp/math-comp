@@ -1406,7 +1406,7 @@ Qed.
 
 Lemma filter_undup p s : filter p (undup s) = undup (filter p s).
 Proof.
-elim: s => //= x s IHs; rewrite (fun_if undup) fun_if /= mem_filter /=.
+elim: s => //= x s IHs; rewrite (fun_if undup) [_ = _]fun_if /= mem_filter /=.
 by rewrite (fun_if (filter p)) /= IHs; case: ifP => -> //=; apply: if_same.
 Qed.
 
