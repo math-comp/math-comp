@@ -821,13 +821,13 @@ Proof.
 move=> eqAB; move: (congr1 usubmx eqAB) (congr1 dsubmx eqAB).
 by rewrite !(col_mxKu, col_mxKd).
 Qed.
-  
+
 Lemma lsubmx_const (r : R) : lsubmx (const_mx r : 'M_(m, n1 + n2)) = const_mx r.
 Proof. by apply/matrixP => i j; rewrite !mxE. Qed.
 
 Lemma rsubmx_const (r : R) : rsubmx (const_mx r : 'M_(m, n1 + n2)) = const_mx r.
 Proof. by apply/matrixP => i j; rewrite !mxE. Qed.
-  
+
 Lemma row_mx_const a : row_mx (const_mx a) (const_mx a) = const_mx a.
 Proof. by split_mxE. Qed.
 
