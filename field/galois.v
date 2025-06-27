@@ -1407,7 +1407,7 @@ have [w [Ew nzw] uM]: {w : #|A|.-tuple L | nzE w & M w \in unitmx}.
   have ->: drsubmx M1 = M by apply/matrixP => i j; rewrite !mxE !(tnth_nth 0).
   have ->: ursubmx M1 - a *m M = 0.
     by apply/rowP=> i; rewrite mulmxKV // !mxE !(tnth_nth 0) subrr.
-  rewrite det_lblock unitrM andbC -unitmxE uM unitfE -oppr_eq0.
+  rewrite det_lblock unitrM andbC  -(unitmxE M) uM unitfE -oppr_eq0.
   congr (_ != 0): nzS; rewrite [_ - _]mx11_scalar det_scalar !mxE opprB /=.
   rewrite -big_uniq // big_cons /= cx_n1 mulN1r addrC; congr (_ + _).
   rewrite (big_nth 1%g) big_mkord; apply: eq_bigr => j _.

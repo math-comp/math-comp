@@ -661,7 +661,7 @@ Lemma quotmE x : x \in G -> quotm (coset H x) = coset (f @* H) (f x).
 Proof. exact: factmE. Qed.
 
 Lemma morphim_quotm A : quotm @* (A / H) = f @* A / f @* H.
-Proof. by rewrite morphim_factm morphim_restrm morphim_comp morphimIdom. Qed.
+Proof. by rewrite morphim_factm [LHS]morphim_restrm morphim_comp morphimIdom. Qed.
 
 Lemma morphpre_quotm Abar : quotm @*^-1 (Abar / f @* H) = f @*^-1 Abar / H.
 Proof.
@@ -921,7 +921,7 @@ Qed.
 Lemma index_morphpre L M :
   L \subset f @* D -> #|f @*^-1 L : f @*^-1 M| = #|L : M|.
 Proof.
-move=> dL; rewrite -!divgI -morphpreI card_morphpre //.
+move=> dL; rewrite -!divgI -morphpreI /= card_morphpre //.
 have: L :&: M \subset f @* D by rewrite subIset ?dL.
 by move/card_morphpre->; rewrite divnMl ?cardG_gt0.
 Qed.

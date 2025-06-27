@@ -1055,7 +1055,8 @@ have rsimUV: mx_rsim (subg_repr (phi jU) sZS) (subg_repr (phi jV) sZS).
   - by rewrite -degU degZ degV.
   - by rewrite /row_free !mxrankMfree.
   have Sx := subsetP sZS x Zx.
-  by rewrite 2!mulmxA bUhom // -(mulmxA _ _ bZ) bZhom // -4!mulmxA bVhom.
+  rewrite 2!mulmxA bUhom // -(mulmxA _ _ bZ) bZhom //.
+  by rewrite -!(mulmxA bU) -!(mulmxA bZ) bVhom.
 have{rsimUV} [B [B' _ homB]] := mx_rsim_def rsimUV.
 have:= eqxx (irr_mode (iphi jU) z); rewrite /irr_mode; set i0 := Ordinal _.
 rewrite {2}[_ z]homB // ![_ z]phi_z mxE mulr1n -scalemx1 -scalemxAr -scalemxAl.

@@ -1641,7 +1641,7 @@ Proof. exact: pprodmEr. Qed.
 Lemma morphim_sdprodm A B :
   A \subset H -> B \subset K -> sdprodm @* (A * B) = fH @* A * fK @* B.
 Proof.
-move=> sAH sBK; rewrite morphim_restrm /= (setIidPr _) ?morphim_pprodm //.
+move=> sAH sBK; rewrite /sdprodm morphim_restrm /= (setIidPr _) ?morphim_pprodm //.
 by case/sdprodP: eqHK_G => _ <- _ _; apply: mulgSS.
 Qed.
 
@@ -1711,7 +1711,7 @@ Proof. exact: pprodmEr. Qed.
 Lemma morphim_cprodm A B :
   A \subset H -> B \subset K -> cprodm @* (A * B) = fH @* A * fK @* B.
 Proof.
-move=> sAH sBK; rewrite morphim_restrm /= (setIidPr _) ?morphim_pprodm //.
+move=> sAH sBK; rewrite [LHS]morphim_restrm /= (setIidPr _) ?morphim_pprodm //.
 by case/cprodP: eqHK_G => _ <- _; apply: mulgSS.
 Qed.
 
@@ -1853,7 +1853,8 @@ Proof. by rewrite -im_sdpair morphim_sdprodm // im_sdprodm1 im_sdprodm2. Qed.
 Lemma injm_xsdprodm :
   'injm xsdprodm = [&& 'injm fH, 'injm fK & fH @* H :&: fK @* K == 1].
 Proof.
-rewrite injm_sdprodm im_sdprodm1 im_sdprodm2 !subG1 /= !ker_restrm !ker_comp.
+rewrite injm_sdprodm im_sdprodm1 im_sdprodm2 !subG1 /=.
+rewrite (ker_restrm xsdprodm_dom1) (ker_restrm xsdprodm_dom2) /= !ker_comp.
 rewrite !morphpre_invm !morphimIim.
 by rewrite !morphim_injm_eq1 ?subsetIl ?injm_sdpair1 ?injm_sdpair2.
 Qed.
