@@ -3416,6 +3416,7 @@ HB.instance Definition _ := isScalable.Build R U A *:%R (a \*o f)
 
 End AlgebraTheory.
 
+(*TOTHINK: can we use wrapper here?*)
 HB.mixin Record NzRing_hasMulInverse R of NzRing R := {
   unit_subdef : pred R;
   inv : R -> R;
