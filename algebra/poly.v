@@ -555,7 +555,7 @@ Lemma size_poly_prod_leq (I : finType) (P : pred I) (F : I -> {poly R}) :
   size (\prod_(i | P i) F i) <= (\sum_(i | P i) size (F i)).+1 - #|P|.
 Proof.
 rewrite -sum1_card.
-elim/big_rec3: _ => [|i n p m _ IHp]; first by rewrite size_poly1.
+elim/big_rec3: _ => [|i n m p _ IHp]; first by rewrite size_poly1.
 have [-> | nz_p] := eqVneq p 0; first by rewrite mulr0 size_poly0.
 rewrite (leq_trans (size_polyMleq _ _)) // subnS -!subn1 leq_sub2r //.
 rewrite -addnS -addnBA ?leq_add2l // ltnW // -subn_gt0 (leq_trans _ IHp) //.

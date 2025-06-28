@@ -1737,7 +1737,7 @@ Lemma lreg_sign n : lreg ((-1) ^+ n : R). Proof. exact/lregX/lregN/lreg1. Qed.
 Lemma prodrN (I : finType) (A : pred I) (F : I -> R) :
   \prod_(i in A) - F i = (- 1) ^+ #|A| * \prod_(i in A) F i.
 Proof.
-rewrite -sum1_card; elim/big_rec3: _ => [|i x _ n _ ->]; first by rewrite mulr1.
+rewrite -sum1_card; elim/big_rec3: _ => [|i x n _ _ ->]; first by rewrite mulr1.
 by rewrite exprS !mulrA mulN1r !mulNr commrX //; apply: commrN1.
 Qed.
 
