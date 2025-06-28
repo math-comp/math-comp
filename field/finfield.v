@@ -519,7 +519,7 @@ Let map_poly_extField (F : fieldType) (L : fieldExtType F) :=
   map_poly (in_alg L) : {poly F} -> {poly L}.
 
 Local Notation "p ^%:A" := (map_poly_extField _ p)
-  (at level 2, format "p ^%:A") : ring_scope.
+  (format "p ^%:A") : ring_scope.
 
 Lemma FinSplittingFieldFor (F : finFieldType) (p : {poly F}) :
   p != 0 -> {L : splittingFieldType F | splittingFieldFor 1 p^%:A {:L}}.
@@ -584,7 +584,7 @@ Lemma pPrimePowerField p k (m := (p ^ k)%N) :
 Proof.
 move=> pr_p k_gt0; have m_gt1: m > 1 by rewrite (ltn_exp2l 0) ?prime_gt1.
 have m_gt0 := ltnW m_gt1; have m1_gt0: m.-1 > 0 by rewrite -ltnS prednK.
-pose q := 'X^m - 'X; have Dq R: q R = ('X^m.-1 - 1) * ('X - 0).
+pose q := 'X^m - 'X; have Dq R: q R = ('X^(m.-1) - 1) * ('X - 0).
   by rewrite subr0 mulrBl mul1r -exprSr prednK.
 have /FinSplittingFieldFor[/= L splitLq]: q 'F_p != 0.
   by rewrite Dq monic_neq0 ?rpredM ?monicXsubC ?monicXnsubC.

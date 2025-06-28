@@ -68,7 +68,7 @@ Definition p_group A := pgroup (pdiv #|A|) A.
 
 Definition p_elt pi x := pi.-nat #[x].
 
-Definition constt x pi := x ^+ (chinese #[x]`_pi #[x]`_pi^' 1 0).
+Definition constt x pi := x ^+ (chinese #[x]`_pi #[x]`_(pi^') 1 0).
 
 Definition Hall A B := (B \subset A) && coprime #|B| #|A : B|.
 
@@ -90,26 +90,24 @@ Arguments pHall {gT} pi%_N A%_g B%_g.
 Arguments Syl {gT} p%_N A%_g.
 Arguments Sylow {gT} A%_g B%_g.
 
-Notation "pi .-group" := (pgroup pi)
-  (at level 2, format "pi .-group") : group_scope.
+Notation "pi .-group" := (pgroup pi) (format "pi .-group") : group_scope.
 
 Notation "pi .-subgroup ( A )" := (psubgroup pi A)
-  (at level 8, format "pi .-subgroup ( A )") : group_scope.
+  (format "pi .-subgroup ( A )") : group_scope.
 
-Notation "pi .-elt" := (p_elt pi)
-  (at level 2, format "pi .-elt") : group_scope.
+Notation "pi .-elt" := (p_elt pi) (format "pi .-elt") : group_scope.
 
 Notation "x .`_ pi" := (constt x pi)
-  (at level 3, format "x .`_ pi") : group_scope.
+  (at level 3, left associativity, format "x .`_ pi") : group_scope.
 
 Notation "pi .-Hall ( G )" := (pHall pi G)
-  (at level 8, format "pi .-Hall ( G )") : group_scope.
+  (format "pi .-Hall ( G )") : group_scope.
 
 Notation "p .-Sylow ( G )" := (nat_pred_of_nat p).-Hall(G)
-  (at level 8, format "p .-Sylow ( G )") : group_scope.
+  (format "p .-Sylow ( G )") : group_scope.
 
 Notation "''Syl_' p ( G )" := (Syl p G)
-  (at level 8, p at level 2, format "''Syl_' p ( G )") : group_scope.
+  (p at level 2, format "''Syl_' p ( G )") : group_scope.
 
 Section PgroupProps.
 
@@ -422,7 +420,7 @@ have: p %| #|G| + 1 by rewrite addn1 pdiv_dvd.
 by rewrite dvdn_addr -def_q // Euclid_dvd1.
 Qed.
 
-Lemma p_elt_exp pi x m : pi.-elt (x ^+ m) = (#[x]`_pi^' %| m).
+Lemma p_elt_exp pi x m : pi.-elt (x ^+ m) = (#[x]`_(pi^') %| m).
 Proof.
 apply/idP/idP=> [pi_xm | /dvdnP[q ->{m}]]; last first.
   rewrite mulnC; apply: pnat_dvd (part_pnat pi #[x]).
@@ -515,7 +513,7 @@ Qed.
 Lemma consttM pi x y : commute x y -> (x * y).`_pi = x.`_pi * y.`_pi.
 Proof.
 move=> cxy; pose m := #|<<[set x; y]>>|; have m_gt0: 0 < m := cardG_gt0 _.
-pose k := chinese m`_pi m`_pi^' 1 0.
+pose k := chinese m`_pi m`_(pi^') 1 0.
 suffices kXpi z: z \in <<[set x; y]>> -> z.`_pi = z ^+ k.
   by rewrite !kXpi ?expgMn // ?groupM ?mem_gen // !inE eqxx ?orbT.
 move=> xyz; have{xyz} zm: #[z] %| m by rewrite cardSg ?cycle_subG.
@@ -861,7 +859,7 @@ End PcoreDef.
 Arguments pcore pi%_N {gT} A%_g.
 Arguments pcore_group pi%_N {gT} A%_G.
 Notation "''O_' pi ( G )" := (pcore pi G)
-  (at level 8, pi at level 2, format "''O_' pi ( G )") : group_scope.
+  (pi at level 2, format "''O_' pi ( G )") : group_scope.
 Notation "''O_' pi ( G )" := (pcore_group pi G) : Group_scope.
 
 Section PseriesDefs.
@@ -885,7 +883,7 @@ Arguments pseries pis%_SEQ {gT} _%_g.
 Local Notation ConsPred p := (@Cons nat_pred p%N) (only parsing).
 Notation "''O_{' p1 , .. , pn } ( A )" :=
   (pseries (ConsPred p1 .. (ConsPred pn [::]) ..) A)
-  (at level 8, format "''O_{' p1 , .. , pn } ( A )") : group_scope.
+  (format "''O_{' p1 , .. , pn } ( A )") : group_scope.
 Notation "''O_{' p1 , .. , pn } ( A )" :=
   (pseries_group (ConsPred p1 .. (ConsPred pn [::]) ..) A) : Group_scope.
 
