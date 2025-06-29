@@ -59,7 +59,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Section Defs.
 
@@ -275,8 +275,9 @@ Hypothesis complH_K : H \in [complements to K in G].
 Lemma remgrM : K <| G -> {in G &, {morph remgr K H : x y / x * y}}.
 Proof.
 case/normalP=> _; case/complP: complH_K => tiKH <- nK_KH x y KHx KHy.
-rewrite {1}(divgr_eq K H y) mulgA (conjgCV x) {2}(divgr_eq K H x) -2!mulgA.
-rewrite mulgA remgrMid //; last by rewrite groupMl mem_remgr.
+rewrite {1}(divgr_eq K H y) mulgA (conjgCV x) {2}(divgr_eq K H x) -mulgA.
+rewrite -[X in _ * X]mulgA mulgA remgrMid //; last first.
+  by rewrite groupMl mem_remgr.
 by rewrite groupMl !(=^~ mem_conjg, nK_KH, mem_divgr).
 Qed.
 
@@ -1026,20 +1027,20 @@ Definition pairg1 x : gT1 * gT2 := (x, 1).
 Definition pair1g x : gT1 * gT2 := (1, x).
 
 Lemma pairg1_morphM : {morph pairg1 : x y / x * y}.
-Proof. by move=> x y /=; rewrite {2}/mulg /= /extprod_mulg /= mul1g. Qed.
+Proof. by move=> x y /=; rewrite {2}/mulg /= /mul_pair/= mul1g. Qed.
 
 Canonical pairg1_morphism := @Morphism _ _ setT _ (in2W pairg1_morphM).
 
 Lemma pair1g_morphM : {morph pair1g : x y / x * y}.
-Proof. by move=> x y /=; rewrite {2}/mulg /= /extprod_mulg /= mul1g. Qed.
+Proof. by move=> x y /=; rewrite {2}/mulg /= /mul_pair/= mul1g. Qed.
 
 Canonical pair1g_morphism := @Morphism _ _ setT _ (in2W pair1g_morphM).
 
 Lemma fst_morphM : {morph (@fst gT1 gT2) : x y / x * y}.
-Proof. by move=> x y. Qed.
+Proof. by []. Qed.
 
 Lemma snd_morphM : {morph (@snd gT1 gT2) : x y / x * y}.
-Proof. by move=> x y. Qed.
+Proof. by []. Qed.
 
 Canonical fst_morphism := @Morphism _ _ setT _ (in2W fst_morphM).
 
@@ -1085,7 +1086,7 @@ apply/imset2P/andP=> [[[x1 u1] [v1 y1]] | [Hx Hy]].
   rewrite !inE /= => /andP[Hx1 /eqP->] /andP[/eqP-> Hx] [-> ->].
   by rewrite mulg1 mul1g.
 exists (x, 1 : gT2) (1 : gT1, y); rewrite ?inE ?Hx ?eqxx //.
-by rewrite /mulg /= /extprod_mulg /= mulg1 mul1g.
+by rewrite /mulg /= /mul_pair /= mulg1 mul1g.
 Qed.
 
 Lemma setX_dprod (H1 : {group gT1}) (H2 : {group gT2}) :
@@ -1884,7 +1885,7 @@ apply: (iffP misomP) => [[pM /isomP[injf /= <-]] | ].
 case/dprodP=> _ defG cH12 trH12.
 have fM: morphic (setX H1 H2) mulgm.
   apply/morphicP=> [[x1 x2] [y1 y2] /setXP[_ Hx2] /setXP[Hy1 _]].
-  by rewrite /= mulgA -(mulgA x1) -(centsP cH12 x2) ?mulgA.
+  by rewrite /= mulgA -(mulgA x1) -(centsP cH12 x2 _ y1) ?mulgA//.
 exists fM; apply/isomP; split; last by rewrite morphimEsub //= imset_mulgm.
 apply/subsetP=> [[x1 x2]]; rewrite !inE /= andbC -eq_invg_mul.
 case: eqP => //= <-; rewrite groupV -in_setI trH12 => /set1P->.

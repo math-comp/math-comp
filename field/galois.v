@@ -41,7 +41,8 @@ Unset Printing Implicit Defensive.
 Reserved Notation "''Gal' ( A / B )"
   (A at level 35, format "''Gal' ( A  /  B )").
 
-Import GroupScope GRing.Theory.
+Local Open Scope group_scope.
+Import GRing.Theory.
 Local Open Scope ring_scope.
 
 Section SplittingFieldFor.

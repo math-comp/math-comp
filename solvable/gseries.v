@@ -34,7 +34,7 @@ Unset Printing Implicit Defensive.
 
 Declare Scope group_rel_scope.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Section GroupDefs.
 

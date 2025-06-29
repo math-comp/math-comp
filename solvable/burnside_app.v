@@ -12,7 +12,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Lemma burnside_formula : forall (gT : finGroupType) s (G : {group gT}),
    uniq s -> s =i G ->
