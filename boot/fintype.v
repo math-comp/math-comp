@@ -1726,9 +1726,8 @@ Section OrdinalSub.
 
 Variable n : nat.
 
-Inductive ordinal : predArgType := Ordinal m of m < n.
-
-Coercion nat_of_ord i := let: Ordinal m _ := i in m.
+Record ordinal : predArgType :=
+  Ordinal { nat_of_ord :> nat ; _ : nat_of_ord < n }.
 
 HB.instance Definition _ := [isSub of ordinal for nat_of_ord].
 HB.instance Definition _ := [Countable of ordinal by <:].
@@ -2261,6 +2260,9 @@ Arguments inord_val {n'}.
 
 Lemma ord1 : all_equal_to (ord0 : 'I_1).
 Proof. by case=> [[] // ?]; apply: val_inj. Qed.
+
+Canonical ordSS n (i : 'I_n) : 'I_n.+1 :=
+  @Ordinal n.+1 i.+1 (lift_subproof 0 (i : 'I_n.+1.-1)).
 
 (* Product of two fintypes which is a fintype *)
 Section ProdFinType.

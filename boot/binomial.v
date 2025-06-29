@@ -380,7 +380,7 @@ rewrite -sum1dep_card (partition_big (@thead _ _) A) /= => [|t]; last first.
 rewrite ffactnS -sum_nat_const; apply: eq_bigr => x Ax.
 rewrite (cardD1 x) [x \in A]Ax /= -(IHn [predD1 A & x]) -sum1dep_card.
 rewrite (reindex (fun t : n.-tuple T => [tuple of x :: t])) /=; last first.
-  pose ttail (t : n.+1.-tuple T) := [tuple of behead t].
+  pose ttail (t : n.+1.-tuple T) : _.-tuple _ := behead t.
   exists ttail => [t _ | t /andP[_ /eqP <-]]; first exact: val_inj.
   by rewrite -tuple_eta.
 apply: eq_bigl=> t; rewrite Ax theadE eqxx andbT /= andbA; congr (_ && _).
@@ -463,7 +463,7 @@ have [-> | n_gt0] := posnP n; last pose i0 := Ordinal n_gt0.
   by apply: (@eq_card1 _ [tuple]) => t; rewrite [t]tuple0 inE.
 rewrite -[n in RHS]card_ord -card_draws.
 pose f_t (t : m.-tuple 'I_n) := [set i in t].
-pose f_A (A : {set 'I_n}) := [tuple of mkseq (nth i0 (enum A)) m].
+pose f_A (A : {set 'I_n}) : _.-tuple _ := mkseq (nth i0 (enum A)) m.
 have val_fA (A : {set 'I_n}) : #|A| = m -> val (f_A A) = enum A.
   by move=> Am; rewrite -[enum _](mkseq_nth i0) -cardE Am.
 have inc_A (A : {set 'I_n}) : sorted ltn (map val (enum A)).
@@ -492,7 +492,7 @@ pose add_mn t i := Ordinal (add_mnP i (tnth t i)).
 pose add_mn_nat (t : m.-tuple In1) i := i + nth x0 t i.
 have add_mnC t: val \o add_mn t =1 add_mn_nat t \o val.
   by move=> i; rewrite /= (tnth_nth x0).
-pose f_add t := [tuple of map (add_mn t) (ord_tuple m)].
+pose f_add t : _.-tuple _ := map (add_mn t) (ord_tuple m).
 rewrite -card_ltn_sorted_tuples -!sum1dep_card (reindex f_add) /=.
   apply: eq_bigl => t; rewrite -map_comp (eq_map (add_mnC t)) map_comp.
   rewrite enumT unlock val_ord_enum -[in LHS](drop0 t).
@@ -506,7 +506,7 @@ rewrite -card_ltn_sorted_tuples -!sum1dep_card (reindex f_add) /=.
   rewrite addSnnS => def_m; rewrite -addSn leq_add2l -IHk //.
   by rewrite (drop_nth x0) // -def_m leq_addl.
 pose sub_mn (t : m.-tuple 'I_(m + n)) i : In1 := inord (tnth t i - i).
-exists (fun t => [tuple of map (sub_mn t) (ord_tuple m)]) => [t _ | t].
+exists (fun t => map (sub_mn t) (ord_tuple m)) => [t _ | t].
   apply: eq_from_tnth => i; apply: val_inj.
   by rewrite /sub_mn !(tnth_ord_tuple, tnth_map) addKn inord_val.
 rewrite inE /= => inc_t; apply: eq_from_tnth => i; apply: val_inj.
