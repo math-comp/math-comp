@@ -1261,7 +1261,7 @@ have{lin_xy} def2xy: `|x| * `|y| *+ 2 = x * y ^* + y * x ^*.
 have def_xy: x * y^* = y * x^*.
   apply/eqP; rewrite -subr_eq0 -[_ == 0](@expf_eq0 _ _ 2).
   rewrite (canRL (subrK _) (subr_sqrDB _ _)) opprK -def2xy exprMn_n exprMn.
-  by rewrite mulrN (@GRing.mul C).[AC (2*2) (1*4*(3*2))] -!normCK mulNrn addNr.
+  by rewrite mulrN (@monoid.mul C).[AC (2*2) (1*4*(3*2))] -!normCK mulNrn addNr.
 have{def_xy def2xy} def_yx: `|y * x| = y * x^*.
   by apply: (mulIf nz2); rewrite !mulr_natr mulrC normrM def2xy def_xy.
 rewrite -{1}(divfK nz_x y) invC_norm mulrCA -{}def_yx !normrM invfM.
