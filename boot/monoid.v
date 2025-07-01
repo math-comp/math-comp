@@ -193,6 +193,10 @@ End ClosedPredicates.
 
 End MagmaTheory.
 
+Prenex Implicits commute.
+
+Prenex Implicits commute.
+
 (*TODO: use autowrap: *)
 (* #[short(type="semigroupType")]
 HB.structure Definition Semigroup
@@ -272,6 +276,8 @@ Section baseUMagmaTheory.
 
 Variable G : baseUMagmaType.
 Implicit Types x : G.
+
+Lemma expgnE x n : x ^+ n = iterop n mul x 1. Proof. by []. Qed.
 Lemma expg0 x : x ^+ 0 = 1. Proof. by []. Qed.
 Lemma expg1 x : x ^+ 1 = x. Proof. by []. Qed.
 Lemma expg2 x : x ^+ 2 = x * x. Proof. by []. Qed.
@@ -347,6 +353,8 @@ Proof. by rewrite /commute mulg1 mul1g. Qed.
 
 End UMagmaTheory.
 
+#[global] Hint Resolve commute1 : core.
+
 #[short(type="monoidType")]
 HB.structure Definition Monoid := {G of UMagma G & Semigroup G}.
 
@@ -397,17 +405,11 @@ Section MonoidTheory.
 Variable G : monoidType.
 Implicit Types x y : G.
 
-Lemma expgSr x n : x ^+ n.+1 = x ^+ n * x.
-Proof.
-elim: n => [|n IHn]; first by rewrite mul1g.
-by rewrite expgS [in LHS]IHn expgS mulgA.
-Qed.
-
 Lemma expgnDr x m n : x ^+ (m + n) = x ^+ m * x ^+ n.
-Proof.
-elim: m => [|m IHm]; first by rewrite mul1g.
-by rewrite 2!expgS IHm mulgA.
-Qed.
+Proof. by elim: m => [|m IHm]; rewrite ?mul1g // !expgS IHm mulgA. Qed.
+
+Lemma expgSr x n : x ^+ n.+1 = x ^+ n * x.
+Proof. by rewrite -addn1 expgnDr expg1. Qed.
 
 Lemma expgnA x m n : x ^+ (m * n) = x ^+ m ^+ n.
 Proof. by rewrite mulnC; elim: n => //= n IHn; rewrite expgS expgnDr IHn. Qed.
@@ -482,14 +484,129 @@ HB.structure Definition BaseGroup := {G of hasInv G & BaseUMagma G}.
 
 Bind Scope group_scope with BaseGroup.sort.
 
-HB.mixin Record Monoid_isGroup G of BaseGroup G := {
+Local Notation "x ^-1" := (inv x) : group_scope. Local Notation "x / y" := (x * y^-1) : group_scope.
+Local Notation "x ^- n" := ((x ^+ n)^-1) : group_scope.
+
+Definition conjg (G : baseGroupType) (x y : G) := y^-1 * (x * y).
+Local Notation "x ^ y" := (conjg x y) : group_scope.
+
+Definition commg (G : baseGroupType) (x y : G) := x^-1 * (conjg x y).
+Local Notation "[ ~ x1 , x2 , .. , xn ]" := (commg .. (commg x1 x2) .. xn)
+  : group_scope.
+
+HB.mixin Record Monoid_isStarMonoid G of BaseGroup G := {
+  invgK : involutive (@inv G);
+  invgM : {morph @inv G : x y / x * y >-> y * x}
+}.
+
+#[short(type="starMonoidType")]
+HB.structure Definition StarMonoid :=
+  { G of Monoid_isStarMonoid G & Monoid G & BaseGroup G }.
+
+Prenex Implicits invgK.
+
+Bind Scope group_scope with StarMonoid.sort.
+
+HB.factory Record isStarMonoid G of Choice G := {
+  mul : G -> G -> G;
+  one : G;
+  inv : G -> G;
+  mulgA : associative mul;
+  mul1g : left_id one mul;
+  invgK : involutive inv;
+  invgM : {morph inv : x y / mul x y >-> mul y x}
+}.
+
+HB.builders Context G of isStarMonoid G.
+
+Lemma invg1 : inv one = one.
+Proof.
+by apply: (can_inj invgK); rewrite -{1}[inv one]mul1g invgM invgK mul1g.
+Qed.
+
+Lemma mulg1 : right_id one mul.
+Proof. by move=> x; apply: (can_inj invgK); rewrite invgM invg1 mul1g. Qed.
+
+HB.instance Definition _ := isMonoid.Build G mulgA mul1g mulg1.
+HB.instance Definition _ := hasInv.Build G inv.
+HB.instance Definition _ := Monoid_isStarMonoid.Build G invgK invgM.
+
+HB.end.
+
+Section StarMonoidTheory.
+Variable G : starMonoidType.
+Implicit Types x y z : G.
+
+Lemma invg_inj : injective (@inv G). Proof. exact: can_inj invgK. Qed.
+
+Lemma invg1 : 1^-1 = 1 :> G.
+Proof. by apply: invg_inj; rewrite -{1}[1^-1]mul1g invgM invgK mul1g. Qed.
+
+Lemma invgF x y : (x / y)^-1 = y / x.
+Proof. by rewrite invgM invgK. Qed.
+
+Lemma prodgV I r (P : pred I) (E : I -> G) :
+  \prod_(i <- r | P i) (E i)^-1 = (\prod_(i <- rev r | P i) E i)^-1.
+Proof.
+elim: r => [|x r IHr]; first by rewrite !big_nil invg1.
+rewrite big_cons rev_cons big_rcons/= IHr.
+by case: ifP => _; rewrite ?mulg1// invgM.
+Qed.
+
+Lemma eqg_inv x y : (x^-1 == y^-1) = (x == y).
+Proof. exact: can_eq invgK x y. Qed.
+
+Lemma eqg_invLR x y : (x^-1 == y) = (x == y^-1).
+Proof. exact: inv_eq invgK x y. Qed.
+
+Lemma invg_eq1 x : (x^-1 == 1) = (x == 1).
+Proof. by rewrite eqg_invLR invg1. Qed.
+
+Lemma expVgn x n : x^-1 ^+ n = x ^- n.
+Proof. by elim: n => [|n IHn]; rewrite ?invg1 // expgSr expgS invgM IHn. Qed.
+
+Lemma conjgE x y : x ^ y = y^-1 * (x * y). Proof. by []. Qed.
+
+Lemma commgEl x y : [~ x, y] = x^-1 * x ^ y. Proof. by []. Qed.
+
+Lemma commgEr x y : [~ x, y] = y^-1 ^ x * y.
+Proof. by rewrite -!mulgA. Qed.
+
+End StarMonoidTheory.
+
+Arguments invg_inj {G} [x1 x2].
+
+HB.mixin Record StarMonoid_isGroup G of BaseGroup G := {
   mulVg : left_inverse one inv (@mul G);
-  mulgV : right_inverse one inv (@mul G)
 }.
 
 #[short(type="groupType")]
 HB.structure Definition Group :=
-  {G of Monoid_isGroup G & BaseGroup G & Monoid G}.
+  {G of StarMonoid_isGroup G & BaseGroup G & StarMonoid G}.
+
+HB.factory Record Monoid_isGroup G of Monoid G & BaseGroup G := {
+  mulVg : left_inverse one inv (@mul G);
+  mulgV : right_inverse one inv (@mul G);
+}.
+
+HB.builders Context G of Monoid_isGroup G.
+
+Fact invgK : involutive (@inv G).
+Proof. by move=> x; rewrite -[LHS]mul1g -(mulgV x) -mulgA mulgV mulg1. Qed.
+
+Fact mulKg : @left_loop G G inv *%g.
+Proof. by move=> x y; rewrite [LHS]mulgA mulVg mul1g. Qed.
+
+Fact invgM : {morph inv : x y / x * y >-> y * x : G}.
+Proof.
+move=> x y; apply: (can_inj (mulKg (x * y))).
+by rewrite [LHS]mulgV [RHS]mulgA -(mulgA x) mulgV mulg1 mulgV.
+Qed.
+
+HB.instance Definition _ := Monoid_isStarMonoid.Build G invgK invgM.
+HB.instance Definition _ := StarMonoid_isGroup.Build G mulVg.
+
+HB.end.
 
 HB.factory Record isGroup G of Choice G := {
   one : G;
@@ -514,21 +631,13 @@ HB.end.
 
 Bind Scope group_scope with Group.sort.
 
-Local Notation "x ^-1" := (inv x) : group_scope.
-Local Notation "x / y" := (x * y^-1) : group_scope.
-Local Notation "x ^- n" := ((x ^+ n)^-1) : group_scope.
-
-Definition conjg (G : groupType) (x y : G) := y^-1 * (x * y).
-Local Notation "x ^ y" := (conjg x y) : group_scope.
-
-Definition commg (G : groupType) (x y : G) := x^-1 * (conjg x y).
-Local Notation "[~ x , y ]" := (commg x y) : group_scope.
-
 Section GroupTheory.
 Variable G : groupType.
 Implicit Types x y : G.
 
-Definition divgg := @mulgV G.
+Lemma mulgV : right_inverse one inv (@mul G).
+Proof. by move=> x; rewrite -{1}(invgK x) mulVg. Qed.
+Definition divgg := mulgV.
 
 Lemma mulKg : @left_loop G G (@inv G) *%g.
 Proof. by move=> x y; rewrite mulgA mulVg mul1g. Qed.
@@ -549,41 +658,15 @@ Proof. by move=> x; apply: can_inj (mulKg x). Qed.
 Lemma mulIg : @left_injective G G G *%g.
 Proof. by move=> x; apply: can_inj (mulgK x). Qed.
 
-Lemma invgK : @involutive G (@inv G).
-Proof. by move=> x; rewrite -[LHS](mulVKg x) divgg mulg1. Qed.
-
-Lemma invg_inj : @injective G G (@inv G).
-Proof. exact: inv_inj invgK. Qed.
-
 Lemma divgI : @right_injective G G G (fun x y => x / y).
 Proof. by move=> x y z /mulgI/invg_inj. Qed.
 
 Lemma divIg : @left_injective G G G (fun x y => x / y).
 Proof. by move=> x y z /mulIg. Qed.
 
-Lemma invg1 : 1 ^-1 = 1 :> G.
-Proof. by rewrite -[LHS]mul1g divgg. Qed.
-
-Lemma invg_eq1 x : (x ^-1 == 1) = (x == 1).
-Proof. by rewrite (inv_eq invgK) invg1. Qed.
-
 Lemma divg1 x : x / 1 = x. Proof. by rewrite invg1 mulg1. Qed.
 
 Lemma div1g x : 1 / x = x^-1. Proof. by rewrite mul1g. Qed.
-
-Lemma invgF x y : (x / y)^-1 = y / x.
-Proof. by apply/(canRL (mulgK x))/(@divIg y); rewrite -mulgA mulVg divgg. Qed.
-
-Lemma invgM : {morph (@inv G): x y / x * y >-> y * x : G}.
-Proof. by move=> x y; rewrite -[y in LHS]invgK invgF. Qed.
-
-Lemma prodgV I r (P : pred I) (E : I -> G) :
-  \prod_(i <- r | P i) (E i)^-1 = (\prod_(i <- rev r | P i) E i)^-1.
-Proof.
-elim: r => [|x r IHr]; first by rewrite !big_nil invg1.
-rewrite big_cons rev_cons big_rcons/= IHr.
-by case: ifP => _; rewrite ?mulg1// invgM.
-Qed.
 
 Lemma divKg x y : commute x y -> x / (x / y) = y.
 Proof. by move=> xyC; rewrite invgF mulgA xyC mulgK. Qed.
@@ -610,28 +693,14 @@ Proof. by rewrite divg_eq mul1g. Qed.
 Lemma mulg_eq1 x y : (x * y == 1) = (x == y^-1).
 Proof. by rewrite -[y in LHS]invgK divg_eq1. Qed.
 
-Lemma eqg_inv x y : (x^-1 == y^-1) = (x == y).
-Proof. exact: can_eq invgK x y. Qed.
-
-Lemma eqg_invLR x y : (x^-1 == y) = (x == y^-1).
-Proof. exact: inv_eq invgK x y. Qed.
-
 Lemma commuteV x y : commute x y -> commute x y^-1.
 Proof. by move=> cxy; apply: (@mulIg y); rewrite mulgVK -mulgA cxy mulKg. Qed.
-
-Lemma expVgn x n : (x^-1) ^+ n = x ^- n.
-Proof.
-apply/esym/mulg1_eq; rewrite -expgMn; first by rewrite divgg expg1n.
-exact/commuteV.
-Qed.
 
 Lemma expgnFr x m n : n <= m -> x ^+ (m - n) = x ^+ m / x ^+ n.
 Proof. by move=> lenm; rewrite -[in RHS](subnK lenm) expgnDr mulgK. Qed.
 
 Lemma expgnFl x y n : commute x y -> (x / y) ^+ n = x ^+ n / y ^+ n.
 Proof. by move=> xyC; rewrite expgMn 1?expVgn; last exact/commuteV. Qed.
-
-Lemma conjgE x y : x ^ y = y^-1 * (x * y). Proof. by []. Qed.
 
 Lemma conjgC x y : x * y = y * x ^ y.
 Proof. by rewrite mulVKg. Qed.
@@ -672,10 +741,11 @@ Proof. by move=> y; apply: can_inj (conjgK y). Qed.
 Lemma conjg_eq1 x y : (x ^ y == 1) = (x == 1).
 Proof. by rewrite (can2_eq (conjgK _) (conjgKV _)) conj1g. Qed.
 
-Lemma commgEl x y : [~ x, y] = x^-1 * x ^ y. Proof. by []. Qed.
-
-Lemma commgEr x y : [~ x, y] = y^-1 ^ x * y.
-Proof. by rewrite -!mulgA. Qed.
+Lemma conjg_prod I r (P : pred I) (F : I -> G) z :
+  (\prod_(i <- r | P i) F i) ^ z = \prod_(i <- r | P i) (F i ^ z).
+Proof.
+by apply: (big_morph ((@conjg G)^~ z)) => [x y|]; rewrite ?conj1g ?conjMg.
+Qed.
 
 Lemma commgC x y : x * y = y * x * [~ x, y].
 Proof. by rewrite -mulgA !mulVKg. Qed.
@@ -739,6 +809,20 @@ Qed.
 End ClosedPredicates.
 
 End GroupTheory.
+
+#[global] Hint Rewrite @mulg1 @mul1g invg1 @mulVg mulgV (@invgK) mulgK mulgVK
+             @invgM @mulgA : gsimpl.
+
+Ltac gsimpl := autorewrite with gsimpl; try done.
+
+Definition gsimp := (@mulg1, @mul1g, (@invg1, @invgK), (@mulgV, @mulVg)).
+Definition gnorm := (gsimp, (@mulgK, @mulgVK, (@mulgA, @invgM))).
+
+Arguments mulgI [G].
+Arguments mulIg [G].
+Arguments conjg_inj {G} x [x1 x2].
+Arguments commgP {G x y}.
+Arguments conjg_fixP {G x y}.
 
 (* Morphism hierarchy. *)
 
@@ -1173,12 +1257,48 @@ HB.instance Definition _ := hasInv.Build H invH.
 
 Lemma mulVg : left_inverse 1%g invH *%g.
 Proof. by move=> x; apply/val_inj; rewrite valM SubK mulVg val1. Qed.
-Lemma mulgV : right_inverse 1%g invH *%g.
-Proof. by move=> x; apply/val_inj; rewrite valM SubK mulgV val1. Qed. 
 
-HB.instance Definition _ := Monoid_isGroup.Build H mulVg mulgV.
+HB.instance Definition _ := StarMonoid_isGroup.Build H mulVg.
 
 HB.end.
+
+Prenex Implicits mul inv natexp conjg commg.
+
+Notation "*%g" := (@mul _) : function_scope.
+Notation "x * y" := (mul x y) : group_scope.
+Notation "1" := (@one _) : group_scope.
+Notation "s `_ i" := (nth 1 s i) : group_scope.
+Notation "\prod_ ( i <- r | P ) F" :=
+  (\big[*%g/1]_(i <- r | P%B) F%g) : group_scope.
+Notation "\prod_ ( i <- r ) F" :=
+  (\big[*%g/1]_(i <- r) F%g) : group_scope.
+Notation "\prod_ ( m <= i < n | P ) F" :=
+  (\big[*%g/1]_(m <= i < n | P%B) F%g) : group_scope.
+Notation "\prod_ ( m <= i < n ) F" :=
+  (\big[*%g/1]_(m <= i < n) F%g) : group_scope.
+Notation "\prod_ ( i | P ) F" :=
+  (\big[*%g/1]_(i | P%B) F%g) : group_scope.
+Notation "\prod_ i F" :=
+  (\big[*%g/1]_i F%g) : group_scope.
+Notation "\prod_ ( i : t | P ) F" :=
+  (\big[*%g/1]_(i : t | P%B) F%g) (only parsing) : group_scope.
+Notation "\prod_ ( i : t ) F" :=
+  (\big[*%g/1]_(i : t) F%g) (only parsing) : group_scope.
+Notation "\prod_ ( i < n | P ) F" :=
+  (\big[*%g/1]_(i < n | P%B) F%g) : group_scope.
+Notation "\prod_ ( i < n ) F" :=
+  (\big[*%g/1]_(i < n) F%g) : group_scope.
+Notation "\prod_ ( i 'in' A | P ) F" :=
+  (\big[*%g/1]_(i in A | P%B) F%g) : group_scope.
+Notation "\prod_ ( i 'in' A ) F" :=
+  (\big[*%g/1]_(i in A) F%g) : group_scope.
+Notation "x ^+ n" := (natexp x n) : group_scope.
+Notation "x ^-1" := (inv x) : group_scope.
+Notation "x / y" := (x * y^-1) : group_scope.
+Notation "x ^- n" := ((x ^+ n)^-1) : group_scope.
+Notation "x ^ y" := (conjg x y) : group_scope.
+Notation "[ ~ x1 , x2 , .. , xn ]" := (commg .. (commg x1 x2) .. xn)
+  : group_scope.
 
 (* Lifting Structure from the codomain of finfuns. *)
 Section FinFunMagma.

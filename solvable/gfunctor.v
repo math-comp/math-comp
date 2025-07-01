@@ -87,7 +87,7 @@ Unset Printing Implicit Defensive.
 
 Declare Scope gFun_scope.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Delimit Scope gFun_scope with gF.
 

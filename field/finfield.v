@@ -57,7 +57,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope GRing.Theory FinRing.Theory.
+Local Open Scope group_scope.
+Import GRing.Theory FinRing.Theory.
 Local Open Scope ring_scope.
 
 Section FinNzRing.

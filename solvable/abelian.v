@@ -70,7 +70,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Section AbelianDefs.
 
@@ -292,7 +292,7 @@ Lemma pi_of_exponent G : \pi(exponent G) = \pi(G).
 Proof. by rewrite /pi_of primes_exponent. Qed.
 
 Lemma partn_exponentS pi H G :
-  H \subset G -> #|G|`_pi %| #|H| -> (exponent H)`_pi = (exponent G)`_pi.
+  H \subset G -> #|G|`_pi %| #|H| -> ((exponent H)`_pi = (exponent G)`_pi)%N.
 Proof.
 move=> sHG Gpi_dvd_H; apply/eqP; rewrite eqn_dvd.
 rewrite partn_dvd ?exponentS ?exponent_gt0 //=; apply/dvdn_partP=> // p.
@@ -312,7 +312,7 @@ rewrite (bigD1 (y ^ z))  ?(subsetP sPH) -?cycle_subG ?cycleJ //=.
 by rewrite orderJ part_pnat_id ?dvdn_lcml // (pi_pnat p_y).
 Qed.
 
-Lemma exponent_Hall pi G H : pi.-Hall(G) H -> exponent H = (exponent G)`_pi.
+Lemma exponent_Hall pi G H : pi.-Hall(G) H -> exponent H = ((exponent G)`_pi)%N.
 Proof.
 move=> hallH; have [sHG piH _] := and3P hallH.
 rewrite -(partn_exponentS sHG) -?(card_Hall hallH) ?part_pnat_id //.

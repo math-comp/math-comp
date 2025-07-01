@@ -125,7 +125,7 @@ Unset Printing Implicit Defensive.
 Declare Scope action_scope.
 Declare Scope groupAction_scope.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Section ActionDef.
 

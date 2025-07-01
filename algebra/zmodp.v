@@ -182,7 +182,7 @@ apply: val_inj => /=; elim: n => [|n IHn]; first by rewrite muln0 modn_small.
 by rewrite !GRing.mulrS /= IHn modnDmr mulnS.
 Qed.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Lemma Zp_mulgC : @commutative 'I_p _ mulg.
 Proof. exact: Zp_addC. Qed.
@@ -263,7 +263,7 @@ Proof. by rewrite Zp_nat valZpK. Qed.
 Lemma natr_negZp (x : 'I_p) : (- x)%:R = - x.
 Proof. by apply: val_inj; rewrite /= Zp_nat /= modn_mod. Qed.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Lemma unit_Zp_mulgC : @commutative {unit 'I_p} _ mulg.
 Proof. by move=> u v; apply: val_inj; rewrite /= GRing.mulrC. Qed.
