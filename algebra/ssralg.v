@@ -7250,7 +7250,7 @@ Notation Frobenius_aut chRp := (pFrobenius_aut chRp).
 Notation "*%R" := (@mul _) : function_scope.
 Notation "x * y" := (mul x y) : ring_scope.
 Arguments exp : simpl never.
-Notation "x ^+ n" := (exp x n) : ring_scope.
+Notation "x ^+ n" := (exp x%R n) : ring_scope.
 Notation "x ^-1" := (inv x) : ring_scope.
 Notation "x ^- n" := (inv (x ^+ n)) : ring_scope.
 Notation "x / y" := (mul x y^-1) : ring_scope.
