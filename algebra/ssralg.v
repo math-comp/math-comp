@@ -7247,7 +7247,7 @@ Notation pFrobenius_aut chRp := (pFrobenius_aut chRp).
 #[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut instead.")]
 Notation Frobenius_aut chRp := (pFrobenius_aut chRp).
 Notation "*%R" := (@mul _) : function_scope.
-Bind Scope ring_scope with Magma.sort.
+Bind Scope ring_scope with Magma.sort. (*Maybe unneeded after https://github.com/math-comp/math-comp/pull/1439?*)
 Notation "x * y" := (mul x y) : ring_scope.
 Arguments exp : simpl never.
 Notation "x ^+ n" := (exp x n) : ring_scope.
