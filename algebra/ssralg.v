@@ -1100,8 +1100,8 @@ Bind Scope ring_scope with NzSemiRing.sort.
 End NzSemiRingExports.
 HB.export NzSemiRingExports.
 
-(*BUG(?): should the type of R be automatically infered here?*)
-Definition exp (R:baseUMagmaType) x n := iterop n (@mul R) x (@one R).
+(*TODO: deprecate one of the two?*)
+Notation exp := natexp.
 
 Arguments exp : simpl never.
 Definition comm R x y := @mul R x y = mul y x.
