@@ -1535,8 +1535,6 @@ Notation Frobenius_aut := pFrobenius_aut (only parsing).
 Notation charf0 := pcharf0 (only parsing).
 #[deprecated(since="mathcomp 2.4.0", note="Use pcharf_prime instead.")]
 Notation charf_prime := pcharf_prime (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use mulrn_pchar instead.")]
-Notation mulrn_char := mulrn_pchar (only parsing).
 #[deprecated(since="mathcomp 2.4.0", note="Use natr_mod_pchar instead.")]
 Notation natr_mod_char := natr_mod_pchar (only parsing).
 #[deprecated(since="mathcomp 2.4.0", note="Use dvdn_pcharf instead.")]
