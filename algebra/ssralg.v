@@ -3451,8 +3451,8 @@ Arguments unit_pred _ _ /.
 Definition unit {R : unitRingType} := [qualify a u : R | unit_pred u].
 
 Local Notation "x ^-1" := (inv x).
-Local Notation "x / y" := (x * y^-1).
-Local Notation "x ^- n" := ((x ^+ n)^-1).
+Local Notation "x / y" := (x * inv y).
+Local Notation "x ^- n" := (inv (x ^+ n)).
 
 Section UnitRingTheory.
 
@@ -3511,7 +3511,7 @@ Proof.
 by move=> ? ? uE; under eq_big_nat do rewrite uE //=; exact: telescope_prodr.
 Qed.
 
-Lemma commrV x y : comm x y -> comm x y^-1.
+Lemma commrV x y : comm x y -> comm x (inv y).
 Proof.
 have [Uy cxy | /invr_out-> //] := boolP (y \in unit).
 by apply: (canLR (mulrK Uy)); rewrite -mulrA cxy mulKr.
