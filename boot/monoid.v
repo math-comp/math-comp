@@ -195,8 +195,6 @@ End MagmaTheory.
 
 Prenex Implicits commute.
 
-Prenex Implicits commute.
-
 (*TODO: use autowrap: *)
 (* #[short(type="semigroupType")]
 HB.structure Definition Semigroup
