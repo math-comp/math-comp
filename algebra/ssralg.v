@@ -635,6 +635,7 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Declare Scope ring_scope.
+Bind Scope ring_scope with Magma.sort. (*Maybe unneeded after https://github.com/math-comp/math-comp/pull/1439?*)
 Declare Scope term_scope.
 Declare Scope linear_ring_scope.
 
@@ -1112,7 +1113,7 @@ Local Notation "1" := (@one _) : ring_scope.
 Local Notation "n %:R" := (1 *+ n) : ring_scope.
 Local Notation "*%R" := (@mul _) : function_scope.
 Local Notation "x * y" := (mul x y) : ring_scope.
-Local Notation "x ^+ n" := (exp x n) : ring_scope.
+Local Notation "x ^+ n" := (exp x%R n) : ring_scope.
 
 Local Notation "\prod_ ( i <- r | P ) F" := (\big[*%R/1]_(i <- r | P) F).
 Local Notation "\prod_ ( i | P ) F" := (\big[*%R/1]_(i | P) F).
@@ -3450,9 +3451,9 @@ Definition unit_pred {R : unitRingType} :=
 Arguments unit_pred _ _ /.
 Definition unit {R : unitRingType} := [qualify a u : R | unit_pred u].
 
-Local Notation "x ^-1" := (inv x).
-Local Notation "x / y" := (x * inv y).
-Local Notation "x ^- n" := (inv (x ^+ n)).
+Local Notation "x ^-1" := (inv x) : ring_scope.
+Local Notation "x / y" := (x * inv y) : ring_scope.
+Local Notation "x ^- n" := (inv (x ^+ n)) : ring_scope.
 
 Section UnitRingTheory.
 
@@ -7247,7 +7248,6 @@ Notation pFrobenius_aut chRp := (pFrobenius_aut chRp).
 #[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut instead.")]
 Notation Frobenius_aut chRp := (pFrobenius_aut chRp).
 Notation "*%R" := (@mul _) : function_scope.
-Bind Scope ring_scope with Magma.sort. (*Maybe unneeded after https://github.com/math-comp/math-comp/pull/1439?*)
 Notation "x * y" := (mul x y) : ring_scope.
 Arguments exp : simpl never.
 Notation "x ^+ n" := (exp x n) : ring_scope.
