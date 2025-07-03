@@ -1009,8 +1009,7 @@ Lemma ler_sum_nat (m n : nat) (F G : nat -> R) :
 Proof. by move=> le_FG; rewrite !big_nat ler_sum. Qed.
 
 Lemma ltr_sum I (r : seq I) (P : pred I) (F G : I -> R) :
-  has P r ->
-  (forall i : I, P i -> F i < G i) ->
+  has P r -> (forall i, P i -> F i < G i) ->
   \sum_(i <- r | P i) F i < \sum_(i <- r | P i) G i.
 Proof.
 rewrite -big_filter -[ltRHS]big_filter -size_filter_gt0.
@@ -1493,15 +1492,15 @@ Proof. by move=> hx hy; rewrite -{1}[y]mulr1 ler_wnM2l. Qed.
 Lemma mulr_ile1 x y : 0 <= x -> 0 <= y -> x <= 1 -> y <= 1 -> x * y <= 1.
 Proof. by move=> *; rewrite (@le_trans _ _ y) ?ler_piMl. Qed.
 
-Lemma prodr_ile1 (s : seq R) :
-  (forall x, x \in s -> 0 <= x <= 1) -> \prod_(j <- s) j <= 1.
+Lemma prodr_ile1 {I : Type} (s : seq I) (P : pred I) (F : I -> R) :
+  (forall i, P i -> 0 <= F i <= 1) -> \prod_(j <- s | P j) F j <= 1.
 Proof.
 elim: s => [_ | y s ih xs01]; rewrite ?big_nil// big_cons.
-have /andP[y0 y1] : 0 <= y <= 1 by rewrite xs01// mem_head.
+case: ifPn => Py; last by rewrite ih.
+have /andP[y0 y1] : 0 <= F y <= 1 by rewrite xs01// mem_head.
 rewrite mulr_ile1 ?andbT//; last first.
   by rewrite ih// => e xs; rewrite xs01// in_cons xs orbT.
-rewrite big_seq prodr_ge0// => x xs.
-by have := xs01 x; rewrite inE xs orbT => /(_ _)/andP[].
+by rewrite prodr_ge0// => x /xs01 /andP[].
 Qed.
 
 Lemma mulr_ilt1 x y : 0 <= x -> 0 <= y -> x < 1 -> y < 1 -> x * y < 1.
