@@ -995,8 +995,12 @@ Proof. by case/orP=> /andP []; [apply: paddr_eq0 | apply: naddr_eq0]. Qed.
 
 (* big sum and ler *)
 Lemma sumr_ge0 I (r : seq I) (P : pred I) (F : I -> R) :
-  (forall i, P i -> (0 <= F i)) -> 0 <= \sum_(i <- r | P i) (F i).
+  (forall i, P i -> 0 <= F i) -> 0 <= \sum_(i <- r | P i) (F i).
 Proof. exact: (big_ind _ _ (@ler_wpDl 0)). Qed.
+
+Lemma sumr_le0 I (r : seq I) (P : pred I) (F : I -> R) :
+  (forall i, P i -> F i <= 0) -> \sum_(i <- r | P i) F i <= 0.
+Proof. by move=> F0; elim/big_ind : _ => // i x Pi; exact/ler_wnDl. Qed.
 
 Lemma ler_sum I (r : seq I) (P : pred I) (F G : I -> R) :
     (forall i, P i -> F i <= G i) ->
