@@ -801,6 +801,7 @@ Lemma addNKr : @rev_left_loop V V -%R +%R. Proof. exact: addNKr. Qed.
 Lemma addrK : @right_loop V V -%R +%R. Proof. exact: addrK. Qed.
 Lemma addrNK : @rev_right_loop V V -%R +%R. Proof. exact: addrNK. Qed.
 Definition subrK := addrNK.
+Lemma subrKC x y : x + (y - x) = y. Proof. by rewrite addrC subrK. Qed.
 Lemma subKr x : involutive (fun y => x - y). Proof. exact: subKr. Qed.
 Lemma addrI : @right_injective V V V +%R. Proof. exact: addrI. Qed.
 Lemma addIr : @left_injective V V V +%R. Proof. exact: addIr. Qed.
