@@ -65,7 +65,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Reserved Notation "x \isog y" (at level 70).
 
