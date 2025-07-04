@@ -309,7 +309,7 @@ Prenex Implicits cyclic Zpm.
 (* Euler's theorem *)
 Theorem Euler_exp_totient a n : coprime a n -> a ^ totient n  = 1 %[mod n].
 Proof.
-case: n => [|[|n']] //; [by rewrite !modn1 | set n := n'.+2] => co_a_n.
+(case: n => [|[|n']] //; [by rewrite !modn1 | set n := n'.+2]) => co_a_n.
 have{co_a_n} Ua: coprime n (inZp a : 'I_n) by rewrite coprime_sym coprime_modl.
 have: FinRing.unit 'Z_n Ua ^+ totient n == 1.
   by rewrite -card_units_Zp // -order_dvdn order_dvdG ?inE.

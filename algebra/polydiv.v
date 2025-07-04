@@ -3161,7 +3161,7 @@ Qed.
 Section Multiplicity.
 
 Definition mup x q :=
-  [arg max_(n > ord0 : 'I_(size q).+1 | ('X - x%:P) ^+ n %| q) n] : nat.
+  [arg max_(n > (ord0 : 'I_(size q).+1) | ('X - x%:P) ^+ n %| q) n] : nat.
 
 Lemma mup_geq x q n : q != 0 -> (n <= mup x q)%N = (('X - x%:P) ^+ n %| q).
 Proof.

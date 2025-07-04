@@ -85,18 +85,18 @@ Notation "H <|<| G" := (subnormal H G)
   (at level 70, no associativity) : group_scope.
 
 Notation "A .-invariant" := (invariant_factor A)
-  (at level 2, format "A .-invariant") : group_rel_scope.
+  (format "A .-invariant") : group_rel_scope.
 Notation "A .-stable" := (stable_factor A)
-  (at level 2, format "A .-stable") : group_rel_scope.
+  (format "A .-stable") : group_rel_scope.
 Notation "A .-central" := (central_factor A)
-  (at level 2, format "A .-central") : group_rel_scope.
+  (format "A .-central") : group_rel_scope.
 Notation "G .-chief" := (chief_factor G)
-  (at level 2, format "G .-chief") : group_rel_scope.
+  (format "G .-chief") : group_rel_scope.
 
 Arguments group_rel_of {gT} r%_group_rel_scope _%_G _%_G : extra scopes.
 
 Notation "r .-series" := (path (rel_of_simpl (group_rel_of r)))
-  (at level 2, format "r .-series") : group_scope.
+  (format "r .-series") : group_scope.
 
 Section Subnormal.
 

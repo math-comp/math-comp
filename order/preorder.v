@@ -530,16 +530,16 @@ Reserved Notation "\top^sl".
 Reserved Notation "x %<| y"  (at level 70, no associativity).
 
 Reserved Notation "\min_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \min_ i '/  '  F ']'").
 Reserved Notation "\min_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \min_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\min_ ( i <- r ) F"
   (F at level 41,
            format "'[' \min_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\min_ ( m <= i < n | P ) F"
-  (F at level 41, i, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \min_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\min_ ( m <= i < n ) F"
   (F at level 41,
@@ -550,29 +550,29 @@ Reserved Notation "\min_ ( i | P ) F"
 Reserved Notation "\min_ ( i : t | P ) F" (F at level 41).
 Reserved Notation "\min_ ( i : t ) F" (F at level 41).
 Reserved Notation "\min_ ( i < n | P ) F"
-  (F at level 41, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \min_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\min_ ( i < n ) F"
   (F at level 41,
            format "'[' \min_ ( i  <  n )  F ']'").
 Reserved Notation "\min_ ( i 'in' A | P ) F"
-  (F at level 41, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \min_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\min_ ( i 'in' A ) F"
   (F at level 41,
            format "'[' \min_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\max_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \max_ i '/  '  F ']'").
 Reserved Notation "\max_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \max_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\max_ ( i <- r ) F"
   (F at level 41,
            format "'[' \max_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\max_ ( m <= i < n | P ) F"
-  (F at level 41, i, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \max_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max_ ( m <= i < n ) F"
   (F at level 41,
@@ -583,13 +583,13 @@ Reserved Notation "\max_ ( i | P ) F"
 Reserved Notation "\max_ ( i : t | P ) F" (F at level 41).
 Reserved Notation "\max_ ( i : t ) F" (F at level 41).
 Reserved Notation "\max_ ( i < n | P ) F"
-  (F at level 41, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \max_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max_ ( i < n ) F"
   (F at level 41,
            format "'[' \max_ ( i  <  n )  F ']'").
 Reserved Notation "\max_ ( i 'in' A | P ) F"
-  (F at level 41, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \max_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\max_ ( i 'in' A ) F"
   (F at level 41,
@@ -599,13 +599,13 @@ Reserved Notation "\min^d_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \min^d_ i '/  '  F ']'").
 Reserved Notation "\min^d_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \min^d_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\min^d_ ( i <- r ) F"
-  (F at level 41, r at level 50,
+  (F at level 41, r at level 60,
            format "'[' \min^d_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\min^d_ ( m <= i < n | P ) F"
-  (F at level 41, i, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \min^d_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\min^d_ ( m <= i < n ) F"
   (F at level 41,
@@ -616,13 +616,13 @@ Reserved Notation "\min^d_ ( i | P ) F"
 Reserved Notation "\min^d_ ( i : t | P ) F" (F at level 41).
 Reserved Notation "\min^d_ ( i : t ) F" (F at level 41).
 Reserved Notation "\min^d_ ( i < n | P ) F"
-  (F at level 41, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \min^d_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\min^d_ ( i < n ) F"
   (F at level 41,
            format "'[' \min^d_ ( i  <  n )  F ']'").
 Reserved Notation "\min^d_ ( i 'in' A | P ) F"
-  (F at level 41, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \min^d_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\min^d_ ( i 'in' A ) F"
   (F at level 41,
@@ -632,13 +632,13 @@ Reserved Notation "\max^d_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \max^d_ i '/  '  F ']'").
 Reserved Notation "\max^d_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \max^d_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\max^d_ ( i <- r ) F"
-  (F at level 41, r at level 50,
+  (F at level 41, r at level 60,
            format "'[' \max^d_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\max^d_ ( m <= i < n | P ) F"
-  (F at level 41, i, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \max^d_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max^d_ ( m <= i < n ) F"
   (F at level 41,
@@ -649,13 +649,13 @@ Reserved Notation "\max^d_ ( i | P ) F"
 Reserved Notation "\max^d_ ( i : t | P ) F" (F at level 41).
 Reserved Notation "\max^d_ ( i : t ) F" (F at level 41).
 Reserved Notation "\max^d_ ( i < n | P ) F"
-  (F at level 41, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \max^d_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max^d_ ( i < n ) F"
   (F at level 41,
            format "'[' \max^d_ ( i  <  n )  F ']'").
 Reserved Notation "\max^d_ ( i 'in' A | P ) F"
-  (F at level 41, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \max^d_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\max^d_ ( i 'in' A ) F"
   (F at level 41,
@@ -926,7 +926,7 @@ Notation dual_top := (@top (dual_display _) _).
 
 Module Import DualSyntax.
 
-Notation "T ^d" := (dual T) (at level 2, format "T ^d") : type_scope.
+Notation "T ^d" := (dual T) (format "T ^d") : type_scope.
 Notation "<=^d%O" := dual_le : function_scope.
 Notation ">=^d%O" := dual_ge : function_scope.
 Notation "<^d%O" := dual_lt : function_scope.
@@ -3314,10 +3314,9 @@ Module Exports.
 HB.reexport TupleProdOrder.
 
 Notation "n .-tupleprod[ disp ]" := (type disp n)
-  (at level 2, disp at next level, format "n .-tupleprod[ disp ]") :
-  type_scope.
+  (format "n .-tupleprod[ disp ]") : type_scope.
 Notation "n .-tupleprod" := (type_ n)
-  (at level 2, format "n .-tupleprod") : type_scope.
+  (format "n .-tupleprod") : type_scope.
 
 Definition leEtprod := @leEtprod.
 Definition ltEtprod := @ltEtprod.
@@ -3432,10 +3431,9 @@ Module Exports.
 HB.reexport TupleLexiOrder.
 
 Notation "n .-tuplelexi[ disp ]" := (type disp n)
-  (at level 2, disp at next level, format "n .-tuplelexi[ disp ]") :
-  type_scope.
+  (format "n .-tuplelexi[ disp ]") : type_scope.
 Notation "n .-tuplelexi" := (type_ n)
-  (at level 2, format "n .-tuplelexi") : type_scope.
+  (format "n .-tuplelexi") : type_scope.
 
 Definition topEtlexi := @topEtlexi.
 Definition botEtlexi := @botEtlexi.

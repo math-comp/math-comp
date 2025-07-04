@@ -48,7 +48,7 @@ Import FinRing.Theory.
 Local Open Scope ring_scope.
 
 Reserved Notation "'{poly_' n R }" (n at level 2, format "'{poly_' n  R }").
-Reserved Notation "''nX^' i"  (at level 3, i at level 2, format "''nX^' i").
+Reserved Notation "''nX^' i" (at level 1, format "''nX^' i").
 Reserved Notation "x .-lagrange" (format "x .-lagrange").
 Reserved Notation "x .-lagrange_" (format "x .-lagrange_").
 Reserved Notation "'qX".
@@ -527,7 +527,7 @@ Notation "'qX" := (qpolyX _) : ring_scope.
 Lemma mk_monic_X (R : nzRingType) : mk_monic 'X = 'X :> {poly R}.
 Proof. by rewrite /mk_monic size_polyX monicX. Qed.
 
-Lemma mk_monic_Xn (R : nzRingType) n : mk_monic 'X^n = 'X^n.-1.+1 :> {poly R}.
+Lemma mk_monic_Xn (R : nzRingType) n : mk_monic 'X^n = 'X^(n.-1.+1) :> {poly R}.
 Proof. by case: n => [|n]; rewrite /mk_monic size_polyXn monicXn /= ?expr1. Qed.
 
 Lemma card_qpoly (R : finNzRingType) (h : {poly R}):

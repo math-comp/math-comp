@@ -179,8 +179,7 @@ Fixpoint binomial n m :=
   end.
 Arguments binomial : simpl never.
 
-Notation "''C' ( n , m )" := (binomial n m)
-  (format "''C' ( n ,  m )") : nat_scope.
+Notation "''C' ( n , m )" := (binomial n m) : nat_scope.
 
 Lemma binE n m : binomial n m =
   match n, m with

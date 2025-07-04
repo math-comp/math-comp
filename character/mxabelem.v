@@ -126,7 +126,7 @@ Qed.
 
 End ScaleAction.
 
-Local Notation "'Zm" := (scale_action _ _) (at level 8) : action_scope.
+Local Notation "'Zm" := (scale_action _ _) : action_scope.
 
 Section RowGroup.
 

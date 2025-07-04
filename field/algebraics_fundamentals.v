@@ -117,7 +117,7 @@ Import Order.TTheory GroupScope GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 Local Notation "p ^ f" := (map_poly f p) : ring_scope.
-Local Notation "p ^@" := (p ^ in_alg _) (at level 2, format "p ^@"): ring_scope.
+Local Notation "p ^@" := (p ^ in_alg _) (format "p ^@"): ring_scope.
 Local Notation "<< E ; u >>" := <<E; u>>%VS.
 Local Notation Qmorphism C := {rmorphism rat -> C}.
 

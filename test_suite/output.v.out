@@ -27,11 +27,11 @@ cyclic_pgroup_Aut_structure
                      [/\ cyclic A /\ cyclic P,
                          exists
                            s : perm_perm_type__canonical__fintype_Finite gT,
-                           [/\ s \in A, #[s] = (p ^ n)%N, m s = (p.+1)%:R%R
+                           [/\ s \in A, #[s] = (p ^ n)%N, m s = p.+1%:R%R
                              & P = <[s]>]
                        & exists
                            s0 : perm_perm_type__canonical__fintype_Finite gT,
-                           [/\ s0 \in A, #[s0] = p, m s0 = ((p ^ n).+1)%:R%R
+                           [/\ s0 \in A, #[s0] = p, m s0 = (p ^ n).+1%:R%R
                              & 'Ohm_1(P) = <[s0]>]]
                     else
                      if n == 1
@@ -45,6 +45,6 @@ cyclic_pgroup_Aut_structure
                               s0 : perm_perm_type__canonical__fintype_Finite
                                      gT,
                               [/\ s0 \in A, #[s0] = 2,
-                                  m s0 = ((2 ^ n).+1)%:R%R,
-                                  m (s0 * t) = ((2 ^ n).-1)%:R%R
+                                  m s0 = (2 ^ n).+1%:R%R,
+                                  m (s0 * t) = (2 ^ n).-1%:R%R
                                 & 'Ohm_1(<[s]>) = <[s0]>]]]]

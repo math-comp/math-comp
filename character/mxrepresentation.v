@@ -3361,7 +3361,7 @@ Qed.
 
 Definition Clifford_action := Action Clifford_is_action.
 
-Local Notation "'Cl" := Clifford_action (at level 8) : action_scope.
+Local Notation "'Cl" := Clifford_action : action_scope.
 
 Lemma val_Clifford_act W x : x \in G -> ('Cl%act W x :=: W *m rG x)%MS.
 Proof. by move=> Gx; apply: eqmx_trans (valWact _ _) _; rewrite subgK. Qed.

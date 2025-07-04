@@ -233,7 +233,7 @@ by rewrite heq1 heq2; apply/eqP).
 Ltac is_isoPtac p f e0 e1 e2 e3 :=
   suff ->: p = f by [rewrite inE eqxx ?orbT];
   let e := fresh "e" in apply/permP;
-  do 5?[case] => // ?; [move: e0 | move: e1 | move: e2 | move: e3] => e;
+  (do 5?[case] => // ?; [move: e0 | move: e1 | move: e2 | move: e3]) => e;
   apply: etrans (congr1 p _) (etrans e _); apply/eqP; rewrite // permE.
 
 Lemma is_isoP : forall p, reflect (is_iso p) (p \in isometries).
