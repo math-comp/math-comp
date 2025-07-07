@@ -112,7 +112,7 @@ Bind Scope ring_scope with ArchiRealField.sort.
 End ArchiRealFieldExports.
 HB.export ArchiRealFieldExports.
 
-#[short(type="archiRcfType")]
+(* #[short(type="archiRcfType")]
 HB.structure Definition ArchiRealClosedField :=
   { R of NumDomain_hasFloorCeilTruncn R & Num.RealClosedField R }.
 
@@ -120,6 +120,10 @@ Module ArchiRealClosedFieldExports.
 Bind Scope ring_scope with ArchiRealClosedField.sort.
 End ArchiRealClosedFieldExports.
 HB.export ArchiRealClosedFieldExports.
+*)
+(*BUG:*)
+(*"synterp code did not open section: coq.next-synterp-action (begin-section X0)"*)
+
 
 Section Def.
 Context {R : archiNumDomainType}.

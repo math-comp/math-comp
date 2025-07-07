@@ -681,6 +681,8 @@ Proof. by apply/val_eqP; rewrite /= -scalerAl rmodpZ // monic_mk_monic. Qed.
 Fact qpoly_scaleAr a p q : qpoly_scale a (p * q) = p * (qpoly_scale a q).
 Proof. by apply/val_eqP; rewrite /= -scalerAr rmodpZ // monic_mk_monic. Qed.
 
+Optimize Heap.
+
 HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build A {poly_deg A}
   qpoly_scaleAl.
 HB.instance Definition _ := GRing.Lalgebra.on {poly %/ h}.
@@ -750,7 +752,7 @@ Qed.
 Lemma qpoly_inv_out (p : {poly %/ h}) : ~~ coprimep hQ p -> qpoly_inv p = p.
 Proof. by rewrite /qpoly_inv => /negPf->. Qed.
 
-HB.instance Definition _ := GRing.ComNzRing_hasMulInverse.Build {poly_deg _}
+HB.instance Definition _ := GRing.ComNzRing_hasMulInverse.Build {poly_(deg h) _}
   qpoly_mulVz qpoly_intro_unit qpoly_inv_out.
 HB.instance Definition _ := GRing.ComUnitAlgebra.on {poly %/ h}.
 
