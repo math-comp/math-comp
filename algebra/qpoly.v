@@ -84,9 +84,11 @@ Section npoly.
 
 Variable (n : nat).
 
+Definition polyn_axiom (p : {poly R}) := p \is a poly_of_size n.
+
 Record npoly : predArgType := NPoly {
   polyn :> {poly R};
-  _ : polyn \is a poly_of_size n
+  _ : polyn_axiom polyn
 }.
 
 HB.instance Definition _ := [isSub for @polyn].
@@ -111,10 +113,10 @@ Arguments npoly_rV /.
 Lemma npoly_rV_K : cancel npoly_rV rVnpoly.
 Proof.
 move=> p /=; apply/val_inj.
-by rewrite val_insubd [_ \is a _]size_poly ?poly_rV_K.
+by rewrite val_insubd [polyn_axiom _]size_poly ?poly_rV_K.
 Qed.
 Lemma rVnpolyK : cancel rVnpoly npoly_rV.
-Proof. by move=> p /=; rewrite val_insubd [_ \is a _]size_poly rVpolyK. Qed.
+Proof. by move=> p /=; rewrite val_insubd [polyn_axiom _]size_poly rVpolyK. Qed.
 Hint Resolve npoly_rV_K rVnpolyK : core.
 
 Lemma npoly_vect_axiom : Vector.axiom n npoly.
@@ -563,7 +565,9 @@ Qed.
 Lemma qpoly_mul_addl : left_distributive (@qpoly_mul A h) +%R.
 Proof. by move=> p q r; rewrite -!(qpoly_mulC r) qpoly_mul_addr. Qed.
 
-HB.instance Definition _ := GRing.Zmodule_isComNzRing.Build {poly__ A} qpoly_mulA
+Definition deg := (size (mk_monic h)).-1.
+
+HB.instance Definition _ := GRing.Zmodule_isComNzRing.Build {poly_deg A} qpoly_mulA
   qpoly_mulC (@qpoly_mul1z _ h) qpoly_mul_addl (@qpoly_nontrivial _ h).
 HB.instance Definition _ := GRing.ComNzRing.on {poly %/ h}.
 
@@ -677,11 +681,11 @@ Proof. by apply/val_eqP; rewrite /= -scalerAl rmodpZ // monic_mk_monic. Qed.
 Fact qpoly_scaleAr a p q : qpoly_scale a (p * q) = p * (qpoly_scale a q).
 Proof. by apply/val_eqP; rewrite /= -scalerAr rmodpZ // monic_mk_monic. Qed.
 
-HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build A {poly__ A}
+HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build A {poly_deg A}
   qpoly_scaleAl.
 HB.instance Definition _ := GRing.Lalgebra.on {poly %/ h}.
 
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build A {poly__ A}
+HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build A {poly_deg A}
   qpoly_scaleAr.
 HB.instance Definition _ := GRing.Algebra.on {poly %/ h}.
 
@@ -746,7 +750,7 @@ Qed.
 Lemma qpoly_inv_out (p : {poly %/ h}) : ~~ coprimep hQ p -> qpoly_inv p = p.
 Proof. by rewrite /qpoly_inv => /negPf->. Qed.
 
-HB.instance Definition _ := GRing.ComNzRing_hasMulInverse.Build {poly__ _}
+HB.instance Definition _ := GRing.ComNzRing_hasMulInverse.Build {poly_deg _}
   qpoly_mulVz qpoly_intro_unit qpoly_inv_out.
 HB.instance Definition _ := GRing.ComUnitAlgebra.on {poly %/ h}.
 
