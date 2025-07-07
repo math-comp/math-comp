@@ -151,8 +151,6 @@ Qed.
 HB.instance Definition _ :=
   GRing.isZmodule.Build 'I_p (@Zp_addA _) (@Zp_addC _) Zp_add0z Zp_addNz.
 
-HB.instance Definition _ := [finGroupMixin of 'I_p for +%R].
-
 (* Ring operations *)
 
 Lemma Zp_mul1z : left_id Zp1 Zp_mul.
@@ -181,6 +179,12 @@ Proof.
 apply: val_inj => /=; elim: n => [|n IHn]; first by rewrite muln0 modn_small.
 by rewrite !GRing.mulrS /= IHn modnDmr mulnS.
 Qed.
+
+#[local]
+HB.instance Definition _ := Finite_isGroup.Build 'I_p (@GRing.addrA _) (@GRing.add0r _) (@GRing.addNr _).
+
+Definition ordGroup := 'I_p.
+HB.instance Definition _ := FinGroup.copy ordGroup 'I_p.
 
 Local Open Scope group_scope.
 
@@ -308,7 +312,7 @@ Section Groups.
 
 Variable p : nat.
 
-Definition Zp := if p > 1 then [set: 'Z_p] else 1%g.
+Definition Zp : {set ordGroup _} := if p > 1 then [set: 'Z_p] else (1%g :> {set ordGroup _}).
 Definition units_Zp := [set: {unit 'Z_p}].
 
 Lemma Zp_cast : p > 1 -> (Zp_trunc p).+2 = p.
