@@ -1883,15 +1883,41 @@ Section ConverseRing.
 HB.instance Definition _ (T : eqType) := Equality.on T^c.
 #[export]
 HB.instance Definition _ (T : choiceType) := Choice.on T^c.
+
 #[export]
 HB.instance Definition _ (U : nmodType)
   := isNmodule.Build U^c
-        (@Algebra.addrA U) (@Algebra.addrC U) (@Algebra.add0r U).
+        (SemiGroup.isLaw.opA
+          (GRing.SemiGroupisLaw__on__BaseAddMagma_add.private
+            (GRing.Nmodule.Algebra_SemiGroupisLaw__on__BaseAddMagma_add_mixin 
+              (Nmodule.class U))))
+        (SemiGroup.isCommutativeLaw.opC
+          (GRing.SemiGroupisCommutativeLaw__on__BaseAddMagma_add.private
+            (GRing.Nmodule.Algebra_SemiGroupisCommutativeLaw__on__BaseAddMagma_add_mixin 
+              (Nmodule.class U))))
+        (Monoid.isMonoidLaw.op1m 
+          (GRing.MonoidisMonoidLaw__on__BaseAddUMagma_addZero.private
+            (GRing.Nmodule.Algebra_MonoidisMonoidLaw__on__BaseAddUMagma_addZero_mixin
+              (Nmodule.class U)))).
+
 #[export]
 HB.instance Definition _ (U : zmodType)
   := isZmodule.Build U^c
-        (@Algebra.addrA U) (@Algebra.addrC U)
-        (@Algebra.add0r U) (@Algebra.addNr U).
+        (SemiGroup.isLaw.opA
+          (GRing.SemiGroupisLaw__on__BaseAddMagma_add.private
+            (GRing.Zmodule.Algebra_SemiGroupisLaw__on__BaseAddMagma_add_mixin
+              (Zmodule.class U))))
+        (SemiGroup.isCommutativeLaw.opC
+          (GRing.SemiGroupisCommutativeLaw__on__BaseAddMagma_add.private
+            (GRing.Zmodule.Algebra_SemiGroupisCommutativeLaw__on__BaseAddMagma_add_mixin
+              (Zmodule.class U))))
+        (Monoid.isMonoidLaw.op1m 
+          (GRing.MonoidisMonoidLaw__on__BaseAddUMagma_addZero.private
+            (GRing.Zmodule.Algebra_MonoidisMonoidLaw__on__BaseAddUMagma_addZero_mixin
+              (Zmodule.class U))))
+        (GRing.BaseZmoduleNmodule_isZmodule.addNr
+        (GRing.Zmodule.Algebra_BaseZmoduleNmodule_isZmodule_mixin
+          (Zmodule.class U))).
 
 #[export]
 HB.instance Definition _ (R : pzSemiRingType) :=
