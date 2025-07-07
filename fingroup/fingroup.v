@@ -179,6 +179,9 @@ Reserved Notation "[ 'min' A 'of' G | gP & gQ ]"
 Reserved Notation "[ 'min' G | gP & gQ ]"
   (format "[ '[hv' 'min'  G '/ '  |  gP '/ '  &  gQ ']' ]").
 
+#[short(type="finMonoidType")]
+HB.structure Definition FinMonoid := { G of Monoid G & Finite G }.
+
 Module isMulBaseGroup.
 #[deprecated(since="mathcomp 2.5.0",
              note="Use Algebra.isStarMonoid.Build instead.")]
