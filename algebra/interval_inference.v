@@ -890,7 +890,7 @@ case: b1 b2 => [b1b b1 | []] [b2b b2 | []] //= x1p x2p; last first.
   + have:= @ltxx _ (itv_bound R) (BLeft 0%Z%:~R).
     by rewrite (lt_le_trans _ x10).
   + by have -> : x1 = 0; [apply/le_anti/andP | rewrite mul0r].
-case: b1b b2b => -[]; rewrite -[intRing.mulz]/GRing.mul.
+case: b1b b2b => -[]; rewrite -[intRing.mulz]/monoid.mul.
 - case: b1 => [[|b1] | b1]; rewrite !bnd_simp => x1b x2b.
   + by have:= @ltxx _ R 0; rewrite (le_lt_trans x1p x1b).
   + case: b2 x2b => [[| b2] | b2] => x2b; rewrite bnd_simp.
