@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype finset fingroup morphism perm action.
-From mathcomp Require Import ssralg countalg.
+From mathcomp Require Import fintype bigop finset fingroup morphism perm action.
+From mathcomp Require Import monoid ssralg countalg.
 
 (*****************************************************************************)
 (*      The algebraic part of the algebraic hierarchy for finite types       *)

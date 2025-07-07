@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
-From mathcomp Require Import fintype finfun bigop order ssralg countalg ssrnum.
+From mathcomp Require Import fintype finfun bigop order monoid ssralg countalg ssrnum.
 From mathcomp Require Import poly.
 
 (******************************************************************************)

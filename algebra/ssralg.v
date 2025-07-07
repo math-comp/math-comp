@@ -3,7 +3,8 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
 From mathcomp Require Import choice fintype finfun bigop prime binomial.
-From mathcomp Require Export nmodule monoid.
+From mathcomp Require Export nmodule.
+From mathcomp Require Import monoid.
 
 (******************************************************************************)
 (*                            Ring-like structures                            *)
