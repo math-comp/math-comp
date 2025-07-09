@@ -108,6 +108,17 @@ with builtins; with (import <nixpkgs> {}).lib;
       ssprove.job = false;
       mathcomp-infotheo.job = false;  # not compatible with master
     }; };
+    "coq-9.1".coqPackages = common-bundles // {
+      coq.override.version = "9.1";
+      coq-elpi.job = true;
+      hierarchy-builder.job = true;
+      mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
+      # check that we compile without warnings on last release of Coq
+      mathcomp-warnings.job = true;
+      interval.job = false;  # not yet compatible with 9.1
+      mathcomp-infotheo.job = false;  # not yet compatible with 9.1
+      ssprove.job = false;  # not yet compatible with 9.1
+    };
     "coq-9.0".coqPackages = common-bundles // {
       coq.override.version = "9.0";
       coq-elpi.job = true;
@@ -115,7 +126,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
-      interval.job = false;  # not yet compatible with 9.0
       mathcomp-infotheo.job = false;  # not yet compatible with 9.0
     };
     "coq-8.20".coqPackages = common-bundles // {
