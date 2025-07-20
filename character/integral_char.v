@@ -35,7 +35,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import Order.TTheory GroupScope GRing.Theory Num.Theory.
+Local Open Scope group_scope.
+Import Order.TTheory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 Lemma group_num_field_exists (gT : finGroupType) (G : {group gT}) :
@@ -439,7 +440,7 @@ have inj_lambda: {in 'Z(G) &, injective lambda}.
   apply/eqP; transitivity ('Res['Z('chi_i)%CF] 'chi_i (x^-1 * y)%g).
     by rewrite cfResE ?cfcenter_sub // groupM ?groupV.
   rewrite Dlambda !cfunE lin_charM ?groupV // -eq_xy -lin_charM ?groupV //.
-  by rewrite mulrC mulVg lin_char1 ?mul1r.
+  by rewrite mulrC mulVg [X in X * _]lin_char1 ?mul1r.
 rewrite unfold_in -if_neg irr1_neq0 Cint_rat_Aint //.
   by rewrite rpred_div ?rpred_nat // rpred_nat_num ?Cnat_irr1.
 rewrite (cfcenter_fful_irr fful) nCdivE natf_indexg ?center_sub //=.
@@ -467,7 +468,7 @@ transitivity ('chi_i x * 'chi_i (x^-1)%g *+ #|h x|); last first.
       exists (x ^ v)%g (z * z1)%g; rewrite ?imset_f ?groupM //.
       by rewrite conjMg -mulgA /(z ^ v)%g cGz // mulKg.
     exists ((x * z) ^ v)%g (z^-1 * z1)%g; rewrite ?imset_f ?groupM ?groupV //.
-    by rewrite conjMg -mulgA /(z ^ v)%g cGz // mulKg mulKVg.
+    by rewrite conjMg -[RHS]mulgA /(z ^ v)%g cGz // mulKg mulKVg.
   rewrite !irr_inv DchiZ ?groupJ ?cfunJ // rmorphM mulrACA -!normCK -exprMn.
   by rewrite (normC_lin_char lin_lambda) ?mulr1 //= cfcenter_fful_irr.
 rewrite mulrAC -natrM mulr_natl; congr (_ *+ _).

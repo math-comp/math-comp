@@ -50,7 +50,8 @@ Unset Printing Implicit Defensive.
 
 Declare Scope abelem_scope.
 
-Import GroupScope GRing.Theory FinRing.Theory.
+Local Open Scope group_scope.
+Import GRing.Theory FinRing.Theory.
 Local Open Scope ring_scope.
 
 (* Special results for representations on a finite field. In this case, the   *)
