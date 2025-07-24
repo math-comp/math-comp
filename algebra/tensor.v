@@ -1,33 +1,41 @@
 From HB Require Import structures.
-From mathcomp Require Import ssrnat ssrint ssreflect finfun fintype seq ssrbool eqtype ssralg zmodp ssrfun choice tuple.
+From mathcomp Require Import ssrnat ssrint ssreflect finfun fintype seq ssrbool.
+From mathcomp Require Import eqtype ssralg zmodp ssrfun choice tuple order.
+
 Open Scope ring_scope.
 Open Scope seq_scope.
 Open Scope bool_scope.
 
-Import GRing.Theory.
+(******************************************************************************)
+(* This file defines tensors.                                                 *)
+(* For tensors we define:                                                     *)
+(*            'T[R]_ds == the type of tensors with elements of type R and     *)
+(*            'T_ds       dimensions ds, e.g. 'T[nat]_[:: 1; 3]. The [R] is   *)
+(*                        optional and can usually be ommited.                *)
+(*                                                                            *)
+(*                                                                            *)
+(*                                                                            *)
+(*                                                                            *)
+(*                                                                            *)
+(*                                                                            *)
+(*                                                                            *)
+(*                                                                            *)
+(*                                                                            *)
+(*                                                                            *)
+(******************************************************************************)
 
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-(******************************************************************************)
-(* This file defines tensors.                                                 *)
-(* For tensors we define:                                                     *)
-(*        ds.-tensor T == the type of tensors with elements of type T and     *)
-(*                        dimensions ds, e.g. [:: 1; 3].-tensor nat.          *)
-(*             const v ==                                                     *)
-(*                                                                            *)
-(*                                                                            *)
-(*                                                                            *)
-(*                                                                            *)
-(*                                                                            *)
-(*                                                                            *)
-(*                                                                            *)
-(*                                                                            *)
-(*                                                                            *)
-(*                                                                            *)
-(*                                                                            *)
-(******************************************************************************)
+Import GRing.Theory.
+
+Reserved Notation "''T_' ds" (at level 0, ds at level 2, format "''T_' ds").
+Reserved Notation "''T[' R ]_ ds" (at level 0, ds at level 2). (* only parsing*)
+
+(*****************************************************************************)
+(****************************Type Definition**********************************)
+(*****************************************************************************)
 
 Section TensorDef.
 
@@ -35,7 +43,7 @@ Context (ds : seq nat) (T : Type).
 
 Definition internal_type := foldr (fun d t => t ^ d)%type T ds.
 
-Variant tensor_of : predArgType := Tensor of internal_type.
+Variant tensor : predArgType := Tensor of internal_type.
 
 Definition tensor_val A := let: Tensor g := A in g.
 
@@ -45,22 +53,16 @@ Proof. by case. Qed.
 End TensorDef.
 
 
-Notation "ds '.-tensor'" := (tensor_of ds)
-    (at level 2, format "ds '.-tensor'") : type_scope.
+Bind Scope ring_scope with tensor.
 
-
-Section NilTensor.
-
-Context (T : Type).
-Implicit Type t : [::].-tensor T.
-
-End NilTensor.
+Notation "''T[' R ]_ ds" := (tensor ds R) (only parsing) : type_scope.
+Notation "''T_' ds" := 'T[_]_ds : type_scope.
 
 
 Section NonEmptyTensor.
 
-Context (d : nat) (ds : seq nat) (T : Type).
-Implicit Type t : (d :: ds).-tensor T.
+Context (d : nat) (ds : seq nat) (R : Type).
+Implicit Type t : 'T[R]_(d :: ds).
 
 Definition nth t (i : 'I_d) := Tensor ((tensor_val t) i).
 
@@ -69,13 +71,13 @@ End NonEmptyTensor.
 
 Section TensorOperations.
 
-Context (T : Type).
+Context (R : Type).
 
-Definition stack {d} {ds : seq nat} (f : {ffun 'I_d -> ds.-tensor T}) := 
-  @Tensor (d :: ds) T [ffun i => tensor_val (f i)].
+Definition stack {d} {ds : seq nat} (f : {ffun 'I_d -> 'T_ds}) := 
+  @Tensor (d :: ds) R [ffun i => tensor_val (f i)].
 
-Fixpoint const {ds : seq nat} : T -> ds.-tensor T := match ds with
-  | [::] => fun v => @Tensor [::] T v
+Fixpoint const {ds : seq nat} : R -> 'T_ds := match ds with
+  | [::] => fun v => @Tensor [::] R v
   | d :: ds' => fun v => stack [ffun=> @const ds' v]
   end.
 
@@ -84,9 +86,9 @@ End TensorOperations.
 
 Section TensorEquality.
 
-Context (T : eqType).
+Context (R : eqType).
 
-Fixpoint tensor_eq_op {ds} : rel (ds.-tensor T) := match ds with
+Fixpoint tensor_eq_op {ds} : rel ('T[R]_ds) := match ds with
   | [::] => fun t1 t2 => eq_op (tensor_val t1) (tensor_val t2)
   | d :: ds' => fun t1 t2 => [forall i, tensor_eq_op (nth t1 i) (nth t2 i)]
   end.
@@ -96,38 +98,37 @@ Proof.
 elim: ds=> [[x] [y]|d ds' Hind [x/=] [y/=]]/=. 
   case (x =P y) => H_xy.
   - by rewrite H_xy; left.
-  - by right=> [[]]; exact H_xy.
+  - by right; case; exact H_xy.
 case forallP => H_forall.
 - left. apply f_equal. apply ffunP => i.
-  have: forall a b, Tensor a = Tensor b -> a = b => [ds T0 a b|H_tensor_ab]; first by case.
+  have: forall a b, Tensor a = Tensor b -> a = b => [ds T0 a b|H_tensor_ab].
+    by case.
   apply H_tensor_ab; apply/Hind.
-  by move: H_forall; rewrite /nth; apply.
-- right. case. 
+  by rewrite /nth; apply H_forall.
+- right=> x_eq_y. 
+  have: forall x1, tensor_eq_op (nth (Tensor x) x1) (nth (Tensor y) x1) => [x1|].
+    by apply/Hind; rewrite x_eq_y.
+  by apply H_forall.
+Qed.
 
-
-elim: d Hind x y H_forall => [Hind x y H_forall|n H1 H2 x y H3].
-  - have: forall x0 : 'I_0, tensor_eq_op (nth (Tensor x) x0) (nth (Tensor y) x0).
-    move=> x0. case: x0 => m i//. by [].
-Admitted.
-
-HB.instance Definition _ {ds} := hasDecEq.Build (ds.-tensor T) tensor_eqP.
+HB.instance Definition _ {ds} := hasDecEq.Build ('T_ds) tensor_eqP.
 
 End TensorEquality.
 
 
 Section MapTensor.
 
-Context {T R S : Type}.
+Context {X Y Z : Type}.
 
-Fixpoint map_tensor {ds} (f : T -> R) : ds.-tensor T -> ds.-tensor R :=
+Fixpoint map_tensor {ds} (f : X -> Y) : 'T[X]_ds -> 'T[Y]_ds :=
   match ds with
-  | [::] => fun t => @Tensor [::] R (f (tensor_val t))
+  | [::] => fun t => @Tensor [::] Y (f (tensor_val t))
   | d :: ds' => fun t => stack [ffun i => map_tensor f (nth t i)]
   end.
 
-Fixpoint map2_tensor {ds} (f : T -> R -> S) : ds.-tensor T -> ds.-tensor R -> ds.-tensor S :=
+Fixpoint map2_tensor {ds} (f : X -> Y -> Z) : 'T[X]_ds -> 'T[Y]_ds -> 'T[Z]_ds :=
     match ds with
-    | [::] => fun u v => @Tensor [::] S (f (tensor_val u) (tensor_val v))
+    | [::] => fun u v => @Tensor [::] Z (f (tensor_val u) (tensor_val v))
     | d :: ds' => fun u v => stack [ffun i => map2_tensor f (nth u i) (nth v i)]
     end.
 
@@ -136,23 +137,23 @@ End MapTensor.
 
 Section TensorChoice.
 
-Context (ds : seq nat) (T : choiceType).
+Context {R : choiceType}.
 
-Definition tensor_hasChoice : hasChoice (ds.-tensor T).
+Definition tensor_hasChoice {ds} : hasChoice ('T[R]_ds).
 Proof. Admitted.
 
-HB.instance Definition _ := tensor_hasChoice.
+HB.instance Definition _ {ds} := @tensor_hasChoice ds.
 
 End TensorChoice.
 
 
 Section TensorNModule.
 
-Context {T : nmodType}.
+Context {R : nmodType}.
 
-Definition addT {ds} := @map2_tensor T T T ds +%R.
+Definition addT {ds} := @map2_tensor R R R ds +%R.
 
-Definition tensor0 {ds} := @const T ds 0.
+Definition tensor0 {ds} := @const R ds 0.
 
 Lemma addTA {ds} : associative (@addT ds).
 Proof.
@@ -178,16 +179,16 @@ Proof.
     by rewrite 2!ffunE /tensor0 /nth/= 2!ffunE tensor_valK Hind.
 Qed.
 
-HB.instance Definition _ {ds} := GRing.isNmodule.Build (ds.-tensor T) addTA addTC add0T.
+HB.instance Definition _ {ds} := GRing.isNmodule.Build ('T_ds) addTA addTC add0T.
 
 End TensorNModule.
 
 
 Section TensorZModule.
 
-Context {T : zmodType}.
+Context {R : zmodType}.
 
-Definition oppT {ds} := @map_tensor T T ds -%R.
+Definition oppT {ds} := @map_tensor R R ds -%R.
 
 Lemma addNT {ds} : left_inverse 0 (@oppT ds) +%R.
 Proof.
@@ -199,18 +200,18 @@ Proof.
     by rewrite Hind.
 Qed.
 
-HB.instance Definition _ {ds} := GRing.Nmodule_isZmodule.Build (ds.-tensor T) addNT.
+HB.instance Definition _ {ds} := GRing.Nmodule_isZmodule.Build ('T[R]_ds) addNT.
 
 End TensorZModule.
 
 
 Section TensorPzSemiRing.
 
-Context (T : pzSemiRingType).
+Context {R : pzSemiRingType}.
 
-Definition tensor1 {ds} := @const T ds 1. 
+Definition tensor1 {ds} := @const R ds 1. 
 
-Definition mulT {ds} := @map2_tensor T T T ds *%R.
+Definition mulT {ds} := @map2_tensor R R R ds *%R.
 
 Lemma mulTA {ds} : associative (@mulT ds).
 Proof.
@@ -276,7 +277,7 @@ Proof.
     by rewrite /nth /stack 2!ffunE tensor_valK Hind.
 Qed.
 
-HB.instance Definition _ {ds} := GRing.Nmodule_isPzSemiRing.Build (ds.-tensor T)
+HB.instance Definition _ {ds} := GRing.Nmodule_isPzSemiRing.Build ('T_ds)
     mulTA mul1T mulT1 mulTDl mulTDr mul0T mulT0.
 
 End TensorPzSemiRing.
@@ -284,28 +285,91 @@ End TensorPzSemiRing.
 
 Section TensorNzSemiRing.
 
-Context (T : nzSemiRingType).
+Context {R : nzSemiRingType}.
 
-Lemma oneT_neq0 {ds} : @GRing.one (ds.-tensor T) != 0.
+(* FALSE when d = 0 in inductive case *)
+(* works when ds : seq Z+ *)
+Lemma oneT_neq0 {ds} : @GRing.one ('T[R]_ds) != 0.
 Proof.
     elim: ds => [|d ds' Hind]; first by rewrite oner_neq0.
-    rewrite /eq_op/=. apply/forallP. 
+    rewrite /eq_op/=. apply/forallPn. eexists.
+    have: (@GRing.one 'T[R]_ds') == 0.
+      rewrite /eq_op/=.
 Admitted.
 
-HB.instance Definition _ {ds} := GRing.PzSemiRing_isNonZero.Build (ds.-tensor T) oneT_neq0.
+HB.instance Definition _ {ds} := GRing.PzSemiRing_isNonZero.Build ('T_ds) oneT_neq0.
 
 End TensorNzSemiRing.
 
 
+Section TensorOrder.
+
+Context (o : Order.disp_t) (R : porderType o).
+
+Fixpoint leT {ds} : rel ('T[R]_ds) := match ds with
+  | [::] => fun t u => Order.le (tensor_val t) (tensor_val u)
+  | d :: ds' => fun t u => [forall i, leT (nth t i) (nth u i)]
+  end.
+
+Definition ltT {ds} : rel ('T[R]_ds) := fun t u => (u != t) && leT t u.
+
+Lemma ltT_def {ds} : forall x y : 'T[R]_ds, ltT x y = (y != x) && leT x y.
+Proof. by rewrite /ltT. Qed.
+
+Lemma leT_refl {ds} : reflexive (@leT ds).
+Proof.
+  elim: ds => [t|d ds' Hind t].
+    by rewrite /leT Order.POrderTheory.le_refl.
+  rewrite /leT -/leT.
+  apply/forallP => x.
+  by apply Hind.
+Qed.
+
+Lemma leT_anti {ds} : antisymmetric (@leT ds).
+Proof.
+  elim: ds => [t u|d ds' Hind t u].
+    rewrite /leT => le_tut.
+    have: tensor_val t = tensor_val u -> t = u => [|H_tensor_val].
+      by case t; case u => i0 i1 /= i1_eq_i0; rewrite i1_eq_i0.
+    apply H_tensor_val.
+    by apply Order.POrderTheory.le_anti.
+  rewrite /leT -/leT => /andP [/forallP le_tu /forallP le_ut].
+  have: (forall i, nth t i = nth u i) -> t = u => [nth_tu|].
+    apply/eqP. rewrite /eq_op/=. apply/forallP => i. rewrite nth_tu.
+    have: nth u i = nth u i -> tensor_eq_op (nth u i) (nth u i) => [/eqP +|].
+      by rewrite /eq_op/=.
+    by apply.
+  apply => i.
+  apply/Hind.
+  by apply/andP; split.
+Qed.
+
+Lemma leT_trans {ds} : transitive (@leT ds).
+Proof.
+  elim: ds => [t u v|d ds' Hind t u v].
+    rewrite /leT. by apply Order.POrderTheory.le_trans.
+  rewrite /leT -/leT => /forallP le_ut /forallP le_tv. apply/forallP => i.
+  apply /Hind.
+  - by apply le_ut.
+  - by apply le_tv.
+Qed.
+
+HB.instance Definition _ {ds} := Order.isPOrder.Build
+  o ('T_ds) ltT_def leT_refl leT_anti leT_trans.
+
+End TensorOrder.
+
+
 Section Test.
 
-HB.about tensor_of.
 
-Context (ds : seq nat) (T : pzSemiRingType) (t u v : ds.-tensor T).
+Context (ds : seq nat) (t u v : 'T[nat]_ds).
 
 Lemma dist : (t + u) * v = t * v + u * v.
 Proof.
     by rewrite mulrDl.
 Qed.
+
+Check Order.le t u.
 
 End Test.
