@@ -3557,7 +3557,7 @@ Proof.
 Qed.
  
 (* The size of l_i(x) polynomial is <= size of the sequence is built uppon. *)
-Lemma size_basis {R: fieldType} (x: R) (s: seq R):
+Lemma size_basis_lag {R: fieldType} (x: R) (s: seq R):
   (size (basis s x) <= (size s).+1)%N.
 Proof.
   rewrite /basis.
@@ -3656,7 +3656,7 @@ Proof.
     apply: leq_trans.
     + by apply: size_scale_leq.
     + apply: leq_trans.
-      * by apply: size_basis.
+      * by apply: size_basis_lag.
       * by rewrite /unzip1 size_map ltnSn.
   - rewrite big_cons.
     apply: leq_trans.
@@ -3669,7 +3669,7 @@ Proof.
           have:
             size (l ++ [:: m, m' & r]) = (size (unzip1 (l ++ [:: m' & r]))).+1.
         -- by rewrite /unzip1 size_map !size_cat -addnS.
-        -- by move=> Heq; rewrite Heq; apply: size_basis.
+        -- by move=> Heq; rewrite Heq; apply: size_basis_lag.
       + have : size (l ++ [:: m, m' & r]) = size ((l ++ [:: m]) ++ m' :: r).
         -- by rewrite !size_cat addn1 !addnS.
         -- by move=> H; rewrite H; apply: IHr.
