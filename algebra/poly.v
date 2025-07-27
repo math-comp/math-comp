@@ -5,6 +5,8 @@ From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop finset tuple div ssralg.
 From mathcomp Require Import countalg binomial.
 
+From Stdlib Require Import Bool.
+
 (******************************************************************************)
 (* This file provides a library for univariate polynomials over ring          *)
 (* structures; it also provides an extended theory for polynomials whose      *)
@@ -94,6 +96,31 @@ From mathcomp Require Import countalg binomial.
 (*                       to just x != y).                                     *)
 (*       uniq_roots s == s is a sequence or pairwise distinct roots, in the   *)
 (*                       sense of diff_roots p above.                         *)
+(*       poly_lag pts == given a set of points(pts) it returns the lagrange   *)
+(*                       polynomial(f(x)).                                    *)
+(*          basis s x == returns each of the l_i(x) given x = x_i and         *)
+(*                          s = [x_1; x_2; ... ; x_d+1].                      *)
+(*        poly_part j == returns y_i * l_i(x) for a certain                   *)
+(*                       j = ((x_i, y_i), [(x_1, y_1), ..., (x_d+1, y_d+1)]). *)
+(*          subseqs s == returns a list of pairs where each pair represents a *)
+(*                       point(first) and the list of the rest of the points  *)
+(*                       needed for calculating l_i(x). E.g:                  *)
+(*                         subseqs [(1,2); (2,3); (3, 4)] =                   *)
+(*                          [((1,2), [(2,3);(3,4)]);                          *)
+(*                           ((2,3), [(1,2) ;(3,4)]);                         *)
+(*                           ((3,4), [(1,2); (2,3))])                         *)
+(*                          ]                                                 *)
+(*      zero_points s == given a sequence returns a sequence of pairs where   *)
+(*                       the first element of each pair is the elements of s  *)
+(*                       in the same order as in s and the second element is  *)
+(*                       always zero.                                         *)
+(*        head_poly p == returns the head of the list resulting from          *)
+(*                       interpreting the polynomial p as a list ending with  *)
+(*                       infinite zeroes.                                     *)
+(*        tail_poly p == returns the tail of the list resulting from          *)
+(*                       interpreting the polynomial p as a list ending with  *)
+(*                       infinite zeroes.                                     *)
+(*                                                                            *)
 (*   *** We only show that these operations and properties are transferred by *)
 (*       morphisms whose domain is a field (thus ensuring injectivity).       *)
 (* We prove the factor_theorem, and the max_poly_roots inequality relating    *)
@@ -2605,7 +2632,7 @@ rewrite -{1}(in_tupleE ps) -(map_tnth_enum (_ ps)) big_map.
 rewrite enumT bigA_distr /= coef_sum.
 transitivity (\sum_(I in {set 'I_(size ps)}) if #|I| == (size ps - n)%N then
                   \prod_(i < size ps | i \in I) - ps`_i else 0).
-  apply eq_bigr => I _.
+  apply/eq_bigr => I _.
   rewrite big_if/= big_const iter_mulr_1 -rmorph_prod/= coefCM coefXn.
   under eq_bigr => i _ do rewrite (tnth_nth 0)/=.
   rewrite -[#|I| == _](eqn_add2r n) subnK//.
@@ -3463,3 +3490,242 @@ by rewrite monic_prod => // i; rewrite monicXsubC.
 Qed.
 
 End ClosedField.
+
+Section Lagrange.
+
+Definition dif_points {A : eqType} { B : Type} (l : seq (A * B)) :=
+  (uniq (unzip1 l)).
+
+Ltac simpl_dif_point :=
+  rewrite /dif_points /unzip1 ?map_cons ?map_cat ?cons_uniq -?/unzip1.
+
+Definition basis {R: unitRingType} (s: seq R) (x: R): {poly R} :=
+  \prod_(c <- s) ((x-c)^-1 *: Poly [:: -c ; 1]).
+
+Definition poly_part {R: unitRingType}
+  (j : R * R * seq (R * R)) : {poly R} :=
+    j.1.2 *: basis (unzip1 j.2) j.1.1.
+
+Fixpoint subseqs_rec {T} l m r : seq (T * seq T) :=
+  match r with
+  | [::] => [:: (m, l)]
+  | a :: r' => (m, l ++ r) :: subseqs_rec (l ++ [:: m]) a r'
+  end.
+
+Definition subseqs {T} (s : seq T) : seq (T * seq T) :=
+  match s with
+  | [::] => [::]
+  | m :: r => subseqs_rec [::] m r
+  end.
+
+Definition poly_lag {R: unitRingType} (pts: seq (R * R)): {poly R} :=
+  \sum_(j <- subseqs pts) poly_part j.
+
+(* If we evaluate l_i(x) for any of the points used to build it, we obtain 0 *)
+Lemma basis_0 {R: comUnitRingType} (x1 x : R) (s : seq R) :
+  x \in s ->
+  (basis s x1).[x] = 0.
+Proof.
+  rewrite /basis.
+  elim: s => [// | a s IHs].
+  rewrite in_cons big_cons hornerM hornerZ.
+  rewrite !horner_cons hornerC GRing.mul0r GRing.add0r GRing.mul1r.
+  case Heq: (x == a).
+  - move: Heq => /eqP-Heq.
+    by rewrite Heq GRing.subrr GRing.mulr0 GRing.mul0r.
+  - move=> H.
+    by rewrite IHs // GRing.mulr0.
+Qed.
+
+(* If we evaluate l_i(x) for the point x_i we obtain 1 *)
+Lemma basis_1 {R: fieldType} (x: R) (s: seq R):
+  (x \notin s) = ((basis s x).[x] == 1).
+Proof.
+  rewrite /basis.
+  elim: s => [|a s IHs].
+  - rewrite big_nil hornerC.
+    by rewrite eq_refl.
+  - rewrite in_cons big_cons hornerM hornerZ.
+    rewrite !horner_cons hornerC GRing.mul0r GRing.add0r GRing.mul1r.
+    case Heq: (x == a).
+    + move: Heq => /eqP-Heq.
+      rewrite Heq GRing.subrr GRing.mulr0 GRing.mul0r eq_sym.
+      by rewrite GRing.oner_eq0.
+    + move: Heq => /negbT-Heq.
+      move: Heq; rewrite -GRing.subr_eq0 => Heq.
+      by rewrite GRing.mulVf // GRing.mul1r IHs.
+Qed.
+ 
+(* The size of l_i(x) polynomial is <= size of the sequence is built uppon. *)
+Lemma size_basis {R: fieldType} (x: R) (s: seq R):
+  (size (basis s x) <= (size s).+1)%N.
+Proof.
+  rewrite /basis.
+  elim: s => [|a s IHs].
+  - by rewrite big_nil size_poly1.
+  - rewrite big_cons.
+    case Heq: (x == a).
+    + move: Heq => /eqP-Heq. rewrite Heq.
+      rewrite GRing.subrr GRing.invr0.
+      rewrite -mul_polyC polyC0 !GRing.mul0r.
+      by rewrite size_poly0.
+    + move: Heq => /negbT-Heq.
+      apply: leq_trans.
+      * by apply: size_polyMleq.
+      * rewrite size_scale.
+        -- by rewrite (@PolyK R 0) // GRing.oner_neq0.
+        -- by rewrite GRing.invr_neq0 // GRing.subr_eq0.
+Qed.
+
+(*
+   Proof that when we construct (partially) our polynomial, the evaluation for
+   an x_i in the list is zero.
+*)
+Lemma poly_part_0 {R : fieldType} (x: R) (l : seq (R * R)) m r:
+  x \in unzip1 l ->
+  (\sum_(j <- subseqs_rec l m r) poly_part j).[x] = 0.
+Proof.
+  elim: r l m => [|m' r IHr] l [x0 y0] Hin.
+  - by rewrite big_seq1 hornerZ basis_0 ?GRing.mulr0.
+  - rewrite /= big_cons hornerD hornerZ.
+    rewrite basis_0 ?IHr; rewrite ?GRing.mulr0; rewrite ?GRing.add0r //;
+    simpl_dif_point; by rewrite mem_cat Hin.
+Qed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+
+Lemma uniq_unzip1_in {S T: eqType} (a: S * T) (s: seq (S * T)):
+  dif_points (a :: s) ->
+  a.1 \notin unzip1 s.
+Proof.
+  rewrite /dif_points; simpl_dif_point.
+  by move=> /andP [].
+Qed.
+
+(**
+   If we have a list of different points (l ++ m :: r) and (x, y) \in m::r
+   we have that the sum over the j <- (subseqs_rec l m r) of the l_j(x) when
+   evaluated in x is equal to y.
+*)
+Lemma poly_part_correct {R: fieldType} (x y: R) l m r:
+  dif_points (l ++ (m :: r)) ->
+  (x, y) \in m :: r ->
+  (\sum_(j <- subseqs_rec l m r) poly_part j).[x] = y.
+Proof.
+  elim: r l m => [|m' r IHr] l [x0 y0] Huniq Hin.
+  - rewrite big_seq1 hornerZ.
+    move: Hin; rewrite mem_seq1 => /eqP-Hin.
+    case: Hin => -> ->.
+    move: Huniq; simpl_dif_point.
+    rewrite uniq_catC -/unzip1 /= => Huniq.
+    move: Huniq => /andP [Hnotin Huniq].
+    move: Hnotin; rewrite basis_1 => /eqP-Hnotin.
+    by rewrite Hnotin GRing.mulr1.
+
+  - rewrite /= big_cons hornerD hornerZ.
+    move: Hin; rewrite in_cons => /orP [/eqP Heq|Hin].
+    + case: Heq => -> ->.
+      rewrite poly_part_0 ?GRing.addr0 //.
+      move: Huniq.
+      rewrite /dif_points /unzip1 map_cat uniq_catC -map_cat cat_cons -/unzip1.
+      move=> /uniq_unzip1_in-Huniq.
+      move: Huniq;
+      rewrite /unzip1 map_cat mem_cat Bool.orb_comm -mem_cat -map_cat -/unzip1.
+      move=> Huniq.
+      move: Huniq; rewrite basis_1 /= => /eqP-Huniq.
+      by rewrite Huniq GRing.mulr1.
+    + by rewrite /unzip1 map_cat mem_cat mem_seq1 eq_refl orbT.
+    + rewrite IHr //.
+      * rewrite basis_0 ?GRing.mulr0 ?GRing.add0r //.
+        move: Hin => /(map_f fst)-Hin.
+        rewrite /unzip1 map_cat mem_cat Bool.orb_comm.
+        by rewrite Hin.
+      * by rewrite -catA cat_cons.
+Qed.
+
+(**
+   Proof that the size of a Lagrange polynomial is [<= size pts] for
+   the second recursive case.
+*)
+Lemma size_poly_part {R: fieldType} l (m: R * R) r:
+  (size (\sum_(j <- subseqs_rec l m r) poly_part j)%R
+    <= size (l ++ m :: r))%N.
+Proof.
+  generalize dependent m.
+  generalize dependent l.
+  elim: r => /= [|m' r IHr] l m.
+  - rewrite big_seq1 size_cat addn1.
+    apply: leq_trans.
+    + by apply: size_scale_leq.
+    + apply: leq_trans.
+      * by apply: size_basis.
+      * by rewrite /unzip1 size_map ltnSn.
+  - rewrite big_cons.
+    apply: leq_trans.
+    + by apply: size_polyD.
+    + rewrite geq_max.
+      apply/andP; split.
+      * rewrite /poly_part /=.
+        apply: leq_trans.
+        -- by apply: size_scale_leq.
+          have:
+            size (l ++ [:: m, m' & r]) = (size (unzip1 (l ++ [:: m' & r]))).+1.
+        -- by rewrite /unzip1 size_map !size_cat -addnS.
+        -- by move=> Heq; rewrite Heq; apply: size_basis.
+      + have : size (l ++ [:: m, m' & r]) = size ((l ++ [:: m]) ++ m' :: r).
+        -- by rewrite !size_cat addn1 !addnS.
+        -- by move=> H; rewrite H; apply: IHr.
+Qed.
+
+(* The size of a Lagrange polynomial is [<= size pts]. *)
+Lemma size_poly_lag {R: fieldType} (pts: seq (R * R)):
+  (size (poly_lag pts) <= size pts)%N.
+Proof.
+  case: pts => [|m r].
+  - by rewrite /poly_lag big_nil size_poly0.
+  - by apply: (size_poly_part [::]).
+Qed.
+
+(* Evaluating a Lagrange polynomial at a point gives the corresponding y value. *)
+Lemma poly_correct {R: fieldType} (x y: R) pts:
+  dif_points pts ->
+  (x, y) \in pts ->
+  (poly_lag pts).[x] = y.
+Proof.
+  case: pts => [// | m r] Huniq Hin.
+  by apply: poly_part_correct.
+Qed.
+
+(**
+   There is exactly one polynomial with size [<= size pts], that satisfies [poly_correct].
+   This is a stronger version of Theorem 3.9 of the book.
+*)
+Lemma poly_unique {R: fieldType} (pts: seq (R * R)) (q: {poly R}):
+  dif_points pts ->
+  (size q <= size pts)%N ->
+  (forall x y, (x, y) \in pts -> q.[x] = y) ->
+  q = poly_lag pts.
+Proof.
+  move=> Huniq Hsize1 Hpred.
+  have Hsize : (size (q - poly_lag pts)%R <= size pts)%N.
+  - move: (size_poly_lag pts) => Hsize2.
+    apply: leq_trans.
+    + apply: size_polyD.
+    by rewrite geq_max size_polyN Hsize1 Hsize2.
+  - apply/eqP.
+    rewrite -GRing.subr_eq0 -size_poly_eq0.
+    rewrite size_poly_eq0.
+    apply/negPn /negP => Hcontra.
+    move: Hsize; rewrite leqNgt => /negP-Hsize.
+    apply: Hsize.
+    have : size pts = size (unzip1 (pts)).
+    + by rewrite size_map.
+    + move=> Hsize2; rewrite Hsize2.
+      apply: max_poly_roots => //.
+      apply/allP => x' /mapP [[x y] Hin Heq].
+      subst.
+      rewrite /root hornerD hornerN.
+      rewrite (Hpred x y) //.
+      rewrite (poly_correct Huniq Hin) //.
+      by rewrite GRing.subr_eq0 eq_refl.
+Qed.
+
+End Lagrange.
