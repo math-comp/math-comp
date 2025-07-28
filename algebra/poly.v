@@ -5,8 +5,6 @@ From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop finset tuple div ssralg.
 From mathcomp Require Import countalg binomial.
 
-From Stdlib Require Import Bool.
-
 (******************************************************************************)
 (* This file provides a library for univariate polynomials over ring          *)
 (* structures; it also provides an extended theory for polynomials whose      *)
@@ -3627,17 +3625,20 @@ Proof.
       move: Huniq.
       rewrite /dif_points /unzip1 map_cat uniq_catC -map_cat cat_cons -/unzip1.
       move=> /uniq_unzip1_in-Huniq.
-      move: Huniq;
-      rewrite /unzip1 map_cat mem_cat Bool.orb_comm -mem_cat -map_cat -/unzip1.
-      move=> Huniq.
-      move: Huniq; rewrite basis_1 /= => /eqP-Huniq.
-      by rewrite Huniq GRing.mulr1.
+      move: Huniq .
+      rewrite /unzip1 map_cat mem_cat negb_or.
+      move => /andP-Huniq.
+      apply and_comm in Huniq.
+      move: Huniq => /andP. 
+      rewrite -negb_or -mem_cat -map_cat -/unzip1.
+      rewrite basis_1 /= => /eqP-Huniq.
+      rewrite Huniq. rewrite GRing.mulr1. reflexivity.
     + by rewrite /unzip1 map_cat mem_cat mem_seq1 eq_refl orbT.
     + rewrite IHr //.
       * rewrite basis_0 ?GRing.mulr0 ?GRing.add0r //.
         move: Hin => /(map_f fst)-Hin.
-        rewrite /unzip1 map_cat mem_cat Bool.orb_comm.
-        by rewrite Hin.
+        rewrite /unzip1 map_cat mem_cat Hin.
+        by apply: orbT.
       * by rewrite -catA cat_cons.
 Qed.
 
