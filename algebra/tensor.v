@@ -1,7 +1,6 @@
 From HB Require Import structures.
 From mathcomp Require Import ssrnat ssrint ssreflect finfun fintype seq ssrbool.
 From mathcomp Require Import eqtype ssralg zmodp ssrfun choice tuple order.
-
 Open Scope ring_scope.
 Open Scope seq_scope.
 Open Scope bool_scope.
@@ -76,6 +75,9 @@ Context (R : Type).
 Definition stack {d} {ds : seq nat} (f : {ffun 'I_d -> 'T_ds}) := 
   @Tensor (d :: ds) R [ffun i => tensor_val (f i)].
 
+Definition unstack {d} {ds : seq nat} (t : 'T[R]_(d :: ds)) : {ffun 'I_d -> 'T[R]_ds} :=
+  [ffun i => @Tensor ds _ ((tensor_val t) i)].
+
 Fixpoint const {ds : seq nat} : R -> 'T_ds := match ds with
   | [::] => fun v => @Tensor [::] R v
   | d :: ds' => fun v => stack [ffun=> @const ds' v]
@@ -99,10 +101,9 @@ elim: ds=> [|d ds' Hind] [x] [y] /=.
   case (x =P y) => [->|x_neq_y]; first by left.
     by right; case; exact x_neq_y.
 case forallP => forall_tensor_eq_op_nth.
-- left; apply f_equal; apply ffunP => i.
-  have: forall a b, Tensor a = Tensor b -> a = b => [ds T0 a b|tensor_eq_ab].
-    by case.
-  apply tensor_eq_ab; apply/Hind.
+- left; apply/congr1/ffunP => i.
+  have: forall a b, Tensor a = Tensor b -> a = b by move=> ds T0 a b; case.
+  apply; apply/Hind.
   by rewrite /nth; apply forall_tensor_eq_op_nth.
 - right=> x_eq_y. 
   have: forall x1, tensor_eq_op (nth (Tensor x) x1) (nth (Tensor y) x1) => [x1|].
@@ -140,188 +141,26 @@ Import Choice.InternalTheory.
 
 Context {R : choiceType}.
 
-Fixpoint tensor_find {ds} : pred 'T[R]_ds -> nat -> option 'T[R]_ds := match ds with
-  | [::] => fun P n => omap (@Tensor [::] _) (find (fun t => P (@Tensor [::] _ t)) n)
-  | d :: ds' => fun P n => None
-  end.
-
-(* Definition tensor_hasChoice {ds} : hasChoice ('T[R]_ds).
-Proof.
-exists tensor_find.
-- elim: ds => [|d ds' Hind] P n t.
-  + rewrite /tensor_find. case: t => /= i H.
-    (* have: P (@Tensor [::] _ i) = (P \o @Tensor [::] _) i => [//|-> H]. *)
-    
-    move: H. case: (find _ n) => //= j.
-    by case => ->.
-  + admit.
-- elim: ds => [|d ds' Hind] P [[i]].
-  + rewrite /tensor_find.
-    have: P (@Tensor [::] _ i) = (P \o @Tensor [::] _) i => [//|-> H].
-    rewrite /isSome.
-    admit.
-  + admit.
-- elim: ds => [|d ds' Hind] P Q P_eq1_Q. 
-  + rewrite /tensor_find /eqfun => n.
-Admitted. *)
-
 Definition tensor_hasChoice {ds} : hasChoice ('T[R]_ds).
-Admitted.
+Proof.
+elim: ds => [|d ds' [f] Hind_correct Hind_complete Hind_extensional].
+- exists (fun P n => omap (@Tensor [::] _) (find (fun t => P (@Tensor [::] _ t)) n)) 
+    => [P n [/= i] H|P [[/= x] ex_P]|P Q P_eq1_Q].
+  + have: forall j, P (Tensor j) = (P \o @Tensor [::] _) j => //->.
+    apply (@correct _ _ n).
+    move: H. case: (find _ n) => //= ?.
+    by case => ->.
+  + have: (exists n, find (fun t => P (@Tensor [::] _ t)) n) -> exists n, omap (@Tensor [::] _) (find (fun t : R => P (@Tensor [::] _ t)) n) => [[n ex_find]|].
+      exists n. move: ex_find. case: (find _ n) => //.
+    apply. apply complete. by exists x.
+  + rewrite /eqfun => n. 
+    by apply/congr1/extensional => t.
+- admit. 
+Admitted. 
 
 HB.instance Definition _ {ds} := @tensor_hasChoice ds.
 
 End TensorChoice.
-
-
-Section TensorNModule.
-
-Context {R : nmodType}.
-
-Definition addT {ds} := @map2_tensor R R R ds +%R.
-
-Definition tensor0 {ds} := @const R ds 0.
-
-Lemma addTA {ds} : associative (@addT ds).
-Proof.
-elim ds=> [t u v|d ds' Hind t u v]; first by rewrite /addT/= addrA.
-rewrite /addT/=; apply f_equal; apply eq_dffun=> x0. 
-rewrite -/addT {2 5}/nth/= !ffunE 2!tensor_valK.
-by apply Hind.
-Qed.
-
-Lemma addTC {ds} : commutative (@addT ds).
-Proof.
-elim: ds => [t u|d ds' Hind t u]; first by rewrite /addT/= addrC.
-rewrite /addT/= /stack.
-apply f_equal; apply eq_dffun=> x0; apply f_equal.
-rewrite !ffunE.
-by apply Hind.
-Qed.
-
-Lemma add0T {ds} : left_id tensor0 (@addT ds).
-Proof.
-elim: ds => [t|d ds' Hind]; first by rewrite /addT/= add0r tensor_valK.
-rewrite /addT/= -/addT /stack => [[i]].
-apply f_equal; apply ffunP => x.
-by rewrite 2!ffunE /tensor0 /nth/= 2!ffunE tensor_valK Hind.
-Qed.
-
-HB.instance Definition _ {ds} := GRing.isNmodule.Build ('T_ds) addTA addTC add0T.
-
-End TensorNModule.
-
-
-Section TensorZModule.
-
-Context {R : zmodType}.
-
-Definition oppT {ds} := @map_tensor R R ds -%R.
-
-Lemma addNT {ds} : left_inverse 0 (@oppT ds) +%R.
-Proof.
-elim: ds => [|d ds' Hind]; case => i.
-  by rewrite /oppT /GRing.add/= /addT/= addNr.
-rewrite /oppT/= -/oppT /GRing.add/= /addT /stack/= /GRing.zero/= /tensor0/=.
-apply f_equal; apply eq_dffun => x.
-rewrite /nth/= 2!ffunE tensor_valK -/addT.
-rewrite (_ : forall a b, addT a b = a + b); last by rewrite /GRing.add/=.
-by rewrite Hind.
-Qed.
-
-HB.instance Definition _ {ds} := GRing.Nmodule_isZmodule.Build ('T_ds) addNT.
-
-End TensorZModule.
-
-
-Section TensorPzSemiRing.
-
-Context {R : pzSemiRingType}.
-
-Definition tensor1 {ds} := @const R ds 1. 
-
-Definition mulT {ds} := @map2_tensor R R R ds *%R.
-
-Lemma mulTA {ds} : associative (@mulT ds).
-Proof.
-elim: ds => [t u v|d ds' Hind t u v]; first by rewrite /mulT/= mulrA.
-rewrite /mulT/= -/mulT.
-apply f_equal; apply eq_dffun => x.
-by rewrite {2 5}/nth/= !ffunE 2!tensor_valK Hind.
-Qed.
-
-Lemma mul1T {ds} : left_id tensor1 (@mulT ds).
-Proof.
-elim: ds => [t|d ds' Hind]; first by rewrite /mulT/= mul1r tensor_valK.
-rewrite /mulT/= -/mulT /stack => [[i]].
-apply f_equal; apply ffunP => x.
-by rewrite 2!ffunE /tensor1 /nth/= 2!ffunE tensor_valK Hind.
-Qed.
-
-Lemma mulT1 {ds} : right_id tensor1 (@mulT ds).
-Proof.
-elim: ds => [t|d ds' Hind]; first by rewrite /mulT/= mulr1 tensor_valK.
-rewrite /mulT/= -/mulT /stack => [[i]].
-apply f_equal; apply ffunP => x.
-by rewrite 2!ffunE /tensor1 /nth/= 2!ffunE tensor_valK Hind.
-Qed.
-
-Lemma mulTDl {ds} : left_distributive (@mulT ds) +%R.
-Proof.
-elim: ds => [t u v|d ds' Hind t u v].
-  by rewrite /mulT/= mulrDl {2}/GRing.add/= /addT.
-rewrite /mulT/= -/mulT /GRing.add/= /addT /nth/=.
-apply f_equal; apply eq_dffun => x.
-rewrite 2!ffunE tensor_valK -/addT.
-have: forall a b, addT a b = a + b => addT_add; first by rewrite /GRing.add/=.
-by rewrite 2!addT_add Hind /nth /stack 4!ffunE 2!tensor_valK.
-Qed.
-
-Lemma mulTDr {ds} : right_distributive (@mulT ds) +%R.
-Proof.
-elim: ds => [t u v|d ds' Hind t u v].
-  by rewrite /mulT/= mulrDr {2}/GRing.add/= /addT.
-rewrite /mulT/= -/mulT /GRing.add/= /addT /nth/=.
-apply f_equal; apply eq_dffun => x.
-rewrite 2!ffunE tensor_valK -/addT.
-have: forall a b, addT a b = a + b => addT_add; first by rewrite /GRing.add/=.
-by rewrite 2!addT_add Hind /nth /stack 4!ffunE 2!tensor_valK.
-Qed.
-
-Lemma mul0T {ds} : left_zero 0 (@mulT ds).
-Proof.
-elim: ds => [t|d ds' Hind t]; first by rewrite /mulT/= mul0r.
-rewrite /mulT/= -/mulT /GRing.zero/= /tensor0/=.
-apply f_equal; apply eq_dffun => x.
-by rewrite /nth /stack 2!ffunE tensor_valK Hind.
-Qed.
-
-Lemma mulT0 {ds} : right_zero 0 (@mulT ds).
-Proof.
-elim: ds => [t|d ds' Hind t]; first by rewrite /mulT/= mulr0.
-rewrite /mulT/= -/mulT /GRing.zero/= /tensor0/=.
-apply f_equal; apply eq_dffun => x.
-by rewrite /nth /stack 2!ffunE tensor_valK Hind.
-Qed.
-
-HB.instance Definition _ {ds} := GRing.Nmodule_isPzSemiRing.Build ('T_ds)
-    mulTA mul1T mulT1 mulTDl mulTDr mul0T mulT0.
-
-End TensorPzSemiRing.
-
-
-Section TensorNzSemiRing.
-
-Context {R : nzSemiRingType}.
-
-Lemma oneT_neq0 {ds} : all [eta leq 1] ds -> @GRing.one ('T[R]_ds) != 0.
-Proof.
-elim: ds => [|d ds' Hind]; first by rewrite oner_neq0.
-rewrite /eq_op/=.
-Admitted.
-
-HB.instance Definition _ {ds} {ds_gt_0} := GRing.PzSemiRing_isNonZero.Build ('T_ds) (oneT_neq0 ds_gt_0).
-
-End TensorNzSemiRing.
 
 
 Section TensorOrder.
@@ -375,3 +214,229 @@ HB.instance Definition _ {ds} := Order.isPOrder.Build
   o ('T_ds) ltT_def leT_refl leT_anti leT_trans.
 
 End TensorOrder.
+
+
+Section TensorNModule.
+
+Context {R : nmodType}.
+
+Definition addT {ds} := @map2_tensor R R R ds +%R.
+
+Definition tensor0 {ds} := @const R ds 0.
+
+Lemma addTA {ds} : associative (@addT ds).
+Proof.
+elim ds=> [t u v|d ds' Hind t u v]; first by rewrite /addT/= addrA.
+rewrite /addT/=.
+apply/congr1/eq_dffun=> x0. 
+rewrite -/addT {2 5}/nth/= !ffunE 2!tensor_valK.
+by apply Hind.
+Qed.
+
+Lemma addTC {ds} : commutative (@addT ds).
+Proof.
+elim: ds => [t u|d ds' Hind t u]; first by rewrite /addT/= addrC.
+rewrite /addT/= /stack.
+apply/congr1/eq_dffun=> x0; apply congr1.
+rewrite !ffunE.
+by apply Hind.
+Qed.
+
+Lemma add0T {ds} : left_id tensor0 (@addT ds).
+Proof.
+elim: ds => [t|d ds' Hind]; first by rewrite /addT/= add0r tensor_valK.
+rewrite /addT/= -/addT /stack => [[i]].
+apply/congr1/ffunP => x.
+by rewrite 2!ffunE /tensor0 /nth/= 2!ffunE tensor_valK Hind.
+Qed.
+
+HB.instance Definition _ {ds} := GRing.isNmodule.Build ('T_ds) addTA addTC add0T.
+
+End TensorNModule.
+
+
+Section TensorZModule.
+
+Context {R : zmodType}.
+
+Definition oppT {ds} := @map_tensor R R ds -%R.
+
+Lemma addNT {ds} : left_inverse 0 (@oppT ds) +%R.
+Proof.
+elim: ds => [|d ds' Hind]; case => i.
+  by rewrite /oppT /GRing.add/= /addT/= addNr.
+rewrite /oppT/= -/oppT /GRing.add/= /addT /stack/= /GRing.zero/= /tensor0/=.
+apply/congr1/eq_dffun => x.
+rewrite /nth/= 2!ffunE tensor_valK -/addT.
+rewrite (_ : forall a b, addT a b = a + b); last by rewrite /GRing.add/=.
+by rewrite Hind.
+Qed.
+
+HB.instance Definition _ {ds} := GRing.Nmodule_isZmodule.Build ('T_ds) addNT.
+
+End TensorZModule.
+
+
+Section TensorPzSemiRing.
+
+Context {R : pzSemiRingType}.
+
+Definition tensor1 {ds} := @const R ds 1. 
+
+Definition mulT {ds} := @map2_tensor R R R ds *%R.
+
+Lemma mulTA {ds} : associative (@mulT ds).
+Proof.
+elim: ds => [t u v|d ds' Hind t u v]; first by rewrite /mulT/= mulrA.
+rewrite /mulT/= -/mulT.
+apply/congr1/eq_dffun => x.
+by rewrite {2 5}/nth/= !ffunE 2!tensor_valK Hind.
+Qed.
+
+Lemma mul1T {ds} : left_id tensor1 (@mulT ds).
+Proof.
+elim: ds => [t|d ds' Hind]; first by rewrite /mulT/= mul1r tensor_valK.
+rewrite /mulT/= -/mulT /stack => [[i]].
+apply/congr1/ffunP => x.
+by rewrite 2!ffunE /tensor1 /nth/= 2!ffunE tensor_valK Hind.
+Qed.
+
+Lemma mulT1 {ds} : right_id tensor1 (@mulT ds).
+Proof.
+elim: ds => [t|d ds' Hind]; first by rewrite /mulT/= mulr1 tensor_valK.
+rewrite /mulT/= -/mulT /stack => [[i]].
+apply/congr1/ffunP => x.
+by rewrite 2!ffunE /tensor1 /nth/= 2!ffunE tensor_valK Hind.
+Qed.
+
+Lemma mulTDl {ds} : left_distributive (@mulT ds) +%R.
+Proof.
+elim: ds => [t u v|d ds' Hind t u v].
+  by rewrite /mulT/= mulrDl {2}/GRing.add/= /addT.
+rewrite /mulT/= -/mulT /GRing.add/= /addT /nth/=.
+apply/congr1/eq_dffun => x.
+rewrite 2!ffunE tensor_valK -/addT.
+have: forall a b, addT a b = a + b => addT_add; first by rewrite /GRing.add/=.
+by rewrite 2!addT_add Hind /nth /stack 4!ffunE 2!tensor_valK.
+Qed.
+
+Lemma mulTDr {ds} : right_distributive (@mulT ds) +%R.
+Proof.
+elim: ds => [t u v|d ds' Hind t u v].
+  by rewrite /mulT/= mulrDr {2}/GRing.add/= /addT.
+rewrite /mulT/= -/mulT /GRing.add/= /addT /nth/=.
+apply/congr1/eq_dffun => x.
+rewrite 2!ffunE tensor_valK -/addT.
+have: forall a b, addT a b = a + b => addT_add; first by rewrite /GRing.add/=.
+by rewrite 2!addT_add Hind /nth /stack 4!ffunE 2!tensor_valK.
+Qed.
+
+Lemma mul0T {ds} : left_zero 0 (@mulT ds).
+Proof.
+elim: ds => [t|d ds' Hind t]; first by rewrite /mulT/= mul0r.
+rewrite /mulT/= -/mulT /GRing.zero/= /tensor0/=.
+apply/congr1/eq_dffun => x.
+by rewrite /nth /stack 2!ffunE tensor_valK Hind.
+Qed.
+
+Lemma mulT0 {ds} : right_zero 0 (@mulT ds).
+Proof.
+elim: ds => [t|d ds' Hind t]; first by rewrite /mulT/= mulr0.
+rewrite /mulT/= -/mulT /GRing.zero/= /tensor0/=.
+apply/congr1/eq_dffun => x.
+by rewrite /nth /stack 2!ffunE tensor_valK Hind.
+Qed.
+
+HB.instance Definition _ {ds} := GRing.Nmodule_isPzSemiRing.Build ('T_ds)
+    mulTA mul1T mulT1 mulTDl mulTDr mul0T mulT0.
+
+End TensorPzSemiRing.
+
+Section TensorComPzSemiRing.
+
+Context {R : comPzSemiRingType}.
+
+Lemma mulTC {ds} : commutative (@GRing.mul 'T[R]_ds).
+Proof.
+elim: ds => [|d ds' Hind] t u; first by rewrite /GRing.mul/= /mulT/= mulrC.
+rewrite /GRing.mul/= /mulT/= -/mulT.
+apply/congr1/ffunP => i.
+rewrite 2!ffunE.
+have: forall a b, a * b = b * a -> mulT a b = mulT b a => [|->//].
+  by rewrite /GRing.mul/=.
+Qed.
+
+HB.about GRing.PzSemiRing_hasCommutativeMul.Build.
+HB.instance Definition _ {ds} := GRing.PzSemiRing_hasCommutativeMul.Build
+  'T_ds mulTC.
+
+End TensorComPzSemiRing.
+
+
+Section TensorNzSemiRing.
+
+Context {R : nzSemiRingType}.
+
+Lemma oneT_neq0 {ds} : all [eta leq 1] ds -> @GRing.one ('T[R]_ds) != 0.
+Proof.
+elim: ds => [|[|d] ds' Hind /andP [d_gt_0 ds'_gt_0]]//.
+  by rewrite oner_neq0.
+rewrite /eq_op/=.
+apply/forallPn.
+exists ord0.
+rewrite /nth/= 4!ffunE 2!tensor_valK -/tensor1 -/tensor0 -/(GRing.one 'T_ds').
+rewrite (_ : tensor0 = @GRing.zero 'T_ds')//.
+by apply/tensor_eqP/eqP/Hind/ds'_gt_0.
+Qed.
+
+HB.instance Definition _ {ds} {ds_gt_0} := GRing.PzSemiRing_isNonZero.Build ('T_ds) (oneT_neq0 ds_gt_0).
+
+HB.about tensor.
+
+End TensorNzSemiRing.
+
+
+Section TensorComNzSemiRing.
+
+Context {R : comNzSemiRingType} {ds : seq nat} {ds_gt_0 : all [eta leq 1] ds}.
+
+(* TODO!!!!!!! *)
+
+HB.about tensor.
+
+HB.about GRing.Nmodule_isComNzSemiRing.Build.
+
+HB.about comNzSemiRingType.
+
+Definition tmp := @oneT_neq0 R ds ds_gt_0. 
+
+(* HB.instance Definition _ {ds} {ds_gt_0 : all [eta leq 1] ds} := @GRing.ComNzSemiRing.on (tensor ds (GRing.ComNzSemiRing.sort R)). *)
+(* HB.instance Definition ngtj := @GRing.Nmodule_isComNzSemiRing.Build *)
+  (* ('T[R]_ds) (@tensor1 R ds) (@mulT R ds) (@mulTA R ds) (@mulTC R ds) (@mul1T R ds) (@mulTDl R ds) (@mul0T R ds) tmp. *)
+
+End TensorComNzSemiRing.
+
+HB.instance Definition _ {R : pzRingType} {ds} := GRing.isPzRing.Build
+  'T[R]_ds addTA addTC add0T addNT mulTA mul1T mulT1 mulTDl mulTDr.
+
+HB.howto comNzRingType.
+HB.about GRing.isNzRing.Build.
+
+(* HB.instance Definition _ {R : nzRingType} {ds} {ds_gt_0} := GRing.isNzRing.Build *)
+  (* ('T[R]_ds) addTA addTC add0T addNT mulTA mul1T mulT1 mulTDl mulTDr (oneT_neq0 ds_gt_0). *)
+
+(* HB.instance Definition _ {R : pzRingType} {ds} := 
+  GRing.PzRing_hasCommutativeMul.Build 'T[R]_ds mulTC. *)
+
+Section TensorNzRing.
+
+Context {R : nzRingType}.
+
+(* HB.howto nzRingType.
+HB.about GRing.isNzRing.Build.
+HB.instance Definition _ {ds} {ds_gt_0} := @GRing.isNzRing.Build
+  'T[R]_ds
+  tensor0 oppT addT tensor1 mulT
+  addTA addTC add0T addNT mulTA mul1T mulT1 mulTDl mulTDr (@oneT_neq0 R ds ds_gt_0). *)
+
+End TensorNzRing.
