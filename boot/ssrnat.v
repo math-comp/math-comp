@@ -399,6 +399,9 @@ Proof. by elim: n m p => [|i IHn] [|m] [|p] //; apply: IHn m p. Qed.
 
 Lemma leq_ltn_trans n m p : m <= n -> n < p -> m < p.
 Proof. by move=> Hmn; apply: leq_trans. Qed.
+ 
+Lemma ltn_leq_trans n m p : m < n -> n <= p -> m < p.
+Proof. by move=> Hmn; apply: leq_trans. Qed.
 
 Lemma ltnW m n : m < n -> m <= n.
 Proof. exact: leq_trans. Qed.
