@@ -72,8 +72,6 @@ Section ContravariantTensor.
 Context (u' : nat) (us ds : seq nat) (R : Type).
 Local Notation u := u'.+1 (only parsing).
 
-Lemma ltn_leq_trans n m p : m < n -> n <= p -> m < p.
-Proof. by move=> Hmn; apply: leq_trans. Qed.
 
 
 Lemma ord_i_j (i : 'I_u) (j : 'I_\prod_(e <- us) e) : j * u + i < \prod_(e <- u :: us) e.
