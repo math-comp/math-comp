@@ -169,11 +169,30 @@ HB.instance Definition _ {R : pzRingType} := GRing.Zmodule_isPzRing.Build
 HB.instance Definition _ {R : comPzRingType} := 
   GRing.PzRing_hasCommutativeMul.Build 'T[R] multC.
 
+Section TensorNz.
+
+Lemma prod_gt_0 {xs} (xs_gt_0 : all (leq 1) xs) : 0 < \prod_(e <- xs) e.
+Proof.
+elim: xs xs_gt_0=> [_|u us' Hind /andP [u_gt_0 us'_gt_0]].
+  by rewrite big_nil.
+rewrite big_cons muln_gt0.
+apply/andP; split=>//.
+exact (Hind us'_gt_0).
+Qed.
+
+Context (us_gt_0 : all (leq 1) us) (ds_gt_0 : all (leq 1) ds).
+
 Lemma onet_neq0 {R : nzSemiRingType} : (1%R : 'T[R]) != 0%R.
-Proof. 
-  rewrite /GRing.one /GRing.zero /= /tensor1 /const_t /Sub /=.
-  apply/eqP.
-Admitted.
+Proof.
+rewrite /GRing.one/GRing.zero /= /tensor1/const_t /Sub/GRing.zero /=.
+apply/eqP. case. apply/matrixP. rewrite /const_mx/eqrel.
+case: (\prod_(u <- us) u) (prod_gt_0 us_gt_0)=> [//|n0 _].
+case: (\prod_(d <- ds) d) (prod_gt_0 ds_gt_0)=> [//|n1 _ H].
+move: (H ord0 ord0).
+rewrite matrix_of_fun.unlock /fun_of_matrix 2!ffunE.
+apply/eqP.
+exact (oner_neq0 R).
+Qed.
 
 HB.instance Definition _ {R : nzSemiRingType} := 
   GRing.PzSemiRing_isNonZero.Build
@@ -183,6 +202,14 @@ HB.instance Definition _ {R : comNzSemiRingType} :=
   GRing.Nmodule_isComNzSemiRing.Build
   'T[R] multA multC mul1t multDl mul0t onet_neq0.
 
+HB.instance Definition _ {R : nzRingType} := GRing.Zmodule_isNzRing.Build
+  'T[R] multA mul1t mult1 multDl multDr onet_neq0.
+
+HB.instance Definition _ {R: comNzRingType} := GRing.Zmodule_isComNzRing.Build
+  'T[R] multA multC mul1t multDl onet_neq0.
+
+End TensorNz.
+
 End TensorRing.
 
 
@@ -190,9 +217,7 @@ Section Test.
 
 Open Scope ring_scope.
 
-Context (R : comPzRingType) (t u : 'T[R]_([:: 2; 3], [:: 2])).
+Context (R : comNzRingType) (t u : 'T[R]_([:: 2; 3], [:: 2])).
 
-Lemma comt : t * u = u * t.
-Proof. by rewrite GRing.mulrC. Qed.
-
-End Test.
+Lemma comt : 1%R != 0%R :> 'T[R]_([:: 4; 9; 6; 2; 3], [:: 2]).
+Proof. by rewrite GRing.oner_neq0. Qed.
