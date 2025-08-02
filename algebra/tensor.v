@@ -1,7 +1,6 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect seq matrix bigop ssrbool eqtype choice.
-From mathcomp Require Import fintype ssralg ssrnat ssrfun order.
-
+From mathcomp Require Import fintype ssralg ssrnat ssrfun order finfun.
 
 (******************************************************************************)
 (* This file defines tensors.                                                 *)
@@ -52,7 +51,6 @@ End TensorDef.
 Notation "''T[' R ]_ ( us , ds )" := (tensor us ds R) (only parsing).
 Notation "''T_' ( us , ds )" := 'T[_]_(us, ds).
 
-
 Section SubtypeInstances.
 
 Import Algebra.
@@ -75,31 +73,37 @@ Proof. by []. Qed.
 HB.instance Definition _ (R : zmodType) := SubChoice_isSubZmodule.Build
   _ _ 'T[R] (zmod_closed R).
 
-HB.about tensor.
-
 End SubtypeInstances.
 
 
 Definition const_t {R us ds} (v : R) : 'T[R]_(us, ds) :=
   Tensor (const_mx v).
 
+
 Section IndexTensor.
 
 Context (R : Type) (u d : nat) (us ds : seq nat).
 
-Lemma ltn_ord_index {x} {xs} (i : 'I_x) (j : 'I_\prod_(e <- xs) e) 
-  : j * x + i < \prod_(e <- x :: xs) e.
-Proof.
-case: i => i i_ord /=; case: j => j j_ord /=.
-rewrite big_cons -ltn_subRL mulnC -mulnBl (ltn_leq_trans i_ord)// leq_pmull//.
-by rewrite subn_gt0.
-Qed.
+Open Scope ring_scope.
+
+Lemma tensormx_cast {x xs} : #|{:'I_x * 'I_\prod_(e <- xs) e}| = \prod_(e <- x :: xs) e.
+Proof. by rewrite card_prod !card_ord big_cons. Qed.
+
+Definition tensormx_index {x xs} (i : 'I_x) (j : 'I_\prod_(e <- xs) e) 
+  : 'I_\prod_(e <- x :: xs) e :=
+  cast_ord tensormx_cast (enum_rank (i, j)).
 
 Definition upper_index (t : 'T[R]_(u :: us, ds)) (i : 'I_u) : 'T[R]_(us, ds) :=
-  Tensor (rowsub (fun j => Ordinal (ltn_ord_index i j)) t).
+  Tensor (rowsub (tensormx_index i) t).
 
 Definition lower_index (t : 'T[R]_(us, d :: ds)) (i : 'I_d) : 'T[R]_(us, ds) :=
-  Tensor (colsub (fun j => Ordinal (ltn_ord_index i j)) t).
+  Tensor (colsub (tensormx_index i) t).
+
+Definition upper_stack (f : 'I_u -> 'T[R]_(us, ds)) : 'T[R]_(u :: us, ds) := 
+  Tensor (castmx (tensormx_cast, erefl) (\matrix_(i, j) f (enum_val i).1 (enum_val i).2 j)).
+
+Definition lower_stack (f : 'I_d -> 'T[R]_(us, ds)) : 'T[R]_(us, d :: ds) :=
+  Tensor (castmx (erefl, tensormx_cast) (\matrix_(i, j) f (enum_val j).1 i (enum_val j).2)).
 
 End IndexTensor.
 
