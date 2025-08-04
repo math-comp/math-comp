@@ -222,3 +222,53 @@ HB.instance Definition _ {R: comNzRingType} := GRing.Zmodule_isComNzRing.Build
 End TensorNz.
 
 End TensorRing.
+
+
+Section TensorPOrder.
+
+Import Order.POrderTheory.
+
+Context (o : Order.disp_t) (R : porderType o) (us ds : seq nat).
+
+Definition reduce_and_mx {m n} (M : 'M[bool]_(m, n)) : bool :=
+  [forall ij, M ij.1 ij.2].
+
+Definition le_t (t u : 'T[R]_(us, ds)) := 
+  [forall ij, (map2_mx <=%O t u) ij.1 ij.2].
+
+Definition lt_t (t u : 'T[R]_(us, ds)) := (u != t) && le_t t u.
+
+Lemma lt_t_def : forall x y, lt_t x y = (y != x) && le_t x y.
+Proof. by []. Qed.
+
+Lemma le_t_refl : reflexive (le_t).
+Proof.
+move=> x; rewrite /le_t.
+apply /forallP=> i.
+by rewrite /map2_mx matrix_of_fun.unlock /fun_of_matrix ffunE le_refl.
+Qed.
+
+Lemma le_t_anti : antisymmetric (le_t).
+Proof.
+move=> x y; rewrite /le_t=> /andP [/forallP le_t_xy /forallP le_t_yx].
+apply /eqP; rewrite /eq_op/=; apply/eqP/matrixP.
+rewrite /eqrel=> i j.
+move: (le_t_xy (i, j)) (le_t_yx (i, j)).
+rewrite /map2_mx matrix_of_fun.unlock /fun_of_matrix !ffunE/=
+  => le_t_xy_ij le_t_yx_ij.
+by apply /le_anti/andP; split. 
+Qed.
+
+Lemma le_t_trans : transitive (le_t).
+Proof.
+move=> x y z; rewrite /le_t=> /forallP le_t_yx /forallP le_t_xz.
+apply/forallP=> ij.
+move: (le_t_yx ij) (le_t_xz ij).
+rewrite /map2_mx matrix_of_fun.unlock /fun_of_matrix !ffunE/=.
+exact /le_trans.
+Qed.
+
+HB.instance Definition _ := Order.isPOrder.Build
+  o 'T[R]_(us, ds) lt_t_def le_t_refl le_t_anti le_t_trans.
+
+End TensorPOrder.
