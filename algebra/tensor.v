@@ -73,6 +73,17 @@ Proof. by []. Qed.
 HB.instance Definition _ (R : zmodType) := SubChoice_isSubZmodule.Build
   _ _ 'T[R] (zmod_closed R).
 
+Lemma subsemimod_closed {m n} (R : pzSemiRingType)
+  : @subsemimod_closed R 'M[R]_(n, m) predT.
+Proof. by []. Qed.
+HB.instance Definition _ (R : pzSemiRingType) := 
+  GRing.SubNmodule_isSubLSemiModule.Build _ _ _ 'T[R] (subsemimod_closed R).
+
+Lemma submod_closed {m n} (R : pzRingType) : @submod_closed R 'M[R]_(n, m) predT.
+Proof. by []. Qed.
+HB.instance Definition _ (R : pzRingType) := 
+  GRing.SubZmodule_isSubLmodule.Build _ _ _ 'T[R] (submod_closed R).
+
 End SubtypeInstances.
 
 
@@ -211,13 +222,3 @@ HB.instance Definition _ {R: comNzRingType} := GRing.Zmodule_isComNzRing.Build
 End TensorNz.
 
 End TensorRing.
-
-
-Section Test.
-
-Open Scope ring_scope.
-
-Context (R : comNzRingType) (t u : 'T[R]_([:: 2; 3], [:: 2])).
-
-Lemma comt : 1%R != 0%R :> 'T[R]_([:: 4; 9; 6; 2; 3], [:: 2]).
-Proof. by rewrite GRing.oner_neq0. Qed.
