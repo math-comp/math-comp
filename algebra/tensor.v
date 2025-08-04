@@ -227,14 +227,12 @@ End TensorRing.
 Section TensorPOrder.
 
 Import Order.POrderTheory.
+Open Scope order_scope.
 
 Context (o : Order.disp_t) (R : porderType o) (us ds : seq nat).
 
-Definition reduce_and_mx {m n} (M : 'M[bool]_(m, n)) : bool :=
-  [forall ij, M ij.1 ij.2].
-
 Definition le_t (t u : 'T[R]_(us, ds)) := 
-  [forall ij, (map2_mx <=%O t u) ij.1 ij.2].
+  [forall ij, (t ij.1 ij.2) <= (u ij.1 ij.2)].
 
 Definition lt_t (t u : 'T[R]_(us, ds)) := (u != t) && le_t t u.
 
@@ -244,8 +242,8 @@ Proof. by []. Qed.
 Lemma le_t_refl : reflexive (le_t).
 Proof.
 move=> x; rewrite /le_t.
-apply /forallP=> i.
-by rewrite /map2_mx matrix_of_fun.unlock /fun_of_matrix ffunE le_refl.
+apply /forallP=> ij.
+by apply le_refl.
 Qed.
 
 Lemma le_t_anti : antisymmetric (le_t).
@@ -253,18 +251,15 @@ Proof.
 move=> x y; rewrite /le_t=> /andP [/forallP le_t_xy /forallP le_t_yx].
 apply /eqP; rewrite /eq_op/=; apply/eqP/matrixP.
 rewrite /eqrel=> i j.
-move: (le_t_xy (i, j)) (le_t_yx (i, j)).
-rewrite /map2_mx matrix_of_fun.unlock /fun_of_matrix !ffunE/=
-  => le_t_xy_ij le_t_yx_ij.
-by apply /le_anti/andP; split. 
+apply /le_anti/andP; split.
+- exact (le_t_xy (i, j)).
+- exact (le_t_yx (i, j)). 
 Qed.
 
 Lemma le_t_trans : transitive (le_t).
 Proof.
 move=> x y z; rewrite /le_t=> /forallP le_t_yx /forallP le_t_xz.
 apply/forallP=> ij.
-move: (le_t_yx ij) (le_t_xz ij).
-rewrite /map2_mx matrix_of_fun.unlock /fun_of_matrix !ffunE/=.
 exact /le_trans.
 Qed.
 
