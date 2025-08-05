@@ -43,8 +43,6 @@ Definition t_val T := let: Tensor g := T in g.
 
 HB.instance Definition _ := [isNew for t_val].
 
-Coercion t_val : tensor >-> matrix.
-
 End TensorDef.
 
 
@@ -105,16 +103,16 @@ Definition tensormx_index {x xs} (i : 'I_x) (j : 'I_\prod_(e <- xs) e)
   cast_ord tensormx_cast (enum_rank (i, j)).
 
 Definition upper_index (t : 'T[R]_(u :: us, ds)) (i : 'I_u) : 'T[R]_(us, ds) :=
-  Tensor (rowsub (tensormx_index i) t).
+  Tensor (rowsub (tensormx_index i) (\val t)).
 
 Definition lower_index (t : 'T[R]_(us, d :: ds)) (i : 'I_d) : 'T[R]_(us, ds) :=
-  Tensor (colsub (tensormx_index i) t).
+  Tensor (colsub (tensormx_index i) (\val t)).
 
 Definition upper_stack (f : 'I_u -> 'T[R]_(us, ds)) : 'T[R]_(u :: us, ds) := 
-  Tensor (castmx (tensormx_cast, erefl) (\matrix_(i, j) f (enum_val i).1 (enum_val i).2 j)).
+  Tensor (castmx (tensormx_cast, erefl) (\matrix_(i, j) \val (f (enum_val i).1) (enum_val i).2 j)).
 
 Definition lower_stack (f : 'I_d -> 'T[R]_(us, ds)) : 'T[R]_(us, d :: ds) :=
-  Tensor (castmx (erefl, tensormx_cast) (\matrix_(i, j) f (enum_val j).1 i (enum_val j).2)).
+  Tensor (castmx (erefl, tensormx_cast) (\matrix_(i, j) \val (f (enum_val j).1) i (enum_val j).2)).
 
 End IndexTensor.
 
@@ -126,8 +124,8 @@ Context (R : Type).
 Lemma ord_nil : 0 < \prod_(x <- [::]) x.
 Proof. by rewrite big_nil. Qed.
 
-Definition tensor_nilE (t : 'T[R]_([::], [::])) : R := 
-  t (Ordinal ord_nil) (Ordinal ord_nil).
+Definition tensor_nilE (t : 'T[R]_([::])) : R := 
+  \val t (Ordinal ord_nil) (Ordinal ord_nil).
 
 End NilTensor.
 
@@ -145,7 +143,8 @@ Context {R : pzSemiRingType}.
 
 Definition tensor1 := @const_t _ us ds (GRing.one R).
 
-Definition mult (t u : 'T[R]_(us, ds)) := @Tensor us ds R (map2_mx *%R t u).
+Definition mult (t u : 'T[R]_(us, ds)) :=
+  @Tensor us ds R (map2_mx *%R (\val t) (\val u)).
 
 Lemma multA : associative mult.
 Proof. by move=> x y z; rewrite /mult map2_mxA. Qed.
@@ -232,7 +231,7 @@ Open Scope order_scope.
 Context (o : Order.disp_t) (R : porderType o) (us ds : seq nat).
 
 Definition le_t (t u : 'T[R]_(us, ds)) := 
-  [forall ij, (t ij.1 ij.2) <= (u ij.1 ij.2)].
+  [forall ij, (\val t ij.1 ij.2) <= (\val u ij.1 ij.2)].
 
 Definition lt_t (t u : 'T[R]_(us, ds)) := (u != t) && le_t t u.
 
