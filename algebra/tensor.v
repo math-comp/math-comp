@@ -49,6 +49,7 @@ End TensorDef.
 Notation "''T[' R ]_ ( us , ds )" := (tensor us ds R) (only parsing).
 Notation "''T_' ( us , ds )" := 'T[_]_(us, ds).
 
+
 Section SubtypeInstances.
 
 Import Algebra.
@@ -95,7 +96,8 @@ Context (R : Type) (u d : nat) (us ds : seq nat).
 
 Open Scope ring_scope.
 
-Lemma tensormx_cast {x xs} : #|{:'I_x * 'I_\prod_(e <- xs) e}| = \prod_(e <- x :: xs) e.
+Lemma tensormx_cast {x xs}
+  : #|{:'I_x * 'I_\prod_(e <- xs) e}| = \prod_(e <- x :: xs) e.
 Proof. by rewrite card_prod !card_ord big_cons. Qed.
 
 Definition tensormx_index {x xs} (i : 'I_x) (j : 'I_\prod_(e <- xs) e) 
@@ -109,10 +111,12 @@ Definition lower_index (t : 'T[R]_(us, d :: ds)) (i : 'I_d) : 'T[R]_(us, ds) :=
   Tensor (colsub (tensormx_index i) (\val t)).
 
 Definition upper_stack (f : 'I_u -> 'T[R]_(us, ds)) : 'T[R]_(u :: us, ds) := 
-  Tensor (castmx (tensormx_cast, erefl) (\matrix_(i, j) \val (f (enum_val i).1) (enum_val i).2 j)).
+  Tensor (castmx (tensormx_cast, erefl) (
+    \matrix_(i, j) \val (f (enum_val i).1) (enum_val i).2 j)).
 
 Definition lower_stack (f : 'I_d -> 'T[R]_(us, ds)) : 'T[R]_(us, d :: ds) :=
-  Tensor (castmx (erefl, tensormx_cast) (\matrix_(i, j) \val (f (enum_val j).1) i (enum_val j).2)).
+  Tensor (castmx (erefl, tensormx_cast) (
+    \matrix_(i, j) \val (f (enum_val j).1) i (enum_val j).2)).
 
 End IndexTensor.
 
@@ -124,7 +128,7 @@ Context (R : Type).
 Lemma ord_nil : 0 < \prod_(x <- [::]) x.
 Proof. by rewrite big_nil. Qed.
 
-Definition tensor_nilE (t : 'T[R]_([::])) : R := 
+Definition tensor_nilE (t : 'T[R]_([::], [::])) : R := 
   \val t (Ordinal ord_nil) (Ordinal ord_nil).
 
 End NilTensor.
@@ -137,7 +141,7 @@ Import GRing.Theory.
 Context (us ds : seq nat).
 Local Notation "''T[' R ]" := 'T[R]_(us, ds).
 
-Section TensorPzSemiRing.
+Section TensorSemiRing.
 
 Context {R : pzSemiRingType}.
 
@@ -164,14 +168,10 @@ Proof. by move=> x; rewrite /mult map2_mx0. Qed.
 HB.instance Definition _ := GRing.Nmodule_isPzSemiRing.Build
   'T[R] multA mul1t mult1 multDl multDr mul0t mult0.
 
-End TensorPzSemiRing.
+End TensorSemiRing.
 
-Lemma multC {R : comPzSemiRingType} : commutative (@mult R).
+Lemma multC {R : comPzSemiRingType} : @commutative 'T[R] _ mult.
 Proof. by move=> x y; rewrite /mult map2_mxC. Qed.
-
-HB.instance Definition _ {R : comPzSemiRingType} := 
-  GRing.Nmodule_isComPzSemiRing.Build 
-  'T[R] multA multC mul1t multDl mul0t.
 
 HB.instance Definition _ {R : pzRingType} := GRing.Zmodule_isPzRing.Build
   'T[R] multA mul1t mult1 multDl multDr.
@@ -181,13 +181,10 @@ HB.instance Definition _ {R : comPzRingType} :=
 
 Section TensorNz.
 
-Lemma prod_gt_0 {xs} (xs_gt_0 : all (leq 1) xs) : 0 < \prod_(e <- xs) e.
+Lemma prod_gt_0 {xs} : all (leq 1) xs -> 0 < \prod_(e <- xs) e.
 Proof.
-elim: xs xs_gt_0=> [_|u us' Hind /andP [u_gt_0 us'_gt_0]].
-  by rewrite big_nil.
-rewrite big_cons muln_gt0.
-apply/andP; split=>//.
-exact (Hind us'_gt_0).
+elim: xs=> [_|x xs' IH /andP[xgt0 xs'gt0]]; first by rewrite big_nil.
+by rewrite big_cons muln_gt0 xgt0/= IH.
 Qed.
 
 Context (us_gt_0 : all (leq 1) us) (ds_gt_0 : all (leq 1) ds).
@@ -195,22 +192,15 @@ Context (us_gt_0 : all (leq 1) us) (ds_gt_0 : all (leq 1) ds).
 Lemma onet_neq0 {R : nzSemiRingType} : (1%R : 'T[R]) != 0%R.
 Proof.
 rewrite /GRing.one/GRing.zero /= /tensor1/const_t /Sub/GRing.zero /=.
-apply/eqP. case. apply/matrixP. rewrite /const_mx/eqrel.
-case: (\prod_(u <- us) u) (prod_gt_0 us_gt_0)=> [//|n0 _].
-case: (\prod_(d <- ds) d) (prod_gt_0 ds_gt_0)=> [//|n1 _ H].
-move: (H ord0 ord0).
-rewrite matrix_of_fun.unlock /fun_of_matrix 2!ffunE.
-apply/eqP.
-exact (oner_neq0 R).
+apply/eqP; case; apply/matrixP; rewrite /const_mx/eqrel.
+case: (\prod_(u <- us) u) (prod_gt_0 us_gt_0)=> [//|n0 _] /(_ ord0).
+case: (\prod_(d <- ds) d) (prod_gt_0 ds_gt_0)=> [//|n1 _] /(_ ord0).
+by rewrite unlock /fun_of_matrix 2!ffunE; apply/eqP/oner_neq0.
 Qed.
 
 HB.instance Definition _ {R : nzSemiRingType} := 
   GRing.PzSemiRing_isNonZero.Build
   'T[R] onet_neq0.
-
-HB.instance Definition _ {R : comNzSemiRingType} := 
-  GRing.Nmodule_isComNzSemiRing.Build
-  'T[R] multA multC mul1t multDl mul0t onet_neq0.
 
 HB.instance Definition _ {R : nzRingType} := GRing.Zmodule_isNzRing.Build
   'T[R] multA mul1t mult1 multDl multDr onet_neq0.
@@ -239,15 +229,11 @@ Lemma lt_t_def : forall x y, lt_t x y = (y != x) && le_t x y.
 Proof. by []. Qed.
 
 Lemma le_t_refl : reflexive (le_t).
-Proof.
-move=> x; rewrite /le_t.
-apply /forallP=> ij.
-by apply le_refl.
-Qed.
+Proof. by move=> x; exact /forallP. Qed.
 
 Lemma le_t_anti : antisymmetric (le_t).
 Proof.
-move=> x y; rewrite /le_t=> /andP [/forallP le_t_xy /forallP le_t_yx].
+move=> x y /andP[/forallP le_t_xy /forallP le_t_yx].
 apply /eqP; rewrite /eq_op/=; apply/eqP/matrixP.
 rewrite /eqrel=> i j.
 apply /le_anti/andP; split.
@@ -257,9 +243,8 @@ Qed.
 
 Lemma le_t_trans : transitive (le_t).
 Proof.
-move=> x y z; rewrite /le_t=> /forallP le_t_yx /forallP le_t_xz.
-apply/forallP=> ij.
-exact /le_trans.
+move=> x y z /forallP le_t_yx /forallP le_t_xz.
+apply/forallP=> ij; exact /le_trans.
 Qed.
 
 HB.instance Definition _ := Order.isPOrder.Build
