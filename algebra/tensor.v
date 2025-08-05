@@ -1,6 +1,6 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect seq matrix bigop ssrbool eqtype choice.
-From mathcomp Require Import fintype ssralg ssrnat ssrfun order finfun.
+From mathcomp Require Import fintype ssralg ssrnat ssrfun order finfun tuple.
 
 (******************************************************************************)
 (* This file defines tensors.                                                 *)
@@ -9,9 +9,8 @@ From mathcomp Require Import fintype ssralg ssrnat ssrfun order finfun.
 (*       'T_(us, ds)       contravariant dimensions us, and covariant         *)
 (*                         dimensions ds, e.g. 'T[nat]_([:: 1; 3], [::]).     *)
 (*                         The [R] is optional and can usually be ommited.    *)
-(*                                                                            *)
-(*                                                                            *)
-(*                                                                            *)
+(* 'nT[R]_(us), 'nT_(us) == 'T[R]_(us, [::]), purely contravariant tensors.   *)
+(* 'oT[R]_(ds), 'oT_(ds) == 'T[R]_([::], ds), purely covariant tensors.       *)
 (*                                                                            *)
 (*                                                                            *)
 (*                                                                            *)
@@ -25,11 +24,41 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
+
+Reserved Notation "''nT_' ( us )"
+  (at level 0, us at level 2, format "''nT_' ( us )").
+Reserved Notation "''oT_' ( ds )"
+  (at level 0, ds at level 2, format "''oT_' ( ds )").
+Reserved Notation "''nT[' R ]_ ( us )" (at level 0, us at level 2).
+  (* only parsing *)
+Reserved Notation "''oT[' R ]_ ( ds )" (at level 0, ds at level 2).
+  (* only parsing *)
 Reserved Notation "''T_' ( us , ds )"
   (at level 0, us at level 2, ds at level 2, format "''T_' ( us ,  ds )").
 Reserved Notation "''T[' R ]_ ( us , ds )"
-  (at level 0, us at level 2, ds at level 2, format "''T[' R ]_ ( us ,  ds )").
-  (* only parsing*)
+  (at level 0, us at level 2, ds at level 2). (* only parsing*)
+
+Reserved Notation "t ^^ i"
+  (at level 3, i at level 2, left associativity, format "t ^^ i").
+Reserved Notation "t `_ i"
+  (at level 3, i at level 2, left associativity, format "t `_ i").
+
+Reserved Notation "\tensor ^^ i E"
+  (at level 34, E at level 39, i at level 2, format "\tensor ^^ i  E").
+Reserved Notation "\tensor `_ i E"
+  (at level 34, E at level 39, i at level 2, format "\tensor `_ i  E").
+Reserved Notation "\tensor ^^ ( i < u ) E"
+  (E at level 39, i, u at level 50). (* only parsing *)
+Reserved Notation "\tensor `_ ( i < d ) E"
+  (E at level 39, i, d at level 50). (* only parsing *)
+Reserved Notation "\tensor ^^ i => E"
+  (at level 34, E at level 39, i at level 2, format "\tensor ^^ i  =>  E").
+Reserved Notation "\tensor `_ i => E"
+  (at level 34, E at level 39, i at level 2, format "\tensor `_ i  =>  E").
+Reserved Notation "\tensor ^^ ( i < u ) => E"
+  (E at level 39, i, u at level 50). (* only parsing *)
+Reserved Notation "\tensor `_ ( i < d ) => E"
+  (E at level 39, i, d at level 50). (* only parsing *) 
 
 
 Section TensorDef.
@@ -48,6 +77,10 @@ End TensorDef.
 
 Notation "''T[' R ]_ ( us , ds )" := (tensor us ds R) (only parsing).
 Notation "''T_' ( us , ds )" := 'T[_]_(us, ds).
+Notation "''nT[' R ]_ ( us )" := 'T[R]_(us, [::]) (only parsing).
+Notation "''oT[' R ]_ ( ds )" := 'T[R]_([::], ds) (only parsing).
+Notation "''oT_' ( ds )" := 'T_([::], ds).
+Notation "''nT_' ( us )" := 'T_(us, [::]).
 
 
 Section SubtypeInstances.
@@ -104,21 +137,38 @@ Definition tensormx_index {x xs} (i : 'I_x) (j : 'I_\prod_(e <- xs) e)
   : 'I_\prod_(e <- x :: xs) e :=
   cast_ord tensormx_cast (enum_rank (i, j)).
 
-Definition upper_index (t : 'T[R]_(u :: us, ds)) (i : 'I_u) : 'T[R]_(us, ds) :=
+Definition nindex (t : 'T[R]_(u :: us, ds)) (i : 'I_u) : 'T[R]_(us, ds) :=
   Tensor (rowsub (tensormx_index i) (\val t)).
 
-Definition lower_index (t : 'T[R]_(us, d :: ds)) (i : 'I_d) : 'T[R]_(us, ds) :=
+Definition oindex (t : 'T[R]_(us, d :: ds)) (i : 'I_d) : 'T[R]_(us, ds) :=
   Tensor (colsub (tensormx_index i) (\val t)).
 
-Definition upper_stack (f : 'I_u -> 'T[R]_(us, ds)) : 'T[R]_(u :: us, ds) := 
+Definition nstack (f : 'I_u -> 'T[R]_(us, ds)) : 'T[R]_(u :: us, ds) := 
   Tensor (castmx (tensormx_cast, erefl) (
     \matrix_(i, j) \val (f (enum_val i).1) (enum_val i).2 j)).
 
-Definition lower_stack (f : 'I_d -> 'T[R]_(us, ds)) : 'T[R]_(us, d :: ds) :=
+Definition ostack (f : 'I_d -> 'T[R]_(us, ds)) : 'T[R]_(us, d :: ds) :=
   Tensor (castmx (erefl, tensormx_cast) (
     \matrix_(i, j) \val (f (enum_val j).1) i (enum_val j).2)).
 
 End IndexTensor.
+
+
+Notation "t ^^ i" := (nindex t i).
+Notation "t `_ i" := (oindex t i).
+
+Notation "\tensor ^^ ( i < u ) E" := (nstack (fun i : 'I_u => E)) 
+  (only parsing).
+Notation "\tensor `_ ( i < d ) E" := (ostack (fun i : 'I_d => E)) 
+  (only parsing).
+Notation "\tensor ^^ i E" := (\tensor^^(i < _) E).
+Notation "\tensor `_ i E" := (\tensor`_(i < _) E).
+Notation "\tensor ^^ ( i < u ) => E" := (\tensor^^(i < u) const_t E) 
+  (only parsing).
+Notation "\tensor `_ ( i < d ) => E" := (\tensor`_(i < d) const_t E) 
+  (only parsing).
+Notation "\tensor ^^ i => E" := (\tensor^^i const_t E).
+Notation "\tensor `_ i => E" := (\tensor`_i const_t E).
 
 
 Section NilTensor.
@@ -251,3 +301,16 @@ HB.instance Definition _ := Order.isPOrder.Build
   o 'T[R]_(us, ds) lt_t_def le_t_refl le_t_anti le_t_trans.
 
 End TensorPOrder.
+
+
+Section TensorTuple.
+
+Context {R : Type} (x : nat).
+
+Definition ntensor_of_tuple (t : x.-tuple R) : 'nT[R]_([:: x]) :=
+  \tensor^^i => (tnth t i).
+
+Definition otensor_of_tuple (t : x.-tuple R) : 'oT[R]_([:: x]) :=
+  \tensor`_i => (tnth t i).
+
+End TensorTuple.
