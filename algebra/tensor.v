@@ -42,6 +42,10 @@ Reserved Notation "t ^^ i"
   (at level 3, i at level 2, left associativity, format "t ^^ i").
 Reserved Notation "t `_ i"
   (at level 3, i at level 2, left associativity, format "t `_ i").
+Reserved Notation "t ^^= i"
+  (at level 3, i at level 2, left associativity, format "t ^^= i").
+Reserved Notation "t `_= i"
+  (at level 3, i at level 2, left associativity, format "t `_= i").
 
 Reserved Notation "\tensor ^^ i E"
   (at level 34, E at level 39, i at level 2, format "\tensor ^^ i  E").
@@ -123,39 +127,80 @@ Definition const_t {R us ds} (v : R) : 'T[R]_(us, ds) :=
   Tensor (const_mx v).
 
 
+Section NilTensor.
+
+Context (R : Type).
+
+Lemma ord_nil : 0 < \prod_(x <- [::]) x.
+Proof. by rewrite big_nil. Qed.
+
+Definition tensor_nilE (t : 'T[R]_([::], [::])) : R := 
+  \val t (Ordinal ord_nil) (Ordinal ord_nil).
+
+Definition const_tK : cancel const_t tensor_nilE.
+Proof. 
+move=> t; rewrite /tensor_nilE/const_t/const_mx/=. 
+by rewrite matrix_of_fun.unlock /fun_of_matrix ffunE.
+Qed.
+
+End NilTensor.
+
+
 Section IndexTensor.
+
+Section IndexTensorBij.
+
+Context {x : nat} {xs : seq nat}.
+
+Lemma tensormx_cast
+: #|{:'I_x * 'I_\prod_(e <- xs) e}| = \prod_(e <- x :: xs) e.
+Proof. by rewrite card_prod !card_ord big_cons. Qed.
+
+Definition tensormx_index (ij : 'I_x * 'I_\prod_(e <- xs) e) 
+  : 'I_\prod_(e <- x :: xs) e :=
+  cast_ord tensormx_cast (enum_rank ij).
+
+Definition tensormx_unindex (i : 'I_\prod_(e <- x :: xs) e)
+  : 'I_x * 'I_\prod_(e <- xs) e :=
+  enum_val (cast_ord (esym tensormx_cast) i).
+
+Lemma tensormx_indexK : cancel tensormx_index tensormx_unindex.
+Proof.
+by move=> ij; rewrite /tensormx_index/tensormx_unindex cast_ordK enum_rankK.
+Qed.
+
+Lemma tensormx_unindexK : cancel tensormx_unindex tensormx_index.
+Proof.
+by move=> i; rewrite /tensormx_index/tensormx_unindex enum_valK cast_ordKV.
+Qed.
+
+End IndexTensorBij.
 
 Context (R : Type) (u d : nat) (us ds : seq nat).
 
 Open Scope ring_scope.
 
-Lemma tensormx_cast {x xs}
-  : #|{:'I_x * 'I_\prod_(e <- xs) e}| = \prod_(e <- x :: xs) e.
-Proof. by rewrite card_prod !card_ord big_cons. Qed.
-
-Definition tensormx_index {x xs} (i : 'I_x) (j : 'I_\prod_(e <- xs) e) 
-  : 'I_\prod_(e <- x :: xs) e :=
-  cast_ord tensormx_cast (enum_rank (i, j)).
-
 Definition nindex (t : 'T[R]_(u :: us, ds)) (i : 'I_u) : 'T[R]_(us, ds) :=
-  Tensor (rowsub (tensormx_index i) (\val t)).
+  Tensor (\matrix_(i', j) (\val t) (tensormx_index (i, i')) j).  
 
-Definition oindex (t : 'T[R]_(us, d :: ds)) (i : 'I_d) : 'T[R]_(us, ds) :=
-  Tensor (colsub (tensormx_index i) (\val t)).
+Definition oindex (t : 'T[R]_(us, d :: ds)) (j : 'I_d) : 'T[R]_(us, ds) :=
+  Tensor (\matrix_(i, j') (\val t) i (tensormx_index (j, j'))).
 
 Definition nstack (f : 'I_u -> 'T[R]_(us, ds)) : 'T[R]_(u :: us, ds) := 
-  Tensor (castmx (tensormx_cast, erefl) (
-    \matrix_(i, j) \val (f (enum_val i).1) (enum_val i).2 j)).
+  Tensor (
+    \matrix_(i, j) \val (f (tensormx_unindex i).1) (tensormx_unindex i).2 j).
 
 Definition ostack (f : 'I_d -> 'T[R]_(us, ds)) : 'T[R]_(us, d :: ds) :=
-  Tensor (castmx (erefl, tensormx_cast) (
-    \matrix_(i, j) \val (f (enum_val j).1) i (enum_val j).2)).
+  Tensor (
+    \matrix_(i, j) \val (f (tensormx_unindex j).1) i (tensormx_unindex j).2).
 
 End IndexTensor.
 
 
 Notation "t ^^ i" := (nindex t i).
 Notation "t `_ i" := (oindex t i).
+Notation "t ^^= i" := (tensor_nilE (nindex t i)).
+Notation "t `_= i" := (tensor_nilE (oindex t i)).
 
 Notation "\tensor ^^ ( i < u ) E" := (nstack (fun i : 'I_u => E)) 
   (only parsing).
@@ -171,20 +216,58 @@ Notation "\tensor ^^ i => E" := (\tensor^^i const_t E).
 Notation "\tensor `_ i => E" := (\tensor`_i const_t E).
 
 
-Section NilTensor.
+Section TensorIndexTheory.
 
 Context (R : Type).
 
-Lemma ord_nil : 0 < \prod_(x <- [::]) x.
-Proof. by rewrite big_nil. Qed.
+Lemma ntensorP {u us ds} (t v : 'T[R]_(u :: us, ds)) 
+  : t = v <-> forall i, t^^i = v^^i.
+Proof.
+split=> [->//|ti_eq_vi]; apply/val_inj/matrixP=> i j.
+move: (ti_eq_vi (tensormx_unindex i).1).
+move=> [/matrixP] /(_ (tensormx_unindex i).2 j).
+rewrite matrix_of_fun.unlock /fun_of_matrix !ffunE/=.
+by rewrite -surjective_pairing tensormx_unindexK.
+Qed.
 
-Definition tensor_nilE (t : 'T[R]_([::], [::])) : R := 
-  \val t (Ordinal ord_nil) (Ordinal ord_nil).
+Lemma otensorP {us d ds} (t v : 'T[R]_(us, d :: ds))
+  : t = v <-> forall i, t`_i = v`_i.
+Proof.
+split=> [->//|ti_eq_vi]; apply/val_inj/matrixP=> i j.
+move: (ti_eq_vi (tensormx_unindex j).1).
+move=> [/matrixP] /(_ i (tensormx_unindex j).2).
+rewrite matrix_of_fun.unlock /fun_of_matrix !ffunE/=.
+by rewrite -surjective_pairing tensormx_unindexK.
+Qed.
 
-End NilTensor.
+Lemma nstackE {u us ds} (f : 'I_u -> 'T[R]_(us, ds)) i : (nstack f)^^i = f i.
+Proof.
+case (f i) eqn:fi_def.
+rewrite /nstack/nindex.
+apply/congr1/matrixP=> x y.
+by rewrite matrix_of_fun.unlock /fun_of_matrix !ffunE tensormx_indexK fi_def.
+Qed.
+
+Lemma ostackE {us d ds} (f : 'I_d -> 'T[R]_(us, ds)) i : (ostack f)`_i = f i.
+Proof.
+case (f i) eqn:fi_def.
+rewrite /ostack/oindex.
+apply/congr1/matrixP=> x y.
+by rewrite matrix_of_fun.unlock /fun_of_matrix !ffunE tensormx_indexK fi_def.
+Qed.
+
+Lemma nstack_eqE {u} (f : 'I_u -> R) i : (\tensor^^i0 => f i0)^^=i = f i.
+Proof. by rewrite nstackE const_tK. Qed.
+
+Lemma ostack_eqE {d} (f : 'I_d -> R) i : (\tensor`_i0 => f i0)`_=i = f i.
+Proof. by rewrite ostackE const_tK. Qed.
+
+End TensorIndexTheory.
 
 
 Section TensorRing.
+
+Context (t : 'T[nat]_([:: 2; 4], [:: 6])).
 
 Import GRing.Theory.
 
@@ -312,5 +395,8 @@ Definition ntensor_of_tuple (t : x.-tuple R) : 'nT[R]_([:: x]) :=
 
 Definition otensor_of_tuple (t : x.-tuple R) : 'oT[R]_([:: x]) :=
   \tensor`_i => (tnth t i).
+
+Lemma ntensor_of_tupleE t i : (ntensor_of_tuple t)^^= i = tnth t i.
+Proof. exact /nstack_eqE. Qed.
 
 End TensorTuple.
