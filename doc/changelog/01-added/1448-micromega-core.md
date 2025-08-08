@@ -10,8 +10,8 @@
   ([#1448](https://github.com/math-comp/math-comp/pull/1448)).
 
 - in `binnums.v`
-  + definitions `pos_nat`, `int_of_Z` and `Zint`
-  + variants `pos_nat_spec` and `Zint_spec`
+  + definitions `pos_nat`, `int_of_Z`, `Zint`, `rat_of_Q` and `Qrat`
+  + variants `pos_nat_spec`, `Zint_spec` and `Qrat_spec`
   + lemmas `pos_nat_Pos_to_nat`, `iter_opDdoubler`, `pos_natP`,
     `pos_nat_ind`, `Pos_to_nat_gt0`, `Pos_to_nat0F`, `pos_nat_exS`,
     `pos_nat_double`, `pos_nat_doubleS`, `pos_natS`, `pos_natD`,
@@ -21,7 +21,9 @@
     `Pos_to_natD`, `Pos_to_nat_pred_double`, `Pos_to_natM`,
     `Zint_int_of_Z`, `ZintP`, `Zint0`, `Zint_pos`, `Zint_neg`,
     `Zint_double`, `Zint_succ_double`, `Zint_pred_double`,
-    `Zint_pos_sub`, `ZintD`, `ZintN`, `ZintB`, `ZintM`, `Zint_eq` and
-    `Zint_le`
+    `Zint_pos_sub`, `ZintD`, `ZintN`, `ZintB`, `ZintM`, `Zint_eq`,
+    `Zint_le`, `Qrat_rat_of_Q`, `QratP`, `Qrat_spec_Q_to_rat`,
+    `Qrat1`, `Qrat_Qmake`, `intr_pos_nat_neq0`, `QratD`, `QratM`,
+    `QratN`, `QratB`, `Qrat_eq` and `Qrat_le`
   + multirules `pos_natE`, `Pos_to_natE` and `ZintE`
     ([#1448](https://github.com/math-comp/math-comp/pull/1448)).
