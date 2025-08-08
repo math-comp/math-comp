@@ -1455,6 +1455,12 @@ Proof. by rewrite -!mul2n mulnA. Qed.
 Lemma doubleMr m n : (m * n).*2 = m * n.*2.
 Proof. by rewrite -!muln2 mulnA. Qed.
 
+Lemma neq_doubleS_double n m : (n.*2.+1 == m.*2) = false.
+Proof.
+case: (leqP m n) => mn; apply/negbTE; rewrite neq_ltn ?ltn_Sdouble ?mn//.
+by rewrite ltnS leq_double mn orbT.
+Qed.
+
 (* Halving. *)
 
 Fixpoint half (n : nat) : nat := if n is n'.+1 then uphalf n' else n
