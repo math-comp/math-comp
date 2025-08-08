@@ -1,6 +1,7 @@
 algebra/algebra.v
 algebra/all_algebra.v
 algebra/archimedean.v
+algebra/binnums.v
 algebra/countalg.v
 algebra/finalg.v
 algebra/fraction.v
