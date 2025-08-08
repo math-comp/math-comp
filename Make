@@ -1,4 +1,5 @@
 algebra/future_Corelib/ListDef.v
+algebra/future_Corelib/NatDef.v
 algebra/future_Corelib/RatDef.v
 algebra/future_Corelib/micromega_formula.v
 algebra/future_Corelib/micromega_witness.v
@@ -14,6 +15,7 @@ algebra/fraction.v
 algebra/intdiv.v
 algebra/interval.v
 algebra/interval_inference.v
+algebra/lra.v
 algebra/matrix.v
 algebra/mxalgebra.v
 algebra/mxpoly.v

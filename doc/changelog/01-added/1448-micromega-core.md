@@ -27,3 +27,6 @@
     `QratN`, `QratB`, `Qrat_eq` and `Qrat_le`
   + multirules `pos_natE`, `Pos_to_natE` and `ZintE`
     ([#1448](https://github.com/math-comp/math-comp/pull/1448)).
+
+- new file `lra.v`
+  ([#1448](https://github.com/math-comp/math-comp/pull/1448)).

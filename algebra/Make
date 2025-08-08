@@ -1,4 +1,5 @@
 future_Corelib/ListDef.v
+future_Corelib/NatDef.v
 future_Corelib/RatDef.v
 future_Corelib/micromega_formula.v
 future_Corelib/micromega_witness.v
@@ -14,6 +15,7 @@ fraction.v
 intdiv.v
 interval.v
 interval_inference.v
+lra.v
 matrix.v
 mxalgebra.v
 mxpoly.v
