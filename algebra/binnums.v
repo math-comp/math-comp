@@ -1,13 +1,15 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From Corelib Require Import PosDef IntDef.
+From mathcomp Require Import RatDef.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
-From mathcomp Require Import ssralg ssrnum ssrint.
+From mathcomp Require Import ssralg ssrnum ssrint rat.
 
 (******************************************************************************)
 (* This file develops some link with binary numbers from Corelib, defining:   *)
 (*     pos_nat == refinement relation between positive and nat                *)
 (*        Zint == refinement relation between Z and int                       *)
-(* It also provides the conversion function int_of_Z, as well as              *)
+(*        Qrat == refinement relation between Q and rat                       *)
+(* It also provides conversion functions int_of_Z and rat_of_Q, as well as    *)
 (* lemmas proving the correctness of the Corelib operators on binary numbers. *)
 (* This is only intended to use the binary numbers for effective computations,*)
 (* in reflexive tactics for instance.                                         *)
@@ -370,4 +372,82 @@ case: ZintP Zin => [//|||]; [|move=> {i}p {}n _ _ pn _..].
 - case: ZintP Zi'n' => [//|//|//|{i'}p' {}n' _ _ p'n' _ /=].
   rewrite !NegzE lerN2 lez_nat /Z.leb/= (pos_nat_compare pn p'n') eqSS.
   by case: eqP => [->/=| nn']; rewrite ?leqnn// ltnS leqNgt; case: ltnP.
+Qed.
+
+Definition rat_of_Q (q : Q) : rat :=
+  (int_of_Z (Qnum q))%:~R / (Pos.to_nat (Qden q))%:R.
+
+Definition Qrat (q : Q) (r : rat) := rat_of_Q q == r.
+
+Lemma Qrat_rat_of_Q q : Qrat q (rat_of_Q q). Proof. exact/eqP. Qed.
+Hint Resolve Qrat_rat_of_Q : core.
+
+Variant Qrat_spec (q : Q) (r : rat) : Prop :=
+  Qrat_spec_Qmake n d
+    of Zint (Qnum q) n & pos_nat (Qden q) d & r = n%:~R / d%:R.
+Arguments Qrat_spec_Qmake {q r}.
+
+Lemma QratP q r : reflect (Qrat_spec q r) (Qrat q r).
+Proof.
+apply/(iffP idP) => [/eqP<-{r}|]; first exact: Qrat_spec_Qmake.
+by case=> _ _ /eqP<- /eqP<- ->.
+Qed.
+
+Lemma Qrat_spec_Q_to_rat q : Qrat_spec q (rat_of_Q q). Proof. exact/QratP. Qed.
+Hint Resolve Qrat_spec_Q_to_rat : core.
+
+Lemma Qrat0 : Qrat Q0 0. Proof. by []. Qed.
+Hint Resolve Qrat0 : core.
+
+Lemma Qrat1 : Qrat Q1 1. Proof. by []. Qed.
+Hint Resolve Qrat0 : core.
+
+Lemma Qrat_Qmake i n p d :
+  Zint i n -> pos_nat p d -> Qrat (Qmake i p) (n%:~R / d%:R).
+Proof. by move=> /eqP<- /eqP<-; rewrite /Qrat /rat_of_Q/=. Qed.
+
+Lemma intr_pos_nat_neq0 {R : numDomainType} {p n} :
+  pos_nat p n -> n%:R != 0 :> R.
+Proof. by move=> /eqP<-; rewrite lt0r_neq0// ltr0n Pos_to_nat_gt0. Qed.
+
+Lemma QratD q r (qr : Qrat q r) q' r' (q'r' : Qrat q' r') :
+  Qrat (Qplus q q') (r + r').
+Proof.
+move: qr q'r' => /QratP[n d qn qd ->] /QratP[n' d' qn' qd' ->] {r r'}.
+rewrite addf_div ?(intr_pos_nat_neq0 qd) ?(intr_pos_nat_neq0 qd')//.
+rewrite !pmulrn -!rmorphM -rmorphD/= -pmulrn Qrat_Qmake ?pos_natM//.
+by rewrite ZintD ?ZintM.
+Qed.
+
+Lemma QratM q r (qr : Qrat q r) q' r' (q'r' : Qrat q' r') :
+  Qrat (Qmult q q') (r * r').
+Proof.
+move: qr q'r' => /QratP[n d qn qd ->] /QratP[n' d' qn' qd' ->] {r r'}.
+by rewrite mulf_div -!rmorphM/= Qrat_Qmake ?ZintM ?pos_natM.
+Qed.
+
+Lemma QratN q r : Qrat q r -> Qrat (Qopp q) (- r).
+Proof.
+by move=> /QratP[n d qn dn ->] {r}; rewrite -mulNr -rmorphN/= Qrat_Qmake ?ZintN.
+Qed.
+
+Lemma QratB q r (qr : Qrat q r) q' r' (q'r' : Qrat q' r') :
+  Qrat (Qminus q q') (r - r').
+Proof. by rewrite QratD ?QratN. Qed.
+
+Lemma Qrat_eq q r (qr : Qrat q r) q' r' (q'r' : Qrat q' r') :
+  Qeq_bool q q' = (r == r').
+Proof.
+move: qr q'r' => /QratP[n d qn qd ->] /QratP[n' d' qn' qd' ->] {r r'}.
+rewrite eqr_div ?(intr_pos_nat_neq0 qd) ?(intr_pos_nat_neq0 qd')//.
+by rewrite !pmulrn -!rmorphM/= eqr_int; apply: Zint_eq; apply: ZintM.
+Qed.
+
+Lemma Qrat_le q r (qr : Qrat q r) q' r' (q'r' : Qrat q' r') :
+  Qle_bool q q' = (r <= r').
+Proof.
+move: qr q'r' => /QratP[n d qn qd ->] /QratP[n' d' qn' qd' ->] {r r'}.
+rewrite ler_pdivrMr 1?mulrAC; last by rewrite ltr0n -(eqP qd) Pos_to_nat_gt0.
+rewrite ler_pdivlMr; last by rewrite ltr0n -(eqP qd') Pos_to_nat_gt0//.
+by rewrite !pmulrn -!rmorphM/= ler_int; apply: Zint_le; apply: ZintM.
 Qed.
