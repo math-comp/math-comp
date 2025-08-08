@@ -8,6 +8,8 @@ fraction.v
 intdiv.v
 interval.v
 interval_inference.v
+arithmetic_tactic.v
+lra.v
 matrix.v
 mxalgebra.v
 mxpoly.v
