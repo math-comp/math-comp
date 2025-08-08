@@ -345,6 +345,12 @@ Local Coercion Posz : nat >-> int.
 
 Lemma PoszM : {morph Posz : n m / (n * m)%N >-> n * m}. Proof. by []. Qed.
 
+Lemma NegzS (n : nat) : Negz n.+1 = Negz n - 1.
+Proof. by rewrite !NegzE -opprD -PoszD addn1. Qed.
+
+Lemma Negz_doubleS (n : nat) : Negz n.*2.+1 = 2 * Negz n.
+Proof. by rewrite !NegzE -doubleS -mul2n PoszM -mulrN. Qed.
+
 Lemma intS (n : nat) : n.+1%:Z = 1 + n%:Z. Proof. by rewrite -PoszD. Qed.
 
 Lemma predn_int (n : nat) : (0 < n)%N -> n.-1%:Z = n%:Z - 1.
