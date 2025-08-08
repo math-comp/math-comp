@@ -1413,6 +1413,8 @@ Lemma doubleS n : n.+1.*2 = n.*2.+2. Proof. by []. Qed.
 
 Lemma double_pred n : n.-1.*2 = n.*2.-2. Proof. by case: n. Qed.
 
+Lemma predn_doubleS n : n.+1.*2.-1 = n.*2.+1. Proof. by []. Qed.
+
 Lemma addnn n : n + n = n.*2.
 Proof. by apply: eqP; elim: n => // n IHn; rewrite addnS. Qed.
 
