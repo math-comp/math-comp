@@ -1,5 +1,6 @@
 all_algebra.v
 archimedean.v
+binnums.v
 countalg.v
 finalg.v
 fraction.v
