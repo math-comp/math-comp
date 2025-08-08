@@ -7,6 +7,7 @@ algebra/fraction.v
 algebra/intdiv.v
 algebra/interval.v
 algebra/interval_inference.v
+algebra/lra.v
 algebra/matrix.v
 algebra/mxalgebra.v
 algebra/mxpoly.v
