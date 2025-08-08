@@ -1,5 +1,6 @@
 pre-all::
 	if command -v coqc > /dev/null && (coqc --version | grep -q '8.20') ; then \
+	  sed -i.bak '/From mathcomp Require Export lra./d' all_algebra.v ; \
 	  for f in $(shell grep "From Corelib" $$(find . -name "*.v") | cut -d: -f1) ; do \
 	    sed -i.bak 's/From Corelib/From Coq/' $${f} ; \
 	    sed -i.bak '/From Coq/ s/PosDef/PArith/' $${f} ; \
