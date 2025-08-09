@@ -155,7 +155,7 @@ doc: __always__ Makefile.coq
 	. etc/utils/builddoc_lib.sh; \
 		cd _build_doc && mangle_sources $(COQFILES)
 	+cd _build_doc && $(COQMAKE)
-	cd _build_doc && grep -v vio: .Makefile.coq.d | sed -e 's/[^ ]*rocq-runtime[^ ]*//g' > depend
+	cd _build_doc && grep -v vio: .Makefile.coq.d | grep -v 'META' | sed -e 's/[^ ]*rocq-runtime[^ ]*//g' > depend
 	cd _build_doc && cat depend | ../etc/buildlibgraph $(COQFILES) > htmldoc/depend.js
 	cd _build_doc && $(COQBIN)coqdoc -t "Mathematical Components" \
 		-g --utf8 -R . mathcomp \
