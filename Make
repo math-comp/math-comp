@@ -1,3 +1,10 @@
+algebra/future_Corelib/ListDef.v
+algebra/future_Corelib/RatDef.v
+algebra/future_Corelib/micromega_formula.v
+algebra/future_Corelib/micromega_witness.v
+algebra/future_Corelib/micromega_tactics.v
+algebra/future_Corelib/micromega_checker.v
+algebra/future_Corelib/micromega_eval.v
 algebra/all_algebra.v
 algebra/archimedean.v
 algebra/binnums.v
