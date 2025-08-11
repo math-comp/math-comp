@@ -318,10 +318,10 @@ rewrite /tensor_nil/= {1}/GRing.add/= /addmx/map2_mx.
 by rewrite matrix_of_fun.unlock /fun_of_matrix ffunE.
 Qed.
 
-Lemma tensor_nilN {R : zmodType} t u
-  : (t - u).[::] = t.[::] - u.[::] :> R.
+Lemma tensor_nilN {R : zmodType} (t u : 'T[R]_([::], [::]))
+  : (- u).[::] = - u.[::].
 Proof.
-rewrite /tensor_nil/= {1}/GRing.add{1}/GRing.opp/=/oppmx/addmx/map2_mx/map_mx.
+rewrite /tensor_nil/= {1}/GRing.opp/=/oppmx/map_mx.
 by rewrite matrix_of_fun.unlock /fun_of_matrix !ffunE.
 Qed.
 
