@@ -1,5 +1,6 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
-From Corelib Require Import PosDef IntDef.
+From mathcomp Require Import PosDef.
+From Corelib Require Import IntDef.
 From mathcomp Require Import RatDef.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 From mathcomp Require Import ssralg ssrnum ssrint rat.
@@ -434,6 +435,16 @@ Qed.
 Lemma QratB q r (qr : Qrat q r) q' r' (q'r' : Qrat q' r') :
   Qrat (Qminus q q') (r - r').
 Proof. by rewrite QratD ?QratN. Qed.
+
+Lemma QratV q r : Qrat q r -> Qrat (Qinv q) (r^-1).
+Proof.
+move=> /QratP[n d qn dn ->] {r}; rewrite invf_div /Qinv/=.
+case: ZintP qn => [//|_ _ _|{}p {}n _ _ pn _|{}p {}n _ _ pn _]/=.
+- by rewrite invr0 mulr0.
+- by rewrite pmulrn -[n%:~R]pmulrn Qrat_Qmake.
+- rewrite NegzE mulrNz divrN -mulNr nmulrn Qrat_Qmake//.
+  by move: dn => /pos_nat_exS[{}d-> qd]; rewrite -NegzE Zint_neg.
+Qed.
 
 Lemma Qrat_eq q r (qr : Qrat q r) q' r' (q'r' : Qrat q' r') :
   Qeq_bool q q' = (r == r').

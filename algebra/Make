@@ -1,4 +1,5 @@
 future_Corelib/ListDef.v
+future_Corelib/PosDef.v
 future_Corelib/NatDef.v
 future_Corelib/RatDef.v
 future_Corelib/micromega_formula.v
