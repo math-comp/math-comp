@@ -1,8 +1,6 @@
-From Corelib Require Import PosDef.
-From mathcomp Require Import RatDef.
+From micromega Require Import PosDef RatDef.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq ssralg ssrnum lra.
-From mathcomp Require Import micromega_formula micromega_witness.
-From mathcomp Require Import micromega_tactics.
+From micromega Require Import formula witness tactics.
 
 Local Open Scope ring_scope.
 
@@ -15,19 +13,19 @@ pose (ff :=
   IMPL
     (A isProp
        {|
-         Flhs := PEadd (PEX xH) (PEmul (PEc ((Qmake (Zpos (xO xH)) xH))) (PEX (xO xH)));
+         Flhs := PEadd (PEX _ xH) (PEmul (PEc ((Qmake (Zpos (xO xH)) xH))) (PEX _ (xO xH)));
          Fop := OpLe;
          Frhs := PEc (Qmake (Zpos (xI xH)) xH)
        |} tt) None
     (IMPL
        (A isProp
           {|
-            Flhs := PEadd (PEmul (PEc (Qmake (Zpos (xO xH)) xH)) (PEX xH)) (PEX (xO xH));
+            Flhs := PEadd (PEmul (PEc (Qmake (Zpos (xO xH)) xH)) (PEX _ xH)) (PEX _ (xO xH));
             Fop := OpLe;
             Frhs := PEc (Qmake (Zpos (xI xH)) xH)
           |} tt) None
        (A isProp
-          {| Flhs := PEadd (PEX xH) (PEX (xO xH)); Fop := OpLe; Frhs := PEc (Qmake (Zpos (xO xH)) xH) |} tt))
+          {| Flhs := PEadd (PEX _ xH) (PEX _ (xO xH)); Fop := OpLe; Frhs := PEc (Qmake (Zpos (xO xH)) xH) |} tt))
   : BFormula (Formula Q) isProp).
 (* getting the witness *)
 let ff' := eval unfold ff in ff in wlra_Q wit ff'.
