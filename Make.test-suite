@@ -5,6 +5,7 @@ test_suite/test_regular_conv.v
 test_suite/test_order_conv.v
 test_suite/test_subtype_factories.v
 test_suite/test_micromega.v
+test_suite/test_lra.v
 
 -I .
 
