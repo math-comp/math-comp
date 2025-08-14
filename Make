@@ -1,4 +1,5 @@
 algebra/future_Corelib/ListDef.v
+algebra/future_Corelib/PosDef.v
 algebra/future_Corelib/NatDef.v
 algebra/future_Corelib/RatDef.v
 algebra/future_Corelib/micromega_formula.v
