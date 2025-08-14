@@ -1,5 +1,4 @@
-From Corelib Require Import PosDef.
-From mathcomp Require Import RatDef.
+From mathcomp Require Import PosDef RatDef.
 From mathcomp Require Import ssreflect ssrfun ssrbool seq ssralg ssrnum lra.
 From mathcomp Require Import micromega_formula micromega_witness.
 From mathcomp Require Import micromega_tactics.

@@ -1,7 +1,8 @@
 (* TODO: remove this file when requiring Rocq >= 9.2
    and use the identical file in Corelib instead *)
 
-From Corelib Require Import PosDef IntDef.
+From mathcomp Require Import PosDef.
+From Corelib Require Import IntDef.
 
 (** * Rational numbers to serve as interface for the micromega plugin
 
@@ -38,6 +39,13 @@ Definition Qmult (x y : Q) :=
 Definition Qopp (x : Q) := Qmake (Z.opp (Qnum x)) (Qden x).
 
 Definition Qminus (x y : Q) := Qplus x (Qopp y).
+
+Definition Qinv (x : Q) :=
+  match Qnum x with
+  | Z0 => Qmake Z0 1
+  | Zpos p => Qmake (Zpos (Qden x)) p
+  | Zneg p => Qmake (Zneg (Qden x)) p
+  end.
 
 Definition Q0 := Qmake Z0 xH.
 Definition Q1 := Qmake (Zpos xH) xH.
