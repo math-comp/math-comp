@@ -1,12 +1,30 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From elpi Require Import derive.std param2.
-From Corelib Require Import BinNums PosDef.
-From micromega Require Import NatDef.
+From Corelib Require Import BinNums.
+From micromega Require Import PosDef NatDef.
 From Corelib Require Import IntDef.
 From micromega Require Import RatDef.
-From micromega Require Import formula witness checker eval.
+From micromega Require Import formula witness tactics checker eval.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 From mathcomp Require Import seq order ssralg ssrnum ssrint rat binnums.
+From mathcomp.algebra Extra Dependency "lra.elpi" as lra.
+
+(******************************************************************************)
+(* This file provides the lra, nra, psatz and psatz <n> tactics.              *)
+(*                                                                            *)
+(* These tactics, based on the micromega plugin distributed with Rocq provide:*)
+(*          lra == a decision procedure for Linear Real Arithmetic            *)
+(*          nra == a *semi* decision procedure for Nonlinear Real Arithmetic  *)
+(*    psatz [n] == a *semi* decision procedure for nonlinear real arithmetic  *)
+(*                 using the PositivstellenSATZ                               *)
+(*                 This can use the external CSDP numerical solver.           *)
+(*                 Higher integer n may find more proofs, at an higher cost.  *)
+(* These tactics work on any realDomainType (with integer coefficients)       *)
+(* or realFieldType (with rational coefficients) and handle additive morphisms*)
+(* {additive _ -> _} and ring morphisms {rmorphism _ -> _}.                   *)
+(*                                                                            *)
+(* See file test-suite/test_lra.v for examples of use.                        *)
+(******************************************************************************)
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -1312,7 +1330,678 @@ exact: (CTautoCheckerT (ler0z R) (CAC:=Zint) Zint0 _ ZintD ZintM ZintB ZintN
   Zint_eq Zint_le (R_of_Z_intr R) Zint_int_of_Z).
 Qed.
 
+(* Everything below is essentially imported form algebra-tactics *)
+
+Implicit Types (V : nmodType) (R : pzSemiRingType) (F : fieldType).
+
+(* Some basic facts about `Decimal.uint` and `Hexadecimal.uint`               *)
+
+Lemma Nat_tail_addE n m : Nat.tail_add n m = (m + n)%N.
+Proof. by elim: n m => [| n IH /=] m; rewrite ?addn0// IH addSn addnS. Qed.
+Lemma Nat_tail_mulE n m : Nat.tail_mul n m = (m * n)%N.
+Proof.
+rewrite /Nat.tail_mul -[RHS]add0n.
+elim: n 0%N => [| n IH /=] r; first by rewrite muln0 addn0.
+by rewrite mulnS addnA -IH Nat_tail_addE.
+Qed.
+
+Lemma PosSD p : Pos.succ p = Pos.add 1 p.
+Proof. by apply: Pos_to_natI; rewrite !Pos_to_natE add1n. Qed.
+Lemma PosDA : associative Pos.add.
+Proof. by move=> ? ? ?; apply: Pos_to_natI; rewrite !Pos_to_natE addnA. Qed.
+Lemma PosMC : commutative Pos.mul.
+Proof. by move=> ? ?; apply: Pos_to_natI; rewrite !Pos_to_natE mulnC. Qed.
+
+Lemma uint_N_nat (d : Decimal.uint) : N.to_nat (N.of_uint d) = Nat.of_uint d.
+Proof.
+suff acc d' p : Pos.to_nat (Pos.of_uint_acc d' p)
+  = Nat.of_uint_acc d' (Pos.to_nat p) by elim: d => //=.
+by elim: d' p => //= d' IH p; rewrite Nat_tail_mulE;
+  rewrite -[10%N]/(Pos.to_nat 1~0~1~0) -!Pos_to_natE -{}IH ?PosSD?PosDA PosMC.
+Qed.
+
+Lemma hex_uint_N_nat (d : Hexadecimal.uint) :
+  N.to_nat (N.of_hex_uint d) = Nat.of_hex_uint d.
+Proof.
+suff acc d' p : Pos.to_nat (Pos.of_hex_uint_acc d' p)
+  = Nat.of_hex_uint_acc d' (Pos.to_nat p) by elim: d => //=.
+by elim: d' p => //= d' IH p; rewrite Nat_tail_mulE;
+  rewrite -[16%N]/(Pos.to_nat 1~0~0~0~0) -!Pos_to_natE -{}IH ?PosSD?PosDA PosMC.
+Qed.
+
+Lemma N_to_natS i : N.to_nat (N.succ i) = (N.to_nat i).+1.
+Proof. by case: i => [//| p /=]; rewrite Pos_to_natS. Qed.
+
+(* In reified syntax trees, constants must be represented by binary integers  *)
+(* `N` and `Z`. For the fine-grained control of conversion, we provide        *)
+(* immediately expanding versions of `N -> nat`, `Z -> int`, and `N -> Z`     *)
+(* conversions.                                                               *)
+
+Definition addn_expand := Eval compute in addn.
+
+Fixpoint nat_of_pos_rec_expand (p : positive) (a : nat) : nat :=
+  match p with
+  | p0~1 => addn_expand a (nat_of_pos_rec_expand p0 (addn_expand a a))
+  | p0~0 => nat_of_pos_rec_expand p0 (addn_expand a a)
+  | 1 => a
+  end%positive.
+
+Definition nat_of_pos_expand (p : positive) : nat := nat_of_pos_rec_expand p 1.
+
+Definition nat_of_N_expand (n : N) : nat :=
+  if n is Npos p then nat_of_pos_expand p else 0%N.
+
+Lemma nat_of_N_expandE : nat_of_N_expand = N.to_nat. Proof. by []. Qed.
+
+(* For representing input terms of the form `S (... (S n) ...)`               *)
+
+Definition add_pos_nat (p : positive) (n : nat) : nat := Pos.iter S n p.
+
+Lemma add_pos_natE p n : add_pos_nat p n = Pos.to_nat p + n.
+Proof.
+by elim: p n => //= p IHp n; rewrite !IHp Pos_to_natE -addnn ?[RHS]addSn addrA.
+Qed.
+
+(* Data types for reifying `nat` and `int` constants, including large ones    *)
+(* that use `Number.uint`                                                     *)
+
+Variant large_nat := large_nat_N of N | large_nat_uint of Number.uint.
+
+Definition nat_of_large_nat (n : large_nat) : nat :=
+  match n with
+  | large_nat_N n => nat_of_N_expand n
+  | large_nat_uint n => Nat.of_num_uint n
+  end.
+
+Definition N_of_large_nat (n : large_nat) : N :=
+  match n with
+  | large_nat_N n => n
+  | large_nat_uint n => N.of_num_uint n
+  end.
+
+Lemma large_nat_N_nat (n : large_nat) :
+  N.to_nat (N_of_large_nat n) = nat_of_large_nat n.
+Proof.
+case: n => [n|[d|d]] /=; first by rewrite nat_of_N_expandE.
+  by rewrite uint_N_nat.
+by rewrite hex_uint_N_nat.
+Qed.
+
+(* Type for reified expressions *)
+Inductive RExpr : pzSemiRingType -> Type :=
+  (* 0 *)
+  | R0 R : RExpr R
+  (* addition: x + y and (n + m)%N *)
+  | RAdd R : RExpr R -> RExpr R -> RExpr R
+  | RnatAdd : RExpr nat -> RExpr nat -> RExpr nat
+  (* natmul: x *+ n, including n%:R = 1 *+ n *)
+  | RMuln R : RExpr R -> RExpr nat -> RExpr R
+  (* opposite *)
+  | ROpp (R : pzRingType) : RExpr R -> RExpr R
+  (* intmul: x *~ z, including z%:~R = 1 *~ z *)
+  | RMulz (R : pzRingType) : RExpr R -> RExpr int -> RExpr R
+  (* 1 *)
+  | R1 R : RExpr R
+  (* multiplication: x * y and (x * y)%N *)
+  | RMul R : RExpr R -> RExpr R -> RExpr R
+  | RnatMul : RExpr nat -> RExpr nat -> RExpr nat
+  (* exponentiation *)
+  | RExpn R : RExpr R -> large_nat -> RExpr R (* x ^+ n *)
+  | RExpPosz (R : unitRingType) : RExpr R -> large_nat -> RExpr R (* x ^ Posz n *)
+  | RExpNegz F : RExpr F -> large_nat -> RExpr F (* x ^ Negz n *)
+  | RnatExpn : RExpr nat -> large_nat -> RExpr nat (* expn n m *)
+  (* multiplicative inverse: x^-1 *)
+  | RInv F : RExpr F -> RExpr F
+  (* constants *)
+  | RnatS : positive -> RExpr nat -> RExpr nat (* S (S ... (S n)...)*)
+  | RnatC : large_nat -> RExpr nat (* n *)
+  | RPosz : RExpr nat -> RExpr int (* Posz n *)
+  | RNegz : RExpr nat -> RExpr int (* Negz n *)
+  (* homomorphism applications *)
+  | RMorph R' R : {rmorphism R' -> R} -> RExpr R' -> RExpr R
+  | RnatMorph R : {rmorphism nat -> R} -> RExpr nat -> RExpr R
+  | RintMorph R : {rmorphism int -> R} -> RExpr int -> RExpr R
+  | RAdditive V R : {additive V -> R} -> MExpr V -> RExpr R
+  | RnatAdditive R : {additive nat -> R} -> RExpr nat -> RExpr R
+  | RintAdditive R : {additive int -> R} -> RExpr int -> RExpr R
+  (* variables *)
+  | RX R : R -> RExpr R
+with MExpr : nmodType -> Type :=
+  | M0 V : MExpr V (* 0 *)
+  | MAdd V : MExpr V -> MExpr V -> MExpr V (* x + y *)
+  | MMuln V : MExpr V -> RExpr nat -> MExpr V (* x *+ n *)
+  | MOpp (V : zmodType) : MExpr V -> MExpr V (* - x *)
+  | MMulz (V : zmodType) : MExpr V -> RExpr int -> MExpr V (* x *~ z *)
+  | MAdditive V' V : {additive V' -> V} -> MExpr V' -> MExpr V
+  | MnatAdditive V : {additive nat -> V} -> RExpr nat -> MExpr V
+  | MintAdditive V : {additive int -> V} -> RExpr int -> MExpr V
+  | MX V : V -> MExpr V.
+
+Scheme RExpr_ind' := Induction for RExpr Sort Prop
+  with MExpr_ind' := Induction for MExpr Sort Prop.
+
+(* Evaluation function for above type                                         *)
+(* Evaluating result of reification should be convertible to input expr.      *)
+Fixpoint Reval R (e : RExpr R) : R :=
+  match e with
+  | R0 _ => 0
+  | RAdd _ e1 e2 => Reval e1 + Reval e2
+  | RnatAdd e1 e2 => addn (Reval e1) (Reval e2)
+  | RMuln _ e1 e2 => Reval e1 *+ Reval e2
+  | ROpp _ e1 => - Reval e1
+  | RMulz _ e1 e2 => Reval e1 *~ Reval e2
+  | R1 _ => 1
+  | RMul _ e1 e2 => Reval e1 * Reval e2
+  | RnatMul e1 e2 => muln (Reval e1) (Reval e2)
+  | RExpn _ e1 n => Reval e1 ^+ nat_of_large_nat n
+  | RExpPosz _ e1 n => Reval e1 ^ Posz (nat_of_large_nat n)
+  | RExpNegz _ e1 n => Reval e1 ^ Negz (nat_of_large_nat n)
+  | RnatExpn e1 n => expn (Reval e1) (nat_of_large_nat n)
+  | RInv _ e1 => (Reval e1)^-1
+  | RnatS p e => add_pos_nat p (Reval e)
+  | RnatC n => nat_of_large_nat n
+  | RPosz e1 => Posz (Reval e1)
+  | RNegz e2 => Negz (Reval e2)
+  | RMorph _ _ f e1
+  | RnatMorph _ f e1
+  | RintMorph _ f e1
+  | RnatAdditive _ f e1
+  | RintAdditive _ f e1 => f (Reval e1)
+  | RAdditive _ _ f e1 => f (Meval e1)
+  | RX _ x => x
+  end
+with Meval V (e : MExpr V) : V :=
+  match e with
+  | M0 _ => 0
+  | MAdd _ e1 e2 => Meval e1 + Meval e2
+  | MMuln _ e1 e2 => Meval e1 *+ Reval e2
+  | MOpp _ e1 => - Meval e1
+  | MMulz _ e1 e2 => Meval e1 *~ Reval e2
+  | MAdditive _ _ f e1 => f (Meval e1)
+  | MnatAdditive _ f e1
+  | MintAdditive _ f e1 => f (Reval e1)
+  | MX _ x => x
+  end.
+
+Definition opt_inv T := option (bool * (T -> T)).
+(* a potential inverse function with a boolean telling whether to use it *)
+
+(* Pushing down morphisms in ring/field expressions by reflection *)
+Section norm.
+Variables (F : pzRingType) (F_of_N : bool -> N -> F).
+Variables (zero : F) (add : F -> F -> F) (opp : F -> F).
+Variables (one : F) (mul : F -> F -> F) (exp : F -> N -> F).
+Variable (inv : option (F -> F)).
+
+Variable (push_inv : bool).  (* when true, push inv inward,
+                                down to constants or variables *)
+
+(* i means "currently pushing an inv" *)
+Fixpoint Rnorm (i : bool) R (f : R -> F) (e : RExpr R) : F :=
+  let pinv v := if inv isn't Some i then f (Reval e) (* should never happen *)
+    else if push_inv then v else i v in
+  let inv_id := if inv is Some i then i else id in
+  let noinv v :=
+    if push_inv && i then inv_id (f (Reval e))  (* inv will be in a variable *)
+    else v (* no inv to put, go on *) in
+  let invi v := if push_inv && i then inv_id v else v in
+  match e in RExpr R return (R -> F) -> F with
+  | R0 _ => fun=> zero
+  | RAdd _ e1 e2 | RnatAdd e1 e2 => fun f =>
+      noinv (add (Rnorm i f e1) (Rnorm i f e2))
+  | RMuln _ e1 e2 => fun f => mul (Rnorm i f e1) (Rnorm i (GRing.natmul 1) e2)
+  | ROpp _ e1 => fun f => opp (Rnorm i f e1)
+  | RMulz _ e1 e2 => fun f => mul (Rnorm i f e1) (Rnorm i intr e2)
+  | R1 _ => fun=> one
+  | RMul _ e1 e2 | RnatMul e1 e2  => fun f => mul (Rnorm i f e1) (Rnorm i f e2)
+  | RExpn _ e1 n | RnatExpn e1 n => fun f =>
+      exp (Rnorm i f e1) (N_of_large_nat n)
+  | RExpPosz _ e1 n => fun f => exp (Rnorm i f e1) (N_of_large_nat n)
+  | RExpNegz _ e1 n => fun f =>
+      pinv (exp (Rnorm (~~ i) f e1) (N.succ (N_of_large_nat n)))
+  | RInv _ e1 => fun f => pinv (Rnorm (~~ i) f e1)
+  | RnatS p e => fun f => noinv (add (F_of_N false (Npos p)) (Rnorm i f e))
+  | RnatC n => fun=> F_of_N (push_inv && i) (N_of_large_nat n)
+  | RPosz e1 => fun=> Rnorm i (GRing.natmul 1) e1
+  | RNegz e1 => fun=> noinv (opp (add one (Rnorm i (GRing.natmul 1) e1)))
+  | RMorph _ _ g e1 => fun f => Rnorm i (fun x => f (g x)) e1
+  | RnatMorph _ _ e1 => fun=> Rnorm i (GRing.natmul 1) e1
+  | RintMorph _ _ e1 => fun=> Rnorm i intr e1
+  | RAdditive _ _ g e1 => fun f => Mnorm i (fun x => f (g x)) e1
+  | RnatAdditive _ g e1 => fun f =>
+      mul (invi (f (g 1%N))) (Rnorm i (GRing.natmul 1) e1)
+  | RintAdditive _ g e1 => fun f => mul (invi (f (g 1%Z))) (Rnorm i intr e1)
+  | RX _ x => fun f => invi (f x)
+  end f
+with Mnorm i V (f : V -> F) (e : MExpr V) : F :=
+  let inv_id := if inv is Some i then i else id in
+  let noinv v :=
+    if push_inv && i then inv_id (f (Meval e))  (* inv will be in a variable *)
+    else v (* no inv to put, go on *) in
+  let invi v := if push_inv && i then inv_id v else v in
+  match e in MExpr V return (V -> F) -> F with
+  | M0 _ => fun=> zero
+  | MAdd _ e1 e2 => fun f => noinv (add (Mnorm i f e1) (Mnorm i f e2))
+  | MMuln _ e1 e2 => fun f => mul (Mnorm i f e1) (Rnorm i (GRing.natmul 1) e2)
+  | MOpp _ e1 => fun f => opp (Mnorm i f e1)
+  | MMulz _ e1 e2 => fun f => mul (Mnorm i f e1) (Rnorm i intr e2)
+  | MAdditive _ _ g e1 => fun f => Mnorm i (fun x => f (g x)) e1
+  | MnatAdditive _ g e1 => fun f =>
+      mul (invi (f (g 1%N))) (Rnorm i (GRing.natmul 1) e1)
+  | MintAdditive _ g e1 => fun f => mul (invi (f (g 1%Z))) (Rnorm i intr e1)
+  | MX _ x => fun f => invi (f x)
+  end f.
+
+Lemma eq_Rnorm i R (f f' : R -> F) (e : RExpr R) :
+  f =1 f' -> Rnorm i f e = Rnorm i f' e.
+Proof.
+pose P R e :=
+  forall i (f f' : R -> F), f =1 f' -> Rnorm i f e = Rnorm i f' e.
+pose P0 V e :=
+  forall i (f f' : V -> F), f =1 f' -> Mnorm i f e = Mnorm i f' e.
+move: i f f'; elim e using (@RExpr_ind' P P0); rewrite {R e}/P {}/P0 //=.
+- by move=> R e1 IHe1 e2 IHe2 i f f' feq; rewrite -(IHe1 _ f) -?(IHe2 _ f) ?feq.
+- by move=> e1 IHe1 e2 IHe2 i f f' feq; rewrite -(IHe1 _ f) -?(IHe2 _ f) ?feq.
+- by move=> R e1 IHe1 e2 _ i f f' /IHe1->.
+- by move=> R e1 IHe1 i f f' /IHe1->.
+- by move=> R e1 IHe1 e2 _ i f f' /IHe1->.
+- by move=> R e1 IHe1 e2 IHe2 i f f' feq; rewrite -(IHe1 _ f) -?(IHe2 _ f).
+- by move=> e1 IHe1 e2 IHe2 i f f' feq; rewrite -(IHe1 _ f) -?(IHe2 _ f).
+- by move=> R e1 IHe1 n i f f' /IHe1->.
+- by move=> R e1 IHe1 n i f f' /IHe1->.
+- by move=> R e1 IHe1 n i f f' feq; rewrite -(IHe1 _ f) ?feq.
+- by move=> e1 IHe1 n i f f' /IHe1->.
+- by move=> R e1 IHe1 i f f' feq; rewrite -(IHe1 _ f) ?feq.
+- by move=> P e1 IHe1 i f f' feq; rewrite -(IHe1 _ f) ?feq.
+- by move=> e1 IHe1 i f f' ->.
+- by move=> V R g e1 IHe1 i f f' feq; apply: IHe1 => x; apply: feq.
+- by move=> V R g e1 IHe1 i f f' feq; apply: IHe1 => x; apply: feq.
+- by move=> R g e1 _ i f f' ->.
+- by move=> R g e1 _ i f f' ->.
+- by move=> R x i f f' ->.
+- by move=> V e1 IHe1 e2 IHe2 i f f' feq; rewrite -(IHe1 _ f) -?(IHe2 _ f) ?feq.
+- by move=> V e1 IHe1 e2 _ i f f' /IHe1->.
+- by move=> V e1 IHe1 i f f' /IHe1->.
+- by move=> V e1 IHe1 e2 _ i f f' /IHe1->.
+- by move=> U V g e1 IHe1 i f f' feq; apply: IHe1 => x; apply: feq.
+- by move=> V g e1 _ i f f' ->.
+- by move=> V g e1 _ i f f' ->.
+- by move=> V x i f f' ->.
+Qed.
+End norm.
+
+Lemma Rnorm_eq_F_of_N (F : pzRingType) (f f' : bool -> N -> F)
+  zero add opp one mul exp inv pi i : f =2 f' ->
+  forall (R : pzSemiRingType) (env : R -> F) e,
+    Rnorm f zero add opp one mul exp inv pi i env e =
+    Rnorm f' zero add opp one mul exp inv pi i env e.
+Proof.
+move=> ff' R m e.
+pose P R e := forall f f' pi i (m : R -> F), f =2 f' ->
+  Rnorm f zero add opp one mul exp inv pi i m e =
+  Rnorm f' zero add opp one mul exp inv pi i m e.
+pose P0 V e := forall f f' pi i (m : V -> F), f =2 f' ->
+  Mnorm f zero add opp one mul exp inv pi i m e =
+  Mnorm f' zero add opp one mul exp inv pi i m e.
+move: f f' pi i m ff'.
+elim e using (@RExpr_ind' P P0); rewrite {R e}/P {}/P0 /=.
+- by [].
+- by move=> R e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> R e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> R e1 IHe1 f f' pi i m /IHe1->.
+- by move=> R e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by [].
+- by move=> R e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> R e1 IHe1 n f f' pi i m /IHe1->.
+- by move=> R e1 IHe1 n f f' pi i m /IHe1->.
+- by move=> R e1 IHe1 n f f' pi i m /IHe1->.
+- by move=> e1 IHe1 n f f' pi i m /IHe1->.
+- by move=> R e1 IHe1 f f' pi i m /IHe1->.
+- by move=> p e IHe f f' pi i m ff'; rewrite -(IHe f) ?ff'.
+- by move=> n f f' pi i m ff'; rewrite /Rnorm ff'.
+- by move=> e IHe f f' pi i m ff'; exact: IHe.
+- by move=> e IHe f f' pi i m /IHe->.
+- by move=> R' R g e IHe f f' pi i m ff'; exact: IHe.
+- by move=> R g e IHe f f' pi i m ff'; exact: IHe.
+- by move=> R g e IHe f f' pi i m ff'; exact: IHe.
+- by move=> V R g e IHe f f' pi i m ff'; exact: IHe.
+- by move=> R g e IHe f f' pi i m ff'; congr mul; exact: IHe.
+- by move=> R g e IHe f f' pi i m ff'; congr mul; exact: IHe.
+- by [].
+- by [].
+- by move=> V e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> V e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> V e IHe f f' pi i m /IHe->.
+- by move=> V e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> V V' g e IHe f f' pi i m ff'; exact: IHe.
+- by move=> V g e IHe f f' pi i m ff'; congr mul; exact: IHe.
+- by move=> V g e IHe f f' pi i m ff'; congr mul; exact: IHe.
+- by [].
+Qed.
+
+Variant field_or_ring := Field of fieldType | Ring of pzRingType.
+Coercion ring_of_field_or_ring (RF : field_or_ring) : pzRingType :=
+  match RF with Field R => R | Ring R => R end.
+Definition field_inv (R : field_or_ring) : option (R -> R) :=
+  if R is Field F then Some (@GRing.inv F) else None.
+Definition inv_id {R : field_or_ring} := if field_inv R is Some i then i else id.
+Definition invi {R : field_or_ring} i (r : R) := if i then inv_id r else r.
+
+Section correct.
+Variables (F : field_or_ring).
+
+#[local] Notation F_of_N := (fun b n => invi b (N.to_nat n)%:R).
+#[local] Notation expN := (fun x n => x ^+ N.to_nat n).
+#[local] Notation Rnorm := (Rnorm F_of_N 0 +%R -%R 1 *%R expN (field_inv F)).
+#[local] Notation Mnorm := (Mnorm F_of_N 0 +%R -%R 1 *%R expN (field_inv F)).
+
+Lemma Rnorm_correct pi (e : RExpr F) : Reval e = Rnorm pi false id e.
+Proof.
+suff: forall (i : bool) R (f : {rmorphism R -> F}) (e' : RExpr R),
+    invi (pi && i) (f (Reval e')) = Rnorm pi i f e'.
+  by move/(_ false _ idfun e); rewrite andbF.
+move=> i R f {}e.
+have invi0 b : invi b 0 = 0 :> F.
+  by rewrite /invi /inv_id /field_inv; case: b F => -[]// F' /[!invr0].
+have inviM b r1 r2 : invi b (r1 * r2) = invi b r1 * invi b r2 :> F.
+  rewrite /invi /inv_id /field_inv.
+  by case: b F r1 r2 => -[]// F' r1 r2 /[!invfM].
+have inviN b r : invi b (- r) = - invi b r :> F.
+  by rewrite /invi /inv_id /field_inv; case: b F r => -[]// F' r /[!invrN].
+have inviXn b r n : invi b (r ^+ n) = (invi b r) ^+ n :> F.
+  by rewrite /invi /inv_id; case: b F r => -[]// F' r /[!exprVn].
+pose P R e := forall i (f : {rmorphism R -> F}),
+  invi (pi && i) (f (Reval e)) = Rnorm pi i f e.
+pose P0 V e := forall i (f : {additive V -> F}),
+  invi (pi && i) (f (Meval e)) = Mnorm pi i f e.
+move: i f; elim e using (@RExpr_ind' P P0); rewrite {R e}/P {}/P0 //=.
+- by move=> R i f; rewrite rmorph0.
+- by move=> R e1 IHe1 e2 IHe2 i f; rewrite rmorphD -IHe1 -IHe2; case: (pi && i).
+- by move=> e1 IHe1 e2 IHe2 i f; rewrite rmorphD -IHe1 -IHe2; case: (pi && i).
+- by move=> R e1 IHe1 e2 IHe2 i f; rewrite rmorphMn -mulr_natr inviM IHe1 IHe2.
+- by move=> R e1 IHe1 i f; rewrite rmorphN inviN IHe1.
+- by move=> R e1 IHe1 e2 IHe2 i f; rewrite rmorphMz -mulrzr inviM IHe1 IHe2.
+- move=> R i f.
+  by rewrite /invi/inv_id/field_inv rmorph1; case: andb F => -[]// F' /[!invr1].
+- by move=> R e1 IHe1 e2 IHe2 i f; rewrite rmorphM inviM IHe1 IHe2.
+- by move=> e1 IHe1 e2 IHe2 i f; rewrite rmorphM inviM IHe1 IHe2.
+- by move=> R e1 IHe1 n i f; rewrite rmorphXn inviXn IHe1 large_nat_N_nat.
+- by move=> R e1 IHe1 n i f; rewrite rmorphXn inviXn IHe1 large_nat_N_nat.
+- move=> R e1 IHe1 n i f; rewrite -large_nat_N_nat N_to_natS NegzE -exprnN.
+  move: IHe1; rewrite /invi/inv_id/field_inv; case: F f=>F' f; [|by case: andb].
+  by move=> <-; rewrite fmorphV rmorphXn invrK; case: pi i => -[]// /[!exprVn].
+- by move=> e1 IHe1 n i f; rewrite rmorphXn inviXn IHe1 large_nat_N_nat.
+- move=> R e1 IHe1 i f.
+  move: IHe1; rewrite /invi/inv_id/field_inv; case: F f=>F' f; [|by case: andb].
+  by move=> <-; rewrite fmorphV invrK; case: pi i => -[].
+- move=> p e1 IHe1 i f; rewrite add_pos_natE rmorphD; set p' := Pos.to_nat p.
+  by rewrite  -[p' in f p']natn rmorph_nat -IHe1; case: (pi && i).
+- by move=> ???; rewrite -[nat_of_large_nat _]natn rmorph_nat -large_nat_N_nat.
+- by move=> e1 IHe1 i f; rewrite -[Posz _]intz rmorph_int -pmulrn IHe1.
+- move=> e1 IHe1 i f.
+  by rewrite -[Negz _]intz rmorph_int /intmul mulrS -IHe1; case: (pi && i).
+- by move=> R S g e1 IHe1 i f; rewrite -/(comp f g _) IHe1.
+- move=> R g e1 IHe1 i f; rewrite -/(comp f g _) IHe1.
+  by apply: eq_Rnorm => /= n; rewrite -[RHS](rmorph_nat (f \o g)) natn.
+- move=> R g e1 IHe1 i f; rewrite -/(comp f g _) IHe1.
+  apply: eq_Rnorm => /= n; rewrite -[RHS](rmorph_int (f \o g)).
+  by congr (f (g _)); rewrite intz.
+- by move=> V R g e1 IHe1 i f; rewrite -/(comp f g _) IHe1.
+- move=> R g e1 IHe1 i f.
+  by rewrite -[Reval e1]natn !raddfMn -mulr_natr inviM IHe1.
+- move=> R g e1 IHe1 i f.
+  by rewrite -[Reval e1]intz ![f _](raddfMz (f \o g)) -mulrzr inviM IHe1.
+- by move=> V i f; rewrite raddf0 invi0.
+- by move=> V e1 IHe1 e2 IHe2 i f; rewrite raddfD -IHe1 -IHe2; case: (pi && i).
+- by move=> V e1 IHe1 e2 IHe2 i f; rewrite raddfMn -mulr_natr inviM IHe1 IHe2.
+- by move=> V e1 IHe1 i f; rewrite raddfN inviN IHe1.
+- by move=> V e1 IHe1 e2 IHe2 i f; rewrite raddfMz -mulrzr inviM IHe1 IHe2.
+- by move=> V V' g e1 IHe1 i f; rewrite -/(comp f g _) IHe1.
+- move=> V g e1 IHe1 i f.
+  by rewrite -[Reval e1]natn !raddfMn -mulr_natr inviM IHe1; case: (pi && i).
+- move=> V g e1 IHe1 i f.
+  rewrite -[Reval e1]intz ![f _](raddfMz (f \o g)) -mulrzr inviM IHe1/=.
+  by case: (pi && i).
+Qed.
+End correct.
+
+Record RFormula R := { Rlhs : RExpr R; Rop : Op2; Rrhs : RExpr R }.
+
+Section Rnorm_formula.
+Variables (R : field_or_ring) (R_of_N : bool -> N -> R).
+Variables (R_of_NE : R_of_N =2 fun b n => invi b (N.to_nat n)%:R).
+Variables (add : R -> R -> R) (addE : add = +%R).
+Variables (mul : R -> R -> R) (mulE : mul = *%R).
+Variables (opp : R -> R) (oppE : opp = -%R).
+Variables (exp : R -> N -> R) (expE : exp = (fun x n => x ^+ N.to_nat n)).
+Variables (inv : option (R -> R)) (invE : inv = field_inv R).
+Variables (beq bneq le lt : R -> R -> bool).
+
+#[local] Notation Rnorm_expr := (Rnorm
+  R_of_N (R_of_N false N0) add opp (R_of_N false (Npos 1)) mul exp inv
+  true false).
+
+Definition Reval_op2 k : Op2 -> R -> R -> eKind k :=
+  if k is isBool then eval_op2 isBool beq bneq le lt
+  else eval_op2 isProp eq (fun x y => ~ x = y) le lt.
+
+Definition Reval_formula k (ff : RFormula R) : eKind k :=
+  let: Build_RFormula lhs o rhs := ff in Reval_op2 k o (Reval lhs) (Reval rhs).
+
+Definition Rnorm_formula k (ff : RFormula R) :=
+  let: Build_RFormula lhs o rhs := ff in
+  Reval_op2 k o (Rnorm_expr id lhs) (Rnorm_expr id rhs).
+
+Lemma Rnorm_formula_correct k (ff : RFormula R) :
+  Reval_formula k ff = Rnorm_formula k ff.
+Proof.
+case: ff => lhs o rhs /=.
+rewrite !(@Rnorm_correct R true) !R_of_NE addE oppE mulE expE invE.
+by congr Reval_op2; apply: Rnorm_eq_F_of_N.
+Qed.
+
+Lemma Rnorm_bf_correct k (ff : BFormula (RFormula R) k) :
+  BFeval eqb Reval_formula ff = BFeval eqb Rnorm_formula ff.
+Proof.
+elim: ff => // {k}.
+- by move=> k ff ?; exact: Rnorm_formula_correct.
+- by move=> k ff1 IH1 ff2 IH2; congr eAND.
+- by move=> k ff1 IH1 ff2 IH2; congr eOR.
+- by move=> k ff IH; congr eNOT.
+- by move=> k ff1 IH1 o ff2 IH2; congr eIMPL.
+- by move=> k ff1 IH1 ff2 IH2; congr eIFF.
+- by move=> ff1 IH1 ff2 IH2; congr eq.
+Qed.
+
+End Rnorm_formula.
+
+Lemma FTautoChecker_sound (F : realFieldType)
+    (ff : BFormula (RFormula F) isProp)
+    (f : BFormula (Formula Q) isProp) (env : seq F) (w : seq (Psatz Q)) :
+    (forall F_of_Q add mul opp exp beq bneq le lt,
+       let norm_ff :=
+         let F_of_N b n :=
+           if b then F_of_Q (Qinv (Qmake (Z.of_N n) 1))
+           else F_of_Q (Qmake (Z.of_N n) 1) in
+         let inv : option (Field F -> Field F) := Some (@GRing.inv F) in
+         Rnorm_formula F_of_N add mul opp exp inv beq bneq le lt in
+       let eval_f :=
+         (KFeval 0 1 add mul opp exp beq bneq le lt F_of_Q)^~ env in
+       BFeval eqb norm_ff ff = BFeval eqb eval_f f) ->
+    QTautoChecker f w ->
+  BFeval eqb (@Reval_formula (Field F) eq_op (cneqb eq_op) <=%R <%R) ff.
+Proof.
+pose F_of_N b n : Field F :=
+  if b then R_of_Q F (Qinv (Qmake (Z.of_N n) 1))
+  else R_of_Q F (Qmake (Z.of_N n) 1).
+have F_of_NE : F_of_N =2 fun b n => @invi (Field F) b (N.to_nat n)%:R.
+  by move=> [] [|[]]; rewrite //= /inv_id/= ?invr0 ?invr1.
+rewrite (Rnorm_bf_correct F_of_NE erefl erefl erefl erefl erefl).
+by move/(_ (R_of_Q F)) => -> /(QTautoCheckerT env).
+Qed.
+
+Lemma RTautoChecker_sound (R : realDomainType)
+    (ff : BFormula (RFormula R) isProp)
+    (f : BFormula (Formula Z) isProp) (env : seq R) (w : seq (Psatz Z)) :
+    (forall R_of_Z add mul opp exp beq bneq le lt,
+       let norm_ff :=
+         let R_of_N _ n := R_of_Z (Z.of_N n) in
+         let inv : option (Ring R -> Ring R) := None in
+         Rnorm_formula R_of_N add mul opp exp inv beq bneq le lt in
+       let eval_f :=
+         (KFeval 0 1 add mul opp exp beq bneq le lt R_of_Z)^~ env in
+       BFeval eqb norm_ff ff = BFeval eqb eval_f f) ->
+    ZTautoChecker f w ->
+  BFeval eqb (@Reval_formula (Ring R) eq_op (cneqb eq_op) <=%R <%R) ff.
+Proof.
+pose R_of_N (b : bool) n : Ring R := R_of_Z R (Z.of_N n).
+have R_of_NE : R_of_N =2 fun b n => @invi (Ring R) b (N.to_nat n)%:R.
+  by case=> [] [].
+rewrite (Rnorm_bf_correct R_of_NE erefl erefl erefl erefl erefl).
+by move/(_ (R_of_Z R)) => -> /(ZTautoCheckerT env).
+Qed.
+
+(* Translating formulas and witnesses from Q to Z for the realDomainType case *)
+
+Fixpoint PExpr_Q2Z (e : PExpr Q) : option (PExpr Z) := match e with
+  | PEO => Some PEO
+  | PEI => Some PEI
+  | PEc (Qmake z 1) => Some (PEc z) | PEc _ => None
+  | PEX n => Some (PEX _ n)
+  | PEadd e1 e2 => map_option2 PEadd (PExpr_Q2Z e1) (PExpr_Q2Z e2)
+  | PEsub e1 e2 => map_option2 PEsub (PExpr_Q2Z e1) (PExpr_Q2Z e2)
+  | PEmul e1 e2 => map_option2 PEmul (PExpr_Q2Z e1) (PExpr_Q2Z e2)
+  | PEopp e1 => map_option PEopp (PExpr_Q2Z e1)
+  | PEpow e1 n => map_option (PEpow ^~ n) (PExpr_Q2Z e1) end.
+
+Definition Formula_Q2Z (ff : Formula Q) : option (Formula Z) :=
+  map_option2
+    (fun l r => Build_Formula l (Fop ff) r)
+    (PExpr_Q2Z (Flhs ff)) (PExpr_Q2Z (Frhs ff)).
+
+Fixpoint BFormula_Q2Z [k] (ff : BFormula (Formula Q) k) :
+    option (BFormula (Formula Z) k) := match ff with
+  | TT k => Some (TT k)
+  | FF k => Some (FF k)
+  | X k P => Some (X k P)
+  | A k a aa => map_option (A k ^~ aa) (Formula_Q2Z a)
+  | AND _ f1 f2 =>
+      map_option2 (fun f => AND f) (BFormula_Q2Z f1) (BFormula_Q2Z f2)
+  | OR _ f1 f2 =>
+      map_option2 (fun f => OR f) (BFormula_Q2Z f1) (BFormula_Q2Z f2)
+  | NOT _ f1 => map_option (fun f => NOT f) (BFormula_Q2Z f1)
+  | IMPL _ f1 o f2 =>
+      map_option2 (fun f => IMPL f o) (BFormula_Q2Z f1) (BFormula_Q2Z f2)
+  | IFF _ f1 f2 =>
+      map_option2 (fun f => IFF f) (BFormula_Q2Z f1) (BFormula_Q2Z f2)
+  | EQ f1 f2 => map_option2 EQ (BFormula_Q2Z f1) (BFormula_Q2Z f2) end.
+
+Fixpoint Pol_Q2Z (p : Pol Q) : Pol Z * positive := match p with
+  | Pc (Qmake n d) => (Pc n, d)
+  | Pinj j p => let (p, n) := Pol_Q2Z p in (Pinj j p, n)
+  | PX p1 i p2 =>
+      let (p1, n1) := Pol_Q2Z p1 in
+      let (p2, n2) := Pol_Q2Z p2 in
+      let mulc c p := PmulC Z0 (Zpos 1) Z.mul Z.eqb p (Zpos c) in
+      (PX (mulc n2 p1) i (mulc n1 p2), Pos.mul n1 n2)
+  end.
+
+Fixpoint Psatz_Q2Z (l : seq positive) (p : Psatz Q) : Psatz Z * positive :=
+  match p with
+  | PsatzC (Qmake n d) => (PsatzC n, d)
+  | PsatzLet p1 p2 =>
+      let (p1, n1) := Psatz_Q2Z l p1 in
+      let (p2, n2) := Psatz_Q2Z (n1 :: l) p2 in
+      (PsatzLet p1 p2, n2)
+  | PsatzIn n => (PsatzIn _ n, nth 1%positive l n)
+  | PsatzSquare p => let (p, n) := Pol_Q2Z p in (PsatzSquare p, Pos.mul n n)
+  | PsatzMulC p1 p2 =>
+      let (p1, n1) := Pol_Q2Z p1 in
+      let (p2, n2) := Psatz_Q2Z l p2 in
+      (PsatzMulC p1 p2, Pos.mul n1 n2)
+  | PsatzMulE p1 p2 =>
+      let (p1, n1) := Psatz_Q2Z l p1 in
+      let (p2, n2) := Psatz_Q2Z l p2 in
+      (PsatzMulE p1 p2, Pos.mul n1 n2)
+  | PsatzAdd p1 p2 =>
+      let (p1, n1) := Psatz_Q2Z l p1 in
+      let (p2, n2) := Psatz_Q2Z l p2 in
+      let mulc c p := PsatzMulE (PsatzC (Zpos c)) p in
+      (PsatzAdd (mulc n2 p1) (mulc n1 p2), Pos.mul n1 n2)
+  | PsatzZ => (PsatzZ _, 1%positive)
+  end.
+
+Definition seq_Psatz_Q2Z : seq (Psatz Q) -> seq (Psatz Z) :=
+  map (fun p => fst (Psatz_Q2Z [::] p)).
+
+(* Main tactics, called from the elpi parser (c.f., lra.elpi) *)
+
+Ltac mclra_witness n f := let w := fresh "__wit" in wlra_Q w f.
+Ltac mcnra_witness n f := let w := fresh "__wit" in wnra_Q w f.
+Ltac mcpsatz_witness n f :=
+  let w := fresh "__wit" in wsos_Q w f || wpsatz_Q n w f.
+
+Ltac mctacF F hyps ff f varmap wit :=
+  let nff := fresh "__ff" in
+  let nf := fresh "__f" in
+  let nvarmap := fresh "__varmap" in
+  pose (nff := ff);
+  pose (nf := f);
+  pose (nvarmap := varmap);
+  refine (hyps (@FTautoChecker_sound F nff nf nvarmap wit
+                  (fun _ _ _ _ _ _ _ _ _ => erefl) _));
+  [ vm_compute; reflexivity ].
+
+Ltac mctacR R hyps ff f varmap wit :=
+  let nff := fresh "__ff" in
+  let nf := fresh "__f" in
+  let nvarmap := fresh "__varmap" in
+  lazymatch eval vm_compute in (BFormula_Q2Z f) with
+  | Some ?f =>
+      pose (nff := ff);
+      pose (nf := f);
+      pose (nvarmap := varmap);
+      refine (hyps (@RTautoChecker_sound R nff f nvarmap (seq_Psatz_Q2Z wit)
+                      (fun _ _ _ _ _ _ _ _ _ => erefl) _));
+      [ vm_compute; reflexivity ]
+  | _ => fail  (* should never happen, the parser only parses int constants *)
+  end.
+
 End Internals.
+
+Strategy expand [addn_expand nat_of_pos_rec_expand nat_of_pos_expand].
+Strategy expand [nat_of_N_expand nat_of_large_nat N_of_large_nat].
+Strategy expand [Reval Meval Reval_op2 Reval_formula].
+Strategy expand [Rnorm Mnorm Rnorm_formula].
+
+Elpi Db mc.canonicals.db lp:{{ /* (* */
+pred canonical-nat-nmodule o:constant.
+pred canonical-nat-semiring o:constant.
+pred canonical-nat-comsemiring o:constant.
+pred canonical-int-nmodule o:constant.
+pred canonical-int-zmodule o:constant.
+pred canonical-int-semiring o:constant.
+pred canonical-int-ring o:constant.
+pred canonical-int-comring o:constant.
+pred canonical-int-unitring o:constant.
+pred coercion o:string o:term.
+/* *) */ }}.
+
+Elpi Tactic mclra.
+Elpi Accumulate Db mc.canonicals.db.
+#[warning="-elpi.flex-clause"] (* remove when requiring elpi >= 3 (with =!=>) *)
+Elpi Accumulate File lra.
+
+Tactic Notation "lra" := elpi mclra "mclra_witness" "mctacF" "mctacR" 0.
+Tactic Notation "nra" := elpi mclra "mcnra_witness" "mctacF" "mctacR" 0.
+Tactic Notation "psatz" integer(n) :=
+  elpi mclra "mcpsatz_witness" "mctacF" "mctacR" ltac_int:(n).
+Tactic Notation "psatz" := elpi mclra "mcpsatz_witness" "mctacF" "mctacR" (-1).
+
+Elpi Query lp:{{ canonical-init library "mc.canonicals.db" }}.
+Elpi Query lp:{{ coercion-init library "mc.canonicals.db" }}.
 
 (* Remove the line below when requiring rocq-elpi > 3.1.0
 c.f., https://github.com/LPCIC/coq-elpi/pull/866 *)
