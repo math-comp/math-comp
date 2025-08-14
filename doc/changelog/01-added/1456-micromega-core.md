@@ -24,9 +24,13 @@
     `Zint_pos_sub`, `ZintD`, `ZintN`, `ZintB`, `ZintM`, `Zint_eq`,
     `Zint_le`, `Qrat_rat_of_Q`, `QratP`, `Qrat_spec_Q_to_rat`,
     `Qrat1`, `Qrat_Qmake`, `intr_pos_nat_neq0`, `QratD`, `QratM`,
-    `QratN`, `QratB`, `Qrat_eq` and `Qrat_le`
+    `QratN`, `QratB`, `Qrat_eq`, `Qrat_le` and `QratV`
   + multirules `pos_natE`, `Pos_to_natE` and `ZintE`
     ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
 
 - new file `lra.v`
   ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
+
+- in `lra.v`
+  + tactics `lra`, `nra`, `psatz` and `psatz <n>`
+    ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
