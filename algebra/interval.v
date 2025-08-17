@@ -323,8 +323,6 @@ Proof. by rewrite !itv_boundlr andbT. Qed.
 Lemma subitvP i1 i2 : i1 <= i2 -> {subset i1 <= i2}.
 Proof. by move=> ? ? /le_trans; exact. Qed.
 
-(* Remove the line below when requiring Coq >= 8.20 *)
-#[warning="-unsupported-attributes"]
 #[warn(note="The lemma subset_itv was generalized in MathComp 2.4.0 and the original was renamed to subset_itv_bound.",
   cats="mathcomp-subset-itv")]
 Lemma subset_itv (x y z u : itv_bound T) : x <= y -> z <= u ->

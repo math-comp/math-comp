@@ -107,12 +107,8 @@ make-coq-latest:
     variables:
       - $CRON_MODE == "nightly"
 
-coq_8.20:
-  extends: .opam-build-once
-
 rocq-prover_9.0:
-  # to be replaced with .opam-build-once when 9.0.0 available
-  extends: .opam-build
+  extends: .opam-build-once
 
 # rocq-prover_9.1: # to uncomment when 9.1+rc1 available
 #   # to be replaced with .opam-build-once when 9.1.0 available
@@ -173,14 +169,9 @@ rocq-prover_dev:
   extends: .test-once
   image: "${CI_REGISTRY_IMAGE}:${CI_PIPELINE_IID}_${CI_COMMIT_REF_SLUG}_rocq-prover-${COQ_VERSION}"
 
-test-coq-8.20:
-  extends: .test-once
-  variables:
-    COQ_VERSION: "8.20"
-
 test-rocq-prover-9.0:
   # to be replaced with .test-rocq-once when 9.0.0 available
-  extends: .test-rocq
+  extends: .test-rocq-once
   variables:
     COQ_VERSION: "9.0"
 
@@ -418,12 +409,9 @@ test-rocq-prover-dev:
     variables:
       - $CRON_MODE == "nightly"
 
-mathcomp-dev_coq-8.20:
-  extends: .docker-deploy-once
-
 mathcomp-dev_rocq-prover-9.0:
   # to be replaced with .docker-deploy-once when 9.0.0 available
-  extends: .docker-deploy
+  extends: .docker-deploy-once
 
 # mathcomp-dev_rocq-prover-9.1: # to uncomment when 9.1+rc1 available
 #   # to be replaced with .docker-deploy-once when 9.1.0 available

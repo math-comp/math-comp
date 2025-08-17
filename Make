@@ -120,10 +120,6 @@ ssreflect/all_ssreflect.v
 -arg -w -arg -notation-overridden
 -arg -w -arg -ambiguous-paths
 -arg -w -arg -elpi.add-const-for-axiom-or-sectionvar
-# handle the following one when requiring Rocq >= 9.0
--arg -w -arg -deprecated-from-Coq
-# remove this one when requiring Rocq >= 9.0
--arg -w -arg -overwriting-delimiting-key
 # introduced in MathComp 2.4.0, to be removed in a few versions
 -arg -w -arg -mathcomp-subset-itv
 # introduced in Rocq 9.2

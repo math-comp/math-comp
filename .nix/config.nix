@@ -27,7 +27,7 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   ## select an entry to build in the following `bundles` set
   ## defaults to "default"
-  default-bundle = "coq-8.20";
+  default-bundle = "coq-9.0";
 
   ## write one `bundles.name` attribute set per
   ## alternative configuration, the can be used to
@@ -127,11 +127,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
       mathcomp-infotheo.job = false;  # not yet compatible with 9.0
-    };
-    "coq-8.20".coqPackages = common-bundles // {
-      coq.override.version = "8.20";
-      coq-elpi.override.version = "2.5.0";  # required by CoqEAL
-      coq-elpi.override.elpi-version = "2.0.7";
     };
   };
 }
