@@ -1,9 +1,9 @@
 - in `poly.v`
-  + Definitions `polyX`, `horner_rec`, `horner`, `comm_coef`, `comm_poly`,
-    `polyOver_pred`, `polyOver`, `deriv`, `derivn`, `nderivn`, `monic`, `root`,
-    `map_poly`, `commr_rmorph`, `horner_morph`, `comp_poly`, `even_poly`,
-    `odd_poly`, `take_poly`, `drop_poly` generalized to `nzSemiRingType`
-  + Definition `horner_eval` generalized to `comNzSemiRingType`
+  + Definitions `polyX`, `horner_rec`, `horner`, `horner_eval`, `comm_coef`,
+    `comm_poly`, `polyOver_pred`, `polyOver`, `deriv`, `derivn`, `nderivn`,
+    `monic`, `root`, `map_poly`, `commr_rmorph`, `horner_morph`, `comp_poly`,
+    `even_poly`, `odd_poly`, `take_poly`, `drop_poly` generalized to
+    `nzSemiRingType`
   + Definition `horner_alg` generalized to `semiAlgType`
   + The implicit arguments of `deriv` and `derivn` are now maximally inserted.
   + `lSemiModType` and `lSemiAlgType` instances on polynomials generalized to
@@ -17,12 +17,12 @@
     to `nzSemiRingType`
   + Semiring morphism instances on `coefp 0`, `polyC`, `map_poly`, `horner_morph`
     generalized to `nzSemiRingType`
-  + Semilinear function instances on `coefp`, `deriv`, `derivn`, `nderivn`,
-    `horner_morph`, `comp_poly`, `even_poly`, `odd_poly`, `take_poly`,
-    `drop_poly` generalized to `nzSemiRingType`
+  + Semilinear function instances on `coefp`, `horner_eval`, `deriv`, `derivn`,
+    `nderivn`, `horner_morph`, `comp_poly`, `even_poly`, `odd_poly`,
+    `take_poly`, `drop_poly` generalized to `nzSemiRingType`
   + Semialgebra morphism instances on `horner_morph` and `comp_poly` generalized
     to `comNzSemiRingType`
-  + Semialgebra morphism instance on `horner_eval` generalized to
+  + Semiring and semialgebra morphism instances on `horner_eval` generalized to
     `comNzSemiRingType`
   + Semialgebra morphism instance on `horner_alg` generalized to `semiAlgType`
   + `addrClosed`, `mulr2Closed`, `mulrClosed`, `semiring2Closed`,

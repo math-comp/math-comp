@@ -74,9 +74,9 @@ From mathcomp Require Import countalg binomial.
 (*                       to the value of map_poly f p at u; this is a ring    *)
 (*                       morphism from {poly R} to the codomain of f when f   *)
 (*                       is a ring morphism.                                  *)
-(*      horner_eval u == the function mapping p to p.[u]; this function can   *)
-(*                       only be used for u in a commutative ring, so it is   *)
-(*                       always a linear ring morphism from {poly R} to R.    *)
+(*      horner_eval u == the (semi)linear function mapping p to p.[u], which  *)
+(*                       is a (semi)algebra morphism when u is in a           *)
+(*                       commutative (semi)ring.                              *)
 (*       horner_alg a == given a in some R-algebra A, the function evaluating *)
 (*                       a polynomial p at a; it is always a linear ring      *)
 (*                       morphism from {poly R} to A.                         *)
@@ -897,10 +897,6 @@ rewrite !(@horner_coef_wide m) ?leq_max ?leqnn ?orbT // -big_split /=.
 by apply: eq_bigr => i _; rewrite -mulrDl.
 Qed.
 
-Lemma horner_sum I (r : seq I) (P : pred I) F x :
-  (\sum_(i <- r | P i) F i).[x] = \sum_(i <- r | P i) (F i).[x].
-Proof. by elim/big_rec2: _ => [|i _ p _ <-]; rewrite (horner0, hornerD). Qed.
-
 Lemma hornerCM a p x : (a%:P * p).[x] = a * p.[x].
 Proof.
 elim/poly_ind: p => [|p c IHp]; first by rewrite !(mulr0, horner0).
@@ -910,8 +906,19 @@ Qed.
 Lemma hornerZ c p x : (c *: p).[x] = c * p.[x].
 Proof. by rewrite -mul_polyC hornerCM. Qed.
 
+Definition horner_eval (x : R) := horner^~ x.
+Lemma horner_evalE x p : horner_eval x p = p.[x]. Proof. by []. Qed.
+
+HB.instance Definition _ x :=
+  GRing.isSemilinear.Build R {poly R} R _ (horner_eval x)
+    ((fun c p => hornerZ c p x), (fun p q => hornerD p q x)).
+
+Lemma horner_sum I (r : seq I) (P : pred I) F x :
+  (\sum_(i <- r | P i) F i).[x] = \sum_(i <- r | P i) (F i).[x].
+Proof. exact: (raddf_sum (horner_eval _)). Qed.
+
 Lemma hornerMn n p x : (p *+ n).[x] = p.[x] *+ n.
-Proof. by elim: n => [| n IHn]; rewrite ?horner0 // !mulrS hornerD IHn. Qed.
+Proof. exact: (raddfMn (horner_eval _)). Qed.
 
 Definition comm_coef p x := forall i, p`_i * x = x * p`_i.
 
@@ -2664,41 +2671,27 @@ HB.instance Definition _ :=
 Lemma hornerM p q x : (p * q).[x] = p.[x] * q.[x].
 Proof. by rewrite hornerM_comm //; apply: mulrC. Qed.
 
-Lemma horner_exp p x n : (p ^+ n).[x] = p.[x] ^+ n.
-Proof. by rewrite horner_exp_comm //; apply: mulrC. Qed.
-
-Lemma horner_prod I r (P : pred I) (F : I -> {poly R}) x :
-  (\prod_(i <- r | P i) F i).[x] = \prod_(i <- r | P i) (F i).[x].
-Proof. by elim/big_rec2: _ => [|i _ p _ <-]; rewrite (hornerM, hornerC). Qed.
-
-Definition hornerE :=
-  (hornerD, hornerN, hornerX, hornerC, horner_exp,
-   simp, hornerCM, hornerZ, hornerM, horner_cons).
-
-Definition horner_eval (x : R) := horner^~ x.
-Lemma horner_evalE x p : horner_eval x p = p.[x]. Proof. by []. Qed.
-
-Fact horner_eval_is_semilinear x : semilinear_for *%R (horner_eval x).
-Proof. by split=> [c p|p q]; rewrite /horner_eval (hornerZ, hornerD). Qed.
-
-Fact horner_eval_is_monoid_morphism x : monoid_morphism (horner_eval x).
-Proof.
-have cxid: commr_rmorph idfun x by apply: mulrC.
-have evalE : horner_eval x =1 horner_morph cxid.
-  by move=> p; congr _.[x]; rewrite map_poly_id.
-by split=> [|p q]; rewrite !evalE ?rmorph1// rmorphM.
-Qed.
+Fact horner_eval_is_monoid_morphism (x : R) : monoid_morphism (horner_eval x).
+Proof. by split => [|p q]; rewrite /horner_eval (hornerC, hornerM). Qed.
 #[deprecated(since="mathcomp 2.5.0",
       note="use `horner_eval_is_monoid_morphism` instead")]
 Definition horner_eval_is_multiplicative x :=
   (fun g => (g.2, g.1)) (horner_eval_is_monoid_morphism x).
-HB.instance Definition _ x :=
-  GRing.isSemilinear.Build R {poly R} R _ (horner_eval x)
-    (horner_eval_is_semilinear x).
 
 HB.instance Definition _ x :=
   GRing.isMonoidMorphism.Build {poly R} R (horner_eval x)
     (horner_eval_is_monoid_morphism x).
+
+Lemma horner_exp p x n : (p ^+ n).[x] = p.[x] ^+ n.
+Proof. exact: (rmorphXn (horner_eval _)). Qed.
+
+Lemma horner_prod I r (P : pred I) (F : I -> {poly R}) x :
+  (\prod_(i <- r | P i) F i).[x] = \prod_(i <- r | P i) (F i).[x].
+Proof. exact: (rmorph_prod (horner_eval _)). Qed.
+
+Definition hornerE :=
+  (hornerD, hornerN, hornerX, hornerC, horner_exp,
+   simp, hornerCM, hornerZ, hornerM, horner_cons).
 
 Section HornerAlg.
 
