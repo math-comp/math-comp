@@ -383,11 +383,8 @@ Qed.
 Lemma coefD p q i : (p + q)`_i = p`_i + q`_i.
 Proof. exact: coef_add_poly. Qed.
 
-Fact coef_is_nmod_morphism i : nmod_morphism (coefp i).
-Proof. by split=> [|p q]; [exact: coef0 | exact: coefD]. Qed.
-
 HB.instance Definition _ i := GRing.isNmodMorphism.Build {poly R} R (coefp i)
-  (coef_is_nmod_morphism i).
+  (coef0 i, fun p q => coefD p q i).
 
 Lemma coefMn p n i : (p *+ n)`_i = p`_i *+ n.
 Proof. exact: (raddfMn (coefp i)). Qed.
@@ -399,11 +396,8 @@ Proof. exact: (raddf_sum (coefp k)). Qed.
 Lemma polyCD : {morph polyC : a b / a + b}.
 Proof. by move=> a b; apply/polyP=> [[|i]]; rewrite coefD !coefC ?addr0. Qed.
 
-Fact polyC_is_nmod_morphism : nmod_morphism polyC.
-Proof. by split; [exact: polyC0 | exact: polyCD]. Qed.
-
 HB.instance Definition _ := GRing.isNmodMorphism.Build R {poly R} polyC
-  polyC_is_nmod_morphism.
+  (polyC0, polyCD).
 
 Lemma polyCMn n : {morph polyC : c / c *+ n}. Proof. exact: raddfMn. Qed.
 
@@ -920,12 +914,9 @@ Proof. by rewrite -mul_polyC hornerCM. Qed.
 Definition horner_eval (x : R) := horner^~ x.
 Lemma horner_evalE x p : horner_eval x p = p.[x]. Proof. by []. Qed.
 
-Fact horner_eval_is_semilinear x : semilinear_for *%R (horner_eval x).
-Proof. by split=> [c p|p q]; rewrite /horner_eval (hornerZ, hornerD). Qed.
-
 HB.instance Definition _ x :=
   GRing.isSemilinear.Build R {poly R} R _ (horner_eval x)
-    (horner_eval_is_semilinear x).
+    ((fun c p => hornerZ c p x), (fun p q => hornerD p q x)).
 
 Lemma horner_sum I (r : seq I) (P : pred I) F x :
   (\sum_(i <- r | P i) F i).[x] = \sum_(i <- r | P i) (F i).[x].
@@ -2464,11 +2455,9 @@ Proof. by apply/polyP => i; rewrite !(coef_even_poly, coefD). Qed.
 Lemma even_polyZ k p : even_poly (k *: p) = k *: even_poly p.
 Proof. by apply/polyP => i; rewrite !(coefZ, coef_even_poly). Qed.
 
-Fact even_poly_is_semilinear : semilinear even_poly.
-Proof. by split=> [k p|p q]; rewrite (even_polyZ, even_polyD). Qed.
-
-HB.instance Definition _ := GRing.isSemilinear.Build R {poly R} {poly R} _
-  even_poly even_poly_is_semilinear.
+HB.instance Definition _ :=
+  GRing.isSemilinear.Build R {poly R} {poly R} _ even_poly
+    (even_polyZ, even_polyD).
 
 Lemma even_polyC (c : R) : even_poly c%:P = c%:P.
 Proof. by apply/polyP => i; rewrite coef_even_poly !coefC; case: i. Qed.
@@ -2498,11 +2487,9 @@ Proof. by apply/polyP => i; rewrite !(coef_odd_poly, coefD). Qed.
 Lemma odd_polyZ k p : odd_poly (k *: p) = k *: odd_poly p.
 Proof. by apply/polyP => i; rewrite !(coefZ, coef_odd_poly). Qed.
 
-Fact odd_poly_is_semilinear : semilinear odd_poly.
-Proof. by split=> [k p|p q]; rewrite (odd_polyZ, odd_polyD). Qed.
-
-HB.instance Definition _ := GRing.isSemilinear.Build R {poly R} {poly R} _
-  odd_poly odd_poly_is_semilinear.
+HB.instance Definition _ :=
+  GRing.isSemilinear.Build R {poly R} {poly R} _ odd_poly
+    (odd_polyZ, odd_polyD).
 
 Lemma size_odd_poly_eq p : ~~ odd (size p) -> size (odd_poly p) = (size p)./2.
 Proof.
@@ -2575,11 +2562,8 @@ apply/polyP => i; rewrite !(coefZ, coef_take_poly); case: leqP => //.
 by rewrite mulr0.
 Qed.
 
-Fact take_poly_is_semilinear m : semilinear (take_poly m).
-Proof. by split=> [k p|p q]; rewrite (take_polyZ, take_polyD). Qed.
-
 HB.instance Definition _ m := GRing.isSemilinear.Build R {poly R} {poly R} _
-  (take_poly m) (take_poly_is_semilinear m).
+  (take_poly m) (take_polyZ^~ m, take_polyD m).
 
 Lemma take_poly_sum m I r P (p : I -> {poly R}) :
   take_poly m (\sum_(i <- r | P i) p i) = \sum_(i <- r| P i) take_poly m (p i).
@@ -2636,11 +2620,8 @@ Proof. by apply/polyP => i; rewrite coefD !coef_drop_poly coefD. Qed.
 Lemma drop_polyZ k m p : drop_poly m (k *: p) = k *: drop_poly m p.
 Proof. by apply/polyP => i; rewrite coefZ !coef_drop_poly coefZ. Qed.
 
-Fact drop_poly_is_semilinear m : semilinear (drop_poly m).
-Proof. by split=> [k p|p q]; rewrite (drop_polyZ, drop_polyD). Qed.
-
 HB.instance Definition _ m := GRing.isSemilinear.Build R {poly R} {poly R} _
-  (drop_poly m) (drop_poly_is_semilinear m).
+  (drop_poly m) (drop_polyZ^~ m, drop_polyD m).
 
 Lemma drop_poly_sum m I r P (p : I -> {poly R}) :
   drop_poly m (\sum_(i <- r | P i) p i) = \sum_(i <- r | P i) drop_poly m (p i).
