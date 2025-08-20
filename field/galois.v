@@ -674,7 +674,7 @@ Proof. by move=> f; apply/val_inj/comp_lfun1r. Qed.
 Fact comp_AEndK : left_inverse \1%AF (@inv_ahom _ L) comp_AEnd.
 Proof.  by move=> f; apply/val_inj; rewrite /= lker0_compfV ?AEnd_lker0. Qed.
 
-HB.instance Definition _:= isMulGroup.Build 'AEnd(L)
+HB.instance Definition _:= Finite_isGroup.Build 'AEnd(L)
   comp_AEndA comp_AEnd1l comp_AEndK.
 
 Definition kAEnd U V := [set f : 'AEnd(L) | kAut U V f].
@@ -758,7 +758,7 @@ Proof. by move=> x; apply/gal_sgval_inj/mulVg. Qed.
 Fact gal_mulP : associative gal_mul.
 Proof. by move=> x y z; apply/gal_sgval_inj/mulgA. Qed.
 
-HB.instance Definition _ := isMulGroup.Build gal_of gal_mulP gal_oneP gal_invP.
+HB.instance Definition _ := Finite_isGroup.Build gal_of gal_mulP gal_oneP gal_invP.
 
 Coercion gal_repr u : 'AEnd(L) := repr (sgval (gal_sgval u)).
 

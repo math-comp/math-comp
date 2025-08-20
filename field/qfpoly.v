@@ -282,7 +282,7 @@ have : n <= #[gX]%g.
   have /Hf/eqP[] : 0 < #[gX]%g < n by rewrite o_gt0.
   by rewrite expg_order.
 case: ltngtP => nLo _ //.
-have: uniq (path.traject (mulg gX) 1%g #[gX]%g).
+have: uniq (path.traject (mul gX) 1%g #[gX]%g).
   by apply/card_uniqP; rewrite path.size_traject -(eq_card (cycle_traject gX)).
 case: #[gX]%g o_gt0 nLo => //= n1 _ nLn1 /andP[/negP[]].
 apply/path.trajectP; exists n.-1; first by rewrite prednK.

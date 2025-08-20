@@ -185,7 +185,7 @@ Qed.
 
 Local Open Scope group_scope.
 
-Lemma Zp_mulgC : @commutative 'I_p _ mulg.
+Lemma Zp_mulgC : @commutative 'I_p _ mul.
 Proof. exact: Zp_addC. Qed.
 
 Lemma Zp_abelian : abelian [set: 'I_p].
@@ -266,7 +266,7 @@ Proof. by apply: val_inj; rewrite /= Zp_nat /= modn_mod. Qed.
 
 Local Open Scope group_scope.
 
-Lemma unit_Zp_mulgC : @commutative {unit 'I_p} _ mulg.
+Lemma unit_Zp_mulgC : @commutative {unit 'I_p} _ mul.
 Proof. by move=> u v; apply: val_inj; rewrite /= GRing.mulrC. Qed.
 
 Lemma unit_Zp_expg (u : {unit 'I_p}) n :
