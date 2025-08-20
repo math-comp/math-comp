@@ -2184,6 +2184,40 @@ End HornerMorph.
 
 End MapPoly.
 
+Section HornerAlg.
+
+Variable (R : nzSemiRingType) (A : semiAlgType R).
+
+Section Defs.
+
+Variable a : A.
+
+Lemma in_alg_comm : commr_rmorph (in_alg A) a.
+Proof. move=> r /=; by rewrite /GRing.comm comm_alg. Qed.
+
+Definition horner_alg := horner_morph in_alg_comm.
+
+Lemma horner_algC c : horner_alg c%:P = c%:A.
+Proof. exact: horner_morphC. Qed.
+
+Lemma horner_algX : horner_alg 'X = a.
+Proof. exact: horner_morphX. Qed.
+
+HB.instance Definition _ := GRing.LRMorphism.on horner_alg.
+
+End Defs.
+
+Variable (pf : {lrmorphism {poly R} -> A}).
+
+Lemma poly_alg_initial : pf =1 horner_alg (pf 'X).
+Proof.
+apply: poly_ind => [|p a IHp]; first by rewrite !rmorph0.
+rewrite !rmorphD !rmorphM /= -{}IHp horner_algC ?horner_algX.
+by rewrite -alg_polyC rmorph_alg.
+Qed.
+
+End HornerAlg.
+
 Lemma mapf_root (F : fieldType) (R : nzRingType) (f : {rmorphism F -> R})
   (p : {poly F}) (x : F) : root (map_poly f p) (f x) = root p x.
 Proof. by rewrite !rootE horner_map fmorph_eq0. Qed.
@@ -2697,40 +2731,6 @@ Proof. exact: (rmorph_prod (horner_eval _)). Qed.
 Definition hornerE :=
   (hornerD, hornerN, hornerX, hornerC, horner_exp,
    simp, hornerCM, hornerZ, hornerM, horner_cons).
-
-Section HornerAlg.
-
-Variable A : semiAlgType R. (* For univariate polys, commutativity is not needed *)
-
-Section Defs.
-
-Variable a : A.
-
-Lemma in_alg_comm : commr_rmorph (in_alg A) a.
-Proof. move=> r /=; by rewrite /GRing.comm comm_alg. Qed.
-
-Definition horner_alg := horner_morph in_alg_comm.
-
-Lemma horner_algC c : horner_alg c%:P = c%:A.
-Proof. exact: horner_morphC. Qed.
-
-Lemma horner_algX : horner_alg 'X = a.
-Proof. exact: horner_morphX. Qed.
-
-HB.instance Definition _ := GRing.LRMorphism.on horner_alg.
-
-End Defs.
-
-Variable (pf : {lrmorphism {poly R} -> A}).
-
-Lemma poly_alg_initial : pf =1 horner_alg (pf 'X).
-Proof.
-apply: poly_ind => [|p a IHp]; first by rewrite !rmorph0.
-rewrite !rmorphD !rmorphM /= -{}IHp horner_algC ?horner_algX.
-by rewrite -alg_polyC rmorph_alg.
-Qed.
-
-End HornerAlg.
 
 Fact comp_poly_is_monoid_morphism q : monoid_morphism (comp_poly q).
 Proof.
