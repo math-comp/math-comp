@@ -27,7 +27,7 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   ## select an entry to build in the following `bundles` set
   ## defaults to "default"
-  default-bundle = "coq-8.20";
+  default-bundle = "rocq-9.0";
 
   ## write one `bundles.name` attribute set per
   ## alternative configuration, the can be used to
@@ -87,12 +87,12 @@ with builtins; with (import <nixpkgs> {}).lib;
          #   from https://github.com/<github_login>/<repository>
        };
   in {
-    "coq-master" = { rocqPackages = {
+    "rocq-master" = { rocqPackages = {
       rocq-core.override.version = "master";
       stdlib.override.version = "master";
       bignums.override.version = "master";
       rocq-elpi.override.version = "master";
-      rocq-elpi.override.elpi-version = "2.0.7";
+      rocq-elpi.override.elpi-version = "3.0.1";
       hierarchy-builder.override.version = "master";
       mathcomp.job = false;
     }; coqPackages = common-bundles // {
@@ -100,7 +100,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       stdlib.override.version = "master";
       bignums.override.version = "master";
       coq-elpi.override.version = "master";
-      coq-elpi.override.elpi-version = "2.0.7";
+      coq-elpi.override.elpi-version = "3.0.1";
       hierarchy-builder.override.version = "master";
       interval.job = false;
       coquelicot.job = false;
@@ -108,7 +108,9 @@ with builtins; with (import <nixpkgs> {}).lib;
       ssprove.job = false;
       mathcomp-infotheo.job = false;  # not compatible with master
     }; };
-    "coq-9.1".coqPackages = common-bundles // {
+    "rocq-9.1" = { rocqPackages = {
+      rocq-core.override.version = "9.1";
+    }; coqPackages = common-bundles // {
       coq.override.version = "9.1";
       coq-elpi.job = true;
       hierarchy-builder.job = true;
@@ -118,8 +120,10 @@ with builtins; with (import <nixpkgs> {}).lib;
       interval.job = false;  # not yet compatible with 9.1
       mathcomp-infotheo.job = false;  # not yet compatible with 9.1
       ssprove.job = false;  # not yet compatible with 9.1
-    };
-    "coq-9.0".coqPackages = common-bundles // {
+    }; };
+    "rocq-9.0" = { rocqPackages = {
+      rocq-core.override.version = "9.0";
+    }; coqPackages = common-bundles // {
       coq.override.version = "9.0";
       coq-elpi.job = true;
       hierarchy-builder.job = true;
@@ -127,7 +131,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
       mathcomp-infotheo.job = false;  # not yet compatible with 9.0
-    };
+    }; };
     "coq-8.20".coqPackages = common-bundles // {
       coq.override.version = "8.20";
       coq-elpi.override.version = "2.5.0";  # required by CoqEAL
