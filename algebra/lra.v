@@ -2242,6 +2242,7 @@ pred coercion o:string o:term.
 
 Elpi Tactic mclra.
 Elpi Accumulate Db mc.canonicals.db.
+#[warning="-elpi.flex-clause"]
 Elpi Accumulate File lra.
 
 Tactic Notation "lra" := elpi mclra "mclra_witness" "mctacF" "mctacR" 0.
