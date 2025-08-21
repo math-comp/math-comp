@@ -131,11 +131,13 @@ with builtins; with (import <nixpkgs> {}).lib;
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
       mathcomp-infotheo.job = false;  # not yet compatible with 9.0
+      odd-order.job = false;  # odd-order dropped support for 9.0
     }; };
     "coq-8.20".coqPackages = common-bundles // {
       coq.override.version = "8.20";
       coq-elpi.override.version = "2.5.0";  # required by CoqEAL
       coq-elpi.override.elpi-version = "2.0.7";
+      odd-order.job = false;  # odd-order dropped support for 8.20
     };
   };
 }
