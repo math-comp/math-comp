@@ -459,7 +459,8 @@ case: repr_rcosetP => h1 Hh1; case: repr_rcosetP => h2 Hh2.
 have: H :* (x * g) \in rcosets H G by rewrite -rcosetE imset_f ?groupM.
 have: H :* x \in rcosets H G by rewrite -rcosetE imset_f.
 case/mem_rX/rcosetP=> h3 Hh3 -> /mem_rX/rcosetP[h4 Hh4 ->].
-rewrite -!(mulgA h1) -!(mulgA h2) -!(mulgA h3) !(mulKVg, invMg).
+rewrite -!(mulgA h1) -!(mulgA h2) -!(mulgA h3).
+do 3 rewrite invMg mulKVg.
 by rewrite addrC -!zmodMgE -!morphM ?groupM ?groupV // -!mulgA !mulKg.
 Qed.
 
