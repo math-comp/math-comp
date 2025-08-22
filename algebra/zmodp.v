@@ -151,6 +151,7 @@ Qed.
 HB.instance Definition _ :=
   GRing.isZmodule.Build 'I_p (@Zp_addA _) (@Zp_addC _) Zp_add0z Zp_addNz.
 
+(* FIXME: This will break when we make rings depend on monoids. *)
 HB.instance Definition _ := [finGroupMixin of 'I_p for +%R].
 
 (* Ring operations *)
@@ -182,9 +183,9 @@ apply: val_inj => /=; elim: n => [|n IHn]; first by rewrite muln0 modn_small.
 by rewrite !GRing.mulrS /= IHn modnDmr mulnS.
 Qed.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
-Lemma Zp_mulgC : @commutative 'I_p _ mulg.
+Lemma Zp_mulgC : @commutative 'I_p _ mul.
 Proof. exact: Zp_addC. Qed.
 
 Lemma Zp_abelian : abelian [set: 'I_p].
@@ -263,9 +264,9 @@ Proof. by rewrite Zp_nat valZpK. Qed.
 Lemma natr_negZp (x : 'I_p) : (- x)%:R = - x.
 Proof. by apply: val_inj; rewrite /= Zp_nat /= modn_mod. Qed.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
-Lemma unit_Zp_mulgC : @commutative {unit 'I_p} _ mulg.
+Lemma unit_Zp_mulgC : @commutative {unit 'I_p} _ mul.
 Proof. by move=> u v; apply: val_inj; rewrite /= GRing.mulrC. Qed.
 
 Lemma unit_Zp_expg (u : {unit 'I_p}) n :

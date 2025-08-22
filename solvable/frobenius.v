@@ -50,7 +50,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Section Definitions.
 
@@ -699,7 +699,7 @@ rewrite -(cardsID 'Ldiv_n()) dvdn_addl.
   rewrite -setIA ['Ldiv_n(_)](setIidPr _) //.
   by apply/subsetP=> x; rewrite !inE -!order_dvdn; apply: dvdn_mull.
 rewrite -setIDA; set A := _ :\: _.
-have pA x: x \in A -> #[x]`_p = (n`_p * p)%N.
+have pA x: x \in A -> (#[x]`_p = n`_p * p)%N.
   rewrite !inE -!order_dvdn => /andP[xn xnp].
   rewrite !p_part // -expnSr; congr (p ^ _)%N; apply/eqP.
   rewrite eqn_leq -{1}addn1 -(pfactorK 1 pr_p) -lognM ?expn1 // mulnC.
@@ -777,11 +777,11 @@ have{def_z} zp_ya: z.`_p = y ^ a.
     by rewrite (constt1P _) ?p_eltNK ?p_elt_constt ?mulg1.
   apply: commute_sym; apply/cent1P.
   by rewrite -def_z conjgK groupMl // in Cz; apply/cent1P.
-have ozp: #[z ^ a^-1]`_p = #[y] by rewrite -order_constt consttJ zp_ya conjgK.
+have ozp: (#[z ^ a^-1]`_p)%N = #[y] by rewrite -order_constt consttJ zp_ya conjgK.
 split; rewrite zp_ya // -class_lcoset lcoset_id // eqxx andbT.
 rewrite -(conjgKV a z) !inE groupJ //= -!order_dvdn orderJ; apply/andP; split.
   apply: contra (partn_dvd p n_gt0) _.
-  by rewrite ozp -(muln1 n`_p) oy dvdn_pmul2l // dvdn1 neq_ltn lt1p orbT.
+  by rewrite ozp -(muln1 n`_p)%N oy dvdn_pmul2l // dvdn1 neq_ltn lt1p orbT.
 rewrite -(partnC p n_gt0) mulnCA mulnA -oy -(@partnC p #[_]) // ozp.
 apply dvdn_mul => //; apply: dvdn_trans (dvdn_trans n'Z (dvdn_gcdr _ _)).
 rewrite {2}/order -morphim_cycle // -quotientE card_quotient ?cycle_subG //.
