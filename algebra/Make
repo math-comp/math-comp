@@ -17,6 +17,7 @@ poly.v
 polyXY.v
 qpoly.v
 rat.v
+ring.v
 ring_quotient.v
 alg/algebra.v
 alg/divalg.v
