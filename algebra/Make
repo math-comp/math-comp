@@ -18,6 +18,8 @@ poly.v
 polyXY.v
 qpoly.v
 rat.v
+ring_tactic.v
+ring.v
 ring_quotient.v
 algebraic_hierarchy/rings_modules_and_algebras.v
 algebraic_hierarchy/divalg.v
