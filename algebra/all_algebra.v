@@ -13,7 +13,6 @@ From mathcomp Require Export qpoly.
 From mathcomp Require Export ssrint.
 From mathcomp Require Export archimedean.
 From mathcomp Require Export rat.
-From mathcomp Require Export lra.
 From mathcomp Require Export intdiv.
 From mathcomp Require Export interval.
 From mathcomp Require Import interval_inference.
@@ -27,3 +26,5 @@ From mathcomp Require Export fraction.
 From mathcomp Require Export zmodp.
 From mathcomp Require Export sesquilinear.
 From mathcomp Require Export spectral.
+From mathcomp Require Export ring.
+From mathcomp Require Export lra.
