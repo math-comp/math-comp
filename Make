@@ -21,6 +21,7 @@ algebra/poly.v
 algebra/polyXY.v
 algebra/qpoly.v
 algebra/rat.v
+algebra/ring.v
 algebra/ring_quotient.v
 algebra/algebraic_hierarchy/rings_modules_and_algebras.v
 algebra/algebraic_hierarchy/divalg.v
