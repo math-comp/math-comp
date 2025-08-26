@@ -28,6 +28,7 @@ poly.v
 polyXY.v
 qpoly.v
 rat.v
+ring.v
 ring_quotient.v
 ssralg.v
 ssrint.v
