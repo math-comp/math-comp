@@ -16,6 +16,33 @@ Definition succ n :=
   | Npos p => Npos (Pos.succ p)
   end.
 
+(** ** Addition *)
+
+Definition add n m :=
+  match n, m with
+  | N0, _ => m
+  | _, N0 => n
+  | Npos p, Npos q => Npos (Pos.add p q)
+  end.
+
+(** Multiplication *)
+
+Definition mul n m :=
+  match n, m with
+  | N0, _ => N0
+  | _, N0 => N0
+  | Npos p, Npos q => Npos (Pos.mul p q)
+  end.
+
+(** Boolean equality and comparison *)
+
+Definition eqb n m :=
+  match n, m with
+    | N0, N0 => true
+    | Npos p, Npos q => Pos.eqb p q
+    | _, _ => false
+  end.
+
 (** Translation from [N] to [nat] and back. *)
 
 Definition to_nat (a : N) :=
