@@ -1,5 +1,5 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
-From micromega Require Import PosDef.
+From micromega Require Import PosDef NatDef.
 From Corelib Require Import IntDef.
 From micromega Require Import RatDef.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
@@ -8,6 +8,7 @@ From mathcomp Require Import ssralg ssrnum ssrint rat.
 (******************************************************************************)
 (* This file develops some link with binary numbers from Corelib, defining:   *)
 (*     pos_nat == refinement relation between positive and nat                *)
+(*        Nnat == refinement relation between N and nat                       *)
 (*        Zint == refinement relation between Z and int                       *)
 (*        Qrat == refinement relation between Q and rat                       *)
 (* It also provides conversion functions int_of_Z and rat_of_Q, as well as    *)
@@ -329,6 +330,73 @@ Qed.
 
 Definition Pos_to_natE := (Pos_to_nat1, Pos_to_nat_double, Pos_to_nat_doubleS,
   Pos_to_natS, Pos_to_natD, Pos_to_nat_pred_double, Pos_to_natM, Pos_to_natB).
+
+Definition Nnat (i : N) (n : nat) := N.to_nat i == n.
+
+Lemma Nnat_N_to_nat i : Nnat i (N.to_nat i). Proof. exact/eqP. Qed.
+
+Variant Nnat_spec (i : N) (n : nat) : N -> nat -> bool -> Set :=
+  | Nnat_spec_false : Nnat_spec i n i n false
+  | Nnat_spec_N0 : i = N0 -> n = 0%N -> Nnat_spec i n N0 0%N true
+  | Nnat_spec_Npos :
+      forall p', i = Npos p' -> pos_nat p' n -> Nnat_spec i n (Npos p') n true.
+
+Lemma NnatP i n : Nnat_spec i n i n (Nnat i n).
+Proof.
+case: (boolP (Nnat i n)) => /eqP Nin; last exact: Nnat_spec_false.
+by case: i n Nin => [|p] n <- /=; [exact: Nnat_spec_N0|exact: Nnat_spec_Npos].
+Qed.
+
+Lemma Nnat0 : Nnat N0 0. Proof. by []. Qed.
+Hint Resolve Nnat0 : core.
+
+Lemma Nnat_pos p n : Nnat (Npos p) n = pos_nat p n. Proof. by []. Qed.
+
+Definition NnatE := (Nnat0, Nnat_pos).
+
+Lemma NnatD i n (Nin : Nnat i n) i' n' (Ni'n' : Nnat i' n') :
+  Nnat (N.add i i') (n + n').
+Proof.
+case: NnatP Nin => [//|/[!add0n]//| {i}p _ pn _].
+case: NnatP Ni'n' => [//|/[!addn0]//| {i'}p' _ p'n' _].
+by rewrite Nnat_pos pos_natD.
+Qed.
+
+Lemma NnatB i n (Nin : Nnat i n) i' n' (Ni'n' : Nnat i' n') :
+  Nnat (N.sub i i') (n - n').
+Proof.
+case: NnatP Nin => [//|//|{}i _ pin _].
+case: NnatP Ni'n' => [//|_ _ _|{}i' _ pi'n' _ /=]; first by rewrite subn0.
+case: (ltnP n n') => nn'; rewrite /Nnat eq_sym.
+  by rewrite Pos_sub_mask_Neg ?(eqP pin) ?(eqP pi'n')// subn_eq0 ltnW.
+by case: Pos.sub_mask (mask_natB pin pi'n' nn') => //= ? /eqP->.
+Qed.
+
+Lemma NnatM i n (Nin : Nnat i n) i' n' (Ni'n' : Nnat i' n') :
+  Nnat (N.mul i i') (n * n').
+Proof.
+case: NnatP Nin => [//|/[!mul0n]//| {i}p _ pn _].
+case: NnatP Ni'n' => [//|/[!muln0]//| {i'}p' _ p'n' _].
+by rewrite Nnat_pos pos_natM.
+Qed.
+
+Lemma Nnat_eq i n (Nin : Nnat i n) i' n' (Ni'n' : Nnat i' n') :
+  N.eqb i i' = (n == n').
+Proof.
+case: NnatP Nin => [//|_ _ _| {i}p _ pn _].
+  by case: NnatP Ni'n' => [//|//| {i'}p' _ + _] => /pos_nat_exS[{}n'->].
+case: NnatP Ni'n' => [//|_ _ _| {i'}p' _ p'n' _].
+  by move: pn => /pos_nat_exS[{}n->].
+exact: (pos_nat_eq pn p'n').
+Qed.
+
+Lemma N_to_natI : injective N.to_nat.
+Proof.
+by case=> [|i] [|i']  => [//|/esym/eqP|/eqP|/Pos_to_natI->//] /[!Pos_to_nat0F].
+Qed.
+
+Lemma N_to_natB i j : N.to_nat (N.sub i j) = (N.to_nat i - N.to_nat j)%N.
+Proof. exact: eqP (NnatB (Nnat_N_to_nat i) (Nnat_N_to_nat j)). Qed.
 
 Definition int_of_Z (i : Z) : int :=
   match i with
