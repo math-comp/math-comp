@@ -6,6 +6,15 @@ From Corelib Require Export PosDef.
 Module Pos.
 Export Pos.
 
+(** ** Predecessor *)
+
+Definition pred x :=
+  match x with
+    | xI p => xO p
+    | xO p => pred_double p
+    | xH => xH
+  end.
+
 (** ** Conversion with a decimal representation for printing/parsing *)
 
 #[local] Notation ten := (1~0~1~0)%positive.
