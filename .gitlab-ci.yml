@@ -39,37 +39,6 @@ variables:
 #### build stage
 ################
 
-# set var OPAM_SWITCH (if need be) and COQ_VERSION when using
-.make-build:
-  stage: build
-  image: docker:latest
-  services:
-    - docker:dind
-  variables:
-    # This image will be built locally only (not pushed)
-    IMAGE: "mathcomp-dev:make_coq_${COQ_VERSION}"
-  before_script:
-    - echo "${OPAM_SWITCH}"
-    - echo "${COQ_VERSION}"
-  script:
-    # TODO: update this when 9.0.0 goes live
-    # if [ "${COQ_VERSION%.*}" = "8" ]; then ...
-    - docker build -f Dockerfile.make --pull --build-arg=coq_image="coqorg/coq:${COQ_VERSION}-ocaml-${OCAML_VERSION}" -t "${IMAGE}" .
-  except:
-    refs:
-      # - /^pr-.*$/
-      - tags
-      - merge_requests
-      - schedules
-    variables:
-      - $CRON_MODE == "nightly"
-      - $CRON_MODE == "minimal"
-
-make-coq-latest:
-  extends: .make-build
-  variables:
-    COQ_VERSION: "latest"
-
 # set var OPAM_SWITCH (if need be) when using
 .opam-build:
   stage: build
