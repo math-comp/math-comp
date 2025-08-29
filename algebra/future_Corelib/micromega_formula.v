@@ -18,20 +18,9 @@
    and use the identical file in Corelib instead *)
 
 From Corelib Require Import PosDef.
+From mathcomp Require Export ring_checker.
 
 Set Implicit Arguments.
-
-(** Definition of polynomial expressions *)
-#[universes(template)]
-Inductive PExpr {C} : Type :=
-| PEc : C -> PExpr
-| PEX : positive -> PExpr
-| PEadd : PExpr -> PExpr -> PExpr
-| PEsub : PExpr -> PExpr -> PExpr
-| PEmul : PExpr -> PExpr -> PExpr
-| PEopp : PExpr -> PExpr
-| PEpow : PExpr -> N -> PExpr.
-Arguments PExpr : clear implicits.
 
 Register PEc as micromega.PExpr.PEc.
 Register PEX as micromega.PExpr.PEX.
