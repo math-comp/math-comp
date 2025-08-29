@@ -195,6 +195,23 @@ elim=> [i IH | i IH |]; rewrite /Pos.to_nat; case=> [j | j |]//=.
 - by move/eqP; rewrite iter_opD2 -double0 neq_doubleS_double.
 Qed.
 
+Variant pos_nat_compare_spec (p p' : positive) :
+    positive -> positive -> comparison -> Set :=
+  | Pos_nat_compare_spec_Eq : pos_nat_compare_spec p p' p p Eq
+  | Pos_nat_compare_spec_Lt :
+      (Pos.to_nat p < Pos.to_nat p')%N -> pos_nat_compare_spec p p' p p' Lt
+  | Pos_nat_compare_spec_Gt :
+      (Pos.to_nat p' < Pos.to_nat p)%N -> pos_nat_compare_spec p p' p p' Gt.
+
+Lemma pos_nat_compareP p p' : pos_nat_compare_spec p p' p p' (Pos.compare p p').
+Proof.
+have := pos_nat_compare (pos_nat_Pos_to_nat p) (pos_nat_Pos_to_nat p').
+(case: Pos.compare; [|do 2?[case: ifP => //]..]) => [|+ _ _|/[swap]+ + _].
+- by case: eqP => [/Pos_to_natI e _|]; [rewrite -{2}e; constructor|case: ifP].
+- by constructor.
+- by move=> e /negbT; rewrite -leqNgt leq_eqVlt eq_sym e/=; constructor.
+Qed.
+
 Lemma Pos_to_nat1 : Pos.to_nat xH = 1%N. Proof. by []. Qed.
 
 Lemma Pos_to_nat_double i : Pos.to_nat (xO i) = (Pos.to_nat i).*2.
