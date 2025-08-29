@@ -1,0 +1,3 @@
+shorten coq.ltac.{ open, all }.
+
+msolve GL SubGL :- all (open ring) GL SubGL.
