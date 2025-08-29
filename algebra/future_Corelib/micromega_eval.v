@@ -19,34 +19,19 @@
 
 From Corelib Require Import PosDef.
 From mathcomp Require Import micromega_formula micromega_witness.
+From mathcomp Require Export ring_eval.
 
 Set Implicit Arguments.
 
 Section Feval.
-Variable R : Type.
-Variable (rO rI : R) (radd rmul rsub: R -> R -> R) (ropp : R -> R).
-Variable (k : kind) (req rneq rle rlt : R -> R -> eKind k).
+Variables (R : Type) (rO rI : R) (radd rmul rsub: R -> R -> R) (ropp : R -> R).
+Variables (Cpow : Type) (Cpow_of_N : N -> Cpow) (rpow : R -> Cpow -> R).
+Variables (k : kind) (req rneq rle rlt : R -> R -> eKind k).
+Variables (C : Type) (R_of_C : C -> R).
+Variables (Env : Type) (env_nth : positive -> Env -> R).
 
-Variable C : Type.
-Variable C2R : C -> R.
-
-Variable Cpow : Type.
-Variable N2Cpow : N -> Cpow.
-Variable rpow : R -> Cpow -> R.
-
-Variable Env : Type.
-Variable env_nth : positive -> Env -> R.
-
-Fixpoint PEeval l pe : R :=
-  match pe with
-  | PEc c => C2R c
-  | PEX j => env_nth j l
-  | PEadd pe1 pe2 => radd (PEeval l pe1) (PEeval l pe2)
-  | PEsub pe1 pe2 => rsub (PEeval l pe1) (PEeval l pe2)
-  | PEmul pe1 pe2 => rmul (PEeval l pe1) (PEeval l pe2)
-  | PEopp pe1 => ropp (PEeval l pe1)
-  | PEpow pe1 n => rpow (PEeval l pe1) (N2Cpow n)
-  end.
+#[local] Notation PEeval := (PEeval
+  rO rI radd rmul rsub ropp Cpow_of_N rpow R_of_C env_nth).
 
 Definition eval_op2 (o : Op2) (x y : R) : eKind k :=
   match o with
@@ -61,11 +46,9 @@ Definition eval_op2 (o : Op2) (x y : R) : eKind k :=
 Definition Feval (env : Env) (f : Formula C) : eKind k :=
   let 'Build_Formula lhs op rhs := f in
   eval_op2 op (PEeval env lhs) (PEeval env rhs).
-
 End Feval.
 
 Section GFormulaEval.
-
 Variable eqb : bool -> bool -> bool.
 
 Context {TA : Type}. (* type of interpreted atoms *)
@@ -114,36 +97,17 @@ Fixpoint GFeval (k : kind) (f : GFormula k) {struct f} : eKind k :=
   | @IFF _ _ _ _ k f1 f2 => eIFF k (GFeval f1) (GFeval f2)
   | EQ f1 f2 => (GFeval f1) = (GFeval f2)
   end.
-
 End GFormulaEval.
 
 Definition BFeval eqb {A : Type} (ea : forall (k : kind), A -> eKind k)
   (k : kind) (f : BFormula A k) := GFeval eqb (fun k x => x) ea f.
 
-Section Fmap.
-Variables (T T' : Type) (f : T -> T').
-
-Fixpoint PEmap (e : PExpr T) : PExpr T' :=
-  match e with
-  | PEc c => PEc (f c)
-  | PEX p => PEX p
-  | PEadd e1 e2 => PEadd (PEmap e1) (PEmap e2)
-  | PEsub e1 e2 => PEsub (PEmap e1) (PEmap e2)
-  | PEmul e1 e2 => PEmul (PEmap e1) (PEmap e2)
-  | PEopp e => PEopp (PEmap e)
-  | PEpow e n => PEpow (PEmap e) n
-  end.
-
-Definition Fmap (f : Formula T)  : Formula T' :=
-  let 'Build_Formula  l o r := f in
-  Build_Formula (PEmap l) o (PEmap r).
-
-End Fmap.
+Definition Fmap T T' (f : T -> T') (g : Formula T) : Formula T' :=
+  let 'Build_Formula l o r := g in
+  Build_Formula (PEmap f l) o (PEmap f r).
 
 Section GFormulaMap.
-Context {TA TA' : Type}.
-Context {TX  : kind -> Type} {AA  : Type} {AF  : Type}.
-
+Context {TA TA' : Type} {TX : kind -> Type} {AA : Type} {AF : Type}.
 Fixpoint GFmap (k : kind) (fct : TA -> TA') (f : @GFormula TA TX AA AF k) :
     @GFormula TA' TX AA AF k :=
   match f with
@@ -158,30 +122,16 @@ Fixpoint GFmap (k : kind) (fct : TA -> TA') (f : @GFormula TA TX AA AF k) :
   | IFF f1 f2 => IFF (GFmap fct f1) (GFmap fct f2)
   | EQ f1 f2  => EQ (GFmap fct f1) (GFmap fct f2)
   end.
-
 End GFormulaMap.
 
-Section Pmap.
-Variables (T T' : Type) (f : T -> T').
-Fixpoint Pmap (P : Pol T) : Pol T' :=
-  match P with
-  | Pc c => Pc (f c)
-  | Pinj j P => Pinj j (Pmap P)
-  | PX P i Q => PX (Pmap P) i (Pmap Q)
-  end.
-End Pmap.
-
-Section PsatzMap.
-Variables (T T' : Type) (f : T -> T').
-Fixpoint Psatz_map (e : Psatz T) : Psatz T' :=
+Fixpoint Psatz_map T T' (f : T -> T') (e : Psatz T) : Psatz T' :=
   match e with
-  | PsatzLet p1 p2 => PsatzLet (Psatz_map p1) (Psatz_map p2)
+  | PsatzLet p1 p2 => PsatzLet (Psatz_map f p1) (Psatz_map f p2)
   | PsatzIn _ n => PsatzIn T' n
   | PsatzSquare e => PsatzSquare (Pmap f e)
-  | PsatzMulC re e => PsatzMulC (Pmap f re) (Psatz_map e)
-  | PsatzMulE f1 f2 => PsatzMulE (Psatz_map f1) (Psatz_map f2)
-  | PsatzAdd f1 f2 => PsatzAdd (Psatz_map f1) (Psatz_map f2)
+  | PsatzMulC re e => PsatzMulC (Pmap f re) (Psatz_map f e)
+  | PsatzMulE f1 f2 => PsatzMulE (Psatz_map f f1) (Psatz_map f f2)
+  | PsatzAdd f1 f2 => PsatzAdd (Psatz_map f f1) (Psatz_map f f2)
   | PsatzC c => PsatzC (f c)
   | PsatzZ _ => PsatzZ T'
   end.
-End PsatzMap.

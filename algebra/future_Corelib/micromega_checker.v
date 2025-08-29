@@ -17,6 +17,11 @@
 (* TODO: remove this file when requiring Rocq >= 9.2
    and use the identical file in Corelib instead *)
 
+From mathcomp Require Import ListDef.
+From Corelib Require Import BinNums PosDef IntDef.
+From mathcomp Require Import RatDef.
+From mathcomp Require Export micromega_formula micromega_witness.
+
 (** This file provides the computational part (checker) of the micromega
 tactics. This checker uses the reified formula to be proved
 (see micromega_formula.v) and a witness provided, from the formula,
@@ -24,11 +29,6 @@ by the micromega OCaml plugin (see micromega_witness.v for the type).
 One can prove that if the checker returns true, then the formula holds.
 Comments below give indications on how that proof should go.
 See test-suite/micromega/witness_tactics.v for an example. *)
-
-From mathcomp Require Import ListDef.
-From Corelib Require Import BinNums PosDef IntDef.
-From mathcomp Require Import RatDef.
-From mathcomp Require Import micromega_formula micromega_witness.
 
 Set Implicit Arguments.
 
@@ -42,291 +42,6 @@ Definition bind_option2 aT a'T rT (f : aT -> a'T -> option rT) o o' :=
   bind_option (fun o => bind_option (f o) o') o.
 Definition map_option2 aT a'T rT (f : aT -> a'T -> rT) :=
   bind_option2 (fun x y => Some (f x y)).
-
-(** * Basic arithmetic operations on Horner polynomials [Pol]
-
-One can prove that an eval function [Peval] commutes with
-each operation, e.g., [Peval l (Padd P P') = Peval l P + Peval l P'] *)
-Section PolOps.
-
-(** Coefficients *)
-Variable (C : Type) (cO cI : C) (cadd cmul csub : C -> C -> C) (copp : C -> C).
-Variable ceqb : C -> C -> bool.
-
-Implicit Type P : Pol C.
-
-(** Equality *)
-Fixpoint Peq P P' {struct P'} : bool :=
-  match P, P' with
-  | Pc c, Pc c' => ceqb c c'
-  | Pinj j Q, Pinj j' Q' =>
-      match Pos.compare j j' with
-      | Eq => Peq Q Q'
-      | _ => false
-      end
-  | PX P i Q, PX P' i' Q' =>
-      match Pos.compare i i' with
-      | Eq => if Peq P P' then Peq Q Q' else false
-      | _ => false
-      end
-  | _, _ => false
-  end.
-
-(** Constructors *)
-
-Definition P0 := Pc cO.
-Definition P1 := Pc cI.
-
-Definition mkPinj j P :=
-  match P with
-  | Pc _ => P
-  | Pinj j' Q => Pinj (Pos.add j j') Q
-  | _ => Pinj j P
-  end.
-
-Definition mkPinj_pred j P :=
-  match j with
-  | xH => P
-  | xO j => Pinj (Pos.pred_double j) P
-  | xI j => Pinj (xO j) P
-  end.
-
-Definition mkX j := mkPinj_pred j (PX P1 1 P0).
-
-Definition mkPX P i Q :=
-  match P with
-  | Pc c => if ceqb c cO then mkPinj xH Q else PX P i Q
-  | Pinj _ _ => PX P i Q
-  | PX P' i' Q' => if Peq Q' P0 then PX P' (Pos.add i' i) Q else PX P i Q
-  end.
-
-(** Opposite *)
-Fixpoint Popp P : Pol C :=
-  match P with
-  | Pc c => Pc (copp c)
-  | Pinj j Q => Pinj j (Popp Q)
-  | PX P i Q => PX (Popp P) i (Popp Q)
-  end.
-
-(** Addition and subtraction *)
-
-Fixpoint PaddC P c : Pol C :=
-  match P with
-  | Pc c1 => Pc (cadd c1 c)
-  | Pinj j Q => Pinj j (PaddC Q c)
-  | PX P i Q => PX P i (PaddC Q c)
-  end.
-
-Fixpoint PsubC P c : Pol C :=
-  match P with
-  | Pc c1 => Pc (csub c1 c)
-  | Pinj j Q => Pinj j (PsubC Q c)
-  | PX P i Q => PX P i (PsubC Q c)
-  end.
-
-Section PopI.
-Variable Pop : Pol C -> Pol C -> Pol C.
-Variable Q : Pol C.
-
-(** [P + Pinj j Q], assuming [Pop . Q] is [. + Q] *)
-Fixpoint PaddI (j : positive) P : Pol C :=
-  match P with
-  | Pc c => mkPinj j (PaddC Q c)
-  | Pinj j' Q' =>
-      match Z.pos_sub j' j with
-      | Zpos k =>  mkPinj j (Pop (Pinj k Q') Q)
-      | Z0 => mkPinj j (Pop Q' Q)
-      | Zneg k => mkPinj j' (PaddI k Q')
-      end
-  | PX P i Q' =>
-      match j with
-      | xH => PX P i (Pop Q' Q)
-      | xO j => PX P i (PaddI (Pos.pred_double j) Q')
-      | xI j => PX P i (PaddI (xO j) Q')
-      end
-  end.
-
-(** [P - Pinj j Q], assuming [Pop . Q] is [. - Q] *)
-Fixpoint PsubI (j : positive) P : Pol C :=
-  match P with
-  | Pc c => mkPinj j (PaddC (Popp Q) c)
-  | Pinj j' Q' =>
-      match Z.pos_sub j' j with
-      | Zpos k =>  mkPinj j (Pop (Pinj k Q') Q)
-      | Z0 => mkPinj j (Pop Q' Q)
-      | Zneg k => mkPinj j' (PsubI k Q')
-      end
-  | PX P i Q' =>
-      match j with
-      | xH => PX P i (Pop Q' Q)
-      | xO j => PX P i (PsubI (Pos.pred_double j) Q')
-      | xI j => PX P i (PsubI (xO j) Q')
-      end
-  end.
-
-Variable P' : Pol C.
-
-(** [P + PX P' i' P0], assumin [Pop . P'] is [. + P'] *)
-Fixpoint PaddX (i' : positive) P : Pol C :=
-  match P with
-  | Pc c => PX P' i' P
-  | Pinj j Q' =>
-      match j with
-      | xH =>  PX P' i' Q'
-      | xO j => PX P' i' (Pinj (Pos.pred_double j) Q')
-      | xI j => PX P' i' (Pinj (xO j) Q')
-      end
-  | PX P i Q' =>
-      match Z.pos_sub i i' with
-      | Zpos k => mkPX (Pop (PX P k P0) P') i' Q'
-      | Z0 => mkPX (Pop P P') i Q'
-      | Zneg k => mkPX (PaddX k P) i Q'
-      end
-  end.
-
-(** [P - PX P' i' P0], assumin [Pop . P'] is [. - P'] *)
-Fixpoint PsubX (i' : positive) P : Pol C :=
-  match P with
-  | Pc c => PX (Popp P') i' P
-  | Pinj j Q' =>
-      match j with
-      | xH =>  PX (Popp P') i' Q'
-      | xO j => PX (Popp P') i' (Pinj (Pos.pred_double j) Q')
-      | xI j => PX (Popp P') i' (Pinj (xO j) Q')
-      end
-  | PX P i Q' =>
-      match Z.pos_sub i i' with
-      | Zpos k => mkPX (Pop (PX P k P0) P') i' Q'
-      | Z0 => mkPX (Pop P P') i Q'
-      | Zneg k => mkPX (PsubX k P) i Q'
-      end
-  end.
-End PopI.
-
-Fixpoint Padd P P' {struct P'} : Pol C :=
-  match P' with
-  | Pc c' => PaddC P c'
-  | Pinj j' Q' => PaddI Padd Q' j' P
-  | PX P' i' Q' =>
-      match P with
-      | Pc c => PX P' i' (PaddC Q' c)
-      | Pinj j Q =>
-          match j with
-          | xH => PX P' i' (Padd Q Q')
-          | xO j => PX P' i' (Padd (Pinj (Pos.pred_double j) Q) Q')
-          | xI j => PX P' i' (Padd (Pinj (xO j) Q) Q')
-          end
-      | PX P i Q =>
-          match Z.pos_sub i i' with
-          | Zpos k => mkPX (Padd (PX P k P0) P') i' (Padd Q Q')
-          | Z0 => mkPX (Padd P P') i (Padd Q Q')
-          | Zneg k => mkPX (PaddX Padd P' k P) i (Padd Q Q')
-          end
-      end
-  end.
-
-Fixpoint Psub P P' {struct P'} : Pol C :=
-  match P' with
-  | Pc c' => PsubC P c'
-  | Pinj j' Q' => PsubI Psub Q' j' P
-  | PX P' i' Q' =>
-      match P with
-      | Pc c => PX (Popp P') i' (PaddC (Popp Q') c)
-      | Pinj j Q =>
-          match j with
-          | xH => PX (Popp P') i' (Psub Q Q')
-          | xO j => PX (Popp P') i' (Psub (Pinj (Pos.pred_double j) Q) Q')
-          | xI j => PX (Popp P') i' (Psub (Pinj (xO j) Q) Q')
-          end
-      | PX P i Q =>
-          match Z.pos_sub i i' with
-          | Zpos k => mkPX (Psub (PX P k P0) P') i' (Psub Q Q')
-          | Z0 => mkPX (Psub P P') i (Psub Q Q')
-          | Zneg k => mkPX (PsubX Psub P' k P) i (Psub Q Q')
-          end
-      end
-  end.
-
-(** Multiplication *)
-
-Fixpoint PmulC_aux P c : Pol C :=
-  match P with
-  | Pc c' => Pc (cmul c' c)
-  | Pinj j Q => mkPinj j (PmulC_aux Q c)
-  | PX P i Q => mkPX (PmulC_aux P c) i (PmulC_aux Q c)
-  end.
-
-Definition PmulC P c :=
-  if ceqb c cO then P0 else
-  if ceqb c cI then P else PmulC_aux P c.
-
-(** [P * Pinj j Q], assuming [Pmul . Q] is [. * Q] *)
-Section PmulI.
-Variable Pmul : Pol C -> Pol C -> Pol C.
-Variable Q : Pol C.
-Fixpoint PmulI (j : positive) P : Pol C :=
-  match P with
-  | Pc c => mkPinj j (PmulC Q c)
-  | Pinj j' Q' =>
-      match Z.pos_sub j' j with
-      | Zpos k => mkPinj j (Pmul (Pinj k Q') Q)
-      | Z0 => mkPinj j (Pmul Q' Q)
-      | Zneg k => mkPinj j' (PmulI k Q')
-      end
-  | PX P' i' Q' =>
-      match j with
-      | xH => mkPX (PmulI xH P') i' (Pmul Q' Q)
-      | xO j' => mkPX (PmulI j P') i' (PmulI (Pos.pred_double j') Q')
-      | xI j' => mkPX (PmulI j P') i' (PmulI (xO j') Q')
-      end
-   end.
-End PmulI.
-
-Fixpoint Pmul P P'' {struct P''} : Pol C :=
-  match P'' with
-  | Pc c => PmulC P c
-  | Pinj j' Q' => PmulI Pmul Q' j' P
-  | PX P' i' Q' =>
-      match P with
-      | Pc c => PmulC P'' c
-      | Pinj j Q =>
-          let QQ' :=
-            match j with
-            | xH => Pmul Q Q'
-            | xO j => Pmul (Pinj (Pos.pred_double j) Q) Q'
-            | xI j => Pmul (Pinj (xO j) Q) Q'
-            end in
-          mkPX (Pmul P P') i' QQ'
-      | PX P i Q=>
-          let QQ' := Pmul Q Q' in
-          let PQ' := PmulI Pmul Q' xH P in
-          let QP' := Pmul (mkPinj xH Q) P' in
-          let PP' := Pmul P P' in
-          Padd (mkPX (Padd (mkPX PP' i P0) QP') i' P0) (mkPX PQ' i QQ')
-      end
-  end.
-
-Fixpoint Psquare P : Pol C :=
-  match P with
-  | Pc c => Pc (cmul c c)
-  | Pinj j Q => Pinj j (Psquare Q)
-  | PX P i Q =>
-      let twoPQ := Pmul P (mkPinj xH (PmulC Q (cadd cI cI))) in
-      let Q2 := Psquare Q in
-      let P2 := Psquare P in
-      mkPX (Padd (mkPX P2 i P0) twoPQ) i Q2
-  end.
-
-Fixpoint Ppow_pos (res P : Pol C) (p : positive) : Pol C :=
-  match p with
-  | xH => Pmul res P
-  | xO p => Ppow_pos (Ppow_pos res P p) P p
-  | xI p => Pmul (Ppow_pos (Ppow_pos res P p) P p) P
-  end.
-
-Definition Ppow_N P n := match n with N0 => P1 | Npos p => Ppow_pos P1 P p end.
-
-End PolOps.
 
 (** * Boolean formulas in Conjunctive Normal Form (CNF) *)
 Section CNF.
@@ -417,6 +132,12 @@ Variables cadd cmul csub : C -> C -> C.
 Variable copp : C -> C.
 Variables ceqb cleb : C -> C -> bool.
 
+#[local] Notation Pol_of_PExpr := (Pol_of_PExpr cO cI cadd cmul csub copp ceqb).
+#[local] Notation Popp := (Popp copp).
+#[local] Notation Padd := (Padd cO cadd ceqb).
+#[local] Notation Psub := (Psub cO cadd csub copp ceqb).
+#[local] Notation Pmul := (Pmul cO cI cadd cmul ceqb).
+
 Definition cneqb (x y : C) := negb (ceqb x y).
 Definition cltb (x y : C) := andb (cleb x y) (cneqb x y).
 
@@ -427,26 +148,6 @@ Variant Op1 : Set := (** relations with 0 *)
 | NonStrict (** >= 0 *).
 
 Definition NFormula : Type := Pol C * Op1. (** normalized formula **)
-
-#[local] Notation mkX := (mkX cO cI).
-#[local] Notation Popp := (Popp copp).
-#[local] Notation Padd := (Padd cO cadd ceqb).
-#[local] Notation Psub := (Psub cO cadd csub copp ceqb).
-#[local] Notation Pmul := (Pmul cO cI cadd cmul ceqb).
-#[local] Notation Ppow_N := (Ppow_N cO cI cadd cmul ceqb).
-
-Fixpoint Pol_of_PExpr (pe : PExpr C) : Pol C :=
-  match pe with
-  | PEc c => Pc c
-  | PEX j => mkX j
-  | PEadd (PEopp pe1) pe2 => Psub (Pol_of_PExpr pe2) (Pol_of_PExpr pe1)
-  | PEadd pe1 (PEopp pe2) => Psub (Pol_of_PExpr pe1) (Pol_of_PExpr pe2)
-  | PEadd pe1 pe2 => Padd (Pol_of_PExpr pe1) (Pol_of_PExpr pe2)
-  | PEsub pe1 pe2 => Psub (Pol_of_PExpr pe1) (Pol_of_PExpr pe2)
-  | PEmul pe1 pe2 => Pmul (Pol_of_PExpr pe1) (Pol_of_PExpr pe2)
-  | PEopp pe1 => Popp (Pol_of_PExpr pe1)
-  | PEpow pe1 n => Ppow_N (Pol_of_PExpr pe1) n
-  end.
 
 (** We normalize Formulas by moving terms to one side *)
 Definition normalise (f : Formula C) : NFormula :=

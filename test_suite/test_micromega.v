@@ -14,19 +14,19 @@ pose (ff :=
   IMPL
     (A isProp
        {|
-         Flhs := PEadd (PEX xH) (PEmul (PEc ((Qmake (Zpos (xO xH)) xH))) (PEX (xO xH)));
+         Flhs := PEadd (PEX _ xH) (PEmul (PEc ((Qmake (Zpos (xO xH)) xH))) (PEX _ (xO xH)));
          Fop := OpLe;
          Frhs := PEc (Qmake (Zpos (xI xH)) xH)
        |} tt) None
     (IMPL
        (A isProp
           {|
-            Flhs := PEadd (PEmul (PEc (Qmake (Zpos (xO xH)) xH)) (PEX xH)) (PEX (xO xH));
+            Flhs := PEadd (PEmul (PEc (Qmake (Zpos (xO xH)) xH)) (PEX _ xH)) (PEX _ (xO xH));
             Fop := OpLe;
             Frhs := PEc (Qmake (Zpos (xI xH)) xH)
           |} tt) None
        (A isProp
-          {| Flhs := PEadd (PEX xH) (PEX (xO xH)); Fop := OpLe; Frhs := PEc (Qmake (Zpos (xO xH)) xH) |} tt))
+          {| Flhs := PEadd (PEX _ xH) (PEX _ (xO xH)); Fop := OpLe; Frhs := PEc (Qmake (Zpos (xO xH)) xH) |} tt))
   : BFormula (Formula Q) isProp).
 (* getting the witness *)
 let ff' := eval unfold ff in ff in wlra_Q wit ff'.

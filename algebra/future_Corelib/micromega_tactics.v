@@ -17,6 +17,9 @@
 (* TODO: remove this file when requiring Rocq >= 9.2
    and use the identical file in Corelib instead *)
 
+From Corelib Require Import BinNums.
+From mathcomp Require Import RatDef micromega_formula micromega_witness.
+
 (** This file provide access to the witness generation tactics
 of the micromega OCaml plugin. The following tactics are provided,
 where [ff : BFormula (Formula Q) isProp]:
@@ -42,8 +45,5 @@ but not
   wlra_Q wit ff.
 >>
 See test-suite/micromega/witness_tactics.v for an example. *)
-
-From Corelib Require Import BinNums.
-From mathcomp Require Import RatDef micromega_formula micromega_witness.
 
 Declare ML Module "rocq-runtime.plugins.micromega".

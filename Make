@@ -2,6 +2,8 @@ algebra/future_Corelib/ListDef.v
 algebra/future_Corelib/PosDef.v
 algebra/future_Corelib/NatDef.v
 algebra/future_Corelib/RatDef.v
+algebra/future_Corelib/ring_checker.v
+algebra/future_Corelib/ring_eval.v
 algebra/future_Corelib/micromega_formula.v
 algebra/future_Corelib/micromega_witness.v
 algebra/future_Corelib/micromega_tactics.v

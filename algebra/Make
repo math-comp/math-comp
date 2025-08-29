@@ -2,6 +2,8 @@ future_Corelib/ListDef.v
 future_Corelib/PosDef.v
 future_Corelib/NatDef.v
 future_Corelib/RatDef.v
+future_Corelib/ring_checker.v
+future_Corelib/ring_eval.v
 future_Corelib/micromega_formula.v
 future_Corelib/micromega_witness.v
 future_Corelib/micromega_tactics.v
