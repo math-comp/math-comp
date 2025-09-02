@@ -713,7 +713,7 @@ semiring-env
    (quote.build.one {{ @PEI N }} :- !),
    (pi In1 In2\ quote.build.mul In1 In2 {{ @PEmul N lp:In1 lp:In2 }} :- !),
    (pi In1 In2\ quote.build.exp In1 In2 {{ @PEpow N lp:In1 lp:In2 }} :- !),
-   (pi In\ quote.build.invN-constant _ In {{ @PEc N lp:In }} :- !)] :- !.
+   (pi Inv In\ quote.build.invN-constant Inv In {{ @PEc N lp:In }} :- !)] :- !.
 
 pred ring-env o:list prop.
 ring-env
@@ -725,9 +725,9 @@ ring-env
    (quote.build.one {{ @PEI Z }} :- !),
    (pi In1 In2\ quote.build.mul In1 In2 {{ @PEmul Z lp:In1 lp:In2 }} :- !),
    (pi In1 In2\ quote.build.exp In1 In2 {{ @PEpow Z lp:In1 lp:In2 }} :- !),
-   (quote.build.invN-constant _ {{ N0 }} {{ @PEc Z Z0 }} :- !),
-   (pi In\
-      quote.build.invN-constant _ {{ Npos lp:In }} {{ @PEc Z (Zpos lp:In) }} :- !)]
+   (pi Inv\ quote.build.invN-constant Inv {{ N0 }} {{ @PEc Z Z0 }} :- !),
+   (pi Inv In\
+      quote.build.invN-constant Inv {{ Npos lp:In }} {{ @PEc Z (Zpos lp:In) }} :- !)]
   :- !.
 
 pred if-verbose i:prop.

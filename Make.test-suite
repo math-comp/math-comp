@@ -8,6 +8,7 @@ test_suite/test_micromega.v
 test_suite/test_lra.v
 test_suite/test_ring.v
 test_suite/test_ring_from_sander.v
+test_suite/test_field.v
 
 -I .
 
