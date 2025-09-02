@@ -673,6 +673,31 @@ mk-ring-morphism Ty (rmorphism U V' SR R' UR' none (x\ x)) Lem CR Env :- !,
       semiring-env SREnv,
       Env = [target-nmodule U, target-semiring SR | SREnv]).
 
+pred mk-field-morphism
+  i:term, o:rmorphism, o:term, o:term, o:list prop, o:list prop.
+mk-field-morphism
+  Ty (rmorphism U (some V) SR (some R) (some UR) (some F) (x\ x)) Lem Field
+  [target-nmodule U, target-semiring SR, target-zmodule V | REnv]
+  [field-mode, target-nmodule U, target-semiring SR, target-zmodule V | FEnv] :-
+  std.do! [
+    std.assert-ok! (coq.unify-eq Ty {{ GRing.Nmodule.sort lp:U }})
+                   "Cannot find a declared nmodType",
+    std.assert-ok! (coq.unify-eq Ty {{ GRing.Zmodule.sort lp:V }})
+                   "Cannot find a declared zmodType",
+    std.assert-ok! (coq.unify-eq Ty {{ GRing.PzSemiRing.sort lp:SR }})
+                   "Cannot find a declared semiRingType",
+    std.assert-ok! (coq.unify-eq Ty {{ GRing.PzRing.sort lp:R }})
+                   "Cannot find a declared ringType",
+    std.assert-ok! (coq.unify-eq Ty {{ GRing.UnitRing.sort lp:UR }})
+                   "Cannot find a declared unitRingType",
+    std.assert-ok! (coq.unify-eq Ty {{ GRing.Field.sort lp:F }})
+                   "Cannot find a declared fieldType",
+    (coq.unify-eq Ty {{ Num.NumField.sort lp:Field }} ok,
+     Lem = {{ numField_correct }};
+     Field = F, Lem = {{ field_correct }}),
+    ring-env REnv,
+    field-env FEnv ].
+
 pred semiring-env o:list prop.
 semiring-env
   [(pi In\ quote.build.variable In {{ @PEX N lp:In }} :- !),
@@ -683,7 +708,7 @@ semiring-env
    (quote.build.one {{ @PEI N }} :- !),
    (pi In1 In2\ quote.build.mul In1 In2 {{ @PEmul N lp:In1 lp:In2 }} :- !),
    (pi In1 In2\ quote.build.exp In1 In2 {{ @PEpow N lp:In1 lp:In2 }} :- !),
-   (pi In\ quote.build.invN-constant _ In {{ @PEc N lp:In }} :- !)] :- !.
+   (pi Inv In\ quote.build.invN-constant Inv In {{ @PEc N lp:In }} :- !)] :- !.
 
 pred ring-env o:list prop.
 ring-env
@@ -695,9 +720,25 @@ ring-env
    (quote.build.one {{ @PEI Z }} :- !),
    (pi In1 In2\ quote.build.mul In1 In2 {{ @PEmul Z lp:In1 lp:In2 }} :- !),
    (pi In1 In2\ quote.build.exp In1 In2 {{ @PEpow Z lp:In1 lp:In2 }} :- !),
-   (quote.build.invN-constant _ {{ N0 }} {{ @PEc Z Z0 }} :- !),
-   (pi In\
-      quote.build.invN-constant _ {{ Npos lp:In }} {{ @PEc Z (Zpos lp:In) }} :- !)]
+   (pi Inv\ quote.build.invN-constant Inv {{ N0 }} {{ @PEc Z Z0 }} :- !),
+   (pi Inv In\
+      quote.build.invN-constant Inv {{ Npos lp:In }} {{ @PEc Z (Zpos lp:In) }} :- !)]
+  :- !.
+
+pred field-env o:list prop.
+field-env
+  [(pi In\ quote.build.variable In {{ @FEX Z lp:In }} :- !),
+   (quote.build.zero {{ @FEO Z }} :- !),
+   (pi In\ quote.build.opp In {{ @FEopp Z lp:In }} :- !),
+   (pi In1 In2\ quote.build.add In1 In2 {{ @FEadd Z lp:In1 lp:In2 }} :- !),
+   (pi In1 In2\ quote.build.sub In1 In2 {{ @FEsub Z lp:In1 lp:In2 }} :- !),
+   (quote.build.one {{ @FEI Z }} :- !),
+   (pi In1 In2\ quote.build.mul In1 In2 {{ @FEmul Z lp:In1 lp:In2 }} :- !),
+   (pi In1 In2\ quote.build.exp In1 In2 {{ @FEpow Z lp:In1 lp:In2 }} :- !),
+   (pi In\ quote.build.inv In {{ @FEinv Z lp:In }} :- !),
+   (pi Inv\ quote.build.invN-constant Inv {{ N0 }} {{ @FEc Z Z0 }} :- !),
+   (pi Inv In Out\
+      quote.build.invN-constant Inv {{ Npos lp:In }} {{ @FEc Z (Zpos lp:In) }} :- !)]
   :- !.
 
 pred if-verbose i:prop.
@@ -747,6 +788,37 @@ ring (goal _ _ P _ Args as G) GS :-
         [trm Lem, trm ComRing, trm VM', trm Lpe',
          trm RE1, trm RE2, trm PE1, trm PE2, trm LpeProofs']
         "Not a valid ring equation" G GS
+    ) ReflTime,
+    if-verbose (coq.say "Reflection:" ReflTime "sec."),
+  ]).
+
+pred field i:goal, o:list sealed-goal.
+field (goal _ _ P _ Args as G) GS :-
+  attributes A, !,
+  coq.parse-attributes A [att "verbose" bool] Opts, !,
+  (Opts => std.do! [  /* use =!=> when requiring elpi >= 3 */
+    @ltacfail! 0 => std.assert-ok!
+      (coq.unify-eq P {{ @eq lp:Ty lp:T1 lp:T2 }})
+      "The goal is not an equation",
+    @ltacfail! 0 => mk-field-morphism Ty C Lem Field REnv FEnv,
+    std.time (
+      (REnv =>  /* use =!=> when requiring elpi >= 3 */
+        std.unzip { std.map Args (quote-arg Ty { rmorphism-rm-field C } VM) }
+          Lpe LpeProofs),
+      (FEnv => quote.ring ff C T1 RE1 PE1 VM),  /* use =!=> when requiring elpi >= 3 */
+      (FEnv => quote.ring ff C T2 RE2 PE2 VM)  /* use =!=> when requiring elpi >= 3 */
+    ) ReifTime,
+    if-verbose (coq.say "Reification:" ReifTime "sec."),
+    list-constant Ty VM VM',
+    list-constant _ Lpe Lpe',
+    std.assert-ok! (coq.typecheck Lpe' _) "Ill-typed term",
+    list->conj LpeProofs LpeProofs',
+    std.assert-ok! (coq.typecheck LpeProofs' _) "Ill-typed equations",
+    std.time (
+      coq.ltac.call-with-error "field_reflection"
+        [trm Lem, trm Field, trm VM', trm Lpe',
+         trm RE1, trm RE2, trm PE1, trm PE2, trm LpeProofs']
+        "Not a valid field equation" G GS
     ) ReflTime,
     if-verbose (coq.say "Reflection:" ReflTime "sec."),
   ]).
