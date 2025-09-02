@@ -153,6 +153,7 @@ doc: __always__ Makefile.coq
 	cp algebra/lra.elpi _build_doc/algebra/
 	cp algebra/ring.elpi _build_doc/algebra/
 	cp algebra/ring_tac.elpi _build_doc/algebra/
+	cp algebra/field_tac.elpi _build_doc/algebra/
 	cp Make Makefile* _build_doc
 	mkdir -p _build_doc/htmldoc
 	. etc/utils/builddoc_lib.sh; \
