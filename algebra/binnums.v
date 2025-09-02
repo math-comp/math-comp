@@ -526,6 +526,18 @@ case: ZintP Zin => [//|||]; [|move=> {i}p {}n _ _ pn _..].
   + by rewrite !NegzE mulrNN -PoszM ZintE pos_natM.
 Qed.
 
+Lemma Zint_pow_pos i n (Zin : Zint i n) p m (pm : pos_nat p m) :
+  Zint (Z.pow_pos i p) (n ^+ m).
+Proof.
+rewrite /Z.pow_pos -[n ^+ m]mul1r; have : Zint (Zpos xH) 1 by [].
+elim/pos_nat_ind: pm i n Zin (Zpos xH) 1 => [| {}p {}m pm IH | {}p {}m pm IH]
+    i n Zin j k Zjk /=.
+- by rewrite expr1 mulrC; apply: ZintM.
+- by rewrite -addnn exprD mulrA; apply: (IH) => //; apply: IH.
+- rewrite -addn1 -addnn !exprD expr1 !mulrA mulrC; apply: ZintM => //.
+  by apply: (IH) => //; apply: IH.
+Qed.
+
 Lemma Zint_eq i n (Zin : Zint i n) i' n' (Zi'n' : Zint i' n') :
   Z.eqb i i' = (n == n').
 Proof.
