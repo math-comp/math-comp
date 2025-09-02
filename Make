@@ -23,6 +23,7 @@ algebra/polyXY.v
 algebra/qpoly.v
 algebra/rat.v
 algebra/ring_tactic.v
+algebra/field_tactic.v
 algebra/ring.v
 algebra/ring_quotient.v
 algebra/algebraic_hierarchy/rings_modules_and_algebras.v

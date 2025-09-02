@@ -27,4 +27,5 @@ From mathcomp Require Export zmodp.
 From mathcomp Require Export sesquilinear.
 From mathcomp Require Export spectral.
 From mathcomp Require Export ring_tactic.
+From mathcomp Require Export field_tactic.
 From mathcomp Require Export arithmetic_tactic.
