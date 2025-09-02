@@ -528,8 +528,6 @@ Qed.
 
 End TautoChecker.
 
-Arguments option_R {_ _}.
-
 Elpi derive.param2 True.
 Elpi derive.param2 False.
 Elpi derive.param2 and.
@@ -540,7 +538,6 @@ Elpi derive.param2 iff.
 Elpi derive.param2 Datatypes.is_true.
 
 Elpi derive.param2 orb.
-Elpi derive.param2 andb.
 Elpi derive.param2 negb.
 Elpi derive.param2 addb.
 Elpi derive.param2 eqb.
@@ -678,13 +675,6 @@ case: k rk t => rk t.
      | isBool_R => bool_Rxx t
      end).
 Qed.
-
-Lemma positive_R_eq p p' : positive_R p p' -> p = p'.
-Proof. by elim/positive_R_ind => [? ? ? ->|? ? ? ->|]. Qed.
-Lemma N_R_eq n n' : N_R n n' -> n = n'.
-Proof. by elim/N_R_ind => [//| ? _ /positive_R_eq<-]. Qed.
-Lemma list_R_eq T (s s' : seq T) : list_R eq s s' -> s = s'.
-Proof. by elim/list_R_ind => [//| x _ <- {}s _ _ <-]. Qed.
 
 Lemma erefl1 {A B} {f : A -> B} : forall a1 a2 (ra : a1 = a2), f a1 = f a2.
 Proof. by move=> ? ? ->. Qed.
