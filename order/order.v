@@ -3165,6 +3165,20 @@ Lemma bigmax_eq_id P F :
   (forall i, P i -> x >= F i) -> \big[max/x]_(i <- r | P i) F i = x.
 Proof. by move=> x_ge; apply: le_anti; rewrite bigmax_ge_id bigmax_le. Qed.
 
+(* NB: on the model of bigop.leq_bigmax_seq *)
+Lemma le_bigmax_seq i0 P F :
+  i0 \in r -> P i0 -> F i0 <= \big[max/x]_(i <- r | P i) F i.
+Proof.
+move=> + Pi0; elim: r => // h t ih; rewrite inE big_cons.
+move=> /predU1P[<-|i0t]; first by rewrite Pi0 le_max// lexx.
+by case: ifPn => Ph; [rewrite le_max ih// orbT|rewrite ih].
+Qed.
+
+(* NB: on the model of bigop.bigmax_sup_seq *)
+Lemma bigmax_sup_seq i0 P t F :
+  i0 \in r -> P i0 -> t <= F i0 -> t <= \big[max/x]_(i <- r | P i) F i.
+Proof. by move=> ? ? ?; exact: le_trans (@le_bigmax_seq i0 _ _ _ _). Qed.
+
 End bigminmax_eqType.
 
 Section bigminmax_finType.
@@ -3379,6 +3393,7 @@ Arguments bigmin_eq_arg {disp T I} x j.
 Arguments bigmax_eq_arg {disp T I} x j.
 Arguments eq_bigmin {disp T I x} j.
 Arguments eq_bigmax {disp T I x} j.
+Arguments le_bigmax_seq {disp T I r} x i0 P.
 
 (* FIXME: some lemmas in the following section should hold for any porderType *)
 Module Import DualTotalTheory.
