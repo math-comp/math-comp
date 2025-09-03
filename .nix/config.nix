@@ -104,7 +104,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       hierarchy-builder.override.version = "master";
       interval.job = false;
       coquelicot.job = false;
-      mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
       ssprove.job = false;
       mathcomp-infotheo.job = false;  # not compatible with master
     }; };
@@ -114,7 +113,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq.override.version = "9.1";
       coq-elpi.job = true;
       hierarchy-builder.job = true;
-      mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
       interval.job = false;  # not yet compatible with 9.1
@@ -127,7 +125,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq.override.version = "9.0";
       coq-elpi.job = true;
       hierarchy-builder.job = true;
-      mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
       mathcomp-infotheo.job = false;  # not yet compatible with 9.0
