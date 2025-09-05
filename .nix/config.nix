@@ -116,7 +116,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
       interval.job = false;  # not yet compatible with 9.1
-      mathcomp-infotheo.job = false;  # not yet compatible with 9.1
       ssprove.job = false;  # not yet compatible with 9.1
     }; };
     "rocq-9.0" = { rocqPackages = {
@@ -127,7 +126,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       hierarchy-builder.job = true;
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
-      mathcomp-infotheo.job = false;  # not yet compatible with 9.0
       odd-order.job = false;  # odd-order dropped support for 9.0
     }; };
     "coq-8.20".coqPackages = common-bundles // {
