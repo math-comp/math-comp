@@ -135,6 +135,10 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq-elpi.override.version = "2.5.0";  # required by CoqEAL
       coq-elpi.override.elpi-version = "2.0.7";
       odd-order.job = false;  # odd-order dropped support for 8.20
+      mathcomp-real-closed.job = false;  # real-closed dropped support for 8.20
+      coqeal.job = false;  # real-closed dropped support for 8.20
+      mathcomp-abel.job = false;  # real-closed dropped support for 8.20
+      mathcomp-apery.job = false;  # real-closed dropped support for 8.20
     };
   };
 }
