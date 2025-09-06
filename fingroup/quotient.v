@@ -563,10 +563,8 @@ Variant inv_quotient_spec (P : pred {group gT}) : Prop :=
 Lemma inv_quotientS :
   Kbar \subset G / H -> inv_quotient_spec (fun K => K \subset G).
 Proof.
-case/andP: nHG => sHG nHG' sKbarG.
-have sKdH: Kbar \subset 'N(H) / H by rewrite (subset_trans sKbarG) ?morphimS.
-exists (coset H @*^-1 Kbar)%G; first by rewrite cosetpreK.
-  by rewrite -{1}ker_coset morphpreS ?sub1G.
+move=> sKH; exists (coset H @*^-1 Kbar); first by rewrite cosetpreK.
+  by rewrite sub_cosetpre.
 by rewrite sub_cosetpre_quo.
 Qed.
 

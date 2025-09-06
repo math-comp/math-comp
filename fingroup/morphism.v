@@ -613,7 +613,7 @@ Qed.
 
 Lemma morphim_norm A : f @* 'N(A) \subset 'N(f @* A).
 Proof.
-apply/subsetP=> fx; case/morphimP=> x Dx Nx -> {fx}.
+apply/subsetP=> fx /morphimP[x Dx Nx -> {fx}].
 by rewrite inE -morphimJ ?(normP Nx).
 Qed.
 
