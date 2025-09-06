@@ -52,7 +52,8 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Local Notation "n %:R" := (n %:R%R).
-Import GroupScope GRing.Theory.
+Local Open Scope group_scope.
+Import GRing.Theory.
 
 Reserved Notation "''Mod_' m" (at level 0, m at level 2, format "''Mod_' m").
 Reserved Notation "''D_' m" (at level 0, m at level 2, format "''D_' m").
@@ -289,7 +290,7 @@ have [cycF ffulF]: cyclic F /\ [faithful F, on 'Ohm_1(G) | [Aut G]].
     rewrite 3!inE /= -2!val_eqE /= val_Fp_nat // [1 %% _]modn_small // defG1.
     apply/idP/subsetP=> [ma1 x1i | ma1].
       case/cycleP=> i ->{x1i}; rewrite inE gactX // -[_ a]def_m //.
-      by rewrite -(expg_mod_order x1) ox1 (eqP ma1).
+      by rewrite -[in eqbLHS](expg_mod_order x1) ox1 (eqP ma1).
     have:= ma1 x1 (cycle_id x1); rewrite inE -[_ a]def_m //.
     by rewrite (eq_expg_mod_order x1 _ 1) ox1 (modn_small p_gt1).
   have card_units_Fp: #|[set: {unit 'F_p}]| = p.-1.
@@ -776,12 +777,12 @@ have{le_ou le_ov} [ou ov]: #[u] = q /\ #[v] = 4.
 have sdB: <[u]> ><| <[v]> = B by rewrite sdprodE.
 have uvj j: u ^ (v ^+ j) = (if odd j then u^-1 else u).
   elim: j => [|j IHj]; first by rewrite conjg1.
-  by rewrite expgS conjgM uv conjVg IHj (fun_if invg) invgK if_neg.
+  by rewrite expgS conjgM uv conjVg IHj (fun_if inv) invgK if_neg.
 have sqrB i j: (u ^+ i * v ^+ j) ^+ 2 = (if odd j then v ^+ 2 else u ^+ i.*2).
   rewrite expgS; case: ifP => odd_j.
     rewrite {1}(conjgC (u ^+ i)) conjXg uvj odd_j expgVn -mulgA mulKg.
     rewrite -expgD addnn -(odd_double_half j) odd_j doubleD addnC /=.
-    by rewrite -(expg_mod _ v4) -!muln2 -mulnA modnMDl.
+    by rewrite -[LHS](expg_mod _ v4) -!muln2 -mulnA modnMDl.
   rewrite {2}(conjgC (u ^+ i)) conjXg uvj odd_j mulgA -(mulgA (u ^+ i)).
   rewrite -expgD addnn -(odd_double_half j) odd_j -2!mul2n mulnA.
   by rewrite expgM v4 expg1n mulg1 -expgD addnn.

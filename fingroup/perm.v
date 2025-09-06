@@ -40,7 +40,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Section PermDefSection.
 
@@ -119,7 +119,7 @@ Proof. by move=> s; apply/permP=> x; rewrite !permE /= permE f_iinv. Qed.
 Lemma perm_mulP : associative perm_mul.
 Proof. by move=> s t u; apply/permP=> x; do !rewrite permE /=. Qed.
 
-HB.instance Definition _ := isMulGroup.Build (perm_type T)
+HB.instance Definition _ := Finite_isGroup.Build (perm_type T)
   perm_mulP perm_oneP perm_invP.
 
 Lemma perm1 x : (1 : {perm T}) x = x.
@@ -246,7 +246,7 @@ Proof. by apply/permP => z; rewrite perm1; case: tpermP. Qed.
 Lemma tpermK x y : involutive (tperm x y).
 Proof. by move=> z; rewrite !permE tperm_proof. Qed.
 
-Lemma tpermKg x y : involutive (mulg (tperm x y)).
+Lemma tpermKg x y : involutive (mul (tperm x y)).
 Proof. by move=> s; apply/permP=> z; rewrite !permM tpermK. Qed.
 
 Lemma tpermV x y : (tperm x y)^-1 = tperm x y.

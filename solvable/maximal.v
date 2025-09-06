@@ -44,7 +44,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Section Defs.
 
@@ -720,7 +720,7 @@ Proof.
 move=> pG [defPhi defG'].
 have [-> | ntG] := eqsVneq G 1; first by rewrite center1 abelem1.
 have [p_pr _ _] := pgroup_pdiv pG ntG.
-have fM: {in 'Z(G) &, {morph expgn^~ p : x y / x * y}}.
+have fM: {in 'Z(G) &, {morph natexp^~ p : x y / x * y}}.
   by move=> x y /setIP[_ /centP cxG] /setIP[/cxG cxy _]; apply: expgMn.
 rewrite abelemE //= center_abelian; apply/exponentP=> /= z Zz.
 apply: (@kerP _ _ _ (Morphism fM)) => //; apply: subsetP z Zz.
@@ -728,7 +728,7 @@ rewrite -{1}defG' gen_subG; apply/subsetP=> _ /imset2P[x y Gx Gy ->].
 have Zxy: [~ x, y] \in 'Z(G) by rewrite -defG' mem_commg.
 have Zxp: x ^+ p \in 'Z(G).
   rewrite -defPhi (Phi_joing pG) (MhoE 1 pG) joing_idr mem_gen // !inE.
-  by rewrite expn1 orbC (imset_f (expgn^~ p)).
+  by rewrite expn1 orbC (imset_f (natexp^~ p)).
 rewrite mem_morphpre /= ?defG' ?Zxy // inE -commXg; last first.
   by red; case/setIP: Zxy => _ /centP->.
 by apply/commgP; red; case/setIP: Zxp => _ /centP->.
@@ -1294,7 +1294,7 @@ have defE: K ><| <[x]> = E.
 have /cyclicP[z defZ]: cyclic 'Z(E) by rewrite prime_cyclic ?oZE.
 apply/(Aut_sub_fullP (center_sub E)); rewrite /= defZ => g injg gZ.
 pose k := invm (injm_Zp_unitm z) (aut injg gZ).
-have fM: {in K &, {morph expgn^~ (val k): u v / u * v}}.
+have fM: {in K &, {morph natexp^~ (val k): u v / u * v}}.
   by move=> u v Ku Kv; rewrite /= expgMn // /commute (centsP cKK).
 pose f := Morphism fM; have fK: f @* K = K.
   apply/setP=> u; rewrite morphimEdom.

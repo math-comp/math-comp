@@ -50,7 +50,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Section PgroupDefs.
 
@@ -158,7 +158,7 @@ Proof. exact: p'natEpi (cardG_gt0 G). Qed.
 Lemma pgroup_pi G : \pi(G).-group G.
 Proof. by rewrite /=; apply: pnat_pi. Qed.
 
-Lemma partG_eq1 pi G : (#|G|`_pi == 1%N) = pi^'.-group G.
+Lemma partG_eq1 pi G : (#|G|`_pi == 1)%N = pi^'.-group G.
 Proof. exact: partn_eq1 (cardG_gt0 G). Qed.
 
 Lemma pgroupP pi G :
@@ -231,7 +231,7 @@ move=> coKR pR ntR; have [p_pr _ [e oK]] := pgroup_pdiv pR ntR.
 by rewrite oK coprime_sym coprime_pexpl // prime_coprime // -p'natE in coKR.
 Qed.
 
-Lemma card_Hall pi G H : pi.-Hall(G) H -> #|H| = #|G|`_pi.
+Lemma card_Hall pi G H : pi.-Hall(G) H -> #|H| = (#|G|`_pi)%N.
 Proof.
 case/and3P=> sHG piH pi'H; rewrite -(Lagrange sHG).
 by rewrite partnM ?Lagrange // part_pnat_id ?part_p'nat ?muln1.
@@ -243,7 +243,7 @@ Proof. by case/andP. Qed.
 Lemma pHall_pgroup pi A B : pi.-Hall(A) B -> pi.-group B.
 Proof. by case/and3P. Qed.
 
-Lemma pHallP pi G H : reflect (H \subset G /\ #|H| = #|G|`_pi) (pi.-Hall(G) H).
+Lemma pHallP pi G H : reflect (H \subset G /\ #|H| = #|G|`_pi)%N (pi.-Hall(G) H).
 Proof.
 apply: (iffP idP) => [piH | [sHG oH]].
   by split; [apply: pHall_sub piH | apply: card_Hall].
@@ -251,7 +251,7 @@ rewrite /pHall sHG -divgS // /pgroup oH.
 by rewrite -{2}(@partnC pi #|G|) ?mulKn ?part_pnat.
 Qed.
 
-Lemma pHallE pi G H : pi.-Hall(G) H = (H \subset G) && (#|H| == #|G|`_pi).
+Lemma pHallE pi G H : pi.-Hall(G) H = (H \subset G) && (#|H| == #|G|`_pi)%N.
 Proof. by apply/pHallP/andP=> [] [->] /eqP. Qed.
 
 Lemma coprime_mulpG_Hall pi G K R :
@@ -503,7 +503,7 @@ Qed.
 Lemma p'_elt_constt pi x : pi^'.-elt (x * (x.`_pi)^-1).
 Proof. by rewrite -{1}(consttC pi^' x) consttNK mulgK p_elt_constt. Qed.
 
-Lemma order_constt pi (x : gT) : #[x.`_pi] = #[x]`_pi.
+Lemma order_constt pi (x : gT) : #[x.`_pi] = (#[x]`_pi)%N.
 Proof.
 rewrite -{2}(consttC pi x) orderM; [|exact: commuteX2|]; last first.
   by apply: (@pnat_coprime pi); apply: p_elt_constt.

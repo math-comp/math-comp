@@ -12,7 +12,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GroupScope.
+Local Open Scope group_scope.
 
 Lemma burnside_formula : forall (gT : finGroupType) s (G : {group gT}),
    uniq s -> s =i G ->
@@ -747,7 +747,7 @@ move=> p; rewrite !L_iso sop_morph seqs1.
 by move/sop: p; apply/allP; vm_compute.
 Qed.
 
-Definition indir_iso3l := map (mulg s0) dir_iso3l.
+Definition indir_iso3l := map (mul s0) dir_iso3l.
 
 Definition iso3l := dir_iso3l ++ indir_iso3l.
 
