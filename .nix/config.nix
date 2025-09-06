@@ -85,6 +85,11 @@ with builtins; with (import <nixpkgs> {}).lib;
          #   for a complete list of Coq packages available in Nix
          # * <github_login>:<branch> is such that this will use the branch <branch>
          #   from https://github.com/<github_login>/<repository>
+         mathcomp-algebra-tactics.override.version = "proux01:mc1456";
+         mathcomp-apery.override.version = "proux01:mc1456";
+         coq-bits.override.version = "mc1456";
+         graph-theory.override.version = "mc1456";
+         mathcomp-infotheo.override.version = "proux01:mc1456";
        };
   in {
     "rocq-master" = { rocqPackages = {
