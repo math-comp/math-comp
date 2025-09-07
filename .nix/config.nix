@@ -69,8 +69,8 @@ with builtins; with (import <nixpkgs> {}).lib;
          mathcomp-doc.job = true;
          mathcomp.job = false;
          stdlib.job = true;
-         jasmin.override.version = "main";
-         ssprove.override.version = "main";
+         #jasmin.override.version = "main";
+         #ssprove.override.version = "main";
          # To add an overlay applying to all bundles,
          # add below a line like
          #<package>.override.version = "<github_login>:<branch>";
@@ -81,6 +81,9 @@ with builtins; with (import <nixpkgs> {}).lib;
          # * <github_login>:<branch> is such that this will use the branch <branch>
          #   from https://github.com/<github_login>/<repository>
          micromega-plugin.override.version = "master";
+         ssprove.override.version = "proux01:mc1456";
+         jasmin.override.version = "proux01:mc1456";
+         mathcomp-infotheo.override.version = "proux01:mc1456";
        };
   in {
     "rocq-master" = { rocqPackages = {
