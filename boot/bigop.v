@@ -2738,10 +2738,12 @@ Lemma bigmax_sup (I : finType) i0 (P : pred I) m F :
 Proof. by move=> Pi0 le_m_Fi0; apply: leq_trans (leq_bigmax_cond i0 Pi0). Qed.
 Arguments bigmax_sup [I] i0 [P m F].
 
-Lemma bigmax_sup_seq (I : eqType) r i0 (P : pred I) m F :
+Lemma bigmaxn_sup_seq (I : eqType) r i0 (P : pred I) m F :
   i0 \in r -> P i0 -> m <= F i0 -> m <= \max_(i <- r | P i) F i.
 Proof. by move=> i0r Pi0 ?; apply: leq_trans (leq_bigmax_seq i0 _ _). Qed.
-Arguments bigmax_sup_seq [I r] i0 [P m F].
+Arguments bigmaxn_sup_seq [I r] i0 [P m F].
+#[deprecated(since="mathcomp 2.5.0", note="Use bigmaxn_sup_seq instead.")]
+Notation bigmax_sup_seq := bigmaxn_sup_seq.
 
 Lemma bigmax_eq_arg (I : finType) i0 (P : pred I) F :
   P i0 -> \max_(i | P i) F i = F [arg max_(i > i0 | P i) F i].
