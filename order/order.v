@@ -3147,8 +3147,8 @@ Lemma subset_bigmax_cond [x0] (I : finType) (A A' P P' : {pred I}) (F : I -> T) 
   \big[max/x0]_(i in A | P i) F i <= \big[max/x0]_(i in A' | P' i) F i.
 Proof. exact: subset_le_big_cond. Qed.
 
-Section bigminmax_eqType.
-Context (I : eqType) (r : seq I) (x : T).
+Section bigminmax_Type.
+Context (I : Type) (r : seq I) (x : T).
 Implicit Types (P : pred I) (F : I -> T).
 
 Lemma bigmin_le_id P F : \big[min/x]_(i <- r | P i) F i <= x.
@@ -3165,7 +3165,7 @@ Lemma bigmax_eq_id P F :
   (forall i, P i -> x >= F i) -> \big[max/x]_(i <- r | P i) F i = x.
 Proof. by move=> x_ge; apply: le_anti; rewrite bigmax_ge_id bigmax_le. Qed.
 
-End bigminmax_eqType.
+End bigminmax_Type.
 
 Section bigminmax_finType.
 Context (I : finType) (x : T).
