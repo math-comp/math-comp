@@ -98,7 +98,7 @@ Notation FalgType := falgType.
 
 (* Supply a default unitRing mixin for the default unitAlgType base type. *)
 HB.factory Record Algebra_isFalgebra (K : fieldType) A
-           of Vector K A & GRing.Algebra K A := {}.
+           of Vector K A & GRing.NzAlgebra K A := {}.
 
 HB.builders Context K A of Algebra_isFalgebra K A.
   Let vA : Vector.type K := A.
@@ -167,7 +167,7 @@ Section FalgLfun.
 Variable (R : comNzRingType) (aT : falgType R).
 Implicit Types f g : 'End(aT).
 
-HB.instance Definition _ := GRing.Algebra.copy 'End(aT)
+HB.instance Definition _ := GRing.NzAlgebra.copy 'End(aT)
   (lfun_algType (FalgType_proper aT)).
 
 Lemma lfun_mulE f g u : (f * g) u = g (f u). Proof. exact: lfunE. Qed.
