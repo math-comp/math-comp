@@ -3147,8 +3147,8 @@ Lemma subset_bigmax_cond [x0] (I : finType) (A A' P P' : {pred I}) (F : I -> T) 
   \big[max/x0]_(i in A | P i) F i <= \big[max/x0]_(i in A' | P' i) F i.
 Proof. exact: subset_le_big_cond. Qed.
 
-Section bigminmax_eqType.
-Context (I : eqType) (r : seq I) (x : T).
+Section bigminmax_Type.
+Context (I : Type) (r : seq I) (x : T).
 Implicit Types (P : pred I) (F : I -> T).
 
 Lemma bigmin_le_id P F : \big[min/x]_(i <- r | P i) F i <= x.
@@ -3164,6 +3164,36 @@ Proof. by move=> x_le; apply: le_anti; rewrite bigmin_le_id le_bigmin. Qed.
 Lemma bigmax_eq_id P F :
   (forall i, P i -> x >= F i) -> \big[max/x]_(i <- r | P i) F i = x.
 Proof. by move=> x_ge; apply: le_anti; rewrite bigmax_ge_id bigmax_le. Qed.
+
+End bigminmax_Type.
+
+Section bigminmax_eqType.
+Context (I : eqType) (r : seq I) (x : T).
+Implicit Types (P : pred I) (F : I -> T).
+
+Lemma ge_bigmin_seq i0 P F :
+  i0 \in r -> P i0 -> \big[min/x]_(i <- r | P i) F i <= F i0.
+Proof.
+move=> + Pi0; elim: r => // h t ih; rewrite inE big_cons.
+move=> /predU1P[<-|i0t]; first by rewrite Pi0 ge_min// lexx.
+by case: ifPn => Ph; [rewrite ge_min ih// orbT|rewrite ih].
+Qed.
+
+Lemma le_bigmax_seq i0 P F :
+  i0 \in r -> P i0 -> F i0 <= \big[max/x]_(i <- r | P i) F i.
+Proof.
+move=> + Pi0; elim: r => // h t ih; rewrite inE big_cons.
+move=> /predU1P[<-|i0t]; first by rewrite Pi0 le_max// lexx.
+by case: ifPn => Ph; [rewrite le_max ih// orbT|rewrite ih].
+Qed.
+
+Lemma bigmin_inf_seq i0 P t F :
+  i0 \in r -> P i0 -> F i0 <= t -> \big[min/x]_(i <- r | P i) F i <= t.
+Proof. by move=> ? ? ?; exact: le_trans (@ge_bigmin_seq i0 _ _ _ _) _. Qed.
+
+Lemma bigmax_sup_seq i0 P t F :
+  i0 \in r -> P i0 -> t <= F i0 -> t <= \big[max/x]_(i <- r | P i) F i.
+Proof. by move=> ? ? ?; exact: le_trans (@le_bigmax_seq i0 _ _ _ _). Qed.
 
 End bigminmax_eqType.
 
@@ -3379,6 +3409,10 @@ Arguments bigmin_eq_arg {disp T I} x j.
 Arguments bigmax_eq_arg {disp T I} x j.
 Arguments eq_bigmin {disp T I x} j.
 Arguments eq_bigmax {disp T I x} j.
+Arguments ge_bigmin_seq {disp T I r} x i0 P.
+Arguments le_bigmax_seq {disp T I r} x i0 P.
+Arguments bigmin_inf_seq {disp T I r} x i0 P.
+Arguments bigmax_sup_seq {disp T I r} x i0 P.
 
 (* FIXME: some lemmas in the following section should hold for any porderType *)
 Module Import DualTotalTheory.
