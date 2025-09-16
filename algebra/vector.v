@@ -10,12 +10,19 @@ From mathcomp Require Import ssralg matrix mxalgebra zmodp.
 (*                                                                            *)
 (* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
 (*                                                                            *)
+(*       semiVectType R == interface structure for finite dimensional (more   *)
+(*                         precisely, detachable) semi-vector spaces over R,  *)
+(*                         which should be at least a nzSemiRingType          *)
+(*                         The HB class is called SemiVector.                 *)
 (*           vectType R == interface structure for finite dimensional (more   *)
 (*                         precisely, detachable) vector spaces over R, which *)
 (*                         should be at least a nzRingType                    *)
 (*                         The HB class is called Vector.                     *)
+(* SemiVector.axiom n M <-> type M is semilinearly isomorphic to 'rV_n        *)
+(*                      := there is a bijection v2r : M -> 'rV_n that is      *)
+(*                         semilinear                                         *)
 (*     Vector.axiom n M <-> type M is linearly isomorphic to 'rV_n            *)
-(*                         := {v2r : M -> 'rV_n| linear v2r & bijective v2r}  *)
+(*                      := {v2r : M -> 'rV_n| linear v2r & bijective v2r}     *)
 (*          {vspace vT} == the type of (detachable) subspaces of vT; vT       *)
 (*                         should have a vectType structure over a fieldType  *)
 (*           subvs_of U == the subtype of elements of V in the subspace U     *)
@@ -119,29 +126,59 @@ Delimit Scope vspace_scope with VS.
 Import GRing.Theory.
 
 (* Finite dimension vector space *)
+Record semivector_axiom_def (R : nzSemiRingType) n (V : lSemiModType R) := {
+  v2r : V -> 'rV[R]_n;
+  v2r_semilinear : semilinear v2r;
+  v2r_bijective : bijective v2r }.
+Arguments semivector_axiom_def [R] n%_N V%_type.
+
 Definition vector_axiom_def (R : nzRingType) n (V : lmodType R) :=
   {v2r : V -> 'rV[R]_n | linear v2r & bijective v2r}.
 Arguments vector_axiom_def [R] n%_N V%_type.
 
-HB.mixin Record Lmodule_hasFinDim (R : nzRingType) (V : Type) of GRing.Lmodule R V :=
+HB.mixin Record LSemiModule_hasFinDim (R : nzSemiRingType) (V : Type)
+  of GRing.LSemiModule R V :=
   { dim : nat;
-    vector_subdef : vector_axiom_def dim V }.
+    vector_subdef : semivector_axiom_def dim V }.
+
+#[mathcomp(axiom="semivector_axiom_def"), short(type="semiVectType")]
+HB.structure Definition SemiVector (R : nzSemiRingType) :=
+  { V of LSemiModule_hasFinDim R V & GRing.LSemiModule R V }.
 
 #[mathcomp(axiom="vector_axiom_def"), short(type="vectType")]
 HB.structure Definition Vector (R : nzRingType) :=
-  { V of Lmodule_hasFinDim R V & GRing.Lmodule R V }.
+  { V of LSemiModule_hasFinDim R V & GRing.Lmodule R V }.
 
 #[deprecated(since="mathcomp 2.2.0", note="Use Vector.axiom instead.")]
 Notation vector_axiom := Vector.axiom.
 Arguments dim {R} s.
 
+HB.factory Record Lmodule_hasFinDim (R : nzRingType) (V : Type)
+  of GRing.Lmodule R V :=
+  { dim : nat;
+    vector_subdef : vector_axiom_def dim V }.
+
+HB.builders Context R V of Lmodule_hasFinDim R V.
+
+Definition v2r := sval vector_subdef.
+
+HB.instance Definition _ :=
+  GRing.isLinear.Build R V 'rV_dim _ v2r (proj1 (proj2_sig vector_subdef)).
+
+HB.instance Definition _ :=
+  LSemiModule_hasFinDim.Build R V
+    (Build_semivector_axiom_def
+       (semilinearP v2r) (proj2 (proj2_sig vector_subdef))).
+
+HB.end.
+
 (* FIXME: S/space and H/hom were defined behind the module Vector *
  * Perhaps we should change their names to avoid conflicts.       *)
 Section OtherDefs.
-Local Coercion dim : Vector.type >-> nat.
-Inductive space (K : fieldType) (vT : Vector.type K) :=
+Local Coercion dim : semiVectType >-> nat.
+Inductive space (K : fieldType) (vT : vectType K) :=
   Space (mx : 'M[K]_vT) & <<mx>>%MS == mx.
-Inductive hom (R : nzRingType) (vT wT : Vector.type R) :=
+Inductive hom (R : nzSemiRingType) (vT wT : semiVectType R) :=
   Hom of 'M[R]_(vT, wT).
 End OtherDefs.
 (* /FIXME *)
@@ -169,13 +206,13 @@ End VectorExports.
 Module VectorInternalTheory.
 
 Section Iso.
-Variables (R : nzRingType) (vT rT : vectType R).
-Local Coercion dim : Vector.type >-> nat.
+Variables (R : nzSemiRingType) (vT rT : semiVectType R).
+Local Coercion dim : semiVectType >-> nat.
 
-Fact v2r_subproof : Vector.axiom vT vT. Proof. exact: vector_subdef. Qed.
-Definition v2r := s2val v2r_subproof.
+Fact v2r_subproof : SemiVector.axiom vT vT. Proof. exact: vector_subdef. Qed.
+Definition v2r := v2r v2r_subproof.
 
-Let v2r_bij : bijective v2r := s2valP' v2r_subproof.
+Let v2r_bij : bijective v2r := v2r_bijective v2r_subproof.
 Fact r2v_subproof : {r2v | cancel r2v v2r}.
 Proof.
 have r2vP r: {v | v2r v = r}.
@@ -190,14 +227,14 @@ Lemma v2rK : cancel v2r r2v.   Proof. by have/bij_can_sym:= r2vK; apply. Qed.
 Lemma v2r_inj : injective v2r. Proof. exact: can_inj v2rK. Qed.
 
 HB.instance Definition _ := GRing.isSemilinear.Build R vT 'rV_vT _ v2r
-  (GRing.semilinear_linear (s2valP v2r_subproof)).
+  (v2r_semilinear v2r_subproof).
 HB.instance Definition _ := GRing.isSemilinear.Build R 'rV_vT vT _ r2v
-  (GRing.semilinear_linear (can2_linear v2rK r2vK)).
+  (can2_semilinear v2rK r2vK).
 End Iso.
 
 Section Vspace.
 Variables (K : fieldType) (vT : vectType K).
-Local Coercion dim : Vector.type >-> nat.
+Local Coercion dim : semiVectType >-> nat.
 
 Definition b2mx n (X : n.-tuple vT) := \matrix_i v2r (tnth X i).
 Lemma b2mxK n (X : n.-tuple vT) i : r2v (row i (b2mx X)) = X`_i.
@@ -219,7 +256,7 @@ Proof. exact: genmxE. Qed.
 End Vspace.
 
 Section Hom.
-Variables (R : nzRingType) (aT rT : vectType R).
+Variables (R : nzSemiRingType) (aT rT : semiVectType R).
 Definition f2mx (f : 'Hom(aT, rT)) := let: Hom A := f in A.
 HB.instance Definition _ : isSub _ _ 'Hom(aT, rT) := [isNew for f2mx].
 End Hom.
@@ -1224,8 +1261,8 @@ Notation directv S := (directv_def (Phantom _ S%VS)).
 (* Linear functions over a vectType *)
 Section LfunDefs.
 
-Variable R : nzRingType.
-Implicit Types aT vT rT : vectType R.
+Variable R : nzSemiRingType.
+Implicit Types aT vT rT : semiVectType R.
 
 Fact lfun_key : unit. Proof. by []. Qed.
 Definition fun_of_lfun_def aT rT (f : 'Hom(aT, rT)) :=
@@ -1270,17 +1307,17 @@ Notation "f @: U" := (lfun_img f%VF%R U) (at level 24) : vspace_scope.
 Notation "f @^-1: W" := (lfun_preim f%VF%R W) (at level 24) : vspace_scope.
 Notation limg f := (lfun_img f fullv).
 
-Section LfunZmodType.
+Section LfunNmodType.
 
-Variables (R : nzRingType) (aT rT : vectType R).
+Variables (R : nzSemiRingType) (aT rT : semiVectType R).
 Implicit Types f g h : 'Hom(aT, rT).
 
 HB.instance Definition _ := [Choice of 'Hom(aT, rT) by <:].
 
-Fact lfun_is_linear f : linear f.
-Proof. by rewrite unlock; apply: linearP. Qed.
+Fact lfun_is_semilinear f : semilinear f.
+Proof. by rewrite unlock; apply: semilinearP. Qed.
 HB.instance Definition _ (f : hom aT rT) := GRing.isSemilinear.Build R aT rT _ f
-  (GRing.semilinear_linear (lfun_is_linear f)).
+  (lfun_is_semilinear f).
 
 Lemma lfunE (ff : {linear aT -> rT}) : linfun ff =1 ff.
 Proof. by move=> v; rewrite 2!unlock /= mul_rV_lin1 /= !v2rK. Qed.
@@ -1299,7 +1336,6 @@ Qed.
 
 Definition zero_lfun : 'Hom(aT, rT) := linfun \0.
 Definition add_lfun f g := linfun (f \+ g).
-Definition opp_lfun f := linfun (-%R \o f).
 
 Fact lfun_addA : associative add_lfun.
 Proof. by move=> f g h; apply/lfunP=> v; rewrite !lfunE /= !lfunE addrA. Qed.
@@ -1310,26 +1346,41 @@ Proof. by move=> f g; apply/lfunP=> v; rewrite !lfunE /= addrC. Qed.
 Fact lfun_add0 : left_id zero_lfun add_lfun.
 Proof. by move=> f; apply/lfunP=> v; rewrite lfunE /= lfunE add0r. Qed.
 
-Lemma lfun_addN : left_inverse zero_lfun opp_lfun add_lfun.
-Proof. by move=> f; apply/lfunP=> v; rewrite !lfunE /= lfunE addNr. Qed.
-
-HB.instance Definition _ := GRing.isZmodule.Build 'Hom(aT, rT)
-  lfun_addA lfun_addC lfun_add0 lfun_addN.
+HB.instance Definition _ := GRing.isNmodule.Build 'Hom(aT, rT)
+  lfun_addA lfun_addC lfun_add0.
 
 Lemma zero_lfunE x : (0 : 'Hom(aT, rT)) x = 0. Proof. exact: lfunE. Qed.
 Lemma add_lfunE f g x : (f + g) x = f x + g x. Proof. exact: lfunE. Qed.
-Lemma opp_lfunE f x : (- f) x = - f x. Proof. exact: lfunE. Qed.
 Lemma sum_lfunE I (r : seq I) (P : pred I) (fs : I -> 'Hom(aT, rT)) x :
   (\sum_(i <- r | P i) fs i) x = \sum_(i <- r | P i) fs i x.
 Proof. by elim/big_rec2: _ => [|i _ f _ <-]; rewrite lfunE. Qed.
 
-End LfunZmodType.
+End LfunNmodType.
 
 Arguments fun_of_lfunK {R aT rT}.
 
-Section LfunVectType.
+Section LfunZmodType.
 
-Variables (R : comNzRingType) (aT rT : vectType R).
+Variables (R : nzRingType) (aT rT : vectType R).
+Implicit Types f g h : 'Hom(aT, rT).
+
+Let zero_lfun := @zero_lfun R aT rT.
+Let add_lfun := @add_lfun R aT rT.
+Definition opp_lfun f := linfun (-%R \o f).
+
+Lemma lfun_addN : left_inverse zero_lfun opp_lfun add_lfun.
+Proof. by move=> f; apply/lfunP=> v; rewrite !lfunE /= lfunE addNr. Qed.
+
+HB.instance Definition _ := GRing.Nmodule_isZmodule.Build 'Hom(aT, rT)
+  lfun_addN.
+
+Lemma opp_lfunE f x : (- f) x = - f x. Proof. exact: lfunE. Qed.
+
+End LfunZmodType.
+
+Section LfunSemiVectType.
+
+Variables (R : comNzSemiRingType) (aT rT : semiVectType R).
 Implicit Types f : 'Hom(aT, rT).
 
 Definition scale_lfun k f := linfun (k \*: f).
@@ -1337,6 +1388,9 @@ Local Infix "*:l" := scale_lfun (at level 40).
 
 Fact lfun_scaleA k1 k2 f : k1 *:l (k2 *:l f) = (k1 * k2) *:l f.
 Proof. by apply/lfunP=> v; rewrite !lfunE /= lfunE scalerA. Qed.
+
+Fact lfun_scale0 f : 0 *:l f = 0.
+Proof. by apply/lfunP=> v; rewrite !lfunE /= scale0r. Qed.
 
 Fact lfun_scale1 f : 1 *:l f = f.
 Proof. by apply/lfunP=> v; rewrite lfunE /= scale1r. Qed.
@@ -1347,30 +1401,33 @@ Proof. by apply/lfunP=> v; rewrite !lfunE /= !lfunE scalerDr. Qed.
 Fact lfun_scaleDl f k1 k2 : (k1 + k2) *:l f = k1 *:l f + k2 *:l f.
 Proof. by apply/lfunP=> v; rewrite !lfunE /= !lfunE scalerDl. Qed.
 
-HB.instance Definition _ :=
-  GRing.Zmodule_isLmodule.Build _ 'Hom(aT, rT)
-    lfun_scaleA lfun_scale1 lfun_scaleDr lfun_scaleDl.
+HB.instance Definition _ := GRing.Nmodule_isLSemiModule.Build _ 'Hom(aT, rT)
+  lfun_scaleA lfun_scale0 lfun_scale1 lfun_scaleDr lfun_scaleDl.
 
 Lemma scale_lfunE k f x : (k *: f) x = k *: f x. Proof. exact: lfunE. Qed.
 
-Fact lfun_vect_iso : Vector.axiom (dim aT * dim rT) 'Hom(aT, rT).
+Fact lfun_vect_iso : SemiVector.axiom (dim aT * dim rT) 'Hom(aT, rT).
 Proof.
-exists (mxvec \o f2mx) => [a f g|].
-  rewrite /= -linearP /= -[A in _ = mxvec A]/(f2mx (Hom _)).
-  congr (mxvec (f2mx _)); apply/lfunP=> v; do 2!rewrite lfunE /=.
-  by rewrite unlock /= -linearP mulmxDr scalemxAr.
+exists (mxvec \o f2mx).
+  by split => [a f|f g]; rewrite -semilinearP/=;
+    rewrite -[A in _ = mxvec A]/(f2mx (Hom _)); congr (mxvec (f2mx _));
+    apply/lfunP=> v; rewrite lfunE/= unlock /= -!semilinearP.
 apply: Bijective (Hom \o vec_mx) _ _ => [[A]|A] /=; last exact: vec_mxK.
 by rewrite mxvecK.
 Qed.
 
-HB.instance Definition _ := Lmodule_hasFinDim.Build _ 'Hom(aT, rT)
+HB.instance Definition _ := LSemiModule_hasFinDim.Build _ 'Hom(aT, rT)
   lfun_vect_iso.
 
-End LfunVectType.
+End LfunSemiVectType.
+
+(* TODO: HB.saturate *)
+HB.instance Definition _ (R : comNzRingType) (aT rT : vectType R) :=
+  SemiVector.on 'Hom(aT, rT).
 
 Section CompLfun.
 
-Variables (R : nzRingType) (wT aT vT rT : vectType R).
+Variables (R : nzSemiRingType) (wT aT vT rT : semiVectType R).
 Implicit Types (f : 'Hom(vT, rT)) (g : 'Hom(aT, vT)) (h : 'Hom(wT, aT)).
 
 Lemma id_lfunE u: \1%VF u = u :> aT. Proof. exact: lfunE. Qed.
@@ -1397,6 +1454,13 @@ Proof. by apply/lfunP=> u; do !rewrite lfunE /=. Qed.
 Lemma comp_lfunDr f g1 g2 : (f \o (g1 + g2) = (f \o g1) + (f \o g2))%VF.
 Proof. by apply/lfunP=> u; do !rewrite lfunE /=; rewrite linearD. Qed.
 
+End CompLfun.
+
+Section CompLfun.
+
+Variables (R : nzRingType) (wT aT vT rT : vectType R).
+Implicit Types (f : 'Hom(vT, rT)) (g : 'Hom(aT, vT)) (h : 'Hom(wT, aT)).
+
 Lemma comp_lfunNl f g : ((- f) \o g = - (f \o g))%VF.
 Proof. by apply/lfunP=> u; do !rewrite lfunE /=. Qed.
 
@@ -1410,7 +1474,7 @@ Definition lfun_simp :=
 
 Section ScaleCompLfun.
 
-Variables (R : comNzRingType) (aT vT rT : vectType R).
+Variables (R : comNzSemiRingType) (aT vT rT : semiVectType R).
 Implicit Types (f : 'Hom(vT, rT)) (g : 'Hom(aT, vT)).
 
 Lemma comp_lfunZl k f g : (k *: (f \o g) = (k *: f) \o g)%VF.
@@ -1956,78 +2020,96 @@ Arguments vsprojK {K vT U} [x] Ux.
 
 Section MatrixVectType.
 
-Variables (R : nzRingType) (m n : nat).
+Variables (R : nzSemiRingType) (m n : nat).
 
 (* The apparently useless => /= in line 1 of the proof performs some evar     *)
 (* expansions that the Ltac interpretation of exists is incapable of doing.   *)
-Fact matrix_vect_iso : Vector.axiom (m * n) 'M[R]_(m, n).
+Fact matrix_vect_iso : SemiVector.axiom (m * n) 'M[R]_(m, n).
 Proof.
-exists mxvec => /=; first exact: linearP.
+exists mxvec; first exact: semilinearP.
 by exists vec_mx; [apply: mxvecK | apply: vec_mxK].
 Qed.
-HB.instance Definition _ := Lmodule_hasFinDim.Build _ 'M[R]_(m, n) matrix_vect_iso.
+HB.instance Definition _ := LSemiModule_hasFinDim.Build _ 'M[R]_(m, n)
+  matrix_vect_iso.
 
 Lemma dim_matrix : dim 'M[R]_(m, n) = m * n.
 Proof. by []. Qed.
 
 End MatrixVectType.
 
+(* TODO: HB.saturate *)
+HB.instance Definition _ (R : nzRingType) (m n : nat) :=
+  SemiVector.on 'M[R]_(m, n).
+
 (* A ring is a one-dimension vector space *)
 Section RegularVectType.
 
-Variable R : nzRingType.
+Variable R : nzSemiRingType.
 
-Fact regular_vect_iso : Vector.axiom 1 R^o.
+Fact regular_vect_iso : SemiVector.axiom 1 R^o.
 Proof.
-exists (fun a => a%:M) => [a b c|]; first by rewrite rmorphD scale_scalar_mx.
+exists (fun a => a%:M).
+  by split => [a b|c d]; rewrite 1?rmorphD 1?scale_scalar_mx.
 by exists (fun A : 'M_1 => A 0 0) => [a | A]; rewrite ?mxE // -mx11_scalar.
 Qed.
-HB.instance Definition _ := Lmodule_hasFinDim.Build _ R^o regular_vect_iso.
+HB.instance Definition _ := LSemiModule_hasFinDim.Build _ R^o regular_vect_iso.
 
 End RegularVectType.
+
+(* TODO: HB.saturate *)
+HB.instance Definition _ (R : nzRingType) := SemiVector.on R^o.
 
 (* External direct product of two vectTypes. *)
 Section ProdVector.
 
-Variables (R : nzRingType) (vT1 vT2 : vectType R).
+Variables (R : nzSemiRingType) (vT1 vT2 : semiVectType R).
 
-Fact pair_vect_iso : Vector.axiom (dim vT1 + dim vT2) (vT1 * vT2).
+Fact pair_vect_iso : SemiVector.axiom (dim vT1 + dim vT2) (vT1 * vT2).
 Proof.
 pose p2r (u : vT1 * vT2) := row_mx (v2r u.1) (v2r u.2).
 pose r2p w := (r2v (lsubmx w) : vT1, r2v (rsubmx w) : vT2).
 have r2pK : cancel r2p p2r by move=> w; rewrite /p2r !r2vK hsubmxK.
 have p2rK : cancel p2r r2p by case=> u v; rewrite /r2p row_mxKl row_mxKr !v2rK.
-have r2p_lin: linear r2p by move=> a u v; congr (_ , _); rewrite /= !linearP.
-pose r2plM := GRing.isLinear.Build _ _ _ _ r2p r2p_lin.
+have r2p_lin: semilinear r2p.
+  by split=> [a u|u v]; congr (_, _); rewrite !semilinearP.
+pose r2plM := GRing.isSemilinear.Build _ _ _ _ r2p r2p_lin.
 pose r2pL : {linear _ -> _} := HB.pack r2p r2plM.
-by exists p2r; [apply: (@can2_linear _ _ _ r2pL) | exists r2p].
+by exists p2r; [apply: (@can2_semilinear _ _ _ r2pL) | exists r2p].
 Qed.
-HB.instance Definition _ := Lmodule_hasFinDim.Build _ (vT1 * vT2)%type
+HB.instance Definition _ := LSemiModule_hasFinDim.Build _ (vT1 * vT2)%type
   pair_vect_iso.
 
 End ProdVector.
 
+(* TODO: HB.saturate *)
+HB.instance Definition _ (R : nzRingType) (vT1 vT2 : vectType R) :=
+  SemiVector.on (vT1 * vT2)%type.
+
 (* Function from a finType into a ring form a vectype. *)
 Section FunVectType.
 
-Variable (I : finType) (R : nzRingType) (vT : vectType R).
+Variable (I : finType) (R : nzSemiRingType) (vT : semiVectType R).
 
 (* Type unification with exist is again a problem in this proof. *)
-Fact ffun_vect_iso : Vector.axiom (#|I| * dim vT) {ffun I -> vT}.
+Fact ffun_vect_iso : SemiVector.axiom (#|I| * dim vT) {ffun I -> vT}.
 Proof.
 pose fr (f : {ffun I -> vT}) := mxvec (\matrix_(i < #|I|) v2r (f (enum_val i))).
-exists fr => /= [k f g|].
-  rewrite -linearP; congr mxvec; apply/matrixP=> i j.
-  by rewrite !mxE !ffunE linearP !mxE.
+exists fr.
+  by split=> [k f|f g]; rewrite -semilinearP; congr mxvec;
+    apply/matrixP=> i j; rewrite mxE ffunE semilinearP !mxE.
 exists (fun r => [ffun i => r2v (row (enum_rank i) (vec_mx r)) : vT]) => [g|r].
   by apply/ffunP=> i; rewrite ffunE mxvecK rowK v2rK enum_rankK.
 by apply/(canLR vec_mxK)/matrixP=> i j; rewrite mxE ffunE r2vK enum_valK mxE.
 Qed.
 
-HB.instance Definition _ := Lmodule_hasFinDim.Build _ {ffun I -> vT}
+HB.instance Definition _ := LSemiModule_hasFinDim.Build _ {ffun I -> vT}
   ffun_vect_iso.
 
 End FunVectType.
+
+(* TODO: HB.saturate *)
+HB.instance Definition _ (I : finType) (R : nzRingType) (vT : vectType R) :=
+  SemiVector.on {ffun I -> vT}.
 
 (* Solving a tuple of linear equations. *)
 Section Solver.
