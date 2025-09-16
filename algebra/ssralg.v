@@ -548,7 +548,7 @@ From mathcomp Require Export nmodule.
 (*    are coercions the machinery will be mostly invisible (with only the     *)
 (*    {linear ...} structure and %Rlin notations showing), but users should   *)
 (*    beware that in (a *: f u)%Rlin, a actually occurs in the f u subterm.   *)
-(* -> The simpler linear_LR, or more specialized linearZZ and scalarZ rules   *)
+(* -> The simpler linearZ_LR, or more specialized linearZZ and scalarZ rules  *)
 (*    should be used instead of linearZ if there are complexity issues, as    *)
 (*    well as for explicit forward and backward application, as the main      *)
 (*    parameter of linearZ is a proper sub-interface of {linear U -> V | s}.  *)
