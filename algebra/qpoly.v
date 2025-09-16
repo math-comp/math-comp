@@ -55,8 +55,8 @@ Reserved Notation "'qX".
 Reserved Notation "{ 'poly' '%/' p }"
   (p at level 2, format "{ 'poly'  '%/'  p }").
 
-Section poly_of_size_zmod.
-Context {R : nzRingType}.
+Section poly_of_size_nmod.
+Context {R : nzSemiRingType}.
 Implicit Types (n : nat).
 
 Section poly_of_size.
@@ -66,15 +66,16 @@ Definition poly_of_size_pred := fun p : {poly R} => size p <= n.
 Arguments poly_of_size_pred _ /.
 Definition poly_of_size := [qualify a p | poly_of_size_pred p].
 
-Lemma npoly_submod_closed : submod_closed poly_of_size.
+Lemma npoly_submod_closed : subsemimod_closed poly_of_size.
 Proof.
-split=> [|x p q sp sq]; rewrite qualifE/= ?size_polyC ?eqxx//.
-rewrite (leq_trans (size_polyD _ _)) // geq_max.
-by rewrite (leq_trans (size_scale_leq _ _)).
+split=> [|x q sq]; first split=> [|p q sp sq]; rewrite qualifE/= ?size_poly0//.
+  by rewrite (leq_trans (size_polyD _ _)) // geq_max [_ <= _]sp.
+exact: leq_trans (size_scale_leq _ _) sq.
 Qed.
 
 HB.instance Definition _ :=
-  GRing.isSubmodClosed.Build R {poly R} poly_of_size_pred npoly_submod_closed.
+  GRing.isSubSemiModClosed.Build R {poly R} poly_of_size_pred
+    npoly_submod_closed.
 
 End poly_of_size.
 
@@ -100,11 +101,10 @@ Proof. exact: npoly_is_a_poly_of_size. Qed.
 Hint Resolve size_npoly : core.
 
 HB.instance Definition _ := [Choice of npoly by <:].
-HB.instance Definition _ := [SubChoice_isSubLmodule of npoly by <:].
+HB.instance Definition _ := [SubChoice_isSubLSemiModule of npoly by <:].
 
 Definition npoly_rV : npoly -> 'rV[R]_n := poly_rV \o val.
-Definition rVnpoly : 'rV[R]_n -> npoly :=
-  insubd (0 : npoly) \o rVpoly.
+Definition rVnpoly : 'rV[R]_n -> npoly := insubd (0 : npoly) \o rVpoly.
 Arguments rVnpoly /.
 Arguments npoly_rV /.
 
@@ -117,13 +117,14 @@ Lemma rVnpolyK : cancel rVnpoly npoly_rV.
 Proof. by move=> p /=; rewrite val_insubd [_ \is a _]size_poly rVpolyK. Qed.
 Hint Resolve npoly_rV_K rVnpolyK : core.
 
-Lemma npoly_vect_axiom : Vector.axiom n npoly.
-Proof. by exists npoly_rV; [exact:linearPZ | exists rVnpoly]. Qed.
+Lemma npoly_vect_axiom : SemiVector.axiom n npoly.
+Proof. by exists npoly_rV; [exact: semilinearPZ | exists rVnpoly]. Qed.
 
-HB.instance Definition _ := Lmodule_hasFinDim.Build R npoly npoly_vect_axiom.
+HB.instance Definition _ := LSemiModule_hasFinDim.Build R npoly
+  npoly_vect_axiom.
 
 End npoly.
-End poly_of_size_zmod.
+End poly_of_size_nmod.
 
 Arguments npoly {R}%_type n%_N.
 
@@ -135,20 +136,45 @@ Hint Resolve size_npoly npoly_is_a_poly_of_size : core.
 Arguments poly_of_size_pred _ _ _ /.
 Arguments npoly : clear implicits.
 
-HB.instance Definition _ (R : countNzRingType) n :=
+Section poly_of_size_zmod.
+
+Variables (R : nzRingType) (n : nat).
+
+Lemma npoly_oppr_closed : oppr_closed (@poly_of_size R n).
+Proof. by move=> p sp; rewrite qualifE/= size_polyN. Qed.
+
+HB.instance Definition _ :=
+  GRing.isOppClosed.Build {poly R} (@poly_of_size_pred R n) npoly_oppr_closed.
+
+Definition opp (p : {poly_n R}) : {poly_n R} := insubd 0 (- val p).
+
+Lemma oppNp : left_inverse 0 opp +%R.
+Proof.
+by move=> p; apply/val_inj; rewrite /= insubdK ?addNr// rpredN; case: p.
+Qed.
+
+HB.instance Definition _ := GRing.Nmodule_isZmodule.Build {poly_n R} oppNp.
+
+End poly_of_size_zmod.
+
+HB.instance Definition _ (R : countNzSemiRingType) n :=
   [Countable of {poly_n R} by <:].
 
-HB.instance Definition _  (R : finNzRingType) n : isFinite {poly_n R} :=
+HB.instance Definition _ (R : countNzRingType) n := GRing.Zmodule.on {poly_n R}.
+
+HB.instance Definition _  (R : finNzSemiRingType) n : isFinite {poly_n R} :=
   CanIsFinite (@npoly_rV_K R n).
 
-Section npoly_theory.
-Context (R : nzRingType) {n : nat}.
+HB.instance Definition _  (R : finNzRingType) n := GRing.Zmodule.on {poly_n R}.
 
-Lemma polyn_is_linear : linear (@polyn _ _ : {poly_n R} -> _).
+Section npoly_theory.
+Context (R : nzSemiRingType) {n : nat}.
+
+Lemma polyn_is_semilinear : semilinear (@polyn _ _ : {poly_n R} -> _).
 Proof. by []. Qed.
 HB.instance Definition _ :=
   GRing.isSemilinear.Build R {poly_n R} {poly R} _ (polyn (n:=n))
-    (GRing.semilinear_linear polyn_is_linear).
+    polyn_is_semilinear.
 
 Canonical mk_npoly (E : nat -> R) : {poly_n R} :=
   @NPoly R _ (\poly_(i < n) E i) (size_poly _ _).
@@ -192,7 +218,7 @@ Arguments npolyp {R} n p.
 
 Section fin_npoly.
 
-Variable R : finNzRingType.
+Variable R : finNzSemiRingType.
 Variable n : nat.
 Implicit Types p q : {poly_n R}.
 
@@ -409,7 +435,7 @@ Notation "x .-lagrange_" := (tnth x.-lagrange) : ring_scope.
 
 Section Qpoly.
 
-Variable R : nzRingType.
+Variable R : nzSemiRingType.
 Variable h : {poly R}.
 
 Definition mk_monic := 
@@ -524,17 +550,18 @@ End QpolyProp.
 
 Notation "'qX" := (qpolyX _) : ring_scope.
 
-Lemma mk_monic_X (R : nzRingType) : mk_monic 'X = 'X :> {poly R}.
+Lemma mk_monic_X (R : nzSemiRingType) : mk_monic 'X = 'X :> {poly R}.
 Proof. by rewrite /mk_monic size_polyX monicX. Qed.
 
-Lemma mk_monic_Xn (R : nzRingType) n : mk_monic 'X^n = 'X^(n.-1.+1) :> {poly R}.
+Lemma mk_monic_Xn (R : nzSemiRingType) n :
+  mk_monic 'X^n = 'X^(n.-1.+1) :> {poly R}.
 Proof. by case: n => [|n]; rewrite /mk_monic size_polyXn monicXn /= ?expr1. Qed.
 
-Lemma card_qpoly (R : finNzRingType) (h : {poly R}):
+Lemma card_qpoly (R : finNzSemiRingType) (h : {poly R}):
    #|{poly %/ h}| = #|R| ^ (size (mk_monic h)).-1.
 Proof. by rewrite card_npoly. Qed.
 
-Lemma card_monic_qpoly (R : finNzRingType) (h : {poly R}):
+Lemma card_monic_qpoly (R : finNzSemiRingType) (h : {poly R}):
   1 < size h -> h \is monic ->  #|{poly %/ h}| = #|R| ^ (size h).-1.
 Proof. by move=> sh_gt1 hM; rewrite card_qpoly /mk_monic sh_gt1 hM. Qed.
 
@@ -625,7 +652,7 @@ by rewrite exprS /= IH // rmodp_mulmr // -exprS.
 Qed.
 
 Lemma qpolyCN (a : A) : qpolyC h (- a) = -(qpolyC h a).
-Proof. apply: val_inj; rewrite /= raddfN //= raddfN. Qed.
+Proof. by apply: val_inj; rewrite /= raddfN //= raddfN. Qed.
 
 Lemma qpolyCD : {morph (qpolyC h) : a b / a + b >-> a + b}%R.
 Proof. by move=> a b; apply/val_eqP/eqP=> /=; rewrite -!raddfD. Qed.
