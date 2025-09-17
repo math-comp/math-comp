@@ -433,10 +433,7 @@ Lemma tuple_map_ord U (t : n.-tuple U) : t = [tuple of map (tnth t) ord_tuple].
 Proof. by apply: val_inj => /=; rewrite map_tnth_enum. Qed.
 
 Lemma tnth_ord_tuple i : tnth ord_tuple i = i.
-Proof.
-apply: val_inj; rewrite (tnth_nth i) -(nth_map _ 0) ?size_tuple //.
-by rewrite /= enumT unlock val_ord_enum nth_iota.
-Qed.
+Proof. by rewrite (tnth_nth i) val_ord_tuple nth_ord_enum. Qed.
 
 Section ImageTuple.
 
