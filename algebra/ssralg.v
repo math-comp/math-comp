@@ -2961,6 +2961,28 @@ Proof. by rewrite exprDn_comm //; apply: mulrC. Qed.
 Lemma sqrrD x y : (x + y) ^+ 2 = x ^+ 2 + x * y *+ 2 + y ^+ 2.
 Proof. by rewrite exprDn !big_ord_recr big_ord0 /= add0r mulr1 mul1r. Qed.
 
+Lemma rmorph_comm (S : pzSemiRingType) (f : {rmorphism R -> S}) x y :
+  comm (f x) (f y).
+Proof. by red; rewrite -!rmorphM mulrC. Qed.
+
+Section ScaleLinear.
+
+Variables (U V : lSemiModType R) (b : R) (f : {linear U -> V}).
+
+Lemma scale_is_scalable : scalable ( *:%R b : V -> V).
+Proof. by move=> a v /=; rewrite !scalerA mulrC. Qed.
+#[export]
+HB.instance Definition _ :=
+  isScalable.Build R V V *:%R ( *:%R b) scale_is_scalable.
+
+Lemma scale_fun_is_scalable : scalable (b \*: f).
+Proof. by move=> a v /=; rewrite !linearZ. Qed.
+#[export]
+HB.instance Definition _ :=
+  isScalable.Build R U V *:%R (b \*: f) scale_fun_is_scalable.
+
+End ScaleLinear.
+
 End ComSemiRingTheory.
 
 (* FIXME: Generalize to `comPzSemiRingType` ? *)
@@ -2999,29 +3021,6 @@ have pcharRp: p \in pchar R by rewrite (pnatPpi pcharRn) ?pi_pdiv.
 have{pcharRn} /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (pcharf_eq pcharRp)).
 by elim: e => // e IHe; rewrite !expnSr !exprM IHe -pFrobenius_autE rmorphD.
 Qed.
-
-(* FIXME: Generalize to `comPzSemiRingType` ? *)
-Lemma rmorph_comm (S : nzSemiRingType) (f : {rmorphism R -> S}) x y :
-  comm (f x) (f y).
-Proof. by red; rewrite -!rmorphM mulrC. Qed.
-
-Section ScaleLinear.
-
-Variables (U V : lSemiModType R) (b : R) (f : {linear U -> V}).
-
-Lemma scale_is_scalable : scalable ( *:%R b : V -> V).
-Proof. by move=> a v /=; rewrite !scalerA mulrC. Qed.
-#[export]
-HB.instance Definition _ :=
-  isScalable.Build R V V *:%R ( *:%R b) scale_is_scalable.
-
-Lemma scale_fun_is_scalable : scalable (b \*: f).
-Proof. by move=> a v /=; rewrite !linearZ. Qed.
-#[export]
-HB.instance Definition _ :=
-  isScalable.Build R U V *:%R (b \*: f) scale_fun_is_scalable.
-
-End ScaleLinear.
 
 End ComNzSemiRingTheory.
 
