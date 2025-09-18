@@ -147,8 +147,7 @@ Context (R : nzRingType) {n : nat}.
 Lemma polyn_is_linear : linear (@polyn _ _ : {poly_n R} -> _).
 Proof. by []. Qed.
 HB.instance Definition _ :=
-  GRing.isSemilinear.Build R {poly_n R} {poly R} _ (polyn (n:=n))
-    (GRing.semilinear_linear polyn_is_linear).
+  GRing.isLinear.Build R {poly_n R} {poly R} _ (polyn (n:=n)) polyn_is_linear.
 
 Canonical mk_npoly (E : nat -> R) : {poly_n R} :=
   @NPoly R _ (\poly_(i < n) E i) (size_poly _ _).
@@ -475,8 +474,8 @@ Fact in_qpoly_is_linear : linear in_qpoly.
 Proof. by move=> k p q; rewrite in_qpolyD in_qpolyZ. Qed.
 
 HB.instance Definition _ :=
-  GRing.isSemilinear.Build R {poly R} {poly_(size (mk_monic h)).-1 R} _ in_qpoly
-    (GRing.semilinear_linear in_qpoly_is_linear).
+  GRing.isLinear.Build R {poly R} {poly_(size (mk_monic h)).-1 R} _ in_qpoly
+    in_qpoly_is_linear.
 
 Lemma qpolyC_proof k :
   (k%:P : {poly R}) \is a poly_of_size (size (mk_monic h)).-1.
