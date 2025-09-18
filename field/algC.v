@@ -580,7 +580,7 @@ Notation algCfield := (type : fieldType).
 Notation algCnumField := (type : numFieldType).
 Notation algCnumClosedField := (type : numClosedFieldType).
 
-Notation Creal := (@Num.Def.Rreal algCnum).
+Notation Creal := (@Num.real algCnum).
 
 Definition getCrat := let: GetCrat_spec CtoQ _ := getCrat_subproof in CtoQ.
 Definition Crat : {pred algC} := fun x => ratr (getCrat x) == x.

@@ -100,23 +100,45 @@ Notation "@ 'minr' R" := (@Order.min ring_display R)
 Section Def.
 Context {R : porderZmodType}.
 
-Definition Rpos_pred := fun x : R => 0 < x.
-Definition Rpos : qualifier 0 R := [qualify x | Rpos_pred x].
-Definition Rneg_pred := fun x : R => x < 0.
-Definition Rneg : qualifier 0 R := [qualify x : R | Rneg_pred x].
-Definition Rnneg_pred := fun x : R => 0 <= x.
-Definition Rnneg : qualifier 0 R := [qualify x : R | Rnneg_pred x].
-Definition Rnpos_pred := fun x : R => x <= 0.
-Definition Rnpos : qualifier 0 R := [qualify x : R | Rnpos_pred x].
-Definition Rreal_pred := fun x : R => (0 <= x) || (x <= 0).
-Definition Rreal : qualifier 0 R := [qualify x : R | Rreal_pred x].
+Definition pos_num_pred := fun x : R => 0 < x.
+Definition pos_num : qualifier 0 R := [qualify x | pos_num_pred x].
+Definition neg_num_pred := fun x : R => x < 0.
+Definition neg_num : qualifier 0 R := [qualify x : R | neg_num_pred x].
+Definition nneg_num_pred := fun x : R => 0 <= x.
+Definition nneg_num : qualifier 0 R := [qualify x : R | nneg_num_pred x].
+Definition npos_num_pred := fun x : R => x <= 0.
+Definition npos_num : qualifier 0 R := [qualify x : R | npos_num_pred x].
+Definition real_num_pred := fun x : R => (0 <= x) || (x <= 0).
+Definition real_num : qualifier 0 R := [qualify x : R | real_num_pred x].
 
 End Def.
 
-Arguments Rpos_pred _ _ /.
-Arguments Rneg_pred _ _ /.
-Arguments Rnneg_pred _ _ /.
-Arguments Rreal_pred _ _ /.
+Arguments pos_num_pred _ _ /.
+Arguments neg_num_pred _ _ /.
+Arguments nneg_num_pred _ _ /.
+Arguments real_num_pred _ _ /.
+
+#[deprecated(since="mathcomp 2.5.0",note="Use pos_num_pred instead.")]
+Notation Rpos_pred := pos_num_pred (only parsing).
+#[deprecated(since="mathcomp 2.5.0",note="Use pos_num instead.")]
+Notation Rpos := pos_num (only parsing).
+#[deprecated(since="mathcomp 2.5.0",note="Use neg_num_pred instead.")]
+Notation Rneg_pred := neg_num_pred (only parsing).
+#[deprecated(since="mathcomp 2.5.0",note="Use neg_num instead.")]
+Notation Rneg := neg_num (only parsing).
+#[deprecated(since="mathcomp 2.5.0",note="Use nneg_num_pred instead.")]
+Notation Rnneg_pred := nneg_num_pred (only parsing).
+#[deprecated(since="mathcomp 2.5.0",note="Use nneg_num instead.")]
+Notation Rnneg := nneg_num (only parsing).
+#[deprecated(since="mathcomp 2.5.0",note="Use npos_num_pred instead.")]
+Notation Rnpos_pred := npos_num_pred (only parsing).
+#[deprecated(since="mathcomp 2.5.0",note="Use npos_num instead.")]
+Notation Rnpos := npos_num (only parsing).
+#[deprecated(since="mathcomp 2.5.0",note="Use real_num_pred instead.")]
+Notation Rreal_pred := real_num_pred (only parsing).
+#[deprecated(since="mathcomp 2.5.0",note="Use real_num instead.")]
+Notation Rreal := real_num (only parsing).
+
 End Def.
 
 (* Shorter qualified names, when Num.Def is not imported. *)
@@ -129,11 +151,11 @@ Notation lteif := lterif (only parsing).
 Notation comparable := comparabler (only parsing).
 Notation max := maxr.
 Notation min := minr.
-Notation pos := Rpos.
-Notation neg := Rneg.
-Notation nneg := Rnneg.
-Notation npos := Rnpos.
-Notation real := Rreal.
+Notation pos := pos_num.
+Notation neg := neg_num.
+Notation nneg := nneg_num.
+Notation npos := npos_num.
+Notation real := real_num.
 
 (* (Exported) symbolic syntax. *)
 Module Import Syntax.
