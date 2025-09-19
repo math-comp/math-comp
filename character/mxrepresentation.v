@@ -286,7 +286,8 @@ Unset Printing Implicit Defensive.
 Declare Scope irrType_scope.
 Declare Scope group_ring_scope.
 
-Import GroupScope GRing.Theory.
+Local Open Scope group_scope.
+Import GRing.Theory.
 Local Open Scope ring_scope.
 
 Reserved Notation "''n_' i" (at level 8, i at level 2, format "''n_' i").

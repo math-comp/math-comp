@@ -49,7 +49,7 @@ HB.structure Definition Zmodule := {M of GRing.Zmodule M & Finite M}.
 
 Module ZmoduleExports.
 Notation "[ 'finGroupMixin' 'of' R 'for' +%R ]" :=
-    (isMulGroup.Build R (@addrA _) (@add0r _) (@addNr _))
+    (Finite_isGroup.Build R (@addrA _) (@add0r _) (@addNr _))
   (format "[ 'finGroupMixin'  'of'  R  'for'  +%R ]") : form_scope.
 End ZmoduleExports.
 HB.export ZmoduleExports.
@@ -177,7 +177,7 @@ HB.structure Definition UnitAlgebra (R : unitRingType) :=
 
 #[export, non_forgetful_inheritance]
 HB.instance Definition _ (R : Zmodule.type) := [finGroupMixin of R for +%R].
-Coercion Zmodule_to_baseFinGroup (R : Zmodule.type) := BaseFinGroup.clone R _.
+Coercion Zmodule_to_baseFinGroup (R : Zmodule.type) := FinStarMonoid.clone R _.
 Coercion Zmodule_to_finGroup (R : Zmodule.type) := FinGroup.clone R _.
 
 Section AdditiveGroup.
@@ -198,7 +198,7 @@ End AdditiveGroup.
 
 #[export, non_forgetful_inheritance]
 HB.instance Definition _ (R : NzRing.type) := [finGroupMixin of R for +%R].
-Coercion NzRing_to_baseFinGroup (R : NzRing.type) := BaseFinGroup.clone R _.
+Coercion NzRing_to_baseFinGroup (R : NzRing.type) := FinStarMonoid.clone R _.
 Coercion NzRing_to_finGroup (R : NzRing.type) := FinGroup.clone R _.
 
 HB.factory Record isNzRing R of NzRing R := {}.
@@ -248,13 +248,13 @@ HB.end.
 #[export, non_forgetful_inheritance]
 HB.instance Definition _ (R : ComNzRing.type) := [finGroupMixin of R for +%R].
 Coercion ComNzRing_to_baseFinGroup (R : ComNzRing.type) :=
-  BaseFinGroup.clone R _.
+  FinStarMonoid.clone R _.
 Coercion ComNzRing_to_finGroup (R : ComNzRing.type) := FinGroup.clone R _.
 
 
 #[export, non_forgetful_inheritance]
 HB.instance Definition _ (R : UnitRing.type) := [finGroupMixin of R for +%R].
-Coercion UnitRing_to_baseFinGroup (R : UnitRing.type) := BaseFinGroup.clone R _.
+Coercion UnitRing_to_baseFinGroup (R : UnitRing.type) := FinStarMonoid.clone R _.
 Coercion UnitRing_to_finGroup (R : UnitRing.type) := FinGroup.clone R _.
 
 Section UnitsGroup.
@@ -284,7 +284,7 @@ Proof. by move=> u; apply/val_inj/mul1r. Qed.
 Lemma unit_mulVu : left_inverse unit1 unit_inv unit_mul.
 Proof. by move=> u; apply/val_inj/(mulVr (valP u)). Qed.
 
-#[export] HB.instance Definition _ := isMulGroup.Build unit_of
+#[export] HB.instance Definition _ := Finite_isGroup.Build unit_of
   unit_muluA unit_mul1u unit_mulVu.
 
 Lemma val_unit1 : val (1%g : unit_of) = 1. Proof. by []. Qed.
@@ -322,7 +322,7 @@ Notation unit R Ux := (@Unit R%type _ Ux).
 #[export, non_forgetful_inheritance]
 HB.instance Definition _ (R : ComUnitRing.type) := [finGroupMixin of R for +%R].
 Coercion ComUnitRing_to_baseFinGroup (R : ComUnitRing.type) :=
-  BaseFinGroup.clone R _.
+  FinStarMonoid.clone R _.
 Coercion ComUnitRing_to_finGroup (R : ComUnitRing.type) :=
   FinGroup.clone R _.
 
@@ -330,13 +330,13 @@ Coercion ComUnitRing_to_finGroup (R : ComUnitRing.type) :=
 HB.instance Definition _ (R : IntegralDomain.type) :=
   [finGroupMixin of R for +%R].
 Coercion IntegralDomain_to_baseFinGroup (R : IntegralDomain.type) :=
-  BaseFinGroup.clone R _.
+  FinStarMonoid.clone R _.
 Coercion IntegralDomain_to_finGroup (R : IntegralDomain.type) :=
   FinGroup.clone R _.
 
 #[export, non_forgetful_inheritance]
 HB.instance Definition _ (R : Field.type) := [finGroupMixin of R for +%R].
-Coercion Field_to_baseFinGroup (R : Field.type) := BaseFinGroup.clone R _.
+Coercion Field_to_baseFinGroup (R : Field.type) := FinStarMonoid.clone R _.
 Coercion Field_to_finGroup (R : Field.type) := FinGroup.clone R _.
 
 HB.factory Record isField F of Field F := {}.
@@ -375,7 +375,7 @@ HB.instance Definition _ (R : nzRingType) (M : Lmodule.type R) :=
   [finGroupMixin of M for +%R].
 
 Coercion Lmodule_to_baseFinGroup (R : nzRingType) (M : Lmodule.type R) :=
-  BaseFinGroup.clone M _.
+  FinStarMonoid.clone M _.
 Coercion Lmodule_to_finGroup (R : nzRingType) (M : Lmodule.type R)
     : finGroupType :=
   FinGroup.clone (M : Type) _.
@@ -384,7 +384,7 @@ Coercion Lmodule_to_finGroup (R : nzRingType) (M : Lmodule.type R)
 HB.instance Definition _ (R : nzRingType) (M : Lalgebra.type R) :=
   [finGroupMixin of M for +%R].
 Coercion Lalgebra_to_baseFinGroup (R : nzRingType) (M : Lalgebra.type R) :=
-  BaseFinGroup.clone M _.
+  FinStarMonoid.clone M _.
 Coercion Lalgebra_to_finGroup (R : nzRingType) (M : Lalgebra.type R) :=
   FinGroup.clone M _.
 
@@ -392,7 +392,7 @@ Coercion Lalgebra_to_finGroup (R : nzRingType) (M : Lalgebra.type R) :=
 HB.instance Definition _ (R : nzRingType) (M : Algebra.type R) :=
   [finGroupMixin of M for +%R].
 Coercion Algebra_to_baseFinGroup (R : nzRingType) (M : Algebra.type R) :=
-  BaseFinGroup.clone M _.
+  FinStarMonoid.clone M _.
 Coercion Algebra_to_finGroup (R : nzRingType) (M : Algebra.type R) :=
   FinGroup.clone M _.
 
@@ -400,7 +400,7 @@ Coercion Algebra_to_finGroup (R : nzRingType) (M : Algebra.type R) :=
 HB.instance Definition _ (R : unitRingType) (M : UnitAlgebra.type R) :=
   [finGroupMixin of M for +%R].
 Coercion UnitAlgebra_to_baseFinGroup
-  (R : unitRingType) (M : UnitAlgebra.type R) := BaseFinGroup.clone M _.
+  (R : unitRingType) (M : UnitAlgebra.type R) := FinStarMonoid.clone M _.
 Coercion UnitAlgebra_to_finGroup (R : unitRingType) (M : UnitAlgebra.type R) :=
   FinGroup.clone M _.
 

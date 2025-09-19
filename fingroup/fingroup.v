@@ -14,12 +14,10 @@ From mathcomp Require Export monoid.
 (*          finGroupType == the structure for finite types with a group law   *)
 (*                          The HB class is called FinGroup.                  *)
 (*           {group gT}  == type of groups with elements of type gT           *)
-(*      baseFinGroupType == the structure for finite types with a monoid law  *)
-(*                          and an involutive antimorphism; finGroupType is   *)
-(*                          derived from baseFinGroupType                     *)
-(*                          The HB class is called BaseFinGroup.              *)
+(*     finStarMonoidType == the structure for finite star-monoids             *)
+(*                          The HB class is called FinStarMonoid.             *)
 (*    FinGroupType mulVg == the finGroupType structure for an existing        *)
-(*                          baseFinGroupType structure, built from a proof of *)
+(*                          finStarMonoidType structure, built from a proof of*)
 (*                          the left inverse group axiom for that structure's *)
 (*                          operations                                        *)
 (*          [group of G] == a clone for an existing {group gT} structure on   *)
@@ -28,7 +26,7 @@ From mathcomp Require Export monoid.
 (* If gT implements finGroupType, then we can form {set gT}, the type of      *)
 (* finite sets with elements of type gT (as finGroupType extends finType).    *)
 (* The group law extends pointwise to {set gT}, which thus implements a sub-  *)
-(* interface baseFinGroupType of finGroupType. To be consistent with the      *)
+(* interface finStarMonoidType of finGroupType. To be consistent with the     *)
 (* predType interface, this is done by coercion to FinGroup.arg_sort, an      *)
 (* alias for FinGroup.sort. Accordingly, all pointwise group operations below *)
 (* have arguments of type (FinGroup.arg_sort) gT and return results of type   *)
@@ -37,7 +35,7 @@ From mathcomp Require Export monoid.
 (*      group_scope (delimiter %g) for point operations and set constructs.   *)
 (*      Group_scope (delimiter %G) for explicit {group gT} structures.        *)
 (* These scopes should not be opened globally, although group_scope is often  *)
-(* opened locally in group-theory files (via Import GroupScope).              *)
+(* opened locally in group-theory files.                                      *)
 (*   As {group gT} is both a subtype and an interface structure for {set gT}, *)
 (* the fact that a given G : {set gT} is a group can (and usually should) be  *)
 (* inferred by type inference with canonical structures. This means that all  *)
@@ -74,7 +72,7 @@ From mathcomp Require Export monoid.
 (*          subg, sgval == the projection into and injection from [subg G]    *)
 (*                  H^# == the set H minus the unit element                   *)
 (*               repr H == some element of H if 1 \notin H != set0, else 1    *)
-(*                         (repr is defined over sets of a baseFinGroupType,  *)
+(*                         (repr is defined over sets of a finStarMonoidType, *)
 (*                         so it can be used, e.g., to pick right cosets.)    *)
 (*               x *: H == left coset of H by x                               *)
 (*          lcosets H G == the set of the left cosets of H by elements of G   *)
@@ -139,13 +137,10 @@ Declare Scope Group_scope.
 
 Delimit Scope Group_scope with G.
 
-(* This module can be imported to open the scope for group element *)
-(* operations locally to a file, without exporting the Open to     *)
-(* clients of that file (as Open would do).                        *)
 Module GroupScope.
 Open Scope group_scope.
 End GroupScope.
-Import GroupScope.
+Local Open Scope group_scope.
 
 (* These are the operation notations introduced by this file. *)
 Reserved Notation "[ ~ x1 , x2 , .. , xn ]"
@@ -183,410 +178,207 @@ Reserved Notation "[ 'min' A 'of' G | gP & gQ ]"
 Reserved Notation "[ 'min' G | gP & gQ ]"
   (format "[ '[hv' 'min'  G '/ '  |  gP '/ '  &  gQ ']' ]").
 
-(* We split the group axiomatisation in two. We define a  *)
-(* class of "base groups", which are basically monoids    *)
-(* with an involutive antimorphism, from which we derive  *)
-(* the class of groups proper. This allows us to reuse    *)
-(* much of the group notation and algebraic axioms for    *)
-(* group subsets, by defining a base group class on them. *)
-(*   We use class/mixins here rather than telescopes to   *)
-(* be able to interoperate with the type coercions.       *)
-(* Another potential benefit (not exploited here) would   *)
-(* be to define a class for infinite groups, which could  *)
-(* share all of the algebraic laws.                       *)
+Module isMulBaseGroup.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.isStarMonoid.Build instead.")]
+Notation Build G := (isStarMonoid.Build G) (only parsing).
+End isMulBaseGroup.
 
-HB.mixin Record isMulBaseGroup G := {
-  mulg_subdef : G -> G -> G;
-  oneg_subdef : G;
-  invg_subdef : G -> G;
-  mulgA_subproof : associative mulg_subdef ;
-  mul1g_subproof : left_id oneg_subdef  mulg_subdef ;
-  invgK_subproof : involutive invg_subdef ;
-  invMg_subproof : {morph invg_subdef  : x y / mulg_subdef  x y >-> mulg_subdef  y x}
-}.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.isStarMonoid instead.")]
+Notation isMulBaseGroup G := (isStarMonoid G) (only parsing).
 
-(* We want to use sort as a coercion class, both to infer         *)
-(* argument scopes properly, and to allow groups and cosets to    *)
-(* coerce to the base group of group subsets.                     *)
-(*   However, the return type of group operations should NOT be a *)
-(* coercion class, since this would trump the real (head-normal)  *)
-(* coercion class for concrete group types, thus spoiling the     *)
-(* coercion of A * B to pred_sort in x \in A * B, or rho * tau to *)
-(* ffun and Funclass in (rho * tau) x, when rho tau : perm T.     *)
-(*   Therefore we define an alias of sort for argument types, and *)
-(* make it the default coercion FinGroup.base_type >-> Sortclass  *)
-(* so that arguments of a functions whose parameters are of type, *)
-(* say, gT : finGroupType, can be coerced to the coercion class   *)
-(* of arg_sort. Care should be taken, however, to declare the     *)
-(* return type of functions and operators as FinGroup.sort gT     *)
-(* rather than gT, e.g., mulg : gT -> gT -> FinGroup.sort gT.     *)
-(* Note that since we do this here and in quotient.v for all the  *)
-(* basic functions, the inferred return type should generally be  *)
-(* correct.                                                       *)
+Module BaseFinGroup_isGroup.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.StarMonoid_isGroup.Build instead.")]
+Notation Build G := (StarMonoid_isGroup.Build G) (only parsing).
+End BaseFinGroup_isGroup.
 
-#[arg_sort, short(type="baseFinGroupType")]
-HB.structure Definition BaseFinGroup := { G of isMulBaseGroup G & Finite G }.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.StarMonoid_isGroup instead.")]
+Notation BaseFinGroup_isGroup G := (StarMonoid_isGroup G) (only parsing).
 
-Module BaseFinGroupExports.
-Bind Scope group_scope with BaseFinGroup.arg_sort.
-Bind Scope group_scope with BaseFinGroup.sort.
-End BaseFinGroupExports.
-HB.export BaseFinGroupExports.
+#[arg_sort, short(type="finStarMonoidType")]
+HB.structure Definition FinStarMonoid := { G of StarMonoid G & Finite G }.
 
-Module Notations.
-Section ElementOps.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.finStarMonoidType instead.")]
+Notation baseFinGroupType := finStarMonoidType (only parsing).
 
-Variable T : baseFinGroupType.
-Notation rT := (BaseFinGroup.sort T).
+Module BaseFinGroup.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.FinStarMonoid.sort instead.")]
+Notation sort := (FinStarMonoid.sort) (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.FinStarMonoid.arg_sort instead.")]
+Notation arg_sort := (FinStarMonoid.arg_sort) (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.FinStarMonoid.on instead.")]
+Notation on M := (FinStarMonoid.on M) (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.FinStarMonoid.copy instead.")]
+Notation copy M N := (FinStarMonoid.copy M N) (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.FinStarMonoid.clone instead.")]
+Notation clone M N := (FinStarMonoid.clone M N) (only parsing).
+End BaseFinGroup.
 
-Definition oneg : rT := Eval unfold oneg_subdef in @oneg_subdef T.
-Definition mulg : T -> T -> rT := Eval unfold mulg_subdef in @mulg_subdef T.
-Definition invg : T -> rT := Eval unfold invg_subdef in @invg_subdef T.
-Definition expgn (x : T) n : rT := iterop n mulg x oneg.
+#[deprecated(since="mathcomp 2.4.0",
+             note="Use FinStarMonoid instead.")]
+Notation BaseFinGroup R := (FinStarMonoid R) (only parsing).
 
-End ElementOps.
-Arguments expgn : simpl never.
+Module FinStarMonoidExports.
+Bind Scope group_scope with FinStarMonoid.arg_sort.
+Bind Scope group_scope with FinStarMonoid.sort.
+End FinStarMonoidExports.
+HB.export FinStarMonoidExports.
 
-Notation "1" := (@oneg _) : group_scope.
-Notation "x1 * x2" := (mulg x1 x2) : group_scope.
-Notation "x ^-1" := (invg x) : group_scope.
-Notation "x ^+ n" := (expgn x n) : group_scope.
-Notation "x ^- n" := (x ^+ n)^-1 : group_scope.
-End Notations.
-HB.export Notations.
-
-HB.mixin Record BaseFinGroup_isGroup G of BaseFinGroup G := {
-  mulVg_subproof : left_inverse (@oneg G) (@invg _) (@mulg _)
-}.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.one instead.")]
+Notation oneg := one (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.mul instead.")]
+Notation mulg := mul (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.inv instead.")]
+Notation invg := inv (only parsing).
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Algebra.natexp instead.")]
+Notation expgn := natexp (only parsing).
 
 #[short(type="finGroupType")]
 HB.structure Definition FinGroup :=
-  { G of BaseFinGroup_isGroup G & BaseFinGroup G }.
+  { G of Group G & Finite G }.
 
 Module FinGroupExports.
 Bind Scope group_scope with FinGroup.sort.
 End FinGroupExports.
 HB.export FinGroupExports.
 
-HB.factory Record isMulGroup G of Finite G := {
-  mulg : G -> G -> G;
-  oneg : G;
-  invg : G -> G;
-  mulgA : associative mulg;
-  mul1g : left_id oneg mulg;
-  mulVg : left_inverse oneg invg mulg;
+HB.factory Record Finite_isGroup G of Finite G := {
+  mul : G -> G -> G;
+  one : G;
+  inv : G -> G;
+  mulgA : associative mul;
+  mul1g : left_id one mul;
+  mulVg : left_inverse one inv mul;
 }.
 
-HB.builders Context G of isMulGroup G.
+Module isMulGroup.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Finite_isGroup.Build instead.")]
+Notation Build G := (Finite_isGroup.Build G) (only parsing).
+End isMulGroup.
+#[deprecated(since="mathcomp 2.5.0",
+             note="Use Finite_isGroup instead.")]
+Notation isMulGroup G := (Finite_isGroup G) (only parsing).
 
-Notation "1" := oneg.
-Infix "*" := mulg.
-Notation "x ^-1" := (invg x).
+HB.builders Context G of Finite_isGroup G.
 
-Lemma mk_invgK : involutive invg.
+Notation "1" := one.
+Infix "*" := mul.
+Notation "x ^-1" := (inv x).
+
+Lemma invgK : involutive inv.
 Proof.
 have mulV21 x: x^-1^-1 * 1 = x by rewrite -(mulVg x) mulgA mulVg mul1g.
 by move=> x; rewrite -[_ ^-1]mulV21 -(mul1g 1) mulgA !mulV21.
 Qed.
 
-Lemma mk_invMg : {morph invg : x y / x * y >-> y * x}.
+Lemma invMg : {morph inv : x y / x * y >-> y * x}.
 Proof.
-have mulgV x: x * x^-1 = 1 by rewrite -{1}[x]mk_invgK mulVg.
+have mulgV x: x * x^-1 = 1 by rewrite -{1}[x]invgK mulVg.
 move=> x y /=; rewrite -[y^-1 * _]mul1g -(mulVg (x * y)) -2!mulgA (mulgA y).
 by rewrite mulgV mul1g mulgV -(mulgV (x * y)) mulgA mulVg mul1g.
 Qed.
 
 HB.instance Definition _ :=
-  isMulBaseGroup.Build G mulgA mul1g mk_invgK mk_invMg.
-HB.instance Definition _ := BaseFinGroup_isGroup.Build G mulVg.
+  isStarMonoid.Build G mulgA mul1g invgK invMg.
+HB.instance Definition _ := StarMonoid_isGroup.Build G mulVg.
 
 HB.end.
 
 #[compress_coercions]
-HB.instance Definition _ (T : baseFinGroupType) :
-    Finite (BaseFinGroup.arg_sort T) := Finite.class T.
-
-(* Arguments of conjg are restricted to true groups to avoid an *)
-(* improper interpretation of A ^ B with A and B sets, namely:  *)
-(*       {x^-1 * (y * z) | y \in A, x, z \in B}                 *)
-Definition conjg (T : finGroupType) (x y : T) := y^-1 * (x * y).
-Notation "x1 ^ x2" := (conjg x1 x2) : group_scope.
-
-Definition commg (T : finGroupType) (x y : T) := x^-1 * x ^ y.
-Notation "[ ~ x1 , x2 , .. , xn ]" := (commg .. (commg x1 x2) .. xn)
-  : group_scope.
-
-Prenex Implicits mulg invg expgn conjg commg.
-
-Notation "\prod_ ( i <- r | P ) F" :=
-  (\big[mulg/1]_(i <- r | P%B) F%g) : group_scope.
-Notation "\prod_ ( i <- r ) F" :=
-  (\big[mulg/1]_(i <- r) F%g) : group_scope.
-Notation "\prod_ ( m <= i < n | P ) F" :=
-  (\big[mulg/1]_(m <= i < n | P%B) F%g) : group_scope.
-Notation "\prod_ ( m <= i < n ) F" :=
-  (\big[mulg/1]_(m <= i < n) F%g) : group_scope.
-Notation "\prod_ ( i | P ) F" :=
-  (\big[mulg/1]_(i | P%B) F%g) : group_scope.
-Notation "\prod_ i F" :=
-  (\big[mulg/1]_i F%g) : group_scope.
-Notation "\prod_ ( i : t | P ) F" :=
-  (\big[mulg/1]_(i : t | P%B) F%g) (only parsing) : group_scope.
-Notation "\prod_ ( i : t ) F" :=
-  (\big[mulg/1]_(i : t) F%g) (only parsing) : group_scope.
-Notation "\prod_ ( i < n | P ) F" :=
-  (\big[mulg/1]_(i < n | P%B) F%g) : group_scope.
-Notation "\prod_ ( i < n ) F" :=
-  (\big[mulg/1]_(i < n) F%g) : group_scope.
-Notation "\prod_ ( i 'in' A | P ) F" :=
-  (\big[mulg/1]_(i in A | P%B) F%g) : group_scope.
-Notation "\prod_ ( i 'in' A ) F" :=
-  (\big[mulg/1]_(i in A) F%g) : group_scope.
-
-Section PreGroupIdentities.
-
-Variable T : baseFinGroupType.
-Implicit Types x y z : T.
-Local Notation mulgT := (@mulg T).
-
-Lemma mulgA : associative mulgT.  Proof. exact: mulgA_subproof. Qed.
-Lemma mul1g : left_id 1 mulgT.  Proof. exact: mul1g_subproof. Qed.
-Lemma invgK : @involutive T invg. Proof. exact: invgK_subproof. Qed.
-Lemma invMg x y : (x * y)^-1 = y^-1 * x^-1. Proof. exact: invMg_subproof. Qed.
-
-Lemma invg_inj : @injective T T invg. Proof. exact: can_inj invgK. Qed.
-
-Lemma eq_invg_sym x y : (x^-1 == y) = (x == y^-1).
-Proof. by apply: (inv_eq invgK). Qed.
-
-Lemma invg1 : 1^-1 = 1 :> T.
-Proof. by apply: invg_inj; rewrite -{1}[1^-1]mul1g invMg invgK mul1g. Qed.
-
-Lemma eq_invg1 x : (x^-1 == 1) = (x == 1).
-Proof. by rewrite eq_invg_sym invg1. Qed.
-
-Lemma mulg1 : right_id 1 mulgT.
-Proof. by move=> x; apply: invg_inj; rewrite invMg invg1 mul1g. Qed.
-
-HB.instance Definition _ := Monoid.isLaw.Build T 1 mulgT mulgA mul1g mulg1.
-
-Lemma expgnE x n : x ^+ n = iterop n mulg x 1. Proof. by []. Qed.
-
-Lemma expg0 x : x ^+ 0 = 1. Proof. by []. Qed.
-Lemma expg1 x : x ^+ 1 = x. Proof. by []. Qed.
-
-Lemma expgS x n : x ^+ n.+1 = x * x ^+ n.
-Proof. by case: n => //; rewrite mulg1. Qed.
-
-Lemma expg1n n : 1 ^+ n = 1 :> T.
-Proof. by elim: n => // n IHn; rewrite expgS mul1g. Qed.
-
-Lemma expgD x n m : x ^+ (n + m) = x ^+ n * x ^+ m.
-Proof. by elim: n => [|n IHn]; rewrite ?mul1g // !expgS IHn mulgA. Qed.
-
-Lemma expgSr x n : x ^+ n.+1 = x ^+ n * x.
-Proof. by rewrite -addn1 expgD expg1. Qed.
-
-Lemma expgM x n m : x ^+ (n * m) = x ^+ n ^+ m.
-Proof.
-elim: m => [|m IHm]; first by rewrite muln0 expg0.
-by rewrite mulnS expgD IHm expgS.
-Qed.
-
-Lemma expgAC x m n : x ^+ m ^+ n = x ^+ n ^+ m.
-Proof. by rewrite -!expgM mulnC. Qed.
-
-Definition commute x y := x * y = y * x.
-
-Lemma commute_refl x : commute x x.
-Proof. by []. Qed.
-
-Lemma commute_sym x y : commute x y -> commute y x.
-Proof. by []. Qed.
-
-Lemma commute1 x : commute x 1.
-Proof. by rewrite /commute mulg1 mul1g. Qed.
-
-Lemma commuteM x y z : commute x y ->  commute x z ->  commute x (y * z).
-Proof. by move=> cxy cxz; rewrite /commute -mulgA -cxz !mulgA cxy. Qed.
-
-Lemma commuteX x y n : commute x y ->  commute x (y ^+ n).
-Proof.
-by move=> cxy; case: n; [apply: commute1 | elim=> // n; apply: commuteM].
-Qed.
-
-Lemma commuteX2 x y m n : commute x y -> commute (x ^+ m) (y ^+ n).
-Proof. by move=> cxy; apply/commuteX/commute_sym/commuteX. Qed.
-
-Lemma expgVn x n : x^-1 ^+ n = x ^- n.
-Proof. by elim: n => [|n IHn]; rewrite ?invg1 // expgSr expgS invMg IHn. Qed.
-
-Lemma expgMn x y n : commute x y -> (x * y) ^+ n  = x ^+ n * y ^+ n.
-Proof.
-move=> cxy; elim: n => [|n IHn]; first by rewrite mulg1.
-by rewrite !expgS IHn -mulgA (mulgA y) (commuteX _ (commute_sym cxy)) !mulgA.
-Qed.
-
-End PreGroupIdentities.
-
-#[global] Hint Resolve commute1 : core.
-Arguments invg_inj {T} [x1 x2].
-Prenex Implicits commute invgK.
-
-Section GroupIdentities.
-
-Variable T : finGroupType.
-Implicit Types x y z : T.
-Local Notation mulgT := (@mulg T).
-
-Lemma mulVg : left_inverse 1 invg mulgT. Proof. exact: mulVg_subproof. Qed.
-
-Lemma mulgV : right_inverse 1 invg mulgT.
-Proof. by move=> x; rewrite -{1}(invgK x) mulVg. Qed.
-
-Lemma mulKg : left_loop invg mulgT.
-Proof. by move=> x y; rewrite mulgA mulVg mul1g. Qed.
-
-Lemma mulKVg : rev_left_loop invg mulgT.
-Proof. by move=> x y; rewrite mulgA mulgV mul1g. Qed.
-
-Lemma mulgI : right_injective mulgT.
-Proof. by move=> x; apply: can_inj (mulKg x). Qed.
-
-Lemma mulgK : right_loop invg mulgT.
-Proof. by move=> x y; rewrite -mulgA mulgV mulg1. Qed.
-
-Lemma mulgKV : rev_right_loop invg mulgT.
-Proof. by move=> x y; rewrite -mulgA mulVg mulg1. Qed.
-
-Lemma mulIg : left_injective mulgT.
-Proof. by move=> x; apply: can_inj (mulgK x). Qed.
-
-Lemma eq_invg_mul x y : (x^-1 == y :> T) = (x * y == 1 :> T).
-Proof. by rewrite -(inj_eq (@mulgI x)) mulgV eq_sym. Qed.
-
-Lemma eq_mulgV1 x y : (x == y) = (x * y^-1 == 1 :> T).
-Proof. by rewrite -(inj_eq invg_inj) eq_invg_mul. Qed.
-
-Lemma eq_mulVg1 x y : (x == y) = (x^-1 * y == 1 :> T).
-Proof. by rewrite -eq_invg_mul invgK. Qed.
-
-Lemma commuteV x y : commute x y -> commute x y^-1.
-Proof. by move=> cxy; apply: (@mulIg y); rewrite mulgKV -mulgA cxy mulKg. Qed.
-
-Lemma conjgE x y : x ^ y = y^-1 * (x * y). Proof. by []. Qed.
-
-Lemma conjgC x y : x * y = y * x ^ y.
-Proof. by rewrite mulKVg. Qed.
-
-Lemma conjgCV x y : x * y = y ^ x^-1 * x.
-Proof. by rewrite -mulgA mulgKV invgK. Qed.
-
-Lemma conjg1 x : x ^ 1 = x.
-Proof. by rewrite conjgE commute1 mulKg. Qed.
-
-Lemma conj1g x : 1 ^ x = 1.
-Proof. by rewrite conjgE mul1g mulVg. Qed.
-
-Lemma conjMg x y z : (x * y) ^ z = x ^ z * y ^ z.
-Proof. by rewrite !conjgE !mulgA mulgK. Qed.
-
-Lemma conjgM x y z : x ^ (y * z) = (x ^ y) ^ z.
-Proof. by rewrite !conjgE invMg !mulgA. Qed.
-
-Lemma conjVg x y : x^-1 ^ y = (x ^ y)^-1.
-Proof. by rewrite !conjgE !invMg invgK mulgA. Qed.
-
-Lemma conjJg x y z : (x ^ y) ^ z = (x ^ z) ^ y ^ z.
-Proof. by rewrite 2!conjMg conjVg. Qed.
-
-Lemma conjXg x y n : (x ^+ n) ^ y = (x ^ y) ^+ n.
-Proof. by elim: n => [|n IHn]; rewrite ?conj1g // !expgS conjMg IHn. Qed.
-
-Lemma conjgK : @right_loop T T invg conjg.
-Proof. by move=> y x; rewrite -conjgM mulgV conjg1. Qed.
-
-Lemma conjgKV : @rev_right_loop T T invg conjg.
-Proof. by move=> y x; rewrite -conjgM mulVg conjg1. Qed.
-
-Lemma conjg_inj : @left_injective T T T conjg.
-Proof. by move=> y; apply: can_inj (conjgK y). Qed.
-
-Lemma conjg_eq1 x y : (x ^ y == 1) = (x == 1).
-Proof. by rewrite (canF_eq (conjgK _)) conj1g. Qed.
-
-Lemma conjg_prod I r (P : pred I) F z :
-  (\prod_(i <- r | P i) F i) ^ z = \prod_(i <- r | P i) (F i ^ z).
-Proof.
-by apply: (big_morph (conjg^~ z)) => [x y|]; rewrite ?conj1g ?conjMg.
-Qed.
-
-Lemma commgEl x y : [~ x, y] = x^-1 * x ^ y. Proof. by []. Qed.
-
-Lemma commgEr x y : [~ x, y] = y^-1 ^ x * y.
-Proof. by rewrite -!mulgA. Qed.
-
-Lemma commgC x y : x * y = y * x * [~ x, y].
-Proof. by rewrite -mulgA !mulKVg. Qed.
-
-Lemma commgCV x y : x * y = [~ x^-1, y^-1] * (y * x).
-Proof. by rewrite commgEl !mulgA !invgK !mulgKV. Qed.
-
-Lemma conjRg x y z : [~ x, y] ^ z = [~ x ^ z, y ^ z].
-Proof. by rewrite !conjMg !conjVg. Qed.
-
-Lemma invg_comm x y : [~ x, y]^-1 = [~ y, x].
-Proof. by rewrite commgEr conjVg invMg invgK. Qed.
-
-Lemma commgP x y : reflect (commute x y) ([~ x, y] == 1 :> T).
-Proof. by rewrite [[~ x, y]]mulgA -invMg -eq_mulVg1 eq_sym; apply: eqP. Qed.
-
-Lemma conjg_fixP x y : reflect (x ^ y = x) ([~ x, y] == 1 :> T).
-Proof. by rewrite -eq_mulVg1 eq_sym; apply: eqP. Qed.
-
-Lemma commg1_sym x y : ([~ x, y] == 1 :> T) = ([~ y, x] == 1 :> T).
-Proof. by rewrite -invg_comm (inv_eq invgK) invg1. Qed.
-
-Lemma commg1 x : [~ x, 1] = 1.
-Proof. exact/eqP/commgP. Qed.
-
-Lemma comm1g x : [~ 1, x] = 1.
-Proof. by rewrite -invg_comm commg1 invg1. Qed.
-
-Lemma commgg x : [~ x, x] = 1.
-Proof. exact/eqP/commgP. Qed.
-
-Lemma commgXg x n : [~ x, x ^+ n] = 1.
-Proof. exact/eqP/commgP/commuteX. Qed.
-
-Lemma commgVg x : [~ x, x^-1] = 1.
-Proof. exact/eqP/commgP/commuteV. Qed.
-
-Lemma commgXVg x n : [~ x, x ^- n] = 1.
-Proof. exact/eqP/commgP/commuteV/commuteX. Qed.
-
-(* Other commg identities should slot in here. *)
-
-End GroupIdentities.
-
-#[global] Hint Rewrite mulg1 @mul1g invg1 @mulVg mulgV (@invgK) mulgK mulgKV
-             @invMg @mulgA : gsimpl.
-
-Ltac gsimpl := autorewrite with gsimpl; try done.
-
-Definition gsimp := (@mulg1, @mul1g, (@invg1, @invgK), (@mulgV, @mulVg)).
-Definition gnorm := (gsimp, (@mulgK, @mulgKV, (@mulgA, @invMg))).
-
-Arguments mulgI [T].
-Arguments mulIg [T].
-Arguments conjg_inj {T} x [x1 x2].
-Arguments commgP {T x y}.
-Arguments conjg_fixP {T x y}.
+HB.instance Definition _ (T : finStarMonoidType) :
+    Finite (FinStarMonoid.arg_sort T) := Finite.class T.
+
+Notation conjg := conjg (only parsing).
+Notation commg := commg (only parsing).
+Notation mulgA := mulgA (only parsing).
+Notation mul1g := mul1g (only parsing).
+Notation invgK := invgK (only parsing).
+Notation invMg := invgM (only parsing).
+Notation invg_inj := invg_inj (only parsing).
+Notation eq_invg_sym := eqg_invLR (only parsing).
+Notation invg1 := invg1 (only parsing).
+Notation eq_invg1 := invg_eq1 (only parsing).
+Notation mulg1 := mulg1 (only parsing).
+Notation expgnE := expgnE (only parsing).
+Notation expg0 := expg0 (only parsing).
+Notation expg1 := expg1 (only parsing).
+Notation expg1n := expg1n (only parsing).
+Notation expgD := expgnDr (only parsing).
+Notation expgSr := expgSr (only parsing).
+Notation expgM := expgnA (only parsing).
+Notation expgAC := expgnAC (only parsing).
+Notation commute := commute (only parsing).
+Notation commute_refl := commute_refl (only parsing).
+Notation commute_sym := commute_sym (only parsing).
+Notation commute1 := commute1 (only parsing).
+Notation commuteM := commuteM (only parsing).
+Notation commuteX := commuteX (only parsing).
+Notation commuteX2 := commuteX2 (only parsing).
+Notation expgVn := expVgn (only parsing).
+Notation expgMn := expgMn (only parsing).
+Notation mulVg := mulVg (only parsing).
+Notation mulgV := mulgV (only parsing).
+Notation mulKg := mulKg (only parsing).
+Notation mulKVg := mulVKg (only parsing).
+Notation mulgI := mulgI (only parsing).
+Notation mulgK := mulgK (only parsing).
+Notation mulgKV := mulgVK (only parsing).
+Lemma eq_invg_mul (T : finGroupType) x y : (x^-1 == y :> T) = (x * y == 1).
+Proof. by rewrite mulg_eq1 eqg_invLR. Qed.
+Lemma eq_mulgV1 (T : finGroupType) x y : (x == y) = (x * y^-1 == 1 :> T).
+Proof. exact/esym/divg_eq1. Qed.
+Lemma eq_mulVg1 (T : finGroupType) x y : (x == y) = (x^-1 * y == 1 :> T).
+Proof. by rewrite mulg_eq1 eqg_inv. Qed.
+Notation commuteV := commuteV (only parsing).
+Notation conjgE := conjgE (only parsing).
+Notation conjgC := conjgC (only parsing).
+Notation conjgCV := conjgCV (only parsing).
+Notation conjg1 := conjg1 (only parsing).
+Notation conj1g := conj1g (only parsing).
+Notation conjMg := conjMg (only parsing).
+Notation conjgM := conjgM (only parsing).
+Notation conjVg := conjVg (only parsing).
+Notation conjJg := conjJg (only parsing).
+Notation conjXg := conjXg (only parsing).
+Notation conjgK := conjgK (only parsing).
+Notation conjgKV := conjgKV (only parsing).
+Notation conjg_inj := conjg_inj (only parsing).
+Notation conjg_eq1 := conjg_eq1 (only parsing).
+Notation conjg_prod := conjg_prod (only parsing).
+Notation commgEl := commgEl (only parsing).
+Notation commgEr := commgEr (only parsing).
+Notation commgC := commgC (only parsing).
+Notation commgCV := commgCV (only parsing).
+Notation conjRg := conjRg (only parsing).
+Notation invg_comm := invgR (only parsing).
+Notation commgP := commgP (only parsing).
+Notation conjg_fixP := conjg_fixP (only parsing).
+Notation commg1_sym := commg1_sym (only parsing).
+Notation commg1 := commg1 (only parsing).
+Notation comm1g := comm1g (only parsing).
+Notation commgg := commgg (only parsing).
+Notation commgXg := commgXg (only parsing).
+Notation commgVg := commgVg (only parsing).
+Notation commgXVg := commgXVg (only parsing).
 
 Section Repr.
 (* Plucking a set representative. *)
 
-Variable gT : baseFinGroupType.
+Variable gT : finStarMonoidType.
 Implicit Type A : {set gT}.
 
 Definition repr A := if 1 \in A then 1 else odflt 1 [pick x in A].
@@ -610,14 +402,14 @@ End Repr.
 Arguments mem_repr [gT A].
 
 Section BaseSetMulDef.
-(* We only assume a baseFinGroupType to allow this construct to be iterated. *)
-Variable gT : baseFinGroupType.
+(* We only assume a finStarMonoidType to allow this construct to be iterated. *)
+Variable gT : finStarMonoidType.
 Implicit Types A B : {set gT}.
 
 (* Set-lifted group operations. *)
 
-Definition set_mulg A B := mulg @2: (A, B).
-Definition set_invg A := invg @^-1: A.
+Definition set_mulg A B := mul @2: (A, B).
+Definition set_invg A := inv @^-1: A.
 
 (* The pre-group structure of group subsets. *)
 
@@ -648,9 +440,9 @@ apply/imset2P/imset2P=> [[x y Ax By /(canRL invgK)->] | [y x]].
 by rewrite !inE => By1 Ax1 ->; exists x^-1 y^-1; rewrite ?invMg.
 Qed.
 
-HB.instance Definition set_base_group := isMulBaseGroup.Build (set_type gT)
+HB.instance Definition set_base_group := isStarMonoid.Build (set_type gT)
   set_mulgA set_mul1g set_invgK set_invgM.
-HB.instance Definition _ : isMulBaseGroup {set gT} := set_base_group.
+HB.instance Definition _ : isStarMonoid {set gT} := set_base_group.
 
 End BaseSetMulDef.
 
@@ -664,32 +456,53 @@ End BaseSetMulDef.
 (* system to declare two different identity coercions on an alias class.  *)
 
 Module GroupSet.
-Definition sort (gT : baseFinGroupType) := {set gT}.
+Definition sort (gT : finStarMonoidType) := {set gT}.
 End GroupSet.
 Identity Coercion GroupSet_of_sort : GroupSet.sort >-> set_of.
 
+Module Type GroupSetFinStarMonoidSig.
+Definition sort (gT : finStarMonoidType) := FinStarMonoid.arg_sort {set gT}.
+End GroupSetFinStarMonoidSig.
+
+Module MakeGroupSetFinStarMonoid (Gset_base : GroupSetFinStarMonoidSig).
+Identity Coercion of_sort : Gset_base.sort >-> FinStarMonoid.arg_sort.
+End MakeGroupSetFinStarMonoid.
+
+Module Export GroupSetFinStarMonoid := MakeGroupSetFinStarMonoid GroupSet.
+
+Module Type GroupSetMagmaSig.
+Definition sort (gT : finStarMonoidType) := Magma.sort {set gT}.
+End GroupSetMagmaSig.
+
+Module MakeGroupSetMagma (Gset_base : GroupSetMagmaSig).
+Identity Coercion of_sort : Gset_base.sort >-> Magma.sort.
+End MakeGroupSetMagma.
+
+Module Export GroupSetMagma := MakeGroupSetMagma GroupSet.
+
 Module Type GroupSetBaseGroupSig.
-Definition sort (gT : baseFinGroupType) := BaseFinGroup.arg_sort {set gT}.
+Definition sort (gT : finStarMonoidType) := BaseGroup.sort {set gT}.
 End GroupSetBaseGroupSig.
 
 Module MakeGroupSetBaseGroup (Gset_base : GroupSetBaseGroupSig).
-Identity Coercion of_sort : Gset_base.sort >-> BaseFinGroup.arg_sort.
+Identity Coercion of_sort : Gset_base.sort >-> BaseGroup.sort.
 End MakeGroupSetBaseGroup.
 
 Module Export GroupSetBaseGroup := MakeGroupSetBaseGroup GroupSet.
+
 HB.instance Definition _ gT : Finite (GroupSet.sort gT) :=
    Finite.class {set gT}.
 
 Section GroupSetMulDef.
-(* Some of these constructs could be defined on a baseFinGroupType. *)
-(* We restrict them to proper finGroupType because we only develop  *)
-(* the theory for that case.                                        *)
+(* Some of these constructs could be defined on a finStarMonoidType. *)
+(* We restrict them to proper finGroupType because we only develop   *)
+(* the theory for that case.                                         *)
 Variable gT : finGroupType.
 Implicit Types A B : {set gT}.
 Implicit Type x y : gT.
 
-Definition lcoset A x := mulg x @: A.
-Definition rcoset A x := mulg^~ x @: A.
+Definition lcoset A x := mul x @: A.
+Definition rcoset A x := mul^~ x @: A.
 Definition lcosets A B := lcoset A @: B.
 Definition rcosets A B := rcoset A @: B.
 Definition indexg B A := #|rcosets A B|.
@@ -770,7 +583,7 @@ Prenex Implicits commg_set normalised centralised abelian.
 
 Section BaseSetMulProp.
 (* Properties of the purely multiplicative structure. *)
-Variable gT : baseFinGroupType.
+Variable gT : finStarMonoidType.
 Implicit Types A B C D : {set gT}.
 Implicit Type x y z : gT.
 
@@ -778,7 +591,7 @@ Implicit Type x y z : gT.
 (* only need to add the monotonicity rules.                        *)
 
 Lemma mulsgP A B x :
-  reflect (imset2_spec mulg (mem A) (fun _ => mem B) x) (x \in A * B).
+  reflect (imset2_spec mul (mem A) (fun _ => mem B) x) (x \in A * B).
 Proof. exact: imset2P. Qed.
 
 Lemma mem_mulg A B x y : x \in A -> y \in B -> x * y \in A * B.
@@ -903,10 +716,10 @@ Proof. by rewrite -mulg_set1 mulgA. Qed.
 Lemma lcoset1 A : 1 *: A = A.
 Proof. exact: mul1g. Qed.
 
-Lemma lcosetK : left_loop invg (fun x A => x *: A).
+Lemma lcosetK : left_loop inv (fun x A => x *: A).
 Proof. by move=> x A; rewrite -lcosetM mulVg mul1g. Qed.
 
-Lemma lcosetKV : rev_left_loop invg (fun x A => x *: A).
+Lemma lcosetKV : rev_left_loop inv (fun x A => x *: A).
 Proof. by move=> x A; rewrite -lcosetM mulgV mul1g. Qed.
 
 Lemma lcoset_inj : right_injective (fun x A => x *: A).
@@ -948,10 +761,10 @@ Proof. by rewrite -mulg_set1 mulgA. Qed.
 Lemma rcoset1 A : A :* 1 = A.
 Proof. exact: mulg1. Qed.
 
-Lemma rcosetK : right_loop invg (fun A x => A :* x).
+Lemma rcosetK : right_loop inv (fun A x => A :* x).
 Proof. by move=> x A; rewrite -rcosetM mulgV mulg1. Qed.
 
-Lemma rcosetKV : rev_right_loop invg (fun A x => A :* x).
+Lemma rcosetKV : rev_right_loop inv (fun A x => A :* x).
 Proof. by move=> x A; rewrite -rcosetM mulVg mulg1. Qed.
 
 Lemma rcoset_inj : left_injective (fun A x => A :* x).
@@ -999,10 +812,10 @@ Proof. by rewrite conjsgE invg1 mul1g mulg1. Qed.
 Lemma conjsgM A x y : A :^ (x * y) = (A :^ x) :^ y.
 Proof. by rewrite !conjsgE invMg -!mulg_set1 !mulgA. Qed.
 
-Lemma conjsgK : @right_loop _ gT invg conjugate.
+Lemma conjsgK : @right_loop _ gT inv conjugate.
 Proof. by move=> x A; rewrite -conjsgM mulgV conjsg1. Qed.
 
-Lemma conjsgKV : @rev_right_loop _ gT invg conjugate.
+Lemma conjsgKV : @rev_right_loop _ gT inv conjugate.
 Proof. by move=> x A; rewrite -conjsgM mulVg conjsg1. Qed.
 
 Lemma conjsg_inj : @left_injective _ gT _ conjugate.
@@ -1171,8 +984,8 @@ Identity Coercion type_of_group : group_of >-> group_type.
 HB.instance Definition _ := [isSub for gval].
 #[hnf] HB.instance Definition _ := [Finite of group_type by <:].
 
-(* No predType or baseFinGroupType structures, as these would hide the *)
-(* group-to-set coercion and thus spoil unification.                  *)
+(* No predType or finStarMonoidType structures, as these would hide the *)
+(* group-to-set coercion and thus spoil unification.                    *)
 HB.instance Definition _ := SubFinite.copy groupT group_type.
 
 Definition group (A : {set gT}) gA : groupT := @Group A gA.
@@ -1245,7 +1058,7 @@ Arguments generated _ _%_g.
 (* specific notation for these because of the coercions inserted during type *)
 (* inference, unless they are defined as [set: gsort my_gT] using the        *)
 (* Notation below.                                                           *)
-Notation gsort gT := (BaseFinGroup.arg_sort gT%type) (only parsing).
+Notation gsort gT := (FinStarMonoid.arg_sort gT%type) (only parsing).
 Notation "<< A >>"  := (generated A) : group_scope.
 Notation "<[ x ] >"  := (cycle x) : group_scope.
 Notation "#[ x ]"  := (order x) : group_scope.
@@ -1338,10 +1151,10 @@ Proof. by move=> G1; rewrite card_le1_trivg ?G1. Qed.
 Lemma mulG_subl A : A \subset A * G.
 Proof. exact: mulg_subl group1. Qed.
 
-Lemma mulG_subr A : A \subset ((G : {set gT}) * A ).
+Lemma mulG_subr A : A \subset (G * A).
 Proof. exact: mulg_subr group1. Qed.
 
-Lemma mulGid : (G : {set gT}) * G = G.
+Lemma mulGid : G * G = G.
 Proof.
 by apply/eqP; rewrite eqEsubset mulG_subr andbT; case/andP: (valP G).
 Qed.
@@ -1672,7 +1485,7 @@ Proof. by move=> u; apply: val_inj; apply: mulVg. Qed.
 Lemma subg_mulP : associative subg_mul.
 Proof. by move=> u v w; apply: val_inj; apply: mulgA. Qed.
 
-HB.instance Definition _ := isMulGroup.Build subg_of
+HB.instance Definition _ := Finite_isGroup.Build subg_of
   subg_mulP subg_oneP subg_invP.
 
 Lemma sgvalM : {in setT &, {morph sgval : x y / x * y}}. Proof. by []. Qed.
@@ -2096,7 +1909,7 @@ Lemma gen_prodgP A x :
 Proof.
 apply: (iffP idP) => [|[n [c Ac ->]]]; last first.
   by apply: group_prod => i _; rewrite mem_gen ?Ac.
-have [n ->] := gen_expgs A; rewrite /expgn Monoid.iteropE /=.
+have [n ->] := gen_expgs A; rewrite /natexp Monoid.iteropE /=.
 rewrite -[n]card_ord -big_const => /prodsgP[/= c Ac def_x]. 
 have{Ac def_x} ->: x = \prod_(i | c i \in A) c i.
   rewrite big_mkcond {x}def_x; apply: eq_bigr => i _.
@@ -2334,7 +2147,7 @@ Proof. by rewrite -trivg_card1 cycle_eq1. Qed.
 Lemma order_gt1 x : (#[x] > 1) = (x != 1).
 Proof. by rewrite ltnNge -trivg_card_le1 cycle_eq1. Qed.
 
-Lemma cycle_traject x : <[x]> =i traject (mulg x) 1 #[x].
+Lemma cycle_traject x : <[x]> =i traject (mul x) 1 #[x].
 Proof.
 set t := _ 1; apply: fsym; apply/subset_cardP; last first.
   by apply/subsetP=> _ /trajectP[i _ ->]; rewrite -iteropE mem_cycle.
@@ -2364,7 +2177,7 @@ Qed.
 
 Lemma expg_order x : x ^+ #[x] = 1.
 Proof.
-have: uniq (traject (mulg x) 1 #[x]).
+have: uniq (traject (mul x) 1 #[x]).
   by apply/card_uniqP; rewrite size_traject -(eq_card (cycle_traject x)).
 case/cyclePmin: (mem_cycle x #[x]) => [] [//|i] ltix.
 rewrite -(subnKC ltix) addSnnS /= expgD; move: (_ - _) => j x_j1.
@@ -2765,7 +2578,8 @@ Proof. by move=> cGH; apply: norm_joinEr (cents_norm cGH). Qed.
 Lemma centJ A x : 'C(A :^ x) = 'C(A) :^ x.
 Proof.
 apply/setP=> y; rewrite mem_conjg; apply/centP/centP=> cAy z Az.
-  by apply: (conjg_inj x); rewrite 2!conjMg conjgKV cAy ?memJ_conjg.
+  apply: (conjg_inj x).
+  by rewrite conjMg [in RHS]conjMg conjgKV cAy ?memJ_conjg.
 by apply: (conjg_inj x^-1); rewrite 2!conjMg cAy -?mem_conjg.
 Qed.
 
