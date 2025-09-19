@@ -231,7 +231,7 @@ have [Uy|/invr_out->] := boolP (y \is a GRing.unit); last by rewrite pmulr_rgt0.
 by rewrite -(pmulr_rgt0 _ y_gt0) mulrC divrK.
 Qed.
 #[export]
-HB.instance Definition _ := GRing.isDivClosed.Build R Rpos_pred
+HB.instance Definition _ := GRing.isDivClosed.Build R pos_num_pred
   pos_divr_closed.
 
 Fact nneg_divr_closed : divr_closed (@nneg R).
@@ -241,19 +241,19 @@ case/predU1P=> [-> _ | x_gt0]; first by rewrite mul0r eqxx.
 by case/predU1P=> [-> | y_gt0]; rewrite ?invr0 ?mulr0 ?eqxx // orbC rpred_div.
 Qed.
 #[export]
-HB.instance Definition _ := GRing.isDivClosed.Build R Rnneg_pred
+HB.instance Definition _ := GRing.isDivClosed.Build R nneg_num_pred
   nneg_divr_closed.
 
 Fact nneg_addr_closed : addr_closed (@nneg R).
 Proof. by split; [apply: lexx | apply: addr_ge0]. Qed.
 #[export]
-HB.instance Definition _ := GRing.isAddClosed.Build R Rnneg_pred
+HB.instance Definition _ := GRing.isAddClosed.Build R nneg_num_pred
   nneg_addr_closed.
 
 Fact real_oppr_closed : oppr_closed (@real R).
 Proof. by move=> x; rewrite /= !realE oppr_ge0 orbC -!oppr_ge0 opprK. Qed.
 #[export]
-HB.instance Definition _ := GRing.isOppClosed.Build R Rreal_pred
+HB.instance Definition _ := GRing.isOppClosed.Build R real_num_pred
   real_oppr_closed.
 
 Fact real_addr_closed : addr_closed (@real R).
@@ -266,7 +266,7 @@ case/orP: Ry => [y_ge0 | y_le0]; first by rewrite realE -nnegrE rpredD.
 by rewrite realE -[y]opprK orbC -oppr_ge0 opprB !subr_ge0 ger_leVge ?oppr_ge0.
 Qed.
 #[export]
-HB.instance Definition _ := GRing.isAddClosed.Build R Rreal_pred
+HB.instance Definition _ := GRing.isAddClosed.Build R real_num_pred
   real_addr_closed.
 
 Fact real_divr_closed : divr_closed (@real R).
@@ -280,7 +280,7 @@ case/orP: Ry => [? | y_le0]; first exact.
 by rewrite -rpredN -mulrN -invrN; apply; rewrite ?oppr_ge0.
 Qed.
 #[export]
-HB.instance Definition _ := GRing.isDivClosed.Build R Rreal_pred
+HB.instance Definition _ := GRing.isDivClosed.Build R real_num_pred
   real_divr_closed.
 
 End NumDomain.
