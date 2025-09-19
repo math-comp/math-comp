@@ -373,7 +373,7 @@ Definition cfAut_closed (S : seq classfun) :=
 End Automorphism.
 
 (* FIX ME this has changed *)
-Notation conjC := Num.conj_op.
+Notation conjC := Num.conj.
 
 Definition cfReal phi := cfAut conjC phi == phi.
 
@@ -433,7 +433,7 @@ Notation "''CF' ( G , A )" := (classfun_on G A) : ring_scope.
 Notation "1" := (@GRing.one (cfun_nzRingType _)) (only parsing) : cfun_scope.
 
 (* FIX ME this has changed *)
-Notation conjC := Num.conj_op.
+Notation conjC := Num.conj.
 
 Notation "phi ^*" := (cfAut conjC phi) : cfun_scope.
 Notation cfConjC_closed := (cfAut_closed conjC).
