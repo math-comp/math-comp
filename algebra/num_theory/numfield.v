@@ -22,8 +22,6 @@ From mathcomp Require Import ssralg poly orderedzmod numdomain.
 (*                    The HB class is called NumField.                        *)
 (* numClosedFieldType == Partially ordered Closed Field with conjugation      *)
 (*                    The HB class is called ClosedField.                     *)
-(*  realDomainType == Num domain where all elements are positive or negative  *)
-(*                    The HB class is called RealDomain.                      *)
 (*   realFieldType == Num Field where all elements are positive or negative   *)
 (*                    The HB class is called RealField.                       *)
 (*         rcfType == A Real Field with the real closed axiom                 *)
