@@ -24,6 +24,8 @@ From mathcomp Require Import ssralg poly orderedzmod.
 (*                    The HB class is called NormedZmodule.                   *)
 (*   numDomainType == Integral domain with an order and a norm                *)
 (*                    The HB class is called NumDomain.                       *)
+(*  realDomainType == Num domain where all elements are positive or negative  *)
+(*                    The HB class is called RealDomain.                      *)
 (*                                                                            *)
 (* Over these structures, we have the following operations:                   *)
 (*             `|x| == norm of x                                              *)
