@@ -18,7 +18,7 @@ From mathcomp Require Import mxalgebra mxpoly vector countalg.
 (*                   of a bounded size polynomial over a finite idomain       *)
 (* Considering {poly_n F} over a field F, it is a vectType and                *)
 (*          'nX^i == 'X^i as an element of {poly_n R}                         *)
-(*         polynX == [tuple 'X^0, ..., 'X^(n - 1)], basis of {poly_n R}       *)
+(*         npolyX == [tuple 'X^0, ..., 'X^(n - 1)], basis of {poly_n R}       *)
 (*    x.-lagrange == lagrange basis of {poly_n R} wrt x : nat -> F            *)
 (* x.-lagrange_ i == the ith lagrange polynomial wrt the sampling points x    *)
 (* Second, it defines polynomials quotiented by a poly (equivalent of 'Z_p),  *)
