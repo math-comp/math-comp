@@ -6,15 +6,11 @@ From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
 From mathcomp Require Import ssralg poly orderedzmod numdomain.
 
 (******************************************************************************)
-(*                            Number structures                               *)
+(*                      Number structures (numfield.v)                        *)
 (*                                                                            *)
 (* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
 (*                                                                            *)
-(* This file defines some classes to manipulate number structures, i.e,       *)
-(* structures with an order and a norm. To use this file, insert              *)
-(* "Import Num.Theory." before your scripts. You can also "Import Num.Def."   *)
-(* to enjoy shorter notations (e.g., minr instead of Num.min, lerif instead   *)
-(* of Num.leif, etc.).                                                        *)
+(* NB: The header of ssrnum.v explains how to use the files in this directory.*)
 (*                                                                            *)
 (* This file defines the following number structures:                         *)
 (*                                                                            *)
@@ -31,10 +27,11 @@ From mathcomp Require Import ssralg poly orderedzmod numdomain.
 (*       Num.sqrt x == in a real-closed field, a positive square root of x if *)
 (*                     x >= 0, or 0 otherwise                                 *)
 (* For numeric algebraically closed fields we provide the generic definitions *)
-(*         'i == the imaginary number (:= sqrtC (-1))                         *)
+(*         'i == the imaginary number                                         *)
 (*      'Re z == the real component of z                                      *)
 (*      'Im z == the imaginary component of z                                 *)
-(*        z^* == the complex conjugate of z (:= conjC z)                      *)
+(*        z^* == the complex conjugate of z                                   *)
+(*            := Num.conj z                                                   *)
 (*    sqrtC z == a nonnegative square root of z, i.e., 0 <= sqrt x if 0 <= x  *)
 (*  n.-root z == more generally, for n > 0, an nth root of z, chosen with a   *)
 (*               minimal non-negative argument for n > 1 (i.e., with a        *)
@@ -58,6 +55,11 @@ From mathcomp Require Import ssralg poly orderedzmod numdomain.
 (* Pdeg2.Real : theory of the degree 2 polynomials on RealField and rcfType.  *)
 (* Pdeg2.RealMonic : theory of Pdeg2.Real specialized to monic polynomials.   *)
 (******************************************************************************)
+
+Reserved Notation "n .-root" (format "n .-root").
+Reserved Notation "'i".
+Reserved Notation "'Re z" (at level 10, z at level 8).
+Reserved Notation "'Im z" (at level 10, z at level 8).
 
 Set Implicit Arguments.
 Unset Strict Implicit.
