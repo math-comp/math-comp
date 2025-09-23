@@ -3500,7 +3500,7 @@ End SetSubsetOrder.
 Module Exports.
 Arguments type disp T%_type.
 Notation "{ 'subset' [ d ] T }" := (type d T)
-  (d at next level, format "{ 'subset' [ d ]  T }") : type_scope.
+  (format "{ 'subset' [ d ]  T }") : type_scope.
 Notation "{ 'subset' T }" := {subset[subset_display] T}
   (format "{ 'subset' T }") : type_scope.
 
