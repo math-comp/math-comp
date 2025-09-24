@@ -2239,7 +2239,7 @@ Definition aut_Iirr u i := cfIirr (cfAut u 'chi[G]_i).
 Lemma aut_IirrE u i : 'chi_(aut_Iirr u i) = cfAut u 'chi_i.
 Proof. by rewrite cfIirrE ?cfAut_irr ?mem_irr. Qed.
 
-Definition conjC_Iirr := aut_Iirr conjC.
+Definition conjC_Iirr := aut_Iirr Num.conj.
 
 Lemma conjC_IirrE i : 'chi[G]_(conjC_Iirr i) = ('chi_i)^*%CF.
 Proof. exact: aut_IirrE. Qed.
@@ -2285,7 +2285,7 @@ move=> Nchi; without loss kerH: / H \subset cfker chi.
   by apply/cfunP=> x; rewrite cfunE cfun1E mulr_natr cfunElock IHchi.
 without loss nsHG: G chi Nchi kerH / H <| G.
   move=> IHchi; have nsHN := normalSG (subset_trans kerH (cfker_sub chi)).
-  rewrite cfQuoInorm//; apply/cfRes_char/IHchi => //; first exact: cfRes_char. 
+  rewrite cfQuoInorm//; apply/cfRes_char/IHchi => //; first exact: cfRes_char.
   by apply: sub_cfker_Res => //; apply: normal_sub.
 have [rG Dchi] := char_reprP Nchi; rewrite Dchi cfker_repr in kerH.
 apply/char_reprP; exists (Representation (quo_repr kerH (normal_norm nsHG))).

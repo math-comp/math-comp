@@ -595,7 +595,7 @@ Qed.
 
 End AutVchar.
 
-Definition cfConjC_vchar :=  cfAut_vchar conjC.
+Definition cfConjC_vchar :=  cfAut_vchar Num.conj.
 
 Section MoreVchar.
 
