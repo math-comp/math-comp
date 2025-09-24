@@ -575,7 +575,7 @@ Qed.
 Lemma conjC_vcharAut chi x : chi \in 'Z[irr G] -> (u (chi x))^* = u (chi x)^*.
 Proof.
 case/vcharP=> chi1 Nchi1 [chi2 Nchi2 ->].
-by rewrite !cfunE !rmorphB !conjC_charAut.
+by rewrite !cfunE !rmorphB /= !conjC_charAut.
 Qed.
 
 Lemma cfdot_aut_vchar phi chi :
@@ -595,7 +595,7 @@ Qed.
 
 End AutVchar.
 
-Definition cfConjC_vchar :=  cfAut_vchar conjC.
+Definition cfConjC_vchar :=  cfAut_vchar Num.conj.
 
 Section MoreVchar.
 

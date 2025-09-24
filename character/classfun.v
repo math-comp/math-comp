@@ -95,7 +95,7 @@ Unset Printing Implicit Defensive.
 Declare Scope cfun_scope.
 
 Local Open Scope group_scope.
-Import Order.TTheory GRing.Theory Num.Theory.
+Import Order.TTheory GRing.Theory Num.Theory Num.Def.
 Local Open Scope ring_scope.
 Delimit Scope cfun_scope with CF.
 
@@ -372,9 +372,6 @@ Definition cfAut_closed (S : seq classfun) :=
 
 End Automorphism.
 
-(* FIX ME this has changed *)
-Notation conjC := Num.conj_op.
-
 Definition cfReal phi := cfAut conjC phi == phi.
 
 Definition cfConjC_subset (S1 S2 : seq classfun) :=
@@ -431,9 +428,6 @@ Notation "''CF' ( G )" := (@fullv _ (cfun_vectType G)) : vspace_scope.
 Notation "''1_' A" := (cfun_indicator _ A) : ring_scope.
 Notation "''CF' ( G , A )" := (classfun_on G A) : ring_scope.
 Notation "1" := (@GRing.one (cfun_nzRingType _)) (only parsing) : cfun_scope.
-
-(* FIX ME this has changed *)
-Notation conjC := Num.conj_op.
 
 Notation "phi ^*" := (cfAut conjC phi) : cfun_scope.
 Notation cfConjC_closed := (cfAut_closed conjC).

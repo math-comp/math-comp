@@ -115,7 +115,7 @@ Reserved Notation "A ''_|_' B" (at level 69, format "A  ''_|_'  B").
 Reserved Notation "eps_theta .-sesqui" (format "eps_theta .-sesqui").
 
 Local Open Scope ring_scope.
-Import GRing.Theory Order.Theory Num.Theory.
+Import GRing.Theory Order.Theory Num.Theory Num.Def.
 
 Notation "''e_' j" := (delta_mx 0 j)
  (format "''e_' j", at level 8, j at level 2) : ring_scope.
@@ -152,22 +152,17 @@ Proof. by move: f => [? [? ? []]]. Qed.
 
 End InvolutiveTheory.
 
-Definition conjC {C : numClosedFieldType} (c : C) : C := c^*.
-
-HB.instance Definition _ (C : numClosedFieldType) :=
-  GRing.RMorphism.on (@conjC C).
-
 Section conjC_involutive.
 Variable C : numClosedFieldType.
 
 Let conjCfun_involutive : involutive (@conjC C). Proof. exact: conjCK. Qed.
 
 HB.instance Definition _ :=
-  isInvolutive.Build _ (@conjC C) conjCfun_involutive.
+  isInvolutive.Build _ conjC conjCfun_involutive.
 
 End conjC_involutive.
 
-Lemma map_mxCK {C : numClosedFieldType}  m n (A : 'M[C]_(m, n)) :
+Lemma map_mxCK {C : numClosedFieldType} m n (A : 'M[C]_(m, n)) :
   (A ^ conjC) ^ conjC = A.
 Proof. by apply/matrixP=> i j; rewrite !mxE conjCK. Qed.
 
@@ -707,7 +702,7 @@ Notation "eps_theta .-sesqui" := (sesqui _ eps_theta) : ring_scope.
 
 Notation symmetric_form := (false, idfun).-sesqui.
 Notation skew := (true, idfun).-sesqui.
-Notation hermitian := (false, @Num.conj_op _).-sesqui.
+Notation hermitian := (false, conjC).-sesqui.
 
 HB.mixin Record isDotProduct (R : numDomainType) (U : lmodType R)
   (op : U -> U -> R) := { neq0_dnorm_gt0 : forall u, u != 0 -> 0 < op u u }.
@@ -1659,7 +1654,7 @@ Notation hermsymmx := (hermitianmx _ false conjC).
 
 Lemma hermitian1mx_subproof {C : numClosedFieldType} n : (1%:M : 'M[C]_n) \is hermsymmx.
 Proof.
-by rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx conjC1.
+by rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx/= conjC1.
 Qed.
 
 Canonical hermitian1mx {C : numClosedFieldType} n :=

@@ -6,15 +6,11 @@ From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
 From mathcomp Require Import ssralg poly orderedzmod numdomain.
 
 (******************************************************************************)
-(*                            Number structures                               *)
+(*                      Number structures (numfield.v)                        *)
 (*                                                                            *)
 (* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
 (*                                                                            *)
-(* This file defines some classes to manipulate number structures, i.e,       *)
-(* structures with an order and a norm. To use this file, insert              *)
-(* "Import Num.Theory." before your scripts. You can also "Import Num.Def."   *)
-(* to enjoy shorter notations (e.g., minr instead of Num.min, lerif instead   *)
-(* of Num.leif, etc.).                                                        *)
+(* NB: The header of ssrnum.v explains how to use the files in this directory.*)
 (*                                                                            *)
 (* This file defines the following number structures:                         *)
 (*                                                                            *)
@@ -31,10 +27,11 @@ From mathcomp Require Import ssralg poly orderedzmod numdomain.
 (*       Num.sqrt x == in a real-closed field, a positive square root of x if *)
 (*                     x >= 0, or 0 otherwise                                 *)
 (* For numeric algebraically closed fields we provide the generic definitions *)
-(*         'i == the imaginary number (:= sqrtC (-1))                         *)
+(*         'i == the imaginary number                                         *)
 (*      'Re z == the real component of z                                      *)
 (*      'Im z == the imaginary component of z                                 *)
-(*        z^* == the complex conjugate of z (:= conjC z)                      *)
+(*        z^* == the complex conjugate of z                                   *)
+(*            := Num.conj z                                                   *)
 (*    sqrtC z == a nonnegative square root of z, i.e., 0 <= sqrt x if 0 <= x  *)
 (*  n.-root z == more generally, for n > 0, an nth root of z, chosen with a   *)
 (*               minimal non-negative argument for n > 1 (i.e., with a        *)
@@ -58,6 +55,11 @@ From mathcomp Require Import ssralg poly orderedzmod numdomain.
 (* Pdeg2.Real : theory of the degree 2 polynomials on RealField and rcfType.  *)
 (* Pdeg2.RealMonic : theory of Pdeg2.Real specialized to monic polynomials.   *)
 (******************************************************************************)
+
+Reserved Notation "n .-root" (format "n .-root").
+Reserved Notation "'i".
+Reserved Notation "'Re z" (at level 10, z at level 8).
+Reserved Notation "'Im z" (at level 10, z at level 8).
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -86,14 +88,19 @@ HB.export NumFieldExports.
 
 HB.mixin Record NumField_isImaginary R of NumField R := {
   imaginary : R;
-  conj_op : {rmorphism R -> R};
+  conj_subdef : {rmorphism R -> R};
   sqrCi : imaginary ^+ 2 = - 1;
-  normCK : forall x, `|x| ^+ 2 = x * conj_op x;
+  normCK_subdef : forall x, `|x| ^+ 2 = x * conj_subdef x;
 }.
 
 #[short(type="numClosedFieldType")]
 HB.structure Definition ClosedField :=
   { R of NumField_isImaginary R & GRing.ClosedField R & NumField R }.
+
+Definition conj {C : numClosedFieldType} : C -> C := @conj_subdef C.
+#[export] HB.instance Definition _ C := GRing.RMorphism.on (@conj C).
+#[deprecated(since="mathcomp 2.5.0",note="Use conj instead.")]
+Notation conj_op := conj (only parsing).
 
 Module ClosedFieldExports.
 Bind Scope ring_scope with ClosedField.sort.
@@ -142,11 +149,19 @@ End RealClosed.
 
 Module Import Def.
 
+Notation conjC := conj.
 Definition sqrtr {R} x := s2val (sig2W (@sqrtr_subproof R x)).
 
 End Def.
 
 Notation sqrt := sqrtr.
+
+Module Import Syntax.
+
+Notation "z ^*" := (conj z) : ring_scope.
+Notation "'i" := imaginary : ring_scope.
+
+End Syntax.
 
 Module Export Theory.
 Section NumFieldTheory.
@@ -588,21 +603,18 @@ Qed.
 
 End RealClosedFieldTheory.
 
-Notation "z ^*" := (conj_op z) : ring_scope.
-Notation "'i" := imaginary : ring_scope.
-
 Section ClosedFieldTheory.
 
 Variable C : numClosedFieldType.
 Implicit Types a x y z : C.
 
-Definition normCK : forall x, `|x| ^+ 2 = x * x^* := normCK.
+Definition normCK : forall x, `|x| ^+ 2 = x * x^* := normCK_subdef.
 
 Definition sqrCi : 'i ^+ 2 = -1 :> C := sqrCi.
 
 Lemma mulCii : 'i * 'i = -1 :> C. Proof. exact: sqrCi. Qed.
 
-Lemma conjCK : involutive (@conj_op C).
+Lemma conjCK : involutive (@conj C).
 Proof.
 have JE x : x^* = `|x|^+2 / x.
   have [->|x_neq0] := eqVneq x 0; first by rewrite rmorph0 invr0 mulr0.
@@ -719,7 +731,7 @@ Proof. by move/CrealP. Qed.
 Lemma conj_normC z : `|z|^* = `|z|.
 Proof. by rewrite conj_Creal ?normr_real. Qed.
 
-Lemma CrealJ : {mono (@conj_op C) : x / x \is Num.real}.
+Lemma CrealJ : {mono (@conj C) : x / x \is Num.real}.
 Proof. by apply: (homo_mono1 conjCK) => x xreal; rewrite conj_Creal. Qed.
 
 Lemma geC0_conj x : 0 <= x -> x^* = x.
@@ -787,7 +799,7 @@ Proof. by rewrite ReE CrealE fmorph_div rmorph_nat rmorphD /= conjCK addrC. Qed.
 
 Lemma Creal_Im x : 'Im x \is real.
 Proof.
-rewrite ImE CrealE fmorph_div rmorph_nat rmorphM /= rmorphB conjCK.
+rewrite ImE CrealE fmorph_div rmorph_nat rmorphM/= rmorphB/= conjCK.
 by rewrite conjCi -opprB mulrNN.
 Qed.
 Hint Resolve Creal_Re Creal_Im : core.
@@ -1874,4 +1886,4 @@ End Theory.
 Module Exports. HB.reexport. End Exports.
 
 End Num.
-Export Num.Exports.
+Export Num.Exports Num.Syntax.
