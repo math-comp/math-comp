@@ -35,7 +35,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GRing.Theory Order.Theory Num.Theory.
+Import GRing.Theory Order.Theory Num.Theory Num.Def.
 Local Open Scope ring_scope.
 Local Open Scope sesquilinear_scope.
 
@@ -85,7 +85,7 @@ move=> n_gt0 AB_comm; have [] := @common_eigenvector _ _ [:: A; B] n_gt0.
 by move=> v v_neq0 /allP vP; exists v; rewrite ?vP ?(mem_head, in_cons, orbT).
 Qed.
 
-Notation "M ^t*" := (M ^t Num.conj) (at level 30) : sesquilinear_scope.
+Notation "M ^t*" := (M ^t conjC) (at level 30) : sesquilinear_scope.
 Notation realmx := (mxOver Num.real).
 
 Lemma trmxCK {C : numClosedFieldType} m n (A : 'M[C]_(m, n)) : A ^t* ^t* = A.
@@ -95,7 +95,7 @@ Section realmx.
 Context {C : numClosedFieldType} {m n : nat}.
 Implicit Types A B : 'M[C]_(m, n).
 
-Lemma realmxC A : A \is a realmx -> A ^ Num.conj = A.
+Lemma realmxC A : A \is a realmx -> A ^ conjC = A.
 Proof.
 by move=> ?; apply/matrixP => x y; rewrite mxE; exact/CrealP/mxOverP.
 Qed.
@@ -229,11 +229,11 @@ by move=> /mulmx1C->; rewrite trmx1.
 Qed.
 
 Lemma conjC_unitary m n (M : 'M[C]_(m, n)) :
-  (M ^ Num.conj \is unitarymx) = (M \is unitarymx).
+  (M ^ conjC \is unitarymx) = (M \is unitarymx).
 Proof.
 apply/unitarymxP/unitarymxP; rewrite -?map_mxM ?map_trmx; last first.
   by move=> ->; rewrite map_mx1.
-by rewrite -[1%:M](map_mx1 Num.conj) => /map_mx_inj ->; rewrite map_mx1.
+by rewrite -[1%:M](map_mx1 conjC) => /map_mx_inj ->; rewrite map_mx1.
 Qed.
 
 Lemma trmxC_unitary n (M : 'M[C]_n) : (M ^t* \is unitarymx) = (M \is unitarymx).
@@ -268,7 +268,7 @@ Section Spectral.
 Variable (C : numClosedFieldType).
 Set Default Proof Using "C".
 
-Local Notation dotmx_def := (form_of_matrix Num.conj 1%:M).
+Local Notation dotmx_def := (form_of_matrix conjC 1%:M).
 Definition dotmx n (u v : 'rV[C]_n) := dotmx_def u%R v%R.
 
 (*
@@ -312,7 +312,7 @@ HB.instance Definition _ n := isDotProduct.Build _ _ (@dotmx n)
   (@dotmx_is_dotmx n).
 
 Local Notation "B ^!" :=
-  (orthomx (@Num.conj C) (mx_of_hermitian (hermitian1mx _)) B) :
+  (orthomx conjC (mx_of_hermitian (hermitian1mx _)) B) :
     matrix_set_scope.
 Local Notation "A '_|_ B" := (A%MS <= B^!)%MS : bool_scope.
 
@@ -602,7 +602,7 @@ move=> P' P'_unitary /allP /= P'P.
 exists ((block_mx 1%:M 0 0 P') *m S).
   rewrite mul_unitarymx ?schmidt_complete_unitarymx //.
   apply/unitarymxP; rewrite tr_block_mx map_block_mx mulmx_block.
-  rewrite !trmx0 !(@map_mx0 _ _ Num.conj) !tr_scalar_mx !map_scalar_mx/=.
+  rewrite !trmx0 !(@map_mx0 _ _ conjC) !tr_scalar_mx !map_scalar_mx/=.
   rewrite ?conjC1 !(mulmx1, mul1mx, mulmx0, mul0mx, addr0, add0r).
   by rewrite (unitarymxP _) -?scalar_mx_block.
 apply/allP => /= A A_in.
@@ -694,7 +694,7 @@ case: orthomx_spectral_subproof.
   by move=> Psp; case: sig2_eqW => //=; constructor.
 move=> /orthomx_spectral_subproof Ann; constructor; apply/eqP.
 apply: contra Ann; rewrite invmx1 mul1mx mulmx1 => /eqP->.
-suff -> : diag_mx 0 = 0 by rewrite qualifE trmx0 (map_mx0 Num.conj).
+suff -> : diag_mx 0 = 0 by rewrite qualifE trmx0 (map_mx0 conjC).
 by move=> ? ?; apply/matrixP=> i j; rewrite !mxE mul0rn.
 Qed.
 
