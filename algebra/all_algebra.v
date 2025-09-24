@@ -13,6 +13,7 @@ From mathcomp Require Export qpoly.
 From mathcomp Require Export ssrint.
 From mathcomp Require Export archimedean.
 From mathcomp Require Export rat.
+From mathcomp Require Export lra.
 From mathcomp Require Export intdiv.
 From mathcomp Require Export interval.
 From mathcomp Require Import interval_inference.
