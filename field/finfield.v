@@ -266,7 +266,7 @@ HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build 'F_p R
 Lemma pprimeChar_scaleAr (a : 'F_p) (x y : R) : a *: (x * y) = x * (a *: y).
 Proof. by rewrite ![a *: _]mulr_natl mulrnAr. Qed.
 
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build 'F_p R
+HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build 'F_p R
   pprimeChar_scaleAr.
 
 End PrimeCharRing.
@@ -727,7 +727,7 @@ by rewrite -[aq d]expr1 -exprB ?leq_b1 ?unitfE ?rpredX.
 Qed.
 
 Definition FinDomainFieldType : finFieldType :=
- let cC := GRing.PzRing_hasCommutativeMul.Build R finDomain_mulrC in
+ let cC := GRing.PzSemiRing_hasCommutativeMul.Build R finDomain_mulrC in
  let cR : comUnitRingType := HB.pack R cC in
  let iC := GRing.ComUnitRing_isIntegral.Build cR domR in
  let iR : finIdomainType := HB.pack cR iC in

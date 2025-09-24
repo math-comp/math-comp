@@ -1821,8 +1821,9 @@ Definition lfun_lalgMixin := GRing.Lmodule_isLalgebra.Build R lfun_nzRingType
 Definition lfun_lalgType : lalgType R :=
   HB.pack 'End(vT) lfun_nzRingType lfun_lalgMixin.
 
-Definition lfun_algMixin := GRing.Lalgebra_isAlgebra.Build R lfun_lalgType
-  (fun k x y => comp_lfunZl k y x).
+Definition lfun_algMixin :=
+  GRing.LSemiAlgebra_isSemiAlgebra.Build R lfun_lalgType
+    (fun k x y => comp_lfunZl k y x).
 Definition lfun_algType : algType R :=
   HB.pack 'End(vT) lfun_lalgType lfun_algMixin.
 

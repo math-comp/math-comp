@@ -321,7 +321,7 @@ Proof. by rewrite !(mulrC phi) cfun_scaleAl. Qed.
 HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build algC classfun
   cfun_scaleAl.
 
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build algC classfun
+HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build algC classfun
   cfun_scaleAr.
 
 Section Automorphism.
