@@ -102,9 +102,9 @@ Unset Printing Implicit Defensive.
 
 Declare Scope quotient_scope.
 
-Reserved Notation "\pi_ Q" (at level 0, format "\pi_ Q").
+Reserved Notation "\pi_ Q" (at level 0, Q at level 0, format "\pi_ Q").
 Reserved Notation "\pi" (format "\pi").
-Reserved Notation "{pi_ Q a }" (Q at next level, format "{pi_ Q  a }").
+Reserved Notation "{pi_ Q a }" (Q at level 0, format "{pi_ Q  a }").
 Reserved Notation "{pi a }" (format "{pi  a }").
 #[warning="-postfix-notation-not-level-1"]
 Reserved Notation "x == y %[mod_eq e ]"
