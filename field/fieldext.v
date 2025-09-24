@@ -82,7 +82,7 @@ Import GRing.Theory.
 
 #[short(type="fieldExtType")]
 HB.structure Definition FieldExt (R : nzRingType) := {T of Falgebra R T &
-  GRing.PzRing_hasCommutativeMul T & GRing.Field T}.
+  GRing.PzSemiRing_hasCommutativeMul T & GRing.Field T}.
 
 Module FieldExtExports.
 Bind Scope ring_scope with FieldExt.sort.
@@ -208,7 +208,7 @@ HB.instance Definition _ (K : {subfield L}) :=
    there, it is thus built only here *)
 
 HB.instance Definition _ (K : {subfield L}) :=
-  [SubNzRing_isSubComNzRing of subvs_of K by <:].
+  [SubSemiRing_isSubComSemiRing of subvs_of K by <:].
 HB.instance Definition _ (K : {subfield L}) :=
   [SubComUnitRing_isSubIntegralDomain of subvs_of K by <:].
 
@@ -645,7 +645,7 @@ HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build _ L_F
 Fact fieldOver_scaleAr a u v : a *F: (u * v) = u * (a *F: v).
 Proof. exact: mulrCA. Qed.
 
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build _ L_F
+HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build _ L_F
   fieldOver_scaleAr.
 
 Fact fieldOver_vectMixin : Lmodule_hasFinDim K_F L_F.
@@ -798,7 +798,7 @@ HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build _ L0
 Fact baseField_scaleAr a u v : a *F0: (u * v) = u * (a *F0: v).
 Proof. exact: scalerAr. Qed.
 
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build _ L0
+HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build _ L0
   baseField_scaleAr.
 
 Let n := \dim {:F}.
@@ -1235,7 +1235,7 @@ HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build _ subFExtend
 
 Fact subfx_scaleAr a u v : subfx_scale a (u * v) = u * (subfx_scale a v).
 Proof. exact: mulrCA. Qed.
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build _ subFExtend
+HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build _ subFExtend
   subfx_scaleAr.
 
 Fact subfx_evalZ : scalable subfx_eval.
@@ -1373,7 +1373,7 @@ have mulZlM : GRing.Lmodule_isLalgebra F rL.
   constructor => a x y; apply: toPinj.
   by rewrite toL_K /toPF !linearZ /= -!/(toPF _) toL_K -scalerAl modpZl.
 pose laL : lalgType F := HB.pack rL mulZlM.
-have mulZrM : GRing.Lalgebra_isAlgebra F laL.
+have mulZrM : GRing.LSemiAlgebra_isSemiAlgebra F laL.
   by constructor => a x y; rewrite !(mulrC x) scalerAl.
 pose aL : algType F := HB.pack laL mulZrM.
 pose uLM := Algebra_isFalgebra.Build F aL.

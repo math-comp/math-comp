@@ -973,8 +973,8 @@ HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build K (subvs_of A)
 
 Lemma subvs_scaleAr k (x y : subvs_of A) : k *: (x * y) = x * (k *: y).
 Proof. exact/val_inj/scalerAr. Qed.
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build K (subvs_of A)
-  subvs_scaleAr.
+HB.instance Definition _ :=
+  GRing.LSemiAlgebra_isSemiAlgebra.Build K (subvs_of A) subvs_scaleAr.
 
 HB.instance Definition _ := Algebra_isFalgebra.Build K (subvs_of A).
 
