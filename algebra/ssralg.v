@@ -424,8 +424,12 @@ From mathcomp Require Export nmodule.
 (*                           x *: y = x * (y : R)                             *)
 (*                   k%:A == the image of the scalar k in a left semialgebra; *)
 (*                           this is simply notation for k *: 1               *)
+(*    subsemialg_closed S <-> collective predicate S is closed under          *)
+(*                           lSemiAlgType operations                          *)
+(*                           (0, 1, +%R, *%R, and *:%R)                       *)
 (* [SubSemiRing_SubLSemiModule_isSubLSemiAlgebra of V by <:]                  *)
-(*                        == mixin axiom for a subType of an lSemiAlgType     *)
+(* [SubChoice_isSubLSemiAlgebra of V by <:] == mixin axiom for a subType of   *)
+(*                           an lSemiAlgType                                  *)
 (*                                                                            *)
 (*  * Lalgebra (left algebra, ring with scaling that associates on the left): *)
 (*        subalg_closed S <-> collective predicate S is closed under lalgType *)
@@ -436,7 +440,8 @@ From mathcomp Require Export nmodule.
 (*                                                                            *)
 (*  * SemiAlgebra (semiring with scaling that associates both left and right):*)
 (* [SubLSemiAlgebra_isSubSemiAlgebra of V by <:] ==                           *)
-(*                        == mixin axiom for a subType of an semiAlgType      *)
+(* [SubChoice_isSubSemiAlgebra of V by <:] == mixin axiom for a subType of an *)
+(*                           semiAlgType                                      *)
 (*                                                                            *)
 (*  * Algebra (ring with scaling that associates both left and right):        *)
 (* [SubLalgebra_isSubAlgebra of V by <:] ==                                   *)
@@ -2031,6 +2036,12 @@ move=> /[dup] /submod_closedB /zmod_closedD SD [S0 Slin]; split => // a v Sv.
 by rewrite -[a *: v]addr0 Slin.
 Qed.
 
+Lemma subsemimod_closed_submod : subsemimod_closed S -> submod_closed.
+Proof. by case=> [[S0 SD] SZ]; split => // a u v Su Sv; apply/SD/Sv/SZ. Qed.
+
+Lemma subsemimod_closedB : subsemimod_closed S -> zmod_closed S.
+Proof. by move/subsemimod_closed_submod/submod_closedB. Qed.
+
 End ClosedPredicates.
 
 End LmoduleTheory.
@@ -2104,6 +2115,21 @@ Variables (R : pzSemiRingType) (A : lSemiAlgType R).
 Lemma mulr_algl (a : R) (x : A) : (a *: 1) * x = a *: x.
 Proof. by rewrite -scalerAl mul1r. Qed.
 
+Section ClosedPredicates.
+
+Variable S : {pred A}.
+
+Definition subsemialg_closed :=
+  [/\ 1 \in S, nmod_closed S, scaler_closed S & mulr_2closed S].
+
+Lemma subsemialg_closedZ : subsemialg_closed -> subsemimod_closed S.
+Proof. by case. Qed.
+
+Lemma subsemialg_closedM : subsemialg_closed -> semiring_closed S.
+Proof. by case. Qed.
+
+End ClosedPredicates.
+
 End LSemiAlgebraTheory.
 
 Section LalgebraTheory.
@@ -2121,6 +2147,18 @@ Proof. by case=> S1 Slin _; split; rewrite // -(subrr 1) linear_closedB. Qed.
 
 Lemma subalg_closedBM : subalg_closed -> subring_closed S.
 Proof. by case=> S1 Slin SM; split=> //; apply: linear_closedB. Qed.
+
+Lemma subalg_closed_semi : subalg_closed -> subsemialg_closed S.
+Proof.
+move=> /[dup] /subalg_closedZ /submod_closedB /zmod_closedD.
+by move=> [S0 SD] [S1 Slin SM]; split => // a u Su; rewrite -[a *: u]addr0 Slin.
+Qed.
+
+Lemma subsemialg_closed_subalg : subsemialg_closed S -> subalg_closed.
+Proof. by case=> S1 [S0 SD] SZ SM; split => // a u v Su Sv; apply/SD/Sv/SZ. Qed.
+
+Lemma subsemialg_closedBM : subsemialg_closed S -> subring_closed S.
+Proof. by move/subsemialg_closed_subalg/subalg_closedBM. Qed.
 
 End ClosedPredicates.
 
@@ -3168,7 +3206,7 @@ End SemiAlgExports.
 
 HB.factory Record LSemiAlgebra_isComSemiAlgebra R V
   of ComPzSemiRing V & LSemiAlgebra R V := {}.
-HB.builders Context (R : pzSemiRingType) V of LSemiAlgebra_isComSemiAlgebra R V.
+HB.builders Context R V of LSemiAlgebra_isComSemiAlgebra R V.
 
 Lemma scalarAr k (x y : V) : k *: (x * y) = x * (k *: y).
 Proof. by rewrite mulrC scalerAl mulrC. Qed.
@@ -3189,21 +3227,13 @@ HB.export AlgExports.
 HB.factory Record Lalgebra_isAlgebra (R : pzRingType) V of Lalgebra R V := {
   scalerAr : forall k (x y : V), k *: (x * y) = x * (k *: y);
 }.
-HB.builders Context (R : pzRingType) V of Lalgebra_isAlgebra R V.
-
+HB.builders Context R V of Lalgebra_isAlgebra R V.
 HB.instance Definition _ := LSemiAlgebra_isSemiAlgebra.Build R V scalerAr.
-
 HB.end.
 
 HB.factory Record Lalgebra_isComAlgebra R V of ComPzRing V & Lalgebra R V := {}.
-HB.builders Context (R : pzRingType) V of Lalgebra_isComAlgebra R V.
-
-Lemma scalarAr k (x y : V) : k *: (x * y) = x * (k *: y).
-Proof. by rewrite mulrC scalerAl mulrC. Qed.
-
-HB.instance Definition lalgebra_is_algebra : Lalgebra_isAlgebra R V :=
-  Lalgebra_isAlgebra.Build R V scalarAr.
-
+HB.builders Context R V of Lalgebra_isComAlgebra R V.
+HB.instance Definition _ := LSemiAlgebra_isComSemiAlgebra.Build R V.
 HB.end.
 
 #[short(type="comSemiAlgType")]
@@ -3800,8 +3830,11 @@ Coercion subsemimod_closedZ : subsemimod_closed >-> scaler_closed.
 Coercion linear_closedB : linear_closed >-> subr_2closed.
 Coercion submod_closedB : submod_closed >-> zmod_closed.
 Coercion submod_closed_semi : submod_closed >-> subsemimod_closed.
+Coercion subsemialg_closedZ : subsemialg_closed >-> subsemimod_closed.
+Coercion subsemialg_closedM : subsemialg_closed >-> semiring_closed.
 Coercion subalg_closedZ : subalg_closed >-> submod_closed.
 Coercion subalg_closedBM : subalg_closed >-> subring_closed.
+Coercion subalg_closed_semi : subalg_closed >-> subsemialg_closed.
 Coercion divr_closedV : divr_closed >-> invr_closed.
 Coercion divr_closedM : divr_closed >-> mulr_closed.
 Coercion sdivr_closed_div : sdivr_closed >-> divr_closed.
@@ -5236,26 +5269,38 @@ HB.end.
 
 HB.factory Record isSubmodClosed (R : pzRingType) (V : lmodType R)
     (S : V -> bool) := {
-  submod_closed_subproof : submod_closed S
+  subsemimod_closed_subproof : subsemimod_closed S
 }.
 
 HB.builders Context R V S of isSubmodClosed R V S.
 HB.instance Definition _ := isZmodClosed.Build V S
-  (submod_closedB submod_closed_subproof).
+  (subsemimod_closedB subsemimod_closed_subproof).
 HB.instance Definition _ := isScaleClosed.Build R V S
-  (subsemimod_closedZ (submod_closed_semi submod_closed_subproof)).
+  (subsemimod_closedZ subsemimod_closed_subproof).
+HB.end.
+
+HB.factory Record isSubSemiAlgClosed (R : pzSemiRingType) (A : lSemiAlgType R)
+    (S : A -> bool) := {
+  subsemialg_closed_subproof : subsemialg_closed S
+}.
+
+HB.builders Context R A S of isSubSemiAlgClosed R A S.
+HB.instance Definition _ := isSubSemiModClosed.Build R A S
+  (subsemialg_closedZ subsemialg_closed_subproof).
+HB.instance Definition _ := isSemiringClosed.Build A S
+  (subsemialg_closedM subsemialg_closed_subproof).
 HB.end.
 
 HB.factory Record isSubalgClosed (R : pzRingType) (A : lalgType R)
     (S : A -> bool) := {
-  subalg_closed_subproof : subalg_closed S
+  subsemialg_closed_subproof : subsemialg_closed S
 }.
 
 HB.builders Context R A S of isSubalgClosed R A S.
 HB.instance Definition _ := isSubmodClosed.Build R A S
-  (subalg_closedZ subalg_closed_subproof).
-HB.instance Definition _ := isSubringClosed.Build A S
-  (subalg_closedBM subalg_closed_subproof).
+  (subsemialg_closedZ subsemialg_closed_subproof).
+HB.instance Definition _ := isSemiringClosed.Build A S
+  (subsemialg_closedM subsemialg_closed_subproof).
 HB.end.
 
 HB.factory Record isDivringClosed (R : unitRingType) (S : R -> bool) := {
@@ -5278,7 +5323,7 @@ HB.builders Context R A S of isDivalgClosed R A S.
 HB.instance Definition _ := isDivringClosed.Build A S
   (divalg_closedBdiv divalg_closed_subproof).
 HB.instance Definition _ := isSubalgClosed.Build R A S
-  (divalg_closedZ divalg_closed_subproof).
+  (subalg_closed_semi (divalg_closedZ divalg_closed_subproof)).
 HB.end.
 
 Section NmodulePred.
@@ -5358,9 +5403,7 @@ Lemma rpred_sign (S : smulClosed R) n : (-1) ^+ n \in S.
 Proof. by rewrite rpredX ?rpredN1. Qed.
 
 Lemma subringClosedP (rngS : subringClosed R) : subring_closed rngS.
-Proof.
-split; [ exact: rpred1 | exact: (zmodClosedP rngS).2 | exact: rpredM ].
-Qed.
+Proof. split; [ exact: rpred1 | exact: rpredB | exact: rpredM ]. Qed.
 
 End RingPred.
 
@@ -5384,22 +5427,27 @@ Lemma rpredZsign (S : opprClosed V) n u : ((-1) ^+ n *: u \in S) = (u \in S).
 Proof. by rewrite -signr_odd scaler_sign fun_if if_arg rpredN if_same. Qed.
 
 Lemma submodClosedP (modS : submodClosed V) : submod_closed modS.
-Proof.
-split; first exact (@rpred0D V modS).1.
-by move=> a u v uS vS; apply: rpredD; first exact: rpredZ.
-Qed.
+Proof. exact/subsemimod_closed_submod/subsemimodClosedP. Qed.
 
 End LmodPred.
+
+Section LalgPred.
+
+Variables (R : pzSemiRingType) (A : lSemiAlgType R).
+
+Lemma subsemialgClosedP (algS : subalgClosed A) : subsemialg_closed algS.
+Proof.
+split; [ exact: rpred1 | exact: rpred0D | exact: rpredZ | exact: rpredM ].
+Qed.
+
+End LalgPred.
 
 Section LalgPred.
 
 Variables (R : pzRingType) (A : lalgType R).
 
 Lemma subalgClosedP (algS : subalgClosed A) : subalg_closed algS.
-Proof.
-split; [ exact: rpred1 | | exact: rpredM ].
-by move=> a u v uS vS; apply: rpredD; first exact: rpredZ.
-Qed.
+Proof. exact/subsemialg_closed_subalg/subsemialgClosedP. Qed.
 
 End LalgPred.
 
@@ -5601,6 +5649,15 @@ Proof. by split=> [|x y] /=; rewrite !SubK. Qed.
 HB.instance Definition _ := isSubPzSemiRing.Build R S U valM.
 HB.end.
 
+HB.factory Record SubPzSemiRing_isNonZero (R : nzSemiRingType) S U
+  of SubPzSemiRing R S U := {}.
+
+HB.builders Context R S U of SubPzSemiRing_isNonZero R S U.
+Lemma oner_neq0 : (1 : U) != 0.
+Proof. by rewrite -(inj_eq val_inj) rmorph0 rmorph1 oner_neq0. Qed.
+HB.instance Definition _ := PzSemiRing_isNonZero.Build U oner_neq0.
+HB.end.
+
 HB.factory Record SubNmodule_isSubNzSemiRing (R : nzSemiRingType) S U
     of SubNmodule R S U := {
   mulr_closed_subproof : mulr_closed S
@@ -5618,13 +5675,9 @@ Notation SubNmodule_isSubSemiRing R S U :=
   (SubNmodule_isSubNzSemiRing R S U) (only parsing).
 
 HB.builders Context R S U of SubNmodule_isSubNzSemiRing R S U.
-
 HB.instance Definition _ := SubNmodule_isSubPzSemiRing.Build R S U
   mulr_closed_subproof.
-
-Lemma oner_neq0 : (1 : U) != 0.
-Proof. by rewrite -(inj_eq val_inj) SubK raddf0 oner_neq0. Qed.
-HB.instance Definition _ := PzSemiRing_isNonZero.Build U oner_neq0.
+HB.instance Definition _ := SubPzSemiRing_isNonZero.Build R S U.
 HB.end.
 
 #[short(type="subComPzSemiRingType")]
@@ -5689,13 +5742,6 @@ HB.factory Record SubZmodule_isSubPzRing (R : pzRingType) S U
 }.
 
 HB.builders Context R S U of SubZmodule_isSubPzRing R S U.
-
-HB.instance Definition _ := isSubringClosed.Build R S subring_closed_subproof.
-
-Let inU v Sv : U := Sub v Sv.
-Let oneU : U := inU (@rpred1 _ (MulClosed.clone R S _)).
-Let mulU (u1 u2 : U) := inU (rpredM _ _ (valP u1) (valP u2)).
-
 HB.instance Definition _ := SubNmodule_isSubPzSemiRing.Build R S U
   (smulr_closedM (subring_closedM subring_closed_subproof)).
 HB.end.
@@ -5737,13 +5783,6 @@ Notation SubZmodule_isSubRing R S U :=
   (SubZmodule_isSubNzRing R S U) (only parsing).
 
 HB.builders Context R S U of SubZmodule_isSubNzRing R S U.
-
-HB.instance Definition _ := isSubringClosed.Build R S subring_closed_subproof.
-
-Let inU v Sv : U := Sub v Sv.
-Let oneU : U := inU (@rpred1 _ (MulClosed.clone R S _)).
-Let mulU (u1 u2 : U) := inU (rpredM _ _ (valP u1) (valP u2)).
-
 HB.instance Definition _ := SubNmodule_isSubNzSemiRing.Build R S U
   (smulr_closedM (subring_closedM subring_closed_subproof)).
 HB.end.
@@ -5756,9 +5795,7 @@ HB.factory Record SubPzRing_isSubComPzRing (R : comPzRingType) S U
     of SubPzRing R S U := {}.
 
 HB.builders Context R S U of SubPzRing_isSubComPzRing R S U.
-Lemma mulrC : @commutative U U *%R.
-Proof. by move=> x y; apply: val_inj; rewrite !rmorphM mulrC. Qed.
-HB.instance Definition _ := PzRing_hasCommutativeMul.Build U mulrC.
+HB.instance Definition _ := SubPzSemiRing_isSubComPzSemiRing.Build R S U.
 HB.end.
 
 #[short(type="subComNzRingType")]
@@ -5829,23 +5866,19 @@ HB.factory Record isSubLmodule (R : pzRingType) (V : lmodType R) (S : pred V)
  valZ : scalable (val : W -> V);
 }.
 
-HB.builders Context (R : pzRingType) (V : lmodType R) S W of
-  isSubLmodule R V S W.
-
+HB.builders Context R V S W of isSubLmodule R V S W.
 HB.instance Definition _ := isSubLSemiModule.Build R V S W valZ.
-
 HB.end.
 
 HB.factory Record SubNmodule_isSubLSemiModule
     (R : pzSemiRingType) (V : lSemiModType R) S W of SubNmodule V S W := {
-  submod_closed_subproof : subsemimod_closed S
+  subsemimod_closed_subproof : subsemimod_closed S
 }.
 
-HB.builders Context (R : pzSemiRingType) (V : lSemiModType R) S W
-  of SubNmodule_isSubLSemiModule R V S W.
+HB.builders Context R V S W of SubNmodule_isSubLSemiModule R V S W.
 
 HB.instance Definition _ :=
-  isSubSemiModClosed.Build R V S submod_closed_subproof.
+  isSubSemiModClosed.Build R V S subsemimod_closed_subproof.
 
 Let inW v Sv : W := Sub v Sv.
 Let scaleW a (w : W) := inW (rpredZ a _ (valP w)).
@@ -5857,13 +5890,9 @@ Proof. by apply: val_inj; rewrite SubK scale0r raddf0. Qed.
 Lemma scale1r : left_id 1 scaleW.
 Proof. by move=> x; apply: val_inj; rewrite SubK scale1r. Qed.
 Lemma scalerDr : right_distributive scaleW +%R.
-Proof.
-by move=> a u v; apply: val_inj; rewrite !(SubK, raddfD)/= !SubK.
-Qed.
+Proof. by move=> a u v; apply: val_inj; rewrite SubK !raddfD/= !SubK. Qed.
 Lemma scalerDl v : {morph scaleW^~ v : a b / a + b}.
-Proof.
-by move=> a b; apply: val_inj; rewrite !(SubK, raddfD)/= !SubK scalerDl.
-Qed.
+Proof. by move=> a b; apply: val_inj; rewrite raddfD/= !SubK scalerDl. Qed.
 HB.instance Definition _ := Nmodule_isLSemiModule.Build R W
   scalerA' scale0r scale1r scalerDr scalerDl.
 
@@ -5873,13 +5902,12 @@ HB.end.
 
 HB.factory Record SubZmodule_isSubLmodule (R : pzRingType) (V : lmodType R) S W
     of SubZmodule V S W := {
-  submod_closed_subproof : submod_closed S
+  subsemimod_closed_subproof : subsemimod_closed S
 }.
 
-HB.builders Context (R : pzRingType) (V : lmodType R) S W
-  of SubZmodule_isSubLmodule R V S W.
+HB.builders Context R V S W of SubZmodule_isSubLmodule R V S W.
 HB.instance Definition _ := SubNmodule_isSubLSemiModule.Build R V S W
-  (submod_closed_semi submod_closed_subproof).
+  subsemimod_closed_subproof.
 HB.end.
 
 #[short(type="subLSemiAlgType")]
@@ -5895,7 +5923,7 @@ HB.factory Record SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra
   (R : pzSemiRingType) (V : lSemiAlgType R) S W
   of SubNzSemiRing V S W & @SubLSemiModule R V S W := {}.
 
-HB.builders Context (R : pzSemiRingType) (V : lSemiAlgType R) S W
+HB.builders Context R V S W
   of SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra R V S W.
 Lemma scalerAl (a : R) (u v : W) : a *: (u * v) = a *: u * v.
 Proof. by apply: val_inj; rewrite !(linearZ, rmorphM) /= linearZ scalerAl. Qed.
@@ -5917,8 +5945,7 @@ End SubRing_SubLmodule_isSubLalgebra.
 Notation SubRing_SubLmodule_isSubLalgebra R V S U :=
   (SubNzRing_SubLmodule_isSubLalgebra R V S U) (only parsing).
 
-HB.builders Context (R : pzRingType) (V : lalgType R) S W
-  of SubNzRing_SubLmodule_isSubLalgebra R V S W.
+HB.builders Context R V S W of SubNzRing_SubLmodule_isSubLalgebra R V S W.
 HB.instance Definition _ :=
   SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra.Build R V S W.
 HB.end.
@@ -5935,8 +5962,7 @@ HB.structure Definition SubAlgebra (R : pzRingType) (V : algType R) S :=
 HB.factory Record SubLSemiAlgebra_isSubSemiAlgebra (R : pzSemiRingType)
     (V : semiAlgType R) S W of @SubLSemiAlgebra R V S W := {}.
 
-HB.builders Context (R : pzSemiRingType) (V : semiAlgType R) S W
-  of SubLSemiAlgebra_isSubSemiAlgebra R V S W.
+HB.builders Context R V S W of SubLSemiAlgebra_isSubSemiAlgebra R V S W.
 Lemma scalerAr (k : R) (x y : W) : k *: (x * y) = x * (k *: y).
 Proof. by apply: val_inj; rewrite !(linearZ, rmorphM)/= linearZ scalerAr. Qed.
 HB.instance Definition _ := LSemiAlgebra_isSemiAlgebra.Build R W scalerAr.
@@ -5945,8 +5971,7 @@ HB.end.
 HB.factory Record SubLalgebra_isSubAlgebra (R : pzRingType)
     (V : algType R) S W of @SubLalgebra R V S W := {}.
 
-HB.builders Context (R : pzRingType) (V : algType R) S W
-  of SubLalgebra_isSubAlgebra R V S W.
+HB.builders Context R V S W of SubLalgebra_isSubAlgebra R V S W.
 HB.instance Definition _ := SubLSemiAlgebra_isSubSemiAlgebra.Build R V S W.
 HB.end.
 
@@ -5959,7 +5984,7 @@ HB.factory Record SubNzRing_isSubUnitRing (R : unitRingType) S U
   divring_closed_subproof : divring_closed S
 }.
 
-HB.builders Context (R : unitRingType) S U of SubNzRing_isSubUnitRing R S U.
+HB.builders Context R S U of SubNzRing_isSubUnitRing R S U.
 
 HB.instance Definition _ := isDivringClosed.Build R S divring_closed_subproof.
 
@@ -5997,8 +6022,7 @@ HB.structure Definition SubIntegralDomain (R : idomainType) (S : pred R) :=
 HB.factory Record SubComUnitRing_isSubIntegralDomain (R : idomainType) S U
   of SubComUnitRing R S U := {}.
 
-HB.builders Context (R : idomainType) S U
-  of SubComUnitRing_isSubIntegralDomain R S U.
+HB.builders Context R S U of SubComUnitRing_isSubIntegralDomain R S U.
 Lemma id : IntegralDomain.axiom U.
 Proof.
 move=> x y /(congr1 val)/eqP; rewrite rmorphM /=.
@@ -6016,7 +6040,7 @@ HB.factory Record SubIntegralDomain_isSubField (F : fieldType) S U
   subfield_subproof : {mono (val : U -> F) : u / u \in unit}
 }.
 
-HB.builders Context (F : fieldType) S U of SubIntegralDomain_isSubField F S U.
+HB.builders Context F S U of SubIntegralDomain_isSubField F S U.
 Lemma fieldP : Field.axiom U.
 Proof.
 by move=> u; rewrite -(inj_eq val_inj) rmorph0 -unitfE subfield_subproof.
@@ -6029,7 +6053,7 @@ HB.factory Record SubChoice_isSubPzSemiRing (R : pzSemiRingType) S U
   semiring_closed_subproof : semiring_closed S
 }.
 
-HB.builders Context (R : pzSemiRingType) S U of SubChoice_isSubPzSemiRing R S U.
+HB.builders Context R S U of SubChoice_isSubPzSemiRing R S U.
 HB.instance Definition _ := SubChoice_isSubNmodule.Build R S U
   (semiring_closedD semiring_closed_subproof).
 HB.instance Definition _ := SubNmodule_isSubPzSemiRing.Build R S U
@@ -6052,11 +6076,10 @@ End SubChoice_isSubSemiRing.
 Notation SubChoice_isSubSemiRing R S U :=
   (SubChoice_isSubNzSemiRing R S U) (only parsing).
 
-HB.builders Context (R : nzSemiRingType) S U of SubChoice_isSubNzSemiRing R S U.
-HB.instance Definition _ := SubChoice_isSubNmodule.Build R S U
-  (semiring_closedD semiring_closed_subproof).
-HB.instance Definition _ := SubNmodule_isSubNzSemiRing.Build R S U
-  (semiring_closedM semiring_closed_subproof).
+HB.builders Context R S U of SubChoice_isSubNzSemiRing R S U.
+HB.instance Definition _ := SubChoice_isSubPzSemiRing.Build R S U
+  semiring_closed_subproof.
+HB.instance Definition _ := SubPzSemiRing_isNonZero.Build R S U.
 HB.end.
 
 HB.factory Record SubChoice_isSubComPzSemiRing (R : comPzSemiRingType) S U
@@ -6064,8 +6087,7 @@ HB.factory Record SubChoice_isSubComPzSemiRing (R : comPzSemiRingType) S U
   semiring_closed_subproof : semiring_closed S
 }.
 
-HB.builders Context (R : comPzSemiRingType) S U
-  of SubChoice_isSubComPzSemiRing R S U.
+HB.builders Context R S U of SubChoice_isSubComPzSemiRing R S U.
 HB.instance Definition _ := SubChoice_isSubPzSemiRing.Build R S U
   semiring_closed_subproof.
 HB.instance Definition _ := SubPzSemiRing_isSubComPzSemiRing.Build R S U.
@@ -6088,25 +6110,26 @@ End SubChoice_isSubComSemiRing.
 Notation SubChoice_isSubComSemiRing R S U :=
   (SubChoice_isSubComNzSemiRing R S U) (only parsing).
 
-HB.builders Context (R : comNzSemiRingType) S U
-  of SubChoice_isSubComNzSemiRing R S U.
-HB.instance Definition _ := SubChoice_isSubNzSemiRing.Build R S U
+HB.builders Context R S U of SubChoice_isSubComNzSemiRing R S U.
+HB.instance Definition _ := SubChoice_isSubComPzSemiRing.Build R S U
   semiring_closed_subproof.
-HB.instance Definition _ := SubNzSemiRing_isSubComNzSemiRing.Build R S U.
+HB.instance Definition _ := SubPzSemiRing_isNonZero.Build R S U.
 HB.end.
 
-HB.factory Record SubChoice_isSubPzRing (R : pzRingType) S U of SubChoice R S U := {
+HB.factory Record SubChoice_isSubPzRing (R : pzRingType) S U
+    of SubChoice R S U := {
   subring_closed_subproof : subring_closed S
 }.
 
-HB.builders Context (R : pzRingType) S U of SubChoice_isSubPzRing R S U.
+HB.builders Context R S U of SubChoice_isSubPzRing R S U.
 HB.instance Definition _ := SubChoice_isSubZmodule.Build R S U
   (subring_closedB subring_closed_subproof).
 HB.instance Definition _ := SubZmodule_isSubPzRing.Build R S U
   subring_closed_subproof.
 HB.end.
 
-HB.factory Record SubChoice_isSubNzRing (R : nzRingType) S U of SubChoice R S U := {
+HB.factory Record SubChoice_isSubNzRing (R : nzRingType) S U
+    of SubChoice R S U := {
   subring_closed_subproof : subring_closed S
 }.
 
@@ -6121,11 +6144,10 @@ End SubChoice_isSubRing.
 Notation SubChoice_isSubRing R S U :=
   (SubChoice_isSubNzRing R S U) (only parsing).
 
-HB.builders Context (R : nzRingType) S U of SubChoice_isSubNzRing R S U.
-HB.instance Definition _ := SubChoice_isSubZmodule.Build R S U
-  (subring_closedB subring_closed_subproof).
-HB.instance Definition _ := SubZmodule_isSubNzRing.Build R S U
+HB.builders Context R S U of SubChoice_isSubNzRing R S U.
+HB.instance Definition _ := SubChoice_isSubPzRing.Build R S U
   subring_closed_subproof.
+HB.instance Definition _ := SubPzSemiRing_isNonZero.Build R S U.
 HB.end.
 
 HB.factory Record SubChoice_isSubComPzRing (R : comPzRingType) S U
@@ -6133,7 +6155,7 @@ HB.factory Record SubChoice_isSubComPzRing (R : comPzRingType) S U
   subring_closed_subproof : subring_closed S
 }.
 
-HB.builders Context (R : comPzRingType) S U of SubChoice_isSubComPzRing R S U.
+HB.builders Context R S U of SubChoice_isSubComPzRing R S U.
 HB.instance Definition _ := SubChoice_isSubPzRing.Build R S U
   subring_closed_subproof.
 HB.instance Definition _ := SubPzRing_isSubComPzRing.Build R S U.
@@ -6155,10 +6177,10 @@ End SubChoice_isSubComRing.
 Notation SubChoice_isSubComRing R S U :=
   (SubChoice_isSubComNzRing R S U) (only parsing).
 
-HB.builders Context (R : comNzRingType) S U of SubChoice_isSubComNzRing R S U.
-HB.instance Definition _ := SubChoice_isSubNzRing.Build R S U
+HB.builders Context R S U of SubChoice_isSubComNzRing R S U.
+HB.instance Definition _ := SubChoice_isSubComPzRing.Build R S U
   subring_closed_subproof.
-HB.instance Definition _ := SubNzRing_isSubComNzRing.Build R S U.
+HB.instance Definition _ := SubPzSemiRing_isNonZero.Build R S U.
 HB.end.
 
 HB.factory Record SubChoice_isSubLSemiModule
@@ -6166,8 +6188,7 @@ HB.factory Record SubChoice_isSubLSemiModule
   subsemimod_closed_subproof : subsemimod_closed S
 }.
 
-HB.builders Context (R : pzSemiRingType) (V : lSemiModType R) S W
-  of SubChoice_isSubLSemiModule R V S W.
+HB.builders Context R V S W of SubChoice_isSubLSemiModule R V S W.
 HB.instance Definition _ := SubChoice_isSubNmodule.Build V S W
   (subsemimod_closedD subsemimod_closed_subproof).
 HB.instance Definition _ := SubNmodule_isSubLSemiModule.Build R V S W
@@ -6176,44 +6197,62 @@ HB.end.
 
 HB.factory Record SubChoice_isSubLmodule (R : pzRingType) (V : lmodType R) S W
     of SubChoice V S W := {
-  submod_closed_subproof : submod_closed S
+  subsemimod_closed_subproof : subsemimod_closed S
 }.
 
-HB.builders Context (R : pzRingType) (V : lmodType R) S W
-  of SubChoice_isSubLmodule R V S W.
+HB.builders Context R V S W of SubChoice_isSubLmodule R V S W.
 HB.instance Definition _ := SubChoice_isSubZmodule.Build V S W
-  (submod_closedB submod_closed_subproof).
+  (subsemimod_closedB subsemimod_closed_subproof).
 HB.instance Definition _ := SubZmodule_isSubLmodule.Build R V S W
-  submod_closed_subproof.
+  subsemimod_closed_subproof.
 HB.end.
 
-(* TODO: SubChoice_isSubLSemiAlgebra? *)
+HB.factory Record SubChoice_isSubLSemiAlgebra
+    (R : pzSemiRingType) (A : lSemiAlgType R) S W of SubChoice A S W := {
+  subsemialg_closed_subproof : subsemialg_closed S
+}.
+
+HB.builders Context R A S W of SubChoice_isSubLSemiAlgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubNzSemiRing.Build A S W
+  (subsemialg_closedM subsemialg_closed_subproof).
+HB.instance Definition _ := SubNmodule_isSubLSemiModule.Build R A S W
+  (subsemialg_closedZ subsemialg_closed_subproof).
+HB.instance Definition _ :=
+  SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra.Build R A S W.
+HB.end.
 
 HB.factory Record SubChoice_isSubLalgebra (R : pzRingType) (A : lalgType R) S W
     of SubChoice A S W := {
-  subalg_closed_subproof : subalg_closed S
+  subsemialg_closed_subproof : subsemialg_closed S
 }.
 
-HB.builders Context (R : pzRingType) (A : lalgType R) S W
-  of SubChoice_isSubLalgebra R A S W.
+HB.builders Context R A S W of SubChoice_isSubLalgebra R A S W.
 HB.instance Definition _ := SubChoice_isSubNzRing.Build A S W
-  (subalg_closedBM subalg_closed_subproof).
+  (subsemialg_closedBM subsemialg_closed_subproof).
 HB.instance Definition _ := SubZmodule_isSubLmodule.Build R A S W
-  (subalg_closedZ subalg_closed_subproof).
+  (subsemialg_closedZ subsemialg_closed_subproof).
 HB.instance Definition _ := SubNzRing_SubLmodule_isSubLalgebra.Build R A S W.
 HB.end.
 
-(* TODO: SubChoice_isSubSemiAlgebra? *)
+HB.factory Record SubChoice_isSubSemiAlgebra
+    (R : pzSemiRingType) (A : semiAlgType R) S W of SubChoice A S W := {
+  subsemialg_closed_subproof : subsemialg_closed S
+}.
+
+HB.builders Context R A S W of SubChoice_isSubSemiAlgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubLSemiAlgebra.Build R A S W
+  subsemialg_closed_subproof.
+HB.instance Definition _ := SubLSemiAlgebra_isSubSemiAlgebra.Build R A S W.
+HB.end.
 
 HB.factory Record SubChoice_isSubAlgebra (R : pzRingType) (A : algType R) S W
     of SubChoice A S W := {
-  subalg_closed_subproof : subalg_closed S
+  subsemialg_closed_subproof : subsemialg_closed S
 }.
 
-HB.builders Context (R : pzRingType) (A : algType R) S W
-  of SubChoice_isSubAlgebra R A S W.
+HB.builders Context R A S W of SubChoice_isSubAlgebra R A S W.
 HB.instance Definition _ := SubChoice_isSubLalgebra.Build R A S W
-  subalg_closed_subproof.
+  subsemialg_closed_subproof.
 HB.instance Definition _ := SubLalgebra_isSubAlgebra.Build R A S W.
 HB.end.
 
@@ -6222,7 +6261,7 @@ HB.factory Record SubChoice_isSubUnitRing (R : unitRingType) S U
   divring_closed_subproof : divring_closed S
 }.
 
-HB.builders Context (R : unitRingType) S U of SubChoice_isSubUnitRing R S U.
+HB.builders Context R S U of SubChoice_isSubUnitRing R S U.
 HB.instance Definition _ := SubChoice_isSubNzRing.Build R S U
   (divring_closedBM divring_closed_subproof).
 HB.instance Definition _ := SubNzRing_isSubUnitRing.Build R S U
@@ -6234,8 +6273,7 @@ HB.factory Record SubChoice_isSubComUnitRing (R : comUnitRingType) S U
   divring_closed_subproof : divring_closed S
 }.
 
-HB.builders Context (R : comUnitRingType) S U
-  of SubChoice_isSubComUnitRing R S U.
+HB.builders Context R S U of SubChoice_isSubComUnitRing R S U.
 HB.instance Definition _ := SubChoice_isSubComNzRing.Build R S U
   (divring_closedBM divring_closed_subproof).
 HB.instance Definition _ := SubNzRing_isSubUnitRing.Build R S U
@@ -6247,8 +6285,7 @@ HB.factory Record SubChoice_isSubIntegralDomain (R : idomainType) S U
   divring_closed_subproof : divring_closed S
 }.
 
-HB.builders Context (R : idomainType) S U
-  of SubChoice_isSubIntegralDomain R S U.
+HB.builders Context R S U of SubChoice_isSubIntegralDomain R S U.
 HB.instance Definition _ := SubChoice_isSubComUnitRing.Build R S U
   divring_closed_subproof.
 HB.instance Definition _ := SubComUnitRing_isSubIntegralDomain.Build R S U.
@@ -6353,18 +6390,21 @@ Notation "[ 'SubChoice_isSubLSemiModule' 'of' U 'by' <: ]" :=
   (format "[ 'SubChoice_isSubLSemiModule'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubZmodule_isSubLmodule' 'of' U 'by' <: ]" :=
-  (SubZmodule_isSubLmodule.Build _ _ _ U (submodClosedP _))
+  (SubZmodule_isSubLmodule.Build _ _ _ U (subsemimodClosedP _))
   (format "[ 'SubZmodule_isSubLmodule'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubLmodule' 'of' U 'by' <: ]" :=
-  (SubChoice_isSubLmodule.Build _ _ _ U (submodClosedP _))
+  (SubChoice_isSubLmodule.Build _ _ _ U (subsemimodClosedP _))
   (format "[ 'SubChoice_isSubLmodule'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra' 'of' U 'by' <: ]" :=
   (SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra.Build _ _ _ U)
   (format "[ 'SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra'  'of'  U  'by'  <: ]")
   : form_scope.
-(* TODO: SubChoice_isSubLSemiAlgebra? *)
+Notation "[ 'SubChoice_isSubLSemiAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubLSemiAlgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubLSemiAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
 Notation "[ 'SubNzRing_SubLmodule_isSubLalgebra' 'of' U 'by' <: ]" :=
   (SubNzRing_SubLmodule_isSubLalgebra.Build _ _ _ U)
   (format "[ 'SubNzRing_SubLmodule_isSubLalgebra'  'of'  U  'by'  <: ]")
@@ -6376,20 +6416,23 @@ Notation "[ 'SubRing_SubLmodule_isSubLalgebra' 'of' U 'by' <: ]" :=
   (format "[ 'SubRing_SubLmodule_isSubLalgebra'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubLalgebra' 'of' U 'by' <: ]" :=
-  (SubChoice_isSubLalgebra.Build _ _ _ U (subalgClosedP _))
+  (SubChoice_isSubLalgebra.Build _ _ _ U (subsemialgClosedP _))
   (format "[ 'SubChoice_isSubLalgebra'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubLSemiAlgebra_isSubSemiAlgebra' 'of' U 'by' <: ]" :=
   (SubLSemiAlgebra_isSubSemiAlgebra.Build _ _ _ U)
   (format "[ 'SubLSemiAlgebra_isSubSemiAlgebra'  'of'  U  'by'  <: ]")
   : form_scope.
-(* TODO: SubChoice_isSubSemiAlgebra? *)
+Notation "[ 'SubChoice_isSubSemiAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubSemiAlgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubSemiAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
 Notation "[ 'SubLalgebra_isSubAlgebra' 'of' U 'by' <: ]" :=
   (SubLalgebra_isSubAlgebra.Build _ _ _ U)
   (format "[ 'SubLalgebra_isSubAlgebra'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubAlgebra' 'of' U 'by' <: ]" :=
-  (SubChoice_isSubAlgebra.Build _ _ _ U (subalgClosedP _))
+  (SubChoice_isSubAlgebra.Build _ _ _ U (subsemialgClosedP _))
   (format "[ 'SubChoice_isSubAlgebra'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubNzRing_isSubUnitRing' 'of' U 'by' <: ]" :=
