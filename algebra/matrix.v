@@ -215,7 +215,7 @@ Reserved Notation "''M[' R ]_ ( m , n )". (* only parsing *)
 Reserved Notation "\matrix_ i E"
   (at level 34, E at level 39, i at level 2, format "\matrix_ i  E").
 Reserved Notation "\matrix_ ( i < n ) E"
-  (E at level 39, i, n at level 50). (* only parsing *)
+  (at level 34, E at level 39, i, n at level 50). (* only parsing *)
 Reserved Notation "\matrix_ ( i , j ) E"
   (E at level 39, j at level 50, format "\matrix_ ( i ,  j )  E").
 Reserved Notation "\matrix[ k ]_ ( i , j ) E"
@@ -228,11 +228,11 @@ Reserved Notation "\matrix_ ( i , j < n ) E"
 Reserved Notation "\row_ j E"
   (at level 34, E at level 39, j at level 2, format "\row_ j  E").
 Reserved Notation "\row_ ( j < n ) E"
-  (E at level 39, j, n at level 50). (* only parsing *)
+  (at level 34, E at level 39, j, n at level 50). (* only parsing *)
 Reserved Notation "\col_ j E"
   (at level 34, E at level 39, j at level 2, format "\col_ j  E").
 Reserved Notation "\col_ ( j < n ) E"
-  (E at level 39, j, n at level 50). (* only parsing *)
+  (at level 34, E at level 39, j, n at level 50). (* only parsing *)
 Reserved Notation "\mxblock_ ( i , j ) E"
   (at level 34, E at level 39, i, j at level 50,
    format "\mxblock_ ( i ,  j )  E").
@@ -243,15 +243,15 @@ Reserved Notation "\mxblock_ ( i , j < n ) E"
 Reserved Notation "\mxrow_ j E"
   (at level 34, E at level 39, j at level 2, format "\mxrow_ j  E").
 Reserved Notation "\mxrow_ ( j < n ) E"
-  (E at level 39, j, n at level 50). (* only parsing *)
+  (at level 34, E at level 39, j, n at level 50). (* only parsing *)
 Reserved Notation "\mxcol_ j E"
   (at level 34, E at level 39, j at level 2, format "\mxcol_ j  E").
 Reserved Notation "\mxcol_ ( j < n ) E"
-  (E at level 39, j, n at level 50). (* only parsing *)
+  (at level 34, E at level 39, j, n at level 50). (* only parsing *)
 Reserved Notation "\mxdiag_ j E"
   (at level 34, E at level 39, j at level 2, format "\mxdiag_ j  E").
 Reserved Notation "\mxdiag_ ( j < n ) E"
-  (E at level 39, j, n at level 50). (* only parsing *)
+  (at level 34, E at level 39, j, n at level 50). (* only parsing *)
 
 Reserved Notation "x %:M"   (format "x %:M").
 Reserved Notation "A *m B" (at level 40, left associativity, format "A  *m  B").
