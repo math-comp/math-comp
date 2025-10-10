@@ -1822,6 +1822,16 @@ Proof. by rewrite lt_neqAle; case: eqP => //= ->; rewrite lexx. Qed.
 
 Definition lte_anti := (=^~ eq_le, @lt_asym disp T, @lt_le_asym disp T, @le_lt_asym disp T).
 
+Lemma eq_geP {x y} : reflect (forall z, (z <= x) = (z <= y)) (x == y).
+Proof.
+by apply: (iffP idP) => [/eqP->//|/[dup]] /[!eq_le] -> <-; rewrite !lexx.
+Qed.
+
+Lemma eq_leP {x y} : reflect (forall z, (x <= z) = (y <= z)) (x == y).
+Proof.
+by apply: (iffP idP) => [/eqP->//|/[dup]] /[!eq_le] <- ->; rewrite !lexx.
+Qed.
+
 Lemma lt_sorted_uniq_le s : sorted <%O s = uniq s && sorted <=%O s.
 Proof.
 rewrite le_sorted_pairwise lt_sorted_pairwise uniq_pairwise -pairwise_relI.
@@ -2798,6 +2808,26 @@ Proof. by rewrite !leNgt => ? /contraTT ?; apply/idP/idP. Qed.
 Lemma eq_ltRL x y z t :
   (x < y -> z < t) -> (y <= x -> t <= z) -> (z < t) = (x < y).
 Proof. by move=> *; apply/esym/eq_ltLR. Qed.
+
+Lemma le_gtP {x y} : reflect (forall z, z < x -> z < y) (x <= y).
+Proof.
+by apply: (iffP idP) => [xy z /lt_le_trans|/(_ y)/[!ltNge]/contraTT]; apply.
+Qed.
+
+Lemma le_ltP {x y} : reflect (forall z, y < z -> x < z) (x <= y).
+Proof.
+by apply: (iffP idP) => [xy z /(le_lt_trans _)|/(_ x)/[!ltNge]/contraTT]; apply.
+Qed.
+
+Lemma eq_gtP {x y} : reflect (forall z, (z < x) = (z < y)) (x == y).
+Proof.
+by apply: (iffP eq_leP) => + k => /(_ k)/[!ltNge]/(congr1 negb); rewrite ?negbK.
+Qed.
+
+Lemma eq_ltP {x y} : reflect (forall z, (x < z) = (y < z)) (x == y).
+Proof.
+by apply: (iffP eq_geP) => + k => /(_ k)/[!ltNge]/(congr1 negb); rewrite ?negbK.
+Qed.
 
 (* max and min is join and meet *)
 

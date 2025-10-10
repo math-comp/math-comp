@@ -1111,6 +1111,18 @@ Proof. by apply/negP; move=> /andP[] xy /(lt_le_trans xy); rewrite ltxx. Qed.
 Lemma le_lt_asym x y : x <= y < x = false.
 Proof. by rewrite andbC lt_le_asym. Qed.
 
+Lemma le_leP {x y} : reflect (forall z, y <= z -> x <= z) (x <= y).
+Proof. by apply: (iffP idP) => [xy z /(le_trans _)->//|]; apply. Qed.
+
+Lemma le_geP {x y} : reflect (forall z, z <= x -> z <= y) (x <= y).
+Proof. by apply: (iffP idP) => [xy z /le_trans|]; apply. Qed.
+
+Lemma lt_ltP {x y} : reflect (forall z, y <= z -> x < z) (x < y).
+Proof. by apply: (iffP idP) => [xy z /(lt_le_trans _)|]; apply. Qed.
+
+Lemma lt_gtP {x y} : reflect (forall z, z <= x -> z < y) (x < y).
+Proof. by apply: (iffP idP) => [xy z /le_lt_trans->//|]; apply. Qed.
+
 Lemma le_path_min x s : path <=%O x s -> all (>= x) s.
 Proof. exact/order_path_min/le_trans. Qed.
 
