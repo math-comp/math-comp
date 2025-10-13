@@ -1,9 +1,949 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-Last releases: [[2.4.0] - 2025-04-14](#240---2025-04-14), [[2.3.0] - 2024-11-28](#230---2024-11-28), [[2.2.0] - 2024-01-17](#220---2024-01-17)
+Last releases: [[2.5.0] - 2025-10-13](#250---2025-10-13), [[2.4.0] - 2025-04-14](#240---2025-04-14), [[2.3.0] - 2024-11-28](#230---2024-11-28)
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## [2.5.0] - 2025-10-13
+
+This release is compatible with Coq version 8.20 and Rocq versions 9.0 and 9.1.
+
+The contributors to this version are:
+
+Reynald Affeldt, Arthur Azevedo de Amorim, Alessandro Bruni, Cyril
+Cohen, Georges Gonthier, Florent Hivert, Enrico Tassi, Laurent Théry,
+Pierre Roux, Takafumi Saikawa Kazuhiko Sakaguchi, Lynda,
+Quentin Vermande
+
+### Added
+
+- new package `mathcomp-boot` containing the files previously in
+  `mathcomp-ssreflect` except `preorder.v`, `order.v` and
+  `all_ssreflect.v`
+  ([#1415](https://github.com/math-comp/math-comp/pull/1415)).
+
+- new package `mathcomp-order` containing `preorder.v` and `order.v`
+  ([#1415](https://github.com/math-comp/math-comp/pull/1415)).
+
+- new file `monoid.v`
+  ([#1256](https://github.com/math-comp/math-comp/pull/1256))
+
+- new file `nmodule.v`
+  ([#1256](https://github.com/math-comp/math-comp/pull/1256))
+
+- new file `preorder.v`
+  ([#1169](https://github.com/math-comp/math-comp/pull/1169))
+
+- in `ssreflect.v`
+  + definition `hide`, Notation `hideT`
+  + ltac (view) Notations `[hide]`, `[let]`, `[fix]`, and `[cofix]`
+    ([#1440](https://github.com/math-comp/math-comp/pull/1440)).
+
+- in `ssrnat.v`
+  + lemmas `leq_leP`, `ltn_gtP`, `leq_geP`, `leq_ltP`, `leq_gtP`,
+    `ltn_ltP`, `eqn_geP`, `eqn_leP`, `eqn_gtP` and `eqn_ltP`
+    ([#1403](https://github.com/math-comp/math-comp/pull/1403)).
+
+- in `seq.v`:
+  + lemma `size_filter_gt0`
+    ([#1420](https://github.com/math-comp/math-comp/pull/1420)).
+
+- in `seq.v`
+  + Lemma `index_inj`
+    ([#1430](https://github.com/math-comp/math-comp/pull/1430)).
+
+- in `div.v`
+  + lemma `modnMDXl`
+    ([#1434](https://github.com/math-comp/math-comp/pull/1434)).
+
+- in `fintype.v`
+  + lemmas `eq_dinjectiveb` and `eq_injectiveb`
+    ([#1429](https://github.com/math-comp/math-comp/pull/1429)).
+
+- in `monoid.v`
+  + mixin `hasMul`
+  + structures `magmaType`, `ChoiceMagma.type`
+  + definition `commute`
+  + lemmas `commute_refl`, `commute_sym`
+  + definition `mulg_closed`
+  + mixin `Magma_isSemigroup`
+  + structure `semigroupType`
+  + factory `isSemigroup`
+  + lemma `commuteM`
+  + mixin `hasOne`
+  + structures `baseUMagmaType`, `ChoiceBaseUMagma.type`
+  + definition `natexp`
+  + lemmas `expg0`, `expg1`, `expg2`, `expgSS`, `expgb`
+  + definition `umagma_closed`
+  + mixin `BaseUMagma_isUMagma`
+  + factory `Magma_isUMagma`
+  + structure `umagmaType`
+  + lemmas `expgS`, `expg1n`, `commute1`
+  + structure `monoidType`
+  + factories `Semigroup_isMonoid`, `UMagma_isMonoid`, `isMonoid`
+  + lemmas `expgSr`, `expgnDr`, `expgnA`, `expgnAC`, `iter_mulg`,
+    `iter_mulg_1`, `prodg_const`, `prodg_const_nat`, `prodgXr`,
+    `commute_prod`, `prodgM_commute`, `prodgMl_commute`,
+    `prodgMr_commute`, `commuteX`, `comuteX2`, `expgMn`.
+  + notation `monoid_closed`
+  + mixin `hasInv`
+  + structure `baseGroupType`
+  + mixin `Monoid_isGroup`
+  + structure `groupType`
+  + factory `isGroup`
+  + definitions `conjg`, `commg`
+  + lemmas `divgg`, `mulKg`, `mulVKg`, `mulgK`, `mulgVK`, `mulgI`,
+    `mulIg`, `invgK`, `invg_inj`, `divgI`, `divIg`, `invg1`,
+    `invg_eq1`, `divg1`, `div1g`, `invgF`, `invgM`, `prodgV`, `divKg`,
+    `mulgKA`, `divgKA`, `mulg1_eq`, `divg1_eq`, `divg_eq`, `divg_eq1`,
+    `mulg_eq1`, `eqg_inv`, `iqg_invLR`, `commuteV`, `expVgn`,
+    `expgnFr`, `expgnFl`, `conjgE`, `conjgC`, `conjgCV`, `conjg1`,
+    `conj1g`, `conjMg`, `conjgM`, `conjVg`, `conjJg`, `conjXg`,
+    `conjgK`, `conjgKV`, `conjg_inj`, `conjg_eq1`, `commgEl`,
+    `commgEr`, `commgC`, `commgCV`, `conjRg`, `invgR`, `commgP`,
+    `conjg_fix`, `conjg_fixP`, `commg1_sym`, `commg1`, `comm1g`,
+    `commgg`, `commgXg`, `commgVg`, `commgXVg`
+  + definitions `invg_closed`, `divg_closed`, `group_closed`
+  + lemmas `group_closedV`, `group_closedM`
+  + mixin `isMultiplicative`
+  + structure `Multiplicative.type`
+  + mixin `isUMagmaMorphism`
+  + structure `UMagmaMorphism.type`
+  + factory `isGroupMorphism`
+  + notation `{multiplicative _ -> _}`
+  + definitions `mul_fun`, `one_fun`
+  + lemmas `can2_gmulfM`, `gmulf_commute`, `gmulf_eq1`, `can2_gmulf1`,
+    `gmulfXn`, `gmulf_prod`, `gumlfV`, `gmulfF`, `gmulf_inj`, `gmulfXVn`,
+    `gmulfJ`, `gmulfR`, `idfun_gmulfM`, `comp_gmulfM`, `idfun_gmulf1`,
+    `one_fun_gmulf1`, `comp_gmulf1`, `one_fun_gmulf1`, `mul_fun_gmulf1`
+  + mixins `isMulClosed`, `isMul1Closed`, `isInvClosed`
+  + structures `mulgClosed`, `umagmaClosed`, `invgClosed`, `groupClosed`
+  + lemmas `gpred_prod`, `gpredXn`, `gpredV`, `gpredF`, `gpredFC`, `gpredXNn`,
+    `gpredMr`, `gpredMl`, `gpredFr`, `gpredFl`, `gpredJ`, `gpredR`
+  + mixin `isSubMagma`
+  + structure `subMagmaType`
+  + factory `SubChoice_isSubMagma`
+  + structure `subSemigroupType`
+  + factory `SubChoice_isSubSemigroup`
+  + mixin `isSubBaseUMagma`
+  + structures `subBaseUMagmaType`, `subUMagmaType`
+  + factory `SubChoice_isSubUMagma`
+  + structure `subMonoidType`
+  + factory `SubChoice_isSubMonoid`
+  + structure `subGroupType`
+  + factory `SubChoice_isSubGroup`
+  + definition `ffun_mul`
+  + lemma `ffun_mulgA`
+  + definition `ffun_one`
+  + lemmas `ffun_mul1g`, `ffun_mulg1`
+  + definition `ffun_inv`
+  + lemmas `ffun_mulVg`, `ffun_mulgV`
+  + definition `mul_pair`
+  + lemmas `fst_is_multiplicative`, `snd_is_multiplicative`, `pair_mulgA`
+  + definition `one_pair`
+  + lemmas `first_is_umagma_morphism`, `snd_is_umagma_morphism`, `pair_mul1g`,
+    `pair_mulg1`
+  + definition `inv_pair`
+  + lemmas `pair_mulVg`, `pair_mulgV`
+    ([#1256](https://github.com/math-comp/math-comp/pull/1256))
+
+- in `monoid.v`
+  + mixins `Monoid_isStarMonoid`, `StarMonoid_isGroup`
+  + structure `starMonoidType`
+  + factories `isStarMonoid`, `Monoid_isGroup`
+    ([#1439](https://github.com/math-comp/math-comp/pull/1439))
+
+- in `nmodule.v`
+  + mixin `hasAdd`
+  + structures `baseAddMagmaType`, `ChoiceBaseAddMagma.type`
+  + definition `to_multiplicative`, `addr_closed`
+  + mixin `BaseAddMagma_isAddMagma`
+  + structure `addMagmaType`
+  + factory `isAddMagma`
+  + lemma `commuteT`
+  + mixin `AddMagma_isAddSemigroup`
+  + structure `addSemigroupType`
+  + factory `isAddSemigroup`
+  + lemmas `addrCA`, `addrAC`, `addrACA`
+  + mixin `hasZero`
+  + structure `baseAddUMagmaType`, `ChoiceBaseAddUMagma.type`
+  + definition `natmul`
+  + lemmas `mulr0n`, `mulr1n`, `mulr2n`, `mulrb`, `mulrSS`
+  + definition `addumagma_closed`
+  + mixin `BaseAddUMagma_isAddUMagma`
+  + factory `isAddUMagma`
+  + structure `addUMagmaType`
+  + lemma `addr0`
+  + factory `isNmodule`
+  + structure `nmodType`
+  + lemmas `mulrS`, `mulrSr`, `mul0rn`, `mulrnDl`, `mulrnDr`,
+    `mulrnA`, `mulrnAC`, `iter_addr`, `iter_addr_0`, `sumrMnl`,
+    `sumrMnr`, `sumr_const`, `sumr_const_nat`
+  + definition `nmod_closed`
+  + mixin `hasOpp`
+  + structure `baseZmodType`
+  + definitions `oppr_closed`, `subr_closed`, `zmod_closed`
+  + mixin `BaseZmoduleNmodule_isZmodule`
+  + structure `zmodType`
+  + factories `Nmodule_isZmodule`, `isZmodule`, `Group_isZmodule`
+  + lemmas `addrN`, `subrr`, `addKr`, `addNKr`, `addrK`, `addrNK`,
+    `subrK`, `subKr`, `addrI`, `subrI`, `subIr`, `opprK`, `oppr_inj`,
+    `oppr0`, `oppr_eq0`, `subr0`, `opprB`, `opprD`, `addrKA`,
+    `subrKA`, `addr0_eq`, `subr0_eq`, `subr_eq`, `subr_eq0`,
+    `addr_eq0`, `eqr_opp`, `eqr_oppLR`, `mulNrn`, `mulrnBl`,
+    `mulrnBr`, `sumrN`, `sumrB`, `telescope_sumr`,
+    `telescope_sumr_eq`, `zmod_closedN`, `zmod_closedD`,
+    `zmod_closed0D`
+  + definition `semi_additive`
+  + mixin `isSemiAdditive`
+  + structure `Additive.type`
+  + definition `additive`
+  + factory `isAdditive`
+  + notation `{additive _ -> _}`
+  + lemmas `raddf0`, `raddfD`, `raddf_sum`
+  + definitions `to_fmultiplicative`, `add_fun`, `null_fun`,
+    `opp_fun`, `sub_fun`
+  + lemmas `raddf_eq0`, `raddfMn`, `can2_semi_additive`, `raddfN`,
+    `raddfB`, `raddf_inj`, `raddfMNn`, `can2_additive`,
+    `add_fun_semi_additive`, `idfun_is_semi_additive`,
+    `comp_is_semi_additive`, `null_fun_is_semi_additive`,
+    `opp_is_semi_additive`, `opp_fun_is_additive`,
+    `sub_fun_is_additive`
+  + mixins `isAddClosed`, `isOppClosed`
+  + structures `addrClosed`, `opprClosed`, `zmodClosed`
+  + factory `isZmodClosed`
+  + definition `to_pmultiplicative`
+  + lemmas `rpred0`, `rpredD`, `rpred0D`, `rpredMn`, `rpredNr`,
+    `rpredN`, `rpredB`, `rpredBC`, `rpredMNn`, `rpredDr`, `rpredDl`,
+    `rpredBr`, `rpredBl` `zmodClosedP`
+  + mixin `isSubBaseAddUMagma`
+  + structures `subBaseAddUMagma`, `subAddUMagma`, `subNmodType`
+  + lemmas `valD`, `val0`
+  + factories `SubChoice_isSubAddUMagma`, `SubChoice_isSubNmodule`
+  + structure `subZmodType` 
+  + lemmas `valB`, `valN`
+  + factories `isSubZmodule`, `SubChoice_isSubZmodule`
+  + notations `0`, `-%R`, `- x`, `+%R`, `x + y`, `x - y`, `x *+ n`,
+    `x *- n`, `\sum_<range> e`, ``s `_ i`` `support` `1` `- 1` `n %:R`
+  + definition `ffun_add`
+  + lemmas `ffun_addrC`, `ffun_addrA`
+  + definition `ffun_zero`
+  + lemmas `ffun_add0r`, `ffunMnE`, `sum_ffunE`, `sum_ffun`
+  + definition `ffun_opp`
+  + lemma `ffun_addNr`
+  + definition `pair_add`
+  + lemmas `pair_addrC`, `pair_addrA`
+  + definition `pair_zero`
+  + lemmas `fst_is_additive`, `snd_is_additive`, `pair_add0r`
+  + definition `pair_opp`
+  + lemmas `pair_addNr`, `natr0E`, `natrDE`, `natrE`
+    ([#1256](https://github.com/math-comp/math-comp/pull/1256))
+
+- in `nmodule.v`
+  + factory `SubNmodule_isSubZmodule`
+  + notation `[SubNmodule_isSubZmodule of U by <:]`
+    ([#1466](https://github.com/math-comp/math-comp/pull/1466)).
+
+- in `fingroup.v`
+  + structure `finStarMonoidType`
+  + factory `Finite_isGroup`
+    ([#1439](https://github.com/math-comp/math-comp/pull/1439)).
+
+- in `preorder.v`
+  + structures `preorderType`, `bPreorderType`, `tPreorderType`,
+    `tbPreorderType`, `finPreorderType`, `finBPreorderType`,
+    `finTPreorderType`, `finTBPreorderType`, `subPreorder`
+  + factories `isDuallyPreorder`, `isPreorder`, `Le_isPreorder`,
+    `LtLe_isPreorder`, `Lt_isPreorder`, `isSubPreorder`,
+    `SubChoice_isSubPreorder`
+  + definitions `PrePcan`, `order_morphism`
+  + lemmas `lt_sorted_is_uniq_le`
+    ([#1169](https://github.com/math-comp/math-comp/pull/1169))
+
+- in `preorder.v`
+  + lemmas `le_leP`, `le_geP`, `lt_ltP` and `lt_gtP`
+    ([#1403](https://github.com/math-comp/math-comp/pull/1403)).
+
+- in `order.v`
+  + lemmas `eq_geP`, `eq_leP`, `le_gtP`, `le_ltP`, `eq_gtP`
+    and `eq_ltP`
+    ([#1403](https://github.com/math-comp/math-comp/pull/1403)).
+
+- in `order.v`
+  + lemmas `ge_bigmin_seq`, `le_bigmax_seq`, `bigmin_inf_seq`
+    and `bigmax_sup_seq`
+    ([#1449](https://github.com/math-comp/math-comp/pull/1449))
+
+- in `ssralg.v`:
+  + lemma `subrKC`
+    ([#1444](https://github.com/math-comp/math-comp/pull/1444))
+
+- in `ssralg.v`
+  + definition `subsemialg_closed`
+  + factories `isSubSemiAlgClosed`, `SubPzSemiRing_isNonZero`,
+    `SubChoice_isSubLSemiAlgebra`, `SubChoice_isSubSemiAlgebra`
+  + lemmas/coercions `subsemialg_closedZ`, `subsemialg_closedM`,
+    `subalg_closed_semi`
+  + lemmas `subsemimod_closed_submod`, `subsemimod_closedB`,
+    `subsemialg_closed_subalg`, `subsemialg_closedBM`,
+    `subsemialgClosedP`
+    ([#1476](https://github.com/math-comp/math-comp/pull/1476),
+    fixes [#1387](https://github.com/math-comp/math-comp/issues/1387)).
+
+- in `countalg.v`
+  + structures `countPzSemiRingType`, `countPzRingType`,
+    `countComPzSemiRingType`, `countPzRingType`
+    ([#1431](https://github.com/math-comp/math-comp/pull/1431)).
+
+- in `finalg.v`
+  + structures `finPzSemiRingType`, `finPzRingType`, `finComPzSemiRingType`,
+   `finPzRingType`
+    ([#1431](https://github.com/math-comp/math-comp/pull/1431)).
+
+- in `numdomain.v`:
+  + lemma `sumr_le0`
+    ([#1444](https://github.com/math-comp/math-comp/pull/1444))
+
+- in `ssrnum.v`
+  + lemmas `maxr_absE`, `minr_absE`
+    ([#1416](https://github.com/math-comp/math-comp/pull/1416)).
+
+- in `ssrnum.v`:
+  + lemmas `ltr_sum`, `ltr_sum_nat` and `prodr_ile1`
+    ([#1420](https://github.com/math-comp/math-comp/pull/1420)).
+
+- in `matrix.v`
+  + lemmas `lsubmx_const` and `rsubmx_const`
+    ([#1442](https://github.com/math-comp/math-comp/pull/1442)).
+
+- in `vector.v`
+  + Semi-vector space structure `semiVectType` over a `nzSemiRingType` that
+    generalizes `vectType` to the case where there is no additive inverse
+  + `LSemiModule_hasFinDim` mixin of semi-vector spaces
+  + `semivector_axiom_def` (`SemiVector.axiom`) axiom of semi-vector spaces
+  + `semiVectType` instances on matrices, `regular`, `prod`, `{ffun I -> vT}`,
+    that generalize the corresponding `vectType` instances to the case where
+    there is no additive inverse
+    ([#1464](https://github.com/math-comp/math-comp/pull/1464)).
+
+- in `qpoly.v`
+  + lemma `npoly_subsemimod_closed`
+    ([#1466](https://github.com/math-comp/math-comp/pull/1466)).
+
+### Changed
+
+- in many files
+  + change level of some notations to adapt to
+    https://github.com/rocq-prover/rocq/pull/17876
+    ([#1110](https://github.com/math-comp/math-comp/pull/1110)).
+
+- in `bigop.v`
+  + `bigmax_sup_seq` -> `bigmaxn_sup_seq`
+    ([#1449](https://github.com/math-comp/math-comp/pull/1449))
+
+- in `monoid.v`
+  + definitions `conjg`, `commg`
+    generalized from `groupType` to `baseGroupType`
+  + lemmas `invg1`, `invgF`, `prodgV`, `eqg_inv`, `eqg_invLR`, `invg_eq1`,
+      `expVgn`, `conjgE`, `commgEl`, `commgEr`
+    generalized from `groupType` to `starMonoidType`
+    ([#1439](https://github.com/math-comp/math-comp/pull/1439)).
+
+- in `fingroup.v`
+  + lemma `expgnE`
+    generalized from `baseFinGroupType` to `baseUMagmaType`
+  + lemma `conjg_prod`
+    generalized from `finGroupType` to `groupType`
+  + tactic `gsimpl`
+    generalized from `finGroupType` to `groupType`
+  + definitions `gsimp`, `gnorm`
+    generalized from `finGroupType` to `groupType`
+    ([#1439](https://github.com/math-comp/math-comp/pull/1439)).
+
+- moved from `order.v` to `preorder.v`
+  + structure `OrderMorphism`
+  + factories `hasBottom`, `hasTop`, `isOrderMorphism`
+  + notations `<= y`, `>= y`, `< y`, `> y`, `<= y :> T`, `>= y :> T`,
+    `< y :> T`, `> y :> T`, `x >=< y`, `>=< y`, `>=< y :> T`,
+    `x >< y`, `>< x`, `>< y :> T`, `f \min g`, `f \max g`,
+    `x < y ?<= 'if' c`, `x < y ?<= 'if' c :> T`, `\bot`, `\top`,
+    `x <=^d y`, `x >=^d y`, `x <^d y`, `x >^d y`, `x <=^d y :> T`,
+    `x >=^d y :> T`, `x <^d y :> T`, `x >^d y :> T`, `<=^d y`, `>=^d y`,
+    `<^d y`, `>^d y`, `<=^d y :> T`, `>=^d y :> T`, `<^d y :> T`,
+    `>^d y :> T`, `x >=<^d y`, `>=<^d y`, `>=<^d y :> T`, `x ><^d y`,
+    `><^d x`, `><^d y :> T`, `x <=^d y <=^d z`, `x <^d y <=^d z`,
+    `x <=^d y <^d z`, `x <^d y <^d z`, `x <=^d y ?= 'iff' c`,
+    `x <=^d y ?= 'iff' c :> T`, `x <^d y ?<= 'if' c`,
+    `x <^d y ?<= 'if' c :> T`, `\bot^d`, `\top^d`, `x <=^p y`,
+    `x >=^p y`, `x <^p y`, `x >^p y`, `x <=^p y :> T`, `x >=^p y :> T`,
+    `x <^p y :> T`, `x >^p y :> T`, `<=^p y`, `>=^p y`, `<^p y`,
+    `>^p y`, `<=^p y :> T`, `>=^p y :> T`, `<^p y :> T`, `>^p y :> T`,
+    `x >=<^p y`, `>=<^p x`, `>=<^p y :> T`, `x ><^p y`, `><^p x`,
+    `><^p y :> T`, `x <=^p y <=^p z`, `x <^p y <=^p z`,
+    `x <=^p y <^p z`, `x <^p y <^p z`, `x <=^p y ?= 'iff' c`,
+    `x <=^p y ?= 'iff' c :> T`, `\bot^p`, `\top^p`, `x <=^sp y`,
+    `x >=^sp y`, `x <^sp y`, `x >^sp y`, `x <=^sp y :> T`,
+    `x >=^sp y :> T`, `x <^sp y :> T`, `x >^sp y :> T`, `<=^sp y`,
+    `>=^sp y`, `<^sp y`, `>^sp y`, `<=^sp y :> T`, `>=^sp y :> T`,
+    `<^sp y :> T`, `>^sp y :> T`, `x >=<^sp y`, `>=<^sp x`,
+    `>=<^sp y :> T`, `x ><^sp y`, `><^sp x`, `><^sp y :> T`,
+    `x <=^sp y <=^sp z`, `x <^sp y <=^sp z`, `x <=^sp y <^sp z`,
+    `x <^sp y <^sp z`, `x <=^sp y ?= 'iff' c`,
+    `x <=^sp y ?= 'iff' c :> T`, `\bot^sp`, `\top^sp`, `x <=^l y`,
+    `x >=^l y`, `x <^l y`, `x >^l y`, `x <=^l y :> T`,
+    `x >=^l y :> T`, `x <^l y :> T`, `x >^l y :> T`, `<=^l y`,
+    `>=^l y`, `<^l y`, `>^l y`, `<=^l y :> T`, `>=^l y :> T`,
+    `<^l y :> T`, `>^l y :> T`, `x >=<^l y`, `>=<^l x`, `>=<^l y :> T`,
+    `x ><^l y`, `><^l x`, `><^l y :> T`, `x <=^l y <=^l z`,
+    `x <^l y <=^l z`, `x <=^l y <^l z`, `x <^l y <^l z`,
+    `x <=^l y ?= 'iff' c`, `x <=^l y ?= 'iff' c :> T`, `\bot^l`,
+    `\top^l`, `x <=^sl y`, `x >=^sl y`, `x <^sl y`, `x >^sl y`,
+    `x <=^sl y :> T`, `x >=^sl y :> T`, `x <^sl y :> T`,
+    `x >^sl y :> T`, `<=^sl y`, `>=^sl y`, `<^sl y`, `>^sl y`,
+    `<=^sl y :> T`, `>=^sl y :> T`, `<^sl y :> T`, `>^sl y :> T`,
+    `x >=<^sl y`, `>=<^sl x`, `>=<^sl y :> T`, `x ><^sl y`, `><^sl x`,
+    `><^sl y :> T`, `x <=^sl y <=^sl z`, `x <^sl y <=^sl z`,
+    `x <=^sl y <^sl z`, `x <^sl y <^sl z`, `x <=^sl y ?= 'iff' c`,
+    `x <=^sl y ?= 'iff' c :> T`, `\bot^sl`, `\top^sl`, `x %<| y`,
+    `\min_ i F`, `\min_ ( i <- r | P ) F`, `\min_ ( i <- r ) F`,
+    `\min_ ( m <= i < n | P ) F`, `\min_ ( m <= i < n ) F`,
+    `\min_ ( i | P ) F`, `\min_ ( i : t | P ) F`, `\min_ ( i : t ) F`,
+    `\min_ ( i < n | P ) F`, `\min_ ( i < n ) F`,
+    `\min_ ( i 'in' A | P ) F`, `\min_ ( i 'in' A ) F`, `\max_ i F`,
+    `\max_ ( i <- r | P ) F`, `\max_ ( i <- r ) F`,
+    `\max_ ( m <= i < n | P ) F`, `\max_ ( m <= i < n ) F`,
+    `\max_ ( i | P ) F`, `\max_ ( i : t | P ) F`, `\max_ ( i : t ) F`,
+    `\max_ ( i < n | P ) F`, `\max_ ( i < n ) F`,
+    `\max_ ( i 'in' A | P ) F`, `\max_ ( i 'in' A ) F`, `\min^d_ i F`,
+    `\min^d_ ( i <- r | P ) F`, `\min^d_ ( i <- r ) F`,
+    `\min^d_ ( m <= i < n | P ) F`, `\min^d_ ( m <= i < n ) F`,
+    `\min^d_ ( i | P ) F`, `\min^d_ ( i : t | P ) F`,
+    `\min^d_ ( i : t ) F`, `\min^d_ ( i < n | P ) F`,
+    `\min^d_ ( i < n ) F`, `\min^d_ ( i 'in' A | P ) F`,
+    `\min^d_ ( i 'in' A ) F`, `\max^d_ i F`, `\max^d_ ( i <- r | P ) F`,
+    `\max^d_ ( i <- r ) F`, `\max^d_ ( m <= i < n | P ) F`,
+    `\max^d_ ( m <= i < n ) F`, `\max^d_ ( i | P ) F`,
+    `\max^d_ ( i : t | P ) F`, `\max^d_ ( i : t ) F`,
+    `\max^d_ ( i < n | P ) F`, `\max^d_ ( i < n ) F`,
+    `\max^d_ ( i 'in' A | P ) F`, `\max^d_ ( i 'in' A ) F`,
+    `'{' 'omorphism' U '->' V '}'`
+  + definitions `comparable`, `ge`, `gt`, `leif`, `le_of_leif`,
+    `lteif`, `min`, `max`, `arg_min`, `arg_max`, `min_fun`, `max_fun`,
+    `nondecreasing`, `dual_display`, `le`, `lt`, `prod_display`
+  + record `disp_t`
+  + lemmas `le_refl`, `ge_refl`, `dvdEnat`
+  + multirule `ltexx`
+  + alias `dual`
+  + variants `le_xor_gt`, `lt_xor_ge`, `compare`, `incompare`
+    ([#1169](https://github.com/math-comp/math-comp/pull/1169))
+
+- in `preorder.v`
+  + structure `OrderMorphism` moved from `order.v` and generalized
+    from `porderType` to `preorderType`
+  + lemmas `leEdual`, `ltEdual`, `botEdual`, `topEdual`, `geE`, `gtE`,
+    `lexx`, `le_trans:`, `ge_trans:`, `le_le_trans`, `lt_le_def`,
+    `ltxx`, `lt_irreflexive`, `lt_eqF`, `gt_eqF`, `ltW`,
+    `lt_le_trans`, `lt_trans:`, `le_lt_trans`, `lt_nsym`, `lt_asym`,
+    `le_gtF`, `lt_geF`, `lt_gtF`, `lt_leAnge`, `lt_le_asym`,
+    `le_lt_asym`, `le_path_min`, `lt_path_min`, `le_path_sortedE`,
+    `lt_path_sortedE`, `le_sorted_pairwise`, `lt_sorted_pairwise`,
+    `le_path_pairwise`, `lt_path_pairwise`, `le_sorted_mask`,
+    `lt_sorted_mask`, `le_sorted_filter`, `lt_sorted_filter`,
+    `le_path_mask`, `lt_path_mask`, `le_path_filter`,
+    `lt_path_filter`, `le_sorted_ltn_nth`, `le_sorted_leq_nth`,
+    `lt_sorted_leq_nth`, `lt_sorted_ltn_nth`, `subseq_le_path`,
+    `subseq_lt_path`, `subseq_le_sorted`, `subseq_lt_sorted`,
+    `lt_sorted_uniq`, `lt_sorted_eq`, `filter_lt_nth`, `count_lt_nth`,
+    `filter_le_nth`, `count_le_nth`, `sorted_filter_lt`,
+    `sorted_filter_le`, `nth_count_le`, `nth_count_lt`, `sort_le_id`,
+    `sort_lt_id`, `comparable_leNgt`, `comparable_ltNge`,
+    `comparable_sym`, `comparablexx`, `incomparable_eqF`,
+    `incomparable_leF`, `incomparable_ltF`, `le_comparable`,
+    `lt_comparable`, `ge_comparable`, `gt_comparable`, `leif_refl`,
+    `eq_leif`, `eqTleif`, `lteif_trans`, `lteifxx`, `lteifNF`,
+    `lteifS`, `lteifT`, `lteifF`, `lteif_orb`, `lteif_andb`,
+    `lteif_imply`, `lteifW`, `ltrW_lteif`, `minElt`, `maxElt`,
+    `minxx`, `maxxx`, `min_minKx`, `min_minxK`, `max_maxKx`,
+    `max_maxxK`, `comparable_minl`, `comparable_minr`,
+    `comparable_maxl`, `comparable_maxr`, `comparable_le_min`,
+    `comparable_ge_min`, `comparable_lt_min`, `comparable_gt_min`,
+    `comparable_le_max`, `comparable_ge_max`, `comparable_lt_max`,
+    `comparable_gt_max`, `comparable_minxK`, `comparable_minKx`,
+    `comparable_maxxK`, `comparable_maxKx`, `comparable_lteif_minr`,
+    `comparable_lteif_minl`, `comparable_lteif_maxr`,
+    `comparable_lteif_maxl`, `comparable_minA`, `comparable_maxA`,
+    `comparable_min_maxl`, `comparable_max_minr`,
+    `comparable_arg_minP:`, `comparable_arg_maxP:`, `comparable_bigl`,
+    `comparable_bigr`, `bigmax_lt`, `lt_bigmin`,
+    `comparable_contraTle`, `comparable_contraTlt`,
+    `comparable_contraPle`, `comparable_contraPlt`,
+    `comparable_contraNle`, `comparable_contraNlt`,
+    `comparable_contra_not_le`, `comparable_contra_not_lt`,
+    `comparable_contraFle`, `comparable_contraFlt`,
+    `comparable_contra_leq_le`, `comparable_contra_leq_lt`,
+    `comparable_contra_ltn_le`, `comparable_contra_ltn_lt`,
+    `comparable_contra_le`, `comparable_contra_le_lt`,
+    `comparable_contra_lt_le`, `comparable_contra_lt`, `leW_mono`,
+    `leW_nmono`, `leW_mono_in`, `leW_nmono_in`, `le0x`, `ltx0`,
+    `lex1`, `lt1x`, `omorph_le`, `leEsub`, `lt_val`, `ltEsub`,
+    `le_wval`, `lt_wval`, `ltn_def`, `leEnat`, `ltEnat`, `minEnat`,
+    `maxEnat`, `botEnat`, `homo_ltn_lt_in`, `nondecn_inP`,
+    `nhomo_ltn_lt_in`, `nonincn_inP`, `homo_ltn_lt`, `nondecnP`,
+    `nhomo_ltn_lt`, `nonincnP`, `dvdE`, `nat1E`, `nat0E`, `leEord`,
+    `ltEord`, `botEord`, `topEord`, `leEbool`, `ltEbool`, `leEprod`,
+    `le_pair`, `botEprod`, `topEprod`, `leEprodlexi`, `ltEprodlexi`,
+    `lexi_pair`, `ltxi_pair`, `botEprodlexi`, `topEprodlexi`,
+    `sub_prod_lexi`, `leEseq`, `le0s`, `les0`, `le_cons`, `botEseq`,
+    `leEseqlexi`, `ltEseqlexi`, `lexi0s`, `lexis0`, `ltxi0s`,
+    `ltxis0`, `lexi_cons`, `ltxi_cons`, `lexi_lehead`, `ltxi_lehead`,
+    `eqhead_lexiE`, `eqhead_ltxiE`, `sub_seqprod_lexi`, `leEtprod`,
+    `ltEtprod`, `botEtprod`, `topEtprod`, `botEtlexi`, `topEtlexi`,
+    `sub_tprod_lexi`, `leEsubset`, `cardE`, `mem_enum`, `enum_uniq`,
+    `cardT`, `enumT`, `enum0`, `enum1`, `eq_enum`, `eq_cardT`,
+    `set_enum`, `enum_set0`, `enum_setT`, `enum_set1`, `enum_ord`,
+    `val_enum_ord`, `size_enum_ord`, `nth_enum_ord`, `nth_ord_enum`,
+    `index_enum_ord`, `mono_sorted_enum`, `enum_valP`, `enum_val_nth`,
+    `nth_enum_rank_in`, `nth_enum_rank`, `enum_rankK_in`,
+    `enum_rankK`, `enum_valK_in`, `enum_valK`, `enum_rank_inj`,
+    `enum_val_inj`, `enum_val_bij_in`, `eq_enum_rank_in`,
+    `enum_rank_in_inj`, `enum_rank_bij`, `enum_val_bij` moved from
+    `order.v` and generalized from `porderType` to `preorderType`
+    ([#1169](https://github.com/math-comp/math-comp/pull/1169))
+
+- in `order.v`
+  + lemmas `bigmin_le_id`, `bigmax_ge_id`, `bigmin_eq_id` and
+    and `bigmax_eq_id` generalized from `eqType` to `Type`
+    ([#1449](https://github.com/math-comp/math-comp/pull/1449))
+
+- in `ssralg.v`
+  + `rmorph_comm` generalized to the "potentially-zero" case, i.e.,
+    `comPzSemiRingType` and `pzSemiRingType`
+  + The semilinear function instances on `GRing.scale` and `GRing.scale_fun`
+    generalized to `comPzSemiRingType`
+    ([#1467](https://github.com/math-comp/math-comp/pull/1467)).
+
+- in `ssralg.v`
+  + Factories `isSubmodClosed`, `SubNmodule_isSubLSemiModule`,
+    `SubZmodule_isSubLmodule`, `SubChoice_isSubLmodule` generalized
+    to take `subsemimod_closed` instead of `submod_closed`
+  + Factories `isSubalgClosed`, `SubChoice_isSubLalgebra`,
+    `SubChoice_isSubAlgebra` generalized to take `subsemialg_closed`
+    instead of `subalg_closed`
+    ([#1476](https://github.com/math-comp/math-comp/pull/1476)).
+
+- in `poly.v`
+  + definitions `polyX`, `horner_rec`, `horner`, `horner_eval`, `comm_coef`,
+    `comm_poly`, `polyOver_pred`, `polyOver`, `deriv`, `derivn`, `nderivn`,
+    `monic`, `root`, `map_poly`, `commr_rmorph`, `horner_morph`, `comp_poly`,
+    `even_poly`, `odd_poly`, `take_poly`, `drop_poly` generalized to
+    `nzSemiRingType`
+  + definition `horner_alg` generalized to `semiAlgType`
+  + The implicit arguments of `deriv` and `derivn` are now maximally inserted.
+  + `lSemiModType` and `lSemiAlgType` instances on polynomials generalized to
+    `nzSemiRingType`
+  + `comNzSemiRingType` and `comSemiAlgType` instance on polynomials generalized
+    to `comNzSemiRingType`
+  + polynomials now inherit the `countNzSemiRingType` and
+    `countComNzSemiRingType` structures of the type of coefficients.
+  + N-module morphism instances on `coefp`, `polyC`, `map_poly`, `horner_morph`,
+    `comp_poly`, `even_poly`, `odd_poly`, `take_poly`, `drop_poly` generalized
+    to `nzSemiRingType`
+  + semiring morphism instances on `coefp 0`, `polyC`, `map_poly`, `horner_morph`
+    generalized to `nzSemiRingType`
+  + semilinear function instances on `coefp`, `horner_eval`, `deriv`, `derivn`,
+    `nderivn`, `horner_morph`, `comp_poly`, `even_poly`, `odd_poly`,
+    `take_poly`, `drop_poly` generalized to `nzSemiRingType`
+  + semialgebra morphism instances on `horner_morph` and `comp_poly` generalized
+    to `comNzSemiRingType`
+  + semiring and semialgebra morphism instances on `horner_eval` generalized to
+    `comNzSemiRingType`
+  + semialgebra morphism instance on `horner_alg` generalized to `semiAlgType`
+  + `addrClosed`, `mulr2Closed`, `mulrClosed`, `semiring2Closed`,
+    `semiringClosed` instances on `polyOver` generalized to `nzSemiRingType`
+  + `mulrClosed` instance on `monic` generalized to `nzSemiRingType`
+  + lemmas `coefMn`, `coef_sum`, `polyCMn`, `polyC_exp`, `polyC_natr`,
+    `pchar_poly`, `mul_polyC`, `scale_polyC`, `alg_polyC`, `coefZ`,
+    `size_scale_leq`, `polyseqX`, `size_polyX`, `polyX_eq0`, `coefX`,
+    `lead_coefX`, `commr_polyX`, `coefMX`, `coefXM`, `cons_poly_def`,
+    `poly_ind`, `polyseqXaddC`, `size_XaddC`, `lead_coefXaddC`, `size_MXaddC`,
+    `polyseqMX`, `size_mulX`, `lead_coefMX`, `size_XmulC`, `coefXn`,
+    `polyseqXn`, `size_polyXn`, `commr_polyXn`, `lead_coefXn`,
+    `lead_coefXnaddC`, `size_XnaddC`, `polyseqMXn`, `coefMXn`, `size_mulXn`,
+    `coefXnM`, `coef_sumMXn`, `poly_def`, `eq_poly`, `horner0`, `hornerC`,
+    `hornerX`, `horner_cons`, `horner_coef0`, `hornerMXaddC`, `hornerMX`,
+    `horner_Poly`, `horner_coef`, `horner_coef_wide`, `horner_poly`, `hornerD`,
+    `horner_sum`, `hornerCM`, `hornerZ`, `hornerMn`, `comm_coef_poly`,
+    `comm_poly0`, `comm_poly1`, `comm_polyX`, `comm_polyD`, `commr_horner`,
+    `hornerM_comm`, `comm_polyM`, `horner_exp_comm`, `comm_poly_exp`,
+    `hornerXn`, `polyOverS`, `polyOver0`, `polyOver_poly`, `polyOverP`,
+    `polyOverC`, `polyOverZ`, `polyOverX`, `polyOverXn`, `rpred_horner`,
+    `coef_deriv`, `polyOver_deriv`, `derivC`, `derivX`, `derivXn`, `deriv0`,
+    `derivD`, `derivMn`, `derivZ`, `deriv_mulC`, `derivMXaddC`, `derivM`,
+    `derivn0`, `derivn1`, `derivnS`, `derivSn`, `coef_derivn`,
+    `polyOver_derivn`, `derivnC`, `derivnD`, `derivnMn`, `derivnZ`, `derivnXn`,
+    `derivnMXaddC`, `derivn_poly0`, `lt_size_deriv`, `coef_nderivn`,
+    `nderivn_def`, `polyOver_nderivn`, `nderivn0`, `nderivn1`, `nderivnC`,
+    `nderivnXn`, `nderivnD`, `nderivnMn`, `nderivnZ`, `nderivnMXaddC`,
+    `nderivn_poly0`, `nderiv_taylor`, `nderiv_taylor_wide`, `monicE`, `monicP`,
+    `monic1`, `monicX`, `monicXn`, `monic_neq0`, `lead_coef_monicM`,
+    `lead_coef_Mmonic`, `size_monicM`, `size_Mmonic`, `monicMl`, `monicMr`,
+    `monic_exp`, `monic_prod`, `monicXaddC`, `monicXnaddC`, `lreg_lead0`,
+    `rreg_lead0`, `lreg_size`, `lreg_polyZ_eq0`, `lead_coef_lreg`, `rreg_size`,
+    `rreg_polyMC_eq0`, `rreg_div0`, `monic_comreg`, `mem_root`, `rootE`,
+    `rootP`, `rootPt`, `rootPf`, `rootC`, `root0`, `root1`, `rootX`,
+    `root_size_gt1`, `map_polyE`, `map_poly0`, `eq_map_poly`, `map_poly_id`,
+    `coef_map_id0`, `map_Poly_id0`, `map_poly_comp_id0`, `size_map_poly_id0`,
+    `map_poly_eq0_id0`, `lead_coef_map_id0`, `size_map_inj_poly`,
+    `map_inj_poly`, `lead_coef_map_inj`, `map_polyK`, `eq_in_map_poly_id0`,
+    `eq_in_map_poly`, `coef_map`, `map_Poly`, `map_poly_comp`, `map_polyC`,
+    `lead_coef_map_eq`, `map_polyZ`, `map_polyX`, `map_polyXn`, `map_polyXaddC`,
+    `monic_map`, `horner_map`, `map_comm_poly`, `map_comm_coef`, `rmorph_root`,
+    `horner_morphC`, `horner_morphX`, `deriv_map`, `derivn_map`, `nderivn_map`,
+    `poly_morphX_comm`, `poly_initial`, `size_map_polyC`, `map_polyC_eq0`,
+    `root_polyC`, `comp_polyE`, `coef_comp_poly`, `polyOver_comp`,
+    `comp_polyCr`, `comp_poly0r`, `comp_polyC`, `comp_poly0`, `comp_polyD`,
+    `comp_polyZ`, `comp_polyXr`, `comp_polyX`, `comp_poly_MXaddC`,
+    `size_comp_poly_leq`, `comp_Xn_poly`, `coef_comp_poly_Xn`, `comp_poly_Xn`,
+    `size_even_poly`, `coef_even_poly`, `even_polyE`, `size_even_poly_eq`,
+    `even_polyD`, `even_polyZ`, `even_polyC`, `size_odd_poly`, `coef_odd_poly`,
+    `odd_polyE`, `odd_polyC`, `odd_polyD`, `odd_polyZ`, `size_odd_poly_eq`,
+    `odd_polyMX`, `even_polyMX`, `sum_even_poly`, `sum_odd_poly`,
+    `poly_even_odd`, `size_take_poly`, `coef_take_poly`, `take_poly_id`,
+    `take_polyD`, `take_polyZ`, `take_poly_sum`, `take_poly0l`, `take_poly0r`,
+    `take_polyMXn`, `take_polyMXn_0`, `take_polyDMXn`, `coef_drop_poly`,
+    `drop_poly_eq0`, `size_drop_poly`, `sum_drop_poly`, `drop_polyD`,
+    `drop_polyZ`, `drop_poly_sum`, `drop_poly0l`, `drop_poly0r`, `drop_polyMXn`,
+    `drop_polyMXn_id`, `drop_polyDMXn`, `poly_take_drop`, `eqp_take_drop`
+    generalized to `nzSemiRingType`
+  + lemmas `hornerM`, `horner_exp`, `horner_prod`, `comp_polyM`, `comp_polyA`,
+    `horner_comp`, `root_comp`, `deriv_comp`, `deriv_exp`
+    generalized to `comNzSemiRingType`
+  + lemmas `in_alg_comm`, `horner_algC`, `horner_algX`, `poly_alg_initial`
+    generalized to `semiAlgType`
+    ([#1395](https://github.com/math-comp/math-comp/pull/1395)).
+
+- in `matrix.v`
+  + definition `mxdiag` generalized to `nmodType`
+  + definitions `lin1_mx`, `lin_mx`, `mulmxr`, `lin_mulmxr` generalized to
+    `pzSemiRingType`
+  + definitions `lin_mulmx`, `lin_mul_row` generalized to `comPzSemiRingType`
+  + `lSemiModType` instance on matrices generalized to `pzSemiRingType`
+  + `lSemiAlgType` instance on square matrices generalized to `nzSemiRingType`
+  + `pzSemiRingType` and `pzRingType` instance on square matrices generalized to
+    arbitrary size
+  + `semiAlgType` instance on square matrices generalized to `comNzSemiRingType`
+  + semilinear function instances on `mulmxr`, `lin_mulmxr`, `mxtrace`, `trmx`,
+    `row`, `col`, `row'`, `col'`, `mxsub`, `row_perm`, `col_perm`, `xrow`,
+    `xcol`, `lsubmx`, `rsubmx`, `usubmx`, `dsubmx`, `vec_mx`, `mxvec`, `diag_mx`
+    generalized to `pzSemiRingType`
+  + semilinear function instances on `mulmx`, `lin_mulmx`, `lin_mul_row`
+    generalized to `comPzSemiRingType`
+  + lemmas `mxrowD`, `mxrow0`, `mxrow_const`, `mxrow_sum`, `submxrowD`,
+    `submxrow0`, `submxrow_sum`, `mxcolD`, `mxcol0`, `mxcol_const`, `mxcol_sum`,
+    `submxcolD`, `submxcol0`, `submxcol_sum`, `mxblockD`, `mxblock0`,
+    `mxblock_const`, `mxblock_sum`, `submxblockD`, `submxblock0`,
+    `submxblock_sum`, `is_trig_mxblockP`, `is_trig_mxblock`, `is_diag_mxblockP`,
+    `is_diag_mxblock`, `submxblock_diag`, `eq_mxdiagP`, `eq_mxdiag`, `mxdiagD`,
+    `mxdiag_sum`, `tr_mxdiag`, `row_mxdiag`, `col_mxdiag` generalized to
+    `nmodType`
+  + lemmas `scalemx_const`, `matrix_sum_delta`, `scalemxAl`, `mxtraceZ`,
+    `row_sum_delta`, `scale_row_mx`, `scale_col_mx`, `scale_block_mx`,
+    `diag_mx_sum_delta`, `row_diag_mx`, `scale_scalar_mx`, `scalemx1`,
+    `scalar_mx_sum_delta`, `mx1_sum_delta`, `mulmx_sum_row`, `mul_scalar_mx`,
+    `mul_rV_lin1`, `mul_rV_lin`, `mul_vec_lin`, `mx_rV_lin`, `mx_vec_lin`,
+    `map_mxZ`, `map_lin1_mx`, `map_lin_mx`, `mxOver_scalar`, `mxOver_scalarE`,
+    `mxOverZ`, `mxOver_diag`, `mxOver_diagE`, `mxOverM`, `mul_mxrow`,
+    `mul_submxrow`, `mxcol_mul`, `submxcol_mul`, `mul_mxrow_mxcol`,
+    `mul_mxcol_mxrow`, `mul_mxrow_mxblock`, `mul_mxblock_mxrow`, `mul_mxblock`,
+    `mxtrace_mxblock`, `mxdiagZ`, `diag_mxrow`, `mxtrace_mxdiag`,
+    `mul_mxdiag_mxcol`, `mul_mxrow_mxdiag`, `mul_mxblock_mxdiag`,
+    `mul_mxdiag_mxblock` generalized to `pzSemiRingType`
+  + lemmas `scalemxAr`, `mul_vec_lin_row`, `mxvec_dotmul`, `mul_mx_scalar`
+    generalized to `comPzSemiRingType`
+    ([#1398](https://github.com/math-comp/math-comp/pull/1398)).
+
+- in `numfield.v`
+  + `Num.conj_op` has been renamed to `Num.conj` and its type has been changed
+    from `{rmorphism R -> R}` to `R -> R` (for any `R : numClosedFieldType`).
+    The new constant `Num.conj` is canonically a ring morphism. The `Num.Def`
+    module now provides its shorthand `conjC`
+    ([#1404](https://github.com/math-comp/math-comp/pull/1404),
+    fixes [#1401](https://github.com/math-comp/math-comp/issues/1401)).
+
+- in `mxpoly.v`
+  + definitions `rVpoly` and `poly_rV` generalized to `nzSemiRingType`
+  + definitions `horner_mx` and `powers_mx` generalized to `comNzSemiRingType`
+  + semilinear function instances on `rVpoly` and `poly_rV` generalized to
+    `nzSemiRingType`
+  + semialgebra homomorphism instance on `horner_mx` generalized to
+    `comNzSemiRingType`
+  + lemmas `coef_rVpoly`, `coef_rVpoly_ord`, `rVpoly_delta`, `rVpolyK`,
+    `poly_rV_K`, `mx_poly_ring_isom`, `map_rVpoly`, `map_poly_rV` generalized to
+    `nzSemiRingType`
+  + lemmas `horner_mx_C`, `horner_mx_X`, `horner_rVpoly`, `horner_mx_diag`,
+    `comm_mx_horner`, `comm_horner_mx`, `comm_horner_mx2`, `map_powers_mx`,
+    `map_horner_mx` generalized to `comNzSemiRingType`
+    ([#1269](https://github.com/math-comp/math-comp/pull/1269)).
+
+- in `vector.v`
+  + semilinear function instance on `fun_of_lfun` generalized to `semiVectType`
+  + `subType`, `eqType`, `subEqType`, `choiceType`, `subChoiceType`, `nmodType`,
+    `lSemiModType`, and `semiVectType` instances on `'Hom(aT, rT)` generalized
+    to `semiVectType`
+  + definitions `dim`, `hom`, `fun_of_lfun_def`, `fun_of_lfun`, `linfun_def`,
+    `linfun`, `id_lfun`, `comp_lfun` generalized to `semiVectType`
+  + lemmas `lfunE`, `fun_of_lfunK`, `lfunP`, `zero_lfunE`, `add_lfunE`,
+    `sum_lfunE`, `scale_lfunE`, `id_lfunE`, `comp_lfunE`, `comp_lfunA`,
+    `comp_lfun1l`, `comp_lfun1r`, `comp_lfun0l`, `comp_lfun0r`, `comp_lfunDl`,
+    `comp_lfunDr`, `comp_lfunZl`, `comp_lfunZr`, `dim_matrix` generalized to
+    `semiVectType`
+    ([#1464](https://github.com/math-comp/math-comp/pull/1464)).
+
+- in `qpoly.v`
+  + definitions `poly_of_size_pred`, `poly_of_size`, `npoly`,
+    `npoly_rV`, `rVnpoly`, `mk_npoly`, `npoly0`, `npolyp`,
+    `npoly_of_seq`, `mk_monic`, `qpoly` generalized to
+    `nzSemiRingType`
+  + definition `npoly_enum` generalized to `finNzSemiRingType`
+  + the `submodClosed` instance on `poly_of_size_pred` generalized to
+    `nzSemiRingType`
+  + the `subType`, `lSemiModType`, `semiVectType` instance on `npoly`
+    generalized to `nzSemiRingType`
+  + the `countNmodType` instance on `npoly` generalized to
+    `countNzSemiRingType`
+  + the `finNmodType` instance on `npoly` generalized to
+    `finNzSemiRingType`
+  + the semilinear function instance on `polyn` generalized to
+    `nzSemiRingType`
+  + the `npoly` instance on `poly` generalized to `nzSemiRingType`
+  + lemmas `npoly_is_a_poly_of_size`, `size_npoly`, `npoly_rV_K`,
+    `rVnpolyK`, `npoly_vect_axiom`, `size_npoly0`, `npolyP`,
+    `coef_npolyp`, `big_coef_npoly`, `npolypK`, `coef_sum`,
+    `mk_monic_X`, `mk_monic_Xn` generalized to `nzSemiRingType`
+  + lemmas `npoly_enum_uniq`, `mem_npoly_enum`, `card_npoly`,
+    `card_qpoly`, `card_monic_qpoly` generalized to
+    `finNzSemiRingType`
+    ([#1466](https://github.com/math-comp/math-comp/pull/1466)).
+
+### Renamed
+
+- in `ssralg.v`
+  + `semi_additive` -> `nmod_morphism`
+  + `isSemiAdditive` -> `isNmodMorphism`
+  + `additive` -> `zmod_morphism`
+  + `isAdditive` -> `isZmodMorphism`
+  + `multiplicative` -> `monoid_morphism`
+  + `isMultiplicative` -> `isMonoidMorphism`
+  + `can2_semi_additive` -> `can2_nmod_morphism`.
+  + `can2_additive` -> `can2_zmod_morphism`.
+  + `additive_semilinear` -> `nmod_morphism_semilinear`.
+  + `additive_linear` -> `zmod_morphism_linear`.
+  + `rmorphismMP` -> `rmorphism_monoidP`.
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `ring_quotient.v`
+  + `isRingQuotient` -> `isNzRingQuotient`
+  + `ringQuotType` -> `nzRingQuotType`
+  + `pi_is_additive` -> `pi_is_zmod_morphism`
+  + `pi_is_multiplicative` -> `pi_is_monoid_morphism`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `finalg.v`
+  + `isRing` -> `isNzRing`
+  + `finSemiRingType`-> `finNzSemiRingType`
+  + `finRingType` -> `finNzRingType`
+  + `finComSemiRingType` -> `finComNzSemiRingType`
+  + `finComRingType` -> `finComNzRingType`
+  + `card_finRing_gt1` -> `card_finNzRing_gt1`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `countalg.v`
+  + `countSemiRingType`-> `countNzSemiRingType`
+  + `countRingType` -> `countNzRingType`
+  + `countComSemiRingType` -> `countComNzSemiRingType`
+  + `countComRingType` -> `countComNzRingType`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `poly.v`
+  + `polyC_multiplicative` -> `polyC_is_monoid_morphism`
+  + `coefp0_multiplicative` -> `coefp0_is_monoid_morphism`
+  + `map_poly_is_additive` -> `map_poly_is_zmod_morphism`
+  + `map_poly_is_multiplicative` -> `map_poly_is_monoid_morphism`
+  + `horner_is_multiplicative` -> `horner_is_monoid_morphism`
+  + `horner_eval_is_multiplicative` -> `horner_eval_is_monoid_morphism`
+  + `comp_poly_multiplicative` -> `comp_poly_is_monoid_morphism`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `fraction.v`
+  + `tofrac_is_additive` -> `tofrac_is_zmod_morphism`
+  + `tofrac_is_multiplicative` -> `tofrac_is_monoid_morphism`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `matrix.v`
+  + `const_mx_is_semi_additive` -> `const_mx_is_nmod_morphism`
+  + `swizzle_mx_is_semi_additive` -> `swizzle_mx_is_nmod_morphism`
+  + `diag_mx_is_semi_additive` -> `diag_mx_is_nmod_morphism`
+  + `scalar_mx_is_semi_additive` -> `scalar_mx_is_nmod_morphism`
+  + `mxtrace_is_semi_additive` -> `mxtrace_is_nmod_morphism`
+  + `const_mx_is_additive` -> `const_mx_is_zmod_morphism`
+  + `swizzle_mx_is_additive` -> `swizzle_mx_is_zmod_morphism`
+  + `diag_mx_is_additive` -> `diag_mx_is_zmod_morphism`
+  + `scalar_mx_is_additive` -> `scalar_mx_is_zmod_morphism`
+  + `mxtrace_is_additive` -> `mxtrace_is_zmod_morphism`
+  + `scalar_mx_is_multiplicative` -> `scalar_mx_is_monoid_morphism`
+  + `map_mx_is_multiplicative` -> `map_mx_is_monoid_morphism`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `orderedzmod.v`
+  + `Rpos_pred` -> `pos_num_pred`
+  + `Rpos` -> `pos_num`
+  + `Rneg_pred` -> `neg_num_pred`
+  + `Rneg` -> `neg_num`
+  + `Rnneg_pred` -> `nneg_num_pred`
+  + `Rnneg` -> `nneg_num`
+  + `Rnpos_pred` -> `npos_num_pred`
+  + `Rnpos` -> `npos_num`
+  + `Rreal_pred` -> `real_num_pred`
+  + `Rreal` -> `real_num`
+    ([#1468](https://github.com/math-comp/math-comp/pull/1468),
+    fixes [#1330](https://github.com/math-comp/math-comp/issues/1330)).
+
+- in `ssrnum.v`
+  + `Re_is_additive` -> `Re_is_zmod_morphism`
+  + `Im_is_additive` -> `Im_is_zmod_morphism`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `ssrint.v`
+  + `intmul1_is_multiplicative` -> `intmul1_is_monoid_morphism`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `archimedean.v`
+  + `real_floor_ge_int_tmp` -> `real_floor_ge_int`
+  + `real_ceil_le_int_tmp` -> `real_ceil_le_int`
+  + `le_ceil_tmp` -> `le_ceil`
+  + `floor_le_tmp` -> `floor_le`
+  + `floor_ge_int_tmp` -> `floor_ge_int`
+  + `ceil_le_int_tmp` -> `ceil_le_int`
+    ([#1469](https://github.com/math-comp/math-comp/pull/1469)).
+
+- in `rat.v`
+  + `ratr_is_additive` -> `ratr_is_zmod_morphism`
+  + `ratr_is_multiplicative` -> `ratr_is_monoid_morphism`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `polyXY.v`
+  + `swapXY_is_additive` -> `swapXY_is_zmod_morphism`
+  + `swapXY_is_multiplicative` -> `swapXY_is_monoid_morphism`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `qpoly.v`
+  + `in_qpoly_is_multiplicative` -> `in_qpoly_monoid_morphism`
+  + `qpolyC_is_additive` -> `qpolyC_is_zmod_morphism`
+  + `qpolyC_is_multiplicative` -> `qpolyC_is_monoid_morphism`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `falgebra.v`
+  + `amulr_is_multiplicative` -> `amulr_is_monoid_morphism`
+  + `ahomP` -> `ahomP_tmp`
+  + `hom_is_multiplicative f` -> `ahom_is_monoid_morphism f`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `fieldext.v`
+  + `vsval_is_multiplicative K` -> `vsval_monoid_morphism`
+  + `subfx_inj_is_zmod_additive` -> `subfx_inj_is_zmod_morphism`
+  + `subfx_eval_is_zmod_additive` -> `subfx_eval_is_zmod_morphism`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `galois.v`
+  + `kHomP` -> `kHomP_tmp`
+  + `kHom_is_additive` -> `kHom_is_zmod_morphism`
+  + `kHom_is_multiplicative` -> `kHom_is_monoid_morphism`
+  + `kHom_kHom_lrmorphism` -> `kHom_monoid_morphism`
+  + `galTrace_is_additive` -> `galTrace_is_zmod_morphism`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `algC.v`
+  + `CtoL_is_zmod_additive` -> `CtoL_is_zmod_morphism`
+  + `CtoL_is_multiplicative` -> `CtoL_is_monoid_morphism`
+  + `conj_is_semi_additive` -> `conj_is_nmod_morphism`
+  + `conj_is_additive` -> `conj_is_zmod_morphism`
+  + `conj_is_multiplicative` -> `conj_is_monoid_morphism`
+  + `algC_invaut_is_additive` -> `algC_invaut_is_zmod_morphism`
+  + `algC_invaut_is_multiplicative nu` -> `algC_invaut_is_monoid_morphism nu`
+  + `algRval_is_additive` -> `algRval_is_zmod_morphism`
+  + `algRval_is_multiplicative` -> `algRval_is_monoid_morphism`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `mxrepresentation.v`
+  + `mxval_sub` -> `mxval_is_zmod_morphism`
+  + `mxval_is_multiplicative` -> `mxval_is_monoid_morphism`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `classfun.v`
+  + `cfAut_is_additive` -> `cfAut_is_zmod_morphism`
+  + `cfAut_is_multiplicative` -> `cfAut_is_monoid_morphism`
+  + `cfRes_is_multiplicative` -> `cfRes_is_monoid_morphism`
+  + `cfIsom_is_additive` -> `cfIsom_is_zmod_morphism`
+  + `cfIsom_is_multiplicative` -> `cfIsom_is_monoid_morphism`
+  + `cfSdprod_is_additive` -> `cfSdprod_is_zmod_morphism`
+  + `cfSdprod_is_multiplicative` -> `cfSdprod_is_monoid_morphism`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `character.v`
+  + `xcfun_is_additive` -> `xcfun_is_zmod_morphism`
+  + `xcfun_r_is_additive` -> `xcfun_r_is_zmod_morphism`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+- in `inertia.v`
+  + `cfConjg_is_multiplicative y` -> `cfConjg_is_monoid_morphism y`
+    ([#1296](https://github.com/math-comp/math-comp/pull/1296)).
+
+### Removed
+
+- in `archimedean.v`
+  + lemmas `real_floor_ge_int`, `real_ceil_le_int`, `floor_ge_int`,
+    `ceil_le_int`, `floor_le`, and `le_ceil`: these names are now taken by new
+    lemmas
+    ([#1469](https://github.com/math-comp/math-comp/pull/1469)).
+
+- in `qpoly.v`
+  + Lemmas `npoly_submod_closed` and `polyn_is_linear` (internal lemmas)
+    ([#1466](https://github.com/math-comp/math-comp/pull/1466)).
+
+### Deprecated
+
+- package `mathcomp-ssreflect`, use `mathcomp-boot` and/or
+  `mathcomp-order` instead
+  ([#1415](https://github.com/math-comp/math-comp/pull/1415)).
+
+- in `fingroup.v`
+  + mixin `isMulBaseGroup` (use `isStarMonoid` instead)
+  + mixin `BaseFinGroup_isGroup` (use `StarMonoid_isGroup` instead)
+  + structure `baseFinGroupType` (use `finStarMonoidType` instead)
+  + definition `oneg` (use `one` instead)
+  + definition `mulg` (use `mul` instead)
+  + definition `invg` (use `inv` instead)
+  + definition `expgn` (use `natexp` instead)
+  + factory `isMulGroup` (use `Finite_isGroup` instead)
+    ([#1439](https://github.com/math-comp/math-comp/pull/1439)).
+
+- in `matrix.v`
+  + lemmas `const_mx_is_zmod_morphism`, `swizzle_mx_is_zmod_morphism`,
+    `diag_mx_is_zmod_morphism`, `scalar_mx_is_zmod_morphism`,
+    `mxtrace_is_zmod_morphism` (use `raddfB` instead)
+    ([#1398](https://github.com/math-comp/math-comp/pull/1398)).
+
+- in `mxpoly.v`
+  + lemmas `poly_rV_is_linear` and `rVpoly_is_linear` (use `linearP` instead)
+    ([#1269](https://github.com/math-comp/math-comp/pull/1269)).
+
+  + lemma `map_poly_is_zmod_morphism` (use `raddfB` instead)
+  + lemmas `deriv_is_linear`, `derivn_is_linear`, `nderivn_is_linear`,
+    `horner_is_linear`, `comp_poly_is_linear`, `even_poly_is_linear`,
+    `odd_poly_is_linear`, `take_poly_is_linear`, `drop_poly_is_linear`,
+    `horner_eval_is_linear` (use `linearP` instead)
+    ([#1395](https://github.com/math-comp/math-comp/pull/1395)).
 
 ## [2.4.0] - 2025-04-14
 
