@@ -1369,15 +1369,11 @@ have mulD: left_distributive mul +%R.
 have nzL1: L1 != 0 by rewrite -(inj_eq toPinj) L1K /toPF raddf0 oner_eq0.
 pose mulM := GRing.Zmodule_isComNzRing.Build _ mulA mulC mul1 mulD nzL1.
 pose rL : comNzRingType := HB.pack vL mulM.
-have mulZlM : GRing.Lmodule_isLalgebra F rL.
+have mulZlM : GRing.LSemiModule_isComSemiAlgebra F rL.
   constructor => a x y; apply: toPinj.
   by rewrite toL_K /toPF !linearZ /= -!/(toPF _) toL_K -scalerAl modpZl.
-pose laL : lalgType F := HB.pack rL mulZlM.
-have mulZrM : GRing.Lalgebra_isAlgebra F laL.
-  by constructor => a x y; rewrite !(mulrC x) scalerAl.
-pose aL : algType F := HB.pack laL mulZrM.
-pose uLM := Algebra_isFalgebra.Build F aL.
-pose cuL : comUnitRingType := HB.pack aL uLM.
+pose caL : comNzAlgType F := HB.pack rL mulZlM.
+pose cuL : comUnitAlgType F := HB.pack caL (Algebra_isFalgebra.Build F caL).
 have unitM : GRing.ComUnitRing_isField cuL.
   constructor => x nz_x; apply/unitrP; set q := toPF x.
   have nz_q: q != 0 by rewrite -(inj_eq toPinj) /toPF raddf0 in nz_x.
@@ -1388,11 +1384,11 @@ have unitM : GRing.ComUnitRing_isField cuL.
   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC.
   apply: toPinj; rewrite !toL_K -upq1 modp_mul modpD mulrC.
   by rewrite modp_mull add0r.
-pose feL : fieldExtType F := HB.pack vL aL cuL unitM.
+pose feL : fieldExtType F := HB.pack vL cuL unitM.
 exists feL; first by rewrite dimvf; apply: mul1n.
 exists toPF.
 have tol_lin: linear toL by move=> a q1 q2; rewrite -linearP -modpZl -modpD.
-have tol_mul : monoid_morphism (toL : {poly F} -> aL).
+have tol_mul : monoid_morphism (toL : {poly F} -> caL).
   by split=> [|q r];
     apply: toPinj; rewrite !toL_K // modp_mul -!(mulrC r) modp_mul.
 pose toLlM := GRing.isLinear.Build _ _ _ _ toL tol_lin.
@@ -1409,7 +1405,7 @@ Qed.
 (*   {L : fieldExtType F & \dim {: L} = (size p).-1 & *)
 (*     {z | root (map_poly (in_alg L) p) z & <<1; z>>%VS = fullv}}. *)
 (* Proof. *)
-(* case=> p_gt1 irr_p; set n := (size p).-1; pose vL := [vectType F of 'rV_n]. *)
+(* case=> p_gt1 irr_p; set n := (size p).-1; pose vL : vectType F := 'rV_n. *)
 (* have Dn: n.+1 = size p := ltn_predK p_gt1. *)
 (* have nz_p: p != 0 by rewrite -size_poly_eq0 -Dn. *)
 (* pose toL q : vL := poly_rV (q %% p). *)
@@ -1429,16 +1425,12 @@ Qed.
 (*   by rewrite !raddfD mulrDl /= !toL_K /toL modpD. *)
 (* have nzL1: L1 != 0 by rewrite -(can_eq rVpolyK) L1K raddf0 oner_eq0. *)
 (* pose mulM := GRing.Zmodule_isComNzRing.Build vL mulA mulC mul1 mulD nzL1. *)
-(* pose rL := ComNzRingType vL mulM. *)
-(* have mulZlM : GRing.Lmodule_isLalgebra F rL. *)
+(* pose rL : comNzRingType := HB.pack vL mulM. *)
+(* have mulZlM : GRing.LSemiModule_isComSemiAlgebra F rL. *)
 (*   constructor => a x y; apply: canRL rVpolyK _. *)
 (*   by rewrite !linearZ /= toL_K -scalerAl modpZl. *)
-(* pose laL := LalgType F rL mulZlM. *)
-(* have mulZrM : GRing.Lalgebra_isAlgebra F laL. *)
-(*   by constructor => a x y; rewrite !(mulrC x) scalerAl. *)
-(* pose aL := AlgType F laL mulZrM. *)
-(* pose uLM := Algebra_isFalgebra.Build F aL. *)
-(* pose cuL := ComUnitRingType uLM _. *)
+(* pose laL : comNzAlgType F := HB.pack rL mulZlM. *)
+(* pose cuL : comUnitAlgType F := HB.pack laL (Algebra_isFalgebra.Build F laL). *)
 (* have unitM : GRing.ComUnitRing_isField cuL. *)
 (*   constructor => x nz_x; apply/unitrP; set q := rVpoly x. *)
 (*   have nz_q: q != 0 by rewrite -(can_eq rVpolyK) raddf0 in nz_x. *)
@@ -1450,7 +1442,7 @@ Qed.
 (*   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC. *)
 (*   congr (poly_rV _); rewrite toL_K modp_mul mulrC (canRL (addKr _) upq1). *)
 (*   by rewrite -mulNr modp_addl_mul_small ?size_poly1. *)
-(* pose feL := FieldExtType _ unitM _. *)
+(* pose feL : fieldExtType F := HB.pack vL cuL unitM. *)
 (* exists feL; first by rewrite dimvf; apply: mul1n. *)
 (* pose z : vL := toL 'X; set iota := in_alg _. *)
 (* have q_z q: rVpoly (map_poly iota q).[z] = q %% p. *)
