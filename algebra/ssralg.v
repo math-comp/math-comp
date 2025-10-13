@@ -239,6 +239,9 @@ From mathcomp Require Export nmodule.
 (* [SubChoice_isSubZmodule of U by <:] == zmodType mixin for a subType whose  *)
 (*                          base type is a zmodType and whose predicate's     *)
 (*                          is a zmodClosed                                   *)
+(* [SubNmodule_isSubZmodule of U by <:] == zmodType mixin for a subNmodType   *)
+(*                          base type is a zmodType and whose predicate's     *)
+(*                          is an opprClosed                                  *)
 (*                                                                            *)
 (*  * PzSemiRing (non-commutative semirings):                                 *)
 (*                    R^c == the converse (semi)ring for R: R^c is convertible*)
@@ -6293,14 +6296,6 @@ HB.end.
 
 Module SubExports.
 
-Notation "[ 'SubChoice_isSubNmodule' 'of' U 'by' <: ]" :=
-  (SubChoice_isSubNmodule.Build _ _ U rpred0D)
-  (format "[ 'SubChoice_isSubNmodule'  'of'  U  'by'  <: ]")
-  : form_scope.
-Notation "[ 'SubChoice_isSubZmodule' 'of' U 'by' <: ]" :=
-  (SubChoice_isSubZmodule.Build _ _ U (zmodClosedP _))
-  (format "[ 'SubChoice_isSubZmodule'  'of'  U  'by'  <: ]")
-  : form_scope.
 Notation "[ 'SubNmodule_isSubNzSemiRing' 'of' U 'by' <: ]" :=
   (SubNmodule_isSubNzSemiRing.Build _ _ U (@rpred1M _ _))
   (format "[ 'SubNmodule_isSubNzSemiRing'  'of'  U  'by'  <: ]")

@@ -1004,7 +1004,7 @@ Lemma rpredBl x y : x \in S -> (x - y \in S) = (y \in S).
 Proof. exact: (@gpredFl _ T). Qed.
 
 Lemma zmodClosedP : zmod_closed S.
-Proof. split; [ exact: (@rpred0D V S).1 | exact: rpredB ]. Qed.
+Proof. split; [ exact: rpred0 | exact: rpredB ]. Qed.
 End Zmod.
 End ZmodPred. 
 
@@ -1109,6 +1109,27 @@ HB.instance Definition _ := isSubBaseAddUMagma.Build V S U valD0.
 
 HB.end.
 
+HB.factory Record SubNmodule_isSubZmodule (V : zmodType) S U
+    of SubNmodule V S U := {
+  oppr_closed_subproof : oppr_closed S
+}.
+
+HB.builders Context V S U of SubNmodule_isSubZmodule V S U.
+
+HB.instance Definition _ := isOppClosed.Build V S oppr_closed_subproof.
+
+Let inU v Sv : U := Sub v Sv.
+Let oppU (u : U) := inU (rpredNr (valP u)).
+
+HB.instance Definition _ := hasOpp.Build U oppU.
+
+Lemma addNr : left_inverse 0 oppU (@add U).
+Proof. by move=> x; apply/val_inj; rewrite raddf0 raddfD/= SubK addNr. Qed.
+
+HB.instance Definition _ := Nmodule_isZmodule.Build U addNr.
+
+HB.end.
+
 HB.factory Record SubChoice_isSubZmodule (V : zmodType) S U
     of SubChoice V S U := {
   zmod_closed_subproof : zmod_closed S
@@ -1119,16 +1140,8 @@ HB.builders Context V S U of SubChoice_isSubZmodule V S U.
 HB.instance Definition _ := isZmodClosed.Build V S zmod_closed_subproof.
 HB.instance Definition _ :=
   SubChoice_isSubNmodule.Build V S U nmod_closed_subproof.
-
-Let inU v Sv : U := Sub v Sv.
-Let oppU (u : U) := inU (rpredNr (valP u)).
-
-HB.instance Definition _ := hasOpp.Build U oppU.
-
-Lemma addNr : left_inverse 0 oppU (@add U).
-Proof. by move=> x; apply/val_inj; rewrite !SubK addNr. Qed.
-
-HB.instance Definition _ := Nmodule_isZmodule.Build U addNr.
+HB.instance Definition _ :=
+  SubNmodule_isSubZmodule.Build V S U (@rpredNr _ _).
 
 HB.end.
 
@@ -1137,6 +1150,10 @@ Module SubExports.
 Notation "[ 'SubChoice_isSubNmodule' 'of' U 'by' <: ]" :=
   (SubChoice_isSubNmodule.Build _ _ U rpred0D)
   (at level 0, format "[ 'SubChoice_isSubNmodule'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubNmodule_isSubZmodule' 'of' U 'by' <: ]" :=
+  (SubNmodule_isSubZmodule.Build _ _ U (@rpredNr _ _))
+  (at level 0, format "[ 'SubNmodule_isSubZmodule'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubZmodule' 'of' U 'by' <: ]" :=
   (SubChoice_isSubZmodule.Build _ _ U (zmodClosedP _))
