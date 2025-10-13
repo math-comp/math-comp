@@ -13,7 +13,7 @@ The contributors to this version are:
 
 Reynald Affeldt, Arthur Azevedo de Amorim, Alessandro Bruni, Cyril
 Cohen, Georges Gonthier, Florent Hivert, Enrico Tassi, Laurent Théry,
-Pierre Roux, Takafumi Saikawa Kazuhiko Sakaguchi, Lynda Bentoucha,
+Pierre Roux, Takafumi Saikawa, Kazuhiko Sakaguchi, Lynda Bentoucha,
 Quentin Vermande
 
 ### Added
