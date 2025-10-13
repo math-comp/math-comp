@@ -428,9 +428,12 @@ Proof. by move=> + [//| xi] [//| yi]; apply. Qed.
 Module Exports.
 Arguments r {T sem i}.
 Notation "{ 'itv' R & i }" := (def (@num_sem R) (Itv.Real i%Z)) : type_scope.
+Notation "{ 'natitv' i }" := (def nat_sem (Itv.Real i%Z)) : type_scope.
 Notation "{ 'i01' R }" := {itv R & `[0, 1]} : type_scope.
+Notation "{ 'n01' }" := {natitv `[0, 1]} : type_scope.
 Notation "{ 'posnum' R }" := (@posnum _ (Phant R))  : ring_scope.
 Notation "{ 'nonneg' R }" := (@nonneg _ (Phant R))  : ring_scope.
+Notation "{ 'posnat' }" := (def nat_sem (Itv.Real `]0, +oo[ )) : type_scope.
 Notation "x %:itv" := (from (Phantom _ x)) : ring_scope.
 Notation "[ 'itv' 'of' x ]" := (fromP (Phantom _ x)) : ring_scope.
 Notation num := r.
@@ -561,6 +564,16 @@ move: x y x_sub_y => [lx ux] [ly uy] /andP[lel leu] /=.
 move=> /andP[lxz zux]; apply/andP; split.
 - by apply: le_trans lxz; rewrite le_num_itv_bound.
 - by apply: le_trans zux _; rewrite le_num_itv_bound.
+Qed.
+
+Lemma nat_spec_sub (n m : Itv.t) : Itv.sub n m ->
+  forall l : nat, nat_spec n l -> nat_spec m l.
+Proof.
+case: n m => [| n] [| m] //= n_sub_m l.
+move: n m n_sub_m => [ln un] [lm um] /andP[lel leu] /=.
+move=> /andP[lxz zux]; apply/andP; split.
+- by apply: le_trans lxz.
+- by apply: le_trans zux _.
 Qed.
 
 Definition empty_itv := Itv.Real `[1, 0]%Z.
@@ -697,6 +710,24 @@ Arguments widen_itvE {R i} _ {_}.
 Arguments posE {R i} _ {_}.
 Arguments nngE {R i} _ {_}.
 
+Section NatTheory.
+Context {i : Itv.t}.
+Implicit Type n : nat_def i.
+
+Lemma widen_natitv_subproof n i' : Itv.sub i i' -> nat_spec i' n%:num.
+Proof. by case: n => n /= /[swap] /nat_spec_sub; apply. Qed.
+
+Definition widen_natitv n i' (uni : unify_itv i i') :=
+  Itv.mk (widen_natitv_subproof n uni).
+
+Lemma widen_natitvE n (uni : unify_itv i i) : @widen_natitv n i uni = n.
+Proof. exact/val_inj. Qed.
+
+End NatTheory.
+
+Arguments widen_natitv {i} _ {_ _}.
+Arguments widen_natitvE {i} _ {_}.
+
 Notation "[ 'gt0' 'of' x ]" := (ltac:(refine (gt0 x%:itv))) (only parsing).
 Notation "[ 'lt0' 'of' x ]" := (ltac:(refine (lt0 x%:itv))) (only parsing).
 Notation "[ 'ge0' 'of' x ]" := (ltac:(refine (ge0 x%:itv))) (only parsing).
@@ -719,6 +750,11 @@ Notation "x %:i01" := (widen_itv x%:itv : {i01 _}) (only parsing) : ring_scope.
 Notation "x %:i01" := (@widen_itv _ _
     (@Itv.from _ _ _ (Phantom _ x)) (Itv.Real `[0, 1]%Z) _)
   (only printing) : ring_scope.
+Notation "x %:n01" := (widen_natitv x%N%:itv : {n01}) (only parsing)
+  : ring_scope.
+Notation "x %:n01" := (@widen_natitv _ _
+    (@Itv.from _ _ _ (Phantom _ x)) (Itv.Real `[0, 1]%Z) _)
+  (only printing) : ring_scope.
 Notation "x %:pos" := (widen_itv x%:itv : {posnum _}) (only parsing)
   : ring_scope.
 Notation "x %:pos" := (@widen_itv _ _
@@ -729,6 +765,11 @@ Notation "x %:nng" := (widen_itv x%:itv : {nonneg _}) (only parsing)
 Notation "x %:nng" := (@widen_itv _ _
     (@Itv.from _ _ _ (Phantom _ x)) (Itv.Real `[0%Z, +oo[) _)
   (only printing) : ring_scope.
+Notation "x %:posnat" := (widen_natitv x%N%:itv : {posnat}) (only parsing)
+  : ring_scope.
+Notation "x %:posnat" := (@widen_natitv
+    (@Itv.from _ _ _ (Phantom _ x)) (Itv.Real `]0, +oo[) _)
+  (only printing) : type_scope.
 
 Local Open Scope ring_scope.
 
@@ -1633,3 +1674,17 @@ Proof. by apply/val_inj; rewrite /= subr0 mulr1 subKr. Qed.
 
 End Test3.
 End Test3.
+
+Module Test4.
+Section Test4.
+
+Type 0%:n01 : {n01}.
+Type 1%:n01 : {n01}.
+Fail Type 2%:n01 : {n01}.
+
+Type 1%:posnat : {posnat}.
+Type 2%:posnat : {posnat}.
+Fail Type 0%:posnat : {posnat}.
+
+End Test4.
+End Test4.
