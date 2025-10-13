@@ -6861,6 +6861,7 @@ Definition addNKr := addNKr.
 Definition addrK := addrK.
 Definition addrNK := addrNK.
 Definition subrK := subrK.
+Definition subrKC := subrKC.
 Definition subKr := subKr.
 Definition addrI := @addrI.
 Definition addIr := @addIr.
