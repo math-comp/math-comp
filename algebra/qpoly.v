@@ -687,7 +687,7 @@ HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build A {poly__ A}
   qpoly_scaleAl.
 HB.instance Definition _ := GRing.Lalgebra.on {poly %/ h}.
 
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build A {poly__ A}
+HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build A {poly__ A}
   qpoly_scaleAr.
 HB.instance Definition _ := GRing.Algebra.on {poly %/ h}.
 

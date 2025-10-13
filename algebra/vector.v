@@ -1821,8 +1821,9 @@ Definition lfun_lalgMixin := GRing.Lmodule_isLalgebra.Build R lfun_nzRingType
 Definition lfun_lalgType : lalgType R :=
   HB.pack 'End(vT) lfun_nzRingType lfun_lalgMixin.
 
-Definition lfun_algMixin := GRing.Lalgebra_isAlgebra.Build R lfun_lalgType
-  (fun k x y => comp_lfunZl k y x).
+Definition lfun_algMixin :=
+  GRing.LSemiAlgebra_isSemiAlgebra.Build R lfun_lalgType
+    (fun k x y => comp_lfunZl k y x).
 Definition lfun_algType : algType R :=
   HB.pack 'End(vT) lfun_lalgType lfun_algMixin.
 
@@ -1970,8 +1971,7 @@ Inductive subvs_of : predArgType := Subvs u & u \in U.
 Definition vsval w : vT := let: Subvs u _ := w in u.
 HB.instance Definition _ := [isSub of subvs_of for vsval].
 HB.instance Definition _ := [Choice of subvs_of by <:].
-HB.instance Definition _ := [SubChoice_isSubZmodule of subvs_of by <:].
-HB.instance Definition _ := [SubZmodule_isSubLmodule of subvs_of by <:].
+HB.instance Definition _ := [SubChoice_isSubLmodule of subvs_of by <:].
 
 Lemma subvsP w : vsval w \in U. Proof. exact: valP. Qed.
 Lemma subvs_inj : injective vsval. Proof. exact: val_inj. Qed.
