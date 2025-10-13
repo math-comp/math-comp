@@ -2181,7 +2181,7 @@ End MapPoly.
 
 Section HornerAlg.
 
-Variable (R : nzSemiRingType) (A : nzSemiAlgType R).
+Variable (R : nzSemiRingType) (A : semiAlgType R).
 
 Section Defs.
 

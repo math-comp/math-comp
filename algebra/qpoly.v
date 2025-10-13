@@ -679,11 +679,11 @@ Proof. by apply/val_eqP; rewrite /= -scalerAr rmodpZ // monic_mk_monic. Qed.
 
 HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build A {poly__ A}
   qpoly_scaleAl.
-HB.instance Definition _ := GRing.NzLalgebra.on {poly %/ h}.
+HB.instance Definition _ := GRing.Lalgebra.on {poly %/ h}.
 
 HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build A {poly__ A}
   qpoly_scaleAr.
-HB.instance Definition _ := GRing.NzAlgebra.on {poly %/ h}.
+HB.instance Definition _ := GRing.Algebra.on {poly %/ h}.
 
 Lemma poly_of_qpolyZ (p : {poly %/ h}) a :
   a *: p = a *: (p : {poly A})  :> {poly A}.
