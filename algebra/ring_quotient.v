@@ -126,8 +126,7 @@ Variable Q : @zmodQuotType V equivV zeroV -%R +%R.
 
 Lemma pi_is_zmod_morphism : zmod_morphism \pi_Q.
 Proof. by move=> x y /=; rewrite !piE. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `pi_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=pi_is_zmod_morphism)]
 Definition pi_is_additive := pi_is_zmod_morphism.
 
 HB.instance Definition _ := GRing.isZmodMorphism.Build V Q \pi_Q pi_is_zmod_morphism.
@@ -148,14 +147,12 @@ addT (oneT : T) (mulT : T -> T -> T) (Q : Type)
   }.
 
 Module isRingQuotient.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isNzRingQuotient.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isNzRingQuotient.Build)]
 Notation Build T eqT zeroT oppT addT oneT mulT Q :=
   (isNzRingQuotient.Build T eqT zeroT oppT addT oneT mulT Q) (only parsing).
 End isRingQuotient.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isNzRingQuotient instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isNzRingQuotient)]
 Notation isRingQuotient T eqT zeroT oppT addT oneT mulT Q :=
   (isNzRingQuotient T eqT zeroT oppT addT oneT mulT Q) (only parsing).
 
@@ -164,8 +161,7 @@ HB.structure Definition NzRingQuotient T eqT zeroT oppT addT oneT mulT :=
   {Q of isNzRingQuotient T eqT zeroT oppT addT oneT mulT Q &
    ZmodQuotient T eqT zeroT oppT addT Q & GRing.NzRing Q }.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use nzRingQuotType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=nzRingQuotType)]
 Notation ringQuotType := (nzRingQuotType) (only parsing).
 
 Section nzRingQuotient.
@@ -189,8 +185,7 @@ Variable Q : @nzRingQuotType R equivR zeroR -%R +%R 1 *%R.
 
 Lemma pi_is_monoid_morphism : monoid_morphism \pi_Q.
 Proof. by split; do ?move=> x y /=; rewrite !piE. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `pi_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=pi_is_monoid_morphism)]
 Definition pi_is_multiplicative :=
   (fun g => (g.2,g.1)) pi_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build R Q \pi_Q

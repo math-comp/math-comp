@@ -60,19 +60,15 @@ HB.structure Definition PzSemiRing := {R of GRing.PzSemiRing R & Finite R}.
 #[short(type="finNzSemiRingType")]
 HB.structure Definition NzSemiRing := {R of GRing.NzSemiRing R & Finite R}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzSemiRing)]
 Notation SemiRing R := (NzSemiRing R) (only parsing).
 
 Module SemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzSemiRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzSemiRing.sort)]
 Notation sort := (NzSemiRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzSemiRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzSemiRing.on)]
 Notation on R := (NzSemiRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzSemiRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzSemiRing.copy)]
 Notation copy T U := (NzSemiRing.copy T U) (only parsing).
 End SemiRing.
 
@@ -82,19 +78,15 @@ HB.structure Definition PzRing := {R of GRing.PzRing R & Finite R}.
 #[short(type="finNzRingType")]
 HB.structure Definition NzRing := {R of GRing.NzRing R & Finite R}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzRing)]
 Notation Ring R := (NzRing R) (only parsing).
 
 Module Ring.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzRing.sort)]
 Notation sort := (NzRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzRing.on)]
 Notation on R := (NzRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzRing.copy)]
 Notation copy T U := (NzRing.copy T U) (only parsing).
 End Ring.
 
@@ -106,19 +98,15 @@ HB.structure Definition ComPzSemiRing :=
 HB.structure Definition ComNzSemiRing :=
   {R of GRing.ComNzSemiRing R & Finite R}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzSemiRing)]
 Notation ComSemiRing R := (ComNzSemiRing R) (only parsing).
 
 Module ComSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzSemiRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzSemiRing.sort)]
 Notation sort := (ComNzSemiRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzSemiRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzSemiRing.on)]
 Notation on R := (ComNzSemiRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzSemiRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzSemiRing.copy)]
 Notation copy T U := (ComNzSemiRing.copy T U) (only parsing).
 End ComSemiRing.
 
@@ -128,19 +116,15 @@ HB.structure Definition ComPzRing := {R of GRing.ComPzRing R & Finite R}.
 #[short(type="finComNzRingType")]
 HB.structure Definition ComNzRing := {R of GRing.ComNzRing R & Finite R}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzRing)]
 Notation ComRing R := (ComNzRing R) (only parsing).
 
 Module ComRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzRing.sort)]
 Notation sort := (ComNzRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzRing.on)]
 Notation on R := (ComNzRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzRing.copy)]
 Notation copy T U := (ComNzRing.copy T U) (only parsing).
 End ComRing.
 
@@ -204,13 +188,11 @@ Coercion NzRing_to_finGroup (R : NzRing.type) := FinGroup.clone R _.
 HB.factory Record isNzRing R of NzRing R := {}.
 
 Module isRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.isNzRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.isNzRing.Build)]
 Notation Build R := (isNzRing.Build R) (only parsing).
 End isRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.isNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.isNzRing)]
 Notation isRing R := (isNzRing R) (only parsing).
 
 HB.builders Context R of isNzRing R.
@@ -444,24 +426,19 @@ End FinRing.
 Import FinRing.
 HB.reexport.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use finNzSemiRingType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=finNzSemiRingType)]
 Notation finSemiRingType := (finNzSemiRingType) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use finNzRingType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=finNzRingType)]
 Notation finRingType := (finNzRingType) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use finComNzSemiRingType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=finComNzSemiRingType)]
 Notation finComSemiRingType := (finComNzSemiRingType) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use finComNzRingType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=finComNzRingType)]
 Notation finComRingType := (finComNzRingType) (only parsing).
 
 Lemma card_finNzRing_gt1 (R : finNzRingType) : 1 < #|R|.
 Proof. by rewrite (cardD1 0) (cardD1 1) !inE GRing.oner_neq0. Qed.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use card_finNzRing_gt1 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=card_finNzRing_gt1)]
 Notation card_finRing_gt1 := (card_finNzRing_gt1) (only parsing).
 
 Notation "{ 'unit' R }" := (unit_of R) (format "{ 'unit'  R }") : type_scope.

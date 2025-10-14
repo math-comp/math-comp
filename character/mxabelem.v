@@ -830,13 +830,13 @@ Qed.
 
 End ModularRepresentation.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use rfix_pgroup_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=rfix_pgroup_pchar)]
 Notation rfix_pgroup_char := (rfix_pgroup_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pcore_sub_rstab_mxsimple_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcore_sub_rstab_mxsimple_pchar)]
 Notation pcore_sub_rstab_mxsimple := (pcore_sub_rstab_mxsimple_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pcore_sub_rker_mx_irr_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcore_sub_rker_mx_irr_pchar)]
 Notation pcore_sub_rker_mx_irr := (pcore_sub_rker_mx_irr_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pcore_faithful_mx_irr_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcore_faithful_mx_irr_pchar)]
 Notation pcore_faithful_mx_irr := (pcore_faithful_mx_irr_pchar) (only parsing).
 
 Section Extraspecial.
@@ -1067,11 +1067,9 @@ Qed.
 
 End Extraspecial.
 
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use extraspecial_repr_structure_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=extraspecial_repr_structure_pchar)]
 Notation extraspecial_repr_structure := (extraspecial_repr_structure_pchar)
   (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use faithful_repr_extraspecial_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=faithful_repr_extraspecial_pchar)]
 Notation faithful_repr_extraspecial := (faithful_repr_extraspecial_pchar)
   (only parsing).

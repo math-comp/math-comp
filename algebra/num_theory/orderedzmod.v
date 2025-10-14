@@ -109,25 +109,25 @@ Arguments neg_num_pred _ _ /.
 Arguments nneg_num_pred _ _ /.
 Arguments real_num_pred _ _ /.
 
-#[deprecated(since="mathcomp 2.5.0",note="Use pos_num_pred instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=pos_num_pred)]
 Notation Rpos_pred := pos_num_pred (only parsing).
-#[deprecated(since="mathcomp 2.5.0",note="Use pos_num instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=pos_num)]
 Notation Rpos := pos_num (only parsing).
-#[deprecated(since="mathcomp 2.5.0",note="Use neg_num_pred instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=neg_num_pred)]
 Notation Rneg_pred := neg_num_pred (only parsing).
-#[deprecated(since="mathcomp 2.5.0",note="Use neg_num instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=neg_num)]
 Notation Rneg := neg_num (only parsing).
-#[deprecated(since="mathcomp 2.5.0",note="Use nneg_num_pred instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=nneg_num_pred)]
 Notation Rnneg_pred := nneg_num_pred (only parsing).
-#[deprecated(since="mathcomp 2.5.0",note="Use nneg_num instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=nneg_num)]
 Notation Rnneg := nneg_num (only parsing).
-#[deprecated(since="mathcomp 2.5.0",note="Use npos_num_pred instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=npos_num_pred)]
 Notation Rnpos_pred := npos_num_pred (only parsing).
-#[deprecated(since="mathcomp 2.5.0",note="Use npos_num instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=npos_num)]
 Notation Rnpos := npos_num (only parsing).
-#[deprecated(since="mathcomp 2.5.0",note="Use real_num_pred instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=real_num_pred)]
 Notation Rreal_pred := real_num_pred (only parsing).
-#[deprecated(since="mathcomp 2.5.0",note="Use real_num instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=real_num)]
 Notation Rreal := real_num (only parsing).
 
 End Def.

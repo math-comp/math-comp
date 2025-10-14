@@ -36,7 +36,7 @@ Proof. by move=> fK [?|] //=; rewrite fK. Qed.
 
 Definition idempotent_op (S : Type) (op : S -> S -> S) := forall x, op x x = x.
 
-#[deprecated(since="mathcomp 2.3.0", note="use `idempotent_op` instead")]
+#[deprecated(since="mathcomp 2.3.0", use=idempotent_op)]
 Notation idempotent:= idempotent_op (only parsing).
 
 Definition idempotent_fun (U : Type) (f : U -> U) := f \o f =1 f.

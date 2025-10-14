@@ -1643,8 +1643,7 @@ Proof. by apply: (big_morph (fun A => A i j)) => [A B|]; rewrite mxE. Qed.
 
 Fact const_mx_is_nmod_morphism : nmod_morphism const_mx.
 Proof. by split=> [|a b]; apply/matrixP => // i j; rewrite !mxE. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `const_mx_is_nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=const_mx_is_nmod_morphism)]
 Definition const_mx_is_semi_additive := const_mx_is_nmod_morphism.
 HB.instance Definition _ := GRing.isNmodMorphism.Build V 'M[V]_(m, n) const_mx
   const_mx_is_nmod_morphism.
@@ -1660,8 +1659,7 @@ Definition swizzle_mx k (A : 'M[V]_(m, n)) :=
 
 Fact swizzle_mx_is_nmod_morphism k : nmod_morphism (swizzle_mx k).
 Proof. by split=> [|A B]; apply/matrixP => i j; rewrite !mxE. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `swizzle_mx_is_nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=swizzle_mx_is_nmod_morphism)]
 Definition swizzle_mx_is_semi_additive := swizzle_mx_is_nmod_morphism.
 HB.instance Definition _ k := GRing.isNmodMorphism.Build 'M_(m, n) 'M_(p, q)
   (swizzle_mx k) (swizzle_mx_is_nmod_morphism k).
@@ -1965,8 +1963,7 @@ Fact diag_mx_is_nmod_morphism n : nmod_morphism (@diag_mx n).
 Proof.
 by split=> [|A B]; apply/matrixP => i j; rewrite !mxE ?mul0rn// mulrnDl.
 Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `diag_mx_is_nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=diag_mx_is_nmod_morphism)]
 Definition diag_mx_is_semi_additive := diag_mx_is_nmod_morphism.
 HB.instance Definition _ n := GRing.isNmodMorphism.Build 'rV_n 'M_n (@diag_mx n)
   (@diag_mx_is_nmod_morphism n).
@@ -2011,8 +2008,7 @@ Proof. by apply/matrixP=> i j; rewrite !mxE eq_sym. Qed.
 
 Fact scalar_mx_is_nmod_morphism : nmod_morphism scalar_mx.
 Proof. by split=> [|a b]; rewrite -!diag_const_mx ?raddf0// !raddfD. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `scalar_mx_is_nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=scalar_mx_is_nmod_morphism)]
 Definition scalar_mx_is_semi_additive := scalar_mx_is_nmod_morphism.
 HB.instance Definition _ := GRing.isNmodMorphism.Build V 'M_n scalar_mx
   scalar_mx_is_nmod_morphism.
@@ -2075,8 +2071,7 @@ Proof.
 split=> [|A B]; first by apply: big1 => i; rewrite mxE.
 by rewrite -big_split /=; apply: eq_bigr => i _; rewrite mxE.
 Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `mxtrace_is_nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=mxtrace_is_nmod_morphism)]
 Definition mxtrace_is_semi_additive := mxtrace_is_nmod_morphism.
 HB.instance Definition _ := GRing.isNmodMorphism.Build 'M_n V mxtrace
   mxtrace_is_nmod_morphism.
@@ -2155,10 +2150,10 @@ Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE addNr. Qed.
 
 HB.instance Definition _ := GRing.Nmodule_isZmodule.Build 'M[V]_(m, n) addNmx.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=raddfB)]
 Fact const_mx_is_zmod_morphism : zmod_morphism const_mx.
 Proof. exact: raddfB. Qed.
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead"),
+#[deprecated(since="mathcomp 2.5.0", use=raddfB),
   warning="-deprecated"]
 Definition const_mx_is_additive := const_mx_is_zmod_morphism.
 
@@ -2168,10 +2163,10 @@ Section Additive.
 
 Variables (m n p q : nat) (f : 'I_p -> 'I_q -> 'I_m) (g : 'I_p -> 'I_q -> 'I_n).
 
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=raddfB)]
 Fact swizzle_mx_is_zmod_morphism k : zmod_morphism (swizzle_mx f g k).
 Proof. exact: raddfB. Qed.
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead"),
+#[deprecated(since="mathcomp 2.5.0", use=raddfB),
   warning="-deprecated"]
 Definition swizzle_mx_is_additive := swizzle_mx_is_zmod_morphism.
 
@@ -2193,10 +2188,10 @@ Proof. by rewrite opp_col_mx !opp_row_mx. Qed.
 
 (* Diagonal matrices *)
 
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=raddfB)]
 Fact diag_mx_is_zmod_morphism n : zmod_morphism (@diag_mx V n).
 Proof. exact: raddfB. Qed.
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead"),
+#[deprecated(since="mathcomp 2.5.0", use=raddfB),
   warning="-deprecated"]
 Definition diag_mx_is_additive := diag_mx_is_zmod_morphism.
 
@@ -2205,10 +2200,10 @@ Section ScalarMx.
 
 Variable n : nat.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=raddfB)]
 Fact scalar_mx_is_zmod_morphism : zmod_morphism (@scalar_mx V n).
 Proof. exact: raddfB. Qed.
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead"),
+#[deprecated(since="mathcomp 2.5.0", use=raddfB),
   warning="-deprecated"]
 Definition scalar_mx_is_additive := scalar_mx_is_zmod_morphism.
 
@@ -2219,10 +2214,10 @@ Section Trace.
 
 Variable n : nat.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=raddfB)]
 Fact mxtrace_is_zmod_morphism : zmod_morphism (@mxtrace V n).
 Proof. exact: raddfB. Qed.
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead"),
+#[deprecated(since="mathcomp 2.5.0", use=raddfB),
   warning="-deprecated"]
 Definition mxtrace_is_additive := mxtrace_is_zmod_morphism.
 
@@ -2851,8 +2846,7 @@ Lemma idmxE : 1%:M = 1 :> 'M_n. Proof. by []. Qed.
 
 Fact scalar_mx_is_monoid_morphism : monoid_morphism (@scalar_mx R n).
 Proof. by split=> //; apply: scalar_mxM. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `scalar_mx_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=scalar_mx_is_monoid_morphism)]
 Definition scalar_mx_is_multiplicative := scalar_mx_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build R 'M_n (@scalar_mx _ n)
   scalar_mx_is_monoid_morphism.
@@ -3122,8 +3116,7 @@ Qed.
 
 Fact map_mx_is_monoid_morphism n : monoid_morphism (map_mx f : 'M_n -> 'M_n).
 Proof. by split; [apply: map_mx1 | apply: map_mxM]. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `map_mx_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=map_mx_is_monoid_morphism)]
 Definition map_mx_is_multiplicative := map_mx_is_monoid_morphism.
 HB.instance Definition _ n :=
   GRing.isMonoidMorphism.Build 'M[aR]_n 'M[rR]_n (map_mx f)
@@ -3319,7 +3312,7 @@ Variable R : pzRingType.
 
 (* Diagonal matrices *)
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact diag_mx_is_linear n : linear (@diag_mx R n). Proof. exact: linearP. Qed.
 
 (* Scalar matrix *)
@@ -3355,15 +3348,15 @@ Proof.
 by move=> le_r_n; rewrite mulmxBl mul1mx mul_pid_mx_copid // oppr0 addr0.
 Qed.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact mulmxr_is_linear m n p B : linear (@mulmxr R m n p B).
 Proof. exact: linearP. Qed.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact lin_mulmxr_is_linear m n p : linear (@lin_mulmxr R m n p).
 Proof. exact: linearP. Qed.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `scalarP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=scalarP)]
 Fact mxtrace_is_scalar n : scalar (@mxtrace R n).
 Proof. exact: scalarP. Qed.
 
@@ -3446,11 +3439,11 @@ End CommMx.
 Section ComMatrix.
 Variable R : comPzRingType.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact lin_mulmx_is_linear m n p : linear (@lin_mulmx R m n p).
 Proof. exact: linearP. Qed.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact lin_mul_row_is_linear m n : linear (@lin_mul_row R m n).
 Proof. exact: linearP. Qed.
 

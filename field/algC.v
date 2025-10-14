@@ -375,8 +375,7 @@ HB.instance Definition _ := GRing.isZmodule.Build type addA addC add0 addN.
 
 Fact CtoL_is_zmod_morphism : zmod_morphism CtoL.
 Proof. by move=> u v; rewrite !LtoC_K. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `CtoL_inj_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=CtoL_is_zmod_morphism)]
 Definition CtoL_is_additive := CtoL_is_zmod_morphism.
 HB.instance Definition _ := GRing.isZmodMorphism.Build type L' CtoL
   CtoL_is_zmod_morphism.
@@ -405,8 +404,7 @@ HB.instance Definition _ :=
 
 Fact CtoL_is_monoid_morphism : monoid_morphism CtoL.
 Proof. by split=> [|u v]; rewrite !LtoC_K. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `CtoL_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=CtoL_is_monoid_morphism)]
 Definition CtoL_is_multiplicative :=
   (fun g => (g.2,g.1)) CtoL_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build type L' CtoL
@@ -453,14 +451,12 @@ Fact conj_is_nmod_morphism : nmod_morphism (fun u => LtoC (conj_subproof u)).
 Proof.
 by split=> [|u v]; apply: CtoL_inj; rewrite LtoC_K ?raddf0// !rmorphD/= !LtoC_K.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `conj_is_nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=conj_is_nmod_morphism)]
 Definition conj_is_semi_additive := conj_is_nmod_morphism.
 
 Fact conj_is_zmod_morphism : {morph (fun u => LtoC (conj_subproof u)) : x / - x}.
 Proof. by move=> u; apply: CtoL_inj; rewrite LtoC_K !raddfN /= LtoC_K. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `CtoL_inj_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=conj_is_zmod_morphism)]
 Definition conj_is_additive := conj_is_zmod_morphism.
 
 Fact conj_is_monoid_morphism : monoid_morphism (fun u => LtoC (conj_subproof u)).
@@ -468,8 +464,7 @@ Proof.
 split=> [|u v]; apply: CtoL_inj; first by rewrite !LtoC_K rmorph1.
 by rewrite LtoC_K 3!{1}rmorphM /= !LtoC_K.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `conj_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=conj_is_monoid_morphism)]
 Definition conj_is_multiplicative :=
   (fun g => (g.2,g.1)) conj_is_monoid_morphism.
 Definition conj : {rmorphism type -> type} :=
@@ -571,8 +566,7 @@ Open Scope C_core_scope.
 Notation algCeq := (type : eqType).
 Notation algCzmod := (type : zmodType).
 Notation algCnzRing := (type : nzRingType).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use algCnzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=algCnzRing)]
 Notation algCring := (type : nzRingType).
 Notation algCuring := (type : unitRingType).
 Notation algCnum := (type : numDomainType).
@@ -923,14 +917,12 @@ Proof. exact: inj_can_sym (algC_invautK nu) (fmorph_inj nu). Qed.
 
 Fact algC_invaut_is_zmod_morphism nu : zmod_morphism (algC_invaut nu).
 Proof. exact: can2_zmod_morphism (algC_autK nu) (algC_invautK nu). Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `algC_invaut_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=algC_invaut_is_zmod_morphism)]
 Definition algC_invaut_is_additive := algC_invaut_is_zmod_morphism.
 
 Fact algC_invaut_is_monoid_morphism nu : monoid_morphism (algC_invaut nu).
 Proof. exact: can2_monoid_morphism (algC_autK nu) (algC_invautK nu). Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `algC_invaut_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=algC_invaut_is_monoid_morphism)]
 Definition algC_invaut_is_multiplicative nu :=
   (fun g => (g.2,g.1)) (algC_invaut_is_monoid_morphism nu).
 HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=
@@ -955,7 +947,7 @@ End AutC.
 
 End AlgebraicsTheory.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use Cpchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Cpchar)]
 Notation Cchar := (Cpchar) (only parsing).
 
 #[global] Hint Resolve Crat0 Crat1 dvdC0 dvdC_refl eqCmod_refl eqCmodm0 : core.
@@ -976,12 +968,10 @@ Proof. by move=> x y; apply/real_leVge/valP/valP. Qed.
 HB.instance Definition _ := Order.POrder_isTotal.Build _ algR total_algR.
 
 Lemma algRval_is_zmod_morphism : zmod_morphism algRval. Proof. by []. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `algRval_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=algRval_is_zmod_morphism)]
 Definition algRval_is_additive := algRval_is_zmod_morphism.
 Lemma algRval_is_monoid_morphism : monoid_morphism algRval. Proof. by []. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `algRval_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=algRval_is_monoid_morphism)]
 Definition algRval_is_multiplicative :=
   (fun g => (g.2,g.1)) algRval_is_monoid_morphism.
 HB.instance Definition _ := GRing.isZmodMorphism.Build algR algC algRval
@@ -1204,4 +1194,3 @@ exists (in_algR xR) => //=.
 by rewrite -(mapf_root algRval)//= prsab rootM root_XsubC eqxx.
 Qed.
 HB.instance Definition _ := Num.RealField_isClosed.Build algR algR_rcfMixin.
-

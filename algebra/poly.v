@@ -528,8 +528,7 @@ Proof. by rewrite coefM big_ord1. Qed.
 Fact coefp0_is_monoid_morphism : monoid_morphism (coefp 0).
 Proof. by split; [exact: polyCK | exact: coef0M]. Qed.
 
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `coefp0_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=coefp0_is_monoid_morphism)]
 Definition coefp0_multiplicative :=
   (fun g => (g.2, g.1)) coefp0_is_monoid_morphism.
 
@@ -605,8 +604,7 @@ Qed.
 (* Polynomial ring structure. *)
 Fact polyC_is_monoid_morphism : monoid_morphism polyC.
 Proof. by split; last apply: polyCM. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `polyC_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=polyC_is_monoid_morphism)]
 Definition polyC_multiplicative :=
   (fun g => (g.2, g.1)) polyC_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build R {poly R} polyC
@@ -1500,7 +1498,7 @@ Notation size_mul_leq := size_polyMleq (only parsing).
 Notation size_prod_leq := size_poly_prod_leq (only parsing).
 #[deprecated(since="mathcomp 2.4.0", note="renamed to `size_poly_exp_leq`")]
 Notation size_exp_leq := size_poly_exp_leq (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar_poly instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar_poly)]
 Notation char_poly := pchar_poly (only parsing).
 
 Section PolynomialTheory.
@@ -1577,7 +1575,7 @@ Proof. by move=> n_gt0; rewrite -polyCN lead_coefXnaddC. Qed.
 Lemma size_XnsubC n c : 0 < n -> size ('X^n - c%:P) = n.+1.
 Proof. by move=> *; rewrite -polyCN size_XnaddC. Qed.
 
-#[deprecated(since="mathcomp 2.3.0",note="Use size_XnsubC instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=size_XnsubC)]
 Lemma size_Xn_sub_1 n : n > 0 -> size ('X^n - 1 : {poly R}) = n.+1.
 Proof. exact/size_XnsubC. Qed.
 
@@ -1625,7 +1623,7 @@ End PolyOverRing.
 
 (* Single derivative. *)
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact deriv_is_linear : linear (@deriv R). Proof. exact: linearP. Qed.
 
 Lemma derivN : {morph deriv : p / - p}.
@@ -1646,10 +1644,10 @@ Definition derivE := Eval lazy beta delta [morphism_2 morphism_1] in
 
 (* Iterated derivative. *)
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact derivn_is_linear n : linear (@derivn R n). Proof. exact: linearP. Qed.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact nderivn_is_linear n : linear (@nderivn R n). Proof. exact: linearP. Qed.
 
 Lemma derivnB n : {morph derivn n : p q / p - q}.
@@ -1700,7 +1698,7 @@ Qed.
 Lemma monicXnsubC n c : 0 < n -> 'X^n - c%:P \is monic.
 Proof. by move=> n_gt0; rewrite monicE lead_coefXnsubC. Qed.
 
-#[deprecated(since="mathcomp 2.3.0'",note="Use monicXnsubC instead.")]
+#[deprecated(since="mathcomp 2.3.0'", use=monicXnsubC)]
 Lemma monic_Xn_sub_1 n : n > 0 -> 'X^n - 1 \is @monic R.
 Proof. exact/monicXnsubC. Qed.
 
@@ -2036,8 +2034,7 @@ split=> [|p q]; apply/polyP=> i.
 rewrite coef_map /= !coefM /= !rmorph_sum; apply: eq_bigr => j _.
 by rewrite !coef_map rmorphM.
 Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `map_poly_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=map_poly_is_monoid_morphism)]
 Definition map_poly_is_multiplicative :=
   (fun g => (g.2, g.1)) map_poly_is_monoid_morphism.
 HB.instance Definition _ :=
@@ -2104,8 +2101,7 @@ split=> [|p q]; first by rewrite /horner_morph rmorph1 hornerC.
 rewrite /horner_morph rmorphM /= hornerM_comm //.
 by apply: comm_coef_poly => i; rewrite coef_map cfu.
 Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `horner_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=horner_is_monoid_morphism)]
 Definition horner_is_multiplicative :=
   (fun g => (g.2, g.1)) horner_is_monoid_morphism.
 HB.instance Definition _ :=
@@ -2138,10 +2134,10 @@ Implicit Types p : {poly aR}.
 
 Local Notation "p ^f" := (map_poly f p) : ring_scope.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=raddfB)]
 Fact map_poly_is_zmod_morphism : zmod_morphism (map_poly f).
 Proof. exact: raddfB. Qed.
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=raddfB)]
 Fact map_poly_is_additive : zmod_morphism (map_poly f).
 Proof. exact: raddfB. Qed.
 
@@ -2171,7 +2167,7 @@ Section HornerMorph.
 Variable u : rR.
 Hypothesis cfu : commr_rmorph f u.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact horner_is_linear : linear_for (f \; *%R) (horner_morph cfu).
 Proof. exact: linearP. Qed.
 
@@ -2387,9 +2383,9 @@ Proof. by rewrite prim_root_dvd_eq0. Qed.
 
 End IdomainPrimRoot.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use prim_root_pcharF instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=prim_root_pcharF)]
 Notation prim_root_charF := prim_root_pcharF (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar_prim_root instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar_prim_root)]
 Notation char_prim_root := pchar_prim_root (only parsing).
 
 Section PolyCompose.
@@ -2397,7 +2393,7 @@ Section PolyCompose.
 Variable R : nzRingType.
 Implicit Types p q : {poly R}.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact comp_poly_is_linear p : linear (comp_poly p). Proof. exact: linearP. Qed.
 
 Lemma comp_polyB p q r : (p - q) \Po r = (p \Po r) - (q \Po r).
@@ -2662,17 +2658,17 @@ Variable R : nzRingType.
 
 Implicit Type p q : {poly R}.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact even_poly_is_linear : linear (@even_poly R). Proof. exact: linearP. Qed.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact odd_poly_is_linear : linear (@odd_poly R). Proof. exact: linearP. Qed.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact take_poly_is_linear m : linear (@take_poly R m).
 Proof. exact: linearP. Qed.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact drop_poly_is_linear m : linear (@drop_poly R m).
 Proof. exact: linearP. Qed.
 
@@ -2707,8 +2703,7 @@ Proof. by rewrite hornerM_comm //; apply: mulrC. Qed.
 
 Fact horner_eval_is_monoid_morphism (x : R) : monoid_morphism (horner_eval x).
 Proof. by split => [|p q]; rewrite /horner_eval (hornerC, hornerM). Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `horner_eval_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=horner_eval_is_monoid_morphism)]
 Definition horner_eval_is_multiplicative x :=
   (fun g => (g.2, g.1)) (horner_eval_is_monoid_morphism x).
 
@@ -2732,8 +2727,7 @@ Proof.
 split=> [|p1 p2]; first by rewrite comp_polyC.
 by rewrite /comp_poly rmorphM hornerM_comm //; apply: mulrC.
 Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `comp_poly_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=comp_poly_is_monoid_morphism)]
 Definition comp_poly_multiplicative q :=
   (fun g => (g.2, g.1)) (comp_poly_is_monoid_morphism q).
 HB.instance Definition _ q := GRing.isMonoidMorphism.Build _ _ (comp_poly q)
@@ -2832,7 +2826,7 @@ apply: congr_big => // i; first exact: in_setT.
 by rewrite (tnth_nth 0).
 Qed.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact horner_eval_is_linear x : linear_for *%R (@horner_eval R x).
 Proof. exact: linearP. Qed.
 

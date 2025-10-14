@@ -179,52 +179,41 @@ Reserved Notation "[ 'min' G | gP & gQ ]"
   (format "[ '[hv' 'min'  G '/ '  |  gP '/ '  &  gQ ']' ]").
 
 Module isMulBaseGroup.
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Algebra.isStarMonoid.Build instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=isStarMonoid.Build)]
 Notation Build G := (isStarMonoid.Build G) (only parsing).
 End isMulBaseGroup.
 
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Algebra.isStarMonoid instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=isStarMonoid)]
 Notation isMulBaseGroup G := (isStarMonoid G) (only parsing).
 
 Module BaseFinGroup_isGroup.
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Algebra.StarMonoid_isGroup.Build instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=StarMonoid_isGroup.Build)]
 Notation Build G := (StarMonoid_isGroup.Build G) (only parsing).
 End BaseFinGroup_isGroup.
 
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Algebra.StarMonoid_isGroup instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=StarMonoid_isGroup)]
 Notation BaseFinGroup_isGroup G := (StarMonoid_isGroup G) (only parsing).
 
 #[arg_sort, short(type="finStarMonoidType")]
 HB.structure Definition FinStarMonoid := { G of StarMonoid G & Finite G }.
 
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Algebra.finStarMonoidType instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=finStarMonoidType)]
 Notation baseFinGroupType := finStarMonoidType (only parsing).
 
 Module BaseFinGroup.
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Algebra.FinStarMonoid.sort instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=FinStarMonoid.sort)]
 Notation sort := (FinStarMonoid.sort) (only parsing).
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Algebra.FinStarMonoid.arg_sort instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=FinStarMonoid.arg_sort)]
 Notation arg_sort := (FinStarMonoid.arg_sort) (only parsing).
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Algebra.FinStarMonoid.on instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=FinStarMonoid.on)]
 Notation on M := (FinStarMonoid.on M) (only parsing).
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Algebra.FinStarMonoid.copy instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=FinStarMonoid.copy)]
 Notation copy M N := (FinStarMonoid.copy M N) (only parsing).
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Algebra.FinStarMonoid.clone instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=FinStarMonoid.clone)]
 Notation clone M N := (FinStarMonoid.clone M N) (only parsing).
 End BaseFinGroup.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinStarMonoid instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinStarMonoid)]
 Notation BaseFinGroup R := (FinStarMonoid R) (only parsing).
 
 Module FinStarMonoidExports.
@@ -233,17 +222,13 @@ Bind Scope group_scope with FinStarMonoid.sort.
 End FinStarMonoidExports.
 HB.export FinStarMonoidExports.
 
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Algebra.one instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=one)]
 Notation oneg := one (only parsing).
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Algebra.mul instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=mul)]
 Notation mulg := mul (only parsing).
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Algebra.inv instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=inv)]
 Notation invg := inv (only parsing).
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Algebra.natexp instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=natexp)]
 Notation expgn := natexp (only parsing).
 
 #[short(type="finGroupType")]
@@ -265,12 +250,10 @@ HB.factory Record Finite_isGroup G of Finite G := {
 }.
 
 Module isMulGroup.
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Finite_isGroup.Build instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=Finite_isGroup.Build)]
 Notation Build G := (Finite_isGroup.Build G) (only parsing).
 End isMulGroup.
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use Finite_isGroup instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=Finite_isGroup)]
 Notation isMulGroup G := (Finite_isGroup G) (only parsing).
 
 HB.builders Context G of Finite_isGroup G.

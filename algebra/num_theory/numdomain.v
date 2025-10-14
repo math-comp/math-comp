@@ -532,7 +532,7 @@ Proof. exact: addr_ge0. Qed.
 
 End NumIntegralDomainTheory.
 
-#[deprecated(since="mathcomp 2.4.0",note="Use pchar_num instead.")]
+#[deprecated(since="mathcomp 2.4.0",use=pchar_num)]
 Notation char_num := pchar_num (only parsing).
 
 Arguments ler01 {R}.
@@ -1256,7 +1256,7 @@ Lemma ler10 : 1 <= 0 :> R = false. Proof. by rewrite lt_geF. Qed.
 Lemma ltr0N1 : 0 < -1 :> R = false. Proof. by rewrite le_gtF // lerN10. Qed.
 Lemma ler0N1 : 0 <= -1 :> R = false. Proof. by rewrite lt_geF // ltrN10. Qed.
 
-#[deprecated(since="mathcomp 2.4.0", note="use `mulrn_wgt0` instead")]
+#[deprecated(since="mathcomp 2.4.0", use=mulrn_wgt0)]
 Lemma pmulrn_rgt0 x n : 0 < x -> 0 < x *+ n = (0 < n)%N.
 Proof. exact: mulrn_wgt0. Qed.
 
@@ -2113,10 +2113,10 @@ Proof. by rewrite realBC distrC => ? /real_ltr_distlBl; apply. Qed.
 Lemma real_ler_distlCBl x y e : x - y \is real -> `|x - y| <= e -> y - e <= x.
 Proof. by rewrite realBC distrC => ? /real_ler_distlBl; apply. Qed.
 
-#[deprecated(since="mathcomp 2.3.0", note="use `ger0_def` instead")]
+#[deprecated(since="mathcomp 2.3.0", use=ger0_def)]
 Lemma eqr_norm_id x : (`|x| == x) = (0 <= x). Proof. by rewrite ger0_def. Qed.
 
-#[deprecated(since="mathcomp 2.3.0", note="use `ler0_def` instead")]
+#[deprecated(since="mathcomp 2.3.0", use=ler0_def)]
 Lemma eqr_normN x : (`|x| == - x) = (x <= 0). Proof. by rewrite ler0_def. Qed.
 
 Definition eqr_norm_idVN := =^~ (ger0_def, ler0_def).
@@ -2274,7 +2274,7 @@ Proof. by move=> Rx; rewrite -normrN -oppr_lt0 -realEsign ?rpredN. Qed.
 Lemma real_normrEsign (x : R) (xR : x \is real) : `|x| = (-1) ^+ (x < 0)%R * x.
 Proof. by rewrite {3}[x]realEsign // signrMK. Qed.
 
-#[deprecated(since="mathcomp 2.3.0", note="use `realEsign` instead")]
+#[deprecated(since="mathcomp 2.3.0", use=realEsign)]
 Lemma real_mulr_sign_norm x : x \is real -> (-1) ^+ (x < 0)%R * `|x| = x.
 Proof. by move/realEsign. Qed.
 
@@ -2778,7 +2778,7 @@ Proof. by case: sgrP; rewrite ?(mul0r, mul1r, mulN1r). Qed.
 Lemma numEsg x : x = sg x * `|x|.
 Proof. by case: sgrP; rewrite !(mul1r, mul0r, mulrNN). Qed.
 
-#[deprecated(since="mathcomp 2.3.0", note="use `numEsg` instead")]
+#[deprecated(since="mathcomp 2.3.0", use=numEsg)]
 Lemma mulr_sg_norm x : sg x * `|x| = x. Proof. by rewrite -numEsg. Qed.
 
 Lemma sgrM x y : sg (x * y) = sg x * sg y.

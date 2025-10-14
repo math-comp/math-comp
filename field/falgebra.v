@@ -93,7 +93,7 @@ Import GRing.Theory.
 #[short(type="falgType")]
 HB.structure Definition Falgebra (R : nzRingType) :=
   { A of Vector R A & GRing.UnitAlgebra R A }.
-#[deprecated(since="mathcomp 2.0.0", note="Use falgType instead.")]
+#[deprecated(since="mathcomp 2.0.0", use=falgType)]
 Notation FalgType := falgType.
 
 (* Supply a default unitRing mixin for the default unitAlgType base type. *)
@@ -256,8 +256,7 @@ Proof.
 split=> [|x y]; first by apply/lfunP => w; rewrite id_lfunE !lfunE /= mulr1.
 by apply/lfunP=> w; rewrite comp_lfunE !lfunE /= mulrA.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `amulr_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=amulr_is_monoid_morphism)]
 Definition amulr_is_multiplicative :=
   (fun p => (p.2, p.1)) amulr_is_monoid_morphism.
 
@@ -1026,8 +1025,8 @@ apply: (iffP ahom_inP) => [[fM f1] | fRM_P]; last first.
   by split=> [x y|]; [rewrite fRM_P.2|rewrite fRM_P.1].
 by split=> // x y; rewrite fM ?memvf.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `ahomP_tmp` instead")]
+#[warning="-deprecated-reference-since-mathcomp-2.5.0",
+  deprecated(since="mathcomp 2.5.0", use=ahomP_tmp)]
 Lemma ahomP {f : 'Hom(aT, rT)} : reflect (multiplicative f) (ahom_in {:aT} f).
 Proof. by apply: (iffP ahomP_tmp) => [][]. Qed.
 
@@ -1059,8 +1058,8 @@ Proof. by apply/ahomP_tmp; case: f. Qed.
 HB.instance Definition _ (f : ahom aT rT) :=
   GRing.isMonoidMorphism.Build aT rT f (ahom_is_monoid_morphism f).
 
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `ahom_is_monoid_morphism` instead")]
+#[warning="-deprecated-reference-since-mathcomp-2.5.0",
+  deprecated(since="mathcomp 2.5.0", use=ahom_is_monoid_morphism)]
 Definition ahom_is_multiplicative (f : ahom aT rT) : multiplicative f :=
   (fun p => (p.2, p.1)) (ahom_is_monoid_morphism f).
 

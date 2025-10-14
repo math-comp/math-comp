@@ -615,9 +615,9 @@ HB.instance Definition _ (x : M) := GRing.isZmodMorphism.Build int M ( *~%R x)
 
 End ZintLmod.
 
-#[deprecated(since="mathcomp 2.3.0", note="Use mulrzDl instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=mulrzDl)]
 Notation mulrzDl_tmp := mulrzDl.
-#[deprecated(since="mathcomp 2.3.0", note="Use mulrzDr instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=mulrzDr)]
 Notation mulrzDr_tmp := mulrzDr.
 
 Lemma ffunMzE (I : finType) (M : zmodType) (f : {ffun I -> M}) z x :
@@ -665,8 +665,7 @@ Proof. by rewrite mulrzA -mulrzr. Qed.
 
 Lemma intmul1_is_monoid_morphism : monoid_morphism ( *~%R (1 : R)).
 Proof. by split; move=> // x y /=; rewrite ?intrD ?mulrNz ?intrM. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `intmul1_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=intmul1_is_monoid_morphism)]
 Definition intmul1_is_multiplicative :=
   (fun g => (g.2,g.1)) intmul1_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build int R ( *~%R 1)
@@ -787,10 +786,10 @@ Proof. by rewrite pFrobenius_autMz pFrobenius_aut1. Qed.
 
 End Frobenius.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autMz instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autMz)]
 Notation Frobenius_autMz := (pFrobenius_autMz) (only parsing).
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut_int instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut_int)]
 Notation Frobenius_aut_int := (pFrobenius_aut_int) (only parsing).
 
 Section NumMorphism.

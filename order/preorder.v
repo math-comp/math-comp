@@ -1999,11 +1999,11 @@ Section SubPreorderTheory.
 Context (d : disp_t) (T : preorderType d) (S : pred T).
 Context (d' : disp_t) (U : SubPreorder.type S d').
 Local Notation val := (val : U -> T).
-#[deprecated(since="mathcomp 2.3.0", note="Use le_val instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=le_val)]
 Lemma leEsub x y : (x <= y) = (val x <= val y). Proof. by rewrite le_val. Qed.
 Lemma lt_val : {mono val : x y / x < y}.
 Proof. by move=> x y; rewrite !lt_leAnge !le_val. Qed.
-#[deprecated(since="mathcomp 2.3.0", note="Use lt_val instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=lt_val)]
 Lemma ltEsub x y : (x < y) = (val x < val y). Proof. by rewrite lt_val. Qed.
 Lemma le_wval : {homo val : x y / x <= y}. Proof. exact/mono2W/le_val. Qed.
 Lemma lt_wval : {homo val : x y / x < y}. Proof. exact/mono2W/lt_val. Qed.

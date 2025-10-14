@@ -329,7 +329,7 @@ Lemma subset_itv (x y z u : itv_bound T) : x <= y -> z <= u ->
   {subset Interval y z <= Interval x u}.
 Proof. by move=> xy zu; apply: subitvP; rewrite subitvE xy zu. Qed.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use subset_itv instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=subset_itv)]
 Lemma subset_itv_bound (r s u v : bool) x y : r <= u -> v <= s ->
   {subset Interval (BSide r x) (BSide s y) <= Interval (BSide u x) (BSide v y)}.
 Proof.

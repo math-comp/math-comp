@@ -2742,7 +2742,7 @@ Lemma bigmaxn_sup_seq (I : eqType) r i0 (P : pred I) m F :
   i0 \in r -> P i0 -> m <= F i0 -> m <= \max_(i <- r | P i) F i.
 Proof. by move=> i0r Pi0 ?; apply: leq_trans (leq_bigmax_seq i0 _ _). Qed.
 Arguments bigmaxn_sup_seq [I r] i0 [P m F].
-#[deprecated(since="mathcomp 2.5.0", note="Use bigmaxn_sup_seq instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=bigmaxn_sup_seq)]
 Notation bigmax_sup_seq := bigmaxn_sup_seq.
 
 Lemma bigmax_eq_arg (I : finType) i0 (P : pred I) F :

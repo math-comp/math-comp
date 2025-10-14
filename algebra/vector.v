@@ -149,7 +149,7 @@ HB.structure Definition SemiVector (R : nzSemiRingType) :=
 HB.structure Definition Vector (R : nzRingType) :=
   { V of LSemiModule_hasFinDim R V & GRing.Lmodule R V }.
 
-#[deprecated(since="mathcomp 2.2.0", note="Use Vector.axiom instead.")]
+#[deprecated(since="mathcomp 2.2.0", use=Vector.axiom)]
 Notation vector_axiom := Vector.axiom.
 Arguments dim {R} s.
 
@@ -1798,22 +1798,19 @@ Prenex Implicits comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr.
 Definition lfun_comp_nzRingMixin := GRing.Zmodule_isNzRing.Build 'End(vT)
   comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr lfun1_neq0.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use lfun_comp_nzRingMixin instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=lfun_comp_nzRingMixin)]
 Notation lfun_comp_ringMixin := (lfun_comp_nzRingMixin) (only parsing).
 
 Definition lfun_comp_nzRingType : nzRingType :=
   HB.pack 'End(vT) lfun_comp_nzRingMixin.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use lfun_comp_nzRingType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=lfun_comp_nzRingType)]
 Notation lfun_comp_ringType := (lfun_comp_nzRingType) (only parsing).
 
 (* In the standard endomorphism ring product is categorical composition. *)
 Definition lfun_nzRingType : nzRingType := lfun_comp_nzRingType^c.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use lfun_nzRingType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=lfun_nzRingType)]
 Notation lfun_ringType := (lfun_nzRingType) (only parsing).
 
 Definition lfun_lalgMixin := GRing.Lmodule_isLalgebra.Build R lfun_nzRingType

@@ -131,7 +131,7 @@ Proof. by apply/pgroupP=> p _; rewrite inE /= pchar_num. Qed.
 
 End AlgC.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use algC'G_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=algC'G_pchar)]
 Notation algC'G := (algC'G_pchar) (only parsing).
 
 Section Defs.
@@ -277,8 +277,7 @@ HB.instance Definition _ := GRing.Zmodule_isComNzRing.Build classfun
 
 Definition cfun_nzRingType : nzRingType := classfun.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use cfun_nzRingType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=cfun_nzRingType)]
 Notation cfun_ringType := (cfun_nzRingType) (only parsing).
 
 Lemma expS_cfunE phi n x : (phi ^+ n.+1) x = phi x ^+ n.+1.
@@ -340,16 +339,14 @@ Lemma cfAut_is_zmod_morphism : zmod_morphism cfAut.
 Proof.
 by move=> phi psi; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE /= rmorphB.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `cfAut_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=cfAut_is_zmod_morphism)]
 Definition cfAut_is_additive := cfAut_is_zmod_morphism.
 
 Lemma cfAut_is_monoid_morphism : monoid_morphism cfAut.
 Proof.
 by split=> [|phi psi]; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE rmorphM.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `cfAut_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=cfAut_is_monoid_morphism)]
 Definition cfAut_is_multiplicative :=
   (fun g => (g.2,g.1)) cfAut_is_monoid_morphism.
 
@@ -1411,8 +1408,7 @@ Proof.
 split=> [|phi psi]; [exact: cfRes_cfun1 | apply/cfunP=> x].
 by rewrite !cfunElock mulrnAr mulrnAl -mulrnA mulnb andbb.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `cfRes_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=cfRes_is_monoid_morphism)]
 Definition cfRes_is_multiplicative :=
   (fun g => (g.2,g.1)) cfRes_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build _ _ cfRes
@@ -1602,14 +1598,12 @@ Proof. by rewrite -(morph1 f) cfIsomE. Qed.
 
 Lemma cfIsom_is_zmod_morphism : zmod_morphism cfIsom.
 Proof. rewrite unlock; exact: raddfB. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `cfIsom_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=cfIsom_is_zmod_morphism)]
 Definition cfIsom_is_additive := cfIsom_is_zmod_morphism.
 
 Lemma cfIsom_is_monoid_morphism : monoid_morphism cfIsom.
 Proof. rewrite unlock; exact: (rmorph1 _, rmorphM _). Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `cfIsom_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=cfIsom_is_monoid_morphism)]
 Definition cfIsom_is_multiplicative :=
   (fun g => (g.2,g.1)) cfIsom_is_monoid_morphism.
 
@@ -1865,14 +1859,12 @@ Canonical cfSdprod_unlockable := [unlockable of cfSdprod].
 
 Lemma cfSdprod_is_zmod_morphism : zmod_morphism cfSdprod.
 Proof. rewrite unlock; exact: raddfB. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `cfSdprod_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=cfSdprod_is_zmod_morphism)]
 Definition cfSdprod_is_additive := cfSdprod_is_zmod_morphism.
 
 Lemma cfSdprod_is_monoid_morphism : monoid_morphism cfSdprod.
 Proof. rewrite unlock; exact: (rmorph1 _, rmorphM _). Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `cfSdprod_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=cfSdprod_is_monoid_morphism)]
 Definition cfSdprod_is_multiplicative :=
   (fun g => (g.2,g.1)) cfSdprod_is_monoid_morphism.
 

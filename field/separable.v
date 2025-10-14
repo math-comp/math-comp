@@ -280,7 +280,7 @@ Qed.
 
 End InfinitePrimitiveElementTheorem.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar0_PET instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar0_PET)]
 Notation char0_PET := (pchar0_PET) (only parsing).
 
 Section Separable.
@@ -566,7 +566,7 @@ Qed.
 
 End SeparableElement.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use separablePn_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=separablePn_pchar)]
 Notation separablePn := (separablePn_pchar) (only parsing).
 
 Arguments separable_elementP {K x}.
@@ -623,7 +623,7 @@ apply: contra_eqT (size_minPoly K x); rewrite defKx -leqNgt => /size1_polyC->.
 by rewrite comp_polyC size_polyC; case: (_ != 0).
 Qed.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use separable_exponent_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=separable_exponent_pchar)]
 Notation separable_exponent := (separable_exponent_pchar) (only parsing).
 
 Lemma pcharf0_separable K : [pchar L] =i pred0 -> forall x, separable_element K x.
@@ -632,7 +632,7 @@ move=> pcharL0 x; have [n /andP[pcharLn]] := separable_exponent_pchar K x.
 by rewrite (pnat_1 pcharLn (sub_in_pnat _ pcharLn)) // => p _; rewrite pcharL0.
 Qed.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf0_separable instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf0_separable)]
 Notation charf0_separable := (pcharf0_separable) (only parsing).
 
 Lemma pcharf_p_separable K x e p :
@@ -668,7 +668,7 @@ rewrite {q}Dq {c}Dc mulrBr -rmorphM -rmorphN -cons_poly_def qualifE /=.
 by rewrite polyseq_cons !polyseqC nz_a /= rpredN andbCA => /and3P[/fpredMl->].
 Qed.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf_p_separable instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf_p_separable)]
 Notation charf_p_separable := (pcharf_p_separable) (only parsing).
 
 Lemma pcharf_n_separable K x n :
@@ -680,7 +680,7 @@ have <-: (n`_p)%N = n by rewrite -(eq_partn n (pcharf_eq pcharLp)) part_pnat_id.
 by rewrite p_part lognE -mem_primes pi_n_p -pcharf_p_separable.
 Qed.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf_n_separable instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf_n_separable)]
 Notation charf_n_separable := (pcharf_n_separable) (only parsing).
 
 Definition purely_inseparable_element U x :=
@@ -704,7 +704,7 @@ rewrite -(Fadjoin_idP Kxm) Dm -(subnKC ltnm) addSnnS expnD exprM -Dn.
 by rewrite -pcharf_p_separable.
 Qed.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use purely_inseparable_elementP_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=purely_inseparable_elementP_pchar)]
 Notation purely_inseparable_elementP := (purely_inseparable_elementP_pchar) (only parsing).
 
 Lemma separable_inseparable_element K x :

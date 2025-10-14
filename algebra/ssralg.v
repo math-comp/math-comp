@@ -786,8 +786,7 @@ Proof. exact: sumr_const. Qed.
 Lemma sumr_const_nat m n x : \sum_(n <= i < m) x = x *+ (m - n).
 Proof. exact: sumr_const_nat. Qed.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Algebra.nmod_closed instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Algebra.nmod_closed)]
 Definition addr_closed := nmod_closed.
 
 End NmoduleTheory.
@@ -940,19 +939,15 @@ HB.mixin Record PzSemiRing_isNonZero R of PzSemiRing R := {
 HB.structure Definition NzSemiRing :=
   { R of PzSemiRing_isNonZero R & PzSemiRing R }.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzSemiRing)]
 Notation SemiRing R := (NzSemiRing R) (only parsing).
 
 Module SemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzSemiRing.sort)]
 Notation sort := (NzSemiRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzSemiRing.on)]
 Notation on R := (NzSemiRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzSemiRing.copy)]
 Notation copy T U := (NzSemiRing.copy T U) (only parsing).
 End SemiRing.
 
@@ -976,13 +971,11 @@ HB.builders Context R of Nmodule_isNzSemiRing R.
 HB.end.
 
 Module Nmodule_isSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Nmodule_isNzSemiRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Nmodule_isNzSemiRing.Build)]
 Notation Build R := (Nmodule_isNzSemiRing.Build R) (only parsing).
 End Nmodule_isSemiRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Nmodule_isNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Nmodule_isNzSemiRing)]
 Notation Nmodule_isSemiRing R := (Nmodule_isNzSemiRing R) (only parsing).
 
 HB.factory Record isNzSemiRing R of Choice R := {
@@ -1004,14 +997,12 @@ HB.factory Record isNzSemiRing R of Choice R := {
 }.
 
 Module isSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isNzSemiRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isNzSemiRing.Build)]
 Notation Build R := (isNzSemiRing.Build R) (only parsing).
 End isSemiRing.
 
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isNzSemiRing)]
 Notation isSemiRing R := (isNzSemiRing R) (only parsing).
 
 HB.builders Context R of isNzSemiRing R.
@@ -1049,12 +1040,12 @@ Local Notation "\prod_ ( m <= i < n ) F" := (\big[*%R/1%R]_(m <= i < n) F%R).
 Definition pchar (R : nzSemiRingType) : nat_pred :=
   [pred p | prime p & p%:R == 0 :> R].
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar)]
 Notation char := pchar (only parsing).
 
 Local Notation has_pchar0 L := (pchar L =i pred0).
 
-#[deprecated(since="mathcomp 2.4.0", note="Use has_pchar0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=has_pchar0)]
 Notation has_char0 L := (has_pchar0 L) (only parsing).
 
 (* Converse ring tag. *)
@@ -1459,56 +1450,52 @@ Bind Scope ring_scope with PzRing.sort.
 End PzRingExports.
 HB.export PzRingExports.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut)]
 Notation Frobenius_aut := pFrobenius_aut (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf0)]
 Notation charf0 := pcharf0 (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf_prime instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf_prime)]
 Notation charf_prime := pcharf_prime (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use mulrn_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=mulrn_pchar)]
 Notation mulrn_char := mulrn_pchar (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use natr_mod_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=natr_mod_pchar)]
 Notation natr_mod_char := natr_mod_pchar (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use dvdn_pcharf instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=dvdn_pcharf)]
 Notation dvdn_charf := dvdn_pcharf (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf_eq instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf_eq)]
 Notation charf_eq := pcharf_eq (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use bin_lt_pcharf_0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=bin_lt_pcharf_0)]
 Notation bin_lt_charf_0 := bin_lt_pcharf_0 (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autE instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autE)]
 Notation Frobenius_autE := pFrobenius_autE (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut0)]
 Notation Frobenius_aut0 := pFrobenius_aut0 (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut1 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut1)]
 Notation Frobenius_aut1 := pFrobenius_aut1 (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autD_comm instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autD_comm)]
 Notation Frobenius_autD_comm := pFrobenius_autD_comm (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autMn instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autMn)]
 Notation Frobenius_autMn := pFrobenius_autMn (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut_nat instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut_nat)]
 Notation Frobenius_aut_nat := pFrobenius_aut_nat (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autM_comm instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autM_comm)]
 Notation Frobenius_autM_comm := pFrobenius_autM_comm (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autX instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autX)]
 Notation Frobenius_autX := pFrobenius_autX (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use addrr_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=addrr_pchar2)]
 Notation addrr_char2 := addrr_pchar2 (only parsing).
 
 #[short(type="nzRingType")]
 HB.structure Definition NzRing := { R of NzSemiRing R & Zmodule R }.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzRing)]
 Notation Ring R := (NzRing R) (only parsing).
 
 Module Ring.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzRing.sort)]
 Notation sort := (NzRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzRing.on)]
 Notation on R := (NzRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzRing.copy)]
 Notation copy T U := (NzRing.copy T U) (only parsing).
 End Ring.
 
@@ -1524,13 +1511,11 @@ HB.factory Record Zmodule_isNzRing R of Zmodule R := {
 }.
 
 Module Zmodule_isRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Zmodule_isNzRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Zmodule_isNzRing.Build)]
 Notation Build R := (Zmodule_isNzRing.Build R) (only parsing).
 End Zmodule_isRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Zmodule_isNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Zmodule_isNzRing)]
 Notation Zmodule_isRing R := (Zmodule_isNzRing R) (only parsing).
 
 HB.builders Context R of Zmodule_isNzRing R.
@@ -1558,13 +1543,11 @@ HB.factory Record isNzRing R of Choice R := {
 }.
 
 Module isRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isNzRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isNzRing.Build)]
 Notation Build R := (isNzRing.Build R) (only parsing).
 End isRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isNzRing)]
 Notation isRing R := (isNzRing R) (only parsing).
 
 HB.builders Context R of isNzRing R.
@@ -1793,19 +1776,19 @@ End Char2.
 
 End NzRingTheory.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autN instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autN)]
 Notation Frobenius_autN := pFrobenius_autN (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autB_comm instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autB_comm)]
 Notation Frobenius_autB_comm := pFrobenius_autB_comm (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use exprNn_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=exprNn_pchar)]
 Notation exprNn_char := exprNn_pchar (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use oppr_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=oppr_pchar2)]
 Notation oppr_char2 := oppr_pchar2 (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use subr_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=subr_pchar2)]
 Notation subr_char2 := subr_pchar2 (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use addrK_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=addrK_pchar2)]
 Notation addrK_char2 := addrK_pchar2 (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use addKr_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=addKr_pchar2)]
 Notation addKr_char2 := addKr_pchar2 (only parsing).
 
 Section ConverseRing.
@@ -2278,12 +2261,12 @@ End ScaleFun.
 
 End AdditiveTheory.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `monoid_morphism` instead")]
-Definition multiplicative (R S : pzSemiRingType) (f : R -> S) : Prop :=
-  {morph f : x y / x * y}%R * (f 1 = 1).
 (* FIXME: remove once PzSemiRing extends Monoid. *)
 Definition monoid_morphism (R S : pzSemiRingType) (f : R -> S) : Prop :=
    (f 1 = 1) * {morph f : x y / x * y}%R.
+#[deprecated(since="mathcomp 2.5.0", use=monoid_morphism)]
+Definition multiplicative (R S : pzSemiRingType) (f : R -> S) : Prop :=
+  {morph f : x y / x * y}%R * (f 1 = 1).
 
 HB.mixin Record isMonoidMorphism (R S : pzSemiRingType) (f : R -> S) := {
   monoid_morphism_subproof : monoid_morphism f
@@ -2327,8 +2310,8 @@ Proof. exact: raddf_sum. Qed.
 
 Lemma rmorphism_monoidP : monoid_morphism f.
 Proof. exact: monoid_morphism_subproof. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `rmorphism_monoidP` instead")]
+#[warning="-deprecated-reference-since-mathcomp-2.5.0",
+  deprecated(since="mathcomp 2.5.0", use=rmorphism_monoidP)]
 Definition rmorphismMP : multiplicative f :=
   (fun p => (p.2, p.1)) rmorphism_monoidP.
 
@@ -2355,8 +2338,7 @@ Proof.
 move=> fK f'K.
 by split=> [|x y]; apply: (canLR fK); rewrite /= (rmorph1, rmorphM) ?f'K.
 Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `can2_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=can2_monoid_morphism)]
 Definition can2_rmorphism f' (cff' : cancel f f') :=
   (fun p => (p.2, p.1)) \o (can2_monoid_morphism cff').
 
@@ -2427,7 +2409,7 @@ End InSemiAlgebra.
 
 End RmorphismTheory.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use rmorph_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=rmorph_pchar)]
 Notation rmorph_char := rmorph_pchar (only parsing).
 
 Module Scale.
@@ -2584,8 +2566,7 @@ Definition linear_for (R : pzSemiRingType) (U : lSemiModType R) (V : nmodType)
 Lemma zmod_morphism_linear (R : pzRingType) (U : lmodType R) V
   (s : Scale.law R V) (f : U -> V) : linear_for s f -> zmod_morphism f.
 Proof. by move=> Lsf x y; rewrite -scaleN1r addrC Lsf Scale.N1op addrC. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `zmod_morphism_linear` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=zmod_morphism_linear)]
 Definition additive_linear := zmod_morphism_linear.
 
 Lemma scalable_linear (R : pzRingType) (U : lmodType R) V
@@ -2870,13 +2851,11 @@ HB.mixin Record PzSemiRing_hasCommutativeMul R of PzSemiRing R := {
 }.
 
 Module SemiRing_hasCommutativeMul.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use PzSemiRing_hasCommutativeMul.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=PzSemiRing_hasCommutativeMul.Build)]
 Notation Build R := (PzSemiRing_hasCommutativeMul.Build R) (only parsing).
 End SemiRing_hasCommutativeMul.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use PzSemiRing_hasCommutativeMul instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=PzSemiRing_hasCommutativeMul)]
 Notation SemiRing_hasCommutativeMul R :=
   (PzSemiRing_hasCommutativeMul R) (only parsing).
 
@@ -2913,19 +2892,15 @@ HB.end.
 HB.structure Definition ComNzSemiRing :=
   {R of NzSemiRing R & PzSemiRing_hasCommutativeMul R}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzSemiRing)]
 Notation ComSemiRing R := (ComNzSemiRing R) (only parsing).
 
 Module ComSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzSemiRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzSemiRing.sort)]
 Notation sort := (ComNzSemiRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzSemiRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzSemiRing.on)]
 Notation on R := (ComNzSemiRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzSemiRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzSemiRing.copy)]
 Notation copy T U := (ComNzSemiRing.copy T U) (only parsing).
 End ComSemiRing.
 
@@ -2946,13 +2921,11 @@ HB.factory Record Nmodule_isComNzSemiRing R of Nmodule R := {
 }.
 
 Module Nmodule_isComSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Nmodule_isComNzSemiRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Nmodule_isComNzSemiRing.Build)]
 Notation Build R := (Nmodule_isComNzSemiRing.Build R) (only parsing).
 End Nmodule_isComSemiRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Nmodule_isComNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Nmodule_isComNzSemiRing)]
 Notation Nmodule_isComSemiRing R := (Nmodule_isComNzSemiRing R) (only parsing).
 
 HB.builders Context R of Nmodule_isComNzSemiRing R.
@@ -3073,13 +3046,11 @@ HB.factory Record PzRing_hasCommutativeMul R of PzRing R := {
 }.
 
 Module Ring_hasCommutativeMul.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use PzRing_hasCommutativeMul.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=PzRing_hasCommutativeMul.Build)]
 Notation Build R := (PzRing_hasCommutativeMul.Build R) (only parsing).
 End Ring_hasCommutativeMul.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use PzRing_hasCommutativeMul instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=PzRing_hasCommutativeMul)]
 Notation Ring_hasCommutativeMul R :=
   (PzRing_hasCommutativeMul R) (only parsing).
 
@@ -3109,29 +3080,24 @@ Bind Scope ring_scope with ComPzRing.sort.
 End ComPzRingExports.
 HB.export ComPzRingExports.
 
-#[deprecated(since="mathcomp 2.5.0",
-      note="Use pFrobenius_aut_is_monoid_morphism instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=pFrobenius_aut_is_monoid_morphism)]
 Notation pFrobenius_aut_is_multiplicative :=
   (fun p => (p.2, p.1) \o pFrobenius_aut_is_monoid_morphism) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use exprDn_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=exprDn_pchar)]
 Notation exprDn_char := exprDn_pchar (only parsing).
 
 #[short(type="comNzRingType")]
 HB.structure Definition ComNzRing := {R of NzRing R & ComNzSemiRing R}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing)]
 Notation ComRing R := (ComNzRing R) (only parsing).
 
 Module ComRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing.sort)]
 Notation sort := (ComNzRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing.on)]
 Notation on R := (ComNzRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing.copy)]
 Notation copy T U := (ComNzRing.copy T U) (only parsing).
 End ComRing.
 
@@ -3146,13 +3112,11 @@ HB.factory Record Zmodule_isComNzRing R of Zmodule R := {
 }.
 
 Module Zmodule_isComRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Zmodule_isComNzRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Zmodule_isComNzRing.Build)]
 Notation Build R := (Zmodule_isComNzRing.Build R) (only parsing).
 End Zmodule_isComRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Zmodule_isComNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Zmodule_isComNzRing)]
 Notation Zmodule_isComRing R := (Zmodule_isComNzRing R) (only parsing).
 
 HB.builders Context R of Zmodule_isComNzRing R.
@@ -3343,13 +3307,11 @@ HB.mixin Record NzRing_hasMulInverse R of NzRing R := {
 }.
 
 Module Ring_hasMulInverse.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing_hasMulInverse.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzRing_hasMulInverse.Build)]
 Notation Build R := (NzRing_hasMulInverse.Build R) (only parsing).
 End Ring_hasMulInverse.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing_hasMulInverse instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzRing_hasMulInverse)]
 Notation Ring_hasMulInverse R := (NzRing_hasMulInverse R) (only parsing).
 
 #[short(type="unitRingType")]
@@ -3666,13 +3628,11 @@ HB.factory Record ComNzRing_hasMulInverse R of ComNzRing R := {
 }.
 
 Module ComRing_hasMulInverse.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing_hasMulInverse.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_hasMulInverse.Build)]
 Notation Build R := (ComNzRing_hasMulInverse.Build R) (only parsing).
 End ComRing_hasMulInverse.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing_hasMulInverse instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_hasMulInverse)]
 Notation ComRing_hasMulInverse R := (ComNzRing_hasMulInverse R) (only parsing).
 
 HB.builders Context R of ComNzRing_hasMulInverse R.
@@ -4616,13 +4576,13 @@ HB.instance Definition _ := IntegralDomain.on R^o.
 
 End IntegralDomainTheory.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use natf_neq0_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=natf_neq0_pchar)]
 Notation natf_neq0 := natf_neq0_pchar (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use natf0_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=natf0_pchar)]
 Notation natf0_char := natf0_pchar (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf'_nat instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf'_nat)]
 Notation charf'_nat := pcharf'_nat (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf0P instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf0P)]
 Notation charf0P := pcharf0P (only parsing).
 
 Arguments lregP {R x}.
@@ -4666,13 +4626,11 @@ HB.factory Record ComNzRing_isField R of ComNzRing R := {
 }.
 
 Module ComRing_isField.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing_isField.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_isField.Build)]
 Notation Build R := (ComNzRing_isField.Build R) (only parsing).
 End ComRing_isField.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing_isField instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_isField)]
 Notation ComRing_isField R := (ComNzRing_isField R) (only parsing).
 
 HB.builders Context R of ComNzRing_isField R.
@@ -4865,11 +4823,11 @@ Proof. by move=> p; rewrite inE -scaler_nat scaler_eq0 oner_eq0 orbF. Qed.
 
 End FieldTheory.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar0_natf_div instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar0_natf_div)]
 Notation char0_natf_div := pchar0_natf_div (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use fmorph_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=fmorph_pchar)]
 Notation fmorph_char := fmorph_pchar (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar_lalg instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar_lalg)]
 Notation char_lalg := pchar_lalg (only parsing).
 
 Arguments fmorph_inj {F R} f [x1 x2].
@@ -5570,13 +5528,11 @@ HB.mixin Record isSubPzSemiRing (R : pzSemiRingType) (S : pred R) U
 }.
 
 Module isSubSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isSubPzSemiRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isSubPzSemiRing.Build)]
 Notation Build R S U := (isSubPzSemiRing.Build R S U) (only parsing).
 End isSubSemiRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isSubPzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isSubPzSemiRing)]
 Notation isSubSemiRing R S U := (isSubPzSemiRing R S U) (only parsing).
 
 #[short(type="subPzSemiRingType")]
@@ -5587,19 +5543,15 @@ HB.structure Definition SubPzSemiRing (R : pzSemiRingType) (S : pred R) :=
 HB.structure Definition SubNzSemiRing (R : nzSemiRingType) (S : pred R) :=
   { U of SubNmodule R S U & NzSemiRing U & isSubPzSemiRing R S U }.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzSemiRing)]
 Notation SubSemiRing R := (SubNzSemiRing R) (only parsing).
 
 Module SubSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzSemiRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzSemiRing.sort)]
 Notation sort := (SubNzSemiRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzSemiRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzSemiRing.on)]
 Notation on R := (SubNzSemiRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzSemiRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzSemiRing.copy)]
 Notation copy T U := (SubNzSemiRing.copy T U) (only parsing).
 End SubSemiRing.
 
@@ -5667,13 +5619,11 @@ HB.factory Record SubNmodule_isSubNzSemiRing (R : nzSemiRingType) S U
 }.
 
 Module SubNmodule_isSubSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNmodule_isSubNzSemiRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNmodule_isSubNzSemiRing.Build)]
 Notation Build R S U := (SubNmodule_isSubNzSemiRing.Build R S U) (only parsing).
 End SubNmodule_isSubSemiRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNmodule_isSubNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNmodule_isSubNzSemiRing)]
 Notation SubNmodule_isSubSemiRing R S U :=
   (SubNmodule_isSubNzSemiRing R S U) (only parsing).
 
@@ -5700,19 +5650,15 @@ HB.end.
 HB.structure Definition SubComNzSemiRing (R : nzSemiRingType) S :=
   {U of SubNzSemiRing R S U & ComNzSemiRing U}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzSemiRing)]
 Notation SubComSemiRing R := (SubComNzSemiRing R) (only parsing).
 
 Module SubComSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzSemiRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzSemiRing.sort)]
 Notation sort  := (SubComNzSemiRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzSemiRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzSemiRing.on)]
 Notation on R := (SubComNzSemiRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzSemiRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzSemiRing.copy)]
 Notation copy T U := (SubComNzSemiRing.copy T U) (only parsing).
 End SubComSemiRing.
 
@@ -5720,14 +5666,12 @@ HB.factory Record SubNzSemiRing_isSubComNzSemiRing (R : comNzSemiRingType) S U
     of SubNzSemiRing R S U := {}.
 
 Module SubSemiRing_isSubComSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzSemiRing_isSubComNzSemiRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzSemiRing_isSubComNzSemiRing.Build)]
 Notation Build R S U :=
   (SubNzSemiRing_isSubComNzSemiRing.Build R S U) (only parsing).
 End SubSemiRing_isSubComSemiRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzSemiRing_isSubComNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzSemiRing_isSubComNzSemiRing)]
 Notation SubSemiRing_isSubComSemiRing R S U :=
   (SubNzSemiRing_isSubComNzSemiRing R S U) (only parsing).
 
@@ -5753,19 +5697,15 @@ HB.end.
 HB.structure Definition SubNzRing (R : nzRingType) (S : pred R) :=
   { U of SubNzSemiRing R S U & NzRing U & isSubBaseAddUMagma R S U }.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzRing)]
 Notation SubRing R := (SubNzRing R) (only parsing).
 
 Module SubRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzRing.sort)]
 Notation sort := (SubNzRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzRing.on)]
 Notation on R := (SubNzRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzRing.copy)]
 Notation copy T U := (SubNzRing.copy T U) (only parsing).
 End SubRing.
 
@@ -5775,13 +5715,11 @@ HB.factory Record SubZmodule_isSubNzRing (R : nzRingType) S U
 }.
 
 Module SubZmodule_isSubRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubZmodule_isSubNzRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubZmodule_isSubNzRing.Build)]
 Notation Build R S U := (SubZmodule_isSubNzRing.Build R S U) (only parsing).
 End SubZmodule_isSubRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubZmodule_isSubNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubZmodule_isSubNzRing)]
 Notation SubZmodule_isSubRing R S U :=
   (SubZmodule_isSubNzRing R S U) (only parsing).
 
@@ -5805,19 +5743,15 @@ HB.end.
 HB.structure Definition SubComNzRing (R : nzRingType) S :=
   {U of SubNzRing R S U & ComNzRing U}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzRing)]
 Notation SubComRing R := (SubComNzRing R) (only parsing).
 
 Module SubComRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzRing.sort)]
 Notation sort := (SubComNzRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzRing.on)]
 Notation on R := (SubComNzRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzRing.copy)]
 Notation copy T U := (SubComNzRing.copy T U) (only parsing).
 End SubComRing.
 
@@ -5825,13 +5759,11 @@ HB.factory Record SubNzRing_isSubComNzRing (R : comNzRingType) S U
     of SubNzRing R S U := {}.
 
 Module SubRing_isSubComRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing_isSubComNzRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzRing_isSubComNzRing.Build)]
 Notation Build R S U := (SubNzRing_isSubComNzRing.Build R S U) (only parsing).
 End SubRing_isSubComRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing_isSubComNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzRing_isSubComNzRing)]
 Notation SubRing_isSubComRing R S U :=
   (SubNzRing_isSubComNzRing R S U) (only parsing).
 
@@ -5937,14 +5869,12 @@ HB.factory Record SubNzRing_SubLmodule_isSubLalgebra (R : pzRingType)
     (V : lalgType R) S W of SubNzRing V S W & @SubLmodule R V S W := {}.
 
 Module SubRing_SubLmodule_isSubLalgebra.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing_SubLmodule_isSubLalgebra.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzRing_SubLmodule_isSubLalgebra.Build)]
 Notation Build R V S U :=
   (SubNzRing_SubLmodule_isSubLalgebra.Build R V S U) (only parsing).
 End SubRing_SubLmodule_isSubLalgebra.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing_SubLmodule_isSubLalgebra instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzRing_SubLmodule_isSubLalgebra)]
 Notation SubRing_SubLmodule_isSubLalgebra R V S U :=
   (SubNzRing_SubLmodule_isSubLalgebra R V S U) (only parsing).
 
@@ -6069,13 +5999,11 @@ HB.factory Record SubChoice_isSubNzSemiRing (R : nzSemiRingType) S U
 }.
 
 Module SubChoice_isSubSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubNzSemiRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubNzSemiRing.Build)]
 Notation Build R S U := (SubChoice_isSubNzSemiRing.Build R S U) (only parsing).
 End SubChoice_isSubSemiRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubNzSemiRing)]
 Notation SubChoice_isSubSemiRing R S U :=
   (SubChoice_isSubNzSemiRing R S U) (only parsing).
 
@@ -6102,14 +6030,12 @@ HB.factory Record SubChoice_isSubComNzSemiRing (R : comNzSemiRingType) S U
 }.
 
 Module SubChoice_isSubComSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubComNzSemiRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubComNzSemiRing.Build)]
 Notation Build R S U :=
   (SubChoice_isSubComNzSemiRing.Build R S U) (only parsing).
 End SubChoice_isSubComSemiRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubComNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubComNzSemiRing)]
 Notation SubChoice_isSubComSemiRing R S U :=
   (SubChoice_isSubComNzSemiRing R S U) (only parsing).
 
@@ -6137,13 +6063,11 @@ HB.factory Record SubChoice_isSubNzRing (R : nzRingType) S U
 }.
 
 Module SubChoice_isSubRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubNzRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubNzRing.Build)]
 Notation Build R S U := (SubChoice_isSubNzRing.Build R S U) (only parsing).
 End SubChoice_isSubRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubNzRing)]
 Notation SubChoice_isSubRing R S U :=
   (SubChoice_isSubNzRing R S U) (only parsing).
 
@@ -6170,13 +6094,11 @@ HB.factory Record SubChoice_isSubComNzRing (R : comNzRingType) S U
 }.
 
 Module SubChoice_isSubComRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubComNzRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubComNzRing.Build)]
 Notation Build R S U := (SubChoice_isSubComNzRing.Build R S U) (only parsing).
 End SubChoice_isSubComRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubComNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubComNzRing)]
 Notation SubChoice_isSubComRing R S U :=
   (SubChoice_isSubComNzRing R S U) (only parsing).
 
@@ -6634,67 +6556,67 @@ Definition sqrrD1 := sqrrD1.
 Definition sqrrB1 := sqrrB1.
 Definition subr_sqr_1 := subr_sqr_1.
 Definition pcharf0 := pcharf0.
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf0)]
 Definition charf0 := pcharf0.
 Definition pcharf_prime := pcharf_prime.
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf_prime instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf_prime)]
 Definition charf_prime := pcharf_prime.
 Definition mulrn_pchar := mulrn_pchar.
-#[deprecated(since="mathcomp 2.4.0", note="Use mulrn_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=mulrn_pchar)]
 Definition mulrn_char := mulrn_pchar.
 Definition dvdn_pcharf := dvdn_pcharf.
-#[deprecated(since="mathcomp 2.4.0", note="Use dvdn_pcharf instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=dvdn_pcharf)]
 Definition dvdn_charf := dvdn_pcharf.
 Definition pcharf_eq := pcharf_eq.
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf_eq instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf_eq)]
 Definition charf_eq := pcharf_eq.
 Definition bin_lt_pcharf_0 := bin_lt_pcharf_0.
-#[deprecated(since="mathcomp 2.4.0", note="Use bin_lt_pcharf_0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=bin_lt_pcharf_0)]
 Definition bin_lt_charf_0 := bin_lt_pcharf_0.
 Definition pFrobenius_autE := pFrobenius_autE.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autE instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autE)]
 Definition Frobenius_autE := pFrobenius_autE.
 Definition pFrobenius_aut0 := pFrobenius_aut0.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut0)]
 Definition Frobenius_aut0 := pFrobenius_aut0.
 Definition pFrobenius_aut1 := pFrobenius_aut1.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut1 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut1)]
 Definition Frobenius_aut1 := pFrobenius_aut1.
 Definition pFrobenius_autD_comm := pFrobenius_autD_comm.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autD_comm instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autD_comm)]
 Definition Frobenius_autD_comm := pFrobenius_autD_comm.
 Definition pFrobenius_autMn := pFrobenius_autMn.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autMn instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autMn)]
 Definition Frobenius_autMn := pFrobenius_autMn.
 Definition pFrobenius_aut_nat := pFrobenius_aut_nat.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut_nat instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut_nat)]
 Definition Frobenius_aut_nat := pFrobenius_aut_nat.
 Definition pFrobenius_autM_comm := pFrobenius_autM_comm.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autM_comm instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autM_comm)]
 Definition Frobenius_autM_comm := pFrobenius_autM_comm.
 Definition pFrobenius_autX := pFrobenius_autX.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autX instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autX)]
 Definition Frobenius_autX := pFrobenius_autX.
 Definition pFrobenius_autN := pFrobenius_autN.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autN instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autN)]
 Definition Frobenius_autN := pFrobenius_autN.
 Definition pFrobenius_autB_comm := pFrobenius_autB_comm.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autB_comm instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autB_comm)]
 Definition Frobenius_autB_comm := pFrobenius_autB_comm.
 Definition exprNn_pchar := exprNn_pchar.
-#[deprecated(since="mathcomp 2.4.0", note="Use exprNn_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=exprNn_pchar)]
 Definition exprNn_char := exprNn_pchar.
 Definition addrr_pchar2 := addrr_pchar2.
-#[deprecated(since="mathcomp 2.4.0", note="Use addrr_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=addrr_pchar2)]
 Definition addrr_char2 := addrr_pchar2.
 Definition oppr_pchar2 := oppr_pchar2.
-#[deprecated(since="mathcomp 2.4.0", note="Use oppr_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=oppr_pchar2)]
 Definition oppr_char2 := oppr_pchar2.
 Definition addrK_pchar2 := addrK_pchar2.
-#[deprecated(since="mathcomp 2.4.0", note="Use addrK_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=addrK_pchar2)]
 Definition addrK_char2 := addrK_pchar2.
 Definition addKr_pchar2 := addKr_pchar2.
-#[deprecated(since="mathcomp 2.4.0", note="Use addKr_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=addKr_pchar2)]
 Definition addKr_char2 := addKr_pchar2.
 Definition iter_mulr := iter_mulr.
 Definition iter_mulr_1 := iter_mulr_1.
@@ -6726,7 +6648,7 @@ Definition sqrrB := sqrrB.
 Definition subr_sqr := subr_sqr.
 Definition subr_sqrDB := subr_sqrDB.
 Definition exprDn_pchar := exprDn_pchar.
-#[deprecated(since="mathcomp 2.4.0", note="Use exprDn_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=exprDn_pchar)]
 Definition exprDn_char := exprDn_pchar.
 Definition mulrV := mulrV.
 Definition divrr := divrr.
@@ -6820,7 +6742,7 @@ Definition rpred_div := rpred_div.
 Definition rpredXN := rpredXN.
 Definition rpredZeq := rpredZeq.
 Definition pchar_lalg := pchar_lalg.
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar_lalg instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar_lalg)]
 Definition char_lalg := pchar_lalg.
 Definition rpredMr := rpredMr.
 Definition rpredMl := rpredMl.
@@ -6849,16 +6771,16 @@ Definition expf_eq0 := expf_eq0.
 Definition sqrf_eq0 := sqrf_eq0.
 Definition expf_neq0 := expf_neq0.
 Definition natf_neq0_pchar := natf_neq0_pchar.
-#[deprecated(since="mathcomp 2.4.0", note="Use natf_neq0_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=natf_neq0_pchar)]
 Definition natf_neq0 := natf_neq0_pchar.
 Definition natf0_pchar := natf0_pchar.
-#[deprecated(since="mathcomp 2.4.0", note="Use natf0_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=natf0_pchar)]
 Definition natf0_char := natf0_pchar.
 Definition pcharf'_nat := pcharf'_nat.
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf'_nat instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf'_nat)]
 Definition charf'_nat := pcharf'_nat.
 Definition pcharf0P := pcharf0P.
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf0P instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf0P)]
 Definition charf0P := pcharf0P.
 Definition eqf_sqr := eqf_sqr.
 Definition mulfI := mulfI.
@@ -6892,7 +6814,7 @@ Definition mulf_div := mulf_div.
 Definition eqr_div := eqr_div.
 Definition eqr_sum_div := eqr_sum_div.
 Definition pchar0_natf_div := pchar0_natf_div.
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar0_natf_div instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar0_natf_div)]
 Definition char0_natf_div := pchar0_natf_div.
 Definition fpredMr := fpredMr.
 Definition fpredMl := fpredMl.
@@ -6905,11 +6827,11 @@ Definition eq_sol := eq_sol.
 Definition size_sol := size_sol.
 Definition solve_monicpoly := @solve_monicpoly.
 #[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `nmod_morphism` instead")]
+  deprecated(since="mathcomp 2.5.0", use=nmod_morphism)]
 Definition semi_additive := semi_additive.
 Definition nmod_morphism := nmod_morphism.
 #[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `zmod_morphism` instead")]
+  deprecated(since="mathcomp 2.5.0", use=zmod_morphism)]
 Definition additive := additive.
 Definition zmod_morphism := zmod_morphism.
 Definition raddf0 := raddf0.
@@ -6924,15 +6846,15 @@ Definition raddfMNn := raddfMNn.
 Definition raddfMnat := raddfMnat.
 Definition raddfMsign := raddfMsign.
 #[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `can2_nmod_morphism` instead")]
+  deprecated(since="mathcomp 2.5.0", use=can2_nmod_morphism)]
 Definition can2_semi_additive := can2_semi_additive.
 Definition can2_nmod_morphism := can2_nmod_morphism.
 #[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `can2_zmod_morphism` instead")]
+  deprecated(since="mathcomp 2.5.0", use=can2_zmod_morphism)]
 Definition can2_additive := can2_additive.
 Definition can2_zmod_morphism := can2_zmod_morphism.
 #[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `monoid_morphism` instead")]
+  deprecated(since="mathcomp 2.5.0", use=monoid_morphism)]
 Definition multiplicative := multiplicative.
 Definition monoid_morphism := monoid_morphism.
 Definition rmorph0 := rmorph0.
@@ -6943,7 +6865,7 @@ Definition rmorph_sum := rmorph_sum.
 Definition rmorphMn := rmorphMn.
 Definition rmorphMNn := rmorphMNn.
 #[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `rmorphism_monoidP` instead")]
+  deprecated(since="mathcomp 2.5.0", use=rmorphism_monoidP)]
 Definition rmorphismMP := rmorphismMP.
 Definition rmorphism_monoidP := rmorphism_monoidP.
 Definition rmorph1 := rmorph1.
@@ -6957,10 +6879,10 @@ Definition rmorphXn := rmorphXn.
 Definition rmorphN1 := rmorphN1.
 Definition rmorph_sign := rmorph_sign.
 Definition rmorph_pchar := rmorph_pchar.
-#[deprecated(since="mathcomp 2.4.0", note="Use rmorph_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=rmorph_pchar)]
 Definition rmorph_char := rmorph_pchar.
 #[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `can2_monoid_morphism` instead")]
+  deprecated(since="mathcomp 2.5.0", use=can2_monoid_morphism)]
 Definition can2_rmorphism := can2_rmorphism.
 Definition can2_monoid_morphism := can2_monoid_morphism.
 Definition rmorph_comm := rmorph_comm.
@@ -6973,7 +6895,7 @@ Arguments fmorph_inj {F R} f [x1 x2].
 Definition fmorph_eq := fmorph_eq.
 Definition fmorph_eq1 := fmorph_eq1.
 Definition fmorph_pchar := fmorph_pchar.
-#[deprecated(since="mathcomp 2.4.0", note="Use fmorph_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=fmorph_pchar)]
 Definition fmorph_char := fmorph_pchar.
 Definition fmorph_unit := fmorph_unit.
 Definition fmorphV := fmorphV.
@@ -7019,12 +6941,12 @@ Definition in_algE := in_algE.
 Definition scalable_for := scalable_for.
 Definition semilinear_for := semilinear_for.
 Definition linear_for := linear_for.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-        note="use `nmod_morphism_semilinear` instead")]
+#[warning="-deprecated-since-mathcomp-2.5.0",
+  deprecated(since="mathcomp 2.5.0", use=nmod_morphism_semilinear)]
 Definition additive_semilinear := additive_semilinear.
 Definition nmod_morphism_semilinear := nmod_morphism_semilinear.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `zmod_morphism_linear` instead")]
+#[warning="-deprecated-since-mathcomp-2.5.0",
+  deprecated(since="mathcomp 2.5.0", use=zmod_morphism_linear)]
 Definition additive_linear := additive_linear.
 Definition zmod_morphism_linear := zmod_morphism_linear.
 Definition scalable_semilinear := scalable_semilinear.
@@ -7155,10 +7077,10 @@ Notation "[ 'pchar' R ]" := (GRing.pchar R) : ring_scope.
 #[deprecated(since="mathcomp 2.4.0", note="Use [pchar R] instead.")]
 Notation "[ 'char' R ]" := (GRing.pchar R) : ring_scope.
 Notation has_pchar0 R := (GRing.pchar R =i pred0).
-#[deprecated(since="mathcomp 2.4.0", note="Use has_pchar0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=has_pchar0)]
 Notation has_char0 R := (GRing.pchar R =i pred0).
 Notation pFrobenius_aut chRp := (pFrobenius_aut chRp).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut)]
 Notation Frobenius_aut chRp := (pFrobenius_aut chRp).
 Notation "*%R" := (@mul _) : function_scope.
 Notation "x * y" := (mul x y) : ring_scope.

@@ -460,7 +460,7 @@ move=> pcharRp [] n; rewrite [LHS](dvdn_pcharf pcharRp)//.
 by rewrite NegzE abszN rmorphN// oppr_eq0.
 Qed.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use dvdz_pcharf  instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=dvdz_pcharf)]
 Notation dvdz_charf chRp := (dvdz_pcharf chRp).
 
 (* Greatest common divisor *)

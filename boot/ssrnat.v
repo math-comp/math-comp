@@ -190,7 +190,7 @@ Proof. exact: eq_irrelevance. Qed.
 
 Definition addn := plus.
 Arguments addn : simpl never.
-#[deprecated(since="mathcomp 2.3.0", note="Use addn instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=addn)]
 Definition addn_rec := addn.
 Notation "m + n" := (addn m n) : nat_scope.
 
@@ -262,7 +262,7 @@ Lemma add4n m : 4 + m = m.+4. Proof. by []. Qed.
 
 Definition subn := minus.
 Arguments subn : simpl never.
-#[deprecated(since="mathcomp 2.3.0", note="Use subn instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=subn)]
 Definition subn_rec := subn.
 Notation "m - n" := (subn m n) : nat_scope.
 
@@ -1097,7 +1097,7 @@ Proof. by elim: n m => /= [|n IHn] m; rewrite ?subn0 // IHn subnS. Qed.
 
 Definition muln := mult.
 Arguments muln : simpl never.
-#[deprecated(since="mathcomp 2.3.0", note="Use muln instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=muln)]
 Definition muln_rec := muln.
 Notation "m * n" := (muln m n) : nat_scope.
 
@@ -1259,7 +1259,7 @@ Proof. by move=> x; elim: n => //= n <-; rewrite mulSn iterD. Qed.
 
 Definition expn m n := iterop n muln m 1.
 Arguments expn : simpl never.
-#[deprecated(since="mathcomp 2.3.0", note="Use expn instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=expn)]
 Definition expn_rec := expn.
 Notation "m ^ n" := (expn m n) : nat_scope.
 
@@ -1358,7 +1358,7 @@ Proof. elim: m => //= m ihm x; rewrite expnS iterM; exact/eq_iter. Qed.
 
 Fixpoint factorial n := if n is n'.+1 then n * factorial n' else 1.
 Arguments factorial : simpl never.
-#[deprecated(since="mathcomp 2.3.0", note="Use factorial instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=factorial)]
 Definition fact_rec := factorial.
 
 Notation "n `!" := (factorial n) (at level 1, format "n `!") : nat_scope.
@@ -1434,7 +1434,7 @@ Proof. by elim: n => // n IHn; rewrite expnS oddM {}IHn orbC; case odd. Qed.
 
 Fixpoint double n := if n is n'.+1 then (double n').+2 else 0.
 Arguments double : simpl never.
-#[deprecated(since="mathcomp 2.3.0", note="Use double instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=double)]
 Definition double_rec := double.
 Notation "n .*2" := (double n) : nat_scope.
 

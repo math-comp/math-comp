@@ -73,12 +73,10 @@ Proof. by rewrite -cardsT cardG_gt1 finNzRing_nontrivial. Qed.
 
 End FinNzRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use finNzRing_nontrivial instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=finNzRing_nontrivial)]
 Notation finRing_nontrivial := (finNzRing_nontrivial) (only parsing).
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use finNzRing_gt1 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=finNzRing_gt1)]
 Notation finRing_gt1 := (finNzRing_gt1) (only parsing).
 
 Section FinField.
@@ -134,9 +132,9 @@ Qed.
 
 End FinField.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use finPcharP instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=finPcharP)]
 Notation finCharP := (finPcharP) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use card_finPcharP instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=card_finPcharP)]
 Notation card_finCharP := (card_finPcharP) (only parsing).
 
 Section CardVspace.
@@ -347,33 +345,33 @@ End FinField.
 
 End PrimeChar.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pPrimeCharType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pPrimeCharType)]
 Notation PrimeCharType := (pPrimeCharType) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scale instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_scale)]
 Notation primeChar_scale := (pprimeChar_scale) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scaleA instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_scaleA)]
 Notation primeChar_scaleA := (pprimeChar_scaleA) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scale1 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_scale1)]
 Notation primeChar_scale1 := (pprimeChar_scale1) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scaleDr instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_scaleDr)]
 Notation primeChar_scaleDr := (pprimeChar_scaleDr) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scaleDl instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_scaleDl)]
 Notation primeChar_scaleDl := (pprimeChar_scaleDl) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scaleAl instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_scaleAl)]
 Notation primeChar_scaleAl := (pprimeChar_scaleAl) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scaleAr instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_scaleAr)]
 Notation primeChar_scaleAr := (pprimeChar_scaleAr) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_abelem instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_abelem)]
 Notation primeChar_abelem := (pprimeChar_abelem) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_pgroup instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_pgroup)]
 Notation primeChar_pgroup := (pprimeChar_pgroup) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use order_pprimeChar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=order_pprimeChar)]
 Notation order_primeChar := (order_pprimeChar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use card_pprimeChar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=card_pprimeChar)]
 Notation card_primeChar := (card_pprimeChar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_vectAxiom instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_vectAxiom)]
 Notation primeChar_vectAxiom := (pprimeChar_vectAxiom) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_dimf instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_dimf)]
 Notation primeChar_dimf := (pprimeChar_dimf) (only parsing).
 
 
@@ -609,7 +607,7 @@ Qed.
 
 End FinFieldExists.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pPrimePowerField instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pPrimePowerField)]
 Notation PrimePowerField := (pPrimePowerField) (only parsing).
 
 Section FinDomain.
@@ -739,5 +737,5 @@ Definition FinDomainSplittingFieldType_pchar p (pcharRp : p \in [pchar R]) :=
 
 End FinDomain.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use FinDomainSplittingFieldType_pchar  instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinDomainSplittingFieldType_pchar)]
 Notation FinDomainSplittingFieldType := (FinDomainSplittingFieldType_pchar) (only parsing).

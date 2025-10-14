@@ -40,7 +40,7 @@ Export numfield.Num.Def.
 End Def.
 
 Module ExtraDef.
-#[deprecated(since="mathcomp 2.5.0", note="Use Num.Def.sqrtr instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=Num.Def.sqrtr)]
 Notation sqrtr := numfield.Num.Def.sqrtr.
 End ExtraDef.
 

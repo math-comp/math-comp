@@ -2177,7 +2177,7 @@ Proof. exact: fin_lmod_pchar_abelem R^o. Qed.
 
 End FimModAbelem.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use fin_lmod_pchar_abelem instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=fin_lmod_pchar_abelem)]
 Notation fin_lmod_char_abelem := (fin_lmod_pchar_abelem) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use fin_ring_pchar_abelem instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=fin_ring_pchar_abelem)]
 Notation fin_ring_char_abelem := (fin_ring_pchar_abelem) (only parsing).
