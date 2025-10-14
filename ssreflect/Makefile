@@ -2,7 +2,7 @@
 
 # setting variables
 COQPROJECT?=Make
-COQMAKEOPTIONS=--no-print-directory
+ROCQMAKEOPTIONS=--no-print-directory
 
 # Main Makefile
 include ../Makefile.common

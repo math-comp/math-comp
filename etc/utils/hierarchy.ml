@@ -35,7 +35,7 @@ Options:
         -canonical soption.
 
     -R dir coqdir:
-        This option is given to coqtop: "recursively map physical dir to
+        This option is given to rocq top: "recursively map physical dir to
         logical coqdir".
 
     -lib library:
@@ -43,14 +43,14 @@ Options:
         repetitively.  If not specified, all.all will be used.|}
 ;;
 
-let coqtop =
-  match Sys.getenv "COQBIN" with
-    | exception Not_found -> "coqtop"
-    | coqbin ->
-      if coqbin.[String.length coqbin - 1] = '/' then
-        coqbin ^ "coqtop"
+let rocq =
+  match Sys.getenv "ROCQBIN" with
+    | exception Not_found -> "rocq"
+    | rocqbin ->
+      if rocqbin.[String.length rocqbin - 1] = '/' then
+        rocqbin ^ "rocq"
       else
-        coqbin ^ "/coqtop"
+        rocqbin ^ "/rocq"
 ;;
 
 let parse_canonicals file =
@@ -232,17 +232,17 @@ let () =
   opt_libmaps := List.rev !opt_libmaps;
   opt_imports :=
     if !opt_imports = [] then ["all.all"] else List.rev !opt_imports;
-  (* Interact with coqtop *)
+  (* Interact with rocq top *)
   begin
-    let (coqtop_out, coqtop_in, _) as coqtop_ch =
-      Unix.open_process_full
-        (Printf.sprintf "%S -w none " coqtop ^
-         String.concat " "
-           (List.map (fun (path, log) -> Printf.sprintf "-R %S %S" path log)
-              !opt_libmaps))
-        (Unix.environment ())
+    let (rocq_top_out, rocq_top_in, _) as rocq_top_ch =
+      let cmd =
+        Printf.sprintf "%S top -w none " rocq
+        ^ String.concat " "
+            (List.map (fun (path, log) -> Printf.sprintf "-R %S %S" path log)
+               !opt_libmaps) in
+      Unix.open_process_full cmd (Unix.environment ())
     in
-    Printf.fprintf coqtop_in {|
+    Printf.fprintf rocq_top_in {|
 Set Printing Width 4611686018427387903.
 From mathcomp Require Import %s.
 Redirect %S Print Canonical Projections.
@@ -251,12 +251,12 @@ Redirect %S Print Graph.
       (String.concat " " !opt_imports)
       (List.hd (String.split_on_char '.' tmp_canonicals))
       (List.hd (String.split_on_char '.' tmp_coercions));
-    close_out coqtop_in;
+    close_out rocq_top_in;
     try
-      while true do ignore (input_line coqtop_out) done
+      while true do ignore (input_line rocq_top_out) done
     with End_of_file ->
-      if Unix.close_process_full coqtop_ch <> WEXITED 0 then
-        failwith "Failed to invoke coqtop."
+      if Unix.close_process_full rocq_top_ch <> WEXITED 0 then
+        failwith "Failed to invoke rocq top."
   end;
   (* Parsing *)
   let coercions = parse_coercions tmp_coercions in
