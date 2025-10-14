@@ -20,5 +20,3 @@ quotient.v
 -arg -w -arg -redundant-canonical-projection
 -arg -w -arg -notation-overridden
 -arg -w -arg -ambiguous-paths
-# remove this one when requiring Rocq >= 9.0
--arg -w -arg -overwriting-delimiting-key

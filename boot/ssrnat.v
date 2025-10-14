@@ -3,8 +3,6 @@
 From Corelib Require Import PosDef.
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype.
-#[export] Set Warnings "-overwriting-delimiting-key".
-(* remove above line when requiring Rocq >= 9.0 *)
 
 (******************************************************************************)
 (* A version of arithmetic on nat (natural numbers) that is better suited to  *)
