@@ -533,7 +533,7 @@ Reserved Notation "\min_ i F"
   (at level 34, F at level 41, i at level 0,
            format "'[' \min_ i '/  '  F ']'").
 Reserved Notation "\min_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 60,
+  (at level 34, F at level 41, i, r at level 60,
            format "'[' \min_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\min_ ( i <- r ) F"
   (F at level 41,
@@ -599,7 +599,7 @@ Reserved Notation "\min^d_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \min^d_ i '/  '  F ']'").
 Reserved Notation "\min^d_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 60,
+  (at level 41, F at level 41, i, r at level 60,
            format "'[' \min^d_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\min^d_ ( i <- r ) F"
   (F at level 41, r at level 60,
@@ -632,7 +632,7 @@ Reserved Notation "\max^d_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \max^d_ i '/  '  F ']'").
 Reserved Notation "\max^d_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 60,
+  (at level 41, F at level 41, i, r at level 60,
            format "'[' \max^d_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\max^d_ ( i <- r ) F"
   (F at level 41, r at level 60,

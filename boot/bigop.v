@@ -166,7 +166,7 @@ Reserved Notation "\sum_ i F"
            right associativity,
            format "'[' \sum_ i '/  '  F ']'").
 Reserved Notation "\sum_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 60,
+  (at level 34, F at level 41, i, r at level 60,
            format "'[' \sum_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\sum_ ( i <- r ) F"
   (F at level 41,
@@ -199,7 +199,7 @@ Reserved Notation "\max_ i F"
   (at level 34, F at level 41, i at level 0,
            format "'[' \max_ i '/  '  F ']'").
 Reserved Notation "\max_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 60,
+  (at level 34, F at level 41, i, r at level 60,
            format "'[' \max_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\max_ ( i <- r ) F"
   (F at level 41,
@@ -232,7 +232,7 @@ Reserved Notation "\prod_ i F"
   (at level 34, F at level 36, i at level 0,
            format "'[' \prod_ i '/  '  F ']'").
 Reserved Notation "\prod_ ( i <- r | P ) F"
-  (F at level 36, i, r at level 60,
+  (at level 34, F at level 36, i, r at level 60,
            format "'[' \prod_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\prod_ ( i <- r ) F"
   (F at level 36,
@@ -265,7 +265,7 @@ Reserved Notation "\bigcup_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \bigcup_ i '/  '  F ']'").
 Reserved Notation "\bigcup_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 60,
+  (at level 41, F at level 41, i, r at level 60,
            format "'[' \bigcup_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\bigcup_ ( i <- r ) F"
   (F at level 41,
@@ -302,7 +302,7 @@ Reserved Notation "\bigcap_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \bigcap_ i '/  '  F ']'").
 Reserved Notation "\bigcap_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 60,
+  (at level 41, F at level 41, i, r at level 60,
            format "'[' \bigcap_ ( i  <-  r  |  P )  F ']'").
 Reserved Notation "\bigcap_ ( i <- r ) F"
   (F at level 41,

@@ -161,17 +161,17 @@ Arguments hom _ _%_group_scope.
 Arguments iso _ _%_group_scope.
 
 Notation "H \homg 'Grp' p" := (hom H p)
-  (p at level 0, format "H  \homg  'Grp'  p") : group_scope.
+  (at level 70, p at level 0, format "H  \homg  'Grp'  p") : group_scope.
 
 Notation "H \isog 'Grp' p" := (iso H p)
-  (p at level 0, format "H  \isog  'Grp'  p") : group_scope.
+  (at level 70, p at level 0, format "H  \isog  'Grp'  p") : group_scope.
 
 Notation "H \homg 'Grp' ( x : p )" := (hom H (fun x => Cast p))
-  (x ident, p custom group_presentation at level 200,
+  (at level 70, x ident, p custom group_presentation at level 200,
    format "'[hv' H '/ '  \homg  'Grp'  ( x  :  p ) ']'") : group_scope.
 
 Notation "H \isog 'Grp' ( x : p )" := (iso H (fun x => Cast p))
-  (x ident, p custom group_presentation at level 200,
+  (at level 70, x ident, p custom group_presentation at level 200,
    format "'[hv' H '/ '  \isog  'Grp'  ( x  :  p ) ']'") : group_scope.
 
 Section PresentationTheory.
@@ -249,4 +249,3 @@ by apply/idP/idP=> [homHp|]; [apply: homGrp_trans homGp | apply: freeG].
 Qed.
 
 End PresentationTheory.
-
