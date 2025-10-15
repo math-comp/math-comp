@@ -80,8 +80,7 @@ apply: (iffP andP) => [[/ahom_inP[fM _] /subvP idKf] | [idKf fM]].
 split; last by apply/subvP=> x /idKf/fixedSpaceP.
 by apply/ahom_inP; split=> //; rewrite idKf ?mem1v.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `kHomP_tmp` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=kHomP_tmp)]
 Lemma kHomP {K V f} :
   reflect [/\ {in V &, forall x y, f (x * y) = f x * f y} &
            {in K, forall x, f x = x}]
@@ -101,8 +100,8 @@ Proof. by apply: andb_idr => /ahom_inP[_ f1]; apply/fixedSpaceP. Qed.
 Lemma kHom_monoid_morphism (f : 'End(L)) :
   reflect (monoid_morphism f) (kHom 1 {:L} f).
 Proof. by rewrite k1HomE; apply: ahomP_tmp. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `kHom_monoid_morphism` instead")]
+#[warning="-deprecated-reference-since-mathcomp-2.5.0",
+  deprecated(since="mathcomp 2.5.0", use=kHom_monoid_morphism)]
 Lemma kHom_lrmorphism (f : 'End(L)) : reflect (multiplicative f) (kHom 1 {:L} f).
 Proof. #[warning="-deprecated-since-mathcomp-2.5.0"] by rewrite k1HomE; apply: ahomP. Qed.
 
@@ -160,7 +159,7 @@ Let kHomf : subvs_of E -> L := f \o vsval.
 
 Lemma kHom_is_zmod_morphism : kHom K E f -> zmod_morphism kHomf.
 Proof. by case/kHomP_tmp => idKf fM; apply: raddfB. Qed.
-#[deprecated(since="mathcomp 2.5.0", note="use `kHom_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=kHom_is_zmod_morphism)]
 Definition kHom_is_additive := kHom_is_zmod_morphism.
 
 Lemma kHom_is_monoid_morphism : kHom K E f -> monoid_morphism kHomf.
@@ -168,7 +167,7 @@ Proof.
 case/kHomP_tmp=> idKf fM; rewrite /kHomf.
 by split=> [|a b] /=; [rewrite algid1 idKf // mem1v | rewrite /= fM ?subvsP].
 Qed.
-#[deprecated(since="mathcomp 2.5.0", note="use `kHom_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=kHom_is_monoid_morphism)]
 Definition kHom_is_multiplicative :=
   (fun p => (p.1, p.2)) \o kHom_is_monoid_morphism.
 
@@ -984,7 +983,7 @@ Fact galTrace_is_zmod_morphism : zmod_morphism (galTrace U V).
 Proof.
 by move=> a b /=; rewrite -sumrB; apply: eq_bigr => x _; rewrite rmorphB.
 Qed.
-#[deprecated(since="mathcomp 2.5.0", note="use `galTrace_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=galTrace_is_zmod_morphism)]
 Definition galTrace_is_additive := galTrace_is_zmod_morphism.
 HB.instance Definition _ := GRing.isZmodMorphism.Build L L (galTrace U V)
   galTrace_is_zmod_morphism.

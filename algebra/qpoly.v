@@ -587,8 +587,7 @@ Qed.
 
 Fact in_qpoly_monoid_morphism : monoid_morphism (in_qpoly h).
 Proof. by split; [ apply: in_qpoly1 | apply: in_qpolyM]. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `in_qpoly_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=in_qpoly_monoid_morphism)]
 Definition in_qpoly_is_multiplicative :=
   (fun g => (g.2,g.1)) in_qpoly_monoid_morphism.
 HB.instance Definition _ :=
@@ -645,14 +644,12 @@ Qed.
 
 Lemma qpolyC_is_zmod_morphism : zmod_morphism (qpolyC h).
 Proof. by move=> x y; rewrite qpolyCD qpolyCN. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `qpolyC_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=qpolyC_is_zmod_morphism)]
 Definition qpolyC_is_additive := qpolyC_is_zmod_morphism.
 
 Lemma qpolyC_is_monoid_morphism : monoid_morphism (qpolyC h).
 Proof. by split=> // x y; rewrite qpolyCM. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `qpolyC_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=qpolyC_is_monoid_morphism)]
 Definition qpolyC_is_multiplicative :=
   (fun g => (g.2,g.1)) qpolyC_is_monoid_morphism.
 
@@ -697,7 +694,7 @@ Proof. by []. Qed.
 
 End QRing.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar_qpoly instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar_qpoly)]
 Notation char_qpoly := (pchar_qpoly) (only parsing).
 
 Section Field.

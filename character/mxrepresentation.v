@@ -4685,81 +4685,67 @@ End LinearIrr.
 
 End FieldRepr.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use mx_Maschke_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=mx_Maschke_pchar)]
 Notation mx_Maschke := (mx_Maschke_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use rsim_regular_submod_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=rsim_regular_submod_pchar)]
 Notation rsim_regular_submod := (rsim_regular_submod_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use irr_mx_sum_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=irr_mx_sum_pchar)]
 Notation irr_mx_sum := (irr_mx_sum_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use Wedderburn_sum_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Wedderburn_sum_pchar)]
 Notation Wedderburn_sum := (Wedderburn_sum_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use Wedderburn_sum_id_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Wedderburn_sum_id_pchar)]
 Notation Wedderburn_sum_id := (Wedderburn_sum_id_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use Wedderburn_is_id_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Wedderburn_is_id_pchar)]
 Notation Wedderburn_is_id:= (Wedderburn_is_id_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use Wedderburn_closed_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Wedderburn_closed_pchar)]
 Notation Wedderburn_closed := (Wedderburn_closed_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use Wedderburn_is_ring_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Wedderburn_is_ring_pchar)]
 Notation Wedderburn_is_ring := (Wedderburn_is_ring_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use Wedderburn_min_ideal_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Wedderburn_min_ideal_pchar)]
 Notation Wedderburn_min_ideal := (Wedderburn_min_ideal_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use rsim_irr_comp_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=rsim_irr_comp_pchar)]
 Notation rsim_irr_comp := (rsim_irr_comp_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use irr_comp'_op0_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=irr_comp'_op0_pchar)]
 Notation irr_comp'_op0 := (irr_comp'_op0_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use irr_comp_envelop_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=irr_comp_envelop_pchar)]
 Notation irr_comp_envelop := (irr_comp_envelop_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use ker_irr_comp_op_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ker_irr_comp_op_pchar)]
 Notation ker_irr_comp_op := (ker_irr_comp_op_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use regular_op_inj_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=regular_op_inj_pchar)]
 Notation regular_op_inj := (regular_op_inj_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use rank_irr_comp_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=rank_irr_comp_pchar)]
 Notation rank_irr_comp := (rank_irr_comp_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use irr_comp_rsim_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=irr_comp_rsim_pchar)]
 Notation irr_comp_rsim := (irr_comp_rsim_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use irr_reprK_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=irr_reprK_pchar)]
 Notation irr_reprK := (irr_reprK_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use irr_repr'_op0_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=irr_repr'_op0_pchar)]
 Notation irr_repr'_op0 := (irr_repr'_op0_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use op_Wedderburn_id_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=op_Wedderburn_id_pchar)]
 Notation op_Wedderburn_id := (op_Wedderburn_id_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use irr_comp_id_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=irr_comp_id_pchar)]
 Notation irr_comp_id := (irr_comp_id_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use rank_Wedderburn_subring_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=rank_Wedderburn_subring_pchar)]
 Notation rank_Wedderburn_subring := (rank_Wedderburn_subring_pchar)
   (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use sum_irr_degree_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=sum_irr_degree_pchar)]
 Notation sum_irr_degree := (sum_irr_degree_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use irr_mx_mult_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=irr_mx_mult_pchar)]
 Notation irr_mx_mult := (irr_mx_mult_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use mxtrace_regular_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=mxtrace_regular_pchar)]
 Notation mxtrace_regular := (mxtrace_regular_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use linear_irr_comp_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=linear_irr_comp_pchar)]
 Notation linear_irr_comp := (linear_irr_comp_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use Wedderburn_subring_center_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Wedderburn_subring_center_pchar)]
 Notation Wedderburn_subring_center := (Wedderburn_subring_center_pchar)
   (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use Wedderburn_center_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Wedderburn_center_pchar)]
 Notation Wedderburn_center := (Wedderburn_center_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use card_irr_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=card_irr_pchar)]
 Notation card_irr := (card_irr_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use cycle_repr_structure_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=cycle_repr_structure_pchar)]
 Notation cycle_repr_structure := (cycle_repr_structure_pchar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-  note="Use splitting_cyclic_primitive_root_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=splitting_cyclic_primitive_root_pchar)]
 Notation splitting_cyclic_primitive_root :=
   (splitting_cyclic_primitive_root_pchar) (only parsing).
 
@@ -5259,8 +5245,7 @@ Proof. exact: mxval_genM. Qed.
 
 Lemma mxval_is_zmod_morphism : zmod_morphism mxval.
 Proof. by move=> x y; rewrite mxvalD mxvalN. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `mxval_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=mxval_is_zmod_morphism)]
 Definition mxval_sub := mxval_is_zmod_morphism.
 
 #[export] HB.instance Definition _ :=
@@ -5268,8 +5253,7 @@ Definition mxval_sub := mxval_is_zmod_morphism.
 
 Lemma mxval_is_monoid_morphism : monoid_morphism mxval.
 Proof. by split; [apply: mxval1 | apply: mxvalM]. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `mxval_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=mxval_is_monoid_morphism)]
 Definition mxval_is_multiplicative :=
   (fun g => (g.2,g.1)) mxval_is_monoid_morphism.
 
@@ -5301,14 +5285,12 @@ Proof. exact: mxval_genV. Qed.
 
 Lemma gen_is_zmod_morphism : zmod_morphism gen.
 Proof. by move=> x y; apply: mxval_inj; rewrite genK !rmorphB /= !genK. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `gen_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=gen_is_zmod_morphism)]
 Definition gen_is_additive := gen_is_zmod_morphism.
 
 Lemma gen_is_monoid_morphism : monoid_morphism gen.
 Proof. by split=> // x y; apply: mxval_inj; rewrite genK !rmorphM /= !genK. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `gen_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=gen_is_monoid_morphism)]
 Definition gen_is_multiplicative :=
   (fun g => (g.2,g.1)) gen_is_monoid_morphism.
 

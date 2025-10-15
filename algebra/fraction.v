@@ -296,7 +296,7 @@ rewrite -[X in _ = _ + X]pi_opp -[RHS]pi_add.
 by rewrite /addf /oppf /= !numden_Ratio ?(oner_neq0, mul1r, mulr1).
 Qed.
 #[deprecated(since="mathcomp 2.5.0",
-      note="use `tofrac_is_zmod_morphism` instead")]
+      use=tofrac_is_zmod_morphism)]
 Definition tofrac_is_additive := tofrac_is_zmod_morphism.
 
 HB.instance Definition _ := GRing.isZmodMorphism.Build R {fraction R} tofrac
@@ -308,7 +308,7 @@ split=> [//|p q]; unlock tofrac; rewrite -[RHS]pi_mul.
 by rewrite /mulf /= !numden_Ratio ?(oner_neq0, mul1r, mulr1).
 Qed.
 #[deprecated(since="mathcomp 2.5.0",
-      note="use `tofrac_is_monoid_morphism` instead")]
+      use=tofrac_is_monoid_morphism)]
 Definition tofrac_is_multiplicative := tofrac_is_monoid_morphism.
 
 HB.instance Definition _ := GRing.isMonoidMorphism.Build R {fraction R} tofrac

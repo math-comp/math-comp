@@ -152,7 +152,7 @@ Lemma poly_rV_is_semilinear : semilinear poly_rV.
 Proof. by split=> [a p|p q]; apply/rowP=> i; rewrite !mxE (coefZ, coefD). Qed.
 HB.instance Definition _ := GRing.isSemilinear.Build R {poly R} 'rV_d _ poly_rV
   poly_rV_is_semilinear.
-#[deprecated(since="mathcomp 2.5.0", note="Use linearP instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Lemma poly_rV_is_linear : linear poly_rV. Proof. exact: linearP. Qed.
 
 Lemma rVpoly_is_semilinear : semilinear rVpoly.
@@ -163,7 +163,7 @@ by case: insubP=> [i _ _|_]; rewrite ?mxE ?addr0.
 Qed.
 HB.instance Definition _ := GRing.isSemilinear.Build R 'rV_d {poly R} _ rVpoly
   rVpoly_is_semilinear.
-#[deprecated(since="mathcomp 2.5.0", note="Use linearP instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Lemma rvPoly_is_linear : linear rVpoly. Proof. exact: linearP. Qed.
 
 End RowPoly.

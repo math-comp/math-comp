@@ -158,6 +158,6 @@ end
 
 cytoscape()
 
--- $COQBIN/coqdep -R . mathcomp */*.v | grep -v vio: > depend
+-- $ROCQBIN/coqdep -R . mathcomp */*.v | grep -v vio: > depend
 --   cat depend | ./graph.lua dot | tee depend.dot | dot -T png -o depend.png
 --   cat depend | ./graph.lua cytoscape `git show release/1.6:mathcomp/Make | grep 'v *$' | cut -d / -f 2 | cut -d . -f 1` > depend.js

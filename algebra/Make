@@ -39,7 +39,3 @@ spectral.v
 -arg -w -arg -redundant-canonical-projection
 -arg -w -arg -notation-overridden
 -arg -w -arg -ambiguous-paths
-# handle the following one when requiring Rocq >= 9.0
--arg -w -arg -deprecated-from-Coq
-# remove this one when requiring Rocq >= 9.0
--arg -w -arg -overwriting-delimiting-key

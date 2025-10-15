@@ -923,13 +923,11 @@ HB.factory Record NumDomain_hasTruncn R of Num.NumDomain R := {
   intrE : forall x, int_num x = nat_num x || nat_num (- x);
 }.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NumDomain_hasTruncn instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NumDomain_hasTruncn)]
 Notation NumDomain_isArchimedean R := (NumDomain_hasTruncn R) (only parsing).
 
 Module NumDomain_isArchimedean.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NumDomain_hasTruncn.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NumDomain_hasTruncn.Build)]
 Notation Build T U := (NumDomain_hasTruncn.Build T U) (only parsing).
 End NumDomain_isArchimedean.
 
@@ -1037,44 +1035,39 @@ Module Exports. HB.reexport. End Exports.
 Notation nat := nat_num.
 Notation int := int_num.
 
-#[deprecated(since="mathcomp 2.3.0", note="Use Num.ArchiRealDomain instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealDomain)]
 Notation ArchiDomain T := (ArchiRealDomain T).
 Module ArchiDomain.
-#[deprecated(since="mathcomp 2.3.0",
-  note="Use Num.ArchiRealDomain.type instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealDomain.type)]
 Notation type := ArchiRealDomain.type.
-#[deprecated(since="mathcomp 2.3.0",
-  note="Use Num.ArchiRealDomain.copy instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealDomain.copy)]
 Notation copy T C := (ArchiRealDomain.copy T C).
-#[deprecated(since="mathcomp 2.3.0",
-  note="Use Num.ArchiRealDomain.on instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealDomain.on)]
 Notation on T := (ArchiRealDomain.on T).
 End ArchiDomain.
-#[deprecated(since="mathcomp 2.3.0", note="Use Num.ArchiRealField instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealField)]
 Notation ArchiField T := (ArchiRealField T).
 Module ArchiField.
-#[deprecated(since="mathcomp 2.3.0",
-  note="Use Num.ArchiRealField.type instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealField.type)]
 Notation type := ArchiRealField.type.
-#[deprecated(since="mathcomp 2.3.0",
-  note="Use Num.ArchiRealField.copy instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealField.copy)]
 Notation copy T C := (ArchiRealField.copy T C).
-#[deprecated(since="mathcomp 2.3.0", note="Use Num.ArchiRealField.on instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealField.on)]
 Notation on T := (ArchiRealField.on T).
 End ArchiField.
 
-#[deprecated(since="mathcomp 2.3.0", note="Use real_floorDzr instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=real_floorDzr)]
 Notation floorD := real_floorDzr.
-#[deprecated(since="mathcomp 2.3.0", note="Use real_ceilDzr instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=real_ceilDzr)]
 Notation ceilD := real_ceilDzr.
-#[deprecated(since="mathcomp 2.3.0", note="Use real_ceilDzr instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=real_ceilDzr)]
 Notation real_ceilD := real_ceilDzr.
 
 End Num.
 
 Export Num.Exports.
 
-#[deprecated(since="mathcomp 2.3.0", note="Use archiRealDomainType instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=archiRealDomainType)]
 Notation archiDomainType := archiRealDomainType (only parsing).
-#[deprecated(since="mathcomp 2.3.0", note="Use archiRealFieldType instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=archiRealFieldType)]
 Notation archiFieldType := archiRealFieldType (only parsing).

@@ -141,8 +141,7 @@ Proof.
 split=> [|phi psi]; first exact: cfConjg_cfun1.
 by apply/cfunP=> x; rewrite !cfunElock.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `cfConjg_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=cfConjg_is_monoid_morphism)]
 Definition cfConjg_is_multiplicative y :=
   (fun g => (g.2,g.1)) (cfConjg_is_monoid_morphism y).
 HB.instance Definition _ y := GRing.isMonoidMorphism.Build _ _ (cfConjg y)

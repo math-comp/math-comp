@@ -10,8 +10,7 @@ license: "CECILL-B"
 build: [ make "-C" "boot" "-j" "%{jobs}%" ]
 install: [ make "-C" "boot" "install" ]
 depends: [
-  ("coq" {>= "8.20" & < "8.21~"}
-  | "rocq-core" {>= "9.0" | = "dev"})
+  "rocq-core" {>= "9.0" | = "dev"}
   # Please keep the "dev" above as it is required for the coq-dev Docker images
   "elpi" {>= "1.17.0"}
   "rocq-hierarchy-builder" {>= "1.9.0"}

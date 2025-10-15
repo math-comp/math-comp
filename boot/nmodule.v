@@ -658,7 +658,7 @@ Arguments oppr_inj {V} [x1 x2].
 
 Definition nmod_morphism (U V : baseAddUMagmaType) (f : U -> V) : Prop :=
   (f 0 = 0) * {morph f : x y / x + y}.
-#[deprecated(since="mathcomp 2.5.0", note="use `nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=nmod_morphism)]
 Definition semi_additive := nmod_morphism.
 
 HB.mixin Record isNmodMorphism (U V : baseAddUMagmaType) (apply : U -> V) := {
@@ -666,8 +666,7 @@ HB.mixin Record isNmodMorphism (U V : baseAddUMagmaType) (apply : U -> V) := {
 }.
 
 Module isSemiAdditive.
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use isNmodMorphism.Build instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=isNmodMorphism.Build)]
 Notation Build U V apply := (isNmodMorphism.Build U V apply) (only parsing).
 End isSemiAdditive.
 
@@ -678,7 +677,7 @@ HB.structure Definition Additive (U V : baseAddUMagmaType) :=
 Definition zmod_morphism (U V : zmodType) (f : U -> V) :=
   {morph f : x y / x - y}.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=zmod_morphism)]
 Definition additive := zmod_morphism.
 
 HB.factory Record isZmodMorphism (U V : zmodType) (apply : U -> V) := {
@@ -686,8 +685,7 @@ HB.factory Record isZmodMorphism (U V : zmodType) (apply : U -> V) := {
 }.
 
 Module isAdditive.
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use isZmodMorphism.Build instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=isZmodMorphism.Build)]
 Notation Build U V apply := (isZmodMorphism.Build U V apply) (only parsing).
 End isAdditive.
 
@@ -779,7 +777,7 @@ split; first exact/(@can2_gmulf1 _ _ g).
 exact/(@can2_gmulfM _ _ g).
 Qed.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `can2_nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=can2_nmod_morphism)]
 Definition can2_semi_additive := can2_nmod_morphism.
 
 End Nmod.
@@ -803,8 +801,7 @@ Proof. exact: (@gmulfXVn _ _ g). Qed.
 Lemma can2_zmod_morphism f' : cancel f f' -> cancel f' f -> zmod_morphism f'.
 Proof. by move=> fK f'K x y /=; apply: (canLR fK); rewrite raddfB !f'K. Qed.
 
-#[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `can2_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=can2_zmod_morphism)]
 Definition can2_additive := can2_zmod_morphism.
 End Zmod.
 

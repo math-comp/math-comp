@@ -3793,7 +3793,7 @@ Context {disp : disp_t} {L : ctbDistrLatticeType disp}.
 Implicit Types (x y z : L).
 
 Lemma complEdiff x : ~` x = \top `\` x. Proof. exact: complEdiff. Qed.
-#[deprecated(since="mathcomp 2.3.0", note="Use complEdiff instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=complEdiff)]
 Notation complE := complEdiff.
 
 Lemma complEcodiff x : ~` x = codiff \bot x. Proof. exact: complEcodiff. Qed.
@@ -4163,13 +4163,12 @@ HB.factory Record BDistrLattice_hasSectionalComplement d T
 
 Module hasRelativeComplement.
 #[deprecated(since="mathcomp 2.3.0",
-             note="Use BDistrLattice_hasSectionalComplement.Build instead.")]
+  use=BDistrLattice_hasSectionalComplement.Build)]
 Notation Build d T :=
   (BDistrLattice_hasSectionalComplement.Build d T) (only parsing).
 End hasRelativeComplement.
 
-#[deprecated(since="mathcomp 2.3.0",
-             note="Use BDistrLattice_hasSectionalComplement instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=BDistrLattice_hasSectionalComplement)]
 Notation hasRelativeComplement d T :=
   (BDistrLattice_hasSectionalComplement d T) (only parsing).
 
@@ -4229,13 +4228,11 @@ HB.factory Record CBDistrLattice_hasComplement d T
 }.
 
 Module hasComplement.
-#[deprecated(since="mathcomp 2.3.0",
-             note="Use CBDistrLattice_hasComplement.Build instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=CBDistrLattice_hasComplement.Build)]
 Notation Build d T := (CBDistrLattice_hasComplement.Build d T) (only parsing).
 End hasComplement.
 
-#[deprecated(since="mathcomp 2.3.0",
-             note="Use CBDistrLattice_hasComplement instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=CBDistrLattice_hasComplement)]
 Notation hasComplement d T := (CBDistrLattice_hasComplement d T) (only parsing).
 
 HB.builders Context d T of CBDistrLattice_hasComplement d T.

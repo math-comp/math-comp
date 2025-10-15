@@ -27,7 +27,7 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   ## select an entry to build in the following `bundles` set
   ## defaults to "default"
-  default-bundle = "rocq-9.0";
+  default-bundle = "rocq-9.1";
 
   ## write one `bundles.name` attribute set per
   ## alternative configuration, the can be used to
@@ -128,15 +128,5 @@ with builtins; with (import <nixpkgs> {}).lib;
       mathcomp-warnings.job = true;
       odd-order.job = false;  # odd-order dropped support for 9.0
     }; };
-    "coq-8.20".coqPackages = common-bundles // {
-      coq.override.version = "8.20";
-      coq-elpi.override.version = "2.5.0";  # required by CoqEAL
-      coq-elpi.override.elpi-version = "2.0.7";
-      odd-order.job = false;  # odd-order dropped support for 8.20
-      mathcomp-real-closed.job = false;  # real-closed dropped support for 8.20
-      coqeal.job = false;  # real-closed dropped support for 8.20
-      mathcomp-abel.job = false;  # real-closed dropped support for 8.20
-      mathcomp-apery.job = false;  # real-closed dropped support for 8.20
-    };
   };
 }

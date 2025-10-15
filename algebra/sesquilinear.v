@@ -1027,9 +1027,9 @@ Definition is_unitary := nondegenerate /\ (is_hermsym form).
 
 End HermitianFinVectTheory.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use is_psymplectic instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=is_psymplectic)]
 Notation is_symplectic := is_psymplectic (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use is_porthogonal instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=is_porthogonal)]
 Notation is_orthogonal := is_porthogonal (only parsing).
 
 Arguments orthogonalP {F eps theta vT form us vs}.

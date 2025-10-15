@@ -78,8 +78,7 @@ Proof. by rewrite swapXY_polyC map_polyX. Qed.
 
 Lemma swapXY_is_zmod_morphism : zmod_morphism swapXY.
 Proof. by move=> u v; rewrite unlock rmorphB !hornerE. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `swapXY_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=swapXY_is_zmod_morphism)]
 Definition swapXY_is_additive := swapXY_is_zmod_morphism.
 HB.instance Definition _ :=
   GRing.isZmodMorphism.Build {poly {poly R}} {poly {poly R}} swapXY
@@ -110,8 +109,7 @@ rewrite (eq_bigr _ (fun _ _ => coefM _ _ _)) exchange_big /=.
 apply: eq_bigr => j1 _; rewrite coefM; apply: eq_bigr=> i1 _.
 by rewrite !coef_swapXY.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `swapXY_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=swapXY_is_monoid_morphism)]
 Definition swapXY_is_multiplicative :=
   (fun g => (g.2,g.1)) swapXY_is_monoid_morphism.
 HB.instance Definition _ :=
