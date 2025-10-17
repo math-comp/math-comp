@@ -88,6 +88,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       bignums.override.version = "master";
       rocq-elpi.override.version = "master";
       hierarchy-builder.override.version = "master";
+      micromega-plugin.override.version = "master";
       mathcomp.job = false;
     }; coqPackages = common-bundles // {
       coq.override.version = "master";
