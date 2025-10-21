@@ -1447,6 +1447,8 @@ Lemma doubleS n : n.+1.*2 = n.*2.+2. Proof. by []. Qed.
 
 Lemma double_pred n : n.-1.*2 = n.*2.-2. Proof. by case: n. Qed.
 
+Lemma predn_doubleS n : n.+1.*2.-1 = n.*2.+1. Proof. by []. Qed.
+
 Lemma addnn n : n + n = n.*2.
 Proof. by apply: eqP; elim: n => // n IHn; rewrite addnS. Qed.
 
@@ -1488,6 +1490,12 @@ Proof. by rewrite -!mul2n mulnA. Qed.
 
 Lemma doubleMr m n : (m * n).*2 = m * n.*2.
 Proof. by rewrite -!muln2 mulnA. Qed.
+
+Lemma neq_doubleS_double n m : (n.*2.+1 == m.*2) = false.
+Proof.
+case: (leqP m n) => mn; apply/negbTE; rewrite neq_ltn ?ltn_Sdouble ?mn//.
+by rewrite ltnS leq_double mn orbT.
+Qed.
 
 (* Halving. *)
 

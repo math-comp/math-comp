@@ -12,6 +12,7 @@ install: [ make "-C" "algebra" "install" ]
 depends: [
   "rocq-mathcomp-order" { = version }
   "rocq-mathcomp-fingroup" { = version }
+  "rocq-micromega-plugin" { = "9.0" }
 ]
 
 tags: [
