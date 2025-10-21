@@ -2841,6 +2841,9 @@ HB.instance Definition _ := GRing.Nmodule_isPzSemiRing.Build 'M[R]_n
   (@mulmxA n n n n) (@mul1mx n n) (@mulmx1 n n)
   (@mulmxDl n n n) (@mulmxDr n n n) (@mul0mx n n n) (@mulmx0 n n n).
 
+HB.instance Definition _ :=
+  GRing.LSemiModule_isLSemiAlgebra.Build R 'M[R]_n (@scalemxAl n n n).
+
 Lemma mulmxE : mulmx = *%R. Proof. by []. Qed.
 Lemma idmxE : 1%:M = 1 :> 'M_n. Proof. by []. Qed.
 
@@ -3022,9 +3025,6 @@ Proof. by apply/eqP=> /matrixP/(_ 0 0)/eqP; rewrite !mxE oner_eq0. Qed.
 
 HB.instance Definition _ :=
   GRing.PzSemiRing_isNonZero.Build 'M[R]_n matrix_nonzero1.
-
-HB.instance Definition _ :=
-  GRing.LSemiModule_isLSemiAlgebra.Build R 'M[R]_n (@scalemxAl R n n n).
 
 End MatrixNzSemiRing.
 
@@ -3297,6 +3297,21 @@ Lemma mul_mx_scalar m n a (A : 'M[R]_(m, n)) : A *m a%:M = a *: A.
 Proof. by rewrite scalar_mxC mul_scalar_mx. Qed.
 
 End ComMatrix.
+
+HB.instance Definition _ (R : comPzSemiRingType) (n : nat) :=
+  GRing.LSemiAlgebra_isSemiAlgebra.Build R 'M[R]_n (fun k => scalemxAr k).
+
+HB.instance Definition _ (R : comPzRingType) (n : nat) :=
+  GRing.PzSemiAlgebra.on 'M[R]_n.
+
+HB.instance Definition _ (R : comNzSemiRingType) (n' : nat) :=
+  GRing.PzSemiAlgebra.on 'M[R]_n'.+1.
+
+HB.instance Definition _ (R : comNzRingType) (n' : nat) :=
+  GRing.PzAlgebra.on 'M[R]_n'.+1.
+
+HB.instance Definition _ (R : finComNzRingType) (n' : nat) :=
+  [Finite of 'M[R]_n'.+1 by <:].
 
 Arguments lin_mulmx {R m n p} A.
 Arguments lin_mul_row {R m n} u.
@@ -3673,15 +3688,6 @@ End ComMatrix.
 
 Arguments lin_mul_row {R m n} u.
 Arguments lin_mulmx {R m n p} A.
-
-HB.instance Definition _ (R : comNzSemiRingType) n :=
-  GRing.LSemiAlgebra_isSemiAlgebra.Build R 'M[R]_n.+1 (fun k => scalemxAr k).
-
-HB.instance Definition _ (R : comNzRingType) (n' : nat) :=
-  GRing.LSemiAlgebra.on 'M[R]_n'.+1.
-
-HB.instance Definition _ (R : finComNzRingType) (n' : nat) :=
-  [Finite of 'M[R]_n'.+1 by <:].
 
 (* Only tall matrices have inverses. *)
 Lemma mulmx1_min (R : comNzRingType) m n (A : 'M[R]_(m, n)) B :
