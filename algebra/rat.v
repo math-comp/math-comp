@@ -863,7 +863,7 @@ End Fmorph.
 
 Section Linear.
 
-Implicit Types (U V : lmodType rat) (A B : lalgType rat).
+Implicit Types (U V : lmodType rat).
 
 Lemma rat_linear U V (f : U -> V) : zmod_morphism f -> scalable f.
 Proof.
