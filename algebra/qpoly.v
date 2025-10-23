@@ -680,11 +680,11 @@ Proof. by apply/val_eqP; rewrite /= -scalerAl rmodpZ // monic_mk_monic. Qed.
 Fact qpoly_scaleAr a p q : qpoly_scale a (p * q) = p * (qpoly_scale a q).
 Proof. by apply/val_eqP; rewrite /= -scalerAr rmodpZ // monic_mk_monic. Qed.
 
-HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build A {poly__ A}
+HB.instance Definition _ := GRing.LSemiModule_isLSemiAlgebra.Build A {poly__ A}
   qpoly_scaleAl.
 HB.instance Definition _ := GRing.NzLalgebra.on {poly %/ h}.
 
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build A {poly__ A}
+HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build A {poly__ A}
   qpoly_scaleAr.
 HB.instance Definition _ := GRing.NzAlgebra.on {poly %/ h}.
 
