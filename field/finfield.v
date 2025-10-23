@@ -255,16 +255,16 @@ Proof. by move=> a b; rewrite /pprimeChar_scale natrFp natrD mulrDl. Qed.
 HB.instance Definition _ := GRing.Zmodule_isLmodule.Build 'F_p R
   pprimeChar_scaleA pprimeChar_scale1 pprimeChar_scaleDr pprimeChar_scaleDl.
 
-Lemma pprimeChar_scaleAl (a : 'F_p) (u v : R) :  a *: (u * v) = (a *: u) * v.
+Lemma pprimeChar_scaleAl (a : 'F_p) (u v : R) : a *: (u * v) = (a *: u) * v.
 Proof. by apply: mulrA. Qed.
 
-HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build 'F_p R
+HB.instance Definition _ := GRing.LSemiModule_isLSemiAlgebra.Build 'F_p R
   pprimeChar_scaleAl.
 
 Lemma pprimeChar_scaleAr (a : 'F_p) (x y : R) : a *: (x * y) = x * (a *: y).
 Proof. by rewrite ![a *: _]mulr_natl mulrnAr. Qed.
 
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build 'F_p R
+HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build 'F_p R
   pprimeChar_scaleAr.
 
 End PrimeCharRing.
@@ -725,7 +725,7 @@ by rewrite -[aq d]expr1 -exprB ?leq_b1 ?unitfE ?rpredX.
 Qed.
 
 Definition FinDomainFieldType : finFieldType :=
- let cC := GRing.PzRing_hasCommutativeMul.Build R finDomain_mulrC in
+ let cC := GRing.SemiRing_hasCommutativeMul.Build R finDomain_mulrC in
  let cR : comUnitRingType := HB.pack R cC in
  let iC := GRing.ComUnitRing_isIntegral.Build cR domR in
  let iR : finIdomainType := HB.pack cR iC in
