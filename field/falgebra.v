@@ -98,7 +98,7 @@ Notation FalgType := falgType.
 
 (* Supply a default unitRing mixin for the default unitAlgType base type. *)
 HB.factory Record Algebra_isFalgebra (K : fieldType) A
-           of Vector K A & GRing.Algebra K A := {}.
+           of Vector K A & GRing.NzAlgebra K A := {}.
 
 HB.builders Context K A of Algebra_isFalgebra K A.
   Let vA : Vector.type K := A.
@@ -167,7 +167,7 @@ Section FalgLfun.
 Variable (R : comNzRingType) (aT : falgType R).
 Implicit Types f g : 'End(aT).
 
-HB.instance Definition _ := GRing.Algebra.copy 'End(aT)
+HB.instance Definition _ := GRing.NzAlgebra.copy 'End(aT)
   (lfun_algType (FalgType_proper aT)).
 
 Lemma lfun_mulE f g u : (f * g) u = g (f u). Proof. exact: lfunE. Qed.
@@ -958,22 +958,22 @@ Proof. by move=> x; apply/val_inj/algidl/(valP x). Qed.
 Fact subvs_mul1 : right_id subvs_one subvs_mul.
 Proof. by move=> x; apply/val_inj/algidr/(valP x). Qed.
 Fact subvs_mulDl : left_distributive subvs_mul +%R.
-Proof. move=> x y z; apply/val_inj/mulrDl. Qed.
+Proof. by move=> x y z; apply/val_inj/mulrDl. Qed.
 Fact subvs_mulDr : right_distributive subvs_mul +%R.
-Proof. move=> x y z; apply/val_inj/mulrDr. Qed.
+Proof. by move=> x y z; apply/val_inj/mulrDr. Qed.
 
 HB.instance Definition _ := GRing.Zmodule_isNzRing.Build (subvs_of A)
   subvs_mulA subvs_mu1l subvs_mul1 subvs_mulDl subvs_mulDr (algid_neq0 _).
 
 Lemma subvs_scaleAl k (x y : subvs_of A) : k *: (x * y) = (k *: x) * y.
 Proof. exact/val_inj/scalerAl. Qed.
-HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build K (subvs_of A)
-  subvs_scaleAl.
+HB.instance Definition _ :=
+  GRing.LSemiModule_isLSemiAlgebra.Build K (subvs_of A) subvs_scaleAl.
 
 Lemma subvs_scaleAr k (x y : subvs_of A) : k *: (x * y) = x * (k *: y).
 Proof. exact/val_inj/scalerAr. Qed.
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build K (subvs_of A)
-  subvs_scaleAr.
+HB.instance Definition _ :=
+  GRing.LSemiAlgebra_isSemiAlgebra.Build K (subvs_of A) subvs_scaleAr.
 
 HB.instance Definition _ := Algebra_isFalgebra.Build K (subvs_of A).
 
