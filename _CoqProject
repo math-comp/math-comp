@@ -15,3 +15,4 @@
 -arg -w -arg -mathcomp-subset-itv
 # introduced in Rocq 9.2
 -arg -w -arg +level-tolerance
+-arg -w -arg -notation-for-abbreviation
