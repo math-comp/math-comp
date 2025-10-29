@@ -1685,7 +1685,7 @@ case: ifP => [isoG | _] in cG * => [_ _ /=|].
   case: leqP isoM => // n_gt3 [//|isoMy isoMxy defX].
   have n1_gt2: n.-1 > 2 by rewrite -(subnKC n_gt3).
   by split=> //; apply/quaternion_classP; exists n.-1.
-do [case: ifP => [isoG | _]; last by case: ifP] in cG * => /= _; move/eqnP=> oy.
+(do [case: ifP => [isoG | _]; last by case: ifP] in cG * ) => /= _ /eqnP oy.
 case/andP: isoG => n_gt3 isoG; rewrite (leqNgt n) (ltnW n_gt3) /=.
 have n1_gt2: n.-1 > 2 by rewrite -(subnKC n_gt3).
 have:= semidihedral_structure n_gt3 genG isoG oy.
