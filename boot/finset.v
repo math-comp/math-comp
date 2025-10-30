@@ -2167,7 +2167,7 @@ Proof.
 case/and3P => /eqP covP trivP set0P BD0 disSD.
 rewrite /partition !inE (negbTE set0P) orbF [_ == B]eq_sym BD0 andbT.
 rewrite /cover bigcup_setU /= big_set1 -covP eqxx /=.
-by move: disSD; rewrite -covP=> /bigcup_disjointP/trivIsetU1 => -[].
+by move: disSD; rewrite -covP => /bigcup_disjointP/trivIsetU1 => -[].
 Qed.
 
 Lemma partition_set0 P : partition P set0 = (P == set0).

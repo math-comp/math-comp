@@ -1399,7 +1399,7 @@ case: (set_0Vmem (D :&: Ha)) => [Da0 | [a /setIP[Da NHa]]].
 have Na := subsetP (coset_norm _) _ NHa.
 have NDa: a \in 'N_D(H) by rewrite inE Da.
 rewrite -(coset_mem NHa) !modactEcond //.
-do 2![case: ifP]=> Cy Cx // eqxy; first exact: act_inj eqxy.
+do 2![case: ifP] => Cy Cx // eqxy; first exact: act_inj eqxy.
   by rewrite -eqxy acts_dom ?Cx in Cy.
 by rewrite eqxy acts_dom ?Cy in Cx.
 Qed.

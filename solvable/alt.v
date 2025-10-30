@@ -441,7 +441,7 @@ have:= prim_trans_norm F11; case/(_ K) => //= => Ksub; last first.
   by rewrite /= -F14 -[Gx]HH2 (mulSGid F8).
 have F14: [faithful Gx, on [set~ x] | 'P].
   apply: subset_trans (aperm_faithful 'Sym_T); rewrite subsetI subsetT.
-  apply/subsetP=> g; do 2![case/setIP]=> _ cgx cgx'; apply/astabP=> z _ /=.
+  apply/subsetP=> g; do 2![case/setIP] => _ cgx cgx'; apply/astabP=> z _ /=.
   case: (z =P x) => [->|]; first exact: (astab1P cgx).
   by move/eqP=> zx; rewrite [_ g](astabP cgx') ?inE.
 have Hreg g z: g \in H -> g z = z -> g = 1.

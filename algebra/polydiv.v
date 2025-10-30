@@ -2274,7 +2274,7 @@ have gn0 : gcdp p q != 0.
 have sp' : size (p %/ (gcdp p q)) <= k.
   rewrite size_divp ?sgp // leq_subLR (leq_trans hs) // -add1n leq_add2r -subn1.
   by rewrite ltn_subRL add1n ltn_neqAle eq_sym [_ == _]cop size_poly_gt0 gn0.
-case (ihk _ sp')=> r' dr'p'; first rewrite p'n0 orbF=> cr'q maxr'.
+case: (ihk _ sp') => r' dr'p'; rewrite p'n0 orbF => cr'q maxr'.
 constructor=> //=; rewrite ?(negPf p0) ?orbF //.
   exact/(dvdp_trans dr'p')/divp_dvd/dvdp_gcdl.
 move=> d dp cdq; apply: maxr'; last by rewrite cdq.
