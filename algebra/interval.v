@@ -208,49 +208,49 @@ Lemma gt_pinfty b : (+oo < b) = false. Proof. by []. Qed.
 Lemma lt_ninfty b : (b < -oo) = false. Proof. by case: b => // -[]. Qed.
 
 Lemma ltBSide x y (b b' : bool) :
-  BSide b x < BSide b' y = (x < y ?<= if b && ~~ b').
+  (BSide b x < BSide b' y) = (x < y ?<= if b && ~~ b').
 Proof. by []. Qed.
 
 Lemma leBSide x y (b b' : bool) :
-  BSide b x <= BSide b' y = (x < y ?<= if b' ==> b).
+  (BSide b x <= BSide b' y) = (x < y ?<= if b' ==> b).
 Proof. by []. Qed.
 
 Definition lteBSide := (ltBSide, leBSide).
 
-Lemma ltBRight_leBLeft b x : b < BRight x = (b <= BLeft x).
+Lemma ltBRight_leBLeft b x : (b < BRight x) = (b <= BLeft x).
 Proof. by move: b => [[] b|[]]. Qed.
-Lemma leBRight_ltBLeft b x : BRight x <= b = (BLeft x < b).
+Lemma leBRight_ltBLeft b x : (BRight x <= b) = (BLeft x < b).
 Proof. by move: b => [[] b|[]]. Qed.
 
-Let BLeft_ltE x y (b : bool) : BSide b x < BLeft y = (x < y).
+Let BLeft_ltE x y (b : bool) : (BSide b x < BLeft y) = (x < y).
 Proof. by case: b. Qed.
-Let BRight_leE x y (b : bool) : BSide b x <= BRight y = (x <= y).
+Let BRight_leE x y (b : bool) : (BSide b x <= BRight y) = (x <= y).
 Proof. by case: b. Qed.
-Let BRight_BLeft_leE x y : BRight x <= BLeft y = (x < y).
+Let BRight_BLeft_leE x y : (BRight x <= BLeft y) = (x < y).
 Proof. by []. Qed.
-Let BLeft_BRight_ltE x y : BLeft x < BRight y = (x <= y).
+Let BLeft_BRight_ltE x y : (BLeft x < BRight y) = (x <= y).
 Proof. by []. Qed.
-Let BRight_BSide_ltE x y (b : bool) : BRight x < BSide b y = (x < y).
+Let BRight_BSide_ltE x y (b : bool) : (BRight x < BSide b y) = (x < y).
 Proof. by case: b. Qed.
-Let BLeft_BSide_leE x y (b : bool) : BLeft x <= BSide b y = (x <= y).
+Let BLeft_BSide_leE x y (b : bool) : (BLeft x <= BSide b y) = (x <= y).
 Proof. by case: b. Qed.
-Let BSide_ltE x y (b : bool) : BSide b x < BSide b y = (x < y).
+Let BSide_ltE x y (b : bool) : (BSide b x < BSide b y) = (x < y).
 Proof. by case: b. Qed.
-Let BSide_leE x y (b : bool) : BSide b x <= BSide b y = (x <= y).
+Let BSide_leE x y (b : bool) : (BSide b x <= BSide b y) = (x <= y).
 Proof. by case: b. Qed.
 Let BInfty_leE a : a <= BInfty T false. Proof. by case: a => [[] a|[]]. Qed.
 Let BInfty_geE a : BInfty T true <= a. Proof. by case: a => [[] a|[]]. Qed.
-Let BInfty_le_eqE a : BInfty T false <= a = (a == BInfty T false).
+Let BInfty_le_eqE a : (BInfty T false <= a) = (a == BInfty T false).
 Proof. by case: a => [[] a|[]]. Qed.
-Let BInfty_ge_eqE a : a <= BInfty T true = (a == BInfty T true).
+Let BInfty_ge_eqE a : (a <= BInfty T true) = (a == BInfty T true).
 Proof. by case: a => [[] a|[]]. Qed.
-Let BInfty_ltE a : a < BInfty T false = (a != BInfty T false).
+Let BInfty_ltE a : (a < BInfty T false) = (a != BInfty T false).
 Proof. by case: a => [[] a|[]]. Qed.
-Let BInfty_gtE a : BInfty T true < a = (a != BInfty T true).
+Let BInfty_gtE a : (BInfty T true < a) = (a != BInfty T true).
 Proof. by case: a => [[] a|[]]. Qed.
-Let BInfty_ltF a : BInfty T false < a = false.
+Let BInfty_ltF a : (BInfty T false < a) = false.
 Proof. by case: a => [[] a|[]]. Qed.
-Let BInfty_gtF a : a < BInfty T true = false.
+Let BInfty_gtF a : (a < BInfty T true) = false.
 Proof. by case: a => [[] a|[]]. Qed.
 Let BInfty_BInfty_ltE : BInfty T true < BInfty T false. Proof. by []. Qed.
 
@@ -408,28 +408,28 @@ Arguments itv_dec {x i}.
 Definition itv_rewrite i x : Type :=
   let: Interval l u := i in
     (match l with
-       | BLeft a => (a <= x) * (x < a = false)
-       | BRight a => (a <= x) * (a < x) * (x <= a = false) * (x < a = false)
+       | BLeft a => (a <= x) * ((x < a) = false)
+       | BRight a => (a <= x) * (a < x) * ((x <= a) = false) * ((x < a) = false)
        | -oo => forall x : T, x == x
        | +oo => forall b : bool, unkeyed b = false
      end *
      match u with
-       | BRight b => (x <= b) * (b < x = false)
-       | BLeft b => (x <= b) * (x < b) * (b <= x = false) * (b < x = false)
+       | BRight b => (x <= b) * ((b < x) = false)
+       | BLeft b => (x <= b) * (x < b) * ((b <= x) = false) * ((b < x) = false)
        | +oo => forall x : T, x == x
        | -oo => forall b : bool, unkeyed b = false
      end *
      match l, u with
        | BLeft a, BRight b =>
-         (a <= b) * (b < a = false) * (a \in `[a, b]) * (b \in `[a, b])
+         (a <= b) * ((b < a) = false) * (a \in `[a, b]) * (b \in `[a, b])
        | BLeft a, BLeft b =>
-         (a <= b) * (a < b) * (b <= a = false) * (b < a = false)
+         (a <= b) * (a < b) * ((b <= a) = false) * ((b < a) = false)
          * (a \in `[a, b]) * (a \in `[a, b[) * (b \in `[a, b]) * (b \in `]a, b])
        | BRight a, BRight b =>
-         (a <= b) * (a < b) * (b <= a = false) * (b < a = false)
+         (a <= b) * (a < b) * ((b <= a) = false) * ((b < a) = false)
          * (a \in `[a, b]) * (a \in `[a, b[) * (b \in `[a, b]) * (b \in `]a, b])
        | BRight a, BLeft b =>
-         (a <= b) * (a < b) * (b <= a = false) * (b < a = false)
+         (a <= b) * (a < b) * ((b <= a) = false) * ((b < a) = false)
          * (a \in `[a, b]) * (a \in `[a, b[) * (b \in `[a, b]) * (b \in `]a, b])
        | _, _ => forall x : T, x == x
      end)%type.

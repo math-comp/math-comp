@@ -1979,7 +1979,8 @@ Proof. by rewrite -comparable_eq_minr; apply/eqP. Qed.
 Lemma comparable_max_idPl : reflect (max x y = x) (y <= x).
 Proof. by rewrite -comparable_eq_maxl; apply/eqP. Qed.
 
-Lemma comparable_lteifNE C : x >=< y -> x < y ?<= if ~~ C = ~~ (y < x ?<= if C).
+Lemma comparable_lteifNE C :
+  x >=< y -> (x < y ?<= if ~~ C) = ~~ (y < x ?<= if C).
 Proof. by case: C => /=; case: comparableP. Qed.
 
 End Comparable2.
@@ -2958,7 +2959,7 @@ Proof. exact: comparable_le_max2. Qed.
 
 (* lteif *)
 
-Lemma lteifNE x y C : x < y ?<= if ~~ C = ~~ (y < x ?<= if C).
+Lemma lteifNE x y C : (x < y ?<= if ~~ C) = ~~ (y < x ?<= if C).
 Proof. by case: C => /=; case: leP. Qed.
 
 Lemma lteif_minr z x y C :
@@ -3756,10 +3757,10 @@ Proof. by rewrite diffUx diffxx joinx0. Qed.
 Lemma joinBKC x y : (x `|` y) `\` x = (y `\` x).
 Proof. by rewrite diffUx diffxx join0x. Qed.
 
-Lemma disj_le x y : x `&` y == \bot -> x <= y = (x == \bot).
+Lemma disj_le x y : x `&` y == \bot -> (x <= y) = (x == \bot).
 Proof. by rewrite [x == \bot]eq_sym -eq_meetl => /eqP ->. Qed.
 
-Lemma disj_leC x y : y `&` x == \bot -> x <= y = (x == \bot).
+Lemma disj_leC x y : y `&` x == \bot -> (x <= y) = (x == \bot).
 Proof. by rewrite meetC => /disj_le. Qed.
 
 Lemma disj_diffl x y : x `&` y == \bot -> x `\` y = x.
@@ -4440,7 +4441,7 @@ Fact meetUl : left_distributive meet join.
 Proof. by move=> *; rewrite !meetE !joinE meetUl. Qed.
 Fact meetxx : idempotent_op meet.
 Proof. by move=> *; rewrite meetE meetxx. Qed.
-Fact le_def x y : x <= y = (meet x y == x).
+Fact le_def x y : (x <= y) = (meet x y == x).
 Proof. by rewrite meetE (eq_meetl x y). Qed.
 
 End GeneratedOrder.
@@ -6283,7 +6284,7 @@ HB.instance Definition _ :=
 Lemma ltEprod x y : (x < y) = [&& x != y, x.1 <= y.1 & x.2 <= y.2].
 Proof. by rewrite lt_neqAle. Qed.
 
-Lemma lt_pair (x1 y1 : T1) (x2 y2 : T2) : (x1, x2) < (y1, y2) :> T1 * T2 =
+Lemma lt_pair (x1 y1 : T1) (x2 y2 : T2) : ((x1, x2) < (y1, y2) :> T1 * T2) =
   [&& (x1 != y1) || (x2 != y2), x1 <= y1 & x2 <= y2].
 Proof. by rewrite ltEprod negb_and. Qed.
 
@@ -6802,11 +6803,11 @@ HB.instance Definition _ :=
 HB.instance Definition _ :=
   Preorder_isPOrder.Build disp2 {t : T & T' t} anti.
 
-Lemma leEsig x y : x <= y =
+Lemma leEsig x y : (x <= y) =
   (tag x <= tag y) && ((tag x >= tag y) ==> (tagged x <= tagged_as x y)).
 Proof. by []. Qed.
 
-Lemma ltEsig x y : x < y =
+Lemma ltEsig x y : (x < y) =
   (tag x <= tag y) && ((tag x >= tag y) ==> (tagged x < tagged_as x y)).
 Proof. by []. Qed.
 

@@ -320,35 +320,35 @@ Proof. by rewrite -mulr2n -[RHS]mulr_natr mulfVK //= pnatr_eq0. Qed.
 (* lteif *)
 
 Lemma lteif_pdivlMr C z x y :
-  0 < z -> x < y / z ?<= if C = (x * z < y ?<= if C).
+  0 < z -> (x < y / z ?<= if C) = (x * z < y ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_pdivlMr. Qed.
 
 Lemma lteif_pdivrMr C z x y :
-  0 < z -> y / z < x ?<= if C = (y < x * z ?<= if C).
+  0 < z -> (y / z < x ?<= if C) = (y < x * z ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_pdivrMr. Qed.
 
 Lemma lteif_pdivlMl C z x y :
-  0 < z -> x < z^-1 * y ?<= if C = (z * x < y ?<= if C).
+  0 < z -> (x < z^-1 * y ?<= if C) = (z * x < y ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_pdivlMl. Qed.
 
 Lemma lteif_pdivrMl C z x y :
-  0 < z -> z^-1 * y < x ?<= if C = (y < z * x ?<= if C).
+  0 < z -> (z^-1 * y < x ?<= if C) = (y < z * x ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_pdivrMl. Qed.
 
 Lemma lteif_ndivlMr C z x y :
-  z < 0 -> x < y / z ?<= if C = (y < x * z ?<= if C).
+  z < 0 -> (x < y / z ?<= if C) = (y < x * z ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_ndivlMr. Qed.
 
 Lemma lteif_ndivrMr C z x y :
-  z < 0 -> y / z < x ?<= if C = (x * z < y ?<= if C).
+  z < 0 -> (y / z < x ?<= if C) = (x * z < y ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_ndivrMr. Qed.
 
 Lemma lteif_ndivlMl C z x y :
-  z < 0 -> x < z^-1 * y ?<= if C = (y < z * x ?<= if C).
+  z < 0 -> (x < z^-1 * y ?<= if C) = (y < z * x ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_ndivlMl. Qed.
 
 Lemma lteif_ndivrMl C z x y :
-  z < 0 -> z^-1 * y < x ?<= if C = (z * x < y ?<= if C).
+  z < 0 -> (z^-1 * y < x ?<= if C) = (z * x < y ?<= if C).
 Proof. by case: C => ? /=; rewrite lter_ndivrMl. Qed.
 
 (* Interval midpoint. *)

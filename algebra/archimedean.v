@@ -558,7 +558,7 @@ Qed.
 Lemma truncn_itv x : 0 <= x -> (truncn x)%:R <= x < (truncn x).+1%:R.
 Proof. by move=> x_ge0; move: (truncnP x); rewrite x_ge0. Qed.
 
-Lemma truncn_le x : (truncn x)%:R <= x = (0 <= x).
+Lemma truncn_le x : ((truncn x)%:R <= x) = (0 <= x).
 Proof. by case: ifP (truncnP x) => [+ /andP[] | + /eqP->//]. Qed.
 
 Lemma real_truncnS_gt x : x \is real_num -> x < (truncn x).+1%:R.

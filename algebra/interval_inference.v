@@ -577,7 +577,7 @@ case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_].
 by rewrite /= in_itv/= andbT.
 Qed.
 
-Lemma le0F x : unify_itv i (Itv.Real `]0%Z, +oo[) -> x%:num <= 0 :> R = false.
+Lemma le0F x : unify_itv i (Itv.Real `]0%Z, +oo[) -> (x%:num <= 0 :> R) = false.
 Proof.
 case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=.
 by rewrite in_itv/= andbT => /lt_geF.
@@ -588,7 +588,7 @@ Proof.
 by case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=; rewrite in_itv.
 Qed.
 
-Lemma ge0F x : unify_itv i (Itv.Real `]-oo, 0%Z[) -> 0 <= x%:num :> R = false.
+Lemma ge0F x : unify_itv i (Itv.Real `]-oo, 0%Z[) -> (0 <= x%:num :> R) = false.
 Proof.
 case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=.
 by rewrite in_itv/= => /lt_geF.
@@ -600,7 +600,7 @@ case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=.
 by rewrite in_itv/= andbT.
 Qed.
 
-Lemma lt0F x : unify_itv i (Itv.Real `[0%Z, +oo[) -> x%:num < 0 :> R = false.
+Lemma lt0F x : unify_itv i (Itv.Real `[0%Z, +oo[) -> (x%:num < 0 :> R) = false.
 Proof.
 case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=.
 by rewrite in_itv/= andbT => /le_gtF.
@@ -611,7 +611,7 @@ Proof.
 by case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=; rewrite in_itv.
 Qed.
 
-Lemma gt0F x : unify_itv i (Itv.Real `]-oo, 0%Z]) -> 0 < x%:num :> R = false.
+Lemma gt0F x : unify_itv i (Itv.Real `]-oo, 0%Z]) -> (0 < x%:num :> R) = false.
 Proof.
 case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=.
 by rewrite in_itv/= => /le_gtF.
@@ -640,7 +640,7 @@ Proof.
 by case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=; rewrite in_itv.
 Qed.
 
-Lemma ge1F x : unify_itv i (Itv.Real `]-oo, 1%Z[) -> 1 <= x%:num :> R = false.
+Lemma ge1F x : unify_itv i (Itv.Real `]-oo, 1%Z[) -> (1 <= x%:num :> R) = false.
 Proof.
 case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=.
 by rewrite in_itv/= => /lt_geF.
@@ -651,7 +651,7 @@ Proof.
 by case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=; rewrite in_itv.
 Qed.
 
-Lemma gt1F x : unify_itv i (Itv.Real `]-oo, 1%Z]) -> 1 < x%:num :> R = false.
+Lemma gt1F x : unify_itv i (Itv.Real `]-oo, 1%Z]) -> (1 < x%:num :> R) = false.
 Proof.
 case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=.
 by rewrite in_itv/= => /le_gtF.
@@ -1484,35 +1484,35 @@ Implicit Type x y : nR.
 Local Notation num := (@num R (@Itv.num_sem R) i).
 
 Lemma num_le_max a x y :
-  a <= Num.max x%:num y%:num = (a <= x%:num) || (a <= y%:num).
+  (a <= Num.max x%:num y%:num) = (a <= x%:num) || (a <= y%:num).
 Proof. by rewrite -comparable_le_max// real_comparable. Qed.
 
 Lemma num_ge_max a x y :
-  Num.max x%:num y%:num <= a = (x%:num <= a) && (y%:num <= a).
+  (Num.max x%:num y%:num <= a) = (x%:num <= a) && (y%:num <= a).
 Proof. by rewrite -comparable_ge_max// real_comparable. Qed.
 
 Lemma num_le_min a x y :
-  a <= Num.min x%:num y%:num = (a <= x%:num) && (a <= y%:num).
+  (a <= Num.min x%:num y%:num) = (a <= x%:num) && (a <= y%:num).
 Proof. by rewrite -comparable_le_min// real_comparable. Qed.
 
 Lemma num_ge_min a x y :
-  Num.min x%:num y%:num <= a = (x%:num <= a) || (y%:num <= a).
+  (Num.min x%:num y%:num <= a) = (x%:num <= a) || (y%:num <= a).
 Proof. by rewrite -comparable_ge_min// real_comparable. Qed.
 
 Lemma num_lt_max a x y :
-  a < Num.max x%:num y%:num = (a < x%:num) || (a < y%:num).
+  (a < Num.max x%:num y%:num) = (a < x%:num) || (a < y%:num).
 Proof. by rewrite -comparable_lt_max// real_comparable. Qed.
 
 Lemma num_gt_max a x y :
-  Num.max x%:num  y%:num < a = (x%:num < a) && (y%:num < a).
+  (Num.max x%:num  y%:num < a) = (x%:num < a) && (y%:num < a).
 Proof. by rewrite -comparable_gt_max// real_comparable. Qed.
 
 Lemma num_lt_min a x y :
-  a < Num.min x%:num y%:num = (a < x%:num) && (a < y%:num).
+  (a < Num.min x%:num y%:num) = (a < x%:num) && (a < y%:num).
 Proof. by rewrite -comparable_lt_min// real_comparable. Qed.
 
 Lemma num_gt_min a x y :
-  Num.min x%:num y%:num < a = (x%:num < a) || (y%:num < a).
+  (Num.min x%:num y%:num < a) = (x%:num < a) || (y%:num < a).
 Proof. by rewrite -comparable_gt_min// real_comparable. Qed.
 
 End MorphReal.
