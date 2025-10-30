@@ -297,13 +297,13 @@ Implicit Types (a x : T) (A B C D : {set T}) (pA pB pC : pred T).
 Lemma eqEsubset A B : (A == B) = (A \subset B) && (B \subset A).
 Proof. by apply/eqP/subset_eqP=> /setP. Qed.
 
-Lemma subEproper A B : A \subset B = (A == B) || (A \proper B).
+Lemma subEproper A B : (A \subset B) = (A == B) || (A \proper B).
 Proof. by rewrite eqEsubset -andb_orr orbN andbT. Qed.
 
 Lemma eqVproper A B : A \subset B -> A = B \/ A \proper B.
 Proof. by rewrite subEproper => /predU1P. Qed.
 
-Lemma properEneq A B : A \proper B = (A != B) && (A \subset B).
+Lemma properEneq A B : (A \proper B) = (A != B) && (A \subset B).
 Proof. by rewrite andbC eqEsubset negb_and andb_orr andbN. Qed.
 
 Lemma proper_neq A B : A \proper B -> A != B.
