@@ -1033,7 +1033,7 @@ Variables S : groupClosed G.
 Lemma gpredF : {in S &, forall u v, u / v \in S}.
 Proof. by move=> x y xS yS; rewrite gpredM// gpredV. Qed.
 
-Lemma gpredFC u v : u / v \in S = (v / u \in S).
+Lemma gpredFC u v : (u / v \in S) = (v / u \in S).
 Proof. by rewrite -gpredV invgF. Qed.
 
 Lemma gpredXNn n: {in S, forall u, u ^- n \in S}.

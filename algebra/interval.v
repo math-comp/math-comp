@@ -300,7 +300,7 @@ Lemma subitvE b1l b1r b2l b2r :
 Proof. by []. Qed.
 
 Lemma in_itv x i :
-  x \in i =
+  (x \in i) =
   let: Interval l u := i in
   match l with
     | BSide b lb => lb < x ?<= if b
@@ -317,7 +317,7 @@ Lemma itv_boundlr bl br x :
 Proof. by []. Qed.
 
 Lemma itv_splitI bl br x :
-  x \in Interval bl br = (x \in Interval bl +oo) && (x \in Interval -oo br).
+  (x \in Interval bl br) = (x \in Interval bl +oo) && (x \in Interval -oo br).
 Proof. by rewrite !itv_boundlr andbT. Qed.
 
 Lemma subitvP i1 i2 : i1 <= i2 -> {subset i1 <= i2}.
@@ -366,14 +366,15 @@ Lemma subitvPr bl b1r b2r :
 Proof. by move=> ?; apply: subitvP; rewrite subitvE lexx. Qed.
 
 Lemma itv_xx x cl cr y :
-  y \in Interval (BSide cl x) (BSide cr x) = cl && ~~ cr && (y == x).
+  (y \in Interval (BSide cl x) (BSide cr x)) = cl && ~~ cr && (y == x).
 Proof. by case: cl cr => [] []; rewrite [LHS]lteif_anti // eq_sym. Qed.
 
-Lemma boundl_in_itv c x b : x \in Interval (BSide c x) b = c && (BRight x <= b).
+Lemma boundl_in_itv c x b :
+  (x \in Interval (BSide c x) b) = c && (BRight x <= b).
 Proof. by rewrite itv_boundlr bound_lexx. Qed.
 
 Lemma boundr_in_itv c x b :
-  x \in Interval b (BSide c x) = ~~ c && (b <= BLeft x).
+  (x \in Interval b (BSide c x)) = ~~ c && (b <= BLeft x).
 Proof. by rewrite itv_boundlr bound_lexx implybF andbC. Qed.
 
 Definition bound_in_itv := (boundl_in_itv, boundr_in_itv).
@@ -594,7 +595,7 @@ HB.instance Definition _ :=
 HB.instance Definition _ :=
   Order.hasTop.Build (interval_display disp) (interval T) itv_lex1.
 
-Lemma in_itvI x i1 i2 : x \in i1 `&` i2 = (x \in i1) && (x \in i2).
+Lemma in_itvI x i1 i2 : (x \in i1 `&` i2) = (x \in i1) && (x \in i2).
 Proof. exact: lexI. Qed.
 
 End IntervalLattice.
@@ -629,7 +630,7 @@ HB.instance Definition _ :=
     (interval_display disp) (interval T) itv_meetUl.
 
 Lemma itv_splitU c a b : a <= c <= b ->
-  forall y, y \in Interval a b = (y \in Interval a c) || (y \in Interval c b).
+  forall y, (y \in Interval a b) = (y \in Interval a c) || (y \in Interval c b).
 Proof.
 case/andP => leac lecb y.
 rewrite !itv_boundlr !(ltNge (BLeft y) _ : (BRight y <= _) = _).
@@ -639,7 +640,7 @@ case: (leP a) (leP b) (leP c) => leay [] leby [] lecy //=.
 Qed.
 
 Lemma itv_splitUeq x a b : x \in Interval a b ->
-  forall y, y \in Interval a b =
+  forall y, (y \in Interval a b) =
     [|| y \in Interval a (BLeft x), y == x | y \in Interval (BRight x) b].
 Proof.
 case/andP => ax xb y; rewrite (@itv_splitU (BLeft x)) ?ax ?ltW //.
@@ -720,7 +721,7 @@ Proof. by move=> xr yr; apply/comparable_BSide_max/real_comparable. Qed.
 Lemma mem0_itvcc_xNx x : (0 \in `[- x, x]) = (0 <= x).
 Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_le0 andbb. Qed.
 
-Lemma mem0_itvoo_xNx x : 0 \in `]- x, x[ = (0 < x).
+Lemma mem0_itvoo_xNx x : (0 \in `]- x, x[) = (0 < x).
 Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_lt0 andbb. Qed.
 
 Lemma oppr_itv ba bb (xa xb x : R) :

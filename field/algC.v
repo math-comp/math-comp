@@ -1020,7 +1020,7 @@ HB.instance Definition _ := Num.NumDomain_bounded_isArchimedean.Build algR
   algR_archiFieldMixin.
 
 Definition algR_pfactor (x : algC) : {poly algR} :=
-  if x \is Creal =P true is ReflectT xR then 'X - (in_algR xR)%:P else
+  if (x \is Creal) =P true is ReflectT xR then 'X - (in_algR xR)%:P else
   'X^2 - (in_algR (Creal_Re x) *+ 2) *: 'X + ((in_algR (normr_real x))^+2)%:P.
 Notation algC_pfactor x := (algR_pfactor x ^^ algRval).
 

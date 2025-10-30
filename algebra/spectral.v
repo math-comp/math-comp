@@ -149,7 +149,7 @@ have -> : P = Q 'i by apply/matrixP=> i j; rewrite !mxE -Crect.
 move=> Qi_unit eq_AP_PB Areal Breal.
 pose p := \det (Pr ^ polyC + 'X *: Pi ^ polyC).
 have horner_evaliC x : horner_eval (x : C) \o polyC =1 id := fun=> hornerC _ _.
-have Qunit x : Q x \in unitmx = (p.[x] != 0).
+have Qunit x : (Q x \in unitmx) = (p.[x] != 0).
   rewrite /p -horner_evalE -det_map_mx map_mxD map_mxZ/= horner_evalE hornerX.
   by rewrite -![(_ ^ polyC) ^ _]map_mx_comp !map_mx_id// unitmxE unitfE.
 have p_neq0 : p != 0.
