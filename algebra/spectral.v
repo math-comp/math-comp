@@ -88,7 +88,7 @@ Qed.
 Notation "M ^t*" := (M ^t conjC) (at level 30) : sesquilinear_scope.
 Notation realmx := (mxOver Num.real).
 
-Lemma trmxCK {C : numClosedFieldType} m n (A : 'M[C]_(m, n)) : A ^t* ^t* = A.
+Lemma trmxCK {C : numClosedFieldType} m n (A : 'M[C]_(m, n)) : (A ^t* ) ^t* = A.
 Proof. by apply/matrixP=> i j; rewrite !mxE conjCK. Qed.
 
 Section realmx.
