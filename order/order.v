@@ -5644,7 +5644,7 @@ Implicit Types (m n p : natdvd).
 Lemma lcmnn n : lcmn n n = n.
 Proof. by case: n => // n; rewrite /lcmn gcdnn mulnK. Qed.
 
-Lemma le_def m n : m %| n = (gcdn m n == m)%N.
+Lemma le_def m n : (m %| n) = (gcdn m n == m)%N.
 Proof. by apply/gcdn_idPl/eqP. Qed.
 
 Lemma joinKI n m : gcdn m (lcmn m n) = m.
@@ -5673,7 +5673,7 @@ HB.instance Definition _ := @POrder_Meet_isDistrLattice.Build dvd_display t
   gcdn lcmn gcdnC lcmnC gcdnA lcmnA joinKI meetKU le_def meetUl.
 
 Import DvdSyntax.
-Lemma sdvdE (m n : t) : m %<| n = (n != m) && (m %| n).
+Lemma sdvdE (m n : t) : (m %<| n) = (n != m) && (m %| n).
 Proof. exact/lt_def. Qed.
 Lemma gcdE : gcd = gcdn :> (t -> t -> t). Proof. by []. Qed.
 Lemma lcmE : lcm = lcmn :> (t -> t -> t). Proof. by []. Qed.

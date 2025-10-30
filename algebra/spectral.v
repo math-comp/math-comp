@@ -85,7 +85,7 @@ move=> n_gt0 AB_comm; have [] := @common_eigenvector _ _ [:: A; B] n_gt0.
 by move=> v v_neq0 /allP vP; exists v; rewrite ?vP ?(mem_head, in_cons, orbT).
 Qed.
 
-Notation "M ^t*" := (M ^t conjC) (at level 30) : sesquilinear_scope.
+Notation "M ^t*" := (M ^t conjC) (at level 29) : sesquilinear_scope.
 Notation realmx := (mxOver Num.real).
 
 Lemma trmxCK {C : numClosedFieldType} m n (A : 'M[C]_(m, n)) : A ^t* ^t* = A.

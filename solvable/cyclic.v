@@ -166,7 +166,7 @@ Proof. by move=> cycK cycH cKH coKH; rewrite cent_joinEr // cyclicM. Qed.
 (*        Order properties                                             *)
 (***********************************************************************)
 
-Lemma order_dvdn a n : #[a] %| n = (a ^+ n == 1).
+Lemma order_dvdn a n : (#[a] %| n) = (a ^+ n == 1).
 Proof. by rewrite (eq_expg_mod_order a n 0) mod0n. Qed.
 
 Lemma order_inf a n : a ^+ n.+1 == 1 -> #[a] <= n.+1.

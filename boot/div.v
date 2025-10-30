@@ -734,7 +734,7 @@ Proof. by rewrite gcdnC; apply: Bezoutl. Qed.
 
 (* Back to the gcd. *)
 
-Lemma dvdn_gcd p m n : p %| gcdn m n = (p %| m) && (p %| n).
+Lemma dvdn_gcd p m n : (p %| gcdn m n) = (p %| m) && (p %| n).
 Proof.
 apply/idP/andP=> [dv_pmn | [dv_pm dv_pn]].
   by rewrite !(dvdn_trans dv_pmn) ?dvdn_gcdl ?dvdn_gcdr.
@@ -835,7 +835,7 @@ Proof. by rewrite /lcmn -muln_divA ?dvdn_gcdr ?dvdn_mulr. Qed.
 Lemma dvdn_lcmr d1 d2 : d2 %| lcmn d1 d2.
 Proof. by rewrite lcmnC dvdn_lcml. Qed.
 
-Lemma dvdn_lcm d1 d2 m : lcmn d1 d2 %| m = (d1 %| m) && (d2 %| m).
+Lemma dvdn_lcm d1 d2 m : (lcmn d1 d2 %| m) = (d1 %| m) && (d2 %| m).
 Proof.
 case: d1 d2 => [|d1] [|d2]; try by case: m => [|m]; rewrite ?lcmn0 ?andbF.
 rewrite -(@dvdn_pmul2r (gcdn d1.+1 d2.+1)) ?gcdn_gt0 // muln_lcm_gcd.
