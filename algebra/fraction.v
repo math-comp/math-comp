@@ -115,8 +115,8 @@ HB.instance Definition _ : EqQuotient _ equivf type := EqQuotient.on type.
 HB.instance Definition _ := Choice.on type.
 
 (* we explain what was the equivalence on the quotient *)
-Lemma equivf_def (x y : ratio R) : x == y %[mod type]
-                                    = (\n_x * \d_y == \d_x * \n_y).
+Lemma equivf_def (x y : ratio R) :
+  (x == y %[mod type]) = (\n_x * \d_y == \d_x * \n_y).
 Proof. by rewrite eqmodE. Qed.
 
 Lemma equivf_r x : \n_x * \d_(repr (\pi_type x)) = \d_x * \n_(repr (\pi_type x)).

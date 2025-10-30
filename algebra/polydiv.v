@@ -1546,7 +1546,7 @@ Qed.
 Lemma dvdUp d p: d %= 1 -> d %| p.
 Proof. by move/eqp_dvdl->; rewrite dvd1p. Qed.
 
-Lemma dvdp_size_eqp p q : p %| q -> size p == size q = (p %= q).
+Lemma dvdp_size_eqp p q : p %| q -> (size p == size q) = (p %= q).
 Proof.
 move=> pq; apply/idP/idP; last by move/eqp_size->.
 have [->|Hq] := eqVneq q 0; first by rewrite size_poly0 size_poly_eq0 eqp0.
@@ -1786,7 +1786,7 @@ case: leqP => [|/ltnW] /subnK <-; rewrite exprD; first exact: gcdp_mull.
 exact/(eqp_trans (gcdpC _ _))/gcdp_mull.
 Qed.
 
-Lemma gcdp_eq0 p q : gcdp p q == 0 = (p == 0) && (q == 0).
+Lemma gcdp_eq0 p q : (gcdp p q == 0) = (p == 0) && (q == 0).
 Proof.
 apply/idP/idP; last by case/andP => /eqP -> /eqP ->; rewrite gcdp0.
 have h m n: gcdp m n == 0 -> (m == 0).

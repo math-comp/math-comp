@@ -4737,7 +4737,7 @@ by apply/eqP/eqP => [->|/(mulIf yD0)/(mulIf tD0)].
 Qed.
 
 Lemma eqr_sum_div I r P (f : I -> F) c a : c != 0 ->
-  \big[+%R/0]_(x <- r | P x) (f x / c) == a
+  (\big[+%R/0]_(x <- r | P x) (f x / c) == a)
   = (\big[+%R/0]_(x <- r | P x) f x == a * c).
 Proof.
 by move=> ?; rewrite -mulr_suml -(divr1 a) eqr_div ?oner_eq0// mulr1 divr1.
