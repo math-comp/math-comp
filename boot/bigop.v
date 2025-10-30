@@ -590,7 +590,7 @@ Canonical bigop_unlock := Unlockable bigop.unlock.
 
 Definition index_iota m n := iota m (n - m).
 
-Lemma mem_index_iota m n i : i \in index_iota m n = (m <= i < n).
+Lemma mem_index_iota m n i : (i \in index_iota m n) = (m <= i < n).
 Proof.
 rewrite mem_iota; case le_m_i: (m <= i) => //=.
 by rewrite -leq_subLR subSn // -subn_gt0 -subnDA subnKC // subn_gt0.
@@ -1223,7 +1223,7 @@ Variant big_enum_spec (I : finType) (P : pred I) : seq I -> Type :=
   BigEnumSpec e of
     forall R idx op (F : I -> R),
       \big[op/idx]_(i <- e) F i = \big[op/idx]_(i | P i) F i
-  & uniq e /\ (forall i, i \in e = P i)
+  & uniq e /\ (forall i, (i \in e) = P i)
   & (let cP := [pred i | P i] in perm_eq e (enum cP) /\ size e = #|cP|)
   : big_enum_spec P e.
 
@@ -1245,7 +1245,7 @@ Variant big_enum_spec (I : finType) (P : pred I) : seq I -> Type :=
 Lemma big_enumP I P : big_enum_spec P (filter P (index_enum I)).
 Proof.
 set e := filter P _; have Ue: uniq e by apply/filter_uniq/index_enum_uniq.
-have mem_e i: i \in e = P i by rewrite mem_filter mem_index_enum andbT.
+have mem_e i: (i \in e) = P i by rewrite mem_filter mem_index_enum andbT.
 split=> // [R idx op F | cP]; first by rewrite big_filter.
 suffices De: perm_eq e (enum cP) by rewrite (perm_size De) cardE.
 by apply/uniq_perm=> // [|i]; rewrite ?enum_uniq ?mem_enum ?mem_e.

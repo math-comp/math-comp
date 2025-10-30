@@ -222,7 +222,7 @@ Implicit Types (x : T) (A B : {set T}) (pA : pred T).
 
 HB.instance Definition _ := Finite.on {set T}.
 
-Lemma in_set pA x : x \in finset pA = pA x.
+Lemma in_set pA x : (x \in finset pA) = pA x.
 Proof. by rewrite [@finset]unlock unlock [x \in _]ffunE. Qed.
 
 Lemma setP A B : A =i B <-> A = B.
@@ -324,7 +324,7 @@ Proof. by rewrite properEneq ltnNge andbC eqEcard; case: (A \subset B). Qed.
 Lemma subset_leqif_cards A B : A \subset B -> (#|A| <= #|B| ?= iff (A == B)).
 Proof. by move=> sAB; rewrite eqEsubset sAB; apply: subset_leqif_card. Qed.
 
-Lemma in_set0 x : x \in set0 = false.
+Lemma in_set0 x : (x \in set0) = false.
 Proof. by rewrite in_set. Qed.
 
 Lemma sub0set A : set0 \subset A.
@@ -1254,7 +1254,7 @@ Qed.
 Lemma imset_f (D : {pred aT}) x : x \in D -> f x \in f @: D.
 Proof. by move=> Dx; apply/imsetP; exists x. Qed.
 
-Lemma mem_imset (D : {pred aT}) x : injective f -> f x \in f @: D = (x \in D).
+Lemma mem_imset (D : {pred aT}) x : injective f -> (f x \in f @: D) = (x \in D).
 Proof.
 by move=> f_inj; apply/imsetP/idP;[case=> [y] ? /f_inj -> | move=> ?; exists x].
 Qed.
@@ -2140,7 +2140,7 @@ Qed.
 Lemma cover_partition P D : partition P D -> cover P = D.
 Proof. by case/and3P=> /eqP. Qed.
 
-Lemma partition0 P D : partition P D -> set0 \in P = false.
+Lemma partition0 P D : partition P D -> (set0 \in P) = false.
 Proof. case/and3P => _ _. by apply: contraNF. Qed.
 
 Lemma partition_neq0 P D B : partition P D -> B \in P -> B != set0.

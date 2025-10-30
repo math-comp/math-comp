@@ -368,7 +368,7 @@ Lemma natr_int n : n%:R \is a int_num.
 Proof. by rewrite intrE natr_nat. Qed.
 #[local] Hint Resolve natr_int : core.
 
-Lemma intrEfloor x : x \is a int_num = ((floor x)%:~R == x).
+Lemma intrEfloor x : (x \is a int_num) = ((floor x)%:~R == x).
 Proof.
 by apply/intrP/eqP => [[n ->] | <-]; [rewrite intrKfloor | exists (floor x)].
 Qed.
@@ -480,7 +480,7 @@ Proof. by move=> x y lexy; rewrite !ceilNfloor lerN2 le_floor ?lerN2. Qed.
 Lemma intrKceil : cancel intr ceil.
 Proof. by move=> m; rewrite ceilNfloor -intrN intrKfloor opprK. Qed.
 
-Lemma intrEceil x : x \is a int_num = ((ceil x)%:~R == x).
+Lemma intrEceil x : (x \is a int_num) = ((ceil x)%:~R == x).
 Proof. by rewrite -rpredN intrEfloor -eqr_oppLR -intrN -ceilNfloor. Qed.
 
 Lemma ceilK : {in int_num, cancel ceil intr}.

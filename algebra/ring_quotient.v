@@ -266,7 +266,7 @@ Section IdealTheory.
 Variables (R : nzRingType) (idealrI : idealr R).
 Local Notation I := (idealrI : pred R).
 
-Lemma idealr1 : 1 \in I = false.
+Lemma idealr1 : (1 \in I) = false.
 Proof. apply: negPf; exact: proper_ideal_subproof.1. Qed.
 
 Lemma idealMr a u : u \in I -> a * u \in I.
@@ -314,10 +314,10 @@ HB.instance Definition _ : EqQuotient R equiv quot := EqQuotient.on quot.
 #[export]
 HB.instance Definition _ := Choice.on quot.
 
-Lemma idealrBE x y : (x - y) \in I = (x == y %[mod quot]).
+Lemma idealrBE x y : ((x - y) \in I) = (x == y %[mod quot]).
 Proof. by rewrite piE equivE. Qed.
 
-Lemma idealrDE x y : (x + y) \in I = (x == - y %[mod quot]).
+Lemma idealrDE x y : ((x + y) \in I) = (x == - y %[mod quot]).
 Proof. by rewrite -idealrBE opprK. Qed.
 
 Definition zero : quot := lift_cst quot 0.

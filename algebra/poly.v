@@ -1431,7 +1431,7 @@ Proof. by move/monicP->; split; [apply: commr1 | apply: rreg1]. Qed.
 
 Definition root p : pred R := fun x => p.[x] == 0.
 
-Lemma mem_root p x : x \in root p = (p.[x] == 0).
+Lemma mem_root p x : (x \in root p) = (p.[x] == 0).
 Proof. by []. Qed.
 
 Lemma rootE p x : (root p x = (p.[x] == 0)) * ((x \in root p) = (p.[x] == 0)).
@@ -2352,7 +2352,7 @@ Hypothesis prim_z : n.-primitive_root z.
 Import prime.
 Let n_gt0 := prim_order_gt0 prim_z.
 
-Lemma prim_root_pcharF p : (p %| n)%N -> p \in [pchar R] = false.
+Lemma prim_root_pcharF p : (p %| n)%N -> (p \in [pchar R]) = false.
 Proof.
 move=> pn; apply: contraTF isT => pchar_p; have p_prime := pcharf_prime pchar_p.
 have /dvdnP[[|k] n_eq_kp] := pn; first by rewrite n_eq_kp in (n_gt0).

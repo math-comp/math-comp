@@ -845,7 +845,7 @@ Implicit Type p q r d : {poly R}.
 Lemma edivp_def p q : edivp p q = (scalp p q, divp p q, modp p q).
 Proof. by rewrite /scalp /divp /modp; case: (edivp p q) => [[]] /=. Qed.
 
-Lemma edivp_redivp p q : lead_coef q \in GRing.unit = false ->
+Lemma edivp_redivp p q : (lead_coef q \in GRing.unit) = false ->
   edivp p q = redivp p q.
 Proof. by move=> hu; rewrite unlock hu; case: (redivp p q) => [[? ?] ?]. Qed.
 
