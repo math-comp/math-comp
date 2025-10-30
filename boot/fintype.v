@@ -696,7 +696,7 @@ Proof.
 by move/subsetP=> s12; apply/subsetP=> x; rewrite !mem_filter=> /andP[-> /s12].
 Qed.
 
-Lemma properE A B : A \proper B = (A \subset B) && ~~ (B \subset A).
+Lemma properE A B : (A \proper B) = (A \subset B) && ~~ (B \subset A).
 Proof. by []. Qed.
 
 Lemma properP A B :

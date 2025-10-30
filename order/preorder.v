@@ -3488,7 +3488,7 @@ Context {disp : disp_t} {T : finType}.
 Local Notation "{ 'subset' T }" := (type disp T).
 Implicit Type (A B C : {subset T}).
 
-Lemma le_def A B : A \subset B = (A :&: B == A).
+Lemma le_def A B : (A \subset B) = (A :&: B == A).
 Proof. exact/setIidPl/eqP. Qed.
 
 #[export]
