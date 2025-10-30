@@ -632,7 +632,7 @@ Qed.
 
 Lemma eq0F x :
   unify (fun ix iy => ~~ Itv.sub ix iy) (Itv.Real `[0%Z, 0%Z]) i ->
-  x%:num == 0 :> R = false.
+  (x%:num == 0 :> R) = false.
 Proof. by move=> u; apply/negbTE/neq0. Qed.
 
 Lemma lt1 x : unify_itv i (Itv.Real `]-oo, 1%Z[) -> x%:num < 1 :> R.

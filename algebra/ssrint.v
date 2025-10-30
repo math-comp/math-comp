@@ -958,7 +958,7 @@ Proof. by rewrite -(mulr0z 1) (inj_eq (mulrIz _)) // oner_eq0. Qed.
 Lemma mulrz_eq0 x n : (x *~ n == 0) = ((n == 0) || (x == 0)).
 Proof. by rewrite -mulrzl mulf_eq0 intr_eq0. Qed.
 
-Lemma mulrz_neq0 x n : x *~ n != 0 = ((n != 0) && (x != 0)).
+Lemma mulrz_neq0 x n : (x *~ n != 0) = ((n != 0) && (x != 0)).
 Proof. by rewrite mulrz_eq0 negb_or. Qed.
 
 Lemma realz n : (n%:~R : R) \in Num.real.

@@ -728,7 +728,7 @@ Proof. by rewrite commgEr conjVg invgM invgK. Qed.
 Lemma commgP x y : reflect (commute x y) ([~ x, y] == 1).
 Proof. rewrite [[~ x, y]]mulgA -invgM mulg_eq1 eqg_inv eq_sym; apply: eqP. Qed.
 
-Lemma conjg_fix x y : x ^ y == x = ([~ x, y] == 1).
+Lemma conjg_fix x y : (x ^ y == x) = ([~ x, y] == 1).
 Proof. by rewrite mulg_eq1 eqg_inv. Qed.
 
 Lemma conjg_fixP x y : reflect (x ^ y = x) ([~ x, y] == 1).

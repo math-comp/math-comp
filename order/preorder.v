@@ -1060,10 +1060,10 @@ Hint Resolve lt_irreflexive : core.
 
 Definition ltexx := (lexx, ltxx).
 
-Lemma lt_eqF x y: x < y -> x == y = false.
+Lemma lt_eqF x y: x < y -> (x == y) = false.
 Proof. by apply: contraTF => /eqP ->; rewrite ltxx. Qed.
 
-Lemma gt_eqF x y : y < x -> x == y = false.
+Lemma gt_eqF x y : y < x -> (x == y) = false.
 Proof. by move=> /lt_eqF; rewrite eq_sym. Qed.
 
 Lemma ltW x y: x < y -> x <= y.

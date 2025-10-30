@@ -375,10 +375,10 @@ Proof. by move=> m n; rewrite -eqn_leq => /eqP. Qed.
 Lemma neq_ltn m n : (m != n) = (m < n) || (n < m).
 Proof. by rewrite eqn_leq negb_and orbC -!ltnNge. Qed.
 
-Lemma gtn_eqF m n : m < n -> n == m = false.
+Lemma gtn_eqF m n : m < n -> (n == m) = false.
 Proof. by rewrite eqn_leq (leqNgt n) => ->. Qed.
 
-Lemma ltn_eqF m n : m < n -> m == n = false.
+Lemma ltn_eqF m n : m < n -> (m == n) = false.
 Proof. by move/gtn_eqF; rewrite eq_sym. Qed.
 
 Lemma ltn_geF m n : m < n -> (m >= n) = false.
