@@ -892,7 +892,7 @@ do [case: m i => [[]//|m] i; case: n j => [[]//|n] j /=] in M nzMij le_mn *.
 wlog Dj: j M nzMij / j = 0; last rewrite {j}Dj in nzMij.
   case/(_ 0 (xcol j 0 M)); rewrite ?mxE ?tpermR // => L uL [R uR [d dvD dM]].
   exists L => //; exists (xcol j 0 R); last exists d => //=.
-     by rewrite xcolE unitmx_mul uR unitmx_perm.
+    by rewrite xcolE unitmx_mul uR unitmx_perm.
   by rewrite xcolE !mulmxA -dM xcolE -mulmxA -perm_mxM tperm2 perm_mx1 mulmx1.
 move Da: (M i 0) nzMij => a nz_a.
 have [A leA] := ubnP `|a|; elim: A => // A IHa in a leA m n M i Da nz_a le_mn *.

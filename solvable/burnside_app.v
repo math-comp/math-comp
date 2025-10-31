@@ -252,7 +252,6 @@ by is_isoPtac p r3 e0 e1 e2 e3.
 by is_isoPtac p sv e0 e1 e2 e3.
 Qed.
 
-
 Lemma group_set_iso : group_set isometries.
 Proof.
 apply/group_setP; split; first by rewrite inE eqxx /=.

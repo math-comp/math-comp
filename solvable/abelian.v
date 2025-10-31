@@ -1247,7 +1247,7 @@ Qed.
 Lemma MhoE p G : p.-group G -> 'Mho^n(G) = <<[set x ^+ (p ^ n) | x in G]>>.
 Proof.
 move=> pG; apply/eqP; rewrite eqEsubset !gen_subG; apply/andP.
-do [split; apply/subsetP=> xpn; case/imsetP=> x] => [|Gx ->]; last first.
+do [split; apply/subsetP => xpn; case/imsetP => x] => [|Gx ->]; last first.
   by rewrite Mho_p_elt ?(mem_p_elt pG).
 case/setIdP=> Gx _ ->; have [-> | ntx] := eqVneq x 1; first by rewrite expg1n.
 by rewrite (pdiv_p_elt (mem_p_elt pG Gx) ntx) mem_gen //; apply: imset_f.

@@ -982,7 +982,7 @@ Let T := to_pmultiplicative S.
 Lemma rpredB : {in S &, forall u v, u - v \in S}.
 Proof. exact: (@gpredF _ T). Qed.
 
-Lemma rpredBC u v : u - v \in S = (v - u \in S).
+Lemma rpredBC u v : (u - v \in S) = (v - u \in S).
 Proof. exact: (@gpredFC _ T). Qed.
 
 Lemma rpredMNn n: {in S, forall u, u *- n \in S}.

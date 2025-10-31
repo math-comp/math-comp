@@ -430,7 +430,7 @@ Qed.
 
 Lemma Euclid_dvd_prod (I : Type) (r : seq I) (P : pred I) (f : I -> nat) p :
   prime p ->
-  p %| \prod_(i <- r | P i) f i = \big[orb/false]_(i <- r | P i) (p %| f i).
+  (p %| \prod_(i <- r | P i) f i) = \big[orb/false]_(i <- r | P i) (p %| f i).
 Proof.
 move=> pP; apply: big_morph=> [x y|]; [exact: Euclid_dvdM | exact: Euclid_dvd1].
 Qed.

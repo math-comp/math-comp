@@ -728,7 +728,7 @@ Proof. by rewrite commgEr conjVg invgM invgK. Qed.
 Lemma commgP x y : reflect (commute x y) ([~ x, y] == 1).
 Proof. rewrite [[~ x, y]]mulgA -invgM mulg_eq1 eqg_inv eq_sym; apply: eqP. Qed.
 
-Lemma conjg_fix x y : x ^ y == x = ([~ x, y] == 1).
+Lemma conjg_fix x y : (x ^ y == x) = ([~ x, y] == 1).
 Proof. by rewrite mulg_eq1 eqg_inv. Qed.
 
 Lemma conjg_fixP x y : reflect (x ^ y = x) ([~ x, y] == 1).
@@ -1033,7 +1033,7 @@ Variables S : groupClosed G.
 Lemma gpredF : {in S &, forall u v, u / v \in S}.
 Proof. by move=> x y xS yS; rewrite gpredM// gpredV. Qed.
 
-Lemma gpredFC u v : u / v \in S = (v / u \in S).
+Lemma gpredFC u v : (u / v \in S) = (v / u \in S).
 Proof. by rewrite -gpredV invgF. Qed.
 
 Lemma gpredXNn n: {in S, forall u, u ^- n \in S}.

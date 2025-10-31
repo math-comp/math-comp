@@ -696,7 +696,7 @@ Proof.
 by move/subsetP=> s12; apply/subsetP=> x; rewrite !mem_filter=> /andP[-> /s12].
 Qed.
 
-Lemma properE A B : A \proper B = (A \subset B) && ~~ (B \subset A).
+Lemma properE A B : (A \proper B) = (A \subset B) && ~~ (B \subset A).
 Proof. by []. Qed.
 
 Lemma properP A B :
@@ -807,10 +807,10 @@ Proof.
 by rewrite subset_disjoint; apply: eq_disjoint_r => x; rewrite !inE /= negbK.
 Qed.
 
-Lemma disjointFr A B x : [disjoint A & B] -> x \in A -> x \in B = false.
+Lemma disjointFr A B x : [disjoint A & B] -> x \in A -> (x \in B) = false.
 Proof. by move/pred0P/(_ x) => /=; case: (x \in A). Qed.
 
-Lemma disjointFl A B x : [disjoint A & B] -> x \in B -> x \in A = false.
+Lemma disjointFl A B x : [disjoint A & B] -> x \in B -> (x \in A) = false.
 Proof. rewrite disjoint_sym; exact: disjointFr. Qed.
 
 Lemma disjointWl A B C :

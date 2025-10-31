@@ -626,7 +626,7 @@ have [y1 Ny1 Py1]: exists2 y1, y1 \in 'N_E(D) & y1 \notin P.
     by rewrite -['N__(D)](nilpotent_sub_norm (pgroup_nil pB)) ?subsetIl.
   case/subsetPn: sNN => z /setIP[Bz NNz]; rewrite inE Bz inE.
   case/subsetPn=> y; rewrite mem_conjg => Dzy Dy.
-  have:= Dzy; rewrite {1}defD; do 2![case/setIP]=> _ Bzy Ezy.
+  have:= Dzy; rewrite {1}defD; do 2![case/setIP] => _ Bzy Ezy.
   have Ey: y \in E by rewrite -(normsP nEG _ (subsetP sBG z Bz)) mem_conjg.
   have /setIP[By Ny]: y \in 'N_<<B>>(D).
     by rewrite -(normP NNz) mem_conjg inE Bzy ?(subsetP nDD).

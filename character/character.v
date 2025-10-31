@@ -1747,7 +1747,7 @@ Section MoreConstt.
 Variables (gT : finGroupType) (G H : {group gT}).
 
 Lemma constt_Ind_Res i j :
-  i \in irr_constt ('Ind[G] 'chi_j) =  (j \in irr_constt ('Res[H] 'chi_i)).
+  (i \in irr_constt ('Ind[G] 'chi_j)) = (j \in irr_constt ('Res[H] 'chi_i)).
 Proof. by rewrite !irr_consttE cfdotC conjC_eq0 -cfdot_Res_l. Qed.
 
 Lemma cfdot_Res_ge_constt i j psi :

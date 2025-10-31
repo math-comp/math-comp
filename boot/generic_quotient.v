@@ -579,7 +579,7 @@ Proof. by apply: (iffP (pi_DC _ _)); rewrite !unlock. Qed.
 #[export]
 HB.instance Definition _ := Choice.copy qT (can_type ereprK).
 
-Lemma eqmodE x y : x == y %[mod qT] = eD x y.
+Lemma eqmodE x y : (x == y %[mod qT]) = eD x y.
 Proof. exact: sameP eqP (@eqmodP _ _). Qed.
 
 #[export]
@@ -633,7 +633,7 @@ Section EquivQuotTheory.
 
 Variables (T : choiceType) (e : equiv_rel T) (Q : eqQuotType e).
 
-Lemma eqmodE x y : x == y %[mod_eq e] = e x y.
+Lemma eqmodE x y : (x == y %[mod_eq e]) = e x y.
 Proof. by rewrite pi_eq_quot. Qed.
 
 Lemma eqmodP x y : reflect (x = y %[mod_eq e]) (e x y).
@@ -647,7 +647,7 @@ Section EqQuotTheory.
 
 Variables (T : Type) (e : rel T) (Q : eqQuotType e).
 
-Lemma eqquotE x y : x == y %[mod Q] = e x y.
+Lemma eqquotE x y : (x == y %[mod Q]) = e x y.
 Proof. by rewrite pi_eq_quot. Qed.
 
 Lemma eqquotP x y : reflect (x = y %[mod Q]) (e x y).

@@ -208,49 +208,49 @@ Lemma gt_pinfty b : (+oo < b) = false. Proof. by []. Qed.
 Lemma lt_ninfty b : (b < -oo) = false. Proof. by case: b => // -[]. Qed.
 
 Lemma ltBSide x y (b b' : bool) :
-  BSide b x < BSide b' y = (x < y ?<= if b && ~~ b').
+  (BSide b x < BSide b' y) = (x < y ?<= if b && ~~ b').
 Proof. by []. Qed.
 
 Lemma leBSide x y (b b' : bool) :
-  BSide b x <= BSide b' y = (x < y ?<= if b' ==> b).
+  (BSide b x <= BSide b' y) = (x < y ?<= if b' ==> b).
 Proof. by []. Qed.
 
 Definition lteBSide := (ltBSide, leBSide).
 
-Lemma ltBRight_leBLeft b x : b < BRight x = (b <= BLeft x).
+Lemma ltBRight_leBLeft b x : (b < BRight x) = (b <= BLeft x).
 Proof. by move: b => [[] b|[]]. Qed.
-Lemma leBRight_ltBLeft b x : BRight x <= b = (BLeft x < b).
+Lemma leBRight_ltBLeft b x : (BRight x <= b) = (BLeft x < b).
 Proof. by move: b => [[] b|[]]. Qed.
 
-Let BLeft_ltE x y (b : bool) : BSide b x < BLeft y = (x < y).
+Let BLeft_ltE x y (b : bool) : (BSide b x < BLeft y) = (x < y).
 Proof. by case: b. Qed.
-Let BRight_leE x y (b : bool) : BSide b x <= BRight y = (x <= y).
+Let BRight_leE x y (b : bool) : (BSide b x <= BRight y) = (x <= y).
 Proof. by case: b. Qed.
-Let BRight_BLeft_leE x y : BRight x <= BLeft y = (x < y).
+Let BRight_BLeft_leE x y : (BRight x <= BLeft y) = (x < y).
 Proof. by []. Qed.
-Let BLeft_BRight_ltE x y : BLeft x < BRight y = (x <= y).
+Let BLeft_BRight_ltE x y : (BLeft x < BRight y) = (x <= y).
 Proof. by []. Qed.
-Let BRight_BSide_ltE x y (b : bool) : BRight x < BSide b y = (x < y).
+Let BRight_BSide_ltE x y (b : bool) : (BRight x < BSide b y) = (x < y).
 Proof. by case: b. Qed.
-Let BLeft_BSide_leE x y (b : bool) : BLeft x <= BSide b y = (x <= y).
+Let BLeft_BSide_leE x y (b : bool) : (BLeft x <= BSide b y) = (x <= y).
 Proof. by case: b. Qed.
-Let BSide_ltE x y (b : bool) : BSide b x < BSide b y = (x < y).
+Let BSide_ltE x y (b : bool) : (BSide b x < BSide b y) = (x < y).
 Proof. by case: b. Qed.
-Let BSide_leE x y (b : bool) : BSide b x <= BSide b y = (x <= y).
+Let BSide_leE x y (b : bool) : (BSide b x <= BSide b y) = (x <= y).
 Proof. by case: b. Qed.
 Let BInfty_leE a : a <= BInfty T false. Proof. by case: a => [[] a|[]]. Qed.
 Let BInfty_geE a : BInfty T true <= a. Proof. by case: a => [[] a|[]]. Qed.
-Let BInfty_le_eqE a : BInfty T false <= a = (a == BInfty T false).
+Let BInfty_le_eqE a : (BInfty T false <= a) = (a == BInfty T false).
 Proof. by case: a => [[] a|[]]. Qed.
-Let BInfty_ge_eqE a : a <= BInfty T true = (a == BInfty T true).
+Let BInfty_ge_eqE a : (a <= BInfty T true) = (a == BInfty T true).
 Proof. by case: a => [[] a|[]]. Qed.
-Let BInfty_ltE a : a < BInfty T false = (a != BInfty T false).
+Let BInfty_ltE a : (a < BInfty T false) = (a != BInfty T false).
 Proof. by case: a => [[] a|[]]. Qed.
-Let BInfty_gtE a : BInfty T true < a = (a != BInfty T true).
+Let BInfty_gtE a : (BInfty T true < a) = (a != BInfty T true).
 Proof. by case: a => [[] a|[]]. Qed.
-Let BInfty_ltF a : BInfty T false < a = false.
+Let BInfty_ltF a : (BInfty T false < a) = false.
 Proof. by case: a => [[] a|[]]. Qed.
-Let BInfty_gtF a : a < BInfty T true = false.
+Let BInfty_gtF a : (a < BInfty T true) = false.
 Proof. by case: a => [[] a|[]]. Qed.
 Let BInfty_BInfty_ltE : BInfty T true < BInfty T false. Proof. by []. Qed.
 
@@ -300,7 +300,7 @@ Lemma subitvE b1l b1r b2l b2r :
 Proof. by []. Qed.
 
 Lemma in_itv x i :
-  x \in i =
+  (x \in i) =
   let: Interval l u := i in
   match l with
     | BSide b lb => lb < x ?<= if b
@@ -317,7 +317,7 @@ Lemma itv_boundlr bl br x :
 Proof. by []. Qed.
 
 Lemma itv_splitI bl br x :
-  x \in Interval bl br = (x \in Interval bl +oo) && (x \in Interval -oo br).
+  (x \in Interval bl br) = (x \in Interval bl +oo) && (x \in Interval -oo br).
 Proof. by rewrite !itv_boundlr andbT. Qed.
 
 Lemma subitvP i1 i2 : i1 <= i2 -> {subset i1 <= i2}.
@@ -366,14 +366,15 @@ Lemma subitvPr bl b1r b2r :
 Proof. by move=> ?; apply: subitvP; rewrite subitvE lexx. Qed.
 
 Lemma itv_xx x cl cr y :
-  y \in Interval (BSide cl x) (BSide cr x) = cl && ~~ cr && (y == x).
+  (y \in Interval (BSide cl x) (BSide cr x)) = cl && ~~ cr && (y == x).
 Proof. by case: cl cr => [] []; rewrite [LHS]lteif_anti // eq_sym. Qed.
 
-Lemma boundl_in_itv c x b : x \in Interval (BSide c x) b = c && (BRight x <= b).
+Lemma boundl_in_itv c x b :
+  (x \in Interval (BSide c x) b) = c && (BRight x <= b).
 Proof. by rewrite itv_boundlr bound_lexx. Qed.
 
 Lemma boundr_in_itv c x b :
-  x \in Interval b (BSide c x) = ~~ c && (b <= BLeft x).
+  (x \in Interval b (BSide c x)) = ~~ c && (b <= BLeft x).
 Proof. by rewrite itv_boundlr bound_lexx implybF andbC. Qed.
 
 Definition bound_in_itv := (boundl_in_itv, boundr_in_itv).
@@ -408,28 +409,28 @@ Arguments itv_dec {x i}.
 Definition itv_rewrite i x : Type :=
   let: Interval l u := i in
     (match l with
-       | BLeft a => (a <= x) * (x < a = false)
-       | BRight a => (a <= x) * (a < x) * (x <= a = false) * (x < a = false)
+       | BLeft a => (a <= x) * ((x < a) = false)
+       | BRight a => (a <= x) * (a < x) * ((x <= a) = false) * ((x < a) = false)
        | -oo => forall x : T, x == x
        | +oo => forall b : bool, unkeyed b = false
      end *
      match u with
-       | BRight b => (x <= b) * (b < x = false)
-       | BLeft b => (x <= b) * (x < b) * (b <= x = false) * (b < x = false)
+       | BRight b => (x <= b) * ((b < x) = false)
+       | BLeft b => (x <= b) * (x < b) * ((b <= x) = false) * ((b < x) = false)
        | +oo => forall x : T, x == x
        | -oo => forall b : bool, unkeyed b = false
      end *
      match l, u with
        | BLeft a, BRight b =>
-         (a <= b) * (b < a = false) * (a \in `[a, b]) * (b \in `[a, b])
+         (a <= b) * ((b < a) = false) * (a \in `[a, b]) * (b \in `[a, b])
        | BLeft a, BLeft b =>
-         (a <= b) * (a < b) * (b <= a = false) * (b < a = false)
+         (a <= b) * (a < b) * ((b <= a) = false) * ((b < a) = false)
          * (a \in `[a, b]) * (a \in `[a, b[) * (b \in `[a, b]) * (b \in `]a, b])
        | BRight a, BRight b =>
-         (a <= b) * (a < b) * (b <= a = false) * (b < a = false)
+         (a <= b) * (a < b) * ((b <= a) = false) * ((b < a) = false)
          * (a \in `[a, b]) * (a \in `[a, b[) * (b \in `[a, b]) * (b \in `]a, b])
        | BRight a, BLeft b =>
-         (a <= b) * (a < b) * (b <= a = false) * (b < a = false)
+         (a <= b) * (a < b) * ((b <= a) = false) * ((b < a) = false)
          * (a \in `[a, b]) * (a \in `[a, b[) * (b \in `[a, b]) * (b \in `]a, b])
        | _, _ => forall x : T, x == x
      end)%type.
@@ -594,7 +595,7 @@ HB.instance Definition _ :=
 HB.instance Definition _ :=
   Order.hasTop.Build (interval_display disp) (interval T) itv_lex1.
 
-Lemma in_itvI x i1 i2 : x \in i1 `&` i2 = (x \in i1) && (x \in i2).
+Lemma in_itvI x i1 i2 : (x \in i1 `&` i2) = (x \in i1) && (x \in i2).
 Proof. exact: lexI. Qed.
 
 End IntervalLattice.
@@ -629,7 +630,7 @@ HB.instance Definition _ :=
     (interval_display disp) (interval T) itv_meetUl.
 
 Lemma itv_splitU c a b : a <= c <= b ->
-  forall y, y \in Interval a b = (y \in Interval a c) || (y \in Interval c b).
+  forall y, (y \in Interval a b) = (y \in Interval a c) || (y \in Interval c b).
 Proof.
 case/andP => leac lecb y.
 rewrite !itv_boundlr !(ltNge (BLeft y) _ : (BRight y <= _) = _).
@@ -639,7 +640,7 @@ case: (leP a) (leP b) (leP c) => leay [] leby [] lecy //=.
 Qed.
 
 Lemma itv_splitUeq x a b : x \in Interval a b ->
-  forall y, y \in Interval a b =
+  forall y, (y \in Interval a b) =
     [|| y \in Interval a (BLeft x), y == x | y \in Interval (BRight x) b].
 Proof.
 case/andP => ax xb y; rewrite (@itv_splitU (BLeft x)) ?ax ?ltW //.
@@ -720,7 +721,7 @@ Proof. by move=> xr yr; apply/comparable_BSide_max/real_comparable. Qed.
 Lemma mem0_itvcc_xNx x : (0 \in `[- x, x]) = (0 <= x).
 Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_le0 andbb. Qed.
 
-Lemma mem0_itvoo_xNx x : 0 \in `]- x, x[ = (0 < x).
+Lemma mem0_itvoo_xNx x : (0 \in `]- x, x[) = (0 < x).
 Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_lt0 andbb. Qed.
 
 Lemma oppr_itv ba bb (xa xb x : R) :

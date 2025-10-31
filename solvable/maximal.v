@@ -1363,7 +1363,7 @@ Lemma SCN_max A : A \in 'SCN(G) -> [max A | A <| G & abelian A].
 Proof.
 case/SCN_P => nAG scA; apply/maxgroupP; split=> [|H].
   by rewrite nAG /abelian -{1}scA subsetIr.
-do 2![case/andP]=> sHG _ abelH sAH; apply/eqP.
+do 2![case/andP] => sHG _ abelH sAH; apply/eqP.
 by rewrite eqEsubset sAH -scA subsetI sHG centsC (subset_trans sAH).
 Qed.
 
