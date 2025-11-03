@@ -1815,12 +1815,12 @@ Notation lfun_ringType := (lfun_nzRingType) (only parsing).
 
 Definition lfun_lalgMixin := GRing.Lmodule_isLalgebra.Build R lfun_nzRingType
   (fun k x y => comp_lfunZr k y x).
-Definition lfun_lalgType : lalgType R :=
+Definition lfun_lalgType : nzLalgType R :=
   HB.pack 'End(vT) lfun_nzRingType lfun_lalgMixin.
 
 Definition lfun_algMixin := GRing.Lalgebra_isAlgebra.Build R lfun_lalgType
   (fun k x y => comp_lfunZl k y x).
-Definition lfun_algType : algType R :=
+Definition lfun_algType : nzAlgType R :=
   HB.pack 'End(vT) lfun_lalgType lfun_algMixin.
 
 End LfunAlgebra.
