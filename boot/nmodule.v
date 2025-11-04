@@ -480,7 +480,6 @@ Variable (U : baseZmodType) (S : {pred U}).
 
 Definition oppr_closed := {in S, forall u, - u \in S}.
 Definition subr_closed := {in S &, forall u v, u - v \in S}.
-Definition zmod_closed := 0 \in S /\ subr_closed.
 
 End ClosedPredicates.
 
@@ -646,13 +645,15 @@ Section ClosedPredicates.
 
 Variable (S : {pred V}).
 
-Lemma zmod_closedN : zmod_closed S -> oppr_closed S.
+Definition zmod_closed := 0 \in S /\ subr_closed S.
+
+Lemma zmod_closedN : zmod_closed -> oppr_closed S.
 Proof. exact: (@group_closedV G). Qed.
 
-Lemma zmod_closedD : zmod_closed S -> addr_closed S.
+Lemma zmod_closedD : zmod_closed -> addr_closed S.
 Proof. exact: (@group_closedM G). Qed.
 
-Lemma zmod_closed0D : zmod_closed S -> nmod_closed S.
+Lemma zmod_closed0D : zmod_closed -> nmod_closed S.
 Proof. by move=> z; split; [case: z|apply: zmod_closedD]. Qed.
 
 End ClosedPredicates.
