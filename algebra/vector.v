@@ -1772,15 +1772,33 @@ End LinearPreimage.
 
 Arguments lpreimK {K aT rT f} [W] fW.
 
-Section LfunAlgebra.
-(* This section is a bit of a place holder: the instances we build here can't *)
-(* be canonical because we are missing an interface for proper vectTypes,     *)
-(* would sit between Vector and Falgebra. For now, we just supply structure   *)
-(* definitions here and supply actual instances for F-algebras in a submodule *)
-(* of the algebra library (there is currently no actual use of the End(vT)    *)
-(* algebra structure). Also note that the unit ring structure is missing.     *)
+Section LfunSemiAlgebra.
 
-Variables (R : comNzRingType) (vT : vectType R).
+Variables (R : comNzSemiRingType) (vT : semiVectType R).
+
+Prenex Implicits comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr.
+
+Definition lfun_comp_pzSemiRingType : pzSemiRingType := HB.pack 'End(vT)
+  (GRing.Nmodule_isPzSemiRing.Build 'End(vT)
+     comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr
+     (comp_lfun0l _) (@comp_lfun0r _ _ _ _)).
+
+(* In the standard endomorphism ring product is categorical composition. *)
+HB.instance Definition _ :=
+  GRing.PzSemiRing.copy 'End(vT) lfun_comp_pzSemiRingType^c.
+
+HB.instance Definition _ := GRing.LSemiModule_isLSemiAlgebra.Build R 'End(vT)
+  (fun k x y => comp_lfunZr k y x).
+
+HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build R 'End(vT)
+  (fun k x y => comp_lfunZl k y x).
+
+(* The instances we build below can't be canonical because we are missing an  *)
+(* interface for proper (semi)VectTypes, would sit between Vector and         *)
+(* Falgebra. For now, we just supply structure definitions here and supply    *)
+(* actual instances for F-algebras in a submodule of the algebra library      *)
+(* (there is currently no actual use of the 'End(vT) algebra structure). Also *)
+(* note that the unit ring structure is missing.                              *)
 Hypothesis vT_proper : dim vT > 0.
 
 Fact lfun1_neq0 : \1%VF != 0 :> 'End(vT).
@@ -1789,41 +1807,41 @@ apply/eqP=> /lfunP/(_ (r2v (const_mx 1))); rewrite !lfunE /= => /(canRL r2vK).
 by move=> /rowP/(_ (Ordinal vT_proper))/eqP; rewrite linear0 !mxE oner_eq0.
 Qed.
 
-Prenex Implicits comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr.
+Definition lfun_nzMixin :=
+  GRing.PzSemiRing_isNonZero.Build 'End(vT) lfun1_neq0.
 
-(* FIXME: as explained above, the following structures should not be declared *
- * as canonical, so mixins and structures are built separately, and we        *
- * don't use HB.instance Definition _ := ...                                  *
- *  This is ok, but maybe we could introduce an alias                         *)
-Definition lfun_comp_nzRingMixin := GRing.Zmodule_isNzRing.Build 'End(vT)
-  comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr lfun1_neq0.
+Definition lfun_nzSemiRingType : nzSemiRingType :=
+  HB.pack 'End(vT) lfun_nzMixin.
 
-#[deprecated(since="mathcomp 2.4.0", use=lfun_comp_nzRingMixin)]
-Notation lfun_comp_ringMixin := (lfun_comp_nzRingMixin) (only parsing).
+Definition lfun_nzLSemiAlgType : nzLSemiAlgType R :=
+  HB.pack 'End(vT) lfun_nzMixin.
 
-Definition lfun_comp_nzRingType : nzRingType :=
-  HB.pack 'End(vT) lfun_comp_nzRingMixin.
+Definition lfun_nzSemiAlgType : nzSemiAlgType R :=
+  HB.pack 'End(vT) lfun_nzMixin.
 
-#[deprecated(since="mathcomp 2.4.0", use=lfun_comp_nzRingType)]
-Notation lfun_comp_ringType := (lfun_comp_nzRingType) (only parsing).
+End LfunSemiAlgebra.
 
-(* In the standard endomorphism ring product is categorical composition. *)
-Definition lfun_nzRingType : nzRingType := lfun_comp_nzRingType^c.
+Section LfunAlgebra.
 
-#[deprecated(since="mathcomp 2.4.0", use=lfun_nzRingType)]
-Notation lfun_ringType := (lfun_nzRingType) (only parsing).
+Variables (R : comNzRingType) (vT : vectType R).
 
-Definition lfun_lalgMixin :=
-  GRing.LSemiModule_isLSemiAlgebra.Build R lfun_nzRingType
-    (fun k x y => comp_lfunZr k y x).
-Definition lfun_lalgType : nzLalgType R :=
-  HB.pack 'End(vT) lfun_nzRingType lfun_lalgMixin.
+HB.instance Definition _ := GRing.PzSemiAlgebra.on 'End(vT).
 
-Definition lfun_algMixin :=
-  GRing.LSemiAlgebra_isSemiAlgebra.Build R lfun_lalgType
-    (fun k x y => comp_lfunZl k y x).
-Definition lfun_algType : nzAlgType R :=
-  HB.pack 'End(vT) lfun_lalgType lfun_algMixin.
+Hypothesis vT_proper : dim vT > 0.
+
+Let lfun1_neq0 := lfun1_neq0 vT_proper.
+Let lfun_nzMixin := lfun_nzMixin vT_proper.
+
+Definition lfun_nzRingType : nzRingType := HB.pack 'End(vT) lfun_nzMixin.
+Definition lfun_nzLalgType : nzLalgType R := HB.pack 'End(vT) lfun_nzMixin.
+Definition lfun_nzAlgType : nzAlgType R := HB.pack 'End(vT) lfun_nzMixin.
+
+#[deprecated(since="mathcomp 2.6.0", note="Use lfun_nzRingType^c instead.")]
+Definition lfun_comp_nzRingType : nzRingType := lfun_nzRingType^c.
+#[deprecated(since="mathcomp 2.6.0", use=lfun_nzLalgType)]
+Definition lfun_lalgType := lfun_nzLalgType.
+#[deprecated(since="mathcomp 2.6.0", use=lfun_nzAlgType)]
+Definition lfun_algType := lfun_nzAlgType.
 
 End LfunAlgebra.
 
