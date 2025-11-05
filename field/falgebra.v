@@ -9,7 +9,7 @@ From mathcomp Require Import finalg zmodp matrix vector poly.
 (*        Finite dimensional free algebras, usually known as F-algebras       *)
 (*                                                                            *)
 (*       falgType K   == the interface type for F-algebras over K; it simply  *)
-(*                       joins the unitAlgType K and vectType K interfaces    *)
+(*                       joins the unitAlgType K and nzVectType K interfaces  *)
 (*                       The HB class is called Falgebra.                     *)
 (*   Any aT with an falgType structure inherits all the Vector, NzRing and    *)
 (* Algebra operations, and supports the following additional operations:      *)
@@ -92,9 +92,26 @@ Import GRing.Theory.
 (* Finite dimensional algebra *)
 #[short(type="falgType")]
 HB.structure Definition Falgebra (R : nzRingType) :=
-  { A of Vector R A & GRing.UnitAlgebra R A }.
+  { A of NzVector R A & GRing.UnitAlgebra R A }.
 #[deprecated(since="mathcomp 2.0.0", use=falgType)]
 Notation FalgType := falgType.
+
+HB.factory Record UnitAlgebra_isFalgebra (R : nzRingType) A
+           of Vector R A & GRing.UnitAlgebra R A := {}.
+
+HB.builders Context R A of UnitAlgebra_isFalgebra R A.
+
+  Import VectorInternalTheory.
+
+  Lemma dim_gt0 : dim A > 0.
+  Proof.
+  rewrite lt0n; apply: contraNneq (oner_neq0 A) => aT0; apply/eqP/v2r_inj.
+  by do 2!move: (v2r _); rewrite aT0 => u v; rewrite !thinmx0.
+  Qed.
+
+  HB.instance Definition _ := SemiVector_isProper.Build R A dim_gt0.
+
+HB.end.
 
 (* Supply a default unitRing mixin for the default unitAlgType base type. *)
 HB.factory Record Algebra_isFalgebra (K : fieldType) A
@@ -127,6 +144,8 @@ HB.builders Context K A of Algebra_isFalgebra K A.
 
   HB.instance Definition _ := GRing.NzRing_hasMulInverse.Build A
     mulVr divrr unitrP invr_out.
+  HB.instance Definition _ := UnitAlgebra_isFalgebra.Build K A.
+
 HB.end.
 
 Module FalgebraExports.
@@ -146,19 +165,9 @@ HB.instance Definition _ (R : comUnitRingType) := GRing.UnitAlgebra.on R^o.
 Lemma regular_fullv (K : fieldType) : (fullv = 1 :> {vspace K^o})%VS.
 Proof. by apply/esym/eqP; rewrite eqEdim subvf dim_vline oner_eq0 dimvf. Qed.
 
-Section Proper.
-
-Variables (R : nzRingType) (aT : falgType R).
-
-Import VectorInternalTheory.
-
-Lemma FalgType_proper : dim aT > 0.
-Proof.
-rewrite lt0n; apply: contraNneq (oner_neq0 aT) => aT0.
-by apply/eqP/v2r_inj; do 2!move: (v2r _); rewrite aT0 => u v; rewrite !thinmx0.
-Qed.
-
-End Proper.
+#[deprecated(since="mathcomp 2.6.0", use=dim_gt0)]
+Lemma FalgType_proper (R : nzRingType) (aT : falgType R) : dim aT > 0.
+Proof. exact: dim_gt0. Qed.
 
 Module FalgLfun.
 
@@ -166,9 +175,6 @@ Section FalgLfun.
 
 Variable (R : comNzRingType) (aT : falgType R).
 Implicit Types f g : 'End(aT).
-
-HB.instance Definition _ := GRing.NzAlgebra.copy 'End(aT)
-  (lfun_nzAlgType (FalgType_proper aT)).
 
 Lemma lfun_mulE f g u : (f * g) u = g (f u). Proof. exact: lfunE. Qed.
 Lemma lfun_compE f g : (g \o f)%VF = f * g. Proof. by []. Qed.

@@ -18,6 +18,12 @@ From mathcomp Require Import ssralg matrix mxalgebra zmodp.
 (*                         precisely, detachable) vector spaces over R, which *)
 (*                         should be at least a nzRingType                    *)
 (*                         The HB class is called Vector.                     *)
+(*     nzSemiVectType R == proper semi-vector spaces over R, i.e.,            *)
+(*                         semiVectType R whose dimensions are non-zero       *)
+(*                         The HB class is called NzSemiVector.               *)
+(*         nzVectType R == proper vector spaces over R, i.e., vectType R      *)
+(*                         whose dimensions are non-zero                      *)
+(*                         The HB class is called NzVector.                   *)
 (* SemiVector.axiom n M <-> type M is semilinearly isomorphic to 'rV_n        *)
 (*                      := there is a bijection v2r : M -> 'rV_n that is      *)
 (*                         semilinear                                         *)
@@ -148,6 +154,18 @@ HB.structure Definition SemiVector (R : nzSemiRingType) :=
 #[mathcomp(axiom="vector_axiom_def"), short(type="vectType")]
 HB.structure Definition Vector (R : nzRingType) :=
   { V of LSemiModule_hasFinDim R V & GRing.Lmodule R V }.
+
+HB.mixin Record SemiVector_isProper (R : nzSemiRingType) (V : Type)
+  of SemiVector R V :=
+  { dim_gt0 : 0 < @dim R V }.
+
+#[short(type="nzSemiVectType")]
+HB.structure Definition NzSemiVector (R : nzSemiRingType) :=
+  { V of SemiVector R V & SemiVector_isProper R V }.
+
+#[short(type="nzVectType")]
+HB.structure Definition NzVector (R : nzRingType) :=
+  { V of Vector R V & SemiVector_isProper R V }.
 
 #[deprecated(since="mathcomp 2.2.0", use=Vector.axiom)]
 Notation vector_axiom := Vector.axiom.
@@ -1772,7 +1790,7 @@ End LinearPreimage.
 
 Arguments lpreimK {K aT rT f} [W] fW.
 
-Section LfunSemiAlgebra.
+Section LfunPzSemiAlgebra.
 
 Variables (R : comNzSemiRingType) (vT : semiVectType R).
 
@@ -1793,55 +1811,48 @@ HB.instance Definition _ := GRing.LSemiModule_isLSemiAlgebra.Build R 'End(vT)
 HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build R 'End(vT)
   (fun k x y => comp_lfunZl k y x).
 
-(* The instances we build below can't be canonical because we are missing an  *)
-(* interface for proper (semi)VectTypes, would sit between Vector and         *)
-(* Falgebra. For now, we just supply structure definitions here and supply    *)
-(* actual instances for F-algebras in a submodule of the algebra library      *)
-(* (there is currently no actual use of the 'End(vT) algebra structure). Also *)
-(* note that the unit ring structure is missing.                              *)
-Hypothesis vT_proper : dim vT > 0.
+End LfunPzSemiAlgebra.
+
+Section LfunNzSemiAlgebra.
+
+Variables (R : comNzSemiRingType) (vT : nzSemiVectType R).
 
 Fact lfun1_neq0 : \1%VF != 0 :> 'End(vT).
 Proof.
 apply/eqP=> /lfunP/(_ (r2v (const_mx 1))); rewrite !lfunE /= => /(canRL r2vK).
-by move=> /rowP/(_ (Ordinal vT_proper))/eqP; rewrite linear0 !mxE oner_eq0.
+by move=> /rowP/(_ (Ordinal dim_gt0))/eqP; rewrite linear0 !mxE oner_eq0.
 Qed.
 
-Definition lfun_nzMixin :=
+HB.instance Definition _ :=
   GRing.PzSemiRing_isNonZero.Build 'End(vT) lfun1_neq0.
 
-Definition lfun_nzSemiRingType : nzSemiRingType :=
-  HB.pack 'End(vT) lfun_nzMixin.
+End LfunNzSemiAlgebra.
 
-Definition lfun_nzLSemiAlgType : nzLSemiAlgType R :=
-  HB.pack 'End(vT) lfun_nzMixin.
+HB.instance Definition _ (R : comNzRingType) (vT : vectType R) :=
+  GRing.PzSemiAlgebra.on 'End(vT).
+HB.instance Definition _ (R : comNzRingType) (vT : nzVectType R) :=
+  GRing.NzSemiAlgebra.on 'End(vT).
 
-Definition lfun_nzSemiAlgType : nzSemiAlgType R :=
-  HB.pack 'End(vT) lfun_nzMixin.
-
-End LfunSemiAlgebra.
-
+(* The following section has been deprecated since MathComp 2.6 *)
 Section LfunAlgebra.
-
 Variables (R : comNzRingType) (vT : vectType R).
-
-HB.instance Definition _ := GRing.PzSemiAlgebra.on 'End(vT).
-
 Hypothesis vT_proper : dim vT > 0.
 
-Let lfun1_neq0 := lfun1_neq0 vT_proper.
-Let lfun_nzMixin := lfun_nzMixin vT_proper.
+#[local, non_forgetful_inheritance]
+HB.instance Definition _ := SemiVector_isProper.Build R vT vT_proper.
 
-Definition lfun_nzRingType : nzRingType := HB.pack 'End(vT) lfun_nzMixin.
-Definition lfun_nzLalgType : nzLalgType R := HB.pack 'End(vT) lfun_nzMixin.
-Definition lfun_nzAlgType : nzAlgType R := HB.pack 'End(vT) lfun_nzMixin.
-
-#[deprecated(since="mathcomp 2.6.0", note="Use lfun_nzRingType^c instead.")]
-Definition lfun_comp_nzRingType : nzRingType := lfun_nzRingType^c.
-#[deprecated(since="mathcomp 2.6.0", use=lfun_nzLalgType)]
-Definition lfun_lalgType := lfun_nzLalgType.
-#[deprecated(since="mathcomp 2.6.0", use=lfun_nzAlgType)]
-Definition lfun_algType := lfun_nzAlgType.
+#[deprecated(since="mathcomp 2.6.0",
+             note="Use the canonical instance on hom instead.")]
+Definition lfun_comp_nzRingType : nzRingType := 'End(vT)^c.
+#[deprecated(since="mathcomp 2.6.0",
+             note="Use the canonical instance on hom instead.")]
+Definition lfun_nzRingType : nzRingType := 'End(vT).
+#[deprecated(since="mathcomp 2.6.0",
+             note="Use the canonical instance on hom instead.")]
+Definition lfun_lalgType : nzLalgType R := 'End(vT).
+#[deprecated(since="mathcomp 2.6.0",
+             note="Use the canonical instance on hom instead.")]
+Definition lfun_algType : nzAlgType R := 'End(vT).
 
 End LfunAlgebra.
 
@@ -2068,12 +2079,14 @@ exists (fun a => a%:M).
   by split => [a b|c d]; rewrite 1?rmorphD 1?scale_scalar_mx.
 by exists (fun A : 'M_1 => A 0 0) => [a | A]; rewrite ?mxE // -mx11_scalar.
 Qed.
-HB.instance Definition _ := LSemiModule_hasFinDim.Build _ R^o regular_vect_iso.
+HB.instance Definition _ := LSemiModule_hasFinDim.Build R R^o regular_vect_iso.
+
+HB.instance Definition _ := SemiVector_isProper.Build R R^o erefl.
 
 End RegularVectType.
 
 (* TODO: HB.saturate *)
-HB.instance Definition _ (R : nzRingType) := SemiVector.on R^o.
+HB.instance Definition _ (R : nzRingType) := NzSemiVector.on R^o.
 
 (* External direct product of two vectTypes. *)
 Section ProdVector.
