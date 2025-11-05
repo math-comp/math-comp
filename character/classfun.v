@@ -314,14 +314,9 @@ HB.instance Definition _ := GRing.Zmodule_isLmodule.Build algC classfun
 
 Fact cfun_scaleAl a phi psi : a *: (phi * psi) = (a *: phi) * psi.
 Proof. by apply/cfunP=> x; rewrite !cfunE mulrA. Qed.
-Fact cfun_scaleAr a phi psi : a *: (phi * psi) = phi * (a *: psi).
-Proof. by rewrite !(mulrC phi) cfun_scaleAl. Qed.
 
-HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build algC classfun
-  cfun_scaleAl.
-
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build algC classfun
-  cfun_scaleAr.
+HB.instance Definition _ :=
+  GRing.LSemiModule_isComSemiAlgebra.Build algC classfun cfun_scaleAl.
 
 Section Automorphism.
 

@@ -82,7 +82,7 @@ Import GRing.Theory.
 
 #[short(type="fieldExtType")]
 HB.structure Definition FieldExt (R : nzRingType) := {T of Falgebra R T &
-  GRing.PzRing_hasCommutativeMul T & GRing.Field T}.
+  GRing.SemiRing_hasCommutativeMul T & GRing.Field T}.
 
 Module FieldExtExports.
 Bind Scope ring_scope with FieldExt.sort.
@@ -207,7 +207,7 @@ HB.instance Definition _ (K : {subfield L}) :=
    there, it is thus built only here *)
 
 HB.instance Definition _ (K : {subfield L}) :=
-  [SubNzRing_isSubComNzRing of subvs_of K by <:].
+  [SubSemiRing_isSubComSemiRing of subvs_of K by <:].
 HB.instance Definition _ (K : {subfield L}) :=
   [SubComUnitRing_isSubIntegralDomain of subvs_of K by <:].
 
@@ -638,14 +638,8 @@ Proof. by []. Qed.
 Fact fieldOver_scaleAl a u v : a *F: (u * v) = (a *F: u) * v.
 Proof. exact: mulrA. Qed.
 
-HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build _ L_F
-  fieldOver_scaleAl.
-
-Fact fieldOver_scaleAr a u v : a *F: (u * v) = u * (a *F: v).
-Proof. exact: mulrCA. Qed.
-
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build _ L_F
-  fieldOver_scaleAr.
+HB.instance Definition _ :=
+  GRing.LSemiModule_isComSemiAlgebra.Build _ L_F fieldOver_scaleAl.
 
 Fact fieldOver_vectMixin : Lmodule_hasFinDim K_F L_F.
 Proof.
@@ -791,14 +785,8 @@ Proof. by []. Qed.
 Fact baseField_scaleAl a (u v : L0) : a *F0: (u * v) = (a *F0: u) * v.
 Proof. exact: scalerAl. Qed.
 
-HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build _ L0
+HB.instance Definition _ := GRing.LSemiModule_isComSemiAlgebra.Build _ L0
   baseField_scaleAl.
-
-Fact baseField_scaleAr a u v : a *F0: (u * v) = u * (a *F0: v).
-Proof. exact: scalerAr. Qed.
-
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build _ L0
-  baseField_scaleAr.
 
 Let n := \dim {:F}.
 Let bF : n.-tuple F := vbasis {:F}.
@@ -1225,13 +1213,8 @@ HB.instance Definition _ := GRing.Zmodule_isLmodule.Build _ subFExtend
 
 Fact subfx_scaleAl a u v : subfx_scale a (u * v) = (subfx_scale a u) * v.
 Proof. exact: mulrA. Qed.
-HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build _ subFExtend
-  subfx_scaleAl.
-
-Fact subfx_scaleAr a u v : subfx_scale a (u * v) = u * (subfx_scale a v).
-Proof. exact: mulrCA. Qed.
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build _ subFExtend
-  subfx_scaleAr.
+HB.instance Definition _ :=
+  GRing.LSemiModule_isComSemiAlgebra.Build _ subFExtend subfx_scaleAl.
 
 Fact subfx_evalZ : scalable subfx_eval.
 Proof. by move=> a q; rewrite -mul_polyC rmorphM. Qed.
