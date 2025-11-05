@@ -168,7 +168,7 @@ Variable (R : comNzRingType) (aT : falgType R).
 Implicit Types f g : 'End(aT).
 
 HB.instance Definition _ := GRing.NzAlgebra.copy 'End(aT)
-  (lfun_algType (FalgType_proper aT)).
+  (lfun_nzAlgType (FalgType_proper aT)).
 
 Lemma lfun_mulE f g u : (f * g) u = g (f u). Proof. exact: lfunE. Qed.
 Lemma lfun_compE f g : (g \o f)%VF = f * g. Proof. by []. Qed.
