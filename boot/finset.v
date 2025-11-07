@@ -222,7 +222,7 @@ Implicit Types (x : T) (A B : {set T}) (pA : pred T).
 
 HB.instance Definition _ := Finite.on {set T}.
 
-Lemma in_set pA x : x \in finset pA = pA x.
+Lemma in_set pA x : (x \in finset pA) = pA x.
 Proof. by rewrite [@finset]unlock unlock [x \in _]ffunE. Qed.
 
 Lemma setP A B : A =i B <-> A = B.
@@ -297,13 +297,13 @@ Implicit Types (a x : T) (A B C D : {set T}) (pA pB pC : pred T).
 Lemma eqEsubset A B : (A == B) = (A \subset B) && (B \subset A).
 Proof. by apply/eqP/subset_eqP=> /setP. Qed.
 
-Lemma subEproper A B : A \subset B = (A == B) || (A \proper B).
+Lemma subEproper A B : (A \subset B) = (A == B) || (A \proper B).
 Proof. by rewrite eqEsubset -andb_orr orbN andbT. Qed.
 
 Lemma eqVproper A B : A \subset B -> A = B \/ A \proper B.
 Proof. by rewrite subEproper => /predU1P. Qed.
 
-Lemma properEneq A B : A \proper B = (A != B) && (A \subset B).
+Lemma properEneq A B : (A \proper B) = (A != B) && (A \subset B).
 Proof. by rewrite andbC eqEsubset negb_and andb_orr andbN. Qed.
 
 Lemma proper_neq A B : A \proper B -> A != B.
@@ -324,7 +324,7 @@ Proof. by rewrite properEneq ltnNge andbC eqEcard; case: (A \subset B). Qed.
 Lemma subset_leqif_cards A B : A \subset B -> (#|A| <= #|B| ?= iff (A == B)).
 Proof. by move=> sAB; rewrite eqEsubset sAB; apply: subset_leqif_card. Qed.
 
-Lemma in_set0 x : x \in set0 = false.
+Lemma in_set0 x : (x \in set0) = false.
 Proof. by rewrite in_set. Qed.
 
 Lemma sub0set A : set0 \subset A.
@@ -1254,7 +1254,7 @@ Qed.
 Lemma imset_f (D : {pred aT}) x : x \in D -> f x \in f @: D.
 Proof. by move=> Dx; apply/imsetP; exists x. Qed.
 
-Lemma mem_imset (D : {pred aT}) x : injective f -> f x \in f @: D = (x \in D).
+Lemma mem_imset (D : {pred aT}) x : injective f -> (f x \in f @: D) = (x \in D).
 Proof.
 by move=> f_inj; apply/imsetP/idP;[case=> [y] ? /f_inj -> | move=> ?; exists x].
 Qed.
@@ -2140,7 +2140,7 @@ Qed.
 Lemma cover_partition P D : partition P D -> cover P = D.
 Proof. by case/and3P=> /eqP. Qed.
 
-Lemma partition0 P D : partition P D -> set0 \in P = false.
+Lemma partition0 P D : partition P D -> (set0 \in P) = false.
 Proof. case/and3P => _ _. by apply: contraNF. Qed.
 
 Lemma partition_neq0 P D B : partition P D -> B \in P -> B != set0.
@@ -2167,7 +2167,7 @@ Proof.
 case/and3P => /eqP covP trivP set0P BD0 disSD.
 rewrite /partition !inE (negbTE set0P) orbF [_ == B]eq_sym BD0 andbT.
 rewrite /cover bigcup_setU /= big_set1 -covP eqxx /=.
-by move: disSD; rewrite -covP=> /bigcup_disjointP/trivIsetU1 => -[].
+by move: disSD; rewrite -covP => /bigcup_disjointP/trivIsetU1 => -[].
 Qed.
 
 Lemma partition_set0 P : partition P set0 = (P == set0).

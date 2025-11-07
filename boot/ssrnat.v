@@ -326,7 +326,7 @@ Notation "m < n < p" := ((m < n) && (n < p)) : nat_scope.
 Lemma ltnS m n : (m < n.+1) = (m <= n). Proof. by []. Qed.
 Lemma leq0n n : 0 <= n.                 Proof. by []. Qed.
 Lemma ltn0Sn n : 0 < n.+1.              Proof. by []. Qed.
-Lemma ltn0 n : n < 0 = false.           Proof. by []. Qed.
+Lemma ltn0 n : (n < 0) = false.         Proof. by []. Qed.
 Lemma leqnn n : n <= n.                 Proof. by elim: n. Qed.
 #[global] Hint Resolve leqnn : core.
 Lemma ltnSn n : n < n.+1.               Proof. by []. Qed.
@@ -356,7 +356,7 @@ Lemma leqVgt m n : (m <= n) || (n < m). Proof. by rewrite leqNgt orNb. Qed.
 Lemma ltnNge m n : (m < n) = ~~ (n <= m).
 Proof. by rewrite leqNgt. Qed.
 
-Lemma ltnn n : n < n = false.
+Lemma ltnn n : (n < n) = false.
 Proof. by rewrite ltnNge leqnn. Qed.
 
 Lemma leqn0 n : (n <= 0) = (n == 0).           Proof. by case: n. Qed.
@@ -375,16 +375,16 @@ Proof. by move=> m n; rewrite -eqn_leq => /eqP. Qed.
 Lemma neq_ltn m n : (m != n) = (m < n) || (n < m).
 Proof. by rewrite eqn_leq negb_and orbC -!ltnNge. Qed.
 
-Lemma gtn_eqF m n : m < n -> n == m = false.
+Lemma gtn_eqF m n : m < n -> (n == m) = false.
 Proof. by rewrite eqn_leq (leqNgt n) => ->. Qed.
 
-Lemma ltn_eqF m n : m < n -> m == n = false.
+Lemma ltn_eqF m n : m < n -> (m == n) = false.
 Proof. by move/gtn_eqF; rewrite eq_sym. Qed.
 
-Lemma ltn_geF m n : m < n -> m >= n = false.
+Lemma ltn_geF m n : m < n -> (m >= n) = false.
 Proof. by rewrite (leqNgt n) => ->. Qed.
 
-Lemma leq_gtF m n : m <= n -> m > n = false.
+Lemma leq_gtF m n : m <= n -> (m > n) = false.
 Proof. by rewrite (ltnNge n) => ->. Qed.
 
 Lemma leq_eqVlt m n : (m <= n) = (m == n) || (m < n).

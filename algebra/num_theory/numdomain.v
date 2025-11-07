@@ -430,7 +430,7 @@ Qed.
 
 Lemma normr_ge0 v : 0 <= `|v|. Proof. by rewrite ger0_def normr_id. Qed.
 
-Lemma normr_lt0 v : `|v| < 0 = false.
+Lemma normr_lt0 v : (`|v| < 0) = false.
 Proof. by rewrite le_gtF// normr_ge0. Qed.
 
 Lemma gtr0_norm_neq0 v : `|v| > 0 -> (v != 0).
@@ -451,10 +451,10 @@ Proof. by apply: (iffP eqP)=> [->|/normr0_eq0 //]; apply: normr0. Qed.
 
 Definition normr_eq0 v := sameP (`|v| =P 0) (normr0P v).
 
-Lemma normr_le0 v : `|v| <= 0 = (v == 0).
+Lemma normr_le0 v : (`|v| <= 0) = (v == 0).
 Proof. by rewrite -normr_eq0 eq_le normr_ge0 andbT. Qed.
 
-Lemma normr_gt0 v : `|v| > 0 = (v != 0).
+Lemma normr_gt0 v : (`|v| > 0) = (v != 0).
 Proof. by rewrite lt_def normr_eq0 normr_ge0 andbT. Qed.
 
 End NormedZmoduleTheory.
@@ -1201,10 +1201,10 @@ Proof.
 by move=> xle0 m n hmn /=; rewrite -lerN2 -!mulNrn ler_wpMn2l // oppr_cp0.
 Qed.
 
-Lemma mulrn_wgt0 x n : 0 < x -> 0 < x *+ n = (0 < n)%N.
+Lemma mulrn_wgt0 x n : 0 < x -> (0 < x *+ n) = (0 < n)%N.
 Proof. by case: n => // n hx; rewrite pmulrn_lgt0. Qed.
 
-Lemma mulrn_wlt0 x n : x < 0 -> x *+ n < 0 = (0 < n)%N.
+Lemma mulrn_wlt0 x n : x < 0 -> (x *+ n < 0) = (0 < n)%N.
 Proof. by case: n => // n hx; rewrite pmulrn_llt0. Qed.
 
 Lemma ler_pMn2l x :
@@ -1244,35 +1244,35 @@ Proof. by rewrite -[0]/0%:R ler_nat leqn0. Qed.
 Lemma ltrn0 n : (n%:R < 0 :> R) = false.
 Proof. by rewrite -[0]/0%:R ltr_nat ltn0. Qed.
 
-Lemma ler1n n : 1 <= n%:R :> R = (1 <= n)%N. Proof. by rewrite -ler_nat. Qed.
-Lemma ltr1n n : 1 < n%:R :> R = (1 < n)%N. Proof. by rewrite -ltr_nat. Qed.
-Lemma lern1 n : n%:R <= 1 :> R = (n <= 1)%N. Proof. by rewrite -ler_nat. Qed.
-Lemma ltrn1 n : n%:R < 1 :> R = (n < 1)%N. Proof. by rewrite -ltr_nat. Qed.
+Lemma ler1n n : (1 <= n%:R :> R) = (1 <= n)%N. Proof. by rewrite -ler_nat. Qed.
+Lemma ltr1n n : (1 < n%:R :> R) = (1 < n)%N. Proof. by rewrite -ltr_nat. Qed.
+Lemma lern1 n : (n%:R <= 1 :> R) = (n <= 1)%N. Proof. by rewrite -ler_nat. Qed.
+Lemma ltrn1 n : (n%:R < 1 :> R) = (n < 1)%N. Proof. by rewrite -ltr_nat. Qed.
 
 Lemma ltrN10 : -1 < 0 :> R. Proof. by rewrite oppr_lt0. Qed.
 Lemma lerN10 : -1 <= 0 :> R. Proof. by rewrite oppr_le0. Qed.
-Lemma ltr10 : 1 < 0 :> R = false. Proof. by rewrite le_gtF. Qed.
-Lemma ler10 : 1 <= 0 :> R = false. Proof. by rewrite lt_geF. Qed.
-Lemma ltr0N1 : 0 < -1 :> R = false. Proof. by rewrite le_gtF // lerN10. Qed.
-Lemma ler0N1 : 0 <= -1 :> R = false. Proof. by rewrite lt_geF // ltrN10. Qed.
+Lemma ltr10 : (1 < 0 :> R) = false. Proof. by rewrite le_gtF. Qed.
+Lemma ler10 : (1 <= 0 :> R) = false. Proof. by rewrite lt_geF. Qed.
+Lemma ltr0N1 : (0 < -1 :> R) = false. Proof. by rewrite le_gtF // lerN10. Qed.
+Lemma ler0N1 : (0 <= -1 :> R) = false. Proof. by rewrite lt_geF // ltrN10. Qed.
 
 #[deprecated(since="mathcomp 2.4.0", use=mulrn_wgt0)]
-Lemma pmulrn_rgt0 x n : 0 < x -> 0 < x *+ n = (0 < n)%N.
+Lemma pmulrn_rgt0 x n : 0 < x -> (0 < x *+ n) = (0 < n)%N.
 Proof. exact: mulrn_wgt0. Qed.
 
-Lemma pmulrn_rlt0 x n : 0 < x -> x *+ n < 0 = false.
+Lemma pmulrn_rlt0 x n : 0 < x -> (x *+ n < 0) = false.
 Proof. by move=> x_gt0; rewrite -(mulr0n x) ltr_pMn2l. Qed.
 
 Lemma pmulrn_rge0 x n : 0 < x -> 0 <= x *+ n.
 Proof. by move=> x_gt0; rewrite -(mulr0n x) ler_pMn2l. Qed.
 
-Lemma pmulrn_rle0 x n : 0 < x -> x *+ n <= 0 = (n == 0)%N.
+Lemma pmulrn_rle0 x n : 0 < x -> (x *+ n <= 0) = (n == 0)%N.
 Proof. by move=> x_gt0; rewrite -(mulr0n x) ler_pMn2l ?leqn0. Qed.
 
-Lemma nmulrn_rgt0 x n : x < 0 -> 0 < x *+ n = false.
+Lemma nmulrn_rgt0 x n : x < 0 -> (0 < x *+ n) = false.
 Proof. by move=> x_lt0; rewrite -(mulr0n x) ltr_nMn2l. Qed.
 
-Lemma nmulrn_rge0 x n : x < 0 -> 0 <= x *+ n = (n == 0)%N.
+Lemma nmulrn_rge0 x n : x < 0 -> (0 <= x *+ n) = (n == 0)%N.
 Proof. by move=> x_lt0; rewrite -(mulr0n x) ler_nMn2l ?leqn0. Qed.
 
 Lemma nmulrn_rle0 x n : x < 0 -> x *+ n <= 0.
@@ -1571,7 +1571,7 @@ move=> xge0 xle1; elim: n=> [|*]; rewrite ?expr0 // exprS.
 by rewrite mulr_ile1 ?exprn_ge0.
 Qed.
 
-Lemma exprn_ilt1 n x : 0 <= x -> x < 1 -> x ^+ n < 1 = (n != 0).
+Lemma exprn_ilt1 n x : 0 <= x -> x < 1 -> (x ^+ n < 1) = (n != 0).
 Proof.
 move=> xge0 xlt1.
 case: n; [by rewrite eqxx ltxx | elim=> [|n ihn]; first by rewrite expr1].
@@ -1585,7 +1585,7 @@ Proof.
 by move=> x_ge1; elim: n=> [|n ihn]; rewrite ?expr0 // exprS mulr_ege1.
 Qed.
 
-Lemma exprn_egt1 n x : 1 < x -> 1 < x ^+ n = (n != 0).
+Lemma exprn_egt1 n x : 1 < x -> (1 < x ^+ n) = (n != 0).
 Proof.
 move=> xgt1; case: n; first by rewrite eqxx ltxx.
 by elim=> [|n ihn]; rewrite ?expr1// exprS mulr_egt1 // exprn_ge0.
@@ -1678,7 +1678,7 @@ Proof. by move=> xgt1; apply: (leW_mono (ler_eXn2l _)). Qed.
 
 Definition lter_eXn2l := (ler_eXn2l, ltr_eXn2l).
 
-Lemma ltrXn2r n x y : 0 <= x -> x < y -> x ^+ n < y ^+ n = (n != 0).
+Lemma ltrXn2r n x y : 0 <= x -> x < y -> (x ^+ n < y ^+ n) = (n != 0).
 Proof.
 move=> xge0 xlty; case: n; first by rewrite ltxx.
 elim=> [|n IHn]; rewrite ?[_ ^+ _.+2]exprS //.
@@ -1986,10 +1986,10 @@ Qed.
 Lemma ler_dist_normD v w : `| `|v| - `|w| | <= `|v + w|.
 Proof. by rewrite -[w]opprK normrN ler_dist_dist. Qed.
 
-Lemma ler_nnorml v x : x < 0 -> `|v| <= x = false.
+Lemma ler_nnorml v x : x < 0 -> (`|v| <= x) = false.
 Proof. by move=> h; rewrite lt_geF //; apply/(lt_le_trans h). Qed.
 
-Lemma ltr_nnorml v x : x <= 0 -> `|v| < x = false.
+Lemma ltr_nnorml v x : x <= 0 -> (`|v| < x) = false.
 Proof. by move=> h; rewrite le_gtF //; apply/(le_trans h). Qed.
 
 Definition lter_nnormr := (ler_nnorml, ltr_nnorml).
@@ -2384,16 +2384,16 @@ Definition subr_lteif0 := (subr_lteifr0, subr_lteif0r).
 Lemma lteif01 C : 0 < 1 ?<= if C :> R.
 Proof. by case: C; rewrite /= lter01. Qed.
 
-Lemma lteifNl C x y : - x < y ?<= if C = (- y < x ?<= if C).
+Lemma lteifNl C x y : (- x < y ?<= if C) = (- y < x ?<= if C).
 Proof. by case: C; rewrite /= lterNl. Qed.
 
-Lemma lteifNr C x y : x < - y ?<= if C = (y < - x ?<= if C).
+Lemma lteifNr C x y : (x < - y ?<= if C) = (y < - x ?<= if C).
 Proof. by case: C; rewrite /= lterNr. Qed.
 
-Lemma lteif0Nr C x : 0 < - x ?<= if C = (x < 0 ?<= if C).
+Lemma lteif0Nr C x : (0 < - x ?<= if C) = (x < 0 ?<= if C).
 Proof. by case: C; rewrite /= (oppr_ge0, oppr_gt0). Qed.
 
-Lemma lteifNr0 C x : - x < 0 ?<= if C = (0 < x ?<= if C).
+Lemma lteifNr0 C x : (- x < 0 ?<= if C) = (0 < x ?<= if C).
 Proof. by case: C; rewrite /= (oppr_le0, oppr_lt0). Qed.
 
 Lemma lteifN2 C : {mono -%R : x y /~ x < y ?<= if C :> R}.
@@ -2441,7 +2441,7 @@ Lemma lteif_nnormr C x y : y < 0 ?<= if ~~ C -> (`|x| < y ?<= if C) = false.
 Proof. by case: C => ?; rewrite /= lter_nnormr. Qed.
 
 Lemma real_lteifNE x y C : x \is Num.real -> y \is Num.real ->
-  x < y ?<= if ~~ C = ~~ (y < x ?<= if C).
+  (x < y ?<= if ~~ C) = ~~ (y < x ?<= if C).
 Proof. by move=> ? ?; rewrite comparable_lteifNE ?real_comparable. Qed.
 
 Lemma real_lteif_norml C x y :
@@ -3029,7 +3029,7 @@ HB.builders Context R of IntegralDomain_isNumRing R.
   Local Notation "x < y" := (Rlt x y) : ring_scope.
   Local Notation "`| x |" := (norm x) : ring_scope.
 
-  Lemma ltrr x : x < x = false. Proof. by rewrite lt_def eqxx. Qed.
+  Lemma ltrr x : (x < x) = false. Proof. by rewrite lt_def eqxx. Qed.
 
   Lemma ge0_def x : (0 <= x) = (`|x| == x).
   Proof. by rewrite le_def subr0. Qed.
@@ -3085,7 +3085,7 @@ HB.builders Context R of IntegralDomain_isNumRing R.
   have: `|-1| ^+ 2 == 1 :> R
     by rewrite expr2 /= -normM mulrNN mul1r -[1]subr0 -le_def le01.
   rewrite sqrf_eq1 => /predU1P [] //; rewrite -[-1]subr0 -le_def.
-  have ->: 0 <= -1 = (-1 == 0 :> R) || (0 < -1)
+  have ->: (0 <= -1) = (-1 == 0 :> R) || (0 < -1)
     by rewrite lt_def; case: eqP => // ->; rewrite lerr.
   by rewrite oppr_eq0 oner_eq0 => /(addr_gt0 lt01); rewrite subrr ltrr.
   Qed.

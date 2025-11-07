@@ -487,7 +487,7 @@ Proof. by move: m n=> [|?] []. Qed.
 
 Lemma le0z_nat n : 0 <= n :> int. Proof. by []. Qed.
 
-Lemma lez0_nat n : n <= 0 :> int = (n == 0 :> nat). Proof. by elim: n. Qed.
+Lemma lez0_nat n : (n <= 0 :> int) = (n == 0 :> nat). Proof. by elim: n. Qed.
 
 Definition ltezN_nat := (lezN_nat, ltzN_nat).
 Definition ltez_natE := (ltez_nat, lteNz_nat, ltezN_nat, le0z_nat, lez0_nat).
@@ -837,28 +837,28 @@ Proof. by rewrite -(mul0rz _ n) ler_wnMz2r. Qed.
 Lemma mulrz_le0_ge0 x n (x0 : x <= 0) (n0 : 0 <= n) : x *~ n <= 0.
 Proof. by rewrite -(mul0rz _ n) ler_wpMz2r. Qed.
 
-Lemma pmulrz_lgt0 x n (n0 : 0 < n) : 0 < x *~ n = (0 < x).
+Lemma pmulrz_lgt0 x n (n0 : 0 < n) : (0 < x *~ n) = (0 < x).
 Proof. by rewrite -(mul0rz _ n) ltr_pMz2r // mul0rz. Qed.
 
-Lemma nmulrz_lgt0 x n (n0 : n < 0) : 0 < x *~ n = (x < 0).
+Lemma nmulrz_lgt0 x n (n0 : n < 0) : (0 < x *~ n) = (x < 0).
 Proof. by rewrite -(mul0rz _ n) ltr_nMz2r // mul0rz. Qed.
 
-Lemma pmulrz_llt0 x n (n0 : 0 < n) : x *~ n < 0 = (x < 0).
+Lemma pmulrz_llt0 x n (n0 : 0 < n) : (x *~ n < 0) = (x < 0).
 Proof. by rewrite -(mul0rz _ n) ltr_pMz2r // mul0rz. Qed.
 
-Lemma nmulrz_llt0 x n (n0 : n < 0) : x *~ n < 0 = (0 < x).
+Lemma nmulrz_llt0 x n (n0 : n < 0) : (x *~ n < 0) = (0 < x).
 Proof. by rewrite -(mul0rz _ n) ltr_nMz2r // mul0rz. Qed.
 
-Lemma pmulrz_lge0 x n (n0 : 0 < n) : 0 <= x *~ n = (0 <= x).
+Lemma pmulrz_lge0 x n (n0 : 0 < n) : (0 <= x *~ n) = (0 <= x).
 Proof. by rewrite -(mul0rz _ n) ler_pMz2r // mul0rz. Qed.
 
-Lemma nmulrz_lge0 x n (n0 : n < 0) : 0 <= x *~ n = (x <= 0).
+Lemma nmulrz_lge0 x n (n0 : n < 0) : (0 <= x *~ n) = (x <= 0).
 Proof. by rewrite -(mul0rz _ n) ler_nMz2r // mul0rz. Qed.
 
-Lemma pmulrz_lle0 x n (n0 : 0 < n) : x *~ n <= 0 = (x <= 0).
+Lemma pmulrz_lle0 x n (n0 : 0 < n) : (x *~ n <= 0) = (x <= 0).
 Proof. by rewrite -(mul0rz _ n) ler_pMz2r // mul0rz. Qed.
 
-Lemma nmulrz_lle0 x n (n0 : n < 0) : x *~ n <= 0 = (0 <= x).
+Lemma nmulrz_lle0 x n (n0 : n < 0) : (x *~ n <= 0) = (0 <= x).
 Proof. by rewrite -(mul0rz _ n) ler_nMz2r // mul0rz. Qed.
 
 Lemma ler_wpMz2l x (hx : 0 <= x) : {homo *~%R x : x y / x <= y}.
@@ -889,28 +889,28 @@ Proof. exact: leW_mono (ler_pMz2l _). Qed.
 Lemma ltr_nMz2l x (hx : x < 0) : {mono *~%R x : x y /~ x < y}.
 Proof. exact: leW_nmono (ler_nMz2l _). Qed.
 
-Lemma pmulrz_rgt0 x n (x0 : 0 < x) : 0 < x *~ n = (0 < n).
+Lemma pmulrz_rgt0 x n (x0 : 0 < x) : (0 < x *~ n) = (0 < n).
 Proof. by rewrite -(mulr0z x) ltr_pMz2l. Qed.
 
-Lemma nmulrz_rgt0 x n (x0 : x < 0) : 0 < x *~ n = (n < 0).
+Lemma nmulrz_rgt0 x n (x0 : x < 0) : (0 < x *~ n) = (n < 0).
 Proof. by rewrite -(mulr0z x) ltr_nMz2l. Qed.
 
-Lemma pmulrz_rlt0 x n (x0 : 0 < x) : x *~ n < 0 = (n < 0).
+Lemma pmulrz_rlt0 x n (x0 : 0 < x) : (x *~ n < 0) = (n < 0).
 Proof. by rewrite -(mulr0z x) ltr_pMz2l. Qed.
 
-Lemma nmulrz_rlt0 x n (x0 : x < 0) : x *~ n < 0 = (0 < n).
+Lemma nmulrz_rlt0 x n (x0 : x < 0) : (x *~ n < 0) = (0 < n).
 Proof. by rewrite -(mulr0z x) ltr_nMz2l. Qed.
 
-Lemma pmulrz_rge0 x n (x0 : 0 < x) : 0 <= x *~ n = (0 <= n).
+Lemma pmulrz_rge0 x n (x0 : 0 < x) : (0 <= x *~ n) = (0 <= n).
 Proof. by rewrite -(mulr0z x) ler_pMz2l. Qed.
 
-Lemma nmulrz_rge0 x n (x0 : x < 0) : 0 <= x *~ n = (n <= 0).
+Lemma nmulrz_rge0 x n (x0 : x < 0) : (0 <= x *~ n) = (n <= 0).
 Proof. by rewrite -(mulr0z x) ler_nMz2l. Qed.
 
-Lemma pmulrz_rle0 x n (x0 : 0 < x) : x *~ n <= 0 = (n <= 0).
+Lemma pmulrz_rle0 x n (x0 : 0 < x) : (x *~ n <= 0) = (n <= 0).
 Proof. by rewrite -(mulr0z x) ler_pMz2l. Qed.
 
-Lemma nmulrz_rle0 x n (x0 : x < 0) : x *~ n <= 0 = (0 <= n).
+Lemma nmulrz_rle0 x n (x0 : x < 0) : (x *~ n <= 0) = (0 <= n).
 Proof. by rewrite -(mulr0z x) ler_nMz2l. Qed.
 
 Lemma mulrIz x (hx : x != 0) : injective ( *~%R x).
@@ -958,7 +958,7 @@ Proof. by rewrite -(mulr0z 1) (inj_eq (mulrIz _)) // oner_eq0. Qed.
 Lemma mulrz_eq0 x n : (x *~ n == 0) = ((n == 0) || (x == 0)).
 Proof. by rewrite -mulrzl mulf_eq0 intr_eq0. Qed.
 
-Lemma mulrz_neq0 x n : x *~ n != 0 = ((n != 0) && (x != 0)).
+Lemma mulrz_neq0 x n : (x *~ n != 0) = ((n != 0) && (x != 0)).
 Proof. by rewrite mulrz_eq0 negb_or. Qed.
 
 Lemma realz n : (n%:~R : R) \in Num.real.

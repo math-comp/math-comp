@@ -1052,7 +1052,7 @@ Proof. by move=> + /(le_trans _)/[apply]; apply: le_trans. Qed.
 Lemma lt_le_def x y: (x < y) = (x <= y) && ~~ (y <= x).
 Proof. exact: lt_def. Qed.
 
-Lemma ltxx x: x < x = false.
+Lemma ltxx x: (x < x) = false.
 Proof. by rewrite lt_le_def andbN. Qed.
 
 Definition lt_irreflexive : irreflexive lt := ltxx.
@@ -1060,10 +1060,10 @@ Hint Resolve lt_irreflexive : core.
 
 Definition ltexx := (lexx, ltxx).
 
-Lemma lt_eqF x y: x < y -> x == y = false.
+Lemma lt_eqF x y: x < y -> (x == y) = false.
 Proof. by apply: contraTF => /eqP ->; rewrite ltxx. Qed.
 
-Lemma gt_eqF x y : y < x -> x == y = false.
+Lemma gt_eqF x y : y < x -> (x == y) = false.
 Proof. by move=> /lt_eqF; rewrite eq_sym. Qed.
 
 Lemma ltW x y: x < y -> x <= y.
@@ -1089,15 +1089,15 @@ Qed.
 Lemma lt_nsym x y : x < y -> y < x -> False.
 Proof. by move=> xy /(lt_trans xy); rewrite ltxx. Qed.
 
-Lemma lt_asym x y : x < y < x = false.
+Lemma lt_asym x y : (x < y < x) = false.
 Proof. by apply/negP => /andP []; apply: lt_nsym. Qed.
 
-Lemma le_gtF x y: x <= y -> y < x = false.
+Lemma le_gtF x y: x <= y -> (y < x) = false.
 Proof.
 by move=> le_xy; apply/negP => /lt_le_trans /(_ le_xy); rewrite ltxx.
 Qed.
 
-Lemma lt_geF x y : x < y -> y <= x = false.
+Lemma lt_geF x y : x < y -> (y <= x) = false.
 Proof. by apply: contraTF => /le_gtF ->. Qed.
 
 Definition lt_gtF x y hxy := le_gtF (@ltW x y hxy).
@@ -1105,10 +1105,10 @@ Definition lt_gtF x y hxy := le_gtF (@ltW x y hxy).
 Lemma lt_leAnge x y : (x < y) = (x <= y) && ~~ (y <= x).
 Proof. exact: lt_le_def. Qed.
 
-Lemma lt_le_asym x y : x < y <= x = false.
+Lemma lt_le_asym x y : (x < y <= x) = false.
 Proof. by apply/negP; move=> /andP[] xy /(lt_le_trans xy); rewrite ltxx. Qed.
 
-Lemma le_lt_asym x y : x <= y < x = false.
+Lemma le_lt_asym x y : (x <= y < x) = false.
 Proof. by rewrite andbC lt_le_asym. Qed.
 
 Lemma le_leP {x y} : reflect (forall z, y <= z -> x <= z) (x <= y).
@@ -1356,15 +1356,15 @@ Qed.
 Lemma lteifxx x C : (x < x ?<= if C) = C.
 Proof. by case: C; rewrite /= ltexx. Qed.
 
-Lemma lteifNF x y C : y < x ?<= if ~~ C -> x < y ?<= if C = false.
+Lemma lteifNF x y C : y < x ?<= if ~~ C -> (x < y ?<= if C) = false.
 Proof. by case: C => [/lt_geF|/le_gtF]. Qed.
 
 Lemma lteifS x y C : x < y -> x < y ?<= if C.
 Proof. by case: C => //= /ltW. Qed.
 
-Lemma lteifT x y : x < y ?<= if true = (x <= y). Proof. by []. Qed.
+Lemma lteifT x y : (x < y ?<= if true) = (x <= y). Proof. by []. Qed.
 
-Lemma lteifF x y : x < y ?<= if false = (x < y). Proof. by []. Qed.
+Lemma lteifF x y : (x < y ?<= if false) = (x < y). Proof. by []. Qed.
 
 Lemma lteif_orb x y : {morph lteif x y : p q / p || q}.
 Proof.
@@ -2616,11 +2616,11 @@ by rewrite -lt_leAnge.
 Qed.
 
 Lemma le_pair (x1 y1 : T1) (x2 y2 : T2) :
-  (x1, x2) <= (y1, y2) :> T1 * T2 = (x1 <= y1) && (x2 <= y2).
+  ((x1, x2) <= (y1, y2) :> T1 * T2) = (x1 <= y1) && (x2 <= y2).
 Proof. by []. Qed.
 
 Lemma lt_pair (x1 y1 : T1) (x2 y2 : T2) :
-  (x1, x2) < (y1, y2) :> T1 * T2
+  ((x1, x2) < (y1, y2) :> T1 * T2)
   = (x1 < y1) && (x2 <= y2) || (x1 <= y1) && (x2 < y2).
 Proof. exact/ltEprod. Qed.
 
@@ -2823,11 +2823,11 @@ Lemma ltEprodlexi x y :
 Proof. by []. Qed.
 
 Lemma lexi_pair (x1 y1 : T1) (x2 y2 : T2) :
-   (x1, x2) <= (y1, y2) :> T1 * T2 = (x1 <= y1) && ((x1 >= y1) ==> (x2 <= y2)).
+  ((x1, x2) <= (y1, y2) :> T1 * T2) = (x1 <= y1) && ((x1 >= y1) ==> (x2 <= y2)).
 Proof. by []. Qed.
 
 Lemma ltxi_pair (x1 y1 : T1) (x2 y2 : T2) :
-   (x1, x2) < (y1, y2) :> T1 * T2 = (x1 <= y1) && ((x1 >= y1) ==> (x2 < y2)).
+  ((x1, x2) < (y1, y2) :> T1 * T2) = (x1 <= y1) && ((x1 >= y1) ==> (x2 < y2)).
 Proof. by []. Qed.
 
 End Preorder.
@@ -3008,17 +3008,17 @@ Qed.
 #[export]
 HB.instance Definition _ := isPreorder.Build disp' (seq T) (rrefl _) refl trans.
 
-Lemma leEseq s1 s2 : s1 <= s2 = if s1 isn't x1 :: s1' then true else
-                                if s2 isn't x2 :: s2' then false else
-                                (x1 <= x2) && (s1' <= s2' :> seq _).
+Lemma leEseq s1 s2 : (s1 <= s2) = if s1 isn't x1 :: s1' then true else
+                                  if s2 isn't x2 :: s2' then false else
+                                  (x1 <= x2) && (s1' <= s2' :> seq _).
 Proof. by case: s1. Qed.
 
 Lemma le0s s : [::] <= s :> seq _. Proof. by []. Qed.
 
-Lemma les0 s : s <= [::] = (s == [::]). Proof. by rewrite leEseq. Qed.
+Lemma les0 s : (s <= [::]) = (s == [::]). Proof. by rewrite leEseq. Qed.
 
 Lemma le_cons x1 s1 x2 s2 :
-   x1 :: s1 <= x2 :: s2 :> seq _ = (x1 <= x2) && (s1 <= s2).
+   (x1 :: s1 <= x2 :: s2 :> seq _) = (x1 <= x2) && (s1 <= s2).
 Proof. by []. Qed.
 
 #[export]
@@ -3113,31 +3113,31 @@ Qed.
 HB.instance Definition _ := isPreorder.Build disp' (seq T) lt_le_def refl trans.
 
 Lemma leEseqlexi s1 s2 :
-   s1 <= s2 = if s1 isn't x1 :: s1' then true else
-              if s2 isn't x2 :: s2' then false else
-              (x1 <= x2) && ((x1 >= x2) ==> (s1' <= s2' :> seq T)).
+  (s1 <= s2) = if s1 isn't x1 :: s1' then true else
+               if s2 isn't x2 :: s2' then false else
+               (x1 <= x2) && ((x1 >= x2) ==> (s1' <= s2' :> seq T)).
 Proof. by case: s1. Qed.
 
 Lemma ltEseqlexi s1 s2 :
-   s1 < s2 = if s2 isn't x2 :: s2' then false else
+  (s1 < s2) = if s2 isn't x2 :: s2' then false else
               if s1 isn't x1 :: s1' then true else
               (x1 <= x2) && ((x1 >= x2) ==> (s1' < s2' :> seq T)).
 Proof. by case: s1. Qed.
 
 Lemma lexi0s s : [::] <= s :> seq T. Proof. by []. Qed.
 
-Lemma lexis0 s : s <= [::] = (s == [::]). Proof. by rewrite leEseqlexi. Qed.
+Lemma lexis0 s : (s <= [::]) = (s == [::]). Proof. by rewrite leEseqlexi. Qed.
 
 Lemma ltxi0s s : ([::] < s :> seq T) = (s != [::]). Proof. by case: s. Qed.
 
-Lemma ltxis0 s : s < [::] = false. Proof. by rewrite ltEseqlexi. Qed.
+Lemma ltxis0 s : (s < [::]) = false. Proof. by rewrite ltEseqlexi. Qed.
 
 Lemma lexi_cons x1 s1 x2 s2 :
-  x1 :: s1 <= x2 :: s2 :> seq T = (x1 <= x2) && ((x1 >= x2) ==> (s1 <= s2)).
+  (x1 :: s1 <= x2 :: s2 :> seq T) = (x1 <= x2) && ((x1 >= x2) ==> (s1 <= s2)).
 Proof. by []. Qed.
 
 Lemma ltxi_cons x1 s1 x2 s2 :
-  x1 :: s1 < x2 :: s2 :> seq T = (x1 <= x2) && ((x1 >= x2) ==> (s1 < s2)).
+  (x1 :: s1 < x2 :: s2 :> seq T) = (x1 <= x2) && ((x1 >= x2) ==> (s1 < s2)).
 Proof. by []. Qed.
 
 Lemma lexi_lehead x s1 y s2 : x :: s1 <= y :: s2 :> seq T -> x <= y.
@@ -3244,7 +3244,7 @@ Implicit Types (n : nat) (T : preorderType disp).
   [SubChoice_isSubPreorder of n.-tuple T by <: with disp'].
 
 Lemma leEtprod n T (t1 t2 : n.-tuple T) :
-   t1 <= t2 = [forall i, tnth t1 i <= tnth t2 i].
+  (t1 <= t2) = [forall i, tnth t1 i <= tnth t2 i].
 Proof.
 elim: n => [|n IHn] in t1 t2 *.
   by rewrite tuple0 [t2]tuple0/= lexx; symmetry; apply/forallP => [].
@@ -3257,8 +3257,8 @@ by have := lext12 (lift ord0 i); rewrite !tnthS.
 Qed.
 
 Lemma ltEtprod n T (t1 t2 : n.-tuple T) :
-  t1 < t2 = [exists i, tnth t1 i < tnth t2 i] &&
-            [forall i, tnth t1 i <= tnth t2 i].
+  (t1 < t2) = [exists i, tnth t1 i < tnth t2 i] &&
+              [forall i, tnth t1 i <= tnth t2 i].
 Proof.
 rewrite lt_leAnge !leEtprod negb_forall andbC.
 apply/andP/andP => -[] /existsP[x] xlt le; split=> //; apply/existsP; exists x.
@@ -3488,7 +3488,7 @@ Context {disp : disp_t} {T : finType}.
 Local Notation "{ 'subset' T }" := (type disp T).
 Implicit Type (A B C : {subset T}).
 
-Lemma le_def A B : A \subset B = (A :&: B == A).
+Lemma le_def A B : (A \subset B) = (A :&: B == A).
 Proof. exact/setIidPl/eqP. Qed.
 
 #[export]

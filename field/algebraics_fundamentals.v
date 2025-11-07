@@ -193,7 +193,7 @@ have /dvdzP[b Da]: (denq y %| a)%Z.
 pose m := `|(numq y * b + N)%R|%N.
 have Dm: m%:R = `|y * a%:~R + N%:R|.
   by rewrite pmulrn abszE intr_norm Da rmorphD !rmorphM /= numqE mulrAC mulrA.
-have ltr_Qnat n1 n2 : (n1%:R < n2%:R :> rat = _) := ltr_nat _ n1 n2.
+have ltr_Qnat n1 n2 : (n1%:R < n2%:R :> rat) = _ := ltr_nat _ n1 n2.
 have ub_y: `|y * a%:~R| < N%:R.
   apply: le_lt_trans (archi_boundP (normr_ge0 _)); rewrite !normrM.
   by rewrite ler_pM // (le_trans _ (ler_norm n)) ?ltW ?ub_n.

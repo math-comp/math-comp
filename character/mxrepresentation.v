@@ -2927,7 +2927,7 @@ move/trivgP: injG => KrG1; pose rZ := subg_repr rG (center_sub _).
 apply: (div_ring_mul_group_cyclic (repr_mx1 rZ)) (repr_mxM rZ) _ _; last first.
   exact: center_abelian.
 move=> x; rewrite -[[set _]]KrG1 !inE mul1mx -subr_eq0 andbC; set U := _ - _.
-do 2![case/andP]=> Gx cGx; rewrite Gx /=; apply: (mx_Schur irrG).
+do 2![case/andP] => Gx cGx; rewrite Gx /=; apply: (mx_Schur irrG).
 apply/centgmxP=> y Gy; rewrite mulmxBl mulmxBr mulmx1 mul1mx.
 by rewrite -!repr_mxM // (centP cGx).
 Qed.

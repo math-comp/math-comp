@@ -497,7 +497,7 @@ Proof. exact: mem0v. Qed.
 Lemma subv0 U : (U <= 0)%VS = (U == 0%VS).
 Proof. by rewrite eqEsubv sub0v andbT. Qed.
 
-Lemma memv0 v : v \in 0%VS = (v == 0).
+Lemma memv0 v : (v \in 0%VS) = (v == 0).
 Proof. by apply/idP/eqP=> [/vlineP[k ->] | ->]; rewrite (scaler0, mem0v). Qed.
 
 (* Full space *)
