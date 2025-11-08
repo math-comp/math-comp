@@ -433,9 +433,8 @@ have eC : q * d * (lead_coef d ^+ k)%:P = q * (lead_coef d ^+ k)%:P * d.
 suff e1 : q1 = q * (lead_coef d ^+ k)%:P.
   by congr (_, _, _) => //=; move: Heq; rewrite e1 mulrDl eC => /addrI.
 have : (q1 - q * (lead_coef d ^+ k)%:P) * d = r * (lead_coef d ^+ k)%:P - r1.
-  apply: (@addIr _ r1); rewrite subrK.
-  apply: (@addrI _ ((q * (lead_coef d ^+ k)%:P) * d)).
-  by rewrite mulrDl mulNr !addrA [_ + (q1 * d)]addrC addrK -eC -mulrDl.
+  apply/eqP; rewrite -subr_eq0 mulrDl !mulNr.
+  by rewrite opprB addrACA -opprD -eC -mulrDl Heq subrr.
 move/eqP; rewrite -[_ == _ - _]subr_eq0 rreg_div0 //.
   by case/andP; rewrite subr_eq0; move/eqP.
 rewrite size_polyN; apply: (leq_ltn_trans (size_polyD _ _)); rewrite size_polyN.
@@ -1279,7 +1278,7 @@ case: (eqVneq d 0) => [-> /dvd0pP -> | dn0]; first by rewrite modp0.
 rewrite dvdp_eq; set c1 := _ ^+ _; set q1 := _ %/ _; move/eqP=> Eq1.
 apply/idP/idP; rewrite dvdp_eq; set c2 := _ ^+ _; set q2 := _ %/ _.
   have sn0 : c1 * c2 != 0.
-   by rewrite !mulf_neq0 // expf_eq0 lead_coef_eq0 (negPf dn0) andbF.
+    by rewrite !mulf_neq0 // expf_eq0 lead_coef_eq0 (negPf dn0) andbF.
   pose quo := (c1 * lead_coef n ^+ scalp m n) *: q2 - c2 *: (m %/ n) * q1.
   move/eqP=> Eq2; apply: (@eq_dvdp _ quo _ _ sn0).
   rewrite mulrDl mulNr -!scalerAl -!mulrA -Eq1 -Eq2 -scalerAr !scalerA.

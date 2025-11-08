@@ -323,9 +323,8 @@ Qed.
 Lemma mulz_addl : left_distributive mulz (+%R).
 Proof.
 move=> x y z; elim: z=> [|n|n]; first by rewrite !(mul0z,mulzC).
-  by rewrite !mulzS=> ->; rewrite !addrA [X in X + _]addrAC.
-rewrite !mulzN !mulzS -!opprD=> /oppr_inj->.
-by rewrite !addrA [X in X + _]addrAC.
+  by rewrite !mulzS=> ->; rewrite addrACA.
+by rewrite !mulzN !mulzS -!opprD addrACA => /oppr_inj->.
 Qed.
 
 Lemma nonzero1z : 1%Z != 0. Proof. by []. Qed.

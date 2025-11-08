@@ -678,14 +678,14 @@ Definition zchinese r1 r2 :=
 Lemma zchinese_modl r1 r2 : (zchinese r1 r2 = r1 %[mod m1])%Z.
 Proof.
 rewrite /zchinese; have [u v /= Duv _] := egcdzP m1 m2.
-rewrite -{2}[r1]mulr1 -((gcdz _ _ =P 1) co_m12) -Duv.
-by rewrite mulrDr mulrAC addrC (mulrAC r2) !mulrA !modzMDl.
+rewrite -[r1 in RHS]mulr1 -((gcdz _ _ =P 1) co_m12) -Duv.
+by rewrite mulrDr addrC mulrAC 2!mulrA 2!modzMDl mulrAC.
 Qed.
 
 Lemma zchinese_modr r1 r2 : (zchinese r1 r2 = r2 %[mod m2])%Z.
 Proof.
 rewrite /zchinese; have [u v /= Duv _] := egcdzP m1 m2.
-rewrite -{2}[r2]mulr1 -((gcdz _ _ =P 1) co_m12) -Duv.
+rewrite -[r2 in RHS]mulr1 -((gcdz _ _ =P 1) co_m12) -Duv.
 by rewrite mulrAC modzMDl mulrAC addrC mulrDr !mulrA modzMDl.
 Qed.
 

@@ -376,8 +376,7 @@ have [||ltyx]// := comparable_leP.
   rewrite (@comparabler_trans _ (y + 1))// /Order.comparable ?lexye ?ltr01//.
   by rewrite lerDl ler01 orbT.
 have /midf_lt [_] := ltyx; rewrite le_gtF//.
-rewrite -(@addrK _ y y) (addrAC _ _ x) -addrA 2!mulrDl -splitr lexye//.
-by rewrite divr_gt0// ?ltr0n// subr_gt0.
+by rewrite addrC -(subrKA y) addrC 2!mulrDl -splitr lexye// divr_gt0// subr_gt0.
 Qed.
 
 Lemma ler_addgt0Pl x y : reflect (forall e, e > 0 -> x <= e + y) (x <= y).
@@ -472,10 +471,8 @@ Section MinMax.
 
 Lemma maxr_absE x y : Num.max x y = (x + y + `|x - y|) / 2.
 Proof.
-apply: canRL (mulfK _) _ => //; rewrite ?pnatr_eq0//.
-case: lerP => _; rewrite [2]mulr2n mulrDr mulr1.
-  by rewrite addrCA addrK.
-by rewrite [RHS]addrC subrKA.
+apply: canRL (mulfK _) _ => //; rewrite ?pnatr_eq0// mulr_natr addrC.
+by case: lerP => _; first rewrite [x + y]addrC; rewrite subrKA.
 Qed.
 
 Lemma minr_absE x y : Num.min x y = (x + y - `|x - y|) / 2.
@@ -892,8 +889,8 @@ Proof. by rewrite oppC_rect addC_rect. Qed.
 Lemma mulC_rect x1 y1 x2 y2 : (x1 + 'i * y1) * (x2 + 'i * y2) =
                               x1 * x2 - y1 * y2 + 'i * (x1 * y2 + x2 * y1).
 Proof.
-rewrite mulrDl !mulrDr (AC (2*2) (1*4*(2*3)))/= mulrACA.
-by rewrite -expr2 sqrCi mulN1r -!mulrA [_ * ('i * _)]mulrCA [_ * y1]mulrC.
+rewrite mulrDl !mulrDr mulrACA -expr2 sqrCi mulN1r.
+by rewrite [_ - _]addrC addrACA mulrCA -mulrA [_ * y1]mulrC.
 Qed.
 
 Lemma ImM x y : 'Im (x * y) = 'Re x * 'Im y + 'Re y * 'Im x.

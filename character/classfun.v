@@ -2018,10 +2018,9 @@ Qed.
 Lemma cfdot_dprod phi1 phi2 psi1 psi2 :
   '[cfDprod phi1 psi1, cfDprod phi2 psi2] = '[phi1, phi2] * '[psi1, psi2].
 Proof.
-rewrite !cfdotE mulrCA -mulrA mulrCA mulrA -invfM -natrM (dprod_card KxH).
-congr (_ * _); rewrite big_distrl reindex_dprod /=; apply: eq_bigr => k Kk.
-rewrite big_distrr; apply: eq_bigr => h Hh /=.
-by rewrite mulrCA -mulrA -rmorphM mulrCA mulrA !cfDprodE.
+rewrite !cfdotE mulrACA -invfM -natrM (dprod_card KxH); congr (_ * _).
+rewrite big_distrl reindex_dprod /=; apply: eq_bigr => k Kk; rewrite big_distrr.
+by apply: eq_bigr => h Hh /=; rewrite mulrACA -rmorphM !cfDprodE.
 Qed.
 
 Lemma cfDprodl_iso : isometry cfDprodl.
