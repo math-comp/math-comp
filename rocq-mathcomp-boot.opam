@@ -15,6 +15,10 @@ depends: [
   "elpi" {>= "1.17.0"}
   "rocq-hierarchy-builder" {>= "1.9.0"}
 ]
+conflicts: [
+  "rocq-mathcomp-ssreflect" { < "2.5~" }
+  "coq-mathcomp-ssreflect" { < "2.5~" }
+]
 
 tags: [
   "keyword:small scale reflection"
