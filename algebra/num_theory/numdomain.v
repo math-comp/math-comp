@@ -817,7 +817,7 @@ Qed.
 
 (* Monotony of addition *)
 Lemma lerD2l x : {mono +%R x : y z / y <= z}.
-Proof. by move=> y z; rewrite -subr_ge0 opprD addrAC addNKr addrC subr_ge0. Qed.
+Proof. by move=> y z; rewrite -subr_ge0 [x + z]addrC addrKA subr_ge0. Qed.
 
 Lemma lerD2r x : {mono +%R^~ x : y z / y <= z}.
 Proof. by move=> y z; rewrite ![_ + x]addrC lerD2l. Qed.
@@ -2515,7 +2515,7 @@ have E'ge0 k: k \in A' -> E' k *+ n' >= 0.
 rewrite -/n Dn in leAm; have{leAm IHm E'ge0}: _ <= _ := IHm _ leAm _ E'ge0.
 have ->: \sum_(k in A') E' k = mu *+ n'.
   apply: (addrI mu); rewrite -mulrS -Dn -sumrMnl (bigD1 i Ai) big_andbC /=.
-  rewrite !(bigD1 j A'j) /= addrCA eqxx !addrA subrK; congr (_ + _).
+  rewrite !(bigD1 j A'j) /= eqxx addrA subrKC addrA; congr (_ + _).
   by apply: eq_bigr => k /andP[_ /negPf->].
 rewrite prodrMn_const exprMn_n -/n' ler_pMn2r ?expn_gt0; last by case: (n').
 have ->: \prod_(k in A') E' k = E' j * pi.
@@ -3180,7 +3180,7 @@ HB.builders Context R of IntegralDomain_isLeReal R.
   rewrite -sub_ge0 ge0_norm //; have [y_ge0 | ny_ge0] := leN_total y.
     by rewrite !ge0_norm ?subrr ?le0_add.
   rewrite -normN ge0_norm //; have [hxy|hxy] := leN_total (x + y).
-    by rewrite ge0_norm // opprD addrCA -addrA addKr le0_add.
+    by rewrite ge0_norm // [x - y]addrC addrKA le0_add.
   by rewrite -normN ge0_norm // opprK addrCA addrNK le0_add.
   Qed.
 
@@ -3256,7 +3256,7 @@ HB.builders Context R of IntegralDomain_isLtReal R.
   rewrite -sub_ge0 ge0_norm //; have [y_ge0 | ny_ge0] := leN_total y.
     by rewrite !ge0_norm ?subrr ?le0_add.
   rewrite -normN ge0_norm //; have [hxy|hxy] := leN_total (x + y).
-    by rewrite ge0_norm // opprD addrCA -addrA addKr le0_add.
+    by rewrite ge0_norm // [x - y]addrC addrKA le0_add.
   by rewrite -normN ge0_norm // opprK addrCA addrNK le0_add.
   Qed.
 

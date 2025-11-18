@@ -323,9 +323,8 @@ Qed.
 Lemma mulz_addl : left_distributive mulz (+%R).
 Proof.
 move=> x y z; elim: z=> [|n|n]; first by rewrite !(mul0z,mulzC).
-  by rewrite !mulzS=> ->; rewrite !addrA [X in X + _]addrAC.
-rewrite !mulzN !mulzS -!opprD=> /oppr_inj->.
-by rewrite !addrA [X in X + _]addrAC.
+  by rewrite !mulzS=> ->; rewrite addrACA.
+by rewrite !mulzN !mulzS -!opprD addrACA => /oppr_inj->.
 Qed.
 
 Lemma nonzero1z : 1%Z != 0. Proof. by []. Qed.
@@ -1632,7 +1631,7 @@ Lemma distnC m1 m2 : `|m1 - m2| = `|m2 - m1|.
 Proof. by rewrite -opprB abszN. Qed.
 
 Lemma distnDl d n1 n2 : `|d + n1 - (d + n2)| = `|n1 - n2|.
-Proof. by rewrite !PoszD opprD addrCA -addrA addKr. Qed.
+Proof. by rewrite addnC !PoszD addrKA. Qed.
 
 Lemma distnDr d n1 n2 : `|n1 + d - (n2 + d)| = `|n1 - n2|.
 Proof. by rewrite -!(addnC d) distnDl. Qed.

@@ -1190,7 +1190,7 @@ Qed.
 Lemma exprMn_n x m n : (x *+ m) ^+ n = x ^+ n *+ (m ^ n) :> R.
 Proof.
 elim: n => [|n IHn]; first by rewrite mulr1n.
-by rewrite exprS IHn mulrnAl mulrnAr -mulrnA exprS -expnSr.
+by rewrite exprS IHn mulrnAl mulrnAr -mulrnA exprS expnSr.
 Qed.
 
 Lemma exprM x m n : x ^+ (m * n) = x ^+ m ^+ n.

@@ -946,7 +946,7 @@ apply/eqmxP/andP; split; last first.
 move: cpq => /(congr1 (horner_mx g))/=; rewrite rmorph1 rmorphD/=.
 rewrite -[X in (X <= _)%MS]mulr1 => <-; rewrite mulrDr [p * u]mulrC addrC.
 rewrite addmx_sub_adds//; apply/sub_kermxP; rewrite mulmxE -mulrA -rmorphM.
-  by rewrite mulrAC [q * p]mulrC rmorphM/= mulrA -!mulmxE mulmx_ker mul0mx.
+  by rewrite mulrAC rmorphM/= mulrC mulrA -!mulmxE mulmx_ker mul0mx.
 rewrite -[_ * _ * q]mulrA [u * _]mulrC.
 by rewrite rmorphM mulrA -!mulmxE mulmx_ker mul0mx.
 Qed.

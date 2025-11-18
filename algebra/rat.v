@@ -381,8 +381,8 @@ Proof. by move=> x y; rewrite !addq_subdefE addrC [x.2 * _]mulrC. Qed.
 
 Fact addq_subdefA : associative addq_subdef.
 Proof.
-move=> x y z; rewrite !addq_subdefE.
-by rewrite !mulrA !mulrDl addrA ![_ * x.2]mulrC !mulrA.
+move=> x y z; rewrite !addq_subdefE/=.
+by rewrite !mulrDl addrA !mulrA 2![_ * _ * x.2]mulrAC.
 Qed.
 
 Fact addq_frac x y : x.2 != 0 -> y.2 != 0 ->

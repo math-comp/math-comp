@@ -336,8 +336,7 @@ Canonical pi_opp_morph := PiMorph1 pi_opp.
 Lemma pi_add : {morph \pi : x y / x + y >-> add x y}.
 Proof.
 move=> x y /=; unlock add; apply/eqP; rewrite piE equivE.
-rewrite opprD addrAC addrA -addrA.
-by rewrite rpredD // (idealrBE, idealrDE) ?pi_opp ?reprK.
+by rewrite opprD addrACA rpredD // (idealrBE, idealrDE) ?pi_opp ?reprK.
 Qed.
 Canonical pi_add_morph := PiMorph2 pi_add.
 

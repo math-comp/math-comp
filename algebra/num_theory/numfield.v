@@ -140,8 +140,8 @@ Proof.
 case x_ge0: (0 <= x); last by exists 0.
 have le0x1: 0 <= x + 1 by rewrite -nnegrE rpredD ?rpred1.
 have [|y /andP[y_ge0 _]] := @poly_ivt ('X^2 - x%:P) _ _ le0x1.
-  rewrite !hornerE -subr_ge0 add0r expr0n sub0r opprK x_ge0 sqrrD mulr1.
-  by rewrite addrAC !addrA addrK -nnegrE !rpredD ?rpredX ?rpred1.
+  rewrite !hornerE expr0n/= sub0r oppr_le0 x_ge0/= subr_ge0.
+  by rewrite -[leLHS]mul1r ler_pM// (lerDl, lerDr).
 by rewrite rootE !hornerE subr_eq0; exists y.
 Qed.
 
@@ -376,8 +376,7 @@ have [||ltyx]// := comparable_leP.
   rewrite (@comparabler_trans _ (y + 1))// /Order.comparable ?lexye ?ltr01//.
   by rewrite lerDl ler01 orbT.
 have /midf_lt [_] := ltyx; rewrite le_gtF//.
-rewrite -(@addrK _ y y) (addrAC _ _ x) -addrA 2!mulrDl -splitr lexye//.
-by rewrite divr_gt0// ?ltr0n// subr_gt0.
+by rewrite addrC -(subrKA y) addrC 2!mulrDl -splitr lexye// divr_gt0// subr_gt0.
 Qed.
 
 Lemma ler_addgt0Pl x y : reflect (forall e, e > 0 -> x <= e + y) (x <= y).
@@ -472,10 +471,8 @@ Section MinMax.
 
 Lemma maxr_absE x y : Num.max x y = (x + y + `|x - y|) / 2.
 Proof.
-apply: canRL (mulfK _) _ => //; rewrite ?pnatr_eq0//.
-case: lerP => _; rewrite [2]mulr2n mulrDr mulr1.
-  by rewrite addrCA addrK.
-by rewrite addrCA addrAC subrr add0r.
+apply: canRL (mulfK _) _ => //; rewrite ?pnatr_eq0// mulr_natr addrC.
+by case: lerP => _; first rewrite [x + y]addrC; rewrite subrKA.
 Qed.
 
 Lemma minr_absE x y : Num.min x y = (x + y - `|x - y|) / 2.
@@ -621,8 +618,7 @@ have JE x : x^* = `|x|^+2 / x.
   by apply: (canRL (mulfK _)) => //; rewrite mulrC -normCK.
 move=> x; have [->|x_neq0] := eqVneq x 0; first by rewrite !rmorph0.
 rewrite !JE normrM normfV exprMn normrX normr_id.
-rewrite invfM exprVn (AC (2*2) (1*(2*3)*4))/= -invfM -exprMn.
-by rewrite divff ?mul1r ?invrK // !expf_eq0 normr_eq0 //.
+by rewrite exprVn -mulrA -invfM mulrA -expr2 divKf// 2!sqrf_eq0 normr_eq0.
 Qed.
 
 Let Re2 z := z + z^*.
@@ -785,7 +781,7 @@ Proof. by rewrite -invCi invC_norm normCi expr1n invr1 mul1r. Qed.
 Lemma Crect x : x = 'Re x + 'i * 'Im x.
 Proof.
 rewrite !(ReE, ImE) 2!mulrA mulCii mulN1r opprB -mulrDl.
-by rewrite addrACA subrr addr0 mulrDl -splitr.
+by rewrite addrCA addrK mulrDl -splitr.
 Qed.
 
 Lemma eqCP x y : x = y <-> ('Re x = 'Re y) /\ ('Im x = 'Im y).
@@ -893,8 +889,8 @@ Proof. by rewrite oppC_rect addC_rect. Qed.
 Lemma mulC_rect x1 y1 x2 y2 : (x1 + 'i * y1) * (x2 + 'i * y2) =
                               x1 * x2 - y1 * y2 + 'i * (x1 * y2 + x2 * y1).
 Proof.
-rewrite mulrDl !mulrDr (AC (2*2) (1*4*(2*3)))/= mulrACA.
-by rewrite -expr2 sqrCi mulN1r -!mulrA [_ * ('i * _)]mulrCA [_ * y1]mulrC.
+rewrite mulrDl !mulrDr mulrACA -expr2 sqrCi mulN1r.
+by rewrite [_ - _]addrC addrACA mulrCA -mulrA [_ * y1]mulrC.
 Qed.
 
 Lemma ImM x y : 'Im (x * y) = 'Re x * 'Im y + 'Re y * 'Im x.
@@ -1444,14 +1440,13 @@ Let a4gt0 : 0 < 4 * a. Proof. by rewrite mulr_gt0 ?ltr0n. Qed.
 Lemma deg2_poly_min x : p.[- b / (2 * a)] <= p.[x].
 Proof.
 rewrite [p]deg2_poly_canonical ?pnatr_eq0// -/a -/b -/c /delta !hornerE/=.
-by rewrite ler_pM2l// lerD2r addrC mulNr subrr expr0n sqr_ge0.
+by rewrite ler_pM2l// lerD2r mulNr addNr expr0n sqr_ge0.
 Qed.
 
 Lemma deg2_poly_minE : p.[- b / (2 * a)] = - delta / (4 * a).
 Proof.
 rewrite [p]deg2_poly_canonical ?pnatr_eq0// -/a -/b -/c -/delta !hornerE/=.
-rewrite [X in X^+2]addrC [in LHS]mulNr subrr expr0n add0r mulNr.
-by rewrite mulrC mulNr invfM mulrA mulfVK.
+by rewrite mulNr addNr expr0n add0r -mulNr mulrC -[LHS]mulrA invfM divfK.
 Qed.
 
 Lemma deg2_poly_gt0 : reflect (forall x, 0 < p.[x]) (delta < 0).
