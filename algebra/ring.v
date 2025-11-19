@@ -1,0 +1,2451 @@
+(* Distributed under the terms of CeCILL-B.                                  *)
+(* This file is largely based on the ring.v file from                        *)
+(* https://github.com/math-comp/algebra-tactics                              *)
+From elpi Require Import derive.std param2.
+From micromega Require Import NatDef.
+From Corelib Require Import IntDef.
+From micromega Require Import formula witness checker eval.
+From micromega Require Import field_checker field_eval.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq order.
+From mathcomp Require Export ssralg.
+From mathcomp Require Import ssrnum ssrint binnums.
+From mathcomp.algebra Extra Dependency "ring.elpi" as ring.
+
+(******************************************************************************)
+(* This file provides the ring tactic.                                        *)
+(*                                                                            *)
+(* This tactic provides:                                                      *)
+(*         ring == a decision procedure for ring and semiring equalities      *)
+(*   ring: e1 ... en == same as ring, assuming equalities e1,..., en          *)
+(*        field == a tactic for field equalities                              *)
+(*                 (leaves non nullity of denominators as goal)               *)
+(*  field: e1 ... en == same as field, assuming ring equalities e1,..., en    *)
+(* These tactics work on any comPzSemiRingType (resp fieldType) and handle    *)
+(* additive morphisms {additive _ -> _} and ring morphisms {rmorphism _ -> _}.*)
+(*                                                                            *)
+(* See files test-suite/test_ring.v and test-suite/test_field.v for examples. *)
+(*                                                                            *)
+(*  * Ring tactic                                                             *)
+(*                                                                            *)
+(* The `ring` tactic solves a goal of the form `p = q :> R` representing a    *)
+(* polynomial equation. The type `R` must have a canonical `comPzRingType`    *)
+(* (commutative ring) or at least `comPzSemiRingType` (commutative semiring)  *)
+(* instance. The `ring` tactic solves the equation by normalizing each side   *)
+(* as a polynomial, whose coefficients are either integers (if `R` is a       *)
+(* `comPzRingType`) or natural numbers `N`.                                   *)
+(* The `ring:` tactic can decide the given polynomial equation modulo given   *)
+(* monomial equations. The syntax to use this feature is `ring: t_1 .. t_n`   *)
+(* where each `t_i` is a proof of equality `m_i = p_i` with `m_i` a monomial  *)
+(* and `p_i` a polynomial (currently, all the monomials and polynomials       *)
+(* `m_1, .., m_n, p_1, .., p_n, p, q` must have the same type `R`).           *)
+(*                                                                            *)
+(*  * Field tactic                                                            *)
+(*                                                                            *)
+(* The `field` tactic solves a goal of the form `p = q :> F` representing a   *)
+(* rational equation. The type `F` must have a canonical `fieldType` (field)  *)
+(* instance. The `field` tactic solves the equation by normalizing each side  *)
+(* to a pair of two polynomials representing a fraction, whose coefficients   *)
+(* are integers.                                                              *)
+(* As is the case for the `ring` tactic, the `field` tactic can decide the    *)
+(* given rational equation modulo given monomial equations. The syntax to use *)
+(*  this feature is the same as the `ring` tactic: `field: t_1 .. t_n`.       *)
+(*                                                                            *)
+(* The `field` tactic generates proof obligations that all the denominators   *)
+(* in the equation are not zero. A proof obligation of the form               *)
+(* `p * q != 0 :> F` is always automatically reduced to `p != 0` and `q != 0`.*)
+(* If the field `F` is a `numFieldType` (partially ordered field), a proof    *)
+(* obligation of the form `c%:~R != 0 :> F` where `c` is a non-zero integer   *)
+(* constant is automatically resolved.                                        *)
+(*                                                                            *)
+(*  * Preprocessing additive and ring morphisms                               *)
+(*                                                                            *)
+(* Both tactic (as well as tactics in lra.v) has a preprocessor and supports  *)
+(* applications of (semi)ring homomorphisms and additive functions (N-module  *)
+(* or Z-module homomorphisms). For example, assume `f : {rmorphism S -> T}`   *)
+(* and `g : {rmorphism R -> S}`, the preprocessor turns a ring sub-expression *)
+(* of the form `f (x + g (y * z))` into `f x + f (g y) * f (g z)`.            *)
+(* A composition of homomorphisms from `nat` and `int` is automatically       *)
+(* normalized to the canonical one. For instance, if `R` in the above example *)
+(* is `int`, the result of the preprocessing should be `f x + y%:~R * z%:~R`  *)
+(* where `f \o g : int -> T` is replaced with `intr` (`_%:~R`).               *)
+(* Thanks to the preprocessor, the `ring` tactic supports the following       *)
+(* constructs, in addition to homomorphism applications:                      *)
+(* - `GRing.zero` (`0%R`),                                                    *)
+(* - `GRing.add` (`+%R`),                                                     *)
+(* - `addn` ((_ + _)%N),                                                      *)
+(* - `GRing.natmul` (including _%:R := GRing.natmul GRing.one),               *)
+(* - `GRing.opp` (`-%R`),                                                     *)
+(* - `intmul` (including _%:~R := intmul GRing.one),                          *)
+(* - `GRing.one` (`1%R`),                                                     *)
+(* - `GRing.mul` (`*%R`),                                                     *)
+(* - `GRing.inv` (`_^-1`, only for field, pushed down for lra.v tactics),     *)
+(* - `muln` ((_ * _)%N),                                                      *)
+(* - `GRing.exp`,[^constant_exponent]                                         *)
+(* - `exprz`,[^constant_exponent]                                             *)
+(* - `expn`,[^constant_exponent]                                              *)
+(* - `S`,                                                                     *)
+(* - `Posz`,                                                                  *)
+(* - `Negz`, and                                                              *)
+(* - constants of type `nat`.                                                 *)
+(* [^constant_exponent]: The exponent must be a constant value. In addition,  *)
+(* it must be non-negative for `exprz` for the ring tactic.                   *)
+(*                                                                            *)
+(* References:                                                                *)
+(* - Kazuhiko Sakaguchi, Reflexive Tactics for Algebra, Revisited, ITP, 2022  *)
+(* - Benjamin Grégoire, Assia Mahboubi, Proving Equalities in a Commutative   *)
+(* Ring Done Right in Coq, TPHOLs, 2005                                       *)
+(******************************************************************************)
+
+Set Implicit Arguments.
+Unset Strict Implicit.
+Unset Printing Implicit Defensive.
+
+Import Order.Theory GRing.Theory Num.Theory.
+
+Local Open Scope ring_scope.
+
+Module Import Internals.
+
+Section Env.
+Variables (R : Type) (rO : R).
+Implicit Type l : seq R.
+
+Definition env_nth (n : positive) l := nth rO l (Pos.to_nat n).-1.
+Definition env_jump (j : positive) l := drop (Pos.to_nat j) l.
+
+Lemma env_jumpD l j j' : env_jump (Pos.add j j') l = env_jump j' (env_jump j l).
+Proof. by rewrite /env_jump drop_drop Pos_to_natD addnC. Qed.
+
+Lemma env_nth_jump l i j : env_nth i (env_jump j l) = env_nth (Pos.add i j) l.
+Proof.
+by rewrite /env_nth nth_drop Pos_to_natD -!subn1 addnBA 1?addnC ?Pos_to_nat_gt0.
+Qed.
+
+End Env.
+
+Section PevalSemiRing.
+Variable C : pzSemiRingType.
+Variable R : comPzSemiRingType.
+Variable R_of_C : {rmorphism C -> R}.
+
+Implicit Type P : Pol C.
+Implicit Type l : seq R.
+
+#[local] Notation env_nth := (env_nth 0).
+#[local] Notation Peval := (Peval
+  +%R *%R N.to_nat (@GRing.exp R) R_of_C (@env_jump R) env_nth).
+#[local] Notation Peq := (Peq eq_op).
+#[local] Notation P0 := (P0 0).
+#[local] Notation P1 := (P1 1).
+#[local] Notation mkX := (mkX 0 1).
+#[local] Notation mkPX := (mkPX 0 eq_op).
+#[local] Notation PaddC := (PaddC +%R).
+#[local] Notation Padd := (Padd 0 +%R eq_op).
+#[local] Notation PaddI := (PaddI +%R Padd).
+#[local] Notation PaddX := (PaddX 0 eq_op Padd).
+#[local] Notation Pmul := (Pmul 0 1 +%R *%R eq_op).
+#[local] Notation PmulC_aux := (PmulC_aux 0 *%R eq_op).
+#[local] Notation PmulC := (PmulC 0 1 *%R eq_op).
+#[local] Notation PmulI := (PmulI 0 1 *%R eq_op Pmul).
+#[local] Notation Ppow_pos := (Ppow_pos 0 1 +%R *%R eq_op).
+#[local] Notation Ppow_N := (Ppow_N 0 1 +%R *%R eq_op).
+
+Lemma Peval_Peq l P P' : Peq P P' -> Peval l P = Peval l P'.
+Proof.
+elim: P l P' => [c | i P IH | P IHP j Q IHQ] l [c' | i' P' | P' j' Q'] //=.
+- by move=> /eqP->.
+- by case: pos_nat_compareP => //; apply: IH.
+- by case: pos_nat_compareP => //; case: ifP => // /IHP-> /IHQ->.
+Qed.
+
+Lemma Peval_mkPinj l j P : Peval l (mkPinj j P) = Peval (env_jump j l) P.
+Proof. by case: P => [//| j' Q /= |//]; rewrite env_jumpD. Qed.
+
+Lemma Peval_mkX l j : Peval l (mkX j) = env_nth j l.
+Proof.
+case: j => [j|j|]/=; rewrite rmorph1 rmorph0 mul1r addr0 expr1 ?env_nth_jump//.
+congr (env_nth _ l); apply: Pos_to_natI; rewrite !Pos_to_natE.
+by rewrite [LHS]add1n prednK// -double0 ltn_double Pos_to_nat_gt0.
+Qed.
+
+Lemma Peval_mkPX l P i Q : Peval l (mkPX P i Q)
+  = Peval l P * (env_nth 1 l) ^+ Pos.to_nat i + Peval (env_jump 1 l) Q.
+Proof.
+case: P => [c |//| P' i' [c |//|//]] /=.
+  by case: eqP => [->|//]; rewrite rmorph0 mul0r add0r Peval_mkPinj.
+by case: eqP => [->|//]/=; rewrite rmorph0 addr0 Pos_to_natD exprD mulrA.
+Qed.
+
+Lemma Popp_id P : Popp id P = P.
+Proof. by elim: P => [| j P /=->// | P /=-> i Q ->]. Qed.
+
+Lemma PevalDC l P c : Peval l (PaddC P c) = Peval l P + R_of_C c.
+Proof.
+by elim: P l => [c'|i P IH|P IHP j Q IHQ] l/=; rewrite ?rmorphD ?IH ?IHQ ?addrA.
+Qed.
+
+Lemma Peval_addI l P j Q :
+    (forall l P, Peval l (Padd P Q) = Peval l P + Peval l Q) ->
+  Peval l (PaddI Q j P) = Peval l P + Peval l (Pinj j Q).
+Proof.
+move=> PevalD; elim: P j l => [c | j' Q' IH | P IHP i Q' IHQ'] j l /=.
+- by rewrite Peval_mkPinj PevalDC addrC.
+- move: (Zint_pos_sub (pos_nat_Pos_to_nat j') (pos_nat_Pos_to_nat j)).
+  case: ZintP => [//| _ /eqP+ _ | k nk _ /[swap] | k nk _ /[swap] ].
+  + rewrite subr_eq0 => /eqP[]/Pos_to_natI->.
+    by rewrite Peval_mkPinj PevalD.
+  + move=> /eqP<- /eqP/[!subr_eq]/eqP[+] _.
+    rewrite addnC -Pos_to_natD => /Pos_to_natI->.
+    by rewrite Peval_mkPinj PevalD /= env_jumpD.
+  + move=> /eqP/[!NegzE]<- /eqP; rewrite -opprB eqr_opp subr_eq => /eqP[+] _.
+    rewrite addnC -Pos_to_natD => /Pos_to_natI->.
+    by rewrite Peval_mkPinj IH /= env_jumpD.
+- case: j => [j | j |]/=.
+  + by rewrite IHQ' addrA /= -env_jumpD.
+  + rewrite IHQ' addrA /= -env_jumpD.
+    congr (_ + Peval (env_jump _ l) _).
+    apply: Pos_to_natI; rewrite !Pos_to_natE add1n prednK//.
+    by rewrite -double0 ltn_double Pos_to_nat_gt0.
+  + by rewrite PevalD addrA.
+Qed.
+
+Lemma Peval_addX l P P' i' :
+    (forall l P, Peval l (Padd P P') = Peval l P + Peval l P') ->
+  Peval l (PaddX P' i' P) = Peval l P + Peval l (PX P' i' P0).
+Proof.
+rewrite /= rmorph0 addr0 addrC.
+move=> PevalD; elim: P i' l => [//| j Q' IH | P IHP i Q' IHQ'] i' l /=.
+- case: j => [j | j |//]/=; rewrite -env_jumpD//.
+  congr (_ + Peval (env_jump _ l) _).
+  apply: Pos_to_natI; rewrite !Pos_to_natE add1n prednK//.
+  by rewrite -double0 ltn_double Pos_to_nat_gt0.
+- rewrite addrA.
+  move: (Zint_pos_sub (pos_nat_Pos_to_nat i) (pos_nat_Pos_to_nat i')).
+  case: ZintP => [//| _ /eqP+ _ | k nk _ /[swap] | k nk _ /[swap] ].
+  + rewrite subr_eq0 => /eqP[]/Pos_to_natI->.
+    by rewrite Peval_mkPX PevalD -mulrDl [Peval l P' + Peval l P]addrC.
+  + move=> /eqP<- /eqP/[!subr_eq]/eqP[+] _.
+    rewrite addnC -Pos_to_natD => /Pos_to_natI->.
+    rewrite Peval_mkPX PevalD [_ + Peval l P']addrC mulrDl /= rmorph0 addr0.
+    by rewrite -mulrA -exprD Pos_to_natD addnC.
+  + move=> /eqP/[!NegzE]<- /eqP; rewrite -opprB eqr_opp subr_eq => /eqP[+] _.
+    rewrite addnC -Pos_to_natD => /Pos_to_natI->.
+    by rewrite Peval_mkPX IHP mulrDl -mulrA -exprD Pos_to_natD addnC.
+Qed.
+
+Lemma PevalD l P P' : Peval l (Padd P P') = Peval l P + Peval l P'.
+Proof.
+elim: P' l P => [c | j' Q' IH | P' IHP' i' Q' IHQ'] l P /=.
+- by rewrite PevalDC.
+- by rewrite Peval_addI.
+case: P => [c | j Q | P i Q] /=.
+- by rewrite PevalDC addrA addrC.
+- rewrite addrCA; case: j => [j | j |] /=; rewrite IHQ'/= -?env_jumpD//.
+  congr (_ + (Peval (env_jump _ l) _ + _)); apply: Pos_to_natI.
+  by rewrite !Pos_to_natE add1n prednK// -double0 ltn_double Pos_to_nat_gt0.
+- rewrite addrACA.
+  move: (Zint_pos_sub (pos_nat_Pos_to_nat i) (pos_nat_Pos_to_nat i')).
+  case: ZintP => [//| _ /eqP+ _ | k nk _ /[swap] | k nk _ /[swap] ].
+  + rewrite subr_eq0 => /eqP[]/Pos_to_natI->.
+    by rewrite Peval_mkPX IHP' IHQ' mulrDl.
+  + move=> /eqP<- /eqP/[!subr_eq]/eqP[+] _.
+    rewrite -Pos_to_natD => /Pos_to_natI->.
+    rewrite Peval_mkPX IHP'/= rmorph0 addr0 mulrDl IHQ'.
+    by rewrite -mulrA -exprD Pos_to_natD.
+  + move=> /eqP/[!NegzE]<- /eqP; rewrite -opprB eqr_opp subr_eq => /eqP[+] _.
+    rewrite -Pos_to_natD => /Pos_to_natI->.
+    rewrite Peval_mkPX (Peval_addX _ _ _ IHP')/= rmorph0 addr0 mulrDl IHQ'.
+    by rewrite -mulrA -exprD Pos_to_natD.
+Qed.
+
+Lemma PsubI_addI P j Q :
+    (forall P', Psub 0 +%R +%R id eq_op P' P = Padd P' P) ->
+  PsubI +%R id (Psub 0 +%R +%R id eq_op) P j Q = PaddI P j Q.
+Proof.
+elim: Q j => [c | j' P' IH | P' IHP i Q' IHQ ] j Psub_add /=.
+- by rewrite Popp_id.
+- by case: Z.pos_sub => [| p | p]; rewrite ?Psub_add ?IH.
+- by case: j => [p | p |]; rewrite ?Psub_add ?IHQ.
+Qed.
+
+Lemma PsubX_addX P' i P :
+    (forall P, Psub 0 +%R +%R id eq_op P P' = Padd P P') ->
+  PsubX 0 id eq_op (Psub 0 +%R +%R id eq_op) P' i P = PaddX P' i P.
+Proof.
+elim: P i => [c | j P IH | P IHP i' Q IHQ] i Psub_add /=.
+- by rewrite Popp_id.
+- by case: j => [p | p |] /=; rewrite Popp_id.
+- by case: Z.pos_sub => [| p | p]; rewrite ?Psub_add ?IHP.
+Qed.
+
+Lemma Psub_add P P' : Psub 0 +%R +%R id eq_op P P' = Padd P P'.
+Proof.
+elim: P' P => [//| j' P' IH | P' IHP' i' Q' IHQ' ] P /=.
+  by rewrite PsubI_addI.
+case: P => [c | j P | P i Q] /=; first by rewrite !Popp_id.
+  by case: j => [p | p |]; rewrite Popp_id IHQ'.
+by case: Z.pos_sub => [| p | p]; rewrite ?IHP' ?IHQ' ?PsubX_addX.
+Qed.
+
+Lemma Peval_mulC_aux l P c : Peval l (PmulC_aux P c) = Peval l P * R_of_C c.
+Proof.
+elim: P l => [c' | j Q IH | P IHP i Q IHQ] l /=; first by rewrite rmorphM.
+  by rewrite Peval_mkPinj IH.
+by rewrite Peval_mkPX IHP IHQ mulrAC -mulrDl.
+Qed.
+
+Lemma PevalMC l P c : Peval l (PmulC P c) = Peval l P * R_of_C c.
+Proof.
+rewrite /PmulC/=; case: eqP => [->|_]; first by rewrite /= rmorph0 mulr0.
+by case: eqP => [->|_]; rewrite ?rmorph1 ?mulr1 ?Peval_mulC_aux.
+Qed.
+
+Lemma Peval_mulI l P j Q :
+    (forall l P, Peval l (Pmul P Q) = Peval l P * Peval l Q) ->
+  Peval l (PmulI Q j P) = Peval l P * Peval l (Pinj j Q).
+Proof.
+move=> PevalM; elim: P j l => [c | j' Q' IH | P IHP i Q' IHQ'] j l /=.
+- by rewrite Peval_mkPinj PevalMC mulrC.
+- move: (Zint_pos_sub (pos_nat_Pos_to_nat j') (pos_nat_Pos_to_nat j)).
+  case: ZintP => [//| _ /eqP+ _ | k nk _ /[swap] | k nk _ /[swap] ].
+  + rewrite subr_eq0 => /eqP[]/Pos_to_natI->.
+    by rewrite Peval_mkPinj PevalM.
+  + move=> /eqP<- /eqP/[!subr_eq]/eqP[+] _.
+    rewrite addnC -Pos_to_natD => /Pos_to_natI->.
+    by rewrite Peval_mkPinj PevalM/= env_jumpD.
+  + move=> /eqP/[!NegzE]<- /eqP; rewrite -opprB eqr_opp subr_eq => /eqP[+] _.
+    rewrite addnC -Pos_to_natD => /Pos_to_natI->.
+    by rewrite Peval_mkPinj IH/= env_jumpD.
+- case: j => [j | j |]; rewrite Peval_mkPX IHP mulrAC.
+  + by rewrite IHQ'/= -env_jumpD -mulrDl.
+  + rewrite IHQ'/= -env_jumpD.
+    have -> : Pos.add xH (Pos.pred_double j) = xO j; last by rewrite -mulrDl.
+    apply: Pos_to_natI; rewrite !Pos_to_natE add1n prednK//.
+    by rewrite -double0 ltn_double Pos_to_nat_gt0.
+  + by rewrite PevalM -mulrDl.
+Qed.
+
+Lemma PevalM l P P' : Peval l (Pmul P P') = Peval l P * Peval l P'.
+Proof.
+elim: P' l P => [c | j' Q' IH | P' IHP' i' Q' IHQ'] l P /=.
+- by rewrite PevalMC.
+- by rewrite Peval_mulI.
+case: P => [c | j Q | P i Q] /=.
+- by rewrite PevalMC mulrC.
+- rewrite Peval_mkPX IHP' mulrDr mulrA.
+  case: j => [j | j |] /=; rewrite IHQ'/= -?env_jumpD//.
+  congr (_ + (Peval (env_jump _ l) _ * _)); apply: Pos_to_natI.
+  by rewrite !Pos_to_natE add1n prednK// -double0 ltn_double Pos_to_nat_gt0.
+rewrite PevalD !Peval_mkPX PevalD Peval_mkPX.
+rewrite !IHP' (Peval_mulI _ _ _ IHQ') /= rmorph0 !addr0 Peval_mkPinj IHQ'.
+rewrite mulrDl -mulrA mulrACA /=.
+rewrite -[X in _ + X + _]mulrA -[X in _ + _ + (X + _)]mulrAC.
+set p := Peval l P * _; set p' := Peval l P' * _.
+set q := Peval _ Q; set q' := Peval _ Q'.
+by rewrite addrACA mulrDl !mulrDr.
+Qed.
+
+Lemma Peval_pow_pos l res P p :
+  Peval l (Ppow_pos res P p) = Peval l res * Peval l P ^+ Pos.to_nat p.
+Proof.
+elim: p l res P => [p IH | p IH |] l res P /=.
+- rewrite PevalM !IH -mulrAC -mulrA -exprS -mulrA -exprD.
+  by rewrite addnS addnn Pos_to_natE.
+- by rewrite !IH -mulrA -exprD addnn Pos_to_natE.
+- by rewrite PevalM expr1.
+Qed.
+
+Lemma Peval_pow_N l P n : Peval l (Ppow_N P n) = Peval l P ^+ N.to_nat n.
+Proof. by case: n => [| p]/=; rewrite ?Peval_pow_pos /= rmorph1 ?mul1r. Qed.
+
+End PevalSemiRing.
+
+Section PevalRing.
+Variable C : pzRingType.
+Variable R : comPzRingType.
+Variable R_of_C : {rmorphism C -> R}.
+
+Implicit Type P : Pol C.
+Implicit Type l : seq R.
+
+#[local] Notation Peval := (Peval
+  +%R *%R N.to_nat (@GRing.exp R) R_of_C (@env_jump R) (env_nth 0)).
+#[local] Notation P0 := (P0 0).
+#[local] Notation Popp := (Popp -%R).
+#[local] Notation PsubC := (PsubC (fun x y => x - y)).
+#[local] Notation Psub := (Psub 0 +%R (fun x y => x - y) -%R eq_op).
+#[local] Notation PsubI := (PsubI +%R -%R Psub).
+#[local] Notation PsubX := (PsubX 0 -%R eq_op Psub).
+
+Lemma PevalN l P : Peval l (Popp P) = - Peval l P.
+Proof.
+elim: P l => [c | i P IH | P IHP j Q IHQ] l /=; rewrite ?rmorphN ?IH//.
+by rewrite IHP IHQ opprD mulNr.
+Qed.
+
+Lemma PevalBC l P c : Peval l (PsubC P c) = Peval l P - R_of_C c.
+Proof.
+by elim: P l => [c'|i P IH|P IHP j Q IHQ] l/=; rewrite ?rmorphB ?IH ?IHQ ?addrA.
+Qed.
+
+Lemma Peval_subI l P j Q :
+    (forall l P, Peval l (Psub P Q) = Peval l P - Peval l Q) ->
+  Peval l (PsubI Q j P) = Peval l P - Peval l (Pinj j Q).
+Proof.
+move=> PevalB; elim: P j l => [c | j' Q' IH | P IHP i Q' IHQ'] j l /=.
+- by rewrite Peval_mkPinj PevalDC PevalN addrC.
+- move: (Zint_pos_sub (pos_nat_Pos_to_nat j') (pos_nat_Pos_to_nat j)).
+  case: ZintP => [//| _ /eqP+ _ | k nk _ /[swap] | k nk _ /[swap] ].
+  + rewrite subr_eq0 => /eqP[]/Pos_to_natI->.
+    by rewrite Peval_mkPinj PevalB.
+  + move=> /eqP<- /eqP/[!subr_eq]/eqP[+] _.
+    rewrite addnC -Pos_to_natD => /Pos_to_natI->.
+    by rewrite Peval_mkPinj PevalB /= env_jumpD.
+  + move=> /eqP/[!NegzE]<- /eqP; rewrite -opprB eqr_opp subr_eq => /eqP[+] _.
+    rewrite addnC -Pos_to_natD => /Pos_to_natI->.
+    by rewrite Peval_mkPinj IH /= env_jumpD.
+- case: j => [j | j |]/=.
+  + by rewrite IHQ' addrA /= -env_jumpD.
+  + rewrite IHQ' addrA /= -env_jumpD.
+    congr (_ - Peval (env_jump _ l) _).
+    apply: Pos_to_natI; rewrite !Pos_to_natE add1n prednK//.
+    by rewrite -double0 ltn_double Pos_to_nat_gt0.
+  + by rewrite PevalB addrA.
+Qed.
+
+Lemma Peval_subX l P P' i' :
+    (forall l P, Peval l (Psub P P') = Peval l P - Peval l P') ->
+  Peval l (PsubX P' i' P) = Peval l P - Peval l (PX P' i' P0).
+Proof.
+rewrite /= rmorph0 addr0 addrC.
+move=> PevalB; elim: P i' l => [c | j Q' IH | P IHP i Q' IHQ'] i' l /=.
+- by rewrite PevalN mulNr.
+- case: j => [j | j |]/=; rewrite PevalN mulNr -?env_jumpD//.
+  congr (_ + Peval (env_jump _ l) _).
+  apply: Pos_to_natI; rewrite !Pos_to_natE add1n prednK//.
+  by rewrite -double0 ltn_double Pos_to_nat_gt0.
+- rewrite addrA -mulNr.
+  move: (Zint_pos_sub (pos_nat_Pos_to_nat i) (pos_nat_Pos_to_nat i')).
+  case: ZintP => [//| _ /eqP+ _ | k nk _ /[swap] | k nk _ /[swap] ].
+  + rewrite subr_eq0 => /eqP[]/Pos_to_natI->.
+    by rewrite Peval_mkPX PevalB [Peval l P - Peval l P']addrC mulrDl.
+  + move=> /eqP<- /eqP/[!subr_eq]/eqP[+] _.
+    rewrite addnC -Pos_to_natD => /Pos_to_natI->.
+    rewrite Peval_mkPX PevalB [_ - Peval l P']addrC mulrDl /= rmorph0 addr0.
+    by rewrite -mulrA -exprD Pos_to_natD addnC.
+  + move=> /eqP/[!NegzE]<- /eqP; rewrite -opprB eqr_opp subr_eq => /eqP[+] _.
+    rewrite addnC -Pos_to_natD => /Pos_to_natI->.
+    by rewrite Peval_mkPX IHP -mulNr mulrDl -mulrA -exprD Pos_to_natD addnC.
+Qed.
+
+Lemma PevalB l P P' : Peval l (Psub P P') = Peval l P - Peval l P'.
+Proof.
+elim: P' l P => [c | j' Q' IH | P' IHP' i' Q' IHQ'] l P /=.
+- by rewrite PevalBC.
+- by rewrite Peval_subI.
+case: P => [c | j Q | P i Q] /=.
+- by rewrite PevalDC addrA addrC !PevalN mulNr -opprD.
+- rewrite opprD addrCA -mulNr.
+  case: j => [j | j |] /=; rewrite PevalN IHQ'/= -?env_jumpD//.
+  congr (_ + (Peval (env_jump _ l) _ + _)); apply: Pos_to_natI.
+  by rewrite !Pos_to_natE add1n prednK// -double0 ltn_double Pos_to_nat_gt0.
+- rewrite opprD addrACA.
+  move: (Zint_pos_sub (pos_nat_Pos_to_nat i) (pos_nat_Pos_to_nat i')).
+  case: ZintP => [//| _ /eqP+ _ | k nk _ /[swap] | k nk _ /[swap] ].
+  + rewrite subr_eq0 => /eqP[]/Pos_to_natI->.
+    by rewrite Peval_mkPX IHP' IHQ' mulrBl.
+  + move=> /eqP<- /eqP/[!subr_eq]/eqP[+] _.
+    rewrite -Pos_to_natD => /Pos_to_natI->.
+    rewrite Peval_mkPX IHP'/= rmorph0 addr0 mulrDl IHQ'.
+    by rewrite mulNr -mulrA -exprD Pos_to_natD.
+  + move=> /eqP/[!NegzE]<- /eqP; rewrite -opprB eqr_opp subr_eq => /eqP[+] _.
+    rewrite -Pos_to_natD => /Pos_to_natI->.
+    rewrite Peval_mkPX (Peval_subX _ _ _ IHP')/= rmorph0 addr0 mulrDl IHQ'.
+    by rewrite mulNr -mulrA -exprD Pos_to_natD.
+Qed.
+
+End PevalRing.
+
+Section MevalSemiRing.
+Variable C : pzSemiRingType.
+Variable R : comPzSemiRingType.
+Variable R_of_C : {rmorphism C -> R}.
+Variable (cdiv : C -> C -> C * C).
+Variable (cdivP : forall x y, let (q, r) := cdiv x y in x = y * q + r).
+
+Implicit Type P : Pol C.
+Implicit Type M : Mon.
+Implicit Type l : seq R.
+
+#[local] Notation env_nth := (env_nth 0).
+#[local] Notation Peval := (Peval
+  +%R *%R N.to_nat (@GRing.exp R) R_of_C (@env_jump R) env_nth).
+#[local] Notation Peq := (Peq eq_op).
+#[local] Notation P0 := (P0 0).
+#[local] Notation P1 := (P1 1).
+#[local] Notation mkX := (mkX 0 1).
+#[local] Notation mkPX := (mkPX 0 eq_op).
+#[local] Notation PaddC := (PaddC +%R).
+#[local] Notation Padd := (Padd 0 +%R eq_op).
+#[local] Notation PaddI := (PaddI +%R Padd).
+#[local] Notation PaddX := (PaddX 0 eq_op Padd).
+#[local] Notation Pmul := (Pmul 0 1 +%R *%R eq_op).
+#[local] Notation PmulC_aux := (PmulC_aux 0 *%R eq_op).
+#[local] Notation PmulC := (PmulC 0 1 *%R eq_op).
+#[local] Notation PmulI := (PmulI 0 1 *%R eq_op Pmul).
+#[local] Notation Ppow_pos := (Ppow_pos 0 1 +%R *%R eq_op).
+#[local] Notation Ppow_N := (Ppow_N 0 1 +%R *%R eq_op).
+
+#[local] Notation Meval := (Meval
+  1 *%R N.to_nat (@GRing.exp R) (@env_jump R) env_nth).
+#[local] Notation cMeval := (cMeval
+  1 *%R N.to_nat (@GRing.exp R) R_of_C (@env_jump R) env_nth).
+#[local] Notation CFactor := (CFactor 0 eq_op cdiv).
+#[local] Notation MFactor := (MFactor 0 1 eq_op cdiv).
+#[local] Notation POneSubst := (POneSubst 0 1 +%R *%R eq_op cdiv).
+#[local] Notation PNSubst1 := (PNSubst1 0 1 +%R *%R eq_op cdiv).
+#[local] Notation PNSubst := (PNSubst 0 1 +%R *%R eq_op cdiv).
+#[local] Notation PSubstL1 := (PSubstL1 0 1 +%R *%R eq_op cdiv).
+#[local] Notation PSubstL := (PSubstL 0 1 +%R *%R eq_op cdiv).
+#[local] Notation PNSubstL := (PNSubstL 0 1 +%R *%R eq_op cdiv).
+#[local] Notation Mon_of_Pol := (Mon_of_Pol 0 eq_op).
+
+Lemma Meval_mkZmon l j M : Meval l (mkZmon j M) = Meval l (zmon j M).
+Proof. by case: M. Qed.
+
+Lemma Meval_zmon_pred l j M :
+  Meval (env_jump 1 l) (zmon_pred j M) = Meval l (zmon j M).
+Proof.
+case: j => [p | p |//]; rewrite ?Meval_mkZmon/= -?env_jumpD//.
+congr (Meval (env_jump _ l) M); apply: Pos_to_natI.
+by rewrite !Pos_to_natE add1n prednK// double_gt0 Pos_to_nat_gt0.
+Qed.
+
+Lemma Meval_mkVmon l i M :
+  Meval l (mkVmon i M) = Meval l M * env_nth 1 l ^+ Pos.to_nat i.
+Proof.
+case: M => [//| j M | i' M] /=; rewrite ?Meval_zmon_pred//.
+by rewrite Pos_to_natD addnC exprD mulrA.
+Qed.
+
+Lemma Peval_CFactor l P c : let (Q, R) := CFactor P c in
+  Peval l P = Peval l Q + R_of_C c * Peval l R.
+Proof.
+elim: P l => [c' | j P IH | P IHP i Q IHQ] l /=.
+- by case: cdiv (cdivP c' c) => q r -> /=; rewrite rmorphD rmorphM addrC.
+- by case: CFactor (IH (env_jump j l)) => R' S /=; rewrite !Peval_mkPinj.
+case: CFactor (IHP l) => R1 S1 ->.
+case: CFactor (IHQ (env_jump 1 l)) => R2 S2 ->.
+by rewrite !Peval_mkPX mulrDr mulrA addrACA -mulrDl.
+Qed.
+
+Lemma Meval_MFactor l P c M : let (Q, R) := MFactor P c M in
+  Peval l P = Peval l Q + cMeval l (c, M) * Peval l R.
+Proof.
+rewrite /cMeval; elim: P l M => [c'|j P IH|P IHP i Q IHQ] l [|jM M|iM M]/=.
+- case: eqP => [->|_] /=; first by rewrite rmorph0 rmorph1 add0r !mul1r.
+  by case: cdiv (cdivP c' c) => q r -> /=; rewrite rmorphD rmorphM mulr1 addrC.
+- by rewrite rmorph0 mulr0 addr0.
+- by rewrite rmorph0 mulr0 addr0.
+- case: eqP => [->|_] /=; first by rewrite rmorph0 rmorph1 add0r !mul1r.
+  case: CFactor (Peval_CFactor (env_jump j l) P c) => Q R' ->.
+  by rewrite !Peval_mkPinj mulr1.
+- case: pos_nat_compareP => [| jjM | jMj].
+  + by case: MFactor (IH (env_jump j l) M) => Q R' ->; rewrite !Peval_mkPinj.
+  + case: MFactor (IH (env_jump j l) (zmon (Pos.sub jM j) M)) => Q R' ->.
+    rewrite !Peval_mkPinj /= -env_jumpD (_ : Pos.add j (Pos.sub jM j) = jM)//.
+    by apply: Pos_to_natI; rewrite Pos_to_natD Pos_to_natB// subnKC// ltnW.
+  + by rewrite /= rmorph0 mulr0 addr0.
+- by rewrite rmorph0 mulr0 addr0.
+- case: eqP => [->|_] /=; first by rewrite rmorph0 rmorph1 add0r !mul1r.
+  case: CFactor (Peval_CFactor l P c) => R1 S1 ->.
+  case: CFactor (Peval_CFactor (env_jump 1 l) Q c) => R2 S2 ->.
+  by rewrite mulr1 !Peval_mkPX mulrDr mulrA addrACA -mulrDl.
+- case: MFactor (IHP l (zmon jM M)) => R1 S1 ->.
+  case: MFactor (IHQ (env_jump 1 l) (zmon_pred jM M)) => R2 S2 ->.
+  by rewrite /= !Peval_mkPX mulrDr mulrA addrACA -mulrDl Meval_zmon_pred.
+- case: pos_nat_compareP => [| iiM | iMi].
+  + case: MFactor (IHP l (mkZmon 1 M)) => R1 S1 ->.
+    by rewrite Peval_mkPX addrAC mulrA [in RHS]mulrAC -mulrDl Meval_mkZmon.
+  + case: MFactor (IHP l (vmon (Pos.sub iM i) M)) => R1 S1 ->.
+    rewrite Peval_mkPX addrAC mulrDl/= mulrAC ![_ * Peval l S1]mulrC.
+    by rewrite -!mulrA -exprD Pos_to_natB ?subnK// ltnW.
+  + case: MFactor (IHP l (mkZmon 1 M)) => R1 S1 ->.
+    rewrite !Peval_mkPX addrAC mulrDl Meval_mkZmon/= rmorph0 addr0 mulrACA.
+    by rewrite -!mulrA -exprD mulrA mulrACA !mulrA Pos_to_natB ?subnKC// ltnW.
+Qed.
+
+Lemma Peval_POneSubst l P1 cM1 P2 P3 : POneSubst P1 cM1 P2 = Some P3 ->
+  cMeval l cM1 = Peval l P2 -> Peval l P1 = Peval l P3.
+Proof.
+case: cM1 => cc M1 /=; case: MFactor (Meval_MFactor l P1 cc M1) => Q1 R1 -> eP3.
+suff -> : P3 = Padd Q1 (Pmul P2 R1) by rewrite PevalD PevalM => <-.
+by case: R1 eP3 => [c |? ?|? ? ?]; [case: eqP => [//|_]| |]; move=> -[].
+Qed.
+
+Lemma Peval_PNSubst1 l n P1 cM1 P2 : cMeval l cM1 = Peval l P2 ->
+  Peval l P1 = Peval l (PNSubst1 P1 cM1 P2 n).
+Proof.
+by elim: n P1 => [|n IHn] /= P1;
+  case: POneSubst (@Peval_POneSubst l P1 cM1 P2) => // P eP eOS;
+  rewrite -?IHn//; apply: eP.
+Qed.
+
+Lemma Peval_PNSubst l n P1 cM1 P2 P3 : PNSubst P1 cM1 P2 n = Some P3 ->
+  cMeval l cM1 = Peval l P2 -> Peval l P1 = Peval l P3.
+Proof.
+rewrite /PNSubst; case: POneSubst (@Peval_POneSubst l P1 cM1 P2) => // P.
+by case: n => [//|n] /(_ P erefl) + [<-] ?; rewrite -Peval_PNSubst1//; apply.
+Qed.
+
+Lemma Peval_PSubstL1 l n LM1 P1 :
+    all (fun MP => cMeval l MP.1 == Peval l MP.2) LM1 ->
+  Peval l P1 = Peval l (PSubstL1 P1 LM1 n).
+Proof.
+elim: LM1 P1 => [//|[M2 P2] LM2 IH] /= P1 /andP[/eqP eMP2 aLM2].
+by rewrite -IH// -Peval_PNSubst1.
+Qed.
+
+Lemma Peval_PSubstL l n LM1 P1 P2 : PSubstL P1 LM1 n = Some P2 ->
+    all (fun MP => cMeval l MP.1 == Peval l MP.2) LM1 ->
+  Peval l P1 = Peval l P2.
+Proof.
+elim: LM1 P1 => [//|[M2 P2'] LM2 IH] /= P3 + /andP[/eqP M2P2' a].
+case: PNSubst (@Peval_PNSubst l n P3 M2 P2') => [P /(_ P erefl) eP|_].
+- by move=> -[<-]; rewrite -Peval_PSubstL1// eP.
+- by move=> ?; apply: IH.
+Qed.
+
+Lemma Peval_PNSubstL l m n LM1 P1 :
+    all (fun MP => cMeval l MP.1 == Peval l MP.2) LM1 ->
+  Peval l P1 = Peval l (PNSubstL P1 LM1 m n).
+Proof.
+by elim: m LM1 P1 => [|m IHm] LM1 P1 a /=;
+  case: PSubstL (@Peval_PSubstL l n LM1 P1) => // P /(_ P erefl);
+  rewrite -?IHm//; apply.
+Qed.
+
+Lemma Meval_Mon_of_Pol l P m : Mon_of_Pol P = Some m ->
+  cMeval l m = Peval l P.
+Proof.
+case: m => c M; elim: P l c M => [c' | j P IH | P IHP i Q IHQ] l c M /=.
+- by case: eqP => [//|_] [<- <-]; rewrite /cMeval/= mulr1.
+- case: Mon_of_Pol IH => // -[{}c {}M] /[swap] -[<- <-].
+  by rewrite /cMeval Meval_mkZmon/=; apply.
+rewrite -[match Q with Pc _ => _ | _ => _ end]/(Peq Q P0).
+case: Peq (@Peval_Peq _ _ R_of_C (env_jump 1 l) Q P0) => [/(_ erefl)/= Q0|//].
+case: Mon_of_Pol IHP => // -[{}c {}M] /[swap] -[<- <-] /(_ l _ _ erefl)<-.
+by rewrite Q0 rmorph0 addr0 /cMeval/= Meval_mkVmon mulrA.
+Qed.
+
+End MevalSemiRing.
+
+Section Csemiring_correct.
+Variables (R C : comPzSemiRingType) (R_of_C : {rmorphism C -> R}).
+Variables (cdiv : C -> C -> C * C).
+Variables (cdivP : forall x y, let (q, r) := cdiv x y in x = y * q + r).
+
+Implicit Type l : seq R.
+
+#[local] Notation Peval := (Peval
+  +%R *%R N.to_nat (@GRing.exp R) R_of_C (@env_jump R) (env_nth 0)).
+#[local] Notation cMeval := (cMeval
+  1 *%R N.to_nat (@GRing.exp R) R_of_C (@env_jump R) (env_nth 0)).
+#[local] Notation PEeval := (PEeval 0 1 +%R *%R +%R id
+  N.to_nat (@GRing.exp R) R_of_C (env_nth 0)).
+#[local] Notation PEeval_eqs := (PEeval_eqs true andb 0 1 +%R *%R +%R id
+  N.to_nat (@GRing.exp R) eq_op R_of_C (env_nth 0)).
+#[local] Notation Peq := (Peq eq_op).
+#[local] Notation Pol_of_PExpr := (Pol_of_PExpr 0 1 +%R *%R +%R id eq_op).
+#[local] Notation mk_monpol_list := (mk_monpol_list
+  0 1 +%R *%R +%R id eq_op cdiv).
+#[local] Notation norm_subst := (norm_subst 0 1 +%R *%R +%R id eq_op cdiv).
+#[local] Notation ring_checker := (ring_checker 0 1 +%R *%R +%R id eq_op cdiv).
+
+Lemma sPeval_Pol_of_PExpr l pe : Peval l (Pol_of_PExpr pe) = PEeval l pe.
+Proof.
+elim: pe l => [||//|i|e1 IH1 e2 IH2|e1 IH1 e2 IH2|e1 IH1 e2 IH2|e IH|e IH k]l/=.
+- by rewrite rmorph0.
+- by rewrite rmorph1.
+- exact: Peval_mkX.
+- by move: e1 IH1 => [||c|i|e1' e2'|e1' e2'|e1' e2'|e|e k] IH1;
+    move: e2 IH2 => [||c'|i'|e1'' e2''|e1'' e2''|e1'' e2''|e'|e' k'] IH2;
+    rewrite ?Psub_add ?PevalD ?IH1 ?IH2//;
+    do ?[by move: (IH2 l) => /= /[!Popp_id]->];
+    move: (IH1 l) => /= /[!Popp_id]->; rewrite addrC.
+- by rewrite Psub_add PevalD IH1 IH2.
+- by rewrite PevalM IH1 IH2.
+- by rewrite Popp_id.
+- by rewrite Peval_pow_N IH.
+Qed.
+
+Lemma sMeval_mk_monpol_list l lpe :
+    all (fun PP => PEeval l PP.1 == PEeval l PP.2) lpe ->
+  all (fun MP => cMeval l MP.1 == Peval l MP.2) (mk_monpol_list lpe).
+Proof.
+elim: lpe => [//| [pe1 pe2] lpe IH] /=/andP[/eqP pe12 a].
+have := @Meval_Mon_of_Pol _ _ R_of_C l (norm_subst 0 [::] pe1).
+case: Mon_of_Pol; rewrite /= IH// => -[c M] /(_ _ erefl)->.
+by rewrite !sPeval_Pol_of_PExpr pe12 andbT.
+Qed.
+
+Lemma sPeval_norm_subst n l lpe pe :
+    all (fun PP => PEeval l PP.1 == PEeval l PP.2) lpe ->
+  Peval l (norm_subst n (mk_monpol_list lpe) pe) = PEeval l pe.
+Proof.
+move/sMeval_mk_monpol_list/Peval_PNSubstL => <-//.
+exact: sPeval_Pol_of_PExpr.
+Qed.
+
+Lemma sPEeval_eqs_PEeval l lpe :
+  PEeval_eqs l lpe -> all (fun PP => PEeval l PP.1 == PEeval l PP.2) lpe.
+Proof.
+elim: lpe => [//|[pe1 pe2] lpe IH] /= elpe.
+by case: lpe elpe IH => [->//|? ?] /andP[-> ?] ->.
+Qed.
+
+Lemma sCring_checkerT n l lpe pe1 pe2 :
+    PEeval_eqs l lpe ->
+    ring_checker n lpe pe1 pe2 ->
+  PEeval l pe1 = PEeval l pe2.
+Proof.
+move/sPEeval_eqs_PEeval => elpe /(Peval_Peq R_of_C l).
+by rewrite !sPeval_norm_subst.
+Qed.
+
+End Csemiring_correct.
+
+Section Cring_correct.
+Variables (R C : comPzRingType) (R_of_C : {rmorphism C -> R}).
+Variables (cdiv : C -> C -> C * C).
+Variables (cdivP : forall x y, let (q, r) := cdiv x y in x = y * q + r).
+
+Implicit Type l : seq R.
+
+#[local] Notation Peval := (Peval
+  +%R *%R N.to_nat (@GRing.exp R) R_of_C (@env_jump R) (env_nth 0)).
+#[local] Notation cMeval := (cMeval
+  1 *%R N.to_nat (@GRing.exp R) R_of_C (@env_jump R) (env_nth 0)).
+#[local] Notation PEeval := (PEeval 0 1 +%R *%R (fun x y : R => x - y) -%R
+  N.to_nat (@GRing.exp R) R_of_C (env_nth 0)).
+#[local] Notation PEeval_eqs := (PEeval_eqs true andb 0 1 +%R *%R
+  (fun x y : R => x - y) -%R N.to_nat (@GRing.exp R) eq_op R_of_C (env_nth 0)).
+#[local] Notation Peq := (Peq eq_op).
+#[local] Notation Pol_of_PExpr := (Pol_of_PExpr
+  0 1 +%R *%R (fun x y : C => x - y) -%R eq_op).
+#[local] Notation mk_monpol_list := (mk_monpol_list
+  0 1 +%R *%R (fun x y : C => x - y) -%R eq_op cdiv).
+#[local] Notation norm_subst := (norm_subst
+  0 1 +%R *%R (fun x y : C => x - y) -%R eq_op cdiv).
+#[local] Notation ring_checker := (ring_checker
+  0 1 +%R *%R (fun x y : C => x - y) -%R eq_op cdiv).
+
+Lemma Peval_Pol_of_PExpr l pe : Peval l (Pol_of_PExpr pe) = PEeval l pe.
+Proof.
+elim: pe l => [||//|i|e1 IH1 e2 IH2|e1 IH1 e2 IH2|e1 IH1 e2 IH2|e IH|e IH k]l/=.
+- by rewrite rmorph0.
+- by rewrite rmorph1.
+- exact: Peval_mkX.
+- by move: e1 IH1 => [||c|i|e1' e2'|e1' e2'|e1' e2'|e|e k] IH1;
+    move: e2 IH2 => [||c'|i'|e1'' e2''|e1'' e2''|e1'' e2''|e'|e' k'] IH2;
+    rewrite ?PevalD ?IH1 ?IH2// PevalB ?IH1 -PevalN IH2// addrC -IH1.
+- by rewrite PevalB IH1 IH2.
+- by rewrite PevalM IH1 IH2.
+- by rewrite PevalN IH.
+- by rewrite Peval_pow_N IH.
+Qed.
+
+Lemma Meval_mk_monpol_list l lpe :
+    all (fun PP => PEeval l PP.1 == PEeval l PP.2) lpe ->
+  all (fun MP => cMeval l MP.1 == Peval l MP.2) (mk_monpol_list lpe).
+Proof.
+elim: lpe => [//| [pe1 pe2] lpe IH] /=/andP[/eqP pe12 a].
+have := @Meval_Mon_of_Pol _ _ R_of_C l (norm_subst 0 [::] pe1).
+case: Mon_of_Pol; rewrite /= IH// => -[c M] /(_ _ erefl)->.
+by rewrite !Peval_Pol_of_PExpr pe12 andbT.
+Qed.
+
+Lemma Peval_norm_subst n l lpe pe :
+    all (fun PP => PEeval l PP.1 == PEeval l PP.2) lpe ->
+  Peval l (norm_subst n (mk_monpol_list lpe) pe) = PEeval l pe.
+Proof.
+by move/Meval_mk_monpol_list/Peval_PNSubstL => <-//; apply: Peval_Pol_of_PExpr.
+Qed.
+
+Lemma PEeval_eqs_PEeval l lpe :
+  PEeval_eqs l lpe -> all (fun PP => PEeval l PP.1 == PEeval l PP.2) lpe.
+Proof.
+elim: lpe => [//|[pe1 pe2] lpe IH] /= elpe.
+by case: lpe elpe IH => [->//|? ?] /andP[-> ?] ->.
+Qed.
+
+Lemma Cring_checkerT n l lpe pe1 pe2 :
+    PEeval_eqs l lpe ->
+    ring_checker n lpe pe1 pe2 ->
+  PEeval l pe1 = PEeval l pe2.
+Proof.
+move/PEeval_eqs_PEeval => elpe /(Peval_Peq R_of_C l).
+by rewrite !Peval_norm_subst.
+Qed.
+
+End Cring_correct.
+
+Section PCond.
+Variables (R : Type) (rO rI : R) (radd rmul rsub : R -> R -> R) (ropp : R -> R).
+Variables (Cpow : Type) (Cpow_of_N : N -> Cpow) (rpow : R -> Cpow -> R).
+Variables (req : R -> R -> bool).
+Variables (C : Type) (R_of_C : C -> R).
+
+#[local] Notation PEeval := (PEeval rO rI radd rmul rsub ropp Cpow_of_N rpow
+  R_of_C (env_nth rO)).
+#[local] Notation PCond := (PCond true negb andb rO rI radd rmul rsub ropp
+  Cpow_of_N rpow req R_of_C (env_nth rO)).
+
+Lemma PCond_cons l c1 c2 :
+  PCond l (c1 :: c2) = ~~ (req (PEeval l c1) rO) && PCond l c2.
+Proof. by case: c2 => [|//]; rewrite andbT. Qed.
+
+Lemma PCond_app l c1 c2 : PCond l (app c1 c2) = PCond l c1 && PCond l c2.
+Proof. by elim: c1 c2 => [//|c c1 IH] c2; rewrite !PCond_cons IH andbA. Qed.
+
+End PCond.
+
+Section FieldCorrect.
+Variables (R : fieldType) (C : comPzRingType) (R_of_C : {rmorphism C -> R}).
+Variables (cdiv : C -> C -> C * C).
+Variables (cdivP : forall x y, let (q, r) := cdiv x y in x = y * q + r).
+
+Implicit Type l : seq R.
+
+#[local] Notation Peval := (Peval
+  +%R *%R N.to_nat (@GRing.exp R) R_of_C (@env_jump R) (env_nth 0)).
+#[local] Notation sub := (fun x y => x - y).
+#[local] Notation PEeval := (PEeval 0 1 +%R *%R sub -%R N.to_nat (@GRing.exp R)
+  R_of_C (env_nth 0)).
+#[local] Notation PEeval_eqs := (PEeval_eqs true andb 0 1 +%R *%R sub -%R
+  N.to_nat (@GRing.exp R) eq_op R_of_C (env_nth 0)).
+#[local] Notation FEeval := (FEeval 0 1 +%R *%R sub -%R (fun x y => x / y)
+  (fun x => x^-1) N.to_nat (@GRing.exp R) R_of_C (env_nth 0)).
+#[local] Notation PCond := (PCond true negb andb 0 1 +%R *%R sub -%R
+  N.to_nat (@GRing.exp R) eq_op R_of_C (env_nth 0)).
+#[local] Notation NPEadd := (NPEadd 0 +%R eq_op).
+#[local] Notation NPEsub := (NPEsub 0 sub eq_op).
+#[local] Notation NPEopp := (NPEopp -%R).
+#[local] Notation pow_pos := (fun x n => x ^+ Pos.to_nat n).
+#[local] Notation NPEpow := (NPEpow 0 1 pow_pos eq_op).
+#[local] Notation NPEmul := (NPEmul 0 1 *%R pow_pos eq_op).
+#[local] Notation PExpr_eq := (PExpr_eq eq_op).
+#[local] Notation default_isIn := (default_isIn 0 1 pow_pos eq_op).
+#[local] Notation isIn := (isIn 0 1 *%R pow_pos eq_op).
+#[local] Notation split_aux := (split_aux 0 1 *%R pow_pos eq_op).
+#[local] Notation split := (split 0 1 *%R pow_pos eq_op).
+#[local] Notation Fnorm := (Fnorm 0 1 +%R *%R sub -%R pow_pos eq_op).
+#[local] Notation field_checker := (field_checker 0 1 +%R *%R sub -%R pow_pos
+  eq_op cdiv).
+#[local] Notation Fcons0 := (Fcons0 0 1 +%R *%R sub -%R eq_op).
+#[local] Notation Fcons00 := (Fcons00 0 1 +%R *%R sub -%R eq_op).
+#[local] Notation Fcons1 := (Fcons1 0 1 +%R *%R sub -%R eq_op).
+#[local] Notation Fcons2 := (Fcons2 0 1 +%R *%R sub -%R pow_pos eq_op).
+
+Lemma PEeval_NPEadd l e1 e2 : PEeval l (NPEadd e1 e2) = PEeval l (PEadd e1 e2).
+Proof.
+by case: e1 => [||c|i|e1 e1'|e1 e1'|e1 e1'|e1|e1 n];
+  case: e2 => [||c'|i'|e2 e2'|e2 e2'|e2 e2'|e2|e2 n']; do ?[reflexivity] => /=;
+  do ?[by case: eqP => [->|//]; rewrite rmorph0 (addr0, add0r)];
+  rewrite rmorphD.
+Qed.
+
+Lemma PEeval_NPEsub l e1 e2 : PEeval l (NPEsub e1 e2) = PEeval l (PEsub e1 e2).
+Proof.
+by case: e1 => [||c|i|e1 e1'|e1 e1'|e1 e1'|e1|e1 n];
+  case: e2 => [||c'|i'|e2 e2'|e2 e2'|e2 e2'|e2|e2 n']; do ?[reflexivity] => /=;
+  do ?[by case: eqP => [->|//]; rewrite rmorph0 (subr0, add0r)//= ?oppr0];
+  rewrite rmorphB.
+Qed.
+
+Lemma PEeval_NPEopp l e : PEeval l (NPEopp e) = PEeval l (PEopp e).
+Proof. by case: e => [||c|i|e e'|e e'|e e'|e|e n]//=; rewrite rmorphN. Qed.
+
+Lemma PEeval_NPEpow l e n : PEeval l (NPEpow e n) = PEeval l (PEpow e n).
+Proof.
+case: n => [| p]; rewrite /NPEpow; first by rewrite /= ?rmorph1 ?expr0.
+case: Pos.eqb (pos_nat_eq (pos_nat_Pos_to_nat p) pos_nat1) => [|_].
+  by move/esym/eqP; rewrite -[1%N]/(Pos.to_nat xH) => /Pos_to_natI->.
+case: e => //= c; case: eqP => [->|_]; rewrite /= ?rmorph1 ?expr1n//.
+by case: eqP => [->|_]; rewrite /= ?rmorph0 ?expr0n ?Pos_to_nat0F//= rmorphXn.
+Qed.
+
+Lemma PEeval_NPEmul l e1 e2 : PEeval l (NPEmul e1 e2) = PEeval l (PEmul e1 e2).
+Proof.
+elim: e1 e2 => [||c|i|e1 IH e1' IH'|e1 IH e1' IH'|e1 IH e1' IH'|e1 IH|e1 IH n];
+  case=> [||c'|i'|e2 e2'|e2 e2'|e2 e2'|e2|e2 n']; do ?[reflexivity] => /=;
+  do ?[by case: eqP => [->|_]; rewrite ?rmorph1 ?mul1r?mulr1; do ?[reflexivity];
+       case: eqP => [->|_]; rewrite ?rmorph0 /= ?mul0r ?mulr0 ?mul1r ?mulr1].
+- by rewrite rmorphM.
+- case: N.eqb (Nnat_eq (Nnat_N_to_nat n) (Nnat_N_to_nat n')) => [|//].
+  by move/esym/eqP/N_to_natI->; rewrite PEeval_NPEpow/= IH exprMn.
+Qed.
+
+Lemma PExpr_eqP (e1 e2 : PExpr C) : reflect (e1 = e2) (PExpr_eq e1 e2).
+Proof.
+apply/(iffP idP) => [|<-]; last first.
+  elim: e1 => /=[//|//|//|p|?->?->//|?->?->//|?->?->//|//|e1 IH n].
+  - by rewrite (pos_nat_eq (pos_nat_Pos_to_nat p) (pos_nat_Pos_to_nat p)).
+  - by rewrite (Nnat_eq (Nnat_N_to_nat n) (Nnat_N_to_nat n)) eqxx IH.
+elim: e1 e2 => [||c1|i1|e1 IH e1' IH'|e1 IH e1' IH'|e1 IH e1' IH'|e IH|e IH n];
+  case=> [||c2|i2|e2 e2'|e2 e2'|e2 e2'|e2|e2 n']//=;
+  do ?[by move=> /andP[/IH-> /IH'->]].
+- by move/eqP->.
+- case: Pos.eqb (pos_nat_eq(pos_nat_Pos_to_nat i1)(pos_nat_Pos_to_nat i2)) =>//.
+  by move/esym/eqP/Pos_to_natI->.
+- by move/IH->.
+- move=> /andP[+ /IH->].
+  by rewrite (Nnat_eq (Nnat_N_to_nat n) (Nnat_N_to_nat n')) => /eqP/N_to_natI->.
+Qed.
+
+Lemma PEeval_default_isIn l e1 p1 e2 p2 n e3 :
+    default_isIn e1 p1 e2 p2 = Some (n, e3) ->
+  ((Pos.to_nat p1 > N.to_nat n)%N
+   /\ PEeval l (PEpow e2 (Npos p2))
+      = PEeval l (PEmul (PEpow e1 (N.sub (Npos p1) n)) e3)).
+Proof.
+rewrite /default_isIn; case: PExpr_eqP => [->|//].
+case: Z.pos_sub (Zint_pos_sub (pos_nat_Pos_to_nat p1) (pos_nat_Pos_to_nat p2)).
+- rewrite /Zint eq_sym subr_eq0 => /eqP[/Pos_to_natI<-] [<- <-]/=.
+  by rewrite Pos_to_nat_gt0 rmorph1 mulr1.
+- move=> p pp1p2.
+  have p1p2 : (Pos.to_nat p2 < Pos.to_nat p1)%N.
+    by rewrite -ltz_nat -subr_gt0 -(eqP pp1p2) ltz_nat Pos_to_nat_gt0.
+  have -> : p = Pos.sub p1 p2.
+    apply/Pos_to_natI/eqP; rewrite -eqz_nat [eqbLHS](eqP pp1p2).
+    by rewrite Pos_to_natB// subzn// ltnW.
+  move=> -[<- <-]/=; rewrite /= Pos_to_natB// ltn_subrL !Pos_to_nat_gt0.
+  rewrite rmorph1 mulr1 (N_to_natB (Npos p1) (Npos (Pos.sub p1 p2)))/=.
+  by rewrite Pos_to_natB ?subKn// ltnW.
+- move=> p pp1p2 [<- <-]/=; rewrite Pos_to_nat_gt0; split=> [//|].
+  rewrite (PEeval_NPEpow l e2 (Npos p))/= -exprD; congr (_ ^+ _).
+  apply/eqP; rewrite -eqz_nat PoszD; apply/eqP/(subIr (Pos.to_nat p1 : int)).
+  apply/oppr_inj; rewrite !opprB opprD addrA subrr add0r.
+  by rewrite -(eqP pp1p2)/= NegzE prednK ?Pos_to_nat_gt0.
+Qed.
+
+Lemma PEeval_isIn l e1 p1 e2 p2 n e3 :
+    isIn e1 p1 e2 p2 = Some (n, e3) ->
+  ((Pos.to_nat p1 > N.to_nat n)%N
+   /\ PEeval l (PEpow e2 (Npos p2))
+      = PEeval l (PEmul (PEpow e1 (N.sub (Npos p1) n)) e3)).
+Proof.
+(elim: e2 p1 p2 n e3 => [||?|?|????|????|e3 IH e4 IH'|??|e2 IH n'] p1 p2 n e5'';
+    do ?[exact: PEeval_default_isIn]; last first)=> /=.
+  case: n' => [//|p3].
+  case: isIn (IH p1 (Pos.mul p3 p2)) => [[n' e5'''] /(_ _ _ erefl)/[swap]|//].
+  by move=> [{n'}-> {e5'''}->] [np1 e]; rewrite -exprM/= -Pos_to_natM.
+case: isIn (IH p1 p2) => [[n'' e5] /(_ _ _ erefl)/[swap]|_]; last first.
+  case: isIn (IH' p1 p2) => [[n' e5] /(_ _ _ erefl)/[swap]|//].
+  move=> [{n'}-> {e5''}<-] [np1 e].
+  rewrite (PEeval_NPEmul l (NPEpow e3 (Npos p2)) e5)/=.
+  rewrite (PEeval_NPEpow l e3 (Npos p2)).
+  by rewrite exprMn [X in _ * X = _]e [RHS]mulrCA.
+case: n'' => [[{n}<- {e5''}<-] [np1 e]|p]/=.
+  rewrite (PEeval_NPEmul l e5 (NPEpow e4 (Npos p2)))/=.
+  rewrite (PEeval_NPEpow l e4 (Npos p2)).
+  by rewrite exprMn [X in X * _ = _]e mulrA.
+case: isIn (IH' p p2) => [[n' e6] /(_ _ _ erefl)/[swap]|_].
+  move=> [{n'}-> {e5''}<-] [np1 ee4] [pp1 ee3]; split; [exact: ltn_trans pp1|].
+  rewrite (PEeval_NPEmul l e5 e6) exprMn ee3 [X in _ * X]ee4/= [LHS]mulrACA.
+  rewrite -exprD (N_to_natB (Npos p1) (Npos p)) (N_to_natB (Npos p) n).
+  by rewrite (N_to_natB (Npos p1) n) addnBA ?subnK// ltnW.
+move=> [{n}<- {e5''}<-] [pp1 e].
+rewrite (PEeval_NPEmul l e5 (NPEpow e4 (Npos p2)))/=.
+by rewrite (PEeval_NPEpow l e4 (Npos p2)) exprMn e mulrA.
+Qed.
+
+Lemma PEeval_split_aux l e1 p e2 :
+  PEeval l (PEpow e1 (Npos p))
+  = PEeval l (PEmul (rsplit_left (split_aux e1 p e2))
+                (rsplit_common (split_aux e1 p e2)))
+  /\ PEeval l e2
+     = PEeval l (PEmul (rsplit_right (split_aux e1 p e2))
+                   (rsplit_common (split_aux e1 p e2))).
+Proof.
+have main_case e1' p' e2' :
+    let res :=
+      match isIn e1' p' e2' xH with
+      | Some (N0, e3) => mk_rsplit (PEc 1) (NPEpow e1' (Npos p')) e3
+      | Some (Npos q, e3) =>
+          mk_rsplit (NPEpow e1' (Npos q)) (NPEpow e1' (Npos (Pos.sub p' q))) e3
+      | None => mk_rsplit (NPEpow e1' (Npos p')) (PEc 1) e2'
+      end in
+    PEeval l (PEpow e1' (Npos p'))
+    = PEeval l (PEmul (rsplit_left res) (rsplit_common res))
+    /\ PEeval l e2'
+       = PEeval l (PEmul (rsplit_right res) (rsplit_common res)).
+  case: isIn (@PEeval_isIn l e1' p' e2' xH) => [[n''' e3] /(_ _ _ erefl)|_/=].
+  - case: n''' => /=[[_ ee2']|q [qp' /[!expr1] ee2']].
+      by rewrite rmorph1 mul1r (PEeval_NPEpow l e1' (Npos p')) mulrC.
+    rewrite (PEeval_NPEpow l e1' (Npos q)).
+    rewrite (PEeval_NPEpow l e1' (Npos (Pos.sub p' q)))/= -exprD ee2' mulrC.
+    by rewrite Pos_to_natB ?subnKC// 1?ltnW// (N_to_natB (Npos p') (Npos q)).
+  - by rewrite (PEeval_NPEpow l e1' (Npos p')) rmorph1 !mulr1.
+elim: e1 p e2 => [||?|?|????|????|e3 IH e4 IH'|??|e3 IH n'] p e2;
+    do ?[exact: main_case] => /=.
+  set r1 := split_aux e3 p e2; set r2 := split_aux e4 p (rsplit_right r1).
+  have [ee3 ee2] := IH p e2; have [ee4 er1] := IH' p (rsplit_right r1).
+  rewrite (PEeval_NPEmul l (rsplit_left r1) (rsplit_left r2)).
+  rewrite (PEeval_NPEmul l (rsplit_common r1) (rsplit_common r2)).
+  rewrite exprMn [X in X * _]ee3 [X in _ *X]ee4 ee2 -/r1/= er1 -/r2/=.
+  by rewrite mulrACA [X in _ /\ _ = _ * X]mulrC !mulrA.
+case: n' => [|p3]; first by rewrite /= rmorph1 expr0 expr1n !mulr1.
+by have [ee3 ee2] := IH (Pos.mul p3 p) e2; rewrite -exprM/= -Pos_to_natM.
+Qed.
+
+Lemma PEeval_split_l l e1 e2 :
+  PEeval l e1
+  = PEeval l (PEmul (rsplit_left (split e1 e2)) (rsplit_common (split e1 e2))).
+Proof. by case: (PEeval_split_aux l e1 xH e2) => /=/[!expr1]. Qed.
+
+Lemma PEeval_split_r l e1 e2 :
+  PEeval l e2
+  = PEeval l (PEmul (rsplit_right (split e1 e2)) (rsplit_common (split e1 e2))).
+Proof. by case: (PEeval_split_aux l e1 xH e2). Qed.
+
+Lemma split_neq0_l l e1 e2 :
+  PEeval l e1 != 0 -> PEeval l (rsplit_left (split e1 e2)) != 0.
+Proof.
+by apply: contraNN; rewrite (PEeval_split_l l e1 e2)/= mulf_eq0 => ->.
+Qed.
+
+Lemma split_neq0_r l e1 e2 :
+  PEeval l e2 != 0 -> PEeval l (rsplit_right (split e1 e2)) != 0.
+Proof.
+by apply: contraNN; rewrite (PEeval_split_r l e1 e2)/= mulf_eq0 => ->.
+Qed.
+
+Lemma PCond_Fnorm l e :
+  PCond l (condition (Fnorm e)) -> PEeval l (denum (Fnorm e)) != 0.
+Proof.
+elim: e => [||c|i|e IH e' IH'|e IH e' IH'|e IH e' IH'|//|e IH|e IH e' IH'
+    |e IH n]/=; do ?[by rewrite rmorph1 oner_neq0];
+    rewrite ?PEeval_NPEmul/= ?PCond_cons ?PCond_app.
+- move=> /andP[/IH en0 /IH' e'n0].
+  by rewrite PEeval_NPEmul -PEeval_split_r mulf_neq0// split_neq0_l.
+- move=> /andP[/IH en0 /IH' e'n0].
+  by rewrite PEeval_NPEmul -PEeval_split_r mulf_neq0// split_neq0_l.
+- by move=> /andP[/IH en0 /IH' e'n0]; rewrite mulf_neq0// split_neq0_r.
+- by move=> /andP[].
+- move=> /andP[ne'n0 /andP[/IH den0 /IH' de'n0]].
+  by rewrite mulf_neq0// ?split_neq0_l ?split_neq0_r.
+- by move=> /IH ene0; rewrite PEeval_NPEpow/= expf_neq0.
+Qed.
+
+Lemma addf_div_common (F : fieldType) (c x1 y1 x2 y2 : F) :
+    y1 * c != 0 -> y2 * c != 0 ->
+  x1 / (y1 * c) + x2 / (y2 * c) = (x1 * y2 + x2 * y1) / (y1 * c * y2).
+Proof.
+move=> y1c y2c; rewrite addf_div// !mulrA -mulrDl -mulf_div divff ?mulr1//.
+by apply: contraNN y1c; rewrite mulf_eq0 => ->; rewrite orbT.
+Qed.
+
+Lemma mulf_div_common (F : fieldType) (c1 c2 x1 y1 x2 y2 : F) :
+    y1 * c1 != 0 -> y2 * c2 != 0 ->
+  (x1 * c2) / (y1 * c1) * ((x2 * c1) / (y2 * c2)) = (x1 * x2) / (y1 * y2).
+Proof.
+move=> y1c1 y2c2; rewrite mulf_div mulrACA [X in _ / X]mulrACA.
+rewrite -[LHS]mulf_div [c2 * c1]mulrC divff ?mulr1// mulf_neq0//.
+  by apply: contraNN y1c1; rewrite mulf_eq0 => ->; rewrite orbT.
+by apply: contraNN y2c2; rewrite mulf_eq0 => ->; rewrite orbT.
+Qed.
+
+Lemma PEeval_Fnorm l e : PCond l (condition (Fnorm e)) ->
+  FEeval l e = PEeval l (num (Fnorm e)) / PEeval l (denum (Fnorm e)).
+Proof.
+elim: e => [||c|i|e IH e' IH'|e IH e' IH'|e IH e' IH'|e IH|e IH|e IH e' IH'
+    |e IH n]/=; rewrite ?PCond_cons ?PCond_app.
+- by rewrite rmorph0 mul0r.
+- by rewrite rmorph1 invr1 mulr1.
+- by rewrite rmorph1 invr1 mulr1.
+- by rewrite rmorph1 invr1 mulr1.
+- move=> /andP[ce ce']; rewrite IH// IH'//.
+  rewrite PEeval_NPEadd/= !PEeval_NPEmul/= PEeval_NPEmul/=.
+  rewrite -[X in _ = _ / (_ * X)]mulrC mulrA -addf_div_common
+    -?[eqbLHS]PEeval_split_l -?[eqbLHS]PEeval_split_r ?PCond_Fnorm//.
+  rewrite -[X in _ = _ / X + _]PEeval_split_l.
+  by rewrite -[X in _ = _ + _ / X]PEeval_split_r.
+- move=> /andP[ce ce']; rewrite IH// IH'//.
+  rewrite PEeval_NPEsub/= !PEeval_NPEmul/= PEeval_NPEmul/= -!mulNr.
+  rewrite -[X in _ = _ / (_ * X)]mulrC mulrA -addf_div_common
+    -?[eqbLHS](PEeval_split_l, PEeval_split_r) ?PCond_Fnorm//.
+  rewrite -[X in _ = _ / X + _]PEeval_split_l.
+  by rewrite -[X in _ = _ + _ / X]PEeval_split_r.
+- move=> /andP[ce ce']; rewrite IH// IH'//.
+  rewrite PEeval_NPEmul/= PEeval_NPEmul/=.
+  rewrite (PEeval_split_l l (num (Fnorm e)) (denum (Fnorm e'))).
+  rewrite (PEeval_split_r l (num (Fnorm e)) (denum (Fnorm e'))).
+  rewrite (PEeval_split_l l (num (Fnorm e')) (denum (Fnorm e))).
+  rewrite (PEeval_split_r l (num (Fnorm e')) (denum (Fnorm e)))/=.
+  by rewrite mulf_div_common
+     -?[eqbLHS](PEeval_split_l, PEeval_split_r) ?PCond_Fnorm//.
+- by move=> ce; rewrite IH// PEeval_NPEopp/= mulNr.
+- by move=> /andP[nen0 ce]; rewrite IH// invf_div.
+- move=> /andP[ne'n0 /andP[ce ce']]; rewrite IH// IH'//.
+  rewrite PEeval_NPEmul/= PEeval_NPEmul/=.
+  rewrite (PEeval_split_l l (num (Fnorm e)) (num (Fnorm e'))).
+  rewrite (PEeval_split_r l (num (Fnorm e)) (num (Fnorm e'))).
+  rewrite (PEeval_split_l l (denum (Fnorm e)) (denum (Fnorm e'))).
+  rewrite (PEeval_split_r l (denum (Fnorm e)) (denum (Fnorm e')))/=.
+  by rewrite [X in _ * X = _]invf_div mulf_div_common
+    -?[eqbLHS](PEeval_split_l, PEeval_split_r) ?PCond_Fnorm//.
+- by move=> ce; rewrite IH// !PEeval_NPEpow/= expr_div_n.
+Qed.
+
+Lemma Cfield_checkerT
+    cond_norm (cond_normP : forall l el, PCond l (cond_norm el) -> PCond l el)
+    n l lpe fe1 fe2 lc :
+    PEeval_eqs l lpe ->
+    field_checker cond_norm n lpe fe1 fe2 = Some lc ->
+    PCond l lc ->
+  FEeval l fe1 = FEeval l fe2.
+Proof.
+rewrite /field_checker; set pe1 := PEmul _ _; set pe2 := PEmul _ _.
+move/(Cring_checkerT cdivP) => /(_ n pe1 pe2); rewrite /ring_checker.
+case: Peq => [/(_ erefl) epe12 [{lc}<-] /cond_normP/[!PCond_app]/andP[P P']|//].
+by apply/eqP; rewrite !PEeval_Fnorm// eqr_div ?PCond_Fnorm//; apply/eqP.
+Qed.
+
+Lemma PCond_Fcons0 l a el :
+  PCond l (Fcons0 a el) -> PEeval l a != 0 /\ PCond l el.
+Proof.
+elim: el => [//|e el IH] /=; set pa := _ a; set pe := _ e.
+case: Peq (@Peval_Peq _ _ R_of_C l pa pe) => [/(_ erefl)|_].
+  by rewrite !Peval_Pol_of_PExpr PCond_cons => -> /andP[-> ->].
+by rewrite !PCond_cons => /andP[-> /IH[->]].
+Qed.
+
+Lemma PCond_Fcons00 l a el :
+  PCond l (Fcons00 a el) -> PEeval l a != 0 /\ PCond l el.
+Proof.
+elim: a el => [||c|i|a IH a' IH'|a IH a' IH'|a IH a' IH'|a IH| a IH n] el /=;
+    do ?[by move/PCond_Fcons0].
+- by move=> /IH[an0 /IH'[a'n0 ->]]; rewrite mulf_neq0.
+- by move=> /IH[an0 ->]; rewrite expf_neq0.
+Qed.
+
+Lemma PCond_Fapp Fcons l el el' :
+    (forall l e el, PCond l (Fcons e el) -> PEeval l e != 0 /\ PCond l el) ->
+  PCond l (Fapp Fcons el el') -> PCond l el /\ PCond l el'.
+Proof.
+move=> FcondP; elim: el el' => [//|e el IH] el' /=.
+by rewrite PCond_cons => /FcondP[-> /IH[-> ->]].
+Qed.
+
+Lemma PCond_cond_norm Fcons l el :
+    (forall l e el, PCond l (Fcons e el) -> PEeval l e != 0 /\ PCond l el) ->
+  PCond l (cond_norm Fcons el) -> PCond l el.
+Proof. by move=> /PCond_Fapp /[apply] -[]. Qed.
+
+End FieldCorrect.
+
+Section NumFieldCorrect.
+Variables (R : numFieldType) (C : numDomainType) (R_of_C : {rmorphism C -> R}).
+Hypothesis R_of_C_ge0 : {mono R_of_C : x / 0 <= x}.
+
+Implicit Type l : seq R.
+
+#[local] Notation sub := (fun x y => x - y).
+#[local] Notation PEeval := (PEeval 0 1 +%R *%R sub -%R N.to_nat (@GRing.exp R)
+  R_of_C (env_nth 0)).
+#[local] Notation PCond := (PCond true negb andb 0 1 +%R *%R sub -%R
+  N.to_nat (@GRing.exp R) eq_op R_of_C (env_nth 0)).
+#[local] Notation pow_pos := (fun x n => x ^+ Pos.to_nat n).
+#[local] Notation Fcons1 := (Fcons1 0 1 +%R *%R sub -%R eq_op).
+#[local] Notation PEsimp := (PEsimp 0 1 +%R *%R sub -%R pow_pos eq_op).
+#[local] Notation Fcons2 := (Fcons2 0 1 +%R *%R sub -%R pow_pos eq_op).
+
+Lemma PCond_Fcons1 l a el :
+  PCond l (Fcons1 a el) -> PEeval l a != 0 /\ PCond l el.
+Proof.
+elim: a el => [||c|i|a IH a' IH'|a IH a' IH'|a IH a' IH'|a IH| a IH n] el /=;
+    do ?[by move/PCond_Fcons0].
+- case: eqP => [->|/eqP]; rewrite /= ?rmorph0 ?eqxx// => c0 ->; split=> [|//].
+  by apply: contraNN c0; rewrite !eq_le -oppr_ge0 -rmorphN !R_of_C_ge0 oppr_ge0.
+- by move=> /IH[an0 /IH'[a'n0 ->]]; rewrite mulf_neq0.
+- by case: ifP; rewrite !oppr_eq0 oner_eq0// => _ /IH.
+- by move=> /IH[an0 ->]; rewrite expf_neq0.
+Qed.
+
+Lemma PEeval_PEsimp l e : PEeval l (PEsimp e) = PEeval l e.
+Proof.
+elim: e => [||c|i|a IH a' IH'|a IH a' IH'|a IH a' IH'|a IH| a IH n] //=.
+- by rewrite PEeval_NPEadd/= IH IH'.
+- by rewrite PEeval_NPEsub/= IH IH'.
+- by rewrite PEeval_NPEmul/= IH IH'.
+- by rewrite PEeval_NPEopp/= IH.
+- by rewrite PEeval_NPEpow/= IH.
+Qed.
+
+Lemma PCond_Fcons2 l a el :
+  PCond l (Fcons2 a el) -> PEeval l a != 0 /\ PCond l el.
+Proof. by move=> /PCond_Fcons1; rewrite PEeval_PEsimp. Qed.
+
+End NumFieldCorrect.
+
+Lemma Ctriv_divP (C : pzSemiRingType) (x y : C) :
+  let (q, r) := triv_div 0 1 eq_op x y in x = y * q + r.
+Proof.
+by rewrite /triv_div; case: eqP => [->|_]; rewrite ?addr0 ?mulr1 ?mulr0 ?add0r.
+Qed.
+
+Arguments option_R {_ _}.
+Arguments list_R {_ _}.
+
+Elpi derive.param2 andb.
+
+Elpi derive.param2 app.
+
+Elpi derive.param2 positive.
+Elpi derive.param2 N.
+Elpi derive.param2 Z.
+
+Elpi derive.param2 Pos.succ.
+Elpi derive.param2 Pos.mask.
+Elpi derive.param2 Pos.pred_double.
+Elpi derive.param2 Pos.pred.
+Elpi derive.param2 Pos.double_mask.
+Elpi derive.param2 Pos.double_pred_mask.
+Elpi derive.param2 Pos.succ_double_mask.
+(* Use derive.param2 when elpi supports mutual fixpoints *)
+Definition Pos_add_R :=
+  fix add_R (x_1 x_2 : positive) (x_R : positive_R x_1 x_2)
+      (y_1 y_2 : positive) (y_R : positive_R y_1 y_2) {struct x_R} :
+    positive_R (Pos.add x_1 y_1) (Pos.add x_2 y_2) :=
+  match x_R with
+  | xI_R p_1 p_2 p_R =>
+      match y_R with
+      | xI_R q_1 q_2 q_R => xO_R (add_carry_R p_1 p_2 p_R q_1 q_2 q_R)
+      | xO_R q_1 q_2 q_R => xI_R (add_R p_1 p_2 p_R q_1 q_2 q_R)
+      | xH_R => xO_R (succ_R p_R)
+      end
+  | xO_R p_1 p_2 p_R =>
+      match y_R with
+      | xI_R q_1 q_2 q_R => xI_R (add_R p_1 p_2 p_R q_1 q_2 q_R)
+      | xO_R q_1 q_2 q_R => xO_R (add_R p_1 p_2 p_R q_1 q_2 q_R)
+      | xH_R => xI_R p_R
+      end
+  | xH_R =>
+      match y_R with
+      | xI_R q_1 q_2 q_R => xO_R (succ_R q_R)
+      | xO_R q_1 q_2 q_R => xI_R q_R
+      | xH_R => xO_R xH_R
+      end
+  end
+  with add_carry_R (x_1 x_2 : positive) (x_R : positive_R x_1 x_2)
+      (y_1 y_2 : positive) (y_R : positive_R y_1 y_2) {struct x_R} :
+    positive_R (Pos.add_carry x_1 y_1) (Pos.add_carry x_2 y_2) :=
+  match x_R with
+  | xI_R p_1 p_2 p_R =>
+      match y_R with
+      | xI_R q_1 q_2 q_R => xI_R (add_carry_R p_1 p_2 p_R q_1 q_2 q_R)
+      | xO_R q_1 q_2 q_R => xO_R (add_carry_R p_1 p_2 p_R q_1 q_2 q_R)
+      | xH_R => xI_R (succ_R p_R)
+      end
+  | xO_R p_1 p_2 p_R =>
+      match y_R with
+      | xI_R q_1 q_2 q_R => xO_R (add_carry_R p_1 p_2 p_R q_1 q_2 q_R)
+      | xO_R q_1 q_2 q_R => xI_R (add_R p_1 p_2 p_R q_1 q_2 q_R)
+      | xH_R => xO_R (succ_R p_R)
+      end
+  | xH_R =>
+      match y_R with
+      | xI_R q_1 q_2 q_R => xI_R (succ_R q_R)
+      | xO_R q_1 q_2 q_R => xO_R (succ_R q_R)
+      | xH_R => xI_R xH_R
+      end
+  end
+  for add_R.
+Elpi derive.param2.register Pos.add Pos_add_R.
+Definition Pos_sub_mask_R :=
+  fix sub_mask_R (x_1 x_2 : positive) (x_R : positive_R x_1 x_2)
+    (y_1 y_2 : positive) (y_R : positive_R y_1 y_2) {struct x_R} :
+      mask_R (Pos.sub_mask x_1 y_1) (Pos.sub_mask x_2 y_2) :=
+  match x_R with
+  | xI_R _ _ p_R =>
+      match y_R with
+      | xI_R _ _ q_R => double_mask_R (sub_mask_R _ _ p_R _ _ q_R)
+      | xO_R _ _ q_R => succ_double_mask_R (sub_mask_R _ _ p_R _ _ q_R)
+      | xH_R => IsPos_R (xO_R p_R)
+      end
+  | xO_R _ _ p_R =>
+      match y_R with
+      | xI_R _ _ q_R => succ_double_mask_R (sub_mask_carry_R _ _ p_R _ _ q_R)
+      | xO_R _ _ q_R => double_mask_R (sub_mask_R _ _ p_R _ _ q_R)
+      | xH_R => IsPos_R (pred_double_R p_R)
+      end
+  | xH_R => match y_R with xH_R => IsNul_R | _ => IsNeg_R end
+  end
+  with sub_mask_carry_R (x_1 x_2 : positive) (x_R : positive_R x_1 x_2)
+    (y_1 y_2 : positive) (y_R : positive_R y_1 y_2) {struct x_R} :
+      mask_R (Pos.sub_mask_carry x_1 y_1) (Pos.sub_mask_carry x_2 y_2) :=
+  match x_R with
+  | xI_R _ _ p_R =>
+      match y_R with
+      | xI_R _ _ q_R => succ_double_mask_R (sub_mask_carry_R _ _ p_R _ _ q_R)
+      | xO_R _ _ q_R => double_mask_R (sub_mask_R _ _ p_R _ _ q_R)
+      | xH_R => IsPos_R (pred_double_R p_R)
+      end
+  | xO_R _ _ p_R =>
+      match y_R with
+      | xI_R _ _ q_R => double_mask_R (sub_mask_carry_R _ _ p_R _ _ q_R)
+      | xO_R _ _ q_R =>succ_double_mask_R (sub_mask_carry_R _ _ p_R _ _ q_R)
+      | xH_R => double_pred_mask_R p_R
+      end
+  | xH_R =>
+      match y_R with
+      | xI_R _ _ _ => IsNeg_R
+      | xO_R _ _ _ => IsNeg_R
+      | xH_R => IsNeg_R
+      end
+  end
+  for sub_mask_R.
+Elpi derive.param2.register Pos.sub_mask Pos_sub_mask_R.
+Elpi derive.param2 Pos.sub.
+Elpi derive.param2 Pos.mul.
+Elpi derive.param2 Pos.compare_cont.
+Elpi derive.param2 Pos.compare.
+Elpi derive.param2 Pos.eqb.
+
+#[warning="-elpi.renamed"]
+Elpi derive.param2 N.eqb.
+
+Elpi derive.param2 Z.double.
+Elpi derive.param2 Z.succ_double.
+#[warning="-elpi.renamed"]
+Elpi derive.param2 Z.pred_double.
+Elpi derive.param2 Z.pos_sub.
+
+Elpi derive.param2 PExpr.
+Elpi derive.param2 Pol.
+Elpi derive.param2 Mon.
+Elpi derive.param2 FExpr.
+Elpi derive.param2 rsplit.
+Elpi derive.param2 rsplit_left.
+Elpi derive.param2 rsplit_right.
+Elpi derive.param2 rsplit_common.
+Elpi derive.param2 field_checker.linear.
+Elpi derive.param2 num.
+Elpi derive.param2 denum.
+Elpi derive.param2 condition.
+
+Elpi derive.param2 Peq.
+Elpi derive.param2 P0.
+Elpi derive.param2 P1.
+Elpi derive.param2 mkPinj.
+Elpi derive.param2 mkPinj_pred.
+Elpi derive.param2 mkX.
+Elpi derive.param2 mkPX.
+Elpi derive.param2 Popp.
+Elpi derive.param2 PaddC.
+Elpi derive.param2 PaddI.
+Elpi derive.param2 PaddX.
+Elpi derive.param2 Padd.
+Elpi derive.param2 PsubC.
+Elpi derive.param2 PsubI.
+Elpi derive.param2 PsubX.
+Elpi derive.param2 Psub.
+Elpi derive.param2 PmulC_aux.
+Elpi derive.param2 PmulC.
+Elpi derive.param2 PmulI.
+Elpi derive.param2 Pmul.
+Elpi derive.param2 Ppow_pos.
+Elpi derive.param2 Ppow_N.
+
+Elpi derive.param2 mkZmon.
+Elpi derive.param2 zmon_pred.
+Elpi derive.param2 mkVmon.
+Elpi derive.param2 Mon_of_Pol.
+Elpi derive.param2 CFactor.
+Elpi derive.param2 MFactor.
+Elpi derive.param2 POneSubst.
+Elpi derive.param2 PNSubst1.
+Elpi derive.param2 PNSubst.
+Elpi derive.param2 PSubstL1.
+Elpi derive.param2 PSubstL.
+Elpi derive.param2 PNSubstL.
+
+Elpi derive.param2 Pol_of_PExpr.
+Elpi derive.param2 norm_subst.
+Elpi derive.param2 mk_monpol_list.
+Elpi derive.param2 ring_checker.
+Elpi derive.param2 PExpr_eq.
+Elpi derive.param2 NPEadd.
+Elpi derive.param2 NPEsub.
+Elpi derive.param2 NPEopp.
+Elpi derive.param2 NPEpow.
+Elpi derive.param2 NPEmul.
+Elpi derive.param2 default_isIn.
+Elpi derive.param2 isIn.
+Elpi derive.param2 split_aux.
+Elpi derive.param2 split.
+Elpi derive.param2 Fnorm.
+Elpi derive.param2 field_checker.
+Elpi derive.param2 Fcons0.
+Elpi derive.param2 Fcons00.
+Elpi derive.param2 absurd_PCond.
+Elpi derive.param2 Fcons1.
+Elpi derive.param2 PEsimp.
+Elpi derive.param2 Fcons2.
+Elpi derive.param2 Fapp.
+Elpi derive.param2 cond_norm.
+Elpi derive.param2 triv_div.
+
+(* a bunch of helper lemmas *)
+
+Lemma bool_Rxx b : bool_R b b. Proof. by case: b; constructor. Qed.
+Lemma nat_Rxx n : nat_R n n. Proof. by elim: n => [| n IH]; constructor. Qed.
+Lemma positive_Rxx p : positive_R p p.
+Proof. by elim: p => [p IH | p IH |]; constructor. Qed.
+Lemma N_Rxx n : N_R n n.
+Proof. by case: n => [| p]; constructor; apply: positive_Rxx. Qed.
+
+Lemma bool_R_eq b b' : bool_R b b' -> b = b'.
+Proof. by case: b b' => [] [] []. Qed.
+Lemma eq_bool_R b b' : b = b' -> bool_R b b'.
+Proof. by move=> ->; apply: bool_Rxx. Qed.
+Lemma option_R_eq T (s s' : option T) : option_R eq s s' -> s = s'.
+Proof. by case=> // ? ? ->. Qed.
+Lemma list_R_eq T (s s' : seq T) : list_R eq s s' -> s = s'.
+Proof. by elim=> [//| x _ <- {}s _ _ <-]. Qed.
+Lemma positive_R_eq p p' : positive_R p p' -> p = p'.
+Proof. by elim/positive_R_ind => [? ? ? ->|? ? ? ->|]. Qed.
+Lemma N_R_eq n n' : N_R n n' -> n = n'.
+Proof. by elim/N_R_ind => [//| ? _ /positive_R_eq<-]. Qed.
+Lemma PExpr_R_eq T (e e' : PExpr T) : PExpr_R eq e e' -> e = e'.
+Proof.
+by elim=> [||??->|??/positive_R_eq->|?? _-> ?? _->|?? _-> ?? _->|?? _-> ?? _->
+  |?? _->|?? _-> ??/N_R_eq->]//.
+Qed.
+
+Lemma eq_bool_R2 {A B} {f : A -> B -> bool} {C D} {g : C -> D -> bool}
+    {AC : A -> C -> Type} {BD : B -> D -> Type} :
+    (forall a c (rac : AC a c) b d (rbd : BD b d), f a b = g c d) ->
+  forall a c (rac : AC a c) b d (rbd : BD b d), bool_R (f a b) (g c d).
+Proof. by move=> e a1 a2 ra b1 b2 rb; apply/eq_bool_R/e. Qed.
+
+Lemma option_R_omap2 A B (RAB : A -> B -> Type) C D (RCD : C -> D -> Type)
+    (f : A -> C) (g : B -> D) : (forall a b, RAB a b -> RCD (f a) (g b)) ->
+  forall a b, option_R RAB a b -> option_R RCD (omap f a) (omap g b).
+Proof. by move=> fg _ _ [a b ab|]; constructor; apply: fg. Qed.
+
+Lemma list_R_map2 A B (RAB : A -> B -> Type) C D (RCD : C -> D -> Type)
+    (f : A -> C) (g : B -> D) : (forall a b, RAB a b -> RCD (f a) (g b)) ->
+  forall x y, list_R RAB x y -> list_R RCD (map f x) (map g y).
+Proof.
+by move=> fg ? ?; elim=> [|? ? ? ? ? ? IH]; constructor; [apply: fg|apply: IH].
+Qed.
+
+Lemma PExpr_R_PEmap2 A B (RAB : A -> B -> Type) C D (RCD : C -> D -> Type)
+    (f : A -> C) (g : B -> D) : (forall a b, RAB a b -> RCD (f a) (g b)) ->
+  forall x y, PExpr_R RAB x y -> PExpr_R RCD (PEmap f x) (PEmap g y).
+Proof.
+move=> fg ? ?; elim=> [||a b ab|a b ab||||a b ab|a b ab IH na nb nab];
+  [| | | |move=> a1 b1 ab1 IH1 a2 b2 ab2 IH2..| |]; constructor=> //; exact: fg.
+Qed.
+
+Lemma list_R_map A B (RAB : A -> B -> Type) (f : A -> B) :
+  (forall a, RAB a (f a)) -> forall l : seq A, list_R RAB l (map f l).
+Proof.
+move=> rf; elim=> [| a l IH]; first exact: nil_R.
+by apply: cons_R; [apply: rf | apply: IH].
+Qed.
+
+Lemma PExpr_R_map A B (RAB : A -> B -> Type) (f : A -> B) :
+    (forall a, RAB a (f a)) ->
+  forall g : PExpr A, PExpr_R RAB g (PEmap f g).
+Proof.
+move=> rf; elim=> [||c|p||||g IH|g IH n]; [| | | |move=> f1 IH1 f2 IH2..| |].
+- exact: PEO_R.
+- exact: PEI_R.
+- exact: PEc_R.
+- exact/PEX_R/positive_Rxx.
+- by apply: PEadd_R; [apply: IH1 | apply: IH2].
+- by apply: PEsub_R; [apply: IH1 | apply: IH2].
+- by apply: PEmul_R; [apply: IH1 | apply: IH2].
+- exact/PEopp_R/IH.
+- by apply: PEpow_R; [apply: IH | apply: N_Rxx].
+Qed.
+
+Lemma FExpr_R_map A B (RAB : A -> B -> Type) (f : A -> B) :
+    (forall a, RAB a (f a)) ->
+  forall g : FExpr A, FExpr_R RAB g (FEmap f g).
+Proof.
+move=> rf; elim=> [||c|p||||g IH|g IH|f1 IH1 f2 IH2|g IH n];
+    [| | | |move=> f1 IH1 f2 IH2..| | | |].
+- exact: FEO_R.
+- exact: FEI_R.
+- exact: FEc_R.
+- exact/FEX_R/positive_Rxx.
+- by apply: FEadd_R; [apply: IH1 | apply: IH2].
+- by apply: FEsub_R; [apply: IH1 | apply: IH2].
+- by apply: FEmul_R; [apply: IH1 | apply: IH2].
+- exact/FEopp_R/IH.
+- exact/FEinv_R/IH.
+- by apply: FEdiv_R; [apply: IH1 | apply: IH2].
+- by apply: FEpow_R; [apply: IH | apply: N_Rxx].
+Qed.
+
+Lemma PEmap_id T (e : PExpr T) : PEmap id e = e.
+Proof. by elim: e => /=[||||?->?->|?->?->|?->?->|?->|?->]. Qed.
+
+(* Refinement of C to N, for actual computation in the reflexive tactic. *)
+
+Definition R_of_N (R : pzSemiRingType) (natr : nat -> R) (n : N) : R :=
+  natr (N.to_nat n).
+Arguments R_of_N : clear implicits.
+
+Section Nsemiring.
+Variables (R : comPzSemiRingType).
+
+#[local] Notation R_of_N := (R_of_N R (GRing.natmul 1)).
+
+Lemma R_of_N_natmul i r : Nnat i r -> R_of_N i = r%:R.
+Proof. by rewrite /R_of_N => /eqP->. Qed.
+
+Lemma semiring_checker_map_N_to_nat n lpe pe1 pe2 :
+  ring_checker N0 (Npos xH) N.add N.mul N.add id N.eqb
+    (triv_div N0 (Npos xH) N.eqb) n lpe pe1 pe2
+  = ring_checker 0 1 +%R *%R +%R id eq_op (triv_div 0 1 eq_op) n
+      (map (fun pp => (PEmap N.to_nat pp.1, PEmap N.to_nat pp.2)) lpe)
+      (PEmap N.to_nat pe1) (PEmap N.to_nat pe2).
+Proof.
+by apply/bool_R_eq/(ring_checker_R _ _ NnatD NnatM NnatD _
+  (eq_bool_R2 Nnat_eq) (triv_div_R _ _ (eq_bool_R2 Nnat_eq)) (nat_Rxx n)) => //;
+  [apply: list_R_map => -[{}pe1 {}pe2]; apply: pair_R| |];
+  apply/PExpr_R_map/Nnat_N_to_nat.
+Qed.
+
+Lemma PEeval_map_N_to_nat l (pe : PExpr N) :
+  PEeval 0 1 +%R *%R +%R id N.to_nat (GRing.exp (R:=R))
+    (GRing.natmul 1) (env_nth 0) l (PEmap N.to_nat pe)
+  = PEeval 0 1 +%R *%R +%R id N.to_nat (GRing.exp (R:=R))
+      R_of_N (env_nth 0) l pe.
+Proof. by elim: pe => //= ? -> // ? // ->. Qed.
+
+Lemma PEeval_eqs_map_N_to_nat l lpe :
+    PEeval_eqs true andb 0 1 +%R *%R +%R id N.to_nat (GRing.exp (R:=R)) eq_op
+      R_of_N (env_nth 0) l lpe ->
+  PEeval_eqs true andb 0 1 +%R *%R +%R id N.to_nat (GRing.exp (R:=R)) eq_op
+    (GRing.natmul 1) (env_nth 0) l
+    (map (fun pp => (PEmap N.to_nat pp.1, PEmap N.to_nat pp.2)) lpe).
+Proof.
+elim: lpe => [//|[pe1 pe2] lpe IH] /=; rewrite !PEeval_map_N_to_nat.
+by case: lpe IH => [_/eqP//| [pe1' pe2'] lpe] /= IH /andP[-> /IH].
+Qed.
+
+#[local] Notation PEeval := (PEeval 0 1 +%R *%R +%R id N.to_nat (@GRing.exp R)
+  R_of_N (env_nth 0)).
+#[local] Notation PEeval_eqs := (PEeval_eqs true andb 0 1 +%R *%R +%R id
+  N.to_nat (@GRing.exp R) eq_op R_of_N (env_nth 0)).
+#[local] Notation ring_checker := (ring_checker
+  N0 (Npos xH) N.add N.mul N.add id N.eqb (triv_div N0 (Npos xH) N.eqb)).
+
+Lemma Nsemiring_correct n l lpe pe1 pe2 :
+    PEeval_eqs l lpe ->
+    ring_checker n lpe pe1 pe2 ->
+  PEeval l pe1 = PEeval l pe2.
+Proof.
+rewrite semiring_checker_map_N_to_nat -!PEeval_map_N_to_nat.
+by move/PEeval_eqs_map_N_to_nat; apply/sCring_checkerT/Ctriv_divP.
+Qed.
+
+End Nsemiring.
+
+(* Refinement of C to Z, for actual computation in the reflexive tactic. *)
+Definition R_of_Z (R : pzRingType) (i : Z) : R := intr (int_of_Z i).
+Arguments R_of_Z : clear implicits.
+
+Section Zring.
+Variables (R : comPzRingType).
+
+#[local] Notation R_of_Z := (R_of_Z R).
+
+Lemma R_of_Z_intr i r : Zint i r -> R_of_Z i = intr r.
+Proof. by rewrite /R_of_Z => /eqP->. Qed.
+
+Lemma ring_checker_map_int_of_Z n lpe pe1 pe2 :
+  ring_checker Z0 (Zpos xH) Z.add Z.mul Z.sub Z.opp Z.eqb
+    (triv_div Z0 (Zpos xH) Z.eqb) n lpe pe1 pe2
+  = ring_checker 0 1 +%R *%R (fun x y => x - y) -%R eq_op (triv_div 0 1 eq_op) n
+      (map (fun pp => (PEmap int_of_Z pp.1, PEmap int_of_Z pp.2)) lpe)
+      (PEmap int_of_Z pe1) (PEmap int_of_Z pe2).
+Proof.
+by apply/bool_R_eq/(ring_checker_R _ _ ZintD ZintM ZintB ZintN
+  (eq_bool_R2 Zint_eq) (triv_div_R _ _ (eq_bool_R2 Zint_eq)) (nat_Rxx n)) => //;
+  [apply: list_R_map => -[{}pe1 {}pe2]; apply: pair_R| |];
+  apply/PExpr_R_map/Zint_int_of_Z.
+Qed.
+
+Lemma PEeval_map_int_of_Z l (pe : PExpr Z) :
+  PEeval 0 1 +%R *%R (fun x y => x - y) -%R N.to_nat (GRing.exp (R:=R))
+    intr (env_nth 0) l (PEmap int_of_Z pe)
+  = PEeval 0 1 +%R *%R (fun x y => x - y) -%R N.to_nat (GRing.exp (R:=R))
+      R_of_Z (env_nth 0) l pe.
+Proof. by elim: pe => //= ? -> // ? // ->. Qed.
+
+Lemma PEeval_eqs_map_int_of_Z l lpe :
+    PEeval_eqs true andb 0 1 +%R *%R (fun x y => x - y) -%R N.to_nat (GRing.exp (R:=R))
+      eq_op R_of_Z (env_nth 0) l lpe ->
+  PEeval_eqs true andb 0 1 +%R *%R (fun x y => x - y) -%R N.to_nat (GRing.exp (R:=R))
+    eq_op intr (env_nth 0) l
+    (map (fun pp => (PEmap int_of_Z pp.1, PEmap int_of_Z pp.2)) lpe).
+Proof.
+elim: lpe => [//|[pe1 pe2] lpe IH] /=; rewrite !PEeval_map_int_of_Z.
+by case: lpe IH => [_ /eqP//| [pe1' pe2'] lpe] /= IH /andP[-> /IH].
+Qed.
+
+#[local] Notation PEeval := (PEeval 0 1 +%R *%R (fun x y => x - y) -%R
+  N.to_nat (@GRing.exp R) R_of_Z (env_nth 0)).
+#[local] Notation PEeval_eqs := (PEeval_eqs true andb 0 1 +%R *%R (fun x y => x - y) -%R
+  N.to_nat (@GRing.exp R) eq_op R_of_Z (env_nth 0)).
+#[local] Notation ring_checker := (ring_checker
+  Z0 (Zpos xH) Z.add Z.mul Z.sub Z.opp Z.eqb (triv_div Z0 (Zpos xH) Z.eqb)).
+
+Lemma Zring_correct n l lpe pe1 pe2 :
+    PEeval_eqs l lpe ->
+    ring_checker n lpe pe1 pe2 ->
+  PEeval l pe1 = PEeval l pe2.
+Proof.
+rewrite ring_checker_map_int_of_Z -!PEeval_map_int_of_Z.
+by move/PEeval_eqs_map_int_of_Z; apply/Cring_checkerT/Ctriv_divP.
+Qed.
+
+End Zring.
+
+Section Zfield.
+Variables (R : fieldType).
+
+#[local] Notation R_of_Z := (R_of_Z R).
+
+Lemma Zint_pow_pos_pos i n (Zin : Zint i n) p p' (pp' : positive_R p p') :
+  Zint (Z.pow_pos i p) (n ^+ Pos.to_nat p').
+Proof. by apply: Zint_pow_pos => //; rewrite (positive_R_eq pp'). Qed.
+
+Lemma field_checker_map_int_of_Z Zcn icn
+    (cnR : forall (Zc : seq (PExpr Z)) (ic : seq (PExpr int)),
+        list_R (PExpr_R Zint) Zc ic -> list_R (PExpr_R Zint) (Zcn Zc) (icn ic))
+    n lpe fe1 fe2 :
+  omap (map (PEmap int_of_Z))
+    (field_checker Z0 (Zpos xH) Z.add Z.mul Z.sub Z.opp Z.pow_pos
+       Z.eqb (triv_div Z0 (Zpos xH) Z.eqb) Zcn n lpe fe1 fe2)
+  = field_checker 0 1 +%R *%R (fun x y => x - y) -%R
+      (fun x p => x ^+ Pos.to_nat p) eq_op (triv_div 0 1 eq_op) icn n
+      (map (fun pp => (PEmap int_of_Z pp.1, PEmap int_of_Z pp.2)) lpe)
+      (FEmap int_of_Z fe1) (FEmap int_of_Z fe2).
+Proof.
+set fc1 := _ fe1 fe2; set fc2 := _ (FEmap _ fe1) (FEmap _ fe2).
+have fc12 : option_R (list_R (PExpr_R Zint)) fc1 fc2.
+  apply: (field_checker_R _ _ ZintD ZintM ZintB ZintN Zint_pow_pos_pos
+    (eq_bool_R2 Zint_eq) (triv_div_R _ _ (eq_bool_R2 Zint_eq)) cnR (nat_Rxx n));
+    move=> //; [|exact/FExpr_R_map/Zint_int_of_Z..].
+  apply: list_R_map => -[{}pe1 {}pe2].
+  by apply: pair_R; apply/PExpr_R_map/Zint_int_of_Z.
+rewrite -[RHS]omap_id; apply: option_R_eq; apply: option_R_omap2 fc12 => a b ab.
+rewrite -[RHS]map_id; apply: list_R_eq; apply: list_R_map2 ab => {}a {}b ab.
+rewrite -[RHS]PEmap_id; apply: PExpr_R_eq; apply: PExpr_R_PEmap2 ab => {}a {}b.
+by move/eqP.
+Qed.
+
+Lemma FEeval_map_int_of_Z l (fe : FExpr Z) :
+  FEeval 0 1 +%R *%R (fun x y => x - y) -%R (fun x y => x / y) (@GRing.inv R)
+    N.to_nat (GRing.exp (R:=R)) intr (env_nth 0) l (FEmap int_of_Z fe)
+  = FEeval 0 1 +%R *%R (fun x y => x - y) -%R (fun x y => x / y) (@GRing.inv R)
+      N.to_nat (GRing.exp (R:=R)) R_of_Z (env_nth 0) l fe.
+Proof. by elim: fe => //= ? -> // ? ->. Qed.
+
+Lemma PCond_map_int_of_Z l lpe :
+    PCond true negb andb 0 1 +%R *%R (fun x y => x - y) -%R
+      N.to_nat (GRing.exp (R:=R)) eq_op R_of_Z (env_nth 0) l lpe ->
+  PCond true negb andb 0 1 +%R *%R (fun x y => x - y) -%R
+    N.to_nat (GRing.exp (R:=R)) eq_op intr (env_nth 0) l
+    (map (PEmap int_of_Z) lpe).
+Proof.
+elim: lpe => [//|pe lpe IH] /=.
+by rewrite !PCond_cons PEeval_map_int_of_Z => /andP[-> /IH].
+Qed.
+
+Lemma cond_norm00_map_int_of_Z Zc ic : list_R (PExpr_R Zint) Zc ic ->
+  list_R (PExpr_R Zint)
+    (cond_norm (Fcons00 Z0 (Zpos xH) Z.add Z.mul Z.sub Z.opp Z.eqb) Zc)
+    (cond_norm (Fcons00 0 1 +%R *%R (fun x y => x - y) -%R eq_op) ic).
+Proof.
+apply: cond_norm_R => Ze ie Zeie {}Zc {}ic Zcic.
+exact: (Fcons00_R _ _ ZintD ZintM ZintB ZintN (eq_bool_R2 Zint_eq)).
+Qed.
+
+#[local] Notation FEeval := (FEeval 0 1 +%R *%R (fun x y => x - y) -%R
+  (fun x y => x / y) (@GRing.inv R) N.to_nat (@GRing.exp R) R_of_Z (env_nth 0)).
+#[local] Notation PEeval_eqs := (PEeval_eqs true andb 0 1 +%R *%R
+  (fun x y => x - y) -%R N.to_nat (@GRing.exp R) eq_op R_of_Z (env_nth 0)).
+#[local] Notation PCond := (PCond true negb andb 0 1 +%R *%R (fun x y => x - y)
+  -%R N.to_nat (@GRing.exp R) eq_op R_of_Z (env_nth 0)).
+#[local] Notation cond_norm := (cond_norm (Fcons00
+  Z0 (Zpos xH) Z.add Z.mul Z.sub Z.opp Z.eqb)).
+#[local] Notation field_checker := (field_checker Z0 (Zpos xH) Z.add Z.mul
+  Z.sub Z.opp Z.pow_pos Z.eqb (triv_div Z0 (Zpos xH) Z.eqb) cond_norm).
+
+Lemma Zfield_correct n l lpe fe1 fe2 lc :
+    PEeval_eqs l lpe ->
+    field_checker n lpe fe1 fe2 = Some lc ->
+    PCond l lc ->
+  FEeval l fe1 = FEeval l fe2.
+Proof.
+move=> /PEeval_eqs_map_int_of_Z + /(congr1 (omap (map (PEmap int_of_Z)))).
+move=> + + /PCond_map_int_of_Z; rewrite -!FEeval_map_int_of_Z.
+rewrite (field_checker_map_int_of_Z cond_norm00_map_int_of_Z).
+apply: (Cfield_checkerT (@Ctriv_divP int)) => el el'.
+exact/PCond_cond_norm/PCond_Fcons00.
+Qed.
+
+End Zfield.
+
+Section ZnumField.
+Variables (R : numFieldType).
+
+#[local] Notation R_of_Z := (R_of_Z R).
+
+Lemma cond_norm2_map_int_of_Z Zc ic : list_R (PExpr_R Zint) Zc ic ->
+  list_R (PExpr_R Zint)
+    (cond_norm (Fcons2 Z0 (Zpos xH) Z.add Z.mul Z.sub Z.opp Z.pow_pos Z.eqb) Zc)
+    (cond_norm (Fcons2 0 1 +%R *%R (fun x y => x - y) -%R
+                  (fun x n => x ^+ Pos.to_nat n) eq_op) ic).
+Proof.
+apply: cond_norm_R => Ze ie Zeie {}Zc {}ic Zcic.
+exact: (Fcons2_R _ _ ZintD ZintM ZintB ZintN Zint_pow_pos_pos
+  (eq_bool_R2 Zint_eq)).
+Qed.
+
+#[local] Notation FEeval := (FEeval 0 1 +%R *%R (fun x y => x - y) -%R
+  (fun x y => x / y) (@GRing.inv R) N.to_nat (@GRing.exp R) R_of_Z (env_nth 0)).
+#[local] Notation PEeval_eqs := (PEeval_eqs true andb 0 1 +%R *%R
+  (fun x y => x - y) -%R N.to_nat (@GRing.exp R) eq_op R_of_Z (env_nth 0)).
+#[local] Notation PCond := (PCond true negb andb 0 1 +%R *%R (fun x y => x - y)
+  -%R N.to_nat (@GRing.exp R) eq_op R_of_Z (env_nth 0)).
+#[local] Notation cond_norm := (cond_norm (Fcons2
+  Z0 (Zpos xH) Z.add Z.mul Z.sub Z.opp Z.pow_pos Z.eqb)).
+#[local] Notation field_checker := (field_checker Z0 (Zpos xH) Z.add Z.mul
+  Z.sub Z.opp Z.pow_pos Z.eqb (triv_div Z0 (Zpos xH) Z.eqb) cond_norm).
+
+Lemma ZnumField_correct n l lpe fe1 fe2 lc :
+    PEeval_eqs l lpe ->
+    field_checker n lpe fe1 fe2 = Some lc ->
+    PCond l lc ->
+  FEeval l fe1 = FEeval l fe2.
+Proof.
+move=> /PEeval_eqs_map_int_of_Z + /(congr1 (omap (map (PEmap int_of_Z)))).
+move=> + + /PCond_map_int_of_Z; rewrite -!FEeval_map_int_of_Z.
+rewrite (field_checker_map_int_of_Z cond_norm2_map_int_of_Z).
+apply: (Cfield_checkerT (@Ctriv_divP int)) => el el'.
+exact/PCond_cond_norm/PCond_Fcons2/ler0z.
+Qed.
+
+End ZnumField.
+
+(* Everything below is essentially imported form algebra-tactics *)
+
+Implicit Types (V : nmodType) (R : pzSemiRingType) (F : fieldType).
+
+(* Some basic facts about `Decimal.uint` and `Hexadecimal.uint`               *)
+
+Lemma Nat_tail_addE n m : Nat.tail_add n m = (m + n)%N.
+Proof. by elim: n m => [| n IH /=] m; rewrite ?addn0// IH addSn addnS. Qed.
+Lemma Nat_tail_mulE n m : Nat.tail_mul n m = (m * n)%N.
+Proof.
+rewrite /Nat.tail_mul -[RHS]add0n.
+elim: n 0%N => [| n IH /=] r; first by rewrite muln0 addn0.
+by rewrite mulnS addnA -IH Nat_tail_addE.
+Qed.
+
+Lemma PosSD p : Pos.succ p = Pos.add 1 p.
+Proof. by apply: Pos_to_natI; rewrite !Pos_to_natE add1n. Qed.
+Lemma PosDA : associative Pos.add.
+Proof. by move=> ? ? ?; apply: Pos_to_natI; rewrite !Pos_to_natE addnA. Qed.
+Lemma PosMC : commutative Pos.mul.
+Proof. by move=> ? ?; apply: Pos_to_natI; rewrite !Pos_to_natE mulnC. Qed.
+
+Lemma uint_N_nat (d : Decimal.uint) : N.to_nat (N.of_uint d) = Nat.of_uint d.
+Proof.
+suff acc d' p : Pos.to_nat (Pos.of_uint_acc d' p)
+  = Nat.of_uint_acc d' (Pos.to_nat p) by elim: d => //=.
+by elim: d' p => //= d' IH p; rewrite Nat_tail_mulE;
+  rewrite -[10%N]/(Pos.to_nat 1~0~1~0) -!Pos_to_natE -{}IH ?PosSD?PosDA PosMC.
+Qed.
+
+Lemma hex_uint_N_nat (d : Hexadecimal.uint) :
+  N.to_nat (N.of_hex_uint d) = Nat.of_hex_uint d.
+Proof.
+suff acc d' p : Pos.to_nat (Pos.of_hex_uint_acc d' p)
+  = Nat.of_hex_uint_acc d' (Pos.to_nat p) by elim: d => //=.
+by elim: d' p => //= d' IH p; rewrite Nat_tail_mulE;
+  rewrite -[16%N]/(Pos.to_nat 1~0~0~0~0) -!Pos_to_natE -{}IH ?PosSD?PosDA PosMC.
+Qed.
+
+Lemma N_to_natS i : N.to_nat (N.succ i) = (N.to_nat i).+1.
+Proof. by case: i => [//| p /=]; rewrite Pos_to_natS. Qed.
+
+(* In reified syntax trees, constants must be represented by binary integers  *)
+(* `N`. For the fine-grained control of conversion, we provide an immediately *)
+(* expanding versions of the `N -> nat` conversion.      `                    *)
+
+Definition addn_expand := Eval compute in addn.
+
+Fixpoint nat_of_pos_rec_expand (p : positive) (a : nat) : nat :=
+  match p with
+  | p0~1 => addn_expand a (nat_of_pos_rec_expand p0 (addn_expand a a))
+  | p0~0 => nat_of_pos_rec_expand p0 (addn_expand a a)
+  | 1 => a
+  end%positive.
+
+Definition nat_of_pos_expand (p : positive) : nat := nat_of_pos_rec_expand p 1.
+
+Definition nat_of_N_expand (n : N) : nat :=
+  if n is Npos p then nat_of_pos_expand p else 0%N.
+
+Lemma nat_of_N_expandE : nat_of_N_expand = N.to_nat. Proof. by []. Qed.
+
+(* For representing input terms of the form `S (... (S n) ...)`               *)
+
+Definition add_pos_nat (p : positive) (n : nat) : nat := Pos.iter S n p.
+
+Lemma add_pos_natE p n : add_pos_nat p n = Pos.to_nat p + n.
+Proof.
+by elim: p n => //= p IHp n; rewrite !IHp Pos_to_natE -addnn ?[RHS]addSn addrA.
+Qed.
+
+(* Data types for reifying `nat` constants, including large ones              *)
+(* that use `Number.uint`                                                     *)
+
+Variant large_nat := large_nat_N of N | large_nat_uint of Number.uint.
+
+Definition nat_of_large_nat (n : large_nat) : nat :=
+  match n with
+  | large_nat_N n => nat_of_N_expand n
+  | large_nat_uint n => Nat.of_num_uint n
+  end.
+
+Definition N_of_large_nat (n : large_nat) : N :=
+  match n with
+  | large_nat_N n => n
+  | large_nat_uint n => N.of_num_uint n
+  end.
+
+Lemma large_nat_N_nat (n : large_nat) :
+  N.to_nat (N_of_large_nat n) = nat_of_large_nat n.
+Proof.
+case: n => [n|[d|d]] /=; first by rewrite nat_of_N_expandE.
+  by rewrite uint_N_nat.
+by rewrite hex_uint_N_nat.
+Qed.
+
+(* Type for reified expressions *)
+Inductive RExpr : pzSemiRingType -> Type :=
+  (* 0 *)
+  | R0 R : RExpr R
+  (* addition: x + y and (n + m)%N *)
+  | RAdd R : RExpr R -> RExpr R -> RExpr R
+  | RnatAdd : RExpr nat -> RExpr nat -> RExpr nat
+  (* natmul: x *+ n, including n%:R = 1 *+ n *)
+  | RMuln R : RExpr R -> RExpr nat -> RExpr R
+  (* opposite *)
+  | ROpp (R : pzRingType) : RExpr R -> RExpr R
+  (* intmul: x *~ z, including z%:~R = 1 *~ z *)
+  | RMulz (R : pzRingType) : RExpr R -> RExpr int -> RExpr R
+  (* 1 *)
+  | R1 R : RExpr R
+  (* multiplication: x * y and (x * y)%N *)
+  | RMul R : RExpr R -> RExpr R -> RExpr R
+  | RnatMul : RExpr nat -> RExpr nat -> RExpr nat
+  (* exponentiation *)
+  | RExpn R : RExpr R -> large_nat -> RExpr R (* x ^+ n *)
+  | RExpPosz (R : unitRingType) : RExpr R -> large_nat -> RExpr R (* x ^ Posz n *)
+  | RExpNegz F : RExpr F -> large_nat -> RExpr F (* x ^ Negz n *)
+  | RnatExpn : RExpr nat -> large_nat -> RExpr nat (* expn n m *)
+  (* multiplicative inverse: x^-1 *)
+  | RInv F : RExpr F -> RExpr F
+  (* constants *)
+  | RnatS : positive -> RExpr nat -> RExpr nat (* S (S ... (S n)...)*)
+  | RnatC : large_nat -> RExpr nat (* n *)
+  | RPosz : RExpr nat -> RExpr int (* Posz n *)
+  | RNegz : RExpr nat -> RExpr int (* Negz n *)
+  (* homomorphism applications *)
+  | RMorph R' R : {rmorphism R' -> R} -> RExpr R' -> RExpr R
+  | RnatMorph R : {rmorphism nat -> R} -> RExpr nat -> RExpr R
+  | RintMorph R : {rmorphism int -> R} -> RExpr int -> RExpr R
+  | RAdditive V R : {additive V -> R} -> MExpr V -> RExpr R
+  | RnatAdditive R : {additive nat -> R} -> RExpr nat -> RExpr R
+  | RintAdditive R : {additive int -> R} -> RExpr int -> RExpr R
+  (* variables *)
+  | RX R : R -> RExpr R
+with MExpr : nmodType -> Type :=
+  | M0 V : MExpr V (* 0 *)
+  | MAdd V : MExpr V -> MExpr V -> MExpr V (* x + y *)
+  | MMuln V : MExpr V -> RExpr nat -> MExpr V (* x *+ n *)
+  | MOpp (V : zmodType) : MExpr V -> MExpr V (* - x *)
+  | MMulz (V : zmodType) : MExpr V -> RExpr int -> MExpr V (* x *~ z *)
+  | MAdditive V' V : {additive V' -> V} -> MExpr V' -> MExpr V
+  | MnatAdditive V : {additive nat -> V} -> RExpr nat -> MExpr V
+  | MintAdditive V : {additive int -> V} -> RExpr int -> MExpr V
+  | MX V : V -> MExpr V.
+
+Scheme RExpr_ind' := Induction for RExpr Sort Prop
+  with MExpr_ind' := Induction for MExpr Sort Prop.
+
+(* Evaluation function for above type                                         *)
+(* Evaluating result of reification should be convertible to input expr.      *)
+Fixpoint Reval R (e : RExpr R) : R :=
+  match e with
+  | R0 _ => 0
+  | RAdd _ e1 e2 => Reval e1 + Reval e2
+  | RnatAdd e1 e2 => addn (Reval e1) (Reval e2)
+  | RMuln _ e1 e2 => Reval e1 *+ Reval e2
+  | ROpp _ e1 => - Reval e1
+  | RMulz _ e1 e2 => Reval e1 *~ Reval e2
+  | R1 _ => 1
+  | RMul _ e1 e2 => Reval e1 * Reval e2
+  | RnatMul e1 e2 => muln (Reval e1) (Reval e2)
+  | RExpn _ e1 n => Reval e1 ^+ nat_of_large_nat n
+  | RExpPosz _ e1 n => Reval e1 ^ Posz (nat_of_large_nat n)
+  | RExpNegz _ e1 n => Reval e1 ^ Negz (nat_of_large_nat n)
+  | RnatExpn e1 n => expn (Reval e1) (nat_of_large_nat n)
+  | RInv _ e1 => (Reval e1)^-1
+  | RnatS p e => add_pos_nat p (Reval e)
+  | RnatC n => nat_of_large_nat n
+  | RPosz e1 => Posz (Reval e1)
+  | RNegz e2 => Negz (Reval e2)
+  | RMorph _ _ f e1
+  | RnatMorph _ f e1
+  | RintMorph _ f e1
+  | RnatAdditive _ f e1
+  | RintAdditive _ f e1 => f (Reval e1)
+  | RAdditive _ _ f e1 => f (Meval e1)
+  | RX _ x => x
+  end
+with Meval V (e : MExpr V) : V :=
+  match e with
+  | M0 _ => 0
+  | MAdd _ e1 e2 => Meval e1 + Meval e2
+  | MMuln _ e1 e2 => Meval e1 *+ Reval e2
+  | MOpp _ e1 => - Meval e1
+  | MMulz _ e1 e2 => Meval e1 *~ Reval e2
+  | MAdditive _ _ f e1 => f (Meval e1)
+  | MnatAdditive _ f e1
+  | MintAdditive _ f e1 => f (Reval e1)
+  | MX _ x => x
+  end.
+
+Section Reval_eqs.
+Variables (C : Type) (R : pzSemiRingType).
+Fixpoint Reval_eqs (lpe : list ((RExpr R * RExpr R) * (PExpr C * PExpr C))) :
+    Prop :=
+  if lpe isn't ((lhs, rhs), _) :: lpe then True
+  else Reval lhs = Reval rhs /\ Reval_eqs lpe.
+End Reval_eqs.
+
+(* Pushing down morphisms in ring/field expressions by reflection *)
+Section norm.
+Variables (F : pzSemiRingType) (F_of_N : bool -> N -> F).
+Variables (zero one : F) (add mul : F -> F -> F).
+Variables (opp_intr : option ((F -> F) * (int -> F))).
+Variables (exp : F -> N -> F) (inv : option (F -> F)).
+
+Variable (push_inv : bool).  (* when true, push inv inward,
+                                down to constants or variables *)
+
+(* i means "currently pushing an inv" *)
+Fixpoint Rnorm (i : bool) R (f : R -> F) (e : RExpr R) : F :=
+  let popp v := if opp_intr is Some (opp, _) then opp v
+    else f (Reval e) in (* should never happen *)
+  let wintr v := if opp_intr is Some (_, intr) then v intr
+    else f (Reval e) in (* should never happen *)
+  let pinv v := if inv isn't Some i then f (Reval e) (* should never happen *)
+    else if push_inv then v else i v in
+  let inv_id := if inv is Some i then i else id in
+  let noinv v :=
+    if push_inv && i then inv_id (f (Reval e))  (* inv will be in a variable *)
+    else v (* no inv to put, go on *) in
+  let invi v := if push_inv && i then inv_id v else v in
+  match e in RExpr R return (R -> F) -> F with
+  | R0 _ => fun=> zero
+  | RAdd _ e1 e2 | RnatAdd e1 e2 => fun f =>
+      noinv (add (Rnorm i f e1) (Rnorm i f e2))
+  | RMuln _ e1 e2 => fun f => mul (Rnorm i f e1) (Rnorm i (GRing.natmul 1) e2)
+  | ROpp _ e1 => fun f => popp (Rnorm i f e1)
+  | RMulz _ e1 e2 => fun f =>
+      wintr (fun intr => mul (Rnorm i f e1) (Rnorm i intr e2))
+  | R1 _ => fun=> one
+  | RMul _ e1 e2 | RnatMul e1 e2  => fun f => mul (Rnorm i f e1) (Rnorm i f e2)
+  | RExpn _ e1 n | RnatExpn e1 n => fun f =>
+      exp (Rnorm i f e1) (N_of_large_nat n)
+  | RExpPosz _ e1 n => fun f => exp (Rnorm i f e1) (N_of_large_nat n)
+  | RExpNegz _ e1 n => fun f =>
+      pinv (exp (Rnorm (~~ i) f e1) (N.succ (N_of_large_nat n)))
+  | RInv _ e1 => fun f => pinv (Rnorm (~~ i) f e1)
+  | RnatS p e => fun f => noinv (add (F_of_N false (Npos p)) (Rnorm i f e))
+  | RnatC n => fun=> F_of_N (push_inv && i) (N_of_large_nat n)
+  | RPosz e1 => fun=> Rnorm i (GRing.natmul 1) e1
+  | RNegz e1 => fun=> noinv (popp (add one (Rnorm i (GRing.natmul 1) e1)))
+  | RMorph _ _ g e1 => fun f => Rnorm i (fun x => f (g x)) e1
+  | RnatMorph _ _ e1 => fun=> Rnorm i (GRing.natmul 1) e1
+  | RintMorph _ _ e1 => fun=> wintr (fun intr => Rnorm i intr e1)
+  | RAdditive _ _ g e1 => fun f => Mnorm i (fun x => f (g x)) e1
+  | RnatAdditive _ g e1 => fun f =>
+      mul (invi (f (g 1%N))) (Rnorm i (GRing.natmul 1) e1)
+  | RintAdditive _ g e1 => fun f =>
+      wintr (fun intr => mul (invi (f (g 1%Z))) (Rnorm i intr e1))
+  | RX _ x => fun f => invi (f x)
+  end f
+with Mnorm i V (f : V -> F) (e : MExpr V) : F :=
+  let popp v := if opp_intr is Some (opp, _) then opp v
+    else f (Meval e) in (* should never happen *)
+  let wintr v := if opp_intr is Some (_, intr) then v intr
+    else f (Meval e) in (* should never happen *)
+  let inv_id := if inv is Some i then i else id in
+  let noinv v :=
+    if push_inv && i then inv_id (f (Meval e))  (* inv will be in a variable *)
+    else v (* no inv to put, go on *) in
+  let invi v := if push_inv && i then inv_id v else v in
+  match e in MExpr V return (V -> F) -> F with
+  | M0 _ => fun=> zero
+  | MAdd _ e1 e2 => fun f => noinv (add (Mnorm i f e1) (Mnorm i f e2))
+  | MMuln _ e1 e2 => fun f => mul (Mnorm i f e1) (Rnorm i (GRing.natmul 1) e2)
+  | MOpp _ e1 => fun f => popp (Mnorm i f e1)
+  | MMulz _ e1 e2 => fun f =>
+      wintr (fun intr => mul (Mnorm i f e1) (Rnorm i intr e2))
+  | MAdditive _ _ g e1 => fun f => Mnorm i (fun x => f (g x)) e1
+  | MnatAdditive _ g e1 => fun f =>
+      wintr (fun intr => mul (invi (f (g 1%N))) (Rnorm i (GRing.natmul 1) e1))
+  | MintAdditive _ g e1 => fun f =>
+      wintr (fun intr => mul (invi (f (g 1%Z))) (Rnorm i intr e1))
+  | MX _ x => fun f => invi (f x)
+  end f.
+
+Lemma eq_Rnorm i R (f f' : R -> F) (e : RExpr R) :
+  f =1 f' -> Rnorm i f e = Rnorm i f' e.
+Proof.
+pose P R e :=
+  forall i (f f' : R -> F), f =1 f' -> Rnorm i f e = Rnorm i f' e.
+pose P0 V e :=
+  forall i (f f' : V -> F), f =1 f' -> Mnorm i f e = Mnorm i f' e.
+move: i f f'; elim e using (@RExpr_ind' P P0); rewrite {R e}/P {}/P0 //=.
+- by move=> R e1 IHe1 e2 IHe2 i f f' feq; rewrite -(IHe1 _ f) -?(IHe2 _ f) ?feq.
+- by move=> e1 IHe1 e2 IHe2 i f f' feq; rewrite -(IHe1 _ f) -?(IHe2 _ f) ?feq.
+- by move=> R e1 IHe1 e2 _ i f f' /IHe1->.
+- by move=> R e1 IHe1 i f f' feq; rewrite -(IHe1 _ f) ?feq.
+- by move=> R ei IHe1 e2 _ i f f' feq; rewrite -(IHe1 _ f) ?feq.
+- by move=> R e1 IHe1 e2 IHe2 i f f' feq; rewrite -(IHe1 _ f) -?(IHe2 _ f).
+- by move=> e1 IHe1 e2 IHe2 i f f' feq; rewrite -(IHe1 _ f) -?(IHe2 _ f).
+- by move=> R e1 IHe1 n i f f' /IHe1->.
+- by move=> R e1 IHe1 n i f f' /IHe1->.
+- by move=> R e1 IHe1 n i f f' feq; rewrite -(IHe1 _ f) ?feq.
+- by move=> e1 IHe1 n i f f' /IHe1->.
+- by move=> R e1 IHe1 i f f' feq; rewrite -(IHe1 _ f) ?feq.
+- by move=> P e1 IHe1 i f f' feq; rewrite -(IHe1 _ f) ?feq.
+- by move=> e1 IHe1 i f f' ->.
+- by move=> V R g e1 IHe1 i f f' feq; apply: IHe1 => x; apply: feq.
+- by move=> R g e1 _ i f f' ->.
+- by move=> V R g e1 IHe1 i f f' feq; apply: IHe1 => x; apply: feq.
+- by move=> R g e1 _ i f f' ->.
+- by move=> R g e1 _ i f f' /[dup]-> feq; case: opp_intr.
+- by move=> R x i f f' ->.
+- by move=> V e1 IHe1 e2 IHe2 i f f' feq; rewrite -(IHe1 _ f) -?(IHe2 _ f) ?feq.
+- by move=> V e1 IHe1 e2 _ i f f' /IHe1->.
+- by move=> V e1 IHe1 i f f' feq; rewrite -(IHe1 _ f) ?feq.
+- by move=> V e1 IHe1 e2 _ i f f' feq; rewrite -(IHe1 _ f) ?feq.
+- by move=> U V g e1 IHe1 i f f' feq; apply: IHe1 => x; apply: feq.
+- by move=> V g e1 _ i f f' feq; rewrite !feq.
+- by move=> V g e1 _ i f f' feq; rewrite !feq.
+- by move=> V x i f f' ->.
+Qed.
+End norm.
+
+Lemma Rnorm_eq_F_of_N (F : pzSemiRingType) (f f' : bool -> N -> F) (ff' : f =2 f')
+  zero one add mul opp_intr exp inv pi i :
+  forall (R : pzSemiRingType) (env : R -> F) e,
+    Rnorm f zero one add mul opp_intr exp inv pi i env e =
+    Rnorm f' zero one add mul opp_intr exp inv pi i env e.
+Proof.
+move=> R m e.
+pose P R e := forall f f' pi i (m : R -> F), f =2 f' ->
+  Rnorm f zero one add mul opp_intr exp inv pi i m e =
+  Rnorm f' zero one add mul opp_intr exp inv pi i m e.
+pose P0 V e := forall f f' pi i (m : V -> F), f =2 f' ->
+  Mnorm f zero one add mul opp_intr exp inv pi i m e =
+  Mnorm f' zero one add mul opp_intr exp inv pi i m e.
+move: f f' pi i m ff'.
+elim e using (@RExpr_ind' P P0); rewrite {R e}/P {}/P0 /=.
+- by [].
+- by move=> R e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> R e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> R e1 IHe1 f f' pi i m /IHe1->.
+- move=> R e1 + e2 + f f' pi i m ff'; case: opp_intr => // -[opp intr] IH1 IH2.
+  by rewrite -(IH1 f) -?(IH2 f).
+- by [].
+- by move=> R e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> R e1 IHe1 n f f' pi i m /IHe1->.
+- by move=> R e1 IHe1 n f f' pi i m /IHe1->.
+- by move=> R e1 IHe1 n f f' pi i m /IHe1->.
+- by move=> e1 IHe1 n f f' pi i m /IHe1->.
+- by move=> R e1 IHe1 f f' pi i m /IHe1->.
+- by move=> p e IHe f f' pi i m ff'; rewrite -(IHe f) ?ff'.
+- by move=> n f f' pi i m ff'; rewrite /Rnorm ff'.
+- by move=> e IHe f f' pi i m ff'; exact: IHe.
+- by move=> e IHe f f' pi i m /IHe->.
+- by move=> R' R g e IHe f f' pi i m ff'; exact: IHe.
+- by move=> R g e IHe f f' pi i m ff'; exact: IHe.
+- by move=> R g e + f f' pi i m ff'; case: opp_intr => // -[opp intr]; apply.
+- by move=> V R g e IHe f f' pi i m ff'; exact: IHe.
+- by move=> R g e IHe f f' pi i m ff'; congr mul; exact: IHe.
+- move=> R g e + f f' pi i m ff'; case: opp_intr => // -[opp intr] IH.
+  by congr mul; apply: IH.
+- by [].
+- by [].
+- by move=> V e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> V e1 IHe1 e2 IHe2 f f' pi i m ff'; rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> V e IHe f f' pi i m /IHe->.
+- move=> V e1 + e2 + f f' pi i m ff'; case: opp_intr => // -[opp intr] IHe1 IHe2.
+  by rewrite -(IHe1 f) -?(IHe2 f).
+- by move=> V V' g e IHe f f' pi i m ff'; exact: IHe.
+- move=> V g e + f f' pi i m ff'; case: opp_intr => // -[opp intr] IH.
+  by congr mul; apply: IH.
+- move=> V g e + f f' pi i m ff'; case: opp_intr => // -[opp intr] IH.
+  by congr mul; apply: IH.
+- by [].
+Qed.
+
+Variant field_or_ring :=
+  | Field of fieldType | Ring of pzRingType | SemiRing of pzSemiRingType.
+Coercion semiring_of_field_or_ring (RF : field_or_ring) : pzSemiRingType :=
+  match RF with Field R => R | Ring R => R | SemiRing R => R end.
+Definition ring_opp_intr (R : field_or_ring) : option ((R -> R) * (int -> R)) :=
+  match R with Field R' | Ring R' => Some (@GRing.opp R', intr) | _ => None end.
+Definition field_inv (R : field_or_ring) : option (R -> R) :=
+  if R is Field F then Some (@GRing.inv F) else None.
+Definition inv_id {R : field_or_ring} := if field_inv R is Some i then i else id.
+Definition invi {R : field_or_ring} i (r : R) := if i then inv_id r else r.
+
+Section correct.
+Variables (F : field_or_ring).
+
+#[local] Notation F_of_N := (fun b n => invi b (N.to_nat n)%:R).
+#[local] Notation expN := (fun x n => x ^+ N.to_nat n).
+#[local] Notation Rnorm := (Rnorm F_of_N 0 1 +%R *%R (ring_opp_intr F) expN
+  (field_inv F)).
+#[local] Notation Mnorm := (Mnorm F_of_N 0 1 +%R *%R (ring_opp_intr F) expN
+  (field_inv F)).
+
+Lemma Rnorm_correct pi (e : RExpr F) :
+    pi = (if F is SemiRing _ then false else true) && pi ->
+  Reval e = Rnorm pi false id e.
+Proof.
+move=> piF.
+suff: forall (i : bool) R (f : {rmorphism R -> F}) (e' : RExpr R),
+    invi (pi && i) (f (Reval e')) = Rnorm pi i f e'.
+  by move/(_ false _ idfun e); rewrite andbF.
+move=> i R f {}e.
+have invi0 b : invi b 0 = 0 :> F.
+  by rewrite /invi /inv_id /field_inv; case: b F => -[]// F' /[!invr0].
+have inviM b r1 r2 : invi b (r1 * r2) = invi b r1 * invi b r2 :> F.
+  rewrite /invi /inv_id /field_inv.
+  by case: b F r1 r2 => -[]// F' r1 r2 /[!invfM].
+have inviXn b r n : invi b (r ^+ n) = (invi b r) ^+ n :> F.
+  by rewrite /invi /inv_id; case: b F r => -[]// F' r /[!exprVn].
+pose P R e := forall i (f : {rmorphism R -> F}),
+  invi (pi && i) (f (Reval e)) = Rnorm pi i f e.
+pose P0 V e := forall i (f : {additive V -> F}),
+  invi (pi && i) (f (Meval e)) = Mnorm pi i f e.
+move: i f; elim e using (@RExpr_ind' P P0); rewrite {R e}/P {}/P0 //=.
+- by move=> R i f; rewrite rmorph0.
+- by move=> R e1 IHe1 e2 IHe2 i f; rewrite rmorphD -IHe1 -IHe2; case: (pi && i).
+- by move=> e1 IHe1 e2 IHe2 i f; rewrite rmorphD -IHe1 -IHe2; case: (pi && i).
+- by move=> R e1 IHe1 e2 IHe2 i f; rewrite rmorphMn -mulr_natr inviM IHe1 IHe2.
+- by move=> R e1 + i; case: F piF => F' -> IHe1 f //=;
+    rewrite rmorphN /invi /inv_id/= ?invrN -fun_if [X in - X]IHe1.
+- by move=> R e1 + e2 + i; case: F piF inviM => F' -> //= inviM IHe1 IHe2 f;
+    rewrite rmorphMz -mulrzr inviM IHe1 IHe2.
+- move=> R i f.
+  by rewrite /invi/inv_id/field_inv rmorph1; case: andb F => -[]// F' /[!invr1].
+- by move=> R e1 IHe1 e2 IHe2 i f; rewrite rmorphM inviM IHe1 IHe2.
+- by move=> e1 IHe1 e2 IHe2 i f; rewrite rmorphM inviM IHe1 IHe2.
+- by move=> R e1 IHe1 n i f; rewrite rmorphXn inviXn IHe1 large_nat_N_nat.
+- by move=> R e1 IHe1 n i f; rewrite rmorphXn inviXn IHe1 large_nat_N_nat.
+- move=> R e1 + n i f; rewrite -large_nat_N_nat N_to_natS NegzE -exprnN.
+  rewrite /invi /inv_id/=; case: F piF f => F' -> //= f; [|by case: andb].
+  by move=> <-; rewrite fmorphV rmorphXn invrK; case: pi i => -[]// /[!exprVn].
+- by move=> e1 IHe1 n i f; rewrite rmorphXn inviXn IHe1 large_nat_N_nat.
+- move=> R e1 + i f.
+  rewrite /invi /inv_id/=; case: F piF f => F' -> //= f; [|by case: andb].
+  by move=> <-; rewrite fmorphV invrK; case: pi i => -[].
+- move=> p e1 IHe1 i f; rewrite add_pos_natE rmorphD; set p' := Pos.to_nat p.
+  by rewrite  -[p' in f p']natn rmorph_nat -IHe1; case: (pi && i).
+- by move=> ???; rewrite -[nat_of_large_nat _]natn rmorph_nat -large_nat_N_nat.
+- by move=> e1 IHe1 i f; rewrite -[X in Posz X]natn !rmorph_nat IHe1.
+- by move=> e1 + i; case: F piF => F' -> //= IHe1 f;
+    rewrite -[Negz _]intz rmorph_int /intmul mulrS -IHe1; case: (pi && i).
+- by move=> R S g e1 IHe1 i f; rewrite -/(comp f g _) IHe1.
+- move=> R g e1 IHe1 i f; rewrite -/(comp f g _) IHe1.
+  by apply: eq_Rnorm => /= n; rewrite -[RHS](rmorph_nat (f \o g)) natn.
+- move=> R g e1 + i; case: F piF => F' -> //= IH f;rewrite -/(comp f g _) IH/=;
+    apply: eq_Rnorm => /= n; rewrite -[RHS](rmorph_int (f \o g));
+    by congr (f (g _)); rewrite intz.
+- by move=> V R g e1 IHe1 i f; rewrite -/(comp f g _) IHe1.
+- move=> R g e1 IHe1 i f.
+  by rewrite -[Reval e1]natn !raddfMn -mulr_natr inviM IHe1.
+- by move=> R g e1 + i; case: F piF inviM => F' -> //= inviM IHe1 f;
+    rewrite -[Reval e1]intz ![f _](raddfMz (f \o g)) -mulrzr inviM IHe1.
+- by move=> V i f; rewrite raddf0 invi0.
+- by move=> V e1 IHe1 e2 IHe2 i f; rewrite raddfD -IHe1 -IHe2; case: (pi && i).
+- by move=> V e1 IHe1 e2 IHe2 i f; rewrite raddfMn -mulr_natr inviM IHe1 IHe2.
+- by move=> V e1 + i; case: F piF => F' -> //= + f => <-; rewrite raddfN;
+    case: andb => //=; rewrite /inv_id/= invrN.
+- by move=> V e1 + e2 + i; case: F piF inviM => F' -> //= iM + + f => <- IHe2;
+    rewrite raddfMz -mulrzr iM IHe2.
+- by move=> V V' g e1 IHe1 i f; rewrite -/(comp f g _) IHe1.
+- move=> V g e1 IH i f; rewrite -[Reval e1]natn !raddfMn -mulr_natr inviM IH.
+  by case: F piF f IH => F' -> //= f /(_ i)->/=.
+- by move=> V g e1 + i; case: F piF inviM => F' -> //= inviM IH f;
+    rewrite -[Reval e1]intz ![f _](raddfMz (f \o g)) -mulrzr inviM IH.
+Qed.
+End correct.
+
+Lemma semiring_correct (R : comPzSemiRingType) n env
+    (lpe : seq ((RExpr R * RExpr R) * (PExpr N * PExpr N)))
+    (re1 re2 : RExpr R) (pe1 pe2 : PExpr N) :
+    Reval_eqs lpe ->
+    (forall R_of_N zero one add mul exp natr,
+       let R_of_N := R_of_N (natr : nat -> R) in
+       let norm := Rnorm (fun=> R_of_N) zero one add mul None
+         (fun x n => exp x (N.to_nat n)) None false false id in
+       let eval := PEeval zero one add mul add id
+         N.to_nat exp R_of_N (env_nth (R_of_N N0)) env in
+       let l := ((re1, re2), (pe1, pe2)) :: lpe in
+       map (fun pp => (norm pp.1.1, norm pp.1.2)) l
+       = map (fun pp => (eval pp.2.1, eval pp.2.2)) l) ->
+    ring_checker N0 (Npos xH) N.add N.mul N.add id
+      N.eqb (triv_div N0 (Npos xH) N.eqb) n (map snd lpe) pe1 pe2 ->
+  Reval re1 = Reval re2.
+Proof.
+have R_of_NE : (fun=> R_of_N R (GRing.natmul 1))
+  =2 fun b n => @invi (SemiRing R) b (N.to_nat n)%:R by case=> [] [].
+rewrite !(@Rnorm_correct (SemiRing R) false _ erefl).
+rewrite -!(Rnorm_eq_F_of_N R_of_NE) => elpe.
+move=> /(_ (R_of_N R) 0 1 +%R *%R (@GRing.exp R) (GRing.natmul 1))[-> ->]/=.
+move=> nelpe; apply: Nsemiring_correct => //.
+elim: lpe elpe nelpe => [//|[[{}re1 {}re2] [{}pe1 {}pe2]] lpe IH] /=.
+move=> -[re12 relpe] [rp1 rp2 rple]; have := IH relpe rple.
+rewrite -rp1 -rp2 !(Rnorm_eq_F_of_N R_of_NE).
+rewrite -!(@Rnorm_correct (SemiRing R) false _ erefl) re12.
+by case: lpe {IH relpe rple} => //=; rewrite eqxx.
+Qed.
+
+Lemma ring_correct (R : comPzRingType) n env
+    (lpe : seq ((RExpr R * RExpr R) * (PExpr Z * PExpr Z)))
+    (re1 re2 : RExpr R) (pe1 pe2 : PExpr Z) :
+    Reval_eqs lpe ->
+    (forall R_of_Z zero one add opp mul exp intr,
+       let R_of_N _ n := R_of_Z (Z.of_N n) in
+       let opp_intr := Some (opp, intr) in
+       let norm := Rnorm R_of_N zero one add mul opp_intr
+         (fun x n => exp x (N.to_nat n)) None false false id in
+       let eval := PEeval zero one add mul (fun x y => add x (opp y)) opp
+         N.to_nat exp R_of_Z (env_nth zero) env in
+       let l := ((re1, re2), (pe1, pe2)) :: lpe in
+       map (fun pp => (norm pp.1.1, norm pp.1.2)) l
+       = map (fun pp => (eval pp.2.1, eval pp.2.2)) l) ->
+    ring_checker Z0 (Zpos xH) Z.add Z.mul Z.sub Z.opp
+      Z.eqb (triv_div Z0 (Zpos xH) Z.eqb) n (map snd lpe) pe1 pe2 ->
+  Reval re1 = Reval re2.
+Proof.
+pose R_of_N (b : bool) n : Ring R := R_of_Z R (Z.of_N n).
+have R_of_NE : R_of_N =2 fun b n => @invi (Ring R) b (N.to_nat n)%:R.
+  by case=> [] [].
+rewrite !(@Rnorm_correct (Ring R) false _ erefl).
+rewrite -!(Rnorm_eq_F_of_N R_of_NE) => elpe.
+move=> /( _ (R_of_Z R) 0 1 +%R -%R *%R (@GRing.exp R) intr)[-> ->]/=.
+move=> nelpe; apply: Zring_correct => //.
+elim: lpe elpe nelpe => [//|[[{}re1 {}re2] [{}pe1 {}pe2]] lpe IH] /=.
+move=> -[re12 relpe] [rp1 rp2 rple]; have := IH relpe rple.
+rewrite -rp1 -rp2 !(Rnorm_eq_F_of_N R_of_NE).
+rewrite -!(@Rnorm_correct (Ring R) false _ erefl) re12.
+by case: lpe {IH relpe rple} => /=; rewrite eqxx.
+Qed.
+
+Lemma field_correct (F : fieldType) n env
+    (lpe : seq ((RExpr F * RExpr F) * (PExpr Z * PExpr Z)))
+    (re1 re2 : RExpr F) (fe1 fe2 : FExpr Z) lc :
+    Reval_eqs lpe ->
+    (forall R_of_Z zero one add opp mul exp inv intr,
+       let R_of_N b n := let n := R_of_Z (Z.of_N n) in if b then inv n else n in
+       let opp_intr := Some (opp, intr) in
+       let norm := Rnorm R_of_N zero one add mul opp_intr
+         (fun x n => exp x (N.to_nat n)) (Some inv) false false id in
+       let eval := PEeval zero one add mul (fun x y => add x (opp y)) opp
+         N.to_nat exp R_of_Z (env_nth zero) env in
+       let feval := FEeval zero one add mul (fun x y => add x (opp y)) opp
+         (fun x y => mul x (inv y)) inv N.to_nat exp R_of_Z (env_nth zero) env
+       in
+       (norm re1, norm re2)
+         :: map (fun pp => (norm pp.1.1, norm pp.1.2)) lpe
+       = (feval fe1, feval fe2)
+           :: map (fun pp => (eval pp.2.1, eval pp.2.2)) lpe) ->
+    field_checker Z0 (Zpos xH) Z.add Z.mul Z.sub Z.opp Z.pow_pos
+      Z.eqb (triv_div Z0 (Zpos xH) Z.eqb) (cond_norm (Fcons00
+         Z0 (Zpos xH) Z.add Z.mul Z.sub Z.opp Z.eqb))
+      n (map snd lpe) fe1 fe2 = Some lc ->
+    PCond true negb andb 0 1 +%R *%R (fun x y => x - y) -%R N.to_nat
+      (@GRing.exp F) eq_op (R_of_Z F) (env_nth 0) (locked env) lc ->
+  Reval re1 = Reval re2.
+Proof.
+pose R_of_N b n : Field F :=
+  let n := R_of_Z F (Z.of_N n) in if b then n^-1 else n.
+have R_of_NE : R_of_N =2 fun b n => @invi (Field F) b (N.to_nat n)%:R.
+  by case=> [] [].
+rewrite !(@Rnorm_correct (Field F) false _ erefl) -lock.
+rewrite -!(Rnorm_eq_F_of_N R_of_NE) => elpe.
+move=> /( _ (R_of_Z F) 0 1 +%R -%R *%R (@GRing.exp F) (@GRing.inv F) intr)
+    [-> ->]/= nelpe; apply: Zfield_correct.
+elim: lpe elpe nelpe => [//|[[{}re1 {}re2] [{}pe1 {}pe2]] lpe IH] /=.
+move=> -[re12 relpe] [rp1 rp2 rple]; have := IH relpe rple.
+rewrite -rp1 -rp2 !(Rnorm_eq_F_of_N R_of_NE).
+rewrite -!(@Rnorm_correct (Field F) false _ erefl) re12.
+by case: lpe {IH relpe rple} => /=; rewrite eqxx.
+Qed.
+
+Lemma numField_correct (F : numFieldType) n env
+    (lpe : seq ((RExpr F * RExpr F) * (PExpr Z * PExpr Z)))
+    (re1 re2 : RExpr F) (fe1 fe2 : FExpr Z) lc :
+    Reval_eqs lpe ->
+    (forall R_of_Z zero one add opp mul exp inv intr,
+       let R_of_N b n := let n := R_of_Z (Z.of_N n) in if b then inv n else n in
+       let opp_intr := Some (opp, intr) in
+       let norm := Rnorm R_of_N zero one add mul opp_intr
+         (fun x n => exp x (N.to_nat n)) (Some inv) false false id in
+       let eval := PEeval zero one add mul (fun x y => add x (opp y)) opp
+         N.to_nat exp R_of_Z (env_nth zero) env in
+       let feval := FEeval zero one add mul (fun x y => add x (opp y)) opp
+         (fun x y => mul x (inv y)) inv N.to_nat exp R_of_Z (env_nth zero) env
+       in
+       (norm re1, norm re2)
+         :: map (fun pp => (norm pp.1.1, norm pp.1.2)) lpe
+       = (feval fe1, feval fe2)
+           :: map (fun pp => (eval pp.2.1, eval pp.2.2)) lpe) ->
+    field_checker Z0 (Zpos xH) Z.add Z.mul Z.sub Z.opp Z.pow_pos
+      Z.eqb (triv_div Z0 (Zpos xH) Z.eqb) (cond_norm (Fcons2
+         Z0 (Zpos xH) Z.add Z.mul Z.sub Z.opp Z.pow_pos Z.eqb))
+      n (map snd lpe) fe1 fe2 = Some lc ->
+    PCond true negb andb 0 1 +%R *%R (fun x y => x - y) -%R N.to_nat
+      (@GRing.exp F) eq_op (R_of_Z F) (env_nth 0) (locked env) lc ->
+  Reval re1 = Reval re2.
+Proof.
+pose R_of_N b n : Field F :=
+  let n := R_of_Z F (Z.of_N n) in if b then n^-1 else n.
+have R_of_NE : R_of_N =2 fun b n => @invi (Field F) b (N.to_nat n)%:R.
+  by case=> [] [].
+rewrite !(@Rnorm_correct (Field F) false _ erefl) -lock.
+rewrite -!(Rnorm_eq_F_of_N R_of_NE) => elpe.
+move=> /( _ (R_of_Z F) 0 1 +%R -%R *%R (@GRing.exp F) (@GRing.inv F) intr)
+    [-> ->]/= nelpe; apply: ZnumField_correct.
+elim: lpe elpe nelpe => [//|[[{}re1 {}re2] [{}pe1 {}pe2]] lpe IH] /=.
+move=> -[re12 relpe] [rp1 rp2 rple]; have := IH relpe rple.
+rewrite -rp1 -rp2 !(Rnorm_eq_F_of_N R_of_NE).
+rewrite -!(@Rnorm_correct (Field F) false _ erefl) re12.
+by case: lpe {IH relpe rple} => /=; rewrite eqxx.
+Qed.
+
+End Internals.
+
+(* Main tactics, called from the elpi parser (c.f., ring.elpi) *)
+
+Ltac ring_reflection Lem R VarMap Lpe RE1 RE2 PE1 PE2 LpeProofs :=
+  exact (Lem R 100%N VarMap Lpe RE1 RE2 PE1 PE2 LpeProofs
+             ltac:(reflexivity) ltac:(vm_compute; reflexivity)).
+
+Ltac field_reflection Lem F VarMap Lpe RE1 RE2 FE1 FE2 LpeProofs :=
+  let nvarmap := fresh "__varmap" in
+  let nlpe := fresh "__lpe" in
+  let nre1 := fresh "__re1" in
+  let nre2 := fresh "__re2" in
+  let nfe1 := fresh "__fe1" in
+  let nfe2 := fresh "__fe2" in
+  let nlpeproofs := fresh "__lpeproofs" in
+  let nlhs := fresh "__lhs" in
+  pose nvarmap := VarMap;
+  pose nlpe := Lpe;
+  pose nre1 := RE1;
+  pose nre2 := RE2;
+  pose nfe1 := FE1;
+  pose nfe2 := FE2;
+  pose nlpeproofs := LpeProofs;
+  refine (Lem F 100%N nvarmap nlpe nre1 nre2 nfe1 nfe2 _ nlpeproofs
+    ltac:(reflexivity)
+    ltac:(set nlhs := field_checker.field_checker _ _ _ _ _ _ _ _ _ _ _ _ _ _;
+          vm_compute in nlhs; reflexivity)
+    _);
+  rewrite /Internals.env_nth /Internals.R_of_Z/= /Pos.to_nat/= -?pmulrn;
+  rewrite -1?lock /nth /nvarmap;
+  move=> {nvarmap nlpe nre1 nre2 nfe1 nfe2 nlpeproofs};
+  do ?[apply/andP; split].
+
+Strategy expand [addn_expand nat_of_pos_rec_expand nat_of_pos_expand].
+Strategy expand [nat_of_N_expand nat_of_large_nat N_of_large_nat R_of_Z].
+Strategy expand [Reval Meval Rnorm Mnorm PEeval FEeval].
+
+Elpi Db mc.canonicals.db lp:{{%(*
+pred canonical-nat-nmodule o:constant.
+pred canonical-nat-semiring o:constant.
+pred canonical-nat-comsemiring o:constant.
+pred canonical-int-nmodule o:constant.
+pred canonical-int-zmodule o:constant.
+pred canonical-int-semiring o:constant.
+pred canonical-int-ring o:constant.
+pred canonical-int-comring o:constant.
+pred canonical-int-unitring o:constant.
+pred coercion o:string o:term.
+%*)}}.
+
+Elpi Tactic mcring.
+Elpi Accumulate Db mc.canonicals.db.
+#[warning="-elpi.flex-clause"] (* remove when requiring elpi >= 3 (with =!=>) *)
+Elpi Accumulate File ring.
+Elpi Accumulate lp:{{%(*
+shorten coq.ltac.{ open, all }.
+msolve GL SubGL :- all (open ring) GL SubGL.
+%*)}}.
+
+Tactic Notation "ring" := elpi mcring.
+Tactic Notation "ring" ":" ne_constr_list(L) := elpi mcring ltac_term_list:(L).
+Tactic Notation "#[" attributes(A) "]" "ring" := ltac_attributes:(A) elpi mcring.
+Tactic Notation "#[" attributes(A) "]" "ring" ":" ne_constr_list(L) :=
+  ltac_attributes:(A) elpi mcring ltac_term_list:(L).
+
+Elpi Tactic mcfield.
+Elpi Accumulate Db mc.canonicals.db.
+#[warning="-elpi.flex-clause"] (* remove when requiring elpi >= 3 (with =!=>) *)
+Elpi Accumulate File ring.
+Elpi Accumulate lp:{{%(*
+shorten coq.ltac.{ open, all }.
+msolve GL SubGL :- all (open field) GL SubGL.
+%*)}}.
+
+Tactic Notation "field" := elpi mcfield.
+Tactic Notation "field" ":" ne_constr_list(L) :=
+  elpi mcfield ltac_term_list:(L).
+Tactic Notation "#[" attributes(A) "]" "field" :=
+  ltac_attributes:(A) elpi mcfield.
+Tactic Notation "#[" attributes(A) "]" "field" ":" ne_constr_list(L) :=
+  ltac_attributes:(A) elpi mcfield ltac_term_list:(L).
+
+Elpi Query lp:{{ canonical-init library "mc.canonicals.db" }}.
+Elpi Query lp:{{ coercion-init library "mc.canonicals.db" }}.
+
+(* Remove the line below when requiring rocq-elpi > 3.2.0
+c.f., https://github.com/LPCIC/coq-elpi/pull/866 *)
+#[global] Unset Uniform Inductive Parameters.
