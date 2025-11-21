@@ -105,8 +105,11 @@ variables:
 rocq-prover_9.0:
   extends: .opam-build-once
 
-# rocq-prover_9.1: # to uncomment when 9.1+rc1 available
-#   # to be replaced with .opam-build-once when 9.1.0 available
+rocq-prover_9.1:
+  extends: .opam-build-once
+
+# rocq-prover_9.2: # to uncomment when 9.2+rc1 available
+#   # to be replaced with .opam-build-once when 9.2.0 available
 #   extends: .opam-build
 
 rocq-prover_dev:
@@ -165,16 +168,20 @@ rocq-prover_dev:
   image: "${CI_REGISTRY_IMAGE}:${CI_PIPELINE_IID}_${CI_COMMIT_REF_SLUG}_rocq-prover-${COQ_VERSION}"
 
 test-rocq-prover-9.0:
-  # to be replaced with .test-rocq-once when 9.0.0 available
   extends: .test-rocq-once
   variables:
     COQ_VERSION: "9.0"
 
-# test-rocq-prover-9.1: # to uncomment when 9.1+rc1 available
-#   # to be replaced with .test-rocq-once when 9.1.0 available
+test-rocq-prover-9.1:
+  extends: .test-rocq-once
+  variables:
+    COQ_VERSION: "9.1"
+
+# test-rocq-prover-9.2: # to uncomment when 9.2+rc1 available
+#   # to be replaced with .test-rocq-once when 9.2.0 available
 #   extends: .test-rocq
 #   variables:
-#     COQ_VERSION: "9.1"
+#     COQ_VERSION: "9.2"
 
 test-rocq-prover-dev:
   extends: .test-rocq
@@ -405,11 +412,13 @@ test-rocq-prover-dev:
       - $CRON_MODE == "nightly"
 
 mathcomp-dev_rocq-prover-9.0:
-  # to be replaced with .docker-deploy-once when 9.0.0 available
   extends: .docker-deploy-once
 
-# mathcomp-dev_rocq-prover-9.1: # to uncomment when 9.1+rc1 available
-#   # to be replaced with .docker-deploy-once when 9.1.0 available
+mathcomp-dev_rocq-prover-9.1:
+  extends: .docker-deploy-once
+
+# mathcomp-dev_rocq-prover-9.2: # to uncomment when 9.2+rc1 available
+#   # to be replaced with .docker-deploy-once when 9.2.0 available
 #   extends: .docker-deploy
 
 mathcomp-dev_rocq-prover-dev:
