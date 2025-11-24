@@ -462,26 +462,20 @@ Variables F : realFieldType.
 Implicit Type x y : F.
 
 Lemma leif_mean_square x y : x * y <= (x ^+ 2 + y ^+ 2) / 2 ?= iff (x == y).
-Proof. by apply: real_leif_mean_square; apply: num_real. Qed.
+Proof. exact: real_leif_mean_square. Qed.
 
 Lemma leif_AGM2 x y : x * y <= ((x + y) / 2)^+ 2 ?= iff (x == y).
-Proof. by apply: real_leif_AGM2; apply: num_real. Qed.
+Proof. exact: real_leif_AGM2. Qed.
 
-Section MinMax.
-
-Lemma maxr_absE x y : Num.max x y = (x + y + `|x - y|) / 2.
+Lemma maxr_absE x y : max x y = (x + y + `|x - y|) / 2.
 Proof.
-apply: canRL (mulfK _) _ => //; rewrite ?pnatr_eq0// mulr_natr addrC.
-by case: lerP => _; first rewrite [x + y]addrC; rewrite subrKA.
+by rewrite addrC -[x + y]addr_min_max distr_max_min subrKA mulrDl -splitr.
 Qed.
 
-Lemma minr_absE x y : Num.min x y = (x + y - `|x - y|) / 2.
+Lemma minr_absE x y : min x y = (x + y - `|x - y|) / 2.
 Proof.
-apply: (addrI (Num.max x y)); rewrite addr_max_min maxr_absE.
-by rewrite -mulrDl addrCA addrK mulrDl -splitr.
+by rewrite addrC -[x + y]addr_max_min distr_max_min opprB subrKA mulrDl -splitr.
 Qed.
-
-End MinMax.
 
 End RealField.
 

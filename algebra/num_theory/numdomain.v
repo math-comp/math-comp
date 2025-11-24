@@ -1833,6 +1833,10 @@ Proof. by rewrite -[x + y]addr_min_max addrK. Qed.
 Lemma maxr_to_min x y : max x y = x + y - min x y.
 Proof. by rewrite -[x + y]addr_max_min addrK. Qed.
 
+Lemma real_distr_max_min :
+  {in real &, forall x y, `|x - y| = max x y - min x y}.
+Proof. by move=> x y x_real y_real; case: real_leP. Qed.
+
 Lemma real_oppr_max : {in real &, {morph -%R : x y / max x y >-> min x y : R}}.
 Proof.
 by move=> x y xr yr; rewrite !(fun_if, if_arg) ltrN2; case: real_ltgtP => // ->.
@@ -2940,6 +2944,9 @@ Lemma leif_AGM2_scaled x y : x * y *+ 4 <= (x + y) ^+ 2 ?= iff (x == y).
 Proof. exact: real_leif_AGM2_scaled. Qed.
 
 Section MinMax.
+
+Lemma distr_max_min x y : `|x - y| = max x y - min x y.
+Proof. exact: real_distr_max_min. Qed.
 
 Lemma oppr_max : {morph -%R : x y / max x y >-> min x y : R}.
 Proof. by move=> x y; apply: real_oppr_max. Qed.
