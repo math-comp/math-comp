@@ -22,7 +22,7 @@ Unset Strict Implicit.
 Local Open Scope group_scope.
 Import GRing.
 
-HB.instance Definition _ := isMulGroup.Build bool addbA addFb addbb.
+HB.instance Definition _ := Finite_isGroup.Build bool addbA addFb addbb.
 
 Section SymAltDef.
 
@@ -256,7 +256,7 @@ have FF (H : {group {perm T}}): H <| 'Alt_T -> H :<>: 1 -> 20 %| #|H|.
       rewrite !permM -Hgx.
       have ->: h (h x) = (h ^+ 2) x by rewrite /= permM.
       by rewrite {1}Hgh3x -!permM /= mulgV mulg1 -expgSr.
-    rewrite commuteX // mulgK {1}[expgn]lock expgS permM -lock.
+    rewrite commuteX // mulgK {1}[natexp]lock expgS permM -lock.
     by move/perm_inj=> eqxhx; case/eqP: (diff_hnx_x 1%N isT isT); rewrite expg1.
   by rewrite (@Gauss_dvd 4 5) // F7.
 apply/simpleP; split => [|H Hnorm]; first by rewrite trivg_card1 F1.
@@ -441,7 +441,7 @@ have:= prim_trans_norm F11; case/(_ K) => //= => Ksub; last first.
   by rewrite /= -F14 -[Gx]HH2 (mulSGid F8).
 have F14: [faithful Gx, on [set~ x] | 'P].
   apply: subset_trans (aperm_faithful 'Sym_T); rewrite subsetI subsetT.
-  apply/subsetP=> g; do 2![case/setIP]=> _ cgx cgx'; apply/astabP=> z _ /=.
+  apply/subsetP=> g; do 2![case/setIP] => _ cgx cgx'; apply/astabP=> z _ /=.
   case: (z =P x) => [->|]; first exact: (astab1P cgx).
   by move/eqP=> zx; rewrite [_ g](astabP cgx') ?inE.
 have Hreg g z: g \in H -> g z = z -> g = 1.
@@ -533,7 +533,7 @@ have [g fK gK] : bijective f.
   have : (c ^+ (j - i)%R)%g \in stabx.
     by rewrite !inE ?groupX ?mem_gen ?sub1set ?inE// ['P%act _ _]cjix eqxx.
   rewrite [stabx]perm_prime_astab// => /set1gP.
-  move=> /(congr1 (mulg (c ^+ i))); rewrite -expgD_Zp// addrC addrNK mulg1.
+  move=> /(congr1 ( *%g (c ^+ i))); rewrite -expgD_Zp// addrC addrNK mulg1.
   by move=> /eqP; rewrite eq_expg_ord// ?cppSS ?ord_c// => /eqP->.
 pose gsf s := g \o s \o f.
 have gsf_inj (s : {perm X}) : injective (gsf s).

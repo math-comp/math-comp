@@ -13,13 +13,11 @@
 #                                                                    #
 # Additionally, the following variables may be customized:           #
 SUBDIRS?=
-COQBIN?=$(dir $(shell command -v coqtop || command -v rocq))
-COQMAKEFILE?=$(shell command -v coq_makefile || echo "$(COQBIN)rocq makefile")
-COQTOP?=$(shell command -v coqtop || echo "$(COQBIN)rocq repl")
-COQDEP?=$(COQBIN)coqdep
+ROCQBIN?=$(dir $(shell command -v rocq))
+ROCQ?="$(ROCQBIN)rocq"
 COQPROJECT?=_CoqProject
-COQMAKEOPTIONS?=
-COQMAKEFILEOPTIONS?=
+ROCQMAKEOPTIONS?=
+ROCQMAKEFILEOPTIONS?=
 V?=
 VERBOSE?=V
 TGTS?=
@@ -31,20 +29,20 @@ TGTS?=
 
 H:= $(if $(VERBOSE),,@)  # not used yet
 TOP     = $(dir $(lastword $(MAKEFILE_LIST)))
-COQMAKE = $(MAKE) -f Makefile.coq $(COQMAKEOPTIONS)
-COQMAKE_TESTSUITE = $(MAKE) -f Makefile.test-suite.coq $(COQMAKEOPTIONS)
-BRANCH_coq:= $(shell $(COQTOP) -v | head -1 | grep -E '(trunk|master)' \
+ROCQMAKE = $(MAKE) -f Makefile.coq $(ROCQMAKEOPTIONS)
+ROCQMAKE_TESTSUITE = $(MAKE) -f Makefile.test-suite.coq $(ROCQMAKEOPTIONS)
+BRANCH_rocq:= $(shell $(ROCQ) -v | head -1 | grep -E '(trunk|master)' \
 	      | wc -l | sed 's/ *//g')
 
 # coq version:
-ifneq "$(BRANCH_coq)" "0"
-COQVVV:= dev
+ifneq "$(BRANCH_rocq)" "0"
+ROCQVVV:= dev
 else
-COQVVV:=$(shell $(COQTOP) --print-version | cut -d" " -f1)
+ROCQVVV:=$(shell $(ROCQ) --print-version | cut -d" " -f1)
 endif
 
-COQV:= $(shell echo $(COQVVV) | cut -d"." -f1)
-COQVV:= $(shell echo $(COQVVV) | cut -d"." -f1-2)
+ROCQV:= $(shell echo $(ROCQVVV) | cut -d"." -f1)
+ROCQVV:= $(shell echo $(ROCQVVV) | cut -d"." -f1-2)
 
 # all: ---------------------------------------------------------------
 all: config build
@@ -53,7 +51,7 @@ all: config build
 .PHONY: pre-makefile
 
 Makefile.coq: pre-makefile $(COQPROJECT) Makefile
-	$(COQMAKEFILE) $(COQMAKEFILEOPTIONS) -f $(COQPROJECT) -o Makefile.coq
+	$(ROCQ) makefile $(ROCQMAKEFILEOPTIONS) -f $(COQPROJECT) -o Makefile.coq
 
 # Test suite ---------------------------------------------------------
 
@@ -66,7 +64,7 @@ MATHCOMP_PATH := -R . mathcomp
 endif
 
 test_suite/test_hierarchy_all.v: $(TEST_DEP)
-	COQBIN=$(COQBIN) ocaml etc/utils/hierarchy.ml -verify $(MATHCOMP_PATH) \
+	ROCQBIN=$(ROCQBIN) ocaml etc/utils/hierarchy.ml -verify $(MATHCOMP_PATH) \
 		-lib all_boot \
 		-lib all_order \
 		-lib all_algebra \
@@ -77,7 +75,7 @@ test_suite/test_hierarchy_all.v: $(TEST_DEP)
 		> test_suite/test_hierarchy_all.v
 
 Makefile.test-suite.coq: test_suite/test_hierarchy_all.v
-	$(COQMAKEFILE) $(COQMAKEFILEOPTIONS) -f Make.test-suite $(MATHCOMP_PATH) -o Makefile.test-suite.coq
+	$(ROCQ) makefile $(ROCQMAKEFILEOPTIONS) -f Make.test-suite $(MATHCOMP_PATH) -o Makefile.test-suite.coq
 
 # Global config, build, clean and distclean --------------------------
 config: sub-config this-config
@@ -98,34 +96,34 @@ distclean: sub-distclean this-distclean
 this-config:: __always__
 
 this-build:: this-config Makefile.coq
-	+$(COQMAKE)
+	+$(ROCQMAKE)
 
 this-only:: this-config Makefile.coq
-	+$(COQMAKE) only "TGTS=$(TGTS)"
+	+$(ROCQMAKE) only "TGTS=$(TGTS)"
 
 this-test-suite:: Makefile.test-suite.coq
-	+$(COQMAKE_TESTSUITE)
+	+$(ROCQMAKE_TESTSUITE)
 
 this-distclean:: this-clean
 	rm -f Makefile.coq Makefile.coq.conf
 	rm -f Makefile.test-suite.coq Makefile.test-suite.coq.conf
 
 this-clean:: __always__
-	@if [ -f Makefile.coq ]; then $(COQMAKE) cleanall; fi
-	@if [ -f Makefile.test-suite.coq ]; then $(COQMAKE_TESTSUITE) cleanall; fi
+	@if [ -f Makefile.coq ]; then $(ROCQMAKE) cleanall; fi
+	@if [ -f Makefile.test-suite.coq ]; then $(ROCQMAKE_TESTSUITE) cleanall; fi
 
 # Install target -----------------------------------------------------
 .PHONY: install
 
 install: __always__ Makefile.coq
-	$(COQMAKE) install
+	$(ROCQMAKE) install
 # counting lines of Coq code -----------------------------------------
 .PHONY: count
 
-COQFILES = $(shell grep '[.]v$$' $(COQPROJECT))
+ROCQFILES = $(shell grep '[.]v$$' $(COQPROJECT))
 
 count:
-	@coqwc $(COQFILES) | tail -1 | \
+	@coqwc $(ROCQFILES) | tail -1 | \
 	  awk '{printf ("%d (spec=%d+proof=%d)\n", $$1+$$2, $$1, $$2)}'
 # Additionally cleaning backup (*~) files ----------------------------
 this-distclean::
@@ -142,25 +140,25 @@ endif
 
 # Make of individual .vo ---------------------------------------------
 %.vo: __always__ Makefile.coq
-	+$(COQMAKE) $@
+	+$(ROCQMAKE) $@
 
 test_suite/%.vo: __always__ Makefile.test-suite.coq
-	+$(COQMAKE_TESTSUITE) $@
+	+$(ROCQMAKE_TESTSUITE) $@
 
 doc: __always__ Makefile.coq
 	mkdir -p _build_doc/
-	cp -r $(COQFILES) -t _build_doc/ --parents
+	cp -r $(ROCQFILES) -t _build_doc/ --parents
 	cp Make Makefile* _build_doc
 	mkdir -p _build_doc/htmldoc
 	. etc/utils/builddoc_lib.sh; \
-		cd _build_doc && mangle_sources $(COQFILES)
-	+cd _build_doc && $(COQMAKE)
-	cd _build_doc && grep -v vio: .Makefile.coq.d > depend
-	cd _build_doc && cat depend | ../etc/buildlibgraph $(COQFILES) > htmldoc/depend.js
-	cd _build_doc && $(COQBIN)coqdoc -t "Mathematical Components" \
+		cd _build_doc && mangle_sources $(ROCQFILES)
+	+cd _build_doc && $(ROCQMAKE)
+	cd _build_doc && grep -v vio: .Makefile.coq.d | sed -e 's/[^ ]*rocq-runtime[^ ]*//g' > depend
+	cd _build_doc && cat depend | ../etc/buildlibgraph $(ROCQFILES) > htmldoc/depend.js
+	cd _build_doc && $(ROCQBIN)coqdoc -t "Mathematical Components" \
 		-g --utf8 -R . mathcomp \
 		--parse-comments \
-		--multi-index $(COQFILES) -d htmldoc
+		--multi-index $(ROCQFILES) -d htmldoc
 	. etc/utils/builddoc_lib.sh; \
 		cd _build_doc && postprocess_html
 	cp etc/artwork/coqdoc.css _build_doc/htmldoc

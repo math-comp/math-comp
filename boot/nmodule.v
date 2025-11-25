@@ -741,7 +741,7 @@ Arguments oppr_inj {V} [x1 x2].
 
 Definition nmod_morphism (U V : baseAddUMagmaType) (f : U -> V) : Prop :=
   (f 0 = 0) * {morph f : x y / x + y}.
-#[deprecated(since="mathcomp 2.5.0", note="use `nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=nmod_morphism)]
 Definition semi_additive := nmod_morphism.
 
 HB.mixin Record isNmodMorphism (U V : baseAddUMagmaType) (apply : U -> V) := {
@@ -749,8 +749,7 @@ HB.mixin Record isNmodMorphism (U V : baseAddUMagmaType) (apply : U -> V) := {
 }.
 
 Module isSemiAdditive.
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use isNmodMorphism.Build instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=isNmodMorphism.Build)]
 Notation Build U V apply := (isNmodMorphism.Build U V apply) (only parsing).
 End isSemiAdditive.
 
@@ -761,7 +760,7 @@ HB.structure Definition Additive (U V : baseAddUMagmaType) :=
 Definition zmod_morphism (U V : zmodType) (f : U -> V) :=
   {morph f : x y / x - y}.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=zmod_morphism)]
 Definition additive := zmod_morphism.
 
 HB.factory Record isZmodMorphism (U V : zmodType) (apply : U -> V) := {
@@ -769,8 +768,7 @@ HB.factory Record isZmodMorphism (U V : zmodType) (apply : U -> V) := {
 }.
 
 Module isAdditive.
-#[deprecated(since="mathcomp 2.5.0",
-             note="Use isZmodMorphism.Build instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=isZmodMorphism.Build)]
 Notation Build U V apply := (isZmodMorphism.Build U V apply) (only parsing).
 End isAdditive.
 
@@ -862,7 +860,7 @@ split; first exact/(@can2_gmulf1 _ _ g).
 exact/(@can2_gmulfM _ _ g).
 Qed.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `can2_nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=can2_nmod_morphism)]
 Definition can2_semi_additive := can2_nmod_morphism.
 
 End Nmod.
@@ -886,8 +884,7 @@ Proof. exact: (@gmulfXVn _ _ g). Qed.
 Lemma can2_zmod_morphism f' : cancel f f' -> cancel f' f -> zmod_morphism f'.
 Proof. by move=> fK f'K x y /=; apply: (canLR fK); rewrite raddfB !f'K. Qed.
 
-#[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `can2_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=can2_zmod_morphism)]
 Definition can2_additive := can2_zmod_morphism.
 End Zmod.
 
@@ -1068,7 +1065,7 @@ Let T := to_pmultiplicative S.
 Lemma rpredB : {in S &, forall u v, u - v \in S}.
 Proof. exact: (@gpredF _ T). Qed.
 
-Lemma rpredBC u v : u - v \in S = (v - u \in S).
+Lemma rpredBC u v : (u - v \in S) = (v - u \in S).
 Proof. exact: (@gpredFC _ T). Qed.
 
 Lemma rpredMNn n: {in S, forall u, u *- n \in S}.
@@ -1087,7 +1084,7 @@ Lemma rpredBl x y : x \in S -> (x - y \in S) = (y \in S).
 Proof. exact: (@gpredFl _ T). Qed.
 
 Lemma zmodClosedP : zmod_closed S.
-Proof. split; [ exact: (@rpred0D V S).1 | exact: rpredB ]. Qed.
+Proof. split; [ exact: rpred0 | exact: rpredB ]. Qed.
 End Zmod.
 End ZmodPred. 
 
@@ -1192,6 +1189,27 @@ HB.instance Definition _ := isSubBaseAddUMagma.Build V S U valD0.
 
 HB.end.
 
+HB.factory Record SubNmodule_isSubZmodule (V : zmodType) S U
+    of SubNmodule V S U := {
+  oppr_closed_subproof : oppr_closed S
+}.
+
+HB.builders Context V S U of SubNmodule_isSubZmodule V S U.
+
+HB.instance Definition _ := isOppClosed.Build V S oppr_closed_subproof.
+
+Let inU v Sv : U := Sub v Sv.
+Let oppU (u : U) := inU (rpredNr (valP u)).
+
+HB.instance Definition _ := hasOpp.Build U oppU.
+
+Lemma addNr : left_inverse 0 oppU (@add U).
+Proof. by move=> x; apply/val_inj; rewrite raddf0 raddfD/= SubK addNr. Qed.
+
+HB.instance Definition _ := Nmodule_isZmodule.Build U addNr.
+
+HB.end.
+
 HB.factory Record SubChoice_isSubZmodule (V : zmodType) S U
     of SubChoice V S U := {
   zmod_closed_subproof : zmod_closed S
@@ -1202,16 +1220,8 @@ HB.builders Context V S U of SubChoice_isSubZmodule V S U.
 HB.instance Definition _ := isZmodClosed.Build V S zmod_closed_subproof.
 HB.instance Definition _ :=
   SubChoice_isSubNmodule.Build V S U nmod_closed_subproof.
-
-Let inU v Sv : U := Sub v Sv.
-Let oppU (u : U) := inU (rpredNr (valP u)).
-
-HB.instance Definition _ := hasOpp.Build U oppU.
-
-Lemma addNr : left_inverse 0 oppU (@add U).
-Proof. by move=> x; apply/val_inj; rewrite !SubK addNr. Qed.
-
-HB.instance Definition _ := Nmodule_isZmodule.Build U addNr.
+HB.instance Definition _ :=
+  SubNmodule_isSubZmodule.Build V S U (@rpredNr _ _).
 
 HB.end.
 
@@ -1220,6 +1230,10 @@ Module SubExports.
 Notation "[ 'SubChoice_isSubNmodule' 'of' U 'by' <: ]" :=
   (SubChoice_isSubNmodule.Build _ _ U rpred0D)
   (at level 0, format "[ 'SubChoice_isSubNmodule'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubNmodule_isSubZmodule' 'of' U 'by' <: ]" :=
+  (SubNmodule_isSubZmodule.Build _ _ U (@rpredNr _ _))
+  (at level 0, format "[ 'SubNmodule_isSubZmodule'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubZmodule' 'of' U 'by' <: ]" :=
   (SubChoice_isSubZmodule.Build _ _ U (zmodClosedP _))

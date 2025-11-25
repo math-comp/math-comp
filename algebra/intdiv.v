@@ -249,7 +249,7 @@ Qed.
 Lemma modzMDl p m d : (p * d + m = m %[mod d])%Z.
 Proof.
 have [-> | d_nz] := eqVneq d 0; first by rewrite mulr0 add0r.
-by rewrite /modz divzMDl // mulrDl opprD addrACA subrr add0r.
+by rewrite /modz divzMDl // mulrDl [_ + m]addrC addrKA.
 Qed.
 
 Lemma mulz_modr {p m d} : 0 < p -> p * (m %% d)%Z = ((p * m) %% (p * d))%Z.
@@ -460,7 +460,7 @@ move=> pcharRp [] n; rewrite [LHS](dvdn_pcharf pcharRp)//.
 by rewrite NegzE abszN rmorphN// oppr_eq0.
 Qed.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use dvdz_pcharf  instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=dvdz_pcharf)]
 Notation dvdz_charf chRp := (dvdz_pcharf chRp).
 
 (* Greatest common divisor *)
@@ -678,14 +678,14 @@ Definition zchinese r1 r2 :=
 Lemma zchinese_modl r1 r2 : (zchinese r1 r2 = r1 %[mod m1])%Z.
 Proof.
 rewrite /zchinese; have [u v /= Duv _] := egcdzP m1 m2.
-rewrite -{2}[r1]mulr1 -((gcdz _ _ =P 1) co_m12) -Duv.
-by rewrite mulrDr mulrAC addrC (mulrAC r2) !mulrA !modzMDl.
+rewrite -[r1 in RHS]mulr1 -((gcdz _ _ =P 1) co_m12) -Duv.
+by rewrite mulrDr addrC mulrAC 2!mulrA 2!modzMDl mulrAC.
 Qed.
 
 Lemma zchinese_modr r1 r2 : (zchinese r1 r2 = r2 %[mod m2])%Z.
 Proof.
 rewrite /zchinese; have [u v /= Duv _] := egcdzP m1 m2.
-rewrite -{2}[r2]mulr1 -((gcdz _ _ =P 1) co_m12) -Duv.
+rewrite -[r2 in RHS]mulr1 -((gcdz _ _ =P 1) co_m12) -Duv.
 by rewrite mulrAC modzMDl mulrAC addrC mulrDr !mulrA modzMDl.
 Qed.
 
@@ -892,7 +892,7 @@ do [case: m i => [[]//|m] i; case: n j => [[]//|n] j /=] in M nzMij le_mn *.
 wlog Dj: j M nzMij / j = 0; last rewrite {j}Dj in nzMij.
   case/(_ 0 (xcol j 0 M)); rewrite ?mxE ?tpermR // => L uL [R uR [d dvD dM]].
   exists L => //; exists (xcol j 0 R); last exists d => //=.
-     by rewrite xcolE unitmx_mul uR unitmx_perm.
+    by rewrite xcolE unitmx_mul uR unitmx_perm.
   by rewrite xcolE !mulmxA -dM xcolE -mulmxA -perm_mxM tperm2 perm_mx1 mulmx1.
 move Da: (M i 0) nzMij => a nz_a.
 have [A leA] := ubnP `|a|; elim: A => // A IHa in a leA m n M i Da nz_a le_mn *.

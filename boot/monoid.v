@@ -25,6 +25,9 @@ From mathcomp Require Import bigop fintype finfun.
 (*                          The HB class is called Monoid.                    *)
 (*         baseGroupType == pointed magma with an inversion operator          *)
 (*                          The HB class is called BaseGroup.                 *)
+(*        starMonoidType == *-monoid, i.e. monoid with an involutive          *)
+(*                          antiautomorphism                                  *)
+(*                          The HB class is called BaseGroup.                 *)
 (*             groupType == group                                             *)
 (*                          The HB class is called Group.                     *)
 (*                                                                            *)
@@ -482,7 +485,8 @@ HB.structure Definition BaseGroup := {G of hasInv G & BaseUMagma G}.
 
 Bind Scope group_scope with BaseGroup.sort.
 
-Local Notation "x ^-1" := (inv x) : group_scope. Local Notation "x / y" := (x * y^-1) : group_scope.
+Local Notation "x ^-1" := (inv x) : group_scope.
+Local Notation "x / y" := (x * y^-1) : group_scope.
 Local Notation "x ^- n" := ((x ^+ n)^-1) : group_scope.
 
 Definition conjg (G : baseGroupType) (x y : G) := y^-1 * (x * y).
@@ -519,7 +523,7 @@ HB.builders Context G of isStarMonoid G.
 
 Lemma invg1 : inv one = one.
 Proof.
-by apply: (can_inj invgK); rewrite -{1}[inv one]mul1g invgM invgK mul1g.
+by apply: (can_inj invgK); rewrite -[inv one in LHS]mul1g invgM invgK mul1g.
 Qed.
 
 Lemma mulg1 : right_id one mul.
@@ -538,7 +542,7 @@ Implicit Types x y z : G.
 Lemma invg_inj : injective (@inv G). Proof. exact: can_inj invgK. Qed.
 
 Lemma invg1 : 1^-1 = 1 :> G.
-Proof. by apply: invg_inj; rewrite -{1}[1^-1]mul1g invgM invgK mul1g. Qed.
+Proof. by apply: invg_inj; rewrite -[1^-1 in LHS]mul1g invgM invgK mul1g. Qed.
 
 Lemma invgF x y : (x / y)^-1 = y / x.
 Proof. by rewrite invgM invgK. Qed.
@@ -760,7 +764,7 @@ Proof. by rewrite commgEr conjVg invgM invgK. Qed.
 Lemma commgP x y : reflect (commute x y) ([~ x, y] == 1).
 Proof. rewrite [[~ x, y]]mulgA -invgM mulg_eq1 eqg_inv eq_sym; apply: eqP. Qed.
 
-Lemma conjg_fix x y : x ^ y == x = ([~ x, y] == 1).
+Lemma conjg_fix x y : (x ^ y == x) = ([~ x, y] == 1).
 Proof. by rewrite mulg_eq1 eqg_inv. Qed.
 
 Lemma conjg_fixP x y : reflect (x ^ y = x) ([~ x, y] == 1).
@@ -1069,7 +1073,7 @@ Variables S : groupClosed G.
 Lemma gpredF : {in S &, forall u v, u / v \in S}.
 Proof. by move=> x y xS yS; rewrite gpredM// gpredV. Qed.
 
-Lemma gpredFC u v : u / v \in S = (v / u \in S).
+Lemma gpredFC u v : (u / v \in S) = (v / u \in S).
 Proof. by rewrite -gpredV invgF. Qed.
 
 Lemma gpredXNn n: {in S, forall u, u ^- n \in S}.
@@ -1255,6 +1259,8 @@ HB.instance Definition _ := hasInv.Build H invH.
 
 Lemma mulVg : left_inverse 1%g invH *%g.
 Proof. by move=> x; apply/val_inj; rewrite valM SubK mulVg val1. Qed.
+Lemma mulgV : right_inverse 1%g invH *%g.
+Proof. by move=> x; apply/val_inj; rewrite valM SubK mulgV val1. Qed.
 
 HB.instance Definition _ := StarMonoid_isGroup.Build H mulVg.
 

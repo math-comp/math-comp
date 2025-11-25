@@ -118,7 +118,7 @@ Import Order.TTheory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 Local Notation "p ^ f" := (map_poly f p) : ring_scope.
-Local Notation "p ^@" := (p ^ in_alg _) (at level 2, format "p ^@"): ring_scope.
+Local Notation "p ^@" := (p ^ in_alg _) (format "p ^@"): ring_scope.
 Local Notation "<< E ; u >>" := <<E; u>>%VS.
 Local Notation Qmorphism C := {rmorphism rat -> C}.
 
@@ -193,7 +193,7 @@ have /dvdzP[b Da]: (denq y %| a)%Z.
 pose m := `|(numq y * b + N)%R|%N.
 have Dm: m%:R = `|y * a%:~R + N%:R|.
   by rewrite pmulrn abszE intr_norm Da rmorphD !rmorphM /= numqE mulrAC mulrA.
-have ltr_Qnat n1 n2 : (n1%:R < n2%:R :> rat = _) := ltr_nat _ n1 n2.
+have ltr_Qnat n1 n2 : (n1%:R < n2%:R :> rat) = _ := ltr_nat _ n1 n2.
 have ub_y: `|y * a%:~R| < N%:R.
   apply: le_lt_trans (archi_boundP (normr_ge0 _)); rewrite !normrM.
   by rewrite ler_pM // (le_trans _ (ler_norm n)) ?ltW ?ub_n.
@@ -452,9 +452,9 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
     rewrite expnSr natrM invfM mulrA -{}Dcd /narrow /= -[mid _]/e.
     have [qe_ge0 // | /ltW qe_le0] := lerP 0 q.[e].
       do ?split=> //=; [exact: (le_trans le_ed) | apply: canRL (mulfK nz2) _].
-      by rewrite mulrBl divfK // mulr_natr opprD addrACA subrr add0r.
+      by rewrite mulrBl divfK // mulr_natr [c + d]addrC addrKA.
     do ?split=> //=; [exact: (le_trans le_ac) | apply: canRL (mulfK nz2) _].
-    by rewrite mulrBl divfK // mulr_natr opprD addrACA subrr addr0.
+    by rewrite mulrBl divfK // mulr_natr [c + d]addrC addrKA.
   have find_root r q ab:
     xup q ab -> {n | forall x, x \in itv (find n q ab) ->`|(r * q).[x]| < h2}.
   - move=> xab; have ub_ab := poly_itv_bound _ ab.1 ab.2.

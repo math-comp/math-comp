@@ -104,7 +104,7 @@ by rewrite norm_rlcoset ?nNH // -lcosetM mulVg mul1g.
 Qed.
 
 HB.instance Definition _ :=
-  isMulGroup.Build coset_of coset_mulP coset_oneP coset_invP.
+  Finite_isGroup.Build coset_of coset_mulP coset_oneP coset_invP.
 
 (* Projection of the initial group type over the cosets groupType.  *)
 
@@ -563,10 +563,8 @@ Variant inv_quotient_spec (P : pred {group gT}) : Prop :=
 Lemma inv_quotientS :
   Kbar \subset G / H -> inv_quotient_spec (fun K => K \subset G).
 Proof.
-case/andP: nHG => sHG nHG' sKbarG.
-have sKdH: Kbar \subset 'N(H) / H by rewrite (subset_trans sKbarG) ?morphimS.
-exists (coset H @*^-1 Kbar)%G; first by rewrite cosetpreK.
-  by rewrite -{1}ker_coset morphpreS ?sub1G.
+move=> sKH; exists (coset H @*^-1 Kbar); first by rewrite cosetpreK.
+  by rewrite sub_cosetpre.
 by rewrite sub_cosetpre_quo.
 Qed.
 

@@ -381,8 +381,8 @@ Proof. by move=> x y; rewrite !addq_subdefE addrC [x.2 * _]mulrC. Qed.
 
 Fact addq_subdefA : associative addq_subdef.
 Proof.
-move=> x y z; rewrite !addq_subdefE.
-by rewrite !mulrA !mulrDl addrA ![_ * x.2]mulrC !mulrA.
+move=> x y z; rewrite !addq_subdefE/=.
+by rewrite !mulrDl addrA !mulrA 2![_ * _ * x.2]mulrAC.
 Qed.
 
 Fact addq_frac x y : x.2 != 0 -> y.2 != 0 ->
@@ -863,7 +863,7 @@ End Fmorph.
 
 Section Linear.
 
-Implicit Types (U V : lmodType rat) (A B : lalgType rat).
+Implicit Types (U V : lmodType rat).
 
 Lemma rat_linear U V (f : U -> V) : zmod_morphism f -> scalable f.
 Proof.
@@ -894,8 +894,7 @@ rewrite -!(rmorphM, rmorphB); congr _%:~R; apply: injZtoQ.
 rewrite !(rmorphM, rmorphB) /= [_ - _]lock /= -lock !numqE.
 by rewrite (mulrAC y) -!mulrBl -mulrA mulrAC !mulrA.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `ratr_is_additive` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=ratr_is_zmod_morphism)]
 Definition ratr_is_additive := ratr_is_zmod_morphism.
 
 Fact ratr_is_monoid_morphism : monoid_morphism (@ratr F).
@@ -908,8 +907,7 @@ do 2!apply: canRL (mulfK (nz_den _)) _; rewrite -!rmorphM; congr _%:~R.
 apply: injZtoQ; rewrite !rmorphM [x * y]lock /= !numqE -lock.
 by rewrite -!mulrA mulrA mulrCA -!mulrA (mulrCA y).
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `ratr_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=ratr_is_monoid_morphism)]
 Definition ratr_is_multiplicative :=
   (fun g => (g.2,g.1)) ratr_is_monoid_morphism.
 
@@ -963,7 +961,7 @@ Variable F : archiNumFieldType.
 Lemma floor_rat : {mono (@ratr F) : x / Num.floor x}.
 Proof.
 move=> x; apply: floor_def; apply/andP; split.
-- by rewrite -ratr_int ler_rat floor_le_tmp.
+- by rewrite -ratr_int ler_rat floor_le.
 - by rewrite -ratr_int ltr_rat floorD1_gt.
 Qed.
 
@@ -1184,7 +1182,7 @@ have [/eqP/size_poly1P[c cN0 ->]|gN1] := eqVneq (size g) 1%N.
   by rewrite mulrC mul_polyC map_polyZ/= eqp_sym eqp_scale// intr_eq0.
 have c_neq0 : (lead_coef q)%:~R != 0 :> 'F_p
    by rewrite -(dvdz_pcharf (pchar_Fp _)).
-have : map_poly (intr : int -> 'F_p) q = (lead_coef q)%:~R *: 'X^(size q).-1.
+have : map_poly (intr : int -> 'F_p) q = (lead_coef q)%:~R *: 'X^((size q).-1).
   apply/val_inj/(@eq_from_nth _ 0) => [|i]; rewrite size_map_poly_id0//.
     by rewrite size_scale// size_polyXn -polySpred.
   move=> i_small; rewrite coef_poly i_small coefZ coefXn lead_coefE.

@@ -166,7 +166,7 @@ Proof. by move=> cycK cycH cKH coKH; rewrite cent_joinEr // cyclicM. Qed.
 (*        Order properties                                             *)
 (***********************************************************************)
 
-Lemma order_dvdn a n : #[a] %| n = (a ^+ n == 1).
+Lemma order_dvdn a n : (#[a] %| n) = (a ^+ n == 1).
 Proof. by rewrite (eq_expg_mod_order a n 0) mod0n. Qed.
 
 Lemma order_inf a n : a ^+ n.+1 == 1 -> #[a] <= n.+1.
@@ -263,7 +263,7 @@ Proof. by move=> cab co_ab; rewrite -coprime_cardMg -?cycleM. Qed.
 Definition expg_invn A k := (egcdn k #|A|).1.
 
 Lemma expgK G k :
-  coprime #|G| k -> {in G, cancel (expgn^~ k) (expgn^~ (expg_invn G k))}.
+  coprime #|G| k -> {in G, cancel (natexp^~ k) (natexp^~ (expg_invn G k))}.
 Proof.
 move=> coGk x /order_dvdG Gx; apply/eqP.
 rewrite -expgM (eq_expg_mod_order _ _ 1) -(modn_dvdm 1 Gx).
@@ -310,7 +310,7 @@ Prenex Implicits cyclic Zpm.
 (* Euler's theorem *)
 Theorem Euler_exp_totient a n : coprime a n -> a ^ totient n  = 1 %[mod n].
 Proof.
-case: n => [|[|n']] //; [by rewrite !modn1 | set n := n'.+2] => co_a_n.
+(case: n => [|[|n']] //; [by rewrite !modn1 | set n := n'.+2]) => co_a_n.
 have{co_a_n} Ua: coprime n (inZp a : 'I_n) by rewrite coprime_sym coprime_modl.
 have: FinRing.unit 'Z_n Ua ^+ totient n == 1.
   by rewrite -card_units_Zp // -order_dvdn order_dvdG ?inE.
@@ -848,7 +848,7 @@ Lemma has_prim_root_subproof (F : fieldType) (n : nat) (rs : seq F)
     (sG_Vg : left_inverse sG_1 sG_V sG_M) :
   has n.-primitive_root rs.
 Proof.
-pose ssMG : Finite_isGroup (seq_sub rs) := isMulGroup.Build (seq_sub rs) sG_Ag sG_1g sG_Vg.
+pose ssMG : Finite_isGroup (seq_sub rs) := Finite_isGroup.Build (seq_sub rs) sG_Ag sG_1g sG_Vg.
 pose gT : finGroupType := HB.pack (seq_sub rs) ssMG.
 have /cyclicP[x gen_x]: @cyclic gT setT.
   apply: (@field_mul_group_cyclic gT [set: _] F r) => // x _.

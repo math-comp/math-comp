@@ -2,13 +2,13 @@ OUTPUT_TESTS=test_suite/output.v test_suite/imset2_finset.v test_suite/imset2_gp
 
 OUTPUT_ARTIFACTS=$(OUTPUT_TESTS:%.v=%.v.out.new)
 
-COQ_VERSION_MINOR=$(shell $(COQC) -print-version | cut -d ' ' -f 1 | cut -d '.' -f 1-2)
+ROCQ_VERSION_MINOR=$(shell $(ROCQ) -print-version | cut -d ' ' -f 1 | cut -d '.' -f 1-2)
 
 # Given a file f we compare its compilation output f.out.new with
-# f.out.COQ_VERSION_MINOR (or f.out if f.out.COQ_VERSION_MINOR does not exist)
+# f.out.ROCQ_VERSION_MINOR (or f.out if f.out.ROCQ_VERSION_MINOR does not exist)
 post-all:: $(OUTPUT_ARTIFACTS)
 	@for f in $(OUTPUT_TESTS); do\
-	  if [ -e "$$f.out.$(COQ_VERSION_MINOR)" ]; then REFERENCE="$$f.out.$(COQ_VERSION_MINOR)";\
+	  if [ -e "$$f.out.$(ROCQ_VERSION_MINOR)" ]; then REFERENCE="$$f.out.$(ROCQ_VERSION_MINOR)";\
 	  else REFERENCE=$$f.out; fi;\
 	  if ! diff -q "$$REFERENCE" "$$f.out.new"; \
 	    then diff -u "$$REFERENCE" "$$f.out.new"; \
@@ -17,4 +17,4 @@ post-all:: $(OUTPUT_ARTIFACTS)
 	done
 
 $(OUTPUT_ARTIFACTS): %.v.out.new: %.v
-	$(COQC) $(COQFLAGS) $(COQLIBS) $< > $<.out.new
+	$(ROCQBIN)rocq c $(ROCQFLAGS) $(ROCQLIBS) $< > $<.out.new

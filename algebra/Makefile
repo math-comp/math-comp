@@ -1,6 +1,6 @@
 # -*- Makefile -*-
 
 COQPROJECT=Make
-COQMAKEOPTIONS=--no-print-directory
+ROCQMAKEOPTIONS=--no-print-directory
 
 include ../Makefile.common

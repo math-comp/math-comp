@@ -716,7 +716,7 @@ Lemma eqAmodN e x y : (- x == y %[mod e])%A = (x == - y %[mod e])%A.
 Proof. by rewrite eqAmod_sym /eqAmod !opprK addrC. Qed.
 
 Lemma eqAmodDr e x y z : (y + x == z + x %[mod e])%A = (y == z %[mod e])%A.
-Proof. by rewrite /eqAmod addrAC opprD !addrA subrK. Qed.
+Proof. by rewrite /eqAmod [z + x]addrC addrKA. Qed.
 
 Lemma eqAmodDl e x y z : (x + y == x + z %[mod e])%A = (y == z %[mod e])%A.
 Proof. by rewrite !(addrC x) eqAmodDr. Qed.

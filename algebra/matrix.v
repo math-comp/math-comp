@@ -213,52 +213,45 @@ Reserved Notation "''M[' R ]_ ( n )". (* only parsing *)
 Reserved Notation "''M[' R ]_ ( m , n )". (* only parsing *)
 
 Reserved Notation "\matrix_ i E"
-  (at level 36, E at level 36, i at level 2,
-   format "\matrix_ i  E").
+  (at level 34, E at level 39, i at level 2, format "\matrix_ i  E").
 Reserved Notation "\matrix_ ( i < n ) E"
-  (E at level 36, i, n at level 50). (* only parsing *)
+  (at level 34, E at level 39, i, n at level 50). (* only parsing *)
 Reserved Notation "\matrix_ ( i , j ) E"
-  (E at level 36, j at level 50,
-   format "\matrix_ ( i ,  j )  E").
+  (E at level 39, j at level 50, format "\matrix_ ( i ,  j )  E").
 Reserved Notation "\matrix[ k ]_ ( i , j ) E"
-  (at level 36, E at level 36, i, j at level 50,
+  (at level 34, E at level 39, i, j at level 50,
    format "\matrix[ k ]_ ( i ,  j )  E").
 Reserved Notation "\matrix_ ( i < m , j < n ) E"
-  (E at level 36, j, n at level 50). (* only parsing *)
+  (E at level 39, j, n at level 50). (* only parsing *)
 Reserved Notation "\matrix_ ( i , j < n ) E"
-  (E at level 36, j, n at level 50). (* only parsing *)
+  (E at level 39, n at level 50). (* only parsing *)
 Reserved Notation "\row_ j E"
-  (at level 36, E at level 36, j at level 2,
-   format "\row_ j  E").
+  (at level 34, E at level 39, j at level 2, format "\row_ j  E").
 Reserved Notation "\row_ ( j < n ) E"
-  (at level 36, E at level 36, j, n at level 50). (* only parsing *)
+  (at level 34, E at level 39, j, n at level 50). (* only parsing *)
 Reserved Notation "\col_ j E"
-  (at level 36, E at level 36, j at level 2,
-   format "\col_ j  E").
+  (at level 34, E at level 39, j at level 2, format "\col_ j  E").
 Reserved Notation "\col_ ( j < n ) E"
-  (at level 36, E at level 36, j, n at level 50). (* only parsing *)
+  (at level 34, E at level 39, j, n at level 50). (* only parsing *)
 Reserved Notation "\mxblock_ ( i , j ) E"
-  (at level 36, E at level 36, i, j at level 50,
+  (at level 34, E at level 39, i, j at level 50,
    format "\mxblock_ ( i ,  j )  E").
 Reserved Notation "\mxblock_ ( i < m , j < n ) E"
-  (E at level 36, i, m, j, n at level 50). (* only parsing *)
+  (E at level 39, m, j, n at level 50). (* only parsing *)
 Reserved Notation "\mxblock_ ( i , j < n ) E"
-  (E at level 36, i, j, n at level 50). (* only parsing *)
+  (E at level 39, n at level 50). (* only parsing *)
 Reserved Notation "\mxrow_ j E"
-  (at level 36, E at level 36, j at level 2,
-   format "\mxrow_ j  E").
+  (at level 34, E at level 39, j at level 2, format "\mxrow_ j  E").
 Reserved Notation "\mxrow_ ( j < n ) E"
-  (E at level 36, j, n at level 50). (* only parsing *)
+  (at level 34, E at level 39, j, n at level 50). (* only parsing *)
 Reserved Notation "\mxcol_ j E"
-  (at level 36, E at level 36, j at level 2,
-   format "\mxcol_ j  E").
+  (at level 34, E at level 39, j at level 2, format "\mxcol_ j  E").
 Reserved Notation "\mxcol_ ( j < n ) E"
-  (E at level 36, j, n at level 50). (* only parsing *)
+  (at level 34, E at level 39, j, n at level 50). (* only parsing *)
 Reserved Notation "\mxdiag_ j E"
-  (at level 36, E at level 36, j at level 2,
-   format "\mxdiag_ j  E").
+  (at level 34, E at level 39, j at level 2, format "\mxdiag_ j  E").
 Reserved Notation "\mxdiag_ ( j < n ) E"
-  (E at level 36, j, n at level 50). (* only parsing *)
+  (at level 34, E at level 39, j, n at level 50). (* only parsing *)
 
 Reserved Notation "x %:M"   (format "x %:M").
 Reserved Notation "A *m B" (at level 40, left associativity, format "A  *m  B").
@@ -821,6 +814,12 @@ Proof.
 move=> eqAB; move: (congr1 usubmx eqAB) (congr1 dsubmx eqAB).
 by rewrite !(col_mxKu, col_mxKd).
 Qed.
+
+Lemma lsubmx_const (r : R) : lsubmx (const_mx r : 'M_(m, n1 + n2)) = const_mx r.
+Proof. by apply/matrixP => i j; rewrite !mxE. Qed.
+
+Lemma rsubmx_const (r : R) : rsubmx (const_mx r : 'M_(m, n1 + n2)) = const_mx r.
+Proof. by apply/matrixP => i j; rewrite !mxE. Qed.
 
 Lemma row_mx_const a : row_mx (const_mx a) (const_mx a) = const_mx a.
 Proof. by split_mxE. Qed.
@@ -1644,8 +1643,7 @@ Proof. by apply: (big_morph (fun A => A i j)) => [A B|]; rewrite mxE. Qed.
 
 Fact const_mx_is_nmod_morphism : nmod_morphism const_mx.
 Proof. by split=> [|a b]; apply/matrixP => // i j; rewrite !mxE. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `const_mx_is_nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=const_mx_is_nmod_morphism)]
 Definition const_mx_is_semi_additive := const_mx_is_nmod_morphism.
 HB.instance Definition _ := GRing.isNmodMorphism.Build V 'M[V]_(m, n) const_mx
   const_mx_is_nmod_morphism.
@@ -1661,8 +1659,7 @@ Definition swizzle_mx k (A : 'M[V]_(m, n)) :=
 
 Fact swizzle_mx_is_nmod_morphism k : nmod_morphism (swizzle_mx k).
 Proof. by split=> [|A B]; apply/matrixP => i j; rewrite !mxE. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `swizzle_mx_is_nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=swizzle_mx_is_nmod_morphism)]
 Definition swizzle_mx_is_semi_additive := swizzle_mx_is_nmod_morphism.
 HB.instance Definition _ k := GRing.isNmodMorphism.Build 'M_(m, n) 'M_(p, q)
   (swizzle_mx k) (swizzle_mx_is_nmod_morphism k).
@@ -1966,8 +1963,7 @@ Fact diag_mx_is_nmod_morphism n : nmod_morphism (@diag_mx n).
 Proof.
 by split=> [|A B]; apply/matrixP => i j; rewrite !mxE ?mul0rn// mulrnDl.
 Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `diag_mx_is_nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=diag_mx_is_nmod_morphism)]
 Definition diag_mx_is_semi_additive := diag_mx_is_nmod_morphism.
 HB.instance Definition _ n := GRing.isNmodMorphism.Build 'rV_n 'M_n (@diag_mx n)
   (@diag_mx_is_nmod_morphism n).
@@ -2012,8 +2008,7 @@ Proof. by apply/matrixP=> i j; rewrite !mxE eq_sym. Qed.
 
 Fact scalar_mx_is_nmod_morphism : nmod_morphism scalar_mx.
 Proof. by split=> [|a b]; rewrite -!diag_const_mx ?raddf0// !raddfD. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `scalar_mx_is_nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=scalar_mx_is_nmod_morphism)]
 Definition scalar_mx_is_semi_additive := scalar_mx_is_nmod_morphism.
 HB.instance Definition _ := GRing.isNmodMorphism.Build V 'M_n scalar_mx
   scalar_mx_is_nmod_morphism.
@@ -2076,8 +2071,7 @@ Proof.
 split=> [|A B]; first by apply: big1 => i; rewrite mxE.
 by rewrite -big_split /=; apply: eq_bigr => i _; rewrite mxE.
 Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `mxtrace_is_nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=mxtrace_is_nmod_morphism)]
 Definition mxtrace_is_semi_additive := mxtrace_is_nmod_morphism.
 HB.instance Definition _ := GRing.isNmodMorphism.Build 'M_n V mxtrace
   mxtrace_is_nmod_morphism.
@@ -2156,10 +2150,10 @@ Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE addNr. Qed.
 
 HB.instance Definition _ := GRing.Nmodule_isZmodule.Build 'M[V]_(m, n) addNmx.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=raddfB)]
 Fact const_mx_is_zmod_morphism : zmod_morphism const_mx.
 Proof. exact: raddfB. Qed.
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead"),
+#[deprecated(since="mathcomp 2.5.0", use=raddfB),
   warning="-deprecated"]
 Definition const_mx_is_additive := const_mx_is_zmod_morphism.
 
@@ -2169,10 +2163,10 @@ Section Additive.
 
 Variables (m n p q : nat) (f : 'I_p -> 'I_q -> 'I_m) (g : 'I_p -> 'I_q -> 'I_n).
 
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=raddfB)]
 Fact swizzle_mx_is_zmod_morphism k : zmod_morphism (swizzle_mx f g k).
 Proof. exact: raddfB. Qed.
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead"),
+#[deprecated(since="mathcomp 2.5.0", use=raddfB),
   warning="-deprecated"]
 Definition swizzle_mx_is_additive := swizzle_mx_is_zmod_morphism.
 
@@ -2194,10 +2188,10 @@ Proof. by rewrite opp_col_mx !opp_row_mx. Qed.
 
 (* Diagonal matrices *)
 
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=raddfB)]
 Fact diag_mx_is_zmod_morphism n : zmod_morphism (@diag_mx V n).
 Proof. exact: raddfB. Qed.
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead"),
+#[deprecated(since="mathcomp 2.5.0", use=raddfB),
   warning="-deprecated"]
 Definition diag_mx_is_additive := diag_mx_is_zmod_morphism.
 
@@ -2206,10 +2200,10 @@ Section ScalarMx.
 
 Variable n : nat.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=raddfB)]
 Fact scalar_mx_is_zmod_morphism : zmod_morphism (@scalar_mx V n).
 Proof. exact: raddfB. Qed.
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead"),
+#[deprecated(since="mathcomp 2.5.0", use=raddfB),
   warning="-deprecated"]
 Definition scalar_mx_is_additive := scalar_mx_is_zmod_morphism.
 
@@ -2220,10 +2214,10 @@ Section Trace.
 
 Variable n : nat.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=raddfB)]
 Fact mxtrace_is_zmod_morphism : zmod_morphism (@mxtrace V n).
 Proof. exact: raddfB. Qed.
-#[deprecated(since="mathcomp 2.5.0", note="use `raddfB` instead"),
+#[deprecated(since="mathcomp 2.5.0", use=raddfB),
   warning="-deprecated"]
 Definition mxtrace_is_additive := mxtrace_is_zmod_morphism.
 
@@ -2847,13 +2841,15 @@ HB.instance Definition _ := GRing.Nmodule_isPzSemiRing.Build 'M[R]_n
   (@mulmxA n n n n) (@mul1mx n n) (@mulmx1 n n)
   (@mulmxDl n n n) (@mulmxDr n n n) (@mul0mx n n n) (@mulmx0 n n n).
 
+HB.instance Definition _ :=
+  GRing.LSemiModule_isLSemiAlgebra.Build R 'M[R]_n (@scalemxAl n n n).
+
 Lemma mulmxE : mulmx = *%R. Proof. by []. Qed.
 Lemma idmxE : 1%:M = 1 :> 'M_n. Proof. by []. Qed.
 
 Fact scalar_mx_is_monoid_morphism : monoid_morphism (@scalar_mx R n).
 Proof. by split=> //; apply: scalar_mxM. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `scalar_mx_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=scalar_mx_is_monoid_morphism)]
 Definition scalar_mx_is_multiplicative := scalar_mx_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build R 'M_n (@scalar_mx _ n)
   scalar_mx_is_monoid_morphism.
@@ -3123,8 +3119,7 @@ Qed.
 
 Fact map_mx_is_monoid_morphism n : monoid_morphism (map_mx f : 'M_n -> 'M_n).
 Proof. by split; [apply: map_mx1 | apply: map_mxM]. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `map_mx_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=map_mx_is_monoid_morphism)]
 Definition map_mx_is_multiplicative := map_mx_is_monoid_morphism.
 HB.instance Definition _ n :=
   GRing.isMonoidMorphism.Build 'M[aR]_n 'M[rR]_n (map_mx f)
@@ -3306,6 +3301,21 @@ Proof. by rewrite scalar_mxC mul_scalar_mx. Qed.
 
 End ComMatrix.
 
+HB.instance Definition _ (R : comPzSemiRingType) (n : nat) :=
+  GRing.LSemiAlgebra_isSemiAlgebra.Build R 'M[R]_n (fun k => scalemxAr k).
+
+HB.instance Definition _ (R : comPzRingType) (n : nat) :=
+  GRing.PzSemiAlgebra.on 'M[R]_n.
+
+HB.instance Definition _ (R : comNzSemiRingType) (n' : nat) :=
+  GRing.PzSemiAlgebra.on 'M[R]_n'.+1.
+
+HB.instance Definition _ (R : comNzRingType) (n' : nat) :=
+  GRing.PzAlgebra.on 'M[R]_n'.+1.
+
+HB.instance Definition _ (R : finComNzRingType) (n' : nat) :=
+  [Finite of 'M[R]_n'.+1 by <:].
+
 Arguments lin_mulmx {R m n p} A.
 Arguments lin_mul_row {R m n} u.
 Arguments diag_mx_comm {R n}.
@@ -3320,7 +3330,7 @@ Variable R : pzRingType.
 
 (* Diagonal matrices *)
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact diag_mx_is_linear n : linear (@diag_mx R n). Proof. exact: linearP. Qed.
 
 (* Scalar matrix *)
@@ -3356,15 +3366,15 @@ Proof.
 by move=> le_r_n; rewrite mulmxBl mul1mx mul_pid_mx_copid // oppr0 addr0.
 Qed.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact mulmxr_is_linear m n p B : linear (@mulmxr R m n p B).
 Proof. exact: linearP. Qed.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact lin_mulmxr_is_linear m n p : linear (@lin_mulmxr R m n p).
 Proof. exact: linearP. Qed.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `scalarP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=scalarP)]
 Fact mxtrace_is_scalar n : scalar (@mxtrace R n).
 Proof. exact: scalarP. Qed.
 
@@ -3447,11 +3457,11 @@ End CommMx.
 Section ComMatrix.
 Variable R : comPzRingType.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact lin_mulmx_is_linear m n p : linear (@lin_mulmx R m n p).
 Proof. exact: linearP. Qed.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `linearP` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=linearP)]
 Fact lin_mul_row_is_linear m n : linear (@lin_mul_row R m n).
 Proof. exact: linearP. Qed.
 
@@ -3539,9 +3549,9 @@ rewrite (bigID (fun f : F => injectiveb f)) /= addrC big1 ?add0r => [|f Uf].
     by exists in_Sn => /= f Uf; first apply: val_inj; apply: insubdK.
   apply: eq_big => /= [s | s _]; rewrite ?(valP s) // big_distrr /=.
   rewrite (reindex_inj (mulgI s)); apply: eq_bigr => t _ /=.
-  rewrite big_split /= [in LHS]mulrA mulrCA mulrA mulrCA mulrA.
-  rewrite -signr_addb odd_permM !pvalE; congr (_ * _); symmetry.
-  by rewrite (reindex_perm s); apply: eq_bigr => i; rewrite permM.
+  rewrite big_split /= [RHS]mulrACA 2!mulrA -signr_addb odd_permM !pvalE.
+  congr (_ * _); rewrite [RHS](reindex_perm s).
+  by apply: eq_bigr => i; rewrite permM.
 transitivity (\det (\matrix_(i, j) B (f i) j) * \prod_i A i (f i)).
   rewrite mulrC big_distrr /=; apply: eq_bigr => s _.
   rewrite mulrCA big_split //=; congr (_ * (_ * _)).
@@ -3681,15 +3691,6 @@ End ComMatrix.
 
 Arguments lin_mul_row {R m n} u.
 Arguments lin_mulmx {R m n p} A.
-
-HB.instance Definition _ (R : comNzSemiRingType) n :=
-  GRing.LSemiAlgebra_isSemiAlgebra.Build R 'M[R]_n.+1 (fun k => scalemxAr k).
-
-HB.instance Definition _ (R : comNzRingType) (n' : nat) :=
-  GRing.LSemiAlgebra.on 'M[R]_n'.+1.
-
-HB.instance Definition _ (R : finComNzRingType) (n' : nat) :=
-  [Finite of 'M[R]_n'.+1 by <:].
 
 (* Only tall matrices have inverses. *)
 Lemma mulmx1_min (R : comNzRingType) m n (A : 'M[R]_(m, n)) B :
@@ -3915,7 +3916,7 @@ Arguments GLgroup n%_N R%_type.
 Arguments GLgroup_group n%_N R%_type.
 
 Notation "''GL_' n [ R ]" := (GLgroup n R)
-  (at level 8, n at level 2, format "''GL_' n [ R ]") : group_scope.
+  (n at level 2, format "''GL_' n [ R ]") : group_scope.
 Notation "''GL_' n ( p )" := 'GL_n['F_p]
   (p at level 10, format "''GL_' n ( p )") : group_scope.
 Notation "''GL_' n [ R ]" := (GLgroup_group n R) : Group_scope.

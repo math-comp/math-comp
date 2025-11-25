@@ -55,10 +55,10 @@ Local Notation "n %:R" := (n %:R%R).
 Local Open Scope group_scope.
 Import GRing.Theory.
 
-Reserved Notation "''Mod_' m" (at level 8, m at level 2, format "''Mod_' m").
-Reserved Notation "''D_' m" (at level 8, m at level 2, format "''D_' m").
-Reserved Notation "''SD_' m" (at level 8, m at level 2, format "''SD_' m").
-Reserved Notation "''Q_' m" (at level 8, m at level 2, format "''Q_' m").
+Reserved Notation "''Mod_' m" (at level 0, m at level 2, format "''Mod_' m").
+Reserved Notation "''D_' m" (at level 0, m at level 2, format "''D_' m").
+Reserved Notation "''SD_' m" (at level 0, m at level 2, format "''SD_' m").
+Reserved Notation "''Q_' m" (at level 0, m at level 2, format "''Q_' m").
 
 Module Extremal.
 
@@ -777,7 +777,7 @@ have{le_ou le_ov} [ou ov]: #[u] = q /\ #[v] = 4.
 have sdB: <[u]> ><| <[v]> = B by rewrite sdprodE.
 have uvj j: u ^ (v ^+ j) = (if odd j then u^-1 else u).
   elim: j => [|j IHj]; first by rewrite conjg1.
-  by rewrite expgS conjgM uv conjVg IHj (fun_if invg) invgK if_neg.
+  by rewrite expgS conjgM uv conjVg IHj (fun_if inv) invgK if_neg.
 have sqrB i j: (u ^+ i * v ^+ j) ^+ 2 = (if odd j then v ^+ 2 else u ^+ i.*2).
   rewrite expgS; case: ifP => odd_j.
     rewrite {1}(conjgC (u ^+ i)) conjXg uvj odd_j expgVn -mulgA mulKg.

@@ -141,12 +141,12 @@ Variant are_groups A B : Prop := AreGroups K H of A = K & B = H.
 Lemma group_not0 G : set0 <> G.
 Proof. by move/setP/(_ 1); rewrite inE group1. Qed.
 
-Lemma mulg0 : right_zero (@set0 gT) mulg.
+Lemma mulg0 : right_zero (@set0 gT) mul.
 Proof.
 by move=> A; apply/setP=> x; rewrite inE; apply/imset2P=> [[y z]]; rewrite inE.
 Qed.
 
-Lemma mul0g : left_zero (@set0 gT) mulg.
+Lemma mul0g : left_zero (@set0 gT) mul.
 Proof.
 by move=> A; apply/setP=> x; rewrite inE; apply/imset2P=> [[y z]]; rewrite inE.
 Qed.
@@ -1012,7 +1012,7 @@ Proof. by move=> x; congr (_, _); apply: mulVg. Qed.
 Lemma extprod_mulgA : associative extprod_mulg.
 Proof. by move=> x y z; congr (_, _); apply: mulgA. Qed.
 
-HB.instance Definition _ := isMulGroup.Build (gT1 * gT2)%type
+HB.instance Definition _ := Finite_isGroup.Build (gT1 * gT2)%type
   extprod_mulgA extprod_mul1g extprod_mulVg.
 
 Lemma group_setX (H1 : {group gT1}) (H2 : {group gT2}) : group_set (setX H1 H2).
@@ -1027,12 +1027,12 @@ Definition pairg1 x : gT1 * gT2 := (x, 1).
 Definition pair1g x : gT1 * gT2 := (1, x).
 
 Lemma pairg1_morphM : {morph pairg1 : x y / x * y}.
-Proof. by move=> x y /=; rewrite {2}/mulg /= /mul_pair/= mul1g. Qed.
+Proof. by move=> x y /=; rewrite {2}/mul /= /mul_pair/= mul1g. Qed.
 
 Canonical pairg1_morphism := @Morphism _ _ setT _ (in2W pairg1_morphM).
 
 Lemma pair1g_morphM : {morph pair1g : x y / x * y}.
-Proof. by move=> x y /=; rewrite {2}/mulg /= /mul_pair/= mul1g. Qed.
+Proof. by move=> x y /=; rewrite {2}/mul /= /mul_pair/= mul1g. Qed.
 
 Canonical pair1g_morphism := @Morphism _ _ setT _ (in2W pair1g_morphM).
 
@@ -1086,7 +1086,7 @@ apply/imset2P/andP=> [[[x1 u1] [v1 y1]] | [Hx Hy]].
   rewrite !inE /= => /andP[Hx1 /eqP->] /andP[/eqP-> Hx] [-> ->].
   by rewrite mulg1 mul1g.
 exists (x, 1 : gT2) (1 : gT1, y); rewrite ?inE ?Hx ?eqxx //.
-by rewrite /mulg /= /mul_pair /= mulg1 mul1g.
+by rewrite /mul /= /mul_pair /= mulg1 mul1g.
 Qed.
 
 Lemma setX_dprod (H1 : {group gT1}) (H2 : {group gT2}) :
@@ -1144,7 +1144,7 @@ Proof. by move=> x; apply/ffunP => i; rewrite !ffunE mulVg. Qed.
 Lemma extnprod_mulgA : associative extnprod_mulg.
 Proof. by move=> x y z; apply/ffunP => i; rewrite !ffunE mulgA. Qed.
 
-HB.instance Definition _ := isMulGroup.Build {dffun forall i : I, gT i}
+HB.instance Definition _ := Finite_isGroup.Build {dffun forall i : I, gT i}
   extnprod_mulgA extnprod_mul1g extnprod_mulVg.
 
 Lemma oneg_ffun i : (1 : gTn) i = 1. Proof. by rewrite ffunE. Qed.
@@ -1372,7 +1372,7 @@ case: v w => [[b y]] /=; case/setXP=> Db Ry [[c z]] /=; case/setXP=> Dc Rz.
 by rewrite !(actMin to) // gactM ?gact_stable // !mulgA.
 Qed.
 
-HB.instance Definition _ := isMulGroup.Build sdT
+HB.instance Definition _ := Finite_isGroup.Build sdT
   sdprod_mulgA sdprod_mul1g sdprod_mulVg.
 
 Definition sdprod_groupType : finGroupType := sdT.
@@ -1867,7 +1867,7 @@ Section DirprodIsom.
 Variable gT : finGroupType.
 Implicit Types G H : {group gT}.
 
-Definition mulgm : gT * gT -> _ := uncurry mulg.
+Definition mulgm : gT * gT -> _ := uncurry mul.
 
 Lemma imset_mulgm (A B : {set gT}) : mulgm @: setX A B = A * B.
 Proof. by rewrite -curry_imset2X. Qed.

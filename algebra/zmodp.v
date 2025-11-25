@@ -151,6 +151,9 @@ Qed.
 HB.instance Definition _ :=
   GRing.isZmodule.Build 'I_p (@Zp_addA _) (@Zp_addC _) Zp_add0z Zp_addNz.
 
+(* FIXME: This will break when we make rings depend on monoids. *)
+HB.instance Definition _ := [finGroupMixin of 'I_p for +%R].
+
 (* Ring operations *)
 
 Lemma Zp_mul1z : left_id Zp1 Zp_mul.
@@ -188,7 +191,7 @@ HB.instance Definition _ := FinGroup.copy ordGroup 'I_p.
 
 Local Open Scope group_scope.
 
-Lemma Zp_mulgC : @commutative 'I_p _ mulg.
+Lemma Zp_mulgC : @commutative 'I_p _ mul.
 Proof. exact: Zp_addC. Qed.
 
 Lemma Zp_abelian : abelian [set: 'I_p].
@@ -238,10 +241,10 @@ Qed.
 (* TODO: bigop is imported after zmodp in matrix.v and intdiv.v to prevent
   these warnings from triggering. We should restore the order of imports when
   these are removed. *)
-#[deprecated(since="mathcomp 2.3.0", note="Use bigop.big_ord1 instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=bigop.big_ord1)]
 Notation big_ord1 := big_ord1 (only parsing).
 
-#[deprecated(since="mathcomp 2.3.0", note="Use bigop.big_ord1_cond instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=bigop.big_ord1_cond)]
 Notation big_ord1_cond := big_ord1_cond (only parsing).
 
 Section ZpNzRing.
@@ -269,7 +272,7 @@ Proof. by apply: val_inj; rewrite /= Zp_nat /= modn_mod. Qed.
 
 Local Open Scope group_scope.
 
-Lemma unit_Zp_mulgC : @commutative {unit 'I_p} _ mulg.
+Lemma unit_Zp_mulgC : @commutative {unit 'I_p} _ mul.
 Proof. by move=> u v; apply: val_inj; rewrite /= GRing.mulrC. Qed.
 
 Lemma unit_Zp_expg (u : {unit 'I_p}) n :
@@ -360,7 +363,7 @@ Proof. by apply/centsP=> u _ v _; apply: unit_Zp_mulgC. Qed.
 
 End Groups.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar_Zp instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar_Zp)]
 Notation char_Zp := (pchar_Zp) (only parsing).
 
 (* Field structure for primes. *)
@@ -458,8 +461,8 @@ Qed.
 
 End Sym.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar_Fp instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar_Fp)]
 Notation char_Fp := (pchar_Fp) (only parsing).
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar_Fp_0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar_Fp_0)]
 Notation char_Fp_0 := (pchar_Fp_0) (only parsing).

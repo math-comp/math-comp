@@ -16,7 +16,7 @@ From mathcomp Require Import monoid ssralg countalg.
 (*   finPzRingType, finNzRingType, finComPzRingType, finComNzRingType,       *)
 (*   finComPzSemiRingType, finComNzSemiRingType, finUnitRingType,            *)
 (*   finComUnitRingType, finIdomainType, finFieldType, finLmodType,          *)
-(*   finLalgType, finAlgType, finUnitAlgType                                 *)
+(*   finNzLalgType, finNzAlgType, finUnitAlgType                             *)
 (*      == the finite counterparts of nmodType, etc                          *)
 (* Note that a finFieldType is canonically decidable.                        *)
 (*   This file also provides direct tie-ins with finite group theory:        *)
@@ -49,7 +49,7 @@ HB.structure Definition Zmodule := {M of GRing.Zmodule M & Finite M}.
 
 Module ZmoduleExports.
 Notation "[ 'finGroupMixin' 'of' R 'for' +%R ]" :=
-    (isMulGroup.Build R (@addrA _) (@add0r _) (@addNr _))
+    (Finite_isGroup.Build R (@addrA _) (@add0r _) (@addNr _))
   (format "[ 'finGroupMixin'  'of'  R  'for'  +%R ]") : form_scope.
 End ZmoduleExports.
 HB.export ZmoduleExports.
@@ -60,19 +60,15 @@ HB.structure Definition PzSemiRing := {R of GRing.PzSemiRing R & Finite R}.
 #[short(type="finNzSemiRingType")]
 HB.structure Definition NzSemiRing := {R of GRing.NzSemiRing R & Finite R}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzSemiRing)]
 Notation SemiRing R := (NzSemiRing R) (only parsing).
 
 Module SemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzSemiRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzSemiRing.sort)]
 Notation sort := (NzSemiRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzSemiRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzSemiRing.on)]
 Notation on R := (NzSemiRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzSemiRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzSemiRing.copy)]
 Notation copy T U := (NzSemiRing.copy T U) (only parsing).
 End SemiRing.
 
@@ -82,19 +78,15 @@ HB.structure Definition PzRing := {R of GRing.PzRing R & Finite R}.
 #[short(type="finNzRingType")]
 HB.structure Definition NzRing := {R of GRing.NzRing R & Finite R}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzRing)]
 Notation Ring R := (NzRing R) (only parsing).
 
 Module Ring.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzRing.sort)]
 Notation sort := (NzRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzRing.on)]
 Notation on R := (NzRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.NzRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.NzRing.copy)]
 Notation copy T U := (NzRing.copy T U) (only parsing).
 End Ring.
 
@@ -106,19 +98,15 @@ HB.structure Definition ComPzSemiRing :=
 HB.structure Definition ComNzSemiRing :=
   {R of GRing.ComNzSemiRing R & Finite R}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzSemiRing)]
 Notation ComSemiRing R := (ComNzSemiRing R) (only parsing).
 
 Module ComSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzSemiRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzSemiRing.sort)]
 Notation sort := (ComNzSemiRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzSemiRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzSemiRing.on)]
 Notation on R := (ComNzSemiRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzSemiRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzSemiRing.copy)]
 Notation copy T U := (ComNzSemiRing.copy T U) (only parsing).
 End ComSemiRing.
 
@@ -128,19 +116,15 @@ HB.structure Definition ComPzRing := {R of GRing.ComPzRing R & Finite R}.
 #[short(type="finComNzRingType")]
 HB.structure Definition ComNzRing := {R of GRing.ComNzRing R & Finite R}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzRing)]
 Notation ComRing R := (ComNzRing R) (only parsing).
 
 Module ComRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzRing.sort)]
 Notation sort := (ComNzRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzRing.on)]
 Notation on R := (ComNzRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.ComNzRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.ComNzRing.copy)]
 Notation copy T U := (ComNzRing.copy T U) (only parsing).
 End ComRing.
 
@@ -161,13 +145,37 @@ HB.structure Definition Field := {R of GRing.Field R & Finite R}.
 HB.structure Definition Lmodule (R : nzRingType) :=
   {M of GRing.Lmodule R M & Finite M}.
 
-#[short(type="finLalgType")]
-HB.structure Definition Lalgebra (R : nzRingType) :=
-  {M of GRing.Lalgebra R M & Finite M}.
+#[short(type="finNzLalgType")]
+HB.structure Definition NzLalgebra (R : nzRingType) :=
+  {M of GRing.NzLalgebra R M & Finite M}.
 
-#[short(type="finAlgType")]
-HB.structure Definition Algebra (R : nzRingType) :=
-  {M of GRing.Algebra R M & Finite M}.
+#[deprecated(since="mathcomp 2.6.0", use=FinRing.NzLalgebra)]
+Notation Lalgebra R := (NzLalgebra R) (only parsing).
+
+Module Lalgebra.
+#[deprecated(since="mathcomp 2.6.0", use=FinRing.NzLalgebra.sort)]
+Notation sort := (NzLalgebra.sort) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=FinRing.NzLalgebra.on)]
+Notation on R := (NzLalgebra.on R) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=FinRing.NzLalgebra.copy)]
+Notation copy T U := (NzLalgebra.copy T U) (only parsing).
+End Lalgebra.
+
+#[short(type="finNzAlgType")]
+HB.structure Definition NzAlgebra (R : nzRingType) :=
+  {M of GRing.NzAlgebra R M & Finite M}.
+
+#[deprecated(since="mathcomp 2.6.0", use=FinRing.NzAlgebra)]
+Notation Algebra R := (NzAlgebra R) (only parsing).
+
+Module Algebra.
+#[deprecated(since="mathcomp 2.6.0", use=FinRing.NzAlgebra.sort)]
+Notation sort := (NzAlgebra.sort) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=FinRing.NzAlgebra.on)]
+Notation on R := (NzAlgebra.on R) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=FinRing.NzAlgebra.copy)]
+Notation copy T U := (NzAlgebra.copy T U) (only parsing).
+End Algebra.
 
 #[short(type="finUnitAlgType")]
 HB.structure Definition UnitAlgebra (R : unitRingType) :=
@@ -176,9 +184,9 @@ HB.structure Definition UnitAlgebra (R : unitRingType) :=
 (* Group structures *)
 
 #[export, non_forgetful_inheritance]
-HB.instance Definition _ (R : Zmodule.type) := [finGroupMixin of R for +%R].
-Coercion Zmodule_to_baseFinGroup (R : Zmodule.type) := BaseFinGroup.clone R _.
-Coercion Zmodule_to_finGroup (R : Zmodule.type) := FinGroup.clone R _.
+HB.instance Definition _ (R : finZmodType) := [finGroupMixin of R for +%R].
+Coercion Zmodule_to_baseFinGroup (R : finZmodType) := FinStarMonoid.clone R _.
+Coercion Zmodule_to_finGroup (R : finZmodType) := FinGroup.clone R _.
 
 Section AdditiveGroup.
 
@@ -197,18 +205,18 @@ Proof. by apply/centsP=> x _ y _; apply: zmod_mulgC. Qed.
 End AdditiveGroup.
 
 #[export, non_forgetful_inheritance]
-HB.instance Definition _ (R : NzRing.type) := [finGroupMixin of R for +%R].
+HB.instance Definition _ (R : finNzRingType) := [finGroupMixin of R for +%R].
+Coercion NzRing_to_baseFinGroup (R : finNzRingType) := FinStarMonoid.clone R _.
+Coercion NzRing_to_finGroup (R : finNzRingType) := FinGroup.clone R _.
 
 HB.factory Record isNzRing R of NzRing R := {}.
 
 Module isRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.isNzRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.isNzRing.Build)]
 Notation Build R := (isNzRing.Build R) (only parsing).
 End isRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use FinRing.isNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinRing.isNzRing)]
 Notation isRing R := (isNzRing R) (only parsing).
 
 HB.builders Context R of isNzRing R.
@@ -244,10 +252,16 @@ HB.builders Context R of isNzRing R.
 HB.end.
 
 #[export, non_forgetful_inheritance]
-HB.instance Definition _ (R : ComNzRing.type) := [finGroupMixin of R for +%R].
+HB.instance Definition _ (R : finComNzRingType) := [finGroupMixin of R for +%R].
+Coercion ComNzRing_to_baseFinGroup (R : finComNzRingType) :=
+  FinStarMonoid.clone R _.
+Coercion ComNzRing_to_finGroup (R : finComNzRingType) := FinGroup.clone R _.
 
 #[export, non_forgetful_inheritance]
-HB.instance Definition _ (R : UnitRing.type) := [finGroupMixin of R for +%R].
+HB.instance Definition _ (R : finUnitRingType) := [finGroupMixin of R for +%R].
+Coercion UnitRing_to_baseFinGroup (R : finUnitRingType) :=
+  FinStarMonoid.clone R _.
+Coercion UnitRing_to_finGroup (R : finUnitRingType) := FinGroup.clone R _.
 
 Section UnitsGroup.
 
@@ -276,7 +290,7 @@ Proof. by move=> u; apply/val_inj/mul1r. Qed.
 Lemma unit_mulVu : left_inverse unit1 unit_inv unit_mul.
 Proof. by move=> u; apply/val_inj/(mulVr (valP u)). Qed.
 
-#[export] HB.instance Definition _ := isMulGroup.Build unit_of
+#[export] HB.instance Definition _ := Finite_isGroup.Build unit_of
   unit_muluA unit_mul1u unit_mulVu.
 
 Lemma val_unit1 : val (1%g : unit_of) = 1. Proof. by []. Qed.
@@ -312,14 +326,23 @@ HB.export UnitsGroupExports.
 Notation unit R Ux := (@Unit R%type _ Ux).
 
 #[export, non_forgetful_inheritance]
-HB.instance Definition _ (R : ComUnitRing.type) := [finGroupMixin of R for +%R].
-
-#[export, non_forgetful_inheritance]
-HB.instance Definition _ (R : IntegralDomain.type) :=
+HB.instance Definition _ (R : finComUnitRingType) :=
   [finGroupMixin of R for +%R].
+Coercion ComUnitRing_to_baseFinGroup (R : finComUnitRingType) :=
+  FinStarMonoid.clone R _.
+Coercion ComUnitRing_to_finGroup (R : finComUnitRingType) :=
+  FinGroup.clone R _.
 
 #[export, non_forgetful_inheritance]
-HB.instance Definition _ (R : Field.type) := [finGroupMixin of R for +%R].
+HB.instance Definition _ (R : finIdomainType) := [finGroupMixin of R for +%R].
+Coercion IntegralDomain_to_baseFinGroup (R : finIdomainType) :=
+  FinStarMonoid.clone R _.
+Coercion IntegralDomain_to_finGroup (R : finIdomainType) := FinGroup.clone R _.
+
+#[export, non_forgetful_inheritance]
+HB.instance Definition _ (R : finFieldType) := [finGroupMixin of R for +%R].
+Coercion Field_to_baseFinGroup (R : finFieldType) := FinStarMonoid.clone R _.
+Coercion Field_to_finGroup (R : finFieldType) := FinGroup.clone R _.
 
 HB.factory Record isField F of Field F := {}.
 
@@ -353,26 +376,38 @@ HB.builders Context F of isField F.
 HB.end.
 
 #[export, non_forgetful_inheritance]
-HB.instance Definition _ (R : nzRingType) (M : Lmodule.type R) :=
+HB.instance Definition _ (R : nzRingType) (M : finLmodType R) :=
   [finGroupMixin of M for +%R].
 
-Coercion Lmodule_to_baseFinGroup (R : nzRingType) (M : Lmodule.type R) :=
-  BaseFinGroup.clone M _.
-Coercion Lmodule_to_finGroup (R : nzRingType) (M : Lmodule.type R)
+Coercion Lmodule_to_baseFinGroup (R : nzRingType) (M : finLmodType R) :=
+  FinStarMonoid.clone M _.
+Coercion Lmodule_to_finGroup (R : nzRingType) (M : finLmodType R)
     : finGroupType :=
   FinGroup.clone (M : Type) _.
 
 #[export, non_forgetful_inheritance]
-HB.instance Definition _ (R : nzRingType) (M : Lalgebra.type R) :=
+HB.instance Definition _ (R : nzRingType) (M : finNzLalgType R) :=
   [finGroupMixin of M for +%R].
+Coercion Lalgebra_to_baseFinGroup (R : nzRingType) (M : finNzLalgType R) :=
+  FinStarMonoid.clone M _.
+Coercion Lalgebra_to_finGroup (R : nzRingType) (M : finNzLalgType R) :=
+  FinGroup.clone M _.
 
 #[export, non_forgetful_inheritance]
-HB.instance Definition _ (R : nzRingType) (M : Algebra.type R) :=
+HB.instance Definition _ (R : nzRingType) (M : finNzAlgType R) :=
   [finGroupMixin of M for +%R].
+Coercion Algebra_to_baseFinGroup (R : nzRingType) (M : finNzAlgType R) :=
+  FinStarMonoid.clone M _.
+Coercion Algebra_to_finGroup (R : nzRingType) (M : finNzAlgType R) :=
+  FinGroup.clone M _.
 
 #[export, non_forgetful_inheritance]
-HB.instance Definition _ (R : unitRingType) (M : UnitAlgebra.type R) :=
+HB.instance Definition _ (R : unitRingType) (M : finUnitAlgType R) :=
   [finGroupMixin of M for +%R].
+Coercion UnitAlgebra_to_baseFinGroup
+  (R : unitRingType) (M : finUnitAlgType R) := FinStarMonoid.clone M _.
+Coercion UnitAlgebra_to_finGroup (R : unitRingType) (M : finUnitAlgType R) :=
+  FinGroup.clone M _.
 
 Module RegularExports.
 HB.instance Definition _ (R : finType) := Finite.on R^o.
@@ -414,24 +449,23 @@ End FinRing.
 Import FinRing.
 HB.reexport.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use finNzSemiRingType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=finNzSemiRingType)]
 Notation finSemiRingType := (finNzSemiRingType) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use finNzRingType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=finNzRingType)]
 Notation finRingType := (finNzRingType) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use finComNzSemiRingType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=finComNzSemiRingType)]
 Notation finComSemiRingType := (finComNzSemiRingType) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use finComNzRingType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=finComNzRingType)]
 Notation finComRingType := (finComNzRingType) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=finNzLalgType)]
+Notation finLalgType := (finNzLalgType) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=finNzAlgType)]
+Notation finAlgType := (finNzAlgType) (only parsing).
 
 Lemma card_finNzRing_gt1 (R : finNzRingType) : 1 < #|R|.
 Proof. by rewrite (cardD1 0) (cardD1 1) !inE GRing.oner_neq0. Qed.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use card_finNzRing_gt1 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=card_finNzRing_gt1)]
 Notation card_finRing_gt1 := (card_finNzRing_gt1) (only parsing).
 
 Notation "{ 'unit' R }" := (unit_of R) (format "{ 'unit'  R }") : type_scope.

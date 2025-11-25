@@ -179,8 +179,7 @@ Fixpoint binomial n m :=
   end.
 Arguments binomial : simpl never.
 
-Notation "''C' ( n , m )" := (binomial n m)
-  (format "''C' ( n ,  m )") : nat_scope.
+Notation "''C' ( n , m )" := (binomial n m) : nat_scope.
 
 Lemma binE n m : binomial n m =
   match n, m with
@@ -283,7 +282,7 @@ elim: n => [|n IHn]; first by rewrite big_geq.
 by rewrite big_nat_recr // IHn binS bin1.
 Qed.
 
-#[deprecated(since="mathcomp 2.3.0", note="Use bin2_sum instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=bin2_sum)]
 Notation triangular_sum := bin2_sum (only parsing).
 
 (* textbook proof of `bin2_sum`. Should be moved out of the main
@@ -307,7 +306,7 @@ apply: eq_bigr => i _; rewrite mulnCA (mulnA a) -expnS subnSK //=.
 by rewrite (mulnC b) -2!mulnA -expnSr -mulnDl.
 Qed.
 
-#[deprecated(since="mathcomp 2.3.0", note="Use expnDn instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=expnDn)]
 Definition Pascal := expnDn.
 
 Lemma Vandermonde k l i :

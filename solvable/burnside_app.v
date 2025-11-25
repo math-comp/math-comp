@@ -233,7 +233,7 @@ by rewrite heq1 heq2; apply/eqP).
 Ltac is_isoPtac p f e0 e1 e2 e3 :=
   suff ->: p = f by [rewrite inE eqxx ?orbT];
   let e := fresh "e" in apply/permP;
-  do 5?[case] => // ?; [move: e0 | move: e1 | move: e2 | move: e3] => e;
+  (do 5?[case] => // ?; [move: e0 | move: e1 | move: e2 | move: e3]) => e;
   apply: etrans (congr1 p _) (etrans e _); apply/eqP; rewrite // permE.
 
 Lemma is_isoP : forall p, reflect (is_iso p) (p \in isometries).
@@ -251,7 +251,6 @@ by is_isoPtac p r2 e0 e1 e2 e3.
 by is_isoPtac p r3 e0 e1 e2 e3.
 by is_isoPtac p sv e0 e1 e2 e3.
 Qed.
-
 
 Lemma group_set_iso : group_set isometries.
 Proof.
@@ -747,7 +746,7 @@ move=> p; rewrite !L_iso sop_morph seqs1.
 by move/sop: p; apply/allP; vm_compute.
 Qed.
 
-Definition indir_iso3l := map (mulg s0) dir_iso3l.
+Definition indir_iso3l := map (mul s0) dir_iso3l.
 
 Definition iso3l := dir_iso3l ++ indir_iso3l.
 

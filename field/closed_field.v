@@ -61,7 +61,7 @@ Definition bind T1 T2 (x : cps T1) (f : T1 -> cps T2) : cps T2 :=
   fun k => x (fun x => f x k).
 Arguments bind {T1 T2} x f k /.
 Notation "''let' x <- y ; z" :=
-  (bind y (fun x => z)) (at level 99, x at level 0, y at level 0,
+  (bind y (fun x => z)) (at level 99, x at level 0, z at level 200,
     format "'[hv' ''let'  x  <-  y ;  '/' z ']'").
 
 Definition cpsif T (c : fF) (t : T) (e : T) : cps T :=
@@ -290,10 +290,10 @@ Proof.
 move=> Pk q sq cq c qq r n e /=.
 elim: n c qq r k Pk e => [|n Pn] c qq r k Pk e; rewrite sizeTP.
   case ltrq : (_ < _); first by rewrite /= ltrq /= -Pk.
-  rewrite lead_coefTP => [|a p]; rewrite Pk.
+  rewrite lead_coefTP => [|a p]; rewrite [in LHS]Pk; [|symmetry].
     rewrite ?(eval_mulpT,eval_amulXnT,eval_sumpT,eval_opppT) //=.
     by rewrite ltrq //= !mul_polyC ?(mul0r,add0r,scale0r).
-  by symmetry; rewrite Pk ?(eval_mulpT,eval_amulXnT,eval_sumpT, eval_opppT).
+  by rewrite [in LHS]Pk ?(eval_mulpT,eval_amulXnT,eval_sumpT, eval_opppT).
 case ltrq : (_<_); first by rewrite /= ltrq Pk.
 rewrite lead_coefTP.
   rewrite Pn ?(eval_mulpT,eval_amulXnT,eval_sumpT,eval_opppT) //=.
@@ -928,6 +928,6 @@ have{z} [q ->] := ext1gen _ _ z; set pn := tagged (E_ _) _.
 apply: integral_horner.
   by apply/integral_poly=> i; rewrite coef_map; apply: integral_rmorph.
 apply: integral_root (ext1root _ _) _.
-  by rewrite map_poly_eq0 -size_poly_gt0 ltnW.
+  by rewrite map_poly_eq0 -size_poly_gt0 ltnW ?minXp_gt1.
 by apply/integral_poly=> i; rewrite coef_map; apply: integral_rmorph.
 Qed.

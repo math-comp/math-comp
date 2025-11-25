@@ -106,8 +106,7 @@ Proof. by case: t. Qed.
 
 End TupleDef.
 
-Notation "n .-tuple" := (tuple_of n)
-  (at level 2, format "n .-tuple") : type_scope.
+Notation "n .-tuple" := (tuple_of n) (format "n .-tuple") : type_scope.
 
 Notation "{ 'tuple' n 'of' T }" := (n.-tuple T : predArgType)
   (only parsing) : type_scope.
@@ -434,10 +433,7 @@ Lemma tuple_map_ord U (t : n.-tuple U) : t = [tuple of map (tnth t) ord_tuple].
 Proof. by apply: val_inj => /=; rewrite map_tnth_enum. Qed.
 
 Lemma tnth_ord_tuple i : tnth ord_tuple i = i.
-Proof.
-apply: val_inj; rewrite (tnth_nth i) -(nth_map _ 0) ?size_tuple //.
-by rewrite /= enumT unlock val_ord_enum nth_iota.
-Qed.
+Proof. by rewrite (tnth_nth i) val_ord_tuple nth_ord_enum. Qed.
 
 Section ImageTuple.
 
@@ -499,8 +495,7 @@ Canonical nil_bseq n T := Bseq (isT : @size T [::] <= n).
 Canonical cons_bseq n T x (t : bseq_of n T) :=
   Bseq (valP t : size (x :: t) <= n.+1).
 
-Notation "n .-bseq" := (bseq_of n)
-  (at level 2, format "n .-bseq") : type_scope.
+Notation "n .-bseq" := (bseq_of n) (format "n .-bseq") : type_scope.
 
 Notation "{ 'bseq' n 'of' T }" := (n.-bseq T : predArgType)
   (only parsing) : type_scope.

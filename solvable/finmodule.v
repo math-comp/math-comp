@@ -47,8 +47,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Local Open Scope group_scope.
 Import GRing.Theory FinRing.Theory.
+Local Open Scope group_scope.
 Local Open Scope ring_scope.
 
 Module FiniteModule.
@@ -171,7 +171,7 @@ by apply: val_inj; rewrite !fmvalJ ?groupM ?conjgM.
 Qed.
 
 Canonical actr_action := Action actr_is_action.
-Notation "''M'" := actr_action (at level 8) : action_scope.
+Notation "''M'" := actr_action : action_scope.
 
 Lemma act0r x : 0 ^@ x = 0.
 Proof. by rewrite /actr conj1g morph1 if_same. Qed.
@@ -198,7 +198,7 @@ by apply/morphicP=> u v _ _; rewrite !permE /= actAr.
 Qed.
 
 Canonical actr_groupAction := GroupAction actr_is_groupAction.
-Notation "''M'" := actr_groupAction (at level 8) : groupAction_scope.
+Notation "''M'" := actr_groupAction : groupAction_scope.
 
 Lemma actr1 u : u ^@ 1 = u.
 Proof. exact: act1. Qed.
@@ -222,7 +222,7 @@ End OneFinMod.
 Bind Scope ring_scope with fmod_of.
 Prenex Implicits fmval fmod actr.
 Notation "u ^@ x" := (actr u x) : ring_scope.
-Notation "''M'" := actr_action (at level 8) : action_scope.
+Notation "''M'" := actr_action : action_scope.
 Notation "''M'" := actr_groupAction : groupAction_scope.
 
 Module Exports.
@@ -459,7 +459,8 @@ case: repr_rcosetP => h1 Hh1; case: repr_rcosetP => h2 Hh2.
 have: H :* (x * g) \in rcosets H G by rewrite -rcosetE imset_f ?groupM.
 have: H :* x \in rcosets H G by rewrite -rcosetE imset_f.
 case/mem_rX/rcosetP=> h3 Hh3 -> /mem_rX/rcosetP[h4 Hh4 ->].
-rewrite -!(mulgA h1) -!(mulgA h2) -!(mulgA h3) !(mulKVg, invMg).
+rewrite -!(mulgA h1) -!(mulgA h2) -!(mulgA h3).
+do 3 rewrite invMg mulKVg.
 by rewrite addrC -!zmodMgE -!morphM ?groupM ?groupV // -!mulgA !mulKg.
 Qed.
 

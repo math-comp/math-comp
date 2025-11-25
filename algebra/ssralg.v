@@ -16,7 +16,7 @@ From mathcomp Require Import monoid.
 (*                                                                            *)
 (* This file defines the following algebraic structures:                      *)
 (*                                                                            *)
-(*  semiPzRingType == non-commutative semi rings                              *)
+(*  pzSemiRingType == non-commutative semi rings                              *)
 (*                    (NModule with a multiplication)                         *)
 (*                    The HB class is called PzSemiRing.                      *)
 (*  nzSemiRingType == non-commutative non-trivial semi rings                  *)
@@ -42,22 +42,34 @@ From mathcomp Require Import monoid.
 (*      lmodType R == module with left multiplication by external scalars     *)
 (*                    in the pzRing R                                         *)
 (*                    The HB class is called Lmodule.                         *)
-(*  lSemiAlgType R == left semialgebra, semiring with scaling that associates *)
-(*                    on the left                                             *)
-(*                    The HB class is called LSemiAlgebra.                    *)
-(*      lalgType R == left algebra, ring with scaling that associates on the  *)
+(*  pzLSemiAlgType R == left semialgebra, semiring with scaling that          *)
+(*                    associates on the left                                  *)
+(*                    The HB class is called PzLSemiAlgebra.                  *)
+(*  nzLSemiAlgType R == non-trivial left semialgebra                          *)
+(*                    The HB class is called NzLSemiAlgebra.                  *)
+(*    pzLalgType R == left algebra, ring with scaling that associates on the  *)
 (*                    left                                                    *)
-(*                    The HB class is called Lalgebra.                        *)
-(*   semiAlgType R == semialgebra, semiring with scaling that associates both *)
+(*                    The HB class is called PzLalgebra.                      *)
+(*    nzLalgType R == non-trivial left algebra                                *)
+(*                    The HB class is called NzLalgebra.                      *)
+(* pzSemiAlgType R == semialgebra, semiring with scaling that associates both *)
 (*                    left and right                                          *)
-(*                    The HB class is called SemiAlgebra.                     *)
-(*       algType R == algebra, ring with scaling that associates both left    *)
+(*                    The HB class is called PzSemiAlgebra.                   *)
+(* nzSemiAlgType R == non-trivial semialgebra                                 *)
+(*                    The HB class is called NzSemiAlgebra.                   *)
+(*     pzAlgType R == algebra, ring with scaling that associates both left    *)
 (*                    and right                                               *)
-(*                    The HB class is called Algebra.                         *)
-(*comSemiAlgType R == commutative semiAlgType                                 *)
-(*                    The HB class is called ComSemiAlgebra.                  *)
-(*    comAlgType R == commutative algType                                     *)
-(*                    The HB class is called ComAlgebra.                      *)
+(*                    The HB class is called PzAlgebra.                       *)
+(*     nzAlgType R == non-trivial algebra                                     *)
+(*                    The HB class is called NzAlgebra.                       *)
+(* comPzSemiAlgType R == commutative pzSemiAlgType                            *)
+(*                    The HB class is called ComPzSemiAlgebra.                *)
+(* comNzSemiAlgType R == commutative nzSemiAlgType                            *)
+(*                    The HB class is called ComNzSemiAlgebra.                *)
+(*  comPzAlgType R == commutative pzAlgType                                   *)
+(*                    The HB class is called ComPzAlgebra.                    *)
+(*  comNzAlgType R == commutative nzAlgType                                   *)
+(*                    The HB class is called ComNzAlgebra.                    *)
 (*    unitRingType == Rings whose units have computable inverses              *)
 (*                    The HB class is called UnitRing.                        *)
 (* comUnitRingType == commutative UnitRing                                    *)
@@ -109,18 +121,30 @@ From mathcomp Require Import monoid.
 (*       subLmodType R V P == join of lmodType and subType (P : pred V)       *)
 (*                            such that val is scalable                       *)
 (*                            The HB class is called SubLmodule.              *)
-(*   subLSemiAlgType R V P == join of lSemiAlgType and subType (P : pred V)   *)
+(* subPzLSemiAlgType R V P == join of pzLSemiAlgType and subType (P : pred V) *)
 (*                            such that val is linear                         *)
-(*                            The HB class is called SubLSemiAlgebra.         *)
-(*       subLalgType R V P == join of lalgType and subType (P : pred V)       *)
+(*                            The HB class is called SubPzLSemiAlgebra.       *)
+(* subNzLSemiAlgType R V P == join of nzLSemiAlgType and subType (P : pred V) *)
 (*                            such that val is linear                         *)
-(*                            The HB class is called SubLalgebra.             *)
-(*    subSemiAlgType R V P == join of semiAlgType and subType (P : pred V)    *)
+(*                            The HB class is called SubNzLSemiAlgebra.       *)
+(*     subPzLalgType R V P == join of pzLalgType and subType (P : pred V)     *)
 (*                            such that val is linear                         *)
-(*                            The HB class is called SubSemiAlgebra.          *)
-(*        subAlgType R V P == join of algType and subType (P : pred V)        *)
+(*                            The HB class is called SubPzLalgebra.           *)
+(*     subNzLalgType R V P == join of nzLalgType and subType (P : pred V)     *)
 (*                            such that val is linear                         *)
-(*                            The HB class is called SubAlgebra.              *)
+(*                            The HB class is called SubNzLalgebra.           *)
+(*  subPzSemiAlgType R V P == join of pzSemiAlgType and subType (P : pred V)  *)
+(*                            such that val is linear                         *)
+(*                            The HB class is called SubPzSemiAlgebra.        *)
+(*  subNzSemiAlgType R V P == join of nzSemiAlgType and subType (P : pred V)  *)
+(*                            such that val is linear                         *)
+(*                            The HB class is called SubNzSemiAlgebra.        *)
+(*      subPzAlgType R V P == join of pzAlgType and subType (P : pred V)      *)
+(*                            such that val is linear                         *)
+(*                            The HB class is called SubPzAlgebra.            *)
+(*      subNzAlgType R V P == join of nzAlgType and subType (P : pred V)      *)
+(*                            such that val is linear                         *)
+(*                            The HB class is called SubNzAlgebra.            *)
 (*     subUnitRingType R P == join of unitRingType and subType (P : pred R)   *)
 (*                            such that val is a ring morphism                *)
 (*                            The HB class is called SubUnitRing.             *)
@@ -137,7 +161,7 @@ From mathcomp Require Import monoid.
 (* Morphisms between the above structures (see below for details):            *)
 (*                                                                            *)
 (*      {rmorphism R -> S} == semi ring (resp. ring) morphism between         *)
-(*                            semiPzRingType (resp. pzRingType) instances     *)
+(*                            pzSemiRingType (resp. pzRingType) instances     *)
 (*                            R and S.                                        *)
 (*                            The HB class is called RMorphism.               *)
 (*     {linear U -> V | s} == semilinear (resp. linear) functions of type     *)
@@ -176,7 +200,7 @@ From mathcomp Require Import monoid.
 (*  zmodClosed V == predicate closed under opposite and addition on V         *)
 (*                  The HB class is called ZmodClosed.                        *)
 (* mulr2Closed R == predicate closed under multiplication on                  *)
-(*                  R : semiPzRingType                                        *)
+(*                  R : pzSemiRingType                                        *)
 (*                  The HB class is called Mul2Closed.                        *)
 (*  mulrClosed R == predicate closed under multiplication and for 1           *)
 (*                  The HB class is called MulClosed.                         *)
@@ -194,11 +218,11 @@ From mathcomp Require Import monoid.
 (*                  The HB class is called SdivClosed.                        *)
 (* submodClosed R == predicate closed under lSemiModType operations           *)
 (*                  The HB class is called SubmodClosed.                      *)
-(* subalgClosed R == predicate closed under lSemiAlgType operations           *)
+(* subalgClosed R == predicate closed under pzLSemiAlgType operations         *)
 (*                  The HB class is called SubalgClosed.                      *)
-(* divringClosed R == predicate closed under unitRing operations              *)
+(* divringClosed R == predicate closed under unitRingType operations          *)
 (*                  The HB class is called DivringClosed.                     *)
-(* divalgClosed R S == predicate closed under (S : unitAlg R) operations      *)
+(* divalgClosed R S == predicate closed under unitAlgType operations          *)
 (*                  The HB class is called DivalgClosed.                      *)
 (*                                                                            *)
 (* The rpred* lemmas ensure that the set S remains stable under the specified *)
@@ -240,6 +264,9 @@ From mathcomp Require Import monoid.
 (* [SubChoice_isSubZmodule of U by <:] == zmodType mixin for a subType whose  *)
 (*                          base type is a zmodType and whose predicate's     *)
 (*                          is a zmodClosed                                   *)
+(* [SubNmodule_isSubZmodule of U by <:] == zmodType mixin for a subNmodType   *)
+(*                          base type is a zmodType and whose predicate's     *)
+(*                          is an opprClosed                                  *)
 (*                                                                            *)
 (*  * PzSemiRing (non-commutative semirings):                                 *)
 (*                    R^c == the converse (semi)ring for R: R^c is convertible*)
@@ -275,13 +302,13 @@ From mathcomp Require Import monoid.
 (*      semiring_closed S <-> collective predicate S is closed under semiring *)
 (*                           operations (0, 1, x + y and x * y in S)          *)
 (* [SubNmodule_isSubPzSemiRing of R by <:] ==                                 *)
-(* [SubChoice_isSubPzSemiRing of R by <:] == semiPzRingType mixin for a       *)
+(* [SubChoice_isSubPzSemiRing of R by <:] == pzSemiRingType mixin for a       *)
 (*                           subType whose base type is a pzSemiRingType and  *)
 (*                           whose predicate's is a semiringClosed            *)
 (*                                                                            *)
 (*  * NzSemiRing (non-commutative non-trivial semirings):                     *)
 (* [SubNmodule_isSubNzSemiRing of R by <:] ==                                 *)
-(* [SubChoice_isSubNzSemiRing of R by <:] == semiNzRingType mixin for a       *)
+(* [SubChoice_isSubNzSemiRing of R by <:] == nzSemiRingType mixin for a       *)
 (*                           subType whose base type is a nzSemiRingType and  *)
 (*                           whose predicate's is a semiringClosed            *)
 (*                                                                            *)
@@ -411,38 +438,44 @@ From mathcomp Require Import monoid.
 (*                           combinations (a *: u + v in S when u, v in S)    *)
 (*        submod_closed S <-> collective predicate S is closed under lmodType *)
 (*                           operations (0 and a *: u + v in S)               *)
-(* [SubZmodule_isSubLmodule of V by <:] ==                                    *)
 (* [SubChoice_isSubLmodule of V by <:] == mixin axiom for a subType of an     *)
 (*                           lmodType                                         *)
 (*                                                                            *)
-(*  * LSemiAlgebra                                                            *)
+(*  * PzLSemiAlgebra                                                          *)
 (*    (left semialgebra, semiring with scaling that associates on the left):  *)
 (*                    R^o == the regular (semi)algebra of R: R^o is           *)
-(*                           convertible to R, but when R has a               *)
-(*                           nz(Semi)RingType structure then R^o extends it   *)
-(*                           to an l(Semi)AlgType structure by letting R act  *)
-(*                           on itself: if x : R and y : R^o then             *)
+(*                           convertible to R, but when R has a (semi)ring    *)
+(*                           structure then R^o extends it to a left          *)
+(*                           (semi)algebra structure by letting R act on      *)
+(*                           itself: if x : R and y : R^o then                *)
 (*                           x *: y = x * (y : R)                             *)
 (*                   k%:A == the image of the scalar k in a left semialgebra; *)
 (*                           this is simply notation for k *: 1               *)
+(*    subsemialg_closed S <-> collective predicate S is closed under          *)
+(*                           lSemiAlgType operations                          *)
+(*                           (0, 1, +%R, *%R, and *:%R)                       *)
 (* [SubSemiRing_SubLSemiModule_isSubLSemiAlgebra of V by <:]                  *)
-(*                        == mixin axiom for a subType of an lSemiAlgType     *)
+(* [SubChoice_isSubPzLSemiAlgebra of V by <:] == mixin axiom for a subType of *)
+(*                           a pzLSemiAlgType                                 *)
 (*                                                                            *)
-(*  * Lalgebra (left algebra, ring with scaling that associates on the left): *)
-(*        subalg_closed S <-> collective predicate S is closed under lalgType *)
-(*                           operations (1, a *: u + v and u * v in S)        *)
-(* [SubNzRing_SubLmodule_isSubLalgebra of V by <:] ==                         *)
-(* [SubChoice_isSubLalgebra of V by <:] == mixin axiom for a subType of an    *)
-(*                           lalgType                                         *)
+(*  * PzLalgebra                                                              *)
+(*    (left algebra, ring with scaling that associates on the left):          *)
+(*        subalg_closed S <-> collective predicate S is closed under          *)
+(*                           pzLalgType operations                            *)
+(*                           (1, a *: u + v and u * v in S)                   *)
+(* [SubRing_SubLmodule_isSubLalgebra of V by <:] ==                           *)
+(* [SubChoice_isSubPzLalgebra of V by <:] == mixin axiom for a subType of a   *)
+(*                           pzLalgType                                       *)
 (*                                                                            *)
-(*  * SemiAlgebra (semiring with scaling that associates both left and right):*)
+(*  * PzSemiAlgebra                                                           *)
+(*    (semiring with scaling that associates both left and right):            *)
 (* [SubLSemiAlgebra_isSubSemiAlgebra of V by <:] ==                           *)
-(*                        == mixin axiom for a subType of an semiAlgType      *)
+(* [SubChoice_isSubPzSemiAlgebra of V by <:] == mixin axiom for a subType of  *)
+(*                           a pzSemiAlgType                                  *)
 (*                                                                            *)
-(*  * Algebra (ring with scaling that associates both left and right):        *)
-(* [SubLalgebra_isSubAlgebra of V by <:] ==                                   *)
-(* [SubChoice_isSubAlgebra of V by <:] == mixin axiom for a subType of an     *)
-(*                           algType                                          *)
+(*  * PzAlgebra (ring with scaling that associates both left and right):      *)
+(* [SubChoice_isSubPzAlgebra of V by <:] == mixin axiom for a subType of a    *)
+(*                           pzAlgType                                        *)
 (*                                                                            *)
 (*  * UnitAlgebra (algebra with computable inverses):                         *)
 (*        divalg_closed S <-> collective predicate S is closed under all      *)
@@ -549,7 +582,7 @@ From mathcomp Require Import monoid.
 (*    are coercions the machinery will be mostly invisible (with only the     *)
 (*    {linear ...} structure and %Rlin notations showing), but users should   *)
 (*    beware that in (a *: f u)%Rlin, a actually occurs in the f u subterm.   *)
-(* -> The simpler linear_LR, or more specialized linearZZ and scalarZ rules   *)
+(* -> The simpler linearZ_LR, or more specialized linearZZ and scalarZ rules  *)
 (*    should be used instead of linearZ if there are complexity issues, as    *)
 (*    well as for explicit forward and backward application, as the main      *)
 (*    parameter of linearZ is a proper sub-interface of {linear U -> V | s}.  *)
@@ -686,6 +719,9 @@ Reserved Notation "'{' 'linear' U '->' V '}'"
    format "{ 'linear'  U  ->  V }").
 Reserved Notation "'{' 'scalar' U '}'" (format "{ 'scalar'  U }").
 
+Reserved Notation "R ^c" (format "R ^c").
+Reserved Notation "R ^o" (format "R ^o").
+
 Declare Scope ring_scope.
 Delimit Scope ring_scope with R.
 Declare Scope term_scope.
@@ -777,8 +813,7 @@ Proof. exact: sumr_const. Qed.
 Lemma sumr_const_nat m n x : \sum_(n <= i < m) x = x *+ (m - n).
 Proof. exact: sumr_const_nat. Qed.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Algebra.nmod_closed instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Algebra.nmod_closed)]
 Definition addr_closed := nmod_closed.
 
 End NmoduleTheory.
@@ -803,6 +838,7 @@ Lemma addNKr : @rev_left_loop V V -%R +%R. Proof. exact: addNKr. Qed.
 Lemma addrK : @right_loop V V -%R +%R. Proof. exact: addrK. Qed.
 Lemma addrNK : @rev_right_loop V V -%R +%R. Proof. exact: addrNK. Qed.
 Definition subrK := addrNK.
+Lemma subrKC x y : x + (y - x) = y. Proof. by rewrite addrC subrK. Qed.
 Lemma subKr x : involutive (fun y => x - y). Proof. exact: subKr. Qed.
 Lemma addrI : @right_injective V V V +%R. Proof. exact: addrI. Qed.
 Lemma addIr : @left_injective V V V +%R. Proof. exact: addIr. Qed.
@@ -1014,19 +1050,15 @@ HB.mixin Record PzSemiRing_isNonZero R of PzSemiRing R := {
 HB.structure Definition NzSemiRing :=
   { R of PzSemiRing_isNonZero R & PzSemiRing R }.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzSemiRing)]
 Notation SemiRing R := (NzSemiRing R) (only parsing).
 
 Module SemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzSemiRing.sort)]
 Notation sort := (NzSemiRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzSemiRing.on)]
 Notation on R := (NzSemiRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzSemiRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzSemiRing.copy)]
 Notation copy T U := (NzSemiRing.copy T U) (only parsing).
 End SemiRing.
 
@@ -1052,13 +1084,11 @@ HB.builders Context R of Nmodule_isNzSemiRing R.
 HB.end.
 
 Module Nmodule_isSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Nmodule_isNzSemiRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Nmodule_isNzSemiRing.Build)]
 Notation Build R := (Nmodule_isNzSemiRing.Build R) (only parsing).
 End Nmodule_isSemiRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Nmodule_isNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Nmodule_isNzSemiRing)]
 Notation Nmodule_isSemiRing R := (Nmodule_isNzSemiRing R) (only parsing).
 
 HB.factory Record isNzSemiRing R of Choice R := {
@@ -1080,14 +1110,12 @@ HB.factory Record isNzSemiRing R of Choice R := {
 }.
 
 Module isSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isNzSemiRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isNzSemiRing.Build)]
 Notation Build R := (isNzSemiRing.Build R) (only parsing).
 End isSemiRing.
 
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isNzSemiRing)]
 Notation isSemiRing R := (isNzSemiRing R) (only parsing).
 
 HB.builders Context R of isNzSemiRing R.
@@ -1127,17 +1155,17 @@ Local Notation "\prod_ ( m <= i < n ) F" := (\big[*%R/1%R]_(m <= i < n) F%R).
 Definition pchar (R : nzSemiRingType) : nat_pred :=
   [pred p | prime p & p%:R == 0 :> R].
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar)]
 Notation char := pchar (only parsing).
 
 Local Notation has_pchar0 L := (pchar L =i pred0).
 
-#[deprecated(since="mathcomp 2.4.0", note="Use has_pchar0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=has_pchar0)]
 Notation has_char0 L := (has_pchar0 L) (only parsing).
 
 (* Converse ring tag. *)
 Definition converse R : Type := R.
-Local Notation "R ^c" := (converse R) (at level 2, format "R ^c") : type_scope.
+Local Notation "R ^c" := (converse R) : type_scope.
 
 Section PzSemiRingTheory.
 
@@ -1245,7 +1273,7 @@ Qed.
 Lemma exprMn_n x m n : (x *+ m) ^+ n = x ^+ n *+ (m ^ n) :> R.
 Proof.
 elim: n => [|n IHn]; first by rewrite mulr1n.
-by rewrite (exprS (x *+ m)) IHn mulrnAl mulrnAr -mulrnA exprS -expnSr.
+by rewrite exprS IHn mulrnAl mulrnAr -mulrnA exprS expnSr.
 Qed.
 
 Lemma exprM x m n : x ^+ (m * n) = x ^+ m ^+ n.
@@ -1530,54 +1558,52 @@ Bind Scope ring_scope with PzRing.sort.
 End PzRingExports.
 HB.export PzRingExports.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut)]
 Notation Frobenius_aut := pFrobenius_aut (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf0)]
 Notation charf0 := pcharf0 (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf_prime instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf_prime)]
 Notation charf_prime := pcharf_prime (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use natr_mod_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=mulrn_pchar)]
+Notation mulrn_char := mulrn_pchar (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=natr_mod_pchar)]
 Notation natr_mod_char := natr_mod_pchar (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use dvdn_pcharf instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=dvdn_pcharf)]
 Notation dvdn_charf := dvdn_pcharf (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf_eq instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf_eq)]
 Notation charf_eq := pcharf_eq (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use bin_lt_pcharf_0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=bin_lt_pcharf_0)]
 Notation bin_lt_charf_0 := bin_lt_pcharf_0 (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autE instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autE)]
 Notation Frobenius_autE := pFrobenius_autE (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut0)]
 Notation Frobenius_aut0 := pFrobenius_aut0 (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut1 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut1)]
 Notation Frobenius_aut1 := pFrobenius_aut1 (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autD_comm instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autD_comm)]
 Notation Frobenius_autD_comm := pFrobenius_autD_comm (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autMn instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autMn)]
 Notation Frobenius_autMn := pFrobenius_autMn (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut_nat instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut_nat)]
 Notation Frobenius_aut_nat := pFrobenius_aut_nat (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autM_comm instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autM_comm)]
 Notation Frobenius_autM_comm := pFrobenius_autM_comm (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autX instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autX)]
 Notation Frobenius_autX := pFrobenius_autX (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use addrr_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=addrr_pchar2)]
 Notation addrr_char2 := addrr_pchar2 (only parsing).
 
 #[short(type="nzRingType")]
 HB.structure Definition NzRing := { R of NzSemiRing R & Zmodule R }.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzRing)]
 Notation Ring R := (NzRing R) (only parsing).
 
 Module Ring.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzRing.sort)]
 Notation sort := (NzRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzRing.on)]
 Notation on R := (NzRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzRing.copy)]
 Notation copy T U := (NzRing.copy T U) (only parsing).
 End Ring.
 
@@ -1593,13 +1619,11 @@ HB.factory Record Zmodule_isNzRing R of Zmodule R := {
 }.
 
 Module Zmodule_isRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Zmodule_isNzRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Zmodule_isNzRing.Build)]
 Notation Build R := (Zmodule_isNzRing.Build R) (only parsing).
 End Zmodule_isRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Zmodule_isNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Zmodule_isNzRing)]
 Notation Zmodule_isRing R := (Zmodule_isNzRing R) (only parsing).
 
 HB.builders Context R of Zmodule_isNzRing R.
@@ -1627,13 +1651,11 @@ HB.factory Record isNzRing R of Choice R := {
 }.
 
 Module isRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isNzRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isNzRing.Build)]
 Notation Build R := (isNzRing.Build R) (only parsing).
 End isRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isNzRing)]
 Notation isRing R := (isNzRing R) (only parsing).
 
 HB.builders Context R of isNzRing R.
@@ -1862,19 +1884,19 @@ End Char2.
 
 End NzRingTheory.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autN instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autN)]
 Notation Frobenius_autN := pFrobenius_autN (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autB_comm instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autB_comm)]
 Notation Frobenius_autB_comm := pFrobenius_autB_comm (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use exprNn_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=exprNn_pchar)]
 Notation exprNn_char := exprNn_pchar (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use oppr_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=oppr_pchar2)]
 Notation oppr_char2 := oppr_pchar2 (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use subr_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=subr_pchar2)]
 Notation subr_char2 := subr_pchar2 (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use addrK_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=addrK_pchar2)]
 Notation addrK_char2 := addrK_pchar2 (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use addKr_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=addKr_pchar2)]
 Notation addKr_char2 := addKr_pchar2 (only parsing).
 
 Section ConverseRing.
@@ -2141,49 +2163,96 @@ move=> /[dup] /submod_closedB /zmod_closedD SD [S0 Slin]; split => // a v Sv.
 by rewrite -[a *: v]addr0 Slin.
 Qed.
 
+Lemma subsemimod_closed_submod : subsemimod_closed S -> submod_closed.
+Proof. by case=> [[S0 SD] SZ]; split => // a u v Su Sv; apply/SD/Sv/SZ. Qed.
+
+Lemma subsemimod_closedB : subsemimod_closed S -> zmod_closed S.
+Proof. by move/subsemimod_closed_submod/submod_closedB. Qed.
+
 End ClosedPredicates.
 
 End LmoduleTheory.
 
-(* TOTHINK: Can I change `NzSemiRing` to `PzSemiRing`? *)
 HB.mixin Record LSemiModule_isLSemiAlgebra R V
-  of NzSemiRing V & LSemiModule R V := {
+  of PzSemiRing V & LSemiModule R V := {
   scalerAl : forall (a : R) (u v : V), a *: (u * v) = (a *: u) * v
 }.
-#[short(type="lSemiAlgType")]
-HB.structure Definition LSemiAlgebra R :=
+
+Module Lmodule_isLalgebra.
+#[deprecated(since="mathcomp 2.6.0", use=LSemiModule_isLSemiAlgebra.Build)]
+Notation Build R V := (LSemiModule_isLSemiAlgebra.Build R V) (only parsing).
+End Lmodule_isLalgebra.
+
+#[deprecated(since="mathcomp 2.6.0", use=LSemiModule_isLSemiAlgebra)]
+Notation Lmodule_isLalgebra R V :=
+  (LSemiModule_isLSemiAlgebra R V) (only parsing).
+
+#[short(type="pzLSemiAlgType")]
+HB.structure Definition PzLSemiAlgebra R :=
+  {A of LSemiModule R A & PzSemiRing A & LSemiModule_isLSemiAlgebra R A}.
+
+Module PzLSemiAlgExports.
+Bind Scope ring_scope with PzLSemiAlgebra.sort.
+End PzLSemiAlgExports.
+HB.export PzLSemiAlgExports.
+
+#[short(type="nzLSemiAlgType")]
+HB.structure Definition NzLSemiAlgebra (R : nzSemiRingType) :=
   {A of LSemiModule R A & NzSemiRing A & LSemiModule_isLSemiAlgebra R A}.
 
-Module LSemiAlgExports.
-Bind Scope ring_scope with LSemiAlgebra.sort.
-End LSemiAlgExports.
-HB.export LSemiAlgExports.
+Module NzLSemiAlgExports.
+Bind Scope ring_scope with NzLSemiAlgebra.sort.
+End NzLSemiAlgExports.
+HB.export NzLSemiAlgExports.
+
+#[deprecated(since="mathcomp 2.6.0", use=NzLSemiAlgebra)]
+Notation LSemiAlgebra R := (NzLSemiAlgebra R) (only parsing).
+
+Module LSemiAlgebra.
+#[deprecated(since="mathcomp 2.6.0", use=NzLSemiAlgebra.sort)]
+Notation sort := (NzLSemiAlgebra.sort) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=NzLSemiAlgebra.on)]
+Notation on R := (NzLSemiAlgebra.on R) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=NzLSemiAlgebra.copy)]
+Notation copy T U := (NzLSemiAlgebra.copy T U) (only parsing).
+End LSemiAlgebra.
 
 (* Scalar injection (see the definition of in_alg A below). *)
 Local Notation "k %:A" := (k *: 1) : ring_scope.
 
-#[short(type="lalgType")]
-HB.structure Definition Lalgebra R :=
+#[short(type="pzLalgType")]
+HB.structure Definition PzLalgebra R :=
+  {A of Lmodule R A & PzRing A & LSemiModule_isLSemiAlgebra R A}.
+
+Module PzLalgExports.
+Bind Scope ring_scope with PzLalgebra.sort.
+End PzLalgExports.
+HB.export PzLalgExports.
+
+#[short(type="nzLalgType")]
+HB.structure Definition NzLalgebra (R : nzRingType) :=
   {A of Lmodule R A & NzRing A & LSemiModule_isLSemiAlgebra R A}.
 
-Module LalgExports.
-Bind Scope ring_scope with Lalgebra.sort.
-End LalgExports.
-HB.export LalgExports.
+Module NzLalgExports.
+Bind Scope ring_scope with NzLalgebra.sort.
+End NzLalgExports.
+HB.export NzLalgExports.
 
-HB.factory Record Lmodule_isLalgebra R V of NzRing V & Lmodule R V := {
-  scalerAl : forall (a : R) (u v : V), a *: (u * v) = (a *: u) * v
-}.
+#[deprecated(since="mathcomp 2.6.0", use=NzLalgebra)]
+Notation Lalgebra R := (NzLalgebra R) (only parsing).
 
-HB.builders Context R V of Lmodule_isLalgebra R V.
-
-HB.instance Definition _ := LSemiModule_isLSemiAlgebra.Build R V scalerAl.
-
-HB.end.
+Module Lalgebra.
+#[deprecated(since="mathcomp 2.6.0", use=NzLalgebra.sort)]
+Notation sort := (NzLalgebra.sort) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=NzLalgebra.on)]
+Notation on R := (NzLalgebra.on R) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=NzLalgebra.copy)]
+Notation copy T U := (NzLalgebra.copy T U) (only parsing).
+End Lalgebra.
 
 (* Regular ring algebra tag. *)
 Definition regular R : Type := R.
-Local Notation "R ^o" := (regular R) (at level 2, format "R ^o") : type_scope.
+Local Notation "R ^o" := (regular R) : type_scope.
 
 Section RegularAlgebra.
 #[export]
@@ -2199,8 +2268,10 @@ HB.instance Definition _ (R : pzSemiRingType) :=
   @Nmodule_isLSemiModule.Build R R^o
     mul mulrA mul0r mul1r mulrDr (fun v a b => mulrDl a b v).
 #[export]
-HB.instance Definition _ (R : nzSemiRingType) :=
+HB.instance Definition _ (R : pzSemiRingType) :=
   LSemiModule_isLSemiAlgebra.Build R R^o mulrA.
+#[export]
+HB.instance Definition _ (R : nzSemiRingType) := NzSemiRing.on R^o.
 #[export]
 HB.instance Definition _ (R : pzRingType) := PzRing.on R^o.
 #[export]
@@ -2209,16 +2280,31 @@ End RegularAlgebra.
 
 Section LSemiAlgebraTheory.
 
-Variables (R : pzSemiRingType) (A : lSemiAlgType R).
+Variables (R : pzSemiRingType) (A : pzLSemiAlgType R).
 
 Lemma mulr_algl (a : R) (x : A) : (a *: 1) * x = a *: x.
 Proof. by rewrite -scalerAl mul1r. Qed.
+
+Section ClosedPredicates.
+
+Variable S : {pred A}.
+
+Definition subsemialg_closed :=
+  [/\ 1 \in S, nmod_closed S, scaler_closed S & mulr_2closed S].
+
+Lemma subsemialg_closedZ : subsemialg_closed -> subsemimod_closed S.
+Proof. by case. Qed.
+
+Lemma subsemialg_closedM : subsemialg_closed -> semiring_closed S.
+Proof. by case. Qed.
+
+End ClosedPredicates.
 
 End LSemiAlgebraTheory.
 
 Section LalgebraTheory.
 
-Variables (R : pzRingType) (A : lalgType R).
+Variables (R : pzRingType) (A : pzLalgType R).
 
 Section ClosedPredicates.
 
@@ -2231,6 +2317,18 @@ Proof. by case=> S1 Slin _; split; rewrite // -(subrr 1) linear_closedB. Qed.
 
 Lemma subalg_closedBM : subalg_closed -> subring_closed S.
 Proof. by case=> S1 Slin SM; split=> //; apply: linear_closedB. Qed.
+
+Lemma subalg_closed_semi : subalg_closed -> subsemialg_closed S.
+Proof.
+move=> /[dup] /subalg_closedZ /submod_closedB /zmod_closedD.
+by move=> [S0 SD] [S1 Slin SM]; split => // a u Su; rewrite -[a *: u]addr0 Slin.
+Qed.
+
+Lemma subsemialg_closed_subalg : subsemialg_closed S -> subalg_closed.
+Proof. by case=> S1 [S0 SD] SZ SM; split => // a u v Su Sv; apply/SD/Sv/SZ. Qed.
+
+Lemma subsemialg_closedBM : subsemialg_closed S -> subring_closed S.
+Proof. by move/subsemialg_closed_subalg/subalg_closedBM. Qed.
 
 End ClosedPredicates.
 
@@ -2250,7 +2348,7 @@ End LiftedSemiRing.
 (* Lifted linear operations. *)
 Section LiftedScale.
 Variables (R : pzSemiRingType) (U : Type).
-Variables (V : lSemiModType R) (A : lSemiAlgType R).
+Variables (V : lSemiModType R) (A : pzLSemiAlgType R).
 Definition scale_fun a (f : U -> V) x := a *: f x.
 Definition in_alg k : A := k%:A.
 End LiftedScale.
@@ -2347,7 +2445,10 @@ End ScaleFun.
 
 End AdditiveTheory.
 
-#[deprecated(since="mathcomp 2.5.0", note="use `monoid_morphism` instead")]
+(* FIXME: remove once PzSemiRing extends Monoid. *)
+Definition monoid_morphism (R S : pzSemiRingType) (f : R -> S) : Prop :=
+   (f 1 = 1) * {morph f : x y / x * y}%R.
+#[deprecated(since="mathcomp 2.5.0", use=monoid_morphism)]
 Definition multiplicative (R S : pzSemiRingType) (f : R -> S) : Prop :=
   {morph f : x y / x * y}%R * (f 1 = 1).
 
@@ -2401,8 +2502,8 @@ Proof. exact: raddf_sum. Qed.
 
 Lemma rmorphism_monoidP : monoid_morphism f.
 Proof. exact: gmulfM1. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `rmorphism_monoidP` instead")]
+#[warning="-deprecated-reference-since-mathcomp-2.5.0",
+  deprecated(since="mathcomp 2.5.0", use=rmorphism_monoidP)]
 Definition rmorphismMP : multiplicative f :=
   (fun p => (p.2, p.1)) rmorphism_monoidP.
 
@@ -2429,8 +2530,7 @@ Proof.
 move=> fK f'K.
 by split=> [|x y]; apply: (canLR fK); rewrite /= (rmorph1, rmorphM) ?f'K.
 Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `can2_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=can2_monoid_morphism)]
 Definition can2_rmorphism f' (cff' : cancel f f') :=
   (fun p => (p.2, p.1)) \o (can2_monoid_morphism cff').
 
@@ -2480,7 +2580,7 @@ End Properties.
 
 Section InSemiAlgebra.
 
-Variables (R : pzSemiRingType) (A : lSemiAlgType R).
+Variables (R : pzSemiRingType) (A : pzLSemiAlgType R).
 
 Fact in_alg_is_nmod_morphism : nmod_morphism (in_alg A).
 Proof. by split; [exact: scale0r | exact: scalerDl]. Qed.
@@ -2501,7 +2601,7 @@ End InSemiAlgebra.
 
 End RmorphismTheory.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use rmorph_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=rmorph_pchar)]
 Notation rmorph_char := rmorph_pchar (only parsing).
 
 Module Scale.
@@ -2658,8 +2758,7 @@ Definition linear_for (R : pzSemiRingType) (U : lSemiModType R) (V : nmodType)
 Lemma zmod_morphism_linear (R : pzRingType) (U : lmodType R) V
   (s : Scale.law R V) (f : U -> V) : linear_for s f -> zmod_morphism f.
 Proof. by move=> Lsf x y; rewrite -scaleN1r addrC Lsf Scale.N1op addrC. Qed.
-#[deprecated(since="mathcomp 2.5.0",
-      note="use `zmod_morphism_linear` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=zmod_morphism_linear)]
 Definition additive_linear := zmod_morphism_linear.
 
 Lemma scalable_linear (R : pzRingType) (U : lmodType R) V
@@ -2898,7 +2997,7 @@ End Scale.
 
 Section LinearLSemiAlg.
 
-Variables (R : pzSemiRingType) (A : lSemiAlgType R) (U : lSemiModType R).
+Variables (R : pzSemiRingType) (A : pzLSemiAlgType R) (U : lSemiModType R).
 Variables (a : A) (f : {linear U -> A}).
 
 Fact mulr_fun_is_scalable : scalable (a \o* f).
@@ -2911,7 +3010,7 @@ End LinearLSemiAlg.
 
 End LinearTheory.
 
-HB.structure Definition LRMorphism (R : pzSemiRingType) (A : lSemiAlgType R)
+HB.structure Definition LRMorphism (R : pzSemiRingType) (A : pzLSemiAlgType R)
     (B : pzSemiRingType) (s : R -> B -> B) :=
   {f of @RMorphism A B f & isScalable R A B s f}.
 (* FIXME: remove the @ once
@@ -2927,7 +3026,7 @@ HB.export LRMorphismExports.
 
 Section LRMorphismTheory.
 
-Variables (R : pzSemiRingType) (A B : lSemiAlgType R) (C : pzSemiRingType).
+Variables (R : pzSemiRingType) (A B : pzLSemiAlgType R) (C : pzSemiRingType).
 Variables (s : R -> C -> C).
 Variables (f : {lrmorphism A -> B}) (g : {lrmorphism B -> C | s}).
 
@@ -2945,30 +3044,46 @@ HB.mixin Record SemiGroupIsCommutativeLaw__on__PzSemiRing_mul
   private : SemiGroup.isCommutativeLaw R (@mul R)
 }.
 
-HB.factory Record PzSemiRing_hasCommutativeMul R of PzSemiRing R := {
+HB.factory Record SemiRing_hasCommutativeMul R of PzSemiRing R := {
   mulrC : commutative (@mul R)
 }.
 
-HB.builders Context R of PzSemiRing_hasCommutativeMul R.
+HB.builders Context R of SemiRing_hasCommutativeMul R.
 
 HB.instance Definition _ := SemiGroup.isCommutativeLaw.Build R (@mul R) mulrC.
 
 HB.end.
 
-Module SemiRing_hasCommutativeMul.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use PzSemiRing_hasCommutativeMul.Build instead.")]
-Notation Build R := (PzSemiRing_hasCommutativeMul.Build R) (only parsing).
-End SemiRing_hasCommutativeMul.
+Module PzSemiRing_hasCommutativeMul.
+#[deprecated(since="mathcomp 2.6.0", use=SemiRing_hasCommutativeMul.Build)]
+Notation Build R := (SemiRing_hasCommutativeMul.Build R) (only parsing).
+End PzSemiRing_hasCommutativeMul.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use PzSemiRing_hasCommutativeMul instead.")]
-Notation SemiRing_hasCommutativeMul R :=
-  (PzSemiRing_hasCommutativeMul R) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=SemiRing_hasCommutativeMul)]
+Notation PzSemiRing_hasCommutativeMul R :=
+  (SemiRing_hasCommutativeMul R) (only parsing).
+
+Module Ring_hasCommutativeMul.
+#[deprecated(since="mathcomp 2.4.0", use=SemiRing_hasCommutativeMul.Build)]
+Notation Build R := (SemiRing_hasCommutativeMul.Build R) (only parsing).
+End Ring_hasCommutativeMul.
+
+#[deprecated(since="mathcomp 2.4.0", use=SemiRing_hasCommutativeMul)]
+Notation Ring_hasCommutativeMul R :=
+  (SemiRing_hasCommutativeMul R) (only parsing).
+
+Module PzRing_hasCommutativeMul.
+#[deprecated(since="mathcomp 2.6.0", use=SemiRing_hasCommutativeMul.Build)]
+Notation Build R := (SemiRing_hasCommutativeMul.Build R) (only parsing).
+End PzRing_hasCommutativeMul.
+
+#[deprecated(since="mathcomp 2.6.0", use=SemiRing_hasCommutativeMul)]
+Notation PzRing_hasCommutativeMul R :=
+  (SemiRing_hasCommutativeMul R) (only parsing).
 
 #[export, short(type="comPzSemiRingType")]
 HB.structure Definition ComPzSemiRing :=
-  {R of PzSemiRing R & PzSemiRing_hasCommutativeMul R}.
+  {R of PzSemiRing R & SemiRing_hasCommutativeMul R}.
 
 Lemma mulrC {R:comPzSemiRingType} : commutative (@mul R).
 Proof. exact SemiGroup.opC. Qed.
@@ -2995,26 +3110,22 @@ HB.builders Context R of Nmodule_isComPzSemiRing R.
   Proof. by move=> x; rewrite mulrC mul0r. Qed.
   HB.instance Definition _ := Nmodule_isPzSemiRing.Build R
     mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0.
-  HB.instance Definition _ := PzSemiRing_hasCommutativeMul.Build R mulrC.
+  HB.instance Definition _ := SemiRing_hasCommutativeMul.Build R mulrC.
 HB.end.
 
 #[export, short(type="comNzSemiRingType")]
 HB.structure Definition ComNzSemiRing :=
-  {R of NzSemiRing R & PzSemiRing_hasCommutativeMul R}.
+  {R of NzSemiRing R & SemiRing_hasCommutativeMul R}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzSemiRing)]
 Notation ComSemiRing R := (ComNzSemiRing R) (only parsing).
 
 Module ComSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzSemiRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzSemiRing.sort)]
 Notation sort := (ComNzSemiRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzSemiRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzSemiRing.on)]
 Notation on R := (ComNzSemiRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzSemiRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzSemiRing.copy)]
 Notation copy T U := (ComNzSemiRing.copy T U) (only parsing).
 End ComSemiRing.
 
@@ -3035,23 +3146,17 @@ HB.factory Record Nmodule_isComNzSemiRing R of Nmodule R := {
 }.
 
 Module Nmodule_isComSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Nmodule_isComNzSemiRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Nmodule_isComNzSemiRing.Build)]
 Notation Build R := (Nmodule_isComNzSemiRing.Build R) (only parsing).
 End Nmodule_isComSemiRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Nmodule_isComNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Nmodule_isComNzSemiRing)]
 Notation Nmodule_isComSemiRing R := (Nmodule_isComNzSemiRing R) (only parsing).
 
 HB.builders Context R of Nmodule_isComNzSemiRing R.
-  Definition mulr1 := Monoid.mulC_id mulrC mul1r.
-  Definition mulrDr := Monoid.mulC_dist mulrC mulrDl.
-  Lemma mulr0 : right_zero zero mul.
-  Proof. by move=> x; rewrite mulrC mul0r. Qed.
-  HB.instance Definition _ := Nmodule_isNzSemiRing.Build R
-    mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0 oner_neq0.
-  HB.instance Definition _ := PzSemiRing_hasCommutativeMul.Build R mulrC.
+  HB.instance Definition _ := Nmodule_isComPzSemiRing.Build R
+    mulrA mulrC mul1r mulrDl mul0r.
+  HB.instance Definition _ := PzSemiRing_isNonZero.Build R oner_neq0.
 HB.end.
 
 Section ComSemiRingTheory.
@@ -3088,6 +3193,28 @@ Proof. by rewrite exprDn_comm //; apply: mulrC. Qed.
 
 Lemma sqrrD x y : (x + y) ^+ 2 = x ^+ 2 + x * y *+ 2 + y ^+ 2.
 Proof. by rewrite exprDn !big_ord_recr big_ord0 /= add0r mulr1 mul1r. Qed.
+
+Lemma rmorph_comm (S : pzSemiRingType) (f : {rmorphism R -> S}) x y :
+  comm (f x) (f y).
+Proof. by red; rewrite -!rmorphM mulrC. Qed.
+
+Section ScaleLinear.
+
+Variables (U V : lSemiModType R) (b : R) (f : {linear U -> V}).
+
+Lemma scale_is_scalable : scalable ( *:%R b : V -> V).
+Proof. by move=> a v /=; rewrite !scalerA mulrC. Qed.
+#[export]
+HB.instance Definition _ :=
+  isScalable.Build R V V *:%R ( *:%R b) scale_is_scalable.
+
+Lemma scale_fun_is_scalable : scalable (b \*: f).
+Proof. by move=> a v /=; rewrite !linearZ. Qed.
+#[export]
+HB.instance Definition _ :=
+  isScalable.Build R U V *:%R (b \*: f) scale_fun_is_scalable.
+
+End ScaleLinear.
 
 End ComSemiRingTheory.
 
@@ -3128,52 +3255,10 @@ have{pcharRn} /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (pcharf_eq pcharRp)
 by elim: e => // e IHe; rewrite !expnSr !exprM IHe -pFrobenius_autE rmorphD.
 Qed.
 
-(* FIXME: Generalize to `comPzSemiRingType` ? *)
-Lemma rmorph_comm (S : nzSemiRingType) (f : {rmorphism R -> S}) x y :
-  comm (f x) (f y).
-Proof. by red; rewrite -!rmorphM mulrC. Qed.
-
-Section ScaleLinear.
-
-Variables (U V : lSemiModType R) (b : R) (f : {linear U -> V}).
-
-Lemma scale_is_scalable : scalable ( *:%R b : V -> V).
-Proof. by move=> a v /=; rewrite !scalerA mulrC. Qed.
-#[export]
-HB.instance Definition _ :=
-  isScalable.Build R V V *:%R ( *:%R b) scale_is_scalable.
-
-Lemma scale_fun_is_scalable : scalable (b \*: f).
-Proof. by move=> a v /=; rewrite !linearZ. Qed.
-#[export]
-HB.instance Definition _ :=
-  isScalable.Build R U V *:%R (b \*: f) scale_fun_is_scalable.
-
-End ScaleLinear.
-
 End ComNzSemiRingTheory.
 
 #[short(type="comPzRingType")]
 HB.structure Definition ComPzRing := {R of PzRing R & ComPzSemiRing R}.
-
-HB.factory Record PzRing_hasCommutativeMul R of PzRing R := {
-  mulrC : commutative (@mul R)
-}.
-
-Module Ring_hasCommutativeMul.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use PzRing_hasCommutativeMul.Build instead.")]
-Notation Build R := (PzRing_hasCommutativeMul.Build R) (only parsing).
-End Ring_hasCommutativeMul.
-
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use PzRing_hasCommutativeMul instead.")]
-Notation Ring_hasCommutativeMul R :=
-  (PzRing_hasCommutativeMul R) (only parsing).
-
-HB.builders Context R of PzRing_hasCommutativeMul R.
-HB.instance Definition _ := PzSemiRing_hasCommutativeMul.Build R mulrC.
-HB.end.
 
 HB.factory Record Zmodule_isComPzRing R of Zmodule R := {
   one : R;
@@ -3189,7 +3274,7 @@ HB.builders Context R of Zmodule_isComPzRing R.
   Definition mulrDr := Monoid.mulC_dist mulrC mulrDl.
   HB.instance Definition _ := Zmodule_isPzRing.Build R
     mulrA mul1r mulr1 mulrDl mulrDr.
-  HB.instance Definition _ := PzRing_hasCommutativeMul.Build R mulrC.
+  HB.instance Definition _ := SemiRing_hasCommutativeMul.Build R mulrC.
 HB.end.
 
 Module ComPzRingExports.
@@ -3197,29 +3282,24 @@ Bind Scope ring_scope with ComPzRing.sort.
 End ComPzRingExports.
 HB.export ComPzRingExports.
 
-#[deprecated(since="mathcomp 2.5.0",
-      note="Use pFrobenius_aut_is_monoid_morphism instead.")]
+#[deprecated(since="mathcomp 2.5.0", use=pFrobenius_aut_is_monoid_morphism)]
 Notation pFrobenius_aut_is_multiplicative :=
   (fun p => (p.2, p.1) \o pFrobenius_aut_is_monoid_morphism) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use exprDn_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=exprDn_pchar)]
 Notation exprDn_char := exprDn_pchar (only parsing).
 
 #[short(type="comNzRingType")]
 HB.structure Definition ComNzRing := {R of NzRing R & ComNzSemiRing R}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing)]
 Notation ComRing R := (ComNzRing R) (only parsing).
 
 Module ComRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing.sort)]
 Notation sort := (ComNzRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing.on)]
 Notation on R := (ComNzRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing.copy)]
 Notation copy T U := (ComNzRing.copy T U) (only parsing).
 End ComRing.
 
@@ -3234,21 +3314,17 @@ HB.factory Record Zmodule_isComNzRing R of Zmodule R := {
 }.
 
 Module Zmodule_isComRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Zmodule_isComNzRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Zmodule_isComNzRing.Build)]
 Notation Build R := (Zmodule_isComNzRing.Build R) (only parsing).
 End Zmodule_isComRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use Zmodule_isComNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Zmodule_isComNzRing)]
 Notation Zmodule_isComRing R := (Zmodule_isComNzRing R) (only parsing).
 
 HB.builders Context R of Zmodule_isComNzRing R.
-  Definition mulr1 := Monoid.mulC_id mulrC mul1r.
-  Definition mulrDr := Monoid.mulC_dist mulrC mulrDl.
-  HB.instance Definition _ := Zmodule_isNzRing.Build R
-    mulrA mul1r mulr1 mulrDl mulrDr oner_neq0.
-  HB.instance Definition _ := PzRing_hasCommutativeMul.Build R mulrC.
+  HB.instance Definition _ := Zmodule_isComPzRing.Build R
+    mulrA mulrC mul1r mulrDl.
+  HB.instance Definition _ := PzSemiRing_isNonZero.Build R oner_neq0.
 HB.end.
 
 Module ComNzRingExports.
@@ -3284,20 +3360,60 @@ Qed.
 
 End ComPzRingTheory.
 
-HB.mixin Record LSemiAlgebra_isSemiAlgebra R V of LSemiAlgebra R V := {
+HB.mixin Record LSemiAlgebra_isSemiAlgebra R V of PzLSemiAlgebra R V := {
   scalerAr : forall k (x y : V), k *: (x * y) = x * (k *: y);
 }.
-#[short(type="semiAlgType")]
-HB.structure Definition SemiAlgebra (R : pzSemiRingType) :=
-  {A of LSemiAlgebra_isSemiAlgebra R A & LSemiAlgebra R A}.
 
-Module SemiAlgExports.
-Bind Scope ring_scope with SemiAlgebra.sort.
-End SemiAlgExports.
+Module Lalgebra_isAlgebra.
+#[deprecated(since="mathcomp 2.6.0", use=LSemiAlgebra_isSemiAlgebra.Build)]
+Notation Build R V := (LSemiAlgebra_isSemiAlgebra.Build R V) (only parsing).
+End Lalgebra_isAlgebra.
+
+#[deprecated(since="mathcomp 2.6.0", use=LSemiAlgebra_isSemiAlgebra)]
+Notation Lalgebra_isAlgebra R V :=
+  (LSemiAlgebra_isSemiAlgebra R V) (only parsing).
+
+#[short(type="pzSemiAlgType")]
+HB.structure Definition PzSemiAlgebra (R : pzSemiRingType) :=
+  {A of LSemiAlgebra_isSemiAlgebra R A & PzLSemiAlgebra R A}.
+
+Module PzSemiAlgExports.
+Bind Scope ring_scope with PzSemiAlgebra.sort.
+End PzSemiAlgExports.
+
+#[short(type="nzSemiAlgType")]
+HB.structure Definition NzSemiAlgebra (R : nzSemiRingType) :=
+  {A of LSemiAlgebra_isSemiAlgebra R A & NzLSemiAlgebra R A}.
+
+Module NzSemiAlgExports.
+Bind Scope ring_scope with NzSemiAlgebra.sort.
+End NzSemiAlgExports.
+
+#[deprecated(since="mathcomp 2.6.0", use=NzSemiAlgebra)]
+Notation SemiAlgebra R := (NzSemiAlgebra R) (only parsing).
+
+Module SemiAlgebra.
+#[deprecated(since="mathcomp 2.6.0", use=NzSemiAlgebra.sort)]
+Notation sort := (NzSemiAlgebra.sort) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=NzSemiAlgebra.on)]
+Notation on R := (NzSemiAlgebra.on R) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=NzSemiAlgebra.copy)]
+Notation copy T U := (NzSemiAlgebra.copy T U) (only parsing).
+End SemiAlgebra.
 
 HB.factory Record LSemiAlgebra_isComSemiAlgebra R V
-  of ComPzSemiRing V & LSemiAlgebra R V := {}.
-HB.builders Context (R : pzSemiRingType) V of LSemiAlgebra_isComSemiAlgebra R V.
+  of ComPzSemiRing V & PzLSemiAlgebra R V := {}.
+
+Module Lalgebra_isComAlgebra.
+#[deprecated(since="mathcomp 2.6.0", use=LSemiAlgebra_isComSemiAlgebra.Build)]
+Notation Build R V := (LSemiAlgebra_isComSemiAlgebra.Build R V) (only parsing).
+End Lalgebra_isComAlgebra.
+
+#[deprecated(since="mathcomp 2.6.0", use=LSemiAlgebra_isComSemiAlgebra)]
+Notation Lalgebra_isComAlgebra R V :=
+  (LSemiAlgebra_isComSemiAlgebra R V) (only parsing).
+
+HB.builders Context R V of LSemiAlgebra_isComSemiAlgebra R V.
 
 Lemma scalarAr k (x y : V) : k *: (x * y) = x * (k *: y).
 Proof. by rewrite mulrC scalerAl mulrC. Qed.
@@ -3306,50 +3422,84 @@ HB.instance Definition _ := LSemiAlgebra_isSemiAlgebra.Build R V scalarAr.
 
 HB.end.
 
-#[short(type="algType")]
-HB.structure Definition Algebra (R : pzRingType) :=
-  {A of LSemiAlgebra_isSemiAlgebra R A & Lalgebra R A}.
-
-Module AlgExports.
-Bind Scope ring_scope with Algebra.sort.
-End AlgExports.
-HB.export AlgExports.
-
-HB.factory Record Lalgebra_isAlgebra (R : pzRingType) V of Lalgebra R V := {
-  scalerAr : forall k (x y : V), k *: (x * y) = x * (k *: y);
+HB.factory Record LSemiModule_isComSemiAlgebra R V
+  of ComPzSemiRing V & LSemiModule R V := {
+  scalerAl : forall (a : R) (u v : V), a *: (u * v) = (a *: u) * v
 }.
-HB.builders Context (R : pzRingType) V of Lalgebra_isAlgebra R V.
-
-HB.instance Definition _ := LSemiAlgebra_isSemiAlgebra.Build R V scalerAr.
-
+HB.builders Context R V of LSemiModule_isComSemiAlgebra R V.
+HB.instance Definition _ := LSemiModule_isLSemiAlgebra.Build R V scalerAl.
+HB.instance Definition _ := LSemiAlgebra_isComSemiAlgebra.Build R V.
 HB.end.
 
-HB.factory Record Lalgebra_isComAlgebra R V of ComPzRing V & Lalgebra R V := {}.
-HB.builders Context (R : pzRingType) V of Lalgebra_isComAlgebra R V.
+#[short(type="pzAlgType")]
+HB.structure Definition PzAlgebra (R : pzRingType) :=
+  {A of LSemiAlgebra_isSemiAlgebra R A & PzLalgebra R A}.
 
-Lemma scalarAr k (x y : V) : k *: (x * y) = x * (k *: y).
-Proof. by rewrite mulrC scalerAl mulrC. Qed.
+Module PzAlgExports.
+Bind Scope ring_scope with PzAlgebra.sort.
+End PzAlgExports.
+HB.export PzAlgExports.
 
-HB.instance Definition lalgebra_is_algebra : Lalgebra_isAlgebra R V :=
-  Lalgebra_isAlgebra.Build R V scalarAr.
+#[short(type="nzAlgType")]
+HB.structure Definition NzAlgebra (R : nzRingType) :=
+  {A of LSemiAlgebra_isSemiAlgebra R A & NzLalgebra R A}.
 
-HB.end.
+Module NzAlgExports.
+Bind Scope ring_scope with NzAlgebra.sort.
+End NzAlgExports.
+HB.export NzAlgExports.
 
-#[short(type="comSemiAlgType")]
-HB.structure Definition ComSemiAlgebra R :=
-  {V of ComNzSemiRing V & SemiAlgebra R V}.
+#[deprecated(since="mathcomp 2.6.0", use=NzAlgebra)]
+Notation Algebra R := (NzAlgebra R) (only parsing).
 
-Module ComSemiAlgExports.
-Bind Scope ring_scope with ComSemiAlgebra.sort.
-End ComSemiAlgExports.
-HB.export ComSemiAlgExports.
+Module Algebra.
+#[deprecated(since="mathcomp 2.6.0", use=NzAlgebra.sort)]
+Notation sort := (NzAlgebra.sort) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=NzAlgebra.on)]
+Notation on R := (NzAlgebra.on R) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=NzAlgebra.copy)]
+Notation copy T U := (NzAlgebra.copy T U) (only parsing).
+End Algebra.
+
+#[short(type="comPzSemiAlgType")]
+HB.structure Definition ComPzSemiAlgebra (R : pzSemiRingType) :=
+  {V of ComPzSemiRing V & PzSemiAlgebra R V}.
+
+Module ComPzSemiAlgExports.
+Bind Scope ring_scope with ComPzSemiAlgebra.sort.
+End ComPzSemiAlgExports.
+HB.export ComPzSemiAlgExports.
+
+#[short(type="comNzSemiAlgType")]
+HB.structure Definition ComNzSemiAlgebra (R : nzSemiRingType) :=
+  {V of ComNzSemiRing V & NzSemiAlgebra R V}.
+
+Module ComNzSemiAlgExports.
+Bind Scope ring_scope with ComNzSemiAlgebra.sort.
+End ComNzSemiAlgExports.
+HB.export ComNzSemiAlgExports.
+
+#[deprecated(since="mathcomp 2.6.0", use=ComNzSemiAlgebra)]
+Notation ComSemiAlgebra R := (ComNzSemiAlgebra R) (only parsing).
+
+Module ComSemiAlgebra.
+#[deprecated(since="mathcomp 2.6.0", use=ComNzSemiAlgebra.sort)]
+Notation sort := (ComNzSemiAlgebra.sort) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=ComNzSemiAlgebra.on)]
+Notation on R := (ComNzSemiAlgebra.on R) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=ComNzSemiAlgebra.copy)]
+Notation copy T U := (ComNzSemiAlgebra.copy T U) (only parsing).
+End ComSemiAlgebra.
 
 Section SemiAlgebraTheory.
 #[export]
 HB.instance Definition _ (R : comPzSemiRingType) :=
-  PzSemiRing_hasCommutativeMul.Build R^c (fun _ _ => mulrC _ _).
+  SemiRing_hasCommutativeMul.Build R^c (fun _ _ => mulrC _ _).
 #[export]
 HB.instance Definition _ (R : comPzSemiRingType) := ComPzSemiRing.on R^o.
+#[export]
+HB.instance Definition _ (R : comPzSemiRingType) :=
+  LSemiAlgebra_isComSemiAlgebra.Build R R^o.
 #[export]
 HB.instance Definition _ (R : comNzSemiRingType) := ComNzSemiRing.on R^c.
 #[export]
@@ -3372,13 +3522,35 @@ End workaround.
 
 End SemiAlgebraTheory.
 
-#[short(type="comAlgType")]
-HB.structure Definition ComAlgebra R := {V of ComNzRing V & Algebra R V}.
+#[short(type="comPzAlgType")]
+HB.structure Definition ComPzAlgebra (R : pzRingType) :=
+  {V of ComPzRing V & PzAlgebra R V}.
 
-Module ComAlgExports.
-Bind Scope ring_scope with ComAlgebra.sort.
-End ComAlgExports.
-HB.export ComAlgExports.
+Module ComPzAlgExports.
+Bind Scope ring_scope with ComPzAlgebra.sort.
+End ComPzAlgExports.
+HB.export ComPzAlgExports.
+
+#[short(type="comNzAlgType")]
+HB.structure Definition ComNzAlgebra (R : nzRingType) :=
+  {V of ComNzRing V & NzAlgebra R V}.
+
+Module ComNzAlgExports.
+Bind Scope ring_scope with ComNzAlgebra.sort.
+End ComNzAlgExports.
+HB.export ComNzAlgExports.
+
+#[deprecated(since="mathcomp 2.6.0", use=ComNzAlgebra)]
+Notation ComAlgebra R := (ComNzAlgebra R) (only parsing).
+
+Module ComAlgebra.
+#[deprecated(since="mathcomp 2.6.0", use=ComNzAlgebra.sort)]
+Notation sort := (ComNzAlgebra.sort) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=ComNzAlgebra.on)]
+Notation on R := (ComNzAlgebra.on R) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=ComNzAlgebra.copy)]
+Notation copy T U := (ComNzAlgebra.copy T U) (only parsing).
+End ComAlgebra.
 
 Section AlgebraTheory.
 #[export]
@@ -3393,7 +3565,7 @@ End AlgebraTheory.
 
 Section SemiAlgebraTheory.
 
-Variables (R : pzSemiRingType) (A : semiAlgType R).
+Variables (R : pzSemiRingType) (A : pzSemiAlgType R).
 Implicit Types (k : R) (x y : A).
 
 Lemma scalerCA k x y : k *: x * y = x * (k *: y).
@@ -3431,7 +3603,7 @@ End SemiAlgebraTheory.
 
 Section AlgebraTheory.
 
-Variables (R : pzSemiRingType) (A : semiAlgType R).
+Variables (R : pzSemiRingType) (A : pzSemiAlgType R).
 Variables (U : lSemiModType R) (a : A) (f : {linear U -> A}).
 
 Lemma mull_fun_is_scalable : scalable (a \*o f).
@@ -3453,13 +3625,11 @@ HB.mixin Record NzRing_hasMulInverse R of NzRing R := {
 }.
 
 Module Ring_hasMulInverse.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing_hasMulInverse.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzRing_hasMulInverse.Build)]
 Notation Build R := (NzRing_hasMulInverse.Build R) (only parsing).
 End Ring_hasMulInverse.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use NzRing_hasMulInverse instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=NzRing_hasMulInverse)]
 Notation Ring_hasMulInverse R := (NzRing_hasMulInverse R) (only parsing).
 
 #[short(type="unitRingType")]
@@ -3776,13 +3946,11 @@ HB.factory Record ComNzRing_hasMulInverse R of ComNzRing R := {
 }.
 
 Module ComRing_hasMulInverse.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing_hasMulInverse.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_hasMulInverse.Build)]
 Notation Build R := (ComNzRing_hasMulInverse.Build R) (only parsing).
 End ComRing_hasMulInverse.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing_hasMulInverse instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_hasMulInverse)]
 Notation ComRing_hasMulInverse R := (ComNzRing_hasMulInverse R) (only parsing).
 
 HB.builders Context R of ComNzRing_hasMulInverse R.
@@ -3799,7 +3967,7 @@ HB.instance Definition _ :=
 HB.end.
 
 #[short(type="unitAlgType")]
-HB.structure Definition UnitAlgebra R := {V of Algebra R V & UnitRing V}.
+HB.structure Definition UnitAlgebra R := {V of NzAlgebra R V & UnitRing V}.
 
 Module UnitAlgebraExports.
 Bind Scope ring_scope with UnitAlgebra.sort.
@@ -3807,7 +3975,8 @@ End UnitAlgebraExports.
 HB.export UnitAlgebraExports.
 
 #[short(type="comUnitAlgType")]
-HB.structure Definition ComUnitAlgebra R := {V of ComAlgebra R V & UnitRing V}.
+HB.structure Definition ComUnitAlgebra R :=
+  {V of ComNzAlgebra R V & UnitRing V}.
 
 Module ComUnitAlgebraExports.
 Bind Scope ring_scope with UnitAlgebra.sort.
@@ -3943,8 +4112,11 @@ Coercion subsemimod_closedZ : subsemimod_closed >-> scaler_closed.
 Coercion linear_closedB : linear_closed >-> subr_2closed.
 Coercion submod_closedB : submod_closed >-> zmod_closed.
 Coercion submod_closed_semi : submod_closed >-> subsemimod_closed.
+Coercion subsemialg_closedZ : subsemialg_closed >-> subsemimod_closed.
+Coercion subsemialg_closedM : subsemialg_closed >-> semiring_closed.
 Coercion subalg_closedZ : subalg_closed >-> submod_closed.
 Coercion subalg_closedBM : subalg_closed >-> subring_closed.
+Coercion subalg_closed_semi : subalg_closed >-> subsemialg_closed.
 Coercion divr_closedV : divr_closed >-> invr_closed.
 Coercion divr_closedM : divr_closed >-> mulr_closed.
 Coercion sdivr_closed_div : sdivr_closed >-> divr_closed.
@@ -4489,7 +4661,7 @@ Qed.
 Lemma dnf_to_rform bcs : rformula (dnf_to_form bcs) = all dnf_rterm bcs.
 Proof.
 elim: bcs => //= [[cl1 cl2] bcs ->]; rewrite {2}/dnf_rterm /=; congr (_ && _).
-by congr andb; [elim: cl1 | elim: cl2] => //= t cl ->; rewrite andbT.
+by (congr andb; [elim: cl1 | elim: cl2]) => //= t cl ->; rewrite andbT.
 Qed.
 
 Section If.
@@ -4723,13 +4895,13 @@ HB.instance Definition _ := IntegralDomain.on R^o.
 
 End IntegralDomainTheory.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use natf_neq0_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=natf_neq0_pchar)]
 Notation natf_neq0 := natf_neq0_pchar (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use natf0_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=natf0_pchar)]
 Notation natf0_char := natf0_pchar (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf'_nat instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf'_nat)]
 Notation charf'_nat := pcharf'_nat (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf0P instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf0P)]
 Notation charf0P := pcharf0P (only parsing).
 
 Arguments lregP {R x}.
@@ -4773,13 +4945,11 @@ HB.factory Record ComNzRing_isField R of ComNzRing R := {
 }.
 
 Module ComRing_isField.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing_isField.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_isField.Build)]
 Notation Build R := (ComNzRing_isField.Build R) (only parsing).
 End ComRing_isField.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use ComNzRing_isField instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_isField)]
 Notation ComRing_isField R := (ComNzRing_isField R) (only parsing).
 
 HB.builders Context R of ComNzRing_isField R.
@@ -4886,7 +5056,7 @@ by apply/eqP/eqP => [->|/(mulIf yD0)/(mulIf tD0)].
 Qed.
 
 Lemma eqr_sum_div I r P (f : I -> F) c a : c != 0 ->
-  \big[+%R/0]_(x <- r | P x) (f x / c) == a
+  (\big[+%R/0]_(x <- r | P x) (f x / c) == a)
   = (\big[+%R/0]_(x <- r | P x) f x == a * c).
 Proof.
 by move=> ?; rewrite -mulr_suml -(divr1 a) eqr_div ?oner_eq0// mulr1 divr1.
@@ -4967,16 +5137,16 @@ Qed.
 
 End ModuleTheory.
 
-Lemma pchar_lalg (A : lalgType F) : pchar A =i pchar F.
+Lemma pchar_lalg (A : nzLalgType F) : pchar A =i pchar F.
 Proof. by move=> p; rewrite inE -scaler_nat scaler_eq0 oner_eq0 orbF. Qed.
 
 End FieldTheory.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar0_natf_div instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar0_natf_div)]
 Notation char0_natf_div := pchar0_natf_div (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use fmorph_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=fmorph_pchar)]
 Notation fmorph_char := fmorph_pchar (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar_lalg instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar_lalg)]
 Notation char_lalg := pchar_lalg (only parsing).
 
 Arguments fmorph_inj {F R} f [x1 x2].
@@ -5208,10 +5378,11 @@ Qed.
 
 End ClosedFieldTheory.
 
-Lemma lalgMixin (R : pzRingType) (A : lalgType R) (B : lmodType R) (f : B -> A) :
-     phant B -> injective f -> scalable f ->
-   forall mulB, {morph f : x y / mulB x y >-> x * y} ->
- forall a u v, a *: (mulB u v) = mulB (a *: u) v.
+Lemma lalgMixin
+  (R : pzRingType) (A : pzLalgType R) (B : lmodType R) (f : B -> A) :
+  phant B -> injective f -> scalable f ->
+  forall mulB, {morph f : x y / mulB x y >-> x * y} ->
+  forall a u v, a *: (mulB u v) = mulB (a *: u) v.
 Proof.
 by move=> _ injf fZ mulB fM a x y; apply: injf; rewrite !(fZ, fM) scalerAl.
 Qed.
@@ -5220,8 +5391,9 @@ Lemma comRingMixin (R : comPzRingType) (T : pzRingType) (f : T -> R) :
   phant T -> injective f -> {morph f : x y / x * y} -> commutative (@mul T).
 Proof. by move=> _ inj_f fM x y; apply: inj_f; rewrite !fM mulrC. Qed.
 
-Lemma algMixin (R : pzRingType) (A : algType R) (B : lalgType R) (f : B -> A) :
-    phant B -> injective f -> {morph f : x y / x * y} -> scalable f ->
+Lemma algMixin
+  (R : pzRingType) (A : pzAlgType R) (B : pzLalgType R) (f : B -> A) :
+  phant B -> injective f -> {morph f : x y / x * y} -> scalable f ->
   forall k (x y : B), k *: (x * y) = x * (k *: y).
 Proof.
 by move=> _ inj_f fM fZ a x y; apply: inj_f; rewrite !(fM, fZ) scalerAr.
@@ -5288,7 +5460,7 @@ HB.structure Definition SubmodClosed (R : pzSemiRingType) (V : lSemiModType R)
   := {S of AddClosed V S & isScaleClosed R V S}.
 
 #[short(type="subalgClosed")]
-HB.structure Definition SubalgClosed (R : pzSemiRingType) (A : lSemiAlgType R)
+HB.structure Definition SubalgClosed (R : pzSemiRingType) (A : pzLSemiAlgType R)
   := {S of SemiringClosed A S & isScaleClosed R A S}.
 
 #[short(type="divringClosed")]
@@ -5296,7 +5468,7 @@ HB.structure Definition DivringClosed (R : unitRingType) :=
   {S of SubringClosed R S & isInvClosed R S}.
 
 #[short(type="divalgClosed")]
-HB.structure Definition DivalgClosed (R : pzRingType) (A : unitAlgType R) :=
+HB.structure Definition DivalgClosed (R : nzRingType) (A : unitAlgType R) :=
   {S of DivringClosed A S & isScaleClosed R A S}.
 
 (* Factories for stability properties *)
@@ -5348,11 +5520,10 @@ HB.factory Record isDivClosed (R : unitRingType) (S : R -> bool) := {
 }.
 
 HB.builders Context R S of isDivClosed R S.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ := isInvClosed.Build R S
-  (divr_closedV divr_closed_subproof).
 HB.instance Definition _ := isMulClosed.Build R S
   (divr_closedM divr_closed_subproof).
+HB.instance Definition _ := isInvClosed.Build R S
+  (divr_closedV divr_closed_subproof).
 HB.end.
 
 HB.factory Record isSdivClosed (R : unitRingType) (S : R -> bool) := {
@@ -5380,26 +5551,38 @@ HB.end.
 
 HB.factory Record isSubmodClosed (R : pzRingType) (V : lmodType R)
     (S : V -> bool) := {
-  submod_closed_subproof : submod_closed S
+  subsemimod_closed_subproof : subsemimod_closed S
 }.
 
 HB.builders Context R V S of isSubmodClosed R V S.
 HB.instance Definition _ := isZmodClosed.Build V S
-  (submod_closedB submod_closed_subproof).
+  (subsemimod_closedB subsemimod_closed_subproof).
 HB.instance Definition _ := isScaleClosed.Build R V S
-  (subsemimod_closedZ (submod_closed_semi submod_closed_subproof)).
+  (subsemimod_closedZ subsemimod_closed_subproof).
 HB.end.
 
-HB.factory Record isSubalgClosed (R : pzRingType) (A : lalgType R)
+HB.factory Record isSubSemiAlgClosed (R : pzSemiRingType) (A : pzLSemiAlgType R)
     (S : A -> bool) := {
-  subalg_closed_subproof : subalg_closed S
+  subsemialg_closed_subproof : subsemialg_closed S
+}.
+
+HB.builders Context R A S of isSubSemiAlgClosed R A S.
+HB.instance Definition _ := isSubSemiModClosed.Build R A S
+  (subsemialg_closedZ subsemialg_closed_subproof).
+HB.instance Definition _ := isSemiringClosed.Build A S
+  (subsemialg_closedM subsemialg_closed_subproof).
+HB.end.
+
+HB.factory Record isSubalgClosed (R : pzRingType) (A : pzLalgType R)
+    (S : A -> bool) := {
+  subsemialg_closed_subproof : subsemialg_closed S
 }.
 
 HB.builders Context R A S of isSubalgClosed R A S.
 HB.instance Definition _ := isSubmodClosed.Build R A S
-  (subalg_closedZ subalg_closed_subproof).
-HB.instance Definition _ := isSubringClosed.Build A S
-  (subalg_closedBM subalg_closed_subproof).
+  (subsemialg_closedZ subsemialg_closed_subproof).
+HB.instance Definition _ := isSemiringClosed.Build A S
+  (subsemialg_closedM subsemialg_closed_subproof).
 HB.end.
 
 HB.factory Record isDivringClosed (R : unitRingType) (S : R -> bool) := {
@@ -5422,7 +5605,7 @@ HB.builders Context R A S of isDivalgClosed R A S.
 HB.instance Definition _ := isDivringClosed.Build A S
   (divalg_closedBdiv divalg_closed_subproof).
 HB.instance Definition _ := isSubalgClosed.Build R A S
-  (divalg_closedZ divalg_closed_subproof).
+  (subalg_closed_semi (divalg_closedZ divalg_closed_subproof)).
 HB.end.
 
 Section NmodulePred.
@@ -5502,9 +5685,7 @@ Lemma rpred_sign (S : smulClosed R) n : (-1) ^+ n \in S.
 Proof. by rewrite rpredX ?rpredN1. Qed.
 
 Lemma subringClosedP (rngS : subringClosed R) : subring_closed rngS.
-Proof.
-split; [ exact: rpred1 | exact: (zmodClosedP rngS).2 | exact: rpredM ].
-Qed.
+Proof. split; [ exact: rpred1 | exact: rpredB | exact: rpredM ]. Qed.
 
 End RingPred.
 
@@ -5528,22 +5709,27 @@ Lemma rpredZsign (S : opprClosed V) n u : ((-1) ^+ n *: u \in S) = (u \in S).
 Proof. by rewrite -signr_odd scaler_sign fun_if if_arg rpredN if_same. Qed.
 
 Lemma submodClosedP (modS : submodClosed V) : submod_closed modS.
-Proof.
-split; first exact (@rpred0D V modS).1.
-by move=> a u v uS vS; apply: rpredD; first exact: rpredZ.
-Qed.
+Proof. exact/subsemimod_closed_submod/subsemimodClosedP. Qed.
 
 End LmodPred.
 
 Section LalgPred.
 
-Variables (R : pzRingType) (A : lalgType R).
+Variables (R : pzSemiRingType) (A : pzLSemiAlgType R).
+
+Lemma subsemialgClosedP (algS : subalgClosed A) : subsemialg_closed algS.
+Proof.
+split; [ exact: rpred1 | exact: rpred0D | exact: rpredZ | exact: rpredM ].
+Qed.
+
+End LalgPred.
+
+Section LalgPred.
+
+Variables (R : pzRingType) (A : pzLalgType R).
 
 Lemma subalgClosedP (algS : subalgClosed A) : subalg_closed algS.
-Proof.
-split; [ exact: rpred1 | | exact: rpredM ].
-by move=> a u v uS vS; apply: rpredD; first exact: rpredZ.
-Qed.
+Proof. exact/subsemialg_closed_subalg/subsemialgClosedP. Qed.
 
 End LalgPred.
 
@@ -5675,13 +5861,11 @@ HB.instance Definition _ := isSubBaseUMagma.Build R S U valM_subproof.1.
 HB.end.
 
 Module isSubSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isSubPzSemiRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isSubPzSemiRing.Build)]
 Notation Build R S U := (isSubPzSemiRing.Build R S U) (only parsing).
 End isSubSemiRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isSubPzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isSubPzSemiRing)]
 Notation isSubSemiRing R S U := (isSubPzSemiRing R S U) (only parsing).
 
 
@@ -5689,19 +5873,15 @@ Notation isSubSemiRing R S U := (isSubPzSemiRing R S U) (only parsing).
 HB.structure Definition SubNzSemiRing (R : nzSemiRingType) (S : pred R) :=
   { U of SubNmodule R S U & NzSemiRing U & isSubPzSemiRing R S U }.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzSemiRing)]
 Notation SubSemiRing R := (SubNzSemiRing R) (only parsing).
 
 Module SubSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzSemiRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzSemiRing.sort)]
 Notation sort := (SubNzSemiRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzSemiRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzSemiRing.on)]
 Notation on R := (SubNzSemiRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzSemiRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzSemiRing.copy)]
 Notation copy T U := (SubNzSemiRing.copy T U) (only parsing).
 End SubSemiRing.
 
@@ -5754,83 +5934,64 @@ Proof. by split=> [|x y] /=; rewrite !SubK. Qed.
 HB.instance Definition _ := isSubPzSemiRing.Build R S U valM.
 HB.end.
 
+HB.factory Record SubPzSemiRing_isNonZero (R : nzSemiRingType) S U
+  of SubPzSemiRing R S U := {}.
+
+HB.builders Context R S U of SubPzSemiRing_isNonZero R S U.
+Lemma oner_neq0 : (1 : U) != 0.
+Proof. by rewrite -(inj_eq val_inj) rmorph0 rmorph1 oner_neq0. Qed.
+HB.instance Definition _ := PzSemiRing_isNonZero.Build U oner_neq0.
+HB.end.
+
 HB.factory Record SubNmodule_isSubNzSemiRing (R : nzSemiRingType) S U
     of SubNmodule R S U := {
   mulr_closed_subproof : mulr_closed S
 }.
 
 Module SubNmodule_isSubSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNmodule_isSubNzSemiRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNmodule_isSubNzSemiRing.Build)]
 Notation Build R S U := (SubNmodule_isSubNzSemiRing.Build R S U) (only parsing).
 End SubNmodule_isSubSemiRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNmodule_isSubNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNmodule_isSubNzSemiRing)]
 Notation SubNmodule_isSubSemiRing R S U :=
   (SubNmodule_isSubNzSemiRing R S U) (only parsing).
 
 HB.builders Context R S U of SubNmodule_isSubNzSemiRing R S U.
-
 HB.instance Definition _ := SubNmodule_isSubPzSemiRing.Build R S U
   mulr_closed_subproof.
-
-Lemma oner_neq0 : (1 : U) != 0.
-Proof. by rewrite -(inj_eq val_inj) SubK raddf0 oner_neq0. Qed.
-HB.instance Definition _ := PzSemiRing_isNonZero.Build U oner_neq0.
+HB.instance Definition _ := SubPzSemiRing_isNonZero.Build R S U.
 HB.end.
 
 #[short(type="subComPzSemiRingType")]
 HB.structure Definition SubComPzSemiRing (R : pzSemiRingType) S :=
   {U of SubPzSemiRing R S U & ComPzSemiRing U}.
 
-HB.factory Record SubPzSemiRing_isSubComPzSemiRing (R : comPzSemiRingType) S U
+(* This Factory should automatically subsume the non-zero and non-semi cases *)
+HB.factory Record SubSemiRing_isSubComSemiRing (R : comPzSemiRingType) S U
     of SubPzSemiRing R S U := {}.
 
-HB.builders Context R S U of SubPzSemiRing_isSubComPzSemiRing R S U.
+HB.builders Context R S U of SubSemiRing_isSubComSemiRing R S U.
 Lemma mulrC : @commutative U U *%R.
 Proof. by move=> x y; apply: val_inj; rewrite !rmorphM mulrC. Qed.
-HB.instance Definition _ := PzSemiRing_hasCommutativeMul.Build U mulrC.
+HB.instance Definition _ := SemiRing_hasCommutativeMul.Build U mulrC.
 HB.end.
 
 #[short(type="subComNzSemiRingType")]
 HB.structure Definition SubComNzSemiRing (R : nzSemiRingType) S :=
   {U of SubNzSemiRing R S U & ComNzSemiRing U}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzSemiRing)]
 Notation SubComSemiRing R := (SubComNzSemiRing R) (only parsing).
 
 Module SubComSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzSemiRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzSemiRing.sort)]
 Notation sort  := (SubComNzSemiRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzSemiRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzSemiRing.on)]
 Notation on R := (SubComNzSemiRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzSemiRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzSemiRing.copy)]
 Notation copy T U := (SubComNzSemiRing.copy T U) (only parsing).
 End SubComSemiRing.
-
-HB.factory Record SubNzSemiRing_isSubComNzSemiRing (R : comNzSemiRingType) S U
-    of SubNzSemiRing R S U := {}.
-
-Module SubSemiRing_isSubComSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzSemiRing_isSubComNzSemiRing.Build instead.")]
-Notation Build R S U :=
-  (SubNzSemiRing_isSubComNzSemiRing.Build R S U) (only parsing).
-End SubSemiRing_isSubComSemiRing.
-
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzSemiRing_isSubComNzSemiRing instead.")]
-Notation SubSemiRing_isSubComSemiRing R S U :=
-  (SubNzSemiRing_isSubComNzSemiRing R S U) (only parsing).
-
-HB.builders Context R S U of SubNzSemiRing_isSubComNzSemiRing R S U.
-HB.instance Definition _ :=  SubPzSemiRing_isSubComPzSemiRing.Build R S U.
-HB.end.
 
 #[short(type="subPzRingType")]
 HB.structure Definition SubPzRing (R : pzRingType) (S : pred R) :=
@@ -5842,13 +6003,6 @@ HB.factory Record SubZmodule_isSubPzRing (R : pzRingType) S U
 }.
 
 HB.builders Context R S U of SubZmodule_isSubPzRing R S U.
-
-HB.instance Definition _ := isSubringClosed.Build R S subring_closed_subproof.
-
-Let inU v Sv : U := Sub v Sv.
-Let oneU : U := inU (@rpred1 _ (MulClosed.clone R S _)).
-Let mulU (u1 u2 : U) := inU (rpredM _ _ (valP u1) (valP u2)).
-
 HB.instance Definition _ := SubNmodule_isSubPzSemiRing.Build R S U
   (smulr_closedM (subring_closedM subring_closed_subproof)).
 HB.end.
@@ -5857,19 +6011,15 @@ HB.end.
 HB.structure Definition SubNzRing (R : nzRingType) (S : pred R) :=
   { U of SubNzSemiRing R S U & NzRing U & isSubBaseAddUMagma R S U }.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzRing)]
 Notation SubRing R := (SubNzRing R) (only parsing).
 
 Module SubRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzRing.sort)]
 Notation sort := (SubNzRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzRing.on)]
 Notation on R := (SubNzRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubNzRing.copy)]
 Notation copy T U := (SubNzRing.copy T U) (only parsing).
 End SubRing.
 
@@ -5879,24 +6029,15 @@ HB.factory Record SubZmodule_isSubNzRing (R : nzRingType) S U
 }.
 
 Module SubZmodule_isSubRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubZmodule_isSubNzRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubZmodule_isSubNzRing.Build)]
 Notation Build R S U := (SubZmodule_isSubNzRing.Build R S U) (only parsing).
 End SubZmodule_isSubRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubZmodule_isSubNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubZmodule_isSubNzRing)]
 Notation SubZmodule_isSubRing R S U :=
   (SubZmodule_isSubNzRing R S U) (only parsing).
 
 HB.builders Context R S U of SubZmodule_isSubNzRing R S U.
-
-HB.instance Definition _ := isSubringClosed.Build R S subring_closed_subproof.
-
-Let inU v Sv : U := Sub v Sv.
-Let oneU : U := inU (@rpred1 _ (MulClosed.clone R S _)).
-Let mulU (u1 u2 : U) := inU (rpredM _ _ (valP u1) (valP u2)).
-
 HB.instance Definition _ := SubNmodule_isSubNzSemiRing.Build R S U
   (smulr_closedM (subring_closedM subring_closed_subproof)).
 HB.end.
@@ -5905,52 +6046,21 @@ HB.end.
 HB.structure Definition SubComPzRing (R : pzRingType) S :=
   {U of SubPzRing R S U & ComPzRing U}.
 
-HB.factory Record SubPzRing_isSubComPzRing (R : comPzRingType) S U
-    of SubPzRing R S U := {}.
-
-HB.builders Context R S U of SubPzRing_isSubComPzRing R S U.
-Lemma mulrC : @commutative U U *%R.
-Proof. by move=> x y; apply: val_inj; rewrite !rmorphM mulrC. Qed.
-HB.instance Definition _ := PzRing_hasCommutativeMul.Build U mulrC.
-HB.end.
-
 #[short(type="subComNzRingType")]
 HB.structure Definition SubComNzRing (R : nzRingType) S :=
   {U of SubNzRing R S U & ComNzRing U}.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzRing)]
 Notation SubComRing R := (SubComNzRing R) (only parsing).
 
 Module SubComRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzRing.sort instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzRing.sort)]
 Notation sort := (SubComNzRing.sort) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzRing.on instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzRing.on)]
 Notation on R := (SubComNzRing.on R) (only parsing).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubComNzRing.copy instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubComNzRing.copy)]
 Notation copy T U := (SubComNzRing.copy T U) (only parsing).
 End SubComRing.
-
-HB.factory Record SubNzRing_isSubComNzRing (R : comNzRingType) S U
-    of SubNzRing R S U := {}.
-
-Module SubRing_isSubComRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing_isSubComNzRing.Build instead.")]
-Notation Build R S U := (SubNzRing_isSubComNzRing.Build R S U) (only parsing).
-End SubRing_isSubComRing.
-
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing_isSubComNzRing instead.")]
-Notation SubRing_isSubComRing R S U :=
-  (SubNzRing_isSubComNzRing R S U) (only parsing).
-
-HB.builders Context R S U of SubNzRing_isSubComNzRing R S U.
-HB.instance Definition _ := SubPzRing_isSubComPzRing.Build R S U.
-HB.end.
 
 HB.mixin Record isSubLSemiModule (R : pzSemiRingType) (V : lSemiModType R)
   (S : pred V) W of SubNmodule V S W & LSemiModule R W := {
@@ -5982,23 +6092,19 @@ HB.factory Record isSubLmodule (R : pzRingType) (V : lmodType R) (S : pred V)
  valZ : scalable (val : W -> V);
 }.
 
-HB.builders Context (R : pzRingType) (V : lmodType R) S W of
-  isSubLmodule R V S W.
-
+HB.builders Context R V S W of isSubLmodule R V S W.
 HB.instance Definition _ := isSubLSemiModule.Build R V S W valZ.
-
 HB.end.
 
 HB.factory Record SubNmodule_isSubLSemiModule
     (R : pzSemiRingType) (V : lSemiModType R) S W of SubNmodule V S W := {
-  submod_closed_subproof : subsemimod_closed S
+  subsemimod_closed_subproof : subsemimod_closed S
 }.
 
-HB.builders Context (R : pzSemiRingType) (V : lSemiModType R) S W
-  of SubNmodule_isSubLSemiModule R V S W.
+HB.builders Context R V S W of SubNmodule_isSubLSemiModule R V S W.
 
 HB.instance Definition _ :=
-  isSubSemiModClosed.Build R V S submod_closed_subproof.
+  isSubSemiModClosed.Build R V S subsemimod_closed_subproof.
 
 Let inW v Sv : W := Sub v Sv.
 Let scaleW a (w : W) := inW (rpredZ a _ (valP w)).
@@ -6010,13 +6116,9 @@ Proof. by apply: val_inj; rewrite SubK scale0r raddf0. Qed.
 Lemma scale1r : left_id 1 scaleW.
 Proof. by move=> x; apply: val_inj; rewrite SubK scale1r. Qed.
 Lemma scalerDr : right_distributive scaleW +%R.
-Proof.
-by move=> a u v; apply: val_inj; rewrite !(SubK, raddfD)/= !SubK.
-Qed.
+Proof. by move=> a u v; apply: val_inj; rewrite SubK !raddfD/= !SubK. Qed.
 Lemma scalerDl v : {morph scaleW^~ v : a b / a + b}.
-Proof.
-by move=> a b; apply: val_inj; rewrite !(SubK, raddfD)/= !SubK scalerDl.
-Qed.
+Proof. by move=> a b; apply: val_inj; rewrite raddfD/= !SubK scalerDl. Qed.
 HB.instance Definition _ := Nmodule_isLSemiModule.Build R W
   scalerA' scale0r scale1r scalerDr scalerDl.
 
@@ -6024,83 +6126,116 @@ Fact valZ : scalable (val : W -> _). Proof. by move=> k w; rewrite SubK. Qed.
 HB.instance Definition _ := isSubLSemiModule.Build R V S W valZ.
 HB.end.
 
-HB.factory Record SubZmodule_isSubLmodule (R : pzRingType) (V : lmodType R) S W
-    of SubZmodule V S W := {
-  submod_closed_subproof : submod_closed S
-}.
+#[short(type="subPzLSemiAlgType")]
+HB.structure Definition SubPzLSemiAlgebra
+    (R : pzSemiRingType) (V : pzLSemiAlgType R) S :=
+  {W of SubPzSemiRing V S W & @SubLSemiModule R V S W & PzLSemiAlgebra R W}.
 
-HB.builders Context (R : pzRingType) (V : lmodType R) S W
-  of SubZmodule_isSubLmodule R V S W.
-HB.instance Definition _ := SubNmodule_isSubLSemiModule.Build R V S W
-  (submod_closed_semi submod_closed_subproof).
-HB.end.
+#[short(type="subNzLSemiAlgType")]
+HB.structure Definition SubNzLSemiAlgebra
+    (R : nzSemiRingType) (V : nzLSemiAlgType R) S :=
+  {W of SubNzSemiRing V S W & @SubLSemiModule R V S W & NzLSemiAlgebra R W}.
 
-#[short(type="subLSemiAlgType")]
-HB.structure Definition SubLSemiAlgebra
-    (R : pzSemiRingType) (V : lSemiAlgType R) S :=
-  {W of SubNzSemiRing V S W & @SubLSemiModule R V S W & LSemiAlgebra R W}.
+#[deprecated(since="mathcomp 2.6.0", use=SubNzLSemiAlgebra)]
+Notation SubLSemiAlgebra R := (SubNzLSemiAlgebra R) (only parsing).
 
-#[short(type="subLalgType")]
-HB.structure Definition SubLalgebra (R : pzRingType) (V : lalgType R) S :=
-  {W of SubNzRing V S W & @SubLmodule R V S W & Lalgebra R W}.
+Module SubLSemiAlgebra.
+#[deprecated(since="mathcomp 2.6.0", use=SubNzLSemiAlgebra.sort)]
+Notation sort := (SubNzLSemiAlgebra.sort) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=SubNzLSemiAlgebra.on)]
+Notation on R := (SubNzLSemiAlgebra.on R) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=SubNzLSemiAlgebra.copy)]
+Notation copy T U := (SubNzLSemiAlgebra.copy T U) (only parsing).
+End SubLSemiAlgebra.
 
-HB.factory Record SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra
-  (R : pzSemiRingType) (V : lSemiAlgType R) S W
-  of SubNzSemiRing V S W & @SubLSemiModule R V S W := {}.
+#[short(type="subPzLalgType")]
+HB.structure Definition SubPzLalgebra (R : pzRingType) (V : pzLalgType R) S :=
+  {W of SubPzRing V S W & @SubLmodule R V S W & PzLalgebra R W}.
 
-HB.builders Context (R : pzSemiRingType) (V : lSemiAlgType R) S W
-  of SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra R V S W.
+#[short(type="subNzLalgType")]
+HB.structure Definition SubNzLalgebra (R : nzRingType) (V : nzLalgType R) S :=
+  {W of SubNzRing V S W & @SubLmodule R V S W & NzLalgebra R W}.
+
+#[deprecated(since="mathcomp 2.6.0", use=SubNzLalgebra)]
+Notation SubLalgebra R := (SubNzLalgebra R) (only parsing).
+
+Module SubLalgebra.
+#[deprecated(since="mathcomp 2.6.0", use=SubNzLalgebra.sort)]
+Notation sort := (SubNzLalgebra.sort) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=SubNzLalgebra.on)]
+Notation on R := (SubNzLalgebra.on R) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=SubNzLalgebra.copy)]
+Notation copy T U := (SubNzLalgebra.copy T U) (only parsing).
+End SubLalgebra.
+
+HB.factory Record SubSemiRing_SubLSemiModule_isSubLSemiAlgebra
+  (R : pzSemiRingType) (V : pzLSemiAlgType R) S W
+  of SubPzSemiRing V S W & @SubLSemiModule R V S W := {}.
+
+HB.builders Context R V S W
+  of SubSemiRing_SubLSemiModule_isSubLSemiAlgebra R V S W.
 Lemma scalerAl (a : R) (u v : W) : a *: (u * v) = a *: u * v.
 Proof. by apply: val_inj; rewrite !(linearZ, rmorphM) /= linearZ scalerAl. Qed.
 HB.instance Definition _ := LSemiModule_isLSemiAlgebra.Build R W scalerAl.
 HB.end.
 
-HB.factory Record SubNzRing_SubLmodule_isSubLalgebra (R : pzRingType)
-    (V : lalgType R) S W of SubNzRing V S W & @SubLmodule R V S W := {}.
+HB.factory Record SubRing_SubLmodule_isSubLalgebra (R : pzRingType)
+    (V : pzLalgType R) S W of SubPzRing V S W & @SubLmodule R V S W := {}.
 
-Module SubRing_SubLmodule_isSubLalgebra.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing_SubLmodule_isSubLalgebra.Build instead.")]
-Notation Build R V S U :=
-  (SubNzRing_SubLmodule_isSubLalgebra.Build R V S U) (only parsing).
-End SubRing_SubLmodule_isSubLalgebra.
-
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubNzRing_SubLmodule_isSubLalgebra instead.")]
-Notation SubRing_SubLmodule_isSubLalgebra R V S U :=
-  (SubNzRing_SubLmodule_isSubLalgebra R V S U) (only parsing).
-
-HB.builders Context (R : pzRingType) (V : lalgType R) S W
-  of SubNzRing_SubLmodule_isSubLalgebra R V S W.
+HB.builders Context R V S W of SubRing_SubLmodule_isSubLalgebra R V S W.
 HB.instance Definition _ :=
-  SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra.Build R V S W.
+  SubSemiRing_SubLSemiModule_isSubLSemiAlgebra.Build R V S W.
 HB.end.
 
-#[short(type="subSemiAlgType")]
-HB.structure Definition SubSemiAlgebra (R : pzSemiRingType) (V : semiAlgType R)
-    S :=
-  {W of @SubLSemiAlgebra R V S W & SemiAlgebra R W}.
+#[short(type="subPzSemiAlgType")]
+HB.structure Definition SubPzSemiAlgebra
+    (R : pzSemiRingType) (V : pzSemiAlgType R) S :=
+  {W of @SubPzLSemiAlgebra R V S W & PzSemiAlgebra R W}.
 
-#[short(type="subAlgType")]
-HB.structure Definition SubAlgebra (R : pzRingType) (V : algType R) S :=
-  {W of @SubLalgebra R V S W & Algebra R W}.
+#[short(type="subNzSemiAlgType")]
+HB.structure Definition SubNzSemiAlgebra
+    (R : nzSemiRingType) (V : nzSemiAlgType R) S :=
+  {W of @SubNzLSemiAlgebra R V S W & NzSemiAlgebra R W}.
+
+#[deprecated(since="mathcomp 2.6.0", use=SubNzSemiAlgebra)]
+Notation SubSemiAlgebra R := (SubNzSemiAlgebra R) (only parsing).
+
+Module SubSemiAlgebra.
+#[deprecated(since="mathcomp 2.6.0", use=SubNzSemiAlgebra.sort)]
+Notation sort := (SubNzSemiAlgebra.sort) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=SubNzSemiAlgebra.on)]
+Notation on R := (SubNzSemiAlgebra.on R) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=SubNzSemiAlgebra.copy)]
+Notation copy T U := (SubNzSemiAlgebra.copy T U) (only parsing).
+End SubSemiAlgebra.
+
+#[short(type="subPzAlgType")]
+HB.structure Definition SubPzAlgebra (R : pzRingType) (V : pzAlgType R) S :=
+  {W of @SubPzLalgebra R V S W & PzAlgebra R W}.
+
+#[short(type="subNzAlgType")]
+HB.structure Definition SubNzAlgebra (R : nzRingType) (V : nzAlgType R) S :=
+  {W of @SubNzLalgebra R V S W & NzAlgebra R W}.
+
+#[deprecated(since="mathcomp 2.6.0", use=SubNzAlgebra)]
+Notation SubAlgebra R := (SubNzAlgebra R) (only parsing).
+
+Module SubAlgebra.
+#[deprecated(since="mathcomp 2.6.0", use=SubNzAlgebra.sort)]
+Notation sort := (SubNzAlgebra.sort) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=SubNzAlgebra.on)]
+Notation on R := (SubNzAlgebra.on R) (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=SubNzAlgebra.copy)]
+Notation copy T U := (SubNzAlgebra.copy T U) (only parsing).
+End SubAlgebra.
 
 HB.factory Record SubLSemiAlgebra_isSubSemiAlgebra (R : pzSemiRingType)
-    (V : semiAlgType R) S W of @SubLSemiAlgebra R V S W := {}.
+    (V : pzSemiAlgType R) S W of @SubPzLSemiAlgebra R V S W := {}.
 
-HB.builders Context (R : pzSemiRingType) (V : semiAlgType R) S W
-  of SubLSemiAlgebra_isSubSemiAlgebra R V S W.
+HB.builders Context R V S W of SubLSemiAlgebra_isSubSemiAlgebra R V S W.
 Lemma scalerAr (k : R) (x y : W) : k *: (x * y) = x * (k *: y).
 Proof. by apply: val_inj; rewrite !(linearZ, rmorphM)/= linearZ scalerAr. Qed.
 HB.instance Definition _ := LSemiAlgebra_isSemiAlgebra.Build R W scalerAr.
-HB.end.
-
-HB.factory Record SubLalgebra_isSubAlgebra (R : pzRingType)
-    (V : algType R) S W of @SubLalgebra R V S W := {}.
-
-HB.builders Context (R : pzRingType) (V : algType R) S W
-  of SubLalgebra_isSubAlgebra R V S W.
-HB.instance Definition _ := SubLSemiAlgebra_isSubSemiAlgebra.Build R V S W.
 HB.end.
 
 #[short(type="subUnitRingType")]
@@ -6112,7 +6247,7 @@ HB.factory Record SubNzRing_isSubUnitRing (R : unitRingType) S U
   divring_closed_subproof : divring_closed S
 }.
 
-HB.builders Context (R : unitRingType) S U of SubNzRing_isSubUnitRing R S U.
+HB.builders Context R S U of SubNzRing_isSubUnitRing R S U.
 
 HB.instance Definition _ := isDivringClosed.Build R S divring_closed_subproof.
 
@@ -6150,8 +6285,7 @@ HB.structure Definition SubIntegralDomain (R : idomainType) (S : pred R) :=
 HB.factory Record SubComUnitRing_isSubIntegralDomain (R : idomainType) S U
   of SubComUnitRing R S U := {}.
 
-HB.builders Context (R : idomainType) S U
-  of SubComUnitRing_isSubIntegralDomain R S U.
+HB.builders Context R S U of SubComUnitRing_isSubIntegralDomain R S U.
 Lemma id : IntegralDomain.axiom U.
 Proof.
 move=> x y /(congr1 val)/eqP; rewrite rmorphM /=.
@@ -6169,7 +6303,7 @@ HB.factory Record SubIntegralDomain_isSubField (F : fieldType) S U
   subfield_subproof : {mono (val : U -> F) : u / u \in unit}
 }.
 
-HB.builders Context (F : fieldType) S U of SubIntegralDomain_isSubField F S U.
+HB.builders Context F S U of SubIntegralDomain_isSubField F S U.
 Lemma fieldP : Field.axiom U.
 Proof.
 by move=> u; rewrite -(inj_eq val_inj) rmorph0 -unitfE subfield_subproof.
@@ -6182,7 +6316,7 @@ HB.factory Record SubChoice_isSubPzSemiRing (R : pzSemiRingType) S U
   semiring_closed_subproof : semiring_closed S
 }.
 
-HB.builders Context (R : pzSemiRingType) S U of SubChoice_isSubPzSemiRing R S U.
+HB.builders Context R S U of SubChoice_isSubPzSemiRing R S U.
 HB.instance Definition _ := SubChoice_isSubNmodule.Build R S U
   (semiring_closedD semiring_closed_subproof).
 HB.instance Definition _ := SubNmodule_isSubPzSemiRing.Build R S U
@@ -6195,21 +6329,18 @@ HB.factory Record SubChoice_isSubNzSemiRing (R : nzSemiRingType) S U
 }.
 
 Module SubChoice_isSubSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubNzSemiRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubNzSemiRing.Build)]
 Notation Build R S U := (SubChoice_isSubNzSemiRing.Build R S U) (only parsing).
 End SubChoice_isSubSemiRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubNzSemiRing)]
 Notation SubChoice_isSubSemiRing R S U :=
   (SubChoice_isSubNzSemiRing R S U) (only parsing).
 
-HB.builders Context (R : nzSemiRingType) S U of SubChoice_isSubNzSemiRing R S U.
-HB.instance Definition _ := SubChoice_isSubNmodule.Build R S U
-  (semiring_closedD semiring_closed_subproof).
-HB.instance Definition _ := SubNmodule_isSubNzSemiRing.Build R S U
-  (semiring_closedM semiring_closed_subproof).
+HB.builders Context R S U of SubChoice_isSubNzSemiRing R S U.
+HB.instance Definition _ := SubChoice_isSubPzSemiRing.Build R S U
+  semiring_closed_subproof.
+HB.instance Definition _ := SubPzSemiRing_isNonZero.Build R S U.
 HB.end.
 
 HB.factory Record SubChoice_isSubComPzSemiRing (R : comPzSemiRingType) S U
@@ -6217,11 +6348,10 @@ HB.factory Record SubChoice_isSubComPzSemiRing (R : comPzSemiRingType) S U
   semiring_closed_subproof : semiring_closed S
 }.
 
-HB.builders Context (R : comPzSemiRingType) S U
-  of SubChoice_isSubComPzSemiRing R S U.
+HB.builders Context R S U of SubChoice_isSubComPzSemiRing R S U.
 HB.instance Definition _ := SubChoice_isSubPzSemiRing.Build R S U
   semiring_closed_subproof.
-HB.instance Definition _ := SubPzSemiRing_isSubComPzSemiRing.Build R S U.
+HB.instance Definition _ := SubSemiRing_isSubComSemiRing.Build R S U.
 HB.end.
 
 HB.factory Record SubChoice_isSubComNzSemiRing (R : comNzSemiRingType) S U
@@ -6230,55 +6360,51 @@ HB.factory Record SubChoice_isSubComNzSemiRing (R : comNzSemiRingType) S U
 }.
 
 Module SubChoice_isSubComSemiRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubComNzSemiRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubComNzSemiRing.Build)]
 Notation Build R S U :=
   (SubChoice_isSubComNzSemiRing.Build R S U) (only parsing).
 End SubChoice_isSubComSemiRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubComNzSemiRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubComNzSemiRing)]
 Notation SubChoice_isSubComSemiRing R S U :=
   (SubChoice_isSubComNzSemiRing R S U) (only parsing).
 
-HB.builders Context (R : comNzSemiRingType) S U
-  of SubChoice_isSubComNzSemiRing R S U.
-HB.instance Definition _ := SubChoice_isSubNzSemiRing.Build R S U
+HB.builders Context R S U of SubChoice_isSubComNzSemiRing R S U.
+HB.instance Definition _ := SubChoice_isSubComPzSemiRing.Build R S U
   semiring_closed_subproof.
-HB.instance Definition _ := SubNzSemiRing_isSubComNzSemiRing.Build R S U.
+HB.instance Definition _ := SubPzSemiRing_isNonZero.Build R S U.
 HB.end.
 
-HB.factory Record SubChoice_isSubPzRing (R : pzRingType) S U of SubChoice R S U := {
+HB.factory Record SubChoice_isSubPzRing (R : pzRingType) S U
+    of SubChoice R S U := {
   subring_closed_subproof : subring_closed S
 }.
 
-HB.builders Context (R : pzRingType) S U of SubChoice_isSubPzRing R S U.
+HB.builders Context R S U of SubChoice_isSubPzRing R S U.
 HB.instance Definition _ := SubChoice_isSubZmodule.Build R S U
   (subring_closedB subring_closed_subproof).
 HB.instance Definition _ := SubZmodule_isSubPzRing.Build R S U
   subring_closed_subproof.
 HB.end.
 
-HB.factory Record SubChoice_isSubNzRing (R : nzRingType) S U of SubChoice R S U := {
+HB.factory Record SubChoice_isSubNzRing (R : nzRingType) S U
+    of SubChoice R S U := {
   subring_closed_subproof : subring_closed S
 }.
 
 Module SubChoice_isSubRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubNzRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubNzRing.Build)]
 Notation Build R S U := (SubChoice_isSubNzRing.Build R S U) (only parsing).
 End SubChoice_isSubRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubNzRing)]
 Notation SubChoice_isSubRing R S U :=
   (SubChoice_isSubNzRing R S U) (only parsing).
 
-HB.builders Context (R : nzRingType) S U of SubChoice_isSubNzRing R S U.
-HB.instance Definition _ := SubChoice_isSubZmodule.Build R S U
-  (subring_closedB subring_closed_subproof).
-HB.instance Definition _ := SubZmodule_isSubNzRing.Build R S U
+HB.builders Context R S U of SubChoice_isSubNzRing R S U.
+HB.instance Definition _ := SubChoice_isSubPzRing.Build R S U
   subring_closed_subproof.
+HB.instance Definition _ := SubPzSemiRing_isNonZero.Build R S U.
 HB.end.
 
 HB.factory Record SubChoice_isSubComPzRing (R : comPzRingType) S U
@@ -6286,10 +6412,10 @@ HB.factory Record SubChoice_isSubComPzRing (R : comPzRingType) S U
   subring_closed_subproof : subring_closed S
 }.
 
-HB.builders Context (R : comPzRingType) S U of SubChoice_isSubComPzRing R S U.
+HB.builders Context R S U of SubChoice_isSubComPzRing R S U.
 HB.instance Definition _ := SubChoice_isSubPzRing.Build R S U
   subring_closed_subproof.
-HB.instance Definition _ := SubPzRing_isSubComPzRing.Build R S U.
+HB.instance Definition _ := SubSemiRing_isSubComSemiRing.Build R S U.
 HB.end.
 
 HB.factory Record SubChoice_isSubComNzRing (R : comNzRingType) S U
@@ -6298,20 +6424,18 @@ HB.factory Record SubChoice_isSubComNzRing (R : comNzRingType) S U
 }.
 
 Module SubChoice_isSubComRing.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubComNzRing.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubComNzRing.Build)]
 Notation Build R S U := (SubChoice_isSubComNzRing.Build R S U) (only parsing).
 End SubChoice_isSubComRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use SubChoice_isSubComNzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubComNzRing)]
 Notation SubChoice_isSubComRing R S U :=
   (SubChoice_isSubComNzRing R S U) (only parsing).
 
-HB.builders Context (R : comNzRingType) S U of SubChoice_isSubComNzRing R S U.
-HB.instance Definition _ := SubChoice_isSubNzRing.Build R S U
+HB.builders Context R S U of SubChoice_isSubComNzRing R S U.
+HB.instance Definition _ := SubChoice_isSubComPzRing.Build R S U
   subring_closed_subproof.
-HB.instance Definition _ := SubNzRing_isSubComNzRing.Build R S U.
+HB.instance Definition _ := SubPzSemiRing_isNonZero.Build R S U.
 HB.end.
 
 HB.factory Record SubChoice_isSubLSemiModule
@@ -6319,8 +6443,7 @@ HB.factory Record SubChoice_isSubLSemiModule
   subsemimod_closed_subproof : subsemimod_closed S
 }.
 
-HB.builders Context (R : pzSemiRingType) (V : lSemiModType R) S W
-  of SubChoice_isSubLSemiModule R V S W.
+HB.builders Context R V S W of SubChoice_isSubLSemiModule R V S W.
 HB.instance Definition _ := SubChoice_isSubNmodule.Build V S W
   (subsemimod_closedD subsemimod_closed_subproof).
 HB.instance Definition _ := SubNmodule_isSubLSemiModule.Build R V S W
@@ -6329,45 +6452,107 @@ HB.end.
 
 HB.factory Record SubChoice_isSubLmodule (R : pzRingType) (V : lmodType R) S W
     of SubChoice V S W := {
-  submod_closed_subproof : submod_closed S
+  subsemimod_closed_subproof : subsemimod_closed S
 }.
 
-HB.builders Context (R : pzRingType) (V : lmodType R) S W
-  of SubChoice_isSubLmodule R V S W.
+HB.builders Context R V S W of SubChoice_isSubLmodule R V S W.
 HB.instance Definition _ := SubChoice_isSubZmodule.Build V S W
-  (submod_closedB submod_closed_subproof).
-HB.instance Definition _ := SubZmodule_isSubLmodule.Build R V S W
-  submod_closed_subproof.
+  (subsemimod_closedB subsemimod_closed_subproof).
+HB.instance Definition _ := SubNmodule_isSubLSemiModule.Build R V S W
+  subsemimod_closed_subproof.
 HB.end.
 
-(* TODO: SubChoice_isSubLSemiAlgebra? *)
-
-HB.factory Record SubChoice_isSubLalgebra (R : pzRingType) (A : lalgType R) S W
-    of SubChoice A S W := {
-  subalg_closed_subproof : subalg_closed S
+HB.factory Record SubChoice_isSubPzLSemiAlgebra
+    (R : pzSemiRingType) (A : pzLSemiAlgType R) S W of SubChoice A S W := {
+  subsemialg_closed_subproof : subsemialg_closed S
 }.
 
-HB.builders Context (R : pzRingType) (A : lalgType R) S W
-  of SubChoice_isSubLalgebra R A S W.
-HB.instance Definition _ := SubChoice_isSubNzRing.Build A S W
-  (subalg_closedBM subalg_closed_subproof).
-HB.instance Definition _ := SubZmodule_isSubLmodule.Build R A S W
-  (subalg_closedZ subalg_closed_subproof).
-HB.instance Definition _ := SubNzRing_SubLmodule_isSubLalgebra.Build R A S W.
+HB.builders Context R A S W of SubChoice_isSubPzLSemiAlgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubPzSemiRing.Build A S W
+  (subsemialg_closedM subsemialg_closed_subproof).
+HB.instance Definition _ := SubNmodule_isSubLSemiModule.Build R A S W
+  (subsemialg_closedZ subsemialg_closed_subproof).
+HB.instance Definition _ :=
+  SubSemiRing_SubLSemiModule_isSubLSemiAlgebra.Build R A S W.
 HB.end.
 
-(* TODO: SubChoice_isSubSemiAlgebra? *)
-
-HB.factory Record SubChoice_isSubAlgebra (R : pzRingType) (A : algType R) S W
-    of SubChoice A S W := {
-  subalg_closed_subproof : subalg_closed S
+HB.factory Record SubChoice_isSubNzLSemiAlgebra
+    (R : nzSemiRingType) (A : nzLSemiAlgType R) S W of SubChoice A S W := {
+  subsemialg_closed_subproof : subsemialg_closed S
 }.
 
-HB.builders Context (R : pzRingType) (A : algType R) S W
-  of SubChoice_isSubAlgebra R A S W.
-HB.instance Definition _ := SubChoice_isSubLalgebra.Build R A S W
-  subalg_closed_subproof.
-HB.instance Definition _ := SubLalgebra_isSubAlgebra.Build R A S W.
+HB.builders Context R A S W of SubChoice_isSubNzLSemiAlgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubPzLSemiAlgebra.Build R A S W
+  subsemialg_closed_subproof.
+HB.instance Definition _ := SubPzSemiRing_isNonZero.Build A S W.
+HB.end.
+
+HB.factory Record SubChoice_isSubPzLalgebra
+    (R : pzRingType) (A : pzLalgType R) S W of SubChoice A S W := {
+  subsemialg_closed_subproof : subsemialg_closed S
+}.
+
+HB.builders Context R A S W of SubChoice_isSubPzLalgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubPzRing.Build A S W
+  (subsemialg_closedBM subsemialg_closed_subproof).
+HB.instance Definition _ := SubNmodule_isSubLSemiModule.Build R A S W
+  (subsemialg_closedZ subsemialg_closed_subproof).
+HB.instance Definition _ := SubRing_SubLmodule_isSubLalgebra.Build R A S W.
+HB.end.
+
+HB.factory Record SubChoice_isSubNzLalgebra
+    (R : nzRingType) (A : nzLalgType R) S W of SubChoice A S W := {
+  subsemialg_closed_subproof : subsemialg_closed S
+}.
+
+HB.builders Context R A S W of SubChoice_isSubNzLalgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubPzLalgebra.Build R A S W
+  subsemialg_closed_subproof.
+HB.instance Definition _ := SubPzSemiRing_isNonZero.Build A S W.
+HB.end.
+
+HB.factory Record SubChoice_isSubPzSemiAlgebra
+    (R : pzSemiRingType) (A : pzSemiAlgType R) S W of SubChoice A S W := {
+  subsemialg_closed_subproof : subsemialg_closed S
+}.
+
+HB.builders Context R A S W of SubChoice_isSubPzSemiAlgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubPzLSemiAlgebra.Build R A S W
+  subsemialg_closed_subproof.
+HB.instance Definition _ := SubLSemiAlgebra_isSubSemiAlgebra.Build R A S W.
+HB.end.
+
+HB.factory Record SubChoice_isSubNzSemiAlgebra
+    (R : nzSemiRingType) (A : nzSemiAlgType R) S W of SubChoice A S W := {
+  subsemialg_closed_subproof : subsemialg_closed S
+}.
+
+HB.builders Context R A S W of SubChoice_isSubNzSemiAlgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubPzSemiAlgebra.Build R A S W
+  subsemialg_closed_subproof.
+HB.instance Definition _ := SubPzSemiRing_isNonZero.Build A S W.
+HB.end.
+
+HB.factory Record SubChoice_isSubPzAlgebra
+    (R : pzRingType) (A : pzAlgType R) S W of SubChoice A S W := {
+  subsemialg_closed_subproof : subsemialg_closed S
+}.
+
+HB.builders Context R A S W of SubChoice_isSubPzAlgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubPzLalgebra.Build R A S W
+  subsemialg_closed_subproof.
+HB.instance Definition _ := SubLSemiAlgebra_isSubSemiAlgebra.Build R A S W.
+HB.end.
+
+HB.factory Record SubChoice_isSubNzAlgebra
+    (R : nzRingType) (A : nzAlgType R) S W of SubChoice A S W := {
+  subsemialg_closed_subproof : subsemialg_closed S
+}.
+
+HB.builders Context R A S W of SubChoice_isSubNzAlgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubPzAlgebra.Build R A S W
+  subsemialg_closed_subproof.
+HB.instance Definition _ := SubPzSemiRing_isNonZero.Build A S W.
 HB.end.
 
 HB.factory Record SubChoice_isSubUnitRing (R : unitRingType) S U
@@ -6375,7 +6560,7 @@ HB.factory Record SubChoice_isSubUnitRing (R : unitRingType) S U
   divring_closed_subproof : divring_closed S
 }.
 
-HB.builders Context (R : unitRingType) S U of SubChoice_isSubUnitRing R S U.
+HB.builders Context R S U of SubChoice_isSubUnitRing R S U.
 HB.instance Definition _ := SubChoice_isSubNzRing.Build R S U
   (divring_closedBM divring_closed_subproof).
 HB.instance Definition _ := SubNzRing_isSubUnitRing.Build R S U
@@ -6387,8 +6572,7 @@ HB.factory Record SubChoice_isSubComUnitRing (R : comUnitRingType) S U
   divring_closed_subproof : divring_closed S
 }.
 
-HB.builders Context (R : comUnitRingType) S U
-  of SubChoice_isSubComUnitRing R S U.
+HB.builders Context R S U of SubChoice_isSubComUnitRing R S U.
 HB.instance Definition _ := SubChoice_isSubComNzRing.Build R S U
   (divring_closedBM divring_closed_subproof).
 HB.instance Definition _ := SubNzRing_isSubUnitRing.Build R S U
@@ -6400,8 +6584,7 @@ HB.factory Record SubChoice_isSubIntegralDomain (R : idomainType) S U
   divring_closed_subproof : divring_closed S
 }.
 
-HB.builders Context (R : idomainType) S U
-  of SubChoice_isSubIntegralDomain R S U.
+HB.builders Context R S U of SubChoice_isSubIntegralDomain R S U.
 HB.instance Definition _ := SubChoice_isSubComUnitRing.Build R S U
   divring_closed_subproof.
 HB.instance Definition _ := SubComUnitRing_isSubIntegralDomain.Build R S U.
@@ -6409,14 +6592,6 @@ HB.end.
 
 Module SubExports.
 
-Notation "[ 'SubChoice_isSubNmodule' 'of' U 'by' <: ]" :=
-  (SubChoice_isSubNmodule.Build _ _ U rpred0D)
-  (format "[ 'SubChoice_isSubNmodule'  'of'  U  'by'  <: ]")
-  : form_scope.
-Notation "[ 'SubChoice_isSubZmodule' 'of' U 'by' <: ]" :=
-  (SubChoice_isSubZmodule.Build _ _ U (zmodClosedP _))
-  (format "[ 'SubChoice_isSubZmodule'  'of'  U  'by'  <: ]")
-  : form_scope.
 Notation "[ 'SubNmodule_isSubNzSemiRing' 'of' U 'by' <: ]" :=
   (SubNmodule_isSubNzSemiRing.Build _ _ U (@rpred1M _ _))
   (format "[ 'SubNmodule_isSubNzSemiRing'  'of'  U  'by'  <: ]")
@@ -6432,27 +6607,51 @@ Notation "[ 'SubChoice_isSubNzSemiRing' 'of' U 'by' <: ]" :=
   (format "[ 'SubChoice_isSubNzSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use [ 'SubChoice_isSubNzSemiRing' of U by <: ] instead.")]
+             note="Use [ SubChoice_isSubNzSemiRing of U by <: ] instead.")]
 Notation "[ 'SubChoice_isSubSemiRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubNzSemiRing.Build _ _ U (semiringClosedP _))
   (format "[ 'SubChoice_isSubSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubSemiRing_isSubComSemiRing' 'of' U 'by' <: ]" :=
+  (SubSemiRing_isSubComSemiRing.Build _ _ U)
+  (format "[ 'SubSemiRing_isSubComSemiRing'  'of'  U  'by'  <: ]")
+  : form_scope.
+#[deprecated(since="mathcomp 2.6.0",
+        note="Use [ SubSemiRing_isSubComSemiRing of U by <: ] instead.")]
+Notation "[ 'SubPzSemiRing_isSubComPzSemiRing' 'of' U 'by' <: ]" :=
+  (SubSemiRing_isSubComSemiRing.Build _ _ U)
+  (format "[ 'SubPzSemiRing_isSubComPzSemiRing'  'of'  U  'by'  <: ]")
+  : form_scope.
+#[deprecated(since="mathcomp 2.6.0",
+        note="Use [ SubSemiRing_isSubComSemiRing of U by <: ] instead.")]
 Notation "[ 'SubNzSemiRing_isSubComNzSemiRing' 'of' U 'by' <: ]" :=
-  (SubNzSemiRing_isSubComNzSemiRing.Build _ _ U)
+  (SubSemiRing_isSubComSemiRing.Build _ _ U)
   (format "[ 'SubNzSemiRing_isSubComNzSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
-        note="Use [ 'SubNzSemiRing_isSubComNzSemiRing' of U by <: ] instead.")]
-Notation "[ 'SubSemiRing_isSubComSemiRing' 'of' U 'by' <: ]" :=
-  (SubNzSemiRing_isSubComNzSemiRing.Build _ _ U)
-  (format "[ 'SubSemiRing_isSubComSemiRing'  'of'  U  'by'  <: ]")
+             note="Use [ SubSemiRing_isSubComSemiRing of U by <: ] instead.")]
+Notation "[ 'SubRing_isSubComRing' 'of' U 'by' <: ]" :=
+  (SubSemiRing_isSubComSemiRing.Build _ _ U)
+  (format "[ 'SubRing_isSubComRing'  'of'  U  'by'  <: ]")
+  : form_scope.
+#[deprecated(since="mathcomp 2.6.0",
+             note="Use [ SubSemiRing_isSubComSemiRing of U by <: ] instead.")]
+Notation "[ 'SubPzRing_isSubComPzRing' 'of' U 'by' <: ]" :=
+  (SubSemiRing_isSubComSemiRing.Build _ _ U)
+  (format "[ 'SubPzRing_isSubComPzRing'  'of'  U  'by'  <: ]")
+  : form_scope.
+#[deprecated(since="mathcomp 2.6.0",
+             note="Use [ SubSemiRing_isSubComSemiRing of U by <: ] instead.")]
+Notation "[ 'SubNzRing_isSubComNzRing' 'of' U 'by' <: ]" :=
+  (SubSemiRing_isSubComSemiRing.Build _ _ U)
+  (format "[ 'SubNzRing_isSubComNzRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubComNzSemiRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubComNzSemiRing.Build _ _ U (semiringClosedP _))
   (format "[ 'SubChoice_isSubComNzSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use [ 'SubChoice_isSubComNzSemiRing' of U by <: ] instead.")]
+             note="Use [ SubChoice_isSubComNzSemiRing of U by <: ] instead.")]
 Notation "[ 'SubChoice_isSubComSemiRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubComNzSemiRing.Build _ _ U (semiringClosedP _))
   (format "[ 'SubChoice_isSubComSemiRing'  'of'  U  'by'  <: ]")
@@ -6462,7 +6661,7 @@ Notation "[ 'SubZmodule_isSubNzRing' 'of' U 'by' <: ]" :=
   (format "[ 'SubZmodule_isSubNzRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use [ 'SubZmodule_isSubNzRing' of U by <: ] instead.")]
+             note="Use [ SubZmodule_isSubNzRing of U by <: ] instead.")]
 Notation "[ 'SubZmodule_isSubRing' 'of' U 'by' <: ]" :=
   (SubZmodule_isSubNzRing.Build _ _ U (subringClosedP _))
   (format "[ 'SubZmodule_isSubRing'  'of'  U  'by'  <: ]")
@@ -6472,27 +6671,17 @@ Notation "[ 'SubChoice_isSubNzRing' 'of' U 'by' <: ]" :=
   (format "[ 'SubChoice_isSubNzRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use [ 'SubChoice_isSubNzRing' of U by <: ] instead.")]
+             note="Use [ SubChoice_isSubNzRing of U by <: ] instead.")]
 Notation "[ 'SubChoice_isSubRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubNzRing.Build _ _ U (subringClosedP _))
   (format "[ 'SubChoice_isSubRing'  'of'  U  'by'  <: ]")
-  : form_scope.
-Notation "[ 'SubNzRing_isSubComNzRing' 'of' U 'by' <: ]" :=
-  (SubNzRing_isSubComNzRing.Build _ _ U)
-  (format "[ 'SubNzRing_isSubComNzRing'  'of'  U  'by'  <: ]")
-  : form_scope.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use [ 'SubNzRing_isSubComNzRing' of U by <: ] instead.")]
-Notation "[ 'SubRing_isSubComRing' 'of' U 'by' <: ]" :=
-  (SubNzRing_isSubComNzRing.Build _ _ U)
-  (format "[ 'SubRing_isSubComRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubComNzRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubComNzRing.Build _ _ U (subringClosedP _))
   (format "[ 'SubChoice_isSubComNzRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use [ 'SubChoice_isSubComNzRing' of U by <: ] instead.")]
+             note="Use [ SubChoice_isSubComNzRing of U by <: ] instead.")]
 Notation "[ 'SubChoice_isSubComRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubComNzRing.Build _ _ U (subringClosedP _))
   (format "[ 'SubChoice_isSubComRing'  'of'  U  'by'  <: ]")
@@ -6505,52 +6694,108 @@ Notation "[ 'SubChoice_isSubLSemiModule' 'of' U 'by' <: ]" :=
   (SubChoice_isSubLSemiModule.Build _ _ _ U (subsemimodClosedP _))
   (format "[ 'SubChoice_isSubLSemiModule'  'of'  U  'by'  <: ]")
   : form_scope.
+#[deprecated(since="mathcomp 2.6.0",
+        note="Use [ SubNmodule_isSubLSemiModule of U by <: ] instead.")]
 Notation "[ 'SubZmodule_isSubLmodule' 'of' U 'by' <: ]" :=
-  (SubZmodule_isSubLmodule.Build _ _ _ U (submodClosedP _))
+  (SubNmodule_isSubLSemiModule.Build _ _ _ U (subsemimodClosedP _))
   (format "[ 'SubZmodule_isSubLmodule'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubLmodule' 'of' U 'by' <: ]" :=
-  (SubChoice_isSubLmodule.Build _ _ _ U (submodClosedP _))
+  (SubChoice_isSubLmodule.Build _ _ _ U (subsemimodClosedP _))
   (format "[ 'SubChoice_isSubLmodule'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubSemiRing_SubLSemiModule_isSubLSemiAlgebra' 'of' U 'by' <: ]" :=
+  (SubSemiRing_SubLSemiModule_isSubLSemiAlgebra.Build _ _ _ U)
+  (format "[ 'SubSemiRing_SubLSemiModule_isSubLSemiAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+#[deprecated(since="mathcomp 2.6.0",
+      note="Use [ SubSemiRing_SubLSemiModule_isSubLSemiAlgebra of U by <: ] instead.")]
 Notation "[ 'SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra' 'of' U 'by' <: ]" :=
-  (SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra.Build _ _ _ U)
+  (SubSemiRing_SubLSemiModule_isSubLSemiAlgebra.Build _ _ _ U)
   (format "[ 'SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra'  'of'  U  'by'  <: ]")
   : form_scope.
-(* TODO: SubChoice_isSubLSemiAlgebra? *)
-Notation "[ 'SubNzRing_SubLmodule_isSubLalgebra' 'of' U 'by' <: ]" :=
-  (SubNzRing_SubLmodule_isSubLalgebra.Build _ _ _ U)
-  (format "[ 'SubNzRing_SubLmodule_isSubLalgebra'  'of'  U  'by'  <: ]")
-  : form_scope.
-#[deprecated(since="mathcomp 2.4.0",
-      note="Use [ 'SubNzRing_SubLmodule_isSubLalgebra' of U by <: ] instead.")]
 Notation "[ 'SubRing_SubLmodule_isSubLalgebra' 'of' U 'by' <: ]" :=
-  (SubNzRing_SubLmodule_isSubLalgebra.Build _ _ _ U)
+  (SubRing_SubLmodule_isSubLalgebra.Build _ _ _ U)
   (format "[ 'SubRing_SubLmodule_isSubLalgebra'  'of'  U  'by'  <: ]")
   : form_scope.
-Notation "[ 'SubChoice_isSubLalgebra' 'of' U 'by' <: ]" :=
-  (SubChoice_isSubLalgebra.Build _ _ _ U (subalgClosedP _))
-  (format "[ 'SubChoice_isSubLalgebra'  'of'  U  'by'  <: ]")
+#[deprecated(since="mathcomp 2.6.0",
+      note="Use [ SubRing_SubLmodule_isSubLalgebra of U by <: ] instead.")]
+Notation "[ 'SubNzRing_SubLmodule_isSubLalgebra' 'of' U 'by' <: ]" :=
+  (SubRing_SubLmodule_isSubLalgebra.Build _ _ _ U)
+  (format "[ 'SubNzRing_SubLmodule_isSubLalgebra'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubLSemiAlgebra_isSubSemiAlgebra' 'of' U 'by' <: ]" :=
   (SubLSemiAlgebra_isSubSemiAlgebra.Build _ _ _ U)
   (format "[ 'SubLSemiAlgebra_isSubSemiAlgebra'  'of'  U  'by'  <: ]")
   : form_scope.
-(* TODO: SubChoice_isSubSemiAlgebra? *)
+#[deprecated(since="mathcomp 2.6.0",
+        note="Use [ SubLSemiAlgebra_isSubSemiAlgebra of U by <: ] instead.")]
 Notation "[ 'SubLalgebra_isSubAlgebra' 'of' U 'by' <: ]" :=
-  (SubLalgebra_isSubAlgebra.Build _ _ _ U)
+  (SubLSemiAlgebra_isSubSemiAlgebra.Build _ _ _ U)
   (format "[ 'SubLalgebra_isSubAlgebra'  'of'  U  'by'  <: ]")
   : form_scope.
-Notation "[ 'SubChoice_isSubAlgebra' 'of' U 'by' <: ]" :=
-  (SubChoice_isSubAlgebra.Build _ _ _ U (subalgClosedP _))
-  (format "[ 'SubChoice_isSubAlgebra'  'of'  U  'by'  <: ]")
+Notation "[ 'SubChoice_isSubPzLSemiAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubPzLSemiAlgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubPzLSemiAlgebra'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubChoice_isSubNzLSemiAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubNzLSemiAlgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubNzLSemiAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+#[deprecated(since="mathcomp 2.6.0",
+      note="Use [ SubChoice_isSubNzLSemiAlgebra of U by <: ] instead.")]
+Notation "[ 'SubChoice_isSubLSemiAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubNzLSemiAlgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubLSemiAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubPzLalgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubPzLalgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubPzLalgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubNzLalgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubNzLalgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubNzLalgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+#[deprecated(since="mathcomp 2.6.0",
+      note="Use [ SubChoice_isSubNzLalgebra of U by <: ] instead.")]
+Notation "[ 'SubChoice_isSubLalgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubNzLalgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubLalgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubPzSemiAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubPzSemiAlgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubPzSemiAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubNzSemiAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubNzSemiAlgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubNzSemiAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+#[deprecated(since="mathcomp 2.6.0",
+             note="Use [ SubChoice_isSubNzSemiAlgebra of U by <: ] instead.")]
+Notation "[ 'SubChoice_isSubSemiAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubNzSemiAlgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubSemiAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubPzAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubPzAlgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubPzAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubNzAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubNzAlgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubNzAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+#[deprecated(since="mathcomp 2.6.0",
+             note="Use [ SubChoice_isSubNzAlgebra of U by <: ] instead.")]
+Notation "[ 'SubChoice_isSubAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubNzAlgebra.Build _ _ _ U (subalgClosedP _))
+  (format "[ 'SubChoice_isSubAlgebra'  'of'  U  'by'  <: ]")
+ : form_scope.
 Notation "[ 'SubNzRing_isSubUnitRing' 'of' U 'by' <: ]" :=
   (SubNzRing_isSubUnitRing.Build _ _ U (divringClosedP _))
   (format "[ 'SubNzRing_isSubUnitRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
-             note="Use [ 'SubNzRing_isSubUnitRing' of U by <: ] instead.")]
+             note="Use [ SubNzRing_isSubUnitRing of U by <: ] instead.")]
 Notation "[ 'SubRing_isSubUnitRing' 'of' U 'by' <: ]" :=
   (SubNzRing_isSubUnitRing.Build _ _ U (divringClosedP _))
   (format "[ 'SubRing_isSubUnitRing'  'of'  U  'by'  <: ]")
@@ -6596,6 +6841,7 @@ Definition addNKr := addNKr.
 Definition addrK := addrK.
 Definition addrNK := addrNK.
 Definition subrK := subrK.
+Definition subrKC := subrKC.
 Definition subKr := subKr.
 Definition addrI := @addrI.
 Definition addIr := @addIr.
@@ -6748,67 +6994,67 @@ Definition sqrrD1 := sqrrD1.
 Definition sqrrB1 := sqrrB1.
 Definition subr_sqr_1 := subr_sqr_1.
 Definition pcharf0 := pcharf0.
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf0)]
 Definition charf0 := pcharf0.
 Definition pcharf_prime := pcharf_prime.
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf_prime instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf_prime)]
 Definition charf_prime := pcharf_prime.
 Definition mulrn_pchar := mulrn_pchar.
-#[deprecated(since="mathcomp 2.4.0", note="Use mulrn_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=mulrn_pchar)]
 Definition mulrn_char := mulrn_pchar.
 Definition dvdn_pcharf := dvdn_pcharf.
-#[deprecated(since="mathcomp 2.4.0", note="Use dvdn_pcharf instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=dvdn_pcharf)]
 Definition dvdn_charf := dvdn_pcharf.
 Definition pcharf_eq := pcharf_eq.
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf_eq instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf_eq)]
 Definition charf_eq := pcharf_eq.
 Definition bin_lt_pcharf_0 := bin_lt_pcharf_0.
-#[deprecated(since="mathcomp 2.4.0", note="Use bin_lt_pcharf_0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=bin_lt_pcharf_0)]
 Definition bin_lt_charf_0 := bin_lt_pcharf_0.
 Definition pFrobenius_autE := pFrobenius_autE.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autE instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autE)]
 Definition Frobenius_autE := pFrobenius_autE.
 Definition pFrobenius_aut0 := pFrobenius_aut0.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut0)]
 Definition Frobenius_aut0 := pFrobenius_aut0.
 Definition pFrobenius_aut1 := pFrobenius_aut1.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut1 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut1)]
 Definition Frobenius_aut1 := pFrobenius_aut1.
 Definition pFrobenius_autD_comm := pFrobenius_autD_comm.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autD_comm instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autD_comm)]
 Definition Frobenius_autD_comm := pFrobenius_autD_comm.
 Definition pFrobenius_autMn := pFrobenius_autMn.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autMn instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autMn)]
 Definition Frobenius_autMn := pFrobenius_autMn.
 Definition pFrobenius_aut_nat := pFrobenius_aut_nat.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut_nat instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut_nat)]
 Definition Frobenius_aut_nat := pFrobenius_aut_nat.
 Definition pFrobenius_autM_comm := pFrobenius_autM_comm.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autM_comm instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autM_comm)]
 Definition Frobenius_autM_comm := pFrobenius_autM_comm.
 Definition pFrobenius_autX := pFrobenius_autX.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autX instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autX)]
 Definition Frobenius_autX := pFrobenius_autX.
 Definition pFrobenius_autN := pFrobenius_autN.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autN instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autN)]
 Definition Frobenius_autN := pFrobenius_autN.
 Definition pFrobenius_autB_comm := pFrobenius_autB_comm.
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_autB_comm instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autB_comm)]
 Definition Frobenius_autB_comm := pFrobenius_autB_comm.
 Definition exprNn_pchar := exprNn_pchar.
-#[deprecated(since="mathcomp 2.4.0", note="Use exprNn_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=exprNn_pchar)]
 Definition exprNn_char := exprNn_pchar.
 Definition addrr_pchar2 := addrr_pchar2.
-#[deprecated(since="mathcomp 2.4.0", note="Use addrr_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=addrr_pchar2)]
 Definition addrr_char2 := addrr_pchar2.
 Definition oppr_pchar2 := oppr_pchar2.
-#[deprecated(since="mathcomp 2.4.0", note="Use oppr_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=oppr_pchar2)]
 Definition oppr_char2 := oppr_pchar2.
 Definition addrK_pchar2 := addrK_pchar2.
-#[deprecated(since="mathcomp 2.4.0", note="Use addrK_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=addrK_pchar2)]
 Definition addrK_char2 := addrK_pchar2.
 Definition addKr_pchar2 := addKr_pchar2.
-#[deprecated(since="mathcomp 2.4.0", note="Use addKr_pchar2 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=addKr_pchar2)]
 Definition addKr_char2 := addKr_pchar2.
 Definition iter_mulr := iter_mulr.
 Definition iter_mulr_1 := iter_mulr_1.
@@ -6840,7 +7086,7 @@ Definition sqrrB := sqrrB.
 Definition subr_sqr := subr_sqr.
 Definition subr_sqrDB := subr_sqrDB.
 Definition exprDn_pchar := exprDn_pchar.
-#[deprecated(since="mathcomp 2.4.0", note="Use exprDn_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=exprDn_pchar)]
 Definition exprDn_char := exprDn_pchar.
 Definition mulrV := mulrV.
 Definition divrr := divrr.
@@ -6934,7 +7180,7 @@ Definition rpred_div := rpred_div.
 Definition rpredXN := rpredXN.
 Definition rpredZeq := rpredZeq.
 Definition pchar_lalg := pchar_lalg.
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar_lalg instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar_lalg)]
 Definition char_lalg := pchar_lalg.
 Definition rpredMr := rpredMr.
 Definition rpredMl := rpredMl.
@@ -6963,16 +7209,16 @@ Definition expf_eq0 := expf_eq0.
 Definition sqrf_eq0 := sqrf_eq0.
 Definition expf_neq0 := expf_neq0.
 Definition natf_neq0_pchar := natf_neq0_pchar.
-#[deprecated(since="mathcomp 2.4.0", note="Use natf_neq0_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=natf_neq0_pchar)]
 Definition natf_neq0 := natf_neq0_pchar.
 Definition natf0_pchar := natf0_pchar.
-#[deprecated(since="mathcomp 2.4.0", note="Use natf0_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=natf0_pchar)]
 Definition natf0_char := natf0_pchar.
 Definition pcharf'_nat := pcharf'_nat.
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf'_nat instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf'_nat)]
 Definition charf'_nat := pcharf'_nat.
 Definition pcharf0P := pcharf0P.
-#[deprecated(since="mathcomp 2.4.0", note="Use pcharf0P instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pcharf0P)]
 Definition charf0P := pcharf0P.
 Definition eqf_sqr := eqf_sqr.
 Definition mulfI := mulfI.
@@ -7006,7 +7252,7 @@ Definition mulf_div := mulf_div.
 Definition eqr_div := eqr_div.
 Definition eqr_sum_div := eqr_sum_div.
 Definition pchar0_natf_div := pchar0_natf_div.
-#[deprecated(since="mathcomp 2.4.0", note="Use pchar0_natf_div instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pchar0_natf_div)]
 Definition char0_natf_div := pchar0_natf_div.
 Definition fpredMr := fpredMr.
 Definition fpredMl := fpredMl.
@@ -7019,11 +7265,11 @@ Definition eq_sol := eq_sol.
 Definition size_sol := size_sol.
 Definition solve_monicpoly := @solve_monicpoly.
 #[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `nmod_morphism` instead")]
+  deprecated(since="mathcomp 2.5.0", use=nmod_morphism)]
 Definition semi_additive := semi_additive.
 Definition nmod_morphism := nmod_morphism.
 #[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `zmod_morphism` instead")]
+  deprecated(since="mathcomp 2.5.0", use=zmod_morphism)]
 Definition additive := additive.
 Definition zmod_morphism := zmod_morphism.
 Definition raddf0 := raddf0.
@@ -7038,15 +7284,15 @@ Definition raddfMNn := raddfMNn.
 Definition raddfMnat := raddfMnat.
 Definition raddfMsign := raddfMsign.
 #[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `can2_nmod_morphism` instead")]
+  deprecated(since="mathcomp 2.5.0", use=can2_nmod_morphism)]
 Definition can2_semi_additive := can2_semi_additive.
 Definition can2_nmod_morphism := can2_nmod_morphism.
 #[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `can2_zmod_morphism` instead")]
+  deprecated(since="mathcomp 2.5.0", use=can2_zmod_morphism)]
 Definition can2_additive := can2_additive.
 Definition can2_zmod_morphism := can2_zmod_morphism.
 #[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `monoid_morphism` instead")]
+  deprecated(since="mathcomp 2.5.0", use=monoid_morphism)]
 Definition multiplicative := multiplicative.
 Definition monoid_morphism := monoid_morphism.
 Definition rmorph0 := rmorph0.
@@ -7057,7 +7303,7 @@ Definition rmorph_sum := rmorph_sum.
 Definition rmorphMn := rmorphMn.
 Definition rmorphMNn := rmorphMNn.
 #[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `rmorphism_monoidP` instead")]
+  deprecated(since="mathcomp 2.5.0", use=rmorphism_monoidP)]
 Definition rmorphismMP := rmorphismMP.
 Definition rmorphism_monoidP := rmorphism_monoidP.
 Definition rmorph1 := rmorph1.
@@ -7071,10 +7317,10 @@ Definition rmorphXn := rmorphXn.
 Definition rmorphN1 := rmorphN1.
 Definition rmorph_sign := rmorph_sign.
 Definition rmorph_pchar := rmorph_pchar.
-#[deprecated(since="mathcomp 2.4.0", note="Use rmorph_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=rmorph_pchar)]
 Definition rmorph_char := rmorph_pchar.
 #[warning="-deprecated-since-mathcomp-2.5.0",
-    deprecated(since="mathcomp 2.5.0", note="use `can2_monoid_morphism` instead")]
+  deprecated(since="mathcomp 2.5.0", use=can2_monoid_morphism)]
 Definition can2_rmorphism := can2_rmorphism.
 Definition can2_monoid_morphism := can2_monoid_morphism.
 Definition rmorph_comm := rmorph_comm.
@@ -7087,7 +7333,7 @@ Arguments fmorph_inj {F R} f [x1 x2].
 Definition fmorph_eq := fmorph_eq.
 Definition fmorph_eq1 := fmorph_eq1.
 Definition fmorph_pchar := fmorph_pchar.
-#[deprecated(since="mathcomp 2.4.0", note="Use fmorph_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=fmorph_pchar)]
 Definition fmorph_char := fmorph_pchar.
 Definition fmorph_unit := fmorph_unit.
 Definition fmorphV := fmorphV.
@@ -7133,12 +7379,12 @@ Definition in_algE := in_algE.
 Definition scalable_for := scalable_for.
 Definition semilinear_for := semilinear_for.
 Definition linear_for := linear_for.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-        note="use `nmod_morphism_semilinear` instead")]
+#[warning="-deprecated-since-mathcomp-2.5.0",
+  deprecated(since="mathcomp 2.5.0", use=nmod_morphism_semilinear)]
 Definition additive_semilinear := additive_semilinear.
 Definition nmod_morphism_semilinear := nmod_morphism_semilinear.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `zmod_morphism_linear` instead")]
+#[warning="-deprecated-since-mathcomp-2.5.0",
+  deprecated(since="mathcomp 2.5.0", use=zmod_morphism_linear)]
 Definition additive_linear := additive_linear.
 Definition zmod_morphism_linear := zmod_morphism_linear.
 Definition scalable_semilinear := scalable_semilinear.
@@ -7210,7 +7456,37 @@ Notation subComSemiRingType := (subComNzSemiRingType) (only parsing).
 Notation subRingType := (subNzRingType) (only parsing).
 #[deprecated(since="mathcomp 2.4.0",
              note="Try subComPzRingType (the potentially-zero counterpart) first, or use subComNzRingType instead.")]
-Notation subComNzRingType := (subComNzRingType) (only parsing).
+Notation subComRingType := (subComNzRingType) (only parsing).
+#[deprecated(since="mathcomp 2.6.0",
+             note="Try pzLSemiAlgType (the potentially-zero counterpart) first, or use nzLSemiAlgType instead.")]
+Notation lSemiAlgType := (nzLSemiAlgType) (only parsing).
+#[deprecated(since="mathcomp 2.6.0",
+             note="Try pzLalgType (the potentially-zero counterpart) first, or use nzLalgType instead.")]
+Notation lalgType := (nzLalgType) (only parsing).
+#[deprecated(since="mathcomp 2.6.0",
+             note="Try pzSemiAlgType (the potentially-zero counterpart) first, or use nzSemiAlgType instead.")]
+Notation semiAlgType := (nzSemiAlgType) (only parsing).
+#[deprecated(since="mathcomp 2.6.0",
+             note="Try pzAlgType (the potentially-zero counterpart) first, or use nzAlgType instead.")]
+Notation algType := (nzAlgType) (only parsing).
+#[deprecated(since="mathcomp 2.6.0",
+             note="Try comPzSemiAlgType (the potentially-zero counterpart) first, or use comNzSemiAlgType instead.")]
+Notation comSemiAlgType := (comNzSemiAlgType) (only parsing).
+#[deprecated(since="mathcomp 2.6.0",
+             note="Try comPzAlgType (the potentially-zero counterpart) first, or use comNzAlgType instead.")]
+Notation comAlgType := (comNzAlgType) (only parsing).
+#[deprecated(since="mathcomp 2.6.0",
+             note="Try subPzLSemiAlgType (the potentially-zero counterpart) first, or use subNzLSemiAlgType instead.")]
+Notation subLSemiAlgType := (subNzLSemiAlgType) (only parsing).
+#[deprecated(since="mathcomp 2.6.0",
+             note="Try subPzLalgType (the potentially-zero counterpart) first, or use subNzLalgType instead.")]
+Notation subLalgType := (subNzLalgType) (only parsing).
+#[deprecated(since="mathcomp 2.6.0",
+             note="Try subPzSemiAlgType (the potentially-zero counterpart) first, or use subNzSemiAlgType instead.")]
+Notation subSemiAlgType := (subNzSemiAlgType) (only parsing).
+#[deprecated(since="mathcomp 2.6.0",
+             note="Try subPzAlgType (the potentially-zero counterpart) first, or use subNzAlgType instead.")]
+Notation subAlgType := (subNzAlgType) (only parsing).
 
 Notation addrClosed := addrClosed.
 Notation opprClosed := opprClosed.
@@ -7267,10 +7543,10 @@ Notation "[ 'pchar' R ]" := (GRing.pchar R) : ring_scope.
 #[deprecated(since="mathcomp 2.4.0", note="Use [pchar R] instead.")]
 Notation "[ 'char' R ]" := (GRing.pchar R) : ring_scope.
 Notation has_pchar0 R := (GRing.pchar R =i pred0).
-#[deprecated(since="mathcomp 2.4.0", note="Use has_pchar0 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=has_pchar0)]
 Notation has_char0 R := (GRing.pchar R =i pred0).
 Notation pFrobenius_aut chRp := (pFrobenius_aut chRp).
-#[deprecated(since="mathcomp 2.4.0", note="Use pFrobenius_aut instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut)]
 Notation Frobenius_aut chRp := (pFrobenius_aut chRp).
 Notation "*%R" := (@mul _) : function_scope.
 Notation "x * y" := (mul x y) : ring_scope.
@@ -7347,8 +7623,8 @@ Notation "\prod_ ( i 'in' A | P ) F" :=
 Notation "\prod_ ( i 'in' A ) F" :=
   (\big[*%R/1%R]_(i in A) F%R) : ring_scope.
 
-Notation "R ^c" := (converse R) (at level 2, format "R ^c") : type_scope.
-Notation "R ^o" := (regular R) (at level 2, format "R ^o") : type_scope.
+Notation "R ^c" := (converse R) : type_scope.
+Notation "R ^o" := (regular R) : type_scope.
 
 Bind Scope term_scope with term.
 Bind Scope term_scope with formula.
@@ -7493,7 +7769,7 @@ Proof. by move=> f1 f2; apply/ffunP=> i; rewrite !ffunE mulrC. Qed.
 (* TODO_HB
 #[export]
 HB.instance Definition _ :=
-  Ring_hasCommutativeMul.Build (ffun_ring _ a) ffun_mulC.
+  SemiRing_hasCommutativeMul.Build (ffun_ring _ a) ffun_mulC.
 *)
 
 End FinFunComRing.
@@ -7527,6 +7803,8 @@ End FinFunLSemiMod.
 #[export]
 HB.instance Definition _ (R : pzRingType) (aT : finType) (rT : lmodType R) :=
   LSemiModule.on {ffun aT -> rT}.
+
+(* TODO: algebra over finfun? *)
 
 (* External direct product. *)
 
@@ -7609,7 +7887,7 @@ Fact pair_mulC : commutative (@mul_pair R1 R2).
 Proof. by move=> x y; congr (_, _); apply: mulrC. Qed.
 
 #[export]
-HB.instance Definition _ := PzSemiRing_hasCommutativeMul.Build (R1 * R2)%type
+HB.instance Definition _ := SemiRing_hasCommutativeMul.Build (R1 * R2)%type
   pair_mulC.
 
 End PairComSemiRing.
@@ -7666,7 +7944,7 @@ End PairLSemiMod.
 
 Section PairLSemiAlg.
 
-Variables (R : pzSemiRingType) (A1 A2 : lSemiAlgType R).
+Variables (R : pzSemiRingType) (A1 A2 : pzLSemiAlgType R).
 
 Fact pair_scaleAl a (u v : A1 * A2) : a *: (u * v) = (a *: u) * v.
 Proof. by congr (_, _); apply: scalerAl. Qed.
@@ -7686,7 +7964,7 @@ End PairLSemiAlg.
 
 Section PairSemiAlg.
 
-Variables (R : pzSemiRingType) (A1 A2 : semiAlgType R).
+Variables (R : pzSemiRingType) (A1 A2 : pzSemiAlgType R).
 
 Fact pair_scaleAr a (u v : A1 * A2) : a *: (u * v) = u * (a *: v).
 Proof. by congr (_, _); apply: scalerAr. Qed.
@@ -7738,26 +8016,41 @@ End PairUnitRing.
 HB.instance Definition _ (R1 R2 : comUnitRingType) :=
   UnitRing.on (R1 * R2)%type.
 #[export]
-HB.instance Definition _ (R : pzSemiRingType) (A1 A2 : comSemiAlgType R) :=
-  SemiAlgebra.on (A1 * A2)%type.
+HB.instance Definition _ (R : pzSemiRingType) (A1 A2 : comPzSemiAlgType R) :=
+  PzSemiAlgebra.on (A1 * A2)%type.
+#[export]
+HB.instance Definition _ (R : nzSemiRingType) (A1 A2 : nzLSemiAlgType R) :=
+  PzLSemiAlgebra.on (A1 * A2)%type.
+#[export]
+HB.instance Definition _ (R : nzSemiRingType) (A1 A2 : nzSemiAlgType R) :=
+  PzSemiAlgebra.on (A1 * A2)%type.
 #[export]
 HB.instance Definition _ (R : pzRingType) (V1 V2 : lmodType R) :=
   LSemiModule.on (V1 * V2)%type.
 #[export]
-HB.instance Definition _ (R : pzRingType) (A1 A2 : lalgType R) :=
-  LSemiAlgebra.on (A1 * A2)%type.
+HB.instance Definition _ (R : pzRingType) (A1 A2 : pzLalgType R) :=
+  PzLSemiAlgebra.on (A1 * A2)%type.
 #[export]
-HB.instance Definition _ (R : pzRingType) (A1 A2 : algType R) :=
-  SemiAlgebra.on (A1 * A2)%type.
+HB.instance Definition _ (R : nzRingType) (A1 A2 : nzLalgType R) :=
+  NzLSemiAlgebra.on (A1 * A2)%type.
 #[export]
-HB.instance Definition _ (R : pzRingType) (A1 A2 : comAlgType R) :=
-  Algebra.on (A1 * A2)%type.
+HB.instance Definition _ (R : pzRingType) (A1 A2 : pzAlgType R) :=
+  PzSemiAlgebra.on (A1 * A2)%type.
 #[export]
-HB.instance Definition _ (R : pzRingType) (A1 A2 : unitAlgType R) :=
-  Algebra.on (A1 * A2)%type.
+HB.instance Definition _ (R : nzRingType) (A1 A2 : nzAlgType R) :=
+  NzSemiAlgebra.on (A1 * A2)%type.
 #[export]
-HB.instance Definition _ (R : pzRingType) (A1 A2 : comUnitAlgType R) :=
-  Algebra.on (A1 * A2)%type.
+HB.instance Definition _ (R : pzRingType) (A1 A2 : comPzAlgType R) :=
+  PzAlgebra.on (A1 * A2)%type.
+#[export]
+HB.instance Definition _ (R : nzRingType) (A1 A2 : comNzAlgType R) :=
+  NzAlgebra.on (A1 * A2)%type.
+#[export]
+HB.instance Definition _ (R : nzRingType) (A1 A2 : unitAlgType R) :=
+  NzAlgebra.on (A1 * A2)%type.
+#[export]
+HB.instance Definition _ (R : nzRingType) (A1 A2 : comUnitAlgType R) :=
+  NzAlgebra.on (A1 * A2)%type.
 (* /TODO *)
 
 Lemma pairMnE (M1 M2 : zmodType) (x : M1 * M2) n :

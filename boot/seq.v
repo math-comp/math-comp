@@ -485,6 +485,9 @@ Proof. by elim: s => //= x s <-; case (a x). Qed.
 Lemma has_count s : has s = (0 < count s).
 Proof. by elim: s => //= x s ->; case (a x). Qed.
 
+Lemma size_filter_gt0 s : (size (filter s) > 0) = (has s).
+Proof. by rewrite size_filter -has_count. Qed.
+
 Lemma count_size s : count s <= size s.
 Proof. by elim: s => //= x s; case: (a x); last apply: leqW. Qed.
 
@@ -2229,7 +2232,7 @@ Lemma mem_mask x m s : x \in mask m s -> x \in s.
 Proof. by rewrite -!has_pred1 => /has_mask. Qed.
 
 Lemma in_mask x m s :
-  uniq s -> x \in mask m s = (x \in s) && nth false m (index x s).
+  uniq s -> (x \in mask m s) = (x \in s) && nth false m (index x s).
 Proof.
 elim: s m => [|y s IHs] [|[] m]//= /andP[yNs ?]; rewrite ?in_cons ?IHs //=;
 by have [->|neq_xy] //= := eqVneq; rewrite ?andbF // (negPf yNs).
@@ -2458,7 +2461,7 @@ Qed.
 Lemma mem_rem_uniq s : uniq s -> rem s =i [predD1 s & x].
 Proof. by move/rem_filter=> -> y; rewrite mem_filter. Qed.
 
-Lemma mem_rem_uniqF s : uniq s -> x \in rem s = false.
+Lemma mem_rem_uniqF s : uniq s -> (x \in rem s) = false.
 Proof. by move/mem_rem_uniq->; rewrite inE eqxx. Qed.
 
 Lemma count_rem P s : count P (rem s) = count P s - (x \in s) && P x.

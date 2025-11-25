@@ -3,8 +3,6 @@
 From Corelib Require Import PosDef.
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype.
-#[export] Set Warnings "-overwriting-delimiting-key".
-(* remove above line when requiring Rocq >= 9.0 *)
 
 (******************************************************************************)
 (* A version of arithmetic on nat (natural numbers) that is better suited to  *)
@@ -145,19 +143,13 @@ Delimit Scope nat_scope with N.
 Notation succn := Datatypes.S.
 Notation predn := Peano.pred.
 
-Notation "n .+1" := (succn n) (at level 2, left associativity,
-  format "n .+1") : nat_scope.
-Notation "n .+2" := n.+1.+1 (at level 2, left associativity,
-  format "n .+2") : nat_scope.
-Notation "n .+3" := n.+2.+1 (at level 2, left associativity,
-  format "n .+3") : nat_scope.
-Notation "n .+4" := n.+2.+2 (at level 2, left associativity,
-  format "n .+4") : nat_scope.
+Notation "n .+1" := (succn n) (left associativity, format "n .+1") : nat_scope.
+Notation "n .+2" := n.+1.+1 (left associativity, format "n .+2") : nat_scope.
+Notation "n .+3" := n.+2.+1 (left associativity, format "n .+3") : nat_scope.
+Notation "n .+4" := n.+2.+2 (left associativity, format "n .+4") : nat_scope.
 
-Notation "n .-1" := (predn n) (at level 2, left associativity,
-  format "n .-1") : nat_scope.
-Notation "n .-2" := n.-1.-1 (at level 2, left associativity,
-  format "n .-2") : nat_scope.
+Notation "n .-1" := (predn n) (left associativity, format "n .-1") : nat_scope.
+Notation "n .-2" := n.-1.-1 (left associativity, format "n .-2") : nat_scope.
 
 Lemma succnK : cancel succn predn. Proof. by []. Qed.
 Lemma succn_inj : injective succn. Proof. by move=> n m []. Qed.
@@ -198,7 +190,7 @@ Proof. exact: eq_irrelevance. Qed.
 
 Definition addn := plus.
 Arguments addn : simpl never.
-#[deprecated(since="mathcomp 2.3.0", note="Use addn instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=addn)]
 Definition addn_rec := addn.
 Notation "m + n" := (addn m n) : nat_scope.
 
@@ -270,7 +262,7 @@ Lemma add4n m : 4 + m = m.+4. Proof. by []. Qed.
 
 Definition subn := minus.
 Arguments subn : simpl never.
-#[deprecated(since="mathcomp 2.3.0", note="Use subn instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=subn)]
 Definition subn_rec := subn.
 Notation "m - n" := (subn m n) : nat_scope.
 
@@ -334,7 +326,7 @@ Notation "m < n < p" := ((m < n) && (n < p)) : nat_scope.
 Lemma ltnS m n : (m < n.+1) = (m <= n). Proof. by []. Qed.
 Lemma leq0n n : 0 <= n.                 Proof. by []. Qed.
 Lemma ltn0Sn n : 0 < n.+1.              Proof. by []. Qed.
-Lemma ltn0 n : n < 0 = false.           Proof. by []. Qed.
+Lemma ltn0 n : (n < 0) = false.         Proof. by []. Qed.
 Lemma leqnn n : n <= n.                 Proof. by elim: n. Qed.
 #[global] Hint Resolve leqnn : core.
 Lemma ltnSn n : n < n.+1.               Proof. by []. Qed.
@@ -364,7 +356,7 @@ Lemma leqVgt m n : (m <= n) || (n < m). Proof. by rewrite leqNgt orNb. Qed.
 Lemma ltnNge m n : (m < n) = ~~ (n <= m).
 Proof. by rewrite leqNgt. Qed.
 
-Lemma ltnn n : n < n = false.
+Lemma ltnn n : (n < n) = false.
 Proof. by rewrite ltnNge leqnn. Qed.
 
 Lemma leqn0 n : (n <= 0) = (n == 0).           Proof. by case: n. Qed.
@@ -383,16 +375,16 @@ Proof. by move=> m n; rewrite -eqn_leq => /eqP. Qed.
 Lemma neq_ltn m n : (m != n) = (m < n) || (n < m).
 Proof. by rewrite eqn_leq negb_and orbC -!ltnNge. Qed.
 
-Lemma gtn_eqF m n : m < n -> n == m = false.
+Lemma gtn_eqF m n : m < n -> (n == m) = false.
 Proof. by rewrite eqn_leq (leqNgt n) => ->. Qed.
 
-Lemma ltn_eqF m n : m < n -> m == n = false.
+Lemma ltn_eqF m n : m < n -> (m == n) = false.
 Proof. by move/gtn_eqF; rewrite eq_sym. Qed.
 
-Lemma ltn_geF m n : m < n -> m >= n = false.
+Lemma ltn_geF m n : m < n -> (m >= n) = false.
 Proof. by rewrite (leqNgt n) => ->. Qed.
 
-Lemma leq_gtF m n : m <= n -> m > n = false.
+Lemma leq_gtF m n : m <= n -> (m > n) = false.
 Proof. by rewrite (ltnNge n) => ->. Qed.
 
 Lemma leq_eqVlt m n : (m <= n) = (m == n) || (m < n).
@@ -419,6 +411,42 @@ Proof. by move=> lt_mn /ltnW; apply: leq_trans. Qed.
 
 Lemma leq_total m n : (m <= n) || (m >= n).
 Proof. by rewrite -implyNb -ltnNge; apply/implyP; apply: ltnW. Qed.
+
+Lemma leq_leP {m n} : reflect (forall k, n <= k -> m <= k) (m <= n).
+Proof. by apply: (iffP idP) => [mn k /(leq_trans _)->//|]; apply. Qed.
+
+Lemma ltn_gtP {m n} : reflect (forall k, k <= m -> k < n) (m < n).
+Proof. by apply: (iffP idP) => [mn k /leq_ltn_trans->//|]; apply. Qed.
+
+Lemma leq_geP {m n} : reflect (forall k, k <= m -> k <= n) (m <= n).
+Proof. by rewrite -ltnS; apply: (iffP ltn_gtP). Qed.
+
+Lemma leq_ltP {m n} : reflect (forall k, n < k -> m < k) (m <= n).
+Proof. by apply: (iffP idP) => [mn k|/(_ n.+1)]; [exact: leq_trans|exact]. Qed.
+
+Lemma leq_gtP {m n} : reflect (forall k, k < m -> k < n) (m <= n).
+Proof. by case: m => [|m]; [constructor|apply: (iffP ltn_gtP)]. Qed.
+
+Lemma ltn_ltP {m n} : reflect (forall k, n <= k -> m < k) (m < n).
+Proof. exact: leq_leP. Qed.
+
+Lemma eqn_geP {m n} : reflect (forall k, (k <= m) = (k <= n)) (m == n).
+Proof. by apply: (iffP idP) => [/eqP->//|/[dup]/[!eqn_leq]-> <- /[!leqnn]]. Qed.
+
+Lemma eqn_leP {m n} : reflect (forall k, (m <= k) = (n <= k)) (m == n).
+Proof. by apply: (iffP idP) => [/eqP->//|/[dup]/[!eqn_leq]<- -> /[!leqnn]]. Qed.
+
+Lemma eqn_gtP {m n} : reflect (forall k, (k < m) = (k < n)) (m == n).
+Proof.
+apply: (iffP eqn_leP) => + k => /(_ k);
+by rewrite !ltnNge => /(congr1 negb); rewrite ?negbK.
+Qed.
+
+Lemma eqn_ltP {m n} : reflect (forall k, (m < k) = (n < k)) (m == n).
+Proof.
+apply: (iffP eqn_geP) => + k => /(_ k);
+by rewrite !ltnNge => /(congr1 negb); rewrite ?negbK.
+Qed.
 
 (* Helper lemmas to support generalized induction over a nat measure.         *)
 (* The idiom for a proof by induction over a measure Mxy : nat involving      *)
@@ -1069,7 +1097,7 @@ Proof. by elim: n m => /= [|n IHn] m; rewrite ?subn0 // IHn subnS. Qed.
 
 Definition muln := mult.
 Arguments muln : simpl never.
-#[deprecated(since="mathcomp 2.3.0", note="Use muln instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=muln)]
 Definition muln_rec := muln.
 Notation "m * n" := (muln m n) : nat_scope.
 
@@ -1231,7 +1259,7 @@ Proof. by move=> x; elim: n => //= n <-; rewrite mulSn iterD. Qed.
 
 Definition expn m n := iterop n muln m 1.
 Arguments expn : simpl never.
-#[deprecated(since="mathcomp 2.3.0", note="Use expn instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=expn)]
 Definition expn_rec := expn.
 Notation "m ^ n" := (expn m n) : nat_scope.
 
@@ -1330,10 +1358,10 @@ Proof. elim: m => //= m ihm x; rewrite expnS iterM; exact/eq_iter. Qed.
 
 Fixpoint factorial n := if n is n'.+1 then n * factorial n' else 1.
 Arguments factorial : simpl never.
-#[deprecated(since="mathcomp 2.3.0", note="Use factorial instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=factorial)]
 Definition fact_rec := factorial.
 
-Notation "n `!" := (factorial n) (at level 2, format "n `!") : nat_scope.
+Notation "n `!" := (factorial n) (at level 1, format "n `!") : nat_scope.
 
 Lemma factE n : factorial n = if n is n'.+1 then n * factorial n' else 1.
 Proof. by case: n. Qed.
@@ -1406,7 +1434,7 @@ Proof. by elim: n => // n IHn; rewrite expnS oddM {}IHn orbC; case odd. Qed.
 
 Fixpoint double n := if n is n'.+1 then (double n').+2 else 0.
 Arguments double : simpl never.
-#[deprecated(since="mathcomp 2.3.0", note="Use double instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=double)]
 Definition double_rec := double.
 Notation "n .*2" := (double n) : nat_scope.
 

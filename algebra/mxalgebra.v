@@ -146,21 +146,19 @@ Reserved Notation "\rank A" (at level 10, A at level 8, format "\rank  A").
 Reserved Notation "A ^C"    (format "A ^C").
 
 Notation "''A_' ( m , n )" := 'M_(m, n ^ 2)
-  (at level 8, format "''A_' ( m ,  n )") : type_scope.
+  (format "''A_' ( m ,  n )") : type_scope.
 
 Notation "''A_' ( n )" := 'A_(n ^ 2, n) (only parsing) : type_scope.
 
 Notation "''A_' n" := 'A_(n)
-  (n at next level, format "''A_' n") : type_scope.
+  (at level 0, n at level 0, format "''A_' n") : type_scope.
 
 Notation "''A' [ F ]_ ( m , n )" := 'M[F]_(m, n ^ 2)
-  (at level 8, only parsing) : type_scope.
-
-Notation "''A' [ F ]_ ( n )" := 'A[F]_(n ^ 2, n)
   (only parsing) : type_scope.
 
-Notation "''A' [ F ]_ n" := 'A[F]_(n)
-  (n at level 2, only parsing) : type_scope.
+Notation "''A' [ F ]_ ( n )" := 'A[F]_(n ^ 2, n) (only parsing) : type_scope.
+
+Notation "''A' [ F ]_ n" := 'A[F]_(n) (n at level 2, only parsing) : type_scope.
 
 Delimit Scope matrix_set_scope with MS.
 
@@ -447,7 +445,7 @@ have ->: pid_mx (1 + r) = block_mx 1 0 0 (pid_mx r) :> 'M[F]_(1 + m, 1 + n).
   by rewrite block_mxA castmx_id col_mx0 row_mx0 -scalar_mx_block -pid_mx_block.
 rewrite xcolE xrowE mulmxA -xcolE -!mulmxA.
 rewrite !(addr0, add0r, mulmx0, mul0mx, mulmx_block, mul1mx) mulmxA defB.
-rewrite addrC subrK mul_mx_scalar scalerA divff // scale1r.
+rewrite subrKC mul_mx_scalar scalerA divff // scale1r.
 have ->: a%:M = ulsubmx A1 by rewrite [_ A1]mx11_scalar !mxE !lshift0 !tpermR.
 rewrite submxK /A1 xrowE !xcolE -!mulmxA mulmxA -!perm_mxM !tperm2 !perm_mx1.
 by rewrite mulmx1 mul1mx.

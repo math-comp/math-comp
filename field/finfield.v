@@ -73,12 +73,10 @@ Proof. by rewrite -cardsT cardG_gt1 finNzRing_nontrivial. Qed.
 
 End FinNzRing.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use finNzRing_nontrivial instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=finNzRing_nontrivial)]
 Notation finRing_nontrivial := (finNzRing_nontrivial) (only parsing).
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use finNzRing_gt1 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=finNzRing_gt1)]
 Notation finRing_gt1 := (finNzRing_gt1) (only parsing).
 
 Section FinField.
@@ -134,9 +132,9 @@ Qed.
 
 End FinField.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use finPcharP instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=finPcharP)]
 Notation finCharP := (finPcharP) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use card_finPcharP instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=card_finPcharP)]
 Notation card_finCharP := (card_finPcharP) (only parsing).
 
 Section CardVspace.
@@ -257,16 +255,16 @@ Proof. by move=> a b; rewrite /pprimeChar_scale natrFp natrD mulrDl. Qed.
 HB.instance Definition _ := GRing.Zmodule_isLmodule.Build 'F_p R
   pprimeChar_scaleA pprimeChar_scale1 pprimeChar_scaleDr pprimeChar_scaleDl.
 
-Lemma pprimeChar_scaleAl (a : 'F_p) (u v : R) :  a *: (u * v) = (a *: u) * v.
+Lemma pprimeChar_scaleAl (a : 'F_p) (u v : R) : a *: (u * v) = (a *: u) * v.
 Proof. by apply: mulrA. Qed.
 
-HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build 'F_p R
+HB.instance Definition _ := GRing.LSemiModule_isLSemiAlgebra.Build 'F_p R
   pprimeChar_scaleAl.
 
 Lemma pprimeChar_scaleAr (a : 'F_p) (x y : R) : a *: (x * y) = x * (a *: y).
 Proof. by rewrite ![a *: _]mulr_natl mulrnAr. Qed.
 
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build 'F_p R
+HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build 'F_p R
   pprimeChar_scaleAr.
 
 End PrimeCharRing.
@@ -328,12 +326,6 @@ End FinNzRing.
 
 HB.instance Definition _ (R : finUnitRingType) pcharRp :=
   FinRing.UnitRing.on (type R pcharRp).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ (R : finUnitRingType) pcharRp :=
-  FinRing.UnitAlgebra.on (type R pcharRp).
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ (R : finUnitRingType) pcharRp :=
-  Falgebra.on (type R pcharRp).
 HB.instance Definition _ (R : finComNzRingType) pcharRp :=
   FinRing.ComNzRing.on (type R pcharRp).
 HB.instance Definition _ (R : finComUnitRingType) pcharRp :=
@@ -353,33 +345,33 @@ End FinField.
 
 End PrimeChar.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pPrimeCharType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pPrimeCharType)]
 Notation PrimeCharType := (pPrimeCharType) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scale instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_scale)]
 Notation primeChar_scale := (pprimeChar_scale) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scaleA instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_scaleA)]
 Notation primeChar_scaleA := (pprimeChar_scaleA) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scale1 instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_scale1)]
 Notation primeChar_scale1 := (pprimeChar_scale1) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scaleDr instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_scaleDr)]
 Notation primeChar_scaleDr := (pprimeChar_scaleDr) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scaleDl instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_scaleDl)]
 Notation primeChar_scaleDl := (pprimeChar_scaleDl) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scaleAl instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_scaleAl)]
 Notation primeChar_scaleAl := (pprimeChar_scaleAl) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_scaleAr instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_scaleAr)]
 Notation primeChar_scaleAr := (pprimeChar_scaleAr) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_abelem instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_abelem)]
 Notation primeChar_abelem := (pprimeChar_abelem) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_pgroup instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_pgroup)]
 Notation primeChar_pgroup := (pprimeChar_pgroup) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use order_pprimeChar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=order_pprimeChar)]
 Notation order_primeChar := (order_pprimeChar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use card_pprimeChar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=card_pprimeChar)]
 Notation card_primeChar := (card_pprimeChar) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_vectAxiom instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_vectAxiom)]
 Notation primeChar_vectAxiom := (pprimeChar_vectAxiom) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use pprimeChar_dimf instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pprimeChar_dimf)]
 Notation primeChar_dimf := (pprimeChar_dimf) (only parsing).
 
 
@@ -520,7 +512,7 @@ Let map_poly_extField (F : fieldType) (L : fieldExtType F) :=
   map_poly (in_alg L) : {poly F} -> {poly L}.
 
 Local Notation "p ^%:A" := (map_poly_extField _ p)
-  (at level 2, format "p ^%:A") : ring_scope.
+  (format "p ^%:A") : ring_scope.
 
 Lemma FinSplittingFieldFor (F : finFieldType) (p : {poly F}) :
   p != 0 -> {L : splittingFieldType F | splittingFieldFor 1 p^%:A {:L}}.
@@ -541,7 +533,7 @@ suffices [L [ys Dp]]: {L : fieldExtType F & splits L p^%:A}.
     suffices: map_poly toL lhs %= map_poly toL rhs by rewrite eqp_map.
     rewrite -Dys big_map in Dp; apply: etrans Dp; apply: congr2.
       by rewrite -map_poly_comp; apply/eq_map_poly=> x; apply: rmorph_alg.
-    by rewrite rmorph_prod; apply/eq_bigr=> z _; apply mapXsubC.
+    by rewrite rmorph_prod; apply/eq_bigr=> z _; apply: mapXsubC.
   set Lzs := LHS; pose Lys := (toL @: Lzs)%VS; apply/vspaceP=> u.
   have: val u \in Lys by rewrite /Lys aimg_adjoin_seq aimg1 Dys (valP u).
   by case/memv_imgP=> v Lzs_v; rewrite memvf lfunE => /val_inj->.
@@ -585,7 +577,7 @@ Lemma pPrimePowerField p k (m := (p ^ k)%N) :
 Proof.
 move=> pr_p k_gt0; have m_gt1: m > 1 by rewrite (ltn_exp2l 0) ?prime_gt1.
 have m_gt0 := ltnW m_gt1; have m1_gt0: m.-1 > 0 by rewrite -ltnS prednK.
-pose q := 'X^m - 'X; have Dq R: q R = ('X^m.-1 - 1) * ('X - 0).
+pose q := 'X^m - 'X; have Dq R: q R = ('X^(m.-1) - 1) * ('X - 0).
   by rewrite subr0 mulrBl mul1r -exprSr prednK.
 have /FinSplittingFieldFor[/= L splitLq]: q 'F_p != 0.
   by rewrite Dq monic_neq0 ?rpredM ?monicXsubC ?monicXnsubC.
@@ -615,7 +607,7 @@ Qed.
 
 End FinFieldExists.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use pPrimePowerField instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=pPrimePowerField)]
 Notation PrimePowerField := (pPrimePowerField) (only parsing).
 
 Section FinDomain.
@@ -733,7 +725,7 @@ by rewrite -[aq d]expr1 -exprB ?leq_b1 ?unitfE ?rpredX.
 Qed.
 
 Definition FinDomainFieldType : finFieldType :=
- let cC := GRing.PzRing_hasCommutativeMul.Build R finDomain_mulrC in
+ let cC := GRing.SemiRing_hasCommutativeMul.Build R finDomain_mulrC in
  let cR : comUnitRingType := HB.pack R cC in
  let iC := GRing.ComUnitRing_isIntegral.Build cR domR in
  let iR : finIdomainType := HB.pack cR iC in
@@ -745,5 +737,5 @@ Definition FinDomainSplittingFieldType_pchar p (pcharRp : p \in [pchar R]) :=
 
 End FinDomain.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use FinDomainSplittingFieldType_pchar  instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=FinDomainSplittingFieldType_pchar)]
 Notation FinDomainSplittingFieldType := (FinDomainSplittingFieldType_pchar) (only parsing).

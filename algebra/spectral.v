@@ -35,7 +35,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import GRing.Theory Order.Theory Num.Theory.
+Import GRing.Theory Order.Theory Num.Theory Num.Def.
 Local Open Scope ring_scope.
 Local Open Scope sesquilinear_scope.
 
@@ -85,7 +85,7 @@ move=> n_gt0 AB_comm; have [] := @common_eigenvector _ _ [:: A; B] n_gt0.
 by move=> v v_neq0 /allP vP; exists v; rewrite ?vP ?(mem_head, in_cons, orbT).
 Qed.
 
-Notation "M ^t*" := (M ^t conjC) (at level 30) : sesquilinear_scope.
+Notation "M ^t*" := (M ^t conjC) (at level 29) : sesquilinear_scope.
 Notation realmx := (mxOver Num.real).
 
 Lemma trmxCK {C : numClosedFieldType} m n (A : 'M[C]_(m, n)) : A ^t* ^t* = A.
@@ -149,7 +149,7 @@ have -> : P = Q 'i by apply/matrixP=> i j; rewrite !mxE -Crect.
 move=> Qi_unit eq_AP_PB Areal Breal.
 pose p := \det (Pr ^ polyC + 'X *: Pi ^ polyC).
 have horner_evaliC x : horner_eval (x : C) \o polyC =1 id := fun=> hornerC _ _.
-have Qunit x : Q x \in unitmx = (p.[x] != 0).
+have Qunit x : (Q x \in unitmx) = (p.[x] != 0).
   rewrite /p -horner_evalE -det_map_mx map_mxD map_mxZ/= horner_evalE hornerX.
   by rewrite -![(_ ^ polyC) ^ _]map_mx_comp !map_mx_id// unitmxE unitfE.
 have p_neq0 : p != 0.
@@ -268,7 +268,7 @@ Section Spectral.
 Variable (C : numClosedFieldType).
 Set Default Proof Using "C".
 
-Local Notation dotmx_def := (form_of_matrix (@conjC _) 1%:M).
+Local Notation dotmx_def := (form_of_matrix conjC 1%:M).
 Definition dotmx n (u v : 'rV[C]_n) := dotmx_def u%R v%R.
 
 (*
@@ -312,7 +312,8 @@ HB.instance Definition _ n := isDotProduct.Build _ _ (@dotmx n)
   (@dotmx_is_dotmx n).
 
 Local Notation "B ^!" :=
-  (orthomx (@conjC C) (mx_of_hermitian (hermitian1mx _)) B) : matrix_set_scope.
+  (orthomx conjC (mx_of_hermitian (hermitian1mx _)) B) :
+    matrix_set_scope.
 Local Notation "A '_|_ B" := (A%MS <= B^!)%MS : bool_scope.
 
 Lemma orthomx1E m n p (A : 'M[C]_(m, n)) (B : 'M_(p, n)) :
@@ -601,12 +602,12 @@ move=> P' P'_unitary /allP /= P'P.
 exists ((block_mx 1%:M 0 0 P') *m S).
   rewrite mul_unitarymx ?schmidt_complete_unitarymx //.
   apply/unitarymxP; rewrite tr_block_mx map_block_mx mulmx_block.
-  rewrite !trmx0 !(@map_mx0 _ _ conjC) !tr_scalar_mx !map_scalar_mx ?conjC1.
-  rewrite !(mulmx1, mul1mx, mulmx0, mul0mx, addr0, add0r).
-  by rewrite (unitarymxP _) -?scalar_mx_block //.
+  rewrite !trmx0 !(@map_mx0 _ _ conjC) !tr_scalar_mx !map_scalar_mx/=.
+  rewrite ?conjC1 !(mulmx1, mul1mx, mulmx0, mul0mx, addr0, add0r).
+  by rewrite (unitarymxP _) -?scalar_mx_block.
 apply/allP => /= A A_in.
 rewrite trmx_mul map_mxM tr_block_mx map_block_mx.
-rewrite !trmx0 !map_mx0 !tr_scalar_mx !map_scalar_mx ?conjC1.
+rewrite !trmx0 !map_mx0 !tr_scalar_mx !map_scalar_mx/= ?conjC1.
 rewrite mulmxA -[_ *m S *m _]mulmxA -[_ *m _ *m S^t*]mulmxA.
 rewrite /S ![schmidt_complete _ *m _]mul_col_mx.
 rewrite !tr_col_mx !map_row_mx !mul_col_row !mulmx_block.

@@ -106,17 +106,17 @@ done
 }
 
 # example invocation:
-# MAKEDOT=etc/utils/ PATH=$COQBIN:$PATH MANGLEDOT=touch COQDOCOPTS="-R . mathcomp" \
+# MAKEDOT=etc/utils/ PATH=$ROCQBIN:$PATH MANGLEDOT=touch ROCQDOCOPTS="-R . mathcomp" \
 #	build_doc */*.v
 build_doc() {
 rm -rf html
 mkdir html
-coqdoc -t "$TITLE" -g --utf8 $COQDOCOPTS \
+rocq doc -t "$TITLE" -g --utf8 $ROCQDOCOPTS \
         --parse-comments \
 	--multi-index $@ -d html
 
 # graph
-coqdep -noglob $COQOPTS $@ > depend
+coqdep -noglob $ROCQOPTS $@ > depend
 sed -i -e 's/ [^ ]*\.cmxs//g' -e 's/ [^ ]*\.cm.//g' depend
 ocamlc -o $MAKEDOT/makedot -pp camlp5o $MAKEDOT/dependtodot.ml
 $MAKEDOT/makedot depend

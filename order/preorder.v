@@ -530,16 +530,16 @@ Reserved Notation "\top^sl".
 Reserved Notation "x %<| y"  (at level 70, no associativity).
 
 Reserved Notation "\min_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \min_ i '/  '  F ']'").
 Reserved Notation "\min_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 50,
+  (at level 34, F at level 41, i, r at level 60,
            format "'[' \min_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\min_ ( i <- r ) F"
   (F at level 41,
            format "'[' \min_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\min_ ( m <= i < n | P ) F"
-  (F at level 41, i, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \min_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\min_ ( m <= i < n ) F"
   (F at level 41,
@@ -550,29 +550,29 @@ Reserved Notation "\min_ ( i | P ) F"
 Reserved Notation "\min_ ( i : t | P ) F" (F at level 41).
 Reserved Notation "\min_ ( i : t ) F" (F at level 41).
 Reserved Notation "\min_ ( i < n | P ) F"
-  (F at level 41, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \min_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\min_ ( i < n ) F"
   (F at level 41,
            format "'[' \min_ ( i  <  n )  F ']'").
 Reserved Notation "\min_ ( i 'in' A | P ) F"
-  (F at level 41, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \min_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\min_ ( i 'in' A ) F"
   (F at level 41,
            format "'[' \min_ ( i  'in'  A ) '/  '  F ']'").
 
 Reserved Notation "\max_ i F"
-  (at level 41, F at level 41, i at level 0,
+  (at level 34, F at level 41, i at level 0,
            format "'[' \max_ i '/  '  F ']'").
 Reserved Notation "\max_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 50,
+  (F at level 41, i, r at level 60,
            format "'[' \max_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\max_ ( i <- r ) F"
   (F at level 41,
            format "'[' \max_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\max_ ( m <= i < n | P ) F"
-  (F at level 41, i, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \max_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max_ ( m <= i < n ) F"
   (F at level 41,
@@ -583,13 +583,13 @@ Reserved Notation "\max_ ( i | P ) F"
 Reserved Notation "\max_ ( i : t | P ) F" (F at level 41).
 Reserved Notation "\max_ ( i : t ) F" (F at level 41).
 Reserved Notation "\max_ ( i < n | P ) F"
-  (F at level 41, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \max_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max_ ( i < n ) F"
   (F at level 41,
            format "'[' \max_ ( i  <  n )  F ']'").
 Reserved Notation "\max_ ( i 'in' A | P ) F"
-  (F at level 41, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \max_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\max_ ( i 'in' A ) F"
   (F at level 41,
@@ -599,13 +599,13 @@ Reserved Notation "\min^d_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \min^d_ i '/  '  F ']'").
 Reserved Notation "\min^d_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 50,
+  (at level 41, F at level 41, i, r at level 60,
            format "'[' \min^d_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\min^d_ ( i <- r ) F"
-  (F at level 41, r at level 50,
+  (F at level 41, r at level 60,
            format "'[' \min^d_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\min^d_ ( m <= i < n | P ) F"
-  (F at level 41, i, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \min^d_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\min^d_ ( m <= i < n ) F"
   (F at level 41,
@@ -616,13 +616,13 @@ Reserved Notation "\min^d_ ( i | P ) F"
 Reserved Notation "\min^d_ ( i : t | P ) F" (F at level 41).
 Reserved Notation "\min^d_ ( i : t ) F" (F at level 41).
 Reserved Notation "\min^d_ ( i < n | P ) F"
-  (F at level 41, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \min^d_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\min^d_ ( i < n ) F"
   (F at level 41,
            format "'[' \min^d_ ( i  <  n )  F ']'").
 Reserved Notation "\min^d_ ( i 'in' A | P ) F"
-  (F at level 41, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \min^d_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\min^d_ ( i 'in' A ) F"
   (F at level 41,
@@ -632,13 +632,13 @@ Reserved Notation "\max^d_ i F"
   (at level 41, F at level 41, i at level 0,
            format "'[' \max^d_ i '/  '  F ']'").
 Reserved Notation "\max^d_ ( i <- r | P ) F"
-  (F at level 41, i, r at level 50,
+  (at level 41, F at level 41, i, r at level 60,
            format "'[' \max^d_ ( i  <-  r  |  P ) '/  '  F ']'").
 Reserved Notation "\max^d_ ( i <- r ) F"
-  (F at level 41, r at level 50,
+  (F at level 41, r at level 60,
            format "'[' \max^d_ ( i  <-  r ) '/  '  F ']'").
 Reserved Notation "\max^d_ ( m <= i < n | P ) F"
-  (F at level 41, i, n at level 50,
+  (F at level 41, i, n at level 60,
            format "'[' \max^d_ ( m  <=  i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max^d_ ( m <= i < n ) F"
   (F at level 41,
@@ -649,13 +649,13 @@ Reserved Notation "\max^d_ ( i | P ) F"
 Reserved Notation "\max^d_ ( i : t | P ) F" (F at level 41).
 Reserved Notation "\max^d_ ( i : t ) F" (F at level 41).
 Reserved Notation "\max^d_ ( i < n | P ) F"
-  (F at level 41, n at level 50,
+  (F at level 41, n at level 60,
            format "'[' \max^d_ ( i  <  n  |  P ) '/  '  F ']'").
 Reserved Notation "\max^d_ ( i < n ) F"
   (F at level 41,
            format "'[' \max^d_ ( i  <  n )  F ']'").
 Reserved Notation "\max^d_ ( i 'in' A | P ) F"
-  (F at level 41, A at level 50,
+  (F at level 41, A at level 60,
            format "'[' \max^d_ ( i  'in'  A  |  P ) '/  '  F ']'").
 Reserved Notation "\max^d_ ( i 'in' A ) F"
   (F at level 41,
@@ -926,7 +926,7 @@ Notation dual_top := (@top (dual_display _) _).
 
 Module Import DualSyntax.
 
-Notation "T ^d" := (dual T) (at level 2, format "T ^d") : type_scope.
+Notation "T ^d" := (dual T) (format "T ^d") : type_scope.
 Notation "<=^d%O" := dual_le : function_scope.
 Notation ">=^d%O" := dual_ge : function_scope.
 Notation "<^d%O" := dual_lt : function_scope.
@@ -1052,7 +1052,7 @@ Proof. by move=> + /(le_trans _)/[apply]; apply: le_trans. Qed.
 Lemma lt_le_def x y: (x < y) = (x <= y) && ~~ (y <= x).
 Proof. exact: lt_def. Qed.
 
-Lemma ltxx x: x < x = false.
+Lemma ltxx x: (x < x) = false.
 Proof. by rewrite lt_le_def andbN. Qed.
 
 Definition lt_irreflexive : irreflexive lt := ltxx.
@@ -1060,10 +1060,10 @@ Hint Resolve lt_irreflexive : core.
 
 Definition ltexx := (lexx, ltxx).
 
-Lemma lt_eqF x y: x < y -> x == y = false.
+Lemma lt_eqF x y: x < y -> (x == y) = false.
 Proof. by apply: contraTF => /eqP ->; rewrite ltxx. Qed.
 
-Lemma gt_eqF x y : y < x -> x == y = false.
+Lemma gt_eqF x y : y < x -> (x == y) = false.
 Proof. by move=> /lt_eqF; rewrite eq_sym. Qed.
 
 Lemma ltW x y: x < y -> x <= y.
@@ -1089,15 +1089,15 @@ Qed.
 Lemma lt_nsym x y : x < y -> y < x -> False.
 Proof. by move=> xy /(lt_trans xy); rewrite ltxx. Qed.
 
-Lemma lt_asym x y : x < y < x = false.
+Lemma lt_asym x y : (x < y < x) = false.
 Proof. by apply/negP => /andP []; apply: lt_nsym. Qed.
 
-Lemma le_gtF x y: x <= y -> y < x = false.
+Lemma le_gtF x y: x <= y -> (y < x) = false.
 Proof.
 by move=> le_xy; apply/negP => /lt_le_trans /(_ le_xy); rewrite ltxx.
 Qed.
 
-Lemma lt_geF x y : x < y -> y <= x = false.
+Lemma lt_geF x y : x < y -> (y <= x) = false.
 Proof. by apply: contraTF => /le_gtF ->. Qed.
 
 Definition lt_gtF x y hxy := le_gtF (@ltW x y hxy).
@@ -1105,11 +1105,23 @@ Definition lt_gtF x y hxy := le_gtF (@ltW x y hxy).
 Lemma lt_leAnge x y : (x < y) = (x <= y) && ~~ (y <= x).
 Proof. exact: lt_le_def. Qed.
 
-Lemma lt_le_asym x y : x < y <= x = false.
+Lemma lt_le_asym x y : (x < y <= x) = false.
 Proof. by apply/negP; move=> /andP[] xy /(lt_le_trans xy); rewrite ltxx. Qed.
 
-Lemma le_lt_asym x y : x <= y < x = false.
+Lemma le_lt_asym x y : (x <= y < x) = false.
 Proof. by rewrite andbC lt_le_asym. Qed.
+
+Lemma le_leP {x y} : reflect (forall z, y <= z -> x <= z) (x <= y).
+Proof. by apply: (iffP idP) => [xy z /(le_trans _)->//|]; apply. Qed.
+
+Lemma le_geP {x y} : reflect (forall z, z <= x -> z <= y) (x <= y).
+Proof. by apply: (iffP idP) => [xy z /le_trans|]; apply. Qed.
+
+Lemma lt_ltP {x y} : reflect (forall z, y <= z -> x < z) (x < y).
+Proof. by apply: (iffP idP) => [xy z /(lt_le_trans _)|]; apply. Qed.
+
+Lemma lt_gtP {x y} : reflect (forall z, z <= x -> z < y) (x < y).
+Proof. by apply: (iffP idP) => [xy z /le_lt_trans->//|]; apply. Qed.
 
 Lemma le_path_min x s : path <=%O x s -> all (>= x) s.
 Proof. exact/order_path_min/le_trans. Qed.
@@ -1344,15 +1356,15 @@ Qed.
 Lemma lteifxx x C : (x < x ?<= if C) = C.
 Proof. by case: C; rewrite /= ltexx. Qed.
 
-Lemma lteifNF x y C : y < x ?<= if ~~ C -> x < y ?<= if C = false.
+Lemma lteifNF x y C : y < x ?<= if ~~ C -> (x < y ?<= if C) = false.
 Proof. by case: C => [/lt_geF|/le_gtF]. Qed.
 
 Lemma lteifS x y C : x < y -> x < y ?<= if C.
 Proof. by case: C => //= /ltW. Qed.
 
-Lemma lteifT x y : x < y ?<= if true = (x <= y). Proof. by []. Qed.
+Lemma lteifT x y : (x < y ?<= if true) = (x <= y). Proof. by []. Qed.
 
-Lemma lteifF x y : x < y ?<= if false = (x < y). Proof. by []. Qed.
+Lemma lteifF x y : (x < y ?<= if false) = (x < y). Proof. by []. Qed.
 
 Lemma lteif_orb x y : {morph lteif x y : p q / p || q}.
 Proof.
@@ -1378,8 +1390,8 @@ Proof. by case: C1 C2 => [][] //= _ /ltW. Qed.
 Lemma lteifW C x y : x < y ?<= if C -> x <= y.
 Proof. by case: C => // /ltW. Qed.
 
-Lemma ltrW_lteif C x y : x < y -> x < y ?<= if C.
-Proof. by case: C => // /ltW. Qed.
+#[deprecated(since="mathcomp 2.6.0", use=lteifW)]
+Notation ltrW_lteif := lteifW.
 
 (* min and max *)
 
@@ -1987,11 +1999,11 @@ Section SubPreorderTheory.
 Context (d : disp_t) (T : preorderType d) (S : pred T).
 Context (d' : disp_t) (U : SubPreorder.type S d').
 Local Notation val := (val : U -> T).
-#[deprecated(since="mathcomp 2.3.0", note="Use le_val instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=le_val)]
 Lemma leEsub x y : (x <= y) = (val x <= val y). Proof. by rewrite le_val. Qed.
 Lemma lt_val : {mono val : x y / x < y}.
 Proof. by move=> x y; rewrite !lt_leAnge !le_val. Qed.
-#[deprecated(since="mathcomp 2.3.0", note="Use lt_val instead.")]
+#[deprecated(since="mathcomp 2.3.0", use=lt_val)]
 Lemma ltEsub x y : (x < y) = (val x < val y). Proof. by rewrite lt_val. Qed.
 Lemma le_wval : {homo val : x y / x <= y}. Proof. exact/mono2W/le_val. Qed.
 Lemma lt_wval : {homo val : x y / x < y}. Proof. exact/mono2W/lt_val. Qed.
@@ -2604,11 +2616,11 @@ by rewrite -lt_leAnge.
 Qed.
 
 Lemma le_pair (x1 y1 : T1) (x2 y2 : T2) :
-  (x1, x2) <= (y1, y2) :> T1 * T2 = (x1 <= y1) && (x2 <= y2).
+  ((x1, x2) <= (y1, y2) :> T1 * T2) = (x1 <= y1) && (x2 <= y2).
 Proof. by []. Qed.
 
 Lemma lt_pair (x1 y1 : T1) (x2 y2 : T2) :
-  (x1, x2) < (y1, y2) :> T1 * T2
+  ((x1, x2) < (y1, y2) :> T1 * T2)
   = (x1 < y1) && (x2 <= y2) || (x1 <= y1) && (x2 < y2).
 Proof. exact/ltEprod. Qed.
 
@@ -2811,11 +2823,11 @@ Lemma ltEprodlexi x y :
 Proof. by []. Qed.
 
 Lemma lexi_pair (x1 y1 : T1) (x2 y2 : T2) :
-   (x1, x2) <= (y1, y2) :> T1 * T2 = (x1 <= y1) && ((x1 >= y1) ==> (x2 <= y2)).
+  ((x1, x2) <= (y1, y2) :> T1 * T2) = (x1 <= y1) && ((x1 >= y1) ==> (x2 <= y2)).
 Proof. by []. Qed.
 
 Lemma ltxi_pair (x1 y1 : T1) (x2 y2 : T2) :
-   (x1, x2) < (y1, y2) :> T1 * T2 = (x1 <= y1) && ((x1 >= y1) ==> (x2 < y2)).
+  ((x1, x2) < (y1, y2) :> T1 * T2) = (x1 <= y1) && ((x1 >= y1) ==> (x2 < y2)).
 Proof. by []. Qed.
 
 End Preorder.
@@ -2996,17 +3008,17 @@ Qed.
 #[export]
 HB.instance Definition _ := isPreorder.Build disp' (seq T) (rrefl _) refl trans.
 
-Lemma leEseq s1 s2 : s1 <= s2 = if s1 isn't x1 :: s1' then true else
-                                if s2 isn't x2 :: s2' then false else
-                                (x1 <= x2) && (s1' <= s2' :> seq _).
+Lemma leEseq s1 s2 : (s1 <= s2) = if s1 isn't x1 :: s1' then true else
+                                  if s2 isn't x2 :: s2' then false else
+                                  (x1 <= x2) && (s1' <= s2' :> seq _).
 Proof. by case: s1. Qed.
 
 Lemma le0s s : [::] <= s :> seq _. Proof. by []. Qed.
 
-Lemma les0 s : s <= [::] = (s == [::]). Proof. by rewrite leEseq. Qed.
+Lemma les0 s : (s <= [::]) = (s == [::]). Proof. by rewrite leEseq. Qed.
 
 Lemma le_cons x1 s1 x2 s2 :
-   x1 :: s1 <= x2 :: s2 :> seq _ = (x1 <= x2) && (s1 <= s2).
+   (x1 :: s1 <= x2 :: s2 :> seq _) = (x1 <= x2) && (s1 <= s2).
 Proof. by []. Qed.
 
 #[export]
@@ -3101,31 +3113,31 @@ Qed.
 HB.instance Definition _ := isPreorder.Build disp' (seq T) lt_le_def refl trans.
 
 Lemma leEseqlexi s1 s2 :
-   s1 <= s2 = if s1 isn't x1 :: s1' then true else
-              if s2 isn't x2 :: s2' then false else
-              (x1 <= x2) && ((x1 >= x2) ==> (s1' <= s2' :> seq T)).
+  (s1 <= s2) = if s1 isn't x1 :: s1' then true else
+               if s2 isn't x2 :: s2' then false else
+               (x1 <= x2) && ((x1 >= x2) ==> (s1' <= s2' :> seq T)).
 Proof. by case: s1. Qed.
 
 Lemma ltEseqlexi s1 s2 :
-   s1 < s2 = if s2 isn't x2 :: s2' then false else
+  (s1 < s2) = if s2 isn't x2 :: s2' then false else
               if s1 isn't x1 :: s1' then true else
               (x1 <= x2) && ((x1 >= x2) ==> (s1' < s2' :> seq T)).
 Proof. by case: s1. Qed.
 
 Lemma lexi0s s : [::] <= s :> seq T. Proof. by []. Qed.
 
-Lemma lexis0 s : s <= [::] = (s == [::]). Proof. by rewrite leEseqlexi. Qed.
+Lemma lexis0 s : (s <= [::]) = (s == [::]). Proof. by rewrite leEseqlexi. Qed.
 
 Lemma ltxi0s s : ([::] < s :> seq T) = (s != [::]). Proof. by case: s. Qed.
 
-Lemma ltxis0 s : s < [::] = false. Proof. by rewrite ltEseqlexi. Qed.
+Lemma ltxis0 s : (s < [::]) = false. Proof. by rewrite ltEseqlexi. Qed.
 
 Lemma lexi_cons x1 s1 x2 s2 :
-  x1 :: s1 <= x2 :: s2 :> seq T = (x1 <= x2) && ((x1 >= x2) ==> (s1 <= s2)).
+  (x1 :: s1 <= x2 :: s2 :> seq T) = (x1 <= x2) && ((x1 >= x2) ==> (s1 <= s2)).
 Proof. by []. Qed.
 
 Lemma ltxi_cons x1 s1 x2 s2 :
-  x1 :: s1 < x2 :: s2 :> seq T = (x1 <= x2) && ((x1 >= x2) ==> (s1 < s2)).
+  (x1 :: s1 < x2 :: s2 :> seq T) = (x1 <= x2) && ((x1 >= x2) ==> (s1 < s2)).
 Proof. by []. Qed.
 
 Lemma lexi_lehead x s1 y s2 : x :: s1 <= y :: s2 :> seq T -> x <= y.
@@ -3232,7 +3244,7 @@ Implicit Types (n : nat) (T : preorderType disp).
   [SubChoice_isSubPreorder of n.-tuple T by <: with disp'].
 
 Lemma leEtprod n T (t1 t2 : n.-tuple T) :
-   t1 <= t2 = [forall i, tnth t1 i <= tnth t2 i].
+  (t1 <= t2) = [forall i, tnth t1 i <= tnth t2 i].
 Proof.
 elim: n => [|n IHn] in t1 t2 *.
   by rewrite tuple0 [t2]tuple0/= lexx; symmetry; apply/forallP => [].
@@ -3245,8 +3257,8 @@ by have := lext12 (lift ord0 i); rewrite !tnthS.
 Qed.
 
 Lemma ltEtprod n T (t1 t2 : n.-tuple T) :
-  t1 < t2 = [exists i, tnth t1 i < tnth t2 i] &&
-            [forall i, tnth t1 i <= tnth t2 i].
+  (t1 < t2) = [exists i, tnth t1 i < tnth t2 i] &&
+              [forall i, tnth t1 i <= tnth t2 i].
 Proof.
 rewrite lt_leAnge !leEtprod negb_forall andbC.
 apply/andP/andP => -[] /existsP[x] xlt le; split=> //; apply/existsP; exists x.
@@ -3314,10 +3326,9 @@ Module Exports.
 HB.reexport TupleProdOrder.
 
 Notation "n .-tupleprod[ disp ]" := (type disp n)
-  (at level 2, disp at next level, format "n .-tupleprod[ disp ]") :
-  type_scope.
+  (format "n .-tupleprod[ disp ]") : type_scope.
 Notation "n .-tupleprod" := (type_ n)
-  (at level 2, format "n .-tupleprod") : type_scope.
+  (format "n .-tupleprod") : type_scope.
 
 Definition leEtprod := @leEtprod.
 Definition ltEtprod := @ltEtprod.
@@ -3432,10 +3443,9 @@ Module Exports.
 HB.reexport TupleLexiOrder.
 
 Notation "n .-tuplelexi[ disp ]" := (type disp n)
-  (at level 2, disp at next level, format "n .-tuplelexi[ disp ]") :
-  type_scope.
+  (format "n .-tuplelexi[ disp ]") : type_scope.
 Notation "n .-tuplelexi" := (type_ n)
-  (at level 2, format "n .-tuplelexi") : type_scope.
+  (format "n .-tuplelexi") : type_scope.
 
 Definition topEtlexi := @topEtlexi.
 Definition botEtlexi := @botEtlexi.
@@ -3478,7 +3488,7 @@ Context {disp : disp_t} {T : finType}.
 Local Notation "{ 'subset' T }" := (type disp T).
 Implicit Type (A B C : {subset T}).
 
-Lemma le_def A B : A \subset B = (A :&: B == A).
+Lemma le_def A B : (A \subset B) = (A :&: B == A).
 Proof. exact/setIidPl/eqP. Qed.
 
 #[export]
@@ -3502,7 +3512,7 @@ End SetSubsetOrder.
 Module Exports.
 Arguments type disp T%_type.
 Notation "{ 'subset' [ d ] T }" := (type d T)
-  (d at next level, format "{ 'subset' [ d ]  T }") : type_scope.
+  (format "{ 'subset' [ d ]  T }") : type_scope.
 Notation "{ 'subset' T }" := {subset[subset_display] T}
   (format "{ 'subset' T }") : type_scope.
 

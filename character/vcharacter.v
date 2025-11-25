@@ -82,7 +82,7 @@ Variables (gT : finGroupType) (G : {group gT}).
 Implicit Types (A B : {set gT}) (S : seq 'CF(G)).
 
 Lemma zchar_split S A phi :
-  phi \in 'Z[S, A] = (phi \in 'Z[S]) && (phi \in 'CF(G, A)).
+  (phi \in 'Z[S, A]) = (phi \in 'Z[S]) && (phi \in 'CF(G, A)).
 Proof. by rewrite !inE cfun_onT andbC. Qed.
 
 Lemma zcharD1E phi S : (phi \in 'Z[S, G^#]) = (phi \in 'Z[S]) && (phi 1%g == 0).
@@ -575,7 +575,7 @@ Qed.
 Lemma conjC_vcharAut chi x : chi \in 'Z[irr G] -> (u (chi x))^* = u (chi x)^*.
 Proof.
 case/vcharP=> chi1 Nchi1 [chi2 Nchi2 ->].
-by rewrite !cfunE !rmorphB !conjC_charAut.
+by rewrite !cfunE !rmorphB /= !conjC_charAut.
 Qed.
 
 Lemma cfdot_aut_vchar phi chi :
@@ -595,7 +595,7 @@ Qed.
 
 End AutVchar.
 
-Definition cfConjC_vchar :=  cfAut_vchar conjC.
+Definition cfConjC_vchar :=  cfAut_vchar Num.conj.
 
 Section MoreVchar.
 
@@ -723,7 +723,7 @@ by exists true, i; rewrite scaleN1r -Hf opprK.
 Qed.
 
 (* This should perhaps be the definition of dirr. *)
-Lemma dirrE phi : phi \in dirr G = (phi \in 'Z[irr G]) && ('[phi] == 1).
+Lemma dirrE phi : (phi \in dirr G) = (phi \in 'Z[irr G]) && ('[phi] == 1).
 Proof.
 apply/dirrP/andP=> [[b [i ->]] | [Zphi /eqP/vchar_norm1P]]; last exact.
 by rewrite rpredZsign irr_vchar cfnorm_sign cfnorm_irr.

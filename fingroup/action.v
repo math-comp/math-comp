@@ -226,40 +226,35 @@ Notation "to ^*" := (setact to) : function_scope.
 Prenex Implicits orbit amove.
 
 Notation "''Fix_' to ( A )" := (afix to A)
- (at level 8, to at level 2, format "''Fix_' to ( A )") : group_scope.
+  (to at level 2, format "''Fix_' to ( A )") : group_scope.
 
 (* camlp4 grammar factoring *)
-Notation "''Fix_' ( to ) ( A )" := 'Fix_to(A)
-  (at level 8, only parsing) : group_scope.
+Notation "''Fix_' ( to ) ( A )" := 'Fix_to(A) (only parsing) : group_scope.
 
 Notation "''Fix_' ( S | to ) ( A )" := (S :&: 'Fix_to(A))
- (at level 8, format "''Fix_' ( S  |  to ) ( A )") : group_scope.
+  (format "''Fix_' ( S  |  to ) ( A )") : group_scope.
 
 Notation "''Fix_' to [ a ]" := ('Fix_to([set a]))
- (at level 8, to at level 2, format "''Fix_' to [ a ]") : group_scope.
+  (to at level 2, format "''Fix_' to [ a ]") : group_scope.
 
 Notation "''Fix_' ( S | to ) [ a ]" := (S :&: 'Fix_to[a])
- (at level 8, format "''Fix_' ( S  |  to ) [ a ]") : group_scope.
+  (format "''Fix_' ( S  |  to ) [ a ]") : group_scope.
 
-Notation "''C' ( S | to )" := (astab S to)
-  (format "''C' ( S  |  to )") : group_scope.
+Notation "''C' ( S | to )" := (astab S to) : group_scope.
 
-Notation "''C_' A ( S | to )" := (A :&: 'C(S | to))
-  (format "''C_' A ( S  |  to )") : group_scope.
+Notation "''C_' A ( S | to )" := (A :&: 'C(S | to)) : group_scope.
 Notation "''C_' ( A ) ( S | to )" := 'C_A(S | to) (only parsing) : group_scope.
 
-Notation "''C' [ x | to ]" := ('C([set x] | to))
-  (format "''C' [ x  |  to ]") : group_scope.
+Notation "''C' [ x | to ]" := ('C([set x] | to)) : group_scope.
 
-Notation "''C_' A [ x | to ]" := (A :&: 'C[x | to])
-  (format "''C_' A [ x  |  to ]") : group_scope.
+Notation "''C_' A [ x | to ]" := (A :&: 'C[x | to]) : group_scope.
 Notation "''C_' ( A ) [ x | to ]" := 'C_A[x | to] (only parsing) : group_scope.
 
 Notation "''N' ( S | to )" := (astabs S to)
   (format "''N' ( S  |  to )") : group_scope.
 
 Notation "''N_' A ( S | to )" := (A :&: 'N(S | to))
-  (format "''N_' A ( S  |  to )") : group_scope.
+  (A at level 2, format "''N_' A ( S  |  to )") : group_scope.
 
 Notation "[ 'acts' A , 'on' S | to ]" := (A \subset pred_of_set 'N(S | to))
   (format "[ 'acts'  A ,  'on'  S  |  to ]") : form_scope.
@@ -506,10 +501,10 @@ Implicit Types S : {set rT}.
 Lemma act1 x : to x 1 = x.
 Proof. by apply: (act_inj to 1); rewrite -actMin ?mulg1. Qed.
 
-Lemma actKin : {in D, right_loop invg to}.
+Lemma actKin : {in D, right_loop inv to}.
 Proof. by move=> a Da /= x; rewrite -actMin ?groupV // mulgV act1. Qed.
 
-Lemma actKVin : {in D, rev_right_loop invg to}.
+Lemma actKVin : {in D, rev_right_loop inv to}.
 Proof. by move=> a Da /= x; rewrite -{2}(invgK a) actKin ?groupV. Qed.
 
 Lemma setactVin S a : a \in D -> to^* S a^-1 = to^~ a @^-1: S.
@@ -899,10 +894,10 @@ Implicit Type S : {set rT}.
 Lemma actM x a b : to x (a * b) = to (to x a) b.
 Proof. by rewrite actMin ?inE. Qed.
 
-Lemma actK : right_loop invg to.
+Lemma actK : right_loop inv to.
 Proof. by move=> a; apply: actKin; rewrite inE. Qed.
 
-Lemma actKV : rev_right_loop invg to.
+Lemma actKV : rev_right_loop inv to.
 Proof. by move=> a; apply: actKVin; rewrite inE. Qed.
 
 Lemma actX x a n : to x (a ^+ n) = iter n (to^~ a) x.
@@ -1292,8 +1287,7 @@ Qed.
 
 End SubAction.
 
-Notation "to ^?" := (subaction _ to)
-  (at level 2, format "to ^?") : action_scope.
+Notation "to ^?" := (subaction _ to) (format "to ^?") : action_scope.
 
 Section QuotientAction.
 
@@ -1405,7 +1399,7 @@ case: (set_0Vmem (D :&: Ha)) => [Da0 | [a /setIP[Da NHa]]].
 have Na := subsetP (coset_norm _) _ NHa.
 have NDa: a \in 'N_D(H) by rewrite inE Da.
 rewrite -(coset_mem NHa) !modactEcond //.
-do 2![case: ifP]=> Cy Cx // eqxy; first exact: act_inj eqxy.
+do 2![case: ifP] => Cy Cx // eqxy; first exact: act_inj eqxy.
   by rewrite -eqxy acts_dom ?Cx in Cy.
 by rewrite eqxy acts_dom ?Cy in Cx.
 Qed.
@@ -1628,7 +1622,7 @@ End PermAction.
 
 Arguments perm_act1P {rT a}.
 
-Notation "'P" := (perm_action _) (at level 8) : action_scope.
+Notation "'P" := (perm_action _) : action_scope.
 
 Section ActpermOrbits.
 
@@ -1870,14 +1864,10 @@ Arguments gacent {aT rT D%_g R%_g} to%_gact A%_g.
 Arguments acts_on_group {aT rT D%_g R%_g} A%_g S%_g to%_gact.
 Arguments acts_irreducibly {aT rT D%_g R%_g} A%_g S%_g to%_gact.
 
-Notation "''C_' ( | to ) ( A )" := (gacent to A)
-  (format "''C_' ( | to ) ( A )") : group_scope.
-Notation "''C_' ( G | to ) ( A )" := (G :&: 'C_(|to)(A))
-  (format "''C_' ( G  |  to ) ( A )") : group_scope.
-Notation "''C_' ( | to ) [ a ]" := 'C_(|to)([set a])
-  (format "''C_' ( | to ) [ a ]") : group_scope.
-Notation "''C_' ( G | to ) [ a ]" := 'C_(G | to)([set a])
-  (format "''C_' ( G  |  to ) [ a ]") : group_scope.
+Notation "''C_' ( | to ) ( A )" := (gacent to A) : group_scope.
+Notation "''C_' ( G | to ) ( A )" := (G :&: 'C_(|to)(A)) : group_scope.
+Notation "''C_' ( | to ) [ a ]" := 'C_(|to)([set a]) : group_scope.
+Notation "''C_' ( G | to ) [ a ]" := 'C_(G | to)([set a]) : group_scope.
 
 Notation "{ 'acts' A , 'on' 'group' G | to }" := (acts_on_group A G to)
   (format "{ 'acts'  A ,  'on'  'group'  G  |  to }") : type_scope.
@@ -2460,14 +2450,14 @@ Definition conjG_action := Action conjG_is_action.
 
 End InternalActionDefs.
 
-Notation "'R" := (@mulgr_action _) (at level 8) : action_scope.
-Notation "'Rs" := (@rcoset_action _) (at level 8) : action_scope.
-Notation "'J" := (@conjg_action _) (at level 8) : action_scope.
-Notation "'J" := (@conjg_groupAction _) (at level 8) : groupAction_scope.
-Notation "'Js" := (@conjsg_action _) (at level 8) : action_scope.
-Notation "'JG" := (@conjG_action _) (at level 8) : action_scope.
-Notation "'Q" := ('J / _)%act (at level 8) : action_scope.
-Notation "'Q" := ('J / _)%gact (at level 8) : groupAction_scope.
+Notation "'R" := (@mulgr_action _) : action_scope.
+Notation "'Rs" := (@rcoset_action _) : action_scope.
+Notation "'J" := (@conjg_action _) : action_scope.
+Notation "'J" := (@conjg_groupAction _) : groupAction_scope.
+Notation "'Js" := (@conjsg_action _) : action_scope.
+Notation "'JG" := (@conjG_action _) : action_scope.
+Notation "'Q" := ('J / _)%act : action_scope.
+Notation "'Q" := ('J / _)%gact : groupAction_scope.
 
 Section InternalGroupAction.
 

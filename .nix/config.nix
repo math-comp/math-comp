@@ -27,7 +27,7 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   ## select an entry to build in the following `bundles` set
   ## defaults to "default"
-  default-bundle = "coq-8.20";
+  default-bundle = "rocq-9.1";
 
   ## write one `bundles.name` attribute set per
   ## alternative configuration, the can be used to
@@ -97,12 +97,12 @@ with builtins; with (import <nixpkgs> {}).lib;
          graph-theory.override.version = "ssrpat-FO-ignore-imparg";
        };
   in {
-    "coq-master" = { rocqPackages = {
-      rocq-core.override.version = "gares:ssrpat-FO-ignore-imparg";
+    "rocq-master" = { rocqPackages = {
+      rocq-core.override.version = "master";
       stdlib.override.version = "master";
       bignums.override.version = "master";
       rocq-elpi.override.version = "master";
-      rocq-elpi.override.elpi-version = "2.0.7";
+      rocq-elpi.override.elpi-version = "3.0.1";
       hierarchy-builder.override.version = "master";
       mathcomp.job = false;
     }; coqPackages = common-bundles // {
@@ -110,28 +110,33 @@ with builtins; with (import <nixpkgs> {}).lib;
       stdlib.override.version = "master";
       bignums.override.version = "master";
       coq-elpi.override.version = "master";
-      coq-elpi.override.elpi-version = "2.0.7";
+      coq-elpi.override.elpi-version = "3.0.1";
       hierarchy-builder.override.version = "master";
       interval.job = false;
       coquelicot.job = false;
-      mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
       ssprove.job = false;
       mathcomp-infotheo.job = false;  # not compatible with master
     }; };
-    "coq-9.0".coqPackages = common-bundles // {
+    "rocq-9.1" = { rocqPackages = {
+      rocq-core.override.version = "9.1";
+    }; coqPackages = common-bundles // {
+      coq.override.version = "9.1";
+      coq-elpi.job = true;
+      hierarchy-builder.job = true;
+      # check that we compile without warnings on last release of Coq
+      mathcomp-warnings.job = true;
+      interval.job = false;  # not yet compatible with 9.1
+      ssprove.job = false;  # not yet compatible with 9.1
+    }; };
+    "rocq-9.0" = { rocqPackages = {
+      rocq-core.override.version = "9.0";
+    }; coqPackages = common-bundles // {
       coq.override.version = "9.0";
       coq-elpi.job = true;
       hierarchy-builder.job = true;
-      mathcomp-doc.job = false;  # currently broken (it's an unmaintainable pile of scripts)
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
-      interval.job = false;  # not yet compatible with 9.0
-      mathcomp-infotheo.job = false;  # not yet compatible with 9.0
-    };
-    "coq-8.20".coqPackages = common-bundles // {
-      coq.override.version = "8.20";
-      coq-elpi.override.version = "2.5.0";  # required by CoqEAL
-      coq-elpi.override.elpi-version = "2.0.7";
-    };
+      odd-order.job = false;  # odd-order dropped support for 9.0
+    }; };
   };
 }

@@ -55,9 +55,9 @@ The instructions assume you have a supported version of Rocq
 (listed in `CHANGELOG.md`).
 
 If `rocq` is in your `PATH`, then you are good to go. Alternatively, you
-can export the `COQBIN` variable to tell `make` where the `coqc` binary is:
+can export the `ROCQBIN` variable to tell `make` where the `coqc` binary is:
 ```
-export COQBIN=/home/username/COQ/coq/bin/
+export ROCQBIN=/home/username/COQ/coq/bin/
 ```
 
 You also need to install

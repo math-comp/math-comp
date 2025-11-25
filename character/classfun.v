@@ -95,7 +95,7 @@ Unset Printing Implicit Defensive.
 Declare Scope cfun_scope.
 
 Local Open Scope group_scope.
-Import Order.TTheory GRing.Theory Num.Theory.
+Import Order.TTheory GRing.Theory Num.Theory Num.Def.
 Local Open Scope ring_scope.
 Delimit Scope cfun_scope with CF.
 
@@ -108,8 +108,10 @@ Reserved Notation "''Res'". (* only parsing *)
 Reserved Notation "''Ind[' G , H ]". (* only parsing *)
 Reserved Notation "''Ind[' G ]". (* only "''Ind[' G ]" *)
 Reserved Notation "''Ind'". (* only parsing *)
-Reserved Notation "'[ phi , psi ]_ G" (at level 0). (* only parsing *)
-Reserved Notation "'[ phi ]_ G" (at level 0). (* only parsing *)
+Reserved Notation "'[ phi , psi ]_ G"
+  (at level 0, G at level 2). (* only parsing *)
+Reserved Notation "'[ phi ]_ G"
+  (at level 0, G at level 2). (* only parsing *)
 Reserved Notation "phi ^u" (format "phi ^u").
 
 Section AlgC.
@@ -129,7 +131,7 @@ Proof. by apply/pgroupP=> p _; rewrite inE /= pchar_num. Qed.
 
 End AlgC.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use algC'G_pchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=algC'G_pchar)]
 Notation algC'G := (algC'G_pchar) (only parsing).
 
 Section Defs.
@@ -275,8 +277,7 @@ HB.instance Definition _ := GRing.Zmodule_isComNzRing.Build classfun
 
 Definition cfun_nzRingType : nzRingType := classfun.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use cfun_nzRingType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=cfun_nzRingType)]
 Notation cfun_ringType := (cfun_nzRingType) (only parsing).
 
 Lemma expS_cfunE phi n x : (phi ^+ n.+1) x = phi x ^+ n.+1.
@@ -313,14 +314,9 @@ HB.instance Definition _ := GRing.Zmodule_isLmodule.Build algC classfun
 
 Fact cfun_scaleAl a phi psi : a *: (phi * psi) = (a *: phi) * psi.
 Proof. by apply/cfunP=> x; rewrite !cfunE mulrA. Qed.
-Fact cfun_scaleAr a phi psi : a *: (phi * psi) = phi * (a *: psi).
-Proof. by rewrite !(mulrC phi) cfun_scaleAl. Qed.
 
-HB.instance Definition _ := GRing.Lmodule_isLalgebra.Build algC classfun
-  cfun_scaleAl.
-
-HB.instance Definition _ := GRing.Lalgebra_isAlgebra.Build algC classfun
-  cfun_scaleAr.
+HB.instance Definition _ :=
+  GRing.LSemiModule_isComSemiAlgebra.Build algC classfun cfun_scaleAl.
 
 Section Automorphism.
 
@@ -338,16 +334,14 @@ Lemma cfAut_is_zmod_morphism : zmod_morphism cfAut.
 Proof.
 by move=> phi psi; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE /= rmorphB.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `cfAut_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=cfAut_is_zmod_morphism)]
 Definition cfAut_is_additive := cfAut_is_zmod_morphism.
 
 Lemma cfAut_is_monoid_morphism : monoid_morphism cfAut.
 Proof.
 by split=> [|phi psi]; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE rmorphM.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `cfAut_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=cfAut_is_monoid_morphism)]
 Definition cfAut_is_multiplicative :=
   (fun g => (g.2,g.1)) cfAut_is_monoid_morphism.
 
@@ -369,9 +363,6 @@ Definition cfAut_closed (S : seq classfun) :=
   {in S, forall phi, cfAut phi \in S}.
 
 End Automorphism.
-
-(* FIX ME this has changed *)
-Notation conjC := Num.conj_op.
 
 Definition cfReal phi := cfAut conjC phi == phi.
 
@@ -429,9 +420,6 @@ Notation "''CF' ( G )" := (@fullv _ (cfun_vectType G)) : vspace_scope.
 Notation "''1_' A" := (cfun_indicator _ A) : ring_scope.
 Notation "''CF' ( G , A )" := (classfun_on G A) : ring_scope.
 Notation "1" := (@GRing.one (cfun_nzRingType _)) (only parsing) : cfun_scope.
-
-(* FIX ME this has changed *)
-Notation conjC := Num.conj_op.
 
 Notation "phi ^*" := (cfAut conjC phi) : cfun_scope.
 Notation cfConjC_closed := (cfAut_closed conjC).
@@ -1088,7 +1076,7 @@ have [[U S_U [V -> oVS]] [X S_X [Y -> oYS]]] := (IHS phi, IHS beta).
 pose Z := '[Y, V] / '[V] *: V; exists (X + Z).
   rewrite /Z -{4}(addKr U V) scalerDr scalerN addrA addrC span_cons.
   by rewrite memv_add ?memvB ?memvZ ?memv_line.
-exists (Y - Z); first by rewrite addrCA !addrA addrK addrC.
+exists (Y - Z); first by rewrite -addrA subrKC.
 apply/orthoPl=> psi /[!inE] /predU1P[-> | Spsi]; last first.
   by rewrite cfdotBl cfdotZl (orthoPl oVS _ Spsi) mulr0 subr0 (orthoPl oYS).
 rewrite cfdotBl !cfdotDr (span_orthogonal oYS) // ?memv_span ?mem_head //.
@@ -1415,8 +1403,7 @@ Proof.
 split=> [|phi psi]; [exact: cfRes_cfun1 | apply/cfunP=> x].
 by rewrite !cfunElock mulrnAr mulrnAl -mulrnA mulnb andbb.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `cfRes_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=cfRes_is_monoid_morphism)]
 Definition cfRes_is_multiplicative :=
   (fun g => (g.2,g.1)) cfRes_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build _ _ cfRes
@@ -1606,14 +1593,12 @@ Proof. by rewrite -(morph1 f) cfIsomE. Qed.
 
 Lemma cfIsom_is_zmod_morphism : zmod_morphism cfIsom.
 Proof. rewrite unlock; exact: raddfB. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `cfIsom_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=cfIsom_is_zmod_morphism)]
 Definition cfIsom_is_additive := cfIsom_is_zmod_morphism.
 
 Lemma cfIsom_is_monoid_morphism : monoid_morphism cfIsom.
 Proof. rewrite unlock; exact: (rmorph1 _, rmorphM _). Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `cfIsom_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=cfIsom_is_monoid_morphism)]
 Definition cfIsom_is_multiplicative :=
   (fun g => (g.2,g.1)) cfIsom_is_monoid_morphism.
 
@@ -1869,14 +1854,12 @@ Canonical cfSdprod_unlockable := [unlockable of cfSdprod].
 
 Lemma cfSdprod_is_zmod_morphism : zmod_morphism cfSdprod.
 Proof. rewrite unlock; exact: raddfB. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `cfSdprod_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=cfSdprod_is_zmod_morphism)]
 Definition cfSdprod_is_additive := cfSdprod_is_zmod_morphism.
 
 Lemma cfSdprod_is_monoid_morphism : monoid_morphism cfSdprod.
 Proof. rewrite unlock; exact: (rmorph1 _, rmorphM _). Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `cfSdprod_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=cfSdprod_is_monoid_morphism)]
 Definition cfSdprod_is_multiplicative :=
   (fun g => (g.2,g.1)) cfSdprod_is_monoid_morphism.
 
@@ -2035,10 +2018,9 @@ Qed.
 Lemma cfdot_dprod phi1 phi2 psi1 psi2 :
   '[cfDprod phi1 psi1, cfDprod phi2 psi2] = '[phi1, phi2] * '[psi1, psi2].
 Proof.
-rewrite !cfdotE mulrCA -mulrA mulrCA mulrA -invfM -natrM (dprod_card KxH).
-congr (_ * _); rewrite big_distrl reindex_dprod /=; apply: eq_bigr => k Kk.
-rewrite big_distrr; apply: eq_bigr => h Hh /=.
-by rewrite mulrCA -mulrA -rmorphM mulrCA mulrA !cfDprodE.
+rewrite !cfdotE mulrACA -invfM -natrM (dprod_card KxH); congr (_ * _).
+rewrite big_distrl reindex_dprod /=; apply: eq_bigr => k Kk; rewrite big_distrr.
+by apply: eq_bigr => h Hh /=; rewrite mulrACA -rmorphM !cfDprodE.
 Qed.
 
 Lemma cfDprodl_iso : isometry cfDprodl.

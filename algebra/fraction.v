@@ -115,8 +115,8 @@ HB.instance Definition _ : EqQuotient _ equivf type := EqQuotient.on type.
 HB.instance Definition _ := Choice.on type.
 
 (* we explain what was the equivalence on the quotient *)
-Lemma equivf_def (x y : ratio R) : x == y %[mod type]
-                                    = (\n_x * \d_y == \d_x * \n_y).
+Lemma equivf_def (x y : ratio R) :
+  (x == y %[mod type]) = (\n_x * \d_y == \d_x * \n_y).
 Proof. by rewrite eqmodE. Qed.
 
 Lemma equivf_r x : \n_x * \d_(repr (\pi_type x)) = \d_x * \n_(repr (\pi_type x)).
@@ -276,9 +276,6 @@ Notation "{ 'fraction' T }" := (FracField.type T).
 Notation equivf := (@FracField.equivf _).
 #[global] Hint Resolve denom_ratioP : core.
 
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ (R : idomainType) := GRing.Field.on {fraction R}.
-
 Section FracFieldTheory.
 
 Import FracField.
@@ -299,7 +296,7 @@ rewrite -[X in _ = _ + X]pi_opp -[RHS]pi_add.
 by rewrite /addf /oppf /= !numden_Ratio ?(oner_neq0, mul1r, mulr1).
 Qed.
 #[deprecated(since="mathcomp 2.5.0",
-      note="use `tofrac_is_zmod_morphism` instead")]
+      use=tofrac_is_zmod_morphism)]
 Definition tofrac_is_additive := tofrac_is_zmod_morphism.
 
 HB.instance Definition _ := GRing.isZmodMorphism.Build R {fraction R} tofrac
@@ -311,7 +308,7 @@ split=> [//|p q]; unlock tofrac; rewrite -[RHS]pi_mul.
 by rewrite /mulf /= !numden_Ratio ?(oner_neq0, mul1r, mulr1).
 Qed.
 #[deprecated(since="mathcomp 2.5.0",
-      note="use `tofrac_is_monoid_morphism` instead")]
+      use=tofrac_is_monoid_morphism)]
 Definition tofrac_is_multiplicative := tofrac_is_monoid_morphism.
 
 HB.instance Definition _ := GRing.isMonoidMorphism.Build R {fraction R} tofrac

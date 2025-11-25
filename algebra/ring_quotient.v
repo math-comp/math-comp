@@ -126,8 +126,7 @@ Variable Q : @zmodQuotType V equivV zeroV -%R +%R.
 
 Lemma pi_is_zmod_morphism : zmod_morphism \pi_Q.
 Proof. by move=> x y /=; rewrite !piE. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `pi_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=pi_is_zmod_morphism)]
 Definition pi_is_additive := pi_is_zmod_morphism.
 
 HB.instance Definition _ := GRing.isZmodMorphism.Build V Q \pi_Q pi_is_zmod_morphism.
@@ -148,14 +147,12 @@ addT (oneT : T) (mulT : T -> T -> T) (Q : Type)
   }.
 
 Module isRingQuotient.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isNzRingQuotient.Build instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isNzRingQuotient.Build)]
 Notation Build T eqT zeroT oppT addT oneT mulT Q :=
   (isNzRingQuotient.Build T eqT zeroT oppT addT oneT mulT Q) (only parsing).
 End isRingQuotient.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use isNzRingQuotient instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=isNzRingQuotient)]
 Notation isRingQuotient T eqT zeroT oppT addT oneT mulT Q :=
   (isNzRingQuotient T eqT zeroT oppT addT oneT mulT Q) (only parsing).
 
@@ -164,8 +161,7 @@ HB.structure Definition NzRingQuotient T eqT zeroT oppT addT oneT mulT :=
   {Q of isNzRingQuotient T eqT zeroT oppT addT oneT mulT Q &
    ZmodQuotient T eqT zeroT oppT addT Q & GRing.NzRing Q }.
 
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use nzRingQuotType instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=nzRingQuotType)]
 Notation ringQuotType := (nzRingQuotType) (only parsing).
 
 Section nzRingQuotient.
@@ -189,8 +185,7 @@ Variable Q : @nzRingQuotType R equivR zeroR -%R +%R 1 *%R.
 
 Lemma pi_is_monoid_morphism : monoid_morphism \pi_Q.
 Proof. by split; do ?move=> x y /=; rewrite !piE. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `pi_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=pi_is_monoid_morphism)]
 Definition pi_is_multiplicative :=
   (fun g => (g.2,g.1)) pi_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build R Q \pi_Q
@@ -271,7 +266,7 @@ Section IdealTheory.
 Variables (R : nzRingType) (idealrI : idealr R).
 Local Notation I := (idealrI : pred R).
 
-Lemma idealr1 : 1 \in I = false.
+Lemma idealr1 : (1 \in I) = false.
 Proof. apply: negPf; exact: proper_ideal_subproof.1. Qed.
 
 Lemma idealMr a u : u \in I -> a * u \in I.
@@ -319,10 +314,10 @@ HB.instance Definition _ : EqQuotient R equiv quot := EqQuotient.on quot.
 #[export]
 HB.instance Definition _ := Choice.on quot.
 
-Lemma idealrBE x y : (x - y) \in I = (x == y %[mod quot]).
+Lemma idealrBE x y : ((x - y) \in I) = (x == y %[mod quot]).
 Proof. by rewrite piE equivE. Qed.
 
-Lemma idealrDE x y : (x + y) \in I = (x == - y %[mod quot]).
+Lemma idealrDE x y : ((x + y) \in I) = (x == - y %[mod quot]).
 Proof. by rewrite -idealrBE opprK. Qed.
 
 Definition zero : quot := lift_cst quot 0.
@@ -341,8 +336,7 @@ Canonical pi_opp_morph := PiMorph1 pi_opp.
 Lemma pi_add : {morph \pi : x y / x + y >-> add x y}.
 Proof.
 move=> x y /=; unlock add; apply/eqP; rewrite piE equivE.
-rewrite opprD addrAC addrA -addrA.
-by rewrite rpredD // (idealrBE, idealrDE) ?pi_opp ?reprK.
+by rewrite opprD addrACA rpredD // (idealrBE, idealrDE) ?pi_opp ?reprK.
 Qed.
 Canonical pi_add_morph := PiMorph2 pi_add.
 

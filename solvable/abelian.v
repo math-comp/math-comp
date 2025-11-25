@@ -126,29 +126,28 @@ Notation "''Ldiv_' n ( G )" := (G :&: 'Ldiv_n())
 
 Prenex Implicits exponent.
 
-Notation "p .-abelem" := (abelem p)
-  (at level 2, format "p .-abelem") : group_scope.
+Notation "p .-abelem" := (abelem p) (format "p .-abelem") : group_scope.
 
 Notation "''E_' p ( G )" := (pElem p G)
-  (at level 8, p at level 2, format "''E_' p ( G )") : group_scope.
+  (p at level 2, format "''E_' p ( G )") : group_scope.
 
 Notation "''E_' p ^ n ( G )" := (pnElem p n G)
   (n at level 2, format "''E_' p ^ n ( G )") : group_scope.
 
 Notation "''E' ^ n ( G )" := (nElem n G)
-  (at level 8, n at level 2, format "''E' ^ n ( G )") : group_scope.
+  (n at level 2, format "''E' ^ n ( G )") : group_scope.
 
 Notation "''E*_' p ( G )" := (pmaxElem p G)
-  (at level 8, p at level 2, format "''E*_' p ( G )") : group_scope.
+  (p at level 2, format "''E*_' p ( G )") : group_scope.
 
 Notation "''m' ( A )" := (gen_rank A)
-  (at level 8, format "''m' ( A )") : group_scope.
+  (format "''m' ( A )") : group_scope.
 
 Notation "''r' ( A )" := (rank A)
-  (at level 8, format "''r' ( A )") : group_scope.
+  (format "''r' ( A )") : group_scope.
 
 Notation "''r_' p ( A )" := (p_rank p A)
-  (at level 8, p at level 2, format "''r_' p ( A )") : group_scope.
+  (p at level 2, format "''r_' p ( A )") : group_scope.
 
 Section Functors.
 
@@ -195,11 +194,11 @@ Arguments Mho_group n%_N {gT} A%_g.
 Arguments OhmPredP {n gT x}.
 
 Notation "''Ohm_' n ( G )" := (Ohm n G)
-  (at level 8, n at level 2, format "''Ohm_' n ( G )") : group_scope.
+  (n at level 2, format "''Ohm_' n ( G )") : group_scope.
 Notation "''Ohm_' n ( G )" := (Ohm_group n G) : Group_scope.
 
 Notation "''Mho^' n ( G )" := (Mho n G)
-  (at level 8, n at level 2, format "''Mho^' n ( G )") : group_scope.
+  (n at level 2, format "''Mho^' n ( G )") : group_scope.
 Notation "''Mho^' n ( G )" := (Mho_group n G) : Group_scope.
 
 Section ExponentAbelem.
@@ -1248,7 +1247,7 @@ Qed.
 Lemma MhoE p G : p.-group G -> 'Mho^n(G) = <<[set x ^+ (p ^ n) | x in G]>>.
 Proof.
 move=> pG; apply/eqP; rewrite eqEsubset !gen_subG; apply/andP.
-do [split; apply/subsetP=> xpn; case/imsetP=> x] => [|Gx ->]; last first.
+do [split; apply/subsetP => xpn; case/imsetP => x] => [|Gx ->]; last first.
   by rewrite Mho_p_elt ?(mem_p_elt pG).
 case/setIdP=> Gx _ ->; have [-> | ntx] := eqVneq x 1; first by rewrite expg1n.
 by rewrite (pdiv_p_elt (mem_p_elt pG Gx) ntx) mem_gen //; apply: imset_f.
@@ -2178,7 +2177,7 @@ Proof. exact: fin_lmod_pchar_abelem R^o. Qed.
 
 End FimModAbelem.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use fin_lmod_pchar_abelem instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=fin_lmod_pchar_abelem)]
 Notation fin_lmod_char_abelem := (fin_lmod_pchar_abelem) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use fin_ring_pchar_abelem instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=fin_ring_pchar_abelem)]
 Notation fin_ring_char_abelem := (fin_ring_pchar_abelem) (only parsing).

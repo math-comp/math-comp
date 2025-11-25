@@ -78,8 +78,7 @@ Proof. by rewrite swapXY_polyC map_polyX. Qed.
 
 Lemma swapXY_is_zmod_morphism : zmod_morphism swapXY.
 Proof. by move=> u v; rewrite unlock rmorphB !hornerE. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `swapXY_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=swapXY_is_zmod_morphism)]
 Definition swapXY_is_additive := swapXY_is_zmod_morphism.
 HB.instance Definition _ :=
   GRing.isZmodMorphism.Build {poly {poly R}} {poly {poly R}} swapXY
@@ -110,8 +109,7 @@ rewrite (eq_bigr _ (fun _ _ => coefM _ _ _)) exchange_big /=.
 apply: eq_bigr => j1 _; rewrite coefM; apply: eq_bigr=> i1 _.
 by rewrite !coef_swapXY.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `swapXY_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=swapXY_is_monoid_morphism)]
 Definition swapXY_is_multiplicative :=
   (fun g => (g.2,g.1)) swapXY_is_monoid_morphism.
 HB.instance Definition _ :=
@@ -254,7 +252,7 @@ Lemma sub_annihilant_in_ideal p q :
 Proof.
 rewrite -size_poly_XaY -(size_map_polyC q) => p1_gt1 q1_gt1.
 have [uv /= [ub_u ub_v Dr]] := resultant_in_ideal p1_gt1 q1_gt1.
-exists uv => // x y; rewrite -[r in r.[y]](hornerC _ x%:P) Dr.
+exists uv => // x y; rewrite -[r in r.[y] = _](hornerC _ x%:P) Dr.
 by rewrite !(hornerE, horner_comp).
 Qed.
 
@@ -294,13 +292,14 @@ Lemma div_annihilant_in_ideal p q :
 Proof.
 rewrite -size_poly_XmY -(size_map_polyC q) => p1_gt1 q1_gt1.
 have [uv /= [ub_u ub_v Dr]] := resultant_in_ideal p1_gt1 q1_gt1.
-exists uv => // x y; rewrite -[r in r.[y]](hornerC _ x%:P) Dr.
+exists uv => // x y; rewrite -[r in r.[y] = _](hornerC _ x%:P) Dr.
 by rewrite !(hornerE, horner_comp).
 Qed.
 
 Lemma div_annihilant_neq0 p q : p != 0 -> q.[0] != 0 -> div_annihilant p q != 0.
 Proof.
-have factorX u: u != 0 -> root u 0 -> exists2 v, v != 0 & u = v * 'X.
+have factorX (S : nzRingType) (u : {poly S}) :
+    u != 0 -> root u 0 -> exists2 v, v != 0 & u = v * 'X.
   move=> nz_u /factor_theorem[v]; rewrite subr0 => Du; exists v => //.
   by apply: contraNneq nz_u => v0; rewrite Du v0 mul0r.
 have nzX: 'X != 0 := monic_neq0 (monicX _); have rootC0 := root_polyC _ 0.

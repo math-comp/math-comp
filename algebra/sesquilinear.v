@@ -115,7 +115,7 @@ Reserved Notation "A ''_|_' B" (at level 69, format "A  ''_|_'  B").
 Reserved Notation "eps_theta .-sesqui" (format "eps_theta .-sesqui").
 
 Local Open Scope ring_scope.
-Import GRing.Theory Order.Theory Num.Theory.
+Import GRing.Theory Order.Theory Num.Theory Num.Def.
 
 Notation "''e_' j" := (delta_mx 0 j)
  (format "''e_' j", at level 8, j at level 2) : ring_scope.
@@ -152,22 +152,17 @@ Proof. apply: involutive_subproof. Qed.
 
 End InvolutiveTheory.
 
-Definition conjC {C : numClosedFieldType} (c : C) : C := c^*.
-
-HB.instance Definition _ (C : numClosedFieldType) :=
-  GRing.RMorphism.on (@conjC C).
-
 Section conjC_involutive.
 Variable C : numClosedFieldType.
 
 Let conjCfun_involutive : involutive (@conjC C). Proof. exact: conjCK. Qed.
 
 HB.instance Definition _ :=
-  isInvolutive.Build _ (@conjC C) conjCfun_involutive.
+  isInvolutive.Build _ conjC conjCfun_involutive.
 
 End conjC_involutive.
 
-Lemma map_mxCK {C : numClosedFieldType}  m n (A : 'M[C]_(m, n)) :
+Lemma map_mxCK {C : numClosedFieldType} m n (A : 'M[C]_(m, n)) :
   (A ^ conjC) ^ conjC = A.
 Proof. by apply/matrixP=> i j; rewrite !mxE conjCK. Qed.
 
@@ -304,13 +299,6 @@ Variable f : {bilinear U -> U' -> V | s & s'}.
 
 Section GenericPropertiesr.
 Variable z : U.
-
-#[local, non_forgetful_inheritance, warning="-HB.no-new-instance"]
-HB.instance Definition _ :=
-  GRing.isZmodMorphism.Build _ _ (f z) (@zmod_morphismr_subproof _ _ _ _ _ _ f z).
-#[local, non_forgetful_inheritance]
-HB.instance Definition _ :=
-  GRing.isScalable.Build _ _ _ _ (f z) (@linearr_subproof _ _ _ _ _ _ f z).
 
 Lemma linear0r : f z 0 = 0. Proof. by rewrite raddf0. Qed.
 Lemma linearNr : {morph f z : x / - x}. Proof. exact: raddfN. Qed.
@@ -714,7 +702,7 @@ Notation "eps_theta .-sesqui" := (sesqui _ eps_theta) : ring_scope.
 
 Notation symmetric_form := (false, idfun).-sesqui.
 Notation skew := (true, idfun).-sesqui.
-Notation hermitian := (false, @Num.conj_op _).-sesqui.
+Notation hermitian := (false, conjC).-sesqui.
 
 HB.mixin Record isDotProduct (R : numDomainType) (U : lmodType R)
   (op : U -> U -> R) := { neq0_dnorm_gt0 : forall u, u != 0 -> 0 < op u u }.
@@ -1039,9 +1027,9 @@ Definition is_unitary := nondegenerate /\ (is_hermsym form).
 
 End HermitianFinVectTheory.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use is_psymplectic instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=is_psymplectic)]
 Notation is_symplectic := is_psymplectic (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="Use is_porthogonal instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=is_porthogonal)]
 Notation is_orthogonal := is_porthogonal (only parsing).
 
 Arguments orthogonalP {F eps theta vT form us vs}.
@@ -1325,7 +1313,7 @@ have [[UU S_U [V -> oVS]] [X S_X [Y -> oYS]]] := (IHS phi, IHS beta).
 pose Z := '[Y, V] / '[V] *: V; exists (X + Z).
   rewrite /Z -{4}(addKr UU V) scalerDr scalerN addrA addrC span_cons.
   by rewrite memv_add ?memvB ?memvZ ?memv_line.
-exists (Y - Z); first by rewrite addrCA !addrA addrK addrC.
+exists (Y - Z); first by rewrite -addrA subrKC.
 apply/orthoPl=> psi; rewrite !inE => /predU1P[-> | Spsi]; last first.
   by rewrite linearBl linearZl_LR /= (orthoPl oVS _ Spsi) mulr0 subr0 (orthoPl oYS).
 rewrite linearBl !linearDr /= (span_orthogonal oYS) // ?memv_span ?mem_head //.
@@ -1666,7 +1654,7 @@ Notation hermsymmx := (hermitianmx _ false conjC).
 
 Lemma hermitian1mx_subproof {C : numClosedFieldType} n : (1%:M : 'M[C]_n) \is hermsymmx.
 Proof.
-by rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx conjC1.
+by rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx/= conjC1.
 Qed.
 
 Canonical hermitian1mx {C : numClosedFieldType} n :=

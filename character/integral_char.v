@@ -35,8 +35,8 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Local Open Scope group_scope.
 Import Order.TTheory GRing.Theory Num.Theory.
+Local Open Scope group_scope.
 Local Open Scope ring_scope.
 
 Lemma group_num_field_exists (gT : finGroupType) (G : {group gT}) :
@@ -157,7 +157,7 @@ Notation "''K_' i" := (gring_class_sum _ i)
   (at level 8, i at level 2, format "''K_' i") : ring_scope.
 
 Notation "''omega_' i [ A ]" := (xcfun (gring_irr_mode i) A)
-   (at level 8, i at level 2, format "''omega_' i [ A ]") : ring_scope.
+  (i at level 2, format "''omega_' i [ A ]") : ring_scope.
 
 Section IntegralChar.
 
@@ -472,7 +472,7 @@ transitivity ('chi_i x * 'chi_i (x^-1)%g *+ #|h x|); last first.
   rewrite !irr_inv DchiZ ?groupJ ?cfunJ // rmorphM mulrACA -!normCK -exprMn.
   by rewrite (normC_lin_char lin_lambda) ?mulr1 //= cfcenter_fful_irr.
 rewrite mulrAC -natrM mulr_natl; congr (_ *+ _).
-symmetry; rewrite /h /mulg /= /set_mulg [in _ @2: (_, _)]unlock cardsE.
+symmetry; rewrite /h /mul /= /set_mulg [in _ @2: (_, _)]unlock cardsE.
 rewrite -cardX card_in_image // => [] [y1 z1] [y2 z2] /=.
 move=> /andP[/=/imsetP[u1 Gu1 ->] Zz1] /andP[/=/imsetP[u2 Gu2 ->] Zz2] {y1 y2}.
 move=> eq12; have /eqP := congr1 'chi_i eq12.

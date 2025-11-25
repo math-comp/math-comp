@@ -6,15 +6,11 @@ From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
 From mathcomp Require Import ssralg poly.
 
 (******************************************************************************)
-(*                            Number structures                               *)
+(*                    Number structures (orderedzmod.v)                       *)
 (*                                                                            *)
 (* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
 (*                                                                            *)
-(* This file defines some classes to manipulate number structures, i.e,       *)
-(* structures with an order and a norm. To use this file, insert              *)
-(* "Import Num.Theory." before your scripts. You can also "Import Num.Def."   *)
-(* to enjoy shorter notations (e.g., minr instead of Num.min, lerif instead   *)
-(* of Num.leif, etc.).                                                        *)
+(* NB: The header of ssrnum.v explains how to use the files in this directory.*)
 (*                                                                            *)
 (* This file defines the following number structures:                         *)
 (*                                                                            *)
@@ -47,11 +43,6 @@ From mathcomp Require Import ssralg poly.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
-
-Reserved Notation "n .-root" (format "n .-root").
-Reserved Notation "'i".
-Reserved Notation "'Re z" (at level 10, z at level 8).
-Reserved Notation "'Im z" (at level 10, z at level 8).
 
 Local Open Scope order_scope.
 Local Open Scope group_scope.
@@ -100,23 +91,45 @@ Notation "@ 'minr' R" := (@Order.min ring_display R)
 Section Def.
 Context {R : porderZmodType}.
 
-Definition Rpos_pred := fun x : R => 0 < x.
-Definition Rpos : qualifier 0 R := [qualify x | Rpos_pred x].
-Definition Rneg_pred := fun x : R => x < 0.
-Definition Rneg : qualifier 0 R := [qualify x : R | Rneg_pred x].
-Definition Rnneg_pred := fun x : R => 0 <= x.
-Definition Rnneg : qualifier 0 R := [qualify x : R | Rnneg_pred x].
-Definition Rnpos_pred := fun x : R => x <= 0.
-Definition Rnpos : qualifier 0 R := [qualify x : R | Rnpos_pred x].
-Definition Rreal_pred := fun x : R => (0 <= x) || (x <= 0).
-Definition Rreal : qualifier 0 R := [qualify x : R | Rreal_pred x].
+Definition pos_num_pred := fun x : R => 0 < x.
+Definition pos_num : qualifier 0 R := [qualify x | pos_num_pred x].
+Definition neg_num_pred := fun x : R => x < 0.
+Definition neg_num : qualifier 0 R := [qualify x : R | neg_num_pred x].
+Definition nneg_num_pred := fun x : R => 0 <= x.
+Definition nneg_num : qualifier 0 R := [qualify x : R | nneg_num_pred x].
+Definition npos_num_pred := fun x : R => x <= 0.
+Definition npos_num : qualifier 0 R := [qualify x : R | npos_num_pred x].
+Definition real_num_pred := fun x : R => (0 <= x) || (x <= 0).
+Definition real_num : qualifier 0 R := [qualify x : R | real_num_pred x].
 
 End Def.
 
-Arguments Rpos_pred _ _ /.
-Arguments Rneg_pred _ _ /.
-Arguments Rnneg_pred _ _ /.
-Arguments Rreal_pred _ _ /.
+Arguments pos_num_pred _ _ /.
+Arguments neg_num_pred _ _ /.
+Arguments nneg_num_pred _ _ /.
+Arguments real_num_pred _ _ /.
+
+#[deprecated(since="mathcomp 2.5.0", use=pos_num_pred)]
+Notation Rpos_pred := pos_num_pred (only parsing).
+#[deprecated(since="mathcomp 2.5.0", use=pos_num)]
+Notation Rpos := pos_num (only parsing).
+#[deprecated(since="mathcomp 2.5.0", use=neg_num_pred)]
+Notation Rneg_pred := neg_num_pred (only parsing).
+#[deprecated(since="mathcomp 2.5.0", use=neg_num)]
+Notation Rneg := neg_num (only parsing).
+#[deprecated(since="mathcomp 2.5.0", use=nneg_num_pred)]
+Notation Rnneg_pred := nneg_num_pred (only parsing).
+#[deprecated(since="mathcomp 2.5.0", use=nneg_num)]
+Notation Rnneg := nneg_num (only parsing).
+#[deprecated(since="mathcomp 2.5.0", use=npos_num_pred)]
+Notation Rnpos_pred := npos_num_pred (only parsing).
+#[deprecated(since="mathcomp 2.5.0", use=npos_num)]
+Notation Rnpos := npos_num (only parsing).
+#[deprecated(since="mathcomp 2.5.0", use=real_num_pred)]
+Notation Rreal_pred := real_num_pred (only parsing).
+#[deprecated(since="mathcomp 2.5.0", use=real_num)]
+Notation Rreal := real_num (only parsing).
+
 End Def.
 
 (* Shorter qualified names, when Num.Def is not imported. *)
@@ -129,11 +142,11 @@ Notation lteif := lterif (only parsing).
 Notation comparable := comparabler (only parsing).
 Notation max := maxr.
 Notation min := minr.
-Notation pos := Rpos.
-Notation neg := Rneg.
-Notation nneg := Rnneg.
-Notation npos := Rnpos.
-Notation real := Rreal.
+Notation pos := pos_num.
+Notation neg := neg_num.
+Notation nneg := nneg_num.
+Notation npos := npos_num.
+Notation real := real_num.
 
 (* (Exported) symbolic syntax. *)
 Module Import Syntax.

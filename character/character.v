@@ -501,8 +501,7 @@ Definition xcfun (chi : 'CF(G)) A :=
 
 Lemma xcfun_is_zmod_morphism phi : zmod_morphism (xcfun phi).
 Proof. by move=> A B; rewrite /xcfun [gring_row _]linearB mulmxBl !mxE. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `xcfun_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=xcfun_is_zmod_morphism)]
 Definition xcfun_is_additive := xcfun_is_zmod_morphism.
 HB.instance Definition _ phi :=
   GRing.isZmodMorphism.Build 'M_(gcard G) _ (xcfun phi) (xcfun_is_zmod_morphism phi).
@@ -521,8 +520,7 @@ Proof.
 move=> phi psi; rewrite /= /xcfun !mxE -sumrB; apply: eq_bigr => i _.
 by rewrite !mxE !cfunE mulrBr.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `xcfun_r_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=xcfun_r_is_zmod_morphism)]
 Definition xcfun_r_is_additive := xcfun_r_is_zmod_morphism.
 HB.instance Definition _ A := GRing.isZmodMorphism.Build _ _ (xcfun_r A)
   (xcfun_r_is_zmod_morphism A).
@@ -798,7 +796,7 @@ Qed.
 
 (* This is Isaacs, Theorem (2.12). *)
 Lemma Wedderburn_id_expansion i :
-  'e_i = #|G|%:R^-1 *: \sum_(x in G) 'chi_i 1%g * 'chi_i x^-1%g *: aG x.
+  'e_i = #|G|%:R^-1 *: (\sum_(x in G) 'chi_i 1%g * 'chi_i x^-1%g *: aG x).
 Proof.
 have Rei: ('e_i \in 'R_i)%MS by apply: Wedderburn_id_mem.
 have /envelop_mxP[a def_e]: ('e_i \in R_G)%MS; last rewrite -/aG in def_e.
@@ -1749,7 +1747,7 @@ Section MoreConstt.
 Variables (gT : finGroupType) (G H : {group gT}).
 
 Lemma constt_Ind_Res i j :
-  i \in irr_constt ('Ind[G] 'chi_j) =  (j \in irr_constt ('Res[H] 'chi_i)).
+  (i \in irr_constt ('Ind[G] 'chi_j)) = (j \in irr_constt ('Res[H] 'chi_i)).
 Proof. by rewrite !irr_consttE cfdotC conjC_eq0 -cfdot_Res_l. Qed.
 
 Lemma cfdot_Res_ge_constt i j psi :
@@ -2239,7 +2237,7 @@ Definition aut_Iirr u i := cfIirr (cfAut u 'chi[G]_i).
 Lemma aut_IirrE u i : 'chi_(aut_Iirr u i) = cfAut u 'chi_i.
 Proof. by rewrite cfIirrE ?cfAut_irr ?mem_irr. Qed.
 
-Definition conjC_Iirr := aut_Iirr conjC.
+Definition conjC_Iirr := aut_Iirr Num.conj.
 
 Lemma conjC_IirrE i : 'chi[G]_(conjC_Iirr i) = ('chi_i)^*%CF.
 Proof. exact: aut_IirrE. Qed.
@@ -2285,7 +2283,7 @@ move=> Nchi; without loss kerH: / H \subset cfker chi.
   by apply/cfunP=> x; rewrite cfunE cfun1E mulr_natr cfunElock IHchi.
 without loss nsHG: G chi Nchi kerH / H <| G.
   move=> IHchi; have nsHN := normalSG (subset_trans kerH (cfker_sub chi)).
-  rewrite cfQuoInorm//; apply/cfRes_char/IHchi => //; first exact: cfRes_char. 
+  rewrite cfQuoInorm//; apply/cfRes_char/IHchi => //; first exact: cfRes_char.
   by apply: sub_cfker_Res => //; apply: normal_sub.
 have [rG Dchi] := char_reprP Nchi; rewrite Dchi cfker_repr in kerH.
 apply/char_reprP; exists (Representation (quo_repr kerH (normal_norm nsHG))).
@@ -2513,7 +2511,7 @@ have mulA: associative mul by move=> u v w; apply: cFinj; rewrite !cFmul mulrA.
 have mul1: left_id one mul by move=> u; apply: cFinj; rewrite cFmul cFone mul1r.
 have mulV: left_inverse one inv mul.
   by move=> u; apply: cFinj; rewrite cFmul cFinv cFone mulVr ?lin_char_unitr.
-pose imA := isMulGroup.Build linT mulA mul1 mulV.
+pose imA := Finite_isGroup.Build linT mulA mul1 mulV.
 pose linG : finGroupType := HB.pack linT imA.
 have cFexp k: {morph cF : u / ((u : linG) ^+ k)%g >-> u ^+ k}.
   by move=> u; elim: k => // k IHk; rewrite expgS exprS cFmul IHk.
@@ -2669,7 +2667,7 @@ Proof. by rewrite cforder_lin_char_dvdG ?cfDet_lin_char. Qed.
 End DetOrder.
 
 Notation "''o' ( phi )" := (cfDet_order phi)
-  (at level 8, format "''o' ( phi )") : cfun_scope.
+  (format "''o' ( phi )") : cfun_scope.
 
 Section CfDetOps.
 

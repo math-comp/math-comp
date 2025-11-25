@@ -91,9 +91,8 @@ Proof.
   have /eqP[] := oner_eq0 L; apply: (addrI b); rewrite addr0 -{2}bJ.
   have: (b + e) * (b + conj e) == 0.
     (* FIX ME : had to add pattern selection *)
-    rewrite mulrDl 2![_ * (b + _)]mulrDr -/a.
-    rewrite addrA addr_eq0 opp_id (mulrC e) -addrA.
-    by rewrite -mulrDr eJ addrAC -{2}[e]opp_id subrr add0r mulr1 Db2.
+    rewrite mulrDl -[e * _]opp_id [e * _]mulrDr -/a eJ.
+    by rewrite addrCA 2!mulrDr mulr1 Db2 mulrC subrr.
   rewrite mulf_eq0 !addr_eq0 !opp_id => /pred2P[] -> //.
   by rewrite {2}eJ rmorphD rmorph1.
 Qed.
@@ -131,24 +130,23 @@ Proof.
   rewrite mulr_sign -/i; case: b => // Ri.
   case: conj_nt => z; wlog zJ: z / conj z = - z.
     move/(_ (z - conj z)); rewrite !rmorphB conjK opprB => zJ.
-    by apply/mul2I/(canRL (subrK _)); rewrite -addrA zJ // addrC subrK.
+    by apply/mul2I/(canRL (subrK _)); rewrite addrAC zJ // subrK.
   have [-> | nz_z] := eqVneq z 0; first exact: rmorph0.
   have [u Ru [v Rv Dz]]:
     exists2 u, conj u = u & exists2 v, conj v = v & (u + z * v) ^+ 2 = z.
   - pose y := sqrt z; exists ((y + conj y) / 2).
       by rewrite fmorph_div rmorphD /= conjK addrC rmorph_nat.
     exists ((y - conj y) / (z *+ 2)).
-      rewrite fmorph_div rmorphMn /= zJ mulNrn invrN mulrN -mulNr rmorphB opprB.
-      by rewrite conjK.
-    rewrite -(mulr_natl z) invfM (mulrC z) !mulrA divfK // -mulrDl addrACA.
+      by rewrite fmorph_div rmorphMn rmorphB conjK zJ mulNrn divrN -mulNr opprB.
+    rewrite -(mulr_natl z) invfM (mulrC z) !mulrA divfK // -mulrDl.
     (* FIX ME : had to add the explicit pattern *)
-    by rewrite subrr addr0 -mulr2n -[_ *+ 2]mulr_natr mulfK ?Neq0 ?sqrtK.
+    by rewrite -addrA subrKC -mulr2n -[_ *+ 2]mulr_natr mulfK ?Neq0 ?sqrtK.
   suff u0: u = 0 by rewrite -Dz u0 add0r rmorphXn rmorphM /= Rv zJ mulNr sqrrN.
   suff [b Du]: exists b : bool, u = (-1) ^+ b * i * z * v.
     apply: mul2I; rewrite mul0rn mulr2n -{2}Ru.
     by rewrite Du !rmorphM /= rmorph_sign Rv Ri zJ !mulrN mulNr subrr.
   have/eqP:= zJ; rewrite -addr_eq0 -{1 2}Dz rmorphXn rmorphD rmorphM /= Ru Rv zJ.
-  rewrite mulNr sqrrB sqrrD addrACA (addrACA (u ^+ 2)) addNr addr0 -!mulr2n.
+  rewrite mulNr sqrrB sqrrD addrACA [_ + _ *+ _]addrC subrKA -2!mulr2n.
   rewrite -mulrnDl -(mul0rn _ 2) (inj_eq mul2I) /= -[rhs in _ + rhs]opprK.
   rewrite -sqrMi subr_eq0 eqf_sqr -mulNr !mulrA.
   by case/pred2P=> ->; [exists false | exists true]; rewrite mulr_sign.
@@ -219,7 +217,7 @@ Proof.
   apply/andP; split; last by apply/posP; exists w.
   rewrite -normK expf_eq0 //=; apply: contraNneq nz_x => /norm_eq0 w0.
   rewrite -[x]sqrtK expf_eq0 /= -/u -(inj_eq mul2I) !mulr2n -{2}(rmorph0 conj).
-  by rewrite -w0 rmorphD rmorphM /= iJ uJ vJ mulNr addrACA subrr addr0.
+  by rewrite -w0 rmorphD rmorphM /= iJ uJ vJ mulNr -addrA subrKC.
 Qed.
 
 Lemma sposD x y : lt 0 x -> lt 0 y -> lt 0 (x + y).
@@ -242,12 +240,11 @@ Proof.
     rewrite /lt nz_u posE -subr_eq0 in u_le0; apply: (mulfI u_le0).
     by rewrite mulr0 -subr_sqr normK Ru subrr.
   have pos_norm z: le 0 (norm z) by apply/posP; exists (sqrt z).
-  rewrite le_sqr ?posJ ?posD // sqrrD !normK -normM rmorphD mulrDl !mulrDr.
-  rewrite addrA addrC !addrA -(addrC (y * conj y)) !addrA.
-  move: (y * _ + _) => u; rewrite -!addrA leB opprD addrACA {u}subrr add0r -leB.
+  rewrite le_sqr ?posJ ?posD // sqrrD !normK -normM rmorphD -addrA addrCA.
+  rewrite mulrDl !mulrDr [y * _ + _]addrC addrACA leB addrKA -leB.
   rewrite {}le_sqr ?posD //.
     by rewrite rmorphD !rmorphM /= !conjK addrC (mulrC x) (mulrC y).
-  rewrite -mulr2n -mulr_natr exprMn normK -natrX mulr_natr sqrrD mulrACA.
+  rewrite -mulr_natr exprMn normK -natrX mulr_natr sqrrD mulrACA.
   rewrite -rmorphM (mulrC y x) addrAC leB mulrnA mulr2n opprD addrACA.
   rewrite subrr addr0 {2}(mulrC x) rmorphM mulrACA -opprB addrAC -sqrrB -sqrMi.
   apply/posP; exists (i * (x * conj y - y * conj x)); congr (_ * _).
@@ -375,8 +372,7 @@ HB.instance Definition _ := GRing.isZmodule.Build type addA addC add0 addN.
 
 Fact CtoL_is_zmod_morphism : zmod_morphism CtoL.
 Proof. by move=> u v; rewrite !LtoC_K. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `CtoL_inj_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=CtoL_is_zmod_morphism)]
 Definition CtoL_is_additive := CtoL_is_zmod_morphism.
 HB.instance Definition _ := GRing.isZmodMorphism.Build type L' CtoL
   CtoL_is_zmod_morphism.
@@ -405,8 +401,7 @@ HB.instance Definition _ :=
 
 Fact CtoL_is_monoid_morphism : monoid_morphism CtoL.
 Proof. by split=> [|u v]; rewrite !LtoC_K. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `CtoL_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=CtoL_is_monoid_morphism)]
 Definition CtoL_is_multiplicative :=
   (fun g => (g.2,g.1)) CtoL_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build type L' CtoL
@@ -453,14 +448,12 @@ Fact conj_is_nmod_morphism : nmod_morphism (fun u => LtoC (conj_subproof u)).
 Proof.
 by split=> [|u v]; apply: CtoL_inj; rewrite LtoC_K ?raddf0// !rmorphD/= !LtoC_K.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `conj_is_nmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=conj_is_nmod_morphism)]
 Definition conj_is_semi_additive := conj_is_nmod_morphism.
 
 Fact conj_is_zmod_morphism : {morph (fun u => LtoC (conj_subproof u)) : x / - x}.
 Proof. by move=> u; apply: CtoL_inj; rewrite LtoC_K !raddfN /= LtoC_K. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `CtoL_inj_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=conj_is_zmod_morphism)]
 Definition conj_is_additive := conj_is_zmod_morphism.
 
 Fact conj_is_monoid_morphism : monoid_morphism (fun u => LtoC (conj_subproof u)).
@@ -468,8 +461,7 @@ Proof.
 split=> [|u v]; apply: CtoL_inj; first by rewrite !LtoC_K rmorph1.
 by rewrite LtoC_K 3!{1}rmorphM /= !LtoC_K.
 Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `conj_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=conj_is_monoid_morphism)]
 Definition conj_is_multiplicative :=
   (fun g => (g.2,g.1)) conj_is_monoid_morphism.
 Definition conj : {rmorphism type -> type} :=
@@ -571,8 +563,7 @@ Open Scope C_core_scope.
 Notation algCeq := (type : eqType).
 Notation algCzmod := (type : zmodType).
 Notation algCnzRing := (type : nzRingType).
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use algCnzRing instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=algCnzRing)]
 Notation algCring := (type : nzRingType).
 Notation algCuring := (type : unitRingType).
 Notation algCnum := (type : numDomainType).
@@ -580,7 +571,7 @@ Notation algCfield := (type : fieldType).
 Notation algCnumField := (type : numFieldType).
 Notation algCnumClosedField := (type : numClosedFieldType).
 
-Notation Creal := (@Num.Def.Rreal algCnum).
+Notation Creal := (@Num.real algCnum).
 
 Definition getCrat := let: GetCrat_spec CtoQ _ := getCrat_subproof in CtoQ.
 Definition Crat : {pred algC} := fun x => ratr (getCrat x) == x.
@@ -782,7 +773,7 @@ Lemma eqCmodN e x y : (- x == y %[mod e])%C = (x == - y %[mod e])%C.
 Proof. by rewrite eqCmod_sym /eqCmod !opprK addrC. Qed.
 
 Lemma eqCmodDr e x y z : (y + x == z + x %[mod e])%C = (y == z %[mod e])%C.
-Proof. by rewrite /eqCmod addrAC opprD !addrA subrK. Qed.
+Proof. by rewrite /eqCmod [z + x]addrC addrKA. Qed.
 
 Lemma eqCmodDl e x y z : (x + y == x + z %[mod e])%C = (y == z %[mod e])%C.
 Proof. by rewrite !(addrC x) eqCmodDr. Qed.
@@ -923,14 +914,12 @@ Proof. exact: inj_can_sym (algC_invautK nu) (fmorph_inj nu). Qed.
 
 Fact algC_invaut_is_zmod_morphism nu : zmod_morphism (algC_invaut nu).
 Proof. exact: can2_zmod_morphism (algC_autK nu) (algC_invautK nu). Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `algC_invaut_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=algC_invaut_is_zmod_morphism)]
 Definition algC_invaut_is_additive := algC_invaut_is_zmod_morphism.
 
 Fact algC_invaut_is_monoid_morphism nu : monoid_morphism (algC_invaut nu).
 Proof. exact: can2_monoid_morphism (algC_autK nu) (algC_invautK nu). Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `algC_invaut_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=algC_invaut_is_monoid_morphism)]
 Definition algC_invaut_is_multiplicative nu :=
   (fun g => (g.2,g.1)) (algC_invaut_is_monoid_morphism nu).
 HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=
@@ -955,7 +944,7 @@ End AutC.
 
 End AlgebraicsTheory.
 
-#[deprecated(since="mathcomp 2.4.0", note="Use Cpchar instead.")]
+#[deprecated(since="mathcomp 2.4.0", use=Cpchar)]
 Notation Cchar := (Cpchar) (only parsing).
 
 #[global] Hint Resolve Crat0 Crat1 dvdC0 dvdC_refl eqCmod_refl eqCmodm0 : core.
@@ -976,12 +965,10 @@ Proof. by move=> x y; apply/real_leVge/valP/valP. Qed.
 HB.instance Definition _ := Order.POrder_isTotal.Build _ algR total_algR.
 
 Lemma algRval_is_zmod_morphism : zmod_morphism algRval. Proof. by []. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `algRval_is_zmod_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=algRval_is_zmod_morphism)]
 Definition algRval_is_additive := algRval_is_zmod_morphism.
 Lemma algRval_is_monoid_morphism : monoid_morphism algRval. Proof. by []. Qed.
-#[warning="-deprecated-since-mathcomp-2.5.0", deprecated(since="mathcomp 2.5.0",
-      note="use `algRval_is_monoid_morphism` instead")]
+#[deprecated(since="mathcomp 2.5.0", use=algRval_is_monoid_morphism)]
 Definition algRval_is_multiplicative :=
   (fun g => (g.2,g.1)) algRval_is_monoid_morphism.
 HB.instance Definition _ := GRing.isZmodMorphism.Build algR algC algRval
@@ -1030,7 +1017,7 @@ HB.instance Definition _ := Num.NumDomain_bounded_isArchimedean.Build algR
   algR_archiFieldMixin.
 
 Definition algR_pfactor (x : algC) : {poly algR} :=
-  if x \is Creal =P true is ReflectT xR then 'X - (in_algR xR)%:P else
+  if (x \is Creal) =P true is ReflectT xR then 'X - (in_algR xR)%:P else
   'X^2 - (in_algR (Creal_Re x) *+ 2) *: 'X + ((in_algR (normr_real x))^+2)%:P.
 Notation algC_pfactor x := (algR_pfactor x ^^ algRval).
 
@@ -1053,14 +1040,12 @@ Proof. by rewrite /algR_pfactor; case: eqP => // p; rewrite p. Qed.
 Lemma algC_pfactorCE (x : algC) : x \isn't Creal ->
   algC_pfactor x = ('X - x%:P) * ('X - x^*%:P).
 Proof.
-move=> xNR; rewrite algR_pfactorCE//=.
-rewrite rmorphD /= rmorphB/= !map_polyZ !map_polyXn/= map_polyX.
-rewrite (map_polyC algRval)/=.
-rewrite mulrBl !mulrBr -!addrA; congr (_ + _).
-rewrite opprD addrA opprK -opprD -rmorphM/= -normCK; congr (- _ + _).
+move=> xNR; rewrite mulrBl !mulrBr -rmorphM/= -normCK opprB addrACA -opprD.
+rewrite algR_pfactorCE// rmorphD rmorphB/= linearZ map_polyC map_polyXn/=.
+(* TODO: Remove the pattern below once we require Rocq >= 9.2 *)
+rewrite map_polyX [LHS]addrAC; congr (_ - _).
 rewrite mulrC !mul_polyC -scalerDl.
-rewrite [x in RHS]algCrect conjC_rect ?Creal_Re ?Creal_Im//.
-by rewrite addrACA addNr addr0.
+by rewrite -mulr2n -mulr_natr ReE divfK ?pnatr_eq0// addrC.
 Qed.
 
 Lemma algC_pfactorE x :
@@ -1136,7 +1121,7 @@ elim: n r => // n IHn [|x r]/= in p pr *.
 rewrite ltnS => r_lt.
 have xJxr : x^* \in x :: r.
   rewrite -root_prod_XsubC -pr.
-  have /eq_map_poly-> : algRval =1 Num.conj_op \o algRval.
+  have /eq_map_poly-> : algRval =1 Num.conj \o algRval.
     by move=> a /=; rewrite (CrealP (algRvalP _)).
   by rewrite map_poly_comp mapf_root pr root_prod_XsubC mem_head.
 have xJr : (x \isn't Creal) ==> (x^* \in r) by rewrite implyNb CrealE.
@@ -1204,4 +1189,3 @@ exists (in_algR xR) => //=.
 by rewrite -(mapf_root algRval)//= prsab rootM root_XsubC eqxx.
 Qed.
 HB.instance Definition _ := Num.RealField_isClosed.Build algR algR_rcfMixin.
-
