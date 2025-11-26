@@ -148,7 +148,7 @@ Let idfunK : involutive (@idfun R). Proof. by []. Qed.
 HB.instance Definition _ := isInvolutive.Build _ _ idfunK.
 
 Lemma rmorphK (f : involutive_rmorphism R) : involutive f.
-Proof. by move: f => [? [? ? []]]. Qed.
+Proof. apply: involutive_subproof. Qed.
 
 End InvolutiveTheory.
 

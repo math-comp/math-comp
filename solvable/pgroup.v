@@ -333,6 +333,8 @@ Proof.
 by move=> defG; rewrite (coprime_sdprod_Hall_l defG) (sdprod_Hall defG).
 Qed.
 
+Set SsrMatching LegacyFoUnif.
+
 Lemma compl_pHall pi K H G :
   pi.-Hall(G) K -> (H \in [complements to K in G]) = pi^'.-Hall(G) H.
 Proof.
@@ -345,6 +347,8 @@ have tiKH: K :&: H = 1 := coprime_TIg (pnat_coprime piK pi'H).
 split=> //; apply/eqP; rewrite eqEcard mul_subG //= TI_cardMg //.
 by rewrite (card_Hall hallK) (card_Hall hallH) partnC.
 Qed.
+
+Unset SsrMatching LegacyFoUnif.
 
 Lemma compl_p'Hall pi K H G :
   pi^'.-Hall(G) K -> (H \in [complements to K in G]) = pi.-Hall(G) H.

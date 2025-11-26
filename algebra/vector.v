@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop finfun tuple.
-From mathcomp Require Import ssralg matrix mxalgebra zmodp.
+From mathcomp Require Import monoid ssralg matrix mxalgebra zmodp.
 
 (******************************************************************************)
 (*                    Finite dimensional vector spaces                        *)
