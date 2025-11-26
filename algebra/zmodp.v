@@ -152,7 +152,7 @@ HB.instance Definition _ :=
   GRing.isZmodule.Build 'I_p (@Zp_addA _) (@Zp_addC _) Zp_add0z Zp_addNz.
 
 (* FIXME: This will break when we make rings depend on monoids. *)
-HB.instance Definition _ := [finGroupMixin of 'I_p for +%R].
+(* HB.instance Definition _ := [finGroupMixin of 'I_p for +%R]. *)
 
 (* Ring operations *)
 
