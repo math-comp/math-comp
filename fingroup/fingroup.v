@@ -454,15 +454,15 @@ End MakeGroupSetFinStarMonoid.
 
 Module Export GroupSetFinStarMonoid := MakeGroupSetFinStarMonoid GroupSet.
 
-Module Type GroupSetMagmaSig.
+Module Type FinGroupSetMagmaSig.
 Definition sort (gT : finStarMonoidType) := Magma.sort {set gT}.
-End GroupSetMagmaSig.
+End FinGroupSetMagmaSig.
 
-Module MakeGroupSetMagma (Gset_base : GroupSetMagmaSig).
+Module MakeFinGroupSetMagma (Gset_base : FinGroupSetMagmaSig).
 Identity Coercion of_sort : Gset_base.sort >-> Magma.sort.
-End MakeGroupSetMagma.
+End MakeFinGroupSetMagma.
 
-Module Export GroupSetMagma := MakeGroupSetMagma GroupSet.
+Module Export FinGroupSetMagma := MakeFinGroupSetMagma GroupSet.
 
 Module Type GroupSetBaseFinGroupSig.
 Definition sort (gT : baseFinGroupType) := BaseFinGroup.arg_sort {set gT}.

@@ -2816,7 +2816,7 @@ Qed.
 Lemma coef0_prod_XsubC (ps : seq R) :
   (\prod_(p <- ps) ('X - p%:P))`_0 = (-1) ^+ (size ps) * \prod_(p <- ps) p.
 Proof.
-rewrite coef_prod_XsubC// subn0; congr GRing.mul.
+rewrite coef_prod_XsubC// subn0; congr mul.
 transitivity (\sum_(I in [set setT : {set 'I_(size ps)}]) \prod_(i in I) ps`_i).
   apply: congr_big =>// i/=.
   apply/idP/set1P => [/eqP cardE | ->]; last by rewrite cardsT card_ord.

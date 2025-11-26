@@ -3497,26 +3497,18 @@ HB.instance Definition _ (R : comPzSemiRingType) :=
   SemiRing_hasCommutativeMul.Build R^c (fun _ _ => mulrC _ _).
 #[export]
 HB.instance Definition _ (R : comPzSemiRingType) := ComPzSemiRing.on R^o.
-#[export]
-HB.instance Definition _ (R : comPzSemiRingType) :=
-  LSemiAlgebra_isComSemiAlgebra.Build R R^o.
-#[export]
-HB.instance Definition _ (R : comNzSemiRingType) := ComNzSemiRing.on R^c.
-#[export]
-HB.instance Definition _ (R : comNzSemiRingType) := ComNzSemiRing.on R^o.
-
 (*Unknown BUG*)
-(* #[export]
-HB.instance Definition _ (R : comNzSemiRingType) :=
+(* #[export] 
+HB.instance Definition _ (R : comPzSemiRingType) :=
   LSemiAlgebra_isComSemiAlgebra.Build R R^o. *)
 (*WORKAROUND*)
 Section workaround.
-Variable (R : comNzSemiRingType).
+Variable (R : comPzSemiRingType).
 Local Lemma scalarAr_regular k (x y : R^o) : k *: (x * y) = x * (k *: y).
 Proof. by rewrite mulrC scalerAl mulrC. Qed.
   #[export]
   HB.instance Definition _ := LSemiAlgebra_isSemiAlgebra.Build R R^o scalarAr_regular.
-(* Check R^o : SemiAlgebra.type _ . *)
+(* Check R^o : PzSemiAlgebra.type _ . *)
 End workaround.
 (*\WORKAROUND*)
 
