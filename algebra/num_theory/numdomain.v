@@ -604,6 +604,8 @@ Definition lterNE := (oppr_cp0, lterN2).
 Lemma ge0_cp x : 0 <= x -> (- x <= 0) * (- x <= x).
 Proof. by move=> hx; rewrite oppr_cp0 hx (@le_trans _ _ 0) ?oppr_cp0. Qed.
 
+Lemma gerN x : 0 <= x -> - x <= x. Proof. by move=> x0; rewrite ge0_cp. Qed.
+
 Lemma gt0_cp x : 0 < x ->
   (0 <= x) * (- x <= 0) * (- x <= x) * (- x < 0) * (- x < x).
 Proof.
