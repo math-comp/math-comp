@@ -72,11 +72,11 @@ HB.instance Definition _ :=
   GRing.isSubSemiModClosed.Build R {poly R} poly_of_size_pred
     npoly_subsemimod_closed.
 
-Definition polyn_axiom (p : {poly R}) := p \is a poly_of_size n.
+Definition polyn_axiom (p : {poly R}) := p \is a poly_of_size.
 
 Record npoly : predArgType := NPoly {
   polyn :> {poly R};
-  _ : polyn \is a poly_of_size
+  _ : polyn_axiom polyn
 }.
 
 HB.instance Definition _ := [isSub for @polyn].
