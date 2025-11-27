@@ -3806,7 +3806,7 @@ Arguments Mul {R} t1%_T t2%_T.
 Arguments Inv {R} t1%_T.
 Arguments Pown {R} t1%_T n%_N.
 #[deprecated(since="mathcomp 2.6.0", use=Pown)]
-Definition Exp := @Pown.
+Notation Exp := @Pown.
 Arguments Equal {R} t1%_T t2%_T.
 Arguments Unit {R} t1%_T.
 Arguments And {R} f1%_T f2%_T.
@@ -6528,6 +6528,8 @@ Definition natrX := natrX.
 Notation "@GRing.exp" := (@GRing.pown) (only parsing).
 #[deprecated(since="mathcomp 2.6.0")]
 Notation "'GRing.exp'" := (GRing.pown) (only parsing).
+#[deprecated(since="mathcomp 2.6.0")]
+Notation "'GRing.Exp'" := (GRing.Pown) (only parsing).
 Definition pownr0 := pownr0.
 #[deprecated(since="mathcomp 2.6.0", use=pownr0)]
 Definition expr0 := pownr0.
@@ -6729,6 +6731,8 @@ Definition exprDn := pownDn.
 Definition pownBn := pownBn.
 #[deprecated(since="mathcomp 2.6.0", use=pownBn)]
 Definition exprBn := pownBn.
+#[deprecated(since="mathcomp 2.6.0")]
+Notation "'GRing.exprB'" := (pownBn) (only parsing).
 Definition subrXX := subrXX.
 Definition sqrrD := sqrrD.
 Definition sqrrB := sqrrB.
