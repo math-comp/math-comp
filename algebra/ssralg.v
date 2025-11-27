@@ -6731,8 +6731,6 @@ Definition exprDn := pownDn.
 Definition pownBn := pownBn.
 #[deprecated(since="mathcomp 2.6.0", use=pownBn)]
 Definition exprBn := pownBn.
-#[deprecated(since="mathcomp 2.6.0")]
-Notation "'GRing.exprB'" := (pownBn) (only parsing).
 Definition subrXX := subrXX.
 Definition sqrrD := sqrrD.
 Definition sqrrB := sqrrB.
@@ -6800,6 +6798,8 @@ Definition exprVn := pownVn.
 Definition pownrB := pownrB.
 #[deprecated(since="mathcomp 2.6.0", use=pownrB)]
 Definition exprB := pownrB.
+#[deprecated(since="mathcomp 2.6.0")]
+Notation "'GRing.exprB'" := (pownrB) (only parsing).
 Definition invr_signM := invr_signM.
 Definition divr_signM := divr_signM.
 Definition rpred0D := @rpred0D.

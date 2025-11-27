@@ -23,7 +23,7 @@
   + `exprMn` -> `pownMn`
   + `exprDn` -> `pownDn`
   + `exprDn_pchar` -> `pownDn_pchar`
-  + `exprB` -> `pownBn`
+  + `exprBn` -> `pownBn`
   + `exprZn` -> `pownZn`
   + `exprVn` -> `pownVn`
   + `exprB` -> `pownrB`
