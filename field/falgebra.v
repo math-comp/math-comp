@@ -429,8 +429,8 @@ Qed.
 
 Lemma expv_line u n : (<[u]> ^+ n = <[u ^+ n]>)%VS.
 Proof.
-elim: n => [|n IH]; first by rewrite expr0 expv0.
-by rewrite exprS expvSl IH prodv_line.
+elim: n => [|n IH]; first by rewrite pownr0 expv0.
+by rewrite pownrS expvSl IH prodv_line.
 Qed.
 
 (* Centralisers and centers. *)

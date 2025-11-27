@@ -1021,7 +1021,7 @@ Proof. by move=> Gx; rewrite -[_^-1]mulr1 -(xiMV Gx) mulKf ?lin_char_neq0. Qed.
 Lemma lin_charX x n : x \in G -> xi (x ^+ n)%g = xi x ^+ n.
 Proof.
 move=> Gx; elim: n => [|n IHn]; first exact: lin_char1.
-by rewrite expgS exprS lin_charM ?groupX ?IHn.
+by rewrite expgS pownrS lin_charM ?groupX ?IHn.
 Qed.
 
 Lemma lin_char_unity_root x : x \in G -> xi x ^+ #[x] = 1.
@@ -1036,7 +1036,7 @@ Qed.
 Lemma lin_charV_conj x : x \in G -> xi x^-1%g = (xi x)^*.
 Proof.
 move=> Gx; rewrite lin_charV // invC_norm mulrC normC_lin_char //.
-by rewrite expr1n divr1.
+by rewrite pown1n divr1.
 Qed.
 
 Lemma lin_char_irr : xi \in irr G.
@@ -1048,7 +1048,7 @@ Qed.
 Lemma mul_conjC_lin_char : xi * xi^*%CF = 1.
 Proof.
 apply/cfun_inP=> x Gx.
-by rewrite !cfunE cfun1E Gx -normCK normC_lin_char ?expr1n.
+by rewrite !cfunE cfun1E Gx -normCK normC_lin_char ?pown1n.
 Qed.
 
 Lemma lin_char_unitr : xi \in GRing.unit.
@@ -1089,7 +1089,7 @@ apply: (iffP idP) => [cGG i | CF_G].
   by rewrite irr_degree_abelian //; last apply: groupC.
 rewrite card_classes_abelian -NirrE -eqC_nat -irr_sum_square //.
 rewrite -{1}[Nirr G]card_ord -sumr_const; apply/eqP/eq_bigr=> i _.
-by rewrite lin_char1 ?expr1n ?CF_G.
+by rewrite lin_char1 ?pown1n ?CF_G.
 Qed.
 
 Lemma irr_repr_lin_char (i : Iirr G) x :
@@ -1169,7 +1169,7 @@ have exp_e j: e 0 j ^+ #[x] = 1.
     by rewrite expg_order repr_mx1 mulmx1 mulmxV // [e]lock !mxE eqxx.
   elim: #[x] => [|n IHn]; first by rewrite repr_mx1 mulmx1 mulmxV // !mxE eqxx.
   rewrite expgS repr_mxM ?groupX // {1}rGx -!mulmxA mulKVmx //.
-  by rewrite mul_diag_mx mulmxA [M in _ = M]mxE -IHn exprS {1}mxE eqxx.
+  by rewrite mul_diag_mx mulmxA [M in _ = M]mxE -IHn pownrS {1}mxE eqxx.
 have norm1_e j: `|e 0 j| = 1.
   by apply/eqP; rewrite -(@pexpr_eq1 _ _ #[x]) // -normrX exp_e normr1.
 exists e; split=> //; first by exists B.
@@ -1182,7 +1182,7 @@ rewrite -[d'](mulKVmx unitB) mxtrace_mulC -[_ *m _](repr_mxK rG Gx) rGx.
 rewrite -!mulmxA mulKVmx // (mulmxA d').
 suffices->: d' *m diag_mx e = 1%:M by rewrite mul1mx mulKmx.
 rewrite mulmx_diag -diag_const_mx; congr diag_mx; apply/rowP=> j.
-by rewrite [e]lock !mxE mulrC -normCK -lock norm1_e expr1n.
+by rewrite [e]lock !mxE mulrC -normCK -lock norm1_e pown1n.
 Qed.
 
 Variables (A : {group aT}) (G : {group gT}).
@@ -2078,7 +2078,7 @@ rewrite (bigID [in D]) (reindex _ (bij_on_codom dprod_Iirr_inj (0, 0))) /=.
 have ->: #|G|%:R = \sum_i \sum_j 'chi_(dprod_Iirr (i, j)) 1%g ^+ 2.
   rewrite -(dprod_card KxH) natrM.
   do 2![rewrite -irr_sum_square (mulr_suml, mulr_sumr); apply: eq_bigr => ? _].
-  by rewrite dprod_IirrE -exprMn -{3}(mulg1 1%g) cfDprodE.
+  by rewrite dprod_IirrE -pownMn -{3}(mulg1 1%g) cfDprodE.
 rewrite (eq_bigl _ _ Df) pair_bigA addrC -subr_eq0 addrK.
 by move/eqP/psumr_eq0P=> -> //= i _; rewrite irr1_degree -natrX ler0n.
 Qed.
@@ -2514,7 +2514,7 @@ have mulV: left_inverse one inv mul.
 pose imA := Finite_isGroup.Build linT mulA mul1 mulV.
 pose linG : finGroupType := HB.pack linT imA.
 have cFexp k: {morph cF : u / ((u : linG) ^+ k)%g >-> u ^+ k}.
-  by move=> u; elim: k => // k IHk; rewrite expgS exprS cFmul IHk.
+  by move=> u; elim: k => // k IHk; rewrite expgS pownrS cFmul IHk.
 do [exists linG, cF; split=> //] => [|xi /inT[u <-]|u]; first 2 [by exists u].
   have inj_cFI: injective (cfIirr \o cF).
     apply: can_inj (insubd one) _ => u; apply: val_inj.
@@ -2611,7 +2611,7 @@ Lemma cfDetD :
   {in character &, {morph cfDet : phi psi / phi + psi >-> phi * psi}}.
 Proof.
 move=> phi psi Nphi Npsi; rewrite unlock /= -big_split; apply: eq_bigr => i _ /=.
-by rewrite -exprD cfdotDl truncnD ?nnegrE ?natr_ge0 // Cnat_cfdot_char_irr.
+by rewrite -pownrD cfdotDl truncnD ?nnegrE ?natr_ge0 // Cnat_cfdot_char_irr.
 Qed.
 
 Lemma cfDet0 : cfDet 0 = 1.
@@ -2620,7 +2620,7 @@ Proof. by rewrite unlock big1 // => i _; rewrite cfdot0l truncn0. Qed.
 Lemma cfDetMn k :
   {in character, {morph cfDet : phi / phi *+ k >-> phi ^+ k}}.
 Proof.
-move=> phi Nphi; elim: k => [|k IHk]; rewrite ?cfDet0 // mulrS exprS -{}IHk.
+move=> phi Nphi; elim: k => [|k IHk]; rewrite ?cfDet0 // mulrS pownrS -{}IHk.
 by rewrite cfDetD ?rpredMn.
 Qed.
 
@@ -2644,7 +2644,7 @@ rewrite /standard_grepr; elim/big_rec2: _ => [|W y _ _ ->].
 rewrite !cfunE Gx /= !{1}trace_mx11 !{1}mxE det_ublock; congr (_ * _).
 rewrite exp_cfunE //; elim: (standard_irr_coef rG W) => /= [|k IHk].
   by rewrite /muln_grepr big_ord0 det1.
-rewrite exprS /muln_grepr big_ord_recl det_ublock -IHk; congr (_ * _).
+rewrite pownrS /muln_grepr big_ord_recl det_ublock -IHk; congr (_ * _).
 by rewrite cfunE trace_mx11 mxE Gx.
 Qed.
 
@@ -2680,7 +2680,7 @@ Proof.
 move=> Nphi; have [sGH | not_sHG] := boolP (H \subset G); last first.
   have /natrP[n Dphi1] := Cnat_char1 Nphi.
   rewrite !cfResEout // Dphi1 lin_char1 ?cfDet_lin_char // scale1r.
-  by rewrite scaler_nat cfDetMn ?cfDet_id ?rpred1 // expr1n.
+  by rewrite scaler_nat cfDetMn ?cfDet_id ?rpred1 // pown1n.
 have [rG ->] := char_reprP Nphi; rewrite !(=^~ cfRepr_sub, cfDetRepr) //.
 apply: cfRepr_sim; exists 1%:M; rewrite ?row_free_unit ?unitmx1 // => x Hx.
 by rewrite mulmx1 mul1mx.
@@ -2693,7 +2693,7 @@ Proof.
 move=> Nphi; have [sGD | not_sGD] := boolP (G \subset D); last first.
   have /natrP[n Dphi1] := Cnat_char1 Nphi.
   rewrite !cfMorphEout // Dphi1 lin_char1 ?cfDet_lin_char // scale1r.
-  by rewrite scaler_nat cfDetMn ?cfDet_id ?rpred1 // expr1n.
+  by rewrite scaler_nat cfDetMn ?cfDet_id ?rpred1 // pown1n.
 have [rG ->] := char_reprP Nphi; rewrite !(=^~ cfRepr_morphim, cfDetRepr) //.
 apply: cfRepr_sim; exists 1%:M; rewrite ?row_free_unit ?unitmx1 // => x Hx.
 by rewrite mulmx1 mul1mx.
@@ -2743,7 +2743,7 @@ apply/setP=> x /[!inE]; apply/andb_id2l=> Gx.
 apply/eqP/is_scalar_mxP=> [|[c rG_c]].
   by case/max_cfRepr_norm_scalar=> // c; exists c.
 rewrite -(sqrCK (char1_ge0 (cfRepr_char rG))) normC_def; congr (sqrtC _).
-rewrite expr2 -{2}(mulgV x) -char_inv ?cfRepr_char ?cfunE ?groupM ?groupV //.
+rewrite pownr2 -{2}(mulgV x) -char_inv ?cfRepr_char ?cfunE ?groupM ?groupV //.
 rewrite Gx group1 repr_mx1 repr_mxM ?repr_mxV ?groupV // !mulrb rG_c.
 by rewrite invmx_scalar -scalar_mxM !mxtrace_scalar mulrnAr mulrnAl mulr_natl.
 Qed.

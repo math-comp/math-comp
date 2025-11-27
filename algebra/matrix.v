@@ -2975,8 +2975,8 @@ End LiftPerm.
 Lemma exp_block_diag_mx m n (A: 'M_m.+1) (B : 'M_n.+1) k :
   (block_mx A 0 0 B) ^+ k = block_mx (A ^+ k) 0 0 (B ^+ k).
 Proof.
-elim: k=> [|k IHk]; first by rewrite !expr0 -scalar_mx_block.
-rewrite !exprS IHk [LHS](mulmx_block A _ _ _ (A ^+ k)).
+elim: k=> [|k IHk]; first by rewrite !pownr0 -scalar_mx_block.
+rewrite !pownrS IHk [LHS](mulmx_block A _ _ _ (A ^+ k)).
 by rewrite !mulmx0 !mul0mx !add0r !addr0.
 Qed.
 
@@ -3521,7 +3521,7 @@ by apply: eq_bigr=> i _; rewrite mxE.
 Qed.
 
 Lemma det0 n' : \det (0 : 'M[R]_n'.+1) = 0.
-Proof. by rewrite -(scale0r 0) detZ exprS !mul0r. Qed.
+Proof. by rewrite -(scale0r 0) detZ pownrS !mul0r. Qed.
 
 Lemma det_scalar n a : \det (a%:M : 'M[R]_n) = a ^+ n.
 Proof. by rewrite -{1}(mulr1 a) -scale_scalar_mx detZ det1 mulr1. Qed.
@@ -3739,7 +3739,7 @@ rewrite /invmx !unitmxE detZ unitrM => /andP[Ua U_A].
 rewrite Ua U_A adjZ !scalerA invrM {U_A}//=.
 case: (posnP n) A => [-> | n_gt0] A; first by rewrite flatmx0 [_ *: _]flatmx0.
 rewrite unitrX_pos // in Ua; rewrite -[_ * _](mulrK Ua) mulrC -!mulrA.
-by rewrite -exprSr prednK // !mulrA divrK ?unitrX.
+by rewrite -pownrSr prednK // !mulrA divrK ?unitrX.
 Qed.
 
 Lemma invmx_scalar a : invmx a%:M = a^-1%:M.
@@ -5071,7 +5071,7 @@ set V := @Vandermonde R.
 elim: n => [|n IHn] in a *; first by rewrite det_mx00 big1// => -[] [].
 pose b : 'rV_n := \row_i a 0 (lift 0 i).
 pose C : 'M_n := diag_mx (\row_(i < n) (b 0 i - a 0 0)).
-pose D : 'M_n.+1 := 1 - a 0 0 *: \matrix_(i, j) (i == j.+1 :> nat)%:R. 
+pose D : 'M_n.+1 := 1 - a 0 0 *: \matrix_(i, j) (i == j.+1 :> nat)%:R.
 have detD : \det D = 1.
   rewrite det_trig ?big_ord_recl ?mxE ?mulr0 ?subr0 ?eqxx.
     by rewrite ?big1 ?mulr1// => i; rewrite !mxE eqxx ltn_eqF// mulr0 subr0.
@@ -5085,10 +5085,10 @@ suff: D * V _ _ a = block_mx 1 (const_mx 1) 0 (V _ _ b *m C) :> 'M_(1 + n).
   by rewrite big_mkcond [RHS]big_mkcond big_ord_recl/= mul1r.
 rewrite mulrBl mul1r -[_ * _]scalemxAl; apply/matrixP => i j; rewrite !mxE.
 under eq_bigr do rewrite !mxE; case: splitP => [{i}_ -> /[!ord1]|{}i ->].
-  rewrite !expr0 big1; last by move=> ?; rewrite mul0r.
+  rewrite !pownr0 big1; last by move=> ?; rewrite mul0r.
   by rewrite ?mulr0 ?subr0 ?mxE; case: splitP => k; rewrite ?ord1 mxE//.
 under eq_bigr do rewrite eqSS mulr_natl mulrb eq_sym.
-rewrite -big_mkcond/= big_ord1_eq exprS ifT// ?leqW// -mulrBl !mxE/=.
+rewrite -big_mkcond/= big_ord1_eq pownrS ifT// ?leqW// -mulrBl !mxE/=.
 case: split_ordP => [{j}_ -> /[!ord1]|{}j ->]; rewrite ?lshift0 ?rshift1 ?mxE.
    by rewrite ?subrr ?mul0r//.
 under eq_bigr do rewrite !mxE mulrnAr mulrb.

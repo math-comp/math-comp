@@ -1209,7 +1209,7 @@ without loss ou: u / '[u, v] = 0.
   rewrite (canRL (subrK _) (erefl u1)) rpredDr ?rpredZ ?memv_line //.
   rewrite linearDl /= ou add0r.
   rewrite linearZl_LR/= normrM (ger0_norm (dnorm_ge0 _ _)).
-  rewrite exprMn mulrA -dnormZ hnormDd/=; last by rewrite linearZr_LR/= ou mulr0.
+  rewrite pownMn mulrA -dnormZ hnormDd/=; last by rewrite linearZr_LR/= ou mulr0.
   have:= IHo _ ou.
   by rewrite mulrDl -leifBLR subrr ou normCK mul0r.
 rewrite ou normCK mul0r; split; first by rewrite mulr_ge0.
@@ -1654,7 +1654,7 @@ Notation hermsymmx := (hermitianmx _ false conjC).
 
 Lemma hermitian1mx_subproof {C : numClosedFieldType} n : (1%:M : 'M[C]_n) \is hermsymmx.
 Proof.
-by rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx/= conjC1.
+by rewrite qualifE /= pownr0 scale1r tr_scalar_mx map_scalar_mx/= conjC1.
 Qed.
 
 Canonical hermitian1mx {C : numClosedFieldType} n :=
