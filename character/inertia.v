@@ -1285,16 +1285,16 @@ have alpha_e: alpha ^+ e = 1.
   rewrite -dvdn_cforder /e -card_quotient //.
   by rewrite cforder_lin_char_dvdG ?cfQuo_lin_char.
 have det_alphaXeta b: cfDet (alpha ^+ b * eta) = alpha ^+ (b * f) * nu.
-  by rewrite cfDet_mul_lin ?rpredX ?irr_char // -exprM -(cfRes1 N) etaNth.
+  by rewrite cfDet_mul_lin ?rpredX ?irr_char // -pownrM -(cfRes1 N) etaNth.
 have [b bf_mod_e]: exists b, b * f = 1 %[mod e].
   rewrite -(chinese_modl co_e_f 1 0) /chinese !mul0n addn0 !mul1n mulnC.
   by exists (egcdn f e).1.
 have alpha_bf: alpha ^+ (b * f) = alpha.
-  by rewrite -(expr_mod _ alpha_e) bf_mod_e expr_mod.
+  by rewrite -(pownr_mod _ alpha_e) bf_mod_e pownr_mod.
 have /irrP[c Dc]: alpha ^+ b * eta \in irr G.
   by rewrite mul_lin_irr ?rpredX ?mem_irr.
 have chiN: 'Res 'chi_c = theta.
-  by rewrite -Dc rmorphM rmorphXn /= alphaN_1 expr1n mul1r.
+  by rewrite -Dc rmorphM rmorphXn /= alphaN_1 pown1n mul1r.
 have det_chi: cfDet 'chi_c = mu by rewrite -Dc det_alphaXeta alpha_bf divrK.
 exists c => // c2 c2Nth det_c2_mu; apply: irr_inj.
 have [irrMc _ imMc _] := constt_Ind_ext nsNG chiN.
@@ -1311,7 +1311,7 @@ have s2Xf_1: 'chi_s2 ^+ f = 1.
   rewrite rmorph1 rmorphXn /= mul1r -{1}det_c2_mu Dc2 -det_chi.
   by rewrite cfDet_mul_lin ?cfMod_lin_char ?irr_char // -(cfRes1 N) chiN.
 suffices /eqP s2_1: 'chi_s2 == 1 by rewrite Dc2 s2_1 rmorph1 mul1r.
-rewrite -['chi_s2]expr1 -dvdn_cforder -(eqnP co_e_f) dvdn_gcd.
+rewrite -['chi_s2]pownr1 -dvdn_cforder -(eqnP co_e_f) dvdn_gcd.
 by rewrite /e -card_quotient ?cforder_lin_char_dvdG //= dvdn_cforder s2Xf_1.
 Qed.
 
@@ -1399,7 +1399,7 @@ wlog [p p_lam]: lambda @m lam_lin IGlam p_ext_lam /
   have IGmu: G \subset 'I[mu p].
     rewrite (subset_trans IGlam) // /mu cfX -cf_lam.
     elim: (chinese _ _ _ _) => [|k IHk]; first by rewrite inertia1 norm_inertia.
-    by rewrite exprS (subset_trans _ (inertia_mul _ _)) // subsetIidl.
+    by rewrite pownrS (subset_trans _ (inertia_mul _ _)) // subsetIidl.
   have [q||u] := IHp _ (lin_mu p) IGmu; [ | by exists p | by exists u].
   rewrite o_mu => /eqnP-> {q}.
   have [Hp sylHp [u uNlam]] := p_ext_lam p m_p; exists Hp => //.
@@ -1443,9 +1443,9 @@ have DcN: 'Res[N] 'chi_c = lambda *+ f.
 have /lin_char_irr/irrP[d Dd]: cfDet 'chi_c ^+ b \is a linear_char.
   by rewrite rpredX // cfDet_lin_char.
 exists d; rewrite -{}Dd rmorphXn /= -cfDetRes ?irr_char // DcN.
-rewrite cfDetMn ?lin_charW // -exprM cfDet_id //.
-rewrite -(expr_mod _ (exp_cforder _)) -cfDet_order_lin // -/m.
-by rewrite fb_mod_m /m cfDet_order_lin // expr_mod ?exp_cforder.
+rewrite cfDetMn ?lin_charW // -pownrM cfDet_id //.
+rewrite -(pownr_mod _ (exp_cforder _)) -cfDet_order_lin // -/m.
+by rewrite fb_mod_m /m cfDet_order_lin // pownr_mod ?exp_cforder.
 Qed.
 
 (* This is Isaacs, Corollary (6.27). *)
@@ -1475,8 +1475,8 @@ have /irrP[u Du]: nu ^+ (b * e) \in irr G by rewrite lin_char_irr ?rpredX.
 exists u; set mu := 'chi_u in Du *.
 have uNlam: 'Res mu = lambda.
   rewrite cfDet_order_lin // in be_mod_lam.
-  rewrite -Du rmorphXn /= vNlam -(expr_mod _ (exp_cforder _)) //.
-  by rewrite be_mod_lam expr_mod ?exp_cforder.
+  rewrite -Du rmorphXn /= vNlam -(pownr_mod _ (exp_cforder _)) //.
+  by rewrite be_mod_lam pownr_mod ?exp_cforder.
 have lin_mu: mu \is a linear_char by rewrite -Du rpredX.
 have o_mu: ('o(mu) = 'o(lambda))%CF.
   have dv_o_lam_mu: 'o(lambda)%CF %| 'o(mu)%CF.
@@ -1485,7 +1485,7 @@ have o_mu: ('o(mu) = 'o(lambda))%CF.
     rewrite -subsetIidl -cfker_Res ?rpredX ?irr_char //.
     by rewrite rmorphXn /= vNlam cfDet_order_lin // exp_cforder cfker_cfun1.
   apply/eqP; rewrite eqn_dvd dv_o_lam_mu andbT cfDet_order_lin //.
-  rewrite dvdn_cforder -Du exprAC -dvdn_cforder dvdn_mull //.
+  rewrite dvdn_cforder -Du pownrAC -dvdn_cforder dvdn_mull //.
   rewrite -(cfQuoK nsNG kerNnu_olam) cforder_mod // /e -card_quotient //.
   by rewrite cforder_lin_char_dvdG ?cfQuo_lin_char ?rpredX.
 split=> // t tNlam co_e_t.
@@ -1499,7 +1499,7 @@ have co_e_mu_t: coprime e #[(mu / 'chi_t)%R]%CF.
   suffices dv_o_mu_t: #[(mu / 'chi_t)%R]%CF %| 'o(mu)%CF * 'o('chi_t)%CF.
     by rewrite (coprime_dvdr dv_o_mu_t) // coprimeMr o_mu co_e_lam.
   rewrite !cfDet_order_lin //; apply/dvdn_cforderP=> x Gx.
-  rewrite invr_lin_char // !cfunE exprMn -rmorphXn {2}mulnC /=.
+  rewrite invr_lin_char // !cfunE pownMn -rmorphXn {2}mulnC /=.
   by rewrite !(dvdn_cforderP _) ?conjC1 ?mulr1 // dvdn_mulr.
 have /eqP mu_t_1: mu / 'chi_t == 1.
   rewrite -(dvdn_cforder (_ / _)%R 1) -(eqnP co_e_mu_t) dvdn_gcd dvdnn andbT.

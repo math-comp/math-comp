@@ -993,7 +993,7 @@ Local Coercion Posz : nat >-> int.
 Lemma exprnP x (n : nat) : x ^+ n = x ^ n. Proof. by []. Qed.
 
 Lemma exprnN x (n : nat) : x ^- n = x ^ (-n%:Z).
-Proof. by case: n=> //; rewrite oppr0 expr0 invr1. Qed.
+Proof. by case: n=> //; rewrite oppr0 pownr0 invr1. Qed.
 
 Lemma expr0z x : x ^ 0 = 1. Proof. by []. Qed.
 
@@ -1005,17 +1005,17 @@ Lemma invr_expz x n : (x ^ n)^-1 = x ^ (- n).
 Proof. by case: (intP n)=> // [|m]; rewrite ?opprK ?expr0z ?invr1 // invrK. Qed.
 
 Lemma exprz_inv x n : (x^-1) ^ n = x ^ (- n).
-Proof. by case: (intP n)=> // m; rewrite -[_ ^ (- _)]exprVn ?opprK ?invrK. Qed.
+Proof. by case: (intP n)=> // m; rewrite -[_ ^ (- _)]pownVn ?opprK ?invrK. Qed.
 
 Lemma exp1rz n : 1 ^ n = 1 :> R.
-Proof. by case: (intP n)=> // m; rewrite -?exprz_inv ?invr1; apply: expr1n. Qed.
+Proof. by case: (intP n)=> // m; rewrite -?exprz_inv ?invr1; apply: pown1n. Qed.
 
-Lemma exprSz x (n : nat) : x ^ n.+1 = x * x ^ n. Proof. exact: exprS. Qed.
+Lemma exprSz x (n : nat) : x ^ n.+1 = x * x ^ n. Proof. exact: pownrS. Qed.
 
-Lemma exprSzr x (n : nat) : x ^ n.+1 = x ^ n * x. Proof. exact: exprSr. Qed.
+Lemma exprSzr x (n : nat) : x ^ n.+1 = x ^ n * x. Proof. exact: pownrSr. Qed.
 
 Fact exprzD_nat x (m n : nat) : x ^ (m%:Z + n) = x ^ m * x ^ n.
-Proof. exact: exprD. Qed.
+Proof. exact: pownrD. Qed.
 
 Fact exprzD_Nnat x (m n : nat) : x ^ (-m%:Z + -n%:Z) = x ^ (-m%:Z) * x ^ (-n%:Z).
 Proof. by rewrite -opprD -!exprz_inv exprzD_nat. Qed.
@@ -1044,8 +1044,8 @@ Lemma exprMz_comm x y n : x \is a GRing.unit -> y \is a GRing.unit ->
   GRing.comm x y -> (x * y) ^ n = x ^ n * y ^ n.
 Proof.
 move=> ux uy com_xy; elim: n => [|n _|n _]; first by rewrite expr0z mulr1.
-  by rewrite -!exprnP exprMn_comm.
-rewrite -!exprnN -!exprVn com_xy -exprMn_comm ?invrM//.
+  by rewrite -!exprnP pownMn_comm.
+rewrite -!exprnN -!pownVn com_xy -pownMn_comm ?invrM//.
 exact/commrV/commr_sym/commrV.
 Qed.
 
@@ -1053,7 +1053,7 @@ Lemma commrXz_wmulls x y n :
   0 <= n -> GRing.comm x y -> (x * y) ^ n = x ^ n * y ^ n.
 Proof.
 move=> n0 com_xy; elim: n n0 => [|n _|n _] //; first by rewrite expr0z mulr1.
-by rewrite -!exprnP exprMn_comm.
+by rewrite -!exprnP pownMn_comm.
 Qed.
 
 Lemma unitrXz x n (ux : x \is a GRing.unit) : x ^ n \is a GRing.unit.
@@ -1089,7 +1089,7 @@ Proof. by rewrite !exprz_exp mulrC. Qed.
 
 Lemma exprz_out x n (nux : x \isn't a GRing.unit) (hn : 0 <= n) :
   x ^ (- n) = x ^ n.
-Proof. by case: (intP n) hn=> //= m; rewrite -exprnN -exprVn invr_out. Qed.
+Proof. by case: (intP n) hn=> //= m; rewrite -exprnN -pownVn invr_out. Qed.
 
 End ExprzUnitRing.
 
@@ -1114,8 +1114,8 @@ Proof. rewrite -[x *~ _]mulrzl exprMz_comm //; exact/commr_sym/commr_int. Qed.
 
 Lemma expNrz x n : (- x) ^ n = (-1) ^ n * x ^ n :> R.
 Proof.
-case: n=> [] n; rewrite ?NegzE; first exact: exprNn.
-by rewrite -!exprz_inv !invrN invr1; apply: exprNn.
+case: n=> [] n; rewrite ?NegzE; first exact: pownNn.
+by rewrite -!exprz_inv !invrN invr1; apply: pownNn.
 Qed.
 
 Lemma unitr_n0expz x n :
@@ -1487,13 +1487,13 @@ by case: sgrP; case: sgrP; rewrite /sgz ?(mulNr, mul0r, mul1r);
 Qed.
 
 Lemma sgzX (n : nat) x : sgz (x ^+ n) = (sgz x) ^+ n.
-Proof. by elim: n => [|n IHn]; rewrite ?sgz1 // !exprS sgzM IHn. Qed.
+Proof. by elim: n => [|n IHn]; rewrite ?sgz1 // !pownrS sgzM IHn. Qed.
 
 Lemma sgz_eq0 x : (sgz x == 0) = (x == 0).
 Proof. by rewrite sgz_cp0. Qed.
 
 Lemma sgz_odd (n : nat) x : x != 0 -> (sgz x) ^+ n = (sgz x) ^+ (odd n).
-Proof. by case: sgzP => //=; rewrite ?expr1n // signr_odd. Qed.
+Proof. by case: sgzP => //=; rewrite ?pown1n // signr_odd. Qed.
 
 Lemma sgz_gt0 x : (sgz x > 0) = (x > 0).
 Proof. by case: sgzP. Qed.
@@ -1550,7 +1550,7 @@ Lemma abszM m1 m2 : `|(m1 * m2)%R| = `|m1| * `|m2|.
 Proof. by case: m1 m2 => [[|m1]|m1] [[|m2]|m2] //=; rewrite ?mulnS mulnC. Qed.
 
 Lemma abszX (n : nat) m : `|m ^+ n| = `|m| ^ n.
-Proof. by elim: n => // n ihn; rewrite exprS expnS abszM ihn. Qed.
+Proof. by elim: n => // n ihn; rewrite pownrS expnS abszM ihn. Qed.
 
 Lemma absz_sg m : `|sgr m| = (m != 0%R). Proof. by case: (intP m). Qed.
 

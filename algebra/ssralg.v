@@ -619,7 +619,7 @@ From mathcomp Require Export nmodule.
 (* operations on nat, as in natrX : (m ^ n)%:R = m%:R ^+ n. For the binary    *)
 (* power operator, a trailing "n" suffix is used to indicate the operator     *)
 (* suffix applies to the left-hand ring argument, as in                       *)
-(*   expr1n : 1 ^+ n = 1 vs. expr1 : x ^+ 1 = x.                              *)
+(*   pown1n : 1 ^+ n = 1 vs. pownr1 : x ^+ 1 = x.                              *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -835,8 +835,8 @@ Bind Scope ring_scope with NzSemiRing.sort.
 End NzSemiRingExports.
 HB.export NzSemiRingExports.
 
-Definition exp R x n := iterop n (@mul R) x (@one R).
-Arguments exp : simpl never.
+Definition pown R x n := iterop n (@mul R) x (@one R).
+Arguments pown : simpl never.
 Definition comm R x y := @mul R x y = mul y x.
 Definition lreg R x := injective (@mul R x).
 Definition rreg R x := injective ((@mul R)^~ x).
@@ -845,7 +845,7 @@ Local Notation "1" := (@one _) : ring_scope.
 Local Notation "n %:R" := (1 *+ n) : ring_scope.
 Local Notation "*%R" := (@mul _) : function_scope.
 Local Notation "x * y" := (mul x y) : ring_scope.
-Local Notation "x ^+ n" := (exp x n) : ring_scope.
+Local Notation "x ^+ n" := (pown x n) : ring_scope.
 
 Local Notation "\prod_ ( i <- r | P ) F" := (\big[*%R/1]_(i <- r | P) F).
 Local Notation "\prod_ ( i | P ) F" := (\big[*%R/1]_(i | P) F).
@@ -911,28 +911,28 @@ Definition natr_sum := big_morph (natmul 1) natrD (mulr0n 1).
 Lemma natrM m n : (m * n)%:R = m%:R * n%:R :> R.
 Proof. by rewrite mulrnA mulr_natr. Qed.
 
-Lemma expr0 x : x ^+ 0 = 1. Proof. by []. Qed.
-Lemma expr1 x : x ^+ 1 = x. Proof. by []. Qed.
-Lemma expr2 x : x ^+ 2 = x * x. Proof. by []. Qed.
+Lemma pownr0 x : x ^+ 0 = 1. Proof. by []. Qed.
+Lemma pownr1 x : x ^+ 1 = x. Proof. by []. Qed.
+Lemma pownr2 x : x ^+ 2 = x * x. Proof. by []. Qed.
 
-Lemma exprS x n : x ^+ n.+1 = x * x ^+ n.
+Lemma pownrS x n : x ^+ n.+1 = x * x ^+ n.
 Proof. by case: n => //; rewrite mulr1. Qed.
 
-Lemma expr0n n : 0 ^+ n = (n == 0%N)%:R :> R.
-Proof. by case: n => // n; rewrite exprS mul0r. Qed.
+Lemma pown0n n : 0 ^+ n = (n == 0%N)%:R :> R.
+Proof. by case: n => // n; rewrite pownrS mul0r. Qed.
 
-Lemma expr1n n : 1 ^+ n = 1 :> R.
-Proof. by elim: n => // n IHn; rewrite exprS mul1r. Qed.
+Lemma pown1n n : 1 ^+ n = 1 :> R.
+Proof. by elim: n => // n IHn; rewrite pownrS mul1r. Qed.
 
-Lemma exprD x m n : x ^+ (m + n) = x ^+ m * x ^+ n.
-Proof. by elim: m => [|m IHm]; rewrite ?mul1r // !exprS -mulrA -IHm. Qed.
+Lemma pownrD x m n : x ^+ (m + n) = x ^+ m * x ^+ n.
+Proof. by elim: m => [|m IHm]; rewrite ?mul1r // !pownrS -mulrA -IHm. Qed.
 
-Lemma exprSr x n : x ^+ n.+1 = x ^+ n * x.
-Proof. by rewrite -addn1 exprD expr1. Qed.
+Lemma pownrSr x n : x ^+ n.+1 = x ^+ n * x.
+Proof. by rewrite -addn1 pownrD pownr1. Qed.
 
-Lemma expr_sum x (I : Type) (s : seq I) (P : pred I) F :
+Lemma pown_sum x (I : Type) (s : seq I) (P : pred I) F :
   x ^+ (\sum_(i <- s | P i) F i) = \prod_(i <- s | P i) x ^+ F i :> R.
-Proof. exact: (big_morph _ (exprD _)). Qed.
+Proof. exact: (big_morph _ (pownrD _)). Qed.
 
 Lemma commr_sym x y : comm x y -> comm y x. Proof. by []. Qed.
 Lemma commr_refl x : comm x x. Proof. by []. Qed.
@@ -971,43 +971,43 @@ Lemma commr_nat x n : comm x n%:R. Proof. exact/commrMn/commr1. Qed.
 Lemma commrX x y n : comm x y -> comm x (y ^+ n).
 Proof.
 rewrite /comm => com_xy.
-by elim: n => [|n IHn]; rewrite ?commr1 // exprS commrM.
+by elim: n => [|n IHn]; rewrite ?commr1 // pownrS commrM.
 Qed.
 
-Lemma exprMn_comm x y n : comm x y -> (x * y) ^+ n = x ^+ n * y ^+ n.
+Lemma pownMn_comm x y n : comm x y -> (x * y) ^+ n = x ^+ n * y ^+ n.
 Proof.
 move=> com_xy; elim: n => /= [|n IHn]; first by rewrite mulr1.
-by rewrite !exprS IHn !mulrA; congr (_ * _); rewrite -!mulrA -commrX.
+by rewrite !pownrS IHn !mulrA; congr (_ * _); rewrite -!mulrA -commrX.
 Qed.
 
-Lemma exprMn_n x m n : (x *+ m) ^+ n = x ^+ n *+ (m ^ n) :> R.
+Lemma pownMn_n x m n : (x *+ m) ^+ n = x ^+ n *+ (m ^ n) :> R.
 Proof.
 elim: n => [|n IHn]; first by rewrite mulr1n.
-by rewrite exprS IHn mulrnAl mulrnAr -mulrnA exprS expnSr.
+by rewrite pownrS IHn mulrnAl mulrnAr -mulrnA pownrS expnSr.
 Qed.
 
-Lemma exprM x m n : x ^+ (m * n) = x ^+ m ^+ n.
+Lemma pownrM x m n : x ^+ (m * n) = x ^+ m ^+ n.
 Proof.
-elim: m => [|m IHm]; first by rewrite expr1n.
-by rewrite mulSn exprD IHm exprS exprMn_comm //; apply: commrX.
+elim: m => [|m IHm]; first by rewrite pown1n.
+by rewrite mulSn pownrD IHm pownrS pownMn_comm //; apply: commrX.
 Qed.
 
-Lemma exprAC x m n : (x ^+ m) ^+ n = (x ^+ n) ^+ m.
-Proof. by rewrite -!exprM mulnC. Qed.
+Lemma pownrAC x m n : (x ^+ m) ^+ n = (x ^+ n) ^+ m.
+Proof. by rewrite -!pownrM mulnC. Qed.
 
-Lemma expr_mod n x i : x ^+ n = 1 -> x ^+ (i %% n) = x ^+ i.
+Lemma pownr_mod n x i : x ^+ n = 1 -> x ^+ (i %% n) = x ^+ i.
 Proof.
-move=> xn1; rewrite {2}(divn_eq i n) exprD mulnC exprM xn1.
-by rewrite expr1n mul1r.
+move=> xn1; rewrite {2}(divn_eq i n) pownrD mulnC pownrM xn1.
+by rewrite pown1n mul1r.
 Qed.
 
-Lemma expr_dvd n x i : x ^+ n = 1 -> n %| i -> x ^+ i = 1.
+Lemma pownr_dvd n x i : x ^+ n = 1 -> n %| i -> x ^+ i = 1.
 Proof.
-by move=> xn1 dvd_n_i; rewrite -(expr_mod i xn1) (eqnP dvd_n_i).
+by move=> xn1 dvd_n_i; rewrite -(pownr_mod i xn1) (eqnP dvd_n_i).
 Qed.
 
 Lemma natrX n k : (n ^ k)%:R = n%:R ^+ k :> R.
-Proof. by rewrite exprMn_n expr1n. Qed.
+Proof. by rewrite pownMn_n pown1n. Qed.
 
 Lemma mulrI_eq0 x y : lreg x -> (x * y == 0) = (y == 0).
 Proof. by move=> reg_x; rewrite -{1}(mulr0 x) (inj_eq reg_x). Qed.
@@ -1026,11 +1026,11 @@ Proof. by move=> rab c c' eq_ca; apply/rab; rewrite !mulrA eq_ca. Qed.
 
 Lemma lregX x n : lreg x -> lreg (x ^+ n).
 Proof.
-by move=> reg_x; elim: n => [|n]; [apply: lreg1 | rewrite exprS; apply: lregM].
+by move=> reg_x; elim: n => [|n]; [apply: lreg1 | rewrite pownrS; apply: lregM].
 Qed.
 
 Lemma iter_mulr n x y : iter n ( *%R x) y = x ^+ n * y.
-Proof. by elim: n => [|n ih]; rewrite ?expr0 ?mul1r //= ih exprS -mulrA. Qed.
+Proof. by elim: n => [|n ih]; rewrite ?mul1r //= ih pownrS -mulrA. Qed.
 
 Lemma iter_mulr_1 n x : iter n ( *%R x) 1 = x ^+ n.
 Proof. by rewrite iter_mulr mulr1. Qed.
@@ -1043,7 +1043,7 @@ Proof. by rewrite big_const_nat -iteropE. Qed.
 
 Lemma prodrXr x I r P (F : I -> nat) :
   \prod_(i <- r | P i) x ^+ F i = x ^+ (\sum_(i <- r | P i) F i).
-Proof. by rewrite (big_morph _ (exprD _) (erefl _)). Qed.
+Proof. by rewrite (big_morph _ (pownrD _) (erefl _)). Qed.
 
 Lemma prodrM_comm {I : eqType} r (P : pred I) (F G : I -> R) :
     (forall i j, P i -> P j -> comm (F i) (G j)) ->
@@ -1080,27 +1080,26 @@ Lemma natr_prod I r P (F : I -> nat) :
   (\prod_(i <- r | P i) F i)%:R = \prod_(i <- r | P i) (F i)%:R :> R.
 Proof. exact: (big_morph _ natrM). Qed.
 
-Lemma exprDn_comm x y n (cxy : comm x y) :
+Lemma pownDn_comm x y n (cxy : comm x y) :
   (x + y) ^+ n = \sum_(i < n.+1) (x ^+ (n - i) * y ^+ i) *+ 'C(n, i).
 Proof.
 elim: n => [|n IHn]; rewrite big_ord_recl mulr1 ?big_ord0 ?addr0 //=.
-rewrite exprS {}IHn /= mulrDl !big_distrr /= big_ord_recl mulr1 subn0.
-rewrite !big_ord_recr /= !binn !subnn !mul1r !subn0 bin0 !exprS -addrA.
+rewrite pownrS {}IHn /= mulrDl !big_distrr /= big_ord_recl mulr1 subn0.
+rewrite !big_ord_recr /= !binn !subnn !mul1r !subn0 bin0 !pownrS -addrA.
 congr (_ + _); rewrite addrA -big_split /=; congr (_ + _).
-apply: eq_bigr => i _; rewrite !mulrnAr !mulrA -exprS -subSn ?(valP i) //.
-by rewrite subSS (commrX _ (commr_sym cxy)) -mulrA -exprS -mulrnDr.
+apply: eq_bigr => i _; rewrite !mulrnAr !mulrA -pownrS -subSn ?(valP i) //.
+by rewrite subSS (commrX _ (commr_sym cxy)) -mulrA -pownrS -mulrnDr.
 Qed.
 
-Lemma exprD1n x n : (x + 1) ^+ n = \sum_(i < n.+1) x ^+ i *+ 'C(n, i).
+Lemma pownD1n x n : (x + 1) ^+ n = \sum_(i < n.+1) x ^+ i *+ 'C(n, i).
 Proof.
-rewrite addrC (exprDn_comm n (commr_sym (commr1 x))).
-by apply: eq_bigr => i _; rewrite expr1n mul1r.
+rewrite addrC (pownDn_comm n (commr_sym (commr1 x))).
+by apply: eq_bigr => i _; rewrite pown1n mul1r.
 Qed.
 
 Lemma sqrrD1 x : (x + 1) ^+ 2 = x ^+ 2 + x *+ 2 + 1.
 Proof.
-rewrite exprD1n !big_ord_recr big_ord0 /= add0r.
-by rewrite addrC addrA addrAC.
+by rewrite pownD1n !big_ord_recr big_ord0 /= add0r addrC addrA addrAC.
 Qed.
 
 Section ClosedPredicates.
@@ -1175,15 +1174,15 @@ Lemma pFrobenius_autE x : x^f = x ^+ p. Proof. by []. Qed.
 Local Notation f'E := pFrobenius_autE.
 
 Lemma pFrobenius_aut0 : 0^f = 0.
-Proof. by rewrite f'E -(prednK (prime_gt0 pcharf_prime)) exprS mul0r. Qed.
+Proof. by rewrite f'E -(prednK (prime_gt0 pcharf_prime)) pownrS mul0r. Qed.
 
 Lemma pFrobenius_aut1 : 1^f = 1.
-Proof. by rewrite f'E expr1n. Qed.
+Proof. by rewrite f'E pown1n. Qed.
 
 Lemma pFrobenius_autD_comm x y (cxy : comm x y) : (x + y)^f = x^f + y^f.
 Proof.
 have defp := prednK (prime_gt0 pcharf_prime).
-rewrite !f'E exprDn_comm // big_ord_recr subnn -defp big_ord_recl /= defp.
+rewrite !f'E pownDn_comm // big_ord_recr subnn -defp big_ord_recl /= defp.
 rewrite subn0 mulr1 mul1r bin0 binn big1 ?addr0 // => i _.
 by rewrite -mulr_natl bin_lt_pcharf_0 ?mul0r //= -{2}defp ltnS (valP i).
 Qed.
@@ -1198,10 +1197,10 @@ Lemma pFrobenius_aut_nat n : (n%:R)^f = n%:R.
 Proof. by rewrite pFrobenius_autMn pFrobenius_aut1. Qed.
 
 Lemma pFrobenius_autM_comm x y : comm x y -> (x * y)^f = x^f * y^f.
-Proof. exact: exprMn_comm. Qed.
+Proof. exact: pownMn_comm. Qed.
 
 Lemma pFrobenius_autX x n : (x ^+ n)^f = x^f ^+ n.
-Proof. by rewrite !f'E -!exprM mulnC. Qed.
+Proof. by rewrite !f'E -!pownrM mulnC. Qed.
 
 End FrobeniusAutomorphism.
 
@@ -1380,7 +1379,7 @@ Bind Scope ring_scope with NzRing.sort.
 End NzRingExports.
 HB.export NzRingExports.
 
-Notation sign R b := (exp (- @one R) (nat_of_bool b)) (only parsing).
+Notation sign R b := (pown (- @one R) (nat_of_bool b)) (only parsing).
 
 Local Notation "- 1" := (- (1)) : ring_scope.
 
@@ -1422,7 +1421,7 @@ Proof. exact: (commrX n (commrN1 x)). Qed.
 
 Lemma signr_odd n : (-1) ^+ (odd n) = (-1) ^+ n :> R.
 Proof.
-elim: n => //= n IHn; rewrite exprS -{}IHn.
+elim: n => //= n IHn; rewrite pownrS -{}IHn.
 by case/odd: n; rewrite !mulN1r ?opprK.
 Qed.
 
@@ -1444,16 +1443,16 @@ Proof.
 by rewrite signr_addb -!mulrA; congr (_ * _); rewrite !mulrA commr_sign.
 Qed.
 
-Lemma exprNn x n : (- x) ^+ n = (-1) ^+ n * x ^+ n :> R.
-Proof. by rewrite -mulN1r exprMn_comm // /comm mulN1r mulrN mulr1. Qed.
+Lemma pownNn x n : (- x) ^+ n = (-1) ^+ n * x ^+ n :> R.
+Proof. by rewrite -mulN1r pownMn_comm // /comm mulN1r mulrN mulr1. Qed.
 
 Lemma sqrrN x : (- x) ^+ 2 = x ^+ 2. Proof. exact: mulrNN. Qed.
 
 Lemma sqrr_sign n : ((-1) ^+ n) ^+ 2 = 1 :> R.
-Proof. by rewrite exprAC sqrrN !expr1n. Qed.
+Proof. by rewrite pownrAC sqrrN !pown1n. Qed.
 
 Lemma signrMK n : @involutive R ( *%R ((-1) ^+ n)).
-Proof. by move=> x; rewrite mulrA -expr2 sqrr_sign mul1r. Qed.
+Proof. by move=> x; rewrite mulrA -pownr2 sqrr_sign mul1r. Qed.
 
 Lemma mulrI0_lreg x : (forall y, x * y = 0 -> y = 0) -> lreg x.
 Proof.
@@ -1470,15 +1469,15 @@ Lemma prodrN (I : finType) (A : pred I) (F : I -> R) :
   \prod_(i in A) - F i = (- 1) ^+ #|A| * \prod_(i in A) F i.
 Proof.
 rewrite -sum1_card; elim/big_rec3: _ => [|i x n _ _ ->]; first by rewrite mulr1.
-by rewrite exprS !mulrA mulN1r !mulNr commrX //; apply: commrN1.
+by rewrite pownrS !mulrA mulN1r !mulNr commrX //; apply: commrN1.
 Qed.
 
-Lemma exprBn_comm x y n (cxy : comm x y) :
+Lemma pownBn_comm x y n (cxy : comm x y) :
   (x - y) ^+ n =
     \sum_(i < n.+1) ((-1) ^+ i * x ^+ (n - i) * y ^+ i) *+ 'C(n, i).
 Proof.
-rewrite exprDn_comm; last exact: commrN.
-by apply: eq_bigr => i _; congr (_ *+ _); rewrite -commr_sign -mulrA -exprNn.
+rewrite pownDn_comm; last exact: commrN.
+by apply: eq_bigr => i _; congr (_ *+ _); rewrite -commr_sign -mulrA -pownNn.
 Qed.
 
 Lemma subrXX_comm x y n (cxy : comm x y) :
@@ -1486,16 +1485,16 @@ Lemma subrXX_comm x y n (cxy : comm x y) :
 Proof.
 case: n => [|n]; first by rewrite big_ord0 mulr0 subrr.
 rewrite mulrBl !big_distrr big_ord_recl big_ord_recr /= subnn mulr1 mul1r.
-rewrite subn0 -!exprS opprD -!addrA; congr (_ + _); rewrite addrA -sumrB.
-rewrite big1 ?add0r // => i _; rewrite !mulrA -exprS -subSn ?(valP i) //.
-by rewrite subSS (commrX _ (commr_sym cxy)) -mulrA -exprS subrr.
+rewrite subn0 -!pownrS opprD -!addrA; congr (_ + _); rewrite addrA -sumrB.
+rewrite big1 ?add0r // => i _; rewrite !mulrA -pownrS -subSn ?(valP i) //.
+by rewrite subSS (commrX _ (commr_sym cxy)) -mulrA -pownrS subrr.
 Qed.
 
 Lemma subrX1 x n : x ^+ n - 1 = (x - 1) * (\sum_(i < n) x ^+ i).
 Proof.
-rewrite -!(opprB 1) mulNr -{1}(expr1n _ n).
+rewrite -!(opprB 1) mulNr -{1}(pown1n _ n).
 rewrite (subrXX_comm _ (commr_sym (commr1 x))); congr (- (_ * _)).
-by apply: eq_bigr => i _; rewrite expr1n mul1r.
+by apply: eq_bigr => i _; rewrite pown1n mul1r.
 Qed.
 
 Lemma sqrrB1 x : (x - 1) ^+ 2 = x ^+ 2 - x *+ 2 + 1.
@@ -1566,12 +1565,12 @@ Qed.
 
 End FrobeniusAutomorphism.
 
-Lemma exprNn_pchar x n : (pchar R).-nat n -> (- x) ^+ n = - (x ^+ n).
+Lemma pownNn_pchar x n : (pchar R).-nat n -> (- x) ^+ n = - (x ^+ n).
 Proof.
 pose p := pdiv n; have [|n_gt1 pcharRn] := leqP n 1; first by case: (n) => [|[]].
 have pcharRp: p \in pchar R by rewrite (pnatPpi pcharRn) // pi_pdiv.
 have /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (pcharf_eq pcharRp)).
-elim: e => // e IHe; rewrite expnSr !exprM {}IHe.
+elim: e => // e IHe; rewrite expnSr !pownrM {}IHe.
 by rewrite -pFrobenius_autE pFrobenius_autN.
 Qed.
 
@@ -1598,8 +1597,10 @@ End NzRingTheory.
 Notation Frobenius_autN := pFrobenius_autN (only parsing).
 #[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autB_comm)]
 Notation Frobenius_autB_comm := pFrobenius_autB_comm (only parsing).
-#[deprecated(since="mathcomp 2.4.0", use=exprNn_pchar)]
-Notation exprNn_char := exprNn_pchar (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=pownNn_pchar)]
+Notation exprNn_char := pownNn_pchar (only parsing).
+#[deprecated(since="mathcomp 2.6.0", use=pownNn_pchar)]
+Notation exprNn_pchar := pownNn_pchar (only parsing).
 #[deprecated(since="mathcomp 2.4.0", use=oppr_pchar2)]
 Notation oppr_char2 := oppr_pchar2 (only parsing).
 #[deprecated(since="mathcomp 2.4.0", use=subr_pchar2)]
@@ -1655,7 +1656,7 @@ Lemma rregM x y : rreg x -> rreg y -> rreg (x * y).
 Proof. by move=> reg_x reg_y; apply: (@lregM R^c). Qed.
 
 Lemma revrX x n : (x : R^c) ^+ n = (x : R) ^+ n.
-Proof. by elim: n => // n IHn; rewrite exprS exprSr IHn. Qed.
+Proof. by elim: n => // n IHn; rewrite pownrS pownrSr IHn. Qed.
 
 Lemma rregX x n : rreg x -> rreg (x ^+ n).
 Proof. by move/(@lregX R^c x n); rewrite revrX. Qed.
@@ -1819,7 +1820,7 @@ Lemma scaler_sign (b : bool) v : (-1) ^+ b *: v = (if b then - v else v).
 Proof. by case: b; rewrite ?scaleNr scale1r. Qed.
 
 Lemma signrZK n : @involutive V ( *:%R ((-1) ^+ n)).
-Proof. by move=> u; rewrite scalerA -expr2 sqrr_sign scale1r. Qed.
+Proof. by move=> u; rewrite scalerA -pownr2 sqrr_sign scale1r. Qed.
 
 Section ClosedPredicates.
 
@@ -2184,7 +2185,7 @@ Lemma rmorph_prod I r (P : pred I) E :
 Proof. exact: (big_morph f rmorphM rmorph1). Qed.
 
 Lemma rmorphXn n : {morph f : x / x ^+ n}.
-Proof. by elim: n => [|n IHn] x; rewrite ?rmorph1 // !exprS rmorphM IHn. Qed.
+Proof. by elim: n => [|n IHn] x; rewrite ?rmorph1 // !pownrS rmorphM IHn. Qed.
 
 Lemma rmorph_nat n : f n%:R = n%:R. Proof. by rewrite rmorphMn rmorph1. Qed.
 
@@ -2824,14 +2825,14 @@ Lemma mulrCA : @left_commutative R R *%R. Proof. exact: mulmCA. Qed.
 Lemma mulrAC : @right_commutative R R *%R. Proof. exact: mulmAC. Qed.
 Lemma mulrACA : @interchange R *%R *%R. Proof. exact: mulmACA. Qed.
 
-Lemma exprMn n : {morph (fun x => x ^+ n) : x y / x * y}.
-Proof. by move=> x y; exact/exprMn_comm/mulrC. Qed.
+Lemma pownMn n : {morph (fun x => x ^+ n) : x y / x * y}.
+Proof. by move=> x y; exact/pownMn_comm/mulrC. Qed.
 
 Lemma prodrXl n I r (P : pred I) (F : I -> R) :
   \prod_(i <- r | P i) F i ^+ n = (\prod_(i <- r | P i) F i) ^+ n.
-Proof. by rewrite (big_morph _ (exprMn n) (expr1n _ n)). Qed.
+Proof. by rewrite (big_morph _ (pownMn n) (pown1n _ n)). Qed.
 
-Lemma prodr_undup_exp_count (I : eqType) r (P : pred I) (F : I -> R) :
+Lemma prodr_undup_pown_count (I : eqType) r (P : pred I) (F : I -> R) :
   \prod_(i <- undup r | P i) F i ^+ count_mem i r = \prod_(i <- r | P i) F i.
 Proof. exact: big_undup_iterop_count.  Qed.
 
@@ -2843,12 +2844,12 @@ Lemma prodrMr {I : finType} (A : pred I) (x : R) F :
   \prod_(i in A) (F i * x) = \prod_(i in A) F i * x ^+ #|A|.
 Proof. by rewrite big_split ?prodr_const. Qed.
 
-Lemma exprDn x y n :
+Lemma pownDn x y n :
   (x + y) ^+ n = \sum_(i < n.+1) (x ^+ (n - i) * y ^+ i) *+ 'C(n, i).
-Proof. by rewrite exprDn_comm //; apply: mulrC. Qed.
+Proof. by rewrite pownDn_comm //; apply: mulrC. Qed.
 
 Lemma sqrrD x y : (x + y) ^+ 2 = x ^+ 2 + x * y *+ 2 + y ^+ 2.
-Proof. by rewrite exprDn !big_ord_recr big_ord0 /= add0r mulr1 mul1r. Qed.
+Proof. by rewrite pownDn !big_ord_recr big_ord0 /= add0r mulr1 mul1r. Qed.
 
 Lemma rmorph_comm (S : pzSemiRingType) (f : {rmorphism R -> S}) x y :
   comm (f x) (f y).
@@ -2903,12 +2904,12 @@ HB.instance Definition _ := isMonoidMorphism.Build R R (pFrobenius_aut pcharRp)
 
 End FrobeniusAutomorphism.
 
-Lemma exprDn_pchar x y n : (pchar R).-nat n -> (x + y) ^+ n = x ^+ n + y ^+ n.
+Lemma pownDn_pchar x y n : (pchar R).-nat n -> (x + y) ^+ n = x ^+ n + y ^+ n.
 Proof.
 pose p := pdiv n; have [|n_gt1 pcharRn] := leqP n 1; first by case: (n) => [|[]].
 have pcharRp: p \in pchar R by rewrite (pnatPpi pcharRn) ?pi_pdiv.
 have{pcharRn} /p_natP[e ->]: p.-nat n by rewrite -(eq_pnat _ (pcharf_eq pcharRp)).
-by elim: e => // e IHe; rewrite !expnSr !exprM IHe -pFrobenius_autE rmorphD.
+by elim: e => // e IHe; rewrite !expnSr !pownrM IHe -pFrobenius_autE rmorphD.
 Qed.
 
 End ComNzSemiRingTheory.
@@ -2941,8 +2942,8 @@ HB.export ComPzRingExports.
 #[deprecated(since="mathcomp 2.5.0", use=pFrobenius_aut_is_monoid_morphism)]
 Notation pFrobenius_aut_is_multiplicative :=
   (fun p => (p.2, p.1) \o pFrobenius_aut_is_monoid_morphism) (only parsing).
-#[deprecated(since="mathcomp 2.4.0", use=exprDn_pchar)]
-Notation exprDn_char := exprDn_pchar (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=pownDn_pchar)]
+Notation exprDn_char := pownDn_pchar (only parsing).
 
 #[short(type="comNzRingType")]
 HB.structure Definition ComNzRing := {R of NzRing R & ComNzSemiRing R}.
@@ -2993,10 +2994,10 @@ Section ComPzRingTheory.
 Variable R : comPzRingType.
 Implicit Types x y : R.
 
-Lemma exprBn x y n :
+Lemma pownBn x y n :
   (x - y) ^+ n =
      \sum_(i < n.+1) ((-1) ^+ i * x ^+ (n - i) * y ^+ i) *+ 'C(n, i).
-Proof. by rewrite exprBn_comm //; apply: mulrC. Qed.
+Proof. by rewrite pownBn_comm //; apply: mulrC. Qed.
 
 Lemma subrXX x y n :
   x ^+ n - y ^+ n = (x - y) * (\sum_(i < n) x ^+ (n.-1 - i) * y ^+ i).
@@ -3217,10 +3218,10 @@ Proof. by rewrite -scalerAr mulr1. Qed.
 Lemma comm_alg a x : comm a%:A x.
 Proof. by rewrite /comm mulr_algr mulr_algl. Qed.
 
-Lemma exprZn k x n : (k *: x) ^+ n = k ^+ n *: x ^+ n.
+Lemma pownZn k x n : (k *: x) ^+ n = k ^+ n *: x ^+ n.
 Proof.
-elim: n => [|n IHn]; first by rewrite !expr0 scale1r.
-by rewrite !exprS IHn -scalerA scalerAr scalerAl.
+elim: n => [|n IHn]; first by rewrite !pownr0 scale1r.
+by rewrite !pownrS IHn -scalerA scalerAr scalerAl.
 Qed.
 
 Lemma scaler_prod I r (P : pred I) (F : I -> R) (G : I -> A) :
@@ -3452,24 +3453,24 @@ Qed.
 
 Lemma unitrX x n : x \is a unit -> x ^+ n \is a unit.
 Proof.
-by move=> Ux; elim: n => [|n IHn]; rewrite ?unitr1 // exprS unitrMl.
+by move=> Ux; elim: n => [|n IHn]; rewrite ?unitr1 // pownrS unitrMl.
 Qed.
 
 Lemma unitrX_pos x n : n > 0 -> (x ^+ n \in unit) = (x \in unit).
 Proof.
-case: n => // n _; rewrite exprS unitrM_comm; last exact: commrX.
+case: n => // n _; rewrite pownrS unitrM_comm; last exact: commrX.
 by case Ux: (x \is a unit); rewrite // unitrX.
 Qed.
 
-Lemma exprVn x n : x^-1 ^+ n = x ^- n.
+Lemma pownVn x n : x^-1 ^+ n = x ^- n.
 Proof.
-elim: n => [|n IHn]; first by rewrite !expr0 ?invr1.
-case Ux: (x \is a unit); first by rewrite exprSr exprS IHn -invrM // unitrX.
+elim: n => [|n IHn]; first by rewrite !pownr0 ?invr1.
+case Ux: (x \is a unit); first by rewrite pownrSr pownrS IHn -invrM // unitrX.
 by rewrite !invr_out ?unitrX_pos ?Ux.
 Qed.
 
-Lemma exprB m n x : n <= m -> x \is a unit -> x ^+ (m - n) = x ^+ m / x ^+ n.
-Proof. by move/subnK=> {2}<- Ux; rewrite exprD mulrK ?unitrX. Qed.
+Lemma pownrB m n x : n <= m -> x \is a unit -> x ^+ (m - n) = x ^+ m / x ^+ n.
+Proof. by move/subnK=> {2}<- Ux; rewrite pownrD mulrK ?unitrX. Qed.
 
 Lemma invr_neq0 x : x != 0 -> x^-1 != 0.
 Proof.
@@ -3645,8 +3646,8 @@ Lemma divr1_eq x y : x / y = 1 -> x = y. Proof. by move/mulr1_eq/invr_inj. Qed.
 Lemma divKr x : x \is a unit -> {in unit, involutive (fun y => x / y)}.
 Proof. by move=> Ux y Uy; rewrite /= invrM ?unitrV // invrK mulrC divrK. Qed.
 
-Lemma expr_div_n x y n : (x / y) ^+ n = x ^+ n / y ^+ n.
-Proof. by rewrite exprMn exprVn. Qed.
+Lemma pown_div_n x y n : (x / y) ^+ n = x ^+ n / y ^+ n.
+Proof. by rewrite pownMn pownVn. Qed.
 
 Lemma unitr_prodP (I : eqType) (r : seq I) (P : pred I) (E : I -> R) :
   reflect {in r, forall i, P i -> E i \is a GRing.unit}
@@ -3781,7 +3782,7 @@ Inductive term : Type :=
 | NatMul of term & nat
 | Mul of term & term
 | Inv of term
-| Exp of term & nat.
+| Pown of term & nat.
 
 Inductive formula : Type :=
 | Bool of bool
@@ -3803,7 +3804,9 @@ Arguments Opp {R} t1%_T.
 Arguments NatMul {R} t1%_T n%_N.
 Arguments Mul {R} t1%_T t2%_T.
 Arguments Inv {R} t1%_T.
-Arguments Exp {R} t1%_T n%_N.
+Arguments Pown {R} t1%_T n%_N.
+#[deprecated(since="mathcomp 2.6.0", use=Pown)]
+Definition Exp := @Pown.
 Arguments Equal {R} t1%_T t2%_T.
 Arguments Unit {R} t1%_T.
 Arguments And {R} f1%_T f2%_T.
@@ -3831,7 +3834,7 @@ Local Infix "*" := Mul : term_scope.
 Local Infix "*+" := NatMul : term_scope.
 Local Notation "t ^-1" := (Inv t) : term_scope.
 Local Notation "t / u" := (Mul t u^-1) : term_scope.
-Local Infix "^+" := Exp : term_scope.
+Local Infix "^+" := Pown : term_scope.
 Local Infix "==" := Equal : term_scope.
 Local Infix "/\" := And : term_scope.
 Local Infix "\/" := Or : term_scope.
@@ -4455,23 +4458,23 @@ rewrite prodf_seq_eq0 -all_predC; apply: eq_all => i /=.
 by rewrite implybE negb_and.
 Qed.
 
-Lemma expf_eq0 x n : (x ^+ n == 0) = (n > 0) && (x == 0).
+Lemma pownf_eq0 x n : (x ^+ n == 0) = (n > 0) && (x == 0).
 Proof.
 elim: n => [|n IHn]; first by rewrite oner_eq0.
-by rewrite exprS mulf_eq0 IHn andKb.
+by rewrite pownrS mulf_eq0 IHn andKb.
 Qed.
 
-Lemma sqrf_eq0 x : (x ^+ 2 == 0) = (x == 0). Proof. exact: expf_eq0. Qed.
+Lemma sqrf_eq0 x : (x ^+ 2 == 0) = (x == 0). Proof. exact: pownf_eq0. Qed.
 
-Lemma expf_neq0 x m : x != 0 -> x ^+ m != 0.
-Proof. by move=> x_nz; rewrite expf_eq0; apply/nandP; right. Qed.
+Lemma pownf_neq0 x m : x != 0 -> x ^+ m != 0.
+Proof. by move=> x_nz; rewrite pownf_eq0; apply/nandP; right. Qed.
 
 Lemma natf_neq0_pchar n : (n%:R != 0 :> R) = (pchar R)^'.-nat n.
 Proof.
 have [-> | /prod_prime_decomp->] := posnP n; first by rewrite eqxx.
 rewrite !big_seq; elim/big_rec: _ => [|[p e] s /=]; first by rewrite oner_eq0.
 case/mem_prime_decomp=> p_pr _ _; rewrite pnatM pnatX eqn0Ngt orbC => <-.
-by rewrite natrM natrX mulf_eq0 expf_eq0 negb_or negb_and pnatE ?inE p_pr.
+by rewrite natrM natrX mulf_eq0 pownf_eq0 negb_or negb_and pnatE ?inE p_pr.
 Qed.
 
 Lemma natf0_pchar n : n > 0 -> n%:R == 0 :> R -> exists p, p \in pchar R.
@@ -4519,7 +4522,7 @@ Proof. by rewrite -invr_eq0; apply: mulIf. Qed.
 Lemma sqrf_eq1 x : (x ^+ 2 == 1) = (x == 1) || (x == -1).
 Proof. by rewrite -subr_eq0 subr_sqr_1 mulf_eq0 subr_eq0 addr_eq0. Qed.
 
-Lemma expfS_eq1 x n :
+Lemma pownfS_eq1 x n :
   (x ^+ n.+1 == 1) = (x == 1) || (\sum_(i < n.+1) x ^+ i == 0).
 Proof. by rewrite -![_ == 1]subr_eq0 subrX1 mulf_eq0. Qed.
 
@@ -4646,15 +4649,15 @@ Proof. by rewrite invfM invrK mulrC. Qed.
 Lemma divKf x : x != 0 -> involutive (fun y => x / y).
 Proof. by move=> nz_x y; rewrite invf_div mulrC divfK. Qed.
 
-Lemma expfB_cond m n x : (x == 0) + n <= m -> x ^+ (m - n) = x ^+ m / x ^+ n.
+Lemma pownfB_cond m n x : (x == 0) + n <= m -> x ^+ (m - n) = x ^+ m / x ^+ n.
 Proof.
-move/subnK=> <-; rewrite addnA addnK !exprD.
+move/subnK=> <-; rewrite addnA addnK !pownrD.
 have [-> | nz_x] := eqVneq; first by rewrite !mulr0 !mul0r.
-by rewrite mulfK ?expf_neq0.
+by rewrite mulfK ?pownf_neq0.
 Qed.
 
-Lemma expfB m n x : n < m -> x ^+ (m - n) = x ^+ m / x ^+ n.
-Proof. by move=> lt_n_m; apply: expfB_cond; case: eqP => // _; apply: ltnW. Qed.
+Lemma pownfB m n x : n < m -> x ^+ (m - n) = x ^+ m / x ^+ n.
+Proof. by move=> lt_n_m; apply: pownfB_cond; case: eqP =>// _; apply: ltnW. Qed.
 
 Lemma prodfV I r (P : pred I) (E : I -> F) :
   \prod_(i <- r | P i) (E i)^-1 = (\prod_(i <- r | P i) E i)^-1.
@@ -6521,15 +6524,37 @@ Definition natrB := natrB.
 Definition natr_sum := natr_sum.
 Definition natrM := natrM.
 Definition natrX := natrX.
-Definition expr0 := expr0.
-Definition exprS := exprS.
-Definition expr1 := expr1.
-Definition expr2 := expr2.
-Definition expr0n := expr0n.
-Definition expr1n := expr1n.
-Definition exprD := exprD.
-Definition exprSr := exprSr.
-Definition expr_sum := expr_sum.
+#[deprecated(since="mathcomp 2.6.0")]
+Notation "@GRing.exp" := (@GRing.pown) (only parsing).
+#[deprecated(since="mathcomp 2.6.0")]
+Notation "'GRing.exp'" := (GRing.pown) (only parsing).
+Definition pownr0 := pownr0.
+#[deprecated(since="mathcomp 2.6.0", use=pownr0)]
+Definition expr0 := pownr0.
+Definition pownrS := pownrS.
+#[deprecated(since="mathcomp 2.6.0", use=pownrS)]
+Definition exprS := pownrS.
+Definition pown1n := pown1n.
+#[deprecated(since="mathcomp 2.6.0", use=pown1n)]
+Definition expr1n := pown1n.
+Definition pown0n := pown0n.
+#[deprecated(since="mathcomp 2.6.0", use=pown0n)]
+Definition expr0n := pown0n.
+Definition pownr1 := pownr1.
+#[deprecated(since="mathcomp 2.6.0", use=pownr1)]
+Definition expr1 := pownr1.
+Definition pownr2 := pownr2.
+#[deprecated(since="mathcomp 2.6.0", use=pownr2)]
+Definition expr2 := pownr2.
+Definition pownrD := pownrD.
+#[deprecated(since="mathcomp 2.6.0", use=pownrD)]
+Definition exprD := pownrD.
+Definition pownrSr := pownrSr.
+#[deprecated(since="mathcomp 2.6.0", use=pownrSr)]
+Definition exprSr := pownrSr.
+Definition pown_sum := pown_sum.
+#[deprecated(since="mathcomp 2.6.0", use=pown_sum)]
+Definition expr_sum := pown_sum.
 Definition commr_sym := commr_sym.
 Definition commr_refl := commr_refl.
 Definition commr0 := commr0.
@@ -6544,13 +6569,25 @@ Definition commrMn := commrMn.
 Definition commrM := commrM.
 Definition commr_nat := commr_nat.
 Definition commrX := commrX.
-Definition exprMn_comm := exprMn_comm.
+Definition pownMn_comm := pownMn_comm.
+#[deprecated(since="mathcomp 2.6.0", use=pownMn_comm)]
+Definition exprMn_comm := pownMn_comm.
 Definition commr_sign := commr_sign.
-Definition exprMn_n := exprMn_n.
-Definition exprM := exprM.
-Definition exprAC := exprAC.
-Definition expr_mod := expr_mod.
-Definition expr_dvd := expr_dvd.
+Definition pownMn_n := pownMn_n.
+#[deprecated(since="mathcomp 2.6.0", use=pownMn_n)]
+Definition exprMn_n := pownMn_n.
+Definition pownrM := pownrM.
+#[deprecated(since="mathcomp 2.6.0", use=pownrM)]
+Definition exprM := pownrM.
+Definition pownrAC := pownrAC.
+#[deprecated(since="mathcomp 2.6.0", use=pownrAC)]
+Definition exprAC := pownrAC.
+Definition pownr_mod := pownr_mod.
+#[deprecated(since="mathcomp 2.6.0", use=pownr_mod)]
+Definition expr_mod := pownr_mod.
+Definition pownr_dvd := pownr_dvd.
+#[deprecated(since="mathcomp 2.6.0", use=pownr_dvd)]
+Definition expr_dvd := pownr_dvd.
 Definition signr_odd := signr_odd.
 Definition signr_eq0 := signr_eq0.
 Definition mulr_sign := mulr_sign.
@@ -6558,7 +6595,9 @@ Definition signr_addb := signr_addb.
 Definition signrN := signrN.
 Definition signrE := signrE.
 Definition mulr_signM := mulr_signM.
-Definition exprNn := exprNn.
+Definition pownNn := pownNn.
+#[deprecated(since="mathcomp 2.6.0", use=pownNn)]
+Definition exprNn := pownNn.
 Definition sqrrN := sqrrN.
 Definition sqrr_sign := sqrr_sign.
 Definition signrMK := signrMK.
@@ -6580,10 +6619,16 @@ Definition rregM := rregM.
 Definition revrX := revrX.
 Definition rregX := rregX.
 Definition rregP {R x} := @rregP R x.
-Definition exprDn_comm := exprDn_comm.
-Definition exprBn_comm := exprBn_comm.
+Definition pownDn_comm := pownDn_comm.
+#[deprecated(since="mathcomp 2.4.0", use=pownDn_comm)]
+Definition exprDn_comm := pownDn_comm.
+Definition pownBn_comm := pownBn_comm.
+#[deprecated(since="mathcomp 2.4.0", use=pownBn_comm)]
+Definition exprBn_comm := pownBn_comm.
 Definition subrXX_comm := subrXX_comm.
-Definition exprD1n := exprD1n.
+Definition pownD1n := pownD1n.
+#[deprecated(since="mathcomp 2.4.0", use=pownD1n)]
+Definition exprD1n := pownD1n.
 Definition subrX1 := subrX1.
 Definition sqrrD1 := sqrrD1.
 Definition sqrrB1 := sqrrB1.
@@ -6636,9 +6681,10 @@ Definition Frobenius_autN := pFrobenius_autN.
 Definition pFrobenius_autB_comm := pFrobenius_autB_comm.
 #[deprecated(since="mathcomp 2.4.0", use=pFrobenius_autB_comm)]
 Definition Frobenius_autB_comm := pFrobenius_autB_comm.
-Definition exprNn_pchar := exprNn_pchar.
-#[deprecated(since="mathcomp 2.4.0", use=exprNn_pchar)]
-Definition exprNn_char := exprNn_pchar.
+#[deprecated(since="mathcomp 2.6.0", use=pownNn_pchar)]
+Definition exprNn_pchar := pownNn_pchar.
+#[deprecated(since="mathcomp 2.4.0", use=pownNn_pchar)]
+Definition exprNn_char := pownNn_pchar.
 Definition addrr_pchar2 := addrr_pchar2.
 #[deprecated(since="mathcomp 2.4.0", use=addrr_pchar2)]
 Definition addrr_char2 := addrr_pchar2.
@@ -6659,7 +6705,9 @@ Definition mulrC := @mulrC.
 Definition mulrCA := mulrCA.
 Definition mulrAC := mulrAC.
 Definition mulrACA := mulrACA.
-Definition exprMn := exprMn.
+Definition pownMn := pownMn.
+#[deprecated(since="mathcomp 2.6.0", use=pownMn)]
+Definition exprMn := pownMn.
 Definition prodrXl := prodrXl.
 Definition prodrXr := prodrXr.
 Definition prodrN := prodrN.
@@ -6672,17 +6720,25 @@ Definition prodrMr := prodrMr.
 Definition prodrMn := prodrMn.
 Definition rev_prodr := rev_prodr.
 Definition natr_prod := natr_prod.
-Definition prodr_undup_exp_count := prodr_undup_exp_count.
-Definition exprDn := exprDn.
-Definition exprBn := exprBn.
+Definition prodr_undup_exp_count := prodr_undup_pown_count.
+#[deprecated(since="mathcomp 2.6.0", use=prodr_undup_pown_count)]
+Definition prodr_undup_pown_count := prodr_undup_pown_count.
+Definition pownDn := pownDn.
+#[deprecated(since="mathcomp 2.6.0", use=pownDn)]
+Definition exprDn := pownDn.
+Definition pownBn := pownBn.
+#[deprecated(since="mathcomp 2.6.0", use=pownBn)]
+Definition exprBn := pownBn.
 Definition subrXX := subrXX.
 Definition sqrrD := sqrrD.
 Definition sqrrB := sqrrB.
 Definition subr_sqr := subr_sqr.
 Definition subr_sqrDB := subr_sqrDB.
-Definition exprDn_pchar := exprDn_pchar.
-#[deprecated(since="mathcomp 2.4.0", use=exprDn_pchar)]
-Definition exprDn_char := exprDn_pchar.
+Definition pownDn_pchar := pownDn_pchar.
+#[deprecated(since="mathcomp 2.4.0", use=pownDn_pchar)]
+Definition exprDn_pchar := pownDn_pchar.
+#[deprecated(since="mathcomp 2.4.0", use=pownDn_pchar)]
+Definition exprDn_char := pownDn_pchar.
 Definition mulrV := mulrV.
 Definition divrr := divrr.
 Definition mulVr := mulVr.
@@ -6734,8 +6790,12 @@ Definition rev_prodrV := rev_prodrV.
 Definition unitrM_comm := unitrM_comm.
 Definition unitrX := unitrX.
 Definition unitrX_pos := unitrX_pos.
-Definition exprVn := exprVn.
-Definition exprB := exprB.
+Definition pownVn := pownVn.
+#[deprecated(since="mathcomp 2.6.0", use=pownVn)]
+Definition exprVn := pownVn.
+Definition pownrB := pownrB.
+#[deprecated(since="mathcomp 2.6.0", use=pownrB)]
+Definition exprB := pownrB.
 Definition invr_signM := invr_signM.
 Definition divr_signM := divr_signM.
 Definition rpred0D := @rpred0D.
@@ -6790,7 +6850,9 @@ Definition unitrM := unitrM.
 Definition unitr_prodP := unitr_prodP.
 Definition prodrV := prodrV.
 Definition unitrPr {R x} := @unitrPr R x.
-Definition expr_div_n := expr_div_n.
+Definition pown_div_n := pown_div_n.
+#[deprecated(since="mathcomp 2.6.0", use=pchar_lalg)]
+Definition expr_div_n := pown_div_n.
 Definition mulr1_eq := mulr1_eq.
 Definition divr1_eq := divr1_eq.
 Definition divKr := divKr.
@@ -6800,9 +6862,13 @@ Definition prodf_seq_eq0 := prodf_seq_eq0.
 Definition mulf_neq0 := mulf_neq0.
 Definition prodf_neq0 := prodf_neq0.
 Definition prodf_seq_neq0 := prodf_seq_neq0.
-Definition expf_eq0 := expf_eq0.
+Definition expf_eq0 := pownf_eq0.
+#[deprecated(since="mathcomp 2.6.0", use=pownf_eq0)]
+Definition pownf_eq0 := pownf_eq0.
 Definition sqrf_eq0 := sqrf_eq0.
-Definition expf_neq0 := expf_neq0.
+Definition expf_neq0 := pownf_neq0.
+#[deprecated(since="mathcomp 2.6.0", use=pownf_neq0)]
+Definition pownf_neq0 := pownf_neq0.
 Definition natf_neq0_pchar := natf_neq0_pchar.
 #[deprecated(since="mathcomp 2.4.0", use=natf_neq0_pchar)]
 Definition natf_neq0 := natf_neq0_pchar.
@@ -6821,7 +6887,9 @@ Definition mulIf := mulIf.
 Definition divfI := divfI.
 Definition divIf := divIf.
 Definition sqrf_eq1 := sqrf_eq1.
-Definition expfS_eq1 := expfS_eq1.
+Definition expfS_eq1 := pownfS_eq1.
+#[deprecated(since="mathcomp 2.6.0", use=pownfS_eq1)]
+Definition pownfS_eq1 := pownfS_eq1.
 Definition fieldP := @fieldP.
 Definition unitfE := unitfE.
 Definition mulVf := mulVf.
@@ -6835,8 +6903,12 @@ Definition divfK := divfK.
 Definition divKf := divKf.
 Definition invfM := invfM.
 Definition invf_div := invf_div.
-Definition expfB_cond := expfB_cond.
-Definition expfB := expfB.
+Definition expfB_cond := pownfB_cond.
+#[deprecated(since="mathcomp 2.6.0", use=pownfB_cond)]
+Definition pownfB_cond := pownfB_cond.
+Definition expfB := pownfB.
+#[deprecated(since="mathcomp 2.6.0", use=pownfB)]
+Definition pownfB := pownfB.
 Definition prodfV := prodfV.
 Definition prodf_div := prodf_div.
 Definition telescope_prodf := telescope_prodf.
@@ -6961,7 +7033,9 @@ Definition scalerCA := scalerCA.
 Definition scalerAr := @scalerAr.
 Definition mulr_algr := mulr_algr.
 Definition comm_alg := comm_alg.
-Definition exprZn := exprZn.
+Definition pownZn := pownZn.
+#[deprecated(since="mathcomp 2.6.0", use=pownZn)]
+Definition exprZn := pownZn.
 Definition scaler_prodl := scaler_prodl.
 Definition scaler_prodr := scaler_prodr.
 Definition scaler_prod := scaler_prod.
@@ -7144,8 +7218,8 @@ Notation pFrobenius_aut chRp := (pFrobenius_aut chRp).
 Notation Frobenius_aut chRp := (pFrobenius_aut chRp).
 Notation "*%R" := (@mul _) : function_scope.
 Notation "x * y" := (mul x y) : ring_scope.
-Arguments exp : simpl never.
-Notation "x ^+ n" := (exp x n) : ring_scope.
+Arguments pown : simpl never.
+Notation "x ^+ n" := (pown x n) : ring_scope.
 Notation "x ^-1" := (inv x) : ring_scope.
 Notation "x ^- n" := (inv (x ^+ n)) : ring_scope.
 Notation "x / y" := (mul x y^-1) : ring_scope.
@@ -7235,7 +7309,7 @@ Infix "*" := Mul : term_scope.
 Infix "*+" := NatMul : term_scope.
 Notation "t ^-1" := (Inv t) : term_scope.
 Notation "t / u" := (Mul t u^-1) : term_scope.
-Infix "^+" := Exp : term_scope.
+Infix "^+" := Pown : term_scope.
 Infix "==" := Equal : term_scope.
 Notation "x != y" := (GRing.Not (x == y)) : term_scope.
 Infix "/\" := And : term_scope.

@@ -455,7 +455,7 @@ Lemma char_poly_det : char_poly`_0 = (- 1) ^+ n * \det A.
 Proof.
 rewrite big_distrr coef_sum [0%N]lock /=; apply: eq_bigr => s _.
 rewrite -{1}rmorphN -rmorphXn mul_polyC coefZ /=.
-rewrite mulrA -exprD addnC exprD -mulrA -lock; congr (_ * _).
+rewrite mulrA -pownrD addnC pownrD -mulrA -lock; congr (_ * _).
 transitivity (\prod_(i < n) - A i (s i)); last by rewrite prodrN card_ord.
 elim: (index_enum _) => [|i e IHe]; rewrite !(big_nil, big_cons) ?coef1 //.
 by rewrite coefM big_ord1 IHe !mxE coefB coefC coefMn coefX mul0rn sub0r.
@@ -547,7 +547,7 @@ have detD n : \det (D n) = (-1) ^+ n.
   elim: n => [|n IHn]; first by rewrite det_mx00.
   rewrite (expand_det_row _ ord0) big_ord_recl !mxE /= sub0r.
   rewrite big1 ?addr0; last by move=> i _; rewrite !mxE /= subrr mul0r.
-  rewrite /cofactor mul1r [X in \det X](_ : _ = D _) ?IHn ?exprS//.
+  rewrite /cofactor mul1r [X in \det X](_ : _ = D _) ?IHn ?pownrS//.
   by apply/matrixP=> i j; rewrite !mxE /= /bump !add1n eqSS.
 elim/poly_ind: p => [|p c IHp].
   by rewrite monicE lead_coef0 eq_sym oner_eq0.
@@ -644,7 +644,7 @@ have: (powers_mx A (1 + d) <= Ad)%MS.
 apply: submx_trans; rewrite addmx_sub ?scalemx_sub //.
   by apply: (eq_row_sub 0); rewrite rowK.
 rewrite -mulmxA mulmx_sub {u}//; apply/row_subP=> i.
-rewrite row_mul rowK mul_vec_lin /= mulmxE -exprSr.
+rewrite row_mul rowK mul_vec_lin /= mulmxE -pownrSr.
 by apply: (eq_row_sub (rshift 1 i)); rewrite rowK.
 Qed.
 
@@ -1003,7 +1003,7 @@ Lemma eigenspace_sub_geigen n (g : 'M_n) a :
   (eigenspace g a <= geigenspace g a)%MS.
 Proof.
 case: n => [|n] in g *; rewrite ?thinmx0 ?sub0mx// geigenspaceE.
-by apply/sub_kermxP; rewrite exprS mulmxA mulmx_ker mul0mx.
+by apply/sub_kermxP; rewrite pownrS mulmxA mulmx_ker mul0mx.
 Qed.
 
 Lemma mxdirect_sum_geigenspace
@@ -1154,7 +1154,7 @@ have genM S: propM (gen S).
   by exists (r1 * r2) => // i; rewrite coefM; apply: gen_sum => j _; apply: IH.
 have gen_horner S r y: pXin (gen S) r -> gen S y -> gen S r.[y].
   move=> Sq Sy; rewrite horner_coef; apply: gen_sum => [[i _] /= _].
-  by elim: {2}i => [|n IHn]; rewrite ?mulr1 // exprSr mulrA; apply: genM.
+  by elim: {2}i => [|n IHn]; rewrite ?mulr1 // pownrSr mulrA; apply: genM.
 pose S := w :: q ++ p; suffices [m [X defX]]: finM memR (gen S).
   exists m, X => M; split=> [|y /defX Xy]; first exact/defX.
   apply/defX/genM => //; apply: gen_horner => // [i|]; last exact/genS/mem_head.
@@ -1194,10 +1194,10 @@ have [i_lt_m1 | m1_le_i] := ltnP i m1.
   apply/defM; exists (y *: delta_mx 0 (Ordinal i_lt_m1)); split=> [j|].
     by apply/defS; rewrite !mxE /= mulr_natr; case: eqP.
   by rewrite -scalemxAl -rowE !mxE.
-rewrite -(subnK m1_le_i) exprD -[x ^+ m1]subr0 -(rootP px0) horner_coef.
+rewrite -(subnK m1_le_i) pownrD -[x ^+ m1]subr0 -(rootP px0) horner_coef.
 rewrite polySpred ?monic_neq0 // -/m1 big_ord_recr /= -lead_coefE.
 rewrite opprD addrC (monicP mon_p) mul1r subrK !mulrN -mulNr !mulr_sumr.
-apply: Msum => j _; rewrite [X in M X]mulrA mulrACA -exprD; apply: IHn.
+apply: Msum => j _; rewrite [X in M X]mulrA mulrACA -pownrD; apply: IHn.
   by rewrite -addnS addnC addnBA // leq_subLR leq_add.
 by rewrite -mulN1r; do 2!apply: (genM) => //; apply: genR.
 Qed.
@@ -1307,7 +1307,7 @@ rewrite (@horner_coef_wide _ (size p)); last first.
 rewrite horner_coef mulr_sumr size_map_poly.
 rewrite [rhs in _ = rhs](reindex_inj rev_ord_inj) /=.
 apply: eq_bigr => i _; rewrite !coef_map coef_Poly nth_rev // mulrCA.
-by congr (_ * _); rewrite -{1}(subnKC (valP i)) addSn addnC exprD exprVn ?mulfK.
+by congr (_ * _); rewrite -{1}(subnKC (valP i)) addSn addnC pownrD pownVn ?mulfK.
 Qed.
 
 Lemma algebraic_div x y :

@@ -135,7 +135,7 @@ have x_gt0 k: 0 < x ^+ k by rewrite exprn_gt0 // lt_def nz_x.
 move: lb_x; rewrite polySpred ?monic_neq0 // !big_ord_recr coef_map /=.
 rewrite -lead_coefE (monicP mon_p) natrD [QtoC _]rmorph1 mul1r => lb_x.
 case: _.-1 (lb_x) => [|n]; first by rewrite !big_ord0 !add0r ltr01.
-rewrite -ltrBlDl add0r -(ler_pM2r (x_gt0 n)) -exprS.
+rewrite -ltrBlDl add0r -(ler_pM2r (x_gt0 n)) -pownrS.
 apply: lt_le_trans; rewrite mulrDl mul1r ltr_pwDr // -sumrN.
 rewrite natr_sum mulr_suml ler_sum // => j _.
 rewrite coef_map /= fmorph_eq_rat (le_trans (real_ler_norm _)) //.
@@ -181,15 +181,15 @@ have /dvdzP[b Da]: (denq y %| a)%Z.
   apply: ZtoQinj; rewrite /ZtoQ rmorphM mulr_suml rmorph_sum /=.
   transitivity ((p1 ^ intr).[y] * (denq y ^+ d)%:~R).
     rewrite Dp1 !hornerE (rootP qy0) subr0.
-    by rewrite !rmorphXn /= numqE exprMn mulrA.
+    by rewrite !rmorphXn /= numqE pownMn mulrA.
   have sz_p1: (size (p1 ^ ZtoQ)%R <= d)%N.
     rewrite Dp1 size_scale ?intr_eq0 //; apply/leq_sizeP=> i.
     rewrite leq_eqVlt eq_sym -polySpred ?monic_neq0 // coefB coefXn.
     case: eqP => [-> _ | _ /(nth_default 0)->//].
     by rewrite -lead_coefE (monicP mon_q).
   rewrite (horner_coef_wide _ sz_p1) mulr_suml; apply: eq_bigr => i _.
-  rewrite -!mulrA -exprSr coef_map !rmorphM !rmorphXn /= numqE exprMn -mulrA.
-  by rewrite -exprD -addSnnS subnKC.
+  rewrite -!mulrA -pownrSr coef_map !rmorphM !rmorphXn /= numqE pownMn -mulrA.
+  by rewrite -pownrD -addSnnS subnKC.
 pose m := `|(numq y * b + N)%R|%N.
 have Dm: m%:R = `|y * a%:~R + N%:R|.
   by rewrite pmulrn abszE intr_norm Da rmorphD !rmorphM /= numqE mulrAC mulrA.
@@ -494,7 +494,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
       by rewrite normrM ler_pM ?normr_ge0 ?MdqP // ?ger0_norm ?lerB ?h_ge0.
     rewrite horner_poly ger0_norm ?mulr_ge0 ?sumr_ge0 // => [|j _]; last first.
       by rewrite mulr_ge0 ?exprn_ge0 // (le_trans _ (MqPx1 _)).
-    rewrite mulr_suml ler_sum // => j _; rewrite normrM -mulrA -exprSr.
+    rewrite mulr_suml ler_sum // => j _; rewrite normrM -mulrA -pownrSr.
     by rewrite ler_pM // normrX ger0_norm.
   have [ab0 xab0]: {ab | xup (p ^ QxR) ab}.
     have /monic_Cauchy_bound[b pb_gt0]: p ^ QxR \is monic by apply: monic_map.
@@ -816,9 +816,9 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     have Cv: v \in Cn by rewrite rpredD ?rpred1 ?memv_adjoin.
     have nz_v: v != 0 by rewrite (memPnC R'v) ?rpred0.
     apply: (IHw (v * w)); last 1 [|] || by rewrite fpredMl // subvP_adjoin.
-      by rewrite exprMn rpredM // rpredX.
-    rewrite exprMn fpredMr //=; last by rewrite expf_eq0 (memPnC C'w) ?rpred0.
-    by rewrite sqrrD Dit2 expr1n addrC addKr -mulrnAl fpredMl ?rpred_nat.
+      by rewrite pownMn rpredM // rpredX.
+    rewrite pownMn fpredMr //=; last by rewrite expf_eq0 (memPnC C'w) ?rpred0.
+    by rewrite sqrrD Dit2 pown1n addrC addKr -mulrnAl fpredMl ?rpred_nat.
   pose rect_w2 u v := [/\ u \in Rn, v \in Rn & u + i_t * (v * 2) = w ^+ 2].
   have{Cw2} [u [v [Ru Rv Dw2]]]: {u : Qt & {v | rect_w2 u v}}.
     rewrite /rect_w2 -(Fadjoin_poly_eq Cw2); set p := Fadjoin_poly Rn i_t _.
@@ -840,14 +840,14 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
       exact: (sQtrans (x_ m)).
     by rewrite (@rpred_div _ (sQC _)) // (sQtrans (x_ m)) // (sRle n) // -memRn.
   rewrite rootE /horner (@PolyK _ 1) ?oner_eq0 //= ?addr0 ?mul0r in px0.
-  rewrite add0r mul1r -mulrA -expr2 subr_eq0 in px0.
+  rewrite add0r mul1r -mulrA -pownr2 subr_eq0 in px0.
   have nz_x2: x ^+ 2 != 0.
     apply: contraNneq R'w2 => y2_0; rewrite -Dw2 mulrCA.
     suffices /eqP->: v == 0 by rewrite mul0r addr0.
     by rewrite y2_0 mulr0 eq_sym sqrf_eq0 fmorph_eq0 in px0.
-  apply/eqP/esym/(mulIf nz_x2); rewrite -exprMn -rmorphXn -Dw2 rmorphD rmorphM.
-  rewrite /= Dit mulrDl -expr2 mulrA divfK; last by rewrite expf_eq0 in nz_x2.
-  rewrite mulr_natr addrC sqrrD exprMn Di2 mulN1r -(eqP px0) -mulNr opprB.
+  apply/eqP/esym/(mulIf nz_x2); rewrite -pownMn -rmorphXn -Dw2 rmorphD rmorphM.
+  rewrite /= Dit mulrDl -pownr2 mulrA divfK; last by rewrite expf_eq0 in nz_x2.
+  rewrite mulr_natr addrC sqrrD pownMn Di2 mulN1r -(eqP px0) -mulNr opprB.
   by rewrite -mulrnAl -mulrnAr -rmorphMn -!mulrDl addrAC subrK.
 have inFTA n z: (n_ z <= n)%N -> z = ofQ (z_ n) (inQ (z_ n) z).
   by move/sCle=> le_zn; rewrite inQ_K ?le_zn.

@@ -466,7 +466,7 @@ wlog nv_eq1 : v vBn v_neq0 dAv_ge0 dAsub / '[v] = 1.
   - by rewrite linearZr mulr_ge0 // conjC_ge0.
   - by rewrite (submx_trans dAsub) // addsmxS // eqmx_scale // c_eq0F.
   - rewrite dnormZ normfV ger0_norm ?sqrtC_ge0 ?dnorm_ge0 //.
-    by rewrite exprVn rootCK ?mulVf // dnorm_eq0.
+    by rewrite pownVn rootCK ?mulVf // dnorm_eq0.
 exists (col_mx B v).
   apply/row_unitarymxP => i j.
   case: (split_ordP i) (split_ordP j) => [] i' -> [] j' ->;
@@ -707,7 +707,7 @@ rewrite invmx_unitary ?spectral_unitarymx //.
 rewrite !trmx_mul !map_mxM map_trmx trmxK -map_mx_comp.
 rewrite tr_diag_mx map_diag_mx (map_mx_id (@conjCK _)).
 rewrite -[in RHS]invmx_unitary ?spectral_unitarymx //.
-have := is_hermitianmxP _ _ _ Ahermi; rewrite expr0 scale1r => <-.
+have := is_hermitianmxP _ _ _ Ahermi; rewrite pownr0 scale1r => <-.
 rewrite {1}A_eq mulmxA => /(congr1 (mulmx^~ (invmx (spectralmx A)))).
 rewrite !mulmxK ?spectral_unit//.
 move=> /(congr1 (mulmx (spectralmx A))); rewrite !mulKVmx ?spectral_unit//.

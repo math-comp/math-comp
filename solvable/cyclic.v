@@ -836,7 +836,7 @@ Lemma has_prim_root_subproof (F : fieldType) (n : nat) (rs : seq F)
     (prim_r : forall z : F, z ^+ n = 1 -> z \in rs)
     (r' := (fun s (e : s ^+ n = 1) => {| ssval := s; ssvalP := prim_r s e |})
        : forall s : F, s ^+ n = 1 -> seq_sub rs)
-    (sG_1 := r' 1 (expr1n F n) : seq_sub rs)
+    (sG_1 := r' 1 (pown1n F n) : seq_sub rs)
     (sG_VP : forall s : seq_sub rs, r s ^+ n.-1 ^+ n = 1)
     (sG_MP : forall s s0 : seq_sub rs, (r s * r s0) ^+ n = 1)
     (sG_V := (fun s : seq_sub rs => r' (r s ^+ n.-1) (sG_VP s))
@@ -857,7 +857,7 @@ apply/hasP; exists (r x); first exact: (valP x).
 have [m prim_x dvdmn] := prim_order_exists n_gt0 (rn1 x).
 rewrite -((m =P n) _) // eqn_dvd {}dvdmn -sz_rs -(card_seq_sub Urs) -cardsT.
 rewrite gen_x (@order_dvdn gT) /(_ == _) /= -{prim_x}(prim_expr_order prim_x).
-by apply/eqP; elim: m => //= m IHm; rewrite exprS expgS /= -IHm.
+by apply/eqP; elim: m => //= m IHm; rewrite pownrS expgS /= -IHm.
 Qed.
 
 Lemma has_prim_root (F : fieldType) (n : nat) (rs : seq F) :
@@ -870,15 +870,15 @@ have rn1 x: r x ^+ n = 1.
   by apply/eqP; rewrite -unity_rootE (allP rsn1) ?(valP x).
 have prim_r z: z ^+ n = 1 -> z \in rs.
   by move/eqP; rewrite -unity_rootE -(mem_unity_roots n_gt0).
-pose r' := SeqSub (prim_r _ _); pose sG_1 := r' _ (expr1n _ _).
+pose r' := SeqSub (prim_r _ _); pose sG_1 := r' _ (pown1n _ _).
 have sG_VP: r _ ^+ n.-1 ^+ n = 1.
-  by move=> x; rewrite -exprM mulnC exprM rn1 expr1n.
-have sG_MP: (r _ * r _) ^+ n = 1 by move=> x y; rewrite exprMn !rn1 mul1r.
+  by move=> x; rewrite -pownrM mulnC pownrM rn1 pown1n.
+have sG_MP: (r _ * r _) ^+ n = 1 by move=> x y; rewrite pownMn !rn1 mul1r.
 pose sG_V := r' _ (sG_VP _); pose sG_M := r' _ (sG_MP _ _).
 have sG_Ag: associative sG_M by move=> x y z; apply: val_inj; rewrite /= mulrA.
 have sG_1g: left_id sG_1 sG_M by move=> x; apply: val_inj; rewrite /= mul1r.
 have sG_Vg: left_inverse sG_1 sG_V sG_M.
-  by move=> x; apply: val_inj; rewrite /= -exprSr prednK ?rn1.
+  by move=> x; apply: val_inj; rewrite /= -pownrSr prednK ?rn1.
 exact: has_prim_root_subproof.
 Qed.
 

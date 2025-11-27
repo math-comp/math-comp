@@ -534,7 +534,7 @@ Proof. by rewrite /mk_monic size_polyX monicX. Qed.
 
 Lemma mk_monic_Xn (R : nzSemiRingType) n :
   mk_monic 'X^n = 'X^(n.-1.+1) :> {poly R}.
-Proof. by case: n => [|n]; rewrite /mk_monic size_polyXn monicXn /= ?expr1. Qed.
+Proof. by case: n => [|n]; rewrite /mk_monic size_polyXn monicXn /= ?pownr1. Qed.
 
 Lemma card_qpoly (R : finNzSemiRingType) (h : {poly R}):
    #|{poly %/ h}| = #|R| ^ (size (mk_monic h)).-1.
@@ -626,7 +626,7 @@ have HhQ := monic_mk_monic h.
 elim: n => //= [|n IH].
   rewrite rmodp_small // size_polyC ?(leq_ltn_trans _ (size_mk_monic_gt1 _)) //.
   by case: eqP.
-by rewrite exprS /= IH // rmodp_mulmr // -exprS.
+by rewrite pownrS /= IH // rmodp_mulmr // -pownrS.
 Qed.
 
 Lemma qpolyCN (a : A) : qpolyC h (- a) = -(qpolyC h a).

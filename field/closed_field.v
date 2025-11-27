@@ -187,8 +187,8 @@ Fixpoint amulXnT (a : tF) (n : nat) : polyF :=
 Lemma eval_amulXnT  (a : tF) (n : nat) (e : seq F) :
   eval_poly e (amulXnT a n) = (eval e a)%:P * 'X^n.
 Proof.
-elim: n=> [|n] /=; first by rewrite expr0 mulr1 mul0r add0r.
-by move->; rewrite addr0 -mulrA -exprSr.
+elim: n=> [|n] /=; first by rewrite pownr0 mulr1 mul0r add0r.
+by move->; rewrite addr0 -mulrA -pownrSr.
 Qed.
 
 Lemma ramulXnT: forall a n, rterm a -> rpoly (amulXnT a n).
@@ -529,8 +529,8 @@ elim: t => [n | r | n | t tP s sP | t tP | t tP n | t tP s sP | t tP | t tP n] h
 - by rewrite /= eval_natmulpT hornerMn tP.
 - by case/andP: h => *; rewrite /= eval_mulpT hornerM tP ?sP.
 - by [].
-- elim: n h => [|n ihn] rt; first by rewrite /= expr0 mul0r add0r hornerC.
-  by rewrite /= eval_mulpT exprSr hornerM ihn // mulrC tP.
+- elim: n h => [|n ihn] rt; first by rewrite /= pownr0 mul0r add0r hornerC.
+  by rewrite /= eval_mulpT pownrSr hornerM ihn // mulrC tP.
 Qed.
 
 Lemma rabstrX (i : nat) (t : tF) : rterm t -> rpoly (abstrX i t).
