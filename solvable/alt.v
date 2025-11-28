@@ -20,7 +20,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 
 Local Open Scope group_scope.
-Import GRing.
+Import GRing.Theory.
 
 HB.instance Definition _ := Finite_isGroup.Build bool addbA addFb addbb.
 
