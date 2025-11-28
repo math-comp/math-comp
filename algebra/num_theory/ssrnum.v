@@ -1,6 +1,7 @@
 From mathcomp Require Export orderedzmod.
 From mathcomp Require Export numdomain.
 From mathcomp Require Export numfield.
+From mathcomp Require Export numext.
 
 (******************************************************************************)
 (*                            Number structures                               *)
