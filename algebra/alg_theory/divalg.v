@@ -154,14 +154,6 @@ HB.mixin Record NzRing_hasMulInverse R of NzRing R := {
   invr_out_subproof : {in [predC unit_subdef], inv =1 id}
 }.
 
-Module Ring_hasMulInverse.
-#[deprecated(since="mathcomp 2.4.0", use=NzRing_hasMulInverse.Build)]
-Notation Build R := (NzRing_hasMulInverse.Build R) (only parsing).
-End Ring_hasMulInverse.
-
-#[deprecated(since="mathcomp 2.4.0", use=NzRing_hasMulInverse)]
-Notation Ring_hasMulInverse R := (NzRing_hasMulInverse R) (only parsing).
-
 #[short(type="unitRingType")]
 HB.structure Definition UnitRing := {R of NzRing_hasMulInverse R & NzRing R}.
 
@@ -474,14 +466,6 @@ HB.factory Record ComNzRing_hasMulInverse R of ComNzRing R := {
   unitPl : forall x y, y * x = 1 -> unit x;
   invr_out : {in [predC unit], inv =1 id}
 }.
-
-Module ComRing_hasMulInverse.
-#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_hasMulInverse.Build)]
-Notation Build R := (ComNzRing_hasMulInverse.Build R) (only parsing).
-End ComRing_hasMulInverse.
-
-#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_hasMulInverse)]
-Notation ComRing_hasMulInverse R := (ComNzRing_hasMulInverse R) (only parsing).
 
 HB.builders Context R of ComNzRing_hasMulInverse R.
 
@@ -1394,15 +1378,6 @@ HB.instance Definition _ := IntegralDomain.on R^o.
 
 End IntegralDomainTheory.
 
-#[deprecated(since="mathcomp 2.4.0", use=natf_neq0_pchar)]
-Notation natf_neq0 := natf_neq0_pchar (only parsing).
-#[deprecated(since="mathcomp 2.4.0", use=natf0_pchar)]
-Notation natf0_char := natf0_pchar (only parsing).
-#[deprecated(since="mathcomp 2.4.0", use=pcharf'_nat)]
-Notation charf'_nat := pcharf'_nat (only parsing).
-#[deprecated(since="mathcomp 2.4.0", use=pcharf0P)]
-Notation charf0P := pcharf0P (only parsing).
-
 Arguments lregP {R x}.
 Arguments rregP {R x}.
 
@@ -1442,14 +1417,6 @@ HB.factory Record ComNzRing_isField R of ComNzRing R := {
   mulVf : forall x, x != 0 -> inv x * x = 1;
   invr0 : inv 0 = 0;
 }.
-
-Module ComRing_isField.
-#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_isField.Build)]
-Notation Build R := (ComNzRing_isField.Build R) (only parsing).
-End ComRing_isField.
-
-#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_isField)]
-Notation ComRing_isField R := (ComNzRing_isField R) (only parsing).
 
 HB.builders Context R of ComNzRing_isField R.
 
@@ -1640,13 +1607,6 @@ Lemma pchar_lalg (A : nzLalgType F) : pchar A =i pchar F.
 Proof. by move=> p; rewrite inE -scaler_nat scaler_eq0 oner_eq0 orbF. Qed.
 
 End FieldTheory.
-
-#[deprecated(since="mathcomp 2.4.0", use=pchar0_natf_div)]
-Notation char0_natf_div := pchar0_natf_div (only parsing).
-#[deprecated(since="mathcomp 2.4.0", use=fmorph_pchar)]
-Notation fmorph_char := fmorph_pchar (only parsing).
-#[deprecated(since="mathcomp 2.4.0", use=pchar_lalg)]
-Notation char_lalg := pchar_lalg (only parsing).
 
 Arguments fmorph_inj {F R} f [x1 x2].
 Arguments telescope_prodf_eq {F n m} f u.
@@ -2172,12 +2132,6 @@ Notation "[ 'SubNzRing_isSubUnitRing' 'of' U 'by' <: ]" :=
   (SubNzRing_isSubUnitRing.Build _ _ U (divringClosedP _))
   (format "[ 'SubNzRing_isSubUnitRing'  'of'  U  'by'  <: ]")
   : form_scope.
-#[deprecated(since="mathcomp 2.4.0",
-             note="Use [ SubNzRing_isSubUnitRing of U by <: ] instead.")]
-Notation "[ 'SubRing_isSubUnitRing' 'of' U 'by' <: ]" :=
-  (SubNzRing_isSubUnitRing.Build _ _ U (divringClosedP _))
-  (format "[ 'SubRing_isSubUnitRing'  'of'  U  'by'  <: ]")
-  : form_scope.
 Notation "[ 'SubChoice_isSubUnitRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubUnitRing.Build _ _ U (divringClosedP _))
   (format "[ 'SubChoice_isSubUnitRing'  'of'  U  'by'  <: ]")
@@ -2269,8 +2223,6 @@ Definition rpred_div := rpred_div.
 Definition rpredXN := rpredXN.
 Definition rpredZeq := rpredZeq.
 Definition pchar_lalg := pchar_lalg.
-#[deprecated(since="mathcomp 2.4.0", use=pchar_lalg)]
-Definition char_lalg := pchar_lalg.
 Definition rpredMr := rpredMr.
 Definition rpredMl := rpredMl.
 Definition rpred_divr := rpred_divr.
@@ -2298,17 +2250,9 @@ Definition expf_eq0 := expf_eq0.
 Definition sqrf_eq0 := sqrf_eq0.
 Definition expf_neq0 := expf_neq0.
 Definition natf_neq0_pchar := natf_neq0_pchar.
-#[deprecated(since="mathcomp 2.4.0", use=natf_neq0_pchar)]
-Definition natf_neq0 := natf_neq0_pchar.
 Definition natf0_pchar := natf0_pchar.
-#[deprecated(since="mathcomp 2.4.0", use=natf0_pchar)]
-Definition natf0_char := natf0_pchar.
 Definition pcharf'_nat := pcharf'_nat.
-#[deprecated(since="mathcomp 2.4.0", use=pcharf'_nat)]
-Definition charf'_nat := pcharf'_nat.
 Definition pcharf0P := pcharf0P.
-#[deprecated(since="mathcomp 2.4.0", use=pcharf0P)]
-Definition charf0P := pcharf0P.
 Definition eqf_sqr := eqf_sqr.
 Definition mulfI := mulfI.
 Definition mulIf := mulIf.
@@ -2341,8 +2285,6 @@ Definition mulf_div := mulf_div.
 Definition eqr_div := eqr_div.
 Definition eqr_sum_div := eqr_sum_div.
 Definition pchar0_natf_div := pchar0_natf_div.
-#[deprecated(since="mathcomp 2.4.0", use=pchar0_natf_div)]
-Definition char0_natf_div := pchar0_natf_div.
 Definition fpredMr := fpredMr.
 Definition fpredMl := fpredMl.
 Definition fpred_divr := fpred_divr.
@@ -2362,8 +2304,6 @@ Arguments fmorph_inj {F R} f [x1 x2].
 Definition fmorph_eq := fmorph_eq.
 Definition fmorph_eq1 := fmorph_eq1.
 Definition fmorph_pchar := fmorph_pchar.
-#[deprecated(since="mathcomp 2.4.0", use=fmorph_pchar)]
-Definition fmorph_char := fmorph_pchar.
 Definition fmorph_unit := fmorph_unit.
 Definition fmorphV := fmorphV.
 Definition fmorph_div := fmorph_div.
