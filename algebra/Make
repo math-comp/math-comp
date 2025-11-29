@@ -18,6 +18,7 @@ rat.v
 ring_quotient.v
 alg_theory/algebra.v
 alg_theory/divalg.v
+alg_theory/decfield.v
 alg_theory/ssralg.v
 ssrint.v
 num_theory/orderedzmod.v

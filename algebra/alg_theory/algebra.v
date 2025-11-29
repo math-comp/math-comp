@@ -9,8 +9,6 @@ From mathcomp Require Import nmodule.
 (*                            Ring-like structures                            *)
 (*                                                                            *)
 (* NB: See CONTRIBUTING.md for an introduction to HB concepts and commands.   *)
-(*     See ssralg.v for general remarks about the module layout, the notation *)
-(*     scopes, and the naming convention.                                     *)
 (*                                                                            *)
 (* Reference: Francois Garillot, Georges Gonthier, Assia Mahboubi, Laurence   *)
 (* Rideau, Packaging mathematical structures, TPHOLs 2009                     *)
@@ -491,6 +489,35 @@ From mathcomp Require Import nmodule.
 (*                           and which simplifies on application              *)
 (*                 f \* g == the function x |-> f x * g x; f \* g             *)
 (*                           simplifies on application                        *)
+(*                                                                            *)
+(* * Module layout, the notation scopes, and the naming convention            *)
+(*                                                                            *)
+(* The following remarks apply to divalg.v and decfield.v, besides algebra.v. *)
+(*   The lemmas are contained in two modules: GRing and GRing.Theory. The     *)
+(* GRing module SHOULD NOT be imported and gives only qualified access to     *)
+(* definitions and lemmas, e.g., GRing.mul and GRing.mul0r. The GRing.Theory  *)
+(* submodule can be imported to obtain unqualified access to the lemmas and   *)
+(* some definitions, e.g., monoid_morphism.                                   *)
+(*   The notations are defined in ring_scope (delimiter %R), except that the  *)
+(* notations for types, e.g., {rmorphism R -> S} and functions, e.g., *%R,    *)
+(* are respectively defined in type_scope and function_scope.                 *)
+(*   This library also extends the conventional suffixes described in library *)
+(* ssrbool.v with the following:                                              *)
+(*   0 -- ring 0, as in addr0 : x + 0 = x                                     *)
+(*   1 -- ring 1, as in mulr1 : x * 1 = x                                     *)
+(*   D -- ring addition, as in linearD : f (u + v) = f u + f v                *)
+(*   B -- ring subtraction, as in opprB : - (x - y) = y - x                   *)
+(*   M -- ring multiplication, as in invfM : (x * y)^-1 = x^-1 * y^-1         *)
+(*  Mn -- ring by nat multiplication, as in raddfMn : f (x *+ n) = f x *+ n   *)
+(*   N -- ring opposite, as in mulNr : (- x) * y = - (x * y)                  *)
+(*   V -- ring inverse, as in mulVr : x^-1 * x = 1                            *)
+(*   X -- ring exponentiation, as in rmorphXn : f (x ^+ n) = f x ^+ n         *)
+(*   Z -- (left) module scaling, as in linearZ : f (a *: v)  = s *: f v       *)
+(* The operator suffixes D, B, M and X are also used for the corresponding    *)
+(* operations on nat, as in natrX : (m ^ n)%:R = m%:R ^+ n. For the binary    *)
+(* power operator, a trailing "n" suffix is used to indicate the operator     *)
+(* suffix applies to the left-hand ring argument, as in                       *)
+(*   expr1n : 1 ^+ n = 1 vs. expr1 : x ^+ 1 = x.                              *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -547,12 +574,6 @@ Reserved Notation "'{' 'scalar' U '}'" (format "{ 'scalar'  U }").
 
 Reserved Notation "R ^c" (format "R ^c").
 Reserved Notation "R ^o" (format "R ^o").
-
-Declare Scope ring_scope.
-Delimit Scope ring_scope with R.
-Declare Scope term_scope.
-Delimit Scope term_scope with T.
-Local Open Scope ring_scope.
 
 Module Export Dummy.
 Module GRing := Algebra.
