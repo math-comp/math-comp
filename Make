@@ -22,6 +22,7 @@ algebra/rat.v
 algebra/ring_quotient.v
 algebra/alg_theory/algebra.v
 algebra/alg_theory/divalg.v
+algebra/alg_theory/decfield.v
 algebra/alg_theory/ssralg.v
 algebra/ssrint.v
 algebra/vector.v

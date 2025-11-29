@@ -3,42 +3,18 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
 From mathcomp Require Import choice fintype finfun bigop prime binomial.
-From mathcomp Require Export nmodule algebra divalg.
+From mathcomp Require Export nmodule algebra divalg decfield.
 
 (******************************************************************************)
 (*                            Ring-like structures                            *)
 (*                                                                            *)
-(* The files in this directory define interfaces for (semi)rings,             *)
-(* (semi)modules, (semi)algebras with or without commutativity,               *)
-(* multiplicative inverse, etc.                                               *)
+(* This file re-exports the contents of algebra.v, divalg.v, and decfield.v:  *)
+(* (semi)rings, (semi)modules, (semi)algebras with or without commutativity,  *)
+(* multiplicative inverse, etc., decidable fields, algebraically closed       *)
+(* fields, and their morphisms.                                               *)
 (*                                                                            *)
 (* Reference: Francois Garillot, Georges Gonthier, Assia Mahboubi, Laurence   *)
 (* Rideau, Packaging mathematical structures, TPHOLs 2009                     *)
-(*                                                                            *)
-(* The lemmas in algebra.v and divalg.v are contained in both the GRing       *)
-(* module and in the GRing.Theory submodule. While the main GRing module      *)
-(* should NOT be imported, GRing.Theory can be imported when unqualified      *)
-(* access to the theory is needed (GRing.Theory also allows the unqualified   *)
-(* use of additive, linear, Linear, etc).                                     *)
-(*   Notations are defined in scope ring_scope (delimiter %R), except term    *)
-(* and formula notations, which are in term_scope (delimiter %T).             *)
-(*   This library also extends the conventional suffixes described in library *)
-(* ssrbool.v with the following:                                              *)
-(*   0 -- ring 0, as in addr0 : x + 0 = x                                     *)
-(*   1 -- ring 1, as in mulr1 : x * 1 = x                                     *)
-(*   D -- ring addition, as in linearD : f (u + v) = f u + f v                *)
-(*   B -- ring subtraction, as in opprB : - (x - y) = y - x                   *)
-(*   M -- ring multiplication, as in invfM : (x * y)^-1 = x^-1 * y^-1         *)
-(*  Mn -- ring by nat multiplication, as in raddfMn : f (x *+ n) = f x *+ n   *)
-(*   N -- ring opposite, as in mulNr : (- x) * y = - (x * y)                  *)
-(*   V -- ring inverse, as in mulVr : x^-1 * x = 1                            *)
-(*   X -- ring exponentiation, as in rmorphXn : f (x ^+ n) = f x ^+ n         *)
-(*   Z -- (left) module scaling, as in linearZ : f (a *: v)  = s *: f v       *)
-(* The operator suffixes D, B, M and X are also used for the corresponding    *)
-(* operations on nat, as in natrX : (m ^ n)%:R = m%:R ^+ n. For the binary    *)
-(* power operator, a trailing "n" suffix is used to indicate the operator     *)
-(* suffix applies to the left-hand ring argument, as in                       *)
-(*   expr1n : 1 ^+ n = 1 vs. expr1 : x ^+ 1 = x.                              *)
 (******************************************************************************)
 
 Set Implicit Arguments.
