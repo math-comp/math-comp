@@ -265,14 +265,12 @@ HB.instance Definition _ (V : addSemigroupType) :=
 Section AddSemigroupTheory.
 Variables V : addSemigroupType.
 
-Lemma addrCA : @left_commutative V V +%R.
-Proof. by move=> x y z; rewrite !addrA [x + _]addrC. Qed.
+#[export]
+HB.instance Definition _ := SemiGroup.isComLaw.Build V +%R addrA addrC.
 
-Lemma addrAC : @right_commutative V V +%R.
-Proof. by move=> x y z; rewrite -!addrA [y + _]addrC. Qed.
-
-Lemma addrACA : @interchange V +%R +%R.
-Proof. by move=> x y z t; rewrite -!addrA [y + (z + t)]addrCA. Qed.
+Lemma addrCA : @left_commutative V V +%R. Proof. exact: SemiGroup.mulmCA. Qed.
+Lemma addrAC : @right_commutative V V +%R. Proof. exact: SemiGroup.mulmAC. Qed.
+Lemma addrACA : @interchange V +%R +%R. Proof. exact: SemiGroup.mulmACA. Qed.
 
 End AddSemigroupTheory.
 
@@ -363,8 +361,6 @@ Local Notation "\sum_ ( m <= i < n ) F" := (\big[+%R/0]_(m <= i < n) F).
 Local Notation "\sum_ ( i < n ) F" := (\big[+%R/0]_(i < n) F).
 Local Notation "\sum_ ( i 'in' A ) F" := (\big[+%R/0]_(i in A) F).
 
-Import Monoid.Theory.
-
 #[export]
 HB.instance Definition _ (V : addUMagmaType) :=
   Magma_isUMagma.Build (to_multiplicative V) add0r (@addr0 V).
@@ -401,7 +397,7 @@ HB.instance Definition _ (V : nmodType) :=
 
 #[export]
 HB.instance Definition _ (V : nmodType) :=
-  Monoid.isComLaw.Build V 0%R +%R addrA addrC add0r.
+  Monoid.isMonoidLaw.Build V 0%R +%R add0r (@addr0 V).
 
 Section NmoduleTheory.
 
@@ -449,7 +445,7 @@ Lemma sumrMnr x I r P (F : I -> nat) :
 Proof. by rewrite (big_morph _ (mulrnDr x) (erefl _)). Qed.
 
 Lemma sumr_const (I : finType) (A : pred I) x : \sum_(i in A) x = x *+ #|A|.
-Proof. by rewrite big_const -iteropE. Qed.
+Proof. by rewrite big_const -Monoid.iteropE. Qed.
 
 Lemma sumr_const_nat m n x : \sum_(n <= i < m) x = x *+ (m - n).
 Proof. by rewrite big_const_nat iter_addr_0. Qed.
@@ -820,13 +816,11 @@ Section AddCFun.
 Variables (U : baseAddUMagmaType) (V : nmodType).
 Implicit Types (f g : {additive U -> V}).
 
-Fact add_fun_nmod_morphism f g : nmod_morphism (add_fun f g).
-Proof.
-by split=> [|x y]; rewrite /= ?raddf0 ?addr0// !raddfD addrCA -!addrA addrCA.
-Qed.
+Fact add_fun_nmod_morphism f g : nmod_morphism (f \+ g).
+Proof. by split=> [|x y]; rewrite /= ?raddf0 ?addr0// !raddfD addrACA. Qed.
 #[export]
 HB.instance Definition _ f g :=
-  isNmodMorphism.Build U V (add_fun f g) (add_fun_nmod_morphism f g).
+  isNmodMorphism.Build U V (f \+ g) (add_fun_nmod_morphism f g).
 
 End AddCFun.
 
@@ -848,46 +842,31 @@ HB.instance Definition _ := isNmodMorphism.Build U W (f \o g)
 
 End AddFun.
 Section AddFun.
-Variables (U : baseAddUMagmaType) (V : addUMagmaType) (W : nmodType).
-Variables (f g : {additive U -> W}).
+Variables (U : baseAddUMagmaType) (V : addUMagmaType).
 
 Fact null_fun_is_nmod_morphism : nmod_morphism (\0 : U -> V).
 Proof. by split=> // x y /=; rewrite addr0. Qed.
 #[export]
 HB.instance Definition _ :=
-  isNmodMorphism.Build U V (\0 : U -> V)
-    null_fun_is_nmod_morphism.
+  isNmodMorphism.Build U V (\0 : U -> V) null_fun_is_nmod_morphism.
 
 End AddFun.
 
 Section AddVFun.
 Variables (U : baseAddUMagmaType) (V : zmodType).
-Variables (f g : {additive U -> V}).
 
 Fact opp_is_zmod_morphism : zmod_morphism (-%R : V -> V).
 Proof. by move=> x y; rewrite /= opprD. Qed.
 #[export]
-HB.instance Definition _ :=
-  isZmodMorphism.Build V V -%R opp_is_zmod_morphism.
+HB.instance Definition _ := isZmodMorphism.Build V V -%R opp_is_zmod_morphism.
 
-Fact opp_fun_is_zmod_morphism : nmod_morphism (\- f).
-Proof.
-split=> [|x y]; first by rewrite -[LHS]/(- (f 0)) raddf0 oppr0.
-by rewrite -[LHS]/(- (f (x + y))) !raddfD/=.
-Qed.
 #[export]
-HB.instance Definition _ :=
-  isNmodMorphism.Build U V (opp_fun f) opp_fun_is_zmod_morphism.
+HB.instance Definition _ (f : {additive U -> V}) :=
+  Additive.copy (\- f) (-%R \o f).
 
-Fact sub_fun_is_zmod_morphism :
-  nmod_morphism (f \- g).
-Proof.
-split=> [|x y]/=; first by rewrite !raddf0 addr0.
-by rewrite !raddfD/= addrACA.
-Qed.
 #[export]
-HB.instance Definition _ :=
-  isNmodMorphism.Build U V (f \- g) sub_fun_is_zmod_morphism.
+HB.instance Definition _ (f g : {additive U -> V}) :=
+  Additive.copy (f \- g) (f \+ (\- g)).
 
 End AddVFun.
 End AdditiveTheory.
