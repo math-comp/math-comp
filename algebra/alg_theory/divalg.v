@@ -1,9 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
-From mathcomp Require Import choice fintype finfun bigop prime binomial.
-From mathcomp Require Import nmodule algebra.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
+From mathcomp Require Import choice fintype bigop prime nmodule algebra.
 
 (******************************************************************************)
 (*              Ring-like structures with multiplicative inverse              *)

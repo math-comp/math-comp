@@ -1,9 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
-From mathcomp Require Import choice fintype finfun bigop prime binomial.
-From mathcomp Require Import nmodule algebra divalg.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
+From mathcomp Require Import fintype finfun bigop nmodule algebra divalg.
 
 (******************************************************************************)
 (*                  Decidable and algebraically closed fields                 *)
