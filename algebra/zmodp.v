@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool choice eqtype ssrnat seq.
 From mathcomp Require Import div fintype bigop finset prime fingroup perm.
-From mathcomp Require Import ssralg finalg countalg.
+From mathcomp Require Import ssralg countalg finalg.
 
 (******************************************************************************)
 (*  Definition of the additive group and ring Zp, represented as 'I_p         *)
