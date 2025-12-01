@@ -4476,24 +4476,6 @@ Lemma pairMnE (M1 M2 : zmodType) (x : M1 * M2) n :
   x *+ n = (x.1 *+ n, x.2 *+ n).
 Proof. by case: x => x y; elim: n => //= n; rewrite !mulrS => ->. Qed.
 
-(* begin hide *)
-
-(* Testing subtype hierarchy
-Section Test0.
-
-Variables (T : choiceType) (S : {pred T}).
-
-Inductive B := mkB x & x \in S.
-Definition vB u := let: mkB x _ := u in x.
-
-HB.instance Definition _ := [isSub for vB].
-HB.instance Definition _ := [Choice of B by <:].
-
-End Test0.
-*)
-
-(* end hide *)
-
 (* Algebraic structure of bool *)
 
 HB.instance Definition _ := Zmodule_isComNzRing.Build bool

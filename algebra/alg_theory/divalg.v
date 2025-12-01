@@ -1475,40 +1475,6 @@ HB.instance Definition _ (R : nzRingType) (A1 A2 : comUnitAlgType R) :=
   NzAlgebra.on (A1 * A2)%type.
 (* /TODO *)
 
-(* begin hide *)
-
-(* Testing subtype hierarchy
-Section Test1.
-
-Variables (R : unitRingType) (S : divringClosed R).
-
-HB.instance Definition _ := [SubChoice_isSubUnitRing of B S by <:].
-
-End Test1.
-
-Section Test2.
-
-Variables (R : comUnitRingType) (A : unitAlgType R) (S : divalgClosed A).
-
-HB.instance Definition _ := [SubZmodule_isSubLmodule of B S by <:].
-HB.instance Definition _ := [SubNzRing_SubLmodule_isSubLalgebra of B S by <:].
-HB.instance Definition _ := [SubLalgebra_isSubAlgebra of B S by <:].
-
-End Test2.
-
-Section Test3.
-
-Variables (F : fieldType) (S : divringClosed F).
-
-HB.instance Definition _ := [SubRing_isSubComNzRing of B S by <:].
-HB.instance Definition _ := [SubComUnitRing_isSubIntegralDomain of B S by <:].
-HB.instance Definition _ := [SubIntegralDomain_isSubField of B S by <:].
-
-End Test3.
-*)
-
-(* end hide *)
-
 (* Algebraic structure of bool *)
 
 Fact mulVb (b : bool) : b != 0 -> b * b = 1.
