@@ -158,13 +158,14 @@ Section intArchimedean.
 
 Implicit Types n : int.
 
-Lemma floorP n : if n \is real_num then n%:~R <= n < (n + 1)%:~R else n == 0.
+Fact floor_subproof n :
+  if n \is real_num then n%:~R <= n < (n + 1)%:~R else n == 0.
 Proof. by rewrite num_real !intz ltzD1 lexx. Qed.
 
-Lemma intrP n : reflect (exists m, n = m%:~R) true.
+Fact intrP n : reflect (exists m, n = m%:~R) true.
 Proof. by apply: ReflectT; exists n; rewrite intz. Qed.
 
-Lemma natrP n : reflect (exists m, n = m%:R) (0 <= n).
+Fact natrP n : reflect (exists m, n = m%:R) (0 <= n).
 Proof.
 apply: (iffP idP); last by case=> m ->; rewrite ler0n.
 by case: n => // n _; exists n; rewrite natz.
@@ -176,7 +177,7 @@ End intArchimedean.
 #[export]
 HB.instance Definition _ :=
   @NumDomain_hasFloorCeilTruncn.Build int id id _ xpredT nneg_num_pred
-    intArchimedean.floorP (fun=> esym (opprK _)) (fun=> erefl)
+    intArchimedean.floor_subproof (fun=> esym (opprK _)) (fun=> erefl)
     intArchimedean.intrP intArchimedean.natrP.
 
 Module Import Theory.
@@ -914,12 +915,12 @@ End Theory.
 (* Factories *)
 
 HB.factory Record NumDomain_hasTruncn R of Num.NumDomain R := {
-  trunc : R -> nat;
+  truncn : R -> nat;
   nat_num : pred R;
   int_num : pred R;
-  truncP : forall x,
-    if 0 <= x then (trunc x)%:R <= x < (trunc x).+1%:R else trunc x == 0;
-  natrE : forall x, nat_num x = ((trunc x)%:R == x);
+  truncn_subproof : forall x,
+    if 0 <= x then (truncn x)%:R <= x < (truncn x).+1%:R else truncn x == 0;
+  natrE : forall x, nat_num x = ((truncn x)%:R == x);
   intrE : forall x, int_num x = nat_num x || nat_num (- x);
 }.
 
@@ -933,64 +934,65 @@ End NumDomain_isArchimedean.
 
 HB.builders Context R of NumDomain_hasTruncn R.
 
-Fact trunc_itv x : 0 <= x -> (trunc x)%:R <= x < (trunc x).+1%:R.
-Proof. by move=> x_ge0; move: (truncP x); rewrite x_ge0. Qed.
+Fact truncn_itv x : 0 <= x -> (truncn x)%:R <= x < (truncn x).+1%:R.
+Proof. by move=> x_ge0; move: (truncn_subproof x); rewrite x_ge0. Qed.
 
 Definition floor (x : R) : int :=
-  if 0 <= x then Posz (trunc x)
-  else if x < 0 then - Posz (trunc (- x) + ~~ int_num x) else 0.
+  if 0 <= x then Posz (truncn x)
+  else if x < 0 then - Posz (truncn (- x) + ~~ int_num x) else 0.
 
-Fact floorP x :
+Fact floor_subproof x :
   if x \is real_num then (floor x)%:~R <= x < (floor x + 1)%:~R else floor x == 0.
 Proof.
 rewrite /floor intrE !natrE negb_or realE.
-case: (comparableP x 0) (@trunc_itv x) => //=;
+case: (comparableP x 0) (@truncn_itv x) => //=;
   try by rewrite -PoszD addn1 -pmulrn => _ ->.
-move=> x_lt0 _; move: (truncP x); rewrite lt_geF // => /eqP ->.
+move=> x_lt0 _; move: (truncn_subproof x); rewrite lt_geF // => /eqP ->.
 rewrite gt_eqF //=; move: x_lt0.
 rewrite [_ + 1]addrC -opprB !intrN lerNl ltrNr andbC -oppr_gt0.
 move: {x}(- x) => x x_gt0; rewrite PoszD -addrA -PoszD.
-have ->: Posz ((trunc x)%:R != x) - 1 = - Posz ((trunc x)%:R == x) by case: eqP.
-have := trunc_itv (ltW x_gt0); rewrite le_eqVlt.
+have ->: Posz ((truncn x)%:R != x) - 1 = - Posz ((truncn x)%:R == x).
+  by case: eqP.
+have := truncn_itv (ltW x_gt0); rewrite le_eqVlt.
 case: eqVneq => /=; last first.
   by rewrite subr0 addn1 -!pmulrn => _ /andP[-> /ltW ->].
 by rewrite intrB mulr1z addn0 -!pmulrn => -> _; rewrite gtrBl lexx andbT.
 Qed.
 
-Fact truncE x : trunc x = if floor x is Posz n then n else 0.
+Fact truncnE x : truncn x = if floor x is Posz n then n else 0.
 Proof.
 rewrite /floor.
-case: (comparableP x 0) (truncP x) => [+ /eqP ->| |_ /eqP ->|] //=.
+case: (comparableP x 0) (truncn_subproof x) => [+ /eqP ->| |_ /eqP ->|] //=.
 by case: (_ + _)%N.
 Qed.
 
-Fact trunc_def x n : n%:R <= x < n.+1%:R -> trunc x = n.
+Fact truncn_def x n : n%:R <= x < n.+1%:R -> truncn x = n.
 Proof.
 case/andP=> lemx ltxm1; apply/eqP; rewrite eqn_leq -ltnS -[(n <= _)%N]ltnS.
-have/trunc_itv/andP[lefx ltxf1]: 0 <= x by apply: le_trans lemx; apply: ler0n.
+have/truncn_itv/andP[lefx ltxf1]: 0 <= x by apply: le_trans lemx; apply: ler0n.
 by rewrite -!(ltr_nat R) 2?(@le_lt_trans _ _ x).
 Qed.
 
-Fact natrK : cancel (GRing.natmul 1) trunc.
-Proof. by move=> m; apply: trunc_def; rewrite ler_nat ltr_nat ltnS leqnn. Qed.
+Fact natrK : cancel (GRing.natmul 1) truncn.
+Proof. by move=> m; apply: truncn_def; rewrite ler_nat ltr_nat ltnS leqnn. Qed.
 
 Fact intrP x : reflect (exists n, x = n%:~R) (int_num x).
 Proof.
 rewrite intrE !natrE; apply: (iffP idP) => [|[n ->]]; last first.
   by case: n => n; rewrite ?NegzE ?opprK natrK eqxx // orbT.
 rewrite -eqr_oppLR !pmulrn -intrN.
-by move=> /orP[] /eqP<-; [exists (trunc x) | exists (- Posz (trunc (- x)))].
+by move=> /orP[] /eqP<-; [exists (truncn x) | exists (- Posz (truncn (- x)))].
 Qed.
 
 Fact natrP x : reflect (exists n, x = n%:R) (nat_num x).
 Proof.
 rewrite natrE.
-by apply: (iffP eqP) => [<-|[n ->]]; [exists (trunc x) | rewrite natrK].
+by apply: (iffP eqP) => [<-|[n ->]]; [exists (truncn x) | rewrite natrK].
 Qed.
 
 HB.instance Definition _ :=
-  @NumDomain_hasFloorCeilTruncn.Build R floor _ trunc int_num nat_num
-    floorP (fun=> erefl) truncE intrP natrP.
+  @NumDomain_hasFloorCeilTruncn.Build R floor _ truncn int_num nat_num
+    floor_subproof (fun=> erefl) truncnE intrP natrP.
 
 HB.end.
 
@@ -999,34 +1001,36 @@ HB.factory Record NumDomain_bounded_isArchimedean R of Num.NumDomain R := {
 }.
 
 HB.builders Context R of NumDomain_bounded_isArchimedean R.
-  Implicit Type x : R.
 
-  Definition bound x := sval (sigW (archi_bound_subproof x)).
+Implicit Type x : R.
 
-  Lemma boundP x : 0 <= x -> x < (bound x)%:R.
-  Proof. by move/ger0_norm=> {1}<-; rewrite /bound; case: (sigW _). Qed.
+Definition bound x := sval (sigW (archi_bound_subproof x)).
 
-  Fact truncn_subproof x : {m | 0 <= x -> m%:R <= x < m.+1%:R }.
-  Proof.
-  have [Rx | _] := boolP (0 <= x); last by exists 0%N.
-  have/ex_minnP[n lt_x_n1 min_n]: exists n, x < n.+1%:R.
-    by exists (bound x); rewrite (lt_trans (boundP Rx)) ?ltr_nat.
-  exists n => _; rewrite {}lt_x_n1 andbT; case: n min_n => //= n min_n.
-  rewrite real_leNgt ?rpred_nat ?ger0_real //; apply/negP => /min_n.
-  by rewrite ltnn.
-  Qed.
+Fact boundP x : 0 <= x -> x < (bound x)%:R.
+Proof. by move/ger0_norm=> {1}<-; rewrite /bound; case: (sigW _). Qed.
 
-  Definition truncn x := if 0 <= x then sval (truncn_subproof x) else 0%N.
+Fact truncn_sig x : {m | 0 <= x -> m%:R <= x < m.+1%:R}.
+Proof.
+have [Rx | _] := boolP (0 <= x); last by exists 0%N.
+have/ex_minnP[n lt_x_n1 min_n]: exists n, x < n.+1%:R.
+  by exists (bound x); rewrite (lt_trans (boundP Rx)) ?ltr_nat.
+exists n => _; rewrite {}lt_x_n1 andbT; case: n min_n => //= n min_n.
+rewrite real_leNgt ?rpred_nat ?ger0_real //; apply/negP => /min_n.
+by rewrite ltnn.
+Qed.
 
-  Lemma truncnP x :
-    if 0 <= x then (truncn x)%:R <= x < (truncn x).+1%:R else truncn x == 0%N.
-  Proof.
-  rewrite /truncn; case: truncn_subproof => // n hn.
-  by case: ifP => x_ge0; rewrite ?(ifT _ _ x_ge0) ?(ifF _ _ x_ge0) // hn.
-  Qed.
+Definition truncn x := if 0 <= x then sval (truncn_sig x) else 0%N.
 
-  HB.instance Definition _ := NumDomain_hasTruncn.Build R
-    truncnP (fun => erefl) (fun => erefl).
+Fact truncn_subproof x :
+  if 0 <= x then (truncn x)%:R <= x < (truncn x).+1%:R else truncn x == 0%N.
+Proof.
+rewrite /truncn; case: truncn_sig => // n hn.
+by case: ifP => x_ge0; rewrite ?(ifT _ _ x_ge0) ?(ifF _ _ x_ge0) // hn.
+Qed.
+
+HB.instance Definition _ := NumDomain_hasTruncn.Build R
+  truncn_subproof (fun => erefl) (fun => erefl).
+
 HB.end.
 
 Module Exports. HB.reexport. End Exports.
