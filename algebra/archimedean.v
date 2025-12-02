@@ -264,6 +264,10 @@ apply/idP/orP => [/intrP[[n|n] ->]|[]/intr_nat]; rewrite ?rpredN //.
 by rewrite NegzE intrN opprK; right; apply/natrP; exists n.+1.
 Qed.
 
+Lemma natr_int n : n%:R \is a int_num.
+Proof. by rewrite intrE natr_nat. Qed.
+#[local] Hint Resolve natr_int : core.
+
 Lemma intr_normK x : x \is a int_num -> `|x| ^+ 2 = x ^+ 2.
 Proof. by move/Rreal_int/real_normK. Qed.
 
@@ -364,10 +368,6 @@ Qed.
 
 Lemma intrKfloor : cancel intr floor.
 Proof. by move=> m; apply: floor_def; rewrite lexx rmorphD ltrDl ltr01. Qed.
-
-Lemma natr_int n : n%:R \is a int_num.
-Proof. by rewrite intrE natr_nat. Qed.
-#[local] Hint Resolve natr_int : core.
 
 Lemma intrEfloor x : (x \is a int_num) = ((floor x)%:~R == x).
 Proof.
