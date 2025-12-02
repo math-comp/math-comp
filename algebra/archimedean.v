@@ -136,15 +136,15 @@ Arguments truncn {R} : rename, simpl never.
 Arguments nat_num {R} : simpl never.
 Arguments int_num {R} : simpl never.
 
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn.")]
-Notation trunc := truncn.
+#[deprecated(since="mathcomp 2.4.0", use=truncn)]
+Notation trunc := truncn (only parsing).
 
 Module Def.
 Export ssrnum.Num.Def.
 
 Notation truncn := truncn.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn.")]
-Notation trunc := truncn.
+#[deprecated(since="mathcomp 2.4.0", use=truncn)]
+Notation trunc := truncn (only parsing).
 Notation floor := floor.
 Notation ceil  := ceil.
 Notation nat_num := nat_num.
@@ -709,50 +709,50 @@ Proof. by move=> _ /intrP[m ->]; apply: rmorph_int. Qed.
 
 End ArchiNumDomainTheory.
 
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn_itv.")]
-Notation trunc_itv := truncn_itv.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn_def.")]
-Notation trunc_def := truncn_def.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncnK.")]
-Notation truncK := truncnK.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn0.")]
-Notation trunc0 := truncn0.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn1.")]
-Notation trunc1 := truncn1.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncnD.")]
-Notation truncD := truncnD.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncnM.")]
-Notation truncM := truncnM.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncnX.")]
-Notation truncX := truncnX.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn_gt0.")]
-Notation trunc_gt0 := truncn_gt0.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn0Pn.")]
-Notation trunc0Pn := truncn0Pn.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to sum_truncnK.")]
-Notation sum_truncK := sum_truncnK.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to prod_truncnK.")]
-Notation prod_truncK := prod_truncnK.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to truncn_floor.")]
-Notation trunc_floor := truncn_floor.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to real_floor_le.")]
-Notation real_ge_floor := real_floor_le.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to real_floorD1_gt.")]
-Notation real_lt_succ_floor := real_floorD1_gt.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to real_ceilB1_lt.")]
-Notation real_gt_pred_ceil := real_floorD1_gt.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to real_ceil_ge.")]
-Notation real_le_ceil := real_ceil_ge.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to le_ceil.")]
-Notation ceil_le := le_ceil.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to natrEtruncn.")]
-Notation natrE := natrEtruncn.
+#[deprecated(since="mathcomp 2.4.0", use=truncn_itv)]
+Notation trunc_itv := truncn_itv (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=truncn_def)]
+Notation trunc_def := truncn_def (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=truncnK)]
+Notation truncK := truncnK (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=truncn0)]
+Notation trunc0 := truncn0 (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=truncn1)]
+Notation trunc1 := truncn1 (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=truncnD)]
+Notation truncD := truncnD (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=truncnM)]
+Notation truncM := truncnM (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=truncnX)]
+Notation truncX := truncnX (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=truncn_gt0)]
+Notation trunc_gt0 := truncn_gt0 (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=truncn0Pn)]
+Notation trunc0Pn := truncn0Pn (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=sum_truncnK)]
+Notation sum_truncK := sum_truncnK (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=prod_truncnK)]
+Notation prod_truncK := prod_truncnK (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=truncn_floor)]
+Notation trunc_floor := truncn_floor (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=real_floor_le)]
+Notation real_ge_floor := real_floor_le (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=real_floorD1_gt)]
+Notation real_lt_succ_floor := real_floorD1_gt (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=real_ceilB1_lt)]
+Notation real_gt_pred_ceil := real_floorD1_gt (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=real_ceil_ge)]
+Notation real_le_ceil := real_ceil_ge (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=le_ceil)]
+Notation ceil_le := le_ceil (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=natrEtruncn)]
+Notation natrE := natrEtruncn (only parsing).
 
-#[deprecated(since="mathcomp 2.5.0", note="Renamed to le_ceil.")]
-Notation le_ceil_tmp := le_ceil.
-#[deprecated(since="mathcomp 2.5.0", note="Renamed to real_floor_ge_int.")]
+#[deprecated(since="mathcomp 2.5.0", use=le_ceil)]
+Notation le_ceil_tmp := le_ceil (only parsing).
+#[deprecated(since="mathcomp 2.5.0", use=real_floor_ge_int)]
 Notation real_floor_ge_int_tmp := real_floor_ge_int (only parsing).
-#[deprecated(since="mathcomp 2.5.0", note="Renamed to real_ceil_le_int.")]
+#[deprecated(since="mathcomp 2.5.0", use=real_ceil_le_int)]
 Notation real_ceil_le_int_tmp := real_ceil_le_int (only parsing).
 
 Arguments natrK {R} _%_N.
@@ -858,19 +858,19 @@ Proof. exact: real_ceil_floor. Qed.
 
 End ArchiRealDomainTheory.
 
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to floor_le.")]
-Notation ge_floor := floor_le.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to floorD1_gt.")]
-Notation lt_succ_floor := floorD1_gt.
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to ceilB1_lt.")]
-Notation gt_pred_ceil := ceilB1_lt.
+#[deprecated(since="mathcomp 2.4.0", use=floor_le)]
+Notation ge_floor := floor_le (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=floorD1_gt)]
+Notation lt_succ_floor := floorD1_gt (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=ceilB1_lt)]
+Notation gt_pred_ceil := ceilB1_lt (only parsing).
 
-#[deprecated(since="mathcomp 2.5.0", note="Renamed to floor_le.")]
-Notation floor_le_tmp := floor_le.
-#[deprecated(since="mathcomp 2.5.0", note="Renamed to floor_ge_int.")]
-Notation floor_ge_int_tmp := floor_ge_int.
-#[deprecated(since="mathcomp 2.5.0", note="Renamed to ceil_le_int.")]
-Notation ceil_le_int_tmp := ceil_le_int.
+#[deprecated(since="mathcomp 2.5.0", use=floor_le)]
+Notation floor_le_tmp := floor_le (only parsing).
+#[deprecated(since="mathcomp 2.5.0", use=floor_ge_int)]
+Notation floor_ge_int_tmp := floor_ge_int (only parsing).
+#[deprecated(since="mathcomp 2.5.0", use=ceil_le_int)]
+Notation ceil_le_int_tmp := ceil_le_int (only parsing).
 
 Section ArchiNumFieldTheory.
 
@@ -1036,32 +1036,32 @@ Notation nat := nat_num.
 Notation int := int_num.
 
 #[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealDomain)]
-Notation ArchiDomain T := (ArchiRealDomain T).
+Notation ArchiDomain T := (ArchiRealDomain T) (only parsing).
 Module ArchiDomain.
 #[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealDomain.type)]
-Notation type := ArchiRealDomain.type.
+Notation type := ArchiRealDomain.type (only parsing).
 #[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealDomain.copy)]
-Notation copy T C := (ArchiRealDomain.copy T C).
+Notation copy T C := (ArchiRealDomain.copy T C) (only parsing).
 #[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealDomain.on)]
-Notation on T := (ArchiRealDomain.on T).
+Notation on T := (ArchiRealDomain.on T) (only parsing).
 End ArchiDomain.
 #[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealField)]
-Notation ArchiField T := (ArchiRealField T).
+Notation ArchiField T := (ArchiRealField T) (only parsing).
 Module ArchiField.
 #[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealField.type)]
-Notation type := ArchiRealField.type.
+Notation type := ArchiRealField.type (only parsing).
 #[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealField.copy)]
-Notation copy T C := (ArchiRealField.copy T C).
+Notation copy T C := (ArchiRealField.copy T C) (only parsing).
 #[deprecated(since="mathcomp 2.3.0", use=Num.ArchiRealField.on)]
-Notation on T := (ArchiRealField.on T).
+Notation on T := (ArchiRealField.on T) (only parsing).
 End ArchiField.
 
 #[deprecated(since="mathcomp 2.3.0", use=real_floorDzr)]
-Notation floorD := real_floorDzr.
+Notation floorD := real_floorDzr (only parsing).
 #[deprecated(since="mathcomp 2.3.0", use=real_ceilDzr)]
-Notation ceilD := real_ceilDzr.
+Notation ceilD := real_ceilDzr (only parsing).
 #[deprecated(since="mathcomp 2.3.0", use=real_ceilDzr)]
-Notation real_ceilD := real_ceilDzr.
+Notation real_ceilD := real_ceilDzr (only parsing).
 
 End Num.
 
