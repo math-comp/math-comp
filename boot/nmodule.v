@@ -198,7 +198,7 @@ End ClosedPredicates.
 End BaseAddMagmaTheory.
 
 
-#[wrapper]
+#[wrapper, primitive]
 HB.mixin Record SemiGroupisCommutativeLaw__on__BaseAddMagma_add
   V of BaseAddMagma V := {
   private : SemiGroup.isCommutativeLaw V add
@@ -249,7 +249,7 @@ Proof. exact/addrC. Qed.
 End AddMagmaTheory.
 
 (*TODO: use autowrapper*)
-#[wrapper]
+#[wrapper, primitive]
 HB.mixin Record SemiGroupisLaw__on__BaseAddMagma_add V of BaseAddMagma V := {
   private : SemiGroup.isLaw V add
 }.
@@ -377,7 +377,7 @@ End BaseAddUMagmaTheory.
 
 (*TODO: consider only requiring the left unital property here
 (or is it ok to put it in the next factory?)*)
-#[wrapper]
+#[wrapper, primitive]
 HB.mixin Record MonoidisMonoidLaw__on__BaseAddUMagma_addZero
   V of BaseAddUMagma V := {
   private : Monoid.isMonoidLaw V zero add

@@ -640,17 +640,16 @@ Optimize Heap.
 
 (* Set Printing All. *)
 
-(*BUG*)
-(* HB.instance Definition _ := GRing.Zmodule_isLmodule.Build _ L_F
-  fieldOver_scaleA fieldOver_scale1 fieldOver_scaleDr fieldOver_scaleDl. *)
-(*WORKAROUND*)
-Lemma fieldOver_mulr0r (v : fieldOver F) :  0 *F: v = 0.
+HB.instance Definition _ := GRing.Zmodule_isLmodule.Build _ L_F
+  fieldOver_scaleA fieldOver_scale1 fieldOver_scaleDr fieldOver_scaleDl.
+(*WORKAROUND - if making wrapper primitive is undesiderable*)
+(* Lemma fieldOver_mulr0r (v : fieldOver F) :  0 *F: v = 0.
 Proof.
   by apply: (addIr (1 *F: v)); rewrite -fieldOver_scaleDl !add0r.
 Qed.
 
 HB.instance Definition _ := @GRing.Nmodule_isLSemiModule.Build _ L_F 
-fieldOver_scale fieldOver_scaleA fieldOver_mulr0r fieldOver_scale1 fieldOver_scaleDr fieldOver_scaleDl.
+fieldOver_scale fieldOver_scaleA fieldOver_mulr0r fieldOver_scale1 fieldOver_scaleDr fieldOver_scaleDl. *)
 (*\WORKAROUND*)
 
 Lemma fieldOver_scaleE a (u : L) : a *: (u : L_F) = vsval a * u.
@@ -661,16 +660,15 @@ Proof. exact: mulrA. Qed.
 
 Optimize Heap.
 
-(*BUG*)
-(* HB.instance Definition _ :=
-  GRing.LSemiModule_isComSemiAlgebra.Build _ L_F fieldOver_scaleAl. *)
-(*WORKAROUND*)
+HB.instance Definition _ :=
+  GRing.LSemiModule_isComSemiAlgebra.Build _ L_F fieldOver_scaleAl.
+(*WORKAROUND - if making wrapper primitive is undesiderable*)
 
-HB.instance Definition _ := GRing.LSemiModule_isLSemiAlgebra.Build _ L_F fieldOver_scaleAl.
+(* HB.instance Definition _ := GRing.LSemiModule_isLSemiAlgebra.Build _ L_F fieldOver_scaleAl.
 Lemma fieldOver_scalarAr (k : subvs_of F) x y : k *F: (x * y) = x * (k *F: y).
 Proof. by rewrite mulrC fieldOver_scaleAl mulrC. Qed.
 
-HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build _ L_F fieldOver_scalarAr.
+HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build _ L_F fieldOver_scalarAr. *)
 
 (*\WORKAROUND*)
 

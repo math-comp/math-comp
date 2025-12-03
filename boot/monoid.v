@@ -203,7 +203,7 @@ Prenex Implicits commute.
 HB.structure Definition Semigroup
   := {G of ChoiceMagma G
         &  SemiGroup.isLaw _ (@mul G)}. *)
-#[wrapper]
+#[wrapper, primitive]
 HB.mixin Record SemiGroupisLaw__on__Magma_mul G ( _ : Magma G) := {
   private : SemiGroup.isLaw G mul
 }.
@@ -299,7 +299,7 @@ End ClosedPredicates.
 
 End baseUMagmaTheory.
 
-#[wrapper] 
+#[wrapper, primitive]
 HB.mixin Record isMonoidLaw__on__BaseUMagma_MulOne G of BaseUMagma G := {
   private: Monoid.isMonoidLaw G (@one G) (@mul G) 
 }.

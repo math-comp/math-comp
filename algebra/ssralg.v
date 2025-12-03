@@ -919,7 +919,7 @@ HB#wrapping tests/MinimalWrapBugs/structVS2mixin.v*)
 HB.structure Definition BaseZMagma :=
   {V of ZPointed V & Magma V}.
 
-#[wrapper]
+#[wrapper, primitive]
 HB.mixin Record MonoidisMulLaw__on__BaseZMagma_zeroMul
   V of BaseZMagma V := {
   private : Monoid.isMulLaw V zero mul
@@ -948,7 +948,7 @@ HB#wrapping tests/MinimalWrapBugs/structVS2mixin.v. Moreover doing this directly
 HB.structure Definition BasePzSemiRing :=
   {R of Nmodule R & Monoid R}.
 
-#[wrapper]
+#[wrapper, primitive]
 HB.mixin Record MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd
   V of BasePzSemiRing V := {
   private : Monoid.isAddLaw V mul add
@@ -970,8 +970,8 @@ HB.factory Record NmoduleMonoid_isPzSemiRing R of Nmodule R & Monoid R := {
 HB.builders Context R of NmoduleMonoid_isPzSemiRing R.
 
 (*BUG: this fail if the structure BaseZMagma is not defined*)
-HB.instance Definition _ := Monoid.isMulLaw.Build R zero mul mul0r mulr0.
-HB.instance Definition _ := Monoid.isAddLaw.Build R mul (@add R) mulrDl mulrDr.
+HB.instance Definition _ := Monoid.isMulLaw.Build R (@zero R) (@mul R) mul0r mulr0.
+HB.instance Definition _ := Monoid.isAddLaw.Build R (@mul R) (@add R) mulrDl mulrDr.
 
 HB.end.
 
@@ -3038,7 +3038,7 @@ Proof. by rewrite linearZ /= rmorph1. Qed.
 
 End LRMorphismTheory.
 
-#[export, wrapper]
+#[export, wrapper, primitive]
 HB.mixin Record SemiGroupIsCommutativeLaw__on__PzSemiRing_mul
   R of PzSemiRing R := {
   private : SemiGroup.isCommutativeLaw R (@mul R)
@@ -3497,20 +3497,10 @@ HB.instance Definition _ (R : comPzSemiRingType) :=
   SemiRing_hasCommutativeMul.Build R^c (fun _ _ => mulrC _ _).
 #[export]
 HB.instance Definition _ (R : comPzSemiRingType) := ComPzSemiRing.on R^o.
-(*Unknown BUG*)
-(* #[export] 
+(*BUG*) (*Workaround was to make primitive all the wrapper mixins*)
+#[export] 
 HB.instance Definition _ (R : comPzSemiRingType) :=
-  LSemiAlgebra_isComSemiAlgebra.Build R R^o. *)
-(*WORKAROUND*)
-Section workaround.
-Variable (R : comPzSemiRingType).
-Local Lemma scalarAr_regular k (x y : R^o) : k *: (x * y) = x * (k *: y).
-Proof. by rewrite mulrC scalerAl mulrC. Qed.
-  #[export]
-  HB.instance Definition _ := LSemiAlgebra_isSemiAlgebra.Build R R^o scalarAr_regular.
-(* Check R^o : PzSemiAlgebra.type _ . *)
-End workaround.
-(*\WORKAROUND*)
+  LSemiAlgebra_isComSemiAlgebra.Build (GRing_ComPzSemiRing__to__GRing_PzSemiRing R) R^o.
 
 End SemiAlgebraTheory.
 
@@ -7828,20 +7818,15 @@ Fact pair_mulr0 : right_zero 0 mul_pair.
 Proof. by move=> x; congr (_, _); apply: mulr0. Qed.
 
 (*BUG*)
-(* 
-#[export]
+(* #[export]
 HB.instance Definition _ := Nmodule_isPzSemiRing.Build (R1 * R2)%type
   pair_mulA pair_mul1l pair_mul1r pair_mulDl pair_mulDr pair_mul0r pair_mulr0.
-*)
-
+Fail Check (R1 * R2)%type : PzSemiRing.type. *)
 (*WORKAROUND*)
 #[export]
 HB.instance Definition _ := NmoduleMonoid_isPzSemiRing.Build (R1 * R2)%type
   pair_mulDl pair_mulDr pair_mul0r pair_mulr0.
 (*\WORKAROUND*)
-
-(*BUG*)
-(* Fail Check (R1 * R2)%type : BasePzSemiRing.type. *)
 
 Fact fst_is_monoid_morphism : monoid_morphism (fst : (R1 * R2)%type -> R1).
 (*BUG(?): the type of fst should be inferred autoamtically?*)

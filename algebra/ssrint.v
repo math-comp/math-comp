@@ -572,18 +572,17 @@ Qed.
 
 HB.instance Definition _ := GRing.Zmodule.on M^z.  (* FIXME, the error message below "nomsg" when we forget this line is not very helpful *)
 
-(*BUG*)
-(* HB.instance Definition _ := @GRing.Zmodule_isLmodule.Build _ M^z
-  (fun n x => x *~ n) mulrzA_C mulr1z mulrzDl mulrzDr. *)
+HB.instance Definition _ := @GRing.Zmodule_isLmodule.Build _ M^z
+  (fun n x => x *~ n) mulrzA_C mulr1z mulrzDl mulrzDr.
 
-(*WORKAROUND*)
-Lemma mulr0r (x:M) :  x *~ 0 = (0:M).
+(*WORKAROUND - if making wrapper primitive is undesiderable*)
+(* Lemma mulr0r (x:M) :  x *~ 0 = (0:M).
 Proof.
   by apply: (addIr (x *~ 1)); rewrite -mulrzDr !add0r.
 Qed.
 
 HB.instance Definition _ := @GRing.Nmodule_isLSemiModule.Build _ M^z
-(fun n x => x *~ n) mulrzA_C mulr0r mulr1z mulrzDl mulrzDr.
+(fun n x => x *~ n) mulrzA_C mulr0r mulr1z mulrzDl mulrzDr. *)
 (*\WORKAROUND*)
 
 Lemma scalezrE n x : n *: (x : M^z) = x *~ n. Proof. by []. Qed.
