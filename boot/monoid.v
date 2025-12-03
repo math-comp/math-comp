@@ -223,6 +223,9 @@ Section SemigroupTheory.
 Variable G : semigroupType.
 Implicit Types x y : G.
 
+#[export]
+HB.instance Definition _ := SemiGroup.isLaw.Build G *%g mulgA.
+
 Lemma commuteM x y z : commute x y -> commute x z -> commute x (y * z).
 Proof. by move=> cxy cxz; rewrite /commute -mulgA -cxz !mulgA cxy. Qed.
 
@@ -361,7 +364,8 @@ HB.instance Definition _ := Magma_isUMagma.Build G mul1g mulg1.
 HB.end.
 
 #[export]
-HB.instance Definition _ (G : monoidType) := Monoid.isLaw.Build G 1 *%g mulgA mul1g mulg1.
+HB.instance Definition _ (G : monoidType) :=
+  Monoid.isMonoidLaw.Build G 1 *%g mul1g mulg1.
 
 Bind Scope group_scope with Monoid.sort.
 
