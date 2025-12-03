@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop finset tuple div ssralg.
+From mathcomp Require Import fintype bigop finset tuple div monoid ssralg.
 From mathcomp Require Import countalg binomial.
 
 (******************************************************************************)
@@ -2751,7 +2751,7 @@ Proof. by rewrite !rootE horner_comp. Qed.
 Lemma deriv_comp p q : (p \Po q) ^`() = (p ^`() \Po q) * q^`().
 Proof.
 elim/poly_ind: p => [|p c IHp]; first by rewrite !(deriv0, comp_poly0) mul0r.
-rewrite comp_poly_MXaddC derivD derivC derivM IHp derivMXaddC comp_polyD.
+rewrite comp_poly_MXaddC [in LHS]derivD [in LHS]derivC derivM IHp derivMXaddC comp_polyD.
 by rewrite comp_polyM comp_polyX addr0 addrC mulrAC -mulrDl.
 Qed.
 
@@ -2816,7 +2816,7 @@ Qed.
 Lemma coef0_prod_XsubC (ps : seq R) :
   (\prod_(p <- ps) ('X - p%:P))`_0 = (-1) ^+ (size ps) * \prod_(p <- ps) p.
 Proof.
-rewrite coef_prod_XsubC// subn0; congr GRing.mul.
+rewrite coef_prod_XsubC// subn0; congr mul.
 transitivity (\sum_(I in [set setT : {set 'I_(size ps)}]) \prod_(i in I) ps`_i).
   apply: congr_big =>// i/=.
   apply/idP/set1P => [/eqP cardE | ->]; last by rewrite cardsT card_ord.
@@ -2942,7 +2942,7 @@ Lemma size_prod_seq (I : eqType) (s : seq I) (F : I -> {poly R}) :
     (forall i, i \in s -> F i != 0) ->
   size (\prod_(i <- s) F i) = ((\sum_(i <- s) size (F i)).+1 - size s)%N.
 Proof.
-move=> nzF; rewrite big_tnth size_prod; last by move=> i; rewrite nzF ?mem_tnth.
+move=> nzF; rewrite [in LHS]big_tnth size_prod; last by move=> i; rewrite nzF ?mem_tnth.
 by rewrite cardT /= size_enum_ord [in RHS]big_tnth.
 Qed.
 

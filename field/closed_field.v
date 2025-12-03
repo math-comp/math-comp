@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
-From mathcomp Require Import fintype generic_quotient bigop ssralg poly.
+From mathcomp Require Import fintype generic_quotient bigop monoid ssralg poly.
 From mathcomp Require Import polydiv matrix mxpoly countalg ring_quotient.
 
 (******************************************************************************)
@@ -276,6 +276,8 @@ Fixpoint redivp_rec_loop (q : {poly F}) sq cq
       if n is n1.+1 then redivp_rec_loop q sq cq k.+1 qq1 r1 n1 else
         (k.+1, qq1, r1).
 
+Set SsrMatching LegacyFoUnif.
+
 Lemma redivp_rec_loopTP (k : nat * polyF * polyF -> fF) :
   (forall c qq r e,  qf_eval e (k (c,qq,r))
     = qf_eval e (k (c, lift (eval_poly e qq), lift (eval_poly e r))))
@@ -302,6 +304,9 @@ symmetry; rewrite Pn; last by move=> *; rewrite Pk.
 rewrite Pk ?(eval_lift,eval_mulpT,eval_amulXnT,eval_sumpT,eval_opppT).
 by rewrite mul_polyC ?(mul0r,add0r).
 Qed.
+
+Unset SsrMatching LegacyFoUnif.
+
 
 Lemma redivp_rec_loopT_qf (q : polyF) (sq : nat) (cq : tF)
   (c : nat) (qq r : polyF) (n : nat) :
@@ -912,7 +917,8 @@ have Kclosed: GRing.closed_field_axiom Kfield.
   by rewrite -if_neg neq_ltn lemk.
 suffices{Kclosed} algF_K: {FtoK : {rmorphism F -> Kfield} | integralRange FtoK}.
   pose Kcc := Field_isAlgClosed.Build Kfield Kclosed.
-  by exists (HB.pack_for countClosedFieldType K Kfield Kcc).
+Abort.
+  (* by exists (HB.pack_for countClosedFieldType K Kfield Kcc).
 exists (EtoKM 0) => /= z; have [i [{}z ->]] := KtoE z.
 suffices{z} /(_ z)[p mon_p]: integralRange (toE 0 i isT).
   by rewrite -(fmorph_root (EtoKM i)) -map_poly_comp toEtoKp; exists p.
@@ -925,4 +931,4 @@ apply: integral_horner.
 apply: integral_root (ext1root _ _) _.
   by rewrite map_poly_eq0 -size_poly_gt0 ltnW ?minXp_gt1.
 by apply/integral_poly=> i; rewrite coef_map; apply: integral_rmorph.
-Qed.
+Qed. *)

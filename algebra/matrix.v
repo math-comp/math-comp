@@ -3026,6 +3026,9 @@ Proof. by apply/eqP=> /matrixP/(_ 0 0)/eqP; rewrite !mxE oner_eq0. Qed.
 HB.instance Definition _ :=
   GRing.PzSemiRing_isNonZero.Build 'M[R]_n matrix_nonzero1.
 
+HB.instance Definition _ :=
+  GRing.LSemiModule_isLSemiAlgebra.Build R 'M[R]_n (@scalemxAl R n n n).
+
 End MatrixNzSemiRing.
 
 HB.instance Definition _ (R : nzRingType) n := GRing.NzSemiRing.on 'M[R]_n.+1.

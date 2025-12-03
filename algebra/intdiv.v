@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple prime order.
-From mathcomp Require Import ssralg poly ssrnum ssrint matrix.
+From mathcomp Require Import monoid ssralg poly ssrnum ssrint matrix.
 From mathcomp Require Import polydiv perm zmodp bigop.
 
 (******************************************************************************)
