@@ -781,18 +781,17 @@ Let is_int x := denq x == 1.
 
 Let is_nat x := (0 <= x) && (denq x == 1).
 
-Fact floorP x :
-  if x \is Num.real then (floor x)%:~R <= x < (floor x + 1)%:~R
-  else floor x == 0.
+Fact floorP x : (floor x)%:~R <= Num.to_real x < (floor x + 1)%:~R.
 Proof.
-rewrite num_real /floor; case: (ratP x) => n d _ {x}; rewrite ler_pdivlMr//.
+rewrite to_realT ?num_real// /floor.
+case: (ratP x) => n d _ {x}; rewrite ler_pdivlMr//.
 by rewrite ltr_pdivrMr// -!intrM ler_int ltr_int lez_floor ?ltz_ceil.
 Qed.
 
 Fact ceilP x : ceil x = - floor (- x).
 Proof. by rewrite /ceil /floor numqN denqN. Qed.
 
-Fact truncnP x : truncn x = if floor x is Posz n then n else 0.
+Fact truncnP x : truncn x = if 0 <= x then `|floor x|%N else 0%N.
 Proof.
 rewrite /truncn /floor; case: (ratP x) => n d _ {x} /=.
 by rewrite !ler_pdivlMr// mul0r; case: n => n; rewrite ler0z//= mul1n.
@@ -815,7 +814,7 @@ End ratArchimedean.
 End ratArchimedean.
 
 HB.instance Definition _ :=
-  Num.NumDomain_hasFloorCeilTruncn.Build rat
+  Num.NumDomain_hasFloorCeilTruncn_truncn_abs_floor.Build rat
     ratArchimedean.floorP ratArchimedean.ceilP ratArchimedean.truncnP
     ratArchimedean.intrP ratArchimedean.natrP.
 
