@@ -20,10 +20,10 @@ algebra/polyXY.v
 algebra/qpoly.v
 algebra/rat.v
 algebra/ring_quotient.v
-algebra/alg_theory/algebra.v
-algebra/alg_theory/divalg.v
-algebra/alg_theory/decfield.v
-algebra/alg_theory/ssralg.v
+algebra/alg/algebra.v
+algebra/alg/divalg.v
+algebra/alg/decfield.v
+algebra/alg/ssralg.v
 algebra/ssrint.v
 algebra/vector.v
 algebra/zmodp.v
