@@ -1165,7 +1165,7 @@ HB.instance Definition _ := isSemigroup.Build H mulgA.
 HB.end.
 
 HB.mixin Record isSubBaseUMagma (G : baseUMagmaType) (S : pred G) H
-    of SubMagma G S H & BaseUMagma H := {
+    of SubType G S H & BaseUMagma H := {
   val1_subproof : (val : H -> G) 1 = 1
 }.
 

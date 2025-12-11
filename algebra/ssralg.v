@@ -950,7 +950,7 @@ HB.structure Definition BasePzSemiRing :=
 
 #[wrapper, primitive]
 HB.mixin Record MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd
-  V of BasePzSemiRing V := {
+  V of Magma V & AddMagma V := {
   private : Monoid.isAddLaw V mul add
 }.
 
@@ -1042,7 +1042,7 @@ Bind Scope ring_scope with PzSemiRing.sort.
 End PzSemiRingExports.
 HB.export PzSemiRingExports.
 
-HB.mixin Record PzSemiRing_isNonZero R of PzSemiRing R := {
+HB.mixin Record PzSemiRing_isNonZero R of Equality R & ZPointed R & BaseUMagma R := {
   oner_neq0 : @one R != 0
 }.
 
@@ -3040,7 +3040,7 @@ End LRMorphismTheory.
 
 #[export, wrapper, primitive]
 HB.mixin Record SemiGroupIsCommutativeLaw__on__PzSemiRing_mul
-  R of PzSemiRing R := {
+  R of Magma R := {
   private : SemiGroup.isCommutativeLaw R (@mul R)
 }.
 
