@@ -186,8 +186,8 @@ Qed.
 #[local]
 HB.instance Definition _ := Finite_isGroup.Build 'I_p (@GRing.addrA _) (@GRing.add0r _) (@GRing.addNr _).
 
-Definition ordGroup := 'I_p.
-HB.instance Definition _ := FinGroup.copy ordGroup 'I_p.
+Definition ordGroup q:= 'I_q.
+HB.instance Definition _ := FinGroup.copy (ordGroup p) 'I_p.
 
 Local Open Scope group_scope.
 
@@ -315,7 +315,8 @@ Section Groups.
 
 Variable p : nat.
 
-Definition Zp : {set ordGroup _} := if p > 1 then [set: 'Z_p] else (1%g :> {set ordGroup _}).
+Definition Zp : {set ordGroup (Zp_trunc p).+2} := if p > 1 then [set: ordGroup (Zp_trunc p).+2] else (1%g :> {set ordGroup _}).
+
 Definition units_Zp := [set: {unit 'Z_p}].
 
 Lemma Zp_cast : p > 1 -> (Zp_trunc p).+2 = p.

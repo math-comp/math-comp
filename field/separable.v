@@ -766,7 +766,7 @@ have [-> | /cyclic_or_large[|[a Dxa]]] := eqVneq x 0; first 2 [by left].
   by rewrite addv0 subfield_closed; right; exists y.
 have [-> | /cyclic_or_large[|[b Dyb]]] := eqVneq y 0; first 2 [by left].
   by rewrite addv0 subfield_closed; right; exists x.
-pose h0 (ij : 'I_a.+1 * 'I_b.+1) := x ^+ ij.1 * y ^+ ij.2.
+pose h0 (ij : ordGroup a.+1 * ordGroup b.+1) := x ^+ ij.1 * y ^+ ij.2.
 pose H := <<[set ij | h0 ij == 1%R]>>%G; pose h (u : coset_of H) := h0 (repr u).
 have h0M: {morph h0: ij1 ij2 / (ij1 * ij2)%g >-> ij1 * ij2}.
   by rewrite /h0 => [] [i1 j1] [i2 j2] /=; rewrite mulrACA -!exprD !expr_mod.
