@@ -670,7 +670,7 @@ Module Order.
 #[projections(primitive)] Record disp_t := Disp {d1 : unit; d2 : unit}.
 
 #[key="T", primitive]
-HB.mixin Record isDuallyPreorder (d : disp_t) T of Equality T := {
+HB.mixin Record isDuallyPreorder (d : disp_t) T := {
   le       : rel T;
   lt       : rel T;
   lt_def   : forall x y, lt x y = (le x y) && ~~ (le y x);
@@ -680,6 +680,9 @@ HB.mixin Record isDuallyPreorder (d : disp_t) T of Equality T := {
   le_trans : transitive    le;
   ge_trans : transitive    (fun x y => le y x);
 }.
+
+HB.structure Definition BasePreorder (d : disp_t) :=
+  { T of isDuallyPreorder d T }.
 
 #[short(type="preorderType")]
 HB.structure Definition Preorder (d : disp_t) :=
@@ -1020,6 +1023,19 @@ HB.export DualPreorder.
 (**********)
 
 Module Import PreorderTheory.
+
+Section BasePreorderTheory.
+Context {disp : disp_t} {T : BasePreorder.type disp}.
+
+Lemma lexx_base (x : T) : x <= x.
+Proof. exact: le_refl. Qed.
+Hint Resolve lexx_base : core.
+  
+Definition le_refl_base : reflexive le := lexx_base.
+Hint Resolve le_refl_base : core.
+
+End BasePreorderTheory.
+
 Section PreorderTheory.
 
 Context {disp : disp_t} {T : preorderType disp}.
@@ -1785,6 +1801,7 @@ End PreorderMonotonyTheory.
 End PreorderTheory.
 
 #[global] Hint Resolve lexx le_refl ltxx lt_irreflexive ltW lt_eqF : core.
+#[global] Hint Resolve lexx_base le_refl_base : core.
 
 Arguments leif_refl {disp T x C}.
 

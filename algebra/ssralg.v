@@ -941,24 +941,30 @@ HB.structure Definition ZMagma :=
   {V of BaseZMagma V & MonoidisMulLaw__on__BaseZMagma_zeroMul V}.
 *)
 
-(* WORKAROUND: defining this structure is necessary to avoid the bug exposed in
+(* WORKAROUND: defining "NmoduleMonoid" is necessary to avoid the bug exposed in
 HB#wrapping tests/MinimalWrapBugs/structVS2mixin.v. Moreover doing this directly at the Nmodule&Monoid level avoid a bug (possibly the same?) while defining substructure *)
 
-#[short(type="BasePzSemiRingType")]
-HB.structure Definition BasePzSemiRing :=
+#[short(type="BaseSemiRingType")]
+HB.structure Definition BaseSemiRing :=
+  {R of BaseAddUMagma R & BaseUMagma R}.
+
+#[short(type="NmoduleMonoidType")]
+HB.structure Definition NmoduleMonoid :=
   {R of Nmodule R & Monoid R}.
 
 #[wrapper, primitive]
 HB.mixin Record MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd
-  V of Magma V & AddMagma V := {
+  V of BaseAddUMagma V & BaseUMagma V := {
   private : Monoid.isAddLaw V mul add
 }.
 
 #[export, short(type="pzSemiRingType")]
 HB.structure Definition PzSemiRing :=
-  { R of BasePzSemiRing R
-       & MonoidisMulLaw__on__BaseZMagma_zeroMul R
-       & MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd R}.
+  { R of BaseSemiRing R
+      & Nmodule R
+      & Monoid R
+      & MonoidisMulLaw__on__BaseZMagma_zeroMul R
+      & MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd R}.
 
 HB.factory Record NmoduleMonoid_isPzSemiRing R of Nmodule R & Monoid R := {
   mulrDl : left_distributive (@mul R) (@add R);
@@ -1505,6 +1511,8 @@ End Char2.
 
 End NzSemiRingTheory.
 
+HB.structure Definition BaseRing := { R of BaseSemiRing R & BaseZmodule R }.
+
 #[short(type="pzRingType")]
 HB.structure Definition PzRing := { R of PzSemiRing R & Zmodule R }.
 
@@ -2000,7 +2008,7 @@ Lemma rregN x : rreg x -> rreg (- x). Proof. exact: (@lregN R^c). Qed.
 
 End RightRegular.
 
-HB.mixin Record Nmodule_isLSemiModule (R : pzSemiRingType) V of Nmodule V := {
+HB.mixin Record Nmodule_isLSemiModule (R : pzSemiRingType) V of BaseAddUMagma V := {
   scale : R -> V -> V;
   scalerA : forall a b v, scale a (scale b v) = scale (a * b) v;
   scale0r : forall v, scale 0 v = 0;
@@ -3596,8 +3604,8 @@ HB.instance Definition _ := isScalable.Build R U A *:%R (a \*o f)
 
 End AlgebraTheory.
 
-(*TOTHINK: can we use wrapper here?*)
-HB.mixin Record NzRing_hasMulInverse R of NzRing R := {
+(*TOTHINK: split this in data an properties?*)
+HB.mixin Record NzRing_hasMulInverse R of BaseUMagma R := {
   unit_subdef : pred R;
   inv : R -> R;
   mulVr_subproof : {in unit_subdef, left_inverse 1 inv *%R};
@@ -3613,6 +3621,8 @@ End Ring_hasMulInverse.
 
 #[deprecated(since="mathcomp 2.4.0", use=NzRing_hasMulInverse)]
 Notation Ring_hasMulInverse R := (NzRing_hasMulInverse R) (only parsing).
+
+HB.structure Definition BaseUnitRing := {R of NzRing_hasMulInverse R & BaseRing R}.
 
 #[short(type="unitRingType")]
 HB.structure Definition UnitRing := {R of NzRing_hasMulInverse R & NzRing R}.
@@ -6044,8 +6054,13 @@ Notation on R := (SubComNzRing.on R) (only parsing).
 Notation copy T U := (SubComNzRing.copy T U) (only parsing).
 End SubComRing.
 
+(* Need to possibly change "scalable" to reduce dependencies here*)
+(* HB.mixin Record isSubLSemiModule (R : pzSemiRingType) (V : lSemiModType R)
+  (S : pred V) W of SubBaseAddUMagma V S W & BaseAddUMagma W & Nmodule_isLSemiModule R W := {
+  valZ : scalable (val : W -> V);
+}. *)
 HB.mixin Record isSubLSemiModule (R : pzSemiRingType) (V : lSemiModType R)
-  (S : pred V) W of SubNmodule V S W & LSemiModule R W := {
+  (S : pred V) W of SubNmodule V S W & BaseAddUMagma W & Nmodule_isLSemiModule R W := {
   valZ : scalable (val : W -> V);
 }.
 
@@ -7684,13 +7699,13 @@ HB.instance Definition _ := Nmodule_isPzSemiRing.Build {ffun aT -> R}
 (*WORKAROUND*)
 
 HB.saturate finfun_of.
-(*BUG: This builds the BaseZMagma structure,
-but it fails to build the BasePzSemiRingType structure.
+
+(*BUG: "HB.saturate" fails to build the BasePzSemiRingType structure.
 I build it by hand *)
 Definition finfun_finfun_of__canonical__BasePzSemiRing
-  : GRing.BasePzSemiRing.type.
+  : GRing.BaseSemiRing.type.
 Proof.
-  simple refine (@BasePzSemiRing.Pack {ffun aT -> R} _).
+  simple refine (@BaseSemiRing.Pack {ffun aT -> R} _).
   econstructor.
   all: try apply Nmodule.class.
   all: try apply Monoid.class.

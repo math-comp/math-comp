@@ -53,7 +53,7 @@ Import orderedzmod.Num.
 Module Num.
 
 HB.mixin Record Zmodule_isSemiNormed (R : POrderedZmodule.type) M
-         of GRing.Zmodule M := {
+         of GRing.BaseZmodule M := {
   norm : M -> R;
   ler_normD : forall x y, norm (x + y) <= norm x + norm y;
   normrMn : forall x n, norm (x *+ n) = norm x *+ n;
@@ -100,6 +100,7 @@ Notation "[ 'normedZmodType' R 'of' T ]" := (@clone _ (Phant R) T _ _ id)
 End NormedZmoduleExports.
 HB.export NormedZmoduleExports.
 
+#[verbose]
 HB.mixin Record isNumRing R of GRing.NzRing R & POrderedZmodule R
   & NormedZmodule (POrderedZmodule.clone R _) R := {
  addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
@@ -107,6 +108,14 @@ HB.mixin Record isNumRing R of GRing.NzRing R & POrderedZmodule R
  normrM : {morph (norm : R -> R) : x y / x * y};
  ler_def : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
 }.
+
+#[short(type="numDomainType")]
+HB.structure Definition BaseNumDomain := { R of
+     GRing.BaseUnitRing R &
+     Order.Preorder R &
+     NormedZmodule (POrderedZmodule.clone R _) R &
+     isNumRing R
+  }.
 
 #[short(type="numDomainType")]
 HB.structure Definition NumDomain := { R of
