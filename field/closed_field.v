@@ -710,6 +710,8 @@ pose IaM := GRing.isZmodClosed.Build _ I (idealr_closedB I_ideal).
 pose IpM := isProperIdeal.Build _ I (idealr_closed_nontrivial I_ideal).
 pose Iid : idealr _ := HB.pack I IaM IpM.
 pose E : comNzRingType := {ideal_quot Iid}.
+unfold reverse_coercion, Quotient.Quotient_quot__canonical__GRing_ComNzRing in E.
+set Eclass := (X in GRing.ComNzRing.Pack X) in @E *.
 pose PtoE : {rmorphism {poly F} -> E} := \pi_E%qT.
 have PtoEd i: PtoE (d i) = 0.
   by apply/eqP; rewrite piE Quotient.equivE subr0; apply/memI; exists i.
@@ -729,16 +731,19 @@ have EmulV : forall x, x != 0 -> Einv x * x = 1.
   rewrite piE /= -[z]reprK -(rmorphM PtoE) -Quotient.idealrBE.
   rewrite -[X in _ - X]uv1 opprD addNKr -mulNr.
   by apply/memI; exists i; apply: dvdp_mull.
+pose FtoE : {rmorphism _ -> _} := PtoE \o polyC; pose w : E := PtoE 'X.
+have defPtoE q: (map_poly FtoE q).[w] = PtoE q.
+  by rewrite (map_poly_comp PtoE polyC) horner_map [_.['X]]comp_polyXr.
+have ? : root (map_poly FtoE p) w.
+  by rewrite /root defPtoE (PtoEd 0).
+have ? (u : E) : u = (map_poly FtoE (repr u)).[w].
+  by rewrite defPtoE /= reprK.
+clearbody Eclass Iid Einv PtoE IpM IaM I d.
 pose EfieldMixin := GRing.ComNzRing_isField.Build _ EmulV Einv0.
 pose Efield : fieldType := HB.pack E EfieldMixin.
 pose EIsCountable := isCountable.Build E (pcan_pickleK (can_pcan (reprK))).
 pose Ecount : countFieldType := HB.pack E Efield EIsCountable.
-pose FtoE : {rmorphism _ -> _} := PtoE \o polyC; pose w : E := PtoE 'X.
-have defPtoE q: (map_poly FtoE q).[w] = PtoE q.
-  by rewrite (map_poly_comp PtoE polyC) horner_map [_.['X]]comp_polyXr.
-exists Ecount, FtoE, w => [|u].
-  by rewrite /root defPtoE (PtoEd 0).
-by exists (repr u); rewrite defPtoE /= reprK.
+by exists Ecount, FtoE, w => // u; exists (repr u).
 Qed.
 
 Lemma countable_algebraic_closure (F : countFieldType) :
@@ -800,7 +805,11 @@ have eqKtrans : transitive eqKrep.
   do [rewrite -toEtrans ?le_max // -maxnA => lez2m] in lez3m *.
   by rewrite (toEtrans (maxn (tag z2) (tag z3))) // eq_z23 -toEtrans.
 pose K := {eq_quot EquivRel _ eqKrefl eqKsym eqKtrans}%qT.
-pose cntK := isCountable.Build K (pcan_pickleK (can_pcan (reprK))).
+
+set Kclass := (EquivClass _ _ _) in @K *.
+clearbody Kclass.
+
+(* pose cntK := isCountable.Build K (pcan_pickleK (can_pcan (reprK))). *)
 pose EtoKrep i (x : E i) : K := \pi%qT (Tagged E x).
 have [EtoK piEtoK]: {EtoK | forall i, EtoKrep i =1 EtoK i} by exists EtoKrep.
 pose FtoK := EtoK 0; rewrite {}/EtoKrep in piEtoK.
@@ -858,7 +867,52 @@ have Kadd0: left_id (FtoK 0) Kadd.
 have KaddN: left_inverse (FtoK 0) Kopp Kadd.
   by move=> u; have [i [x ->]] := KtoE u; rewrite -EtoK_N -EtoK_D addNr EtoK_0.
 pose KzmodMixin := GRing.isZmodule.Build K KaddA KaddC Kadd0 KaddN.
-pose Kzmod : countZmodType := HB.pack K KzmodMixin.
+unfold GRing.isZmodule.phant_Build in KzmodMixin.
+set ed := (EquivQuot.choice_Choice__to__choice_hasChoice (defaultEncModRel (EquivRelPack Kclass))) in KzmodMixin.
+set cd := (EquivQuot.choice_Choice__to__eqtype_hasDecEq (defaultEncModRel (EquivRelPack Kclass))) in KzmodMixin.
+Timeout 5 Time pose Kzmod : countZmodType := HB.pack K KzmodMixin.
+rewrite -/ed -/cd in @Kzmod. 
+set Kmclass := (X in @CountRing.Zmodule.Pack _ X) in @Kzmod.
+do [
+set mop := Algebra.Builders_100.Algebra_isZmodule__to__Algebra_hasOpp KzmodMixin;
+set mzero := Algebra.Builders_100.Algebra_isZmodule__to__Algebra_hasZero KzmodMixin;
+set madd := Algebra.Builders_100.Algebra_isZmodule__to__Algebra_hasAdd KzmodMixin;
+set wm1 : Algebra.SemiGroupisLaw__on__BaseAddMagma_add.axioms_ K madd := Algebra.Builders_100.Algebra_isZmodule__to__Algebra_SemiGroupisLaw__on__BaseAddMagma_add KzmodMixin;
+set wm2 : Algebra.SemiGroupisCommutativeLaw__on__BaseAddMagma_add.axioms_ K madd := Algebra.Builders_100.Algebra_isZmodule__to__Algebra_SemiGroupisCommutativeLaw__on__BaseAddMagma_add KzmodMixin;
+set wm3 : Algebra.MonoidisMonoidLaw__on__BaseAddUMagma_addZero.axioms_ K mzero madd := Algebra.Builders_100.Algebra_isZmodule__to__Algebra_MonoidisMonoidLaw__on__BaseAddUMagma_addZero KzmodMixin;
+set m4 : Algebra.BaseZmoduleNmodule_isZmodule.axioms_ K mop mzero madd := Algebra.Builders_100.Algebra_isZmodule__to__Algebra_BaseZmoduleNmodule_isZmodule KzmodMixin;
+set m7 := choice_Countable__to__choice_Choice_isCountable__17 (defaultEncModRel (EquivRelPack Kclass))
+ ] in @Kmclass Kzmod *.
+
+do [
+  rewrite -[_ KzmodMixin]/(Algebra.SemiGroupisLaw__on__BaseAddMagma_add.Axioms_ _) /=;
+  set m1 := (X in Algebra.SemiGroupisLaw__on__BaseAddMagma_add.Axioms_ X)
+] in wm1 Kmclass Kzmod.
+clearbody m1.
+
+do [
+  rewrite -[_ KzmodMixin]/(Algebra.SemiGroupisCommutativeLaw__on__BaseAddMagma_add.Axioms_ _) /=;
+  set m2 := (X in Algebra.SemiGroupisCommutativeLaw__on__BaseAddMagma_add.Axioms_ X)
+] in wm2 Kmclass Kzmod.
+clearbody m2.
+
+do [
+  rewrite -[_ KzmodMixin]/(Algebra.MonoidisMonoidLaw__on__BaseAddUMagma_addZero.Axioms_ _) /=;
+  set m3 := (X in Algebra.MonoidisMonoidLaw__on__BaseAddUMagma_addZero.Axioms_ X)
+] in wm3 Kmclass Kzmod.
+clearbody m3.
+
+
+ clearbody m4 m7.
+ simpl in Kmclass.
+
+rewrite -[_ KzmodMixin]/(Algebra.hasOpp.Axioms_ _)/= in mop m4 Kmclass Kzmod.
+
+rewrite -[_ KzmodMixin]/(Algebra.hasZero.Axioms_ _)/= in mzero wm3 m4 Kmclass Kzmod.
+
+rewrite -[_ KzmodMixin]/(Algebra.hasAdd.Axioms_ _)/= in madd wm1 wm2 wm3 m4 Kmclass Kzmod.
+
+
 have KmulC: commutative Kmul.
   by move=> u v; have [i [x ->] [y ->]] := KtoE2 u v; rewrite -!EtoK_M mulrC.
 have KmulA: @associative Kzmod Kmul.
@@ -870,15 +924,80 @@ have KmulD: left_distributive Kmul Kadd.
   move=> u v w; have [i [x ->] [[y ->] [z ->]]] := KtoE3 u v w.
   by rewrite -!(EtoK_M, EtoK_D) mulrDl.
 have Kone_nz: FtoK 1 != FtoK 0 by rewrite EtoKeq0 oner_neq0.
-pose KringMixin := GRing.Zmodule_isComNzRing.Build _
-  KmulA KmulC Kmul1 KmulD Kone_nz.
-pose Kring : comNzRingType := HB.pack K Kzmod KringMixin cntK.
-have KmulV: forall x : Kring, x != 0 -> (Kinv x : Kring) * x = 1.
-  move=> u; have [i [x ->]] := KtoE u; rewrite EtoKeq0 => nz_x.
+
+
+pose KringMixin : GRing.Zmodule_isComNzRing.axioms_ K ed cd mop mzero madd wm1 wm2 wm3 m4 :=
+  GRing.Zmodule_isComNzRing.Build _ KmulA KmulC Kmul1 KmulD Kone_nz.
+unfold GRing.Zmodule_isComNzRing.phant_Build in KringMixin.
+
+
+pose Kring : comNzRingType := HB.pack K Kzmod KringMixin.
+set Kclass2 := (X in @GRing.ComNzRing.Pack _ X) in @Kring.
+simpl in Kclass2.
+
+set mone := GRing.Builders_523.GRing_Zmodule_isComNzRing__to__monoid_hasOne KringMixin in Kclass2 Kring.
+rewrite -[_ KringMixin]/(hasOne.Axioms_ _) /= in @mone @Kclass2 Kring.
+
+set mmul := GRing.Builders_523.GRing_Zmodule_isComNzRing__to__monoid_hasMul KringMixin in Kclass2 Kring.
+rewrite -[_ KringMixin]/(hasMul.Axioms_ _) /= in @mmul @Kclass2 Kring.
+
+rewrite -[X in @GRing.ComNzRing.Class _ _ X]/mone in @Kclass2 Kring.
+rewrite -[X in @GRing.ComNzRing.Class _ _ _ X]/ed in @Kclass2 Kring.
+rewrite -[X in @GRing.ComNzRing.Class _ _ _ _ X]/cd in @Kclass2 Kring.
+
+set wm8 : GRing.SemiGroupIsCommutativeLaw__on__PzSemiRing_mul.axioms_ K mmul := GRing.Builders_523.GRing_Zmodule_isComNzRing__to__GRing_SemiGroupIsCommutativeLaw__on__PzSemiRing_mul
+KringMixin in  @Kclass2 Kring.
+rewrite -[_ KringMixin]/(GRing.SemiGroupIsCommutativeLaw__on__PzSemiRing_mul.Axioms_ _) /= in @wm8 @Kclass2 Kring.
+set m8 := (X in GRing.SemiGroupIsCommutativeLaw__on__PzSemiRing_mul.Axioms_ X) in wm8 @Kclass2 Kring.
+clearbody m8.
+
+set m9 : GRing.PzSemiRing_isNonZero.axioms_ K cd mzero mone mmul := GRing.Builders_523.HB_unnamed_factory_533 KringMixin in @Kclass2 Kring.
+clearbody m9.
+
+set wm10 : isMonoidLaw__on__BaseUMagma_MulOne.axioms_ K mone mmul := GRing.Builders_523.GRing_Zmodule_isComNzRing__to__monoid_isMonoidLaw__on__BaseUMagma_MulOne KringMixin in  @Kclass2 Kring.
+rewrite -[_ KringMixin]/(isMonoidLaw__on__BaseUMagma_MulOne.Axioms_ _) /= in @wm10 @Kclass2 Kring.
+set m10 := (X in isMonoidLaw__on__BaseUMagma_MulOne.Axioms_ X) in @wm10 @Kclass2 Kring.
+clearbody m10.
+
+set wm11 : SemiGroupisLaw__on__Magma_mul.axioms_ K mmul := GRing.Builders_523.GRing_Zmodule_isComNzRing__to__monoid_SemiGroupisLaw__on__Magma_mul KringMixin in  @Kclass2 Kring.
+rewrite -[_ KringMixin]/(SemiGroupisLaw__on__Magma_mul.Axioms_ _) /= in @wm11 @Kclass2 Kring.
+set m11 := (X in SemiGroupisLaw__on__Magma_mul.Axioms_ X) in @wm11 @Kclass2 Kring.
+clearbody m11.
+
+set wm12 : GRing.MonoidisMulLaw__on__BaseZMagma_zeroMul.axioms_ K mzero mmul := GRing.Builders_523.GRing_Zmodule_isComNzRing__to__GRing_MonoidisMulLaw__on__BaseZMagma_zeroMul KringMixin in @Kclass2 Kring.
+rewrite -[_ KringMixin]/(GRing.MonoidisMulLaw__on__BaseZMagma_zeroMul.Axioms_ _) /= in @wm12 @Kclass2 Kring.
+set m12 := (X in GRing.MonoidisMulLaw__on__BaseZMagma_zeroMul.Axioms_ X) in @wm12 @Kclass2 Kring.
+clearbody m12.
+
+set wm13 : GRing.MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd.axioms_ K mmul madd wm2 := GRing.Builders_523.GRing_Zmodule_isComNzRing__to__GRing_MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd KringMixin in  @Kclass2 Kring.
+rewrite -[_ KringMixin]/(GRing.MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd.Axioms_ _) /= in @wm13 @Kclass2 Kring.
+set m13 := (X in GRing.MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd.Axioms_ X) in @wm13 @Kclass2 Kring.
+clearbody m13.
+
+have KmulV: forall x : Kring, x != FtoK 0 -> (Kinv x : Kring) * x = 1.
+  move=> u; have [i [x ->]] := KtoE u; rewrite (@EtoKeq0 i x) => nz_x.
   by rewrite -EtoK_V -[_ * _]EtoK_M mulVf ?EtoK_1.
 have Kinv0: Kinv (FtoK 0) = FtoK 0 by rewrite -EtoK_V invr0.
-pose KfieldMixin := GRing.ComNzRing_isField.Build _ KmulV Kinv0.
-pose Kfield : fieldType := HB.pack K Kring KfieldMixin.
+
+pose KfieldMixin : GRing.ComNzRing_isField.axioms_ K mop mone ed cd mzero mmul wm8 m9 wm10 wm11 wm12 madd m4 wm1 wm3 wm2 wm13 := GRing.ComNzRing_isField.Build _ KmulV Kinv0.
+unfold GRing.ComNzRing_isField.phant_Build in KfieldMixin.
+
+Timeout 5 Time pose Kfield : fieldType := HB.pack Kring KfieldMixin.
+
+simpl in Kfield.
+
+set wmX : GRing.MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd.axioms_ K mmul madd wm2 := GRing.Builders_837.local_mixin_GRing_MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd m2 m13 in Kfield.
+rewrite -[GRing.Builders_837.local_mixin_GRing_MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd _ _]/(GRing.MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd.Axioms_ _) /= in wmX Kfield.
+set mX := (X in GRing.MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd.Axioms_ X) in @wmX @Kfield.
+
+set m14 : GRing.NzRing_hasMulInverse.axioms_ K mone mmul wm10 wm11 ed cd mop mzero m9 wm12 madd wm1 wm2 wmX wm3 m4 := GRing.Builders_844.GRing_ComNzRing_isField__to__GRing_NzRing_hasMulInverse KfieldMixin in Kfield.
+set m15 : GRing.MathCompCompatField.Field.mixin_of K mone mmul wm10 wm11 ed cd mop mzero m9 wm12 madd wm1 wm2 wmX wm3 m4 _ := (X in GRing.Field.Class X) in Kfield.
+set m16 : GRing.MathCompCompatIntegralDomain.IntegralDomain.mixin_of K mone mmul wm8 wm10 wm11 ed cd mop mzero m9 wm12 madd wm1 wm2 wmX wm3 m4 _:= (X in GRing.Field.Class _ X) in Kfield.
+Fail clearbody m14.
+
+clearbody m15. 
+
+
 have EtoKAdd i : zmod_morphism (EtoK i : E i -> Kfield).
   by move=> x y; rewrite EtoK_D EtoK_N.
 have EtoKMul i : monoid_morphism (EtoK i : E i -> Kfield).
@@ -916,8 +1035,10 @@ have Kclosed: GRing.closed_field_axiom Kfield.
   rewrite (eq_map_poly (toEleS _ _ _ _)) map_poly_comp {}IHk //= /incEp codeK.
   by rewrite -if_neg neq_ltn lemk.
 suffices{Kclosed} algF_K: {FtoK : {rmorphism F -> Kfield} | integralRange FtoK}.
-  pose Kcc := Field_isAlgClosed.Build Kfield Kclosed.
-  by exists (HB.pack_for countClosedFieldType K Kfield Kcc).
+  pose Kcc : Field_isAlgClosed.axioms_ K mone mmul wm8 wm10 wm11 ed cd mop mzero m9 wm12 madd wm1 wm2 wm13 wm3 m4 _ _ _ := Field_isAlgClosed.Build Kfield Kclosed.
+  unfold Field_isAlgClosed.phant_Build in Kcc.
+  pose cntK := isCountable.Build K (pcan_pickleK (can_pcan (reprK))).
+  Timeout 10 Time by exists (HB.pack_for countClosedFieldType Kfield Kcc cntK).
 exists (EtoKM 0) => /= z; have [i [{}z ->]] := KtoE z.
 suffices{z} /(_ z)[p mon_p]: integralRange (toE 0 i isT).
   by rewrite -(fmorph_root (EtoKM i)) -map_poly_comp toEtoKp; exists p.
