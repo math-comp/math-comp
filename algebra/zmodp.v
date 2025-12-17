@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool choice eqtype ssrnat seq.
-From mathcomp Require Import div fintype bigop finset prime fingroup perm.
+From mathcomp Require Import div fintype bigop finset prime monoid fingroup perm.
 From mathcomp Require Import ssralg finalg countalg.
 
 (******************************************************************************)
@@ -152,7 +152,7 @@ HB.instance Definition _ :=
   GRing.isZmodule.Build 'I_p (@Zp_addA _) (@Zp_addC _) Zp_add0z Zp_addNz.
 
 (* FIXME: This will break when we make rings depend on monoids. *)
-HB.instance Definition _ := [finGroupMixin of 'I_p for +%R].
+(* HB.instance Definition _ := [finGroupMixin of 'I_p for +%R]. *)
 
 (* Ring operations *)
 
@@ -182,6 +182,12 @@ Proof.
 apply: val_inj => /=; elim: n => [|n IHn]; first by rewrite muln0 modn_small.
 by rewrite !GRing.mulrS /= IHn modnDmr mulnS.
 Qed.
+
+#[local]
+HB.instance Definition _ := Finite_isGroup.Build 'I_p (@GRing.addrA _) (@GRing.add0r _) (@GRing.addNr _).
+
+Definition ordGroup q:= 'I_q.
+HB.instance Definition _ := FinGroup.copy (ordGroup p) 'I_p.
 
 Local Open Scope group_scope.
 
@@ -309,7 +315,8 @@ Section Groups.
 
 Variable p : nat.
 
-Definition Zp := if p > 1 then [set: 'Z_p] else 1%g.
+Definition Zp : {set ordGroup (Zp_trunc p).+2} := if p > 1 then [set: ordGroup (Zp_trunc p).+2] else (1%g :> {set ordGroup _}).
+
 Definition units_Zp := [set: {unit 'Z_p}].
 
 Lemma Zp_cast : p > 1 -> (Zp_trunc p).+2 = p.

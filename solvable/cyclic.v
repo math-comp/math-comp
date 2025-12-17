@@ -45,6 +45,8 @@ Import GRing.Theory.
 (*  Cyclic groups.                                                     *)
 (***********************************************************************)
 
+Notation "''ZG_' x " := (ordGroup (Zp_trunc x).+2) (at level 0, x at level 2) : type_scope.
+
 Section Cyclic.
 
 Variable gT : finGroupType.
@@ -63,15 +65,17 @@ Proof. by rewrite -cycle1 cycle_cyclic. Qed.
 
 (***********************************************************************)
 (* Isomorphism with the additive group                                 *)
-(***********************************************************************)
+(***********************************************************************) 
 
 Section Zpm.
 
 Variable a : gT.
 
-Definition Zpm (i : 'Z_#[a]) := a ^+ i.
+(* Definition Zpm (i : 'Z_#[a]) := a ^+ i. *)
+Definition Zpm (i : 'ZG_#[a]) := a ^+ i.
 
-Lemma ZpmM : {in Zp #[a] &, {morph Zpm : x y / x * y}}.
+Lemma ZpmM : {in Zp #[a] &, {morph Zpm : x y / (x + y)%R >-> x * y}}.
+(* Lemma ZpmM : {in Zp #[a] &, {morph Zpm : x y / x * y}}. *)
 Proof.
 rewrite /Zpm; case: (eqVneq a 1) => [-> | nta] i j _ _.
   by rewrite !expg1n ?mulg1.
@@ -85,7 +89,9 @@ Proof.
 apply/eqP; rewrite eq_sym eqEcard cycle_subG /= andbC morphimEdom.
 rewrite (leq_trans (leq_imset_card _ _)) ?card_Zp //= /Zp order_gt1.
 case: eqP => /= [a1 | _]; first by rewrite imset_set1 morph1 a1 set11.
-by apply/imsetP; exists 1%R; rewrite ?expg1 ?inE.
+apply/imsetP =>/=. 
+(* rewrite /ordGroup. exists 1%R; rewrite ?inE//. *)
+exists (1%R : 'Z_#[a]); rewrite ?inE//.
 Qed.
 
 Lemma injm_Zpm : 'injm Zpm.
@@ -719,7 +725,7 @@ End CyclicAutomorphism.
 Lemma sum_totient_dvd n : \sum_(d < n.+1 | d %| n) totient d = n.
 Proof.
 case: n => [|[|n']]; try by rewrite big_mkcond !big_ord_recl big_ord0.
-set n := n'.+2; pose x1 : 'Z_n := 1%R.
+set n := n'.+2; pose x1 : 'ZG_n := (1%R : 'Z_n).
 have ox1: #[x1] = n by rewrite /order -Zp_cycle card_Zp.
 rewrite -[rhs in _ = rhs]ox1 -[#[_]]sum_ncycle_totient [#|_|]ox1 big_mkcond /=.
 apply: eq_bigr => d _; rewrite -{2}ox1; case: ifP => [|ndv_dG]; last first.

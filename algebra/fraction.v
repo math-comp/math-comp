@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
-From mathcomp Require Import ssrAC choice tuple bigop ssralg poly polydiv.
+From mathcomp Require Import ssrAC choice tuple bigop monoid ssralg poly polydiv.
 From mathcomp Require Import generic_quotient.
 
 (******************************************************************************)

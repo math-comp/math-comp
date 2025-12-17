@@ -53,6 +53,9 @@ Import Order.TTheory GRing.Theory.
 Fact ring_display : Order.disp_t. Proof. exact. Qed.
 
 Module Num.
+  
+HB.structure Definition BasePOrderedZmodule :=
+  { R of Order.BasePreorder ring_display R & GRing.BaseZmodule R }.
 
 #[short(type="porderZmodType")]
 HB.structure Definition POrderedZmodule :=

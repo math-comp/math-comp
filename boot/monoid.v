@@ -198,12 +198,21 @@ End MagmaTheory.
 
 Prenex Implicits commute.
 
-HB.mixin Record Magma_isSemigroup G of Magma G := {
-  mulgA : associative (@mul G)
+(*TODO: use autowrap: *)
+(* #[short(type="semigroupType")]
+HB.structure Definition Semigroup
+  := {G of ChoiceMagma G
+        &  SemiGroup.isLaw _ (@mul G)}. *)
+#[wrapper, primitive]
+HB.mixin Record SemiGroupisLaw__on__Magma_mul G ( _ : Magma G) := {
+  private : SemiGroup.isLaw G mul
 }.
 
 #[short(type="semigroupType")]
-HB.structure Definition Semigroup := {G of Magma_isSemigroup G & ChoiceMagma G}.
+HB.structure Definition Semigroup := {G of ChoiceMagma G & SemiGroupisLaw__on__Magma_mul G }.
+
+Lemma mulgA {G: Semigroup.type} : associative (@mul G).
+Proof. exact SemiGroup.opA. Qed.
 
 HB.factory Record isSemigroup G of Choice G := {
   mul : G -> G -> G;
@@ -213,7 +222,18 @@ HB.factory Record isSemigroup G of Choice G := {
 HB.builders Context G of isSemigroup G.
 
 HB.instance Definition _ := hasMul.Build G mul.
-HB.instance Definition _ := Magma_isSemigroup.Build G mulgA.
+
+HB.instance Definition _ := SemiGroup.isLaw.Build G monoid.mul mulgA.
+
+HB.end.
+
+HB.factory Record Magma_isSemigroup G of Magma G := {
+  mulgA : associative (@mul G)
+}.
+
+HB.builders Context G of Magma_isSemigroup G.
+
+HB.instance Definition _ := SemiGroup.isLaw.Build G _ mulgA.
 
 HB.end.
 
@@ -279,11 +299,27 @@ End ClosedPredicates.
 
 End baseUMagmaTheory.
 
-HB.mixin Record BaseUMagma_isUMagma G of BaseUMagma G := {
+#[wrapper, primitive]
+HB.mixin Record isMonoidLaw__on__BaseUMagma_MulOne G of BaseUMagma G := {
+  private: Monoid.isMonoidLaw G (@one G) (@mul G) 
+}.
+
+#[short(type="umagmaType")]
+HB.structure Definition UMagma := {G of ChoiceMagma G & isMonoidLaw__on__BaseUMagma_MulOne G & hasOne G}.
+
+HB.factory Record BaseUMagma_isUMagma G of BaseUMagma G := {
   mul1g : left_id one (@mul G);
   mulg1 : right_id one (@mul G)
 }.
 
+HB.builders Context G of BaseUMagma_isUMagma G.
+
+HB.instance Definition _ := Monoid.isMonoidLaw.Build G _ _ mul1g mulg1.
+
+HB.end.
+
+(*TODO: consider renaming, this name is misleading
+  since the factory does not make G an UMagma (it misses Choice and DecEq)*)
 HB.factory Record Magma_isUMagma G of Magma G := {
   one : G;
   mul1g : left_id one (@mul G);
@@ -292,12 +328,13 @@ HB.factory Record Magma_isUMagma G of Magma G := {
 
 HB.builders Context G of Magma_isUMagma G.
 HB.instance Definition _ := hasOne.Build G one.
-#[warning="-HB.no-new-instance"]
 HB.instance Definition _ := BaseUMagma_isUMagma.Build G mul1g mulg1.
 HB.end.
 
-#[short(type="umagmaType")]
-HB.structure Definition UMagma := {G of Magma_isUMagma G & ChoiceMagma G}.
+Lemma mul1g {G:umagmaType} : left_id one (@mul G).
+Proof. exact Monoid.op1m. Qed.
+Lemma mulg1 {G:umagmaType} : right_id one (@mul G).
+Proof. exact Monoid.opm1. Qed.
 
 Bind Scope group_scope with UMagma.sort.
 
@@ -320,7 +357,7 @@ End UMagmaTheory.
 #[global] Hint Resolve commute1 : core.
 
 #[short(type="monoidType")]
-HB.structure Definition Monoid := {G of Magma_isUMagma G & Semigroup G}.
+HB.structure Definition Monoid := {G of UMagma G & Semigroup G}.
 
 HB.factory Record Semigroup_isMonoid G of Semigroup G := {
   one : G;
@@ -360,8 +397,7 @@ HB.instance Definition _ := Magma_isUMagma.Build G mul1g mulg1.
 
 HB.end.
 
-#[export]
-HB.instance Definition _ (G : monoidType) := Monoid.isLaw.Build G 1 *%g mulgA mul1g mulg1.
+HB.saturate (@mul _).
 
 Bind Scope group_scope with Monoid.sort.
 
@@ -817,6 +853,10 @@ HB.structure Definition UMagmaMorphism (G H : baseUMagmaType) :=
 Definition monoid_morphism (G H : baseUMagmaType) (f : G -> H) : Prop :=
    (f 1 = 1) * {morph f : x y / x * y}.
 
+Lemma gmulfM1
+  {G H : baseUMagmaType} (f : UMagmaMorphism.type G H) : monoid_morphism f.
+Proof. exact (gmulf1 , gmulfM). Qed.
+
 HB.factory Record isUMagmaMorphism (G H : baseUMagmaType) (f : G -> H) := {
   monoid_morphism_subproof : monoid_morphism f
 }.
@@ -1131,7 +1171,7 @@ HB.instance Definition _ := isSemigroup.Build H mulgA.
 HB.end.
 
 HB.mixin Record isSubBaseUMagma (G : baseUMagmaType) (S : pred G) H
-    of SubMagma G S H & BaseUMagma H := {
+    of SubType G S H & BaseUMagma H := {
   val1_subproof : (val : H -> G) 1 = 1
 }.
 
@@ -1228,7 +1268,7 @@ Proof. by move=> x; apply/val_inj; rewrite valM SubK mulVg val1. Qed.
 Lemma mulgV : right_inverse 1%g invH *%g.
 Proof. by move=> x; apply/val_inj; rewrite valM SubK mulgV val1. Qed.
 
-HB.instance Definition _ := Monoid_isGroup.Build H mulVg mulgV.
+HB.instance Definition _ := StarMonoid_isGroup.Build H mulVg.
 
 HB.end.
 

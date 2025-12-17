@@ -4,6 +4,7 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
 From mathcomp Require Import choice fintype finfun bigop prime binomial.
 From mathcomp Require Export nmodule.
+From mathcomp Require Import monoid.
 
 (******************************************************************************)
 (*                            Ring-like structures                            *)
@@ -627,6 +628,7 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Declare Scope ring_scope.
+Bind Scope ring_scope with Magma.sort. (*Maybe unneeded after https://github.com/math-comp/math-comp/pull/1439?*)
 Declare Scope term_scope.
 Declare Scope linear_ring_scope.
 
@@ -704,7 +706,75 @@ Definition zmod_closedD := zmod_closed0D.
 #[deprecated(since="mathcomp 2.6.0", use=Algebra.subr_closed)]
 Definition subr_2closed := subr_closed.
 
-HB.mixin Record Nmodule_isPzSemiRing R of Nmodule R := {
+(*WORKAROUND: defining this structure is necessary to avoid the bug exposed in
+HB#wrapping tests/MinimalWrapBugs/structVS2mixin.v*)
+#[short(type="baseZMagmaType")]
+HB.structure Definition BaseZMagma :=
+  {V of ZPointed V & Magma V}.
+
+#[wrapper, primitive]
+HB.mixin Record MonoidisMulLaw__on__BaseZMagma_zeroMul
+  V of BaseZMagma V := {
+  private : Monoid.isMulLaw V zero mul
+}.
+
+(*TODO: consider if defining these structure is desired.
+
+It seems it is not. We want property in structures in which they are used and not in the minimal one in which they make sense
+
+*)
+
+(* 
+(* #[short(type="baseZMagmaType")] *)
+HB.structure Definition BaseZMagma :=
+  {V of hasZero V & Magma V}.
+
+(* #[short(type="ZMagmaType")] *)
+HB.structure Definition ZMagma :=
+  {V of BaseZMagma V & MonoidisMulLaw__on__BaseZMagma_zeroMul V}.
+*)
+
+(* WORKAROUND: defining "NmoduleMonoid" is necessary to avoid the bug exposed in
+HB#wrapping tests/MinimalWrapBugs/structVS2mixin.v. Moreover doing this directly at the Nmodule&Monoid level avoid a bug (possibly the same?) while defining substructure *)
+
+#[short(type="BaseSemiRingType")]
+HB.structure Definition BaseSemiRing :=
+  {R of BaseAddUMagma R & BaseUMagma R}.
+
+#[short(type="NmoduleMonoidType")]
+HB.structure Definition NmoduleMonoid :=
+  {R of Nmodule R & Monoid R}.
+
+#[wrapper, primitive]
+HB.mixin Record MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd
+  V of BaseAddUMagma V & BaseUMagma V := {
+  private : Monoid.isAddLaw V mul add
+}.
+
+#[export, short(type="pzSemiRingType")]
+HB.structure Definition PzSemiRing :=
+  { R of BaseSemiRing R
+      & Nmodule R
+      & Monoid R
+      & MonoidisMulLaw__on__BaseZMagma_zeroMul R
+      & MonoidisAddLaw__on__BaseMagmaBaseAddMagma_mulAdd R}.
+
+HB.factory Record NmoduleMonoid_isPzSemiRing R of Nmodule R & Monoid R := {
+  mulrDl : left_distributive (@mul R) (@add R);
+  mulrDr : right_distributive (@mul R) (@add R);
+  mul0r : left_zero zero (@mul R);
+  mulr0 : right_zero zero (@mul R);
+}.
+
+HB.builders Context R of NmoduleMonoid_isPzSemiRing R.
+
+(*BUG: this fail if the structure BaseZMagma is not defined*)
+HB.instance Definition _ := Monoid.isMulLaw.Build R (@zero R) (@mul R) mul0r mulr0.
+HB.instance Definition _ := Monoid.isAddLaw.Build R (@mul R) (@add R) mulrDl mulrDr.
+
+HB.end.
+
+HB.factory Record Nmodule_isPzSemiRing R of Nmodule R := {
   one : R;
   mul : R -> R -> R;
   mulrA : associative mul;
@@ -716,9 +786,29 @@ HB.mixin Record Nmodule_isPzSemiRing R of Nmodule R := {
   mulr0 : right_zero zero mul;
 }.
 
-#[short(type="pzSemiRingType")]
-HB.structure Definition PzSemiRing :=
-  { R of Nmodule_isPzSemiRing R & Nmodule R }.
+HB.builders Context R of Nmodule_isPzSemiRing R.
+
+HB.instance Definition _ := isMonoid.Build R mulrA mul1r mulr1.
+HB.instance Definition _
+  := NmoduleMonoid_isPzSemiRing.Build R mulrDl mulrDr mul0r mulr0 .
+
+HB.end.
+
+
+Lemma mulrA {R : pzSemiRingType} : associative (@mul R).
+Proof. exact mulgA. Qed.
+Lemma mul1r {R : pzSemiRingType} : left_id one (@mul R).
+Proof. exact mul1g. Qed.
+Lemma mulr1 {R : pzSemiRingType} : right_id one (@mul R).
+Proof. exact mulg1. Qed.
+Lemma mulrDl {R : pzSemiRingType} : left_distributive (@mul R) +%R.
+Proof. exact Monoid.mul_op_Dl. Qed.
+Lemma mulrDr {R : pzSemiRingType} : right_distributive (@mul R) +%R.
+Proof. exact Monoid.mul_op_Dr. Qed.
+Lemma mul0r {R : pzSemiRingType} : left_zero zero (@mul R).
+Proof. exact Monoid.mul_zerol. Qed.
+Lemma mulr0 {R : pzSemiRingType} : right_zero zero (@mul R).
+Proof. exact Monoid.mul_zeror. Qed.
 
 HB.factory Record isPzSemiRing R of Choice R := {
   zero : R;
@@ -738,10 +828,12 @@ HB.factory Record isPzSemiRing R of Choice R := {
 }.
 
 HB.builders Context R of isPzSemiRing R.
-  HB.instance Definition _ := @isNmodule.Build R
-    zero add addrA addrC add0r.
-  HB.instance Definition _ := @Nmodule_isPzSemiRing.Build R
-    one mul mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0.
+
+HB.instance Definition _ := @isNmodule.Build R
+  zero add addrA addrC add0r.
+HB.instance Definition _ := @Nmodule_isPzSemiRing.Build R
+  one mul mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0.
+
 HB.end.
 
 Module PzSemiRingExports.
@@ -749,11 +841,11 @@ Bind Scope ring_scope with PzSemiRing.sort.
 End PzSemiRingExports.
 HB.export PzSemiRingExports.
 
-HB.mixin Record PzSemiRing_isNonZero R of PzSemiRing R := {
+HB.mixin Record PzSemiRing_isNonZero R of Equality R & ZPointed R & BaseUMagma R := {
   oner_neq0 : @one R != 0
 }.
 
-#[short(type="nzSemiRingType")]
+#[export, short(type="nzSemiRingType")]
 HB.structure Definition NzSemiRing :=
   { R of PzSemiRing_isNonZero R & PzSemiRing R }.
 
@@ -783,9 +875,11 @@ HB.factory Record Nmodule_isNzSemiRing R of Nmodule R := {
 }.
 
 HB.builders Context R of Nmodule_isNzSemiRing R.
+
   HB.instance Definition _ :=
     Nmodule_isPzSemiRing.Build R mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0.
   HB.instance Definition _ := PzSemiRing_isNonZero.Build R oner_neq0.
+  
 HB.end.
 
 Module Nmodule_isSemiRing.
@@ -835,7 +929,9 @@ Bind Scope ring_scope with NzSemiRing.sort.
 End NzSemiRingExports.
 HB.export NzSemiRingExports.
 
-Definition exp R x n := iterop n (@mul R) x (@one R).
+(*TODO: deprecate one of the two?*)
+Notation exp := natexp.
+
 Arguments exp : simpl never.
 Definition comm R x y := @mul R x y = mul y x.
 Definition lreg R x := injective (@mul R x).
@@ -845,7 +941,7 @@ Local Notation "1" := (@one _) : ring_scope.
 Local Notation "n %:R" := (1 *+ n) : ring_scope.
 Local Notation "*%R" := (@mul _) : function_scope.
 Local Notation "x * y" := (mul x y) : ring_scope.
-Local Notation "x ^+ n" := (exp x n) : ring_scope.
+Local Notation "x ^+ n" := (exp x%R n) : ring_scope.
 
 Local Notation "\prod_ ( i <- r | P ) F" := (\big[*%R/1]_(i <- r | P) F).
 Local Notation "\prod_ ( i | P ) F" := (\big[*%R/1]_(i | P) F).
@@ -874,13 +970,6 @@ Section PzSemiRingTheory.
 
 Variable R : pzSemiRingType.
 Implicit Types x y : R.
-
-#[export]
-HB.instance Definition _ := Monoid.isLaw.Build R 1 *%R mulrA mul1r mulr1.
-#[export]
-HB.instance Definition _ := Monoid.isMulLaw.Build R 0 *%R mul0r mulr0.
-#[export]
-HB.instance Definition _ := Monoid.isAddLaw.Build R *%R +%R mulrDl mulrDr.
 
 Lemma mulr_suml I r P (F : I -> R) x :
   (\sum_(i <- r | P i) F i) * x = \sum_(i <- r | P i) F i * x.
@@ -1215,6 +1304,8 @@ End Char2.
 
 End NzSemiRingTheory.
 
+HB.structure Definition BaseRing := { R of BaseSemiRing R & BaseZmodule R }.
+
 #[short(type="pzRingType")]
 HB.structure Definition PzRing := { R of PzSemiRing R & Zmodule R }.
 
@@ -1235,8 +1326,8 @@ HB.builders Context R of Zmodule_isPzRing R.
   Proof. by move=> x; apply: (addIr (1 * x)); rewrite -mulrDl !add0r mul1r. Qed.
   Lemma mulr0 : @right_zero R R 0 mul.
   Proof. by move=> x; apply: (addIr (x * 1)); rewrite -mulrDr !add0r mulr1. Qed.
-  HB.instance Definition _ := Nmodule_isPzSemiRing.Build R
-    mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0.
+  HB.instance Definition _ :=
+    Nmodule_isPzSemiRing.Build R mulrA mul1r mulr1 mulrDl mulrDr mul0r mulr0.
 HB.end.
 
 HB.factory Record isPzRing R of Choice R := {
@@ -1499,7 +1590,7 @@ by apply: eq_bigr => i _; rewrite expr1n mul1r.
 Qed.
 
 Lemma sqrrB1 x : (x - 1) ^+ 2 = x ^+ 2 - x *+ 2 + 1.
-Proof. by rewrite -sqrrN opprB addrC sqrrD1 sqrrN mulNrn. Qed.
+Proof. by rewrite -[in LHS]sqrrN opprB addrC sqrrD1 sqrrN mulNrn. Qed.
 
 Lemma subr_sqr_1 x : x ^+ 2 - 1 = (x - 1) * (x + 1).
 Proof. by rewrite subrX1 !big_ord_recr big_ord0 /= addrAC add0r. Qed.
@@ -1610,14 +1701,47 @@ Notation addrK_char2 := addrK_pchar2 (only parsing).
 Notation addKr_char2 := addKr_pchar2 (only parsing).
 
 Section ConverseRing.
+
 #[export]
 HB.instance Definition _ (T : eqType) := Equality.on T^c.
 #[export]
 HB.instance Definition _ (T : choiceType) := Choice.on T^c.
+
 #[export]
-HB.instance Definition _ (U : nmodType) := Nmodule.on U^c.
+HB.instance Definition _ (U : nmodType)
+  := isNmodule.Build U^c
+        (SemiGroup.isLaw.opA
+          (GRing.SemiGroupisLaw__on__BaseAddMagma_add.private
+            (GRing.Nmodule.Algebra_SemiGroupisLaw__on__BaseAddMagma_add_mixin 
+              (Nmodule.class U))))
+        (SemiGroup.isCommutativeLaw.opC
+          (GRing.SemiGroupisCommutativeLaw__on__BaseAddMagma_add.private
+            (GRing.Nmodule.Algebra_SemiGroupisCommutativeLaw__on__BaseAddMagma_add_mixin 
+              (Nmodule.class U))))
+        (Monoid.isMonoidLaw.op1m 
+          (GRing.MonoidisMonoidLaw__on__BaseAddUMagma_addZero.private
+            (GRing.Nmodule.Algebra_MonoidisMonoidLaw__on__BaseAddUMagma_addZero_mixin
+              (Nmodule.class U)))).
+
 #[export]
-HB.instance Definition _ (U : zmodType) := Zmodule.on U^c.
+HB.instance Definition _ (U : zmodType)
+  := isZmodule.Build U^c
+        (SemiGroup.isLaw.opA
+          (GRing.SemiGroupisLaw__on__BaseAddMagma_add.private
+            (GRing.Zmodule.Algebra_SemiGroupisLaw__on__BaseAddMagma_add_mixin
+              (Zmodule.class U))))
+        (SemiGroup.isCommutativeLaw.opC
+          (GRing.SemiGroupisCommutativeLaw__on__BaseAddMagma_add.private
+            (GRing.Zmodule.Algebra_SemiGroupisCommutativeLaw__on__BaseAddMagma_add_mixin
+              (Zmodule.class U))))
+        (Monoid.isMonoidLaw.op1m 
+          (GRing.MonoidisMonoidLaw__on__BaseAddUMagma_addZero.private
+            (GRing.Zmodule.Algebra_MonoidisMonoidLaw__on__BaseAddUMagma_addZero_mixin
+              (Zmodule.class U))))
+        (GRing.BaseZmoduleNmodule_isZmodule.addNr
+        (GRing.Zmodule.Algebra_BaseZmoduleNmodule_isZmodule_mixin
+          (Zmodule.class U))).
+
 #[export]
 HB.instance Definition _ (R : pzSemiRingType) :=
   let mul' (x y : R) := y * x in
@@ -1677,7 +1801,7 @@ Lemma rregN x : rreg x -> rreg (- x). Proof. exact: (@lregN R^c). Qed.
 
 End RightRegular.
 
-HB.mixin Record Nmodule_isLSemiModule (R : pzSemiRingType) V of Nmodule V := {
+HB.mixin Record Nmodule_isLSemiModule (R : pzSemiRingType) V of BaseAddUMagma V := {
   scale : R -> V -> V;
   scalerA : forall a b v, scale a (scale b v) = scale (a * b) v;
   scale0r : forall v, scale 0 v = 0;
@@ -2129,9 +2253,17 @@ Definition monoid_morphism (R S : pzSemiRingType) (f : R -> S) : Prop :=
 Definition multiplicative (R S : pzSemiRingType) (f : R -> S) : Prop :=
   {morph f : x y / x * y}%R * (f 1 = 1).
 
-HB.mixin Record isMonoidMorphism (R S : pzSemiRingType) (f : R -> S) := {
-  monoid_morphism_subproof : monoid_morphism f
+(*TODO: Consider to remove this factory,
+it is essentially a duplicate of the factory isUMagmaMorphism
+(the latter can be called on pzSemiRingType) *)
+HB.factory Record isMonoidMorphism (R S : pzSemiRingType) (f : R -> S) := {
+  rmorphism_subproof : monoid_morphism f
 }.
+HB.builders Context R S f of isMonoidMorphism R S f.
+
+HB.instance Definition _ := isUMagmaMorphism.Build R S f rmorphism_subproof. 
+
+HB.end.
 
 HB.structure Definition RMorphism (R S : pzSemiRingType) :=
   {f of @isNmodMorphism R S f & isMonoidMorphism R S f}.
@@ -2170,7 +2302,7 @@ Lemma rmorph_sum I r (P : pred I) E :
 Proof. exact: raddf_sum. Qed.
 
 Lemma rmorphism_monoidP : monoid_morphism f.
-Proof. exact: monoid_morphism_subproof. Qed.
+Proof. exact: gmulfM1. Qed.
 #[warning="-deprecated-reference-since-mathcomp-2.5.0",
   deprecated(since="mathcomp 2.5.0", use=rmorphism_monoidP)]
 Definition rmorphismMP : multiplicative f :=
@@ -2330,15 +2462,15 @@ Module Exports. HB.reexport. End Exports.
 End Scale.
 Export Scale.Exports.
 
-#[export]
+#[export, wrapper = off]
 HB.instance Definition _ (R : pzSemiRingType) :=
   Scale.isPreLaw.Build R R *%R (fun => mull_fun_is_nmod_morphism _ idfun).
 
-#[export]
+#[export, wrapper = off]
 HB.instance Definition _ (R : pzSemiRingType) :=
   Scale.isSemiLaw.Build R R *%R mul0r mul1r mulrA.
 
-#[export]
+#[export, wrapper = off]
 HB.instance Definition _ (R : pzRingType) :=
   Scale.isLaw.Build R R *%R (@mulN1r R).
 
@@ -2707,9 +2839,21 @@ Proof. by rewrite linearZ /= rmorph1. Qed.
 
 End LRMorphismTheory.
 
-HB.mixin Record SemiRing_hasCommutativeMul R of PzSemiRing R := {
+#[export, wrapper, primitive]
+HB.mixin Record SemiGroupIsCommutativeLaw__on__PzSemiRing_mul
+  R of Magma R := {
+  private : SemiGroup.isCommutativeLaw R (@mul R)
+}.
+
+HB.factory Record SemiRing_hasCommutativeMul R of PzSemiRing R := {
   mulrC : commutative (@mul R)
 }.
+
+HB.builders Context R of SemiRing_hasCommutativeMul R.
+
+HB.instance Definition _ := SemiGroup.isCommutativeLaw.Build R (@mul R) mulrC.
+
+HB.end.
 
 Module PzSemiRing_hasCommutativeMul.
 #[deprecated(since="mathcomp 2.6.0", use=SemiRing_hasCommutativeMul.Build)]
@@ -2738,9 +2882,12 @@ End PzRing_hasCommutativeMul.
 Notation PzRing_hasCommutativeMul R :=
   (SemiRing_hasCommutativeMul R) (only parsing).
 
-#[short(type="comPzSemiRingType")]
+#[export, short(type="comPzSemiRingType")]
 HB.structure Definition ComPzSemiRing :=
   {R of PzSemiRing R & SemiRing_hasCommutativeMul R}.
+
+Lemma mulrC {R:comPzSemiRingType} : commutative (@mul R).
+Proof. exact SemiGroup.opC. Qed.
 
 Module ComPzSemiRingExports.
 Bind Scope ring_scope with ComPzSemiRing.sort.
@@ -2767,7 +2914,7 @@ HB.builders Context R of Nmodule_isComPzSemiRing R.
   HB.instance Definition _ := SemiRing_hasCommutativeMul.Build R mulrC.
 HB.end.
 
-#[short(type="comNzSemiRingType")]
+#[export, short(type="comNzSemiRingType")]
 HB.structure Definition ComNzSemiRing :=
   {R of NzSemiRing R & SemiRing_hasCommutativeMul R}.
 
@@ -2818,8 +2965,6 @@ Section ComSemiRingTheory.
 Variable R : comPzSemiRingType.
 Implicit Types x y : R.
 
-#[export]
-HB.instance Definition _ := SemiGroup.isCommutativeLaw.Build R *%R mulrC.
 Lemma mulrCA : @left_commutative R R *%R. Proof. exact: mulmCA. Qed.
 Lemma mulrAC : @right_commutative R R *%R. Proof. exact: mulmAC. Qed.
 Lemma mulrACA : @interchange R *%R *%R. Proof. exact: mulmACA. Qed.
@@ -3153,13 +3298,11 @@ HB.instance Definition _ (R : comPzSemiRingType) :=
   SemiRing_hasCommutativeMul.Build R^c (fun _ _ => mulrC _ _).
 #[export]
 HB.instance Definition _ (R : comPzSemiRingType) := ComPzSemiRing.on R^o.
-#[export]
+(*BUG*) (*Workaround was to make primitive all the wrapper mixins*)
+#[export] 
 HB.instance Definition _ (R : comPzSemiRingType) :=
-  LSemiAlgebra_isComSemiAlgebra.Build R R^o.
-#[export]
-HB.instance Definition _ (R : comNzSemiRingType) := ComNzSemiRing.on R^c.
-#[export]
-HB.instance Definition _ (R : comNzSemiRingType) := ComNzSemiRing.on R^o.
+  LSemiAlgebra_isComSemiAlgebra.Build (GRing_ComPzSemiRing__to__GRing_PzSemiRing R) R^o.
+
 End SemiAlgebraTheory.
 
 #[short(type="comPzAlgType")]
@@ -3254,7 +3397,8 @@ HB.instance Definition _ := isScalable.Build R U A *:%R (a \*o f)
 
 End AlgebraTheory.
 
-HB.mixin Record NzRing_hasMulInverse R of NzRing R := {
+(*TOTHINK: split this in data an properties?*)
+HB.mixin Record NzRing_hasMulInverse R of BaseUMagma R := {
   unit_subdef : pred R;
   inv : R -> R;
   mulVr_subproof : {in unit_subdef, left_inverse 1 inv *%R};
@@ -3271,6 +3415,8 @@ End Ring_hasMulInverse.
 #[deprecated(since="mathcomp 2.4.0", use=NzRing_hasMulInverse)]
 Notation Ring_hasMulInverse R := (NzRing_hasMulInverse R) (only parsing).
 
+HB.structure Definition BaseUnitRing := {R of NzRing_hasMulInverse R & BaseRing R}.
+
 #[short(type="unitRingType")]
 HB.structure Definition UnitRing := {R of NzRing_hasMulInverse R & NzRing R}.
 
@@ -3285,9 +3431,9 @@ Definition unit_pred {R : unitRingType} :=
 Arguments unit_pred _ _ /.
 Definition unit {R : unitRingType} := [qualify a u : R | unit_pred u].
 
-Local Notation "x ^-1" := (inv x).
-Local Notation "x / y" := (x * y^-1).
-Local Notation "x ^- n" := ((x ^+ n)^-1).
+Local Notation "x ^-1" := (inv x) : ring_scope.
+Local Notation "x / y" := (x * inv y) : ring_scope.
+Local Notation "x ^- n" := (inv (x ^+ n)) : ring_scope.
 
 Section UnitRingTheory.
 
@@ -3346,7 +3492,7 @@ Proof.
 by move=> ? ? uE; under eq_big_nat do rewrite uE //=; exact: telescope_prodr.
 Qed.
 
-Lemma commrV x y : comm x y -> comm x y^-1.
+Lemma commrV x y : comm x y -> comm x (inv y).
 Proof.
 have [Uy cxy | /invr_out-> //] := boolP (y \in unit).
 by apply: (canLR (mulrK Uy)); rewrite -mulrA cxy mulKr.
@@ -5447,10 +5593,22 @@ End Predicates.
 
 End FieldPred.
 
-HB.mixin Record isSubPzSemiRing (R : pzSemiRingType) (S : pred R) U
+#[short(type="subPzSemiRingType")]
+HB.structure Definition SubPzSemiRing (R:pzSemiRingType) (S : pred R) :=
+  {U of SubNmodule R S U & SubMonoid R S U & PzSemiRing U}.
+
+HB.factory Record isSubPzSemiRing (R : pzSemiRingType) (S : pred R) U
     of SubNmodule R S U & PzSemiRing U := {
   valM_subproof : monoid_morphism (val : U -> R);
 }.
+
+HB.builders
+  Context (R : pzSemiRingType) (S : pred R) U of isSubPzSemiRing R S U.
+
+HB.instance Definition _ := isSubMagma.Build R S U valM_subproof.2.
+HB.instance Definition _ := isSubBaseUMagma.Build R S U valM_subproof.1.
+
+HB.end.
 
 Module isSubSemiRing.
 #[deprecated(since="mathcomp 2.4.0", use=isSubPzSemiRing.Build)]
@@ -5460,9 +5618,6 @@ End isSubSemiRing.
 #[deprecated(since="mathcomp 2.4.0", use=isSubPzSemiRing)]
 Notation isSubSemiRing R S U := (isSubPzSemiRing R S U) (only parsing).
 
-#[short(type="subPzSemiRingType")]
-HB.structure Definition SubPzSemiRing (R : pzSemiRingType) (S : pred R) :=
-  { U of SubNmodule R S U & PzSemiRing U & isSubPzSemiRing R S U }.
 
 #[short(type="subNzSemiRingType")]
 HB.structure Definition SubNzSemiRing (R : nzSemiRingType) (S : pred R) :=
@@ -5484,10 +5639,10 @@ Section multiplicative.
 Context (R : pzSemiRingType) (S : pred R) (U : SubPzSemiRing.type S).
 Notation val := (val : U -> R).
 #[export]
-HB.instance Definition _ := isMonoidMorphism.Build U R val valM_subproof.
+HB.instance Definition _ := isMonoidMorphism.Build U R val (gmulfM1 val).
 Lemma val1 : val 1 = 1. Proof. exact: rmorph1. Qed.
 Lemma valM : {morph val : x y / x * y}. Proof. exact: rmorphM. Qed.
-Lemma valM1 : monoid_morphism val. Proof. exact: valM_subproof. Qed.
+Lemma valM1 : monoid_morphism val. Proof. exact: rmorphism_monoidP. Qed.
 End multiplicative.
 
 HB.factory Record SubNmodule_isSubPzSemiRing (R : pzSemiRingType) S U
@@ -5657,8 +5812,13 @@ Notation on R := (SubComNzRing.on R) (only parsing).
 Notation copy T U := (SubComNzRing.copy T U) (only parsing).
 End SubComRing.
 
+(* Need to possibly change "scalable" to reduce dependencies here*)
+(* HB.mixin Record isSubLSemiModule (R : pzSemiRingType) (V : lSemiModType R)
+  (S : pred V) W of SubBaseAddUMagma V S W & BaseAddUMagma W & Nmodule_isLSemiModule R W := {
+  valZ : scalable (val : W -> V);
+}. *)
 HB.mixin Record isSubLSemiModule (R : pzSemiRingType) (V : lSemiModType R)
-  (S : pred V) W of SubNmodule V S W & LSemiModule R W := {
+  (S : pred V) W of SubNmodule V S W & BaseAddUMagma W & Nmodule_isLSemiModule R W := {
   valZ : scalable (val : W -> V);
 }.
 
@@ -7108,13 +7268,11 @@ Definition print (x : Inatmul) : option Number.int :=
   | _ => None
   end.
 
-Arguments GRing.one {_}.
 Set Warnings "-via-type-remapping,-via-type-mismatch".
 Number Notation Idummy_placeholder parse print (via Inatmul
   mapping [[natmul] => INatmul, [opp] => IOpp, [one] => IOne])
   : ring_scope.
 Set Warnings "via-type-remapping,via-type-mismatch".
-Arguments GRing.one : clear implicits.
 
 Notation "0" := (@zero _) : ring_scope.
 Notation "-%R" := (@opp _) : ring_scope.
@@ -7145,7 +7303,7 @@ Notation Frobenius_aut chRp := (pFrobenius_aut chRp).
 Notation "*%R" := (@mul _) : function_scope.
 Notation "x * y" := (mul x y) : ring_scope.
 Arguments exp : simpl never.
-Notation "x ^+ n" := (exp x n) : ring_scope.
+Notation "x ^+ n" := (exp x%R n) : ring_scope.
 Notation "x ^-1" := (inv x) : ring_scope.
 Notation "x ^- n" := (inv (x ^+ n)) : ring_scope.
 Notation "x / y" := (mul x y^-1) : ring_scope.
@@ -7286,10 +7444,34 @@ Proof. by move=> f; apply/ffunP=> i; rewrite !ffunE mul0r. Qed.
 Fact ffun_mul_0r :  right_zero (@ffun_zero _ _) ffun_mul.
 Proof. by move=> f; apply/ffunP=> i; rewrite !ffunE mulr0. Qed.
 
+(*BUG*)
+(*
 #[export]
 HB.instance Definition _ := Nmodule_isPzSemiRing.Build {ffun aT -> R}
   ffun_mulA ffun_mul_1l ffun_mul_1r ffun_mul_addl ffun_mul_addr
   ffun_mul_0l ffun_mul_0r.
+*)
+(*WORKAROUND*)
+
+HB.saturate finfun_of.
+
+(*BUG: "HB.saturate" fails to build the BasePzSemiRingType structure.
+I build it by hand *)
+Definition finfun_finfun_of__canonical__BasePzSemiRing
+  : GRing.BaseSemiRing.type.
+Proof.
+  simple refine (@BaseSemiRing.Pack {ffun aT -> R} _).
+  econstructor.
+  all: try apply Nmodule.class.
+  all: try apply Monoid.class.
+Defined.
+Canonical finfun_finfun_of__canonical__BasePzSemiRing.
+
+#[export]
+HB.instance Definition _ := NmoduleMonoid_isPzSemiRing.Build {ffun aT -> R}   
+  ffun_mul_addl ffun_mul_addr ffun_mul_0l ffun_mul_0r.
+
+(*\WORKAROUND*)
 Definition ffun_semiring : pzSemiRingType := {ffun aT -> R}.
 End FinFunSemiRing.
 
@@ -7405,15 +7587,26 @@ Proof. by move=> x; congr (_, _); apply: mul0r. Qed.
 Fact pair_mulr0 : right_zero 0 mul_pair.
 Proof. by move=> x; congr (_, _); apply: mulr0. Qed.
 
-#[export]
+(*BUG*)
+(* #[export]
 HB.instance Definition _ := Nmodule_isPzSemiRing.Build (R1 * R2)%type
   pair_mulA pair_mul1l pair_mul1r pair_mulDl pair_mulDr pair_mul0r pair_mulr0.
+Fail Check (R1 * R2)%type : PzSemiRing.type. *)
+(*WORKAROUND*)
+#[export]
+HB.instance Definition _ := NmoduleMonoid_isPzSemiRing.Build (R1 * R2)%type
+  pair_mulDl pair_mulDr pair_mul0r pair_mulr0.
+(*\WORKAROUND*)
 
-Fact fst_is_monoid_morphism : monoid_morphism fst. Proof. by []. Qed.
+Fact fst_is_monoid_morphism : monoid_morphism (fst : (R1 * R2)%type -> R1).
+(*BUG(?): the type of fst should be inferred autoamtically?*)
+Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isMonoidMorphism.Build (R1 * R2)%type R1 fst
   fst_is_monoid_morphism.
-Fact snd_is_monoid_morphism : monoid_morphism snd. Proof. by []. Qed.
+Fact snd_is_monoid_morphism : monoid_morphism (snd : (R1 * R2)%type -> R2).
+(*BUG(?): the type of snd should be inferred autoamtically?*)
+Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isMonoidMorphism.Build (R1 * R2)%type R2 snd
   snd_is_monoid_morphism.

@@ -73,7 +73,8 @@ Proof. by rewrite commgMJ conjg_mulR mulgA. Qed.
 
 Lemma Hall_Witt_identity x y z :
   [~ x, y^-1, z] ^ y * [~ y, z^-1, x] ^ z * [~ z, x^-1, y] ^ x = 1.
-Proof. (* gsimpl *)
+Proof.
+  (* gsimpl *)
 pose a x y z : gT := x * z * y ^ x.
 suffices{x y z} hw_aux x y z: [~ x, y^-1, z] ^ y = (a x y z)^-1 * (a y z x).
   by rewrite !hw_aux; move: a {hw_aux} => a; rewrite 2!mulgA !mulgK mulVg.

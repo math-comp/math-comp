@@ -85,6 +85,16 @@ with builtins; with (import <nixpkgs> {}).lib;
          #   for a complete list of Coq packages available in Nix
          # * <github_login>:<branch> is such that this will use the branch <branch>
          #   from https://github.com/<github_login>/<repository>
+         mathcomp-analysis.override.version = "gares:ssrpat-FO-ignore-imparg";
+         mathcomp-classical.override.version = "gares:ssrpat-FO-ignore-imparg";
+         odd-order.override.version = "gares:ssrpat-FO-ignore-imparg";
+         multinomials.override.version = "proux01:ssrpat-FO-ignore-imparg";
+         mathcomp-real-closed.override.version = "proux01:ssrpat-FO-ignore-imparg";
+         coqeal.override.version = "proux01:ssrpat-FO-ignore-imparg";
+         mathcomp-abel.override.version = "proux01:ssrpat-FO-ignore-imparg";
+         gaia.override.version = "ssrpat-FO-ignore-imparg";
+         mathcomp-apery.override.version = "ssrpat-FO-ignore-imparg";
+         graph-theory.override.version = "ssrpat-FO-ignore-imparg";
        };
   in {
     "rocq-master" = { rocqPackages = {
@@ -96,7 +106,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       hierarchy-builder.override.version = "master";
       mathcomp.job = false;
     }; coqPackages = common-bundles // {
-      coq.override.version = "master";
+      coq.override.version = "gares:ssrpat-FO-ignore-imparg";
       stdlib.override.version = "master";
       bignums.override.version = "master";
       coq-elpi.override.version = "master";

@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
-From mathcomp Require Import choice fintype tuple finfun bigop ssralg countalg.
+From mathcomp Require Import choice fintype tuple finfun bigop monoid ssralg countalg.
 From mathcomp Require Import finalg zmodp matrix vector falgebra poly polydiv.
 From mathcomp Require Import mxpoly generic_quotient.
 
@@ -206,6 +206,8 @@ HB.instance Definition _ (K : {subfield L}) :=
    section of falgebra.v but the SubRing structure did not stand
    there, it is thus built only here *)
 
+Optimize Heap.
+
 HB.instance Definition _ (K : {subfield L}) :=
   [SubSemiRing_isSubComSemiRing of subvs_of K by <:].
 HB.instance Definition _ (K : {subfield L}) :=
@@ -215,8 +217,13 @@ Lemma subvs_fieldMixin K : GRing.field_axiom (subvs_of K).
 Proof.
 by move=> w nz_w; rewrite unitrE -val_eqE /= vsval_invf algid1 divff.
 Qed.
+
+Optimize Heap.
+
 HB.instance Definition _ K := GRing.UnitRing_isField.Build (subvs_of K)
   (@subvs_fieldMixin K).
+
+Optimize Heap.
 
 Lemma polyOver_subvs {K} {p : {poly L}} :
   reflect (exists q : {poly subvs_of K}, p = map_poly vsval q)
@@ -629,8 +636,21 @@ Proof. exact: mulrDr. Qed.
 Fact fieldOver_scaleDl v a b : (a + b) *F: v = a *F: v + b *F: v.
 Proof. exact: mulrDl. Qed.
 
+Optimize Heap.
+
+(* Set Printing All. *)
+
 HB.instance Definition _ := GRing.Zmodule_isLmodule.Build _ L_F
   fieldOver_scaleA fieldOver_scale1 fieldOver_scaleDr fieldOver_scaleDl.
+(*WORKAROUND - if making wrapper primitive is undesiderable*)
+(* Lemma fieldOver_mulr0r (v : fieldOver F) :  0 *F: v = 0.
+Proof.
+  by apply: (addIr (1 *F: v)); rewrite -fieldOver_scaleDl !add0r.
+Qed.
+
+HB.instance Definition _ := @GRing.Nmodule_isLSemiModule.Build _ L_F 
+fieldOver_scale fieldOver_scaleA fieldOver_mulr0r fieldOver_scale1 fieldOver_scaleDr fieldOver_scaleDl. *)
+(*\WORKAROUND*)
 
 Lemma fieldOver_scaleE a (u : L) : a *: (u : L_F) = vsval a * u.
 Proof. by []. Qed.
@@ -638,8 +658,19 @@ Proof. by []. Qed.
 Fact fieldOver_scaleAl a u v : a *F: (u * v) = (a *F: u) * v.
 Proof. exact: mulrA. Qed.
 
+Optimize Heap.
+
 HB.instance Definition _ :=
   GRing.LSemiModule_isComSemiAlgebra.Build _ L_F fieldOver_scaleAl.
+(*WORKAROUND - if making wrapper primitive is undesiderable*)
+
+(* HB.instance Definition _ := GRing.LSemiModule_isLSemiAlgebra.Build _ L_F fieldOver_scaleAl.
+Lemma fieldOver_scalarAr (k : subvs_of F) x y : k *F: (x * y) = x * (k *F: y).
+Proof. by rewrite mulrC fieldOver_scaleAl mulrC. Qed.
+
+HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build _ L_F fieldOver_scalarAr. *)
+
+(*\WORKAROUND*)
 
 Fact fieldOver_vectMixin : Lmodule_hasFinDim K_F L_F.
 Proof.

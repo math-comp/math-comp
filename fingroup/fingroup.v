@@ -178,6 +178,9 @@ Reserved Notation "[ 'min' A 'of' G | gP & gQ ]"
 Reserved Notation "[ 'min' G | gP & gQ ]"
   (format "[ '[hv' 'min'  G '/ '  |  gP '/ '  &  gQ ']' ]").
 
+#[short(type="finMonoidType")]
+HB.structure Definition FinMonoid := { G of Monoid G & Finite G }.
+
 Module isMulBaseGroup.
 #[deprecated(since="mathcomp 2.5.0", use=isStarMonoid.Build)]
 Notation Build G := (isStarMonoid.Build G) (only parsing).
@@ -213,9 +216,6 @@ Notation copy M N := (FinStarMonoid.copy M N) (only parsing).
 Notation clone M N := (FinStarMonoid.clone M N) (only parsing).
 End BaseFinGroup.
 
-#[deprecated(since="mathcomp 2.4.0", use=FinStarMonoid)]
-Notation BaseFinGroup R := (FinStarMonoid R) (only parsing).
-
 Module FinStarMonoidExports.
 Bind Scope group_scope with FinStarMonoid.arg_sort.
 Bind Scope group_scope with FinStarMonoid.sort.
@@ -240,6 +240,7 @@ Bind Scope group_scope with FinGroup.sort.
 End FinGroupExports.
 HB.export FinGroupExports.
 
+(*TODO: use wrappers?*)
 HB.factory Record Finite_isGroup G of Finite G := {
   mul : G -> G -> G;
   one : G;
@@ -453,8 +454,28 @@ End MakeGroupSetFinStarMonoid.
 
 Module Export GroupSetFinStarMonoid := MakeGroupSetFinStarMonoid GroupSet.
 
-Module Type GroupSetMagmaSig.
+Module Type FinGroupSetMagmaSig.
 Definition sort (gT : finStarMonoidType) := Magma.sort {set gT}.
+End FinGroupSetMagmaSig.
+
+Module MakeFinGroupSetMagma (Gset_base : FinGroupSetMagmaSig).
+Identity Coercion of_sort : Gset_base.sort >-> Magma.sort.
+End MakeFinGroupSetMagma.
+
+Module Export FinGroupSetMagma := MakeFinGroupSetMagma GroupSet.
+
+Module Type GroupSetBaseFinGroupSig.
+Definition sort (gT : baseFinGroupType) := BaseFinGroup.arg_sort {set gT}.
+End GroupSetBaseFinGroupSig.
+
+Module MakeGroupSetBaseFinGroup (Gset_base : GroupSetBaseFinGroupSig).
+Identity Coercion of_sort : Gset_base.sort >-> BaseFinGroup.arg_sort.
+End MakeGroupSetBaseFinGroup.
+
+Module Export GroupSetBaseFinGroup := MakeGroupSetBaseFinGroup GroupSet.
+
+Module Type GroupSetMagmaSig.
+Definition sort (gT : baseFinGroupType) := Magma.sort {set gT}.
 End GroupSetMagmaSig.
 
 Module MakeGroupSetMagma (Gset_base : GroupSetMagmaSig).
@@ -464,7 +485,7 @@ End MakeGroupSetMagma.
 Module Export GroupSetMagma := MakeGroupSetMagma GroupSet.
 
 Module Type GroupSetBaseGroupSig.
-Definition sort (gT : finStarMonoidType) := BaseGroup.sort {set gT}.
+Definition sort (gT : baseFinGroupType) := BaseGroup.sort {set gT}.
 End GroupSetBaseGroupSig.
 
 Module MakeGroupSetBaseGroup (Gset_base : GroupSetBaseGroupSig).
@@ -1210,7 +1231,8 @@ Proof. by move=> G_P; elim/big_ind: _ => //; apply: groupM. Qed.
 
 (* Inverse is an anti-morphism. *)
 
-Lemma invGid : G^-1 = G. Proof. by apply/setP=> x; rewrite inE groupV. Qed.
+Lemma invGid : G^-1 = G.
+Proof. by apply/setP=> x; rewrite inE groupV. Qed.
 
 Lemma inv_subG A : (A^-1 \subset G) = (A \subset G).
 Proof. by rewrite -{1}invGid invSg. Qed.

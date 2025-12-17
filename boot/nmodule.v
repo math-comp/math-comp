@@ -203,13 +203,20 @@ Definition addr_closed := {in S &, forall u v, u + v \in S}.
 End ClosedPredicates.
 End BaseAddMagmaTheory.
 
-HB.mixin Record BaseAddMagma_isAddMagma V of BaseAddMagma V := {
-  addrC : commutative (@add V)
+
+#[wrapper, primitive]
+HB.mixin Record SemiGroupisCommutativeLaw__on__BaseAddMagma_add
+  V of BaseAddMagma V := {
+  private : SemiGroup.isCommutativeLaw V add
 }.
 
-#[short(type="addMagmaType")]
+#[export, short(type="addMagmaType")]
 HB.structure Definition AddMagma :=
-  {V of BaseAddMagma_isAddMagma V & ChoiceBaseAddMagma V}.
+  { V of BaseAddMagma V
+      &  SemiGroupisCommutativeLaw__on__BaseAddMagma_add V}.
+
+Lemma addrC {G: addMagmaType} : commutative (@add G).
+Proof. exact SemiGroup.opC. Qed.
 
 HB.factory Record isAddMagma V of Choice V := {
   add : V -> V -> V;
@@ -217,8 +224,21 @@ HB.factory Record isAddMagma V of Choice V := {
 }.
 
 HB.builders Context V of isAddMagma V.
+
 HB.instance Definition _ := hasAdd.Build V add.
-HB.instance Definition _ := BaseAddMagma_isAddMagma.Build V addrC.
+HB.instance Definition _
+  := SemiGroup.isCommutativeLaw.Build V Algebra.add addrC.
+
+HB.end.
+
+HB.factory Record BaseAddMagma_isAddMagma V of BaseAddMagma V := {
+  addrC : commutative (@add V)
+}.
+
+HB.builders Context V of BaseAddMagma_isAddMagma V.
+
+HB.instance Definition _ := SemiGroup.isCommutativeLaw.Build V _ addrC.
+
 HB.end.
 
 Module AddMagmaExports.
@@ -234,13 +254,18 @@ Proof. exact/addrC. Qed.
 
 End AddMagmaTheory.
 
-HB.mixin Record AddMagma_isAddSemigroup V of AddMagma V := {
-  addrA : associative (@add V)
+(*TODO: use autowrapper*)
+#[wrapper, primitive]
+HB.mixin Record SemiGroupisLaw__on__BaseAddMagma_add V of BaseAddMagma V := {
+  private : SemiGroup.isLaw V add
 }.
 
-#[short(type="addSemigroupType")]
+#[export, short(type="addSemigroupType")]
 HB.structure Definition AddSemigroup :=
-  {V of AddMagma_isAddSemigroup V & AddMagma V}.
+  {V of AddMagma V & SemiGroupisLaw__on__BaseAddMagma_add V}.
+
+Lemma addrA {G: addSemigroupType} : associative (@add G).
+Proof. exact SemiGroup.opA. Qed.
 
 HB.factory Record isAddSemigroup V of Choice V := {
   add : V -> V -> V;
@@ -249,8 +274,20 @@ HB.factory Record isAddSemigroup V of Choice V := {
 }.
 
 HB.builders Context V of isAddSemigroup V.
+
 HB.instance Definition _ := isAddMagma.Build V addrC.
-HB.instance Definition _ := AddMagma_isAddSemigroup.Build V addrA.
+HB.instance Definition _ := SemiGroup.isLaw.Build V +%R addrA. 
+
+HB.end.
+
+HB.factory Record AddMagma_isAddSemigroup V of AddMagma V := {
+  addrA : associative (@add V)
+}.
+
+HB.builders Context V of AddMagma_isAddSemigroup V.
+
+HB.instance Definition _ := SemiGroup.isLaw.Build V _ addrA.
+
 HB.end.
 
 Module AddSemigroupExports.
@@ -280,9 +317,19 @@ HB.mixin Record hasZero V := {
   zero : V
 }.
 
+(*Pointed type structure (with point representing a zero)*)
+(*WORKAROUND: defining this structure is necessary to avoid an error
+in ssralg.v
+"the first structure declared in this hierarchy containing 
+Algebra_hasZero is Algebra_BaseAddUMagma which also contains 
+[Algebra_hasAdd] ." *)
+#[short(type="zPointedType")]
+HB.structure Definition ZPointed :=
+  {V of hasZero V}.
+
 #[short(type="baseAddUMagmaType")]
 HB.structure Definition BaseAddUMagma :=
-  {V of hasZero V & BaseAddMagma V}.
+  {V of ZPointed V & BaseAddMagma V}.
 
 Module BaseAddUMagmaExports.
 Bind Scope ring_scope with BaseAddUMagma.sort.
@@ -334,9 +381,20 @@ End ClosedPredicates.
 
 End BaseAddUMagmaTheory.
 
-HB.mixin Record BaseAddUMagma_isAddUMagma V of BaseAddUMagma V := {
-  add0r : left_id zero (@add V)
+(*TODO: consider only requiring the left unital property here
+(or is it ok to put it in the next factory?)*)
+#[wrapper, primitive]
+HB.mixin Record MonoidisMonoidLaw__on__BaseAddUMagma_addZero
+  V of BaseAddUMagma V := {
+  private : Monoid.isMonoidLaw V zero add
 }.
+
+#[export, short(type="addUMagmaType")]
+HB.structure Definition AddUMagma
+  :={V of Choice V
+        & AddMagma V
+        & BaseAddUMagma V
+        & MonoidisMonoidLaw__on__BaseAddUMagma_addZero V}.
 
 HB.factory Record isAddUMagma V of Choice V := {
   add : V -> V -> V;
@@ -348,15 +406,30 @@ HB.factory Record isAddUMagma V of Choice V := {
 HB.builders Context V of isAddUMagma V.
 HB.instance Definition _ := isAddMagma.Build V addrC.
 HB.instance Definition _ := hasZero.Build V zero.
-#[warning="-HB.no-new-instance"]
-HB.instance Definition _ := BaseAddUMagma_isAddUMagma.Build V add0r.
+
+Lemma addr0 : right_id zero add.
+Proof. by move=> x; rewrite addrC add0r. Qed.
+
+HB.instance Definition _
+  := Monoid.isMonoidLaw.Build V 0 +%R add0r addr0.
 HB.end.
 
-#[short(type="addUMagmaType")]
-HB.structure Definition AddUMagma := {V of isAddUMagma V & Choice V}.
+(*TODO: consider the added required structure (AddMagma V & Choice V)*)
+HB.factory Record BaseAddUMagma_isAddUMagma V of BaseAddUMagma V
+    & AddMagma V & Choice V := {
+  add0r : left_id (@zero V) (@add V)
+}.
 
-Lemma addr0 (V : addUMagmaType) : right_id (@zero V) add.
-Proof. by move=> x; rewrite addrC add0r. Qed.
+HB.builders Context V of BaseAddUMagma_isAddUMagma V.
+
+HB.instance Definition _ := isAddUMagma.Build V addrC add0r.
+
+HB.end.
+
+Lemma addr0 {V : addUMagmaType} : right_id (@zero V) add.
+Proof. exact: Monoid.opm1. Qed.
+Lemma add0r {V : addUMagmaType} : left_id (@zero V) add.
+Proof. exact: Monoid.op1m. Qed.
 
 Local Notation "\sum_ ( i <- r | P ) F" := (\big[+%R/0]_(i <- r | P) F).
 Local Notation "\sum_ ( m <= i < n ) F" := (\big[+%R/0]_(m <= i < n) F).
@@ -369,6 +442,11 @@ Import Monoid.Theory.
 HB.instance Definition _ (V : addUMagmaType) :=
   Magma_isUMagma.Build (to_multiplicative V) add0r (@addr0 V).
 
+#[short(type="nmodType")]
+HB.structure Definition Nmodule
+  :={V of AddUMagma V
+        & AddSemigroup V}.
+
 HB.factory Record isNmodule V of Choice V := {
   zero : V;
   add : V -> V -> V;
@@ -378,17 +456,22 @@ HB.factory Record isNmodule V of Choice V := {
 }.
 
 HB.builders Context V of isNmodule V.
+
 HB.instance Definition _ := isAddUMagma.Build V addrC add0r.
 HB.instance Definition _ := AddMagma_isAddSemigroup.Build V addrA.
+
 HB.end.
+
+(*BUG(?): How do I export the canonical projection this generate?
+Workaround in AllExports*)
+HB.saturate (@add _).
+
+
 
 Module AddUMagmaExports.
 Bind Scope ring_scope with AddUMagma.sort.
 End AddUMagmaExports.
 HB.export AddUMagmaExports.
-
-#[short(type="nmodType")]
-HB.structure Definition Nmodule := {V of isNmodule V & Choice V}.
 
 Module NmoduleExports.
 Bind Scope ring_scope with Nmodule.sort.
@@ -397,11 +480,11 @@ HB.export NmoduleExports.
 
 #[export]
 HB.instance Definition _ (V : nmodType) :=
-  UMagma_isMonoid.Build (to_multiplicative V) addrA.
+  UMagma_isMonoid.Build (to_multiplicative V) (addrA).
 
 #[export]
 HB.instance Definition _ (V : nmodType) :=
-  Monoid.isComLaw.Build V 0%R +%R addrA addrC add0r.
+  Magma_isSemigroup.Build (to_multiplicative V) (addrA).
 
 Section NmoduleTheory.
 
@@ -1170,7 +1253,11 @@ Notation "[ 'SubChoice_isSubZmodule' 'of' U 'by' <: ]" :=
 End SubExports.
 HB.export SubExports.
 
-Module AllExports. HB.reexport. End AllExports.
+Module AllExports.
+  HB.reexport.
+  Canonical Algebra_add__canonical__Monoid_Law.
+  Canonical Algebra_add__canonical__Monoid_ComLaw.
+End AllExports.
 
 End Algebra.
 
@@ -1237,7 +1324,6 @@ Proof. by move=> f1 f2; apply/ffunP => a; rewrite !ffunE addrC. Qed.
 
 HB.instance Definition _ :=
   BaseAddMagma_isAddMagma.Build {ffun aT -> rT} ffun_addrC.
-
 End FinFunAddMagma.
 
 Section FinFunAddSemigroup.
@@ -1249,7 +1335,6 @@ Proof. by move=> f g h; apply/ffunP => a; rewrite !ffunE addrA. Qed.
 
 HB.instance Definition _ :=
   AddMagma_isAddSemigroup.Build {ffun aT -> rT} ffun_addrA.
-
 End FinFunAddSemigroup.
 
 Section FinFunBaseAddUMagma.
@@ -1271,7 +1356,6 @@ Proof. by move=> f; apply/ffunP => a; rewrite !ffunE add0r. Qed.
 
 HB.instance Definition _ :=
   BaseAddUMagma_isAddUMagma.Build {ffun aT -> rT} ffun_add0r.
-
 End FinFunAddUMagma.
 
 (* FIXME: HB.saturate *)
@@ -1320,8 +1404,8 @@ HB.instance Definition _ := hasOpp.Build {ffun aT -> rT} ffun_opp.
 Fact ffun_addNr : left_inverse 0 ffun_opp +%R.
 Proof. by move=> f; apply/ffunP => a; rewrite !ffunE addNr. Qed.
 
-HB.instance Definition _ := Nmodule_isZmodule.Build {ffun aT -> rT} ffun_addNr.
-
+HB.instance Definition _
+  := Nmodule_isZmodule.Build {ffun aT -> rT} ffun_addNr.
 End FinFunZmod.
 
 Section PairBaseAddMagma.
@@ -1401,8 +1485,8 @@ HB.instance Definition _ := hasOpp.Build (U * V)%type pair_opp.
 Fact pair_addNr : left_inverse 0 pair_opp +%R.
 Proof. by move=> [] al ar; rewrite /pair_opp; congr pair; apply/addNr. Qed.
 
-HB.instance Definition _ := Nmodule_isZmodule.Build (U * V)%type pair_addNr.
-
+HB.instance Definition _
+  := Nmodule_isZmodule.Build (U * V)%type pair_addNr.
 End PairZmodule.
 
 (* zmodType structure on bool *)

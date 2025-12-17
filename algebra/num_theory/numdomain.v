@@ -53,7 +53,7 @@ Import orderedzmod.Num.
 Module Num.
 
 HB.mixin Record Zmodule_isSemiNormed (R : POrderedZmodule.type) M
-         of GRing.Zmodule M := {
+         of GRing.BaseZmodule M := {
   norm : M -> R;
   ler_normD : forall x y, norm (x + y) <= norm x + norm y;
   normrMn : forall x n, norm (x *+ n) = norm x *+ n;
@@ -100,6 +100,7 @@ Notation "[ 'normedZmodType' R 'of' T ]" := (@clone _ (Phant R) T _ _ id)
 End NormedZmoduleExports.
 HB.export NormedZmoduleExports.
 
+#[verbose]
 HB.mixin Record isNumRing R of GRing.NzRing R & POrderedZmodule R
   & NormedZmodule (POrderedZmodule.clone R _) R := {
  addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
@@ -107,6 +108,14 @@ HB.mixin Record isNumRing R of GRing.NzRing R & POrderedZmodule R
  normrM : {morph (norm : R -> R) : x y / x * y};
  ler_def : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
 }.
+
+#[short(type="numDomainType")]
+HB.structure Definition BaseNumDomain := { R of
+     GRing.BaseUnitRing R &
+     Order.Preorder R &
+     NormedZmodule (POrderedZmodule.clone R _) R &
+     isNumRing R
+  }.
 
 #[short(type="numDomainType")]
 HB.structure Definition NumDomain := { R of
@@ -1684,7 +1693,8 @@ Lemma ltrXn2r n x y : 0 <= x -> x < y -> (x ^+ n < y ^+ n) = (n != 0).
 Proof.
 move=> xge0 xlty; case: n; first by rewrite ltxx.
 elim=> [|n IHn]; rewrite ?[_ ^+ _.+2]exprS //.
-rewrite (@le_lt_trans _ _ (x * y ^+ n.+1)) ?ler_wpM2l ?ltr_pM2r ?IHn //.
+(*TODO: need to add "%R" by hand here, scopes does not seem to be setted propperly*)
+rewrite (@le_lt_trans _ _ (x * (y ^+ n.+1)%R)) ?ler_wpM2l ?ltr_pM2r ?IHn //.
   by rewrite ltW.
 by rewrite exprn_gt0 // (le_lt_trans xge0).
 Qed.

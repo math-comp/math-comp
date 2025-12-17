@@ -350,6 +350,9 @@ HB.mixin Record isCommutativeLaw T (op : T -> T -> T) := {
 }.
 
 #[export]
+HB.structure Definition Com T := {op of isCommutativeLaw T op}.
+
+#[export]
 HB.structure Definition ComLaw T := {op of Law T op & isCommutativeLaw T op}.
 Notation com_law := ComLaw.type.
 
@@ -401,14 +404,21 @@ Module Monoid.
 
 Export SemiGroup.
 
+(*TODO: Consider renaming this to "isUnital"*)
+#[export]
 HB.mixin Record isMonoidLaw T (idm : T) (op : T -> T -> T) := {
   op1m : left_id idm op;
   opm1 : right_id idm op;
 }.
 
+(*TODO: Consider renaming this to "Unital"*)
+#[export]
+HB.structure Definition PreLaw T idm :=
+{op of isMonoidLaw T idm op}.
+
 #[export]
 HB.structure Definition Law T idm :=
-  {op of SemiGroup.Law T op & isMonoidLaw T idm op}.
+  {op of SemiGroup.Law T op & PreLaw T idm op}.
 Notation law := Law.type.
 
 HB.factory Record isLaw T (idm : T) (op : T -> T -> T) := {
@@ -444,6 +454,7 @@ HB.instance Definition _ := isCommutativeLaw.Build T op opC.
 
 HB.end.
 
+(*TODO: consider renamening (eg. "isAnnihilating")*)
 HB.mixin Record isMulLaw T (zero : T) (mul : T -> T -> T) := {
   mul_zerol : left_zero zero mul;
   mul_zeror : right_zero zero mul;
@@ -453,6 +464,7 @@ HB.mixin Record isMulLaw T (zero : T) (mul : T -> T -> T) := {
 HB.structure Definition MulLaw T zero := {mul of isMulLaw T zero mul}.
 Notation mul_law := MulLaw.type.
 
+(*TODO: consider renamening (eg. "isDistributive")*)
 HB.mixin Record isAddLaw T (mul : T -> T -> T) (op : T -> T -> T) := {
   mul_op_Dl : left_distributive mul op;
   mul_op_Dr : right_distributive mul op;
