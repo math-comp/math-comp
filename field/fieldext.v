@@ -653,7 +653,7 @@ have r2v_lin: linear r2v.
   move=> a u v; rewrite /r2v scaler_sumr -big_split /=; apply: eq_bigr => i _.
   by rewrite scalerA -scalerDl !mxE.
 pose r2vlM := GRing.isLinear.Build _ _ _ _ r2v r2v_lin.
-pose r2vL : {linear _ -> _} := HB.pack r2v r2vlM.
+HB.enrich r2v as r2vL : {linear _ -> _} with r2vlM.
 have v2rP x: {r : 'rV[K_F]_n | x = r2v r}.
   apply: sig_eqW; have /memv_sumP[y Fy ->]: x \in SbL by rewrite defL memvf.
   have /fin_all_exists[r Dr] i: exists r, y i = r *: (bL`_i : L_F).
@@ -1346,12 +1346,12 @@ have mulD: left_distributive mul +%R.
   by rewrite !toL_K /toPF raddfD mulrDl modpD.
 have nzL1: L1 != 0 by rewrite -(inj_eq toPinj) L1K /toPF raddf0 oner_eq0.
 pose mulM := GRing.Zmodule_isComNzRing.Build _ mulA mulC mul1 mulD nzL1.
-pose rL : comNzRingType := HB.pack vL mulM.
+HB.enrich vL as rL : comNzRingType with mulM.
 have mulZlM : GRing.LSemiModule_isComSemiAlgebra F rL.
   constructor => a x y; apply: toPinj.
   by rewrite toL_K /toPF !linearZ /= -!/(toPF _) toL_K -scalerAl modpZl.
-pose caL : comNzAlgType F := HB.pack rL mulZlM.
-pose cuL : comUnitAlgType F := HB.pack caL (Algebra_isFalgebra.Build F caL).
+HB.enrich rL as caL : (comNzAlgType F) with mulZlM.
+HB.enrich rL as cuL : (comUnitAlgType F) with caL (Algebra_isFalgebra.Build F caL).
 have unitM : GRing.ComUnitRing_isField cuL.
   constructor => x nz_x; apply/unitrP; set q := toPF x.
   have nz_q: q != 0 by rewrite -(inj_eq toPinj) /toPF raddf0 in nz_x.
@@ -1362,7 +1362,7 @@ have unitM : GRing.ComUnitRing_isField cuL.
   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC.
   apply: toPinj; rewrite !toL_K -upq1 modp_mul modpD mulrC.
   by rewrite modp_mull add0r.
-pose feL : fieldExtType F := HB.pack vL cuL unitM.
+HB.enrich vL as feL : (fieldExtType F) with cuL unitM.
 exists feL; first by rewrite dimvf; apply: mul1n.
 exists toPF.
 have tol_lin: linear toL by move=> a q1 q2; rewrite -linearP -modpZl -modpD.
@@ -1371,7 +1371,7 @@ have tol_mul : monoid_morphism (toL : {poly F} -> caL).
     apply: toPinj; rewrite !toL_K // modp_mul -!(mulrC r) modp_mul.
 pose toLlM := GRing.isLinear.Build _ _ _ _ toL tol_lin.
 pose toLmM := GRing.isMonoidMorphism.Build _ _ _ tol_mul.
-pose toLLRM : {lrmorphism _ -> feL} := HB.pack toL toLlM toLmM.
+HB.enrich toL as toLLRM : {lrmorphism _ -> feL} with toLlM toLmM.
 by exists toLLRM.
 Qed.
 

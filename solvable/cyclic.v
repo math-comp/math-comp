@@ -849,7 +849,7 @@ Lemma has_prim_root_subproof (F : fieldType) (n : nat) (rs : seq F)
   has n.-primitive_root rs.
 Proof.
 pose ssMG : Finite_isGroup (seq_sub rs) := Finite_isGroup.Build (seq_sub rs) sG_Ag sG_1g sG_Vg.
-pose gT : finGroupType := HB.pack (seq_sub rs) ssMG.
+HB.enrich (seq_sub rs) as gT : finGroupType with ssMG.
 have /cyclicP[x gen_x]: @cyclic gT setT.
   apply: (@field_mul_group_cyclic gT [set: _] F r) => // x _.
   by split=> [ri1 | ->]; first apply: val_inj.

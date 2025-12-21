@@ -325,8 +325,7 @@ have sQring z: divring_closed (sQ z).
 pose sQzM z := GRing.isZmodClosed.Build _ _ (sQring z : zmod_closed _).
 pose sQmM z := GRing.isMulClosed.Build _ _ (sQring z).
 pose sQiM z := GRing.isInvClosed.Build _ _ (sQring z).
-pose sQC z : divringClosed _ := HB.pack (sQ z)
-  (sQzM z) (sQmM z) (sQiM z).
+HB.enrich sQ z as sQC : (divringClosed _) with (sQzM z) (sQmM z) (sQiM z).
 pose morph_ofQ x z Qxz := forall u, ofQ z (Qxz u) = ofQ x u.
 have QtoQ z x: x \in sQ z -> {Qxz : 'AHom(Q x, Q z) | morph_ofQ x z Qxz}.
   move=> z_x; pose Qxz u := inQ z (ofQ x u).
@@ -339,7 +338,7 @@ have QtoQ z x: x \in sQ z -> {Qxz : 'AHom(Q x, Q z) | morph_ofQ x z Qxz}.
   have QxzaM := GRing.isZmodMorphism.Build _ _ _ Qxza.
   have QxzmM := GRing.isMonoidMorphism.Build _ _ _ Qxzm.
   have QxzlM := GRing.isScalable.Build _ _ _ _ _ (rat_linear Qxza).
-  pose QxzLRM : {lrmorphism _ -> _} := HB.pack Qxz QxzaM QxzmM QxzlM.
+  HB.enrich Qxz as QxzLRM : {lrmorphism _ -> _} with QxzaM QxzmM QxzlM.
   by exists (linfun_ahom QxzLRM) => u; rewrite lfunE QxzE.
 pose sQs z s := all (mem (sQ z)) s.
 have inQsK z s: sQs z s -> map (ofQ z) (map (inQ z) s) = s.
@@ -598,7 +597,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
   have absE v: le 0 v -> abs v = v by rewrite /abs => ->.
   pose RyM := Num.IntegralDomain_isLtReal.Build (Q y) posD
                 posM posNneg posB posVneg absN absE (rrefl _).
-  pose Ry : realFieldType := HB.pack (Q y) RyM.
+  HB.enrich (Q y) as Ry : realFieldType with RyM.
   have QisArchi : Num.NumDomain_bounded_isArchimedean Ry.
     by constructor; apply: (@rat_algebraic_archimedean Ry _ alg_integral).
   exists (HB.pack_for archiRealFieldType _ QisArchi); apply: idfun.
@@ -610,7 +609,7 @@ have some_realC: realC.
       exact: can2_monoid_morphism (inj_can_sym QfK (fmorph_inj _)) QfK.
     pose faM := GRing.isZmodMorphism.Build _ _ _ fA.
     pose fmM := GRing.isMonoidMorphism.Build _ _ _ fM.
-    pose fRM : {rmorphism _ -> _} := HB.pack f faM fmM.
+    HB.enrich f as fRM : {rmorphism _ -> _} with faM fmM.
     by exists 0, rat; exact: fRM.
   have /Fadjoin1_polyP/sig_eqW[q]: x \in <<1; 0>>%VS by rewrite -sQof2 rmorph0.
   by exists q.[0]; rewrite -horner_map rmorph0.
@@ -672,7 +671,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     have [y /and3P[y_C y_z _]] := PET [:: z_ n; z].
     by have [t /(sQtrans y)t_y] := galQ y; exists t; rewrite !t_y.
   pose QtMixin := FieldExt_isSplittingField.Build _ (Q t) gal_t.
-  pose Qt : splittingFieldType rat := HB.pack (Q t) QtMixin.
+  HB.enrich (Q t) as Qt : (splittingFieldType rat) with QtMixin.
   have /QtoQ[CnQt CnQtE] := t_C.
   pose Rn : {subfield Qt} := (CnQt @: R_ n)%AS; pose i_t : Qt := CnQt (i_ n).
   pose Cn : {subfield Qt} := <<Rn; i_t>>%AS.
@@ -703,7 +702,7 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     apply/and3P; split; [by []|by apply: sepQ|].
     apply/splitting_normalField=> //.
     pose QzMixin := FieldExt_isSplittingField.Build _ (Q z) gal_z.
-    pose Qz : splittingFieldType _ := HB.pack (Q z) QzMixin.
+    HB.enrich (Q z) as Qz : (splittingFieldType _) with QzMixin.
     pose u : Qz := inQ z z.
     have /QtoQ[Qzt QztE] := t_z; exists (minPoly 1 u ^ Qzt).
       have /polyOver1P[q ->] := minPolyOver 1 u; apply/polyOver_poly=> j _.
@@ -886,7 +885,7 @@ have conjM : monoid_morphism conj.
   by rewrite !(conjE m) // (inFTA m x) // (inFTA m y) -?rmorphM /conj_ ?ofQ_K.
 have conjaM := GRing.isZmodMorphism.Build _ _ _ conjA.
 have conjmM := GRing.isMonoidMorphism.Build _ _ _ conjM.
-pose conjRM : {rmorphism _ -> _} := HB.pack conj conjaM conjmM.
+HB.enrich conj as conjRM : {rmorphism _ -> _} with conjaM conjmM.
 exists conjRM => [z | /(_ i)/eqP/idPn[]] /=.
   by have [n [/conjE-> /(conjK (n_ z))->]] := maxn3 (n_ (conj z)) (n_ z) 0.
 rewrite /conj/conj_ cj_i rmorphN inQ_K // eq_sym -addr_eq0 -mulr2n -mulr_natl.

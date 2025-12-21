@@ -218,9 +218,9 @@ have nu0m : monoid_morphism nu0.
   by rewrite !rmorphM /= !QnC_nu0.
 pose nu0aM := GRing.isZmodMorphism.Build Qn Qn nu0 nu0a.
 pose nu0mM := GRing.isMonoidMorphism.Build Qn Qn nu0 nu0m.
-pose nu0RM : {rmorphism _ -> _} := HB.pack nu0 nu0aM nu0mM.
+HB.enrich nu0 as nu0RM : {rmorphism _ -> _} with nu0 nu0aM nu0mM.
 pose nu0lM := GRing.isScalable.Build rat Qn Qn *:%R nu0 (fmorph_numZ nu0RM).
-pose nu0LRM : {lrmorphism _ -> _} := HB.pack nu0 nu0aM nu0mM nu0lM.
+HB.enrich nu0 as nu0LRM : {lrmorphism _ -> _} with nu0aM nu0mM nu0lM.
 by exists nu0LRM.
 Qed.
 
@@ -380,8 +380,7 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     pose in01aM := GRing.isZmodMorphism.Build _ _ in01 in01a.
     pose in01mM := GRing.isMonoidMorphism.Build _ _ in01 in01m.
     pose in01lM := GRing.isScalable.Build _ _  _ _ in01 in01l.
-    pose in01LRM : {lrmorphism _ -> _} := HB.pack in01
-      in01aM in01mM in01lM.
+    HB.enrich in01 as in01LRM : {lrmorphism _ -> _} with in01aM in01mM in01lM.
     by exists in01LRM.
   have {z zz Dz px} Dx: exists xx, x = QrC xx.
     exists (map_poly (in_alg Qr) px).[zz].
@@ -415,13 +414,13 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     by rewrite map_polyXsubC.
   have [f1 aut_f1 Df1]:= kHom_extends (sub1v (ASpace algK)) hom_f Qpr splitQr.
   pose f1mM := GRing.isMonoidMorphism.Build _ _ f1 (kHom_monoid_morphism aut_f1).
-  pose nu : {lrmorphism _ -> _} := HB.pack (fun_of_lfun f1) f1mM.
+  HB.enrich (fun_of_lfun f1) as nu : {lrmorphism _ -> _} with f1mM.
   exists (SubAut Qr QrC nu) => //; exists in01 => //= y.
   by rewrite -Df -Df1 //; apply/memK; exists y.
 have phiZ: scalable phi.
   by move=> a y; rewrite rmorphZ_num -alg_num_field mulr_algl.
 pose philM := GRing.isScalable.Build _ _ _ _ phi phiZ.
-pose phiLRM : {lrmorphism _ -> _} := HB.pack (GRing.RMorphism.sort phi) philM.
+HB.enrich (GRing.RMorphism.sort phi) as phiLRM : {lrmorphism _ -> _}with philM.
 pose fix ext n :=
   if n is i.+1 then oapp (fun x => s2val (ext1 (ext i) x)) (ext i) (unpickle i)
   else SubAut Qs QsC phiLRM.
@@ -460,7 +459,7 @@ have num : monoid_morphism nu.
   by rewrite (fmorph_inj _ Dx) !rmorphM /= -!nu_inj Dx1 Dx2.
 pose nuaM := GRing.isZmodMorphism.Build _ _ nu nua.
 pose numM := GRing.isMonoidMorphism.Build _ _ nu num.
-pose nuRM : {rmorphism _ -> _} := HB.pack nu nuaM numM.
+HB.enrich nu as nuRM : {rmorphism _ -> _} with nuaM numM.
 by exists nuRM => x; rewrite /= (nu_inj 0).
 Qed.
 
@@ -496,7 +495,7 @@ have pzn_zk0: root (map_poly \1%VF (minPoly 1 zn)) (zn ^+ k).
 have phim : monoid_morphism phi.
   by apply/kHom_monoid_morphism; rewrite -genQn span_seq1 /= kHomExtendP.
 pose phimM := GRing.isMonoidMorphism.Build _ _ phi phim.
-pose phiRM : {rmorphism _ -> _} := HB.pack (fun_of_lfun phi) phimM.
+HB.enrich (fun_of_lfun phi) as phiRM : {rmorphism _ -> _} with phimM.
 have [nu Dnu] := extend_algC_subfield_aut QnC phiRM.
 exists nu => _ /(prim_rootP prim_z)[i ->].
 rewrite rmorphXn /= exprAC -Dz -Dnu /= -{1}[zn]hornerX /phi.
@@ -628,7 +627,7 @@ Theorem fin_Csubring_Aint S n (Y : n.-tuple algC) :
 Proof.
 move=> mulS.
 pose Sm := GRing.isMulClosed.Build _ _ mulS.
-pose SC : mulrClosed _ := HB.pack S Sm.
+HB.enrich S as SC : (mulrClosed _) with Sm.
 have ZP_C c: (ZtoC c)%:P \is a polyOver Num.int_num_subdef.
   by rewrite raddfMz rpred_int.
 move=> S_P x Sx; pose v := \row_(i < n) Y`_i.

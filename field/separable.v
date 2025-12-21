@@ -545,7 +545,7 @@ have Dlin: linear Df.
   move=> a u v; rewrite /Df linearP /= -mul_polyC derivD derivM derivC.
   by rewrite mul0r add0r hornerD hornerM hornerC -scalerAl mul1r.
 pose DlinM := GRing.isLinear.Build _ _ _ _ Df Dlin.
-pose DL : {linear _ -> _} := HB.pack Df DlinM.
+HB.enrich Df as DL : {linear _ -> _} with DlinM.
 pose D := linfun DL; apply: base_separable.
 have DK_0: (K <= lker D)%VS.
   apply/subvP=> v Kv; rewrite memv_ker lfunE /= /Df Fadjoin_polyC //.
