@@ -210,4 +210,9 @@ Tactic Notation "HB.enrich" ident(k) ":" uconstr(tk) "as" ident(id) ":" open_con
   (* list-w-params_list: avoids a shelved goal... *) let ty' := type of id in unify ty ty'; (* /list-w-params_list *)
   do [ HB.share_mixins k ] in @id *.
 
+Tactic Notation "HB.enrich" ident(k) "as" ident(id) ":" open_constr(ty) "with" uconstr_list(b) :=
+  pose id : ty := ltac:(elpi HB.pack ltac_term:(k) ltac_term_list:(b));
+  (* list-w-params_list: avoids a shelved goal... *) let ty' := type of id in unify ty ty'; (* /list-w-params_list *)
+  do [ HB.share_mixins k ] in @id *.
+
 (*****************************************************************************)
