@@ -536,7 +536,7 @@ Definition pi := locked (fun x => EquivQuotient (canon_id x)).
 
 Lemma ereprK : cancel erepr pi.
 Proof.
-pose T : subType _ := HB.pack equivQuotient [isSub for erepr].
+HB.enrich (equivQuotient) as T : (subType _) with [isSub for erepr].
 by unlock pi; case=> x hx; apply/(@val_inj _ _ T)/eqP.
 Qed.
 

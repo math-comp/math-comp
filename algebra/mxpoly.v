@@ -499,7 +499,7 @@ have bij_phi: bijective phi.
   by case: leqP => // P_le_k; rewrite nth_default ?mxE.
 pose phiaM := GRing.isNmodMorphism.Build _ _ phi phi_is_nmod_morphism.
 pose phimM := GRing.isMonoidMorphism.Build _ _ phi phi_is_monoid_morphism.
-pose phiRM : {rmorphism _ -> _} := HB.pack phi phiaM phimM.
+HB.enrich phi as phiRM : {rmorphism _ -> _} with phiaM phimM.
 exists phiRM; split=> // [p | A]; apply/polyP=> k; apply/matrixP=> i j.
   by rewrite coef_phi coef_map !mxE coefMn.
 by rewrite coef_phi !mxE !coefC; case k; last rewrite /= mxE.

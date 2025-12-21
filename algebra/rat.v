@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import prime fintype finfun bigop order tuple ssralg.
+From mathcomp Require Import prime fintype finfun bigop order tuple nmodule ssralg.
 From mathcomp Require Import countalg div ssrnum ssrint archimedean poly zmodp.
 From mathcomp Require Import polydiv intdiv matrix mxalgebra vector.
 
@@ -861,6 +861,7 @@ Proof. by move=> a; rewrite -{1}[a]divq_num_den fmorph_div !rmorph_int. Qed.
 
 End Fmorph.
 
+
 Section Linear.
 
 Implicit Types (U V : lmodType rat).
@@ -869,7 +870,7 @@ Lemma rat_linear U V (f : U -> V) : zmod_morphism f -> scalable f.
 Proof.
 move=> fB a u.
 pose aM := GRing.isZmodMorphism.Build U V f fB.
-pose phi : {additive U -> V} := HB.pack f aM.
+HB.enrich f as phi : {additive U -> V} with aM.
 rewrite -[f]/(phi : _ -> _) -{2}[a]divq_num_den mulrC -scalerA.
 apply: canRL (scalerK _) _; first by rewrite intr_eq0 denq_neq0.
 rewrite 2!scaler_int -3!raddfMz /=.

@@ -295,7 +295,7 @@ Lemma kAutf_lker0 K f : kHom K {:L} f -> lker f == 0%VS.
 Proof.
 move/(kHomSl (sub1v _))/kHom_monoid_morphism => fM.
 pose fmM := GRing.isMonoidMorphism.Build _ _ _ fM.
-pose fRM : {rmorphism _ -> _} := HB.pack (fun_of_lfun f) fmM.
+HB.enrich (fun_of_lfun f) as fRM : {rmorphism _ -> _} with fmM.
 by apply/lker0P; apply: (fmorph_inj fRM).
 Qed.
 
@@ -515,7 +515,7 @@ rewrite -DhomEz; apply/kAHomP => _ /Fadjoin_polyP[q Eq ->].
 have homLfj: kHom E {:L} fj := comp_kHom (inv_kHomf homLfi) homLf.
 have /kHom_monoid_morphism fjM := kHomSl (sub1v _) homLfj.
 pose fjmM := GRing.isMonoidMorphism.Build _ _ _ fjM.
-pose fjRM : {rmorphism _ -> _} := HB.pack (fun_of_lfun fj) fjmM.
+HB.enrich (fun_of_lfun fj) as fjRM : {rmorphism _ -> _} with fjmM.
 rewrite -[fj _](horner_map fjRM) (kHom_poly_id homLfj) //=.
 by rewrite (@lfunE _ _ L) /= Dfz -fi_z lker0_lfunK.
 Qed.
@@ -556,7 +556,7 @@ have{irr_q} [Lz [inLz [z qz0]]]: {Lz : fieldExtType F &
   have inLzL_linear: linear (locked inLz).
     by move=> a u v; rewrite -[in LHS]mulr_algl rmorphD rmorphM -lock mulr_algl.
   pose inLzLlM := GRing.isLinear.Build _ _ _ _ _ inLzL_linear.
-  pose inLzLL : {linear _ -> _} := HB.pack (locked inLz : _ -> _) inLzLlM.
+  HB.enrich (locked inLz : _ -> _) as inLzLL : {linear _ -> _} with inLzLlM.
   have ihLzZ: ahom_in {:L} (linfun inLzLL).
     by apply/ahom_inP; split=> [u v|]; rewrite !lfunE (rmorphM, rmorph1).
   exists Lz, (AHom ihLzZ), z; congr (root _ z): qz0.
