@@ -668,6 +668,7 @@ by apply/forall_inP; move/directv_sum_unique: dxSbL => <- //; apply/eqP/v2rK.
 Qed.
 
 HB.instance Definition _ := fieldOver_vectMixin.
+HB.instance Definition _ := UnitAlgebra_isFalgebra.Build K_F L_F.
 
 Implicit Types (V : {vspace L}) (E : {subfield L}).
 
@@ -814,6 +815,7 @@ by rewrite !coord_sum_free ?(basis_free (vbasisP _)).
 Qed.
 
 HB.instance Definition _ := baseField_vectMixin.
+HB.instance Definition _ := UnitAlgebra_isFalgebra.Build F0 L0.
 
 Let F0ZEZ a x v : a *: ((x *: v : L) : L0)  = (a *: x) *: v.
 Proof. by rewrite [a *: _]scalerA -scalerAl mul1r. Qed.
@@ -1295,7 +1297,9 @@ by move/eqP/(can_inj rVpolyK).
 Qed.
 
 Definition SubfxVect := Lmodule_hasFinDim.Build _ subFExtend min_subfx_vect.
-Definition SubFieldExtType : fieldExtType F := HB.pack subFExtend SubfxVect.
+Definition SubVectType : vectType F := HB.pack subFExtend SubfxVect.
+Definition SubFieldExtType : fieldExtType F :=
+  HB.pack subFExtend SubfxVect (UnitAlgebra_isFalgebra.Build F SubVectType).
 
 End Irreducible.
 
@@ -1362,7 +1366,8 @@ have unitM : GRing.ComUnitRing_isField cuL.
   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC.
   apply: toPinj; rewrite !toL_K -upq1 modp_mul modpD mulrC.
   by rewrite modp_mull add0r.
-pose feL : fieldExtType F := HB.pack vL cuL unitM.
+pose feL : fieldExtType F :=
+  HB.pack vL cuL unitM (UnitAlgebra_isFalgebra.Build F cuL).
 exists feL; first by rewrite dimvf; apply: mul1n.
 exists toPF.
 have tol_lin: linear toL by move=> a q1 q2; rewrite -linearP -modpZl -modpD.
@@ -1420,7 +1425,8 @@ Qed.
 (*   suffices: x * toL u.2 = 1 by exists (toL u.2); rewrite mulrC. *)
 (*   congr (poly_rV _); rewrite toL_K modp_mul mulrC (canRL (addKr _) upq1). *)
 (*   by rewrite -mulNr modp_addl_mul_small ?size_poly1. *)
-(* pose feL : fieldExtType F := HB.pack vL cuL unitM. *)
+(* pose feL : fieldExtType F := *)
+(*   HB.pack vL cuL unitM (UnitAlgebra_isFalgebra.Build F cuL). *)
 (* exists feL; first by rewrite dimvf; apply: mul1n. *)
 (* pose z : vL := toL 'X; set iota := in_alg _. *)
 (* have q_z q: rVpoly (map_poly iota q).[z] = q %% p. *)
