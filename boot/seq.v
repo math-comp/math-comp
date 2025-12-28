@@ -2856,6 +2856,29 @@ move: s_x; rewrite inE; have [-> // | _] := eqVneq; apply: IHs.
 by apply: sub_in2 inj_f => z; apply: predU1r.
 Qed.
 
+Lemma index_map_in s x :
+  {in s &, injective f} -> x \in s -> index (f x) (map f s) = index x s.
+Proof.
+elim: s => // y s IHs inj_f s_x /=.
+have -> : (f y == f x) = (y == x).
+  by apply/eqP/eqP => [/inj_f ->| ->] //; rewrite inE eqxx.
+case: (boolP (y == x)) => [//| /negbTE neq_x_y].
+rewrite {}IHs //.
+  by move=> {s_x neq_x_y}x z sx sz; apply: inj_f; apply: predU1r.
+by move: s_x; rewrite inE eq_sym neq_x_y.
+Qed.
+
+Lemma uniq_map_inj_in s : uniq (map f s) -> {in s &, injective f}.
+Proof.
+move=> f_uniq.
+have indmap x : x \in s -> index (f x) (map f s) = index x s.
+  move=> /[dup] sx /map_f sfx; apply/eqP.
+  rewrite -(nth_uniq (f x) _ _ f_uniq) ?index_mem ?size_map ?index_mem //.
+  by rewrite nth_index // (nth_map x) ?index_mem // nth_index.
+move=> x y sx sy eqfxy; apply: (index_inj x sx sy).
+by rewrite -!indmap ?eqfxy.
+Qed.
+
 Lemma perm_map s t : perm_eq s t -> perm_eq (map f s) (map f t).
 Proof. by move/permP=> Est; apply/permP=> a; rewrite !count_map Est. Qed.
 
