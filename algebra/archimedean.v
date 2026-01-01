@@ -856,6 +856,13 @@ Proof. exact: real_ceil_le0. Qed.
 Lemma ceil_floor x : ceil x = floor x + (x \isn't a int_num).
 Proof. exact: real_ceil_floor. Qed.
 
+Lemma abs_ceil_ge x : `|x| <= `|ceil x|.+1%:R.
+Proof.
+rewrite -natr1 natr_absz; have [x0|x0] := ltP 0 x.
+- by rewrite !gtr0_norm ?ceil_gt0// ler_wpDr// ceil_ge.
+- by rewrite !ler0_norm ?ceil_le0// ceilNfloor opprK intrD1 ltW// floorD1_gt.
+Qed.
+
 End ArchiRealDomainTheory.
 
 #[deprecated(since="mathcomp 2.4.0", note="Renamed to floor_le.")]
