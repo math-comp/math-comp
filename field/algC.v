@@ -121,7 +121,7 @@ Qed.
 Definition i := sqrt (- 1).
 
 Lemma sqrMi x: (i * x) ^+ 2 = - x ^+ 2.
-Proof. by rewrite exprMn sqrtK mulN1r. Qed.
+Proof. by rewrite pownMn sqrtK mulN1r. Qed.
 
 Lemma iJ : conj i = - i.
 Proof.
@@ -155,7 +155,7 @@ Qed.
 Definition norm x := sqrt x * conj (sqrt x).
 
 Lemma normK x : norm x ^+ 2 = x * conj x.
-Proof. by rewrite exprMn -rmorphXn sqrtK. Qed.
+Proof. by rewrite pownMn -rmorphXn sqrtK. Qed.
 
 Lemma normE x y : y ^+ 2 = x -> norm x = y * conj y.
 Proof.
@@ -165,17 +165,17 @@ Qed.
 
 Lemma norm_eq0 x : norm x = 0 -> x = 0.
 Proof.
-  by move/eqP; rewrite mulf_eq0 fmorph_eq0 -mulf_eq0 -expr2 sqrtK => /eqP.
+  by move/eqP; rewrite mulf_eq0 fmorph_eq0 -mulf_eq0 -pownr2 sqrtK => /eqP.
 Qed.
 
 Lemma normM x y : norm (x * y) = norm x * norm y.
 Proof.
-  by rewrite mulrACA -rmorphM; apply: normE; rewrite exprMn !sqrtK.
+  by rewrite mulrACA -rmorphM; apply: normE; rewrite pownMn !sqrtK.
 Qed.
 
 Lemma normN x : norm (- x) = norm x.
 Proof.
-  by rewrite -mulN1r normM {1}/norm iJ mulrN -expr2 sqrtK opprK mul1r.
+  by rewrite -mulN1r normM {1}/norm iJ mulrN -pownr2 sqrtK opprK mul1r.
 Qed.
 
 Definition le x y := norm (y - x) == y - x.
@@ -190,7 +190,7 @@ Proof. by rewrite posE. Qed.
 Lemma posP x : reflect (exists y, x = y * conj y) (le 0 x).
 Proof.
   rewrite posE; apply: (iffP eqP) => [Dx | [y {x}->]]; first by exists (sqrt x).
-  by rewrite (normE (normK y)) rmorphM /= conjK (mulrC (conj _)) -expr2 normK.
+  by rewrite (normE (normK y)) rmorphM /= conjK (mulrC (conj _)) -pownr2 normK.
 Qed.
 
 Lemma posJ x : le 0 x -> conj x = x.
@@ -244,7 +244,7 @@ Proof.
   rewrite mulrDl !mulrDr [y * _ + _]addrC addrACA leB addrKA -leB.
   rewrite {}le_sqr ?posD //.
     by rewrite rmorphD !rmorphM /= !conjK addrC (mulrC x) (mulrC y).
-  rewrite -mulr_natr exprMn normK -natrX mulr_natr sqrrD mulrACA.
+  rewrite -mulr_natr pownMn normK -natrX mulr_natr sqrrD mulrACA.
   rewrite -rmorphM (mulrC y x) addrAC leB mulrnA mulr2n opprD addrACA.
   rewrite subrr addr0 {2}(mulrC x) rmorphM mulrACA -opprB addrAC -sqrrB -sqrMi.
   apply/posP; exists (i * (x * conj y - y * conj x)); congr (_ * _).
@@ -481,7 +481,7 @@ have [i i2]: exists i : type, i ^+ 2 = -1.
 move/(_ i)/(congr1 CtoL); rewrite LtoC_K => iL_J.
 have/lt_geF/idP[] := @ltr01 cfType.
 rewrite -oppr_ge0 -(rmorphN1 CtoL).
-by rewrite -i2 rmorphXn /= expr2 -{2}iL_J -normCK  exprn_ge0.
+by rewrite -i2 rmorphXn /= pownr2 -{2}iL_J -normCK  exprn_ge0.
 Qed.
 
 HB.instance Definition _ := isComplex.Build type conjK conj_nt.
@@ -1074,7 +1074,7 @@ Lemma algC_pfactorCgt0 x y : x \isn't Creal -> y \is Creal ->
 Proof.
 move=> xNR yR; rewrite algC_pfactorCE// hornerM !hornerXsubC.
 rewrite [x]algCrect conjC_rect ?Creal_Re ?Creal_Im// !opprD !addrA opprK.
-rewrite -subr_sqr exprMn sqrCi mulN1r opprK ltr_wpDl//.
+rewrite -subr_sqr pownMn sqrCi mulN1r opprK ltr_wpDl//.
 - by rewrite real_exprn_even_ge0// ?rpredB// ?Creal_Re.
 by rewrite real_exprn_even_gt0 ?Creal_Im ?orTb//=; apply/eqP/Creal_ImP.
 Qed.
@@ -1151,7 +1151,7 @@ have {pa0 pb0} pab0 : p.[a] * p.[b] < 0 by rewrite pmulr_llt0.
 wlog p_monic : p p_neq0 pab0 / p \is monic => [hwlog|].
   have [|||x axb] := hwlog ((lead_coef p)^-1 *: p).
   - by rewrite scaler_eq0 invr_eq0 lead_coef_eq0 (negPf p_neq0).
-  - rewrite !hornerE/= -mulrA mulrACA -expr2 pmulr_rlt0//.
+  - rewrite !hornerE/= -mulrA mulrACA -pownr2 pmulr_rlt0//.
     by rewrite exprn_even_gt0//= invr_eq0 lead_coef_eq0.
   - by rewrite monicE lead_coefZ mulVf ?lead_coef_eq0 ?eqxx.
   by rewrite rootZ ?invr_eq0 ?lead_coef_eq0//; exists x.

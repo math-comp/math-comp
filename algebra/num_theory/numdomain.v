@@ -1569,40 +1569,40 @@ Definition exprn_gte0 := (exprn_ge0, exprn_gt0).
 
 Lemma exprn_ile1 n x : 0 <= x -> x <= 1 -> x ^+ n <= 1.
 Proof.
-move=> xge0 xle1; elim: n=> [|*]; rewrite ?expr0 // exprS.
+move=> xge0 xle1; elim: n=> [|*]; rewrite ?pownr0 // pownrS.
 by rewrite mulr_ile1 ?exprn_ge0.
 Qed.
 
 Lemma exprn_ilt1 n x : 0 <= x -> x < 1 -> (x ^+ n < 1) = (n != 0).
 Proof.
 move=> xge0 xlt1.
-case: n; [by rewrite eqxx ltxx | elim=> [|n ihn]; first by rewrite expr1].
-by rewrite exprS mulr_ilt1 // exprn_ge0.
+case: n; [by rewrite eqxx ltxx | elim=> [|n ihn]; first by rewrite pownr1].
+by rewrite pownrS mulr_ilt1 // exprn_ge0.
 Qed.
 
 Definition exprn_ilte1 := (exprn_ile1, exprn_ilt1).
 
 Lemma exprn_ege1 n x : 1 <= x -> 1 <= x ^+ n.
 Proof.
-by move=> x_ge1; elim: n=> [|n ihn]; rewrite ?expr0 // exprS mulr_ege1.
+by move=> x_ge1; elim: n=> [|n ihn]; rewrite ?pownr0 // pownrS mulr_ege1.
 Qed.
 
 Lemma exprn_egt1 n x : 1 < x -> (1 < x ^+ n) = (n != 0).
 Proof.
 move=> xgt1; case: n; first by rewrite eqxx ltxx.
-by elim=> [|n ihn]; rewrite ?expr1// exprS mulr_egt1 // exprn_ge0.
+by elim=> [|n ihn]; rewrite ?pownr1// pownrS mulr_egt1 // exprn_ge0.
 Qed.
 
 Definition exprn_egte1 := (exprn_ege1, exprn_egt1).
 Definition exprn_cp1 := (exprn_ilte1, exprn_egte1).
 
 Lemma ler_iXnr x n : (0 < n)%N -> 0 <= x -> x <= 1 -> x ^+ n <= x.
-Proof. by case: n => n // *; rewrite exprS ler_piMr // exprn_ile1. Qed.
+Proof. by case: n => n // *; rewrite pownrS ler_piMr // exprn_ile1. Qed.
 
 Lemma ltr_iXnr x n : 0 < x -> x < 1 -> (x ^+ n < x) = (1 < n)%N.
 Proof.
-case: n=> [|[|n]] //; first by rewrite expr0 => _ /lt_gtF ->.
-by move=> x0 x1; rewrite exprS gtr_pMr // ?exprn_ilt1 // ltW.
+case: n=> [|[|n]] //; first by rewrite pownr0 => _ /lt_gtF ->.
+by move=> x0 x1; rewrite pownrS gtr_pMr // ?exprn_ilt1 // ltW.
 Qed.
 
 Definition lter_iXnr := (ler_iXnr, ltr_iXnr).
@@ -1610,50 +1610,50 @@ Definition lter_iXnr := (ler_iXnr, ltr_iXnr).
 Lemma ler_eXnr x n : (0 < n)%N -> 1 <= x -> x <= x ^+ n.
 Proof.
 case: n => // n _ x_ge1.
-by rewrite exprS ler_peMr ?(le_trans _ x_ge1) // exprn_ege1.
+by rewrite pownrS ler_peMr ?(le_trans _ x_ge1) // exprn_ege1.
 Qed.
 
 Lemma ltr_eXnr x n : 1 < x -> (x < x ^+ n) = (1 < n)%N.
 Proof.
-move=> x_ge1; case: n=> [|[|n]] //; first by rewrite expr0 lt_gtF.
-by rewrite exprS ltr_pMr ?(lt_trans _ x_ge1) ?exprn_egt1.
+move=> x_ge1; case: n=> [|[|n]] //; first by rewrite pownr0 lt_gtF.
+by rewrite pownrS ltr_pMr ?(lt_trans _ x_ge1) ?exprn_egt1.
 Qed.
 
 Definition lter_eXnr := (ler_eXnr, ltr_eXnr).
 Definition lter_Xnr := (lter_iXnr, lter_eXnr).
 
 Lemma ler_wiXn2l x :
-  0 <= x -> x <= 1 -> {homo GRing.exp x : m n / (n <= m)%N >-> m <= n}.
+  0 <= x -> x <= 1 -> {homo GRing.pown x : m n / (n <= m)%N >-> m <= n}.
 Proof.
 move=> xge0 xle1 m n /= hmn.
-by rewrite -(subnK hmn) exprD ler_piMl ?(exprn_ge0, exprn_ile1).
+by rewrite -(subnK hmn) pownrD ler_piMl ?(exprn_ge0, exprn_ile1).
 Qed.
 
-Lemma ler_weXn2l x : 1 <= x -> {homo GRing.exp x : m n / (m <= n)%N >-> m <= n}.
+Lemma ler_weXn2l x : 1 <= x -> {homo GRing.pown x : m n / (m <= n)%N >-> m <= n}.
 Proof.
-move=> xge1 m n /= hmn; rewrite -(subnK hmn) exprD.
+move=> xge1 m n /= hmn; rewrite -(subnK hmn) pownrD.
 by rewrite ler_peMl ?(exprn_ge0, exprn_ege1) // (le_trans _ xge1) ?ler01.
 Qed.
 
 Lemma ieexprn_weq1 x n : 0 <= x -> (x ^+ n == 1) = ((n == 0) || (x == 1)).
 Proof.
-move=> xle0; case: n => [|n]; first by rewrite expr0 eqxx.
+move=> xle0; case: n => [|n]; first by rewrite pownr0 eqxx.
 case: (@real_ltgtP x 1); do ?by rewrite ?ger0_real.
 + by move=> x_lt1; rewrite 1?lt_eqF // exprn_ilt1.
 + by move=> x_lt1; rewrite 1?gt_eqF // exprn_egt1.
-by move->; rewrite expr1n eqxx.
+by move->; rewrite pown1n eqxx.
 Qed.
 
-Lemma ieexprIn x : 0 < x -> x != 1 -> injective (GRing.exp x).
+Lemma ieexprIn x : 0 < x -> x != 1 -> injective (GRing.pown x).
 Proof.
 move=> x_gt0 x_neq1 m n; without loss /subnK <-: m n / (n <= m)%N.
   by move=> IH eq_xmn; case/orP: (leq_total m n) => /IH->.
-case: {m}(m - n)%N => // m /eqP/idPn[]; rewrite -[x ^+ n]mul1r exprD.
+case: {m}(m - n)%N => // m /eqP/idPn[]; rewrite -[x ^+ n]mul1r pownrD.
 by rewrite (inj_eq (mulIf _)) ?ieexprn_weq1 ?ltW // expf_neq0 ?gt_eqF.
 Qed.
 
 Lemma ler_iXn2l x :
-  0 < x -> x < 1 -> {mono GRing.exp x : m n / (n <= m)%N >-> m <= n}.
+  0 < x -> x < 1 -> {mono GRing.pown x : m n / (n <= m)%N >-> m <= n}.
 Proof.
 move=> xgt0 xlt1; apply: (le_nmono (inj_nhomo_lt _ _)); last first.
   by apply/ler_wiXn2l; exact/ltW.
@@ -1661,13 +1661,13 @@ by apply: ieexprIn; rewrite ?lt_eqF ?ltr_cpable.
 Qed.
 
 Lemma ltr_iXn2l x :
-  0 < x -> x < 1 -> {mono GRing.exp x : m n / (n < m)%N >-> m < n}.
+  0 < x -> x < 1 -> {mono GRing.pown x : m n / (n < m)%N >-> m < n}.
 Proof. by move=> xgt0 xlt1; apply: (leW_nmono (ler_iXn2l _ _)). Qed.
 
 Definition lter_iXn2l := (ler_iXn2l, ltr_iXn2l).
 
 Lemma ler_eXn2l x :
-  1 < x -> {mono GRing.exp x : m n / (m <= n)%N >-> m <= n}.
+  1 < x -> {mono GRing.pown x : m n / (m <= n)%N >-> m <= n}.
 Proof.
 move=> xgt1; apply: (le_mono (inj_homo_lt _ _)); last first.
   by apply: ler_weXn2l; rewrite ltW.
@@ -1675,7 +1675,7 @@ by apply: ieexprIn; rewrite ?gt_eqF ?gtr_cpable //; apply: lt_trans xgt1.
 Qed.
 
 Lemma ltr_eXn2l x :
-  1 < x -> {mono (GRing.exp x) : m n / (m < n)%N >-> m < n}.
+  1 < x -> {mono (GRing.pown x) : m n / (m < n)%N >-> m < n}.
 Proof. by move=> xgt1; apply: (leW_mono (ler_eXn2l _)). Qed.
 
 Definition lter_eXn2l := (ler_eXn2l, ltr_eXn2l).
@@ -1683,66 +1683,66 @@ Definition lter_eXn2l := (ler_eXn2l, ltr_eXn2l).
 Lemma ltrXn2r n x y : 0 <= x -> x < y -> (x ^+ n < y ^+ n) = (n != 0).
 Proof.
 move=> xge0 xlty; case: n; first by rewrite ltxx.
-elim=> [|n IHn]; rewrite ?[_ ^+ _.+2]exprS //.
+elim=> [|n IHn]; rewrite ?[_ ^+ _.+2]pownrS //.
 rewrite (@le_lt_trans _ _ (x * y ^+ n.+1)) ?ler_wpM2l ?ltr_pM2r ?IHn //.
   by rewrite ltW.
 by rewrite exprn_gt0 // (le_lt_trans xge0).
 Qed.
 
-Lemma lerXn2r n : {in nneg & , {homo (@GRing.exp R)^~ n : x y / x <= y}}.
+Lemma lerXn2r n : {in nneg & , {homo (@GRing.pown R)^~ n : x y / x <= y}}.
 Proof.
-move=> x y /= x0 y0 xy; elim: n => [|n IHn]; rewrite !(expr0, exprS) //.
+move=> x y /= x0 y0 xy; elim: n => [|n IHn]; rewrite !(pownr0, pownrS) //.
 by rewrite (@le_trans _ _ (x * y ^+ n)) ?ler_wpM2l ?ler_wpM2r ?exprn_ge0.
 Qed.
 
 Definition lterXn2r := (lerXn2r, ltrXn2r).
 
 Lemma ltr_wpXn2r n :
-  (0 < n)%N -> {in nneg & , {homo (@GRing.exp R)^~ n : x y / x < y}}.
+  (0 < n)%N -> {in nneg & , {homo (@GRing.pown R)^~ n : x y / x < y}}.
 Proof. by move=> ngt0 x y /= x0 y0 hxy; rewrite ltrXn2r // -lt0n. Qed.
 
 Lemma ler_pXn2r n :
-  (0 < n)%N -> {in nneg & , {mono (@GRing.exp R)^~ n : x y / x <= y}}.
+  (0 < n)%N -> {in nneg & , {mono (@GRing.pown R)^~ n : x y / x <= y}}.
 Proof.
 case: n => // n _ x y; rewrite !qualifE /= =>  x_ge0 y_ge0.
-have [-> | nzx] := eqVneq x 0; first by rewrite exprS mul0r exprn_ge0.
+have [-> | nzx] := eqVneq x 0; first by rewrite pownrS mul0r exprn_ge0.
 rewrite -subr_ge0 subrXX pmulr_lge0 ?subr_ge0 //= big_ord_recr /=.
-rewrite subnn expr0 mul1r /= ltr_pwDr // ?exprn_gt0 ?lt0r ?nzx //.
+rewrite subnn pownr0 mul1r /= ltr_pwDr // ?exprn_gt0 ?lt0r ?nzx //.
 by rewrite sumr_ge0 // => i _; rewrite mulr_ge0 ?exprn_ge0.
 Qed.
 
 Lemma ltr_pXn2r n :
-  (0 < n)%N -> {in nneg & , {mono (@GRing.exp R)^~ n : x y / x < y}}.
+  (0 < n)%N -> {in nneg & , {mono (@GRing.pown R)^~ n : x y / x < y}}.
 Proof.
 by move=> n_gt0 x y x_ge0 y_ge0; rewrite !lt_neqAle !eq_le !ler_pXn2r.
 Qed.
 
 Definition lter_pXn2r := (ler_pXn2r, ltr_pXn2r).
 
-Lemma pexpIrn n : (0 < n)%N -> {in nneg &, injective ((@GRing.exp R)^~ n)}.
+Lemma pexpIrn n : (0 < n)%N -> {in nneg &, injective ((@GRing.pown R)^~ n)}.
 Proof. by move=> n_gt0; apply: inc_inj_in (ler_pXn2r _). Qed.
 
 (* expr and ler/ltr *)
 Lemma expr_le1 n x : (0 < n)%N -> 0 <= x -> (x ^+ n <= 1) = (x <= 1).
 Proof.
-by move=> ngt0 xge0; rewrite -{1}[1](expr1n _ n) ler_pXn2r // [_ \in _]ler01.
+by move=> ngt0 xge0; rewrite -{1}[1](pown1n _ n) ler_pXn2r // [_ \in _]ler01.
 Qed.
 
 Lemma expr_lt1 n x : (0 < n)%N -> 0 <= x -> (x ^+ n < 1) = (x < 1).
 Proof.
-by move=> ngt0 xge0; rewrite -{1}[1](expr1n _ n) ltr_pXn2r // [_ \in _]ler01.
+by move=> ngt0 xge0; rewrite -{1}[1](pown1n _ n) ltr_pXn2r // [_ \in _]ler01.
 Qed.
 
 Definition expr_lte1 := (expr_le1, expr_lt1).
 
 Lemma expr_ge1 n x : (0 < n)%N -> 0 <= x -> (1 <= x ^+ n) = (1 <= x).
 Proof.
-by move=> ngt0 xge0; rewrite -{1}[1](expr1n _ n) ler_pXn2r // [_ \in _]ler01.
+by move=> ngt0 xge0; rewrite -{1}[1](pown1n _ n) ler_pXn2r // [_ \in _]ler01.
 Qed.
 
 Lemma expr_gt1 n x : (0 < n)%N -> 0 <= x -> (1 < x ^+ n) = (1 < x).
 Proof.
-by move=> ngt0 xge0; rewrite -{1}[1](expr1n _ n) ltr_pXn2r // [_ \in _]ler01.
+by move=> ngt0 xge0; rewrite -{1}[1](pown1n _ n) ltr_pXn2r // [_ \in _]ler01.
 Qed.
 
 Definition expr_gte1 := (expr_ge1, expr_gt1).
@@ -2130,7 +2130,7 @@ Definition eqr_norm_idVN := =^~ (ger0_def, ler0_def).
 Lemma real_exprn_even_ge0 n x : x \is real -> ~~ odd n -> 0 <= x ^+ n.
 Proof.
 move=> xR even_n; have [/exprn_ge0 -> //|x_lt0] := real_ge0P xR.
-rewrite -[x]opprK -mulN1r exprMn -signr_odd (negPf even_n) expr0 mul1r.
+rewrite -[x]opprK -mulN1r pownMn -signr_odd (negPf even_n) pownr0 mul1r.
 by rewrite exprn_ge0 ?oppr_ge0 ?ltW.
 Qed.
 
@@ -2157,7 +2157,7 @@ Lemma real_exprn_odd_ge0 n x :
 Proof.
 case/real_ge0P => [x_ge0|x_lt0] n_odd; first by rewrite exprn_ge0.
 apply: negbTE; rewrite lt_geF //.
-case: n n_odd => // n /= n_even; rewrite exprS pmulr_llt0 //.
+case: n n_odd => // n /= n_even; rewrite pownrS pmulr_llt0 //.
 by rewrite real_exprn_even_gt0 ?ler0_real ?ltW // (lt_eqF x_lt0) ?orbT.
 Qed.
 
@@ -2186,7 +2186,7 @@ Proof. by move=> Rx; rewrite -normrX ger0_norm -?realEsqr. Qed.
 (* Binary sign ((-1) ^+ s). *)
 
 Lemma normr_sign s : `|(-1) ^+ s : R| = 1.
-Proof. by rewrite normrX normrN1 expr1n. Qed.
+Proof. by rewrite normrX normrN1 pown1n. Qed.
 
 Lemma normrMsign s x : `|(-1) ^+ s * x| = `|x|.
 Proof. by rewrite normrM normr_sign mul1r. Qed.
@@ -2227,7 +2227,7 @@ Lemma sgrN1 : sg (-1) = -1 :> R. Proof. by rewrite ltr0_sg // ltrN10. Qed.
 Definition sgrE := (sgr0, sgr1, sgrN1).
 
 Lemma sqr_sg x : sg x ^+ 2 = (x != 0)%:R.
-Proof. by rewrite sgr_def exprMn_n sqrr_sign -mulnn mulnb andbb. Qed.
+Proof. by rewrite sgr_def pownMn_n sqrr_sign -mulnn mulnb andbb. Qed.
 
 Lemma mulr_sg_eq1 x y : (sg x * y == 1) = (x != 0) && (sg x == y).
 Proof.
@@ -2246,7 +2246,7 @@ Lemma sgr_eq0 x : (sg x == 0) = (x == 0).
 Proof. by rewrite -sqrf_eq0 sqr_sg pnatr_eq0; case: (x == 0). Qed.
 
 Lemma sgr_odd n x : x != 0 -> (sg x) ^+ n = (sg x) ^+ (odd n).
-Proof. by rewrite /sg; do 2!case: ifP => // _; rewrite ?expr1n ?signr_odd. Qed.
+Proof. by rewrite /sg; do 2!case: ifP => // _; rewrite ?pown1n ?signr_odd. Qed.
 
 Lemma sgrMn x n : sg (x *+ n) = (n != 0)%:R * sg x.
 Proof.
@@ -2490,7 +2490,7 @@ have [m leAm] := ubnP #|A|; elim: m => // m IHm in A leAm E n * => Ege0.
 apply/leifP; case: ifPn => [/forall_inP-Econstant | Enonconstant].
   have [i /= Ai | A0] := pickP [in A]; last by rewrite [n]eq_card0 ?big_pred0.
   have /eqfun_inP-E_i := Econstant i Ai; rewrite -(eq_bigr _ E_i) sumr_const.
-  by rewrite exprMn_n prodrMn_const -(eq_bigr _ E_i) prodr_const.
+  by rewrite pownMn_n prodrMn_const -(eq_bigr _ E_i) prodr_const.
 set mu := \sum_(i in A) E i; pose En i := E i *+ n.
 pose cmp_mu s := [pred i | s * mu < s * En i].
 have{Enonconstant} has_cmp_mu e (s := (-1) ^+ e): {i | i \in A & cmp_mu s i}.
@@ -2523,10 +2523,10 @@ have ->: \sum_(k in A') E' k = mu *+ n'.
   apply: (addrI mu); rewrite -mulrS -Dn -sumrMnl (bigD1 i Ai) big_andbC /=.
   rewrite !(bigD1 j A'j) /= eqxx addrA subrKC addrA; congr (_ + _).
   by apply: eq_bigr => k /andP[_ /negPf->].
-rewrite prodrMn_const exprMn_n -/n' ler_pMn2r ?expn_gt0; last by case: (n').
+rewrite prodrMn_const pownMn_n -/n' ler_pMn2r ?expn_gt0; last by case: (n').
 have ->: \prod_(k in A') E' k = E' j * pi.
   by rewrite (bigD1 j) //=; congr *%R; apply: eq_bigr => k /andP[_ /negPf->].
-rewrite -(ler_pM2l mu_gt0) -exprS -Dn mulrA; apply: lt_le_trans.
+rewrite -(ler_pM2l mu_gt0) -pownrS -Dn mulrA; apply: lt_le_trans.
 rewrite ltr_pM2r //= eqxx -addrA mulrDr mulrC -ltrBlDl -mulrBl.
 by rewrite mulrC ltr_pM2r ?subr_gt0.
 Qed.
@@ -2797,7 +2797,7 @@ Lemma sgrN x : sg (- x) = - sg x.
 Proof. by rewrite -mulrN1 sgrM sgrN1 mulrN1. Qed.
 
 Lemma sgrX n x : sg (x ^+ n) = (sg x) ^+ n.
-Proof. by elim: n => [|n IHn]; rewrite ?sgr1 // !exprS sgrM IHn. Qed.
+Proof. by elim: n => [|n IHn]; rewrite ?sgr1 // !pownrS sgrM IHn. Qed.
 
 Lemma sgr_smul x y : sg (sg x * y) = sg x * sg y.
 Proof. by rewrite sgrM sgr_id. Qed.
@@ -3008,7 +3008,7 @@ have x_ge1: 1 <= x; last have x_gt0 := lt_le_trans ltr01 x_ge1.
 rewrite horner_coef -(subnK p_gt1) -/n addnS big_ord_recr /= addn1.
 rewrite [in p`__]subnSK // subn1 -lead_coefE mon_p mul1r -ltrBlDl sub0r.
 apply: le_lt_trans (_ : lb * x ^+ n < _); last first.
-  by rewrite exprS ltr_pM2r ?exprn_gt0// -(ltrD2r 1) ltr_pwDr.
+  by rewrite pownrS ltr_pM2r ?exprn_gt0// -(ltrD2r 1) ltr_pwDr.
 rewrite -sumrN mulr_suml ler_sum // => j _; apply: le_trans (ler_norm _) _.
 rewrite normrN normrM ler_wpM2l // normrX.
 by rewrite ger0_norm ?(ltW x_gt0) // ler_weXn2l ?leq_ord.
@@ -3092,7 +3092,7 @@ HB.builders Context R of IntegralDomain_isNumRing R.
   Lemma normrN1 : `|-1| = 1 :> R.
   Proof.
   have: `|-1| ^+ 2 == 1 :> R
-    by rewrite expr2 /= -normM mulrNN mul1r -[1]subr0 -le_def le01.
+    by rewrite pownr2 /= -normM mulrNN mul1r -[1]subr0 -le_def le01.
   rewrite sqrf_eq1 => /predU1P [] //; rewrite -[-1]subr0 -le_def.
   have ->: (0 <= -1) = (-1 == 0 :> R) || (0 < -1)
     by rewrite lt_def; case: eqP => // ->; rewrite lerr.

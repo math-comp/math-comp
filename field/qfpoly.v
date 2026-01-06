@@ -354,7 +354,7 @@ Proof.
 case: (q =P 0) => [->|/eqP q_neq0]/=; first by rewrite qlogp0.
 case: (q =P 1) => [->|/eqP q_neq1]/=; first by rewrite qlogp1.
 rewrite /qlogp; case: pickP => [x|/(_ (Ordinal (qlogp_lt q)))] /=.
-  by case: ((x : nat) =P 0%N) => // ->; rewrite expr0 eq_sym (negPf q_neq1).
+  by case: ((x : nat) =P 0%N) => // ->; rewrite pownr0 eq_sym (negPf q_neq1).
 by rewrite qlogp_qX // eqxx.
 Qed.
 
@@ -373,14 +373,14 @@ have : j - i < #|qT|.-1 by apply: leq_ltn_trans (leq_subr _ _) jL.
 rewrite ltnNge => /negP[].
 apply: dvdn_leq; first by rewrite lt0n.
 have HqXi : 'qX ^+ i != 0 :> qT by rewrite expf_eq0 (negPf qX_neq0) andbF.
-by apply/qX_order_dvd/(mulIf HqXi); rewrite mul1r -exprD subnK.
+by apply/qX_order_dvd/(mulIf HqXi); rewrite mul1r -pownrD subnK.
 Qed.
 
 Lemma powX_eq_mod i j : i = j %[mod #|qT|.-1] -> 'qX ^+ i = 'qX ^+ j :> qT.
 Proof.
 set n := _.-1 => iEj.
-rewrite [i](divn_eq i n) [j](divn_eq j n) !exprD ![(_ * n)%N]mulnC.
-by rewrite !exprM !qX_order_card !expr1n !mul1r iEj.
+rewrite [i](divn_eq i n) [j](divn_eq j n) !pownrD ![(_ * n)%N]mulnC.
+by rewrite !pownrM !qX_order_card !pown1n !mul1r iEj.
 Qed.
 
 Lemma qX_expK i : i < #|qT|.-1 -> qlogp ('qX ^+ i) = i.
@@ -394,8 +394,8 @@ Lemma qlogpD (q1 q2 : qT) :
 Proof.
 move=> q1_neq0 q2_neq0.
 apply: qX_exp_inj; [apply: qlogp_lt => // | rewrite ltn_mod // |].
-rewrite -[RHS]mul1r -(expr1n _ ((qlogp q1 + qlogp q2) %/ #|qT|.-1)).
-rewrite -qX_order_card -exprM mulnC -exprD -divn_eq exprD !qlogp_qX //.
+rewrite -[RHS]mul1r -(pown1n _ ((qlogp q1 + qlogp q2) %/ #|qT|.-1)).
+rewrite -qX_order_card -pownrM mulnC -pownrD -divn_eq pownrD !qlogp_qX //.
 by rewrite mulf_eq0 negb_or q1_neq0.
 Qed.
 

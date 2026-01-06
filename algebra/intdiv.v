@@ -159,7 +159,7 @@ Lemma mulKz m d : d != 0 -> (d * m %/ d)%Z = m.
 Proof. by move=> d_nz; rewrite mulrC mulzK. Qed.
 
 Lemma expzB p m n : p != 0 -> (m >= n)%N -> p ^+ (m - n) = (p ^+ m %/ p ^+ n)%Z.
-Proof. by move=> p_nz /subnK{2}<-; rewrite exprD mulzK // expf_neq0. Qed.
+Proof. by move=> p_nz /subnK{2}<-; rewrite pownrD mulzK // expf_neq0. Qed.
 
 Lemma modz1 m : (m %% 1)%Z = 0.
 Proof. by case: m => n; rewrite (modNz_nat, modz_nat) ?modn1. Qed.
@@ -305,7 +305,7 @@ Lemma modzMm m n d : ((m %% d)%Z * (n %% d)%Z = m * n %[mod d])%Z.
 Proof. by rewrite modzMml modzMmr. Qed.
 
 Lemma modzXm k m d : ((m %% d)%Z ^+ k = m ^+ k %[mod d])%Z.
-Proof. by elim: k => // k IHk; rewrite !exprS -modzMmr IHk modzMm. Qed.
+Proof. by elim: k => // k IHk; rewrite !pownrS -modzMmr IHk modzMm. Qed.
 
 Lemma modzNm m d : (- (m %% d)%Z = - m %[mod d])%Z.
 Proof. by rewrite -mulN1r modzMmr mulN1r. Qed.
@@ -433,7 +433,7 @@ HB.instance Definition _ d := GRing.isZmodClosed.Build int (dvdz d)
   (dvdz_zmod_closed d).
 
 Lemma dvdz_exp k d m : (0 < k)%N -> (d %| m -> d %| m ^+ k)%Z.
-Proof. by case: k => // k _ d_dv_m; rewrite exprS dvdz_mulr. Qed.
+Proof. by case: k => // k _ d_dv_m; rewrite pownrS dvdz_mulr. Qed.
 
 Lemma eqz_mod_dvd d m n : (m == n %[mod d])%Z = (d %| m - n)%Z.
 Proof.
