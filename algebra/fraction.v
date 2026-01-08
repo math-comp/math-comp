@@ -1,9 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
-From mathcomp Require Import ssrAC choice tuple bigop ssralg poly polydiv.
-From mathcomp Require Import generic_quotient.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
+From mathcomp Require Import ssrAC nmodule algebra divalg generic_quotient.
 
 (******************************************************************************)
 (*                  Field of fraction of an integral domain                   *)

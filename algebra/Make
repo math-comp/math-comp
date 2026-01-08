@@ -16,7 +16,10 @@ polyXY.v
 qpoly.v
 rat.v
 ring_quotient.v
-ssralg.v
+alg/algebra.v
+alg/divalg.v
+alg/decfield.v
+alg/ssralg.v
 ssrint.v
 num_theory/orderedzmod.v
 num_theory/numdomain.v
