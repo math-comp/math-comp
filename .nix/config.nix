@@ -13,10 +13,6 @@ with builtins; with (import <nixpkgs> {}).lib;
   ## to serve as a basis for nix-shell edit this
   shell-attribute = "mathcomp-single";
 
-  ## Set this when the package has no rocqPackages version yet
-  ## (either in nixpkgs or in .nix/rocq-overlays)
-  no-rocq-yet = true;
-
   ## Indicate the relative location of your _CoqProject
   ## If not specified, it defaults to "_CoqProject"
   coqproject = "_CoqProject";
