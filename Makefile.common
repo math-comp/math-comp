@@ -155,7 +155,7 @@ doc: __always__ Makefile.coq
 	+cd _build_doc && $(ROCQMAKE)
 	cd _build_doc && grep -v vio: .Makefile.coq.d | sed -e 's/[^ ]*rocq-runtime[^ ]*//g' > depend
 	cd _build_doc && cat depend | ../etc/buildlibgraph $(ROCQFILES) > htmldoc/depend.js
-	cd _build_doc && $(ROCQBIN)coqdoc -t "Mathematical Components" \
+	cd _build_doc && $(ROCQ) doc -t "Mathematical Components" \
 		-g --utf8 -R . mathcomp \
 		--parse-comments \
 		--multi-index $(ROCQFILES) -d htmldoc
