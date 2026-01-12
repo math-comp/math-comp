@@ -26,3 +26,5 @@ From mathcomp Require Export fraction.
 From mathcomp Require Export zmodp.
 From mathcomp Require Export sesquilinear.
 From mathcomp Require Export spectral.
+From mathcomp Require Export ring.
+From mathcomp Require Export lra.
