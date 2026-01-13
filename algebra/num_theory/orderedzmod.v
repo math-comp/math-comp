@@ -58,6 +58,11 @@ Module Num.
 HB.structure Definition POrderedZmodule :=
   { R of Order.isPOrder ring_display R & GRing.Zmodule R }.
 
+Module POrderedZmoduleExports.
+Bind Scope ring_scope with POrderedZmodule.sort.
+End POrderedZmoduleExports.
+HB.export POrderedZmoduleExports.
+
 Module Export Def.
 
 Notation ler := (@Order.le ring_display _) (only parsing).
