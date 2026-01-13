@@ -14,6 +14,8 @@ From mathcomp Require Import ssralg poly.
 (*                                                                            *)
 (* This file defines the following number structures:                         *)
 (*                                                                            *)
+(*  porderNmodType == join of Order.POrder and GRing.Nmodule                  *)
+(*                    The HB class is called POrderNmodule.                   *)
 (*  porderZmodType == join of Order.POrder and GRing.Zmodule                  *)
 (*                    The HB class is called POrderZmodule.                   *)
 (*                                                                            *)
@@ -54,9 +56,18 @@ Fact ring_display : Order.disp_t. Proof. exact. Qed.
 
 Module Num.
 
+#[short(type="porderNmodType")]
+HB.structure Definition POrderNmodule :=
+  { R of Order.isPOrder ring_display R & GRing.Nmodule R}.
+
+Module POrderNmoduleExports.
+Bind Scope ring_scope with POrderNmodule.sort.
+End POrderNmoduleExports.
+HB.export POrderNmoduleExports.
+
 #[short(type="porderZmodType")]
 HB.structure Definition POrderZmodule :=
-  { R of Order.isPOrder ring_display R & GRing.Zmodule R }.
+  { R of POrderNmodule R & GRing.Zmodule R }.
 
 Module POrderZmoduleExports.
 Bind Scope ring_scope with POrderZmodule.sort.
@@ -94,7 +105,7 @@ Notation "@ 'minr' R" := (@Order.min ring_display R)
   (at level 10, R at level 8, only parsing) : function_scope.
 
 Section Def.
-Context {R : porderZmodType}.
+Context {R : porderNmodType}.
 
 Definition pos_num_pred := fun x : R => 0 < x.
 Definition pos_num : qualifier 0 R := [qualify x | pos_num_pred x].
