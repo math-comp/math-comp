@@ -15,7 +15,7 @@ From mathcomp Require Import ssralg poly.
 (* This file defines the following number structures:                         *)
 (*                                                                            *)
 (*  porderZmodType == join of Order.POrder and GRing.Zmodule                  *)
-(*                    The HB class is called POrderedZmodule.                 *)
+(*                    The HB class is called POrderZmodule.                   *)
 (*                                                                            *)
 (* The ordering symbols and notations (<, <=, >, >=, _ <= _ ?= iff _,         *)
 (* _ < _ ?<= if _, >=<, and ><) and lattice operations (meet and join)        *)
@@ -55,13 +55,13 @@ Fact ring_display : Order.disp_t. Proof. exact. Qed.
 Module Num.
 
 #[short(type="porderZmodType")]
-HB.structure Definition POrderedZmodule :=
+HB.structure Definition POrderZmodule :=
   { R of Order.isPOrder ring_display R & GRing.Zmodule R }.
 
-Module POrderedZmoduleExports.
-Bind Scope ring_scope with POrderedZmodule.sort.
-End POrderedZmoduleExports.
-HB.export POrderedZmoduleExports.
+Module POrderZmoduleExports.
+Bind Scope ring_scope with POrderZmodule.sort.
+End POrderZmoduleExports.
+HB.export POrderZmoduleExports.
 
 Module Export Def.
 

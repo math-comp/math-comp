@@ -77,8 +77,8 @@ Module Num.
 #[short(type="numFieldType")]
 HB.structure Definition NumField := { R of GRing.UnitRing_isField R &
      GRing.IntegralDomain R &
-     POrderedZmodule R &
-     NormedZmodule (POrderedZmodule.clone R _) R &
+     POrderZmodule R &
+     NormedZmodule (POrderZmodule.clone R _) R &
      isNumRing R }.
 
 Module NumFieldExports.

@@ -52,7 +52,7 @@ Import orderedzmod.Num.
 
 Module Num.
 
-HB.mixin Record Zmodule_isSemiNormed (R : POrderedZmodule.type) M
+HB.mixin Record Zmodule_isSemiNormed (R : POrderZmodule.type) M
          of GRing.Zmodule M := {
   norm : M -> R;
   ler_normD : forall x y, norm (x + y) <= norm x + norm y;
@@ -65,7 +65,7 @@ HB.structure Definition SemiNormedZmodule (R : porderZmodType) :=
   { M of Zmodule_isSemiNormed R M & GRing.Zmodule M }.
 
 HB.mixin Record SemiNormedZmodule_isPositiveDefinite
-    (R : POrderedZmodule.type) M of @SemiNormedZmodule R M := {
+    (R : POrderZmodule.type) M of @SemiNormedZmodule R M := {
   normr0_eq0 : forall x : M, norm x = 0 -> x = 0;
 }.
 
@@ -74,7 +74,7 @@ HB.structure Definition NormedZmodule (R : porderZmodType) :=
   { M of SemiNormedZmodule_isPositiveDefinite R M & SemiNormedZmodule R M }.
 Arguments norm {R M} x : rename.
 
-HB.factory Record Zmodule_isNormed (R : POrderedZmodule.type) M
+HB.factory Record Zmodule_isNormed (R : POrderZmodule.type) M
          of GRing.Zmodule M := {
   norm : M -> R;
   ler_normD : forall x y, norm (x + y) <= norm x + norm y;
@@ -82,7 +82,7 @@ HB.factory Record Zmodule_isNormed (R : POrderedZmodule.type) M
   normrMn : forall x n, norm (x *+ n) = norm x *+ n;
   normrN : forall x, norm (- x) = norm x;
 }.
-HB.builders Context (R : POrderedZmodule.type) M of Zmodule_isNormed R M.
+HB.builders Context (R : POrderZmodule.type) M of Zmodule_isNormed R M.
   HB.instance Definition _ :=
     Zmodule_isSemiNormed.Build R M ler_normD normrMn normrN.
   HB.instance Definition _ :=
@@ -100,8 +100,8 @@ Notation "[ 'normedZmodType' R 'of' T ]" := (@clone _ (Phant R) T _ _ id)
 End NormedZmoduleExports.
 HB.export NormedZmoduleExports.
 
-HB.mixin Record isNumRing R of GRing.NzRing R & POrderedZmodule R
-  & NormedZmodule (POrderedZmodule.clone R _) R := {
+HB.mixin Record isNumRing R of GRing.NzRing R & POrderZmodule R
+  & NormedZmodule (POrderZmodule.clone R _) R := {
  addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
  ger_leVge : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
  normrM : {morph (norm : R -> R) : x y / x * y};
@@ -111,8 +111,8 @@ HB.mixin Record isNumRing R of GRing.NzRing R & POrderedZmodule R
 #[short(type="numDomainType")]
 HB.structure Definition NumDomain := { R of
      GRing.IntegralDomain R &
-     POrderedZmodule R &
-     NormedZmodule (POrderedZmodule.clone R _) R &
+     POrderZmodule R &
+     NormedZmodule (POrderZmodule.clone R _) R &
      isNumRing R
   }.
 Arguments addr_gt0 {_} [x y] : rename.
