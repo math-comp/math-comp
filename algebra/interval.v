@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import div fintype bigop order ssralg finset fingroup.
-From mathcomp Require Import ssrnum.
+From mathcomp Require Import orderedzmod numdomain numfield.
 
 (******************************************************************************)
 (*                         Intervals in ordered types                         *)
