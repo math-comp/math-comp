@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
-From mathcomp Require Import ssralg poly orderedzmod.
+From mathcomp Require Import interval ssralg poly orderedzmod.
 
 (******************************************************************************)
 (*                    Number structures (numdomain.v)                         *)
@@ -2550,6 +2550,56 @@ Qed.
 End NumDomainOperationTheory.
 
 #[global] Hint Resolve lerN2 ltrN2 normr_real : core.
+
+Section IntervalNumDomain.
+
+Variable R : numDomainType.
+Implicit Types x : R.
+
+Lemma real_BSide_min b x y : x \in Num.real -> y \in Num.real ->
+  BSide b (Order.min x y) = Order.min (BSide b x) (BSide b y).
+Proof. by move=> xr yr; apply/comparable_BSide_min/real_comparable. Qed.
+
+Lemma real_BSide_max b x y : x \in Num.real -> y \in Num.real ->
+  BSide b (Order.max x y) = Order.max (BSide b x) (BSide b y).
+Proof. by move=> xr yr; apply/comparable_BSide_max/real_comparable. Qed.
+
+Lemma mem0_itvcc_xNx x : (0 \in `[- x, x]) = (0 <= x).
+Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_le0 andbb. Qed.
+
+Lemma mem0_itvoo_xNx x : (0 \in `]- x, x[) = (0 < x).
+Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_lt0 andbb. Qed.
+
+Lemma oppr_itv ba bb (xa xb x : R) :
+  (- x \in Interval (BSide ba xa) (BSide bb xb)) =
+  (x \in Interval (BSide (~~ bb) (- xb)) (BSide (~~ ba) (- xa))).
+Proof.
+by rewrite !itv_boundlr /<=%O /= !implybF negbK andbC lteifNl lteifNr.
+Qed.
+
+Lemma oppr_itvoo (a b x : R) : (- x \in `]a, b[) = (x \in `]- b, - a[).
+Proof. exact: oppr_itv. Qed.
+
+Lemma oppr_itvco (a b x : R) : (- x \in `[a, b[) = (x \in `]- b, - a]).
+Proof. exact: oppr_itv. Qed.
+
+Lemma oppr_itvoc (a b x : R) : (- x \in `]a, b]) = (x \in `[- b, - a[).
+Proof. exact: oppr_itv. Qed.
+
+Lemma oppr_itvcc (a b x : R) : (- x \in `[a, b]) = (x \in `[- b, - a]).
+Proof. exact: oppr_itv. Qed.
+
+Definition miditv (R : numDomainType) (i : interval R) : R :=
+  match i with
+  | Interval (BSide _ a) (BSide _ b) => (a + b) / 2%:R
+  | Interval -oo%O (BSide _ b) => b - 1
+  | Interval (BSide _ a) +oo%O => a + 1
+  | Interval -oo%O +oo%O => 0
+  | _ => 0
+  end.
+
+End IntervalNumDomain.
+
 #[global] Hint Extern 0 (is_true (_%:R \is real)) => apply: realn : core.
 #[global] Hint Extern 0 (is_true (0 \is real)) => apply: real0 : core.
 #[global] Hint Extern 0 (is_true (1 \is real)) => apply: real1 : core.
