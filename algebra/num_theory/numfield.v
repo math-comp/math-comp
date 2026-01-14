@@ -27,7 +27,7 @@ From mathcomp Require Import interval ssralg poly orderedzmod numdomain.
 (*       Num.sqrt x == in a real-closed field, a positive square root of x if *)
 (*                     x >= 0, or 0 otherwise                                 *)
 (* For numeric algebraically closed fields we provide the generic definitions *)
-(*         'i == the imaginary number                                         *)
+(*         'i == the imaginary number (:= sqrtC (-1))                         *)
 (*      'Re z == the real component of z                                      *)
 (*      'Im z == the imaginary component of z                                 *)
 (*        z^* == the complex conjugate of z                                   *)
