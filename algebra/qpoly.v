@@ -480,8 +480,8 @@ Fact in_qpoly_is_linear : linear in_qpoly.
 Proof. by move=> k p q; rewrite in_qpolyD in_qpolyZ. Qed.
 
 HB.instance Definition _ :=
-  GRing.isSemilinear.Build R {poly R} {poly_(size (mk_monic h)).-1 R} _ in_qpoly
-    (GRing.semilinear_linear in_qpoly_is_linear).
+  GRing.isLinear.Build R {poly R} {poly_(size (mk_monic h)).-1 R} _ in_qpoly
+    in_qpoly_is_linear.
 
 Lemma qpolyC_proof k :
   (k%:P : {poly R}) \is a poly_of_size (size (mk_monic h)).-1.
