@@ -149,6 +149,8 @@ End RealClosed.
 
 Module Import Def.
 
+Export Num.Def.
+
 Notation conjC := conj.
 Definition sqrtr {R} x := s2val (sig2W (@sqrtr_subproof R x)).
 
@@ -164,6 +166,9 @@ Notation "'i" := imaginary : ring_scope.
 End Syntax.
 
 Module Export Theory.
+
+Export Num.Theory.
+
 Section NumFieldTheory.
 
 Variable F : numFieldType.

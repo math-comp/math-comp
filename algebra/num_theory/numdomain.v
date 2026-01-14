@@ -128,6 +128,8 @@ HB.export NumDomainExports.
 
 Module Export Def.
 
+Export Num.Def.
+
 Notation normr := norm.
 Notation "`| x |" := (norm x) : ring_scope.
 
@@ -297,6 +299,8 @@ Export Internals.Exports.
 End PredInstances.
 
 Module Export Theory.
+
+Export Num.Theory.
 
 Section NumIntegralDomainTheory.
 
