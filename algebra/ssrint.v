@@ -657,13 +657,17 @@ Lemma intrN n : (- n)%:~R = - n%:~R :> R. Proof. exact: mulrNz. Qed.
 
 Lemma intrD m n : (m + n)%:~R = m%:~R + n%:~R :> R. Proof. exact: mulrzDr. Qed.
 
+Lemma intrD1 m : (m + 1)%:~R = m%:~R + 1 :> R. Proof. by rewrite intrD. Qed.
+
+Lemma intr1D m : (1 + m)%:~R = 1 + m%:~R :> R. Proof. by rewrite intrD. Qed.
+
 Lemma intrB m n : (m - n)%:~R = m%:~R - n%:~R :> R. Proof. exact: mulrzBr. Qed.
 
 Lemma intrM m n : (m * n)%:~R = m%:~R * n%:~R :> R.
 Proof. by rewrite mulrzA -mulrzr. Qed.
 
 Lemma intmul1_is_monoid_morphism : monoid_morphism ( *~%R (1 : R)).
-Proof. by split; move=> // x y /=; rewrite ?intrD ?mulrNz ?intrM. Qed.
+Proof. by split; move=> // x y /=; rewrite intrM. Qed.
 #[deprecated(since="mathcomp 2.5.0", use=intmul1_is_monoid_morphism)]
 Definition intmul1_is_multiplicative :=
   (fun g => (g.2,g.1)) intmul1_is_monoid_morphism.
