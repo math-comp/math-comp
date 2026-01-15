@@ -657,9 +657,9 @@ Lemma intrN n : (- n)%:~R = - n%:~R :> R. Proof. exact: mulrNz. Qed.
 
 Lemma intrD m n : (m + n)%:~R = m%:~R + n%:~R :> R. Proof. exact: mulrzDr. Qed.
 
-Lemma intrD1 m : m%:~R + 1 = (m + 1)%:~R :> R. Proof. by rewrite intrD. Qed.
+Lemma intrD1 m : (m + 1)%:~R = m%:~R + 1 :> R. Proof. by rewrite intrD. Qed.
 
-Lemma intr1D m : 1 + m%:~R = (1 + m)%:~R :> R. Proof. by rewrite intrD. Qed.
+Lemma intr1D m : (1 + m)%:~R = 1 + m%:~R :> R. Proof. by rewrite intrD. Qed.
 
 Lemma intrB m n : (m - n)%:~R = m%:~R - n%:~R :> R. Proof. exact: mulrzBr. Qed.
 
