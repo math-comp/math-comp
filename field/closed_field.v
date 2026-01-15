@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
-From mathcomp Require Import fintype generic_quotient bigop ssralg poly.
+From mathcomp Require Import fintype generic_quotient bigop nmodule ssralg poly.
 From mathcomp Require Import polydiv matrix mxpoly countalg ring_quotient.
 
 (******************************************************************************)
@@ -703,8 +703,14 @@ have I_ideal : idealr_closed I.
   by apply: dvdp_trans Iq2; apply/dv_d/leq_maxr.
 pose IaM := GRing.isZmodClosed.Build _ I (idealr_closedB I_ideal).
 pose IpM := isProperIdeal.Build _ I (idealr_closed_nontrivial I_ideal).
-pose Iid : idealr _ := HB.pack I IaM IpM.
-pose E : comNzRingType := {ideal_quot Iid}.
+HB.enrich I as Iid : (idealr _) with IaM IpM.
+pose E_ := {ideal_quot Iid}.
+pose EcomRing := GRing.ComNzRing.on E_.
+
+pose E : comNzRingType := HB.pack E_ EcomRing.
+do [ HB.share_mixins_noclear (E_) ] in @E.
+(* HB.enrich E_ as E : comNzRingType with EcomRing. *)
+
 pose PtoE : {rmorphism {poly F} -> E} := \pi_E%qT.
 have PtoEd i: PtoE (d i) = 0.
   by apply/eqP; rewrite piE Quotient.equivE subr0; apply/memI; exists i.
@@ -725,9 +731,13 @@ have EmulV : forall x, x != 0 -> Einv x * x = 1.
   rewrite -[X in _ - X]uv1 opprD addNKr -mulNr.
   by apply/memI; exists i; apply: dvdp_mull.
 pose EfieldMixin := GRing.ComNzRing_isField.Build _ EmulV Einv0.
+
 pose Efield : fieldType := HB.pack E EfieldMixin.
+do [ HB.share_mixins_noclear E_ ] in @Efield.
+(* HB.enrich E_ as Efield : fieldType with E EfieldMixin. *)
+
 pose EIsCountable := isCountable.Build E (pcan_pickleK (can_pcan (reprK))).
-pose Ecount : countFieldType := HB.pack E Efield EIsCountable.
+HB.enrich E_ as Ecount : countFieldType with Efield EIsCountable.
 pose FtoE : {rmorphism _ -> _} := PtoE \o polyC; pose w : E := PtoE 'X.
 have defPtoE q: (map_poly FtoE q).[w] = PtoE q.
   by rewrite (map_poly_comp PtoE polyC) horner_map [_.['X]]comp_polyXr.
@@ -853,7 +863,11 @@ have Kadd0: left_id (FtoK 0) Kadd.
 have KaddN: left_inverse (FtoK 0) Kopp Kadd.
   by move=> u; have [i [x ->]] := KtoE u; rewrite -EtoK_N -EtoK_D addNr EtoK_0.
 pose KzmodMixin := GRing.isZmodule.Build K KaddA KaddC Kadd0 KaddN.
+
 pose Kzmod : countZmodType := HB.pack K KzmodMixin.
+do [ HB.share_mixins_noclear K ] in @Kzmod.
+(* HB.enrich K as Kzmod : countZmodType with KzmodMixin. *)
+
 have KmulC: commutative Kmul.
   by move=> u v; have [i [x ->] [y ->]] := KtoE2 u v; rewrite -!EtoK_M mulrC.
 have KmulA: @associative Kzmod Kmul.
@@ -867,21 +881,23 @@ have KmulD: left_distributive Kmul Kadd.
 have Kone_nz: FtoK 1 != FtoK 0 by rewrite EtoKeq0 oner_neq0.
 pose KringMixin := GRing.Zmodule_isComNzRing.Build _
   KmulA KmulC Kmul1 KmulD Kone_nz.
-pose Kring : comNzRingType := HB.pack K Kzmod KringMixin cntK.
+HB.enrich K as Kring : comNzRingType with Kzmod KringMixin cntK.
 have KmulV: forall x : Kring, x != 0 -> (Kinv x : Kring) * x = 1.
   move=> u; have [i [x ->]] := KtoE u; rewrite EtoKeq0 => nz_x.
   by rewrite -EtoK_V -[_ * _]EtoK_M mulVf ?EtoK_1.
 have Kinv0: Kinv (FtoK 0) = FtoK 0 by rewrite -EtoK_V invr0.
 pose KfieldMixin := GRing.ComNzRing_isField.Build _ KmulV Kinv0.
-pose Kfield : fieldType := HB.pack K Kring KfieldMixin.
+HB.enrich K as Kfield : fieldType with Kring KfieldMixin.
 have EtoKAdd i : zmod_morphism (EtoK i : E i -> Kfield).
   by move=> x y; rewrite EtoK_D EtoK_N.
 have EtoKMul i : monoid_morphism (EtoK i : E i -> Kfield).
   by split=> [|x y]; rewrite ?EtoK_M ?EtoK_1.
 pose EtoKMa i := GRing.isZmodMorphism.Build _ _ _ (EtoKAdd i).
 pose EtoKMm i := GRing.isMonoidMorphism.Build _ _ _ (EtoKMul i).
-pose EtoKM i : {rmorphism _ -> _} :=
-  HB.pack (EtoK i : E i -> Kfield) (EtoKMa i) (EtoKMm i).
+
+pose  EtoKM i : {rmorphism _ -> _} := HB.pack (EtoK i : E i -> Kfield) (EtoKMa i) (EtoKMm i).
+(* bug: HB.enrich EtoK i : (E i -> Kfield) as EtoKM : {rmorphism _ -> _} with (EtoKMa i) (EtoKMm i). *)
+
 have EtoK_E: EtoK _ = EtoKM _ by [].
 have toEtoKp := @eq_map_poly _ Kring _ _(toEtoK _ _ _).
 have Kclosed: GRing.closed_field_axiom Kfield.

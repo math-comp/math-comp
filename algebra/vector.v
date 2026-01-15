@@ -1122,7 +1122,7 @@ have lin_f: linear f.
   move=> k u v; rewrite scaler_sumr -big_split; apply: eq_bigr => i _.
   by rewrite /= scalerA -scalerDl linearP.
 pose flM := GRing.isLinear.Build _ _ _ _ f lin_f.
-pose fL : {linear _ -> _} := HB.pack f flM.
+HB.enrich f as fL : {linear _ -> _} with flM.
 exists fL => freeX eq_szX.
 apply/esym/(@eq_from_nth _ 0); rewrite ?size_map eq_szX // => i ltiX.
 rewrite (nth_map 0) //= /f (bigD1 (Ordinal ltiX)) //=.
@@ -2071,7 +2071,7 @@ have p2rK : cancel p2r r2p by case=> u v; rewrite /r2p row_mxKl row_mxKr !v2rK.
 have r2p_lin: semilinear r2p.
   by split=> [a u|u v]; congr (_, _); rewrite !semilinearP.
 pose r2plM := GRing.isSemilinear.Build _ _ _ _ r2p r2p_lin.
-pose r2pL : {linear _ -> _} := HB.pack r2p r2plM.
+HB.enrich r2p as r2pL : {linear _ -> _} with r2plM.
 by exists p2r; [apply: (@can2_semilinear _ _ _ r2pL) | exists r2p].
 Qed.
 HB.instance Definition _ := LSemiModule_hasFinDim.Build _ (vT1 * vT2)%type
@@ -2124,7 +2124,7 @@ Lemma vsolve_eqP (U : {vspace vT}) :
 Proof.
 have lhsZ: linear lhsf by move=> a u v; apply/ffunP=> i; rewrite !ffunE linearP.
 pose lhslM := GRing.isLinear.Build _ _ _ _ lhsf lhsZ.
-pose lhsL : {linear _ -> _} := HB.pack lhsf lhslM.
+HB.enrich lhsf as lhsL : {linear _ -> _} with lhslM.
 apply: (iffP memv_imgP) => [] [u Uu sol_u]; exists u => //.
   by move=> i; rewrite -[tnth rhs i]ffunE sol_u (lfunE lhsL) ffunE.
 by apply/ffunP=> i; rewrite (lfunE lhsL) !ffunE sol_u.

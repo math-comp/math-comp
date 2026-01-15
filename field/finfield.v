@@ -438,7 +438,7 @@ have fZ: scalable f.
 pose faM := GRing.isZmodMorphism.Build _ _ f fA.
 pose fmM := GRing.isMonoidMorphism.Build _ _ f fM.
 pose flM := GRing.isScalable.Build _ _ _ _ f fZ.
-pose fLRM : {lrmorphism _ -> _} := HB.pack f faM fmM flM.
+HB.enrich f as fLRM : {lrmorphism _ -> _} with faM fmM flM.
 have /kAut_to_gal[alpha galLalpha Dalpha]: kAut 1 {:L} (linfun fLRM).
   rewrite kAutfE; apply/kHomP_tmp; split=> [x /idfP | x y _ _]; rewrite !lfunE //=.
   exact: (rmorphM fLRM).
@@ -724,13 +724,14 @@ have [-> | nz_aqd] := eqVneq (aq d) 0; first by rewrite mul0r /=.
 by rewrite -[aq d]expr1 -exprB ?leq_b1 ?unitfE ?rpredX.
 Qed.
 
-Definition FinDomainFieldType : finFieldType :=
- let cC := GRing.SemiRing_hasCommutativeMul.Build R finDomain_mulrC in
- let cR : comUnitRingType := HB.pack R cC in
- let iC := GRing.ComUnitRing_isIntegral.Build cR domR in
- let iR : finIdomainType := HB.pack cR iC in
+Definition FinDomainFieldType : finFieldType.
+ pose cC := GRing.SemiRing_hasCommutativeMul.Build R finDomain_mulrC.
+ HB.enrich R as cR : comUnitRingType with cC.
+ pose iC := GRing.ComUnitRing_isIntegral.Build cR domR.
+ HB.enrich R as iR : finIdomainType with cR iC in
  let fC := GRing.UnitRing_isField.Build iR finDomain_field in
- HB.pack iR fC.
+ HB.enrich R as fR : finFieldType with iR fC.
+ exact fR.
 
 Definition FinDomainSplittingFieldType_pchar p (pcharRp : p \in [pchar R]) :=
   SplittingField.clone 'F_p R (@pPrimeCharType p FinDomainFieldType pcharRp).
