@@ -1,7 +1,8 @@
 (* mathcomp analysis (c) 2017 Inria and AIST. License: CeCILL-C.              *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool ssrnat eqtype choice.
-From mathcomp Require Import order ssralg ssrnum ssrint interval.
+From mathcomp Require Import order interval ssralg.
+From mathcomp Require Import orderedzmod numdomain numfield ssrint.
 
 (**md**************************************************************************)
 (* # Numbers within an interval                                               *)

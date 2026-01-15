@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
-From mathcomp Require Import ssralg poly orderedzmod numdomain.
+From mathcomp Require Import interval ssralg poly orderedzmod numdomain.
 
 (******************************************************************************)
 (*                      Number structures (numfield.v)                        *)
@@ -149,6 +149,8 @@ End RealClosed.
 
 Module Import Def.
 
+Export Num.Def.
+
 Notation conjC := conj.
 Definition sqrtr {R} x := s2val (sig2W (@sqrtr_subproof R x)).
 
@@ -164,6 +166,9 @@ Notation "'i" := imaginary : ring_scope.
 End Syntax.
 
 Module Export Theory.
+
+Export Num.Theory.
+
 Section NumFieldTheory.
 
 Variable F : numFieldType.
@@ -456,6 +461,62 @@ Lemma natf_indexg (gT : finGroupType) (G H : {group gT}) :
 Proof. by move=> sHG; rewrite -divgS // natf_div ?cardSg. Qed.
 
 End NumFieldTheory.
+
+Section IntervalNumField.
+
+Variable R : numFieldType.
+Implicit Types (x y z : R) (i : interval R).
+
+Local Notation mid x y := ((x + y) / 2).
+
+Lemma mid_in_itv : forall ba bb (xa xb : R), xa < xb ?<= if ba && ~~ bb ->
+  mid xa xb \in Interval (BSide ba xa) (BSide bb xb).
+Proof.
+by move=> [] [] xa xb /= ?; apply/itv_dec; rewrite /= ?midf_lte // ?ltW.
+Qed.
+
+Lemma mid_in_itvoo : forall (xa xb : R), xa < xb -> mid xa xb \in `]xa, xb[.
+Proof. by move=> xa xb ?; apply: mid_in_itv. Qed.
+
+Lemma mid_in_itvcc : forall (xa xb : R), xa <= xb -> mid xa xb \in `[xa, xb].
+Proof. by move=> xa xb ?; apply: mid_in_itv. Qed.
+
+Lemma mem_miditv i : (i.1 < i.2)%O -> miditv i \in i.
+Proof.
+move: i => [[ba a|[]] [bb b|[]]] //= ab; first exact: mid_in_itv.
+by rewrite !in_itv -lteifBlDl subrr lteif01.
+by rewrite !in_itv lteifBlDr -lteifBlDl subrr lteif01.
+Qed.
+
+Lemma miditv_le_left i b : (i.1 < i.2)%O -> (BSide b (miditv i) <= i.2)%O.
+Proof.
+case: i => [x y] lti; have := mem_miditv lti; rewrite inE => /andP[_ ].
+by apply: le_trans; rewrite !bnd_simp.
+Qed.
+
+Lemma miditv_ge_right i b : (i.1 < i.2)%O -> (i.1 <= BSide b (miditv i))%O.
+Proof.
+case: i => [x y] lti; have := mem_miditv lti; rewrite inE => /andP[+ _].
+by move=> /le_trans; apply; rewrite !bnd_simp.
+Qed.
+
+Lemma in_segmentDgt0Pr x y z :
+  reflect (forall e, e > 0 -> y \in `[x - e, z + e]) (y \in `[x, z]).
+Proof.
+apply/(iffP idP)=> [xyz e /[dup] e_gt0 /ltW e_ge0 | xyz_e].
+  by rewrite in_itv /= lerBDr !ler_wpDr// (itvP xyz).
+by rewrite in_itv /= ; apply/andP; split; apply/ler_addgt0Pr => ? /xyz_e;
+  rewrite in_itv /= lerBDr => /andP [].
+Qed.
+
+Lemma in_segmentDgt0Pl x y z :
+  reflect (forall e, e > 0 -> y \in `[- e + x, e + z]) (y \in `[x, z]).
+Proof.
+apply/(equivP (in_segmentDgt0Pr x y z)).
+by split=> zxy e /zxy; rewrite [z + _]addrC [_ + x]addrC.
+Qed.
+
+End IntervalNumField.
 
 Section RealField.
 Variables F : realFieldType.

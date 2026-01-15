@@ -1,9 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import div fintype bigop order ssralg finset fingroup.
-From mathcomp Require Import ssrnum.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype seq choice.
+From mathcomp Require Import fintype nmodule order.
 
 (******************************************************************************)
 (*                         Intervals in ordered types                         *)
@@ -701,111 +700,3 @@ by symmetry; rewrite inE/= -predC_itvl -predC_itvr.
 Qed.
 
 End IntervalTotal.
-
-Local Open Scope ring_scope.
-Import GRing.Theory Num.Theory.
-
-Section IntervalNumDomain.
-
-Variable R : numDomainType.
-Implicit Types x : R.
-
-Lemma real_BSide_min b x y : x \in Num.real -> y \in Num.real ->
-  BSide b (Order.min x y) = Order.min (BSide b x) (BSide b y).
-Proof. by move=> xr yr; apply/comparable_BSide_min/real_comparable. Qed.
-
-Lemma real_BSide_max b x y : x \in Num.real -> y \in Num.real ->
-  BSide b (Order.max x y) = Order.max (BSide b x) (BSide b y).
-Proof. by move=> xr yr; apply/comparable_BSide_max/real_comparable. Qed.
-
-Lemma mem0_itvcc_xNx x : (0 \in `[- x, x]) = (0 <= x).
-Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_le0 andbb. Qed.
-
-Lemma mem0_itvoo_xNx x : (0 \in `]- x, x[) = (0 < x).
-Proof. by rewrite itv_boundlr [in LHS]/<=%O /= oppr_lt0 andbb. Qed.
-
-Lemma oppr_itv ba bb (xa xb x : R) :
-  (- x \in Interval (BSide ba xa) (BSide bb xb)) =
-  (x \in Interval (BSide (~~ bb) (- xb)) (BSide (~~ ba) (- xa))).
-Proof.
-by rewrite !itv_boundlr /<=%O /= !implybF negbK andbC lteifNl lteifNr.
-Qed.
-
-Lemma oppr_itvoo (a b x : R) : (- x \in `]a, b[) = (x \in `]- b, - a[).
-Proof. exact: oppr_itv. Qed.
-
-Lemma oppr_itvco (a b x : R) : (- x \in `[a, b[) = (x \in `]- b, - a]).
-Proof. exact: oppr_itv. Qed.
-
-Lemma oppr_itvoc (a b x : R) : (- x \in `]a, b]) = (x \in `[- b, - a[).
-Proof. exact: oppr_itv. Qed.
-
-Lemma oppr_itvcc (a b x : R) : (- x \in `[a, b]) = (x \in `[- b, - a]).
-Proof. exact: oppr_itv. Qed.
-
-Definition miditv (R : numDomainType) (i : interval R) : R :=
-  match i with
-  | Interval (BSide _ a) (BSide _ b) => (a + b) / 2%:R
-  | Interval -oo%O (BSide _ b) => b - 1
-  | Interval (BSide _ a) +oo%O => a + 1
-  | Interval -oo%O +oo%O => 0
-  | _ => 0
-  end.
-
-End IntervalNumDomain.
-
-Section IntervalField.
-
-Variable R : numFieldType.
-Implicit Types (x y z : R) (i : interval R).
-
-Local Notation mid x y := ((x + y) / 2).
-
-Lemma mid_in_itv : forall ba bb (xa xb : R), xa < xb ?<= if ba && ~~ bb ->
-  mid xa xb \in Interval (BSide ba xa) (BSide bb xb).
-Proof.
-by move=> [] [] xa xb /= ?; apply/itv_dec; rewrite /= ?midf_lte // ?ltW.
-Qed.
-
-Lemma mid_in_itvoo : forall (xa xb : R), xa < xb -> mid xa xb \in `]xa, xb[.
-Proof. by move=> xa xb ?; apply: mid_in_itv. Qed.
-
-Lemma mid_in_itvcc : forall (xa xb : R), xa <= xb -> mid xa xb \in `[xa, xb].
-Proof. by move=> xa xb ?; apply: mid_in_itv. Qed.
-
-Lemma mem_miditv i : (i.1 < i.2)%O -> miditv i \in i.
-Proof.
-move: i => [[ba a|[]] [bb b|[]]] //= ab; first exact: mid_in_itv.
-by rewrite !in_itv -lteifBlDl subrr lteif01.
-by rewrite !in_itv lteifBlDr -lteifBlDl subrr lteif01.
-Qed.
-
-Lemma miditv_le_left i b : (i.1 < i.2)%O -> (BSide b (miditv i) <= i.2)%O.
-Proof.
-case: i => [x y] lti; have := mem_miditv lti; rewrite inE => /andP[_ ].
-by apply: le_trans; rewrite !bnd_simp.
-Qed.
-
-Lemma miditv_ge_right i b : (i.1 < i.2)%O -> (i.1 <= BSide b (miditv i))%O.
-Proof.
-case: i => [x y] lti; have := mem_miditv lti; rewrite inE => /andP[+ _].
-by move=> /le_trans; apply; rewrite !bnd_simp.
-Qed.
-
-Lemma in_segmentDgt0Pr x y z :
-  reflect (forall e, e > 0 -> y \in `[x - e, z + e]) (y \in `[x, z]).
-Proof.
-apply/(iffP idP)=> [xyz e /[dup] e_gt0 /ltW e_ge0 | xyz_e].
-  by rewrite in_itv /= lerBDr !ler_wpDr// (itvP xyz).
-by rewrite in_itv /= ; apply/andP; split; apply/ler_addgt0Pr => ? /xyz_e;
-  rewrite in_itv /= lerBDr => /andP [].
-Qed.
-
-Lemma in_segmentDgt0Pl x y z :
-  reflect (forall e, e > 0 -> y \in `[- e + x, e + z]) (y \in `[x, z]).
-Proof.
-apply/(equivP (in_segmentDgt0Pr x y z)).
-by split=> zxy e /zxy; rewrite [z + _]addrC [_ + x]addrC.
-Qed.
-
-End IntervalField.
