@@ -113,6 +113,7 @@ HB.instance Definition _ := GRing.ComUnitRing_isField.Build {poly %/ h with hI}
 
 HB.instance Definition _ := GRing.UnitAlgebra.on {poly %/ h with hI}.
 HB.instance Definition _ := Vector.on {poly %/ h with hI}.
+HB.instance Definition _ := UnitAlgebra_isFalgebra.Build R {poly %/ h with hI}.
 
 End Field.
 
