@@ -351,6 +351,14 @@ move=> exP; suffices [x Px /eqP Ex]: {x | P x & lhs x == rhs x} by exists x.
 by apply: sig2W; have [x Px /eqP Ex] := exP; exists x.
 Qed.
 
+Lemma sig_eq2W (vT vT' : eqType) (lhs rhs : T -> vT) (lhs' rhs' : T -> vT') :
+    (exists2 x : T, lhs x = rhs x & lhs' x = rhs' x) ->
+  {x : T | lhs x = rhs x & lhs' x = rhs' x}.
+Proof.
+move=> e; suff [x /eqP]: {x : T | lhs x == rhs x & lhs' x = rhs' x} by exists x.
+by apply: sig2_eqW; case: e => x /eqP; exists x.
+Qed.
+
 Definition choose P x0 :=
   if insub x0 : {? x | P x} is Some (exist x Px) then
     xchoose (ex_intro [eta P] x Px)

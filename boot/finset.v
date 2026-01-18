@@ -447,6 +447,15 @@ Proof. by rewrite !inE eqxx. Qed.
 Lemma set22 a b : b \in [set a; b].
 Proof. by rewrite !inE eqxx orbT. Qed.
 
+Lemma disjoint_set1l pA x : [disjoint [set x] & pA] = (x \notin pA).
+Proof.
+apply/pred0P/idP=> [/(_ x)/=|]; first by rewrite inE eqxx /= => ->.
+by move=> xNA y; rewrite !inE; case: eqP => //= ->; apply/negbTE.
+Qed.
+
+Lemma disjoint_set1r pA x : [disjoint pA & [set x]] = (x \notin pA).
+Proof. by rewrite disjoint_sym disjoint_set1l. Qed.
+
 Lemma setUP x A B : reflect (x \in A \/ x \in B) (x \in A :|: B).
 Proof. by rewrite !inE; apply: orP. Qed.
 
@@ -705,6 +714,17 @@ Proof. by rewrite !setDE setCU setIA. Qed.
 
 Lemma setDDr A B C : A :\: (B :\: C) = (A :\: B) :|: (A :&: C).
 Proof. by rewrite !setDE setCI setIUr setCK. Qed.
+
+Lemma setUD B A C : B \subset A -> C \subset B ->
+  (A :\: B) :|: (B :\: C) = (A :\: C).
+Proof.
+move=> subBA subCB; apply/setP=> x; rewrite !inE.
+have /implyP  := subsetP subBA x; have /implyP  := subsetP subCB x.
+by do !case: (_ \in _).
+Qed.
+
+Lemma setUDl A B: A :|: B :\: A = A :|: B.
+Proof. by apply/setP=> x; rewrite !inE; do !case: (_ \in _). Qed.
 
 (* powerset *)
 
@@ -2018,6 +2038,12 @@ Qed.
 
 Lemma cover1 A : cover [set A] = A.
 Proof. by rewrite /cover big_set1. Qed.
+
+Lemma subset_cover P P' : P \subset P' -> cover P \subset cover P'.
+Proof.
+move=> /subsetP subP; apply/subsetP=> x /bigcupP [scc /subP].
+by move=> scc' x_in; apply/bigcupP; exists scc.
+Qed.
 
 Lemma trivIset1 A : trivIset [set A].
 Proof. by rewrite /trivIset cover1 big_set1. Qed.

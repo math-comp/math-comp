@@ -119,6 +119,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 (*             mask m s == the subsequence of s selected by m : bitseq, with  *)
 (*                         item i of s selected by bit i in m (extra items or *)
 (*                         bits are ignored.                                  *)
+(*           mindex m i == the natural number such that                       *)
+(*                         nth x0 (mask m s) i = nth x0 s (mindex m i)        *)
 (*  ** Surgery:                                                               *)
 (* s1 ++ s2, cat s1 s2 == the concatenation of s1 and s2.                     *)
 (*            take n s == the sequence containing only the first n items of s *)
@@ -409,6 +411,9 @@ Proof. by case: s n => [|x s] [|n]. Qed.
 Lemma nth_cat s1 s2 n :
   nth (s1 ++ s2) n = if n < size s1 then nth s1 n else nth s2 (n - size s1).
 Proof. by elim: s1 n => [|x s1 IHs] []. Qed.
+
+Lemma nth_cons x s n : nth (x :: s) n = if n > 0 then nth s n.-1 else x.
+Proof. by case: n. Qed.
 
 Lemma nth_rcons s x n :
   nth (rcons s x) n =
@@ -1171,6 +1176,9 @@ Proof. by rewrite !inE. Qed.
 Lemma mem_cat x s1 s2 : (x \in s1 ++ s2) = (x \in s1) || (x \in s2).
 Proof. by elim: s1 => //= y s1 IHs; rewrite !inE /= -orbA -IHs. Qed.
 
+Lemma mem_catC x s1 s2 : (x \in s1 ++ s2) = (x \in s2 ++ s1).
+Proof. by rewrite !mem_cat orbC. Qed.
+
 Lemma mem_rcons s y : rcons s y =i y :: s.
 Proof. by move=> x; rewrite -cats1 /= mem_cat mem_seq1 orbC in_cons. Qed.
 
@@ -1191,6 +1199,12 @@ Proof.
 by elim: s n => // x s IHs [_|n sz_s]; rewrite ?mem_head // mem_behead ?IHs.
 Qed.
 
+Lemma mem_nthE s n : (nth s n \in s) = ((n >= size s) ==> (x0 \in s)).
+Proof.
+apply/idP/idP; first by case: ltnP => // ?; rewrite nth_default.
+by case: ltnP => //= ns x0s; [rewrite mem_nth|rewrite nth_default].
+Qed.
+
 Lemma mem_take s x : x \in take n0 s -> x \in s.
 Proof. by move=> s0x; rewrite -(cat_take_drop n0 s) mem_cat /= s0x. Qed.
 
@@ -1201,6 +1215,11 @@ Lemma last_eq s z x y : x != y -> z != y -> (last x s == y) = (last z s == y).
 Proof. by move=> /negPf xz /negPf yz; case: s => [|t s]//; rewrite xz yz. Qed.
 
 Section Filters.
+Lemma subset_cons2 x s s' : {subset s <= s'} -> {subset x :: s <= x :: s'}.
+Proof. by move=> ss' y; rewrite !in_cons => /orP[->//|/ss'->]; rewrite orbT. Qed.
+
+Lemma subset_cons x s s' : {subset s <= s'} -> {subset s <= x :: s'}.
+Proof. by move=> ss' y; rewrite !in_cons => /ss'-> /[!orbT]. Qed.
 
 Implicit Type a : pred T.
 
@@ -1335,6 +1354,18 @@ Lemma uniq_catCA s1 s2 s3 : uniq (s1 ++ s2 ++ s3) = uniq (s2 ++ s1 ++ s3).
 Proof.
 by rewrite !catA -!(uniq_catC s3) !(cat_uniq s3) uniq_catC !has_cat orbC.
 Qed.
+
+Lemma uniq_cat_inLR x s1 s2 : uniq (s1 ++ s2) ->
+  x \in s1 ++ s2 -> (x \in s1) = (x \notin s2).
+Proof.
+rewrite mem_cat=> s_uniq /orP[] x_in; move: s_uniq.
+  by rewrite uniq_catC cat_uniq => /and3P[_ /hasPn /(_ _ x_in)->].
+by rewrite cat_uniq => /and3P[_ /hasPn /(_ _ x_in) /= /negPf->]; rewrite x_in.
+Qed.
+
+Lemma uniq_cat_inRL x s1 s2 : uniq (s1 ++ s2) ->
+  x \in s1 ++ s2 -> (x \in s2) = (x \notin s1).
+Proof. by rewrite mem_catC uniq_catC; apply: uniq_cat_inLR. Qed.
 
 Lemma rcons_uniq s x : uniq (rcons s x) = (x \notin s) && uniq s.
 Proof. by rewrite -cats1 uniq_catC. Qed.
@@ -1692,11 +1723,39 @@ Qed.
 
 End NthTheory.
 
-Lemma set_nth_default T s (y0 x0 : T) n : n < size s -> nth x0 s n = nth y0 s n.
+Section SetNthLast.
+Variables (T : Type) (s : seq T) (y0 x0 : T).
+
+Lemma set_nth_default n : n < size s -> nth x0 s n = nth y0 s n.
 Proof. by elim: s n => [|y s' IHs] [|n] //= /IHs. Qed.
+
+Lemma set_last_default : size s > 0 -> last x0 s = last y0 s.
+Proof. by elim: s => [|y s' IHs] //= /IHs. Qed.
+
+End SetNthLast.
 
 Lemma headI T s (x : T) : rcons s x = head x s :: behead (rcons s x).
 Proof. by case: s. Qed.
+
+Section LastTakeDrop.
+Variable (T : eqType).
+Implicit Types (x : T) (n : nat) (s : seq T).
+
+Lemma last_take x n s : last x (take n s) =
+  if n > 0 then if n <= size s then nth x s n.-1 else last x s else x.
+Proof.
+elim: n s => [|n ihn] [|y s] //= in x *; rewrite {}ihn ltnS; case: n => //=.
+by move=> n; case: ltnP => // n_lt; apply/set_nth_default.
+Qed.
+
+Lemma last_drop x n s : last x (drop n s) = if n < size s then last x s else x.
+Proof.
+case: ltnP => sn; last by rewrite drop_oversize.
+rewrite -[s in RHS](cat_take_drop n) last_cat.
+by rewrite (@set_last_default _ _ x) ?size_drop ?subn_gt0.
+Qed.
+
+End LastTakeDrop.
 
 Arguments nthP {T s x}.
 Arguments has_nthP {T a s}.
@@ -2503,6 +2562,9 @@ Proof. by case: s. Qed.
 Lemma nth_map n s : n < size s -> nth x2 (map s) n = f (nth x1 s n).
 Proof. by elim: s n => [|x s IHs] []. Qed.
 
+Lemma map_nth x n s : f (nth x s n) = nth (f x) (map s) n.
+Proof. by elim: n s => [|n IHn] [|y s] /=. Qed.
+
 Lemma map_rcons s x : map (rcons s x) = rcons (map s) (f x).
 Proof. by rewrite -!cats1 map_cat. Qed.
 
@@ -2750,6 +2812,12 @@ Implicit Types (s : seq T) (a : pred T).
 
 Lemma filter_subseq a s : subseq (filter a s) s.
 Proof. by apply/subseqP; exists (map a s); rewrite ?size_map ?filter_mask. Qed.
+
+Lemma subset_memP s1 s2 : {subset s1 <= s2} -> {s3 | subseq s3 s2 & s1 =i s3}.
+Proof.
+move=> s12; exists (filter [in s1] s2); first by rewrite filter_subseq.
+by move=> x; rewrite mem_filter andb_idr//; apply: s12.
+Qed.
 
 Lemma subseq_filter s1 s2 a :
   subseq s1 (filter a s2) = all a s1 && subseq s1 s2.
@@ -3074,6 +3142,16 @@ elim: n m j => [//|n IHn] m [|j] jlen /=; rewrite leq_addr.
   rewrite (@eq_in_filter _ _ pred0) ?filter_pred0// => i.
   by rewrite addn0 leqNgt mem_iota => /andP[->].
 by rewrite addnS -addSn IHn -1?ltnS.
+Qed.
+
+Definition mindex m := nth (size m) (mask m (iota 0 (size m))).
+
+Lemma nth_mask {T} m x0 (s : seq T) : size m >= size s ->
+  forall i, nth x0 (mask m s) i = nth x0 s (mindex m i).
+Proof.
+rewrite /mindex => sm i.
+by elim: m s sm i => [|[] m IHm]//= [|x s]//= sm [|i];
+   rewrite ?nth_nil ?(iotaDl 1)//= -map_mask -map_nth/= IHm.
 Qed.
 
 (* Making a sequence of a specific length, using indexes to compute items. *)
@@ -3401,18 +3479,18 @@ Lemma zip_map I f g (s : seq I) :
 Proof. by elim: s => //= i s ->. Qed.
 
 Lemma unzip1_map_nth_zip x y s t l :
-  size s = size t -> 
+  size s = size t ->
   unzip1 [seq nth (x, y) (zip s t) i | i <- l] = [seq nth x s i | i <- l].
 Proof. by move=> st; elim: l => [//=|n l IH /=]; rewrite nth_zip ?IH ?st. Qed.
 
 Lemma unzip2_map_nth_zip x y s t l :
-  size s = size t -> 
+  size s = size t ->
   unzip2 [seq nth (x, y) (zip s t) i | i <- l] = [seq nth y t i | i <- l].
 Proof. by move=> st; elim: l => [//=|n l IH /=]; rewrite nth_zip ?IH ?st. Qed.
 
 End Zip.
 
-Lemma zip_uniql (S T : eqType) (s : seq S) (t : seq T) : 
+Lemma zip_uniql (S T : eqType) (s : seq S) (t : seq T) :
   uniq s -> uniq (zip s t).
 Proof.
 case: s t => [|s0 s] [|t0 t] //; apply: contraTT => /(uniqPn (s0, t0)) [i [j]].
@@ -3420,7 +3498,7 @@ case=> o z; rewrite !nth_zip_cond !ifT ?js ?(ltn_trans o)// => -[n _].
 by apply/(uniqPn s0); exists i, j; rewrite o n (leq_trans z) ?size_zip?geq_minl.
 Qed.
 
-Lemma zip_uniqr (S T : eqType) (s : seq S) (t : seq T) : 
+Lemma zip_uniqr (S T : eqType) (s : seq S) (t : seq T) :
   uniq t -> uniq (zip s t).
 Proof.
 case: s t => [|s0 s] [|t0 t] //; apply: contraTT => /(uniqPn (s0, t0)) [i [j]].
@@ -3428,7 +3506,7 @@ case=> o z; rewrite !nth_zip_cond !ifT ?js ?(ltn_trans o)// => -[_ n].
 by apply/(uniqPn t0); exists i, j; rewrite o n (leq_trans z) ?size_zip?geq_minr.
 Qed.
 
-Lemma perm_zip_sym (S T : eqType) (s1 s2 : seq S) (t1 t2 : seq T) : 
+Lemma perm_zip_sym (S T : eqType) (s1 s2 : seq S) (t1 t2 : seq T) :
   perm_eq (zip s1 t1) (zip s2 t2) -> perm_eq (zip t1 s1) (zip t2 s2).
 Proof.
 have swap t s : zip t s = map (fun u => (u.2, u.1)) (zip s t).
@@ -3436,8 +3514,8 @@ have swap t s : zip t s = map (fun u => (u.2, u.1)) (zip s t).
 by rewrite [zip t1 s1]swap [zip t2 s2]swap; apply: perm_map.
 Qed.
 
-Lemma perm_zip1 {S T : eqType} (t1 t2 : seq T) (s1 s2 : seq S): 
-  size s1 = size t1 -> size s2 = size t2 -> 
+Lemma perm_zip1 {S T : eqType} (t1 t2 : seq T) (s1 s2 : seq S):
+  size s1 = size t1 -> size s2 = size t2 ->
   perm_eq (zip s1 t1) (zip s2 t2) -> perm_eq s1 s2.
 Proof.
 wlog [x y] : s1 s2 t1 t2 / (S * T)%type => [hwlog|].

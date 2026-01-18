@@ -2932,29 +2932,9 @@ HB.instance Definition _ :=
 End Mulmxr.
 
 Section LiftPerm.
-
-(* Block expression of a lifted permutation matrix, for the Cormen LUP. *)
+(* Block expression of a lifted permutation matrix *)
 
 Variable n : nat.
-
-(* These could be in zmodp, but that would introduce a dependency on perm. *)
-
-Definition lift0_perm s : 'S_n.+1 := lift_perm 0 0 s.
-
-Lemma lift0_perm0 s : lift0_perm s 0 = 0.
-Proof. exact: lift_perm_id. Qed.
-
-Lemma lift0_perm_lift s k' :
-  lift0_perm s (lift 0 k') = lift (0 : 'I_n.+1) (s k').
-Proof. exact: lift_perm_lift. Qed.
-
-Lemma lift0_permK s : cancel (lift0_perm s) (lift0_perm s^-1).
-Proof. by move=> i; rewrite /lift0_perm -lift_permV permK. Qed.
-
-Lemma lift0_perm_eq0 s i : (lift0_perm s i == 0) = (i == 0).
-Proof. by rewrite (canF_eq (lift0_permK s)) lift0_perm0. Qed.
-
-(* Block expression of a lifted permutation matrix *)
 
 Definition lift0_mx A : 'M_(1 + n) := block_mx 1 0 0 A.
 
