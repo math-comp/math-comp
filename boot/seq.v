@@ -2848,13 +2848,29 @@ case/subseqP=> m sz_m ->; apply/subseqP.
 by exists m; rewrite ?size_map ?map_mask.
 Qed.
 
+Lemma index_map_in s x :
+  {in s &, injective f} -> x \in s -> index (f x) (map f s) = index x s.
+Proof.
+move=> f_inj x_in_s; rewrite /index find_map.
+by apply: eq_in_find => y /= y_s; rewrite (inj_in_eq f_inj).
+Qed.
+
+Lemma index_map_inW s x : {in s, injective f} -> index (f x) (map f s) = index x s.
+Proof.
+move=> fI; have [/index_map_in-> // _ _ _ _ /fI-> //|xs] := boolP (x \in s).
+rewrite !memNindex ?size_map//; apply/mapP => -[y ys].
+by move=> /esym/fI -/(_ ys) yx; rewrite -yx ys in xs.
+Qed.
+
+Lemma uniq_map_inj_in s : uniq (map f s) -> {in s &, injective f}.
+Proof.
+move=> f_uniq x y /(nthP x)[i ilt <-] /(nthP x)[j jlt <-].
+by rewrite -!(nth_map _ (f x))// => /uniqP /[!(inE, size_map)] ->.
+Qed.
+
 Lemma nth_index_map s x0 x :
   {in s &, injective f} -> x \in s -> nth x0 s (index (f x) (map f s)) = x.
-Proof.
-elim: s => //= y s IHs inj_f s_x; rewrite (inj_in_eq inj_f) ?mem_head //.
-move: s_x; rewrite inE; have [-> // | _] := eqVneq; apply: IHs.
-by apply: sub_in2 inj_f => z; apply: predU1r.
-Qed.
+Proof. by move=> f_inj x_in_s; rewrite index_map_in// nth_index. Qed.
 
 Lemma perm_map s t : perm_eq s t -> perm_eq (map f s) (map f t).
 Proof. by move/permP=> Est; apply/permP=> a; rewrite !count_map Est. Qed.
@@ -2871,7 +2887,7 @@ Lemma mem_map s x : (f x \in map f s) = (x \in s).
 Proof. by apply/mapP/idP=> [[y Hy /Hf->] //|]; exists x. Qed.
 
 Lemma index_map s x : index (f x) (map f s) = index x s.
-Proof. by rewrite /index; elim: s => //= y s IHs; rewrite (inj_eq Hf) IHs. Qed.
+Proof. by apply: index_map_inW; apply: in1W. Qed.
 
 Lemma map_inj_uniq s : uniq (map f s) = uniq s.
 Proof. by apply: map_inj_in_uniq; apply: in2W. Qed.
@@ -3121,6 +3137,13 @@ elim: i => [|i IH] in s j *; first by rewrite subn0 drop0 => /map_nth_iota0->.
 case: s => [|x s /IH<-]; first by rewrite leqn0 => /eqP->.
 by rewrite -add1n iotaDl -map_comp.
 Qed.
+
+Lemma take_mkseq f n i : take i (mkseq f n) = mkseq f (minn i n).
+Proof. by rewrite /mkseq -map_take take_iota. Qed.
+
+Lemma drop_mkseq f n i :
+  drop i (mkseq f n) = mkseq (fun k => f (i + k)) (n - i).
+Proof. by rewrite /mkseq -map_drop drop_iota addnC iotaDl -map_comp. Qed.
 
 End MakeSeq.
 
