@@ -3145,6 +3145,13 @@ case: s => [|x s /IH<-]; first by rewrite leqn0 => /eqP->.
 by rewrite -add1n iotaDl -map_comp.
 Qed.
 
+Lemma take_mkseq f n i : take i (mkseq f n) = mkseq f (minn i n).
+Proof. by rewrite /mkseq -map_take take_iota. Qed.
+
+Lemma drop_mkseq f n i :
+  drop i (mkseq f n) = mkseq (fun k => f (i + k)) (n - i).
+Proof. by rewrite /mkseq -map_drop drop_iota addnC iotaDl -map_comp. Qed.
+
 End MakeSeq.
 
 Section MakeEqSeq.
