@@ -100,6 +100,18 @@ Notation "[ 'normedZmodType' R 'of' T ]" := (@clone _ (Phant R) T _ _ id)
 End NormedZmoduleExports.
 HB.export NormedZmoduleExports.
 
+HB.structure Definition POrderSemiNormedZmodule (R : porderZmodType) :=
+  { M of POrderZmodule M & Zmodule_isSemiNormed R M}.
+
+HB.structure Definition POrderNormedZmodule (R : porderZmodType) :=
+  { M of POrderZmodule M & Zmodule_isNormed R M}.
+
+HB.structure Definition POrderedSemiNormedZmodule (R : porderZmodType) :=
+  { M of POrderedZmodule M & Zmodule_isSemiNormed R M}.
+
+HB.structure Definition POrderedNormedZmodule (R : porderZmodType) :=
+  { M of POrderedZmodule M & Zmodule_isNormed R M}.
+
 HB.mixin Record NumZmod_isNumRing R of GRing.NzRing R & POrderZmodule R
   & NormedZmodule (POrderZmodule.clone R _) R := {
  addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
