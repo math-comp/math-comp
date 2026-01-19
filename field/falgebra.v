@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
-From mathcomp Require Import choice fintype div tuple finfun bigop ssralg.
+From mathcomp Require Import choice fintype div tuple finfun bigop order ssralg.
 From mathcomp Require Import finalg zmodp matrix vector poly.
 
 (******************************************************************************)
@@ -87,7 +87,7 @@ Reserved Notation "''AEnd' ( T )" (format "''AEnd' ( T )").
 Notation "\dim_ E V" := (divn (\dim V) (\dim E))
   (at level 10, E at level 2, V at level 8, format "\dim_ E  V") : nat_scope.
 
-Import GRing.Theory.
+Import Order.LTheory GRing.Theory.
 
 (* Finite dimensional algebra *)
 #[short(type="falgType")]
@@ -562,11 +562,11 @@ Notation "{ 'aspace' T }" := (aspace T) : type_scope.
 Notation "A * B" := (prodv A B) : vspace_scope.
 Notation "A ^+ n" := (expv A n) : vspace_scope.
 Notation "'C [ u ]" := (centraliser1_vspace u) : vspace_scope.
-Notation "'C_ U [ v ]" := (capv U 'C[v]) : vspace_scope.
-Notation "'C_ ( U ) [ v ]" := (capv U 'C[v]) (only parsing) : vspace_scope.
+Notation "'C_ U [ v ]" := (capv U 'C[v]%VS) : vspace_scope.
+Notation "'C_ ( U ) [ v ]" := (capv U 'C[v]%VS) (only parsing) : vspace_scope.
 Notation "'C ( V )" := (centraliser_vspace V) : vspace_scope.
-Notation "'C_ U ( V )" := (capv U 'C(V)) : vspace_scope.
-Notation "'C_ ( U ) ( V )" := (capv U 'C(V)) (only parsing) : vspace_scope.
+Notation "'C_ U ( V )" := (capv U 'C(V)%VS) : vspace_scope.
+Notation "'C_ ( U ) ( V )" := (capv U 'C(V)%VS) (only parsing) : vspace_scope.
 Notation "'Z ( V )" := (center_vspace V) : vspace_scope.
 
 Notation "1" := (aspace1 _) : aspace_scope.
@@ -635,7 +635,7 @@ Proof. by rewrite dim_vline algid_neq0. Qed.
 Lemma adim_gt0 A : (0 < \dim A)%N.
 Proof. by rewrite -(dim_algid A) dimvS // -memvE ?memv_algid. Qed.
 
-Lemma not_asubv0 A : ~~ (A <= 0)%VS.
+Lemma not_asubv0 A : ~~ (A <= 0 :> {vspace aT})%VS.
 Proof. by rewrite subv0 -dimv_eq0 -lt0n adim_gt0. Qed.
 
 Lemma adim1P {A} : reflect (A = <[algid A]>%VS :> {vspace aT}) (\dim A == 1%N).
