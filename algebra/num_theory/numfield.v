@@ -2,8 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
-From mathcomp Require Import interval ssralg poly orderedzmod numdomain.
+From mathcomp Require Import div path fintype bigop ssrAC finset fingroup.
+From mathcomp Require Import nmodule order interval algebra divalg decfield.
+From mathcomp Require Import poly orderedzmod numdomain.
 
 (******************************************************************************)
 (*                      Number structures (numfield.v)                        *)
@@ -65,8 +66,6 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Local Open Scope order_scope.
-Local Open Scope group_scope.
 Local Open Scope ring_scope.
 
 Import Order.TTheory GRing.Theory.
@@ -457,7 +456,7 @@ by rewrite le_gtF // ub_q // normfV invf_le1 ?normr_gt0.
 Qed.
 
 Lemma natf_indexg (gT : finGroupType) (G H : {group gT}) :
-  H \subset G -> #|G : H|%:R = (#|G|%:R / #|H|%:R)%R :> F.
+  H \subset G -> #|G : H|%g%:R = (#|G|%:R / #|H|%:R)%R :> F.
 Proof. by move=> sHG; rewrite -divgS // natf_div ?cardSg. Qed.
 
 End NumFieldTheory.

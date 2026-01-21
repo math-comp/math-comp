@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
-From mathcomp Require Import interval ssralg poly orderedzmod.
+From mathcomp Require Import fintype bigop finset fingroup nmodule order.
+From mathcomp Require Import interval algebra divalg poly orderedzmod.
 
 (******************************************************************************)
 (*                    Number structures (numdomain.v)                         *)
@@ -43,8 +43,6 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Local Open Scope order_scope.
-Local Open Scope group_scope.
 Local Open Scope ring_scope.
 
 Import Order.TTheory GRing.Theory.
@@ -1393,12 +1391,12 @@ Context {I : finType} (i0 : I).
 Context (P : pred I) (F : I -> R) (Pi0 : P i0).
 Hypothesis F_real : {in P, forall i, F i \is real}.
 
-Lemma real_arg_minP : extremum_spec <=%R P F [arg min_(i < i0 | P i) F i].
+Lemma real_arg_minP : extremum_spec <=%R P F [arg min_(i < i0 | P i) F i]%O.
 Proof.
 by apply: comparable_arg_minP => // i j iP jP; rewrite real_comparable ?F_real.
 Qed.
 
-Lemma real_arg_maxP : extremum_spec >=%R P F [arg max_(i > i0 | P i) F i].
+Lemma real_arg_maxP : extremum_spec >=%R P F [arg max_(i > i0 | P i) F i]%O.
 Proof.
 by apply: comparable_arg_maxP => // i j iP jP; rewrite real_comparable ?F_real.
 Qed.
@@ -2034,10 +2032,10 @@ Proof. by rewrite ltr0n cardG_gt0. Qed.
 Lemma natrG_neq0 G : #|G|%:R != 0 :> R.
 Proof. by rewrite gt_eqF // natrG_gt0. Qed.
 
-Lemma natr_indexg_gt0 G B : #|G : B|%:R > 0 :> R.
+Lemma natr_indexg_gt0 G B : #|G : B|%g%:R > 0 :> R.
 Proof. by rewrite ltr0n indexg_gt0. Qed.
 
-Lemma natr_indexg_neq0 G B : #|G : B|%:R != 0 :> R.
+Lemma natr_indexg_neq0 G B : #|G : B|%g%:R != 0 :> R.
 Proof. by rewrite gt_eqF // natr_indexg_gt0. Qed.
 
 End FinGroup.
