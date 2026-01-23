@@ -2000,11 +2000,8 @@ Lemma bigUI (I : finType) (P Q : pred I) F :
   (\big[*%M/1]_(i in [predU P & Q]) F i) * \big[*%M/1]_(i in [predI P & Q]) F i
   = (\big[*%M/1]_(i in P) F i) * (\big[*%M/1]_(i in Q) F i).
 Proof.
-rewrite [E in E * _ = _](bigID (fun i => i \in P)).
-rewrite [E in  (E * _) * _ = _](bigID (fun i => i \in Q)).
-rewrite -Monoid.mulmA.
-rewrite [E in _ = _ * E](bigID (fun i => i \in P)).
-rewrite [E in _ = E * _](bigID (fun i => i \in Q)).
+rewrite (bigID (mem P)) (bigID (mem Q)) -Monoid.mulmA.
+rewrite [E in _ = _ * E](bigID (mem P)) [E in _ = E * _](bigID (mem Q)).
 rewrite [E in _ = _ * E]Monoid.mulmC.
 do 2 congr (_*_); apply: eq_bigl=>i; rewrite !inE;
   by case (i \in P); case (i \in Q).
