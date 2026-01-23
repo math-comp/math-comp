@@ -2,8 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import ssrAC div fintype path bigop order finset fingroup.
-From mathcomp Require Import ssralg poly.
+From mathcomp Require Import fintype bigop nmodule order algebra.
 
 (******************************************************************************)
 (*                    Number structures (orderedzmod.v)                       *)
@@ -55,8 +54,6 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Local Open Scope order_scope.
-Local Open Scope group_scope.
 Local Open Scope ring_scope.
 
 Import Order.TTheory GRing.Theory.
@@ -84,7 +81,7 @@ End POrderZmoduleExports.
 HB.export POrderZmoduleExports.
 
 HB.mixin Record Add_isHomo R of POrderNmodule R := {
-  ler_wD2l : forall x : R, {homo +%R x : y z / y <= z}
+  ler_wD2l : forall x : R, {homo +%R x : y z / (y <= z)%O}
 }.
 
 #[short(type="porderedNmodType")]
@@ -185,15 +182,15 @@ Notation "@ 'minr' R" := (@Order.min ring_display R)
 Section Def.
 Context {R : porderNmodType}.
 
-Definition pos_num_pred := fun x : R => 0 < x.
+Definition pos_num_pred := fun x : R => ltr 0 x.
 Definition pos_num : qualifier 0 R := [qualify x | pos_num_pred x].
-Definition neg_num_pred := fun x : R => x < 0.
+Definition neg_num_pred := fun x : R => ltr x 0.
 Definition neg_num : qualifier 0 R := [qualify x : R | neg_num_pred x].
-Definition nneg_num_pred := fun x : R => 0 <= x.
+Definition nneg_num_pred := fun x : R => ler 0 x.
 Definition nneg_num : qualifier 0 R := [qualify x : R | nneg_num_pred x].
-Definition npos_num_pred := fun x : R => x <= 0.
+Definition npos_num_pred := fun x : R => ler x 0.
 Definition npos_num : qualifier 0 R := [qualify x : R | npos_num_pred x].
-Definition real_num_pred := fun x : R => (0 <= x) || (x <= 0).
+Definition real_num_pred := fun x : R => (ler 0 x) || (ler x 0).
 Definition real_num : qualifier 0 R := [qualify x : R | real_num_pred x].
 
 End Def.
