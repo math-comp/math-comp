@@ -1525,7 +1525,7 @@ Lemma big_subsetI A B (F : {set I} -> R) :
       (\big[aop/idx]_(C : {set I} | C \subset A :&: B) F C)
   = \big[aop/idx]_(C : {set I} | C \subset A) F C.
 Proof.
-rewrite [E in _=E](bigID (fun C : {set I} => C \subset B)) [E in _=E]Monoid.mulmC.
+rewrite [RHS](bigID (fun C : {set I} => C \subset B)) [RHS]Monoid.mulmC.
 by congr (aop _ _); apply: eq_bigl=>/=C; exact: subsetI.
 Qed.
 
