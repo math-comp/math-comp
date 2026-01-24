@@ -4580,6 +4580,45 @@ Definition CanIsTotal : DistrLattice_isTotal _ (can_type f_can) :=
 End Can.
 End CancelTotal.
 
+HB.factory Record IsoBottom disp T of Order.POrder disp T := {
+  disp' : Order.disp_t;
+  T' : bPOrderType disp';
+  f : T -> T';
+  f' : T' -> T;
+  f_can : cancel f f';
+  f'_can : cancel f' f;
+  f_mono : {mono f : x y / x <= y}%O;
+}.
+
+HB.builders Context disp T of IsoBottom disp T.
+
+Definition bottom := f' \bot%O.
+Lemma isobottom x : (bottom <= x)%O.
+Proof. by rewrite /bottom -f_mono f'_can Order.le0x. Qed.
+
+HB.instance Definition _ := Order.hasBottom.Build _ T isobottom.
+HB.end.
+
+HB.factory Record IsoTop disp T of Order.POrder disp T := {
+  disp' : Order.disp_t;
+  T' : tPOrderType disp';
+  f : T -> T';
+  f' : T' -> T;
+  f_can : cancel f f';
+  f'_can : cancel f' f;
+  f_mono : {mono f : x y / x <= y}%O;
+}.
+
+HB.builders Context disp T of IsoTop disp T.
+
+Definition top := f' \top%O.
+Lemma isotop x : (x <= top)%O.
+Proof. by rewrite /top -f_mono f'_can Order.lex1. Qed.
+
+HB.instance Definition _ := Order.hasTop.Build _ T isotop.
+HB.end.
+
+
 HB.factory Record IsoLattice disp T of POrder disp T := {
   disp' : disp_t;
   T' : latticeType disp';
