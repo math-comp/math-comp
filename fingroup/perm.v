@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
 From mathcomp Require Import choice fintype tuple finfun bigop finset binomial.
-From mathcomp Require Import fingroup morphism.
+From mathcomp Require Import fingroup morphism nmodule.
 
 (******************************************************************************)
 (* This file contains the definition and properties associated to the group   *)
@@ -30,6 +30,7 @@ From mathcomp Require Import fingroup morphism.
 (* lift_perm i j s == the permutation obtained by lifting s : 'S_n.-1 over    *)
 (*                    (i |-> j), that maps i to j and lift i k to             *)
 (*                    lift j (s k).                                           *)
+(*        tact s t == action of the permutation s : 'S_n on t : n.-tuple T    *)
 (* Canonical structures are defined allowing permutations to be an eqType,    *)
 (* choiceType, countType, finType, subType, finGroupType; permutations with   *)
 (* composition form a group, therefore inherit all generic group notations:   *)
@@ -480,7 +481,7 @@ rewrite -/(dp s) !addnA !eq_porbit_mem andbT; congr (_ + _); last first.
     by rewrite -ts_z !eq_porbit_mem {1 2}ts_z sxz syz imset_f ?inE.
   suffices exp_id n: ((t x y s) ^+ n) z = (s ^+ n) z.
     apply/porbit_setP => u; apply/idP/idP=> /porbitP[i ->].
-      by rewrite /aperm exp_id mem_porbit. 
+      by rewrite /aperm exp_id mem_porbit.
     by rewrite /aperm -exp_id mem_porbit.
   elim: n => // n IHn; rewrite !expgSr !permM {}IHn tpermD //.
     by apply: contraNneq sxz => ->; apply: mem_porbit.
@@ -612,7 +613,7 @@ rewrite /lift_perm_fun => k.
 by case: (unliftP i k) => [j'|] ->; rewrite (liftK, unlift_none) ?permK.
 Qed.
 
-Definition lift_perm i j s := perm (can_inj (lift_permK i j s)).
+Definition lift_perm i j s : 'S_n.+1 := perm (can_inj (lift_permK i j s)).
 
 Lemma lift_perm_id i j s : lift_perm i j s i = j.
 Proof. by rewrite permE /lift_perm_fun unlift_none. Qed.
@@ -666,6 +667,28 @@ Qed.
 End LiftPerm.
 
 Prenex Implicits lift_perm lift_permK.
+
+Section Lift0Perm.
+
+Variable n : nat.
+Local Open Scope ring_scope.
+
+Definition lift0_perm s : 'S_n.+1 := lift_perm 0 0 s.
+
+Lemma lift0_perm0 s : lift0_perm s 0 = 0.
+Proof. exact: lift_perm_id. Qed.
+
+Lemma lift0_perm_lift s k' :
+  lift0_perm s (lift 0 k') = lift (0 : 'I_n.+1) (s k').
+Proof. exact: lift_perm_lift. Qed.
+
+Lemma lift0_permK s : cancel (lift0_perm s) (lift0_perm s^-1).
+Proof. by move=> i; rewrite /lift0_perm -lift_permV permK. Qed.
+
+Lemma lift0_perm_eq0 s i : (lift0_perm s i == 0) = (i == 0).
+Proof. by rewrite (canF_eq (lift0_permK s)) lift0_perm0. Qed.
+
+End Lift0Perm.
 
 Lemma permS0 : all_equal_to (1 : 'S_0).
 Proof. by move=> g; apply/permP; case. Qed.
@@ -725,3 +748,52 @@ by apply/setP => /= s /[!inE]; apply/imsetP; exists s; rewrite ?inE.
 Qed.
 
 End CastSn.
+
+Definition tact {T n} (s : 'S_n) (t : n.-tuple T) : n.-tuple T :=
+  [tuple tnth t (s i) | i < n].
+
+Lemma tactE {T n} (s : 'S_n) (t : n.-tuple T) :
+  tact s t = [tuple tnth t (s i) | i < n] :> n.-tuple T.
+Proof. exact. Qed.
+
+Lemma tactP {T : eqType} {n : nat} {r : seq T} {t : n.-tuple T} :
+  reflect (exists s : 'S_n, r = tact s t) (perm_eq r t).
+Proof. exact: tuple_permP. Qed.
+
+Lemma perm_tact {T : eqType} {n} (s : 'S_n) (t : n.-tuple T) :
+  perm_eq (tact s t) t.
+Proof. by apply/tactP; exists s. Qed.
+
+Lemma tact1 {T : eqType} {n} (t : n.-tuple T) : tact 1 t = t :> n.-tuple T.
+Proof.
+apply/eq_from_tnth => i.
+by rewrite !tnth_map /= permE /= !tnth_ord_tuple.
+Qed.
+
+Lemma tactM {T : eqType} {n} (s s' : 'S_n) (t : n.-tuple T) :
+  tact (s * s') t = tact s (tact s' t).
+Proof.
+congr tval; apply/eq_from_tnth => i.
+by rewrite !tnth_map /= permE /= !tnth_ord_tuple.
+Qed.
+
+Lemma tactK {T : eqType} {n} (s s' : 'S_n) (t : n.-tuple T) :
+  tact s^-1 (tact s t) = t.
+Proof. by rewrite -tactM mulVg tact1. Qed.
+
+Lemma tnth_tact {T n} (s : 'S_n) (t : n.-tuple T) i :
+  tnth (tact s t) i = tnth t (s i).
+Proof. by rewrite tactE tnth_mktuple. Qed.
+
+Lemma tact_lift0 {T n} (s : 'S_n) x (t : n.-tuple T) :
+  tact (lift0_perm s) (x :: t) = x :: tact s t :> n.+1.-tuple T.
+Proof.
+apply/eq_from_tnth => i; rewrite tnth_tact.
+have [_/[!ord1]->|k {i}->] := @split_ordP 1 n i.
+  by rewrite !lshift0/= lift0_perm0.
+by rewrite !rshift1 lift0_perm_lift !tnthS tnth_tact.
+Qed.
+
+Lemma tval_tact_lift0 {T n} (s : 'S_n) x (t : n.-tuple T) :
+  tact (lift0_perm s) (x :: t) = x :: tact s t :> seq T.
+Proof. by have /(congr1 val) := tact_lift0 s x t. Qed.

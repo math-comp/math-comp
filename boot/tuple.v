@@ -161,12 +161,26 @@ Proof. by case: n / eq_mn. Qed.
 
 Lemma in_tupleE s : in_tuple s = s :> seq T. Proof. by []. Qed.
 
+Lemma tnth_in_tuple n (t : n.-tuple T) i :
+   tnth (in_tuple t) i = tnth t (cast_ord (size_tuple _) i).
+Proof. exact/set_nth_default. Qed.
+
+Lemma in_tuple_tuple n (t : n.-tuple T) :
+  in_tuple t = tcast (esym (size_tuple _)) t.
+Proof. by apply/eq_from_tnth=> i; rewrite tnth_in_tuple/= tcastE esymK. Qed.
+
+Lemma in_tuple_cons x s : in_tuple (x :: s) = x :: in_tuple s.
+Proof. exact/val_inj/(@eq_from_nth _ x). Qed.
+
 End CastTuple.
 
 Section SeqTuple.
 
 Variables (n m : nat) (T U rT : Type).
 Implicit Type t : n.-tuple T.
+
+Lemma in_tupleP (P : list T -> Type) : (forall n (t : n.-tuple T), P t) -> forall l, P l.
+Proof. by move=> + l => /(_ _ (in_tuple l)). Qed.
 
 Lemma rcons_tupleP t x : size (rcons t x) == n.+1.
 Proof. by rewrite size_rcons size_tuple. Qed.

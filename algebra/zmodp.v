@@ -12,18 +12,10 @@ From mathcomp Require Import ssralg countalg finalg.
 (* From fintype.v:                                                            *)
 (*     'I_p == the subtype of integers less than p, taken here as the type of *)
 (*             the integers mod p.                                            *)
+(* The zmodType structure is declared in nmodule.v,                           *)
+(* and the finZmodType structure in finalg.                                   *)
+(*                                                                            *)
 (* This file:                                                                 *)
-(*     inZp == the natural projection from nat into the integers mod p,       *)
-(*             represented as 'I_p. Here p is implicit, but MUST be of the    *)
-(*             form n.+1.                                                     *)
-(* The operations:                                                            *)
-(*      Zp0 == the identity element for addition                              *)
-(*      Zp1 == the identity element for multiplication, and a generator of    *)
-(*             additive group                                                 *)
-(*   Zp_opp == inverse function for addition                                  *)
-(*   Zp_add == addition                                                       *)
-(*   Zp_mul == multiplication                                                 *)
-(*   Zp_inv == inverse function for multiplication                            *)
 (* Note that while 'I_n.+1 has canonical finZmodType and finGroupType         *)
 (* structures, only 'I_n.+2 has a canonical ring structure (it has, in fact,  *)
 (* a canonical finComUnitRing structure), and hence an associated             *)
@@ -56,6 +48,12 @@ Unset Printing Implicit Defensive.
 Local Open Scope ring_scope.
 
 Section ZpDef.
+Variable p' : nat.
+Let p := p'.+1.
+
+Notation Zp1 := (@Zp1 p').
+Notation inZp := (inZp p').
+Implicit Types x : 'I_p.
 
 (***********************************************************************)
 (*                                                                     *)
@@ -63,98 +61,10 @@ Section ZpDef.
 (*                                                                     *)
 (***********************************************************************)
 
-(* Operations on 'I_p without constraint on p. *)
-Section Generic.
-Variable p : nat.
-Implicit Types i j : 'I_p.
-
-Lemma Zp_opp_subproof i : (p - i) %% p < p.
-Proof. by case: p i => [[]//|k] i; apply/ltn_pmod. Qed.
-
-Definition Zp_opp i := Ordinal (Zp_opp_subproof i).
-
-Lemma Zp_add_subproof i j : (i + j) %% p < p.
-Proof. by case: p i j => [[]//|k] i j; apply/ltn_pmod. Qed.
-
-Definition Zp_add i j := Ordinal (Zp_add_subproof i j).
-
-Lemma Zp_mul_subproof i j : (i * j) %% p < p.
-Proof. by case: p i j => [[]//|k] i j; apply/ltn_pmod. Qed.
-
-Definition Zp_mul i j := Ordinal (Zp_mul_subproof i j).
-
-Lemma Zp_inv_subproof i : (egcdn i p).1 %% p < p.
-Proof. by case: p i => [[]//|k] i; apply/ltn_pmod. Qed.
-
-Definition Zp_inv i := if coprime p i then Ordinal (Zp_inv_subproof i) else i.
-
-Lemma Zp_addA : associative Zp_add.
-Proof.
-by move=> x y z; apply: val_inj; rewrite /= modnDml modnDmr addnA.
-Qed.
-
-Lemma Zp_addC : commutative Zp_add.
-Proof. by move=> x y; apply: val_inj; rewrite /= addnC. Qed.
-
-Lemma Zp_mulC : commutative Zp_mul.
-Proof. by move=> x y; apply: val_inj; rewrite /= mulnC. Qed.
-
-Lemma Zp_mulA : associative Zp_mul.
-Proof.
-by move=> x y z; apply: val_inj; rewrite /= modnMml modnMmr mulnA.
-Qed.
-
-Lemma Zp_mul_addr : right_distributive Zp_mul Zp_add.
-Proof.
-by move=> x y z; apply: val_inj; rewrite /= modnMmr modnDm mulnDr.
-Qed.
-
-Lemma Zp_mul_addl : left_distributive Zp_mul Zp_add.
-Proof. by move=> x y z; rewrite -!(Zp_mulC z) Zp_mul_addr. Qed.
-
-Lemma Zp_inv_out i : ~~ coprime p i -> Zp_inv i = i.
-Proof. by rewrite /Zp_inv => /negPf->. Qed.
-
-End Generic.
-
-Arguments Zp_opp {p}.
-Arguments Zp_add {p}.
-Arguments Zp_mul {p}.
-Arguments Zp_inv {p}.
-
-Variable p' : nat.
-Local Notation p := p'.+1.
-
-Implicit Types x y z : 'I_p.
-
-(* Standard injection; val (inZp i) = i %% p *)
-Definition inZp i := Ordinal (ltn_pmod i (ltn0Sn p')).
-Lemma modZp x : x %% p = x.
-Proof. by rewrite modn_small ?ltn_ord. Qed.
-Lemma valZpK x : inZp x = x.
-Proof. by apply: val_inj; rewrite /= modZp. Qed.
-
-(* Operations *)
-Definition Zp0 : 'I_p := ord0.
-Definition Zp1 := inZp 1.
-
-(* Additive group structure. *)
-
-Lemma Zp_add0z : left_id Zp0 Zp_add.
-Proof. by move=> x; apply: val_inj; rewrite /= modZp. Qed.
-
-Lemma Zp_addNz : left_inverse Zp0 Zp_opp Zp_add.
-Proof.
-by move=> x; apply: val_inj; rewrite /= modnDml subnK ?modnn // ltnW.
-Qed.
-
-HB.instance Definition _ :=
-  GRing.isZmodule.Build 'I_p (@Zp_addA _) (@Zp_addC _) Zp_add0z Zp_addNz.
-
 (* FIXME: This will break when we make rings depend on monoids. *)
 HB.instance Definition _ := [finGroupMixin of 'I_p for +%R].
 
-(* Ring operations *)
+(* Ring properties *)
 
 Lemma Zp_mul1z : left_id Zp1 Zp_mul.
 Proof. by move=> x; apply: val_inj; rewrite /= modnMml mul1n modZp. Qed.
@@ -212,25 +122,6 @@ Arguments Zp0 {p'}.
 Arguments Zp1 {p'}.
 Arguments inZp {p'} i.
 Arguments valZpK {p'} x.
-
-(* We redefine fintype.ord1 to specialize it with 0 instead of ord0 *)
-(* since 'I_n is now canonically a zmodType  *)
-Lemma ord1 : all_equal_to (0 : 'I_1).
-Proof. exact: ord1. Qed.
-
-Lemma lshift0 m n : lshift m (0 : 'I_n.+1) = (0 : 'I_(n + m).+1).
-Proof. exact: val_inj. Qed.
-
-Lemma rshift1 n : @rshift 1 n =1 lift (0 : 'I_n.+1).
-Proof. by move=> i; apply: val_inj. Qed.
-
-Lemma split1 n i :
-  split (i : 'I_(1 + n)) = oapp (@inr _ _) (inl _ 0) (unlift 0 i).
-Proof.
-case: unliftP => [i'|] -> /=.
-  by rewrite -rshift1 (unsplitK (inr _ _)).
-by rewrite -(lshift0 n 0) (unsplitK (inl _ _)).
-Qed.
 
 (* TODO: bigop is imported after zmodp in matrix.v and intdiv.v to prevent
   these warnings from triggering. We should restore the order of imports when

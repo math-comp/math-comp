@@ -62,6 +62,18 @@ From mathcomp Require Import ssrnat seq choice path div.
 (*                       whether if u : 'I_m + 'I_n is inl j or inr k         *)
 (*            split i == the u : 'I_m + 'I_n such that i = unsplit u; the     *)
 (*                       type 'I_(m + n) of i determines the split            *)
+(*     inZp == the natural projection from nat into the integers mod p,       *)
+(*             represented as 'I_p. Here p is implicit, but MUST be of the    *)
+(*             form n.+1.                                                     *)
+(*                                                                            *)
+(* Ordinal operations (most properties are in nmodule.v or zmodp.v)           *)
+(*      Zp0 == the identity element for addition                              *)
+(*      Zp1 == the identity element for multiplication, and a generator of    *)
+(*             additive group                                                 *)
+(*   Zp_opp == inverse function for addition                                  *)
+(*   Zp_add == addition                                                       *)
+(*   Zp_mul == multiplication                                                 *)
+(*   Zp_inv == inverse function for multiplication                            *)
 (*                                                                            *)
 (* Finally, every type T with a finType structure supports the following      *)
 (* operations:                                                                *)
@@ -2260,6 +2272,94 @@ Arguments inord_val {n'}.
 
 Lemma ord1 : all_equal_to (ord0 : 'I_1).
 Proof. by case=> [[] // ?]; apply: val_inj. Qed.
+
+Section Generic.
+Variable p : nat.
+Implicit Types i j : 'I_p.
+
+Lemma modZp i : i %% p = i.
+Proof. by rewrite modn_small ?ltn_ord. Qed.
+
+Lemma Zp_opp_subproof i : (p - i) %% p < p.
+Proof. by case: p i => [[]//|k] i; apply/ltn_pmod. Qed.
+
+Definition Zp_opp i := Ordinal (Zp_opp_subproof i).
+
+Lemma Zp_add_subproof i j : (i + j) %% p < p.
+Proof. by case: p i j => [[]//|k] i j; apply/ltn_pmod. Qed.
+
+Definition Zp_add i j := Ordinal (Zp_add_subproof i j).
+
+Lemma Zp_mul_subproof i j : (i * j) %% p < p.
+Proof. by case: p i j => [[]//|k] i j; apply/ltn_pmod. Qed.
+
+Definition Zp_mul i j := Ordinal (Zp_mul_subproof i j).
+
+Lemma Zp_inv_subproof i : (egcdn i p).1 %% p < p.
+Proof. by case: p i => [[]//|k] i; apply/ltn_pmod. Qed.
+
+Definition Zp_inv i := if coprime p i then Ordinal (Zp_inv_subproof i) else i.
+
+Lemma Zp_addA : associative Zp_add.
+Proof.
+by move=> x y z; apply: val_inj; rewrite /= modnDml modnDmr addnA.
+Qed.
+
+Lemma Zp_addC : commutative Zp_add.
+Proof. by move=> x y; apply: val_inj; rewrite /= addnC. Qed.
+
+Lemma Zp_mulC : commutative Zp_mul.
+Proof. by move=> x y; apply: val_inj; rewrite /= mulnC. Qed.
+
+Lemma Zp_mulA : associative Zp_mul.
+Proof.
+by move=> x y z; apply: val_inj; rewrite /= modnMml modnMmr mulnA.
+Qed.
+
+Lemma Zp_mul_addr : right_distributive Zp_mul Zp_add.
+Proof.
+by move=> x y z; apply: val_inj; rewrite /= modnMmr modnDm mulnDr.
+Qed.
+
+Lemma Zp_mul_addl : left_distributive Zp_mul Zp_add.
+Proof. by move=> x y z; rewrite -!(Zp_mulC z) Zp_mul_addr. Qed.
+
+Lemma Zp_inv_out i : ~~ coprime p i -> Zp_inv i = i.
+Proof. by rewrite /Zp_inv => /negPf->. Qed.
+
+End Generic.
+
+Arguments Zp_opp {p}.
+Arguments Zp_add {p}.
+Arguments Zp_mul {p}.
+Arguments Zp_inv {p}.
+            
+Section NonTrivial.
+
+Variable p' : nat.
+Local Notation p := p'.+1.
+
+Implicit Types x y z : 'I_p.
+(* Standard injection; val (inZp i) = i %% p *)
+
+Definition inZp (i : nat) : 'I_p := Ordinal (ltn_pmod i (ltn0Sn p')).
+
+Lemma valZpK x : inZp x = x.
+Proof. by apply: val_inj; rewrite /= modZp. Qed.
+
+(* Operations *)
+Definition Zp0 : 'I_p := ord0.
+Definition Zp1 := inZp 1.
+
+Lemma Zp_add0z : left_id Zp0 Zp_add.
+Proof. by move=> x; apply: val_inj; rewrite /= modZp. Qed.
+
+Lemma Zp_addNz : left_inverse Zp0 Zp_opp Zp_add.
+Proof.
+by move=> x; apply: val_inj; rewrite /= modnDml subnK ?modnn // ltnW.
+Qed.
+
+End NonTrivial.
 
 (* Product of two fintypes which is a fintype *)
 Section ProdFinType.

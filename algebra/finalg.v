@@ -479,7 +479,10 @@ rewrite -(cardC1 0) cardsT card_sub; apply: eq_card => x.
 by rewrite GRing.unitfE.
 Qed.
 
-(* Finite Algebraic structure for bool *)
+(* Finite Algebraic structure for bool and 'I_n *)
 
-#[hnf] HB.instance Definition _ := GRing.NzRing.on bool.
+HB.saturate bool.
 #[hnf] HB.instance Definition _ := isField.Build bool.
+(* isField is an empty factory (c.f., above) *)
+
+HB.saturate ordinal.

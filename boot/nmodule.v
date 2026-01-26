@@ -1,6 +1,6 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
-From mathcomp Require Import bigop fintype finfun monoid.
+From mathcomp Require Import bigop fintype finfun monoid div.
 
 (******************************************************************************)
 (*                       Additive group-like structures                       *)
@@ -1396,3 +1396,25 @@ HB.instance Definition _ (V : nmodType) (x : V) :=
 Lemma natr0E : 0 = 0%N. Proof. by []. Qed.
 Lemma natrDE n m : n + m = (n + m)%N. Proof. by []. Qed.
 Definition natrE := (natr0E, natrDE).
+
+HB.instance Definition _ p :=
+  isZmodule.Build 'I_p.+1 (@Zp_addA _) (@Zp_addC _) (@Zp_add0z _) (@Zp_addNz _).
+
+(* We redefine fintype.ord1 to specialize it with 0 instead of ord0 *)
+(* since 'I_n is now canonically a zmodType  *)
+Lemma ord1 : all_equal_to (0 : 'I_1).
+Proof. exact: ord1. Qed.
+
+Lemma lshift0 m n : lshift m (0 : 'I_n.+1) = (0 : 'I_(n + m).+1).
+Proof. exact: val_inj. Qed.
+
+Lemma rshift1 n : @rshift 1 n =1 lift (0 : 'I_n.+1).
+Proof. by move=> i; apply: val_inj. Qed.
+
+Lemma split1 n i :
+  split (i : 'I_(1 + n)) = oapp (@inr _ _) (inl _ 0) (unlift 0 i).
+Proof.
+case: unliftP => [i'|] -> /=.
+  by rewrite -rshift1 (unsplitK (inr _ _)).
+by rewrite -(lshift0 n 0) (unsplitK (inl _ _)).
+Qed.
