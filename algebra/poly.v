@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop finset tuple div ssralg.
-From mathcomp Require Import countalg binomial.
+From mathcomp Require Import fintype bigop finset tuple div binomial.
+From mathcomp Require Import ssralg countalg.
 
 (******************************************************************************)
 (* This file provides a library for univariate polynomials over ring          *)
