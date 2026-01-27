@@ -2711,8 +2711,8 @@ Proof. by rewrite [q in RHS]divp_eq mulrDr modpD mulrA modp_mull add0r. Qed.
 
 End UnitDivisor.
 
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to leq_divMp.")]
-Notation leq_trunc_divp := leq_divMp.
+#[deprecated(since="mathcomp 2.4.0", use=leq_divMp)]
+Notation leq_trunc_divp := leq_divMp (only parsing).
 
 Section MoreUnitDivisor.
 
@@ -3344,8 +3344,8 @@ End FieldMap.
 
 End FieldDivision.
 
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to leq_divMp.")]
-Notation leq_trunc_divp := leq_divMp.
+#[deprecated(since="mathcomp 2.4.0", use=leq_divMp)]
+Notation leq_trunc_divp := leq_divMp (only parsing).
 
 End Field.
 

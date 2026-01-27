@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop finset tuple div ssralg.
-From mathcomp Require Import countalg binomial.
+From mathcomp Require Import fintype bigop finset tuple div binomial.
+From mathcomp Require Import ssralg countalg.
 
 (******************************************************************************)
 (* This file provides a library for univariate polynomials over ring          *)
@@ -1488,15 +1488,15 @@ Arguments rootP {R p x}.
 Arguments rootPf {R p x}.
 Arguments rootPt {R p x}.
 
-#[deprecated(since="mathcomp 2.4.0", note="renamed to `size_polyD`")]
+#[deprecated(since="mathcomp 2.4.0", use=size_polyD)]
 Notation size_add := size_polyD (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="renamed to `size_polyDl`")]
+#[deprecated(since="mathcomp 2.4.0", use=size_polyDl)]
 Notation size_addl := size_polyDl (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="renamed to `size_polyMleq`")]
+#[deprecated(since="mathcomp 2.4.0", use=size_polyMleq)]
 Notation size_mul_leq := size_polyMleq (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="renamed to `size_poly_prod_leq`")]
+#[deprecated(since="mathcomp 2.4.0", use=size_poly_prod_leq)]
 Notation size_prod_leq := size_poly_prod_leq (only parsing).
-#[deprecated(since="mathcomp 2.4.0", note="renamed to `size_poly_exp_leq`")]
+#[deprecated(since="mathcomp 2.4.0", use=size_poly_exp_leq)]
 Notation size_exp_leq := size_poly_exp_leq (only parsing).
 #[deprecated(since="mathcomp 2.4.0", use=pchar_poly)]
 Notation char_poly := pchar_poly (only parsing).
@@ -1878,7 +1878,7 @@ Notation "n .-primitive_root" := (primitive_root_of_unity n) : ring_scope.
 
 Arguments unity_rootP {R n z}.
 
-#[deprecated(since="mathcomp 2.4.0", note="renamed to `size_polyN`")]
+#[deprecated(since="mathcomp 2.4.0", use=size_polyN)]
 Notation size_opp := size_polyN (only parsing).
 
 (* Container morphism. *)
