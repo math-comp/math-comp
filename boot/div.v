@@ -140,8 +140,8 @@ Proof. by rewrite ltn_mod. Qed.
 Lemma leq_divM m d : m %/ d * d <= m.
 Proof. by rewrite [leqRHS](divn_eq m d) leq_addr. Qed.
 
-#[deprecated(since="mathcomp 2.4.0", note="Renamed to leq_divM.")]
-Notation leq_trunc_div := leq_divM.
+#[deprecated(since="mathcomp 2.4.0", use=leq_divM)]
+Notation leq_trunc_div := leq_divM (only parsing).
 
 Lemma leq_mod m d : m %% d <= m.
 Proof. by rewrite [leqRHS](divn_eq m d) leq_addl. Qed.
