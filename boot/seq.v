@@ -185,7 +185,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 (*         [seq x <- s | C] := filter (fun x => C) s.                         *)
 (*         [seq E | x <- s] := map (fun x => E) s.                            *)
 (*   [seq x <- s | C1 & C2] := [seq x <- s | C1 && C2].                       *)
-(*     [seq E | x <- s & C] := [seq E | x <- [seq x | C]].                    *)
+(*     [seq E | x <- s & C] := [seq E | x <- [seq x <- s | C]].               *)
 (*  --> The above allow optional type casts on the eigenvariables, as in      *)
 (*  [seq x : T <- s | C] or [seq E | x : T <- s, y : U <- t]. The cast may be *)
 (*  needed as type inference considers E or C before s.                       *)
