@@ -338,12 +338,14 @@ Proof. by elim: m => // m IHm; rewrite !expnS -modnMmr IHm modnMml modnMmr. Qed.
 Lemma modnMDXl p m n d : (p * d + m) ^ n  = m ^ n %[mod d].
 Proof. by elim: n => // n IH; rewrite !expnS -modnMm IH modnMDl modnMm. Qed.
 
-Lemma modnMBXl p m n d : m <= p * d -> (p * d - m) ^ n.*2 = m ^ n.*2 %[mod d].
+Lemma modnMBXl p m n d : 
+  m <= p * d -> (p * d - m) ^ n = (p * d - m) ^ odd n * m ^ n./2.*2 %[mod d].
 Proof.
-move=> mpd; elim: n => //= n IH.
-rewrite doubleS -addn2 expnD -modnMmr.
+move=> mpd; have [k]:= ubnP n; elim: k n => //= k IH; case => [|[|n nk]] //.
+  by rewrite muln1.
+rewrite /= negbK doubleS -addn2 expnD -modnMmr.
 suff -> : (p * d - m) ^ 2  = m ^ 2 %[mod d].
- by rewrite modnMmr -modnMml IH modnMml expnD.
+  by rewrite modnMmr -modnMml IH 1? ltnW // modnMml -mulnA -expnD addn2.
 rewrite -sqrnD_sub // -(modnMDXl p _ _ d).
 suff pdm4 : 4 * (p * d * m) <= (p * d + m) ^ 2.
   rewrite -[in RHS](subnK pdm4) -modnDmr -modnMmr [p * _ * _]mulnAC.
@@ -353,7 +355,7 @@ by apply: ltnW; rewrite -subn_gt0 sqrnD_sub ?expn_gt0 ?subn_gt0 ?mpd // ltnW.
 Qed.
 
 Lemma modn_sqrB m n : n <= m -> (m - n) ^ 2 = n ^ 2 %[mod m].
-Proof. by move=> nLn; have := @modnMBXl 1 n 1 m; rewrite mul1n => ->. Qed.
+Proof. by move=> nLn; have := @modnMBXl 1 n 2 m; rewrite !mul1n => ->. Qed.
 
 (** Divisibility **)
 
