@@ -145,23 +145,32 @@ endif
 test_suite/%.vo: __always__ Makefile.test-suite.coq
 	+$(ROCQMAKE_TESTSUITE) $@
 
-doc: __always__ Makefile.coq
-	mkdir -p _build_doc/
-	cp -r $(ROCQFILES) -t _build_doc/ --parents
-	cp Make Makefile* _build_doc
-	mkdir -p _build_doc/htmldoc
-	. etc/utils/builddoc_lib.sh; \
-		cd _build_doc && mangle_sources $(ROCQFILES)
-	+cd _build_doc && $(ROCQMAKE)
-	cd _build_doc && grep -v vio: .Makefile.coq.d | sed -e 's/[^ ]*rocq-runtime[^ ]*//g' > depend
-	cd _build_doc && cat depend | ../etc/buildlibgraph $(ROCQFILES) > htmldoc/depend.js
-	cd _build_doc && $(ROCQ) doc -t "Mathematical Components" \
-		-g --utf8 -R . mathcomp \
-		--parse-comments \
-		--multi-index $(ROCQFILES) -d htmldoc
-	. etc/utils/builddoc_lib.sh; \
-		cd _build_doc && postprocess_html
-	cp etc/artwork/coqdoc.css _build_doc/htmldoc
+# Html documentation
+
+DOCDIR=html
+
+GIT_HASH := $(shell git describe --tags --exact-match 2>/dev/null || git rev-parse --short HEAD)
+
+# Set to -show-type-information-using-rocq-lsp to enable tooltips (memory heavy).
+ROCQNAVI_TYPE_INFO ?=
+
+$(DOCDIR)/dependency_graph.pre:
+	mkdir -p $(DOCDIR)
+	coqdep -f _CoqProject | perl etc/builddoc_dependency_dot.pl > $(DOCDIR)/dependency_graph.pre
+
+$(DOCDIR)/dependency_graph.dot: $(DOCDIR)/dependency_graph.pre
+	tred $(DOCDIR)/dependency_graph.pre > $(DOCDIR)/dependency_graph.dot
+
+doc: build $(DOCDIR)/dependency_graph.dot
+	etc/rocqnavi_generate-hierarchy-graph.sh $(DOCDIR)/hierarchy_graph.dot
+	find . -name "*.v" -o -name "*.glob" | grep -v "/\." | grep -v "_opam/" | xargs rocqnavi \
+	-title "Mathematical Components $(GIT_HASH)" \
+	-d $(DOCDIR) -Q . mathcomp \
+	-coqlib https://rocq-prover.org/doc/current/stdlib/ \
+	-file-graph $(DOCDIR)/dependency_graph.dot \
+	-structure-graph $(DOCDIR)/hierarchy_graph.dot \
+	-index-blacklist etc/rocqnavi_index-blacklist \
+	$(ROCQNAVI_TYPE_INFO)
 
 doc-clean:
-	rm -rf _build_doc/
+	rm -rf $(DOCDIR)
