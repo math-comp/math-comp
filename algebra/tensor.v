@@ -1,6 +1,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect seq matrix bigop ssrbool eqtype choice.
 From mathcomp Require Import fintype ssralg ssrnat ssrfun order finfun tuple.
+From mathcomp Require Import finset.
 From mathcomp Require Import interval_inference numdomain.
 From Corelib Require Import ssreflect.
 
@@ -155,11 +156,6 @@ Lemma subsemimod_closed {m n} (R : pzSemiRingType)
 Proof. by []. Qed.
 HB.instance Definition _ (R : pzSemiRingType) := 
   GRing.SubNmodule_isSubLSemiModule.Build _ _ _ 'T[R] (subsemimod_closed R).
-
-Lemma submod_closed {m n} (R : pzRingType) : @submod_closed R 'M[R]_(n, m) predT.
-Proof. by []. Qed.
-HB.instance Definition _ (R : pzRingType) := 
-  GRing.SubZmodule_isSubLmodule.Build _ _ _ 'T[R] (submod_closed R).
 
 End SubtypeInstances.
 
@@ -441,61 +437,65 @@ Section IndexTensor.
 
 Section IndexTensorBij.
 
-(* Context {k : nat} {u_ : nat ^ k}. *)
+Context {k : nat} (u_ : nat ^ k).
 
-(* Definition xs' := [ffun i => if unlift ord0 i is some j then xs j else x].  *)
+Local Notation fprod_u := (fprod (fun i : 'I_k => 'I_(u_ i))).
 
-Program Fixpoint pr {k : nat} {u_ : nat ^ k.+1} : 'I_(\prod_(i < k.+1) u_ i) -> {dffun forall i : 'I_k.+1, 'I_(u_ i)}
-  := match k with
-     | 0 => _
-     | l.+1 => _
-     end.
-Next Obligation.
-case=> //u_ k0.
-rewrite big_ord_recl big_ord0 muln1 => i.
-apply: [ffun => cast_ord _ i] => /= s.
-by rewrite ord1.
-Qed.
-Next Obligation.
-rewrite muln1.
-apply: dffun_of_fprod => /=.
-apply: (@FProd _ _ (fun=> i)).
+Lemma card_fprod_u : #|fprod_u| = \prod_(i < k) u_ i.
+Proof. by rewrite card_fprod; apply: eq_bigr => i _; rewrite card_ord. Qed.
 
-pose fun0 := fun i : 'I_0 => ord0. 
-rewrite -k0.
-eexists.
+Definition tensor_index (f : fprod_u) : 'I_(\prod_(i < k) u_ i) :=
+  cast_ord card_fprod_u (enum_rank f).
+
+Definition tensor_unindex (i : 'I_(\prod_(i < k) u_ i)) : fprod_u :=
+  enum_val (cast_ord (esym card_fprod_u) i).
+
+Lemma tensor_indexK : cancel tensor_index tensor_unindex.
+Proof. by move=> f; rewrite /tensor_index /tensor_unindex cast_ordK enum_rankK. Qed.
+
+Lemma tensor_unindexK : cancel tensor_unindex tensor_index.
+Proof. by move=> i; rewrite /tensor_index /tensor_unindex enum_valK cast_ordKV. Qed.
+
+Lemma tensor_index_bij : bijective tensor_index.
+Proof. by exists tensor_unindex;[exact: tensor_indexK|exact: tensor_unindexK]. Qed.
+
+Definition tensor_dffun_index : 'I_(\prod_(i < k) u_ i) ->
+    {dffun forall i : 'I_k, 'I_(u_ i)} :=
+  @dffun_of_fprod _ _ \o tensor_unindex.
+
+Definition tensor_dffun_unindex : {dffun forall i : 'I_k, 'I_(u_ i)} ->
+    'I_(\prod_(i < k) u_ i) :=
+  tensor_index \o @fprod_of_dffun _ _.
+
+Lemma tensor_dffun_indexK : cancel tensor_dffun_index tensor_dffun_unindex.
+Proof. by move=> i; rewrite /tensor_dffun_index /tensor_dffun_unindex/= dffun_of_fprodK tensor_unindexK. Qed.
+
+Lemma tensor_dffun_unindexK : cancel tensor_dffun_unindex tensor_dffun_index.
+Proof. by move=> f; rewrite /tensor_dffun_index /tensor_dffun_unindex/= tensor_indexK fprod_of_dffunK. Qed.
+
+Lemma tensor_dffun_index_bij : bijective tensor_dffun_index.
+Proof. by exists tensor_dffun_unindex;[exact: tensor_dffun_indexK|exact: tensor_dffun_unindexK]. Qed.
+
+End IndexTensorBij.
+
+Section IndexTensorConsBij.
+
+Context (u : nat) {k : nat} (u_ : nat ^ k).
+
+Local Notation u_cons := [ffun i : 'I_k.+1 => if unlift ord0 i is Some j then u_ j else u].
+
+Lemma tensormx_cast : #|{:'I_u.+1 * 'I_\prod_(i < k) (u_ i).+1}| = \prod_(i < k.+1) (u_cons i).+1.
 Proof.
-move: k u_.
-elim.
-- 
+rewrite card_prod !card_ord big_ord_recl ffunE/= unlift_none.
+by congr (_ * _); apply: eq_bigr => i _; rewrite ffunE liftK.
+Qed.
 
-eexists.
-apply: bij_comp.
-  apply: dffun_of_fprod_bij.
-  
-  
-Program Fixpoint pr {k : nat} {u_ : nat ^ k} : {f : 'I_(\prod_(i < k) u_ i) -> {dffun forall i : 'I_k, 'I_(u_ i)} | bijective f}
-
-exists (@dffun_of_fprod 'I_k (ordinal \o xs) \o _).
-
-dffun_of_fprod (T_:=fun x : 'I_k => (ordinal \o xs) x)
-     : fprod (fun x : 'I_k => (ordinal \o xs) x) -> {dffun forall i : 'I_k, (ordinal \o xs) i}
-
-Record fprod (I : finType) (T_ : I -> finType) : predArgType := FProd
-  { fprod_fun : {ffun I -> {i : I & T_ i}};  fprod_prop : is_true [forall i, tag (fprod_fun i) == i] }.
-
-Admitted.
-
-Lemma tensormx_cast
-: #|{:'I_x * 'I_\prod_(i < k) xs i}| = \prod_(i < k.+1) xs' i.
-Proof. by rewrite card_prod !card_ord big_cons. Qed.
-
-Definition tensormx_index (ij : 'I_x * 'I_\prod_(e <- xs) e) 
-  : 'I_\prod_(e <- x :: xs) e :=
+Definition tensormx_index (ij : 'I_u.+1 * 'I_\prod_(i < k) (u_ i).+1)
+  : 'I_\prod_(i < k.+1) (u_cons i).+1 :=
   cast_ord tensormx_cast (enum_rank ij).
 
-Definition tensormx_unindex (i : 'I_\prod_(e <- x :: xs) e)
-  : 'I_x * 'I_\prod_(e <- xs) e :=
+Definition tensormx_unindex (i : 'I_\prod_(i < k.+1) (u_cons i).+1)
+  : 'I_u.+1 * 'I_\prod_(i < k) (u_ i).+1 :=
   enum_val (cast_ord (esym tensormx_cast) i).
 
 Lemma tensormx_indexK : cancel tensormx_index tensormx_unindex.
@@ -504,28 +504,27 @@ Proof. by move=> ij; rewrite /tensormx_unindex cast_ordK enum_rankK. Qed.
 Lemma tensormx_unindexK : cancel tensormx_unindex tensormx_index.
 Proof. by move=> i; rewrite /tensormx_index enum_valK cast_ordKV. Qed.
 
-End IndexTensorBij.
+End IndexTensorConsBij.
 
-Context (R : Type) (u d : nat) k l (u_ : nat ^ k) (d_ : nat ^ l).
+Context (R : Type) (u d k l : nat) (u_ : nat ^ k) (d_ : nat ^ l).
+Local Notation u_cons := [ffun i : 'I_k.+1 => if unlift ord0 i is Some j then u_ j else u].
+Local Notation d_cons := [ffun i : 'I_l.+1 => if unlift ord0 i is Some j then d_ j else d].
 
-Open Scope ring_scope.
+Definition nindex (t : 'T[R]_(u_cons, d_)) (i : 'I_u.+1) : 'T[R]_(u_, d_) :=
+  Tensor (\matrix_(i', j) (\val t) (tensormx_index (i, i')) j).
 
-Definition nindex (t : 'T[R]_(u.+1 :: u_, d_)) (i : 'I_u.+1) : 'T[R]_(us, ds) :=
-  Tensor (\matrix_(i', j) (\val t) (tensormx_index (i, i')) j).  
-
-Definition oindex (t : 'T[R]_(us, d.+1 :: ds)) (j : 'I_d.+1) : 'T[R]_(us, ds) :=
+Definition oindex (t : 'T[R]_(u_, d_cons)) (j : 'I_d.+1) : 'T[R]_(u_, d_) :=
   Tensor (\matrix_(i, j') (\val t) i (tensormx_index (j, j'))).
 
-Definition nstack (f : 'I_u.+1 -> 'T[R]_(us, ds)) : 'T[R]_(u.+1 :: us, ds) := 
+Definition nstack (f : 'I_u.+1 -> 'T[R]_(u_, d_)) : 'T[R]_(u_cons, d_) := 
   Tensor (
     \matrix_(i, j) \val (f (tensormx_unindex i).1) (tensormx_unindex i).2 j).
 
-Definition ostack (f : 'I_d.+1 -> 'T[R]_(us, ds)) : 'T[R]_(us, d.+1 :: ds) :=
+Definition ostack (f : 'I_d.+1 -> 'T[R]_(u_, d_)) : 'T[R]_(u_, d_cons) :=
   Tensor (
     \matrix_(i, j) \val (f (tensormx_unindex j).1) i (tensormx_unindex j).2).
 
 End IndexTensor.
-
 
 Notation "t ^^ i" := (nindex t i).
 Notation "t `_ i" := (oindex t i).
