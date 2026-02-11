@@ -7,7 +7,7 @@ From mathcomp Require Import nmodule algebra divalg decfield countalg finalg.
 
 (******************************************************************************)
 (*  Definition of the additive group and ring Zp, represented as 'I_p         *)
-(******************************************************************************)
+(*                                                                            *)
 (* Definitions:                                                               *)
 (* From fintype.v:                                                            *)
 (*     'I_p == the subtype of integers less than p, taken here as the type of *)
