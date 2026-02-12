@@ -109,6 +109,8 @@ Reserved Notation "t .[::]".
 Section TensorDef.
 
 Definition tensor_nil_f := [ffun i : 'I_0 => 0].
+Definition fcons {k : nat} {T : Type} (x : T) (f : 'I_k -> T) : T ^ k.+1 :=
+  [ffun i => oapp f x (unlift ord0 i)].
 
 Context {k l : nat} (u_ : nat ^ k) (d_ : nat ^ l) (K : Type).
 
@@ -507,8 +509,8 @@ Proof. by move=> i; rewrite /tensormx_index enum_valK cast_ordKV. Qed.
 End IndexTensorConsBij.
 
 Context (R : Type) (u d k l : nat) (u_ : nat ^ k) (d_ : nat ^ l).
-Local Notation u_cons := [ffun i : 'I_k.+1 => if unlift ord0 i is Some j then u_ j else u].
-Local Notation d_cons := [ffun i : 'I_l.+1 => if unlift ord0 i is Some j then d_ j else d].
+Local Notation u_cons := (fcons u u_).
+Local Notation d_cons := (fcons d d_).
 
 Definition nindex (t : 'T[R]_(u_cons, d_)) (i : 'I_u.+1) : 'T[R]_(u_, d_) :=
   Tensor (\matrix_(i', j) (\val t) (tensormx_index (i, i')) j).
@@ -547,9 +549,10 @@ Notation "\tensor `_ i => E" := (\tensor`_i const_t E).
 
 Section TensorIndexTheory.
 
+
 Context (R : Type).
 
-Lemma ntensorP {u} {us ds : pseq} (t v : 'T[R]_(u.+1 :: us, ds)) 
+Lemma ntensorP (u k l : nat) (u_ : nat ^ k) (d_ : nat ^ l) (t v : 'T[R]_(fcons u u_, d_)) 
   : t = v <-> forall i, t^^i = v^^i.
 Proof.
 split=> [->//|eq_i]; apply/val_inj/matrixP=> i j.
@@ -557,7 +560,7 @@ move: (eq_i (tensormx_unindex i).1)=> [/matrixP] /(_ (tensormx_unindex i).2 j).
 by rewrite !mxE -surjective_pairing tensormx_unindexK.
 Qed.
 
-Lemma otensorP {d} {us ds : pseq} (t v : 'T[R]_(us, d.+1 :: ds))
+Lemma otensorP (d k l : nat) (u_ : nat ^ k) (d_ : nat ^ l) (t v : 'T[R]_(u_, fcons d d_))
   : t = v <-> forall i, t`_i = v`_i.
 Proof.
 split=> [->//|eq_i]; apply/val_inj/matrixP=> i j.
@@ -565,24 +568,24 @@ move: (eq_i (tensormx_unindex j).1)=> [/matrixP] /(_ i (tensormx_unindex j).2).
 by rewrite !mxE -surjective_pairing tensormx_unindexK.
 Qed.
 
-Lemma ntensor_eqP {u} (t v : 'nT[R]_([:: u.+1]))
+Lemma ntensor_eqP (u : nat) (t v : 'nT[R]_(fcons u tensor_nil_f))
   : t = v <-> forall i, t^^=i = v^^=i.
 Proof.
 split=> [->//|eq_i]; apply/ntensorP=> i.
 by move: (eq_i i)=> /tensor_nil_eqP.
 Qed.
 
-Lemma otensor_eqP {d} (t v : 'oT[R]_([:: d.+1]))
+Lemma otensor_eqP (d : nat) (t v : 'oT[R]_(fcons d tensor_nil_f))
   : t = v <-> forall i, t`_=i = v`_=i.
 Proof.
 split=> [->//|eq_i]; apply/otensorP=> i.
 by move: (eq_i i)=> /tensor_nil_eqP.
 Qed.
 
-Lemma nstackE {u us ds} (f : 'I_u.+1 -> 'T[R]_(us, ds)) i : (nstack f)^^i = f i.
+Lemma nstackE {u k l} {u_ : nat ^ k} {d_ : nat ^ l} (f : 'I_u.+1 -> 'T[R]_(u_, d_)) i : (nstack f)^^i = f i.
 Proof. by apply/val_inj/matrixP => x y; rewrite !mxE tensormx_indexK. Qed.
 
-Lemma ostackE {us d ds} (f : 'I_d.+1 -> 'T[R]_(us, ds)) i : (ostack f)`_i = f i.
+Lemma ostackE {d k l} {u_ : nat ^ k} {d_ : nat ^ l} (f : 'I_d.+1 -> 'T[R]_(u_, d_)) i : (ostack f)`_i = f i.
 Proof. by apply/val_inj/matrixP => x y; rewrite !mxE tensormx_indexK. Qed.
 
 Lemma nstack_eqE {u} (f : 'I_u.+1 -> R) i : (\tensor^^i0 => f i0)^^=i = f i.
@@ -596,12 +599,12 @@ End TensorIndexTheory.
 
 Section TensorTuple.
 
-Context {R : Type} (x : nat) (us ds : pseq).
+Context {R : Type} (x : nat) (k l : nat) (u_ : nat ^ k) (d_ : nat ^ l).
 
-Definition ntensor_of_tuple (t : x.+1.-tuple R) : 'nT[R]_([:: x.+1]) :=
+Definition ntensor_of_tuple (t : x.+1.-tuple R) : 'nT[R]_(fcons x tensor_nil_f) :=
   \tensor^^i => (tnth t i).
 
-Definition otensor_of_tuple (t : x.+1.-tuple R) : 'oT[R]_([:: x.+1]) :=
+Definition otensor_of_tuple (t : x.+1.-tuple R) : 'oT[R]_(fcons x tensor_nil_f) :=
   \tensor`_i => (tnth t i).
 
 Lemma ntensor_of_tupleE t i : (ntensor_of_tuple t)^^=i = tnth t i.
@@ -610,10 +613,10 @@ Proof. exact: nstack_eqE. Qed.
 Lemma otensor_of_tupleE t i : (otensor_of_tuple t)`_=i = tnth t i.
 Proof. exact: ostack_eqE. Qed.
 
-Definition nstack_tuple (t : x.+1.-tuple 'T[R]_(us, ds)) :=
+Definition nstack_tuple (t : x.+1.-tuple 'T[R]_(u_, d_)) :=
   \tensor^^i tnth t i.
 
-Definition ostack_tuple (t : x.+1.-tuple 'T[R]_(us, ds)) :=
+Definition ostack_tuple (t : x.+1.-tuple 'T[R]_(u_, d_)) :=
   \tensor`_i tnth t i.
 
 Lemma nstack_tupleE t i : (nstack_tuple t)^^i = tnth t i.
@@ -639,7 +642,7 @@ Section TensorMatrix.
 
 Context {R : Type} {n m : nat}.
 
-Definition tensor_of_matrix (M : 'M_(_, _)) : 'T[R]_([:: n.+1], [:: m.+1]) :=
+Definition tensor_of_matrix (M : 'M_(_, _)) : 'T[R]_(fcons n tensor_nil_f, fcons m tensor_nil_f) :=
   \tensor^^i \tensor`_j => M i j.
 
 Definition matrix_of_tensor t : 'M[R]_(n.+1, m.+1) :=
