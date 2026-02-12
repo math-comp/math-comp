@@ -49,6 +49,12 @@ From Corelib Require Import ssreflect.
 (* lSemiModType, lModType.                                                    *)
 (*   Tensors also implement a pointwise partial ordering, as well as          *)
 (* ring instances where the underlying type satisfies that instance.          *)
+(* NOTE: Ring multiplication ( *%R ) is the Hadamard (element-wise) product.  *)
+(*                                                                            *)
+(* Tensor operations:                                                         *)
+(* t *h u == Hadamard product of t and u (element-wise multiplication)        *)
+(* t *t u == proper tensor product: combines dimensions,                      *)
+(*           'T_(u1, d1) * 'T_(u2, d2) -> 'T_(cat u1 u2, cat d1 d2)           *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -218,37 +224,38 @@ Context {R : pzSemiRingType}.
 
 Definition tensor1 := @const_t _ _ _ u_ d_ (GRing.one R).
 
-Definition mult (t u : 'T[R]_(u_, d_)) :=
+(* Hadamard product: element-wise multiplication *)
+Definition hmult (t u : 'T[R]_(u_, d_)) :=
   @Tensor _ _ u_ d_ R (map2_mx *%R (\val t) (\val u)).
 
-Lemma multA : associative mult.
-Proof. by move=> x y z; rewrite /mult map2_mxA. Qed.
-Lemma mul1t : left_id tensor1 mult.
-Proof. by move=> [x]; rewrite /mult map2_1mx. Qed.
-Lemma mult1 : right_id tensor1 mult.
-Proof. by move=> [x]; rewrite /mult map2_mx1. Qed.
-Lemma multDl : left_distributive mult +%R.
-Proof. by move=> x y z; rewrite /mult map2_mxDl. Qed.
-Lemma multDr : right_distributive mult +%R.
-Proof. by move=> x y z; rewrite /mult map2_mxDr. Qed.
-Lemma mul0t : left_zero 0%R mult.
-Proof. by move=> x; rewrite /mult map2_0mx. Qed.
-Lemma mult0 : right_zero 0%R mult.
-Proof. by move=> x; rewrite /mult map2_mx0. Qed.
+Lemma hmultA : associative hmult.
+Proof. by move=> x y z; rewrite /hmult map2_mxA. Qed.
+Lemma hmul1t : left_id tensor1 hmult.
+Proof. by move=> [x]; rewrite /hmult map2_1mx. Qed.
+Lemma hmult1 : right_id tensor1 hmult.
+Proof. by move=> [x]; rewrite /hmult map2_mx1. Qed.
+Lemma hmultDl : left_distributive hmult +%R.
+Proof. by move=> x y z; rewrite /hmult map2_mxDl. Qed.
+Lemma hmultDr : right_distributive hmult +%R.
+Proof. by move=> x y z; rewrite /hmult map2_mxDr. Qed.
+Lemma hmul0t : left_zero 0%R hmult.
+Proof. by move=> x; rewrite /hmult map2_0mx. Qed.
+Lemma hmult0 : right_zero 0%R hmult.
+Proof. by move=> x; rewrite /hmult map2_mx0. Qed.
 
 HB.instance Definition _ := GRing.Nmodule_isPzSemiRing.Build
-  'T[R] multA mul1t mult1 multDl multDr mul0t mult0.
+  'T[R] hmultA hmul1t hmult1 hmultDl hmultDr hmul0t hmult0.
 
 End TensorSemiRing.
 
-Lemma multC {R : comPzSemiRingType} : @commutative 'T[R] _ mult.
-Proof. by move=> x y; rewrite /mult map2_mxC. Qed.
+Lemma hmultC {R : comPzSemiRingType} : @commutative 'T[R] _ hmult.
+Proof. by move=> x y; rewrite /hmult map2_mxC. Qed.
 
 HB.instance Definition _ {R : pzRingType} := GRing.Zmodule_isPzRing.Build
-  'T[R] multA mul1t mult1 multDl multDr.
+  'T[R] hmultA hmul1t hmult1 hmultDl hmultDr.
 
 HB.instance Definition _ {R : comPzRingType} := 
-  GRing.PzRing_hasCommutativeMul.Build 'T[R] multC.
+  GRing.PzRing_hasCommutativeMul.Build 'T[R] hmultC.
 
 Lemma onet_neq0 {R : nzSemiRingType} : (1%R : 'T[R]) != 0%R.
 Proof.
@@ -266,10 +273,10 @@ HB.instance Definition _ {R : nzSemiRingType} :=
   'T[R] onet_neq0.
 
 HB.instance Definition _ {R : nzRingType} := GRing.Zmodule_isNzRing.Build
-  'T[R] multA mul1t mult1 multDl multDr onet_neq0.
+  'T[R] hmultA hmul1t hmult1 hmultDl hmultDr onet_neq0.
 
 HB.instance Definition _ {R : comNzRingType} := GRing.Zmodule_isComNzRing.Build
-  'T[R] multA multC mul1t multDl onet_neq0.
+  'T[R] hmultA hmultC hmul1t hmultDl onet_neq0.
 
 Definition unitt {R : unitRingType} (t : 'T[R]) :=
   [forall ij, (\val t ij.1 ij.2) \is a GRing.unit].
@@ -307,6 +314,10 @@ HB.instance Definition _ {R : unitRingType} :=
   GRing.NzRing_hasMulInverse.Build 'T[R] mulVt divtt unittP invt_out.
 
 End TensorRing.
+
+(* Notations for Hadamard product *)
+Notation "*h%R" := hmult : ring_scope.
+Notation "x *h y" := (hmult x y) (at level 40, left associativity) : ring_scope.
 
 Section NilTensor.
 
@@ -658,3 +669,53 @@ by rewrite nstackE ostack_eqE mxE.
 Qed.
 
 End TensorMatrix.
+
+Section TensorProduct.
+
+Context {R : pzSemiRingType}.
+Context {k1 l1 k2 l2 : nat}.
+Context (u1_ : nat ^ k1) (d1_ : nat ^ l1).
+Context (u2_ : nat ^ k2) (d2_ : nat ^ l2).
+
+Definition fcat {n m : nat} (f : nat ^ n) (g : nat ^ m) : nat ^ (n + m) :=
+  [ffun i : 'I_(n + m) => 
+    match split i with
+    | inl j => f j
+    | inr j => g j
+    end].
+
+Lemma prod_fcat {n m : nat} (f : nat ^ n) (g : nat ^ m) :
+  \prod_(i < n) (f i).+1 * \prod_(i < m) (g i).+1 = \prod_(i < n + m) (fcat f g i).+1.
+Proof.
+rewrite big_split_ord/= /fcat.
+congr (_ * _).
+  apply/eq_bigr => i _; rewrite ffunE/=.
+  case: split_ordP => j.
+    by move=>/lshift_inj ->.
+  by move=>/eqP; rewrite eq_lrshift.
+apply/eq_bigr => i _; rewrite ffunE/=.
+case: split_ordP => j.
+  by move=> /eqP; rewrite eq_rlshift.
+by move=>/rshift_inj ->.
+Qed.
+
+Lemma prod_card (m n : nat) : #|{:'I_m * 'I_n}| = (m * n)%N.
+Proof. by rewrite card_prod !card_ord. Qed.
+
+Definition prod_split (m n : nat) (i : 'I_(m * n)) : 'I_m * 'I_n :=
+  enum_val (cast_ord (esym (prod_card m n)) i).
+
+Definition prod_unsplit (m n : nat) (ij : 'I_m * 'I_n) : 'I_(m * n) :=
+  cast_ord (prod_card m n) (enum_rank ij).
+
+Definition tprod (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) 
+  : 'T[R]_(fcat u1_ u2_, fcat d1_ d2_) :=
+  Tensor (\matrix_(i, j) 
+    let ii := prod_split (cast_ord (esym (prod_fcat _ _)) i) in
+    let jj := prod_split (cast_ord (esym (prod_fcat _ _)) j) in
+    (\val t ii.1 jj.1) * (\val u ii.2 jj.2))%R.
+
+End TensorProduct.
+
+Notation "*t%R" := tprod : ring_scope.
+Notation "x *t y" := (tprod x y) (at level 40, left associativity) : ring_scope.
