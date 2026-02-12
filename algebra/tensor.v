@@ -1,7 +1,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect seq matrix bigop ssrbool eqtype choice.
 From mathcomp Require Import fintype ssralg ssrnat ssrfun order finfun tuple.
-From mathcomp Require Import finset.
+From mathcomp Require Import finset sesquilinear.
 From mathcomp Require Import interval_inference numdomain.
 From Corelib Require Import ssreflect.
 
@@ -50,6 +50,7 @@ From Corelib Require Import ssreflect.
 (*   Tensors also implement a pointwise partial ordering, as well as          *)
 (* ring instances where the underlying type satisfies that instance.          *)
 (* NOTE: Ring multiplication ( *%R ) is the Hadamard (element-wise) product.  *)
+(* Proper tensor product forms a bilinear structure.                          *)
 (*                                                                            *)
 (* Tensor operations:                                                         *)
 (* t *h u == Hadamard product of t and u (element-wise multiplication)        *)
@@ -136,10 +137,9 @@ Notation "''oT[' R ]_ ( ds )" := 'T[R]_(tensor_nil_f, ds) (only parsing).
 Notation "''oT_' ( ds )" := 'oT[_]_(ds).
 Notation "''nT_' ( us )" := 'nT[_]_(us).
 
+Import Algebra GRing.
 
 Section SubtypeInstances.
-
-Import Algebra.
 
 Context {l k : nat} (u_ : nat ^ k) (d_ : nat ^ l).
 Local Notation "''T[' R ]" := 'T[R]_(u_, d_).
@@ -163,7 +163,12 @@ Lemma subsemimod_closed {m n} (R : pzSemiRingType)
   : @subsemimod_closed R 'M[R]_(n, m) predT.
 Proof. by []. Qed.
 HB.instance Definition _ (R : pzSemiRingType) := 
-  GRing.SubNmodule_isSubLSemiModule.Build _ _ _ 'T[R] (subsemimod_closed R).
+  SubNmodule_isSubLSemiModule.Build _ _ _ 'T[R] (subsemimod_closed R).
+
+Lemma submod_closed {m n} (R : pzRingType) : @submod_closed R 'M[R]_(n, m) predT.
+Proof. by []. Qed.
+HB.instance Definition _ (R : pzRingType) :=
+  GRing.SubChoice_isSubLmodule.Build _ _ _ 'T[R] (submod_closed R).
 
 End SubtypeInstances.
 
@@ -557,10 +562,7 @@ Notation "\tensor `_ ( i < d ) => E" := (\tensor`_(i < d) const_t E)
 Notation "\tensor ^^ i => E" := (\tensor^^i const_t E).
 Notation "\tensor `_ i => E" := (\tensor`_i const_t E).
 
-
 Section TensorIndexTheory.
-
-
 Context (R : Type).
 
 Lemma ntensorP (u k l : nat) (u_ : nat ^ k) (d_ : nat ^ l) (t v : 'T[R]_(fcons u u_, d_)) 
@@ -672,7 +674,7 @@ End TensorMatrix.
 
 Section TensorProduct.
 
-Context {R : pzSemiRingType}.
+Context {R : pzSemiRingType} {R' : pzRingType}.
 Context {k1 l1 k2 l2 : nat}.
 Context (u1_ : nat ^ k1) (d1_ : nat ^ l1).
 Context (u2_ : nat ^ k2) (d2_ : nat ^ l2).
@@ -715,7 +717,126 @@ Definition tprod (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_))
     let jj := prod_split (cast_ord (esym (prod_fcat _ _)) j) in
     (\val t ii.1 jj.1) * (\val u ii.2 jj.2))%R.
 
+Local Open Scope ring_scope.
+
+Lemma tprodDl (t u : 'T[R]_(u1_, d1_)) (v : 'T[R]_(u2_, d2_)) :
+  tprod (t + u) v = (tprod t v + tprod u v).
+Proof.
+by apply/val_inj/matrixP => i j; rewrite /tensor_val/= !mxE/= mulrDl.
+Qed.
+
+Lemma tprodDr (t : 'T[R]_(u1_, d1_)) (u v : 'T[R]_(u2_, d2_)) :
+  tprod t (u + v) = tprod t u + tprod t v.
+Proof.
+by apply/val_inj/matrixP => i j; rewrite /tensor_val/= !mxE /= mulrDr.
+Qed.
+
+Lemma tprod0l (t : 'T[R]_(u2_, d2_)) :
+  tprod (0 : 'T[R]_(u1_, d1_)) t = 0.
+Proof.
+by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mul0r.
+Qed.
+
+Lemma tprod0r (t : 'T[R]_(u1_, d1_)) :
+  tprod t (0 : 'T[R]_(u2_, d2_)) = 0.
+Proof.
+by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE mulr0.
+Qed.
+
+Lemma tprod_const (a b : R) :
+  tprod (@const_t R _ _ u1_ d1_ a) (@const_t R _ _ u2_ d2_ b) = 
+  const_t (a * b)%R.
+Proof.
+by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE.
+Qed.
+
+
 End TensorProduct.
 
 Notation "*t%R" := tprod : ring_scope.
 Notation "x *t y" := (tprod x y) (at level 40, left associativity) : ring_scope.
+
+Section TensorProductBilinear.
+
+Context {R : comNzRingType}.
+Context {k1 l1 k2 l2 : nat}.
+Context (u1_ : nat ^ k1) (d1_ : nat ^ l1).
+Context (u2_ : nat ^ k2) (d2_ : nat ^ l2).
+
+Local Open Scope ring_scope.
+
+Lemma tprod_linear_l (u : 'T[R]_(u2_, d2_)) :
+  GRing.linear_for *:%R (fun t : 'T[R]_(u1_, d1_) => t *t u).
+Proof.
+move=> a x y; apply/val_inj/matrixP=> i j; rewrite /tensor_val/= !mxE/=.
+rewrite mulrDl; congr (_ + _);
+  by rewrite mulrA.
+Qed.
+
+Lemma tprod_linear_r (t : 'T[R]_(u1_, d1_)) :
+  GRing.linear_for *:%R (fun u : 'T[R]_(u2_, d2_) => t *t u).
+Proof.
+move=> a x y; apply/val_inj/matrixP=> i j; rewrite /tensor_val/= !mxE/=.
+by rewrite mulrDr; congr (_ + _); rewrite mulrA (mulrCA a) mulrA.
+Qed.
+
+HB.instance Definition _ := bilinear_isBilinear.Build
+  R
+  'T[R]_(u1_, d1_) 'T[R]_(u2_, d2_)
+  'T[R]_(fcat u1_ u2_, fcat d1_ d2_)
+  *:%R *:%R (@tprod _ _ _ _ _ _ _ _ _) (conj tprod_linear_l tprod_linear_r).
+
+End TensorProductBilinear.
+
+Section TensorProductHadamard.
+
+Context {R : comRingType}.
+Context {k1 l1 k2 l2 : nat}.
+Context (u1_ : nat ^ k1) (d1_ : nat ^ l1).
+Context (u2_ : nat ^ k2) (d2_ : nat ^ l2).
+
+Local Open Scope ring_scope.
+
+Lemma tprod_hmult (t1 u1 : 'T[R]_(u1_, d1_)) (t2 u2 : 'T[R]_(u2_, d2_)) :
+  (t1 *h u1) *t (t2 *h u2) = (t1 *t t2) *h (u1 *t u2).
+Proof.
+by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrACA.
+Qed.
+
+End TensorProductHadamard.
+
+Section TensorProductRing.
+
+Context {k1 l1 k2 l2 : nat}.
+Context (u1_ : nat ^ k1) (d1_ : nat ^ l1).
+Context (u2_ : nat ^ k2) (d2_ : nat ^ l2).
+
+Local Open Scope ring_scope.
+
+Lemma tprodNl {R : pzRingType} (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
+  (- t) *t u = - (t *t u).
+Proof.
+by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulNr.
+Qed.
+
+Lemma tprodNr {R : pzRingType} (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
+  t *t (- u) = - (t *t u).
+Proof.
+by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrN.
+Qed.
+
+(* Note: true commutativity would swap dimensions, requiring a more complex statement *)
+Lemma tprod_scale {R : comPzSemiRingType} (a b : R) (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
+  (const_t a *h t) *t (const_t b *h u) = const_t (a * b)%R *h (t *t u).
+Proof.
+by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrACA.
+Qed.
+
+Lemma tprod_hmult_compat {R : comPzSemiRingType} 
+  (t1 t2 : 'T[R]_(u1_, d1_)) (u1 u2 : 'T[R]_(u2_, d2_)) :
+  (t1 *h t2) *t (u1 *h u2) = (t1 *t u1) *h (t2 *t u2).
+Proof.
+by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrACA.
+Qed.
+
+End TensorProductRing.
