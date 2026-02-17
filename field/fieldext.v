@@ -608,7 +608,7 @@ Section FieldOver.
 
 Variables (F0 : fieldType) (L : fieldExtType F0) (F : {subfield L}).
 
-Definition fieldOver of {vspace L} : Type := L.
+Definition fieldOver & {vspace L} : Type := L.
 Local Notation K_F := (subvs_of F).
 Local Notation L_F := (fieldOver F).
 

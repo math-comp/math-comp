@@ -83,7 +83,7 @@ Structure morphism (D : {set aT}) : Type := Morphism {
 (* for the 'textbook' notion of morphism, when the required structures are    *)
 (* available (e.g. its domain is a group).                                    *)
 
-Definition morphism_for D of phant rT := morphism D.
+Definition morphism_for D & phant rT := morphism D.
 
 Definition clone_morphism D f :=
   let: Morphism _ fM := f
@@ -128,11 +128,11 @@ Proof. by case f. Qed.
 Notation morPhantom := (phantom (aT -> rT)).
 Definition MorPhantom := Phantom (aT -> rT).
 
-Definition dom of morPhantom f := D.
+Definition dom & morPhantom f := D.
 
-Definition morphim of morPhantom f := fun A => f @: (D :&: A).
+Definition morphim & morPhantom f := fun A => f @: (D :&: A).
 
-Definition morphpre of morPhantom f := fun R : {set rT} => D :&: f @^-1: R.
+Definition morphpre & morPhantom f := fun R : {set rT} => D :&: f @^-1: R.
 
 Definition ker mph := morphpre mph 1.
 
@@ -875,7 +875,7 @@ Variable gT : finGroupType.
 Implicit Types A B : {set gT}.
 Implicit Type G : {group gT}.
 
-Definition idm of {set gT} := fun x : gT => x : FinGroup.sort gT.
+Definition idm & {set gT} := fun x : gT => x : FinGroup.sort gT.
 
 Lemma idm_morphM A : {in A & , {morph idm A : x y / x * y}}.
 Proof. by []. Qed.
@@ -911,7 +911,7 @@ Variables A D : {set aT}.
 Implicit Type B : {set aT}.
 Implicit Type R : {set rT}.
 
-Definition restrm of A \subset D := @id (aT -> FinGroup.sort rT).
+Definition restrm & A \subset D := @id (aT -> FinGroup.sort rT).
 
 Section Props.
 
@@ -968,7 +968,7 @@ Section TrivMorphism.
 
 Variables aT rT : finGroupType.
 
-Definition trivm of {set aT} & aT := 1 : FinGroup.sort rT.
+Definition trivm & {set aT} & aT := 1 : FinGroup.sort rT.
 
 Lemma trivm_morphM (A : {set aT}) : {in A &, {morph trivm A : x y / x * y}}.
 Proof. by move=> x y /=; rewrite mulg1. Qed.
@@ -1034,7 +1034,7 @@ Variables G H : {group aT}.
 Variable f : {morphism G >-> rT}.
 Variable q : {morphism H >-> qT}.
 
-Definition factm of 'ker q \subset 'ker f  & G \subset H :=
+Definition factm & 'ker q \subset 'ker f  & G \subset H :=
   fun x => f (repr (q @*^-1 [set x])).
 
 Hypothesis sKqKf : 'ker q \subset 'ker f.
@@ -1216,7 +1216,7 @@ apply: (iffP forallP) => [fM x y Ax Ay | fM [x y] /=].
 by apply/implyP=> /andP[Ax Ay]; rewrite fM.
 Qed.
 
-Definition morphm of morphic f := f : aT -> FinGroup.sort rT.
+Definition morphm & morphic f := f : aT -> FinGroup.sort rT.
 
 Lemma morphmE fM : morphm fM = f. Proof. by []. Qed.
 

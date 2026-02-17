@@ -198,7 +198,7 @@ HB.factory Record bilinear_isBilinear (R : nzRingType) (U U' : lmodType R)
   bilinear_subproof : bilinear_for s s' f
 }.
 
-HB.builders Context R U U' V s s' f of bilinear_isBilinear R U U' V s s' f.
+HB.builders Context R U U' V s s' f & bilinear_isBilinear R U U' V s s' f.
 HB.instance Definition _ := isBilinear.Build R U U' V s s' f
     (fun u' => zmod_morphism_linear (bilinear_subproof.1 u'))
     (fun u => zmod_morphism_linear (bilinear_subproof.2 u))

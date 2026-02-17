@@ -62,13 +62,13 @@ Declare Scope C_expanded_scope.
 Import Order.TTheory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
-HB.factory Record isComplex L of GRing.ClosedField L  := {
+HB.factory Record isComplex L & GRing.ClosedField L  := {
   conj :  {rmorphism L -> L};
   conjK : involutive conj;
   conj_nt : ~ conj =1 id
 }.
 
-HB.builders Context L of isComplex L.
+HB.builders Context L & isComplex L.
 
 Lemma nz2: 2 != 0 :> L.
 Proof.

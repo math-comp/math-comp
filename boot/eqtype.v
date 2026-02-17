@@ -745,9 +745,9 @@ Section TransferType.
 
 Variables (T T' : Type) (f : T -> T').
 
-Definition inj_type of injective f : Type := T.
-Definition pcan_type g of pcancel f g : Type := T.
-Definition can_type g of cancel f g : Type := T.
+Definition inj_type & injective f : Type := T.
+Definition pcan_type g & pcancel f g : Type := T.
+Definition can_type g & cancel f g : Type := T.
 
 End TransferType.
 

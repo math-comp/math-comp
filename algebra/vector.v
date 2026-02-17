@@ -143,7 +143,7 @@ Definition vector_axiom_def (R : nzRingType) n (V : lmodType R) :=
 Arguments vector_axiom_def [R] n%_N V%_type.
 
 HB.mixin Record LSemiModule_hasFinDim (R : nzSemiRingType) (V : Type)
-  of GRing.LSemiModule R V :=
+  & GRing.LSemiModule R V :=
   { dim : nat;
     vector_subdef : semivector_axiom_def dim V }.
 
@@ -156,7 +156,7 @@ HB.structure Definition Vector (R : nzRingType) :=
   { V of LSemiModule_hasFinDim R V & GRing.Lmodule R V }.
 
 HB.mixin Record SemiVector_isProper (R : nzSemiRingType) (V : Type)
-  of SemiVector R V :=
+  & SemiVector R V :=
   { dim_gt0 : 0 < @dim R V }.
 
 #[short(type="nzSemiVectType")]
@@ -172,11 +172,11 @@ Notation vector_axiom := Vector.axiom.
 Arguments dim {R} s.
 
 HB.factory Record Lmodule_hasFinDim (R : nzRingType) (V : Type)
-  of GRing.Lmodule R V :=
+  & GRing.Lmodule R V :=
   { dim : nat;
     vector_subdef : vector_axiom_def dim V }.
 
-HB.builders Context R V of Lmodule_hasFinDim R V.
+HB.builders Context R V & Lmodule_hasFinDim R V.
 
 Definition v2r := sval vector_subdef.
 
@@ -834,7 +834,7 @@ Proof. by rewrite vs2mx_sum; apply: proper_mxsumP. Qed.
 Canonical nary_addv_expr := ProperSumvExpr nary_addv_subproof.
 End Nary.
 
-Definition directv_def S of phantom {vspace vT} (unwrap (addv_val S)) :=
+Definition directv_def S & phantom {vspace vT} (unwrap (addv_val S)) :=
   \dim (unwrap S) == unwrap (addv_dim S).
 
 End SumExpr.
@@ -1942,7 +1942,7 @@ Let sumv_pi_rec i :=
   else 0.
 
 Notation sumV := (\sum_(i <- r0 | P i) Vs i)%VS.
-Definition sumv_pi_for V of V = sumV := fun i => sumv_pi_rec i (filter P r0).
+Definition sumv_pi_for V & V = sumV := fun i => sumv_pi_rec i (filter P r0).
 
 Variables (V : {vspace vT}) (defV : V = sumV).
 

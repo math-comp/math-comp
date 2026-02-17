@@ -396,10 +396,10 @@ Definition num_sem (R : numDomainType) (i : interval int) (x : R) : bool :=
 
 Definition nat_sem (i : interval int) (x : nat) : bool := Posz x \in i.
 
-Definition posnum (R : numDomainType) of phant R :=
+Definition posnum (R : numDomainType) & phant R :=
   def (@num_sem R) (Real `]0, +oo[).
 
-Definition nonneg (R : numDomainType) of phant R :=
+Definition nonneg (R : numDomainType) & phant R :=
   def (@num_sem R) (Real `[0, +oo[).
 
 (* a few lifting helper functions *)

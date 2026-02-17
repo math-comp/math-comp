@@ -637,7 +637,7 @@ Definition multiplicative (R S : pzSemiRingType) (f : R -> S) : Prop :=
 HB.factory Record isMultiplicative (R S : pzSemiRingType) (f : R -> S) := {
       rmorphism_subproof : multiplicative f
 }.
-HB.builders Context R S f of isMultiplicative R S f.
+HB.builders Context R S f & isMultiplicative R S f.
 
 #[warning="-HB.no-new-instance"]
 HB.instance Definition _ := isMonoidMorphism.Build R S f

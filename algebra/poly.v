@@ -1902,7 +1902,7 @@ Qed.
 
 Definition commr_rmorph u := forall x, GRing.comm u (f x).
 
-Definition horner_morph u of commr_rmorph u := fun p => (map_poly p).[u].
+Definition horner_morph u & commr_rmorph u := fun p => (map_poly p).[u].
 
 End Definitions.
 

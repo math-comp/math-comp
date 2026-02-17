@@ -358,7 +358,7 @@ HB.factory Record isComLaw T (op : T -> T -> T) := {
   opC : commutative op;
 }.
 
-HB.builders Context T op of isComLaw T op.
+HB.builders Context T op & isComLaw T op.
 
 HB.instance Definition _ := isLaw.Build T op opA.
 HB.instance Definition _ := isCommutativeLaw.Build T op opC.
@@ -417,7 +417,7 @@ HB.factory Record isLaw T (idm : T) (op : T -> T -> T) := {
   opm1 : right_id idm op;
 }.
 
-HB.builders Context T idm op of isLaw T idm op.
+HB.builders Context T idm op & isLaw T idm op.
 
 HB.instance Definition _ := SemiGroup.isLaw.Build T op opA.
 HB.instance Definition _ := isMonoidLaw.Build T idm op op1m opm1.
@@ -435,7 +435,7 @@ HB.factory Record isComLaw T (idm : T) (op : T -> T -> T) := {
   op1m : left_id idm op;
 }.
 
-HB.builders Context T idm op of isComLaw T idm op.
+HB.builders Context T idm op & isComLaw T idm op.
 
 Lemma opm1 : right_id idm op. Proof. by move=> x; rewrite opC op1m. Qed.
 
@@ -450,7 +450,7 @@ HB.mixin Record isMulLaw T (zero : T) (mul : T -> T -> T) := {
 }.
 
 #[export]
-HB.structure Definition MulLaw T zero := {mul of isMulLaw T zero mul}.
+HB.structure Definition MulLaw T zero := {mul & isMulLaw T zero mul}.
 Notation mul_law := MulLaw.type.
 
 HB.mixin Record isAddLaw T (mul : T -> T -> T) (op : T -> T -> T) := {
@@ -855,7 +855,7 @@ Section oAC.
 
 Variables (T : Type) (op : T -> T -> T).
 
-Definition oAC of associative op & commutative op :=
+Definition oAC & associative op & commutative op :=
   fun x => oapp (fun y => Some (oapp (op^~ y) y x)) x.
 Arguments oAC : simpl never.
 

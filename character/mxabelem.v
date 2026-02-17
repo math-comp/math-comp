@@ -578,7 +578,7 @@ Section OneGroup.
 
 Variable G : {group gT}.
 Definition abelem_mx_fun (g : subg_of G) v := ErV ((rV_E v) ^ val g).
-Definition abelem_mx of G \subset 'N(E) :=
+Definition abelem_mx & G \subset 'N(E) :=
   fun x => lin1_mx (abelem_mx_fun (subg G x)).
 
 Hypothesis nEG : G \subset 'N(E).

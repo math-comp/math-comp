@@ -85,7 +85,7 @@ Bind Scope ring_scope with NumField.sort.
 End NumFieldExports.
 HB.export NumFieldExports.
 
-HB.mixin Record NumField_isImaginary R of NumField R := {
+HB.mixin Record NumField_isImaginary R & NumField R := {
   imaginary : R;
   conj_subdef : {rmorphism R -> R};
   sqrCi : imaginary ^+ 2 = - 1;
@@ -115,7 +115,7 @@ Bind Scope ring_scope with RealField.sort.
 End RealFieldExports.
 HB.export RealFieldExports.
 
-HB.mixin Record RealField_isClosed R of RealField R := {
+HB.mixin Record RealField_isClosed R & RealField R := {
   poly_ivt_subproof : real_closed_axiom R
 }.
 

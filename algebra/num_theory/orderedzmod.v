@@ -80,7 +80,7 @@ Bind Scope ring_scope with POrderZmodule.sort.
 End POrderZmoduleExports.
 HB.export POrderZmoduleExports.
 
-HB.mixin Record Add_isHomo R of POrderNmodule R := {
+HB.mixin Record Add_isHomo R & POrderNmodule R := {
   ler_wD2l : forall x : R, {homo +%R x : y z / (y <= z)%O}
 }.
 
@@ -102,14 +102,14 @@ Bind Scope ring_scope with POrderedZmodule.sort.
 End POrderedZmoduleExports.
 HB.export POrderedZmoduleExports.
 
-HB.factory Record ZmodulePositiveCone R of GRing.Zmodule R := {
+HB.factory Record ZmodulePositiveCone R & GRing.Zmodule R := {
   nonneg : {pred R};
   nonneg0 : nonneg 0;
   nonnegD : forall x y, nonneg x -> nonneg y -> nonneg (x + y);
   nonneg_definite : forall x, nonneg x -> nonneg (- x) -> x = 0;
 }.
 
-HB.builders Context R of ZmodulePositiveCone R.
+HB.builders Context R & ZmodulePositiveCone R.
 
 Definition le x y := nonneg (y - x).
 
@@ -135,7 +135,7 @@ HB.instance Definition _ := Add_isHomo.Build R ler_wD2l.
 
 HB.end.
 
-HB.mixin Record POrderedZmodule_hasTransCmp R of GRing.Nmodule R
+HB.mixin Record POrderedZmodule_hasTransCmp R & GRing.Nmodule R
     & Order.isPOrder ring_display R := {
   comparabler_trans : transitive (Order.comparable : rel R)
 }.

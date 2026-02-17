@@ -301,7 +301,7 @@ Notation PiEmbed e :=
 (* About eqQuotType *)
 (********************)
 
-HB.mixin Record isEqQuotient T (eq_quot_op : rel T) (Q : Type) of
+HB.mixin Record isEqQuotient T (eq_quot_op : rel T) (Q : Type) &
   isQuotient T Q & hasDecEq Q := {
   pi_eq_quot : {mono \pi_Q : x y / eq_quot_op x y >-> x == y}
 }.
@@ -412,7 +412,7 @@ Variable e : equiv_rel.
 Definition equiv_class :=
   let: EquivRelPack _ ce as e' := e return equiv_class_of e' in ce.
 
-Definition equiv_pack (r : rel T) ce of phant_id ce equiv_class :=
+Definition equiv_pack (r : rel T) ce & phant_id ce equiv_class :=
   @EquivRelPack r ce.
 
 Lemma equiv_refl x : e x x. Proof. by case: e => [] ? []. Qed.
@@ -523,7 +523,7 @@ Record equivQuotient := EquivQuotient {
   _ : (frel canon) erepr erepr
 }.
 
-Definition type_of of (phantom (rel _) encD) := equivQuotient.
+Definition type_of & (phantom (rel _) encD) := equivQuotient.
 
 Lemma canon_id : forall x, (invariant canon canon) x.
 Proof.

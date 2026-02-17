@@ -64,7 +64,7 @@ HB.instance Definition _ := [isSub for tval].
 
 Implicit Type t : tuple_of.
 
-Definition tsize of tuple_of := n.
+Definition tsize & tuple_of := n.
 
 Lemma size_tuple t : size t = n.
 Proof. exact: (eqP (valP t)). Qed.

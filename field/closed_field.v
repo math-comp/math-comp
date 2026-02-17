@@ -651,11 +651,11 @@ Proof. by move=> i bc /= rbc; apply: ex_elim_qf. Qed.
 End ClosedFieldQE.
 End ClosedFieldQE.
 
-HB.factory Record Field_isAlgClosed F of GRing.Field F := {
+HB.factory Record Field_isAlgClosed F & GRing.Field F := {
   solve_monicpoly : GRing.closed_field_axiom F;
 }.
 
-HB.builders Context F of Field_isAlgClosed F.
+HB.builders Context F & Field_isAlgClosed F.
   HB.instance Definition _ := GRing.Field_QE_isDecField.Build F
     (@ClosedFieldQE.wf_ex_elim F)
     (ClosedFieldQE.holds_ex_elim solve_monicpoly).
