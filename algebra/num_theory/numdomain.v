@@ -51,7 +51,7 @@ Import orderedzmod.Num.
 Module Num.
 
 HB.mixin Record Zmodule_isSemiNormed (R : POrderZmodule.type) M
-         of GRing.Zmodule M := {
+         & GRing.Zmodule M := {
   norm : M -> R;
   ler_normD : forall x y, norm (x + y) <= norm x + norm y;
   normrMn : forall x n, norm (x *+ n) = norm x *+ n;
@@ -63,7 +63,7 @@ HB.structure Definition SemiNormedZmodule (R : porderZmodType) :=
   { M of Zmodule_isSemiNormed R M & GRing.Zmodule M }.
 
 HB.mixin Record SemiNormedZmodule_isPositiveDefinite
-    (R : POrderZmodule.type) M of @SemiNormedZmodule R M := {
+    (R : POrderZmodule.type) M & @SemiNormedZmodule R M := {
   normr0_eq0 : forall x : M, norm x = 0 -> x = 0;
 }.
 
@@ -73,14 +73,14 @@ HB.structure Definition NormedZmodule (R : porderZmodType) :=
 Arguments norm {R M} x : rename.
 
 HB.factory Record Zmodule_isNormed (R : porderZmodType) M
-         of GRing.Zmodule M := {
+         & GRing.Zmodule M := {
   norm : M -> R;
   ler_normD : forall x y, norm (x + y) <= norm x + norm y;
   normr0_eq0 : forall x, norm x = 0 -> x = 0;
   normrMn : forall x n, norm (x *+ n) = norm x *+ n;
   normrN : forall x, norm (- x) = norm x;
 }.
-HB.builders Context (R : POrderZmodule.type) M of Zmodule_isNormed R M.
+HB.builders Context (R : POrderZmodule.type) M & Zmodule_isNormed R M.
   HB.instance Definition _ :=
     Zmodule_isSemiNormed.Build R M ler_normD normrMn normrN.
   HB.instance Definition _ :=
@@ -110,7 +110,7 @@ HB.structure Definition POrderedSemiNormedZmodule (R : porderZmodType) :=
 HB.structure Definition POrderedNormedZmodule (R : porderZmodType) :=
   { M of POrderedZmodule M & Zmodule_isNormed R M}.
 
-HB.mixin Record NumZmod_isNumRing R of GRing.NzRing R & POrderZmodule R
+HB.mixin Record NumZmod_isNumRing R & GRing.NzRing R & POrderZmodule R
   & NormedZmodule (POrderZmodule.clone R _) R := {
  addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
  ger_leVge : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
@@ -128,7 +128,7 @@ HB.structure Definition NumDomain := { R of
 Arguments addr_gt0 {_} [x y] : rename.
 Arguments ger_leVge {_} [x y] : rename.
 
-HB.factory Record isNumRing R of GRing.NzRing R & POrderZmodule R
+HB.factory Record isNumRing R & GRing.NzRing R & POrderZmodule R
   & GRing.IntegralDomain R
   & NormedZmodule (POrderZmodule.clone R _) R := {
  addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
@@ -136,7 +136,7 @@ HB.factory Record isNumRing R of GRing.NzRing R & POrderZmodule R
  normrM : {morph (norm : R -> R) : x y / x * y};
  ler_def : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
 }.
-HB.builders Context R of isNumRing R.
+HB.builders Context R & isNumRing R.
 
 Fact ler_wD2l (x : R) : {homo +%R x : y z / y <= z}.
 Proof. by move=> y z; rewrite !ler_def ![_ + z]addrC addrKA. Qed.
@@ -2410,7 +2410,7 @@ End PolyBounds.
 End RealDomainOperations.
 End Theory.
 
-HB.factory Record IntegralDomain_isNumRing R of GRing.IntegralDomain R := {
+HB.factory Record IntegralDomain_isNumRing R & GRing.IntegralDomain R := {
   Rle : rel R;
   Rlt : rel R;
   norm : R -> R;
@@ -2423,7 +2423,7 @@ HB.factory Record IntegralDomain_isNumRing R of GRing.IntegralDomain R := {
   lt_def    : forall x y, (Rlt x y) = (y != x) && (Rle x y)
 }.
 
-HB.builders Context R of IntegralDomain_isNumRing R.
+HB.builders Context R & IntegralDomain_isNumRing R.
   Local Notation "x <= y" := (Rle x y) : ring_scope.
   Local Notation "x < y" := (Rlt x y) : ring_scope.
   Local Notation "`| x |" := (norm x) : ring_scope.
@@ -2502,11 +2502,11 @@ HB.builders Context R of IntegralDomain_isNumRing R.
     isNumRing.Build R addr_gt0 ger_total normM le_def.
 HB.end.
 
-HB.factory Record NumDomain_isReal R of NumDomain R := {
+HB.factory Record NumDomain_isReal R & NumDomain R := {
   real : real_axiom R
 }.
 
-HB.builders Context R of NumDomain_isReal R.
+HB.builders Context R & NumDomain_isReal R.
   Lemma le_total : Order.POrder_isTotal ring_display R.
   Proof.
   constructor=> x y; move: (real (x - y)).
@@ -2516,7 +2516,7 @@ HB.builders Context R of NumDomain_isReal R.
   HB.instance Definition _ := le_total.
 HB.end.
 
-HB.factory Record IntegralDomain_isLeReal R of GRing.IntegralDomain R := {
+HB.factory Record IntegralDomain_isLeReal R & GRing.IntegralDomain R := {
   Rle : rel R;
   Rlt : rel R;
   norm : R -> R;
@@ -2530,7 +2530,7 @@ HB.factory Record IntegralDomain_isLeReal R of GRing.IntegralDomain R := {
   lt_def    : forall x y, Rlt x y = (y != x) && Rle x y;
 }.
 
-HB.builders Context R of IntegralDomain_isLeReal R.
+HB.builders Context R & IntegralDomain_isLeReal R.
   Local Notation le := Rle.
   Local Notation lt := Rlt.
 
@@ -2593,7 +2593,7 @@ HB.builders Context R of IntegralDomain_isLeReal R.
     le_total.
 HB.end.
 
-HB.factory Record IntegralDomain_isLtReal R of GRing.IntegralDomain R := {
+HB.factory Record IntegralDomain_isLtReal R & GRing.IntegralDomain R := {
   Rlt : rel R;
   Rle : rel R;
   norm : R -> R;
@@ -2607,7 +2607,7 @@ HB.factory Record IntegralDomain_isLtReal R of GRing.IntegralDomain R := {
   le_def    : forall x y, Rle x y = (x == y) || Rlt x y;
 }.
 
-HB.builders Context R of IntegralDomain_isLtReal R.
+HB.builders Context R & IntegralDomain_isLtReal R.
   Local Notation le := Rle.
   Local Notation lt := Rlt.
 

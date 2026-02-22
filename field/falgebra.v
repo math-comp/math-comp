@@ -97,9 +97,9 @@ HB.structure Definition Falgebra (R : nzRingType) :=
 Notation FalgType := falgType.
 
 HB.factory Record UnitAlgebra_isFalgebra (R : nzRingType) A
-           of Vector R A & GRing.UnitAlgebra R A := {}.
+           & Vector R A & GRing.UnitAlgebra R A := {}.
 
-HB.builders Context R A of UnitAlgebra_isFalgebra R A.
+HB.builders Context R A & UnitAlgebra_isFalgebra R A.
 
   Import VectorInternalTheory.
 
@@ -115,9 +115,9 @@ HB.end.
 
 (* Supply a default unitRing mixin for the default unitAlgType base type. *)
 HB.factory Record Algebra_isFalgebra (K : fieldType) A
-           of Vector K A & GRing.NzAlgebra K A := {}.
+           & Vector K A & GRing.NzAlgebra K A := {}.
 
-HB.builders Context K A of Algebra_isFalgebra K A.
+HB.builders Context K A & Algebra_isFalgebra K A.
   Let vA : Vector.type K := A.
   Let am u := linfun (u \o* idfun : vA -> vA).
   Let uam := [pred u | lker (am u) == 0%VS].

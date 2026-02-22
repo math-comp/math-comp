@@ -95,7 +95,7 @@ Variable eqT : rel T.
 Variables (zeroT : T) (oppT : T -> T) (addT : T -> T -> T). *)
 
 HB.mixin Record isZmodQuotient T eqT (zeroT : T) (oppT : T -> T) (addT : T -> T -> T)
-(Q : Type) of GRing.Zmodule Q & EqQuotient T eqT Q := {
+(Q : Type) & GRing.Zmodule Q & EqQuotient T eqT Q := {
   pi_zeror : \pi_Q zeroT = 0;
   pi_oppr : {morph \pi_Q : x / oppT x >-> - x};
   pi_addr : {morph \pi_Q : x y / addT x y >-> x + y}
@@ -140,7 +140,7 @@ Variables (oneT : T) (mulT : T -> T -> T).
  *)
 HB.mixin Record isNzRingQuotient T eqT zeroT oppT
 addT (oneT : T) (mulT : T -> T -> T) (Q : Type)
-  of ZmodQuotient T eqT zeroT oppT addT Q & GRing.NzRing Q:=
+  & ZmodQuotient T eqT zeroT oppT addT Q & GRing.NzRing Q:=
   {
     pi_oner : \pi_Q oneT = 1;
     pi_mulr : {morph \pi_Q : x y / mulT x y >-> x * y}
@@ -194,7 +194,7 @@ HB.instance Definition _ := GRing.isMonoidMorphism.Build R Q \pi_Q
 End PiRMorphism.
 
 HB.mixin Record isUnitRingQuotient T eqT zeroT oppT addT oneT mulT (unitT : pred T) (invT : T -> T)
-  (Q : Type) of NzRingQuotient T eqT zeroT oppT addT oneT mulT Q & GRing.UnitRing Q :=
+  (Q : Type) & NzRingQuotient T eqT zeroT oppT addT oneT mulT Q & GRing.UnitRing Q :=
   {
     pi_unitr : {mono \pi_Q : x / unitT x >-> x \in GRing.unit};
     pi_invr : {morph \pi_Q : x / invT x >-> x^-1}
@@ -255,7 +255,7 @@ HB.factory Record isIdealr (R : nzRingType) (S : R -> bool) := {
   idealr_closed_subproof : idealr_closed S
 }.
 
-HB.builders Context R S of isIdealr R S.
+HB.builders Context R S & isIdealr R S.
 HB.instance Definition _ := GRing.isZmodClosed.Build R S
   (idealr_closedB idealr_closed_subproof).
 HB.instance Definition _ := isProperIdeal.Build R S

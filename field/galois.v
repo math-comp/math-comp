@@ -372,7 +372,7 @@ Arguments kHom_monoid_morphism {F L f}.
 Definition splitting_field_axiom (F : fieldType) (L : fieldExtType F) :=
   exists2 p : {poly L}, p \is a polyOver 1%VS & splittingFieldFor 1 p {:L}.
 
-HB.mixin Record FieldExt_isSplittingField (F : fieldType) L of FieldExt F L := {
+HB.mixin Record FieldExt_isSplittingField (F : fieldType) L & FieldExt F L := {
   splittingFieldP_subproof : splitting_field_axiom L
 }.
 
@@ -412,12 +412,12 @@ by rewrite mem_filter /= ltn_ord mem_index_enum.
 Qed.
 
 HB.factory Record FieldExt_isNormalSplittingField
-    (F : fieldType) L of FieldExt F L := {
+    (F : fieldType) L & FieldExt F L := {
   normal_field_splitting_axiom : forall (K : {subfield L}) x,
     exists r, minPoly K x == \prod_(y <- r) ('X - y%:P)
 }.
 
-HB.builders Context F L of FieldExt_isNormalSplittingField F L.
+HB.builders Context F L & FieldExt_isNormalSplittingField F L.
 HB.instance Definition _ := FieldExt_isSplittingField.Build F L
   (normal_field_splitting normal_field_splitting_axiom).
 HB.end.

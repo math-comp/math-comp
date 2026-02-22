@@ -203,7 +203,7 @@ Definition addr_closed := {in S &, forall u v, u + v \in S}.
 End ClosedPredicates.
 End BaseAddMagmaTheory.
 
-HB.mixin Record BaseAddMagma_isAddMagma V of BaseAddMagma V := {
+HB.mixin Record BaseAddMagma_isAddMagma V & BaseAddMagma V := {
   addrC : commutative (@add V)
 }.
 
@@ -211,12 +211,12 @@ HB.mixin Record BaseAddMagma_isAddMagma V of BaseAddMagma V := {
 HB.structure Definition AddMagma :=
   {V of BaseAddMagma_isAddMagma V & ChoiceBaseAddMagma V}.
 
-HB.factory Record isAddMagma V of Choice V := {
+HB.factory Record isAddMagma V & Choice V := {
   add : V -> V -> V;
   addrC : commutative add
 }.
 
-HB.builders Context V of isAddMagma V.
+HB.builders Context V & isAddMagma V.
 HB.instance Definition _ := hasAdd.Build V add.
 HB.instance Definition _ := BaseAddMagma_isAddMagma.Build V addrC.
 HB.end.
@@ -234,7 +234,7 @@ Proof. exact/addrC. Qed.
 
 End AddMagmaTheory.
 
-HB.mixin Record AddMagma_isAddSemigroup V of AddMagma V := {
+HB.mixin Record AddMagma_isAddSemigroup V & AddMagma V := {
   addrA : associative (@add V)
 }.
 
@@ -242,13 +242,13 @@ HB.mixin Record AddMagma_isAddSemigroup V of AddMagma V := {
 HB.structure Definition AddSemigroup :=
   {V of AddMagma_isAddSemigroup V & AddMagma V}.
 
-HB.factory Record isAddSemigroup V of Choice V := {
+HB.factory Record isAddSemigroup V & Choice V := {
   add : V -> V -> V;
   addrC : commutative add;
   addrA : associative add
 }.
 
-HB.builders Context V of isAddSemigroup V.
+HB.builders Context V & isAddSemigroup V.
 HB.instance Definition _ := isAddMagma.Build V addrC.
 HB.instance Definition _ := AddMagma_isAddSemigroup.Build V addrA.
 HB.end.
@@ -332,18 +332,18 @@ End ClosedPredicates.
 
 End BaseAddUMagmaTheory.
 
-HB.mixin Record BaseAddUMagma_isAddUMagma V of BaseAddUMagma V := {
+HB.mixin Record BaseAddUMagma_isAddUMagma V & BaseAddUMagma V := {
   add0r : left_id zero (@add V)
 }.
 
-HB.factory Record isAddUMagma V of Choice V := {
+HB.factory Record isAddUMagma V & Choice V := {
   add : V -> V -> V;
   zero : V;
   addrC : commutative add;
   add0r : left_id zero add
 }.
 
-HB.builders Context V of isAddUMagma V.
+HB.builders Context V & isAddUMagma V.
 HB.instance Definition _ := isAddMagma.Build V addrC.
 HB.instance Definition _ := hasZero.Build V zero.
 #[warning="-HB.no-new-instance"]
@@ -365,7 +365,7 @@ Local Notation "\sum_ ( i 'in' A ) F" := (\big[+%R/0]_(i in A) F).
 HB.instance Definition _ (V : addUMagmaType) :=
   Magma_isUMagma.Build (to_multiplicative V) add0r (@addr0 V).
 
-HB.factory Record isNmodule V of Choice V := {
+HB.factory Record isNmodule V & Choice V := {
   zero : V;
   add : V -> V -> V;
   addrA : associative add;
@@ -373,7 +373,7 @@ HB.factory Record isNmodule V of Choice V := {
   add0r : left_id zero add
 }.
 
-HB.builders Context V of isNmodule V.
+HB.builders Context V & isNmodule V.
 HB.instance Definition _ := isAddUMagma.Build V addrC add0r.
 HB.instance Definition _ := AddMagma_isAddSemigroup.Build V addrA.
 HB.end.
@@ -479,7 +479,7 @@ Definition subr_closed := {in S &, forall u v, u - v \in S}.
 
 End ClosedPredicates.
 
-HB.mixin Record BaseZmoduleNmodule_isZmodule V of BaseZmodule V := {
+HB.mixin Record BaseZmoduleNmodule_isZmodule V & BaseZmodule V := {
   addNr : left_inverse zero opp (@add V)
 }.
 
@@ -487,17 +487,17 @@ HB.mixin Record BaseZmoduleNmodule_isZmodule V of BaseZmodule V := {
 HB.structure Definition Zmodule :=
   {V of BaseZmoduleNmodule_isZmodule V & BaseZmodule V & Nmodule V}.
 
-HB.factory Record Nmodule_isZmodule V of Nmodule V := {
+HB.factory Record Nmodule_isZmodule V & Nmodule V := {
   opp : V -> V;
   addNr : left_inverse zero opp add
 }.
 
-HB.builders Context V of Nmodule_isZmodule V.
+HB.builders Context V & Nmodule_isZmodule V.
 HB.instance Definition _ := hasOpp.Build V opp.
 HB.instance Definition _ := BaseZmoduleNmodule_isZmodule.Build V addNr.
 HB.end.
 
-HB.factory Record isZmodule V of Choice V := {
+HB.factory Record isZmodule V & Choice V := {
   zero : V;
   opp : V -> V;
   add : V -> V -> V;
@@ -507,7 +507,7 @@ HB.factory Record isZmodule V of Choice V := {
   addNr : left_inverse zero opp add
 }.
 
-HB.builders Context V of isZmodule V.
+HB.builders Context V & isZmodule V.
 
 HB.instance Definition _ := isNmodule.Build V addrA addrC add0r.
 HB.instance Definition _ := Nmodule_isZmodule.Build V addNr.
@@ -695,7 +695,7 @@ Module isAdditive.
 Notation Build U V apply := (isZmodMorphism.Build U V apply) (only parsing).
 End isAdditive.
 
-HB.builders Context U V apply of isZmodMorphism U V apply.
+HB.builders Context U V apply & isZmodMorphism U V apply.
 Local Lemma raddf0 : apply 0 = 0.
 Proof. by rewrite -[0]subr0 zmod_morphism_subproof subrr. Qed.
 
@@ -745,7 +745,7 @@ Definition add_fun (f g : U -> V) x := f x + g x.
 End LiftedAddMagma.
 Section LiftedNmod.
 Variables (U : Type) (V : baseAddUMagmaType).
-Definition null_fun of U : V := 0.
+Definition null_fun & U : V := 0.
 End LiftedNmod.
 Section LiftedZmod.
 Variables (U : Type) (V : baseZmodType).
@@ -898,7 +898,7 @@ HB.factory Record isZmodClosed (V : zmodType) (S : V -> bool) := {
   zmod_closed_subproof : zmod_closed S
 }.
 
-HB.builders Context V S of isZmodClosed V S.
+HB.builders Context V S & isZmodClosed V S.
 HB.instance Definition _ := isOppClosed.Build V S
   (zmod_closedN zmod_closed_subproof).
 HB.instance Definition _ := isAddClosed.Build V S
@@ -995,7 +995,7 @@ End Zmod.
 End ZmodPred. 
 
 HB.mixin Record isSubBaseAddUMagma (V : baseAddUMagmaType) (S : pred V) U
-    of SubType V S U & BaseAddUMagma U := {
+    & SubType V S U & BaseAddUMagma U := {
   valD0_subproof : nmod_morphism (val : U -> V)
 }.
 
@@ -1021,11 +1021,11 @@ Lemma val0 : val 0 = 0. Proof. exact: raddf0. Qed.
 End subBaseAddUMagma.
 
 HB.factory Record SubChoice_isSubAddUMagma (V : addUMagmaType) S U
-    of SubChoice V S U := {
+    & SubChoice V S U := {
   addumagma_closed_subproof : addumagma_closed S
 }.
 
-HB.builders Context V S U of SubChoice_isSubAddUMagma V S U.
+HB.builders Context V S U & SubChoice_isSubAddUMagma V S U.
 
 HB.instance Definition _ := isAddClosed.Build V S addumagma_closed_subproof.
 
@@ -1049,11 +1049,11 @@ HB.instance Definition _ := isSubBaseAddUMagma.Build V S U valD0.
 HB.end.
 
 HB.factory Record SubChoice_isSubNmodule (V : nmodType) S U
-    of SubChoice V S U := {
+    & SubChoice V S U := {
   nmod_closed_subproof : nmod_closed S
 }.
 
-HB.builders Context V S U of SubChoice_isSubNmodule V S U.
+HB.builders Context V S U & SubChoice_isSubNmodule V S U.
 
 HB.instance Definition _ :=
   SubChoice_isSubAddUMagma.Build V S U nmod_closed_subproof.
@@ -1077,11 +1077,11 @@ Lemma valN : {morph val : x / - x}. Proof. exact: raddfN. Qed.
 End zmod_morphism.
 
 HB.factory Record isSubZmodule (V : zmodType) S U
-    of SubChoice V S U & Zmodule U := {
+    & SubChoice V S U & Zmodule U := {
   valB_subproof : zmod_morphism (val : U -> V)
 }.
 
-HB.builders Context V S U of isSubZmodule V S U.
+HB.builders Context V S U & isSubZmodule V S U.
 
 Fact valD0 : nmod_morphism (val : U -> V).
 Proof.
@@ -1096,11 +1096,11 @@ HB.instance Definition _ := isSubBaseAddUMagma.Build V S U valD0.
 HB.end.
 
 HB.factory Record SubNmodule_isSubZmodule (V : zmodType) S U
-    of SubNmodule V S U := {
+    & SubNmodule V S U := {
   oppr_closed_subproof : oppr_closed S
 }.
 
-HB.builders Context V S U of SubNmodule_isSubZmodule V S U.
+HB.builders Context V S U & SubNmodule_isSubZmodule V S U.
 
 HB.instance Definition _ := isOppClosed.Build V S oppr_closed_subproof.
 
@@ -1117,11 +1117,11 @@ HB.instance Definition _ := Nmodule_isZmodule.Build U addNr.
 HB.end.
 
 HB.factory Record SubChoice_isSubZmodule (V : zmodType) S U
-    of SubChoice V S U := {
+    & SubChoice V S U := {
   zmod_closed_subproof : zmod_closed S
 }.
 
-HB.builders Context V S U of SubChoice_isSubZmodule V S U.
+HB.builders Context V S U & SubChoice_isSubZmodule V S U.
 
 HB.instance Definition _ := isZmodClosed.Build V S zmod_closed_subproof.
 HB.instance Definition _ :=

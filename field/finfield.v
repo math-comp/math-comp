@@ -223,7 +223,7 @@ Section PrimeCharRing.
 
 Variable R0 : nzRingType.
 
-Definition pPrimeCharType of p \in [pchar R0] : predArgType := R0.
+Definition pPrimeCharType & p \in [pchar R0] : predArgType := R0.
 
 Hypothesis pcharRp : p \in [pchar R0].
 Local Notation R := (pPrimeCharType pcharRp).

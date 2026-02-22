@@ -51,7 +51,7 @@ Import Order.TTheory GRing.Theory Num.Theory.
 Module Num.
 Import Num.Def.
 
-HB.mixin Record NumDomain_hasFloorCeilTruncn R of Num.NumDomain R := {
+HB.mixin Record NumDomain_hasFloorCeilTruncn R & Num.NumDomain R := {
   floor : R -> int;
   ceil  : R -> int;
   truncn : R -> nat;
@@ -914,7 +914,7 @@ End Theory.
 
 (* Factories *)
 
-HB.factory Record NumDomain_hasTruncn R of Num.NumDomain R := {
+HB.factory Record NumDomain_hasTruncn R & Num.NumDomain R := {
   truncn : R -> nat;
   nat_num : pred R;
   int_num : pred R;
@@ -932,7 +932,7 @@ Module NumDomain_isArchimedean.
 Notation Build T U := (NumDomain_hasTruncn.Build T U) (only parsing).
 End NumDomain_isArchimedean.
 
-HB.builders Context R of NumDomain_hasTruncn R.
+HB.builders Context R & NumDomain_hasTruncn R.
 
 Fact truncn_itv x : 0 <= x -> (truncn x)%:R <= x < (truncn x).+1%:R.
 Proof. by move=> x_ge0; move: (truncn_subproof x); rewrite x_ge0. Qed.
@@ -996,11 +996,11 @@ HB.instance Definition _ :=
 
 HB.end.
 
-HB.factory Record NumDomain_bounded_isArchimedean R of Num.NumDomain R := {
+HB.factory Record NumDomain_bounded_isArchimedean R & Num.NumDomain R := {
   archi_bound_subproof : Num.archimedean_axiom R
 }.
 
-HB.builders Context R of NumDomain_bounded_isArchimedean R.
+HB.builders Context R & NumDomain_bounded_isArchimedean R.
 
 Implicit Type x : R.
 

@@ -670,7 +670,7 @@ Module Order.
 #[projections(primitive)] Record disp_t := Disp {d1 : unit; d2 : unit}.
 
 #[key="T", primitive]
-HB.mixin Record isDuallyPreorder (d : disp_t) T of Equality T := {
+HB.mixin Record isDuallyPreorder (d : disp_t) T & Equality T := {
   le       : rel T;
   lt       : rel T;
   lt_def   : forall x y, lt x y = (le x y) && ~~ (le y x);
@@ -686,13 +686,13 @@ HB.structure Definition Preorder (d : disp_t) :=
   { T of Choice T & isDuallyPreorder d T }.
 
 #[key="T", primitive]
-HB.mixin Record hasBottom d T of Preorder d T := {
+HB.mixin Record hasBottom d T & Preorder d T := {
   bottom : T;
   le0x : forall x, le bottom x;
 }.
 
 #[key="T", primitive]
-HB.mixin Record hasTop d T of Preorder d T := {
+HB.mixin Record hasTop d T & Preorder d T := {
   top : T;
   lex1 : forall x, le x top;
 }.
@@ -1821,7 +1821,7 @@ End TPreorderTheory.
 
 (* preorder *)
 
-HB.factory Record isPreorder (d : disp_t) T of Equality T := {
+HB.factory Record isPreorder (d : disp_t) T & Equality T := {
   le       : rel T;
   lt       : rel T;
   lt_def   : forall x y, lt x y = (le x y) && ~~ (le y x);
@@ -1829,7 +1829,7 @@ HB.factory Record isPreorder (d : disp_t) T of Equality T := {
   le_trans : transitive    le;
 }.
 
-HB.builders Context (d : disp_t) T of isPreorder d T.
+HB.builders Context (d : disp_t) T & isPreorder d T.
 (* TODO: print nice error message when keyed type is not provided *)
 
 Let ge_trans : transitive (fun x y => le y x).
@@ -1840,13 +1840,13 @@ HB.instance Definition _ := @isDuallyPreorder.Build d T
   le _ lt_def (fun x y => lt_def y x) le_refl le_refl le_trans ge_trans.
 HB.end.
 
-HB.factory Record Le_isPreorder (d : disp_t) T of Equality T := {
+HB.factory Record Le_isPreorder (d : disp_t) T & Equality T := {
   le       : rel T;
   le_refl  : reflexive     le;
   le_trans : transitive    le;
 }.
 
-HB.builders Context (d : disp_t) T of Le_isPreorder d T.
+HB.builders Context (d : disp_t) T & Le_isPreorder d T.
 (* TODO: print nice error message when keyed type is not provided *)
 
 #[warning="-HB.no-new-instance"]
@@ -1854,14 +1854,14 @@ HB.instance Definition _ := @isPreorder.Build d T
   le _ (fun _ _ => erefl) le_refl le_trans.
 HB.end.
 
-HB.factory Record LtLe_isPreorder (d : disp_t) T of Equality T := {
+HB.factory Record LtLe_isPreorder (d : disp_t) T & Equality T := {
   le : rel T;
   lt : rel T;
   le_def   : forall x y, le x y = (x == y) || lt x y;
   lt_irr   : irreflexive lt;
   lt_trans : transitive lt;
 }.
-HB.builders Context (d : disp_t) T of LtLe_isPreorder d T.
+HB.builders Context (d : disp_t) T & LtLe_isPreorder d T.
 
 Let le_refl : reflexive le. Proof. by move=> x; rewrite le_def eqxx. Qed.
 
@@ -1884,13 +1884,13 @@ HB.instance Definition _ := @isPreorder.Build d T
 
 HB.end.
 
-HB.factory Record Lt_isPreorder (d : disp_t) T of Equality T := {
+HB.factory Record Lt_isPreorder (d : disp_t) T & Equality T := {
   lt       : rel T;
   lt_irr   : irreflexive lt;
   lt_trans : transitive  lt;
 }.
 
-HB.builders Context (d : disp_t) (T : Type) of Lt_isPreorder d T.
+HB.builders Context (d : disp_t) (T : Type) & Lt_isPreorder d T.
 #[warning="-HB.no-new-instance"]
 HB.instance Definition _ := @LtLe_isPreorder.Build d T
   _ lt (fun _ _ => erefl) lt_irr lt_trans.
@@ -1986,7 +1986,7 @@ End OrderMorphismTheory.
 End OrderMorphismTheory.
 
 HB.mixin Record isSubPreorder d (T : preorderType d) (S : pred T) d' U
-    of SubType T S U & Preorder d' U := {
+    & SubType T S U & Preorder d' U := {
   le_val : {mono (val : U -> T) : x y / x <= y};
 }.
 
@@ -2015,9 +2015,9 @@ Arguments lt_wval {d T S d' U} x y.
 End SubPreorderTheory.
 
 HB.factory Record SubChoice_isSubPreorder d (T : preorderType d) S (d' : disp_t) U
-    of SubChoice T S U := {}.
+    & SubChoice T S U := {}.
 
-HB.builders Context d T S d' U of SubChoice_isSubPreorder d T S d' U.
+HB.builders Context d T S d' U & SubChoice_isSubPreorder d T S d' U.
 HB.instance Definition _ : isPreorder d' U :=
   @PreCancelPartial.PrePcan d' U d T val.
 Fact valD : order_morphism (val : U -> T). Proof. by []. Qed.

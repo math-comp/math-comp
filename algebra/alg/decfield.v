@@ -705,7 +705,7 @@ Definition decidable_field_axiom (R : unitRingType)
     (s : seq R -> pred (formula R)) :=
   forall e f, reflect (holds e f) (s e f).
 
-HB.mixin Record Field_isDecField R of UnitRing R := {
+HB.mixin Record Field_isDecField R & UnitRing R := {
   sat : seq R -> pred (formula R);
   satP : decidable_field_axiom sat;
 }.
@@ -884,12 +884,12 @@ Qed.
 
 End QE_Mixin.
 
-HB.factory Record Field_QE_isDecField F of Field F := {
+HB.factory Record Field_QE_isDecField F & Field F := {
   proj : nat -> seq (term F) * seq (term F) -> formula F;
   wf_proj : wf_QE_proj proj;
   ok_proj : valid_QE_proj proj;
 }.
-HB.builders Context F of Field_QE_isDecField F.
+HB.builders Context F & Field_QE_isDecField F.
 
 HB.instance Definition qe_is_def_field : Field_isDecField F :=
   Field_isDecField.Build F (proj_satP wf_proj ok_proj).
@@ -900,7 +900,7 @@ Definition closed_field_axiom (R : pzRingType) :=
   forall n (P : nat -> R), n > 0 ->
    exists x : R, x ^+ n = \sum_(i < n) P i * (x ^+ i).
 
-HB.mixin Record DecField_isAlgClosed F of DecidableField F := {
+HB.mixin Record DecField_isAlgClosed F & DecidableField F := {
   solve_monicpoly : closed_field_axiom F;
 }.
 

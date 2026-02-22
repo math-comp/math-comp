@@ -280,7 +280,7 @@ Section CprodBy.
 Variables gTH gTK : finGroupType.
 Variables (H : {group gTH}) (K : {group gTK}) (gz : {morphism 'Z(H) >-> gTK}).
 
-Definition ker_cprod_by of isom 'Z(H) 'Z(K) gz :=
+Definition ker_cprod_by & isom 'Z(H) 'Z(K) gz :=
   [set xy | let: (x, y) := xy in (x \in 'Z(H)) && (y == (gz x)^-1)].
 
 Hypothesis isoZ : isom 'Z(H) 'Z(K) gz.

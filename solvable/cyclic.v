@@ -321,7 +321,7 @@ Section Eltm.
 
 Variables (aT rT : finGroupType) (x : aT) (y : rT).
 
-Definition eltm of #[y] %| #[x] := fun x_i => y ^+ invm (injm_Zpm x) x_i.
+Definition eltm & #[y] %| #[x] := fun x_i => y ^+ invm (injm_Zpm x) x_i.
 
 Hypothesis dvd_y_x : #[y] %| #[x].
 
@@ -584,7 +584,7 @@ Section CycleMorphism.
 
 Variable n : nat.
 
-Definition cyclem of gT := fun x : gT => x ^+ n.
+Definition cyclem & gT := fun x : gT => x ^+ n.
 
 Lemma cyclemM : {in <[a]> & , {morph cyclem a : x y / x * y}}.
 Proof.

@@ -570,7 +570,7 @@ Section Morphim.
 Variables (aT rT : finGroupType) (G D : {group aT}) (f : {morphism D >-> rT}).
 Variables (n : nat) (rGf : mx_representation (f @* G) n).
 
-Definition morphim_mx of G \subset D := fun x => rGf (f x).
+Definition morphim_mx & G \subset D := fun x => rGf (f x).
 
 Hypothesis sGD : G \subset D.
 
@@ -602,7 +602,7 @@ Section Conjugate.
 Variables (gT : finGroupType) (G : {group gT}) (n : nat).
 Variables (rG : mx_representation G n) (B : 'M[R]_n).
 
-Definition rconj_mx of B \in unitmx := fun x => B *m rG x *m invmx B.
+Definition rconj_mx & B \in unitmx := fun x => B *m rG x *m invmx B.
 
 Hypothesis uB : B \in unitmx.
 
@@ -649,7 +649,7 @@ Section Quotient.
 Variables (gT : finGroupType) (G : {group gT}) (n : nat).
 Variable rG : mx_representation G n.
 
-Definition quo_mx (H : {set gT}) of H \subset rker rG & G \subset 'N(H) :=
+Definition quo_mx (H : {set gT}) & H \subset rker rG & G \subset 'N(H) :=
   fun Hx : coset_of H => rG (repr Hx).
 
 Section SubQuotient.
@@ -1184,10 +1184,10 @@ apply: cap_eqmx => //; apply/eqmxP/rV_eqP => u.
 by rewrite (sameP sub_kermxP eqP) -in_factmodE in_factmod_eq0.
 Qed.
 
-Definition submod_mx of mxmodule U :=
+Definition submod_mx & mxmodule U :=
   fun x => in_submod (val_submod 1%:M *m rG x).
 
-Definition factmod_mx of mxmodule U :=
+Definition factmod_mx & mxmodule U :=
   fun x => in_factmod (val_factmod 1%:M *m rG x).
 
 Hypothesis Umod : mxmodule U.

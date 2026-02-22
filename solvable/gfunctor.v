@@ -492,7 +492,7 @@ Canonical bgFunc_id := [igFun by idGfun_closed & idGfun_cont].
 Canonical gFunc_id := [gFun by idGfun_cont].
 Canonical mgFunc_id := [mgFun by idGfun_monotonic].
 
-Definition trivGfun gT of {set gT} := [1 gT].
+Definition trivGfun gT & {set gT} := [1 gT].
 
 Lemma trivGfun_cont : GFunctor.pcontinuous trivGfun.
 Proof. by move=> gT rT D G f; rewrite morphim1. Qed.

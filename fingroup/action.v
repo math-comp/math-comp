@@ -160,7 +160,7 @@ Notation "{ 'action' aT &-> T }" := (action [set: aT] T)
 Notation "[ 'action' 'of' to ]" := (clone_action (@Action _ _ _ to))
   (format "[ 'action'  'of'  to ]") : form_scope.
 
-Definition act_dom aT D rT of @action aT D rT := D.
+Definition act_dom aT D rT & @action aT D rT := D.
 
 Section TotalAction.
 
@@ -1136,7 +1136,7 @@ Section Restrict.
 Variables (aT : finGroupType) (D : {set aT}) (rT : Type).
 Variables (to : action D rT) (A : {set aT}).
 
-Definition ract of A \subset D := act to.
+Definition ract & A \subset D := act to.
 
 Variable sAD : A \subset D.
 
@@ -1164,7 +1164,7 @@ Variables (aT : finGroupType) (D : {set aT}) (rT : finType).
 Definition actby_cond (A : {set aT}) R (to : action D rT) : Prop :=
   [acts A, on R | to].
 
-Definition actby A R to of actby_cond A R to :=
+Definition actby A R to & actby_cond A R to :=
   fun x a => if (x \in R) && (a \in A) then to x a else x.
 
 Variables (A : {group aT}) (R : {set rT}) (to : action D rT).
@@ -1846,7 +1846,7 @@ Implicit Type A : {set aT}.
 Implicit Type S : {set rT}.
 Implicit Type to : groupAction D R.
 
-Definition gact_range of groupAction D R := R.
+Definition gact_range & groupAction D R := R.
 
 Definition gacent to A := 'Fix_(R | to)(D :&: A).
 

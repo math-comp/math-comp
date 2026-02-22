@@ -170,7 +170,7 @@ Declare Scope fin_quant_scope.
 Definition finite_axiom (T : eqType) e :=
   forall x : T, count_mem x e = 1.
 
-HB.mixin Record isFinite T of Equality T := {
+HB.mixin Record isFinite T & Equality T := {
   enum_subdef : seq T;
   enumP_subdef : finite_axiom enum_subdef
 }.
@@ -216,7 +216,7 @@ End FiniteNES.
 Section CanonicalFinType.
 Variable (T : eqType) (s : seq T).
 
-Definition fin_type of finite_axiom s : Type := T.
+Definition fin_type & finite_axiom s : Type := T.
 
 Variable (f : finite_axiom s).
 Notation fT := (fin_type f).
@@ -291,7 +291,7 @@ Prenex Implicits pred0b.
 
 Module FiniteQuant.
 
-Variant quantified := Quantified of bool.
+Variant quantified := Quantified & bool.
 
 Delimit Scope fin_quant_scope with Q. (* Bogus, only used to declare scope. *)
 Bind Scope fin_quant_scope with quantified.
@@ -1463,7 +1463,7 @@ Qed.
 End SubFinType.
 
 HB.factory Record SubCountable_isFinite (T : finType) P (sT : Type)
-  of SubCountable T P sT := { }.
+  & SubCountable T P sT := { }.
 
 HB.builders Context (T : finType) (P : pred T) (sT : Type)
   (a : SubCountable_isFinite T P sT).

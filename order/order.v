@@ -1237,7 +1237,7 @@ Module Order.
 Export Order.
 
 #[key="T", primitive]
-HB.mixin Record Preorder_isDuallyPOrder (d : disp_t) T of Preorder d T := {
+HB.mixin Record Preorder_isDuallyPOrder (d : disp_t) T & Preorder d T := {
   le_anti  : antisymmetric (@le d T);
   ge_anti  : antisymmetric (fun x y => @le d T y x);
 }.
@@ -1261,13 +1261,13 @@ HB.export POrderExports.
 (* Bind Scope order_scope with POrder.sort. *)
 
 #[key="T", primitive]
-HB.mixin Record POrder_isMeetSemilattice d (T : Type) of POrder d T := {
+HB.mixin Record POrder_isMeetSemilattice d (T : Type) & POrder d T := {
   meet : T -> T -> T;
   lexI : forall x y z, (x <= meet y z) = (x <= y) && (x <= z);
 }.
 
 #[key="T", primitive]
-HB.mixin Record POrder_isJoinSemilattice d T of POrder d T := {
+HB.mixin Record POrder_isJoinSemilattice d T & POrder d T := {
   join : T -> T -> T;
   leUx : forall x y z, (join x y <= z) = (x <= z) && (y <= z);
 }.
@@ -1424,7 +1424,7 @@ End TLatticeSyntax.
 HB.export TLatticeSyntax.
 
 #[key="T", primitive]
-HB.mixin Record Lattice_isDistributive d (T : Type) of Lattice d T := {
+HB.mixin Record Lattice_isDistributive d (T : Type) & Lattice d T := {
   meetUl : @left_distributive T T meet join;
   joinIl : @left_distributive T T join meet; (* dual of meetUl *)
 }.
@@ -1446,7 +1446,7 @@ HB.structure Definition TBDistrLattice d :=
   { T of BDistrLattice d T  & hasTop d T }.
 
 #[key="T", primitive]
-HB.mixin Record DistrLattice_isTotal d T of DistrLattice d T :=
+HB.mixin Record DistrLattice_isTotal d T & DistrLattice d T :=
   { le_total : total (<=%O : rel T) }.
 
 #[short(type="orderType")]
@@ -1463,7 +1463,7 @@ HB.structure Definition TTotal d := { T of Total d T & hasTop d T }.
 HB.structure Definition TBTotal d := { T of BTotal d T & hasTop d T }.
 
 #[key="T", primitive]
-HB.mixin Record DistrLattice_hasRelativeComplement d T of DistrLattice d T := {
+HB.mixin Record DistrLattice_hasRelativeComplement d T & DistrLattice d T := {
   (* rcompl x y z is the complement of z in the interval [x, y]. *)
   rcompl : T -> T -> T -> T;
   rcomplPmeet : forall x y z, ((x `&` y) `|` z) `&` rcompl x y z = x `&` y;
@@ -1476,7 +1476,7 @@ HB.structure Definition CDistrLattice d :=
 
 #[key="T", primitive]
 HB.mixin Record CDistrLattice_hasSectionalComplement d T
-         of CDistrLattice d T & hasBottom d T := {
+         & CDistrLattice d T & hasBottom d T := {
   diff : T -> T -> T;
   (* FIXME: a bug in HB prevents us writing "rcompl \bot x y" *)
   diffErcompl : forall x y, diff x y = rcompl (\bot : T) x y;
@@ -1489,7 +1489,7 @@ HB.structure Definition CBDistrLattice d :=
 
 #[key="T", primitive]
 HB.mixin Record CDistrLattice_hasDualSectionalComplement d T
-         of CDistrLattice d T & hasTop d T := {
+         & CDistrLattice d T & hasTop d T := {
   codiff : T -> T -> T;
   codiffErcompl : forall x y, codiff x y = rcompl x \top y;
 }.
@@ -1504,7 +1504,7 @@ Notation "x `\` y" := (diff x y) : order_scope.
 End CBDistrLatticeSyntax.
 
 #[key="T", primitive]
-HB.mixin Record CDistrLattice_hasComplement d T of
+HB.mixin Record CDistrLattice_hasComplement d T &
          CTDistrLattice d T & CBDistrLattice d T := {
   compl : T -> T;
   (* FIXME: a bug in HB prevents us writing "\top `\` x" and "codiff \bot x" *)
@@ -3873,11 +3873,11 @@ End CTBDistrLatticeTheory.
 
 (* porderType *)
 
-HB.factory Record Preorder_isPOrder (d : disp_t) T of Preorder d T := {
+HB.factory Record Preorder_isPOrder (d : disp_t) T & Preorder d T := {
   le_anti  : antisymmetric (@le d T);
 }.
 
-HB.builders Context (d : disp_t) T of Preorder_isPOrder d T.
+HB.builders Context (d : disp_t) T & Preorder_isPOrder d T.
 
 Let ge_anti : antisymmetric (fun x y => @le d T y x).
 Proof. by move=> x y; rewrite andbC; apply: le_anti. Qed.
@@ -3886,7 +3886,7 @@ HB.instance Definition _ := Preorder_isDuallyPOrder.Build d T le_anti ge_anti.
 
 HB.end.
 
-HB.factory Record isPOrder (d : disp_t) T of Choice T := {
+HB.factory Record isPOrder (d : disp_t) T & Choice T := {
   le       : rel T;
   lt       : rel T;
   lt_def   : forall x y, lt x y = (y != x) && (le x y);
@@ -3895,7 +3895,7 @@ HB.factory Record isPOrder (d : disp_t) T of Choice T := {
   le_trans : transitive    le;
 }.
 
-HB.builders Context (d : disp_t) T of isPOrder d T.
+HB.builders Context (d : disp_t) T & isPOrder d T.
 
 Let lt_le_def x y : lt x y = le x y && ~~ le y x.
 Proof.
@@ -3909,20 +3909,20 @@ HB.instance Definition _ := Preorder_isPOrder.Build d T le_anti.
 
 HB.end.
 
-HB.factory Record Le_isPOrder (d : disp_t) T of Choice T := {
+HB.factory Record Le_isPOrder (d : disp_t) T & Choice T := {
   le       : rel T;
   le_refl  : reflexive     le;
   le_anti  : antisymmetric le;
   le_trans : transitive    le;
 }.
 
-HB.builders Context (d : disp_t) T of Le_isPOrder d T.
+HB.builders Context (d : disp_t) T & Le_isPOrder d T.
 (* TODO: print nice error message when keyed type is not provided *)
 HB.instance Definition _ := @Le_isPreorder.Build d T le le_refl le_trans.
 HB.instance Definition _ := @Preorder_isPOrder.Build d T le_anti.
 HB.end.
 
-HB.factory Record LtLe_isPOrder (d : disp_t) T of Choice T := {
+HB.factory Record LtLe_isPOrder (d : disp_t) T & Choice T := {
   le : rel T;
   lt : rel T;
   le_def   : forall x y, le x y = (x == y) || lt x y;
@@ -3930,7 +3930,7 @@ HB.factory Record LtLe_isPOrder (d : disp_t) T of Choice T := {
   lt_trans : transitive lt;
 }.
 
-HB.builders Context (d : disp_t) T of LtLe_isPOrder d T.
+HB.builders Context (d : disp_t) T & LtLe_isPOrder d T.
 
 HB.instance Definition _ := @LtLe_isPreorder.Build d T le lt le_def lt_irr lt_trans.
 
@@ -3945,13 +3945,13 @@ HB.instance Definition _ := @Preorder_isPOrder.Build d T le_anti.
 
 HB.end.
 
-HB.factory Record Lt_isPOrder (d : disp_t) T of Choice T := {
+HB.factory Record Lt_isPOrder (d : disp_t) T & Choice T := {
   lt       : rel T;
   lt_irr   : irreflexive lt;
   lt_trans : transitive  lt;
 }.
 
-HB.builders Context d T of Lt_isPOrder d T.
+HB.builders Context d T & Lt_isPOrder d T.
 #[warning="-HB.no-new-instance"]
 HB.instance Definition _ := @LtLe_isPOrder.Build d T
   _ lt (fun _ _ => erefl) lt_irr lt_trans.
@@ -3959,14 +3959,14 @@ HB.end.
 
 (* meetSemilatticeType and joinSemilatticeType *)
 
-HB.factory Record POrder_Meet_isSemilattice d T of POrder d T := {
+HB.factory Record POrder_Meet_isSemilattice d T & POrder d T := {
   meet : T -> T -> T;
   meetC : commutative meet;
   meetA : associative meet;
   leEmeet : forall x y, (x <= y) = (meet x y == x);
 }.
 
-HB.builders Context d T of POrder_Meet_isSemilattice d T.
+HB.builders Context d T & POrder_Meet_isSemilattice d T.
 
 Fact meetxx : idempotent_op meet.
 Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
@@ -3983,14 +3983,14 @@ HB.instance Definition _ := @POrder_isMeetSemilattice.Build d T meet lexI.
 
 HB.end.
 
-HB.factory Record POrder_Join_isSemilattice d T of POrder d T := {
+HB.factory Record POrder_Join_isSemilattice d T & POrder d T := {
   join : T -> T -> T;
   joinC : commutative join;
   joinA : associative join;
   leEjoin : forall x y, (y <= x) = (join x y == x);
 }.
 
-HB.builders Context d T of POrder_Join_isSemilattice d T.
+HB.builders Context d T & POrder_Join_isSemilattice d T.
 
 Fact joinxx : idempotent_op join.
 Proof. by move=> x; apply/eqP; rewrite -leEjoin. Qed.
@@ -4008,19 +4008,19 @@ HB.end.
 
 (* latticeType *)
 
-HB.factory Record POrder_MeetJoin_isLattice d T of POrder d T := {
+HB.factory Record POrder_MeetJoin_isLattice d T & POrder d T := {
   meet : T -> T -> T;
   join : T -> T -> T;
   meetP : forall x y z, (x <= meet y z) = (x <= y) && (x <= z);
   joinP : forall x y z, (join x y <= z) = (x <= z) && (y <= z);
 }.
 
-HB.builders Context d T of POrder_MeetJoin_isLattice d T.
+HB.builders Context d T & POrder_MeetJoin_isLattice d T.
 HB.instance Definition _ := @POrder_isMeetSemilattice.Build d T meet meetP.
 HB.instance Definition _ := @POrder_isJoinSemilattice.Build d T join joinP.
 HB.end.
 
-HB.factory Record POrder_isLattice d T of POrder d T := {
+HB.factory Record POrder_isLattice d T & POrder d T := {
   meet : T -> T -> T;
   join : T -> T -> T;
   meetC : commutative meet;
@@ -4032,7 +4032,7 @@ HB.factory Record POrder_isLattice d T of POrder d T := {
   leEmeet : forall x y, (x <= y) = (meet x y == x);
 }.
 
-HB.builders Context d T of POrder_isLattice d T.
+HB.builders Context d T & POrder_isLattice d T.
 
 Fact leEjoin x y : (y <= x) = (join x y == x).
 Proof.
@@ -4069,11 +4069,11 @@ HB.end.
 
 (* distrLatticeType *)
 
-HB.factory Record Lattice_Meet_isDistrLattice d T of Lattice d T := {
+HB.factory Record Lattice_Meet_isDistrLattice d T & Lattice d T := {
   meetUl : @left_distributive T T meet join;
 }.
 
-HB.builders Context d T of Lattice_Meet_isDistrLattice d T.
+HB.builders Context d T & Lattice_Meet_isDistrLattice d T.
 
 Let meetUr : right_distributive (@meet _ T) (@join _ T).
 Proof. by move=> x y z; rewrite ![x `&` _]meetC meetUl. Qed.
@@ -4085,7 +4085,7 @@ HB.instance Definition _ := Lattice_isDistributive.Build d T meetUl joinIl.
 
 HB.end.
 
-HB.factory Record POrder_Meet_isDistrLattice d T of POrder d T := {
+HB.factory Record POrder_Meet_isDistrLattice d T & POrder d T := {
   meet : T -> T -> T;
   join : T -> T -> T;
   meetC : commutative meet;
@@ -4098,7 +4098,7 @@ HB.factory Record POrder_Meet_isDistrLattice d T of POrder d T := {
   meetUl : left_distributive meet join;
 }.
 
-HB.builders Context d T of POrder_Meet_isDistrLattice d T.
+HB.builders Context d T & POrder_Meet_isDistrLattice d T.
 
 HB.instance Definition _ := @POrder_isLattice.Build d T
   meet join meetC joinC meetA joinA joinKI meetKU leEmeet.
@@ -4107,7 +4107,7 @@ HB.instance Definition _ :=
 
 HB.end.
 
-HB.factory Record isMeetJoinDistrLattice (d : disp_t) T of Choice T := {
+HB.factory Record isMeetJoinDistrLattice (d : disp_t) T & Choice T := {
   le : rel T;
   lt : rel T;
   meet : T -> T -> T;
@@ -4124,7 +4124,7 @@ HB.factory Record isMeetJoinDistrLattice (d : disp_t) T of Choice T := {
   meetxx : idempotent_op meet;
 }.
 
-HB.builders Context d T of isMeetJoinDistrLattice d T.
+HB.builders Context d T & isMeetJoinDistrLattice d T.
 
 Fact le_refl : reflexive le. Proof. by move=> x; rewrite le_def meetxx. Qed.
 
@@ -4156,7 +4156,7 @@ HB.end.
 (* complemented lattices *)
 
 HB.factory Record BDistrLattice_hasSectionalComplement d T
-    of BDistrLattice d T := {
+    & BDistrLattice d T := {
   diff : T -> T -> T;
   diffKI : forall x y, y `&` diff x y = \bot;
   joinIB : forall x y, (x `&` y) `|` diff x y = x;
@@ -4173,7 +4173,7 @@ End hasRelativeComplement.
 Notation hasRelativeComplement d T :=
   (BDistrLattice_hasSectionalComplement d T) (only parsing).
 
-HB.builders Context d T of BDistrLattice_hasSectionalComplement d T.
+HB.builders Context d T & BDistrLattice_hasSectionalComplement d T.
 
 Definition rcompl x y z := (x `&` y) `|` diff (y `|` x) z.
 
@@ -4195,13 +4195,13 @@ HB.instance Definition _ :=
 HB.end.
 
 HB.factory Record TDistrLattice_hasDualSectionalComplement d T
-    of TDistrLattice d T := {
+    & TDistrLattice d T := {
   codiff : T -> T -> T;
   codiffKU : forall x y, y `|` codiff x y = \top;
   meetUB : forall x y, (x `|` y) `&` codiff x y = x;
 }.
 
-HB.builders Context d T of TDistrLattice_hasDualSectionalComplement d T.
+HB.builders Context d T & TDistrLattice_hasDualSectionalComplement d T.
 
 Definition rcompl x y z := (y `|` x) `&` codiff (x `&` y) z.
 
@@ -4223,7 +4223,7 @@ HB.instance Definition _ :=
 HB.end.
 
 HB.factory Record CBDistrLattice_hasComplement d T
-    of CBDistrLattice d T & hasTop d T := {
+    & CBDistrLattice d T & hasTop d T := {
   compl : T -> T;
   complEdiff : forall x, compl x = (\top : T) `\` x; (* FIXME *)
 }.
@@ -4236,7 +4236,7 @@ End hasComplement.
 #[deprecated(since="mathcomp 2.3.0", use=CBDistrLattice_hasComplement)]
 Notation hasComplement d T := (CBDistrLattice_hasComplement d T) (only parsing).
 
-HB.builders Context d T of CBDistrLattice_hasComplement d T.
+HB.builders Context d T & CBDistrLattice_hasComplement d T.
 
 HB.instance Definition _ := @CDistrLattice_hasDualSectionalComplement.Build d T
   (fun x y => rcompl x \top y) (fun _ _ => erefl).
@@ -4250,12 +4250,12 @@ HB.instance Definition _ :=
 HB.end.
 
 HB.factory Record CTDistrLattice_hasComplement d T
-    of CTDistrLattice d T & hasBottom d T := {
+    & CTDistrLattice d T & hasBottom d T := {
   compl : T -> T;
   complEcodiff : forall x, compl x = codiff (\bot : T) x;
 }.
 
-HB.builders Context d T of CTDistrLattice_hasComplement d T.
+HB.builders Context d T & CTDistrLattice_hasComplement d T.
 
 HB.instance Definition _ := @CDistrLattice_hasSectionalComplement.Build d T
   (fun x y => rcompl (\bot : T) x y) (fun _ _ => erefl).
@@ -4268,13 +4268,13 @@ HB.instance Definition _ :=
 
 HB.end.
 
-HB.factory Record TBDistrLattice_hasComplement d T of TBDistrLattice d T := {
+HB.factory Record TBDistrLattice_hasComplement d T & TBDistrLattice d T := {
   compl : T -> T;
   joinxC : forall x, x `|` compl x = \top;
   meetxC : forall x, x `&` compl x = \bot;
 }.
 
-HB.builders Context d T of TBDistrLattice_hasComplement d T.
+HB.builders Context d T & TBDistrLattice_hasComplement d T.
 
 Definition diff x y := x `&` compl y.
 Definition codiff x y := x `|` compl y.
@@ -4305,11 +4305,11 @@ HB.end.
 
 (* orderType *)
 
-HB.factory Record Lattice_isTotal d T of Lattice d T := {
+HB.factory Record Lattice_isTotal d T & Lattice d T := {
   le_total : total (<=%O : rel T)
 }.
 
-HB.builders Context d T of Lattice_isTotal d T.
+HB.builders Context d T & Lattice_isTotal d T.
 
 Fact meetUl : @left_distributive T T meet join.
 Proof.
@@ -4323,10 +4323,10 @@ HB.instance Definition _ := DistrLattice_isTotal.Build d T le_total.
 
 HB.end.
 
-HB.factory Record POrder_isTotal d T of POrder d T := {
+HB.factory Record POrder_isTotal d T & POrder d T := {
   le_total : total (<=%O : rel T) }.
 
-HB.builders Context d T of POrder_isTotal d T.
+HB.builders Context d T & POrder_isTotal d T.
 
 Implicit Types (x y z : T).
 
@@ -4387,7 +4387,7 @@ HB.instance Definition _ :=
   Lattice_isTotal.Build d T comparableT.
 HB.end.
 
-HB.factory Record isOrder (d : disp_t) T of Choice T := {
+HB.factory Record isOrder (d : disp_t) T & Choice T := {
   le : rel T;
   lt : rel T;
   meet : T -> T -> T;
@@ -4400,7 +4400,7 @@ HB.factory Record isOrder (d : disp_t) T of Choice T := {
   le_total : total le;
 }.
 
-HB.builders Context d T of isOrder d T.
+HB.builders Context d T & isOrder d T.
 
 Fact le_refl : reflexive le.
 Proof. by move=> x; case: (le x x) (le_total x x). Qed.
@@ -4452,7 +4452,7 @@ HB.instance Definition _ := DistrLattice_isTotal.Build d T le_total.
 
 HB.end.
 
-HB.factory Record LtOrder (d : disp_t) T of Choice T := {
+HB.factory Record LtOrder (d : disp_t) T & Choice T := {
   le : rel T;
   lt : rel T;
   meet : T -> T -> T;
@@ -4465,7 +4465,7 @@ HB.factory Record LtOrder (d : disp_t) T of Choice T := {
   lt_total : forall x y, x != y -> lt x y || lt y x;
 }.
 
-HB.builders Context d T of LtOrder d T.
+HB.builders Context d T & LtOrder d T.
 
 Fact lt_def x y : lt x y = (y != x) && le x y.
 Proof. by rewrite le_def; case: eqVneq => //= ->; rewrite lt_irr. Qed.
@@ -4495,13 +4495,13 @@ HB.instance Definition _ :=
   isOrder.Build d T lt_def meet_def_le join_def_le le_anti le_trans le_total.
 HB.end.
 
-HB.factory Record MonoTotal disp T of POrder disp T := {
+HB.factory Record MonoTotal disp T & POrder disp T := {
   disp' : disp_t;
   T' : orderType disp';
   f : T -> T';
   f_mono : {mono f : x y / x <= y}
 }.
-HB.builders Context disp T of MonoTotal disp T.
+HB.builders Context disp T & MonoTotal disp T.
 Fact totalT : total (<=%O : rel T).
 Proof. by move=> x y; rewrite -!f_mono le_total. Qed.
 HB.instance Definition _ := POrder_isTotal.Build disp T totalT.
@@ -4580,7 +4580,7 @@ Definition CanIsTotal : DistrLattice_isTotal _ (can_type f_can) :=
 End Can.
 End CancelTotal.
 
-HB.factory Record IsoBottom disp T of Order.POrder disp T := {
+HB.factory Record IsoBottom disp T & Order.POrder disp T := {
   disp' : Order.disp_t;
   T' : bPOrderType disp';
   f : T -> T';
@@ -4590,7 +4590,7 @@ HB.factory Record IsoBottom disp T of Order.POrder disp T := {
   f_mono : {mono f : x y / x <= y}%O;
 }.
 
-HB.builders Context disp T of IsoBottom disp T.
+HB.builders Context disp T & IsoBottom disp T.
 
 Definition bottom := f' \bot%O.
 Lemma isobottom x : (bottom <= x)%O.
@@ -4599,7 +4599,7 @@ Proof. by rewrite /bottom -f_mono f'_can Order.le0x. Qed.
 HB.instance Definition _ := Order.hasBottom.Build _ T isobottom.
 HB.end.
 
-HB.factory Record IsoTop disp T of Order.POrder disp T := {
+HB.factory Record IsoTop disp T & Order.POrder disp T := {
   disp' : Order.disp_t;
   T' : tPOrderType disp';
   f : T -> T';
@@ -4609,7 +4609,7 @@ HB.factory Record IsoTop disp T of Order.POrder disp T := {
   f_mono : {mono f : x y / x <= y}%O;
 }.
 
-HB.builders Context disp T of IsoTop disp T.
+HB.builders Context disp T & IsoTop disp T.
 
 Definition top := f' \top%O.
 Lemma isotop x : (x <= top)%O.
@@ -4619,7 +4619,7 @@ HB.instance Definition _ := Order.hasTop.Build _ T isotop.
 HB.end.
 
 
-HB.factory Record IsoLattice disp T of POrder disp T := {
+HB.factory Record IsoLattice disp T & POrder disp T := {
   disp' : disp_t;
   T' : latticeType disp';
   f : T -> T';
@@ -4629,7 +4629,7 @@ HB.factory Record IsoLattice disp T of POrder disp T := {
   f_mono : {mono f : x y / x <= y};
 }.
 
-HB.builders Context disp T of IsoLattice disp T.
+HB.builders Context disp T & IsoLattice disp T.
 
 Definition meet (x y : T) := f' (meet (f x) (f y)).
 Definition join (x y : T) := f' (join (f x) (f y)).
@@ -4652,7 +4652,7 @@ HB.instance Definition _ := POrder_isLattice.Build _ T
 
 HB.end.
 
-HB.factory Record IsoDistrLattice disp T of POrder disp T := {
+HB.factory Record IsoDistrLattice disp T & POrder disp T := {
   disp' : disp_t;
   T' : distrLatticeType disp';
   f : T -> T';
@@ -4662,7 +4662,7 @@ HB.factory Record IsoDistrLattice disp T of POrder disp T := {
   f_mono : {mono f : x y / x <= y};
 }.
 
-HB.builders Context disp T of IsoDistrLattice disp T.
+HB.builders Context disp T & IsoDistrLattice disp T.
 
 HB.instance Definition _ := IsoLattice.Build _ T f_can f'_can f_mono.
 
@@ -4710,12 +4710,12 @@ HB.structure Definition LatticeMorphism d (T : latticeType d)
   {f of @MeetLatticeMorphism d T d' T' f & @JoinLatticeMorphism d T d' T' f}.
 
 HB.factory Record isLatticeMorphism d (T : latticeType d)
-    d' (T' : latticeType d') (f : T -> T') of @OrderMorphism d T d' T' f := {
+    d' (T' : latticeType d') (f : T -> T') & @OrderMorphism d T d' T' f := {
   omorphI_subproof : meet_morphism f;
   omorphU_subproof : join_morphism f;
 }.
 
-HB.builders Context d T d' T' f of isLatticeMorphism d T d' T' f.
+HB.builders Context d T d' T' f & isLatticeMorphism d T d' T' f.
 HB.instance Definition _ := isMeetLatticeMorphism.Build d T d' T' f
   omorphI_subproof.
 HB.instance Definition _ := isJoinLatticeMorphism.Build d T d' T' f
@@ -4981,7 +4981,7 @@ HB.factory Record isLatticeClosed d (T : latticeType d) (S : {pred T}) := {
   opredU : join_closed S;
 }.
 
-HB.builders Context d T S of isLatticeClosed d T S.
+HB.builders Context d T S & isLatticeClosed d T S.
 HB.instance Definition _ := isMeetLatticeClosed.Build d T S opredI.
 HB.instance Definition _ := isJoinLatticeClosed.Build d T S opredU.
 HB.end.
@@ -4993,7 +4993,7 @@ HB.factory Record isTBLatticeClosed d (T : tbLatticeType d) (S : {pred T}) := {
   opred1 : \top \in S;
 }.
 
-HB.builders Context d T S of isTBLatticeClosed d T S.
+HB.builders Context d T S & isTBLatticeClosed d T S.
 HB.instance Definition _ := isLatticeClosed.Build d T S opredI opredU.
 HB.instance Definition _ := isBLatticeClosed.Build d T S opred0.
 HB.instance Definition _ := isTLatticeClosed.Build d T S opred1.
@@ -5044,9 +5044,9 @@ HB.structure Definition SubPOrder d (T : porderType d) S d' :=
   { U of SubEquality T S U & POrder d' U & isSubPreorder d T S d' U }.
 
 HB.factory Record SubChoice_isSubPOrder d (T : porderType d) S (d' : disp_t) U
-    of SubChoice T S U := {}.
+    & SubChoice T S U := {}.
 
-HB.builders Context d T S d' U of SubChoice_isSubPOrder d T S d' U.
+HB.builders Context d T S d' U & SubChoice_isSubPOrder d T S d' U.
 HB.instance Definition _ := SubChoice_isSubPreorder.Build d T S d' U.
 HB.instance Definition _ := Preorder_isPOrder.Build d' U
    (@CancelPartial.anti U d T _ _ (@valK _ _ U)).
@@ -5057,12 +5057,12 @@ HB.instance Definition _ d (T : porderType d) (S : pred T) (d' : disp_t)
   (U : subType S) := SubChoice_isSubPOrder.Build d T S d' (sub_type U).
 
 HB.mixin Record isMeetSubLattice d (T : latticeType d) (S : pred T) d' U
-    of SubType T S U & Lattice d' U := {
+    & SubType T S U & Lattice d' U := {
   valI_subproof : {morph (val : U -> T) : x y / x `&` y};
 }.
 
 HB.mixin Record isJoinSubLattice d (T : latticeType d) (S : pred T) d' U
-    of SubType T S U & Lattice d' U := {
+    & SubType T S U & Lattice d' U := {
   valU_subproof : {morph (val : U -> T) : x y / x `|` y};
 }.
 
@@ -5141,12 +5141,12 @@ HB.instance Definition _ (d : disp_t) (T : latticeType d) (S : pred T)
   isJoinLatticeMorphism.Build d' U d T val valU_subproof.
 
 HB.factory Record SubPOrder_isSubLattice d (T : latticeType d) S d' U
-    of @SubPOrder d T S d' U := {
+    & @SubPOrder d T S d' U := {
   opredI_subproof : meet_closed S;
   opredU_subproof : join_closed S;
 }.
 
-HB.builders Context d T S d' U of SubPOrder_isSubLattice d T S d' U.
+HB.builders Context d T S d' U & SubPOrder_isSubLattice d T S d' U.
 
 HB.instance Definition _ := isLatticeClosed.Build d T S
   opredI_subproof opredU_subproof.
@@ -5181,19 +5181,19 @@ HB.instance Definition _ := isJoinSubLattice.Build d T S d' U valU.
 HB.end.
 
 HB.factory Record SubChoice_isSubLattice d (T : latticeType d) S (d' : disp_t) U
-    of SubChoice T S U := {
+    & SubChoice T S U := {
   opredI_subproof : meet_closed S;
   opredU_subproof : join_closed S;
 }.
 
-HB.builders Context d T S d' U of SubChoice_isSubLattice d T S d' U.
+HB.builders Context d T S d' U & SubChoice_isSubLattice d T S d' U.
 HB.instance Definition _ := SubChoice_isSubPOrder.Build d T S d' U.
 HB.instance Definition _ := SubPOrder_isSubLattice.Build d T S d' U
   opredI_subproof opredU_subproof.
 HB.end.
 
 HB.mixin Record isBSubLattice d (T : bLatticeType d) (S : pred T) d' U
-    of SubType T S U & BLattice d' U := {
+    & SubType T S U & BLattice d' U := {
   val0_subproof : (val : U -> T) \bot = \bot;
 }.
 
@@ -5219,11 +5219,11 @@ HB.instance Definition _ (d : disp_t) (T : bLatticeType d) (S : pred T)
   isBLatticeMorphism.Build d' U d T val val0_subproof.
 
 HB.factory Record SubPOrder_isBSubLattice d (T : bLatticeType d) S d' U
-    of @SubPOrder d T S d' U & Lattice d' U := {
+    & @SubPOrder d T S d' U & Lattice d' U := {
   opred0_subproof : \bot \in S;
 }.
 
-HB.builders Context d T S d' U of SubPOrder_isBSubLattice d T S d' U.
+HB.builders Context d T S d' U & SubPOrder_isBSubLattice d T S d' U.
 
 Let inU v Sv : U := Sub v Sv.
 Let zeroU : U := inU opred0_subproof.
@@ -5237,13 +5237,13 @@ HB.instance Definition _ := isBSubLattice.Build d T S d' U val0.
 HB.end.
 
 HB.factory Record SubChoice_isBSubLattice
-    d (T : bLatticeType d) S (d' : disp_t) U of SubChoice T S U := {
+    d (T : bLatticeType d) S (d' : disp_t) U & SubChoice T S U := {
   opredI_subproof : meet_closed S;
   opredU_subproof : join_closed S;
   opred0_subproof : \bot \in S;
 }.
 
-HB.builders Context d T S d' U of SubChoice_isBSubLattice d T S d' U.
+HB.builders Context d T S d' U & SubChoice_isBSubLattice d T S d' U.
 HB.instance Definition _ := SubChoice_isSubLattice.Build d T S d' U
   opredI_subproof opredU_subproof.
 HB.instance Definition _ := SubPOrder_isBSubLattice.Build d T S d' U
@@ -5251,7 +5251,7 @@ HB.instance Definition _ := SubPOrder_isBSubLattice.Build d T S d' U
 HB.end.
 
 HB.mixin Record isTSubLattice d (T : tLatticeType d) (S : pred T) d' U
-    of SubType T S U & TLattice d' U := {
+    & SubType T S U & TLattice d' U := {
   val1_subproof : (val : U -> T) \top = \top;
 }.
 
@@ -5277,11 +5277,11 @@ HB.instance Definition _ (d : disp_t) (T : tLatticeType d) (S : pred T)
   isTLatticeMorphism.Build d' U d T val val1_subproof.
 
 HB.factory Record SubPOrder_isTSubLattice d (T : tLatticeType d) S d' U
-    of @SubPOrder d T S d' U & Lattice d' U := {
+    & @SubPOrder d T S d' U & Lattice d' U := {
   opred1_subproof : \top \in S;
 }.
 
-HB.builders Context d T S d' U of SubPOrder_isTSubLattice d T S d' U.
+HB.builders Context d T S d' U & SubPOrder_isTSubLattice d T S d' U.
 
 Let inU v Sv : U := Sub v Sv.
 Let oneU : U := inU opred1_subproof.
@@ -5295,13 +5295,13 @@ HB.instance Definition _ := isTSubLattice.Build d T S d' U val1.
 HB.end.
 
 HB.factory Record SubChoice_isTSubLattice
-    d (T : tLatticeType d) S (d' : disp_t) U of SubChoice T S U := {
+    d (T : tLatticeType d) S (d' : disp_t) U & SubChoice T S U := {
   opredI_subproof : meet_closed S;
   opredU_subproof : join_closed S;
   opred1_subproof : \top \in S;
 }.
 
-HB.builders Context d T S d' U of SubChoice_isTSubLattice d T S d' U.
+HB.builders Context d T S d' U & SubChoice_isTSubLattice d T S d' U.
 HB.instance Definition _ := SubChoice_isSubLattice.Build d T S d' U
   opredI_subproof opredU_subproof.
 HB.instance Definition _ := SubPOrder_isTSubLattice.Build d T S d' U
@@ -5317,12 +5317,12 @@ HB.instance Definition _ (d : disp_t) (T : tbLatticeType d) (S : pred T) d'
     (U : TBSubLattice.type S d') := BLatticeMorphism.on (val : U -> T).
 
 HB.factory Record SubPOrder_isTBSubLattice d (T : tbLatticeType d) S d' U
-    of @SubPOrder d T S d' U & Lattice d' U := {
+    & @SubPOrder d T S d' U & Lattice d' U := {
   opred0_subproof : \bot \in S;
   opred1_subproof : \top \in S;
 }.
 
-HB.builders Context d T S d' U of SubPOrder_isTBSubLattice d T S d' U.
+HB.builders Context d T S d' U & SubPOrder_isTBSubLattice d T S d' U.
 HB.instance Definition _ := SubPOrder_isBSubLattice.Build d T S d' U
   opred0_subproof.
 HB.instance Definition _ := SubPOrder_isTSubLattice.Build d T S d' U
@@ -5330,14 +5330,14 @@ HB.instance Definition _ := SubPOrder_isTSubLattice.Build d T S d' U
 HB.end.
 
 HB.factory Record SubChoice_isTBSubLattice d (T : tbLatticeType d) S
-    (d' : disp_t) U of SubChoice T S U := {
+    (d' : disp_t) U & SubChoice T S U := {
   opredI_subproof : meet_closed S;
   opredU_subproof : join_closed S;
   opred0_subproof : \bot \in S;
   opred1_subproof : \top \in S;
 }.
 
-HB.builders Context d T S d' U of SubChoice_isTBSubLattice d T S d' U.
+HB.builders Context d T S d' U & SubChoice_isTBSubLattice d T S d' U.
 HB.instance Definition _ := SubChoice_isSubLattice.Build d T S d' U
   opredI_subproof opredU_subproof.
 HB.instance Definition _ := SubPOrder_isTBSubLattice.Build d T S d' U
@@ -5349,18 +5349,18 @@ HB.structure Definition SubOrder d (T : orderType d) S d' :=
   { U of @SubLattice d T S d' U & Total d' U }.
 
 HB.factory Record SubLattice_isSubOrder d (T : orderType d) S d' U
-    of @SubLattice d T S d' U := {}.
+    & @SubLattice d T S d' U := {}.
 
-HB.builders Context d T S d' U of SubLattice_isSubOrder d T S d' U.
+HB.builders Context d T S d' U & SubLattice_isSubOrder d T S d' U.
 Lemma totalU : total (<=%O : rel U).
 Proof. by move=> x y; rewrite -!le_val le_total. Qed.
 HB.instance Definition _ := Lattice_isTotal.Build d' U totalU.
 HB.end.
 
 HB.factory Record SubPOrder_isSubOrder d (T : orderType d) S d' U
-    of @SubPOrder d T S d' U := {}.
+    & @SubPOrder d T S d' U := {}.
 
-HB.builders Context d T S d' U of SubPOrder_isSubOrder d T S d' U.
+HB.builders Context d T S d' U & SubPOrder_isSubOrder d T S d' U.
 Fact opredI : meet_closed S.
 Proof. by move=> x y Sx Sy; rewrite meetEtotal; case: leP. Qed.
 Fact opredU : join_closed S.
@@ -5370,9 +5370,9 @@ HB.instance Definition _ := SubLattice_isSubOrder.Build d T S d' U.
 HB.end.
 
 HB.factory Record SubChoice_isSubOrder d (T : orderType d) S (d' : disp_t) U
-    of @SubChoice T S U := {}.
+    & @SubChoice T S U := {}.
 
-HB.builders Context d T S d' U of SubChoice_isSubOrder d T S d' U.
+HB.builders Context d T S d' U & SubChoice_isSubOrder d T S d' U.
 HB.instance Definition _ := SubChoice_isSubPOrder.Build d T S d' U.
 HB.instance Definition _ := SubPOrder_isSubOrder.Build d T S d' U.
 HB.end.

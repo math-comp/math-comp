@@ -2058,7 +2058,7 @@ Qed.
 Canonical nary_mxsum_expr := ProperMxsumExpr nary_mxsum_proof.
 End Nary.
 
-Definition mxdirect_def m n T of phantom 'M_(m, n) (unwrap (mxsum_val T)) :=
+Definition mxdirect_def m n T & phantom 'M_(m, n) (unwrap (mxsum_val T)) :=
   \rank (unwrap T) == unwrap (mxsum_rank T).
 
 End SumExpr.

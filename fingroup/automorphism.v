@@ -276,7 +276,7 @@ Section ConjugationMorphism.
 Variable gT : finGroupType.
 Implicit Type A : {set gT}.
 
-Definition conjgm of {set gT} := fun x y : gT => y ^ x.
+Definition conjgm & {set gT} := fun x y : gT => y ^ x.
 
 Lemma conjgmE A x y : conjgm A x y = y ^ x. Proof. by []. Qed.
 

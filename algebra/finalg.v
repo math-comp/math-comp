@@ -209,7 +209,7 @@ HB.instance Definition _ (R : finNzRingType) := [finGroupMixin of R for +%R].
 Coercion NzRing_to_baseFinGroup (R : finNzRingType) := FinStarMonoid.clone R _.
 Coercion NzRing_to_finGroup (R : finNzRingType) := FinGroup.clone R _.
 
-HB.factory Record isNzRing R of NzRing R := {}.
+HB.factory Record isNzRing R & NzRing R := {}.
 
 Module isRing.
 #[deprecated(since="mathcomp 2.4.0", use=FinRing.isNzRing.Build)]
@@ -219,7 +219,7 @@ End isRing.
 #[deprecated(since="mathcomp 2.4.0", use=FinRing.isNzRing)]
 Notation isRing R := (isNzRing R) (only parsing).
 
-HB.builders Context R of isNzRing R.
+HB.builders Context R & isNzRing R.
   Definition is_inv (x y : R) := (x * y == 1) && (y * x == 1).
   Definition unit := [qualify a x : R | [exists y, is_inv x y]].
   Definition inv x := odflt x (pick (is_inv x)).
@@ -344,9 +344,9 @@ HB.instance Definition _ (R : finFieldType) := [finGroupMixin of R for +%R].
 Coercion Field_to_baseFinGroup (R : finFieldType) := FinStarMonoid.clone R _.
 Coercion Field_to_finGroup (R : finFieldType) := FinGroup.clone R _.
 
-HB.factory Record isField F of Field F := {}.
+HB.factory Record isField F & Field F := {}.
 
-HB.builders Context F of isField F.
+HB.builders Context F & isField F.
   Fixpoint sat e f :=
     match f with
     | GRing.Bool b => b

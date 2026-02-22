@@ -113,7 +113,7 @@ Module Import GRing.
 (* FIXME: Since we should not import GRing, we should be able to remove this: *)
 Export GRing.
 
-HB.mixin Record NzRing_hasMulInverse R of NzRing R := {
+HB.mixin Record NzRing_hasMulInverse R & NzRing R := {
   unit_subdef : pred R;
   inv : R -> R;
   mulVr_subproof : {in unit_subdef, left_inverse 1 inv *%R};
@@ -427,7 +427,7 @@ End ComUnitRingExports.
 HB.export ComUnitRingExports.
 
 (* TODO_HB: fix the name (was ComUnitRingMixin) *)
-HB.factory Record ComNzRing_hasMulInverse R of ComNzRing R := {
+HB.factory Record ComNzRing_hasMulInverse R & ComNzRing R := {
   unit : {pred R};
   inv : R -> R;
   mulVx : {in unit, left_inverse 1 inv *%R};
@@ -435,7 +435,7 @@ HB.factory Record ComNzRing_hasMulInverse R of ComNzRing R := {
   invr_out : {in [predC unit], inv =1 id}
 }.
 
-HB.builders Context R of ComNzRing_hasMulInverse R.
+HB.builders Context R & ComNzRing_hasMulInverse R.
 
 Fact mulC_mulrV : {in unit, right_inverse 1 inv *%R}.
 Proof. by move=> x Ux /=; rewrite mulrC mulVx. Qed.
@@ -582,7 +582,7 @@ End ClosedExports.
 Definition integral_domain_axiom (R : pzRingType) :=
   forall x y : R, x * y = 0 -> (x == 0) || (y == 0).
 
-HB.mixin Record ComUnitRing_isIntegral R of ComUnitRing R := {
+HB.mixin Record ComUnitRing_isIntegral R & ComUnitRing R := {
   mulf_eq0_subproof : integral_domain_axiom R;
 }.
 
@@ -718,7 +718,7 @@ Arguments rregP {R x}.
 
 Definition field_axiom (R : unitRingType) := forall x : R, x != 0 -> x \in unit.
 
-HB.mixin Record UnitRing_isField R of UnitRing R := {
+HB.mixin Record UnitRing_isField R & UnitRing R := {
   fieldP : field_axiom R;
 }.
 
@@ -738,22 +738,22 @@ move=> m x y xy0; apply/norP=> [[]] /m Ux /m.
 by rewrite -(unitrMr _ Ux) xy0 unitr0.
 Qed.
 
-HB.factory Record ComUnitRing_isField R of ComUnitRing R := {
+HB.factory Record ComUnitRing_isField R & ComUnitRing R := {
   fieldP : field_axiom R;
 }.
-HB.builders Context R of ComUnitRing_isField R.
+HB.builders Context R & ComUnitRing_isField R.
 HB.instance Definition _ :=
   ComUnitRing_isIntegral.Build R (IdomainMixin fieldP).
 HB.instance Definition _ := UnitRing_isField.Build R fieldP.
 HB.end.
 
-HB.factory Record ComNzRing_isField R of ComNzRing R := {
+HB.factory Record ComNzRing_isField R & ComNzRing R := {
   inv : R -> R;
   mulVf : forall x, x != 0 -> inv x * x = 1;
   invr0 : inv 0 = 0;
 }.
 
-HB.builders Context R of ComNzRing_isField R.
+HB.builders Context R & ComNzRing_isField R.
 
 Fact intro_unit (x y : R) : y * x = 1 -> x != 0.
 Proof.
@@ -976,7 +976,7 @@ HB.factory Record isDivClosed (R : unitRingType) (S : R -> bool) := {
   divr_closed_subproof : divr_closed S
 }.
 
-HB.builders Context R S of isDivClosed R S.
+HB.builders Context R S & isDivClosed R S.
 HB.instance Definition _ := isMulClosed.Build R S
   (divr_closedM divr_closed_subproof).
 HB.instance Definition _ := isInvClosed.Build R S
@@ -987,7 +987,7 @@ HB.factory Record isSdivClosed (R : unitRingType) (S : R -> bool) := {
   sdivr_closed_subproof : sdivr_closed S
 }.
 
-HB.builders Context R S of isSdivClosed R S.
+HB.builders Context R S & isSdivClosed R S.
 HB.instance Definition _ := isDivClosed.Build R S
   (sdivr_closed_div sdivr_closed_subproof).
 HB.instance Definition _ := isSmulClosed.Build R S
@@ -998,7 +998,7 @@ HB.factory Record isDivringClosed (R : unitRingType) (S : R -> bool) := {
   divring_closed_subproof : divring_closed S
 }.
 
-HB.builders Context R S of isDivringClosed R S.
+HB.builders Context R S & isDivringClosed R S.
 HB.instance Definition _ := isSubringClosed.Build R S
   (divring_closedBM divring_closed_subproof).
 HB.instance Definition _ := isSdivClosed.Build R S
@@ -1010,7 +1010,7 @@ HB.factory Record isDivalgClosed (R : comUnitRingType) (A : unitAlgType R)
   divalg_closed_subproof : divalg_closed S
 }.
 
-HB.builders Context R A S of isDivalgClosed R A S.
+HB.builders Context R A S & isDivalgClosed R A S.
 HB.instance Definition _ := isDivringClosed.Build A S
   (divalg_closedBdiv divalg_closed_subproof).
 HB.instance Definition _ := isSubalgClosed.Build R A S
@@ -1132,11 +1132,11 @@ HB.structure Definition SubUnitRing (R : nzRingType) (S : pred R) :=
   {U of SubNzRing R S U & UnitRing U}.
 
 HB.factory Record SubNzRing_isSubUnitRing (R : unitRingType) S U
-    of SubNzRing R S U := {
+    & SubNzRing R S U := {
   divring_closed_subproof : divring_closed S
 }.
 
-HB.builders Context R S U of SubNzRing_isSubUnitRing R S U.
+HB.builders Context R S U & SubNzRing_isSubUnitRing R S U.
 
 HB.instance Definition _ := isDivringClosed.Build R S divring_closed_subproof.
 
@@ -1172,9 +1172,9 @@ HB.structure Definition SubIntegralDomain (R : idomainType) (S : pred R) :=
   {U of SubComNzRing R S U & IntegralDomain U}.
 
 HB.factory Record SubComUnitRing_isSubIntegralDomain (R : idomainType) S U
-  of SubComUnitRing R S U := {}.
+  & SubComUnitRing R S U := {}.
 
-HB.builders Context R S U of SubComUnitRing_isSubIntegralDomain R S U.
+HB.builders Context R S U & SubComUnitRing_isSubIntegralDomain R S U.
 Lemma id : IntegralDomain.axiom U.
 Proof.
 move=> x y /(congr1 val)/eqP; rewrite rmorphM /=.
@@ -1188,11 +1188,11 @@ HB.structure Definition SubField (F : fieldType) (S : pred F) :=
   {U of SubIntegralDomain F S U & Field U}.
 
 HB.factory Record SubIntegralDomain_isSubField (F : fieldType) S U
-    of SubIntegralDomain F S U := {
+    & SubIntegralDomain F S U := {
   subfield_subproof : {mono (val : U -> F) : u / u \in unit}
 }.
 
-HB.builders Context F S U of SubIntegralDomain_isSubField F S U.
+HB.builders Context F S U & SubIntegralDomain_isSubField F S U.
 Lemma fieldP : Field.axiom U.
 Proof.
 by move=> u; rewrite -(inj_eq val_inj) rmorph0 -unitfE subfield_subproof.
@@ -1201,11 +1201,11 @@ HB.instance Definition _ := UnitRing_isField.Build U fieldP.
 HB.end.
 
 HB.factory Record SubChoice_isSubUnitRing (R : unitRingType) S U
-    of SubChoice R S U := {
+    & SubChoice R S U := {
   divring_closed_subproof : divring_closed S
 }.
 
-HB.builders Context R S U of SubChoice_isSubUnitRing R S U.
+HB.builders Context R S U & SubChoice_isSubUnitRing R S U.
 HB.instance Definition _ := SubChoice_isSubNzRing.Build R S U
   (divring_closedBM divring_closed_subproof).
 HB.instance Definition _ := SubNzRing_isSubUnitRing.Build R S U
@@ -1213,11 +1213,11 @@ HB.instance Definition _ := SubNzRing_isSubUnitRing.Build R S U
 HB.end.
 
 HB.factory Record SubChoice_isSubComUnitRing (R : comUnitRingType) S U
-    of SubChoice R S U := {
+    & SubChoice R S U := {
   divring_closed_subproof : divring_closed S
 }.
 
-HB.builders Context R S U of SubChoice_isSubComUnitRing R S U.
+HB.builders Context R S U & SubChoice_isSubComUnitRing R S U.
 HB.instance Definition _ := SubChoice_isSubComNzRing.Build R S U
   (divring_closedBM divring_closed_subproof).
 HB.instance Definition _ := SubNzRing_isSubUnitRing.Build R S U
@@ -1225,11 +1225,11 @@ HB.instance Definition _ := SubNzRing_isSubUnitRing.Build R S U
 HB.end.
 
 HB.factory Record SubChoice_isSubIntegralDomain (R : idomainType) S U
-    of SubChoice R S U := {
+    & SubChoice R S U := {
   divring_closed_subproof : divring_closed S
 }.
 
-HB.builders Context R S U of SubChoice_isSubIntegralDomain R S U.
+HB.builders Context R S U & SubChoice_isSubIntegralDomain R S U.
 HB.instance Definition _ := SubChoice_isSubComUnitRing.Build R S U
   divring_closed_subproof.
 HB.instance Definition _ := SubComUnitRing_isSubIntegralDomain.Build R S U.

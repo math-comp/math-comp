@@ -1513,7 +1513,7 @@ Section defs.
 
 Variables (A B : {set gT}) (fA fB : gT -> FinGroup.sort rT).
 
-Definition pprodm of B \subset 'N(A) & {in A & B, morph_act 'J 'J fA fB}
+Definition pprodm & B \subset 'N(A) & {in A & B, morph_act 'J 'J fA fB}
                   & {in A :&: B, fA =1 fB} :=
   fun x => fA (divgr A B x) * fB (remgr A B x).
 

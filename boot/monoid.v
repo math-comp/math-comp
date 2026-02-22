@@ -198,19 +198,19 @@ End MagmaTheory.
 
 Prenex Implicits commute.
 
-HB.mixin Record Magma_isSemigroup G of Magma G := {
+HB.mixin Record Magma_isSemigroup G & Magma G := {
   mulgA : associative (@mul G)
 }.
 
 #[short(type="semigroupType")]
 HB.structure Definition Semigroup := {G of Magma_isSemigroup G & ChoiceMagma G}.
 
-HB.factory Record isSemigroup G of Choice G := {
+HB.factory Record isSemigroup G & Choice G := {
   mul : G -> G -> G;
   mulgA : associative mul
 }.
 
-HB.builders Context G of isSemigroup G.
+HB.builders Context G & isSemigroup G.
 
 HB.instance Definition _ := hasMul.Build G mul.
 HB.instance Definition _ := Magma_isSemigroup.Build G mulgA.
@@ -282,18 +282,18 @@ End ClosedPredicates.
 
 End baseUMagmaTheory.
 
-HB.mixin Record BaseUMagma_isUMagma G of BaseUMagma G := {
+HB.mixin Record BaseUMagma_isUMagma G & BaseUMagma G := {
   mul1g : left_id one (@mul G);
   mulg1 : right_id one (@mul G)
 }.
 
-HB.factory Record Magma_isUMagma G of Magma G := {
+HB.factory Record Magma_isUMagma G & Magma G := {
   one : G;
   mul1g : left_id one (@mul G);
   mulg1 : right_id one (@mul G)
 }.
 
-HB.builders Context G of Magma_isUMagma G.
+HB.builders Context G & Magma_isUMagma G.
 HB.instance Definition _ := hasOne.Build G one.
 #[warning="-HB.no-new-instance"]
 HB.instance Definition _ := BaseUMagma_isUMagma.Build G mul1g mulg1.
@@ -325,29 +325,29 @@ End UMagmaTheory.
 #[short(type="monoidType")]
 HB.structure Definition Monoid := {G of Magma_isUMagma G & Semigroup G}.
 
-HB.factory Record Semigroup_isMonoid G of Semigroup G := {
+HB.factory Record Semigroup_isMonoid G & Semigroup G := {
   one : G;
   mul1g : left_id one mul;
   mulg1 : right_id one mul
 }.
 
-HB.builders Context G of Semigroup_isMonoid G.
+HB.builders Context G & Semigroup_isMonoid G.
 
 HB.instance Definition _ := Magma_isUMagma.Build G mul1g mulg1.
 
 HB.end.
 
-HB.factory Record UMagma_isMonoid G of UMagma G := {
+HB.factory Record UMagma_isMonoid G & UMagma G := {
   mulgA : associative (@mul G)
 }.
 
-HB.builders Context G of UMagma_isMonoid G.
+HB.builders Context G & UMagma_isMonoid G.
 
 HB.instance Definition _ := Magma_isSemigroup.Build G mulgA.
 
 HB.end.
 
-HB.factory Record isMonoid G of Choice G := {
+HB.factory Record isMonoid G & Choice G := {
   mul : G -> G -> G;
   one : G;
   mulgA : associative mul;
@@ -355,7 +355,7 @@ HB.factory Record isMonoid G of Choice G := {
   mulg1 : right_id one mul
 }.
 
-HB.builders Context G of isMonoid G.
+HB.builders Context G & isMonoid G.
 
 HB.instance Definition _ := hasMul.Build G mul.
 HB.instance Definition _ := Magma_isSemigroup.Build G mulgA.
@@ -474,7 +474,7 @@ Definition group_closed := 1 \in S /\ divg_closed.
 
 End ClosedPredicates.
 
-HB.mixin Record Monoid_isStarMonoid G of BaseGroup G := {
+HB.mixin Record Monoid_isStarMonoid G & BaseGroup G := {
   invgK : involutive (@inv G);
   invgM : {morph @inv G : x y / x * y >-> y * x}
 }.
@@ -487,7 +487,7 @@ Prenex Implicits invgK.
 
 Bind Scope group_scope with StarMonoid.sort.
 
-HB.factory Record isStarMonoid G of Choice G := {
+HB.factory Record isStarMonoid G & Choice G := {
   mul : G -> G -> G;
   one : G;
   inv : G -> G;
@@ -497,7 +497,7 @@ HB.factory Record isStarMonoid G of Choice G := {
   invgM : {morph inv : x y / mul x y >-> mul y x}
 }.
 
-HB.builders Context G of isStarMonoid G.
+HB.builders Context G & isStarMonoid G.
 
 Lemma invg1 : inv one = one.
 Proof.
@@ -556,7 +556,7 @@ End StarMonoidTheory.
 
 Arguments invg_inj {G} [x1 x2].
 
-HB.mixin Record StarMonoid_isGroup G of BaseGroup G := {
+HB.mixin Record StarMonoid_isGroup G & BaseGroup G := {
   mulVg : left_inverse one inv (@mul G);
 }.
 
@@ -564,12 +564,12 @@ HB.mixin Record StarMonoid_isGroup G of BaseGroup G := {
 HB.structure Definition Group :=
   {G of StarMonoid_isGroup G & BaseGroup G & StarMonoid G}.
 
-HB.factory Record Monoid_isGroup G of Monoid G & BaseGroup G := {
+HB.factory Record Monoid_isGroup G & Monoid G & BaseGroup G := {
   mulVg : left_inverse one inv (@mul G);
   mulgV : right_inverse one inv (@mul G);
 }.
 
-HB.builders Context G of Monoid_isGroup G.
+HB.builders Context G & Monoid_isGroup G.
 
 Fact invgK : involutive (@inv G).
 Proof. by move=> x; rewrite -[LHS]mul1g -(mulgV x) -mulgA mulgV mulg1. Qed.
@@ -588,7 +588,7 @@ HB.instance Definition _ := StarMonoid_isGroup.Build G mulVg.
 
 HB.end.
 
-HB.factory Record isGroup G of Choice G := {
+HB.factory Record isGroup G & Choice G := {
   one : G;
   inv : G -> G;
   mul : G -> G -> G;
@@ -599,7 +599,7 @@ HB.factory Record isGroup G of Choice G := {
   mulgV : right_inverse one inv mul
 }.
 
-HB.builders Context G of isGroup G.
+HB.builders Context G & isGroup G.
 
 HB.instance Definition _ := hasMul.Build G mul.
 HB.instance Definition _ := Magma_isSemigroup.Build G mulgA.
@@ -825,7 +825,7 @@ HB.factory Record isUMagmaMorphism (G H : baseUMagmaType) (f : G -> H) := {
   monoid_morphism_subproof : monoid_morphism f
 }.
 
-HB.builders Context G H apply of isUMagmaMorphism G H apply.
+HB.builders Context G H apply & isUMagmaMorphism G H apply.
 HB.instance Definition _ :=
   isMultiplicative.Build G H apply monoid_morphism_subproof.2.
 HB.instance Definition _ :=
@@ -836,7 +836,7 @@ HB.factory Record isGroupMorphism (G H : groupType) (f : G -> H) := {
   gmulfF : {morph f : x y / x / y}
 }.
 
-HB.builders Context G H apply of isGroupMorphism G H apply.
+HB.builders Context G H apply & isGroupMorphism G H apply.
 
 Local Lemma gmulf1 : apply 1 = 1.
 Proof. by rewrite -[1]divg1 gmulfF divgg. Qed.
@@ -1077,7 +1077,7 @@ End Group.
 End GroupPred. 
 
 HB.mixin Record isSubMagma (G : magmaType) (S : pred G) H
-    of SubType G S H & Magma H := {
+    & SubType G S H & Magma H := {
   valM_subproof : {morph (val : H -> G) : x y / x * y}
 }.
 
@@ -1093,11 +1093,11 @@ Lemma valM : {morph val : x y / x * y}. Proof. exact: gmulfM. Qed.
 End subMagma.
 
 HB.factory Record SubChoice_isSubMagma (G : magmaType) S H
-    of SubChoice G S H := {
+    & SubChoice G S H := {
   mulg_closed_subproof : mulg_closed S
 }.
 
-HB.builders Context G S H of SubChoice_isSubMagma G S H.
+HB.builders Context G S H & SubChoice_isSubMagma G S H.
 
 HB.instance Definition _ := isMulClosed.Build G S mulg_closed_subproof.
 
@@ -1118,11 +1118,11 @@ HB.structure Definition SubSemigroup (G : semigroupType) S :=
   { H of SubMagma G S H & Semigroup H}.
 
 HB.factory Record SubChoice_isSubSemigroup (G : semigroupType) S H
-    of SubChoice G S H := {
+    & SubChoice G S H := {
   mulg_closed_subproof : mulg_closed S
 }.
 
-HB.builders Context G S H of SubChoice_isSubSemigroup G S H.
+HB.builders Context G S H & SubChoice_isSubSemigroup G S H.
 
 HB.instance Definition _ :=
   SubChoice_isSubMagma.Build G S H mulg_closed_subproof.
@@ -1135,7 +1135,7 @@ HB.instance Definition _ := isSemigroup.Build H mulgA.
 HB.end.
 
 HB.mixin Record isSubBaseUMagma (G : baseUMagmaType) (S : pred G) H
-    of SubMagma G S H & BaseUMagma H := {
+    & SubMagma G S H & BaseUMagma H := {
   val1_subproof : (val : H -> G) 1 = 1
 }.
 
@@ -1156,11 +1156,11 @@ Lemma val1 : val 1 = 1. Proof. exact: gmulf1. Qed.
 End subUMagma.
 
 HB.factory Record SubChoice_isSubUMagma (G : umagmaType) S H
-    of SubChoice G S H := {
+    & SubChoice G S H := {
   umagma_closed_subproof : umagma_closed S
 }.
 
-HB.builders Context G S H of SubChoice_isSubUMagma G S H.
+HB.builders Context G S H & SubChoice_isSubUMagma G S H.
 
 HB.instance Definition _ :=
   SubChoice_isSubMagma.Build G S H (snd umagma_closed_subproof).
@@ -1189,11 +1189,11 @@ HB.structure Definition SubMonoid (G : monoidType) S :=
   { H of SubUMagma G S H & Monoid H}.
 
 HB.factory Record SubChoice_isSubMonoid (G : monoidType) S H
-    of SubChoice G S H := {
+    & SubChoice G S H := {
   monoid_closed_subproof : monoid_closed S
 }.
 
-HB.builders Context G S H of SubChoice_isSubMonoid G S H.
+HB.builders Context G S H & SubChoice_isSubMonoid G S H.
 
 HB.instance Definition _ :=
   SubChoice_isSubUMagma.Build G S H monoid_closed_subproof.
@@ -1207,11 +1207,11 @@ HB.structure Definition SubGroup (G : groupType) S :=
   { H of SubUMagma G S H & Group H}.
 
 HB.factory Record SubChoice_isSubGroup (G : groupType) S H
-    of SubChoice G S H := {
+    & SubChoice G S H := {
   group_closed_subproof : group_closed S
 }.
 
-HB.builders Context G S H of SubChoice_isSubGroup G S H.
+HB.builders Context G S H & SubChoice_isSubGroup G S H.
 
 Lemma umagma_closed : umagma_closed S.
 Proof.

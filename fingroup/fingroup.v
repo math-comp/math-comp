@@ -240,7 +240,7 @@ Bind Scope group_scope with FinGroup.sort.
 End FinGroupExports.
 HB.export FinGroupExports.
 
-HB.factory Record Finite_isGroup G of Finite G := {
+HB.factory Record Finite_isGroup G & Finite G := {
   mul : G -> G -> G;
   one : G;
   inv : G -> G;
@@ -256,7 +256,7 @@ End isMulGroup.
 #[deprecated(since="mathcomp 2.5.0", use=Finite_isGroup)]
 Notation isMulGroup G := (Finite_isGroup G) (only parsing).
 
-HB.builders Context G of Finite_isGroup G.
+HB.builders Context G & Finite_isGroup G.
 
 Notation "1" := one.
 Infix "*" := mul.

@@ -517,7 +517,7 @@ HB.factory Record isCountable (T : Type) : Type := {
   unpickle : nat -> option T;
   pickleK : pcancel pickle unpickle
 }.
-HB.builders Context T of isCountable T.
+HB.builders Context T & isCountable T.
   HB.instance Definition _ := Equality.copy T (pcan_type pickleK).
   HB.instance Definition _ := PCanHasChoice pickleK.
   HB.instance Definition _ := Choice_isCountable.Build T pickleK.
