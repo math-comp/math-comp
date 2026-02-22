@@ -57,8 +57,8 @@ We write
   ```
 
   If all the subgoals have the same importance, use bullets for all of
-  them, however, if one goal is more important than the others
-  (i.e. is main flow of the proof). Then you might remove the bullet
+  them. However, if one goal is more important than the others
+  (i.e., is main flow of the proof), then you might remove the bullet
   for this last one and unindent it as in:
   ```
   tactic.
@@ -66,6 +66,16 @@ We write
   - tactic. (* secondary subgoal 2 *)
   tactic. (* third subgoal is the main one *)
   ```
+  In this last cast, bullets can be removed as in:
+  ```
+  tactic.
+    tactic. (* secondary subgoal 1 *)
+    tactic. (* secondary subgoal 2 *)
+  tactic. (* third subgoal is the main one *)
+  ```
+  provided that it does not impair reading, for example when the secondary
+  subgoals are cleary appearing as such (e.g., one-liners, starting with
+  closing tacticals, preceded by a `last 2 first` tactical, etc.).
 
 ## Statements of lemmas, theorems and definitions
 
