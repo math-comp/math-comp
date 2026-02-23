@@ -109,7 +109,7 @@ From mathcomp Require Import bigop fintype finfun monoid div.
 (*                           maps the Nmodule structure of U to that of V, 0  *)
 (*                           to 0 and + to +                                  *)
 (*                        := (f 0 = 0) * {morph f : x y / x + y}              *)
-(*       zmod_morphisme f <-> f of type U -> V is a zmod morphism, i.e., f    *)
+(*        zmod_morphism f <-> f of type U -> V is a zmod morphism, i.e., f    *)
 (*                           maps the Zmodule structure of U to that of V, 0  *)
 (*                           to 0, - to - and + to + (equivalently, binary -  *)
 (*                           to -)                                            *)
