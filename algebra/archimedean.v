@@ -317,7 +317,7 @@ Qed.
 
 Lemma intr_ler_sqr x : x \is a int_num -> x <= x ^+ 2.
 Proof.
-move=> Zx; have [-> | nz_x] := eqVneq x 0; first by rewrite expr0n.
+move=> Zx; have [-> | nz_x] := eqVneq x 0; first by rewrite pow0rn.
 apply: le_trans (_ : `|x| <= _); first by rewrite real_ler_norm ?Rreal_int.
 by rewrite -intr_normK // ler_eXnr // norm_intr_ge1.
 Qed.

@@ -1036,7 +1036,7 @@ Qed.
 Lemma lin_charV_conj x : x \in G -> xi x^-1%g = (xi x)^*.
 Proof.
 move=> Gx; rewrite lin_charV // invC_norm mulrC normC_lin_char //.
-by rewrite expr1n divr1.
+by rewrite pow1rn divr1.
 Qed.
 
 Lemma lin_char_irr : xi \in irr G.
@@ -1048,7 +1048,7 @@ Qed.
 Lemma mul_conjC_lin_char : xi * xi^*%CF = 1.
 Proof.
 apply/cfun_inP=> x Gx.
-by rewrite !cfunE cfun1E Gx -normCK normC_lin_char ?expr1n.
+by rewrite !cfunE cfun1E Gx -normCK normC_lin_char ?pow1rn.
 Qed.
 
 Lemma lin_char_unitr : xi \in GRing.unit.
@@ -1089,7 +1089,7 @@ apply: (iffP idP) => [cGG i | CF_G].
   by rewrite irr_degree_abelian //; last apply: groupC.
 rewrite card_classes_abelian -NirrE -eqC_nat -irr_sum_square //.
 rewrite -{1}[Nirr G]card_ord -sumr_const; apply/eqP/eq_bigr=> i _.
-by rewrite lin_char1 ?expr1n ?CF_G.
+by rewrite lin_char1 ?pow1rn ?CF_G.
 Qed.
 
 Lemma irr_repr_lin_char (i : Iirr G) x :
@@ -1182,7 +1182,7 @@ rewrite -[d'](mulKVmx unitB) mxtrace_mulC -[_ *m _](repr_mxK rG Gx) rGx.
 rewrite -!mulmxA mulKVmx // (mulmxA d').
 suffices->: d' *m diag_mx e = 1%:M by rewrite mul1mx mulKmx.
 rewrite mulmx_diag -diag_const_mx; congr diag_mx; apply/rowP=> j.
-by rewrite [e]lock !mxE mulrC -normCK -lock norm1_e expr1n.
+by rewrite [e]lock !mxE mulrC -normCK -lock norm1_e pow1rn.
 Qed.
 
 Variables (A : {group aT}) (G : {group gT}).
@@ -2078,7 +2078,7 @@ rewrite (bigID [in D]) (reindex _ (bij_on_codom dprod_Iirr_inj (0, 0))) /=.
 have ->: #|G|%:R = \sum_i \sum_j 'chi_(dprod_Iirr (i, j)) 1%g ^+ 2.
   rewrite -(dprod_card KxH) natrM.
   do 2![rewrite -irr_sum_square (mulr_suml, mulr_sumr); apply: eq_bigr => ? _].
-  by rewrite dprod_IirrE -exprMn -{3}(mulg1 1%g) cfDprodE.
+  by rewrite dprod_IirrE -powMrn -{3}(mulg1 1%g) cfDprodE.
 rewrite (eq_bigl _ _ Df) pair_bigA addrC -subr_eq0 addrK.
 by move/eqP/psumr_eq0P=> -> //= i _; rewrite irr1_degree -natrX ler0n.
 Qed.
@@ -2611,7 +2611,7 @@ Lemma cfDetD :
   {in character &, {morph cfDet : phi psi / phi + psi >-> phi * psi}}.
 Proof.
 move=> phi psi Nphi Npsi; rewrite unlock /= -big_split; apply: eq_bigr => i _ /=.
-by rewrite -exprD cfdotDl truncnD ?nnegrE ?natr_ge0 // Cnat_cfdot_char_irr.
+by rewrite -powrDn cfdotDl truncnD ?nnegrE ?natr_ge0 // Cnat_cfdot_char_irr.
 Qed.
 
 Lemma cfDet0 : cfDet 0 = 1.
@@ -2680,7 +2680,7 @@ Proof.
 move=> Nphi; have [sGH | not_sHG] := boolP (H \subset G); last first.
   have /natrP[n Dphi1] := Cnat_char1 Nphi.
   rewrite !cfResEout // Dphi1 lin_char1 ?cfDet_lin_char // scale1r.
-  by rewrite scaler_nat cfDetMn ?cfDet_id ?rpred1 // expr1n.
+  by rewrite scaler_nat cfDetMn ?cfDet_id ?rpred1 // pow1rn.
 have [rG ->] := char_reprP Nphi; rewrite !(=^~ cfRepr_sub, cfDetRepr) //.
 apply: cfRepr_sim; exists 1%:M; rewrite ?row_free_unit ?unitmx1 // => x Hx.
 by rewrite mulmx1 mul1mx.
@@ -2693,7 +2693,7 @@ Proof.
 move=> Nphi; have [sGD | not_sGD] := boolP (G \subset D); last first.
   have /natrP[n Dphi1] := Cnat_char1 Nphi.
   rewrite !cfMorphEout // Dphi1 lin_char1 ?cfDet_lin_char // scale1r.
-  by rewrite scaler_nat cfDetMn ?cfDet_id ?rpred1 // expr1n.
+  by rewrite scaler_nat cfDetMn ?cfDet_id ?rpred1 // pow1rn.
 have [rG ->] := char_reprP Nphi; rewrite !(=^~ cfRepr_morphim, cfDetRepr) //.
 apply: cfRepr_sim; exists 1%:M; rewrite ?row_free_unit ?unitmx1 // => x Hx.
 by rewrite mulmx1 mul1mx.

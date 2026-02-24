@@ -929,7 +929,7 @@ have injw: {in 'Z(S) &, injective (irr_mode i0)}.
   by rewrite !{1}irr_center_scalar ?eq_xy; first by split.
 have prim_w e: 0 < e < p -> p.-primitive_root (w ^+ e).
   case/andP=> e_gt0 lt_e_p; apply/andP; split=> //.
-  apply/eqfunP=> -[d ltdp] /=; rewrite unity_rootE -exprM.
+  apply/eqfunP=> -[d ltdp] /=; rewrite unity_rootE -powrMn.
   rewrite -(irr_mode1 i0) -irr_modeX // (inj_in_eq injw) ?groupX ?group1 //.
   rewrite -order_dvdn ozp Euclid_dvdM // gtnNdvd //=.
   move: ltdp; rewrite leq_eqVlt.
@@ -965,7 +965,7 @@ have rphi_z i: rphi i z = (w ^+ i.+1)%:M.
 pose iphi i := irr_comp sS (rphi i); pose phi_ i := irr_repr (iphi i).
 have{} phi_ze i e: phi_ i (z ^+ e)%g = (w ^+ (e * i.+1)%N)%:M.
   rewrite /phi_ !{1}irr_center_scalar ?groupX ?irr_modeX //.
-  suffices ->: irr_mode (iphi i) z = w ^+ i.+1 by rewrite mulnC exprM.
+  suffices ->: irr_mode (iphi i) z = w ^+ i.+1 by rewrite mulnC powrMn.
   have:= mx_rsim_sym (rsim_irr_comp_pchar sS F'S (rphi_irr i)).
   case/mx_rsim_def=> B [B' _ homB]; rewrite /irr_mode homB // rphi_z.
   rewrite -{1}scalemx1 -scalemxAr -scalemxAl -{1}(repr_mx1 (rphi i)).
@@ -989,7 +989,7 @@ split=> // [i | ze | i].
   case/cyclePmin=> e; rewrite ozp => lt_e_p ->{ze}.
   case: (posnP e) => [-> | e_gt0 _]; first by rewrite eqxx.
   exists (w ^+ e) => [|i]; first by rewrite prim_w ?e_gt0.
-  by rewrite phi_ze exprM.
+  by rewrite phi_ze powrMn.
 rewrite deg_phi {i}; set d := irr_degree i0.
 apply/eqP; move/eqP: (sum_irr_degree_pchar sS F'S splitF).
 rewrite (bigID [in linS]) /= -/irr_degree.

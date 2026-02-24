@@ -139,7 +139,7 @@ Proof.
 case x_ge0: (0 <= x); last by exists 0.
 have le0x1: 0 <= x + 1 by rewrite -nnegrE rpredD ?rpred1.
 have [|y /andP[y_ge0 _]] := @poly_ivt ('X^2 - x%:P) _ _ le0x1.
-  rewrite !hornerE expr0n/= sub0r oppr_le0 x_ge0/= subr_ge0.
+  rewrite !hornerE pow0rn/= sub0r oppr_le0 x_ge0/= subr_ge0.
   by rewrite -[leLHS]mul1r ler_pM// (lerDl, lerDr).
 by rewrite rootE !hornerE subr_eq0; exists y.
 Qed.
@@ -412,7 +412,7 @@ Lemma real_leif_AGM2 x y :
   x \is real -> y \is real -> x * y <= mid x y ^+ 2 ?= iff (x == y).
 Proof.
 move=> Rx Ry; rewrite -(mono_leif (ler_pM2r (ltr_nat F 0 4))).
-rewrite mulr_natr (natrX F 2 2) -exprMn divfK ?pnatr_eq0 //.
+rewrite mulr_natr (natrX F 2 2) -powMrn divfK ?pnatr_eq0 //.
 exact: real_leif_AGM2_scaled.
 Qed.
 
@@ -597,7 +597,7 @@ Lemma sqrtr0 : sqrt 0 = 0 :> R.
 Proof. by move: (sqrtr_sqr 0); rewrite exprS mul0r => ->; rewrite normr0. Qed.
 
 Lemma sqrtr1 : sqrt 1 = 1 :> R.
-Proof. by move: (sqrtr_sqr 1); rewrite expr1n => ->; rewrite normr1. Qed.
+Proof. by move: (sqrtr_sqr 1); rewrite pow1rn => ->; rewrite normr1. Qed.
 
 Lemma sqrtr_eq0 a : (sqrt a == 0) = (a <= 0).
 Proof.
@@ -671,7 +671,7 @@ have JE x : x^* = `|x|^+2 / x.
   have [->|x_neq0] := eqVneq x 0; first by rewrite rmorph0 invr0 mulr0.
   by apply: (canRL (mulfK _)) => //; rewrite mulrC -normCK.
 move=> x; have [->|x_neq0] := eqVneq x 0; first by rewrite !rmorph0.
-rewrite !JE normrM normfV exprMn normrX normr_id.
+rewrite !JE normrM normfV powMrn normrX normr_id.
 by rewrite exprVn -mulrA -invfM mulrA -expr2 divKf// 2!sqrf_eq0 normr_eq0.
 Qed.
 
@@ -830,7 +830,7 @@ Lemma invCi : 'i^-1 = - 'i :> C.
 Proof. by rewrite -div1r -[1]opprK -sqrCi mulNr mulfK ?neq0Ci. Qed.
 
 Lemma conjCi : 'i^* = - 'i :> C.
-Proof. by rewrite -invCi invC_norm normCi expr1n invr1 mul1r. Qed.
+Proof. by rewrite -invCi invC_norm normCi pow1rn invr1 mul1r. Qed.
 
 Lemma Crect x : x = 'Re x + 'i * 'Im x.
 Proof.
@@ -970,7 +970,7 @@ Lemma normC2_rect :
   {in real &, forall x y, `|x + 'i * y| ^+ 2 = x ^+ 2 + y ^+ 2}.
 Proof.
 move=> x y Rx Ry; rewrite /= normCK rmorphD rmorphM /= conjCi !conj_Creal //.
-by rewrite mulrC mulNr -subr_sqr exprMn sqrCi mulN1r opprK.
+by rewrite mulrC mulNr -subr_sqr powMrn sqrCi mulN1r opprK.
 Qed.
 
 Lemma normC2_Re_Im z : `|z| ^+ 2 = 'Re z ^+ 2 + 'Im z ^+ 2.
@@ -1077,7 +1077,7 @@ move=> n_gt1; have [|w /eqP pw_0] := closed_rootP (\poly_(i < n) (1 : C)) _.
 rewrite horner_poly (eq_bigr _ (fun _ _ => mul1r _)) in pw_0.
 have wn1: w ^+ n = 1 by apply/eqP; rewrite -subr_eq0 subrX1 pw_0 mulr0.
 suffices /existsP[i ltRwi0]: [exists i : 'I_n, 'Re (w ^+ i) < 0].
-  by exists (w ^+ i) => //; rewrite exprAC wn1 expr1n.
+  by exists (w ^+ i) => //; rewrite exprAC wn1 pow1rn.
 apply: contra_eqT (congr1 Re pw_0) => /existsPn geRw0.
 rewrite raddf_sum raddf0 /= (bigD1 (Ordinal (ltnW n_gt1))) //=.
 rewrite (Creal_ReP _ _) ?rpred1 // gt_eqF ?ltr_wpDr ?ltr01 //=.
@@ -1096,7 +1096,7 @@ wlog leRI0yw: w wn1 ltRw0 / 0 <= 'Re y * 'Im w.
   case/real_ge0P=> [|/ltW leRIyw0]; first exact: IHw.
   apply: (IHw w^* ); rewrite ?Re_conj ?Im_conj ?mulrN ?oppr_ge0 //.
   by rewrite -rmorphXn wn1 rmorph1.
-exists (w * y); first by rewrite exprMn wn1 mul1r rootCK.
+exists (w * y); first by rewrite powMrn wn1 mul1r rootCK.
 rewrite [w]Crect [y]Crect mulC_rect.
 by rewrite Im_rect ?rpredD ?rpredN 1?rpredM // addr_ge0 // ltW ?nmulr_rgt0.
 Qed.
@@ -1109,7 +1109,7 @@ have Rx: x \is real by rewrite -[x](rootCK n_gt0) rpredX // ltr0_real.
 have Re_y: 'Re y = y by apply/Creal_ReP; rewrite ltr0_real.
 have [z zn_x leR0z]: exists2 z, z ^+ n = x & 'Re z >= 0.
   have [w wn1 ltRw0] := neg_unity_root n_gt1.
-  exists (w * y); first by rewrite exprMn wn1 mul1r rootCK.
+  exists (w * y); first by rewrite powMrn wn1 mul1r rootCK.
   by rewrite ReMr ?ltr0_real // ltW // nmulr_lgt0.
 without loss leI0z: z zn_x leR0z / 'Im z >= 0.
   move=> IHz; have: 'Im z \is real by [].
@@ -1177,7 +1177,7 @@ Proof. by move/(rootCX 0)/(_ ler01). Qed.
 
 Lemma rootCpX n x k : (k > 0)%N -> 0 <= x -> n.-root (x ^+ k) = n.-root x ^+ k.
 Proof.
-by case: n => [|n] k_gt0; [rewrite !root0C expr0n gtn_eqF | apply: rootCX].
+by case: n => [|n] k_gt0; [rewrite !root0C pow0rn gtn_eqF | apply: rootCX].
 Qed.
 
 Lemma rootCV n x : 0 <= x -> n.-root x^-1 = (n.-root x)^-1.
@@ -1214,12 +1214,12 @@ have nx_gt0: 0 < n.-root x by rewrite rootC_gt0.
 have Rnx: n.-root x \is real by rewrite ger0_real ?ltW.
 apply: eqC_semipolar; last 1 first; try apply/eqP.
 - by rewrite ImMl // !(Im_rootC_ge0, mulr_ge0, rootC_ge0).
-- by rewrite -(eqrXn2 n_gt0) // -!normrX exprMn !rootCK.
+- by rewrite -(eqrXn2 n_gt0) // -!normrX powMrn !rootCK.
 rewrite eq_le; apply/andP; split; last first.
-  rewrite rootC_Re_max ?exprMn ?rootCK ?ImMl //.
+  rewrite rootC_Re_max ?powMrn ?rootCK ?ImMl //.
   by rewrite mulr_ge0 ?Im_rootC_ge0 ?ltW.
 rewrite -[n.-root _](mulVKf (negbT (gt_eqF nx_gt0))) !(ReMl Rnx) //.
-rewrite ler_pM2l // rootC_Re_max ?exprMn ?exprVn ?rootCK ?mulKf ?gt_eqF //.
+rewrite ler_pM2l // rootC_Re_max ?powMrn ?exprVn ?rootCK ?mulKf ?gt_eqF //.
 by rewrite ImMl ?rpredV // mulr_ge0 ?invr_ge0 ?Im_rootC_ge0 ?ltW.
 Qed.
 
@@ -1318,7 +1318,7 @@ have{lin_xy} def2xy: `|x| * `|y| *+ 2 = x * y ^* + y * x ^*.
   by rewrite addrA -[RHS]addrA -!mulrDr -mulrDl -rmorphD -normCK lin_xy.
 have def_xy: x * y^* = y * x^*.
   apply/eqP; rewrite -subr_eq0 -[_ == 0](@expf_eq0 _ _ 2).
-  rewrite (canRL (subrK _) (subr_sqrDB _ _)) opprK -def2xy exprMn_n exprMn.
+  rewrite (canRL (subrK _) (subr_sqrDB _ _)) opprK -def2xy powrMn_n powMrn.
   by rewrite mulrN (@GRing.mul C).[AC (2*2) (1*4*(3*2))] -!normCK mulNrn addNr.
 have{def_xy def2xy} def_yx: `|y * x| = y * x^*.
   by apply: (mulIf nz2); rewrite !mulr_natr mulrC normrM def2xy def_xy.
@@ -1494,13 +1494,13 @@ Let a4gt0 : 0 < 4 * a. Proof. by rewrite mulr_gt0 ?ltr0n. Qed.
 Lemma deg2_poly_min x : p.[- b / (2 * a)] <= p.[x].
 Proof.
 rewrite [p]deg2_poly_canonical ?pnatr_eq0// -/a -/b -/c /delta !hornerE/=.
-by rewrite ler_pM2l// lerD2r mulNr addNr expr0n sqr_ge0.
+by rewrite ler_pM2l// lerD2r mulNr addNr pow0rn sqr_ge0.
 Qed.
 
 Lemma deg2_poly_minE : p.[- b / (2 * a)] = - delta / (4 * a).
 Proof.
 rewrite [p]deg2_poly_canonical ?pnatr_eq0// -/a -/b -/c -/delta !hornerE/=.
-by rewrite mulNr addNr expr0n add0r -mulNr mulrC -[LHS]mulrA invfM divfK.
+by rewrite mulNr addNr pow0rn add0r -mulNr mulrC -[LHS]mulrA invfM divfK.
 Qed.
 
 Lemma deg2_poly_gt0 : reflect (forall x, 0 < p.[x]) (delta < 0).
@@ -1582,7 +1582,7 @@ Let c := p`_0.
 Let pneq0 : p != 0. Proof. by rewrite -size_poly_gt0 degp. Qed.
 Let aneq0 : a != 0.
 Proof. by move: pneq0; rewrite -lead_coef_eq0 lead_coefE degp. Qed.
-Let sqa2 : 4 * a ^+ 2 = (2 * a) ^+ 2. Proof. by rewrite exprMn -natrX. Qed.
+Let sqa2 : 4 * a ^+ 2 = (2 * a) ^+ 2. Proof. by rewrite powMrn -natrX. Qed.
 Let nz2 : 2 != 0 :> F. Proof. by rewrite pnatr_eq0. Qed.
 
 Let delta := b ^+ 2 - 4 * a * c.
@@ -1620,7 +1620,7 @@ Let aa4gt0 : 0 < 4 * a * a. Proof. by rewrite mulr_gt0 ?ltr0n. Qed.
 Let xb4 x : (x + b / (2 * a)) ^+ 2 * (4 * a * a) = (x * (2 * a) + b) ^+ 2.
 Proof.
 have -> : 4 * a * a = (2 * a) ^+ 2 by rewrite expr2 mulrACA -natrM mulrA.
-by rewrite -exprMn mulrDl mulfVK ?mulf_neq0 ?pnatr_eq0.
+by rewrite -powMrn mulrDl mulfVK ?mulf_neq0 ?pnatr_eq0.
 Qed.
 
 Lemma deg2_poly_gt0l x : x < r1 -> 0 < p.[x].

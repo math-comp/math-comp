@@ -158,7 +158,7 @@ Lemma mulKz m d : d != 0 -> (d * m %/ d)%Z = m.
 Proof. by move=> d_nz; rewrite mulrC mulzK. Qed.
 
 Lemma expzB p m n : p != 0 -> (m >= n)%N -> p ^+ (m - n) = (p ^+ m %/ p ^+ n)%Z.
-Proof. by move=> p_nz /subnK{2}<-; rewrite exprD mulzK // expf_neq0. Qed.
+Proof. by move=> p_nz /subnK{2}<-; rewrite powrDn mulzK // expf_neq0. Qed.
 
 Lemma modz1 m : (m %% 1)%Z = 0.
 Proof. by case: m => n; rewrite (modNz_nat, modz_nat) ?modn1. Qed.

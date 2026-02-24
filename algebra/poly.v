@@ -1822,9 +1822,9 @@ Proof.
 wlog le_ji: i j / j <= i.
   move=> IH; case: (leqP j i) => [|/ltnW] /IH //.
   by rewrite eq_sym (eq_sym (j %% n)%N).
-rewrite -{1}(subnKC le_ji) exprD -prim_expr_mod eqn_mod_dvd //.
+rewrite -{1}(subnKC le_ji) powrDn -prim_expr_mod eqn_mod_dvd //.
 rewrite prim_order_dvd; apply/eqP/eqP=> [|->]; last by rewrite mulr1.
-move/(congr1 ( *%R (z ^+ (n - j %% n)))); rewrite mulrA -exprD.
+move/(congr1 ( *%R (z ^+ (n - j %% n)))); rewrite mulrA -powrDn.
 by rewrite subnK ?prim_expr_order ?mul1r // ltnW ?ltn_mod.
 Qed.
 
@@ -1833,7 +1833,7 @@ Proof.
 set d := gcdn k n; have d_gt0: (0 < d)%N by rewrite gcdn_gt0 orbC n_gt0.
 have [d_dv_k d_dv_n]: (d %| k /\ d %| n)%N by rewrite dvdn_gcdl dvdn_gcdr.
 set q := (n %/ d)%N; rewrite /q.-primitive_root ltn_divRL // n_gt0.
-apply/forallP=> i; rewrite unity_rootE -exprM -prim_order_dvd.
+apply/forallP=> i; rewrite unity_rootE -powrMn -prim_order_dvd.
 rewrite -(divnK d_dv_n) -/q -(divnK d_dv_k) mulnAC dvdn_pmul2r //.
 apply/eqP; apply/idP/idP=> [|/eqP->]; last by rewrite dvdn_mull.
 rewrite Gauss_dvdr; first by rewrite eqn_leq ltn_ord; apply: dvdn_leq.
@@ -1849,7 +1849,7 @@ Qed.
 Lemma prim_root_eq0 : (z == 0) = (n == 0%N).
 Proof.
 rewrite gtn_eqF//; apply/eqP => z0; have /esym/eqP := prim_expr_order.
-by rewrite z0 expr0n gtn_eqF//= oner_eq0.
+by rewrite z0 pow0rn gtn_eqF//= oner_eq0.
 Qed.
 
 End OnePrimitive.
@@ -1862,13 +1862,13 @@ apply/idP/idP=> [prim_zk | co_k_n].
   set d := gcdn k n; have dv_d_n: (d %| n)%N := dvdn_gcdr _ _.
   rewrite /coprime -/d -(eqn_pmul2r n_gt0) mul1n -{2}(gcdnMl n d).
   rewrite -{2}(divnK dv_d_n) (mulnC _ d) -muln_gcdr (gcdn_idPr _) //.
-  rewrite (prim_order_dvd prim_zk) -exprM -(prim_order_dvd prim_z).
+  rewrite (prim_order_dvd prim_zk) -powrMn -(prim_order_dvd prim_z).
   by rewrite muln_divCA_gcd dvdn_mulr.
-have zkn_1: z ^+ k ^+ n = 1 by rewrite exprAC (prim_expr_order prim_z) expr1n.
+have zkn_1: z ^+ k ^+ n = 1 by rewrite exprAC (prim_expr_order prim_z) pow1rn.
 have{zkn_1} [m prim_zk dv_m_n]:= prim_order_exists n_gt0 zkn_1.
 suffices /eqP <-: m == n by [].
 rewrite eqn_dvd dv_m_n -(@Gauss_dvdr n k m) 1?coprime_sym //=.
-by rewrite (prim_order_dvd prim_z) exprM (prim_expr_order prim_zk).
+by rewrite (prim_order_dvd prim_z) powrMn (prim_expr_order prim_zk).
 Qed.
 
 End PolynomialTheory.
@@ -2319,7 +2319,7 @@ Proof. by rewrite /(_ \Po p) map_polyXn hornerXn. Qed.
 Lemma coef_comp_poly_Xn p n i : 0 < n ->
   (p \Po 'X^n)`_i = if n %| i then p`_(i %/ n) else 0.
 Proof.
-move=> n_gt0; rewrite comp_polyE; under eq_bigr do rewrite -exprM mulnC.
+move=> n_gt0; rewrite comp_polyE; under eq_bigr do rewrite -powrMn mulnC.
 rewrite coef_sumMXn/=; case: dvdnP => [[j ->]|nD]; last first.
    by rewrite big1// => j /eqP ?; case: nD; exists j.
 under eq_bigl do rewrite eqn_mul2r gtn_eqF//.
@@ -2356,7 +2356,7 @@ Lemma prim_root_pcharF p : (p %| n)%N -> (p \in [pchar R]) = false.
 Proof.
 move=> pn; apply: contraTF isT => pchar_p; have p_prime := pcharf_prime pchar_p.
 have /dvdnP[[|k] n_eq_kp] := pn; first by rewrite n_eq_kp in (n_gt0).
-have /eqP := prim_expr_order prim_z; rewrite n_eq_kp exprM.
+have /eqP := prim_expr_order prim_z; rewrite n_eq_kp powrMn.
 rewrite -pFrobenius_autE -(pFrobenius_aut1 pchar_p) -subr_eq0 -rmorphB/=.
 rewrite pFrobenius_autE expf_eq0// prime_gt0//= subr_eq0.
 rewrite -(prim_order_dvd prim_z) n_eq_kp mulnC -dvdn_divRL// divnn/= dvdn1.
@@ -2601,7 +2601,7 @@ Lemma sum_drop_poly n p :
   \sum_(n <= i < size p) p`_i *: 'X^i = drop_poly n p * 'X^n.
 Proof.
 rewrite (big_addn 0) big_mkord /drop_poly poly_def mulr_suml.
-by apply: eq_bigr => i _; rewrite exprD scalerAl.
+by apply: eq_bigr => i _; rewrite powrDn scalerAl.
 Qed.
 
 Lemma drop_polyD m p q : drop_poly m (p + q) = drop_poly m p + drop_poly m q.
@@ -3230,7 +3230,7 @@ have n_gt0: n > 0 := prim_order_gt0 prim_z.
 rewrite (@all_roots_prod_XsubC _ ('X^n - 1) zn); first 1 last.
 - by rewrite size_XnsubC // size_map size_iota subn0.
 - apply/allP=> _ /mapP[i _ ->] /=; rewrite rootE !hornerE.
-  by rewrite exprAC (prim_expr_order prim_z) expr1n subrr.
+  by rewrite exprAC (prim_expr_order prim_z) pow1rn subrr.
 - rewrite uniq_rootsE map_inj_in_uniq ?iota_uniq // => i j.
   rewrite !mem_index_iota => ltin ltjn /eqP.
   by rewrite (eq_prim_root_expr prim_z) !modn_small // => /eqP.
@@ -3380,7 +3380,7 @@ Proof.
 rewrite [p]deg2_poly_canonical//= -/a -/b -/c -/delta /r1 /r2.
 rewrite ![(- b + _) * _]mulrDl 2!polyCD 2!opprD 2!addrA !mulNr !polyCN !opprK.
 rewrite -scalerAl [in RHS]mulrC -subr_sqr -polyC_exp -[4]/(2 * 2)%:R natrM.
-by rewrite -expr2 -exprMn [in RHS]exprMn exprVn r_sqrt_delta.
+by rewrite -expr2 -powMrn [in RHS]powMrn exprVn r_sqrt_delta.
 Qed.
 
 Lemma deg2_poly_root1 : root p r1.
@@ -3417,7 +3417,7 @@ Let a1 : a = 1. Proof. by move: (monicP monicp); rewrite lead_coefE degp. Qed.
 Let delta := b ^+ 2 - 4 * c.
 
 Lemma deg2_poly_canonical : p = (('X + (b / 2)%:P)^+2 - (delta / 4)%:P).
-Proof. by rewrite [p]deg2_poly_canonical// -/a a1 scale1r expr1n !mulr1. Qed.
+Proof. by rewrite [p]deg2_poly_canonical// -/a a1 scale1r pow1rn !mulr1. Qed.
 
 Variable r : F.
 Hypothesis r_sqrt_delta : r ^+ 2 = delta.

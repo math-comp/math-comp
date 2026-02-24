@@ -1285,7 +1285,7 @@ have alpha_e: alpha ^+ e = 1.
   rewrite -dvdn_cforder /e -card_quotient //.
   by rewrite cforder_lin_char_dvdG ?cfQuo_lin_char.
 have det_alphaXeta b: cfDet (alpha ^+ b * eta) = alpha ^+ (b * f) * nu.
-  by rewrite cfDet_mul_lin ?rpredX ?irr_char // -exprM -(cfRes1 N) etaNth.
+  by rewrite cfDet_mul_lin ?rpredX ?irr_char // -powrMn -(cfRes1 N) etaNth.
 have [b bf_mod_e]: exists b, b * f = 1 %[mod e].
   rewrite -(chinese_modl co_e_f 1 0) /chinese !mul0n addn0 !mul1n mulnC.
   by exists (egcdn f e).1.
@@ -1294,7 +1294,7 @@ have alpha_bf: alpha ^+ (b * f) = alpha.
 have /irrP[c Dc]: alpha ^+ b * eta \in irr G.
   by rewrite mul_lin_irr ?rpredX ?mem_irr.
 have chiN: 'Res 'chi_c = theta.
-  by rewrite -Dc rmorphM rmorphXn /= alphaN_1 expr1n mul1r.
+  by rewrite -Dc rmorphM rmorphXn /= alphaN_1 pow1rn mul1r.
 have det_chi: cfDet 'chi_c = mu by rewrite -Dc det_alphaXeta alpha_bf divrK.
 exists c => // c2 c2Nth det_c2_mu; apply: irr_inj.
 have [irrMc _ imMc _] := constt_Ind_ext nsNG chiN.
@@ -1443,7 +1443,7 @@ have DcN: 'Res[N] 'chi_c = lambda *+ f.
 have /lin_char_irr/irrP[d Dd]: cfDet 'chi_c ^+ b \is a linear_char.
   by rewrite rpredX // cfDet_lin_char.
 exists d; rewrite -{}Dd rmorphXn /= -cfDetRes ?irr_char // DcN.
-rewrite cfDetMn ?lin_charW // -exprM cfDet_id //.
+rewrite cfDetMn ?lin_charW // -powrMn cfDet_id //.
 rewrite -(expr_mod _ (exp_cforder _)) -cfDet_order_lin // -/m.
 by rewrite fb_mod_m /m cfDet_order_lin // expr_mod ?exp_cforder.
 Qed.
@@ -1499,7 +1499,7 @@ have co_e_mu_t: coprime e #[(mu / 'chi_t)%R]%CF.
   suffices dv_o_mu_t: #[(mu / 'chi_t)%R]%CF %| 'o(mu)%CF * 'o('chi_t)%CF.
     by rewrite (coprime_dvdr dv_o_mu_t) // coprimeMr o_mu co_e_lam.
   rewrite !cfDet_order_lin //; apply/dvdn_cforderP=> x Gx.
-  rewrite invr_lin_char // !cfunE exprMn -rmorphXn {2}mulnC /=.
+  rewrite invr_lin_char // !cfunE powMrn -rmorphXn {2}mulnC /=.
   by rewrite !(dvdn_cforderP _) ?conjC1 ?mulr1 // dvdn_mulr.
 have /eqP mu_t_1: mu / 'chi_t == 1.
   rewrite -(dvdn_cforder (_ / _)%R 1) -(eqnP co_e_mu_t) dvdn_gcd dvdnn andbT.

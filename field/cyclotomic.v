@@ -96,7 +96,7 @@ rewrite (reindex (fun k => Ordinal (fP k))); last first.
     by apply: val_inj; rewrite /= mulKn.
   rewrite in_d // => Dd; apply: val_inj; rewrite /= mulnC divnK // /q -Dd.
   by rewrite divnA ?mulKn ?dvdn_gcdl ?dvdn_gcdr.
-apply: eq_big => k; rewrite ?exprM // -val_eqE in_d //=.
+apply: eq_big => k; rewrite ?powrMn // -val_eqE in_d //=.
 rewrite -eqn_mul ?dvdn_gcdr ?gcdn_gt0 ?n_gt0 ?orbT //.
 rewrite -[n in gcdn _ n](divnK d_dv_n) -muln_gcdr mulnCA mulnA divnK //.
 by rewrite mulnC eqn_mul // divnn n_gt0 eq_sym.
@@ -188,7 +188,7 @@ have injf: injective (f e).
   by rewrite (chinese_modr co_e_n 0) modnMmr muln1 modn_small.
 rewrite [_ n](reindex_inj injf); apply: eq_big => k /=.
   by rewrite coprime_modl coprimeMl co_e_n andbT.
-by rewrite prim_expr_mod // mulnC exprM -Dz0.
+by rewrite prim_expr_mod // mulnC powrMn -Dz0.
 Qed.
 
 Lemma prod_Cyclotomic n :
@@ -279,7 +279,7 @@ rewrite map_poly_comp -[_.[_]]map_comp_poly /= => co_fg.
 suffices: coprimep (pZtoC f) (pZtoC (g \Po 'X^p)).
   move/coprimep_root=> /=/(_ (z ^+ k1))/implyP.
   rewrite map_comp_poly map_polyXn horner_comp hornerXn.
-  rewrite -exprM -Dk [_ == 0]gzk0 implybF => /negP[].
+  rewrite -powrMn -Dk [_ == 0]gzk0 implybF => /negP[].
   have: root pz (z ^+ k1).
     by rewrite root_cyclotomic // prim_root_exp_coprime.
   rewrite -Dpz -Dfg rmorphM rootM => /orP[] //= /IHk-> //.
@@ -300,8 +300,8 @@ case/d_dv_mon=> // f1 Df1 /d_dv_mon[|f2 ->].
   rewrite monicE lead_coefE size_comp_poly size_polyXn /=.
   rewrite comp_polyE coef_sum polySpred ?monic_neq0 //= mulnC.
   rewrite big_ord_recr /= -lead_coefE (monicP mon_g) scale1r.
-  rewrite -exprM coefXn eqxx big1 ?add0r // => i _.
-  rewrite coefZ -exprM coefXn eqn_pmul2l ?prime_gt0 //.
+  rewrite -powrMn coefXn eqxx big1 ?add0r // => i _.
+  rewrite coefZ -powrMn coefXn eqn_pmul2l ?prime_gt0 //.
   by rewrite eqn_leq leqNgt ltn_ord mulr0.
 have monFp h: h \is monic -> size (map_poly intr h) = size h.
   by move=> mon_h; rewrite size_poly_eq // -lead_coefE (monicP mon_h) oner_eq0.

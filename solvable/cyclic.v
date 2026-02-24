@@ -836,7 +836,7 @@ Lemma has_prim_root_subproof (F : fieldType) (n : nat) (rs : seq F)
     (prim_r : forall z : F, z ^+ n = 1 -> z \in rs)
     (r' := (fun s (e : s ^+ n = 1) => {| ssval := s; ssvalP := prim_r s e |})
        : forall s : F, s ^+ n = 1 -> seq_sub rs)
-    (sG_1 := r' 1 (expr1n F n) : seq_sub rs)
+    (sG_1 := r' 1 (pow1rn F n) : seq_sub rs)
     (sG_VP : forall s : seq_sub rs, r s ^+ n.-1 ^+ n = 1)
     (sG_MP : forall s s0 : seq_sub rs, (r s * r s0) ^+ n = 1)
     (sG_V := (fun s : seq_sub rs => r' (r s ^+ n.-1) (sG_VP s))
@@ -870,10 +870,10 @@ have rn1 x: r x ^+ n = 1.
   by apply/eqP; rewrite -unity_rootE (allP rsn1) ?(valP x).
 have prim_r z: z ^+ n = 1 -> z \in rs.
   by move/eqP; rewrite -unity_rootE -(mem_unity_roots n_gt0).
-pose r' := SeqSub (prim_r _ _); pose sG_1 := r' _ (expr1n _ _).
+pose r' := SeqSub (prim_r _ _); pose sG_1 := r' _ (pow1rn _ _).
 have sG_VP: r _ ^+ n.-1 ^+ n = 1.
-  by move=> x; rewrite -exprM mulnC exprM rn1 expr1n.
-have sG_MP: (r _ * r _) ^+ n = 1 by move=> x y; rewrite exprMn !rn1 mul1r.
+  by move=> x; rewrite -powrMn mulnC powrMn rn1 pow1rn.
+have sG_MP: (r _ * r _) ^+ n = 1 by move=> x y; rewrite powMrn !rn1 mul1r.
 pose sG_V := r' _ (sG_VP _); pose sG_M := r' _ (sG_MP _ _).
 have sG_Ag: associative sG_M by move=> x y z; apply: val_inj; rewrite /= mulrA.
 have sG_1g: left_id sG_1 sG_M by move=> x; apply: val_inj; rewrite /= mul1r.

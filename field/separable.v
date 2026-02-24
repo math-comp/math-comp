@@ -98,7 +98,7 @@ Lemma separable_nosquare p u k :
   separable p -> 1 < k -> size u != 1 -> (u ^+ k %| p) = false.
 Proof.
 move=> /separable_polyP[/poly_square_freeP sq'p _] /subnKC <- /sq'p.
-by apply: contraNF; apply: dvdp_trans; rewrite exprD dvdp_mulr.
+by apply: contraNF; apply: dvdp_trans; rewrite powrDn dvdp_mulr.
 Qed.
 
 Lemma separable_deriv_eq0 p u :
@@ -157,12 +157,12 @@ split=> [|u u_pg u_gt1]; last first.
 have pg_dv_p: p %/ g %| p by rewrite divp_dvd ?dvdp_gcdl.
 apply/poly_square_freeP=> u; rewrite neq_ltn ltnS leqn0 size_poly_eq0.
 case/predU1P=> [-> | /max_dvd_u[k]].
-  by apply: contra nz_p; rewrite expr0n -dvd0p => /dvdp_trans->.
+  by apply: contra nz_p; rewrite pow0rn -dvd0p => /dvdp_trans->.
 apply: contra => u2_dv_pg; case: k; [by rewrite dvd1p | elim=> [|n IHn]].
   exact: dvdp_trans (dvdp_mulr _ _) (dvdp_trans u2_dv_pg pg_dv_p).
 suff: u ^+ n.+2 %| (p %/ g) * g.
   by rewrite Pdiv.Idomain.divpK ?dvdp_gcdl // dvdpZr ?lcn_neq0.
-rewrite -add2n exprD dvdp_mul // dvdp_gcd.
+rewrite -add2n powrDn dvdp_mul // dvdp_gcd.
 rewrite (dvdp_trans _ IHn) ?exprS ?dvdp_mull //=.
 suff: u ^+ n %| ((p %/ u ^+ n.+1) * u ^+ n.+1)^`().
   by rewrite Pdiv.Idomain.divpK // derivZ dvdpZr ?lcn_neq0.
@@ -423,17 +423,17 @@ have pr_p := pcharf_prime pcharLp; have p_gt0 := prime_gt0 pr_p.
 apply/polyP=> i; rewrite coef_sum.
 have [[{}i ->] | p'i] := altP (@dvdnP p i); last first.
   rewrite big1 => [|j _]; last first.
-    rewrite coefZ -exprM coefXn [_ == _](contraNF _ p'i) ?mulr0 // => /eqP->.
+    rewrite coefZ -powrMn coefXn [_ == _](contraNF _ p'i) ?mulr0 // => /eqP->.
     by rewrite dvdn_mulr.
   rewrite (dvdn_pcharf pcharLp) in p'i; apply: mulfI p'i _ _ _.
   by rewrite mulr0 mulr_natl; case: i => // i; rewrite -coef_deriv f'0 coef0.
 have [ltri | leir] := leqP r.+1 i.
   rewrite nth_default ?sz_f ?Dn ?ltn_pmul2r ?big1 // => j _.
-  rewrite coefZ -exprM coefXn mulnC gtn_eqF ?mulr0 //.
+  rewrite coefZ -powrMn coefXn mulnC gtn_eqF ?mulr0 //.
   by rewrite ltn_pmul2l ?(leq_trans _ ltri).
 rewrite (bigD1 (Sub i _)) //= big1 ?addr0 => [|j i'j]; last first.
-  by rewrite coefZ -exprM coefXn mulnC eqn_pmul2l // mulr_natr mulrb ifN_eqC.
-by rewrite coef_poly leir coefZ -exprM coefXn mulnC eqxx mulr1.
+  by rewrite coefZ -powrMn coefXn mulnC eqn_pmul2l // mulr_natr mulrb ifN_eqC.
+by rewrite coef_poly leir coefZ -powrMn coefXn mulnC eqxx mulr1.
 Qed.
 
 Lemma separable_root_der : separable_element K x (+) root (minPoly K x)^`() x.
@@ -611,7 +611,7 @@ elim: n => // n IHn in x @d *; rewrite ltnS => le_d_n.
 have [[p pcharLp]|] := altP (separablePn_pchar K x); last by rewrite negbK; exists 1.
 case=> g Kg defKx; have p_pr := pcharf_prime pcharLp.
 suffices /IHn[m /andP[pcharLm sepKxpm]]: adjoin_degree K (x ^+ p) < n.
-  by exists (p * m)%N; rewrite pnatM pnatE // pcharLp pcharLm exprM.
+  by exists (p * m)%N; rewrite pnatM pnatE // pcharLp pcharLm powrMn.
 apply: leq_trans le_d_n; rewrite -ltnS -!size_minPoly.
 have nzKx: minPoly K x != 0 by rewrite monic_neq0 ?monic_minPoly.
 have nzg: g != 0 by apply: contra_eqN defKx => /eqP->; rewrite comp_poly0.
@@ -648,7 +648,7 @@ move=> pcharLp; apply/idP/idP=> [sepKx | /Fadjoin_poly_eq]; last first.
   by rewrite !mulr0 subr0 coprimep1.
 without loss{e} ->: e x sepKx / e = 0.
   move=> IH; elim: {e}e.+1 => [|e]; [exact: memv_adjoin | apply: subvP].
-  apply/FadjoinP/andP; rewrite subv_adjoin expnSr exprM (IH 0) //.
+  apply/FadjoinP/andP; rewrite subv_adjoin expnSr powrMn (IH 0) //.
   by have /adjoin_separableP-> := sepKx; rewrite ?rpredX ?memv_adjoin.
 set K' := <<K; x ^+ p>>%VS; have sKK': (K <= K')%VS := subv_adjoin _ _.
 pose q := minPoly K' x; pose g := 'X^p - (x ^+ p)%:P.
@@ -700,7 +700,7 @@ have pcharLp: p \in [pchar L] by rewrite (pnatPpi pcharLm) ?pi_pdiv.
 have [/p_natP[em Dm] /p_natP[en Dn]]: p.-nat m /\ p.-nat n.
   by rewrite -!(eq_pnat _ (pcharf_eq pcharLp)).
 rewrite Dn Dm ltn_exp2l ?prime_gt1 ?pdiv_prime // in ltnm.
-rewrite -(Fadjoin_idP Kxm) Dm -(subnKC ltnm) addSnnS expnD exprM -Dn.
+rewrite -(Fadjoin_idP Kxm) Dm -(subnKC ltnm) addSnnS expnD powrMn -Dn.
 by rewrite -pcharf_p_separable.
 Qed.
 
@@ -769,7 +769,7 @@ have [-> | /cyclic_or_large[|[b Dyb]]] := eqVneq y 0; first 2 [by left].
 pose h0 (ij : 'I_a.+1 * 'I_b.+1) := x ^+ ij.1 * y ^+ ij.2.
 pose H := <<[set ij | h0 ij == 1%R]>>%G; pose h (u : coset_of H) := h0 (repr u).
 have h0M: {morph h0: ij1 ij2 / (ij1 * ij2)%g >-> ij1 * ij2}.
-  by rewrite /h0 => [] [i1 j1] [i2 j2] /=; rewrite mulrACA -!exprD !expr_mod.
+  by rewrite /h0 => [] [i1 j1] [i2 j2] /=; rewrite mulrACA -!powrDn !expr_mod.
 have memH ij: (ij \in H) = (h0 ij == 1).
   rewrite /= gen_set_id ?inE //; apply/group_setP; rewrite inE [h0 _]mulr1.
   by split=> // ? ? /[!(inE, h0M)] /eqP-> /eqP->; rewrite mulr1.
@@ -886,7 +886,7 @@ Proof.
 have insepP := purely_inseparable_elementP_pchar.
 move=> /insepP[n pcharLn Kxn] /insepP[m pcharLm Kym]; apply/insepP.
 have pcharLnm: [pchar L].-nat (n * m)%N by rewrite pnatM pcharLn.
-by exists (n * m)%N; rewrite ?exprDn_pchar // {2}mulnC !exprM memvD // rpredX.
+by exists (n * m)%N; rewrite ?exprDn_pchar // {2}mulnC !powrMn memvD // rpredX.
 Qed.
 
 Lemma inseparable_sum I r (P : pred I) (v_ : I -> L) K :
@@ -1027,7 +1027,7 @@ Proof.
 have insepP := purely_inseparableP => /insepP insepK_M /insepP insepM_E.
 have insepPe := purely_inseparable_elementP_pchar.
 apply/insepP=> x /insepM_E/insepPe[n pcharLn /insepK_M/insepPe[m pcharLm Kxnm]].
-by apply/insepPe; exists (n * m)%N; rewrite ?exprM // pnatM pcharLn pcharLm.
+by apply/insepPe; exists (n * m)%N; rewrite ?powrMn // pnatM pcharLn pcharLm.
 Qed.
 
 End Separable.

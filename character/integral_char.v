@@ -76,7 +76,7 @@ have [Hx | /cfun0->] := boolP (x \in H); last by exists 0; rewrite rmorph0.
 have [e [_ [enx1 _] [-> _] _]] := repr_rsim_diag rH Hx.
 have /fin_all_exists[k Dk] i: exists k, e 0 i = z ^+ k.
   have [|k ->] := (prim_rootP prim_z) (e 0 i); last by exists k.
-  by have /dvdnP[q ->] := x_dv_n; rewrite mulnC exprM enx1 expr1n.
+  by have /dvdnP[q ->] := x_dv_n; rewrite mulnC powrMn enx1 pow1rn.
 exists (\sum_i w ^+ k i); rewrite rmorph_sum; apply/eq_bigr => i _.
 by rewrite rmorphXn /= Dz Dk.
 Qed.
@@ -469,7 +469,7 @@ transitivity ('chi_i x * 'chi_i (x^-1)%g *+ #|h x|); last first.
       by rewrite conjMg -mulgA /(z ^ v)%g cGz // mulKg.
     exists ((x * z) ^ v)%g (z^-1 * z1)%g; rewrite ?imset_f ?groupM ?groupV //.
     by rewrite conjMg -[RHS]mulgA /(z ^ v)%g cGz // mulKg mulKVg.
-  rewrite !irr_inv DchiZ ?groupJ ?cfunJ // rmorphM mulrACA -!normCK -exprMn.
+  rewrite !irr_inv DchiZ ?groupJ ?cfunJ // rmorphM mulrACA -!normCK -powMrn.
   by rewrite (normC_lin_char lin_lambda) ?mulr1 //= cfcenter_fful_irr.
 rewrite mulrAC -natrM mulr_natl; congr (_ *+ _).
 symmetry; rewrite /h /mul /= /set_mulg [in _ @2: (_, _)]unlock cardsE.

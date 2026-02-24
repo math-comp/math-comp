@@ -971,7 +971,7 @@ without loss ophi: phi / '[phi, psi] = 0.
     by rewrite cfdotBl cfdotZl divfK ?cfnorm_eq0 ?subrr.
   rewrite (canRL (subrK _) (erefl phi1)) rpredDr ?rpredZ ?memv_line //.
   rewrite cfdotDl ophi add0r cfdotZl normrM (ger0_norm (cfnorm_ge0 _)).
-  rewrite exprMn mulrA -cfnormZ cfnormDd; last by rewrite cfdotZr ophi mulr0.
+  rewrite powMrn mulrA -cfnormZ cfnormDd; last by rewrite cfdotZr ophi mulr0.
   by have:= IHo _ ophi; rewrite mulrDl -leifBLR subrr ophi normCK mul0r.
 rewrite ophi normCK mul0r; split; first by rewrite mulr_ge0 ?cfnorm_ge0.
 rewrite eq_sym mulf_eq0 orbC cfnorm_eq0 (negPf nz_psi) /=.

@@ -181,15 +181,15 @@ have /dvdzP[b Da]: (denq y %| a)%Z.
   apply: ZtoQinj; rewrite /ZtoQ rmorphM mulr_suml rmorph_sum /=.
   transitivity ((p1 ^ intr).[y] * (denq y ^+ d)%:~R).
     rewrite Dp1 !hornerE (rootP qy0) subr0.
-    by rewrite !rmorphXn /= numqE exprMn mulrA.
+    by rewrite !rmorphXn /= numqE powMrn mulrA.
   have sz_p1: (size (p1 ^ ZtoQ)%R <= d)%N.
     rewrite Dp1 size_scale ?intr_eq0 //; apply/leq_sizeP=> i.
     rewrite leq_eqVlt eq_sym -polySpred ?monic_neq0 // coefB coefXn.
     case: eqP => [-> _ | _ /(nth_default 0)->//].
     by rewrite -lead_coefE (monicP mon_q).
   rewrite (horner_coef_wide _ sz_p1) mulr_suml; apply: eq_bigr => i _.
-  rewrite -!mulrA -exprSr coef_map !rmorphM !rmorphXn /= numqE exprMn -mulrA.
-  by rewrite -exprD -addSnnS subnKC.
+  rewrite -!mulrA -exprSr coef_map !rmorphM !rmorphXn /= numqE powMrn -mulrA.
+  by rewrite -powrDn -addSnnS subnKC.
 pose m := `|(numq y * b + N)%R|%N.
 have Dm: m%:R = `|y * a%:~R + N%:R|.
   by rewrite pmulrn abszE intr_norm Da rmorphD !rmorphM /= numqE mulrAC mulrA.
@@ -816,9 +816,9 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     have Cv: v \in Cn by rewrite rpredD ?rpred1 ?memv_adjoin.
     have nz_v: v != 0 by rewrite (memPnC R'v) ?rpred0.
     apply: (IHw (v * w)); last 1 [|] || by rewrite fpredMl // subvP_adjoin.
-      by rewrite exprMn rpredM // rpredX.
-    rewrite exprMn fpredMr //=; last by rewrite expf_eq0 (memPnC C'w) ?rpred0.
-    by rewrite sqrrD Dit2 expr1n addrC addKr -mulrnAl fpredMl ?rpred_nat.
+      by rewrite powMrn rpredM // rpredX.
+    rewrite powMrn fpredMr //=; last by rewrite expf_eq0 (memPnC C'w) ?rpred0.
+    by rewrite sqrrD Dit2 pow1rn addrC addKr -mulrnAl fpredMl ?rpred_nat.
   pose rect_w2 u v := [/\ u \in Rn, v \in Rn & u + i_t * (v * 2) = w ^+ 2].
   have{Cw2} [u [v [Ru Rv Dw2]]]: {u : Qt & {v | rect_w2 u v}}.
     rewrite /rect_w2 -(Fadjoin_poly_eq Cw2); set p := Fadjoin_poly Rn i_t _.
@@ -845,9 +845,9 @@ have /all_sig[n_ FTA] z: {n | z \in sQ (z_ n)}.
     apply: contraNneq R'w2 => y2_0; rewrite -Dw2 mulrCA.
     suffices /eqP->: v == 0 by rewrite mul0r addr0.
     by rewrite y2_0 mulr0 eq_sym sqrf_eq0 fmorph_eq0 in px0.
-  apply/eqP/esym/(mulIf nz_x2); rewrite -exprMn -rmorphXn -Dw2 rmorphD rmorphM.
+  apply/eqP/esym/(mulIf nz_x2); rewrite -powMrn -rmorphXn -Dw2 rmorphD rmorphM.
   rewrite /= Dit mulrDl -expr2 mulrA divfK; last by rewrite expf_eq0 in nz_x2.
-  rewrite mulr_natr addrC sqrrD exprMn Di2 mulN1r -(eqP px0) -mulNr opprB.
+  rewrite mulr_natr addrC sqrrD powMrn Di2 mulN1r -(eqP px0) -mulNr opprB.
   by rewrite -mulrnAl -mulrnAr -rmorphMn -!mulrDl addrAC subrK.
 have inFTA n z: (n_ z <= n)%N -> z = ofQ (z_ n) (inQ (z_ n) z).
   by move/sCle=> le_zn; rewrite inQ_K ?le_zn.

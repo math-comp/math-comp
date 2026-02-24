@@ -320,7 +320,7 @@ by rewrite !invr_out ?unitrX_pos ?Ux.
 Qed.
 
 Lemma exprB m n x : n <= m -> x \is a unit -> x ^+ (m - n) = x ^+ m / x ^+ n.
-Proof. by move/subnK=> {2}<- Ux; rewrite exprD mulrK ?unitrX. Qed.
+Proof. by move/subnK=> {2}<- Ux; rewrite powrDn mulrK ?unitrX. Qed.
 
 Lemma invr_neq0 x : x != 0 -> x^-1 != 0.
 Proof.
@@ -489,7 +489,7 @@ Lemma divKr x : x \is a unit -> {in unit, involutive (fun y => x / y)}.
 Proof. by move=> Ux y Uy; rewrite /= invrM ?unitrV // invrK mulrC divrK. Qed.
 
 Lemma expr_div_n x y n : (x / y) ^+ n = x ^+ n / y ^+ n.
-Proof. by rewrite exprMn exprVn. Qed.
+Proof. by rewrite powMrn exprVn. Qed.
 
 Lemma unitr_prodP (I : eqType) (r : seq I) (P : pred I) (E : I -> R) :
   reflect {in r, forall i, P i -> E i \is a GRing.unit}
@@ -810,7 +810,7 @@ Proof. by move=> nz_x y; rewrite invf_div mulrC divfK. Qed.
 
 Lemma expfB_cond m n x : (x == 0) + n <= m -> x ^+ (m - n) = x ^+ m / x ^+ n.
 Proof.
-move/subnK=> <-; rewrite addnA addnK !exprD.
+move/subnK=> <-; rewrite addnA addnK !powrDn.
 have [-> | nz_x] := eqVneq; first by rewrite !mulr0 !mul0r.
 by rewrite mulfK ?expf_neq0.
 Qed.

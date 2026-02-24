@@ -121,7 +121,7 @@ Qed.
 Definition i := sqrt (- 1).
 
 Lemma sqrMi x: (i * x) ^+ 2 = - x ^+ 2.
-Proof. by rewrite exprMn sqrtK mulN1r. Qed.
+Proof. by rewrite powMrn sqrtK mulN1r. Qed.
 
 Lemma iJ : conj i = - i.
 Proof.
@@ -155,7 +155,7 @@ Qed.
 Definition norm x := sqrt x * conj (sqrt x).
 
 Lemma normK x : norm x ^+ 2 = x * conj x.
-Proof. by rewrite exprMn -rmorphXn sqrtK. Qed.
+Proof. by rewrite powMrn -rmorphXn sqrtK. Qed.
 
 Lemma normE x y : y ^+ 2 = x -> norm x = y * conj y.
 Proof.
@@ -170,7 +170,7 @@ Qed.
 
 Lemma normM x y : norm (x * y) = norm x * norm y.
 Proof.
-  by rewrite mulrACA -rmorphM; apply: normE; rewrite exprMn !sqrtK.
+  by rewrite mulrACA -rmorphM; apply: normE; rewrite powMrn !sqrtK.
 Qed.
 
 Lemma normN x : norm (- x) = norm x.
@@ -244,7 +244,7 @@ Proof.
   rewrite mulrDl !mulrDr [y * _ + _]addrC addrACA leB addrKA -leB.
   rewrite {}le_sqr ?posD //.
     by rewrite rmorphD !rmorphM /= !conjK addrC (mulrC x) (mulrC y).
-  rewrite -mulr_natr exprMn normK -natrX mulr_natr sqrrD mulrACA.
+  rewrite -mulr_natr powMrn normK -natrX mulr_natr sqrrD mulrACA.
   rewrite -rmorphM (mulrC y x) addrAC leB mulrnA mulr2n opprD addrACA.
   rewrite subrr addr0 {2}(mulrC x) rmorphM mulrACA -opprB addrAC -sqrrB -sqrMi.
   apply/posP; exists (i * (x * conj y - y * conj x)); congr (_ * _).
@@ -1074,7 +1074,7 @@ Lemma algC_pfactorCgt0 x y : x \isn't Creal -> y \is Creal ->
 Proof.
 move=> xNR yR; rewrite algC_pfactorCE// hornerM !hornerXsubC.
 rewrite [x]algCrect conjC_rect ?Creal_Re ?Creal_Im// !opprD !addrA opprK.
-rewrite -subr_sqr exprMn sqrCi mulN1r opprK ltr_wpDl//.
+rewrite -subr_sqr powMrn sqrCi mulN1r opprK ltr_wpDl//.
 - by rewrite real_exprn_even_ge0// ?rpredB// ?Creal_Re.
 by rewrite real_exprn_even_gt0 ?Creal_Im ?orTb//=; apply/eqP/Creal_ImP.
 Qed.
