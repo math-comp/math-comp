@@ -154,19 +154,16 @@ GIT_HASH := $(shell git describe --tags --exact-match 2>/dev/null || git rev-par
 # Set to -show-type-information-using-rocq-lsp to enable tooltips (memory heavy).
 ROCQNAVI_TYPE_INFO ?=
 
-$(DOCDIR)/dependency_graph.pre:
+$(DOCDIR)/depend.d:
 	mkdir -p $(DOCDIR)
-	coqdep -f _CoqProject | perl etc/builddoc_dependency_dot.pl > $(DOCDIR)/dependency_graph.pre
+	coqdep -f _CoqProject > $(DOCDIR)/depend.d
 
-$(DOCDIR)/dependency_graph.dot: $(DOCDIR)/dependency_graph.pre
-	tred $(DOCDIR)/dependency_graph.pre > $(DOCDIR)/dependency_graph.dot
-
-doc: build $(DOCDIR)/dependency_graph.dot
+doc: build $(DOCDIR)/depend.d
 	etc/rocqnavi_generate-hierarchy-graph.sh $(DOCDIR)/hierarchy_graph.dot
 	find . -name "*.v" -o -name "*.glob" | grep -v "/\." | grep -v "_opam/" | xargs rocqnavi \
 	-title "Mathematical Components $(GIT_HASH)" \
 	-d $(DOCDIR) -Q . mathcomp \
-	-file-graph $(DOCDIR)/dependency_graph.dot \
+	-file-graph-from-depend $(DOCDIR)/depend.d \
 	-structure-graph $(DOCDIR)/hierarchy_graph.dot \
 	-index-blacklist etc/rocqnavi_index-blacklist \
 	$(ROCQNAVI_TYPE_INFO)
