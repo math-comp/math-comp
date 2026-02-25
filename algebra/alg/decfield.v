@@ -455,7 +455,7 @@ elim: t r0 m => /=; try do [
   by elim: r1 m => //= u r1 IHr1 m; rewrite IHr1].
 move=> t1 IH r m letm /IH {IH} /(_ letm) {letm}.
 case: to_rterm => t1' r1 /= [def_r ub_t1' ub_r1 <-].
-rewrite size_rcons addnS leqnn -{1}cats1 takel_cat ?def_r; last first.
+rewrite size_rcons addnS leqnn -{1}cats1 takel_cat ?def_r.
   by rewrite -def_r size_take geq_min leqnn orbT.
 elim: r1 m ub_r1 ub_t1' {def_r} => /= [|u r1 IHr1] m => [_|[->]].
   by rewrite addn0 eqxx.
@@ -641,7 +641,7 @@ Lemma Pick_form_qf :
 Proof.
 move=> qfp qft qfe; have mA := (big_morph qf_form) true andb.
 rewrite mA // big1 //= => p _.
-rewrite mA // big1 => [|i _]; first by case: pick.
+rewrite mA // big1 => [i _|]; last by case: pick.
 by rewrite fun_if if_same /= qfp.
 Qed.
 
@@ -653,12 +653,12 @@ move=> P; rewrite ((big_morph qev) false orb) //= big_orE /=.
 apply/existsP/idP=> [[p] | true_at_P].
   rewrite ((big_morph qev) true andb) //= big_andE /=.
   case/andP=> /forallP-eq_p_P.
-  rewrite (@eq_pick _ _ P) => [|i]; first by case: pick.
+  rewrite (@eq_pick _ _ P) => [i|]; last by case: pick.
   by move/(_ i): eq_p_P => /=; case: (p i) => //= /negPf.
 exists [ffun i => P i] => /=; apply/andP; split.
   rewrite ((big_morph qev) true andb) //= big_andE /=.
   by apply/forallP=> i; rewrite /= ffunE; case Pi: (P i) => //=; apply: negbT.
-rewrite (@eq_pick _ _ P) => [|i]; first by case: pick true_at_P.
+rewrite (@eq_pick _ _ P) => [i|]; last by case: pick true_at_P.
 by rewrite ffunE.
 Qed.
 

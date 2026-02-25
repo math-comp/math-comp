@@ -432,7 +432,7 @@ have [y0 Fxy0 | Fx00] := pickP (F x0); last first.
   by rewrite !eq_card0 // => f; apply: contraFF (Fx00 (f x0))=> /familyP; apply.
 pose F1 x := if eqP is ReflectT Dx then xpred1 (ecast x (rT x) Dx y0) else F x.
 transitivity (#|[predX F x0 & family F1 : pred fT]|); last first.
-  rewrite cardX {}IH_E {uniqE}// => [|x E'x]; last first.
+  rewrite cardX {}IH_E {uniqE}// => [x E'x|].
     rewrite /F1; case: eqP => [Dx | /nesym/eqP-x0'x]; first exact: card1.
     by rewrite trivF // negb_or x0'x.
   congr (_ * foldr _ _ _); apply/eq_in_map=> x Ex.

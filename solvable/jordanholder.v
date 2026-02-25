@@ -203,15 +203,15 @@ have i1 : perm_eq (mksrepr G N1 :: mkfactors N1 st1)
   rewrite perm_cons -[mksrepr _ _ :: _]/(mkfactors N1 [:: N & sN]).
   apply: Hi=> //; rewrite /comps ?lst1 //= lsN csN andbT /=.
   rewrite -quotient_simple.
-    by rewrite -(isog_simple iso2) quotient_simple.
-  by rewrite (normalS (subsetIl N1 N2) (normal_sub nN1G)).
+    by rewrite (normalS (subsetIl N1 N2) (normal_sub nN1G)).
+  by rewrite -(isog_simple iso2) quotient_simple.
 have i2 : perm_eq (mksrepr G N2 :: mkfactors N2 st2)
                   [:: mksrepr G N2, mksrepr N2 N & mkfactors N sN].
   rewrite perm_cons -[mksrepr _ _ :: _]/(mkfactors N2 [:: N & sN]).
   apply: Hi=> //; rewrite /comps ?lst2 //= lsN csN andbT /=.
   rewrite -quotient_simple.
-    by rewrite -(isog_simple iso1) quotient_simple.
-  by rewrite (normalS (subsetIr N1 N2) (normal_sub nN2G)).
+    by rewrite (normalS (subsetIr N1 N2) (normal_sub nN2G)).
+  by rewrite -(isog_simple iso1) quotient_simple.
 pose fG1 := [:: mksrepr G N1, mksrepr N1 N & mkfactors N sN].
 pose fG2 := [:: mksrepr G N2, mksrepr N2 N & mkfactors N sN].
 have i3 : perm_eq fG1 fG2.
@@ -261,8 +261,8 @@ Proof.
 move=> aAN1 aAN2.
 apply/subsetP=> x Ax; rewrite !inE Ax /=; apply/subsetP=> y Ny /[1!inE].
 case/setIP: Ny=> N1y N2y; rewrite inE ?astabs_act  ?N1y ?N2y //.
-- by move/subsetP: aAN2; move/(_ x Ax).
 - by move/subsetP: aAN1; move/(_ x Ax).
+- by move/subsetP: aAN2; move/(_ x Ax).
 Qed.
 
 Lemma gastabsP (S : {set rT}) (a : aT) :
@@ -626,8 +626,8 @@ have nNN2 : N <| N2.
 have aN : [ acts A, on N1 :&: N2 | to].
   apply/subsetP=> x Ax; rewrite !inE Ax /=; apply/subsetP=> y Ny; rewrite inE.
   case/setIP: Ny=> N1y N2y. rewrite inE ?astabs_act  ?N1y ?N2y //.
-    by move/subsetP: aN2; move/(_ x Ax).
-  by move/subsetP: aN1; move/(_ x Ax).
+    by move/subsetP: aN1; move/(_ x Ax).
+  by move/subsetP: aN2; move/(_ x Ax).
 have i1 : perm_eq (mksrepr G N1 :: mkfactors N1 st1)
                   [:: mksrepr G N1, mksrepr N1 N & mkfactors N sN].
   rewrite perm_cons -[mksrepr _ _ :: _]/(mkfactors N1 [:: N & sN]).
@@ -636,8 +636,8 @@ have i1 : perm_eq (mksrepr G N1 :: mkfactors N1 st1)
   apply: asimpleI => //.
     by apply: subset_trans (normal_norm nN2G); apply: normal_sub.
   rewrite -quotientMidl (maxainvM _ _ maxN_2) //.
-    by apply: maxainv_asimple_quo.
-  by move=> e; apply: neN12.
+    by move=> e; apply: neN12.
+  by apply: maxainv_asimple_quo.
 have i2 : perm_eq (mksrepr G N2 :: mkfactors N2 st2)
                   [:: mksrepr G N2, mksrepr N2 N & mkfactors N sN].
   rewrite perm_cons -[mksrepr _ _ :: _]/(mkfactors N2 [:: N & sN]).

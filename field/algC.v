@@ -1109,7 +1109,7 @@ wlog p_monic : p / p \is monic => [hwlog|].
   have [|r] := hwlog ((lead_coef p)^-1 *: p).
     by rewrite monicE lead_coefZ mulVf ?lead_coef_eq0//.
   rewrite !lead_coefZ mulVf ?lead_coef_eq0//= scale1r.
-  rewrite map_polyZ/= => /(canRL (scalerKV _))->; first by exists r.
+  rewrite map_polyZ/= => /(canRL (scalerKV _))->; last by exists r.
   by rewrite fmorph_eq0 lead_coef_eq0.
 suff: {r : seq algC | p ^^ algRval = \prod_(z <- r) algC_pfactor z}.
   by move=> [r rP]; exists r; rewrite rP (monicP _)// scale1r.

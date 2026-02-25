@@ -1144,9 +1144,9 @@ pose fL : {linear _ -> _} := HB.pack f flM.
 exists fL => freeX eq_szX.
 apply/esym/(@eq_from_nth _ 0); rewrite ?size_map eq_szX // => i ltiX.
 rewrite (nth_map 0) //= /f (bigD1 (Ordinal ltiX)) //=.
-rewrite big1 => [|j /negbTE neqji]; rewrite (coord_free (Ordinal _)) //.
-  by rewrite eqxx scale1r addr0.
-by rewrite eq_sym neqji scale0r.
+rewrite big1 => [j /negbTE neqji|]; rewrite (coord_free (Ordinal _)) //.
+  by rewrite eq_sym neqji scale0r.
+by rewrite eqxx scale1r addr0.
 Qed.
 
 (* Subspace bases *)
@@ -2031,8 +2031,8 @@ exists (fun rw : 'rV_(\dim U) => vsproj (\sum_i rw 0 i *: (vbasis U)`_i)).
   move=> w /=; congr (vsproj _ = w): (vsvalK w).
   by rewrite {1}(coord_vbasis (subvsP w)); apply: eq_bigr => i _; rewrite mxE.
 move=> rw; apply/rowP=> i; rewrite mxE vsprojK.
-  by rewrite coord_sum_free ?(basis_free (vbasisP U)).
-by apply: rpred_sum => j _; rewrite rpredZ ?vbasis_mem ?memt_nth.
+  by apply: rpred_sum => j _; rewrite rpredZ ?vbasis_mem ?memt_nth.
+by rewrite coord_sum_free ?(basis_free (vbasisP U)).
 Qed.
 
 HB.instance Definition _ := Lmodule_hasFinDim.Build K subvs_of subvs_vect_iso.

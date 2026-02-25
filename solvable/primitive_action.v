@@ -62,7 +62,7 @@ apply/forallP/maximal_eqP=> /= [primG | [_ maxCx] Q].
   have defH: 'N_(G)(X | to) = H.
     have trH: [transitive H, on X | to] by apply/imsetP; exists x.
     have sHN: H \subset 'N_G(X | to) by rewrite subsetI sHG atrans_acts.
-    move/(subgroup_transitiveP Xx sHN): (trH) => /= <-.
+    move/(subgroup_transitiveP Xx sHN): (trH) => /= <-; last first.
       by rewrite mulSGid //= setIAC subIset ?sCH.
     apply/imsetP; exists x => //; apply/eqP.
     by rewrite eqEsubset imsetS // acts_sub_orbit ?subsetIr.

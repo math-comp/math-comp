@@ -680,7 +680,7 @@ Lemma expgnFr x m n : n <= m -> x ^+ (m - n) = x ^+ m / x ^+ n.
 Proof. by move=> lenm; rewrite -[in RHS](subnK lenm) expgnDr mulgK. Qed.
 
 Lemma expgnFl x y n : commute x y -> (x / y) ^+ n = x ^+ n / y ^+ n.
-Proof. by move=> xyC; rewrite expgMn 1?expVgn; last exact/commuteV. Qed.
+Proof. by move=> xyC; rewrite expgMn 1?expVgn; first exact/commuteV. Qed.
 
 Lemma conjgC x y : x * y = y * x ^ y.
 Proof. by rewrite mulVKg. Qed.

@@ -619,7 +619,7 @@ have Df1 u: inLz (f1 u) = f (inLz u).
   elim/last_ind: r1 {u}(inLz u) => [|r1 y IHr1] u.
     by rewrite Fadjoin_nil => _ Fu; rewrite fFid // (subvP (sub1v _)).
   rewrite all_rcons adjoin_rcons => /andP[rr1 ry] /Fadjoin_polyP[pu r1pu ->].
-  rewrite (kHom_horner homLf) -defLz; last exact: seqv_sub_adjoin; last first.
+  rewrite (kHom_horner homLf) -defLz; [|exact: seqv_sub_adjoin|].
     by apply: polyOverS r1pu; apply/subvP/adjoin_seqSr/allP.
   apply: rpred_horner.
     by apply/polyOverP=> i; rewrite coef_map /= defLz IHr1 ?(polyOverP r1pu).
@@ -1213,7 +1213,7 @@ have x_ (i : 'I_n): {x | x \in 'Gal(<<K; a>> / K) & x a = r`_i}.
   by rewrite splitKa root_prod_XsubC mem_nth.
 have /card_image <-: injective (fun i => s2val (x_ i)).
   move=> i j /eqP; case: (x_ i) (x_ j) => y /= galEy Dya [z /= galEx Dza].
-  rewrite gal_adjoin_eq // Dya Dza nth_uniq // => [/(i =P j)//|].
+  rewrite gal_adjoin_eq // Dya Dza nth_uniq // => [|/(i =P j)//].
   by rewrite -separable_prod_XsubC -splitKa; apply: separable_generatorP.
 apply/eqP/eq_card=> x; apply/codomP/idP=> [[i ->] | galEx]; first by case: x_.
 have /(nthP 0) [i ltin Dxa]: x a \in r.
@@ -1293,7 +1293,7 @@ rewrite -fixedKE; apply/polyOverP => i; apply/fixedFieldP=> [|x galEx].
   rewrite (polyOverP _) // big_map rpred_prod // => b _.
   by rewrite polyOverXsubC memv_gal.
 rewrite -coef_map rmorph_prod; congr (_ : {poly _})`_i.
-symmetry; rewrite (perm_big (map x r)) /= ?(big_map x).
+symmetry; rewrite (perm_big (map x r)) /= ?(big_map x); last first.
   by apply: eq_bigr => b _; rewrite rmorphB /= map_polyX map_polyC.
 have Uxr: uniq (map x r) by rewrite map_inj_uniq //; apply: fmorph_inj.
 have /uniq_min_size: {subset map x r <= r}.
@@ -1364,7 +1364,7 @@ transitivity (\prod_(j < i.+1) (x ^+ j)%g a).
   by apply: eq_bigr => j _; rewrite expgSr galM ?lfunE.
 have [/modn_small->//||->] := ltngtP i.+1 n; first by rewrite ltnNge ltn_ord.
 rewrite modnn big_ord0; apply: etrans normEa1; rewrite /galNorm DgalE -im_Zpm.
-rewrite morphimEdom big_imset /=; last exact/injmP/injm_Zpm.
+rewrite morphimEdom big_imset /=; first exact/injmP/injm_Zpm.
 by apply: eq_bigl => j /=; rewrite mem_Zp ?order_gt1.
 Qed.
 

@@ -1029,7 +1029,7 @@ Lemma eqmx_rowsub_comp (m n p q : nat) f (g : 'I_n -> 'I_p) (A : 'M_(m, q)) :
 Proof.
 move=> leq_pn g_inj; have eq_np : n == p by rewrite eqn_leq leq_pn (inj_leq g).
 rewrite (eqP eq_np) in g g_inj *.
-rewrite (eq_rowsub (f \o (perm g_inj))); last by move=> i; rewrite /= permE.
+rewrite (eq_rowsub (f \o (perm g_inj))); first by move=> i; rewrite /= permE.
 exact: eqmx_rowsub_comp_perm.
 Qed.
 
@@ -1620,7 +1620,7 @@ Proof.
 apply/eqP; set K := kermx B; set C := (A :&: K)%MS.
 rewrite -(eqmxMr B (eq_row_base A)); set K' := _ *m B.
 rewrite -{2}(subnKC (rank_leq_row K')) -mxrank_ker eqn_add2l.
-rewrite -(mxrankMfree _ (row_base_free A)) mxrank_leqif_sup.
+rewrite -(mxrankMfree _ (row_base_free A)) mxrank_leqif_sup; last first.
   by rewrite sub_capmx -(eq_row_base A) submxMl sub_kermx -mulmxA mulmx_ker/=.
 have /submxP[C' defC]: (C <= row_base A)%MS by rewrite eq_row_base capmxSl.
 by rewrite defC submxMr // sub_kermx mulmxA -defC -sub_kermx capmxSr.
@@ -1695,7 +1695,7 @@ Lemma mxrank_sum_cap m1 m2 n (A : 'M_(m1, n)) (B : 'M_(m2, n)) :
 Proof.
 set C := (A :&: B)%MS; set D := (A :\: B)%MS.
 have rDB: \rank (A + B)%MS = \rank (D + B)%MS.
-  apply/eqP; rewrite mxrank_leqif_sup; first by rewrite addsmxS ?diffmxSl.
+  apply/eqP; rewrite mxrank_leqif_sup; last by rewrite addsmxS ?diffmxSl.
   by rewrite addsmx_sub addsmxSr -(addsmx_diff_cap_eq A B) addsmxS ?capmxSr.
 rewrite {1}rDB mxrank_disjoint_sum ?capmx_diff //.
 by rewrite addnC addnA mxrank_cap_compl.
@@ -1865,7 +1865,7 @@ Qed.
 
 Lemma eq_maxrowsub : (rowsub mxf A :=: A)%MS.
 Proof.
-apply/eqmxP; rewrite -(eq_leqif (mxrank_leqif_eq _))//.
+apply/eqmxP; rewrite -(eq_leqif (mxrank_leqif_eq _))//; last first.
   exact: maxrowsub_free.
 apply/row_subP => i; apply/submxP; exists (delta_mx 0 (mxf i)).
 by rewrite -rowE; apply/rowP => j; rewrite !mxE.
@@ -2128,7 +2128,7 @@ set Q := P; have [m] := ubnP #|Q|; have: Q \subset P by [].
 elim: m Q => // m IHm Q /subsetP-sQP.
 case: (pickP Q) => [i Qi | Q0]; last by rewrite !big_pred0 ?mxrank0.
 rewrite (cardD1x Qi) !((bigD1 i) Q) //=.
-move/IHm=> <- {IHm}/=; last by apply/subsetP=> j /andP[/sQP].
+move/IHm=> <- {IHm}/=; first by apply/subsetP=> j /andP[/sQP].
 case: (dxS i (sQP i Qi)) => /eqnP=> <- TiQ_0; rewrite mxrank_disjoint_sum //.
 apply/eqP; rewrite -submx0 -{2}TiQ_0 capmxS //=.
 by apply/sumsmx_subP=> j /= /andP[Qj i'j]; rewrite (sumsmx_sup j) ?[P j]sQP.
@@ -2242,11 +2242,11 @@ have nz_aij: a_ i - a_ j != 0.
   by case/andP: Pi'j => Pj ne_ji; rewrite subr_eq0 eq_sym (inj_in_eq inj_a).
 case: (sub_dsumsmx dxVi' (sub0mx 1 _)) => C _ _ uniqC.
 rewrite -(eqmx_eq0 (eqmx_scale _ nz_aij)).
-rewrite (uniqC (fun k => (a_ i - a_ k) *: u k)) => // [|k Pi'k|].
-- by rewrite -(uniqC (fun _ => 0)) ?big1 // => k Pi'k; apply: sub0mx.
+rewrite (uniqC (fun k => (a_ i - a_ k) *: u k)) => // [k Pi'k| |].
 - by rewrite scalemx_sub ?Vi'u.
-rewrite -{1}(subrr (v *m g)) {1}def_vg def_v scaler_sumr mulmx_suml -sumrB.
-by apply: eq_bigr => k /Vi'u/eigenspaceP->; rewrite scalerBl.
+- rewrite -{1}(subrr (v *m g)) {1}def_vg def_v scaler_sumr mulmx_suml -sumrB.
+  by apply: eq_bigr => k /Vi'u/eigenspaceP->; rewrite scalerBl.
+by rewrite -(uniqC (fun _ => 0)) ?big1 // => k Pi'k; apply: sub0mx.
 Qed.
 
 End Eigenspace.
@@ -2483,12 +2483,12 @@ have: m <= n by []; elim: m => [_ | m IHm /ltnW-le_mn].
   by rewrite flatmx0 !inE mxrank.unlock !eqxx.
 rewrite big_nat_recr // -{}IHm //= !subSS mulnBr muln1 -expnD subnKC //.
 rewrite -sum_nat_const /= -sum1_card -add1n.
-rewrite (partition_big dsubmx (fr m)) /= => [|A]; last first.
+rewrite (partition_big dsubmx (fr m)) /= => [A|].
   rewrite !inE -{1}(vsubmxK A); move: {A}(_ A) (_ A) => Ad Au Afull.
   rewrite eqn_leq rank_leq_row -(leq_add2l (\rank Au)) -mxrank_sum_cap.
   rewrite {1 3}[@mxrank]lock addsmxE (eqnP Afull) -lock -addnA.
   by rewrite leq_add ?rank_leq_row ?leq_addr.
-apply: eq_bigr => A rAm; rewrite (reindex (col_mx^~ A)) /=; last first.
+apply: eq_bigr => A rAm; rewrite (reindex (col_mx^~ A)) /=.
   exists usubmx => [v _ | vA]; first by rewrite col_mxKu.
   by case/andP=> _ /eqP <-; rewrite vsubmxK.
 transitivity #|~: [set v *m A | v in 'rV_m]|; last first.
@@ -2515,7 +2515,7 @@ elim: {n'}n => [|n IHn].
 rewrite !big_nat_recr //= expnD mulnAC mulnA -{}IHn -mulnA mulnC.
 set LHS := #|_|; rewrite -[n.+1]muln1 -{2}[n]mul1n {}/LHS.
 rewrite -!card_mx subn1 -(cardC1 0) -mulnA; set nzC := predC1 _.
-rewrite -sum1_card (partition_big lsubmx nzC) => [|A]; last first.
+rewrite -sum1_card (partition_big lsubmx nzC) => [A|].
   rewrite unitmxE unitfE; apply: contra; move/eqP=> v0.
   rewrite -[A]hsubmxK v0 -[n.+1]/(1 + n)%N -col_mx0.
   rewrite -[rsubmx _]vsubmxK -det_tr tr_row_mx !tr_col_mx !trmx0.
@@ -2532,7 +2532,7 @@ have def_a: usubmx v1 = a%:M.
 pose Schur := dsubmx v1 *m (a^-1 *: u).
 pose L : 'M_(1 + n) := block_mx a%:M 0 (dsubmx v1) 1%:M.
 pose U B : 'M_(1 + n) := block_mx 1 (a^-1 *: u) 0 B.
-rewrite (reindex (fun B => L *m U B)); last first.
+rewrite (reindex (fun B => L *m U B)).
   exists (fun A1 => drsubmx A1 - Schur) => [B _ | A1].
     by rewrite mulmx_block block_mxKdr mul1mx addrC addKr.
   rewrite !inE mulmx_block !mulmx0 mul0mx !mulmx1 !addr0 mul1mx addrC subrK.
@@ -2906,14 +2906,14 @@ apply/eqmxP/andP; split.
     have Rz2 := submx_trans R2z2 (addsmxSr R1 R2).
     rewrite -{1}[z.1](addrK z.2) mulmxBr (cent_mxP Cz) // mulmxDl.
     rewrite [A *m z.2]memmx0 1?[z.2 *m A]memmx0 ?addrK //.
-      by rewrite -dxR12 sub_capmx (mulsmx_subP idlR1) // (mulsmx_subP idrR2).
-    by rewrite -dxR12 sub_capmx (mulsmx_subP idrR1) // (mulsmx_subP idlR2).
+      by rewrite -dxR12 sub_capmx (mulsmx_subP idrR1) // (mulsmx_subP idlR2).
+    by rewrite -dxR12 sub_capmx (mulsmx_subP idlR1) // (mulsmx_subP idrR2).
   apply/cent_mxP=> A R2_A; have R_A := submx_trans R2_A (addsmxSr R1 R2).
   have Rz1 := submx_trans R1z1 (addsmxSl R1 R2).
   rewrite -{1}[z.2](addKr z.1) mulmxDr (cent_mxP Cz) // mulmxDl.
   rewrite mulmxN [A *m z.1]memmx0 1?[z.1 *m A]memmx0 ?addKr //.
-    by rewrite -dxR12 sub_capmx (mulsmx_subP idrR1) // (mulsmx_subP idlR2).
-  by rewrite -dxR12 sub_capmx (mulsmx_subP idlR1) // (mulsmx_subP idrR2).
+    by rewrite -dxR12 sub_capmx (mulsmx_subP idlR1) // (mulsmx_subP idrR2).
+  by rewrite -dxR12 sub_capmx (mulsmx_subP idrR1) // (mulsmx_subP idlR2).
 rewrite addsmx_sub; apply/andP; split.
   apply/memmx_subP=> z; rewrite sub_capmx => /andP[R1z cR1z].
   have Rz := submx_trans R1z (addsmxSl R1 R2).
@@ -2922,16 +2922,16 @@ rewrite addsmx_sub; apply/andP; split.
   have R_A2 := submx_trans R2_A2 (addsmxSr R1 R2).
   rewrite mulmxDl mulmxDr (cent_mxP cR1z) //; congr (_ + _).
   rewrite [A.2 *m z]memmx0 1?[z *m A.2]memmx0 //.
-    by rewrite -dxR12 sub_capmx (mulsmx_subP idrR1) // (mulsmx_subP idlR2).
-  by rewrite -dxR12 sub_capmx (mulsmx_subP idlR1) // (mulsmx_subP idrR2).
+    by rewrite -dxR12 sub_capmx (mulsmx_subP idlR1) // (mulsmx_subP idrR2).
+  by rewrite -dxR12 sub_capmx (mulsmx_subP idrR1) // (mulsmx_subP idlR2).
 apply/memmx_subP=> z; rewrite !sub_capmx => /andP[R2z cR2z].
 have Rz := submx_trans R2z (addsmxSr R1 R2); rewrite Rz.
 apply/cent_mxP=> _ /memmx_addsP[A [R1_A1 R2_A2 ->]].
 rewrite mulmxDl mulmxDr (cent_mxP cR2z _ R2_A2) //; congr (_ + _).
 have R_A1 := submx_trans R1_A1 (addsmxSl R1 R2).
 rewrite [A.1 *m z]memmx0 1?[z *m A.1]memmx0 //.
-  by rewrite -dxR12 sub_capmx (mulsmx_subP idlR1) // (mulsmx_subP idrR2).
-by rewrite -dxR12 sub_capmx (mulsmx_subP idrR1) // (mulsmx_subP idlR2).
+  by rewrite -dxR12 sub_capmx (mulsmx_subP idrR1) // (mulsmx_subP idlR2).
+by rewrite -dxR12 sub_capmx (mulsmx_subP idlR1) // (mulsmx_subP idrR2).
 Qed.
 
 Lemma mxdirect_sums_center (I : finType) m n (R : 'A_(m, n)) R_ :
@@ -2945,22 +2945,22 @@ have anhR i j A B : i != j -> A \in R_ i -> B \in R_ j -> A *m B = 0.
   move=> ne_ij RiA RjB; apply: memmx0.
   have [[_ idRiR] [idRRj _]] := (andP (idealR i), andP (idealR j)).
   rewrite -(mxdirect_sumsP dxR j) // sub_capmx (sumsmx_sup i) //.
-    by rewrite (mulsmx_subP idRRj) // (memmx_subP (sR_R i)).
-  by rewrite (mulsmx_subP idRiR) // (memmx_subP (sR_R j)).
+    by rewrite (mulsmx_subP idRiR) // (memmx_subP (sR_R j)).
+  by rewrite (mulsmx_subP idRRj) // (memmx_subP (sR_R i)).
 apply/eqmxP/andP; split.
   apply/memmx_subP=> Z; rewrite sub_capmx => /andP[].
   rewrite -{1}defR => /memmx_sumsP[z ->{Z} Rz cRz].
   apply/memmx_sumsP; exists z => // i; rewrite sub_capmx Rz.
   apply/cent_mxP=> A RiA; have:= cent_mxP cRz A (memmx_subP (sR_R i) A RiA).
   rewrite (bigD1 i) //= mulmxDl mulmxDr mulmx_suml mulmx_sumr.
-  by rewrite !big1 ?addr0 // => j; last rewrite eq_sym; move/anhR->.
+  by rewrite !big1 ?addr0 // => j; first rewrite eq_sym; move/anhR->.
 apply/sumsmx_subP => i _; apply/memmx_subP=> z; rewrite sub_capmx.
 case/andP=> Riz cRiz; rewrite sub_capmx (memmx_subP (sR_R i)) //=.
 apply/cent_mxP=> A; rewrite -{1}defR; case/memmx_sumsP=> a -> R_a.
 rewrite (bigD1 i) // mulmxDl mulmxDr mulmx_suml mulmx_sumr.
-rewrite !big1 => [|j|j]; first by rewrite !addr0 (cent_mxP cRiz).
-  by rewrite eq_sym => /anhR->.
-by move/anhR->.
+rewrite !big1 => [j|j|]; last by rewrite !addr0 (cent_mxP cRiz).
+  by move/anhR->.
+by rewrite eq_sym => /anhR->.
 Qed.
 
 End MatrixAlgebra.
@@ -3005,7 +3005,7 @@ Proof.
 rewrite mxrankE /row_ebase /col_ebase unlock.
 elim: m n A => [|m IHm] [|n] A /=; rewrite ?map_mx1 //.
 set pAnz := [pred k | A k.1 k.2 != 0].
-rewrite (@eq_pick _ _ pAnz) => [|k]; last by rewrite /= mxE fmorph_eq0.
+rewrite (@eq_pick _ _ pAnz) => [k|]; first by rewrite /= mxE fmorph_eq0.
 case: {+}(pick _) => [[i j]|]; last by rewrite !map_mx1.
 rewrite mxE -fmorphV  -map_xcol -map_xrow -map_dlsubmx -map_drsubmx.
 rewrite -map_ursubmx -map_mxZ -map_mxM -map_mxB {}IHm /=.

@@ -2291,9 +2291,9 @@ Lemma matrix_sum_delta A : A = \sum_(i < m) \sum_(j < n) A i j *: delta_mx i j.
 Proof.
 apply/matrixP=> i j.
 rewrite summxE (bigD1_ord i) // summxE (bigD1_ord j) //= !mxE !eqxx mulr1.
-rewrite !big1 ?addr0 //= => [i' | j'] _.
-  by rewrite summxE big1// => j' _; rewrite !mxE eq_liftF mulr0.
-by rewrite !mxE eqxx eq_liftF mulr0.
+rewrite !big1 ?addr0 //= => [j' | i'] _.
+  by rewrite !mxE eqxx eq_liftF mulr0.
+by rewrite summxE big1// => j' _; rewrite !mxE eq_liftF mulr0.
 Qed.
 
 End SemiRingModule.
@@ -2637,9 +2637,9 @@ apply/matrixP=> i k; rewrite !mxE !leq_min.
 have [le_n_i | lt_i_n] := leqP n i.
   rewrite andbF big1 // => j _.
   by rewrite -pid_mx_minh !mxE leq_min ltnNge le_n_i andbF mul0r.
-rewrite (bigD1 (Ordinal lt_i_n)) //= big1 ?addr0 => [|j].
-  by rewrite !mxE eqxx /= -natrM mulnb andbCA.
-by rewrite -val_eqE /= !mxE eq_sym -natrM => /negPf->.
+rewrite (bigD1 (Ordinal lt_i_n)) //= big1 ?addr0 => [j|].
+  by rewrite -val_eqE /= !mxE eq_sym -natrM => /negPf->.
+by rewrite !mxE eqxx /= -natrM mulnb andbCA.
 Qed.
 
 Lemma pid_mx_id m n p r :
@@ -3480,7 +3480,7 @@ Qed.
 
 Lemma det_perm n (s : 'S_n) : \det (perm_mx s) = (-1) ^+ s :> R.
 Proof.
-rewrite [\det _](bigD1 s) //= big1 => [|i _]; last by rewrite /= !mxE eqxx.
+rewrite [\det _](bigD1 s) //= big1 => [i _|]; first by rewrite /= !mxE eqxx.
 rewrite mulr1 big1 ?addr0 => //= t Dst.
 case: (pickP (fun i => s i != t i)) => [i ist | Est].
   by rewrite (bigD1 i) // mulrCA /= !mxE (negPf ist) mul0r.
@@ -3520,21 +3520,21 @@ transitivity (\sum_(f : F) \sum_(s : 'S_n) (-1) ^+ s * \prod_i AB s i (f i)).
   rewrite exchange_big; apply: eq_bigr => /= s _; rewrite -big_distrr /=.
   congr (_ * _); rewrite -(bigA_distr_bigA (AB s)) /=.
   by apply: eq_bigr => x _; rewrite mxE.
-rewrite (bigID (fun f : F => injectiveb f)) /= addrC big1 ?add0r => [|f Uf].
-  rewrite (reindex (@pval _)) /=; last first.
-    pose in_Sn := insubd (1%g : 'S_n).
-    by exists in_Sn => /= f Uf; first apply: val_inj; apply: insubdK.
-  apply: eq_big => /= [s | s _]; rewrite ?(valP s) // big_distrr /=.
-  rewrite (reindex_inj (mulgI s)); apply: eq_bigr => t _ /=.
-  rewrite big_split /= [RHS]mulrACA 2!mulrA -signr_addb odd_permM !pvalE.
-  congr (_ * _); rewrite [RHS](reindex_perm s).
-  by apply: eq_bigr => i; rewrite permM.
-transitivity (\det (\matrix_(i, j) B (f i) j) * \prod_i A i (f i)).
-  rewrite mulrC big_distrr /=; apply: eq_bigr => s _.
-  rewrite mulrCA big_split //=; congr (_ * (_ * _)).
-  by apply: eq_bigr => x _; rewrite mxE.
-case/injectivePn: Uf => i1 [i2 Di12 Ef12].
-by rewrite (determinant_alternate Di12) ?simp //= => j; rewrite !mxE Ef12.
+rewrite (bigID (fun f : F => injectiveb f)) /= addrC big1 ?add0r => [f Uf|].
+  transitivity (\det (\matrix_(i, j) B (f i) j) * \prod_i A i (f i)).
+    rewrite mulrC big_distrr /=; apply: eq_bigr => s _.
+    rewrite mulrCA big_split //=; congr (_ * (_ * _)).
+    by apply: eq_bigr => x _; rewrite mxE.
+  case/injectivePn: Uf => i1 [i2 Di12 Ef12].
+  by rewrite (determinant_alternate Di12) ?simp //= => j; rewrite !mxE Ef12.
+rewrite (reindex (@pval _)) /=.
+  pose in_Sn := insubd (1%g : 'S_n).
+  by exists in_Sn => /= f Uf; first apply: val_inj; apply: insubdK.
+apply: eq_big => /= [s | s _]; rewrite ?(valP s) // big_distrr /=.
+rewrite (reindex_inj (mulgI s)); apply: eq_bigr => t _ /=.
+rewrite big_split /= [RHS]mulrACA 2!mulrA -signr_addb odd_permM !pvalE.
+congr (_ * _); rewrite [RHS](reindex_perm s).
+by apply: eq_bigr => i; rewrite permM.
 Qed.
 
 Lemma detM n' (A B : 'M[R]_n'.+1) : \det (A * B) = \det A * \det B.
@@ -3546,7 +3546,7 @@ Lemma expand_cofactor n (A : 'M[R]_n) i j :
     \sum_(s : 'S_n | s i == j) (-1) ^+ s * \prod_(k | i != k) A k (s k).
 Proof.
 case: n A i j => [|n] A i0 j0; first by case: i0.
-rewrite (reindex (lift_perm i0 j0)); last first.
+rewrite (reindex (lift_perm i0 j0)).
   pose ulsf i (s : 'S_n.+1) k := odflt k (unlift (s i) (s (lift i k))).
   have ulsfK i (s : 'S_n.+1) k: lift (s i) (ulsf i s k) = s (lift i k).
     rewrite /ulsf; have:= neq_lift i k.
@@ -3563,8 +3563,8 @@ rewrite /cofactor big_distrr /=.
 apply: eq_big => [s | s _]; first by rewrite lift_perm_id eqxx.
 rewrite -signr_odd mulrA -signr_addb oddD -odd_lift_perm; congr (_ * _).
 case: (pickP 'I_n) => [k0 _ | n0]; last first.
-  by rewrite !big1 // => [j /unlift_some[i] | i _]; have:= n0 i.
-rewrite (reindex (lift i0)).
+  by rewrite !big1 // => [i _ | j /unlift_some[i]]; have:= n0 i.
+rewrite (reindex (lift i0)); last first.
   by apply: eq_big => [k | k _] /=; rewrite ?neq_lift // !mxE lift_perm_lift.
 exists (fun k => odflt k0 (unlift i0 k)) => k; first by rewrite liftK.
 by case/unlift_some=> k' -> ->.
@@ -3643,7 +3643,7 @@ elim: n1 => [|n1 IHn1] in Aul Aur *.
   rewrite det1 mul1r; congr (\det _); apply/matrixP=> i j.
   by do 2![rewrite !mxE; case: splitP => [[]|k] //=; move/val_inj=> <- {k}].
 rewrite (expand_det_col _ (lshift n2 0)) big_split_ord /=.
-rewrite addrC big1 1?simp => [|i _]; last by rewrite block_mxEdl mxE simp.
+rewrite addrC big1 1?simp => [i _|]; first by rewrite block_mxEdl mxE simp.
 rewrite (expand_det_col _ 0) big_distrl /=; apply: eq_bigr=> i _.
 rewrite block_mxEul -!mulrA; do 2!congr (_ * _).
 by rewrite col'_col_mx !col'Kl raddf0 row'Ku row'_row_mx IHn1.
@@ -5053,7 +5053,7 @@ pose b : 'rV_n := \row_i a 0 (lift 0 i).
 pose C : 'M_n := diag_mx (\row_(i < n) (b 0 i - a 0 0)).
 pose D : 'M_n.+1 := 1 - a 0 0 *: \matrix_(i, j) (i == j.+1 :> nat)%:R. 
 have detD : \det D = 1.
-  rewrite det_trig ?big_ord_recl ?mxE ?mulr0 ?subr0 ?eqxx.
+  rewrite det_trig ?big_ord_recl ?mxE ?mulr0 ?subr0 ?eqxx; last first.
     by rewrite ?big1 ?mulr1// => i; rewrite !mxE eqxx ltn_eqF// mulr0 subr0.
   by apply/is_trig_mxP => *; rewrite !mxE ![_ == _]ltn_eqF ?mulr0 ?subr0 ?leqW.
 suff: D * V _ _ a = block_mx 1 (const_mx 1) 0 (V _ _ b *m C) :> 'M_(1 + n).
@@ -5065,7 +5065,7 @@ suff: D * V _ _ a = block_mx 1 (const_mx 1) 0 (V _ _ b *m C) :> 'M_(1 + n).
   by rewrite big_mkcond [RHS]big_mkcond big_ord_recl/= mul1r.
 rewrite mulrBl mul1r -[_ * _]scalemxAl; apply/matrixP => i j; rewrite !mxE.
 under eq_bigr do rewrite !mxE; case: splitP => [{i}_ -> /[!ord1]|{}i ->].
-  rewrite !expr0 big1; last by move=> ?; rewrite mul0r.
+  rewrite !expr0 big1; first by move=> ?; rewrite mul0r.
   by rewrite ?mulr0 ?subr0 ?mxE; case: splitP => k; rewrite ?ord1 mxE//.
 under eq_bigr do rewrite eqSS mulr_natl mulrb eq_sym.
 rewrite -big_mkcond/= big_ord1_eq exprS ifT// ?leqW// -mulrBl !mxE/=.

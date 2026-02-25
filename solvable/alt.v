@@ -171,7 +171,7 @@ pose A3 := [set x : {perm T} | #[x] == 3]; suffices oA3: #|A :&: A3| = 8.
   rewrite -(([set P] =P 'Syl_2(A)) _) ?cards1 // eqEsubset sub1set inE sylP.
   by apply/subsetP=> Q sylQ; rewrite inE -val_eqE /= !sQ2 // inE.
 rewrite -[8]/(4 * 2)%N -{}oQ3 -sum1_card -sum_nat_const.
-rewrite (partition_big (fun x => <[x]>%G) [in 'Syl_3(A)]) => [|x]; last first.
+rewrite (partition_big (fun x => <[x]>%G) [in 'Syl_3(A)]) => [x|].
   by case/setIP=> Ax; rewrite /= !inE pHallE p_part cycle_subG Ax oA.
 apply: eq_bigr => Q; rewrite inE pHallE oA p_part -?natTrecE //=.
 case/andP=> sQA /eqP oQ; have:= oQ.
@@ -353,7 +353,7 @@ have{le_p_n} lt_p1_n: #|[set x | p1 x != x]| < n.
 transitivity (p1 (+) true); last first.
   by rewrite odd_permM odd_tperm -Hx1 inE eq_sym addbK.
 have ->: p = p1 * tperm x1 (p x1) by rewrite -tpermV mulgK.
-rewrite morphM; last 2 first; first by rewrite 2!inE; apply/astab1P.
+rewrite morphM; last 2 first; last by rewrite 2!inE; apply/astab1P.
   by rewrite 2!inE; apply/astab1P; rewrite -[RHS]p1x_x permM px_x.
 rewrite odd_permM IHn //=; congr (_ (+) _).
 pose x2 : T' := Sub x1 nx1x; pose px2 : T' := Sub (p x1) npx1x.
@@ -378,7 +378,7 @@ apply/isogP; exists [morphism of restrm sSd rfd] => /=; last first.
   have dz': rgd z x == x by rewrite rgd_x.
   move=> kz; exists (rgd z); last by rewrite /= rfd_rgd.
     by rewrite 2!inE (sameP astab1P eqP).
-  rewrite 4!inE /= (sameP astab1P eqP) dz' -rfd_odd; last exact/eqP.
+  rewrite 4!inE /= (sameP astab1P eqP) dz' -rfd_odd; first exact/eqP.
   by rewrite rfd_rgd mker // ?set11.
 apply/injmP=> x1 y1 /=.
 case/setIP=> Hax1; move/astab1P; rewrite /= /aperm => Hx1.

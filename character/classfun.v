@@ -590,7 +590,7 @@ Proof.
 have b_i (i : 'I_#|classes G ::&: A|) : (cfun_base G A)`_i = '1_(enum_val i).
   by rewrite /enum_val -!tnth_nth tnth_map.
 apply/freeP => s S0 i; move/cfunP/(_ (repr (enum_val i))): S0.
-rewrite sum_cfunE (bigD1 i) //= big1 ?addr0 => [|j].
+rewrite sum_cfunE (bigD1 i) //= big1 ?addr0 => [j|]; last first.
   rewrite b_i !cfunE; have /setIdP[/imsetP[x Gx ->] _] := enum_valP i.
   by rewrite cfun_repr cfun_classE Gx class_refl mulr1.
 apply: contraNeq; rewrite b_i !cfunE mulf_eq0 => /norP[_].
@@ -788,7 +788,7 @@ Lemma cfdotElr A B phi psi :
   '[phi, psi] = #|G|%:R^-1 * \sum_(x in A :&: B) phi x * (psi x)^*.
 Proof.
 move=> Aphi Bpsi; rewrite (big_setID G)/= cfdotE (big_setID (A :&: B))/= setIC.
-congr (_ * (_ + _)); rewrite !big1 // => x /setDP[_].
+congr (_ * (_ + _)); rewrite !big1 // => x /setDP[_]; last first.
   by move/cfun0->; rewrite mul0r.
 rewrite inE; case/nandP=> notABx; first by rewrite (cfun_on0 Aphi) ?mul0r.
 by rewrite (cfun_on0 Bpsi) // rmorph0 mulr0.
@@ -971,7 +971,7 @@ without loss ophi: phi / '[phi, psi] = 0.
     by rewrite cfdotBl cfdotZl divfK ?cfnorm_eq0 ?subrr.
   rewrite (canRL (subrK _) (erefl phi1)) rpredDr ?rpredZ ?memv_line //.
   rewrite cfdotDl ophi add0r cfdotZl normrM (ger0_norm (cfnorm_ge0 _)).
-  rewrite exprMn mulrA -cfnormZ cfnormDd; last by rewrite cfdotZr ophi mulr0.
+  rewrite exprMn mulrA -cfnormZ cfnormDd; first by rewrite cfdotZr ophi mulr0.
   by have:= IHo _ ophi; rewrite mulrDl -leifBLR subrr ophi normCK mul0r.
 rewrite ophi normCK mul0r; split; first by rewrite mulr_ge0 ?cfnorm_ge0.
 rewrite eq_sym mulf_eq0 orbC cfnorm_eq0 (negPf nz_psi) /=.
@@ -984,7 +984,7 @@ Lemma cfCauchySchwarz_sqrt phi psi :
 Proof.
 rewrite -(sqrCK (normr_ge0 _)) -sqrtCM ?qualifE/= ?cfnorm_ge0 //.
 rewrite (mono_in_leif (@ler_sqrtC _)) 1?rpredM ?qualifE/= ?cfnorm_ge0 //;
-  [ exact: cfCauchySchwarz | exact: O.. ].
+  [ exact: O.. | exact: cfCauchySchwarz ].
 Qed.
 
 Lemma cf_triangle_leif phi psi :
@@ -992,7 +992,7 @@ Lemma cf_triangle_leif phi psi :
            ?= iff ~~ free (phi :: psi) && (0 <= coord [tuple psi] 0 phi).
 Proof.
 rewrite -(mono_in_leif ler_sqr) ?rpredD ?qualifE/= ?sqrtC_ge0 ?cfnorm_ge0 //;
-  [| exact: O.. ].
+  [ exact: O.. |].
 rewrite andbC sqrrD !sqrtCK addrAC cfnormD (mono_leif (lerD2l _)).
 rewrite -mulr_natr -[_ + _](divfK (negbT (eqC_nat 2 0))) -/('Re _).
 rewrite (mono_leif (ler_pM2r _)) ?ltr0n //.
@@ -1157,7 +1157,7 @@ case/pairwise_orthogonalP=> [/=/andP[notS0 uniqS] oSS].
 rewrite -(in_tupleE S); apply/freeP => a aS0 i.
 have S_i: S`_i \in S by apply: mem_nth.
 have /eqP: '[S`_i, 0]_G = 0 := cfdot0r _.
-rewrite -{2}aS0 raddf_sum /= (bigD1 i) //= big1 => [|j neq_ji]; last 1 first.
+rewrite -{2}aS0 raddf_sum /= (bigD1 i) //= big1 => [j neq_ji|].
   by rewrite cfdotZr oSS ?mulr0 ?mem_nth // eq_sym nth_uniq.
 rewrite addr0 cfdotZr mulf_eq0 conjC_eq0 cfnorm_eq0.
 by case/pred2P=> // Si0; rewrite -Si0 S_i in notS0.
@@ -1927,7 +1927,7 @@ Lemma reindex_dprod R idx (op : Monoid.com_law idx) (F : gT -> R) :
       \big[op/idx]_(k in K) \big[op/idx]_(h in H) F (k * h)%g.
 Proof.
 have /mulgmP/misomP[fM /isomP[injf im_f]] := KxH.
-rewrite pair_big_dep -im_f morphimEdom big_imset; last exact/injmP.
+rewrite pair_big_dep -im_f morphimEdom big_imset; first exact/injmP.
 by apply: eq_big => [][x y]; rewrite ?inE.
 Qed.
 
@@ -2108,7 +2108,7 @@ Lemma cfBigdprodE phi x :
     (forall i, P i -> x i \in A i) ->
   cfBigdprod phi (\prod_(i | P i) x i)%g = \prod_(i | P i) phi i (x i).
 Proof.
-move=> Ax; rewrite prod_cfunE; last by rewrite -(bigdprodW defG) mem_prodg.
+move=> Ax; rewrite prod_cfunE; first by rewrite -(bigdprodW defG) mem_prodg.
 by apply: eq_bigr => i Pi; rewrite cfBigdprodEi.
 Qed.
 
@@ -2125,7 +2125,7 @@ apply/cfun_inP=> x Aix; rewrite cfunE cfResE ?sAG // mulrAC.
 have {1}->: x = (\prod_(j | P j) (if j == i then x else 1))%g.
   rewrite -big_mkcondr (big_pred1 i) ?eqxx // => j /=.
   by apply: andb_idl => /eqP->.
-rewrite cfBigdprodE => [|j _]; last by case: eqP => // ->.
+rewrite cfBigdprodE => [j _|]; first by case: eqP => // ->.
 apply: canLR (mulfK nzPhi) _; rewrite cfBigdprod1 !(bigD1 i Pi) /= eqxx.
 by rewrite mulrCA !mulrA; congr (_ * _); apply: eq_bigr => j /andP[_ /negPf->].
 Qed.
@@ -2146,7 +2146,7 @@ have /fin_all_exists[h1 Dh1] x: exists f, x \in G -> is_hK x f.
     by apply/ffunP=> i; rewrite ffunE; case: ifPn => [/Uf-> | /(supportP Pf1)].
   split; last by rewrite fK; apply/eqP/eq_bigr=> i Pi; rewrite ffunE Pi.
   by apply/familyP=> i; rewrite ffunE !unfold_in; case: ifP => //= /Af.
-rewrite (reindex_onto h h1) /= => [|x /Dh1/(_ (h1 x))]; last first.
+rewrite (reindex_onto h h1) /= => [x /Dh1/(_ (h1 x))|].
   by rewrite eqxx => /andP[_ /eqP].
 apply/eq_big => [f | f /andP[/Dh1<- /andP[/pfamilyP[_ Af] _]]]; last first.
   by rewrite !cfBigdprodE // rmorph_prod -big_split /=.
@@ -2267,12 +2267,12 @@ Proof.
 move=> defG; have [/andP[sKG _] _ mulKH nKH _] := sdprod_context defG.
 rewrite cfIndE //; apply: canLR (mulKf (neq0CG _)) _; rewrite -mulKH mulr_sumr.
 rewrite (set_partition_big _ (rcosets_partition_mul H K)) ?big_imset /=.
-  apply: eq_bigr => y Hy; rewrite rcosetE norm_rlcoset ?(subsetP nKH) //.
-  rewrite -lcosetE mulr_natl big_imset /=; last exact: in2W (mulgI _).
-  by rewrite -sumr_const; apply: eq_bigr => z Kz; rewrite conjgM cfunJ.
-have [{}nKH /isomP[injf _]] := sdprod_isom defG.
-apply: can_in_inj (fun Ky => invm injf (coset K (repr Ky))) _ => y Hy.
-by rewrite rcosetE -val_coset ?(subsetP nKH) // coset_reprK invmE.
+  have [{}nKH /isomP[injf _]] := sdprod_isom defG.
+  apply: can_in_inj (fun Ky => invm injf (coset K (repr Ky))) _ => y Hy.
+  by rewrite rcosetE -val_coset ?(subsetP nKH) // coset_reprK invmE.
+apply: eq_bigr => y Hy; rewrite rcosetE norm_rlcoset ?(subsetP nKH) //.
+rewrite -lcosetE mulr_natl big_imset /=; first exact: in2W (mulgI _).
+by rewrite -sumr_const; apply: eq_bigr => z Kz; rewrite conjgM cfunJ.
 Qed.
 
 Lemma cfInd_on A phi :
@@ -2335,7 +2335,7 @@ have [sHG | not_sHG] := boolP (H \subset G); last first.
   rewrite (cfdotEl _ (cfuni_on _ _)) mulVKf ?neq0CG // big_set1.
   by rewrite cfuniE ?normal1 ?set11 ?mul1r.
 transitivity (#|H|%:R^-1 * \sum_(x in G) phi x * (psi x)^* ).
-  rewrite (big_setID H) /= (setIidPr sHG) addrC big1 ?add0r; last first.
+  rewrite (big_setID H) /= (setIidPr sHG) addrC big1 ?add0r.
     by move=> x /setDP[_ /cfun0->]; rewrite mul0r.
   by congr (_ * _); apply: eq_bigr => x Hx; rewrite cfResE.
 set h' := _^-1; apply: canRL (mulKf (neq0CG G)) _.
@@ -2408,7 +2408,7 @@ have [[injg defR] [_ defS]] := (isomP isoG, isomP isoH).
 rewrite morphimEdom (eq_in_imset eq_hg) -morphimEsub // in defS.
 apply/cfun_inP=> s; rewrite -{1}defR => /morphimP[x _ Gx ->]{s}.
 rewrite cfIsomE ?cfIndE // -defR -{1}defS ?morphimS ?card_injm // morphimEdom.
-congr (_ * _); rewrite big_imset //=; last exact/injmP.
+congr (_ * _); rewrite big_imset //=; first exact/injmP.
 apply: eq_bigr => y Gy; rewrite -morphJ //.
 have [Hxy | H'xy] := boolP (x ^ y \in H); first by rewrite -eq_hg ?cfIsomE.
 by rewrite !cfun0 -?defS // -sub1set -morphim_set1 ?injmSK ?sub1set // groupJ.

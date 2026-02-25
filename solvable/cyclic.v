@@ -278,7 +278,7 @@ apply/idP/idP=> [/cyclicP[x defG] | coKH]; last by rewrite -defKH cyclicM.
 rewrite /coprime -dvdn1 -(@dvdn_pmul2l m) ?lcmn_gt0 ?cardG_gt0 //.
 rewrite muln_lcm_gcd muln1 -TI_cardMg // defKH defG order_dvdn.
 have /mulsgP[y z Ky Hz ->]: x \in K * H by rewrite defKH defG cycle_id.
-rewrite -[1]mulg1 expgMn; last exact/commute_sym/(centsP cKH).
+rewrite -[1]mulg1 expgMn; first exact/commute_sym/(centsP cKH).
 apply/eqP; congr (_ * _); apply/eqP; rewrite -order_dvdn.
   exact: dvdn_trans (order_dvdG Ky) (dvdn_lcml _ _).
 exact: dvdn_trans (order_dvdG Hz) (dvdn_lcmr _ _).
@@ -331,7 +331,7 @@ apply/eqP; rewrite eq_expg_mod_order.
 have [x_le1 | x_gt1] := leqP #[x] 1.
   suffices: #[y] %| 1 by rewrite dvdn1 => /eqP->; rewrite !modn1.
   by rewrite (dvdn_trans dvd_y_x) // dvdn1 order_eq1 -cycle_eq1 trivg_card_le1.
-rewrite -(expg_znat i (cycle_id x)) invmE /=; last by rewrite /Zp x_gt1 inE.
+rewrite -(expg_znat i (cycle_id x)) invmE /=; first by rewrite /Zp x_gt1 inE.
 by rewrite val_Zp_nat // modn_dvdm.
 Qed.
 
@@ -679,7 +679,7 @@ Proof.
 have [lea1 | lt1a] := leqP #[a] 1.
   rewrite /order card_le1_trivg // cards1 (@eq_card1 _ 1) // => x.
   by rewrite !inE -cycle_eq1 eq_sym.
-rewrite -(card_injm (injm_invm (injm_Zpm a))) /= ?im_Zpm; last first.
+rewrite -(card_injm (injm_invm (injm_Zpm a))) /= ?im_Zpm.
   by apply/subsetP=> x /[1!inE]; apply: cycle_generator.
 rewrite -card_units_Zp // cardsE card_sub morphim_invmE; apply: eq_card => /= d.
 by rewrite !inE /= qualifE /= /Zp lt1a inE /= generator_coprime {1}Zp_cast.
@@ -704,7 +704,7 @@ Proof.
 pose h (x : gT) : 'I_#|G|.+1 := inord #[x].
 symmetry; rewrite -{1}sum1_card (partition_big h xpredT) //=.
 apply: eq_bigr => d _; set Gd := finset _.
-rewrite -sum_nat_const sum1dep_card -sum1_card (_ : finset _ = Gd); last first.
+rewrite -sum_nat_const sum1dep_card -sum1_card (_ : finset _ = Gd).
   apply/setP=> x /[!inE]; apply: andb_id2l => Gx.
   by rewrite /eq_op /= inordK // ltnS subset_leq_card ?cycle_subG.
 rewrite (partition_big_imset cycle) {}/Gd; apply: eq_bigr => C /=.
@@ -726,7 +726,7 @@ apply: eq_bigr => d _; rewrite -{2}ox1; case: ifP => [|ndv_dG]; last first.
   rewrite eq_card0 // => C; apply/imsetP=> [[x /setIdP[Gx oxd] _{C}]].
   by rewrite -(eqP oxd) order_dvdG in ndv_dG.
 move/cycle_sub_group; set Gd := [set _] => def_Gd.
-rewrite (_ : _ @: _ = @gval _ @: Gd); first by rewrite imset_set1 cards1 mul1n.
+rewrite (_ : _ @: _ = @gval _ @: Gd); last by rewrite imset_set1 cards1 mul1n.
 apply/setP=> C; apply/idP/imsetP=> [| [gC GdC ->{C}]].
   case/imsetP=> x /setIdP[_ oxd] ->; exists <[x]>%G => //.
   by rewrite -def_Gd inE -Zp_cycle subsetT.

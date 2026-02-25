@@ -406,12 +406,12 @@ apply/codiagonalizablePfull; eexists _; last exists P; rewrite /=.
 - rewrite -sub1mx eqmx_col.
   by under eq_bigr do rewrite (eq_genmx (PrV _)); rewrite -genmx_sums genmxE V1.
 apply/allP => A AAs /=; rewrite similar_diag_sum.
-- by apply/forallP => i; apply: P_diag.
 - rewrite mxdirectE/=.
   under eq_bigr do rewrite (eq_genmx (PrV _)); rewrite -genmx_sums genmxE V1.
   by under eq_bigr do rewrite genmxE PrV; rewrite  -(mxdirectP Vdirect)//= V1.
 - by move=> i; rewrite (eqmx_stable _ (PrV _)) ?AV.
 - by move=> i; rewrite /row_free eqmxMfull ?eq_row_base ?row_full_unit.
+- by apply/forallP => i; apply: P_diag.
 Qed.
 
 Lemma diagonalizable_diag {n} (d : 'rV[F]_n) : diagonalizable (diag_mx d).

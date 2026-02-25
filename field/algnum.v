@@ -197,7 +197,7 @@ have Qn_bC (u : {x | x \in Crat_span (map QnC b)}): {y | QnC y = sval u}.
   by rewrite rmorphZ_num (nth_map 0) // -(size_map QnC).
 pose CtoQn x := oapp (fun u => sval (Qn_bC u)) 0 (insub x).
 suffices QnCK: cancel QnC CtoQn by exists CtoQn; rewrite // -(rmorph0 QnC) /=.
-move=> x; rewrite /CtoQn insubT => /= [|Qn_x]; last first.
+move=> x; rewrite /CtoQn insubT => /= [Qn_x|].
   by case: (Qn_bC _) => x1 /= /fmorph_inj.
 rewrite (coord_vbasis (memvf x)) rmorph_sum rpred_sum //= => i _.
 rewrite rmorphZ_num Crat_spanZ ?mem_Crat_span // -/b.
@@ -243,7 +243,7 @@ case: (splitting_field_normal 1%AS x) => rs /eqP Hrs.
 have: root (map_poly (nu \o QnC) (minPoly 1%AS x)) (nu (QnC x)).
   by rewrite fmorph_root root_minPoly.
 rewrite map_Qnum_poly ?minPolyOver // Hrs.
-rewrite [map_poly _ _](_:_ = \prod_(y <- map QnC rs) ('X - y%:P)).
+rewrite [map_poly _ _](_:_ = \prod_(y <- map QnC rs) ('X - y%:P)); last first.
   by rewrite root_prod_XsubC; case/mapP => y _ ?; exists y.
 by rewrite big_map rmorph_prod /=; apply: eq_bigr => i _; rewrite map_polyXsubC.
 Qed.
@@ -391,7 +391,7 @@ have ext1 mu0 x : {mu1 | exists y, x = Sinj mu1 y
     apply: (iffP memv_imgP) => [[yy _ ->] | [yy ->]];
       by exists yy; rewrite ?lfunE ?memvf.
   have algK: is_aspace K.
-    rewrite /is_aspace has_algid1; last first.
+    rewrite /is_aspace has_algid1.
       by apply/memK; exists 1; rewrite rmorph1.
     apply/prodvP=> _ _ /memK[y1 ->] /memK[y2 ->].
     by apply/memK; exists (y1 * y2); rewrite rmorphM.
@@ -477,7 +477,7 @@ pose phi := kHomExtend 1 \1 zn (zn ^+ k).
 have homQn1: kHom 1 1 (\1%VF : 'End(Qn)) by rewrite kHom1.
 have pzn_zk0: root (map_poly \1%VF (minPoly 1 zn)) (zn ^+ k).
   rewrite -(fmorph_root QnC) rmorphXn /= Dz -map_poly_comp.
-  rewrite (@eq_map_poly _ _ _ QnC) => [|a]; last by rewrite /= id_lfunE.
+  rewrite (@eq_map_poly _ _ _ QnC) => [a|]; first by rewrite /= id_lfunE.
   set p1 := map_poly _ _.
   have [q1 Dp1]: exists q1, p1 = pQtoC q1.
     have aP i: (minPoly 1 zn)`_i \in 1%VS.
@@ -501,7 +501,7 @@ have [nu Dnu] := extend_algC_subfield_aut QnC phiRM.
 exists nu => _ /(prim_rootP prim_z)[i ->].
 rewrite rmorphXn /= exprAC -Dz -Dnu /= -{1}[zn]hornerX /phi.
 rewrite (kHomExtend_poly homQn1) ?polyOverX //.
-rewrite map_polyE map_id_in => [|?]; last by rewrite id_lfunE.
+rewrite map_polyE map_id_in => [?|]; first by rewrite id_lfunE.
 by rewrite polyseqK hornerX rmorphXn.
 Qed.
 
@@ -520,7 +520,7 @@ case/dvdpP_rat_int=> qz [a nz_a Dq] [r].
 move/(congr1 (fun q1 => lead_coef (a *: pZtoQ q1))).
 rewrite rmorphM scalerAl -Dq lead_coefZ lead_coefM /=.
 have /monicP->: pZtoQ pz \is monic by rewrite -(map_monic QtoC) pZtoQtoC -Dp.
-rewrite (monicP mon_q) mul1r mulr1 lead_coef_map_inj //; last exact: intr_inj.
+rewrite (monicP mon_q) mul1r mulr1 lead_coef_map_inj //; first exact: intr_inj.
 rewrite Dq => ->; apply/polyOverP=> i; rewrite !(coefZ, coef_map).
 by rewrite -rmorphM /= rmorph_int.
 Qed.

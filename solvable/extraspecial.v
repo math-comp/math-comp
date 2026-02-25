@@ -143,8 +143,8 @@ rewrite [@gtype _]unlock; apply: intro_isoGrp => [|rT H].
   have Gy: y \in G by rewrite -cycle_subG joing_subr.
   rewrite eqEsubset subsetT -im_sdpair mulG_subG /= -/G; apply/andP; split.
     apply/subsetP=> u /morphimP[[i j] _ _ def_u].
-    suffices ->: u = z ^+ i * x ^+ j. 
-      rewrite groupMl; apply/groupX; first exact: Gx.
+    suffices ->: u = z ^+ i * x ^+ j.
+      rewrite groupMl; apply/groupX; last exact: Gx.
       by apply/groupR; first exact: Gx.
     rewrite def_zi def_xi !natr_Zp -morphM ?inE // def_u.
     by congr (sdpair1 _ (_, _)); rewrite ?mulg1 ?mul1g.
@@ -247,7 +247,8 @@ rewrite cent_joinEr ?(sub_abelian_cent2 cGzGz) ?cycle_subG ?mem_quotient //.
 have oZx: #|<[coset 'Z(G) x]>| = p.
   rewrite -orderE (nt_prime_order p_pr) ?expGz ?mem_quotient //.
   by apply: contra notZx; move/eqP=> Zx; rewrite coset_idr ?(subsetP nZG).
-rewrite TI_cardMg ?oZx -?orderE ?(nt_prime_order p_pr) ?expGz ?mem_quotient //.
+rewrite TI_cardMg ?oZx -?orderE ?(nt_prime_order p_pr) ?expGz ?mem_quotient //;
+    last first.
   apply: contra not_cxy; move/eqP=> Zy.
   rewrite -cent_cycle (subsetP _ y (coset_idr _ Zy)) ?(subsetP nZG) //.
   by rewrite subIset ?centS ?orbT ?cycle_subG.
@@ -294,7 +295,7 @@ elim: n => [|n IHn].
   by rewrite (dvdn_trans (exponent_dvdn _)) ?card_pX1p2n.
 case: pX1p2S => gz isoZ; rewrite -im_cpair /=.
 apply/exponentP=> xy; case/imset2P=> x y C1x C2y ->{xy}.
-rewrite expgMn; last by red; rewrite -(centsP (im_cpair_cent isoZ)).
+rewrite expgMn; first by red; rewrite -(centsP (im_cpair_cent isoZ)).
 rewrite (exponentP _ y C2y) ?exponent_injm ?injm_cpair1g // mulg1.
 by rewrite (exponentP _ x C1x) ?exponent_injm ?injm_cpairg1 // exponent_pX1p2.
 Qed.
@@ -472,7 +473,7 @@ have defY: <[x]> \x E = Y.
     rewrite prime_TIg -?orderE ?ox // -(quotientSGK _ sZE) ?quotient_cycle //.
     rewrite (sameP setIidPl eqP) eq_sym -defEt tiXEt -quotient_cycle //.
     by rewrite -subG1 quotient_sub1 // cycle_subG.
-  rewrite dprodE //; last 1 first.
+  rewrite dprodE //.
     by rewrite cent_cycle (subset_trans sEY) //= -/Y -defCx subsetIr.
   rewrite -[Y](quotientGK nsZY) -defYt cosetpreM -quotient_cycle //.
   rewrite quotientK // -(normC nZX) defEt quotientGK ?(normalS _ sEY) //.
@@ -607,9 +608,9 @@ have oQ: #|'Q_(2 ^ 3)| = 8 by rewrite card_quaternion.
 have pQ: 2.-group 'Q_8 by rewrite /pgroup oQ.
 case: DnQ_P => gz isoZ.
 rewrite -im_cpair cardMg_divn setI_im_cpair cpair_center_id.
-rewrite -injm_center//; last exact: injm_cpair1g.
+rewrite -injm_center//; first exact: injm_cpair1g.
 rewrite (card_injm (injm_cpairg1 _))//= (card_injm (injm_cpair1g _))//.
-rewrite (card_injm (injm_cpair1g _))//; last exact: center_sub.
+rewrite (card_injm (injm_cpair1g _))//; first exact: center_sub.
 rewrite oQ card_pX1p2n // (card_center_extraspecial pQ Q8_extraspecial).
 by rewrite -muln_divA // mulnC -(expnD 2 2).
 Qed.
@@ -623,7 +624,7 @@ Proof.
 case: DnQ_P (DnQ_pgroup n) => gz isoZ pDnQ.
 have [injDn injQ] := (injm_cpairg1 isoZ, injm_cpair1g isoZ).
 have [n0 | n_gt0] := posnP n.
-  rewrite -im_cpair mulSGid; first exact: injm_extraspecial Q8_extraspecial.
+  rewrite -im_cpair mulSGid; last exact: injm_extraspecial Q8_extraspecial.
   apply/setIidPl; rewrite setI_im_cpair -injm_center //=.
   by congr (_ @* _); rewrite n0 center_ncprod0.
 apply: (cprod_extraspecial pDnQ (im_cpair_cprod isoZ) (setI_im_cpair _)).
@@ -730,7 +731,7 @@ right; case: DnQ_P => gz isoZ; rewrite (isog_cprod_by _ defG) //; first 1 last.
 rewrite /= -morphimIim; case/cprodP: defDn => _ defDn cDn1E.
 rewrite setICA setIA -defDn -group_modr ?morphimS ?subsetT //.
 rewrite /= im_fR (setIC R) ziER -center_prod // defZE -defZR.
-rewrite mulSGid /=; last first.
+rewrite mulSGid /=.
   by rewrite -{1}im_fR -injm_center // -cpairg1_center !morphimS ?center_sub.
 rewrite -injm_center ?subsetT // -injmI // setI_im_cpair.
 by rewrite -injm_center // cpairg1_center injm_center // im_fR mulGid.

@@ -257,7 +257,7 @@ case def_b': (b - _) => [|b']; last first.
     by rewrite subnDA subnn addnC addSnnS.
   by rewrite mul1n -doubleB -doubleD subn1 !addn1 def_k1.
 have ltdp: d < p.
-  move/eqP: def_b'; rewrite subn_eq0 -(@leq_pmul2r kb); last first.
+  move/eqP: def_b'; rewrite subn_eq0 -(@leq_pmul2r kb).
     by rewrite -def_kb1.
   rewrite mulnBl -def_k2 ltnS -(leq_add2r c); move/leq_trans; apply.
   have{} ltc: c < k.*2.
@@ -279,7 +279,7 @@ have next_pm: lb_dvd p.+2 m.
      case/hasP: leppm; exists 2; first by rewrite /p -(subnKC lt0k).
     by rewrite /= def_q dvdn_mull // dvdn2 /= odd_double.
   move/(congr1 (dvdn p)): def_m; rewrite -!mul2n mulnA -mulnDl.
-  rewrite dvdn_mull // dvdn_addr; last by rewrite def_q dvdn_mull.
+  rewrite dvdn_mull // dvdn_addr; first by rewrite def_q dvdn_mull.
   case/dvdnP=> r; rewrite mul2n => def_r; move: ltdp (congr1 odd def_r).
   rewrite odd_double -ltn_double def_r -mul2n ltn_pmul2r //.
   by case: r def_r => [|[|[]]] //; rewrite def_d // mul1n /= odd_double.
@@ -300,12 +300,12 @@ rewrite -doubleS -{1}[m]mul1n -[1]/(k.+1.*2.+1 ^ 0)%N.
 apply: IHn; first exact: ltnW.
 rewrite doubleS -/p [ifnz 0 _ _]/=; do 2?split => //.
   rewrite orbT next_pm /= -(leq_add2r d.*2) def_m 2!addSnnS -doubleS leq_add.
-  - move: ltc; rewrite /kb {}/bc andbT; case e => //= e' _; case: ifnzP => //.
-    by case: edivn2P.
   - by rewrite -[ltnLHS]muln1 ltn_pmul2l.
-  by rewrite leq_double def_a mulSn (leq_trans ltdp) ?leq_addr.
+  - by rewrite leq_double def_a mulSn (leq_trans ltdp) ?leq_addr.
+  move: ltc; rewrite /kb {}/bc andbT; case e => //= e' _; case: ifnzP => //.
+  by case: edivn2P.
 rewrite mulnDl !muln2 -addnA addnCA doubleD addnCA.
-rewrite (_ : _ + bc.2 = d); last first.
+rewrite (_ : _ + bc.2 = d).
   rewrite /d {}/bc /kb -muln2.
   case: (e) (b) def_b' => //= _ []; first by case: edivn2P.
   by case c; do 2?case; rewrite // mul1n /= muln2.
@@ -537,7 +537,7 @@ Lemma ltn_pdiv2_prime n : 0 < n -> n < pdiv n ^ 2 -> prime n.
 Proof.
 case def_n: n => [|[|n']] // _; rewrite -def_n => lt_n_p2.
 suffices ->: n = pdiv n by rewrite pdiv_prime ?def_n.
-apply/eqP; rewrite eqn_leq leqNgt andbC pdiv_leq; last by rewrite def_n.
+apply/eqP; rewrite eqn_leq leqNgt andbC pdiv_leq; first by rewrite def_n.
 apply/contraL: lt_n_p2 => lt_pm_m; case/dvdnP: (pdiv_dvd n) => q def_q.
 rewrite -leqNgt [leqRHS]def_q leq_pmul2r // pdiv_min_dvd //.
   by rewrite -[pdiv n]mul1n [ltnRHS]def_q ltn_pmul2r in lt_pm_m.
@@ -1609,7 +1609,7 @@ have [n0 np0 np'0]: [/\ n > 0, np > 0 & np' > 0] by rewrite ltnW ?part_gt0.
 have def_n: n = np * np' by rewrite partnC.
 have lnp0: 0 < logn p n by rewrite lognE p_pr n0 pdiv_dvd.
 pose in_mod k (k0 : k > 0) d := Ordinal (ltn_pmod d k0).
-rewrite {1}def_n totient_coprime // {IHn}(IHn np') ?big_mkord; last first.
+rewrite {1}def_n totient_coprime // {IHn}(IHn np') ?big_mkord.
   by rewrite def_n ltn_Pmull // /np p_part -(expn0 p) ltn_exp2l.
 have ->: totient np = #|[pred d : 'I_np | coprime np d]|.
   rewrite [np in LHS]p_part totient_pfactor //=; set q := p ^ _.
@@ -1617,7 +1617,7 @@ have ->: totient np = #|[pred d : 'I_np | coprime np d]|.
   have def_np: np = p * q by rewrite -expnS prednK // -p_part.
   pose mulp := [fun d : 'I_q => in_mod _ np0 (p * d)].
   rewrite -def_np -{1}[np]card_ord -(cardC [in codom mulp]).
-  rewrite card_in_image => [|[d1 ltd1] [d2 ltd2] /= _ _ []]; last first.
+  rewrite card_in_image => [[d1 ltd1] [d2 ltd2] /= _ _ []|].
     move/eqP; rewrite def_np -!muln_modr ?modn_small //.
     by rewrite eqn_pmul2l // => eq_op12; apply/eqP.
   rewrite card_ord; congr (q + _); apply: eq_card => d /=.
@@ -1629,11 +1629,11 @@ have ->: totient np = #|[pred d : 'I_np | coprime np d]|.
   by exists (Ordinal ltr); apply: val_inj; rewrite /= -def_d modn_small.
 pose h (d : 'I_n) := (in_mod _ np0 d, in_mod _ np'0 d).
 pose h' (d : 'I_np * 'I_np') := in_mod _ n0 (chinese np np' d.1 d.2).
-rewrite -!big_mkcond -sum_nat_const pair_big (reindex_onto h h') => [|[d d'] _].
-  apply: eq_bigl => [[d ltd] /=]; rewrite !inE -val_eqE /= andbC !coprime_modr.
-  by rewrite def_n -chinese_mod // -coprimeMl -def_n modn_small ?eqxx.
-apply/eqP; rewrite /eq_op /= /eq_op /= !modn_dvdm ?dvdn_part //.
-by rewrite chinese_modl // chinese_modr // !modn_small ?eqxx ?ltn_ord.
+rewrite -!big_mkcond -sum_nat_const pair_big (reindex_onto h h') => [[d d'] _|].
+  apply/eqP; rewrite /eq_op /= /eq_op /= !modn_dvdm ?dvdn_part //.
+  by rewrite chinese_modl // chinese_modr // !modn_small ?eqxx ?ltn_ord.
+apply: eq_bigl => [[d ltd] /=]; rewrite !inE -val_eqE /= andbC !coprime_modr.
+by rewrite def_n -chinese_mod // -coprimeMl -def_n modn_small ?eqxx.
 Qed.
 
 Lemma totient_gt1 n : (totient n > 1) = (n > 2).
