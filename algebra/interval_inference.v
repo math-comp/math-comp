@@ -624,10 +624,20 @@ case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=.
 by rewrite in_itv/= andbT.
 Qed.
 
+Lemma gen0 (x : nat_def i) : unify_itv i (Itv.Real `[0%Z, +oo[) -> (0 <= x%:num)%N.
+Proof.
+by case: x => x /= /[swap] /nat_spec_sub /[apply] /andP[_] /=.
+Qed.
+
 Lemma lt0F x : unify_itv i (Itv.Real `[0%Z, +oo[) -> (x%:num < 0 :> R) = false.
 Proof.
 case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=.
 by rewrite in_itv/= andbT => /le_gtF.
+Qed.
+
+Lemma ltn0F (x : nat_def i) : unify_itv i (Itv.Real `[0%Z, +oo[) -> (x%:num < 0)%N = false.
+Proof.
+by case: x => x /= /[swap] /nat_spec_sub /[apply] /andP[_] /= => /le_gtF.
 Qed.
 
 Lemma le0 x : unify_itv i (Itv.Real `]-oo, 0%Z]) -> x%:num <= 0 :> R.
