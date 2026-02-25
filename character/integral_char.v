@@ -665,7 +665,7 @@ have Qpi1: pi1 \in Crat.
   have /(prim_rootP pr_eps)[m Dem]: b ^+ n = 1.
     apply/eqP; rewrite -(fmorph_eq1 QnC) rmorphXn /= Db -lin_charX //.
     by rewrite -expg_mod_order orderE defG modnn lin_char1.
-  rewrite -Db /= -DnuC Dem rmorphXn /= defItoQ exprAC -{m}Dem rmorphXn /= {b}Db.
+  rewrite -Db /= -DnuC Dem rmorphXn /= defItoQ powrAC -{m}Dem rmorphXn /= {b}Db.
   by rewrite lin_charX.
 clear I ItoS imItoS injItoS ItoQ inItoQ defItoQ imItoQ injItoQ.
 clear Qn galQn QnC gQnC eps pr_eps QnGg calG.

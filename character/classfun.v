@@ -2312,7 +2312,7 @@ Qed.
 Lemma cfnorm_Ind_cfun1 : H <| G -> '['Ind[G, H] 1] = #|G : H|%:R.
 Proof.
 move=> nsHG; rewrite cfInd_cfun1 // cfnormZ normr_nat cfdot_cfuni // setIid.
-by rewrite expr2 {2}natf_indexg ?normal_sub // !mulrA divfK ?mulfK ?neq0CG.
+by rewrite powr2n {2}natf_indexg ?normal_sub // !mulrA divfK ?mulfK ?neq0CG.
 Qed.
 
 Lemma cfIndInd phi :

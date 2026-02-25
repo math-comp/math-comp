@@ -707,7 +707,7 @@ rewrite invmx_unitary ?spectral_unitarymx //.
 rewrite !trmx_mul !map_mxM map_trmx trmxK -map_mx_comp.
 rewrite tr_diag_mx map_diag_mx (map_mx_id (@conjCK _)).
 rewrite -[in RHS]invmx_unitary ?spectral_unitarymx //.
-have := is_hermitianmxP _ _ _ Ahermi; rewrite expr0 scale1r => <-.
+have := is_hermitianmxP _ _ _ Ahermi; rewrite powr0n scale1r => <-.
 rewrite {1}A_eq mulmxA => /(congr1 (mulmx^~ (invmx (spectralmx A)))).
 rewrite !mulmxK ?spectral_unit//.
 move=> /(congr1 (mulmx (spectralmx A))); rewrite !mulKVmx ?spectral_unit//.

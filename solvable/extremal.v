@@ -5,8 +5,9 @@ From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype bigop finset prime binomial.
 From mathcomp Require Import fingroup morphism perm automorphism presentation.
 From mathcomp Require Import quotient action commutator gproduct gfunctor.
-From mathcomp Require Import ssralg countalg finalg zmodp cyclic pgroup center gseries.
-From mathcomp Require Import nilpotent sylow abelian finmodule matrix maximal.
+From mathcomp Require Import ssralg countalg finalg zmodp cyclic pgroup center.
+From mathcomp Require Import gseries nilpotent sylow abelian finmodule matrix.
+From mathcomp Require Import maximal.
 
 (******************************************************************************)
 (*    This file contains the definition and properties of extremal p-groups;  *)
@@ -252,7 +253,7 @@ have m1: m 1 = 1%R by rewrite /m morph1.
 have mM: {in A &, {morph m : a b / a * b >-> (a * b)%R}}.
   by move=> a b Aa Ab; rewrite /m morphM ?defA.
 have mX k: {in A, {morph m : a / a ^+ k >-> (a ^+ k)%R}}.
-  by elim: k => // k IHk a Aa; rewrite expgS exprS mM ?groupX ?IHk.
+  by elim: k => // k IHk a Aa; rewrite expgS powrS mM ?groupX ?IHk.
 have inj_m: {in A &, injective m}.
   apply: can_in_inj (fun u => m' (insubd (1 : {unit 'Z_q}) u)) _ => a Aa.
   by rewrite valKd invmK ?defA.

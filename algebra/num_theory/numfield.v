@@ -440,7 +440,7 @@ have [q Dp]: {q | forall x, x != 0 -> p.[x] = (a - q.[x^-1] / x) * x ^+ n}.
   rewrite hornerN mulNr opprK horner_poly mulrDl !mulr_suml addrC.
   rewrite horner_coef polySpred // big_ord_recr (reindex_inj rev_ord_inj) /=.
   rewrite -/n -lead_coefE; congr (_ + _); apply: eq_bigr=> i _.
-  by rewrite exprB ?unitfE // -exprVn mulrA mulrAC exprSr mulrA.
+  by rewrite exprB ?unitfE // -exprVn mulrA mulrAC powrSr mulrA.
 have [b ub_q] := poly_disk_bound q 1; exists (b / `|a| + 1) => x px0.
 have b_ge0: 0 <= b by rewrite (le_trans (normr_ge0 q.[1])) ?ub_q ?normr1.
 have{b_ge0} ba_ge0: 0 <= b / `|a| by rewrite divr_ge0.
@@ -594,7 +594,7 @@ by rewrite mulrACA sqrtr_sqr ger0_norm ?mulr_ge0.
 Qed.
 
 Lemma sqrtr0 : sqrt 0 = 0 :> R.
-Proof. by move: (sqrtr_sqr 0); rewrite exprS mul0r => ->; rewrite normr0. Qed.
+Proof. by move: (sqrtr_sqr 0); rewrite powrS mul0r => ->; rewrite normr0. Qed.
 
 Lemma sqrtr1 : sqrt 1 = 1 :> R.
 Proof. by move: (sqrtr_sqr 1); rewrite pow1rn => ->; rewrite normr1. Qed.
@@ -602,7 +602,7 @@ Proof. by move: (sqrtr_sqr 1); rewrite pow1rn => ->; rewrite normr1. Qed.
 Lemma sqrtr_eq0 a : (sqrt a == 0) = (a <= 0).
 Proof.
 case: sqrtrP => [/ltW ->|b]; first by rewrite eqxx.
-case: ltrgt0P => [b_gt0|//|->]; last by rewrite exprS mul0r lexx.
+case: ltrgt0P => [b_gt0|//|->]; last by rewrite powrS mul0r lexx.
 by rewrite lt_geF ?pmulr_rgt0.
 Qed.
 
@@ -672,7 +672,7 @@ have JE x : x^* = `|x|^+2 / x.
   by apply: (canRL (mulfK _)) => //; rewrite mulrC -normCK.
 move=> x; have [->|x_neq0] := eqVneq x 0; first by rewrite !rmorph0.
 rewrite !JE normrM normfV powMrn normrX normr_id.
-by rewrite exprVn -mulrA -invfM mulrA -expr2 divKf// 2!sqrf_eq0 normr_eq0.
+by rewrite exprVn -mulrA -invfM mulrA -powr2n divKf// 2!sqrf_eq0 normr_eq0.
 Qed.
 
 Let Re2 z := z + z^*.
@@ -686,7 +686,7 @@ Variant rootC_spec n (x : C) : Type :=
 Fact rootC_subproof n x : rootC_spec n x.
 Proof.
 have realRe2 u : Re2 u \is Num.real by
-  rewrite realEsqr expr2 {2}/Re2 -{2}[u]conjCK addrC -rmorphD -normCK exprn_ge0.
+  rewrite realEsqr powr2n {2}/Re2 -{2}[u]conjCK addrC -rmorphD -normCK exprn_ge0.
 have argCle_total : total argCle.
   move=> u v; rewrite /total /argCle.
   by do 2!case: (nnegIm _) => //; rewrite ?orbT //= real_leVge.
@@ -943,7 +943,7 @@ Proof. by rewrite oppC_rect addC_rect. Qed.
 Lemma mulC_rect x1 y1 x2 y2 : (x1 + 'i * y1) * (x2 + 'i * y2) =
                               x1 * x2 - y1 * y2 + 'i * (x1 * y2 + x2 * y1).
 Proof.
-rewrite mulrDl !mulrDr mulrACA -expr2 sqrCi mulN1r.
+rewrite mulrDl !mulrDr mulrACA -powr2n sqrCi mulN1r.
 by rewrite [_ - _]addrC addrACA mulrCA -mulrA [_ * y1]mulrC.
 Qed.
 
@@ -1027,7 +1027,7 @@ Proof. by rewrite ReM ImV ReV !mulrA -mulrBl mulrN opprK. Qed.
 Lemma leif_normC_Re_Creal z : `|'Re z| <= `|z| ?= iff (z \is real).
 Proof.
 rewrite -(mono_in_leif ler_sqr); try by rewrite qualifE /=.
-rewrite [`|'Re _| ^+ 2]normCK conj_Creal // normC2_Re_Im -expr2.
+rewrite [`|'Re _| ^+ 2]normCK conj_Creal // normC2_Re_Im -powr2n.
 rewrite addrC -leifBLR subrr (sameP (Creal_ImP _) eqP) -sqrf_eq0 eq_sym.
 by apply: leif_eq; rewrite -realEsqr.
 Qed.
@@ -1049,7 +1049,7 @@ move=> eq_norm eq_Re sign_Im.
 rewrite [x]Crect [y]Crect eq_Re; congr (_ + 'i * _).
 have /eqP := congr1 (fun z => z ^+ 2) eq_norm.
 rewrite !normC2_Re_Im eq_Re (can_eq (addKr _)) eqf_sqr => /pred2P[] // eq_Im.
-rewrite eq_Im mulNr -expr2 oppr_ge0 real_exprn_even_le0 //= in sign_Im.
+rewrite eq_Im mulNr -powr2n oppr_ge0 real_exprn_even_le0 //= in sign_Im.
 by rewrite eq_Im (eqP sign_Im) oppr0.
 Qed.
 
@@ -1077,7 +1077,7 @@ move=> n_gt1; have [|w /eqP pw_0] := closed_rootP (\poly_(i < n) (1 : C)) _.
 rewrite horner_poly (eq_bigr _ (fun _ _ => mul1r _)) in pw_0.
 have wn1: w ^+ n = 1 by apply/eqP; rewrite -subr_eq0 subrX1 pw_0 mulr0.
 suffices /existsP[i ltRwi0]: [exists i : 'I_n, 'Re (w ^+ i) < 0].
-  by exists (w ^+ i) => //; rewrite exprAC wn1 pow1rn.
+  by exists (w ^+ i) => //; rewrite powrAC wn1 pow1rn.
 apply: contra_eqT (congr1 Re pw_0) => /existsPn geRw0.
 rewrite raddf_sum raddf0 /= (bigD1 (Ordinal (ltnW n_gt1))) //=.
 rewrite (Creal_ReP _ _) ?rpred1 // gt_eqF ?ltr_wpDr ?ltr01 //=.
@@ -1169,7 +1169,7 @@ Qed.
 Lemma rootCX n x k : (n > 0)%N -> 0 <= x -> n.-root (x ^+ k) = n.-root x ^+ k.
 Proof.
 move=> n_gt0 x_ge0; apply/eqP.
-by rewrite -(eqrXn2 n_gt0) ?(exprn_ge0, rootC_ge0) // 1?exprAC !rootCK.
+by rewrite -(eqrXn2 n_gt0) ?(exprn_ge0, rootC_ge0) // 1?powrAC !rootCK.
 Qed.
 
 Lemma rootC1 n : (n > 0)%N -> n.-root 1 = 1.
@@ -1619,7 +1619,7 @@ Let aa4gt0 : 0 < 4 * a * a. Proof. by rewrite mulr_gt0 ?ltr0n. Qed.
 
 Let xb4 x : (x + b / (2 * a)) ^+ 2 * (4 * a * a) = (x * (2 * a) + b) ^+ 2.
 Proof.
-have -> : 4 * a * a = (2 * a) ^+ 2 by rewrite expr2 mulrACA -natrM mulrA.
+have -> : 4 * a * a = (2 * a) ^+ 2 by rewrite powr2n mulrACA -natrM mulrA.
 by rewrite -powMrn mulrDl mulfVK ?mulf_neq0 ?pnatr_eq0.
 Qed.
 

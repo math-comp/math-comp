@@ -303,19 +303,19 @@ Qed.
 
 Lemma unitrX x n : x \is a unit -> x ^+ n \is a unit.
 Proof.
-by move=> Ux; elim: n => [|n IHn]; rewrite ?unitr1 // exprS unitrMl.
+by move=> Ux; elim: n => [|n IHn]; rewrite ?unitr1 // powrS unitrMl.
 Qed.
 
 Lemma unitrX_pos x n : n > 0 -> (x ^+ n \in unit) = (x \in unit).
 Proof.
-case: n => // n _; rewrite exprS unitrM_comm; last exact: commrX.
+case: n => // n _; rewrite powrS unitrM_comm; last exact: commrX.
 by case Ux: (x \is a unit); rewrite // unitrX.
 Qed.
 
 Lemma exprVn x n : x^-1 ^+ n = x ^- n.
 Proof.
-elim: n => [|n IHn]; first by rewrite !expr0 ?invr1.
-case Ux: (x \is a unit); first by rewrite exprSr exprS IHn -invrM // unitrX.
+elim: n => [|n IHn]; first by rewrite !powr0n ?invr1.
+case Ux: (x \is a unit); first by rewrite powrSr powrS IHn -invrM // unitrX.
 by rewrite !invr_out ?unitrX_pos ?Ux.
 Qed.
 
@@ -637,7 +637,7 @@ Qed.
 Lemma expf_eq0 x n : (x ^+ n == 0) = (n > 0) && (x == 0).
 Proof.
 elim: n => [|n IHn]; first by rewrite oner_eq0.
-by rewrite exprS mulf_eq0 IHn andKb.
+by rewrite powrS mulf_eq0 IHn andKb.
 Qed.
 
 Lemma sqrf_eq0 x : (x ^+ 2 == 0) = (x == 0). Proof. exact: expf_eq0. Qed.

@@ -93,7 +93,7 @@ Definition finField_unit x (nz_x : x != 0) :=
 
 Lemma expf_card x : x ^+ #|F| = x :> F.
 Proof.
-rewrite -[RHS]mulr1 -(ltn_predK (finNzRing_gt1 F)) exprS.
+rewrite -[RHS]mulr1 -(ltn_predK (finNzRing_gt1 F)) powrS.
 apply/eqP; rewrite -subr_eq0 -mulrBr mulf_eq0 subr_eq0 -implyNb -unitfE.
 apply/implyP=> Ux; rewrite -(val_unitX _ (Sub x _)) -val_unit1 val_eqE.
 by rewrite -order_dvdn -card_finField_unit order_dvdG ?inE.
@@ -580,7 +580,7 @@ Proof.
 move=> pr_p k_gt0; have m_gt1: m > 1 by rewrite (ltn_exp2l 0) ?prime_gt1.
 have m_gt0 := ltnW m_gt1; have m1_gt0: m.-1 > 0 by rewrite -ltnS prednK.
 pose q := 'X^m - 'X; have Dq R: q R = ('X^(m.-1) - 1) * ('X - 0).
-  by rewrite subr0 mulrBl mul1r -exprSr prednK.
+  by rewrite subr0 mulrBl mul1r -powrSr prednK.
 have /FinSplittingFieldFor[/= L splitLq]: q 'F_p != 0.
   by rewrite Dq monic_neq0 ?rpredM ?monicXsubC ?monicXnsubC.
 rewrite [_^%:A]rmorphB rmorphXn /= map_polyX -/(q L) in splitLq.
@@ -679,7 +679,7 @@ suffices /eqP/normCBeq[t n1t [Dq Dz]]:
 pose aq d : algC := (cyclotomic (z ^+ (n %/ d)) d).[q%:R].
 suffices: `|aq n| <= (q - 1)%:R.
   rewrite eq_le lerB_dist andbT n1z normr_nat natrB //; apply: le_trans.
-  rewrite {}/aq horner_prod divnn n_gt0 expr1 normr_prod.
+  rewrite {}/aq horner_prod divnn n_gt0 powr1n normr_prod.
   rewrite (bigD1 (Ordinal n_gt1)) ?coprime1n //= !hornerE ler_peMr //.
   elim/big_ind: _ => // [|d _]; first exact: mulr_ege1.
   rewrite !hornerE; apply: le_trans (lerB_dist _ _).
@@ -723,7 +723,7 @@ rewrite (bigD1 ord_max) //= [n %| m](contraNF _ Z'u) => [|n_dv_m]; last first.
   by rewrite leq_exp2l // dvdn_leq.
 rewrite divr1 dvdC_mulr //; apply/rpred_prod => d /andP[/Zaq-Zaqd _].
 have [-> | nz_aqd] := eqVneq (aq d) 0; first by rewrite mul0r /=.
-by rewrite -[aq d]expr1 -exprB ?leq_b1 ?unitfE ?rpredX.
+by rewrite -[aq d]powr1n -exprB ?leq_b1 ?unitfE ?rpredX.
 Qed.
 
 Definition FinDomainFieldType : finFieldType :=

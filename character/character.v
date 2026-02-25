@@ -1021,7 +1021,7 @@ Proof. by move=> Gx; rewrite -[_^-1]mulr1 -(xiMV Gx) mulKf ?lin_char_neq0. Qed.
 Lemma lin_charX x n : x \in G -> xi (x ^+ n)%g = xi x ^+ n.
 Proof.
 move=> Gx; elim: n => [|n IHn]; first exact: lin_char1.
-by rewrite expgS exprS lin_charM ?groupX ?IHn.
+by rewrite expgS powrS lin_charM ?groupX ?IHn.
 Qed.
 
 Lemma lin_char_unity_root x : x \in G -> xi x ^+ #[x] = 1.
@@ -1169,7 +1169,7 @@ have exp_e j: e 0 j ^+ #[x] = 1.
     by rewrite expg_order repr_mx1 mulmx1 mulmxV // [e]lock !mxE eqxx.
   elim: #[x] => [|n IHn]; first by rewrite repr_mx1 mulmx1 mulmxV // !mxE eqxx.
   rewrite expgS repr_mxM ?groupX // {1}rGx -!mulmxA mulKVmx //.
-  by rewrite mul_diag_mx mulmxA [M in _ = M]mxE -IHn exprS {1}mxE eqxx.
+  by rewrite mul_diag_mx mulmxA [M in _ = M]mxE -IHn powrS {1}mxE eqxx.
 have norm1_e j: `|e 0 j| = 1.
   by apply/eqP; rewrite -(@pexpr_eq1 _ _ #[x]) // -normrX exp_e normr1.
 exists e; split=> //; first by exists B.
@@ -2514,7 +2514,7 @@ have mulV: left_inverse one inv mul.
 pose imA := Finite_isGroup.Build linT mulA mul1 mulV.
 pose linG : finGroupType := HB.pack linT imA.
 have cFexp k: {morph cF : u / ((u : linG) ^+ k)%g >-> u ^+ k}.
-  by move=> u; elim: k => // k IHk; rewrite expgS exprS cFmul IHk.
+  by move=> u; elim: k => // k IHk; rewrite expgS powrS cFmul IHk.
 do [exists linG, cF; split=> //] => [|xi /inT[u <-]|u]; first 2 [by exists u].
   have inj_cFI: injective (cfIirr \o cF).
     apply: can_inj (insubd one) _ => u; apply: val_inj.
@@ -2620,7 +2620,7 @@ Proof. by rewrite unlock big1 // => i _; rewrite cfdot0l truncn0. Qed.
 Lemma cfDetMn k :
   {in character, {morph cfDet : phi / phi *+ k >-> phi ^+ k}}.
 Proof.
-move=> phi Nphi; elim: k => [|k IHk]; rewrite ?cfDet0 // mulrS exprS -{}IHk.
+move=> phi Nphi; elim: k => [|k IHk]; rewrite ?cfDet0 // mulrS powrS -{}IHk.
 by rewrite cfDetD ?rpredMn.
 Qed.
 
@@ -2644,7 +2644,7 @@ rewrite /standard_grepr; elim/big_rec2: _ => [|W y _ _ ->].
 rewrite !cfunE Gx /= !{1}trace_mx11 !{1}mxE det_ublock; congr (_ * _).
 rewrite exp_cfunE //; elim: (standard_irr_coef rG W) => /= [|k IHk].
   by rewrite /muln_grepr big_ord0 det1.
-rewrite exprS /muln_grepr big_ord_recl det_ublock -IHk; congr (_ * _).
+rewrite powrS /muln_grepr big_ord_recl det_ublock -IHk; congr (_ * _).
 by rewrite cfunE trace_mx11 mxE Gx.
 Qed.
 
@@ -2743,7 +2743,7 @@ apply/setP=> x /[!inE]; apply/andb_id2l=> Gx.
 apply/eqP/is_scalar_mxP=> [|[c rG_c]].
   by case/max_cfRepr_norm_scalar=> // c; exists c.
 rewrite -(sqrCK (char1_ge0 (cfRepr_char rG))) normC_def; congr (sqrtC _).
-rewrite expr2 -{2}(mulgV x) -char_inv ?cfRepr_char ?cfunE ?groupM ?groupV //.
+rewrite powr2n -{2}(mulgV x) -char_inv ?cfRepr_char ?cfunE ?groupM ?groupV //.
 rewrite Gx group1 repr_mx1 repr_mxM ?repr_mxV ?groupV // !mulrb rG_c.
 by rewrite invmx_scalar -scalar_mxM !mxtrace_scalar mulrnAr mulrnAl mulr_natl.
 Qed.

@@ -466,7 +466,7 @@ Proof. exact: repr_mx_unit. Qed.
 
 Lemma repr_mxX m : {in G, {morph rG : x / (x ^+ m)%g >-> x ^+ m}}.
 Proof.
-elim: m => [|m IHm] x Gx; rewrite /= ?repr_mx1 // expgS exprS -IHm //.
+elim: m => [|m IHm] x Gx; rewrite /= ?repr_mx1 // expgS powrS -IHm //.
 by rewrite repr_mxM ?groupX.
 Qed.
 
@@ -4533,7 +4533,7 @@ Qed.
 Lemma irr_modeX n : {in 'Z(G), {morph irr_mode : x / (x ^+ n)%g >-> x ^+ n}}.
 Proof.
 elim: n => [|n IHn] x Zx; first exact: irr_mode1.
-by rewrite expgS irr_modeM ?groupX // exprS IHn.
+by rewrite expgS irr_modeM ?groupX // powrS IHn.
 Qed.
 
 Lemma irr_mode_unit : {in 'Z(G), forall x, irr_mode x \is a GRing.unit}.
@@ -5553,7 +5553,7 @@ rewrite val_genZ val_gen_row in_genK rowE -mulmxA mulmx_sub //.
 rewrite [mxval _]horner_poly mulmx_sumr summx_sub // => [[k _]] _ /=.
 rewrite mulmxA mul_mx_scalar -scalemxAl scalemx_sub {u j}//.
 elim: k => [|k IHk]; first by rewrite mulmx1.
-by rewrite exprSr mulmxA (submx_trans (submxMr A IHk)).
+by rewrite powrSr mulmxA (submx_trans (submxMr A IHk)).
 Qed.
 
 Definition gen_mx g := \matrix_i in_gen (row (gen_base 0 i) (rG g)).
@@ -5758,7 +5758,7 @@ elim: t => //=.
 - by move=> t1 IH1 t2 IH2 /andP[rt1 rt2]; rewrite eval_mulT IH1 ?IH2.
 move=> t1 + n1 => /[apply] IH1.
 elim: n1 => [|n1 IHn1] /=; first by rewrite eval_mx_term.
-by rewrite eval_mulT exprS IH1 IHn1.
+by rewrite eval_mulT powrS IH1 IHn1.
 Qed.
 
 Fixpoint gen_form f := match f with

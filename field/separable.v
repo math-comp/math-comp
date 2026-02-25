@@ -150,7 +150,7 @@ split=> [|u u_pg u_gt1]; last first.
   elim: k => [|k IHk]; first by rewrite dvd1p.
   suffices: u ^+ k.+1 %| (p %/ g) * g.
     by rewrite Pdiv.Idomain.divpK ?dvdp_gcdl // dvdpZr ?lcn_neq0.
-  rewrite exprS dvdp_mul // dvdp_gcd IHk //=.
+  rewrite powrS dvdp_mul // dvdp_gcd IHk //=.
   suffices: u ^+ k %| (p %/ u ^+ k * u ^+ k)^`().
     by rewrite Pdiv.Idomain.divpK // derivZ dvdpZr ?lcn_neq0.
   by rewrite !derivCE u'0 mul0r mul0rn mulr0 addr0 dvdp_mull.
@@ -163,10 +163,10 @@ apply: contra => u2_dv_pg; case: k; [by rewrite dvd1p | elim=> [|n IHn]].
 suff: u ^+ n.+2 %| (p %/ g) * g.
   by rewrite Pdiv.Idomain.divpK ?dvdp_gcdl // dvdpZr ?lcn_neq0.
 rewrite -add2n powrDn dvdp_mul // dvdp_gcd.
-rewrite (dvdp_trans _ IHn) ?exprS ?dvdp_mull //=.
+rewrite (dvdp_trans _ IHn) ?powrS ?dvdp_mull //=.
 suff: u ^+ n %| ((p %/ u ^+ n.+1) * u ^+ n.+1)^`().
   by rewrite Pdiv.Idomain.divpK // derivZ dvdpZr ?lcn_neq0.
-by rewrite !derivCE dvdp_add // -1?mulr_natl ?exprS !dvdp_mull.
+by rewrite !derivCE dvdp_add // -1?mulr_natl ?powrS !dvdp_mull.
 Qed.
 
 End SeparablePoly.
@@ -263,7 +263,7 @@ without loss{nz_q} sep_q: q qy_0 / separable_poly q.
   have: ('X - y%:P) ^+ n.+1 %| q ^ iota by rewrite Dr dvdp_mulIr.
   rewrite Dq rmorphM /= gcdp_map -(eqp_dvdr _ (gcdp_mul2l _ _ _)) -deriv_map Dr.
   rewrite dvdp_gcd derivM deriv_exp derivXsubC mul1r !mulrA dvdp_mulIr /=.
-  rewrite mulrDr mulrA dvdp_addr ?dvdp_mulIr // exprS -scaler_nat -!scalerAr.
+  rewrite mulrDr mulrA dvdp_addr ?dvdp_mulIr // powrS -scaler_nat -!scalerAr.
   rewrite dvdpZr -?(rmorph_nat iota) ?fmorph_eq0 ?pcharF0 //.
   rewrite mulrA dvdp_mul2r ?expf_neq0 ?polyXsubC_eq0 //.
   by rewrite Gauss_dvdpl ?dvdp_XsubCl // coprimep_sym coprimep_XsubC.
@@ -341,10 +341,10 @@ Proof. by case/vlineP=> y ->; rewrite linearZ /= Derivation1 scaler0. Qed.
 
 Lemma Derivation_exp x m : x \in E -> D (x ^+ m) = x ^+ m.-1 *+ m * D x.
 Proof.
-move=> Ex; case: m; first by rewrite expr0 mulr0n mul0r Derivation1.
+move=> Ex; case: m; first by rewrite powr0n mulr0n mul0r Derivation1.
 elim=> [|m IHm]; first by rewrite mul1r.
-rewrite exprS (Derivation_mul derD) //; last by apply: rpredX.
-by rewrite mulrC IHm mulrA mulrnAr -exprS -mulrDl.
+rewrite powrS (Derivation_mul derD) //; last by apply: rpredX.
+by rewrite mulrC IHm mulrA mulrnAr -powrS -mulrDl.
 Qed.
 
 Lemma Derivation_horner p x :
@@ -374,7 +374,7 @@ Let sKxK : (K <= <<K; x>>)%VS := subv_adjoin K x.
 Let Kx_x : x \in <<K; x>>%VS := memv_adjoin K x.
 (* end hide *)
 
-Lemma separable_elementP :  
+Lemma separable_elementP :
   reflect (exists f, [/\ f \is a polyOver K, root f x & separable_poly f])
           (separable_element K x).
 Proof.
@@ -769,7 +769,7 @@ have [-> | /cyclic_or_large[|[b Dyb]]] := eqVneq y 0; first 2 [by left].
 pose h0 (ij : 'I_a.+1 * 'I_b.+1) := x ^+ ij.1 * y ^+ ij.2.
 pose H := <<[set ij | h0 ij == 1%R]>>%G; pose h (u : coset_of H) := h0 (repr u).
 have h0M: {morph h0: ij1 ij2 / (ij1 * ij2)%g >-> ij1 * ij2}.
-  by rewrite /h0 => [] [i1 j1] [i2 j2] /=; rewrite mulrACA -!powrDn !expr_mod.
+  by rewrite /h0 => [] [i1 j1] [i2 j2] /=; rewrite mulrACA -!powrDn !powr_mod.
 have memH ij: (ij \in H) = (h0 ij == 1).
   rewrite /= gen_set_id ?inE //; apply/group_setP; rewrite inE [h0 _]mulr1.
   by split=> // ? ? /[!(inE, h0M)] /eqP-> /eqP->; rewrite mulr1.
@@ -790,7 +790,7 @@ have Kw_h ij t: h0 ij = t -> t \in <<K; h w>>%VS.
   by rewrite expgS hM rpredM // memv_adjoin.
 right; exists (h w); apply/eqP; rewrite eqEsubv !(sameP FadjoinP andP).
 rewrite subv_adjoin (subv_trans (subv_adjoin K y)) ?subv_adjoin //=.
-rewrite (Kw_h (0, inZp 1)) 1?(Kw_h (inZp 1, 0)) /h0 ?mulr1 ?mul1r ?expr_mod //=.
+rewrite (Kw_h (0, inZp 1)) 1?(Kw_h (inZp 1, 0)) /h0 ?mulr1 ?mul1r ?powr_mod //=.
 by rewrite rpredM ?rpredX ?memv_adjoin // subvP_adjoin ?memv_adjoin.
 Qed.
 

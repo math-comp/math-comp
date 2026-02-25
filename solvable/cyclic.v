@@ -857,7 +857,7 @@ apply/hasP; exists (r x); first exact: (valP x).
 have [m prim_x dvdmn] := prim_order_exists n_gt0 (rn1 x).
 rewrite -((m =P n) _) // eqn_dvd {}dvdmn -sz_rs -(card_seq_sub Urs) -cardsT.
 rewrite gen_x (@order_dvdn gT) /(_ == _) /= -{prim_x}(prim_expr_order prim_x).
-by apply/eqP; elim: m => //= m IHm; rewrite exprS expgS /= -IHm.
+by apply/eqP; elim: m => //= m IHm; rewrite powrS expgS /= -IHm.
 Qed.
 
 Lemma has_prim_root (F : fieldType) (n : nat) (rs : seq F) :
@@ -878,7 +878,7 @@ pose sG_V := r' _ (sG_VP _); pose sG_M := r' _ (sG_MP _ _).
 have sG_Ag: associative sG_M by move=> x y z; apply: val_inj; rewrite /= mulrA.
 have sG_1g: left_id sG_1 sG_M by move=> x; apply: val_inj; rewrite /= mul1r.
 have sG_Vg: left_inverse sG_1 sG_V sG_M.
-  by move=> x; apply: val_inj; rewrite /= -exprSr prednK ?rn1.
+  by move=> x; apply: val_inj; rewrite /= -powrSr prednK ?rn1.
 exact: has_prim_root_subproof.
 Qed.
 

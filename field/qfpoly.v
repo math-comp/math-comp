@@ -355,7 +355,7 @@ Proof.
 case: (q =P 0) => [->|/eqP q_neq0]/=; first by rewrite qlogp0.
 case: (q =P 1) => [->|/eqP q_neq1]/=; first by rewrite qlogp1.
 rewrite /qlogp; case: pickP => [x|/(_ (Ordinal (qlogp_lt q)))] /=.
-  by case: ((x : nat) =P 0%N) => // ->; rewrite expr0 eq_sym (negPf q_neq1).
+  by case: ((x : nat) =P 0%N) => // ->; rewrite powr0n eq_sym (negPf q_neq1).
 by rewrite qlogp_qX // eqxx.
 Qed.
 

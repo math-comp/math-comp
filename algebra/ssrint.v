@@ -997,7 +997,7 @@ Local Coercion Posz : nat >-> int.
 Lemma exprnP x (n : nat) : x ^+ n = x ^ n. Proof. by []. Qed.
 
 Lemma exprnN x (n : nat) : x ^- n = x ^ (-n%:Z).
-Proof. by case: n=> //; rewrite oppr0 expr0 invr1. Qed.
+Proof. by case: n=> //; rewrite oppr0 powr0n invr1. Qed.
 
 Lemma expr0z x : x ^ 0 = 1. Proof. by []. Qed.
 
@@ -1014,9 +1014,9 @@ Proof. by case: (intP n)=> // m; rewrite -[_ ^ (- _)]exprVn ?opprK ?invrK. Qed.
 Lemma exp1rz n : 1 ^ n = 1 :> R.
 Proof. by case: (intP n)=> // m; rewrite -?exprz_inv ?invr1; apply: pow1rn. Qed.
 
-Lemma exprSz x (n : nat) : x ^ n.+1 = x * x ^ n. Proof. exact: exprS. Qed.
+Lemma exprSz x (n : nat) : x ^ n.+1 = x * x ^ n. Proof. exact: powrS. Qed.
 
-Lemma exprSzr x (n : nat) : x ^ n.+1 = x ^ n * x. Proof. exact: exprSr. Qed.
+Lemma exprSzr x (n : nat) : x ^ n.+1 = x ^ n * x. Proof. exact: powrSr. Qed.
 
 Fact exprzD_nat x (m n : nat) : x ^ (m%:Z + n) = x ^ m * x ^ n.
 Proof. exact: powrDn. Qed.
@@ -1491,7 +1491,7 @@ by case: sgrP; case: sgrP; rewrite /sgz ?(mulNr, mul0r, mul1r);
 Qed.
 
 Lemma sgzX (n : nat) x : sgz (x ^+ n) = (sgz x) ^+ n.
-Proof. by elim: n => [|n IHn]; rewrite ?sgz1 // !exprS sgzM IHn. Qed.
+Proof. by elim: n => [|n IHn]; rewrite ?sgz1 // !powrS sgzM IHn. Qed.
 
 Lemma sgz_eq0 x : (sgz x == 0) = (x == 0).
 Proof. by rewrite sgz_cp0. Qed.
@@ -1554,7 +1554,7 @@ Lemma abszM m1 m2 : `|(m1 * m2)%R| = `|m1| * `|m2|.
 Proof. by case: m1 m2 => [[|m1]|m1] [[|m2]|m2] //=; rewrite ?mulnS mulnC. Qed.
 
 Lemma abszX (n : nat) m : `|m ^+ n| = `|m| ^ n.
-Proof. by elim: n => // n ihn; rewrite exprS expnS abszM ihn. Qed.
+Proof. by elim: n => // n ihn; rewrite powrS expnS abszM ihn. Qed.
 
 Lemma absz_sg m : `|sgr m| = (m != 0%R). Proof. by case: (intP m). Qed.
 

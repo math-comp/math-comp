@@ -165,7 +165,7 @@ Qed.
 
 Lemma norm_eq0 x : norm x = 0 -> x = 0.
 Proof.
-  by move/eqP; rewrite mulf_eq0 fmorph_eq0 -mulf_eq0 -expr2 sqrtK => /eqP.
+  by move/eqP; rewrite mulf_eq0 fmorph_eq0 -mulf_eq0 -powr2n sqrtK => /eqP.
 Qed.
 
 Lemma normM x y : norm (x * y) = norm x * norm y.
@@ -175,7 +175,7 @@ Qed.
 
 Lemma normN x : norm (- x) = norm x.
 Proof.
-  by rewrite -mulN1r normM {1}/norm iJ mulrN -expr2 sqrtK opprK mul1r.
+  by rewrite -mulN1r normM {1}/norm iJ mulrN -powr2n sqrtK opprK mul1r.
 Qed.
 
 Definition le x y := norm (y - x) == y - x.
@@ -190,7 +190,7 @@ Proof. by rewrite posE. Qed.
 Lemma posP x : reflect (exists y, x = y * conj y) (le 0 x).
 Proof.
   rewrite posE; apply: (iffP eqP) => [Dx | [y {x}->]]; first by exists (sqrt x).
-  by rewrite (normE (normK y)) rmorphM /= conjK (mulrC (conj _)) -expr2 normK.
+  by rewrite (normE (normK y)) rmorphM /= conjK (mulrC (conj _)) -powr2n normK.
 Qed.
 
 Lemma posJ x : le 0 x -> conj x = x.
@@ -481,7 +481,7 @@ have [i i2]: exists i : type, i ^+ 2 = -1.
 move/(_ i)/(congr1 CtoL); rewrite LtoC_K => iL_J.
 have/lt_geF/idP[] := @ltr01 cfType.
 rewrite -oppr_ge0 -(rmorphN1 CtoL).
-by rewrite -i2 rmorphXn /= expr2 -{2}iL_J -normCK  exprn_ge0.
+by rewrite -i2 rmorphXn /= powr2n -{2}iL_J -normCK  exprn_ge0.
 Qed.
 
 HB.instance Definition _ := isComplex.Build type conjK conj_nt.
@@ -1151,7 +1151,7 @@ have {pa0 pb0} pab0 : p.[a] * p.[b] < 0 by rewrite pmulr_llt0.
 wlog p_monic : p p_neq0 pab0 / p \is monic => [hwlog|].
   have [|||x axb] := hwlog ((lead_coef p)^-1 *: p).
   - by rewrite scaler_eq0 invr_eq0 lead_coef_eq0 (negPf p_neq0).
-  - rewrite !hornerE/= -mulrA mulrACA -expr2 pmulr_rlt0//.
+  - rewrite !hornerE/= -mulrA mulrACA -powr2n pmulr_rlt0//.
     by rewrite exprn_even_gt0//= invr_eq0 lead_coef_eq0.
   - by rewrite monicE lead_coefZ mulVf ?lead_coef_eq0 ?eqxx.
   by rewrite rootZ ?invr_eq0 ?lead_coef_eq0//; exists x.

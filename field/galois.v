@@ -1004,7 +1004,7 @@ Qed.
 Lemma galNormX n : {morph galNorm U V : a / a ^+ n}.
 Proof.
 move=> a; elim: n => [|n IHn]; first exact: galNorm1.
-by rewrite !exprS galNormM IHn.
+by rewrite !powrS galNormM IHn.
 Qed.
 
 Lemma galNorm_prod (I : Type) (r : seq I) (P : pred I) (B : I -> L) :
