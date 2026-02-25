@@ -92,7 +92,7 @@ Proof. by rewrite /mk_monic !hI. Qed.
 Lemma coprimep_unit (p : {poly %/ h}) : p != 0%R -> coprimep hQ p.
 Proof.
 move=> pNZ.
-rewrite irreducible_poly_coprime //; last first.
+rewrite irreducible_poly_coprime //.
   by case: hI; rewrite mk_monicE.
 apply: contra pNZ => H; case: eqP => // /eqP /dvdp_leq /(_ H).
 by rewrite leqNgt size_mk_monic.

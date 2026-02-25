@@ -1940,7 +1940,7 @@ have ->: \sum_(k in A') E' k = mu *+ n'.
   apply: (addrI mu); rewrite -mulrS -Dn -sumrMnl (bigD1 i Ai) big_andbC /=.
   rewrite !(bigD1 j A'j) /= eqxx addrA subrKC addrA; congr (_ + _).
   by apply: eq_bigr => k /andP[_ /negPf->].
-rewrite prodrMn_const exprMn_n -/n' ler_pMn2r ?expn_gt0; last by case: (n').
+rewrite prodrMn_const exprMn_n -/n' ler_pMn2r ?expn_gt0; first by case: (n').
 have ->: \prod_(k in A') E' k = E' j * pi.
   by rewrite (bigD1 j) //=; congr *%R; apply: eq_bigr => k /andP[_ /negPf->].
 rewrite -(ler_pM2l mu_gt0) -exprS -Dn mulrA; apply: lt_le_trans.

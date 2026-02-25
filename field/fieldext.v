@@ -401,10 +401,10 @@ Qed.
 Lemma Fadjoin_eq_sum : <<K; x>>%VS = sumKx.
 Proof.
 apply/esym/eqP; rewrite eqEdim eq_leq ?andbT.
-  apply/subv_sumP=> i _; rewrite -agenvM prodvS ?subv_adjoin //.
-  by rewrite -expv_line (subv_trans (subX_agenv _ _)) ?agenvS ?addvSr.
-rewrite dim_Fadjoin -[n]card_ord -sum_nat_const (directvP Fadjoin_sum_direct).
-by apply: eq_bigr => i _; rewrite /= dim_cosetv.
+  rewrite dim_Fadjoin -[n]card_ord -sum_nat_const (directvP Fadjoin_sum_direct).
+  by apply: eq_bigr => i _; rewrite /= dim_cosetv.
+apply/subv_sumP=> i _; rewrite -agenvM prodvS ?subv_adjoin //.
+by rewrite -expv_line (subv_trans (subX_agenv _ _)) ?agenvS ?addvSr.
 Qed.
 
 Lemma Fadjoin_poly_eq v : v \in <<K; x>>%VS -> (Fadjoin_poly K x v).[x] = v.
@@ -475,8 +475,8 @@ set p := minPoly K x; apply: (iffP idP) => [Kx | Dp]; last first.
   suffices ->: x = - p`_0 by rewrite rpredN (polyOverP minPolyOver).
   by rewrite Dp coefB coefX coefC add0r opprK.
 rewrite (@all_roots_prod_XsubC _ p [:: x]) /= ?root_minPoly //.
-  by rewrite big_seq1 (monicP (monic_minPoly K x)) scale1r.
-by apply/eqP; rewrite size_minPoly eqSS adjoin_deg_eq1.
+  by apply/eqP; rewrite size_minPoly eqSS adjoin_deg_eq1.
+by rewrite big_seq1 (monicP (monic_minPoly K x)) scale1r.
 Qed.
 
 Lemma root_small_adjoin_poly p :
@@ -698,7 +698,7 @@ Qed.
 
 Fact aspaceOver_suproof E : is_aspace (vspaceOver E).
 Proof.
-rewrite /is_aspace has_algid1; last by rewrite mem_vspaceOver (@mem1v _ L).
+rewrite /is_aspace has_algid1; first by rewrite mem_vspaceOver (@mem1v _ L).
 by apply/prodvP=> u v; rewrite !mem_vspaceOver; apply: memvM.
 Qed.
 Canonical aspaceOver E := ASpace (aspaceOver_suproof E).
@@ -745,7 +745,7 @@ Lemma aspaceOverP (E_F : {subfield L_F}) :
 Proof.
 have [V [defEF modV memV]] := vspaceOverP E_F.
 have algE: has_algid V && (V * V <= V)%VS.
-  rewrite has_algid1; last by rewrite -memV mem1v.
+  rewrite has_algid1; first by rewrite -memV mem1v.
   by apply/prodvP=> u v; rewrite -!memV; apply: memvM.
 by exists (ASpace algE); rewrite -sup_field_module; split; first apply: val_inj.
 Qed.
@@ -853,7 +853,7 @@ Qed.
 
 Fact baseAspace_suproof (E : {subfield L}) : is_aspace (baseVspace E).
 Proof.
-rewrite /is_aspace has_algid1; last by rewrite mem_baseVspace (mem1v E).
+rewrite /is_aspace has_algid1; first by rewrite mem_baseVspace (mem1v E).
 by apply/prodvP=> u v; rewrite !mem_baseVspace; apply: memvM.
 Qed.
 Canonical baseAspace E := ASpace (baseAspace_suproof E).
