@@ -166,7 +166,6 @@ doc: build $(DOCDIR)/dependency_graph.dot
 	find . -name "*.v" -o -name "*.glob" | grep -v "/\." | grep -v "_opam/" | xargs rocqnavi \
 	-title "Mathematical Components $(GIT_HASH)" \
 	-d $(DOCDIR) -Q . mathcomp \
-	-coqlib https://rocq-prover.org/doc/current/stdlib/ \
 	-file-graph $(DOCDIR)/dependency_graph.dot \
 	-structure-graph $(DOCDIR)/hierarchy_graph.dot \
 	-index-blacklist etc/rocqnavi_index-blacklist \
