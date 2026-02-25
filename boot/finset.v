@@ -1625,9 +1625,9 @@ Lemma big_imset h (A : {pred I}) G : {in A &, injective h} ->
   \big[aop/idx]_(j in h @: A) G j = \big[aop/idx]_(i in A) G (h i).
 Proof.
 move=> injh; pose hA := mem (image h A).
-rewrite (eq_bigl hA) => [|j]; last exact/imsetP/imageP.
+rewrite (eq_bigl hA) => [j|]; first exact/imsetP/imageP.
 pose h' := omap (fun u : {j | hA j} => iinv (svalP u)) \o insub.
-rewrite (reindex_omap h h') => [|j hAj]; rewrite {}/h'/= ?insubT/= ?f_iinv//.
+rewrite (reindex_omap h h') => [j hAj|]; rewrite {}/h'/= ?insubT/= ?f_iinv//.
 apply: eq_bigl => i; case: insubP => [u /= -> def_u | nhAhi]; last first.
   by apply/andP/idP => [[]//| Ai]; case/imageP: nhAhi; exists i.
 set i' := iinv _; have Ai' : i' \in A := mem_iinv (svalP u).
@@ -1648,7 +1648,7 @@ Lemma big_cards1 (f : {set I} -> R) :
   \big[aop/idx]_(A : {set I} | #|A| == 1) f A
   = \big[aop/idx]_(i : I) f [set i].
 Proof.
-rewrite (reindex_omap set1 unset1) => [|A /cards1P[i ->] /[!set1K]//].
+rewrite (reindex_omap set1 unset1) => [A /cards1P[i ->] /[!set1K]//|].
 by apply: eq_bigl => i; rewrite set1K cards1 !eqxx.
 Qed.
 
@@ -1667,7 +1667,7 @@ transitivity (\big[add/zero]_(f0 in (imset f (mem setT)))
   suff <-: setT = imset f (mem setT) by apply: congr_big=>// i; rewrite in_setT.
   apply/esym/eqP; rewrite -subTset; apply/subsetP => b _.
   by apply/imsetP; exists (FinSet b).
-rewrite big_imset; last by case=> g; case=> h _ _; rewrite /f => /= ->.
+rewrite big_imset; first by case=> g; case=> h _ _; rewrite /f => /= ->.
 apply: congr_big => //; case=> g; first exact: in_setT.
 by move=> _; apply: eq_bigr => i _; congr (if _ then _ else _); rewrite unlock.
 Qed.
@@ -2240,11 +2240,11 @@ Let rhs P E := \big[op/idx]_(A in P) \big[op/idx]_(x in A) E x.
 Lemma big_trivIset_cond P (K : pred T) (E : T -> R) :
   trivIset P -> \big[op/idx]_(x in cover P | K x) E x = rhs_cond P K E.
 Proof.
-move=> tiP; rewrite (partition_big (pblock P) [in P]) -/op => /= [|x].
-  apply: eq_bigr => A PA; apply: eq_bigl => x; rewrite andbAC; congr (_ && _).
-  rewrite -mem_pblock; apply/andP/idP=> [[Px /eqP <- //] | Ax].
-  by rewrite (def_pblock tiP PA Ax).
-by case/andP=> Px _; apply: pblock_mem.
+move=> tiP; rewrite (partition_big (pblock P) [in P]) -/op => /= [x|].
+  by case/andP=> Px _; apply: pblock_mem.
+apply: eq_bigr => A PA; apply: eq_bigl => x; rewrite andbAC; congr (_ && _).
+rewrite -mem_pblock; apply/andP/idP=> [[Px /eqP <- //] | Ax].
+by rewrite (def_pblock tiP PA Ax).
 Qed.
 
 Lemma big_trivIset P (E : T -> R) :
@@ -2274,10 +2274,10 @@ have trivP: trivIset P.
 have ->: \bigcup_i F i = cover P.
   apply/esym; rewrite cover_imset big_mkcond; apply: eq_bigr => i _.
   by rewrite inE; case: eqP.
-rewrite big_trivIset // /rhs big_imset => [|i j _ /setIdP[_ notFj0] eqFij].
-  rewrite big_mkcond; apply: eq_bigr => i _; rewrite inE.
-  by case: eqP => //= ->; rewrite big_set0.
-by apply: contraNeq (disjF _ _) _; rewrite -setI_eq0 eqFij setIid.
+rewrite big_trivIset // /rhs big_imset => [i j _ /setIdP[_ notFj0] eqFij|].
+  by apply: contraNeq (disjF _ _) _; rewrite -setI_eq0 eqFij setIid.
+rewrite big_mkcond; apply: eq_bigr => i _; rewrite inE.
+by case: eqP => //= ->; rewrite big_set0.
 Qed.
 
 End BigOps.
@@ -2764,7 +2764,7 @@ Lemma big_tag_cond  (Q_ : forall i, {pred T_ i})
      untag idx (P_ i) j.
 Proof.
 rewrite (big_sub_cond (tagged_with T_ i)).
-rewrite (reindex (tag_with i)); last exact/onW_bij/tag_with_bij.
+rewrite (reindex (tag_with i)); first exact/onW_bij/tag_with_bij.
 by apply: eq_big => [x|x Qix]; rewrite ?untagE.
 Qed.
 
@@ -2790,7 +2790,7 @@ Section BigFProd.
     \big[plus/zero]_(g in family (tagged_with T_) | Q g)
      \big[times/one]_(i : I) (untag zero (P_ i) (g i)).
   Proof.
-  rewrite (reindex (@of_family_tagged_with _ T_)); last first.
+  rewrite (reindex (@of_family_tagged_with _ T_)).
     exact/onW_bij/of_family_tagged_with_bij.
   rewrite [in RHS]big_sub_cond; apply/esym/eq_bigr => -[/= f fP] Qf.
   apply: eq_bigr => i _; rewrite /fun_of_fprod/=.

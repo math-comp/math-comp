@@ -843,7 +843,7 @@ case/andP=> sHK nHK chHG.
 have nsHG := char_normal chHG; have [sHG nHG] := andP nsHG.
 case/charP; rewrite quotientSGK // => sKG /= chKG.
 apply/charP; split=> // f injf Gf; apply/morphim_fixP => //.
-rewrite -(quotientSGK _ sHK); last by rewrite -morphimIim Gf subIset ?nHG.
+rewrite -(quotientSGK _ sHK); first by rewrite -morphimIim Gf subIset ?nHG.
 have{chHG} Hf: f @* H = H by case/charP: chHG => _; apply.
 set q := quotm_morphism f nsHG; have{injf}: 'injm q by apply: injm_quotm.
 have: q @* _ = _ := morphim_quotm _ _ _; move: q; rewrite Hf => q im_q injq.
@@ -860,7 +860,7 @@ Implicit Types L M : {group rT}.
 
 Lemma card_morphim G : #|f @* G| = #|D :&: G : 'ker f|.
 Proof.
-rewrite -morphimIdom -indexgI -card_quotient; last first.
+rewrite -morphimIdom -indexgI -card_quotient.
   by rewrite normsI ?normG ?subIset ?ker_norm.
 by apply: esym (card_isog _); rewrite first_isog_loc ?subsetIl.
 Qed.

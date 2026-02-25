@@ -427,7 +427,7 @@ exists (fun sP nn => f sP (dc nn) nil) => [sP n ys | sP [ys] | sP sQ eqPQ n].
   case Df: (find _ n)=> // [x] _; exists (code (n :: dc n1)).
   by rewrite codeK /= Df /= (correct Df).
 elim: {n}(dc n) nil => [|n ns IHs] xs /=; first by rewrite eqPQ.
-rewrite (@extensional _ _ (r (f sQ ns) xs)) => [|x]; last by rewrite IHs.
+rewrite (@extensional _ _ (r (f sQ ns) xs)) => [x|]; first by rewrite IHs.
 by case: find => /=.
 Qed.
 HB.instance Definition _ := seq_hasChoice.
@@ -453,9 +453,9 @@ exists f => [tP n u | tP [[i x] tPxi] | sP sQ eqPQ n].
   case/complete=> ni tPn; exists (code [:: ni; nt]); rewrite /f codeK /fi.
   by case Df: find tPn => //= [j] _; have:= correct Df.
 rewrite /f /fi; case: (dc n) => [|ni [|nt []]] //=.
-rewrite (@extensional _ _ (ft sQ nt)) => [|i].
-  by case: find => //= i; congr (omap _ _); apply: extensional => x /=.
-by congr (omap _ _); apply: extensional => x /=.
+rewrite (@extensional _ _ (ft sQ nt)) => [i|].
+  by congr (omap _ _); apply: extensional => x /=.
+by case: find => //= i; congr (omap _ _); apply: extensional => x /=.
 Qed.
 HB.instance Definition _ := tagged_hasChoice.
 

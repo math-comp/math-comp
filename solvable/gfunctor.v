@@ -401,13 +401,13 @@ have sFK: 'ker (restrm sDF (coset (F2 _ G))) \subset K.
   rewrite {}/K !ker_restrm ker_comp /= subsetI subsetIl !ker_coset /=.
   by rewrite -sub_morphim_pre ?subsetIl // morphimIdom ?morphimF.
 have sOF := gFsub F1 (G / F2 _ G); have sGG: G \subset G by [].
-rewrite -sub_quotient_pre; last first.
+rewrite -sub_quotient_pre.
   by apply: subset_trans (nF2 _ _); rewrite morphimS ?gFmod_closed.
 suffices im_fact H : F2 _ G \subset gval H -> H \subset G ->
   factm sFK sGG @* (H / F2 _ G) = f @* H / F2 _ (f @* G).
 - rewrite -2?im_fact ?gFmod_closed ?gFsub //.
-    by rewrite cosetpreK morphimF /= ?morphim_restrm ?setIid.
-  by rewrite -sub_quotient_pre ?normG //= trivg_quotient sub1G.
+    by rewrite -sub_quotient_pre ?normG //= trivg_quotient sub1G.
+  by rewrite cosetpreK morphimF /= ?morphim_restrm ?setIid.
 move=> sFH sHG; rewrite -(morphimIdom _ (H / _)) /= {2}morphim_restrm /= setIid.
 rewrite -morphimIG ?ker_coset // -(morphim_restrm sDF) morphim_factm.
 by rewrite morphim_restrm morphim_comp -quotientE morphimIdom.
@@ -423,7 +423,7 @@ Variables F1 F2 : GFunctor.pmap.
 Lemma gFmod_hereditary : GFunctor.hereditary (F1 %% F2).
 Proof.
 move=> gT H G sHG; set FGH := _ :&: H; have nF2H := gFnorm F2 H.
-rewrite -sub_quotient_pre; last exact: subset_trans (subsetIr _ _) _.
+rewrite -sub_quotient_pre; first exact: subset_trans (subsetIr _ _) _.
 pose rH := restrm nF2H (coset (F2 _ H)); pose rHM := [morphism of rH].
 have rnorm_simpl: rHM @* H = H / F2 _ H by rewrite morphim_restrm setIid.
 have nF2G := subset_trans sHG (gFnorm F2 G).

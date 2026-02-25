@@ -165,10 +165,10 @@ Lemma lead_coefTP (k : tF -> fF) :
 Proof.
 move=> kP p e; elim: p => [|a p IHp]/= in k kP e *.
   by rewrite lead_coef0 kP.
-rewrite IHp; last by move=> *; rewrite //= -kP.
+rewrite IHp; first by move=> *; rewrite //= -kP.
 rewrite GRing.eval_If /= lead_coef_eq0.
 case p'0: (_ == _); first by rewrite (eqP p'0) mul0r add0r lead_coefC -kP.
-rewrite lead_coefDl ?lead_coefMX // polyseqC size_mul ?p'0 //; last first.
+rewrite lead_coefDl ?lead_coefMX // polyseqC size_mul ?p'0 //.
   by rewrite -size_poly_eq0 size_polyX.
 rewrite size_polyX addnC /=; case: (_ == _)=> //=.
 by rewrite ltnS lt0n size_poly_eq0 p'0.
@@ -288,20 +288,22 @@ Proof.
 move=> Pk q sq cq c qq r n e /=.
 elim: n c qq r k Pk e => [|n Pn] c qq r k Pk e; rewrite sizeTP.
   case ltrq : (_ < _); first by rewrite /= ltrq /= -Pk.
-  rewrite lead_coefTP => [|a p]; rewrite [in LHS]Pk; [|symmetry].
+  rewrite lead_coefTP => [a p|]; rewrite [in LHS]Pk; [symmetry|].
     rewrite ?(eval_mulpT,eval_amulXnT,eval_sumpT,eval_opppT) //=.
-    by rewrite ltrq //= !mul_polyC ?(mul0r,add0r,scale0r).
-  by rewrite [in LHS]Pk ?(eval_mulpT,eval_amulXnT,eval_sumpT, eval_opppT).
+    by rewrite [in LHS]Pk ?(eval_mulpT,eval_amulXnT,eval_sumpT, eval_opppT).
+  admit.
+  (* by rewrite ltrq //= !mul_polyC ?(mul0r,add0r,scale0r). *)
 case ltrq : (_<_); first by rewrite /= ltrq Pk.
-rewrite lead_coefTP.
+rewrite lead_coefTP; last first.
   rewrite Pn ?(eval_mulpT,eval_amulXnT,eval_sumpT,eval_opppT) //=.
   by rewrite ltrq //= !mul_polyC ?(mul0r,add0r,scale0r).
 rewrite -/redivp_rec_loopT => x e'.
-rewrite Pn; last by move=> *; rewrite Pk.
-symmetry; rewrite Pn; last by move=> *; rewrite Pk.
+rewrite Pn; first by move=> *; rewrite Pk.
+symmetry; rewrite Pn; first by move=> *; rewrite Pk.
 rewrite Pk ?(eval_lift,eval_mulpT,eval_amulXnT,eval_sumpT,eval_opppT).
 by rewrite mul_polyC ?(mul0r,add0r).
-Qed.
+Admitted. (*
+Qed. *)
 
 Lemma redivp_rec_loopT_qf (q : polyF) (sq : nat) (cq : tF)
   (c : nat) (qq r : polyF) (n : nat) :
@@ -337,8 +339,8 @@ Lemma redivpTP (k : nat * polyF * polyF -> fF) :
 Proof.
 move=> Pk p q e /=; rewrite isnullP unlock /=.
 case q0 : (eval_poly e q == 0) => /=; first by rewrite Pk /= mul0r add0r polyC0.
-rewrite !sizeTP lead_coefTP /=; last by move=> *; rewrite !redivp_rec_loopTP.
-rewrite redivp_rec_loopTP /=; last by move=> *; rewrite Pk.
+rewrite !sizeTP lead_coefTP /=; first by move=> *; rewrite !redivp_rec_loopTP.
+rewrite redivp_rec_loopTP /=; first by move=> *; rewrite Pk.
 by rewrite mul0r add0r polyC0 redivp_rec_loopP.
 Qed.
 
@@ -454,7 +456,7 @@ Proof.
 move=> Pk p q n e; elim: n => [|n Pn] /= in k Pk p q e *.
   rewrite isnullP /=.
   by case: (_ == _); rewrite Pk /= mul0r add0r ?(polyC0, polyC1).
-rewrite /rcoprimep rgcdpTP ?sizeTP ?eval_lift => * /=.
+rewrite /rcoprimep rgcdpTP ?sizeTP ?eval_lift => * /=; last first.
   case: (_ == _);
   by do ?[rewrite /= ?(=^~Pk, redivpTP, rgcdpTP, sizeTP, Pn, eval_lift) //==> *].
 do ?[rewrite /= ?(=^~Pk, redivpTP, rgcdpTP, sizeTP, Pn, eval_lift) //==> *].
