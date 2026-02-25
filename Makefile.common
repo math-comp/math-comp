@@ -156,10 +156,10 @@ ROCQNAVI_TYPE_INFO ?=
 
 $(DOCDIR)/depend.d:
 	mkdir -p $(DOCDIR)
-	coqdep -f _CoqProject > $(DOCDIR)/depend.d
+	$(ROCQ) dep -f _CoqProject > $(DOCDIR)/depend.d
 
 doc: build $(DOCDIR)/depend.d
-	etc/rocqnavi_generate-hierarchy-graph.sh $(DOCDIR)/hierarchy_graph.dot
+	etc/rocqnavi_generate-hierarchy-graph.sh $(ROCQ) $(DOCDIR)/hierarchy_graph.dot
 	find . -name "*.v" -o -name "*.glob" | grep -v "/\." | grep -v "_opam/" | xargs rocqnavi \
 	-title "Mathematical Components $(GIT_HASH)" \
 	-d $(DOCDIR) -Q . mathcomp \
