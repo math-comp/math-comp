@@ -651,8 +651,8 @@ Proof.
 move=> Dy nHy; have [sHD | not_sHD] := boolP (H \subset D); last first.
   by rewrite !cfMorphEout // rmorph_alg cfConjg1.
 apply/cfun_inP=> x Gx; rewrite !(cfConjgE, cfMorphE) ?memJ_norm ?groupV //.
-  by rewrite morphJ ?morphV ?groupV // (subsetP sHD).
-by rewrite (subsetP (morphim_norm _ _)) ?mem_morphim.
+  by rewrite (subsetP (morphim_norm _ _)) ?mem_morphim.
+by rewrite morphJ ?morphV ?groupV // (subsetP sHD).
 Qed.
 
 Lemma inertia_morph_pre (phi : 'CF(f @* H)) :
@@ -685,7 +685,7 @@ Proof.
 move=> Gy nHy; have [_ defS] := isomP isoH.
 rewrite morphimEdom (eq_in_imset eq_hg) -morphimEsub // in defS.
 apply/cfun_inP=> gx; rewrite -{1}defS => /morphimP[x Gx Hx ->] {gx}.
-rewrite cfConjgE; last by rewrite -defS inE -morphimJ ?(normP nHy).
+rewrite cfConjgE; first by rewrite -defS inE -morphimJ ?(normP nHy).
 by rewrite -morphV -?morphJ -?eq_hg ?cfIsomE ?cfConjgE ?memJ_norm ?groupV.
 Qed.
 
@@ -848,11 +848,11 @@ Lemma cfConjgBigdprodi i (phi : 'CF(A i)) :
    (cfBigdprodi defG phi ^ y = cfBigdprodi defG (phi ^ y))%CF.
 Proof.
 rewrite cfConjgDprodl; try by case: ifP => [/nAy// | _]; rewrite norm1 inE.
-  congr (cfDprodl _ _); case: ifP => [Pi | _].
-    by rewrite cfConjgRes_norm ?nAy.
-  by apply/cfun_inP=> _ /set1P->; rewrite !(cfRes1, cfConjg1).
-rewrite -sub1set norms_gen ?norms_bigcup // sub1set.
-by apply/bigcapP=> j /andP[/nAy].
+  rewrite -sub1set norms_gen ?norms_bigcup // sub1set.
+  by apply/bigcapP=> j /andP[/nAy].
+congr (cfDprodl _ _); case: ifP => [Pi | _].
+  by rewrite cfConjgRes_norm ?nAy.
+by apply/cfun_inP=> _ /set1P->; rewrite !(cfRes1, cfConjg1).
 Qed.
 
 Lemma cfConjgBigdprod phi :
@@ -946,7 +946,7 @@ have AtoB_P s (psi := 'chi_s) (chi := 'Ind[G] psi): s \in calA ->
     by split; rewrite ?char1_ge0 // eq_sym char1_eq0.
   have lb_chi_r: chi 1%g <= 'chi_r 1%g ?= iff (f == e).
     rewrite cfInd1 // -(cfRes1 H) DpsiH -(cfRes1 H 'chi_r) DrH !cfunE sum_cfunE.
-    rewrite (eq_big_seq (fun _ => theta 1%g)) => [|i]; last first.
+    rewrite (eq_big_seq (fun _ => theta 1%g)) => [i|].
       by case/cfclassP=> y _ ->; rewrite cfConjg1.
     rewrite reindex_cfclass //= sumr_const -(eq_card (cfclass_IirrE _ _)).
     rewrite mulr_natl mulrnAr card_cfclass_Iirr //.
@@ -1141,7 +1141,7 @@ have [defKT | ltKT_K] := eqVneq (K :&: T) K; last first.
     by rewrite size_cfclass //= -{2}(setIidPl sKG) -setIA defKT.
   pose phiKt := Tuple (introT eqP t_cast); pose p i := cfIirr (tnth phiKt i).
   have pK i: 'chi_(p i) = (phi ^: K)%CF`_i.
-    rewrite cfIirrE; first by rewrite (tnth_nth 0).
+    rewrite cfIirrE; last by rewrite (tnth_nth 0).
     by have /cfclassP[y _ ->] := mem_tnth i phiKt; rewrite cfConjg_irr ?mem_irr.
   constructor 3; exists p => [i j /(congr1 (tnth (irr L)))/eqP| ].
     by apply: contraTeq; rewrite !pK !nth_uniq ?t_cast ?cfclass_uniq.
@@ -1152,7 +1152,7 @@ have [defKT | ltKT_K] := eqVneq (K :&: T) K; last first.
     rewrite -[t]card_ord -mulrA -(cfRes1 L) DthL cfunE; congr (_ * _).
     rewrite mulr_natl -sumr_const sum_cfunE -t_cast; apply: eq_bigr => i _.
     by have /cfclassP[y _ ->] := mem_nth 0 (valP i); rewrite cfConjg1.
-  rewrite eqn_leq lt0n (contraNneq _ (irr1_neq0 s)); last first.
+  rewrite eqn_leq lt0n (contraNneq _ (irr1_neq0 s)).
     by rewrite Dth1 => ->; rewrite !mul0r.
   rewrite -leC_nat -(ler_pM2r (gt0CiG K L)) -/t -(ler_pM2r (irr1_gt0 p0)).
   rewrite mul1r -Dth1 -cfInd1 //.
@@ -1170,7 +1170,7 @@ have mmLthL i: 'Res[L] 'chi_(mmLth i) = 'Res[L] theta.
   by rewrite scale1r mul1r.
 have [inj_Mphi | /injectivePn[i [j i'j eq_mm_ij]]] := boolP (injectiveb mmLth).
   suffices /eqP e1: e == 1 by constructor 1; rewrite DthL e1 scale1r mem_irr.
-  rewrite eqn_leq lt0n (contraNneq _ (irr1_neq0 s)); last first.
+  rewrite eqn_leq lt0n (contraNneq _ (irr1_neq0 s)).
     by rewrite -(cfRes1 L) DthL cfunE => ->; rewrite !mul0r.
   rewrite -leq_sqr -leC_nat natrX -(ler_pM2r (irr1_gt0 p0)) -mulrA mul1r.
   have ->: e%:R * 'chi_p0 1%g = 'Res[L] theta 1%g by rewrite DthL cfunE.

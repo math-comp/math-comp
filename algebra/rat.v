@@ -1066,7 +1066,7 @@ have [K kerK]: {K : 'M_(k, m) | map_mx intr K == kermx S}%MS.
   move: (mxrank_ker S); rewrite rE kE => krk.
   pose B := row_base (kermx S); pose d := \prod_ij denq (B ij.1 ij.2).
   exists (castmx (krk, erefl m) (map_mx numq (intr d *: B))).
-  rewrite map_castmx !eqmx_cast -map_mx_comp map_mx_id_in => [|i j]; last first.
+  rewrite map_castmx !eqmx_cast -map_mx_comp map_mx_id_in => [i j|].
     rewrite mxE mulrC [d](bigD1 (i, j)) //= rmorphM mulrA.
     by rewrite -numqE -rmorphM numq_int.
   suff nz_d: d%:Q != 0 by rewrite !eqmx_scale // !eq_row_base andbb.

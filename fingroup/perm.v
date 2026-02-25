@@ -268,22 +268,23 @@ rewrite -ffactnn -{2}(card_sig [in A]) /= -card_inj_ffuns_on.
 pose fT (f : ffA) := [ffun x => oapp f x (insub x)].
 pose pfT f := insubd (1 : {perm T}) (fT f).
 pose fA s : ffA := [ffun u => s (val u)].
-rewrite -!sum1dep_card -sum1_card (reindex_onto fA pfT) => [|f].
-  apply: eq_bigl => p; rewrite andbC; apply/idP/and3P=> [onA | []]; first split.
-  - apply/eqP; suffices fTAp: fT (fA p) = pval p.
-      by apply/permP=> x; rewrite -!pvalE insubdK fTAp //; apply: (valP p).
-    apply/ffunP=> x; rewrite ffunE pvalE.
-    by case: insubP => [u _ <- | /out_perm->] //=; rewrite ffunE.
-  - by apply/forallP=> [[x Ax]]; rewrite ffunE /= perm_closed.
-  - by apply/injectiveP=> u v; rewrite !ffunE => /perm_inj; apply: val_inj.
-  move/eqP=> <- _ _; apply/subsetP=> x; rewrite !inE -pvalE val_insubd fun_if.
-  by rewrite if_arg ffunE; case: insubP; rewrite // pvalE perm1 if_same eqxx.
-case/andP=> /forallP-onA /injectiveP-f_inj.
-apply/ffunP=> u; rewrite ffunE -pvalE insubdK; first by rewrite ffunE valK.
-apply/injectiveP=> {u} x y; rewrite !ffunE.
-case: insubP => [u _ <-|]; case: insubP => [v _ <-|] //=; first by move/f_inj->.
-  by move=> Ay' def_y; rewrite -def_y [_ \in A]onA in Ay'.
-by move=> Ax' def_x; rewrite def_x [_ \in A]onA in Ax'.
+rewrite -!sum1dep_card -sum1_card (reindex_onto fA pfT) => [f|].
+  case/andP=> /forallP-onA /injectiveP-f_inj.
+  apply/ffunP=> u; rewrite ffunE -pvalE insubdK; last by rewrite ffunE valK.
+  apply/injectiveP=> {u} x y; rewrite !ffunE.
+  case: insubP => [u _ <-|]; case: insubP => [v _ <-|] //=.
+  - by move/f_inj->.
+  - by move=> Ay' def_y; rewrite -def_y [_ \in A]onA in Ay'.
+  by move=> Ax' def_x; rewrite def_x [_ \in A]onA in Ax'.
+apply: eq_bigl => p; rewrite andbC; apply/idP/and3P=> [onA | []]; first split.
+- apply/eqP; suffices fTAp: fT (fA p) = pval p.
+    by apply/permP=> x; rewrite -!pvalE insubdK fTAp //; apply: (valP p).
+  apply/ffunP=> x; rewrite ffunE pvalE.
+  by case: insubP => [u _ <- | /out_perm->] //=; rewrite ffunE.
+- by apply/forallP=> [[x Ax]]; rewrite ffunE /= perm_closed.
+- by apply/injectiveP=> u v; rewrite !ffunE => /perm_inj; apply: val_inj.
+move/eqP=> <- _ _; apply/subsetP=> x; rewrite !inE -pvalE val_insubd fun_if.
+by rewrite if_arg ffunE; case: insubP; rewrite // pvalE perm1 if_same eqxx.
 Qed.
 
 End Theory.
@@ -597,7 +598,7 @@ Implicit Types s t : 'S_n.
 
 Lemma card_Sn : #|'S_(n)| = n`!.
 Proof.
-rewrite (eq_card (B := perm_on [set : 'I_n])).
+rewrite (eq_card (B := perm_on [set : 'I_n])); last first.
   by rewrite card_perm /= cardsE /= card_ord.
 move=> p; rewrite inE unfold_in /perm_on /=.
 by apply/esym/subsetP => i _; rewrite in_set.
@@ -655,7 +656,7 @@ elim: {k}(k : nat) {1 3}k (erefl (k : nat)) => [|m IHm] k def_k.
   by rewrite (_ : k = ord0) ?lift_perm1 ?odd_perm1 //; apply: val_inj.
 have le_mn: m < n.+1 by [rewrite -def_k ltnW]; pose j := Ordinal le_mn.
 rewrite -(mulg1 1)%g -(lift_permM _ j) odd_permM {}IHm // addbC.
-rewrite (_ : _ 1 = tperm j k); first by rewrite odd_tperm neq_ltn/= def_k leqnn.
+rewrite (_ : _ 1 = tperm j k); last by rewrite odd_tperm neq_ltn/= def_k leqnn.
 apply/permP=> i; case: (unliftP j i) => [i'|] ->; last first.
   by rewrite lift_perm_id tpermL.
 apply: ord_inj; rewrite lift_perm_lift !permE /= eq_sym -if_neg neq_lift.

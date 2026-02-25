@@ -172,7 +172,7 @@ Lemma lcn_cprod n A B G : A \* B = G -> 'L_n(A) \* 'L_n(B) = 'L_n(G).
 Proof.
 case: n => // n /cprodP[[H K -> ->{A B}] defG cHK].
 have sL := subset_trans (lcn_sub _ _); rewrite cprodE ?(centSS _ _ cHK) ?sL //.
-symmetry; elim: n => // n; rewrite lcnSn => ->; rewrite commMG /=; last first.
+symmetry; elim: n => // n; rewrite lcnSn => ->; rewrite commMG /=.
   by apply: subset_trans (commg_normr _ _); rewrite sL // -defG mulG_subr.
 rewrite -!(commGC G) -defG -{1}(centC cHK).
 rewrite !commMG ?normsR ?lcn_norm ?cents_norm // 1?centsC //.
@@ -182,7 +182,7 @@ Qed.
 Lemma lcn_dprod n A B G : A \x B = G -> 'L_n(A) \x 'L_n(B) = 'L_n(G).
 Proof.
 move=> defG; have [[K H defA defB] _ _ tiAB] := dprodP defG.
-rewrite !dprodEcp // in defG *; first exact: lcn_cprod.
+rewrite !dprodEcp // in defG *; last exact: lcn_cprod.
 by rewrite defA defB; apply/trivgP; rewrite -tiAB defA defB setISS ?lcn_sub.
 Qed.
 
@@ -442,7 +442,7 @@ Qed.
 Lemma ucn_dprod n A B G : A \x B = G -> 'Z_n(A) \x 'Z_n(B) = 'Z_n(G).
 Proof.
 move=> defG; have [[K H defA defB] _ _ tiAB] := dprodP defG.
-rewrite !dprodEcp // in defG *; first exact: ucn_cprod.
+rewrite !dprodEcp // in defG *; last exact: ucn_cprod.
 by rewrite defA defB; apply/trivgP; rewrite -tiAB defA defB setISS ?ucn_sub.
 Qed.
 
@@ -785,7 +785,7 @@ have -> : (morphm fm @* setXn G)%g = setXn (fun i => G (lift ord0 i)).
   exists w; last by apply/ffunP => i; rewrite morphmE ffunE/= wl.
   apply/setXnP => i.
   case: (unliftP ord0 i) => [j|]->; rewrite ?wl ?w0 ?vG//.
-rewrite IHn ?andbT//; last by move=> i; apply: solG.
+rewrite IHn ?andbT//; first by move=> i; apply: solG.
 pose k (x : gT ord0) : prod_group_gT :=
   [ffun i : 'I_n.+1 =>
      match (ord0 =P i) return (gT i) : Type with

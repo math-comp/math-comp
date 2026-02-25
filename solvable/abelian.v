@@ -333,7 +333,7 @@ Proof.
 case/cprodP=> [[K H -> ->{A B}] <- cKH].
 apply/eqP; rewrite eqn_dvd dvdn_lcm !exponentS ?mulG_subl ?mulG_subr //=.
 apply/exponentP=> _ /imset2P[x y Kx Hy ->].
-rewrite -[1]mulg1 expgMn; last by red; rewrite -(centsP cKH).
+rewrite -[1]mulg1 expgMn; first by red; rewrite -(centsP cKH).
 congr (_ * _); apply/eqP; rewrite -order_dvdn.
   by rewrite (dvdn_trans (dvdn_exponent Kx)) ?dvdn_lcml.
 by rewrite (dvdn_trans (dvdn_exponent Hy)) ?dvdn_lcmr.
@@ -462,7 +462,7 @@ apply/idP/andP=> [abelG | []].
 case/and3P=> pH cHH expHp; case/and3P=> pK cKK expKp.
 rewrite -defG /abelem pgroupM pH pK abelianM cHH cKK cHK /=.
 apply/exponentP=> _ /imset2P[x y Hx Ky ->].
-rewrite expgMn; last by red; rewrite -(centsP cHK).
+rewrite expgMn; first by red; rewrite -(centsP cHK).
 by rewrite (exponentP expHp) // (exponentP expKp) // mul1g.
 Qed.
 
@@ -690,10 +690,10 @@ Proof.
 move=> p_pr; apply: (iffP (pmaxElemP p G E)) => [[] | defE].
   case/pElemP=> sEG abelE maxE; have [_ cEE eE] := and3P abelE.
   apply/setP=> x; rewrite !inE -andbA; apply/and3P/idP=> [[Gx cEx xp] | Ex].
-    rewrite -(maxE (<[x]> <*> E)%G) ?joing_subr //.
+    rewrite -(maxE (<[x]> <*> E)%G) ?joing_subr //; last first.
       by rewrite -cycle_subG joing_subl.
     rewrite inE join_subG cycle_subG Gx sEG /=.
-    rewrite (cprod_abelem _ (cprodEY _)); last by rewrite centsC cycle_subG.
+    rewrite (cprod_abelem _ (cprodEY _)); first by rewrite centsC cycle_subG.
     by rewrite cycle_abelem ?p_pr ?orbT // order_dvdn xp.
   by rewrite (subsetP sEG) // (subsetP cEE) // (exponentP eE).
 split=> [|H]; last first.
@@ -773,8 +773,8 @@ Qed.
 Lemma p_rank_abelem p G : p.-abelem G -> 'r_p(G) = logn p #|G|.
 Proof.
 move=> abelG; apply/eqP; rewrite eqn_leq andbC (bigmax_sup G)//.
-  by apply/bigmax_leqP=> E /[1!inE] /andP[/lognSg->].
-by rewrite inE subxx.
+  by rewrite inE subxx.
+by apply/bigmax_leqP=> E /[1!inE] /andP[/lognSg->].
 Qed.
 
 Lemma p_rankS p A B : A \subset B -> 'r_p(A) <= 'r_p(B).
@@ -973,7 +973,7 @@ Lemma injm_Ldiv n A : f @* 'Ldiv_n(A) = 'Ldiv_n(f @* A).
 Proof.
 apply/eqP; rewrite eqEsubset morphim_Ldiv.
 rewrite -[f @* 'Ldiv_n(A)](morphpre_invm injf).
-rewrite -sub_morphim_pre; last by rewrite subIset ?morphim_sub.
+rewrite -sub_morphim_pre; first by rewrite subIset ?morphim_sub.
 rewrite injmI ?injm_invm // setISS ?morphim_LdivT //.
 by rewrite sub_morphim_pre ?morphim_sub // morphpre_invm.
 Qed.
@@ -1105,7 +1105,7 @@ Proof.
 move=> defG; apply/eqP; rewrite eqn_leq -leq_subLR andbC.
 have [_ defKH cKH tiKH] := dprodP defG; have nKH := cents_norm cKH.
 rewrite {1}(isog_p_rank (quotient_isog nKH tiKH)) /= -quotientMidl defKH.
-rewrite p_rank_quotient; last by rewrite -defKH mul_subG ?normG.
+rewrite p_rank_quotient; first by rewrite -defKH mul_subG ?normG.
 have [[E EpE] [F EpF]] := (p_rank_witness p K, p_rank_witness p H).
 have [[sEK abelE <-] [sFH abelF <-]] := (pnElemP EpE, pnElemP EpF).
 have defEF: E \x F = E <*> F.
@@ -1149,7 +1149,7 @@ Qed.
 Lemma Ohm_cont rT G (f : {morphism G >-> rT}) :
   f @* 'Ohm_n(G) \subset 'Ohm_n(f @* G).
 Proof.
-rewrite morphim_gen ?genS //; last by rewrite -gen_subG Ohm_sub.
+rewrite morphim_gen ?genS //; first by rewrite -gen_subG Ohm_sub.
 apply/subsetP=> fx /morphimP[x Gx]; rewrite inE Gx /=.
 case/OhmPredP=> p p_pr xpn_1 -> {fx}.
 rewrite inE morphimEdom imset_f //=; apply/OhmPredP; exists p => //.
@@ -1181,26 +1181,26 @@ Lemma Ohm_p_cycle p x :
   p.-elt x -> 'Ohm_n(<[x]>) = <[x ^+ (p ^ (logn p #[x] - n))]>.
 Proof.
 move=> p_x; apply/eqP; rewrite (OhmE p_x) eqEsubset cycle_subG mem_gen.
-  rewrite gen_subG andbT; apply/subsetP=> y /LdivP[x_y ypn].
-  case: (leqP (logn p #[x]) n) => [|lt_n_x].
-    by rewrite -subn_eq0 => /eqP->.
-  have p_pr: prime p by move: lt_n_x; rewrite lognE; case: (prime p).
-  have def_y: <[y]> = <[x ^+ (#[x] %/ #[y])]>.
-    apply: congr_group; apply/set1P.
-    by rewrite -cycle_sub_group ?cardSg ?inE ?cycle_subG ?x_y /=.
-  rewrite -cycle_subG def_y cycle_subG -{1}(part_pnat_id p_x) p_part.
-  rewrite -{1}(subnK (ltnW lt_n_x)) expnD -muln_divA ?order_dvdn ?ypn //.
-  by rewrite expgM mem_cycle.
-rewrite !inE mem_cycle -expgM -expnD addnC -maxnE -order_dvdn.
-by rewrite -{1}(part_pnat_id p_x) p_part dvdn_exp2l ?leq_maxr.
+  rewrite !inE mem_cycle -expgM -expnD addnC -maxnE -order_dvdn.
+  by rewrite -{1}(part_pnat_id p_x) p_part dvdn_exp2l ?leq_maxr.
+rewrite gen_subG andbT; apply/subsetP=> y /LdivP[x_y ypn].
+case: (leqP (logn p #[x]) n) => [|lt_n_x].
+  by rewrite -subn_eq0 => /eqP->.
+have p_pr: prime p by move: lt_n_x; rewrite lognE; case: (prime p).
+have def_y: <[y]> = <[x ^+ (#[x] %/ #[y])]>.
+  apply: congr_group; apply/set1P.
+  by rewrite -cycle_sub_group ?cardSg ?inE ?cycle_subG ?x_y /=.
+rewrite -cycle_subG def_y cycle_subG -{1}(part_pnat_id p_x) p_part.
+rewrite -{1}(subnK (ltnW lt_n_x)) expnD -muln_divA ?order_dvdn ?ypn //.
+by rewrite expgM mem_cycle.
 Qed.
 
 Lemma Ohm_dprod A B G : A \x B = G -> 'Ohm_n(A) \x 'Ohm_n(B) = 'Ohm_n(G).
 Proof.
 case/dprodP => [[H K -> ->{A B}]] <- cHK tiHK.
-rewrite dprodEY //; last first.
-- by apply/trivgP; rewrite -tiHK setISS ?Ohm_sub.
+rewrite dprodEY //.
 - by rewrite (subset_trans (subset_trans _ cHK)) ?centS ?Ohm_sub.
+- by apply/trivgP; rewrite -tiHK setISS ?Ohm_sub.
 apply/eqP; rewrite -(cent_joinEr cHK) eqEsubset join_subG /=.
 rewrite !OhmS ?joing_subl ?joing_subr //= cent_joinEr //= -genM_join genS //.
 apply/subsetP=> _ /setIdP[/imset2P[x y Hx Ky ->] /OhmPredP[p p_pr /eqP]].
@@ -1259,7 +1259,7 @@ Proof.
 move=> pG cGG; rewrite (MhoE pG); rewrite gen_set_id //; apply/group_setP.
 split=> [|xn yn]; first by apply/imsetP; exists 1; rewrite ?expg1n.
 case/imsetP=> x Gx ->; case/imsetP=> y Gy ->.
-by rewrite -expgMn; [apply: imset_f; rewrite groupM | apply: (centsP cGG)].
+by rewrite -expgMn; [apply: (centsP cGG) | apply: imset_f; rewrite groupM].
 Qed.
 
 Lemma trivg_Mho G : 'Mho^n(G) == 1 -> 'Ohm_n(G) == G.
@@ -1275,7 +1275,7 @@ Qed.
 Lemma Mho_p_cycle p x : p.-elt x -> 'Mho^n(<[x]>) = <[x ^+ (p ^ n)]>.
 Proof.
 move=> p_x.
-apply/eqP; rewrite (MhoE p_x) eqEsubset cycle_subG mem_gen; last first.
+apply/eqP; rewrite (MhoE p_x) eqEsubset cycle_subG mem_gen.
   by apply: imset_f; apply: cycle_id.
 rewrite gen_subG andbT; apply/subsetP=> _ /imsetP[_ /cycleP[k ->] ->].
 by rewrite -expgM mulnC expgM mem_cycle.
@@ -1283,21 +1283,21 @@ Qed.
 
 Lemma Mho_cprod A B G : A \* B = G -> 'Mho^n(A) \* 'Mho^n(B) = 'Mho^n(G).
 Proof.
-case/cprodP => [[H K -> ->{A B}]] <- cHK; rewrite cprodEY //; last first.
+case/cprodP => [[H K -> ->{A B}]] <- cHK; rewrite cprodEY //.
   by rewrite (subset_trans (subset_trans _ cHK)) ?centS ?Mho_sub.
 apply/eqP; rewrite -(cent_joinEr cHK) eqEsubset join_subG /=.
 rewrite !MhoS ?joing_subl ?joing_subr //= cent_joinEr // -genM_join.
 apply: genS; apply/subsetP=> xypn /imsetP[_ /setIdP[/imset2P[x y Hx Ky ->]]].
 move/constt_p_elt; move: (pdiv _) => p <- ->.
 have cxy: commute x y by red; rewrite -(centsP cHK).
-rewrite consttM // expgMn; last exact: commuteX2.
+rewrite consttM // expgMn; first exact: commuteX2.
 by rewrite mem_mulg ?Mho_p_elt ?groupX ?p_elt_constt.
 Qed.
 
 Lemma Mho_dprod A B G : A \x B = G -> 'Mho^n(A) \x 'Mho^n(B) = 'Mho^n(G).
 Proof.
 case/dprodP => [[H K -> ->{A B}]] defG cHK tiHK.
-rewrite dprodEcp; first by apply: Mho_cprod; rewrite cprodE.
+rewrite dprodEcp; last by apply: Mho_cprod; rewrite cprodE.
 by apply/trivgP; rewrite -tiHK setISS ?Mho_sub.
 Qed.
 
@@ -1516,7 +1516,7 @@ Proof.
 move=> cGG; have nilG := abelian_nil cGG; case p_pr: (prime p); last first.
   by apply/eqP; rewrite lognE p_pr eqn0Ngt p_rank_gt0 mem_primes p_pr.
 case/dprodP: (Ohm_dprod 1 (nilpotent_pcoreC p nilG)) => _ <- _ /TI_cardMg->.
-rewrite mulnC logn_Gauss; last first.
+rewrite mulnC logn_Gauss.
   rewrite prime_coprime // -p'natE // -/(pgroup _ _).
   exact: pgroupS (Ohm_sub _ _) (pcore_pgroup _ _).
 rewrite -(p_rank_Sylow (nilpotent_pcore_Hall p nilG)) -p_rank_Ohm1.
@@ -1562,8 +1562,8 @@ rewrite leq_eqVlt => /predU1P[{xp_yp m IHm leym}oy | ltpy]; last first.
     by move/IHm; apply; rewrite groupMr // groupV groupX ?cycle_id.
   apply: leq_ltn_trans (leq_trans ltpy leym).
   rewrite dvdn_leq ?prime_gt0 // order_dvdn expgMn.
-    by rewrite expgVn def_yp mulgV.
-  by apply: (centsP cGG); rewrite ?groupV ?groupX.
+    by apply: (centsP cGG); rewrite ?groupV ?groupX.
+  by rewrite expgVn def_yp mulgV.
 pose Y := <[y]>; have nsYG: Y <| G by rewrite -sub_abelian_normal ?cycle_subG.
 have [sYG nYG] := andP nsYG; have nYx := subsetP nYG x Gx.
 have GxY: coset Y x \in G / Y by rewrite mem_morphim.
@@ -1604,7 +1604,7 @@ have ltKm: #|K| < m.
   by rewrite subsetI subxx cycle_subG.
 case/splitsP: (IHm _ _ ltKm (abelemS sKG abelG) (subsetIr H K)) => L.
 case/complP=> tiHKL defK; apply/splitsP; exists L; rewrite inE.
-rewrite -subG1 -tiHKL -setIA setIS; last by rewrite subsetI -defK mulG_subr /=.
+rewrite -subG1 -tiHKL -setIA setIS; first by rewrite subsetI -defK mulG_subr /=.
 by rewrite -(setIidPr sHG) -defG -group_modl ?cycle_subG //= setIC -mulgA defK.
 Qed.
 
@@ -1693,8 +1693,8 @@ have{lnOx} lnOy i: lnO i <[x]> = lnO i <[y]>.
   have co_yx': coprime #[y] #[x.`_p^'] by rewrite !order_constt coprime_partC.
   have defX: <[y]> \x <[x.`_p^']> = <[x]>.
     rewrite dprodE ?coprime_TIg //.
-      by rewrite -cycleM ?consttC //; apply: (centsP cXX); apply: mem_cycle.
-    by apply: (sub_abelian_cent2 cXX); rewrite cycle_subG mem_cycle.
+      by apply: (sub_abelian_cent2 cXX); rewrite cycle_subG mem_cycle.
+    by rewrite -cycleM ?consttC //; apply: (centsP cXX); apply: mem_cycle.
   rewrite -(lnOx i _ _ _ defX) addnC {1}/lnO lognE.
   case: and3P => // [[p_pr _ /idPn[]]]; rewrite -p'natE //.
   exact: pgroupS (Ohm_sub _ _) (p_elt_constt _ _).
@@ -1791,11 +1791,11 @@ case p_x: (p_group <[x]>); last first.
   rewrite -(dprod_card (Ohm_dprod n def_x)) -(dprod_card (Mho_dprod n def_x)).
   rewrite mulnCA -mulnA mulnCA mulnA.
   rewrite !{}IHm ?(dprod_card def_x) ?(leq_trans _ lexm) {m lexm}//.
-    rewrite /order -(dprod_card def_x) -!orderE !order_constt ltn_Pmull //.
-    rewrite p_part -(expn0 p) ltn_exp2l 1?lognE ?prime_gt1 ?pdiv_prime //.
-    by rewrite order_gt0 pdiv_dvd.
-  rewrite proper_card // properEneq cycle_subG mem_cycle andbT.
-  by apply: contra (negbT p'x); move/eqP <-; apply: p_elt_constt.
+    rewrite proper_card // properEneq cycle_subG mem_cycle andbT.
+    by apply: contra (negbT p'x); move/eqP <-; apply: p_elt_constt.
+  rewrite /order -(dprod_card def_x) -!orderE !order_constt ltn_Pmull //.
+  rewrite p_part -(expn0 p) ltn_exp2l 1?lognE ?prime_gt1 ?pdiv_prime //.
+  by rewrite order_gt0 pdiv_dvd.
 case/p_groupP: p_x => p p_pr p_x.
 rewrite (Ohm_p_cycle n p_x) (Mho_p_cycle n p_x) -!orderE.
 set k := logn p #[x]; have ox: #[x] = (p ^ k)%N by rewrite -card_pgroup.
@@ -1905,7 +1905,7 @@ rewrite leq_pmul2l //; apply: contraLR.
 rewrite eqn_dvd dvdn_exponent //= -ltnNge => lt_x_e.
 rewrite (leq_trans (ltn_Pmull (prime_gt1 p_pr) _)) ?expn_gt0 ?prime_gt0 //.
 rewrite -expnS dvdn_leq // ?gcdn_gt0 ?order_gt0 // dvdn_gcd.
-rewrite pfactor_dvdn // dvdn_exp2l.
+rewrite pfactor_dvdn // dvdn_exp2l; last first.
   by rewrite -[ltnRHS]subn0 ltn_sub2l // lognE p_pr order_gt0 p_dv_x.
 rewrite ltn_sub2r // ltnNge -(dvdn_Pexp2l _ _ (prime_gt1 p_pr)) -!p_part.
 by rewrite !part_pnat_id // (pnat_dvd (exponent_dvdn G)).
@@ -2013,7 +2013,7 @@ Lemma exponent_dprod_homocyclic p K H G :
 Proof.
 move=> defG pG homG ntK; have [homK _] := dprod_homocyclic defG pG homG.
 have [] := abelian_type_dprod_homocyclic defG pG homG.
-by rewrite abelian_type_homocyclic // -['r(K)]prednK ?rank_gt0 => [[]|].
+by rewrite abelian_type_homocyclic // -['r(K)]prednK ?rank_gt0 => [|[]].
 Qed.
 
 End AbelianStructure.

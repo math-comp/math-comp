@@ -54,7 +54,7 @@ apply/idP/idP=> [pr_p | dv_pF]; last first.
   apply/primeP; split=> // d dv_dp; have: d <= p by apply: dvdn_leq.
   rewrite orbC leq_eqVlt => /orP[-> // | ltdp].
   have:= dvdn_trans dv_dp dv_pF; rewrite dFact // big_mkord.
-  rewrite (bigD1 (Ordinal ltdp)) /=; last by rewrite -lt0n (dvdn_gt0 p_gt0).
+  rewrite (bigD1 (Ordinal ltdp)) /=; first by rewrite -lt0n (dvdn_gt0 p_gt0).
   by rewrite orbC -addn1 dvdn_addr ?dvdn_mulr // dvdn1 => ->.
 pose Fp1 := Ordinal lt1p; pose Fp0 := Ordinal p_gt0.
 have ltp1p: p.-1 < p by [rewrite prednK]; pose Fpn1 := Ordinal ltp1p.
@@ -95,21 +95,21 @@ have vFpId i: (vFp i == i :> nat) = xpred2 Fp1 Fpn1 i.
   rewrite addnBA ?leq_sqr // mulnS -addnA -mulnn -mulnDl.
   rewrite -(subnK (le_pmFp (vFp i) i)) mulnDl addnCA.
   rewrite -[1 ^ 2]/(Fp1 : nat) -addnBA // dvdn_addl.
-    by rewrite Euclid_dvdM // -eqFp eq_sym orbC /dvdn Fp_mod eqn0Ngt lt0i.
-  by rewrite -eqn_mod_dvd // Fp_mod modnDl -(vFpV _ ni0).
+    by rewrite -eqn_mod_dvd // Fp_mod modnDl -(vFpV _ ni0).
+  by rewrite Euclid_dvdM // -eqFp eq_sym orbC /dvdn Fp_mod eqn0Ngt lt0i.
 suffices [mod_fact]: toFp (p.-1)`! = Fpn1.
   by rewrite /dvdn -addn1 -modnDml mod_fact addn1 prednK // modnn.
-rewrite dFact //; rewrite ((big_morph toFp) Fp1 mFpM) //; first last.
-- by apply: val_inj; rewrite /= modn_small.
+rewrite dFact //; rewrite ((big_morph toFp) Fp1 mFpM) //.
 - by move=> i j; apply: val_inj; rewrite /= modnMm.
-rewrite big_mkord (eq_bigr id) => [|i _]; last by apply: val_inj => /=.
+- by apply: val_inj; rewrite /= modn_small.
+rewrite big_mkord (eq_bigr id) => [i _|]; first by apply: val_inj => /=.
 pose ltv i := vFp i < i; rewrite (bigID ltv) -/mFpM [mFpM _ _]mFpC.
-rewrite (bigD1 Fp1) -/mFpM; last by rewrite [ltv _]ltn_neqAle vFpId.
-rewrite [mFpM _ _]mFp1 (bigD1 Fpn1) -?mFpA -/mFpM; last first.
+rewrite (bigD1 Fp1) -/mFpM; first by rewrite [ltv _]ltn_neqAle vFpId.
+rewrite [mFpM _ _]mFp1 (bigD1 Fpn1) -?mFpA -/mFpM.
   rewrite -lt0n -ltnS prednK // lt1p.
   by rewrite [ltv _]ltn_neqAle vFpId eqxx orbT eq_sym eqF1n1.
-rewrite (reindex_onto vFp vFp) -/mFpM => [|i]; last by do 3!case/andP; auto.
-rewrite (eq_bigl (xpredD1 ltv Fp0)) => [|i]; last first.
+rewrite (reindex_onto vFp vFp) -/mFpM => [i|]; first by do 3!case/andP; auto.
+rewrite (eq_bigl (xpredD1 ltv Fp0)) => [i|].
   rewrite andbC -!andbA -2!negb_or -vFpId orbC -leq_eqVlt -ltnNge.
   have [->|ni0] := eqVneq i; last by rewrite vFpK // eqxx vFp0.
   by case: eqP => // ->; rewrite !andbF.
@@ -374,11 +374,11 @@ Lemma card_uniq_tuples T n (A : pred T) :
 Proof.
 elim: n A => [|n IHn] A.
   by rewrite (@eq_card1 _ [tuple]) // => t; rewrite [t]tuple0 inE.
-rewrite -sum1dep_card (partition_big (@thead _ _) A) /= => [|t]; last first.
+rewrite -sum1dep_card (partition_big (@thead _ _) A) /= => [t|].
   by case/tupleP: t => x t; do 2!case/andP.
 rewrite ffactnS -sum_nat_const; apply: eq_bigr => x Ax.
 rewrite (cardD1 x) [x \in A]Ax /= -(IHn [predD1 A & x]) -sum1dep_card.
-rewrite (reindex (fun t : n.-tuple T => [tuple of x :: t])) /=; last first.
+rewrite (reindex (fun t : n.-tuple T => [tuple of x :: t])) /=.
   pose ttail (t : n.+1.-tuple T) := [tuple of behead t].
   exists ttail => [t _ | t /andP[_ /eqP <-]]; first exact: val_inj.
   by rewrite -tuple_eta.
@@ -416,8 +416,7 @@ apply/eqP; rewrite -(eqn_pmul2r (fact_gt0 k)) bin_ffact // eq_sym.
 rewrite -sum_nat_cond_const -{1 3}(card_ord k).
 rewrite -card_inj_ffuns_on -sum1dep_card.
 pose imIk (f : {ffun 'I_k -> T}) := f @: 'I_k.
-rewrite (partition_big imIk (fun A => (A \subset B) && (#|A| == k))) /=
-  => [|f]; last first.
+rewrite (partition_big imIk (fun A => (A \subset B) && (#|A| == k))) /= => [f|].
   move=> /andP [/ffun_onP f_ffun /injectiveP inj_f].
   rewrite card_imset ?card_ord // eqxx andbT.
   by apply/subsetP => x /imsetP [i _ ->]; rewrite f_ffun.
@@ -426,7 +425,7 @@ have [f0 inj_f0 im_f0]: exists2 f, injective f & f @: 'I_k = A.
   rewrite -cardAk; exists enum_val; first exact: enum_val_inj.
   apply/setP=> a; apply/imsetP/idP=> [[i _ ->] | Aa]; first exact: enum_valP.
   by exists (enum_rank_in Aa a); rewrite ?enum_rankK_in.
-rewrite (reindex (fun p : {ffun _} => [ffun i => f0 (p i)])) /=; last first.
+rewrite (reindex (fun p : {ffun _} => [ffun i => f0 (p i)])) /=.
   pose ff0' f i := odflt i [pick j | f i == f0 j].
   exists (fun f => [ffun i => ff0' f i]) => [p _ | f].
     apply/ffunP=> i; rewrite ffunE /ff0'; case: pickP => [j | /(_ (p i))].
@@ -469,7 +468,7 @@ have inc_A (A : {set 'I_n}) : sorted ltn (map val (enum A)).
   rewrite -[enum _](eq_filter (mem_enum _)).
   rewrite -(eq_filter (mem_map val_inj _)) -filter_map.
   by rewrite (sorted_filter ltn_trans) // unlock val_ord_enum iota_ltn_sorted.
-rewrite -!sum1dep_card (reindex_onto f_t f_A) /= => [|A]; last first.
+rewrite -!sum1dep_card (reindex_onto f_t f_A) /= => [A|].
   by move/eqP=> cardAm; apply/setP=> x; rewrite inE -(mem_enum A) -val_fA.
 apply: eq_bigl => t.
 apply/idP/idP => [inc_t|/andP [/eqP t_m /eqP <-]]; last by rewrite val_fA.
@@ -492,14 +491,14 @@ pose add_mn_nat (t : m.-tuple In1) i := i + nth x0 t i.
 have add_mnC t: val \o add_mn t =1 add_mn_nat t \o val.
   by move=> i; rewrite /= (tnth_nth x0).
 pose f_add t := [tuple of map (add_mn t) (ord_tuple m)].
-rewrite -card_ltn_sorted_tuples -!sum1dep_card (reindex f_add) /=.
+rewrite -card_ltn_sorted_tuples -!sum1dep_card (reindex f_add) /=; last first.
   apply: eq_bigl => t; rewrite -map_comp (eq_map (add_mnC t)) map_comp.
   rewrite enumT unlock val_ord_enum -[in LHS](drop0 t).
   have [m0 | m_gt0] := posnP m.
     by rewrite {2}m0 /= drop_oversize // size_tuple m0.
   have def_m := subnK m_gt0; rewrite -{2}def_m addn1 /= {1}/add_mn_nat.
   move: 0 (m - 1) def_m => i k; rewrite -[in RHS](size_tuple t) => def_m.
-  rewrite (drop_nth x0) /=; last by rewrite -def_m leq_addl.
+  rewrite (drop_nth x0) /=; first by rewrite -def_m leq_addl.
   elim: k i (nth x0 t i) def_m => [|k IHk] i x /=.
     by rewrite add0n => ->; rewrite drop_size.
   rewrite addSnnS => def_m; rewrite -addSn leq_add2l -IHk //.
@@ -532,7 +531,7 @@ Proof.
 symmetry; set In1 := 'I_n.+1; pose x0 : In1 := ord0.
 pose add_mn (i j : In1) : In1 := inord (i + j).
 pose f_add (t : m.-tuple In1) := [tuple of scanl add_mn x0 t].
-rewrite -card_sorted_tuples -!sum1dep_card (reindex f_add) /=.
+rewrite -card_sorted_tuples -!sum1dep_card (reindex f_add) /=; last first.
   apply: eq_bigl => t; rewrite -[\sum_(i <- t) i]add0n.
   transitivity (path leq x0 (map val (f_add t))) => /=; first by case: map.
   rewrite -{1 2}[0]/(val x0); elim: {t}(val t) (x0) => /= [|x t IHt] s.
@@ -562,7 +561,8 @@ Lemma card_ord_partitions m n :
 Proof.
 symmetry; set In1 := 'I_n.+1; pose x0 : In1 := ord0.
 pose f_add (t : m.-tuple In1) := [tuple of sub_ord (\sum_(x <- t) x) :: t].
-rewrite -card_partial_ord_partitions -!sum1dep_card (reindex f_add) /=.
+rewrite -card_partial_ord_partitions -!sum1dep_card (reindex f_add) /=;
+    last first.
   by apply: eq_bigl => t; rewrite big_cons /= addnC (sameP maxn_idPr eqP) maxnE.
 exists (fun t : m.+1.-tuple In1 => [tuple of behead t]) => [t _|].
   exact: val_inj.

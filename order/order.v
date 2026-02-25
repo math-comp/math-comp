@@ -3455,7 +3455,7 @@ Lemma sorted_filter_gt x s :
   sorted <=%O s -> [seq y <- s | x < y] = drop (count (<= x) s) s.
 Proof.
 move=> s_sorted; rewrite count_le_gt -[LHS]revK -filter_rev.
-rewrite (@sorted_filter_lt _ T^d); first by rewrite take_rev revK count_rev.
+rewrite (@sorted_filter_lt _ T^d); last by rewrite take_rev revK count_rev.
 by rewrite rev_sorted.
 Qed.
 
@@ -3463,7 +3463,7 @@ Lemma sorted_filter_ge x s :
   sorted <=%O s -> [seq y <- s | x <= y] = drop (count (< x) s) s.
 Proof.
 move=> s_sorted; rewrite count_lt_ge -[LHS]revK -filter_rev.
-rewrite (@sorted_filter_le _ T^d); first by rewrite take_rev revK count_rev.
+rewrite (@sorted_filter_le _ T^d); last by rewrite take_rev revK count_rev.
 by rewrite rev_sorted.
 Qed.
 

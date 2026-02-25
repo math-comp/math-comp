@@ -528,8 +528,8 @@ Definition type_of & (phantom (rel _) encD) := equivQuotient.
 Lemma canon_id : forall x, (invariant canon canon) x.
 Proof.
 move=> x /=; rewrite /canon (@eq_choose _ _ (eC x)).
-  by rewrite (@choose_id _ (eC x) _ x) ?chooseP ?equiv_refl.
-by move=> y; apply: equiv_ltrans; rewrite equiv_sym /= chooseP.
+  by move=> y; apply: equiv_ltrans; rewrite equiv_sym /= chooseP.
+by rewrite (@choose_id _ (eC x) _ x) ?chooseP ?equiv_refl.
 Qed.
 
 Definition pi := locked (fun x => EquivQuotient (canon_id x)).
@@ -548,7 +548,7 @@ Lemma pi_CD (x y : C) : reflect (pi x = pi y) (eC x y).
 Proof.
 apply: (iffP idP) => hxy.
   apply: (can_inj ereprK); unlock pi canon => /=.
-  rewrite -(@eq_choose _ (eC x) (eC y)); last first.
+  rewrite -(@eq_choose _ (eC x) (eC y)).
     by move=> z; rewrite /eC /=; apply: equiv_ltrans.
   by apply: choose_id; rewrite ?equiv_refl //.
 rewrite (equiv_trans (chooseP (equiv_refl _ _))) //=.
