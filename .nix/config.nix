@@ -81,6 +81,9 @@ with builtins; with (import <nixpkgs> {}).lib;
          #   for a complete list of Coq packages available in Nix
          # * <github_login>:<branch> is such that this will use the branch <branch>
          #   from https://github.com/<github_login>/<repository>
+         mathcomp-finmap.override.version = "proux01:mc1545";
+         coquelicot.override.version = "proux01:mc1545";
+         interval.override.version = "mc1545";
        };
   in {
     "rocq-master" = { rocqPackages = {
@@ -111,7 +114,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       hierarchy-builder.job = true;
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
-      interval.job = false;  # not yet compatible with 9.1
       ssprove.job = false;  # not yet compatible with 9.1
     }; };
     "rocq-9.0" = { rocqPackages = {
