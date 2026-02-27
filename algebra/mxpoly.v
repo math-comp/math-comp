@@ -3,8 +3,8 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype tuple finfun bigop fingroup perm.
-From mathcomp Require Import nmodule algebra divalg decfield matrix mxalgebra.
-From mathcomp Require Import poly polydiv.
+From mathcomp Require Import nmodule rings_modules_and_algebras divalg decfield.
+From mathcomp Require Import matrix mxalgebra poly polydiv.
 
 (******************************************************************************)
 (*   This file provides basic support for formal computation with matrices,   *)

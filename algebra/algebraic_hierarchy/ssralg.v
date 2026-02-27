@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
 From mathcomp Require Import choice fintype finfun bigop prime binomial.
-From mathcomp Require Export nmodule algebra divalg decfield.
+From mathcomp Require Export nmodule rings_modules_and_algebras divalg decfield.
 
 (******************************************************************************)
 (*                            Ring-like structures                            *)

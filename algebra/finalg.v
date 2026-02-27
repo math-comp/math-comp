@@ -3,7 +3,8 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype finset fingroup morphism perm action.
-From mathcomp Require Import nmodule algebra divalg decfield countalg.
+From mathcomp Require Import nmodule rings_modules_and_algebras divalg decfield.
+From mathcomp Require Import countalg.
 
 (*****************************************************************************)
 (*      The algebraic part of the algebraic hierarchy for finite types       *)

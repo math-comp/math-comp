@@ -2,7 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat.
-From mathcomp Require Import seq nmodule algebra divalg generic_quotient.
+From mathcomp Require Import seq generic_quotient nmodule.
+From mathcomp Require Import rings_modules_and_algebras divalg.
 
 (******************************************************************************)
 (*                   Quotients of algebraic structures                        *)

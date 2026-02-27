@@ -3,7 +3,8 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop finset fingroup nmodule order.
-From mathcomp Require Import interval algebra divalg poly orderedzmod.
+From mathcomp Require Import interval rings_modules_and_algebras divalg poly.
+From mathcomp Require Import orderedzmod.
 
 (******************************************************************************)
 (*                    Number structures (numdomain.v)                         *)

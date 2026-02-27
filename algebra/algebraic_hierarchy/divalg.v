@@ -2,7 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
-From mathcomp Require Import choice fintype bigop prime nmodule algebra.
+From mathcomp Require Import choice fintype bigop prime nmodule.
+From mathcomp Require Import rings_modules_and_algebras.
 
 (******************************************************************************)
 (*              Ring-like structures with multiplicative inverse              *)
