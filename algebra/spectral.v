@@ -1,8 +1,8 @@
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat.
-From mathcomp Require Import seq div fintype bigop ssralg finset fingroup zmodp.
-From mathcomp Require Import poly polydiv order ssrnum matrix mxalgebra vector.
-From mathcomp Require Import mxpoly mxred sesquilinear.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
+From mathcomp Require Import fintype bigop nmodule order algebra divalg.
+From mathcomp Require Import poly matrix mxalgebra mxpoly mxred.
+From mathcomp Require Import orderedzmod numdomain numfield sesquilinear.
 
 (******************************************************************************)
 (*                             Spectral theory                                *)

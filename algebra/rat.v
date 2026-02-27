@@ -1,10 +1,11 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import prime fintype finfun bigop order tuple ssralg.
-From mathcomp Require Import countalg div ssrnum ssrint archimedean poly zmodp.
-From mathcomp Require Import polydiv intdiv matrix mxalgebra vector.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
+From mathcomp Require Import choice fintype tuple finfun bigop prime nmodule.
+From mathcomp Require Import order algebra divalg countalg poly polydiv.
+From mathcomp Require Import zmodp matrix mxalgebra vector orderedzmod.
+From mathcomp Require Import numdomain numfield ssrint intdiv archimedean.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)
