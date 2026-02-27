@@ -24,6 +24,8 @@ ssrint.v
 num_theory/orderedzmod.v
 num_theory/numdomain.v
 num_theory/numfield.v
+num_theory/zmodext.v
+num_theory/numext.v
 num_theory/ssrnum.v
 vector.v
 zmodp.v

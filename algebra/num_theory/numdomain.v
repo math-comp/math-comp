@@ -50,6 +50,15 @@ Import orderedzmod.Num.
 
 Module Num.
 
+(*
+HB.mixin Record Zmodule_isSemiPseudoNormed (R : POrderedZmodule.type) M
+         of GRing.Zmodule M := {
+  enorm : M -> \bar R;
+  ler_normD : forall x y, norm (x + y) <= norm x + norm y;
+  normrMn : forall x n, norm (x *+ n) = norm x *+ n;
+  normrN : forall x, norm (- x) = norm x;
+}. *)
+
 HB.mixin Record Zmodule_isSemiNormed (R : POrderZmodule.type) M
          & GRing.Zmodule M := {
   norm : M -> R;
@@ -61,6 +70,43 @@ HB.mixin Record Zmodule_isSemiNormed (R : POrderZmodule.type) M
 #[short(type="semiNormedZmodType")]
 HB.structure Definition SemiNormedZmodule (R : porderZmodType) :=
   { M of Zmodule_isSemiNormed R M & GRing.Zmodule M }.
+
+(* HB.factory Record Zmodule_isSemiNormed (R : POrderedZmodule.type) M
+         of GRing.Zmodule M := {
+  norm : M -> R;
+  ler_normD : forall x y, norm (x + y) <= norm x + norm y;
+  normrMn : forall x n, norm (x *+ n) = norm x *+ n;
+  normrN : forall x, norm (- x) = norm x;
+}.
+
+HB.builders Context R M of Zmodule_isSemiNormed R M.
+
+
+Fact real_addr_closed : addr_closed (@real R).
+Proof.
+split=> [|x y Rx Ry]; first by rewrite realE lexx.
+without loss{Rx} x_ge0: x y Ry / 0 <= x.
+  case/orP: Rx => [? | x_le0]; first exact.
+  by rewrite -rpredN opprD; apply; rewrite ?rpredN ?oppr_ge0.
+case/orP: Ry => [y_ge0 | y_le0]; first by rewrite realE -nnegrE rpredD.
+rewrite realE -[y]opprK orbC -oppr_ge0 opprB !subr_ge0.
+rewrite ger_leVge.
+rewrite ?oppr_ge0.
+Qed. *)
+(*
+HB.instance Definition _ := GRing.isAddClosed.Build R Rreal_pred
+  real_addr_closed.
+
+
+Lemma  comparabler_trans : transitive (comparable : rel R).
+Proof.
+move=> y x z; rewrite !comparablerE => xBy_real yBz_real.
+
+have := rpredD xBy_real yBz_real; rewrite addrA addrNK.
+Qed. *)
+
+(* HB.end. *)
+
 
 HB.mixin Record SemiNormedZmodule_isPositiveDefinite
     (R : POrderZmodule.type) M & @SemiNormedZmodule R M := {
@@ -1465,7 +1511,7 @@ Hint Extern 0 (is_true (norm _ \is real)) => apply: normr_real : core.
 Lemma real_ler_norml x y : x \is real -> (`|x| <= y) = (- y <= x <= y).
 Proof.
 move=> xR; wlog x_ge0 : x xR / 0 <= x => [hwlog|].
-  move: (xR) => /(@real_leVge _ 0) /orP [|/hwlog->|hx] //.
+  have /orP[/hwlog->|hx]// := real_leVge real0 xR.
   by rewrite -[x]opprK normrN lerN2 andbC lerNl hwlog ?realN ?oppr_ge0.
 rewrite ger0_norm //; have [le_xy|] := boolP (x <= y); last by rewrite andbF.
 by rewrite (le_trans _ x_ge0) // oppr_le0 (le_trans x_ge0).
@@ -1497,8 +1543,8 @@ Qed.
 
 Lemma real_ltr_norml x y : x \is real -> (`|x| < y) = (- y < x < y).
 Proof.
-move=> Rx; wlog x_ge0 : x Rx / 0 <= x => [hwlog|].
-  move: (Rx) => /(@real_leVge _ 0) /orP [|/hwlog->|hx] //.
+move=> xR; wlog x_ge0 : x xR / 0 <= x => [hwlog|].
+  have /orP[/hwlog->|hx]// := real_leVge real0 xR.
   by rewrite -[x]opprK normrN ltrN2 andbC ltrNl hwlog ?realN ?oppr_ge0.
 rewrite ger0_norm //; have [le_xy|] := boolP (x < y); last by rewrite andbF.
 by rewrite (lt_le_trans _ x_ge0) // oppr_lt0 (le_lt_trans x_ge0).
