@@ -602,7 +602,7 @@ elim: {a b}#|b| {1 3 4}b (eqxx #|b|) => [|m IHm] b def_m f_b.
   by rewrite eq_card0 // => x; apply: (pred0P def_m).
 have [x b_x | b0] := pickP b; last by rewrite (eq_card0 b0) in def_m.
 have [r_x ox_n] := f_b x b_x; rewrite (cardD1 x) [x \in b]b_x eqSS in def_m.
-rewrite mulSn -{1}ox_n -(IHm _ def_m) => [|_ /andP[_ /f_b //]].
+rewrite mulSn -{1}ox_n -(IHm _ def_m) => [_ /andP[_ /f_b //]|].
 rewrite -(cardID (fconnect f x)); congr (_ + _); apply: eq_card => y.
   by apply: andb_idl => /= fxy; rewrite !inE -(rootP symf fxy) r_x.
 by congr (~~ _ && _); rewrite /= /in_mem /= symf -(root_connect symf) r_x.
@@ -622,7 +622,7 @@ Lemma fcard_gt0P (a : {pred T}) :
   fclosed f a -> reflect (exists x, x \in a) (0 < fcard f a).
 Proof.
 move=> clfA; apply: (iffP card_gt0P) => [[x /andP[]]|[x xA]]; first by exists x.
-exists (froot f x); rewrite inE roots_root /=; last exact: fconnect_sym.
+exists (froot f x); rewrite inE roots_root /=; first exact: fconnect_sym.
 by rewrite -(closed_connect clfA (connect_root _ x)).
 Qed.
 
@@ -838,8 +838,8 @@ Proof.
 have [xcycle|Ncycle] := boolP (fcycle f (orbit x)); constructor => //.
   by rewrite order_id_cycle.
 rewrite /order (eq_card (_ : _ =1 [predU1 x & fconnect f (f x)])).
-  by rewrite cardU1 inE (contraNN (all_iffLR orbitPcycle 2 0)).
-by move=> y; rewrite !inE fconnect_eqVf eq_sym.
+  by move=> y; rewrite !inE fconnect_eqVf eq_sym.
+by rewrite cardU1 inE (contraNN (all_iffLR orbitPcycle 2 0)).
 Qed.
 
 Lemma fconnect_f x : fconnect f (f x) x = fcycle f (orbit x).

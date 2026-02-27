@@ -1791,7 +1791,7 @@ Proof. by move=> tiGH; rewrite mul_cardG tiGH cards1 muln1. Qed.
 Lemma cardMg_TI G H : #|G| * #|H| <= #|G * H| -> G :&: H = 1.
 Proof.
 move=> leGH; apply: card_le1_trivg.
-rewrite -(@leq_pmul2l #|G * H|); first by rewrite -mul_cardG muln1.
+rewrite -(@leq_pmul2l #|G * H|); last by rewrite -mul_cardG muln1.
 by apply: leq_trans leGH; rewrite muln_gt0 !cardG_gt0.
 Qed.
 
@@ -1875,7 +1875,7 @@ have B_1 n : 1 \in B ^+ n.
   by elim: n => [|n IHn]; rewrite ?set11 // expgS mulUg mul1g inE IHn.
 case: (pickP (fun i : 'I_N => B ^+ i.+1 \subset B ^+ i)) => [n fixBn | no_fix].
   exists n; apply/eqP; rewrite eqEsubset BsubG andbT.
-  rewrite -[B ^+ n]gen_set_id ?genS ?subsetUr //.
+  rewrite -[B ^+ n]gen_set_id ?genS ?subsetUr //; last first.
     by apply: subset_trans fixBn; rewrite expgS mulUg subsetU ?mulg_subl ?orbT.
   rewrite /group_set B_1 /=.
   elim: {2}(n : nat) => [|m IHm]; first by rewrite mulg1.
@@ -1923,7 +1923,7 @@ Proof. by rewrite -genJ conjUg. Qed.
 
 Lemma genD1 A x : x \in <<A :\ x>> -> <<A :\ x>> = <<A>>.
 Proof.
-move=> gA'x; apply/eqP; rewrite eqEsubset genS; last by rewrite subsetDl.
+move=> gA'x; apply/eqP; rewrite eqEsubset genS; first by rewrite subsetDl.
 rewrite gen_subG; apply/subsetP=> y Ay.
 by case: (y =P x) => [-> //|]; move/eqP=> nyx; rewrite mem_gen // !inE nyx.
 Qed.
@@ -1993,7 +1993,7 @@ Proof. by rewrite joingC joing1G. Qed.
 Lemma genM_join G H : <<G * H>> = G <*> H.
 Proof.
 apply/eqP; rewrite eqEsubset gen_subG /= -{1}[G <*> H]mulGid.
-rewrite genS; last by rewrite subUset mulG_subl mulG_subr.
+rewrite genS; first by rewrite subUset mulG_subl mulG_subr.
 by rewrite mulgSS ?(sub_gen, subsetUl, subsetUr).
 Qed.
 

@@ -70,7 +70,7 @@ move=> v vN0 /allP /= vP; exists (v *m (row_base (eigenspace A a))).
   by rewrite mulmx_free_eq0 ?row_base_free.
 apply/andP; split.
   by apply/eigenvectorP; exists a; rewrite mulmx_sub // eq_row_base.
-apply/allP => B B_in; rewrite -stablemx_restrict ?vP //.
+apply/allP => B B_in; rewrite -stablemx_restrict ?vP //; last first.
   by apply/mapP; exists B.
 by rewrite comm_mx_stable_eigenspace //; exact: A_comm.
 Qed.
@@ -464,9 +464,9 @@ have [v /and4P [vBn v_neq0 dAv_ge0 dAsub]] :
     rewrite orthomx_sym in vBn.
     exists v; rewrite vBn v_neq0 -pBE/=.
       rewrite ['[_, _]](hermmx_eq0P _ _) ?lexx //=.
+        by rewrite (submx_trans _ vBn) // proj_ortho_sub.
       rewrite (submx_trans (proj_ortho_sub _ _)) //.
       by rewrite -{1}[B]addr0 addmx_sub_adds ?sub0mx.
-    by rewrite (submx_trans _ vBn) // proj_ortho_sub.
   pose c := (sqrtC '[BoSn])^-1; have c_gt0 : c > 0.
     by rewrite invr_gt0 sqrtC_gt0 lt_def ?dnorm_eq0 ?dnorm_ge0 BoSn_neq0.
   exists BoSn; apply/and4P; split => //.
@@ -498,7 +498,7 @@ apply/forallP => i; case: (split_ordP i) => j -> /=.
   have /andP [sABj dot_gt0] := subAB j.
   rewrite rowKu -row_usubmx (submx_trans sABj) //=.
   rewrite (eq_rect _ (submx _) (submx_refl _)) //.
-  rewrite [in RHS](reindex (lshift 1)) /=.
+  rewrite [in RHS](reindex (lshift 1)) /=; last first.
     by apply: eq_bigr=> k k_le; rewrite rowKu.
   exists (fun k => insubd j k) => k; rewrite inE /= => le_kj;
   by apply/val_inj; rewrite /= insubdK // -topredE /= (leq_ltn_trans le_kj).
@@ -592,7 +592,7 @@ pose r A := S *m A *m S^t*.
 have vSvo X : stablemx v X ->
   schmidt (row_base v) *m X *m schmidt (row_base v^!%MS) ^t* = 0.
   move=> /eigenvectorP [a v_in].
-  rewrite (eigenspaceP (_ : (_ <= _ a))%MS); last first.
+  rewrite (eigenspaceP (_ : (_ <= _ a))%MS).
     by rewrite eqmx_schmidt_free ?row_base_free ?eq_row_base.
   rewrite -scalemxAl (orthomx1P _) ?scaler0 //.
   by do 2!rewrite eqmx_schmidt_free ?row_base_free ?eq_row_base // orthomx_sym.
@@ -601,7 +601,7 @@ have drrE X : drsubmx (r X) =
   by rewrite /r mul_col_mx tr_col_mx map_row_mx mul_col_row block_mxKdr.
 have vSv X a : (v <= eigenspace X a)%MS ->
   schmidt (row_base v) *m X *m schmidt (row_base v) ^t* = a%:M.
-  move=> vXa; rewrite (eigenspaceP (_ : (_ <= _ a)%MS)); last first.
+  move=> vXa; rewrite (eigenspaceP (_ : (_ <= _ a)%MS)).
     by rewrite eqmx_schmidt_free ?row_base_free ?eq_row_base.
   by rewrite -scalemxAl (unitarymxP _) ?scalemx1 ?schmidt_unitarymx ?rank_leq_col.
 have [] := IHN _ _ [seq drsubmx (r A) | A <- As].

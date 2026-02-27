@@ -975,7 +975,7 @@ exists (block_mx 1 Mu 0 R).
   by rewrite unitmxE det_ublock det_scalar1 mul1r.
 exists (1 :: d); set D1 := \matrix_(i, j) _ in dM1.
   by rewrite /= path_min_sorted //; apply/allP => g _; apply: dvd1n.
-rewrite [D in _ *m D *m _](_ : _ = block_mx 1 0 0 D1); last first.
+rewrite [D in _ *m D *m _](_ : _ = block_mx 1 0 0 D1).
   by apply/matrixP=> i j; do 3?[rewrite ?mxE ?ord1 //=; case: splitP => ? ->].
 rewrite !mulmx_block !(mul0mx, mulmx0, addr0) !mulmx1 add0r mul1mx -Da -dM1.
 by rewrite addNKr submxK.

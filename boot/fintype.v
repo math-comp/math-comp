@@ -428,7 +428,7 @@ Lemma enum0 : enum pred0 = Nil T. Proof. exact: filter_pred0. Qed.
 
 Lemma enum1 x : enum (pred1 x) = [:: x].
 Proof.
-rewrite [enum _](all_pred1P x _ _); first by rewrite size_filter enumP.
+rewrite [enum _](all_pred1P x _ _); last by rewrite size_filter enumP.
 by apply/allP=> y; rewrite mem_enum.
 Qed.
 
@@ -481,9 +481,9 @@ Proof. by rewrite !cardE !size_filter count_predUI. Qed.
 
 Lemma cardID B A : #|[predI A & B]| + #|[predD A & B]| = #|A|.
 Proof.
-rewrite -cardUI addnC [#|predI _ _|]eq_card0 => [|x] /=.
-  by apply: eq_card => x; rewrite !inE andbC -andb_orl orbN.
-by rewrite !inE -!andbA andbC andbA andbN.
+rewrite -cardUI addnC [#|predI _ _|]eq_card0 => [x|] /=.
+  by rewrite !inE -!andbA andbC andbA andbN.
+by apply: eq_card => x; rewrite !inE andbC -andb_orl orbN.
 Qed.
 
 Lemma cardC A : #|A| + #|[predC A]| = #|T|.
@@ -494,7 +494,7 @@ Proof.
 case Ax: (x \in A).
   by apply: eq_card => y /[1!inE]/=; case: eqP => // ->.
 rewrite /= -(card1 x) -cardUI addnC.
-rewrite [#|predI _ _|]eq_card0 => [|y /=]; first exact: eq_card.
+rewrite [#|predI _ _|]eq_card0 => [y /=|]; last exact: eq_card.
 by rewrite !inE; case: eqP => // ->.
 Qed.
 
@@ -509,7 +509,7 @@ Proof.
 case Ax: (x \in A); last first.
   by apply: eq_card => y /[!inE]/=; case: eqP => // ->.
 rewrite /= -(card1 x) -cardUI addnC /=.
-rewrite [#|predI _ _|]eq_card0 => [|y]; last by rewrite !inE; case: eqP.
+rewrite [#|predI _ _|]eq_card0 => [y|]; first by rewrite !inE; case: eqP.
 by apply: eq_card => y /[!inE]; case: eqP => // ->.
 Qed.
 
@@ -541,7 +541,7 @@ Proof. by apply: (iffP eqP); [apply: card0_eq | apply: eq_card0]. Qed.
 Lemma pred0Pn P : reflect (exists x, P x) (~~ pred0b P).
 Proof.
 case: (pickP P) => [x Px | P0].
-  by rewrite (introN (pred0P P)) => [|P0]; [left; exists x | rewrite P0 in Px].
+  by rewrite (introN (pred0P P)) => [P0|]; [rewrite P0 in Px | left; exists x].
 by rewrite -lt0n eq_card0 //; right=> [[x]]; rewrite P0.
 Qed.
 
@@ -1478,7 +1478,7 @@ Proof. by rewrite pmap_sub_uniq // -enumT enum_uniq. Qed.
 
 Lemma val_sub_enum : map val sub_enum = enum P.
 Proof.
-rewrite pmap_filter; last exact: insubK.
+rewrite pmap_filter; first exact: insubK.
 by apply: eq_filter => x; apply: isSome_insub.
 Qed.
 
@@ -1752,7 +1752,7 @@ Definition ord_enum : seq ordinal := pmap insub (iota 0 n).
 
 Lemma val_ord_enum : map val ord_enum = iota 0 n.
 Proof.
-rewrite pmap_filter; last exact: insubK.
+rewrite pmap_filter; first exact: insubK.
 by apply/all_filterP; apply/allP=> i; rewrite mem_iota isSome_insub.
 Qed.
 
@@ -1943,7 +1943,7 @@ Proof. by move=> x; apply: enum_rankK_in. Qed.
 
 Lemma enum_valK_in x0 A Ax0 : cancel enum_val (@enum_rank_in T x0 A Ax0).
 Proof.
-move=> x; apply: ord_inj; rewrite enum_rank_in.unlock insubdK; last first.
+move=> x; apply: ord_inj; rewrite enum_rank_in.unlock insubdK.
   by rewrite cardE [_ \in _]index_mem mem_nth // -cardE.
 by rewrite index_uniq ?enum_uniq // -cardE.
 Qed.

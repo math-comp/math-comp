@@ -64,7 +64,7 @@ move=> pM sMR /mingroupP[/andP[ntM nMG] minM].
 have /andP[sGpG nGpG]: 'O_p(G) <| G := gFnormal _ G.
 have sGD := acts_dom nMG; have sGpD: 'O_p(G) \subset D := gFsub_trans _ sGD.
 rewrite subsetI sGpG -gacentC //=; apply/setIidPl; apply: minM (subsetIl _ _).
-rewrite nontrivial_gacent_pgroup ?pcore_pgroup //=; last first.
+rewrite nontrivial_gacent_pgroup ?pcore_pgroup //=.
   by split; rewrite ?gFsub_trans.
 by apply: subset_trans (acts_subnorm_subgacent sGpD nMG); rewrite subsetI subxx.
 Qed.
@@ -144,8 +144,8 @@ have sylP: p.-Sylow(G) P.
     rewrite p_part lognE p_pr /= -trivg_card1; apply/idPn=> ntP.
     by case/pgroup_pdiv: pP p_pr => // ->.
   rewrite -(LagrangeI G 'N(P)) /= mulnC partnM ?cardG_gt0 // part_p'nat.
-    by rewrite mul1n (card_Hall (sylS P S_P)).
-  by rewrite p'natE // -indexgI -oSiN // /dvdn oS1.
+    by rewrite p'natE // -indexgI -oSiN // /dvdn oS1.
+  by rewrite mul1n (card_Hall (sylS P S_P)).
 have eqS Q: maxp G Q = p.-Sylow(G) Q.
   apply/idP/idP=> [S_Q|]; last exact: Hall_max.
   have{} S_Q: Q \in S by rewrite inE.
@@ -285,10 +285,10 @@ Qed.
 Lemma Sylow_gen G : <<\bigcup_(P : {group gT} | Sylow G P) P>> = G.
 Proof.
 set T := [set P : {group gT} | Sylow G P].
-rewrite -{2}(@Sylow_transversal_gen T G) => [|P | q _].
-- by congr <<_>>; apply: eq_bigl => P; rewrite inE.
+rewrite -{2}(@Sylow_transversal_gen T G) => [P | q _|].
 - by rewrite inE => /and3P[].
-by case: (Sylow_exists q G) => P sylP; exists P; rewrite // inE (p_Sylow sylP).
+- by case: (Sylow_exists q G) => P sylP; exists P; rewrite // inE (p_Sylow sylP).
+- by congr <<_>>; apply: eq_bigl => P; rewrite inE.
 Qed.
 
 End MoreSylow.
@@ -408,8 +408,8 @@ Lemma nilpotent_Hall_pcore pi G H :
 Proof.
 move=> nilG hallH; have maxH := Hall_max hallH; apply/eqP.
 rewrite eqEsubset pcore_max ?(pHall_pgroup hallH) //.
-  by rewrite (normal_sub_max_pgroup maxH) ?pcore_pgroup ?pcore_normal.
-exact: nilpotent_maxp_normal maxH.
+  exact: nilpotent_maxp_normal maxH.
+by rewrite (normal_sub_max_pgroup maxH) ?pcore_pgroup ?pcore_normal.
 Qed.
 
 Lemma nilpotent_pcore_Hall pi G : nilpotent G -> pi.-Hall(G) 'O_pi(G).
@@ -425,10 +425,10 @@ Proof.
 move=> nilG; have trO: 'O_pi(G) :&: 'O_pi^'(G) = 1.
   by apply: coprime_TIg; apply: (@pnat_coprime pi); apply: pcore_pgroup.
 rewrite dprodE //.
-  apply/eqP; rewrite eqEcard mul_subG ?pcore_sub // (TI_cardMg trO).
-  by rewrite !(card_Hall (nilpotent_pcore_Hall _ _)) // partnC ?leqnn.
-rewrite (sameP commG1P trivgP) -trO subsetI commg_subl commg_subr.
-by rewrite !gFsub_trans ?gFnorm.
+  rewrite (sameP commG1P trivgP) -trO subsetI commg_subl commg_subr.
+  by rewrite !gFsub_trans ?gFnorm.
+apply/eqP; rewrite eqEcard mul_subG ?pcore_sub // (TI_cardMg trO).
+by rewrite !(card_Hall (nilpotent_pcore_Hall _ _)) // partnC ?leqnn.
 Qed.
 
 Lemma sub_nilpotent_cent2 H K G :
@@ -646,8 +646,8 @@ have [y2 Ny2 Dy2]: exists2 y2, y2 \in 'N_(P :&: E)(D) & y2 \notin D.
   case/subsetPn: sNN => z /setIP[Pz NNz]; rewrite 2!inE Pz.
   case/subsetPn=> y Dzy Dy; exists y => //; apply: subsetP Dzy.
   rewrite -setIA setICA subsetI sub_conjg (normsP nEG) ?groupV //.
-    by rewrite sDE -(normP NNz); rewrite conjSg subsetI sDP.
-  by apply: subsetP Pz; apply: (subset_trans (pHall_sub sylP)).
+    by apply: subsetP Pz; apply: (subset_trans (pHall_sub sylP)).
+  by rewrite sDE -(normP NNz); rewrite conjSg subsetI sDP.
 suff{Dy2} Dy2D: y2 |: D = D by rewrite -Dy2D setU11 in Dy2.
 apply: maxD; last by rewrite subsetUr.
 case/setIP: Ny2 => PEy2 Ny2; case/setIP: Ny1 => Ey1 Ny1.

@@ -3607,7 +3607,7 @@ Qed.
 Lemma reshapeKl sh s : size s >= sumn sh -> shape (reshape sh s) = sh.
 Proof.
 elim: sh s => [[]|n sh IHsh] //= s sz_s.
-rewrite size_takel; last exact: leq_trans (leq_addr _ _) sz_s.
+rewrite size_takel; first exact: leq_trans (leq_addr _ _) sz_s.
 by rewrite IHsh // -(leq_add2l n) size_drop -maxnE leq_max sz_s orbT.
 Qed.
 
@@ -4289,7 +4289,7 @@ Lemma allpairs_uniq_dep f s t (st := [seq Tagged T y | x <- s, y <- t x]) :
 Proof.
 move=> g Us Ut; rewrite -(map_allpairs g (existT T)) => /map_inj_in_uniq->{f g}.
 elim: s Us => //= x s IHs /andP[s'x Us] in st Ut *; rewrite {st}cat_uniq.
-rewrite {}IHs {Us}// ?andbT => [|x1 s_s1]; last exact/Ut/mem_behead.
+rewrite {}IHs {Us}// ?andbT => [x1 s_s1|]; first exact/Ut/mem_behead.
 have injT: injective (existT T x) by move=> y z /eqP; rewrite eq_Tagged => /eqP.
 rewrite (map_inj_in_uniq (in2W injT)) {injT}Ut ?mem_head // has_sym has_map.
 by apply: contra s'x => /hasP[y _ /allpairsPdep[z [_ [? _ /(congr1 tag)/=->]]]].
@@ -4805,7 +4805,7 @@ suffices /permPl->: perm_eq (tally s) (map (b (tally s)) (unzip1 (tally s))).
   by under eq_map do rewrite /= (permP (tallyK s)).
 elim: (tally s) Ubs => [|[x m] bs IH] //= /andP[bs'x /IH-IHbs {IH}].
 rewrite /tseq /= -/(tseq _) count_cat count_nseq /= eqxx mul1n.
-rewrite (count_memPn _) ?addn0 ?perm_cons; last first.
+rewrite (count_memPn _) ?addn0 ?perm_cons.
   apply: contra bs'x; elim: {b IHbs}bs => //= b bs IHbs.
   by rewrite mem_cat mem_nseq inE andbC; case: (_ == _).
 congr perm_eq: IHbs; apply/eq_in_map=> y bs_y; congr (y, _).
@@ -4875,7 +4875,7 @@ have{s} [n [bs [-> Dn /permPr<- _]]] := permsP s.
 elim: n => [|n IHn] /= in t bs Dn *.
   by rewrite inE (nilP Dn); apply/eqP/perm_nilP.
 rewrite -[bs in tseq bs]cats0 in Dn *; have x0 : T by case: (tseq _) Dn.
-rewrite -[RHS](@andb_idl (last x0 t \in tseq bs)); last first.
+rewrite -[RHS](@andb_idl (last x0 t \in tseq bs)).
   case/lastP: t {IHn} => [|t x] Dt; first by rewrite -(perm_size Dt) in Dn.
   by rewrite -[bs]cats0 -(perm_mem Dt) last_rcons mem_rcons mem_head.
 elim: bs [::] => [|[x [|m]] bs IHbs] //= bs2 in Dn *.
@@ -4894,7 +4894,7 @@ elim: n => //= n IHn in bs Dn Ubs *; rewrite -[bs]cats0 /unzip1 in Dn Ubs.
 elim: bs [::] => [|[x [|m]] bs IHbs] //= bs2 in Dn Ubs *.
   by case/andP: Ubs => _ /IHbs->.
 rewrite /= cons_permsE cat_uniq has_sym andbCA andbC.
-rewrite {}IHbs; first 1 last; first by rewrite (perm_size (perm_tseq bsCA)).
+rewrite {}IHbs; first 1 last; last by rewrite (perm_size (perm_tseq bsCA)).
   by rewrite (perm_uniq (perm_map _ bsCA)).
 rewrite (map_inj_uniq (rcons_injl x)) {}IHn {Dn}//=.
 have: x \notin unzip1 bs by apply: contraL Ubs; rewrite map_cat mem_cat => ->.

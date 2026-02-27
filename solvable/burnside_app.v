@@ -21,8 +21,8 @@ Lemma burnside_formula : forall (gT : finGroupType) s (G : {group gT}),
 Proof.
 move=> gT s G Us sG sT to.
 rewrite big_uniq // -(card_uniqP Us) (eq_card sG) -Frobenius_Cauchy.
-  by apply: eq_big => // p _; rewrite setTI.
-by apply/actsP=> ? _ ?; rewrite !inE.
+  by apply/actsP=> ? _ ?; rewrite !inE.
+by apply: eq_big => // p _; rewrite setTI.
 Qed.
 
 Arguments burnside_formula {gT}.
@@ -262,7 +262,7 @@ Canonical iso_group := Group group_set_iso.
 
 Lemma card_rot : #|rot| = 4.
 Proof.
-rewrite -[4]/(size [:: id1; r1; r2; r3]) -(card_uniqP _).
+rewrite -[4]/(size [:: id1; r1; r2; r3]) -(card_uniqP _); last first.
   by apply: eq_card => x; rewrite rot_is_rot !inE -!orbA.
 by apply: map_uniq (fun p : {perm square} => p c0) _ _; rewrite /= !permE.
 Qed.
@@ -368,7 +368,8 @@ Lemma card_n2 : forall x y z t : square, uniq [:: x; y; z; t] ->
   #|[set p : col_squares | (p x == p y) && (p z == p t)]| = (n ^ 2)%N.
 Proof.
 move=> x y z t Uxt; rewrite -[n]card_ord.
-pose f (p : col_squares) := (p x, p z); rewrite -(@card_in_image _ _ f).
+pose f (p : col_squares) := (p x, p z).
+rewrite -(@card_in_image _ _ f); last first.
   rewrite -mulnn -card_prod; apply: eq_card => [] [c d] /=; apply/imageP.
   rewrite (cat_uniq [::x; y]) in Uxt; case/and3P: Uxt => _.
   rewrite /= !orbF !andbT => /norP[] /[!inE] nxzt nyzt _.
@@ -387,7 +388,7 @@ Lemma card_n :
    = n.
 Proof.
 rewrite -[n]card_ord /coin0 /coin1 /coin2 /coin3.
-pose f (p : col_squares) := p c3; rewrite -(@card_in_image _ _ f).
+pose f (p : col_squares) := p c3; rewrite -(@card_in_image _ _ f); last first.
   apply: eq_card => c /=; apply/imageP.
   exists ([ffun => c] : col_squares); last by rewrite /f ffunE.
   by rewrite /= inE !ffunE !eqxx.
@@ -399,18 +400,18 @@ Qed.
 
 Lemma burnside_app2 : (square_coloring_number2 * 2 = n ^ 4 + n ^ 2)%N.
 Proof.
-rewrite (burnside_formula [:: id1; sh]) => [||p]; last first.
-- by rewrite !inE.
+rewrite (burnside_formula [:: id1; sh]) => [|p|].
 - by rewrite /= inE diff_id_sh.
+- by rewrite !inE.
 by rewrite 2!big_cons big_nil addn0 {1}card_Fid F_Sh card_n2.
 Qed.
 
 Lemma burnside_app_rot :
   (square_coloring_number4 * 4 = n ^ 4 + n ^ 2 + 2 * n)%N.
 Proof.
-rewrite (burnside_formula [:: id1; r1; r2; r3]) => [||p]; last first.
-- by rewrite !inE !orbA.
+rewrite (burnside_formula [:: id1; r1; r2; r3]) => [|p|].
 - by apply: map_uniq (fun p : {perm square} => p c0) _ _; rewrite /= !permE.
+- by rewrite !inE !orbA.
 rewrite !big_cons big_nil /= addn0 {1}card_Fid F_r1 F_r2 F_r3.
 by rewrite card_n card_n2 //= [n + _]addnC !addnA addn0.
 Qed.
@@ -431,17 +432,17 @@ move/eqn_pmul2l <-; rewrite -expnS -card_Fid Fid cardsT.
 rewrite -{1}[n]card_ord -cardX.
 pose pk k := [ffun i => k (if i == y then x else i) : colors].
 rewrite -(@card_image _ _ (fun k : col_squares => (k y, pk k))).
-  apply/eqP; apply: eq_card => ck /=; rewrite inE /= [_ \in _]inE.
-  apply/eqP/imageP; last first.
-    by case=> k _ -> /=; rewrite !ffunE if_same eqxx.
-  case: ck => c k /= kxy.
-  exists [ffun i => if i == y then c else k i]; first by rewrite inE.
-  rewrite !ffunE eqxx; congr (_, _); apply/ffunP=> i; rewrite !ffunE.
-  case Eiy: (i == y); last by rewrite Eiy.
-  by rewrite (negbTE nxy) (eqP Eiy).
-move=> k1 k2 [Eky Epk]; apply/ffunP=> i.
-have{Epk}: pk k1 i = pk k2 i by rewrite Epk.
-by rewrite !ffunE; case: eqP => // ->.
+  move=> k1 k2 [Eky Epk]; apply/ffunP=> i.
+  have{Epk}: pk k1 i = pk k2 i by rewrite Epk.
+  by rewrite !ffunE; case: eqP => // ->.
+apply/eqP; apply: eq_card => ck /=; rewrite inE /= [_ \in _]inE.
+apply/eqP/imageP; last first.
+  by case=> k _ -> /=; rewrite !ffunE if_same eqxx.
+case: ck => c k /= kxy.
+exists [ffun i => if i == y then c else k i]; first by rewrite inE.
+rewrite !ffunE eqxx; congr (_, _); apply/ffunP=> i; rewrite !ffunE.
+case Eiy: (i == y); last by rewrite Eiy.
+by rewrite (negbTE nxy) (eqP Eiy).
 Qed.
 
 Lemma F_Sd2 : 'Fix_to[sd2] = [set x | coin0 x == coin2 x].
@@ -454,10 +455,10 @@ Lemma burnside_app_iso :
   (square_coloring_number8 * 8 = n ^ 4 + 2 * n ^ 3 + 3 * n ^ 2 + 2 * n)%N.
 Proof.
 pose iso_list := [:: id1; r1; r2; r3; sh; sv; sd1; sd2].
-rewrite (burnside_formula iso_list) => [||p]; last first.
-- by rewrite /= !inE.
+rewrite (burnside_formula iso_list) => [|p|].
 - apply: map_uniq (fun p : {perm square} => (p c0, p c1)) _ _.
   by rewrite /= !permE.
+- by rewrite /= !inE.
 rewrite !big_cons big_nil {1}card_Fid F_r1 F_r2 F_r3 F_Sh F_Sv F_Sd1 F_Sd2.
 rewrite card_n !card_n3 // !card_n2 //= !addnA !addn0.
 by rewrite [LHS]addn.[ACl 1 * 7 * 8 * 3 * 5 * 6 * 2 * 4].
@@ -1141,7 +1142,7 @@ Proof.
 move=> x y z t Uxt; rewrite -[n]card_ord.
 case: (uniq4_uniq6 Uxt) => u [v Uxv].
 pose ff (p : col_cubes) := (p x, p z, p u, p v).
-rewrite -(@card_in_image _ _ ff); first last.
+rewrite -(@card_in_image _ _ ff).
   move=> p1 p2 /[!inE] /andP[p1y p1t] /andP[p2y p2t] [px pz] pu pv.
   have eqp12 : all (fun i => p1 i == p2 i) [:: x; y; z; t; u; v].
    by rewrite /= -(eqP p1y) -(eqP p1t) -(eqP p2y) -(eqP p2t) px pz pu pv !eqxx.
@@ -1168,7 +1169,7 @@ Proof.
 move=> x y z t Uxt; rewrite -[n]card_ord.
 case: (uniq4_uniq6 Uxt) => u [v Uxv].
 pose ff (p : col_cubes) := (p x, p u, p v);
-    rewrite -(@card_in_image _ _ ff); first last.
+    rewrite -(@card_in_image _ _ ff).
   move=> p1 p2 /[!inE]; rewrite -!andbA.
   move=> /and3P[/eqP p1xy /eqP p1yz /eqP p1zt].
   move=> /and3P[/eqP p2xy /eqP p2yz /eqP p2zt] [px pu] pv.
@@ -1192,7 +1193,7 @@ Lemma card_n2_3 : forall x y z t u v: cube, uniq [:: x; y; z; t; u; v] ->
 Proof.
 move=> x y z t u v  Uxv; rewrite -[n]card_ord .
 pose ff (p : col_cubes) := (p x, p t).
-rewrite -(@card_in_image _ _ ff); first last.
+rewrite -(@card_in_image _ _ ff).
   move=> p1 p2 /[!inE]; rewrite -!andbA.
   move=> /and4P[/eqP p1xy /eqP p1yz /eqP p1tu /eqP p1uv].
   move=> /and4P[/eqP p2xy/eqP  p2yz /eqP p2tu /eqP p2uv] [px pu].
@@ -1214,7 +1215,7 @@ Lemma card_n3s : forall x y z t u v: cube, uniq [:: x; y; z; t; u; v] ->
 Proof.
 move=> x y z t u v Uxv; rewrite -[n]card_ord .
 pose ff (p : col_cubes) := (p x, p z, p u).
-rewrite -(@card_in_image _ _ ff); first last.
+rewrite -(@card_in_image _ _ ff).
   move=> p1 p2 /[!inE]; rewrite -!andbA.
   move=> /and3P[/eqP p1xy /eqP p1zt /eqP p1uv].
   move=> /and3P[/eqP p2xy /eqP p2zt /eqP p2uv] [px pz] pu.
@@ -1243,13 +1244,13 @@ Proof.
 pose iso_list := [:: id3; s05; s14; s23; r05; r14; r23; r50; r41; r32;
                      r024; r042; r012; r021; r031; r013; r043; r034;
                      s1; s2; s3; s4; s5; s6].
-rewrite (burnside_formula iso_list); last first.
-- by move=> p; rewrite !inE /= !(eq_sym _ p).
+rewrite (burnside_formula iso_list).
 - apply: map_uniq (fun p : {perm cube} => (p F0, p F1)) _ _.
   have bsr : (fun p : {perm cube} => (p F0, p F1)) =1
              (fun p => (nth F0 p F0, nth F0 p F1)) \o sop.
     by move=> x; rewrite /= -2!sop_spec.
   by rewrite (eq_map bsr) map_comp  -(eqP Lcorrect); vm_compute.
+- by move=> p; rewrite !inE /= !(eq_sym _ p).
 rewrite !big_cons big_nil {1}card_Fid3 /= F_s05 F_s14 F_s23 F_r05 F_r14 F_r23
   F_r50 F_r41 F_r32 F_r024 F_r042 F_r012 F_r021 F_r031 F_r013 F_r043  F_r034
   F_s1  F_s2 F_s3 F_s4 F_s5 F_s6.

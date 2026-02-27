@@ -1262,7 +1262,7 @@ Lemma exprBn_comm x y n (cxy : comm x y) :
   (x - y) ^+ n =
     \sum_(i < n.+1) ((-1) ^+ i * x ^+ (n - i) * y ^+ i) *+ 'C(n, i).
 Proof.
-rewrite exprDn_comm; last exact: commrN.
+rewrite exprDn_comm; first exact: commrN.
 by apply: eq_bigr => i _; congr (_ *+ _); rewrite -commr_sign -mulrA -exprNn.
 Qed.
 

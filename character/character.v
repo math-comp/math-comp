@@ -444,8 +444,8 @@ pose W i := oapp val 0 (soc i); pose S := (\sum_i W i)%MS.
 have C'G: [pchar algC]^'.-group G := algC'G_pchar G.
 have [defS dxS]: (S :=: 1%:M)%MS /\ mxdirect S.
   rewrite /S mxdirectE /= !(bigID soc xpredT) /=.
-  rewrite addsmxC big1 => [|i]; last by rewrite /W; case (soc i).
-  rewrite adds0mx_id addnC (@big1 nat) ?add0n => [|i]; last first.
+  rewrite addsmxC big1 => [i|]; first by rewrite /W; case (soc i).
+  rewrite adds0mx_id addnC (@big1 nat) ?add0n => [i|].
     by rewrite /W; case: (soc i); rewrite ?mxrank0.
   have <-: Socle sG = 1%:M := reducible_Socle1 sG (mx_Maschke_pchar rG C'G).
   have [W0 _ | noW] := pickP sG; last first.
@@ -462,9 +462,9 @@ have [defS dxS]: (S :=: 1%:M)%MS /\ mxdirect S.
     by rewrite inE /soc /=; case: pickP => //= Wi; move/eqP.
   rewrite !(reindex standard_irr) {bij_irr}//=.
   have all_soc Wi: soc (standard_irr Wi) by rewrite irrK.
-  rewrite (eq_bigr val) => [|Wi _]; last by rewrite /W irrK.
+  rewrite (eq_bigr val) => [Wi _|]; first by rewrite /W irrK.
   rewrite !(eq_bigl _ _ all_soc); split=> //.
-  rewrite (eq_bigr (mxrank \o val)) => [|Wi _]; last by rewrite /W irrK.
+  rewrite (eq_bigr (mxrank \o val)) => [Wi _|]; first by rewrite /W irrK.
   by rewrite -mxdirectE /= Socle_direct.
 pose modW i : mxmodule rG (W i) :=
   if soc i is Some Wi as oWi return mxmodule rG (oapp val 0 oWi) then
@@ -884,7 +884,7 @@ Lemma char1_eq0 chi : chi \is a character -> (chi 1%g == 0) = (chi == 0).
 Proof.
 case/char_sum_irr=> r ->; apply/idP/idP=> [|/eqP->]; last by rewrite cfunE.
 case: r => [|i r]; rewrite ?big_nil // sum_cfunE big_cons.
-rewrite paddr_eq0 ?sumr_ge0  => // [||j _]; rewrite 1?ltW ?irr1_gt0 //.
+rewrite paddr_eq0 ?sumr_ge0  => // [|j _|]; rewrite 1?ltW ?irr1_gt0 //.
 by rewrite (negbTE (irr1_neq0 i)).
 Qed.
 
@@ -1256,7 +1256,7 @@ Proof. by move=> xG GxG; rewrite /c cast_ordKV enum_rankK_in. Qed.
 Lemma reindex_irr_class R idx (op : @Monoid.com_law R idx) F :
   \big[op/idx]_(xG in classes G) F xG = \big[op/idx]_i F (c i).
 Proof.
-rewrite (reindex c); first by apply: eq_bigl => i; apply: enum_valP.
+rewrite (reindex c); last by apply: eq_bigl => i; apply: enum_valP.
 by exists iC; [apply: in1W; apply: irr_classK | apply: class_IirrK].
 Qed.
 
@@ -1266,7 +1266,7 @@ Let X' := \matrix_(i, j) (#|'C_G[g i]|%:R^-1 * ('chi[G]_j (g i))^*).
 Let XX'_1: X *m X' = 1%:M.
 Proof.
 apply/matrixP=> i j; rewrite !mxE -first_orthogonality_relation mulr_sumr.
-rewrite sum_by_classes => [|u v Gu Gv]; last by rewrite -conjVg !cfunJ.
+rewrite sum_by_classes => [u v Gu Gv|]; first by rewrite -conjVg !cfunJ.
 rewrite reindex_irr_class /=; apply/esym/eq_bigr=> k _.
 rewrite !mxE irr_inv // -/(g k) -divg_index -indexgI /=.
 rewrite (pchar0_natf_div Cpchar) ?dvdn_indexg // index_cent1 invfM invrK.
@@ -1636,7 +1636,7 @@ Qed.
 Lemma TI_cfker_irr : \bigcap_i cfker 'chi[G]_i = [1].
 Proof.
 apply/trivgP; apply: subset_trans cfaithful_reg; rewrite cfkerE ?cfReg_char //.
-rewrite subsetI (bigcap_min 0) //=; last by rewrite cfker_irr0.
+rewrite subsetI (bigcap_min 0) //=; first by rewrite cfker_irr0.
 by apply/bigcapsP=> i _; rewrite bigcap_inf.
 Qed.
 
@@ -2149,7 +2149,7 @@ Proof. by move=> Pi; rewrite !irrEchar cfBigdprodi_charE ?cfBigdprodi_iso. Qed.
 Lemma cfBigdprod_irr chi :
   (forall i, P i -> chi i \in irr (A i)) -> cfBigdprod defG chi \in irr G.
 Proof.
-move=> Nchi; rewrite irrEchar cfBigdprod_char => [|i /Nchi/irrWchar] //=.
+move=> Nchi; rewrite irrEchar cfBigdprod_char => [i /Nchi/irrWchar|] //=.
 by rewrite cfdot_bigdprod big1 // => i /Nchi/irrWnorm.
 Qed.
 
@@ -2165,7 +2165,7 @@ have nz_Phi1: Phi 1%g != 0 by rewrite Phi1_1 oner_eq0.
 have [_ <-] := cfBigdprodK nz_Phi1 Pi.
 rewrite Phi1_1 divr1 -/Phi Phi1 rmorph1.
 rewrite prod_cfunE // in Phi1_1; have := natr_prod_eq1 _ Phi1_1 Pi.
-rewrite -(cfRes1 (A i)) cfBigdprodiK // => ->; first by rewrite scale1r.
+rewrite -(cfRes1 (A i)) cfBigdprodiK // => ->; last by rewrite scale1r.
 by move=> {i Pi} j /Nphi Nphi_j; rewrite Cnat_char1 ?cfBigdprodi_char.
 Qed.
 
@@ -2173,7 +2173,7 @@ Lemma cfBigdprod_Res_lin chi :
   chi \is a linear_char -> cfBigdprod defG (fun i => 'Res[A i] chi) = chi.
 Proof.
 move=> Lchi; apply/cfun_inP=> _ /(mem_bigdprod defG)[x [Ax -> _]].
-rewrite (lin_char_prod Lchi) ?cfBigdprodE // => [|i Pi]; last first.
+rewrite (lin_char_prod Lchi) ?cfBigdprodE // => [i Pi|].
   by rewrite (subsetP (sAG Pi)) ?Ax.
 by apply/eq_bigr=> i Pi; rewrite cfResE ?sAG ?Ax.
 Qed.
@@ -2630,7 +2630,7 @@ transitivity (\prod_W detRepr (socle_repr W) ^+ standard_irr_coef rG W).
   rewrite (reindex _ (socle_of_Iirr_bij _)) unlock /=.
   apply: eq_bigr => i _; congr (_ ^+ _).
   rewrite (cfRepr_sim (mx_rsim_standard rG)) cfRepr_standard.
-  rewrite cfdot_suml (bigD1 i) ?big1 //= => [|j i'j]; last first.
+  rewrite cfdot_suml (bigD1 i) ?big1 //= => [j i'j|].
     by rewrite cfdotZl cfdot_irr (negPf i'j) mulr0.
   by rewrite cfdotZl cfnorm_irr mulr1 addr0 natrK.
 apply/cfun_inP=> x Gx; rewrite prod_cfunE //.
@@ -2703,7 +2703,7 @@ Lemma cfDetIsom aT rT (G : {group aT}) (R : {group rT})
                 (f : {morphism G >-> rT}) (isoGR : isom G R f) phi :
   cfDet (cfIsom isoGR phi) = cfIsom isoGR (cfDet phi).
 Proof.
-rewrite unlock rmorph_prod (reindex (isom_Iirr isoGR)); last first.
+rewrite unlock rmorph_prod (reindex (isom_Iirr isoGR)).
   by exists (isom_Iirr (isom_sym isoGR)) => i; rewrite ?isom_IirrK ?isom_IirrKV.
 apply: eq_bigr=> i; rewrite -!cfDetRepr !irrRepr isom_IirrE rmorphXn cfIsom_iso.
 by rewrite /= ![in cfIsom _]unlock cfDetMorph ?cfRes_char ?cfDetRes ?irr_char.
@@ -2862,10 +2862,10 @@ Qed.
 (* This is Isaacs (2.28). *)
 Lemma cap_cfcenter_irr : \bigcap_i 'Z('chi[G]_i)%CF = 'Z(G).
 Proof.
-apply/esym/eqP; rewrite eqEsubset (introT bigcapsP) /= => [|i _]; last first.
+apply/esym/eqP; rewrite eqEsubset (introT bigcapsP) /= => [i _|].
   rewrite -(quotientSGK _ (normal_sub (cfker_center_normal _))).
-    by rewrite cfcenter_eq_center morphim_center.
-  by rewrite subIset // normal_norm // cfker_normal.
+    by rewrite subIset // normal_norm // cfker_normal.
+  by rewrite cfcenter_eq_center morphim_center.
 set Z := \bigcap_i _.
 have sZG: Z \subset G by rewrite (bigcap_min 0) ?cfcenter_sub.
 rewrite subsetI sZG (sameP commG1P trivgP) -(TI_cfker_irr G).
@@ -2883,7 +2883,7 @@ Proof.
 move=> sHG; rewrite cfun_onE mulrCA natf_indexg // -mulrA mulKf ?neq0CG //.
 rewrite (big_setID H) (setIidPr sHG) /= addrC.
 rewrite (mono_leif (ler_pM2l _)) ?invr_gt0 ?gt0CG // -leifBLR -sumrB.
-rewrite big1 => [|x Hx]; last by rewrite !cfResE ?subrr.
+rewrite big1 => [x Hx|]; first by rewrite !cfResE ?subrr.
 have ->: (support phi \subset H) = (G :\: H \subset [set x | phi x == 0]).
   rewrite subDset setUC -subDset; apply: eq_subset => x.
   by rewrite !inE (andb_idr (contraR _)) // => /cfun0->.
@@ -2935,7 +2935,7 @@ Lemma cfcenter_fful_irr i : cfaithful 'chi[G]_i -> 'Z('chi_i)%CF = 'Z(G).
 Proof.
 move/trivgP=> Ki1; have:= cfcenter_eq_center i; rewrite {}Ki1.
 have inj1: 'injm (@coset gT 1%g) by rewrite ker_coset.
-by rewrite -injm_center; first apply: injm_morphim_inj; rewrite ?norms1.
+by rewrite -injm_center; last apply: injm_morphim_inj; rewrite ?norms1.
 Qed.
 
 (* This is Isaacs (2.32)(b). *)

@@ -463,13 +463,13 @@ Qed.
 Fact mul_1poly : left_id 1%:P mul_poly.
 Proof.
 move=> p; apply/polyP => i; rewrite coef_mul_poly big_ord_recl subn0.
-by rewrite big1 => [|j _]; rewrite coefC !simp.
+by rewrite big1 => [j _|]; rewrite coefC !simp.
 Qed.
 
 Fact mul_poly1 : right_id 1%:P mul_poly.
 Proof.
 move=> p; apply/polyP => i; rewrite coef_mul_poly_rev big_ord_recl subn0.
-by rewrite big1 => [|j _]; rewrite coefC !simp.
+by rewrite big1 => [j _|]; rewrite coefC !simp.
 Qed.
 
 Fact mul_polyDl : left_distributive mul_poly +%R.
@@ -487,13 +487,13 @@ Qed.
 Fact mul_0poly : left_zero 0%:P mul_poly.
 Proof.
 move=> p; apply/polyP => i; rewrite coef_mul_poly big_ord_recl subn0.
-by rewrite big1 => [|j _]; rewrite coefC !simp // coefC; case: ifP.
+by rewrite big1 => [j _|]; rewrite coefC !simp // coefC; case: ifP.
 Qed.
 
 Fact mul_poly0 : right_zero 0%:P mul_poly.
 Proof.
 move=> p; apply/polyP => i; rewrite coef_mul_poly_rev big_ord_recl subn0.
-by rewrite big1 => [|j _]; rewrite coefC !simp // coefC; case: ifP.
+by rewrite big1 => [j _|]; rewrite coefC !simp // coefC; case: ifP.
 Qed.
 
 Fact poly1_neq0 : 1%:P != 0 :> {poly R}.
@@ -582,12 +582,12 @@ Qed.
 
 Lemma coefCM c p i : (c%:P * p)`_i = c * p`_i.
 Proof.
-by rewrite coefM big_ord_recl subn0 big1 => [|j _]; rewrite coefC !simp.
+by rewrite coefM big_ord_recl subn0 big1 => [j _|]; rewrite coefC !simp.
 Qed.
 
 Lemma coefMC c p i : (p * c%:P)`_i = p`_i * c.
 Proof.
-by rewrite coefMr big_ord_recl subn0 big1 => [|j _]; rewrite coefC !simp.
+by rewrite coefMr big_ord_recl subn0 big1 => [j _|]; rewrite coefC !simp.
 Qed.
 
 Lemma polyCM : {morph polyC : a b / a * b}.
@@ -1197,7 +1197,7 @@ Qed.
 Lemma derivn_poly0 p n : size p <= n -> p^`(n) = 0.
 Proof.
 move=> le_p_n; apply/polyP=> i; rewrite coef_derivn.
-rewrite nth_default; first by rewrite mul0rn coef0.
+rewrite nth_default; last by rewrite mul0rn coef0.
 exact/(leq_trans le_p_n)/leq_addr.
 Qed.
 
@@ -1278,7 +1278,7 @@ Qed.
 Lemma nderivn_poly0 p n : size p <= n -> p^`N(n) = 0.
 Proof.
 move=> le_p_n; apply/polyP=> i; rewrite coef_nderivn.
-rewrite nth_default; first by rewrite mul0rn coef0.
+rewrite nth_default; last by rewrite mul0rn coef0.
 exact/(leq_trans le_p_n)/leq_addr.
 Qed.
 
@@ -1389,7 +1389,7 @@ Proof. by move/rreg_neq0; rewrite lead_coef_eq0. Qed.
 Lemma lreg_size c p : GRing.lreg c -> size (c *: p) = size p.
 Proof.
 move=> reg_c; have [-> | nz_p] := eqVneq p 0; first by rewrite scaler0.
-rewrite -mul_polyC size_proper_mul; first by rewrite size_polyC lreg_neq0.
+rewrite -mul_polyC size_proper_mul; last by rewrite size_polyC lreg_neq0.
 by rewrite lead_coefC mulrI_eq0 ?lead_coef_eq0.
 Qed.
 
@@ -1402,7 +1402,7 @@ Proof. by move=> reg_c; rewrite !lead_coefE coefZ lreg_size. Qed.
 Lemma rreg_size c p : GRing.rreg c -> size (p * c%:P) =  size p.
 Proof.
 move=> reg_c; have [-> | nz_p] := eqVneq p 0; first by rewrite mul0r.
-rewrite size_proper_mul; first by rewrite size_polyC rreg_neq0 ?addn1.
+rewrite size_proper_mul; last by rewrite size_polyC rreg_neq0 ?addn1.
 by rewrite lead_coefC mulIr_eq0 ?lead_coef_eq0.
 Qed.
 
@@ -1416,7 +1416,7 @@ Proof.
 move=> /mulIr_eq0 reg_d lt_r_d; rewrite addrC.
 have [-> | nz_q] := eqVneq q 0; first by rewrite mul0r addr0.
 have qd0: lead_coef q * lead_coef d != 0 by rewrite reg_d lead_coef_eq0.
-apply/negbTE; rewrite -size_poly_eq0 addrC size_polyDl.
+apply/negbTE; rewrite -size_poly_eq0 addrC size_polyDl; last first.
   by rewrite size_poly_eq0 -lead_coef_eq0 lead_coef_proper_mul.
 apply: leq_trans lt_r_d _; rewrite size_proper_mul //.
 move: nz_q; rewrite -size_poly_eq0.
@@ -1836,7 +1836,7 @@ set q := (n %/ d)%N; rewrite /q.-primitive_root ltn_divRL // n_gt0.
 apply/forallP=> i; rewrite unity_rootE -exprM -prim_order_dvd.
 rewrite -(divnK d_dv_n) -/q -(divnK d_dv_k) mulnAC dvdn_pmul2r //.
 apply/eqP; apply/idP/idP=> [|/eqP->]; last by rewrite dvdn_mull.
-rewrite Gauss_dvdr; first by rewrite eqn_leq ltn_ord; apply: dvdn_leq.
+rewrite Gauss_dvdr; last by rewrite eqn_leq ltn_ord; apply: dvdn_leq.
 by rewrite /coprime gcdnC -(eqn_pmul2r d_gt0) mul1n muln_gcdl !divnK.
 Qed.
 
@@ -2806,7 +2806,7 @@ set f : 'I_(size ps) -> {set 'I_(size ps)} := fun a => [set a].
 transitivity (\sum_(I in imset f (mem setT)) \prod_(i in I) ps`_i).
   apply: congr_big => // I /=.
   by apply/cards1P/imsetP => [[a ->] | [a _ ->]]; exists a.
-rewrite big_imset/=; last first.
+rewrite big_imset/=.
   by move=> i j _ _ ij; apply/set1P; rewrite -/(f j) -ij set11.
 rewrite -[in RHS](in_tupleE ps) -(map_tnth_enum (_ ps)) big_map enumT.
 apply: congr_big => // i; first exact: in_setT.
@@ -2942,7 +2942,7 @@ Lemma size_prod_seq (I : eqType) (s : seq I) (F : I -> {poly R}) :
     (forall i, i \in s -> F i != 0) ->
   size (\prod_(i <- s) F i) = ((\sum_(i <- s) size (F i)).+1 - size s)%N.
 Proof.
-move=> nzF; rewrite big_tnth size_prod; last by move=> i; rewrite nzF ?mem_tnth.
+move=> nzF; rewrite big_tnth size_prod; first by move=> i; rewrite nzF ?mem_tnth.
 by rewrite cardT /= size_enum_ord [in RHS]big_tnth.
 Qed.
 
@@ -3017,7 +3017,7 @@ Lemma lead_coef_comp p q : size q > 1 ->
 Proof.
 move=> q_gt1; rewrite !lead_coefE coef_comp_poly size_comp_poly.
 have [->|nz_p] := eqVneq p 0; first by rewrite size_poly0 big_ord0 coef0 mul0r.
-rewrite polySpred //= big_ord_recr /= big1 ?add0r => [|i _].
+rewrite polySpred //= big_ord_recr /= big1 ?add0r => [i _|]; last first.
   by rewrite -!lead_coefE -lead_coef_exp !lead_coefE size_exp mulnC.
 rewrite [X in _ * X]nth_default ?mulr0 ?(leq_trans (size_poly_exp_leq _ _)) //.
 by rewrite mulnC ltn_mul2r -subn1 subn_gt0 q_gt1 /=.
@@ -3141,7 +3141,7 @@ have [|q' def_q] := factor_theorem q z _; last first.
 rewrite {p}def_p in rpz.
 elim/last_ind: rs drs rpz => [|rs t IHrs] /=; first by rewrite big_nil mulr1.
 rewrite all_rcons => /andP[/andP[/eqP czt Uzt] /IHrs{}IHrs].
-rewrite -cats1 big_cat big_seq1 /= mulrA rootE hornerM_comm; last first.
+rewrite -cats1 big_cat big_seq1 /= mulrA rootE hornerM_comm.
   by rewrite /comm_poly hornerXsubC mulrBl mulrBr czt.
 rewrite hornerXsubC -opprB mulrN oppr_eq0 -(mul0r (t - z)).
 by rewrite (inj_eq (mulIr Uzt)) => /IHrs.
@@ -3227,7 +3227,7 @@ Lemma factor_Xn_sub_1 : \prod_(0 <= i < n) ('X - (z ^+ i)%:P) = 'X^n - 1.
 Proof.
 transitivity (\prod_(w <- zn) ('X - w%:P)); first by rewrite big_map.
 have n_gt0: n > 0 := prim_order_gt0 prim_z.
-rewrite (@all_roots_prod_XsubC _ ('X^n - 1) zn); first 1 last.
+rewrite (@all_roots_prod_XsubC _ ('X^n - 1) zn).
 - by rewrite size_XnsubC // size_map size_iota subn0.
 - apply/allP=> _ /mapP[i _ ->] /=; rewrite rootE !hornerE.
   by rewrite exprAC (prim_expr_order prim_z) expr1n subrr.

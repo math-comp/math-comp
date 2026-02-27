@@ -202,8 +202,8 @@ have cKH: H \subset 'C(K) by rewrite centsC.
 apply/imset2P/and3P=> [[x y /setIP[Hx cHx] /setIP[Ky cKy] ->{z}]| []].
   by rewrite imset2_f ?groupM // ?(subsetP cHK) ?(subsetP cKH).
 case/imset2P=> x y Hx Ky ->{z}.
-rewrite groupMr => [cHx|]; last exact: subsetP Ky.
-rewrite groupMl => [cKy|]; last exact: subsetP Hx.
+rewrite groupMr => [|cHx]; first exact: subsetP Ky.
+rewrite groupMl => [|cKy]; first exact: subsetP Hx.
 by exists x y; rewrite ?inE ?Hx ?Ky.
 Qed.
 
@@ -399,7 +399,7 @@ Lemma setI_im_cpair : CH :&: CK = 'Z(CH).
 Proof.
 apply/eqP; rewrite eqEsubset setIS //=.
 rewrite subsetI center_sub -injm_center //.
-rewrite (eq_in_morphim _ eq_cpairZ); first by rewrite morphim_comp morphimS.
+rewrite (eq_in_morphim _ eq_cpairZ); last by rewrite morphim_comp morphimS.
 by rewrite !(setIidPr _) // -sub_morphim_pre.
 Qed.
 
@@ -476,7 +476,7 @@ apply: andb_id2l => /= injfH; apply: andb_idr => _.
 rewrite !im_ifactm // -(morphimIdom gH) setI_im_cpair -injm_center //.
 rewrite morphim_ifactm // eqEsubset subsetI morphimS //=.
 rewrite {1}injm_center // setIS //=.
-rewrite (eq_in_morphim _ eq_fHK); first by rewrite morphim_comp morphimS.
+rewrite (eq_in_morphim _ eq_fHK); last by rewrite morphim_comp morphimS.
 by rewrite !(setIidPr _) // -sub_morphim_pre.
 Qed.
 
@@ -636,7 +636,7 @@ Qed.
 Lemma ncprod1 : G_ 1 \isog G.
 Proof.
 case: ncprodS => gz isoZ; rewrite isog_sym /= -im_cpair.
-rewrite mulGSid /=; first by rewrite sub_isog ?injm_cpairg1.
+rewrite mulGSid /=; last by rewrite sub_isog ?injm_cpairg1.
 rewrite -{3}center_ncprod0 injm_center ?injm_cpair1g //.
 by rewrite -cpair_center_id center_sub.
 Qed.

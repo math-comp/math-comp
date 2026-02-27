@@ -241,19 +241,19 @@ have: rj0T (Ss_ dj.+1) = 'X^dj *: rj0T (S_ j1) + 1 *: rj0T (Ss_ dj).
   apply/rowP=> i; apply/polyP=> k; rewrite scale1r !(Sylvester_mxE, mxE) eqxx.
   rewrite coefD coefXnM coefC !coef_poly ltnS subn_eq0 ltn_neqAle andbC.
   have [k_le_dj | k_gt_dj] /= := leqP k dj; last by rewrite addr0.
-  rewrite Sylvester_mxE insubdK; last exact: leq_ltn_trans (ltjS).
+  rewrite Sylvester_mxE insubdK; first exact: leq_ltn_trans (ltjS).
   by have [->|] := eqP; rewrite (addr0, add0r).
 rewrite -det_tr => /determinant_multilinear->;
   try by apply/matrixP=> i j; rewrite !mxE lift_eqF.
 have [dj0 | dj_gt0] := posnP dj; rewrite ?dj0 !mul1r.
-  rewrite !det_tr det_map_mx addrC (expand_det_col _ j0) big1 => [|i _].
-    rewrite add0r; congr (\det _)%:P.
-    apply/matrixP=> i j; rewrite [in RHS]mxE; case: eqP => // ->.
-    by congr (S i _); apply: val_inj.
-  by rewrite mxE /= [Ss0_ _ _]poly_def big_ord0 mul0r.
+  rewrite !det_tr det_map_mx addrC (expand_det_col _ j0) big1 => [i _|].
+    by rewrite mxE /= [Ss0_ _ _]poly_def big_ord0 mul0r.
+  rewrite add0r; congr (\det _)%:P.
+  apply/matrixP=> i j; rewrite [in RHS]mxE; case: eqP => // ->.
+  by congr (S i _); apply: val_inj.
 have /determinant_alternate->: j1 != j0 by rewrite -val_eqE -lt0n.
-  by rewrite mulr0 add0r det_tr IHj // ltnW.
-by move=> i; rewrite !mxE if_same.
+  by move=> i; rewrite !mxE if_same.
+by rewrite mulr0 add0r det_tr IHj // ltnW.
 Qed.
 
 Lemma resultant_eq0 (R : idomainType) (p q : {poly R}) :
@@ -271,11 +271,11 @@ apply/det0P/idP=> [[uv nz_uv] | r_nonC].
   do [rewrite -[uv]hsubmxK -{1}row_mx0 mul_row_col !mul_rV_lin1 /=] in nz_uv *.
   set u := rVpoly _; set v := rVpoly _; pose m := gcdp (v * p) (v * q).
   have lt_vp: size v < size p by rewrite (polySpred p_nz) ltnS size_poly.
-  move/(congr1 rVpoly)/eqP; rewrite -linearD linear0 poly_rV_K; last first.
+  move/(congr1 rVpoly)/eqP; rewrite -linearD linear0 poly_rV_K.
     rewrite (leq_trans (size_polyD _ _)) // geq_max.
     rewrite !(leq_trans (size_polyMleq _ _)) // -subn1 leq_subLR.
-      by rewrite addnC addnA leq_add ?leqSpred ?size_poly.
-    by rewrite addnCA leq_add ?leqSpred ?size_poly.
+      by rewrite addnCA leq_add ?leqSpred ?size_poly.
+    by rewrite addnC addnA leq_add ?leqSpred ?size_poly.
   rewrite addrC addr_eq0 => /eqP vq_up.
   have nz_v: v != 0.
     apply: contraNneq nz_uv => v0; apply/eqP.
@@ -359,8 +359,8 @@ apply/matrixP => i j; rewrite !mxE.
 elim/poly_ind: p => [|p c ihp]; first by rewrite rmorph0 horner0 mxE mul0rn.
 rewrite !hornerE mulrnDl rmorphD rmorphM /= horner_mx_X horner_mx_C !mxE.
 rewrite (bigD1 j)//= ihp mxE eqxx mulr1n -mulrnAl big1 ?addr0.
-  by have [->|_] := eqVneq; rewrite /= !(mulr1n, addr0, mul0r).
-by move=> k /negPf nkF; rewrite mxE nkF mulr0.
+  by move=> k /negPf nkF; rewrite mxE nkF mulr0.
+by have [->|_] := eqVneq; rewrite /= !(mulr1n, addr0, mul0r).
 Qed.
 
 Lemma comm_mx_horner A B p : comm_mx A B -> comm_mx A (horner_mx B p).
@@ -529,7 +529,7 @@ Qed.
 Lemma char_poly_trig {R : comNzRingType} n (A : 'M[R]_n) : is_trig_mx A ->
   char_poly A = \prod_(i < n) ('X - (A i i)%:P).
 Proof.
-move=> /is_trig_mxP Atrig; rewrite /char_poly det_trig.
+move=> /is_trig_mxP Atrig; rewrite /char_poly det_trig; last first.
   by apply: eq_bigr => i; rewrite !mxE eqxx.
 by apply/is_trig_mxP => i j lt_ij; rewrite !mxE -val_eqE ltn_eqF ?Atrig ?subrr.
 Qed.
@@ -546,7 +546,7 @@ pose D n : 'M[{poly R}]_n := \matrix_(i, j)
 have detD n : \det (D n) = (-1) ^+ n.
   elim: n => [|n IHn]; first by rewrite det_mx00.
   rewrite (expand_det_row _ ord0) big_ord_recl !mxE /= sub0r.
-  rewrite big1 ?addr0; last by move=> i _; rewrite !mxE /= subrr mul0r.
+  rewrite big1 ?addr0; first by move=> i _; rewrite !mxE /= subrr mul0r.
   rewrite /cofactor mul1r [X in \det X](_ : _ = D _) ?IHn ?exprS//.
   by apply/matrixP=> i j; rewrite !mxE /= /bump !add1n eqSS.
 elim/poly_ind: p => [|p c IHp].
@@ -554,7 +554,7 @@ elim/poly_ind: p => [|p c IHp].
 have [->|p_neq0] := eqVneq p 0.
   rewrite mul0r add0r monicE lead_coefC => /eqP->.
   by rewrite /companionmx /char_poly size_poly1 det_mx00.
-rewrite monicE lead_coefDl ?lead_coefMX => [p_monic|]; last first.
+rewrite monicE lead_coefDl ?lead_coefMX => [|p_monic].
   rewrite size_polyC size_mulX ?polyX_eq0// ltnS.
   by rewrite (leq_trans (leq_b1 _)) ?size_poly_gt0.
 rewrite -[in RHS]IHp // /companionmx size_MXaddC (negPf p_neq0) /=.
@@ -563,7 +563,7 @@ have [->|spV1_gt0] := posnP (size p).-1.
   rewrite [X in \det X]mx11_scalar det_scalar1 !mxE ?eqxx det_mx00.
   by rewrite mul1r -horner_coef0 hornerMXaddC mulr0 add0r rmorphN opprK.
 rewrite (expand_det_col _ ord0) /= -[(size p).-1]prednK //.
-rewrite big_ord_recr big_ord_recl/= big1 ?add0r //=; last first.
+rewrite big_ord_recr big_ord_recl/= big1 ?add0r //=.
   move=> i _; rewrite !mxE -val_eqE /= /bump leq0n add1n eqSS.
   by rewrite ltn_eqF ?subrr ?mul0r.
 rewrite !mxE ?subnn -horner_coef0 /= hornerMXaddC.
@@ -572,7 +572,7 @@ rewrite mulrC /cofactor; congr (_ * 'X + _).
   rewrite /cofactor -signr_odd oddD addbb mul1r; congr (\det _).
   apply/matrixP => i j; rewrite !mxE -val_eqE coefD coefMX coefC.
   by rewrite /= /bump /= !add1n !eqSS addr0.
-rewrite /cofactor [X in \det X](_ : _ = D _).
+rewrite /cofactor [X in \det X](_ : _ = D _); last first.
   by rewrite detD /= addn0 -signr_odd -signr_addb addbb mulr1.
 apply/matrixP=> i j; rewrite !mxE -!val_eqE /= /bump /=.
 by rewrite leqNgt ltn_ord add0n add1n [_ == _.-2.+1]ltn_eqF.
@@ -583,7 +583,7 @@ Lemma mulmx_delta_companion (R : nzRingType) (p : seq R)
   delta_mx 0 i *m companionmx p = delta_mx 0 (Ordinal i_small) :> 'rV__.
 Proof.
 apply/rowP => j; rewrite !mxE (bigD1 i) //= ?(=^~val_eqE, mxE) /= eqxx mul1r.
-rewrite ltn_eqF ?big1 ?addr0 1?eq_sym //; last first.
+rewrite ltn_eqF ?big1 ?addr0 1?eq_sym //.
   by rewrite -ltnS prednK // (leq_trans  _ i_small).
 by move=> k /negPf ki_eqF; rewrite !mxE eqxx ki_eqF mul0r.
 Qed.
@@ -637,7 +637,7 @@ rewrite rmorphD rmorphM /= horner_mx_C horner_mx_X.
 rewrite addrC -scalemx1 linearP /= -(mul_vec_lin (mulmxr A)).
 case/submxP: IHp => u ->{p}.
 have: (powers_mx A (1 + d) <= Ad)%MS.
-  rewrite -(geq_leqif (mxrank_leqif_sup _)).
+  rewrite -(geq_leqif (mxrank_leqif_sup _)); last first.
     by rewrite (eqnP minpoly_mx_free) /d; case: ex_minnP.
   rewrite addnC; apply/row_subP=> i.
   by apply: eq_row_sub (lshift 1 i) _; rewrite !rowK.
@@ -765,7 +765,7 @@ Lemma mxminpoly_diag {F : fieldType} {n} (d : 'rV[F]_n.+1)
   mxminpoly (diag_mx d) = \prod_(r <- u) ('X - r%:P).
 Proof.
 apply/eqP; rewrite -eqp_monic ?mxminpoly_monic ?monic_prod_XsubC// /eqp.
-rewrite mxminpoly_min/=; last first.
+rewrite mxminpoly_min/=.
   rewrite horner_mx_diag; apply/matrixP => i j; rewrite !mxE horner_prod.
   case: (altP (i =P j)) => [->|neq_ij//]; rewrite mulr1n.
   rewrite (bigD1_seq (d 0 j)) ?undup_uniq ?mem_undup ?map_f// /=.
@@ -962,7 +962,7 @@ move=> j js ihjs /= /andP[jNjs js_uniq]; apply/eqmxP.
 rewrite !big_cons; case: ifP => [Pj|PNj]; rewrite ?ihjs ?submx_refl//.
 suff cjjs: coprimep (p_ j) (\prod_(i <- js | P i) p_ i).
   by rewrite !kermxpolyM// !(adds_eqmx (eqmx_refl _) (ihjs _)) ?submx_refl.
-rewrite (@big_morph _ _ _ true andb) ?big_all_cond ?coprimep1//; last first.
+rewrite (@big_morph _ _ _ true andb) ?big_all_cond ?coprimep1//.
   by move=> p q; rewrite coprimepMr.
 apply/allP => i i_js; apply/implyP => Pi; apply: p_coprime => //.
 by apply: contraNneq jNjs => <-.
@@ -979,7 +979,7 @@ have cpNi : {in [pred j | P j && (j != i)] &,
   by move=> j k /andP[Pj _] /andP[Pk _]; apply: p_coprime.
 rewrite -!(cap_eqmx (eqmx_refl _) (kermxpoly_prod g _))//.
 rewrite mxdirect_kermxpoly ?submx_refl//.
-rewrite (@big_morph _ _ _ true andb) ?big_all_cond ?coprimep1//; last first.
+rewrite (@big_morph _ _ _ true andb) ?big_all_cond ?coprimep1//.
   by move=> p q; rewrite coprimepMr.
 by apply/allP => j _; apply/implyP => /andP[Pj neq_ji]; apply: p_coprime.
 Qed.
@@ -1302,7 +1302,7 @@ case=> p nz_p pu0; exists (Poly (rev p)).
   apply/eqP=> /polyP/(_ 0); rewrite coef_Poly coef0 nth_rev ?size_poly_gt0 //.
   by apply/eqP; rewrite subn1 lead_coef_eq0.
 apply/eqP/(mulfI (nz_u_n (size p).-1)); rewrite mulr0 -(rootP pu0).
-rewrite (@horner_coef_wide _ (size p)); last first.
+rewrite (@horner_coef_wide _ (size p)).
   by rewrite size_map_poly -(size_rev p) size_Poly.
 rewrite horner_coef mulr_sumr size_map_poly.
 rewrite [rhs in _ = rhs](reindex_inj rev_ord_inj) /=.
@@ -1401,7 +1401,7 @@ Lemma eval_mxrank e r m n (A : 'M_(m, n)) :
 Proof.
 elim: m r n A => [|m IHm] r [|n] A /=; try by case r; rewrite unlock.
 rewrite GRing.eval_Pick !unlock /=; set pf := fun _ => _.
-rewrite -(@eq_pick _ pf) => [|k]; rewrite {}/pf ?mxE // eq_sym.
+rewrite -(@eq_pick _ pf) => [k|]; rewrite {}/pf ?mxE // eq_sym.
 case: pick => [[i j]|] //=; set B := _ - _; have:= mxrankE B.
 case: (Gaussian_elimination_ B) r => [[_ _] _] [|r] //= <-; rewrite {}IHm eqSS.
 by congr (\rank _ == r); apply/matrixP=> k l; rewrite !(mxE, big_ord1) !tpermR.
@@ -1848,12 +1848,12 @@ apply/codiagonalizablePfull; eexists _; last exists P; rewrite /=.
 - rewrite -sub1mx eqmx_col.
   by under eq_bigr do rewrite (eq_genmx (PrV _)); rewrite -genmx_sums genmxE V1.
 apply/allP => A AAs /=; rewrite diagonalizable_for_sum.
-- by apply/forallP => i; apply: P_diag.
 - rewrite mxdirectE/=.
   under eq_bigr do rewrite (eq_genmx (PrV _)); rewrite -genmx_sums genmxE V1.
   by under eq_bigr do rewrite genmxE PrV; rewrite  -(mxdirectP Vdirect)//= V1.
 - by move=> i; rewrite (eqmx_stable _ (PrV _)) ?AV.
 - by move=> i; rewrite /row_free eqmxMfull ?eq_row_base ?row_full_unit.
+- by apply/forallP => i; apply: P_diag.
 Qed.
 
 Lemma diagonalizable_diag {n} (d : 'rV[F]_n) : diagonalizable (diag_mx d).
@@ -1902,7 +1902,7 @@ apply/(codiagonalizable_on _ mxdirect_eigenspaces) => // i/=.
     by rewrite thinmx0 sub0mx.
   by rewrite comm_mx_stable_eigenspace.
 apply/codiagonalizable1.
-rewrite (@conjmx_eigenvalue _ _ _ rs`_i); first exact: diagonalizable_scalar.
+rewrite (@conjmx_eigenvalue _ _ _ rs`_i); last exact: diagonalizable_scalar.
   by rewrite eq_row_base.
 by rewrite row_base_free.
 Qed.
@@ -1972,7 +1972,7 @@ have := dAAs B; rewrite inE BAs orbT => /(_ isT) [P Punit].
 move=> /diagonalizable_forPex[D /(simmxLR Punit)->] sePD.
 have rAeP : row_free (row_base (eigenspace A rs`_i) *m invmx P).
   by rewrite /row_free mxrankMfree ?row_free_unit ?unitmx_inv// eq_row_base.
-rewrite -conjMumx ?unitmx_inv ?row_base_free => [|//|//|//].
+rewrite -conjMumx ?unitmx_inv ?row_base_free => [//|//|//|].
 apply/diagonalizable_conj_diag => //.
 by rewrite stablemx_comp// stablemx_unit ?unitmx_inv.
 Qed.

@@ -544,7 +544,7 @@ Lemma ltn_morphim A : [1] \proper 'ker_A f -> #|f @* A| < #|A|.
 Proof.
 case/properP; rewrite sub1set => /setIP[A1 _] [x /setIP[Ax kx] x1].
 rewrite (cardsD1 1 A) A1 ltnS -{1}(setD1K A1) morphimU morphim1.
-rewrite (setUidPr _) ?sub1set; last first.
+rewrite (setUidPr _) ?sub1set.
   by rewrite -(mker kx) mem_morphim ?(dom_ker kx) // inE x1.
 by rewrite (leq_trans (leq_imset_card _ _)) ?subset_leq_card ?subsetIr.
 Qed.
@@ -574,7 +574,7 @@ Proof. by move=> nsGf nsHf /morphim_injG->. Qed.
 Lemma morphim_gen A : A \subset D -> f @* <<A>> = <<f @* A>>.
 Proof.
 move=> sAD; apply/eqP.
-rewrite eqEsubset andbC gen_subG morphimS; last exact: subset_gen.
+rewrite eqEsubset andbC gen_subG morphimS; first exact: subset_gen.
 by rewrite sub_morphim_pre gen_subG // -sub_morphim_pre // subset_gen.
 Qed.
 
@@ -589,7 +589,7 @@ Lemma morphpre_gen R :
   1 \in R -> R \subset f @* D -> f @*^-1 <<R>> = <<f @*^-1 R>>.
 Proof.
 move=> R1 sRfD; apply/eqP.
-rewrite eqEsubset andbC gen_subG morphpreS; last exact: subset_gen.
+rewrite eqEsubset andbC gen_subG morphpreS; first exact: subset_gen.
 rewrite -{1}(morphpreK sRfD) -morphim_gen ?subsetIl // morphimGK //=.
   by rewrite sub_gen // setIS // preimsetS ?sub1set.
 by rewrite gen_subG subsetIl.
@@ -601,7 +601,7 @@ Lemma morphimR A B :
   A \subset D -> B \subset D -> f @* [~: A, B] = [~: f @* A, f @* B].
 Proof.
 move/subsetP=> sAD /subsetP sBD.
-rewrite morphim_gen; last first; last congr <<_>>.
+rewrite morphim_gen; last congr <<_>>.
   by apply/subsetP=> _ /imset2P[x y Ax By ->]; rewrite groupR; auto.
 apply/setP=> fz; apply/morphimP/imset2P=> [[z _] | [fx fy]].
   case/imset2P=> x y Ax By -> -> {z fz}.
@@ -1060,7 +1060,7 @@ Canonical factm_morphism := Morphism factm_morphM.
 
 Lemma morphim_factm (A : {set aT}) : ff @* (q @* A) = f @* A.
 Proof.
-rewrite -morphim_comp /= {1}/morphim /= morphimGK //; last first.
+rewrite -morphim_comp /= {1}/morphim /= morphimGK //.
   by rewrite (subset_trans sKqKf) ?subsetIl.
 apply/setP=> y; apply/morphimP/morphimP;
   by case=> x Gx Ax ->{y}; exists x; rewrite //= factmE.

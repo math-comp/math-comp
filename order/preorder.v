@@ -3660,7 +3660,7 @@ Proof. by move=> x; apply: enum_rankK_in. Qed.
 
 Lemma enum_valK_in x0 A Ax0 : cancel enum_val (@enum_rank_in x0 A Ax0).
 Proof.
-move=> x; apply: ord_inj; rewrite insubdK; last first.
+move=> x; apply: ord_inj; rewrite insubdK.
   by rewrite cardE [_ \in _]index_mem mem_nth // -cardE.
 by rewrite index_uniq ?enum_uniq // -cardE.
 Qed.

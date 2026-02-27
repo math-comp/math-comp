@@ -626,8 +626,8 @@ Lemma telescope_sumr n m (f : nat -> V) : n <= m ->
   \sum_(n <= k < m) (f k.+1 - f k) = f m - f n.
 Proof.
 move=> nm; rewrite (telescope_big (fun i j => f j - f i)).
-  by case: ltngtP nm => // ->; rewrite subrr.
-by move=> k /andP[nk km]/=; rewrite addrC subrKA.
+  by move=> k /andP[nk km]/=; rewrite addrC subrKA.
+by case: ltngtP nm => // ->; rewrite subrr.
 Qed.
 
 Lemma telescope_sumr_eq n m (f u : nat -> V) : n <= m ->

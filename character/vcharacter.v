@@ -428,7 +428,7 @@ suffices def_xi: xi = (-1) ^+ b i *: 'chi_i.
   exists i; rewrite // mem_enum inE -/(b i) orbC.
   by case: (b i) def_xi Sxi => // ->; rewrite scale1r.
 move: Sxi; rewrite [xi]cfun_sum_cfdot (bigD1 i) //.
-rewrite big1 //= ?addr0 => [|j ne_ji]; last first.
+rewrite big1 //= ?addr0 => [j ne_ji|].
   apply/eqP; rewrite scaler_eq0 -normr_eq0 -[_ == 0](expf_eq0 _ 2) normCK.
   by rewrite xi_i'_0 ?eqxx.
 have:= norm_xi_i; rewrite (aut_intr _ (Cint_cfdot_vchar_irr _ _)) //.
@@ -637,7 +637,7 @@ have [[_ sHG regGH][_ tiHG /eqP defNH]] := (normedTI_memJ_P ntiHG, and3P ntiHG).
 suffices /sigW[K defG]: exists K, gval K ><| H == G by exists K; apply/andP.
 pose K1 := G :\: cover (H^# :^: G).
 have oK1: #|K1| = #|G : H|.
-  rewrite cardsD (setIidPr _); last first.
+  rewrite cardsD (setIidPr _).
     rewrite cover_imset; apply/bigcupsP=> x Gx.
     by rewrite sub_conjg conjGid ?groupV // (subset_trans (subsetDl _ _)).
   rewrite (cover_partition (partition_normedTI ntiHG)) -(Lagrange sHG).
@@ -650,7 +650,7 @@ suffices extG i: {j | {in H, 'chi[G]_j =1 'chi[H]_i} & K1 \subset cfker 'chi_j}.
     apply/trivgP; rewrite -(TI_cfker_irr H) /= setIC; apply/bigcapsP=> i _.
     apply/subsetP=> x /setIP[Hx /bigcapP/(_ i isT)/=]; rewrite !cfkerEirr !inE.
     by case: (extG i) => /= j def_j _; rewrite !def_j.
-  exists K; rewrite sdprodE // eqEcard TI_cardMg // mul_subG //=; last first.
+  exists K; rewrite sdprodE // eqEcard TI_cardMg // mul_subG //=.
     by rewrite (bigcap_min (0 : Iirr H)) ?cfker_sub.
   rewrite -(Lagrange sHG) mulnC leq_pmul2r // -oK1 subset_leq_card //.
   by apply/bigcapsP=> i _; case: (extG i).
@@ -665,7 +665,7 @@ have /cfun_onP theta0: theta \in 'CF(H, H^#).
 have RItheta: 'Res ('Ind[G] theta) = theta.
   apply/cfun_inP=> x Hx; rewrite cfResE ?cfIndE // (big_setID H) /= addrC.
   apply: canLR (mulKf (neq0CG H)) _; rewrite (setIidPr sHG) mulr_natl.
-  rewrite big1 ?add0r => [|y /setDP[/regGH tiHy H'y]]; last first.
+  rewrite big1 ?add0r => [y /setDP[/regGH tiHy H'y]|].
     have [-> | ntx] := eqVneq x 1%g; first by rewrite conj1g theta0 ?inE ?eqxx.
     by rewrite theta0 ?tiHy // !inE ntx.
   by rewrite -sumr_const; apply: eq_bigr => y Hy; rewrite cfunJ.
@@ -877,7 +877,7 @@ Lemma cfun_sum_dconstt (phi : 'CF(G)) :
   phi = \sum_(i in dirr_constt phi) '[phi, dchi i] *: dchi i.
 Proof.
 move=> PiZ; rewrite [LHS]cfun_sum_constt.
-rewrite (reindex (to_dirr phi))=> [/= |]; last first.
+rewrite (reindex (to_dirr phi))=> [| /=].
   by exists (@of_irr _)=> //; apply: of_irrK .
 by apply: eq_big => i; rewrite ?irr_constt_to_dirr // cfdot_todirrE.
 Qed.
@@ -888,11 +888,11 @@ Lemma cnorm_dconstt (phi : 'CF(G)) :
 Proof.
 move=> PiZ; rewrite {1 2}(cfun_sum_dconstt PiZ).
 rewrite cfdot_suml; apply: eq_bigr=> i IiD.
-rewrite cfdot_sumr (bigD1 i) //= big1 ?addr0 => [|j /andP [JiD IdJ]].
-  rewrite cfdotZr cfdotZl cfdot_dchi eqxx eq_sym (negPf (ndirr_diff i)).
-  by rewrite subr0 mulr1 aut_natr ?Cnat_dirr.
-rewrite cfdotZr cfdotZl cfdot_dchi eq_sym (negPf IdJ) -natrB ?mulr0 //.
-by rewrite (negPf (contraNneq _ (dirr_constt_oppl JiD))) => // <-.
+rewrite cfdot_sumr (bigD1 i) //= big1 ?addr0 => [j /andP [JiD IdJ]|].
+  rewrite cfdotZr cfdotZl cfdot_dchi eq_sym (negPf IdJ) -natrB ?mulr0 //.
+  by rewrite (negPf (contraNneq _ (dirr_constt_oppl JiD))) => // <-.
+rewrite cfdotZr cfdotZl cfdot_dchi eqxx eq_sym (negPf (ndirr_diff i)).
+by rewrite subr0 mulr1 aut_natr ?Cnat_dirr.
 Qed.
 
 Lemma dirr_small_norm (phi : 'CF(G)) n :
@@ -928,13 +928,13 @@ rewrite addrC (big_setID (dirr_constt (- phi2))) /= cfdotDl; congr (_ + _).
   rewrite (negPf (contraTneq _ p2i)) // => ->.
   by rewrite dirr_constt_oppr dirr_constt_oppl.
 rewrite cfdot_sumr (big_setID (dirr_constt phi1)) setIC /= addrC.
-rewrite big1 ?add0r => [|j /setDP[p2j p1'j]]; last first.
+rewrite big1 ?add0r => [j /setDP[p2j p1'j]|].
   rewrite cfdot_suml big1 // => i /setDP[p1i p2'i].
-  rewrite cfdot_dchi (negPf (contraTneq _ p1i)) => [|-> //].
+  rewrite cfdot_dchi (negPf (contraTneq _ p1i)) => [-> //|].
   rewrite (negPf (contraNneq _ p2'i)) ?subrr // => ->.
   by rewrite dirr_constt_oppr ndirrK.
 rewrite -sumr_const; apply: eq_bigr => i /setIP[p1i p2i]; rewrite cfdot_suml.
-rewrite (bigD1 i) /=; last by rewrite inE dirr_constt_oppr dirr_constt_oppl.
+rewrite (bigD1 i) /=; first by rewrite inE dirr_constt_oppr dirr_constt_oppl.
 rewrite cfnorm_dchi big1 ?addr0 // => j /andP[/setDP[p1j _] i'j].
 rewrite cfdot_dchi (negPf i'j) (negPf (contraTneq _ p1j)) ?subrr // => ->.
 exact: dirr_constt_oppl.

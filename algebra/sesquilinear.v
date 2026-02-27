@@ -1177,7 +1177,7 @@ case/pairwise_orthogonalP=> [/=/andP[notS0 uniqS] oSS].
 rewrite -(in_tupleE S); apply/freeP => a aS0 i.
 have S_i: S`_i \in S by apply: mem_nth.
 have /eqP: '[S`_i, 0] = 0 := linear0r _ _.
-rewrite -{2}aS0 raddf_sum /= (bigD1 i) //= big1 => [|j neq_ji]; last 1 first.
+rewrite -{2}aS0 raddf_sum /= (bigD1 i) //= big1 => [j neq_ji|].
   by rewrite linearZ /= oSS ?mulr0 ?mem_nth // eq_sym nth_uniq.
 rewrite addr0 linearZ mulf_eq0 conjC_eq0 dnorm_eq0.
 by case/pred2P=> // Si0; rewrite -Si0 S_i in notS0.
@@ -1209,7 +1209,7 @@ without loss ou: u / '[u, v] = 0.
   rewrite (canRL (subrK _) (erefl u1)) rpredDr ?rpredZ ?memv_line //.
   rewrite linearDl /= ou add0r.
   rewrite linearZl_LR/= normrM (ger0_norm (dnorm_ge0 _ _)).
-  rewrite exprMn mulrA -dnormZ hnormDd/=; last by rewrite linearZr_LR/= ou mulr0.
+  rewrite exprMn mulrA -dnormZ hnormDd/=; first by rewrite linearZr_LR/= ou mulr0.
   have:= IHo _ ou.
   by rewrite mulrDl -leifBLR subrr ou normCK mul0r.
 rewrite ou normCK mul0r; split; first by rewrite mulr_ge0.

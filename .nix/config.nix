@@ -81,6 +81,27 @@ with builtins; with (import <nixpkgs> {}).lib;
          #   for a complete list of Coq packages available in Nix
          # * <github_login>:<branch> is such that this will use the branch <branch>
          #   from https://github.com/<github_login>/<repository>
+         coqeal.override.version = "proux01:mc1545";
+         coquelicot.override.version = "proux01:mc1545";
+         coq-bits.override.version = "mc1545";
+         deriving.override.version = "proux01:mc1545";
+         extructures.override.version = "proux01:mc1545";
+         fourcolor.override.version = "mc1545";
+         gaia.override.version = "mc1545";
+         graph-theory.override.version = "mc1545";
+         mathcomp-algebra-tactics.override.version = "proux01:mc1545";
+         mathcomp-classical.override.version = "proux01:mc1545";
+         mathcomp-analysis.override.version = "proux01:mc1545";
+         mathcomp-apery.override.version = "mc1545";
+         mathcomp-finmap.override.version = "proux01:mc1545";
+         mathcomp-real-closed.override.version = "proux01:mc1545";
+         mathcomp-tarjan.override.version = "proux01:mc1545";
+         mathcomp-word.override.version = "proux01:mc1545";
+         mathcomp-zify.override.version = "proux01:mc1545";
+         multinomials.override.version = "proux01:mc1545";
+         odd-order.override.version = "proux01:mc1545";
+         QuickChick.override.version = "proux01:mc1545";
+         reglang.override.version = "mc1545";
        };
   in {
     "rocq-master" = { rocqPackages = {

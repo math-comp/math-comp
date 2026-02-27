@@ -505,7 +505,7 @@ move=> nVG nsVU; apply/mingroupP/mingroupP; case=> /andP[->] /=.
   rewrite quotient_norms //; split=> // H /andP[ntH nHG] sHU.
   by apply: minUV (sHU); rewrite ntH -(cosetpreK H) actsQ // norm_quotient_pre.
 rewrite sub_quotient_pre // => nUG minU; rewrite astabsQ //.
-rewrite (subset_trans nUG); last first.
+rewrite (subset_trans nUG).
   by rewrite subsetI subsetIl /= -{2}(quotientGK nsVU) morphpre_norm.
 split=> // H /andP[ntH nHG] sHU.
 rewrite -{1}(cosetpreK H) astabsQ ?normal_cosetpre ?subsetI ?nVG //= in nHG.

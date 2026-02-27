@@ -1135,7 +1135,7 @@ by apply: eq_big => i *; rewrite inord_val.
 Qed.
 
 Lemma big_ord0 P F : \big[op/idx]_(i < 0 | P i) F i = idx.
-Proof. by rewrite big_pred0 => [|[]]. Qed.
+Proof. by rewrite big_pred0 => [[]|]. Qed.
 
 Lemma big_mask_tuple I n m (t : n.-tuple I) (P : pred I) F :
   \big[op/idx]_(i <- mask m t | P i) F i
@@ -1427,7 +1427,7 @@ case: (pickP P) => [i Pi | P0]; last first.
   by rewrite !big_pred0 // => j; rewrite P0.
 have := h'K i Pi; case h'i_eq : (h' i) => [/= j|//] [hj_eq].
 rewrite (bigD1 i Pi) (bigD1 j) hj_eq ?Pi ?h'i_eq ?eqxx //=; congr (op : _ -> _).
-rewrite {}IHn => [|k /andP[]|]; [|by auto | by rewrite (cardD1x i) in lePn].
+rewrite {}IHn => [k /andP[]||]; [by auto | by rewrite (cardD1x i) in lePn|].
 apply: eq_bigl => k; rewrite andbC -andbA (andbCA (P _)); case: eqP => //= hK.
 congr (_ && ~~ _); apply/eqP/eqP => [|->//].
 by move=> /(congr1 h'); rewrite h'i_eq hK => -[].
@@ -1462,8 +1462,8 @@ Lemma bigD1_ord n j (P : pred 'I_n) F :
     = op (F j) (\big[op/x]_(i < n.-1 | P (lift j i)) F (lift j i)).
 Proof.
 move=> Pj; rewrite (bigD1 j Pj) (reindex_omap (lift j) (unlift j))/=.
-  by under eq_bigl do rewrite liftK eq_sym eqxx neq_lift ?andbT.
-by move=> i; case: unliftP => [k ->|->]; rewrite ?eqxx ?andbF.
+  by move=> i; case: unliftP => [k ->|->]; rewrite ?eqxx ?andbF.
+by under eq_bigl do rewrite liftK eq_sym eqxx neq_lift ?andbT.
 Qed.
 
 Lemma big_enum_val_cond (I : finType) (A : pred I) (P : pred I) F :
@@ -1471,11 +1471,11 @@ Lemma big_enum_val_cond (I : finType) (A : pred I) (P : pred I) F :
   \big[op/x]_(i < #|A| | P (enum_val i)) F (enum_val i).
 Proof.
 have [A_eq0|/card_gt0P[x0 x0A]] := posnP #|A|.
-  rewrite !big_pred0 // => i; last by rewrite card0_eq.
+  rewrite !big_pred0 // => i; first by rewrite card0_eq.
   by have: false by move: i => []; rewrite A_eq0.
 rewrite (reindex (enum_val : 'I_#|A| -> I)).
-  by apply: eq_big => [y|y Py]; rewrite ?enum_valP.
-by apply: subon_bij (enum_val_bij_in x0A) => y /andP[].
+  by apply: subon_bij (enum_val_bij_in x0A) => y /andP[].
+by apply: eq_big => [y|y Py]; rewrite ?enum_valP.
 Qed.
 Arguments big_enum_val_cond [I A] P F.
 
@@ -1615,7 +1615,7 @@ move=> Qp; transitivity (\big[op/x]_(i <- s | P i && Q (p i)) F i).
 have [n leQn] := ubnP #|Q|; elim: n => // n IHn in Q {Qp} leQn *.
 case: (pickP Q) => [j Qj | Q0]; last first.
   by rewrite !big_pred0 // => i; rewrite Q0 andbF.
-rewrite (bigD1 j) // -IHn; last by rewrite ltnS (cardD1x j Qj) in leQn.
+rewrite (bigD1 j) // -IHn; first by rewrite ltnS (cardD1x j Qj) in leQn.
 rewrite (bigID_idem (fun i => p i == j)).
 congr (op : _ -> _); apply: eq_bigl => i; last by rewrite andbA.
 by case: eqP => [->|_]; rewrite !(Qj, andbT, andbF).
@@ -1630,7 +1630,7 @@ Lemma sig_big_dep_idem (I : finType) (J : I -> finType)
 Proof.
 pose s := [seq Tagged J j | i <- index_enum I, j <- index_enum (J i)].
 rewrite [LHS]big_mkcond_idem big_mkcondl_idem.
-rewrite [RHS]big_mkcond_idem -[RHS](@perm_big _ s).
+rewrite [RHS]big_mkcond_idem -[RHS](@perm_big _ s); last first.
   rewrite big_allpairs_dep_idem/=; apply: eq_bigr => i _.
   by rewrite -big_mkcond_idem/=; case: P; rewrite // big1_idem.
 rewrite uniq_perm ?index_enum_uniq//.
@@ -1664,7 +1664,7 @@ Proof.
 move=> PQxQ; pose p u := (u.2, u.1).
 under [LHS]eq_bigr do rewrite big_tnth; rewrite [LHS]big_tnth.
 under [RHS]eq_bigr do rewrite big_tnth; rewrite [RHS]big_tnth.
-rewrite !pair_big_dep_idem (reindex_onto (p _ _) (p _ _)) => [|[]] //=.
+rewrite !pair_big_dep_idem (reindex_onto (p _ _) (p _ _)) => [[]|] //=.
 apply: eq_big => [] [j i] //=; symmetry; rewrite eqxx andbT andb_idl //.
 by case/andP; apply: PQxQ.
 Qed.
@@ -1686,7 +1686,7 @@ Lemma exchange_big_dep_nat_idem m1 n1 m2 n2 (P : pred nat) (Q : rel nat)
        \big[op/x]_(m1 <= i < n1 | P i && Q i j) F i j.
 Proof.
 move=> PQxQ; under eq_bigr do rewrite big_seq_cond.
-rewrite big_seq_cond /= (exchange_big_dep_idem xQ) => [|i j]; last first.
+rewrite big_seq_cond /= (exchange_big_dep_idem xQ) => [i j|].
   by rewrite !mem_index_iota => /andP[mn_i Pi] /andP[mn_j /PQxQ->].
 rewrite 2!(big_seq_cond _ _ _ xQ); apply: eq_bigr => j /andP[-> _] /=.
 by rewrite [rhs in _ = rhs]big_seq_cond; apply: eq_bigl => i; rewrite -andbA.
@@ -1902,7 +1902,7 @@ move=> le_m21; have [le_nm1|lt_m1n] := leqP n m1.
   rewrite big_geq// big_nat_cond big1//.
   by move=> i /and3P[/andP[_ /leq_trans/(_ le_nm1)/ltn_geF->]].
 rewrite big_mkcond big_mkcondl (big_cat_nat _ _ le_m21) 1?ltnW//.
-rewrite [X in op X]big_nat_cond [X in op X]big_pred0; last first.
+rewrite [X in op X]big_nat_cond [X in op X]big_pred0.
   by move=> k; case: ltnP; rewrite andbF.
 by rewrite Monoid.mul1m; apply: congr_big_nat => // k /andP[].
 Qed.
@@ -1989,7 +1989,7 @@ Lemma telescope_big (f : nat -> nat -> R) (n m : nat) :
 Proof.
 elim: m => [//| m IHm]; first by rewrite ltn0 big_geq.
 move=> tm; rewrite ltnS; case: ltnP=> // mn; first by rewrite big_geq.
-rewrite big_nat_recr// IHm//; last first.
+rewrite big_nat_recr// IHm//.
   by move=> k /andP[nk /ltnW nm]; rewrite tm// nk.
 by case: ltngtP mn=> //= [nm|<-]; rewrite ?mul1m// tm// nm leqnn.
 Qed.
@@ -2072,7 +2072,7 @@ move=> Qp; transitivity (\big[*%M/1]_(i <- s | P i && Q (p i)) F i).
 have [n leQn] := ubnP #|Q|; elim: n => // n IHn in Q {Qp} leQn *.
 case: (pickP Q) => [j Qj | Q0]; last first.
   by rewrite !big_pred0 // => i; rewrite Q0 andbF.
-rewrite (bigD1 j) // -IHn; last by rewrite ltnS (cardD1x Qj) in leQn.
+rewrite (bigD1 j) // -IHn; first by rewrite ltnS (cardD1x Qj) in leQn.
 rewrite (bigID (fun i => p i == j)); congr (_ * _); apply: eq_bigl => i.
   by case: eqP => [-> | _]; rewrite !(Qj, simpm).
 by rewrite andbA.
@@ -2095,7 +2095,7 @@ Lemma big_sub_cond (I : finType) (A P : {pred I}) (F : I -> R) :
   \big[*%M/1]_(i in A | P i) F i =
   \big[*%M/1]_(x : {x in A} | P (val x)) F (val x).
 Proof.
-rewrite (reindex_omap (val : {x in A} -> I) insub); last first.
+rewrite (reindex_omap (val : {x in A} -> I) insub).
   by move=> i /andP[iA Pi]; rewrite insubT.
 by apply: eq_bigl=> -[i iA]/=; rewrite insubT ?iA /= eqxx andbT.
 Qed.
@@ -2370,8 +2370,8 @@ Lemma perm_big_supp_cond [r s : seq I] [P : pred I] (F : I -> R) :
   \big[op/idx]_(i <- r | P i) F i = \big[op/idx]_(i <- s | P i) F i.
 Proof.
 move=> prs; rewrite !(bigID [pred i | F i == idx] P F)/=.
-rewrite big1 ?Monoid.mul1m; last by move=> i /andP[_ /eqP->].
-rewrite [in RHS]big1 ?Monoid.mul1m; last by move=> i /andP[_ /eqP->].
+rewrite big1 ?Monoid.mul1m; first by move=> i /andP[_ /eqP->].
+rewrite [in RHS]big1 ?Monoid.mul1m; first by move=> i /andP[_ /eqP->].
 by rewrite -[in LHS]big_filter -[in RHS]big_filter; apply perm_big.
 Qed.
 
@@ -2431,11 +2431,11 @@ rewrite -{P mem_r}big_r; elim: r Ur => /= [_ | i r IHr].
   apply/familyP/eqP=> /= [Df |->{f} i]; last by rewrite ffunE !inE.
   by apply/ffunP=> i; rewrite ffunE; apply/eqP/Df.
 case/andP=> /negbTE nri; rewrite big_cons big_distrl => {}/IHr<-.
-rewrite (partition_big (fun f : fIJ => f i) (Q i)) => [|f]; last first.
+rewrite (partition_big (fun f : fIJ => f i) (Q i)) => [f|].
   by move/familyP/(_ i); rewrite /= inE /= eqxx.
 pose seti j (f : fIJ) := [ffun k => if k == i then j else f k].
 apply: eq_bigr => j Qij.
-rewrite (reindex_onto (seti j) (seti j0)) => [|f /andP[_ /eqP fi]]; last first.
+rewrite (reindex_onto (seti j) (seti j0)) => [f /andP[_ /eqP fi]|].
   by apply/ffunP=> k; rewrite !ffunE; case: eqP => // ->.
 rewrite big_distrr; apply: eq_big => [f | f eq_f]; last first.
   rewrite big_cons ffunE eqxx !big_seq; congr (_ * _).
@@ -2565,7 +2565,7 @@ Lemma telescope_sumn_in n m f : n <= m ->
     (forall i, n <= i < m -> f i <= f i.+1) ->
   \sum_(n <= k < m) (f k.+1 - f k) = f m - f n.
 Proof.
-move=> nm fle; rewrite (telescope_big (fun i j => f j - f i)).
+move=> nm fle; rewrite (telescope_big (fun i j => f j - f i)); last first.
   by case: ltngtP nm => // ->; rewrite subnn.
 move=> k /andP[nk km]; rewrite /= addnBAC ?subnKC ?fle ?(ltnW nk)//.
 elim: k nk km => [//| k IHk /[!ltnS]/[1!leq_eqVlt]+ km].

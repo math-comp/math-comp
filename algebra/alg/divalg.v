@@ -308,7 +308,7 @@ Qed.
 
 Lemma unitrX_pos x n : n > 0 -> (x ^+ n \in unit) = (x \in unit).
 Proof.
-case: n => // n _; rewrite exprS unitrM_comm; last exact: commrX.
+case: n => // n _; rewrite exprS unitrM_comm; first exact: commrX.
 by case Ux: (x \is a unit); rewrite // unitrX.
 Qed.
 

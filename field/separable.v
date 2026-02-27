@@ -86,8 +86,8 @@ have [g_p]: g %| p /\ g %| p^`() by rewrite dvdp_gcdr ?dvdp_gcdl.
 pose c := lead_coef g ^+ scalp p g; have nz_c: c != 0 by rewrite lcn_neq0.
 have Dcp: c *: p = p %/ g * g by rewrite Pdiv.Idomain.divpK.
 rewrite nz_g andbT leqNgt -(dvdpZr _ _ nz_c) -derivZ Dcp derivM.
-rewrite dvdp_addr; last by rewrite dvdp_mull.
-rewrite Gauss_dvdpr; last by rewrite sq'p // mulrC -Dcp dvdpZl.
+rewrite dvdp_addr; first by rewrite dvdp_mull.
+rewrite Gauss_dvdpr; first by rewrite sq'p // mulrC -Dcp dvdpZl.
 by apply: contraL => /nz_der1p nz_g'; rewrite gtNdvdp ?nz_g' ?lt_size_deriv.
 Qed.
 
@@ -256,7 +256,7 @@ move=> nz_q qy_0 /pcharf0P pcharF0.
 without loss{nz_q} sep_q: q qy_0 / separable_poly q.
   move=> IHq; apply: IHq (make_separable nz_q).
   have /dvdpP[q1 Dq] := dvdp_gcdl q q^`().
-  rewrite {1}Dq mulpK ?gcdp_eq0; last by apply/nandP; left.
+  rewrite {1}Dq mulpK ?gcdp_eq0; first by apply/nandP; left.
   have [n [r nz_ry Dr]] := multiplicity_XsubC (q ^ iota) y.
   rewrite map_poly_eq0 nz_q /= in nz_ry.
   case: n => [|n] in Dr; first by rewrite Dr mulr1 (negPf nz_ry) in qy_0.
@@ -343,7 +343,7 @@ Lemma Derivation_exp x m : x \in E -> D (x ^+ m) = x ^+ m.-1 *+ m * D x.
 Proof.
 move=> Ex; case: m; first by rewrite expr0 mulr0n mul0r Derivation1.
 elim=> [|m IHm]; first by rewrite mul1r.
-rewrite exprS (Derivation_mul derD) //; last by apply: rpredX.
+rewrite exprS (Derivation_mul derD) //; first by apply: rpredX.
 by rewrite mulrC IHm mulrA mulrnAr -exprS -mulrDl.
 Qed.
 
@@ -422,7 +422,7 @@ rewrite comp_polyE size_poly_eq -?Dn ?fn1 ?oner_eq0 //.
 have pr_p := pcharf_prime pcharLp; have p_gt0 := prime_gt0 pr_p.
 apply/polyP=> i; rewrite coef_sum.
 have [[{}i ->] | p'i] := altP (@dvdnP p i); last first.
-  rewrite big1 => [|j _]; last first.
+  rewrite big1 => [j _|].
     rewrite coefZ -exprM coefXn [_ == _](contraNF _ p'i) ?mulr0 // => /eqP->.
     by rewrite dvdn_mulr.
   rewrite (dvdn_pcharf pcharLp) in p'i; apply: mulfI p'i _ _ _.
@@ -431,7 +431,7 @@ have [ltri | leir] := leqP r.+1 i.
   rewrite nth_default ?sz_f ?Dn ?ltn_pmul2r ?big1 // => j _.
   rewrite coefZ -exprM coefXn mulnC gtn_eqF ?mulr0 //.
   by rewrite ltn_pmul2l ?(leq_trans _ ltri).
-rewrite (bigD1 (Sub i _)) //= big1 ?addr0 => [|j i'j]; last first.
+rewrite (bigD1 (Sub i _)) //= big1 ?addr0 => [j i'j|].
   by rewrite coefZ -exprM coefXn mulnC eqn_pmul2l // mulr_natr mulrb ifN_eqC.
 by rewrite coef_poly leir coefZ -exprM coefXn mulnC eqxx mulr1.
 Qed.
@@ -593,7 +593,7 @@ have KyxEqKx: (<< <<K; q.[x]>>; x>> = <<K; x>>)%VS.
   apply/FadjoinP/andP; rewrite memv_adjoin andbT.
   by apply/FadjoinP/andP; rewrite subv_adjoin mempx_Fadjoin.
 have /[!KyxEqKx] derDx := extendDerivationP derD sepFyx.
-rewrite -horner_comp (Derivation_horner derDx) ?memv_adjoin //; last first.
+rewrite -horner_comp (Derivation_horner derDx) ?memv_adjoin //.
   by apply: (polyOverSv (subv_adjoin _ _)); apply: polyOver_comp.
 set Dx_p := map_poly _; have Dx_p_0 t: t \is a polyOver K -> (Dx_p t).[x] = 0.
   move/polyOverP=> Kt; congr (_.[x] = 0): (horner0 x); apply/esym/polyP => i.
