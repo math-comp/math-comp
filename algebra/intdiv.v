@@ -2,8 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype tuple bigop prime order perm.
-From mathcomp Require Import ssralg poly polydiv ssrnum ssrint zmodp matrix.
+From mathcomp Require Import div choice fintype tuple bigop prime nmodule order.
+From mathcomp Require Import perm algebra divalg poly polydiv zmodp matrix.
+From mathcomp Require Import orderedzmod numdomain ssrint.
 
 (******************************************************************************)
 (* This file provides various results on divisibility of integers.            *)
