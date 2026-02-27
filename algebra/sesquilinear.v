@@ -1,7 +1,8 @@
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
-From mathcomp Require Import choice fintype tuple bigop ssralg finset fingroup.
-From mathcomp Require Import zmodp poly order ssrnum matrix mxalgebra vector.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
+From mathcomp Require Import fintype tuple bigop order nmodule algebra divalg.
+From mathcomp Require Import orderedzmod numdomain numfield.
+From mathcomp Require Import matrix mxalgebra vector.
 
 (******************************************************************************)
 (*                            Sesquilinear forms                              *)

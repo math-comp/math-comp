@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
-From mathcomp Require Import fintype finfun bigop order ssralg countalg ssrnum.
-From mathcomp Require Import poly.
+From mathcomp Require Import fintype finfun bigop order nmodule algebra divalg.
+From mathcomp Require Import countalg poly orderedzmod numdomain numfield.
 
 (******************************************************************************)
 (* This file develops a basic theory of signed integers, defining:            *)
