@@ -1382,6 +1382,9 @@ Qed.
 
 End BuildIsometries.
 
+Elpi mlock Definition form_of_matrix (R : fieldType) (n : nat) (theta : R -> R)
+  m M (U V : 'M_(m, n)) := \tr (U *m M *m (V ^t theta)).
+
 Section MatrixForms.
 Variables (R : fieldType) (n : nat).
 Implicit Types (a b : R) (u v : 'rV[R]_n) (M N P Q : 'M[R]_n).
@@ -1389,7 +1392,6 @@ Implicit Types (a b : R) (u v : 'rV[R]_n) (M N P Q : 'M[R]_n).
 Section Def.
 Variable theta : R -> R.
 
-Definition form_of_matrix m M (U V : 'M_(m, n)) := \tr (U *m M *m (V ^t theta)).
 Definition matrix_of_form (form : 'rV[R]_n -> 'rV[R]_n -> R) : 'M[R]_n :=
   \matrix_(i, j) form 'e_i 'e_j.
 
@@ -1411,7 +1413,7 @@ Local Notation "''[' U ]" := '[U, U]%R : ring_scope.
 Let form_of_matrix_is_linear U :
   linear_for (theta \; *%R) (form_of_matrix theta M U).
 Proof.
-rewrite /form_of_matrix => k v w; rewrite -linearP/=.
+rewrite unlock => k v w; rewrite -linearP/=.
 by rewrite linearP map_mxD map_mxZ !mulmxDr !scalemxAr.
 Qed.
 
@@ -1422,7 +1424,7 @@ Definition form_of_matrixr U := (form_of_matrix theta M)^~U.
 
 Let form_of_matrixr_is_linear U : linear_for *%R (form_of_matrixr U).
 Proof.
-rewrite /form_of_matrixr /form_of_matrix => k v w.
+rewrite /form_of_matrixr unlock => k v w.
 by rewrite -linearP /= !mulmxDl -!scalemxAl.
 Qed.
 
@@ -1437,11 +1439,11 @@ Canonical form_of_matrixr_rev :=
 Lemma form_of_matrix_is_bilinear :
   bilinear_for
     (GRing.Scale.Law.clone _ _ ( *%R ) _) (GRing.Scale.Law.clone _ _ (theta \; *%R ) _)
-    (@form_of_matrix theta m M).
+    (@form_of_matrix _ _ theta m M).
 Proof.
 split=> [u'|u] a x y /=.
-- by rewrite /form_of_matrix !mulmxDl linearD/= -!scalemxAl linearZ.
-- rewrite /form_of_matrix -linearZ/= -linearD/= [in LHS]linearD/= map_mxD.
+- by rewrite unlock !mulmxDl linearD/= -!scalemxAl linearZ.
+- rewrite unlock -linearZ/= -linearD/= [in LHS]linearD/= map_mxD.
   rewrite mulmxDr; congr (\tr (_ + _)).
   rewrite scalemxAr; congr (_ *m _).
   by rewrite linearZ/= map_mxZ.
@@ -1451,7 +1453,7 @@ HB.instance Definition _ :=
   bilinear_isBilinear.Build R _ _ _
     (GRing.Scale.Law.clone _ _ ( *%R ) _)
     (GRing.Scale.Law.clone _ _ (theta \; *%R ) _)
-    (@form_of_matrix theta m M)
+    (@form_of_matrix _ _ theta m M)
     form_of_matrix_is_bilinear.
 (*Canonical form_of_matrix_is_bilinear := [the @bilinear _ _ _ _ of form_of_matrix theta M].*)
 
@@ -1466,7 +1468,7 @@ Local Notation "''[' u ]" := '[u, u]%R : ring_scope.
 
 Lemma rV_formee i j : '['e_i :'rV__, 'e_j] = M i j.
 Proof.
-rewrite /form_of_matrix -rowE -map_trmx map_delta_mx -[M in LHS]trmxK.
+rewrite unlock -rowE -map_trmx map_delta_mx -[M in LHS]trmxK.
 by rewrite -tr_col -trmx_mul -rowE trace_mx11 !mxE.
 Qed.
 
@@ -1475,7 +1477,7 @@ Proof. by apply/matrixP => i j; rewrite !mxE rV_formee. Qed.
 
 Lemma rV_form0_eq0 : M = 0 -> forall u v, '[u, v] = 0.
 Proof.
-by rewrite /form_of_matrix => -> u v; rewrite mulmx0 mul0mx trace_mx11 mxE.
+by rewrite unlock => -> u v; rewrite mulmx0 mul0mx trace_mx11 mxE.
 Qed.
 
 End FormOfMatrix1.
@@ -1539,10 +1541,10 @@ by rewrite (map_mx_id (rmorphK _)).
 Qed.
 
 Lemma form_of_matrix_is_hermitian m x y :
-  (@form_of_matrix theta m M) x y =
-  (-1) ^+ eps * theta ((@form_of_matrix theta m M) y x).
+  (@form_of_matrix _ _ theta m M) x y =
+  (-1) ^+ eps * theta ((@form_of_matrix _ _ theta m M) y x).
 Proof.
-rewrite {1}hermitianmxE /form_of_matrix.
+rewrite {1}hermitianmxE unlock.
 rewrite -!(scalemxAr, scalemxAl) linearZ/=; congr (_ * _).
 rewrite -mxtrace_tr -trace_map_mx !(trmx_mul, map_mxM, map_trmx, trmxK).
 by rewrite -mulmxA -!map_mx_comp !(map_mx_id (rmorphK _)).
@@ -1559,7 +1561,7 @@ Local Notation "A '_|_ B" := (A%MS <= B%MS^!)%MS : matrix_set_scope.
 Lemma orthomxE u v : (u '_|_ v)%MS = ('[u, v] == 0).
 Proof.
 rewrite (sameP sub_kermxP eqP) mulmxA.
-by rewrite [_ *m _^t _]mx11_scalar -trace_mx11 fmorph_eq0.
+by rewrite [_ *m _^t _]mx11_scalar -trace_mx11 fmorph_eq0 unlock.
 Qed.
 
 Lemma hermmx_eq0P {u v} : reflect ('[u, v] = 0) (u '_|_ v)%MS.
