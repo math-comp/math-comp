@@ -1390,8 +1390,8 @@ Proof. by case: C1 C2 => [][] //= _ /ltW. Qed.
 Lemma lteifW C x y : x < y ?<= if C -> x <= y.
 Proof. by case: C => // /ltW. Qed.
 
-#[deprecated(since="mathcomp 2.6.0", use=lteifW)]
-Notation ltrW_lteif := lteifW.
+#[deprecated(since="mathcomp 2.6.0", use=lteifS)]
+Notation ltrW_lteif := lteifS.
 
 (* min and max *)
 
