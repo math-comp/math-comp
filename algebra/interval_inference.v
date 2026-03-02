@@ -28,10 +28,10 @@ From mathcomp Require Import orderedzmod numdomain numfield ssrint.
 (*                  {i01 R} is canonically stable by common operations.       *)
 (*    {posnum R} := {itv R & `]0, +oo[)                                       *)
 (*    {nonneg R} := {itv R & `[0, +oo[)                                       *)
-(*    {natitv i} := generic type of natural numbers in interval i             *)
-(*         {n01} := {natitv `[0, 1]}                                          *)
+(* {itv nat & i} := generic type of natural numbers in interval i             *)
+(*     {i01 nat} := {itv nat & `[0, 1]}                                       *)
 (*                  Natural numbers in [0, 1], i.e., 0 or 1.                  *)
-(*      {posnat} := {natitv `]0, +oo[)                                        *)
+(*  {posnum nat} := {natitv `]0, +oo[)                                        *)
 (*                  Natural numbers greater than 0.                           *)
 (* ```                                                                        *)
 (*                                                                            *)
@@ -434,12 +434,12 @@ Proof. by move=> + [//| xi] [//| yi]; apply. Qed.
 Module Exports.
 Arguments r {T sem i}.
 Notation "{ 'itv' R & i }" := (def (@num_sem R) (Itv.Real i%Z)) : type_scope.
-Notation "{ 'natitv' i }" := (def nat_sem (Itv.Real i%Z)) : type_scope.
+Notation "{ 'itv' 'nat' & i }" := (def nat_sem (Itv.Real i%Z)) : type_scope.
 Notation "{ 'i01' R }" := {itv R & `[0, 1]} : type_scope.
-Notation "{ 'n01' }" := {natitv `[0, 1]} : type_scope.
+Notation "{ 'i01' 'nat' }" := {itv nat & `[0, 1]} : type_scope.
 Notation "{ 'posnum' R }" := (@posnum _ (Phant R))  : ring_scope.
 Notation "{ 'nonneg' R }" := (@nonneg _ (Phant R))  : ring_scope.
-Notation "{ 'posnat' }" := (def nat_sem (Itv.Real `]0%Z, +oo[ )) : type_scope.
+Notation "{ 'posnum' 'nat' }" := (def nat_sem (Itv.Real `]0%Z, +oo[ )) : type_scope.
 Notation "x %:itv" := (from (Phantom _ x)) : ring_scope.
 Notation "[ 'itv' 'of' x ]" := (fromP (Phantom _ x)) : ring_scope.
 Notation num := r.
@@ -624,20 +624,10 @@ case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=.
 by rewrite in_itv/= andbT.
 Qed.
 
-Lemma gen0 (x : nat_def i) : unify_itv i (Itv.Real `[0%Z, +oo[) -> (0 <= x%:num)%N.
-Proof.
-by case: x => x /= /[swap] /nat_spec_sub /[apply] /andP[_] /=.
-Qed.
-
 Lemma lt0F x : unify_itv i (Itv.Real `[0%Z, +oo[) -> (x%:num < 0 :> R) = false.
 Proof.
 case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=.
 by rewrite in_itv/= andbT => /le_gtF.
-Qed.
-
-Lemma ltn0F (x : nat_def i) : unify_itv i (Itv.Real `[0%Z, +oo[) -> (x%:num < 0)%N = false.
-Proof.
-by case: x => x /= /[swap] /nat_spec_sub /[apply] /andP[_] /= => /le_gtF.
 Qed.
 
 Lemma le0 x : unify_itv i (Itv.Real `]-oo, 0%Z]) -> x%:num <= 0 :> R.
@@ -786,7 +776,7 @@ Notation "x %:i01" := (widen_itv x%:itv : {i01 _}) (only parsing) : ring_scope.
 Notation "x %:i01" := (@widen_itv _ _
     (@Itv.from _ _ _ (Phantom _ x)) (Itv.Real `[0, 1]%Z) _)
   (only printing) : ring_scope.
-Notation "x %:n01" := (widen_natitv x%N%:itv : {n01}) (only parsing)
+Notation "x %:n01" := (widen_natitv x%N%:itv : {i01 nat}) (only parsing)
   : ring_scope.
 Notation "x %:n01" := (@widen_natitv _ _
     (@Itv.from _ _ _ (Phantom _ x)) (Itv.Real `[0, 1]%Z) _)
@@ -801,7 +791,7 @@ Notation "x %:nng" := (widen_itv x%:itv : {nonneg _}) (only parsing)
 Notation "x %:nng" := (@widen_itv _ _
     (@Itv.from _ _ _ (Phantom _ x)) (Itv.Real `[0%Z, +oo[) _)
   (only printing) : ring_scope.
-Notation "x %:posnat" := (widen_natitv x%N%:itv : {posnat}) (only parsing)
+Notation "x %:posnat" := (widen_natitv x%N%:itv : {posnum nat}) (only parsing)
   : ring_scope.
 Notation "x %:posnat" := (@widen_natitv
     (@Itv.from _ _ _ (Phantom _ x)) (Itv.Real `]0, +oo[) _)
@@ -1714,13 +1704,13 @@ End Test3.
 Module Test4.
 Section Test4.
 
-Type 0%:n01 : {n01}.
-Type 1%:n01 : {n01}.
-Fail Type 2%:n01 : {n01}.
+Type 0%:n01 : {i01 nat}.
+Type 1%:n01 : {i01 nat}.
+Fail Type 2%:n01 : {i01 nat}.
 
-Type 1%:posnat : {posnat}.
-Type 2%:posnat : {posnat}.
-Fail Type 0%:posnat : {posnat}.
+Type 1%:posnat : {posnum nat}.
+Type 2%:posnat : {posnum nat}.
+Fail Type 0%:posnat : {posnum nat}.
 
 End Test4.
 End Test4.
