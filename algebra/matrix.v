@@ -4131,14 +4131,13 @@ Proof. exact: mxOver_const. Qed.
 
 Section mxOverAdd.
 Variable addS : addrClosed M.
-Fact mxOver_add_subproof : addr_closed (@mxOver m n _ addS).
+Fact mxOver_nmod_closed : nmod_closed (@mxOver m n _ addS).
 Proof.
 split=> [|p q Sp Sq]; first by rewrite mxOver0 // ?rpred0.
 by apply/mxOverP=> i j; rewrite mxE rpredD // !(mxOverP _).
 Qed.
 HB.instance Definition _ :=
-  GRing.isAddClosed.Build 'M[M]_(m, n) (mxOver_pred addS)
-    mxOver_add_subproof.
+  GRing.isAddClosed.Build 'M[M]_(m, n) (mxOver_pred addS) mxOver_nmod_closed.
 End mxOverAdd.
 
 Section mxOverOpp.
