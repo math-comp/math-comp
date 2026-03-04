@@ -2,7 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop order ssralg poly ssrnum ssrint.
+From mathcomp Require Import fintype bigop nmodule order algebra divalg.
+From mathcomp Require Import decfield poly orderedzmod numdomain numfield.
+From mathcomp Require Import ssrint.
 
 (******************************************************************************)
 (*                           Archimedean structures                           *)
@@ -140,7 +142,7 @@ Arguments int_num {R} : simpl never.
 Notation trunc := truncn (only parsing).
 
 Module Def.
-Export ssrnum.Num.Def.
+Export Num.Def.
 
 Notation truncn := truncn.
 #[deprecated(since="mathcomp 2.4.0", use=truncn)]
@@ -181,7 +183,7 @@ HB.instance Definition _ :=
     intArchimedean.intrP intArchimedean.natrP.
 
 Module Import Theory.
-Export ssrnum.Num.Theory.
+Export Num.Theory.
 
 Section ArchiNumDomainTheory.
 
