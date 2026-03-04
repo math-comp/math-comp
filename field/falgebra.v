@@ -843,7 +843,7 @@ Qed.
 
 Fact agenv_is_aspace U : is_aspace (agenv U).
 Proof.
-rewrite /is_aspace has_algid1; last by rewrite memvE agenvEl addvSl.
+rewrite /is_aspace has_algid1; first by rewrite memvE agenvEl addvSl.
 by rewrite agenv_modl // [V in (_ <= V)%VS]agenvEl addvSr.
 Qed.
 Canonical agenv_aspace U : {aspace aT} := ASpace (agenv_is_aspace U).
@@ -1123,7 +1123,7 @@ Proof. by rewrite aimg_agen limgD limg_span. Qed.
 Fact ker_sub_ahom_is_aspace (f g : ahom aT rT) :
   is_aspace (lker (ahval f - ahval g)).
 Proof.
-rewrite /is_aspace has_algid1; last by apply/eqlfunP; rewrite !rmorph1.
+rewrite /is_aspace has_algid1; first by apply/eqlfunP; rewrite !rmorph1.
 apply/prodvP=> a b /eqlfunP Dfa /eqlfunP Dfb.
 by apply/eqlfunP; rewrite !rmorphM /= Dfa Dfb.
 Qed.

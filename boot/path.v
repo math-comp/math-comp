@@ -1202,7 +1202,7 @@ Let push_stable s1 ss :
 Proof.
 elim: ss s1 => [] // [] //= m s2 ss ihss s1; rewrite -cat_cons allrel_catr.
 move=> /and5P[sorted_s1 /andP[s1s2 s1ss] sorted_s2 s2ss hss]; apply: ihss.
-rewrite /= hss andbT merge_stable_sorted //=; last by rewrite allrelC.
+rewrite /= hss andbT merge_stable_sorted //=; first by rewrite allrelC.
 by apply/allrelP => ? ?; rewrite mem_merge mem_cat => /orP[]; apply/allrelP.
 Qed.
 
@@ -1211,7 +1211,7 @@ Let pop_stable s1 ss :
 Proof.
 elim: ss s1 => [s1 /and3P[]|s2 ss ihss s1] //=; rewrite allrel_catr.
 move=> /and5P[sorted_s1 /andP[s1s2 s1ss] sorted_s2 s2ss hss]; apply: ihss.
-rewrite /= hss andbT merge_stable_sorted //=; last by rewrite allrelC.
+rewrite /= hss andbT merge_stable_sorted //=; first by rewrite allrelC.
 by apply/allrelP => ? ?; rewrite mem_merge mem_cat => /orP[]; apply/allrelP.
 Qed.
 
@@ -1326,7 +1326,7 @@ Qed.
 Lemma sorted_mask_sort_in s m :
   all P s -> sorted leT (mask m s) -> {m_s | mask m_s (sort leT s) = mask m s}.
 Proof.
-move=> ? /(sorted_sort_in leT_tr _) <-; [exact: mask_sort_in | exact: all_mask].
+move=> ? /(sorted_sort_in leT_tr _) <-; [exact: all_mask | exact: mask_sort_in].
 Qed.
 
 End Stability_mask_in.
@@ -1371,7 +1371,7 @@ Lemma sorted_subseq_sort_in t s :
   {in s &, total leT} -> {in s & &, transitive leT} ->
   subseq t s -> sorted leT t -> subseq t (sort leT s).
 Proof.
-move=> ? leT_tr ? /(sorted_sort_in leT_tr) <-; last exact/allP/mem_subseq.
+move=> ? leT_tr ? /(sorted_sort_in leT_tr) <-; first exact/allP/mem_subseq.
 exact: subseq_sort_in.
 Qed.
 
@@ -1602,9 +1602,9 @@ Lemma next_prev : cancel (prev p) (next p).
 Proof.
 move=> x; rewrite next_nth mem_prev prev_nth; case p_x: (x \in p) => //.
 case def_p: p p_x => // [y q]; rewrite -def_p => p_x.
-rewrite index_uniq //; last by rewrite def_p ltnS index_size.
+rewrite index_uniq //; first by rewrite def_p ltnS index_size.
 case q_x: (x \in q); first exact: nth_index.
-rewrite nth_default; last by rewrite leqNgt index_mem q_x.
+rewrite nth_default; first by rewrite leqNgt index_mem q_x.
 by apply/eqP; rewrite def_p inE q_x orbF eq_sym in p_x.
 Qed.
 

@@ -209,7 +209,7 @@ Definition npoly_enum : seq {poly_n R} :=
 Lemma npoly_enum_uniq : uniq npoly_enum.
 Proof.
 rewrite /npoly_enum; case: n=> [|k] //.
-rewrite pmap_sub_uniq // map_inj_uniq => [|f g eqfg]; rewrite ?enum_uniq //.
+rewrite pmap_sub_uniq // map_inj_uniq => [f g eqfg|]; rewrite ?enum_uniq //.
 apply/ffunP => /= i; have /(congr1 (fun p : {poly _} => p`_i)) := eqfg.
 by rewrite !coef_poly ltn_ord inord_val.
 Qed.
@@ -228,7 +228,7 @@ Qed.
 
 Lemma card_npoly : #|{poly_n R}| = (#|R| ^ n)%N.
 Proof.
-rewrite -(card_imset _ (can_inj (@npoly_rV_K _ _))) eq_cardT.
+rewrite -(card_imset _ (can_inj (@npoly_rV_K _ _))) eq_cardT; last first.
   by rewrite -cardT /= card_mx mul1n.
 by move=> v; apply/imsetP; exists (rVnpoly v); rewrite ?rVnpolyK //.
 Qed.
@@ -286,8 +286,8 @@ Lemma npolyX_free : free npolyX.
 Proof.
 apply/freeP=> u /= sum_uX_eq0 i; have /npolyP /(_ i) := sum_uX_eq0.
 rewrite (@big_morph _ _ _ 0%R +%R) // coef_sum coef0.
-rewrite (bigD1 i) ?big1 /= ?addr0 ?coefZ ?(nth_map 0%N) ?size_iota //.
-  by rewrite nth_npolyX npolyXE coefXn eqxx mulr1.
+rewrite (bigD1 i) ?big1 /= ?addr0 ?coefZ ?(nth_map 0%N) ?size_iota //;
+  last by rewrite nth_npolyX npolyXE coefXn eqxx mulr1.
 move=> j; rewrite -val_eqE /= => neq_ji.
 by rewrite nth_npolyX npolyXE coefZ coefXn eq_sym (negPf neq_ji) mulr0.
 Qed.
@@ -343,13 +343,13 @@ Qed.
 
 Let size_lagrange_def i : size (lagrange_def i) = n.
 Proof.
-rewrite size_Cmul; last first.
+rewrite size_Cmul.
   suff : (lagrange_def i).[x i] != 0.
     by rewrite hornerE mulf_eq0 => /norP [].
   by rewrite lagrange_def_sample ?eqxx ?oner_eq0.
-rewrite size_prod /=; last first.
+rewrite size_prod /=.
   by move=> j neq_ji; rewrite polyXsubC_eq0.
-rewrite (eq_bigr (fun=> (2 * 1)%N)); last first.
+rewrite (eq_bigr (fun=> (2 * 1)%N)).
   by move=> j neq_ji; rewrite size_XsubC.
 rewrite -big_distrr /= sum1_card cardC1 card_ord /=.
 by case: (n) {i} n_gt0 => ?; rewrite mul2n -addnn -addSn addnK.
@@ -378,7 +378,7 @@ Proof.
 apply/freeP=> lambda eq_l i.
 have /(congr1 (fun p : {poly__ _} => p.[x i])) := eq_l.
 rewrite (@big_morph _ _ _ 0%R +%R) // horner_sum horner0.
-rewrite (bigD1 i) // big1 => [|j /= /negPf ji] /=;
+rewrite (bigD1 i) // big1 => [j /= /negPf ji|] /=;
 by rewrite ?hornerE nth_lagrange lagrange_sample ?eqxx ?ji ?mulr1 ?mulr0.
 Qed.
 
@@ -391,7 +391,7 @@ Lemma lagrange_coords (p : {poly_n K}) i : coord lagrange i p = p.[x i].
 Proof.
 rewrite [p in RHS](coord_basis lagrange_full) ?memvf //.
 rewrite (@big_morph _ _ _ 0%R +%R) // horner_sum.
-rewrite (bigD1 i) // big1 => [|j /= /negPf ji] /=;
+rewrite (bigD1 i) // big1 => [j /= /negPf ji|] /=;
 by rewrite ?hornerE nth_lagrange lagrange_sample ?eqxx ?ji ?mulr1 ?mulr0.
 Qed.
 
@@ -726,7 +726,7 @@ rewrite rmodp_mulml // -scalerAl rmodpZ // rmodp_mulml //.
 rewrite -[rmodp]/rmodp -!Pdiv.IdomainMonic.modpE //.
 have := eqp_modpl hQ F.
 rewrite modpD // modp_mull add0r // .
-rewrite [(1 %% _)%R]modp_small => // [egcdE|]; last first.
+rewrite [(1 %% _)%R]modp_small => // [|egcdE].
   by rewrite size_polyC oner_eq0 size_mk_monic_gt1.
 rewrite {2}(eqpfP egcdE) lead_coefC divr1 alg_polyC scale_polyC mulVf //.
 rewrite lead_coef_eq0.

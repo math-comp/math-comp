@@ -134,7 +134,7 @@ transitivity (\sum_(x in zi ^: G) \sum_(y in zj ^: G) aG (x * y)%g).
 pose h2 xy : gT := (xy.1 * xy.2)%g.
 pose h1 xy := enum_rank_in (classes1 G) (h2 xy ^: G).
 rewrite pair_big (partition_big h1 xpredT) //=; apply: eq_bigr => k _.
-rewrite (partition_big h2 [in enum_val k]) /= => [|[x y]]; last first.
+rewrite (partition_big h2 [in enum_val k]) /= => [[x y]|].
   case/andP=> /andP[/= /sKG Gx /sKG Gy] /eqP <-.
   by rewrite enum_rankK_in ?class_refl ?mem_classes ?groupM ?Gx ?Gy.
 rewrite scaler_sumr; apply: eq_bigr => g Kk_g; rewrite scaler_nat.
@@ -349,7 +349,7 @@ have Dalpha: alpha = - 1 / p%:R.
   transitivity (cfReg G g); first by rewrite cfRegE (negPf nt_g).
   rewrite cfReg_sum sum_cfunE (bigD1 0) //= irr0 !cfunE cfun11 cfun1E Gg.
   rewrite mulr1; congr (1 + _); rewrite (bigID p_dv1) /= addrC big_andbC.
-  rewrite big1 => [|i /p_dvd_supp_g chig0]; last by rewrite cfunE chig0 mulr0.
+  rewrite big1 => [i /p_dvd_supp_g chig0|]; first by rewrite cfunE chig0 mulr0.
   rewrite add0r big_andbC mulr_suml; apply: eq_bigr => i _.
   by rewrite mulrAC divfK // cfunE.
 suffices: (p %| 1)%C by rewrite (dvdC_nat p 1) dvdn1 -(subnKC (prime_gt1 p_pr)).
@@ -382,8 +382,8 @@ rewrite ltnS => leGn piGle2; have [simpleG | ] := boolP (simple G); last first.
     move=> m_dv_G; apply: leq_trans piGle2.
     by rewrite uniq_leq_size ?primes_uniq //; apply: pi_of_dvd.
   rewrite (series_sol nsNG) !IHn ?dv_le_pi ?cardSg ?dvdn_quotient //.
-    by apply: leq_trans leGn; apply: ltn_quotient.
-  by apply: leq_trans leGn; apply: proper_card.
+    by apply: leq_trans leGn; apply: proper_card.
+  by apply: leq_trans leGn; apply: ltn_quotient.
 have [->|[p p_pr p_dv_G]] := trivgVpdiv G; first exact: solvable1.
 have piGp: p \in \pi(G) by rewrite mem_primes p_pr cardG_gt0.
 have [P sylP] := Sylow_exists p G; have [sPG pP p'GP] := and3P sylP.
@@ -407,7 +407,7 @@ rewrite unfold_in -if_neg irr1_neq0 Cint_rat_Aint //=.
   by rewrite rpred_div ?rpred_nat // rpred_nat_num ?Cnat_irr1.
 rewrite -[n in n / _]/(_ *+ true) -(eqxx i) -mulr_natr.
 rewrite -first_orthogonality_relation mulVKf ?neq0CG //.
-rewrite sum_by_classes => [|x y Gx Gy]; rewrite -?conjVg ?cfunJ //.
+rewrite sum_by_classes => [x y Gx Gy|]; rewrite -?conjVg ?cfunJ //.
 rewrite mulr_suml rpred_sum // => K /repr_classesP[Gx {1}->].
 by rewrite !mulrA mulrAC rpredM ?Aint_irr ?Aint_class_div_irr1.
 Qed.
@@ -448,7 +448,7 @@ have ->: #|G|%:R = \sum_(x in G) 'chi_i x * 'chi_i (x^-1)%g.
   rewrite -[_%:R]mulr1; apply: canLR (mulVKf (neq0CG G)) _.
   by rewrite first_orthogonality_relation eqxx.
 rewrite (big_setID [set x | 'chi_i x == 0]) /= -setIdE.
-rewrite big1 ?add0r => [| x /setIdP[_ /eqP->]]; last by rewrite mul0r.
+rewrite big1 ?add0r => [x /setIdP[_ /eqP->]|]; first by rewrite mul0r.
 pose h x := (x ^: G * 'Z(G))%g; rewrite (partition_big_imset h).
 rewrite !mulr_suml rpred_sum //= => _ /imsetP[x /setDP[Gx nz_chi_x] ->].
 have: #|x ^: G|%:R * ('chi_i x * 'chi_i x^-1%g) / 'chi_i 1%g \in Aint.
@@ -539,7 +539,7 @@ have [j ->]: exists j, 'chi_i = 'Res 'chi[G]_j.
   rewrite card_Iirr_abelian ?(abelianS sHG) //.
   rewrite -(eqn_pmul2r (indexg_gt0 G H)) Lagrange //; apply/eqP.
   rewrite -sum_nat_const -card_Iirr_abelian // -sum1_card.
-  rewrite (partition_big rH [in codom rH]) /=; last exact: image_f.
+  rewrite (partition_big rH [in codom rH]) /=; first exact: image_f.
   have nsHG: H <| G by rewrite -sub_abelian_normal.
   apply: eq_bigr => _ /codomP[i ->]; rewrite -card_quotient ?normal_norm //.
   rewrite -card_Iirr_abelian ?quotient_abelian //.
@@ -555,7 +555,7 @@ have [j ->]: exists j, 'chi_i = 'Res 'chi[G]_j.
   rewrite -(card_imset _ inj_rQ) -sum1_card; apply: eq_bigl => j.
   rewrite -(inj_eq irr_inj) -!DrH; apply/eqP/imsetP=> [eq_ij | [k _ ->]].
     have [k Dk] := Mlin (conjC_Iirr i) j; exists (quo_Iirr H k) => //.
-    apply/irr_inj; rewrite -DrQ quo_IirrK //.
+    apply/irr_inj; rewrite -DrQ quo_IirrK //; last first.
       by rewrite -Dk conjC_IirrE mulrCA mulrA mulJi mul1r.
     apply/subsetP=> x Hx; have Gx := subsetP sHG x Hx.
     rewrite cfkerEirr inE linG1 -Dk conjC_IirrE; apply/eqP.
@@ -579,9 +579,9 @@ Proof.
 have [p_pr | pr'p] := boolP (prime p); last first.
   have p'n n: (n > 0)%N -> p^'.-nat n.
     by move/p'natEpi->; rewrite mem_primes (negPf pr'p).
-  rewrite irr1_degree natrK => _ /pnat_1-> => [_ _|].
-    by rewrite part_p'nat ?p'n.
-  by rewrite p'n ?irr_degree_gt0.
+  rewrite irr1_degree natrK => _ /pnat_1-> => [|_ _].
+    by rewrite p'n ?irr_degree_gt0.
+  by rewrite part_p'nat ?p'n.
 move=> fful_i /p_natP[a Dchi1] sylP cPP.
 have Dchi1C: 'chi_i 1%g = (p ^ a)%:R by rewrite -Dchi1 irr1_degree natrK.
 have pa_dv_ZiG: (p ^ a %| #|G : 'Z(G)|)%N.
@@ -678,7 +678,7 @@ have{pi1 Zpi1} pi2_ge1: 1 <= pi2.
 have Sgt0: (#|S| > 0)%N by rewrite (cardD1 g) [g \in S]Sg.
 rewrite -mulr_natr -ler_pdivlMr ?ltr0n //.
 have n2chi_ge0 s: s \in S -> 0 <= `|chi s| ^+ 2 by rewrite exprn_ge0.
-rewrite -(expr_ge1 Sgt0); last by rewrite divr_ge0 ?ler0n ?sumr_ge0.
+rewrite -(expr_ge1 Sgt0); first by rewrite divr_ge0 ?ler0n ?sumr_ge0.
 by rewrite (le_trans pi2_ge1) // leif_AGM.
 Qed.
 
@@ -702,7 +702,7 @@ have defS: [pred s in G^# | <[s]> == <[g]>] =i S.
 have resS: {in S, 'chi_i =1 chi}.
   by move=> s /cycle_generator=> g_s; rewrite cfResE ?cycle_subG.
 rewrite !(eq_bigl _ _ defS) sumr_const.
-rewrite (eq_bigr (fun s => `|chi s| ^+ 2)) => [|s /resS-> //].
+rewrite (eq_bigr (fun s => `|chi s| ^+ 2)) => [s /resS-> //|].
 apply: sum_norm2_char_generators => [|s Ss].
   by rewrite cfRes_char ?irr_char.
 by rewrite -resS // nz_chi ?(subsetP sgG) ?cycle_generator.
