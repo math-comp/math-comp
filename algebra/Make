@@ -21,10 +21,10 @@ alg/divalg.v
 alg/decfield.v
 alg/ssralg.v
 ssrint.v
-num_theory/orderedzmod.v
-num_theory/numdomain.v
-num_theory/numfield.v
-num_theory/ssrnum.v
+num/orderedzmod.v
+num/numdomain.v
+num/numfield.v
+num/ssrnum.v
 vector.v
 zmodp.v
 sesquilinear.v
