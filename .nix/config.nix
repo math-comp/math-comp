@@ -88,7 +88,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       stdlib.override.version = "master";
       bignums.override.version = "master";
       rocq-elpi.override.version = "master";
-      rocq-elpi.override.elpi-version = "3.4.2";
+      rocq-elpi.override.elpi-version = "3.6.1";
       hierarchy-builder.override.version = "master";
       mathcomp.job = false;
     }; coqPackages = common-bundles // {
@@ -96,7 +96,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       stdlib.override.version = "master";
       bignums.override.version = "master";
       coq-elpi.override.version = "master";
-      coq-elpi.override.elpi-version = "3.4.2";
+      coq-elpi.override.elpi-version = "3.6.1";
       hierarchy-builder.override.version = "master";
       interval.job = false;
       coquelicot.job = false;
