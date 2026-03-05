@@ -586,6 +586,12 @@ have := sqrtr_ge0 (a ^+ 2); rewrite (eqP ha) oppr_ge0 normr_le0 => /eqP ->.
 by rewrite normr0 oppr0.
 Qed.
 
+Lemma sqr_inj : {in Num.nneg &, injective (fun x : R => x ^+ 2)}.
+Proof. by move=> ? ? ? ? /(congr1 sqrt); rewrite !sqrtr_sqr !ger0_norm. Qed.
+
+Lemma sqrtr_inj : {in Num.nneg &, injective (fun x : R => sqrt x)}.
+Proof. by move=> x y xge0 yge0 sxy; rewrite -[x]sqr_sqrtr// sxy sqr_sqrtr. Qed.
+
 Lemma sqrtrM a b : 0 <= a -> sqrt (a * b) = sqrt a * sqrt b.
 Proof.
 case: (sqrtrP a) => // {}a a_ge0 _; case: (sqrtrP b) => [b_lt0 | {}b b_ge0].
