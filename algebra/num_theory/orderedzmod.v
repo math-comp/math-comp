@@ -720,10 +720,10 @@ Lemma ltr_nMn2l x :
   x < 0 -> {mono (@GRing.natmul R x) : m n / (n < m)%N >-> m < n}.
 Proof. by move=> x_lt0; apply: leW_nmono (ler_nMn2l _). Qed.
 
-Fact nneg_addr_closed : addr_closed (@Num.nneg R).
+Fact nneg_nmod_closed : nmod_closed (@Num.nneg R).
 Proof. by split; [apply: lexx | apply: addr_ge0]. Qed.
 HB.instance Definition _ := GRing.isAddClosed.Build R nneg_num_pred
-  nneg_addr_closed.
+  nneg_nmod_closed.
 
 Fact real_oppr_closed : oppr_closed (@Num.real R).
 Proof. by move=> x; rewrite /= !realE oppr_ge0 orbC -!oppr_ge0 opprK. Qed.
@@ -838,7 +838,7 @@ Proof.
 by move=> /ge_comparable + /le_comparable => /comparabler_trans/[apply].
 Qed.
 
-Fact real_addr_closed : addr_closed (@Num.real R).
+Fact real_nmod_closed : nmod_closed (@Num.real R).
 Proof.
 split=> [|x y Rx Ry]; first by rewrite realE lexx.
 without loss{Rx} x_ge0: x y Ry / 0 <= x.
@@ -848,7 +848,7 @@ case/orP: Ry => [y_ge0 | y_le0]; first by rewrite realE -nnegrE rpredD.
 by rewrite realE -[y]opprK orbC -oppr_ge0 opprB !subr_ge0 ger_leVge ?oppr_ge0.
 Qed.
 HB.instance Definition _ := GRing.isAddClosed.Build R real_num_pred
-  real_addr_closed.
+  real_nmod_closed.
 
 Lemma ler_leVge x y : x <= 0 -> y <= 0 -> (x <= y) || (y <= x).
 Proof. by rewrite -!oppr_ge0 => /(ger_leVge _) /[apply]; rewrite !lerN2. Qed.
