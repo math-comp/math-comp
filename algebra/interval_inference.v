@@ -434,7 +434,7 @@ Notation "{ 'i01' R }" := {itv R & `[0, 1]} : type_scope.
 Notation "{ 'n01' }" := {natitv `[0, 1]} : type_scope.
 Notation "{ 'posnum' R }" := (@posnum _ (Phant R))  : ring_scope.
 Notation "{ 'nonneg' R }" := (@nonneg _ (Phant R))  : ring_scope.
-Notation "{ 'posnat' }" := (def nat_sem (Itv.Real `]0, +oo[ )) : type_scope.
+Notation "{ 'posnat' }" := (def nat_sem (Itv.Real `]0%Z, +oo[ )) : type_scope.
 Notation "x %:itv" := (from (Phantom _ x)) : ring_scope.
 Notation "[ 'itv' 'of' x ]" := (fromP (Phantom _ x)) : ring_scope.
 Notation num := r.
@@ -591,6 +591,11 @@ case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_].
 by rewrite /= in_itv/= andbT.
 Qed.
 
+Lemma gtn0 (x : nat_def i) : unify_itv i (Itv.Real `]0, +oo[) -> (0 < x%:num)%N.
+Proof.
+by case: x => x /= /[swap] /nat_spec_sub /[apply] /andP[_] //.
+Qed.
+
 Lemma le0F x : unify_itv i (Itv.Real `]0%Z, +oo[) -> (x%:num <= 0 :> R) = false.
 Proof.
 case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=.
@@ -614,10 +619,20 @@ case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=.
 by rewrite in_itv/= andbT.
 Qed.
 
+Lemma gen0 (x : nat_def i) : unify_itv i (Itv.Real `[0%Z, +oo[) -> (0 <= x%:num)%N.
+Proof.
+by case: x => x /= /[swap] /nat_spec_sub /[apply] /andP[_] /=.
+Qed.
+
 Lemma lt0F x : unify_itv i (Itv.Real `[0%Z, +oo[) -> (x%:num < 0 :> R) = false.
 Proof.
 case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=.
 by rewrite in_itv/= andbT => /le_gtF.
+Qed.
+
+Lemma ltn0F (x : nat_def i) : unify_itv i (Itv.Real `[0%Z, +oo[) -> (x%:num < 0)%N = false.
+Proof.
+by case: x => x /= /[swap] /nat_spec_sub /[apply] /andP[_] /= => /le_gtF.
 Qed.
 
 Lemma le0 x : unify_itv i (Itv.Real `]-oo, 0%Z]) -> x%:num <= 0 :> R.
@@ -648,6 +663,21 @@ Lemma eq0F x :
   unify (fun ix iy => ~~ Itv.sub ix iy) (Itv.Real `[0%Z, 0%Z]) i ->
   (x%:num == 0 :> R) = false.
 Proof. by move=> u; apply/negbTE/neq0. Qed.
+
+Lemma neqn0 (n : nat_def i) :
+  unify (fun ix iy => ~~ Itv.sub ix iy) (Itv.Real `[0%Z, 0%Z]) i ->
+  (n%:num != 0)%N.
+Proof.
+case: i n => [//| [l u] [n /= Pn]]; apply: contra => /eqP n0 /=.
+move: Pn; rewrite n0 => /andP[l0 u0]; apply/andP; split.
+- by case: l l0 => [[] l /= |//]; rewrite !bnd_simp ?lerz0 ?ltrz0.
+- by case: u u0 => [[] u /= |//]; rewrite !bnd_simp ?ler0z ?ltr0z.
+Qed.
+
+Lemma eqn0F (n : nat_def i) :
+  unify (fun ix iy => ~~ Itv.sub ix iy) (Itv.Real `[0%Z, 0%Z]) i ->
+  (n%:num == 0)%N = false.
+Proof. by move=> u; apply/negbTE/neqn0. Qed.
 
 Lemma lt1 x : unify_itv i (Itv.Real `]-oo, 1%Z[) -> x%:num < 1 :> R.
 Proof.
