@@ -2,9 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
-From mathcomp Require Import fintype tuple finfun bigop fingroup perm div.
-From mathcomp Require Import ssralg zmodp matrix mxalgebra.
-From mathcomp Require Import poly polydiv mxpoly binomial.
+From mathcomp Require Import choice fintype bigop nmodule algebra divalg.
+From mathcomp Require Import poly polydiv matrix mxpoly.
 
 (******************************************************************************)
 (* This file provides additional primitives and theory for bivariate          *)
