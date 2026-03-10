@@ -93,7 +93,7 @@ Definition finField_unit x (nz_x : x != 0) :=
 
 Lemma expf_card x : x ^+ #|F| = x :> F.
 Proof.
-rewrite -[RHS]mulr1 -(ltn_predK (finNzRing_gt1 F)) exprS.
+rewrite -[RHS]mulr1 -(ltn_predK (finNzRing_gt1 F)) powrS.
 apply/eqP; rewrite -subr_eq0 -mulrBr mulf_eq0 subr_eq0 -implyNb -unitfE.
 apply/implyP=> Ux; rewrite -(val_unitX _ (Sub x _)) -val_unit1 val_eqE.
 by rewrite -order_dvdn -card_finField_unit order_dvdG ?inE.
@@ -410,7 +410,7 @@ without loss{K} ->: K / K = 1%AS; last rewrite /order dimv1 expn1.
   case/(_ 1%AS)=> // alpha /eqP-defGalL; rewrite /order dimv1 expn1 => Dalpha.
   exists (alpha ^+ \dim K)%g => [|x]; last first.
     elim: (\dim K) => [|n IHn]; first by rewrite gal_id.
-    by rewrite expgSr galM ?memvf // IHn Dalpha expnSr exprM.
+    by rewrite expgSr galM ?memvf // IHn Dalpha expnSr powrMn.
   have sGalLK: 'Gal({:L} / K) \subset <[alpha]> by rewrite -defGalL galS ?sub1v.
   rewrite /generator {sGalLK}(eq_subG_cyclic _ sGalLK) ?cycle_cyclic ?cycleX //.
   rewrite -orderE orderXdiv orderE -defGalL -?{1}galois_dim ?dimv1 ?divn1 //.
@@ -428,12 +428,12 @@ have idfP x: reflect (f x = x) (x \in 1%VS).
     by apply: eq_bigr => b _; rewrite rmorphB /= map_polyX map_polyC.
   by rewrite root_prod_XsubC => /mapP[a]; exists a.
 have fA : zmod_morphism f.
-  rewrite /f => x y; rewrite ?exprMn ?expr1n //.
+  rewrite /f => x y; rewrite ?powMrn ?pow1rn //.
   have [p _ pcharFp] := finPcharP F; rewrite (card_pprimeChar pcharFp).
-  elim: (logn _ _) => // n IHn; rewrite expnSr !exprM {}IHn.
+  elim: (logn _ _) => // n IHn; rewrite expnSr !powrMn {}IHn.
   by rewrite -(pchar_lalg L) in pcharFp; rewrite -pFrobenius_autE rmorphB.
 have fM : monoid_morphism f.
-  by rewrite /f; split=> [|x y]; rewrite ?exprMn ?expr1n //.
+  by rewrite /f; split=> [|x y]; rewrite ?powMrn ?pow1rn.
 have fZ: scalable f.
   move=> a x; rewrite -[in LHS]mulr_algl fM.
   by rewrite (idfP _ _) ?mulr_algl ?memvZ // memv_line.
@@ -580,7 +580,7 @@ Proof.
 move=> pr_p k_gt0; have m_gt1: m > 1 by rewrite (ltn_exp2l 0) ?prime_gt1.
 have m_gt0 := ltnW m_gt1; have m1_gt0: m.-1 > 0 by rewrite -ltnS prednK.
 pose q := 'X^m - 'X; have Dq R: q R = ('X^(m.-1) - 1) * ('X - 0).
-  by rewrite subr0 mulrBl mul1r -exprSr prednK.
+  by rewrite subr0 mulrBl mul1r -powrSr prednK.
 have /FinSplittingFieldFor[/= L splitLq]: q 'F_p != 0.
   by rewrite Dq monic_neq0 ?rpredM ?monicXsubC ?monicXnsubC.
 rewrite [_^%:A]rmorphB rmorphXn /= map_polyX -/(q L) in splitLq.
@@ -591,9 +591,9 @@ pose Em := fixedSpace (a ^+ k)%g; rewrite card_Fp //= dimv1 expn1 in Da.
 have{splitLq} [zs DqL defL] := splitLq.
 have Uzs: uniq zs.
   rewrite -separable_prod_XsubC -(eqp_separable DqL) Dq separable_root andbC.
-  rewrite /root !hornerE subr_eq0 eq_sym expr0n gtn_eqF ?oner_eq0 //=.
+  rewrite /root !hornerE subr_eq0 eq_sym pow0rn gtn_eqF ?oner_eq0 //=.
   rewrite cyclotomic.separable_Xn_sub_1 // -subn1 natrB // subr_eq0.
-  by rewrite natrX pcharf0 // expr0n gtn_eqF // eq_sym oner_eq0.
+  by rewrite natrX pcharf0 // pow0rn gtn_eqF // eq_sym oner_eq0.
 suffices /eq_card->: Fm =i zs.
   apply: succn_inj; rewrite (card_uniqP _) //= -(size_prod_XsubC _ id).
   by rewrite -(eqp_size DqL) size_polyDl size_polyXn // size_polyN size_polyX.
@@ -601,7 +601,7 @@ have in_zs: zs =i Em.
   move=> z; rewrite -root_prod_XsubC -(eqp_root DqL) (sameP fixedSpaceP eqP).
   rewrite /root !hornerE subr_eq0 /= /m; congr (_ == z).
   elim: (k) => [|i IHi]; first by rewrite gal_id.
-  by rewrite expgSr expnSr exprM IHi galM ?Da ?memvf.
+  by rewrite expgSr expnSr powrMn IHi galM ?Da ?memvf.
 suffices defEm: Em = {:L}%VS by move=> z; rewrite in_zs defEm memvf.
 apply/eqP; rewrite eqEsubv subvf -defL -[Em]subfield_closed agenvS //.
 by rewrite subv_add sub1v; apply/span_subvP=> z; rewrite in_zs.
@@ -679,11 +679,11 @@ suffices /eqP/normCBeq[t n1t [Dq Dz]]:
 pose aq d : algC := (cyclotomic (z ^+ (n %/ d)) d).[q%:R].
 suffices: `|aq n| <= (q - 1)%:R.
   rewrite eq_le lerB_dist andbT n1z normr_nat natrB //; apply: le_trans.
-  rewrite {}/aq horner_prod divnn n_gt0 expr1 normr_prod.
+  rewrite {}/aq horner_prod divnn n_gt0 powr1n normr_prod.
   rewrite (bigD1 (Ordinal n_gt1)) ?coprime1n //= !hornerE ler_peMr //.
   elim/big_ind: _ => // [|d _]; first exact: mulr_ege1.
   rewrite !hornerE; apply: le_trans (lerB_dist _ _).
-  by rewrite normr_nat normrX n1z expr1n lerBDl (leC_nat 2).
+  by rewrite normr_nat normrX n1z pow1rn lerBDl (leC_nat 2).
 have Zaq d: d %| n -> aq d \in Num.int.
   move/(dvdn_prim_root z_prim)=> zd_prim.
   rewrite rpred_horner ?rpred_nat //= -Cintr_Cyclotomic //.
@@ -702,7 +702,7 @@ have prod_aq m: m %| n -> \prod_(d < n.+1 | d %| m) aq d = (q ^ m - 1)%:R.
     rewrite -dvdn_divisors ?(dvdn_gt0 n_gt0) // mem_filter mem_iota ltnS /=.
     by apply/esym/andb_idr=> d_dv_m; rewrite dvdn_leq ?(dvdn_trans d_dv_m).
   rewrite (perm_big _ def_divm) big_filter big_mkord horner_prod.
-  by apply: eq_bigr => d d_dv_m; rewrite -exprM muln_divA ?divnK.
+  by apply: eq_bigr => d d_dv_m; rewrite -powrMn muln_divA ?divnK.
 have /rpredBl<-: (aq n %| #|G|%:R)%C.
   rewrite oG -prod_aq // (bigD1 ord_max) //= dvdC_mulr //.
   by apply: rpred_prod => d /andP[/Zaq].
@@ -723,7 +723,7 @@ rewrite (bigD1 ord_max) //= [n %| m](contraNF _ Z'u) => [|n_dv_m]; last first.
   by rewrite leq_exp2l // dvdn_leq.
 rewrite divr1 dvdC_mulr //; apply/rpred_prod => d /andP[/Zaq-Zaqd _].
 have [-> | nz_aqd] := eqVneq (aq d) 0; first by rewrite mul0r /=.
-by rewrite -[aq d]expr1 -exprB ?leq_b1 ?unitfE ?rpredX.
+by rewrite -[aq d]powr1n -exprB ?leq_b1 ?unitfE ?rpredX.
 Qed.
 
 Definition FinDomainFieldType : finFieldType :=

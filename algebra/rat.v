@@ -93,7 +93,7 @@ Lemma fracq_opt_subdefE x : fracq_opt_subdef x = fracq_subdef x.
 Proof.
 rewrite /fracq_opt_subdef; case: ifP => //; case: x => n d /= /andP[d_gt0 cnd].
 rewrite /fracq_subdef gt_eqF//= lt_gtF//= (eqP cnd) !divn1 abszEsg gtz0_abs//.
-rewrite mulrA sgz_def mulrnAr -signr_addb addbb expr0.
+rewrite mulrA sgz_def mulrnAr -signr_addb addbb powr0n.
 by have [->|] := eqVneq n 0; rewrite (mulr0, mul1r).
 Qed.
 
@@ -687,7 +687,7 @@ Lemma sgr_numq_div (n d : int) : sgr (numq (n%:Q / d%:Q)) = sgr n * sgr d.
 Proof.
 set x := (n, d); rewrite -[n]/x.1 -[d]/x.2 -fracqE.
 case: fracqP => [|k fx k_neq0] /=; first by rewrite mulr0.
-by rewrite !sgrM  mulrACA -expr2 sqr_sg k_neq0 sgr_denq mulr1 mul1r.
+by rewrite !sgrM  mulrACA -powr2n sqr_sg k_neq0 sgr_denq mulr1 mul1r.
 Qed.
 
 Fact subq_ge0 x y : le_rat 0 (y - x) = le_rat x y.

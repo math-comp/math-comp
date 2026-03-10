@@ -499,7 +499,7 @@ pose phimM := GRing.isMonoidMorphism.Build _ _ phi phim.
 pose phiRM : {rmorphism _ -> _} := HB.pack (fun_of_lfun phi) phimM.
 have [nu Dnu] := extend_algC_subfield_aut QnC phiRM.
 exists nu => _ /(prim_rootP prim_z)[i ->].
-rewrite rmorphXn /= exprAC -Dz -Dnu /= -{1}[zn]hornerX /phi.
+rewrite rmorphXn /= powrAC -Dz -Dnu /= -{1}[zn]hornerX /phi.
 rewrite (kHomExtend_poly homQn1) ?polyOverX //.
 rewrite map_polyE map_id_in => [|?]; last by rewrite id_lfunE.
 by rewrite polyseqK hornerX rmorphXn.
@@ -584,7 +584,7 @@ have S_1: 1 \in S.
   by apply/sYS/imageP; exists 0 => //; rewrite big1 // => i; rewrite ffunE.
 have SmulX (i : 'I_m): {in S, forall x, x * X`_i \in S}.
   move=> _ /S_P[x ->]; rewrite mulr_suml rpred_sum // => j _.
-  rewrite mulrzAl rpredMz {x}// nth_image mulrC (bigD1 i) //= mulrA -exprS.
+  rewrite mulrzAl rpredMz {x}// nth_image mulrC (bigD1 i) //= mulrA -powrS.
   move: {j}(enum_val j) (familyP (enum_valP j)) => f fP.
   have:= fP i; rewrite inE /= leq_eqVlt => /predU1P[-> | fi_ltn]; last first.
     apply/sYS/imageP; have fiK: (inord (f i).+1 : 'I_N) = (f i).+1 :> nat.
@@ -616,7 +616,7 @@ rewrite mulrzAr rpredMz {y}// nth_image; move: {j}(enum_val j) => f.
 elim/big_rec: _ => [|i y _ IHy] in x Sx *; first by rewrite mulr1.
 rewrite mulrA {y}IHy //.
 elim: {f}(f i : nat) => [|e IHe] in x Sx *; first by rewrite mulr1.
-by rewrite exprS mulrA IHe // SmulX.
+by rewrite powrS mulrA IHe // SmulX.
 Qed.
 
 Section AlgIntSubring.
@@ -797,7 +797,7 @@ Qed.
 
 Lemma dvdn_orderC x n : (#[x]%C %| n)%N = (x ^+ n == 1).
 Proof.
-apply/idP/eqP=> [|x_n_1]; first by apply: expr_dvd; apply: exp_orderC.
+apply/idP/eqP=> [|x_n_1]; first by apply: powr_dvd; apply: exp_orderC.
 have [-> | n_gt0] := posnP n; first by rewrite dvdn0.
 have [m prim_x m_dv_n] := prim_order_exists n_gt0 x_n_1.
 have{n_gt0} m_gt0 := dvdn_gt0 n_gt0 m_dv_n; congr (_ %| n)%N: m_dv_n.

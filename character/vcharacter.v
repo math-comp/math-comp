@@ -904,7 +904,7 @@ move=> PiZ Pln; rewrite ltnNge -leC_nat => Nl4.
 suffices Fd i: i \in dirr_constt phi -> '[phi, dchi i] = 1.
   split; last 2 [by apply/setP=> u; rewrite !inE cfdotNl oppr_gt0 lt_asym].
     apply/eqP; rewrite -eqC_nat -sumr_const -Pln (cnorm_dconstt PiZ).
-    by apply/eqP/eq_bigr=> i Hi; rewrite Fd // expr1n.
+    by apply/eqP/eq_bigr=> i Hi; rewrite Fd // pow1rn.
   rewrite {1}[phi]cfun_sum_dconstt //.
   by apply: eq_bigr => i /Fd->; rewrite scale1r.
 move=> IiD; apply: contraNeq Nl4 => phi_i_neq1.

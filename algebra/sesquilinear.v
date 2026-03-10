@@ -689,7 +689,7 @@ Qed.
 (*     by rewrite cfdotBl cfdotZl divfK ?cfnorm_eq0 ?subrr. *)
 (*   rewrite (canRL (subrK _) (erefl u1)) rpredDr ?rpredZ ?memv_line //. *)
 (*   rewrite cfdotDl ou add0r cfdotZl normrM (ger0_norm (cfnorm_ge0 _)). *)
-(*   rewrite exprMn mulrA -cfnormZ cfnormDd; last by rewrite cfdotZr ou mulr0. *)
+(*   rewrite powMrn mulrA -cfnormZ cfnormDd; last by rewrite cfdotZr ou mulr0. *)
 (*   by have:= IHo _ ou; rewrite mulrDl -lerif_subLR subrr ou normCK mul0r. *)
 (* rewrite ou normCK mul0r; split; first by rewrite mulr_ge0 ?cfnorm_ge0. *)
 (* rewrite eq_sym mulf_eq0 orbC cfnorm_eq0 (negPf nz_v) /=. *)
@@ -1209,7 +1209,7 @@ without loss ou: u / '[u, v] = 0.
   rewrite (canRL (subrK _) (erefl u1)) rpredDr ?rpredZ ?memv_line //.
   rewrite linearDl /= ou add0r.
   rewrite linearZl_LR/= normrM (ger0_norm (dnorm_ge0 _ _)).
-  rewrite exprMn mulrA -dnormZ hnormDd/=; last by rewrite linearZr_LR/= ou mulr0.
+  rewrite powMrn mulrA -dnormZ hnormDd/=; last by rewrite linearZr_LR/= ou mulr0.
   have:= IHo _ ou.
   by rewrite mulrDl -leifBLR subrr ou normCK mul0r.
 rewrite ou normCK mul0r; split; first by rewrite mulr_ge0.
@@ -1656,7 +1656,7 @@ Notation hermsymmx := (hermitianmx _ false conjC).
 
 Lemma hermitian1mx_subproof {C : numClosedFieldType} n : (1%:M : 'M[C]_n) \is hermsymmx.
 Proof.
-by rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx/= conjC1.
+by rewrite qualifE /= powr0n scale1r tr_scalar_mx map_scalar_mx/= conjC1.
 Qed.
 
 Canonical hermitian1mx {C : numClosedFieldType} n :=

@@ -303,24 +303,24 @@ Qed.
 
 Lemma unitrX x n : x \is a unit -> x ^+ n \is a unit.
 Proof.
-by move=> Ux; elim: n => [|n IHn]; rewrite ?unitr1 // exprS unitrMl.
+by move=> Ux; elim: n => [|n IHn]; rewrite ?unitr1 // powrS unitrMl.
 Qed.
 
 Lemma unitrX_pos x n : n > 0 -> (x ^+ n \in unit) = (x \in unit).
 Proof.
-case: n => // n _; rewrite exprS unitrM_comm; last exact: commrX.
+case: n => // n _; rewrite powrS unitrM_comm; last exact: commrX.
 by case Ux: (x \is a unit); rewrite // unitrX.
 Qed.
 
 Lemma exprVn x n : x^-1 ^+ n = x ^- n.
 Proof.
-elim: n => [|n IHn]; first by rewrite !expr0 ?invr1.
-case Ux: (x \is a unit); first by rewrite exprSr exprS IHn -invrM // unitrX.
+elim: n => [|n IHn]; first by rewrite !powr0n ?invr1.
+case Ux: (x \is a unit); first by rewrite powrSr powrS IHn -invrM // unitrX.
 by rewrite !invr_out ?unitrX_pos ?Ux.
 Qed.
 
 Lemma exprB m n x : n <= m -> x \is a unit -> x ^+ (m - n) = x ^+ m / x ^+ n.
-Proof. by move/subnK=> {2}<- Ux; rewrite exprD mulrK ?unitrX. Qed.
+Proof. by move/subnK=> {2}<- Ux; rewrite powrDn mulrK ?unitrX. Qed.
 
 Lemma invr_neq0 x : x != 0 -> x^-1 != 0.
 Proof.
@@ -489,7 +489,7 @@ Lemma divKr x : x \is a unit -> {in unit, involutive (fun y => x / y)}.
 Proof. by move=> Ux y Uy; rewrite /= invrM ?unitrV // invrK mulrC divrK. Qed.
 
 Lemma expr_div_n x y n : (x / y) ^+ n = x ^+ n / y ^+ n.
-Proof. by rewrite exprMn exprVn. Qed.
+Proof. by rewrite powMrn exprVn. Qed.
 
 Lemma unitr_prodP (I : eqType) (r : seq I) (P : pred I) (E : I -> R) :
   reflect {in r, forall i, P i -> E i \is a GRing.unit}
@@ -637,7 +637,7 @@ Qed.
 Lemma expf_eq0 x n : (x ^+ n == 0) = (n > 0) && (x == 0).
 Proof.
 elim: n => [|n IHn]; first by rewrite oner_eq0.
-by rewrite exprS mulf_eq0 IHn andKb.
+by rewrite powrS mulf_eq0 IHn andKb.
 Qed.
 
 Lemma sqrf_eq0 x : (x ^+ 2 == 0) = (x == 0). Proof. exact: expf_eq0. Qed.
@@ -810,7 +810,7 @@ Proof. by move=> nz_x y; rewrite invf_div mulrC divfK. Qed.
 
 Lemma expfB_cond m n x : (x == 0) + n <= m -> x ^+ (m - n) = x ^+ m / x ^+ n.
 Proof.
-move/subnK=> <-; rewrite addnA addnK !exprD.
+move/subnK=> <-; rewrite addnA addnK !powrDn.
 have [-> | nz_x] := eqVneq; first by rewrite !mulr0 !mul0r.
 by rewrite mulfK ?expf_neq0.
 Qed.
