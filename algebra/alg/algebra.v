@@ -2830,7 +2830,7 @@ End AlgebraTheory.
 
 Module ClosedExports.
 
-Notation addr_closed := nmod_closed.
+Notation nmod_closed := nmod_closed.
 Notation oppr_closed := oppr_closed.
 Notation zmod_closed := zmod_closed.
 Notation mulr_closed := mulr_closed.
@@ -2845,14 +2845,14 @@ Notation subalg_closed := subalg_closed.
 
 Coercion zmod_closed0D : zmod_closed >-> nmod_closed.
 Coercion zmod_closedN : zmod_closed >-> oppr_closed.
-Coercion semiring_closedD : semiring_closed >-> addr_closed.
+Coercion semiring_closedD : semiring_closed >-> nmod_closed.
 Coercion semiring_closedM : semiring_closed >-> mulr_closed.
 Coercion smulr_closedM : smulr_closed >-> mulr_closed.
 Coercion smulr_closedN : smulr_closed >-> oppr_closed.
 Coercion subring_closedB : subring_closed >-> zmod_closed.
 Coercion subring_closedM : subring_closed >-> smulr_closed.
 Coercion subring_closed_semi : subring_closed >-> semiring_closed.
-Coercion subsemimod_closedD : subsemimod_closed >-> addr_closed.
+Coercion subsemimod_closedD : subsemimod_closed >-> nmod_closed.
 Coercion subsemimod_closedZ : subsemimod_closed >-> scaler_closed.
 Coercion linear_closedB : linear_closed >-> subr_closed.
 Coercion submod_closedB : submod_closed >-> zmod_closed.

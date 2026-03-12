@@ -844,13 +844,13 @@ Proof. by rewrite -irr0 irr_char. Qed.
 Lemma cfun0_char : (0 : 'CF(G)) \is a character.
 Proof. by apply/forallP=> i; rewrite linear0 rpred0. Qed.
 
-Fact add_char : addr_closed (@character G).
+Fact char_nmod_closed : nmod_closed (@character G).
 Proof.
 split=> [|chi xi /forallP-Nchi /forallP-Nxi]; first exact: cfun0_char.
 by apply/forallP=> i; rewrite linearD rpredD /=.
 Qed.
 HB.instance Definition _ := GRing.isAddClosed.Build (classfun G) character_pred
-  add_char.
+  char_nmod_closed.
 
 Lemma char_sum_irrP {phi} :
   reflect (exists n, phi = \sum_i (n i)%:R *: 'chi_i) (phi \is a character).
