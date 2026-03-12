@@ -88,7 +88,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       stdlib.override.version = "master";
       bignums.override.version = "master";
       rocq-elpi.override.version = "master";
-      rocq-elpi.override.elpi-version = "3.6.1";
       hierarchy-builder.override.version = "master";
       mathcomp.job = false;
     }; coqPackages = common-bundles // {
@@ -96,12 +95,21 @@ with builtins; with (import <nixpkgs> {}).lib;
       stdlib.override.version = "master";
       bignums.override.version = "master";
       coq-elpi.override.version = "master";
-      coq-elpi.override.elpi-version = "3.6.1";
       hierarchy-builder.override.version = "master";
       interval.job = false;
       coquelicot.job = false;
       ssprove.job = false;
       mathcomp-infotheo.job = false;  # not compatible with master
+    }; };
+    "rocq-9.2" = { rocqPackages = {
+      rocq-core.override.version = "9.2";
+    }; coqPackages = common-bundles // {
+      coq.override.version = "9.2";
+      coq-elpi.job = true;
+      hierarchy-builder.job = true;
+      interval.job = false;
+      ssprove.job = false;  # waiting for equations
+      mathcomp-infotheo.job = false;  # not yet compatible with 9.2
     }; };
     "rocq-9.1" = { rocqPackages = {
       rocq-core.override.version = "9.1";
@@ -111,6 +119,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       hierarchy-builder.job = true;
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
+      ConCert.job = false;
     }; };
     "rocq-9.0" = { rocqPackages = {
       rocq-core.override.version = "9.0";
