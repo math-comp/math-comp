@@ -278,14 +278,14 @@ have GrH x: x \in G -> rH x \in G.
   move=> Gx; case/rcosetP: (HrH x) => y Hy ->.
   by rewrite groupM // (subsetP sHG).
 have rH_Pmul x y: x \in P -> rH (x * y) = pQ x * rH y.
-  by move=> Px; rewrite /rH mulgA -pQmul; first by rewrite /pP rPmul ?mulgA.
+  by move=> Px; rewrite /rH mulgA -pQmul; last by rewrite /pP rPmul ?mulgA.
 have rH_Hmul h y: h \in H -> rH (h * y) = rH y.
   by move=> Hh; rewrite rH_Pmul ?(subsetP sHP) // -(mulg1 h) pQhq ?mul1g.
 pose mu x y := fmod ((rH x * rH y)^-1 * rH (x * y)).
 pose nu y := (\sum_(Px in rcosets P G) mu (repr Px) y)%R.
 have rHmul: {in G &, forall x y, rH (x * y) = rH x * rH y * val (mu x y)}.
   move=> x y Gx Gy; rewrite /= fmodK ?mulKVg // -mem_lcoset lcoset_sym.
-  rewrite -norm_rlcoset; last by rewrite nHG ?GrH ?groupM.
+  rewrite -norm_rlcoset; first by rewrite nHG ?GrH ?groupM.
   by rewrite (rcoset_eqP (HrH _)) -rcoset_mul ?nHG ?GrH // mem_mulg.
 have actrH a x: x \in G -> (a ^@ rH x = a ^@ x)%R.
   move=> Gx; apply: val_inj; rewrite /= !fmvalJ ?nHG ?GrH //.
@@ -335,7 +335,7 @@ exists (Morphism fM @* G)%G; apply/complP; split.
   rewrite -{1}(mulgKV y (rH y)) groupMl -?mem_rcoset // => Hy.
   by rewrite -(mulg1 y) /f nu_Hmul // rH_Hmul //; apply: (morph1 (Morphism fM)).
 apply/setP=> x; apply/mulsgP/idP=> [[h y Hh fy ->{x}] | Gx].
-  rewrite groupMl; last exact: (subsetP sHG).
+  rewrite groupMl; first exact: (subsetP sHG).
   case/morphimP: fy => z _ Gz ->{h Hh y}.
   by rewrite /= /f groupMl ?GrH // (subsetP sHG) ?fmodP.
 exists (x * (f x)^-1) (f x); last first; first by rewrite mulgKV.
@@ -367,11 +367,11 @@ apply/eqP; rewrite eq_sym eqEcard; apply/andP; split; last first.
   by rewrite cardJg -(leq_pmul2l (cardG_gt0 H)) -!TI_cardMg // eqHL eqHK.
 apply/subsetP=> _ /imsetP[x Kx ->]; rewrite conjgE mulgA (conjgC _ x).
 have Gx: x \in G by rewrite sKG.
-rewrite conjVg -mulgA -fmvalJ ?nHG // -fmvalN -fmvalA (_ : _ + _ = nu x)%R.
-  by rewrite val_nu // mulKVg groupV mem_remgr // eqHL groupV.
+rewrite conjVg -mulgA -fmvalJ ?nHG // -fmvalN -fmvalA (_ : _ + _ = nu x)%R;
+  last by rewrite val_nu // mulKVg groupV mem_remgr // eqHL groupV.
 rewrite actZr -!mulNrn -mulrnDl actr_sum.
 rewrite addrC (reindex_acts _ (actsRs_rcosets _ K) Kx) -sumrB /= -/Q.
-rewrite (eq_bigr (fun _ => nu x)) => [|_ /imsetP[y Ky ->]]; last first.
+rewrite (eq_bigr (fun _ => nu x)) => [_ /imsetP[y Ky ->]|].
   rewrite !rcosetE -rcosetM QeqLP.
   case: repr_rcosetP => z /setIP[Lz _]; case: repr_rcosetP => t /setIP[Lt _].
   rewrite !nu_cocycle ?groupM ?(sKG y) // ?sLG //.
@@ -379,7 +379,7 @@ rewrite (eq_bigr (fun _ => nu x)) => [|_ /imsetP[y Ky ->]]; last first.
 apply: val_inj; rewrite sumr_const !fmvalZ.
 rewrite -{2}(expgK coHiPG (fmodP (nu x))); congr (_ ^+ _ ^+ _).
 rewrite -[#|_|]divgS ?subsetIl // -(divnMl (cardG_gt0 H)).
-rewrite -!TI_cardMg //; last by rewrite setIA setIAC (setIidPl sHP).
+rewrite -!TI_cardMg //; first by rewrite setIA setIAC (setIidPl sHP).
 by rewrite group_modl // eqHK (setIidPr sPG) divgS.
 Qed.
 
@@ -440,7 +440,7 @@ Proof.
 move=> s t Gs Gt /=.
 rewrite [transfer t](reindex_acts 'Rs _ Gs) ?actsRs_rcosets //= -big_split /=.
 apply: eq_bigr => _ /rcosetsP[x Gx ->]; rewrite !rcosetE -!rcosetM.
-rewrite -zmodMgE -morphM -?mem_rcoset; first by rewrite !mulgA mulgKV rcosetM.
+rewrite -zmodMgE -morphM -?mem_rcoset; last by rewrite !mulgA mulgKV rcosetM.
   by rewrite rcoset_repr rcosetM mem_rcoset mulgK mem_repr_rcoset.
 by rewrite rcoset_repr (rcosetM _ _ t) mem_rcoset mulgK mem_repr_rcoset.
 Qed.
@@ -564,8 +564,8 @@ have trY: is_transversal Y HG G.
     have HGgHyg: H :* y * <[g]> \in HG :* <[g]>.
       by rewrite mem_mulg ?set11 // -rcosetE imset_f ?(subsetP sYG).
     rewrite !(def_pblock tiX HGgHyg) //.
-      by rewrite -[x'](mulgK (g ^+ j)) mem_mulg // groupV mem_cycle.
-    by rewrite -[x](mulgK (g ^+ i)) mem_mulg ?rcoset_refl // groupV mem_cycle.
+      by rewrite -[x](mulgK (g ^+ i)) mem_mulg ?rcoset_refl // groupV mem_cycle.
+    by rewrite -[x'](mulgK (g ^+ j)) mem_mulg // groupV mem_cycle.
   apply/set1P; rewrite /y eq_xx'; congr (_ * _ ^+ _) => //; apply/eqP.
   rewrite -(@nth_uniq _ (H :* x) (traj x)) ?size_traj // ?eq_xx' //.
   by rewrite !nth_traj ?(rcoset_eqP Hy_x'gj) // -eq_xx'.
@@ -575,7 +575,7 @@ have rYE x i : x \in X -> i < n_ x -> rY (H :* x :* g ^+ i) = x * g ^+ i.
   apply/esym/def_pblock; last exact: rcoset_refl; first by case/and3P: partHG.
   by rewrite -rcosetE imset_f ?groupM ?groupX // sXG.
 rewrite (transfer_indep trY Gg) /V -/rY (set_partition_big _ partHGg) /=.
-rewrite -defHgX big_imset /=; last first.
+rewrite -defHgX big_imset /=.
   apply/imset_injP; rewrite defHgX (card_transversal trX) defHGg.
   by rewrite (card_in_imset injHGg).
 apply eq_bigr=> x Xx; rewrite Hgr_eq (eq_bigl _ _ (pcyc_eq x)) -big_uniq //=.
@@ -587,10 +587,10 @@ elim: {1 3}n 0%N (addn0 n) => [|m IHm] i def_i /=.
   rewrite -(mulgA _ _ g) -rcosetM -expgSr -[(H :* x) :* _]rcosetE.
   rewrite -actpermE morphX ?inE // permX // -{2}def_n n_eq iter_porbit mulgA.
   by rewrite -[H :* x]rcoset1 (rYE _ 0) ?mulg1.
-rewrite big_cons rYE //; last by rewrite def_n -def_i ltnS leq_addl.
+rewrite big_cons rYE //; first by rewrite def_n -def_i ltnS leq_addl.
 rewrite permE /= rcosetE -rcosetM -(mulgA _ _ g) -expgSr.
 rewrite addSnnS in def_i; rewrite IHm //.
-rewrite rYE //; last by rewrite def_n -def_i ltnS leq_addl.
+rewrite rYE //; first by rewrite def_n -def_i ltnS leq_addl.
 by rewrite mulgV [fmalpha 1]morph1 add0r.
 Qed.
 

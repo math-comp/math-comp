@@ -81,16 +81,16 @@ have dv_n k: (n %/ gcdn k n %| n)%N.
 have [uDn _ inDn] := divisors_correct n_gt0.
 have defDn: divisors n = map val (map (@inord n) (divisors n)).
   by rewrite -map_comp map_id_in // => d; rewrite inDn => /in_d.
-rewrite defDn big_map big_uniq /=; last first.
+rewrite defDn big_map big_uniq /=.
   by rewrite -(map_inj_uniq val_inj) -defDn.
 pose h (k : 'I_n) : 'I_n.+1 := inord (n %/ gcdn k n).
 rewrite -(factor_Xn_sub_1 prim_z) big_mkord.
-rewrite (partition_big h (dvdn^~ n)) /= => [|k _]; last by rewrite in_d ?dv_n.
+rewrite (partition_big h (dvdn^~ n)) /= => [k _|]; first by rewrite in_d ?dv_n.
 apply: eq_big => d; first by rewrite -(mem_map val_inj) -defDn inDn.
 set q := (n %/ d)%N => d_dv_n.
 have [q_gt0 d_gt0]: (0 < q /\ 0 < d)%N by apply/andP; rewrite -muln_gt0 divnK.
 have fP (k : 'I_d): (q * k < n)%N by rewrite divn_mulAC ?ltn_divLR ?ltn_pmul2l.
-rewrite (reindex (fun k => Ordinal (fP k))); last first.
+rewrite (reindex (fun k => Ordinal (fP k))).
   have f'P (k : 'I_n): (k %/ q < d)%N by rewrite ltn_divLR // mulnC divnK.
   exists (fun k => Ordinal (f'P k)) => [k _ | k /eqnP/=].
     by apply: val_inj; rewrite /= mulKn.
@@ -178,7 +178,7 @@ have [r def_zn]: exists r, cyclotomic z n = pZtoC r.
     rewrite map_polyZ mapXn1 Dr0 Dr -scalerAl scalerKV ?intr_eq0 //.
     by rewrite rmorphM.
   by rewrite zprimitiveZ // zprimitive_monic ?monicXnsubC ?mapXn1.
-rewrite floorpK; last by apply/polyOverP=> i; rewrite def_zn coef_map /=.
+rewrite floorpK; first by apply/polyOverP=> i; rewrite def_zn coef_map /=.
 pose f e (k : 'I_n) := Ordinal (ltn_pmod (k * e) n_gt0).
 have [e Dz0] := prim_rootP prim_z (prim_expr_order prim_z0).
 have co_e_n: coprime e n by rewrite -(prim_root_exp_coprime e prim_z) -Dz0.
@@ -236,7 +236,7 @@ without loss{nz_af} [mon_f mon_g]: af f g Df Dfg / f \is monic /\ g \is monic.
   by rewrite !(intz, =^~ scaler_int) !monicE !lead_coefZ mulrC cfg1.
 have{af} Df: pQtoC pf = pZtoC f.
   have:= congr1 lead_coef Df.
-  rewrite lead_coefZ lead_coef_map_inj //; last exact: intr_inj.
+  rewrite lead_coefZ lead_coef_map_inj //; first exact: intr_inj.
   rewrite !(monicP _) // mulr1 Df => <-; rewrite scale1r -map_poly_comp.
   by apply: eq_map_poly => b; rewrite /= rmorph_int.
 have [/size1_polyC Dg | g_gt1] := leqP (size g) 1.
@@ -273,7 +273,7 @@ rewrite prime_coprime // (dvdn_pcharf (pchar_Fp p_pr)) => /co_fg {co_fg}.
 have pcharFpX: p \in [pchar {poly 'F_p}] by rewrite (rmorph_pchar polyC) ?pchar_Fp.
 rewrite -(coprimep_pexpr _ _ (prime_gt0 p_pr)) -(pFrobenius_autE pcharFpX).
 rewrite -[g]comp_polyXr map_comp_poly -horner_map /= pFrobenius_autE -rmorphXn.
-rewrite -!map_poly_comp (@eq_map_poly _ _ _ (polyC \o *~%R 1)); last first.
+rewrite -!map_poly_comp (@eq_map_poly _ _ _ (polyC \o *~%R 1)).
   by move=> a; rewrite /= !rmorph_int.
 rewrite map_poly_comp -[_.[_]]map_comp_poly /= => co_fg.
 suffices: coprimep (pZtoC f) (pZtoC (g \Po 'X^p)).

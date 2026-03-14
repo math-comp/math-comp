@@ -159,7 +159,7 @@ Hypothesis injf : 'injm f.
 Lemma morphim_fixP A : A \subset G -> reflect (f @* A = A) (f @* A \subset A).
 Proof.
 rewrite /morphim => sAG; have:= eqEcard (f @: A) A.
-rewrite (setIidPr sAG) card_in_imset ?leqnn ?andbT  => [<-|]; first exact: eqP.
+rewrite (setIidPr sAG) card_in_imset ?leqnn ?andbT  => [|<-]; last exact: eqP.
 by move/injmP: injf; apply: sub_in2; apply/subsetP.
 Qed.
 

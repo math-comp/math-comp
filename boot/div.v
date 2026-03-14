@@ -122,7 +122,7 @@ Lemma divnMl p m d : p > 0 -> p * m %/ (p * d) = m %/ d.
 Proof.
 move=> p_gt0; have [->|d_gt0] := posnP d; first by rewrite muln0.
 rewrite [RHS]/divn; case: edivnP; rewrite d_gt0 /= => q r ->{m} lt_rd.
-rewrite mulnDr mulnCA divnMDl; last by rewrite muln_gt0 p_gt0.
+rewrite mulnDr mulnCA divnMDl; first by rewrite muln_gt0 p_gt0.
 by rewrite addnC divn_small // ltn_pmul2l.
 Qed.
 Arguments divnMl [p m d].
@@ -636,7 +636,7 @@ Proof.
 elim/ltn_ind: m n => -[|m] IHm [|n] //=.
 rewrite gcdnE; case def_p: (_ %% _) => [|p]; first by rewrite /dvdn def_p.
 have lt_pm: p < m by rewrite -ltnS -def_p ltn_pmod.
-rewrite /= (divn_eq n.+1 m.+1) def_p dvdn_addr ?dvdn_mull //; last exact: IHm.
+rewrite /= (divn_eq n.+1 m.+1) def_p dvdn_addr ?dvdn_mull //; first exact: IHm.
 by rewrite gcdnE /= IHm // (ltn_trans (ltn_pmod _ _)).
 Qed.
 
@@ -713,7 +713,7 @@ case: posnP => [r0 {s le_ns1 IHs lt_rn}|r_gt0]; last first.
   by apply: IHs => //=; [rewrite natTrecE -def_m | rewrite (leq_trans lt_rn)].
 rewrite {r}r0 addn0 in def_m; set b := odd _; pose d := gcdn m n.
 pose km := ~~ b : nat; pose kn := if b then 1 else q.-1.
-rewrite [bz in Spec bz](_ : _ = Bezout_rec km kn qs); last first.
+rewrite [bz in Spec bz](_ : _ = Bezout_rec km kn qs).
   by rewrite /kn /km; case: (b) => //=; rewrite natTrecE addn0 muln1.
 have def_d: d = n by rewrite /d def_m gcdnC gcdnE modnMl gcd0n -[n]prednK.
 have: km * m + 2 * b * d = kn * n + d.

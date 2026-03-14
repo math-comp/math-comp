@@ -75,7 +75,7 @@ move/bigdprodWY: defF => <- {F}; elim: r rp => [_|q r IHr] /=.
   by rewrite big_nil gen0 pgroup1 normal1.
 rewrite inE eq_sym big_cons -joingE -joing_idr => /norP[qp /IHr {IHr}].
 set F := <<_>> => /andP[p'F nsFG].
-rewrite norm_joinEl /= -/F; last exact/gFsub_trans/normal_norm.
+rewrite norm_joinEl /= -/F; first exact/gFsub_trans/normal_norm.
 by rewrite pgroupM p'F normalM ?pcore_normal //= (pi_pgroup (pcore_pgroup q G)).
 Qed.
 
@@ -345,7 +345,7 @@ Lemma Phi_cprod G H K :
   p.-group G -> H \* K = G -> 'Phi(H) \* 'Phi(K) = 'Phi(G).
 Proof.
 move=> pG defG; have [_ /mulG_sub[sHG sKG] cHK] := cprodP defG.
-rewrite cprodEY /=; last by rewrite (centSS (Phi_sub _) (Phi_sub _)).
+rewrite cprodEY /=; first by rewrite (centSS (Phi_sub _) (Phi_sub _)).
 rewrite !(Phi_joing (pgroupS _ pG)) //=.
 have /cprodP[_ <- /cent_joinEr <-] := der_cprod 1 defG.
 have /cprodP[_ <- /cent_joinEr <-] := Mho_cprod 1 defG.
@@ -434,7 +434,7 @@ Lemma FittingEgen G :
   'F(G) = <<\bigcup_(p < #|G|.+1 | (p : nat) \in \pi(G)) 'O_p(G)>>.
 Proof.
 apply/eqP; rewrite eqEsubset gen_subG /=.
-rewrite -{1}(bigdprodWY (erefl 'F(G))) (big_nth 0) big_mkord genS.
+rewrite -{1}(bigdprodWY (erefl 'F(G))) (big_nth 0) big_mkord genS; last first.
   by apply/bigcupsP=> p _; rewrite -p_core_Fitting pcore_sub.
 apply/bigcupsP=> [[i /= lti]] _; set p := nth _ _ i.
 have pi_p: p \in \pi(G) by rewrite mem_nth.
@@ -571,11 +571,11 @@ pose Iok (I : {set {perm gT}}) :=
   (I \subset Aut G) &&
   [exists (M : {group gT} | M <| G), \big[dprod/1]_(f in I) f @: H == M].
 have defH: (1 : {perm gT}) @: H = H.
-  apply/eqP; rewrite eqEcard card_imset ?leqnn; last exact: perm_inj.
+  apply/eqP; rewrite eqEcard card_imset ?leqnn; first exact: perm_inj.
   by rewrite andbT; apply/subsetP=> _ /imsetP[x Hx ->]; rewrite perm1.
 have [|I] := @maxset_exists _ Iok 1.
-  rewrite /Iok sub1G; apply/existsP; exists H.
-  by rewrite /normal sHG nHG (big_pred1 1) => [|f]; rewrite ?defH /= ?inE.
+  rewrite /Iok sub1G; apply/existsP; exists H; last first.
+  by rewrite /normal sHG nHG (big_pred1 1) => [f|]; rewrite ?defH /= ?inE.
 case/maxsetP=> /andP[Aut_I /exists_eq_inP[M /andP[sMG nMG] defM]] maxI.
 rewrite sub1set=> ntI; case/eqVproper: sMG => [defG | /andP[sMG not_sGM]].
   exists H; split=> //; last by exists I; rewrite ?defM.
@@ -621,7 +621,7 @@ have cfHM: M \subset 'C(autm Af @* H).
   rewrite centsC (sameP commG1P trivgP) -tifHM subsetI commg_subl commg_subr.
   by rewrite (subset_trans sMG) // (subset_trans sfHG).
 exists (autm Af @* H <*> M)%G; rewrite /normal /= join_subG sMG sfHG normsY //=.
-rewrite (bigD1 f) ?inE ?eqxx // (eq_bigl [in I]) /= => [|g]; last first.
+rewrite (bigD1 f) ?inE ?eqxx // (eq_bigl [in I]) /= => [g|].
   by rewrite /= !inE andbC; case: eqP => // ->.
 by rewrite defM -(autmE Af) -morphimEsub // dprodE // cent_joinEr ?eqxx.
 Qed.
@@ -681,7 +681,7 @@ Qed.
 Lemma Fitting_pcore pi G : 'F('O_pi(G)) = 'O_pi('F(G)).
 Proof.
 apply/eqP; rewrite eqEsubset.
-rewrite (subset_trans _ (pcoreS _ (Fitting_sub _))); last first.
+rewrite (subset_trans _ (pcoreS _ (Fitting_sub _))).
   by rewrite subsetI Fitting_sub Fitting_max ?Fitting_nil ?gFnormal_trans.
 rewrite (subset_trans _ (FittingS (pcore_sub _ _))) // subsetI pcore_sub.
 by rewrite pcore_max ?pcore_pgroup ?gFnormal_trans.
@@ -729,7 +729,7 @@ have Zxy: [~ x, y] \in 'Z(G) by rewrite -defG' mem_commg.
 have Zxp: x ^+ p \in 'Z(G).
   rewrite -defPhi (Phi_joing pG) (MhoE 1 pG) joing_idr mem_gen // !inE.
   by rewrite expn1 orbC (imset_f (natexp^~ p)).
-rewrite mem_morphpre /= ?defG' ?Zxy // inE -commXg; last first.
+rewrite mem_morphpre /= ?defG' ?Zxy // inE -commXg.
   by red; case/setIP: Zxy => _ /centP->.
 by apply/commgP; red; case/setIP: Zxp => _ /centP->.
 Qed.
@@ -769,7 +769,7 @@ have{sZ2G'_Z} sG'Z: G^`(1) \subset 'Z(G).
   rewrite -quotient_der ?gFnorm // -quotientGI ?ucn_subS ?quotientS1 //=.
   by rewrite ucn1.
 have sCG': 'C_G(A) \subset G^`(1).
-  rewrite -quotient_sub1 //; last by rewrite subIset ?gFnorm.
+  rewrite -quotient_sub1 //; first by rewrite subIset ?gFnorm.
   rewrite (subset_trans (quotient_subcent _ G A)) //= -[G in G / _]defG.
   have nGA: A \subset 'N(G) by rewrite -commg_subl defG.
   rewrite quotientR ?gFnorm_trans ?normG //.
@@ -1057,7 +1057,7 @@ have defG: E * R = G.
   have cGx_x: <[x]> \subset 'C_G[x] by rewrite cycle_subG inE Gx cent1id.
   have nsRcx := p_maximal_normal (pgroupS sCxG pG) maxR.
   rewrite (norm_joinEr (subset_trans cGx_x (normal_norm nsRcx))).
-  rewrite (mulg_normal_maximal nsRcx) //=; last first.
+  rewrite (mulg_normal_maximal nsRcx) //=.
     by rewrite centY !cent_cycle cycle_subG !in_setI Gx cent1id cent1C.
   have nsCxG := p_maximal_normal pG maxCx.
   have syG: <[y]> \subset G by rewrite cycle_subG.
@@ -1308,7 +1308,7 @@ exists (sdprodm_morphism defE fMact).
 rewrite im_sdprodm injm_sdprodm injm_idm -card_im_injm im_idm fK.
 have [_ -> _ ->] := sdprodP defE; rewrite !eqxx; split=> //= u Zu.
 rewrite sdprodmEl ?(subsetP sZK) ?defZ // -(autE injg gZ Zu).
-rewrite -[aut _ _](invmK (injm_Zp_unitm z)); first by rewrite permE Zu.
+rewrite -[aut _ _](invmK (injm_Zp_unitm z)); last by rewrite permE Zu.
 by rewrite im_Zp_unitm Aut_aut.
 Qed.
 
@@ -1349,7 +1349,7 @@ Lemma exponent_Ohm1_class2 H :
   odd p -> p.-group H -> nil_class H <= 2 -> exponent 'Ohm_1(H) %| p.
 Proof.
 move=> odd_p pH; rewrite nil_class2 => sH'Z; apply/exponentP=> x /=.
-rewrite (OhmE 1 pH) expn1 gen_set_id => {x} [/LdivP[] //|].
+rewrite (OhmE 1 pH) expn1 gen_set_id => {x} [|/LdivP[] //].
 apply/group_setP; split=> [|x y]; first by rewrite !inE group1 expg1n //=.
 case/LdivP=> Hx xp1 /LdivP[Hy yp1]; rewrite !inE groupM //=.
 have [_ czH]: [~ y, x] \in H /\ centralises [~ y, x] H.
@@ -1373,7 +1373,7 @@ Proof.
 move/pgroup_nil=> nilG; rewrite /abelian.
 case/maxgroupP=> /andP[nsAG abelA] maxA; have [sAG nAG] := andP nsAG.
 rewrite inE nsAG eqEsubset /= andbC subsetI abelA normal_sub //=.
-rewrite -quotient_sub1; last by rewrite subIset 1?normal_norm.
+rewrite -quotient_sub1; first by rewrite subIset 1?normal_norm.
 apply/trivgP; apply: (TI_center_nil (quotient_nil A nilG)).
   by rewrite quotient_normal // /normal subsetIl normsI ?normG ?norms_cent.
 apply/trivgP/subsetP=> _ /setIP[/morphimP[x Nx /setIP[_ Cx]] ->].
@@ -1411,7 +1411,7 @@ apply/subsetP=> w /imset2P[u v].
 rewrite /= -groupV -(groupV _ v) /= astabQR //= -/Z !inE (groupV 'C(Z)).
 case/and4P=> cZu _ _ sRuZ /and4P[cZv' _ _ sRvZ] ->{w}.
 apply/centP=> a Aa; rewrite /commute -!mulgA (commgCV v) (mulgA u).
-rewrite (centP cZu); last by rewrite (subsetP sRvZ) ?mem_commg ?set11 ?groupV.
+rewrite (centP cZu); first by rewrite (subsetP sRvZ) ?mem_commg ?set11 ?groupV.
 rewrite 2!(mulgA v^-1) mulKVg 4!mulgA invgK (commgC u^-1) mulgA.
 rewrite -(mulgA _ _ v^-1) -(centP cZv') ?(subsetP sRuZ) ?mem_commg ?set11//.
 by rewrite -!mulgA invgK mulKVg !mulKg.
@@ -1453,7 +1453,7 @@ have sXW: <[x]> \subset W.
 have{nil_classY pY sXW sZY sZCA} defW: W = <[x]> * Z.
   rewrite -[W](setIidPr (Ohm_sub _ _)) /= -/Y {1}defY -group_modl //= -/Y -/W.
   congr (_ * _); apply/eqP; rewrite eqEsubset {1}[Z](OhmE 1 pA).
-  rewrite subsetI setIAC subIset //; first by rewrite sZCA -[Z]Ohm_id OhmS.
+  rewrite subsetI setIAC subIset //; last by rewrite sZCA -[Z]Ohm_id OhmS.
   rewrite sub_gen ?setIS //; apply/subsetP=> w Ww; rewrite inE.
   by apply/eqP; apply: exponentP w Ww; apply: exponent_Ohm1_class2.
 have{sXG sAG} sXAG: XA \subset G by rewrite join_subG sXG.
@@ -1525,7 +1525,7 @@ rewrite groupM //= => nt_xyp; pose XY := <[x]> <*> <[y]>.
 have{yp1 nt_xyp} defXY: XY = U.
   have sXY_U: XY \subset U by rewrite join_subG !cycle_subG Ux Uy.
   rewrite [XY]minU //= eqEsubset Ohm_sub (OhmE 1 (pgroupS _ pU)) //.
-  rewrite /= joing_idl joing_idr genS; last first.
+  rewrite /= joing_idl joing_idr genS.
     by rewrite subsetI subset_gen subUset !sub1set !inE xp1 yp1.
   apply: contra nt_xyp => /exponentP-> //.
   by rewrite groupMl mem_gen // (set21, set22).
@@ -1540,8 +1540,8 @@ have{genXp minU xp1 sVU ltVU} expVp: exponent V %| p.
   by rewrite inE -order_dvdn (dvdn_trans (order_dvdG Vv)) // cardJg order_dvdn.
 have{A pA defA1 sX'A V expVp} Zxy: [~ x, y] \in Z.
   rewrite -defA1 (OhmE 1 pA) mem_gen // !inE (exponentP expVp).
-    by rewrite (subsetP sX'A) //= mem_commg ?(subsetP sUX).
-  by rewrite groupMl -1?[x^-1]conjg1 mem_gen // imset2_f // ?groupV cycle_id.
+    by rewrite groupMl -1?[x^-1]conjg1 mem_gen // imset2_f // ?groupV cycle_id.
+  by rewrite (subsetP sX'A) //= mem_commg ?(subsetP sUX).
 have{Zxy sUX cZX} cXYxy: [~ x, y] \in 'C(XY).
   by rewrite centsC in cZX; rewrite defXY (subsetP (centS sUX)) ?(subsetP cZX).
 rewrite -defU1 exponent_Ohm1_class2 // nil_class2 -defXY der1_joing_cycles //.
@@ -1565,23 +1565,23 @@ have sKG := char_sub chK; have nKG := char_normal chK.
 exists K; split=> //; apply/eqP; rewrite eqEsubset andbC setSI //=.
 have chZ: 'Z(K) \char G by [apply: subcent_char]; have nZG := char_norm chZ.
 have chC: 'C_G(K) \char G by apply: subcent_char chK.
-rewrite -quotient_sub1; last by rewrite subIset // char_norm.
+rewrite -quotient_sub1; first by rewrite subIset // char_norm.
 apply/trivgP; apply: (TI_center_nil (quotient_nil _ (pgroup_nil pG))).
   by rewrite quotient_normal ?norm_normalI ?norms_cent ?normal_norm.
 apply: TI_Ohm1; apply/trivgP; rewrite -trivg_quotient -sub_cosetpre_quo //.
-rewrite morphpreI quotientGK /=; last first.
+rewrite morphpreI quotientGK /=.
   by apply: normalS (char_normal chZ); rewrite ?subsetIl ?setSI.
 set X := _ :&: _; pose gX := [group of X].
 have sXG: X \subset G by rewrite subIset ?subsetIl.
 have cXK: K \subset 'C(gX) by rewrite centsC 2?subIset // subxx orbT.
 rewrite subsetI centsC cXK andbT -(mul1g K) -mulSG mul1g -(cent_joinEr cXK).
 rewrite [_ <*> K]maxK ?joing_subr //= andbC (cent_joinEr cXK).
-rewrite -center_prod // (subset_trans _ (mulG_subr _ _)).
+rewrite -center_prod // (subset_trans _ (mulG_subr _ _)); last first.
   rewrite charM 1?charI ?(char_from_quotient (normal_cosetpre _)) //.
   by rewrite cosetpreK !gFchar_trans.
-rewrite (@Phi_mulg p) ?(pgroupS _ pG) // subUset commGC commMG; last first.
+rewrite (@Phi_mulg p) ?(pgroupS _ pG) // subUset commGC commMG.
   by rewrite normsR ?(normsG sKG) // cents_norm // centsC.
-rewrite !mul_subG 1?commGC //.
+rewrite !mul_subG 1?commGC //; last first.
   apply: subset_trans (commgS _ (subsetIr _ _)) _.
   rewrite -quotient_cents2 ?subsetIl // centsC // cosetpreK //.
   exact/gFsub_trans/subsetIr.

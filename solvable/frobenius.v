@@ -498,7 +498,7 @@ apply/normedTI_memJ_P; rewrite setD_eq0 subG1 sHG -defKH -(normC nKH).
 split=> // z _ /setD1P[ntz Hz] /mulsgP[y x Hy Kx ->]; rewrite groupMl // !inE.
 rewrite conjg_eq1 ntz; apply/idP/idP=> [Hzxy | Hx]; last by rewrite !in_group.
 apply: (subsetP (sub1G H)); have Hzy: z ^ y \in H by apply: groupJ.
-rewrite -(regG (z ^ y)); last by apply/setD1P; rewrite conjg_eq1.
+rewrite -(regG (z ^ y)); first by apply/setD1P; rewrite conjg_eq1.
 rewrite inE Kx cent1C (sameP cent1P commgP) -in_set1 -[[set 1]]tiKH inE /=.
 rewrite andbC groupM ?groupV -?conjgM //= commgEr groupMr //.
 by rewrite memJ_norm ?(subsetP nKH) ?groupV.
@@ -599,7 +599,7 @@ apply/setP=> x /[!inE]; have [-> | ntx] := eqVneq; first exact: group1.
 rewrite /= -(cover_partition partG) /cover.
 have neKHy y: gval K <> H^# :^ y.
   by move/setP/(_ 1); rewrite group1 conjD1g setD11.
-rewrite big_setU1 /= ?inE; last by apply/imsetP=> [[y _ /neKHy]].
+rewrite big_setU1 /= ?inE; first by apply/imsetP=> [[y _ /neKHy]].
 have [nsKG sHG _ _ tiKH] := sdprod_context defG; have [sKG nKG]:= andP nsKG.
 symmetry; case Kx: (x \in K) => /=.
   apply/set0Pn=> [[v /setIP[Sv]]]; have [y Gy ->] := atransP2 transG Su Sv.
@@ -632,11 +632,11 @@ apply/Frobenius_semiregularP; first exact: quotient_coprime_sdprod.
 move=> _ /(subsetP (quotientD1 _ _))/morphimP[x nNx H1x ->].
 rewrite -cent_cycle -quotient_cycle //=.
 rewrite -strongest_coprime_quotient_cent ?cycle_subG //.
-- by rewrite cent_cycle quotientS1 ?regH.
 - by rewrite subIset ?sNK.
 - rewrite (coprimeSg (subsetIl N _)) ?(coprimeSg sNK) ?(coprimegS _ coKH) //.
   by rewrite cycle_subG; case/setD1P: H1x.
-by rewrite orbC abelian_sol ?cycle_abelian.
+- by rewrite orbC abelian_sol ?cycle_abelian.
+- by rewrite cent_cycle quotientS1 ?regH.
 Qed.
 
 Section InjmFrobenius.
@@ -695,7 +695,7 @@ have: n %| #|'Ldiv_(p * n)(G)|.
   have: p * n %| #|G| by rewrite oG dvdn_pmul2r ?pdiv_dvd.
   move/IHm=> IH; apply: dvdn_trans (IH _); first exact: dvdn_mull.
   by rewrite oG divnMr.
-rewrite -(cardsID 'Ldiv_n()) dvdn_addl.
+rewrite -(cardsID 'Ldiv_n()) dvdn_addl; last first.
   rewrite -setIA ['Ldiv_n(_)](setIidPr _) //.
   by apply/subsetP=> x; rewrite !inE -!order_dvdn; apply: dvdn_mull.
 rewrite -setIDA; set A := _ :\: _.
@@ -711,21 +711,22 @@ have pA x: x \in A -> (#[x]`_p = n`_p * p)%N.
 rewrite -(partnC p n_gt0) Gauss_dvd ?coprime_partC //; apply/andP; split.
   rewrite -sum1_card (partition_big_imset (@cycle _)) /=.
   apply: dvdn_sum => _ /imsetP[x /setIP[Gx Ax] ->].
-  rewrite (eq_bigl (generator <[x]>)) => [|y].
-    rewrite sum1dep_card -totient_gen -[#[x]](partnC p) //.
-    rewrite totient_coprime ?coprime_partC // dvdn_mulr // .
-    by rewrite (pA x Ax) p_part // -expnSr totient_pfactor // dvdn_mull.
-  rewrite /generator eq_sym andbC; case xy: {+}(_ == _) => //.
-  rewrite !inE -!order_dvdn in Ax *.
-  by rewrite -cycle_subG /order -(eqP xy) cycle_subG Gx.
+  rewrite (eq_bigl (generator <[x]>)) => [y|].
+    rewrite /generator eq_sym andbC; case xy: {+}(_ == _) => //.
+    rewrite !inE -!order_dvdn in Ax *.
+    by rewrite -cycle_subG /order -(eqP xy) cycle_subG Gx.
+  rewrite sum1dep_card -totient_gen -[#[x]](partnC p) //.
+  rewrite totient_coprime ?coprime_partC // dvdn_mulr // .
+  by rewrite (pA x Ax) p_part // -expnSr totient_pfactor // dvdn_mull.
 rewrite -sum1_card (partition_big_imset (fun x => x.`_p ^: G)) /=.
 apply: dvdn_sum => _ /imsetP[x /setIP[Gx Ax] ->].
 set y := x.`_p; have oy: #[y] = (n`_p * p)%N by rewrite order_constt pA.
-rewrite (partition_big (fun x => x.`_p) [in y ^: G]) /= => [|z]; last first.
+rewrite (partition_big (fun x => x.`_p) [in y ^: G]) /= => [z|].
   by case/andP=> _ /eqP <-; rewrite /= class_refl.
 pose G' := ('C_G[y] / <[y]>)%G; pose n' := gcdn #|G'| n`_p^'.
 have n'_gt0: 0 < n' by rewrite gcdn_gt0 cardG_gt0.
-rewrite (eq_bigr (fun _ => #|'Ldiv_n'(G')|)) => [|_ /imsetP[a Ga ->]].
+rewrite (eq_bigr (fun _ => #|'Ldiv_n'(G')|)) => [_ /imsetP[a Ga ->]|];
+    last first.
   rewrite sum_nat_const -index_cent1 indexgI.
   rewrite -(dvdn_pmul2l (cardG_gt0 'C_G[y])) mulnA LagrangeI.
   have oCy: #|'C_G[y]| = (#[y] * #|G'|)%N.
@@ -742,7 +743,7 @@ rewrite (eq_bigr (fun _ => #|'Ldiv_n'(G')|)) => [|_ /imsetP[a Ga ->]].
   by rewrite cardSg ?subsetIl // dvdn_mul ?pdiv_dvd.
 pose h := [fun z => coset <[y]> (z ^ a^-1)].
 pose h' := [fun Z : coset_of <[y]> => (y * (repr Z).`_p^') ^ a].
-rewrite -sum1_card (reindex_onto h h') /= => [|Z]; last first.
+rewrite -sum1_card (reindex_onto h h') /= => [Z|].
   rewrite conjgK coset_kerl ?cycle_id ?morph_constt ?repr_coset_norm //.
   rewrite /= coset_reprK 2!inE -order_dvdn dvdn_gcd => /and3P[_ _ p'Z].
   by apply: constt_p_elt (pnat_dvd p'Z _); apply: part_pnat.
@@ -755,28 +756,28 @@ apply: eq_bigl => z; apply/andP/andP=> [[]|[]].
   have G'z: h z \in G' by rewrite mem_morphim //= inE groupJ // groupV.
   rewrite inE G'z inE -order_dvdn dvdn_gcd order_dvdG //=.
   rewrite /order -morphim_cycle // -quotientE card_quotient ?cycle_subG //.
-  rewrite -(@dvdn_pmul2l #[y]) // Lagrange; last first.
+  rewrite -(@dvdn_pmul2l #[y]) // Lagrange.
     by rewrite /= cycleJ cycle_subG mem_conjgV -zp_ya mem_cycle.
   rewrite oy mulnAC partnC // [#|_|]orderJ; split.
     by rewrite !inE -!order_dvdn mulnC in Az; case/andP: Az.
   set Z := coset _ _; have NZ := repr_coset_norm Z; have:= coset_reprK Z.
   case/kercoset_rcoset=> {NZ}// _ /cycleP[i ->] ->{Z}.
-  rewrite consttM; last exact/commute_sym/commuteX/cent1P.
+  rewrite consttM; first exact/commute_sym/commuteX/cent1P.
   rewrite (constt1P _) ?p_eltNK 1?p_eltX ?p_elt_constt // mul1g.
   by rewrite conjMg consttJ conjgKV -zp_ya consttC.
 rewrite 2!inE -order_dvdn; set Z := coset _ _ => /andP[Cz n'Z] /eqP def_z.
 have Nz: z ^ a^-1 \in 'N(<[y]>).
-  rewrite -def_z conjgK groupMr; first by rewrite -(cycle_subG y) normG.
+  rewrite -def_z conjgK groupMr; last by rewrite -(cycle_subG y) normG.
   by rewrite groupX ?repr_coset_norm.
 have{Cz} /setIP[Gz Cz]: z ^ a^-1 \in 'C_G[y].
   case/morphimP: Cz => u Nu Cu /kercoset_rcoset[] // _ /cycleP[i ->] ->.
   by rewrite groupMr // groupX // inE groupX //; apply/cent1P.
 have{def_z} zp_ya: z.`_p = y ^ a.
   rewrite -def_z consttJ consttM.
-    rewrite constt_p_elt ?p_elt_constt //.
-    by rewrite (constt1P _) ?p_eltNK ?p_elt_constt ?mulg1.
-  apply: commute_sym; apply/cent1P.
-  by rewrite -def_z conjgK groupMl // in Cz; apply/cent1P.
+    apply: commute_sym; apply/cent1P.
+    by rewrite -def_z conjgK groupMl // in Cz; apply/cent1P.
+  rewrite constt_p_elt ?p_elt_constt //.
+  by rewrite (constt1P _) ?p_eltNK ?p_elt_constt ?mulg1.
 have ozp: (#[z ^ a^-1]`_p)%N = #[y] by rewrite -order_constt consttJ zp_ya conjgK.
 split; rewrite zp_ya // -class_lcoset lcoset_id // eqxx andbT.
 rewrite -(conjgKV a z) !inE groupJ //= -!order_dvdn orderJ; apply/andP; split.
