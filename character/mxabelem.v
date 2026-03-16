@@ -887,15 +887,15 @@ have nb_irr: #|sS| = (p ^ n.*2 + p.-1)%N.
     apply/eqP; rewrite eqEcard sub1set class_refl cards1.
     by rewrite -index_cent1 (setIidPl _) ?indexgg // sub_cent1.
   move/eqP: (class_formula S); rewrite (bigID [in Zcl]) /=.
-  rewrite (eq_bigr (fun _ => 1)) => [|zS]; last first.
+  rewrite (eq_bigr (fun _ => 1)) => [zS|].
     case/andP=> _ /setIdP[/imsetP[z Sz ->{zS}] /subsetIP[_ cSzS]].
     rewrite (setIidPl _) ?indexgg // sub_cent1 (subsetP cSzS) //.
     exact: mem_repr (class_refl S z).
-  rewrite sum1dep_card setIdE (setIidPr _) 1?cardsE ?cardZcl; last first.
+  rewrite sum1dep_card setIdE (setIidPr _) 1?cardsE ?cardZcl.
     by apply/subsetP=> zS /[!inE] /andP[].
   have pn_gt0: p ^ n.*2 > 0 by rewrite expn_gt0 p_gt0.
   rewrite card_irr_pchar // oSpn expnS -(prednK pn_gt0) mulnS eqn_add2l.
-  rewrite (eq_bigr (fun _ => p)) => [|xS]; last first.
+  rewrite (eq_bigr (fun _ => p)) => [xS|].
     case/andP=> SxS; rewrite inE SxS; case/imsetP: SxS => x Sx ->{xS} notZxS.
     have [y Sy ->] := repr_class S x; apply: p_maximal_index => //.
     apply: cent1_extraspecial_maximal => //; first exact: groupJ.
@@ -926,7 +926,7 @@ have wp1: w ^+ p = 1 by rewrite -irr_modeX // -ozp expg_order irr_mode1.
 have injw: {in 'Z(S) &, injective (irr_mode i0)}.
   move=> x y Zx Zy /= eq_xy; have [[Sx _] [Sy _]] := (setIP Zx, setIP Zy).
   apply: mx_faithful_inj (fful_nlin _ nlin_i0) _ _ Sx Sy _.
-  by rewrite !{1}irr_center_scalar ?eq_xy; first by split.
+  by rewrite !{1}irr_center_scalar ?eq_xy; last by split.
 have prim_w e: 0 < e < p -> p.-primitive_root (w ^+ e).
   case/andP=> e_gt0 lt_e_p; apply/andP; split=> //.
   apply/eqfunP=> -[d ltdp] /=; rewrite unity_rootE -exprM.
@@ -947,11 +947,11 @@ have alpha_i_z i: ((alpha ^+ ephi i) z = z ^+ i.+1)%g.
   transitivity ((a ^+ ephi i) z)%g.
     elim: (ephi i : nat) => // e IHe; rewrite !expgS !permM alphaZ //.
     have Aut_a: a \in Aut 'Z(S) by rewrite defAutZ cycle_id.
-    rewrite -{2}[a](invmK (injm_Zp_unitm z)); last by rewrite im_Zp_unitm -defZ.
+    rewrite -{2}[a](invmK (injm_Zp_unitm z)); first by rewrite im_Zp_unitm -defZ.
     rewrite /= autE ?cycle_id // -/j /= /cyclem.
     rewrite -(autmE (groupX _ Aut_a)) -(autmE (groupX _ Aut_alpha)).
     by rewrite !morphX //= !autmE IHe.
-  rewrite [(a ^+ _)%g](invmK (injm_Zpm a)) /=; last first.
+  rewrite [(a ^+ _)%g](invmK (injm_Zpm a)) /=.
     by rewrite im_Zpm -defAutZ defZ Aut_aut.
   by rewrite autE ?cycle_id //= val_Zp_nat ozp ?modIp'.
 have rphiP i: S :==: autm (groupX (ephi i) Aut_alpha) @* S by rewrite im_autm.
@@ -993,14 +993,14 @@ split=> // [i | ze | i].
 rewrite deg_phi {i}; set d := irr_degree i0.
 apply/eqP; move/eqP: (sum_irr_degree_pchar sS F'S splitF).
 rewrite (bigID [in linS]) /= -/irr_degree.
-rewrite (eq_bigr (fun=> 1)) => [|i]; last by rewrite !inE; move/eqP->.
+rewrite (eq_bigr (fun=> 1)) => [i|]; first by rewrite !inE; move/eqP->.
 rewrite sum1_card nb_lin.
-rewrite (eq_bigl [in codom iphi]) // => [|i]; last first.
+rewrite (eq_bigl [in codom iphi]) // => [i|].
   by rewrite -in_setC -im_iphi.
-rewrite (eq_bigr (fun=> d ^ 2))%N => [|_ /codomP[i ->]]; last first.
+rewrite (eq_bigr (fun=> d ^ 2))%N => [_ /codomP[i ->]|].
   by rewrite deg_phi.
 rewrite sum_nat_const card_image // card_ord oSpn (expnS p) -{3}[p]prednK //.
-rewrite mulSn eqn_add2l eqn_pmul2l; last by rewrite -ltnS prednK.
+rewrite mulSn eqn_add2l eqn_pmul2l; first by rewrite -ltnS prednK.
 by rewrite -muln2 expnM eqn_sqr.
 Qed.
 

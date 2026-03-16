@@ -803,7 +803,7 @@ Proof.
 move=> GactS; have sGD := acts_dom GactS.
 transitivity (\sum_(a in G) \sum_(x in 'Fix_(S | to)[a]) 1%N).
   by apply: eq_bigr => a _; rewrite -sum1_card.
-rewrite (exchange_big_dep [in S]) /= => [|a x _]; last by case/setIP.
+rewrite (exchange_big_dep [in S]) /= => [a x _|]; first by case/setIP.
 rewrite (set_partition_big _ (orbit_partition GactS)) -sum_nat_const /=.
 apply: eq_bigr => _ /imsetP[x Sx ->].
 rewrite -(card_orbit_in_stab x sGD) -sum_nat_const.
@@ -1078,7 +1078,7 @@ Lemma astab_trans_gcore G S u :
   [transitive G, on S | to] -> u \in S -> 'C(S | to) = gcore 'C[u | to] G.
 Proof.
 move=> transG Su; apply/eqP; rewrite eqEsubset.
-rewrite gcore_max ?astabS ?sub1set //=; last first.
+rewrite gcore_max ?astabS ?sub1set //=.
   exact: subset_trans (atrans_acts transG) (astab_norm _ _).
 apply/subsetP=> x cSx; apply/astabP=> uy.
 case/(atransP2 transG Su) => y Gy ->{uy}.
@@ -1444,7 +1444,7 @@ move=> cSH /subsetIP[sGD nHG].
 apply/eqP; rewrite eqEsubset !subsetI !subsetIl /= -!astabCin ?quotientS //.
 have cfixH F: H \subset 'C(S :&: F | to).
   by rewrite (subset_trans cSH) // astabS ?subsetIl.
-rewrite andbC astab_mod ?quotientS //=; last by rewrite astabCin ?subsetIr.
+rewrite andbC astab_mod ?quotientS //=; first by rewrite astabCin ?subsetIr.
 by rewrite -(quotientSGK nHG) //= -astab_mod // astabCin ?quotientS ?subsetIr.
 Qed.
 
@@ -2382,7 +2382,7 @@ Qed.
 Lemma morph_gacent A : A \subset D1 -> h @* 'C_(|to1)(A) = 'C_(|to2)(f @* A).
 Proof.
 have [[_ defD2] [injh defR2]] := (isomP iso_f, isomP iso_h).
-move=> sAD1; rewrite !gacentE //; last by rewrite -defD2 morphimS.
+move=> sAD1; rewrite !gacentE //; first by rewrite -defD2 morphimS.
 rewrite morphimEsub ?subsetIl // -{1}defR2 morphimEdom.
 exact: (morph_afix (gact_stable to1) (injmP injh)).
 Qed.

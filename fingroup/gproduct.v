@@ -379,7 +379,7 @@ Lemma index_sdprodr G A B M :
   A ><| B = G -> M \subset B -> #|B : M| =  #|G : A <*> M|.
 Proof.
 move=> defG; case/sdprodP: defG (defG) => [[K H -> ->] mulKH nKH _] defG sMH.
-rewrite -!divgS //=; last by rewrite -genM_join gen_subG -mulKH mulgS.
+rewrite -!divgS //=; first by rewrite -genM_join gen_subG -mulKH mulgS.
 by rewrite -(sdprod_card defG) -(sdprod_card (sdprod_subr defG sMH)) divnMl.
 Qed.
 
@@ -584,7 +584,7 @@ Lemma cprod_modl A B G H :
   A \* B = G -> A \subset H -> A \* (B :&: H) = G :&: H.
 Proof.
 case/cprodP=> [[U V -> -> {A B}]] defG cUV sUH.
-by rewrite cprodE; [rewrite group_modl ?defG | rewrite subIset ?cUV].
+by rewrite cprodE; [rewrite subIset ?cUV | rewrite group_modl ?defG].
 Qed.
 
 Lemma cprod_modr A B G H :
@@ -596,13 +596,13 @@ Lemma bigcprodYP (I : finType) (P : pred I) (H : I -> {group gT}) :
           (\big[cprod/1]_(i | P i) H i == (\prod_(i | P i) H i)%G).
 Proof.
 apply: (iffP eqP) => [defG i j Pi Pj neq_ij | cHH].
-  rewrite (bigD1 j) // (bigD1 i) /= ?cprodA in defG; last exact/andP.
+  rewrite (bigD1 j) // (bigD1 i) /= ?cprodA in defG; first exact/andP.
   by case/cprodP: defG => [[K _ /cprodP[//]]].
 set Q := P; have sQP: subpred Q P by []; have [n leQn] := ubnP #|Q|.
 elim: n => // n IHn in (Q) leQn sQP *.
 have [i Qi | Q0] := pickP Q; last by rewrite !big_pred0.
 rewrite (cardD1x Qi) add1n ltnS !(bigD1 i Qi) /= in leQn *.
-rewrite {}IHn {n leQn}// => [|j /andP[/sQP //]].
+rewrite {}IHn {n leQn}// => [j /andP[/sQP //]|].
 rewrite bigprodGE cprodEY // gen_subG; apply/bigcupsP=> j /andP[neq_ji Qj].
 by rewrite cHH ?sQP.
 Qed.
@@ -774,7 +774,7 @@ set Q := P; have sQP: subpred Q P by []; have [n leQn] := ubnP #|Q|.
 elim: n => // n IHn in (Q) leQn sQP *.
 have [i Qi | Q0] := pickP Q; last by rewrite !big_pred0.
 rewrite (cardD1x Qi) add1n ltnS !(bigD1 i Qi) /= in leQn *.
-rewrite {}IHn {n leQn}// => [|j /andP[/sQP //]].
+rewrite {}IHn {n leQn}// => [j /andP[/sQP //]|].
 apply/dprodYP; apply: subset_trans (dxG i (sQP i Qi)); rewrite !bigprodGE.
 by apply: genS; apply/bigcupsP=> j /andP[Qj ne_ji]; rewrite (bigcup_max j) ?sQP.
 Qed.
@@ -783,7 +783,7 @@ Lemma dprod_modl A B G H :
   A \x B = G -> A \subset H -> A \x (B :&: H) = G :&: H.
 Proof.
 case/dprodP=> [[U V -> -> {A B}]] defG cUV trUV sUH.
-rewrite dprodEcp; first by apply: cprod_modl; rewrite ?cprodE.
+rewrite dprodEcp; last by apply: cprod_modl; rewrite ?cprodE.
 by rewrite setIA trUV (setIidPl _) ?sub1G.
 Qed.
 
@@ -948,7 +948,7 @@ Proof.
 elim/big_rec2: _ G => [|i fB B Pi def_fB] G sGD defG.
   by rewrite -defG morphim1.
 case/cprodP: defG (defG) => [[Hi Gi -> defB] _ _]; rewrite defB => defG.
-rewrite (def_fB Gi) //; first exact: morphim_cprod.
+rewrite (def_fB Gi) //; last exact: morphim_cprod.
 by apply: subset_trans sGD; case/cprod_normal2: defG => _ /andP[].
 Qed.
 
@@ -959,7 +959,7 @@ Proof.
 move=> sGD injf; elim/big_rec2: _ G sGD => [|i fB B Pi def_fB] G sGD defG.
   by rewrite -defG morphim1.
 case/dprodP: defG (defG) => [[Hi Gi -> defB] _ _ _]; rewrite defB => defG.
-rewrite (def_fB Gi) //; first exact: injm_dprod.
+rewrite (def_fB Gi) //; last exact: injm_dprod.
 by apply: subset_trans sGD; case/dprod_normal2: defG => _ /andP[].
 Qed.
 
@@ -1273,7 +1273,7 @@ suff -> : \big[dprod/1]_i groupXn1 (H i) = (\prod_i groupXn1 (H i))%G.
   by rewrite comm_prodG//=; apply: in2W; apply: set1gXn_commute.
 apply/eqP; apply/bigdprodYP => i //= _; rewrite subsetD.
 apply/andP; split.
-  rewrite comm_prodG; last by apply: in2W; apply: set1gXn_commute.
+  rewrite comm_prodG; first by apply: in2W; apply: set1gXn_commute.
   apply/centsP => _ /prodsgP[/= h_ h_P ->] _ /set1gXnP [h hH ->].
   apply/ffunP => j; rewrite !ffunE/=.
   rewrite (big_morph _ (@dffunM j) (_ : _ = 1)) ?ffunE//.
@@ -1281,7 +1281,7 @@ apply/andP; split.
   rewrite big1 ?mulg1 ?mul1g// => j neq_ji.
   by have /set1gXnP[? _ ->] := h_P j neq_ji; rewrite ffunE dfwith_out.
 rewrite -setI_eq0 -subset0; apply/subsetP => /= x; rewrite !inE.
-rewrite comm_prodG; last by apply: in2W; apply: set1gXn_commute.
+rewrite comm_prodG; first by apply: in2W; apply: set1gXn_commute.
 move=> /and3P[+ + /set1gXnP [h _ x_h]]; rewrite {x}x_h.
 move=> /prodsgP[x_ x_P /ffunP/(_ i)]; rewrite ffunE dfwith_in => {h}->.
 apply: contra_neqT => _; apply/ffunP => j; rewrite !ffunE/=.
@@ -1300,7 +1300,7 @@ Qed.
 Lemma setXn_gen H : (forall i, 1 \in H i) -> 
   <<setXn H>> = setXn (fun i => <<H i>>).
 Proof.
-move=> H1; apply/eqP; rewrite eqEsubset gen_subG setXnS/=; last first.
+move=> H1; apply/eqP; rewrite eqEsubset gen_subG setXnS/=.
   by move=> ?; rewrite subset_gen.
 rewrite -[in X in X \subset _]setXn_prod; under eq_bigr do
    rewrite -morphim_dfung1 morphim_gen ?subsetT// morphim_dfung1.
@@ -1426,7 +1426,7 @@ Lemma sdpair_setact (G : {set rT}) a : G \subset R -> a \in D ->
   sdpair1 @* (to^~ a @: G) = (sdpair1 @* G) :^ sdpair2 a.
 Proof.
 move=> sGR Da; have GtoR := subsetP sGR; apply/eqP.
-rewrite eqEcard cardJg !(card_injm injm_sdpair1) //; last first.
+rewrite eqEcard cardJg !(card_injm injm_sdpair1) //.
   by apply/subsetP=> _ /imsetP[x Gx ->]; rewrite gact_stable ?GtoR.
 rewrite (card_imset _ (act_inj _ _)) leqnn andbT.
 apply/subsetP=> _ /morphimP[xa Rxa /imsetP[x Gx def_xa ->]].
@@ -1558,7 +1558,7 @@ Canonical pprodm_morphism := Morphism pprodmM.
 Lemma morphim_pprodm A B :
   A \subset H -> B \subset K -> f @* (A * B) = fH @* A * fK @* B.
 Proof.
-move=> sAH sBK; rewrite [f @* _]morphimEsub /=; last first.
+move=> sAH sBK; rewrite [f @* _]morphimEsub /=.
   by rewrite norm_joinEr // mulgSS.
 apply/setP=> y; apply/imsetP/idP=> [[_ /mulsgP[x a Ax Ba ->] ->{y}] |].
   have Hx := subsetP sAH x Ax; have Ka := subsetP sBK a Ba.

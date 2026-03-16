@@ -104,9 +104,9 @@ Proof.
 set n := #|F|; set oppX := - 'X; set pF := LHS.
 have le_oppX_n: size oppX <= n by rewrite size_polyN size_polyX finNzRing_gt1.
 have: size pF = (size (enum F)).+1 by rewrite -cardE size_polyDl size_polyXn.
-move/all_roots_prod_XsubC->; last by rewrite uniq_rootsE enum_uniq.
-  by rewrite big_enum lead_coefDl ?size_polyXn // lead_coefXn scale1r.
-by apply/allP=> x _; rewrite rootE !hornerE expf_card subrr.
+move/all_roots_prod_XsubC->; [|by rewrite uniq_rootsE enum_uniq|].
+  by apply/allP=> x _; rewrite rootE !hornerE expf_card subrr.
+by rewrite big_enum lead_coefDl ?size_polyXn // lead_coefXn scale1r.
 Qed.
 
 Lemma finPcharP : {p | prime p & p \in [pchar F]}.
@@ -718,7 +718,7 @@ have ->: #|u ^: G|%:R = \prod_(d < n.+1 | d %| n) (aq d / aq d ^+ (d %| m)).
   rewrite -index_cent1 natf_indexg ?subsetT //= setTI prodf_div prod_aq // -oG.
   congr (_ / _); rewrite big_mkcond oCu -prod_aq //= big_mkcond /=.
   by apply: eq_bigr => d _; case: ifP => [/dvdn_trans->| _]; rewrite ?if_same.
-rewrite (bigD1 ord_max) //= [n %| m](contraNF _ Z'u) => [|n_dv_m]; last first.
+rewrite (bigD1 ord_max) //= [n %| m](contraNF _ Z'u) => [n_dv_m|].
   rewrite -sub_cent1 subEproper eq_sym eqEcard subsetT oG oCu leq_sub2r //.
   by rewrite leq_exp2l // dvdn_leq.
 rewrite divr1 dvdC_mulr //; apply/rpred_prod => d /andP[/Zaq-Zaqd _].
