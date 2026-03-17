@@ -68,9 +68,7 @@ with builtins; with (import <nixpkgs> {}).lib;
          mathcomp-doc.job = true;
          mathcomp.job = false;
          stdlib.job = true;
-         # jasmin.override.version = "main";
-         jasmin.job = false;  # broken since https://github.com/math-comp/math-comp/pull/1256
-         # (see https://github.com/jasmin-lang/jasmin/pull/1093 for details)
+         jasmin.override.version = "main";
          ssprove.override.version = "main";
          # To add an overlay applying to all bundles,
          # add below a line like
@@ -100,6 +98,10 @@ with builtins; with (import <nixpkgs> {}).lib;
       coquelicot.job = false;
       ssprove.job = false;
       mathcomp-infotheo.job = false;  # not compatible with master
+      paco.override.version = "master";  # for jasmin
+      paco.job = false;  # only for jasmin
+      ITree.override.version = "master";  # for jasmin
+      ITree.job = false;  # only for jasmin
     }; };
     "rocq-9.2" = { rocqPackages = {
       rocq-core.override.version = "9.2";
@@ -108,6 +110,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq-elpi.job = true;
       hierarchy-builder.job = true;
       interval.job = false;
+      jasmin.job = false;  # waiting for InteractionTrees
       ssprove.job = false;  # waiting for equations
       mathcomp-infotheo.job = false;  # not yet compatible with 9.2
     }; };
