@@ -38,6 +38,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "coqeal"
       "coquelicot"
       "ExtLib"
+      "fcsl-pcm"
       "fourcolor"
       "gaia"
       "graph-theory"
