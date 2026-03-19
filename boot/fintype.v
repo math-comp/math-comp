@@ -336,19 +336,20 @@ Notation "[ 'forall' x 'in' A B ]" := [x | all_in (x \in A) B]
 Notation "[ 'forall' x : T 'in' A B ]" := [x : T | all_in (x \in A) B]
   (only parsing) : bool_scope.
 Notation ", 'forall' x B" := [x | all B]^*
-  (at level 200, x at level 99,
+  (at level 200, x at level 99, B at level 200,
    format ", '/ '  'forall'  x B") : fin_quant_scope.
 Notation ", 'forall' x : T B" := [x : T | all B]^*
-  (only parsing) : fin_quant_scope.
+  (B at level 200, only parsing) : fin_quant_scope.
 Notation ", 'forall' ( x | C ) B" := [x | all_in C B]^*
-  (at level 200, x at level 99,
+  (at level 200, x at level 99, B at level 200,
    format ", '/ '  '[' 'forall'  ( x '/  '  |  C ) ']' B") : fin_quant_scope.
 Notation ", 'forall' ( x : T | C ) B" := [x : T | all_in C B]^*
-  (only parsing) : fin_quant_scope.
+  (B at level 200, only parsing) : fin_quant_scope.
 Notation ", 'forall' x 'in' A B" := [x | all_in (x \in A) B]^*
-  (format ", '/ '  '[' 'forall'  x '/  '  'in'  A ']' B") : bool_scope.
+  (B at level 200,
+   format ", '/ '  '[' 'forall'  x '/  '  'in'  A ']' B") : bool_scope.
 Notation ", 'forall' x : T 'in' A B" := [x : T | all_in (x \in A) B]^*
-  (only parsing) : bool_scope.
+  (B at level 200, only parsing) : bool_scope.
 
 Notation "[ 'exists' x B ]" := (~~ [x | ex B])
   (x at level 99,
@@ -364,19 +365,20 @@ Notation "[ 'exists' x 'in' A B ]" := (~~ [x | ex_in (x \in A) B])
 Notation "[ 'exists' x : T 'in' A B ]" := (~~ [x : T | ex_in (x \in A) B])
   (only parsing) : bool_scope.
 Notation ", 'exists' x B" := (~~ [x | ex B])^*
-  (at level 200, x at level 99,
+  (at level 200, x at level 99, B at level 200,
    format ", '/ '  'exists'  x B") : fin_quant_scope.
 Notation ", 'exists' x : T B" := (~~ [x : T | ex B])^*
-  (only parsing) : fin_quant_scope.
+  (B at level 200, only parsing) : fin_quant_scope.
 Notation ", 'exists' ( x | C ) B" := (~~ [x | ex_in C B])^*
-  (at level 200, x at level 99,
+  (at level 200, x at level 99, B at level 200,
    format ", '/ '  '[' 'exists'  ( x '/  '  |  C ) ']' B") : fin_quant_scope.
 Notation ", 'exists' ( x : T | C ) B" := (~~ [x : T | ex_in C B])^*
-  (only parsing) : fin_quant_scope.
+  (B at level 200, only parsing) : fin_quant_scope.
 Notation ", 'exists' x 'in' A B" := (~~ [x | ex_in (x \in A) B])^*
-  (format ", '/ '  '[' 'exists'  x '/  '  'in'  A ']' B") : bool_scope.
+  (B at level 200,
+   format ", '/ '  '[' 'exists'  x '/  '  'in'  A ']' B") : bool_scope.
 Notation ", 'exists' x : T 'in' A B" := (~~ [x : T | ex_in (x \in A) B])^*
-  (only parsing) : bool_scope.
+  (B at level 200, only parsing) : bool_scope.
 
 End Exports.
 
