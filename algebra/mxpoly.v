@@ -1,9 +1,10 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
-From mathcomp Require Import div fintype tuple finfun bigop fingroup perm.
-From mathcomp Require Import ssralg zmodp matrix mxalgebra poly polydiv.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
+From mathcomp Require Import choice fintype tuple finfun bigop fingroup perm.
+From mathcomp Require Import nmodule algebra divalg decfield matrix mxalgebra.
+From mathcomp Require Import poly polydiv.
 
 (******************************************************************************)
 (*   This file provides basic support for formal computation with matrices,   *)

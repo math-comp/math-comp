@@ -1,9 +1,10 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import fintype finfun bigop finset fingroup perm order.
-From mathcomp Require Import div prime binomial ssralg finalg zmodp matrix.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
+From mathcomp Require Import choice fintype finfun bigop prime finset binomial.
+From mathcomp Require Import nmodule fingroup perm order algebra divalg finalg.
+From mathcomp Require Import zmodp matrix.
 
 (*****************************************************************************)
 (* In this file we develop the rank and row space theory of matrices, based  *)

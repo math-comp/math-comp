@@ -1,8 +1,8 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
-From mathcomp Require Import choice fintype finfun bigop fingroup perm order.
-From mathcomp Require Import ssralg zmodp matrix mxalgebra poly polydiv mxpoly.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
+From mathcomp Require Import fintype finfun bigop nmodule order algebra divalg.
+From mathcomp Require Import poly polydiv matrix mxalgebra mxpoly.
 
 (*****************************************************************************)
 (* In this file, we prove diagonalization theorems. For this purpose, we     *)
