@@ -28,6 +28,11 @@ From mathcomp Require Import orderedzmod numdomain numfield ssrint.
 (*                  {i01 R} is canonically stable by common operations.       *)
 (*    {posnum R} := {itv R & `]0, +oo[)                                       *)
 (*    {nonneg R} := {itv R & `[0, +oo[)                                       *)
+(* {itv nat & i} := generic type of natural numbers in interval i             *)
+(*     {i01 nat} := {itv nat & `[0, 1]}                                       *)
+(*                  Natural numbers in [0, 1], i.e., 0 or 1.                  *)
+(*  {posnum nat} := {natitv `]0, +oo[)                                        *)
+(*                  Natural numbers greater than 0.                           *)
 (* ```                                                                        *)
 (*                                                                            *)
 (* ## casts from/to values within known interval                              *)
@@ -429,12 +434,12 @@ Proof. by move=> + [//| xi] [//| yi]; apply. Qed.
 Module Exports.
 Arguments r {T sem i}.
 Notation "{ 'itv' R & i }" := (def (@num_sem R) (Itv.Real i%Z)) : type_scope.
-Notation "{ 'natitv' i }" := (def nat_sem (Itv.Real i%Z)) : type_scope.
+Notation "{ 'itv' 'nat' & i }" := (def nat_sem (Itv.Real i%Z)) : type_scope.
 Notation "{ 'i01' R }" := {itv R & `[0, 1]} : type_scope.
-Notation "{ 'n01' }" := {natitv `[0, 1]} : type_scope.
+Notation "{ 'i01' 'nat' }" := {itv nat & `[0, 1]} : type_scope.
 Notation "{ 'posnum' R }" := (@posnum _ (Phant R))  : ring_scope.
 Notation "{ 'nonneg' R }" := (@nonneg _ (Phant R))  : ring_scope.
-Notation "{ 'posnat' }" := (def nat_sem (Itv.Real `]0, +oo[ )) : type_scope.
+Notation "{ 'posnum' 'nat' }" := (def nat_sem (Itv.Real `]0%Z, +oo[ )) : type_scope.
 Notation "x %:itv" := (from (Phantom _ x)) : ring_scope.
 Notation "[ 'itv' 'of' x ]" := (fromP (Phantom _ x)) : ring_scope.
 Notation num := r.
@@ -591,6 +596,11 @@ case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_].
 by rewrite /= in_itv/= andbT.
 Qed.
 
+Lemma gtn0 (x : nat_def i) : unify_itv i (Itv.Real `]0, +oo[) -> (0 < x%:num)%N.
+Proof.
+by case: x => x /= /[swap] /nat_spec_sub /[apply] /andP[_] //.
+Qed.
+
 Lemma le0F x : unify_itv i (Itv.Real `]0%Z, +oo[) -> (x%:num <= 0 :> R) = false.
 Proof.
 case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=.
@@ -649,6 +659,21 @@ Lemma eq0F x :
   (x%:num == 0 :> R) = false.
 Proof. by move=> u; apply/negbTE/neq0. Qed.
 
+Lemma neqn0 (n : nat_def i) :
+  unify (fun ix iy => ~~ Itv.sub ix iy) (Itv.Real `[0%Z, 0%Z]) i ->
+  (n%:num != 0)%N.
+Proof.
+case: i n => [//| [l u] [n /= Pn]]; apply: contra => /eqP n0 /=.
+move: Pn; rewrite n0 => /andP[l0 u0]; apply/andP; split.
+- by case: l l0 => [[] l /= |//]; rewrite !bnd_simp ?lerz0 ?ltrz0.
+- by case: u u0 => [[] u /= |//]; rewrite !bnd_simp ?ler0z ?ltr0z.
+Qed.
+
+Lemma eqn0F (n : nat_def i) :
+  unify (fun ix iy => ~~ Itv.sub ix iy) (Itv.Real `[0%Z, 0%Z]) i ->
+  (n%:num == 0)%N = false.
+Proof. by move=> u; apply/negbTE/neqn0. Qed.
+
 Lemma lt1 x : unify_itv i (Itv.Real `]-oo, 1%Z[) -> x%:num < 1 :> R.
 Proof.
 by case: x => x /= /[swap] /num_spec_sub /[apply] /andP[_] /=; rewrite in_itv.
@@ -692,6 +717,7 @@ End NumDomainTheory.
 
 Arguments bottom {R i} _ {_}.
 Arguments gt0 {R i} _ {_}.
+Arguments gtn0 {i} _ {_}.
 Arguments le0F {R i} _ {_}.
 Arguments lt0 {R i} _ {_}.
 Arguments ge0F {R i} _ {_}.
@@ -702,6 +728,8 @@ Arguments gt0F {R i} _ {_}.
 Arguments cmp0 {R i} _ {_}.
 Arguments neq0 {R i} _ {_}.
 Arguments eq0F {R i} _ {_}.
+Arguments neqn0 {i} _ {_}.
+Arguments eqn0F {i} _ {_}.
 Arguments lt1 {R i} _ {_}.
 Arguments ge1F {R i} _ {_}.
 Arguments le1 {R i} _ {_}.
@@ -746,12 +774,14 @@ Notation "[ 'neq0' 'of' x ]" := (ltac:(refine (neq0 x%:itv))) (only parsing).
 #[export] Hint Extern 0 (is_true (_ != 0%R)) => solve [apply: neq0] : core.
 #[export] Hint Extern 0 (is_true (_ < 1%R)%R) => solve [apply: lt1] : core.
 #[export] Hint Extern 0 (is_true (_ <= 1%R)%R) => solve [apply: le1] : core.
+#[export] Hint Extern 0 (is_true (0%R < _)%N) => solve [apply: gtn0] : core.
+#[export] Hint Extern 0 (is_true (_ != 0)%N) => solve [apply: neqn0] : core.
 
 Notation "x %:i01" := (widen_itv x%:itv : {i01 _}) (only parsing) : ring_scope.
 Notation "x %:i01" := (@widen_itv _ _
     (@Itv.from _ _ _ (Phantom _ x)) (Itv.Real `[0, 1]%Z) _)
   (only printing) : ring_scope.
-Notation "x %:n01" := (widen_natitv x%N%:itv : {n01}) (only parsing)
+Notation "x %:n01" := (widen_natitv x%N%:itv : {i01 nat}) (only parsing)
   : ring_scope.
 Notation "x %:n01" := (@widen_natitv _ _
     (@Itv.from _ _ _ (Phantom _ x)) (Itv.Real `[0, 1]%Z) _)
@@ -766,7 +796,7 @@ Notation "x %:nng" := (widen_itv x%:itv : {nonneg _}) (only parsing)
 Notation "x %:nng" := (@widen_itv _ _
     (@Itv.from _ _ _ (Phantom _ x)) (Itv.Real `[0%Z, +oo[) _)
   (only printing) : ring_scope.
-Notation "x %:posnat" := (widen_natitv x%N%:itv : {posnat}) (only parsing)
+Notation "x %:posnat" := (widen_natitv x%N%:itv : {posnum nat}) (only parsing)
   : ring_scope.
 Notation "x %:posnat" := (@widen_natitv
     (@Itv.from _ _ _ (Phantom _ x)) (Itv.Real `]0, +oo[) _)
@@ -1632,60 +1662,3 @@ Variant nonneg_spec (R : numDomainType) (x : R) : R -> bool -> Type :=
 
 Lemma nonnegP (R : numDomainType) (x : R) : 0 <= x -> nonneg_spec x x (0 <= x).
 Proof. by move=> xge0; rewrite xge0 -[x]/(NngNum xge0)%:num; constructor. Qed.
-
-Section Test1.
-
-Variable R : numDomainType.
-Variable x : {i01 R}.
-
-Goal 0%:i01 = 1%:i01 :> {i01 R}.
-Proof.
-Abort.
-
-Goal (- x%:num)%:itv = (- x%:num)%:itv :> {itv R & `[-1, 0]}.
-Proof.
-Abort.
-
-Goal (1 - x%:num)%:i01 = x.
-Proof.
-Abort.
-
-End Test1.
-
-Section Test2.
-
-Variable R : realDomainType.
-Variable x y : {i01 R}.
-
-Goal (x%:num * y%:num)%:i01 = x%:num%:i01.
-Proof.
-Abort.
-
-End Test2.
-
-Module Test3.
-Section Test3.
-Variable R : realDomainType.
-
-Definition s_of_pq (p q : {i01 R}) : {i01 R} :=
-  (1 - ((1 - p%:num)%:i01%:num * (1 - q%:num)%:i01%:num))%:i01.
-
-Lemma s_of_p0 (p : {i01 R}) : s_of_pq p 0%:i01 = p.
-Proof. by apply/val_inj; rewrite /= subr0 mulr1 subKr. Qed.
-
-End Test3.
-End Test3.
-
-Module Test4.
-Section Test4.
-
-Type 0%:n01 : {n01}.
-Type 1%:n01 : {n01}.
-Fail Type 2%:n01 : {n01}.
-
-Type 1%:posnat : {posnat}.
-Type 2%:posnat : {posnat}.
-Fail Type 0%:posnat : {posnat}.
-
-End Test4.
-End Test4.
