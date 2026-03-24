@@ -10,13 +10,13 @@ From Corelib Require Import ssreflect.
 (* For tensors we define:                                                     *)
 (*                 pseq == the type of sequences of strictly positive natural *)
 (*                         numbers, coerces to and from seq.                  *)
-(*       'T[R]_(us, ds) == the type of tensors with elements of type R,       *)
-(*       'T_(us, ds)       contravariant dimensions us, and covariant         *)
-(*                         dimensions ds, e.g. 'T[nat]_([:: 1; 3], [::])      *)
-(*                         (us and ds must be instances of pseq).             *)
+(*       'T[R]_(u_, d_) == the type of tensors with elements of type R,       *)
+(*       'T_(u_, d_)       contravariant dimensions u_, and covariant         *)
+(*                         dimensions d_, e.g. 'T[nat]_([:: 1; 3], [::])      *)
+(*                         (u_ and d_ must be instances of pseq).             *)
 (*                         The [R] is optional and can usually be ommited.    *)
-(* 'nT[R]_(us), 'nT_(us) == 'T[R]_(us, [::]), purely contravariant tensors.   *)
-(* 'oT[R]_(ds), 'oT_(ds) == 'T[R]_([::], ds), purely covariant tensors.       *)
+(* 'nT[R]_(u_), 'nT_(u_) == 'T[R]_(u_, [::]), purely contravariant tensors.   *)
+(* 'oT[R]_(d_), 'oT_(d_) == 'T[R]_([::], d_), purely covariant tensors.       *)
 (*                  t^^i == the tensor obtained by fixing the first           *)
 (*                          contravariant dimension of t to i.                *)
 (*                  t`_i == the tensor obtained by fixing the first           *)
@@ -63,18 +63,18 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 
-Reserved Notation "''nT_' ( us )"
-  (at level 0, us at level 2, format "''nT_' ( us )").
-Reserved Notation "''oT_' ( ds )"
-  (at level 0, ds at level 2, format "''oT_' ( ds )").
-Reserved Notation "''nT[' R ]_ ( us )" (at level 0, us at level 2).
+Reserved Notation "''nT_' ( u_ )"
+  (at level 0, u_ at level 2, format "''nT_' ( u_ )").
+Reserved Notation "''oT_' ( d_ )"
+  (at level 0, d_ at level 2, format "''oT_' ( d_ )").
+Reserved Notation "''nT[' R ]_ ( u_ )" (at level 0, u_ at level 2).
   (* only parsing *)
-Reserved Notation "''oT[' R ]_ ( ds )" (at level 0, ds at level 2).
+Reserved Notation "''oT[' R ]_ ( d_ )" (at level 0, d_ at level 2).
   (* only parsing *)
-Reserved Notation "''T_' ( us , ds )"
-  (at level 0, us at level 2, ds at level 2, format "''T_' ( us ,  ds )").
-Reserved Notation "''T[' R ]_ ( us , ds )"
-  (at level 0, us at level 2, ds at level 2). (* only parsing*)
+Reserved Notation "''T_' ( u_ , d_ )"
+  (at level 0, u_ at level 2, d_ at level 2, format "''T_' ( u_ ,  d_ )").
+Reserved Notation "''T[' R ]_ ( u_ , d_ )"
+  (at level 0, u_ at level 2, d_ at level 2). (* only parsing*)
 
 Reserved Notation "t ^^ i"
   (at level 3, i at level 2, left associativity, format "t ^^ i").
@@ -130,12 +130,12 @@ HB.instance Definition _ := [isNew for tensor_val].
 
 End TensorDef.
 
-Notation "''T[' R ]_ ( us , ds )" := (tensor us ds R) (only parsing).
-Notation "''T_' ( us , ds )" := 'T[_]_(us, ds).
-Notation "''nT[' R ]_ ( us )" := 'T[R]_(us, tensor_nil_f) (only parsing).
-Notation "''oT[' R ]_ ( ds )" := 'T[R]_(tensor_nil_f, ds) (only parsing).
-Notation "''oT_' ( ds )" := 'oT[_]_(ds).
-Notation "''nT_' ( us )" := 'nT[_]_(us).
+Notation "''T[' R ]_ ( u_ , d_ )" := (tensor u_ d_ R) (only parsing).
+Notation "''T_' ( u_ , d_ )" := 'T[_]_(u_, d_).
+Notation "''nT[' R ]_ ( u_ )" := 'T[R]_(u_, tensor_nil_f) (only parsing).
+Notation "''oT[' R ]_ ( d_ )" := 'T[R]_(tensor_nil_f, d_) (only parsing).
+Notation "''oT_' ( d_ )" := 'oT[_]_(d_).
+Notation "''nT_' ( u_ )" := 'nT[_]_(u_).
 
 Import Algebra GRing.
 
