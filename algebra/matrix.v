@@ -3106,8 +3106,8 @@ End MapSemiRingMatrix.
 
 Section CommMx.
 (***********************************************************************)
-(************* Commutation property specialized to 'M[R]_n *************)
-(***********************************************************************)
+(* Commutation property specialized to 'M[R]_n                         *)
+(*                                                                     *)
 (* GRing.comm is bound to (non trivial) rings, and matrices form a     *)
 (* (non trivial) ring only when they are square and of manifestly      *)
 (* positive size. However during proofs in endomorphism reduction, we  *)
