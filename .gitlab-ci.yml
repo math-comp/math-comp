@@ -108,8 +108,12 @@ rocq-prover_9.0:
 rocq-prover_9.1:
   extends: .opam-build-once
 
-# rocq-prover_9.2: # to uncomment when 9.2+rc1 available
-#   # to be replaced with .opam-build-once when 9.2.0 available
+rocq-prover_9.2:
+  # to be replaced with .opam-build-once when 9.2.0 available
+  extends: .opam-build
+
+# rocq-prover_9.3: # to uncomment when 9.3+rc1 available
+#   # to be replaced with .opam-build-once when 9.3.0 available
 #   extends: .opam-build
 
 rocq-prover_dev:
@@ -177,11 +181,17 @@ test-rocq-prover-9.1:
   variables:
     COQ_VERSION: "9.1"
 
-# test-rocq-prover-9.2: # to uncomment when 9.2+rc1 available
-#   # to be replaced with .test-rocq-once when 9.2.0 available
+test-rocq-prover-9.2:
+  # to be replaced with .test-rocq-once when 9.2.0 available
+  extends: .test-rocq
+  variables:
+    COQ_VERSION: "9.2"
+
+# test-rocq-prover-9.3: # to uncomment when 9.3+rc1 available
+#   # to be replaced with .test-rocq-once when 9.3.0 available
 #   extends: .test-rocq
 #   variables:
-#     COQ_VERSION: "9.2"
+#     COQ_VERSION: "9.3"
 
 test-rocq-prover-dev:
   extends: .test-rocq
@@ -417,8 +427,12 @@ mathcomp-dev_rocq-prover-9.0:
 mathcomp-dev_rocq-prover-9.1:
   extends: .docker-deploy-once
 
-# mathcomp-dev_rocq-prover-9.2: # to uncomment when 9.2+rc1 available
-#   # to be replaced with .docker-deploy-once when 9.2.0 available
+mathcomp-dev_rocq-prover-9.2:
+  # to be replaced with .docker-deploy-once when 9.2.0 available
+  extends: .docker-deploy
+
+# mathcomp-dev_rocq-prover-9.3: # to uncomment when 9.3+rc1 available
+#   # to be replaced with .docker-deploy-once when 9.3.0 available
 #   extends: .docker-deploy
 
 mathcomp-dev_rocq-prover-dev:
