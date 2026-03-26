@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop nmodule order algebra.
+From mathcomp Require Import fintype bigop nmodule order.
 
 (******************************************************************************)
 (*                    Number structures (orderedzmod.v)                       *)
@@ -56,7 +56,7 @@ Unset Printing Implicit Defensive.
 
 Local Open Scope ring_scope.
 
-Import Order.TTheory GRing.Theory.
+Import Order.TTheory Algebra.
 
 Fact ring_display : Order.disp_t. Proof. exact. Qed.
 
@@ -64,7 +64,7 @@ Module Num.
 
 #[short(type="porderNmodType")]
 HB.structure Definition POrderNmodule :=
-  { R of Order.isPOrder ring_display R & GRing.Nmodule R}.
+  { R of Order.isPOrder ring_display R & Algebra.Nmodule R}.
 
 Module POrderNmoduleExports.
 Bind Scope ring_scope with POrderNmodule.sort.
@@ -73,7 +73,7 @@ HB.export POrderNmoduleExports.
 
 #[short(type="porderZmodType")]
 HB.structure Definition POrderZmodule :=
-  { R of POrderNmodule R & GRing.Zmodule R }.
+  { R of POrderNmodule R & Algebra.Zmodule R }.
 
 Module POrderZmoduleExports.
 Bind Scope ring_scope with POrderZmodule.sort.
@@ -95,14 +95,14 @@ HB.export POrderedNmoduleExports.
 
 #[short(type="porderedZmodType")]
 HB.structure Definition POrderedZmodule :=
-  { R of GRing.Zmodule R & POrderedNmodule R}.
+  { R of Algebra.Zmodule R & POrderedNmodule R}.
 
 Module POrderedZmoduleExports.
 Bind Scope ring_scope with POrderedZmodule.sort.
 End POrderedZmoduleExports.
 HB.export POrderedZmoduleExports.
 
-HB.factory Record ZmodulePositiveCone R & GRing.Zmodule R := {
+HB.factory Record ZmodulePositiveCone R & Algebra.Zmodule R := {
   nonneg : {pred R};
   nonneg0 : nonneg 0;
   nonnegD : forall x y, nonneg x -> nonneg y -> nonneg (x + y);
@@ -135,7 +135,7 @@ HB.instance Definition _ := Add_isHomo.Build R ler_wD2l.
 
 HB.end.
 
-HB.mixin Record POrderedZmodule_hasTransCmp R & GRing.Nmodule R
+HB.mixin Record POrderedZmodule_hasTransCmp R & Algebra.Nmodule R
     & Order.isPOrder ring_display R := {
   comparabler_trans : transitive (Order.comparable : rel R)
 }.
@@ -661,13 +661,13 @@ Lemma psumr_neq0P (I : finType) (P : pred I) (F : I -> R) :
   (exists i, P i && (0 < F i)).
 Proof. by move=> ? /eqP; rewrite psumr_neq0// => /hasP[x _ ?]; exists x. Qed.
 
-Lemma ltr_wpMn2r n : (0 < n)%N -> {homo (@GRing.natmul R)^~ n : x y / x < y}.
+Lemma ltr_wpMn2r n : (0 < n)%N -> {homo (@Algebra.natmul R)^~ n : x y / x < y}.
 Proof.
 elim: n => // -[|n] IHn _ x y ltxy//.
 by rewrite mulrS [in ltRHS]mulrS ltrD// IHn.
 Qed.
 
-Lemma ler_wMn2r n : {homo (@GRing.natmul R)^~ n : x y / x <= y}.
+Lemma ler_wMn2r n : {homo (@Algebra.natmul R)^~ n : x y / x <= y}.
 Proof. by case: n => // n; exact/ltW_homo/ltr_wpMn2r. Qed.
 
 Lemma mulrn_wge0 x n : 0 <= x -> 0 <= x *+ n.
@@ -677,11 +677,11 @@ Lemma mulrn_wle0 x n : x <= 0 -> x *+ n <= 0.
 Proof. by move=> /(ler_wMn2r n); rewrite mul0rn. Qed.
 
 Lemma ler_wpMn2l x :
-  0 <= x -> {homo (@GRing.natmul R x) : m n / (m <= n)%N >-> m <= n}.
+  0 <= x -> {homo (@Algebra.natmul R x) : m n / (m <= n)%N >-> m <= n}.
 Proof. by move=> xge0 m n /subnK <-; rewrite mulrnDr ler_wpDl ?mulrn_wge0. Qed.
 
 Lemma ler_wnMn2l x :
-  x <= 0 -> {homo (@GRing.natmul R x) : m n / (n <= m)%N >-> m <= n}.
+  x <= 0 -> {homo (@Algebra.natmul R x) : m n / (n <= m)%N >-> m <= n}.
 Proof.
 by move=> xle0 m n hmn /=; rewrite -lerN2 -!mulNrn ler_wpMn2l // oppr_cp0.
 Qed.
@@ -693,7 +693,7 @@ move=> + xgt0; elim: n => // n IHn _; rewrite mulrS (lt_le_trans xgt0)// lerDl.
 by case: n IHn => // n /(_ _)/ltW->.
 Qed.
 
-Lemma pmulrIn x : x > 0 -> injective (GRing.natmul x).
+Lemma pmulrIn x : x > 0 -> injective (Algebra.natmul x).
 Proof.
 move=> x_neq0 m n /eqP; wlog lt_mn : m n / (m < n)%N => [hwlog|].
   by case: (ltngtP m n) => // [|+ /eqP/esym/eqP] => /hwlog/[apply].
@@ -701,7 +701,7 @@ by rewrite eq_sym -subr_eq0 -mulrnBr 1?ltnW// gt_eqF// mulrn_lgt0// subn_gt0.
 Qed.
 
 Lemma ler_pMn2l x :
-  0 < x -> {mono (@GRing.natmul R x) : m n / (m <= n)%N >-> m <= n}.
+  0 < x -> {mono (@Algebra.natmul R x) : m n / (m <= n)%N >-> m <= n}.
 Proof.
 move=> x_gt0; apply: le_mono; elim=> [|m IHm] [|n]//= lt_mn.
  by rewrite mulr0n mulrn_lgt0.
@@ -709,25 +709,25 @@ by rewrite !mulrS ler_ltD// IHm.
 Qed.
 
 Lemma ltr_pMn2l x :
-  0 < x -> {mono (@GRing.natmul R x) : m n / (m < n)%N >-> m < n}.
+  0 < x -> {mono (@Algebra.natmul R x) : m n / (m < n)%N >-> m < n}.
 Proof. by move=> x_gt0; apply: leW_mono (ler_pMn2l _). Qed.
 
 Lemma ler_nMn2l x :
-  x < 0 -> {mono (@GRing.natmul R x) : m n / (n <= m)%N >-> m <= n}.
+  x < 0 -> {mono (@Algebra.natmul R x) : m n / (n <= m)%N >-> m <= n}.
 Proof. by move=> xlt0 m n /=; rewrite -lerN2 -!mulNrn ler_pMn2l// oppr_gt0. Qed.
 
 Lemma ltr_nMn2l x :
-  x < 0 -> {mono (@GRing.natmul R x) : m n / (n < m)%N >-> m < n}.
+  x < 0 -> {mono (@Algebra.natmul R x) : m n / (n < m)%N >-> m < n}.
 Proof. by move=> x_lt0; apply: leW_nmono (ler_nMn2l _). Qed.
 
-Fact nneg_addr_closed : addr_closed (@Num.nneg R).
+Fact nneg_addr_closed : nmod_closed (@Num.nneg R).
 Proof. by split; [apply: lexx | apply: addr_ge0]. Qed.
-HB.instance Definition _ := GRing.isAddClosed.Build R nneg_num_pred
+HB.instance Definition _ := Algebra.isAddClosed.Build R nneg_num_pred
   nneg_addr_closed.
 
 Fact real_oppr_closed : oppr_closed (@Num.real R).
 Proof. by move=> x; rewrite /= !realE oppr_ge0 orbC -!oppr_ge0 opprK. Qed.
-HB.instance Definition _ := GRing.isOppClosed.Build R real_num_pred
+HB.instance Definition _ := Algebra.isOppClosed.Build R real_num_pred
   real_oppr_closed.
 
 Lemma real0 : 0%R \is @Num.real R. Proof. by rewrite qualifE/= lexx. Qed.
@@ -838,7 +838,7 @@ Proof.
 by move=> /ge_comparable + /le_comparable => /comparabler_trans/[apply].
 Qed.
 
-Fact real_addr_closed : addr_closed (@Num.real R).
+Fact real_addr_closed : nmod_closed (@Num.real R).
 Proof.
 split=> [|x y Rx Ry]; first by rewrite realE lexx.
 without loss{Rx} x_ge0: x y Ry / 0 <= x.
@@ -847,7 +847,7 @@ without loss{Rx} x_ge0: x y Ry / 0 <= x.
 case/orP: Ry => [y_ge0 | y_le0]; first by rewrite realE -nnegrE rpredD.
 by rewrite realE -[y]opprK orbC -oppr_ge0 opprB !subr_ge0 ger_leVge ?oppr_ge0.
 Qed.
-HB.instance Definition _ := GRing.isAddClosed.Build R real_num_pred
+HB.instance Definition _ := Algebra.isAddClosed.Build R real_num_pred
   real_addr_closed.
 
 Lemma ler_leVge x y : x <= 0 -> y <= 0 -> (x <= y) || (y <= x).
@@ -862,7 +862,7 @@ Proof. exact: real_leVge. Qed.
 Lemma realB : {in Num.real &, forall x y, x - y \is Num.real}.
 Proof. exact: rpredB. Qed.
 
-Lemma realN : {mono (@GRing.opp R) : x / x \is Num.real}.
+Lemma realN : {mono (@Algebra.opp R) : x / x \is Num.real}.
 Proof. exact: rpredN. Qed.
 
 Lemma realBC x y : (x - y \is Num.real) = (y - x \is Num.real).
