@@ -39,11 +39,12 @@ Lemma relpre_trans {T' T : Type} {leT : rel T} {f : T' -> T} :
   transitive leT -> transitive (relpre f leT).
 Proof. by move=> + y x z; apply. Qed.
 
-Definition And31 (P1 P2 P3 : Prop) (a : [/\ P1, P2 & P3]) :=
+Definition and3proj1 (P1 P2 P3 : Prop) (a : [/\ P1, P2 & P3]) :=
   let: And3 p1 p2 p3 := a in p1.
 
-Definition And32 (P1 P2 P3 : Prop) (a : [/\ P1, P2 & P3]) :=
+Definition and3proj2 (P1 P2 P3 : Prop) (a : [/\ P1, P2 & P3]) :=
   let: And3 p1 p2 p3 := a in p2.
 
-Definition And33 (P1 P2 P3 : Prop) (a : [/\ P1, P2 & P3]) :=
+Definition and3proj3 (P1 P2 P3 : Prop) (a : [/\ P1, P2 & P3]) :=
   let: And3 p1 p2 p3 := a in p3.
+
