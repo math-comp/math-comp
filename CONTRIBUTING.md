@@ -210,15 +210,39 @@ Abbreviations are in the header of the file which introduces them. We list here 
   - L-algebra becomes `lalg`/`Lalg`
 - Partial order is abbreviated to `porder` or `POrder`, e.g., `porderType`, `CanPOrderMixin` in `order.v`
 
-#### Deprecations
+#### Breaking changes and deprecations
 
-Definitions and lemmas should never be removed or renamed without warning users:
-they should be deprecated first, during at least one release.
-We use the pragma `deprecated` to implement deprecation of definitions and lemmas;
-see the many examples in the source code.
-We try to keep deprecation warnings for at least two years unless we need to remove them
-(for example because of a name clash, and in any case after at least one release); after this period, deprecation warnings
-might disappear at any moment, making the deletion or the renaming definitive.
+In principle, changes that may break users code, e.g.:
+- renaming or removing definitions, lemmas, or libraries, and
+- changing the contents of definitions or the statements of lemmas,
+
+should be performed only after deprecating the part of the library to be changed
+to warn users about it while keeping the compatibility. For example, to rename a
+definition:
+```rocq
+Definition foo_old := ...
+```
+to `foo_new`, we typically modify the above code, using the `deprecated`
+attribute (cf. the Rocq reference manual), as follows:
+```rocq
+Definition foo_new := ...
+#[deprecated(since="mathcomp x.x.x", use=foo_new)]
+Notation foo_old := foo_new (only parsing).
+```
+where `x.x.x` is the version of MathComp that introduces this deprecation. If
+the `use` field is insufficient for explaining the change, we should use the
+`note` field instead.
+
+The deprecation warnings **must** be kept for at least one release. We try to
+keep deprecation warnings for **at least two years** unless we need to remove
+them (for example because of a name clash, and in any case after at least one
+release); after this period, deprecation warnings might disappear at any moment,
+making the deletion or the renaming definitive.
+
+An exception to this rule is when changing internal definitions or lemmas, e.g.,
+lemmas marked as `Fact` that are used only for declaring instances. In this
+case, deprecation is not required unless we observe a breakage in CI, but the
+changelog entry is required.
 
 ## Doc style
 
