@@ -16,3 +16,5 @@
 # introduced in Rocq 9.2
 -arg -w -arg +level-tolerance
 -arg -w -arg -notation-for-abbreviation
+# introduced in Rocq 9.3
+-arg -w -arg -rewrite-rw
