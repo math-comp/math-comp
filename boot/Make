@@ -36,3 +36,5 @@ ssrmatching.v
 -arg -w -arg -redundant-canonical-projection
 -arg -w -arg -notation-overridden
 -arg -w -arg -ambiguous-paths
+# introduced in Rocq 9.3
+-arg -w -arg -rewrite-rw
