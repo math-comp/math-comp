@@ -29,6 +29,7 @@ vector.v
 zmodp.v
 sesquilinear.v
 spectral.v
+tensor.v
 
 -R . mathcomp.algebra
 
