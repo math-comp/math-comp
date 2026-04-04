@@ -69,8 +69,8 @@ with builtins; with (import <nixpkgs> {}).lib;
          mathcomp-doc.job = true;
          mathcomp.job = false;
          stdlib.job = true;
-         jasmin.override.version = "main";
-         ssprove.override.version = "main";
+         #jasmin.override.version = "main";
+         #ssprove.override.version = "main";
          # To add an overlay applying to all bundles,
          # add below a line like
          #<package>.override.version = "<github_login>:<branch>";
@@ -80,6 +80,10 @@ with builtins; with (import <nixpkgs> {}).lib;
          #   for a complete list of Coq packages available in Nix
          # * <github_login>:<branch> is such that this will use the branch <branch>
          #   from https://github.com/<github_login>/<repository>
+         micromega-plugin.override.version = "master";
+         ssprove.override.version = "proux01:mc1456";
+         jasmin.override.version = "proux01:mc1456";
+         mathcomp-infotheo.override.version = "proux01:mc1456";
        };
   in {
     "rocq-master" = { rocqPackages = {
@@ -88,6 +92,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       bignums.override.version = "master";
       rocq-elpi.override.version = "master";
       hierarchy-builder.override.version = "master";
+      micromega-plugin.override.version = "master";
       mathcomp.job = false;
     }; coqPackages = common-bundles // {
       coq.override.version = "master";
@@ -106,6 +111,7 @@ with builtins; with (import <nixpkgs> {}).lib;
     }; };
     "rocq-9.2" = { rocqPackages = {
       rocq-core.override.version = "9.2";
+      micromega-plugin.override.version = "master";
     }; coqPackages = common-bundles // {
       coq.override.version = "9.2";
       coq-elpi.job = true;
@@ -117,6 +123,7 @@ with builtins; with (import <nixpkgs> {}).lib;
     }; };
     "rocq-9.1" = { rocqPackages = {
       rocq-core.override.version = "9.1";
+      micromega-plugin.override.version = "master";
     }; coqPackages = common-bundles // {
       coq.override.version = "9.1";
       coq-elpi.job = true;
@@ -127,6 +134,7 @@ with builtins; with (import <nixpkgs> {}).lib;
     }; };
     "rocq-9.0" = { rocqPackages = {
       rocq-core.override.version = "9.0";
+      micromega-plugin.override.version = "master";
     }; coqPackages = common-bundles // {
       coq.override.version = "9.0";
       coq-elpi.job = true;

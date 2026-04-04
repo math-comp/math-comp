@@ -1,11 +1,13 @@
 all_algebra.v
 archimedean.v
+binnums.v
 countalg.v
 finalg.v
 fraction.v
 intdiv.v
 interval.v
 interval_inference.v
+lra.v
 matrix.v
 mxalgebra.v
 mxpoly.v
@@ -15,6 +17,7 @@ poly.v
 polyXY.v
 qpoly.v
 rat.v
+ring.v
 ring_quotient.v
 alg/algebra.v
 alg/divalg.v
