@@ -300,11 +300,10 @@ Proof. by move=> z_lt0; rewrite mulrC ltr_ndivrMr ?[z * _]mulrC. Qed.
 
 Definition lter_ndivrMl := (ler_ndivrMl, ltr_ndivrMl).
 
-Lemma divDl_le1 x y (x0 : 0 <= x) (y0 : 0 <= y) :
-  x/(x + y) <= 1.
+Lemma divDl_le1 x y : 0 <= x -> 0 <= y -> x / (x + y) <= 1.
 Proof.
-move: x0; rewrite le0r => /predU1P [->|x0]; first by rewrite mul0r.
-by rewrite ler_pdivrMr ?mul1r ?lerDl // ltr_wpDr.
+rewrite le0r => /predU1P[-> _|*]; first by rewrite mul0r.
+by rewrite ler_pdivrMr ?ltr_wpDr// mul1r lerDl.
 Qed.
 
 Lemma natf_div m d : (d %| m)%N -> (m %/ d)%:R = m%:R / d%:R :> F.
