@@ -1045,6 +1045,9 @@ Definition invr_lte0 := (invr_le0, invr_lt0).
 Lemma divr_ge0 x y : 0 <= x -> 0 <= y -> 0 <= x / y.
 Proof. by move=> x_ge0 y_ge0; rewrite mulr_ge0 ?invr_ge0. Qed.
 
+Lemma divDl_ge0 x y : 0 <= x -> 0 <= y -> 0 <= x / (x + y).
+Proof. by move=> *; rewrite divr_ge0// addr_ge0. Qed.
+
 Lemma divr_gt0 x y : 0 < x -> 0 < y -> 0 < x / y.
 Proof. by move=> x_gt0 y_gt0; rewrite pmulr_rgt0 ?invr_gt0. Qed.
 
