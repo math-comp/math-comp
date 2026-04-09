@@ -2611,7 +2611,7 @@ Lemma cfDetD :
   {in character &, {morph cfDet : phi psi / phi + psi >-> phi * psi}}.
 Proof.
 move=> phi psi Nphi Npsi; rewrite unlock /= -big_split; apply: eq_bigr => i _ /=.
-by rewrite -exprD cfdotDl truncnD ?nnegrE ?natr_ge0 // Cnat_cfdot_char_irr.
+by rewrite -exprD cfdotDl truncnDnr ?nnegrE ?natr_ge0 // Cnat_cfdot_char_irr.
 Qed.
 
 Lemma cfDet0 : cfDet 0 = 1.
