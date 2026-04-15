@@ -1,7 +1,9 @@
 [![pipeline status](https://gitlab.inria.fr/math-comp/math-comp/badges/master/pipeline.svg)](https://gitlab.inria.fr/math-comp/math-comp/commits/master)
 [![Join the chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://coq.zulipchat.com/#narrow/stream/237664-math-comp-users)
 
-# The Mathematical Components repository
+### The Mathematical Components repository
+
+<img align="right" src="https://github.com/math-comp/math-comp/raw/master/etc/artwork/rocqy-mathcomp.png" alt="MathComp Rocqy" width="35%" />
 
 The Mathematical Components Library is an extensive and coherent
 repository of formalized mathematical theories. It is based on
