@@ -3,8 +3,8 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple bigop prime nmodule order.
-From mathcomp Require Import perm algebra divalg poly polydiv zmodp matrix.
-From mathcomp Require Import orderedzmod numdomain ssrint.
+From mathcomp Require Import perm rings_modules_and_algebras divalg poly.
+From mathcomp Require Import polydiv zmodp matrix orderedzmod numdomain ssrint.
 
 (******************************************************************************)
 (* This file provides various results on divisibility of integers.            *)

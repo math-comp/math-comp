@@ -3,9 +3,10 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype tuple finfun bigop prime nmodule.
-From mathcomp Require Import order algebra divalg countalg poly polydiv.
-From mathcomp Require Import zmodp matrix mxalgebra vector orderedzmod.
-From mathcomp Require Import numdomain numfield ssrint intdiv archimedean.
+From mathcomp Require Import order rings_modules_and_algebras divalg countalg.
+From mathcomp Require Import poly polydiv zmodp matrix mxalgebra vector.
+From mathcomp Require Import orderedzmod numdomain numfield ssrint intdiv.
+From mathcomp Require Import archimedean.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)

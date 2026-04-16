@@ -3,7 +3,8 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype finfun bigop finset nmodule fingroup perm.
-From mathcomp Require Import order algebra divalg countalg finalg zmodp.
+From mathcomp Require Import order rings_modules_and_algebras divalg countalg.
+From mathcomp Require Import finalg zmodp.
 
 (******************************************************************************)
 (* Basic concrete linear algebra : definition of type for matrices, and all   *)

@@ -3,8 +3,9 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype finfun bigop prime finset binomial.
-From mathcomp Require Import nmodule fingroup perm order algebra divalg finalg.
-From mathcomp Require Import zmodp matrix.
+From mathcomp Require Import nmodule fingroup perm order.
+From mathcomp Require Import rings_modules_and_algebras divalg finalg zmodp.
+From mathcomp Require Import matrix.
 
 (*****************************************************************************)
 (* In this file we develop the rank and row space theory of matrices, based  *)

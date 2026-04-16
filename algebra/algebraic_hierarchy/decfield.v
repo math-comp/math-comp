@@ -2,7 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype finfun bigop nmodule algebra divalg.
+From mathcomp Require Import fintype finfun bigop nmodule.
+From mathcomp Require Import rings_modules_and_algebras divalg.
 
 (******************************************************************************)
 (*                  Decidable and algebraically closed fields                 *)
