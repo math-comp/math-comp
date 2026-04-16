@@ -2,10 +2,11 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype div tuple bigop prime finset fingroup.
-From mathcomp Require Import ssralg poly polydiv morphism action countalg.
-From mathcomp Require Import finalg zmodp cyclic center pgroup abelian matrix.
-From mathcomp Require Import mxpoly vector falgebra fieldext separable galois.
+From mathcomp Require Import fintype div tuple bigop prime finset.
+From mathcomp Require Import fingroup_hierarchy ssralg poly polydiv morphism.
+From mathcomp Require Import action countalg finalg zmodp cyclic center pgroup.
+From mathcomp Require Import abelian matrix mxpoly vector falgebra fieldext.
+From mathcomp Require Import separable galois.
 From mathcomp Require ssrnum ssrint archimedean algC cyclotomic.
 
 (******************************************************************************)

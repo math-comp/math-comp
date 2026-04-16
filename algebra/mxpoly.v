@@ -2,9 +2,10 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
-From mathcomp Require Import choice fintype tuple finfun bigop fingroup perm.
-From mathcomp Require Import nmodule rings_modules_and_algebras divalg decfield.
-From mathcomp Require Import matrix mxalgebra poly polydiv.
+From mathcomp Require Import choice fintype tuple finfun bigop.
+From mathcomp Require Import fingroup_hierarchy perm nmodule.
+From mathcomp Require Import rings_modules_and_algebras divalg decfield matrix.
+From mathcomp Require Import mxalgebra poly polydiv.
 
 (******************************************************************************)
 (*   This file provides basic support for formal computation with matrices,   *)

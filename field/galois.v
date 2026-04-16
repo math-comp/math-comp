@@ -3,9 +3,9 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype tuple finfun bigop ssralg poly.
-From mathcomp Require Import polydiv finset fingroup morphism quotient perm.
-From mathcomp Require Import action zmodp cyclic matrix mxalgebra vector.
-From mathcomp Require Import falgebra fieldext separable.
+From mathcomp Require Import polydiv finset fingroup_hierarchy morphism.
+From mathcomp Require Import quotient perm action zmodp cyclic matrix mxalgebra.
+From mathcomp Require Import vector falgebra fieldext separable.
 
 (******************************************************************************)
 (*                       Basic Galois field theory                            *)

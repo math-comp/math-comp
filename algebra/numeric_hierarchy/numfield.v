@@ -2,9 +2,10 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import div path fintype bigop ssrAC finset fingroup.
-From mathcomp Require Import nmodule order interval rings_modules_and_algebras.
-From mathcomp Require Import divalg decfield poly orderedzmod numdomain.
+From mathcomp Require Import div path fintype bigop ssrAC finset.
+From mathcomp Require Import fingroup_hierarchy nmodule order interval.
+From mathcomp Require Import rings_modules_and_algebras divalg decfield poly.
+From mathcomp Require Import orderedzmod numdomain.
 
 (******************************************************************************)
 (*                      Number structures (numfield.v)                        *)

@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype finfun bigop prime finset binomial.
-From mathcomp Require Import nmodule fingroup perm order.
+From mathcomp Require Import nmodule fingroup_hierarchy perm order.
 From mathcomp Require Import rings_modules_and_algebras divalg finalg zmodp.
 From mathcomp Require Import matrix.
 

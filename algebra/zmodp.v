@@ -2,9 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool choice eqtype ssrnat seq.
-From mathcomp Require Import div fintype bigop finset prime fingroup perm.
-From mathcomp Require Import nmodule rings_modules_and_algebras divalg decfield.
-From mathcomp Require Import countalg finalg.
+From mathcomp Require Import div fintype bigop finset prime fingroup_hierarchy.
+From mathcomp Require Import perm nmodule rings_modules_and_algebras divalg.
+From mathcomp Require Import decfield countalg finalg.
 
 (******************************************************************************)
 (*  Definition of the additive group and ring Zp, represented as 'I_p         *)

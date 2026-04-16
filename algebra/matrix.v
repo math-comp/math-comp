@@ -2,9 +2,10 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype finfun bigop finset nmodule fingroup perm.
-From mathcomp Require Import order rings_modules_and_algebras divalg countalg.
-From mathcomp Require Import finalg zmodp.
+From mathcomp Require Import fintype finfun bigop finset nmodule.
+From mathcomp Require Import fingroup_hierarchy perm order.
+From mathcomp Require Import rings_modules_and_algebras divalg countalg finalg.
+From mathcomp Require Import zmodp.
 
 (******************************************************************************)
 (* Basic concrete linear algebra : definition of type for matrices, and all   *)

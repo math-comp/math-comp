@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq.
-From mathcomp Require Import fintype finset fingroup morphism.
+From mathcomp Require Import fintype finset fingroup_hierarchy morphism.
 
 (******************************************************************************)
 (* Support for generator-and-relation presentations of groups. We provide the *)

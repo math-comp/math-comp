@@ -1,6 +1,7 @@
 action.v
 all_fingroup.v
 automorphism.v
+fingroup_hierarchy.v
 fingroup.v
 gproduct.v
 morphism.v
