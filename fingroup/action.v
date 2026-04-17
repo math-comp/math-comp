@@ -2,7 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnotations eqtype.
 From mathcomp Require Import ssrnat div seq prime fintype bigop finset.
-From mathcomp Require Import fingroup morphism perm automorphism quotient.
+From mathcomp Require Import fingroup_hierarchy morphism perm automorphism.
+From mathcomp Require Import quotient.
 
 (******************************************************************************)
 (* Group action: orbits, stabilisers, transitivity.                           *)

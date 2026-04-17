@@ -3,9 +3,9 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
 From mathcomp Require Import div fintype tuple tuple bigop prime finset ssralg.
-From mathcomp Require Import zmodp fingroup morphism perm automorphism quotient.
-From mathcomp Require Import action cyclic pgroup gseries sylow.
-From mathcomp Require Import primitive_action nilpotent maximal.
+From mathcomp Require Import zmodp fingroup_hierarchy morphism perm.
+From mathcomp Require Import automorphism quotient action cyclic pgroup gseries.
+From mathcomp Require Import sylow primitive_action nilpotent maximal.
 
 (******************************************************************************)
 (*  Definitions of the symmetric and alternate groups, and some properties.   *)

@@ -1,14 +1,15 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat fintype.
-From mathcomp Require Import bigop finset binomial fingroup morphism.
+From mathcomp Require Import bigop finset binomial fingroup_hierarchy morphism.
 From mathcomp Require Import automorphism quotient gfunctor.
 
 (******************************************************************************)
 (*   This files contains the proofs of several key properties of commutators, *)
 (* including the Hall-Witt identity and the Three Subgroup Lemma.             *)
 (*   The definition and notation for both pointwise and set wise commutators  *)
-(* ([~x, y, ...] and [~: A, B ,...], respectively) are given in fingroup.v    *)
+(* ([~x, y, ...] and [~: A, B ,...], respectively) are given                  *)
+(* in fingroup_hierarchy.v                                                    *)
 (* This file defines the derived group series:                                *)
 (*           G^`(0) ==  G                                                     *)
 (*       G^`(n.+1) == [~: G^`(n), G^`(n)]                                     *)

@@ -3,9 +3,9 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime.
-From mathcomp Require Import ssralg poly polydiv finset fingroup morphism.
-From mathcomp Require Import perm automorphism quotient finalg action zmodp.
-From mathcomp Require Import commutator cyclic center pgroup matrix mxalgebra.
+From mathcomp Require Import ssralg poly polydiv finset fingroup_hierarchy.
+From mathcomp Require Import morphism perm automorphism quotient finalg action.
+From mathcomp Require Import zmodp commutator cyclic center pgroup matrix.
 From mathcomp Require Import mxalgebra mxpoly.
 
 (******************************************************************************)

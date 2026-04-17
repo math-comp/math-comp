@@ -2,9 +2,10 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import choice div fintype finfun bigop finset prime.
-From mathcomp Require Import binomial fingroup morphism perm automorphism.
-From mathcomp Require Import action quotient gfunctor gproduct ssralg countalg.
-From mathcomp Require Import finalg zmodp cyclic pgroup gseries nilpotent sylow.
+From mathcomp Require Import binomial fingroup_hierarchy morphism perm.
+From mathcomp Require Import automorphism action quotient gfunctor gproduct.
+From mathcomp Require Import ssralg countalg finalg zmodp cyclic pgroup gseries.
+From mathcomp Require Import nilpotent sylow.
 
 (******************************************************************************)
 (* Constructions based on abelian groups and their structure, with some       *)

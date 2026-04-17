@@ -1,6 +1,6 @@
 From mathcomp Require Export action.
 From mathcomp Require Export automorphism.
-From mathcomp Require Export fingroup.
+From mathcomp Require Export fingroup_hierarchy.
 From mathcomp Require Export gproduct.
 From mathcomp Require Export morphism.
 From mathcomp Require Export perm.

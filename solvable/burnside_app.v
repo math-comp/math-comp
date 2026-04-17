@@ -2,8 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
-From mathcomp Require Import choice fintype tuple finfun bigop finset fingroup.
-From mathcomp Require Import action perm primitive_action ssrAC.
+From mathcomp Require Import choice fintype tuple finfun bigop finset.
+From mathcomp Require Import fingroup_hierarchy action perm primitive_action.
+From mathcomp Require Import ssrAC.
 
 (*   Application of the Burside formula to count the number of distinct       *)
 (* colorings of the vertices of a square and a cube.                          *)
