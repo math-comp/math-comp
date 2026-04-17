@@ -147,8 +147,11 @@ From mathcomp Require Import finset.
 (*        f \max g ==  the function x |-> Order.max (f x) (g x);              *)
 (*                     f \max g simplifies on application.                    *)
 (* nondecreasing f <-> the function f : T -> T' is nondecreasing,             *)
-(*                     where T and T' are porderType                          *)
+(*                     where T and T' are preorderType                        *)
 (*                 :=  {homo f : x y / x <= y}                                *)
+(* order_morphism f <-> the function f : T -> T' preserves the order,         *)
+(*                     where T and T' are preorderType                        *)
+(*                 :=  {mono f : x y / x <= y}                                *)
 (* Unary (partially applied) versions of order notations:                     *)
 (*            >= y :=  @Order.le d T y                                        *)
 (*                 ==  a predicate characterizing elements greater than or    *)
@@ -173,9 +176,15 @@ From mathcomp Require Import finset.
 (* For T of type bPreorderType d:                                             *)
 (*            \bot :=  @Order.bottom d T                                      *)
 (*                 ==  the bottom element of type T                           *)
+(*  \max_<range> e :=  \big[Order.max / Order.bottom]_<range> e               *)
+(*                 ==  iterated max of a preorder with a bottom               *)
+(*                     the possible <range>s are documented in bigop.v        *)
 (* For T of type tPreorderType d:                                             *)
 (*            \top :=  @Order.top d T                                         *)
 (*                 ==  the top element of type T                              *)
+(*  \min_<range> e :=  \big[Order.max / Order.top]_<range> e                  *)
+(*                 ==  iterated min of a preorder with a top                  *)
+(*                     the possible <range>s are documented in bigop.v        *)
 (*                                                                            *)
 (* For preorderType we provide the following operations:                      *)
 (*   [arg min_(i < i0 | P) M] == a value i : T minimizing M : R, subject to   *)
@@ -291,7 +300,7 @@ From mathcomp Require Import finset.
 (*                                                                            *)
 (* We provide Order.enum_val, Order.enum_rank, and Order.enum_rank_in, which  *)
 (* are monotonic variations of enum_val, enum_rank, and enum_rank_in          *)
-(* whenever the type is porderType, and their monotonicity is provided if     *)
+(* whenever the type is preorderType, and their monotonicity is provided if   *)
 (* this order is total. The theory is in the module Order (Order.enum_valK,   *)
 (* Order.enum_rank_inK, etc) but Order.Enum can be imported to shorten these. *)
 (*                                                                            *)
@@ -881,6 +890,56 @@ Notation ltRHS := (X in (_ < X)%O)%pattern.
 Notation "\bot" := bottom : order_scope.
 Notation "\top" := top : order_scope.
 
+Notation "\min_ i F" :=
+  (\big[min/top]_i F) : order_scope.
+Notation "\min_ ( i <- r | P ) F" :=
+  (\big[min/top]_(i <- r | P%B) F%O) : order_scope.
+Notation "\min_ ( i < r ) F" :=
+  (\big[min/top]_(i <- r) F%O) : order_scope.
+Notation "\min_ ( m <= i < n | P ) F" :=
+  (\big[min/top]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\min_ ( m <= i < n ) F" :=
+  (\big[min/top]_(m <= i < n) F%O) : order_scope.
+Notation "\min_ ( i | P ) F" :=
+  (\big[min/top]_(i | P%B) F%O) : order_scope.
+Notation "\min_ ( i : t | P ) F" :=
+  (\big[min/top]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\min_ ( i : t ) F" :=
+  (\big[min/top]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\min_ ( i < n | P ) F" :=
+  (\big[min/top]_(i < n | P%B) F%O) : order_scope.
+Notation "\min_ ( i < n ) F" :=
+  (\big[min/top]_(i < n) F%O) : order_scope.
+Notation "\min_ ( i 'in' A | P ) F" :=
+  (\big[min/top]_(i in A | P%B) F%O) : order_scope.
+Notation "\min_ ( i 'in' A ) F" :=
+  (\big[min/top]_(i in A) F%O) : order_scope.
+
+Notation "\max_ i F" :=
+  (\big[max/bottom]_i F%O) : order_scope.
+Notation "\max_ ( i <- r | P ) F" :=
+  (\big[max/bottom]_(i <- r | P%B) F%O) : order_scope.
+Notation "\max_ ( i < r ) F" :=
+  (\big[max/bottom]_(i <- r) F%O) : order_scope.
+Notation "\max_ ( m <= i < n | P ) F" :=
+  (\big[max/bottom]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\max_ ( m <= i < n ) F" :=
+  (\big[max/bottom]_(m <= i < n) F%O) : order_scope.
+Notation "\max_ ( i | P ) F" :=
+  (\big[max/bottom]_(i | P%B) F%O) : order_scope.
+Notation "\max_ ( i : t | P ) F" :=
+  (\big[max/bottom]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\max_ ( i : t ) F" :=
+  (\big[max/bottom]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\max_ ( i < n | P ) F" :=
+  (\big[max/bottom]_(i < n | P%B) F%O) : order_scope.
+Notation "\max_ ( i < n ) F" :=
+  (\big[max/bottom]_(i < n) F%O) : order_scope.
+Notation "\max_ ( i 'in' A | P ) F" :=
+  (\big[max/bottom]_(i in A | P%B) F%O) : order_scope.
+Notation "\max_ ( i 'in' A ) F" :=
+  (\big[max/bottom]_(i in A) F%O) : order_scope.
+
 End PreOSyntax.
 HB.export PreOSyntax.
 
@@ -979,6 +1038,59 @@ Notation "x ><^d y" := (~~ (><^d%O x y)) : order_scope.
 
 Notation "\bot^d" := dual_bottom : order_scope.
 Notation "\top^d" := dual_top : order_scope.
+
+Local Notation min := dual_min.
+Local Notation max := dual_max.
+
+Notation "\min^d_ i F" :=
+  (\big[min/top]_i F) : order_scope.
+Notation "\min^d_ ( i <- r | P ) F" :=
+  (\big[min/top]_(i <- r | P%B) F%O) : order_scope.
+Notation "\min^d_ ( i < r ) F" :=
+  (\big[min/top]_(i <- r) F%O) : order_scope.
+Notation "\min^d_ ( m <= i < n | P ) F" :=
+  (\big[min/top]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\min^d_ ( m <= i < n ) F" :=
+  (\big[min/top]_(m <= i < n) F%O) : order_scope.
+Notation "\min^d_ ( i | P ) F" :=
+  (\big[min/top]_(i | P%B) F%O) : order_scope.
+Notation "\min^d_ ( i : t | P ) F" :=
+  (\big[min/top]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\min^d_ ( i : t ) F" :=
+  (\big[min/top]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\min^d_ ( i < n | P ) F" :=
+  (\big[min/top]_(i < n | P%B) F%O) : order_scope.
+Notation "\min^d_ ( i < n ) F" :=
+  (\big[min/top]_(i < n) F%O) : order_scope.
+Notation "\min^d_ ( i 'in' A | P ) F" :=
+  (\big[min/top]_(i in A | P%B) F%O) : order_scope.
+Notation "\min^d_ ( i 'in' A ) F" :=
+  (\big[min/top]_(i in A) F%O) : order_scope.
+
+Notation "\max^d_ i F" :=
+  (\big[max/bottom]_i F%O) : order_scope.
+Notation "\max^d_ ( i <- r | P ) F" :=
+  (\big[max/bottom]_(i <- r | P%B) F%O) : order_scope.
+Notation "\max^d_ ( i < r ) F" :=
+  (\big[max/bottom]_(i <- r) F%O) : order_scope.
+Notation "\max^d_ ( m <= i < n | P ) F" :=
+  (\big[max/bottom]_(m <= i < n | P%B) F%O) : order_scope.
+Notation "\max^d_ ( m <= i < n ) F" :=
+  (\big[max/bottom]_(m <= i < n) F%O) : order_scope.
+Notation "\max^d_ ( i | P ) F" :=
+  (\big[max/bottom]_(i | P%B) F%O) : order_scope.
+Notation "\max^d_ ( i : t | P ) F" :=
+  (\big[max/bottom]_(i : t | P%B) F%O) (only parsing) : order_scope.
+Notation "\max^d_ ( i : t ) F" :=
+  (\big[max/bottom]_(i : t) F%O) (only parsing) : order_scope.
+Notation "\max^d_ ( i < n | P ) F" :=
+  (\big[max/bottom]_(i < n | P%B) F%O) : order_scope.
+Notation "\max^d_ ( i < n ) F" :=
+  (\big[max/bottom]_(i < n) F%O) : order_scope.
+Notation "\max^d_ ( i 'in' A | P ) F" :=
+  (\big[max/bottom]_(i in A | P%B) F%O) : order_scope.
+Notation "\max^d_ ( i 'in' A ) F" :=
+  (\big[max/bottom]_(i in A) F%O) : order_scope.
 
 End DualSyntax.
 
