@@ -144,7 +144,7 @@ Proof. by move=> y z; rewrite !ler_def ![_ + z]addrC addrKA. Qed.
 
 HB.instance Definition _ := Add_isHomo.Build R ler_wD2l.
 
-Fact real_addr_closed : addr_closed (@Num.real R).
+Fact real_nmod_closed : nmod_closed (@Num.real R).
 Proof.
 split=> [|x y Rx Ry]; first by rewrite realE lexx.
 without loss{Rx} x_ge0: x y Ry / 0 <= x.
@@ -154,7 +154,7 @@ case/orP: Ry => [y_ge0 | y_le0]; first by rewrite realE -nnegrE rpredD.
 by rewrite realE -[y]opprK orbC -oppr_ge0 opprB !subr_ge0 ger_leVge ?oppr_ge0.
 Qed.
 HB.instance Definition _ := GRing.isAddClosed.Build R Num.real
-  real_addr_closed.
+  real_nmod_closed.
 
 Fact comparabler_trans : transitive (Num.comparable : rel R).
 Proof.

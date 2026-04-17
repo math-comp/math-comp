@@ -796,7 +796,11 @@ Definition char0_natf_div := pchar0_natf_div.
 Definition fmorph_char := fmorph_pchar.
 End Theory.
 
-Module AllExports. HB.reexport. End AllExports.
+Module AllExports.
+#[deprecated(since="mathcomp 2.6.0", use=nmod_closed)]
+Notation addr_closed := nmod_closed.
+HB.reexport.
+End AllExports.
 
 End GRing.
 

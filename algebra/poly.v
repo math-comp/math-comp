@@ -1010,13 +1010,13 @@ Proof.
 by rewrite qualifE /= polyseqC; case: eqP => [->|] /=; rewrite ?andbT ?rpred0.
 Qed.
 
-Fact polyOver_addr_closed : addr_closed (polyOver S).
+Fact polyOver_nmod_closed : nmod_closed (polyOver S).
 Proof.
 split=> [|p q Sp Sq]; first exact: polyOver0.
 by apply/polyOverP=> i; rewrite coefD rpredD ?(polyOverP _).
 Qed.
 HB.instance Definition _ := GRing.isAddClosed.Build {poly R} (polyOver_pred S)
-  polyOver_addr_closed.
+  polyOver_nmod_closed.
 
 End PolyOverAdd.
 
