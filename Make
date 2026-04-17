@@ -29,6 +29,7 @@ algebra/vector.v
 algebra/zmodp.v
 algebra/sesquilinear.v
 algebra/spectral.v
+algebra/tensor.v
 all/all.v
 character/all_character.v
 character/character.v
