@@ -17,12 +17,16 @@ From mathcomp Require Import orderedzmod.
 (*                                                                            *)
 (*  semiNormedZmodType == Zmodule with a semi-norm                            *)
 (*                        The HB class is called SemiNormedZmodule.           *)
-(*  normedZmodType == Zmodule with a norm                                     *)
-(*                    The HB class is called NormedZmodule.                   *)
-(*   numDomainType == Integral domain with an order and a norm                *)
-(*                    The HB class is called NumDomain.                       *)
-(*  realDomainType == Num domain where all elements are positive or negative  *)
-(*                    The HB class is called RealDomain.                      *)
+(*      normedZmodType == Zmodule with a norm                                 *)
+(*                        The HB class is called NormedZmodule.               *)
+(* subNormedZmodType S == join of normedZmodType M and subType (S : pred M)   *)
+(*                        such that val preserves the norm                    *)
+(*                        The HB class is called SubNormedZmodule.            *)
+(*       numDomainType == Integral domain with an order and a norm            *)
+(*                        The HB class is called NumDomain.                   *)
+(*      realDomainType == Num domain where all elements are positive or       *)
+(*                        negative                                            *)
+(*                        The HB class is called RealDomain.                  *)
 (*                                                                            *)
 (* Over these structures, we have the following operations:                   *)
 (*             `|x| == norm of x                                              *)
@@ -72,6 +76,17 @@ HB.mixin Record SemiNormedZmodule_isPositiveDefinite
 HB.structure Definition NormedZmodule (R : porderZmodType) :=
   { M of SemiNormedZmodule_isPositiveDefinite R M & SemiNormedZmodule R M }.
 Arguments norm {R M} x : rename.
+
+HB.mixin Record Zmodule_isSubNormed (R : porderZmodType) (M : normedZmodType R)
+   (S : pred M) U & SubType M S U & NormedZmodule R U := {
+  norm_valE : forall x : U, norm ((val : U -> M) x) = norm x
+}.
+
+#[short(type="subNormedZmodType")]
+HB.structure Definition SubNormedZmodule (R : porderZmodType)
+    (M : normedZmodType R) (S : pred M) :=
+  { U of SubChoice M S U & Num.NormedZmodule R U & GRing.SubZmodule M S U
+       & Zmodule_isSubNormed R M S U }.
 
 HB.factory Record Zmodule_isNormed (R : porderZmodType) M
          & GRing.Zmodule M := {
