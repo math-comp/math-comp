@@ -1,6 +1,7 @@
 all_order.v
 preorder.v
 order.v
+order_instances.v
 
 -I .
 -R . mathcomp.order
