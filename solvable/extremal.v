@@ -5,8 +5,9 @@ From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype bigop finset prime binomial.
 From mathcomp Require Import fingroup morphism perm automorphism presentation.
 From mathcomp Require Import quotient action commutator gproduct gfunctor.
-From mathcomp Require Import ssralg countalg finalg zmodp cyclic pgroup center gseries.
-From mathcomp Require Import nilpotent sylow abelian finmodule matrix maximal.
+From mathcomp Require Import algebraic_hierarchy countalg finalg zmodp cyclic.
+From mathcomp Require Import pgroup center gseries nilpotent sylow abelian.
+From mathcomp Require Import finmodule matrix maximal.
 
 (******************************************************************************)
 (*    This file contains the definition and properties of extremal p-groups;  *)

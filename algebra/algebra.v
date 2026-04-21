@@ -2,6 +2,8 @@
 To enjoys the automation it provides,
 you need to explictly "Import interval_inference". *)
 
+From mathcomp Require Export algebraic_hierarchy.
+#[warning="-deprecated-library-file-since-mathcomp-2.6.0"]
 From mathcomp Require Export ssralg.
 From mathcomp Require Export ssrnum.
 From mathcomp Require Export finalg.

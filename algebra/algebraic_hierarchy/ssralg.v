@@ -3,19 +3,10 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
 From mathcomp Require Import choice fintype finfun bigop prime binomial.
-From mathcomp Require Export nmodule rings_modules_and_algebras divalg decfield.
+From mathcomp Require Export algebraic_hierarchy.
 
-(******************************************************************************)
-(*                            Ring-like structures                            *)
-(*                                                                            *)
-(* This file re-exports the contents of algebra.v, divalg.v, and decfield.v:  *)
-(* (semi)rings, (semi)modules, (semi)algebras with or without commutativity,  *)
-(* multiplicative inverse, etc., decidable fields, algebraically closed       *)
-(* fields, and their morphisms.                                               *)
-(*                                                                            *)
-(* Reference: Francois Garillot, Georges Gonthier, Assia Mahboubi, Laurence   *)
-(* Rideau, Packaging mathematical structures, TPHOLs 2009                     *)
-(******************************************************************************)
+Attributes deprecated(since="mathcomp 2.6.0",
+  note="'ssralg' has been renamed 'algebraic_hierarchy'.").
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -628,10 +619,6 @@ Notation subr_char2 := subr_pchar2 (only parsing).
 Notation addrK_char2 := addrK_pchar2 (only parsing).
 #[deprecated(since="mathcomp 2.4.0", use=addKr_pchar2)]
 Notation addKr_char2 := addKr_pchar2 (only parsing).
-
-#[deprecated(since="mathcomp 2.5.0", use=monoid_morphism)]
-Definition multiplicative (R S : pzSemiRingType) (f : R -> S) : Prop :=
-  {morph f : x y / x * y}%R * (f 1 = 1).
 
 #[warning="-deprecated-since-mathcomp-2.5.0"]
 HB.factory Record isMultiplicative (R S : pzSemiRingType) (f : R -> S) := {

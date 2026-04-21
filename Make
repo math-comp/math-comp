@@ -25,6 +25,7 @@ algebra/algebraic_hierarchy/rings_modules_and_algebras.v
 algebra/algebraic_hierarchy/divalg.v
 algebra/algebraic_hierarchy/decfield.v
 algebra/algebraic_hierarchy/ssralg.v
+algebra/algebraic_hierarchy/algebraic_hierarchy.v
 algebra/ssrint.v
 algebra/vector.v
 algebra/zmodp.v

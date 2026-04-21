@@ -1,5 +1,5 @@
 From HB Require Import structures.
-From mathcomp Require Import boot ssralg.
+From mathcomp Require Import boot algebraic_hierarchy.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

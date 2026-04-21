@@ -21,6 +21,7 @@ algebraic_hierarchy/rings_modules_and_algebras.v
 algebraic_hierarchy/divalg.v
 algebraic_hierarchy/decfield.v
 algebraic_hierarchy/ssralg.v
+algebraic_hierarchy/algebraic_hierarchy.v
 ssrint.v
 numeric_hierarchy/orderedzmod.v
 numeric_hierarchy/numdomain.v

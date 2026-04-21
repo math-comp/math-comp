@@ -1,6 +1,6 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool ssrnat eqtype choice.
-From mathcomp Require Import order interval ssralg.
+From mathcomp Require Import order interval algebraic_hierarchy.
 From mathcomp Require Import orderedzmod numdomain numfield ssrint.
 From mathcomp Require Import interval_inference.
 
