@@ -21,7 +21,7 @@
 !boot
 !order
 !ssreflect
-!fingroup
+!group
 !algebra
 !solvable
 !field
