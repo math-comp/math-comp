@@ -9,7 +9,7 @@ From mathcomp Require Import falgebra fieldext separable galois algC cyclotomic.
 
 (******************************************************************************)
 (* This file provides a few basic results and constructions in algebraic      *)
-(* number theory, that are used in the character theory library. Most of      *)
+(* number theory, that are used in the group representation package. Most of  *)
 (* these could be generalized to a more abstract setting. Note that the type  *)
 (* of abstract number fields is simply extFieldType rat. We define here:      *)
 (*  x \in Crat_span X <=> x is a Q-linear combination of elements of          *)
