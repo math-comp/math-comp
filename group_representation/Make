@@ -7,7 +7,7 @@ mxabelem.v
 mxrepresentation.v
 vcharacter.v
 
--R . mathcomp.character
+-R . mathcomp.group_representation
 
 # Warnings set as error to avoid (re)introducing them
 -arg -w -arg +duplicate-clear
