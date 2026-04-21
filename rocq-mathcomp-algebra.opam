@@ -11,7 +11,7 @@ build: [ make "-C" "algebra" "-j" "%{jobs}%" ]
 install: [ make "-C" "algebra" "install" ]
 depends: [
   "rocq-mathcomp-order" { = version }
-  "rocq-mathcomp-fingroup" { = version }
+  "rocq-mathcomp-finite-group" { = version }
 ]
 
 tags: [
