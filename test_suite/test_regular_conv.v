@@ -1,4 +1,4 @@
-From mathcomp Require Import all_boot all_order all_algebra all_field.
+From mathcomp Require Import boot order algebra field.
 
 Section regular.
 

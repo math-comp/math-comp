@@ -1,8 +1,4 @@
-From mathcomp Require Export action.
-From mathcomp Require Export automorphism.
-From mathcomp Require Export fingroup.
-From mathcomp Require Export gproduct.
-From mathcomp Require Export morphism.
-From mathcomp Require Export perm.
-From mathcomp Require Export presentation.
-From mathcomp Require Export quotient.
+Attributes deprecated(since="mathcomp 2.6.0",
+  note="'all_fingroup' has been renamed 'group'.").
+
+From mathcomp Require Export group.

@@ -1,4 +1,5 @@
 abelian.v
+solvable.v
 all_solvable.v
 alt.v
 burnside_app.v
