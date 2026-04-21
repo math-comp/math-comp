@@ -3,7 +3,7 @@ ARG coq_image="rocq/rocq-prover:dev-ocaml-4.14"
 FROM ${coq_image} as builder
 
 ENV MATHCOMP_VERSION="dev"
-ENV MATHCOMP_PACKAGE="coq-mathcomp-character"
+ENV MATHCOMP_PACKAGE="coq-mathcomp-group-representation"
 
 WORKDIR /home/mathcomp
 
@@ -28,13 +28,13 @@ RUN set -x \
   && opam pin add -n -y -k path rocq-mathcomp-algebra . \
   && opam pin add -n -y -k path rocq-mathcomp-solvable . \
   && opam pin add -n -y -k path rocq-mathcomp-field . \
-  && opam pin add -n -y -k path rocq-mathcomp-character . \
+  && opam pin add -n -y -k path rocq-mathcomp-group-representation . \
   && opam pin add -n -k path coq-mathcomp-ssreflect . \
   && opam pin add -n -k path coq-mathcomp-finite-group . \
   && opam pin add -n -k path coq-mathcomp-algebra . \
   && opam pin add -n -k path coq-mathcomp-solvable . \
   && opam pin add -n -k path coq-mathcomp-field . \
-  && opam pin add -n -k path coq-mathcomp-character . \
+  && opam pin add -n -k path coq-mathcomp-group-representation . \
   && opam install -y -v -j "${NJOBS}" "${MATHCOMP_PACKAGE}" \
   && opam clean -a -c -s --logs \
   && opam config list && opam list
