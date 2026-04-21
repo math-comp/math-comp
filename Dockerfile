@@ -24,13 +24,13 @@ RUN set -x \
   && coqc --version \
   && opam pin add -n -y -k path rocq-mathcomp-boot . \
   && opam pin add -n -y -k path rocq-mathcomp-order . \
-  && opam pin add -n -y -k path rocq-mathcomp-fingroup . \
+  && opam pin add -n -y -k path rocq-mathcomp-finite-group . \
   && opam pin add -n -y -k path rocq-mathcomp-algebra . \
   && opam pin add -n -y -k path rocq-mathcomp-solvable . \
   && opam pin add -n -y -k path rocq-mathcomp-field . \
   && opam pin add -n -y -k path rocq-mathcomp-character . \
   && opam pin add -n -k path coq-mathcomp-ssreflect . \
-  && opam pin add -n -k path coq-mathcomp-fingroup . \
+  && opam pin add -n -k path coq-mathcomp-finite-group . \
   && opam pin add -n -k path coq-mathcomp-algebra . \
   && opam pin add -n -k path coq-mathcomp-solvable . \
   && opam pin add -n -k path coq-mathcomp-field . \
