@@ -7,7 +7,7 @@ bug-reports: "https://github.com/math-comp/math-comp/issues"
 dev-repo: "git+https://github.com/math-comp/math-comp.git"
 license: "CECILL-B"
 
-depends: [ "rocq-mathcomp-character" { = version } ]
+depends: [ "rocq-mathcomp-group-representation" { = version } ]
 authors: [ "The Mathematical Components team" ]
 
-synopsis: "Compatibility package for rocq-mathcomp-character"
+synopsis: "Compatibility package for rocq-mathcomp-group-representation"

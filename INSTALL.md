@@ -102,5 +102,5 @@ for P in rocq*.opam; do opam pin add -n -k path ${P%.opam} .; done
 Then you can use `opam install` to compile and install any package.
 For example:
 ```
-opam install rocq-mathcomp-character -j3
+opam install rocq-mathcomp-group-representation -j3
 ```
