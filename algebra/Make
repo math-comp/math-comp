@@ -27,6 +27,7 @@ numeric_hierarchy/orderedzmod.v
 numeric_hierarchy/numdomain.v
 numeric_hierarchy/numfield.v
 numeric_hierarchy/ssrnum.v
+numeric_hierarchy/numeric_hierarchy.v
 vector.v
 zmodp.v
 sesquilinear.v

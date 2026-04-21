@@ -7,8 +7,8 @@ From mathcomp Require Import algebraic_hierarchy poly finset gproduct fingroup.
 From mathcomp Require Import morphism perm automorphism quotient finalg action.
 From mathcomp Require Import zmodp commutator cyclic center pgroup nilpotent.
 From mathcomp Require Import sylow abelian matrix mxalgebra mxpoly.
-From mathcomp Require Import mxrepresentation vector ssrnum algC classfun.
-From mathcomp Require Import archimedean.
+From mathcomp Require Import mxrepresentation vector numeric_hierarchy algC.
+From mathcomp Require Import classfun archimedean.
 
 (******************************************************************************)
 (* This file contains the basic notions of character theory, based on Isaacs. *)

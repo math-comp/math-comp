@@ -4,8 +4,8 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
 From mathcomp Require Import div fintype path bigop finset prime order.
 From mathcomp Require Import algebraic_hierarchy poly polydiv mxpoly.
-From mathcomp Require Import generic_quotient countalg ssrnum closed_field.
-From mathcomp Require Import ssrint archimedean rat intdiv.
+From mathcomp Require Import generic_quotient countalg numeric_hierarchy.
+From mathcomp Require Import closed_field ssrint archimedean rat intdiv.
 From mathcomp Require Import algebraics_fundamentals.
 
 (******************************************************************************)
