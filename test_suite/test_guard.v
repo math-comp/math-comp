@@ -1,4 +1,4 @@
-From mathcomp Require Import all_boot.
+From mathcomp Require Import boot.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

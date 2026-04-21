@@ -1,3 +1,4 @@
+group_representation.v
 all_character.v
 character.v
 classfun.v
