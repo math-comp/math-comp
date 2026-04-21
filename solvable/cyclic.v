@@ -3,8 +3,8 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
 From mathcomp Require Import div fintype bigop prime finset fingroup morphism.
-From mathcomp Require Import perm automorphism quotient gproduct ssralg.
-From mathcomp Require Import finalg zmodp poly.
+From mathcomp Require Import perm automorphism quotient gproduct.
+From mathcomp Require Import algebraic_hierarchy finalg zmodp poly.
 
 (******************************************************************************)
 (*  Properties of cyclic groups.                                              *)

@@ -4,9 +4,9 @@ From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype bigop finset prime binomial.
 From mathcomp Require Import fingroup morphism perm automorphism presentation.
 From mathcomp Require Import quotient action commutator gproduct gfunctor.
-From mathcomp Require Import ssralg finalg zmodp cyclic pgroup center gseries.
-From mathcomp Require Import nilpotent sylow abelian finmodule matrix maximal.
-From mathcomp Require Import extremal.
+From mathcomp Require Import algebraic_hierarchy finalg zmodp cyclic pgroup.
+From mathcomp Require Import center gseries nilpotent sylow abelian finmodule.
+From mathcomp Require Import matrix maximal extremal.
 
 (******************************************************************************)
 (* This file contains the fine structure thorems for extraspecial p-groups.   *)

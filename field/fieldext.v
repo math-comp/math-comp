@@ -2,9 +2,10 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
-From mathcomp Require Import choice fintype tuple finfun bigop ssralg countalg.
-From mathcomp Require Import finalg zmodp matrix vector falgebra poly polydiv.
-From mathcomp Require Import mxpoly generic_quotient.
+From mathcomp Require Import choice fintype tuple finfun bigop.
+From mathcomp Require Import algebraic_hierarchy countalg finalg zmodp matrix.
+From mathcomp Require Import vector falgebra poly polydiv mxpoly.
+From mathcomp Require Import generic_quotient.
 
 (******************************************************************************)
 (*                   Finite dimensional field extensions                      *)

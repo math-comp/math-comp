@@ -4,8 +4,9 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype tuple finfun bigop finset prime.
 From mathcomp Require Import binomial fingroup morphism perm quotient gproduct.
-From mathcomp Require Import ssralg finalg zmodp matrix mxalgebra poly polydiv.
-From mathcomp Require Import mxpoly polyXY vector cyclic falgebra fieldext.
+From mathcomp Require Import algebraic_hierarchy finalg zmodp matrix mxalgebra.
+From mathcomp Require Import poly polydiv mxpoly polyXY vector cyclic falgebra.
+From mathcomp Require Import fieldext.
 
 (******************************************************************************)
 (* This file provides a theory of separable and inseparable field extensions. *)

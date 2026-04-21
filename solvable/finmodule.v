@@ -2,9 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype bigop ssralg finset fingroup.
-From mathcomp Require Import morphism perm finalg action gproduct commutator .
-From mathcomp Require Import cyclic.
+From mathcomp Require Import div choice fintype bigop algebraic_hierarchy.
+From mathcomp Require Import finset fingroup morphism perm finalg action.
+From mathcomp Require Import gproduct commutator cyclic.
 
 (******************************************************************************)
 (*  This file regroups constructions and results that are based on the most   *)

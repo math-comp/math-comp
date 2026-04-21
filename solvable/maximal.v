@@ -3,9 +3,10 @@
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
 From mathcomp Require Import div fintype finfun bigop finset prime binomial.
 From mathcomp Require Import fingroup morphism perm automorphism quotient.
-From mathcomp Require Import action commutator gproduct gfunctor ssralg .
-From mathcomp Require Import countalg finalg zmodp cyclic pgroup center gseries.
-From mathcomp Require Import nilpotent sylow abelian finmodule.
+From mathcomp Require Import action commutator gproduct gfunctor.
+From mathcomp Require Import algebraic_hierarchy countalg finalg zmodp cyclic.
+From mathcomp Require Import pgroup center gseries nilpotent sylow abelian.
+From mathcomp Require Import finmodule.
 
 (******************************************************************************)
 (*   This file establishes basic properties of several important classes of   *)
