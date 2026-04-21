@@ -65,13 +65,13 @@ endif
 
 test_suite/test_hierarchy_all.v: $(TEST_DEP)
 	ROCQBIN=$(ROCQBIN) ocaml etc/utils/hierarchy.ml -verify $(MATHCOMP_PATH) \
-		-lib all_boot \
-		-lib all_order \
-		-lib all_algebra \
-		-lib all_field \
-		-lib all_character \
-		-lib all_fingroup \
-		-lib all_solvable \
+		-lib boot \
+		-lib order \
+		-lib algebra \
+		-lib field \
+		-lib group_representation \
+		-lib finite_group \
+		-lib solvable \
 		> test_suite/test_hierarchy_all.v
 
 Makefile.test-suite.coq: test_suite/test_hierarchy_all.v

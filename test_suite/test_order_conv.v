@@ -1,4 +1,4 @@
-From mathcomp Require Import all_boot all_order.
+From mathcomp Require Import boot order.
 Import Order.Theory.
 
 Section dual_of_dual.
