@@ -6,7 +6,7 @@ From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
 From mathcomp Require Import algebraic_hierarchy poly finset fingroup morphism.
 From mathcomp Require Import perm automorphism quotient action countalg finalg.
 From mathcomp Require Import zmodp commutator cyclic center pgroup sylow.
-From mathcomp Require Import gseries nilpotent abelian ssrnum ssrint.
+From mathcomp Require Import gseries nilpotent abelian numeric_hierarchy ssrint.
 From mathcomp Require Import archimedean polydiv rat matrix mxalgebra intdiv.
 From mathcomp Require Import mxpoly vector falgebra fieldext separable galois.
 From mathcomp Require Import algC cyclotomic algnum mxrepresentation classfun.

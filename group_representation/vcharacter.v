@@ -6,8 +6,9 @@ From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
 From mathcomp Require Import algebraic_hierarchy poly finset fingroup morphism.
 From mathcomp Require Import perm automorphism quotient finalg action gproduct.
 From mathcomp Require Import zmodp commutator cyclic center pgroup sylow.
-From mathcomp Require Import frobenius vector ssrnum ssrint archimedean intdiv.
-From mathcomp Require Import algC algnum classfun character integral_char.
+From mathcomp Require Import frobenius vector numeric_hierarchy ssrint.
+From mathcomp Require Import archimedean intdiv algC algnum classfun character.
+From mathcomp Require Import integral_char.
 
 (******************************************************************************)
 (* This file provides basic notions of virtual character theory:              *)

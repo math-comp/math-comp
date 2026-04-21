@@ -7,7 +7,7 @@ From mathcomp Require Import algebraic_hierarchy poly polydiv morphism action.
 From mathcomp Require Import countalg finalg zmodp cyclic center pgroup abelian.
 From mathcomp Require Import matrix mxpoly vector falgebra fieldext separable.
 From mathcomp Require Import galois.
-From mathcomp Require ssrnum ssrint archimedean algC cyclotomic.
+From mathcomp Require numeric_hierarchy ssrint archimedean algC cyclotomic.
 
 (******************************************************************************)
 (*           Additional constructions and results on finite fields            *)
@@ -615,7 +615,8 @@ Notation PrimePowerField := (pPrimePowerField) (only parsing).
 
 Section FinDomain.
 
-Import order ssrnum ssrint archimedean algC cyclotomic Order.TTheory Num.Theory.
+Import order numeric_hierarchy ssrint archimedean algC cyclotomic.
+Import Order.TTheory Num.Theory.
 Local Infix "%|" := dvdn. (* Hide polynomial divisibility. *)
 
 Variable R : finUnitRingType.

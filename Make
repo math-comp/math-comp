@@ -15,6 +15,7 @@ algebra/numeric_hierarchy/orderedzmod.v
 algebra/numeric_hierarchy/numdomain.v
 algebra/numeric_hierarchy/numfield.v
 algebra/numeric_hierarchy/ssrnum.v
+algebra/numeric_hierarchy/numeric_hierarchy.v
 algebra/polydiv.v
 algebra/poly.v
 algebra/polyXY.v

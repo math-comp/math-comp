@@ -3,8 +3,8 @@
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime.
 From mathcomp Require Import algebraic_hierarchy poly finset fingroup finalg.
-From mathcomp Require Import zmodp cyclic ssrnum ssrint archimedean polydiv.
-From mathcomp Require Import intdiv mxpoly rat vector falgebra fieldext.
+From mathcomp Require Import zmodp cyclic numeric_hierarchy ssrint archimedean.
+From mathcomp Require Import polydiv intdiv mxpoly rat vector falgebra fieldext.
 From mathcomp Require Import separable galois algC.
 
 (******************************************************************************)
