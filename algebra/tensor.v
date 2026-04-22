@@ -11,9 +11,9 @@ From Corelib Require Import ssreflect.
 (*       'T[R]_(u_, d_) == the type of tensors with elements of type R,       *)
 (*       'T_(u_, d_)       contravariant dimensions u_, and covariant         *)
 (*                         dimensions d_, where u_ and d_ are finite          *)
-(*                         functions from ordinals to positive numbers         *)
+(*                         functions from ordinals to positive numbers        *)
 (*                         ({posnum nat} ^ k and {posnum nat} ^ l resp.).     *)
-(*                         The [R] is optional and can usually be ommited.    *)
+(*                         The [R] is optional and can usually be omitted.    *)
 (* 'nT[R]_(u_), 'nT_(u_) == purely contravariant tensors (no covariant dims). *)
 (* 'oT[R]_(d_), 'oT_(d_) == purely covariant tensors (no contravariant dims). *)
 (*                  t^^i == the tensor obtained by fixing the first           *)
@@ -23,18 +23,18 @@ From Corelib Require Import ssreflect.
 (* \tensor^^(i < n) Expr(i) ==                                                *)
 (*                         the 'T_(n :: _, _) tensor t such that              *)
 (*                         t^^i = Expr(i) with i : 'I_n, the < n bound can    *)
-(*                         usually be ommitted.                               *)
+(*                         usually be omitted.                               *)
 (* \tensor`_(j < n) Expr(j) ==                                                *)
 (*                         the 'T_(_, n :: _) tensor t such that              *)
 (*                         t`_j = Expr(j) with j : 'I_n, the < n bound can    *)
-(*                         usually be ommitted.                               *)
+(*                         usually be omitted.                               *)
 (*            const_t v == the constant tensor whose entries are all v        *)
 (*                         (dimensions are inferred from context)             *)
 (*               t.[::] == the value of the single entry in a                 *)
 (*                         tensor t : 'T_([::], [::]).                        *)
 (*         t^^=i, t`_=i == variants of the indexing operations equivalent to  *)
 (*                         (t^^i).[::], (t`_i).[::], useful for indexing the  *)
-(*                         final dimnsions of tensors.                        *)
+(*                         final dimensions of tensors.                       *)
 (* \tensor^^(i < n) => Expr(i), \tensor`_(j < n) => Expr(j) ==                *)
 (*                         variant constructor equivalent to                  *)
 (*                         \tensor^^(i < n) const_t Expr(i).                  *)
@@ -51,10 +51,16 @@ From Corelib Require Import ssreflect.
 (* NOTE: Ring multiplication ( *%R ) is the Hadamard (element-wise) product.  *)
 (* Proper tensor product forms a bilinear structure.                          *)
 (*                                                                            *)
+(* Dimension notation:                                                        *)
+(*  [dims n1; ..; nk] == posnum nat tuple from nat literals (only parsing),   *)
+(*                        e.g. 'T[R]_([dims 2; 3], [dims 4]).                 *)
+(*           [dims]    == empty dimension tuple (0.-tuple {posnum nat}).       *)
+(*                                                                            *)
 (* Tensor operations:                                                         *)
-(* t *h u == Hadamard product of t and u (element-wise multiplication)        *)
+(* t *h u == Hadamard product of t and u (element-wise multiplication),       *)
+(*           same as t * u (ring multiplication)                              *)
 (* t *t u == proper tensor product: combines dimensions,                      *)
-(*           'T_(u1, d1) * 'T_(u2, d2) -> 'T_(cat u1 u2, cat d1 d2)           *)
+(*           'T_(u1, d1) * 'T_(u2, d2) -> 'T_(cat u1 u2, cat d1 d2)          *)
 (******************************************************************************)
 
 Set Implicit Arguments.
@@ -106,9 +112,9 @@ Reserved Notation "[ 'tensor' ^^ t ; .. ; tn ]"
 Reserved Notation "[ 'tensor' `_ t ; .. ; tn ]"
   (format "[ 'tensor' `_ '['  t ; '/'  .. ; '/'  tn ']' ]").
 Reserved Notation "[ 'tensor' ^^= x ; .. ; xn ]"
-  (format "[ 'tensor' ^^= '['  t ; '/'  .. ; '/'  tn ']' ]").
+  (format "[ 'tensor' ^^= '['  x ; '/'  .. ; '/'  xn ']' ]").
 Reserved Notation "[ 'tensor' `_= x ; .. ; xn ]"
-  (format "[ 'tensor' `_= '['  t ; '/'  .. ; '/'  tn ']' ]").
+  (format "[ 'tensor' `_= '['  x ; '/'  .. ; '/'  xn ']' ]").
 
 Reserved Notation "t .[::]".
 
@@ -118,6 +124,17 @@ Reserved Notation "x *h y"
 Reserved Notation "*t%R" (at level 0).
 Reserved Notation "x *t y"
   (at level 40, left associativity, format "x  *t  y").
+
+(* Coercion from tuples to finfun: allows writing tensor dimensions as tuples *)
+Coercion finfun_of_tuple : tuple_of >-> finfun_of.
+
+(* Shorthand notation for posnum nat tuples used as tensor dimensions.
+   These are only parsing: goals will display the underlying finfun form.
+   Requires ring_scope for %:posnat elaboration. *)
+Notation "[dims]" := ([tuple] : 0.-tuple {posnum nat}) (only parsing).
+Local Open Scope ring_scope.
+Notation "[dims x ; .. ; y ]" :=
+  [tuple of x%:posnat :: .. [:: y%:posnat] ..] (only parsing).
 
 Section TensorDef.
 
