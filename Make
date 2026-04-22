@@ -118,6 +118,9 @@ boot/tuple.v
 order/all_order.v
 order/preorder.v
 order/porder.v
+order/lattice.v
+order/total_order.v
+order/complemented_lattice.v
 order/order.v
 order/order_instances.v
 ssreflect/all_ssreflect.v
