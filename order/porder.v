@@ -715,7 +715,6 @@ HB.factory Record Lt_isPOrder (d : disp_t) T & Choice T := {
 }.
 
 HB.builders Context d T & Lt_isPOrder d T.
-#[warning="-HB.no-new-instance"]
 HB.instance Definition _ := @LtLe_isPOrder.Build d T
   _ lt (fun _ _ => erefl) lt_irr lt_trans.
 HB.end.
