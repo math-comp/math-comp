@@ -105,6 +105,7 @@ boot/ssrnotations.v
 boot/tuple.v
 order/all_order.v
 order/preorder.v
+order/porder.v
 order/order.v
 order/order_instances.v
 ssreflect/all_ssreflect.v
