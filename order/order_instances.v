@@ -3,7 +3,7 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import path div fintype tuple finfun bigop finset prime.
-From mathcomp Require Import preorder order.
+From mathcomp Require Import preorder porder order.
 
 (******************************************************************************)
 (*                 Instances of preorder and order structures                 *)
