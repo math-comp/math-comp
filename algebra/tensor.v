@@ -8,15 +8,14 @@ From Corelib Require Import ssreflect.
 (******************************************************************************)
 (* This file defines tensors,                                                 *)
 (* For tensors we define:                                                     *)
-(*                 pseq == the type of sequences of strictly positive natural *)
-(*                         numbers, coerces to and from seq.                  *)
 (*       'T[R]_(u_, d_) == the type of tensors with elements of type R,       *)
 (*       'T_(u_, d_)       contravariant dimensions u_, and covariant         *)
-(*                         dimensions d_, e.g. 'T[nat]_([:: 1; 3], [::])      *)
-(*                         (u_ and d_ must be instances of pseq).             *)
+(*                         dimensions d_, where u_ and d_ are finite          *)
+(*                         functions from ordinals to positive numbers         *)
+(*                         ({posnum nat} ^ k and {posnum nat} ^ l resp.).     *)
 (*                         The [R] is optional and can usually be ommited.    *)
-(* 'nT[R]_(u_), 'nT_(u_) == 'T[R]_(u_, [::]), purely contravariant tensors.   *)
-(* 'oT[R]_(d_), 'oT_(d_) == 'T[R]_([::], d_), purely covariant tensors.       *)
+(* 'nT[R]_(u_), 'nT_(u_) == purely contravariant tensors (no covariant dims). *)
+(* 'oT[R]_(d_), 'oT_(d_) == purely covariant tensors (no contravariant dims). *)
 (*                  t^^i == the tensor obtained by fixing the first           *)
 (*                          contravariant dimension of t to i.                *)
 (*                  t`_i == the tensor obtained by fixing the first           *)
@@ -112,6 +111,13 @@ Reserved Notation "[ 'tensor' `_= x ; .. ; xn ]"
   (format "[ 'tensor' `_= '['  t ; '/'  .. ; '/'  tn ']' ]").
 
 Reserved Notation "t .[::]".
+
+Reserved Notation "*h%R" (at level 0).
+Reserved Notation "x *h y"
+  (at level 40, left associativity, format "x  *h  y").
+Reserved Notation "*t%R" (at level 0).
+Reserved Notation "x *t y"
+  (at level 40, left associativity, format "x  *t  y").
 
 Section TensorDef.
 
@@ -230,37 +236,37 @@ Context {R : pzSemiRingType}.
 Definition tensor1 := @const_t _ _ _ u_ d_ (GRing.one R).
 
 (* Hadamard product: element-wise multiplication *)
-Definition hmult (t u : 'T[R]_(u_, d_)) :=
+Definition hmul (t u : 'T[R]_(u_, d_)) :=
   @Tensor _ _ u_ d_ R (map2_mx *%R (\val t) (\val u)).
 
-Lemma hmultA : associative hmult.
-Proof. by move=> x y z; rewrite /hmult map2_mxA. Qed.
-Lemma hmul1t : left_id tensor1 hmult.
-Proof. by move=> [x]; rewrite /hmult map2_1mx. Qed.
-Lemma hmult1 : right_id tensor1 hmult.
-Proof. by move=> [x]; rewrite /hmult map2_mx1. Qed.
-Lemma hmultDl : left_distributive hmult +%R.
-Proof. by move=> x y z; rewrite /hmult map2_mxDl. Qed.
-Lemma hmultDr : right_distributive hmult +%R.
-Proof. by move=> x y z; rewrite /hmult map2_mxDr. Qed.
-Lemma hmul0t : left_zero 0%R hmult.
-Proof. by move=> x; rewrite /hmult map2_0mx. Qed.
-Lemma hmult0 : right_zero 0%R hmult.
-Proof. by move=> x; rewrite /hmult map2_mx0. Qed.
+#[local] Fact hmulA : associative hmul.
+Proof. by move=> x y z; rewrite /hmul map2_mxA. Qed.
+Lemma hmul1t : left_id tensor1 hmul.
+Proof. by move=> [x]; rewrite /hmul map2_1mx. Qed.
+Lemma hmul1 : right_id tensor1 hmul.
+Proof. by move=> [x]; rewrite /hmul map2_mx1. Qed.
+Lemma hmulDl : left_distributive hmul +%R.
+Proof. by move=> x y z; rewrite /hmul map2_mxDl. Qed.
+Lemma hmulDr : right_distributive hmul +%R.
+Proof. by move=> x y z; rewrite /hmul map2_mxDr. Qed.
+Lemma hmul0t : left_zero 0%R hmul.
+Proof. by move=> x; rewrite /hmul map2_0mx. Qed.
+Lemma hmul0 : right_zero 0%R hmul.
+Proof. by move=> x; rewrite /hmul map2_mx0. Qed.
 
 HB.instance Definition _ := GRing.Nmodule_isPzSemiRing.Build
-  'T[R] hmultA hmul1t hmult1 hmultDl hmultDr hmul0t hmult0.
+  'T[R] hmulA hmul1t hmul1 hmulDl hmulDr hmul0t hmul0.
 
 End TensorSemiRing.
 
-Lemma hmultC {R : comPzSemiRingType} : @commutative 'T[R] _ hmult.
-Proof. by move=> x y; rewrite /hmult map2_mxC. Qed.
+Lemma hmulC {R : comPzSemiRingType} : @commutative 'T[R] _ hmul.
+Proof. by move=> x y; rewrite /hmul map2_mxC. Qed.
 
 HB.instance Definition _ {R : pzRingType} := GRing.Zmodule_isPzRing.Build
-  'T[R] hmultA hmul1t hmult1 hmultDl hmultDr.
+  'T[R] hmulA hmul1t hmul1 hmulDl hmulDr.
 
 HB.instance Definition _ {R : comPzRingType} := 
-  SemiRing_hasCommutativeMul.Build 'T[R] hmultC.
+  SemiRing_hasCommutativeMul.Build 'T[R] hmulC.
 
 Lemma onet_neq0 {R : nzSemiRingType} : (1%R : 'T[R]) != 0%R.
 Proof.
@@ -280,10 +286,10 @@ HB.instance Definition _ {R : nzSemiRingType} :=
   'T[R] onet_neq0.
 
 HB.instance Definition _ {R : nzRingType} := GRing.Zmodule_isNzRing.Build
-  'T[R] hmultA hmul1t hmult1 hmultDl hmultDr onet_neq0.
+  'T[R] hmulA hmul1t hmul1 hmulDl hmulDr onet_neq0.
 
 HB.instance Definition _ {R : comNzRingType} := GRing.Zmodule_isComNzRing.Build
-  'T[R] hmultA hmultC hmul1t hmultDl onet_neq0.
+  'T[R] hmulA hmulC hmul1t hmulDl onet_neq0.
 
 Definition unitt {R : unitRingType} (t : 'T[R]) :=
   [forall ij, (\val t ij.1 ij.2) \is a GRing.unit].
@@ -323,8 +329,8 @@ HB.instance Definition _ {R : unitRingType} :=
 End TensorRing.
 
 (* Notations for Hadamard product *)
-Notation "*h%R" := hmult : ring_scope.
-Notation "x *h y" := (hmult x y) (at level 40, left associativity) : ring_scope.
+Notation "*h%R" := hmul : ring_scope.
+Notation "x *h y" := (hmul x y) : ring_scope.
 
 Section NilTensor.
 
@@ -721,7 +727,7 @@ Definition prod_split (m n : nat) (i : 'I_(m * n)) : 'I_m * 'I_n :=
 Definition prod_unsplit (m n : nat) (ij : 'I_m * 'I_n) : 'I_(m * n) :=
   cast_ord (prod_card m n) (enum_rank ij).
 
-Definition tprod (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) 
+Definition mults (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) 
   : 'T[R]_(fcat u1_ u2_, fcat d1_ d2_) :=
   Tensor (\matrix_(i, j) 
     let ii := prod_split (cast_ord (esym (prod_fcat _ _)) i) in
@@ -730,32 +736,32 @@ Definition tprod (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_))
 
 Local Open Scope ring_scope.
 
-Lemma tprodDl (t u : 'T[R]_(u1_, d1_)) (v : 'T[R]_(u2_, d2_)) :
-  tprod (t + u) v = (tprod t v + tprod u v).
+Lemma multsDl (t u : 'T[R]_(u1_, d1_)) (v : 'T[R]_(u2_, d2_)) :
+  mults (t + u) v = (mults t v + mults u v).
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val/= !mxE/= mulrDl.
 Qed.
 
-Lemma tprodDr (t : 'T[R]_(u1_, d1_)) (u v : 'T[R]_(u2_, d2_)) :
-  tprod t (u + v) = tprod t u + tprod t v.
+Lemma multsDr (t : 'T[R]_(u1_, d1_)) (u v : 'T[R]_(u2_, d2_)) :
+  mults t (u + v) = mults t u + mults t v.
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val/= !mxE /= mulrDr.
 Qed.
 
-Lemma tprod0l (t : 'T[R]_(u2_, d2_)) :
-  tprod (0 : 'T[R]_(u1_, d1_)) t = 0.
+Lemma mults0l (t : 'T[R]_(u2_, d2_)) :
+  mults (0 : 'T[R]_(u1_, d1_)) t = 0.
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mul0r.
 Qed.
 
-Lemma tprod0r (t : 'T[R]_(u1_, d1_)) :
-  tprod t (0 : 'T[R]_(u2_, d2_)) = 0.
+Lemma mults0r (t : 'T[R]_(u1_, d1_)) :
+  mults t (0 : 'T[R]_(u2_, d2_)) = 0.
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE mulr0.
 Qed.
 
-Lemma tprod_const (a b : R) :
-  tprod (@const_t R _ _ u1_ d1_ a) (@const_t R _ _ u2_ d2_ b) = 
+Lemma mults_const (a b : R) :
+  mults (@const_t R _ _ u1_ d1_ a) (@const_t R _ _ u2_ d2_ b) = 
   const_t (a * b)%R.
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE.
@@ -764,8 +770,8 @@ Qed.
 
 End TensorProduct.
 
-Notation "*t%R" := tprod : ring_scope.
-Notation "x *t y" := (tprod x y) (at level 40, left associativity) : ring_scope.
+Notation "*t%R" := mults : ring_scope.
+Notation "x *t y" := (mults x y) : ring_scope.
 
 Section TensorProductBilinear.
 
@@ -776,7 +782,7 @@ Context (u2_ : {posnum nat} ^ k2) (d2_ : {posnum nat} ^ l2).
 
 Local Open Scope ring_scope.
 
-Lemma tprod_linear_l (u : 'T[R]_(u2_, d2_)) :
+Lemma mults_linear_l (u : 'T[R]_(u2_, d2_)) :
   GRing.linear_for *:%R (fun t : 'T[R]_(u1_, d1_) => t *t u).
 Proof.
 move=> a x y; apply/val_inj/matrixP=> i j; rewrite /tensor_val/= !mxE/=.
@@ -784,7 +790,7 @@ rewrite mulrDl; congr (_ + _);
   by rewrite mulrA.
 Qed.
 
-Lemma tprod_linear_r (t : 'T[R]_(u1_, d1_)) :
+Lemma mults_linear_r (t : 'T[R]_(u1_, d1_)) :
   GRing.linear_for *:%R (fun u : 'T[R]_(u2_, d2_) => t *t u).
 Proof.
 move=> a x y; apply/val_inj/matrixP=> i j; rewrite /tensor_val/= !mxE/=.
@@ -795,7 +801,7 @@ HB.instance Definition _ := bilinear_isBilinear.Build
   R
   'T[R]_(u1_, d1_) 'T[R]_(u2_, d2_)
   'T[R]_(fcat u1_ u2_, fcat d1_ d2_)
-  *:%R *:%R (@tprod _ _ _ _ _ _ _ _ _) (conj tprod_linear_l tprod_linear_r).
+  *:%R *:%R (@mults _ _ _ _ _ _ _ _ _) (conj mults_linear_l mults_linear_r).
 
 End TensorProductBilinear.
 
@@ -808,7 +814,7 @@ Context (u2_ : {posnum nat} ^ k2) (d2_ : {posnum nat} ^ l2).
 
 Local Open Scope ring_scope.
 
-Lemma tprod_hmult (t1 u1 : 'T[R]_(u1_, d1_)) (t2 u2 : 'T[R]_(u2_, d2_)) :
+Lemma mults_hmul (t1 u1 : 'T[R]_(u1_, d1_)) (t2 u2 : 'T[R]_(u2_, d2_)) :
   (t1 *h u1) *t (t2 *h u2) = (t1 *t t2) *h (u1 *t u2).
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrACA.
@@ -824,26 +830,26 @@ Context (u2_ : {posnum nat} ^ k2) (d2_ : {posnum nat} ^ l2).
 
 Local Open Scope ring_scope.
 
-Lemma tprodNl {R : pzRingType} (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
+Lemma multsNl {R : pzRingType} (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
   (- t) *t u = - (t *t u).
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulNr.
 Qed.
 
-Lemma tprodNr {R : pzRingType} (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
+Lemma multsNr {R : pzRingType} (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
   t *t (- u) = - (t *t u).
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrN.
 Qed.
 
 (* Note: true commutativity would swap dimensions, requiring a more complex statement *)
-Lemma tprod_scale {R : comPzSemiRingType} (a b : R) (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
+Lemma mults_scale {R : comPzSemiRingType} (a b : R) (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
   (const_t a *h t) *t (const_t b *h u) = const_t (a * b)%R *h (t *t u).
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrACA.
 Qed.
 
-Lemma tprod_hmult_compat {R : comPzSemiRingType} 
+Lemma mults_hmul_compat {R : comPzSemiRingType} 
   (t1 t2 : 'T[R]_(u1_, d1_)) (u1 u2 : 'T[R]_(u2_, d2_)) :
   (t1 *h t2) *t (u1 *h u2) = (t1 *t u1) *h (t2 *t u2).
 Proof.
