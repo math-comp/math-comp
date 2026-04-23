@@ -2,6 +2,8 @@ all_order.v
 preorder.v
 porder.v
 lattice.v
+total_order.v
+complemented_lattice.v
 order.v
 order_instances.v
 
