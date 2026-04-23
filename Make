@@ -107,8 +107,11 @@ order/all_order.v
 order/preorder.v
 order/porder.v
 order/lattice.v
+order/lattice_instances.v
 order/total_order.v
+order/total_order_instances.v
 order/complemented_lattice.v
+order/complemented_lattice_instances.v
 order/order.v
 order/order_instances.v
 ssreflect/all_ssreflect.v

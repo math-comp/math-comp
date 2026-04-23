@@ -2,8 +2,10 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice.
-From mathcomp Require Export preorder porder lattice total_order.
-From mathcomp Require Export complemented_lattice order_instances.
+From mathcomp Require Export preorder porder lattice lattice_instances.
+From mathcomp Require Export total_order total_order_instances.
+From mathcomp Require Export complemented_lattice.
+From mathcomp Require Export complemented_lattice_instances order_instances.
 
 (******************************************************************************)
 (*              Types equipped with preorder and order relations              *)
