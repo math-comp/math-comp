@@ -3,7 +3,8 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import path div fintype tuple finfun bigop finset prime.
-From mathcomp Require Import preorder porder lattice order.
+From mathcomp Require Import preorder porder lattice total_order.
+From mathcomp Require Import complemented_lattice.
 
 (******************************************************************************)
 (*                 Instances of preorder and order structures                 *)
@@ -749,7 +750,10 @@ Reserved Notation "~^sl` A" (at level 35, right associativity).
 
 Module Order.
 
-Import Order Order.Theory.
+Import total_order.Order.
+Import total_order.Order.Theory.
+Import complemented_lattice.Order.
+Import complemented_lattice.Order.Theory.
 
 (********************)
 (* Instances on nat *)
@@ -4377,11 +4381,10 @@ Module DefaultProdLexiOrder := Order.DefaultProdLexiOrder.
 Module DefaultSeqLexiOrder := Order.DefaultSeqLexiOrder.
 Module DefaultTupleLexiOrder := Order.DefaultTupleLexiOrder.
 
-Import Order.Theory.
-
 Module tagnat.
 Section tagnat.
-Import Order.EnumVal.
+
+Import total_order.Order.Theory Order.EnumVal.
 
 Context {n : nat} {p_ : 'I_n -> nat}.
 
