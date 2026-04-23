@@ -1,12 +1,11 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype tuple finfun bigop finset prime.
-From mathcomp Require Import binomial ssralg poly polydiv fingroup perm.
-From mathcomp Require Import morphism quotient gproduct finalg zmodp cyclic.
-From mathcomp Require Import matrix mxalgebra mxpoly polyXY vector falgebra.
-From mathcomp Require Import fieldext.
+From mathcomp Require Import binomial fingroup morphism perm quotient gproduct.
+From mathcomp Require Import ssralg finalg zmodp matrix mxalgebra poly polydiv.
+From mathcomp Require Import mxpoly polyXY vector cyclic falgebra fieldext.
 
 (******************************************************************************)
 (* This file provides a theory of separable and inseparable field extensions. *)
