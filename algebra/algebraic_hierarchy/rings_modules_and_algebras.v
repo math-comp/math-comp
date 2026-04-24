@@ -3233,7 +3233,7 @@ HB.structure Definition SubComPzRing (R : pzRingType) S :=
 
 (* It will be possible to remove this factory after the release of MathComp 2.7.0 *)
 HB.factory Record SubPzRing_isSubComPzRing (R : comPzRingType) S U
-    of SubPzRing R S U := {}.
+    & SubPzRing R S U := {}.
 
 HB.builders Context R S U of SubPzRing_isSubComPzRing R S U.
 HB.instance Definition _ := SubSemiRing_isSubComSemiRing.Build R S U.
