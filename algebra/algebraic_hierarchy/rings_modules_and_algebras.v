@@ -3235,7 +3235,7 @@ HB.structure Definition SubComPzRing (R : pzRingType) S :=
 HB.factory Record SubPzRing_isSubComPzRing (R : comPzRingType) S U
     & SubPzRing R S U := {}.
 
-HB.builders Context R S U of SubPzRing_isSubComPzRing R S U.
+HB.builders Context R S U & SubPzRing_isSubComPzRing R S U.
 HB.instance Definition _ := SubSemiRing_isSubComSemiRing.Build R S U.
 HB.end.
 
