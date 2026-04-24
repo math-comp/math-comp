@@ -3576,6 +3576,11 @@ Notation "[ 'SubNmodule_isSubNzSemiRing' 'of' U 'by' <: ]" :=
   (SubNmodule_isSubNzSemiRing.Build _ _ U (@rpred1M _ _))
   (format "[ 'SubNmodule_isSubNzSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubNmodule_isSubPzSemiRing' 'of' U 'by' <: ]" :=
+  (SubNmodule_isSubPzSemiRing.Build _ _ U (@rpred1M _ _))
+  (format "[ 'SubNmodule_isSubPzSemiRing'  'of'  U  'by'  <: ]")
+  : form_scope.
+
 Notation "[ 'SubChoice_isSubNzSemiRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubNzSemiRing.Build _ _ U (semiringClosedP _))
   (format "[ 'SubChoice_isSubNzSemiRing'  'of'  U  'by'  <: ]")
