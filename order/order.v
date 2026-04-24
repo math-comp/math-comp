@@ -456,10 +456,6 @@ From mathcomp Require Export preorder.
 (* [SubChoice_isSubOrder of U by <: with disp] ==                             *)
 (* [SubChoice_isSubOrder of U by <:] == orderType mixin for a subType whose   *)
 (*                          base type is an orderType                         *)
-(*   [POrder of U by <:] == porderType mixin for a subType whose base type is *)
-(*                          a porderType                                      *)
-(*    [Order of U by <:] == orderType mixin for a subType whose base type is  *)
-(*                          an orderType                                      *)
 (*                                                                            *)
 (* We provide expected instances of ordered types for bool, nat (for leq and  *)
 (* and dvdn), 'I_n, 'I_n.+1 (with a top and bottom), nat for dvdn,            *)
@@ -5419,12 +5415,6 @@ End Total.
 
 Module Exports.
 HB.reexport DeprecatedSubOrder.
-Notation "[ 'POrder' 'of' T 'by' <: ]" :=
-  (POrder.copy T%type (sub_type T%type))
-  (format "[ 'POrder'  'of'  T  'by'  <: ]") : form_scope.
-Notation "[ 'Order' 'of' T 'by' <: ]" :=
-  (Total.copy T%type (sub_type T%type))
-  (only parsing) : form_scope.
 End Exports.
 End DeprecatedSubOrder.
 HB.export DeprecatedSubOrder.Exports.
