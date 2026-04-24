@@ -3588,13 +3588,29 @@ Notation "[ 'SubChoice_isSubComNzSemiRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubComNzSemiRing.Build _ _ U (semiringClosedP _))
   (format "[ 'SubChoice_isSubComNzSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubChoice_isSubComPzSemiRing' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubComPzSemiRing.Build _ _ U (semiringClosedP _))
+  (format "[ 'SubChoice_isSubComPzSemiRing'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubPzSemiRing' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubPzSemiRing.Build _ _ U (subringClosedP _))
+  (format "[ 'SubChoice_isSubPzSemiRing'  'of'  U  'by'  <: ]")
+  : form_scope.
 Notation "[ 'SubZmodule_isSubNzRing' 'of' U 'by' <: ]" :=
   (SubZmodule_isSubNzRing.Build _ _ U (subringClosedP _))
   (format "[ 'SubZmodule_isSubNzRing'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubChoice_isSubPzRing' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubPzRing.Build _ _ U (subringClosedP _))
+  (format "[ 'SubChoice_isSubPzRing'  'of'  U  'by'  <: ]")
+  : form_scope.
 Notation "[ 'SubChoice_isSubNzRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubNzRing.Build _ _ U (subringClosedP _))
   (format "[ 'SubChoice_isSubNzRing'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubComPzRing' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubComPzRing.Build _ _ U (subringClosedP _))
+  (format "[ 'SubChoice_isSubComPzRing'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubComNzRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubComNzRing.Build _ _ U (subringClosedP _))
