@@ -802,6 +802,14 @@ Notation addr_closed := nmod_closed.
 HB.reexport.
 End AllExports.
 
+(* It will be possible to remove this factory after the release of MathComp 2.7.0 *)
+HB.factory Record SubPzRing_isSubComPzRing (R : comPzRingType) S U
+    & SubPzRing R S U := {}.
+
+HB.builders Context R S U & SubPzRing_isSubComPzRing R S U.
+HB.instance Definition _ := SubSemiRing_isSubComSemiRing.Build R S U.
+HB.end.
+
 End GRing.
 
 Export AllExports.
@@ -867,11 +875,3 @@ Notation "[ 'char' R ]" := (GRing.pchar R) : ring_scope.
 Notation has_char0 R := (GRing.pchar R =i pred0).
 #[deprecated(since="mathcomp 2.4.0", use=pFrobenius_aut)]
 Notation Frobenius_aut chRp := (pFrobenius_aut chRp).
-
-(* It will be possible to remove this factory after the release of MathComp 2.7.0 *)
-HB.factory Record SubPzRing_isSubComPzRing (R : comPzRingType) S U
-    & SubPzRing R S U := {}.
-
-HB.builders Context R S U & SubPzRing_isSubComPzRing R S U.
-HB.instance Definition _ := SubSemiRing_isSubComSemiRing.Build R S U.
-HB.end.
