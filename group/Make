@@ -1,13 +1,14 @@
-all_character.v
-character.v
-classfun.v
-inertia.v
-integral_char.v
-mxabelem.v
-mxrepresentation.v
-vcharacter.v
+action.v
+all_fingroup.v
+automorphism.v
+fingroup.v
+gproduct.v
+morphism.v
+perm.v
+presentation.v
+quotient.v
 
--R . mathcomp.character
+-R . mathcomp.group
 
 # Warnings set as error to avoid (re)introducing them
 -arg -w -arg +duplicate-clear
