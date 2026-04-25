@@ -1,4 +1,5 @@
 action.v
+group.v
 all_fingroup.v
 automorphism.v
 fingroup.v
@@ -8,7 +9,7 @@ perm.v
 presentation.v
 quotient.v
 
--R . mathcomp.fingroup
+-R . mathcomp.group
 
 # Warnings set as error to avoid (re)introducing them
 -arg -w -arg +duplicate-clear

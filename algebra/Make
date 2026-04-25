@@ -1,3 +1,4 @@
+algebra.v
 all_algebra.v
 archimedean.v
 countalg.v
@@ -20,11 +21,13 @@ algebraic_hierarchy/rings_modules_and_algebras.v
 algebraic_hierarchy/divalg.v
 algebraic_hierarchy/decfield.v
 algebraic_hierarchy/ssralg.v
+algebraic_hierarchy/algebraic_hierarchy.v
 ssrint.v
 numeric_hierarchy/orderedzmod.v
 numeric_hierarchy/numdomain.v
 numeric_hierarchy/numfield.v
 numeric_hierarchy/ssrnum.v
+numeric_hierarchy/numeric_hierarchy.v
 vector.v
 zmodp.v
 sesquilinear.v

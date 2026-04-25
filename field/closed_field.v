@@ -2,8 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
-From mathcomp Require Import fintype generic_quotient bigop ssralg poly.
-From mathcomp Require Import polydiv matrix mxpoly countalg ring_quotient.
+From mathcomp Require Import fintype generic_quotient bigop algebraic_hierarchy.
+From mathcomp Require Import poly polydiv matrix mxpoly countalg ring_quotient.
 
 (******************************************************************************)
 (*         A quantifier elimination for algebraically closed fields           *)
