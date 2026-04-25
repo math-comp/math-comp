@@ -223,7 +223,9 @@ From mathcomp Require Import nmodule.
 (*                           products (1 and x * y in S for x, y in S)        *)
 (*      semiring_closed S <-> collective predicate S is closed under semiring *)
 (*                           operations (0, 1, x + y and x * y in S)          *)
-(* [SubNmodule_isSubPzSemiRing of R by <:] ==                                 *)
+(* [SubNmodule_isSubPzSemiRing of R by <:] == pzSemiRingType mixin for a      *)
+(*                           subType whose base type is a pzSemiRingType and  *)
+(*                           whose predicate's is a mulr_closed               *)
 (* [SubChoice_isSubPzSemiRing of R by <:] == pzSemiRingType mixin for a       *)
 (*                           subType whose base type is a pzSemiRingType and  *)
 (*                           whose predicate's is a semiringClosed            *)
@@ -256,9 +258,11 @@ From mathcomp Require Import nmodule.
 (*                           subringClosed                                    *)
 (*                                                                            *)
 (*  * ComPzSemiRing (commutative PzSemiRings):                                *)
-(* [SubNmodule_isSubComPzSemiRing of R by <:] ==                              *)
+(* [SubNmodule_isSubComPzSemiRing of R by <:] == comPzSemiRingType mixin for  *)
+(*                          a subType whose base type is a comPzSemiRingType  *)
+(*                          and whose predicate's is a ring_closed            *)
 (* [SubChoice_isSubComPzSemiRing of R by <:] == comPzSemiRingType mixin for a *)
-(*                           subType whose base type is a comPzSemiRingType   *)
+(*                          subType whose base type is a comPzSemiRingType    *)
 (*                          and whose predicate's is a semiringClosed         *)
 (*                                                                            *)
 (*  * ComNzSemiRing (commutative NzSemiRings):                                *)
@@ -3159,6 +3163,28 @@ HB.instance Definition _ := Nmodule_isPzSemiRing.Build U
 Lemma valM : monoid_morphism (val : U -> R).
 Proof. by split=> [|x y] /=; rewrite !SubK. Qed.
 HB.instance Definition _ := isSubPzSemiRing.Build R S U valM.
+HB.end.
+
+HB.factory Record SubNmodule_isSubComPzSemiRing (R : comPzSemiRingType) S U
+    & SubNmodule R S U := {
+  mulr_closed_subproof : mulr_closed S
+}.
+
+HB.builders Context R S U & SubNmodule_isSubComPzSemiRing R S U.
+
+HB.instance Definition _ :=
+  SubNmodule_isSubPzSemiRing.Build R S U mulr_closed_subproof.
+
+HB.instance Definition _ := isMulClosed.Build R S mulr_closed_subproof.
+
+Let inU v Sv : U := Sub v Sv.
+Let mulU (u1 u2 : U) := inU (rpredM _ _ (valP u1) (valP u2)).
+
+Lemma mulrC : commutative mulU.
+Proof. by move=> x y; apply: val_inj; rewrite !SubK mulrC. Qed.
+
+HB.instance Definition _ := SemiRing_hasCommutativeMul.Build U mulrC.
+
 HB.end.
 
 HB.factory Record SubPzSemiRing_isNonZero (R : nzSemiRingType) S U
