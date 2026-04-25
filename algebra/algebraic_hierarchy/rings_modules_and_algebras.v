@@ -225,16 +225,16 @@ From mathcomp Require Import nmodule.
 (*                           operations (0, 1, x + y and x * y in S)          *)
 (* [SubNmodule_isSubPzSemiRing of R by <:] == pzSemiRingType mixin for a      *)
 (*                           subType whose base type is a pzSemiRingType and  *)
-(*                           whose predicate's is a mulr_closed               *)
+(*                           whose predicate is a mulr_closed                 *)
 (* [SubChoice_isSubPzSemiRing of R by <:] == pzSemiRingType mixin for a       *)
 (*                           subType whose base type is a pzSemiRingType and  *)
-(*                           whose predicate's is a semiringClosed            *)
+(*                           whose predicate is a semiringClosed              *)
 (*                                                                            *)
 (*  * NzSemiRing (non-commutative non-trivial semirings):                     *)
 (* [SubNmodule_isSubNzSemiRing of R by <:] ==                                 *)
 (* [SubChoice_isSubNzSemiRing of R by <:] == nzSemiRingType mixin for a       *)
 (*                           subType whose base type is a nzSemiRingType and  *)
-(*                           whose predicate's is a semiringClosed            *)
+(*                           whose predicate is a semiringClosed              *)
 (*                                                                            *)
 (*  * PzRing (non-commutative rings):                                         *)
 (*         GRing.sign R b := (-1) ^+ b in R : pzRingType, with b : bool       *)
@@ -246,42 +246,46 @@ From mathcomp Require Import nmodule.
 (*                           operations (1, x - y and x * y in S)             *)
 (* [SubZmodule_isSubPzRing of R by <:] ==                                     *)
 (* [SubChoice_isSubPzRing of R by <:] == pzRingType mixin for a subType whose *)
-(*                           base                                             *)
-(*                           type is a pzRingType and whose predicate's is a  *)
-(*                           subringClosed                                    *)
+(*                           base type is a pzRingType and whose predicate is *)
+(*                           a subringClosed                                  *)
 (*                                                                            *)
 (*  * NzRing (non-commutative non-trivial rings):                             *)
 (* [SubZmodule_isSubNzRing of R by <:] ==                                     *)
 (* [SubChoice_isSubNzRing of R by <:] == nzRingType mixin for a subType whose *)
-(*                           base                                             *)
-(*                           type is a nzRingType and whose predicate's is a  *)
-(*                           subringClosed                                    *)
+(*                           base type is a nzRingType and whose predicate is *)
+(*                           a subringClosed                                  *)
 (*                                                                            *)
 (*  * ComPzSemiRing (commutative PzSemiRings):                                *)
 (* [SubNmodule_isSubComPzSemiRing of R by <:] == comPzSemiRingType mixin for  *)
 (*                          a subType whose base type is a comPzSemiRingType  *)
-(*                          and whose predicate's is a ring_closed            *)
+(*                          and whose predicate is a ring_closed              *)
 (* [SubChoice_isSubComPzSemiRing of R by <:] == comPzSemiRingType mixin for a *)
 (*                          subType whose base type is a comPzSemiRingType    *)
-(*                          and whose predicate's is a semiringClosed         *)
+(*                          and whose predicate is a semiringClosed           *)
 (*                                                                            *)
 (*  * ComNzSemiRing (commutative NzSemiRings):                                *)
-(* [SubNmodule_isSubComNzSemiRing of R by <:] ==                              *)
+(* [SubNmodule_isSubComNzSemiRing of R by <:] == comNzSemiRingType mixin for  *)
+(*                          a subType whose base type is a comNzSemiRingType  *)
+(*                          and whose predicate is a ring_closed              *)
 (* [SubChoice_isSubComNzSemiRing of R by <:] == comNzSemiRingType mixin for a *)
 (*                           subType whose base type is a comNzSemiRingType   *)
-(*                          and whose predicate's is a semiringClosed         *)
+(*                          and whose predicate is a semiringClosed           *)
 (*                                                                            *)
 (*  * ComPzRing (commutative PzRings):                                        *)
-(* [SubZmodule_isSubComPzRing of R by <:] ==                                  *)
+(* [SubZmodule_isSubComPzRing of R by <:] == comPzRingType mixin for a        *)
+(*                           subtype whose base type is a comPzRingType and   *)
+(*                           whose predicate is a subring_closed              *)
 (* [SubChoice_isSubComPzRing of R by <:] == comPzRingType mixin for a         *)
 (*                           subType whose base type is a comPzRingType and   *)
-(*                           whose predicate's is a subringClosed             *)
+(*                           whose predicate is a subringClosed               *)
 (*                                                                            *)
 (*  * ComNzRing (commutative NzRings):                                        *)
-(* [SubZmodule_isSubComNzRing of R by <:] ==                                  *)
+(* [SubZmodule_isSubComNzRing of R by <:] == comNzRingType mixin for a        *)
+(*                           subtype whose base type is a comNzRingType and   *)
+(*                           whose predicate is a subring_closed              *)
 (* [SubChoice_isSubComNzRing of R by <:] == comNzRingType mixin for a         *)
 (*                           subType whose base type is a comNzRingType and   *)
-(*                           whose predicate's is a subringClosed             *)
+(*                           whose predicate is a subringClosed               *)
 (*                                                                            *)
 (*  * LSemiModule (semimodule with left multiplication by external scalars).  *)
 (*                 a *: v == v scaled by a, when v is in an LSemiModule V and *)
@@ -3165,28 +3169,6 @@ Proof. by split=> [|x y] /=; rewrite !SubK. Qed.
 HB.instance Definition _ := isSubPzSemiRing.Build R S U valM.
 HB.end.
 
-HB.factory Record SubNmodule_isSubComPzSemiRing (R : comPzSemiRingType) S U
-    & SubNmodule R S U := {
-  mulr_closed_subproof : mulr_closed S
-}.
-
-HB.builders Context R S U & SubNmodule_isSubComPzSemiRing R S U.
-
-HB.instance Definition _ :=
-  SubNmodule_isSubPzSemiRing.Build R S U mulr_closed_subproof.
-
-HB.instance Definition _ := isMulClosed.Build R S mulr_closed_subproof.
-
-Let inU v Sv : U := Sub v Sv.
-Let mulU (u1 u2 : U) := inU (rpredM _ _ (valP u1) (valP u2)).
-
-Lemma mulrC : commutative mulU.
-Proof. by move=> x y; apply: val_inj; rewrite !SubK mulrC. Qed.
-
-HB.instance Definition _ := SemiRing_hasCommutativeMul.Build U mulrC.
-
-HB.end.
-
 HB.factory Record SubPzSemiRing_isNonZero (R : nzSemiRingType) S U
   & SubPzSemiRing R S U := {}.
 
@@ -3221,6 +3203,28 @@ Proof. by move=> x y; apply: val_inj; rewrite !rmorphM mulrC. Qed.
 HB.instance Definition _ := SemiRing_hasCommutativeMul.Build U mulrC.
 HB.end.
 
+HB.factory Record SubNmodule_isSubComPzSemiRing (R : comPzSemiRingType) S U
+    & SubNmodule R S U := {
+  mulr_closed_subproof : mulr_closed S
+}.
+
+HB.builders Context R S U & SubNmodule_isSubComPzSemiRing R S U.
+HB.instance Definition _ :=
+  SubNmodule_isSubPzSemiRing.Build R S U mulr_closed_subproof.
+HB.instance Definition _ := SubSemiRing_isSubComSemiRing.Build R S U.
+HB.end.
+
+HB.factory Record SubNmodule_isSubComNzSemiRing (R : comNzSemiRingType) S U
+    & SubNmodule R S U := {
+  mulr_closed_subproof : mulr_closed S
+}.
+
+HB.builders Context R S U & SubNmodule_isSubComNzSemiRing R S U.
+HB.instance Definition _ :=
+  SubNmodule_isSubNzSemiRing.Build R S U mulr_closed_subproof.
+HB.instance Definition _ := SubSemiRing_isSubComSemiRing.Build R S U.
+HB.end.
+
 #[short(type="subComNzSemiRingType")]
 HB.structure Definition SubComNzSemiRing (R : nzSemiRingType) S :=
   {U of SubNzSemiRing R S U & ComNzSemiRing U}.
@@ -3243,6 +3247,17 @@ HB.end.
 HB.structure Definition SubNzRing (R : nzRingType) (S : pred R) :=
   { U of SubNzSemiRing R S U & NzRing U & isSubBaseAddUMagma R S U }.
 
+HB.factory Record SubZmodule_isSubComPzRing (R : comPzRingType) S U
+    & SubZmodule R S U := {
+  subring_closed_subproof : subring_closed S
+}.
+
+HB.builders Context R S U & SubZmodule_isSubComPzRing R S U.
+HB.instance Definition _ :=
+  SubZmodule_isSubPzRing.Build R S U subring_closed_subproof.
+HB.instance Definition _ := SubSemiRing_isSubComSemiRing.Build R S U.
+HB.end.
+
 HB.factory Record SubZmodule_isSubNzRing (R : nzRingType) S U
     & SubZmodule R S U := {
   subring_closed_subproof : subring_closed S
@@ -3251,6 +3266,17 @@ HB.factory Record SubZmodule_isSubNzRing (R : nzRingType) S U
 HB.builders Context R S U & SubZmodule_isSubNzRing R S U.
 HB.instance Definition _ := SubNmodule_isSubNzSemiRing.Build R S U
   (smulr_closedM (subring_closedM subring_closed_subproof)).
+HB.end.
+
+HB.factory Record SubZmodule_isSubComNzRing (R : comNzRingType) S U
+    & SubZmodule R S U := {
+  subring_closed_subproof : subring_closed S
+}.
+
+HB.builders Context R S U & SubZmodule_isSubComNzRing R S U.
+HB.instance Definition _ :=
+  SubZmodule_isSubNzRing.Build R S U subring_closed_subproof.
+HB.instance Definition _ := SubSemiRing_isSubComSemiRing.Build R S U.
 HB.end.
 
 #[short(type="subComPzRingType")]
