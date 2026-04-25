@@ -13,7 +13,7 @@ From mathcomp Require Import path fintype bigop finset.
 (*     and order structures in MathComp, and the files in this directory.     *)
 (*                                                                            *)
 (* * Interfaces                                                               *)
-(* We provide the following interfaces for types equipped with an order:      *)
+(* We provide the following interfaces for types equipped with a preorder:    *)
 (*                                                                            *)
 (*            preorderType d == the type of preordered types                  *)
 (*                              The HB class is called Preorder.              *)
@@ -481,7 +481,7 @@ Notation max := max.
 
 End Def.
 
-Module Import PreOSyntax.
+Module PreOSyntax.
 
 Notation "<=%O" := le : function_scope.
 Notation ">=%O" := ge : function_scope.
@@ -645,6 +645,40 @@ HB.structure Definition FinTPreorder d := { T of FinPreorder d T & hasTop d T }.
 #[short(type="finTBPreorderType")]
 HB.structure Definition FinTBPreorder d := { T of FinBPreorder d T & hasTop d T }.
 
+(*************)
+(* MORPHISMS *)
+(*************)
+
+Definition order_morphism d (T : preorderType d) d' (T' : preorderType d')
+  (f : T -> T') : Prop := {mono f : x y / x <= y}.
+
+HB.mixin Record isOrderMorphism d (T : preorderType d) d' (T' : preorderType d')
+    (apply : T -> T') := {
+  omorph_le_subproof : {homo apply : x y / x <= y} ;
+}.
+
+HB.structure Definition OrderMorphism d (T : preorderType d)
+  d' (T' : preorderType d') := {f of isOrderMorphism d T d' T' f}.
+
+Module OrderMorphismExports.
+Notation "{ 'omorphism' T -> T' }" :=
+  (@OrderMorphism.type _ T%type _ T'%type) : type_scope.
+End OrderMorphismExports.
+HB.export OrderMorphismExports.
+
+(************)
+(* SUBTYPES *)
+(************)
+
+HB.mixin Record isSubPreorder d (T : preorderType d) (S : pred T) d' U
+    & SubType T S U & Preorder d' U := {
+  le_val : {mono (val : U -> T) : x y / x <= y};
+}.
+
+#[short(type="subPreorder")]
+HB.structure Definition SubPreorder d (T : preorderType d) S d' :=
+  { U of SubEquality T S U & Preorder d' U & isSubPreorder d T S d' U }.
+
 (********)
 (* DUAL *)
 (********)
@@ -664,7 +698,7 @@ Notation dual_min := (@min (dual_display _) _).
 Notation dual_bottom := (@bottom (dual_display _) _).
 Notation dual_top := (@top (dual_display _) _).
 
-Module Import DualSyntax.
+Module DualSyntax.
 
 Notation "T ^d" := (dual T) (format "T ^d") : type_scope.
 Notation "<=^d%O" := dual_le : function_scope.
@@ -778,6 +812,7 @@ Notation "\max^d_ ( i 'in' A ) F" :=
   (\big[max/bot]_(i in A) F%O) : order_scope.
 
 End DualSyntax.
+HB.export DualSyntax.
 
 Module DualPreorder.
 
@@ -808,6 +843,8 @@ HB.instance Definition _ d (T : bPreorderType d) :=
 
 Lemma topEdual d (T : bPreorderType d) : (dual_top : T^d) = \bot :> T.
 Proof. by []. Qed.
+
+HB.saturate dual.
 
 End DualPreorder.
 HB.export DualPreorder.
@@ -1612,11 +1649,119 @@ End TPreorderTheory.
 #[global] Hint Extern 0 (is_true (\bot <= _)) => exact: le0x : core.
 #[global] Hint Extern 0 (is_true (_ <= \top)) => exact: lex1 : core.
 
+Module Import OrderMorphismTheory.
+Section OrderMorphismTheory.
+
+Lemma omorph_le (d : disp_t) (T : preorderType d) (d' : disp_t) (T' : preorderType d')
+(f : {omorphism T -> T'}) : {homo f : x y / x <= y}.
+Proof. exact: omorph_le_subproof. Qed.
+
+Section IdCompFun.
+
+Variables (d : disp_t) (T : preorderType d) (d' : disp_t) (T' : preorderType d').
+Variables (d'' : disp_t) (T'' : preorderType d'').
+Variables (f : {omorphism T' -> T''}) (g : {omorphism T -> T'}).
+
+Fact idfun_is_nondecreasing : nondecreasing (@idfun T).
+Proof. by []. Qed.
+#[export]
+HB.instance Definition _ := isOrderMorphism.Build d T d T idfun
+  idfun_is_nondecreasing.
+
+Fact comp_is_nondecreasing : nondecreasing (f \o g).
+Proof. by move=> ? ? ?; do 2 apply: omorph_le. Qed.
+
+#[export]
+HB.instance Definition _ := isOrderMorphism.Build d T d'' T'' (f \o g)
+  comp_is_nondecreasing.
+
+End IdCompFun.
+
+End OrderMorphismTheory.
+End OrderMorphismTheory.
+
+Module Import SubPreorderTheory.
+Section SubPreorderTheory.
+Context (d : disp_t) (T : preorderType d) (S : pred T).
+Context (d' : disp_t) (U : SubPreorder.type S d').
+Local Notation val := (val : U -> T).
+#[deprecated(since="mathcomp 2.3.0", use=le_val)]
+Lemma leEsub x y : (x <= y) = (val x <= val y). Proof. by rewrite le_val. Qed.
+Lemma lt_val : {mono val : x y / x < y}.
+Proof. by move=> x y; rewrite !lt_leAnge !le_val. Qed.
+#[deprecated(since="mathcomp 2.3.0", use=lt_val)]
+Lemma ltEsub x y : (x < y) = (val x < val y). Proof. by rewrite lt_val. Qed.
+Lemma le_wval : {homo val : x y / x <= y}. Proof. exact/mono2W/le_val. Qed.
+Lemma lt_wval : {homo val : x y / x < y}. Proof. exact/mono2W/lt_val. Qed.
+HB.instance Definition _ := isOrderMorphism.Build d' U d T val le_wval.
+End SubPreorderTheory.
+Arguments lt_val {d T S d' U} x y.
+Arguments le_wval {d T S d' U} x y.
+Arguments lt_wval {d T S d' U} x y.
+End SubPreorderTheory.
+
+Notation enum A := (sort <=%O (enum A)).
+
+Section Enum.
+Variables (d : disp_t) (T : finPreorderType d).
+
+Lemma cardE (A : {pred T}) : #|A| = size (enum A).
+Proof. by rewrite size_sort cardE. Qed.
+
+Lemma mem_enum (A : {pred T}) : enum A =i A.
+Proof. by move=> x; rewrite mem_sort mem_enum. Qed.
+
+Lemma enum_uniq (A : {pred T}) : uniq (enum A).
+Proof. by rewrite sort_uniq enum_uniq. Qed.
+
+Lemma cardT : #|T| = size (enum T).
+Proof. by rewrite cardT size_sort. Qed.
+
+Lemma enumT : enum T = sort <=%O (Finite.enum T).
+Proof. by rewrite enumT. Qed.
+
+Lemma enum0 : enum (pred0 : {pred T}) = [::].
+Proof. by rewrite enum0. Qed.
+
+Lemma enum1 (x : T) : enum (pred1 x) = [:: x].
+Proof. by rewrite enum1. Qed.
+
+Lemma eq_enum (A B : {pred T}) : A =i B -> enum A = enum B.
+Proof. by move=> /eq_enum->. Qed.
+
+Lemma eq_cardT (A : {pred T}) : A =i predT -> #|A| = size (enum T).
+Proof. by move=> /eq_enum<-; rewrite cardE. Qed.
+
+Lemma set_enum (A : {set T}) : [set x in enum A] = A.
+Proof. by apply/setP => x; rewrite inE mem_enum. Qed.
+
+Lemma enum_set0 : enum (set0 : {set T}) = [::].
+Proof. by rewrite enum_set0. Qed.
+
+Lemma enum_setT : enum [set: T] = sort <=%O (Finite.enum T).
+Proof. by rewrite enum_setT. Qed.
+
+Lemma enum_set1 (a : T) : enum [set a] = [:: a].
+Proof. by rewrite enum_set1. Qed.
+
+End Enum.
+
+Lemma mono_sorted_enum d d' (T : finPreorderType d)
+    (T' : preorderType d') (f : T -> T') :
+    total (<=%O : rel T) -> {mono f : x y / (x <= y)%O} ->
+  sorted <=%O [seq f x | x <- enum T].
+Proof.
+move=> /sort_sorted ss_sorted lef; wlog [x0 x'0] : / (T * T')%type.
+  by case: (enum T) => // x ? => /(_ (x, f x)).
+rewrite (sorted_pairwise le_trans).
+apply/(pairwiseP x'0) => i j; rewrite !inE !size_map -!cardT.
+move=> ilt jlt ij; rewrite !(nth_map x0) -?cardT// lef.
+by rewrite (sorted_leq_nth le_trans le_refl) ?inE -?cardT// 1?ltnW.
+Qed.
+
 (*************)
 (* FACTORIES *)
 (*************)
-
-(* preorder *)
 
 HB.factory Record isPreorder (d : disp_t) T & Equality T := {
   le       : rel T;
@@ -1732,85 +1877,6 @@ HB.instance Definition _ (disp : disp_t) (T : Type)
   (f' : T' -> T) (f_can : cancel f f') : isPreorder disp (can_type f_can) :=
   @PreCancelPartial.PrePcan disp (can_type f_can) disp' T' f.
 
-(* Morphism hierarchy. *)
-
-Definition order_morphism d (T : preorderType d) d' (T' : preorderType d')
-  (f : T -> T') : Prop := {mono f : x y / x <= y}.
-
-HB.mixin Record isOrderMorphism d (T : preorderType d) d' (T' : preorderType d')
-    (apply : T -> T') := {
-  omorph_le_subproof : {homo apply : x y / x <= y} ;
-}.
-
-HB.structure Definition OrderMorphism d (T : preorderType d)
-  d' (T' : preorderType d') := {f of isOrderMorphism d T d' T' f}.
-
-Module OrderMorphismExports.
-Notation "{ 'omorphism' T -> T' }" :=
-  (@OrderMorphism.type _ T%type _ T'%type) : type_scope.
-End OrderMorphismExports.
-HB.export OrderMorphismExports.
-
-Module Import OrderMorphismTheory.
-Section OrderMorphismTheory.
-
-Lemma omorph_le (d : disp_t) (T : preorderType d) (d' : disp_t) (T' : preorderType d')
-(f : {omorphism T -> T'}) : {homo f : x y / x <= y}.
-Proof. exact: omorph_le_subproof. Qed.
-
-Section IdCompFun.
-
-Variables (d : disp_t) (T : preorderType d) (d' : disp_t) (T' : preorderType d').
-Variables (d'' : disp_t) (T'' : preorderType d'').
-Variables (f : {omorphism T' -> T''}) (g : {omorphism T -> T'}).
-
-Fact idfun_is_nondecreasing : nondecreasing (@idfun T).
-Proof. by []. Qed.
-#[export]
-HB.instance Definition _ := isOrderMorphism.Build d T d T idfun
-  idfun_is_nondecreasing.
-
-Fact comp_is_nondecreasing : nondecreasing (f \o g).
-Proof. by move=> ? ? ?; do 2 apply: omorph_le. Qed.
-
-#[export]
-HB.instance Definition _ := isOrderMorphism.Build d T d'' T'' (f \o g)
-  comp_is_nondecreasing.
-
-End IdCompFun.
-
-End OrderMorphismTheory.
-End OrderMorphismTheory.
-
-HB.mixin Record isSubPreorder d (T : preorderType d) (S : pred T) d' U
-    & SubType T S U & Preorder d' U := {
-  le_val : {mono (val : U -> T) : x y / x <= y};
-}.
-
-#[short(type="subPreorder")]
-HB.structure Definition SubPreorder d (T : preorderType d) S d' :=
-  { U of SubEquality T S U & Preorder d' U & isSubPreorder d T S d' U }.
-
-Module Import SubPreorderTheory.
-Section SubPreorderTheory.
-Context (d : disp_t) (T : preorderType d) (S : pred T).
-Context (d' : disp_t) (U : SubPreorder.type S d').
-Local Notation val := (val : U -> T).
-#[deprecated(since="mathcomp 2.3.0", use=le_val)]
-Lemma leEsub x y : (x <= y) = (val x <= val y). Proof. by rewrite le_val. Qed.
-Lemma lt_val : {mono val : x y / x < y}.
-Proof. by move=> x y; rewrite !lt_leAnge !le_val. Qed.
-#[deprecated(since="mathcomp 2.3.0", use=lt_val)]
-Lemma ltEsub x y : (x < y) = (val x < val y). Proof. by rewrite lt_val. Qed.
-Lemma le_wval : {homo val : x y / x <= y}. Proof. exact/mono2W/le_val. Qed.
-Lemma lt_wval : {homo val : x y / x < y}. Proof. exact/mono2W/lt_val. Qed.
-HB.instance Definition _ := isOrderMorphism.Build d' U d T val le_wval.
-End SubPreorderTheory.
-Arguments lt_val {d T S d' U} x y.
-Arguments le_wval {d T S d' U} x y.
-Arguments lt_wval {d T S d' U} x y.
-End SubPreorderTheory.
-
 HB.factory Record SubChoice_isSubPreorder d (T : preorderType d) S (d' : disp_t) U
     & SubChoice T S U := {}.
 
@@ -1835,79 +1901,11 @@ Notation "[ 'SubChoice_isSubPreorder' 'of' U 'by' <: 'with' disp ]" :=
 End SubOrderExports.
 HB.export SubOrderExports.
 
-Notation enum A := (sort <=%O (enum A)).
-
-Section Enum.
-Variables (d : disp_t) (T : finPreorderType d).
-
-Lemma cardE (A : {pred T}) : #|A| = size (enum A).
-Proof. by rewrite size_sort cardE. Qed.
-
-Lemma mem_enum (A : {pred T}) : enum A =i A.
-Proof. by move=> x; rewrite mem_sort mem_enum. Qed.
-
-Lemma enum_uniq (A : {pred T}) : uniq (enum A).
-Proof. by rewrite sort_uniq enum_uniq. Qed.
-
-Lemma cardT : #|T| = size (enum T).
-Proof. by rewrite cardT size_sort. Qed.
-
-Lemma enumT : enum T = sort <=%O (Finite.enum T).
-Proof. by rewrite enumT. Qed.
-
-Lemma enum0 : enum (pred0 : {pred T}) = [::].
-Proof. by rewrite enum0. Qed.
-
-Lemma enum1 (x : T) : enum (pred1 x) = [:: x].
-Proof. by rewrite enum1. Qed.
-
-Lemma eq_enum (A B : {pred T}) : A =i B -> enum A = enum B.
-Proof. by move=> /eq_enum->. Qed.
-
-Lemma eq_cardT (A : {pred T}) : A =i predT -> #|A| = size (enum T).
-Proof. by move=> /eq_enum<-; rewrite cardE. Qed.
-
-Lemma set_enum (A : {set T}) : [set x in enum A] = A.
-Proof. by apply/setP => x; rewrite inE mem_enum. Qed.
-
-Lemma enum_set0 : enum (set0 : {set T}) = [::].
-Proof. by rewrite enum_set0. Qed.
-
-Lemma enum_setT : enum [set: T] = sort <=%O (Finite.enum T).
-Proof. by rewrite enum_setT. Qed.
-
-Lemma enum_set1 (a : T) : enum [set a] = [:: a].
-Proof. by rewrite enum_set1. Qed.
-
-End Enum.
-
-Lemma mono_sorted_enum d d' (T : finPreorderType d)
-    (T' : preorderType d') (f : T -> T') :
-    total (<=%O : rel T) -> {mono f : x y / (x <= y)%O} ->
-  sorted <=%O [seq f x | x <- enum T].
-Proof.
-move=> /sort_sorted ss_sorted lef; wlog [x0 x'0] : / (T * T')%type.
-  by case: (enum T) => // x ? => /(_ (x, f x)).
-rewrite (sorted_pairwise le_trans).
-apply/(pairwiseP x'0) => i j; rewrite !inE !size_map -!cardT.
-move=> ilt jlt ij; rewrite !(nth_map x0) -?cardT// lef.
-by rewrite (sorted_leq_nth le_trans le_refl) ?inE -?cardT// 1?ltnW.
-Qed.
-
-Module Syntax.
-Export PreOSyntax.
-Export DualSyntax.
-End Syntax.
-
 Module Theory.
 Export PreorderTheory.
-Export PreOCoercions.
 Export BPreorderTheory.
 Export TPreorderTheory.
-Export DualPreorder. (* FIXME? *)
-
 Export OrderMorphismTheory.
-
 Export SubPreorderTheory.
 End Theory.
 
@@ -1918,14 +1916,3 @@ End Exports.
 End Order.
 
 Export Order.Exports.
-
-Export Order.Syntax.
-
-Export Order.Preorder.Exports.
-Export Order.BPreorder.Exports.
-Export Order.TPreorder.Exports.
-Export Order.TBPreorder.Exports.
-Export Order.FinPreorder.Exports.
-Export Order.FinBPreorder.Exports.
-Export Order.FinTPreorder.Exports.
-Export Order.FinTBPreorder.Exports.
