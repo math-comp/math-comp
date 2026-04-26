@@ -172,23 +172,23 @@ HB.instance Definition _ (R : choiceType) := [Choice of 'T[R] by <:].
 HB.instance Definition _ (R : countType) := [Countable of 'T[R] by <:].
 HB.instance Definition _ (R : finType) := [Finite of 'T[R] by <:].
 
-#[local] Fact nmod_closed {m n} (R : nmodType) : @nmod_closed 'M[R]_(n, m) predT.
+Let nmod_closed {m n} (R : nmodType) : @nmod_closed 'M[R]_(n, m) predT.
 Proof. by []. Qed.
 HB.instance Definition _ (R : nmodType) := SubChoice_isSubNmodule.Build
   _ _ 'T[R] (nmod_closed R).
 
-#[local] Fact zmod_closed {m n} (R : zmodType) : @zmod_closed 'M[R]_(n, m) predT.
+Let zmod_closed {m n} (R : zmodType) : @zmod_closed 'M[R]_(n, m) predT.
 Proof. by []. Qed.
 HB.instance Definition _ (R : zmodType) := SubChoice_isSubZmodule.Build
   _ _ 'T[R] (zmod_closed R).
 
-#[local] Fact subsemimod_closed {m n} (R : pzSemiRingType)
+Let subsemimod_closed {m n} (R : pzSemiRingType)
   : @subsemimod_closed R 'M[R]_(n, m) predT.
 Proof. by []. Qed.
 HB.instance Definition _ (R : pzSemiRingType) :=
   SubNmodule_isSubLSemiModule.Build _ _ _ 'T[R] (subsemimod_closed R).
 
-#[local] Fact submod_closed {m n} (R : pzRingType) : @submod_closed R 'M[R]_(n, m) predT.
+Let submod_closed {m n} (R : pzRingType) : @submod_closed R 'M[R]_(n, m) predT.
 Proof. by []. Qed.
 HB.instance Definition _ (R : pzRingType) :=
   GRing.SubChoice_isSubLmodule.Build _ _ _ 'T[R] (submod_closed R).
@@ -209,20 +209,20 @@ Definition le_t (t u : 'T[R]_(u_, d_)) :=
 
 Definition lt_t (t u : 'T[R]_(u_, d_)) := (u != t) && le_t t u.
 
-#[local] Fact lt_t_def : forall x y, lt_t x y = (y != x) && le_t x y.
+Let lt_t_def : forall x y, lt_t x y = (y != x) && le_t x y.
 Proof. by []. Qed.
 
-#[local] Fact le_t_refl : reflexive (le_t).
+Let le_t_refl : reflexive (le_t).
 Proof. by move=> x; exact /forallP. Qed.
 
-#[local] Fact le_t_anti : antisymmetric (le_t).
+Let le_t_anti : antisymmetric (le_t).
 Proof.
 move=> x y /andP[/forallP le_t_xy /forallP le_t_yx].
 apply/val_inj/matrixP=> i j; apply /le_anti/andP.
 exact (conj (le_t_xy (i, j)) (le_t_yx (i, j))).
 Qed.
 
-#[local] Fact le_t_trans : transitive (le_t).
+Let le_t_trans : transitive (le_t).
 Proof.
 move=> x y z /forallP le_t_yx /forallP le_t_xz.
 apply/forallP=> ij; exact /le_trans.
@@ -256,19 +256,19 @@ Definition tensor1 := @const_t _ _ _ u_ d_ (GRing.one R).
 Definition hmul (t u : 'T[R]_(u_, d_)) :=
   @Tensor _ _ u_ d_ R (map2_mx *%R (\val t) (\val u)).
 
-#[local] Fact hmulA : associative hmul.
+Let hmulA : associative hmul.
 Proof. by move=> x y z; rewrite /hmul map2_mxA. Qed.
-#[local] Fact hmul1t : left_id tensor1 hmul.
+Let hmul1t : left_id tensor1 hmul.
 Proof. by move=> [x]; rewrite /hmul map2_1mx. Qed.
-#[local] Fact hmul1 : right_id tensor1 hmul.
+Let hmul1 : right_id tensor1 hmul.
 Proof. by move=> [x]; rewrite /hmul map2_mx1. Qed.
-#[local] Fact hmulDl : left_distributive hmul +%R.
+Let hmulDl : left_distributive hmul +%R.
 Proof. by move=> x y z; rewrite /hmul map2_mxDl. Qed.
-#[local] Fact hmulDr : right_distributive hmul +%R.
+Let hmulDr : right_distributive hmul +%R.
 Proof. by move=> x y z; rewrite /hmul map2_mxDr. Qed.
-#[local] Fact hmul0t : left_zero 0%R hmul.
+Let hmul0t : left_zero 0%R hmul.
 Proof. by move=> x; rewrite /hmul map2_0mx. Qed.
-#[local] Fact hmul0 : right_zero 0%R hmul.
+Let hmul0 : right_zero 0%R hmul.
 Proof. by move=> x; rewrite /hmul map2_mx0. Qed.
 
 HB.instance Definition _ := GRing.Nmodule_isPzSemiRing.Build
@@ -276,16 +276,17 @@ HB.instance Definition _ := GRing.Nmodule_isPzSemiRing.Build
 
 End TensorSemiRing.
 
-#[local] Fact hmulC {R : comPzSemiRingType} : @commutative 'T[R] _ hmul.
+Let hmulC {R : comPzSemiRingType} : @commutative 'T[R] _ hmul.
 Proof. by move=> x y; rewrite /hmul map2_mxC. Qed.
 
 HB.instance Definition _ {R : pzRingType} := GRing.Zmodule_isPzRing.Build
-  'T[R] hmulA hmul1t hmul1 hmulDl hmulDr.
+  'T[R] (@mulrA 'T[R]) (@mul1r 'T[R]) (@mulr1 'T[R])
+    (@mulrDl 'T[R]) (@mulrDr 'T[R]).
 
 HB.instance Definition _ {R : comPzRingType} := 
   SemiRing_hasCommutativeMul.Build 'T[R] hmulC.
 
-#[local] Fact onet_neq0 {R : nzSemiRingType} : (1%R : 'T[R]) != 0%R.
+Let onet_neq0 {R : nzSemiRingType} : (1%R : 'T[R]) != 0%R.
 Proof.
 rewrite /GRing.one/GRing.zero /= /GRing.zero.
 apply/eqP; case; apply/matrixP; rewrite /const_mx/eqrel.
@@ -303,10 +304,12 @@ HB.instance Definition _ {R : nzSemiRingType} :=
   'T[R] onet_neq0.
 
 HB.instance Definition _ {R : nzRingType} := GRing.Zmodule_isNzRing.Build
-  'T[R] hmulA hmul1t hmul1 hmulDl hmulDr onet_neq0.
+  'T[R] (@mulrA 'T[R]) (@mul1r 'T[R]) (@mulr1 'T[R])
+    (@mulrDl 'T[R]) (@mulrDr 'T[R]) (@oner_neq0 'T[R]).
 
 HB.instance Definition _ {R : comNzRingType} := GRing.Zmodule_isComNzRing.Build
-  'T[R] hmulA hmulC hmul1t hmulDl onet_neq0.
+  'T[R] (@mulrA 'T[R]) (@mulrC 'T[R]) (@mul1r 'T[R])
+    (@mulrDl 'T[R]) (@oner_neq0 'T[R]).
 
 Definition unitt {R : unitRingType} (t : 'T[R]) :=
   [forall ij, (\val t ij.1 ij.2) \is a GRing.unit].
@@ -314,21 +317,21 @@ Definition unitt {R : unitRingType} (t : 'T[R]) :=
 Definition invt {R : unitRingType} (t : 'T[R]) := 
   if t \in unitt then Tensor (map_mx GRing.inv (\val t)) else t.
 
-#[local] Fact mulVt {R : unitRingType} : {in @unitt R, left_inverse 1%R invt *%R}.
+Let mulVt {R : unitRingType} : {in @unitt R, left_inverse 1%R invt *%R}.
 Proof.
 move=> t t_unit; apply/val_inj/matrixP=> i j/=.
 rewrite /invt t_unit !mxE mulVr//=.
 by move: t_unit; rewrite /unitt=> /forallP /(_ (i, j)).
 Qed.
 
-#[local] Fact divtt {R : unitRingType} : {in @unitt R, right_inverse 1%R invt *%R}.
+Let divtt {R : unitRingType} : {in @unitt R, right_inverse 1%R invt *%R}.
 Proof.
 move=> t t_unit; apply/val_inj/matrixP=> i j/=.
 rewrite /invt t_unit !mxE divrr//.
 by move: t_unit; rewrite /unitt=> /forallP /(_ (i, j)).
 Qed.
 
-#[local] Fact unittP {R : unitRingType}
+Let unittP {R : unitRingType}
   : forall x y, y * x = 1%R /\ x * y = 1 -> @unitt R x.
 Proof.
 move=> x y [/eqP + /eqP]; rewrite /eq_op/==> /eqP/matrixP yx1 /eqP/matrixP xy1.
@@ -337,7 +340,7 @@ move: (conj (yx1 ij.1 ij.2) (xy1 ij.1 ij.2)).
 by rewrite !mxE.
 Qed.
 
-#[local] Fact invt_out {R : unitRingType} : {in [predC @unitt R], invt =1 id}.
+Let invt_out {R : unitRingType} : {in [predC @unitt R], invt =1 id}.
 Proof. by move=> t /negbTE t_not_unit; rewrite /invt t_not_unit. Qed.
 
 HB.instance Definition _ {R : unitRingType} :=
@@ -799,7 +802,7 @@ Context (u2_ : {posnum nat} ^ k2) (d2_ : {posnum nat} ^ l2).
 
 Local Open Scope ring_scope.
 
-#[local] Fact mults_linear_l (u : 'T[R]_(u2_, d2_)) :
+Let mults_linear_l (u : 'T[R]_(u2_, d2_)) :
   GRing.linear_for *:%R (fun t : 'T[R]_(u1_, d1_) => t *t u).
 Proof.
 move=> a x y; apply/val_inj/matrixP=> i j; rewrite /tensor_val/= !mxE/=.
@@ -807,7 +810,7 @@ rewrite mulrDl; congr (_ + _);
   by rewrite mulrA.
 Qed.
 
-#[local] Fact mults_linear_r (t : 'T[R]_(u1_, d1_)) :
+Let mults_linear_r (t : 'T[R]_(u1_, d1_)) :
   GRing.linear_for *:%R (fun u : 'T[R]_(u2_, d2_) => t *t u).
 Proof.
 move=> a x y; apply/val_inj/matrixP=> i j; rewrite /tensor_val/= !mxE/=.
