@@ -52,4 +52,4 @@
     `multsNr`, `mults_hmul`, `mults_scale`, `mults_hmul_compat`
 - in `boot/ssrnat.v`
   + lemma `ltn_leq_trans`
-    ([#1535](https://github.com/math-comp/math-comp/pull/1535)).
+    ([#1535](https://github.com/math-comp/math-comp/pull/1535))
