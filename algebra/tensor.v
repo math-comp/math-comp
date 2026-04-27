@@ -6,14 +6,13 @@ From mathcomp Require Import interval interval_inference numdomain.
 From Corelib Require Import ssreflect.
 
 (******************************************************************************)
-(* This file defines tensors,                                                 *)
 (* For tensors we define:                                                     *)
 (*       'T[R]_(u_, d_) == the type of tensors with elements of type R,       *)
 (*       'T_(u_, d_)       contravariant dimensions u_, and covariant         *)
 (*                         dimensions d_, where u_ and d_ are finite          *)
 (*                         functions from ordinals to positive numbers        *)
 (*                         ({posnum nat} ^ k and {posnum nat} ^ l resp.)      *)
-(*                         The [R] is optional and can usually be omitted     *)
+(*                         The [R] is optional and can usually be omitted.    *)
 (* 'nT[R]_(u_), 'nT_(u_) == purely contravariant tensors (no covariant dims)  *)
 (* 'oT[R]_(d_), 'oT_(d_) == purely covariant tensors (no contravariant dims)  *)
 (*                  t^^i == the tensor obtained by fixing the first           *)
@@ -23,11 +22,11 @@ From Corelib Require Import ssreflect.
 (* \tensor^^(i < n) Expr(i) ==                                                *)
 (*                         the 'T_(n :: _, _) tensor t such that              *)
 (*                         t^^i = Expr(i) with i : 'I_n, the < n bound can    *)
-(*                         usually be omitted                                *)
+(*                         usually be omitted                                 *)
 (* \tensor`_(j < n) Expr(j) ==                                                *)
 (*                         the 'T_(_, n :: _) tensor t such that              *)
 (*                         t`_j = Expr(j) with j : 'I_n, the < n bound can    *)
-(*                         usually be omitted                                *)
+(*                         usually be omitted                                 *)
 (*            const_t v == the constant tensor whose entries are all v        *)
 (*                         (dimensions are inferred from context)             *)
 (*               t.[::] == the value of the single entry in a                 *)
@@ -234,8 +233,8 @@ HB.instance Definition _ := Order.isPOrder.Build
 End TensorPOrder.
 
 
-Definition const_t {R k l} {u_ : {posnum nat} ^ k} {d_ : {posnum nat} ^ l} (v : R) : 'T[R]_(u_, d_) :=
-  Tensor (const_mx v).
+Definition const_t {R k l} {u_ : {posnum nat} ^ k} {d_ : {posnum nat} ^ l}
+  (v : R) : 'T[R]_(u_, d_) := Tensor (const_mx v).
 
 
 Section TensorRing.
@@ -290,10 +289,12 @@ Let onet_neq0 {R : nzSemiRingType} : (1%R : 'T[R]) != 0%R.
 Proof.
 rewrite /GRing.one/GRing.zero /= /GRing.zero.
 apply/eqP; case; apply/matrixP; rewrite /const_mx/eqrel.
-case: (\prod_(i < k) (u_ i)%:num) (@prodn_gt0 _ (index_enum 'I_k) predT (fun i => (u_ i)%:num)) => [//|n0 _].
+case: (\prod_(i < k) (u_ i)%:num)
+    (@prodn_gt0 _ (index_enum 'I_k) predT (fun i=> (u_ i)%:num))=> [//|n0 _].
   suff : (forall i : 'I_k, 0 < (u_ i)%:posnum) by move=> /[swap] /[apply].
   by move => i; rewrite gtn0.
-case: (\prod_(i < l) (d_ i)%:posnum) (@prodn_gt0 _ (index_enum 'I_l) predT (fun i => (d_ i)%:posnum)) => [//|n1 _].
+case: (\prod_(i < l) (d_ i)%:posnum)
+    (@prodn_gt0 _ (index_enum 'I_l) predT (fun i=> (d_ i)%:posnum))=> [//|n1 _].
   suff : (forall i : 'I_l, 0 < (d_ i)%:posnum) by move=> /[swap] /[apply].
   by move => i; rewrite gtn0.
 by move=> /(_ ord0 ord0); rewrite !mxE; apply/eqP/oner_neq0.
@@ -500,13 +501,19 @@ Definition tensor_unindex (i : 'I_(\prod_(i < k) (u_ i)%:num)) : fprod_u :=
   enum_val (cast_ord (esym card_fprod_u) i).
 
 Lemma tensor_indexK : cancel tensor_index tensor_unindex.
-Proof. by move=> f; rewrite /tensor_index /tensor_unindex cast_ordK enum_rankK. Qed.
+Proof.
+by move=> f; rewrite /tensor_index /tensor_unindex cast_ordK enum_rankK.
+Qed.
 
 Lemma tensor_unindexK : cancel tensor_unindex tensor_index.
-Proof. by move=> i; rewrite /tensor_index /tensor_unindex enum_valK cast_ordKV. Qed.
+Proof.
+by move=> i; rewrite /tensor_index /tensor_unindex enum_valK cast_ordKV.
+Qed.
 
 Lemma tensor_index_bij : bijective tensor_index.
-Proof. by exists tensor_unindex;[exact: tensor_indexK|exact: tensor_unindexK]. Qed.
+Proof.
+by exists tensor_unindex; [exact: tensor_indexK | exact: tensor_unindexK].
+Qed.
 
 Definition tensor_dffun_index : 'I_(\prod_(i < k) (u_ i)%:num) ->
     {dffun forall i : 'I_k, 'I_(u_ i)%:num} :=
@@ -517,13 +524,22 @@ Definition tensor_dffun_unindex : {dffun forall i : 'I_k, 'I_(u_ i)%:num} ->
   tensor_index \o @fprod_of_dffun _ _.
 
 Lemma tensor_dffun_indexK : cancel tensor_dffun_index tensor_dffun_unindex.
-Proof. by move=> i; rewrite /tensor_dffun_index /tensor_dffun_unindex/= dffun_of_fprodK tensor_unindexK. Qed.
+Proof.
+by move=> i; rewrite /tensor_dffun_index /tensor_dffun_unindex/=
+    dffun_of_fprodK tensor_unindexK.
+Qed.
 
 Lemma tensor_dffun_unindexK : cancel tensor_dffun_unindex tensor_dffun_index.
-Proof. by move=> f; rewrite /tensor_dffun_index /tensor_dffun_unindex/= tensor_indexK fprod_of_dffunK. Qed.
+Proof.
+by move=> f; rewrite /tensor_dffun_index /tensor_dffun_unindex/=
+    tensor_indexK fprod_of_dffunK.
+Qed.
 
 Lemma tensor_dffun_index_bij : bijective tensor_dffun_index.
-Proof. by exists tensor_dffun_unindex;[exact: tensor_dffun_indexK|exact: tensor_dffun_unindexK]. Qed.
+Proof.
+by exists tensor_dffun_unindex;
+    [exact: tensor_dffun_indexK | exact: tensor_dffun_unindexK].
+Qed.
 
 End IndexTensorBij.
 
@@ -533,9 +549,11 @@ Local Open Scope ring_scope.
 
 Context (u : {posnum nat}) {k : nat} (u_ : {posnum nat} ^ k).
 
-Local Notation u_cons := ([ffun i : 'I_k.+1 => if unlift ord0 i is Some j then u_ j else u] : {posnum nat} ^ k.+1).
+Local Notation u_cons : ([ffun i : 'I_k.+1 =>
+  if unlift ord0 i is Some j then u_ j else u] : {posnum nat} ^ k.+1).
 
-Lemma tensormx_cast : #|{:'I_u%:num * 'I_(\prod_(i < k) (u_ i)%:num)}| = \prod_(i < k.+1) (u_cons i)%:num.
+Lemma tensormx_cast : #|{:'I_u%:num * 'I_(\prod_(i < k) (u_ i)%:num)}|
+                        = \prod_(i < k.+1) (u_cons i)%:num.
 Proof.
 rewrite card_prod !card_ord big_ord_recl ffunE/= unlift_none.
 by congr (_ * _); apply: eq_bigr => i _; rewrite ffunE liftK.
@@ -559,7 +577,8 @@ End IndexTensorConsBij.
 
 Local Open Scope ring_scope.
 
-Context (R : Type) (u d : {posnum nat}) (k l : nat) (u_ : {posnum nat} ^ k) (d_ : {posnum nat} ^ l).
+Context (R : Type) (u d : {posnum nat}) (k l : nat).
+Context (u_ : {posnum nat} ^ k) (d_ : {posnum nat} ^ l).
 Local Notation u_cons := (fcons u u_).
 Local Notation d_cons := (fcons d d_).
 
@@ -600,7 +619,9 @@ Notation "\tensor `_ i => E" := (\tensor`_i const_t E).
 Section TensorIndexTheory.
 Context (R : Type).
 
-Lemma ntensorP (u : {posnum nat}) (k l : nat) (u_ : {posnum nat} ^ k) (d_ : {posnum nat} ^ l) (t v : 'T[R]_(fcons u u_, d_)) 
+Lemma ntensorP (u : {posnum nat}) (k l : nat)
+    (u_ : {posnum nat} ^ k) (d_ : {posnum nat} ^ l)
+    (t v : 'T[R]_(fcons u u_, d_)) 
   : t = v <-> forall i, t^^i = v^^i.
 Proof.
 split=> [->//|eq_i]; apply/val_inj/matrixP=> i j.
@@ -608,7 +629,9 @@ move: (eq_i (tensormx_unindex i).1)=> [/matrixP] /(_ (tensormx_unindex i).2 j).
 by rewrite !mxE -surjective_pairing tensormx_unindexK.
 Qed.
 
-Lemma otensorP (d : {posnum nat}) (k l : nat) (u_ : {posnum nat} ^ k) (d_ : {posnum nat} ^ l) (t v : 'T[R]_(u_, fcons d d_))
+Lemma otensorP (d : {posnum nat}) (k l : nat)
+    (u_ : {posnum nat} ^ k) (d_ : {posnum nat} ^ l)
+    (t v : 'T[R]_(u_, fcons d d_))
   : t = v <-> forall i, t`_i = v`_i.
 Proof.
 split=> [->//|eq_i]; apply/val_inj/matrixP=> i j.
@@ -632,16 +655,24 @@ Qed.
 
 (* Note: there seems to be some conflict between ring scope and the `_ notation *)
 
-Lemma nstackE {u : {posnum nat}} {k l} {u_ : {posnum nat} ^ k} {d_ : {posnum nat} ^ l} (f : 'I_u%:num%R -> 'T[R]_(u_, d_)) i : (nstack f)^^i = f i.
+Lemma nstackE {u : {posnum nat}} {k l}
+    {u_ : {posnum nat} ^ k} {d_ : {posnum nat} ^ l}
+    (f : 'I_u%:num%R -> 'T[R]_(u_, d_)) i
+  : (nstack f)^^i = f i.
 Proof. by apply/val_inj/matrixP => x y; rewrite !mxE tensormx_indexK. Qed.
 
-Lemma ostackE {d : {posnum nat}} {k l} {u_ : {posnum nat} ^ k} {d_ : {posnum nat} ^ l} (f : 'I_d%:num%R -> 'T[R]_(u_, d_)) i : (ostack f)`_i = f i.
+Lemma ostackE {d : {posnum nat}} {k l}
+    {u_ : {posnum nat} ^ k} {d_ : {posnum nat} ^ l}
+    (f : 'I_d%:num%R -> 'T[R]_(u_, d_)) i
+  : (ostack f)`_i = f i.
 Proof. by apply/val_inj/matrixP => x y; rewrite !mxE tensormx_indexK. Qed.
 
-Lemma nstack_eqE {u : {posnum nat}} (f : 'I_u%:num%R -> R) i : (\tensor^^i0 => f i0)^^=i = f i.
+Lemma nstack_eqE {u : {posnum nat}} (f : 'I_u%:num%R -> R) i
+  : (\tensor^^i0 => f i0)^^=i = f i.
 Proof. by rewrite nstackE const_tK. Qed.
 
-Lemma ostack_eqE {d : {posnum nat}} (f : 'I_d%:num%R -> R) i : (\tensor`_i0 => f i0)`_=i = f i.
+Lemma ostack_eqE {d : {posnum nat}} (f : 'I_d%:num%R -> R) i
+  : (\tensor`_i0 => f i0)`_=i = f i.
 Proof. by rewrite ostackE const_tK. Qed.
 
 End TensorIndexTheory.
@@ -649,13 +680,14 @@ End TensorIndexTheory.
 
 Section TensorTuple.
 
-Context {R : Type} (x : {posnum nat}) (k l : nat) (u_ : {posnum nat} ^ k) (d_ : {posnum nat} ^ l).
+Context {R : Type} (x : {posnum nat}) (k l : nat).
+Context (u_ : {posnum nat} ^ k) (d_ : {posnum nat} ^ l).
 
-Definition ntensor_of_tuple (t : x%:num%R.-tuple R) : 'nT[R]_(fcons x tensor_nil_f) :=
-  \tensor^^i => (tnth t i).
+Definition ntensor_of_tuple (t : x%:num%R.-tuple R)
+  : 'nT[R]_(fcons x tensor_nil_f) := \tensor^^i => (tnth t i).
 
-Definition otensor_of_tuple (t : x%:num%R.-tuple R) : 'oT[R]_(fcons x tensor_nil_f) :=
-  \tensor`_i => (tnth t i).
+Definition otensor_of_tuple (t : x%:num%R.-tuple R)
+  : 'oT[R]_(fcons x tensor_nil_f) := \tensor`_i => (tnth t i).
 
 Lemma ntensor_of_tupleE t i : (ntensor_of_tuple t)^^=i = tnth t i.
 Proof. exact: nstack_eqE. Qed.
@@ -692,8 +724,9 @@ Section TensorMatrix.
 
 Context {R : Type} {n m : {posnum nat}}.
 
-Definition tensor_of_matrix (M : 'M_(_, _)) : 'T[R]_(fcons n tensor_nil_f, fcons m tensor_nil_f) :=
-  \tensor^^i \tensor`_j => M i j.
+Definition tensor_of_matrix (M : 'M_(_, _)) :
+  'T[R]_(fcons n tensor_nil_f, fcons m tensor_nil_f) :=
+    \tensor^^i \tensor`_j => M i j.
 
 Definition matrix_of_tensor t : 'M[R]_(n%:num%R, m%:num%R) :=
   \matrix_(i, j) t^^i`_=j.
@@ -862,16 +895,16 @@ Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrN.
 Qed.
 
-(* Note: true commutativity would swap dimensions, requiring a more complex statement *)
-Lemma mults_scale {R : comPzSemiRingType} (a b : R) (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
-  (const_t a *h t) *t (const_t b *h u) = const_t (a * b)%R *h (t *t u).
+Lemma mults_scale {R : comPzSemiRingType} (a b : R)
+    (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_))
+  : (const_t a *h t) *t (const_t b *h u) = const_t (a * b)%R *h (t *t u).
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrACA.
 Qed.
 
 Lemma mults_hmul_compat {R : comPzSemiRingType} 
-  (t1 t2 : 'T[R]_(u1_, d1_)) (u1 u2 : 'T[R]_(u2_, d2_)) :
-  (t1 *h t2) *t (u1 *h u2) = (t1 *t u1) *h (t2 *t u2).
+    (t1 t2 : 'T[R]_(u1_, d1_)) (u1 u2 : 'T[R]_(u2_, d2_))
+  : (t1 *h t2) *t (u1 *h u2) = (t1 *t u1) *h (t2 *t u2).
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrACA.
 Qed.
