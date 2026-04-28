@@ -549,7 +549,7 @@ Local Open Scope ring_scope.
 
 Context (u : {posnum nat}) {k : nat} (u_ : {posnum nat} ^ k).
 
-Local Notation u_cons : ([ffun i : 'I_k.+1 =>
+Local Notation u_cons := ([ffun i : 'I_k.+1 =>
   if unlift ord0 i is Some j then u_ j else u] : {posnum nat} ^ k.+1).
 
 Lemma tensormx_cast : #|{:'I_u%:num * 'I_(\prod_(i < k) (u_ i)%:num)}|
