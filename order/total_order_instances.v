@@ -2,7 +2,7 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import path fintype bigop.
+From mathcomp Require Import path fintype tuple bigop.
 From mathcomp Require Import preorder porder lattice total_order.
 
 (******************************************************************************)
@@ -36,15 +36,26 @@ From mathcomp Require Import preorder porder lattice total_order.
 (*         seqlexi T := lexiprod_with (seqlexi_display d) T                   *)
 (*                      where d is the display of T, and seqlexi_display adds *)
 (*                      an extra ^sl to all notations                         *)
+(* n.-tuplelexi[d] T == n.-tuple T                                            *)
+(*                   == an alias for tuple, such that if T is canonically     *)
+(*                      ordered, then n.-tuplelexi[d] T is canonically        *)
+(*                      ordered in lexicographic order, i.e.,                 *)
+(*                      [:: x1, .., xn] <= [y1, .., yn] =                     *)
+(*                        (x1 <= x2) && ((x1 >= y1) ==> ((x2 <= y2) && ...))  *)
+(*                      and displayed in display d                            *)
+(*    n.-tuplelexi T := n.-tuplelexi[seqlexi_display d] T                     *)
+(*                      where d is the display of T                           *)
 (*                                                                            *)
 (* We provide expected instances of ordered types for nat (for leq), 'I_n,    *)
 (* 'I_n.+1 (with a top and bottom), T *lexi[disp] T', {t : T & T' x} (with    *)
 (* lexicographic ordering), seqlexi_with d T (with lexicographic ordering),   *)
-(* and all possible finite type instances.                                    *)
+(* n.-tuplelexi[d] T (with lexicographic ordering), and all possible finite   *)
+(* type instances.                                                            *)
 (* (Use `HB.about type` to discover the instances on type.)                   *)
 (*                                                                            *)
-(* In order to get a canonical lexicographic order on prod and seq, one may   *)
-(* import modules DefaultProdLexiOrder, and DefaultSeqLexiOrder.              *)
+(* In order to get a canonical lexicographic order on prod, seq, and tuple,   *)
+(* one may import modules DefaultProdLexiOrder, DefaultSeqLexiOrder, and      *)
+(* DefaultTupleLexiOrder.                                                     *)
 (*                                                                            *)
 (* We provide Order.enum_val, Order.enum_rank, and Order.enum_rank_in, which  *)
 (* are monotonic variations of enum_val, enum_rank, and enum_rank_in          *)
@@ -1473,6 +1484,261 @@ HB.instance Definition _ (T : orderType disp) :=
 End DefaultSeqLexiOrder.
 End DefaultSeqLexiOrder.
 
+(*********************************************)
+(* We declare an alias of the tuples,        *)
+(* which has canonical lexicographic order.  *)
+(*********************************************)
+
+Module TupleLexiOrder.
+Section TupleLexiOrder.
+Import DefaultSeqLexiOrder.
+
+Definition type (disp : disp_t) n T := n.-tuple T.
+Definition type_ (disp : disp_t) n (T : preorderType disp) :=
+  type (Order.seqlexi_display disp) n T.
+
+Context {disp disp' : disp_t}.
+Local Notation "n .-tuple" := (type disp' n) : type_scope.
+
+Section Basics.
+Context (n : nat).
+#[export] HB.instance Definition _ (T : eqType) := Equality.on (n.-tuple T).
+#[export] HB.instance Definition _ (T : choiceType) :=
+  SubChoice.on (n.-tuple T).
+#[export] HB.instance Definition _ (T : countType) :=
+  SubCountable.on (n.-tuple T).
+#[export] HB.instance Definition _ (T : finType) :=
+  SubFinite.on (n.-tuple T).
+End Basics.
+
+Section Preorder.
+Implicit Types (T : preorderType disp).
+
+#[export]
+HB.instance Definition _ n T :=
+  [SubChoice_isSubPreorder of n.-tuple T by <: with disp'].
+
+End Preorder.
+
+Section BPreorder.
+Context (n : nat) (T : bPreorderType disp).
+Implicit Types (t : n.-tuple T).
+
+Fact le0x t : [tuple \bot | _ < n] <= t :> n.-tuple T.
+Proof.
+have ->: [tuple \bot | _ < n] = [tuple of nseq n \bot] :> n.-tuple T.
+  by apply/eq_from_tnth => i; rewrite tnth_map tnth_nseq.
+rewrite /le/= /PreCancelPartial.le/=; case: t => s/= /eqP <-.
+by elim: s => //= x s; rewrite lexi_cons le0x => ->; rewrite implybT.
+Qed.
+
+#[export] HB.instance Definition _ := hasBottom.Build _ (n.-tuple T) le0x.
+
+Lemma botEtlexi : \bot = [tuple \bot | _ < n] :> n.-tuple T. Proof. by []. Qed.
+
+End BPreorder.
+
+Section TPreorder.
+Context (n : nat) (T : tPreorderType disp).
+Implicit Types (t : n.-tuple T).
+
+Fact lex1 t : t <= [tuple \top | _ < n].
+Proof.
+have ->: [tuple \top | _ < n] = [tuple of nseq n \top] :> n.-tuple T.
+  by apply/eq_from_tnth => i; rewrite tnth_map tnth_nseq.
+rewrite /le/= /PreCancelPartial.le/=; case: t => s/= /eqP <-.
+by elim: s => //= x s; rewrite lexi_cons lex1 => ->; rewrite implybT.
+Qed.
+
+#[export] HB.instance Definition _ := hasTop.Build _ (n.-tuple T) lex1.
+
+Lemma topEtlexi : \top = [tuple \top | _ < n] :> n.-tuple T. Proof. by []. Qed.
+
+End TPreorder.
+
+Section POrder.
+Implicit Types (n : nat) (T : porderType disp).
+
+#[export] HB.instance Definition _ n T :=
+  [SubChoice_isSubPOrder of n.-tuple T by <: with disp'].
+
+Lemma lexi_tupleP n T (t1 t2 : n.-tuple T) :
+   reflect (exists k : 'I_n.+1, forall i : 'I_n, (i <= k)%N ->
+               tnth t1 i <= tnth t2 i ?= iff (i != k :> nat)) (t1 <= t2).
+Proof.
+elim: n => [|n IHn] in t1 t2 *.
+  by rewrite tuple0 [t2]tuple0/= lexx; constructor; exists ord0 => -[].
+case: (tupleP t1) (tupleP t2) => [x1 {}t1] [x2 {}t2].
+rewrite [_ <= _]lexi_cons; apply: (iffP idP) => [|[k leif_xt12]].
+  case: comparableP => //= [ltx12 _|-> /IHn[k kP]].
+    exists ord0 => i; rewrite leqn0 => /eqP/(@ord_inj n.+1 i ord0)->.
+    by apply/leifP; rewrite !tnth0.
+  exists (lift ord0 k) => i; case: (unliftP ord0 i) => [j ->|-> _].
+    by rewrite !ltnS => /kP; rewrite !tnthS.
+  by apply/leifP; rewrite !tnth0 eqxx.
+have /= := leif_xt12 ord0 isT; rewrite !tnth0 => leif_x12.
+rewrite leif_x12/=; move: leif_x12 leif_xt12 => /leifP.
+case: (unliftP ord0 k) => {k} [k-> /eqP<-{x2}|-> /lt_geF->//] leif_xt12.
+rewrite lexx implyTb; apply/IHn; exists k => i le_ik.
+by have := leif_xt12 (lift ord0 i) le_ik; rewrite !tnthS.
+Qed.
+
+Lemma ltxi_tupleP n T (t1 t2 : n.-tuple T) :
+   reflect (exists k : 'I_n, forall i : 'I_n, (i <= k)%N ->
+               tnth t1 i <= tnth t2 i ?= iff (i != k :> nat)) (t1 < t2).
+Proof.
+elim: n => [|n IHn] in t1 t2 *.
+  by rewrite tuple0 [t2]tuple0/= ltxx; constructor => - [] [].
+case: (tupleP t1) (tupleP t2) => [x1 {}t1] [x2 {}t2].
+rewrite [_ < _]ltxi_cons; apply: (iffP idP) => [|[k leif_xt12]].
+  case: (comparableP x1 x2) => //= [ltx12 _|-> /IHn[k kP]].
+    exists ord0 => i; rewrite leqn0 => /eqP/(@ord_inj n.+1 i ord0)->.
+    by apply/leifP; rewrite !tnth0.
+  exists (lift ord0 k) => i; case: (unliftP ord0 i) => {i} [i ->|-> _].
+    by rewrite !ltnS => /kP; rewrite !tnthS.
+  by apply/leifP; rewrite !tnth0 eqxx.
+have /= := leif_xt12 ord0 isT; rewrite !tnth0 => leif_x12.
+rewrite leif_x12/=; move: leif_x12 leif_xt12 => /leifP.
+case: (unliftP ord0 k) => {k} [k-> /eqP<-{x2}|-> /lt_geF->//] leif_xt12.
+rewrite lexx implyTb; apply/IHn; exists k => i le_ik.
+by have := leif_xt12 (lift ord0 i) le_ik; rewrite !tnthS.
+Qed.
+
+Lemma ltxi_tuplePlt n T (t1 t2 : n.-tuple T) : reflect
+  (exists2 k : 'I_n, forall i : 'I_n, (i < k)%N -> tnth t1 i = tnth t2 i
+                                                 & tnth t1 k < tnth t2 k)
+  (t1 < t2).
+Proof.
+apply: (iffP (ltxi_tupleP _ _)) => [[k kP]|[k kP ltk12]].
+  exists k => [i i_lt|]; last by rewrite (lt_leif (kP _ _)) ?eqxx ?leqnn.
+  by have /eqTleif->// := kP i (ltnW i_lt); rewrite ltn_eqF.
+by exists k => i; case: ltngtP => //= [/kP-> _|/ord_inj-> _]; apply/leifP.
+Qed.
+
+End POrder.
+
+#[export] HB.instance Definition _ n (T : orderType disp) :=
+  [SubChoice_isSubOrder of n.-tuple T by <: with disp'].
+
+(* FIXME: use HB.saturate *)
+#[export] HB.instance Definition _ (n : nat) (T : tbPreorderType disp) :=
+  Preorder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : bPOrderType disp) :=
+  POrder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : tPOrderType disp) :=
+  POrder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : tbPOrderType disp) :=
+  POrder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : bOrderType disp) :=
+  POrder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : tOrderType disp) :=
+  POrder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : tbOrderType disp) :=
+  POrder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : finPreorderType disp) :=
+  Preorder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : finBPreorderType disp) :=
+  Preorder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : finTPreorderType disp) :=
+  Preorder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : finTBPreorderType disp) :=
+  Preorder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : finPOrderType disp) :=
+  POrder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : finBPOrderType disp) :=
+  POrder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : finTPOrderType disp) :=
+  POrder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : finTBPOrderType disp) :=
+  POrder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : finOrderType disp) :=
+  POrder.on (n.-tuple T).
+#[export] HB.instance Definition _ (n : nat) (T : finTBOrderType disp) :=
+  POrder.on (n.-tuple T).
+(* /FIXME *)
+
+End TupleLexiOrder.
+
+Module Exports.
+
+HB.reexport TupleLexiOrder.
+
+Notation "n .-tuplelexi[ disp ]" := (type disp n)
+  (format "n .-tuplelexi[ disp ]") : type_scope.
+Notation "n .-tuplelexi" := (type_ n)
+  (format "n .-tuplelexi") : type_scope.
+
+Definition topEtlexi := @topEtlexi.
+Definition botEtlexi := @botEtlexi.
+Definition lexi_tupleP := @lexi_tupleP.
+Arguments lexi_tupleP {disp disp' n T t1 t2}.
+Definition ltxi_tupleP := @ltxi_tupleP.
+Arguments ltxi_tupleP {disp disp' n T t1 t2}.
+Definition ltxi_tuplePlt := @ltxi_tuplePlt.
+Arguments ltxi_tuplePlt {disp disp' n T t1 t2}.
+
+End Exports.
+End TupleLexiOrder.
+HB.export TupleLexiOrder.Exports.
+
+Module DefaultTupleLexiOrder.
+Section DefaultTupleLexiOrder.
+Context {disp : disp_t}.
+
+Notation "n .-tuplelexi" := n.-tuplelexi[Order.seqlexi_display disp].
+
+HB.instance Definition _ n (T : preorderType disp) :=
+  Preorder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : bPreorderType disp) :=
+  BPreorder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : tPreorderType disp) :=
+  TPreorder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : tbPreorderType disp) :=
+  TBPreorder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : porderType disp) :=
+  POrder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : bPOrderType disp) :=
+  BPOrder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : tPOrderType disp) :=
+  TPOrder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : tbPOrderType disp) :=
+  TBPOrder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : orderType disp) :=
+  Lattice.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : orderType disp) :=
+  DistrLattice.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : orderType disp) :=
+  Total.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : bOrderType disp) :=
+  BTotal.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : tOrderType disp) :=
+  TTotal.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : tbOrderType disp) :=
+  TBTotal.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : finPreorderType disp) :=
+  FinPreorder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : finBPreorderType disp) :=
+  FinBPreorder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : finTPreorderType disp) :=
+  FinTPreorder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : finTBPreorderType disp) :=
+  FinTBPreorder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : finPOrderType disp) :=
+  FinPOrder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : finBPOrderType disp) :=
+  FinBPOrder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : finTPOrderType disp) :=
+  FinTPOrder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : finTBPOrderType disp) :=
+  FinTBPOrder.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : finOrderType disp) :=
+  FinTotal.copy (n.-tuple T) (n.-tuplelexi T).
+HB.instance Definition _ n (T : finTBOrderType disp) :=
+  FinTBTotal.copy (n.-tuple T) (n.-tuplelexi T).
+
+End DefaultTupleLexiOrder.
+End DefaultTupleLexiOrder.
+
 (* Some lemmas about [Order.enum 'I_n] *)
 (* TOTHINK: move to OrdinalOrder? *)
 Section Ordinal.
@@ -1648,6 +1914,7 @@ Export Order.Exports.
 
 Module DefaultProdLexiOrder := Order.DefaultProdLexiOrder.
 Module DefaultSeqLexiOrder := Order.DefaultSeqLexiOrder.
+Module DefaultTupleLexiOrder := Order.DefaultTupleLexiOrder.
 
 Module tagnat.
 Section tagnat.
