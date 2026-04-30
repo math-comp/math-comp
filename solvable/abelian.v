@@ -3,8 +3,9 @@
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import choice div fintype finfun bigop finset prime.
 From mathcomp Require Import binomial fingroup morphism perm automorphism.
-From mathcomp Require Import action quotient gfunctor gproduct ssralg countalg.
-From mathcomp Require Import finalg zmodp cyclic pgroup gseries nilpotent sylow.
+From mathcomp Require Import action quotient gfunctor gproduct.
+From mathcomp Require Import algebraic_hierarchy countalg finalg zmodp cyclic.
+From mathcomp Require Import pgroup gseries nilpotent sylow.
 
 (******************************************************************************)
 (* Constructions based on abelian groups and their structure, with some       *)

@@ -3,12 +3,12 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
 From mathcomp Require Import choice fintype div tuple finfun bigop prime order.
-From mathcomp Require Import ssralg ssrnum finset fingroup morphism perm.
-From mathcomp Require Import automorphism quotient action zmodp cyclic center.
-From mathcomp Require Import gproduct commutator gseries nilpotent pgroup.
-From mathcomp Require Import sylow maximal frobenius matrix mxalgebra.
-From mathcomp Require Import mxrepresentation vector algC classfun character.
-From mathcomp Require Import archimedean.
+From mathcomp Require Import algebraic_hierarchy numeric_hierarchy finset.
+From mathcomp Require Import fingroup morphism perm automorphism quotient.
+From mathcomp Require Import action zmodp cyclic center gproduct commutator.
+From mathcomp Require Import gseries nilpotent pgroup sylow maximal frobenius.
+From mathcomp Require Import matrix mxalgebra mxrepresentation vector algC.
+From mathcomp Require Import classfun character archimedean.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

@@ -3,10 +3,11 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple finfun bigop prime order.
-From mathcomp Require Import ssralg poly finset fingroup morphism perm.
-From mathcomp Require Import automorphism quotient finalg action gproduct zmodp.
-From mathcomp Require Import commutator cyclic center pgroup sylow matrix.
-From mathcomp Require Import vector falgebra ssrnum algC algnum archimedean.
+From mathcomp Require Import algebraic_hierarchy poly finset fingroup morphism.
+From mathcomp Require Import perm automorphism quotient finalg action gproduct.
+From mathcomp Require Import zmodp commutator cyclic center pgroup sylow matrix.
+From mathcomp Require Import vector falgebra numeric_hierarchy algC algnum.
+From mathcomp Require Import archimedean.
 
 (******************************************************************************)
 (* This file contains the basic theory of class functions:                    *)

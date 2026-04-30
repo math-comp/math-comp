@@ -1,14 +1,14 @@
-action.v
-all_fingroup.v
-automorphism.v
-fingroup.v
-gproduct.v
-morphism.v
-perm.v
-presentation.v
-quotient.v
+group_representation.v
+all_character.v
+character.v
+classfun.v
+inertia.v
+integral_char.v
+mxabelem.v
+mxrepresentation.v
+vcharacter.v
 
--R . mathcomp.fingroup
+-R . mathcomp.group_representation
 
 # Warnings set as error to avoid (re)introducing them
 -arg -w -arg +duplicate-clear
