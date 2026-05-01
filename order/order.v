@@ -1571,31 +1571,6 @@ Notation "\meet^d_ ( i 'in' A | P ) F" :=
 Notation "\meet^d_ ( i 'in' A ) F" :=
  (\big[meet / \top]_(i in A) F%O) : order_scope.
 
-Notation "\meet^d_ ( i <- r | P ) F" :=
-  (\big[meet / \top]_(i <- r | P%B) F%O) : order_scope.
-Notation "\meet^d_ ( i <- r ) F" :=
-  (\big[meet / \top]_(i <- r) F%O) : order_scope.
-Notation "\meet^d_ ( i | P ) F" :=
-  (\big[meet / \top]_(i | P%B) F%O) : order_scope.
-Notation "\meet^d_ i F" :=
-  (\big[meet / \top]_i F%O) : order_scope.
-Notation "\meet^d_ ( i : I | P ) F" :=
-  (\big[meet / \top]_(i : I | P%B) F%O) (only parsing) : order_scope.
-Notation "\meet^d_ ( i : I ) F" :=
-  (\big[meet / \top]_(i : I) F%O) (only parsing) : order_scope.
-Notation "\meet^d_ ( m <= i < n | P ) F" :=
- (\big[meet / \top]_(m <= i < n | P%B) F%O) : order_scope.
-Notation "\meet^d_ ( m <= i < n ) F" :=
- (\big[meet / \top]_(m <= i < n) F%O) : order_scope.
-Notation "\meet^d_ ( i < n | P ) F" :=
- (\big[meet / \top]_(i < n | P%B) F%O) : order_scope.
-Notation "\meet^d_ ( i < n ) F" :=
- (\big[meet / \top]_(i < n) F%O) : order_scope.
-Notation "\meet^d_ ( i 'in' A | P ) F" :=
- (\big[meet / \top]_(i in A | P%B) F%O) : order_scope.
-Notation "\meet^d_ ( i 'in' A ) F" :=
- (\big[meet / \top]_(i in A) F%O) : order_scope.
-
 End DualSyntax.
 
 (*
