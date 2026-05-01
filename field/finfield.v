@@ -614,7 +614,8 @@ Notation PrimePowerField := (pPrimePowerField) (only parsing).
 
 Section FinDomain.
 
-Import order ssrnum ssrint archimedean algC cyclotomic Order.TTheory Num.Theory.
+Import preorder porder ssrnum ssrint archimedean algC cyclotomic.
+Import Order.Theory Num.Theory.
 Local Infix "%|" := dvdn. (* Hide polynomial divisibility. *)
 
 Variable R : finUnitRingType.

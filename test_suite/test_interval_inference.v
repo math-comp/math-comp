@@ -8,8 +8,7 @@ From mathcomp Require Import interval_inference.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
-Import Order.TTheory Order.Syntax.
-Import GRing.Theory Num.Theory.
+Import Order.Theory GRing.Theory Num.Theory.
 
 Local Open Scope ring_scope.
 Local Open Scope order_scope.

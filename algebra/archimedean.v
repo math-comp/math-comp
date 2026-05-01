@@ -2,9 +2,10 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop nmodule order.
-From mathcomp Require Import rings_modules_and_algebras divalg decfield poly.
-From mathcomp Require Import orderedzmod numdomain numfield ssrint.
+From mathcomp Require Import fintype bigop nmodule preorder porder lattice.
+From mathcomp Require Import total_order rings_modules_and_algebras divalg.
+From mathcomp Require Import decfield poly orderedzmod numdomain numfield.
+From mathcomp Require Import ssrint.
 
 (******************************************************************************)
 (*                           Archimedean structures                           *)
@@ -48,7 +49,7 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Local Open Scope ring_scope.
-Import Order.TTheory GRing.Theory Num.Theory.
+Import Order.Theory GRing.Theory Num.Theory.
 
 Module Num.
 Import Num.Def.

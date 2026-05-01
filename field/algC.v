@@ -2,7 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
-From mathcomp Require Import div fintype path bigop finset prime order ssralg.
+From mathcomp Require Import div fintype path bigop finset prime.
+From mathcomp Require Import preorder porder lattice total_order ssralg.
 From mathcomp Require Import poly polydiv mxpoly generic_quotient countalg.
 From mathcomp Require Import ssrnum closed_field ssrint archimedean rat intdiv.
 From mathcomp Require Import algebraics_fundamentals.
@@ -59,7 +60,7 @@ Declare Scope C_scope.
 Declare Scope C_core_scope.
 Declare Scope C_expanded_scope.
 
-Import Order.TTheory GRing.Theory Num.Theory.
+Import Order.Theory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 HB.factory Record isComplex L & GRing.ClosedField L  := {
