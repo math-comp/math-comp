@@ -2,9 +2,10 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
-From mathcomp Require Import fintype finfun bigop order nmodule.
-From mathcomp Require Import rings_modules_and_algebras divalg countalg poly.
-From mathcomp Require Import orderedzmod numdomain numfield.
+From mathcomp Require Import fintype finfun bigop preorder porder lattice.
+From mathcomp Require Import total_order nmodule rings_modules_and_algebras.
+From mathcomp Require Import divalg countalg poly orderedzmod numdomain.
+From mathcomp Require Import numfield.
 
 (******************************************************************************)
 (* This file develops a basic theory of signed integers, defining:            *)
@@ -63,7 +64,7 @@ Reserved Notation "n != m :> 'int'" (format "n  !=  m  :>  'int'").
 #[warning="-postfix-notation-not-level-1"]
 Reserved Notation "n <> m :> 'int'" (format "n  <>  m  :>  'int'").
 
-Import Order.TTheory GRing.Theory Num.Theory.
+Import Order.Theory GRing.Theory Num.Theory.
 Delimit Scope int_scope with Z.
 Local Open Scope int_scope.
 

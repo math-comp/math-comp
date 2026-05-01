@@ -1,7 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype finfun bigop nmodule order.
+From mathcomp Require Import fintype finfun bigop nmodule.
 From mathcomp Require Import rings_modules_and_algebras divalg poly polydiv.
 From mathcomp Require Import matrix mxalgebra mxpoly.
 

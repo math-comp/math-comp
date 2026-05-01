@@ -2,7 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
-From mathcomp Require Import div fintype path tuple bigop finset prime order.
+From mathcomp Require Import div fintype path tuple bigop finset prime.
+From mathcomp Require Import preorder porder lattice total_order.
 From mathcomp Require Import ssralg poly polydiv mxpoly countalg closed_field.
 From mathcomp Require Import ssrnum ssrint archimedean rat intdiv fingroup.
 From mathcomp Require Import finalg zmodp cyclic pgroup sylow vector falgebra.
@@ -114,7 +115,7 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Local Open Scope group_scope.
-Import Order.TTheory GRing.Theory Num.Theory.
+Import Order.Theory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 Local Notation "p ^ f" := (map_poly f p) : ring_scope.
