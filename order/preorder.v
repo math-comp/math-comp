@@ -1039,6 +1039,10 @@ Notation "x ><^d y" := (~~ (><^d%O x y)) : order_scope.
 Notation "\bot^d" := dual_bottom : order_scope.
 Notation "\top^d" := dual_top : order_scope.
 
+(* The following Local Notations are here to define the \min^d_ and \max^d_   *)
+(* notations below. Do not remove them.                                       *)
+Local Notation bot := dual_bottom.
+Local Notation top := dual_top.
 Local Notation min := dual_min.
 Local Notation max := dual_max.
 
@@ -1068,29 +1072,29 @@ Notation "\min^d_ ( i 'in' A ) F" :=
   (\big[min/top]_(i in A) F%O) : order_scope.
 
 Notation "\max^d_ i F" :=
-  (\big[max/bottom]_i F%O) : order_scope.
+  (\big[max/bot]_i F%O) : order_scope.
 Notation "\max^d_ ( i <- r | P ) F" :=
-  (\big[max/bottom]_(i <- r | P%B) F%O) : order_scope.
+  (\big[max/bot]_(i <- r | P%B) F%O) : order_scope.
 Notation "\max^d_ ( i < r ) F" :=
-  (\big[max/bottom]_(i <- r) F%O) : order_scope.
+  (\big[max/bot]_(i <- r) F%O) : order_scope.
 Notation "\max^d_ ( m <= i < n | P ) F" :=
-  (\big[max/bottom]_(m <= i < n | P%B) F%O) : order_scope.
+  (\big[max/bot]_(m <= i < n | P%B) F%O) : order_scope.
 Notation "\max^d_ ( m <= i < n ) F" :=
-  (\big[max/bottom]_(m <= i < n) F%O) : order_scope.
+  (\big[max/bot]_(m <= i < n) F%O) : order_scope.
 Notation "\max^d_ ( i | P ) F" :=
-  (\big[max/bottom]_(i | P%B) F%O) : order_scope.
+  (\big[max/bot]_(i | P%B) F%O) : order_scope.
 Notation "\max^d_ ( i : t | P ) F" :=
-  (\big[max/bottom]_(i : t | P%B) F%O) (only parsing) : order_scope.
+  (\big[max/bot]_(i : t | P%B) F%O) (only parsing) : order_scope.
 Notation "\max^d_ ( i : t ) F" :=
-  (\big[max/bottom]_(i : t) F%O) (only parsing) : order_scope.
+  (\big[max/bot]_(i : t) F%O) (only parsing) : order_scope.
 Notation "\max^d_ ( i < n | P ) F" :=
-  (\big[max/bottom]_(i < n | P%B) F%O) : order_scope.
+  (\big[max/bot]_(i < n | P%B) F%O) : order_scope.
 Notation "\max^d_ ( i < n ) F" :=
-  (\big[max/bottom]_(i < n) F%O) : order_scope.
+  (\big[max/bot]_(i < n) F%O) : order_scope.
 Notation "\max^d_ ( i 'in' A | P ) F" :=
-  (\big[max/bottom]_(i in A | P%B) F%O) : order_scope.
+  (\big[max/bot]_(i in A | P%B) F%O) : order_scope.
 Notation "\max^d_ ( i 'in' A ) F" :=
-  (\big[max/bottom]_(i in A) F%O) : order_scope.
+  (\big[max/bot]_(i in A) F%O) : order_scope.
 
 End DualSyntax.
 
