@@ -2,11 +2,11 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
-From mathcomp Require Import choice fintype div tuple finfun bigop prime order.
-From mathcomp Require Import ssralg ssrnum finset fingroup morphism perm.
-From mathcomp Require Import automorphism quotient action zmodp cyclic center.
-From mathcomp Require Import gproduct commutator gseries nilpotent pgroup.
-From mathcomp Require Import sylow maximal frobenius matrix mxalgebra.
+From mathcomp Require Import choice fintype div tuple finfun bigop prime finset.
+From mathcomp Require Import preorder porder ssralg ssrnum fingroup morphism.
+From mathcomp Require Import perm automorphism quotient action zmodp cyclic.
+From mathcomp Require Import center gproduct commutator gseries nilpotent.
+From mathcomp Require Import pgroup sylow maximal frobenius matrix mxalgebra.
 From mathcomp Require Import mxrepresentation vector algC classfun character.
 From mathcomp Require Import archimedean.
 
@@ -15,7 +15,7 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Local Open Scope group_scope.
-Import Order.TTheory GRing.Theory Num.Theory.
+Import Order.Theory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 (******************************************************************************)

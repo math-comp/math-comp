@@ -2,12 +2,13 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype choice ssrnat seq.
-From mathcomp Require Import path div fintype tuple finfun bigop prime order.
-From mathcomp Require Import ssralg poly finset gproduct fingroup morphism.
-From mathcomp Require Import perm automorphism quotient finalg action zmodp.
-From mathcomp Require Import commutator cyclic center pgroup nilpotent sylow.
-From mathcomp Require Import abelian matrix mxalgebra mxpoly mxrepresentation.
-From mathcomp Require Import vector ssrnum algC classfun archimedean.
+From mathcomp Require Import path div fintype tuple finfun bigop prime finset.
+From mathcomp Require Import preorder porder ssralg poly gproduct fingroup.
+From mathcomp Require Import morphism perm automorphism quotient finalg action.
+From mathcomp Require Import zmodp commutator cyclic center pgroup nilpotent.
+From mathcomp Require Import sylow abelian matrix mxalgebra mxpoly.
+From mathcomp Require Import mxrepresentation vector ssrnum algC classfun.
+From mathcomp Require Import archimedean.
 
 (******************************************************************************)
 (* This file contains the basic notions of character theory, based on Isaacs. *)
@@ -69,7 +70,7 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Local Open Scope group_scope.
-Import Order.TTheory GRing.Theory Num.Theory.
+Import Order.Theory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 Section AlgC.
