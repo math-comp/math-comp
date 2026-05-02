@@ -3,10 +3,10 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype tuple finfun bigop prime nmodule.
-From mathcomp Require Import order rings_modules_and_algebras divalg countalg.
-From mathcomp Require Import poly polydiv zmodp matrix mxalgebra vector.
-From mathcomp Require Import orderedzmod numdomain numfield ssrint intdiv.
-From mathcomp Require Import archimedean.
+From mathcomp Require Import preorder porder lattice total_order.
+From mathcomp Require Import rings_modules_and_algebras divalg countalg poly.
+From mathcomp Require Import polydiv zmodp matrix mxalgebra vector orderedzmod.
+From mathcomp Require Import numdomain numfield ssrint intdiv archimedean.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)
@@ -28,7 +28,7 @@ From mathcomp Require Import archimedean.
 (*                 decidable property for Q-vector spaces.                    *)
 (******************************************************************************)
 
-Import Order.TTheory GRing.Theory Num.Theory.
+Import Order.Theory GRing.Theory Num.Theory.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

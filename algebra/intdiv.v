@@ -2,9 +2,10 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype tuple bigop prime nmodule order.
-From mathcomp Require Import perm rings_modules_and_algebras divalg poly.
-From mathcomp Require Import polydiv zmodp matrix orderedzmod numdomain ssrint.
+From mathcomp Require Import div choice fintype tuple bigop prime nmodule.
+From mathcomp Require Import preorder porder lattice total_order perm.
+From mathcomp Require Import rings_modules_and_algebras divalg poly polydiv.
+From mathcomp Require Import zmodp matrix orderedzmod numdomain ssrint.
 
 (******************************************************************************)
 (* This file provides various results on divisibility of integers.            *)
@@ -47,7 +48,7 @@ Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
-Import Order.TTheory GRing.Theory Num.Theory.
+Import Order.Theory GRing.Theory Num.Theory.
 Local Open Scope ring_scope.
 
 Definition divz (m d : int) : int :=
