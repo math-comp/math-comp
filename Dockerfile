@@ -3,7 +3,7 @@ ARG coq_image="rocq/rocq-prover:dev-ocaml-4.14"
 FROM ${coq_image} as builder
 
 ENV MATHCOMP_VERSION="dev"
-ENV MATHCOMP_PACKAGE="coq-mathcomp-character"
+ENV MATHCOMP_PACKAGE="rocq-mathcomp-group-representation"
 
 WORKDIR /home/mathcomp
 
@@ -20,21 +20,15 @@ RUN set -x \
   && opam update -y \
   && opam config list && opam repo list && opam list \
   && if [ -d /home/coq ]; then sudo chown -R coq:coq /home/mathcomp; else sudo chown -R rocq:rocq /home/mathcomp; fi \
-  && ( which coqc || opam install -y -v coq ) \
-  && coqc --version \
+  && ( which rocq || opam install -y -v rocq-runtime ) \
+  && rocq --version \
   && opam pin add -n -y -k path rocq-mathcomp-boot . \
   && opam pin add -n -y -k path rocq-mathcomp-order . \
-  && opam pin add -n -y -k path rocq-mathcomp-fingroup . \
+  && opam pin add -n -y -k path rocq-mathcomp-finite-group . \
   && opam pin add -n -y -k path rocq-mathcomp-algebra . \
   && opam pin add -n -y -k path rocq-mathcomp-solvable . \
   && opam pin add -n -y -k path rocq-mathcomp-field . \
-  && opam pin add -n -y -k path rocq-mathcomp-character . \
-  && opam pin add -n -k path coq-mathcomp-ssreflect . \
-  && opam pin add -n -k path coq-mathcomp-fingroup . \
-  && opam pin add -n -k path coq-mathcomp-algebra . \
-  && opam pin add -n -k path coq-mathcomp-solvable . \
-  && opam pin add -n -k path coq-mathcomp-field . \
-  && opam pin add -n -k path coq-mathcomp-character . \
+  && opam pin add -n -y -k path rocq-mathcomp-group-representation . \
   && opam install -y -v -j "${NJOBS}" "${MATHCOMP_PACKAGE}" \
   && opam clean -a -c -s --logs \
   && opam config list && opam list
