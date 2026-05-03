@@ -363,14 +363,32 @@ End SubNmodule_isSubSemiRing.
 Notation SubNmodule_isSubSemiRing R S U :=
   (SubNmodule_isSubNzSemiRing R S U) (only parsing).
 
+Module SubZmodule_isSubPzRing.
+#[deprecated(since="mathcomp 2.6.0", use=SubNmodule_isSubPzSemiRing.Build)]
+Notation Build R S U := (SubNmodule_isSubPzSemiRing.Build R S U) (only parsing).
+End SubZmodule_isSubPzRing.
+
+#[deprecated(since="mathcomp 2.6.0", use=SubNmodule_isSubPzSemiRing)]
+Notation SubZmodule_isSubPzRing R S U :=
+  (SubNmodule_isSubPzSemiRing R S U) (only parsing).
+
+Module SubZmodule_isSubNzRing.
+#[deprecated(since="mathcomp 2.6.0", use=SubNmodule_isSubNzSemiRing.Build)]
+Notation Build R S U := (SubNmodule_isSubNzSemiRing.Build R S U) (only parsing).
+End SubZmodule_isSubNzRing.
+
+#[deprecated(since="mathcomp 2.6.0", use=SubNmodule_isSubNzSemiRing)]
+Notation SubZmodule_isSubNzRing R S U :=
+  (SubNmodule_isSubNzSemiRing R S U) (only parsing).
+
 Module SubZmodule_isSubRing.
-#[deprecated(since="mathcomp 2.4.0", use=SubZmodule_isSubNzRing.Build)]
-Notation Build R S U := (SubZmodule_isSubNzRing.Build R S U) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=SubNmodule_isSubNzSemiRing.Build)]
+Notation Build R S U := (SubNmodule_isSubNzSemiRing.Build R S U) (only parsing).
 End SubZmodule_isSubRing.
 
-#[deprecated(since="mathcomp 2.4.0", use=SubZmodule_isSubNzRing)]
+#[deprecated(since="mathcomp 2.4.0", use=SubNmodule_isSubNzSemiRing)]
 Notation SubZmodule_isSubRing R S U :=
-  (SubZmodule_isSubNzRing R S U) (only parsing).
+  (SubNmodule_isSubNzSemiRing R S U) (only parsing).
 
 Module SubChoice_isSubSemiRing.
 #[deprecated(since="mathcomp 2.4.0", use=SubChoice_isSubNzSemiRing.Build)]
@@ -483,10 +501,16 @@ Notation "[ 'SubChoice_isSubComSemiRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubComNzSemiRing.Build _ _ U (semiringClosedP _))
   (format "[ 'SubChoice_isSubComSemiRing'  'of'  U  'by'  <: ]")
   : form_scope.
+#[deprecated(since="mathcomp 2.6.0",
+             note="Use [ SubNmodule_isSubNzSemiRing of U by <: ] instead.")]
+Notation "[ 'SubZmodule_isSubNzRing' 'of' U 'by' <: ]" :=
+  (SubNmodule_isSubNzSemiRing.Build _ _ U (subringClosedP _))
+  (format "[ 'SubZmodule_isSubNzRing'  'of'  U  'by'  <: ]")
+  : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
              note="Use [ SubZmodule_isSubNzRing of U by <: ] instead.")]
 Notation "[ 'SubZmodule_isSubRing' 'of' U 'by' <: ]" :=
-  (SubZmodule_isSubNzRing.Build _ _ U (subringClosedP _))
+  (SubNmodule_isSubNzSemiRing.Build _ _ U (subringClosedP _))
   (format "[ 'SubZmodule_isSubRing'  'of'  U  'by'  <: ]")
   : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
