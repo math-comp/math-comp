@@ -110,7 +110,7 @@ Or in the presence of a property denoted by an n-ary or unary predicate:
  - `mainSymbol_unaryPredicate`
 
 Where:
- - `mainSymbol` is the most meaningful part of the lemma. It generally is the head symbol of the right-hand side of an equation or the head symbol of a theorem. It can also simply be the main object of study, head symbol or not. It is usually either:
+ - `mainSymbol` is the most meaningful part of the lemma. It generally is the head symbol of the left-hand side of an equation or the head symbol of a theorem. It can also simply be the main object of study, head symbol or not. It is usually either:
    + one of the main symbols of the theory at hand (e.g., it will be `opp`, `add`, `mul`, etc.) or
    + a special "canonical" operation, such as a ring morphism or a
      subtype predicate (e.g. `linear`, `raddf`, `rmorph`, `rpred`, etc.)
