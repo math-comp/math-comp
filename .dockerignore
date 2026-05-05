@@ -21,11 +21,11 @@
 !boot
 !order
 !ssreflect
-!fingroup
+!finite_group
 !algebra
 !solvable
 !field
-!character
+!group_representation
 !all
 !test_suite
 

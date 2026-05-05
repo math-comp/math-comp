@@ -7,7 +7,7 @@ bug-reports: "https://github.com/math-comp/math-comp/issues"
 dev-repo: "git+https://github.com/math-comp/math-comp.git"
 license: "CECILL-B"
 
-depends: [ "rocq-mathcomp-fingroup" {= version} ]
+depends: [ "rocq-mathcomp-finite-group" {= version} ]
 authors: [ "The Mathematical Components team" ]
 
-synopsis: "Compatibility package for rocq-mathcomp-fingroup"
+synopsis: "Compatibility package for rocq-mathcomp-finite-group"
