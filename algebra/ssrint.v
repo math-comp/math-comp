@@ -1735,22 +1735,22 @@ Implicit Types i j k : nat.
 Implicit Types p q r : {poly R}.
 
 Lemma coefMrz p n i : (p *~ n)`_i = (p`_i *~ n).
-Proof. by case: n => n; rewrite ?NegzE (coefMNn, coefMn). Qed.
+Proof. exact: (raddfMz (coefp i)). Qed.
 
 Lemma polyCMz n : {morph (@polyC R) : c / c *~ n}.
-Proof. by case: (intP n) => // n' c; rewrite ?mulrNz ?polyCN polyCMn. Qed.
+Proof. exact: raddfMz. Qed.
 
 Lemma hornerMz n p x : (p *~ n).[x] = p.[x] *~ n.
-Proof. by case: n => n; rewrite ?NegzE ?mulNzr ?(hornerN, hornerMn). Qed.
+Proof. exact: (raddfMz (horner_eval _)). Qed.
 
 Lemma horner_int n x : (n%:~R : {poly R}).[x] = n%:~R.
 Proof. by rewrite hornerMz hornerC. Qed.
 
 Lemma derivMz n p : (p *~ n)^`() = p^`() *~ n.
-Proof. by case: n => n; rewrite ?NegzE -?pmulrn (derivMn, derivMNn). Qed.
+Proof. exact: raddfMz. Qed.
 
 Lemma mulpz p n : p *~ n = n%:~R *: p.
-Proof. by rewrite -mul_polyC polyCMz polyC1 mulrzl. Qed.
+Proof. by rewrite scaler_int. Qed.
 
 End PolyZintRing.
 
