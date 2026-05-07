@@ -1,5 +1,5 @@
 From HB Require Import structures.
-From mathcomp Require Import all_boot ssralg.
+From mathcomp Require Import boot ssralg.
 
 Set Implicit Arguments.
 Unset Strict Implicit.

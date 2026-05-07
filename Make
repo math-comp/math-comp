@@ -1,3 +1,4 @@
+algebra/algebra.v
 algebra/all_algebra.v
 algebra/archimedean.v
 algebra/countalg.v
@@ -30,6 +31,7 @@ algebra/zmodp.v
 algebra/sesquilinear.v
 algebra/spectral.v
 all/all.v
+group_representation/group_representation.v
 group_representation/all_character.v
 group_representation/character.v
 group_representation/classfun.v
@@ -41,6 +43,7 @@ group_representation/vcharacter.v
 field/algC.v
 field/algebraics_fundamentals.v
 field/algnum.v
+field/field.v
 field/all_field.v
 field/closed_field.v
 field/cyclotomic.v
@@ -51,6 +54,7 @@ field/galois.v
 field/qfpoly.v
 field/separable.v
 finite_group/action.v
+finite_group/finite_group.v
 finite_group/all_fingroup.v
 finite_group/automorphism.v
 finite_group/fingroup.v
@@ -60,6 +64,7 @@ finite_group/perm.v
 finite_group/presentation.v
 finite_group/quotient.v
 solvable/abelian.v
+solvable/solvable.v
 solvable/all_solvable.v
 solvable/alt.v
 solvable/burnside_app.v
@@ -79,6 +84,7 @@ solvable/nilpotent.v
 solvable/pgroup.v
 solvable/primitive_action.v
 solvable/sylow.v
+boot/boot.v
 boot/all_boot.v
 boot/bigop.v
 boot/binomial.v
