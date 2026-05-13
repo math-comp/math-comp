@@ -706,12 +706,43 @@ HB.mixin Record hasTop d T & Preorder d T := {
   lex1 : forall x, le x top;
 }.
 
+#[key="T", primitive]
+HB.mixin Record hasNoBottom d T & Preorder d T := {
+  lt_nobottom : forall x : T, exists y : T, lt y x;
+}.
+
+#[key="T", primitive]
+HB.mixin Record hasNoTop d T & Preorder d T := {
+  lt_notop : forall x : T, exists y : T, lt x y;
+}.
+
+#[key="T", primitive]
+HB.mixin Record Preorder_isDense d T & Preorder d T := {
+  lt_dense : forall x y : T, lt x y -> exists z : T, (lt x z) && (lt z y);
+}.
+
 #[short(type="bPreorderType")]
 HB.structure Definition BPreorder d := { T of hasBottom d T & Preorder d T }.
 #[short(type="tPreorderType")]
 HB.structure Definition TPreorder d := { T of hasTop d T & Preorder d T }.
 #[short(type="tbPreorderType")]
 HB.structure Definition TBPreorder d := { T of hasTop d T & BPreorder d T }.
+
+#[short(type="lowerEndlessPreorderType")]
+HB.structure Definition LowerEndlessPreorder d :=
+  { T of hasNoBottom d T & Preorder d T }.
+#[short(type="upperEndlessPreorderType")]
+HB.structure Definition UpperEndlessPreorder d :=
+  { T of hasNoTop d T & Preorder d T }.
+#[short(type="endlessPreorderType")]
+HB.structure Definition EndlessPreorder d :=
+  { T of hasNoTop d T & LowerEndlessPreorder d T }.
+#[short(type="densePreorderType")]
+HB.structure Definition DensePreorder d :=
+  { T of Preorder_isDense d T & Preorder d T }.
+#[short(type="endlessDensePreorderType")]
+HB.structure Definition EndlessDensePreorder d :=
+  { T of EndlessPreorder d T & DensePreorder d T }.
 
 Section PreorderDef.
 
@@ -963,6 +994,27 @@ HB.structure Definition FinTPreorder d := { T of FinPreorder d T & hasTop d T }.
 
 #[short(type="finTBPreorderType")]
 HB.structure Definition FinTBPreorder d := { T of FinBPreorder d T & hasTop d T }.
+
+#[short(type="finLowerEndlessPreorderType")]
+HB.structure Definition FinLowerEndlessPreorder d :=
+  { T of FinPreorder d T & hasNoBottom d T }.
+
+#[short(type="finUpperEndlessPreorderType")]
+HB.structure Definition FinUpperEndlessPreorder d :=
+  { T of FinPreorder d T & hasNoTop d T }.
+
+#[short(type="finEndlessPreorderType")]
+HB.structure Definition FinEndlessPreorder d :=
+  { T of FinLowerEndlessPreorder d T & hasNoTop d T }.
+
+#[short(type="finDensePreorderType")]
+HB.structure Definition FinDensePreorder d :=
+  { T of FinPreorder d T & Preorder_isDense d T }.
+
+(* example: {x,y,z} with x < y < z < x *)
+#[short(type="finEndlessDensePreorderType")]
+HB.structure Definition FinEndlessDensePreorder d :=
+  { T of FinEndlessPreorder d T & FinDensePreorder d T }.
 
 (********)
 (* DUAL *)
