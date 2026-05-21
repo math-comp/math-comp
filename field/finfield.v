@@ -392,7 +392,7 @@ Implicit Types (a b : F) (x y : L) (K E : {subfield L}).
 
 Let galL K : galois K {:L}.
 Proof.
-without loss {K} ->: K / K = 1%AS.
+without loss ->: K / K = 1%AS.
   by move=> IH_K; apply: galoisS (IH_K _ (erefl _)); rewrite sub1v subvf.
 apply/splitting_galoisField; pose finL := FinFieldExtType L.
 exists ('X^#|finL| - 'X); split; first by rewrite rpredB 1?rpredX ?polyOverX.
@@ -406,7 +406,7 @@ Qed.
 Fact galLgen K :
   {alpha | generator 'Gal({:L} / K) alpha & forall x, alpha x = x ^+ order K}.
 Proof.
-without loss{K} ->: K / K = 1%AS; last rewrite /order dimv1 expn1.
+without loss ->: K / K = 1%AS; last rewrite /order dimv1 expn1.
   case/(_ 1%AS)=> // alpha /eqP-defGalL; rewrite /order dimv1 expn1 => Dalpha.
   exists (alpha ^+ \dim K)%g => [|x]; last first.
     elim: (\dim K) => [|n IHn]; first by rewrite gal_id.
