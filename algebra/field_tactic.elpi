@@ -11,9 +11,9 @@ mk-field-morphism
                    "Cannot find a declared nmodType",
     std.assert-ok! (coq.unify-eq Ty {{ GRing.Zmodule.sort lp:V }})
                    "Cannot find a declared zmodType",
-    std.assert-ok! (coq.unify-eq Ty {{ GRing.PzSemiRing.sort lp:SR }})
+    std.assert-ok! (coq.unify-eq Ty {{ GRing.SemiRing.sort lp:SR }})
                    "Cannot find a declared semiRingType",
-    std.assert-ok! (coq.unify-eq Ty {{ GRing.PzRing.sort lp:R }})
+    std.assert-ok! (coq.unify-eq Ty {{ GRing.Ring.sort lp:R }})
                    "Cannot find a declared ringType",
     std.assert-ok! (coq.unify-eq Ty {{ GRing.UnitRing.sort lp:UR }})
                    "Cannot find a declared unitRingType",

@@ -897,7 +897,7 @@ HB.instance Definition qe_is_def_field : Field_isDecField F :=
 HB.end.
 
 (* Axiom == all non-constant monic polynomials have a root *)
-Definition closed_field_axiom (R : pzRingType) :=
+Definition closed_field_axiom (R : ringType) :=
   forall n (P : nat -> R), n > 0 ->
    exists x : R, x ^+ n = \sum_(i < n) P i * (x ^+ i).
 

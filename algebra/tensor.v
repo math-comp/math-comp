@@ -143,13 +143,13 @@ HB.instance Definition _ (R : nmodType) :=
 HB.instance Definition _ (R : zmodType) :=
   GRing.SubChoice_isSubZmodule.Build _ _ 'T[R] (nmod_closed R).
 
-Let subsemimod_closed {m n} (R : pzSemiRingType)
+Let subsemimod_closed {m n} (R : semiRingType)
   : @GRing.subsemimod_closed R 'M[R]_(n, m) predT.
 Proof. by []. Qed.
-HB.instance Definition _ (R : pzSemiRingType) :=
+HB.instance Definition _ (R : semiRingType) :=
   GRing.SubNmodule_isSubLSemiModule.Build _ _ _ 'T[R] (subsemimod_closed R).
 
-HB.instance Definition _ (R : pzRingType) := GRing.SubLSemiModule.on 'T[R].
+HB.instance Definition _ (R : ringType) := GRing.SubLSemiModule.on 'T[R].
 
 End SubtypeInstances.
 
@@ -223,7 +223,7 @@ Local Notation "''T[' R ]" := 'T[R]_(u_, d_).
 
 Section TensorSemiRing.
 
-Context {R : pzSemiRingType}.
+Context {R : semiRingType}.
 
 Definition tensor1 := @const_t _ _ _ u_ d_ (GRing.one R).
 
@@ -246,16 +246,16 @@ Proof. by move=> x; rewrite /hmul map2_0mx. Qed.
 Let hmul0 : right_zero 0%R hmul.
 Proof. by move=> x; rewrite /hmul map2_mx0. Qed.
 
-HB.instance Definition _ := GRing.Nmodule_isPzSemiRing.Build
+HB.instance Definition _ := GRing.Nmodule_isSemiRing.Build
   'T[R] hmulA hmul1t hmul1 hmulDl hmulDr hmul0t hmul0.
 
 End TensorSemiRing.
 
-Let hmulC {R : comPzSemiRingType} : @commutative 'T[R] _ *%R.
+Let hmulC {R : comSemiRingType} : @commutative 'T[R] _ *%R.
 Proof. by move=> x y; rewrite /(_ * _)/= map2_mxC. Qed.
 
 
-HB.instance Definition _ {R : comPzSemiRingType} :=
+HB.instance Definition _ {R : comSemiRingType} :=
   GRing.SemiRing_hasCommutativeMul.Build 'T[R] hmulC.
 
 Let onet_neq0 {R : nzSemiRingType} : (1%R : 'T[R]) != 0%R.
@@ -269,13 +269,12 @@ by apply/eqP; rewrite !mxE oner_neq0.
 Qed.
 
 HB.instance Definition _ {R : nzSemiRingType} := 
-  GRing.PzSemiRing_isNonZero.Build
-  'T[R] onet_neq0.
+  GRing.SemiRing_isNonZero.Build 'T[R] onet_neq0.
 
 (* FIXME: HB.saturate *)
-HB.instance Definition _ {R : pzRingType} := GRing.PzSemiRing.on 'T[R].
+HB.instance Definition _ {R : ringType} := GRing.SemiRing.on 'T[R].
 HB.instance Definition _ {R : nzRingType} := GRing.NzSemiRing.on 'T[R].
-HB.instance Definition _ {R : comPzRingType} := GRing.PzRing.on 'T[R].
+HB.instance Definition _ {R : comRingType} := GRing.Ring.on 'T[R].
 HB.instance Definition _ {R : comNzRingType} := GRing.NzRing.on 'T[R].
 
 Definition unitt {R : unitRingType} (t : 'T[R]) :=
@@ -355,11 +354,11 @@ HB.instance Definition _ {U : nmodType} :=
   GRing.isNmodMorphism.Build 'sT[U] U (@tensor_nil U)
     tensor_nil_is_nmod_morphism.
 
-Fact tensor_nil_is_monoid_morphism {R : pzSemiRingType} :
+Fact tensor_nil_is_monoid_morphism {R : semiRingType} :
   monoid_morphism (@tensor_nil R).
 Proof. by split=> [|? ?]; rewrite /tensor_nil mxE. Qed.
 
-HB.instance Definition _ {R : pzSemiRingType} :=
+HB.instance Definition _ {R : semiRingType} :=
   GRing.isMonoidMorphism.Build 'sT[R] R (@tensor_nil R)
     tensor_nil_is_monoid_morphism.
 
@@ -387,11 +386,11 @@ HB.instance Definition _ {U : nmodType} :=
   GRing.isNmodMorphism.Build U 'T[U]_(u_, d_) (@const_t U _ _ u_ d_)
     const_t_is_nmod_morphism.
 
-Fact const_t_is_monoid_morphism {R : pzSemiRingType} :
+Fact const_t_is_monoid_morphism {R : semiRingType} :
   monoid_morphism (@const_t R _ _ u_ d_).
 Proof. by split=> [|? ?]; apply/val_inj/matrixP=> i j; rewrite !mxE. Qed.
 
-HB.instance Definition _ {R : pzSemiRingType} :=
+HB.instance Definition _ {R : semiRingType} :=
   GRing.isMonoidMorphism.Build R 'T[R]_(u_, d_) (@const_t R _ _ u_ d_)
     const_t_is_monoid_morphism.
 
@@ -654,7 +653,7 @@ Qed.
 End TensorMatrix.
 
 Section TensorProduct.
-Context {R : pzSemiRingType} {R' : pzRingType}.
+Context {R : semiRingType}.
 Context {k1 l1 k2 l2 : nat}.
 Context (u1_ : {posnum nat} ^ k1) (d1_ : {posnum nat} ^ l1).
 Context (u2_ : {posnum nat} ^ k2) (d2_ : {posnum nat} ^ l2).
@@ -751,7 +750,7 @@ HB.instance Definition _ := bilinear_isBilinear.Build
 End TensorProductBilinear.
 
 Section TensorProductHadamard.
-Context {R : comPzRingType}.
+Context {R : comRingType}.
 Context {k1 l1 k2 l2 : nat}.
 Context (u1_ : {posnum nat} ^ k1) (d1_ : {posnum nat} ^ l1).
 Context (u2_ : {posnum nat} ^ k2) (d2_ : {posnum nat} ^ l2).
@@ -769,26 +768,26 @@ Context {k1 l1 k2 l2 : nat}.
 Context (u1_ : {posnum nat} ^ k1) (d1_ : {posnum nat} ^ l1).
 Context (u2_ : {posnum nat} ^ k2) (d2_ : {posnum nat} ^ l2).
 
-Lemma multsNl {R : pzRingType} (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
+Lemma multsNl {R : ringType} (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
   (- t) *t u = - (t *t u).
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulNr.
 Qed.
 
-Lemma multsNr {R : pzRingType} (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
+Lemma multsNr {R : ringType} (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
   t *t (- u) = - (t *t u).
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrN.
 Qed.
 
-Lemma mults_scale {R : comPzSemiRingType} (a b : R)
+Lemma mults_scale {R : comSemiRingType} (a b : R)
     (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
   (const_t a * t) *t (const_t b * u) = const_t (a * b) * (t *t u).
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrACA.
 Qed.
 
-Lemma mults_hmul_compat {R : comPzSemiRingType} 
+Lemma mults_hmul_compat {R : comSemiRingType}
     (t1 t2 : 'T[R]_(u1_, d1_)) (u1 u2 : 'T[R]_(u2_, d2_)) :
   (t1 * t2) *t (u1 * u2) = (t1 *t u1) * (t2 *t u2).
 Proof.

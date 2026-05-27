@@ -17,7 +17,7 @@ From mathcomp.algebra Extra Dependency "ring_tactic.elpi" as ring_tactic.
 (* This tactic provides:                                                      *)
 (*         ring == a decision procedure for ring and semiring equalities      *)
 (*   ring: e1 ... en == same as ring, assuming equalities e1,..., en          *)
-(* These tactics work on any comPzSemiRingType and handle additive morphisms  *)
+(* These tactics work on any comSemiRingType and handle additive morphisms    *)
 (* {additive _ -> _} and ring morphisms {rmorphism _ -> _}.                   *)
 (*                                                                            *)
 (* See file test-suite/test_ring.v for examples of use.                       *)
@@ -25,11 +25,11 @@ From mathcomp.algebra Extra Dependency "ring_tactic.elpi" as ring_tactic.
 (*  * Ring tactic                                                             *)
 (*                                                                            *)
 (* The `ring` tactic solves a goal of the form `p = q :> R` representing a    *)
-(* polynomial equation. The type `R` must have a canonical `comPzRingType`    *)
-(* (commutative ring) or at least `comPzSemiRingType` (commutative semiring)  *)
+(* polynomial equation. The type `R` must have a canonical `comRingType`      *)
+(* (commutative ring) or at least `comSemiRingType` (commutative semiring)    *)
 (* instance. The `ring` tactic solves the equation by normalizing each side   *)
 (* as a polynomial, whose coefficients are either integers (if `R` is a       *)
-(* `comPzRingType`) or natural numbers `N`.                                   *)
+(* `comRingType`) or natural numbers `N`.                                     *)
 (* The `ring:` tactic can decide the given polynomial equation modulo given   *)
 (* monomial equations. The syntax to use this feature is `ring: e1 .. en`     *)
 (* where each `ei` is a proof of equality `m_i = p_i` with `m_i` a monomial  *)
@@ -101,8 +101,8 @@ Qed.
 End Env.
 
 Section PevalSemiRing.
-Variable C : pzSemiRingType.
-Variable R : comPzSemiRingType.
+Variable C : semiRingType.
+Variable R : comSemiRingType.
 Variable R_of_C : {rmorphism C -> R}.
 
 Implicit Type P : Pol C.
@@ -338,8 +338,8 @@ Proof. by case: n => [| p]/=; rewrite ?Peval_pow_pos /= rmorph1 ?mul1r. Qed.
 End PevalSemiRing.
 
 Section PevalRing.
-Variable C : pzRingType.
-Variable R : comPzRingType.
+Variable C : ringType.
+Variable R : comRingType.
 Variable R_of_C : {rmorphism C -> R}.
 
 Implicit Type P : Pol C.
@@ -444,8 +444,8 @@ Qed.
 End PevalRing.
 
 Section MevalSemiRing.
-Variable C : pzSemiRingType.
-Variable R : comPzSemiRingType.
+Variable C : semiRingType.
+Variable R : comSemiRingType.
 Variable R_of_C : {rmorphism C -> R}.
 Variable (cdiv : C -> C -> C * C).
 Variable (cdivP : forall x y, let (q, r) := cdiv x y in x = y * q + r).
@@ -618,7 +618,7 @@ Qed.
 End MevalSemiRing.
 
 Section Csemiring_correct.
-Variables (R C : comPzSemiRingType) (R_of_C : {rmorphism C -> R}).
+Variables (R C : comSemiRingType) (R_of_C : {rmorphism C -> R}).
 Variables (cdiv : C -> C -> C * C).
 Variables (cdivP : forall x y, let (q, r) := cdiv x y in x = y * q + r).
 
@@ -693,7 +693,7 @@ Qed.
 End Csemiring_correct.
 
 Section Cring_correct.
-Variables (R C : comPzRingType) (R_of_C : {rmorphism C -> R}).
+Variables (R C : comRingType) (R_of_C : {rmorphism C -> R}).
 Variables (cdiv : C -> C -> C * C).
 Variables (cdivP : forall x y, let (q, r) := cdiv x y in x = y * q + r).
 
@@ -767,7 +767,7 @@ Qed.
 
 End Cring_correct.
 
-Lemma Ctriv_divP (C : pzSemiRingType) (x y : C) :
+Lemma Ctriv_divP (C : semiRingType) (x y : C) :
   let (q, r) := triv_div 0 1 eq_op x y in x = y * q + r.
 Proof.
 by rewrite /triv_div; case: eqP => [->|_]; rewrite ?addr0 ?mulr1 ?mulr0 ?add0r.
@@ -990,12 +990,12 @@ Qed.
 
 (* Refinement of C to N, for actual computation in the reflexive tactic. *)
 
-Definition R_of_N (R : pzSemiRingType) (natr : nat -> R) (n : N) : R :=
+Definition R_of_N (R : semiRingType) (natr : nat -> R) (n : N) : R :=
   natr (N.to_nat n).
 Arguments R_of_N : clear implicits.
 
 Section Nsemiring.
-Variables (R : comPzSemiRingType).
+Variables (R : comSemiRingType).
 
 #[local] Notation R_of_N := (R_of_N R (GRing.natmul 1)).
 
@@ -1052,11 +1052,11 @@ Qed.
 End Nsemiring.
 
 (* Refinement of C to Z, for actual computation in the reflexive tactic. *)
-Definition R_of_Z (R : pzRingType) (i : Z) : R := intr (int_of_Z i).
+Definition R_of_Z (R : ringType) (i : Z) : R := intr (int_of_Z i).
 Arguments R_of_Z : clear implicits.
 
 Section Zring.
-Variables (R : comPzRingType).
+Variables (R : comRingType).
 
 #[local] Notation R_of_Z := (R_of_Z R).
 
@@ -1114,7 +1114,7 @@ End Zring.
 
 (* Everything below is essentially imported form algebra-tactics *)
 
-Implicit Types (V : nmodType) (R : pzSemiRingType) (F : fieldType).
+Implicit Types (V : nmodType) (R : semiRingType) (F : fieldType).
 
 (* Some basic facts about `Decimal.uint` and `Hexadecimal.uint`               *)
 
@@ -1216,7 +1216,7 @@ by case: n => [n|[d|h]|d|h] /=;
 Qed.
 
 (* Type for reified expressions *)
-Inductive RExpr : pzSemiRingType -> Type :=
+Inductive RExpr : semiRingType -> Type :=
   (* 0 *)
   | R0 R : RExpr R
   (* addition: x + y and (n + m)%N *)
@@ -1225,9 +1225,9 @@ Inductive RExpr : pzSemiRingType -> Type :=
   (* natmul: x *+ n, including n%:R = 1 *+ n *)
   | RMuln R : RExpr R -> RExpr nat -> RExpr R
   (* opposite *)
-  | ROpp (R : pzRingType) : RExpr R -> RExpr R
+  | ROpp (R : ringType) : RExpr R -> RExpr R
   (* intmul: x *~ z, including z%:~R = 1 *~ z *)
-  | RMulz (R : pzRingType) : RExpr R -> RExpr int -> RExpr R
+  | RMulz (R : ringType) : RExpr R -> RExpr int -> RExpr R
   (* 1 *)
   | R1 R : RExpr R
   (* multiplication: x * y and (x * y)%N *)
@@ -1312,7 +1312,7 @@ with Meval V (e : MExpr V) : V :=
   end.
 
 Section Reval_eqs.
-Variables (C : Type) (R : pzSemiRingType).
+Variables (C : Type) (R : semiRingType).
 Fixpoint Reval_eqs (lpe : list ((RExpr R * RExpr R) * (PExpr C * PExpr C))) :
     Prop :=
   if lpe isn't ((lhs, rhs), _) :: lpe then True
@@ -1321,7 +1321,7 @@ End Reval_eqs.
 
 (* Pushing down morphisms in ring/field expressions by reflection *)
 Section norm.
-Variables (F : pzSemiRingType) (F_of_N : bool -> N -> F).
+Variables (F : semiRingType) (F_of_N : bool -> N -> F).
 Variables (zero one : F) (add mul : F -> F -> F).
 Variables (opp_intr : option ((F -> F) * (int -> F))).
 Variables (exp : F -> N -> F) (inv : option (F -> F)).
@@ -1436,9 +1436,9 @@ move: i f f'; elim e using (@RExpr_ind' P P0); rewrite {R e}/P {}/P0 //=.
 Qed.
 End norm.
 
-Lemma Rnorm_eq_F_of_N (F : pzSemiRingType) (f f' : bool -> N -> F) (ff' : f =2 f')
+Lemma Rnorm_eq_F_of_N (F : semiRingType) (f f' : bool -> N -> F) (ff' : f =2 f')
   zero one add mul opp_intr exp inv pi i :
-  forall (R : pzSemiRingType) (env : R -> F) e,
+  forall (R : semiRingType) (env : R -> F) e,
     Rnorm f zero one add mul opp_intr exp inv pi i env e =
     Rnorm f' zero one add mul opp_intr exp inv pi i env e.
 Proof.
@@ -1493,8 +1493,8 @@ elim e using (@RExpr_ind' P P0); rewrite {R e}/P {}/P0 /=.
 Qed.
 
 Variant field_or_ring :=
-  | Field of fieldType | Ring of pzRingType | SemiRing of pzSemiRingType.
-Coercion semiring_of_field_or_ring (RF : field_or_ring) : pzSemiRingType :=
+  | Field of fieldType | Ring of ringType | SemiRing of semiRingType.
+Coercion semiring_of_field_or_ring (RF : field_or_ring) : semiRingType :=
   match RF with Field R => R | Ring R => R | SemiRing R => R end.
 Definition ring_opp_intr (R : field_or_ring) : option ((R -> R) * (int -> R)) :=
   match R with Field R' | Ring R' => Some (@GRing.opp R', intr) | _ => None end.
@@ -1587,7 +1587,7 @@ move: i f; elim e using (@RExpr_ind' P P0); rewrite {R e}/P {}/P0 //=.
 Qed.
 End correct.
 
-Lemma semiring_correct (R : comPzSemiRingType) n env
+Lemma semiring_correct (R : comSemiRingType) n env
     (lpe : seq ((RExpr R * RExpr R) * (PExpr N * PExpr N)))
     (re1 re2 : RExpr R) (pe1 pe2 : PExpr N) :
     Reval_eqs lpe ->
@@ -1617,7 +1617,7 @@ rewrite -!(@Rnorm_correct (SemiRing R) false _ erefl) re12.
 by case: lpe {IH relpe rple} => //=; rewrite eqxx.
 Qed.
 
-Lemma ring_correct (R : comPzRingType) n env
+Lemma ring_correct (R : comRingType) n env
     (lpe : seq ((RExpr R * RExpr R) * (PExpr Z * PExpr Z)))
     (re1 re2 : RExpr R) (pe1 pe2 : PExpr Z) :
     Reval_eqs lpe ->
