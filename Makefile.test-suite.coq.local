@@ -1,4 +1,4 @@
-OUTPUT_TESTS=test_suite/output.v test_suite/imset2_finset.v test_suite/imset2_gproduct.v test_suite/test_rat.v
+OUTPUT_TESTS=test_suite/output.v test_suite/imset2_finset.v test_suite/imset2_gproduct.v test_suite/test_rat.v test_suite/test_ring_error.v
 
 OUTPUT_ARTIFACTS=$(OUTPUT_TESTS:%.v=%.v.out.new)
 
