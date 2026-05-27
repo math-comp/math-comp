@@ -580,7 +580,7 @@ Coercion divalg_closedZ : divalg_closed >-> subalg_closed.
 
 End ClosedExports.
 
-Definition integral_domain_axiom (R : pzRingType) :=
+Definition integral_domain_axiom (R : ringType) :=
   forall x y : R, x * y = 0 -> (x == 0) || (y == 0).
 
 HB.mixin Record ComUnitRing_isIntegral R & ComUnitRing R := {
