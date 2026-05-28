@@ -1,6 +1,7 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
+From Corelib Require Import PosDef.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
 From mathcomp Require Import choice fintype tuple finfun bigop prime nmodule.
 From mathcomp Require Import order rings_modules_and_algebras divalg countalg.
@@ -136,73 +137,267 @@ Definition fracq '((n', d')) : rat :=
   end.
 Arguments fracq : simpl never.
 
-(* Define a Number Notation for rat in rat_scope *)
-(* Since rat values obtained from fracq contain fracq_subdef, which is not *)
-(* an inductive constructor, we need to go through an intermediate         *)
-(* inductive type.                                                         *)
-Variant Irat_prf := Ifracq_subproof : (int * int) -> Irat_prf.
-Variant Irat := IRat : (int * int) -> Irat_prf -> Irat.
+(* ========================================================================== *)
+(*  Fast Number Notation for rat in rat_scope                                 *)
+(*                                                                            *)
+(*  The naive approach goes through `Nat.of_uint`, producing a unary nat      *)
+(*  tree of size O(n) for a literal n. For multi-digit literals this is       *)
+(*  intractable: `0.314159%Q` takes ~27s, longer literals overflow the stack. *)
+(*                                                                            *)
+(*  Strategy:                                                                 *)
+(*  1. Parse arithmetic happens in binary `positive` (from Corelib.PosDef).   *)
+(*  2. The intermediate inductive `IratFast` uses *only* constructors —       *)
+(*     `vm_compute` during Number Notation evaluation has nothing to unfold.  *)
+(*  3. The `mapping` clause rewrites those constructors to opaque wrappers    *)
+(*     (`Posz_of_pos`) and a smart constructor (`mkRat`) that defers the      *)
+(*     canonicality proof so the proof obligation infers `valq` without      *)
+(*     forcing reduction.                                                    *)
+(*  4. No gcd is done at parse time — `mkRat` builds `Rat (fracq_subproof    *)
+(*     (n, d))` so canonicalization is deferred to first numerical use.      *)
+(*                                                                            *)
+(*  Result: log-size terms, sub-millisecond elaboration even for 30+ digits.  *)
+(* ========================================================================== *)
 
-Definition parse (x : Number.number) : option Irat :=
-  let parse_pos i f :=
-    let nf := Decimal.nb_digits f in
-    let d := (10 ^ nf)%nat in
-    let n := (Nat.of_uint i * d + Nat.of_uint f)%nat in
-    valq (fracq (Posz n, Posz d)) in
-  let parse i f :=
-    match i with
-    | Decimal.Pos i => parse_pos i f
-    | Decimal.Neg i => let (n, d) := parse_pos i f in ((- n)%R, d)
-    end in
+Definition Posz_of_pos (p : positive) : int := Posz (Pos.to_nat p).
+Definition Posz_zero : int := Posz 0.
+Arguments Posz_of_pos : simpl never.
+Arguments Posz_zero : simpl never.
+
+(* mkRat: pass only the proof to `Rat` and let Coq infer `valq` from
+   `fracq_subproof`'s type (same trick as `fracq` above). No convertibility
+   check on (n, d) is forced; binary literals wrapped in the opaque
+   `Posz_of_pos` stay log-size. *)
+Definition mkRat (n d : int) : rat := Rat (fracq_subproof (n, d)).
+Arguments mkRat : simpl never.
+
+(* Forward negation helper: rat negation isn't available until `oppq` is
+   defined further down. We just negate the numerator in the pair so the
+   `IRatNeg` mapping has a target. *)
+Definition mkRatN (q : rat) : rat := Rat (fracq_subproof ((- (valq q).1)%R, (valq q).2)).
+Arguments mkRatN : simpl never.
+
+(* Intermediate inductives: pure constructors, nothing to unfold. *)
+Inductive Ipositive : Set :=
+  | IxH : Ipositive
+  | IxO : Ipositive -> Ipositive
+  | IxI : Ipositive -> Ipositive.
+
+Inductive Iint_fast : Set :=
+  | IPosF : Ipositive -> Iint_fast
+  | IZeroF : Iint_fast.
+
+Inductive IratFast :=
+  | IRatF : Iint_fast -> Iint_fast -> IratFast
+  | IRatNeg : IratFast -> IratFast.
+
+Fixpoint Ipos_of_pos (p : positive) : Ipositive :=
+  match p with
+  | xH => IxH
+  | xO q => IxO (Ipos_of_pos q)
+  | xI q => IxI (Ipos_of_pos q)
+  end.
+
+Fixpoint pos_of_Ipos (p : Ipositive) : positive :=
+  match p with
+  | IxH => xH
+  | IxO q => xO (pos_of_Ipos q)
+  | IxI q => xI (pos_of_Ipos q)
+  end.
+
+(* Parser helpers — duplicated from `boot/ssrAC.v`'s `Module Pos.` because
+   ssrAC also exports the AC tactic infrastructure we don't want here. A
+   future refactor could move these (plus `N_of_uint`) into a new
+   `boot/binnums_decimal.v` shared by both files. *)
+Local Notation ten := (xO (xI (xO xH))).
+
+Fixpoint pos_of_uint_acc (d : Decimal.uint) (acc : positive) : positive :=
+  match d with
+  | Decimal.Nil => acc
+  | Decimal.D0 l => pos_of_uint_acc l (Pos.mul ten acc)
+  | Decimal.D1 l => pos_of_uint_acc l (Pos.add 1 (Pos.mul ten acc))
+  | Decimal.D2 l => pos_of_uint_acc l (Pos.add 1~0 (Pos.mul ten acc))
+  | Decimal.D3 l => pos_of_uint_acc l (Pos.add 1~1 (Pos.mul ten acc))
+  | Decimal.D4 l => pos_of_uint_acc l (Pos.add 1~0~0 (Pos.mul ten acc))
+  | Decimal.D5 l => pos_of_uint_acc l (Pos.add 1~0~1 (Pos.mul ten acc))
+  | Decimal.D6 l => pos_of_uint_acc l (Pos.add 1~1~0 (Pos.mul ten acc))
+  | Decimal.D7 l => pos_of_uint_acc l (Pos.add 1~1~1 (Pos.mul ten acc))
+  | Decimal.D8 l => pos_of_uint_acc l (Pos.add 1~0~0~0 (Pos.mul ten acc))
+  | Decimal.D9 l => pos_of_uint_acc l (Pos.add 1~0~0~1 (Pos.mul ten acc))
+  end.
+
+(* Returns N because the decimal might be all-zeros. *)
+Fixpoint N_of_uint (d : Decimal.uint) : N :=
+  match d with
+  | Decimal.Nil => N0
+  | Decimal.D0 l => N_of_uint l
+  | Decimal.D1 l => Npos (pos_of_uint_acc l 1)
+  | Decimal.D2 l => Npos (pos_of_uint_acc l 1~0)
+  | Decimal.D3 l => Npos (pos_of_uint_acc l 1~1)
+  | Decimal.D4 l => Npos (pos_of_uint_acc l 1~0~0)
+  | Decimal.D5 l => Npos (pos_of_uint_acc l 1~0~1)
+  | Decimal.D6 l => Npos (pos_of_uint_acc l 1~1~0)
+  | Decimal.D7 l => Npos (pos_of_uint_acc l 1~1~1)
+  | Decimal.D8 l => Npos (pos_of_uint_acc l 1~0~0~0)
+  | Decimal.D9 l => Npos (pos_of_uint_acc l 1~0~0~1)
+  end.
+
+(* Combine integer + fractional digit strings into a single positive:
+   reuse pos_of_uint_acc with the integer-part value as initial accumulator. *)
+Definition pos_of_uint_pair (i : Decimal.uint) (f : Decimal.uint) : N :=
+  match N_of_uint i, N_of_uint f with
+  | N0, n => n
+  | Npos p, _ => Npos (pos_of_uint_acc f p)
+  end.
+
+(* 10^n as a positive (n : nat, small — at most decimal-digit-count). *)
+Fixpoint ten_pow (n : nat) : positive :=
+  match n with
+  | O => xH
+  | S k => Pos.mul ten (ten_pow k)
+  end.
+
+Definition Iint_of_N (n : N) : Iint_fast :=
+  match n with
+  | N0 => IZeroF
+  | Npos p => IPosF (Ipos_of_pos p)
+  end.
+
+(* Positive-magnitude parse: integer + fractional digit strings -> IratFast *)
+Definition parse_magnitude (i f : Decimal.uint) : IratFast :=
+  let nf := Decimal.nb_digits f in
+  let n_total := pos_of_uint_pair i f in
+  let d_pos := ten_pow nf in
+  IRatF (Iint_of_N n_total) (IPosF (Ipos_of_pos d_pos)).
+
+Definition parse (x : Number.number) : option IratFast :=
   match x with
-  | Number.Decimal (Decimal.Decimal i f) =>
-      let nd := parse i f in
-      Some (IRat nd (Ifracq_subproof nd))
-  | Number.Decimal (Decimal.DecimalExp _ _ _) => None
-  | Number.Hexadecimal _ => None
+  | Number.Decimal (Decimal.Decimal (Decimal.Pos i) f) =>
+      Some (parse_magnitude i f)
+  | Number.Decimal (Decimal.Decimal (Decimal.Neg i) f) =>
+      Some (IRatNeg (parse_magnitude i f))
+  | _ => None
   end.
 
-Definition print (r : Irat) : option Number.number :=
-  let print_pos n d :=
-    if d == 1%nat then Some (Nat.to_uint n, Decimal.Nil) else
-      let d2d5 :=
-        match prime_decomp d with
-        | [:: (2, d2); (5, d5)] => Some (d2, d5)
-        | [:: (2, d2)] => Some (d2, O)
-        | [:: (5, d5)] => Some (O, d5)
-        | _ => None
-        end in
-      match d2d5 with
-      | Some (d2, d5) =>
-          let f := (2 ^ (d5 - d2) * 5 ^ (d2 - d5))%nat in
-          let (i, f) := edivn (n * f) (d * f) in
-          Some (Nat.to_uint i, Nat.to_uint f)
-      | None => None
-      end in
-  let print_IRat nd :=
-    match nd with
-    | (Posz n, Posz d) =>
-        match print_pos n d with
-        | Some (i, f) => Some (Decimal.Pos i, f)
-        | None => None
-        end
-    | (Negz n, Posz d) =>
-        match print_pos n.+1 d with
-        | Some (i, f) => Some (Decimal.Neg i, f)
-        | None => None
-        end
-    | (_, Negz _) => None
-    end in
+(* ============================================================ *)
+(*  Pretty-printer: round-trip literals back to decimal           *)
+(* ============================================================ *)
+
+(* positive -> little-endian decimal *)
+Fixpoint pos_to_little (p : positive) : Decimal.uint :=
+  match p with
+  | xH => Decimal.D1 Decimal.Nil
+  | xI q => Decimal.Little.succ_double (pos_to_little q)
+  | xO q => Decimal.Little.double (pos_to_little q)
+  end.
+
+(* Depth of a positive's binary tree — used as fuel upper bound. *)
+Fixpoint pos_size (p : positive) : nat :=
+  match p with
+  | xH => 1%nat
+  | xO q | xI q => S (pos_size q)
+  end.
+
+(* Find k such that target = 10^k, by iterating multiplication. *)
+Fixpoint pow10_check (target current : positive) (k fuel : nat) : option nat :=
+  match fuel with
+  | O => None
+  | S f' =>
+      if Pos.eqb target current then Some k
+      else pow10_check target (Pos.mul ten current) (S k) f'
+  end.
+
+Definition pos_log10 (p : positive) : option nat :=
+  pow10_check p xH O (S (pos_size p)).
+
+(* Decompose a digit list: returns (Some cons, tail) where `cons` rebuilds the
+   leading digit, or (None, Nil) when empty. Lets pad/take/drop be 1-liners. *)
+Definition uint_uncons (u : Decimal.uint) :
+    option (Decimal.uint -> Decimal.uint) * Decimal.uint :=
+  match u with
+  | Decimal.Nil  => (None, Decimal.Nil)
+  | Decimal.D0 v => (Some Decimal.D0, v)
+  | Decimal.D1 v => (Some Decimal.D1, v)
+  | Decimal.D2 v => (Some Decimal.D2, v)
+  | Decimal.D3 v => (Some Decimal.D3, v)
+  | Decimal.D4 v => (Some Decimal.D4, v)
+  | Decimal.D5 v => (Some Decimal.D5, v)
+  | Decimal.D6 v => (Some Decimal.D6, v)
+  | Decimal.D7 v => (Some Decimal.D7, v)
+  | Decimal.D8 v => (Some Decimal.D8, v)
+  | Decimal.D9 v => (Some Decimal.D9, v)
+  end.
+
+(* Pad a little-endian decimal to at least k digits by appending D0. *)
+Fixpoint pad_little (k : nat) (u : Decimal.uint) : Decimal.uint :=
+  match k with
+  | O => u
+  | S k' => let '(hd, tl) := uint_uncons u in
+            match hd with
+            | Some f => f (pad_little k' tl)
+            | None   => Decimal.D0 (pad_little k' Decimal.Nil)
+            end
+  end.
+
+(* Take the first k digits of a little-endian decimal. *)
+Fixpoint take_little (k : nat) (u : Decimal.uint) : Decimal.uint :=
+  match k with
+  | O => Decimal.Nil
+  | S k' => let '(hd, tl) := uint_uncons u in
+            match hd with
+            | Some f => f (take_little k' tl)
+            | None   => Decimal.Nil
+            end
+  end.
+
+(* Drop the first k digits of a little-endian decimal. *)
+Fixpoint drop_little (k : nat) (u : Decimal.uint) : Decimal.uint :=
+  match k with
+  | O => u
+  | S k' => let '(_, tail) := uint_uncons u in drop_little k' tail
+  end.
+
+(* Given numerator-as-positive and k = log10(denom), produce
+   (integer-part-big-endian, fractional-part-big-endian). *)
+Definition split_decimal (pn : positive) (k : nat) : Decimal.uint * Decimal.uint :=
+  let little := pos_to_little pn in
+  let padded := pad_little (S k) little in
+  let frac_l := take_little k padded in
+  let int_l := drop_little k padded in
+  (Decimal.rev int_l, Decimal.rev frac_l).
+
+(* Print: only fires on the shape my parser produces — IRatF (n,d) with
+   d = 10^k, optionally wrapped in IRatNeg for negatives. Manually built
+   `mkRat`s with other denominators round-trip via Coq's default `Rat …`. *)
+Definition print_body (sign : bool) (n_int : Iint_fast) (p_d : Ipositive) :
+    option Number.number :=
+  match pos_log10 (pos_of_Ipos p_d) with
+  | None => None
+  | Some k =>
+      let zero_dec := Decimal.D0 Decimal.Nil in
+      let mk_decimal head frac :=
+        Number.Decimal (Decimal.Decimal head frac) in
+      Some (match n_int with
+            | IZeroF => mk_decimal (Decimal.Pos zero_dec) Decimal.Nil
+            | IPosF p =>
+                let '(i, f) := split_decimal (pos_of_Ipos p) k in
+                mk_decimal (if sign then Decimal.Neg i else Decimal.Pos i) f
+            end)
+  end.
+
+Definition print (r : IratFast) : option Number.number :=
   match r with
-  | IRat nd _ =>
-      match print_IRat nd with
-      | Some (i, f) => Some (Number.Decimal (Decimal.Decimal i f))
-      | None => None
-      end
+  | IRatF n_int (IPosF p_d) => print_body false n_int p_d
+  | IRatNeg (IRatF n_int (IPosF p_d)) => print_body true n_int p_d
+  | _ => None
   end.
 
-Number Notation rat parse print (via Irat
-  mapping [Rat => IRat, fracq_subproof => Ifracq_subproof])
+#[warnings="-via-type-remapping,-via-type-mismatch"]
+Number Notation rat parse print (via IratFast
+  mapping [mkRat => IRatF,
+           mkRatN => IRatNeg,
+           Posz_of_pos => IPosF,
+           Posz_zero => IZeroF,
+           xH => IxH, xO => IxO, xI => IxI])
   : rat_scope.
 
 (* Now, the following should parse as rat (and print unchanged) *)
@@ -849,6 +1044,21 @@ Lemma rpred_rat (S : divringClosed R) a : ratr a \in S.
 Proof. by rewrite rpred_div ?rpred_int. Qed.
 
 End InRing.
+
+(* ============================================================ *)
+(*  Ring-scope cast for decimal literals: `3.14%:RR : R`         *)
+(*                                                               *)
+(*  We do NOT register a Number Notation in `ring_scope` because *)
+(*  Coq's resolution would then dispatch *all* numeric literals  *)
+(*  (including pure integers) to it, breaking pattern-matching   *)
+(*  lemmas like `pnatr_eq0` that expect `n%:R` shape.            *)
+(*                                                               *)
+(*  Instead, users write `3.14%:RR` (or `(3.14%Q)%:RR`) to lift  *)
+(*  a `rat` literal into any `unitRingType`. The %Q parser still *)
+(*  uses the fast binary path, so the literal itself is cheap.   *)
+(* ============================================================ *)
+
+Notation "x %:RR" := (@ratr _ x%Q) (at level 2, format "x %:RR") : ring_scope.
 
 Section Fmorph.
 
