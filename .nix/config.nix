@@ -107,6 +107,8 @@ with builtins; with (import <nixpkgs> {}).lib;
     }; };
     "rocq-9.2" = { rocqPackages = {
       rocq-core.override.version = "9.2";
+      micromega-plugin.override.version = "master";
+      micromega-plugin.job = false;
     }; coqPackages = common-bundles // {
       coq.override.version = "9.2";
       coq-elpi.job = true;
@@ -118,6 +120,8 @@ with builtins; with (import <nixpkgs> {}).lib;
     }; };
     "rocq-9.1" = { rocqPackages = {
       rocq-core.override.version = "9.1";
+      micromega-plugin.override.version = "master";
+      micromega-plugin.job = false;
     }; coqPackages = common-bundles // {
       coq.override.version = "9.1";
       coq-elpi.job = true;
@@ -128,6 +132,8 @@ with builtins; with (import <nixpkgs> {}).lib;
     }; };
     "rocq-9.0" = { rocqPackages = {
       rocq-core.override.version = "9.0";
+      micromega-plugin.override.version = "master";
+      micromega-plugin.job = false;
     }; coqPackages = common-bundles // {
       coq.override.version = "9.0";
       coq-elpi.job = true;
