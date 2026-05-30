@@ -192,6 +192,15 @@ HB.instance Definition _ :=
   Order.isPOrder.Build (itv_bound_display disp) (itv_bound T)
     lt_bound_def le_bound_refl le_bound_anti le_bound_trans.
 
+Fact bound_le0x b : -oo <= b. Proof. by []. Qed.
+
+Fact bound_lex1 b : b <= +oo. Proof. by case: b => [|[]]. Qed.
+
+HB.instance Definition _ :=
+  Order.hasBottom.Build (itv_bound_display disp) (itv_bound T) bound_le0x.
+HB.instance Definition _ :=
+  Order.hasTop.Build (itv_bound_display disp) (itv_bound T) bound_lex1.
+
 Lemma bound_lexx c1 c2 x : (BSide c1 x <= BSide c2 x) = (c2 ==> c1).
 Proof. by rewrite /<=%O /= lteifxx. Qed.
 
@@ -290,9 +299,18 @@ HB.instance Definition _ :=
   Order.isPOrder.Build  (interval_display disp) (interval T)
   (fun _ _ => erefl) subitv_refl subitv_anti subitv_trans.
 
+Fact itv_le0x i : Interval +oo -oo <= i. Proof. by case: i => [[|[]]]. Qed.
+
+Fact itv_lex1 i : i <= `]-oo, +oo[. Proof. by case: i => [?[|[]]]. Qed.
+
+HB.instance Definition _ :=
+  Order.hasBottom.Build (interval_display disp) (interval T) itv_le0x.
+HB.instance Definition _ :=
+  Order.hasTop.Build (interval_display disp) (interval T) itv_lex1.
+
 Definition pred_of_itv i : pred T := [pred x | `[x, x] <= i].
 
-Canonical Structure itvPredType := PredType pred_of_itv.
+Canonical itvPredType := PredType pred_of_itv.
 
 Lemma subitvE b1l b1r b2l b2r :
   (Interval b1l b1r <= Interval b2l b2r) = (b2l <= b1l) && (b1r <= b2r).
@@ -480,74 +498,41 @@ Definition bound_join bl br : itv_bound T :=
       BSide ((~~ (x <= y) || yb) && (~~ (y <= x) || xb)) (x `|` y)
   end.
 
-Lemma bound_meetC : commutative bound_meet.
+Fact bound_lexI b1 b2 b3 : (b1 <= bound_meet b2 b3) = (b1 <= b2) && (b1 <= b3).
 Proof.
-case=> [? ?|[]][? ?|[]] //=; rewrite meetC; congr BSide.
-by case: lcomparableP; rewrite ?orbF // orbC.
+case: b1 b2 b3 => [b1 t1|[]] [b2 t2|[]] [b3 t3|[]];
+  rewrite ?andbF ?andbT//= ?leBSide/=.
+case: lcomparableP => [||ic|<-]; rewrite ?orbF/= -?lteifF.
+- move=> lt23; apply/idP/idP => [/[dup] + ->|/andP[]//=].
+  by move=> /lteif_trans /(_ lt23); apply/lteif_imply; rewrite andbF.
+- move=> lt32; apply/idP/idP => [/[dup] + ->|/andP[]//=]; rewrite andbT.
+  by move=> /lteif_trans /(_ lt32); apply/lteif_imply; rewrite andbF.
+- rewrite lexI; apply/idP/idP => [|/andP[/lteifW -> /lteifW ->]//].
+  rewrite !le_eqVlt => /andP[] /predU1P[->|]; first by case: comparableP ic.
+  move=> /[swap] /predU1P[->|]; first by case: comparableP ic.
+  by move=> /lteifS-> /lteifS->.
+by rewrite -lteif_andb; case: b1 b2 b3 => [] [] [].
 Qed.
 
-Lemma bound_joinC : commutative bound_join.
+Fact bound_leUx b1 b2 b3 : (bound_join b1 b2 <= b3) = (b1 <= b3) && (b2 <= b3).
 Proof.
-case=> [? ?|[]][? ?|[]] //=; rewrite joinC; congr BSide.
-by case: lcomparableP; rewrite ?andbT // andbC.
-Qed.
-
-Lemma bound_meetA : associative bound_meet.
-Proof.
-case=> [? x|[]][? y|[]][? z|[]] //=; rewrite !lexI meetA; congr BSide.
-by case: (lcomparableP x y) => [|||->]; case: (lcomparableP y z) => [|||->];
-  case: (lcomparableP x z) => [|||//<-]; case: (lcomparableP x y);
-  rewrite //= ?andbF ?orbF ?lexx ?orbA //; case: (lcomparableP y z).
-Qed.
-
-Lemma bound_joinA : associative bound_join.
-Proof.
-case=> [? x|[]][? y|[]][? z|[]] //=; rewrite !leUx joinA; congr BSide.
-by case: (lcomparableP x y) => [|||->]; case: (lcomparableP y z) => [|||->];
-  case: (lcomparableP x z) => [|||//<-]; case: (lcomparableP x y);
-  rewrite //= ?orbT ?andbT ?lexx ?andbA //; case: (lcomparableP y z).
-Qed.
-
-Lemma bound_meetKU b2 b1 : bound_join b1 (bound_meet b1 b2) = b1.
-Proof.
-case: b1 b2 => [? ?|[]][? ?|[]] //=;
-  rewrite ?meetKU ?joinxx ?leIl ?lexI ?lexx ?andbb //=; congr BSide.
-by case: lcomparableP; rewrite ?orbF /= ?andbb ?orbK.
-Qed.
-
-Lemma bound_joinKI b2 b1 : bound_meet b1 (bound_join b1 b2) = b1.
-Proof.
-case: b1 b2 => [? ?|[]][? ?|[]] //=;
-  rewrite ?joinKI ?meetxx ?leUl ?leUx ?lexx ?orbb //=; congr BSide.
-by case: lcomparableP; rewrite ?orbF ?orbb ?andKb.
-Qed.
-
-Lemma bound_leEmeet b1 b2 : (b1 <= b2) = (bound_meet b1 b2 == b1).
-Proof.
-case: b1 b2 => [[]t[][]|[][][]] //=; rewrite ?eqxx// => t';
-  rewrite [LHS]/<=%O /eq_op ?andbT ?andbF ?orbF/= /eq_op/= /eq_op/=;
-  case: lcomparableP => //=; rewrite ?eqxx//=; [| | |].
-- by move/lt_eqF.
-- move=> ic; apply: esym; apply: contraNF ic.
-  by move=> /eqP/meet_idPl; apply: le_comparable.
-- by move/lt_eqF.
-- move=> ic; apply: esym; apply: contraNF ic.
-  by move=> /eqP/meet_idPl; apply: le_comparable.
+case: b1 b2 b3 => [b1 t1|[]] [b2 t2|[]] [b3 t3|[]];
+  rewrite ?andbF ?andbT//= ?leBSide/=.
+case: lcomparableP => [||ic|<-]; rewrite ?andbT ?implybT/= -?lteifF.
+- move=> lt12; apply/idP/idP => [/[dup] /(lteif_trans lt12) + ->|/andP[]//].
+  by rewrite andbT; apply/lteif_imply.
+- move=> lt21; apply/idP/idP => [/[dup] /(lteif_trans lt21) + ->|/andP[]//].
+  by apply/lteif_imply.
+- rewrite leUx; apply/idP/idP => [|/andP[/lteifW -> /lteifW ->]//].
+  rewrite !le_eqVlt => /andP[] /predU1P[<-|]; first by case: comparableP ic.
+  move=> /[swap] /predU1P[<-|]; first by case: comparableP ic.
+  by move=> /lteifS-> /lteifS->.
+by rewrite -lteif_andb; case: b1 b2 b3 => [] [] [].
 Qed.
 
 HB.instance Definition _ :=
-  Order.POrder_isLattice.Build (itv_bound_display disp) (itv_bound T)
-    bound_meetC bound_joinC bound_meetA bound_joinA
-    bound_joinKI bound_meetKU bound_leEmeet.
-
-Lemma bound_le0x b : -oo <= b. Proof. by []. Qed.
-
-Lemma bound_lex1 b : b <= +oo. Proof. by case: b => [|[]]. Qed.
-
-HB.instance Definition _ :=
-  Order.hasBottom.Build (itv_bound_display disp) (itv_bound T) bound_le0x.
-HB.instance Definition _ :=
-  Order.hasTop.Build (itv_bound_display disp) (itv_bound T) bound_lex1.
+  Order.POrder_MeetJoin_isLattice.Build (itv_bound_display disp) (itv_bound T)
+    bound_lexI bound_leUx.
 
 Definition itv_meet i1 i2 : interval T :=
   let: Interval b1l b1r := i1 in
@@ -557,42 +542,21 @@ Definition itv_join i1 i2 : interval T :=
   let: Interval b1l b1r := i1 in
   let: Interval b2l b2r := i2 in Interval (b1l `&` b2l) (b1r `|` b2r).
 
-Lemma itv_meetC : commutative itv_meet.
-Proof. by case=> [? ?][? ?] /=; rewrite meetC joinC. Qed.
-
-Lemma itv_joinC : commutative itv_join.
-Proof. by case=> [? ?][? ?] /=; rewrite meetC joinC. Qed.
-
-Lemma itv_meetA : associative itv_meet.
-Proof. by case=> [? ?][? ?][? ?] /=; rewrite meetA joinA. Qed.
-
-Lemma itv_joinA : associative itv_join.
-Proof. by case=> [? ?][? ?][? ?] /=; rewrite meetA joinA. Qed.
-
-Lemma itv_meetKU i2 i1 : itv_join i1 (itv_meet i1 i2) = i1.
-Proof. by case: i1 i2 => [? ?][? ?] /=; rewrite meetKU joinKI. Qed.
-
-Lemma itv_joinKI i2 i1 : itv_meet i1 (itv_join i1 i2) = i1.
-Proof. by case: i1 i2 => [? ?][? ?] /=; rewrite meetKU joinKI. Qed.
-
-Lemma itv_leEmeet i1 i2 : (i1 <= i2) = (itv_meet i1 i2 == i1).
+Fact itv_lexI i1 i2 i3 : (i1 <= itv_meet i2 i3) = (i1 <= i2) && (i1 <= i3).
 Proof.
-by case: i1 i2 => [? ?] [? ?]; rewrite /eq_op/=/eq_op/= eq_meetl eq_joinl.
+case: i1 i2 i3 => [b1l b1r] [b2l b2r] [b3l b3r].
+by rewrite !subitvE/= leUx lexI andbACA.
+Qed.
+
+Fact itv_leUx i1 i2 i3 : (itv_join i1 i2 <= i3) = (i1 <= i3) && (i2 <= i3).
+Proof.
+case: i1 i2 i3 => [b1l b1r] [b2l b2r] [b3l b3r].
+by rewrite !subitvE/= leUx lexI andbACA.
 Qed.
 
 HB.instance Definition _ :=
-  Order.POrder_isLattice.Build (interval_display disp) (interval T)
-    itv_meetC itv_joinC itv_meetA itv_joinA
-    itv_joinKI itv_meetKU itv_leEmeet.
-
-Lemma itv_le0x i : Interval +oo -oo <= i. Proof. by case: i => [[|[]]]. Qed.
-
-Lemma itv_lex1 i : i <= `]-oo, +oo[. Proof. by case: i => [?[|[]]]. Qed.
-
-HB.instance Definition _ :=
-  Order.hasBottom.Build (interval_display disp) (interval T) itv_le0x.
-HB.instance Definition _ :=
-  Order.hasTop.Build (interval_display disp) (interval T) itv_lex1.
+  Order.POrder_MeetJoin_isLattice.Build (interval_display disp) (interval T)
+    itv_lexI itv_leUx.
 
 Lemma in_itvI x i1 i2 : (x \in i1 `&` i2) = (x \in i1) && (x \in i2).
 Proof. exact: lexI. Qed.
@@ -612,14 +576,14 @@ Lemma BSide_max s (x y : T) :
   BSide s (Order.max x y) = Order.max (BSide s x) (BSide s y).
 Proof. exact: comparable_BSide_max. Qed.
 
-Lemma itv_bound_total : total (<=%O : rel (itv_bound T)).
+Fact itv_bound_total : total (<=%O : rel (itv_bound T)).
 Proof. by move=> [[]?|[]][[]?|[]]; rewrite /<=%O //=; case: ltgtP. Qed.
 
 HB.instance Definition _ :=
   Order.Lattice_isTotal.Build
     (itv_bound_display disp) (itv_bound T) itv_bound_total.
 
-Lemma itv_meetUl : @left_distributive (interval T) _ Order.meet Order.join.
+Fact itv_meetUl : @left_distributive (interval T) _ Order.meet Order.join.
 Proof.
 by move=> [? ?][? ?][? ?]; rewrite /Order.meet /Order.join /= -meetUl -joinIl.
 Qed.
