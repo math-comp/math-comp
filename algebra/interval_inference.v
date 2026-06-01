@@ -462,7 +462,8 @@ Section POrder.
 Context d (T : porderType d) (f : interval int -> T -> bool) (i : Itv.t).
 Local Notation itv := (Itv.def f i).
 HB.instance Definition _ := [isSub for @Itv.r T f i].
-HB.instance Definition _ : Order.POrder d itv := [POrder of itv by <:].
+HB.instance Definition _ : Order.SubPOrder d (Itv.spec f i) d itv :=
+  Order.SubPOrder.copy itv (sub_type itv).
 End POrder.
 
 Section Order.
