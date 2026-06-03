@@ -645,7 +645,7 @@ move=> pcharLp; apply/idP/idP=> [sepKx | /Fadjoin_poly_eq]; last first.
   - by rewrite rootE !hornerE horner_comp hornerXn Dx subrr.
   rewrite unlock !(derivE, deriv_comp) -mulr_natr -rmorphMn /= mL0.
   by rewrite !mulr0 subr0 coprimep1.
-without loss{e} ->: e x sepKx / e = 0.
+without loss ->: e x sepKx / e = 0.
   move=> IH; elim: {e}e.+1 => [|e]; [exact: memv_adjoin | apply: subvP].
   apply/FadjoinP/andP; rewrite subv_adjoin expnSr exprM (IH 0) //.
   by have /adjoin_separableP-> := sepKx; rewrite ?rpredX ?memv_adjoin.
