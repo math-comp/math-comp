@@ -140,10 +140,12 @@ HB.structure Definition POrderedNormedZmodule (R : porderZmodType) :=
 
 HB.structure Definition foo R :=
   { A of GRing.PzSemiRing A & SemiNormedZmodule R A }.
+(* HB.structure Definition foo1 R := *)
+(*   { A of GRing.PzSemiRing A & NormedZmodule R A }. *)
 
 #[short(type="normedRingType")]
 HB.structure Definition NormedRing (R : porderZmodType) :=
- {K of GRing.PzRing K & POrderedNormedZmodule R K}.
+ {K of GRing.PzRing K & NormedZmodule R K}.
 
 
 HB.structure Definition Normed_and_Lmodule (R : porderZmodType) (K : pzRingType) :=
@@ -166,13 +168,14 @@ HB.structure Definition NormedAlgebra
 
 
 HB.mixin Record NumZmod_isNumRing R & GRing.PzRing R & POrderZmodule R
-  & NormedZmodule (POrderZmodule.clone R _) R := {
- addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
+  & NormedZmodule (POrderZmodule.clone R _) R
+  (* & Num.Zmodule_isSemiNormed (POrderZmodule.clone R _) R *)
+  (* & GRing.Nmodule_isLSemiModule (GRing.PzSemiRing.clone R _) R *)
+:= {
  ger_leVge : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
  normrM : {morph (norm : R -> R) : x y / x * y};
  ler_def : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
 }.
-
 (* Section foo. *)
 (* HB.declare Context (R : Type) (foo1 : GRing.IntegralDomain R) *)
 (*   (foo2 : NumZmodule R) (foo3 : POrderRing R) *)
@@ -194,31 +197,26 @@ HB.mixin Record NumZmod_isNumRing R & GRing.PzRing R & POrderZmodule R
 (*        R & *)
 (*      NumZmod_isNumRing R *)
 
+HB.mixin Record isRegular R & GRing.PzSemiRing R  & 
+  GRing.Nmodule_isLSemiModule (GRing.PzSemiRing.clone R _) R := {}.
 
 #[short(type="numDomainType")]
 HB.structure Definition NumDomain := { R of
      GRing.IntegralDomain R &
      NumZmodule R &
-     POrderRing R &
-     NormedRing (POrderZmodule.clone R _) R &
-     (* GRing.Nmodule_isLSemiModule (GRing.PzSemiRing.clone R _) R *)
-     (* Normed_and_Lmodule_isAlgebraicNormedModule *)
-     (*   (POrderRing.clone R _) *)
-     (*   (NormedRing.clone _ R _) *)
-     (*   R & *)
-      NumZmod_isNumRing R
+     Num.Zmodule_isSemiNormed (POrderZmodule.clone R _) R &
+     Num.SemiNormedZmodule_isPositiveDefinite (POrderZmodule.clone R _) R &
+     GRing.Nmodule_isLSemiModule (GRing.PzSemiRing.clone R _) R &
+     NormedZmodule _ R &
+     NumZmod_isNumRing R &
+     isRegular R
    }.
 Arguments addr_gt0 {_} [x y] : rename.
 Arguments ger_leVge {_} [x y] : rename.
 
-Section test.
-Variables (R : numDomainType) (K : normedAlgType R) (V : algNormedModType K).
-
-
-HB.factory Record isNumRing R & GRing.NzRing R & POrderZmodule R
+HB.factory Record isNumRing R & GRing.PzRing R & POrderZmodule R
   & GRing.IntegralDomain R
   & NormedZmodule (POrderZmodule.clone R _) R := {
- addr_gt0 : forall x y : R, 0 < x -> 0 < y -> 0 < (x + y);
  ger_leVge : forall x y : R, 0 <= x -> 0 <= y -> (x <= y) || (y <= x);
  normrM : {morph (norm : R -> R) : x y / x * y};
  ler_def : forall x y : R, (x <= y) = (norm (y - x) == (y - x));
@@ -252,7 +250,7 @@ HB.instance Definition _ :=
   POrderedZmodule_hasTransCmp.Build R comparabler_trans.
 
 HB.instance Definition _ :=
-  NumZmod_isNumRing.Build R addr_gt0 ger_leVge normrM ler_def.
+  NumZmod_isNumRing.Build R ger_leVge normrM ler_def.
 HB.end.
 
 Module NumDomainExports.
