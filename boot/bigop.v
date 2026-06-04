@@ -104,8 +104,9 @@ From mathcomp Require Import div fintype tuple finfun.
 (*                       for operators satisfying the Monoid interfaces,      *)
 (*                       exports SemiGroup.Theory                             *)
 (*       Monoid.simpm == generic monoid simplification rewrite multirule      *)
-(*             oAC op == convert an AC operator op : T -> T -> T              *)
-(*                       to a Monoid.com_law on option T                      *)
+(*            olaw op == extends a law on T to a law on option T, it is       *)
+(*                       canonically a Monoid.law when op is a SemiGroup.law  *)
+(*                       a Monoid.com_law when op is a SemiGroup.com_law      *)
 (* Monoid structures are predeclared for many basic operators: (_ && _)%B,    *)
 (* (_ || _)%B, (_ (+) _)%B (exclusive or), (_ + _)%N, (_ * _)%N, maxn,        *)
 (* gcdn, lcmn and (_ ++ _)%SEQ (list concatenation)                           *)
@@ -851,47 +852,58 @@ by elim/big_rec2: _ => // j x y Pj [Qx <-]; rewrite [Q _]Qop ?fop ?QF.
 Qed.
 Arguments big_morph_in [R1 R2] Q f [id1 op1 id2 op2].
 
-Section oA.
+Section OptionLaw.
+Context {T : Type} (op : T -> T -> T).
 
-Variables (T : Type) (op : T -> T -> T).
+Definition olaw x := oapp (fun y => Some (oapp (op^~ y) y x)) x.
 
-Definition oA & associative op :=
-  fun x => oapp (fun y => Some (oapp (op^~ y) y x)) x.
-Arguments oA : simpl never.
+Lemma olawss x y : olaw (Some x) (Some y) = some (op x y). Proof. by []. Qed.
+Lemma olawx1 : left_id None olaw. Proof. by case. Qed.
+Lemma olaw1x : right_id None olaw. Proof. by []. Qed.
 
-Hypothesis (opA : associative op).
-Local Notation oop := (oA opA).
+End OptionLaw.
+Arguments olaw : simpl never.
 
-Lemma oAE x y : oop (Some x) (Some y) = some (op x y). Proof. by []. Qed.
+Section OptionSemiGroupLaw.
+Import Monoid.
 
-Let oopA_subdef : associative oop.
-Proof. by move=> [x|] [y|] [z|]//; rewrite /oA/= opA. Qed.
+Variables (T : Type) (op : SemiGroup.law T).
 
-Let oopx1_subdef : left_id None oop. Proof. by case. Qed.
-Let oop1x_subdef : right_id None oop. Proof. by []. Qed.
+Let olawA_subdef : associative (olaw op).
+Proof. by move=> [x|] [y|] [z|]//; rewrite /olaw/= mulmA. Qed.
 
-HB.instance Definition _ := Monoid.isLaw.Build (option T) None oop
-  oopA_subdef oopx1_subdef oop1x_subdef.
+HB.instance Definition _ := Monoid.isLaw.Build (option T) None (olaw op)
+  olawA_subdef (olawx1 _) (olaw1x _).
 
 Context [x : T].
 
-Lemma some_big_A_mk_monoid [I : Type] r P (F : I -> T) :
+Lemma some_big_mk_monoid [I : Type] r P (F : I -> T) :
   Some (\big[op/x]_(i <- r | P i) F i) =
-    oop (\big[oop/None]_(i <- r | P i) Some (F i)) (Some x).
+    olaw op (\big[olaw op/None]_(i <- r | P i) Some (F i)) (Some x).
 Proof. by elim/big_rec2 : _ => //= i [y|] _ Pi [] -> //=; rewrite opA. Qed.
 
-Lemma big_A_mk_monoid [I : Type] r P (F : I -> T) :
+Lemma big_mk_option_monoid [I : Type] r P (F : I -> T) :
   \big[op/x]_(i <- r | P i) F i =
-    odflt x (oop (\big[oop/None]_(i <- r | P i) Some (F i)) (Some x)).
-Proof. by apply: Some_inj; rewrite some_big_A_mk_monoid. Qed.
+    odflt x (olaw op (\big[olaw op/None]_(i <- r | P i) Some (F i)) (Some x)).
+Proof. by apply: Some_inj; rewrite some_big_mk_monoid. Qed.
 
-End oA.
-Arguments oA : simpl never.
+End OptionSemiGroupLaw.
+
+Section OptionComLaw.
+Import Monoid.
+Variables (T : Type) (op : SemiGroup.com_law T).
+
+Let oopC_subdef : commutative (olaw op).
+Proof. by move=> [x|] [y|]//; rewrite /olaw/= opC. Qed.
+HB.instance Definition _ := isCommutativeLaw.Build
+  (option T) (olaw op) oopC_subdef.
+End OptionComLaw.
 
 Section oAC.
 
 Variables (T : Type) (op : T -> T -> T).
 
+#[deprecated(since="math-comp 2.6", use=olaw)]
 Definition oAC & associative op & commutative op :=
   fun x => oapp (fun y => Some (oapp (op^~ y) y x)) x.
 Arguments oAC : simpl never.
@@ -916,11 +928,13 @@ HB.instance Definition _ := Monoid.isComLaw.Build (option T) None oop
 
 Context [x : T].
 
+#[deprecated(since="math-comp 2.6", use=some_big_mk_monoid)]
 Lemma some_big_AC_mk_monoid [I : Type] r P (F : I -> T) :
   Some (\big[op/x]_(i <- r | P i) F i) =
     oop (\big[oop/None]_(i <- r | P i) Some (F i)) (Some x).
 Proof. by elim/big_rec2 : _ => //= i [y|] _ Pi [] -> //=; rewrite opA. Qed.
 
+#[deprecated(since="math-comp 2.6", use=big_mk_option_monoid)]
 Lemma big_AC_mk_monoid [I : Type] r P (F : I -> T) :
   \big[op/x]_(i <- r | P i) F i =
     odflt x (oop (\big[oop/None]_(i <- r | P i) Some (F i)) (Some x)).
@@ -2272,22 +2286,19 @@ Arguments big_pmap [R idx op J I] h [r].
 Arguments telescope_big [R idx op] f [n m].
 
 Section SemiGroupWithOneCommutativeAndIdempotent.
-
+Import Monoid.
 Variables (R : Type) (op : SemiGroup.law R).
 Context [x : R].
 Hypothesis opxx : op x x = x.
 Hypothesis opxC : forall a, op x a = op a x.
-
-Local Notation opA := SemiGroup.opA.
-Local Notation mk := (big_A_mk_monoid opA).
 
 Lemma big_split_ord_idem m n (P : pred 'I_(m + n)) F :
   \big[op/x]_(i | P i) F i =
      op (\big[op/x]_(i | P (lshift n i)) F (lshift n i))
         (\big[op/x]_(i | P (rshift m i)) F (rshift m i)).
 Proof.
-rewrite mk [X in op X _]mk [X in op _ X]mk big_split_ord//=.
-do 2!case: (\big[_/_]_(_ | _) _) => //=.
+apply/Some_inj; rewrite -olawss !some_big_mk_monoid big_split_ord//=.
+do 2!case: (\big[_/_]_(_ | _) _); rewrite /olaw //= ?opxx//.
 - by move=> a b; rewrite !opA -!opxC !opA opxx.
 - by move=> a; rewrite -opA/= opxx.
 - by move=> a; rewrite -opxC opA/= opxx.
@@ -2296,16 +2307,14 @@ Qed.
 End SemiGroupWithOneCommutativeAndIdempotent.
 
 Section IncreasingSemiGroup.
-
+Import Monoid.
 Variables (R : Type) (op : SemiGroup.com_law R).
 Variable le : rel R.
 Hypothesis le_refl : reflexive le.
 Hypothesis op_incr : forall x y, le x (op x y).
 Context [x : R].
 
-Local Notation opA := SemiGroup.opA.
-Local Notation opC := SemiGroup.opC.
-Local Notation mk := (big_AC_mk_monoid opA opC).
+Local Notation mk := (big_mk_option_monoid op).
 
 Lemma sub_le_big I [s] (P P' : {pred I}) (F : I -> R) :
     (forall i, P i -> P' i) ->
