@@ -1174,6 +1174,22 @@ HB.structure Definition TPOrder d := { T of hasTop d T & POrder d T }.
 #[short(type="tbPOrderType")]
 HB.structure Definition TBPOrder d := { T of hasTop d T & BPOrder d T }.
 
+#[short(type="lowerEndlessPOrderType")]
+HB.structure Definition LowerEndlessPOrder d :=
+  { T of hasNoBottom d T & POrder d T }.
+#[short(type="upperEndlessPOrderType")]
+HB.structure Definition UpperEndlessPOrder d :=
+  { T of hasNoTop d T & POrder d T }.
+#[short(type="endlessPOrderType")]
+HB.structure Definition EndlessPOrder d :=
+  { T of hasNoTop d T & LowerEndlessPOrder d T }.
+#[short(type="densePOrderType")]
+HB.structure Definition DensePOrder d :=
+  { T of Preorder_isDense d T & POrder d T }.
+#[short(type="endlessDensePOrderType")]
+HB.structure Definition EndlessDensePOrder d :=
+  { T of EndlessPOrder d T & DensePOrder d T }.
+
 Module POrderExports.
 Arguments le_trans {d s} [_ _ _].
 End POrderExports.
@@ -1382,6 +1398,26 @@ HB.structure Definition TTotal d := { T of Total d T & hasTop d T }.
 
 #[short(type="tbOrderType")]
 HB.structure Definition TBTotal d := { T of BTotal d T & hasTop d T }.
+
+#[short(type="lowerEndlessOrderType")]
+HB.structure Definition LowerEndlessOrder d :=
+  { T of hasNoBottom d T & Total d T }.
+
+#[short(type="upperEndlessOrderType")]
+HB.structure Definition UpperEndlessOrder d :=
+  { T of hasNoTop d T & Total d T }.
+
+#[short(type="endlessOrderType")]
+HB.structure Definition EndlessOrder d :=
+  { T of hasNoTop d T & LowerEndlessOrder d T }.
+
+#[short(type="denseOrderType")]
+HB.structure Definition DenseOrder d :=
+  { T of Preorder_isDense d T & Total d T }.
+
+#[short(type="endlessDenseOrderType")]
+HB.structure Definition EndlessDenseOrder d :=
+  { T of EndlessOrder d T & DenseOrder d T }.
 
 #[key="T", primitive]
 HB.mixin Record DistrLattice_hasRelativeComplement d T & DistrLattice d T := {
