@@ -851,6 +851,43 @@ by elim/big_rec2: _ => // j x y Pj [Qx <-]; rewrite [Q _]Qop ?fop ?QF.
 Qed.
 Arguments big_morph_in [R1 R2] Q f [id1 op1 id2 op2].
 
+Section oA.
+
+Variables (T : Type) (op : T -> T -> T).
+
+Definition oA & associative op :=
+  fun x => oapp (fun y => Some (oapp (op^~ y) y x)) x.
+Arguments oA : simpl never.
+
+Hypothesis (opA : associative op).
+Local Notation oop := (oA opA).
+
+Lemma oAE x y : oop (Some x) (Some y) = some (op x y). Proof. by []. Qed.
+
+Let oopA_subdef : associative oop.
+Proof. by move=> [x|] [y|] [z|]//; rewrite /oA/= opA. Qed.
+
+Let oopx1_subdef : left_id None oop. Proof. by case. Qed.
+Let oop1x_subdef : right_id None oop. Proof. by []. Qed.
+
+HB.instance Definition _ := Monoid.isLaw.Build (option T) None oop
+  oopA_subdef oopx1_subdef oop1x_subdef.
+
+Context [x : T].
+
+Lemma some_big_A_mk_monoid [I : Type] r P (F : I -> T) :
+  Some (\big[op/x]_(i <- r | P i) F i) =
+    oop (\big[oop/None]_(i <- r | P i) Some (F i)) (Some x).
+Proof. by elim/big_rec2 : _ => //= i [y|] _ Pi [] -> //=; rewrite opA. Qed.
+
+Lemma big_A_mk_monoid [I : Type] r P (F : I -> T) :
+  \big[op/x]_(i <- r | P i) F i =
+    odflt x (oop (\big[oop/None]_(i <- r | P i) Some (F i)) (Some x)).
+Proof. by apply: Some_inj; rewrite some_big_A_mk_monoid. Qed.
+
+End oA.
+Arguments oA : simpl never.
+
 Section oAC.
 
 Variables (T : Type) (op : T -> T -> T).
@@ -865,17 +902,17 @@ Local Notation oop := (oAC opA opC).
 
 Lemma oACE x y : oop (Some x) (Some y) = some (op x y). Proof. by []. Qed.
 
-Lemma oopA_subdef : associative oop.
+Let oopAC_subdef : associative oop.
 Proof. by move=> [x|] [y|] [z|]//; rewrite /oAC/= opA. Qed.
 
-Lemma oopx1_subdef : left_id None oop. Proof. by case. Qed.
-Lemma oop1x_subdef : right_id None oop. Proof. by []. Qed.
+Let oopx1_subdef : left_id None oop. Proof. by case. Qed.
+Let oop1x_subdef : right_id None oop. Proof. by []. Qed.
 
-Lemma oopC_subdef : commutative oop.
+Let oopC_subdef : commutative oop.
 Proof. by move=> [x|] [y|]//; rewrite /oAC/= opC. Qed.
 
 HB.instance Definition _ := Monoid.isComLaw.Build (option T) None oop
-  oopA_subdef oopC_subdef oopx1_subdef.
+  oopAC_subdef oopC_subdef oopx1_subdef.
 
 Context [x : T].
 
@@ -2234,6 +2271,30 @@ Arguments big_cat_nat [R idx op n m p P F].
 Arguments big_pmap [R idx op J I] h [r].
 Arguments telescope_big [R idx op] f [n m].
 
+Section SemiGroupWithOneCommutativeAndIdempotent.
+
+Variables (R : Type) (op : SemiGroup.law R).
+Context [x : R].
+Hypothesis opxx : op x x = x.
+Hypothesis opxC : forall a, op x a = op a x.
+
+Local Notation opA := SemiGroup.opA.
+Local Notation mk := (big_A_mk_monoid opA).
+
+Lemma big_split_ord_idem m n (P : pred 'I_(m + n)) F :
+  \big[op/x]_(i | P i) F i =
+     op (\big[op/x]_(i | P (lshift n i)) F (lshift n i))
+        (\big[op/x]_(i | P (rshift m i)) F (rshift m i)).
+Proof.
+rewrite mk [X in op X _]mk [X in op _ X]mk big_split_ord//=.
+do 2!case: (\big[_/_]_(_ | _) _) => //=.
+- by move=> a b; rewrite !opA -!opxC !opA opxx.
+- by move=> a; rewrite -opA/= opxx.
+- by move=> a; rewrite -opxC opA/= opxx.
+Qed.
+
+End SemiGroupWithOneCommutativeAndIdempotent.
+
 Section IncreasingSemiGroup.
 
 Variables (R : Type) (op : SemiGroup.com_law R).
@@ -2244,14 +2305,15 @@ Context [x : R].
 
 Local Notation opA := SemiGroup.opA.
 Local Notation opC := SemiGroup.opC.
+Local Notation mk := (big_AC_mk_monoid opA opC).
 
 Lemma sub_le_big I [s] (P P' : {pred I}) (F : I -> R) :
     (forall i, P i -> P' i) ->
   le (\big[op/x]_(i <- s | P i) F i) (\big[op/x]_(i <- s | P' i) F i).
 Proof.
-move=> PP'; rewrite [X in le _ X](big_AC_mk_monoid opA opC) (bigID P P') /=.
+move=> PP'; rewrite [X in le _ X]mk (bigID P P') /=.
 under [in X in le _ X]eq_bigl do rewrite (andb_idl (PP' _)).
-rewrite [X in le X _](big_AC_mk_monoid opA opC).
+rewrite [X in le X _]mk.
 case: (bigop _ _ _) (bigop _ _ _) => [y|] [z|]//=.
   by rewrite -opA [_ y x]opC opA op_incr.
 by rewrite opC op_incr.
@@ -2261,9 +2323,9 @@ Lemma sub_le_big_seq (I : eqType) s s' P (F : I -> R) :
     (forall i, count_mem i s <= count_mem i s')%N ->
   le (\big[op/x]_(i <- s | P i) F i) (\big[op/x]_(i <- s' | P i) F i).
 Proof.
-rewrite (big_AC_mk_monoid opA opC) => /count_subseqP[_ /subseqP[m sm ->]].
+rewrite mk => /count_subseqP[_ /subseqP[m sm ->]].
 move/(perm_big _)->; rewrite big_mask [X in le _ X]big_tnth.
-by rewrite -!(big_AC_mk_monoid opA opC) sub_le_big // => j /andP[].
+by rewrite -!mk sub_le_big // => j /andP[].
 Qed.
 
 Lemma sub_le_big_seq_cond (I : eqType) s s' P P' (F : I -> R) :
