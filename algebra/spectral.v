@@ -1,7 +1,8 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop nmodule order.
-From mathcomp Require Import rings_modules_and_algebras divalg poly matrix.
+From mathcomp Require Import rings_modules_and_algebras divalg poly polydiv.
+From mathcomp Require Import matrix.
 From mathcomp Require Import mxalgebra mxpoly mxred orderedzmod numdomain.
 From mathcomp Require Import numfield sesquilinear.
 
@@ -758,3 +759,263 @@ by move=> /esym/CrealP.
 Qed.
 
 End Spectral.
+
+Local Notation "p ^^ f" := (map_poly f p)
+  (at level 30, f at level 30, format "p  ^^  f").
+
+Section RealSubfield.
+
+Variable (C : numClosedFieldType).
+
+Record realsubfield :=
+  Realsub { realsubval : C; realsubvalP : realsubval \is Num.real }.
+
+HB.instance Definition _ := [isSub for realsubval].
+HB.instance Definition _ := [Choice of realsubfield by <:].
+HB.instance Definition _ :=
+  [SubChoice_isSubIntegralDomain of realsubfield by <:].
+HB.instance Definition _ :=
+  [SubIntegralDomain_isSubField of realsubfield by <:].
+HB.instance Definition _ : Order.isPOrder ring_display realsubfield :=
+  Order.CancelPartial.Pcan _ valK.
+Lemma total_realsubfield :
+  total (<=%O : rel (realsubfield : porderType _)).
+Proof. by move=> x y; apply/real_leVge/valP/valP. Qed.
+HB.instance Definition _ :=
+  Order.POrder_isTotal.Build _ realsubfield total_realsubfield.
+
+Lemma realsubval_is_zmod_morphism : zmod_morphism realsubval.
+Proof. by []. Qed.
+Lemma realsubval_is_monoid_morphism : monoid_morphism realsubval.
+Proof. by []. Qed.
+HB.instance Definition _ :=
+  GRing.isZmodMorphism.Build realsubfield C realsubval
+  realsubval_is_zmod_morphism.
+HB.instance Definition _ :=
+  GRing.isMonoidMorphism.Build realsubfield C realsubval
+  realsubval_is_monoid_morphism.
+
+Definition realsubfield_norm (x : realsubfield) : realsubfield :=
+  Realsub (normr_real (val x)).
+Lemma realsubfield_ler_norm_add x y :
+  realsubfield_norm (x + y) <= (realsubfield_norm x + realsubfield_norm y).
+Proof. exact: ler_normD. Qed.
+Lemma realsubfield_normr0_eq0 x : realsubfield_norm x = 0 -> x = 0.
+Proof. by move=> /(congr1 val)/normr0_eq0 ?; apply/val_inj. Qed.
+Lemma realsubfield_normrMn x n :
+  realsubfield_norm (x *+ n) = realsubfield_norm x *+ n.
+Proof. by apply/val_inj; rewrite /= !rmorphMn/= normrMn. Qed.
+Lemma realsubfield_normrN x : realsubfield_norm (- x) = realsubfield_norm x.
+Proof. by apply/val_inj; apply: normrN. Qed.
+
+Section Num.
+
+Section withz.
+Let z : realsubfield := 0.
+Lemma realsubfield_addr_gt0 (x y : realsubfield) : z < x -> z < y -> z < x + y.
+Proof. exact: addr_gt0. Qed.
+Lemma realsubfield_ger_leVge (x y : realsubfield) :
+  z <= x -> z <= y -> (x <= y) || (y <= x).
+Proof. exact: ger_leVge. Qed.
+Lemma realsubfield_normrM : {morph realsubfield_norm : x y / x * y}.
+Proof. by move=> *; apply/val_inj; apply: normrM. Qed.
+Lemma realsubfield_ler_def (x y : realsubfield) :
+  (x <= y) = (realsubfield_norm (y - x) == y - x).
+Proof. by apply: ler_def. Qed.
+End withz.
+
+HB.instance Definition _ := Num.Zmodule_isNormed.Build _ realsubfield
+  realsubfield_ler_norm_add realsubfield_normr0_eq0
+  realsubfield_normrMn realsubfield_normrN.
+HB.instance Definition _ := Num.isNumRing.Build realsubfield
+  realsubfield_addr_gt0 realsubfield_ger_leVge
+  realsubfield_normrM realsubfield_ler_def.
+End Num.
+
+Definition realsubpfactor (x : C) : {poly realsubfield} :=
+  if x \is Num.real =P true is ReflectT xR then 'X - (Realsub xR)%:P else
+  'X^2 - (Realsub (Creal_Re x) *+ 2) *: 'X + ((Realsub (normr_real x))^+2)%:P.
+Notation Cpfactor x := (realsubpfactor x ^^ realsubval).
+
+Lemma realsubpfactorRE (x : C) (xR : x \is Num.real) :
+  realsubpfactor x = 'X - (Realsub xR)%:P.
+Proof.
+rewrite /realsubpfactor; case: eqP xR => //= p1 p2.
+by rewrite (bool_irrelevance p1 p2).
+Qed.
+
+Lemma CpfactorRE (x : C) : x \is Num.real ->
+  Cpfactor x = 'X - x%:P.
+Proof. by move=> xR; rewrite realsubpfactorRE map_polyXsubC. Qed.
+
+Lemma realsubpfactorCE (x : C) : x \isn't Num.real ->
+  realsubpfactor x =
+  'X^2 - (Realsub (Creal_Re x) *+ 2) *: 'X + ((Realsub (normr_real x))^+2)%:P.
+Proof. by rewrite /realsubpfactor; case: eqP => // p; rewrite p. Qed.
+
+Lemma CpfactorCE (x : C) : x \isn't Num.real ->
+  Cpfactor x = ('X - x%:P) * ('X - x^*%:P).
+Proof.
+move=> xNR; rewrite realsubpfactorCE//=.
+rewrite rmorphD /= rmorphB/= !map_polyZ !map_polyXn/= map_polyX.
+rewrite (map_polyC realsubval)/=.
+rewrite mulrBl !mulrBr -!addrA; congr (_ + _).
+rewrite opprD addrA opprK -opprD -rmorphM/= -normCK; congr (- _ + _).
+rewrite mulrC !mul_polyC -scalerDl.
+rewrite [x in RHS]Crect conjC_rect ?Creal_Re ?Creal_Im//.
+by rewrite addrACA addNr addr0.
+Qed.
+
+Lemma CpfactorE x :
+  Cpfactor x = ('X - x%:P) * ('X - x^*%:P) ^+ (x \isn't Num.real).
+Proof.
+by have [/CpfactorRE|/CpfactorCE] := boolP (_ \is _); rewrite ?mulr1.
+Qed.
+
+Lemma size_Cpfactor x : size (Cpfactor x) = (x \isn't Num.real).+2.
+Proof.
+have [xR|xNR] := boolP (_ \is _); first by rewrite CpfactorRE// size_XsubC.
+by rewrite CpfactorCE// size_mul ?size_XsubC ?polyXsubC_eq0.
+Qed.
+
+Lemma size_realsubpfactor x : size (realsubpfactor x) = (x \isn't Num.real).+2.
+Proof. by have := size_Cpfactor x; rewrite size_map_poly. Qed.
+
+Lemma Cpfactor_eq0 x : (Cpfactor x == 0) = false.
+Proof. by rewrite -size_poly_eq0 size_Cpfactor. Qed.
+
+Lemma realsubpfactor_eq0 x : (realsubpfactor x == 0) = false.
+Proof. by rewrite -size_poly_eq0 size_realsubpfactor. Qed.
+
+Lemma CpfactorCgt0 x y : x \isn't Num.real -> y \is Num.real ->
+  (Cpfactor x).[y] > 0.
+Proof.
+move=> xNR yR; rewrite CpfactorCE// hornerM !hornerXsubC.
+rewrite [x]Crect conjC_rect ?Creal_Re ?Creal_Im// !opprD !addrA opprK.
+rewrite -subr_sqr exprMn sqrCi mulN1r opprK ltr_wpDl//.
+- by rewrite real_exprn_even_ge0// ?rpredB// ?Creal_Re.
+by rewrite real_exprn_even_gt0 ?Creal_Im ?orTb//=; apply/eqP/Creal_ImP.
+Qed.
+
+Lemma realsubpfactorR_mul_gt0 (x a b : C) :
+    x \is Num.real -> a \is Num.real -> b \is Num.real ->
+    a <= b ->
+    ((Cpfactor x).[a] * (Cpfactor x).[b] <= 0) =
+  (a <= x <= b).
+Proof.
+move=> xR aR bR ab; rewrite !CpfactorRE// !hornerXsubC.
+have [lt_xa|lt_ax|->]/= := real_ltgtP xR aR; last first.
+- by rewrite subrr mul0r lexx ab.
+- by rewrite nmulr_rle0 ?subr_lt0 ?subr_ge0.
+rewrite pmulr_rle0 ?subr_gt0// subr_le0.
+by apply: negbTE; rewrite -real_ltNge// (lt_le_trans lt_xa).
+Qed.
+
+Lemma monic_Cpfactor x : Cpfactor x \is monic.
+Proof. by rewrite CpfactorE rpredM ?rpredX ?monicXsubC. Qed.
+
+Lemma monic_realsubpfactor x : realsubpfactor x \is monic.
+Proof. by have := monic_Cpfactor x; rewrite map_monic. Qed.
+
+Lemma poly_realsub_pfactor (p : {poly realsubfield}) :
+  { r : seq C |
+    p ^^ realsubval = val (lead_coef p) *: \prod_(z <- r) Cpfactor z }.
+Proof.
+wlog p_monic : p / p \is monic => [hwlog|].
+  have [->|pN0] := eqVneq p 0.
+    by exists [::]; rewrite lead_coef0/= rmorph0 scale0r.
+  have [|r] := hwlog ((lead_coef p)^-1 *: p).
+    by rewrite monicE lead_coefZ mulVf ?lead_coef_eq0//.
+  rewrite !lead_coefZ mulVf ?lead_coef_eq0//= scale1r.
+  rewrite map_polyZ/=.
+  have lcN0 : realsubval (lead_coef p) != 0.
+    by rewrite fmorph_eq0 lead_coef_eq0.
+  by move=> /(canRL (scalerKV lcN0))->; exists r.
+suff: {r : seq C | p ^^ realsubval = \prod_(z <- r) Cpfactor z}.
+  by move=> [r rP]; exists r; rewrite rP (monicP _)// scale1r.
+have [/= r pr] := closed_field_poly_normal (p ^^ realsubval).
+rewrite (monicP _) ?monic_map ?scale1r// {p_monic} in pr *.
+have [n] := ubnP (size r).
+elim: n r => // n IHn [|x r]/= in p pr *.
+ by exists [::]; rewrite pr !big_nil.
+rewrite ltnS => r_lt.
+have xJxr : x^* \in x :: r.
+  rewrite -root_prod_XsubC -pr.
+  have /eq_map_poly-> : realsubval =1 Num.conj \o realsubval.
+    by move=> a /=; rewrite (CrealP (realsubvalP _)).
+  by rewrite map_poly_comp mapf_root pr root_prod_XsubC mem_head.
+have xJr : (x \isn't Num.real) ==> (x^* \in r) by rewrite implyNb CrealE.
+have pxdvdC : Cpfactor x %| p ^^ realsubval.
+  rewrite pr CpfactorE big_cons/= dvdp_mul2l ?polyXsubC_eq0//.
+  by case: (_ \is _) xJr; rewrite ?dvd1p// dvdp_XsubCl root_prod_XsubC.
+pose pr'x := p %/ realsubpfactor x.
+have [||r'] := IHn (if x \is Num.real then r else rem x^* r) pr'x;
+  last 2 first.
+- by case: (_ \is _) in xJr *;
+    rewrite ?size_rem// (leq_ltn_trans (leq_pred _)).
+- move=> /eqP; rewrite map_divp -dvdp_eq_mul ?Cpfactor_eq0//= => /eqP->.
+  by exists (x :: r'); rewrite big_cons mulrC.
+rewrite map_divp/= pr big_cons CpfactorE/=.
+rewrite divp_pmul2l ?expf_neq0 ?polyXsubC_eq0//.
+case: (_ \is _) => /= in xJr *; first by rewrite divp1//.
+by rewrite (big_rem _ xJr)/= mulKp ?polyXsubC_eq0.
+Qed.
+
+Definition realsubfield_rcfMixin : Num.real_closed_axiom realsubfield.
+Proof.
+move=> p a b le_ab /andP[pa_le0 pb_ge0]/=.
+case: ltgtP pa_le0 => //= pa0 _; last first.
+  by exists a; rewrite ?lexx// rootE pa0.
+case: ltgtP pb_ge0 => //= pb0 _; last first.
+  by exists b; rewrite ?lexx ?andbT// rootE -pb0.
+have p_neq0 : p != 0 by apply: contraTneq pa0 => ->; rewrite horner0 ltxx.
+have {pa0 pb0} pab0 : p.[a] * p.[b] < 0 by rewrite pmulr_llt0.
+wlog p_monic : p p_neq0 pab0 / p \is monic => [hwlog|].
+  have [|||x axb] := hwlog ((lead_coef p)^-1 *: p).
+  - by rewrite scaler_eq0 invr_eq0 lead_coef_eq0 (negPf p_neq0).
+  - rewrite !hornerE/= -mulrA mulrACA -expr2 pmulr_rlt0//.
+    by rewrite exprn_even_gt0//= invr_eq0 lead_coef_eq0.
+  - by rewrite monicE lead_coefZ mulVf ?lead_coef_eq0 ?eqxx.
+  by rewrite rootZ ?invr_eq0 ?lead_coef_eq0//; exists x.
+have /= [rs prs] := poly_realsub_pfactor p.
+rewrite (monicP _) ?monic_map// scale1r {p_monic} in prs.
+pose ab := [pred x | val a <= x <= val b].
+have abR : {subset ab <= Num.real}.
+  move=> x /andP[+ _].
+  by rewrite -subr_ge0 => /ger0_real; rewrite rpredBr// realsubvalP.
+wlog : p pab0 {p_neq0 prs} /
+    p ^^ realsubval = \prod_(x <- rs | x \in ab) ('X - x%:P) => [hw|].
+  move: prs; rewrite -!rmorph_prod => /map_poly_inj.
+  rewrite (bigID ab)/=; set q := (X in X * _); set u := (X in _ * X) => pqu.
+  have [||] := hw q; last first.
+  - by move=> x; exists x => //; rewrite pqu rootM q0.
+  - by rewrite rmorph_prod/=; under eq_bigr do rewrite CpfactorRE ?abR//.
+  have := pab0; rewrite pqu !hornerM mulrACA [_ * _ * _ < 0]pmulr_llt0//.
+  rewrite !horner_prod -big_split/= prodr_gt0// => x.
+  have [xR|xNR] := boolP (x \is Num.real); last first.
+    rewrite (_ : (0 < ?[a]) = (realsubval 0 < realsubval ?a))//=.
+    by rewrite -!horner_map/= mulr_gt0 ?CpfactorCgt0 ?realsubvalP.
+  apply: contraNT; rewrite -leNgt.
+  rewrite (_ : (?[a] <= 0) = (realsubval ?a <= realsubval 0))//= -!horner_map/=.
+  by rewrite realsubpfactorR_mul_gt0 ?realsubvalP.
+rewrite -big_filter; have := filter_all ab rs.
+set rsab := filter _ _.
+have: all (mem Num.real) rsab.
+  by apply/allP => x; rewrite mem_filter => /andP[/abR].
+case: rsab => [_ _|x rsab]/=; rewrite (big_nil, big_cons).
+  move=> pval1; move: pab0.
+  have /map_poly_inj-> : p ^^ realsubval = 1 ^^ realsubval by rewrite rmorph1.
+  by rewrite !hornerE ltr10.
+move=> /andP[xR rsabR] /andP[axb arsb] prsab.
+exists (Realsub xR) => //=.
+by rewrite -(mapf_root realsubval)//= prsab rootM root_XsubC eqxx.
+Qed.
+HB.instance Definition _ :=
+  Num.RealField_isClosed.Build realsubfield realsubfield_rcfMixin.
+
+End RealSubfield.
+
+Check (fun C : numClosedFieldType => realsubfield C : rcfType).
+Check (fun C : numClosedFieldType => realsubfield C : conjFieldType).
+Check (fun (C : numClosedFieldType) =>
+  (@realsubval C : realsubfield C -> C) : {rmorphism _ -> _}).
