@@ -23,6 +23,11 @@ From mathcomp Require Import divalg decfield poly orderedzmod numdomain.
 (*                    The HB class is called RealField.                       *)
 (*         rcfType == A Real Field with the real closed axiom                 *)
 (*                    The HB class is called RealClosedField.                 *)
+(*   conjFieldType == numField with an involutive conjugation `conj`          *)
+(*                    s.t. `|x|^2 = x * conj x`, and a square root of         *)
+(*                    nonnegative elements; common ancestor of rcfType        *)
+(*                    and numClosedFieldType.                                 *)
+(*                    The HB class is called ConjField.                       *)
 (*                                                                            *)
 (* Over these structures, we have the following operation:                    *)
 (*       Num.sqrt x == in a real-closed field, a positive square root of x if *)
@@ -98,10 +103,10 @@ HB.mixin Record NumField_hasSqrt R & NumField R := {
 }.
 
 (* Intermediate ancestor carrying only the conjugation: declared before       *)
-(* [ConjField] so that a [numClosedFieldType] (which gains [NumField_hasConj]  *)
-(* via the factory but only later acquires [NumField_hasSqrt] from [sqrtC])    *)
-(* shares [NumField_hasConj] through this structure rather than through        *)
-(* [ConjField].                                                                *)
+(* [ConjField] so that a [numClosedFieldType] (which gains [NumField_hasConj] *)
+(* via the factory but only later acquires [NumField_hasSqrt] from [sqrtC])   *)
+(* shares [NumField_hasConj] through this structure rather than through       *)
+(* [ConjField].                                                               *)
 HB.structure Definition NumFieldConj :=
   { R of NumField_hasConj R & NumField R }.
 
@@ -206,10 +211,10 @@ HB.mixin Record RealField_hasPolyIvt R & RealField R := {
   poly_ivt_subproof : real_closed_axiom R
 }.
 
-(* The historical [RealField_isClosed] mixin is now an HB factory: besides the *)
-(* intermediate value property it rebuilds the (trivial) conjugation [conj=id] *)
-(* and the square root of nonnegative elements, so that an [rcfType] is        *)
-(* endowed with the [conjFieldType] structure.                                 *)
+(* The historical [RealField_isClosed] mixin is now an HB factory: besides    *)
+(* the intermediate value property it rebuilds the (trivial) conjugation      *)
+(* [conj=id] and the square root of nonnegative elements, so that an          *)
+(* [rcfType] is endowed with the [conjFieldType] structure.                   *)
 HB.factory Record RealField_isClosed R & RealField R := {
   poly_ivtF : real_closed_axiom R
 }.
@@ -237,7 +242,8 @@ Fact rcf_sqrtr_ge0 x : 0 <= rcf_sqrtr x.
 Proof. by rewrite /rcf_sqrtr; case: (sig2W _). Qed.
 Fact rcf_sqr_sqrtr x : 0 <= x -> rcf_sqrtr x ^+ 2 = x.
 Proof.
-by rewrite /rcf_sqrtr => x_ge0; case: (sig2W _) => /= y _; rewrite x_ge0 => /eqP.
+rewrite /rcf_sqrtr => x_ge0.
+by case: (sig2W _) => /= y _; rewrite x_ge0 => /eqP.
 Qed.
 Fact rcf_ler0_sqrtr x : x <= 0 -> rcf_sqrtr x = 0.
 Proof.

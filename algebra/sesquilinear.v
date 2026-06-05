@@ -1665,9 +1665,11 @@ Notation symmetricmx := (hermitianmx _ false idfun).
 Notation skewmx := (hermitianmx _ true idfun).
 Notation hermsymmx := (hermitianmx _ false conjC).
 
-Lemma hermitian1mx_subproof {C : conjFieldType} n : (1%:M : 'M[C]_n) \is hermsymmx.
+Lemma hermitian1mx_subproof {C : conjFieldType} n :
+  (1%:M : 'M[C]_n) \is hermsymmx.
 Proof.
-by rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx/= (rmorph1 conjC).
+rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx/=.
+by rewrite (rmorph1 conjC).
 Qed.
 
 Canonical hermitian1mx {C : conjFieldType} n :=

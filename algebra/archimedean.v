@@ -87,10 +87,10 @@ Bind Scope ring_scope with ArchiNumField.sort.
 End ArchiNumFieldExports.
 HB.export ArchiNumFieldExports.
 
-(* Join structures: since [numClosedFieldType] and [rcfType] now both inherit  *)
-(* [Num.ConjField] (and the intermediate [Num.NumFieldConj]), the archimedean  *)
-(* closed and real-closed fields share the conjugation mixins; HB requires a   *)
-(* common ancestor combining the archimedean [floorCeil] mixin with them.      *)
+(* Join structures: since [numClosedFieldType] and [rcfType] now both inherit *)
+(* [Num.ConjField] (and the intermediate [Num.NumFieldConj]), the archimedean *)
+(* closed and real-closed fields share the conjugation mixins; HB requires a  *)
+(* common ancestor combining the archimedean [floorCeil] mixin with them.     *)
 HB.structure Definition ArchiNumFieldConj :=
   { R of NumDomain_hasFloorCeilTruncn R & Num.NumFieldConj R }.
 
