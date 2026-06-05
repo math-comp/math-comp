@@ -416,8 +416,10 @@ Lemma add_proj_ortho p m n (U : 'M_(p, n)) (W : 'M_(m, n)) :
 Proof.
 rewrite -[W in LHS](@add_proj_mx _ _ _ <<U>>%MS U^!%MS W)//.
 rewrite !mulmxDl proj_ortho_id ?proj_ortho_sub //.
-rewrite proj_ortho_0 ?proj_mx_sub // addr0.
-rewrite proj_ortho_0 ?ortho_id ?proj_ortho_sub // add0r.
+rewrite [_ *m proj_mx U^!%MS _ *m proj_ortho U]proj_ortho_0 ?proj_mx_sub //.
+rewrite addr0.
+rewrite [_ *m proj_mx <<U>>%MS _ *m proj_ortho U^!%MS]proj_ortho_0
+  ?ortho_id ?proj_ortho_sub // add0r.
 by rewrite proj_ortho_id ?proj_mx_sub// add_proj_mx.
 Qed.
 

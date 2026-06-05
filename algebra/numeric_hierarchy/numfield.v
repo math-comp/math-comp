@@ -85,19 +85,106 @@ Bind Scope ring_scope with NumField.sort.
 End NumFieldExports.
 HB.export NumFieldExports.
 
-HB.mixin Record NumField_isImaginary R & NumField R := {
-  imaginary : R;
+HB.mixin Record NumField_hasConj R & NumField R := {
   conj_subdef : {rmorphism R -> R};
-  sqrCi : imaginary ^+ 2 = - 1;
   normCK_subdef : forall x, `|x| ^+ 2 = x * conj_subdef x;
 }.
+
+HB.mixin Record NumField_hasSqrt R & NumField R := {
+  sqrtr_subdef : R -> R;
+  sqrtr_ge0_subdef : forall x, 0 <= sqrtr_subdef x;
+  sqr_sqrtr_subdef : forall x, 0 <= x -> sqrtr_subdef x ^+ 2 = x;
+  ler0_sqrtr_subdef : forall x, x <= 0 -> sqrtr_subdef x = 0;
+}.
+
+(* Intermediate ancestor carrying only the conjugation: declared before       *)
+(* [ConjField] so that a [numClosedFieldType] (which gains [NumField_hasConj]  *)
+(* via the factory but only later acquires [NumField_hasSqrt] from [sqrtC])    *)
+(* shares [NumField_hasConj] through this structure rather than through        *)
+(* [ConjField].                                                                *)
+HB.structure Definition NumFieldConj :=
+  { R of NumField_hasConj R & NumField R }.
+
+#[short(type="conjFieldType")]
+HB.structure Definition ConjField :=
+  { R of NumField_hasConj R & NumField_hasSqrt R & NumField R }.
+
+HB.mixin Record NumField_hasImaginary R & NumField R := {
+  imaginary : R;
+  sqrCi : imaginary ^+ 2 = - 1;
+}.
+
+(* The historical [NumField_isImaginary] mixin is now an HB factory: it       *)
+(* rebuilds the imaginary unit ([NumField_hasImaginary]) and the conjugation  *)
+(* ([NumField_hasConj]) so that a [numClosedFieldType] gains the              *)
+(* [conjFieldType] structure (the square root is provided separately, after   *)
+(* [sqrtC] is available).  Field order is preserved so that existing          *)
+(* [NumField_isImaginary.Build] calls (which infer the data fields from the   *)
+(* proof fields) keep working.                                                *)
+HB.factory Record NumField_isImaginary R of GRing.ClosedField R & NumField R
+:= {
+  imaginaryF : R;
+  conjF : {rmorphism R -> R};
+  sqrCiF : imaginaryF ^+ 2 = - 1;
+  normCKF : forall x, `|x| ^+ 2 = x * conjF x;
+}.
+HB.builders Context R of NumField_isImaginary R.
+  HB.instance Definition _ := NumField_hasImaginary.Build R sqrCiF.
+  HB.instance Definition _ := NumField_hasConj.Build R normCKF.
+
+  (* [conjF] fixes real elements, ported from [CrealE]. *)
+  Let conjFreal x : (x \is Num.real) = (conjF x == x).
+  Proof.
+  rewrite realEsqr ger0_def normrX normCKF.
+  by have [-> | /mulfI/inj_eq-> //] := eqVneq x 0; rewrite rmorph0 !eqxx.
+  Qed.
+
+  Fact cl_sqrtr_subproof (x : R) :
+    exists2 y, 0 <= y & (if 0 <= x then y ^+ 2 == x else y == 0) : bool.
+  Proof.
+  case x_ge0: (0 <= x); last by exists 0.
+  have x_real : x \is Num.real := ger0_real x_ge0.
+  pose z := sval (sig_eqW (@GRing.solve_monicpoly _ 2 (nth 0 [:: x]) isT)).
+  have Dz : z ^+ 2 = x.
+    rewrite /z; case: sig_eqW => /= w ->.
+    by rewrite !big_ord_recl big_ord0 /= mulr1 mul0r !addr0.
+  have cjz : conjF z ^+ 2 = z ^+ 2.
+    by rewrite -rmorphXn Dz; apply/eqP; rewrite -conjFreal.
+  exists `|z|; first by rewrite normr_ge0.
+  have /orP[/eqP cjzz|/eqP cjzNz] : (conjF z == z) ||
+      (conjF z == - z) by rewrite -eqf_sqr cjz eqxx.
+    by rewrite real_normK ?Dz// realEsqr Dz x_ge0.
+  have nz2 : `|z| ^+ 2 = - x by rewrite normCKF cjzNz mulrN -expr2 Dz.
+  have x0 : x = 0.
+    by apply: le_anti; rewrite x_ge0 andbT -oppr_ge0 -nz2 exprn_ge0.
+  by rewrite nz2 x0 oppr0.
+  Qed.
+  Definition cl_sqrtr x := s2val (sig2W (cl_sqrtr_subproof x)).
+  Fact cl_sqrtr_ge0 x : 0 <= cl_sqrtr x.
+  Proof. by rewrite /cl_sqrtr; case: (sig2W _). Qed.
+  Fact cl_sqr_sqrtr x : 0 <= x -> cl_sqrtr x ^+ 2 = x.
+  Proof.
+  rewrite /cl_sqrtr => x_ge0.
+  by case: (sig2W _) => /= y _; rewrite x_ge0 => /eqP.
+  Qed.
+  Fact cl_ler0_sqrtr x : x <= 0 -> cl_sqrtr x = 0.
+  Proof.
+  rewrite /cl_sqrtr; case: (sig2W _) => y /= _.
+  case: ifP => [x0 /eqP sq xle0|_ /eqP//].
+  have x_eq0 : x = 0 by apply: le_anti; rewrite x0 xle0.
+  by move: sq; rewrite x_eq0 => /eqP; rewrite sqrf_eq0 => /eqP.
+  Qed.
+  HB.instance Definition _ :=
+    NumField_hasSqrt.Build R cl_sqrtr_ge0 cl_sqr_sqrtr cl_ler0_sqrtr.
+HB.end.
 
 #[short(type="numClosedFieldType")]
 HB.structure Definition ClosedField :=
   { R of NumField_isImaginary R & GRing.ClosedField R & NumField R }.
 
-Definition conj {C : numClosedFieldType} : C -> C := @conj_subdef C.
-#[export] HB.instance Definition _ C := GRing.RMorphism.on (@conj C).
+Definition conj {R : conjFieldType} : R -> R := @conj_subdef R.
+#[export] HB.instance Definition _ (R : conjFieldType) :=
+  GRing.RMorphism.on (@conj R).
 #[deprecated(since="mathcomp 2.5.0", use=conj)]
 Notation conj_op := conj (only parsing).
 
@@ -115,9 +202,52 @@ Bind Scope ring_scope with RealField.sort.
 End RealFieldExports.
 HB.export RealFieldExports.
 
-HB.mixin Record RealField_isClosed R & RealField R := {
+HB.mixin Record RealField_hasPolyIvt R & RealField R := {
   poly_ivt_subproof : real_closed_axiom R
 }.
+
+(* The historical [RealField_isClosed] mixin is now an HB factory: besides the *)
+(* intermediate value property it rebuilds the (trivial) conjugation [conj=id] *)
+(* and the square root of nonnegative elements, so that an [rcfType] is        *)
+(* endowed with the [conjFieldType] structure.                                 *)
+HB.factory Record RealField_isClosed R & RealField R := {
+  poly_ivtF : real_closed_axiom R
+}.
+HB.builders Context R of RealField_isClosed R.
+
+HB.instance Definition _ := RealField_hasPolyIvt.Build R poly_ivtF.
+
+Let conjid : {rmorphism R -> R} := idfun.
+Fact rcf_normCK (x : R) : `|x| ^+ 2 = x * conjid x.
+Proof. by rewrite real_normK ?num_real// expr2. Qed.
+HB.instance Definition _ := NumField_hasConj.Build R rcf_normCK.
+
+Fact rcf_sqrtr_subproof (x : R) :
+  exists2 y, 0 <= y & (if 0 <= x then y ^+ 2 == x else y == 0) : bool.
+Proof.
+case x_ge0: (0 <= x); last by exists 0.
+have le0x1 : 0 <= x + 1 by rewrite -nnegrE rpredD ?rpred1.
+have [|y /andP[y_ge0 _]] := @poly_ivtF ('X^2 - x%:P) _ _ le0x1.
+  rewrite !hornerE expr0n/= sub0r oppr_le0 x_ge0/= subr_ge0.
+  by rewrite -[leLHS]mul1r ler_pM// (lerDl, lerDr).
+by rewrite rootE !hornerE subr_eq0; exists y.
+Qed.
+Definition rcf_sqrtr x := s2val (sig2W (rcf_sqrtr_subproof x)).
+Fact rcf_sqrtr_ge0 x : 0 <= rcf_sqrtr x.
+Proof. by rewrite /rcf_sqrtr; case: (sig2W _). Qed.
+Fact rcf_sqr_sqrtr x : 0 <= x -> rcf_sqrtr x ^+ 2 = x.
+Proof.
+by rewrite /rcf_sqrtr => x_ge0; case: (sig2W _) => /= y _; rewrite x_ge0 => /eqP.
+Qed.
+Fact rcf_ler0_sqrtr x : x <= 0 -> rcf_sqrtr x = 0.
+Proof.
+rewrite /rcf_sqrtr; case: (sig2W _) => y /= _.
+by have [//|_ /eqP//|->] := ltrgt0P x; rewrite mulf_eq0 orbb => /eqP.
+Qed.
+HB.instance Definition _ :=
+  NumField_hasSqrt.Build R rcf_sqrtr_ge0 rcf_sqr_sqrtr rcf_ler0_sqrtr.
+
+HB.end.
 
 #[short(type="rcfType")]
 HB.structure Definition RealClosedField :=
@@ -151,7 +281,7 @@ Module Import Def.
 Export Num.Def.
 
 Notation conjC := conj.
-Definition sqrtr {R} x := s2val (sig2W (@sqrtr_subproof R x)).
+Definition sqrtr {R : conjFieldType} (x : R) := sqrtr_subdef x.
 
 End Def.
 
@@ -167,6 +297,59 @@ End Syntax.
 Module Export Theory.
 
 Export Num.Theory.
+
+Section ConjFieldTheory.
+
+Variable R : conjFieldType.
+Implicit Types a x y z : R.
+
+Definition normCK : forall x, `|x| ^+ 2 = x * x^* := normCK_subdef.
+
+Lemma normCKC x : `|x| ^+ 2 = x^* * x. Proof. by rewrite normCK mulrC. Qed.
+
+Lemma conjCK : involutive (@conj R).
+Proof.
+have JE x : x^* = `|x|^+2 / x.
+  have [->|x_neq0] := eqVneq x 0; first by rewrite rmorph0 invr0 mulr0.
+  by apply: (canRL (mulfK _)) => //; rewrite mulrC -normCK.
+move=> x; have [->|x_neq0] := eqVneq x 0; first by rewrite !rmorph0.
+rewrite !JE normrM normrV ?unitfE// exprMn normrX normr_id.
+by rewrite exprVn -mulrA -invfM mulrA -expr2 divKf// 2!sqrf_eq0 normr_eq0.
+Qed.
+
+Lemma mul_conjC_ge0 x : 0 <= x * x^*.
+Proof. by rewrite -normCK exprn_ge0. Qed.
+
+Lemma mul_conjC_gt0 x : (0 < x * x^* ) = (x != 0).
+Proof.
+have [->|x_neq0] := eqVneq; first by rewrite rmorph0 mulr0.
+by rewrite -normCK exprn_gt0 ?normr_gt0.
+Qed.
+
+Lemma mul_conjC_eq0 x : (x * x^* == 0) = (x == 0).
+Proof. by rewrite -normCK expf_eq0 normr_eq0. Qed.
+
+Lemma conjC_ge0 x : (0 <= x^* ) = (0 <= x).
+Proof.
+wlog suffices: x / 0 <= x -> 0 <= x^*.
+  by move=> IH; apply/idP/idP=> /IH; rewrite ?conjCK.
+rewrite [in X in X -> _]le0r => /predU1P[-> | x_gt0]; first by rewrite rmorph0.
+by rewrite -(pmulr_rge0 _ x_gt0) mul_conjC_ge0.
+Qed.
+
+(* Square Root theory *)
+
+Lemma sqrtr_ge0 a : 0 <= sqrt a.
+Proof. exact: sqrtr_ge0_subdef. Qed.
+Hint Resolve sqrtr_ge0 : core.
+
+Lemma sqr_sqrtr a : 0 <= a -> sqrt a ^+ 2 = a.
+Proof. exact: sqr_sqrtr_subdef. Qed.
+
+Lemma ler0_sqrtr a : a <= 0 -> sqrt a = 0.
+Proof. exact: ler0_sqrtr_subdef. Qed.
+
+End ConjFieldTheory.
 
 Section NumFieldTheory.
 
@@ -554,20 +737,7 @@ Lemma poly_ivt : real_closed_axiom R. Proof. exact: poly_ivt. Qed.
 
 (* Square Root theory *)
 
-Lemma sqrtr_ge0 a : 0 <= sqrt a.
-Proof. by rewrite /sqrt; case: (sig2W _). Qed.
 Hint Resolve sqrtr_ge0 : core.
-
-Lemma sqr_sqrtr a : 0 <= a -> sqrt a ^+ 2 = a.
-Proof.
-by rewrite /sqrt => a_ge0; case: (sig2W _) => /= x _; rewrite a_ge0 => /eqP.
-Qed.
-
-Lemma ler0_sqrtr a : a <= 0 -> sqrt a = 0.
-Proof.
-rewrite /sqrtr; case: (sig2W _) => x /= _.
-by have [//|_ /eqP//|->] := ltrgt0P a; rewrite mulf_eq0 orbb => /eqP.
-Qed.
 
 Lemma ltr0_sqrtr a : a < 0 -> sqrt a = 0.
 Proof. by move=> /ltW; apply: ler0_sqrtr. Qed.
@@ -579,7 +749,7 @@ Variant sqrtr_spec a : R -> bool -> bool -> R -> Type :=
 Lemma sqrtrP a : sqrtr_spec a a (0 <= a) (a < 0) (sqrt a).
 Proof.
 have [a_ge0|a_lt0] := ger0P a.
-  by rewrite -{1 2}[a]sqr_sqrtr //; constructor.
+  by rewrite -{1 2}[a]sqr_sqrtr //; constructor; apply: sqrtr_ge0.
 by rewrite ltr0_sqrtr //; constructor.
 Qed.
 
@@ -630,7 +800,7 @@ Qed.
 Lemma ler_wsqrtr : {homo @sqrt R : a b / a <= b}.
 Proof.
 move=> a b /= le_ab; case: (boolP (0 <= a))=> [pa|]; last first.
-  by rewrite -ltNge; move/ltW; rewrite -sqrtr_eq0; move/eqP->.
+  by rewrite -ltNge; move/ltW; rewrite -sqrtr_eq0 => /eqP->; apply: sqrtr_ge0.
 rewrite -(@ler_pXn2r R 2) ?nnegrE ?sqrtr_ge0 //.
 by rewrite !sqr_sqrtr // (le_trans pa).
 Qed.
@@ -671,21 +841,9 @@ Section ClosedFieldTheory.
 Variable C : numClosedFieldType.
 Implicit Types a x y z : C.
 
-Definition normCK : forall x, `|x| ^+ 2 = x * x^* := normCK_subdef.
-
 Definition sqrCi : 'i ^+ 2 = -1 :> C := sqrCi.
 
 Lemma mulCii : 'i * 'i = -1 :> C. Proof. exact: sqrCi. Qed.
-
-Lemma conjCK : involutive (@conj C).
-Proof.
-have JE x : x^* = `|x|^+2 / x.
-  have [->|x_neq0] := eqVneq x 0; first by rewrite rmorph0 invr0 mulr0.
-  by apply: (canRL (mulfK _)) => //; rewrite mulrC -normCK.
-move=> x; have [->|x_neq0] := eqVneq x 0; first by rewrite !rmorph0.
-rewrite !JE normrM normfV exprMn normrX normr_id.
-by rewrite exprVn -mulrA -invfM mulrA -expr2 divKf// 2!sqrf_eq0 normr_eq0.
-Qed.
 
 Let Re2 z := z + z^*.
 Definition nnegIm z := (0 <= 'i * (z^* - z)).
@@ -742,28 +900,6 @@ Proof. by rewrite ['Im _]unlock. Qed.
 
 Let nz2 : 2 != 0 :> C. Proof. by rewrite pnatr_eq0. Qed.
 
-Lemma normCKC x : `|x| ^+ 2 = x^* * x. Proof. by rewrite normCK mulrC. Qed.
-
-Lemma mul_conjC_ge0 x : 0 <= x * x^*.
-Proof. by rewrite -normCK exprn_ge0. Qed.
-
-Lemma mul_conjC_gt0 x : (0 < x * x^* ) = (x != 0).
-Proof.
-have [->|x_neq0] := eqVneq; first by rewrite rmorph0 mulr0.
-by rewrite -normCK exprn_gt0 ?normr_gt0.
-Qed.
-
-Lemma mul_conjC_eq0 x : (x * x^* == 0) = (x == 0).
-Proof. by rewrite -normCK expf_eq0 normr_eq0. Qed.
-
-Lemma conjC_ge0 x : (0 <= x^* ) = (0 <= x).
-Proof.
-wlog suffices: x / 0 <= x -> 0 <= x^*.
-  by move=> IH; apply/idP/idP=> /IH; rewrite ?conjCK.
-rewrite [in X in X -> _]le0r => /predU1P[-> | x_gt0]; first by rewrite rmorph0.
-by rewrite -(pmulr_rge0 _ x_gt0) mul_conjC_ge0.
-Qed.
-
 Lemma conjC_nat n : (n%:R)^* = n%:R :> C. Proof. exact: rmorph_nat. Qed.
 Lemma conjC0 : 0^* = 0 :> C. Proof. exact: rmorph0. Qed.
 Lemma conjC1 : 1^* = 1 :> C. Proof. exact: rmorph1. Qed.
@@ -794,7 +930,7 @@ Lemma conj_normC z : `|z|^* = `|z|.
 Proof. by rewrite conj_Creal ?normr_real. Qed.
 
 Lemma CrealJ : {mono (@conj C) : x / x \is Num.real}.
-Proof. by apply: (homo_mono1 conjCK) => x xreal; rewrite conj_Creal. Qed.
+Proof. by apply: (homo_mono1 (@conjCK C)) => x xreal; rewrite conj_Creal. Qed.
 
 Lemma geC0_conj x : 0 <= x -> x^* = x.
 Proof. by move=> /ger0_real/CrealP. Qed.
@@ -1405,7 +1541,7 @@ Notation "'i" := imaginary : ring_scope.
 Notation "'Re z" := (Re z) : ring_scope.
 Notation "'Im z" := (Im z) : ring_scope.
 
-Arguments conjCK {C} x.
+Arguments conjCK {R} x.
 Arguments sqrCK {C} [x] le0x.
 Arguments sqrCK_P {C x}.
 
