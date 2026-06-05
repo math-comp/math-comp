@@ -90,7 +90,7 @@ Notation "M ^t*" := (M ^t conjC) (at level 29, left associativity)
   : sesquilinear_scope.
 Notation realmx := (mxOver Num.real).
 
-Lemma trmxCK {C : numClosedFieldType} m n (A : 'M[C]_(m, n)) : A ^t* ^t* = A.
+Lemma trmxCK {C : conjFieldType} m n (A : 'M[C]_(m, n)) : A ^t* ^t* = A.
 Proof. by apply/matrixP=> i j; rewrite !mxE conjCK. Qed.
 
 Section realmx.
@@ -172,7 +172,7 @@ by rewrite !mxOverM// => /(_ isT isT isT isT) [-> ->].
 Qed.
 
 Section unitarymx.
-Context {C : numClosedFieldType}.
+Context {C : conjFieldType}.
 
 Definition unitarymx {m n} := [qualify X : 'M[C]_(m, n) | X *m X ^t* == 1%:M].
 Fact unitarymx_key m n : pred_key (@unitarymx m n). Proof. by []. Qed.
@@ -267,12 +267,18 @@ Proof. by move=> Asym Areal; rewrite hermitian_normalmx// realsym_hermsym. Qed.
 End normalmx.
 
 Local Notation dotmx_def := (form_of_matrix (@conjC _) 1%:M).
-Definition dotmx (C : numClosedFieldType) n (u v : 'rV[C]_n) :=
+Definition dotmx (C : conjFieldType) n (u v : 'rV[C]_n) :=
   dotmx_def u%R v%R.
 
-Section Spectral.
-Variable (C : numClosedFieldType).
+Section ConjSpectral.
+Variable (C : conjFieldType).
 Set Default Proof Using "C".
+
+Lemma sqrtr_gt0_dnorm (a : C) : 0 <= a -> (0 < sqrtr a) = (0 < a).
+Proof.
+move=> a_ge0; rewrite lt0r sqrtr_ge0 lt0r a_ge0 !andbT.
+by rewrite -(sqr_sqrtr a_ge0) sqrf_eq0 sqr_sqrtr.
+Qed.
 
 (**
 TODO: bug report
@@ -471,8 +477,8 @@ have [v /and4P [vBn v_neq0 dAv_ge0 dAsub]] :
         by rewrite (submx_trans _ vBn) // proj_ortho_sub.
       rewrite (submx_trans (proj_ortho_sub _ _)) //.
       by rewrite -{1}[B]addr0 addmx_sub_adds ?sub0mx.
-  pose c := (sqrtC '[BoSn])^-1; have c_gt0 : c > 0.
-    by rewrite invr_gt0 sqrtC_gt0 lt_def ?dnorm_eq0 ?dnorm_ge0 BoSn_neq0.
+  pose c := (sqrtr '[BoSn])^-1; have c_gt0 : c > 0.
+    by rewrite invr_gt0 sqrtr_gt0_dnorm ?dnorm_ge0// lt_def ?dnorm_eq0 ?dnorm_ge0 BoSn_neq0.
   exists BoSn; apply/and4P; split => //.
   - by rewrite orthomx_sym ?proj_ortho_sub // /gtr_eqF.
   - rewrite -pBE linearDl/=.
@@ -480,16 +486,16 @@ have [v /and4P [vBn v_neq0 dAv_ge0 dAsub]] :
     by rewrite orthomx_proj_mx_ortho // orthomx_sym.
   - by rewrite -pBE addmx_sub_adds // proj_ortho_sub.
 wlog nv_eq1 : v vBn v_neq0 dAv_ge0 dAsub / '[v] = 1.
-  pose c := (sqrtC '[v])^-1.
-  have c_gt0 : c > 0 by rewrite invr_gt0 sqrtC_gt0 ?dnorm_gt0.
+  pose c := (sqrtr '[v])^-1.
+  have c_gt0 : c > 0 by rewrite invr_gt0 sqrtr_gt0_dnorm ?dnorm_ge0// dnorm_gt0.
   have [c_ge0 c_eq0F] := (ltW c_gt0, gt_eqF c_gt0).
   move=> /(_ (c *: v)); apply.
   - by rewrite orthomxZ ?c_eq0F.
   - by rewrite scaler_eq0 c_eq0F.
   - by rewrite linearZr mulr_ge0 // conjC_ge0.
   - by rewrite (submx_trans dAsub) // addsmxS // eqmx_scale // c_eq0F.
-  - rewrite dnormZ normfV ger0_norm ?sqrtC_ge0 ?dnorm_ge0 //.
-    by rewrite exprVn rootCK ?mulVf // dnorm_eq0.
+  - rewrite dnormZ normfV ger0_norm ?sqrtr_ge0 ?dnorm_ge0 //.
+    by rewrite exprVn sqr_sqrtr ?dnorm_ge0 ?mulVf // dnorm_eq0.
 exists (col_mx B v).
   apply/row_unitarymxP => i j.
   case: (split_ordP i) (split_ordP j) => [] i' -> [] j' ->;
@@ -572,6 +578,18 @@ move=> [:nsV]; rewrite !(orthomx1P _) -?scalar_mx_block //;
   [abstract: nsV|]; last by rewrite orthomx_sym.
 by do 2!rewrite eqmx_schmidt_free ?eq_row_base ?row_base_free // orthomx_sym.
 Qed.
+
+End ConjSpectral.
+
+Section Spectral.
+Variable (C : numClosedFieldType).
+
+Local Notation "''[' u , v ]" := (dotmx u v) : ring_scope.
+Local Notation "''[' u ]" := '[u, u]%R : ring_scope.
+Local Notation "B ^!" :=
+  (orthomx conjC (mx_of_hermitian (hermitian1mx _)) B) :
+    matrix_set_scope.
+Local Notation "A '_|_ B" := (A%MS <= B^!)%MS : bool_scope.
 
 Lemma cotrigonalization n (As : seq 'M[C]_n) :
   {in As &, forall A B, comm_mx A B} ->
