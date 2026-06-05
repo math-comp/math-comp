@@ -5,13 +5,11 @@
     nonnegative elements
   + mixins `NumField_hasConj`, `NumField_hasSqrt`, `NumField_hasImaginary` and
     `RealField_hasPolyIvt`
-    ([#1611](https://github.com/math-comp/math-comp/pull/1611),
-    by Guillaume Baudart and Cyril Cohen).
+    ([#1611](https://github.com/math-comp/math-comp/pull/1611)).
 
 - in `algebra/archimedean.v`
   + join structures `ArchiNumFieldConj` and `ArchiConjField`
-    ([#1611](https://github.com/math-comp/math-comp/pull/1611),
-    by Guillaume Baudart and Cyril Cohen).
+    ([#1611](https://github.com/math-comp/math-comp/pull/1611)).
 
 - in `algebra/spectral.v`
   + definition `realsubfield` and injection `realsubval`, equipping the subfield
@@ -19,5 +17,4 @@
   + lemmas `flag_pid_mx` and `schmidt_trig` (the triangular Gram-Schmidt factor)
   + lemma `schmidt_diag_real` and theorem `real_spectral_theorem`, the spectral
     theorem for real symmetric matrices
-    ([#1611](https://github.com/math-comp/math-comp/pull/1611),
-    by Guillaume Baudart and Cyril Cohen).
+    ([#1611](https://github.com/math-comp/math-comp/pull/1611)).

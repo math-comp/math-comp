@@ -126,14 +126,15 @@ HB.mixin Record NumField_hasImaginary R & NumField R := {
 (* [sqrtC] is available).  Field order is preserved so that existing          *)
 (* [NumField_isImaginary.Build] calls (which infer the data fields from the   *)
 (* proof fields) keep working.                                                *)
-HB.factory Record NumField_isImaginary R of GRing.ClosedField R & NumField R
+HB.factory Record NumField_isImaginary R & GRing.ClosedField R & NumField R
 := {
   imaginaryF : R;
   conjF : {rmorphism R -> R};
   sqrCiF : imaginaryF ^+ 2 = - 1;
   normCKF : forall x, `|x| ^+ 2 = x * conjF x;
 }.
-HB.builders Context R of NumField_isImaginary R.
+HB.builders Context R & NumField_isImaginary R.
+  #[warnings="-HB.no-new-instance"]
   HB.instance Definition _ := NumField_hasImaginary.Build R sqrCiF.
   HB.instance Definition _ := NumField_hasConj.Build R normCKF.
 
@@ -218,8 +219,9 @@ HB.mixin Record RealField_hasPolyIvt R & RealField R := {
 HB.factory Record RealField_isClosed R & RealField R := {
   poly_ivtF : real_closed_axiom R
 }.
-HB.builders Context R of RealField_isClosed R.
+HB.builders Context R & RealField_isClosed R.
 
+#[warnings="-HB.no-new-instance"]
 HB.instance Definition _ := RealField_hasPolyIvt.Build R poly_ivtF.
 
 Let conjid : {rmorphism R -> R} := idfun.

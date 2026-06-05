@@ -876,7 +876,7 @@ HB.instance Definition _ := Num.isNumRing.Build realsubfield
 End Num.
 
 Definition realsubpfactor (x : C) : {poly realsubfield} :=
-  if x \is Num.real =P true is ReflectT xR then 'X - (Realsub xR)%:P else
+  if (x \is Num.real) =P true is ReflectT xR then 'X - (Realsub xR)%:P else
   'X^2 - (Realsub (Creal_Re x) *+ 2) *: 'X + ((Realsub (normr_real x))^+2)%:P.
 Notation Cpfactor x := (realsubpfactor x ^^ realsubval).
 
