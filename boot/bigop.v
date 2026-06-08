@@ -906,22 +906,22 @@ Variables (T : Type) (op : T -> T -> T).
 #[deprecated(since="math-comp 2.6", use=olaw)]
 Definition oAC & associative op & commutative op :=
   fun x => oapp (fun y => Some (oapp (op^~ y) y x)) x.
-Arguments oAC : simpl never.
 
 Hypothesis (opA : associative op) (opC : commutative op).
 
+#[warning="-deprecated"]
 Local Notation oop := (oAC opA opC).
 
 Lemma oACE x y : oop (Some x) (Some y) = some (op x y). Proof. by []. Qed.
 
 Let oopAC_subdef : associative oop.
-Proof. by move=> [x|] [y|] [z|]//; rewrite /oAC/= opA. Qed.
+Proof. by move=> [x|] [y|] [z|]//; rewrite /oop/= opA. Qed.
 
 Let oopx1_subdef : left_id None oop. Proof. by case. Qed.
 Let oop1x_subdef : right_id None oop. Proof. by []. Qed.
 
 Let oopC_subdef : commutative oop.
-Proof. by move=> [x|] [y|]//; rewrite /oAC/= opC. Qed.
+Proof. by move=> [x|] [y|]//; rewrite /oop/= opC. Qed.
 
 HB.instance Definition _ := Monoid.isComLaw.Build (option T) None oop
   oopAC_subdef oopC_subdef oopx1_subdef.
@@ -938,9 +938,13 @@ Proof. by elim/big_rec2 : _ => //= i [y|] _ Pi [] -> //=; rewrite opA. Qed.
 Lemma big_AC_mk_monoid [I : Type] r P (F : I -> T) :
   \big[op/x]_(i <- r | P i) F i =
     odflt x (oop (\big[oop/None]_(i <- r | P i) Some (F i)) (Some x)).
-Proof. by apply: Some_inj; rewrite some_big_AC_mk_monoid. Qed.
+Proof.
+#[warning="-deprecated"]
+by apply: Some_inj; rewrite some_big_AC_mk_monoid.
+Qed.
 
 End oAC.
+#[warning="-deprecated"]
 Arguments oAC : simpl never.
 
 Section Extensionality.
