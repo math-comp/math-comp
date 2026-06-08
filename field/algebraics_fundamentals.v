@@ -322,7 +322,7 @@ have ofQ_K z: cancel (ofQ z) (inQ z).
 have sQring z: divring_closed (sQ z).
   have sQ_1: 1 \in sQ z by rewrite -(rmorph1 (ofQ z)) sQof.
   by split=> // x y /inQ_K<- /inQ_K<- /=; rewrite -(rmorphB, fmorph_div) sQof.
-pose sQzM z := GRing.isZmodClosed.Build _ _ (sQring z : zmod_closed _).
+pose sQzM z := Algebra.isZmodClosed.Build _ _ (sQring z : zmod_closed _).
 pose sQmM z := GRing.isMulClosed.Build _ _ (sQring z).
 pose sQiM z := GRing.isInvClosed.Build _ _ (sQring z).
 pose sQC z : divringClosed _ := HB.pack (sQ z)
@@ -336,7 +336,7 @@ have QtoQ z x: x \in sQ z -> {Qxz : 'AHom(Q x, Q z) | morph_ofQ x z Qxz}.
   have Qxzm : monoid_morphism Qxz.
     by split=> [|u v]; apply: (canLR (ofQ_K z));
       rewrite ?rmorph1 ?rmorphM /= ?QxzE.
-  have QxzaM := GRing.isZmodMorphism.Build _ _ _ Qxza.
+  have QxzaM := Algebra.isZmodMorphism.Build _ _ _ Qxza.
   have QxzmM := GRing.isMonoidMorphism.Build _ _ _ Qxzm.
   have QxzlM := GRing.isScalable.Build _ _ _ _ _ (rat_linear Qxza).
   pose QxzLRM : {lrmorphism _ -> _} := HB.pack Qxz QxzaM QxzmM QxzlM.
@@ -596,7 +596,7 @@ have add_Rroot xR p c: {yR | extendsR xR yR & has_Rroot xR p c -> root_in yR p}.
       by rewrite v_gt0 /= -if_neg posNneg.
     by rewrite v_lt0 /= -if_neg -(opprK v) posN posNneg ?posN.
   have absE v: le 0 v -> abs v = v by rewrite /abs => ->.
-  pose RyM := Num.IntegralDomain_isLtReal.Build (Q y) posD
+  set RyM := Num.IntegralDomain_isLtReal.Build (Q y) posD
                 posM posNneg posB posVneg absN absE (rrefl _).
   pose Ry : realFieldType := HB.pack (Q y) RyM.
   have QisArchi : Num.NumDomain_bounded_isArchimedean Ry.
@@ -608,7 +608,7 @@ have some_realC: realC.
       exact: can2_zmod_morphism (inj_can_sym QfK (fmorph_inj _)) QfK.
     have fM : monoid_morphism f.
       exact: can2_monoid_morphism (inj_can_sym QfK (fmorph_inj _)) QfK.
-    pose faM := GRing.isZmodMorphism.Build _ _ _ fA.
+    pose faM := Algebra.isZmodMorphism.Build _ _ _ fA.
     pose fmM := GRing.isMonoidMorphism.Build _ _ _ fM.
     pose fRM : {rmorphism _ -> _} := HB.pack f faM fmM.
     by exists 0, rat; exact: fRM.

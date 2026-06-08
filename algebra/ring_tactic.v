@@ -10,6 +10,7 @@ From mathcomp Require Import preorder.
 From mathcomp Require Export ssralg.
 From mathcomp Require Import ssrint binnums.
 From mathcomp.algebra Extra Dependency "ring_tactic.elpi" as ring_tactic.
+Elpi TC.AddClasses param_db.
 
 (******************************************************************************)
 (* This file provides the ring tactic.                                        *)
