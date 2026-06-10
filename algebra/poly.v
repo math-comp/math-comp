@@ -905,12 +905,14 @@ Qed.
 Lemma hornerZ c p x : (c *: p).[x] = c * p.[x].
 Proof. by rewrite -mul_polyC hornerCM. Qed.
 
+HB.instance Definition _ x :=
+  GRing.isSemilinear.Build R {poly R} R _ (horner ^~ x)
+    ((fun c p => hornerZ c p x), (fun p q => hornerD p q x)).
+
 Definition horner_eval (x : R) := horner^~ x.
 Lemma horner_evalE x p : horner_eval x p = p.[x]. Proof. by []. Qed.
 
-HB.instance Definition _ x :=
-  GRing.isSemilinear.Build R {poly R} R _ (horner_eval x)
-    ((fun c p => hornerZ c p x), (fun p q => hornerD p q x)).
+HB.instance Definition _ x := GRing.Linear.copy (horner_eval x) (horner ^~ x).
 
 Lemma horner_sum I (r : seq I) (P : pred I) F x :
   (\sum_(i <- r | P i) F i).[x] = \sum_(i <- r | P i) (F i).[x].
@@ -2096,22 +2098,22 @@ split=> [c p|p q]; rewrite /horner_morph; first by rewrite linearZ hornerZ.
 by rewrite linearD hornerD.
 Qed.
 
-Fact horner_is_monoid_morphism : monoid_morphism (horner_morph cfu).
+Fact horner_morph_is_monoid_morphism : monoid_morphism (horner_morph cfu).
 Proof.
 split=> [|p q]; first by rewrite /horner_morph rmorph1 hornerC.
 rewrite /horner_morph rmorphM /= hornerM_comm //.
 by apply: comm_coef_poly => i; rewrite coef_map cfu.
 Qed.
-#[deprecated(since="mathcomp 2.5.0", use=horner_is_monoid_morphism)]
+#[deprecated(since="mathcomp 2.5.0", use=horner_morph_is_monoid_morphism)]
 Definition horner_is_multiplicative :=
-  (fun g => (g.2, g.1)) horner_is_monoid_morphism.
+  (fun g => (g.2, g.1)) horner_morph_is_monoid_morphism.
 HB.instance Definition _ :=
   GRing.isSemilinear.Build aR {poly aR} rR _ (horner_morph cfu)
     horner_is_semilinear.
 
 HB.instance Definition _ :=
   GRing.isMonoidMorphism.Build {poly aR} rR (horner_morph cfu)
-    horner_is_monoid_morphism.
+    horner_morph_is_monoid_morphism.
 
 End HornerMorph.
 
@@ -2702,15 +2704,18 @@ HB.instance Definition _ :=
 Lemma hornerM p q x : (p * q).[x] = p.[x] * q.[x].
 Proof. by rewrite hornerM_comm //; apply: mulrC. Qed.
 
-Fact horner_eval_is_monoid_morphism (x : R) : monoid_morphism (horner_eval x).
-Proof. by split => [|p q]; rewrite /horner_eval (hornerC, hornerM). Qed.
-#[deprecated(since="mathcomp 2.5.0", use=horner_eval_is_monoid_morphism)]
+Fact horner_is_monoid_morphism (x : R) : monoid_morphism (horner ^~ x).
+Proof. by split => [|p q]; rewrite (hornerC, hornerM). Qed.
+#[deprecated(since="mathcomp 2.5.0", use=horner_is_monoid_morphism)]
 Definition horner_eval_is_multiplicative x :=
-  (fun g => (g.2, g.1)) (horner_eval_is_monoid_morphism x).
+  (fun g => (g.2, g.1)) (horner_is_monoid_morphism x).
 
 HB.instance Definition _ x :=
-  GRing.isMonoidMorphism.Build {poly R} R (horner_eval x)
-    (horner_eval_is_monoid_morphism x).
+  GRing.isMonoidMorphism.Build {poly R} R (horner ^~ x)
+    (horner_is_monoid_morphism x).
+
+HB.instance Definition _ x :=
+  GRing.RMorphism.copy (horner_eval x) (horner ^~ x).
 
 Lemma horner_exp p x n : (p ^+ n).[x] = p.[x] ^+ n.
 Proof. exact: (rmorphXn (horner_eval _)). Qed.
