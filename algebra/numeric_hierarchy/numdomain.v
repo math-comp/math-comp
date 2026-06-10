@@ -2,7 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype bigop finset fingroup nmodule order.
+From mathcomp Require Import fintype bigop finset fingroup nmodule preorder.
+From mathcomp Require Import porder lattice total_order total_order_instances.
 From mathcomp Require Import interval rings_modules_and_algebras divalg poly.
 From mathcomp Require Import orderedzmod.
 
@@ -50,7 +51,7 @@ Unset Printing Implicit Defensive.
 
 Local Open Scope ring_scope.
 
-Import Order.TTheory GRing.Theory.
+Import Order.Theory GRing.Theory.
 Import orderedzmod.Num.
 
 Module Num.

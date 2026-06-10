@@ -1,7 +1,8 @@
 (* mathcomp analysis (c) 2017 Inria and AIST. License: CeCILL-C.              *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool ssrnat eqtype choice.
-From mathcomp Require Import order interval ssralg.
+From mathcomp Require Import preorder porder lattice total_order.
+From mathcomp Require Import total_order_instances interval ssralg.
 From mathcomp Require Import orderedzmod numdomain numfield ssrint.
 
 (**md**************************************************************************)
@@ -122,8 +123,7 @@ Reserved Notation "[ 'neq0' 'of' x ]" (format "[ 'neq0' 'of'  x ]").
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
-Import Order.TTheory Order.Syntax.
-Import GRing.Theory Num.Theory.
+Import Order.Theory GRing.Theory Num.Theory.
 
 Local Open Scope ring_scope.
 Local Open Scope order_scope.

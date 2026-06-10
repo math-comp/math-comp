@@ -3,8 +3,8 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype finfun bigop finset nmodule fingroup perm.
-From mathcomp Require Import order rings_modules_and_algebras divalg countalg.
-From mathcomp Require Import finalg zmodp.
+From mathcomp Require Import total_order_instances rings_modules_and_algebras.
+From mathcomp Require Import divalg countalg finalg zmodp.
 
 (******************************************************************************)
 (* Basic concrete linear algebra : definition of type for matrices, and all   *)
@@ -4811,7 +4811,7 @@ by under [LHS]eq_bigr do rewrite mxcol_mul; rewrite -mxcol_sum.
 Qed.
 
 Section SquareBlockMatrixNmod.
-Import Order.TTheory tagnat.
+Import tagnat.
 Context {V : nmodType} {p : nat} {p_ : 'I_p -> nat}.
 Notation sp := (\sum_i p_ i)%N.
 Implicit Type (s : 'I_sp).
@@ -4939,7 +4939,7 @@ Notation "\mxdiag_ ( i < n ) E" := (mxdiag (fun i : 'I_n => E))
 Notation "\mxdiag_ i E" := (\mxdiag_(i < _) E) : ring_scope.
 
 Section SquareBlockMatrixZmod.
-Import Order.TTheory tagnat.
+Import tagnat.
 Context {V : zmodType} {p : nat} {p_ : 'I_p -> nat}.
 Notation sp := (\sum_i p_ i)%N.
 Implicit Type (s : 'I_sp).
