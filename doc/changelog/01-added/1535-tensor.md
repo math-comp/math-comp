@@ -14,14 +14,11 @@
     and `tuple_of_finfun : finfun_of >-> tuple_of`, letting a
     `k.-tuple T` and a `{ffun 'I_k -> T}` flow into either context
     transparently
-  + new `tensor_scope` (delimited `%tnsr`) containing the indexing
-    operations `t^^i`, ``` ``t`_i`` ```, `t^^=i`, ``` ``t`_=i`` ```,
-    the nullary projection `t.[::]`, the stacking constructors
-    `\tensor^^`, ``` \tensor`_ ``` (with their `=>` variants), and
-    the bracket constructors `[tensor^^ ...]`, ``` [tensor`_ ...] ```,
-    `[tensor^^= ...]`, ``` [tensor`_= ...] ```; `tensor_scope` is
-    bound to the `tensor` type via `Bind Scope` so the indexing
-    notations resolve correctly under `ring_scope`
+  + indexing operations `t^^i`, `t\_i`, `t^^=i`, `t\_=i`, the nullary
+    projection `t.[::]`, the stacking constructors `\tensor^^`,
+    `\tensor\_` (with their `=>` variants), and the bracket
+    constructors `[tensor^^ ...]`, `[tensor\_ ...]`, `[tensor^^= ...]`,
+    `[tensor\_= ...]`, all in `ring_scope`
   + underlying definitions for the indexing operations: `nindex`,
     `oindex`, and `tensor_nil`
   + tensor definitions `const_t`, `tensor1`, `nstack`, `ostack`,
