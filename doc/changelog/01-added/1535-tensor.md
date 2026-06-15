@@ -14,16 +14,7 @@
     and `tuple_of_finfun : finfun_of >-> tuple_of`, letting a
     `k.-tuple T` and a `{ffun 'I_k -> T}` flow into either context
     transparently
-  + new `tensor_scope` (delimited `%tnsr`) containing the indexing
-    operations `t^^i`, ``` ``t`_i`` ```, `t^^=i`, ``` ``t`_=i`` ```,
-    the nullary projection `t.[::]`, the stacking constructors
-    `\tensor^^`, ``` \tensor`_ ``` (with their `=>` variants), and
-    the bracket constructors `[tensor^^ ...]`, ``` [tensor`_ ...] ```,
-    `[tensor^^= ...]`, ``` [tensor`_= ...] ```; `tensor_scope` is
-    bound to the `tensor` type via `Bind Scope` so the indexing
-    notations resolve correctly under `ring_scope`
-  + underlying definitions for the indexing operations: `nindex`,
-    `oindex`, and `tensor_nil`
+  + indexing operations: `nindex`, `oindex`, and `tensor_nil`
   + tensor definitions `const_t`, `tensor1`, `nstack`, `ostack`,
     `nstack_tuple`, `ostack_tuple`, `ntensor_of_tuple`,
     `otensor_of_tuple`, `tuple_of_ntensor`, `tuple_of_otensor`,
@@ -31,10 +22,9 @@
   + tensor-reshaping operator `castt` (and lemmas `val_castt`,
     `castt_id`, `castt_comp`, `casttK`, `casttKV`), mirroring
     `castmx` at the tensor level
-  + Hadamard (element-wise) product `t *h u` (definition `hmul`,
-    notation in `ring_scope`) and tensor product `t *t u` (definition
-    `mults`), with `*%R` interpreted as the Hadamard product on
-    tensors
+  + Hadamard (element-wise) product `hmul` and tensor product `mults`
+    (both without notation), with `*%R` interpreted as the Hadamard
+    product on tensors
   + ring-instance support definitions `unitt`, `invt`
   + index bijections `tensor_index`, `tensor_unindex`,
     `tensor_dffun_index`, `tensor_dffun_unindex`, `tensormx_index`,
