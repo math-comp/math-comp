@@ -1,12 +1,13 @@
 # Contribution Guide for the Mathematical Components library
 
-We describe here best practices for contributing to the library. In
-particular we explain what conventions are used in the library. When
-contributing, you should comply to these conventions to get your code
-integrated to the library.
+Thank you for contributing to the library! We describe here the best
+practices for contributing to the library. In particular, we explain
+what conventions are used in the library. When contributing, you
+should try to comply with these conventions to get your code integrated
+into the library.
 
-This file is not comprehensive yet and might still contain mistakes or
-unclear indications, please consider contributing to its improvement.
+This file might not be comprehensive yet and might still contain mistakes
+or unclear indications, please consider contributing to its improvement.
 
 ## Proof style
 
@@ -14,7 +15,7 @@ unclear indications, please consider contributing to its improvement.
 - One important guideline is to structure proofs in blocks, i.e.,
   forward steps, to limit the scope of errors.
   + See [G. Gonthier, A. Mahboubi, "An introduction to small scale reflection in Coq", p.103](https://doi.org/10.6092/issn.1972-5787/1979) for an illustration
-- **A line should have no more than 80 characters**. If a line is
+- A line should have no more than 80 characters. If a line is
 longer than that, it should be cut semantically. If there is no way to
 make a semantic cut (e.g. the user provides an explicit term that is
 too long to fit on one line), then just cut it over several lines to
