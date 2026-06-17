@@ -1,12 +1,13 @@
 # Contribution Guide for the Mathematical Components library
 
-We describe here best practices for contributing to the library. In
-particular we explain what conventions are used in the library. When
-contributing, you should comply to these conventions to get your code
-integrated to the library.
+Thank you for contributing to the library! We describe here the best
+practices for contributing to the library. In particular, we explain
+what conventions are used in the library. When contributing, you
+should try to comply as much as possible with these conventions. The
+review process can also help you get there.
 
-This file is not comprehensive yet and might still contain mistakes or
-unclear indications, please consider contributing to its improvement.
+This file might not be comprehensive yet and might still contain mistakes
+or unclear indications, feel free to contribute to its improvement.
 
 ## Proof style
 
@@ -14,7 +15,7 @@ unclear indications, please consider contributing to its improvement.
 - One important guideline is to structure proofs in blocks, i.e.,
   forward steps, to limit the scope of errors.
   + See [G. Gonthier, A. Mahboubi, "An introduction to small scale reflection in Coq", p.103](https://doi.org/10.6092/issn.1972-5787/1979) for an illustration
-- **A line should have no more than 80 characters**. If a line is
+- A line should have no more than 80 characters. If a line is
 longer than that, it should be cut semantically. If there is no way to
 make a semantic cut (e.g. the user provides an explicit term that is
 too long to fit on one line), then just cut it over several lines to
@@ -69,7 +70,7 @@ We write
 
 ## Statements of lemmas, theorems and definitions
 
-- Universal quantifications with dependent variable should appear on the left hand side of the colon, until we reach the first non dependent variables. e.g.
+- Universal quantifications with dependent variables should appear on the left-hand side of the colon, until we reach the first non-dependent variables. e.g.
   `Lemma example x y : x < y -> x >= y = false`
 
 ### Term style
@@ -88,7 +89,7 @@ This particular example can be problematic if matrix.v is imported because then,
 - Variable/hypothesis names follow the following conventions.
   + Hypothesis should not be named `H`, `H'`,... (these collide with
   subgroup variable conventions) but have meaningful names. For
-  example, an hypothesis `n > 0` should be named `n_gt0`.
+  example, a hypothesis `n > 0` should be named `n_gt0`.
   + Induction Hypotheses are prefixed by `IH` or `ih` (e.g. induction hypothesis on `n` is called `IHn`).
   + Natural numbers and integers should be named `m`, `n`, `p`, `d`, ...
   + Elements of another ring should be named `x`, `y`, `z`, `u`, `v`, `w`, ...
@@ -181,7 +182,7 @@ Abbreviations are in the header of the file which introduces them. We list here 
 - `Search _ "prefix" "suffix"* (symbol|pattern)* in library.` (for coq < 8.12)
 - `Search "prefix" "suffix"* (symbol|pattern)* inside library.` (for coq >= 8.12)
 
-### Naming conventions for definitions (non exhaustive)
+### Naming conventions for definitions (non-exhaustive)
 
 - types of mathematical structures
   + Mixed case, the first letter lowercase and the first letter of each internal
@@ -212,7 +213,7 @@ Abbreviations are in the header of the file which introduces them. We list here 
 
 #### Breaking changes and deprecations
 
-In principle, changes that may break users code, e.g.:
+In principle, changes that may break users' code, e.g.:
 - renaming or removing definitions, lemmas, or libraries, and
 - changing the contents of definitions or the statements of lemmas,
 
