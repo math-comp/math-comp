@@ -30,6 +30,8 @@ make it readable.
   ```
 - Do not use `Focus` or `{}`, use the relevant [indentation](#indentation-in-proof-scripts),
   along with terminators like `by` or `exact`.
+- Adding new theories with in particular with new datatypes and definitions
+  should be discussed in mathcomp meetings.
 
 ### Spaces
 We write

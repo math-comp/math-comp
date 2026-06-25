@@ -1,10 +1,11 @@
 From HB Require Import structures.
-From mathcomp Require Import ssreflect seq matrix bigop ssrbool eqtype choice.
-From mathcomp Require Import fintype ssralg ssrnat ssrfun order finfun tuple.
-From mathcomp Require Import finset sesquilinear.
-From mathcomp Require Import interval interval_inference numdomain.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq fintype.
+From mathcomp Require Import finfun finset tuple bigop ssralg order ssrnum ssrint.
+From mathcomp Require Import sesquilinear matrix interval interval_inference numdomain.
 
 (******************************************************************************)
+(* Tensor library is experimental.                                            *)
+(* Caution: the interface may change in the future.                           *)
 (* For tensors we define:                                                     *)
 (*       'T[R]_(u_, d_) == the type of tensors with elements of type R,       *)
 (*          'T_(u_, d_)    contravariant dimensions u_ and covariant          *)
@@ -53,9 +54,7 @@ From mathcomp Require Import interval interval_inference numdomain.
 (* Proper tensor product forms a bilinear structure.                          *)
 (*                                                                            *)
 (* Tensor operations:                                                         *)
-(* hmul t u == Hadamard product of t and u (element-wise multiplication),     *)
-(*           same as t * u (ring multiplication)                              *)
-(* mults t u == proper tensor product: combines dimensions,                   *)
+(* t *t u == proper tensor product: combines dimensions,                      *)
 (*           'T_(u1, d1) -> 'T_(u2, d2) -> 'T_(u1 +++ u2, d1 +++ d2)          *)
 (******************************************************************************)
 
@@ -65,20 +64,17 @@ Unset Printing Implicit Defensive.
 
 Import GRing.Theory.
 
-Reserved Notation "''nT_' ( u_ )"
-  (at level 0, u_ at level 2, format "''nT_' ( u_ )").
-Reserved Notation "''oT_' ( d_ )"
-  (at level 0, d_ at level 2, format "''oT_' ( d_ )").
-Reserved Notation "''nT[' R ]_ ( u_ )" (at level 0, u_ at level 2).
-  (* only parsing *)
-Reserved Notation "''oT[' R ]_ ( d_ )" (at level 0, d_ at level 2).
-  (* only parsing *)
-Reserved Notation "''T_' ( u_ , d_ )"
-  (at level 0, u_ at level 2, d_ at level 2, format "''T_' ( u_ ,  d_ )").
-Reserved Notation "''T[' R ]_ ( u_ , d_ )"
-  (at level 0, u_ at level 2, d_ at level 2). (* only parsing*)
-Reserved Notation "''sT'" (at level 0, format "''sT'").
-Reserved Notation "''sT[' R ]" (at level 0). (* only parsing *)
+Reserved Notation "*t%R".
+Reserved Notation "x *t y" (at level 40, left associativity, format "x  *t  y").
+
+Reserved Notation "''nT_' ( u_ )" (format "''nT_' ( u_ )").
+Reserved Notation "''oT_' ( d_ )" (format "''oT_' ( d_ )").
+Reserved Notation "''nT[' R ]_ ( u_ )". (* only parsing *)
+Reserved Notation "''oT[' R ]_ ( d_ )". (* only parsing *)
+Reserved Notation "''T_' ( u_ , d_ )" (format "''T_' ( u_ ,  d_ )").
+Reserved Notation "''T[' R ]_ ( u_ , d_ )". (* only parsing*)
+Reserved Notation "''sT'" (format "''sT'").
+Reserved Notation "''sT[' R ]". (* only parsing *)
 
 (* Coercion from tuples to finfun: allows writing tensor dimensions as tuples *)
 #[warning="-uniform-inheritance"]
@@ -103,12 +99,19 @@ End TensorDef.
 
 Bind Scope ring_scope with tensor.
 
+#[deprecated(note="tensor is experimental, the interface might change in the future",
+since="mathcomp 2.6.0 experimental tensor")]
 Notation "''T[' R ]_ ( u_ , d_ )" := (tensor u_ d_ R) (only parsing) : type_scope.
+#[deprecated(note="tensor is experimental, the interface might change in the future",
+since="mathcomp 2.6.0 experimental tensor")]
 Notation "''T[' R ]_ [ u1 , .. , uk ; d1 , .. , dl ]"
   := (tensor [tuple of u1%:posnat :: .. [:: uk%:posnat] ..]
              [tuple of d1%:posnat :: .. [:: dl%:posnat] ..] R)
      (only parsing) : type_scope.
+#[deprecated(note="tensor is experimental, the interface might change in the future",
+since="mathcomp 2.6.0 experimental tensor")]
 Notation "''T_' ( u_ , d_ )" := (tensor u_ d_ _) : type_scope.
+Set Warnings "-deprecated-notation-since-mathcomp-2.6.0-experimental-tensor".
 Notation "''nT[' R ]_ ( u_ )" := 'T[R]_( u_ , [tuple] ) (only parsing) : type_scope.
 Notation "''nT[' R ]_ [ u1 , .. , uk ]"
   := 'T[R]_( [tuple of u1%:posnat :: .. [:: uk%:posnat] ..] , [tuple] )
@@ -225,7 +228,7 @@ Context {R : pzSemiRingType}.
 Definition tensor1 := @const_t _ _ _ u_ d_ (GRing.one R).
 
 (* Hadamard product: element-wise multiplication *)
-Definition hmul (t u : 'T[R]_(u_, d_)) :=
+Let hmul (t u : 'T[R]_(u_, d_)) :=
   @Tensor _ _ u_ d_ R (map2_mx *%R (\val t) (\val u)).
 
 Let hmulA : associative hmul.
@@ -248,8 +251,8 @@ HB.instance Definition _ := GRing.Nmodule_isPzSemiRing.Build
 
 End TensorSemiRing.
 
-Let hmulC {R : comPzSemiRingType} : @commutative 'T[R] _ hmul.
-Proof. by move=> x y; rewrite /hmul map2_mxC. Qed.
+Let hmulC {R : comPzSemiRingType} : @commutative 'T[R] _ *%R.
+Proof. by move=> x y; rewrite /(_ * _)/= map2_mxC. Qed.
 
 
 HB.instance Definition _ {R : comPzSemiRingType} :=
@@ -259,8 +262,8 @@ Let onet_neq0 {R : nzSemiRingType} : (1%R : 'T[R]) != 0%R.
 Proof.
 apply/eqP; case=> /matrixP.
 set i := \prod_(i < k) (u_ i)%:num; set j := \prod_(i < l) (d_ i)%:num.
-have: 0 < i by apply/prodn_gt0 => ?; rewrite gtn0.
-have: 0 < j by apply/prodn_gt0 => ?; rewrite gtn0.
+have: (0 < i)%N by apply/prodn_gt0 => ?; rewrite gtn0.
+have: (0 < j)%N by apply/prodn_gt0 => ?; rewrite gtn0.
 case: i j => [|i] [|j]// _ _ /(_ ord0 ord0).
 by apply/eqP; rewrite !mxE oner_neq0.
 Qed.
@@ -658,11 +661,11 @@ Context (u2_ : {posnum nat} ^ k2) (d2_ : {posnum nat} ^ l2).
 
 Lemma prod_fcat {n m : nat} (f : {posnum nat} ^ n) (g : {posnum nat} ^ m) :
   (\prod_(i < n) (f i)%:num%R) * (\prod_(i < m) (g i)%:num%R)
-    = \prod_(i < n + m) ((f +++ g) i)%:num%R.
+    = \prod_(i < n + m) (cat_ordfun f g i)%:num%R.
 Proof.
 rewrite big_split_ord; congr (_ * _); apply: eq_bigr => i _.
-  by rewrite fcat_lshift.
-by rewrite fcat_rshift.
+  by rewrite cat_lshift.
+by rewrite cat_rshift.
 Qed.
 
 Lemma prod_card (m n : nat) : #|{:'I_m * 'I_n}| = (m * n)%N.
@@ -675,15 +678,15 @@ Definition prod_unsplit (m n : nat) (ij : 'I_m * 'I_n) : 'I_(m * n) :=
   cast_ord (prod_card m n) (enum_rank ij).
 
 Definition mults (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_))
-  : 'T[R]_((u1_ +++ u2_), (d1_ +++ d2_)) :=
-  Tensor (\matrix_(i, j) 
+  : 'T[R]_(cat_ordfun u1_ u2_, cat_ordfun d1_ d2_) :=
+  Tensor (\matrix_(i, j)
     let ii := prod_split (cast_ord (esym (prod_fcat _ _)) i) in
     let jj := prod_split (cast_ord (esym (prod_fcat _ _)) j) in
     (\val t ii.1 jj.1) * (\val u ii.2 jj.2))%R.
 
 
 Lemma multsDl (t u : 'T[R]_(u1_, d1_)) (v : 'T[R]_(u2_, d2_)) :
-  mults (t + u) v = (mults t v + mults u v).
+  mults (t + u) v = mults t v + mults u v.
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val/= !mxE/= mulrDl.
 Qed.
@@ -715,6 +718,9 @@ Qed.
 
 End TensorProduct.
 
+Notation "*t%R" := mults : function_scope.
+Notation "x *t y" := (mults x y) : ring_scope.
+
 Section TensorProductBilinear.
 Context {R : comNzRingType}.
 Context {k1 l1 k2 l2 : nat}.
@@ -722,7 +728,7 @@ Context (u1_ : {posnum nat} ^ k1) (d1_ : {posnum nat} ^ l1).
 Context (u2_ : {posnum nat} ^ k2) (d2_ : {posnum nat} ^ l2).
 
 Let mults_linear_l (u : 'T[R]_(u2_, d2_)) :
-  GRing.linear_for *:%R (fun t : 'T[R]_(u1_, d1_) => mults t u).
+  GRing.linear_for *:%R (fun t : 'T[R]_(u1_, d1_) => t *t u).
 Proof.
 move=> a x y; apply/val_inj/matrixP=> i j; rewrite /tensor_val/= !mxE/=.
 rewrite mulrDl; congr (_ + _);
@@ -730,7 +736,7 @@ rewrite mulrDl; congr (_ + _);
 Qed.
 
 Let mults_linear_r (t : 'T[R]_(u1_, d1_)) :
-  GRing.linear_for *:%R (fun u : 'T[R]_(u2_, d2_) => mults t u).
+  GRing.linear_for *:%R (fun u : 'T[R]_(u2_, d2_) => t *t u).
 Proof.
 move=> a x y; apply/val_inj/matrixP=> i j; rewrite /tensor_val/= !mxE/=.
 by rewrite mulrDr; congr (_ + _); rewrite mulrA (mulrCA a) mulrA.
@@ -739,7 +745,7 @@ Qed.
 HB.instance Definition _ := bilinear_isBilinear.Build
   R
   'T[R]_(u1_, d1_) 'T[R]_(u2_, d2_)
-  'T[R]_((u1_ +++ u2_), (d1_ +++ d2_))
+  'T[R]_(cat_ordfun u1_ u2_, cat_ordfun d1_ d2_)
   *:%R *:%R (@mults _ _ _ _ _ _ _ _ _) (conj mults_linear_l mults_linear_r).
 
 End TensorProductBilinear.
@@ -751,7 +757,7 @@ Context (u1_ : {posnum nat} ^ k1) (d1_ : {posnum nat} ^ l1).
 Context (u2_ : {posnum nat} ^ k2) (d2_ : {posnum nat} ^ l2).
 
 Lemma mults_hmul (t1 u1 : 'T[R]_(u1_, d1_)) (t2 u2 : 'T[R]_(u2_, d2_)) :
-  mults (hmul t1 u1) (hmul t2 u2) = hmul (mults t1 t2) (mults u1 u2).
+  (t1 * u1) *t (t2 * u2) = (t1 *t t2) * (u1 *t u2).
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrACA.
 Qed.
@@ -764,27 +770,27 @@ Context (u1_ : {posnum nat} ^ k1) (d1_ : {posnum nat} ^ l1).
 Context (u2_ : {posnum nat} ^ k2) (d2_ : {posnum nat} ^ l2).
 
 Lemma multsNl {R : pzRingType} (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
-  mults (- t) u = - (mults t u).
+  (- t) *t u = - (t *t u).
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulNr.
 Qed.
 
 Lemma multsNr {R : pzRingType} (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
-  mults t (- u) = - (mults t u).
+  t *t (- u) = - (t *t u).
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrN.
 Qed.
 
 Lemma mults_scale {R : comPzSemiRingType} (a b : R)
-    (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_))
-  : mults (hmul (const_t a) t) (hmul (const_t b) u) = hmul (const_t (a * b)%R) (mults t u).
+    (t : 'T[R]_(u1_, d1_)) (u : 'T[R]_(u2_, d2_)) :
+  (const_t a * t) *t (const_t b * u) = const_t (a * b) * (t *t u).
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrACA.
 Qed.
 
 Lemma mults_hmul_compat {R : comPzSemiRingType} 
-    (t1 t2 : 'T[R]_(u1_, d1_)) (u1 u2 : 'T[R]_(u2_, d2_))
-  : mults (hmul t1 t2) (hmul u1 u2) = hmul (mults t1 u1) (mults t2 u2).
+    (t1 t2 : 'T[R]_(u1_, d1_)) (u1 u2 : 'T[R]_(u2_, d2_)) :
+  (t1 * t2) *t (u1 * u2) = (t1 *t u1) * (t2 *t u2).
 Proof.
 by apply/val_inj/matrixP => i j; rewrite /tensor_val /= !mxE /= mulrACA.
 Qed.
