@@ -1,9 +1,662 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-Last releases: [[2.5.0] - 2025-10-13](#250---2025-10-13), [[2.4.0] - 2025-04-14](#240---2025-04-14), [[2.3.0] - 2024-11-28](#230---2024-11-28)
+Last releases: [[2.6.0] - 2026-06-27](#260---2026-06-27), [[2.5.0] - 2025-10-13](#250---2025-10-13), [[2.4.0] - 2025-04-14](#240---2025-04-14)
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## [2.6.0] - 2026-06-27
+
+This release is compatible with Rocq versions 9.0, 9.1 and 9.2.
+
+The contributors to this version are:
+
+Reynald Affeldt, Valentin Blot, Alessandro Bruni, Cyril Cohen, Florent
+Hivert, Marie Kerjean, Vincent Laporte, Pierre Roux, Takafumi Saikawa,
+Kazuhiko Sakaguchi, Joshua Smart, Laurent Théry, Holger Thies, Quentin
+Vermande, Li Zhou
+
+### Added
+
+- in `ssrbool.v`
+  + definitions `and3proj1`, `and3proj2`, `and3proj3`, `and4proj1`,
+    `and4proj2`, `and4proj3`, `and4proj4`, `and5proj1`, `and5proj2`,
+    `and5proj3`, `and5proj4`, `and5proj5`
+    ([#1552](https://github.com/math-comp/math-comp/pull/1552)).
+
+- in `ssrnat.v`
+  + lemmas `neq_doubleS_double` and `predn_doubleS`
+    ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
+  + lemma `ltn_leq_trans`
+    ([#1535](https://github.com/math-comp/math-comp/pull/1535))
+
+- in `seq.v`
+  + lemmas `take_mkseq`, `drop_mkseq`, `index_map_in`, `index_map_inW`
+    and `uniq_map_inj_in`
+    ([#1514](https://github.com/math-comp/math-comp/pull/1514)).
+  + definition `mindex`
+  + lemmas `nth_cons`, `mem_catC`, `mem_nthE`, `subset_cons2`, `subset_cons`,
+    `uniq_cat_inLR`, `uniq_cat_inRL`, `set_last_default`, `last_take`,
+    `last_drop`, `map_nth`, `subset_memP`, `nth_mask`
+    ([#1523](https://github.com/math-comp/math-comp/pull/1523)).
+
+- in `div.v`
+  + lemmas `modnMBXl` and `modn_sqrB`
+    ([#1529](https://github.com/math-comp/math-comp/pull/1529)).
+
+- in `choice.v`,
+  + lemma `sig_eq2W`,
+    ([#1523](https://github.com/math-comp/math-comp/pull/1523)).
+
+- in `finset.v`,
+  + lemmas `disjoint_set1l`, `disjoint_set1r`, `setUD`, `setUDl`, `subset_cover`,
+    ([#1523](https://github.com/math-comp/math-comp/pull/1523)).
+
+- in `tuple.v`
+  + lemmas `tnth_in_tuple`, `in_tuple_tuple`, `in_tuple_cons`, `in_tupleP`,
+    ([#1523](https://github.com/math-comp/math-comp/pull/1523)).
+  
+- in `finfun.v`
+  + definition `cat_fun : forall A B : finType, (A -> T) -> (B -> T) -> (A + B -> T)`
+  + lemmas `cat_inl` and `cat_inr`
+  + definition `cat_ordfun : forall T (m n : nat), T ^ m -> T ^ n -> T ^ (m + n)`
+  + lemmas `cat_lshift`, `cat_rshift`, `cat_ordfunK` and `cat_ordfun_comp`
+  + multirule `cat_lrshift`
+    ([#1535](https://github.com/math-comp/math-comp/pull/1535))
+
+- in `bigop.v`
+  + lemma `big_cat_ordfun` for splitting `\big[op/idx]_(i < n + m) (F +++ G) i`
+    ([#1535](https://github.com/math-comp/math-comp/pull/1535))
+  + definition `olaw`
+  + lemmas `olawss`, `olawx1`,`olaw1x`, `some_big_mk_monoid`,
+    `big_mk_option_monoid` and `big_split_ord_idem`
+  + instances of `Monoid.law` and `Monoid.com_law` for `olaw op`
+    when `op` has respective type `SemiGroup.law` and `SemiGroup.com_law`
+    ([#1608](https://github.com/math-comp/math-comp/pull/1608)).
+
+- in `nmodule.v`
+  + lemma `subrKC`, moved from `ssralg.v`
+    ([#1433](https://github.com/math-comp/math-comp/pull/1433)).
+
+- in `preorder.v`
+  + notations `\max_<range>` and `\min_<range>`
+    ([#1578](https://github.com/math-comp/math-comp/pull/1578)).
+
+- in `order.v`
+  + factories for isomorphic bounded orders:
+    `IsoTop` :satisfied: and `IsoBottom`
+    ([#1525](https://github.com/math-comp/math-comp/pull/1525)).
+
+- in `perm.v`
+  + definition `tact`,
+  + lemmas `tactE`, `tactP`, `perm_tact`, `tact1`, `tactM`, `tactK`, `tnth_tact`, `tact_lift0`, `tval_tact_lift0`,
+    ([#1523](https://github.com/math-comp/math-comp/pull/1523)).
+
+- in `rings_modules_and_algebras.v`
+  + notations for
+    `SubNmodule_isSubPzSemiRing`,
+    `SubChoice_isSubPzRing`,
+    `SubChoice_isSubComPzRing`,
+    `SubChoice_isSubPzSemiRing` and
+    `SubChoice_isSubComPzSemiRing`
+    ([#1586](https://github.com/math-comp/math-comp/pull/1586))
+
+- in `ssralg.v`
+  + potentially-zero (semi)algebra structures `pzLSemiAlgType`, `pzLalgType`,
+    `pzSemiAlgType`, `pzAlgType`, `comPzSemiAlgType`, `comPzAlgType`,
+    `subPzLSemiAlgType`, `subPzLalgType`, `subPzSemiAlgType`, `subPzAlgType`
+  + factories
+    `[SubChoice_isSubPzLSemiAlgebra of U by <:]`,
+    `[SubChoice_isSubPzLalgebra of U by <:]`,
+    `[SubChoice_isSubPzSemiAlgebra of U by <:]`,
+    `[SubChoice_isSubPzAlgebra of U by <:]`
+    ([#1482](https://github.com/math-comp/math-comp/pull/1482),
+    fixes [#1386](https://github.com/math-comp/math-comp/issues/1386)).
+
+- in `finalg.v`
+  + instances of `countNmodType`, `countZmodType` `finNmodType` and
+  `finZmodType` on `ordinal`
+    ([#1523](https://github.com/math-comp/math-comp/pull/1523)).
+
+- in `orderedzmod.v`
+  + structure `POrderNmodule`
+  + notation `porderNmodeType` for `POrderNmodule.type`
+  + factories `Add_isHomo` and `POrderedZmodule_hasTransCmp`
+  + structures `porderedNmodType`, `porderedZmodType` and
+    `numZmodType`
+  + definitions `ZmodulePositiveCone.type` and `ZmodulePositiveCone.le`
+  + instance of `porderedZmodType` on `ZmodulePositiveCone.type`
+  + lemmas `addr_gt0`, `mulrn_lgt0`, `pmulrIn`, `zmod_leP`,
+    `zmod_ltP`, `zmod_ltgtP`, `zmod_ge0P`, `zmod_le0P` and
+    `zmod_ltgt0P`
+  + multirule `lteif_oppE`
+    ([#1520](https://github.com/math-comp/math-comp/pull/1520)).
+
+- in `numdomain.v`
+  + lemmas `real_distr_max_min` and `distr_max_min`
+    ([#1500](https://github.com/math-comp/math-comp/pull/1500)).
+  + lemma `gerN`
+    ([#1501](https://github.com/math-comp/math-comp/pull/1501)).
+  + lemma `divDl_ge0`
+    ([#1517](https://github.com/math-comp/math-comp/pull/1517)).
+  + mixin `Zmodule_isSubNormed`
+  + structure `SubNormedZmodule`
+  + notation `subNormedZmodType`
+    (* [1579](https://github.com/math-comp/math-comp/pull/1579) *)
+
+- in `numfield.v`
+  + lemma `divDl_le1`
+    ([#1517](https://github.com/math-comp/math-comp/pull/1517)).
+  + lemmas `sqr_inj` and `sqrtr_inj`
+    ([#1553](https://github.com/math-comp/math-comp/pull/1553)).
+    
+- in `ssrint.v`
+  + lemmas `NegzS` and `Negz_doubleS`
+    ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
+  + lemmas `intrD1`, `intr1D`
+    ([#1515](https://github.com/math-comp/math-comp/pull/1515)).
+
+
+- in `interval-inference.v`
+  + lemmas `nat_spec_sub`, `widen_natitv`, `widen_natitvE`
+    ([#1485](https://github.com/math-comp/math-comp/pull/1485)).
+  + notations `{itv nat & _}`, `{i01 nat}`, `{posnum nat}`,
+    `_%:n01` and `_%:posnat`
+  + lemmas `gtn0`, `neqn0`, `eqn0F` for natural number intervals
+  + hints for `gtn0` and `neqn0`
+    ([#1546](https://github.com/math-comp/math-comp/pull/1546)).
+  + `SubPOrder` instance on `Itv.def`
+    ([#1604](https://github.com/math-comp/math-comp/pull/1604)).
+
+- new file `binnums.v`
+  ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
+
+- in `binnums.v`
+  + definitions `pos_nat`, `int_of_Z`, `Zint`, `rat_of_Q`, `Qrat`,
+    `mask_nat` and `Nnat`
+  + variants `pos_nat_spec`, `Zint_spec`, `Qrat_spec`,
+    `pos_nat_compare_spec` and `Nnat_spec`
+  + lemmas `pos_nat_Pos_to_nat`, `iter_opDdoubler`, `pos_natP`,
+    `pos_nat_ind`, `Pos_to_nat_gt0`, `Pos_to_nat0F`, `pos_nat_exS`,
+    `pos_nat_double`, `pos_nat_doubleS`, `pos_natS`, `pos_natD`,
+    `pos_nat_pred_double`, `pos_natM`, `pos_nat_eq`,
+    `pos_nat_compare`, `pos_nat_le`, `Pos_to_natI`, `Pos_to_nat1`,
+    `Pos_to_nat_double`, `Pos_to_nat_doubleS`, `Pos_to_natS`,
+    `Pos_to_natD`, `Pos_to_nat_pred_double`, `Pos_to_natM`,
+    `Zint_int_of_Z`, `ZintP`, `Zint0`, `Zint_pos`, `Zint_neg`,
+    `Zint_double`, `Zint_succ_double`, `Zint_pred_double`,
+    `Zint_pos_sub`, `ZintD`, `ZintN`, `ZintB`, `ZintM`, `Zint_eq`,
+    `Zint_le`, `Qrat_rat_of_Q`, `QratP`, `Qrat_spec_Q_to_rat`,
+    `Qrat1`, `Qrat_Qmake`, `intr_pos_nat_neq0`, `QratD`, `QratM`,
+    `QratN`, `QratB`, `Qrat_eq`, `Qrat_le`, `QratV`,
+    `pos_nat_compareP` `mask_nat_double_pred`,
+    `mask_nat_double`, `mask_nat_succ_double`, `mask_natB`,
+    `pos_natB`, `Pos_to_natB`, `Pos_sub_mask_Neg`, `Nnat_N_to_nat`,
+    `NnatP`, `Nnat0`, `Nnat_pos`, `NnatD`, `NnatB`, `NnatM`,
+    `Nnat_eq`, `N_to_natI` and `Zint_pow_pos`
+  + multirules `pos_natE`, `Pos_to_natE`, `ZintE` and `NnatE`
+    ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
+
+- new file `ring_tactic.v`
+  ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
+
+- new deprecated file `ring.v`
+  ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
+
+- in `ring_tactic.v`
+  + tactic `ring`
+    ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
+
+- new file `field_tactic.v`
+  ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
+
+- in `field_tactic.v`
+  + tactics `field` and `field?`
+    ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
+
+- new file `arithmetic_tactic.v`
+  ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
+
+- new deprecated file `lra.v`
+  ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
+
+- in `arithmetic_tactic.v`
+  + tactics `lra`, `nra`, `psatz` and `psatz <n>`
+    ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
+
+- in `vector.v`
+  + proper (semi-)vector space structures `nzSemiVectType` and `nzVectType`
+  + mixin `SemiVector_isProper`
+  + lemma `dim_gt0`
+  + canonical `nzSemiVectType` (resp. `nzVectType`) on `R^o` for any
+    `nzSemiRingType` (resp. `nzRingType) `R`
+    ([#1492](https://github.com/math-comp/math-comp/pull/1492),
+    fixes [#1470](https://github.com/math-comp/math-comp/issues/1470)).
+
+- in `falgebra.v`
+  + factory `UnitAlgebra_isFalgebra` for deriving a `falgType R` instance of a
+    type that is canonically a `vectType R` and a `unitAlgType R`
+    ([#1492](https://github.com/math-comp/math-comp/pull/1492),
+    fixes [#1470](https://github.com/math-comp/math-comp/issues/1470)).
+
+- new experimental file `tensor.v`
+  + types `'T[R]_(u_, d_)`, `'T_(u_, d_)` for tensors over `R` with
+    contravariant dimensions `u_` and covariant dimensions `d_`
+    (each a `k.-tuple {posnum nat}`, coerced to `{posnum nat} ^ k`),
+    and shorthands `'nT[R]_(u_)`, `'nT_(u_)` (purely contravariant),
+    `'oT[R]_(d_)`, `'oT_(d_)` (purely covariant), and `'sT[R]`, `'sT`
+    (purely scalar, i.e. `'T[R]_([tuple], [tuple])`), built from the
+    variant `tensor` and its projection `tensor_val`
+  + parsing shorthand notations
+    `'T[R]_[u1, .., uk ; d1, .., dl]`, `'nT[R]_[u1, .., uk]`,
+    `'oT[R]_[d1, .., dl]` expanding to the corresponding
+    `[tuple of u1%:posnat :: .. :: uk%:posnat]`-based forms
+  + bidirectional coercions `finfun_of_tuple : tuple_of >-> finfun_of`
+    and `tuple_of_finfun : finfun_of >-> tuple_of`, letting a
+    `k.-tuple T` and a `{ffun 'I_k -> T}` flow into either context
+    transparently
+  + indexing operations: `nindex`, `oindex`, and `tensor_nil`
+  + tensor definitions `const_t`, `tensor1`, `nstack`, `ostack`,
+    `nstack_tuple`, `ostack_tuple`, `ntensor_of_tuple`,
+    `otensor_of_tuple`, `tuple_of_ntensor`, `tuple_of_otensor`,
+    `matrix_of_tensor`, and `tensor_of_matrix`
+  + tensor-reshaping operator `castt` (and lemmas `val_castt`,
+    `castt_id`, `castt_comp`, `casttK`, `casttKV`), mirroring
+    `castmx` at the tensor level
+  + notation `_ *t _` for the tensor product (`*t%R` for the unary notation)
+  + ring-instance support definitions `unitt`, `invt`
+  + index bijections `tensor_index`, `tensor_unindex`,
+    `tensor_dffun_index`, `tensor_dffun_unindex`, `tensormx_index`,
+    `tensormx_unindex`, `prod_split`, `prod_unsplit`
+  + `subType`, `eqType`, `choiceType`, `countType`, `finType`, `nmodType`,
+    `zmodType`, `lSemiModType`, `lModType` instances inherited from `matrix`,
+    `pzSemiRing`, `pzRing`, `comPzRing`, `nzSemiRing`, `nzRing`,
+    `comNzRing`, and `unitRing` instances (using the Hadamard product),
+    and a `bilinear` instance for the proper tensor product
+  + `nmodMorphism` (over an `nmodType`) and `monoidMorphism` (over a
+    `pzSemiRingType`) instances for `tensor_nil` and for `const_t`,
+    so `raddfD`/`raddfN`/`raddf0` and `rmorphM`/`rmorph1` apply
+    directly to `_.[::]` and to `const_t _`
+  + nil-tensor lemmas `prod_nil`, `ord_prod_nil`, `tensor_nilK`,
+    `const_tK`, `tensor_nil_eqP`, `tensor_nilV`
+  + constant-tensor lemma `const_tV`
+  + index-bijection lemmas `card_fprod_u`, `tensor_indexK`,
+    `tensor_unindexK`, `tensor_index_bij`, `tensor_dffun_indexK`,
+    `tensor_dffun_unindexK`, `tensor_dffun_index_bij`, `tensormx_cast`,
+    `tensormx_indexK`, `tensormx_unindexK`
+  + extensionality and computation lemmas `ntensorP`, `otensorP`,
+    `ntensor_eqP`, `otensor_eqP`, `nstackE`, `ostackE`, `nstack_eqE`,
+    `ostack_eqE`, `nstack_tupleE`, `ostack_tupleE`,
+    `ntensor_of_tupleE`, `otensor_of_tupleE`, `tensor_of_matrixK`,
+    `matrix_of_tensorK`
+  + tensor-product lemmas `prod_fcat`, `prod_card`, `multsDl`,
+    `multsDr`, `mults0l`, `mults0r`, `mults_const`, `multsNl`,
+    `multsNr`, `mults_hmul`, `mults_scale`, `mults_hmul_compat`
+    ([#1535](https://github.com/math-comp/math-comp/pull/1535))
+
+### Changed
+
+- in `monoid.v`
+  + definitions `invg_closed`, `divg_closed`, `group_closed` generalized from
+    `groupType` to `baseGroupType`
+    ([#1433](https://github.com/math-comp/math-comp/pull/1433)).
+  + the `SemiGroup.law` instance on `*%g` generalized to `semigroupType`
+    ([#1507](https://github.com/math-comp/math-comp/pull/1507)).
+
+- in `nmodule.v`
+  + mixin `isOppClosed` generalized from `zmodType` to `baseZmodType`
+  + structures `opprClosed` and `zmodClosed` generalized from `zmodType` to
+    `baseZmodType`
+  + the definition `zmod_closed`, specialized from `baseZmodType` to
+    `zmodType` to avoid non-uniform implicit coercions
+  + the implicit status of `telescope_sumr_eq`, changed to match
+    the old one in `ssralg.v`
+    ([#1433](https://github.com/math-comp/math-comp/pull/1433)).
+  + the `SemiGroup.com_law` instance on `+%R` generalized to `addSemigroupType`
+    ([#1507](https://github.com/math-comp/math-comp/pull/1507)).
+  + moved definitions `Zp0`, `Zp1`, `Zp_add`, `Zp_opp`, `Zp_mul` and `inZp`
+    from `zmodp.v`
+  + moved lemmas `Zp_addA`, `Zp_addC`, `Zp_mulA` , `Zp_mul_addr`,
+    `Zp_mul_addl`, `Zp_inv_out`, `modZp`, `valZpK`, `Zp_add0z`, `Zp_addNz`,
+    `ord1`, `lshift0`, `rshift1` and `split1` from `zmodp.v`
+  + moved the Zmodule instance on `I_p.+1` from `zmodp.v`
+    ([#1523](https://github.com/math-comp/math-comp/pull/1523)).
+
+- in `fintype.v`
+  + moved definitions `Zp_opp`, `Zp_add`, `Zp_mul` from `zmodp.v`
+    ([#1523](https://github.com/math-comp/math-comp/pull/1523)).
+
+- in `order.v`
+  + moved the notations `\max^d_<range>` and `\min^d_<range>` to `preorder.v`
+    ([#1578](https://github.com/math-comp/math-comp/pull/1578) and
+     [#1590](https://github.com/math-comp/math-comp/pull/1590)).
+
+- in `perm.v`
+  + moved definition `lift0_perm` and lemmas `lift0_perm0`, `lift0_perm_lift`,
+    `lift0_permK` and `lift0_perm_eq0` from `zmodp.v`
+    ([#1523](https://github.com/math-comp/math-comp/pull/1523)).
+
+- in `interval.v`
+  + lemmas `real_BSide_min`, `real_BSide_max`, `mem0_itvcc_xNx`,
+    `mem0_itvoo_xNx`, `oppr_itv`, `oppr_itvoo`, `oppr_itvco`,
+    `oppr_itvoc`, `oppr_itvcc` moved to `Num.Theory` in `numdomain.v`
+  + definition `miditv` moved to `Num.Theory` in `numdomain.v`
+  + lemmas `mid_in_itv`, `mid_in_itvoo`, `mid_in_itvcc`, `mem_miditv`,
+    `miditv_le_left`, `miditv_ge_right`, `in_segmentDgt0Pr`,
+    `in_segmentDgt0Pl` moved to `Num.Theory` in `numfield.v`
+  ([#1521](https://github.com/math-comp/math-comp/pull/1521)).
+
+- in `ssralg.v`
+  + the type parameter of `nzLSemiAlgType`, `nzSemiAlgType`, `comNzSemiAlgType`,
+    `subNzLSemiAlgType` and `subNzSemiAlgType`, changed from
+    `pzSemiRingType` to `nzSemiRingType`
+  + the type parameter of `nzLalgType`, `nzAlgType`, `comNzAlgType`,
+    `subNzLalgType` and `subNzAlgType`, changed from `pzRingType` to
+    `nzRingType`
+  + the linear semiring morphism structure `{lrmorphism A -> B}`, generalized to
+    `pzLSemiAlgType`
+  + structure `subalgClosed` generalized to `pzLSemiAlgType`
+  + factory `isSubSemiAlgClosed` generalized to `pzLSemiAlgType`
+  + factories `LSemiAlgebra_isComSemiAlgebra` and `LSemiModule_isComSemiAlgebra`
+    generalized to `pzSemiAlgType`
+  + factories `Lmodule_isLalgebra` and `isSubalgClosed` generalized to
+    `pzLalgType`
+  + factory `Lalgebra_isAlgebra` generalized to `pzAlgType`
+  + factory `Lalgebra_isComAlgebra` generalized to `comPzAlgType`
+  + factory `[SubSemiRing_SubLSemiModule_isSubLSemiAlgebra of V by <:]`
+    generalized to `subPzLSemiAlgType`
+  + factory `[SubRing_SubLmodule_isSubLalgebra of V by <:]` generalized to
+    `subPzLalgType`
+  + factory `[SubLSemiAlgebra_isSubSemiAlgebra of V by <:]` generalized to
+    `subPzSemiAlgType`
+  + factory `[SubLalgebra_isSubAlgebra of V by <:]` generalized to
+    `subPzAlgType`
+  + definitions `subsemialg_closed`, `scale_fun` and `in_alg` generalized to
+    `pzLSemiAlgType`
+  + definition `subalg_closed` generalized to `pzLalgType`
+  + lemmas `mulr_algl`, `subsemialg_closedZ`, `subsemialg_closedM`,
+    `rmorph_alg` and `subsemialgClosedP` generalized to `pzLSemiAlgType`
+  + lemmas `scalerCA`, `mulr_algr`, `comm_alg`, `exprZn`, `scaler_prod`,
+    `scaler_prodl` and `scaler_prodr` generalized to `pzSemiAlgType`
+  + lemmas `subalg_closedZ`, `subalg_closedBM`, `subalg_closed_semi`,
+    `subsemialg_closed_subalg`, `subsemialg_closedBM` and `subalgClosedP`
+    generalized to `pzLalgType`
+    ([#1482](https://github.com/math-comp/math-comp/pull/1482),
+    fixes [#1386](https://github.com/math-comp/math-comp/issues/1386)).
+
+- file `ssralg.v` is split into the following four files in `algebra/algebraic_hierarchy/`:
+  + `rings_modules_and_algebras.v` contains the (semi)ring, (semi)module, and (semi)algebra
+    structures below `unitRingType`, their morphisms, and their theory.
+  + `divalg.v` contains the structures with (partial) multiplicative inverse
+    `GRing.inv` (`unitRingType`, `comUnitRingType`, `unitAlgType`,
+    `comUnitAlgType`, `idomainType`, and `fieldType`) and their theory.
+  + `decfield.v` contains the reflection of the first order theory of rings
+    (`GRing.term`, `GRing.formula`, etc.), decidable fields (`decFieldType`),
+    algebraically closed fields (`closedFieldType`), and their theory.
+  + `ssralg.v` re-exports the contents of the above three files to provide the
+    compatibility layer for the old `ssralg.v`.
+  + NB: Users are encouraged to import only what they need among the new files
+    `algebra.v`, `divalg.v`, and `decfield.v` instead of importing `ssralg.v`.
+    However, users need to pay attention to the following points in porting
+    their code to the new files:
+    * The new files, e.g., `divalg.v`, do not re-export their dependencies,
+      e.g., `algebra.v` and `nmodule.v`. Users need to explicitly import the
+      files they need.
+    * Each of the new files provides `GRing` and `GRing.Theory` modules as in the
+      old `ssralg.v`, the `GRing.Theory` modules re-export the other
+      `GRing.Theory` modules that the former ones depend on. Therefore,
+      importing `GRing.Theory` without any qualifier (e.g., not
+      `divalg.GRing.Theory`) should suffice to import all the required
+      results, *given that the libraries are imported in the dependency order*
+      (`nmodule.v`, `algebra.v`, `divalg.v`, and then `decfield.v`).
+    * All the declarations deprecated at this point are moved to `ssralg.v`.
+      Therefore, all the deprecation warning messages rooted from `ssralg.v`
+      have to be addressed before removing the import of `ssralg.v`
+    ([#1504](https://github.com/math-comp/math-comp/pull/1504)).
+
+- in `orderedzmod.v`
+  + definitions `pos_num_pred`, `pos_num`, `neg_num_pred`, `neg_num`,
+    `nneg_num_pred`, `nneg_num`, `npos_num_pred`, `npos_num`,
+    `real_num_pred` and `real_num` generalized from `porderZmodType`
+    to `porderNmodeType`
+  + lemmas `subr_ge0`, `oppr_ge0`, `le0r`, `addr_ge0`, `posrE`,
+    `nnegrE`, `realE`, `negrE`, `nposrE`, `lt0r`, `lt0r_neq0`,
+    `ltr0_neq0`, `big_real`, `subr_gt0`, `subr_le0`, `subr_lt0`,
+    `comparable0r`, `comparabler0`, `subr_comparable0`,
+    `comparablerE`, `lerN2`, `lerNr`, `ltrNr`, `lerNl`, `ltrNl`,
+    `oppr_gt0`, `oppr_le0`, `oppr_lt0`, `gtrN`, `ge0_cp`, `gerN`,
+    `gt0_cp`, `le0_cp`, `lt0_cp`, `ger0_real`, `ler0_real`,
+    `gtr0_real`, `ltr0_real`, `real0`, `lerD2l`, `lerD2r`, `ltrD2l`,
+    `ltrD2r`, `lerD`, `ler_ltD`, `ltr_leD`, `ltrD`, `lerB`, `ler_ltB`,
+    `ltr_leB`, `ltrB`, `lerBlDr`, `ltrBlDr`, `lerBrDr`, `ltrBrDr`,
+    `lerBlDl`, `ltrBlDl`, `lerBrDl`, `ltrBrDl`, `lerDl`, `ltrDl`,
+    `lerDr`, `ltrDr`, `gerDl`, `gerBl`, `gtrDl`, `gtrBl`, `gerDr`,
+    `gtrDr`, `ler_wpDl`, `ltr_wpDl`, `ltr_pwDl`, `ltr_pDl`,
+    `ler_wnDl`, `ltr_wnDl`, `ltr_nwDl`, `ltr_nDl`, `ler_wpDr`,
+    `ltr_wpDr`, `ltr_pwDr`, `ltr_pDr`, `ler_wnDr`, `ltr_wnDr`,
+    `ltr_nwDr`, `ltr_nDr`, `paddr_eq0`, `naddr_eq0`, `addr_ss_eq0`,
+    `sumr_ge0`, `sumr_le0`, `ler_sum`, `ler_sum_nat`, `ltr_sum`,
+    `ltr_sum_nat`, `psumr_eq0`, `psumr_eq0P`, `psumr_neq0`,
+    `psumr_neq0P`, `ler_pMn2l`, `ltr_pMn2l`, `ler_nMn2l`, `ltr_nMn2l`,
+    `ler_wpMn2l`, `ler_wnMn2l`, `ltr_wpMn2r`, `ler_wMn2r`,
+    `mulrn_wge0`, `mulrn_wle0`, `lteifNl`, `lteifNr`, `lteif0Nr`,
+    `lteifNr0`, `lteifN2`, `lteifD2l`, `lteifD2r`, `lteifBlDr`,
+    `lteifBrDr`, `lteifBlDl`, `lteifBrDl`, `addr_min_max`,
+    `addr_max_min`, `minr_to_max` and `maxr_to_min` generalized from
+    `numDomainType` to `porderedZmodType`
+  + multirules `subr_lte0`, `subr_gte0`, `subr_cp0`, `lterNr`,
+    `lterNl`, `oppr_gte0`, `oppr_lte0`, `oppr_cp0`, `lterNE`, `lerD2`,
+    `ltrD2`, `lterD2`, `lerBDr`, `ltrBDr`, `lterBDr`, `lerBDl`,
+    `ltrBDl`, `lterBDl`, `cprD`, `lteifD2`, `lteifBDr` and `lteifBDl`
+    generalized from `numDomainType` to `porderedZmodType`
+  + lemmas `sum_real`, `comparabler_trans`, `ler_leVge`, `real_leVge`,
+    `real_comparable`, `realB`, `realN`, `realBC`, `realD`,
+    `real_ltNge`, `real_leNgt`, `max_real`, `min_real`, `bigmax_real`,
+    `bigmin_real`, `real_neqr_lt`, `lerB_real`, `gerB_real`,
+    `ler_real`, `ger_real`, `Nreal_leF`, `Nreal_geF`, `Nreal_ltF`,
+    `Nreal_gtF`, `real_wlog_ler`, `real_wlog_ltr`, `real_mono`,
+    `real_nmono`, `real_mono_in`, `real_nmono_in`, `realn_mono`,
+    `realn_nmono`, `realn_mono_in`, `realn_nmono_in`, `ger_leVge`,
+    `real_oppr_max`, `real_oppr_min`, `real_addr_minl`,
+    `real_addr_minr`, `real_addr_maxl` and `real_addr_maxr`
+    generalized from `numDomainType` to `numZmodType`
+    ([#1520](https://github.com/math-comp/math-comp/pull/1520)).
+
+- in `matrix.v`
+  + `pzLSemiAlgType`, `pzLalgType`, `pzSemiAlgType` and `pzAlgType` instances on
+    matrices generalized to potentially-zero (semi)rings and the case where the
+    size is potentially zero
+    ([#1482](https://github.com/math-comp/math-comp/pull/1482),
+    fixes [#1386](https://github.com/math-comp/math-comp/issues/1386)).
+
+- in `vector.v`
+  + the non-zero (semi)ring and (semi)algebra structures on `'End(vT)`
+    are now canonical
+    ([#1492](https://github.com/math-comp/math-comp/pull/1492),
+    fixes [#1470](https://github.com/math-comp/math-comp/issues/1470)).
+
+- in `spectral.v`
+  + notation `_ ^t*` moved from level 30 (right associative)
+    to lvel 29 (left associative)
+    ([#1490](https://github.com/math-comp/math-comp/pull/1490)).
+
+- in `falgebra.v`
+  + `falgType` now inherits from `nzVectType`
+    ([#1492](https://github.com/math-comp/math-comp/pull/1492),
+    fixes [#1470](https://github.com/math-comp/math-comp/issues/1470)).
+
+### Renamed
+
+- package `fingroup` -> `finite-group`
+  ([#1581](https://github.com/math-comp/math-comp/pull/1581)).
+
+- package `character` -> `group-representation`
+  ([#1581](https://github.com/math-comp/math-comp/pull/1581)).
+
+- files
+  + `all_boot.v` -> `boot.v`
+  + `all_fingroup.v` -> `finite_group.v`
+  + `all_algebra.v` -> `algebra.v`
+  + `all_solvable.v` -> `solvable.v`
+  + `all_field.v` -> `field.v`
+  + `all_character.v` -> `group_representation.v`
+    ([#1582](https://github.com/math-comp/math-comp/pull/1582)).
+
+- in `algebra/`
+  + The `num_theory/` directory has been moved to `numeric_hierachy/`
+    ([#1547](https://github.com/math-comp/math-comp/pull/1547)).
+
+- in `rings_modules_and_algebras.v`
+  + `addr_closed` -> `nmod_closed`
+  + Note that the deprecation abbreviation for the legacy `addr_closed` is
+    declared only in `ssralg.v`
+    ([#1551](https://github.com/math-comp/math-comp/pull/1551)).
+
+- in `ssralg.v`
+  + `lSemiAlgType` -> `nzLSemiAlgType`
+  + `lalgType` -> `nzLalgType`
+  + `semiAlgType` -> `nzSemiAlgType`
+  + `algType` -> `nzAlgType`
+  + `comSemiAlgType` -> `comNzSemiAlgType`
+  + `comAlgType` -> `comNzAlgType`
+  + `subLSemiAlgType` -> `subNzLSemiAlgType`
+  + `subLalgType` -> `subNzLalgType`
+  + `subSemiAlgType` -> `subNzSemiAlgType`
+  + `subAlgType` -> `subNzAlgType`
+  + `[SubNzSemiRing_SubLSemiModule_isSubLSemiAlgebra of U by <:]` ->
+    `[SubSemiRing_SubLSemiModule_isSubLSemiAlgebra of U by <:]`
+  + `[SubNzRing_SubLmodule_isSubLalgebra of U by <:]` ->
+    `[SubRing_SubLmodule_isSubLalgebra of U by <:]`
+  + `[SubChoice_isSubLSemiAlgebra of U by <:]` ->
+    `[SubChoice_isSubNzLSemiAlgebra of U by <:]`
+  + `[SubChoice_isSubLalgebra of U by <:]` ->
+    `[SubChoice_isSubNzLalgebra of U by <:]`
+  + `[SubChoice_isSubSemiAlgebra of U by <:]` ->
+    `[SubChoice_isSubNzSemiAlgebra of U by <:]`
+  + `[SubChoice_isSubAlgebra of U by <:]` ->
+    `[SubChoice_isSubNzAlgebra of U by <:]`
+    ([#1482](https://github.com/math-comp/math-comp/pull/1482),
+    fixes [#1386](https://github.com/math-comp/math-comp/issues/1386)).
+
+- in `finalg.v`
+  + `finLalgType` -> `finNzLalgType`
+  + `finAlgType` -> `finNzAlgType`
+    ([#1482](https://github.com/math-comp/math-comp/pull/1482),
+    fixes [#1386](https://github.com/math-comp/math-comp/issues/1386)).
+
+- in `matrix.v`
+  + `mxOver_add_subproof` -> `mxOver_nmod_closed`
+    ([#1551](https://github.com/math-comp/math-comp/pull/1551)).
+
+- in `poly.v`
+  + `polyOver_addr_closed` -> `polyOver_nmod_closed`
+    ([#1551](https://github.com/math-comp/math-comp/pull/1551)).
+
+- in `orderedzmod.v`
+  + `POrderedZmodule` -> `POrderZmodule`
+    ([#1520](https://github.com/math-comp/math-comp/pull/1520)).
+  + `nneg_addr_closed` -> `nneg_nmod_closed`
+  + `real_addr_closed` -> `real_nmod_closed`
+    ([#1551](https://github.com/math-comp/math-comp/pull/1551)).
+
+- in `numdomain.v`
+  + `real_addr_closed` -> `real_nmod_closed`
+    ([#1551](https://github.com/math-comp/math-comp/pull/1551)).
+
+- in `character.v`
+  + `add_char` -> `char_nmod_closed`
+    ([#1551](https://github.com/math-comp/math-comp/pull/1551)).
+
+### Removed
+
+- in `ssreflect.v`
+  + `Global Set SsrOldRewriteGoalsOrder`, for a smooth transition, we recommend adding
+    `Set SsrOldRewriteGoalsOrder.  (* change Set to Unset when porting the file, then remove the line when requiring MathComp >= 2.6 *)`
+    in each of your files after requiring `ssreflect.v` (even indirectly), which will enable
+    porting to the new rewrite subgoals order on a file per file basis
+    ([#1545](https://github.com/math-comp/math-comp/pull/1545)).
+
+- in `rings_modules_and_algebras.v`
+  + factories `SubZmodule_isSubPzRing`, `SubZmodule_isSubNzRing`
+    ([#1586](https://github.com/math-comp/math-comp/pull/1586))
+
+- in `ssralg.v`, the following constants and abbreviations have been removed
+  from the `GRing` module in favor of `nmodule.v`, but they are still reexported
+  from the `GRing.Theory` module:
+  + lemmas `addrA`, `addrC`, `add0r`, `addr0`, `addrCA`, `addrAC`, `addrACA`,
+    `mulr0n`, `mulr1n`, `mulr2n`, `mulrS`, `mulrSr`, `mulrb`, `mul0rn`,
+    `mulrnDl`, `mulrnDr`, `mulrnA`, `mulrnAC`, `iter_addr`, `iter_addr_0`,
+    `sumrMnl`, `sumrMnr`, `sumr_const`, `sumr_const_nat`, `addNr`, `addrN`,
+    `subrr`, `addKr`, `addNKr`, `addrK`, `addrNK`, `subrK`, `subrKC`, `subKr`,
+    `addrI`, `addIr`, `subrI`, `subIr`, `opprK`, `oppr_inj`, `oppr0`,
+    `oppr_eq0`, `subr0`, `sub0r`, `opprB`, `opprD`, `addrKA`, `subrKA`,
+    `addr0_eq`, `subr0_eq`, `addr_eq0`, `eqr_opp`, `eqr_oppLR`, `mulNrn`,
+    `mulrnBl`, `mulrnBr`, `sumrN`, `sumrB`, `telescope_sumr`,
+    `telescope_sumr_eq`, `zmod_closedN`, `rpred0D`, `zmodClosedP`
+  + definitions `oppr_closed`, `zmod_closed`, `addrClosed`, `opprClosed`
+    ([#1433](https://github.com/math-comp/math-comp/pull/1433),
+    fixes [#1478](https://github.com/math-comp/math-comp/issues/1478)).
+
+### Deprecated
+
+- in `bigop.v`, deprecated `oAC`, `oACE`, `some_big_AC_mk_monoid`, and 
+    `big_AC_mk_monoid`.
+    ([#1608](https://github.com/math-comp/math-comp/pull/1608)).
+
+- in `preorder.v`
+  + lemma `ltrW_lteif`, use `lteifS` instead
+    ([#1493](https://github.com/math-comp/math-comp/pull/1493),
+    fixes [#1488](https://github.com/math-comp/math-comp/issues/1488)).
+
+- in `ssralg.v`
+  + lemma `zmod_closedD`, use `zmod_closed0D` in `nmodule.v` instead
+  + definition `subr_2closed`, use `subr_closed` in `nmodule.v` instead
+    ([#1433](https://github.com/math-comp/math-comp/pull/1433)).
+  + factory `Lmodule_isLalgebra`, use `LSemiModule_isLSemiAlgebra` instead
+  + factory `PzSemiRing_hasCommutativeMul`, use `SemiRing_hasCommutativeMul`
+    instead
+  + factory `Ring_hasCommutativeMul`, use `SemiRing_hasCommutativeMul` instead
+  + factory `PzRing_hasCommutativeMul`, use `SemiRing_hasCommutativeMul` instead
+  + factory `Lalgebra_isAlgebra`, use `LSemiAlgebra_isSemiAlgebra` instead
+  + factory `Lalgebra_isComAlgebra`, use `LSemiAlgebra_isComSemiAlgebra` instead
+  + factory `[SubPzSemiRing_isSubComPzSemiRing of U by <:]`,
+    use `[SubSemiRing_isSubComSemiRing of U by <:]` instead
+  + factory `[SubNzSemiRing_isSubComNzSemiRing of U by <:]`,
+    use `[SubSemiRing_isSubComSemiRing of U by <:]` instead
+  + factory `[SubPzRing_isSubComPzRing of U by <:]`,
+    use `[SubSemiRing_isSubComSemiRing of U by <:]` instead
+  + factory `[SubNzRing_isSubComNzRing of U by <:]`,
+    use `[SubSemiRing_isSubComSemiRing of U by <:]` instead
+  + factory `[SubZmodule_isSubLmodule of U by <:]`,
+    use `[SubNmodule_isSubLSemiModule of U by <:]` instead
+  + factory `[SubLalgebra_isSubAlgebra of U by <:]`,
+    use `[SubLSemiAlgebra_isSubSemiAlgebra of U by <:]` instead
+    ([#1475](https://github.com/math-comp/math-comp/pull/1475)).
+  + `lalgMixin`, use `[ SubSemiRing_SubLSemiModule_isSubLSemiAlgebra of U by <: ]` instead
+  + `comRingMixin`, use `[ SubSemiRing_isSubComSemiRing of U by <: ]` instead
+  + `algMixin`, use `[ SubLSemiAlgebra_isSubSemiAlgebra of U by <: ]` instead
+    ([#1504](https://github.com/math-comp/math-comp/pull/1504)).
+
+- in `vector.v`
+  + `lfun_comp_nzRingType`
+  + `lfun_nzRingType`
+  + `lfun_lalgType`
+  + `lfun_algType`
+    ([#1492](https://github.com/math-comp/math-comp/pull/1492),
+    fixes [#1470](https://github.com/math-comp/math-comp/issues/1470)).
+
+- file `ring.v`
+  use `ring_tactic.v` instead
+  ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
+
+- file `lra.v`
+  use `arithmetic_tactic.v` instead
+  ([#1456](https://github.com/math-comp/math-comp/pull/1456)).
+
+- in `falgebra.v`
+  + lemma `FalgType_proper`, use `dim_gt0` instead
+    ([#1492](https://github.com/math-comp/math-comp/pull/1492),
+    fixes [#1470](https://github.com/math-comp/math-comp/issues/1470)).
 
 ## [2.5.0] - 2025-10-13
 

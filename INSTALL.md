@@ -19,13 +19,13 @@ Once your OPAM environment is configured
 you can install any math-comp package via
 ```
 opam repo add rocq-released https://rocq-prover.org/opam/released
-opam pin add -n rocq-core -k version 9.0.0
+opam pin add -n rocq-core -k version 9.1.0
 opam install rocq-core -j3
 opam install rocq-mathcomp-boot -j3
 ```
 Replace `boot` here by the package you want, the dependencies will be
 installed automatically. We recommend pinning a particular version of Rocq
-(we give `9.0.0` as an example, see `CHANGELOG.md` for the supported versions).
+(we give `9.1.0` as an example, see `CHANGELOG.md` for the supported versions).
 To get the latest development version you need to execute the following:
 ```
 opam repo add rocq-extra-dev https://rocq-prover.org/opam/extra-dev
@@ -84,9 +84,9 @@ this file `INSTALL.md`) and that you have OPAM installed and
 configured with the standard Coq repositories.
 
 First, we recommend pinning a particular version of Coq
-(e.g. `9.0.0`):
+(e.g. `9.1.0`):
 ```
-opam pin add -n rocq-core -k version 9.0.0
+opam pin add -n rocq-core -k version 9.1.0
 ```
 
 Then for each math-comp package, pin the `opam` file:
