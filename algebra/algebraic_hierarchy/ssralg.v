@@ -570,7 +570,7 @@ Notation "[ 'SubChoice_isSubSemiAlgebra' 'of' U 'by' <: ]" :=
 #[deprecated(since="mathcomp 2.6.0",
              note="Use [ SubChoice_isSubNzAlgebra of U by <: ] instead.")]
 Notation "[ 'SubChoice_isSubAlgebra' 'of' U 'by' <: ]" :=
-  (SubChoice_isSubNzAlgebra.Build _ _ _ U (subalgClosedP _))
+  (SubChoice_isSubNzAlgebra.Build _ _ _ U (subsemialgClosedP _))
   (format "[ 'SubChoice_isSubAlgebra'  'of'  U  'by'  <: ]")
  : form_scope.
 #[deprecated(since="mathcomp 2.4.0",
