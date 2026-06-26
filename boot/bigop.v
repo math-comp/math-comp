@@ -2023,13 +2023,11 @@ rewrite map_cat -!map_comp (map_comp (addn m)) /=.
 by rewrite ![index_enum _]unlock unlock !val_ord_enum -iotaDl addn0 iotaD.
 Qed.
 
-Lemma big_fcat n m (F : R ^ n) (G : R ^ m) :
-  \big[*%M/1]_(i < n + m) (F +++ G) i =
-    (\big[*%M/1]_(i < n) F i) * (\big[*%M/1]_(i < m) G i).
+Lemma big_cat_ordfun m n (F : R ^ m) (G : R ^ n) :
+  \big[*%M/1]_i cat_ordfun F G i = (\big[*%M/1]_i F i) * (\big[*%M/1]_i G i).
 Proof.
-rewrite big_split_ord; congr (_ * _); apply: eq_bigr => i _.
-  by rewrite fcat_lshift.
-by rewrite fcat_rshift.
+by rewrite big_split_ord; congr (_ * _);
+   apply: eq_bigr => ?; rewrite ?cat_lrshift.
 Qed.
 
 Lemma big_flatten I rr (P : pred I) F :

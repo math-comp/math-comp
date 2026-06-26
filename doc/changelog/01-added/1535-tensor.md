@@ -1,4 +1,4 @@
-- new file `algebra/tensor.v`
+- experimental new library `algebra/tensor.v`
   + types `'T[R]_(u_, d_)`, `'T_(u_, d_)` for tensors over `R` with
     contravariant dimensions `u_` and covariant dimensions `d_`
     (each a `k.-tuple {posnum nat}`, coerced to `{posnum nat} ^ k`),
@@ -22,9 +22,7 @@
   + tensor-reshaping operator `castt` (and lemmas `val_castt`,
     `castt_id`, `castt_comp`, `casttK`, `casttKV`), mirroring
     `castmx` at the tensor level
-  + Hadamard (element-wise) product `hmul` and tensor product `mults`
-    (both without notation), with `*%R` interpreted as the Hadamard
-    product on tensors
+  + notation `_ *t _` for the tensor product (`*t%R` for the unary notation)
   + ring-instance support definitions `unitt`, `invt`
   + index bijections `tensor_index`, `tensor_unindex`,
     `tensor_dffun_index`, `tensor_dffun_unindex`, `tensormx_index`,
@@ -54,11 +52,13 @@
     `multsDr`, `mults0l`, `mults0r`, `mults_const`, `multsNl`,
     `multsNr`, `mults_hmul`, `mults_scale`, `mults_hmul_compat`
 - in `boot/finfun.v`
-  + concatenation `fcat : T ^ n -> T ^ m -> T ^ (n + m)` of finite
-    functions over ordinals, with infix notation `f +++ g` and
-    computation lemmas `fcat_lshift` and `fcat_rshift`
+  + definition `cat_fun : forall A B : finType, (A -> T) -> (B -> T) -> (A + B -> T)`
+  + lemmas `cat_inl` and `cat_inr`
+  + definition `cat_ordfun : forall T (m n : nat), T ^ m -> T ^ n -> T ^ (m + n)`
+  + lemmas `cat_lshift`, `cat_rshift`, `cat_ordfunK` and `cat_ordfun_comp`
+  + multirule `cat_lrshift`
 - in `boot/bigop.v`
-  + lemma `big_fcat` for splitting `\big[op/idx]_(i < n + m) (F +++ G) i`
+  + lemma `big_cat_ordfun` for splitting `\big[op/idx]_(i < n + m) (F +++ G) i`
     into the product of the `n`- and `m`-indexed sub-bigops
 - in `boot/ssrnat.v`
   + lemma `ltn_leq_trans`

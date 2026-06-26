@@ -18,7 +18,6 @@ From mathcomp Require Import fintype tuple.
 (* --> More generally, {ffun fT} is always structurally positive.             *)
 (*    fcat f g == concatenation of f : T ^ n and g : T ^ m as a finfun        *)
 (*               of type T ^ (n + m)    *)
-(*      f +++ g := fcat f g                                *)
 (*   {ffun fT} inherits combinatorial structures of rT, i.e., eqType,         *)
 (* choiceType, countType, and finType. However, due to some limitations of    *)
 (* the Coq 8.9 unification code the structures are only inherited in the      *)
@@ -84,8 +83,6 @@ From mathcomp Require Import fintype tuple.
 Set Implicit Arguments.
 Unset Strict Implicit.
 Unset Printing Implicit Defensive.
-
-Reserved Notation "f +++ g" (at level 60, right associativity).
 
 Section Def.
 
@@ -297,20 +294,46 @@ End FinFunTuple.
 
 Section FinFunCat.
 
-Context {T : Type} {n m : nat}.
+Context {T : Type} {A B : finType}.
 
-Definition fcat (f : T ^ n) (g : T ^ m) : T ^ (n + m) :=
-  [ffun i => match split i with inl j => f j | inr j => g j end].
+Definition cat_fun (f : A -> T) (g : B -> T) : A + B -> T :=
+  fun i => match i with inl j => f j | inr j => g j end.
 
-Lemma fcat_lshift f g j : fcat f g (lshift m j) = f j.
-Proof. by rewrite ffunE (unsplitK (inl _ _)). Qed.
+Lemma cat_inl f g j : cat_fun f g (inl j) = f j.
+Proof. by []. Qed.
 
-Lemma fcat_rshift f g j : fcat f g (rshift n j) = g j.
-Proof. by rewrite ffunE (unsplitK (inr _ _)). Qed.
+Lemma cat_inr f g j : cat_fun f g (inr j) = g j.
+Proof. by []. Qed.
 
 End FinFunCat.
 
-Infix "+++" := fcat.
+Section OrdFunCat.
+Context {T : Type} {m n : nat}.
+
+Definition cat_ordfun (f : T ^ m) (g : T ^ n) : T^(m + n) :=
+  finfun (cat_fun f g \o split).
+
+Lemma cat_lshift f g j : cat_ordfun f g (lshift n j) = f j.
+Proof. by rewrite ffunE/= (unsplitK (inl _ _)). Qed.
+
+Lemma cat_rshift f g j : cat_ordfun f g (rshift m j) = g j.
+Proof. by rewrite ffunE/= (unsplitK (inr _ _)). Qed.
+
+Definition cat_lrshift := (@cat_lshift, @cat_rshift).
+
+End OrdFunCat.
+
+Lemma cat_ordfunK {m n} :
+  cat_ordfun (finfun (@lshift m n)) (finfun (@rshift _ _)) =1 id.
+Proof.
+by move=> i; case: (split_ordP i) => //= {}i ->; rewrite ?cat_lrshift ?ffunE.
+Qed.
+
+Lemma cat_ordfun_comp {m n S T} (f : S ^ m) (g : S ^ n) (h : S -> T) :
+  cat_ordfun (finfun (h \o f)) (finfun (h \o g)) =1 h \o cat_ordfun f g.
+Proof.
+by move=> i; case: (split_ordP i) => //= {}i ->; rewrite ?cat_lrshift ?ffunE.
+Qed.
 
 Section FunPlainTheory.
 
