@@ -202,13 +202,19 @@ Local Open Scope group_scope.
 Import GRing.Theory.
 Local Open Scope ring_scope.
 
+#[warning="-level-0-notation-not-closed"]
 Reserved Notation "''M_' n"     (at level 0, n at level 2, format "''M_' n").
+#[warning="-level-0-notation-not-closed"]
 Reserved Notation "''rV_' n"    (at level 0, n at level 2, format "''rV_' n").
+#[warning="-level-0-notation-not-closed"]
 Reserved Notation "''cV_' n"    (at level 0, n at level 2, format "''cV_' n").
 Reserved Notation "''M_' ( n )". (* only parsing *)
 Reserved Notation "''M_' ( m , n )" (format "''M_' ( m ,  n )").
+#[warning="-level-0-notation-not-closed"]
 Reserved Notation "''M[' R ]_ n"    (at level 0, n at level 2). (* only parsing *)
+#[warning="-level-0-notation-not-closed"]
 Reserved Notation "''rV[' R ]_ n"   (at level 0, n at level 2). (* only parsing *)
+#[warning="-level-0-notation-not-closed"]
 Reserved Notation "''cV[' R ]_ n"   (at level 0, n at level 2). (* only parsing *)
 Reserved Notation "''M[' R ]_ ( n )". (* only parsing *)
 Reserved Notation "''M[' R ]_ ( m , n )". (* only parsing *)

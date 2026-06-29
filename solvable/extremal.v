@@ -55,9 +55,13 @@ Local Notation "n %:R" := (n %:R%R).
 Local Open Scope group_scope.
 Import GRing.Theory.
 
+#[warning="-level-0-notation-not-closed"]
 Reserved Notation "''Mod_' m" (at level 0, m at level 2, format "''Mod_' m").
+#[warning="-level-0-notation-not-closed"]
 Reserved Notation "''D_' m" (at level 0, m at level 2, format "''D_' m").
+#[warning="-level-0-notation-not-closed"]
 Reserved Notation "''SD_' m" (at level 0, m at level 2, format "''SD_' m").
+#[warning="-level-0-notation-not-closed"]
 Reserved Notation "''Q_' m" (at level 0, m at level 2, format "''Q_' m").
 
 Module Extremal.

@@ -167,6 +167,9 @@ Unset Printing Implicit Defensive.
 
 Declare Scope fin_quant_scope.
 
+#[warning="-level-0-notation-not-closed"]
+Reserved Notation "''I_' n" (at level 0, n at level 2, format "''I_' n").
+
 Definition finite_axiom (T : eqType) e :=
   forall x : T, count_mem x e = 1.
 
@@ -1769,8 +1772,7 @@ HB.instance Definition _ := isFinite.Build ordinal
 
 End OrdinalSub.
 
-Notation "''I_' n" := (ordinal n)
-  (at level 0, n at level 2, format "''I_' n").
+Notation "''I_' n" := (ordinal n).
 
 #[global] Hint Resolve ltn_ord : core.
 

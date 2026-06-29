@@ -152,6 +152,7 @@ Notation "''A_' ( m , n )" := 'M_(m, n ^ 2)
 
 Notation "''A_' ( n )" := 'A_(n ^ 2, n) (only parsing) : type_scope.
 
+#[warning="-level-0-notation-not-closed"]
 Notation "''A_' n" := 'A_(n)
   (at level 0, n at level 0, format "''A_' n") : type_scope.
 
@@ -160,6 +161,7 @@ Notation "''A' [ F ]_ ( m , n )" := 'M[F]_(m, n ^ 2)
 
 Notation "''A' [ F ]_ ( n )" := 'A[F]_(n ^ 2, n) (only parsing) : type_scope.
 
+#[warning="-level-0-notation-not-closed"]
 Notation "''A' [ F ]_ n" := 'A[F]_(n) (n at level 2, only parsing) : type_scope.
 
 Delimit Scope matrix_set_scope with MS.

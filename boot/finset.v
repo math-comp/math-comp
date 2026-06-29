@@ -1161,6 +1161,7 @@ Definition preimset (aT : finType) rT f (R : mem_pred rT) :=
 
 Notation "f @^-1: A" := (preimset f (mem A)) (at level 24) : set_scope.
 Notation "f @: A" := (imset f (mem A)) (at level 24) : set_scope.
+#[warning="-postfix-notation-not-level-1"]
 Notation "f @2: ( A , B )" := (imset2 f (mem A) (fun _ => mem B))
   (at level 24, format "f  @2:  ( A ,  B )") : set_scope.
 

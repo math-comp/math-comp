@@ -16,5 +16,7 @@
 # introduced in Rocq 9.2
 -arg -w -arg +level-tolerance
 -arg -w -arg -notation-for-abbreviation
+-arg -w -arg -deprecated-lookup-elim-by-name
+-arg -w -arg -implicit-create-rewrite-hint-db
 # introduced in Rocq 9.3
 -arg -w -arg -rewrite-rw

@@ -49,6 +49,7 @@ Import GRing.Theory.
 
 Reserved Notation "p ^{1+2}" (format "p ^{1+2}").
 Reserved Notation "p ^{1+2* n }" (n at level 2, format "p ^{1+2* n }").
+#[warning="-level-0-notation-not-closed"]
 Reserved Notation "''D^' n" (at level 0, n at level 2, format "''D^' n").
 Reserved Notation "''D^' n * 'Q'" (format "''D^' n * 'Q'").
 
