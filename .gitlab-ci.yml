@@ -76,9 +76,6 @@ variables:
     variables:
       - $CRON_MODE == "nightly"
 
-rocq-prover_9.0:
-  extends: .opam-build-once
-
 rocq-prover_9.1:
   extends: .opam-build-once
 
@@ -142,11 +139,6 @@ rocq-prover_dev:
 .test-rocq-once:
   extends: .test-once
   image: "${CI_REGISTRY_IMAGE}:${CI_PIPELINE_IID}_${CI_COMMIT_REF_SLUG}_rocq-prover-${COQ_VERSION}"
-
-test-rocq-prover-9.0:
-  extends: .test-rocq-once
-  variables:
-    COQ_VERSION: "9.0"
 
 test-rocq-prover-9.1:
   extends: .test-rocq-once
@@ -391,9 +383,6 @@ test-rocq-prover-dev:
       - schedules
     variables:
       - $CRON_MODE == "nightly"
-
-mathcomp-dev_rocq-prover-9.0:
-  extends: .docker-deploy-once
 
 mathcomp-dev_rocq-prover-9.1:
   extends: .docker-deploy-once
