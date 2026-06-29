@@ -150,15 +150,5 @@ with builtins; with (import <nixpkgs> {}).lib;
       hierarchy-builder.job = true;
       ConCert.job = false;
     }; };
-    "rocq-9.0" = { rocqPackages = common-bundles // {
-      rocq-core.override.version = "9.0";
-      micromega-plugin.override.version = "master";
-      micromega-plugin.job = false;
-    }; coqPackages = coq-common-bundles // {
-      coq.override.version = "9.0";
-      coq-elpi.job = true;
-      hierarchy-builder.job = true;
-      odd-order.job = false;  # odd-order dropped support for 9.0
-    }; };
   };
 }
