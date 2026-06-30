@@ -86,6 +86,7 @@ move=> n_gt0 AB_comm; have [] := @common_eigenvector _ _ [:: A; B] n_gt0.
 by move=> v v_neq0 /allP vP; exists v; rewrite ?vP ?(mem_head, in_cons, orbT).
 Qed.
 
+#[warning="-postfix-notation-not-level-1"]
 Notation "M ^t*" := (M ^t conjC) (at level 29, left associativity)
   : sesquilinear_scope.
 Notation realmx := (mxOver Num.real).

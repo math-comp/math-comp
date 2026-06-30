@@ -140,7 +140,7 @@ Notation "x ^+ n" := (Exp x n)
   (in custom group_presentation at level 29, n constr at level 28).
 Notation "x ^ y" := (Conj x y)
   (in custom group_presentation at level 30, right associativity).
-Notation "x ^-1" := (Inv x) (in custom group_presentation at level 3).
+Notation "x ^-1" := (Inv x) (in custom group_presentation at level 1).
 Notation "x ^- n" := (Inv (Exp x n))
   (in custom group_presentation at level 29, n constr at level 28).
 Notation "[ ~ x1 , x2 , .. , xn ]" := (Comm .. (Comm x1 x2) .. xn)
@@ -154,6 +154,7 @@ Notation "( p )" := p (in custom group_presentation, p at level 200).
 Notation "1" := Idx (in custom group_presentation).
 Notation "x" := x (in custom group_presentation at level 0, x ident).
 
+#[warning="-level-0-notation-not-closed"]
 Notation "x : p" := (Generator (fun x => Cast p))
   (in custom group_presentation, x ident, p custom group_presentation at level 200).
 
@@ -166,10 +167,12 @@ Notation "H \homg 'Grp' p" := (hom H p)
 Notation "H \isog 'Grp' p" := (iso H p)
   (at level 70, p at level 0, format "H  \isog  'Grp'  p") : group_scope.
 
+#[warning="-postfix-notation-not-level-1"]
 Notation "H \homg 'Grp' ( x : p )" := (hom H (fun x => Cast p))
   (at level 70, x ident, p custom group_presentation at level 200,
    format "'[hv' H '/ '  \homg  'Grp'  ( x  :  p ) ']'") : group_scope.
 
+#[warning="-postfix-notation-not-level-1"]
 Notation "H \isog 'Grp' ( x : p )" := (iso H (fun x => Cast p))
   (at level 70, x ident, p custom group_presentation at level 200,
    format "'[hv' H '/ '  \isog  'Grp'  ( x  :  p ) ']'") : group_scope.

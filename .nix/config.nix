@@ -124,6 +124,8 @@ with builtins; with (import <nixpkgs> {}).lib;
       jasmin.job = false;  # waiting for InteractionTrees
       ssprove.job = false;  # waiting for equations
       mathcomp-infotheo.job = false;  # not yet compatible with 9.2
+      # check that we compile without warnings on last release of Coq
+      mathcomp-warnings.job = true;
     }; };
     "rocq-9.1" = { rocqPackages = common-bundles // {
       rocq-core.override.version = "9.1";
@@ -133,8 +135,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq.override.version = "9.1";
       coq-elpi.job = true;
       hierarchy-builder.job = true;
-      # check that we compile without warnings on last release of Coq
-      mathcomp-warnings.job = true;
       ConCert.job = false;
     }; };
     "rocq-9.0" = { rocqPackages = common-bundles // {
@@ -145,8 +145,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq.override.version = "9.0";
       coq-elpi.job = true;
       hierarchy-builder.job = true;
-      # check that we compile without warnings on last release of Coq
-      mathcomp-warnings.job = true;
       odd-order.job = false;  # odd-order dropped support for 9.0
     }; };
   };

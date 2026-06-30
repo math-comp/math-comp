@@ -1681,6 +1681,7 @@ Notation restrictmx V := (conjmx (row_base V)).
 
 Definition simmx_to_for {F : fieldType} {m n}
   (P : 'M_(m, n)) A (S : {pred 'M[F]_m}) := S (conjmx P A).
+#[warning="-postfix-notation-not-level-1"]
 Notation "A ~_ P '{' 'in' S '}'" := (simmx_to_for P A S)
   (at level 70, P at level 0, format "A  ~_ P  '{' 'in'  S '}'") :
   ring_scope.
@@ -1693,6 +1694,7 @@ Notation "A '~_{in' S '}' B" := (simmx_in S A B)
   (at level 70, format "A '~_{in'  S '}'  B").
 
 Notation simmx_in_to S A S' := (exists2 P, P \in S & A ~_P {in S'}).
+#[warning="-postfix-notation-not-level-1"]
 Notation "A '~_{in' S '}' '{' 'in' S' '}'" := (simmx_in_to S A S')
   (format "A '~_{in'  S '}'  '{' 'in'  S' '}'").
 

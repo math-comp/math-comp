@@ -102,6 +102,7 @@ Unset Printing Implicit Defensive.
 
 Declare Scope quotient_scope.
 
+#[warning="-level-0-notation-not-closed"]
 Reserved Notation "\pi_ Q" (at level 0, Q at level 0, format "\pi_ Q").
 Reserved Notation "\pi" (format "\pi").
 Reserved Notation "{pi_ Q a }" (Q at level 0, format "{pi_ Q  a }").

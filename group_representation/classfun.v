@@ -108,8 +108,10 @@ Reserved Notation "''Res'". (* only parsing *)
 Reserved Notation "''Ind[' G , H ]". (* only parsing *)
 Reserved Notation "''Ind[' G ]". (* only "''Ind[' G ]" *)
 Reserved Notation "''Ind'". (* only parsing *)
+#[warning="-level-0-notation-not-closed"]
 Reserved Notation "'[ phi , psi ]_ G"
   (at level 0, G at level 2). (* only parsing *)
+#[warning="-level-0-notation-not-closed"]
 Reserved Notation "'[ phi ]_ G"
   (at level 0, G at level 2). (* only parsing *)
 Reserved Notation "phi ^u" (format "phi ^u").
@@ -1677,8 +1679,10 @@ by rewrite cfunJ.
 Qed.
 Definition cfQuo phi := Cfun 1 (cfQuo_subproof phi).
 
+#[warning="-postfix-notation-not-level-1"]
 Local Notation "phi /  'B'" := (cfQuo phi)
   (at level 40, left associativity) : cfun_scope.
+#[warning="-postfix-notation-not-level-1"]
 Local Notation "phi %%  'B'" := (cfMod phi) (at level 40) : cfun_scope.
 
 (* We specialize the cfMorph lemmas to cfMod by strengthening the domain      *)
