@@ -40,6 +40,10 @@ From mathcomp Require Import rings_modules_and_algebras.
 (* x \is a Num.nneg <=> x is positive or 0 (:= x >= 0)                        *)
 (* x \is a Num.npos <=> x is negative or 0 (:= x <= 0)                        *)
 (* x \is a Num.real <=> x is real (:= x >= 0 or x < 0)                        *)
+(*    Num.to_real x == x if x is real, otherwise 0                            *)
+(*                  := if x \is Num.real then x else 0                        *)
+(*    Num.to_nneg x == x if x is positive or 0, otherwise 0                   *)
+(*                  := if 0 <= x then x else 0                                *)
 (*                                                                            *)
 (* - list of prefixes :                                                       *)
 (*   p : positive                                                             *)
@@ -194,6 +198,9 @@ Definition npos_num : qualifier 0 R := [qualify x : R | npos_num_pred x].
 Definition real_num_pred := fun x : R => (ler 0 x) || (ler x 0).
 Definition real_num : qualifier 0 R := [qualify x : R | real_num_pred x].
 
+Definition num_to_real (x : R) : R := if x \is real_num then x else 0.
+Definition num_to_nneg (x : R) : R := if ler 0 x then x else 0.
+
 End Def.
 
 Arguments pos_num_pred _ _ /.
@@ -239,6 +246,9 @@ Notation neg := neg_num.
 Notation nneg := nneg_num.
 Notation npos := npos_num.
 Notation real := real_num.
+
+Notation to_real := num_to_real.
+Notation to_nneg := num_to_nneg.
 
 (* (Exported) symbolic syntax. *)
 Module Import Syntax.
@@ -817,6 +827,33 @@ Proof. by case: C; rewrite /= lterBDl. Qed.
 
 Definition lteifBDl := (lteifBlDl, lteifBrDl).
 
+Lemma to_realT x : x \is real_num -> to_real x = x.
+Proof. exact: ifT. Qed.
+
+Lemma real_to_real x : to_real x \is real_num.
+Proof. by rewrite /to_real; case: ifP. Qed.
+
+Lemma to_nnegT x : 0 <= x -> to_nneg x = x.
+Proof. exact: ifT. Qed.
+
+Lemma ler_to_nneg : {homo @to_nneg R : x y / x <= y}.
+Proof.
+move=> x y lexy; rewrite /to_nneg; case: ifP => [le0x|]; last by case: ifP.
+by rewrite (le_trans le0x lexy).
+Qed.
+
+Lemma nneg_to_nneg x : to_nneg x \is nneg_num.
+Proof. by rewrite nnegrE /to_nneg; case: ifP. Qed.
+
+Lemma real_to_nneg x : to_nneg x \is real_num.
+Proof. exact/ger0_real/nneg_to_nneg. Qed.
+
+(* TOTHINK: is this the right name? *)
+Lemma to_real_le_nneg x : to_real x <= to_nneg x.
+Proof.
+by rewrite /to_real /to_nneg realE; have []//= := comparableP 0 x => /ltW.
+Qed.
+
 End porderZmodTypeTheory.
 
 #[global]
@@ -1032,6 +1069,12 @@ Qed.
 
 Lemma real_addr_maxr : {in real & real & real, @right_distributive R R +%R max}.
 Proof. by move=> x y z xr yr zr; rewrite !(addrC x) real_addr_maxl. Qed.
+
+Lemma ler_to_real : {homo @to_real R : x y / x <= y}.
+Proof. by move=> x y lexy; rewrite /to_real (ler_real lexy); case: ifP. Qed.
+
+Lemma to_realN x : to_real (- x) = - to_real x.
+Proof. by rewrite /to_real realN; case: ifP; rewrite // oppr0. Qed.
 
 End NumZmoduleTheory.
 
