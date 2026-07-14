@@ -604,8 +604,10 @@ Proof. by rewrite ceilNfloor oppr_gt0 floor_lt0 oppr_lt0. Qed.
 Lemma ceil_neq0 x : (ceil x != 0) = (x <= - 1) || (x > 0).
 Proof. by rewrite neq_lt ceil_lt0 ceil_gt0. Qed.
 
-(* TODO: *)
-(* Lemma to_real_ceil_floor x : ceil x = floor x + (to_real x \isn't a int_num). *)
+(* Lemma real_ceil_floor gives the general version; this provides the num_to_real specialization. *)
+Lemma to_real_ceil_floor x :
+    ceil x = floor x + (num_to_real x \isn't a int_num).
+Proof. by rewrite real_ceil_floor ?num_real. Qed.
 
 Lemma real_ceil_floor x : x \is real_num ->
   ceil x = floor x + (x \isn't a int_num).
