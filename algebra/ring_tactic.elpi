@@ -284,6 +284,12 @@ n-const {{ lp:In : _ }} OutM Out :- !, n-const In OutM Out.
 n-const {{ Nat.of_num_uint lp:In }} {{ large_nat_uint lp:In }} Out :- !,
   ground-uint In,
   coq.reduction.vm.norm {{ N.of_num_uint lp:In }} {{ N }} Out.
+% [Nat.of_num_little_uint In] is convertible to
+% [Nat.of_num_uint (Number.rev_uint In)] by reversing the digits
+n-const {{ Nat.of_num_little_uint lp:In }} {{ large_nat_uint lp:Rev }} Out :- !,
+  ground-uint In,
+  coq.reduction.vm.norm {{ Number.rev_uint lp:In }} {{ Number.uint }} Rev,
+  coq.reduction.vm.norm {{ N.of_num_uint lp:Rev }} {{ N }} Out.
 n-const {{ Nat.of_uint lp:In }} {{ large_nat_dec_uint lp:In }} Out :- !,
   ground-decimal In,
   coq.reduction.vm.norm {{ N.of_uint lp:In }} {{ N }} Out.
@@ -308,6 +314,10 @@ z-const {{ @GRing.natmul _ (@GRing.one _) lp:In }} tt OutM Out :-
 z-const {{ Posz (Nat.of_num_uint lp:In) }} tt {{ large_nat_uint lp:In }} Out :-
   ground-uint In, !,
   coq.reduction.vm.norm {{ N.of_num_uint lp:In }} {{ N }} Out.
+z-const {{ Posz (Nat.of_num_little_uint lp:In) }} tt {{ large_nat_uint lp:Rev }} Out :-
+  ground-uint In, !,
+  coq.reduction.vm.norm {{ Number.rev_uint lp:In }} {{ Number.uint }} Rev,
+  coq.reduction.vm.norm {{ N.of_num_uint lp:Rev }} {{ N }} Out.
 z-const {{ Posz (Nat.of_uint lp:In) }} tt {{ large_nat_dec_uint lp:In }} Out :-
   ground-decimal In, !,
   coq.reduction.vm.norm {{ N.of_uint lp:In }} {{ N }} Out.
@@ -318,6 +328,10 @@ z-const {{ Posz (Nat.of_hex_uint lp:In) }} tt {{ large_nat_hex_uint lp:In }}
 z-const {{ Negz (Nat.of_num_uint lp:In) }} ff {{ large_nat_uint lp:In }} Out :-
   ground-uint In, !,
   coq.reduction.vm.norm {{ N.of_num_uint lp:In }} {{ N }} Out.
+z-const {{ Negz (Nat.of_num_little_uint lp:In) }} ff {{ large_nat_uint lp:Rev }} Out :-
+  ground-uint In, !,
+  coq.reduction.vm.norm {{ Number.rev_uint lp:In }} {{ Number.uint }} Rev,
+  coq.reduction.vm.norm {{ N.of_num_uint lp:Rev }} {{ N }} Out.
 z-const {{ Negz (Nat.of_uint lp:In) }} ff {{ large_nat_dec_uint lp:In }} Out :-
   ground-decimal In, !,
   coq.reduction.vm.norm {{ N.of_uint lp:In }} {{ N }} Out.
@@ -480,6 +494,14 @@ ring Inv _ {{ Nat.of_num_uint lp:In }}
      {{ RnatC (large_nat_uint lp:In) }} Out _ :- !,
   ground-uint In, !,
   coq.reduction.vm.norm {{ N.of_num_uint lp:In }} {{ N }} InN, !,
+  build.invN-constant Inv InN Out.
+% [Nat.of_num_little_uint In] is convertible to
+% [Nat.of_num_uint (Number.rev_uint In)] by reversing the digits
+ring Inv _ {{ Nat.of_num_little_uint lp:In }}
+     {{ RnatC (large_nat_uint lp:Rev) }} Out _ :- !,
+  ground-uint In, !,
+  coq.reduction.vm.norm {{ Number.rev_uint lp:In }} {{ Number.uint }} Rev, !,
+  coq.reduction.vm.norm {{ N.of_num_uint lp:Rev }} {{ N }} InN, !,
   build.invN-constant Inv InN Out.
 ring Inv _ {{ Nat.of_uint lp:In }}
      {{ RnatC (large_nat_dec_uint lp:In) }} Out _ :- !,
