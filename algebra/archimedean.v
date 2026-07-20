@@ -53,9 +53,7 @@ Import Order.TTheory GRing.Theory Num.Theory.
 Module Num.
 Import Num.Def.
 
-(* TODO: rename to NumDomain_hasFloorCeilTruncn (MC 2.8 or later) *)
-HB.mixin Record NumDomain_hasFloorCeilTruncn_truncn_abs_floor
-  R & Num.NumDomain R := {
+HB.mixin Record NumDomain_hasFloorCeilTruncn R & Num.NumDomain R := {
   floor : R -> int;
   ceil  : R -> int;
   truncn : R -> nat;
@@ -68,9 +66,19 @@ HB.mixin Record NumDomain_hasFloorCeilTruncn_truncn_abs_floor
   nat_num_subproof : forall x, reflect (exists n, x = n%:R) (nat_num_subdef x);
 }.
 
+#[deprecated(since="mathcomp 2.8.0",
+             use=NumDomain_hasFloorCeilTruncn)]
+Notation NumDomain_hasFloorCeilTruncn_truncn_abs_floor R :=
+  (NumDomain_hasFloorCeilTruncn R) (only parsing).
+
+Module NumDomain_hasFloorCeilTruncn_truncn_abs_floor.
+#[deprecated(since="mathcomp 2.8.0", use=NumDomain_hasFloorCeilTruncn.Build)]
+Notation Build T U := (NumDomain_hasFloorCeilTruncn.Build T U) (only parsing).
+End NumDomain_hasFloorCeilTruncn_truncn_abs_floor.
+
 #[short(type="archiNumDomainType")]
 HB.structure Definition ArchiNumDomain :=
-  { R of NumDomain_hasFloorCeilTruncn_truncn_abs_floor R & Num.NumDomain R }.
+  { R of NumDomain_hasFloorCeilTruncn R & Num.NumDomain R }.
 
 Module ArchiNumDomainExports.
 Bind Scope ring_scope with ArchiNumDomain.sort.
@@ -79,7 +87,7 @@ HB.export ArchiNumDomainExports.
 
 #[short(type="archiNumFieldType")]
 HB.structure Definition ArchiNumField :=
-  { R of NumDomain_hasFloorCeilTruncn_truncn_abs_floor R & Num.NumField R }.
+  { R of NumDomain_hasFloorCeilTruncn R & Num.NumField R }.
 
 Module ArchiNumFieldExports.
 Bind Scope ring_scope with ArchiNumField.sort.
@@ -88,7 +96,7 @@ HB.export ArchiNumFieldExports.
 
 #[short(type="archiClosedFieldType")]
 HB.structure Definition ArchiClosedField :=
-  { R of NumDomain_hasFloorCeilTruncn_truncn_abs_floor R & Num.ClosedField R }.
+  { R of NumDomain_hasFloorCeilTruncn R & Num.ClosedField R }.
 
 Module ArchiClosedFieldExports.
 Bind Scope ring_scope with ArchiClosedField.sort.
@@ -97,7 +105,7 @@ HB.export ArchiClosedFieldExports.
 
 #[short(type="archiRealDomainType")]
 HB.structure Definition ArchiRealDomain :=
-  { R of NumDomain_hasFloorCeilTruncn_truncn_abs_floor R & Num.RealDomain R }.
+  { R of NumDomain_hasFloorCeilTruncn R & Num.RealDomain R }.
 
 Module ArchiRealDomainExports.
 Bind Scope ring_scope with ArchiRealDomain.sort.
@@ -106,7 +114,7 @@ HB.export ArchiRealDomainExports.
 
 #[short(type="archiRealFieldType")]
 HB.structure Definition ArchiRealField :=
-  { R of NumDomain_hasFloorCeilTruncn_truncn_abs_floor R & Num.RealField R }.
+  { R of NumDomain_hasFloorCeilTruncn R & Num.RealField R }.
 
 Module ArchiRealFieldExports.
 Bind Scope ring_scope with ArchiRealField.sort.
@@ -115,7 +123,7 @@ HB.export ArchiRealFieldExports.
 
 #[short(type="archiRcfType")]
 HB.structure Definition ArchiRealClosedField :=
-  { R of NumDomain_hasFloorCeilTruncn_truncn_abs_floor R
+  { R of NumDomain_hasFloorCeilTruncn R
     & Num.RealClosedField R }.
 
 Module ArchiRealClosedFieldExports.
@@ -182,7 +190,7 @@ End intArchimedean.
 
 #[export]
 HB.instance Definition _ :=
-  @NumDomain_hasFloorCeilTruncn_truncn_abs_floor.Build int
+  @NumDomain_hasFloorCeilTruncn.Build int
     id id _ xpredT nneg_num_pred
     intArchimedean.floor_subproof (fun=> esym (opprK _))
     intArchimedean.truncn_subproof intArchimedean.intrP intArchimedean.natrP.
@@ -385,8 +393,7 @@ Lemma real_floor_eqP x n : x \is real_num ->
   reflect (floor x = n) (n%:~R <= x < (n + 1)%:~R).
 Proof. by move=> /real_eq_floor <-; exact/eqP. Qed.
 
-(* TODO: rename to floor_eq *)
-Lemma floor_def x n : n%:~R <= x < (n + 1)%:~R -> floor x = n.
+Lemma floor_eq x n : n%:~R <= x < (n + 1)%:~R -> floor x = n.
 Proof.
 move=> /[dup] /andP[lenx _] ?.
 by apply/real_floor_eqP; rewrite // (ger_real lenx) realz.
@@ -399,7 +406,7 @@ exact/le_leP/to_real_floor_le.
 Qed.
 
 Lemma intrKfloor : cancel intr floor.
-Proof. by move=> m; apply: floor_def; rewrite lexx rmorphD ltrDl ltr01. Qed.
+Proof. by move=> m; apply: floor_eq; rewrite lexx rmorphD ltrDl ltr01. Qed.
 
 Lemma intrEfloor x : (x \is a int_num) = ((floor x)%:~R == x).
 Proof.
@@ -416,7 +423,7 @@ Lemma floor1 : floor 1 = 1. Proof. exact: intrKfloor 1. Qed.
 Lemma to_real_floorDzr x y :
   x \is a int_num -> floor (x + num_to_real y) = floor x + floor y.
 Proof.
-move=> /intrP[m ->]; apply: floor_def.
+move=> /intrP[m ->]; apply: floor_eq.
 by rewrite -addrA 2!rmorphD/= intrKfloor lerD2l ltrD2l to_real_floor_itv.
 Qed.
 
@@ -532,8 +539,7 @@ Lemma real_ceil_eqP x n : x \is real_num ->
   reflect (ceil x = n) ((n - 1)%:~R < x <= n%:~R).
 Proof. by move=> /real_eq_ceil<-; exact/eqP. Qed.
 
-(* TODO: rename to ceil_eq *)
-Lemma ceil_def x n : (n - 1)%:~R < x <= n%:~R -> ceil x = n.
+Lemma ceil_eq x n : (n - 1)%:~R < x <= n%:~R -> ceil x = n.
 Proof.
 move=> /[dup] /andP[_ lexn] ?.
 by apply/real_ceil_eqP; rewrite // (ler_real lexn) realz.
@@ -715,8 +721,7 @@ Proof. by rewrite -to_nneg_eq_truncn; exact: eqP. Qed.
 Lemma truncn_eqP x n : 0 <= x -> reflect (truncn x = n) (n%:R <= x < n.+1%:R).
 Proof. by move=> /eq_truncn <-; exact: eqP. Qed.
 
-(* TODO: rename to truncn_eq *)
-Lemma truncn_def x n : n%:R <= x < n.+1%:R -> truncn x = n.
+Lemma truncn_eq x n : n%:R <= x < n.+1%:R -> truncn x = n.
 Proof.
 by move=> /[dup] /andP[lenx _] ?; apply/truncn_eqP; first exact: le_trans lenx.
 Qed.
@@ -728,7 +733,7 @@ by apply: le_trans (to_nneg_truncn_le x) (ler_to_nneg lexy).
 Qed.
 
 Lemma natrK : cancel (GRing.natmul 1) truncn.
-Proof. by move=> m; apply: truncn_def; rewrite ler_nat ltr_nat ltnS leqnn. Qed.
+Proof. by move=> m; apply: truncn_eq; rewrite ler_nat ltr_nat ltnS leqnn. Qed.
 
 Lemma natrEtruncn x : (x \is a nat_num) = ((truncn x)%:R == x).
 Proof.
@@ -754,7 +759,7 @@ Lemma truncn1 : truncn 1 = 1%N. Proof. exact: natrK 1%N. Qed.
 Lemma to_nneg_truncnDnr x y :
   x \is a nat_num -> truncn (x + num_to_nneg y) = (truncn x + truncn y)%N.
 Proof.
-move=> /natrP[n ->]; apply: truncn_def.
+move=> /natrP[n ->]; apply: truncn_eq.
 by rewrite -addnS !natrD !natrK lerD2l ltrD2l to_nneg_truncn_itv.
 Qed.
 
@@ -846,8 +851,8 @@ End ArchiNumDomainTheory.
 
 #[deprecated(since="mathcomp 2.4.0", use=truncn_itv)]
 Notation trunc_itv := truncn_itv (only parsing).
-#[deprecated(since="mathcomp 2.4.0", use=truncn_def)]
-Notation trunc_def := truncn_def (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=truncn_eq)]
+Notation trunc_def := truncn_eq (only parsing).
 #[deprecated(since="mathcomp 2.4.0", use=truncnK)]
 Notation truncK := truncnK (only parsing).
 #[deprecated(since="mathcomp 2.4.0", use=truncn0)]
@@ -910,10 +915,15 @@ Notation truncn_gt_nat := truncn_gtn (only parsing).
 Notation truncn_lt_nat := truncn_ltn (only parsing).
 #[deprecated(since="mathcomp 2.7.0", use=real_truncn_leq)]
 Notation real_truncn_le_nat := real_truncn_leq (only parsing).
-#[deprecated(since="mathcomp 2.7.0", use=eq_truncn)]
-Notation truncn_eq := eq_truncn (only parsing).
 #[deprecated(since="mathcomp 2.7.0", use=truncnDnr)]
 Notation truncnD := truncnDnr (only parsing).
+
+#[deprecated(since="mathcomp 2.8.0", use=floor_eq)]
+Notation floor_def := floor_eq (only parsing).
+#[deprecated(since="mathcomp 2.8.0", use=ceil_eq)]
+Notation ceil_def := ceil_eq (only parsing).
+#[deprecated(since="mathcomp 2.8.0", use=truncn_eq)]
+Notation truncn_def := truncn_eq (only parsing).
 
 Arguments natrK {R} _%_N.
 Arguments intrKfloor {R}.
@@ -1046,10 +1056,6 @@ Notation floor_lt_int := floor_ltz (only parsing).
 Notation ceil_le_int := ceil_lez (only parsing).
 #[deprecated(since="mathcomp 2.7.0", use=ceil_gtz)]
 Notation ceil_gt_int := ceil_gtz (only parsing).
-#[deprecated(since="mathcomp 2.7.0", use=eq_floor)]
-Notation floor_eq := eq_floor (only parsing).
-#[deprecated(since="mathcomp 2.7.0", use=eq_ceil)]
-Notation ceil_eq := eq_ceil (only parsing).
 #[deprecated(since="mathcomp 2.7.0", use=truncn_leq)]
 Notation truncn_le_nat := truncn_leq (only parsing).
 
@@ -1093,61 +1099,6 @@ End ZnatPred.
 End Theory.
 
 (* Factories *)
-
-HB.factory Record NumDomain_hasFloorCeilTruncn_deprecated R
-    & Num.NumDomain R := {
-  floor : R -> int;
-  ceil  : R -> int;
-  truncn : R -> nat;
-  int_num_subdef : pred R;
-  nat_num_subdef : pred R;
-  floor_subproof :
-    forall x,
-      if x \is real_num then (floor x)%:~R <= x < (floor x + 1)%:~R
-      else floor x == 0;
-  ceil_subproof : forall x, ceil x = - floor (- x);
-  truncn_subproof : forall x, truncn x = if floor x is Posz n then n else 0;
-  int_num_subproof : forall x, reflect (exists n, x = n%:~R) (int_num_subdef x);
-  nat_num_subproof : forall x, reflect (exists n, x = n%:R) (nat_num_subdef x);
-}.
-
-#[deprecated(since="mathcomp 2.7.0",
-             use=NumDomain_hasFloorCeilTruncn_truncn_abs_floor)]
-Notation NumDomain_hasFloorCeilTruncn R :=
- (NumDomain_hasFloorCeilTruncn_deprecated R) (only parsing).
-
-Module NumDomain_hasFloorCeilTruncn.
-#[deprecated(since="mathcomp 2.7.0",
-             use=NumDomain_hasFloorCeilTruncn_truncn_abs_floor)]
-Notation Build T U :=
-  (NumDomain_hasFloorCeilTruncn_deprecated.Build T U) (only parsing).
-End NumDomain_hasFloorCeilTruncn.
-
-HB.builders Context R & NumDomain_hasFloorCeilTruncn_deprecated R.
-
-Fact floor_subproof' x : (floor x)%:~R <= num_to_real x < (floor x + 1)%:~R.
-Proof.
-have := floor_subproof x; rewrite /num_to_real.
-by case: ifPn => // _ /eqP ->; rewrite add0r lexx ltr01.
-Qed.
-
-Fact truncn_subproof' x : truncn x = if 0 <= x then `|floor x|%N else 0%N.
-Proof.
-have := floor_subproof x; rewrite realE truncn_subproof.
-have []//= := comparableP x 0.
-- by move=> x_lt0 /andP[/le_lt_trans/(_ x_lt0) + _]; rewrite ltrz0; case: floor.
-- by move=> x_gt0 /andP[_ /(lt_trans x_gt0)]; rewrite ltr0z ltzD1; case: floor.
-- by move=> _ /eqP ->.
-- by move=> -> /andP[_]; rewrite ltr0z ltzD1; case: floor.
-Qed.
-
-HB.instance Definition _ :=
-  @NumDomain_hasFloorCeilTruncn_truncn_abs_floor.Build R
-    floor ceil truncn int_num_subdef nat_num_subdef
-    floor_subproof' ceil_subproof truncn_subproof'
-    int_num_subproof nat_num_subproof.
-
-HB.end.
 
 HB.factory Record NumDomain_hasTruncn R & Num.NumDomain R := {
   truncn : R -> nat;
@@ -1225,7 +1176,7 @@ by apply: (iffP eqP) => [<-|[n ->]]; [exists (truncn x) | rewrite natrK].
 Qed.
 
 HB.instance Definition _ :=
-  @NumDomain_hasFloorCeilTruncn_truncn_abs_floor.Build R
+  @NumDomain_hasFloorCeilTruncn.Build R
     floor _ truncn int_num nat_num
     floor_subproof (fun=> erefl) truncnE intrP natrP.
 
