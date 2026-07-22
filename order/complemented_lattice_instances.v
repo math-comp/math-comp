@@ -484,7 +484,7 @@ Definition lt x y := (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
 
 Lemma leEprod x y : (x <= y) = (x.1 <= y.1) && (x.2 <= y.2). Proof. by []. Qed.
 
-Lemma ltEprod x y :
+Lemma ltEprod_pre x y :
   (x < y) = (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
 Proof.
 rewrite lt_leAnge !leEprod negb_and andb_orr andbAC -lt_leAnge -andbA.
@@ -495,10 +495,10 @@ Lemma le_pair (x1 y1 : T1) (x2 y2 : T2) :
   ((x1, x2) <= (y1, y2) :> T1 * T2) = (x1 <= y1) && (x2 <= y2).
 Proof. by []. Qed.
 
-Lemma lt_pair (x1 y1 : T1) (x2 y2 : T2) :
+Lemma lt_pair_pre (x1 y1 : T1) (x2 y2 : T2) :
   ((x1, x2) < (y1, y2) :> T1 * T2)
   = (x1 < y1) && (x2 <= y2) || (x1 <= y1) && (x2 < y2).
-Proof. exact/ltEprod. Qed.
+Proof. exact/ltEprod_pre. Qed.
 
 End Preorder.
 
@@ -569,13 +569,12 @@ HB.instance Definition _ := POrder.on T2'.
   Preorder_isDuallyPOrder.Build disp3 (T1 * T2)
     (@anti _ _ T1' T2') (@anti _ _ T1^d T2^d).
 
-(* FIXME: name collision with ltEprod and lt_pair above *)
-Lemma ltEprod' x y : (x < y) = [&& x != y, x.1 <= y.1 & x.2 <= y.2].
+Lemma ltEprod x y : (x < y) = [&& x != y, x.1 <= y.1 & x.2 <= y.2].
 Proof. by rewrite lt_neqAle. Qed.
 
-Lemma lt_pair' (x1 y1 : T1) (x2 y2 : T2) : ((x1, x2) < (y1, y2) :> T1 * T2) =
+Lemma lt_pair (x1 y1 : T1) (x2 y2 : T2) : ((x1, x2) < (y1, y2) :> T1 * T2) =
   [&& (x1 != y1) || (x2 != y2), x1 <= y1 & x2 <= y2].
-Proof. by rewrite ltEprod' negb_and. Qed.
+Proof. by rewrite ltEprod negb_and. Qed.
 
 End POrder.
 
@@ -918,13 +917,13 @@ Notation "T *prod[ d ] T'" := (type d T T')
 Notation "T *p T'" := (type_ T T')
   (at level 70, format "T  *p  T'") : type_scope.
 Definition leEprod := @leEprod.
-Definition ltEprod := @ltEprod.
+Definition ltEprod_pre := @ltEprod_pre.
 Definition le_pair := @le_pair.
-Definition lt_pair := @lt_pair.
+Definition lt_pair_pre := @lt_pair_pre.
 Definition botEprod := @botEprod.
 Definition topEprod := @topEprod.
-Definition ltEprod' := @ltEprod'. (* FIXME *)
-Definition lt_pair' := @lt_pair'. (* FIXME *)
+Definition ltEprod := @ltEprod.
+Definition lt_pair := @lt_pair.
 Definition meetEprod := @meetEprod.
 Definition joinEprod := @joinEprod.
 Definition rcomplEprod := @rcomplEprod.
