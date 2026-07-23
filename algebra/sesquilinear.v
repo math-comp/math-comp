@@ -154,7 +154,7 @@ Proof. by move: f => [? [? ? []]]. Qed.
 End InvolutiveTheory.
 
 Section conjC_involutive.
-Variable C : numClosedFieldType.
+Variable C : conjFieldType.
 
 Let conjCfun_involutive : involutive (@conjC C). Proof. exact: conjCK. Qed.
 
@@ -163,7 +163,7 @@ HB.instance Definition _ :=
 
 End conjC_involutive.
 
-Lemma map_mxCK {C : numClosedFieldType} m n (A : 'M[C]_(m, n)) :
+Lemma map_mxCK {C : conjFieldType} m n (A : 'M[C]_(m, n)) :
   (A ^ conjC) ^ conjC = A.
 Proof. by apply/matrixP=> i j; rewrite !mxE conjCK. Qed.
 
@@ -1039,7 +1039,7 @@ Arguments mem_orthovPn {F eps theta vT form V u}.
 Arguments mem_orthovP {F eps theta vT form V u}.
 
 Section DotVectTheory.
-Variables (C : numClosedFieldType).
+Variables (C : conjFieldType).
 Variable (U : lmodType C) (form : {dot U for conjC}).
 
 Local Notation "''[' u , v ]" := (form u%R v%R) : ring_scope.
@@ -1058,15 +1058,6 @@ Proof. by rewrite -dnorm_geiff0 eq_sym. Qed.
 Lemma dnorm_gt0 u : (0 < '[u]) = (u != 0).
 Proof. by rewrite lt_def dnorm_eq0 dnorm_ge0 andbT. Qed.
 
-Lemma sqrt_dnorm_ge0 u : 0 <= sqrtC '[u].
-Proof. by rewrite sqrtC_ge0 dnorm_ge0. Qed.
-
-Lemma sqrt_dnorm_eq0 u : (sqrtC '[u] == 0) = (u == 0).
-Proof. by rewrite sqrtC_eq0 dnorm_eq0. Qed.
-
-Lemma sqrt_dnorm_gt0 u : (sqrtC '[u] > 0) = (u != 0).
-Proof. by rewrite sqrtC_gt0 dnorm_gt0. Qed.
-
 Lemma dnormZ a u : '[a *: u]= `|a| ^+ 2 * '[u].
 Proof. by rewrite linearZl_LR linearZr_LR/= mulrA normCK. Qed.
 
@@ -1077,6 +1068,25 @@ Lemma dnormB u v : let d := '[u, v] in '[u - v] = '[u] + '[v] - (d + d^*).
 Proof. by rewrite hnormB mul1r. Qed.
 
 End DotVectTheory.
+
+Section DotVectTheoryClosed.
+Variables (C : numClosedFieldType).
+Variable (U : lmodType C) (form : {dot U for conjC}).
+
+Local Notation "''[' u , v ]" := (form u%R v%R) : ring_scope.
+Local Notation "''[' u ]" := '[u, u]%R : ring_scope.
+
+Lemma sqrt_dnorm_ge0 u : 0 <= sqrtC '[u].
+Proof. by rewrite sqrtC_ge0 dnorm_ge0. Qed.
+
+Lemma sqrt_dnorm_eq0 u : (sqrtC '[u] == 0) = (u == 0).
+Proof. by rewrite sqrtC_eq0 dnorm_eq0. Qed.
+
+Lemma sqrt_dnorm_gt0 u : (sqrtC '[u] > 0) = (u != 0).
+Proof. by rewrite sqrtC_gt0 dnorm_gt0. Qed.
+
+End DotVectTheoryClosed.
+
 #[global]
 Hint Extern 0 (is_true (0 <= Dot.sort _ _ _
   (* NB: This Hint is assuming ^*, a more precise pattern would be welcome *)))
@@ -1655,10 +1665,12 @@ Notation symmetricmx := (hermitianmx _ false idfun).
 Notation skewmx := (hermitianmx _ true idfun).
 Notation hermsymmx := (hermitianmx _ false conjC).
 
-Lemma hermitian1mx_subproof {C : numClosedFieldType} n : (1%:M : 'M[C]_n) \is hermsymmx.
+Lemma hermitian1mx_subproof {C : conjFieldType} n :
+  (1%:M : 'M[C]_n) \is hermsymmx.
 Proof.
-by rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx/= conjC1.
+rewrite qualifE /= expr0 scale1r tr_scalar_mx map_scalar_mx/=.
+by rewrite (rmorph1 conjC).
 Qed.
 
-Canonical hermitian1mx {C : numClosedFieldType} n :=
+Canonical hermitian1mx {C : conjFieldType} n :=
   HermitianMx (@hermitian1mx_subproof C n).
