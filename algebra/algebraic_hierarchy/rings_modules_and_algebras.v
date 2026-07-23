@@ -2185,8 +2185,8 @@ Definition wrap (f : map_class) := Wrap f.
 End Linear.
 End Linear.
 Notation "{ 'linear' U -> V | s }" := (@Linear.type _ U V s) : type_scope.
-Notation "{ 'linear' U -> V }" := {linear U -> V | *:%R} : type_scope.
-Notation "{ 'scalar' U }" := {linear U -> _ | *%R}
+Notation "{ 'linear' U -> V }" := {linear U -> V | idfun \; *:%R} : type_scope.
+Notation "{ 'scalar' U }" := {linear U -> _ | idfun \; *%R}
   (format "{ 'scalar'  U }") : type_scope.
 (* Support for right-to-left rewriting with the generic linearZ rule. *)
 Coercion Linear.map_for_map : Linear.map_for >-> Linear.type.
@@ -2312,14 +2312,18 @@ End Idfun.
 
 Section Plain.
 
-Variables (R : pzSemiRingType) (W U : lSemiModType R) (V : nmodType).
-Variables (s : R -> V -> V) (f : {linear U -> V | s}) (g : {linear W -> U}).
+Variables (R S T : pzSemiRingType)
+  (fRS : {rmorphism R -> S}) (fST : {rmorphism S -> T})
+  (W : lSemiModType R) (U : lSemiModType S)  (V : nmodType).
+Variables (g : {linear W -> U | fRS \; *:%R}).
+Variables (s : T -> V -> V) (f : {linear U -> V | fST \; s}).
 
-Lemma comp_is_scalable : scalable_for s (f \o g).
+Lemma comp_is_scalable : scalable_for (fST \o fRS \; s) (f \o g).
 Proof. by move=> a v /=; rewrite !linearZ_LR. Qed.
 
 #[export]
-HB.instance Definition _ := isScalable.Build R W V s (f \o g) comp_is_scalable.
+HB.instance Definition _ :=
+  isScalable.Build R W V (fST \o fRS \; s) (f \o g) comp_is_scalable.
 
 End Plain.
 
@@ -2407,9 +2411,6 @@ Section LRMorphismTheory.
 Variables (R : pzSemiRingType) (A B : pzLSemiAlgType R) (C : pzSemiRingType).
 Variables (s : R -> C -> C).
 Variables (f : {lrmorphism A -> B}) (g : {lrmorphism B -> C | s}).
-
-#[export] HB.instance Definition _ := RMorphism.on (@idfun A).
-#[export] HB.instance Definition _ := RMorphism.on (g \o f).
 
 Lemma rmorph_alg a : f a%:A = a%:A.
 Proof. by rewrite linearZ /= rmorph1. Qed.
