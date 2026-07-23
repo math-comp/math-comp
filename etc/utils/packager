@@ -74,9 +74,11 @@ do pkgdir="$PKGPREFIX/$name-mathcomp-$pkg/$name-mathcomp-$pkg.$VERSION"
    mkdir -p $pkgdir
    if [ $VERSION == "dev" ]
    then cp $GITROOT/$name-mathcomp-$pkg.opam $pkgdir/opam
-   else git show "$BRANCH:$name-mathcomp-$pkg.opam" > $pkgdir/opam
+   else if git show "$BRANCH:$name-mathcomp-$pkg.opam" > $pkgdir/opam ; then
         sed -r "/^version/d" -i $pkgdir/opam
-   fi
+   else
+        echo "Warning; no $name-mathcomp-$pkg.opam"
+   fi ; fi
    echo "" >> $pkgdir/opam
    echo "url {" >> $pkgdir/opam
    echo $URLLINE >> $pkgdir/opam
