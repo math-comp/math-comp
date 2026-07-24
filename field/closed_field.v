@@ -68,7 +68,7 @@ Definition cpsif T (c : fF) (t : T) (e : T) : cps T :=
   fun k => GRing.If c (k t) (k e).
 Arguments cpsif {T} c t e k /.
 Notation "''if' c1 'then' c2 'else' c3" := (cpsif c1%T c2%T c3%T)
-  (at level 200, right associativity, format
+  (at level 10, c3 at level 200, right associativity, format
 "'[hv   ' ''if'  c1  '/' '[' 'then'  c2  ']' '/' '[' 'else'  c3 ']' ']'").
 
 Notation eval := GRing.eval.
