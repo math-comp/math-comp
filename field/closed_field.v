@@ -576,6 +576,7 @@ Definition ex_elim (x : nat) (pqs : seq tF * seq tF) :=
 
 Lemma ex_elim_qf (x : nat) (pqs : seq tF * seq tF) :
   GRing.dnf_rterm pqs -> qf (ex_elim x pqs).
+Proof.
 case: pqs => ps qs; case/andP=> /= rps rqs.
 apply: ex_elim_seq_qf; first exact: rseq_poly_map.
 apply: rabstrX=> /=.

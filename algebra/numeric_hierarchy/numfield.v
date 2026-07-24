@@ -1841,6 +1841,7 @@ by move=> ?; apply: deg2_poly_ge0r; rewrite // -/a ?a1 ?ler01 ?mulr1.
 Qed.
 
 Lemma deg2_poly_le0m x : 0 <= delta -> r1 <= x <= r2 -> p.[x] <= 0.
+Proof.
 move=> dge0 xm.
 by apply: deg2_poly_le0m; rewrite -/a -/b -/c ?a1 ?mulr1 -/delta ?ler01.
 Qed.
