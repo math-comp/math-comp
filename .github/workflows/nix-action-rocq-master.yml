@@ -10,8 +10,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -24,8 +25,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -76,8 +78,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -90,8 +93,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -148,8 +152,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -162,8 +167,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -211,8 +217,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -225,8 +232,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -273,8 +281,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -287,8 +296,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -344,8 +354,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -358,8 +369,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -396,7 +408,6 @@ jobs:
   coqeal:
     needs:
     - coq
-    - mathcomp-ssreflect
     - mathcomp-algebra
     - bignums
     - multinomials
@@ -408,8 +419,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -422,8 +434,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -453,10 +466,6 @@ jobs:
       name: 'Building/fetching previous CI target: coq'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle 
         "rocq-master" --argstr job "coq"
-    - if: steps.stepCheck.outputs.status != 'fetched'
-      name: 'Building/fetching previous CI target: mathcomp-ssreflect'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle 
-        "rocq-master" --argstr job "mathcomp-ssreflect"
     - if: steps.stepCheck.outputs.status != 'fetched'
       name: 'Building/fetching previous CI target: mathcomp-algebra'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle 
@@ -489,8 +498,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -503,8 +513,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -558,8 +569,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -572,8 +584,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -627,8 +640,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -641,8 +655,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -697,8 +712,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -711,8 +727,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -772,8 +789,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -786,8 +804,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -852,8 +871,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -866,8 +886,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -932,8 +953,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -946,8 +968,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -996,8 +1019,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -1010,8 +1034,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -1066,8 +1091,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -1080,8 +1106,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -1141,8 +1168,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -1155,8 +1183,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -1220,8 +1249,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -1234,8 +1264,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -1299,8 +1330,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -1313,8 +1345,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -1377,8 +1410,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -1391,8 +1425,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -1454,8 +1489,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -1468,8 +1504,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -1538,8 +1575,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -1552,8 +1590,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -1602,8 +1641,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -1616,8 +1656,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -1667,8 +1708,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -1681,8 +1723,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -1736,8 +1779,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -1750,8 +1794,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -1805,8 +1850,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -1819,8 +1865,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -1874,8 +1921,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -1888,8 +1936,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -1943,8 +1992,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -1957,8 +2007,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -2012,8 +2063,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -2026,8 +2078,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -2080,8 +2133,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -2094,8 +2148,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -2145,8 +2200,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -2159,8 +2215,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -2214,8 +2271,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -2228,8 +2286,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -2282,8 +2341,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -2296,8 +2356,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -2347,8 +2408,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -2361,8 +2423,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -2413,8 +2476,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -2427,8 +2491,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -2470,8 +2535,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -2484,8 +2550,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -2539,8 +2606,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -2553,8 +2621,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -2608,8 +2677,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -2622,8 +2692,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -2679,8 +2750,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -2693,8 +2765,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -2758,8 +2831,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -2772,8 +2846,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -2833,8 +2908,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -2847,8 +2923,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -2897,8 +2974,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -2911,8 +2989,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -2977,8 +3056,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -2991,8 +3071,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -3042,8 +3123,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -3056,8 +3138,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -3108,8 +3191,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -3122,8 +3206,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -3162,8 +3247,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -3176,8 +3262,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -3217,8 +3304,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -3231,8 +3319,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -3277,8 +3366,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -3291,8 +3381,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install
@@ -3340,8 +3431,9 @@ jobs:
         github.sha }}\" >> $GITHUB_ENV\nelse\n  echo \"target_commit=${{ github.event.pull_request.head.sha
         }}\" >> $GITHUB_ENV\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.target_commit }}
     - name: Determine which commit to test
@@ -3354,8 +3446,9 @@ jobs:
         }}\" >> $GITHUB_ENV\n  else\n    echo \"tested_commit=$merge_commit\" >> $GITHUB_ENV\n\
         \  fi\nfi\n"
     - name: Git checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
+        allow-unsafe-pr-checkout: true
         fetch-depth: 0
         ref: ${{ env.tested_commit }}
     - name: Cachix install

@@ -112,6 +112,19 @@ with builtins; with (import <nixpkgs> {}).lib;
       ITree.override.version = "master";  # for jasmin
       ITree.job = false;  # only for jasmin
     }; };
+    "rocq-9.3" = { rocqPackages = common-bundles // {
+      rocq-core.override.version = "9.3";
+      micromega-plugin.override.version = "master";
+      micromega-plugin.job = false;
+    }; coqPackages = coq-common-bundles // {
+      coq.override.version = "9.3";
+      coq-elpi.job = true;
+      hierarchy-builder.job = true;
+      interval.job = false;
+      jasmin.job = false;  # waiting for InteractionTrees
+      ssprove.job = false;  # waiting for equations
+      mathcomp-infotheo.job = false;  # not yet compatible with 9.2
+    }; };
     "rocq-9.2" = { rocqPackages = common-bundles // {
       rocq-core.override.version = "9.2";
       micromega-plugin.override.version = "master";
