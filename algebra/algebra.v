@@ -14,7 +14,6 @@ From mathcomp Require Export ssrint.
 From mathcomp Require Export archimedean.
 From mathcomp Require Export rat.
 From mathcomp Require Export intdiv.
-From mathcomp Require Export interval.
 From mathcomp Require Import interval_inference.
 From mathcomp Require Export matrix.
 From mathcomp Require Export mxpoly.

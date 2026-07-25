@@ -4,6 +4,7 @@ From mathcomp Require Export preorder porder lattice lattice_instances.
 From mathcomp Require Export total_order total_order_instances.
 From mathcomp Require Export complemented_lattice.
 From mathcomp Require Export complemented_lattice_instances order_instances.
+From mathcomp Require Export interval.
 
 (******************************************************************************)
 (*              Types equipped with preorder and order relations              *)
@@ -31,6 +32,7 @@ From mathcomp Require Export complemented_lattice_instances order_instances.
 (*       order_instances.v: re-exportation of all the order instances above,  *)
 (*                          as well as instances of the totally-ordered and   *)
 (*                          complemented lattice structure                    *)
+(*              interval.v: theory of intervals in ordered types              *)
 (*     order.v (this file): re-exportation of all the files above             *)
 (*                                                                            *)
 (* As a rule of thumb, <library>_instances.v depend only on <library>.v and   *)

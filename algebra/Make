@@ -6,7 +6,6 @@ countalg.v
 finalg.v
 fraction.v
 intdiv.v
-interval.v
 interval_inference.v
 arithmetic_tactic.v
 lra.v

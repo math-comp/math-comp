@@ -9,6 +9,7 @@ complemented_lattice.v
 complemented_lattice_instances.v
 order.v
 order_instances.v
+interval.v
 
 -I .
 -R . mathcomp.order

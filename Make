@@ -6,7 +6,6 @@ algebra/countalg.v
 algebra/finalg.v
 algebra/fraction.v
 algebra/intdiv.v
-algebra/interval.v
 algebra/interval_inference.v
 algebra/arithmetic_tactic.v
 algebra/lra.v
@@ -127,6 +126,7 @@ order/complemented_lattice.v
 order/complemented_lattice_instances.v
 order/order.v
 order/order_instances.v
+order/interval.v
 ssreflect/all_ssreflect.v
 
 -I .
