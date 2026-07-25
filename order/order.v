@@ -5,6 +5,7 @@ From mathcomp Require Export total_order total_order_instances.
 From mathcomp Require Export complemented_lattice.
 From mathcomp Require Export complemented_lattice_instances order_instances.
 From mathcomp Require Export interval.
+(* N.B. orderedzmod is not exported here yet. *)
 
 (******************************************************************************)
 (*              Types equipped with preorder and order relations              *)
