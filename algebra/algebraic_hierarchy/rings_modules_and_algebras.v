@@ -2977,9 +2977,6 @@ End AlgebraTheory.
 
 Module ClosedExports.
 
-Notation nmod_closed := nmod_closed.
-Notation oppr_closed := oppr_closed.
-Notation zmod_closed := zmod_closed.
 Notation mulr_closed := mulr_closed.
 Notation semiring_closed := semiring_closed.
 Notation smulr_closed := smulr_closed.
@@ -2990,8 +2987,6 @@ Notation linear_closed := linear_closed.
 Notation submod_closed := submod_closed.
 Notation subalg_closed := subalg_closed.
 
-Coercion zmod_closed0D : zmod_closed >-> nmod_closed.
-Coercion zmod_closedN : zmod_closed >-> oppr_closed.
 Coercion semiring_closedD : semiring_closed >-> nmod_closed.
 Coercion semiring_closedM : semiring_closed >-> mulr_closed.
 Coercion smulr_closedM : smulr_closed >-> mulr_closed.
@@ -4037,75 +4032,8 @@ HB.export SubExports.
 
 Module Theory.
 
-Definition addrA := @addrA.
-Definition addrC := @addrC.
-Definition add0r := @add0r.
-Definition addNr := @addNr.
-Definition addr0 := addr0.
-Definition addrN := addrN.
-Definition subrr := subrr.
-Definition addrCA := addrCA.
-Definition addrAC := addrAC.
-Definition addrACA := addrACA.
-Definition addKr := addKr.
-Definition addNKr := addNKr.
-Definition addrK := addrK.
-Definition addrNK := addrNK.
-Definition subrK := subrK.
-Definition subrKC := subrKC.
-Definition subKr := subKr.
-Definition addrI := @addrI.
-Definition addIr := @addIr.
-Definition subrI := @subrI.
-Definition subIr := @subIr.
-Arguments addrI {V} y [x1 x2].
-Arguments addIr {V} x [x1 x2].
-Arguments subrI {V} y [x1 x2].
-Arguments subIr {V} x [x1 x2].
-Definition opprK := @opprK.
-Arguments opprK {V}.
-Definition oppr_inj := @oppr_inj.
-Arguments oppr_inj {V} [x1 x2].
-Definition oppr0 := oppr0.
-Definition oppr_eq0 := oppr_eq0.
-Definition opprD := opprD.
-Definition opprB := opprB.
-Definition addrKA := addrKA.
-Definition subrKA := subrKA.
-Definition subr0 := subr0.
-Definition sub0r := sub0r.
-Definition subr_eq := subr_eq.
-Definition addr0_eq := addr0_eq.
-Definition subr0_eq := subr0_eq.
-Definition subr_eq0 := subr_eq0.
-Definition addr_eq0 := addr_eq0.
-Definition eqr_opp := eqr_opp.
-Definition eqr_oppLR := eqr_oppLR.
-Definition sumrN := sumrN.
-Definition sumrB := sumrB.
-Definition sumrMnl := sumrMnl.
-Definition sumrMnr := sumrMnr.
-Definition sumr_const := sumr_const.
-Definition sumr_const_nat := sumr_const_nat.
-Definition telescope_sumr := telescope_sumr.
-Definition telescope_sumr_eq := @telescope_sumr_eq.
-Arguments telescope_sumr_eq {V n m} f u.
-Definition mulr0n := mulr0n.
-Definition mulr1n := mulr1n.
-Definition mulr2n := mulr2n.
-Definition mulrS := mulrS.
-Definition mulrSr := mulrSr.
-Definition mulrb := mulrb.
-Definition mul0rn := mul0rn.
-Definition mulNrn := mulNrn.
-Definition mulrnDl := mulrnDl.
-Definition mulrnDr := mulrnDr.
-Definition mulrnBl := mulrnBl.
-Definition mulrnBr := mulrnBr.
-Definition mulrnA := mulrnA.
-Definition mulrnAC := mulrnAC.
-Definition iter_addr := iter_addr.
-Definition iter_addr_0 := iter_addr_0.
+Export Algebra.Theory.
+
 Definition mulrA := @mulrA.
 Definition mul1r := @mul1r.
 Definition mulr1 := @mulr1.
@@ -4253,21 +4181,6 @@ Definition sqrrB := sqrrB.
 Definition subr_sqr := subr_sqr.
 Definition subr_sqrDB := subr_sqrDB.
 Definition exprDn_pchar := exprDn_pchar.
-Definition rpred0D := @rpred0D.
-Definition rpred0 := rpred0.
-Definition rpredD := rpredD.
-Definition rpredNr := @rpredNr.
-Definition rpred_sum := rpred_sum.
-Definition rpredMn := rpredMn.
-Definition rpredN := rpredN.
-Definition rpredB := rpredB.
-Definition rpredBC := rpredBC.
-Definition rpredMNn := rpredMNn.
-Definition rpredDr := rpredDr.
-Definition rpredDl := rpredDl.
-Definition rpredBr := rpredBr.
-Definition rpredBl := rpredBl.
-Definition zmodClosedP := zmodClosedP.
 Definition rpredMsign := rpredMsign.
 Definition rpred1M := @rpred1M.
 Definition rpred1 := @rpred1.
@@ -4284,21 +4197,8 @@ Definition rpredZnat := rpredZnat.
 Definition submodClosedP := submodClosedP.
 Definition subalgClosedP := subalgClosedP.
 Definition rpredZ := @rpredZ.
-Definition nmod_morphism := nmod_morphism.
-Definition zmod_morphism := zmod_morphism.
-Definition raddf0 := raddf0.
-Definition raddf_eq0 := raddf_eq0.
-Definition raddf_inj := raddf_inj.
-Definition raddfN := raddfN.
-Definition raddfD := raddfD.
-Definition raddfB := raddfB.
-Definition raddf_sum := raddf_sum.
-Definition raddfMn := raddfMn.
-Definition raddfMNn := raddfMNn.
 Definition raddfMnat := raddfMnat.
 Definition raddfMsign := raddfMsign.
-Definition can2_nmod_morphism := can2_nmod_morphism.
-Definition can2_zmod_morphism := can2_zmod_morphism.
 Definition monoid_morphism := monoid_morphism.
 Definition rmorph0 := rmorph0.
 Definition rmorphN := rmorphN.
@@ -4381,15 +4281,12 @@ Definition can2_linear := can2_linear.
 Definition can2_semilinear := can2_semilinear.
 Definition rmorph_alg := rmorph_alg.
 
-Definition raddf := (raddf0, raddfN, raddfD, raddfMn).
-
 Definition rmorphE :=
   (rmorphD, rmorph0, rmorphB, rmorphN, rmorphMNn, rmorphMn, rmorph1, rmorphXn).
 
 Definition linearE :=
   (linearD, linear0, linearB, linearMNn, linearMn, linearZ).
 
-Notation null_fun V := (null_fun V) (only parsing).
 Notation in_alg A := (in_alg A) (only parsing).
 
 End Theory.
