@@ -91,7 +91,7 @@ Proof. by elim: c1 c2 => [//|c c1 IH] c2; rewrite !PCond_cons IH andbA. Qed.
 End PCond.
 
 Section FieldCorrect.
-Variables (R : fieldType) (C : comPzRingType) (R_of_C : {rmorphism C -> R}).
+Variables (R : fieldType) (C : comRingType) (R_of_C : {rmorphism C -> R}).
 Variables (cdiv : C -> C -> C * C).
 Variables (cdivP : forall x y, let (q, r) := cdiv x y in x = y * q + r).
 

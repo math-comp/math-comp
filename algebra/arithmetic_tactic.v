@@ -48,8 +48,8 @@ Module Import Internals.
 Export Internals.
 
 Section PevalSemiRing.
-Variable C : pzSemiRingType.
-Variable R : comPzSemiRingType.
+Variable C : semiRingType.
+Variable R : comSemiRingType.
 Variable R_of_C : {rmorphism C -> R}.
 
 Implicit Type l : seq R.
@@ -890,7 +890,7 @@ Qed.
 
 (* Everything below is essentially imported form algebra-tactics *)
 
-Implicit Types (V : nmodType) (R : pzSemiRingType) (F : fieldType).
+Implicit Types (V : nmodType) (R : semiRingType) (F : fieldType).
 
 Record RFormula R := { Rlhs : RExpr R; Rop : Op2; Rrhs : RExpr R }.
 

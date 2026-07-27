@@ -91,19 +91,19 @@ mc-canonical-init Scope DbName :- std.do! [
   register-instance Scope DbName
     {{:gref GRing.Nmodule.sort }} {{:gref nat }} mc-canonical-nat-nmodule,
   register-instance Scope DbName
-    {{:gref GRing.PzSemiRing.sort }} {{:gref nat }} mc-canonical-nat-semiring,
+    {{:gref GRing.SemiRing.sort }} {{:gref nat }} mc-canonical-nat-semiring,
   register-instance Scope DbName
-    {{:gref GRing.ComPzSemiRing.sort }} {{:gref nat }} mc-canonical-nat-comsemiring,
+    {{:gref GRing.ComSemiRing.sort }} {{:gref nat }} mc-canonical-nat-comsemiring,
   register-instance Scope DbName
     {{:gref GRing.Nmodule.sort }} {{:gref int }} mc-canonical-int-nmodule,
   register-instance Scope DbName
     {{:gref GRing.Zmodule.sort }} {{:gref int }} mc-canonical-int-zmodule,
   register-instance Scope DbName
-    {{:gref GRing.PzSemiRing.sort }} {{:gref int }} mc-canonical-int-semiring,
+    {{:gref GRing.SemiRing.sort }} {{:gref int }} mc-canonical-int-semiring,
   register-instance Scope DbName
-    {{:gref GRing.PzRing.sort }} {{:gref int }} mc-canonical-int-ring,
+    {{:gref GRing.Ring.sort }} {{:gref int }} mc-canonical-int-ring,
   register-instance Scope DbName
-    {{:gref GRing.ComPzRing.sort }} {{:gref int }} mc-canonical-int-comring,
+    {{:gref GRing.ComRing.sort }} {{:gref int }} mc-canonical-int-comring,
   register-instance Scope DbName
     {{:gref GRing.UnitRing.sort }} {{:gref int }} mc-canonical-int-unitring ].
 
@@ -129,11 +129,11 @@ mc-coercion-init Scope DbName :- std.do! [
   register-coercion Scope DbName "add"
     {{ @GRing.add }} {{ nmodType }},
   register-coercion Scope DbName "one"
-    {{ @GRing.one }} {{ pzSemiRingType }},
+    {{ @GRing.one }} {{ semiRingType }},
   register-coercion Scope DbName "mul"
-    {{ @GRing.mul }} {{ pzSemiRingType }},
+    {{ @GRing.mul }} {{ semiRingType }},
   register-coercion Scope DbName "exp"
-    {{ @GRing.exp }} {{ pzSemiRingType }},
+    {{ @GRing.exp }} {{ semiRingType }},
   register-coercion Scope DbName "inv"
     {{ @GRing.inv }} {{ unitRingType }},
   register-coercion Scope DbName "natmul"
@@ -147,10 +147,10 @@ mc-coercion-init Scope DbName :- std.do! [
   coq.elpi.accumulate Scope DbName (clause _ _ (mc-coercion "additive-im" CAdditiveIm :- !)),
   std.assert-ok! (coq.typecheck {{ @GRing.RMorphism.sort lp:RMorphDom lp:RMorphIm }} _) "lra: constant not found GRing.RMorphism",
   std.assert-ok! (coq.typecheck RMorphDom TRMorphDom) "lra: mistyped constant",
-  std.assert-ok! (coq.elaborate-skeleton {{ id }} {{ pzSemiRingType -> lp:TRMorphDom }} CRMorphDom) "lra: elab skeleton",
+  std.assert-ok! (coq.elaborate-skeleton {{ id }} {{ semiRingType -> lp:TRMorphDom }} CRMorphDom) "lra: elab skeleton",
   coq.elpi.accumulate Scope DbName (clause _ _ (mc-coercion "rmorph-dom" CRMorphDom :- !)),
   std.assert-ok! (coq.typecheck RMorphIm TRMorphIm) "lra: mistyped constant",
-  std.assert-ok! (coq.elaborate-skeleton {{ id }} {{ pzSemiRingType -> lp:TRMorphIm }} CRMorphIm) "lra: elab skeleton",
+  std.assert-ok! (coq.elaborate-skeleton {{ id }} {{ semiRingType -> lp:TRMorphIm }} CRMorphIm) "lra: elab skeleton",
   coq.elpi.accumulate Scope DbName (clause _ _ (mc-coercion "rmorph-im" CRMorphIm :- !)),
 ].
 
@@ -527,9 +527,9 @@ ring _ _ In _ _ _ :- coq.error "Unknown" {coq.term->string In}.
 
 pred ring.rmorphism.aux i:term, i:term -> term, o:rmorphism.
 ring.rmorphism.aux SR Morph (rmorphism U V' SR R' UR' F' Morph) :- !,
-  Sort = {{ GRing.PzSemiRing.sort lp:SR }},
+  Sort = {{ GRing.SemiRing.sort lp:SR }},
   coq.unify-eq Sort {{ GRing.Nmodule.sort lp:U }} ok,
-  if (target-zmodule _, coq.unify-eq Sort {{ GRing.PzRing.sort lp:R }} ok,
+  if (target-zmodule _, coq.unify-eq Sort {{ GRing.Ring.sort lp:R }} ok,
       coq.unify-eq Sort {{ GRing.Zmodule.sort lp:V }} ok)
      (V' = some V, R' = some R,
       if (coq.unify-eq Sort {{ GRing.UnitRing.sort lp:UR }} ok)
@@ -682,23 +682,23 @@ pred mk-ring-morphism i:term, o:rmorphism, o:term, o:term, o:list prop.
 mk-ring-morphism Ty (rmorphism U V' SR R' UR' none (x\ x)) Lem CR Env :- !,
   std.assert-ok! (coq.unify-eq Ty {{ GRing.Nmodule.sort lp:U }})
                  "Cannot find a declared nmodType",
-  std.assert-ok! (coq.unify-eq Ty {{ GRing.PzSemiRing.sort lp:SR }})
+  std.assert-ok! (coq.unify-eq Ty {{ GRing.SemiRing.sort lp:SR }})
                  "Cannot find a declared semiRingType",
   if (coq.unify-eq Ty {{ GRing.Zmodule.sort lp:V }} ok,
-      coq.unify-eq Ty {{ GRing.PzRing.sort lp:R }} ok)
+      coq.unify-eq Ty {{ GRing.Ring.sort lp:R }} ok)
      % if the target is a ring
      (V' = some V, R' = some R,
       if (coq.unify-eq Ty {{ GRing.UnitRing.sort lp:UR }} ok)
          (UR' = some UR) (UR' = none),
       Lem = {{ ring_correct }},
-      std.assert-ok! (coq.unify-eq Ty {{ GRing.ComPzRing.sort lp:CR }})
+      std.assert-ok! (coq.unify-eq Ty {{ GRing.ComRing.sort lp:CR }})
                      "Cannot find a declared comRingType",
       ring-env REnv,
       Env = [target-nmodule U, target-semiring SR, target-zmodule V | REnv])
      % if the target is a semiring
      (V' = none, R' = none, UR' = none,
       Lem = {{ semiring_correct }},
-      std.assert-ok! (coq.unify-eq Ty {{ GRing.ComPzSemiRing.sort lp:CR }})
+      std.assert-ok! (coq.unify-eq Ty {{ GRing.ComSemiRing.sort lp:CR }})
                      "Cannot find a declared comSemiRingType",
       semiring-env SREnv,
       Env = [target-nmodule U, target-semiring SR | SREnv]).

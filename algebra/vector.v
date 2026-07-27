@@ -1790,20 +1790,20 @@ End LinearPreimage.
 
 Arguments lpreimK {K aT rT f} [W] fW.
 
-Section LfunPzSemiAlgebra.
+Section LfunSemiAlgebra.
 
 Variables (R : comNzSemiRingType) (vT : semiVectType R).
 
 Prenex Implicits comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr.
 
-Definition lfun_comp_pzSemiRingType : pzSemiRingType := HB.pack 'End(vT)
-  (GRing.Nmodule_isPzSemiRing.Build 'End(vT)
+Definition lfun_comp_semiRingType : semiRingType := HB.pack 'End(vT)
+  (GRing.Nmodule_isSemiRing.Build 'End(vT)
      comp_lfunA comp_lfun1l comp_lfun1r comp_lfunDl comp_lfunDr
      (comp_lfun0l _) (@comp_lfun0r _ _ _ _)).
 
 (* In the standard endomorphism ring product is categorical composition. *)
 HB.instance Definition _ :=
-  GRing.PzSemiRing.copy 'End(vT) lfun_comp_pzSemiRingType^c.
+  GRing.SemiRing.copy 'End(vT) lfun_comp_semiRingType^c.
 
 HB.instance Definition _ := GRing.LSemiModule_isLSemiAlgebra.Build R 'End(vT)
   (fun k x y => comp_lfunZr k y x).
@@ -1811,7 +1811,7 @@ HB.instance Definition _ := GRing.LSemiModule_isLSemiAlgebra.Build R 'End(vT)
 HB.instance Definition _ := GRing.LSemiAlgebra_isSemiAlgebra.Build R 'End(vT)
   (fun k x y => comp_lfunZl k y x).
 
-End LfunPzSemiAlgebra.
+End LfunSemiAlgebra.
 
 Section LfunNzSemiAlgebra.
 
@@ -1824,12 +1824,12 @@ by move=> /rowP/(_ (Ordinal dim_gt0))/eqP; rewrite linear0 !mxE oner_eq0.
 Qed.
 
 HB.instance Definition _ :=
-  GRing.PzSemiRing_isNonZero.Build 'End(vT) lfun1_neq0.
+  GRing.SemiRing_isNonZero.Build 'End(vT) lfun1_neq0.
 
 End LfunNzSemiAlgebra.
 
 HB.instance Definition _ (R : comNzRingType) (vT : vectType R) :=
-  GRing.PzSemiAlgebra.on 'End(vT).
+  GRing.SemiAlgebra.on 'End(vT).
 HB.instance Definition _ (R : comNzRingType) (vT : nzVectType R) :=
   GRing.NzSemiAlgebra.on 'End(vT).
 

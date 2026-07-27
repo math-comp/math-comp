@@ -76,7 +76,7 @@ with builtins; with (import <nixpkgs> {}).lib;
     coq-common-bundles = listToAttrs (forEach coq-master (p:
       { name = p; value.override.version = "master"; }))
     // { jasmin.override.version = "main";
-         ssprove.override.version = "main";
+         ssprove.override.version = "pi8027:deprecation_mc2.4";
          # To add an overlay applying to all bundles,
          # add below a line like
          #<package>.override.version = "<github_login>:<branch>";
