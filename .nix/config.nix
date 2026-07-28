@@ -34,13 +34,6 @@ with builtins; with (import <nixpkgs> {}).lib;
 
   bundles = let
     master = [
-      "mathcomp-analysis"
-      "mathcomp-bigenough"
-      "mathcomp-classical"
-      "mathcomp-finmap"
-      "mathcomp-real-closed"
-    ];
-    coq-master = master ++ [
       "coq-bits"
       "coqeal"
       "coquelicot"
@@ -52,8 +45,13 @@ with builtins; with (import <nixpkgs> {}).lib;
       "interval"
       "mathcomp-abel"
       "mathcomp-algebra-tactics"
+      "mathcomp-analysis"
       "mathcomp-apery"
+      "mathcomp-bigenough"
+      "mathcomp-classical"
+      "mathcomp-finmap"
       "mathcomp-infotheo"
+      "mathcomp-real-closed"
       "mathcomp-word"
       "mathcomp-zify"
       "multinomials"
@@ -72,37 +70,36 @@ with builtins; with (import <nixpkgs> {}).lib;
       mathcomp-doc.job = true;
       mathcomp.job = false;
       stdlib.job = true;
+      jasmin.override.version = "main";
+      ssprove.override.version = "main";
+      CertiRocq.job = false;
+      ConCert.job = false;
+      libvalidsdp.job = false;
+      relation-algebra.job = false;
+      validsdp.job = false;
+      wasmcert.job = false;
+      # To add an overlay applying to all bundles,
+      # add below a line like
+      #<package>.override.version = "<github_login>:<branch>";
+      # where
+      # * <package> will typically be one of the strings above (without the quotes)
+      #   or look at https://github.com/NixOS/nixpkgs/tree/master/pkgs/development/coq-modules
+      #   for a complete list of Coq packages available in Nix
+      # * <github_login>:<branch> is such that this will use the branch <branch>
+      #   from https://github.com/<github_login>/<repository>
     };
-    coq-common-bundles = listToAttrs (forEach coq-master (p:
-      { name = p; value.override.version = "master"; }))
-    // { jasmin.override.version = "main";
-         ssprove.override.version = "pi8027:deprecation_mc2.4";
-         # To add an overlay applying to all bundles,
-         # add below a line like
-         #<package>.override.version = "<github_login>:<branch>";
-         # where
-         # * <package> will typically be one of the strings above (without the quotes)
-         #   or look at https://github.com/NixOS/nixpkgs/tree/master/pkgs/development/coq-modules
-         #   for a complete list of Coq packages available in Nix
-         # * <github_login>:<branch> is such that this will use the branch <branch>
-         #   from https://github.com/<github_login>/<repository>
-       };
   in {
-    "rocq-master" = { rocqPackages = common-bundles // {
+    "rocq-master".rocqPackages = common-bundles // {
       rocq-core.override.version = "master";
-      stdlib.override.version = "master";
-      bignums.override.version = "master";
+      coq.override.version = "master";
       rocq-elpi.override.version = "master";
       hierarchy-builder.override.version = "master";
       micromega-plugin.override.version = "master";
-      mathcomp.job = false;
-      rocqnavi.override.version = "master";
-    }; coqPackages = coq-common-bundles // {
-      coq.override.version = "master";
       stdlib.override.version = "master";
       bignums.override.version = "master";
-      coq-elpi.override.version = "master";
-      hierarchy-builder.override.version = "master";
+      mathcomp.job = false;
+      rocqnavi.override.version = "master";
+      autosubst.job = false;
       interval.job = false;
       coquelicot.job = false;
       ssprove.job = false;
@@ -111,56 +108,52 @@ with builtins; with (import <nixpkgs> {}).lib;
       paco.job = false;  # only for jasmin
       ITree.override.version = "master";  # for jasmin
       ITree.job = false;  # only for jasmin
-    }; };
-    "rocq-9.3" = { rocqPackages = common-bundles // {
+    };
+    "rocq-9.3".rocqPackages = common-bundles // {
       rocq-core.override.version = "9.3";
-      micromega-plugin.override.version = "master";
-      micromega-plugin.job = false;
-      # check that we compile without warnings on last release of Coq
-      mathcomp-warnings.job = true;
-    }; coqPackages = coq-common-bundles // {
       coq.override.version = "9.3";
       coq-elpi.job = true;
+      micromega-plugin.override.version = "master";
+      micromega-plugin.job = false;
       hierarchy-builder.job = true;
       interval.job = false;
       jasmin.job = false;  # waiting for InteractionTrees
       ssprove.job = false;  # waiting for equations
-      mathcomp-infotheo.job = false;  # not yet compatible with 9.2
-    }; };
-    "rocq-9.2" = { rocqPackages = common-bundles // {
+      mathcomp-infotheo.job = false;  # not yet compatible with 9.3
+      # check that we compile without warnings on last release of Coq
+      mathcomp-warnings.job = true;
+    };
+    "rocq-9.2".rocqPackages = common-bundles // {
       rocq-core.override.version = "9.2";
-      micromega-plugin.override.version = "master";
-      micromega-plugin.job = false;
-    }; coqPackages = coq-common-bundles // {
       coq.override.version = "9.2";
       coq-elpi.job = true;
+      micromega-plugin.override.version = "master";
+      micromega-plugin.job = false;
       hierarchy-builder.job = true;
       interval.job = false;
       jasmin.job = false;  # waiting for InteractionTrees
       ssprove.job = false;  # waiting for equations
       mathcomp-infotheo.job = false;  # not yet compatible with 9.2
-    }; };
-    "rocq-9.1" = { rocqPackages = common-bundles // {
+    };
+    "rocq-9.1".rocqPackages = common-bundles // {
       rocq-core.override.version = "9.1";
-      micromega-plugin.override.version = "master";
-      micromega-plugin.job = false;
-    }; coqPackages = coq-common-bundles // {
       coq.override.version = "9.1";
       coq-elpi.job = true;
+      micromega-plugin.override.version = "master";
+      micromega-plugin.job = false;
       hierarchy-builder.job = true;
       ConCert.job = false;
       fcsl-pcm.job = false;  # fcsl-pcm dropped support for Rocq 9.1
-    }; };
-    "rocq-9.0" = { rocqPackages = common-bundles // {
+    };
+    "rocq-9.0".rocqPackages = common-bundles // {
       rocq-core.override.version = "9.0";
-      micromega-plugin.override.version = "master";
-      micromega-plugin.job = false;
-    }; coqPackages = coq-common-bundles // {
       coq.override.version = "9.0";
       coq-elpi.job = true;
+      micromega-plugin.override.version = "master";
+      micromega-plugin.job = false;
       hierarchy-builder.job = true;
       odd-order.job = false;  # odd-order dropped support for 9.0
       fcsl-pcm.job = false;  # fcsl-pcm dropped support for Rocq 9.0
-    }; };
+    };
   };
 }
