@@ -323,7 +323,8 @@ Notation "[ x : T | B ]" := (quant0b (fun x : T => B x)) (x name).
 
 Module Exports.
 
-Notation ", F" := F^* (at level 200, format ", '/ '  F") : fin_quant_scope.
+Notation ", F" := F^* (at level 10, F at level 200, format ", '/ '  F") :
+  fin_quant_scope.
 
 Notation "[ 'forall' x B ]" := [x | all B]
   (x at level 99, format "[ '[hv' 'forall'  x B ] ']'") : bool_scope.
@@ -339,12 +340,12 @@ Notation "[ 'forall' x 'in' A B ]" := [x | all_in (x \in A) B]
 Notation "[ 'forall' x : T 'in' A B ]" := [x : T | all_in (x \in A) B]
   (only parsing) : bool_scope.
 Notation ", 'forall' x B" := [x | all B]^*
-  (at level 200, x at level 99, B at level 200,
+  (at level 10, x at level 99, B at level 200,
    format ", '/ '  'forall'  x B") : fin_quant_scope.
 Notation ", 'forall' x : T B" := [x : T | all B]^*
   (B at level 200, only parsing) : fin_quant_scope.
 Notation ", 'forall' ( x | C ) B" := [x | all_in C B]^*
-  (at level 200, x at level 99, B at level 200,
+  (at level 10, x at level 99, B at level 200,
    format ", '/ '  '[' 'forall'  ( x '/  '  |  C ) ']' B") : fin_quant_scope.
 Notation ", 'forall' ( x : T | C ) B" := [x : T | all_in C B]^*
   (B at level 200, only parsing) : fin_quant_scope.
@@ -368,12 +369,12 @@ Notation "[ 'exists' x 'in' A B ]" := (~~ [x | ex_in (x \in A) B])
 Notation "[ 'exists' x : T 'in' A B ]" := (~~ [x : T | ex_in (x \in A) B])
   (only parsing) : bool_scope.
 Notation ", 'exists' x B" := (~~ [x | ex B])^*
-  (at level 200, x at level 99, B at level 200,
+  (at level 10, x at level 99, B at level 200,
    format ", '/ '  'exists'  x B") : fin_quant_scope.
 Notation ", 'exists' x : T B" := (~~ [x : T | ex B])^*
   (B at level 200, only parsing) : fin_quant_scope.
 Notation ", 'exists' ( x | C ) B" := (~~ [x | ex_in C B])^*
-  (at level 200, x at level 99, B at level 200,
+  (at level 10, x at level 99, B at level 200,
    format ", '/ '  '[' 'exists'  ( x '/  '  |  C ) ']' B") : fin_quant_scope.
 Notation ", 'exists' ( x : T | C ) B" := (~~ [x : T | ex_in C B])^*
   (B at level 200, only parsing) : fin_quant_scope.

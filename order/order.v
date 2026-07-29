@@ -3840,6 +3840,7 @@ Fact joinxx : idempotent_op join.
 Proof. by move=> x; apply/eqP; rewrite -leEjoin. Qed.
 
 Fact leUx x y z : (join x y <= z) = (x <= z) && (y <= z).
+Proof.
 rewrite !leEjoin; apply/eqP/andP => [<-|[/eqP<- /eqP<-]].
   split; apply/eqP; last by rewrite joinA -joinA joinxx.
   by rewrite -joinA (joinC _ x) (joinA x) joinxx.
@@ -3900,6 +3901,7 @@ Fact joinxx : idempotent_op join.
 Proof. by move=> x; apply/eqP; rewrite -leEjoin. Qed.
 
 Fact leUx x y z : (join x y <= z) = (x <= z) && (y <= z).
+Proof.
 rewrite !leEjoin; apply/eqP/andP => [<-|[/eqP<- /eqP<-]].
   split; apply/eqP; last by rewrite joinA -joinA joinxx.
   by rewrite -joinA (joinC _ x) (joinA x) joinxx.
