@@ -2,7 +2,8 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype seq choice.
-From mathcomp Require Import fintype nmodule order.
+From mathcomp Require Import fintype nmodule preorder porder lattice.
+From mathcomp Require Import total_order order_instances.
 
 (******************************************************************************)
 (*                         Intervals in ordered types                         *)
@@ -68,7 +69,7 @@ Reserved Notation "`] a , '+oo' [" (format "`] a ,  '+oo' [").
 Reserved Notation "`] -oo , '+oo' [" (format "`] -oo ,  '+oo' [").
 
 Local Open Scope order_scope.
-Import Order.TTheory.
+Import Order.Theory.
 
 Variant itv_bound (T : Type) : Type := BSide of bool & T | BInfty of bool.
 Notation BLeft := (BSide true).
@@ -328,6 +329,8 @@ Lemma subset_itv (x y z u : itv_bound T) : x <= y -> z <= u ->
   {subset Interval y z <= Interval x u}.
 Proof. by move=> xy zu; apply: subitvP; rewrite subitvE xy zu. Qed.
 
+(* TODO: Remove `subset_itv_bound` below. It requires the order structure     *)
+(* instances on bool (and thus almost the entire order package).              *)
 #[deprecated(since="mathcomp 2.4.0", use=subset_itv)]
 Lemma subset_itv_bound (r s u v : bool) x y : r <= u -> v <= s ->
   {subset Interval (BSide r x) (BSide s y) <= Interval (BSide u x) (BSide v y)}.
