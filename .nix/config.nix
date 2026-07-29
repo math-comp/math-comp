@@ -116,6 +116,8 @@ with builtins; with (import <nixpkgs> {}).lib;
       rocq-core.override.version = "9.3";
       micromega-plugin.override.version = "master";
       micromega-plugin.job = false;
+      # check that we compile without warnings on last release of Coq
+      mathcomp-warnings.job = true;
     }; coqPackages = coq-common-bundles // {
       coq.override.version = "9.3";
       coq-elpi.job = true;
@@ -137,8 +139,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       jasmin.job = false;  # waiting for InteractionTrees
       ssprove.job = false;  # waiting for equations
       mathcomp-infotheo.job = false;  # not yet compatible with 9.2
-      # check that we compile without warnings on last release of Coq
-      mathcomp-warnings.job = true;
     }; };
     "rocq-9.1" = { rocqPackages = common-bundles // {
       rocq-core.override.version = "9.1";
