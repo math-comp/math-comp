@@ -482,10 +482,7 @@ Lemma leEprod x y : (x <= y) = (x.1 <= y.1) && (x.2 <= y.2). Proof. by []. Qed.
 
 Lemma ltEprod_pre x y :
   (x < y) = (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
-Proof.
-rewrite lt_leAnge !leEprod negb_and andb_orr andbAC -lt_leAnge -andbA.
-by rewrite -lt_leAnge.
-Qed.
+Proof. by []. Qed.
 
 Lemma le_pair (x1 y1 : T1) (x2 y2 : T2) :
   ((x1, x2) <= (y1, y2) :> T1 * T2) = (x1 <= y1) && (x2 <= y2).
@@ -544,8 +541,7 @@ Context (T1 : porderType disp1) (T2 : porderType disp2).
 
 Fact anti : antisymmetric (@le _ _ T1 T2).
 Proof.
-case=> [? ?] [? ?].
-by rewrite andbAC andbA andbAC -andbA => /= /andP [] /le_anti -> /le_anti ->.
+by case=> [? ?] [? ?]; rewrite andbACA/= => /andP[] /le_anti-> /le_anti->.
 Qed.
 
 End POrder.
