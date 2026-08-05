@@ -10,6 +10,7 @@ complemented_lattice_instances.v
 order.v
 order_instances.v
 interval.v
+orderedzmod.v
 
 -I .
 -R . mathcomp.order
