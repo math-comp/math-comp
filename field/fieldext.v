@@ -1349,7 +1349,7 @@ have mulD: left_distributive mul +%R.
   move=> x y z; apply: toPinj; rewrite /toPF raddfD /= -!/(toPF _).
   by rewrite !toL_K /toPF raddfD mulrDl modpD.
 have nzL1: L1 != 0 by rewrite -(inj_eq toPinj) L1K /toPF raddf0 oner_eq0.
-pose mulM := GRing.Zmodule_isComNzRing.Build _ mulA mulC mul1 mulD nzL1.
+set mulM := GRing.Zmodule_isComNzRing.Build _ mulA mulC mul1 mulD nzL1.
 pose rL : comNzRingType := HB.pack vL mulM.
 have mulZlM : GRing.LSemiModule_isComSemiAlgebra F rL.
   constructor => a x y; apply: toPinj.

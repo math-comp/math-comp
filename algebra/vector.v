@@ -1389,7 +1389,7 @@ Definition opp_lfun f := linfun (-%R \o f).
 Lemma lfun_addN : left_inverse zero_lfun opp_lfun add_lfun.
 Proof. by move=> f; apply/lfunP=> v; rewrite !lfunE /= lfunE addNr. Qed.
 
-HB.instance Definition _ := GRing.Nmodule_isZmodule.Build 'Hom(aT, rT)
+HB.instance Definition _ := Algebra.Nmodule_isZmodule.Build 'Hom(aT, rT)
   lfun_addN.
 
 Lemma opp_lfunE f x : (- f) x = - f x. Proof. exact: lfunE. Qed.
