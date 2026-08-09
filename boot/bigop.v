@@ -591,6 +591,10 @@ Canonical bigop_unlock := Unlockable bigop.unlock.
 
 Definition index_iota m n := iota m (n - m).
 
+Lemma index_iotaS m n :
+  m <= n -> index_iota m n.+1 = rcons (index_iota m n) n.
+Proof. by move=> ?; rewrite /index_iota subSn// iotaS subnKC. Qed.
+
 Lemma mem_index_iota m n i : (i \in index_iota m n) = (m <= i < n).
 Proof.
 rewrite mem_iota; case le_m_i: (m <= i) => //=.
@@ -1144,6 +1148,12 @@ Lemma big_nat_recl n m F : m <= n ->
      op (F m) (\big[op/idx]_(m <= i < n) F i.+1).
 Proof. by move=> lemn; rewrite big_ltn // big_add1. Qed.
 
+Lemma big_nat_recr_op n m (P : pred nat) F :
+  m <= n ->
+  let idx' := if P n then op (F n) idx else idx in
+  \big[op/idx]_(m <= i < n.+1 | P i) F i = \big[op/idx']_(m <= i < n | P i) F i.
+Proof. by move=> ?; rewrite index_iotaS// big_rcons_op. Qed.
+
 Lemma big_mkord n (P : pred nat) F :
   \big[op/idx]_(0 <= i < n | P i) F i = \big[op/idx]_(i < n | P i) F i.
 Proof.
@@ -1273,6 +1283,41 @@ Lemma big_nseq I n a (F : I -> R):
 Proof. exact: big_nseq_cond. Qed.
 
 End Extensionality.
+
+Section MoreOnExtensionality.
+
+Variables (R : Type) (idx : R) (op : R -> R -> R) (I : Type).
+
+Lemma big_nat_dvdn n d F :
+  \big[op/idx]_(0 <= i < n | d.+1 %| i) F i =
+  \big[op/idx]_(0 <= i < (n + d) %/ d.+1) F (d.+1 * i)%N.
+Proof.
+elim: n idx.
+  by move=> ?; rewrite divn_small// !big_nil.
+move=> n IHn idx0.
+rewrite addSn divnS// -addnS dvdn_addl// big_nat_recr_op// IHn.
+case/boolP: (d.+1 %| n) => H /=.
+  rewrite add1n big_nat_recr_op//.
+  rewrite divnDl// (@divn_small d)// addn0.
+  congr bigop.body; congr op; congr F.
+  by rewrite muln_divCA// divnn muln1.
+by rewrite add0n.
+Qed.
+
+Lemma big_ord_recr_op n (P : pred nat) F :
+  let idx' := if P n then op (F n) idx else idx in
+  \big[op/idx]_(i < n.+1 | P i) F i = \big[op/idx']_(i < n | P i) F i.
+Proof.
+rewrite big_mknat big_nat_recr_op//=.
+case: n => [|n]; first by rewrite inordK// big_nil big_ord0.
+rewrite big_mknat inordK//.
+rewrite [LHS]big_nat_cond [RHS]big_nat_cond.
+apply: eq_big => i.
+  by apply: andb_id2l => /andP[] ? in1; rewrite !inordK// (ltn_trans in1).
+by move=> /andP[] /andP[? in1]; rewrite !inordK// (ltn_trans in1).
+Qed.
+
+End MoreOnExtensionality.
 
 Variant big_enum_spec (I : finType) (P : pred I) : seq I -> Type :=
   BigEnumSpec e of
