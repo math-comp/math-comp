@@ -149,6 +149,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq-elpi.job = true;
       hierarchy-builder.job = true;
       ConCert.job = false;
+      fcsl-pcm.job = false;  # fcsl-pcm dropped support for Rocq 9.1
     }; };
     "rocq-9.0" = { rocqPackages = common-bundles // {
       rocq-core.override.version = "9.0";
@@ -159,6 +160,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       coq-elpi.job = true;
       hierarchy-builder.job = true;
       odd-order.job = false;  # odd-order dropped support for 9.0
+      fcsl-pcm.job = false;  # fcsl-pcm dropped support for Rocq 9.0
     }; };
   };
 }
