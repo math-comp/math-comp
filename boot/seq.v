@@ -3116,6 +3116,9 @@ Proof. by elim: n1 m => [|n1 IHn1] m; rewrite ?addn0 // -addSnnS /= -IHn1. Qed.
 Lemma iotaDl m1 m2 n : iota (m1 + m2) n = map (addn m1) (iota m2 n).
 Proof. by elim: n m2 => //= n IHn m2; rewrite -addnS IHn. Qed.
 
+Lemma iotaS m n : iota m n.+1 = rcons (iota m n) (m + n).
+Proof. by rewrite -addn1 iotaD cats1. Qed.
+
 Lemma nth_iota p m n i : i < n -> nth p (iota m n) i = m + i.
 Proof.
 by move/subnKC <-; rewrite addSnnS iotaD nth_cat size_iota ltnn subnn.
@@ -3183,7 +3186,7 @@ Proof. by rewrite size_map size_iota. Qed.
 
 Lemma mkseqS f n :
   mkseq f n.+1 = rcons (mkseq f n) (f n).
-Proof. by rewrite /mkseq -addn1 iotaD add0n map_cat cats1. Qed.
+Proof. by rewrite /mkseq iotaS map_rcons. Qed.
 
 Lemma eq_mkseq f g : f =1 g -> mkseq f =1 mkseq g.
 Proof. by move=> Efg n; apply: eq_map Efg _. Qed.
