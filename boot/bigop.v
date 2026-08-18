@@ -1296,12 +1296,11 @@ elim: n idx.
   by move=> ?; rewrite divn_small// !big_nil.
 move=> n IHn idx0.
 rewrite addSn divnS// -addnS dvdn_addl// big_nat_recr_op// IHn.
-case/boolP: (d.+1 %| n) => H /=.
-  rewrite add1n big_nat_recr_op//.
-  rewrite divnDl// (@divn_small d)// addn0.
-  congr bigop.body; congr op; congr F.
-  by rewrite muln_divCA// divnn muln1.
-by rewrite add0n.
+case/boolP: (d.+1 %| n) => H /=; last by rewrite add0n.
+rewrite add1n big_nat_recr_op//.
+rewrite divnDl// (@divn_small d)// addn0.
+congr bigop.body; congr op; congr F.
+by rewrite muln_divCA// divnn muln1.
 Qed.
 
 Lemma big_ord_recr_op n (P : pred nat) F :
