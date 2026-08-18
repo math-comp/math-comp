@@ -441,9 +441,9 @@ Context (disp1 disp2 : disp_t).
 Context (T1 : preorderType disp1) (T2 : preorderType disp2).
 Implicit Types (x y : T1 * T2).
 
-Let le x y := (x.1 <= y.1) && (x.2 <= y.2).
+Definition le x y := (x.1 <= y.1) && (x.2 <= y.2).
 
-Let lt x y := (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
+Definition lt x y := (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
 
 Fact lt_def x y : lt x y = le x y && ~~ le y x.
 Proof.
@@ -472,12 +472,8 @@ HB.instance Definition _ := Preorder.on T1'.
 Let T2' : Type := T2.
 HB.instance Definition _ := Preorder.on T2'.
 
-Definition le x y := (x.1 <= y.1) && (x.2 <= y.2).
-
-Definition lt x y := (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
-
 #[export] HB.instance Definition _ :=
-  @isDuallyPreorder.Build disp3 (T1 * T2) le lt
+  @isDuallyPreorder.Build disp3 (T1 * T2) (@le _ _ T1 T2) (@lt _ _ T1 T2)
     (@lt_def _ _ T1' T2') (@lt_def _ _ T1^d T2^d)
     (@refl _ _ T1' T2') (@refl _ _ T1^d T2^d)
     (@trans _ _ T1' T2') (@trans _ _ T1^d T2^d).
@@ -486,10 +482,7 @@ Lemma leEprod x y : (x <= y) = (x.1 <= y.1) && (x.2 <= y.2). Proof. by []. Qed.
 
 Lemma ltEprod_pre x y :
   (x < y) = (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
-Proof.
-rewrite lt_leAnge !leEprod negb_and andb_orr andbAC -lt_leAnge -andbA.
-by rewrite -lt_leAnge.
-Qed.
+Proof. by []. Qed.
 
 Lemma le_pair (x1 y1 : T1) (x2 y2 : T2) :
   ((x1, x2) <= (y1, y2) :> T1 * T2) = (x1 <= y1) && (x2 <= y2).
@@ -543,13 +536,12 @@ Lemma topEprod : \top = (\top, \top) :> T1 * T2. Proof. by []. Qed.
 End TPreorder.
 
 Section POrder.
-Context (disp1 disp2 disp3 : disp_t).
+Context (disp1 disp2 : disp_t).
 Context (T1 : porderType disp1) (T2 : porderType disp2).
 
-Fact anti : antisymmetric (@le disp1 disp2 disp2 T1 T2).
+Fact anti : antisymmetric (@le _ _ T1 T2).
 Proof.
-case=> [? ?] [? ?].
-by rewrite andbAC andbA andbAC -andbA => /= /andP [] /le_anti -> /le_anti ->.
+by case=> [? ?] [? ?]; rewrite andbACA/= => /andP[] /le_anti-> /le_anti->.
 Qed.
 
 End POrder.
