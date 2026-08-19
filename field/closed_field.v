@@ -68,7 +68,7 @@ Definition cpsif T (c : fF) (t : T) (e : T) : cps T :=
   fun k => GRing.If c (k t) (k e).
 Arguments cpsif {T} c t e k /.
 Notation "''if' c1 'then' c2 'else' c3" := (cpsif c1%T c2%T c3%T)
-  (at level 200, right associativity, format
+  (at level 10, c3 at level 200, right associativity, format
 "'[hv   ' ''if'  c1  '/' '[' 'then'  c2  ']' '/' '[' 'else'  c3 ']' ']'").
 
 Notation eval := GRing.eval.
@@ -576,6 +576,7 @@ Definition ex_elim (x : nat) (pqs : seq tF * seq tF) :=
 
 Lemma ex_elim_qf (x : nat) (pqs : seq tF * seq tF) :
   GRing.dnf_rterm pqs -> qf (ex_elim x pqs).
+Proof.
 case: pqs => ps qs; case/andP=> /= rps rqs.
 apply: ex_elim_seq_qf; first exact: rseq_poly_map.
 apply: rabstrX=> /=.

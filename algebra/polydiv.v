@@ -1493,6 +1493,7 @@ by rewrite /eqp; case/andP=> pq qp dp; apply: (dvdp_trans dp).
 Qed.
 
 Lemma eqp_dvdl d2 d1 p : d1 %= d2 -> (d1 %| p) = (d2 %| p).
+Proof.
 suff Hmn m n: m %= n -> (m %| p) -> (n %| p).
   by move=> ?; apply/idP/idP; apply: Hmn; rewrite // eqp_sym.
 by rewrite /eqp; case/andP=> dd' d'd dp; apply: (dvdp_trans d'd).
