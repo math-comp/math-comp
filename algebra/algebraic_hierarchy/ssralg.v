@@ -1,21 +1,13 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+
+Attributes deprecated(since="mathcomp 2.7.0",
+  note="Use algebraic_hierarchy.v instead").
+
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
 From mathcomp Require Import choice fintype finfun bigop prime binomial.
 From mathcomp Require Export nmodule rings_modules_and_algebras divalg decfield.
-
-(******************************************************************************)
-(*                            Ring-like structures                            *)
-(*                                                                            *)
-(* This file re-exports the contents of algebra.v, divalg.v, and decfield.v:  *)
-(* (semi)rings, (semi)modules, (semi)algebras with or without commutativity,  *)
-(* multiplicative inverse, etc., decidable fields, algebraically closed       *)
-(* fields, and their morphisms.                                               *)
-(*                                                                            *)
-(* Reference: Francois Garillot, Georges Gonthier, Assia Mahboubi, Laurence   *)
-(* Rideau, Packaging mathematical structures, TPHOLs 2009                     *)
-(******************************************************************************)
 
 Set Implicit Arguments.
 Unset Strict Implicit.

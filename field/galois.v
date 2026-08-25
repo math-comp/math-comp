@@ -2,10 +2,11 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
-From mathcomp Require Import choice fintype tuple finfun bigop ssralg poly.
-From mathcomp Require Import polydiv finset fingroup morphism quotient perm.
-From mathcomp Require Import action zmodp cyclic matrix mxalgebra vector.
-From mathcomp Require Import falgebra fieldext separable.
+From mathcomp Require Import choice fintype tuple finfun bigop finset nmodule.
+From mathcomp Require Import fingroup morphism quotient perm action.
+From mathcomp Require Import rings_modules_and_algebras divalg zmodp poly.
+From mathcomp Require Import polydiv matrix mxalgebra vector cyclic falgebra.
+From mathcomp Require Import fieldext separable.
 
 (******************************************************************************)
 (*                       Basic Galois field theory                            *)
@@ -100,9 +101,9 @@ Proof. by apply: andb_idr => /ahom_inP[_ f1]; apply/fixedSpaceP. Qed.
 Lemma kHom_monoid_morphism (f : 'End(L)) :
   reflect (monoid_morphism f) (kHom 1 {:L} f).
 Proof. by rewrite k1HomE; apply: ahomP_tmp. Qed.
-#[warning="-deprecated-reference-since-mathcomp-2.5.0",
-  deprecated(since="mathcomp 2.5.0", use=kHom_monoid_morphism)]
-Lemma kHom_lrmorphism (f : 'End(L)) : reflect (multiplicative f) (kHom 1 {:L} f).
+#[deprecated(since="mathcomp 2.5.0", use=kHom_monoid_morphism)]
+Lemma kHom_lrmorphism (f : 'End(L)) :
+  reflect ((f 1 = 1) * {morph f : x y / x * y >-> x * y}) (kHom 1 {:L} f).
 Proof. #[warning="-deprecated-since-mathcomp-2.5.0"] by rewrite k1HomE; apply: ahomP. Qed.
 
 (* Lemma kHom_lrmorphism (f : 'End(L)) : reflect (lrmorphism f) (kHom 1 {:L} f). *)

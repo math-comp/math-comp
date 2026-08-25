@@ -1,12 +1,11 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
-From mathcomp Require Import choice fintype bigop finset prime binomial.
-From mathcomp Require Import fingroup morphism perm automorphism presentation.
-From mathcomp Require Import quotient action commutator gproduct gfunctor.
-From mathcomp Require Import ssralg finalg zmodp cyclic pgroup center gseries.
-From mathcomp Require Import nilpotent sylow abelian finmodule matrix maximal.
-From mathcomp Require Import extremal.
+From mathcomp Require Import choice fintype bigop finset prime nmodule fingroup.
+From mathcomp Require Import morphism perm automorphism presentation quotient.
+From mathcomp Require Import action gproduct rings_modules_and_algebras zmodp.
+From mathcomp Require Import commutator cyclic pgroup center gseries sylow.
+From mathcomp Require Import abelian maximal extremal.
 
 (******************************************************************************)
 (* This file contains the fine structure thorems for extraspecial p-groups.   *)
