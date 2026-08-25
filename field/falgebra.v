@@ -2,8 +2,9 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
-From mathcomp Require Import choice fintype div tuple finfun bigop ssralg.
-From mathcomp Require Import finalg zmodp matrix vector poly.
+From mathcomp Require Import choice fintype div tuple finfun bigop nmodule.
+From mathcomp Require Import rings_modules_and_algebras divalg poly matrix.
+From mathcomp Require Import vector.
 
 (******************************************************************************)
 (*        Finite dimensional free algebras, usually known as F-algebras       *)
@@ -1031,9 +1032,10 @@ apply: (iffP ahom_inP) => [[fM f1] | fRM_P]; last first.
   by split=> [x y|]; [rewrite fRM_P.2|rewrite fRM_P.1].
 by split=> // x y; rewrite fM ?memvf.
 Qed.
-#[warning="-deprecated-reference-since-mathcomp-2.5.0",
-  deprecated(since="mathcomp 2.5.0", use=ahomP_tmp)]
-Lemma ahomP {f : 'Hom(aT, rT)} : reflect (multiplicative f) (ahom_in {:aT} f).
+
+#[deprecated(since="mathcomp 2.5.0", use=ahomP_tmp)]
+Lemma ahomP {f : 'Hom(aT, rT)} :
+  reflect ((f 1 = 1) * {morph f : x y / x * y >-> x * y}) (ahom_in {:aT} f).
 Proof. by apply: (iffP ahomP_tmp) => [][]. Qed.
 
 Structure ahom := AHom {ahval :> 'Hom(aT, rT); _ : ahom_in {:aT} ahval}.
@@ -1063,11 +1065,6 @@ Proof. by apply/ahomP_tmp; case: f. Qed.
 #[hnf]
 HB.instance Definition _ (f : ahom aT rT) :=
   GRing.isMonoidMorphism.Build aT rT f (ahom_is_monoid_morphism f).
-
-#[warning="-deprecated-reference-since-mathcomp-2.5.0",
-  deprecated(since="mathcomp 2.5.0", use=ahom_is_monoid_morphism)]
-Definition ahom_is_multiplicative (f : ahom aT rT) : multiplicative f :=
-  (fun p => (p.2, p.1)) (ahom_is_monoid_morphism f).
 
 Lemma ahomWin (f : ahom aT rT) U : ahom_in U f.
 Proof.

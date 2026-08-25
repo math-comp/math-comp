@@ -1,12 +1,11 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype tuple finfun bigop prime finset.
-From mathcomp Require Import preorder porder ssralg poly fingroup morphism perm.
-From mathcomp Require Import automorphism quotient finalg action gproduct.
-From mathcomp Require Import zmodp commutator cyclic center pgroup sylow.
-From mathcomp Require Import frobenius vector ssrnum ssrint archimedean intdiv.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
+From mathcomp Require Import fintype tuple finfun bigop finset nmodule.
+From mathcomp Require Import fingroup gproduct preorder porder orderedzmod.
+From mathcomp Require Import rings_modules_and_algebras divalg vector.
+From mathcomp Require Import numeric_hierarchy ssrint archimedean frobenius.
 From mathcomp Require Import algC algnum classfun character integral_char.
 
 (******************************************************************************)
