@@ -1,14 +1,14 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
-From mathcomp Require Import choice fintype div tuple finfun bigop prime finset.
-From mathcomp Require Import preorder porder ssralg ssrnum fingroup morphism.
-From mathcomp Require Import perm automorphism quotient action zmodp cyclic.
-From mathcomp Require Import center gproduct commutator gseries nilpotent.
-From mathcomp Require Import pgroup sylow maximal frobenius matrix mxalgebra.
-From mathcomp Require Import mxrepresentation vector algC classfun character.
-From mathcomp Require Import archimedean.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
+From mathcomp Require Import fintype div tuple finfun bigop prime finset.
+From mathcomp Require Import nmodule fingroup morphism automorphism quotient.
+From mathcomp Require Import action gproduct preorder porder orderedzmod.
+From mathcomp Require Import rings_modules_and_algebras divalg.
+From mathcomp Require Import numeric_hierarchy archimedean vector.
+From mathcomp Require Import cyclic center pgroup commutator gseries nilpotent.
+From mathcomp Require Import sylow maximal frobenius algC classfun character.
 
 Set Implicit Arguments.
 Unset Strict Implicit.
