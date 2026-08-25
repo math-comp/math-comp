@@ -6,6 +6,7 @@ From Corelib Require Import IntDef.
 From micromega_plugin Require Import RatDef.
 From micromega_plugin Require Import formula witness tactics checker eval.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
+#[warnings="-deprecated-since-mathcomp-2.7.0"]
 From mathcomp Require Import seq order ssralg ssrnum ssrint rat binnums.
 From mathcomp Require Import ring_tactic.
 From mathcomp.algebra Extra Dependency "ring_tactic.elpi" as ring_tactic.

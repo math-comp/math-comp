@@ -2,10 +2,15 @@
 To enjoys the automation it provides,
 you need to explictly "Import interval_inference". *)
 
+(* TODO: replace with algebraic_hierarchy and numeric_hierarchy *)
+#[warning="-deprecated-library-file-since-mathcomp-2.7.0"]
 From mathcomp Require Export ssralg.
-From mathcomp Require Export ssrnum.
-From mathcomp Require Export finalg.
 From mathcomp Require Export countalg.
+From mathcomp Require Export finalg.
+From mathcomp Require Export ring_quotient.
+#[warning="-deprecated-library-file-since-mathcomp-2.7.0"]
+From mathcomp Require Export ssrnum.
+(* /TODO *)
 From mathcomp Require Export poly.
 From mathcomp Require Export polydiv.
 From mathcomp Require Export polyXY.
@@ -20,7 +25,6 @@ From mathcomp Require Export mxpoly.
 From mathcomp Require Export mxalgebra.
 From mathcomp Require Export mxred.
 From mathcomp Require Export vector.
-From mathcomp Require Export ring_quotient.
 From mathcomp Require Export fraction.
 From mathcomp Require Export zmodp.
 From mathcomp Require Export sesquilinear.
