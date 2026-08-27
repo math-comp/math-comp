@@ -5,6 +5,7 @@ From mathcomp Require Export total_order total_order_instances.
 From mathcomp Require Export complemented_lattice.
 From mathcomp Require Export complemented_lattice_instances order_instances.
 From mathcomp Require Export interval.
+(* N.B. orderedzmod is not exported here yet. *)
 
 (******************************************************************************)
 (*              Types equipped with preorder and order relations              *)
@@ -33,7 +34,10 @@ From mathcomp Require Export interval.
 (*                          as well as instances of the totally-ordered and   *)
 (*                          complemented lattice structure                    *)
 (*              interval.v: theory of intervals in ordered types              *)
-(*     order.v (this file): re-exportation of all the files above             *)
+(*           orderedzmod.v: partially-ordered N-modules and Z-modules, and    *)
+(*                          their theory                                      *)
+(*     order.v (this file): re-exportation of all the files above (except     *)
+(*                          orderedzmod.v)                                    *)
 (*                                                                            *)
 (* As a rule of thumb, <library>_instances.v depend only on <library>.v and   *)
 (* its dependencies, and instance declarations on the same carrier type       *)

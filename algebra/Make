@@ -27,7 +27,6 @@ algebraic_hierarchy/divalg.v
 algebraic_hierarchy/decfield.v
 algebraic_hierarchy/ssralg.v
 ssrint.v
-numeric_hierarchy/orderedzmod.v
 numeric_hierarchy/numdomain.v
 numeric_hierarchy/numfield.v
 numeric_hierarchy/ssrnum.v

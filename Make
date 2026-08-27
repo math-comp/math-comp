@@ -13,7 +13,6 @@ algebra/matrix.v
 algebra/mxalgebra.v
 algebra/mxpoly.v
 algebra/mxred.v
-algebra/numeric_hierarchy/orderedzmod.v
 algebra/numeric_hierarchy/numdomain.v
 algebra/numeric_hierarchy/numfield.v
 algebra/numeric_hierarchy/ssrnum.v
@@ -127,6 +126,7 @@ order/complemented_lattice_instances.v
 order/order.v
 order/order_instances.v
 order/interval.v
+order/orderedzmod.v
 ssreflect/all_ssreflect.v
 
 -I .
