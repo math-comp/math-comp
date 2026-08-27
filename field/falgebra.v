@@ -149,7 +149,7 @@ HB.builders Context K A & Algebra_isFalgebra K A.
 HB.end.
 
 Module FalgebraExports.
-Bind Scope ring_scope with sort.
+Bind Scope ring_scope with Falgebra.sort.
 End FalgebraExports.
 HB.export FalgebraExports.
 
