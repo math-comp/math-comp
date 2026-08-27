@@ -1587,6 +1587,7 @@ move: i f; elim e using (@RExpr_ind' P P0); rewrite {R e}/P {}/P0 //=.
 Qed.
 End correct.
 
+#[universes(polymorphic)]
 Lemma semiring_correct (R : comSemiRingType) n env
     (lpe : seq ((RExpr R * RExpr R) * (PExpr N * PExpr N)))
     (re1 re2 : RExpr R) (pe1 pe2 : PExpr N) :
@@ -1617,6 +1618,7 @@ rewrite -!(@Rnorm_correct (SemiRing R) false _ erefl) re12.
 by case: lpe {IH relpe rple} => //=; rewrite eqxx.
 Qed.
 
+#[universes(polymorphic)]
 Lemma ring_correct (R : comRingType) n env
     (lpe : seq ((RExpr R * RExpr R) * (PExpr Z * PExpr Z)))
     (re1 re2 : RExpr R) (pe1 pe2 : PExpr Z) :
