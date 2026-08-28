@@ -814,7 +814,7 @@ End ratArchimedean.
 End ratArchimedean.
 
 HB.instance Definition _ :=
-  Num.NumDomain_hasFloorCeilTruncn_truncn_abs_floor.Build rat
+  Num.NumDomain_hasFloorCeilTruncn.Build rat
     ratArchimedean.floorP ratArchimedean.ceilP ratArchimedean.truncnP
     ratArchimedean.intrP ratArchimedean.natrP.
 
@@ -961,9 +961,8 @@ Variable F : archiNumFieldType.
 
 Lemma floor_rat : {mono (@ratr F) : x / Num.floor x}.
 Proof.
-move=> x; apply: floor_def; apply/andP; split.
-- by rewrite -ratr_int ler_rat floor_le.
-- by rewrite -ratr_int ltr_rat floorD1_gt.
+move=> x; apply: floor_eq.
+by rewrite -2!(@ratr_int F) ler_rat ltr_rat floor_le floorD1_gt.
 Qed.
 
 Lemma ceil_rat : {mono (@ratr F) : x / Num.ceil x}.
