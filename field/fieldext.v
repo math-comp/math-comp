@@ -1,10 +1,10 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq div.
-From mathcomp Require Import choice fintype tuple finfun bigop ssralg countalg.
-From mathcomp Require Import finalg zmodp matrix vector falgebra poly polydiv.
-From mathcomp Require Import mxpoly generic_quotient.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
+From mathcomp Require Import div fintype tuple bigop generic_quotient nmodule.
+From mathcomp Require Import rings_modules_and_algebras divalg countalg finalg.
+From mathcomp Require Import matrix vector poly polydiv mxpoly falgebra.
 
 (******************************************************************************)
 (*                   Finite dimensional field extensions                      *)

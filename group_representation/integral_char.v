@@ -1,15 +1,16 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype tuple finfun bigop prime finset.
-From mathcomp Require Import preorder porder ssralg poly fingroup morphism perm.
-From mathcomp Require Import automorphism quotient action countalg finalg zmodp.
-From mathcomp Require Import commutator cyclic center pgroup sylow gseries.
-From mathcomp Require Import nilpotent abelian ssrnum ssrint archimedean.
-From mathcomp Require Import polydiv rat matrix mxalgebra intdiv mxpoly vector.
-From mathcomp Require Import falgebra fieldext separable galois algC cyclotomic.
-From mathcomp Require Import algnum mxrepresentation classfun character.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
+From mathcomp Require Import div fintype tuple bigop prime finset nmodule.
+From mathcomp Require Import fingroup morphism perm quotient action.
+From mathcomp Require Import preorder porder orderedzmod.
+From mathcomp Require Import rings_modules_and_algebras divalg finalg poly.
+From mathcomp Require Import polydiv matrix mxalgebra vector numeric_hierarchy.
+From mathcomp Require Import ssrint archimedean rat cyclic center pgroup.
+From mathcomp Require Import gseries nilpotent sylow abelian falgebra fieldext.
+From mathcomp Require Import galois algC cyclotomic algnum mxrepresentation.
+From mathcomp Require Import classfun character.
 
 (******************************************************************************)
 (* This file provides some standard results based on integrality properties   *)

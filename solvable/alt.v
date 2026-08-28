@@ -2,10 +2,11 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
-From mathcomp Require Import div fintype tuple tuple bigop prime finset ssralg.
-From mathcomp Require Import zmodp fingroup morphism perm automorphism quotient.
-From mathcomp Require Import action cyclic pgroup gseries sylow.
-From mathcomp Require Import primitive_action nilpotent maximal.
+From mathcomp Require Import div fintype tuple bigop prime finset nmodule.
+From mathcomp Require Import fingroup morphism perm automorphism quotient.
+From mathcomp Require Import action rings_modules_and_algebras zmodp.
+From mathcomp Require Import cyclic pgroup gseries sylow primitive_action.
+From mathcomp Require Import nilpotent maximal.
 
 (******************************************************************************)
 (*  Definitions of the symmetric and alternate groups, and some properties.   *)
