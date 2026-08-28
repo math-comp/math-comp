@@ -1,0 +1,141 @@
+# This is a comment.
+# Each line is a file pattern followed by one or more owners.
+# The order is important; the last matching pattern takes the most precedence.
+# - owners can be given using the following syntax:
+#   `@GitHubUsername`, `@math-comp/group` or `email@example.com`
+# - paths/patterns can be given using the syntax:
+#   + `/stuff/` for all files inside the root directory `stuff`
+#   + `stuff/` for all files inside any directory called `stuff`
+#   + use of wildcard `*` is permitted
+# See https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners
+# for the official documentation.
+
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence,
+# @math-comp/core will be requested for
+# review when someone opens a pull request.
+*        @math-comp/core
+
+# When someone opens a pull request that only modifies .v files
+# the following teams will be requested for a review.
+*.v      @math-comp/core @math-comp/reporter
+
+# Ownership of /etc directory
+# /etc/
+
+# Ownership of opam files
+# *.opam
+
+# Ownership of nix files
+*.nix @CohenCyril
+
+# Ownership of current Changelog
+# CHANGELOG_UNRELEASED.md
+
+# Ownership of release Changelog
+# CHANGELOG.md
+
+# Ownership of various readmes
+# CONTRIBUTING.md
+# README.md
+# INSTALL.md
+
+# Ownershop of Docker related files
+# Dockerfile*
+
+# Ownership of CIs
+# .github/workflows/nix.yml
+# .gitlab-ci.yml
+
+# File by file .v ownership, ordered alphabetically
+# algebra/all_algebra.v
+# algebra/finalg.v
+# algebra/countalg.v
+# algebra/fraction.v
+# algebra/intdiv.v
+# algebra/interval.v
+# algebra/matrix.v
+# algebra/mxalgebra.v
+# algebra/mxpoly.v
+# algebra/polydiv.v
+# algebra/poly.v
+# algebra/polyXY.v
+# algebra/rat.v
+# algebra/ring_quotient.v
+# algebra/ssralg.v
+# algebra/ssrint.v
+# algebra/ssrnum.v
+# algebra/vector.v
+# algebra/zmodp.v
+# all/all.v
+# character/all_character.v
+# character/character.v
+# character/classfun.v
+# character/inertia.v
+# character/integral_char.v
+# character/mxabelem.v
+# character/mxrepresentation.v
+# character/vcharacter.v
+# field/algC.v
+# field/algebraics_fundamentals.v
+# field/algnum.v
+# field/all_field.v
+# field/closed_field.v
+# field/cyclotomic.v
+# field/falgebra.v
+# field/fieldext.v
+# field/finfield.v
+# field/galois.v
+# field/separable.v
+# fingroup/action.v
+# fingroup/all_fingroup.v
+# fingroup/automorphism.v
+# fingroup/fingroup.v
+# fingroup/gproduct.v
+# fingroup/morphism.v
+# fingroup/perm.v
+# fingroup/presentation.v
+# fingroup/quotient.v
+# solvable/abelian.v
+# solvable/all_solvable.v
+# solvable/alt.v
+# solvable/burnside_app.v
+# solvable/center.v
+# solvable/commutator.v
+# solvable/cyclic.v
+# solvable/extraspecial.v
+# solvable/extremal.v
+# solvable/finmodule.v
+# solvable/frobenius.v
+# solvable/gfunctor.v
+# solvable/gseries.v
+# solvable/hall.v
+# solvable/jordanholder.v
+# solvable/maximal.v
+# solvable/nilpotent.v
+# solvable/pgroup.v
+# solvable/primitive_action.v
+# solvable/sylow.v
+# ssreflect/all_ssreflect.v
+# ssreflect/bigop.v
+# ssreflect/binomial.v
+# ssreflect/choice.v
+# ssreflect/div.v
+# ssreflect/eqtype.v
+# ssreflect/finfun.v
+# ssreflect/fingraph.v
+# ssreflect/finset.v
+# ssreflect/fintype.v
+# ssreflect/generic_quotient.v
+# ssreflect/order.v
+# ssreflect/path.v
+# ssreflect/prime.v
+# ssreflect/seq.v
+# ssreflect/ssrAC.v
+# ssreflect/ssrbool.v
+# ssreflect/ssreflect.v
+# ssreflect/ssrfun.v
+# ssreflect/ssrnat.v
+# ssreflect/ssrnotations.v
+# ssreflect/ssrmatching.v
+# ssreflect/tuple.v
