@@ -678,25 +678,25 @@ Local Notation inlined_new_rect :=
 Reserved Notation "[ 'isSub' 'for' v ]" (format "[ 'isSub'  'for'  v ]").
 
 Notation "[ 'isSub' 'for' v ]" :=
-  (@isSub.phant_Build _ _ _ v _ inlined_sub_rect vrefl_rect)
+  (@isSub.phant_Build_ _ _ _ v _ inlined_sub_rect vrefl_rect)
   (only parsing) : form_scope.
 
 Notation "[ 'isSub' 'of'  T  'for' v ]" :=
-  (@isSub.phant_Build _ _ T v _ inlined_sub_rect vrefl_rect)
+  (@isSub.phant_Build_ _ _ T v _ inlined_sub_rect vrefl_rect)
   (only parsing) : form_scope.
 
 Notation "[ 'isSub' 'for' v 'by' rec ]" :=
- (@isSub.phant_Build _ _ _ v _ rec vrefl)
+ (@isSub.phant_Build_ _ _ _ v _ rec vrefl)
  (format "[ 'isSub'  'for'  v  'by'  rec ]") : form_scope.
 
-Notation "[ 'isSub' 'for' v ]" := (@isSub.phant_Build _ _ _ v _ _ _)
+Notation "[ 'isSub' 'for' v ]" := (@isSub.phant_Build_ _ _ _ v _ _ _)
   (only printing, format "[ 'isSub'  'for'  v ]") : form_scope.
 
 Reserved Notation "[ 'isNew' 'for' v ]" (format "[ 'isNew'  'for'  v ]").
 
 Definition NewMixin T U v c Urec sk :=
   let Urec' P IH := Urec P (fun x : T => IH x isT : P _) in
-  @isSub.phant_Build _ _ U v (fun x _ => c x) Urec' sk.
+  @isSub.phant_Build_ _ _ U v (fun x _ => c x) Urec' sk.
 
 Notation "[ 'isNew' 'for' v ]" :=
   (@NewMixin _ _ v _ inlined_new_rect vrefl_rect) (only parsing) : form_scope.

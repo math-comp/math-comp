@@ -1524,7 +1524,7 @@ Proof.
 by move=> p; apply/polyP => i; rewrite coefD coef_opp_poly coef0 addNr.
 Qed.
 
-HB.instance Definition _ := GRing.Nmodule_isZmodule.Build (polynomial R)
+HB.instance Definition _ := Algebra.Nmodule_isZmodule.Build (polynomial R)
   add_polyN.
 
 (* Size, leading coef, morphism properties of coef *)
