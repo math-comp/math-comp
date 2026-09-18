@@ -1012,6 +1012,7 @@ Definition Formula_Q2Z (ff : Formula Q) : option (Formula Z) :=
     (fun l r => Build_Formula l (Fop ff) r)
     (PExpr_Q2Z (Flhs ff)) (PExpr_Q2Z (Frhs ff)).
 
+#[universes(polymorphic)]
 Fixpoint BFormula_Q2Z [k] (ff : BFormula (Formula Q) k) :
     option (BFormula (Formula Z) k) := match ff with
   | TT k => Some (TT k)

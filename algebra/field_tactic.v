@@ -691,6 +691,7 @@ End ZnumField.
 
 (* Everything below is essentially imported form algebra-tactics *)
 
+#[universes(polymorphic)]
 Lemma field_correct (F : fieldType) n env
     (lpe : seq ((RExpr F * RExpr F) * (PExpr Z * PExpr Z)))
     (re1 re2 : RExpr F) (fe1 fe2 : FExpr Z) lc :
@@ -732,6 +733,7 @@ rewrite -!(@Rnorm_correct (Field F) false _ erefl) re12.
 by case: lpe {IH relpe rple} => /=; rewrite eqxx.
 Qed.
 
+#[universes(polymorphic)]
 Lemma numField_correct (F : numFieldType) n env
     (lpe : seq ((RExpr F * RExpr F) * (PExpr Z * PExpr Z)))
     (re1 re2 : RExpr F) (fe1 fe2 : FExpr Z) lc :
