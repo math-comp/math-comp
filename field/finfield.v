@@ -2,11 +2,14 @@
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype div tuple bigop prime finset fingroup.
-From mathcomp Require Import ssralg poly polydiv morphism action countalg.
-From mathcomp Require Import finalg zmodp cyclic center pgroup abelian matrix.
-From mathcomp Require Import mxpoly vector falgebra fieldext separable galois.
-From mathcomp Require ssrnum ssrint archimedean algC cyclotomic.
+From mathcomp Require Import fintype div tuple bigop prime finset nmodule.
+From mathcomp Require Import fingroup morphism action.
+From mathcomp Require Import rings_modules_and_algebras divalg countalg finalg.
+From mathcomp Require Import poly polydiv zmodp matrix mxpoly vector cyclic.
+From mathcomp Require Import center pgroup abelian falgebra fieldext separable.
+From mathcomp Require Import galois.
+From mathcomp Require preorder porder orderedzmod numdomain ssrint archimedean.
+From mathcomp Require algC cyclotomic.
 
 (******************************************************************************)
 (*           Additional constructions and results on finite fields            *)
@@ -614,7 +617,7 @@ Notation PrimePowerField := (pPrimePowerField) (only parsing).
 
 Section FinDomain.
 
-Import preorder porder ssrnum ssrint archimedean algC cyclotomic.
+Import preorder porder orderedzmod numdomain ssrint archimedean algC cyclotomic.
 Import Order.Theory Num.Theory.
 Local Infix "%|" := dvdn. (* Hide polynomial divisibility. *)
 

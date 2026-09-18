@@ -5,9 +5,9 @@ From elpi Require Import derive.std param2.
 From micromega_plugin Require Import NatDef.
 From Corelib Require Import IntDef.
 From micromega_plugin Require Import formula witness checker eval.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq nmodule.
 From mathcomp Require Import preorder.
-From mathcomp Require Export ssralg.
+From mathcomp Require Import rings_modules_and_algebras divalg.
 From mathcomp Require Import ssrint binnums.
 From mathcomp.algebra Extra Dependency "ring_tactic.elpi" as ring_tactic.
 

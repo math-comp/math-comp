@@ -5,8 +5,10 @@ From micromega_plugin Require Import PosDef NatDef.
 From Corelib Require Import IntDef.
 From micromega_plugin Require Import RatDef.
 From micromega_plugin Require Import formula witness tactics checker eval.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
-From mathcomp Require Import seq order ssralg ssrnum ssrint rat binnums.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq nmodule.
+From mathcomp Require Import preorder porder lattice total_order orderedzmod.
+From mathcomp Require Import rings_modules_and_algebras divalg.
+From mathcomp Require Import numeric_hierarchy ssrint rat binnums.
 From mathcomp Require Import ring_tactic.
 From mathcomp.algebra Extra Dependency "ring_tactic.elpi" as ring_tactic.
 From mathcomp.algebra Extra Dependency "arithmetic_tactic.elpi"
