@@ -133,7 +133,6 @@ with builtins; with (import <nixpkgs> {}).lib;
       interval.job = false;
       jasmin.job = false;  # waiting for InteractionTrees
       ssprove.job = false;  # waiting for equations
-      mathcomp-infotheo.job = false;  # not yet compatible with 9.2
     };
     "rocq-9.1".rocqPackages = common-bundles // {
       rocq-core.override.version = "9.1";
