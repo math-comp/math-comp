@@ -1,6 +1,6 @@
 concurrency:
   cancel-in-progress: true
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.head_ref }}
 jobs:
   ExtLib:
     needs:
