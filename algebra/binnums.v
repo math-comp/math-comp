@@ -2,8 +2,10 @@
 From micromega_plugin Require Import PosDef NatDef.
 From Corelib Require Import IntDef.
 From micromega_plugin Require Import RatDef.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
-From mathcomp Require Import ssralg ssrnum ssrint rat.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat nmodule.
+From mathcomp Require Import preorder porder lattice total_order orderedzmod.
+From mathcomp Require Import rings_modules_and_algebras divalg.
+From mathcomp Require Import numdomain numfield ssrint rat.
 
 (******************************************************************************)
 (* This file develops some link with binary numbers from Corelib, defining:   *)

@@ -1,12 +1,12 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype tuple finfun bigop prime finset.
-From mathcomp Require Import preorder porder ssralg poly fingroup morphism perm.
-From mathcomp Require Import automorphism quotient finalg action gproduct zmodp.
-From mathcomp Require Import commutator cyclic center pgroup sylow matrix.
-From mathcomp Require Import vector falgebra ssrnum algC algnum archimedean.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
+From mathcomp Require Import choice fintype tuple finfun bigop prime finset.
+From mathcomp Require Import nmodule fingroup morphism quotient action gproduct.
+From mathcomp Require Import preorder porder orderedzmod.
+From mathcomp Require Import rings_modules_and_algebras divalg matrix vector.
+From mathcomp Require Import numeric_hierarchy archimedean pgroup algC algnum.
 
 (******************************************************************************)
 (* This file contains the basic theory of class functions:                    *)

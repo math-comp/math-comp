@@ -1,9 +1,9 @@
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
-From mathcomp Require Import fintype tuple div bigop binomial finset finfun.
-From mathcomp Require Import ssralg countalg finalg poly polydiv qpoly perm.
-From mathcomp Require Import fingroup falgebra fieldext finfield galois.
-From mathcomp Require Import finalg zmodp matrix vector.
+From mathcomp Require Import div fintype bigop finset nmodule fingroup.
+From mathcomp Require Import rings_modules_and_algebras divalg countalg finalg.
+From mathcomp Require Import poly polydiv vector qpoly.
+From mathcomp Require Import falgebra fieldext finfield.
 
 (******************************************************************************)
 (* This file extends the algebras R[X]/<p> defined in qpoly with the field    *)
