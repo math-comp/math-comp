@@ -40,6 +40,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "ExtLib"
       "fcsl-pcm"
       "fourcolor"
+      "fpseries"
       "gaia"
       "graph-theory"
       "interval"
@@ -104,6 +105,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       coquelicot.job = false;
       ssprove.job = false;
       mathcomp-infotheo.job = false;  # not compatible with master
+      fpseries.job = false;  # not compatible with master
       paco.override.version = "master";  # for jasmin
       paco.job = false;  # only for jasmin
       ITree.override.version = "master";  # for jasmin
@@ -120,6 +122,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       jasmin.job = false;  # waiting for InteractionTrees
       ssprove.job = false;  # waiting for equations
       mathcomp-infotheo.job = false;  # not yet compatible with 9.3
+      fpseries.job = false;  # not yet compatible with 9.3
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
     };
