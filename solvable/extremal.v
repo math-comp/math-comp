@@ -692,7 +692,7 @@ have: #|G| %| q.*2  by rewrite -card_dihedral ?card_homg.
 have Gxy: <[x * y]> \subset G.
   by rewrite cycle_subG groupM ?mem_gen ?set21 ?set22.
 have[k oG]: exists k, #|G| = (k * q)%N by apply/dvdnP; rewrite cardSg.
-rewrite oG -mul2n dvdn_pmul2r ?order_gt0 ?dvdn_divisors // !inE /=.
+rewrite oG -mul2n dvdn_pmul2r ?order_gt0 ?dvdn_divisors // !inE ?in_nil ?orbF /=.
 case/pred2P=> [k1 | -> //]; case/negP: ne_x_y.
 have cycG: cyclic G.
   apply/cyclicP; exists (x * y); apply/eqP.
@@ -801,7 +801,7 @@ have Kw: w \in K.
   suffices: v ^+ 2 \in <[u]> :&: <[v]> by rewrite tiUV inE -order_dvdn ov.
   by rewrite inE {1}def_v2 groupM ?groupV !mem_cycle.
 have ow: #[w] = 2.
-  case/setDP: Kw; rewrite inE -order_dvdn dvdn_divisors // !inE /= order_eq1.
+  case/setDP: Kw; rewrite inE -order_dvdn dvdn_divisors // !inE ?in_nil ?orbF /= order_eq1.
   by case/orP=> /eqP-> // /imsetP[]; exists 1; rewrite ?inE ?expg1n.
 have defK: K = [set w].
   apply/eqP; rewrite eqEsubset sub1set Kw andbT subDset setUC.
@@ -1199,7 +1199,7 @@ have{invUV} invXX': {in X & G :\: X, forall z t, z ^ t = z^-1}.
   case/setDP=> Gz notXz; rewrite /q /r n3 /= in oxr ox.
   suff xz: x ^ z = x^-1 by case/cycleP: Xt => i ->; rewrite conjXg xz expgVn.
   have: x ^ z \in X by rewrite memJ_norm ?cycle_id ?(subsetP nXG).
-  rewrite invg_expg /X cycle_traject ox !inE /= !mulg1 -order_eq1 orderJ ox /=.
+  rewrite invg_expg /X cycle_traject ox !inE ?in_nil ?orbF /= !mulg1 -order_eq1 orderJ ox /=.
   case/or3P; move/eqP=> //; last by move/(congr1 order); rewrite orderJ ox oxr.
   move/conjg_fixP; rewrite (sameP commgP cent1P) cent1C -cent_cycle -/X => cXz.
   have defXz: X * <[z]> = G by rewrite (mulg_normal_maximal nsXG) ?cycle_subG.
@@ -1290,7 +1290,7 @@ rewrite pprodE //; split=> // [|||n_gt3].
   rewrite eqEsubset (OhmE 1 pG) cycle_subG gen_subG andbC.
   rewrite mem_gen ?inE ?groupX -?order_dvdn ?oxr //=.
   apply/subsetP=> t; case/setIP=> Gt; rewrite inE -order_dvdn /=.
-  rewrite dvdn_divisors ?inE //= order_eq1.
+  rewrite dvdn_divisors ?inE ?in_nil ?orbF //= order_eq1.
   case/pred2P=> [->|]; first exact: group1.
   by move/def_ur=> -> //; rewrite def_xr cycle_id.
 - split=> //= H; apply/idP/idP=> [maxH |]; last first.
