@@ -88,6 +88,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       #   for a complete list of Coq packages available in Nix
       # * <github_login>:<branch> is such that this will use the branch <branch>
       #   from https://github.com/<github_login>/<repository>
+      coq-combi.override.version = "proux01:mcmaster";
     };
   in {
     "rocq-master".rocqPackages = common-bundles // {
