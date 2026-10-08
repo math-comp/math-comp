@@ -2723,6 +2723,16 @@ move=> leE12; rewrite -big_andE.
 by elim/big_rec3: _ => // i Ci m1 m2 /leE12; apply: leqif_add.
 Qed.
 
+Lemma leq_sum_in (I : eqType) r (P : pred I) (E1 E2 : I -> nat) :
+    {in r, forall i, P i -> E1 i <= E2 i} ->
+  \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
+Proof.
+move=> leE12; rewrite !(big_seq_cond P).
+have leE12' i : (i \in r) && P i -> E1 i <= E2 i.
+  by move=> /andP[ir Pi]; apply: leE12.
+by elim/big_ind2: _ => // m1 m2 n1 n2; apply: leq_add.
+Qed.
+
 Lemma leq_sum I r (P : pred I) (E1 E2 : I -> nat) :
     (forall i, P i -> E1 i <= E2 i) ->
   \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
@@ -2732,6 +2742,28 @@ Lemma sub_in_leq_sum (I : eqType) r (P P' : pred I) (E : I -> nat) :
     {in r, subpred P P'} ->
   \sum_(i <- r | P i) E i <= \sum_(i <- r | P' i) E i.
 Proof. exact: (sub_in_le_big leqnn (fun m n => leq_addr n m)). Qed.
+
+Lemma eq_sum_leq_seq (I : eqType) r (P : pred I) (E1 E2 : I -> nat) :
+    {in r, forall i, P i -> E1 i <= E2 i} ->
+  (\sum_(i <- r | P i) E1 i == \sum_(i <- r | P i) E2 i) =
+  all (fun i => P i ==> (E1 i == E2 i)) r.
+Proof.
+move=> leE12; apply: eq_leqif.
+rewrite -big_all_cond !(big_seq_cond P).
+elim/big_rec3: _ => // i m1 m2 b /andP[ir Pi] le_m.
+by apply: leqif_add => //; apply: leqif_eq; exact: leE12.
+Qed.
+
+Lemma ltn_sum_leq_seq (I : eqType) r (P : pred I) (E1 E2 : I -> nat) :
+    {in r, forall i, P i -> E1 i <= E2 i} ->
+  (\sum_(i <- r | P i) E1 i < \sum_(i <- r | P i) E2 i) =
+  has (fun i => P i && (E1 i < E2 i)) r.
+Proof.
+move=> leE12.
+rewrite ltn_neqAle (leq_sum_in leE12) andbT (eq_sum_leq_seq leE12).
+rewrite -has_predC; apply: eq_in_has => i ir /=.
+by case Pi: (P i) => //=; rewrite ltn_neqAle leE12 // andbT.
+Qed.
 
 Lemma sumnB I r (P : pred I) (E1 E2 : I -> nat) :
      (forall i, P i -> E1 i <= E2 i) ->
