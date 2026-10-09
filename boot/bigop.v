@@ -2728,8 +2728,8 @@ Lemma leq_sum I r (P : pred I) (E1 E2 : I -> nat) :
   \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
 Proof. by move=> leE12; elim/big_ind2: _ => // m1 m2 n1 n2; apply: leq_add. Qed.
 
-Lemma sub_in_sum (I : eqType) r (P P' : pred I) (E : I -> nat) :
-    {in r, forall i, P i -> P' i} ->
+Lemma sub_in_leq_sum (I : eqType) r (P P' : pred I) (E : I -> nat) :
+    {in r, subpred P P'} ->
   \sum_(i <- r | P i) E i <= \sum_(i <- r | P' i) E i.
 Proof. exact: (sub_in_le_big leqnn (fun m n => leq_addr n m)). Qed.
 
