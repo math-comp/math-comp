@@ -1280,12 +1280,10 @@ Proof. by elim: s => //= x s IHs /forall_cons [-> /IHs ->]. Qed.
 Lemma eq_in_count s : {in s, a1 =1 a2} -> count a1 s = count a2 s.
 Proof. by move/eq_in_filter=> eq_a12; rewrite -!size_filter eq_a12. Qed.
 
-Lemma sub_in_count s :
-  {in s, forall x, a1 x -> a2 x} -> count a1 s <= count a2 s.
+Lemma sub_in_count s : {in s, subpred a1 a2} -> count a1 s <= count a2 s.
 Proof.
-elim: s => //= x s IHs /forall_cons [a12x /IHs le_s].
-apply: leq_add => //.
-by case a1x: (a1 x) => //=; rewrite (a12x a1x).
+elim: s => [//|x s IHs] /forall_cons[a12x /IHs le_s] /=.
+by apply: leq_add => //; case: a1 a12x => // ->.
 Qed.
 
 Lemma eq_in_all s : {in s, a1 =1 a2} -> all a1 s = all a2 s.
