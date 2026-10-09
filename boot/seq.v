@@ -575,7 +575,7 @@ Proof. by rewrite -!cats1 filter_cat /=; case (a x); rewrite /= ?cats0. Qed.
 
 Lemma last_filter s : a (last x0 s) -> last x0 (filter s) = last x0 s.
 Proof.
-case/lastP: s => [|s x] //; rewrite last_rcons => ax.
+case/lastP: s => [//|s x]; rewrite last_rcons => ax.
 by rewrite filter_rcons ax last_rcons.
 Qed.
 
