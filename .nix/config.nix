@@ -71,7 +71,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       mathcomp.job = false;
       stdlib.job = true;
       jasmin.override.version = "main";
-      ssprove.override.version = "main";
+      ssprove.override.version = "main";  # currently doesn't compile on MathComp master
       CertiRocq.job = false;
       ConCert.job = false;
       libvalidsdp.job = false;
