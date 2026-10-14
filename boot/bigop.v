@@ -2894,6 +2894,15 @@ Qed.
 Lemma eq_bigmax (I : finType) F : #|I| > 0 -> {i0 : I | \max_i F i = F i0}.
 Proof. by case/(eq_bigmax_cond F) => x _ ->; exists x. Qed.
 
+Lemma eq_bigmax_seq (I : eqType) r (P : pred I) F : has P r ->
+  {i0 | (i0 \in r) && P i0 & \max_(i <- r | P i) F i = F i0}.
+Proof.
+rewrite -size_filter_gt0 => nz; rewrite -big_filter big_tnth.
+pose tPr := tnth (in_tuple (filter P r)).
+have [|i maxE] := eq_bigmax (fun i => F (tPr i)) _; first by rewrite card_ord.
+by exists (tPr i) => //; rewrite andbC -mem_filter mem_tnth.
+Qed.
+
 Lemma expn_sum m I r (P : pred I) F :
   (m ^ (\sum_(i <- r | P i) F i) = \prod_(i <- r | P i) m ^ F i)%N.
 Proof. exact: (big_morph _ (expnD m)). Qed.
