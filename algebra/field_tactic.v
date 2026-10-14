@@ -7,7 +7,9 @@ From Corelib Require Import IntDef.
 From micromega_plugin Require Import formula witness checker eval.
 From micromega_plugin Require Import field_checker field_eval.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq order.
+#[warnings="-deprecated-since-mathcomp-2.7.0"]
 From mathcomp Require Export ssralg.
+#[warnings="-deprecated-since-mathcomp-2.7.0"]
 From mathcomp Require Import ssrnum ssrint binnums ring_tactic.
 From mathcomp.algebra Extra Dependency "ring_tactic.elpi" as ring_tactic.
 From mathcomp.algebra Extra Dependency "field_tactic.elpi" as field_tactic.
