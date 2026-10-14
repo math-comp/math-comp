@@ -368,20 +368,23 @@ Notation "[ 'Sub' Q 'of' T 'by' %/ ]" :=
   (format "[ 'Sub'  Q  'of'  T  'by'  %/ ]") : form_scope.
 
 Notation "[ 'Sub' Q 'by' %/ ]" :=
-  (SubType.copy Q%type (quot_type Q))
+  (SubType.copy Q%type (quot_type Q%type))
   (format "[ 'Sub'  Q  'by'  %/ ]") : form_scope.
 
 Notation "[ 'Equality' 'of' Q 'by' <:%/ ]" :=
-  (Equality.copy Q%type (quot_type Q))
+  (Equality.copy Q%type (quot_type Q%type))
   (format "[ 'Equality'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
-Notation "[ 'Choice' 'of' Q 'by' <:%/ ]" := (Choice.copy Q%type (quot_type Q))
+Notation "[ 'Choice' 'of' Q 'by' <:%/ ]" :=
+  (Choice.copy Q%type (quot_type Q%type))
   (format "[ 'Choice'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
-Notation "[ 'Countable' 'of' Q 'by' <:%/ ]" := (Countable.copy Q%type (quot_type Q))
+Notation "[ 'Countable' 'of' Q 'by' <:%/ ]" :=
+  (Countable.copy Q%type (quot_type Q%type))
   (format "[ 'Countable'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
-Notation "[ 'Finite' 'of' Q 'by' <:%/ ]" := (Finite.copy Q%type (quot_type Q))
+Notation "[ 'Finite' 'of' Q 'by' <:%/ ]" :=
+  (Finite.copy Q%type (quot_type Q%type))
   (format "[ 'Finite'  'of'  Q  'by'  <:%/ ]") : form_scope.
 
 (****************************************************)
