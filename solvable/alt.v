@@ -143,7 +143,10 @@ Proof.
 move=> T3; have{T3} oA: #|'Alt_T| = 3.
   by apply: double_inj; rewrite -mul2n card_Alt T3.
 apply/simpleP; split=> [|K]; [by rewrite trivg_card1 oA | case/andP=> sKH _].
-have:= cardSg sKH; rewrite oA dvdn_divisors // !inE orbC /= -oA.
+(* Folded global fixpoints leave the empty tail of [divisors 3] opaque to
+   [!inE]; the optional [?in_nil ?orbF] clears it to recover the expected
+   pred2 shape, and is a no-op on Rocq versions that unfold [divisors]. *)
+have:= cardSg sKH; rewrite oA dvdn_divisors // !inE ?in_nil ?orbF orbC /= -oA.
 case/pred2P=> eqK; [right | left]; apply/eqP.
   by rewrite eqEcard sKH eqK leqnn.
 by rewrite eq_sym eqEcard sub1G eqK cards1.
