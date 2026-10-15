@@ -298,6 +298,30 @@ Reserved Notation "A `|^sl` B" (at level 52, left associativity).
 Reserved Notation "A `\^sl` B" (at level 50, left associativity).
 Reserved Notation "~^sl` A" (at level 35, right associativity).
 
+(* Reserved notations for ordering of sum *)
+Reserved Notation "x <=^s y" (at level 70, y at next level).
+Reserved Notation "x >=^s y" (at level 70, y at next level).
+Reserved Notation "x <^s y" (at level 70, y at next level).
+Reserved Notation "x >^s y" (at level 70, y at next level).
+Reserved Notation "x <=^s y :> T" (at level 70, y at next level).
+Reserved Notation "x >=^s y :> T" (at level 70, y at next level).
+Reserved Notation "x <^s y :> T" (at level 70, y at next level).
+Reserved Notation "x >^s y :> T" (at level 70, y at next level).
+Reserved Notation "<=^s y" (at level 35).
+Reserved Notation ">=^s y" (at level 35).
+Reserved Notation "<^s y" (at level 35).
+Reserved Notation ">^s y" (at level 35).
+Reserved Notation "<=^s y :> T" (at level 35, y at next level).
+Reserved Notation ">=^s y :> T" (at level 35, y at next level).
+Reserved Notation "<^s y :> T" (at level 35, y at next level).
+Reserved Notation ">^s y :> T" (at level 35, y at next level).
+Reserved Notation "x >=<^s y" (at level 70, no associativity).
+Reserved Notation ">=<^s x" (at level 35).
+Reserved Notation ">=<^s y :> T" (at level 35, y at next level).
+Reserved Notation "x ><^s y" (at level 70, no associativity).
+Reserved Notation "><^s x" (at level 35).
+Reserved Notation "><^s y :> T" (at level 35, y at next level).
+
 Module Order.
 
 Export Order.
@@ -828,6 +852,68 @@ Notation "\max^l_ ( i 'in' A ) F" :=
 
 End SeqLexiSyntax.
 HB.export SeqLexiSyntax.
+
+(*****************************)
+(* Definition of sum_display *)
+(*****************************)
+
+Fact sum_display_unit (_ _ : unit) : unit. Proof. exact: tt. Qed.
+
+Definition sum_display (displ dispr : disp_t) : disp_t :=
+  Disp (sum_display_unit (d1 displ) (d1 dispr))
+       (sum_display_unit (d2 displ) (d2 dispr)).
+
+Module Import SumSyntax.
+
+Notation "<=^s%O" := (@le (sum_display _ _) _) : function_scope.
+Notation ">=^s%O" := (@ge (sum_display _ _) _)  : function_scope.
+Notation ">=^s%O" := (@ge (sum_display _ _) _)  : function_scope.
+Notation "<^s%O" := (@lt (sum_display _ _) _) : function_scope.
+Notation ">^s%O" := (@gt (sum_display _ _) _) : function_scope.
+Notation "<?=^s%O" := (@leif (sum_display _ _) _) : function_scope.
+Notation ">=<^s%O" := (@comparable (sum_display _ _) _) : function_scope.
+Notation "><^s%O" := (fun x y => ~~ (@comparable (sum_display _ _) _ x y)) :
+  function_scope.
+
+Notation "<=^s y" := (>=^s%O y) : order_scope.
+Notation "<=^s y :> T" := (<=^s (y : T)) (only parsing) : order_scope.
+Notation ">=^s y"  := (<=^s%O y) : order_scope.
+Notation ">=^s y :> T" := (>=^s (y : T)) (only parsing) : order_scope.
+
+Notation "<^s y" := (>^s%O y) : order_scope.
+Notation "<^s y :> T" := (<^s (y : T)) (only parsing) : order_scope.
+Notation ">^s y" := (<^s%O y) : order_scope.
+Notation ">^s y :> T" := (>^s (y : T)) (only parsing) : order_scope.
+
+Notation "x <=^s y" := (<=^s%O x y) : order_scope.
+Notation "x <=^s y :> T" := ((x : T) <=^s (y : T)) (only parsing) : order_scope.
+Notation "x >=^s y" := (y <=^s x) (only parsing) : order_scope.
+Notation "x >=^s y :> T" := ((x : T) >=^s (y : T)) (only parsing) : order_scope.
+
+Notation "x <^s y"  := (<^s%O x y) : order_scope.
+Notation "x <^s y :> T" := ((x : T) <^s (y : T)) (only parsing) : order_scope.
+Notation "x >^s y"  := (y <^s x) (only parsing) : order_scope.
+Notation "x >^s y :> T" := ((x : T) >^s (y : T)) (only parsing) : order_scope.
+
+Notation "x <=^s y <=^s z" := ((x <=^s y) && (y <=^s z)) : order_scope.
+Notation "x <^s y <=^s z" := ((x <^s y) && (y <=^s z)) : order_scope.
+Notation "x <=^s y <^s z" := ((x <=^s y) && (y <^s z)) : order_scope.
+Notation "x <^s y <^s z" := ((x <^s y) && (y <^s z)) : order_scope.
+
+Notation "x <=^s y ?= 'iff' C" := (<?=^s%O x y C) : order_scope.
+Notation "x <=^s y ?= 'iff' C :> T" := ((x : T) <=^s (y : T) ?= iff C)
+  (only parsing) : order_scope.
+
+Notation ">=<^s y" := [pred x | >=<^s%O x y] : order_scope.
+Notation ">=<^s y :> T" := (>=<^s (y : T)) (only parsing) : order_scope.
+Notation "x >=<^s y" := (>=<^s%O x y) : order_scope.
+
+Notation "><^s y" := [pred x | ~~ (>=<^s%O x y)] : order_scope.
+Notation "><^s y :> T" := (><^s (y : T)) (only parsing) : order_scope.
+Notation "x ><^s y" := (~~ (><^s%O x y)) : order_scope.
+
+End SumSyntax.
+HB.export SumSyntax.
 
 (*********************************************************)
 (* We declare lexicographic ordering on dependent pairs. *)
@@ -1742,6 +1828,243 @@ HB.instance Definition _ n (T : finTBOrderType disp) :=
 End DefaultTupleLexiOrder.
 End DefaultTupleLexiOrder.
 
+(********************************************************)
+(* We declare an alias of the sum                       *)
+(* which has canonical order (left is less than right). *)
+(********************************************************)
+
+Module SumOrder.
+
+Local Open Scope type_scope. (* FIXME *)
+
+Definition type (disp : disp_t) (T T' : Type) := T + T'.
+Definition type_
+  (disp1 disp2 : disp_t) (T : preorderType disp1) (T' : preorderType disp2) :=
+  type (sum_display disp1 disp2) T T'.
+
+Section Basis.
+Context {disp : disp_t}.
+
+Local Notation "T + T'" := (type disp T T') : type_scope.
+
+#[export] HB.instance Definition _ (T T' : eqType) := Equality.on (T + T').
+#[export] HB.instance Definition _ (T T' : choiceType) := Choice.on (T + T').
+#[export] HB.instance Definition _ (T T' : countType) := Countable.on (T + T').
+#[export] HB.instance Definition _ (T T' : finType) := Finite.on (T + T').
+
+End Basis.
+
+Section Preorder.
+Context (disp1 disp2 : disp_t).
+Context (T1 : preorderType disp1) (T2 : preorderType disp2).
+Implicit Types (x y : T1 + T2).
+
+Let le x y : bool :=
+  match x, y with
+  | inl _, inr _ => true
+  | inl a1, inl a2 => a1 <= a2
+  | inr _, inl _ => false
+  | inr b1, inr b2 => b1 <= b2
+  end.
+
+Let lt x y : bool :=
+  match x, y with
+  | inl _, inr _ => true
+  | inl a1, inl a2 => a1 < a2
+  | inr _, inl _ => false
+  | inr b1, inr b2 => b1 < b2
+  end.
+
+Fact lt_def x y : lt x y = le x y && ~~ le y x.
+Proof. by case: x; case: y => x y; rewrite /lt /le ?lt_leAnge. Qed.
+
+Fact gt_def x y : lt y x = le y x && ~~ le x y.
+Proof. by case: x; case: y => x y; rewrite /lt /le ?lt_leAnge. Qed.
+
+Fact refl : reflexive le.
+Proof. by case => x; rewrite /le lexx. Qed.
+
+Fact ge_refl : reflexive (fun x y => le y x).
+Proof. by case => x; rewrite /le lexx. Qed.
+
+Fact trans : transitive le.
+Proof. rewrite /le => -[y | y] [x | x] [z | z] //; apply: le_trans. Qed.
+
+Fact ge_trans : transitive (fun x y => le y x).
+Proof. rewrite /le => -[y | y] [x | x] [z | z] // /[swap]; apply: le_trans. Qed.
+
+End Preorder.
+
+Section Preorder.
+Context (disp1 disp2 disp3 : disp_t).
+Context (T1 : preorderType disp1) (T2 : preorderType disp2).
+Local Notation "T1 + T2" := (type disp3 T1 T2) : type_scope.
+Implicit Types (x y : T1 + T2).
+
+Let T1' : Type := T1.
+HB.instance Definition _ := Preorder.on T1'.
+Let T2' : Type := T2.
+HB.instance Definition _ := Preorder.on T2'.
+
+Definition le x y : bool :=
+  match x, y with
+  | inl _, inr _ => true
+  | inl a1, inl a2 => a1 <= a2
+  | inr _, inl _ => false
+  | inr b1, inr b2 => b1 <= b2
+  end.
+
+Definition lt x y : bool :=
+  match x, y with
+  | inl _, inr _ => true
+  | inl a1, inl a2 => a1 < a2
+  | inr _, inl _ => false
+  | inr b1, inr b2 => b1 < b2
+  end.
+
+#[export]
+HB.instance Definition _ := @isDuallyPreorder.Build disp3 (T1 + T2) le lt
+  (@lt_def _ _ T1' T2') (@gt_def _ _ T1' T2')
+  (@refl _ _ T1' T2') (@ge_refl _ _ T1' T2')
+  (@trans _ _ T1' T2') (@ge_trans _ _ T1' T2').
+
+Lemma leEsum x y : (x <= y) = match x, y with
+  | inl _, inr _ => true
+  | inl a1, inl a2 => a1 <= a2
+  | inr _, inl _ => false
+  | inr b1, inr b2 => b1 <= b2
+  end.
+Proof. by []. Qed.
+
+Lemma ltEsum x y : (x < y) = match x, y with
+  | inl _, inr _ => true
+  | inl a1, inl a2 => a1 < a2
+  | inr _, inl _ => false
+  | inr b1, inr b2 => b1 < b2
+  end.
+Proof. by []. Qed.
+
+End Preorder.
+
+Section BPreorder.
+Context (disp1 disp2 : disp_t).
+Context (T1 : bPreorderType disp1) (T2 : preorderType disp2).
+Local Notation "T1 + T2" := (type (Disp tt tt) T1 T2) : type_scope.
+Implicit Types (x : T1 + T2).
+
+Fact le0x x : inl \bot <= x :> T1 + T2.
+Proof. by case: x => x; rewrite leEsum. Qed.
+
+End BPreorder.
+
+Section BPreorder.
+Context (disp1 disp2 disp3 : disp_t).
+Context (T1 : bPreorderType disp1) (T2 : preorderType disp2).
+Local Notation "T1 + T2" := (type disp3 T1 T2) : type_scope.
+
+Let T1' : Type := T1.
+HB.instance Definition _ := BPreorder.on T1'.
+Let T2' : Type := T2.
+HB.instance Definition _ := Preorder.on T2'.
+
+#[export]
+HB.instance Definition _ :=
+  @hasBottom.Build disp3 (T1 + T2) (inl \bot) (@le0x _ _ T1' T2').
+
+Lemma botEsum : \bot = (inl \bot) :> T1 + T2. Proof. by []. Qed.
+
+End BPreorder.
+
+Section TPreorder.
+Context (disp1 disp2 : disp_t).
+Context (T1 : preorderType disp1) (T2 : tPreorderType disp2).
+Local Notation "T1 + T2" := (type (sum_display disp1 disp2) T1 T2) : type_scope.
+Implicit Types (x : T1 + T2).
+
+Fact lex1 x : x <= inr \top :> T1 + T2.
+Proof. by case: x => x; rewrite leEsum. Qed.
+
+End TPreorder.
+
+Section TPreorder.
+Context (disp1 disp2 disp3 : disp_t).
+Context (T1 : preorderType disp1) (T2 : tPreorderType disp2).
+Local Notation "T1 + T2" := (type disp3 T1 T2) : type_scope.
+
+Let T1' : Type := T1.
+HB.instance Definition _ := Preorder.on T1'.
+Let T2' : Type := T2.
+HB.instance Definition _ := TPreorder.on T2'.
+
+#[export]
+HB.instance Definition _ :=
+  @hasTop.Build disp3 (T1 + T2) (inr \top) (@lex1 _ _ T1' T2').
+
+Lemma topEsum : \top = inr \top :> T1 + T2. Proof. by []. Qed.
+
+End TPreorder.
+
+#[export]
+HB.instance Definition _ (disp1 disp2 disp3 : disp_t)
+  (T1 : bPreorderType disp1) (T2 : tPreorderType disp2) :=
+  Preorder.on (type disp3 T1 T2).
+
+Section FinPreorder.
+Context (disp1 disp2 disp3 : disp_t).
+
+#[export] HB.saturate type.
+
+End FinPreorder.
+
+Module Exports.
+HB.reexport SumOrder.
+Notation "T +sum[ d ] T'" := (type d T T')
+  (at level 70, d at next level, format "T  +sum[ d ]  T'") : type_scope.
+Notation "T +s T'" := (type_ T T')
+  (at level 70, format "T  +s  T'") : type_scope.
+Definition leEsum := @leEsum.
+Definition ltEsum := @ltEsum.
+Definition botEsum := @botEsum.
+Definition topEsum := @topEsum.
+End Exports.
+End SumOrder.
+HB.export SumOrder.Exports.
+
+Module DefaultSumOrder.
+Section DefaultSumOrder.
+Context {disp1 disp2 : disp_t}.
+
+Let sum T1 T2 := T1 +sum[sum_display disp1 disp2] T2.
+
+(* FIXME: Scopes of arguments are broken in several places.                   *)
+(* FIXME: Declaring a bunch of copies is still a bit painful.                 *)
+HB.instance Definition _ (T : preorderType disp1) (T' : preorderType disp2) :=
+  Preorder.copy (T + T')%type (T +s T').
+(* Somehow this does not generate new instances ._. *)
+HB.instance Definition _ (T1 : bPreorderType disp1) (T2 : preorderType disp2)
+  : hasBottom (sum_display disp1 disp2) (sum T1 T2) :=
+  BPreorder.copy (T1 + T2)%type (sum T1 T2).
+HB.instance Definition _ (T1 : preorderType disp1) (T2 : tPreorderType disp2) :=
+  TPreorder.copy (T1 + T2)%type (sum T1 T2).
+HB.instance Definition _ (T1 : bPreorderType disp1) (T2 : tPreorderType disp2) :=
+  TBPreorder.copy (T1 + T2)%type (sum T1 T2).
+HB.instance Definition _
+  (T1 : finPreorderType disp1) (T2 : finPreorderType disp2) :=
+  FinPreorder.copy (T1 + T2)%type (sum T1 T2).
+HB.instance Definition _
+  (T1 : finBPreorderType disp1) (T2 : finPreorderType disp2) :=
+  FinBPreorder.copy (T1 + T2)%type (sum T1 T2).
+HB.instance Definition _
+  (T1 : finPreorderType disp1) (T2 : finTPreorderType disp2) :=
+  FinTPreorder.copy (T1 + T2)%type (sum T1 T2).
+HB.instance Definition _
+  (T1 : finBPreorderType disp1) (T2 : finTPreorderType disp2) :=
+  FinTBPreorder.copy (T1 + T2)%type (sum T1 T2).
+(* /FIXME *)
+
+End DefaultSumOrder.
+End DefaultSumOrder.
+
 (* Some lemmas about [Order.enum 'I_n] *)
 (* TOTHINK: move to OrdinalOrder? *)
 Section Ordinal.
@@ -1918,6 +2241,7 @@ Export Order.Exports.
 Module DefaultProdLexiOrder := Order.DefaultProdLexiOrder.
 Module DefaultSeqLexiOrder := Order.DefaultSeqLexiOrder.
 Module DefaultTupleLexiOrder := Order.DefaultTupleLexiOrder.
+Module DefaultSumOrder := Order.DefaultSumOrder.
 
 Module tagnat.
 Section tagnat.
