@@ -3127,6 +3127,18 @@ HB.instance Definition _ := isScaleClosed.Build R V S
   (subsemimod_closedZ subsemimod_closed_subproof).
 HB.end.
 
+HB.factory Record SubmodClosed_isZmodClosed
+  (R : ringType) (L : lmodType R) (P : {pred L}) & GRing.SubmodClosed R P :=
+  {}.
+
+HB.builders Context R L P & SubmodClosed_isZmodClosed R L P.
+
+Lemma submodClosedB : oppr_closed P.
+Proof. by move=> x xP; rewrite -scaleN1r; apply: rpredZ. Qed.
+
+HB.instance Definition _ := GRing.isOppClosed.Build L P submodClosedB.
+HB.end.
+
 HB.factory Record isSubSemiAlgClosed (R : semiRingType) (A : lSemiAlgType R)
     (S : A -> bool) := {
   subsemialg_closed_subproof : subsemialg_closed S
