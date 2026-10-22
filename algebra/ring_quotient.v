@@ -5,8 +5,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat.
 From mathcomp Require Import seq generic_quotient nmodule.
 From mathcomp Require Import rings_modules_and_algebras divalg.
 
-(******************************************************************************)
-(*                   Quotients of algebraic structures                        *)
+(**md**************************************************************************)
+(* # Quotients of algebraic structures                                        *)
 (*                                                                            *)
 (* This file defines a join hierarchy mixing the structures defined in file   *)
 (* ssralg (up to unit ring type) and the quotType quotient structure defined  *)
@@ -27,6 +27,7 @@ From mathcomp Require Import rings_modules_and_algebras divalg.
 (* non commutative ring and left or two-sided ideals.                         *)
 (*                                                                            *)
 (* The file defines the following Structures:                                 *)
+(* ```                                                                        *)
 (*     zmodQuotType T e z n a == Z-module  obtained  by  quotienting type  T  *)
 (*                               with  the  relation  e  and  whose neutral,  *)
 (*                               opposite and addition are the images in the  *)
@@ -66,6 +67,12 @@ From mathcomp Require Import rings_modules_and_algebras divalg.
 (*                             provide canonical structures of ring quotients *)
 (*                             for commutative rings, in which a right ideal  *)
 (*                             is obviously a two-sided ideal                 *)
+(* ```                                                                        *)
+(*                                                                            *)
+(* `lmodQuotType`                                                             *)
+(* : quotient of left modules                                                 *)
+(* : The HB class is `LmodQuotient`.                                          *)
+(*                                                                            *)
 (******************************************************************************)
 
 Import GRing.Theory.
@@ -290,6 +297,37 @@ Qed.
 
 End PrimeIdealTheory.
 
+HB.mixin Record ZmodQuotient_isLmodQuotient (R : ringType) T eqT
+  (zeroT : T) (oppT : T -> T) (addT : T -> T -> T) (scaleT : R -> T -> T)
+  (Q : Type) of ZmodQuotient T eqT zeroT oppT addT Q & GRing.Lmodule R Q := {
+  pi_scaler : forall a, {morph \pi_Q : x / scaleT a x >-> a *: x}
+}.
+
+#[short(type="lmodQuotType")]
+HB.structure Definition LmodQuotient R T eqT zeroT oppT addT scaleT :=
+  {Q of ZmodQuotient_isLmodQuotient R T eqT zeroT oppT addT scaleT Q &
+   ZmodQuotient T eqT zeroT oppT addT Q & GRing.Lmodule R Q }.
+
+Section LModQuotient.
+Context {R : ringType} {T : Type} (eqT : rel T)
+  (zeroT : T) (oppT : T -> T) (addT : T -> T -> T) (scaleT : R -> T -> T).
+Implicit Type zqT : LmodQuotient.type eqT zeroT oppT addT scaleT.
+
+Canonical pi_scale_quot_morph zqT a := PiMorph1 (@pi_scaler _ _ _ _ _ _ _ zqT a).
+
+End LModQuotient.
+
+Section PiLinear.
+Context {R : ringType} {L : lmodType R} (equivL : rel L) (zeroL : L)
+  (Q : @lmodQuotType R L equivL zeroL -%R +%R *:%R).
+
+Let pi_is_linear : linear \pi_Q.
+Proof. by move=> a x y /=; rewrite !piE. Qed.
+
+HB.instance Definition _ := GRing.isLinear.Build R L Q _ \pi_Q pi_is_linear.
+
+End PiLinear.
+
 Module Quotient.
 Section ZmodQuotient.
 Variables (R : zmodType) (I : zmodClosed R).
@@ -422,6 +460,49 @@ by move=> /eqP; rewrite -[x]reprK -[y]reprK !piE !equivE !subr0 prime_idealrM.
 Qed.
 
 End IDomainQuotient.
+
+Section LmodQuotient.
+Context {R : ringType} {L : lmodType R} (P : submodClosed L).
+
+Definition Pzmod : {pred _} := P.
+HB.instance Definition _ := GRing.SubmodClosed.on Pzmod.
+HB.instance Definition _ := @GRing.SubmodClosed_isZmodClosed.Build R L Pzmod.
+
+Definition zmodquot := (quot Pzmod).
+
+Definition scale a := lift_op1 zmodquot ( *:%R a).
+
+Lemma pi_scale a : {morph \pi : x / a *: x >-> scale a x}.
+Proof.
+move=> x; unlock scale; apply/eqP; rewrite piE equivE.
+by rewrite -scalerBr rpredZ// idealrBE reprK.
+Qed.
+
+Canonical pi_scale_morph a := PiMorph1 (pi_scale a).
+
+Let scalerA a b f : scale a (scale b f) = scale (a * b) f.
+Proof. by rewrite -[f]reprK !piE scalerA. Qed.
+
+Let scale1r : left_id 1 scale.
+Proof. by move=> f; rewrite -[f]reprK !piE scale1r. Qed.
+
+Let scalerDr : right_distributive scale +%R.
+Proof. by move=> a f g; rewrite -[f]reprK -[g]reprK !piE scalerDr. Qed.
+
+Let scalerDl f : {morph scale^~ f: a b / a + b}.
+Proof. by move=> a b; rewrite -[f]reprK !piE scalerDl. Qed.
+
+#[export]
+HB.instance Definition _ := ZmodQuotient.on zmodquot.
+#[export]
+HB.instance Definition _ :=
+  GRing.Zmodule_isLmodule.Build R zmodquot scalerA scale1r scalerDr scalerDl.
+#[export]
+HB.instance Definition _ :=
+  ZmodQuotient_isLmodQuotient.Build R L (equiv Pzmod) 0 -%R +%R *:%R zmodquot
+  pi_scale.
+
+End LmodQuotient.
 
 Module Exports. HB.reexport. End Exports.
 End Quotient.
