@@ -70,7 +70,9 @@ From mathcomp Require Import rings_modules_and_algebras divalg.
 (* ```                                                                        *)
 (*                                                                            *)
 (* `lmodQuotType`                                                             *)
-(* : quotient of left module                                                  *)
+(* : quotient of left modules                                                 *)
+(* : The HB class is `LmodQuotient`.                                          *)
+(*                                                                            *)
 (******************************************************************************)
 
 Import GRing.Theory.
@@ -295,8 +297,7 @@ Qed.
 
 End PrimeIdealTheory.
 
-
-HB.mixin Record ZmodQuotient_isLmodQuotient (R : pzRingType) T eqT
+HB.mixin Record ZmodQuotient_isLmodQuotient (R : ringType) T eqT
   (zeroT : T) (oppT : T -> T) (addT : T -> T -> T) (scaleT : R -> T -> T)
   (Q : Type) of ZmodQuotient T eqT zeroT oppT addT Q & GRing.Lmodule R Q := {
   pi_scaler : forall a, {morph \pi_Q : x / scaleT a x >-> a *: x}
@@ -308,7 +309,7 @@ HB.structure Definition LmodQuotient R T eqT zeroT oppT addT scaleT :=
    ZmodQuotient T eqT zeroT oppT addT Q & GRing.Lmodule R Q }.
 
 Section LModQuotient.
-Context {R : pzRingType} {T : Type} (eqT : rel T)
+Context {R : ringType} {T : Type} (eqT : rel T)
   (zeroT : T) (oppT : T -> T) (addT : T -> T -> T) (scaleT : R -> T -> T).
 Implicit Type zqT : LmodQuotient.type eqT zeroT oppT addT scaleT.
 
@@ -317,27 +318,15 @@ Canonical pi_scale_quot_morph zqT a := PiMorph1 (@pi_scaler _ _ _ _ _ _ _ zqT a)
 End LModQuotient.
 
 Section PiLinear.
-Context {R : pzRingType} {L : lmodType R} (equivL : rel L) (zeroL : L)
+Context {R : ringType} {L : lmodType R} (equivL : rel L) (zeroL : L)
   (Q : @lmodQuotType R L equivL zeroL -%R +%R *:%R).
 
-Lemma pi_is_linear : linear \pi_Q.
+Let pi_is_linear : linear \pi_Q.
 Proof. by move=> a x y /=; rewrite !piE. Qed.
 
 HB.instance Definition _ := GRing.isLinear.Build R L Q _ \pi_Q pi_is_linear.
 
 End PiLinear.
-
-HB.factory Record SubmodClosed_isZmodClosed
-  (R : pzRingType) (L : lmodType R) (P : {pred L}) of GRing.SubmodClosed R P :=
-  {}.
-
-HB.builders Context R L P of SubmodClosed_isZmodClosed R L P.
-
-Lemma submodClosedB : oppr_closed P.
-Proof. by move=> x xP; rewrite -scaleN1r; apply: rpredZ. Qed.
-
-HB.instance Definition _ := GRing.isOppClosed.Build L P submodClosedB.
-HB.end.
 
 Module Quotient.
 Section ZmodQuotient.
@@ -473,11 +462,11 @@ Qed.
 End IDomainQuotient.
 
 Section LmodQuotient.
-Context {R : pzRingType} {L : lmodType R} (P : submodClosed L).
+Context {R : ringType} {L : lmodType R} (P : submodClosed L).
 
 Definition Pzmod : {pred _} := P.
 HB.instance Definition _ := GRing.SubmodClosed.on Pzmod.
-HB.instance Definition _ := @SubmodClosed_isZmodClosed.Build R L Pzmod.
+HB.instance Definition _ := @GRing.SubmodClosed_isZmodClosed.Build R L Pzmod.
 
 Definition zmodquot := (quot Pzmod).
 
