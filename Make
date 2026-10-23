@@ -96,6 +96,7 @@ boot/binomial.v
 boot/choice.v
 boot/div.v
 boot/eqtype.v
+boot/filter.v
 boot/finfun.v
 boot/fingraph.v
 boot/finset.v
@@ -106,6 +107,7 @@ boot/nmodule.v
 boot/path.v
 boot/prime.v
 boot/seq.v
+boot/sets.v
 boot/ssrAC.v
 boot/ssrbool.v
 boot/ssreflect.v
