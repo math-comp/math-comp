@@ -155,9 +155,8 @@ End IntervalCan.
 
 Export IntervalCan.Exports.
 
-Section IntervalPOrder.
-
-Variable (disp : Order.disp_t) (T : porderType disp).
+Section IntervalPreOrder.
+Context {disp : Order.disp_t} {T : preorderType disp}.
 Implicit Types (x y z : T) (b bl br : itv_bound T) (i : interval T).
 
 Definition le_bound b1 b2 :=
@@ -174,14 +173,20 @@ Definition lt_bound b1 b2 :=
     | _, _ => false
   end.
 
-Lemma lt_bound_def b1 b2 : lt_bound b1 b2 = (b2 != b1) && le_bound b1 b2.
-Proof. by case: b1 b2 => [[]?|[]][[]?|[]] //=; rewrite lt_def. Qed.
+Lemma lt_bound_def b1 b2 :
+  lt_bound b1 b2 = (le_bound b1 b2) && ~~ (le_bound b2 b1).
+Proof.
+case: b1 b2 => [[]t0|[]][[]t1|[]] //=.
+- by rewrite lt_le_def.
+- apply/esym; rewrite andb_idr// => t0t1; apply/negP.
+  by move/lt_le_trans => /(_ _ t0t1); rewrite ltxx.
+- apply/esym; rewrite andb_idr// => t0t1; apply/negP.
+  by move/lt_le_trans => /(_ _ t0t1); rewrite ltxx.
+- by rewrite lt_le_def.
+Qed.
 
 Lemma le_bound_refl : reflexive le_bound.
 Proof. by move=> [[]?|[]] /=. Qed.
-
-Lemma le_bound_anti : antisymmetric le_bound.
-Proof. by case=> [[]?|[]] [[]?|[]] //=; case: comparableP => // ->. Qed.
 
 Lemma le_bound_trans : transitive le_bound.
 Proof.
@@ -190,8 +195,8 @@ by case=> [[]?|[]] [[]?|[]] [[]?|[]] lexy leyz //;
 Qed.
 
 HB.instance Definition _ :=
-  Order.isPOrder.Build (itv_bound_display disp) (itv_bound T)
-    lt_bound_def le_bound_refl le_bound_anti le_bound_trans.
+  Order.isPreorder.Build (itv_bound_display disp) (itv_bound T)
+    lt_bound_def le_bound_refl le_bound_trans.
 
 Lemma bound_lexx c1 c2 x : (BSide c1 x <= BSide c2 x) = (c2 ==> c1).
 Proof. by rewrite /<=%O /= lteifxx. Qed.
@@ -261,25 +266,12 @@ Definition bnd_simp := (BLeft_ltE, BRight_leE,
   BInfty_le_eqE, BInfty_ge_eqE, BInfty_ltE, BInfty_gtE, BInfty_ltF, BInfty_gtF,
   @lexx _ T, @ltxx _ T, @eqxx T).
 
-Lemma comparable_BSide_min s (x y : T) : (x >=< y)%O ->
-  BSide s (Order.min x y) = Order.min (BSide s x) (BSide s y).
-Proof. by rewrite !minEle bnd_simp => /comparable_leP[]. Qed.
-
-Lemma comparable_BSide_max s (x y : T) : (x >=< y)%O ->
-  BSide s (Order.max x y) = Order.max (BSide s x) (BSide s y).
-Proof. by rewrite !maxEle bnd_simp => /comparable_leP[]. Qed.
-
 Definition subitv i1 i2 :=
   let: Interval b1l b1r := i1 in
   let: Interval b2l b2r := i2 in (b2l <= b1l) && (b1r <= b2r).
 
 Lemma subitv_refl : reflexive subitv.
 Proof. by case=> /= ? ?; rewrite !lexx. Qed.
-
-Lemma subitv_anti : antisymmetric subitv.
-Proof.
-by case=> [? ?][? ?]; rewrite andbACA => /andP[] /le_anti -> /le_anti ->.
-Qed.
 
 Lemma subitv_trans : transitive subitv.
 Proof.
@@ -288,8 +280,8 @@ by rewrite (le_trans Hl' Hl) (le_trans Hr Hr').
 Qed.
 
 HB.instance Definition _ :=
-  Order.isPOrder.Build  (interval_display disp) (interval T)
-  (fun _ _ => erefl) subitv_refl subitv_anti subitv_trans.
+  Order.isPreorder.Build  (interval_display disp) (interval T)
+  (fun _ _ => erefl) subitv_refl subitv_trans.
 
 Definition pred_of_itv i : pred T := [pred x | `[x, x] <= i].
 
@@ -342,12 +334,6 @@ Proof. by apply: subset_itv; rewrite bnd_simp. Qed.
 Lemma subset_itv_co_cc x y : {subset `[x, y[ <= `[x, y]}.
 Proof. by apply: subset_itv; rewrite bnd_simp. Qed.
 
-Lemma itvxx x : `[x, x] =i pred1 x.
-Proof. by move=> y; rewrite in_itv/= -eq_le eq_sym. Qed.
-
-Lemma itvxxP y x : reflect (y = x) (y \in `[x, x]).
-Proof. by rewrite itvxx; apply/eqP. Qed.
-
 Lemma subitvPl b1l b2l br :
   b2l <= b1l -> {subset Interval b1l br <= Interval b2l br}.
 Proof. by move=> ?; apply: subitvP; rewrite subitvE lexx andbT. Qed.
@@ -355,10 +341,6 @@ Proof. by move=> ?; apply: subitvP; rewrite subitvE lexx andbT. Qed.
 Lemma subitvPr bl b1r b2r :
   b1r <= b2r -> {subset Interval bl b1r <= Interval bl b2r}.
 Proof. by move=> ?; apply: subitvP; rewrite subitvE lexx. Qed.
-
-Lemma itv_xx x cl cr y :
-  (y \in Interval (BSide cl x) (BSide cr x)) = cl && ~~ cr && (y == x).
-Proof. by case: cl cr => [] []; rewrite [LHS]lteif_anti // eq_sym. Qed.
 
 Lemma boundl_in_itv c x b :
   (x \in Interval (BSide c x) b) = c && (BRight x <= b).
@@ -434,6 +416,46 @@ case: i => [[[]a|[]][[]b|[]]] /andP [] ha hb; rewrite /= ?bound_in_itv;
 Qed.
 
 Arguments itvP [x i].
+
+End IntervalPreOrder.
+
+Section IntervalPOrder.
+Context {disp : Order.disp_t} {T : porderType disp}.
+Implicit Types (x y z : T) (b bl br : itv_bound T) (i : interval T).
+
+Let le_bound_anti : antisymmetric (@le_bound _ T).
+Proof. by case=> [[]?|[]] [[]?|[]] //=; case: comparableP => // ->. Qed.
+
+HB.instance Definition _ :=
+  Order.Preorder_isPOrder.Build (itv_bound_display disp) (itv_bound T)
+    le_bound_anti.
+
+Lemma comparable_BSide_min s (x y : T) : (x >=< y)%O ->
+  BSide s (Order.min x y) = Order.min (BSide s x) (BSide s y).
+Proof. by rewrite !minEle bnd_simp => /comparable_leP[]. Qed.
+
+Lemma comparable_BSide_max s (x y : T) : (x >=< y)%O ->
+  BSide s (Order.max x y) = Order.max (BSide s x) (BSide s y).
+Proof. by rewrite !maxEle bnd_simp => /comparable_leP[]. Qed.
+
+Let subitv_anti : antisymmetric (@subitv _ T).
+Proof.
+by case=> [? ?][? ?]; rewrite andbACA => /andP[] /le_anti -> /le_anti ->.
+Qed.
+
+HB.instance Definition _ :=
+  Order.Preorder_isPOrder.Build (interval_display disp) (interval T)
+    subitv_anti.
+
+Lemma itvxx x : `[x, x] =i pred1 x.
+Proof. by move=> y; rewrite in_itv/= -eq_le eq_sym. Qed.
+
+Lemma itvxxP y x : reflect (y = x) (y \in `[x, x]).
+Proof. by rewrite itvxx; apply/eqP. Qed.
+
+Lemma itv_xx x cl cr y :
+  (y \in Interval (BSide cl x) (BSide cr x)) = cl && ~~ cr && (y == x).
+Proof. by case: cl cr => [] []; rewrite [LHS]lteif_anti // eq_sym. Qed.
 
 Lemma itv_splitU1 b x : b <= BLeft x ->
   Interval b (BRight x) =i [predU1 x & Interval b (BLeft x)].
