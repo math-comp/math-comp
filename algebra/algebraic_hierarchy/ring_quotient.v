@@ -299,7 +299,7 @@ End PrimeIdealTheory.
 
 HB.mixin Record ZmodQuotient_isLmodQuotient (R : ringType) T eqT
   (zeroT : T) (oppT : T -> T) (addT : T -> T -> T) (scaleT : R -> T -> T)
-  (Q : Type) of ZmodQuotient T eqT zeroT oppT addT Q & GRing.Lmodule R Q := {
+  (Q : Type) & ZmodQuotient T eqT zeroT oppT addT Q & GRing.Lmodule R Q := {
   pi_scaler : forall a, {morph \pi_Q : x / scaleT a x >-> a *: x}
 }.
 
