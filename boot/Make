@@ -12,7 +12,7 @@ bigop.v
 binomial.v
 choice.v
 div.v
-filter.v
+near.v
 finfun.v
 fingraph.v
 finset.v

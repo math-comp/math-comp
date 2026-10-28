@@ -96,7 +96,7 @@ boot/binomial.v
 boot/choice.v
 boot/div.v
 boot/eqtype.v
-boot/filter.v
+boot/near.v
 boot/finfun.v
 boot/fingraph.v
 boot/finset.v
