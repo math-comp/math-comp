@@ -2,6 +2,7 @@ boot.v
 all_boot.v
 eqtype.v
 seq.v
+sets.v
 ssrAC.v
 ssrbool.v
 ssreflect.v
@@ -11,6 +12,7 @@ bigop.v
 binomial.v
 choice.v
 div.v
+near.v
 finfun.v
 fingraph.v
 finset.v
