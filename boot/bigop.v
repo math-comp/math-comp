@@ -2201,8 +2201,8 @@ Lemma partition_big_seq (I J : eqType) s t (P : pred I) (p : I -> J) F :
     \big[*%M/1]_(j <- t) \big[*%M/1]_(i <- s | P i && (p i == j)) F i.
 Proof.
 move=> ut pt.
-rewrite (exchange_big_dep_idem (Monoid.mul1m op idx) _ _ (xQ:=P)) /=;
-  first by move=> j i _ /andP[].
+rewrite (exchange_big_dep_idem (Monoid.mul1m op idx) _ _ (xQ:=P)) /=.
+  by move=> j i _ /andP[].
 rewrite !(big_seq_cond _ _ _ P); apply: eq_bigr => i /andP[si Pi].
 by rewrite Pi /= (big_pred1_seq (p i)) //; exact: pt.
 Qed.
@@ -2768,8 +2768,8 @@ Lemma leq_sum_partition (I J : eqType) s t (P : pred I)
     \sum_(j <- t) \sum_(i <- s | P i && (p i == j)) F i.
 Proof.
 move=> pt.
-rewrite (partition_big_seq (undup t) p (undup_uniq t)); first by
-  move=> i si Pi; rewrite mem_undup; exact: pt.
+rewrite (partition_big_seq (undup t) p (undup_uniq t)).
+  by move=> i si Pi; rewrite mem_undup; exact: pt.
 apply: (sub_le_big_seq leqnn (fun m n => leq_addr n m)).
 by move=> i; apply/leq_count_subseq/undup_subseq.
 Qed.
