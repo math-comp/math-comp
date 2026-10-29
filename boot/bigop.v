@@ -1963,6 +1963,14 @@ Lemma big_pred1 (I : finType) i (P : pred I) F :
   P =1 pred1 i -> \big[*%M/1]_(j | P j) F j = F i.
 Proof. by move/(eq_bigl _ _)->; apply: big_pred1_eq. Qed.
 
+Lemma big_pred1_seq (I : eqType) r i (P : pred I) F :
+  i \in r -> uniq r -> {in r, P =1 pred1 i} ->
+  \big[*%M/1]_(j <- r | P j) F j = F i.
+Proof.
+move=> ir ur; rewrite -big_filter => /eq_in_filter->.
+by rewrite filter_pred1_uniq // big_seq1.
+Qed.
+
 Lemma big_ord1 F : \big[op/idx]_(i < 1) F i = F ord0.
 Proof. by rewrite big_ord_recl big_ord0 Monoid.mulm1. Qed.
 
@@ -2101,6 +2109,7 @@ by case: ltngtP mn=> //= [nm|<-]; rewrite ?mul1m// tm// nm leqnn.
 Qed.
 
 End Plain.
+Arguments big_pred1_seq [op I r] i [P F].
 
 Section Abelian.
 
@@ -2185,6 +2194,18 @@ by rewrite andbA.
 Qed.
 
 Arguments partition_big [I s J P] p Q [F].
+
+Lemma partition_big_seq (I J : eqType) s t (P : pred I) (p : I -> J) F :
+  uniq t -> {in s, forall i, P i -> p i \in t} ->
+  \big[*%M/1]_(i <- s | P i) F i =
+    \big[*%M/1]_(j <- t) \big[*%M/1]_(i <- s | P i && (p i == j)) F i.
+Proof.
+move=> ut pt.
+rewrite (exchange_big_dep_idem (Monoid.mul1m op idx) _ _ (xQ:=P)) /=.
+  by move=> j i _ /andP[].
+rewrite !(big_seq_cond _ _ _ P); apply: eq_bigr => i /andP[si Pi].
+by rewrite Pi /= (big_pred1_seq (p i)) //; exact: pt.
+Qed.
 
 Lemma big_enum_val (I : finType) (A : pred I) F :
   \big[op/idx]_(x in A) F x = \big[op/idx]_(i < #|A|) F (enum_val i).
@@ -2296,6 +2317,7 @@ Arguments big1_seq [R idx op I].
 Arguments big1 [R idx op I].
 Arguments big_only1 {R idx op I} i [P F].
 Arguments big_pred1 [R idx op I] i [P F].
+Arguments big_pred1_seq [R idx op I r] i [P F].
 Arguments perm_big [R op x I r1] r2 [P F].
 Arguments big_uniq [R op x I] r [F].
 Arguments big_rem [R idx op I r] x [P F].
@@ -2305,6 +2327,7 @@ Arguments bigD1 [R op x I] j [P F].
 Arguments bigD1_seq [R op x I r] j [F].
 Arguments bigD1_ord [R op x n] j [P F].
 Arguments partition_big [R idx op I s J P] p Q [F].
+Arguments partition_big_seq [R idx op I J s] t [P] p [F].
 Arguments reindex_omap [R op x I J] h h' [P F].
 Arguments reindex_onto [R op x I J] h h' [P F].
 Arguments reindex [R op x I J] h [P F].
@@ -2737,6 +2760,19 @@ Lemma leq_sum I r (P : pred I) (E1 E2 : I -> nat) :
     (forall i, P i -> E1 i <= E2 i) ->
   \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
 Proof. by move=> leE12; elim/big_ind2: _ => // m1 m2 n1 n2; apply: leq_add. Qed.
+
+Lemma leq_sum_partition (I J : eqType) s t (P : pred I)
+    (p : I -> J) (F : I -> nat) :
+  {in s, forall i, P i -> p i \in t} ->
+  \sum_(i <- s | P i) F i <=
+    \sum_(j <- t) \sum_(i <- s | P i && (p i == j)) F i.
+Proof.
+move=> pt.
+rewrite (partition_big_seq (undup t) p (undup_uniq t)).
+  by move=> i si Pi; rewrite mem_undup; exact: pt.
+apply: (sub_le_big_seq leqnn (fun m n => leq_addr n m)).
+by move=> i; apply/leq_count_subseq/undup_subseq.
+Qed.
 
 Lemma sub_in_leq_sum (I : eqType) r (P P' : pred I) (E : I -> nat) :
     {in r, subpred P P'} ->
