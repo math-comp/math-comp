@@ -307,9 +307,6 @@ Notation rmorph_char := rmorph_pchar (only parsing).
 #[deprecated(since="mathcomp 2.5.0", use=zmod_morphism_linear)]
 Definition additive_linear := zmod_morphism_linear.
 
-#[deprecated(since="mathcomp 2.5.0", use=pFrobenius_aut_is_monoid_morphism)]
-Notation pFrobenius_aut_is_multiplicative :=
-  (fun p => (p.2, p.1) \o pFrobenius_aut_is_monoid_morphism) (only parsing).
 #[deprecated(since="mathcomp 2.4.0", use=exprDn_pchar)]
 Notation exprDn_char := exprDn_pchar (only parsing).
 

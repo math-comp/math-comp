@@ -336,16 +336,11 @@ Lemma cfAut_is_zmod_morphism : zmod_morphism cfAut.
 Proof.
 by move=> phi psi; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE /= rmorphB.
 Qed.
-#[deprecated(since="mathcomp 2.5.0", use=cfAut_is_zmod_morphism)]
-Definition cfAut_is_additive := cfAut_is_zmod_morphism.
 
 Lemma cfAut_is_monoid_morphism : monoid_morphism cfAut.
 Proof.
 by split=> [|phi psi]; apply/cfunP=> x; rewrite ?cfAut_cfun1i // !cfunE rmorphM.
 Qed.
-#[deprecated(since="mathcomp 2.5.0", use=cfAut_is_monoid_morphism)]
-Definition cfAut_is_multiplicative :=
-  (fun g => (g.2,g.1)) cfAut_is_monoid_morphism.
 
 HB.instance Definition _ := GRing.isZmodMorphism.Build classfun classfun cfAut
   cfAut_is_zmod_morphism.
@@ -1405,9 +1400,6 @@ Proof.
 split=> [|phi psi]; [exact: cfRes_cfun1 | apply/cfunP=> x].
 by rewrite !cfunElock mulrnAr mulrnAl -mulrnA mulnb andbb.
 Qed.
-#[deprecated(since="mathcomp 2.5.0", use=cfRes_is_monoid_morphism)]
-Definition cfRes_is_multiplicative :=
-  (fun g => (g.2,g.1)) cfRes_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build _ _ cfRes
   cfRes_is_monoid_morphism.
 
@@ -1595,14 +1587,9 @@ Proof. by rewrite -(morph1 f) cfIsomE. Qed.
 
 Lemma cfIsom_is_zmod_morphism : zmod_morphism cfIsom.
 Proof. rewrite unlock; exact: raddfB. Qed.
-#[deprecated(since="mathcomp 2.5.0", use=cfIsom_is_zmod_morphism)]
-Definition cfIsom_is_additive := cfIsom_is_zmod_morphism.
 
 Lemma cfIsom_is_monoid_morphism : monoid_morphism cfIsom.
 Proof. rewrite unlock; exact: (rmorph1 _, rmorphM _). Qed.
-#[deprecated(since="mathcomp 2.5.0", use=cfIsom_is_monoid_morphism)]
-Definition cfIsom_is_multiplicative :=
-  (fun g => (g.2,g.1)) cfIsom_is_monoid_morphism.
 
 Lemma cfIsom_is_scalable : scalable cfIsom.
 Proof. rewrite unlock; exact: linearZ_LR. Qed.
@@ -1858,14 +1845,9 @@ Canonical cfSdprod_unlockable := [unlockable of cfSdprod].
 
 Lemma cfSdprod_is_zmod_morphism : zmod_morphism cfSdprod.
 Proof. rewrite unlock; exact: raddfB. Qed.
-#[deprecated(since="mathcomp 2.5.0", use=cfSdprod_is_zmod_morphism)]
-Definition cfSdprod_is_additive := cfSdprod_is_zmod_morphism.
 
 Lemma cfSdprod_is_monoid_morphism : monoid_morphism cfSdprod.
 Proof. rewrite unlock; exact: (rmorph1 _, rmorphM _). Qed.
-#[deprecated(since="mathcomp 2.5.0", use=cfSdprod_is_monoid_morphism)]
-Definition cfSdprod_is_multiplicative :=
-  (fun g => (g.2,g.1)) cfSdprod_is_monoid_morphism.
 
 Lemma cfSdprod_is_scalable : scalable cfSdprod.
 Proof. rewrite unlock; exact: linearZ_LR. Qed.

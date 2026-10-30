@@ -5245,17 +5245,12 @@ Proof. exact: mxval_genM. Qed.
 
 Lemma mxval_is_zmod_morphism : zmod_morphism mxval.
 Proof. by move=> x y; rewrite mxvalD mxvalN. Qed.
-#[deprecated(since="mathcomp 2.5.0", use=mxval_is_zmod_morphism)]
-Definition mxval_sub := mxval_is_zmod_morphism.
 
 #[export] HB.instance Definition _ :=
   GRing.isZmodMorphism.Build FA 'M[F]_n mxval mxval_is_zmod_morphism.
 
 Lemma mxval_is_monoid_morphism : monoid_morphism mxval.
 Proof. by split; [apply: mxval1 | apply: mxvalM]. Qed.
-#[deprecated(since="mathcomp 2.5.0", use=mxval_is_monoid_morphism)]
-Definition mxval_is_multiplicative :=
-  (fun g => (g.2,g.1)) mxval_is_monoid_morphism.
 
 #[export] HB.instance Definition _ :=
   GRing.isMonoidMorphism.Build FA 'M[F]_n mxval mxval_is_monoid_morphism.
@@ -5285,14 +5280,9 @@ Proof. exact: mxval_genV. Qed.
 
 Lemma gen_is_zmod_morphism : zmod_morphism gen.
 Proof. by move=> x y; apply: mxval_inj; rewrite genK !rmorphB /= !genK. Qed.
-#[deprecated(since="mathcomp 2.5.0", use=gen_is_zmod_morphism)]
-Definition gen_is_additive := gen_is_zmod_morphism.
 
 Lemma gen_is_monoid_morphism : monoid_morphism gen.
 Proof. by split=> // x y; apply: mxval_inj; rewrite genK !rmorphM /= !genK. Qed.
-#[deprecated(since="mathcomp 2.5.0", use=gen_is_monoid_morphism)]
-Definition gen_is_multiplicative :=
-  (fun g => (g.2,g.1)) gen_is_monoid_morphism.
 
 #[export] HB.instance Definition _ := GRing.isZmodMorphism.Build F FA gen
   gen_is_zmod_morphism.
