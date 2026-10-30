@@ -676,9 +676,6 @@ Proof. by rewrite mulrzA -mulrzr. Qed.
 
 Lemma intmul1_is_monoid_morphism : monoid_morphism ( *~%R (1 : R)).
 Proof. by split; move=> // x y /=; rewrite intrM. Qed.
-#[deprecated(since="mathcomp 2.5.0", use=intmul1_is_monoid_morphism)]
-Definition intmul1_is_multiplicative :=
-  (fun g => (g.2,g.1)) intmul1_is_monoid_morphism.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build int R ( *~%R 1)
   intmul1_is_monoid_morphism.
 

@@ -263,9 +263,6 @@ Proof.
 split=> [|x y]; first by apply/lfunP => w; rewrite id_lfunE !lfunE /= mulr1.
 by apply/lfunP=> w; rewrite comp_lfunE !lfunE /= mulrA.
 Qed.
-#[deprecated(since="mathcomp 2.5.0", use=amulr_is_monoid_morphism)]
-Definition amulr_is_multiplicative :=
-  (fun p => (p.2, p.1)) amulr_is_monoid_morphism.
 
 #[hnf]
 HB.instance Definition _ := GRing.isSemilinear.Build K aT (hom aT aT) _ amulr

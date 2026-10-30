@@ -895,8 +895,6 @@ rewrite -!(rmorphM, rmorphB); congr _%:~R; apply: injZtoQ.
 rewrite !(rmorphM, rmorphB) /= [_ - _]lock /= -lock !numqE.
 by rewrite (mulrAC y) -!mulrBl -mulrA mulrAC !mulrA.
 Qed.
-#[deprecated(since="mathcomp 2.5.0", use=ratr_is_zmod_morphism)]
-Definition ratr_is_additive := ratr_is_zmod_morphism.
 
 Fact ratr_is_monoid_morphism : monoid_morphism (@ratr F).
 Proof.
@@ -908,9 +906,6 @@ do 2!apply: canRL (mulfK (nz_den _)) _; rewrite -!rmorphM; congr _%:~R.
 apply: injZtoQ; rewrite !rmorphM [x * y]lock /= !numqE -lock.
 by rewrite -!mulrA mulrA mulrCA -!mulrA (mulrCA y).
 Qed.
-#[deprecated(since="mathcomp 2.5.0", use=ratr_is_monoid_morphism)]
-Definition ratr_is_multiplicative :=
-  (fun g => (g.2,g.1)) ratr_is_monoid_morphism.
 
 HB.instance Definition _ := GRing.isZmodMorphism.Build rat F (@ratr F)
   ratr_is_zmod_morphism.
