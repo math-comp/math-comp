@@ -143,6 +143,9 @@ with builtins; with (import <nixpkgs> {}).lib;
       hierarchy-builder.job = true;
       ConCert.job = false;
       fcsl-pcm.job = false;  # fcsl-pcm dropped support for Rocq 9.1
+      multinomials.job = false;  # multinomials dropped support for Rocq 9.1
+      coqeal.job = false;
+      mathcomp-apery.job = false;
     };
   };
 }
