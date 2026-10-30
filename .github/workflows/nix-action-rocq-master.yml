@@ -2796,8 +2796,8 @@ jobs:
     needs:
     - rocq-core
     - mathcomp-boot
+    - mathcomp-order
     - mathcomp-algebra
-    - mathcomp-fingroup
     - stdlib
     runs-on: ubuntu-latest
     steps:
@@ -2858,13 +2858,13 @@ jobs:
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle 
         "rocq-master" --argstr job "mathcomp-boot"
     - if: steps.stepCheck.outputs.status != 'fetched'
+      name: 'Building/fetching previous CI target: mathcomp-order'
+      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle 
+        "rocq-master" --argstr job "mathcomp-order"
+    - if: steps.stepCheck.outputs.status != 'fetched'
       name: 'Building/fetching previous CI target: mathcomp-algebra'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle 
         "rocq-master" --argstr job "mathcomp-algebra"
-    - if: steps.stepCheck.outputs.status != 'fetched'
-      name: 'Building/fetching previous CI target: mathcomp-fingroup'
-      run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle 
-        "rocq-master" --argstr job "mathcomp-fingroup"
     - if: steps.stepCheck.outputs.status != 'fetched'
       name: 'Building/fetching previous CI target: stdlib'
       run: NIXPKGS_ALLOW_UNFREE=1 nix-build --no-out-link --argstr bundle 
