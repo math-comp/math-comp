@@ -1,21 +1,14 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
+
+Attributes deprecated(since="mathcomp 2.7.0",
+  note="Use nmodule.v, rings_modules_and_algebras.v, divalg.v, and decfield.v
+  instead. We recommend handling all other deprecations from ssralg first.").
+
 From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat div seq.
 From mathcomp Require Import choice fintype finfun bigop prime binomial.
 From mathcomp Require Export nmodule rings_modules_and_algebras divalg decfield.
-
-(******************************************************************************)
-(*                            Ring-like structures                            *)
-(*                                                                            *)
-(* This file re-exports the contents of algebra.v, divalg.v, and decfield.v:  *)
-(* (semi)rings, (semi)modules, (semi)algebras with or without commutativity,  *)
-(* multiplicative inverse, etc., decidable fields, algebraically closed       *)
-(* fields, and their morphisms.                                               *)
-(*                                                                            *)
-(* Reference: Francois Garillot, Georges Gonthier, Assia Mahboubi, Laurence   *)
-(* Rideau, Packaging mathematical structures, TPHOLs 2009                     *)
-(******************************************************************************)
 
 Set Implicit Arguments.
 Unset Strict Implicit.
@@ -314,9 +307,6 @@ Notation rmorph_char := rmorph_pchar (only parsing).
 #[deprecated(since="mathcomp 2.5.0", use=zmod_morphism_linear)]
 Definition additive_linear := zmod_morphism_linear.
 
-#[deprecated(since="mathcomp 2.5.0", use=pFrobenius_aut_is_monoid_morphism)]
-Notation pFrobenius_aut_is_multiplicative :=
-  (fun p => (p.2, p.1) \o pFrobenius_aut_is_monoid_morphism) (only parsing).
 #[deprecated(since="mathcomp 2.4.0", use=exprDn_pchar)]
 Notation exprDn_char := exprDn_pchar (only parsing).
 

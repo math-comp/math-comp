@@ -1,14 +1,15 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype choice ssrnat seq.
-From mathcomp Require Import path div fintype tuple finfun bigop prime finset.
-From mathcomp Require Import preorder porder ssralg poly gproduct fingroup.
-From mathcomp Require Import morphism perm automorphism quotient finalg action.
-From mathcomp Require Import zmodp commutator cyclic center pgroup nilpotent.
-From mathcomp Require Import sylow abelian matrix mxalgebra mxpoly.
-From mathcomp Require Import mxrepresentation vector ssrnum algC classfun.
-From mathcomp Require Import archimedean.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
+From mathcomp Require Import div fintype tuple finfun bigop prime finset.
+From mathcomp Require Import nmodule fingroup morphism perm quotient action.
+From mathcomp Require Import gproduct preorder porder orderedzmod.
+From mathcomp Require Import rings_modules_and_algebras divalg finalg poly.
+From mathcomp Require Import matrix mxalgebra vector numeric_hierarchy.
+From mathcomp Require Import archimedean commutator cyclic center pgroup.
+From mathcomp Require Import nilpotent sylow abelian algC mxrepresentation.
+From mathcomp Require Import classfun.
 
 (******************************************************************************)
 (* This file contains the basic notions of character theory, based on Isaacs. *)
@@ -502,8 +503,6 @@ Definition xcfun (chi : 'CF(G)) A :=
 
 Lemma xcfun_is_zmod_morphism phi : zmod_morphism (xcfun phi).
 Proof. by move=> A B; rewrite /xcfun [gring_row _]linearB mulmxBl !mxE. Qed.
-#[deprecated(since="mathcomp 2.5.0", use=xcfun_is_zmod_morphism)]
-Definition xcfun_is_additive := xcfun_is_zmod_morphism.
 HB.instance Definition _ phi :=
   GRing.isZmodMorphism.Build 'M_(gcard G) _ (xcfun phi) (xcfun_is_zmod_morphism phi).
 
@@ -521,8 +520,6 @@ Proof.
 move=> phi psi; rewrite /= /xcfun !mxE -sumrB; apply: eq_bigr => i _.
 by rewrite !mxE !cfunE mulrBr.
 Qed.
-#[deprecated(since="mathcomp 2.5.0", use=xcfun_r_is_zmod_morphism)]
-Definition xcfun_r_is_additive := xcfun_r_is_zmod_morphism.
 HB.instance Definition _ A := GRing.isZmodMorphism.Build _ _ (xcfun_r A)
   (xcfun_r_is_zmod_morphism A).
 

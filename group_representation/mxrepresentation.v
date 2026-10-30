@@ -1,12 +1,12 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype tuple finfun bigop prime.
-From mathcomp Require Import ssralg poly polydiv finset fingroup morphism.
-From mathcomp Require Import perm automorphism quotient finalg action zmodp.
-From mathcomp Require Import commutator cyclic center pgroup matrix mxalgebra.
-From mathcomp Require Import mxalgebra mxpoly.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
+From mathcomp Require Import div choice fintype bigop finset prime nmodule.
+From mathcomp Require Import fingroup morphism perm quotient action.
+From mathcomp Require Import rings_modules_and_algebras divalg decfield finalg.
+From mathcomp Require Import poly polydiv matrix mxalgebra mxpoly commutator.
+From mathcomp Require Import cyclic center pgroup.
 
 (******************************************************************************)
 (*  This file provides linkage between classic Group Theory and commutative   *)
@@ -5245,17 +5245,12 @@ Proof. exact: mxval_genM. Qed.
 
 Lemma mxval_is_zmod_morphism : zmod_morphism mxval.
 Proof. by move=> x y; rewrite mxvalD mxvalN. Qed.
-#[deprecated(since="mathcomp 2.5.0", use=mxval_is_zmod_morphism)]
-Definition mxval_sub := mxval_is_zmod_morphism.
 
 #[export] HB.instance Definition _ :=
   GRing.isZmodMorphism.Build FA 'M[F]_n mxval mxval_is_zmod_morphism.
 
 Lemma mxval_is_monoid_morphism : monoid_morphism mxval.
 Proof. by split; [apply: mxval1 | apply: mxvalM]. Qed.
-#[deprecated(since="mathcomp 2.5.0", use=mxval_is_monoid_morphism)]
-Definition mxval_is_multiplicative :=
-  (fun g => (g.2,g.1)) mxval_is_monoid_morphism.
 
 #[export] HB.instance Definition _ :=
   GRing.isMonoidMorphism.Build FA 'M[F]_n mxval mxval_is_monoid_morphism.
@@ -5285,14 +5280,9 @@ Proof. exact: mxval_genV. Qed.
 
 Lemma gen_is_zmod_morphism : zmod_morphism gen.
 Proof. by move=> x y; apply: mxval_inj; rewrite genK !rmorphB /= !genK. Qed.
-#[deprecated(since="mathcomp 2.5.0", use=gen_is_zmod_morphism)]
-Definition gen_is_additive := gen_is_zmod_morphism.
 
 Lemma gen_is_monoid_morphism : monoid_morphism gen.
 Proof. by split=> // x y; apply: mxval_inj; rewrite genK !rmorphM /= !genK. Qed.
-#[deprecated(since="mathcomp 2.5.0", use=gen_is_monoid_morphism)]
-Definition gen_is_multiplicative :=
-  (fun g => (g.2,g.1)) gen_is_monoid_morphism.
 
 #[export] HB.instance Definition _ := GRing.isZmodMorphism.Build F FA gen
   gen_is_zmod_morphism.

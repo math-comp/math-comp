@@ -587,9 +587,6 @@ Qed.
 
 Fact in_qpoly_monoid_morphism : monoid_morphism (in_qpoly h).
 Proof. by split; [ apply: in_qpoly1 | apply: in_qpolyM]. Qed.
-#[deprecated(since="mathcomp 2.5.0", use=in_qpoly_monoid_morphism)]
-Definition in_qpoly_is_multiplicative :=
-  (fun g => (g.2,g.1)) in_qpoly_monoid_morphism.
 HB.instance Definition _ :=
   GRing.isMonoidMorphism.Build {poly A} {poly %/ h} (in_qpoly h)
     in_qpoly_monoid_morphism.
@@ -644,14 +641,9 @@ Qed.
 
 Lemma qpolyC_is_zmod_morphism : zmod_morphism (qpolyC h).
 Proof. by move=> x y; rewrite qpolyCD qpolyCN. Qed.
-#[deprecated(since="mathcomp 2.5.0", use=qpolyC_is_zmod_morphism)]
-Definition qpolyC_is_additive := qpolyC_is_zmod_morphism.
 
 Lemma qpolyC_is_monoid_morphism : monoid_morphism (qpolyC h).
 Proof. by split=> // x y; rewrite qpolyCM. Qed.
-#[deprecated(since="mathcomp 2.5.0", use=qpolyC_is_monoid_morphism)]
-Definition qpolyC_is_multiplicative :=
-  (fun g => (g.2,g.1)) qpolyC_is_monoid_morphism.
 
 HB.instance Definition _ := GRing.isZmodMorphism.Build A {poly %/ h} (qpolyC h)
   qpolyC_is_zmod_morphism.

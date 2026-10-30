@@ -1,12 +1,13 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrbool ssrfun ssrnat eqtype seq choice.
-From mathcomp Require Import div fintype path tuple bigop finset prime.
-From mathcomp Require Import preorder porder lattice total_order.
-From mathcomp Require Import ssralg poly polydiv mxpoly countalg closed_field.
-From mathcomp Require Import ssrnum ssrint archimedean rat intdiv fingroup.
-From mathcomp Require Import finalg zmodp cyclic pgroup sylow vector falgebra.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq choice.
+From mathcomp Require Import div fintype path bigop finset prime nmodule.
+From mathcomp Require Import preorder porder lattice total_order orderedzmod.
+From mathcomp Require Import fingroup rings_modules_and_algebras divalg.
+From mathcomp Require Import decfield countalg poly polydiv mxpoly.
+From mathcomp Require Import numeric_hierarchy ssrint archimedean rat intdiv.
+From mathcomp Require Import vector cyclic pgroup sylow closed_field falgebra.
 From mathcomp Require Import fieldext separable galois.
 
 (******************************************************************************)

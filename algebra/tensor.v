@@ -1,7 +1,9 @@
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq fintype.
-From mathcomp Require Import finfun finset tuple bigop ssralg order ssrnum ssrint.
-From mathcomp Require Import sesquilinear matrix interval interval_inference numdomain.
+From mathcomp Require Import ssreflect ssrfun ssrbool eqtype choice ssrnat seq.
+From mathcomp Require Import fintype tuple finfun bigop finset nmodule.
+From mathcomp Require Import preorder porder lattice total_order interval.
+From mathcomp Require Import rings_modules_and_algebras divalg matrix.
+From mathcomp Require Import sesquilinear interval_inference.
 
 (******************************************************************************)
 (* Tensor library is experimental.                                            *)
