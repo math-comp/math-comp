@@ -2,8 +2,6 @@ algebra/algebra.v
 algebra/all_algebra.v
 algebra/archimedean.v
 algebra/binnums.v
-algebra/countalg.v
-algebra/finalg.v
 algebra/fraction.v
 algebra/intdiv.v
 algebra/interval_inference.v
@@ -15,6 +13,7 @@ algebra/mxpoly.v
 algebra/mxred.v
 algebra/numeric_hierarchy/numdomain.v
 algebra/numeric_hierarchy/numfield.v
+algebra/numeric_hierarchy/numeric_hierarchy.v
 algebra/numeric_hierarchy/ssrnum.v
 algebra/polydiv.v
 algebra/poly.v
@@ -24,10 +23,13 @@ algebra/rat.v
 algebra/ring_tactic.v
 algebra/field_tactic.v
 algebra/ring.v
-algebra/ring_quotient.v
 algebra/algebraic_hierarchy/rings_modules_and_algebras.v
 algebra/algebraic_hierarchy/divalg.v
 algebra/algebraic_hierarchy/decfield.v
+algebra/algebraic_hierarchy/countalg.v
+algebra/algebraic_hierarchy/finalg.v
+algebra/algebraic_hierarchy/ring_quotient.v
+algebra/algebraic_hierarchy/algebraic_hierarchy.v
 algebra/algebraic_hierarchy/ssralg.v
 algebra/ssrint.v
 algebra/vector.v

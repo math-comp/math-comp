@@ -1,13 +1,13 @@
 (* (c) Copyright 2006-2016 Microsoft Corporation and Inria.                  *)
 (* Distributed under the terms of CeCILL-B.                                  *)
 From HB Require Import structures.
-From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq path.
-From mathcomp Require Import div choice fintype tuple finfun bigop prime.
-From mathcomp Require Import ssralg poly finset fingroup morphism perm.
-From mathcomp Require Import automorphism quotient gproduct action finalg.
-From mathcomp Require Import zmodp commutator cyclic center pgroup gseries.
-From mathcomp Require Import nilpotent sylow maximal abelian matrix.
-From mathcomp Require Import mxalgebra mxrepresentation.
+From mathcomp Require Import ssreflect ssrbool ssrfun eqtype ssrnat seq div.
+From mathcomp Require Import choice fintype finfun bigop finset prime nmodule.
+From mathcomp Require Import fingroup morphism perm automorphism quotient.
+From mathcomp Require Import action gproduct rings_modules_and_algebras divalg.
+From mathcomp Require Import finalg poly zmodp matrix mxalgebra commutator.
+From mathcomp Require Import cyclic center pgroup gseries nilpotent sylow.
+From mathcomp Require Import abelian maximal mxrepresentation.
 
 (******************************************************************************)
 (*   This file completes the theory developed in mxrepresentation.v with the  *)
