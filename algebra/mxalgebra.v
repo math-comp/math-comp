@@ -2224,8 +2224,6 @@ Lemma eigenvalueP a :
   reflect (exists2 v : 'rV_n, v *m g = a *: v & v != 0) (eigenvalue a).
 Proof. by apply: (iffP (rowV0Pn _)) => [] [v]; move/eigenspaceP; exists v. Qed.
 
-Notation stablemx V f := (V%MS *m f%R <= V%MS)%MS.
-
 Lemma eigenvectorP {v : 'rV_n} :
   reflect (exists a, (v <= eigenspace a)%MS) (stablemx v g).
 Proof. by apply: (iffP (sub_rVP _ _)) => -[a] /eigenspaceP; exists a. Qed.
