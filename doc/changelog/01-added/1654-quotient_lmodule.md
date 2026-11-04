@@ -5,7 +5,3 @@
     * definitions `Pzmod`, `zmodquot`, `scale`
     * lemma `pi_scale`
     * canonical `pi_scale_morph`
-
-- in `rings_modules_and_algebras.v`
-  + factory `SubmodClosed_isZmodClosed`
-    ([#1654](https://github.com/math-comp/math-comp/pull/1654)).
