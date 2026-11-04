@@ -69,8 +69,11 @@ From mathcomp Require Import rings_modules_and_algebras divalg.
 (*                             is obviously a two-sided ideal                 *)
 (* ```                                                                        *)
 (*                                                                            *)
-(* `lmodQuotType`                                                             *)
-(* : quotient of left modules                                                 *)
+(* `@lmodQuotType R T eq zero opp add scale`                                  *)
+(* : L-module obtained by quotienting `T` with the relation `eq` and whose    *)
+(* : neutral, opposite, addition, and scaling are the images in the quotient  *)
+(* : of the parameters `zero`, `opp`, `add`, and `scale` resp.                *)
+(* : `R` is a `ringType`.                                                     *)
 (* : The HB class is `LmodQuotient`.                                          *)
 (*                                                                            *)
 (******************************************************************************)
@@ -466,7 +469,8 @@ Context {R : ringType} {L : lmodType R} (P : submodClosed L).
 
 Definition Pzmod : {pred _} := P.
 HB.instance Definition _ := GRing.SubmodClosed.on Pzmod.
-HB.instance Definition _ := @GRing.SubmodClosed_isZmodClosed.Build R L Pzmod.
+HB.instance Definition _ :=
+  GRing.isSubmodClosed.Build R L Pzmod (GRing.subsemimodClosedP P).
 
 Definition zmodquot := (quot Pzmod).
 
