@@ -2081,6 +2081,32 @@ Proof.
 by elim: rr => [|r rr IHrr]; rewrite ?big_nil //= big_cat big_cons -IHrr.
 Qed.
 
+Lemma bigcatE (I T : Type) r (P : pred I) (F : I -> seq T) :
+  \big[cat/[::]]_(i <- r | P i) F i = flatten [seq F i | i <- r & P i].
+Proof. by rewrite -big_filter /flatten foldrE big_map. Qed.
+
+Lemma mem_bigcatP (I T : eqType) r (P : pred I) (F : I -> seq T) x :
+  reflect (exists2 i, i \in r & P i && (x \in F i))
+    (x \in \big[cat/[::]]_(i <- r | P i) F i).
+Proof.
+rewrite (big_morph _ (mem_cat x) erefl) (big_mkcond_idem erefl) unlock.
+exact: hasP.
+Qed.
+
+Lemma bigcat_uniq (I T : eqType) r (P : pred I) (F : I -> seq T)
+    (s := [seq i <- r | P i]) :
+  uniq s -> {in s, forall i, uniq (F i)} ->
+  (forall x, {in s &, forall i j, x \in F i -> x \in F j -> i = j}) ->
+  uniq (\big[cat/[::]]_(i <- r | P i) F i).
+Proof.
+move=> us uF sep.
+rewrite bigcatE -/s -[flatten _]map_id map_flatten -map_comp.
+apply: allpairs_uniq_dep us uF _.
+move=> _ _ /allpairsPdep[i [x [ir xi ->]]]
+  /allpairsPdep[j [y [jr yj ->]]] /= xy.
+by rewrite (sep x i j ir jr xi _) ?xy.
+Qed.
+
 Lemma big_pmap J I (h : J -> option I) (r : seq J) F :
   \big[op/idx]_(i <- pmap h r) F i = \big[op/idx]_(j <- r) oapp F idx (h j).
 Proof.
@@ -2659,6 +2685,7 @@ Qed.
 End FinType.
 
 End BigBool.
+
 
 Section NatConst.
 
