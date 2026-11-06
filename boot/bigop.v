@@ -2388,19 +2388,16 @@ Lemma sub_le_big_seq_cond (I : eqType) s s' P P' (F : I -> R) :
   le (\big[op/x]_(i <- s | P i) F i) (\big[op/x]_(i <- s' | P' i) F i).
 Proof. by  move=> /(sub_le_big_seq xpredT F); rewrite !big_filter. Qed.
 
-Lemma uniq_sub_le_big (I : eqType) s s' P (F : I -> R) : uniq s -> uniq s' ->
+Lemma uniq_sub_le_big (I : eqType) s s' P (F : I -> R) : uniq s ->
     {subset s <= s'} ->
   le (\big[op/x]_(i <- s | P i) F i) (\big[op/x]_(i <- s' | P i) F i).
-Proof.
-move=> us us' ss'; rewrite sub_le_big_seq => // i; rewrite !count_uniq_mem//.
-by have /implyP := ss' i; case: (_ \in s) (_ \in s') => [] [].
-Qed.
+Proof. by move=> us /(leq_uniq_count us); apply: sub_le_big_seq. Qed.
 
 Lemma uniq_sub_le_big_cond (I : eqType) s s' P P' (F : I -> R) :
-    uniq (filter P s) -> uniq (filter P' s') ->
+    uniq (filter P s) ->
     {subset [seq i <- s | P i] <= [seq i <- s' | P' i]} ->
   le (\big[op/x]_(i <- s | P i) F i) (\big[op/x]_(i <- s' | P' i) F i).
-Proof. by move=> u v /(uniq_sub_le_big xpredT F u v); rewrite !big_filter. Qed.
+Proof. by move=> u /(uniq_sub_le_big xpredT F u); rewrite !big_filter. Qed.
 
 Section Id.
 
