@@ -1084,6 +1084,14 @@ Lemma eq_big_seq (I : eqType) (r : seq I) F1 F2 :
   {in r, F1 =1 F2} -> \big[op/idx]_(i <- r) F1 i = \big[op/idx]_(i <- r) F2 i.
 Proof. by move=> eqF; rewrite !big_seq (eq_bigr _ eqF). Qed.
 
+Lemma eq_big_in (I : eqType) r (P : pred I) F G :
+  {in r, forall i, P i -> F i = G i} ->
+  \big[op/idx]_(i <- r | P i) F i = \big[op/idx]_(i <- r | P i) G i.
+Proof.
+move=> eqF; rewrite [LHS]big_seq_cond [RHS]big_seq_cond.
+by apply: eq_bigr => i /andP[]; exact: eqF.
+Qed.
+
 (* Similar lemmas for exposing integer indexing in the predicate. *)
 Lemma big_nat_cond m n (P : pred nat) F :
   \big[op/idx]_(m <= i < n | P i) F i
@@ -2270,6 +2278,7 @@ Arguments eq_bigr [R idx op I r P F1] F2.
 Arguments eq_big_idx [R idx op idx' I] i0 [P F].
 Arguments big_seq_cond [R idx op I r].
 Arguments eq_big_seq [R idx op I r F1] F2.
+Arguments eq_big_in [R idx op I r P F] G.
 Arguments congr_big_nat [R idx op m1 n1] m2 n2 [P1] P2 [F1] F2.
 Arguments big_map [R idx op I J] h [r].
 Arguments big_nth [R idx op I] x0 [r].
@@ -2738,6 +2747,21 @@ Lemma leq_sum I r (P : pred I) (E1 E2 : I -> nat) :
   \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
 Proof. by move=> leE12; elim/big_ind2: _ => // m1 m2 n1 n2; apply: leq_add. Qed.
 
+Lemma leq_sum_const (I : eqType) r (P : pred I) (F : I -> nat) c :
+  {in r, forall i, P i -> F i <= c} ->
+  \sum_(i <- r | P i) F i <= count P r * c.
+Proof.
+move=> leFc; apply: leq_trans (leq_sum_in leFc) _.
+by rewrite big_const_seq iter_addn_0 mulnC.
+Qed.
+
+Lemma leq_sum_subseq (I : eqType) (r s : seq I) (P : pred I) (F : I -> nat) :
+  subseq r s -> \sum_(i <- r | P i) F i <= \sum_(i <- s | P i) F i.
+Proof.
+move=> rs; apply: (sub_le_big_seq leqnn (fun m n => leq_addr n m)).
+by move=> i; apply: leq_count_subseq rs.
+Qed.
+
 Lemma sub_in_leq_sum (I : eqType) r (P P' : pred I) (E : I -> nat) :
     {in r, subpred P P'} ->
   \sum_(i <- r | P i) E i <= \sum_(i <- r | P' i) E i.
@@ -2783,6 +2807,15 @@ Lemma sum_nat_seq_neq0 I r (P : pred I) F :
   (\sum_(i <- r | P i) F i != 0)%N = has (fun i => P i && (F i != 0)%N) r.
 Proof.
 by rewrite sum_nat_seq_eq0// -has_predC; apply: eq_has => x /=; case Px: (P x).
+Qed.
+
+Lemma sum_nat_lt_count (I : Type) r (P : pred I) (F : I -> nat) :
+  \sum_(i <- r | P i) F i < count P r ->
+  has (fun i => P i && (F i == 0)) r.
+Proof.
+elim: r => //= i r IHr; rewrite big_cons; case: (P i) => //=.
+case: (F i) => //= n.
+by rewrite addSn ltnS; move/(leq_ltn_trans (leq_addl _ _))/IHr.
 Qed.
 
 Lemma sum_nat_eq1 (I : finType) (P : pred I) (F : I -> nat) :
@@ -2894,6 +2927,14 @@ apply: (iffP idP) => leFm => [i ri Pi|].
 rewrite big_seq_cond; elim/big_ind: _ => // [m1 m2|i /andP[ri]].
   by rewrite geq_max => ->.
 exact: leFm.
+Qed.
+
+Lemma bigmax_leq_sum (I : Type) r (P : pred I) (F : I -> nat) :
+  \max_(i <- r | P i) F i <= \sum_(i <- r | P i) F i.
+Proof.
+apply: (big_ind2 leq) => // m1 n1 m2 n2 le1 le2.
+by rewrite geq_max (leq_trans le1 (leq_addr _ _))
+  (leq_trans le2 (leq_addl _ _)).
 Qed.
 
 Lemma bigmax_sup (I : finType) i0 (P : pred I) m F :
