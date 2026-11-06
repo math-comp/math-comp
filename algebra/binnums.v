@@ -116,11 +116,8 @@ Qed.
 Lemma pos_nat_pred_double p n :
   pos_nat p n -> pos_nat (Pos.pred_double p) n.*2.-1.
 Proof.
-by elim/pos_nat_ind => [//||] {}p {}n; [move=> /pos_nat_exS[?-> pn]|];
-  rewrite /Pos.pred_double/= -/double -?doubleS !pos_natE.
-(* when dropping support for Coq 8.20, replace above proof by
 by elim/pos_nat_ind => [//||] {}p {}n; [move=> /pos_nat_exS[?-> pn]/=|];
-  rewrite !pos_natE. *)
+  rewrite !pos_natE.
 Qed.
 
 Lemma pos_natM p n p' n' :
