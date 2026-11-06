@@ -2954,6 +2954,14 @@ by move=> Pi0 m_Fi0; rewrite (dvdn_trans m_Fi0) // (bigD1 i0) ?dvdn_lcml.
 Qed.
 Arguments biglcmn_sup [I] i0 [P F m].
 
+Lemma biglcmn_sup_seq (I : eqType) r i0 (P : pred I) F m :
+  i0 \in r -> P i0 -> m %| F i0 -> m %| \big[lcmn/1%N]_(i <- r | P i) F i.
+Proof.
+by move=> i0r Pi0 mFi0; rewrite (dvdn_trans mFi0) //
+  (big_rem i0) //= Pi0 dvdn_lcml.
+Qed.
+Arguments biglcmn_sup_seq [I r] i0 [P F m].
+
 Lemma dvdn_biggcdP (I : finType) (P : pred I) F m :
   reflect (forall i, P i -> m %| F i) (m %| \big[gcdn/0]_(i | P i) F i).
 Proof.
