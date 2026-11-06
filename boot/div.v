@@ -185,6 +185,13 @@ move/leq_divRL=> -> le_de.
 by apply: leq_trans (leq_divM m e); apply: leq_mul.
 Qed.
 
+Lemma eqdivn_leqmodn m n d :
+  m %/ d = n %/ d -> (m %% d <= n %% d) = (m <= n).
+Proof.
+by move=> eqdiv; rewrite [in RHS](divn_eq m d) [in RHS](divn_eq n d)
+  eqdiv leq_add2l.
+Qed.
+
 Lemma edivnD m n d (offset := m %% d + n %% d >= d) : 0 < d ->
    edivn (m + n) d = (m %/ d + n %/ d + offset, m %% d + n %% d - offset * d).
 Proof.
