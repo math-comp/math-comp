@@ -257,7 +257,9 @@ Arguments eqmx {F} {m1%_N m2%_N n%_N} A%_MS B%_MS.
 
 Local Notation "A :=: B" := (eqmx A%MS B%MS) : matrix_set_scope.
 
-Notation stablemx V f := (V%MS *m f%R <= V%MS)%MS.
+Arguments mulmx : clear scopes.
+Notation stablemx V f := (mulmx V%MS f%R <= V%MS)%MS.
+Arguments mulmx _ (m n p)%_N (A B)%_R.
 
 Section LtmxIdentities.
 
@@ -2224,8 +2226,6 @@ Lemma eigenvalueP a :
   reflect (exists2 v : 'rV_n, v *m g = a *: v & v != 0) (eigenvalue a).
 Proof. by apply: (iffP (rowV0Pn _)) => [] [v]; move/eigenspaceP; exists v. Qed.
 
-Notation stablemx V f := (V%MS *m f%R <= V%MS)%MS.
-
 Lemma eigenvectorP {v : 'rV_n} :
   reflect (exists a, (v <= eigenspace a)%MS) (stablemx v g).
 Proof. by apply: (iffP (sub_rVP _ _)) => -[a] /eigenspaceP; exists a. Qed.
@@ -2583,7 +2583,9 @@ Section MatrixAlgebra.
 
 Variables F : fieldType.
 
-Local Notation "A \in R" := (@submx F _ _ _ (mxvec A) R).
+Local Notation "A \in R" := (@submx F _ _ _ (mxvec A) R) : bool_scope.
+(* Fixme: Maybe the above local notation should rather be in matrix_set_scope
+   (that's the scope it's exported in at the end of the section). *)
 
 Lemma mem0mx m n (R : 'A_(m, n)) : 0 \in R.
 Proof. by rewrite linear0 sub0mx. Qed.
