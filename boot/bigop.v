@@ -2102,8 +2102,7 @@ Proof.
 move=> us uF sep.
 rewrite bigcatE -/s -[flatten _]map_id map_flatten -map_comp.
 apply: allpairs_uniq_dep us uF _.
-move=> _ _ /allpairsPdep[i [x [ir xi ->]]]
-  /allpairsPdep[j [y [jr yj ->]]] /= xy.
+move=> _ _ /allpairsPdep[i [x [ir xi ->]]] /allpairsPdep[j [y [jr yj ->]]]/= xy.
 by rewrite (sep x i j ir jr xi _) ?xy.
 Qed.
 
@@ -2685,7 +2684,6 @@ Qed.
 End FinType.
 
 End BigBool.
-
 
 Section NatConst.
 
