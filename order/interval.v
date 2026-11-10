@@ -469,10 +469,10 @@ Qed.
 
 End IntervalPOrder.
 
-Section IntervalLattice.
+Section IntervalMeetSemilattice.
 
-Variable (disp : Order.disp_t) (T : latticeType disp).
-Implicit Types (x y z : T) (b bl br : itv_bound T) (i : interval T).
+Variable (disp : Order.disp_t) (T : meetSemilatticeType disp).
+Implicit Types (x y z : T) (b bl br : itv_bound T).
 
 Definition bound_meet bl br : itv_bound T :=
   match bl, br with
@@ -482,6 +482,33 @@ Definition bound_meet bl br : itv_bound T :=
       BSide (((x <= y) && xb) || ((y <= x) && yb)) (x `&` y)
   end.
 
+Fact bound_lexI b1 b2 b3 : (b1 <= bound_meet b2 b3) = (b1 <= b2) && (b1 <= b3).
+Proof.
+case: b1 b2 b3 => [b1 t1|[]] [b2 t2|[]] [b3 t3|[]];
+  rewrite ?andbF ?andbT//= ?leBSide/=.
+case: comparableP => [/[dup] /ltW /meet_idPl->|/[dup] /ltW /meet_idPr->|ic|<-].
+- rewrite orbF/= -lteifF => lt23; apply/idP/idP => [/[dup] + ->|/andP[]//=].
+  by move=> /lteif_trans /(_ lt23); apply/lteif_imply; rewrite andbF.
+- rewrite /= -lteifF => lt32; apply/idP/idP => [/[dup] + ->|/andP[]//=].
+  by rewrite andbT => /lteif_trans /(_ lt32); apply/lteif_imply; rewrite andbF.
+- rewrite orbF/= lexI; apply/idP/idP => [|/andP[/lteifW -> /lteifW ->]//].
+  rewrite !le_eqVlt => /andP[] /predU1P[->|]; first by case: comparableP ic.
+  move=> /[swap] /predU1P[->|]; first by case: comparableP ic.
+  by move=> /lteifS-> /lteifS->.
+by rewrite meetxx -lteif_andb; case: b1 b2 b3 => [] [] [].
+Qed.
+
+HB.instance Definition _ :=
+  Order.POrder_isMeetSemilattice.Build (itv_bound_display disp) (itv_bound T)
+    bound_lexI.
+
+End IntervalMeetSemilattice.
+
+Section IntervalJoinSemilattice.
+
+Variable (disp : Order.disp_t) (T : joinSemilatticeType disp).
+Implicit Types (x y z : T) (b bl br : itv_bound T).
+
 Definition bound_join bl br : itv_bound T :=
   match bl, br with
     | -oo, b | b, -oo => b
@@ -490,41 +517,35 @@ Definition bound_join bl br : itv_bound T :=
       BSide ((~~ (x <= y) || yb) && (~~ (y <= x) || xb)) (x `|` y)
   end.
 
-Fact bound_lexI b1 b2 b3 : (b1 <= bound_meet b2 b3) = (b1 <= b2) && (b1 <= b3).
-Proof.
-case: b1 b2 b3 => [b1 t1|[]] [b2 t2|[]] [b3 t3|[]];
-  rewrite ?andbF ?andbT//= ?leBSide/=.
-case: lcomparableP => [||ic|<-]; rewrite ?orbF/= -?lteifF.
-- move=> lt23; apply/idP/idP => [/[dup] + ->|/andP[]//=].
-  by move=> /lteif_trans /(_ lt23); apply/lteif_imply; rewrite andbF.
-- move=> lt32; apply/idP/idP => [/[dup] + ->|/andP[]//=]; rewrite andbT.
-  by move=> /lteif_trans /(_ lt32); apply/lteif_imply; rewrite andbF.
-- rewrite lexI; apply/idP/idP => [|/andP[/lteifW -> /lteifW ->]//].
-  rewrite !le_eqVlt => /andP[] /predU1P[->|]; first by case: comparableP ic.
-  move=> /[swap] /predU1P[->|]; first by case: comparableP ic.
-  by move=> /lteifS-> /lteifS->.
-by rewrite -lteif_andb; case: b1 b2 b3 => [] [] [].
-Qed.
-
 Fact bound_leUx b1 b2 b3 : (bound_join b1 b2 <= b3) = (b1 <= b3) && (b2 <= b3).
 Proof.
 case: b1 b2 b3 => [b1 t1|[]] [b2 t2|[]] [b3 t3|[]];
   rewrite ?andbF ?andbT//= ?leBSide/=.
-case: lcomparableP => [||ic|<-]; rewrite ?andbT ?implybT/= -?lteifF.
-- move=> lt12; apply/idP/idP => [/[dup] /(lteif_trans lt12) + ->|/andP[]//].
+case: comparableP => [/[dup] /ltW /join_idPr->|/[dup] /ltW /join_idPl->|ic|<-].
+- rewrite andbT/= -lteifF => lt12.
+  apply/idP/idP => [/[dup] /(lteif_trans lt12) + ->|/andP[]//].
   by rewrite andbT; apply/lteif_imply.
-- move=> lt21; apply/idP/idP => [/[dup] /(lteif_trans lt21) + ->|/andP[]//].
-  by apply/lteif_imply.
-- rewrite leUx; apply/idP/idP => [|/andP[/lteifW -> /lteifW ->]//].
+- rewrite /= -lteifF => lt21.
+  apply/idP/idP => [/[dup] /(lteif_trans lt21) + ->|/andP[]//].
+  exact/lteif_imply.
+- rewrite andbT/= implybT/= leUx.
+  apply/idP/idP => [|/andP[/lteifW -> /lteifW ->]//].
   rewrite !le_eqVlt => /andP[] /predU1P[<-|]; first by case: comparableP ic.
   move=> /[swap] /predU1P[<-|]; first by case: comparableP ic.
   by move=> /lteifS-> /lteifS->.
-by rewrite -lteif_andb; case: b1 b2 b3 => [] [] [].
+by rewrite joinxx -lteif_andb; case: b1 b2 b3 => [] [] [].
 Qed.
 
 HB.instance Definition _ :=
-  Order.POrder_MeetJoin_isLattice.Build (itv_bound_display disp) (itv_bound T)
-    bound_lexI bound_leUx.
+  Order.POrder_isJoinSemilattice.Build (itv_bound_display disp) (itv_bound T)
+    bound_leUx.
+
+End IntervalJoinSemilattice.
+
+Section IntervalLattice.
+
+Variable (disp : Order.disp_t) (T : latticeType disp).
+Implicit Types (x y z : T) (b bl br : itv_bound T) (i : interval T).
 
 Definition itv_meet i1 i2 : interval T :=
   let: Interval b1l b1r := i1 in
