@@ -314,7 +314,7 @@ HB.structure Definition LmodQuotient R T eqT zeroT oppT addT scaleT :=
 Section LModQuotient.
 Context {R : ringType} {T : Type} (eqT : rel T)
   (zeroT : T) (oppT : T -> T) (addT : T -> T -> T) (scaleT : R -> T -> T).
-Implicit Type zqT : LmodQuotient.type eqT zeroT oppT addT scaleT.
+Implicit Type zqT : lmodQuotType eqT zeroT oppT addT scaleT.
 
 Canonical pi_scale_quot_morph zqT a := PiMorph1 (@pi_scaler _ _ _ _ _ _ _ zqT a).
 
