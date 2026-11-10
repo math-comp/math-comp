@@ -2957,8 +2957,8 @@ Arguments biglcmn_sup [I] i0 [P F m].
 Lemma biglcmn_sup_seq (I : eqType) r i0 (P : pred I) F m :
   i0 \in r -> P i0 -> m %| F i0 -> m %| \big[lcmn/1%N]_(i <- r | P i) F i.
 Proof.
-by move=> i0r Pi0 mFi0; rewrite (dvdn_trans mFi0) //
-  (big_rem i0) //= Pi0 dvdn_lcml.
+move=> i0r Pi0 mFi0.
+by rewrite (dvdn_trans mFi0) // (big_rem i0) //= Pi0 dvdn_lcml.
 Qed.
 Arguments biglcmn_sup_seq [I r] i0 [P F m].
 
