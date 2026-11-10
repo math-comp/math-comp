@@ -468,7 +468,6 @@ Section LmodQuotient.
 Context {R : ringType} {L : lmodType R} (P : submodClosed L).
 
 Definition Pzmod : {pred _} := P.
-HB.instance Definition _ := GRing.SubmodClosed.on Pzmod.
 HB.instance Definition _ :=
   GRing.isSubmodClosed.Build R L Pzmod (GRing.subsemimodClosedP P).
 
