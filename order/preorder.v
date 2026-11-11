@@ -133,6 +133,11 @@ From mathcomp Require Import path fintype bigop finset.
 (* [SubChoice_isSubPreorder of U by <:] == preorderType mixin for a subType   *)
 (*                          whose base type is a preorderType                 *)
 (*                                                                            *)
+(* le_sorted_last bounds every member by the last item of a sorted sequence.  *)
+(* le_sorted_nth_gap excludes members strictly between two consecutive items. *)
+(* le_sorted_subseq_nth_rev compares items counted from the end of a sorted   *)
+(* sequence and a subsequence. The indexing lemmas require valid positions.   *)
+(*                                                                            *)
 (* Acknowledgments: The files in this directory are based on prior work by    *)
 (* D. Dreyer, G. Gonthier, A. Nanevski, P-Y Strub, B. Ziliani                 *)
 (******************************************************************************)
@@ -1014,6 +1019,28 @@ Lemma le_sorted_leq_nth (x0 : T) (s : seq T) : sorted <=%O s ->
   {in [pred n | (n < size s)%N] &,
     {homo nth x0 s : i j / (i <= j)%N >-> i <= j}}.
 Proof. exact/sorted_leq_nth/le_refl/le_trans. Qed.
+
+Lemma le_sorted_last (x0 : T) s x :
+  sorted <=%O s -> x \in s -> x <= last x0 s.
+Proof. exact/sorted_last/le_refl/le_trans. Qed.
+
+Lemma le_sorted_nth_gap (x0 : T) s i x :
+  sorted <=%O s -> (i.+1 < size s)%N ->
+  nth x0 s i < x -> x < nth x0 s i.+1 -> x \notin s.
+Proof.
+move=> s_sorted i_lt lo hi; apply/negP=> /(nthP x0) [j j_lt eqx].
+rewrite -eqx in lo hi.
+case: (leqP j i) => [ji|ij].
+  move: (le_sorted_leq_nth x0 s_sorted j_lt (ltnW i_lt) ji).
+  by rewrite (lt_geF lo).
+move: (le_sorted_leq_nth x0 s_sorted i_lt j_lt ij).
+by rewrite (lt_geF hi).
+Qed.
+
+Lemma le_sorted_subseq_nth_rev (x0 : T) s t n :
+  sorted <=%O s -> subseq t s -> (n < size t)%N ->
+  nth x0 t (size t - n.+1) <= nth x0 s (size s - n.+1).
+Proof. exact/sorted_subseq_nth_rev/le_refl/le_trans. Qed.
 
 Lemma lt_sorted_leq_nth (x0 : T) (s : seq T) : sorted <%O s ->
   {in [pred n | (n < size s)%N] &,
