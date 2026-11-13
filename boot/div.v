@@ -200,12 +200,12 @@ Lemma divnD m n d : 0 < d ->
   (m + n) %/ d = (m %/ d) + (n %/ d) + (m %% d + n %% d >= d).
 Proof. by move=> /(@edivnD m n); rewrite edivn_def => -[]. Qed.
 
-Lemma eqn_divnD m n d :
-  0 < d -> ((m + n) %/ d == m %/ d) = (m %% d + n < d).
+Lemma eqn_divnD m n d : 0 < d ->
+  ((m + n) %/ d == m %/ d) = (m %% d + n < d).
 Proof.
 move=> d_gt0.
 rewrite eqn_leq (leq_div2r d (leq_addr n m)) andbT -ltnS ltn_divLR //.
-by rewrite {1}(divn_eq m d) mulSnr -addnA ltn_add2l.
+by rewrite [in ltnLHS](divn_eq m d) mulSnr -addnA ltn_add2l.
 Qed.
 
 Lemma modnD m n d : 0 < d ->
@@ -585,7 +585,7 @@ Proof. by move=> d_gt0; rewrite /divn edivnS//; case: ifP. Qed.
 Lemma ltn_divnS m d : (m %/ d < m.+1 %/ d) = (d %| m.+1).
 Proof.
 case: d => [|d]; first by rewrite !divn0 dvd0n.
-by rewrite divnS // -{1}[m %/ d.+1]add0n ltn_add2r lt0b.
+by rewrite divnS// -[ltnLHS]add0n ltn_add2r lt0b.
 Qed.
 
 Lemma divn_pred m d : m.-1 %/ d = (m %/ d) - (d %| m).
