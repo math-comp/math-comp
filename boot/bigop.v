@@ -2871,9 +2871,9 @@ Lemma sum_nat_lt_count (I : Type) r (P : pred I) (F : I -> nat) :
   \sum_(i <- r | P i) F i < count P r ->
   has (fun i => P i && (F i == 0)) r.
 Proof.
-elim: r => //= i r IHr; rewrite big_cons; case: (P i) => //=.
-case: (F i) => //= n.
-by rewrite addSn ltnS; move/(leq_ltn_trans (leq_addl _ _))/IHr.
+elim: r => [//| i r IHr]; rewrite big_cons /=.
+case: (P i) => [|//]; case: (F i) => [//| n].
+by rewrite addSn ltnS => /(leq_ltn_trans (leq_addl _ _))/IHr.
 Qed.
 
 Lemma sum_nat_eq1 (I : finType) (P : pred I) (F : I -> nat) :
