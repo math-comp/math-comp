@@ -165,6 +165,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 (*               := [:: f a x_1; f x_1 x_2; ...; f x_n-1 x_n]                 *)
 (*       zip s t == itemwise pairing of s and t (dropping any extra items).   *)
 (*               := [:: (x_1, y_1); ...; (x_mn, y_mn)] with mn = minn n m.    *)
+(* has_zip_change detects an adjacent true-to-false predicate transition      *)
+(* when the predicate holds at the first element and fails at the last.       *)
 (*      unzip1 s == [:: (x_1).1; ...; (x_n).1] when s : seq (S * T).          *)
 (*      unzip2 s == [:: (x_1).2; ...; (x_n).2] when s : seq (S * T).          *)
 (*     flatten s == x_1 ++ ... ++ x_n ++ [::] when s : seq (seq T).           *)
@@ -3527,6 +3529,15 @@ Lemma unzip2_map_nth_zip x y s t l :
 Proof. by move=> st; elim: l => [//=|n l IH /=]; rewrite nth_zip ?IH ?st. Qed.
 
 End Zip.
+
+Lemma has_zip_change (T : Type) (P : pred T) x s :
+  P x -> ~~ P (last x s) ->
+  has (fun xy => P xy.1 && ~~ P xy.2) (zip (x :: s) s).
+Proof.
+elim: s x => [|y s IHs] x Px /=; first by rewrite Px.
+case Py: (P y); rewrite Px /=; last by [].
+exact: IHs y Py.
+Qed.
 
 Lemma zip_uniql (S T : eqType) (s : seq S) (t : seq T) :
   uniq s -> uniq (zip s t).
