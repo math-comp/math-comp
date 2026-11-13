@@ -46,6 +46,9 @@ From mathcomp Require Import path fintype bigop finset preorder porder lattice.
 (*    [Order of U by <:] == orderType mixin for a subType whose base type is  *)
 (*                          an orderType                                      *)
 (*                                                                            *)
+(* The sequence lemmas le_bigmin2_seq and le_bigmax2_seq compare filtered     *)
+(* minima and maxima under pointwise comparison on the selected members.      *)
+(*                                                                            *)
 (* Acknowledgments: The files in this directory are based on prior work by    *)
 (* D. Dreyer, G. Gonthier, A. Nanevski, P-Y Strub, B. Ziliani                 *)
 (******************************************************************************)
@@ -619,6 +622,22 @@ Lemma bigmax_sup_seq i0 P t F :
   i0 \in r -> P i0 -> t <= F i0 -> t <= \big[max/x]_(i <- r | P i) F i.
 Proof. by move=> ? ? ?; exact: le_trans (@le_bigmax_seq i0 _ _ _ _). Qed.
 
+Lemma le_bigmin2_seq P F1 F2 : {in r, forall i, P i -> F1 i <= F2 i} ->
+  \big[min/x]_(i <- r | P i) F1 i <= \big[min/x]_(i <- r | P i) F2 i.
+Proof.
+move=> leF; rewrite big_seq_cond [leRHS]big_seq_cond.
+elim/big_ind2: _ => // [a b c d|i /andP[ir Pi]]; first exact: le_min2.
+exact: leF.
+Qed.
+
+Lemma le_bigmax2_seq P F1 F2 : {in r, forall i, P i -> F1 i <= F2 i} ->
+  \big[max/x]_(i <- r | P i) F1 i <= \big[max/x]_(i <- r | P i) F2 i.
+Proof.
+move=> leF; rewrite big_seq_cond [leRHS]big_seq_cond.
+elim/big_ind2: _ => // [a b c d|i /andP[ir Pi]]; first exact: le_max2.
+exact: leF.
+Qed.
+
 End bigminmax_eqType.
 
 Section bigminmax_finType.
@@ -720,20 +739,11 @@ Qed.
 
 Lemma le_bigmin2 P F1 F2 : (forall i, P i -> F1 i <= F2 i) ->
   \big[min/x]_(i | P i) F1 i <= \big[min/x]_(i | P i) F2 i.
-Proof.
-move=> FG; elim/big_ind2 : _ => // a b e f ba fe.
-rewrite ge_min 2!le_min ba fe /= andbT.
-move: (le_total a e) => /orP[/(le_trans ba)-> // | /(le_trans fe)->].
-by rewrite orbT.
-Qed.
+Proof. by move=> leF; apply: le_bigmin2_seq => i _; apply: leF. Qed.
 
 Lemma le_bigmax2 P F1 F2 : (forall i, P i -> F1 i <= F2 i) ->
   \big[max/x]_(i | P i) F1 i <= \big[max/x]_(i | P i) F2 i.
-Proof.
-move=> FG; elim/big_ind2 : _ => // a b e f ba fe.
-rewrite le_max 2!ge_max ba fe /= andbT; have [//|/= af] := leP f a.
-by rewrite (le_trans ba) // (le_trans _ fe) // ltW.
-Qed.
+Proof. by move=> leF; apply: le_bigmax2_seq => i _; apply: leF. Qed.
 
 Lemma bigmaxUl (A B : {set I}) F :
   \big[max/x]_(i in A) F i <= \big[max/x]_(i in A :|: B) F i.
