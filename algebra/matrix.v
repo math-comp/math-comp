@@ -2145,7 +2145,7 @@ Definition oppmx := @map_mx V V -%R m n.
 Lemma addNmx : left_inverse (const_mx 0) oppmx (@addmx V m n).
 Proof. by move=> A; apply/matrixP=> i j; rewrite !mxE addNr. Qed.
 
-HB.instance Definition _ := GRing.Nmodule_isZmodule.Build 'M[V]_(m, n) addNmx.
+HB.instance Definition _ := Algebra.Nmodule_isZmodule.Build 'M[V]_(m, n) addNmx.
 
 End FixedDim.
 
