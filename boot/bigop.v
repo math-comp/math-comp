@@ -1422,14 +1422,12 @@ Variable op : SemiGroup.law R.
 Variable x : R.
 Hypothesis opxx : op x x = x.
 
-Lemma big_const_idem I (r : seq I) P : \big[op/x]_(i <- r | P i) x = x.
-Proof. by elim/big_ind : _ => // _ _ -> ->. Qed.
-
 Lemma big1_idem I r (P : pred I) F :
   (forall i, P i -> F i = x) -> \big[op/x]_(i <- r | P i) F i = x.
-Proof.
-move=> Fix; under eq_bigr => ? ? do rewrite Fix//; exact: big_const_idem.
-Qed.
+Proof. by move=> Fix; elim/big_rec: _ => // _ _ /Fix -> ->. Qed.
+
+Lemma big_const_idem I (r : seq I) P : \big[op/x]_(i <- r | P i) x = x.
+Proof. exact: big1_idem. Qed.
 
 Lemma big_id_idem I (r : seq I) P F :
   op (\big[op/x]_(i <- r | P i) F i) x = \big[op/x]_(i <- r | P i) F i.
@@ -2777,20 +2775,18 @@ move=> leE12; rewrite -big_andE.
 by elim/big_rec3: _ => // i Ci m1 m2 /leE12; apply: leqif_add.
 Qed.
 
+Lemma leq_sum I r (P : pred I) (E1 E2 : I -> nat) :
+    (forall i, P i -> E1 i <= E2 i) ->
+  \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
+Proof. by move=> leE12; elim/big_ind2: _ => // m1 m2 n1 n2; apply: leq_add. Qed.
+
 Lemma leq_sum_in (I : eqType) r (P : pred I) (E1 E2 : I -> nat) :
     {in r, forall i, P i -> E1 i <= E2 i} ->
   \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
 Proof.
 move=> leE12; rewrite !(big_seq_cond P).
-have leE12' i : (i \in r) && P i -> E1 i <= E2 i.
-  by move=> /andP[ir Pi]; apply: leE12.
-by elim/big_ind2: _ => // m1 m2 n1 n2; apply: leq_add.
+by apply/leq_sum => i /andP[]; apply: leE12.
 Qed.
-
-Lemma leq_sum I r (P : pred I) (E1 E2 : I -> nat) :
-    (forall i, P i -> E1 i <= E2 i) ->
-  \sum_(i <- r | P i) E1 i <= \sum_(i <- r | P i) E2 i.
-Proof. by move=> leE12; elim/big_ind2: _ => // m1 m2 n1 n2; apply: leq_add. Qed.
 
 Lemma leq_sum_partition (I J : eqType) s t (P : pred I)
     (p : I -> J) (F : I -> nat) :
@@ -2969,36 +2965,27 @@ Lemma leq_bigmax (I : finType) F (i0 : I) : F i0 <= \max_i F i.
 Proof. exact: leq_bigmax_cond. Qed.
 Arguments leq_bigmax [I F].
 
-Lemma bigmax_leqP (I : finType) (P : pred I) m F :
-  reflect (forall i, P i -> F i <= m) (\max_(i | P i) F i <= m).
-Proof.
-apply: (iffP idP) => leFm => [i Pi|].
-  by apply: leq_trans leFm; apply: leq_bigmax_cond.
-by elim/big_ind: _ => // m1 m2; rewrite geq_max => ->.
-Qed.
-
 Lemma bigmax_leqP_seq (I : eqType) r (P : pred I) m F :
   reflect (forall i, i \in r -> P i -> F i <= m) (\max_(i <- r | P i) F i <= m).
 Proof.
 apply: (iffP idP) => leFm => [i ri Pi|].
   exact/(leq_trans _ leFm)/leq_bigmax_seq.
-rewrite big_seq_cond; elim/big_ind: _ => // [m1 m2|i /andP[ri]].
-  by rewrite geq_max => ->.
-exact: leFm.
+rewrite big_seq_cond; elim/big_rec: _ => // i n /andP[ri Pi].
+by rewrite geq_max leFm.
+Qed.
+
+Lemma bigmax_leqP (I : finType) (P : pred I) m F :
+  reflect (forall i, P i -> F i <= m) (\max_(i | P i) F i <= m).
+Proof.
+by apply: (iffP (bigmax_leqP_seq _ _ _ _)) => + i => /(_ i)//; exact.
 Qed.
 
 Lemma bigmax_leq_sum (I : Type) r (P : pred I) (F : I -> nat) :
   \max_(i <- r | P i) F i <= \sum_(i <- r | P i) F i.
 Proof.
-apply: (big_ind2 leq) => // m1 n1 m2 n2 le1 le2.
-by rewrite geq_max (leq_trans le1 (leq_addr _ _))
-  (leq_trans le2 (leq_addl _ _)).
+elim/big_rec2: _ => // i m n _ lenm.
+by rewrite geq_max leq_addr/= (leq_trans lenm)// leq_addl.
 Qed.
-
-Lemma bigmax_sup (I : finType) i0 (P : pred I) m F :
-  P i0 -> m <= F i0 -> m <= \max_(i | P i) F i.
-Proof. by move=> Pi0 le_m_Fi0; apply: leq_trans (leq_bigmax_cond i0 Pi0). Qed.
-Arguments bigmax_sup [I] i0 [P m F].
 
 Lemma bigmaxn_sup_seq (I : eqType) r i0 (P : pred I) m F :
   i0 \in r -> P i0 -> m <= F i0 -> m <= \max_(i <- r | P i) F i.
@@ -3006,6 +2993,11 @@ Proof. by move=> i0r Pi0 ?; apply: leq_trans (leq_bigmax_seq i0 _ _). Qed.
 Arguments bigmaxn_sup_seq [I r] i0 [P m F].
 #[deprecated(since="mathcomp 2.5.0", use=bigmaxn_sup_seq)]
 Notation bigmax_sup_seq := bigmaxn_sup_seq.
+
+Lemma bigmax_sup (I : finType) i0 (P : pred I) m F :
+  P i0 -> m <= F i0 -> m <= \max_(i | P i) F i.
+Proof. exact: bigmaxn_sup_seq. Qed.
+Arguments bigmax_sup [I] i0 [P m F].
 
 Lemma bigmax_eq_arg (I : finType) i0 (P : pred I) F :
   P i0 -> \max_(i | P i) F i = F [arg max_(i > i0 | P i) F i].
@@ -3046,13 +3038,6 @@ apply: (iffP idP) => [dvFm i Pi | dvFm].
 by elim/big_ind: _ => // p q p_m; rewrite dvdn_lcm p_m.
 Qed.
 
-Lemma biglcmn_sup (I : finType) i0 (P : pred I) F m :
-  P i0 -> m %| F i0 -> m %| \big[lcmn/1%N]_(i | P i) F i.
-Proof.
-by move=> Pi0 m_Fi0; rewrite (dvdn_trans m_Fi0) // (bigD1 i0) ?dvdn_lcml.
-Qed.
-Arguments biglcmn_sup [I] i0 [P F m].
-
 Lemma biglcmn_sup_seq (I : eqType) r i0 (P : pred I) F m :
   i0 \in r -> P i0 -> m %| F i0 -> m %| \big[lcmn/1%N]_(i <- r | P i) F i.
 Proof.
@@ -3060,6 +3045,11 @@ move=> i0r Pi0 mFi0.
 by rewrite (dvdn_trans mFi0) // (big_rem i0) //= Pi0 dvdn_lcml.
 Qed.
 Arguments biglcmn_sup_seq [I r] i0 [P F m].
+
+Lemma biglcmn_sup (I : finType) i0 (P : pred I) F m :
+  P i0 -> m %| F i0 -> m %| \big[lcmn/1%N]_(i | P i) F i.
+Proof. exact: biglcmn_sup_seq. Qed.
+Arguments biglcmn_sup [I] i0 [P F m].
 
 Lemma dvdn_biggcdP (I : finType) (P : pred I) F m :
   reflect (forall i, P i -> m %| F i) (m %| \big[gcdn/0]_(i | P i) F i).
