@@ -643,6 +643,7 @@ Qed.
 Lemma truncn_floor x : truncn x = if 0 <= x then `|floor x|%N else 0%N.
 Proof. exact: truncn_subproof. Qed.
 
+#[deprecated(since="mathcomp 2.7.0", use=truncn_floor)]
 Lemma truncEfloor x : truncn x = if floor x is Posz n then n else 0.
 Proof.
 move: (to_real_floor_le0 x) (to_real_floor_ge0 x).
