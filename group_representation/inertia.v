@@ -44,7 +44,7 @@ Section ConjDef.
 Variables (gT : finGroupType) (B : {set gT}) (y : gT) (phi : 'CF(B)).
 Local Notation G := <<B>>.
 
-Fact cfConjg_subproof :
+Let cfConjg_subproof :
   is_class_fun G [ffun x => phi (if y \in 'N(G) then x ^ y^-1 else x)].
 Proof.
 apply: intro_class_fun => [x z _ Gz | x notGx].
@@ -115,7 +115,7 @@ Proof. by move=> phi /=; rewrite -{1}[y]invgK cfConjgK. Qed.
 Lemma cfConjg1 phi y : (phi ^ y)%CF 1%g = phi 1%g.
 Proof. by rewrite cfunElock conj1g if_same. Qed.
 
-Fact cfConjg_is_linear y : linear (cfConjg y : 'CF(G) -> 'CF(G)).
+Let cfConjg_is_linear y : linear (cfConjg y : 'CF(G) -> 'CF(G)).
 Proof. by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock. Qed.
 HB.instance Definition _ y := GRing.isSemilinear.Build _ _ _ _ (cfConjg y)
   (GRing.semilinear_linear (cfConjg_is_linear y)).
@@ -136,7 +136,7 @@ Proof.
 by rewrite -cfuniG; have [/cfConjg_cfuni|/cfConjgEout] := boolP (y \in 'N(G)).
 Qed.
 
-Fact cfConjg_is_monoid_morphism y : monoid_morphism (cfConjg y : _ -> 'CF(G)).
+Let cfConjg_is_monoid_morphism y : monoid_morphism (cfConjg y : _ -> 'CF(G)).
 Proof.
 split=> [|phi psi]; first exact: cfConjg_cfun1.
 by apply/cfunP=> x; rewrite !cfunElock.
@@ -177,7 +177,7 @@ Definition inertia (B : {set gT}) (phi : 'CF(B)) :=
 Local Notation "''I[' phi ]" := (inertia phi) : group_scope.
 Local Notation "''I_' G [ phi ]" := (G%g :&: 'I[phi]) : group_scope.
 
-Fact group_set_inertia (H : {group gT}) phi : group_set 'I[phi : 'CF(H)].
+Let group_set_inertia (H : {group gT}) phi : group_set 'I[phi : 'CF(H)].
 Proof.
 apply/group_setP; split; first by rewrite inE group1 /= cfConjgJ1.
 move=> y z /setIdP[nHy /eqP n_phi_y] /setIdP[nHz n_phi_z].

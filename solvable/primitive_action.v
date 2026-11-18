@@ -138,7 +138,7 @@ Variables (to : {action gT &-> sT}) (n :  nat).
 
 Definition n_act (t : n.-tuple sT) a := [tuple of map (to^~ a) t].
 
-Fact n_act_is_action : is_action setT n_act.
+Let n_act_is_action : is_action setT n_act.
 Proof.
 by apply: is_total_action => [t|t a b]; apply: eq_from_tnth => i;
     rewrite !tnth_map ?act1 ?actM.

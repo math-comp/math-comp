@@ -825,7 +825,7 @@ Section AddCFun.
 Variables (U : baseAddUMagmaType) (V : nmodType).
 Implicit Types (f g : {additive U -> V}).
 
-Fact add_fun_nmod_morphism f g : nmod_morphism (f \+ g).
+Let add_fun_nmod_morphism f g : nmod_morphism (f \+ g).
 Proof. by split=> [|x y]; rewrite /= ?raddf0 ?addr0// !raddfD addrACA. Qed.
 #[export]
 HB.instance Definition _ f g :=
@@ -837,13 +837,13 @@ Section AddFun.
 Variables (U V W : baseAddUMagmaType).
 Variables (f : {additive V -> W}) (g : {additive U -> V}).
 
-Fact idfun_is_nmod_morphism : nmod_morphism (@idfun U).
+Let idfun_is_nmod_morphism : nmod_morphism (@idfun U).
 Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isNmodMorphism.Build U U idfun
   idfun_is_nmod_morphism.
 
-Fact comp_is_nmod_morphism : nmod_morphism (f \o g).
+Let comp_is_nmod_morphism : nmod_morphism (f \o g).
 Proof. by split=> [|x y]; rewrite /= ?raddf0// !raddfD. Qed.
 #[export]
 HB.instance Definition _ := isNmodMorphism.Build U W (f \o g)
@@ -853,7 +853,7 @@ End AddFun.
 Section AddFun.
 Variables (U : baseAddUMagmaType) (V : addUMagmaType).
 
-Fact null_fun_is_nmod_morphism : nmod_morphism (\0 : U -> V).
+Let null_fun_is_nmod_morphism : nmod_morphism (\0 : U -> V).
 Proof. by split=> // x y /=; rewrite addr0. Qed.
 #[export]
 HB.instance Definition _ :=
@@ -864,7 +864,7 @@ End AddFun.
 Section AddVFun.
 Variables (U : baseAddUMagmaType) (V : zmodType).
 
-Fact opp_is_zmod_morphism : zmod_morphism (-%R : V -> V).
+Let opp_is_zmod_morphism : zmod_morphism (-%R : V -> V).
 Proof. by move=> x y; rewrite /= opprD. Qed.
 #[export]
 HB.instance Definition _ := isZmodMorphism.Build V V -%R opp_is_zmod_morphism.
@@ -1103,7 +1103,7 @@ HB.factory Record isSubZmodule (V : zmodType) S U
 
 HB.builders Context V S U & isSubZmodule V S U.
 
-Fact valD0 : nmod_morphism (val : U -> V).
+Let valD0 : nmod_morphism (val : U -> V).
 Proof.
 have val0: (val : U -> V) 0 = 0.
   by rewrite -[X in val X](subr0 0) valB_subproof subrr.
@@ -1338,7 +1338,7 @@ Section FinFunAddMagma.
 Variable (aT : finType) (rT : addMagmaType).
 Implicit Types f g : {ffun aT -> rT}.
 
-Fact ffun_addrC : commutative (@ffun_add aT rT).
+Let ffun_addrC : commutative (@ffun_add aT rT).
 Proof. by move=> f1 f2; apply/ffunP => a; rewrite !ffunE addrC. Qed.
 
 HB.instance Definition _ :=
@@ -1350,7 +1350,7 @@ Section FinFunAddSemigroup.
 Variable (aT : finType) (rT : addSemigroupType).
 Implicit Types f g : {ffun aT -> rT}.
 
-Fact ffun_addrA : associative (@ffun_add aT rT).
+Let ffun_addrA : associative (@ffun_add aT rT).
 Proof. by move=> f g h; apply/ffunP => a; rewrite !ffunE addrA. Qed.
 
 HB.instance Definition _ :=
@@ -1372,7 +1372,7 @@ Section FinFunAddUMagma.
 Variable (aT : finType) (rT : addUMagmaType).
 Implicit Types f g : {ffun aT -> rT}.
 
-Fact ffun_add0r : left_id (@ffun_zero aT rT) (@ffun_add aT rT).
+Let ffun_add0r : left_id (@ffun_zero aT rT) (@ffun_add aT rT).
 Proof. by move=> f; apply/ffunP => a; rewrite !ffunE add0r. Qed.
 
 HB.instance Definition _ :=
@@ -1423,7 +1423,7 @@ Definition ffun_opp f := [ffun a => - f a].
 
 HB.instance Definition _ := hasOpp.Build {ffun aT -> rT} ffun_opp.
 
-Fact ffun_addNr : left_inverse 0 ffun_opp +%R.
+Let ffun_addNr : left_inverse 0 ffun_opp +%R.
 Proof. by move=> f; apply/ffunP => a; rewrite !ffunE addNr. Qed.
 
 HB.instance Definition _ := Nmodule_isZmodule.Build {ffun aT -> rT} ffun_addNr.
@@ -1442,7 +1442,7 @@ End PairBaseAddMagma.
 Section PairAddMagma.
 Variables U V : addMagmaType.
 
-Fact pair_addrC : commutative (@add_pair U V).
+Let pair_addrC : commutative (@add_pair U V).
 Proof. by move=> a b; congr pair; exact: addrC. Qed.
 
 HB.instance Definition _ :=
@@ -1453,7 +1453,7 @@ End PairAddMagma.
 Section PairAddSemigroup.
 Variables U V : addSemigroupType.
 
-Fact pair_addrA : associative (@add_pair U V).
+Let pair_addrA : associative (@add_pair U V).
 Proof. by move=> [] al ar [] bl br [] cl cr; rewrite /add_pair !addrA. Qed.
 
 HB.instance Definition _ :=
@@ -1468,8 +1468,8 @@ Definition pair_zero : U * V := (0, 0).
 
 HB.instance Definition _ := hasZero.Build (U * V)%type pair_zero.
 
-Fact fst_is_zmod_morphism : nmod_morphism (@fst U V). Proof. by []. Qed.
-Fact snd_is_zmod_morphism : nmod_morphism (@snd U V). Proof. by []. Qed.
+Let fst_is_zmod_morphism : nmod_morphism (@fst U V). Proof. by []. Qed.
+Let snd_is_zmod_morphism : nmod_morphism (@snd U V). Proof. by []. Qed.
 
 HB.instance Definition _ :=
   isNmodMorphism.Build _ _ (@fst U V) fst_is_zmod_morphism.
@@ -1481,7 +1481,7 @@ End PairBaseAddUMagma.
 Section PairAddUMagma.
 Variables U V : addUMagmaType.
 
-Fact pair_add0r : left_id (@pair_zero U V) (@add_pair U V).
+Let pair_add0r : left_id (@pair_zero U V) (@add_pair U V).
 Proof. by move=> [] al ar; rewrite /add_pair !add0r. Qed.
 
 HB.instance Definition _ :=
@@ -1504,7 +1504,7 @@ Definition pair_opp (a : U * V) := (- a.1, - a.2).
 
 HB.instance Definition _ := hasOpp.Build (U * V)%type pair_opp.
 
-Fact pair_addNr : left_inverse 0 pair_opp +%R.
+Let pair_addNr : left_inverse 0 pair_opp +%R.
 Proof. by move=> [] al ar; rewrite /pair_opp; congr pair; apply/addNr. Qed.
 
 HB.instance Definition _ := Nmodule_isZmodule.Build (U * V)%type pair_addNr.

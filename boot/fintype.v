@@ -1563,7 +1563,7 @@ by rewrite (nth_map x) ?nth_index ?index_mem ?mem_seq_sub_enum.
 Qed.
 
 Definition seq_sub_isCountable := isCountable.Build seq_sub seq_sub_pickleK.
-Fact seq_sub_axiom : Finite.axiom seq_sub_enum.
+Let seq_sub_axiom : Finite.axiom seq_sub_enum.
 Proof. exact: Finite.uniq_enumP (undup_uniq _) mem_seq_sub_enum. Qed.
 Definition seq_sub_isFinite := isFinite.Build seq_sub seq_sub_axiom.
 

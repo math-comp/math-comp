@@ -829,7 +829,7 @@ Lemma Crat0 : 0 \in Crat. Proof. by apply/CratP; exists 0; rewrite rmorph0. Qed.
 Lemma Crat1 : 1 \in Crat. Proof. by apply/CratP; exists 1; rewrite rmorph1. Qed.
 #[local] Hint Resolve Crat0 Crat1 : core.
 
-Fact Crat_divring_closed : divring_closed Crat.
+Let Crat_divring_closed : divring_closed Crat.
 Proof.
 split=> // _ _ /CratP[x ->] /CratP[y ->].
   by rewrite -rmorphB Crat_rat.
@@ -903,10 +903,10 @@ Proof. by move=> x; rewrite /algC_invaut; case: algC_invaut_subproof. Qed.
 Lemma algC_autK nu : cancel nu (algC_invaut nu).
 Proof. exact: inj_can_sym (algC_invautK nu) (fmorph_inj nu). Qed.
 
-Fact algC_invaut_is_zmod_morphism nu : zmod_morphism (algC_invaut nu).
+Let algC_invaut_is_zmod_morphism nu : zmod_morphism (algC_invaut nu).
 Proof. exact: can2_zmod_morphism (algC_autK nu) (algC_invautK nu). Qed.
 
-Fact algC_invaut_is_monoid_morphism nu : monoid_morphism (algC_invaut nu).
+Let algC_invaut_is_monoid_morphism nu : monoid_morphism (algC_invaut nu).
 Proof. exact: can2_monoid_morphism (algC_autK nu) (algC_invautK nu). Qed.
 
 HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=

@@ -406,7 +406,7 @@ exists (enum finL).
 by apply/vspaceP=> x; rewrite memvf seqv_sub_adjoin ?(mem_enum finL).
 Qed.
 
-Fact galLgen K :
+Let galLgen K :
   {alpha | generator 'Gal({:L} / K) alpha & forall x, alpha x = x ^+ order K}.
 Proof.
 without loss ->: K / K = 1%AS; last rewrite /order dimv1 expn1.

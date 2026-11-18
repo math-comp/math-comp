@@ -1655,13 +1655,13 @@ Variables (d : disp_t) (T : preorderType d) (d' : disp_t) (T' : preorderType d')
 Variables (d'' : disp_t) (T'' : preorderType d'').
 Variables (f : {omorphism T' -> T''}) (g : {omorphism T -> T'}).
 
-Fact idfun_is_nondecreasing : nondecreasing (@idfun T).
+Let idfun_is_nondecreasing : nondecreasing (@idfun T).
 Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isOrderMorphism.Build d T d T idfun
   idfun_is_nondecreasing.
 
-Fact comp_is_nondecreasing : nondecreasing (f \o g).
+Let comp_is_nondecreasing : nondecreasing (f \o g).
 Proof. by move=> ? ? ?; do 2 apply: omorph_le. Qed.
 
 #[export]
@@ -1876,7 +1876,7 @@ HB.factory Record SubChoice_isSubPreorder d (T : preorderType d) S (d' : disp_t)
 HB.builders Context d T S d' U & SubChoice_isSubPreorder d T S d' U.
 HB.instance Definition _ : isPreorder d' U :=
   @PreCancelPartial.PrePcan d' U d T val.
-Fact valD : order_morphism (val : U -> T). Proof. by []. Qed.
+Let valD : order_morphism (val : U -> T). Proof. by []. Qed.
 HB.instance Definition _ := isSubPreorder.Build d T S d' U valD.
 HB.end.
 

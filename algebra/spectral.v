@@ -314,7 +314,7 @@ apply/matrixP=> i j; rewrite !mxE; have := Mo i j; rewrite dotmxE !mxE => <-.
 by apply: eq_bigr => /= k _; rewrite !mxE.
 Qed.
 
-Fact dotmx_is_hermitian n : isHermitianSesquilinear _ _ false conjC (@dotmx C n).
+Let dotmx_is_hermitian n : isHermitianSesquilinear _ _ false conjC (@dotmx C n).
 Proof.
 split=> /= u v; rewrite !dotmxE/= expr0 mul1r.
 suff -> : u *m v ^t* = ((v *m u ^t* ) ^t* ) by rewrite !mxE.
@@ -322,7 +322,7 @@ by rewrite !trmx_mul map_mxM/= trmxCK.
 Qed.
 HB.instance Definition _ n := @dotmx_is_hermitian n.
 
-Fact dotmx_is_dot n : isDotProduct _ _ (@dotmx C n).
+Let dotmx_is_dot n : isDotProduct _ _ (@dotmx C n).
 Proof.
 split => /= u u_neq0; rewrite dotmxE mxE.
 suff /existsP[i ui_neq0] : [exists i, u 0%R i != 0].

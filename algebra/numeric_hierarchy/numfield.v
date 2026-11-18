@@ -696,7 +696,7 @@ Variant rootC_spec n (x : C) : Type :=
   RootCspec (y : C) of if (n > 0)%N then y ^+ n = x else y = 0
                         & forall z, (n > 0)%N -> z ^+ n = x -> argCle y z.
 
-Fact rootC_subproof n x : rootC_spec n x.
+Let rootC_subproof n x : rootC_spec n x.
 Proof.
 have realRe2 u : Re2 u \is Num.real by
   rewrite realEsqr expr2 {2}/Re2 -{2}[u]conjCK addrC -rmorphD -normCK exprn_ge0.
@@ -867,12 +867,12 @@ by rewrite conjCi -opprB mulrNN.
 Qed.
 Hint Resolve Creal_Re Creal_Im : core.
 
-Fact Re_is_zmod_morphism : zmod_morphism Re.
+Let Re_is_zmod_morphism : zmod_morphism Re.
 Proof. by move=> x y; rewrite !ReE rmorphB addrACA -opprD mulrBl. Qed.
 #[export]
 HB.instance Definition _ := GRing.isZmodMorphism.Build C C Re Re_is_zmod_morphism.
 
-Fact Im_is_zmod_morphism : zmod_morphism Im.
+Let Im_is_zmod_morphism : zmod_morphism Im.
 Proof.
 by move=> x y; rewrite !ImE rmorphB opprD addrACA -opprD mulrBr mulrBl.
 Qed.
