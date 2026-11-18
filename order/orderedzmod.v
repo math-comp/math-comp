@@ -830,11 +830,17 @@ Definition lteifBDl := (lteifBlDl, lteifBrDl).
 Lemma to_realT x : x \is real_num -> to_real x = x.
 Proof. exact: ifT. Qed.
 
+Lemma to_realF x : x \isn't real_num -> to_real x = 0.
+Proof. exact: ifN. Qed.
+
 Lemma real_to_real x : to_real x \is real_num.
 Proof. by rewrite /to_real; case: ifP. Qed.
 
 Lemma to_nnegT x : 0 <= x -> to_nneg x = x.
 Proof. exact: ifT. Qed.
+
+Lemma to_nnegN x : ~~ (0 <= x) -> to_nneg x = 0.
+Proof. exact: ifN. Qed.
 
 Lemma ler_to_nneg : {homo @to_nneg R : x y / x <= y}.
 Proof.
