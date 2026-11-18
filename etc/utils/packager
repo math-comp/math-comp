@@ -39,17 +39,19 @@ git rev-parse --verify $TAG
 ARCHIVEURL="https://github.com/math-comp/math-comp/archive/$TAG.tar.gz"
 GITROOT=$(git rev-parse --show-toplevel)
 
+SED=$(command -v gsed || echo "sed")
+
 # we build the url file content and the list of packages, and where to put them
 if [ $VERSION == "dev" ]
 then
 # variables useful for package construction
   URLLINE="src: \"git+https://github.com/math-comp/math-comp.git\""
-  PKGS=$(sed -r "s/.*mathcomp\.([^\.]*)*.*/\1/" $GITROOT/all/all.v \
+  PKGS=$($SED -r "s/.*mathcomp\.([^\.]*)*.*/\1/" $GITROOT/all/all.v \
         | paste -sd " " -)
   PKGPREFIX="$GITROOT/opam/extra-dev/packages"
 else
   ARCHIVE=$(mktemp)
-  PREFIX=$(echo math-comp-$TAG | sed "s/\+/-/")
+  PREFIX=$(echo math-comp-$TAG | $SED "s/\+/-/")
   wget -O $ARCHIVE $ARCHIVEURL
   SUM=$(sha256sum $ARCHIVE | cut -d " " -f 1)
   EXTRACTED=$(mktemp -d)
@@ -58,7 +60,7 @@ else
   URLLINE="src: \"$ARCHIVEURL\""
   CHECKSUMLINE="checksum: \"sha256=$SUM\""
   PKGS=$(ls -fS -d -1 $EXTRACTED/*/rocq*.opam \
-        | sed -r "s?.*rocq-mathcomp-([^/]+).opam?\1?" \
+        | $SED -r "s?.*rocq-mathcomp-([^/]+).opam?\1?" \
         | paste -sd " " -)
   PKGPREFIX="$GITROOT/opam/released/packages"
 fi
@@ -75,7 +77,7 @@ do pkgdir="$PKGPREFIX/$name-mathcomp-$pkg/$name-mathcomp-$pkg.$VERSION"
    if [ $VERSION == "dev" ]
    then cp $GITROOT/$name-mathcomp-$pkg.opam $pkgdir/opam
    else if git show "$BRANCH:$name-mathcomp-$pkg.opam" > $pkgdir/opam ; then
-        sed -r "/^version/d" -i $pkgdir/opam
+        $SED -r "/^version/d" -i $pkgdir/opam
    else
         echo "Warning; no $name-mathcomp-$pkg.opam"
    fi ; fi
@@ -88,3 +90,6 @@ do pkgdir="$PKGPREFIX/$name-mathcomp-$pkg/$name-mathcomp-$pkg.$VERSION"
    echo "}" >> $pkgdir/opam
 done
 done
+
+# finally test the existence of the archive
+wget --spider $ARCHIVEURL
