@@ -385,6 +385,7 @@ Definition proj_mx n (U V : 'M_n) : 'M_n := pinvmx (col_mx U V) *m col_mx U 0.
 
 Local Notation GaussE := Gaussian_elimination_.
 
+(* TODO: Local? *)
 Fact mxrankE m n (A : 'M_(m, n)) : \rank A = (GaussE A).2.
 Proof. by rewrite mxrank.unlock unlock /=; case: m n A => [|m] [|n]. Qed.
 
@@ -2045,7 +2046,7 @@ Canonical sum_mxsum n (S : proper_mxsum_expr n) :=
 
 Section Binary.
 Variable (m1 m2 n : nat) (S1 : mxsum_expr m1 n) (S2 : mxsum_expr m2 n).
-Fact binary_mxsum_proof :
+Local Fact binary_mxsum_proof :
   mxsum_spec (unwrap S1 + unwrap S2)
              (unwrap (mxsum_rank S1) + unwrap (mxsum_rank S2)).
 Proof. by case: S1 S2 => [A1 r1 A1P] [A2 r2 A2P]; right. Qed.
@@ -2054,7 +2055,7 @@ End Binary.
 
 Section Nary.
 Context J (r : seq J) (P : pred J) n (S_ : J -> mxsum_expr n n).
-Fact nary_mxsum_proof :
+Local Fact nary_mxsum_proof :
   mxsum_spec (\sum_(j <- r | P j) unwrap (S_ j))
              (\sum_(j <- r | P j) unwrap (mxsum_rank (S_ j))).
 Proof.

@@ -390,7 +390,7 @@ Section Char.
 
 Variables (gT : finGroupType) (G : {group gT}).
 
-Fact cfRepr_subproof n (rG : mx_representation algC G n) :
+Local Fact cfRepr_subproof n (rG : mx_representation algC G n) :
   is_class_fun <<G>> [ffun x => \tr (rG x) *+ (x \in G)].
 Proof.
 rewrite genGid; apply: intro_class_fun => [x y Gx Gy | _ /negbTE-> //].
@@ -515,7 +515,7 @@ Arguments xcfun_r A phi /.
 
 Lemma xcfun_rE A chi : xcfun_r A chi = xcfun chi A. Proof. by []. Qed.
 
-Fact xcfun_r_is_zmod_morphism A : zmod_morphism (xcfun_r A).
+Local Fact xcfun_r_is_zmod_morphism A : zmod_morphism (xcfun_r A).
 Proof.
 move=> phi psi; rewrite /= /xcfun !mxE -sumrB; apply: eq_bigr => i _.
 by rewrite !mxE !cfunE mulrBr.
@@ -554,7 +554,7 @@ Let sG := DecSocleType (regular_repr algC G).
 Lemma NirrE : Nirr G = #|classes G|.
 Proof. by rewrite /pred_Nirr (cardD1 [1]) classes1. Qed.
 
-Fact Iirr_cast : Nirr G = #|sG|.
+Local Fact Iirr_cast : Nirr G = #|sG|.
 Proof. by rewrite NirrE ?card_irr_pchar ?algC'G_pchar //; apply: groupC. Qed.
 
 Let offset := cast_ord (esym Iirr_cast) (enum_rank [1 sG]%irr).
@@ -842,7 +842,7 @@ Proof. by rewrite -irr0 irr_char. Qed.
 Lemma cfun0_char : (0 : 'CF(G)) \is a character.
 Proof. by apply/forallP=> i; rewrite linear0 rpred0. Qed.
 
-Fact char_nmod_closed : nmod_closed (@character G).
+Local Fact char_nmod_closed : nmod_closed (@character G).
 Proof.
 split=> [|chi xi /forallP-Nchi /forallP-Nxi]; first exact: cfun0_char.
 by apply/forallP=> i; rewrite linearD rpredD /=.
@@ -1099,7 +1099,7 @@ move: (_ x); rewrite -[irr_degree _](@natrK algC) -irr1_degree lin_char1 //.
 by rewrite (natrK 1) => A; rewrite trace_mx11 -mx11_scalar.
 Qed.
 
-Fact linear_char_divr : divr_closed (@linear_char G).
+Local Fact linear_char_divr : divr_closed (@linear_char G).
 Proof.
 split=> [|chi xi Lchi Lxi]; first exact: cfun1_lin_char.
 rewrite invr_lin_char // qualifE/= cfunE.
@@ -2572,7 +2572,7 @@ Variables (n : nat) (rG : mx_representation algC G n).
 
 Definition det_repr_mx x : 'M_1 := (\det (rG x))%:M.
 
-Fact det_is_repr : mx_repr G det_repr_mx.
+Local Fact det_is_repr : mx_repr G det_repr_mx.
 Proof.
 split=> [|g h Gg Gh]; first by rewrite /det_repr_mx repr_mx1 det1.
 by rewrite /det_repr_mx repr_mxM // det_mulmx !mulmxE scalar_mxM.
@@ -2747,7 +2747,7 @@ by rewrite invmx_scalar -scalar_mxM !mxtrace_scalar mulrnAr mulrnAl mulr_natl.
 Qed.
 
 (* This is part of Isaacs (2.27)(b). *)
-Fact cfcenter_group_set phi : group_set ('Z(phi))%CF.
+Local Fact cfcenter_group_set phi : group_set ('Z(phi))%CF.
 Proof.
 have [[rG ->] | /negbTE notNphi] := altP (@char_reprP _ G phi).
   by rewrite cfcenter_repr groupP.

@@ -1858,13 +1858,13 @@ Section MulFun.
 
 Variables (R : semiRingType) (U : nmodType) (a : R) (f : {additive U -> R}).
 
-Fact mull_fun_is_nmod_morphism : nmod_morphism (a \*o f).
+Local Fact mull_fun_is_nmod_morphism : nmod_morphism (a \*o f).
 Proof. by split=> [|x y]; rewrite /= ?raddf0 ?mulr0// raddfD mulrDr. Qed.
 #[export]
 HB.instance Definition _ := isNmodMorphism.Build U R (a \*o f)
   mull_fun_is_nmod_morphism.
 
-Fact mulr_fun_is_nmod_morphism : nmod_morphism (a \o* f).
+Local Fact mulr_fun_is_nmod_morphism : nmod_morphism (a \o* f).
 Proof. by split=> [|x y]; rewrite /= ?raddf0 ?mul0r// raddfD mulrDl. Qed.
 #[export]
 HB.instance Definition _ := isNmodMorphism.Build U R (a \o* f)
@@ -1976,13 +1976,13 @@ Section Projections.
 Variables (R S T : semiRingType).
 Variables (f : {rmorphism S -> T}) (g : {rmorphism R -> S}).
 
-Fact idfun_is_monoid_morphism : monoid_morphism (@idfun R).
+Local Fact idfun_is_monoid_morphism : monoid_morphism (@idfun R).
 Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isMonoidMorphism.Build R R idfun
   idfun_is_monoid_morphism.
 
-Fact comp_is_monoid_morphism : monoid_morphism (f \o g).
+Local Fact comp_is_monoid_morphism : monoid_morphism (f \o g).
 Proof. by split=> [|x y] /=; rewrite ?rmorph1 ?rmorphM. Qed.
 #[export]
 HB.instance Definition _ := isMonoidMorphism.Build R T (f \o g)
@@ -2011,14 +2011,14 @@ Section InSemiAlgebra.
 
 Variables (R : semiRingType) (A : lSemiAlgType R).
 
-Fact in_alg_is_nmod_morphism : nmod_morphism (in_alg A).
+Local Fact in_alg_is_nmod_morphism : nmod_morphism (in_alg A).
 Proof. by split; [exact: scale0r | exact: scalerDl]. Qed.
 
 #[export]
 HB.instance Definition _ :=
   isNmodMorphism.Build R A (in_alg A) in_alg_is_nmod_morphism.
 
-Fact in_alg_is_monoid_morphism : monoid_morphism (in_alg A).
+Local Fact in_alg_is_monoid_morphism : monoid_morphism (in_alg A).
 Proof. by split=> [|x y]; rewrite /= ?scale1r // mulr_algl scalerA. Qed.
 #[export]
 HB.instance Definition _ := isMonoidMorphism.Build R A (in_alg A)
@@ -2066,18 +2066,18 @@ Section CompSemiLaw.
 Context (R : semiRingType) (V : nmodType) (s : semiLaw R V).
 Context (aR : semiRingType) (nu : {rmorphism aR -> R}).
 
-Fact comp_op0v v : (nu \; s) 0 v = 0.
+Local Fact comp_op0v v : (nu \; s) 0 v = 0.
 Proof. by rewrite /= rmorph0 op0v. Qed.
 
-Fact comp_op1v : (nu \; s) 1 =1 id.
+Local Fact comp_op1v : (nu \; s) 1 =1 id.
 Proof. by move=> v; rewrite /= rmorph1 op1v. Qed.
 
-Fact comp_opA a b v : (nu \; s) a ((nu \; s) b v) = (nu \; s) (a * b) v.
+Local Fact comp_opA a b v : (nu \; s) a ((nu \; s) b v) = (nu \; s) (a * b) v.
 Proof. by rewrite /= opA rmorphM. Qed.
 
 End CompSemiLaw.
 
-Fact compN1op
+Local Fact compN1op
   (R : ringType) (V : zmodType) (s : law R V)
   (aR : ringType) (nu : {rmorphism aR -> R}) : (nu \; s) (-1) =1 -%R.
 Proof. by move=> v; rewrite /= rmorphN1 N1op. Qed.
@@ -2425,7 +2425,7 @@ Section LinearLSemiAlg.
 Variables (R : semiRingType) (A : lSemiAlgType R) (U : lSemiModType R).
 Variables (a : A) (f : {linear U -> A}).
 
-Fact mulr_fun_is_scalable : scalable (a \o* f).
+Local Fact mulr_fun_is_scalable : scalable (a \o* f).
 Proof. by move=> k x /=; rewrite linearZ scalerAl. Qed.
 #[export]
 HB.instance Definition _ :=
@@ -3460,7 +3460,7 @@ Proof. by move=> a b; apply: val_inj; rewrite raddfD/= !SubK scalerDl. Qed.
 HB.instance Definition _ := Nmodule_isLSemiModule.Build R W
   scalerA' scale0r scale1r scalerDr scalerDl.
 
-Fact valZ : scalable (val : W -> _). Proof. by move=> k w; rewrite SubK. Qed.
+Local Fact valZ : scalable (val : W -> _). Proof. by move=> k w; rewrite SubK. Qed.
 HB.instance Definition _ := isSubLSemiModule.Build R V S W valZ.
 HB.end.
 
@@ -4466,19 +4466,19 @@ Variable (aT : finType) (R : semiRingType).
 Definition ffun_one : {ffun aT -> R} := [ffun => 1].
 Definition ffun_mul (f g : {ffun aT -> R}) := [ffun x => f x * g x].
 
-Fact ffun_mulA : associative ffun_mul.
+Local Fact ffun_mulA : associative ffun_mul.
 Proof. by move=> f1 f2 f3; apply/ffunP=> i; rewrite !ffunE mulrA. Qed.
-Fact ffun_mul_1l : left_id ffun_one ffun_mul.
+Local Fact ffun_mul_1l : left_id ffun_one ffun_mul.
 Proof. by move=> f; apply/ffunP=> i; rewrite !ffunE mul1r. Qed.
-Fact ffun_mul_1r : right_id ffun_one ffun_mul.
+Local Fact ffun_mul_1r : right_id ffun_one ffun_mul.
 Proof. by move=> f; apply/ffunP=> i; rewrite !ffunE mulr1. Qed.
-Fact ffun_mul_addl :  left_distributive ffun_mul (@ffun_add _ _).
+Local Fact ffun_mul_addl :  left_distributive ffun_mul (@ffun_add _ _).
 Proof. by move=> f1 f2 f3; apply/ffunP=> i; rewrite !ffunE mulrDl. Qed.
-Fact ffun_mul_addr :  right_distributive ffun_mul (@ffun_add _ _).
+Local Fact ffun_mul_addr :  right_distributive ffun_mul (@ffun_add _ _).
 Proof. by move=> f1 f2 f3; apply/ffunP=> i; rewrite !ffunE mulrDr. Qed.
-Fact ffun_mul_0l :  left_zero (@ffun_zero _ _) ffun_mul.
+Local Fact ffun_mul_0l :  left_zero (@ffun_zero _ _) ffun_mul.
 Proof. by move=> f; apply/ffunP=> i; rewrite !ffunE mul0r. Qed.
-Fact ffun_mul_0r :  right_zero (@ffun_zero _ _) ffun_mul.
+Local Fact ffun_mul_0r :  right_zero (@ffun_zero _ _) ffun_mul.
 Proof. by move=> f; apply/ffunP=> i; rewrite !ffunE mulr0. Qed.
 
 #[export]
@@ -4492,7 +4492,7 @@ Section FinFunSemiRing.
 
 Variable (aT : finType) (R : nzSemiRingType) (a : aT).
 
-Fact ffun1_nonzero : ffun_one aT R != 0.
+Local Fact ffun1_nonzero : ffun_one aT R != 0.
 Proof. by apply/eqP => /ffunP/(_ a)/eqP; rewrite !ffunE oner_eq0. Qed.
 
 (* TODO_HB uncomment once ffun_ring below is fixed
@@ -4528,7 +4528,7 @@ Section FinFunComRing.
 
 Variable (aT : finType) (R : comRingType) (a : aT).
 
-Fact ffun_mulC : commutative (@ffun_mul aT R).
+Local Fact ffun_mulC : commutative (@ffun_mul aT R).
 Proof. by move=> f1 f2; apply/ffunP=> i; rewrite !ffunE mulrC. Qed.
 
 (* TODO_HB
@@ -4547,16 +4547,16 @@ Implicit Types f g : {ffun aT -> rT}.
 
 Definition ffun_scale k f := [ffun a => k *: f a].
 
-Fact ffun_scaleA k1 k2 f :
+Local Fact ffun_scaleA k1 k2 f :
   ffun_scale k1 (ffun_scale k2 f) = ffun_scale (k1 * k2) f.
 Proof. by apply/ffunP=> a; rewrite !ffunE scalerA. Qed.
-Fact ffun_scale0r f : ffun_scale 0 f = 0.
+Local Fact ffun_scale0r f : ffun_scale 0 f = 0.
 Proof. by apply/ffunP=> a; rewrite !ffunE scale0r. Qed.
-Fact ffun_scale1 : left_id 1 ffun_scale.
+Local Fact ffun_scale1 : left_id 1 ffun_scale.
 Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE scale1r. Qed.
-Fact ffun_scale_addr k : {morph (ffun_scale k) : x y / x + y}.
+Local Fact ffun_scale_addr k : {morph (ffun_scale k) : x y / x + y}.
 Proof. by move=> f g; apply/ffunP=> a; rewrite !ffunE scalerDr. Qed.
-Fact ffun_scale_addl u : {morph (ffun_scale)^~ u : k1 k2 / k1 + k2}.
+Local Fact ffun_scale_addl u : {morph (ffun_scale)^~ u : k1 k2 / k1 + k2}.
 Proof. by move=> k1 k2; apply/ffunP=> a; rewrite !ffunE scalerDl. Qed.
 
 #[export]
@@ -4579,36 +4579,36 @@ Variables R1 R2 : semiRingType.
 
 Definition mul_pair (x y : R1 * R2) := (x.1 * y.1, x.2 * y.2).
 
-Fact pair_mulA : associative mul_pair.
+Local Fact pair_mulA : associative mul_pair.
 Proof. by move=> x y z; congr (_, _); apply: mulrA. Qed.
 
-Fact pair_mul1l : left_id (1, 1) mul_pair.
+Local Fact pair_mul1l : left_id (1, 1) mul_pair.
 Proof. by case=> x1 x2; congr (_, _); apply: mul1r. Qed.
 
-Fact pair_mul1r : right_id (1, 1) mul_pair.
+Local Fact pair_mul1r : right_id (1, 1) mul_pair.
 Proof. by case=> x1 x2; congr (_, _); apply: mulr1. Qed.
 
-Fact pair_mulDl : left_distributive mul_pair +%R.
+Local Fact pair_mulDl : left_distributive mul_pair +%R.
 Proof. by move=> x y z; congr (_, _); apply: mulrDl. Qed.
 
-Fact pair_mulDr : right_distributive mul_pair +%R.
+Local Fact pair_mulDr : right_distributive mul_pair +%R.
 Proof. by move=> x y z; congr (_, _); apply: mulrDr. Qed.
 
-Fact pair_mul0r : left_zero 0 mul_pair.
+Local Fact pair_mul0r : left_zero 0 mul_pair.
 Proof. by move=> x; congr (_, _); apply: mul0r. Qed.
 
-Fact pair_mulr0 : right_zero 0 mul_pair.
+Local Fact pair_mulr0 : right_zero 0 mul_pair.
 Proof. by move=> x; congr (_, _); apply: mulr0. Qed.
 
 #[export]
 HB.instance Definition _ := Nmodule_isSemiRing.Build (R1 * R2)%type
   pair_mulA pair_mul1l pair_mul1r pair_mulDl pair_mulDr pair_mul0r pair_mulr0.
 
-Fact fst_is_monoid_morphism : monoid_morphism fst. Proof. by []. Qed.
+Local Fact fst_is_monoid_morphism : monoid_morphism fst. Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isMonoidMorphism.Build (R1 * R2)%type R1 fst
   fst_is_monoid_morphism.
-Fact snd_is_monoid_morphism : monoid_morphism snd. Proof. by []. Qed.
+Local Fact snd_is_monoid_morphism : monoid_morphism snd. Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isMonoidMorphism.Build (R1 * R2)%type R2 snd
   snd_is_monoid_morphism.
@@ -4619,7 +4619,7 @@ Section PairSemiRing.
 
 Variables R1 R2 : nzSemiRingType.
 
-Fact pair_one_neq0 : 1 != 0 :> R1 * R2.
+Local Fact pair_one_neq0 : 1 != 0 :> R1 * R2.
 Proof. by rewrite xpair_eqE oner_eq0. Qed.
 
 #[export]
@@ -4632,7 +4632,7 @@ Section PairComSemiRing.
 
 Variables R1 R2 : comSemiRingType.
 
-Fact pair_mulC : commutative (@mul_pair R1 R2).
+Local Fact pair_mulC : commutative (@mul_pair R1 R2).
 Proof. by move=> x y; congr (_, _); apply: mulrC. Qed.
 
 #[export]
@@ -4661,30 +4661,30 @@ Variables (R : semiRingType) (V1 V2 : lSemiModType R).
 
 Definition scale_pair a (v : V1 * V2) : V1 * V2 := (a *: v.1, a *: v.2).
 
-Fact pair_scaleA a b u : scale_pair a (scale_pair b u) = scale_pair (a * b) u.
+Local Fact pair_scaleA a b u : scale_pair a (scale_pair b u) = scale_pair (a * b) u.
 Proof. by congr (_, _); apply: scalerA. Qed.
 
-Fact pair_scale0 u : scale_pair 0 u = 0.
+Local Fact pair_scale0 u : scale_pair 0 u = 0.
 Proof. by case: u => u1 u2; congr (_, _); apply: scale0r. Qed.
 
-Fact pair_scale1 u : scale_pair 1 u = u.
+Local Fact pair_scale1 u : scale_pair 1 u = u.
 Proof. by case: u => u1 u2; congr (_, _); apply: scale1r. Qed.
 
-Fact pair_scaleDr : right_distributive scale_pair +%R.
+Local Fact pair_scaleDr : right_distributive scale_pair +%R.
 Proof. by move=> a u v; congr (_, _); apply: scalerDr. Qed.
 
-Fact pair_scaleDl u : {morph scale_pair^~ u: a b / a + b}.
+Local Fact pair_scaleDl u : {morph scale_pair^~ u: a b / a + b}.
 Proof. by move=> a b; congr (_, _); apply: scalerDl. Qed.
 
 #[export]
 HB.instance Definition _ := Nmodule_isLSemiModule.Build R (V1 * V2)%type
   pair_scaleA pair_scale0 pair_scale1 pair_scaleDr pair_scaleDl.
 
-Fact fst_is_scalable : scalable fst. Proof. by []. Qed.
+Local Fact fst_is_scalable : scalable fst. Proof. by []. Qed.
 #[export]
 HB.instance Definition _ :=
   isScalable.Build R (V1 * V2)%type V1 *:%R fst fst_is_scalable.
-Fact snd_is_scalable : scalable snd. Proof. by []. Qed.
+Local Fact snd_is_scalable : scalable snd. Proof. by []. Qed.
 #[export]
 HB.instance Definition _ :=
   isScalable.Build R (V1 * V2)%type V2 *:%R snd snd_is_scalable.
@@ -4695,7 +4695,7 @@ Section PairLSemiAlg.
 
 Variables (R : semiRingType) (A1 A2 : lSemiAlgType R).
 
-Fact pair_scaleAl a (u v : A1 * A2) : a *: (u * v) = (a *: u) * v.
+Local Fact pair_scaleAl a (u v : A1 * A2) : a *: (u * v) = (a *: u) * v.
 Proof. by congr (_, _); apply: scalerAl. Qed.
 
 #[export]
@@ -4715,7 +4715,7 @@ Section PairSemiAlg.
 
 Variables (R : semiRingType) (A1 A2 : semiAlgType R).
 
-Fact pair_scaleAr a (u v : A1 * A2) : a *: (u * v) = u * (a *: v).
+Local Fact pair_scaleAr a (u v : A1 * A2) : a *: (u * v) = u * (a *: v).
 Proof. by congr (_, _); apply: scalerAr. Qed.
 
 #[export]

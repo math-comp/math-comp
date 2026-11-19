@@ -331,7 +331,7 @@ Section NatOrder.
   
 Definition nat_display : disp_t. Proof. exact. Qed.
 
-Fact ltn_def n m : (n < m)%N = (m != n) && (n <= m)%N.
+Local Fact ltn_def n m : (n < m)%N = (m != n) && (n <= m)%N.
 Proof. by rewrite ltn_neqAle eq_sym. Qed.
 
 #[export] HB.instance Definition _ :=
@@ -847,16 +847,16 @@ Definition le x y := (tag x <= tag y) &&
 Definition lt x y := (tag x <= tag y) &&
   ((tag x >= tag y) ==> (tagged x < tagged_as x y)).
 
-Fact refl : reflexive le.
+Local Fact refl : reflexive le.
 Proof. by move=> [x x']; rewrite /le tagged_asE/= !lexx. Qed.
 
-Fact anti : antisymmetric le.
+Local Fact anti : antisymmetric le.
 Proof.
 rewrite /le => -[x x'] [y y']/=; case: comparableP => //= eq_xy.
 by case: _ / eq_xy in y' *; rewrite !tagged_asE => /le_anti ->.
 Qed.
 
-Fact trans : transitive le.
+Local Fact trans : transitive le.
 Proof.
 move=> [y y'] [x x'] [z z'] /andP[/= lexy lexy'] /andP[/= leyz leyz'].
 rewrite /= /le (le_trans lexy) //=; apply/implyP => lezx.
@@ -866,7 +866,7 @@ elim: _ / (@le_anti _ _ x z) in z' leyz' *; last by rewrite (le_trans lexy).
 by rewrite lexx !tagged_asE/= in lexy' leyz' *; rewrite (le_trans lexy').
 Qed.
 
-Fact lt_le_def x y : lt x y = le x y && ~~ le y x.
+Local Fact lt_le_def x y : lt x y = le x y && ~~ le y x.
 Proof.
 rewrite /lt /le; case: x y => [x x'] [y y']//=.
 case: (comparableP x y) => //= xy.
@@ -903,7 +903,7 @@ End POrder.
 Section BPOrder.
 Context (T : bPOrderType disp1) (T' : T -> bPOrderType disp2).
 
-Fact le0x (x : {t : T & T' t}) : Tagged T' (\bot : T' \bot) <= x.
+Local Fact le0x (x : {t : T & T' t}) : Tagged T' (\bot : T' \bot) <= x.
 Proof. by rewrite leEsig /= !le0x implybT. Qed.
 
 #[export] HB.instance Definition _ := hasBottom.Build _ {t : T & T' t} le0x.
@@ -915,7 +915,7 @@ End BPOrder.
 Section TPOrder.
 Context (T : tPOrderType disp1) (T' : T -> tPOrderType disp2).
 
-Fact lex1 (x : {t : T & T' t}) : x <= Tagged T' (\top : T' \top).
+Local Fact lex1 (x : {t : T & T' t}) : x <= Tagged T' (\top : T' \top).
 Proof.
 rewrite leEsig /=; case: comparableP (lex1 (tag x)) => //=.
 by case: x => //= x px x0; rewrite x0 in px *; rewrite tagged_asE lex1.
@@ -931,7 +931,7 @@ Section Total.
 Context (T : orderType disp1) (T' : T -> orderType disp2).
 Implicit Types (x y : {t : T & T' t}).
 
-Fact total : total (<=%O : rel {t : T & T' t}).
+Local Fact total : total (<=%O : rel {t : T & T' t}).
 Proof.
 move=> x y; rewrite !leEsig; case: (ltgtP (tag x) (tag y)) => //=.
 case: x y => [x x'] [y y']/= eqxy; elim: _ /eqxy in y' *.
@@ -1024,17 +1024,17 @@ Implicit Types (x y : T1 * T2).
 Let le x y := (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 <= y.2)).
 Let lt x y := (x.1 <= y.1) && ((x.1 >= y.1) ==> (x.2 < y.2)).
 
-Fact refl : reflexive le.
+Local Fact refl : reflexive le.
 Proof. by move=> ?; rewrite /le !lexx. Qed.
 
-Fact trans : transitive le.
+Local Fact trans : transitive le.
 Proof.
 move=> y x z /andP [hxy /implyP hxy'] /andP [hyz /implyP hyz'].
 rewrite /le (le_trans hxy) //=; apply/implyP => hzx.
 by apply/le_trans/hxy'/(le_trans hyz): (hyz' (le_trans hzx hxy)).
 Qed.
 
-Fact lt_le_def x y : lt x y = le x y && ~~ le y x.
+Local Fact lt_le_def x y : lt x y = le x y && ~~ le y x.
 Proof.
 rewrite /lt /le; case: x y => [x1 x2] [y1 y2]/=.
 case/boolP: (x1 <= y1); case/boolP: (y1 <= x1) => //= _ _.
@@ -1087,7 +1087,7 @@ Context (T1 : bPreorderType disp1) (T2 : bPreorderType disp2).
 Local Notation "T1 * T2" := (type (Disp tt tt) T1 T2) : type_scope.
 Implicit Types (x : T1 * T2).
 
-Fact le0x x : (\bot, \bot) <= x :> T1 * T2.
+Local Fact le0x x : (\bot, \bot) <= x :> T1 * T2.
 Proof. by rewrite leEprodlexi !le0x implybT. Qed.
 
 End BPreorder.
@@ -1125,7 +1125,7 @@ Section POrder.
 Context (disp1 disp2 disp3 : disp_t).
 Context (T1 : porderType disp1) (T2 : porderType disp2).
 
-Fact anti : antisymmetric (@le disp1 disp2 disp2 T1 T2).
+Local Fact anti : antisymmetric (@le disp1 disp2 disp2 T1 T2).
 Proof.
 by rewrite /le => -[x x'] [y y'] /=; case: comparableP => //= -> /le_anti->.
 Qed.
@@ -1154,7 +1154,7 @@ Context (disp1 disp2 disp3 : disp_t).
 Context (T1 : orderType disp1) (T2 : orderType disp2).
 Local Notation "T1 * T2" := (type disp3 T1 T2) : type_scope.
 
-Fact total : total (<=%O : rel (T1 * T2)).
+Local Fact total : total (<=%O : rel (T1 * T2)).
 Proof.
 by move=> x y; rewrite !leEprodlexi; case: ltgtP => //= _; exact: le_total.
 Qed.
@@ -1342,10 +1342,10 @@ Fixpoint lt s1 s2 := if s2 isn't x2 :: s2' then false else
                      if s1 isn't x1 :: s1' then true else
                        (x1 <= x2) && ((x1 >= x2) ==> lt s1' s2').
 
-Fact refl: reflexive le.
+Local Fact refl: reflexive le.
 Proof. by elim => [|x s ih] //=; rewrite lexx. Qed.
 
-Fact trans: transitive le.
+Local Fact trans: transitive le.
 Proof.
 elim=> [|y sy ihs] [|x sx] [|z sz] //= /andP[] xy /implyP yx /andP[] yz /implyP zy /=.
 rewrite (le_trans xy yz)/=; apply/implyP => zx.
@@ -1410,7 +1410,7 @@ Section POrder.
 Variable T : porderType disp.
 Implicit Types s : seq T.
 
-Fact anti: antisymmetric (@le T).
+Local Fact anti: antisymmetric (@le T).
 Proof.
 move=> x y /andP []; elim: x y => [|x sx ih] [|y sy] //=.
 by case: comparableP => //= -> lesxsy /(ih _ lesxsy) ->.
@@ -1432,7 +1432,7 @@ End POrder.
 Section Total.
 Context (T : orderType disp).
 
-Fact total : total (<=%O : rel (seq T)).
+Local Fact total : total (<=%O : rel (seq T)).
 Proof.
 by elim=> [|x1 s1 ihs1] [|x2 s2]//=; rewrite !lexi_cons; case: ltgtP => /=.
 Qed.
@@ -1527,7 +1527,7 @@ Section BPreorder.
 Context (n : nat) (T : bPreorderType disp).
 Implicit Types (t : n.-tuple T).
 
-Fact le0x t : [tuple \bot | _ < n] <= t :> n.-tuple T.
+Local Fact le0x t : [tuple \bot | _ < n] <= t :> n.-tuple T.
 Proof.
 have ->: [tuple \bot | _ < n] = [tuple of nseq n \bot] :> n.-tuple T.
   by apply/eq_from_tnth => i; rewrite tnth_map tnth_nseq.
@@ -1545,7 +1545,7 @@ Section TPreorder.
 Context (n : nat) (T : tPreorderType disp).
 Implicit Types (t : n.-tuple T).
 
-Fact lex1 t : t <= [tuple \top | _ < n].
+Local Fact lex1 t : t <= [tuple \top | _ < n].
 Proof.
 have ->: [tuple \top | _ < n] = [tuple of nseq n \top] :> n.-tuple T.
   by apply/eq_from_tnth => i; rewrite tnth_map tnth_nseq.

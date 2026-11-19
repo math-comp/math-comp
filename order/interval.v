@@ -174,7 +174,7 @@ Definition lt_bound b1 b2 :=
     | _, _ => false
   end.
 
-Fact lt_bound_def b1 b2 :
+Local Fact lt_bound_def b1 b2 :
   lt_bound b1 b2 = le_bound b1 b2 && ~~ le_bound b2 b1.
 Proof.
 case: b1 b2 => [[]t0|[]][[]t1|[]] //=; rewrite ?lt_le_def//.
@@ -182,10 +182,10 @@ case: b1 b2 => [[]t0|[]][[]t1|[]] //=; rewrite ?lt_le_def//.
 by rewrite -andbA andbb.
 Qed.
 
-Fact le_bound_refl : reflexive le_bound.
+Local Fact le_bound_refl : reflexive le_bound.
 Proof. by move=> [[]?|[]] /=. Qed.
 
-Fact le_bound_trans : transitive le_bound.
+Local Fact le_bound_trans : transitive le_bound.
 Proof.
 by case=> [[]?|[]] [[]?|[]] [[]?|[]] lexy leyz //;
   apply: (lteif_imply _ (lteif_trans lexy leyz)).
@@ -195,9 +195,9 @@ HB.instance Definition _ :=
   Order.isPreorder.Build (itv_bound_display disp) (itv_bound T)
     lt_bound_def le_bound_refl le_bound_trans.
 
-Fact bound_le0x b : -oo <= b. Proof. by []. Qed.
+Local Fact bound_le0x b : -oo <= b. Proof. by []. Qed.
 
-Fact bound_lex1 b : b <= +oo. Proof. by case: b => [|[]]. Qed.
+Local Fact bound_lex1 b : b <= +oo. Proof. by case: b => [|[]]. Qed.
 
 HB.instance Definition _ :=
   Order.hasBottom.Build (itv_bound_display disp) (itv_bound T) bound_le0x.
@@ -276,10 +276,10 @@ Definition subitv i1 i2 :=
   let: Interval b1l b1r := i1 in
   let: Interval b2l b2r := i2 in (b2l <= b1l) && (b1r <= b2r).
 
-Fact subitv_refl : reflexive subitv.
+Local Fact subitv_refl : reflexive subitv.
 Proof. by case=> /= ? ?; rewrite !lexx. Qed.
 
-Fact subitv_trans : transitive subitv.
+Local Fact subitv_trans : transitive subitv.
 Proof.
 case=> [yl yr][xl xr][zl zr] /andP [Hl Hr] /andP [Hl' Hr'] /=.
 by rewrite (le_trans Hl' Hl) (le_trans Hr Hr').
@@ -289,9 +289,9 @@ HB.instance Definition _ :=
   Order.isPreorder.Build  (interval_display disp) (interval T)
   (fun _ _ => erefl) subitv_refl subitv_trans.
 
-Fact itv_le0x i : Interval +oo -oo <= i. Proof. by case: i => [[|[]]]. Qed.
+Local Fact itv_le0x i : Interval +oo -oo <= i. Proof. by case: i => [[|[]]]. Qed.
 
-Fact itv_lex1 i : i <= `]-oo, +oo[. Proof. by case: i => [?[|[]]]. Qed.
+Local Fact itv_lex1 i : i <= `]-oo, +oo[. Proof. by case: i => [?[|[]]]. Qed.
 
 HB.instance Definition _ :=
   Order.hasBottom.Build (interval_display disp) (interval T) itv_le0x.
@@ -439,7 +439,7 @@ Section IntervalPOrder.
 Variable (disp : Order.disp_t) (T : porderType disp).
 Implicit Types (x y z : T) (b bl br : itv_bound T) (i : interval T).
 
-Fact le_bound_anti : antisymmetric (@le_bound _ T).
+Local Fact le_bound_anti : antisymmetric (@le_bound _ T).
 Proof. by case=> [[]?|[]] [[]?|[]] //=; case: comparableP => // ->. Qed.
 
 HB.instance Definition _ :=
@@ -454,7 +454,7 @@ Lemma comparable_BSide_max s (x y : T) : (x >=< y)%O ->
   BSide s (Order.max x y) = Order.max (BSide s x) (BSide s y).
 Proof. by rewrite !maxEle bnd_simp => /comparable_leP[]. Qed.
 
-Fact subitv_anti : antisymmetric (@subitv _ T).
+Local Fact subitv_anti : antisymmetric (@subitv _ T).
 Proof.
 by case=> [? ?][? ?]; rewrite andbACA => /andP[] /le_anti -> /le_anti ->.
 Qed.
@@ -502,7 +502,7 @@ Definition bound_meet bl br : itv_bound T :=
       BSide (((x <= y) && xb) || ((y <= x) && yb)) (x `&` y)
   end.
 
-Fact bound_lexI b1 b2 b3 : (b1 <= bound_meet b2 b3) = (b1 <= b2) && (b1 <= b3).
+Local Fact bound_lexI b1 b2 b3 : (b1 <= bound_meet b2 b3) = (b1 <= b2) && (b1 <= b3).
 Proof.
 case: b1 b2 b3 => [b1 t1|[]] [b2 t2|[]] [b3 t3|[]];
   rewrite ?andbF ?andbT//= ?leBSide/=.
@@ -537,7 +537,7 @@ Definition bound_join bl br : itv_bound T :=
       BSide ((~~ (x <= y) || yb) && (~~ (y <= x) || xb)) (x `|` y)
   end.
 
-Fact bound_leUx b1 b2 b3 : (bound_join b1 b2 <= b3) = (b1 <= b3) && (b2 <= b3).
+Local Fact bound_leUx b1 b2 b3 : (bound_join b1 b2 <= b3) = (b1 <= b3) && (b2 <= b3).
 Proof.
 case: b1 b2 b3 => [b1 t1|[]] [b2 t2|[]] [b3 t3|[]];
   rewrite ?andbF ?andbT//= ?leBSide/=.
@@ -575,13 +575,13 @@ Definition itv_join i1 i2 : interval T :=
   let: Interval b1l b1r := i1 in
   let: Interval b2l b2r := i2 in Interval (b1l `&` b2l) (b1r `|` b2r).
 
-Fact itv_lexI i1 i2 i3 : (i1 <= itv_meet i2 i3) = (i1 <= i2) && (i1 <= i3).
+Local Fact itv_lexI i1 i2 i3 : (i1 <= itv_meet i2 i3) = (i1 <= i2) && (i1 <= i3).
 Proof.
 case: i1 i2 i3 => [b1l b1r] [b2l b2r] [b3l b3r].
 by rewrite !subitvE/= leUx lexI andbACA.
 Qed.
 
-Fact itv_leUx i1 i2 i3 : (itv_join i1 i2 <= i3) = (i1 <= i3) && (i2 <= i3).
+Local Fact itv_leUx i1 i2 i3 : (itv_join i1 i2 <= i3) = (i1 <= i3) && (i2 <= i3).
 Proof.
 case: i1 i2 i3 => [b1l b1r] [b2l b2r] [b3l b3r].
 by rewrite !subitvE/= leUx lexI andbACA.
@@ -609,14 +609,14 @@ Lemma BSide_max s (x y : T) :
   BSide s (Order.max x y) = Order.max (BSide s x) (BSide s y).
 Proof. exact: comparable_BSide_max. Qed.
 
-Fact itv_bound_total : total (<=%O : rel (itv_bound T)).
+Local Fact itv_bound_total : total (<=%O : rel (itv_bound T)).
 Proof. by move=> [[]?|[]][[]?|[]]; rewrite /<=%O //=; case: ltgtP. Qed.
 
 HB.instance Definition _ :=
   Order.Lattice_isTotal.Build
     (itv_bound_display disp) (itv_bound T) itv_bound_total.
 
-Fact itv_meetUl : @left_distributive (interval T) _ Order.meet Order.join.
+Local Fact itv_meetUl : @left_distributive (interval T) _ Order.meet Order.join.
 Proof.
 by move=> [? ?][? ?][? ?]; rewrite /Order.meet /Order.join /= -meetUl -joinIl.
 Qed.

@@ -1608,7 +1608,7 @@ rewrite -subG1 -tiHKL -setIA setIS; first by rewrite subsetI -defK mulG_subr /=.
 by rewrite -(setIidPr sHG) -defG -group_modl ?cycle_subG //= setIC -mulgA defK.
 Qed.
 
-Fact abelian_type_subproof G :
+Local Fact abelian_type_subproof G :
   {H : {group gT} & abelian G -> {x | #[x] = exponent G & <[x]> \x H = G}}.
 Proof.
 case cGG: (abelian G); last by exists G.

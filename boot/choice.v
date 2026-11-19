@@ -291,6 +291,7 @@ Module Export ChoiceNamespace.
   Variable T : Choice.type.
   Implicit Types P Q : pred T.
 
+  (* TODO: Local? *)
   Fact xchoose_subproof P exP :
     {x | find P (ex_minn (@choice_complete_subdef _ P exP)) = Some x}.
   Proof.
@@ -411,7 +412,7 @@ Variables (P : pred T) (sT : subType P).
 
 End SubChoice.
 
-Fact seq_hasChoice : hasChoice (seq T).
+Local Fact seq_hasChoice : hasChoice (seq T).
 Proof.
 pose r f := [fun xs => fun x : T => f (x :: xs) : option (seq T)].
 pose fix f sP ns xs {struct ns} :=
@@ -438,7 +439,7 @@ Section TagChoice.
 
 Variables (I : choiceType) (T_ : I -> choiceType).
 
-Fact tagged_hasChoice : hasChoice {i : I & T_ i}.
+Local Fact tagged_hasChoice : hasChoice {i : I & T_ i}.
 Proof.
 pose mkT i (x : T_ i) := Tagged T_ x.
 pose ft tP n i := omap (mkT i) (find (tP \o mkT i) n).
@@ -461,7 +462,7 @@ HB.instance Definition _ := tagged_hasChoice.
 
 End TagChoice.
 
-Fact nat_hasChoice : hasChoice nat.
+Local Fact nat_hasChoice : hasChoice nat.
 Proof.
 pose f := [fun (P : pred nat) n => if P n then Some n else None].
 exists f => [P n m | P [n Pn] | P Q eqPQ n] /=; last by rewrite eqPQ.

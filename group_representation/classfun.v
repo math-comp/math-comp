@@ -196,11 +196,11 @@ case: phi => f fP Gy; apply/eqP.
 by case: (andP fP) => /'forall_forall_inP->.
 Qed.
 
-Fact cfun_zero_subproof : is_class_fun G (0 : {ffun _}).
+Local Fact cfun_zero_subproof : is_class_fun G (0 : {ffun _}).
 Proof. exact: intro_class_fun. Qed.
 Definition cfun_zero := Cfun 0 cfun_zero_subproof.
 
-Fact cfun_comp_subproof f phi :
+Local Fact cfun_comp_subproof f phi :
   f 0 = 0 -> is_class_fun G [ffun x => f (phi x)].
 Proof.
 by move=> f0; apply: intro_class_fun => [x y _ /cfunJgen | x /cfun0gen] ->.
@@ -208,14 +208,14 @@ Qed.
 Definition cfun_comp f f0 phi := Cfun 0 (@cfun_comp_subproof f phi f0).
 Definition cfun_opp := cfun_comp (oppr0 _).
 
-Fact cfun_add_subproof phi psi : is_class_fun G [ffun x => phi x + psi x].
+Local Fact cfun_add_subproof phi psi : is_class_fun G [ffun x => phi x + psi x].
 Proof.
 apply: intro_class_fun => [x y Gx Gy | x notGx]; rewrite ?cfunJgen //.
 by rewrite !cfun0gen ?add0r.
 Qed.
 Definition cfun_add phi psi := Cfun 0 (cfun_add_subproof phi psi).
 
-Fact cfun_indicator_subproof (A : {set gT}) :
+Local Fact cfun_indicator_subproof (A : {set gT}) :
   is_class_fun G [ffun x => ((x \in G) && (x ^: G \subset A))%:R].
 Proof.
 apply: intro_class_fun => [x y Gx Gy | x /negbTE/= -> //].
@@ -227,7 +227,7 @@ Local Notation "''1_' A" := (cfun_indicator A) : ring_scope.
 Lemma cfun1Egen x : '1_G x = (x \in G)%:R.
 Proof. by rewrite cfunElock andb_idr // => /class_subG->. Qed.
 
-Fact cfun_mul_subproof phi psi : is_class_fun G [ffun x => phi x * psi x].
+Local Fact cfun_mul_subproof phi psi : is_class_fun G [ffun x => phi x * psi x].
 Proof.
 apply: intro_class_fun => [x y Gx Gy | x notGx]; rewrite ?cfunJgen //.
 by rewrite cfun0gen ?mul0r.
@@ -240,13 +240,13 @@ Definition cfun_inv phi :=
 
 Definition cfun_scale a := cfun_comp (mulr0 a).
 
-Fact cfun_addA : associative cfun_add.
+Local Fact cfun_addA : associative cfun_add.
 Proof. by move=> phi psi xi; apply/cfunP=> x; rewrite !cfunE addrA. Qed.
-Fact cfun_addC : commutative cfun_add.
+Local Fact cfun_addC : commutative cfun_add.
 Proof. by move=> phi psi; apply/cfunP=> x; rewrite !cfunE addrC. Qed.
-Fact cfun_add0 : left_id cfun_zero cfun_add.
+Local Fact cfun_add0 : left_id cfun_zero cfun_add.
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE add0r. Qed.
-Fact cfun_addN : left_inverse cfun_zero cfun_opp cfun_add.
+Local Fact cfun_addN : left_inverse cfun_zero cfun_opp cfun_add.
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE addNr. Qed.
 
 HB.instance Definition _ := GRing.isZmodule.Build classfun
@@ -259,17 +259,17 @@ Lemma sum_cfunE I r (P : pred I) (phi : I -> classfun) x :
   (\sum_(i <- r | P i) phi i) x = \sum_(i <- r | P i) (phi i) x.
 Proof. by elim/big_rec2: _ => [|i _ psi _ <-]; rewrite cfunE. Qed.
 
-Fact cfun_mulA : associative cfun_mul.
+Local Fact cfun_mulA : associative cfun_mul.
 Proof. by move=> phi psi xi; apply/cfunP=> x; rewrite !cfunE mulrA. Qed.
-Fact cfun_mulC : commutative cfun_mul.
+Local Fact cfun_mulC : commutative cfun_mul.
 Proof. by move=> phi psi; apply/cfunP=> x; rewrite !cfunE mulrC. Qed.
-Fact cfun_mul1 : left_id '1_G cfun_mul.
+Local Fact cfun_mul1 : left_id '1_G cfun_mul.
 Proof.
 by move=> phi; apply: cfun_in_genP => x Gx; rewrite !cfunE cfun1Egen Gx mul1r.
 Qed.
-Fact cfun_mulD : left_distributive cfun_mul cfun_add.
+Local Fact cfun_mulD : left_distributive cfun_mul cfun_add.
 Proof. by move=> phi psi xi; apply/cfunP=> x; rewrite !cfunE mulrDl. Qed.
-Fact cfun_nz1 : '1_G != 0.
+Local Fact cfun_nz1 : '1_G != 0.
 Proof.
 by apply/eqP=> /cfunP/(_ 1%g)/eqP; rewrite cfun1Egen cfunE group1 oner_eq0.
 Qed.
@@ -285,36 +285,36 @@ Notation cfun_ringType := (cfun_nzRingType) (only parsing).
 Lemma expS_cfunE phi n x : (phi ^+ n.+1) x = phi x ^+ n.+1.
 Proof. by elim: n => //= n IHn; rewrite !cfunE IHn. Qed.
 
-Fact cfun_mulV : {in cfun_unit, left_inverse 1 cfun_inv *%R}.
+Local Fact cfun_mulV : {in cfun_unit, left_inverse 1 cfun_inv *%R}.
 Proof.
 move=> phi Uphi; rewrite /cfun_inv Uphi; apply/cfun_in_genP=> x Gx.
 by rewrite !cfunE cfun1Egen Gx mulVf ?(forall_inP Uphi).
 Qed.
-Fact cfun_unitP phi psi : psi * phi = 1 -> phi \in cfun_unit.
+Local Fact cfun_unitP phi psi : psi * phi = 1 -> phi \in cfun_unit.
 Proof.
 move/cfunP=> phiK; apply/forall_inP=> x Gx; rewrite -unitfE; apply/unitrP.
 by exists (psi x); have:= phiK x; rewrite !cfunE cfun1Egen Gx mulrC.
 Qed.
-Fact cfun_inv0id : {in [predC cfun_unit], cfun_inv =1 id}.
+Local Fact cfun_inv0id : {in [predC cfun_unit], cfun_inv =1 id}.
 Proof. by rewrite /cfun_inv => phi /negbTE/= ->. Qed.
 
 HB.instance Definition _ :=
    GRing.ComNzRing_hasMulInverse.Build classfun cfun_mulV cfun_unitP cfun_inv0id.
 
-Fact cfun_scaleA a b phi :
+Local Fact cfun_scaleA a b phi :
   cfun_scale a (cfun_scale b phi) = cfun_scale (a * b) phi.
 Proof. by apply/cfunP=> x; rewrite !cfunE mulrA. Qed.
-Fact cfun_scale1 : left_id 1 cfun_scale.
+Local Fact cfun_scale1 : left_id 1 cfun_scale.
 Proof. by move=> phi; apply/cfunP=> x; rewrite !cfunE mul1r. Qed.
-Fact cfun_scaleDr : right_distributive cfun_scale +%R.
+Local Fact cfun_scaleDr : right_distributive cfun_scale +%R.
 Proof. by move=> a phi psi; apply/cfunP=> x; rewrite !cfunE mulrDr. Qed.
-Fact cfun_scaleDl phi : {morph cfun_scale^~ phi : a b / a + b}.
+Local Fact cfun_scaleDl phi : {morph cfun_scale^~ phi : a b / a + b}.
 Proof. by move=> a b; apply/cfunP=> x; rewrite !cfunE mulrDl. Qed.
 
 HB.instance Definition _ := GRing.Zmodule_isLmodule.Build algC classfun
   cfun_scaleA cfun_scale1 cfun_scaleDr cfun_scaleDl.
 
-Fact cfun_scaleAl a phi psi : a *: (phi * psi) = (a *: phi) * psi.
+Local Fact cfun_scaleAl a phi psi : a *: (phi * psi) = (a *: phi) * psi.
 Proof. by apply/cfunP=> x; rewrite !cfunE mulrA. Qed.
 
 HB.instance Definition _ :=
@@ -366,7 +366,7 @@ Definition cfReal phi := cfAut conjC phi == phi.
 Definition cfConjC_subset (S1 S2 : seq classfun) :=
   [/\ uniq S1, {subset S1 <= S2} & cfAut_closed conjC S1].
 
-Fact cfun_vect_iso : Vector.axiom #|classes G| classfun.
+Local Fact cfun_vect_iso : Vector.axiom #|classes G| classfun.
 Proof.
 exists (fun phi => \row_i phi (repr (enum_val i))) => [a phi psi|].
   by apply/rowP=> i; rewrite !(mxE, cfunE).
@@ -670,7 +670,7 @@ Proof. exact: rmorph1. Qed.
 
 (* Class function kernel and faithful class functions *)
 
-Fact cfker_is_group phi : group_set (cfker phi).
+Local Fact cfker_is_group phi : group_set (cfker phi).
 Proof.
 apply/group_setP; split=> [|x y]; rewrite !inE ?group1.
   by apply/forallP=> y; rewrite mul1g.
@@ -1368,7 +1368,7 @@ Variables (gT : finGroupType) (A B : {set gT}).
 Local Notation H := <<A>>.
 Local Notation G := <<B>>.
 
-Fact cfRes_subproof (phi : 'CF(B)) :
+Local Fact cfRes_subproof (phi : 'CF(B)) :
   is_class_fun H [ffun x => phi (if H \subset G then x else 1%g) *+ (x \in H)].
 Proof.
 apply: intro_class_fun => /= [x y Hx Hy | x /negbTE/=-> //].
@@ -1463,7 +1463,7 @@ Section Main.
 Variable G : {group aT}.
 Implicit Type phi : 'CF(f @* G).
 
-Fact cfMorph_subproof phi :
+Local Fact cfMorph_subproof phi :
   is_class_fun <<G>>
     [ffun x => phi (if G \subset D then f x else 1%g) *+ (x \in G)].
 Proof.
@@ -1491,14 +1491,14 @@ apply/cfun_inP=> x Gx; rewrite cfunElock !cfun1E Gx.
 by case: subsetP => [sGD | _]; rewrite ?group1 // mem_morphim ?sGD.
 Qed.
 
-Fact cfMorph_is_linear : linear cfMorph.
+Local Fact cfMorph_is_linear : linear cfMorph.
 Proof.
 by move=> a phi psi; apply/cfunP=> x; rewrite !cfunElock mulrnAr -mulrnDl.
 Qed.
 HB.instance Definition _ := GRing.isSemilinear.Build algC _ _ _ cfMorph
   (GRing.semilinear_linear cfMorph_is_linear).
 
-Fact cfMorph_is_monoid_morphism : monoid_morphism cfMorph.
+Local Fact cfMorph_is_monoid_morphism : monoid_morphism cfMorph.
 Proof.
 split=> [|phi psi]; [exact: cfMorph_cfun1 | apply/cfunP=> x].
 by rewrite !cfunElock mulrnAr mulrnAl -mulrnA mulnb andbb.
@@ -1656,7 +1656,7 @@ Definition cfMod : 'CF(G / B) -> 'CF(G) := cfMorph.
 Definition ffun_Quo (phi : 'CF(G)) :=
   [ffun Hx : coset_of B =>
     phi (if B \subset cfker phi then repr Hx else 1%g) *+ (Hx \in G / B)%g].
-Fact cfQuo_subproof phi : is_class_fun <<G / B>> (ffun_Quo phi).
+Local Fact cfQuo_subproof phi : is_class_fun <<G / B>> (ffun_Quo phi).
 Proof.
 rewrite genGid; apply: intro_class_fun => [|Hx /negPf-> //].
 move=> _ _ /morphimP[x Nx Gx ->] /morphimP[z Nz Gz ->].
@@ -1836,7 +1836,7 @@ Section SDproduct.
 Variables (gT : finGroupType) (G K H : {group gT}).
 Hypothesis defG : K ><| H = G.
 
-Fact cfSdprodKey : unit. Proof. by []. Qed.
+Local Fact cfSdprodKey : unit. Proof. by []. Qed.
 
 Definition cfSdprod :=
   locked_with cfSdprodKey
@@ -2044,7 +2044,7 @@ Hypothesis defG : \big[dprod/1%g]_(i | P i) A i = G.
 Let sAG i : P i -> A i \subset G.
 Proof. by move=> Pi; rewrite -(bigdprodWY defG) (bigD1 i) ?joing_subl. Qed.
 
-Fact cfBigdprodi_subproof i :
+Local Fact cfBigdprodi_subproof i :
   gval (if P i then A i else 1%G) \x <<\bigcup_(j | P j && (j != i)) A j>> = G.
 Proof.
 have:= defG; rewrite fun_if big_mkcond (bigD1 i) // -big_mkcondl /= => defGi.
@@ -2206,7 +2206,7 @@ Definition ffun_cfInd (phi : 'CF(A)) :=
   [ffun x => if H \subset G then #|A|%:R^-1 * (\sum_(y in G) phi (x ^ y))
                             else #|G|%:R * '[phi, 1] *+ (x == 1%g)].
 
-Fact cfInd_subproof phi : is_class_fun G (ffun_cfInd phi).
+Local Fact cfInd_subproof phi : is_class_fun G (ffun_cfInd phi).
 Proof.
 apply: intro_class_fun => [x y Gx Gy | x H'x]; last first.
   case: subsetP => [sHG | _]; last by rewrite (negPf (group1_contra H'x)).
