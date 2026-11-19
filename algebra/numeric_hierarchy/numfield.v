@@ -730,8 +730,8 @@ Definition nthroot n x := let: RootCspec y _ _ := rootC_subproof n x in y.
 Notation "n .-root" := (nthroot n) : ring_scope.
 Notation sqrtC := 2.-root.
 
-Fact Re_lock : unit. Proof. exact: tt. Qed.
-Fact Im_lock : unit. Proof. exact: tt. Qed.
+Definition Re_lock : unit. Proof. exact: tt. Qed.
+Definition Im_lock : unit. Proof. exact: tt. Qed.
 Definition Re z := locked_with Re_lock ((z + z^*) / 2%:R).
 Definition Im z := locked_with Im_lock ('i * (z^* - z) / 2%:R).
 Notation "'Re z" := (Re z) : ring_scope.

@@ -161,7 +161,7 @@ Record classfun : predArgType :=
   Classfun {cfun_val; _ : is_class_fun G cfun_val}.
 Implicit Types phi psi xi : classfun.
 (* The default expansion lemma cfunE requires key = 0. *)
-Fact classfun_key : unit. Proof. by []. Qed.
+Definition classfun_key : unit. Proof. by []. Qed.
 Definition Cfun := locked_with classfun_key (fun flag : nat => Classfun).
 
 HB.instance Definition _ := [isSub for cfun_val].
@@ -1571,7 +1571,7 @@ Let defR := isom_im isoGR.
 Local Notation G1 := (isom_inv isoGR @* R).
 Let defG : G1 = G := isom_im (isom_sym isoGR).
 
-Fact cfIsom_key : unit. Proof. by []. Qed.
+Definition cfIsom_key : unit. Proof. by []. Qed.
 Definition cfIsom :=
   locked_with cfIsom_key (cfMorph \o 'Res[G1] : 'CF(G) -> 'CF(R)).
 Canonical cfIsom_unlockable := [unlockable of cfIsom].

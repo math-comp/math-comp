@@ -176,7 +176,7 @@ Section unitarymx.
 Context {C : numClosedFieldType}.
 
 Definition unitarymx {m n} := [qualify X : 'M[C]_(m, n) | X *m X ^t* == 1%:M].
-Fact unitarymx_key m n : pred_key (@unitarymx m n). Proof. by []. Qed.
+Definition unitarymx_key m n : pred_key (@unitarymx m n). Proof. by []. Qed.
 Canonical unitarymx_keyed m n := KeyedQualifier (unitarymx_key m n).
 
 Lemma unitarymxP m n {M : 'M[C]_(m, n)} :
@@ -248,7 +248,7 @@ Section normalmx.
 Context {C : numClosedFieldType} {n : nat}.
 
 Definition normalmx := [qualify M : 'M[C]_n | M *m M ^t* == M ^t* *m M].
-Fact normalmx_key : pred_key normalmx. Proof. by []. Qed.
+Definition normalmx_key : pred_key normalmx. Proof. by []. Qed.
 Canonical normalmx_keyed := KeyedQualifier normalmx_key.
 
 Lemma normalmxP {M : 'M[C]_n} :

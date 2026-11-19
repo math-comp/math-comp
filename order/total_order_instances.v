@@ -329,7 +329,7 @@ Import Order.Theory.
 Module NatOrder.
 Section NatOrder.
   
-Fact nat_display : disp_t. Proof. exact. Qed.
+Definition nat_display : disp_t. Proof. exact. Qed.
 
 Fact ltn_def n m : (n < m)%N = (m != n) && (n <= m)%N.
 Proof. by rewrite ltn_neqAle eq_sym. Qed.
@@ -451,7 +451,7 @@ End NatMonotonyTheory.
 Module OrdinalOrder.
 Section OrdinalOrder.
 
-Fact ord_display : disp_t. Proof. exact. Qed.
+Definition ord_display : disp_t. Proof. exact. Qed.
 
 Section PossiblyTrivial.
 Context (n : nat).
@@ -491,9 +491,9 @@ HB.export OrdinalOrder.Exports.
 (* Definition of lexi_display *)
 (******************************)
 
-Fact lexi_display (disp _ : disp_t) : disp_t. Proof. exact: disp. Qed.
+Definition lexi_display (disp _ : disp_t) : disp_t. Proof. exact: disp. Qed.
 
-Fact seqlexi_display (disp : disp_t) : disp_t. Proof. exact: disp. Qed.
+Definition seqlexi_display (disp : disp_t) : disp_t. Proof. exact: disp. Qed.
 
 Module LexiSyntax.
 

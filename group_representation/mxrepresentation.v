@@ -1942,7 +1942,7 @@ Qed.
 
 Section Components.
 
-Fact component_mx_key : unit. Proof. by []. Qed.
+Definition component_mx_key : unit. Proof. by []. Qed.
 Definition component_mx_expr (U : 'M[F]_n) :=
   (\sum_i cyclic_mx (row i (row_hom_mx (nz_row U))))%MS.
 Definition component_mx := locked_with component_mx_key component_mx_expr.
@@ -4077,7 +4077,7 @@ rewrite gring_opG ?gring_projE // eqxx big1 ?addr0 ?oner_eq0 // => x.
 by case/andP=> Gx nt_x; rewrite gring_opG // gring_projE // eq_sym (negPf nt_x).
 Qed.
 
-Fact principal_comp_key : unit. Proof. by []. Qed.
+Definition principal_comp_key : unit. Proof. by []. Qed.
 Definition principal_comp_def :=
   PackSocle (component_socle sG principal_comp_subproof).
 Definition principal_comp := locked_with principal_comp_key principal_comp_def.

@@ -2551,7 +2551,7 @@ by split=> // B PB sBA; rewrite (minA B) // PB (subset_trans sBA).
 Qed.
 
 (* The 'locked_with' allows Coq to find the value of P by unification. *)
-Fact maxset_key : unit. Proof. by []. Qed.
+Definition maxset_key : unit. Proof. by []. Qed.
 Definition maxset P A :=
   minset (fun B => locked_with maxset_key P (~: B)) (~: A).
 

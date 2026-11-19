@@ -299,7 +299,7 @@ Coercion fun_of_matrix : matrix >-> Funclass.
 
 End MatrixDef.
 
-Fact matrix_key : unit. Proof. by []. Qed.
+Definition matrix_key : unit. Proof. by []. Qed.
 
 HB.lock
 Definition matrix_of_fun R (m n : nat) (k : unit) (F : 'I_m -> 'I_n -> R) :=
@@ -382,7 +382,7 @@ Section MatrixStructural.
 Variable R : Type.
 
 (* Constant matrix *)
-Fact const_mx_key : unit. Proof. by []. Qed.
+Definition const_mx_key : unit. Proof. by []. Qed.
 Definition const_mx m n a : 'M[R]_(m, n) := \matrix[const_mx_key]_(i, j) a.
 Arguments const_mx {m n}.
 
@@ -404,13 +404,13 @@ Definition conform_mx m' n' B A :=
   end.
 
 (* Transpose a matrix *)
-Fact trmx_key : unit. Proof. by []. Qed.
+Definition trmx_key : unit. Proof. by []. Qed.
 Definition trmx A := \matrix[trmx_key]_(i, j) A j i.
 
 (* Permute a matrix vertically (rows) or horizontally (columns) *)
-Fact row_perm_key : unit. Proof. by []. Qed.
+Definition row_perm_key : unit. Proof. by []. Qed.
 Definition row_perm (s : 'S_m) A := \matrix[row_perm_key]_(i, j) A (s i) j.
-Fact col_perm_key : unit. Proof. by []. Qed.
+Definition col_perm_key : unit. Proof. by []. Qed.
 Definition col_perm (s : 'S_n) A := \matrix[col_perm_key]_(i, j) A i (s j).
 
 (* Exchange two rows/columns of a matrix *)
@@ -741,12 +741,12 @@ Variables m m1 m2 n n1 n2 : nat.
 
 (* Concatenating two matrices, in either direction. *)
 
-Fact row_mx_key : unit. Proof. by []. Qed.
+Definition row_mx_key : unit. Proof. by []. Qed.
 Definition row_mx (A1 : 'M_(m, n1)) (A2 : 'M_(m, n2)) : 'M[R]_(m, n1 + n2) :=
   \matrix[row_mx_key]_(i, j)
      match split j with inl j1 => A1 i j1 | inr j2 => A2 i j2 end.
 
-Fact col_mx_key : unit. Proof. by []. Qed.
+Definition col_mx_key : unit. Proof. by []. Qed.
 Definition col_mx (A1 : 'M_(m1, n)) (A2 : 'M_(m2, n)) : 'M[R]_(m1 + m2, n) :=
   \matrix[col_mx_key]_(i, j)
      match split i with inl i1 => A1 i1 j | inr i2 => A2 i2 j end.
@@ -755,19 +755,19 @@ Definition col_mx (A1 : 'M_(m1, n)) (A2 : 'M_(m2, n)) : 'M[R]_(m1 + m2, n) :=
 (* The shape of the (dependent) width parameters of the type of A *)
 (* determines which submatrix is selected.                        *)
 
-Fact lsubmx_key : unit. Proof. by []. Qed.
+Definition lsubmx_key : unit. Proof. by []. Qed.
 Definition lsubmx (A : 'M[R]_(m, n1 + n2)) :=
   \matrix[lsubmx_key]_(i, j) A i (lshift n2 j).
 
-Fact rsubmx_key : unit. Proof. by []. Qed.
+Definition rsubmx_key : unit. Proof. by []. Qed.
 Definition rsubmx (A : 'M[R]_(m, n1 + n2)) :=
   \matrix[rsubmx_key]_(i, j) A i (rshift n1 j).
 
-Fact usubmx_key : unit. Proof. by []. Qed.
+Definition usubmx_key : unit. Proof. by []. Qed.
 Definition usubmx (A : 'M[R]_(m1 + m2, n)) :=
   \matrix[usubmx_key]_(i, j) A (lshift m2 i) j.
 
-Fact dsubmx_key : unit. Proof. by []. Qed.
+Definition dsubmx_key : unit. Proof. by []. Qed.
 Definition dsubmx (A : 'M[R]_(m1 + m2, n)) :=
   \matrix[dsubmx_key]_(i, j) A (rshift m1 i) j.
 
@@ -1215,7 +1215,7 @@ Coercion pair_of_mxvec_index k (i_k : is_mxvec_index k) :=
 Definition mxvec (A : 'M[R]_(m, n)) :=
   castmx (erefl _, mxvec_cast) (\row_k A (enum_val k).1 (enum_val k).2).
 
-Fact vec_mx_key : unit. Proof. by []. Qed.
+Definition vec_mx_key : unit. Proof. by []. Qed.
 Definition vec_mx (u : 'rV[R]_(m * n)) :=
   \matrix[vec_mx_key]_(i, j) u 0 (mxvec_index i j).
 
@@ -1263,7 +1263,7 @@ Section MapMatrix.
 
 Variables (aT rT : Type) (f : aT -> rT).
 
-Fact map_mx_key : unit. Proof. by []. Qed.
+Definition map_mx_key : unit. Proof. by []. Qed.
 Definition map_mx m n (A : 'M_(m, n)) := \matrix[map_mx_key]_(i, j) f (A i j).
 
 Notation "A ^f" := (map_mx A) : ring_scope.
@@ -1408,7 +1408,7 @@ Arguments map_mx_id {R m n} [f].
 Section Map2Matrix.
 Context {R S T : Type} (f : R -> S -> T).
 
-Fact map2_mx_key : unit. Proof. by []. Qed.
+Definition map2_mx_key : unit. Proof. by []. Qed.
 Definition map2_mx m n (A : 'M_(m, n)) (B : 'M_(m, n)) :=
   \matrix[map2_mx_key]_(i, j) f (A i j) (B i j).
 
@@ -1631,7 +1631,7 @@ Section FixedDim.
 Variables m n : nat.
 Implicit Types A B : 'M[V]_(m, n).
 
-Fact addmx_key : unit. Proof. by []. Qed.
+Definition addmx_key : unit. Proof. by []. Qed.
 Definition addmx := @map2_mx V V V +%R m n.
 
 Definition addmxA : associative addmx := map2_mxA.
@@ -1955,7 +1955,7 @@ Qed.
 
 (* Diagonal matrices *)
 
-Fact diag_mx_key : unit. Proof. by []. Qed.
+Definition diag_mx_key : unit. Proof. by []. Qed.
 Definition diag_mx n (d : 'rV[V]_n) :=
   \matrix[diag_mx_key]_(i, j) (d 0 i *+ (i == j)).
 
@@ -1996,7 +1996,7 @@ Section ScalarMx.
 
 Variable n : nat.
 
-Fact scalar_mx_key : unit. Proof. by []. Qed.
+Definition scalar_mx_key : unit. Proof. by []. Qed.
 Definition scalar_mx x : 'M[V]_n :=
   \matrix[scalar_mx_key]_(i , j) (x *+ (i == j)).
 Notation "x %:M" := (scalar_mx x) : ring_scope.
@@ -2139,7 +2139,7 @@ Section FixedDim.
 Variables m n : nat.
 Implicit Types A B : 'M[V]_(m, n).
 
-Fact oppmx_key : unit. Proof. by []. Qed.
+Definition oppmx_key : unit. Proof. by []. Qed.
 Definition oppmx := @map_mx V V -%R m n.
 
 Lemma addNmx : left_inverse (const_mx 0) oppmx (@addmx V m n).
@@ -2203,11 +2203,11 @@ Section SemiRingModule.
 Variables m n : nat.
 Implicit Types A B : 'M[R]_(m, n).
 
-Fact scalemx_key : unit. Proof. by []. Qed.
+Definition scalemx_key : unit. Proof. by []. Qed.
 Definition scalemx x A := \matrix[scalemx_key]_(i, j) (x * A i j).
 
 (* Basis *)
-Fact delta_mx_key : unit. Proof. by []. Qed.
+Definition delta_mx_key : unit. Proof. by []. Qed.
 Definition delta_mx i0 j0 : 'M[R]_(m, n) :=
   \matrix[delta_mx_key]_(i, j) ((i == i0) && (j == j0))%:R.
 
@@ -2302,7 +2302,7 @@ Lemma col1 n i : col i (1%:M : 'M_n) = delta_mx i 0.
 Proof. by apply/colP => j; rewrite !mxE eqxx andbT. Qed.
 
 (* Matrix multiplication using bigops. *)
-Fact mulmx_key : unit. Proof. by []. Qed.
+Definition mulmx_key : unit. Proof. by []. Qed.
 Definition mulmx {m n p} (A : 'M_(m, n)) (B : 'M_(n, p)) : 'M[R]_(m, p) :=
   \matrix[mulmx_key]_(i, k) \sum_j (A i j * B j k).
 
@@ -2540,7 +2540,7 @@ Qed.
 
 (* Partial identity matrix (used in rank decomposition). *)
 
-Fact pid_mx_key : unit. Proof. by []. Qed.
+Definition pid_mx_key : unit. Proof. by []. Qed.
 Definition pid_mx {m n} r : 'M[R]_(m, n) :=
   \matrix[pid_mx_key]_(i, j) ((i == j :> nat) && (i < r))%:R.
 
@@ -2807,7 +2807,7 @@ Section LinRowVector.
 
 Variables m n : nat.
 
-Fact lin1_mx_key : unit. Proof. by []. Qed.
+Definition lin1_mx_key : unit. Proof. by []. Qed.
 Definition lin1_mx (f : 'rV[R]_m -> 'rV[R]_n) :=
   \matrix[lin1_mx_key]_(i, j) f (delta_mx 0 i) 0 j.
 
@@ -3295,7 +3295,7 @@ Definition cofactor n A (i j : 'I_n) : R :=
   (-1) ^+ (i + j) * determinant (row' i (col' j A)).
 
 (* The adjugate matrix : defined as the transpose of the matrix of cofactors *)
-Fact adjugate_key : unit. Proof. by []. Qed.
+Definition adjugate_key : unit. Proof. by []. Qed.
 Definition adjugate n (A : 'M_n) := \matrix[adjugate_key]_(i, j) cofactor A j i.
 
 End MatrixAlgebra.

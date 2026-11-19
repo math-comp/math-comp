@@ -305,7 +305,7 @@ Import Order.Theory.
 (* first parameter is set to dvd_display.                                   *)
 (****************************************************************************)
 
-Fact dvd_display : disp_t. Proof. exact. Qed.
+Definition dvd_display : disp_t. Proof. exact. Qed.
 
 Module DvdSyntax.
 
@@ -452,7 +452,7 @@ HB.export NatDvd.Exports.
 (* Definition of seqprod_display *)
 (*********************************)
 
-Fact seqprod_display (disp : disp_t) : disp_t. Proof. exact: disp. Qed.
+Definition seqprod_display (disp : disp_t) : disp_t. Proof. exact: disp. Qed.
 
 Module SeqProdSyntax.
 

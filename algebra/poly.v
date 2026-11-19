@@ -247,7 +247,7 @@ Qed.
 
 (* Build a polynomial from an infinite sequence of coefficients and a bound. *)
 Definition poly_expanded_def n E := Poly (mkseq E n).
-Fact poly_key : unit. Proof. by []. Qed.
+Definition poly_key : unit. Proof. by []. Qed.
 Definition poly := locked_with poly_key poly_expanded_def.
 Canonical poly_unlockable := [unlockable fun poly].
 Local Notation "\poly_ ( i < n ) E" := (poly n (fun i : nat => E)).
@@ -285,7 +285,7 @@ Qed.
 
 (* Nmodule structure for polynomial *)
 Definition add_poly_def p q := \poly_(i < maxn (size p) (size q)) (p`_i + q`_i).
-Fact add_poly_key : unit. Proof. by []. Qed.
+Definition add_poly_key : unit. Proof. by []. Qed.
 Definition add_poly := locked_with add_poly_key add_poly_def.
 Canonical add_poly_unlockable := [unlockable fun add_poly].
 
@@ -425,7 +425,7 @@ Proof. by move/lead_coefDl<-; rewrite addrC. Qed.
 (* Polynomial semiring structure. *)
 Definition mul_poly_def p q :=
   \poly_(i < (size p + size q).-1) (\sum_(j < i.+1) p`_j * q`_(i - j)).
-Fact mul_poly_key : unit. Proof. by []. Qed.
+Definition mul_poly_key : unit. Proof. by []. Qed.
 Definition mul_poly := locked_with mul_poly_key mul_poly_def.
 Canonical mul_poly_unlockable := [unlockable fun mul_poly].
 
@@ -617,7 +617,7 @@ Qed.
 
 (* Algebra structure of polynomials. *)
 Definition scale_poly_def a (p : {poly R}) := \poly_(i < size p) (a * p`_i).
-Fact scale_poly_key : unit. Proof. by []. Qed.
+Definition scale_poly_key : unit. Proof. by []. Qed.
 Definition scale_poly := locked_with scale_poly_key scale_poly_def.
 Canonical scale_poly_unlockable := [unlockable fun scale_poly].
 
@@ -674,7 +674,7 @@ HB.instance Definition _ := GRing.Linear.on (coefp 0).
 
 (* The indeterminate, at last! *)
 Definition polyX_def := Poly [:: 0; 1].
-Fact polyX_key : unit. Proof. by []. Qed.
+Definition polyX_key : unit. Proof. by []. Qed.
 Definition polyX : {poly R} := locked_with polyX_key polyX_def.
 Canonical polyX_unlockable := [unlockable of polyX].
 Local Notation "'X" := polyX.
@@ -1502,7 +1502,7 @@ Implicit Types (a b c x y z : R) (p q r d : {poly R}).
 
 (* Zmodule structure for polynomial *)
 Definition opp_poly_def p := \poly_(i < size p) - p`_i.
-Fact opp_poly_key : unit. Proof. by []. Qed.
+Definition opp_poly_key : unit. Proof. by []. Qed.
 Definition opp_poly := locked_with opp_poly_key opp_poly_def.
 Canonical opp_poly_unlockable := [unlockable fun opp_poly].
 

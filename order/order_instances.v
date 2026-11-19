@@ -66,7 +66,7 @@ Module BoolOrder.
 Section BoolOrder.
 Implicit Types (x y : bool).
 
-Fact bool_display : disp_t. Proof. exact. Qed.
+Definition bool_display : disp_t. Proof. exact. Qed.
 
 Fact ltb_def x y : (x < y)%N = (y != x) && (x <= y)%N.
 Proof. by case: x y => [] []. Qed.

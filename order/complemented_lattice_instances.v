@@ -240,7 +240,7 @@ Import Order.Theory.
 (* Definition of prod_display *)
 (******************************)
 
-Fact prod_display_unit (_ _ : unit) : unit. Proof. exact: tt. Qed.
+Definition prod_display_unit (_ _ : unit) : unit. Proof. exact: tt. Qed.
 
 Definition prod_display (displ dispr : disp_t) : disp_t :=
   Disp (prod_display_unit (d1 displ) (d1 dispr))
@@ -1544,7 +1544,7 @@ End DefaultTupleProdOrder.
 Module SetSubsetOrder.
 Section SetSubsetOrder.
 
-Fact subset_display : disp_t. Proof. exact. Qed.
+Definition subset_display : disp_t. Proof. exact. Qed.
 
 Definition type (disp : disp_t) (T : finType) := {set T}.
 

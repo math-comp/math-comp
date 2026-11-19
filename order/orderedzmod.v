@@ -63,7 +63,7 @@ Local Open Scope ring_scope.
 
 Import Order.Theory Algebra.Theory.
 
-Fact ring_display : Order.disp_t. Proof. exact. Qed.
+Definition ring_display : Order.disp_t. Proof. exact. Qed.
 
 Module Num.
 
