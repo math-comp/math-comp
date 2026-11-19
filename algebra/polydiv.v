@@ -130,7 +130,7 @@ Definition redivp_rec (q : {poly R}) :=
 
 Definition redivp_expanded_def p q :=
    if q == 0 then (0, 0, p) else redivp_rec q 0 0 p (size p).
-Fact redivp_key : unit. Proof. by []. Qed.
+Definition redivp_key : unit. Proof. by []. Qed.
 Definition redivp : {poly R} -> {poly R} -> nat * {poly R} * {poly R} :=
   locked_with redivp_key redivp_expanded_def.
 Canonical redivp_unlockable := [unlockable fun redivp].
@@ -814,7 +814,7 @@ Definition edivp_expanded_def p q :=
   if lead_coef q \in GRing.unit then
     (0, (lead_coef q)^-k *: d, (lead_coef q)^-k *: r)
   else edvpq.
-Fact edivp_key : unit. Proof. by []. Qed.
+Definition edivp_key : unit. Proof. by []. Qed.
 Definition edivp := locked_with edivp_key edivp_expanded_def.
 Canonical edivp_unlockable := [unlockable fun edivp].
 

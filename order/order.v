@@ -107,7 +107,7 @@ From mathcomp Require Export interval.
 (*                                                                            *)
 (* Alternative notation displays can be defined by:                           *)
 (* 1. declaring a new opaque definition of type Order.disp_t. Using the idiom *)
-(*    `Fact my_display : Order.disp_t. Proof. exact: Disp tt tt. Qed.`        *)
+(*    `Definition my_display : Order.disp_t. Proof. exact: Disp tt tt. Qed.`  *)
 (* 2. using this symbol to tag canonical porderType structures using          *)
 (*    `HB.instance Definition _ := isPOrder.Build my_display my_type ...`,    *)
 (* 3. declaring notations for the main operations of this library, by         *)

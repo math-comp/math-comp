@@ -309,7 +309,7 @@ Definition capv U V := mx2vs (vs2mx U :&: vs2mx V).
 Definition complv U := mx2vs (vs2mx U)^C.
 Definition diffv U V := mx2vs (vs2mx U :\: vs2mx V).
 Definition vpick U := r2v (nz_row (vs2mx U)).
-Fact span_key : unit. Proof. by []. Qed.
+Definition span_key : unit. Proof. by []. Qed.
 Definition span_expanded_def X := mx2vs (b2mx (in_tuple X)).
 Definition span := locked_with span_key span_expanded_def.
 Canonical span_unlockable := [unlockable fun span].
@@ -1282,7 +1282,7 @@ Section LfunDefs.
 Variable R : nzSemiRingType.
 Implicit Types aT vT rT : semiVectType R.
 
-Fact lfun_key : unit. Proof. by []. Qed.
+Definition lfun_key : unit. Proof. by []. Qed.
 Definition fun_of_lfun_def aT rT (f : 'Hom(aT, rT)) :=
   r2v \o mulmxr (f2mx f) \o v2r.
 Definition fun_of_lfun := locked_with lfun_key fun_of_lfun_def.
@@ -1309,7 +1309,7 @@ Implicit Types aT rT : vectType K.
 
 Definition inv_lfun aT rT (f : 'Hom(aT, rT)) := Hom (pinvmx (f2mx f)).
 Definition lker aT rT (f : 'Hom(aT, rT)) := mx2vs (kermx (f2mx f)).
-Fact lfun_img_key : unit. Proof. by []. Qed.
+Definition lfun_img_key : unit. Proof. by []. Qed.
 Definition lfun_img_def aT rT f (U : {vspace aT}) : {vspace rT} :=
   mx2vs (vs2mx U *m f2mx f).
 Definition lfun_img := locked_with lfun_img_key lfun_img_def.
@@ -2008,7 +2008,7 @@ Lemma vsval_is_linear : linear vsval. Proof. by []. Qed.
 HB.instance Definition _ := GRing.isSemilinear.Build K subvs_of vT _ vsval
   (GRing.semilinear_linear vsval_is_linear).
 
-Fact vsproj_key : unit. Proof. by []. Qed.
+Definition vsproj_key : unit. Proof. by []. Qed.
 Definition vsproj_def u := Subvs (memv_proj U u).
 Definition vsproj := locked_with vsproj_key vsproj_def.
 Canonical vsproj_unlockable := [unlockable fun vsproj].

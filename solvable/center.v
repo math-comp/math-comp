@@ -313,7 +313,7 @@ apply/subsetP=> [[x y]] /[1!inE] /andP[Zx /eqP->].
 by rewrite inE /= Zx groupV (subsetP sgzZZ) ?mem_morphim.
 Qed.
 
-Fact cprod_by_key : unit. Proof. by []. Qed.
+Definition cprod_by_key : unit. Proof. by []. Qed.
 Definition cprod_by_def : finGroupType := subg_of (setX H K / kerHK).
 Definition cprod_by := locked_with cprod_by_key cprod_by_def.
 Local Notation C := [set: FinGroup.sort cprod_by].
@@ -610,7 +610,7 @@ Variables (gT : finGroupType) (G : {group gT}).
 Fixpoint ncprod_def n : finGroupType :=
   if n is n'.+1 then xcprod G [set: ncprod_def n']
   else subg_of 'Z(G).
-Fact ncprod_key : unit. Proof. by []. Qed.
+Definition ncprod_key : unit. Proof. by []. Qed.
 Definition ncprod := locked_with ncprod_key ncprod_def.
 
 Local Notation G_ n := [set: gsort (ncprod n)].

@@ -280,7 +280,7 @@ Proof. by move=> Uu; apply/lker0P=> v w; rewrite !lfunE; apply: mulIr. Qed.
 Lemma lfun1_poly (p : {poly aT}) : map_poly \1%VF p = p.
 Proof. by apply: map_poly_id => u _; apply: id_lfunE. Qed.
 
-Fact prodv_key : unit. Proof. by []. Qed.
+Definition prodv_key : unit. Proof. by []. Qed.
 Definition prodv :=
   locked_with prodv_key (fun U V => <<allpairs *%R (vbasis U) (vbasis V)>>%VS).
 Canonical prodv_unlockable := [unlockable fun prodv].

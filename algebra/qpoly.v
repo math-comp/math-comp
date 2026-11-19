@@ -146,7 +146,7 @@ Proof. by rewrite size_poly0. Qed.
 
 Definition npoly0 := NPoly (size_npoly0).
 
-Fact npolyp_key : unit. Proof. exact: tt. Qed.
+Definition npolyp_key : unit. Proof. exact: tt. Qed.
 Definition npolyp : {poly R} -> {poly_n R} :=
   locked_with npolyp_key (mk_npoly \o (nth 0)).
 
@@ -322,7 +322,7 @@ Notation lagrange_def := (fun i :'I_n =>
   let k := i in let p := \prod_(j < n | j != k) ('X - (x j)%:P)
   in (p.[x k]^-1)%:P * p).
 
-Fact lagrange_key : unit. Proof. exact: tt. Qed.
+Definition lagrange_key : unit. Proof. exact: tt. Qed.
 
 Definition lagrange := locked_with lagrange_key
   [tuple npolyp n (lagrange_def i) | i < n].

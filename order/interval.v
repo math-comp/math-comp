@@ -102,8 +102,8 @@ Notation "`[ a , '+oo' [" := (Interval (BLeft a) +oo) : ring_scope.
 Notation "`] a , '+oo' [" := (Interval (BRight a) +oo) : ring_scope.
 Notation "`] -oo , '+oo' [" := (Interval -oo +oo) : ring_scope.
 
-Fact itv_bound_display (disp : Order.disp_t) : Order.disp_t. Proof. exact. Qed.
-Fact interval_display (disp : Order.disp_t) : Order.disp_t. Proof. exact. Qed.
+Definition itv_bound_display (disp : Order.disp_t) : Order.disp_t. Proof. exact. Qed.
+Definition interval_display (disp : Order.disp_t) : Order.disp_t. Proof. exact. Qed.
 
 Module IntervalCan.
 Section IntervalCan.
