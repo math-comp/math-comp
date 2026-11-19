@@ -68,22 +68,22 @@ Implicit Types (x y : bool).
 
 Definition bool_display : disp_t. Proof. exact. Qed.
 
-Fact ltb_def x y : (x < y)%N = (y != x) && (x <= y)%N.
+Local Fact ltb_def x y : (x < y)%N = (y != x) && (x <= y)%N.
 Proof. by case: x y => [] []. Qed.
 
-Fact leb_refl : reflexive (leq : rel bool).
+Local Fact leb_refl : reflexive (leq : rel bool).
 Proof. by case. Qed.
 
-Fact leb_anti : antisymmetric (leq : rel bool).
+Local Fact leb_anti : antisymmetric (leq : rel bool).
 Proof. by case=> [] []. Qed.
 
-Fact leb_trans : transitive (leq : rel bool).
+Local Fact leb_trans : transitive (leq : rel bool).
 Proof. exact: leq_trans. Qed.
 
-Fact leb_andb x y z : (x <= y && z)%N = (x <= y)%N && (x <= z)%N.
+Local Fact leb_andb x y z : (x <= y && z)%N = (x <= y)%N && (x <= z)%N.
 Proof. by case: x y z => [] [] []. Qed.
 
-Fact le_orb_b x y z : (x || y <= z)%N = (x <= z)%N && (y <= z)%N.
+Local Fact le_orb_b x y z : (x || y <= z)%N = (x <= z)%N && (y <= z)%N.
 Proof. by case: x y z => [] [] []. Qed.
 
 #[export] HB.instance Definition _ :=

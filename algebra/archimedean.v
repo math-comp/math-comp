@@ -163,16 +163,16 @@ Implicit Types n : int.
 
 Let truncz n := if n is Posz n then n else 0%N.
 
-Fact floor_subproof n : n%:~R <= num_to_real n < (n + 1)%:~R.
+Local Fact floor_subproof n : n%:~R <= num_to_real n < (n + 1)%:~R.
 Proof. by rewrite to_realT ?num_real// !intz ltzD1 lexx. Qed.
 
-Fact truncn_subproof n : truncz n = if 0 <= n then `|n|%N else 0%N.
+Local Fact truncn_subproof n : truncz n = if 0 <= n then `|n|%N else 0%N.
 Proof. by rewrite /truncz; case: n. Qed.
 
-Fact intrP n : reflect (exists m, n = m%:~R) true.
+Local Fact intrP n : reflect (exists m, n = m%:~R) true.
 Proof. by apply: ReflectT; exists n; rewrite intz. Qed.
 
-Fact natrP n : reflect (exists m, n = m%:R) (0 <= n).
+Local Fact natrP n : reflect (exists m, n = m%:R) (0 <= n).
 Proof.
 apply: (iffP idP); last by case=> m ->; rewrite ler0n.
 by case: n => // n _; exists n; rewrite natz.
@@ -232,7 +232,7 @@ Lemma nat_num0 : 0 \is a nat_num. Proof. exact: (natr_nat 0). Qed.
 Lemma nat_num1 : 1 \is a nat_num. Proof. exact: (natr_nat 1). Qed.
 #[local] Hint Resolve int_num0 int_num1 nat_num0 nat_num1 : core.
 
-Fact int_num_subring : subring_closed int_num.
+Local Fact int_num_subring : subring_closed int_num.
 Proof.
 by split=> // _ _ /intrP[n ->] /intrP[m ->]; rewrite -(intrB, intrM).
 Qed.
@@ -240,7 +240,7 @@ Qed.
 HB.instance Definition _ := GRing.isSubringClosed.Build R int_num_subdef
   int_num_subring.
 
-Fact nat_num_semiring : semiring_closed nat_num.
+Local Fact nat_num_semiring : semiring_closed nat_num.
 Proof.
 by do 2![split] => //= _ _ /natrP[n ->] /natrP[m ->]; rewrite -(natrD, natrM).
 Qed.
@@ -1126,13 +1126,13 @@ End NumDomain_hasFloorCeilTruncn.
 
 HB.builders Context R & NumDomain_hasFloorCeilTruncn_deprecated R.
 
-Fact floor_subproof' x : (floor x)%:~R <= num_to_real x < (floor x + 1)%:~R.
+Local Fact floor_subproof' x : (floor x)%:~R <= num_to_real x < (floor x + 1)%:~R.
 Proof.
 have := floor_subproof x; rewrite /num_to_real.
 by case: ifPn => // _ /eqP ->; rewrite add0r lexx ltr01.
 Qed.
 
-Fact truncn_subproof' x : truncn x = if 0 <= x then `|floor x|%N else 0%N.
+Local Fact truncn_subproof' x : truncn x = if 0 <= x then `|floor x|%N else 0%N.
 Proof.
 have := floor_subproof x; rewrite realE truncn_subproof.
 have []//= := comparableP x 0.
@@ -1170,14 +1170,14 @@ End NumDomain_isArchimedean.
 
 HB.builders Context R & NumDomain_hasTruncn R.
 
-Fact truncn_itv x : 0 <= x -> (truncn x)%:R <= x < (truncn x).+1%:R.
+Local Fact truncn_itv x : 0 <= x -> (truncn x)%:R <= x < (truncn x).+1%:R.
 Proof. by move=> x_ge0; have := truncn_subproof x; rewrite x_ge0. Qed.
 
 Definition floor (x : R) : int :=
   if 0 <= x then Posz (truncn x)
   else if x < 0 then - Posz (truncn (- x) + ~~ int_num x) else 0.
 
-Fact floor_subproof x : (floor x)%:~R <= num_to_real x < (floor x + 1)%:~R.
+Local Fact floor_subproof x : (floor x)%:~R <= num_to_real x < (floor x + 1)%:~R.
 Proof.
 rewrite /num_to_real realE /floor intrE !natrE negb_or.
 have []/= := comparableP x 0; last first.
@@ -1196,22 +1196,22 @@ case: eqVneq => /=; last first.
 by rewrite intrB mulr1z addn0 -!pmulrn => -> _; rewrite gtrBl lexx andbT.
 Qed.
 
-Fact truncnE x : truncn x = if 0 <= x then `|floor x|%N else 0%N.
+Local Fact truncnE x : truncn x = if 0 <= x then `|floor x|%N else 0%N.
 Proof.
 by rewrite /floor; case: (comparableP x 0) (truncn_subproof x) => //= _ /eqP ->.
 Qed.
 
-Fact truncn_def x n : n%:R <= x < n.+1%:R -> truncn x = n.
+Local Fact truncn_def x n : n%:R <= x < n.+1%:R -> truncn x = n.
 Proof.
 case/andP=> lenx ltx1; apply/eqP; rewrite eqn_leq -ltnS -[(n <= _)%N]ltnS.
 have/truncn_itv/andP[lefx ltxf1]: 0 <= x by apply: le_trans lenx; apply: ler0n.
 by rewrite -!(ltr_nat R) 2?(@le_lt_trans _ _ x).
 Qed.
 
-Fact natrK : cancel (GRing.natmul 1) truncn.
+Local Fact natrK : cancel (GRing.natmul 1) truncn.
 Proof. by move=> m; apply: truncn_def; rewrite ler_nat ltr_nat ltnS leqnn. Qed.
 
-Fact intrP x : reflect (exists n, x = n%:~R) (int_num x).
+Local Fact intrP x : reflect (exists n, x = n%:~R) (int_num x).
 Proof.
 rewrite intrE !natrE; apply: (iffP idP) => [|[n ->]]; last first.
   by case: n => n; rewrite ?NegzE ?opprK natrK eqxx // orbT.
@@ -1219,7 +1219,7 @@ rewrite -eqr_oppLR !pmulrn -intrN.
 by move=> /orP[] /eqP<-; [exists (truncn x) | exists (- Posz (truncn (- x)))].
 Qed.
 
-Fact natrP x : reflect (exists n, x = n%:R) (nat_num x).
+Local Fact natrP x : reflect (exists n, x = n%:R) (nat_num x).
 Proof.
 rewrite natrE.
 by apply: (iffP eqP) => [<-|[n ->]]; [exists (truncn x) | rewrite natrK].
@@ -1242,10 +1242,10 @@ Implicit Type x : R.
 
 Definition bound x := sval (sigW (archi_bound_subproof x)).
 
-Fact boundP x : 0 <= x -> x < (bound x)%:R.
+Local Fact boundP x : 0 <= x -> x < (bound x)%:R.
 Proof. by move/ger0_norm=> {1}<-; rewrite /bound; case: (sigW _). Qed.
 
-Fact truncn_sig x : {m | 0 <= x -> m%:R <= x < m.+1%:R}.
+Local Fact truncn_sig x : {m | 0 <= x -> m%:R <= x < m.+1%:R}.
 Proof.
 have [Rx | _] := boolP (0 <= x); last by exists 0%N.
 have/ex_minnP[n lt_x_n1 min_n]: exists n, x < n.+1%:R.
@@ -1257,7 +1257,7 @@ Qed.
 
 Definition truncn x := if 0 <= x then sval (truncn_sig x) else 0%N.
 
-Fact truncn_subproof x :
+Local Fact truncn_subproof x :
   if 0 <= x then (truncn x)%:R <= x < (truncn x).+1%:R else truncn x == 0%N.
 Proof.
 rewrite /truncn; case: truncn_sig => // n hn.

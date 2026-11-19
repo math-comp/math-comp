@@ -118,20 +118,20 @@ HB.builders Context R & ZmodulePositiveCone R.
 
 Definition le x y := nonneg (y - x).
 
-Fact le_refl : reflexive le.
+Local Fact le_refl : reflexive le.
 Proof. by move=> x; rewrite /le subrr nonneg0. Qed.
 
-Fact le_anti : antisymmetric le.
+Local Fact le_anti : antisymmetric le.
 Proof.
 by move=> x y /andP[xy yx]; apply/subr0_eq/nonneg_definite; rewrite ?opprB.
 Qed.
 
-Fact le_trans : transitive le.
+Local Fact le_trans : transitive le.
 Proof.
 by move=> x y z => /nonnegD /[apply]; rewrite addrCA [_ - x]addrAC subrr add0r.
 Qed.
 
-Fact ler_wD2l : forall x, {homo +%R x : y z / le y z}.
+Local Fact ler_wD2l : forall x, {homo +%R x : y z / le y z}.
 Proof. by move=> x y z; rewrite /le [x + _]addrC addrKA. Qed.
 
 HB.instance Definition _ := Order.Le_isPOrder.Build ring_display R
@@ -731,12 +731,12 @@ Lemma ltr_nMn2l x :
   x < 0 -> {mono (@Algebra.natmul R x) : m n / (n < m)%N >-> m < n}.
 Proof. by move=> x_lt0; apply: leW_nmono (ler_nMn2l _). Qed.
 
-Fact nneg_nmod_closed : nmod_closed (@Num.nneg R).
+Local Fact nneg_nmod_closed : nmod_closed (@Num.nneg R).
 Proof. by split; [apply: lexx | apply: addr_ge0]. Qed.
 HB.instance Definition _ := Algebra.isAddClosed.Build R nneg_num_pred
   nneg_nmod_closed.
 
-Fact real_oppr_closed : oppr_closed (@Num.real R).
+Local Fact real_oppr_closed : oppr_closed (@Num.real R).
 Proof. by move=> x; rewrite /= !realE oppr_ge0 orbC -!oppr_ge0 opprK. Qed.
 HB.instance Definition _ := Algebra.isOppClosed.Build R real_num_pred
   real_oppr_closed.
@@ -876,7 +876,7 @@ Proof.
 by move=> /ge_comparable + /le_comparable => /comparabler_trans/[apply].
 Qed.
 
-Fact real_nmod_closed : nmod_closed (@Num.real R).
+Local Fact real_nmod_closed : nmod_closed (@Num.real R).
 Proof.
 split=> [|x y Rx Ry]; first by rewrite realE lexx.
 without loss{Rx} x_ge0: x y Ry / 0 <= x.

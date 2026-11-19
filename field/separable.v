@@ -459,7 +459,7 @@ Variable D : 'End(L).
 
 Let Dx E := - (map_poly D (minPoly E x)).[x] / ((minPoly E x)^`()).[x].
 
-Fact extendDerivation_zmod_morphism_subproof E (adjEx := Fadjoin_poly E x) :
+Local Fact extendDerivation_zmod_morphism_subproof E (adjEx := Fadjoin_poly E x) :
   let body y (p := adjEx y) := (map_poly D p).[x] + p^`().[x] * Dx E in
   zmod_morphism body.
 Proof.
@@ -468,7 +468,7 @@ rewrite raddfB /= derivB -/adjEx !hornerE /= raddfB /= !hornerE.
 by rewrite mulrBl addrACA opprD.
 Qed.
 
-Fact extendDerivation_scalable_subproof E (adjEx := Fadjoin_poly E x) :
+Local Fact extendDerivation_scalable_subproof E (adjEx := Fadjoin_poly E x) :
   let body y (p := adjEx y) := (map_poly D p).[x] + p^`().[x] * Dx E in
   scalable body.
 Proof.

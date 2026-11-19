@@ -1563,7 +1563,7 @@ by rewrite (nth_map x) ?nth_index ?index_mem ?mem_seq_sub_enum.
 Qed.
 
 Definition seq_sub_isCountable := isCountable.Build seq_sub seq_sub_pickleK.
-Fact seq_sub_axiom : Finite.axiom seq_sub_enum.
+Local Fact seq_sub_axiom : Finite.axiom seq_sub_enum.
 Proof. exact: Finite.uniq_enumP (undup_uniq _) mem_seq_sub_enum. Qed.
 Definition seq_sub_isFinite := isFinite.Build seq_sub seq_sub_axiom.
 
@@ -1842,11 +1842,11 @@ Proof. by move=> i; apply: val_inj. Qed.
 Lemma cast_ord_inj n1 n2 eq_n : injective (@cast_ord n1 n2 eq_n).
 Proof. exact: can_inj (cast_ordK eq_n). Qed.
 
-Fact ordS_subproof n (i : 'I_n) : i.+1 %% n < n.
+Local Fact ordS_subproof n (i : 'I_n) : i.+1 %% n < n.
 Proof. by case: n i => [|n] [m m_lt]//=; rewrite ltn_pmod. Qed.
 Definition ordS n (i : 'I_n) := Ordinal (ordS_subproof i).
 
-Fact ord_pred_subproof n (i : 'I_n) : (i + n).-1 %% n < n.
+Local Fact ord_pred_subproof n (i : 'I_n) : (i + n).-1 %% n < n.
 Proof. by case: n i => [|n] [m m_lt]//=; rewrite ltn_pmod. Qed.
 Definition ord_pred n (i : 'I_n) := Ordinal (ord_pred_subproof i).
 
