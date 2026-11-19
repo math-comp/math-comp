@@ -57,7 +57,7 @@ rewrite inE mem0v; apply/sumboolP; exists 0.
 by rewrite big1 // => i _; rewrite ffunE.
 Qed.
 
-Fact Zchar_zmod : zmod_closed Zchar.
+Let Zchar_zmod : zmod_closed Zchar.
 Proof.
 split; first exact: cfun0_zchar.
 move=> phi xi /andP[Aphi /sumboolP[a Da]] /andP[Axi /sumboolP[b Db]].
@@ -260,7 +260,7 @@ Qed.
 Lemma Cnat_cfnorm_vchar : {in 'Z[irr G], forall phi, '[phi] \in Num.nat}.
 Proof. by move=> phi Zphi; rewrite /= natrEint cfnorm_ge0 Cint_cfdot_vchar. Qed.
 
-Fact vchar_mulr_closed : mulr_closed 'Z[irr G].
+Let vchar_mulr_closed : mulr_closed 'Z[irr G].
 Proof.
 split; first exact: cfun1_vchar.
 move=> _ _ /vcharP[xi1 Nxi1 [xi2 Nxi2 ->]] /vcharP[xi3 Nxi3 [xi4 Nxi4 ->]].
@@ -701,7 +701,7 @@ Section Norm1vchar.
 
 Variables (gT : finGroupType) (G : {group gT}).
 
-Fact dirr_oppr_closed : oppr_closed (dirr G).
+Let dirr_oppr_closed : oppr_closed (dirr G).
 Proof. by move=> xi; rewrite !inE opprK orbC. Qed.
 HB.instance Definition _ := GRing.isOppClosed.Build (classfun G) (dirr G)
   dirr_oppr_closed.

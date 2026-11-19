@@ -988,7 +988,7 @@ HB.factory Record Lattice_isTotal d T & Lattice d T := {
 
 HB.builders Context d T & Lattice_isTotal d T.
 
-Fact meetUl : @left_distributive T T meet join.
+Let meetUl : @left_distributive T T meet join.
 Proof.
 pose leP x y := lcomparable_leP (le_total x y); move=> x y z; apply/esym.
 by case: (leP x y) (leP x z) (leP y z) => [|/ltW] xy [|/ltW] xz [|/ltW] yz;
@@ -1005,9 +1005,9 @@ HB.factory Record POrder_isTotal d T & POrder d T := {
 
 HB.builders Context d T & POrder_isTotal d T.
 
-Fact lexI (x y z : T) : (x <= min y z) = (x <= y) && (x <= z).
+Let lexI (x y z : T) : (x <= min y z) = (x <= y) && (x <= z).
 Proof. exact/comparable_le_min/le_total. Qed.
-Fact leUx (x y z : T) : (max x y <= z) = (x <= z) && (y <= z).
+Let leUx (x y z : T) : (max x y <= z) = (x <= z) && (y <= z).
 Proof. exact/comparable_ge_max/le_total. Qed.
 
 HB.instance Definition _ := POrder_MeetJoin_isLattice.Build d T lexI leUx.
@@ -1030,10 +1030,10 @@ HB.factory Record isOrder (d : disp_t) T & Choice T := {
 
 HB.builders Context d T & isOrder d T.
 
-Fact le_refl : reflexive le.
+Let le_refl : reflexive le.
 Proof. by move=> x; case: (le x x) (le_total x x). Qed.
 
-Fact lt_le_def x y : lt x y = (le x y) && ~~ (le y x).
+Let lt_le_def x y : lt x y = (le x y) && ~~ (le y x).
 Proof.
 rewrite lt_def andbC; case/boolP: (le x y) => //= xy.
 congr negb; apply/eqP/idP => [->|yx]; first exact/le_refl.
@@ -1050,8 +1050,8 @@ HB.instance Definition _ := POrder.on T'.
 HB.instance Definition _ := POrder_isTotal.Build d T' le_total.
 Implicit Types (x y z : T').
 
-Fact meetE x y : meet x y = x `&` y. Proof. by rewrite meet_def. Qed.
-Fact joinE x y : join x y = x `|` y. Proof. by rewrite join_def. Qed.
+Let meetE x y : meet x y = x `&` y. Proof. by rewrite meet_def. Qed.
+Let joinE x y : join x y = x `|` y. Proof. by rewrite join_def. Qed.
 
 Fact lexI x y z : (x <= meet y z) = (x <= y) && (x <= z).
 Proof. by rewrite meetE lexI. Qed.
@@ -1080,28 +1080,28 @@ HB.factory Record LtOrder (d : disp_t) T & Choice T := {
 
 HB.builders Context d T & LtOrder d T.
 
-Fact lt_def x y : lt x y = (y != x) && le x y.
+Let lt_def x y : lt x y = (y != x) && le x y.
 Proof. by rewrite le_def; case: eqVneq => //= ->; rewrite lt_irr. Qed.
 
-Fact meet_def_le x y : meet x y = if lt x y then x else y.
+Let meet_def_le x y : meet x y = if lt x y then x else y.
 Proof. by rewrite meet_def lt_def; case: eqP. Qed.
 
-Fact join_def_le x y : join x y = if lt x y then y else x.
+Let join_def_le x y : join x y = if lt x y then y else x.
 Proof. by rewrite join_def lt_def; case: eqP. Qed.
 
-Fact le_anti : antisymmetric le.
+Let le_anti : antisymmetric le.
 Proof.
 move=> x y; rewrite !le_def; case: eqVneq => //= _ /andP [] hxy.
 by move/(lt_trans hxy); rewrite lt_irr.
 Qed.
 
-Fact le_trans : transitive le.
+Let le_trans : transitive le.
 Proof.
 move=> y x z; rewrite !le_def; case: eqVneq => [->|_] //=.
 by case: eqVneq => [-> ->|_ hxy /(lt_trans hxy) ->]; rewrite orbT.
 Qed.
 
-Fact le_total : total le.
+Let le_total : total le.
 Proof. by move=> x y; rewrite !le_def; case: eqVneq => //; exact: lt_total. Qed.
 
 HB.instance Definition _ :=
@@ -1115,7 +1115,7 @@ HB.factory Record MonoTotal disp T & POrder disp T := {
   f_mono : {mono f : x y / x <= y}
 }.
 HB.builders Context disp T & MonoTotal disp T.
-Fact totalT : total (<=%O : rel T).
+Let totalT : total (<=%O : rel T).
 Proof. by move=> x y; rewrite -!f_mono le_total. Qed.
 HB.instance Definition _ := POrder_isTotal.Build disp T totalT.
 HB.end.
@@ -1166,9 +1166,9 @@ HB.factory Record SubPOrder_isSubOrder d (T : orderType d) S d' U
     & @SubPOrder d T S d' U := {}.
 
 HB.builders Context d T S d' U & SubPOrder_isSubOrder d T S d' U.
-Fact opredI : meet_closed S.
+Let opredI : meet_closed S.
 Proof. by move=> x y Sx Sy; rewrite meetEtotal; case: leP. Qed.
-Fact opredU : join_closed S.
+Let opredU : join_closed S.
 Proof. by move=> x y Sx Sy; rewrite joinEtotal; case: leP. Qed.
 HB.instance Definition _ := SubPOrder_isSubLattice.Build d T S d' U opredI opredU.
 HB.instance Definition _ := SubLattice_isSubOrder.Build d T S d' U.

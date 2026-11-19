@@ -571,13 +571,13 @@ HB.factory Record Monoid_isGroup G & Monoid G & BaseGroup G := {
 
 HB.builders Context G & Monoid_isGroup G.
 
-Fact invgK : involutive (@inv G).
+Let invgK : involutive (@inv G).
 Proof. by move=> x; rewrite -[LHS]mul1g -(mulgV x) -mulgA mulgV mulg1. Qed.
 
-Fact mulKg : @left_loop G G inv *%g.
+Let mulKg : @left_loop G G inv *%g.
 Proof. by move=> x y; rewrite [LHS]mulgA mulVg mul1g. Qed.
 
-Fact invgM : {morph inv : x y / x * y >-> y * x : G}.
+Let invgM : {morph inv : x y / x * y >-> y * x : G}.
 Proof.
 move=> x y; apply: (can_inj (mulKg (x * y))).
 by rewrite [LHS]mulgV [RHS]mulgA -(mulgA x) mulgV mulg1 mulgV.
@@ -939,11 +939,11 @@ Section MulFun.
 Variables (G H K : magmaType).
 Variables (f g : {multiplicative H -> K}) (h : {multiplicative G -> H}).
 
-Fact idfun_gmulfM : {morph @idfun G : x y / x * y}.
+Let idfun_gmulfM : {morph @idfun G : x y / x * y}.
 Proof. by []. Qed.
 HB.instance Definition _ := isMultiplicative.Build G G idfun idfun_gmulfM.
 
-Fact comp_gmulfM : {morph f \o h : x y / x * y}.
+Let comp_gmulfM : {morph f \o h : x y / x * y}.
 Proof. by move=> x y /=; rewrite !gmulfM. Qed.
 HB.instance Definition _ := isMultiplicative.Build G K (f \o h) comp_gmulfM.
 End MulFun.
@@ -951,12 +951,12 @@ End MulFun.
 Section Mul1Fun.
 Variables (G : magmaType) (H : umagmaType).
 
-Fact idfun_gmulf1 : idfun 1 = 1 :> H.
+Let idfun_gmulf1 : idfun 1 = 1 :> H.
 Proof. by []. Qed.
 HB.instance Definition _ :=
   Multiplicative_isUMagmaMorphism.Build H H idfun idfun_gmulf1.
 
-Fact one_fun_gmulfM : {morph @one_fun G H : x y / x * y}.
+Let one_fun_gmulfM : {morph @one_fun G H : x y / x * y}.
 Proof. by move=> x y; rewrite mulg1. Qed.
 HB.instance Definition _ :=
   isMultiplicative.Build G H (@one_fun G H) one_fun_gmulfM.
@@ -966,18 +966,18 @@ Section Mul11Fun.
 Variables (G H K : umagmaType).
 Variables (f g : UMagmaMorphism.type H K) (h : UMagmaMorphism.type G H).
 
-Fact comp_gmulf1 : (f \o h) 1 = 1.
+Let comp_gmulf1 : (f \o h) 1 = 1.
 Proof. by rewrite /= !gmulf1. Qed.
 #[warning="-HB.no-new-instance"]
 HB.instance Definition _ :=
   Multiplicative_isUMagmaMorphism.Build G K (f \o h) comp_gmulf1.
 
-Fact one_fun_gmulf1 : @one_fun G H 1 = 1.
+Let one_fun_gmulf1 : @one_fun G H 1 = 1.
 Proof. by []. Qed.
 HB.instance Definition _ :=
   Multiplicative_isUMagmaMorphism.Build G H (@one_fun G H) one_fun_gmulf1.
 
-Fact mul_fun_gmulf1 : (f \* g) 1 = 1.
+Let mul_fun_gmulf1 : (f \* g) 1 = 1.
 Proof. by rewrite /= !gmulf1 mulg1. Qed.
 
 End Mul11Fun.
@@ -1293,7 +1293,7 @@ Section FinFunSemigroup.
 Variable (aT : finType) (rT : semigroupType).
 Implicit Types f g : {ffun aT -> rT}.
 
-Fact ffun_mulgA : associative (@ffun_mul aT rT).
+Let ffun_mulgA : associative (@ffun_mul aT rT).
 Proof. by move=> f1 f2 f3; apply/ffunP=> a; rewrite !ffunE mulgA. Qed.
 
 HB.instance Definition _ := isSemigroup.Build {ffun aT -> rT} ffun_mulgA.
@@ -1319,9 +1319,9 @@ Section FinFunUMagma.
 Variable (aT : finType) (rT : umagmaType).
 Implicit Types f g : {ffun aT -> rT}.
 
-Fact ffun_mul1g : left_id (@ffun_one aT rT) *%g.
+Let ffun_mul1g : left_id (@ffun_one aT rT) *%g.
 Proof. by move=> f; apply/ffunP => a; rewrite !ffunE mul1g. Qed.
-Fact ffun_mulg1 : right_id (@ffun_one aT rT) *%g.
+Let ffun_mulg1 : right_id (@ffun_one aT rT) *%g.
 Proof. by move=> f; apply/ffunP => a; rewrite !ffunE mulg1. Qed.
 
 HB.instance Definition _ :=
@@ -1349,10 +1349,10 @@ Section FinFunGroup.
 Variable (aT : finType) (rT : groupType).
 Implicit Types f g : {ffun aT -> rT}.
 
-Fact ffun_mulVg :
+Let ffun_mulVg :
   left_inverse (@ffun_one aT rT) (@ffun_inv _ _) (@ffun_mul _ _).
 Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE mulVg. Qed.
-Fact ffun_mulgV :
+Let ffun_mulgV :
   right_inverse (@ffun_one aT rT) (@ffun_inv _ _) (@ffun_mul _ _).
 Proof. by move=> f; apply/ffunP=> a; rewrite !ffunE mulgV. Qed.
 
@@ -1369,11 +1369,11 @@ Definition mul_pair (x y : G * H) := (x.1 * y.1, x.2 * y.2).
 
 HB.instance Definition _ := hasMul.Build (G * H)%type mul_pair.
 
-Fact fst_is_multiplicative : {morph fst : x y / x * y}. Proof. by []. Qed.
+Let fst_is_multiplicative : {morph fst : x y / x * y}. Proof. by []. Qed.
 HB.instance Definition _ :=
   isMultiplicative.Build _ _ fst fst_is_multiplicative.
 
-Fact snd_is_multiplicative : {morph snd : x y / x * y}. Proof. by []. Qed.
+Let snd_is_multiplicative : {morph snd : x y / x * y}. Proof. by []. Qed.
 HB.instance Definition _ :=
   isMultiplicative.Build _ _ snd snd_is_multiplicative.
 
@@ -1396,11 +1396,11 @@ Definition one_pair : G * H := (1, 1).
 
 HB.instance Definition _ := hasOne.Build (G * H)%type one_pair.
 
-Fact fst_is_umagma_morphism : fst (1 : G * H) = 1. Proof. by []. Qed.
+Let fst_is_umagma_morphism : fst (1 : G * H) = 1. Proof. by []. Qed.
 HB.instance Definition _ :=
   Multiplicative_isUMagmaMorphism.Build _ _ fst fst_is_umagma_morphism.
 
-Fact snd_is_umagma_morphism : snd (1 : G * H) = 1. Proof. by []. Qed.
+Let snd_is_umagma_morphism : snd (1 : G * H) = 1. Proof. by []. Qed.
 HB.instance Definition _ :=
   Multiplicative_isUMagmaMorphism.Build _ _ snd snd_is_umagma_morphism.
 

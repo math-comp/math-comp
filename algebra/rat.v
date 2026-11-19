@@ -765,7 +765,6 @@ Proof. by case: b; rewrite ?(mul1r, mulN1r) // denqN. Qed.
 Lemma denq_norm x : denq `|x| = denq x.
 Proof. by rewrite normrEsign denq_mulr_sign. Qed.
 
-Module ratArchimedean.
 Section ratArchimedean.
 
 Implicit Types x : rat.
@@ -781,42 +780,40 @@ Let is_int x := denq x == 1.
 
 Let is_nat x := (0 <= x) && (denq x == 1).
 
-Fact floorP x : (floor x)%:~R <= Num.to_real x < (floor x + 1)%:~R.
+Let floorP x : (floor x)%:~R <= Num.to_real x < (floor x + 1)%:~R.
 Proof.
 rewrite to_realT ?num_real// /floor.
 case: (ratP x) => n d _ {x}; rewrite ler_pdivlMr//.
 by rewrite ltr_pdivrMr// -!intrM ler_int ltr_int lez_floor ?ltz_ceil.
 Qed.
 
-Fact ceilP x : ceil x = - floor (- x).
+Let ceilP x : ceil x = - floor (- x).
 Proof. by rewrite /ceil /floor numqN denqN. Qed.
 
-Fact truncnP x : truncn x = if 0 <= x then `|floor x|%N else 0%N.
+Let truncnP x : truncn x = if 0 <= x then `|floor x|%N else 0%N.
 Proof.
 rewrite /truncn /floor; case: (ratP x) => n d _ {x} /=.
 by rewrite !ler_pdivlMr// mul0r; case: n => n; rewrite ler0z//= mul1n.
 Qed.
 
-Fact intrP x : reflect (exists n, x = n%:~R) (is_int x).
+Let intrP x : reflect (exists n, x = n%:~R) (is_int x).
 Proof.
 apply: (iffP idP) => [/eqP d1 | [i ->]]; [|by rewrite /is_int denq_int].
 by exists (numq x); case: (ratP x) d1 => n d _ ->; rewrite divr1.
 Qed.
 
-Fact natrP x : reflect (exists n, x = n%:R) (is_nat x).
+Let natrP x : reflect (exists n, x = n%:R) (is_nat x).
 Proof.
 apply: (iffP idP) => [/andP[]/[swap]/intrP[i ->]|[n ->]].
   by rewrite ler0z; case: i => [n _|//]; exists n.
 by rewrite /is_nat pmulrn ler0z denq_int.
 Qed.
 
-End ratArchimedean.
-End ratArchimedean.
-
 HB.instance Definition _ :=
   Num.NumDomain_hasFloorCeilTruncn_truncn_abs_floor.Build rat
-    ratArchimedean.floorP ratArchimedean.ceilP ratArchimedean.truncnP
-    ratArchimedean.intrP ratArchimedean.natrP.
+    floorP ceilP truncnP intrP natrP.
+
+End ratArchimedean.
 
 Lemma floorErat (x : rat) : Num.floor x = (numq x %/ denq x)%Z.
 Proof. by []. Qed.
@@ -883,7 +880,7 @@ Section InPrealField.
 
 Variable F : numFieldType.
 
-Fact ratr_is_zmod_morphism : zmod_morphism (@ratr F).
+Let ratr_is_zmod_morphism : zmod_morphism (@ratr F).
 Proof.
 have injZtoQ: @injective rat int intr by apply: intr_inj.
 have nz_den x: (denq x)%:~R != 0 :> F by rewrite intr_eq0 denq_eq0.
@@ -896,7 +893,7 @@ rewrite !(rmorphM, rmorphB) /= [_ - _]lock /= -lock !numqE.
 by rewrite (mulrAC y) -!mulrBl -mulrA mulrAC !mulrA.
 Qed.
 
-Fact ratr_is_monoid_morphism : monoid_morphism (@ratr F).
+Let ratr_is_monoid_morphism : monoid_morphism (@ratr F).
 Proof.
 have injZtoQ: @injective rat int intr by apply: intr_inj.
 have nz_den x: (denq x)%:~R != 0 :> F by rewrite intr_eq0 denq_eq0.

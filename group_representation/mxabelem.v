@@ -72,14 +72,14 @@ Definition mx_repr_act (u : 'rV_n) x := u *m rG (val (subg G x)).
 Lemma mx_repr_actE u x : x \in G -> mx_repr_act u x = u *m rG x.
 Proof. by move=> Gx; rewrite /mx_repr_act /= subgK. Qed.
 
-Fact mx_repr_is_action : is_action G mx_repr_act.
+Let mx_repr_is_action : is_action G mx_repr_act.
 Proof.
 split=> [x | u x y Gx Gy]; first exact: can_inj (repr_mxK _ (subgP _)).
 by rewrite !mx_repr_actE ?groupM // -mulmxA repr_mxM.
 Qed.
 Canonical Structure mx_repr_action := Action mx_repr_is_action.
 
-Fact mx_repr_is_groupAction : is_groupAction [set: 'rV[R]_n] mx_repr_action.
+Let mx_repr_is_groupAction : is_groupAction [set: 'rV[R]_n] mx_repr_action.
 Proof.
 move=> x Gx /[!inE]; apply/andP; split; first by apply/subsetP=> u /[!inE].
 by apply/morphicP=> /= u v _ _; rewrite !actpermE /= /mx_repr_act mulmxDl.
@@ -105,13 +105,13 @@ Variables m n : nat.
 
 Definition scale_act (A : 'M[F]_(m, n)) (a : {unit F}) := val a *: A.
 Lemma scale_actE A a : scale_act A a = val a *: A. Proof. by []. Qed.
-Fact scale_is_action : is_action setT scale_act.
+Let scale_is_action : is_action setT scale_act.
 Proof.
 apply: is_total_action=> [A | A a b]; rewrite /scale_act ?scale1r //.
 by rewrite ?scalerA mulrC.
 Qed.
 Canonical scale_action := Action scale_is_action.
-Fact scale_is_groupAction : is_groupAction setT scale_action.
+Let scale_is_groupAction : is_groupAction setT scale_action.
 Proof.
 move=> a _ /[1!inE]; apply/andP; split; first by apply/subsetP=> A /[!inE].
 by apply/morphicP=> u A _ _ /=; rewrite !actpermE /= /scale_act scalerDr.
@@ -139,7 +139,7 @@ Definition rowg m (A : 'M[F]_(m, n)) : {set rVn} := [set u | u <= A]%MS.
 Lemma mem_rowg m A v : (v \in @rowg m A) = (v <= A)%MS.
 Proof. by rewrite inE. Qed.
 
-Fact rowg_group_set m A : group_set (@rowg m A).
+Let rowg_group_set m A : group_set (@rowg m A).
 Proof.
 by apply/group_setP; split=> [|u v]; rewrite !inE ?sub0mx //; apply: addmx_sub.
 Qed.
@@ -268,7 +268,7 @@ Variables (gT : finGroupType) (G : {group gT}) (n' : nat).
 Local Notation n := n'.+1.
 Variable (rG : mx_representation F G n).
 
-Fact GL_mx_repr : mx_repr 'GL_n[F] GLval. Proof. by []. Qed.
+Let GL_mx_repr : mx_repr 'GL_n[F] GLval. Proof. by []. Qed.
 Canonical GLrepr := MxRepresentation GL_mx_repr.
 
 Lemma GLmx_faithful : mx_faithful GLrepr.
@@ -584,7 +584,7 @@ Definition abelem_mx & G \subset 'N(E) :=
 Hypothesis nEG : G \subset 'N(E).
 Local Notation r := (abelem_mx nEG).
 
-Fact abelem_mx_linear_proof g : linear (abelem_mx_fun g).
+Let abelem_mx_linear_proof g : linear (abelem_mx_fun g).
 Proof.
 rewrite /abelem_mx_fun; case: g => x /= /(subsetP nEG) Nx /= m u v.
 rewrite rVabelemD rVabelemZ conjMg conjXg.
@@ -600,7 +600,7 @@ move=> Gx; rewrite /= mul_rV_lin1 /= /abelem_mx_fun subgK //.
 by rewrite abelem_rV_K // memJ_norm // (subsetP nEG).
 Qed.
 
-Fact abelem_mx_repr : mx_repr G r.
+Let abelem_mx_repr : mx_repr G r.
 Proof.
 split=> [|x y Gx Gy]; apply/row_matrixP=> i; apply: rVabelem_inj.
   by rewrite rowE -row1 rVabelemJmx // conjg1.
