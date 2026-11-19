@@ -87,6 +87,8 @@ with builtins; with (import <nixpkgs> {}).lib;
       #   for a complete list of Coq packages available in Nix
       # * <github_login>:<branch> is such that this will use the branch <branch>
       #   from https://github.com/<github_login>/<repository>
+      mathcomp-abel.override.version = "mc1679";
+      mathcomp-infotheo.override.version = "pi8027:mc1679";
     };
   in {
     "rocq-master".rocqPackages = common-bundles // {
