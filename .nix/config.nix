@@ -37,6 +37,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       "coq-bits"
       "coqeal"
       "coquelicot"
+      "coq-combi"
       "ExtLib"
       "fcsl-pcm"
       "fourcolor"
@@ -87,6 +88,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       #   for a complete list of Coq packages available in Nix
       # * <github_login>:<branch> is such that this will use the branch <branch>
       #   from https://github.com/<github_login>/<repository>
+      coq-combi.override.version = "proux01:mcmaster";
     };
   in {
     "rocq-master".rocqPackages = common-bundles // {
@@ -104,6 +106,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       coquelicot.job = false;
       ssprove.job = false;
       mathcomp-infotheo.job = false;  # not compatible with master
+      coq-combi.job = false;  # not compatible with master
       paco.override.version = "master";  # for jasmin
       paco.job = false;  # only for jasmin
       ITree.override.version = "master";  # for jasmin
@@ -120,6 +123,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       jasmin.job = false;  # waiting for InteractionTrees
       ssprove.job = false;  # waiting for equations
       mathcomp-infotheo.job = false;  # not yet compatible with 9.3
+      coq-combi.job = false;  # not yet compatible with 9.3
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
     };
