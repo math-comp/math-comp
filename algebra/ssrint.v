@@ -426,13 +426,13 @@ Definition ltz m n :=
     | Negz m', Negz n' => (n' < m')%N
   end.
 
-Fact lez_add m n : lez 0 m -> lez 0 n -> lez 0 (m + n).
+Local Fact lez_add m n : lez 0 m -> lez 0 n -> lez 0 (m + n).
 Proof. by case: m n => [] m [] n. Qed.
 
-Fact lez_mul m n : lez 0 m -> lez 0 n -> lez 0 (m * n).
+Local Fact lez_mul m n : lez 0 m -> lez 0 n -> lez 0 (m * n).
 Proof. by case: m n => [] m [] n. Qed.
 
-Fact lez_anti m : lez 0 m -> lez m 0 -> m = 0.
+Local Fact lez_anti m : lez 0 m -> lez m 0 -> m = 0.
 Proof. by case: m; first case. Qed.
 
 Lemma subz_ge0 m n : lez 0 (n - m) = lez m n.
@@ -444,16 +444,16 @@ by [ rewrite subzn //
       move: hmn; rewrite -subn_gt0; case: (_ - _)%N].
 Qed.
 
-Fact lez_total m n : lez m n || lez n m.
+Local Fact lez_total m n : lez m n || lez n m.
 Proof. by move: m n => [] m [] n //=; apply: leq_total. Qed.
 
-Fact normzN m : normz (- m) = normz m.
+Local Fact normzN m : normz (- m) = normz m.
 Proof. by case: m => // -[]. Qed.
 
-Fact gez0_norm m : lez 0 m -> normz m = m.
+Local Fact gez0_norm m : lez 0 m -> normz m = m.
 Proof. by case: m. Qed.
 
-Fact ltz_def m n : (ltz m n) = (n != m) && (lez m n).
+Local Fact ltz_def m n : (ltz m n) = (n != m) && (lez m n).
 Proof.
 by move: m n => [] m [] n //=; rewrite (ltn_neqAle, leq_eqVlt) // eq_sym.
 Qed.
@@ -548,7 +548,7 @@ Variable M : zmodType.
 Implicit Types m n : int.
 Implicit Types x y z : M.
 
-Fact mulrzA_C m n x : (x *~ n) *~ m = x *~ (m * n).
+Local Fact mulrzA_C m n x : (x *~ n) *~ m = x *~ (m * n).
 Proof.
 elim: m=> [|m _|m _]; elim: n=> [|n _|n _]; rewrite /intmul //=;
 rewrite ?(muln0, mulr0n, mul0rn, oppr0, mulNrn, opprK) //;
@@ -557,12 +557,13 @@ rewrite ?(muln0, mulr0n, mul0rn, oppr0, mulNrn, opprK) //;
 * by rewrite -mulrnA.
 Qed.
 
-Fact mulrzAC m n x : (x *~ n) *~ m = (x *~ m) *~ n.
+Local Fact mulrzAC m n x : (x *~ n) *~ m = (x *~ m) *~ n.
 Proof. by rewrite !mulrzA_C mulrC. Qed.
 
+(* TODO: Local? *)
 Fact mulr1z (x : M) : x *~ 1 = x. Proof. by []. Qed.
 
-Fact mulrzDl m : {morph ( *~%R^~ m : M -> M) : x y / x + y}.
+Local Fact mulrzDl m : {morph ( *~%R^~ m : M -> M) : x y / x + y}.
 Proof. by case: m => m x y; rewrite /intmul mulrnDl // opprD. Qed.
 
 Lemma mulrzBl_nat (m n : nat) x : x *~ (m%:Z - n%:Z) = x *~ m - x *~ n.
@@ -572,6 +573,7 @@ have [hmn|/ltnW hmn] := leqP n m; first exact.
 by rewrite -[in LHS]opprB -[RHS]opprB subzn // -nmulrn pmulrn -subzn // => ->.
 Qed.
 
+(* TODO: Local? *)
 Fact mulrzDr x : {morph *~%R x : m n / m + n}.
 Proof.
 by case=> []m []n; rewrite ?NegzE /intmul /= -/(intmul _ _) -?opprD;
@@ -1022,10 +1024,11 @@ Lemma exprSz x (n : nat) : x ^ n.+1 = x * x ^ n. Proof. exact: exprS. Qed.
 
 Lemma exprSzr x (n : nat) : x ^ n.+1 = x ^ n * x. Proof. exact: exprSr. Qed.
 
+(* TODO: Local? *)
 Fact exprzD_nat x (m n : nat) : x ^ (m%:Z + n) = x ^ m * x ^ n.
 Proof. exact: exprD. Qed.
 
-Fact exprzD_Nnat x (m n : nat) : x ^ (-m%:Z + -n%:Z) = x ^ (-m%:Z) * x ^ (-n%:Z).
+Local Fact exprzD_Nnat x (m n : nat) : x ^ (-m%:Z + -n%:Z) = x ^ (-m%:Z) * x ^ (-n%:Z).
 Proof. by rewrite -opprD -!exprz_inv exprzD_nat. Qed.
 
 Lemma exprzD_ss x m n : (0 <= m) && (0 <= n) || (m <= 0) && (n <= 0)
@@ -1223,7 +1226,7 @@ move=> [] m [] n; rewrite -!topredE /= ?oppr_cp0 ?ltz_nat // => _ _.
 by rewrite lez_nat -?exprnP => /ler_wiXn2l; apply.
 Qed.
 
-Fact ler_wpeXz2l x (x1 : 1 <= x) : {in >= 0 &, {homo exprz x : x y / x <= y}}.
+Local Fact ler_wpeXz2l x (x1 : 1 <= x) : {in >= 0 &, {homo exprz x : x y / x <= y}}.
 Proof.
 move=> [] m [] n; rewrite -!topredE /= ?oppr_cp0 ?ltz_nat // => _ _.
 by rewrite lez_nat -?exprnP=> /ler_weXn2l; apply.
@@ -1258,7 +1261,7 @@ rewrite le0r=> /predU1P [->|lx0]; first by rewrite !exp0rz invr0.
 by rewrite lef_pV2 -?topredE /= ?exprz_gt0 // ler_wiXn2l.
 Qed.
 
-Fact ler_wneXz2l x (x1 : 1 <= x) : {in <= 0 &, {homo exprz x : x y / x <= y}}.
+Local Fact ler_wneXz2l x (x1 : 1 <= x) : {in <= 0 &, {homo exprz x : x y / x <= y}}.
 Proof.
 move=> m n hm hn /= hmn.
 rewrite -lef_pV2 -?topredE /= ?exprz_gt0 ?(lt_le_trans ltr01) //.

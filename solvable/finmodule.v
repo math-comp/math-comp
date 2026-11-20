@@ -92,16 +92,16 @@ Definition actr u x := if x \in 'N(A) then fmod (fmval u ^ x) else u.
 Definition fmod_opp u := sub2f u^-1.
 Definition fmod_add u v := sub2f (u * v).
 
-Fact fmod_add0r : left_id (sub2f 1) fmod_add.
+Local Fact fmod_add0r : left_id (sub2f 1) fmod_add.
 Proof. by move=> u; apply: val_inj; apply: mul1g. Qed.
 
-Fact fmod_addrA : associative fmod_add.
+Local Fact fmod_addrA : associative fmod_add.
 Proof. by move=> u v w; apply: val_inj; apply: mulgA. Qed.
 
-Fact fmod_addNr : left_inverse (sub2f 1) fmod_opp fmod_add.
+Local Fact fmod_addNr : left_inverse (sub2f 1) fmod_opp fmod_add.
 Proof. by move=> u; apply: val_inj; apply: mulVg. Qed.
 
-Fact fmod_addrC : commutative fmod_add.
+Local Fact fmod_addrC : commutative fmod_add.
 Proof. by case=> x Ax [y Ay]; apply: val_inj; apply: (centsP abelA). Qed.
 
 #[export]
@@ -163,7 +163,7 @@ move=> Ny; apply: val_inj; rewrite fmvalJ ?fmodKcond ?memJ_norm //.
 by case: ifP => // _; rewrite conj1g.
 Qed.
 
-Fact actr_is_action : is_action 'N(A) actr.
+Local Fact actr_is_action : is_action 'N(A) actr.
 Proof.
 split=> [a u v eq_uv_a | u a b Na Nb].
   case Na: (a \in 'N(A)); last by rewrite /actr Na in eq_uv_a.
@@ -192,7 +192,7 @@ Proof.
 by move=> u; elim: n => [|n IHn]; rewrite ?act0r // !mulrS actAr IHn.
 Qed.
 
-Fact actr_is_groupAction : is_groupAction setT 'M.
+Local Fact actr_is_groupAction : is_groupAction setT 'M.
 Proof.
 move=> a Na /[1!inE]; apply/andP; split; first by apply/subsetP=> u _ /[1!inE].
 by apply/morphicP=> u v _ _; rewrite !permE /= actAr.
@@ -425,7 +425,7 @@ Hypotheses (sHG : H \subset G) (abelA : abelian (alpha @* H)).
 
 Local Notation HG := (rcosets (gval H) (gval G)).
 
-Fact transfer_morph_subproof : H \subset alpha @*^-1 (alpha @* H).
+Local Fact transfer_morph_subproof : H \subset alpha @*^-1 (alpha @* H).
 Proof. by rewrite -sub_morphim_pre. Qed.
 
 Let fmalpha := restrm transfer_morph_subproof (fmod abelA \o alpha).

@@ -425,7 +425,7 @@ Proof. by rewrite dvdzE !abszX ltz_nat; apply: dvdn_Pexp2l. Qed.
 Lemma dvdz_exp2r m n k : (m %| n -> m ^+ k %| n ^+ k)%Z.
 Proof. by rewrite !dvdzE !abszX; apply: dvdn_exp2r. Qed.
 
-Fact dvdz_zmod_closed d : zmod_closed (dvdz d).
+Local Fact dvdz_zmod_closed d : zmod_closed (dvdz d).
 Proof.
 split=> [|_ _ /dvdzP[p ->] /dvdzP[q ->]]; first exact: dvdz0.
 by rewrite -mulrBl dvdz_mull.

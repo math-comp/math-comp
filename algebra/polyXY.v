@@ -56,7 +56,7 @@ Section PolyXY_NzRing.
 Variable R : nzRingType.
 Implicit Types (u : {poly {poly R}}) (p q : {poly R}) (x : R).
 
-Fact swapXY_key : unit. Proof. by []. Qed.
+Definition swapXY_key : unit. Proof. by []. Qed.
 Definition swapXY_def u : {poly {poly R}} := (u ^ map_poly polyC).['Y].
 Definition swapXY := locked_with swapXY_key swapXY_def.
 Canonical swapXY_unlockable := [unlockable fun swapXY].

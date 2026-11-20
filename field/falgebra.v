@@ -195,13 +195,13 @@ Proof. exact: lker0_compfV. Qed.
 Lemma lfun_mulrV f : lker f == 0%VS -> f * f^-1%VF = 1.
 Proof. exact: lker0_compVf. Qed.
 
-Fact lfun_mulRVr f : lker f == 0%VS -> lfun_invr f * f = 1.
+Local Fact lfun_mulRVr f : lker f == 0%VS -> lfun_invr f * f = 1.
 Proof. by move=> Uf; rewrite /lfun_invr Uf lfun_mulVr. Qed.
 
-Fact lfun_mulrRV f : lker f == 0%VS -> f * lfun_invr f = 1.
+Local Fact lfun_mulrRV f : lker f == 0%VS -> f * lfun_invr f = 1.
 Proof. by move=> Uf; rewrite /lfun_invr Uf lfun_mulrV. Qed.
 
-Fact lfun_unitrP f g : g * f = 1 /\ f * g = 1 -> lker f == 0%VS.
+Local Fact lfun_unitrP f g : g * f = 1 /\ f * g = 1 -> lker f == 0%VS.
 Proof.
 case=> _ fK; apply/lker0P; apply: can_inj (g) _ => u.
 by rewrite -lfun_mulE fK lfunE.
@@ -236,7 +236,7 @@ Proof. by move=> u v /lfunP/(_ 1); rewrite !lfunE /= !mulr1. Qed.
 Lemma amulr_inj : injective amulr.
 Proof. by move=> u v /lfunP/(_ 1); rewrite !lfunE /= !mul1r. Qed.
 
-Fact amull_is_linear : linear amull.
+Local Fact amull_is_linear : linear amull.
 Proof.
 move=> a u v; apply/lfunP => w.
 by rewrite !lfunE /= scale_lfunE !lfunE /= mulrDl scalerAl.
@@ -280,7 +280,7 @@ Proof. by move=> Uu; apply/lker0P=> v w; rewrite !lfunE; apply: mulIr. Qed.
 Lemma lfun1_poly (p : {poly aT}) : map_poly \1%VF p = p.
 Proof. by apply: map_poly_id => u _; apply: id_lfunE. Qed.
 
-Fact prodv_key : unit. Proof. by []. Qed.
+Definition prodv_key : unit. Proof. by []. Qed.
 Definition prodv :=
   locked_with prodv_key (fun U V => <<allpairs *%R (vbasis U) (vbasis V)>>%VS).
 Canonical prodv_unlockable := [unlockable fun prodv].
@@ -485,7 +485,7 @@ Proof. by rewrite centvC capvSr. Qed.
 Definition is_algid e U :=
   [/\ e \in U, e != 0 & {in U, forall u, e * u = u /\ u * e = u}].
 
-Fact algid_decidable U : decidable (exists e, is_algid e U).
+Local Fact algid_decidable U : decidable (exists e, is_algid e U).
 Proof.
 have [-> | nzU] := eqVneq U 0%VS.
   by right=> [[e []]]; rewrite memv0 => ->.
@@ -530,7 +530,7 @@ HB.instance Definition _ := [Choice of aspace by <:].
 Definition clone_aspace U (A : aspace) :=
   fun algU & phant_id algU (valP A) =>  @ASpace U algU : aspace.
 
-Fact aspace1_subproof : is_aspace 1.
+Local Fact aspace1_subproof : is_aspace 1.
 Proof. by rewrite /is_aspace prod1v -memvE has_algid1 memv_line. Qed.
 Canonical aspace1 : aspace := ASpace aspace1_subproof.
 
@@ -687,7 +687,7 @@ suff ->: (amulr u @: A)%VS = A by rewrite -memvE -algid_eq1 (unitr_algid1 Au).
 by apply/eqP; rewrite limg_amulr -dimv_leqif_eq ?prodv_sub ?dim_cosetv_unit.
 Qed.
 
-Fact aspace_cap_subproof A B : algid A \in B -> is_aspace (A :&: B).
+Local Fact aspace_cap_subproof A B : algid A \in B -> is_aspace (A :&: B).
 Proof.
 move=> BeA; apply/andP.
 split; [apply/has_algidP | by rewrite subv_cap !prodv_sub ?capvSl ?capvSr].
@@ -696,7 +696,7 @@ by split=> // u /memv_capP[Au _]; rewrite ?algidl ?algidr.
 Qed.
 Definition aspace_cap A B BeA := ASpace (@aspace_cap_subproof A B BeA).
 
-Fact centraliser1_is_aspace u : is_aspace 'C[u].
+Local Fact centraliser1_is_aspace u : is_aspace 'C[u].
 Proof.
 rewrite /is_aspace has_algid1 ?cent1v1 //=.
 apply/prodvP=> v w /cent1vP-cuv /cent1vP-cuw.
@@ -704,7 +704,7 @@ by apply/cent1vP; rewrite -mulrA cuw !mulrA cuv.
 Qed.
 Canonical centraliser1_aspace u := ASpace (centraliser1_is_aspace u).
 
-Fact centraliser_is_aspace V : is_aspace 'C(V).
+Local Fact centraliser_is_aspace V : is_aspace 'C(V).
 Proof.
 rewrite /is_aspace has_algid1 ?centv1 //=.
 apply/prodvP=> u w /centvP-cVu /centvP-cVw.
@@ -839,7 +839,7 @@ elim: i => [|i]; first by rewrite expv0 prodv1.
 by apply: subv_trans; rewrite expvSl prodvA prodvSl.
 Qed.
 
-Fact agenv_is_aspace U : is_aspace (agenv U).
+Local Fact agenv_is_aspace U : is_aspace (agenv U).
 Proof.
 rewrite /is_aspace has_algid1; first by rewrite memvE agenvEl addvSl.
 by rewrite agenv_modl // [V in (_ <= V)%VS]agenvEl addvSr.
@@ -955,15 +955,15 @@ Definition subvs_one := Subvs (memv_algid A).
 Definition subvs_mul (u v : subvs_of A) :=
   Subvs (subv_trans (memv_mul (subvsP u) (subvsP v)) (asubv _)).
 
-Fact subvs_mulA : associative subvs_mul.
+Local Fact subvs_mulA : associative subvs_mul.
 Proof. by move=> x y z; apply/val_inj/mulrA. Qed.
-Fact subvs_mu1l : left_id subvs_one subvs_mul.
+Local Fact subvs_mu1l : left_id subvs_one subvs_mul.
 Proof. by move=> x; apply/val_inj/algidl/(valP x). Qed.
-Fact subvs_mul1 : right_id subvs_one subvs_mul.
+Local Fact subvs_mul1 : right_id subvs_one subvs_mul.
 Proof. by move=> x; apply/val_inj/algidr/(valP x). Qed.
-Fact subvs_mulDl : left_distributive subvs_mul +%R.
+Local Fact subvs_mulDl : left_distributive subvs_mul +%R.
 Proof. by move=> x y z; apply/val_inj/mulrDl. Qed.
-Fact subvs_mulDr : right_distributive subvs_mul +%R.
+Local Fact subvs_mulDr : right_distributive subvs_mul +%R.
 Proof. by move=> x y z; apply/val_inj/mulrDr. Qed.
 
 HB.instance Definition _ := GRing.Zmodule_isNzRing.Build (subvs_of A)
@@ -1041,7 +1041,7 @@ HB.instance Definition _ := [isSub for ahval].
 HB.instance Definition _ := [Equality of ahom by <:].
 HB.instance Definition _ := [Choice of ahom by <:].
 
-Fact linfun_is_ahom (f : {lrmorphism aT -> rT}) : ahom_in {:aT} (linfun f).
+Local Fact linfun_is_ahom (f : {lrmorphism aT -> rT}) : ahom_in {:aT} (linfun f).
 Proof. by apply/ahom_inP; split=> [x y|]; rewrite !lfunE ?rmorphM ?rmorph1. Qed.
 Canonical linfun_ahom f := AHom (linfun_is_ahom f).
 
@@ -1057,7 +1057,7 @@ Section LRMorphism.
 
 Variables aT rT sT : falgType K.
 
-Fact ahom_is_monoid_morphism (f : ahom aT rT) : monoid_morphism f.
+Local Fact ahom_is_monoid_morphism (f : ahom aT rT) : monoid_morphism f.
 Proof. by apply/ahomP_tmp; case: f. Qed.
 #[hnf]
 HB.instance Definition _ (f : ahom aT rT) :=
@@ -1114,7 +1114,7 @@ Lemma aimg_adjoin_seq (f : ahom aT rT) U xs :
   (f @: <<U & xs>> = <<f @: U & map f xs>>)%VS.
 Proof. by rewrite aimg_agen limgD limg_span. Qed.
 
-Fact ker_sub_ahom_is_aspace (f g : ahom aT rT) :
+Local Fact ker_sub_ahom_is_aspace (f g : ahom aT rT) :
   is_aspace (lker (ahval f - ahval g)).
 Proof.
 rewrite /is_aspace has_algid1; first by apply/eqlfunP; rewrite !rmorph1.

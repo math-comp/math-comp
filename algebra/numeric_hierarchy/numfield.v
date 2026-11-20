@@ -134,7 +134,7 @@ Variable R : rcfType.
 
 Lemma poly_ivt : real_closed_axiom R. Proof. exact: poly_ivt_subproof. Qed.
 
-Fact sqrtr_subproof (x : R) :
+Local Fact sqrtr_subproof (x : R) :
   exists2 y, 0 <= y & (if 0 <= x then y ^+ 2 == x else y == 0) : bool.
 Proof.
 case x_ge0: (0 <= x); last by exists 0.
@@ -696,7 +696,7 @@ Variant rootC_spec n (x : C) : Type :=
   RootCspec (y : C) of if (n > 0)%N then y ^+ n = x else y = 0
                         & forall z, (n > 0)%N -> z ^+ n = x -> argCle y z.
 
-Fact rootC_subproof n x : rootC_spec n x.
+Local Fact rootC_subproof n x : rootC_spec n x.
 Proof.
 have realRe2 u : Re2 u \is Num.real by
   rewrite realEsqr expr2 {2}/Re2 -{2}[u]conjCK addrC -rmorphD -normCK exprn_ge0.
@@ -730,8 +730,8 @@ Definition nthroot n x := let: RootCspec y _ _ := rootC_subproof n x in y.
 Notation "n .-root" := (nthroot n) : ring_scope.
 Notation sqrtC := 2.-root.
 
-Fact Re_lock : unit. Proof. exact: tt. Qed.
-Fact Im_lock : unit. Proof. exact: tt. Qed.
+Definition Re_lock : unit. Proof. exact: tt. Qed.
+Definition Im_lock : unit. Proof. exact: tt. Qed.
 Definition Re z := locked_with Re_lock ((z + z^*) / 2%:R).
 Definition Im z := locked_with Im_lock ('i * (z^* - z) / 2%:R).
 Notation "'Re z" := (Re z) : ring_scope.
@@ -867,12 +867,12 @@ by rewrite conjCi -opprB mulrNN.
 Qed.
 Hint Resolve Creal_Re Creal_Im : core.
 
-Fact Re_is_zmod_morphism : zmod_morphism Re.
+Local Fact Re_is_zmod_morphism : zmod_morphism Re.
 Proof. by move=> x y; rewrite !ReE rmorphB addrACA -opprD mulrBl. Qed.
 #[export]
 HB.instance Definition _ := GRing.isZmodMorphism.Build C C Re Re_is_zmod_morphism.
 
-Fact Im_is_zmod_morphism : zmod_morphism Im.
+Local Fact Im_is_zmod_morphism : zmod_morphism Im.
 Proof.
 by move=> x y; rewrite !ImE rmorphB opprD addrACA -opprD mulrBr mulrBl.
 Qed.

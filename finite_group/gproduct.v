@@ -1209,7 +1209,7 @@ by apply/val_inj; have [<-|nij]/= := eqVneq i j;
    [rewrite !dfwith_in|rewrite !dfwith_out].
 Qed.
 
-Fact set1gXn_key : unit. Proof. by []. Qed.
+Definition set1gXn_key : unit. Proof. by []. Qed.
 Definition set1gXn {i} (H : {set gT i}) : {set {dffun forall i : I, gT i}} :=
   locked_with set1gXn_key (setXn (dfwith (fun i0 : I => [1 gT _]%g) H)).
 

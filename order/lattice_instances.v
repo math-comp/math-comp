@@ -305,7 +305,7 @@ Import Order.Theory.
 (* first parameter is set to dvd_display.                                   *)
 (****************************************************************************)
 
-Fact dvd_display : disp_t. Proof. exact. Qed.
+Definition dvd_display : disp_t. Proof. exact. Qed.
 
 Module DvdSyntax.
 
@@ -403,7 +403,7 @@ Implicit Types (m n p : t).
 
 #[export] HB.instance Definition _ := Choice.copy t nat.
 
-Fact dvdn_anti : antisymmetric dvdn.
+Local Fact dvdn_anti : antisymmetric dvdn.
 Proof. by move=> a b => /andP[] /gcdn_idPl + /gcdn_idPr => ->. Qed.
 
 (* Note that this where the dvd_display is associated with the type NatDvd.t. *)
@@ -414,7 +414,7 @@ Proof. by move=> a b => /andP[] /gcdn_idPl + /gcdn_idPr => ->. Qed.
 #[export] HB.instance Definition _ :=
   @POrder_MeetJoin_isLattice.Build dvd_display t gcdn lcmn dvdn_gcd dvdn_lcm.
 
-Fact meetUl : @left_distributive t t gcd lcm.
+Local Fact meetUl : @left_distributive t t gcd lcm.
 Proof.
 move=> [|m'] [|n'] [|p']; rewrite ?joinxx ?join1x ?joinx1 ?meet1x ?meetx1//=.
 - by rewrite meetKUC.
@@ -452,7 +452,7 @@ HB.export NatDvd.Exports.
 (* Definition of seqprod_display *)
 (*********************************)
 
-Fact seqprod_display (disp : disp_t) : disp_t. Proof. exact: disp. Qed.
+Definition seqprod_display (disp : disp_t) : disp_t. Proof. exact: disp. Qed.
 
 Module SeqProdSyntax.
 
@@ -646,9 +646,9 @@ Fixpoint le s1 s2 := if s1 isn't x1 :: s1' then true else
                      if s2 isn't x2 :: s2' then false else
                      (x1 <= x2) && le s1' s2'.
 
-Fact refl : reflexive le. Proof. by elim=> //= ? ? ?; rewrite !lexx. Qed.
+Local Fact refl : reflexive le. Proof. by elim=> //= ? ? ?; rewrite !lexx. Qed.
 
-Fact trans : transitive le.
+Local Fact trans : transitive le.
 Proof.
 elim=> [|y ys ihs] [|x xs] [|z zs] //= /andP[xy xys] /andP[yz yzs].
 by rewrite (le_trans xy)// ihs.
@@ -680,7 +680,7 @@ Section POrder.
 Variable T : porderType disp.
 Implicit Types s : seq T.
 
-Fact anti : antisymmetric (@le T).
+Local Fact anti : antisymmetric (@le T).
 Proof.
 by elim=> [|x s ihs] [|y s'] //=; rewrite andbACA => /andP[/le_anti-> /ihs->].
 Qed.
@@ -700,7 +700,7 @@ Fixpoint meet s1 s2 :=
     | _, _ => [::]
   end.
 
-Fact lexI s1 s2 s3 : (s1 <= meet s2 s3) = (s1 <= s2) && (s1 <= s3).
+Local Fact lexI s1 s2 s3 : (s1 <= meet s2 s3) = (s1 <= s2) && (s1 <= s3).
 Proof.
 elim: s1 s2 s3 => [|x s1 IHs1] [|y s2] [|z s3] //=; first by rewrite andbF.
 by rewrite leEseq lexI IHs1 andbACA.
@@ -728,7 +728,7 @@ Fixpoint join s1 s2 :=
     | x1 :: s1', x2 :: s2' => (x1 `|` x2) :: join s1' s2'
   end.
 
-Fact leUx s1 s2 s3 : (join s1 s2 <= s3) = (s1 <= s3) && (s2 <= s3).
+Local Fact leUx s1 s2 s3 : (join s1 s2 <= s3) = (s1 <= s3) && (s2 <= s3).
 Proof.
 elim : s1 s2 s3 => [|x s1 IHs1] [|y s2] [|z s3] //=; first by rewrite andbT.
 by rewrite leEseq leUx IHs1 andbACA.
@@ -757,7 +757,7 @@ End JoinSemilattice.
 Section DistrLattice.
 Context (T : distrLatticeType disp).
 
-Fact meetUl : left_distributive (@meet T) (@join T).
+Local Fact meetUl : left_distributive (@meet T) (@join T).
 Proof. by elim=> [|? ? ih] [|? ?] [|? ?] //=; rewrite meetUl ih. Qed.
 
 #[export] HB.instance Definition _ :=

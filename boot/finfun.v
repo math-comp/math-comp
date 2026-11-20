@@ -171,7 +171,7 @@ Variables (aT : finType) (rT : aT -> Type).
 Notation fT := {ffun finPi aT rT}.
 Implicit Type f : fT.
 
-Fact ffun0 (aT0 : #|aT| = 0) : fT.
+Definition ffun0 (aT0 : #|aT| = 0) : fT.
 Proof. by apply/finfun=> x; have:= card0_eq aT0 x. Qed.
 
 Lemma ffunE g x : (finfun g : fT) x = g x.

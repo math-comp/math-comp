@@ -247,7 +247,7 @@ Qed.
 
 (* Build a polynomial from an infinite sequence of coefficients and a bound. *)
 Definition poly_expanded_def n E := Poly (mkseq E n).
-Fact poly_key : unit. Proof. by []. Qed.
+Definition poly_key : unit. Proof. by []. Qed.
 Definition poly := locked_with poly_key poly_expanded_def.
 Canonical poly_unlockable := [unlockable fun poly].
 Local Notation "\poly_ ( i < n ) E" := (poly n (fun i : nat => E)).
@@ -285,23 +285,23 @@ Qed.
 
 (* Nmodule structure for polynomial *)
 Definition add_poly_def p q := \poly_(i < maxn (size p) (size q)) (p`_i + q`_i).
-Fact add_poly_key : unit. Proof. by []. Qed.
+Definition add_poly_key : unit. Proof. by []. Qed.
 Definition add_poly := locked_with add_poly_key add_poly_def.
 Canonical add_poly_unlockable := [unlockable fun add_poly].
 
-Fact coef_add_poly p q i : (add_poly p q)`_i = p`_i + q`_i.
+Local Fact coef_add_poly p q i : (add_poly p q)`_i = p`_i + q`_i.
 Proof.
 rewrite unlock coef_poly; case: leqP => //.
 by rewrite geq_max => /andP[le_p_i le_q_i]; rewrite !nth_default ?add0r.
 Qed.
 
-Fact add_polyA : associative add_poly.
+Local Fact add_polyA : associative add_poly.
 Proof. by move=> p q r; apply/polyP=> i; rewrite !coef_add_poly addrA. Qed.
 
-Fact add_polyC : commutative add_poly.
+Local Fact add_polyC : commutative add_poly.
 Proof. by move=> p q; apply/polyP=> i; rewrite !coef_add_poly addrC. Qed.
 
-Fact add_poly0 : left_id 0%:P add_poly.
+Local Fact add_poly0 : left_id 0%:P add_poly.
 Proof.
 by move=> p; apply/polyP=> i; rewrite coef_add_poly coefC if_same add0r.
 Qed.
@@ -425,11 +425,11 @@ Proof. by move/lead_coefDl<-; rewrite addrC. Qed.
 (* Polynomial semiring structure. *)
 Definition mul_poly_def p q :=
   \poly_(i < (size p + size q).-1) (\sum_(j < i.+1) p`_j * q`_(i - j)).
-Fact mul_poly_key : unit. Proof. by []. Qed.
+Definition mul_poly_key : unit. Proof. by []. Qed.
 Definition mul_poly := locked_with mul_poly_key mul_poly_def.
 Canonical mul_poly_unlockable := [unlockable fun mul_poly].
 
-Fact coef_mul_poly p q i :
+Local Fact coef_mul_poly p q i :
   (mul_poly p q)`_i = \sum_(j < i.+1) p`_j * q`_(i - j).
 Proof.
 rewrite unlock coef_poly ltn_predRL; case: leqP => // le_pq_i1.
@@ -439,14 +439,14 @@ rewrite [q`__]nth_default ?mulr0 // leq_subRL -ltnS //.
 by rewrite (leq_trans _ le_pq_i1) // ltn_add2r.
 Qed.
 
-Fact coef_mul_poly_rev p q i :
+Local Fact coef_mul_poly_rev p q i :
   (mul_poly p q)`_i = \sum_(j < i.+1) p`_(i - j) * q`_j.
 Proof.
 rewrite coef_mul_poly (reindex_inj rev_ord_inj) /=.
 by apply: eq_bigr => j _; rewrite (sub_ordK j).
 Qed.
 
-Fact mul_polyA : associative mul_poly.
+Local Fact mul_polyA : associative mul_poly.
 Proof.
 move=> p q r; apply/polyP=> i; rewrite coef_mul_poly coef_mul_poly_rev.
 pose coef3 j k := p`_j * (q`_(i - j - k) * r`_k).
@@ -461,43 +461,43 @@ rewrite (big_ord_narrow_leq (leq_subr _ _)) coef_mul_poly big_distrl /=.
 by apply: eq_bigr => j _; rewrite /coef3 -!subnDA addnC mulrA.
 Qed.
 
-Fact mul_1poly : left_id 1%:P mul_poly.
+Local Fact mul_1poly : left_id 1%:P mul_poly.
 Proof.
 move=> p; apply/polyP => i; rewrite coef_mul_poly big_ord_recl subn0.
 by rewrite big1 => [j _|]; rewrite coefC !simp.
 Qed.
 
-Fact mul_poly1 : right_id 1%:P mul_poly.
+Local Fact mul_poly1 : right_id 1%:P mul_poly.
 Proof.
 move=> p; apply/polyP => i; rewrite coef_mul_poly_rev big_ord_recl subn0.
 by rewrite big1 => [j _|]; rewrite coefC !simp.
 Qed.
 
-Fact mul_polyDl : left_distributive mul_poly +%R.
+Local Fact mul_polyDl : left_distributive mul_poly +%R.
 Proof.
 move=> p q r; apply/polyP=> i; rewrite coefD !coef_mul_poly -big_split.
 by apply: eq_bigr => j _; rewrite coefD mulrDl.
 Qed.
 
-Fact mul_polyDr : right_distributive mul_poly +%R.
+Local Fact mul_polyDr : right_distributive mul_poly +%R.
 Proof.
 move=> p q r; apply/polyP=> i; rewrite coefD !coef_mul_poly -big_split.
 by apply: eq_bigr => j _; rewrite coefD mulrDr.
 Qed.
 
-Fact mul_0poly : left_zero 0%:P mul_poly.
+Local Fact mul_0poly : left_zero 0%:P mul_poly.
 Proof.
 move=> p; apply/polyP => i; rewrite coef_mul_poly big_ord_recl subn0.
 by rewrite big1 => [j _|]; rewrite coefC !simp // coefC; case: ifP.
 Qed.
 
-Fact mul_poly0 : right_zero 0%:P mul_poly.
+Local Fact mul_poly0 : right_zero 0%:P mul_poly.
 Proof.
 move=> p; apply/polyP => i; rewrite coef_mul_poly_rev big_ord_recl subn0.
 by rewrite big1 => [j _|]; rewrite coefC !simp // coefC; case: ifP.
 Qed.
 
-Fact poly1_neq0 : 1%:P != 0 :> {poly R}.
+Local Fact poly1_neq0 : 1%:P != 0 :> {poly R}.
 Proof. by rewrite polyC_eq0 oner_neq0. Qed.
 
 HB.instance Definition _ := GRing.Nmodule_isNzSemiRing.Build (polynomial R)
@@ -526,7 +526,7 @@ Proof. exact: coef_mul_poly_rev. Qed.
 Lemma coef0M p q : (p * q)`_0 = p`_0 * q`_0.
 Proof. by rewrite coefM big_ord1. Qed.
 
-Fact coefp0_is_monoid_morphism : monoid_morphism (coefp 0).
+Local Fact coefp0_is_monoid_morphism : monoid_morphism (coefp 0).
 Proof. by split; [exact: polyCK | exact: coef0M]. Qed.
 
 HB.instance Definition _ := GRing.isMonoidMorphism.Build {poly R} R (coefp 0)
@@ -599,7 +599,7 @@ by rewrite -{1}(prednK nzp) mulnS -addnS leq_add2l.
 Qed.
 
 (* Polynomial ring structure. *)
-Fact polyC_is_monoid_morphism : monoid_morphism polyC.
+Local Fact polyC_is_monoid_morphism : monoid_morphism polyC.
 Proof. by split; last apply: polyCM. Qed.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build R {poly R} polyC
   polyC_is_monoid_morphism.
@@ -617,32 +617,32 @@ Qed.
 
 (* Algebra structure of polynomials. *)
 Definition scale_poly_def a (p : {poly R}) := \poly_(i < size p) (a * p`_i).
-Fact scale_poly_key : unit. Proof. by []. Qed.
+Definition scale_poly_key : unit. Proof. by []. Qed.
 Definition scale_poly := locked_with scale_poly_key scale_poly_def.
 Canonical scale_poly_unlockable := [unlockable fun scale_poly].
 
-Fact scale_polyE a p : scale_poly a p = a%:P * p.
+Local Fact scale_polyE a p : scale_poly a p = a%:P * p.
 Proof.
 apply/polyP=> n; rewrite unlock coef_poly coefCM.
 by case: leqP => // le_p_n; rewrite nth_default ?mulr0.
 Qed.
 
-Fact scale_polyA a b p : scale_poly a (scale_poly b p) = scale_poly (a * b) p.
+Local Fact scale_polyA a b p : scale_poly a (scale_poly b p) = scale_poly (a * b) p.
 Proof. by rewrite !scale_polyE mulrA polyCM. Qed.
 
-Fact scale_0poly p : scale_poly 0 p = 0.
+Local Fact scale_0poly p : scale_poly 0 p = 0.
 Proof. by rewrite scale_polyE mul0r. Qed.
 
-Fact scale_1poly : left_id 1 scale_poly.
+Local Fact scale_1poly : left_id 1 scale_poly.
 Proof. by move=> p; rewrite scale_polyE mul1r. Qed.
 
-Fact scale_polyDr a : {morph scale_poly a : p q / p + q}.
+Local Fact scale_polyDr a : {morph scale_poly a : p q / p + q}.
 Proof. by move=> p q; rewrite !scale_polyE mulrDr. Qed.
 
-Fact scale_polyDl p : {morph scale_poly^~ p : a b / a + b}.
+Local Fact scale_polyDl p : {morph scale_poly^~ p : a b / a + b}.
 Proof. by move=> a b /=; rewrite !scale_polyE raddfD mulrDl. Qed.
 
-Fact scale_polyAl a p q : scale_poly a (p * q) = scale_poly a p * q.
+Local Fact scale_polyAl a p q : scale_poly a (p * q) = scale_poly a p * q.
 Proof. by rewrite !scale_polyE mulrA. Qed.
 
 HB.instance Definition _ := GRing.Nmodule_isLSemiModule.Build R (polynomial R)
@@ -674,7 +674,7 @@ HB.instance Definition _ := GRing.Linear.on (coefp 0).
 
 (* The indeterminate, at last! *)
 Definition polyX_def := Poly [:: 0; 1].
-Fact polyX_key : unit. Proof. by []. Qed.
+Definition polyX_key : unit. Proof. by []. Qed.
 Definition polyX : {poly R} := locked_with polyX_key polyX_def.
 Canonical polyX_unlockable := [unlockable of polyX].
 Local Notation "'X" := polyX.
@@ -1003,7 +1003,7 @@ Proof.
 by rewrite qualifE /= polyseqC; case: eqP => [->|] /=; rewrite ?andbT ?rpred0.
 Qed.
 
-Fact polyOver_nmod_closed : nmod_closed (polyOver S).
+Local Fact polyOver_nmod_closed : nmod_closed (polyOver S).
 Proof.
 split=> [|p q Sp Sq]; first exact: polyOver0.
 by apply/polyOverP=> i; rewrite coefD rpredD ?(polyOverP _).
@@ -1031,7 +1031,7 @@ Section PolyOverSemiring.
 
 Variable S : semiringClosed R.
 
-Fact polyOver_mul1_closed : 1 \in polyOver S.
+Local Fact polyOver_mul1_closed : 1 \in polyOver S.
 Proof. by rewrite polyOverC rpred1. Qed.
 HB.instance Definition _ := GRing.isMul1Closed.Build {poly R} (polyOver_pred S)
   polyOver_mul1_closed.
@@ -1085,7 +1085,7 @@ apply/polyP=> i; rewrite coef_deriv coefMn !coefXn eqSS.
 by case: eqP => [-> // | _]; rewrite !mul0rn.
 Qed.
 
-Fact deriv_is_semilinear : semilinear deriv.
+Local Fact deriv_is_semilinear : semilinear deriv.
 Proof.
 split=> [k p|p q]; apply/polyP => i.
   by rewrite !(coef_deriv, coefZ) mulrnAr.
@@ -1152,7 +1152,7 @@ move=> p /polyOverP Kp /= n; apply/polyOverP=> i.
 by rewrite coef_derivn rpredMn.
 Qed.
 
-Fact derivn_is_semilinear n : semilinear (derivn n).
+Local Fact derivn_is_semilinear n : semilinear (derivn n).
 Proof.
 by elim: n => // n IHn; split=> [a p|p q]; rewrite derivnS IHn semilinearPZ.
 Qed.
@@ -1242,7 +1242,7 @@ have [lt_m_n | le_n_m] := ltnP m n.
 by rewrite -{1 3}(subnKC le_n_m) eqn_add2l; case: eqP => [->|]; rewrite ?mul0rn.
 Qed.
 
-Fact nderivn_is_semilinear n : semilinear (nderivn n).
+Local Fact nderivn_is_semilinear n : semilinear (nderivn n).
 Proof.
 split=> [k p|p q]; apply/polyP => i.
   by rewrite !(coef_nderivn, coefZ) mulrnAr.
@@ -1354,7 +1354,7 @@ Proof. by move=> mon_p; rewrite !monicE lead_coef_monicM. Qed.
 Lemma monicMr p q : q \is monic -> (p * q \is monic) = (p \is monic).
 Proof. by move=> mon_q; rewrite !monicE lead_coef_Mmonic. Qed.
 
-Fact monic_mulr_closed : mulr_closed monic.
+Local Fact monic_mulr_closed : mulr_closed monic.
 Proof. by split=> [|p q mon_p]; rewrite (monic1, monicMl). Qed.
 HB.instance Definition _ := GRing.isMulClosed.Build {poly R} monic_pred
   monic_mulr_closed.
@@ -1502,17 +1502,17 @@ Implicit Types (a b c x y z : R) (p q r d : {poly R}).
 
 (* Zmodule structure for polynomial *)
 Definition opp_poly_def p := \poly_(i < size p) - p`_i.
-Fact opp_poly_key : unit. Proof. by []. Qed.
+Definition opp_poly_key : unit. Proof. by []. Qed.
 Definition opp_poly := locked_with opp_poly_key opp_poly_def.
 Canonical opp_poly_unlockable := [unlockable fun opp_poly].
 
-Fact coef_opp_poly p i : (opp_poly p)`_i = - p`_i.
+Local Fact coef_opp_poly p i : (opp_poly p)`_i = - p`_i.
 Proof.
 rewrite unlock coef_poly /=.
 by case: leqP => // le_p_i; rewrite nth_default ?oppr0.
 Qed.
 
-Fact add_polyN : left_inverse 0%:P opp_poly (@add_poly _).
+Local Fact add_polyN : left_inverse 0%:P opp_poly (@add_poly _).
 Proof.
 by move=> p; apply/polyP => i; rewrite coefD coef_opp_poly coef0 addNr.
 Qed.
@@ -1588,7 +1588,7 @@ Definition hornerE_comm :=
 
 (* Lifting a ring predicate to polynomials. *)
 
-Fact polyOverNr (zmodS : zmodClosed R) : oppr_closed (polyOver zmodS).
+Local Fact polyOverNr (zmodS : zmodClosed R) : oppr_closed (polyOver zmodS).
 Proof.
 by move=> p /polyOverP Sp; apply/polyOverP=> i; rewrite coefN rpredN.
 Qed.
@@ -1989,7 +1989,7 @@ Lemma map_poly_comp (g : iR -> aR) p :
   map_poly (f \o g) p = map_poly f (map_poly g p).
 Proof. exact: map_poly_comp_id0 (raddf0 f). Qed.
 
-Fact map_poly_is_nmod_morphism : nmod_morphism (map_poly f).
+Local Fact map_poly_is_nmod_morphism : nmod_morphism (map_poly f).
 Proof.
 split=> [|p q]; apply/polyP => i; first by rewrite coef_map !coef0 raddf0.
 by rewrite !(coef_map, coefD) raddfD.
@@ -2012,7 +2012,7 @@ Implicit Types p : {poly aR}.
 
 Local Notation "p ^f" := (map_poly f p) : ring_scope.
 
-Fact map_poly_is_monoid_morphism : monoid_morphism (map_poly f).
+Local Fact map_poly_is_monoid_morphism : monoid_morphism (map_poly f).
 Proof.
 split=> [|p q]; apply/polyP=> i.
   by rewrite !(coef_map, coef1) /= rmorph_nat.
@@ -2071,13 +2071,13 @@ Proof. by rewrite /horner_morph map_polyC hornerC. Qed.
 Lemma horner_morphX : horner_morph cfu 'X = u.
 Proof. by rewrite /horner_morph map_polyX hornerX. Qed.
 
-Fact horner_is_semilinear : semilinear_for (f \; *%R) (horner_morph cfu).
+Local Fact horner_is_semilinear : semilinear_for (f \; *%R) (horner_morph cfu).
 Proof.
 split=> [c p|p q]; rewrite /horner_morph; first by rewrite linearZ hornerZ.
 by rewrite linearD hornerD.
 Qed.
 
-Fact horner_is_monoid_morphism : monoid_morphism (horner_morph cfu).
+Local Fact horner_is_monoid_morphism : monoid_morphism (horner_morph cfu).
 Proof.
 split=> [|p q]; first by rewrite /horner_morph rmorph1 hornerC.
 rewrite /horner_morph rmorphM /= hornerM_comm //.
@@ -2236,7 +2236,7 @@ Proof. by rewrite comp_polyCr horner_coef0. Qed.
 Lemma comp_polyC c p : c%:P \Po p = c%:P.
 Proof. by rewrite /(_ \Po p) map_polyC hornerC. Qed.
 
-Fact comp_poly_is_semilinear p : semilinear (comp_poly p).
+Local Fact comp_poly_is_semilinear p : semilinear (comp_poly p).
 Proof.
 split=> [a q|q r]; last by rewrite /comp_poly linearD /= hornerD.
 by rewrite /comp_poly linearZ /= hornerZ mul_polyC.
@@ -2623,7 +2623,7 @@ Section PolynomialComNzSemiRing.
 Variable R : comNzSemiRingType.
 Implicit Types p q : {poly R}.
 
-Fact poly_mul_comm p q : p * q = q * p.
+Local Fact poly_mul_comm p q : p * q = q * p.
 Proof.
 apply/polyP=> i; rewrite coefM coefMr.
 by apply: eq_bigr => j _; rewrite mulrC.
@@ -2637,7 +2637,7 @@ HB.instance Definition _ :=
 Lemma hornerM p q x : (p * q).[x] = p.[x] * q.[x].
 Proof. by rewrite hornerM_comm //; apply: mulrC. Qed.
 
-Fact horner_eval_is_monoid_morphism (x : R) : monoid_morphism (horner_eval x).
+Local Fact horner_eval_is_monoid_morphism (x : R) : monoid_morphism (horner_eval x).
 Proof. by split => [|p q]; rewrite /horner_eval (hornerC, hornerM). Qed.
 HB.instance Definition _ x :=
   GRing.isMonoidMorphism.Build {poly R} R (horner_eval x)
@@ -2654,7 +2654,7 @@ Definition hornerE :=
   (hornerD, hornerN, hornerX, hornerC, horner_exp,
    simp, hornerCM, hornerZ, hornerM, horner_cons).
 
-Fact comp_poly_is_monoid_morphism q : monoid_morphism (comp_poly q).
+Local Fact comp_poly_is_monoid_morphism q : monoid_morphism (comp_poly q).
 Proof.
 split=> [|p1 p2]; first by rewrite comp_polyC.
 by rewrite /comp_poly rmorphM hornerM_comm //; apply: mulrC.
@@ -2769,7 +2769,7 @@ Proof.
 by move=> nz_p nz_q; rewrite -size_proper_mul ?mulf_neq0 ?lead_coef_eq0.
 Qed.
 
-Fact poly_idomainAxiom p q : p * q = 0 -> (p == 0) || (q == 0).
+Local Fact poly_idomainAxiom p q : p * q = 0 -> (p == 0) || (q == 0).
 Proof.
 move=> pq0; apply/norP=> [[p_nz q_nz]]; move/eqP: (size_mul p_nz q_nz).
 by rewrite eq_sym pq0 size_poly0 (polySpred p_nz) (polySpred q_nz) addnS.
@@ -2780,13 +2780,13 @@ Definition poly_unit : pred {poly R} :=
 
 Definition poly_inv p := if p \in poly_unit then (p`_0)^-1%:P else p.
 
-Fact poly_mulVp : {in poly_unit, left_inverse 1 poly_inv *%R}.
+Local Fact poly_mulVp : {in poly_unit, left_inverse 1 poly_inv *%R}.
 Proof.
 move=> p Up; rewrite /poly_inv Up.
 by case/andP: Up => /size_poly1P[c _ ->]; rewrite coefC -polyCM => /mulVr->.
 Qed.
 
-Fact poly_intro_unit p q : q * p = 1 -> p \in poly_unit.
+Local Fact poly_intro_unit p q : q * p = 1 -> p \in poly_unit.
 Proof.
 move=> pq1; apply/andP; split; last first.
   apply/unitrP; exists q`_0.
@@ -2798,7 +2798,7 @@ rewrite size_mul // (polySpred nz_p) (polySpred nz_q) addnS addSn !eqSS.
 by rewrite addn_eq0 => /andP[].
 Qed.
 
-Fact poly_inv_out : {in [predC poly_unit], poly_inv =1 id}.
+Local Fact poly_inv_out : {in [predC poly_unit], poly_inv =1 id}.
 Proof. by rewrite /poly_inv => p /negbTE/= ->. Qed.
 
 HB.instance Definition _ := GRing.ComNzRing_hasMulInverse.Build (polynomial R)

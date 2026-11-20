@@ -299,7 +299,7 @@ Coercion fun_of_matrix : matrix >-> Funclass.
 
 End MatrixDef.
 
-Fact matrix_key : unit. Proof. by []. Qed.
+Definition matrix_key : unit. Proof. by []. Qed.
 
 HB.lock
 Definition matrix_of_fun R (m n : nat) (k : unit) (F : 'I_m -> 'I_n -> R) :=
@@ -382,7 +382,7 @@ Section MatrixStructural.
 Variable R : Type.
 
 (* Constant matrix *)
-Fact const_mx_key : unit. Proof. by []. Qed.
+Definition const_mx_key : unit. Proof. by []. Qed.
 Definition const_mx m n a : 'M[R]_(m, n) := \matrix[const_mx_key]_(i, j) a.
 Arguments const_mx {m n}.
 
@@ -404,13 +404,13 @@ Definition conform_mx m' n' B A :=
   end.
 
 (* Transpose a matrix *)
-Fact trmx_key : unit. Proof. by []. Qed.
+Definition trmx_key : unit. Proof. by []. Qed.
 Definition trmx A := \matrix[trmx_key]_(i, j) A j i.
 
 (* Permute a matrix vertically (rows) or horizontally (columns) *)
-Fact row_perm_key : unit. Proof. by []. Qed.
+Definition row_perm_key : unit. Proof. by []. Qed.
 Definition row_perm (s : 'S_m) A := \matrix[row_perm_key]_(i, j) A (s i) j.
-Fact col_perm_key : unit. Proof. by []. Qed.
+Definition col_perm_key : unit. Proof. by []. Qed.
 Definition col_perm (s : 'S_n) A := \matrix[col_perm_key]_(i, j) A i (s j).
 
 (* Exchange two rows/columns of a matrix *)
@@ -741,12 +741,12 @@ Variables m m1 m2 n n1 n2 : nat.
 
 (* Concatenating two matrices, in either direction. *)
 
-Fact row_mx_key : unit. Proof. by []. Qed.
+Definition row_mx_key : unit. Proof. by []. Qed.
 Definition row_mx (A1 : 'M_(m, n1)) (A2 : 'M_(m, n2)) : 'M[R]_(m, n1 + n2) :=
   \matrix[row_mx_key]_(i, j)
      match split j with inl j1 => A1 i j1 | inr j2 => A2 i j2 end.
 
-Fact col_mx_key : unit. Proof. by []. Qed.
+Definition col_mx_key : unit. Proof. by []. Qed.
 Definition col_mx (A1 : 'M_(m1, n)) (A2 : 'M_(m2, n)) : 'M[R]_(m1 + m2, n) :=
   \matrix[col_mx_key]_(i, j)
      match split i with inl i1 => A1 i1 j | inr i2 => A2 i2 j end.
@@ -755,19 +755,19 @@ Definition col_mx (A1 : 'M_(m1, n)) (A2 : 'M_(m2, n)) : 'M[R]_(m1 + m2, n) :=
 (* The shape of the (dependent) width parameters of the type of A *)
 (* determines which submatrix is selected.                        *)
 
-Fact lsubmx_key : unit. Proof. by []. Qed.
+Definition lsubmx_key : unit. Proof. by []. Qed.
 Definition lsubmx (A : 'M[R]_(m, n1 + n2)) :=
   \matrix[lsubmx_key]_(i, j) A i (lshift n2 j).
 
-Fact rsubmx_key : unit. Proof. by []. Qed.
+Definition rsubmx_key : unit. Proof. by []. Qed.
 Definition rsubmx (A : 'M[R]_(m, n1 + n2)) :=
   \matrix[rsubmx_key]_(i, j) A i (rshift n1 j).
 
-Fact usubmx_key : unit. Proof. by []. Qed.
+Definition usubmx_key : unit. Proof. by []. Qed.
 Definition usubmx (A : 'M[R]_(m1 + m2, n)) :=
   \matrix[usubmx_key]_(i, j) A (lshift m2 i) j.
 
-Fact dsubmx_key : unit. Proof. by []. Qed.
+Definition dsubmx_key : unit. Proof. by []. Qed.
 Definition dsubmx (A : 'M[R]_(m1 + m2, n)) :=
   \matrix[dsubmx_key]_(i, j) A (rshift m1 i) j.
 
@@ -1215,7 +1215,7 @@ Coercion pair_of_mxvec_index k (i_k : is_mxvec_index k) :=
 Definition mxvec (A : 'M[R]_(m, n)) :=
   castmx (erefl _, mxvec_cast) (\row_k A (enum_val k).1 (enum_val k).2).
 
-Fact vec_mx_key : unit. Proof. by []. Qed.
+Definition vec_mx_key : unit. Proof. by []. Qed.
 Definition vec_mx (u : 'rV[R]_(m * n)) :=
   \matrix[vec_mx_key]_(i, j) u 0 (mxvec_index i j).
 
@@ -1263,7 +1263,7 @@ Section MapMatrix.
 
 Variables (aT rT : Type) (f : aT -> rT).
 
-Fact map_mx_key : unit. Proof. by []. Qed.
+Definition map_mx_key : unit. Proof. by []. Qed.
 Definition map_mx m n (A : 'M_(m, n)) := \matrix[map_mx_key]_(i, j) f (A i j).
 
 Notation "A ^f" := (map_mx A) : ring_scope.
@@ -1408,7 +1408,7 @@ Arguments map_mx_id {R m n} [f].
 Section Map2Matrix.
 Context {R S T : Type} (f : R -> S -> T).
 
-Fact map2_mx_key : unit. Proof. by []. Qed.
+Definition map2_mx_key : unit. Proof. by []. Qed.
 Definition map2_mx m n (A : 'M_(m, n)) (B : 'M_(m, n)) :=
   \matrix[map2_mx_key]_(i, j) f (A i j) (B i j).
 
@@ -1631,7 +1631,7 @@ Section FixedDim.
 Variables m n : nat.
 Implicit Types A B : 'M[V]_(m, n).
 
-Fact addmx_key : unit. Proof. by []. Qed.
+Definition addmx_key : unit. Proof. by []. Qed.
 Definition addmx := @map2_mx V V V +%R m n.
 
 Definition addmxA : associative addmx := map2_mxA.
@@ -1648,7 +1648,7 @@ Lemma summxE I r (P : pred I) (E : I -> 'M_(m, n)) i j :
   (\sum_(k <- r | P k) E k) i j = \sum_(k <- r | P k) E k i j.
 Proof. by apply: (big_morph (fun A => A i j)) => [A B|]; rewrite mxE. Qed.
 
-Fact const_mx_is_nmod_morphism : nmod_morphism const_mx.
+Local Fact const_mx_is_nmod_morphism : nmod_morphism const_mx.
 Proof. by split=> [|a b]; apply/matrixP => // i j; rewrite !mxE. Qed.
 HB.instance Definition _ := GRing.isNmodMorphism.Build V 'M[V]_(m, n) const_mx
   const_mx_is_nmod_morphism.
@@ -1662,7 +1662,7 @@ Variables (m n p q : nat) (f : 'I_p -> 'I_q -> 'I_m) (g : 'I_p -> 'I_q -> 'I_n).
 Definition swizzle_mx k (A : 'M[V]_(m, n)) :=
   \matrix[k]_(i, j) A (f i j) (g i j).
 
-Fact swizzle_mx_is_nmod_morphism k : nmod_morphism (swizzle_mx k).
+Local Fact swizzle_mx_is_nmod_morphism k : nmod_morphism (swizzle_mx k).
 Proof. by split=> [|A B]; apply/matrixP => i j; rewrite !mxE. Qed.
 HB.instance Definition _ k := GRing.isNmodMorphism.Build 'M_(m, n) 'M_(p, q)
   (swizzle_mx k) (swizzle_mx_is_nmod_morphism k).
@@ -1955,14 +1955,14 @@ Qed.
 
 (* Diagonal matrices *)
 
-Fact diag_mx_key : unit. Proof. by []. Qed.
+Definition diag_mx_key : unit. Proof. by []. Qed.
 Definition diag_mx n (d : 'rV[V]_n) :=
   \matrix[diag_mx_key]_(i, j) (d 0 i *+ (i == j)).
 
 Lemma tr_diag_mx n (d : 'rV_n) : (diag_mx d)^T = diag_mx d.
 Proof. by apply/matrixP=> i j /[!mxE]; case: eqVneq => // ->. Qed.
 
-Fact diag_mx_is_nmod_morphism n : nmod_morphism (@diag_mx n).
+Local Fact diag_mx_is_nmod_morphism n : nmod_morphism (@diag_mx n).
 Proof.
 by split=> [|A B]; apply/matrixP => i j; rewrite !mxE ?mul0rn// mulrnDl.
 Qed.
@@ -1996,7 +1996,7 @@ Section ScalarMx.
 
 Variable n : nat.
 
-Fact scalar_mx_key : unit. Proof. by []. Qed.
+Definition scalar_mx_key : unit. Proof. by []. Qed.
 Definition scalar_mx x : 'M[V]_n :=
   \matrix[scalar_mx_key]_(i , j) (x *+ (i == j)).
 Notation "x %:M" := (scalar_mx x) : ring_scope.
@@ -2007,7 +2007,7 @@ Proof. by apply/matrixP=> i j; rewrite !mxE. Qed.
 Lemma tr_scalar_mx a : (a%:M)^T = a%:M.
 Proof. by apply/matrixP=> i j; rewrite !mxE eq_sym. Qed.
 
-Fact scalar_mx_is_nmod_morphism : nmod_morphism scalar_mx.
+Local Fact scalar_mx_is_nmod_morphism : nmod_morphism scalar_mx.
 Proof. by split=> [|a b]; rewrite -!diag_const_mx ?raddf0// !raddfD. Qed.
 HB.instance Definition _ := GRing.isNmodMorphism.Build V 'M_n scalar_mx
   scalar_mx_is_nmod_morphism.
@@ -2065,7 +2065,7 @@ Local Notation "'\tr' A" := (mxtrace A) : ring_scope.
 Lemma mxtrace_tr A : \tr A^T = \tr A.
 Proof. by apply: eq_bigr=> i _; rewrite mxE. Qed.
 
-Fact mxtrace_is_nmod_morphism : nmod_morphism mxtrace.
+Local Fact mxtrace_is_nmod_morphism : nmod_morphism mxtrace.
 Proof.
 split=> [|A B]; first by apply: big1 => i; rewrite mxE.
 by rewrite -big_split /=; apply: eq_bigr => i _; rewrite mxE.
@@ -2139,7 +2139,7 @@ Section FixedDim.
 Variables m n : nat.
 Implicit Types A B : 'M[V]_(m, n).
 
-Fact oppmx_key : unit. Proof. by []. Qed.
+Definition oppmx_key : unit. Proof. by []. Qed.
 Definition oppmx := @map_mx V V -%R m n.
 
 Lemma addNmx : left_inverse (const_mx 0) oppmx (@addmx V m n).
@@ -2203,29 +2203,29 @@ Section SemiRingModule.
 Variables m n : nat.
 Implicit Types A B : 'M[R]_(m, n).
 
-Fact scalemx_key : unit. Proof. by []. Qed.
+Definition scalemx_key : unit. Proof. by []. Qed.
 Definition scalemx x A := \matrix[scalemx_key]_(i, j) (x * A i j).
 
 (* Basis *)
-Fact delta_mx_key : unit. Proof. by []. Qed.
+Definition delta_mx_key : unit. Proof. by []. Qed.
 Definition delta_mx i0 j0 : 'M[R]_(m, n) :=
   \matrix[delta_mx_key]_(i, j) ((i == i0) && (j == j0))%:R.
 
 Local Notation "x *m: A" := (scalemx x A) (at level 40) : ring_scope.
 
-Fact scale0mx A : 0 *m: A = 0.
+Local Fact scale0mx A : 0 *m: A = 0.
 Proof. by apply/matrixP=> i j; rewrite !mxE mul0r. Qed.
 
-Fact scale1mx A : 1 *m: A = A.
+Local Fact scale1mx A : 1 *m: A = A.
 Proof. by apply/matrixP=> i j; rewrite !mxE mul1r. Qed.
 
-Fact scalemxDl A x y : (x + y) *m: A = x *m: A + y *m: A.
+Local Fact scalemxDl A x y : (x + y) *m: A = x *m: A + y *m: A.
 Proof. by apply/matrixP=> i j; rewrite !mxE mulrDl. Qed.
 
-Fact scalemxDr x A B : x *m: (A + B) = x *m: A + x *m: B.
+Local Fact scalemxDr x A B : x *m: (A + B) = x *m: A + x *m: B.
 Proof. by apply/matrixP=> i j; rewrite !mxE mulrDr. Qed.
 
-Fact scalemxA x y A : x *m: (y *m: A) = (x * y) *m: A.
+Local Fact scalemxA x y A : x *m: (y *m: A) = (x * y) *m: A.
 Proof. by apply/matrixP=> i j; rewrite !mxE mulrA. Qed.
 
 HB.instance Definition _ :=
@@ -2302,7 +2302,7 @@ Lemma col1 n i : col i (1%:M : 'M_n) = delta_mx i 0.
 Proof. by apply/colP => j; rewrite !mxE eqxx andbT. Qed.
 
 (* Matrix multiplication using bigops. *)
-Fact mulmx_key : unit. Proof. by []. Qed.
+Definition mulmx_key : unit. Proof. by []. Qed.
 Definition mulmx {m n p} (A : 'M_(m, n)) (B : 'M_(n, p)) : 'M[R]_(m, p) :=
   \matrix[mulmx_key]_(i, k) \sum_j (A i j * B j k).
 
@@ -2540,7 +2540,7 @@ Qed.
 
 (* Partial identity matrix (used in rank decomposition). *)
 
-Fact pid_mx_key : unit. Proof. by []. Qed.
+Definition pid_mx_key : unit. Proof. by []. Qed.
 Definition pid_mx {m n} r : 'M[R]_(m, n) :=
   \matrix[pid_mx_key]_(i, j) ((i == j :> nat) && (i < r))%:R.
 
@@ -2688,7 +2688,7 @@ End Trace.
 
 Section StructuralLinear.
 
-Fact swizzle_mx_is_scalable m n p q f g k :
+Local Fact swizzle_mx_is_scalable m n p q f g k :
   scalable (@swizzle_mx R m n p q f g k).
 Proof. by move=> a A; apply/matrixP=> i j; rewrite !mxE. Qed.
 HB.instance Definition _ m n p q f g k :=
@@ -2739,7 +2739,7 @@ Proof. by rewrite scale_col_mx !scale_row_mx. Qed.
 
 (* Diagonal matrices *)
 
-Fact diag_mx_is_scalable n : scalable (@diag_mx R n).
+Local Fact diag_mx_is_scalable n : scalable (@diag_mx R n).
 Proof. by move=> a A; apply/matrixP=> i j; rewrite !mxE mulrnAr. Qed.
 HB.instance Definition _ n :=
   GRing.isScalable.Build R 'rV_n 'M_n _ (@diag_mx _ n) (@diag_mx_is_scalable n).
@@ -2795,7 +2795,7 @@ HB.instance Definition _ :=
 Lemma mulmxE : mulmx = *%R. Proof. by []. Qed.
 Lemma idmxE : 1%:M = 1 :> 'M_n. Proof. by []. Qed.
 
-Fact scalar_mx_is_monoid_morphism : monoid_morphism (@scalar_mx R n).
+Local Fact scalar_mx_is_monoid_morphism : monoid_morphism (@scalar_mx R n).
 Proof. by split=> //; apply: scalar_mxM. Qed.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build R 'M_n (@scalar_mx _ n)
   scalar_mx_is_monoid_morphism.
@@ -2807,7 +2807,7 @@ Section LinRowVector.
 
 Variables m n : nat.
 
-Fact lin1_mx_key : unit. Proof. by []. Qed.
+Definition lin1_mx_key : unit. Proof. by []. Qed.
 Definition lin1_mx (f : 'rV[R]_m -> 'rV[R]_n) :=
   \matrix[lin1_mx_key]_(i, j) f (delta_mx 0 i) 0 j.
 
@@ -2854,7 +2854,7 @@ Implicit Type B : 'M[R]_(n, p).
 Definition mulmxr B A := mulmx A B.
 Arguments mulmxr B A /.
 
-Fact mulmxr_is_semilinear B : semilinear (mulmxr B).
+Local Fact mulmxr_is_semilinear B : semilinear (mulmxr B).
 Proof. by split=> [a A|A1 A2]; rewrite /= (mulmxDl, scalemxAl). Qed.
 HB.instance Definition _ (B : 'M_(n, p)) :=
   GRing.isSemilinear.Build R 'M_(m, n) 'M_(m, p) _ (mulmxr B)
@@ -2862,7 +2862,7 @@ HB.instance Definition _ (B : 'M_(n, p)) :=
 
 Definition lin_mulmxr B := lin_mx (mulmxr B).
 
-Fact lin_mulmxr_is_semilinear : semilinear lin_mulmxr.
+Local Fact lin_mulmxr_is_semilinear : semilinear lin_mulmxr.
 Proof.
 split=> [a A|A B]; apply/row_matrixP; case/mxvec_indexP=> i j;
   rewrite (linearZ, linearD) /= !rowE !mul_rV_lin /= vec_mx_delta;
@@ -3040,7 +3040,7 @@ move=> def_gf; apply: map_lin1_mx => A /=.
 by rewrite map_mxvec def_gf map_vec_mx.
 Qed.
 
-Fact map_mx_is_monoid_morphism n : monoid_morphism (map_mx f : 'M_n -> 'M_n).
+Local Fact map_mx_is_monoid_morphism n : monoid_morphism (map_mx f : 'M_n -> 'M_n).
 Proof. by split; [apply: map_mx1 | apply: map_mxM]. Qed.
 HB.instance Definition _ n :=
   GRing.isMonoidMorphism.Build 'M[aR]_n 'M[rR]_n (map_mx f)
@@ -3139,7 +3139,7 @@ Qed.
 Lemma scalemxAr a A B : a *: (A *m B) = A *m (a *: B).
 Proof. by apply: trmx_inj; rewrite trmx_mul !linearZ /= trmx_mul scalemxAl. Qed.
 
-Fact mulmx_is_scalable A : scalable (@mulmx _ m n p A).
+Local Fact mulmx_is_scalable A : scalable (@mulmx _ m n p A).
 Proof. by move=> a B; rewrite scalemxAr. Qed.
 HB.instance Definition _ A :=
   GRing.isScalable.Build R 'M[R]_(n, p) 'M[R]_(m, p) *:%R (mulmx A)
@@ -3147,7 +3147,7 @@ HB.instance Definition _ A :=
 
 Definition lin_mulmx A : 'M[R]_(n * p, m * p) := lin_mx (mulmx A).
 
-Fact lin_mulmx_is_semilinear : semilinear lin_mulmx.
+Local Fact lin_mulmx_is_semilinear : semilinear lin_mulmx.
 Proof.
 by split=> [a A|A B]; apply/row_matrixP=> i; rewrite (linearZ, linearD) /=;
   rewrite !rowE !mul_rV_lin /= -(linearZ, linearD) /= (scalemxAl, mulmxDl).
@@ -3164,7 +3164,7 @@ Variables m n : nat.
 
 Definition lin_mul_row u : 'M[R]_(m * n, n) := lin1_mx (mulmx u \o vec_mx).
 
-Fact lin_mul_row_is_semilinear : semilinear lin_mul_row.
+Local Fact lin_mul_row_is_semilinear : semilinear lin_mul_row.
 Proof.
 by split=> [a u|u v]; apply/row_matrixP=> i; rewrite (linearZ, linearD) /=;
   rewrite !rowE !mul_rV_lin1 /= (mulmxDl, scalemxAl).
@@ -3295,7 +3295,7 @@ Definition cofactor n A (i j : 'I_n) : R :=
   (-1) ^+ (i + j) * determinant (row' i (col' j A)).
 
 (* The adjugate matrix : defined as the transpose of the matrix of cofactors *)
-Fact adjugate_key : unit. Proof. by []. Qed.
+Definition adjugate_key : unit. Proof. by []. Qed.
 Definition adjugate n (A : 'M_n) := \matrix[adjugate_key]_(i, j) cofactor A j i.
 
 End MatrixAlgebra.
@@ -4050,7 +4050,7 @@ Proof. exact: mxOver_const. Qed.
 
 Section mxOverAdd.
 Variable addS : addrClosed M.
-Fact mxOver_nmod_closed : nmod_closed (@mxOver m n _ addS).
+Local Fact mxOver_nmod_closed : nmod_closed (@mxOver m n _ addS).
 Proof.
 split=> [|p q Sp Sq]; first by rewrite mxOver0 // ?rpred0.
 by apply/mxOverP=> i j; rewrite mxE rpredD // !(mxOverP _).
@@ -4061,7 +4061,7 @@ End mxOverAdd.
 
 Section mxOverOpp.
 Variable oppS : opprClosed M.
-Fact mxOver_opp_subproof : oppr_closed (@mxOver m n _ oppS).
+Local Fact mxOver_opp_subproof : oppr_closed (@mxOver m n _ oppS).
 Proof. by move=> A /mxOverP SA; apply/mxOverP=> i j; rewrite mxE rpredN. Qed.
 HB.instance Definition _ :=
   GRing.isOppClosed.Build 'M[M]_(m, n) (mxOver_pred oppS)
@@ -4124,7 +4124,7 @@ End mxOverRing.
 Section mxRingOver.
 Context {R : semiRingType} {n : nat} (S : semiringClosed R).
 
-Fact mxOver_mul_subproof : mulr_closed (@mxOver n n _ S).
+Local Fact mxOver_mul_subproof : mulr_closed (@mxOver n n _ S).
 Proof. by split; rewrite ?mxOver_scalar ?rpred0 ?rpred1//; apply: mxOverM. Qed.
 HB.instance Definition _ := GRing.isMulClosed.Build _ (mxOver_pred S)
   mxOver_mul_subproof.

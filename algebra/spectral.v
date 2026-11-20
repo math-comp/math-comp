@@ -176,7 +176,7 @@ Section unitarymx.
 Context {C : numClosedFieldType}.
 
 Definition unitarymx {m n} := [qualify X : 'M[C]_(m, n) | X *m X ^t* == 1%:M].
-Fact unitarymx_key m n : pred_key (@unitarymx m n). Proof. by []. Qed.
+Definition unitarymx_key m n : pred_key (@unitarymx m n). Proof. by []. Qed.
 Canonical unitarymx_keyed m n := KeyedQualifier (unitarymx_key m n).
 
 Lemma unitarymxP m n {M : 'M[C]_(m, n)} :
@@ -248,7 +248,7 @@ Section normalmx.
 Context {C : numClosedFieldType} {n : nat}.
 
 Definition normalmx := [qualify M : 'M[C]_n | M *m M ^t* == M ^t* *m M].
-Fact normalmx_key : pred_key normalmx. Proof. by []. Qed.
+Definition normalmx_key : pred_key normalmx. Proof. by []. Qed.
 Canonical normalmx_keyed := KeyedQualifier normalmx_key.
 
 Lemma normalmxP {M : 'M[C]_n} :
@@ -314,7 +314,7 @@ apply/matrixP=> i j; rewrite !mxE; have := Mo i j; rewrite dotmxE !mxE => <-.
 by apply: eq_bigr => /= k _; rewrite !mxE.
 Qed.
 
-Fact dotmx_is_hermitian n : isHermitianSesquilinear _ _ false conjC (@dotmx C n).
+Local Fact dotmx_is_hermitian n : isHermitianSesquilinear _ _ false conjC (@dotmx C n).
 Proof.
 split=> /= u v; rewrite !dotmxE/= expr0 mul1r.
 suff -> : u *m v ^t* = ((v *m u ^t* ) ^t* ) by rewrite !mxE.
@@ -322,7 +322,7 @@ by rewrite !trmx_mul map_mxM/= trmxCK.
 Qed.
 HB.instance Definition _ n := @dotmx_is_hermitian n.
 
-Fact dotmx_is_dot n : isDotProduct _ _ (@dotmx C n).
+Local Fact dotmx_is_dot n : isDotProduct _ _ (@dotmx C n).
 Proof.
 split => /= u u_neq0; rewrite dotmxE mxE.
 suff /existsP[i ui_neq0] : [exists i, u 0%R i != 0].

@@ -61,7 +61,7 @@ Definition poly_of_size_pred := fun p : {poly R} => size p <= n.
 Arguments poly_of_size_pred _ /.
 Definition poly_of_size := [qualify a p | poly_of_size_pred p].
 
-Fact npoly_subsemimod_closed : subsemimod_closed poly_of_size.
+Local Fact npoly_subsemimod_closed : subsemimod_closed poly_of_size.
 Proof.
 split=> [|x q sq]; first split=> [|p q sp sq]; rewrite qualifE/= ?size_poly0//.
   by rewrite (leq_trans (size_polyD _ _)) // geq_max [_ <= _]sp.
@@ -132,7 +132,7 @@ HB.instance Definition _  (R : finNzSemiRingType) n : isFinite {poly_n R} :=
 Section SemiNPolyTheory.
 Context (R : nzSemiRingType) {n : nat}.
 
-Fact polyn_is_semilinear : semilinear (@polyn _ _ : {poly_n R} -> _).
+Local Fact polyn_is_semilinear : semilinear (@polyn _ _ : {poly_n R} -> _).
 Proof. by []. Qed.
 HB.instance Definition _ :=
   GRing.isSemilinear.Build R {poly_n R} {poly R} _ (polyn (n:=n))
@@ -141,12 +141,12 @@ HB.instance Definition _ :=
 Canonical mk_npoly (E : nat -> R) : {poly_n R} :=
   @NPoly R _ (\poly_(i < n) E i) (size_poly _ _).
 
-Fact size_npoly0 : size (0 : {poly R}) <= n.
+Local Fact size_npoly0 : size (0 : {poly R}) <= n.
 Proof. by rewrite size_poly0. Qed.
 
 Definition npoly0 := NPoly (size_npoly0).
 
-Fact npolyp_key : unit. Proof. exact: tt. Qed.
+Definition npolyp_key : unit. Proof. exact: tt. Qed.
 Definition npolyp : {poly R} -> {poly_n R} :=
   locked_with npolyp_key (mk_npoly \o (nth 0)).
 
@@ -182,7 +182,7 @@ Section NPolyTheory.
 
 Variables (R : nzRingType) (n : nat).
 
-Fact npoly_oppr_closed : oppr_closed (@poly_of_size R n).
+Local Fact npoly_oppr_closed : oppr_closed (@poly_of_size R n).
 Proof. by move=> p sp; rewrite qualifE/= size_polyN. Qed.
 
 HB.instance Definition _ :=
@@ -322,7 +322,7 @@ Notation lagrange_def := (fun i :'I_n =>
   let k := i in let p := \prod_(j < n | j != k) ('X - (x j)%:P)
   in (p.[x k]^-1)%:P * p).
 
-Fact lagrange_key : unit. Proof. exact: tt. Qed.
+Definition lagrange_key : unit. Proof. exact: tt. Qed.
 
 Definition lagrange := locked_with lagrange_key
   [tuple npolyp n (lagrange_def i) | i < n].
@@ -476,7 +476,7 @@ Proof. by apply/val_eqP=> /=; rewrite rmodpD ?monic_mk_monic. Qed.
 Lemma in_qpolyZ a p : in_qpoly (a *: p) = a *: in_qpoly p.
 Proof. apply/val_eqP=> /=; rewrite rmodpZ ?monic_mk_monic //. Qed.
 
-Fact in_qpoly_is_linear : linear in_qpoly.
+Local Fact in_qpoly_is_linear : linear in_qpoly.
 Proof. by move=> k p q; rewrite in_qpolyD in_qpolyZ. Qed.
 
 HB.instance Definition _ :=
@@ -585,7 +585,7 @@ apply/val_eqP => /=.
 by rewrite rmodp_mulml ?rmodp_mulmr // monic_mk_monic.
 Qed.
 
-Fact in_qpoly_monoid_morphism : monoid_morphism (in_qpoly h).
+Local Fact in_qpoly_monoid_morphism : monoid_morphism (in_qpoly h).
 Proof. by split; [ apply: in_qpoly1 | apply: in_qpolyM]. Qed.
 HB.instance Definition _ :=
   GRing.isMonoidMorphism.Build {poly A} {poly %/ h} (in_qpoly h)
@@ -653,23 +653,23 @@ HB.instance Definition _ :=
 
 Definition qpoly_scale k (p : {poly %/ h}) : {poly %/ h} := (k *: p)%R.
 
-Fact qpoly_scaleA a b p :
+Local Fact qpoly_scaleA a b p :
   qpoly_scale a (qpoly_scale b p) = qpoly_scale (a * b) p.
 Proof.  by apply/val_eqP; rewrite /= scalerA. Qed.
 
-Fact qpoly_scale1l : left_id 1%R qpoly_scale.
+Local Fact qpoly_scale1l : left_id 1%R qpoly_scale.
 Proof. by move=> p; apply/val_eqP; rewrite /= scale1r. Qed.
 
-Fact qpoly_scaleDr a : {morph qpoly_scale a : p q / (p + q)%R}.
+Local Fact qpoly_scaleDr a : {morph qpoly_scale a : p q / (p + q)%R}.
 Proof. by move=> p q; apply/val_eqP; rewrite /= scalerDr. Qed.
 
-Fact qpoly_scaleDl p : {morph qpoly_scale^~ p : a b / a + b}%R.
+Local Fact qpoly_scaleDl p : {morph qpoly_scale^~ p : a b / a + b}%R.
 Proof. by move=> a b; apply/val_eqP; rewrite /= scalerDl. Qed.
 
-Fact qpoly_scaleAl a p q : qpoly_scale a (p * q) = (qpoly_scale a p * q).
+Local Fact qpoly_scaleAl a p q : qpoly_scale a (p * q) = (qpoly_scale a p * q).
 Proof. by apply/val_eqP; rewrite /= -scalerAl rmodpZ // monic_mk_monic. Qed.
 
-Fact qpoly_scaleAr a p q : qpoly_scale a (p * q) = p * (qpoly_scale a q).
+Local Fact qpoly_scaleAr a p q : qpoly_scale a (p * q) = p * (qpoly_scale a q).
 Proof. by apply/val_eqP; rewrite /= -scalerAr rmodpZ // monic_mk_monic. Qed.
 
 HB.instance Definition _ := GRing.LSemiModule_isLSemiAlgebra.Build A {poly__ A}

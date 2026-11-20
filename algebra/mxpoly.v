@@ -608,7 +608,7 @@ Local Notation n := n'.+1.
 Variable A : 'M[F]_n.
 Implicit Types p q : {poly F}.
 
-Fact degree_mxminpoly_proof : exists d, \rank (powers_mx A d.+1) <= d.
+Local Fact degree_mxminpoly_proof : exists d, \rank (powers_mx A d.+1) <= d.
 Proof. by exists (n ^ 2)%N; rewrite rank_leq_col. Qed.
 Definition degree_mxminpoly := ex_minn degree_mxminpoly_proof.
 Local Notation d := degree_mxminpoly.
