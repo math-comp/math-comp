@@ -393,6 +393,12 @@ move=> /[dup] /andP[lenx _] ?.
 by apply/real_floor_eqP; rewrite // (ger_real lenx) realz.
 Qed.
 
+Lemma floor_to_real x : floor (num_to_real x) = floor x.
+Proof.
+apply/to_real_floor_eqP; rewrite to_realT ?real_to_real//.
+exact: to_real_floor_itv.
+Qed.
+
 Lemma le_floor : {homo floor : x y / x <= y}.
 Proof.
 move=> x y /ler_to_real; rewrite to_real_floor_gez.
@@ -413,6 +419,9 @@ Proof. by move=> z; rewrite intrEfloor => /eqP. Qed.
 Lemma floor0 : floor 0 = 0. Proof. exact: intrKfloor 0. Qed.
 Lemma floor1 : floor 1 = 1. Proof. exact: intrKfloor 1. Qed.
 #[local] Hint Resolve floor0 floor1 : core.
+
+Lemma floor_default x : x \isn't real_num -> floor x = 0.
+Proof. by move=> Hx; rewrite -floor_to_real to_realF. Qed.
 
 Lemma to_real_floorDzr x y :
   x \is a int_num -> floor (x + num_to_real y) = floor x + floor y.
@@ -540,6 +549,12 @@ move=> /[dup] /andP[_ lexn] ?.
 by apply/real_ceil_eqP; rewrite // (ler_real lexn) realz.
 Qed.
 
+Lemma ceil_to_real x : ceil (num_to_real x) = ceil x.
+Proof.
+apply/to_real_ceil_eqP; rewrite to_realT ?real_to_real//.
+exact: to_real_ceil_itv.
+Qed.
+
 Lemma le_ceil : {homo ceil : x y / x <= y}.
 Proof. by move=> x y lexy; rewrite !ceilNfloor lerN2 le_floor ?lerN2. Qed.
 
@@ -555,6 +570,9 @@ Proof. by move=> z; rewrite intrEceil => /eqP. Qed.
 Lemma ceil0 : ceil 0 = 0. Proof. exact: intrKceil 0. Qed.
 Lemma ceil1 : ceil 1 = 1. Proof. exact: intrKceil 1. Qed.
 #[local] Hint Resolve ceil0 ceil1 : core.
+
+Lemma ceil_default x : x \isn't real_num -> ceil x = 0.
+Proof. by move=> Hx; rewrite -ceil_to_real to_realF. Qed.
 
 Lemma to_real_ceilDzr x y :
   x \is a int_num -> ceil (x + num_to_real y) = ceil x + ceil y.
@@ -605,16 +623,19 @@ Proof. by rewrite ceilNfloor oppr_gt0 floor_lt0 oppr_lt0. Qed.
 Lemma ceil_neq0 x : (ceil x != 0) = (x <= - 1) || (x > 0).
 Proof. by rewrite neq_lt ceil_lt0 ceil_gt0. Qed.
 
-(* TODO: *)
-(* Lemma to_real_ceil_floor x : ceil x = floor x + (to_real x \isn't a int_num). *)
-
 Lemma real_ceil_floor x : x \is real_num ->
   ceil x = floor x + (x \isn't a int_num).
 Proof.
 case Ix: (x \is a int_num) => Rx /=.
   by apply/eqP; rewrite addr0 ceilNfloor eqr_oppLR floorN.
-apply/to_real_ceil_eqP; rewrite addrK; have := to_real_floor_itv x.
-by rewrite to_realT// le_eqVlt -intrEfloor Ix /= => /andP[-> /ltW].
+apply/real_ceil_eqP; rewrite // addrK; have := real_floor_itv Rx.
+by rewrite le_eqVlt -intrEfloor Ix /= => /andP[-> /ltW].
+Qed.
+
+Lemma to_real_ceil_floor x :
+  ceil x = floor x + (num_to_real x \isn't a int_num).
+Proof.
+by rewrite -ceil_to_real -floor_to_real; apply/real_ceil_floor/real_to_real.
 Qed.
 
 (* Relating Cnat and oldCnat. *)
@@ -622,6 +643,7 @@ Qed.
 Lemma truncn_floor x : truncn x = if 0 <= x then `|floor x|%N else 0%N.
 Proof. exact: truncn_subproof. Qed.
 
+#[deprecated(since="mathcomp 2.7.0", use=truncn_floor)]
 Lemma truncEfloor x : truncn x = if floor x is Posz n then n else 0.
 Proof.
 move: (to_real_floor_le0 x) (to_real_floor_ge0 x).
