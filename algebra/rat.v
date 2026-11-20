@@ -765,17 +765,15 @@ Proof. by case: b; rewrite ?(mul1r, mulN1r) // denqN. Qed.
 Lemma denq_norm x : denq `|x| = denq x.
 Proof. by rewrite normrEsign denq_mulr_sign. Qed.
 
-Module ratArchimedean.
 Section ratArchimedean.
 
 Implicit Types x : rat.
 
-Definition floor x : int := (numq x %/ denq x)%Z.
+Let floor x : int := (numq x %/ denq x)%Z.
 
-Definition ceil x : int := - (- numq x %/ denq x)%Z.
+Let ceil x : int := - (- numq x %/ denq x)%Z.
 
-Definition truncn x : nat :=
-  if 0 <= x then (`|numq x| %/ `|denq x|)%N else 0%N.
+Let truncn x : nat := if 0 <= x then (`|numq x| %/ `|denq x|)%N else 0%N.
 
 Let is_int x := denq x == 1.
 
@@ -810,13 +808,11 @@ apply: (iffP idP) => [/andP[]/[swap]/intrP[i ->]|[n ->]].
 by rewrite /is_nat pmulrn ler0z denq_int.
 Qed.
 
-End ratArchimedean.
-End ratArchimedean.
-
 HB.instance Definition _ :=
   Num.NumDomain_hasFloorCeilTruncn_truncn_abs_floor.Build rat
-    ratArchimedean.floorP ratArchimedean.ceilP ratArchimedean.truncnP
-    ratArchimedean.intrP ratArchimedean.natrP.
+    floorP ceilP truncnP intrP natrP.
+
+End ratArchimedean.
 
 Lemma floorErat (x : rat) : Num.floor x = (numq x %/ denq x)%Z.
 Proof. by []. Qed.

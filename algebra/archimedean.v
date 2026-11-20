@@ -156,17 +156,16 @@ Notation archi_bound := bound.
 
 End Def.
 
-Module intArchimedean.
 Section intArchimedean.
 
 Implicit Types n : int.
 
 Let truncz n := if n is Posz n then n else 0%N.
 
-Local Fact floor_subproof n : n%:~R <= num_to_real n < (n + 1)%:~R.
+Local Fact floorP n : n%:~R <= num_to_real n < (n + 1)%:~R.
 Proof. by rewrite to_realT ?num_real// !intz ltzD1 lexx. Qed.
 
-Local Fact truncn_subproof n : truncz n = if 0 <= n then `|n|%N else 0%N.
+Local Fact truncnP n : truncz n = if 0 <= n then `|n|%N else 0%N.
 Proof. by rewrite /truncz; case: n. Qed.
 
 Local Fact intrP n : reflect (exists m, n = m%:~R) true.
@@ -178,15 +177,13 @@ apply: (iffP idP); last by case=> m ->; rewrite ler0n.
 by case: n => // n _; exists n; rewrite natz.
 Qed.
 
-End intArchimedean.
-End intArchimedean.
-
 #[export]
 HB.instance Definition _ :=
   @NumDomain_hasFloorCeilTruncn_truncn_abs_floor.Build int
     id id _ xpredT nneg_num_pred
-    intArchimedean.floor_subproof (fun=> esym (opprK _))
-    intArchimedean.truncn_subproof intArchimedean.intrP intArchimedean.natrP.
+    floorP (fun=> esym (opprK _)) truncnP intrP natrP.
+
+End intArchimedean.
 
 Module Import Theory.
 Export Num.Theory.
