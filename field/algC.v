@@ -15,7 +15,6 @@ From mathcomp Require Import algebraics_fundamentals.
 (* filed with an automorphism of order 2; this amounts to the purely          *)
 (* algebraic contents of the Fundamenta Theorem of Algebra.                   *)
 (*       algC == the closed, countable field of algebraic numbers.            *)
-(*  algCeq, algCnzRing, ..., algCnumField == structures for algC.             *)
 (* The ssrnum interfaces are implemented for algC as follows:                 *)
 (*     x <= y <=> (y - x) is a nonnegative real                               *)
 (*      x < y <=> (y - x) is a (strictly) positive real                       *)
@@ -551,18 +550,26 @@ Delimit Scope C_scope with C.
 Delimit Scope C_core_scope with Cc.
 Delimit Scope C_expanded_scope with Cx.
 Open Scope C_core_scope.
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCeq := (type : eqType).
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCzmod := (type : zmodType).
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCnzRing := (type : nzRingType).
-#[deprecated(since="mathcomp 2.4.0", use=algCnzRing)]
+#[deprecated(since="mathcomp 2.4.0", use=algC)]
 Notation algCring := (type : nzRingType).
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCuring := (type : unitRingType).
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCnum := (type : numDomainType).
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCfield := (type : fieldType).
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCnumField := (type : numFieldType).
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCnumClosedField := (type : numClosedFieldType).
 
-Notation Creal := (@Num.real algCnum).
+Notation Creal := (@Num.real algC).
 
 Definition getCrat := let: GetCrat_spec CtoQ _ := getCrat_subproof in CtoQ.
 Definition Crat : {pred algC} := fun x => ratr (getCrat x) == x.

@@ -176,11 +176,11 @@ Qed.
 Lemma Aint_irr i x : 'chi[G]_i x \in Aint.
 Proof. exact/Aint_char/irr_char. Qed.
 
-Local Notation R_G := (group_ring algCfield G).
+Local Notation R_G := (group_ring algC G).
 Local Notation a := gring_classM_coef.
 
 (* This is Isaacs (2.25). *)
-Lemma mx_irr_gring_op_center_scalar n (rG : mx_representation algCfield G n) A :
+Lemma mx_irr_gring_op_center_scalar n (rG : mx_representation algC G n) A :
   mx_irreducible rG -> (A \in 'Z(R_G))%MS -> is_scalar_mx (gring_op rG A).
 Proof.
 move/groupC=> irrG /center_mxP[R_A cGA].
@@ -193,10 +193,10 @@ Section GringIrrMode.
 Variable i : Iirr G.
 
 Let n := irr_degree (socle_of_Iirr i).
-Let mxZn_inj: injective (@scalar_mx algCfield n).
+Let mxZn_inj: injective (@scalar_mx algC n).
 Proof. by rewrite -[n]prednK ?irr_degree_gt0 //; apply: fmorph_inj. Qed.
 
-Lemma cfRepr_gring_center n1 (rG : mx_representation algCfield G n1) A :
+Lemma cfRepr_gring_center n1 (rG : mx_representation algC G n1) A :
   cfRepr rG = 'chi_i -> (A \in 'Z(R_G))%MS -> gring_op rG A = 'omega_i[A]%:M.
 Proof.
 move=> def_rG Z_A; rewrite unlock xcfunZl -{2}def_rG xcfun_repr.
