@@ -71,7 +71,7 @@ Implicit Types (U V : {vspace L}) (K E : {subfield L}) (f g : 'End(L)).
 
 Definition kHom U V f := ahom_in V f && (U <= fixedSpace f)%VS.
 
-Lemma kHomP_tmp {K V f} :
+Lemma kHomP {K V f} :
   reflect [/\ {in K, forall x, f x = x} &
               {in V &, forall x y, f (x * y) = f x * f y}]
           (kHom K V f).
@@ -81,12 +81,9 @@ apply: (iffP andP) => [[/ahom_inP[fM _] /subvP idKf] | [idKf fM]].
 split; last by apply/subvP=> x /idKf/fixedSpaceP.
 by apply/ahom_inP; split=> //; rewrite idKf ?mem1v.
 Qed.
-#[deprecated(since="mathcomp 2.5.0", use=kHomP_tmp)]
-Lemma kHomP {K V f} :
-  reflect [/\ {in V &, forall x y, f (x * y) = f x * f y} &
-           {in K, forall x, f x = x}]
-          (kHom K V f).
-Proof. by apply: (iffP kHomP_tmp) => [][]. Qed.
+
+#[deprecated(since="mathcomp 2.7.0", use=kHomP)]
+Definition kHomP_tmp := @kHomP.
 
 Lemma kAHomP {U V} {f : 'AEnd(L)} :
   reflect {in U, forall x, f x = x} (kHom U V f).
@@ -100,7 +97,7 @@ Proof. by apply: andb_idr => /ahom_inP[_ f1]; apply/fixedSpaceP. Qed.
 
 Lemma kHom_monoid_morphism (f : 'End(L)) :
   reflect (monoid_morphism f) (kHom 1 {:L} f).
-Proof. by rewrite k1HomE; apply: ahomP_tmp. Qed.
+Proof. by rewrite k1HomE; apply: ahomP. Qed.
 #[deprecated(since="mathcomp 2.5.0", use=kHom_monoid_morphism)]
 Lemma kHom_lrmorphism (f : 'End(L)) :
   reflect ((f 1 = 1) * {morph f : x y / x * y >-> x * y}) (kHom 1 {:L} f).
@@ -115,14 +112,14 @@ Proof. by rewrite k1HomE ahomWin. Qed.
 Lemma kHom_poly_id K E f p :
   kHom K E f -> p \is a polyOver K -> map_poly f p = p.
 Proof.
-by case/kHomP_tmp=> idKf _ /polyOverP Kp; apply/polyP=> i; rewrite coef_map /= idKf.
+by case/kHomP=> idKf _ /polyOverP Kp; apply/polyP=> i; rewrite coef_map /= idKf.
 Qed.
 
 Lemma kHomSl U1 U2 V f : (U1 <= U2)%VS -> kHom U2 V f -> kHom U1 V f.
 Proof. by rewrite /kHom => sU12 /andP[-> /(subv_trans sU12)]. Qed.
 
 Lemma kHomSr K V1 V2 f : (V1 <= V2)%VS -> kHom K V2 f -> kHom K V1 f.
-Proof. by move/subvP=> sV12 /kHomP_tmp[idKf /(sub_in2 sV12)fM]; apply/kHomP_tmp. Qed.
+Proof. by move/subvP=> sV12 /kHomP[idKf /(sub_in2 sV12)fM]; apply/kHomP. Qed.
 
 Lemma kHomS K1 K2 V1 V2 f :
   (K1 <= K2)%VS -> (V1 <= V2)%VS -> kHom K2 V2 f -> kHom K1 V1 f.
@@ -133,13 +130,13 @@ Lemma kHom_eq K E f g :
 Proof.
 move/subvP=> sKE eq_fg; wlog suffices: f g eq_fg / kHom K E f -> kHom K E g.
   by move=> IH; apply/idP/idP; apply: IH => x /eq_fg.
-case/kHomP_tmp=> idKf fM; apply/kHomP_tmp.
+case/kHomP=> idKf fM; apply/kHomP.
 by split=> [x Kx | x y Ex Ey]; rewrite -!eq_fg ?fM ?rpredM // ?idKf ?sKE.
 Qed.
 
 Lemma kHom_inv K E f : kHom K E f -> {in E, {morph f : x / x^-1}}.
 Proof.
-case/kHomP_tmp=> idKf fM x Ex.
+case/kHomP=> idKf fM x Ex.
 have [-> | nz_x] := eqVneq x 0; first by rewrite linear0 invr0 linear0.
 have fxV: f x * f x^-1 = 1 by rewrite -fM ?rpredV ?divff // idKf ?mem1v.
 have Ufx: f x \is a GRing.unit by apply/unitrPr; exists (f x^-1).
@@ -148,7 +145,7 @@ Qed.
 
 Lemma kHom_dim K E f : kHom K E f -> \dim (f @: E) = \dim E.
 Proof.
-move=> homKf; have [idKf fM] := kHomP_tmp homKf.
+move=> homKf; have [idKf fM] := kHomP homKf.
 apply/limg_dim_eq/eqP; rewrite -subv0; apply/subvP=> v.
 rewrite memv_cap memv0 memv_ker => /andP[Ev]; apply: contraLR => nz_v.
 by rewrite -unitfE unitrE -(kHom_inv homKf) // -fM ?rpredV ?divff ?idKf ?mem1v.
@@ -159,11 +156,11 @@ Variables (K E : {subfield L}) (f : 'End(L)).
 Let kHomf : subvs_of E -> L := f \o vsval.
 
 Lemma kHom_is_zmod_morphism : kHom K E f -> zmod_morphism kHomf.
-Proof. by case/kHomP_tmp => idKf fM; apply: raddfB. Qed.
+Proof. by case/kHomP => idKf fM; apply: raddfB. Qed.
 
 Lemma kHom_is_monoid_morphism : kHom K E f -> monoid_morphism kHomf.
 Proof.
-case/kHomP_tmp=> idKf fM; rewrite /kHomf.
+case/kHomP => idKf fM; rewrite /kHomf.
 by split=> [|a b] /=; [rewrite algid1 idKf // mem1v | rewrite /= fM ?subvsP].
 Qed.
 
@@ -252,8 +249,8 @@ Qed.
 
 Lemma kHomExtendP : kHom K <<E; x>> kHomExtend.
 Proof.
-have [idKf fM] := kHomP_tmp homKf.
-apply/kHomP_tmp; split=> [z Kz|]; first by rewrite kHomExtend_id ?(subvP sKE) ?idKf.
+have [idKf fM] := kHomP homKf.
+apply/kHomP; split=> [z Kz|]; first by rewrite kHomExtend_id ?(subvP sKE) ?idKf.
 move=> _ _ /Fadjoin_polyP[p Ep ->] /Fadjoin_polyP[q Eq ->].
 rewrite -hornerM !kHomExtend_poly ?rpredM // -hornerM; congr _.[_].
 apply/polyP=> i; rewrite coef_map !coefM /= linear_sum /=.
@@ -297,17 +294,17 @@ Qed.
 
 Lemma inv_kHomf K f : kHom K {:L} f -> kHom K {:L} f^-1.
 Proof.
-move=> homKf; have [[idKf fM] kerf0] := (kHomP_tmp homKf, kAutf_lker0 homKf).
+move=> homKf; have [[idKf fM] kerf0] := (kHomP homKf, kAutf_lker0 homKf).
 have f1K: cancel f^-1%VF f by apply: lker0_lfunVK.
-apply/kHomP_tmp; split=> [x Kx | x y _ _]; apply: (lker0P kerf0).
+apply/kHomP; split=> [x Kx | x y _ _]; apply: (lker0P kerf0).
   by rewrite f1K idKf.
 by rewrite fM ?memvf ?{1}f1K.
 Qed.
 
 Lemma inv_is_ahom (f : 'AEnd(L)) : ahom_in {:L} f^-1.
 Proof.
-have /ahomP_tmp/kHom_monoid_morphism hom1f := valP f.
-exact/ahomP_tmp/kHom_monoid_morphism/inv_kHomf.
+have /ahomP/kHom_monoid_morphism hom1f := valP f.
+exact/ahomP/kHom_monoid_morphism/inv_kHomf.
 Qed.
 
 Canonical inv_ahom (f : 'AEnd(L)) : 'AEnd(L) := AHom (inv_is_ahom f).
@@ -316,7 +313,7 @@ Notation "f ^-1" := (inv_ahom f) : lrfun_scope.
 Lemma comp_kHom_img K E f g :
   kHom K (g @: E) f -> kHom K E g -> kHom K E (f \o g).
 Proof.
-move=> /kHomP_tmp[idKf fM] /kHomP_tmp[idKg gM]; apply/kHomP_tmp; split=> [x Kx | x y Ex Ey].
+move=> /kHomP[idKf fM] /kHomP[idKg gM]; apply/kHomP; split=> [x Kx | x y Ex Ey].
   by rewrite lfunE /= idKg ?idKf.
 by rewrite !lfunE /= gM // fM ?memv_img.
 Qed.
@@ -350,15 +347,15 @@ have [m DfpEz]: {m | fpEz %= \prod_(w <- mask m rs) ('X - w%:P)}.
 exists (mask m rs)`_0; rewrite (eqp_root DfpEz) root_prod_XsubC mem_nth //.
 rewrite -ltnS -(size_prod_XsubC _ id) -(eqp_size DfpEz).
 rewrite size_poly_eq -?lead_coefE ?size_minPoly // (monicP (monic_minPoly E z)).
-by have [idKf _] := kHomP_tmp homEf; rewrite idKf ?mem1v ?oner_eq0.
+by have [idKf _] := kHomP homEf; rewrite idKf ?mem1v ?oner_eq0.
 Qed.
 
 End kHom.
 
 Notation "f ^-1" := (inv_ahom f) : lrfun_scope.
 
-#[warning="-deprecated-since-mathcomp-2.5.0"]
 Arguments kHomP {F L K V f}.
+#[warning="-deprecated-since-mathcomp-2.7.0"]
 Arguments kHomP_tmp {F L K V f}.
 Arguments kAHomP {F L U V f}.
 #[warning="-deprecated-since-mathcomp-2.5.0"]
@@ -606,7 +603,7 @@ have [f homLf fxz]: exists2 f : 'End(Lz), kHom 1 imL f & f (inLz x) = z.
     by exists \1%VF; rewrite ?lfunE ?kHom1.
   exists f => //; rewrite -Df ?memv_adjoin ?(kHomExtend_val (kHom1 1 1)) //.
   by rewrite lfun1_poly.
-pose f1 := (inLz^-1 \o f \o inLz)%VF; have /kHomP_tmp[fFid fM] := homLf.
+pose f1 := (inLz^-1 \o f \o inLz)%VF; have /kHomP[fFid fM] := homLf.
 have Df1 u: inLz (f1 u) = f (inLz u).
   rewrite !comp_lfunE limg_lfunVK //= -[limg _]/(asval imL).
   have [r def_pz defLz] := splitLpz; set r1 := r.
@@ -636,7 +633,7 @@ Proof.
 move=> homKf; have{homKf} [homFf sFE] := (kHomSl (sub1v K) homKf, sub1v E).
 have [p Fp /(splittingFieldForS sFE (subvf E))splitLp] := splittingPoly.
 have [g0 homLg0 eq_fg] := kHom_extends sFE homFf Fp splitLp.
-by apply: exist (Sub g0 _) _ =>  //; apply/ahomP_tmp/kHom_monoid_morphism.
+by apply: exist (Sub g0 _) _ =>  //; apply/ahomP/kHom_monoid_morphism.
 Qed.
 
 End SplittingFieldTheory.
@@ -1081,7 +1078,7 @@ have [r /eqP splitKa] := splitting_field_normal K a.
 exists r => //; apply/allP => b; rewrite -root_prod_XsubC -splitKa => pKa_b_0.
 pose y := kHomExtend K \1 a b; have [hom1K lf1p] := (kHom1 K K, lfun1_poly).
 have homKy: kHom K <<K; a>> y by apply/kHomExtendP; rewrite ?lf1p.
-have [[g Dy] [idKy _]] := (kHom_to_AEnd homKy, kHomP_tmp homKy).
+have [[g Dy] [idKy _]] := (kHom_to_AEnd homKy, kHomP homKy).
 have <-: g a = b by rewrite -Dy ?memv_adjoin // (kHomExtend_val hom1K) ?lf1p.
 suffices /nKE <-: g \in kAEndf K by apply: memv_img.
 by rewrite inE kAutfE; apply/kAHomP=> c Kc; rewrite -Dy ?subvP_adjoin ?idKy.
@@ -1139,7 +1136,7 @@ Lemma kHom_to_gal K M E f :
   {x | x \in 'Gal(E / K) & {in M, f =1 x}}.
 Proof.
 case/andP=> /subvP sKM /subvP sME nKE KhomMf.
-have [[g Df] [idKf _]] := (kHom_to_AEnd KhomMf, kHomP_tmp KhomMf).
+have [[g Df] [idKf _]] := (kHom_to_AEnd KhomMf, kHomP KhomMf).
 suffices /kAut_to_gal[x galEx Dg]: kAut K E g.
   by exists x => //= a Ma; rewrite Df // Dg ?sME.
 have homKg: kHom K {:L} g by apply/kAHomP=> a Ka; rewrite -Df ?sKM ?idKf.
@@ -1577,7 +1574,7 @@ rewrite eqEdim limg_dim_eq ?(eqP (AEnd_lker0 _)) ?capv0 // leqnn andbT.
 apply/subvP => _ /memv_imgP[a /mem_fixedFieldP[Ea cGa] ->].
 have /kAut_to_gal[x galEx -> //]: kAut K E f.
   rewrite /kAut (forall_inP nKE) // andbT; apply/kAHomP.
-  by move: autKf; rewrite inE kAutfE => /kHomP_tmp[].
+  by move: autKf; rewrite inE kAutfE => /kHomP[].
 apply/fixedFieldP=> [|y Gy]; first exact: memv_gal.
 by rewrite -galM // conjgCV galM //= cGa // memJ_norm ?groupV ?(subsetP nGgal).
 Qed.
