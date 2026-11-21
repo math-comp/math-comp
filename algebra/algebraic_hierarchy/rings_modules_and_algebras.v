@@ -1883,20 +1883,6 @@ HB.instance Definition _ := isNmodMorphism.Build U R (a \o* f)
 
 End MulFun.
 
-Section Properties.
-
-Variables (U V : zmodType) (f : {additive U -> V}).
-
-Lemma raddfN : {morph f : x / - x}. Proof. exact: raddfN. Qed.
-Lemma raddfB : {morph f : x y / x - y}. Proof. exact: raddfB. Qed.
-
-Lemma raddf_inj : (forall x, f x = 0 -> x = 0) -> injective f.
-Proof. exact: raddf_inj. Qed.
-
-Lemma raddfMNn n : {morph f : x / x *- n}. Proof. exact: raddfMNn. Qed.
-
-End Properties.
-
 Section RingProperties.
 
 Variables (R S : ringType) (f : {additive R -> S}).
