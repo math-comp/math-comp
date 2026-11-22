@@ -64,6 +64,17 @@ Delimit Scope term_scope with T.
 
 Local Open Scope ring_scope.
 
+Reserved Notation "x %:T" (left associativity, format "x %:T").
+Reserved Notation "''X_' i" (at level 8, i at level 2, format "''X_' i").
+(* Patch for recurring Coq parser bug: Coq seg faults when a level 200 *)
+(* notation is used as a pattern.                                      *)
+Reserved Notation "''exists' ''X_' i , f"
+  (at level 199, i at level 2, right associativity,
+   format "'[hv' ''exists'  ''X_' i , '/ '  f ']'").
+Reserved Notation "''forall' ''X_' i , f"
+  (at level 199, i at level 2, right associativity,
+   format "'[hv' ''forall'  ''X_' i , '/ '  f ']'").
+
 Module Import GRing.
 
 (* FIXME: Since we should not import GRing, we should be able to remove this: *)

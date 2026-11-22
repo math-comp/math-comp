@@ -529,17 +529,6 @@ Reserved Notation "k %:A" (left associativity, format "k %:A").
 Reserved Notation "[ 'pchar' F ]" (format "[ 'pchar'  F ]").
 Reserved Notation "[ 'char' F ]" (format "[ 'char'  F ]").
 
-Reserved Notation "x %:T" (left associativity, format "x %:T").
-Reserved Notation "''X_' i" (at level 8, i at level 2, format "''X_' i").
-(* Patch for recurring Coq parser bug: Coq seg faults when a level 200 *)
-(* notation is used as a pattern.                                      *)
-Reserved Notation "''exists' ''X_' i , f"
-  (at level 199, i at level 2, right associativity,
-   format "'[hv' ''exists'  ''X_' i , '/ '  f ']'").
-Reserved Notation "''forall' ''X_' i , f"
-  (at level 199, i at level 2, right associativity,
-   format "'[hv' ''forall'  ''X_' i , '/ '  f ']'").
-
 Reserved Notation "x ^f" (left associativity, format "x ^f").
 
 Reserved Notation "\0".
