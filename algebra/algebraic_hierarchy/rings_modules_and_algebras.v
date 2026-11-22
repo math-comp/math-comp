@@ -2169,6 +2169,7 @@ Lemma nmod_morphism_semilinear (R : semiRingType)
 Proof.
 by case=> sf Df; split => //; rewrite -[0 in LHS](scale0r 0) sf Scale.op0v.
 Qed.
+#[deprecated(since="mathcomp 2.7.0", use=nmod_morphism_semilinear)]
 Definition additive_semilinear := nmod_morphism_semilinear.
 
 Lemma scalable_semilinear (R : semiRingType)
@@ -2182,7 +2183,7 @@ HB.factory Record isSemilinear (R : semiRingType) (U : lSemiModType R)
 }.
 HB.builders Context R U V s f & isSemilinear R U V s f.
 HB.instance Definition _ := isNmodMorphism.Build U V f
-  (additive_semilinear linear_subproof).
+  (nmod_morphism_semilinear linear_subproof).
 
 HB.instance Definition _ :=
   isScalable.Build R U V s f (scalable_semilinear linear_subproof).
