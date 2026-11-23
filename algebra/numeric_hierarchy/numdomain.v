@@ -155,12 +155,12 @@ HB.factory Record isNumRing R & GRing.NzRing R & POrderZmodule R
 }.
 HB.builders Context R & isNumRing R.
 
-Fact ler_wD2l (x : R) : {homo +%R x : y z / y <= z}.
+Let ler_wD2l (x : R) : {homo +%R x : y z / y <= z}.
 Proof. by move=> y z; rewrite !ler_def ![_ + z]addrC addrKA. Qed.
 
 HB.instance Definition _ := Add_isHomo.Build R ler_wD2l.
 
-Fact real_nmod_closed : nmod_closed (@Num.real R).
+Let real_nmod_closed : nmod_closed (@Num.real R).
 Proof.
 split=> [|x y Rx Ry]; first by rewrite realE lexx.
 without loss{Rx} x_ge0: x y Ry / 0 <= x.
@@ -172,7 +172,7 @@ Qed.
 HB.instance Definition _ := GRing.isAddClosed.Build R Num.real
   real_nmod_closed.
 
-Fact comparabler_trans : transitive (Num.comparable : rel R).
+Let comparabler_trans : transitive (Num.comparable : rel R).
 Proof.
 move=> y x z; rewrite !comparablerE => xBy_real yBz_real.
 by have := rpredD xBy_real yBz_real; rewrite addrA addrNK.
@@ -271,7 +271,7 @@ Qed.
 
 (* Closure properties of the real predicates. *)
 
-Fact pos_divr_closed : divr_closed (@pos R).
+Let pos_divr_closed : divr_closed (@pos R).
 Proof.
 split=> [|x y x_gt0 y_gt0]; rewrite posrE ?ltr01 //.
 have [Uy|/invr_out->] := boolP (y \is a GRing.unit); last by rewrite pmulr_rgt0.
@@ -281,7 +281,7 @@ Qed.
 HB.instance Definition _ := GRing.isDivClosed.Build R pos_num_pred
   pos_divr_closed.
 
-Fact nneg_divr_closed : divr_closed (@nneg R).
+Let nneg_divr_closed : divr_closed (@nneg R).
 Proof.
 split=> [|x y]; rewrite !nnegrE ?ler01 ?le0r // -!posrE.
 case/predU1P=> [-> _ | x_gt0]; first by rewrite mul0r eqxx.
@@ -291,7 +291,7 @@ Qed.
 HB.instance Definition _ := GRing.isDivClosed.Build R nneg_num_pred
   nneg_divr_closed.
 
-Fact real_divr_closed : divr_closed (@real R).
+Let real_divr_closed : divr_closed (@real R).
 Proof.
 split=> [|x y Rx Ry]; first by rewrite realE ler01.
 without loss{Rx} x_ge0: x / 0 <= x.

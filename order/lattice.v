@@ -1394,12 +1394,12 @@ Section MeetCompFun.
 
 Variables (f : {mlmorphism T' -> T''}) (g : {mlmorphism T -> T'}).
 
-Fact idfun_is_meet_morphism : meet_morphism (@idfun T). Proof. by []. Qed.
+Let idfun_is_meet_morphism : meet_morphism (@idfun T). Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isMeetLatticeMorphism.Build d T d T idfun
   idfun_is_meet_morphism.
 
-Fact comp_is_meet_morphism : meet_morphism (f \o g).
+Let comp_is_meet_morphism : meet_morphism (f \o g).
 Proof. by move=> x y; rewrite /= !omorphI. Qed.
 #[export]
 HB.instance Definition _ := isMeetLatticeMorphism.Build d T d'' T'' (f \o g)
@@ -1411,12 +1411,12 @@ Section JoinCompFun.
 
 Variables (f : {jlmorphism T' -> T''}) (g : {jlmorphism T -> T'}).
 
-Fact idfun_is_join_morphism : join_morphism (@idfun T). Proof. by []. Qed.
+Let idfun_is_join_morphism : join_morphism (@idfun T). Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isJoinLatticeMorphism.Build d T d T idfun
   idfun_is_join_morphism.
 
-Fact comp_is_join_morphism : join_morphism (f \o g).
+Let comp_is_join_morphism : join_morphism (f \o g).
 Proof. by move=> x y; rewrite /= !omorphU. Qed.
 #[export]
 HB.instance Definition _ := isJoinLatticeMorphism.Build d T d'' T'' (f \o g)
@@ -1450,12 +1450,12 @@ Variables (d' : disp_t) (T' : bLatticeType d').
 Variables (d'' : disp_t) (T'' : bLatticeType d'').
 Variables (f : {blmorphism T' -> T''}) (g : {blmorphism T -> T'}).
 
-Fact idfun_is_bottom_morphism : (@idfun T) \bot = \bot. Proof. by []. Qed.
+Let idfun_is_bottom_morphism : (@idfun T) \bot = \bot. Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isBLatticeMorphism.Build d T d T idfun
   idfun_is_bottom_morphism.
 
-Fact comp_is_bottom_morphism : (f \o g) \bot = \bot.
+Let comp_is_bottom_morphism : (f \o g) \bot = \bot.
 Proof. by rewrite /= !omorph0. Qed.
 #[export]
 HB.instance Definition _ := isBLatticeMorphism.Build d T d'' T'' (f \o g)
@@ -1487,12 +1487,12 @@ Variables (d' : disp_t) (T' : tLatticeType d').
 Variables (d'' : disp_t) (T'' : tLatticeType d'').
 Variables (f : {tlmorphism T' -> T''}) (g : {tlmorphism T -> T'}).
 
-Fact idfun_is_top_morphism : (@idfun T) \top = \top. Proof. by []. Qed.
+Let idfun_is_top_morphism : (@idfun T) \top = \top. Proof. by []. Qed.
 #[export]
 HB.instance Definition _ := isTLatticeMorphism.Build d T d T idfun
   idfun_is_top_morphism.
 
-Fact comp_is_top_morphism : (f \o g) \top = \top.
+Let comp_is_top_morphism : (f \o g) \top = \top.
 Proof. by rewrite /= !omorph1. Qed.
 #[export]
 HB.instance Definition _ := isTLatticeMorphism.Build d T d'' T'' (f \o g)
@@ -1652,10 +1652,10 @@ HB.factory Record POrder_Meet_isSemilattice d T & POrder d T := {
 
 HB.builders Context d T & POrder_Meet_isSemilattice d T.
 
-Fact meetxx : idempotent_op meet.
+Let meetxx : idempotent_op meet.
 Proof. by move=> x; apply/eqP; rewrite -leEmeet. Qed.
 
-Fact lexI x y z : (x <= meet y z) = (x <= y) && (x <= z).
+Let lexI x y z : (x <= meet y z) = (x <= y) && (x <= z).
 Proof.
 rewrite !leEmeet; apply/eqP/andP => [<-|[/eqP<- /eqP<-]].
   split; apply/eqP; last by rewrite meetA -meetA meetxx.
@@ -1676,10 +1676,10 @@ HB.factory Record POrder_Join_isSemilattice d T & POrder d T := {
 
 HB.builders Context d T & POrder_Join_isSemilattice d T.
 
-Fact joinxx : idempotent_op join.
+Let joinxx : idempotent_op join.
 Proof. by move=> x; apply/eqP; rewrite -leEjoin. Qed.
 
-Fact leUx x y z : (join x y <= z) = (x <= z) && (y <= z).
+Let leUx x y z : (join x y <= z) = (x <= z) && (y <= z).
 Proof.
 rewrite !leEjoin; apply/eqP/andP => [<-|[/eqP<- /eqP<-]].
   split; apply/eqP; last by rewrite joinA -joinA joinxx.
@@ -1719,7 +1719,7 @@ HB.factory Record POrder_isLattice d T & POrder d T := {
 
 HB.builders Context d T & POrder_isLattice d T.
 
-Fact leEjoin x y : (y <= x) = (join x y == x).
+Let leEjoin x y : (y <= x) = (join x y == x).
 Proof.
 rewrite leEmeet; apply/eqP/eqP => <-.
   by rewrite meetC meetKU.
@@ -1792,18 +1792,18 @@ HB.factory Record isMeetJoinDistrLattice (d : disp_t) T & Choice T := {
 
 HB.builders Context d T & isMeetJoinDistrLattice d T.
 
-Fact le_refl : reflexive le. Proof. by move=> x; rewrite le_def meetxx. Qed.
+Let le_refl : reflexive le. Proof. by move=> x; rewrite le_def meetxx. Qed.
 
-Fact le_anti : antisymmetric le.
+Let le_anti : antisymmetric le.
 Proof. by move=> x y; rewrite !le_def meetC => /andP [] /eqP {2}<- /eqP ->. Qed.
 
-Fact le_trans : transitive le.
+Let le_trans : transitive le.
 Proof.
 move=> y x z; rewrite !le_def => /eqP lexy /eqP leyz; apply/eqP.
 by rewrite -[in LHS]lexy -meetA leyz lexy.
 Qed.
 
-Fact lt_le_def x y : lt x y = (le x y) && ~~ (le y x).
+Let lt_le_def x y : lt x y = (le x y) && ~~ (le y x).
 Proof.
 rewrite lt_def andbC; case/boolP: (le x y) => //= xy.
 congr negb; apply/eqP/idP => [->|yx]; first exact/le_refl.
@@ -1833,9 +1833,9 @@ HB.builders Context disp T & IsoLattice disp T.
 Definition meet (x y : T) := f' (meet (f x) (f y)).
 Definition join (x y : T) := f' (join (f x) (f y)).
 
-Fact lexI x y z : (x <= meet y z) = (x <= y) && (x <= z).
+Let lexI x y z : (x <= meet y z) = (x <= y) && (x <= z).
 Proof. by rewrite -!f_mono f'_can lexI. Qed.
-Fact leUx x y z : (join x y <= z) = (x <= z) && (y <= z).
+Let leUx x y z : (join x y <= z) = (x <= z) && (y <= z).
 Proof. by rewrite -!f_mono f'_can leUx. Qed.
 HB.instance Definition _ := POrder_MeetJoin_isLattice.Build _ T lexI leUx.
 
@@ -1855,7 +1855,7 @@ HB.builders Context disp T & IsoDistrLattice disp T.
 
 HB.instance Definition _ := IsoLattice.Build _ T f_can f'_can f_mono.
 
-Fact meetUl : left_distributive (meet : T -> T -> T) join.
+Let meetUl : left_distributive (meet : T -> T -> T) join.
 Proof. by move=> x y z; rewrite /meet /join /= !f'_can meetUl. Qed.
 
 HB.instance Definition _ := Lattice_Meet_isDistrLattice.Build _ T meetUl.
@@ -1919,15 +1919,15 @@ Let inU v Sv : U := Sub v Sv.
 Let meetU (u1 u2 : U) : U := inU (opredI (valP u1) (valP u2)).
 Let joinU (u1 u2 : U) : U := inU (opredU (valP u1) (valP u2)).
 
-Fact lexI x y z : (x <= meetU y z) = (x <= y) && (x <= z).
+Let lexI x y z : (x <= meetU y z) = (x <= y) && (x <= z).
 Proof. by rewrite -!le_val !SubK lexI. Qed.
-Fact leUx x y z : (joinU x y <= z) = (x <= z) && (y <= z).
+Let leUx x y z : (joinU x y <= z) = (x <= z) && (y <= z).
 Proof. by rewrite -!le_val !SubK leUx. Qed.
 HB.instance Definition _ := POrder_MeetJoin_isLattice.Build d' U lexI leUx.
 
-Fact valI : meet_morphism (val : U -> T).
+Let valI : meet_morphism (val : U -> T).
 Proof. by move=> x y; rewrite !SubK. Qed.
-Fact valU : join_morphism (val : U -> T).
+Let valU : join_morphism (val : U -> T).
 Proof. by move=> x y; rewrite !SubK. Qed.
 HB.instance Definition _ := isMeetSubLattice.Build d T S d' U valI.
 HB.instance Definition _ := isJoinSubLattice.Build d T S d' U valU.
@@ -1955,10 +1955,10 @@ HB.builders Context d T S d' U & SubPOrder_isBSubLattice d T S d' U.
 Let inU v Sv : U := Sub v Sv.
 Let zeroU : U := inU opred0_subproof.
 
-Fact le0x x : zeroU <= x. Proof. by rewrite -le_val /= SubK le0x. Qed.
+Let le0x x : zeroU <= x. Proof. by rewrite -le_val /= SubK le0x. Qed.
 HB.instance Definition _ := hasBottom.Build d' U le0x.
 
-Fact val0 : (val : U -> T) \bot = \bot. Proof. by rewrite SubK. Qed.
+Let val0 : (val : U -> T) \bot = \bot. Proof. by rewrite SubK. Qed.
 #[warning="-HB.no-new-instance"]
 HB.instance Definition _ := isBSubLattice.Build d T S d' U val0.
 HB.end.
@@ -1987,10 +1987,10 @@ HB.builders Context d T S d' U & SubPOrder_isTSubLattice d T S d' U.
 Let inU v Sv : U := Sub v Sv.
 Let oneU : U := inU opred1_subproof.
 
-Fact lex1 x : x <= oneU. Proof. by rewrite -le_val /= SubK lex1. Qed.
+Let lex1 x : x <= oneU. Proof. by rewrite -le_val /= SubK lex1. Qed.
 HB.instance Definition _ := hasTop.Build d' U lex1.
 
-Fact val1 : (val : U -> T) \top = \top. Proof. by rewrite SubK. Qed.
+Let val1 : (val : U -> T) \top = \top. Proof. by rewrite SubK. Qed.
 #[warning="-HB.no-new-instance"]
 HB.instance Definition _ := isTSubLattice.Build d T S d' U val1.
 HB.end.

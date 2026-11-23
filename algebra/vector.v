@@ -227,11 +227,11 @@ Section Iso.
 Variables (R : nzSemiRingType) (vT rT : semiVectType R).
 Local Coercion dim : semiVectType >-> nat.
 
-Fact v2r_subproof : SemiVector.axiom vT vT. Proof. exact: vector_subdef. Qed.
+Let v2r_subproof : SemiVector.axiom vT vT. Proof. exact: vector_subdef. Qed.
 Definition v2r := v2r v2r_subproof.
 
 Let v2r_bij : bijective v2r := v2r_bijective v2r_subproof.
-Fact r2v_subproof : {r2v | cancel r2v v2r}.
+Let r2v_subproof : {r2v | cancel r2v v2r}.
 Proof.
 have r2vP r: {v | v2r v = r}.
   by apply: sig_eqW; have [v _ vK] := v2r_bij; exists (v r).
@@ -262,7 +262,7 @@ Definition vs2mx (U : @space K vT) := let: Space mx _ := U in mx.
 Lemma gen_vs2mx (U : {vspace vT}) : <<vs2mx U>>%MS = vs2mx U.
 Proof. by apply/eqP; rewrite /vs2mx; case: U. Qed.
 
-Fact mx2vs_subproof m (A : 'M[K]_(m, vT)) : <<(<<A>>)>>%MS == <<A>>%MS.
+Let mx2vs_subproof m (A : 'M[K]_(m, vT)) : <<(<<A>>)>>%MS == <<A>>%MS.
 Proof. by rewrite genmx_id. Qed.
 Definition mx2vs {m} A : {vspace vT} := Space (@mx2vs_subproof m A).
 
@@ -455,7 +455,7 @@ apply: (iffP idP) => [|[k ->]]; rewrite memvK genmxE ?linearZ ?scalemx_sub //.
 by case/sub_rVP=> k; rewrite -linearZ => /v2r_inj->; exists k.
 Qed.
 
-Fact memv_submod_closed U : submod_closed U.
+Let memv_submod_closed U : submod_closed U.
 Proof.
 split=> [|a u v]; rewrite !memvK 1?linear0 1?sub0mx // => Uu Uv.
 by rewrite linearP addmx_sub ?scalemx_sub.
@@ -818,7 +818,7 @@ Canonical proper_addv (S : proper_addv_expr) :=
 
 Section Binary.
 Variables S1 S2 : addv_expr.
-Fact binary_addv_subproof :
+Let binary_addv_subproof :
   mxsum_spec (vs2mx (unwrap S1 + unwrap S2))
              (unwrap (addv_dim S1) + unwrap (addv_dim S2)).
 Proof. by rewrite vs2mxD; apply: proper_mxsumP. Qed.
@@ -827,7 +827,7 @@ End Binary.
 
 Section Nary.
 Variables (I : Type) (r : seq I) (P : pred I) (S_ : I -> addv_expr).
-Fact nary_addv_subproof :
+Let nary_addv_subproof :
   mxsum_spec (vs2mx (\sum_(i <- r | P i) unwrap (S_ i)))
              (\sum_(i <- r | P i) unwrap (addv_dim (S_ i))).
 Proof. by rewrite vs2mx_sum; apply: proper_mxsumP. Qed.
@@ -1001,7 +1001,7 @@ Definition coord_expanded_def n (X : n.-tuple vT) i v :=
 Definition coord := locked_with span_key coord_expanded_def.
 Canonical coord_unlockable := [unlockable fun coord].
 
-Fact coord_is_scalar n (X : n.-tuple vT) i : scalar (coord X i).
+Let coord_is_scalar n (X : n.-tuple vT) i : scalar (coord X i).
 Proof. by move=> k u v; rewrite unlock linearP mulmxDl -scalemxAl !mxE. Qed.
 HB.instance Definition _ n Xn i :=
   GRing.isSemilinear.Build K vT K _ (coord Xn i)
@@ -1332,7 +1332,7 @@ Implicit Types f g h : 'Hom(aT, rT).
 
 HB.instance Definition _ := [Choice of 'Hom(aT, rT) by <:].
 
-Fact lfun_is_semilinear f : semilinear f.
+Let lfun_is_semilinear f : semilinear f.
 Proof. by rewrite unlock; apply: semilinearP. Qed.
 HB.instance Definition _ (f : hom aT rT) := GRing.isSemilinear.Build R aT rT _ f
   (lfun_is_semilinear f).
@@ -1355,13 +1355,13 @@ Qed.
 Definition zero_lfun : 'Hom(aT, rT) := linfun \0.
 Definition add_lfun f g := linfun (f \+ g).
 
-Fact lfun_addA : associative add_lfun.
+Let lfun_addA : associative add_lfun.
 Proof. by move=> f g h; apply/lfunP=> v; rewrite !lfunE /= !lfunE addrA. Qed.
 
-Fact lfun_addC : commutative add_lfun.
+Let lfun_addC : commutative add_lfun.
 Proof. by move=> f g; apply/lfunP=> v; rewrite !lfunE /= addrC. Qed.
 
-Fact lfun_add0 : left_id zero_lfun add_lfun.
+Let lfun_add0 : left_id zero_lfun add_lfun.
 Proof. by move=> f; apply/lfunP=> v; rewrite lfunE /= lfunE add0r. Qed.
 
 HB.instance Definition _ := GRing.isNmodule.Build 'Hom(aT, rT)
@@ -1404,19 +1404,19 @@ Implicit Types f : 'Hom(aT, rT).
 Definition scale_lfun k f := linfun (k \*: f).
 Local Infix "*:l" := scale_lfun (at level 40).
 
-Fact lfun_scaleA k1 k2 f : k1 *:l (k2 *:l f) = (k1 * k2) *:l f.
+Let lfun_scaleA k1 k2 f : k1 *:l (k2 *:l f) = (k1 * k2) *:l f.
 Proof. by apply/lfunP=> v; rewrite !lfunE /= lfunE scalerA. Qed.
 
-Fact lfun_scale0 f : 0 *:l f = 0.
+Let lfun_scale0 f : 0 *:l f = 0.
 Proof. by apply/lfunP=> v; rewrite !lfunE /= scale0r. Qed.
 
-Fact lfun_scale1 f : 1 *:l f = f.
+Let lfun_scale1 f : 1 *:l f = f.
 Proof. by apply/lfunP=> v; rewrite lfunE /= scale1r. Qed.
 
-Fact lfun_scaleDr k f1 f2 : k *:l (f1 + f2) = k *:l f1 + k *:l f2.
+Let lfun_scaleDr k f1 f2 : k *:l (f1 + f2) = k *:l f1 + k *:l f2.
 Proof. by apply/lfunP=> v; rewrite !lfunE /= !lfunE scalerDr. Qed.
 
-Fact lfun_scaleDl f k1 k2 : (k1 + k2) *:l f = k1 *:l f + k2 *:l f.
+Let lfun_scaleDl f k1 k2 : (k1 + k2) *:l f = k1 *:l f + k2 *:l f.
 Proof. by apply/lfunP=> v; rewrite !lfunE /= !lfunE scalerDl. Qed.
 
 HB.instance Definition _ := GRing.Nmodule_isLSemiModule.Build _ 'Hom(aT, rT)
@@ -1424,7 +1424,7 @@ HB.instance Definition _ := GRing.Nmodule_isLSemiModule.Build _ 'Hom(aT, rT)
 
 Lemma scale_lfunE k f x : (k *: f) x = k *: f x. Proof. exact: lfunE. Qed.
 
-Fact lfun_vect_iso : SemiVector.axiom (dim aT * dim rT) 'Hom(aT, rT).
+Let lfun_vect_iso : SemiVector.axiom (dim aT * dim rT) 'Hom(aT, rT).
 Proof.
 exists (mxvec \o f2mx).
   by split => [a f|f g]; rewrite -semilinearP/=;
@@ -1817,7 +1817,7 @@ Section LfunNzSemiAlgebra.
 
 Variables (R : comNzSemiRingType) (vT : nzSemiVectType R).
 
-Fact lfun1_neq0 : \1%VF != 0 :> 'End(vT).
+Let lfun1_neq0 : \1%VF != 0 :> 'End(vT).
 Proof.
 apply/eqP=> /lfunP/(_ (r2v (const_mx 1))); rewrite !lfunE /= => /(canRL r2vK).
 by move=> /rowP/(_ (Ordinal dim_gt0))/eqP; rewrite linear0 !mxE oner_eq0.
@@ -2023,7 +2023,7 @@ Proof. by move=> k w1 w2; apply: val_inj; rewrite unlock /= linearP. Qed.
 HB.instance Definition _ := GRing.isSemilinear.Build K vT subvs_of _ vsproj
   (GRing.semilinear_linear vsproj_is_linear).
 
-Fact subvs_vect_iso : Vector.axiom (\dim U) subvs_of.
+Let subvs_vect_iso : Vector.axiom (\dim U) subvs_of.
 Proof.
 exists (fun w => \row_i coord (vbasis U) i (vsval w)).
   by move=> k w1 w2; apply/rowP=> i; rewrite !mxE linearP.
@@ -2051,7 +2051,7 @@ Variables (R : nzSemiRingType) (m n : nat).
 
 (* The apparently useless => /= in line 1 of the proof performs some evar     *)
 (* expansions that the Ltac interpretation of exists is incapable of doing.   *)
-Fact matrix_vect_iso : SemiVector.axiom (m * n) 'M[R]_(m, n).
+Let matrix_vect_iso : SemiVector.axiom (m * n) 'M[R]_(m, n).
 Proof.
 exists mxvec; first exact: semilinearP.
 by exists vec_mx; [apply: mxvecK | apply: vec_mxK].
@@ -2073,7 +2073,7 @@ Section RegularVectType.
 
 Variable R : nzSemiRingType.
 
-Fact regular_vect_iso : SemiVector.axiom 1 R^o.
+Let regular_vect_iso : SemiVector.axiom 1 R^o.
 Proof.
 exists (fun a => a%:M).
   by split => [a b|c d]; rewrite 1?rmorphD 1?scale_scalar_mx.
@@ -2093,7 +2093,7 @@ Section ProdVector.
 
 Variables (R : nzSemiRingType) (vT1 vT2 : semiVectType R).
 
-Fact pair_vect_iso : SemiVector.axiom (dim vT1 + dim vT2) (vT1 * vT2).
+Let pair_vect_iso : SemiVector.axiom (dim vT1 + dim vT2) (vT1 * vT2).
 Proof.
 pose p2r (u : vT1 * vT2) := row_mx (v2r u.1) (v2r u.2).
 pose r2p w := (r2v (lsubmx w) : vT1, r2v (rsubmx w) : vT2).
@@ -2120,7 +2120,7 @@ Section FunVectType.
 Variable (I : finType) (R : nzSemiRingType) (vT : semiVectType R).
 
 (* Type unification with exist is again a problem in this proof. *)
-Fact ffun_vect_iso : SemiVector.axiom (#|I| * dim vT) {ffun I -> vT}.
+Let ffun_vect_iso : SemiVector.axiom (#|I| * dim vT) {ffun I -> vT}.
 Proof.
 pose fr (f : {ffun I -> vT}) := mxvec (\matrix_(i < #|I|) v2r (f (enum_val i))).
 exists fr.

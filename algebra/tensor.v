@@ -349,14 +349,14 @@ Proof.
 by split=> [?|->//]; apply/val_inj/matrixP=> i j; rewrite !ord_prod_nil.
 Qed.
 
-Fact tensor_nil_is_nmod_morphism {U : nmodType} : nmod_morphism (@tensor_nil U).
+Let tensor_nil_is_nmod_morphism {U : nmodType} : nmod_morphism (@tensor_nil U).
 Proof. by split=> [|? ?]; rewrite /tensor_nil mxE. Qed.
 
 HB.instance Definition _ {U : nmodType} :=
   GRing.isNmodMorphism.Build 'sT[U] U (@tensor_nil U)
     tensor_nil_is_nmod_morphism.
 
-Fact tensor_nil_is_monoid_morphism {R : semiRingType} :
+Let tensor_nil_is_monoid_morphism {R : semiRingType} :
   monoid_morphism (@tensor_nil R).
 Proof. by split=> [|? ?]; rewrite /tensor_nil mxE. Qed.
 
@@ -380,7 +380,7 @@ End NilTensorTheory.
 Section ConstTensorTheory.
 Context {l k : nat} (u_ : {posnum nat} ^ k) (d_ : {posnum nat} ^ l).
 
-Fact const_t_is_nmod_morphism {U : nmodType} :
+Let const_t_is_nmod_morphism {U : nmodType} :
   nmod_morphism (@const_t U _ _ u_ d_).
 Proof. by split=> [|? ?]; apply/val_inj/matrixP=> i j; rewrite !mxE. Qed.
 
@@ -388,7 +388,7 @@ HB.instance Definition _ {U : nmodType} :=
   GRing.isNmodMorphism.Build U 'T[U]_(u_, d_) (@const_t U _ _ u_ d_)
     const_t_is_nmod_morphism.
 
-Fact const_t_is_monoid_morphism {R : semiRingType} :
+Let const_t_is_monoid_morphism {R : semiRingType} :
   monoid_morphism (@const_t R _ _ u_ d_).
 Proof. by split=> [|? ?]; apply/val_inj/matrixP=> i j; rewrite !mxE. Qed.
 
