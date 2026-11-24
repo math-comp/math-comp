@@ -66,16 +66,20 @@ From mathcomp Require Import rings_modules_and_algebras.
 (*                                                                            *)
 (*   divClosed R == predicate closed under division                           *)
 (*                  The HB class is called DivClosed.                         *)
+(* divsemiringClosed R == predicate closed under unitSemiRingType operations  *)
+(*                  The HB class is called DivsemiringClosed.                 *)
 (*  sdivClosed R == predicate closed under division and opposite              *)
 (*                  The HB class is called SdivClosed.                        *)
 (* divringClosed R == predicate closed under unitRingType operations          *)
 (*                  The HB class is called DivringClosed.                     *)
+(* divsemialgClosed R S == predicate closed under unitSemiAlgType operations  *)
+(*                  The HB class is called DivsemialgClosed.                  *)
 (* divalgClosed R S == predicate closed under unitAlgType operations          *)
 (*                  The HB class is called DivalgClosed.                      *)
 (*                                                                            *)
 (* Canonical properties of the algebraic structures:                          *)
 (*                                                                            *)
-(*  * UnitRing (NzRings whose units have computable inverses):                *)
+(*  * UnitSemiRing (NzSemiRings whose units have computable inverses):        *)
 (*     x \is a GRing.unit <=> x is a unit (i.e., has an inverse)              *)
 (*                   x^-1 == the ring inverse of x, if x is a unit, else x    *)
 (*                  x / y == x divided by y (notation for x * y^-1)           *)
@@ -83,40 +87,68 @@ From mathcomp Require Import rings_modules_and_algebras.
 (*         invr_closed S <-> collective predicate S is closed under inverse   *)
 (*         divr_closed S <-> collective predicate S is closed under division  *)
 (*                           (1 and x / y in S)                               *)
+(*  divsemiring_closed S <-> collective predicate S is closed under division  *)
+(*                           and addition, and contains zero                  *)
+(* [SubNzSemiRing_isSubUnitSemiRing of R by <:] == unitSemiRingType mixin for *)
+(*                           a subType whose base type is a unitSemiRingType  *)
+(*                           and whose predicate's is a divsemiringClosed and *)
+(*                           whose semiring structure is compatible with the  *)
+(*                           base type's                                      *)
+(* [SubChoice_isSubUnitSemiRing of R by <:] == unitSemiRingType mixin for a   *)
+(*                           a subType whose base type is a unitSemiRingType  *)
+(*                           and whose predicate is a divsemiringClosed       *)
+(*                                                                            *)
+(*  * UnitRing (NzRings whose units have computable inverses):                *)
 (*        sdivr_closed S <-> collective predicate S is closed under division  *)
 (*                           and opposite (-1 and x / y in S, for x, y in S)  *)
 (*      divring_closed S <-> collective predicate S is closed under unitRing  *)
 (*                           operations (1, x - y and x / y in S)             *)
-(* [SubNzRing_isSubUnitRing of R by <:] ==                                    *)
 (* [SubChoice_isSubUnitRing of R by <:] == unitRingType mixin for a subType   *)
 (*                           whose base type is a unitRingType and whose      *)
-(*                           predicate's is a divringClosed and whose ring    *)
-(*                           structure is compatible with the base type's     *)
+(*                           predicate's is a divringClosed                   *)
+(*                                                                            *)
+(*  * ComUnitSemiRing (commutative semirings with computable inverses):       *)
+(* [SubChoice_isSubComUnitSemiRing of R by <:] == comUnitSemiRingType mixin   *)
+(*                           for a subType whose base type is a               *)
+(*                           comUnitSemiRingType and whose predicate's is a   *)
+(*                           divsemiringClosed                                *)
 (*                                                                            *)
 (*  * ComUnitRing (commutative rings with computable inverses):               *)
 (* [SubChoice_isSubComUnitRing of R by <:] == comUnitRingType mixin for a     *)
 (*                           subType whose base type is a comUnitRingType and *)
-(*                           whose predicate's is a divringClosed and whose   *)
-(*                           ring structure is compatible with the base       *)
-(*                           type's                                           *)
+(*                           whose predicate's is a divringClosed             *)
+(*                                                                            *)
+(*  * SemiIntegralDomain                                                      *)
+(*    (integral, commutative, semiring with partial inverses):                *)
+(* [SubComUnitSemiRing_isSubSemiIntegralDomain R by <:] ==                    *)
+(* [SubChoice_isSubSemiIntegralDomain R by <:] == mixin axiom for a           *)
+(*                           semi-integral domain subType                     *)
 (*                                                                            *)
 (*  * IntegralDomain (integral, commutative, ring with partial inverses):     *)
-(* [SubComUnitRing_isSubIntegralDomain R by <:] ==                            *)
-(* [SubChoice_isSubIntegralDomain R by <:] == mixin axiom for a idomain       *)
-(*                           subType                                          *)
+(* [SubChoice_isSubIntegralDomain R by <:] == mixin axiom for an integral     *)
+(*                           domain subType                                   *)
 (*                                                                            *)
-(*  * Field (commutative fields):                                             *)
+(*  * SemiField (commutative semifields):                                     *)
 (*  GRing.Field.axiom inv == field axiom: x != 0 -> inv x * x = 1 for all x   *)
 (*                           This is equivalent to the property above, but    *)
 (*                           does not require a unitRingType as inv is an     *)
 (*                           explicit argument.                               *)
+(* [SubSemiIntegralDomain_isSubSemiField of R by <:] == mixin axiom for a     *)
+(*                           semifield subType                                *)
+(*                                                                            *)
+(*  * Field (commutative fields):                                             *)
 (* [SubIntegralDomain_isSubField of R by <:] == mixin axiom for a field       *)
 (*                           subType                                          *)
+(*                                                                            *)
+(*  * UnitSemiAlgebra (semialgebra with computable inverses):                 *)
+(*    divsemialg_closed S <-> collective predicate S is closed under all      *)
+(*                           unitSemiAlgType operations (0, 1, a *: u, u + v  *)
+(*                           and u / v are in S for u, v in S)                *)
 (*                                                                            *)
 (*  * UnitAlgebra (algebra with computable inverses):                         *)
 (*        divalg_closed S <-> collective predicate S is closed under all      *)
 (*                           unitAlgType operations (1, a *: u + v and u / v  *)
-(*                           are in S fo u, v in S)                           *)
+(*                           are in S for u, v in S)                          *)
 (*                                                                            *)
 (* See algebra.v for general remarks about the module layout, the notation    *)
 (* scopes, and the naming convention for lemmas.                              *)
@@ -558,6 +590,7 @@ Variables (R : unitSemiRingType) (S : {pred R}).
 Definition invr_closed := {in S, forall x, x^-1 \in S}.
 Definition divr_2closed := {in S &, forall x y, x / y \in S}.
 Definition divr_closed := 1 \in S /\ divr_2closed.
+Definition divsemiring_closed := nmod_closed S /\ divr_closed.
 
 Lemma divr_closedV : divr_closed -> invr_closed.
 Proof. by case=> S1 Sdiv x Sx; rewrite -[x^-1]mul1r Sdiv. Qed.
@@ -565,6 +598,14 @@ Proof. by case=> S1 Sdiv x Sx; rewrite -[x^-1]mul1r Sdiv. Qed.
 Lemma divr_closedM : divr_closed -> mulr_closed S.
 Proof.
 by case=> S1 Sdiv; split=> // x y Sx Sy; rewrite -[y]invrK -[y^-1]mul1r !Sdiv.
+Qed.
+
+Lemma divsemiring_closed_div : divsemiring_closed -> divr_closed.
+Proof. by case. Qed.
+
+Lemma divsemiring_closedM : divsemiring_closed -> semiring_closed S.
+Proof.
+by case => ? ?; split => //; exact/divr_closedM/divsemiring_closed_div.
 Qed.
 
 End UnitSemiRingClosedPredicates.
@@ -635,6 +676,12 @@ Lemma divring_closed_div : divring_closed -> sdivr_closed.
 Proof.
 case=> S1 SB Sdiv; split; rewrite ?zmod_closedN //.
 exact/subring_closedB/divring_closedBM.
+Qed.
+
+Lemma divring_closed_semi : divring_closed -> divsemiring_closed S.
+Proof.
+move=> Sdiv; split; first exact/divring_closedBM.
+exact/sdivr_closed_div/divring_closed_div.
 Qed.
 
 End UnitRingClosedPredicates.
@@ -722,6 +769,23 @@ apply: (mulIr Ukx).
 by rewrite mulVr // -scalerAl -scalerAr scalerA !mulVr // scale1r.
 Qed.
 
+Section ClosedPredicates.
+
+Variables S : {pred A}.
+
+Definition divsemialg_closed :=
+  [/\ 1 \in S, subsemimod_closed S & divr_2closed S].
+
+Lemma divsemialg_closedDdiv : divsemialg_closed -> divsemiring_closed S.
+Proof. by case=> ? []. Qed.
+
+Lemma divsemialg_closedZ : divsemialg_closed -> subsemialg_closed S.
+Proof.
+by case=> S1 [SD SZ] Sdiv; split=> //; have [] := divr_closedM (conj S1 Sdiv).
+Qed.
+
+End ClosedPredicates.
+
 End UnitSemiAlgebraTheory.
 
 Section UnitAlgebraTheory.
@@ -740,29 +804,12 @@ Proof. by case=> S1 /linear_closedB. Qed.
 Lemma divalg_closedZ : divalg_closed -> subalg_closed S.
 Proof. by case=> S1 Slin Sdiv; split=> //; have [] := @divr_closedM A S. Qed.
 
+Lemma divalg_closed_semi : divalg_closed -> divsemialg_closed S.
+Proof. by case=> S1 Slin Sdiv; split => //; apply/divalg_closedZ. Qed.
+
 End ClosedPredicates.
 
 End UnitAlgebraTheory.
-
-Module ClosedExports.
-
-Notation invr_closed := invr_closed.
-Notation divr_2closed := divr_2closed.
-Notation divr_closed := divr_closed.
-Notation sdivr_closed := sdivr_closed.
-Notation divring_closed := divring_closed.
-Notation divalg_closed := divalg_closed.
-
-Coercion divr_closedV : divr_closed >-> invr_closed.
-Coercion divr_closedM : divr_closed >-> mulr_closed.
-Coercion sdivr_closed_div : sdivr_closed >-> divr_closed.
-Coercion sdivr_closedM : sdivr_closed >-> smulr_closed.
-Coercion divring_closedBM : divring_closed >-> subring_closed.
-Coercion divring_closed_div : divring_closed >-> sdivr_closed.
-Coercion divalg_closedBdiv : divalg_closed >-> divring_closed.
-Coercion divalg_closedZ : divalg_closed >-> subalg_closed.
-
-End ClosedExports.
 
 Section SemiIntegralDomainTheory.
 
@@ -1105,6 +1152,10 @@ HB.mixin Record isInvClosed (R : unitSemiRingType) (S : {pred R}) := {
 HB.structure Definition DivClosed (R : unitSemiRingType) :=
   {S of MulClosed R S & isInvClosed R S}.
 
+#[short(type="divsemiringClosed")]
+HB.structure Definition DivsemiringClosed (R : unitSemiRingType) :=
+  {S of SemiringClosed R S & isInvClosed R S}.
+
 #[short(type="sdivClosed")]
 HB.structure Definition SdivClosed (R : unitRingType) :=
   {S of SmulClosed R S & isInvClosed R S}.
@@ -1112,6 +1163,11 @@ HB.structure Definition SdivClosed (R : unitRingType) :=
 #[short(type="divringClosed")]
 HB.structure Definition DivringClosed (R : unitRingType) :=
   {S of SubringClosed R S & isInvClosed R S}.
+
+#[short(type="divsemialgClosed")]
+HB.structure Definition DivsemialgClosed
+    (R : nzSemiRingType) (A : unitSemiAlgType R) :=
+  {S of DivsemiringClosed A S & isScaleClosed R A S}.
 
 #[short(type="divalgClosed")]
 HB.structure Definition DivalgClosed (R : nzRingType) (A : unitAlgType R) :=
@@ -1128,6 +1184,18 @@ HB.instance Definition _ := isMulClosed.Build R S
   (divr_closedM divr_closed_subproof).
 HB.instance Definition _ := isInvClosed.Build R S
   (divr_closedV divr_closed_subproof).
+HB.end.
+
+HB.factory Record isDivsemiringClosed
+    (R : unitSemiRingType) (S : R -> bool) := {
+  divsemiring_closed_subproof : divsemiring_closed S
+}.
+
+HB.builders Context R S & isDivsemiringClosed R S.
+HB.instance Definition _ := isSemiringClosed.Build R S
+  (divsemiring_closedM divsemiring_closed_subproof).
+HB.instance Definition _ := isInvClosed.Build R S
+  (divr_closedV (divsemiring_closed_div divsemiring_closed_subproof)).
 HB.end.
 
 HB.factory Record isSdivClosed (R : unitRingType) (S : R -> bool) := {
@@ -1150,6 +1218,18 @@ HB.instance Definition _ := isSubringClosed.Build R S
   (divring_closedBM divring_closed_subproof).
 HB.instance Definition _ := isSdivClosed.Build R S
   (divring_closed_div divring_closed_subproof).
+HB.end.
+
+HB.factory Record isDivsemialgClosed
+    (R : unitSemiRingType) (A : unitSemiAlgType R) (S : A -> bool) := {
+  divsemialg_closed_subproof : divsemialg_closed S
+}.
+
+HB.builders Context R A S & isDivsemialgClosed R A S.
+HB.instance Definition _ := isDivsemiringClosed.Build A S
+  (divsemialg_closedDdiv divsemialg_closed_subproof).
+HB.instance Definition _ := isSubSemiAlgClosed.Build R A S
+  (divsemialg_closedZ divsemialg_closed_subproof).
 HB.end.
 
 HB.factory Record isDivalgClosed (R : unitRingType) (A : unitAlgType R)
@@ -1202,6 +1282,11 @@ Lemma rpred_divl x y : x \in S -> x \is a unit -> (x / y \in S) = (y \in S).
 Proof. by rewrite -(rpredV y); apply: rpredMl. Qed.
 
 End Div.
+
+Lemma divsemiringClosedP (divS : divsemiringClosed R) : divsemiring_closed divS.
+Proof.
+by split; [exact: rpred0D | split; [ exact: rpred1 | exact: rpred_div ]].
+Qed.
 
 End UnitSemiRingPred.
 
@@ -1287,7 +1372,7 @@ End SemiFieldPred.
 (*************)
 
 (* TODO_HB: fix the name (was ComUnitRingMixin) *)
-HB.factory Record ComNzRing_hasMulInverse R & ComNzRing R := {
+HB.factory Record ComNzSemiRing_hasMulInverse R & ComNzSemiRing R := {
   unit : {pred R};
   inv : R -> R;
   mulVx : {in unit, left_inverse 1 inv *%R};
@@ -1295,7 +1380,15 @@ HB.factory Record ComNzRing_hasMulInverse R & ComNzRing R := {
   invr_out : {in [predC unit], inv =1 id}
 }.
 
-HB.builders Context R & ComNzRing_hasMulInverse R.
+#[deprecated(since="mathcomp 2.7.0", use=ComNzSemiRing_hasMulInverse)]
+Notation ComNzRing_hasMulInverse R :=
+  (ComNzSemiRing_hasMulInverse R) (only parsing).
+Module ComNzRing_hasMulInverse.
+#[deprecated(since="mathcomp 2.7.0", use=ComNzSemiRing_hasMulInverse.Build)]
+Notation Build R := (ComNzSemiRing_hasMulInverse.Build R) (only parsing).
+End ComNzRing_hasMulInverse.
+
+HB.builders Context R & ComNzSemiRing_hasMulInverse R.
 
 Fact mulC_mulrV : {in unit, right_inverse 1 inv *%R}.
 Proof. by move=> x Ux /=; rewrite mulrC mulVx. Qed.
@@ -1308,22 +1401,37 @@ HB.instance Definition _ :=
 
 HB.end.
 
-HB.factory Record ComUnitRing_isField R & ComUnitRing R := {
+HB.factory Record ComUnitSemiRing_isSemiField R & ComUnitSemiRing R := {
   fieldP : Field.axiom R;
 }.
-HB.builders Context R & ComUnitRing_isField R.
+
+#[deprecated(since="mathcomp 2.7.0", use=ComUnitSemiRing_isSemiField)]
+Notation ComUnitRing_isField R := (ComUnitSemiRing_isSemiField R) (only parsing).
+Module ComUnitRing_isField.
+#[deprecated(since="mathcomp 2.7.0", use=ComUnitSemiRing_isSemiField.Build)]
+Notation Build R := (ComUnitSemiRing_isSemiField.Build R) (only parsing).
+End ComUnitRing_isField.
+
+HB.builders Context R & ComUnitSemiRing_isSemiField R.
 HB.instance Definition _ :=
   ComUnitSemiRing_isIntegral.Build R (IdomainMixin fieldP).
 HB.instance Definition _ := UnitSemiRing_isSemiField.Build R fieldP.
 HB.end.
 
-HB.factory Record ComNzRing_isField R & ComNzRing R := {
+HB.factory Record ComNzSemiRing_isSemiField R & ComNzRing R := {
   inv : R -> R;
   mulVf : forall x, x != 0 -> inv x * x = 1;
   invr0 : inv 0 = 0;
 }.
 
-HB.builders Context R & ComNzRing_isField R.
+#[deprecated(since="mathcomp 2.7.0", use=ComNzSemiRing_isSemiField)]
+Notation ComNzRing_isField R := (ComNzSemiRing_isSemiField R) (only parsing).
+Module ComNzRing_isField.
+#[deprecated(since="mathcomp 2.7.0", use=ComNzSemiRing_isSemiField.Build)]
+Notation Build R := (ComNzSemiRing_isSemiField.Build R) (only parsing).
+End ComNzRing_isField.
+
+HB.builders Context R & ComNzSemiRing_isSemiField R.
 
 Fact intro_unit (x y : R) : y * x = 1 -> x != 0.
 Proof.
@@ -1334,22 +1442,23 @@ Qed.
 Fact inv_out : {in predC (predC1 0), inv =1 id}.
 Proof. by move=> x /negbNE/eqP->; exact: invr0. Qed.
 
-HB.instance Definition _ : ComNzRing_hasMulInverse R :=
-  ComNzRing_hasMulInverse.Build R mulVf intro_unit inv_out.
+HB.instance Definition _ :=
+  ComNzSemiRing_hasMulInverse.Build R mulVf intro_unit inv_out.
 
-HB.instance Definition _ : ComUnitRing_isField R :=
-  ComUnitRing_isField.Build R (fun x x_neq_0 => x_neq_0).
+HB.instance Definition _ :=
+  ComUnitSemiRing_isSemiField.Build R (fun x x_neq_0 => x_neq_0).
 
 HB.end.
 
-HB.factory Record SubNzRing_isSubUnitRing (R : unitRingType) S U
-    & SubNzRing R S U := {
-  divring_closed_subproof : divring_closed S
+HB.factory Record SubNzSemiRing_isSubUnitSemiRing (R : unitSemiRingType) S U
+    & SubNzSemiRing R S U := {
+  divsemiring_closed_subproof : divsemiring_closed S
 }.
 
-HB.builders Context R S U & SubNzRing_isSubUnitRing R S U.
+HB.builders Context R S U & SubNzSemiRing_isSubUnitSemiRing R S U.
 
-HB.instance Definition _ := isDivringClosed.Build R S divring_closed_subproof.
+HB.instance Definition _ :=
+  isDivsemiringClosed.Build R S divsemiring_closed_subproof.
 
 Let inU v Sv : U := Sub v Sv.
 Let invU (u : U) := inU (rpredVr _ (valP u)).
@@ -1375,29 +1484,28 @@ HB.instance Definition _ := NzSemiRing_hasMulInverse.Build U
   mulVr divrr unitrP invr_out.
 HB.end.
 
-HB.factory Record SubComUnitRing_isSubIntegralDomain (R : idomainType) S U
-  & SubComUnitRing R S U := {}.
-
-HB.builders Context R S U & SubComUnitRing_isSubIntegralDomain R S U.
-Lemma id : IntegralDomain.axiom U.
-Proof.
-move=> x y /(congr1 val)/eqP; rewrite rmorphM /=.
-by rewrite -!(inj_eq val_inj) rmorph0 -mulf_eq0.
-Qed.
-HB.instance Definition _ := ComUnitSemiRing_isIntegral.Build U id.
-HB.end.
-
-HB.factory Record SubIntegralDomain_isSubField (F : fieldType) S U
-    & SubIntegralDomain F S U := {
-  subfield_subproof : {mono (val : U -> F) : u / u \in unit}
+HB.factory Record SubChoice_isSubUnitSemiRing (R : unitSemiRingType) S U
+    & SubChoice R S U := {
+  divsemiring_closed_subproof : divsemiring_closed S
 }.
 
-HB.builders Context F S U & SubIntegralDomain_isSubField F S U.
-Lemma fieldP : Field.axiom U.
-Proof.
-by move=> u; rewrite -(inj_eq val_inj) rmorph0 -unitfE subfield_subproof.
-Qed.
-HB.instance Definition _ := UnitSemiRing_isSemiField.Build U fieldP.
+HB.builders Context R S U & SubChoice_isSubUnitSemiRing R S U.
+HB.instance Definition _ := SubChoice_isSubNzSemiRing.Build R S U
+  (divsemiring_closedM divsemiring_closed_subproof).
+HB.instance Definition _ := SubNzSemiRing_isSubUnitSemiRing.Build R S U
+  divsemiring_closed_subproof.
+HB.end.
+
+(* Deprecated since MathComp 2.7 *)
+HB.factory Record SubNzRing_isSubUnitRing (R : unitRingType) S U
+    & SubNzRing R S U := {
+  divring_closed_subproof : divring_closed S
+}.
+
+HB.builders Context R S U & SubNzRing_isSubUnitRing R S U.
+HB.instance Definition _ :=
+  SubNzSemiRing_isSubUnitSemiRing.Build R S U
+    (divring_closed_semi divring_closed_subproof).
 HB.end.
 
 HB.factory Record SubChoice_isSubUnitRing (R : unitRingType) S U
@@ -1408,8 +1516,20 @@ HB.factory Record SubChoice_isSubUnitRing (R : unitRingType) S U
 HB.builders Context R S U & SubChoice_isSubUnitRing R S U.
 HB.instance Definition _ := SubChoice_isSubNzRing.Build R S U
   (divring_closedBM divring_closed_subproof).
-HB.instance Definition _ := SubNzRing_isSubUnitRing.Build R S U
-  divring_closed_subproof.
+HB.instance Definition _ := SubNzSemiRing_isSubUnitSemiRing.Build R S U
+  (divring_closed_semi divring_closed_subproof).
+HB.end.
+
+HB.factory Record SubChoice_isSubComUnitSemiRing (R : comUnitSemiRingType) S U
+    & SubChoice R S U := {
+  divsemiring_closed_subproof : divsemiring_closed S
+}.
+
+HB.builders Context R S U & SubChoice_isSubComUnitSemiRing R S U.
+HB.instance Definition _ := SubChoice_isSubComNzSemiRing.Build R S U
+  (divsemiring_closedM divsemiring_closed_subproof).
+HB.instance Definition _ := SubNzSemiRing_isSubUnitSemiRing.Build R S U
+  divsemiring_closed_subproof.
 HB.end.
 
 HB.factory Record SubChoice_isSubComUnitRing (R : comUnitRingType) S U
@@ -1420,8 +1540,43 @@ HB.factory Record SubChoice_isSubComUnitRing (R : comUnitRingType) S U
 HB.builders Context R S U & SubChoice_isSubComUnitRing R S U.
 HB.instance Definition _ := SubChoice_isSubComNzRing.Build R S U
   (divring_closedBM divring_closed_subproof).
-HB.instance Definition _ := SubNzRing_isSubUnitRing.Build R S U
-  divring_closed_subproof.
+HB.instance Definition _ := SubNzSemiRing_isSubUnitSemiRing.Build R S U
+  (divring_closed_semi divring_closed_subproof).
+HB.end.
+
+HB.factory Record SubComUnitSemiRing_isSubSemiIntegralDomain
+  (R : semiIdomainType) S U & SubComUnitSemiRing R S U := {}.
+
+#[deprecated(since="mathcomp 2.7.0",
+      use=SubComUnitSemiRing_isSubSemiIntegralDomain)]
+Notation SubComUnitRing_isSubIntegralDomain R S U :=
+  (SubComUnitSemiRing_isSubSemiIntegralDomain R S U) (only parsing).
+Module SubComUnitRing_isSubIntegralDomain.
+#[deprecated(since="mathcomp 2.7.0",
+      use=SubComUnitSemiRing_isSubSemiIntegralDomain.Build)]
+Notation Build R S U :=
+  (SubComUnitSemiRing_isSubSemiIntegralDomain.Build R S U) (only parsing).
+End SubComUnitRing_isSubIntegralDomain.
+
+HB.builders Context R S U & SubComUnitSemiRing_isSubSemiIntegralDomain R S U.
+Lemma id : IntegralDomain.axiom U.
+Proof.
+move=> x y /(congr1 val)/eqP; rewrite rmorphM /=.
+by rewrite -!(inj_eq val_inj) rmorph0 -mulf_eq0.
+Qed.
+HB.instance Definition _ := ComUnitSemiRing_isIntegral.Build U id.
+HB.end.
+
+HB.factory Record SubChoice_isSubSemiIntegralDomain (R : semiIdomainType) S U
+    & SubChoice R S U := {
+  divsemiring_closed_subproof : divsemiring_closed S
+}.
+
+HB.builders Context R S U & SubChoice_isSubSemiIntegralDomain R S U.
+HB.instance Definition _ := SubChoice_isSubComUnitSemiRing.Build R S U
+  divsemiring_closed_subproof.
+HB.instance Definition _ :=
+  SubComUnitSemiRing_isSubSemiIntegralDomain.Build R S U.
 HB.end.
 
 HB.factory Record SubChoice_isSubIntegralDomain (R : idomainType) S U
@@ -1432,11 +1587,75 @@ HB.factory Record SubChoice_isSubIntegralDomain (R : idomainType) S U
 HB.builders Context R S U & SubChoice_isSubIntegralDomain R S U.
 HB.instance Definition _ := SubChoice_isSubComUnitRing.Build R S U
   divring_closed_subproof.
-HB.instance Definition _ := SubComUnitRing_isSubIntegralDomain.Build R S U.
+HB.instance Definition _ :=
+  SubComUnitSemiRing_isSubSemiIntegralDomain.Build R S U.
 HB.end.
+
+HB.factory Record SubSemiIntegralDomain_isSubSemiField (F : semiFieldType) S U
+    & SubSemiIntegralDomain F S U := {
+  subfield_subproof : {mono (val : U -> F) : u / u \in unit}
+}.
+
+#[deprecated(since="mathcomp 2.7.0",
+      use=SubSemiIntegralDomain_isSubSemiField)]
+Notation SubIntegralDomain_isSubField R S U :=
+  (SubSemiIntegralDomain_isSubSemiField R S U) (only parsing).
+Module SubIntegralDomain_isSubField.
+#[deprecated(since="mathcomp 2.7.0",
+      use=SubSemiIntegralDomain_isSubSemiField.Build)]
+Notation Build R S U :=
+  (SubSemiIntegralDomain_isSubSemiField.Build R S U) (only parsing).
+End SubIntegralDomain_isSubField.
+
+HB.builders Context F S U & SubSemiIntegralDomain_isSubSemiField F S U.
+Lemma fieldP : Field.axiom U.
+Proof.
+by move=> u; rewrite -(inj_eq val_inj) rmorph0 -unitfE subfield_subproof.
+Qed.
+HB.instance Definition _ := UnitSemiRing_isSemiField.Build U fieldP.
+HB.end.
+
+Module ClosedExports.
+
+Notation invr_closed := invr_closed.
+Notation divr_2closed := divr_2closed.
+Notation divr_closed := divr_closed.
+Notation divsemiring_closed := divsemiring_closed.
+Notation sdivr_closed := sdivr_closed.
+Notation divring_closed := divring_closed.
+Notation divsemialg_closed := divsemialg_closed.
+Notation divalg_closed := divalg_closed.
+
+Coercion divr_closedV : divr_closed >-> invr_closed.
+Coercion divr_closedM : divr_closed >-> mulr_closed.
+Coercion divsemiring_closed_div : divsemiring_closed >-> divr_closed.
+Coercion divsemiring_closedM : divsemiring_closed >-> semiring_closed.
+Coercion sdivr_closed_div : sdivr_closed >-> divr_closed.
+Coercion sdivr_closedM : sdivr_closed >-> smulr_closed.
+Coercion divring_closedBM : divring_closed >-> subring_closed.
+Coercion divring_closed_div : divring_closed >-> sdivr_closed.
+Coercion divring_closed_semi : divring_closed >-> divsemiring_closed.
+Coercion divsemialg_closedDdiv : divsemialg_closed >-> divsemiring_closed.
+Coercion divsemialg_closedZ : divsemialg_closed >-> subsemialg_closed.
+Coercion divalg_closedBdiv : divalg_closed >-> divring_closed.
+Coercion divalg_closedZ : divalg_closed >-> subalg_closed.
+Coercion divalg_closed_semi : divalg_closed >-> divsemialg_closed.
+
+End ClosedExports.
+HB.export ClosedExports.
 
 Module SubExports.
 
+Notation "[ 'SubNzSemiRing_isSubUnitSemiRing' 'of' U 'by' <: ]" :=
+  (SubNzSemiRing_isSubUnitSemiRing.Build _ _ U (divsemiringClosedP _))
+  (format "[ 'SubNzSemiRing_isSubUnitSemiRing'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubUnitSemiRing' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubUnitSemiRing.Build _ _ U (divsemiringClosedP _))
+  (format "[ 'SubChoice_isSubUnitSemiRing'  'of'  U  'by'  <: ]")
+  : form_scope.
+#[deprecated(since="mathcomp 2.7.0",
+             note="Use [ SubNzSemiRing_isSubUnitSemiRing of U by <: ] instead.")]
 Notation "[ 'SubNzRing_isSubUnitRing' 'of' U 'by' <: ]" :=
   (SubNzRing_isSubUnitRing.Build _ _ U (divringClosedP _))
   (format "[ 'SubNzRing_isSubUnitRing'  'of'  U  'by'  <: ]")
@@ -1445,20 +1664,40 @@ Notation "[ 'SubChoice_isSubUnitRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubUnitRing.Build _ _ U (divringClosedP _))
   (format "[ 'SubChoice_isSubUnitRing'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubChoice_isSubComUnitSemiRing' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubComUnitSemiRing.Build _ _ U (divsemiringClosedP _))
+  (format "[ 'SubChoice_isSubComUnitSemiRing'  'of'  U  'by'  <: ]")
+  : form_scope.
 Notation "[ 'SubChoice_isSubComUnitRing' 'of' U 'by' <: ]" :=
   (SubChoice_isSubComUnitRing.Build _ _ U (divringClosedP _))
   (format "[ 'SubChoice_isSubComUnitRing'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubComUnitSemiRing_isSubSemiIntegralDomain' 'of' U 'by' <: ]" :=
+  (SubComUnitSemiRing_isSubSemiIntegralDomain.Build _ _ U)
+  (format "[ 'SubComUnitSemiRing_isSubSemiIntegralDomain'  'of'  U  'by'  <: ]")
+  : form_scope.
+#[deprecated(since="mathcomp 2.7.0",
+             note="Use [ SubComUnitSemiRing_isSubSemiIntegralDomain of U by <: ] instead.")]
 Notation "[ 'SubComUnitRing_isSubIntegralDomain' 'of' U 'by' <: ]" :=
-  (SubComUnitRing_isSubIntegralDomain.Build _ _ U)
+  (SubComUnitSemiRing_isSubSemiIntegralDomain.Build _ _ U)
   (format "[ 'SubComUnitRing_isSubIntegralDomain'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubSemiIntegralDomain' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubSemiIntegralDomain.Build _ _ U (divsemiringClosedP _))
+  (format "[ 'SubChoice_isSubSemiIntegralDomain'  'of'  U  'by'  <: ]")
   : form_scope.
 Notation "[ 'SubChoice_isSubIntegralDomain' 'of' U 'by' <: ]" :=
   (SubChoice_isSubIntegralDomain.Build _ _ U (divringClosedP _))
   (format "[ 'SubChoice_isSubIntegralDomain'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubSemiIntegralDomain_isSubSemiField' 'of' U 'by' <: ]" :=
+  (SubSemiIntegralDomain_isSubSemiField.Build _ _ U (frefl _))
+  (format "[ 'SubSemiIntegralDomain_isSubSemiField'  'of'  U  'by'  <: ]")
+  : form_scope.
+#[deprecated(since="mathcomp 2.7.0",
+             note="Use [ SubSemiIntegralDomain_isSubSemiField of U by <: ] instead.")]
 Notation "[ 'SubIntegralDomain_isSubField' 'of' U 'by' <: ]" :=
-  (SubIntegralDomain_isSubField.Build _ _ U (frefl _))
+  (SubSemiIntegralDomain_isSubSemiField.Build _ _ U (frefl _))
   (format "[ 'SubIntegralDomain_isSubField'  'of'  U  'by'  <: ]")
   : form_scope.
 
@@ -1621,7 +1860,6 @@ Module AllExports. HB.reexport. End AllExports.
 End GRing.
 
 Export AllExports.
-Export ClosedExports.
 
 Notation "x ^-1" := (inv x) : ring_scope.
 Notation "x ^- n" := (inv (x ^+ n)) : ring_scope.
@@ -1695,9 +1933,9 @@ Proof. by case: b. Qed.
 Fact invb_out (x y : bool) : y * x = 1 -> x != 0.
 Proof. by case: x; case: y. Qed.
 
-HB.instance Definition _ := ComNzRing_hasMulInverse.Build bool
+HB.instance Definition _ := ComNzSemiRing_hasMulInverse.Build bool
   mulVb invb_out (fun x => fun => erefl x).
 
 Lemma bool_fieldP : Field.axiom bool. Proof. by []. Qed.
 
-HB.instance Definition _ := ComUnitRing_isField.Build bool bool_fieldP.
+HB.instance Definition _ := ComUnitSemiRing_isSemiField.Build bool bool_fieldP.
