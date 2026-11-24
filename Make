@@ -104,10 +104,12 @@ boot/finset.v
 boot/fintype.v
 boot/generic_quotient.v
 boot/monoid.v
+boot/near.v
 boot/nmodule.v
 boot/path.v
 boot/prime.v
 boot/seq.v
+boot/sets.v
 boot/ssrAC.v
 boot/ssrbool.v
 boot/ssreflect.v
