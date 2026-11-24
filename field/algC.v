@@ -15,7 +15,6 @@ From mathcomp Require Import algebraics_fundamentals.
 (* filed with an automorphism of order 2; this amounts to the purely          *)
 (* algebraic contents of the Fundamenta Theorem of Algebra.                   *)
 (*       algC == the closed, countable field of algebraic numbers.            *)
-(*  algCeq, algCnzRing, ..., algCnumField == structures for algC.             *)
 (* The ssrnum interfaces are implemented for algC as follows:                 *)
 (*     x <= y <=> (y - x) is a nonnegative real                               *)
 (*      x < y <=> (y - x) is a (strictly) positive real                       *)
@@ -38,9 +37,7 @@ From mathcomp Require Import algebraics_fundamentals.
 (* minCpoly z == the minimal (monic) polynomial over Crat with root z.        *)
 (* algC_invaut nu == an inverse of nu : {rmorphism algC -> algC}.             *)
 (*         (x %| y)%C <=> y is an integer (Num.int) multiple of x; if x or y  *)
-(*        (x %| y)%Cx     are of type nat or int they are coerced to algC.    *)
-(*                        The (x %| y)%Cx display form is a workaround for    *)
-(*                        design limitations of the Coq Notation facilities.  *)
+(*                        are of type nat or int they are coerced to algC.    *)
 (* (x == y %[mod z])%C <=> x and y differ by an integer (Num.int) multiple of *)
 (*                z; as above, arguments of type nat or int are cast to algC. *)
 (* (x != y %[mod z])%C <=> x and y do not differ by an integer multiple of z. *)
@@ -58,7 +55,7 @@ Unset Strict Implicit.
 Unset Printing Implicit Defensive.
 
 Declare Scope C_scope.
-Declare Scope C_core_scope.
+(* `C_expanded_scope` is deprecated since MathComp 2.7 *)
 Declare Scope C_expanded_scope.
 
 Import Order.Theory GRing.Theory Num.Theory.
@@ -548,21 +545,27 @@ Import Implementation Internals.
 
 Notation algC := type.
 Delimit Scope C_scope with C.
-Delimit Scope C_core_scope with Cc.
 Delimit Scope C_expanded_scope with Cx.
-Open Scope C_core_scope.
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCeq := (type : eqType).
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCzmod := (type : zmodType).
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCnzRing := (type : nzRingType).
-#[deprecated(since="mathcomp 2.4.0", use=algCnzRing)]
+#[deprecated(since="mathcomp 2.4.0", use=algC)]
 Notation algCring := (type : nzRingType).
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCuring := (type : unitRingType).
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCnum := (type : numDomainType).
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCfield := (type : fieldType).
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCnumField := (type : numFieldType).
+#[deprecated(since="mathcomp 2.7.0", use=algC)]
 Notation algCnumClosedField := (type : numClosedFieldType).
 
-Notation Creal := (@Num.real algCnum).
+Notation Creal := (@Num.real algC).
 
 Definition getCrat := let: GetCrat_spec CtoQ _ := getCrat_subproof in CtoQ.
 Definition Crat : {pred algC} := fun x => ratr (getCrat x) == x.
@@ -580,8 +583,11 @@ Definition CdivE := (nCdivE, zCdivE).
 
 Definition dvdC (x : divisor) : {pred algC} :=
    fun y => if x == 0 then y == 0 else y / x \in Num.int.
-Notation "x %| y" := (y \in dvdC x) : C_expanded_scope.
-Notation "x %| y" := (@in_mem divisor y (mem (dvdC x))) : C_scope.
+#[deprecated(since="mathcomp 2.7.0", note="Use (_ %| _)%C instead.")]
+Notation "x %| y" := (y \in dvdC x) (only parsing) : C_expanded_scope.
+Notation "x %| y" :=
+  (@in_mem divisor y (mem (dvdC x))) (only parsing) : C_scope.
+Notation "x %| y" := (y \in dvdC x) (only printing) : C_scope.
 
 Definition eqCmod (e x y : divisor) := (e %| x - y)%C.
 
