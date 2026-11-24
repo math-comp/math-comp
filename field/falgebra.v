@@ -1023,17 +1023,15 @@ rewrite !linearZ -!scalerAr -!scalerAl 2!linearZ /=; congr (_ *: (_ *: _)).
 by apply/eqP/fM; apply: memt_nth.
 Qed.
 
-Lemma ahomP_tmp {f : 'Hom(aT, rT)} : reflect (monoid_morphism f) (ahom_in {:aT} f).
+Lemma ahomP {f : 'Hom(aT, rT)} : reflect (monoid_morphism f) (ahom_in {:aT} f).
 Proof.
 apply: (iffP ahom_inP) => [[fM f1] | fRM_P]; last first.
   by split=> [x y|]; [rewrite fRM_P.2|rewrite fRM_P.1].
 by split=> // x y; rewrite fM ?memvf.
 Qed.
 
-#[deprecated(since="mathcomp 2.5.0", use=ahomP_tmp)]
-Lemma ahomP {f : 'Hom(aT, rT)} :
-  reflect ((f 1 = 1) * {morph f : x y / x * y >-> x * y}) (ahom_in {:aT} f).
-Proof. by apply: (iffP ahomP_tmp) => [][]. Qed.
+#[deprecated(since="mathcomp 2.7.0", use=ahomP)]
+Definition ahomP_tmp := @ahomP.
 
 Structure ahom := AHom {ahval :> 'Hom(aT, rT); _ : ahom_in {:aT} ahval}.
 
@@ -1049,8 +1047,8 @@ End Class_Def.
 
 Arguments ahom_in [aT rT].
 Arguments ahom_inP {aT rT f U}.
-#[warning="-deprecated-since-mathcomp-2.5.0"]
 Arguments ahomP {aT rT f}.
+#[warning="-deprecated-since-mathcomp-2.7.0"]
 Arguments ahomP_tmp {aT rT f}.
 
 Section LRMorphism.
@@ -1058,7 +1056,7 @@ Section LRMorphism.
 Variables aT rT sT : falgType K.
 
 Fact ahom_is_monoid_morphism (f : ahom aT rT) : monoid_morphism f.
-Proof. by apply/ahomP_tmp; case: f. Qed.
+Proof. by apply/ahomP; case: f. Qed.
 #[hnf]
 HB.instance Definition _ (f : ahom aT rT) :=
   GRing.isMonoidMorphism.Build aT rT f (ahom_is_monoid_morphism f).
