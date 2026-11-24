@@ -186,15 +186,15 @@ Local Open Scope near_scope.
 
 Reserved Notation "{ 'near' x , P }" (at level 0, format "{ 'near'  x ,  P }").
 Reserved Notation "'\forall' x '\near' x_0 , P"
-  (at level 200, x name, P at level 200,
+  (at level 10, x name, P at level 200,
    format "'\forall'  x  '\near'  x_0 ,  P").
 Reserved Notation "{ 'near' x & y , P }"
   (at level 0, format "{ 'near'  x  &  y ,  P }").
 Reserved Notation "'\forall' x '\near' x_0 & y '\near' y_0 , P"
-  (at level 200, x name, y name, P at level 200,
+  (at level 10, x name, y name, P at level 200,
    format "'\forall'  x  '\near'  x_0  &  y  '\near'  y_0 ,  P").
 Reserved Notation "'\forall' x & y '\near' z , P"
-  (at level 200, x name, y name, P at level 200,
+  (at level 10, x name, y name, P at level 200,
    format "'\forall'  x  &  y  '\near'  z ,  P").
 Reserved Notation "F `=>` G" (at level 70, format "F  `=>`  G").
 Reserved Notation "F --> G" (at level 70, format "F  -->  G").
