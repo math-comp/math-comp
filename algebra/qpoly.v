@@ -741,7 +741,7 @@ Qed.
 Lemma qpoly_inv_out (p : {poly %/ h}) : ~~ coprimep hQ p -> qpoly_inv p = p.
 Proof. by rewrite /qpoly_inv => /negPf->. Qed.
 
-HB.instance Definition _ := GRing.ComNzRing_hasMulInverse.Build {poly__ _}
+HB.instance Definition _ := GRing.ComNzSemiRing_hasMulInverse.Build {poly__ _}
   qpoly_mulVz qpoly_intro_unit qpoly_inv_out.
 HB.instance Definition _ := GRing.ComUnitAlgebra.on {poly %/ h}.
 

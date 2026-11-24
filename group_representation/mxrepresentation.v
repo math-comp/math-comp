@@ -5272,7 +5272,7 @@ Qed.
 Lemma gen_invr0 : genV 0 = 0.
 Proof. by apply: mxval_inj; rewrite mxval_genV !mxval0 -{2}invr0. Qed.
 
-#[export] HB.instance Definition _ := GRing.ComNzRing_isField.Build FA
+#[export] HB.instance Definition _ := GRing.ComNzSemiRing_isSemiField.Build FA
   gen_mulVr gen_invr0.
 
 Lemma mxvalV : {morph mxval : x / x^-1 >-> invmx x}.

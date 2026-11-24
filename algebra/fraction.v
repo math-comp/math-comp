@@ -264,7 +264,8 @@ Qed.
 
 (* fractions form a ring with explicit unit *)
 (* fractions form a field *)
-HB.instance Definition _ := GRing.ComNzRing_isField.Build type mulV_l inv0.
+HB.instance Definition _ :=
+  GRing.ComNzSemiRing_isSemiField.Build type mulV_l inv0.
 
 End FracField.
 End FracField.

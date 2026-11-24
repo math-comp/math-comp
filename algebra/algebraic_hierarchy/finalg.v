@@ -220,7 +220,7 @@ HB.builders Context R & isNzRing R.
   Qed.
 
   HB.instance Definition _ :=
-    GRing.NzRing_hasMulInverse.Build R mulVr mulrV intro_unit invr_out.
+    GRing.NzSemiRing_hasMulInverse.Build R mulVr mulrV intro_unit invr_out.
 HB.end.
 
 #[export, non_forgetful_inheritance]

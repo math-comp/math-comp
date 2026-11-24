@@ -108,8 +108,8 @@ rewrite [in X in X == _]mk_monicE.
 by have [[]] := hI; case: size => [|[]].
 Qed.
 
-HB.instance Definition _ := GRing.ComUnitRing_isField.Build {poly %/ h with hI}
-  coprimep_unit.
+HB.instance Definition _ :=
+  GRing.ComUnitSemiRing_isSemiField.Build {poly %/ h with hI} coprimep_unit.
 
 HB.instance Definition _ := GRing.UnitAlgebra.on {poly %/ h with hI}.
 HB.instance Definition _ := Vector.on {poly %/ h with hI}.

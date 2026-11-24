@@ -3706,7 +3706,7 @@ End Defs.
 Variable n' : nat.
 Local Notation n := n'.+1.
 
-HB.instance Definition _ := GRing.NzRing_hasMulInverse.Build 'M[R]_n
+HB.instance Definition _ := GRing.NzSemiRing_hasMulInverse.Build 'M[R]_n
   (@mulVmx n) (@mulmxV n) (@intro_unitmx n) (@invmx_out n).
 
 (* Lemmas requiring that the coefficients are in a unit ring *)

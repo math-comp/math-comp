@@ -206,13 +206,13 @@ HB.instance Definition _ (K : {subfield L}) :=
 HB.instance Definition _ (K : {subfield L}) :=
   [SubSemiRing_isSubComSemiRing of subvs_of K by <:].
 HB.instance Definition _ (K : {subfield L}) :=
-  [SubComUnitRing_isSubIntegralDomain of subvs_of K by <:].
+  [SubComUnitSemiRing_isSubSemiIntegralDomain of subvs_of K by <:].
 
 Lemma subvs_fieldMixin K : GRing.field_axiom (subvs_of K).
 Proof.
 by move=> w nz_w; rewrite unitrE -val_eqE /= vsval_invf algid1 divff.
 Qed.
-HB.instance Definition _ K := GRing.UnitRing_isField.Build (subvs_of K)
+HB.instance Definition _ K := GRing.UnitSemiRing_isSemiField.Build (subvs_of K)
   (@subvs_fieldMixin K).
 
 Lemma polyOver_subvs {K} {p : {poly L}} :
@@ -1138,7 +1138,7 @@ apply/eqP; rewrite !piE /equiv_subfext /iotaFz /subfx_inv_rep !linear0.
 by rewrite /subfx_poly_inv rmorph0 eqxx mod0p !linear0.
 Qed.
 
-HB.instance Definition _ := GRing.ComNzRing_isField.Build subFExtend
+HB.instance Definition _ := GRing.ComNzSemiRing_isSemiField.Build subFExtend
   subfx_fieldAxiom subfx_inv0.
 
 Fact subfx_inj_is_zmod_morphism : zmod_morphism subfx_inj.
@@ -1345,7 +1345,7 @@ have mulZlM : GRing.LSemiModule_isComSemiAlgebra F rL.
   by rewrite toL_K /toPF !linearZ /= -!/(toPF _) toL_K -scalerAl modpZl.
 pose caL : comNzAlgType F := HB.pack rL mulZlM.
 pose cuL : comUnitAlgType F := HB.pack caL (Algebra_isFalgebra.Build F caL).
-have unitM : GRing.ComUnitRing_isField cuL.
+have unitM : GRing.ComUnitSemiRing_isSemiField cuL.
   constructor => x nz_x; apply/unitrP; set q := toPF x.
   have nz_q: q != 0 by rewrite -(inj_eq toPinj) /toPF raddf0 in nz_x.
   have /Bezout_eq1_coprimepP[u upq1]: coprimep p q.

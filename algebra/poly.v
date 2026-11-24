@@ -2801,11 +2801,12 @@ Qed.
 Fact poly_inv_out : {in [predC poly_unit], poly_inv =1 id}.
 Proof. by rewrite /poly_inv => p /negbTE/= ->. Qed.
 
-HB.instance Definition _ := GRing.ComNzRing_hasMulInverse.Build (polynomial R)
-  poly_mulVp poly_intro_unit poly_inv_out.
+HB.instance Definition _ :=
+  GRing.ComNzSemiRing_hasMulInverse.Build (polynomial R)
+    poly_mulVp poly_intro_unit poly_inv_out.
 
-HB.instance Definition _ := GRing.ComUnitRing_isIntegral.Build (polynomial R)
-  poly_idomainAxiom.
+HB.instance Definition _ :=
+  GRing.ComUnitSemiRing_isIntegral.Build (polynomial R) poly_idomainAxiom.
 
 Lemma poly_unitE p :
   (p \in GRing.unit) = (size p == 1) && (p`_0 \in GRing.unit).

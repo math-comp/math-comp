@@ -143,7 +143,7 @@ HB.builders Context K A & Algebra_isFalgebra K A.
   Lemma invr_out : {in [predC uam], vam =1 id}.
   Proof. by move=> u /negbTE/= ->. Qed.
 
-  HB.instance Definition _ := GRing.NzRing_hasMulInverse.Build A
+  HB.instance Definition _ := GRing.NzSemiRing_hasMulInverse.Build A
     mulVr divrr unitrP invr_out.
   HB.instance Definition _ := UnitAlgebra_isFalgebra.Build K A.
 
@@ -210,7 +210,7 @@ Qed.
 Lemma lfun_invr_out f : lker f != 0%VS -> lfun_invr f = f.
 Proof. by rewrite /lfun_invr => /negPf->. Qed.
 
-HB.instance Definition _ := GRing.NzRing_hasMulInverse.Build 'End(aT)
+HB.instance Definition _ := GRing.NzSemiRing_hasMulInverse.Build 'End(aT)
   lfun_mulRVr lfun_mulrRV lfun_unitrP lfun_invr_out.
 
 Lemma lfun_invE f : lker f == 0%VS -> f^-1%VF = f^-1.

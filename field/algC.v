@@ -409,7 +409,8 @@ Qed.
 
 Fact inv0 : inv 0 = 0. Proof. by apply: CtoL_inj; rewrite !LtoC_K invr0. Qed.
 
-HB.instance Definition _ := GRing.ComNzRing_isField.Build type mulVf inv0.
+HB.instance Definition _ :=
+  GRing.ComNzSemiRing_isSemiField.Build type mulVf inv0.
 
 Fact closedFieldAxiom : GRing.closed_field_axiom type.
 Proof.
@@ -950,7 +951,7 @@ Record algR := in_algR {algRval :> algC; algRvalP : algRval \is Creal}.
 HB.instance Definition _ := [isSub for algRval].
 HB.instance Definition _ := [Countable of algR by <:].
 HB.instance Definition _ := [SubChoice_isSubIntegralDomain of algR by <:].
-HB.instance Definition _ := [SubIntegralDomain_isSubField of algR by <:].
+HB.instance Definition _ := [SubSemiIntegralDomain_isSubSemiField of algR by <:].
 HB.instance Definition _ : Order.isPOrder ring_display algR :=
   Order.CancelPartial.Pcan _ valK.
 Lemma total_algR : total (<=%O : rel (algR : porderType _)).

@@ -144,7 +144,7 @@ HB.instance Definition _ :=
   GRing.Zmodule_isComNzRing.Build 'I_p
     (@Zp_mulA _) (@Zp_mulC _) (@Zp_mul1z _) (@Zp_mul_addl _) Zp_nontrivial.
 HB.instance Definition _ :=
-  GRing.ComNzRing_hasMulInverse.Build 'I_p
+  GRing.ComNzSemiRing_hasMulInverse.Build 'I_p
     (@Zp_mulVz _) (@Zp_intro_unit _) (@Zp_inv_out _).
 
 Lemma Zp_nat n : n%:R = inZp n :> 'I_p.
@@ -292,7 +292,7 @@ Proof. by rewrite pdiv_id // unitZpE // prime_gt1. Qed.
 
 End F_prime.
 
-Lemma Fp_fieldMixin : GRing.ComUnitRing_isField 'F_p.
+Lemma Fp_fieldMixin : GRing.ComUnitSemiRing_isSemiField 'F_p.
 Proof.
 constructor => x nzx.
 rewrite qualifE /= prime_coprime ?gtnNdvd ?lt0n //.
