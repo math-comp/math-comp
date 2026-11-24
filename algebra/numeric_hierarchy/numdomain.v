@@ -2396,6 +2396,33 @@ Lemma minNr x : min (- x) x = - `|x|. Proof. exact: real_minNr. Qed.
 
 End MinMax.
 
+
+Section NumPoly.
+Implicit Type (p : {poly R}).
+
+Lemma size_deriv p :
+  size p^`() = (size p).-1.
+Proof. by apply: pchar0_size_deriv; exact: pchar_num. Qed.
+
+Lemma derivnPpoly0 p n : (size p <= n)%N = (p^`(n) == 0).
+Proof. by apply: pchar0_derivnPpoly0; exact: pchar_num. Qed.
+
+Lemma size_derivn p n :
+  size p^`(n) = (size p - n)%N.
+Proof.
+elim: n=> [|n ihn]; first by rewrite derivn0 subn0.
+by rewrite derivnS size_deriv ihn subnS.
+Qed.
+
+Lemma size_nderivn p n :
+  size p^`N(n) = (size p - n)%N.
+Proof.
+rewrite -size_derivn nderivn_def -mulr_natl.
+by rewrite -polyC1 -!polyCMn size_Cmul // pnatr_eq0 -lt0n fact_gt0.
+Qed.
+
+End NumPoly.
+
 Section PolyBounds.
 
 Variable p : {poly R}.
