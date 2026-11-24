@@ -422,9 +422,8 @@ Definition rmorph_char := rmorph_pchar.
 #[warning="-deprecated-since-mathcomp-2.5.0",
   deprecated(since="mathcomp 2.5.0", use=can2_monoid_morphism)]
 Definition can2_rmorphism := can2_rmorphism.
-#[warning="-deprecated-since-mathcomp-2.5.0",
-  deprecated(since="mathcomp 2.5.0", use=nmod_morphism_semilinear)]
-Definition additive_semilinear := additive_semilinear.
+#[deprecated(since="mathcomp 2.5.0", use=nmod_morphism_semilinear)]
+Definition additive_semilinear := nmod_morphism_semilinear.
 #[warning="-deprecated-since-mathcomp-2.5.0",
   deprecated(since="mathcomp 2.5.0", use=zmod_morphism_linear)]
 Definition additive_linear := additive_linear.

@@ -529,17 +529,6 @@ Reserved Notation "k %:A" (left associativity, format "k %:A").
 Reserved Notation "[ 'pchar' F ]" (format "[ 'pchar'  F ]").
 Reserved Notation "[ 'char' F ]" (format "[ 'char'  F ]").
 
-Reserved Notation "x %:T" (left associativity, format "x %:T").
-Reserved Notation "''X_' i" (at level 8, i at level 2, format "''X_' i").
-(* Patch for recurring Coq parser bug: Coq seg faults when a level 200 *)
-(* notation is used as a pattern.                                      *)
-Reserved Notation "''exists' ''X_' i , f"
-  (at level 199, i at level 2, right associativity,
-   format "'[hv' ''exists'  ''X_' i , '/ '  f ']'").
-Reserved Notation "''forall' ''X_' i , f"
-  (at level 199, i at level 2, right associativity,
-   format "'[hv' ''forall'  ''X_' i , '/ '  f ']'").
-
 Reserved Notation "x ^f" (left associativity, format "x ^f").
 
 Reserved Notation "\0".
@@ -1883,20 +1872,6 @@ HB.instance Definition _ := isNmodMorphism.Build U R (a \o* f)
 
 End MulFun.
 
-Section Properties.
-
-Variables (U V : zmodType) (f : {additive U -> V}).
-
-Lemma raddfN : {morph f : x / - x}. Proof. exact: raddfN. Qed.
-Lemma raddfB : {morph f : x y / x - y}. Proof. exact: raddfB. Qed.
-
-Lemma raddf_inj : (forall x, f x = 0 -> x = 0) -> injective f.
-Proof. exact: raddf_inj. Qed.
-
-Lemma raddfMNn n : {morph f : x / x *- n}. Proof. exact: raddfMNn. Qed.
-
-End Properties.
-
 Section RingProperties.
 
 Variables (R S : ringType) (f : {additive R -> S}).
@@ -2183,6 +2158,7 @@ Lemma nmod_morphism_semilinear (R : semiRingType)
 Proof.
 by case=> sf Df; split => //; rewrite -[0 in LHS](scale0r 0) sf Scale.op0v.
 Qed.
+#[deprecated(since="mathcomp 2.7.0", use=nmod_morphism_semilinear)]
 Definition additive_semilinear := nmod_morphism_semilinear.
 
 Lemma scalable_semilinear (R : semiRingType)
@@ -2196,7 +2172,7 @@ HB.factory Record isSemilinear (R : semiRingType) (U : lSemiModType R)
 }.
 HB.builders Context R U V s f & isSemilinear R U V s f.
 HB.instance Definition _ := isNmodMorphism.Build U V f
-  (additive_semilinear linear_subproof).
+  (nmod_morphism_semilinear linear_subproof).
 
 HB.instance Definition _ :=
   isScalable.Build R U V s f (scalable_semilinear linear_subproof).
