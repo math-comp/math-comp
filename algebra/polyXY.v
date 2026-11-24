@@ -361,7 +361,8 @@ Proof.
 move=> nz_p nz_q px0 qy0; have pFto0 := map_poly_eq0 FtoE.
 rewrite map_resultant ?pFto0 ?lead_coef_eq0 ?map_poly_eq0 ?poly_XaY_eq0 //.
 rewrite map_comp_poly rmorphD /= map_polyC /= !map_polyX -!map_poly_comp /=.
-by rewrite !(eq_map_poly (map_polyC _)) !map_poly_comp sub_annihilantP ?pFto0.
+rewrite !(eq_map_poly (map_polyC _)) map_poly_comp [q ^ _]map_poly_comp.
+by rewrite sub_annihilantP ?pFto0.
 Qed.
 
 Lemma map_div_annihilantP (p q : {poly F}) (x y : E) :
@@ -371,7 +372,8 @@ Proof.
 move=> nz_p nz_q nz_y px0 qy0; have pFto0 := map_poly_eq0 FtoE.
 rewrite map_resultant ?pFto0 ?lead_coef_eq0 ?map_poly_eq0 ?poly_XmY_eq0 //.
 rewrite map_comp_poly rmorphM /= map_polyC /= !map_polyX -!map_poly_comp /=.
-by rewrite !(eq_map_poly (map_polyC _)) !map_poly_comp div_annihilantP ?pFto0.
+rewrite !(eq_map_poly (map_polyC _)) map_poly_comp [q ^ _]map_poly_comp.
+by rewrite div_annihilantP ?pFto0.
 Qed.
 
 Lemma root_annihilant x p (pEx := (p ^ pFtoE).[x%:P]) :
