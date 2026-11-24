@@ -4,7 +4,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool ssrnat eqtype choice.
 From mathcomp Require Import nmodule preorder porder lattice total_order.
 From mathcomp Require Import total_order_instances interval orderedzmod.
 From mathcomp Require Import rings_modules_and_algebras divalg decfield.
-From mathcomp Require Import numdomain numfield ssrint.
+From mathcomp Require Import orderedring numdomain numfield ssrint.
 
 (**md**************************************************************************)
 (* # Numbers within an interval                                               *)

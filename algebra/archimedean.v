@@ -4,8 +4,8 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype bigop nmodule preorder porder lattice.
 From mathcomp Require Import total_order rings_modules_and_algebras divalg.
-From mathcomp Require Import decfield poly orderedzmod numdomain numfield.
-From mathcomp Require Import ssrint.
+From mathcomp Require Import decfield poly orderedzmod orderedring numdomain.
+From mathcomp Require Import numfield ssrint.
 
 (******************************************************************************)
 (*                           Archimedean structures                           *)

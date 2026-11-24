@@ -14,6 +14,7 @@ algebra/mxred.v
 algebra/numeric_hierarchy/numdomain.v
 algebra/numeric_hierarchy/numfield.v
 algebra/numeric_hierarchy/numeric_hierarchy.v
+algebra/numeric_hierarchy/orderedring.v
 algebra/numeric_hierarchy/ssrnum.v
 algebra/polydiv.v
 algebra/poly.v

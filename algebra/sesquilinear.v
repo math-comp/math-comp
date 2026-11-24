@@ -2,7 +2,8 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import fintype tuple bigop preorder porder nmodule.
 From mathcomp Require Import rings_modules_and_algebras divalg orderedzmod.
-From mathcomp Require Import numdomain numfield matrix mxalgebra vector.
+From mathcomp Require Import orderedring numdomain numfield matrix mxalgebra.
+From mathcomp Require Import vector.
 
 (******************************************************************************)
 (*                            Sesquilinear forms                              *)

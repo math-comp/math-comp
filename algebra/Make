@@ -28,6 +28,7 @@ algebraic_hierarchy/ring_quotient.v
 algebraic_hierarchy/algebraic_hierarchy.v
 algebraic_hierarchy/ssralg.v
 ssrint.v
+numeric_hierarchy/orderedring.v
 numeric_hierarchy/numdomain.v
 numeric_hierarchy/numfield.v
 numeric_hierarchy/numeric_hierarchy.v

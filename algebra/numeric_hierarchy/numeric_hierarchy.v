@@ -1,5 +1,4 @@
-From mathcomp Require Export numdomain.
-From mathcomp Require Export numfield.
+From mathcomp Require Export orderedring numdomain numfield.
 
 (******************************************************************************)
 (*                            Number structures                               *)

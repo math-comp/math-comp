@@ -4,8 +4,8 @@ From HB Require Import structures.
 From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat choice seq.
 From mathcomp Require Import fintype finfun bigop preorder porder lattice.
 From mathcomp Require Import total_order nmodule rings_modules_and_algebras.
-From mathcomp Require Import divalg countalg poly orderedzmod numdomain.
-From mathcomp Require Import numfield.
+From mathcomp Require Import divalg countalg poly orderedzmod orderedring.
+From mathcomp Require Import numdomain numfield.
 
 (******************************************************************************)
 (* This file develops a basic theory of signed integers, defining:            *)
