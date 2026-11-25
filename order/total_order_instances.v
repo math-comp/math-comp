@@ -45,6 +45,19 @@ From mathcomp Require Import preorder porder lattice total_order.
 (*                      and displayed in display d                            *)
 (*    n.-tuplelexi T := n.-tuplelexi[seqlexi_display d] T                     *)
 (*                      where d is the display of T                           *)
+(*    T +sum[ d ] T' := T + T                                                 *)
+(*                   == an alias for the sum type such that, if T and T' are  *)
+(*                      canonically ordered, then T +sum[ d ] T' is           *)
+(*                      canonically ordered as follows:                       *)
+(*                      (inl x <= inl y) = x <= y :> T,                       *)
+(*                      (inl x <= inr y) = true,                              *)
+(*                      (inr x <= inl y) = true, and                          *)
+(*                      (inr x <= inr y) = x <= y :> T',                      *)
+(*                      and displayed in display d                            *)
+(*           T +s T' := T +sum[sum_display d d'] T'                           *)
+(*                      where d and d' are the displays of T and T',          *)
+(*                      respectively, and sum_display adds an extra ^s to     *)
+(*                      all notations                                         *)
 (*                                                                            *)
 (* This file provides instances of order structure (total orders or below) on *)
 (* the following types:                                                       *)
@@ -321,6 +334,18 @@ Reserved Notation ">=<^s y :> T" (at level 35, y at next level).
 Reserved Notation "x ><^s y" (at level 70, no associativity).
 Reserved Notation "><^s x" (at level 35).
 Reserved Notation "><^s y :> T" (at level 35, y at next level).
+
+Reserved Notation "x <=^s y <=^s z" (at level 70, y, z at next level).
+Reserved Notation "x <^s y <=^s z" (at level 70, y, z at next level).
+Reserved Notation "x <=^s y <^s z" (at level 70, y, z at next level).
+Reserved Notation "x <^s y <^s z" (at level 70, y, z at next level).
+Reserved Notation "x <=^s y ?= 'iff' c" (at level 70, y, c at next level,
+  format "x '[hv'  <=^s  y '/'  ?=  'iff'  c ']'").
+Reserved Notation "x <=^s y ?= 'iff' c :> T" (at level 70, y, c at next level,
+  format "x '[hv'  <=^s  y '/'  ?=  'iff'  c  :> T ']'").
+
+Reserved Notation "\bot^s".
+Reserved Notation "\top^s".
 
 Module Order.
 
@@ -857,11 +882,7 @@ HB.export SeqLexiSyntax.
 (* Definition of sum_display *)
 (*****************************)
 
-Fact sum_display_unit (_ _ : unit) : unit. Proof. exact: tt. Qed.
-
-Definition sum_display (displ dispr : disp_t) : disp_t :=
-  Disp (sum_display_unit (d1 displ) (d1 dispr))
-       (sum_display_unit (d2 displ) (d2 dispr)).
+Definition sum_display (displ dispr : disp_t) : disp_t. Proof. by []. Qed.
 
 Module Import SumSyntax.
 
@@ -911,6 +932,9 @@ Notation "x >=<^s y" := (>=<^s%O x y) : order_scope.
 Notation "><^s y" := [pred x | ~~ (>=<^s%O x y)] : order_scope.
 Notation "><^s y :> T" := (><^s (y : T)) (only parsing) : order_scope.
 Notation "x ><^s y" := (~~ (><^s%O x y)) : order_scope.
+
+Notation "\bot^s" := (@bottom (sum_display _ _) _) : order_scope.
+Notation "\top^s" := (@top (sum_display _ _) _) : order_scope.
 
 End SumSyntax.
 HB.export SumSyntax.
@@ -1855,8 +1879,9 @@ Local Notation "T + T'" := (type disp T T') : type_scope.
 End Basis.
 
 Section Preorder.
-Context (disp1 disp2 : disp_t).
+Context (disp1 disp2 disp3 : disp_t).
 Context (T1 : preorderType disp1) (T2 : preorderType disp2).
+Local Notation "T1 + T2" := (type disp3 T1 T2) : type_scope.
 Implicit Types (x y : T1 + T2).
 
 Let le x y : bool :=
@@ -1878,55 +1903,15 @@ Let lt x y : bool :=
 Fact lt_def x y : lt x y = le x y && ~~ le y x.
 Proof. by case: x; case: y => x y; rewrite /lt /le ?lt_leAnge. Qed.
 
-Fact gt_def x y : lt y x = le y x && ~~ le x y.
-Proof. by case: x; case: y => x y; rewrite /lt /le ?lt_leAnge. Qed.
-
 Fact refl : reflexive le.
-Proof. by case => x; rewrite /le lexx. Qed.
-
-Fact ge_refl : reflexive (fun x y => le y x).
 Proof. by case => x; rewrite /le lexx. Qed.
 
 Fact trans : transitive le.
 Proof. rewrite /le => -[y | y] [x | x] [z | z] //; apply: le_trans. Qed.
 
-Fact ge_trans : transitive (fun x y => le y x).
-Proof. rewrite /le => -[y | y] [x | x] [z | z] // /[swap]; apply: le_trans. Qed.
-
-End Preorder.
-
-Section Preorder.
-Context (disp1 disp2 disp3 : disp_t).
-Context (T1 : preorderType disp1) (T2 : preorderType disp2).
-Local Notation "T1 + T2" := (type disp3 T1 T2) : type_scope.
-Implicit Types (x y : T1 + T2).
-
-Let T1' : Type := T1.
-HB.instance Definition _ := Preorder.on T1'.
-Let T2' : Type := T2.
-HB.instance Definition _ := Preorder.on T2'.
-
-Definition le x y : bool :=
-  match x, y with
-  | inl _, inr _ => true
-  | inl a1, inl a2 => a1 <= a2
-  | inr _, inl _ => false
-  | inr b1, inr b2 => b1 <= b2
-  end.
-
-Definition lt x y : bool :=
-  match x, y with
-  | inl _, inr _ => true
-  | inl a1, inl a2 => a1 < a2
-  | inr _, inl _ => false
-  | inr b1, inr b2 => b1 < b2
-  end.
-
 #[export]
-HB.instance Definition _ := @isDuallyPreorder.Build disp3 (T1 + T2) le lt
-  (@lt_def _ _ T1' T2') (@gt_def _ _ T1' T2')
-  (@refl _ _ T1' T2') (@ge_refl _ _ T1' T2')
-  (@trans _ _ T1' T2') (@ge_trans _ _ T1' T2').
+HB.instance Definition _ :=
+  @isPreorder.Build disp3 (T1 + T2) le lt lt_def refl trans.
 
 Lemma leEsum x y : (x <= y) = match x, y with
   | inl _, inr _ => true
@@ -1947,58 +1932,34 @@ Proof. by []. Qed.
 End Preorder.
 
 Section BPreorder.
-Context (disp1 disp2 : disp_t).
+Context (disp1 disp2 disp3 : disp_t).
 Context (T1 : bPreorderType disp1) (T2 : preorderType disp2).
-Local Notation "T1 + T2" := (type (Disp tt tt) T1 T2) : type_scope.
+Local Notation "T1 + T2" := (type disp3 T1 T2) : type_scope.
 Implicit Types (x : T1 + T2).
 
 Fact le0x x : inl \bot <= x :> T1 + T2.
 Proof. by case: x => x; rewrite leEsum. Qed.
 
-End BPreorder.
-
-Section BPreorder.
-Context (disp1 disp2 disp3 : disp_t).
-Context (T1 : bPreorderType disp1) (T2 : preorderType disp2).
-Local Notation "T1 + T2" := (type disp3 T1 T2) : type_scope.
-
-Let T1' : Type := T1.
-HB.instance Definition _ := BPreorder.on T1'.
-Let T2' : Type := T2.
-HB.instance Definition _ := Preorder.on T2'.
-
 #[export]
 HB.instance Definition _ :=
-  @hasBottom.Build disp3 (T1 + T2) (inl \bot) (@le0x _ _ T1' T2').
+  @hasBottom.Build disp3 (T1 + T2) (inl \bot) le0x.
 
 Lemma botEsum : \bot = (inl \bot) :> T1 + T2. Proof. by []. Qed.
 
 End BPreorder.
 
 Section TPreorder.
-Context (disp1 disp2 : disp_t).
+Context (disp1 disp2 disp3 : disp_t).
 Context (T1 : preorderType disp1) (T2 : tPreorderType disp2).
-Local Notation "T1 + T2" := (type (sum_display disp1 disp2) T1 T2) : type_scope.
+Local Notation "T1 + T2" := (type disp3 T1 T2) : type_scope.
 Implicit Types (x : T1 + T2).
 
 Fact lex1 x : x <= inr \top :> T1 + T2.
 Proof. by case: x => x; rewrite leEsum. Qed.
 
-End TPreorder.
-
-Section TPreorder.
-Context (disp1 disp2 disp3 : disp_t).
-Context (T1 : preorderType disp1) (T2 : tPreorderType disp2).
-Local Notation "T1 + T2" := (type disp3 T1 T2) : type_scope.
-
-Let T1' : Type := T1.
-HB.instance Definition _ := Preorder.on T1'.
-Let T2' : Type := T2.
-HB.instance Definition _ := TPreorder.on T2'.
-
 #[export]
 HB.instance Definition _ :=
-  @hasTop.Build disp3 (T1 + T2) (inr \top) (@lex1 _ _ T1' T2').
+  @hasTop.Build disp3 (T1 + T2) (inr \top) lex1.
 
 Lemma topEsum : \top = inr \top :> T1 + T2. Proof. by []. Qed.
 
@@ -2040,9 +2001,7 @@ Let sum T1 T2 := T1 +sum[sum_display disp1 disp2] T2.
 (* FIXME: Declaring a bunch of copies is still a bit painful.                 *)
 HB.instance Definition _ (T : preorderType disp1) (T' : preorderType disp2) :=
   Preorder.copy (T + T')%type (T +s T').
-(* Somehow this does not generate new instances ._. *)
-HB.instance Definition _ (T1 : bPreorderType disp1) (T2 : preorderType disp2)
-  : hasBottom (sum_display disp1 disp2) (sum T1 T2) :=
+HB.instance Definition _ (T1 : bPreorderType disp1) (T2 : preorderType disp2) :=
   BPreorder.copy (T1 + T2)%type (sum T1 T2).
 HB.instance Definition _ (T1 : preorderType disp1) (T2 : tPreorderType disp2) :=
   TPreorder.copy (T1 + T2)%type (sum T1 T2).
