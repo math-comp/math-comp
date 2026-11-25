@@ -122,12 +122,24 @@ From mathcomp Require Import nmodule.
 (*  subNzSemiAlgType R V P == join of nzSemiAlgType and subType (P : pred V)  *)
 (*                            such that val is linear                         *)
 (*                            The HB class is called SubNzSemiAlgebra.        *)
+(* subComSemiAlgType R V P == join of comSemiAlgType and subType (P : pred V) *)
+(*                            such that val is linear                         *)
+(*                            The HB class is called SubComSemiAlgebra.       *)
+(*subComNzSemiAlgType R V P == join of comNzSemiAlgType and subType           *)
+(*                            (P : pred V) such that val is linear            *)
+(*                            The HB class is called SubComNzSemiAlgebra.     *)
 (*        subAlgType R V P == join of algType and subType (P : pred V)        *)
 (*                            such that val is linear                         *)
 (*                            The HB class is called SubAlgebra.              *)
 (*      subNzAlgType R V P == join of nzAlgType and subType (P : pred V)      *)
 (*                            such that val is linear                         *)
 (*                            The HB class is called SubNzAlgebra.            *)
+(*     subComAlgType R V P == join of comAlgType and subType (P : pred V)     *)
+(*                            such that val is linear                         *)
+(*                            The HB class is called SubComAlgebra.           *)
+(*   subComNzAlgType R V P == join of comNzAlgType and subType (P : pred V)   *)
+(*                            such that val is linear                         *)
+(*                            The HB class is called SubComNzAlgebra.         *)
 (*                                                                            *)
 (* Morphisms between the above structures (see below for details):            *)
 (*                                                                            *)
@@ -309,6 +321,10 @@ From mathcomp Require Import nmodule.
 (* [SubChoice_isSubLSemiAlgebra of V by <:] == mixin axiom for a subType of   *)
 (*                           a lSemiAlgType                                   *)
 (*                                                                            *)
+(*  * NzLSemiAlgebra (non-trivial left semialgebra):                          *)
+(* [SubChoice_isSubNzLSemiAlgebra of V by <:] == mixin axiom for a subType of *)
+(*                           a nzLSemiAlgType                                 *)
+(*                                                                            *)
 (*  * Lalgebra                                                                *)
 (*    (left algebra, ring with scaling that associates on the left):          *)
 (*        subalg_closed S <-> collective predicate S is closed under lalgType *)
@@ -317,15 +333,43 @@ From mathcomp Require Import nmodule.
 (* [SubChoice_isSubLalgebra of V by <:] == mixin axiom for a subType of a     *)
 (*                           lalgType                                         *)
 (*                                                                            *)
+(*  * NzLAlgebra (non-trivial left algebra):                                  *)
+(* [SubChoice_isSubNzLAlgebra of V by <:] == mixin axiom for a subType of a   *)
+(*                           nzLalgType                                       *)
+(*                                                                            *)
 (*  * SemiAlgebra                                                             *)
 (*    (semiring with scaling that associates both left and right):            *)
 (* [SubLSemiAlgebra_isSubSemiAlgebra of V by <:] ==                           *)
 (* [SubChoice_isSubSemiAlgebra of V by <:] == mixin axiom for a subType of    *)
 (*                           a semiAlgType                                    *)
 (*                                                                            *)
+(*  * NzSemiAlgebra (non-trivial semialgebra):                                *)
+(* [SubChoice_isSubNzSemiAlgebra of V by <:] == mixin axiom for a subType of  *)
+(*                           a nzSemiAlgType                                  *)
+(*                                                                            *)
+(*  * ComSemiAlgebra (commutative semialgebra):                               *)
+(* [SubChoice_isSubComSemiAlgebra of V by <:] == mixin axiom for a subType of *)
+(*                           a comSemiAlgType                                 *)
+(*                                                                            *)
+(*  * ComNzSemiAlgebra (commutative non-trivial semialgebra):                 *)
+(* [SubChoice_isSubComNzSemiAlgebra of V by <:] == mixin axiom for a subType  *)
+(*                           of a comNzSemiAlgType                            *)
+(*                                                                            *)
 (*  * Algebra (ring with scaling that associates both left and right):        *)
 (* [SubChoice_isSubAlgebra of V by <:] == mixin axiom for a subType of a      *)
 (*                           algType                                          *)
+(*                                                                            *)
+(*  * NzAlgebra (non-trivial algebra):                                        *)
+(* [SubChoice_isSubNzAlgebra of V by <:] == mixin axiom for a subType of a    *)
+(*                           nzAlgType                                        *)
+(*                                                                            *)
+(*  * ComAlgebra (commutative algebra):                                       *)
+(* [SubChoice_isSubComAlgebra of V by <:] == mixin axiom for a subType of a   *)
+(*                           comAlgType                                       *)
+(*                                                                            *)
+(*  * ComNzAlgebra (commutative non-trivial algebra):                         *)
+(* [SubChoice_isSubComNzAlgebra of V by <:] == mixin axiom for a subType of a *)
+(*                           comNzAlgType                                     *)
 (*                                                                            *)
 (*   In addition to this structure hierarchy, we also develop a separate,     *)
 (* parallel hierarchy for morphisms linking these structures:                 *)
@@ -1280,6 +1324,16 @@ HB.structure Definition SubNzSemiAlgebra
     (R : nzSemiRingType) (V : nzSemiAlgType R) S :=
   {W of @SubNzLSemiAlgebra R V S W & NzSemiAlgebra R W}.
 
+#[short(type="subComSemiAlgType")]
+HB.structure Definition SubComSemiAlgebra
+  (R : semiRingType) (V : semiAlgType R) S
+  := {W of @SubLSemiAlgebra R V S W & ComSemiAlgebra R W}.
+
+#[short(type="subComNzSemiAlgType")]
+HB.structure Definition SubComNzSemiAlgebra
+  (R : nzSemiRingType) (V : nzSemiAlgType R) S
+  := {W of @SubLSemiAlgebra R V S W & ComNzSemiAlgebra R W}.
+
 #[short(type="subAlgType")]
 HB.structure Definition SubAlgebra (R : ringType) (V : algType R) S :=
   {W of @SubLalgebra R V S W & Algebra R W}.
@@ -1298,6 +1352,14 @@ End SubPzAlgebra.
 #[short(type="subNzAlgType")]
 HB.structure Definition SubNzAlgebra (R : nzRingType) (V : nzAlgType R) S :=
   {W of @SubNzLalgebra R V S W & NzAlgebra R W}.
+
+#[short(type="subComAlgType")]
+HB.structure Definition SubComAlgebra (R : ringType) (V : algType R) S :=
+  {W of @SubLalgebra R V S W & ComAlgebra R W}.
+
+#[short(type="subComNzAlgType")]
+HB.structure Definition SubComNzAlgebra (R : nzRingType) (V : nzAlgType R) S :=
+  {W of @SubLalgebra R V S W & ComNzAlgebra R W}.
 
 (***************************)
 (* CONVERSE RING INSTANCES *)
@@ -3842,6 +3904,32 @@ HB.instance Definition _ := SubChoice_isSubSemiAlgebra.Build R A S W
 HB.instance Definition _ := SubSemiRing_isNonZero.Build A S W.
 HB.end.
 
+(* subComSemiAlgType *)
+
+HB.factory Record SubChoice_isSubComSemiAlgebra
+    (R : semiRingType) (A : comSemiAlgType R) S W & SubChoice A S W := {
+  subsemialg_closed_subproof : subsemialg_closed S
+}.
+
+HB.builders Context R A S W & SubChoice_isSubComSemiAlgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubSemiAlgebra.Build R A S W
+  subsemialg_closed_subproof.
+HB.instance Definition _ := SubSemiRing_isSubComSemiRing.Build A S W.
+HB.end.
+
+(* subComNzSemiAlgType *)
+
+HB.factory Record SubChoice_isSubComNzSemiAlgebra
+    (R : nzSemiRingType) (A : comNzSemiAlgType R) S W & SubChoice A S W := {
+  subsemialg_closed_subproof : subsemialg_closed S
+}.
+
+HB.builders Context R A S W & SubChoice_isSubComNzSemiAlgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubComSemiAlgebra.Build R A S W
+  subsemialg_closed_subproof.
+HB.instance Definition _ := SubSemiRing_isNonZero.Build A S W.
+HB.end.
+
 (* subAlgType *)
 
 HB.factory Record SubChoice_isSubAlgebra
@@ -3873,6 +3961,32 @@ HB.factory Record SubChoice_isSubNzAlgebra
 
 HB.builders Context R A S W & SubChoice_isSubNzAlgebra R A S W.
 HB.instance Definition _ := SubChoice_isSubAlgebra.Build R A S W
+  subsemialg_closed_subproof.
+HB.instance Definition _ := SubSemiRing_isNonZero.Build A S W.
+HB.end.
+
+(* subAlgType *)
+
+HB.factory Record SubChoice_isSubComAlgebra
+    (R : ringType) (A : comAlgType R) S W & SubChoice A S W := {
+  subsemialg_closed_subproof : subsemialg_closed S
+}.
+
+HB.builders Context R A S W & SubChoice_isSubComAlgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubAlgebra.Build R A S W
+  subsemialg_closed_subproof.
+HB.instance Definition _ := SubSemiRing_isSubComSemiRing.Build A S W.
+HB.end.
+
+(* subNzAlgType *)
+
+HB.factory Record SubChoice_isSubComNzAlgebra
+    (R : nzRingType) (A : comNzAlgType R) S W & SubChoice A S W := {
+  subsemialg_closed_subproof : subsemialg_closed S
+}.
+
+HB.builders Context R A S W & SubChoice_isSubComNzAlgebra R A S W.
+HB.instance Definition _ := SubChoice_isSubComAlgebra.Build R A S W
   subsemialg_closed_subproof.
 HB.instance Definition _ := SubSemiRing_isNonZero.Build A S W.
 HB.end.
@@ -3971,6 +4085,14 @@ Notation "[ 'SubChoice_isSubNzSemiAlgebra' 'of' U 'by' <: ]" :=
   (SubChoice_isSubNzSemiAlgebra.Build _ _ _ U (subsemialgClosedP _))
   (format "[ 'SubChoice_isSubNzSemiAlgebra'  'of'  U  'by'  <: ]")
   : form_scope.
+Notation "[ 'SubChoice_isSubComSemiAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubComSemiAlgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubComSemiAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubComNzSemiAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubComNzSemiAlgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubComNzSemiAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
 Notation "[ 'SubChoice_isSubAlgebra' 'of' U 'by' <: ]" :=
   (SubChoice_isSubAlgebra.Build _ _ _ U (subsemialgClosedP _))
   (format "[ 'SubChoice_isSubAlgebra'  'of'  U  'by'  <: ]")
@@ -3978,6 +4100,14 @@ Notation "[ 'SubChoice_isSubAlgebra' 'of' U 'by' <: ]" :=
 Notation "[ 'SubChoice_isSubNzAlgebra' 'of' U 'by' <: ]" :=
   (SubChoice_isSubNzAlgebra.Build _ _ _ U (subsemialgClosedP _))
   (format "[ 'SubChoice_isSubNzAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubComAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubComAlgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubComAlgebra'  'of'  U  'by'  <: ]")
+  : form_scope.
+Notation "[ 'SubChoice_isSubComNzAlgebra' 'of' U 'by' <: ]" :=
+  (SubChoice_isSubComNzAlgebra.Build _ _ _ U (subsemialgClosedP _))
+  (format "[ 'SubChoice_isSubComNzAlgebra'  'of'  U  'by'  <: ]")
   : form_scope.
 
 #[deprecated(since="mathcomp 2.7.0",
