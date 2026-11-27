@@ -146,6 +146,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       multinomials.job = false;  # multinomials dropped support for Rocq 9.1
       coqeal.job = false;
       mathcomp-apery.job = false;
+      odd-order.job = false;  # odd-order dropped support for Rocq 9.1
     };
   };
 }
