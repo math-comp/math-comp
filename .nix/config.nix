@@ -72,12 +72,10 @@ with builtins; with (import <nixpkgs> {}).lib;
       stdlib.job = true;
       jasmin.override.version = "main";
       ssprove.override.version = "main";  # currently doesn't compile on MathComp master
-      CertiRocq.job = false;
       ConCert.job = false;
       libvalidsdp.job = false;
       relation-algebra.job = false;
       validsdp.job = false;
-      wasmcert.job = false;
       # To add an overlay applying to all bundles,
       # add below a line like
       #<package>.override.version = "<github_login>:<branch>";
@@ -108,6 +106,19 @@ with builtins; with (import <nixpkgs> {}).lib;
       paco.job = false;  # only for jasmin
       ITree.override.version = "master";  # for jasmin
       ITree.job = false;  # only for jasmin
+      flocq.override.version = "master";  # for compcert
+      flocq.job = false;
+      MenhirLib.override.version = "master";  # for compcert
+      MenhirLib.job = false;
+      compcert.override.version = "master";  # for wasmcert
+      parseque.override.version = "master";  # for wasmcert
+      parseque.job = false;  # only used by wasmcert
+      metarocq.override.version = "main";  # for CertiRocq
+      metarocq.job = false;
+      metarocq-erasure-plugin.job = true;
+      equations.override.version = "main";  # for CertiRocq
+      wasmcert.override.version = "rocq-master";
+      CertiRocq.override.version = "rocq-master";
     };
     "rocq-9.3".rocqPackages = common-bundles // {
       rocq-core.override.version = "9.3";
@@ -122,6 +133,9 @@ with builtins; with (import <nixpkgs> {}).lib;
       mathcomp-infotheo.job = false;  # not yet compatible with 9.3
       # check that we compile without warnings on last release of Coq
       mathcomp-warnings.job = true;
+      compcert.job = false;  # not yet compatible with 9.3
+      wasmcert.job = false;  # not yet compatible with 9.3
+      CertiRocq.job = false;  # not yet compatible with 9.3
     };
     "rocq-9.2".rocqPackages = common-bundles // {
       rocq-core.override.version = "9.2";
@@ -133,6 +147,7 @@ with builtins; with (import <nixpkgs> {}).lib;
       interval.job = false;
       jasmin.job = false;  # waiting for InteractionTrees
       ssprove.job = false;  # waiting for equations
+      CertiRocq.job = false;  # doesn't compile on 9.2
     };
     "rocq-9.1".rocqPackages = common-bundles // {
       rocq-core.override.version = "9.1";
