@@ -105,6 +105,7 @@ Import GRing.Theory.
 Local Open Scope ring_scope.
 
 Reserved Notation "p %= q" (at level 70, no associativity).
+Reserved Notation "'\mu_' x" (at level 8, format "'\mu_' x").
 
 Local Notation simp := Monoid.simpm.
 
@@ -823,9 +824,11 @@ Definition modp p q := (edivp p q).2.
 Definition scalp p q := ((edivp p q).1).1.
 Definition dvdp p q := modp q p == 0.
 Definition eqp p q := (dvdp p q) && (dvdp q p).
-
+Definition mup (x : R) q :=
+  if q == 0 then 0%N else sval (multiplicity_XsubC q x).
 End IDomainPseudoDivisionDefs.
 
+Notation "'\mu_' x" := (mup x) : ring_scope.
 Notation "m %/ d" := (divp m d) : ring_scope.
 Notation "m %% d" := (modp m d) : ring_scope.
 Notation "p %| q" := (dvdp p q) : ring_scope.
@@ -2322,6 +2325,17 @@ apply: size2_dvdp_gdco; rewrite ?p0 //.
 by rewrite size_polyDl size_polyX // size_polyN size_polyC ltnS; case: (x != 0).
 Qed.
 
+Lemma gdcop_eq0 (p q : {poly R}) :
+  (gdcop p q == 0)%B = (q == 0)%B && (p != 0)%B.
+Proof.
+have [[->|q_neq0] [->|p_neq0] /=] := (altP (q =P 0), altP (p =P 0)).
++ by rewrite gdcop0 eqxx oner_eq0.
++ by rewrite gdcop0 (negPf p_neq0) eqxx.
++ apply/negP=> /eqP hg; have := coprimep_gdco 0 q_neq0.
+  by rewrite hg coprimep0 eqp01.
+by apply/negP=> /eqP hg; have := dvdp_gdco p q; rewrite hg dvd0p; apply/negP.
+Qed.
+
 Lemma dvdp_comp_poly r p q : (p %| q) -> (p \Po r) %| (q \Po r).
 Proof.
 have [-> | pn0] := eqVneq p 0.
@@ -2455,6 +2469,226 @@ Arguments gcdp : simpl never.
 #[global] Hint Resolve eqpxx divp0 divp1 mod0p modp0 modp1 : core.
 #[global] Hint Resolve dvdp_mull dvdp_mulr dvdpp dvdp0 : core.
 Arguments dvdp_exp_XsubCP {R p c n}.
+
+Section IDomainMultiplicity.
+Context (R : idomainType).
+Implicit Types (a x y c : R) (p q r d : {poly R}).
+
+Lemma mup_spec p a : p != 0 ->
+  { q : {poly R} & (~~ root q a)
+    & ( p = q * ('X - a%:P) ^+ (\mu_a p)) }.
+Proof.
+move=> nz_p; rewrite /mup -if_neg.
+by case: (_ p a) => m /=/sig2_eqW[q]; rewrite nz_p; exists q.
+Qed.
+
+Lemma mup0 x : \mu_x 0 = 0%N.
+Proof. by rewrite /mup {1}eqxx. Qed.
+
+Lemma mup_dvdp p x : ('X - x%:P) ^+ (\mu_x p) %| p.
+Proof.
+case p0: (p == 0); first by rewrite (eqP p0) mup0 expr0 dvd1p.
+case: (@mup_spec p x); first by rewrite p0.
+by move=> q qn0 hp //=; rewrite {2}hp dvdp_mulIr.
+Qed.
+
+Lemma mupS_dvdpF p x : p != 0 ->
+  (('X - x%:P)^+(\mu_x p).+1 %| p) = false.
+Proof.
+move=> pn0; case: (mup_spec x pn0) => q qn0 hp /=.
+rewrite {2}hp exprS dvdp_mul2r.
+  by rewrite expf_neq0 // polyXsubC_eq0.
+apply: negbTE; rewrite -eqp_div_XsubC; apply: contra qn0.
+by move/eqP->; rewrite rootM root_XsubC eqxx orbT.
+Qed.
+
+Lemma mup_geq x q n : q != 0 -> (n <= \mu_x q)%N = (('X - x%:P)^+n %| q).
+Proof.
+move=> pn0; apply/esym.
+case: leqP=> hn; last apply/negP => hp.
+  apply: (@dvdp_trans _ (('X - x%:P) ^+ (\mu_x q))); last by rewrite mup_dvdp.
+  by rewrite dvdp_Pexp2l // size_XsubC.
+suff : ('X - x%:P) ^+ (\mu_x q).+1 %| q by rewrite mupS_dvdpF.
+by apply: dvdp_trans hp; rewrite dvdp_Pexp2l // size_XsubC.
+Qed.
+
+Lemma mup_leq x q n : q != 0 ->
+  (mup x q <= n)%N = ~~ (('X - x%:P) ^+ n.+1 %| q).
+Proof. by move=> qN0; rewrite leqNgt mup_geq. Qed.
+
+Lemma mup_ltn x q n : q != 0 -> (mup x q < n)%N = ~~ (('X - x%:P) ^+ n %| q).
+Proof. by move=> qN0; rewrite ltnNge mup_geq. Qed.
+
+Lemma XsubC_dvd x q : q != 0 -> ('X - x%:P %| q) = (0 < mup x q)%N.
+Proof. by move=> /mup_geq-/(_ _ 1%N)/esym; apply. Qed.
+
+Lemma mup_XsubCX n x y :
+  mup x (('X - y%:P) ^+ n) = (if (y == x) then n else 0)%N.
+Proof.
+have Xxn0 : ('X - y%:P) ^+ n != 0 by rewrite ?expf_neq0 ?polyXsubC_eq0.
+apply/eqP; rewrite eqn_leq mup_leq ?mup_geq//.
+have [->|Nxy] := eqVneq x y.
+  by rewrite /= dvdpp ?dvdp_Pexp2l ?size_XsubC ?ltnn.
+by rewrite dvd1p dvdp_XsubCl /root horner_exp !hornerE expf_neq0// subr_eq0.
+Qed.
+
+Lemma mupNroot x q : ~~ root q x -> mup x q = 0%N.
+Proof.
+move=> qNx; have qN0 : q != 0 by apply: contraNneq qNx => ->; rewrite root0.
+by move: qNx; rewrite -dvdp_XsubCl XsubC_dvd// lt0n negbK => /eqP.
+Qed.
+
+Lemma mup_eqn p x n : p != 0 ->
+  (\mu_x p == n) = (('X - x%:P)^+n %| p) && ~~(('X - x%:P)^+n.+1 %| p).
+Proof. by move=> hp0; rewrite -!mup_geq // -leqNgt -eqn_leq eq_sym. Qed.
+
+Lemma mup_gt0 p x : p != 0 -> (0 < \mu_x p)%N = root p x.
+Proof. by move=> hp0; rewrite mup_geq // expr1 root_factor_theorem. Qed.
+
+Lemma cofactor_XsubC_mup  x p n :
+  ~~ root p x -> \mu_x (p * ('X - x%:P) ^+ n) = n.
+Proof.
+move=> p0; apply/eqP; rewrite mup_eqn//.
+  apply: contra p0; rewrite mulf_eq0 expf_eq0 polyXsubC_eq0 andbF orbF.
+  by move/eqP->; rewrite root0.
+rewrite dvdp_mulIr /= exprS dvdp_mul2r -?root_factor_theorem //.
+by rewrite expf_eq0 polyXsubC_eq0 andbF //.
+Qed.
+
+Lemma mupMr x q1 q2 : ~~ root q1 x -> mup x (q1 * q2) = mup x q2.
+Proof.
+move=> q1Nx; have q1N0 : q1 != 0 by apply: contraNneq q1Nx => ->; rewrite root0.
+have [->|q2N0] := eqVneq q2 0; first by rewrite mulr0.
+apply/esym/eqP; rewrite eqn_leq mup_geq ?mulf_neq0// dvdp_mull -?mup_geq//=.
+rewrite mup_leq ?mulf_neq0// Gauss_dvdpr -?mup_ltn//.
+by rewrite coprimep_expl// coprimep_sym coprimep_XsubC.
+Qed.
+
+Lemma mupMl x q1 q2 : ~~ root q2 x -> mup x (q1 * q2) = mup x q1.
+Proof. by rewrite mulrC; apply/mupMr. Qed.
+
+Lemma mupM x q1 q2 : q1 != 0 -> q2 != 0 ->
+  mup x (q1 * q2) = (mup x q1 + mup x q2)%N.
+Proof.
+move=> q1N0 q2N0; apply/eqP; rewrite eqn_leq mup_leq ?mulf_neq0//.
+rewrite mup_geq ?mulf_neq0// exprD ?dvdp_mul; do ?by rewrite -mup_geq.
+have [m1 [r1]] := multiplicity_XsubC q1 x; rewrite q1N0 /= => r1Nx ->.
+have [m2 [r2]] := multiplicity_XsubC q2 x; rewrite q2N0 /= => r2Nx ->.
+rewrite !mupMr// ?mup_XsubCX eqxx/= mulrACA exprS exprD.
+rewrite dvdp_mul2r ?mulf_neq0 ?expf_neq0 ?polyXsubC_eq0//.
+by rewrite dvdp_XsubCl rootM negb_or r1Nx r2Nx.
+Qed.
+
+Lemma mup_polyC c x : \mu_x (c%:P) = 0%N.
+Proof.
+case c0: (c == 0); first by rewrite (eqP c0) mup0.
+by apply: mupNroot; rewrite rootC c0.
+Qed.
+
+Lemma mup_XsubC x : \mu_x ('X - x%:P) = 1%N.
+Proof.
+apply/eqP; rewrite mup_eqn ?polyXsubC_eq0 //=.
+by rewrite expr1 dvdpp/= -{2}[_ - _]expr1 dvdp_Pexp2l // size_XsubC.
+Qed.
+
+Lemma mup_scale c p x : c != 0 -> \mu_x (c *: p) = \mu_x p.
+Proof.
+move=> cn0; case p0: (p == 0); first by rewrite (eqP p0) scaler0.
+by rewrite -mul_polyC mupMr ?rootC.
+Qed.
+
+Lemma mupN p x : \mu_x (-p) = \mu_x p.
+Proof.
+rewrite -mulN1r -polyC1 -polyCN mul_polyC mup_scale //.
+by rewrite -oppr0 (inj_eq (inv_inj (@opprK _))) oner_eq0.
+Qed.
+
+Lemma mupX p x n : \mu_x (p ^+ n) = (\mu_x p * n)%N.
+Proof.
+elim: n p => [|n ihn] p; first by rewrite expr0 mup_polyC muln0.
+case: (eqVneq p 0) => [->|p0]; first by rewrite exprS mul0r mup0 mul0n.
+by rewrite exprS mupM ?ihn ?mulnS// expf_eq0 negb_and p0 orbT.
+Qed.
+
+Lemma mupDr p q x : p != 0 -> (\mu_x p < \mu_x q)%N ->
+  \mu_x (p + q) = \mu_x p.
+Proof.
+move=> pn0 mupq.
+have pqn0 : p + q != 0.
+  move: mupq; rewrite ltnNge; apply: contra.
+  by rewrite -[q]opprK subr_eq0; move/eqP->; rewrite opprK mupN leqnn.
+have qn0 : q != 0 by move: mupq; apply: contraL; move/eqP->; rewrite mup0 ltn0.
+case: (mup_spec x pn0)=> [qqp qqp0] hp.
+case: (mup_spec x qn0)=> [qqq qqq0] hq.
+rewrite hp hq -(subnK (ltnW mupq)).
+rewrite mupM.
+- by apply: contra qqp0; move/eqP->; rewrite root0.
+- by rewrite expf_eq0 polyXsubC_eq0 andbF.
+rewrite mupX mup_XsubC mul1n [\mu_x qqp]mupNroot // add0n.
+rewrite exprD mulrA -mulrDl.
+set Lp : {poly R} := (X in \mu_x (X * _)).
+set Rp : {poly R} := (X in \mu_x (_ * X)).
+have : Lp * Rp != 0. 
+  by rewrite mulrDl -mulrA -exprD subnK 1?ltnW // -hp -hq.
+rewrite mulf_eq0 negb_or {}/Lp {}/Rp => /andP[Lp0 Rp0].
+rewrite mupM // mupNroot ?add0n ?mupX ?mup_XsubC ?mul1n //.
+by rewrite rootE !hornerE subrr -subnSK // subnS exprS mul0r mulr0 addr0.
+Qed.
+
+Lemma mupDl p q x : q != 0 -> (\mu_x p > \mu_x q)%N ->
+  \mu_x (p + q) = \mu_x q.
+Proof. by move=> q0 hmu; rewrite addrC mupDr. Qed.
+
+Lemma mup_div p x n : (n <= \mu_x p)%N ->
+  \mu_x (p %/ ('X - x%:P) ^+ n) = (\mu_x p - n)%N.
+Proof.
+move=> hn.
+case p0: (p == 0); first by rewrite (eqP p0) div0p mup0 sub0n.
+case: (@mup_spec p x); rewrite ?p0 // => q hq hp.
+rewrite {1}hp -{1}(subnK hn) exprD mulrA.
+rewrite mulpK; first by rewrite expf_neq0 // polyXsubC_eq0.
+rewrite lead_coef_exp lead_coefXsubC 2!expr1n scale1r.
+rewrite mupM ?expf_eq0 ?polyXsubC_eq0 ?andbF //.
+  by apply: contra hq; move/eqP->; rewrite root0.
+by rewrite mupX mupNroot // add0n mup_XsubC mul1n.
+Qed.
+
+Lemma mu_prod_XsubC x (s : seq R) :
+  mup x (\prod_(y <- s) ('X - y%:P)) = count_mem x s.
+Proof.
+elim: s => [|y s IHs]; rewrite (big_cons, big_nil)/=.
+  by rewrite mupNroot// root1.
+rewrite mupM ?polyXsubC_eq0// ?monic_neq0 ?monic_prod_XsubC//.
+by rewrite IHs (@mup_XsubCX 1).
+Qed.
+
+Lemma prod_XsubC_eq (s t : seq R) :
+  \prod_(x <- s) ('X - x%:P) = \prod_(x <- t) ('X - x%:P) -> perm_eq s t.
+Proof.
+move=> eq_prod; apply/allP => x _ /=; apply/eqP.
+by have /(congr1 (mup x)) := eq_prod; rewrite !mu_prod_XsubC.
+Qed.
+
+Hypothesis char0 : has_pchar0 R.
+
+Lemma mup_deriv : forall x (p : {poly R}), root p x ->
+  \mu_x (p^`()) = (\mu_x p - 1)%N.
+Proof.
+move=> x p px0; have [-> | nz_p] := eqVneq p 0; first by rewrite derivC mup0.
+have [q nz_qx Dp] := mup_spec x nz_p.
+case Dm: (\mu_x p) => [|m]; first by rewrite Dp Dm mulr1 (negPf nz_qx) in px0.
+rewrite subn1 Dp Dm !derivCE exprS mul1r mulrnAr -mulrnAl mulrA -mulrDl.
+rewrite cofactor_XsubC_mup // rootE !(hornerE, hornerMn) subrr mulr0 add0r.
+by rewrite -mulr_natr mulf_neq0 // ((pcharf0P _).1 char0).
+Qed.
+
+Lemma mup_deriv_root : forall x (p : {poly R}), p != 0 -> root p x ->
+  \mu_x p = (\mu_x (p^`()) + 1)%N.
+Proof.
+by move=> x p p0 rpx; rewrite mup_deriv // subn1 addn1 prednK // mup_gt0.
+Qed.
+
+End IDomainMultiplicity.
 
 End CommonIdomain.
 
@@ -3156,89 +3390,6 @@ have q_gt1: size q > 1 by rewrite ltn_neqAle eq_sym sz_q_neq1 size_poly_gt0.
 rewrite -dvdp_size_eqp // eqn_leq dvdp_leq //= leqNgt; apply/negP=> p_gt_q.
 by have [|x /idPn//] := reducible_cubic_root p_le4 _ q_dv_p; rewrite q_gt1.
 Qed.
-
-Section Multiplicity.
-
-Definition mup x q :=
-  [arg max_(n > (ord0 : 'I_(size q).+1) | ('X - x%:P) ^+ n %| q) n] : nat.
-
-Lemma mup_geq x q n : q != 0 -> (n <= mup x q)%N = (('X - x%:P) ^+ n %| q).
-Proof.
-move=> q_neq0; rewrite /mup; symmetry.
-case: arg_maxnP; rewrite ?expr0 ?dvd1p//= => i i_dvd gti.
-case: ltnP => [|/dvdp_exp2l/dvdp_trans]; last exact.
-apply: contraTF => dvdq; rewrite -leqNgt.
-suff n_small : (n < (size q).+1)%N by exact: (gti (Ordinal n_small)).
-by rewrite ltnS ltnW// -(size_exp_XsubC _ x) dvdp_leq.
-Qed.
-
-Lemma mup_leq x q n : q != 0 ->
-  (mup x q <= n)%N = ~~ (('X - x%:P) ^+ n.+1 %| q).
-Proof. by move=> qN0; rewrite leqNgt mup_geq. Qed.
-
-Lemma mup_ltn x q n : q != 0 -> (mup x q < n)%N = ~~ (('X - x%:P) ^+ n %| q).
-Proof. by move=> qN0; rewrite ltnNge mup_geq. Qed.
-
-Lemma XsubC_dvd x q : q != 0 -> ('X - x%:P %| q) = (0 < mup x q)%N.
-Proof. by move=> /mup_geq-/(_ _ 1%N)/esym; apply. Qed.
-
-Lemma mup_XsubCX n x y :
-  mup x (('X - y%:P) ^+ n) = (if (y == x) then n else 0)%N.
-Proof.
-have Xxn0 : ('X - y%:P) ^+ n != 0 by rewrite ?expf_neq0 ?polyXsubC_eq0.
-apply/eqP; rewrite eqn_leq mup_leq ?mup_geq//.
-have [->|Nxy] := eqVneq x y.
-  by rewrite /= dvdpp ?dvdp_Pexp2l ?size_XsubC ?ltnn.
-by rewrite dvd1p dvdp_XsubCl /root horner_exp !hornerE expf_neq0// subr_eq0.
-Qed.
-
-Lemma mupNroot x q : ~~ root q x -> mup x q = 0%N.
-Proof.
-move=> qNx; have qN0 : q != 0 by apply: contraNneq qNx => ->; rewrite root0.
-by move: qNx; rewrite -dvdp_XsubCl XsubC_dvd// lt0n negbK => /eqP.
-Qed.
-
-Lemma mupMr x q1 q2 : ~~ root q1 x -> mup x (q1 * q2) = mup x q2.
-Proof.
-move=> q1Nx; have q1N0 : q1 != 0 by apply: contraNneq q1Nx => ->; rewrite root0.
-have [->|q2N0] := eqVneq q2 0; first by rewrite mulr0.
-apply/esym/eqP; rewrite eqn_leq mup_geq ?mulf_neq0// dvdp_mull -?mup_geq//=.
-rewrite mup_leq ?mulf_neq0// Gauss_dvdpr -?mup_ltn//.
-by rewrite coprimep_expl// coprimep_sym coprimep_XsubC.
-Qed.
-
-Lemma mupMl x q1 q2 : ~~ root q2 x -> mup x (q1 * q2) = mup x q1.
-Proof. by rewrite mulrC; apply/mupMr. Qed.
-
-Lemma mupM x q1 q2 : q1 != 0 -> q2 != 0 ->
-  mup x (q1 * q2) = (mup x q1 + mup x q2)%N.
-Proof.
-move=> q1N0 q2N0; apply/eqP; rewrite eqn_leq mup_leq ?mulf_neq0//.
-rewrite mup_geq ?mulf_neq0// exprD ?dvdp_mul; do ?by rewrite -mup_geq.
-have [m1 [r1]] := multiplicity_XsubC q1 x; rewrite q1N0 /= => r1Nx ->.
-have [m2 [r2]] := multiplicity_XsubC q2 x; rewrite q2N0 /= => r2Nx ->.
-rewrite !mupMr// ?mup_XsubCX eqxx/= mulrACA exprS exprD.
-rewrite dvdp_mul2r ?mulf_neq0 ?expf_neq0 ?polyXsubC_eq0//.
-by rewrite dvdp_XsubCl rootM negb_or r1Nx r2Nx.
-Qed.
-
-Lemma mu_prod_XsubC x (s : seq F) :
-  mup x (\prod_(y <- s) ('X - y%:P)) = count_mem x s.
-Proof.
-elim: s => [|y s IHs]; rewrite (big_cons, big_nil)/=.
-  by rewrite mupNroot// root1.
-rewrite mupM ?polyXsubC_eq0// ?monic_neq0 ?monic_prod_XsubC//.
-by rewrite IHs (@mup_XsubCX 1).
-Qed.
-
-Lemma prod_XsubC_eq (s t : seq F) :
-  \prod_(x <- s) ('X - x%:P) = \prod_(x <- t) ('X - x%:P) -> perm_eq s t.
-Proof.
-move=> eq_prod; apply/allP => x _ /=; apply/eqP.
-by have /(congr1 (mup x)) := eq_prod; rewrite !mu_prod_XsubC.
-Qed.
-
-End Multiplicity.
 
 Section FieldRingMap.
 

@@ -16,6 +16,8 @@ fingraph.v
 finset.v
 fintype.v
 generic_quotient.v
+sets.v
+near.v
 monoid.v
 nmodule.v
 path.v

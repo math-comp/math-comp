@@ -2996,6 +2996,43 @@ HB.instance Definition _ (R : countComNzRingType) :=
 HB.instance Definition _ (R : countIdomainType) :=
   [Countable of polynomial R by <:].
 
+Section PolyPchar0Idomain.
+Context (R : idomainType).
+
+Hypothesis hc0 : has_pchar0 R.
+
+Let eqn0 (n : nat) : (n%:R == 0 :> R) = (n == 0).
+Proof. by apply/pcharf0P : n. Qed.
+
+Lemma pchar0_size_deriv (p : {poly R}) :
+  size p^`() = (size p).-1.
+Proof.
+have [lep1|lt1p] := leqP (size p) 1.
+  by rewrite {1}[p]size1_polyC // derivC size_poly0 -subn1 (eqnP lep1).
+rewrite size_poly_eq // -mulr_natr mulf_eq0 eqn0 -subn2 -subSn // subn2.
+by rewrite lead_coef_eq0 -size_poly_eq0 -(subnKC lt1p).
+Qed.
+
+Lemma pchar0_derivnPpoly0 (p : {poly R}) n : (size p <= n)%N = (p^`(n) == 0).
+Proof.
+apply/idP/idP.
+   move=> Hpn; apply/eqP; apply/polyP=>i; rewrite coef_derivn.
+   rewrite nth_default; last by rewrite mul0rn coef0.
+   by apply: leq_trans Hpn _; apply leq_addr.
+elim: n {-2}n p (leqnn n) => [m | n ihn [| m]] p.
+- by rewrite leqn0; move/eqP->; rewrite derivn0 leqn0 -size_poly_eq0.
+- by move=> _; apply: ihn; rewrite leq0n.
+- rewrite derivSn => hmn hder; case e: (size p) => [|sp] //.
+  rewrite -(prednK (ltn0Sn sp)) [(_.-1)%N]lock -e -lock -pchar0_size_deriv ltnS.
+  exact: ihn.
+Qed.
+
+End PolyPchar0Idomain.
+
+Lemma neq0_scale_monic (F : fieldType) (p : {poly F}) :
+  (p != 0)%B -> (lead_coef p) ^-1 *: p \is monic.
+Proof. by move=> ?; rewrite monicE lead_coefZ mulVf ?lead_coef_eq0. Qed.
+
 Section MapFieldPoly.
 
 Variables (F : fieldType) (R : nzRingType) (f : {rmorphism F -> R}).
