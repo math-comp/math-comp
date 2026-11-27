@@ -1392,8 +1392,7 @@ Lemma num_spec_sqrtC (i : Itv.t) (x : num_def R i) (r := sqrtC_itv i) :
 Proof.
 rewrite {}/r; case: i x => [//| [l u] [x /=/and3P[xr /= lx xu]]].
 case: l lx => [bl [l |//] |[]//] lx; apply/and3P; split=> //=.
-  apply: sqrtC_real.
-  by case: bl lx => /[!bnd_simp] [|/ltW]; apply: le_trans.
+  by apply: sqrtC_real; case: bl lx => /[!bnd_simp] [|/ltW]; apply: le_trans.
 case: bl lx => /[!bnd_simp] lx.
 - by rewrite sqrtC_ge0; apply: le_trans lx.
 - by rewrite sqrtC_gt0; apply: le_lt_trans lx.

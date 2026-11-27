@@ -156,7 +156,8 @@ End IntervalCan.
 Export IntervalCan.Exports.
 
 Section IntervalPreOrder.
-Context [disp : Order.disp_t] {T : preorderType disp}.
+
+Variable (disp : Order.disp_t) (T : preorderType disp).
 Implicit Types (x y z : T) (b bl br : itv_bound T) (i : interval T).
 
 Definition le_bound b1 b2 :=
@@ -173,22 +174,18 @@ Definition lt_bound b1 b2 :=
     | _, _ => false
   end.
 
-Lemma lt_bound_def b1 b2 :
-  lt_bound b1 b2 = (le_bound b1 b2) && ~~ (le_bound b2 b1).
+Fact lt_bound_def b1 b2 :
+  lt_bound b1 b2 = le_bound b1 b2 && ~~ le_bound b2 b1.
 Proof.
-case: b1 b2 => [[]t0|[]][[]t1|[]] //=.
-- by rewrite lt_le_def.
-- apply/esym; rewrite andb_idr// => t0t1; apply/negP.
-  by move/lt_le_trans => /(_ _ t0t1); rewrite ltxx.
-- apply/esym; rewrite andb_idr// => t0t1; apply/negP.
-  by move/lt_le_trans => /(_ _ t0t1); rewrite ltxx.
-- by rewrite lt_le_def.
+case: b1 b2 => [[]t0|[]][[]t1|[]] //=; rewrite ?lt_le_def//.
+  by case: (boolP (t0 <= t1)); rewrite //= andbF.
+by rewrite -andbA andbb.
 Qed.
 
-Lemma le_bound_refl : reflexive le_bound.
+Fact le_bound_refl : reflexive le_bound.
 Proof. by move=> [[]?|[]] /=. Qed.
 
-Lemma le_bound_trans : transitive le_bound.
+Fact le_bound_trans : transitive le_bound.
 Proof.
 by case=> [[]?|[]] [[]?|[]] [[]?|[]] lexy leyz //;
   apply: (lteif_imply _ (lteif_trans lexy leyz)).
@@ -279,10 +276,10 @@ Definition subitv i1 i2 :=
   let: Interval b1l b1r := i1 in
   let: Interval b2l b2r := i2 in (b2l <= b1l) && (b1r <= b2r).
 
-Lemma subitv_refl : reflexive subitv.
+Fact subitv_refl : reflexive subitv.
 Proof. by case=> /= ? ?; rewrite !lexx. Qed.
 
-Lemma subitv_trans : transitive subitv.
+Fact subitv_trans : transitive subitv.
 Proof.
 case=> [yl yr][xl xr][zl zr] /andP [Hl Hr] /andP [Hl' Hr'] /=.
 by rewrite (le_trans Hl' Hl) (le_trans Hr Hr').
@@ -438,10 +435,11 @@ Arguments itvP [x i].
 End IntervalPreOrder.
 
 Section IntervalPOrder.
-Context {disp : Order.disp_t} {T : porderType disp}.
+
+Variable (disp : Order.disp_t) (T : porderType disp).
 Implicit Types (x y z : T) (b bl br : itv_bound T) (i : interval T).
 
-Let le_bound_anti : antisymmetric (@le_bound _ T).
+Fact le_bound_anti : antisymmetric (@le_bound _ T).
 Proof. by case=> [[]?|[]] [[]?|[]] //=; case: comparableP => // ->. Qed.
 
 HB.instance Definition _ :=
@@ -456,7 +454,7 @@ Lemma comparable_BSide_max s (x y : T) : (x >=< y)%O ->
   BSide s (Order.max x y) = Order.max (BSide s x) (BSide s y).
 Proof. by rewrite !maxEle bnd_simp => /comparable_leP[]. Qed.
 
-Let subitv_anti : antisymmetric (@subitv _ T).
+Fact subitv_anti : antisymmetric (@subitv _ T).
 Proof.
 by case=> [? ?][? ?]; rewrite andbACA => /andP[] /le_anti -> /le_anti ->.
 Qed.
