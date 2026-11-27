@@ -104,28 +104,28 @@ Notation SubZmodule_isSubRing R S U :=
   (SubNmodule_isSubNzSemiRing R S U) (only parsing).
 
 Module Ring_hasMulInverse.
-#[deprecated(since="mathcomp 2.4.0", use=NzRing_hasMulInverse.Build)]
-Notation Build R := (NzRing_hasMulInverse.Build R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=NzSemiRing_hasMulInverse.Build)]
+Notation Build R := (NzSemiRing_hasMulInverse.Build R) (only parsing).
 End Ring_hasMulInverse.
 
-#[deprecated(since="mathcomp 2.4.0", use=NzRing_hasMulInverse)]
-Notation Ring_hasMulInverse R := (NzRing_hasMulInverse R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=NzSemiRing_hasMulInverse)]
+Notation Ring_hasMulInverse R := (NzSemiRing_hasMulInverse R) (only parsing).
 
 Module ComRing_hasMulInverse.
-#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_hasMulInverse.Build)]
-Notation Build R := (ComNzRing_hasMulInverse.Build R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=ComNzSemiRing_hasMulInverse.Build)]
+Notation Build R := (ComNzSemiRing_hasMulInverse.Build R) (only parsing).
 End ComRing_hasMulInverse.
 
-#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_hasMulInverse)]
-Notation ComRing_hasMulInverse R := (ComNzRing_hasMulInverse R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=ComNzSemiRing_hasMulInverse)]
+Notation ComRing_hasMulInverse R := (ComNzSemiRing_hasMulInverse R) (only parsing).
 
 Module ComRing_isField.
-#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_isField.Build)]
-Notation Build R := (ComNzRing_isField.Build R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=ComNzSemiRing_isSemiField.Build)]
+Notation Build R := (ComNzSemiRing_isSemiField.Build R) (only parsing).
 End ComRing_isField.
 
-#[deprecated(since="mathcomp 2.4.0", use=ComNzRing_isField)]
-Notation ComRing_isField R := (ComNzRing_isField R) (only parsing).
+#[deprecated(since="mathcomp 2.4.0", use=ComNzSemiRing_isSemiField)]
+Notation ComRing_isField R := (ComNzSemiRing_isSemiField R) (only parsing).
 
 Module SubExports.
 

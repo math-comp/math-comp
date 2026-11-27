@@ -388,14 +388,14 @@ Proof. exact. Qed.
 Lemma idomain_axiomz m n : m * n = 0 -> (m == 0) || (n == 0).
 Proof. by case: m n => [[|m]|m] [[|n]|n]. Qed.
 
-Definition comMixin := GRing.ComNzRing_hasMulInverse.Build int
+Definition comMixin := GRing.ComNzSemiRing_hasMulInverse.Build int
   mulVz unitzPl invz_out.
 
 End intUnitRing.
 End intUnitRing.
 
 HB.instance Definition _ := intUnitRing.comMixin.
-HB.instance Definition _ := GRing.ComUnitRing_isIntegral.Build int
+HB.instance Definition _ := GRing.ComUnitSemiRing_isIntegral.Build int
   intUnitRing.idomain_axiomz.
 
 Definition absz m := match m with Posz p => p | Negz n => n.+1 end.

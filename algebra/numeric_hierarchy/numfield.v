@@ -75,11 +75,8 @@ Import orderedzmod.Num numdomain.Num.
 Module Num.
 
 #[short(type="numFieldType")]
-HB.structure Definition NumField := { R of GRing.UnitRing_isField R &
-     GRing.IntegralDomain R &
-     POrderZmodule R &
-     NormedZmodule (POrderZmodule.clone R _) R &
-     isNumRing R }.
+HB.structure Definition NumField :=
+  { R of NumDomain R & GRing.UnitSemiRing_isSemiField R }.
 
 Module NumFieldExports.
 Bind Scope ring_scope with NumField.sort.

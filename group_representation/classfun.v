@@ -298,8 +298,8 @@ Qed.
 Fact cfun_inv0id : {in [predC cfun_unit], cfun_inv =1 id}.
 Proof. by rewrite /cfun_inv => phi /negbTE/= ->. Qed.
 
-HB.instance Definition _ :=
-   GRing.ComNzRing_hasMulInverse.Build classfun cfun_mulV cfun_unitP cfun_inv0id.
+HB.instance Definition _ := GRing.ComNzSemiRing_hasMulInverse.Build classfun
+  cfun_mulV cfun_unitP cfun_inv0id.
 
 Fact cfun_scaleA a b phi :
   cfun_scale a (cfun_scale b phi) = cfun_scale (a * b) phi.

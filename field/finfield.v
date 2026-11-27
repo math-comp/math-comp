@@ -733,9 +733,9 @@ Qed.
 Definition FinDomainFieldType : finFieldType :=
  let cC := GRing.SemiRing_hasCommutativeMul.Build R finDomain_mulrC in
  let cR : comUnitRingType := HB.pack R cC in
- let iC := GRing.ComUnitRing_isIntegral.Build cR domR in
+ let iC := GRing.ComUnitSemiRing_isIntegral.Build cR domR in
  let iR : finIdomainType := HB.pack cR iC in
- let fC := GRing.UnitRing_isField.Build iR finDomain_field in
+ let fC := GRing.UnitSemiRing_isSemiField.Build iR finDomain_field in
  HB.pack iR fC.
 
 Definition FinDomainSplittingFieldType_pchar p (pcharRp : p \in [pchar R]) :=

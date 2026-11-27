@@ -312,7 +312,7 @@ Let invt_out {R : unitRingType} : {in [predC @unitt R], invt =1 id}.
 Proof. by move=> t /negbTE t_not_unit; rewrite /invt t_not_unit. Qed.
 
 HB.instance Definition _ {R : unitRingType} :=
-  GRing.NzRing_hasMulInverse.Build 'T[R] mulVt divtt unittP invt_out.
+  GRing.NzSemiRing_hasMulInverse.Build 'T[R] mulVt divtt unittP invt_out.
 
 End TensorRing.
 
@@ -401,8 +401,8 @@ Lemma const_tV {R : unitRingType} x
 Proof.
 apply/val_inj/matrixP=> i j.
 rewrite {2}/GRing.inv/=/invt.
-case (const_t x \in @unitt _ _ u_ d_ R) eqn:t_unit; rewrite !mxE=>//.
-apply invr_out; move: t_unit=> /negbT /forallP not_all_unit.
+case: ifP; rewrite !mxE //= => t_unit.
+apply: invr_out; move: t_unit=> /negbT /forallP not_all_unit.
 apply/negP=> ?.
 apply: not_all_unit=> ?.
 by rewrite mxE.

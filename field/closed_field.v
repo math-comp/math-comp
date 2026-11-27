@@ -726,7 +726,7 @@ have EmulV : forall x, x != 0 -> Einv x * x = 1.
   rewrite piE /= -[z]reprK -(rmorphM PtoE) -Quotient.idealrBE.
   rewrite -[X in _ - X]uv1 opprD addNKr -mulNr.
   by apply/memI; exists i; apply: dvdp_mull.
-pose EfieldMixin := GRing.ComNzRing_isField.Build _ EmulV Einv0.
+pose EfieldMixin := GRing.ComNzSemiRing_isSemiField.Build _ EmulV Einv0.
 pose Efield : fieldType := HB.pack E EfieldMixin.
 pose EIsCountable := isCountable.Build E (pcan_pickleK (can_pcan (reprK))).
 pose Ecount : countFieldType := HB.pack E Efield EIsCountable.
@@ -874,7 +874,7 @@ have KmulV: forall x : Kring, x != 0 -> (Kinv x : Kring) * x = 1.
   move=> u; have [i [x ->]] := KtoE u; rewrite EtoKeq0 => nz_x.
   by rewrite -EtoK_V -[_ * _]EtoK_M mulVf ?EtoK_1.
 have Kinv0: Kinv (FtoK 0) = FtoK 0 by rewrite -EtoK_V invr0.
-pose KfieldMixin := GRing.ComNzRing_isField.Build _ KmulV Kinv0.
+pose KfieldMixin := GRing.ComNzSemiRing_isSemiField.Build _ KmulV Kinv0.
 pose Kfield : fieldType := HB.pack K Kring KfieldMixin.
 have EtoKAdd i : zmod_morphism (EtoK i : E i -> Kfield).
   by move=> x y; rewrite EtoK_D EtoK_N.

@@ -514,7 +514,8 @@ Qed.
 
 Fact invq0 : invq 0 = 0. Proof. exact/eqP. Qed.
 
-HB.instance Definition _ := GRing.ComNzRing_isField.Build rat mulVq invq0.
+HB.instance Definition _ :=
+  GRing.ComNzSemiRing_isSemiField.Build rat mulVq invq0.
 
 Lemma numq_eq0 x : (numq x == 0) = (x == 0).
 Proof.
