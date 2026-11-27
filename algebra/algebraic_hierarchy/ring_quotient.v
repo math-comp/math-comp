@@ -101,96 +101,195 @@ Reserved Notation "m <> n %[ 'mod_ideal' I ]"
 Reserved Notation "m != n %[ 'mod_ideal' I ]"
   (format "'[hv ' m '/'  !=  n '/'  %[ 'mod_ideal'  I ] ']'").
 
-(* Variable (T : Type).
-Variable eqT : rel T.
-Variables (zeroT : T) (oppT : T -> T) (addT : T -> T -> T). *)
+HB.mixin Record isNmodQuotient T eqT (zeroT : T) (addT : T -> T -> T)
+    (Q : Type) & GRing.Nmodule Q & EqQuotient T eqT Q := {
+  pi_zeror : \pi_Q zeroT = 0;
+  pi_addr : {morph \pi_Q : x y / addT x y >-> x + y}
+}.
 
-HB.mixin Record isZmodQuotient T eqT (zeroT : T) (oppT : T -> T) (addT : T -> T -> T)
+#[short(type="nmodQuotType")]
+HB.structure Definition NmodQuotient T eqT zeroT addT :=
+  {Q of isNmodQuotient T eqT zeroT addT Q &
+        GRing.Nmodule Q & EqQuotient T eqT Q}.
+
+HB.mixin Record NmodQuotient_isZmodQuotient T eqT (oppT : T -> T) (Q : Type) &
+    GRing.Zmodule Q & EqQuotient T eqT Q := {
+  pi_oppr : {morph \pi_Q : x / oppT x >-> - x};
+}.
+
+#[short(type="zmodQuotType")]
+HB.structure Definition ZmodQuotient T eqT zeroT oppT addT :=
+  {Q of NmodQuotient_isZmodQuotient T eqT oppT Q &
+        NmodQuotient T eqT zeroT addT Q & GRing.Zmodule Q}.
+
+HB.mixin Record NmodQuotient_isSemiRingQuotient T eqT (oneT : T)
+    (mulT : T -> T -> T) (Q : Type) & GRing.SemiRing Q & EqQuotient T eqT Q := {
+    pi_oner : \pi_Q oneT = 1;
+    pi_mulr : {morph \pi_Q : x y / mulT x y >-> x * y}
+  }.
+
+#[short(type="semiRingQuotType")]
+HB.structure Definition SemiRingQuotient T eqT zeroT addT oneT mulT :=
+  {Q of NmodQuotient_isSemiRingQuotient T eqT oneT mulT Q &
+   NmodQuotient T eqT zeroT addT Q & GRing.SemiRing Q }.
+
+#[short(type="nzSemiRingQuotType")]
+HB.structure Definition NzSemiRingQuotient T eqT zeroT addT oneT mulT :=
+  {Q of NmodQuotient_isSemiRingQuotient T eqT oneT mulT Q &
+   NmodQuotient T eqT zeroT addT Q & GRing.NzSemiRing Q }.
+
+#[short(type="ringQuotType")]
+HB.structure Definition RingQuotient T eqT zeroT oppT addT oneT mulT :=
+  {Q of NmodQuotient_isSemiRingQuotient T eqT oneT mulT Q &
+   ZmodQuotient T eqT zeroT oppT addT Q & GRing.Ring Q }.
+
+#[short(type="nzRingQuotType")]
+HB.structure Definition NzRingQuotient T eqT zeroT oppT addT oneT mulT :=
+  {Q of NmodQuotient_isSemiRingQuotient T eqT oneT mulT Q &
+   ZmodQuotient T eqT zeroT oppT addT Q & GRing.NzRing Q }.
+
+Module isRingQuotient.
+#[deprecated(since="mathcomp 2.4.0", use=NmodQuotient_isSemiRingQuotient.Build)]
+Notation Build T eqT zeroT oppT addT oneT mulT Q :=
+  (NmodQuotient_isSemiRingQuotient.Build T eqT oneT mulT Q) (only parsing).
+End isRingQuotient.
+
+#[deprecated(since="mathcomp 2.4.0", use=NmodQuotient_isSemiRingQuotient)]
+Notation isRingQuotient T eqT zeroT oppT addT oneT mulT Q :=
+  (NmodQuotient_isSemiRingQuotient T eqT oneT mulT Q) (only parsing).
+
+Module isNzRingQuotient.
+#[deprecated(since="mathcomp 2.7.0", use=NmodQuotient_isSemiRingQuotient.Build)]
+Notation Build T eqT zeroT oppT addT oneT mulT Q :=
+  (NmodQuotient_isSemiRingQuotient.Build T eqT oneT mulT Q) (only parsing).
+End isNzRingQuotient.
+
+#[deprecated(since="mathcomp 2.7.0", use=NmodQuotient_isSemiRingQuotient)]
+Notation isNzRingQuotient T eqT zeroT oppT addT oneT mulT Q :=
+  (NmodQuotient_isSemiRingQuotient T eqT oneT mulT Q) (only parsing).
+
+HB.mixin Record NmodQuotient_isLSemiModQuotient (R : semiRingType) T eqT
+  (zeroT : T) (addT : T -> T -> T) (scaleT : R -> T -> T) (Q : Type) &
+  NmodQuotient T eqT zeroT addT Q & GRing.LSemiModule R Q := {
+  pi_scaler : forall a, {morph \pi_Q : x / scaleT a x >-> a *: x}
+}.
+
+#[deprecated(since="mathcomp 2.7.0", use=NmodQuotient_isLSemiModQuotient)]
+Notation ZmodQuotient_isLmodQuotient R T eqT zeroT oppT addT scaleT Q :=
+  (NmodQuotient_isLSemiModQuotient R T eqT zeroT addT scaleT Q) (only parsing).
+
+Module ZmodQuotient_isLmodQuotient.
+#[deprecated(since="mathcomp 2.7.0", use=NmodQuotient_isLSemiModQuotient.Build)]
+Notation Build R T eqT zeroT oppT addT scaleT Q :=
+  (NmodQuotient_isLSemiModQuotient.Build R T eqT zeroT addT scaleT Q)
+  (only parsing).
+End ZmodQuotient_isLmodQuotient.
+
+#[short(type="lSemiModQuotType")]
+HB.structure Definition LSemiModQuotient R T eqT zeroT addT scaleT :=
+  {Q of NmodQuotient_isLSemiModQuotient R T eqT zeroT addT scaleT Q &
+   NmodQuotient T eqT zeroT addT Q & GRing.LSemiModule R Q }.
+
+#[short(type="lmodQuotType")]
+HB.structure Definition LmodQuotient (R : ringType) T eqT zeroT oppT addT scaleT :=
+  {Q of NmodQuotient_isLSemiModQuotient R T eqT zeroT addT scaleT Q &
+   ZmodQuotient T eqT zeroT oppT addT Q & GRing.Lmodule R Q }.
+
+HB.mixin Record NzRingQuotient_isUnitRingQuotient T eqT (unitT : pred T)
+    (invT : T -> T) (Q : Type) & GRing.UnitRing Q & EqQuotient T eqT Q :=
+  {
+    pi_unitr : {mono \pi_Q : x / unitT x >-> x \in GRing.unit};
+    pi_invr : {morph \pi_Q : x / invT x >-> x^-1}
+  }.
+
+#[short(type="unitRingQuotType")]
+HB.structure Definition UnitRingQuotient T eqT zeroT oppT addT oneT mulT unitT invT :=
+  {Q of NzRingQuotient_isUnitRingQuotient T eqT unitT invT Q &
+     NzRingQuotient T eqT zeroT oppT addT oneT mulT Q & GRing.UnitRing Q }.
+
+HB.factory Record isZmodQuotient T eqT (zeroT : T) (oppT : T -> T) (addT : T -> T -> T)
 (Q : Type) & GRing.Zmodule Q & EqQuotient T eqT Q := {
   pi_zeror : \pi_Q zeroT = 0;
   pi_oppr : {morph \pi_Q : x / oppT x >-> - x};
   pi_addr : {morph \pi_Q : x y / addT x y >-> x + y}
 }.
 
-#[short(type="zmodQuotType")]
-HB.structure Definition ZmodQuotient T eqT zeroT oppT addT :=
-  {Q of isZmodQuotient T eqT zeroT oppT addT Q &
-        GRing.Zmodule Q & EqQuotient T eqT Q}.
+HB.builders Context T eqT zeroT oppT addT Q &
+  isZmodQuotient T eqT zeroT oppT addT Q.
+HB.instance Definition _ :=
+  isNmodQuotient.Build T eqT zeroT addT Q pi_zeror pi_addr.
+HB.instance Definition _ :=
+  NmodQuotient_isZmodQuotient.Build T eqT oppT Q pi_oppr.
+HB.end.
+
+HB.factory Record isUnitRingQuotient T eqT zeroT oppT addT oneT mulT (unitT : pred T) (invT : T -> T)
+  (Q : Type) & NzRingQuotient T eqT zeroT oppT addT oneT mulT Q & GRing.UnitRing Q :=
+  {
+    pi_unitr : {mono \pi_Q : x / unitT x >-> x \in GRing.unit};
+    pi_invr : {morph \pi_Q : x / invT x >-> x^-1}
+  }.
+
+HB.builders Context T eqT zeroT oppT addT oneT mulT unitT invT Q &
+  isUnitRingQuotient T eqT zeroT oppT addT oneT mulT unitT invT Q.
+HB.instance Definition _ :=
+  NzRingQuotient_isUnitRingQuotient.Build T eqT unitT invT Q pi_unitr pi_invr.
+HB.end.
+
+Section NmodQuotient.
+
+Variable (T : Type).
+Variable eqT : rel T.
+Variables (zeroT : T) (addT : T -> T -> T).
+Implicit Type nqT : nmodQuotType eqT zeroT addT.
+
+Canonical pi_zero_quot_morph nqT := PiMorph (@pi_zeror _ _ _ _ nqT).
+Canonical pi_add_quot_morph nqT := PiMorph2 (@pi_addr _ _ _ _ nqT).
+
+End NmodQuotient.
+
+Section PiAdditive.
+
+(* NB: the old additive instance used to work for any `zeroV : V` instead of  *)
+(* `0%R`. *)
+Variables (V : nmodType) (equivV : rel V).
+Variable Q : @nmodQuotType V equivV 0%R +%R.
+
+Lemma pi_is_nmod_morphism : nmod_morphism \pi_Q.
+Proof. by split=> [|x y]; rewrite !piE. Qed.
+
+HB.instance Definition _ :=
+  GRing.isNmodMorphism.Build V Q \pi_Q pi_is_nmod_morphism.
+
+End PiAdditive.
 
 Section ZModQuotient.
 
 Variable (T : Type).
 Variable eqT : rel T.
 Variables (zeroT : T) (oppT : T -> T) (addT : T -> T -> T).
-Implicit Type zqT : ZmodQuotient.type eqT zeroT oppT addT.
+Implicit Type zqT : zmodQuotType eqT zeroT oppT addT.
 
-Canonical pi_zero_quot_morph zqT := PiMorph (@pi_zeror _ _ _ _ _ zqT).
 Canonical pi_opp_quot_morph zqT := PiMorph1 (@pi_oppr _ _ _ _ _ zqT).
-Canonical pi_add_quot_morph zqT := PiMorph2 (@pi_addr _ _ _ _ _ zqT).
 
 End ZModQuotient.
 
-Section PiAdditive.
-
-Variables (V : zmodType) (equivV : rel V) (zeroV : V).
-Variable Q : @zmodQuotType V equivV zeroV -%R +%R.
-
-Lemma pi_is_zmod_morphism : zmod_morphism \pi_Q.
-Proof. by move=> x y /=; rewrite !piE. Qed.
-
-HB.instance Definition _ := GRing.isZmodMorphism.Build V Q \pi_Q pi_is_zmod_morphism.
-
-End PiAdditive.
-
-(* Variable (T : Type).
-Variable eqT : rel T.
-Variables (zeroT : T) (oppT : T -> T) (addT : T -> T -> T).
-Variables (oneT : T) (mulT : T -> T -> T).
- *)
-HB.mixin Record isNzRingQuotient T eqT zeroT oppT
-addT (oneT : T) (mulT : T -> T -> T) (Q : Type)
-  & ZmodQuotient T eqT zeroT oppT addT Q & GRing.NzRing Q:=
-  {
-    pi_oner : \pi_Q oneT = 1;
-    pi_mulr : {morph \pi_Q : x y / mulT x y >-> x * y}
-  }.
-
-Module isRingQuotient.
-#[deprecated(since="mathcomp 2.4.0", use=isNzRingQuotient.Build)]
-Notation Build T eqT zeroT oppT addT oneT mulT Q :=
-  (isNzRingQuotient.Build T eqT zeroT oppT addT oneT mulT Q) (only parsing).
-End isRingQuotient.
-
-#[deprecated(since="mathcomp 2.4.0", use=isNzRingQuotient)]
-Notation isRingQuotient T eqT zeroT oppT addT oneT mulT Q :=
-  (isNzRingQuotient T eqT zeroT oppT addT oneT mulT Q) (only parsing).
-
-#[short(type="nzRingQuotType")]
-HB.structure Definition NzRingQuotient T eqT zeroT oppT addT oneT mulT :=
-  {Q of isNzRingQuotient T eqT zeroT oppT addT oneT mulT Q &
-   ZmodQuotient T eqT zeroT oppT addT Q & GRing.NzRing Q }.
-
-#[deprecated(since="mathcomp 2.4.0", use=nzRingQuotType)]
-Notation ringQuotType := (nzRingQuotType) (only parsing).
-
-Section nzRingQuotient.
-(*Clash with the module name NzRingQuotient*)
+Section SemiRingQuotient.
 
 Variable (T : Type).
 Variable eqT : rel T.
-Variables (zeroT : T) (oppT : T -> T) (addT : T -> T -> T) (oneT : T) (mulT : T -> T -> T).
-Implicit Type rqT : NzRingQuotient.type eqT zeroT oppT addT oneT mulT.
+Variables (zeroT : T) (addT : T -> T -> T) (oneT : T) (mulT : T -> T -> T).
+Implicit Type rqT : SemiRingQuotient.type eqT zeroT addT oneT mulT.
 
-Canonical pi_one_quot_morph rqT := PiMorph (@pi_oner _ _ _ _ _ _ _ rqT).
-Canonical pi_mul_quot_morph rqT := PiMorph2 (@pi_mulr _ _ _ _ _ _ _ rqT).
+Canonical pi_one_quot_morph rqT := PiMorph (@pi_oner _ _ _ _ _ _ rqT).
+Canonical pi_mul_quot_morph rqT := PiMorph2 (@pi_mulr _ _ _ _ _ _ rqT).
 
-End nzRingQuotient.
+End SemiRingQuotient.
 
 Section PiRMorphism.
 
-Variables (R : nzRingType) (equivR : rel R) (zeroR : R).
+Variables (R : semiRingType) (equivR : rel R).
 
-Variable Q : @nzRingQuotType R equivR zeroR -%R +%R 1 *%R.
+Variable Q : @semiRingQuotType R equivR 0%R +%R 1 *%R.
 
 Lemma pi_is_monoid_morphism : monoid_morphism \pi_Q.
 Proof. by split; do ?move=> x y /=; rewrite !piE. Qed.
@@ -199,16 +298,26 @@ HB.instance Definition _ := GRing.isMonoidMorphism.Build R Q \pi_Q
 
 End PiRMorphism.
 
-HB.mixin Record isUnitRingQuotient T eqT zeroT oppT addT oneT mulT (unitT : pred T) (invT : T -> T)
-  (Q : Type) & NzRingQuotient T eqT zeroT oppT addT oneT mulT Q & GRing.UnitRing Q :=
-  {
-    pi_unitr : {mono \pi_Q : x / unitT x >-> x \in GRing.unit};
-    pi_invr : {morph \pi_Q : x / invT x >-> x^-1}
-  }.
+Section LSemiModQuotient.
+Context {R : semiRingType} {T : Type} (eqT : rel T).
+Context (zeroT : T) (addT : T -> T -> T) (scaleT : R -> T -> T).
+Implicit Type zqT : lSemiModQuotType eqT zeroT addT scaleT.
 
-#[short(type="unitRingQuotType")]
-HB.structure Definition UnitRingQuotient T eqT zeroT oppT addT oneT mulT unitT invT :=
-  {Q of isUnitRingQuotient T eqT zeroT oppT addT oneT mulT unitT invT Q & GRing.UnitRing Q & isQuotient T Q & isEqQuotient T eqT Q & isZmodQuotient T eqT zeroT oppT addT Q & isNzRingQuotient T eqT zeroT oppT addT oneT mulT Q}.
+Canonical pi_scale_quot_morph zqT a := PiMorph1 (@pi_scaler _ _ _ _ _ _ zqT a).
+
+End LSemiModQuotient.
+
+Section PiSemilinear.
+Context {R : semiRingType} {L : lSemiModType R} (equivL : rel L).
+Context (Q : @lSemiModQuotType R L equivL 0%R +%R *:%R).
+
+Local Fact pi_is_semilinear : semilinear \pi_Q.
+Proof. by split=> [a x|x y]; rewrite !piE. Qed.
+
+HB.instance Definition _ :=
+  GRing.isSemilinear.Build R L Q _ \pi_Q pi_is_semilinear.
+
+End PiSemilinear.
 
 Section UnitRingQuot.
 Variable (T : Type).
@@ -216,29 +325,32 @@ Variable eqT : rel T.
 Variables (zeroT : T) (oppT : T -> T) (addT : T -> T -> T).
 Variables (oneT : T) (mulT : T -> T -> T).
 Variables (unitT : pred T) (invT : T -> T).
-Implicit Type urqT : UnitRingQuotient.type eqT zeroT oppT addT oneT mulT unitT invT.
+Implicit Type urqT : unitRingQuotType eqT zeroT oppT addT oneT mulT unitT invT.
 
 Canonical pi_unit_quot_morph urqT := PiMono1 (@pi_unitr _ _ _ _ _ _ _ _ _ urqT).
 Canonical pi_inv_quot_morph urqT := PiMorph1 (@pi_invr _ _ _ _ _ _ _ _ _ urqT).
 
 End UnitRingQuot.
 
-Definition proper_ideal (R : nzRingType) (S : {pred R}) : Prop :=
+Definition proper_ideal (R : semiRingType) (S : {pred R}) : Prop :=
   1 \notin S /\ forall a, {in S, forall u, a * u \in S}.
 
-Definition prime_idealr_closed (R : nzRingType) (S : {pred R}) : Prop :=
+Definition prime_idealr_closed (R : semiRingType) (S : {pred R}) : Prop :=
   forall u v, u * v \in S -> (u \in S) || (v \in S).
 
-Definition idealr_closed (R : nzRingType) (S : {pred R}) :=
+Definition idealr_closed (R : semiRingType) (S : {pred R}) :=
   [/\ 0 \in S, 1 \notin S & forall a, {in S &, forall u v, a * u + v \in S}].
 
 Lemma idealr_closed_nontrivial R S : @idealr_closed R S -> proper_ideal S.
 Proof. by case=> S0 S1 hS; split => // a x xS; rewrite -[_ * _]addr0 hS. Qed.
 
-Lemma idealr_closedB R S : @idealr_closed R S -> zmod_closed S.
+Lemma idealr_closedD R S : @idealr_closed R S -> nmod_closed S.
+Proof. by case=> S0 _ hS; split=> // x y xS yS; rewrite -[x]mul1r hS. Qed.
+
+Lemma idealr_closedB (R : ringType) S : @idealr_closed R S -> zmod_closed S.
 Proof. by case=> S0 _ hS; split=> // x y xS yS; rewrite -mulN1r addrC hS. Qed.
 
-HB.mixin Record isProperIdeal (R : nzRingType) (S : R -> bool) := {
+HB.mixin Record isProperIdeal (R : semiRingType) (S : R -> bool) := {
   proper_ideal_subproof : proper_ideal S
 }.
 
@@ -246,30 +358,30 @@ HB.mixin Record isProperIdeal (R : nzRingType) (S : R -> bool) := {
 HB.structure Definition ProperIdeal R := {S of isProperIdeal R S}.
 
 #[short(type="idealr")]
-HB.structure Definition Idealr (R : nzRingType) :=
-  {S of GRing.ZmodClosed R S & ProperIdeal R S}.
+HB.structure Definition Idealr (R : ringType) :=
+  {S of Algebra.ZmodClosed R S & ProperIdeal R S}.
 
-HB.mixin Record isPrimeIdealrClosed (R : nzRingType) (S : R -> bool) := {
+HB.mixin Record isPrimeIdealrClosed (R : semiRingType) (S : R -> bool) := {
   prime_idealr_closed_subproof : prime_idealr_closed S
 }.
 
 #[short(type="prime_idealr")]
-HB.structure Definition PrimeIdealr (R : nzRingType) :=
+HB.structure Definition PrimeIdealr (R : ringType) :=
   {S of Idealr R S & isPrimeIdealrClosed R S}.
 
-HB.factory Record isIdealr (R : nzRingType) (S : R -> bool) := {
+HB.factory Record isIdealr (R : semiRingType) (S : R -> bool) := {
   idealr_closed_subproof : idealr_closed S
 }.
 
 HB.builders Context R S & isIdealr R S.
-HB.instance Definition _ := GRing.isZmodClosed.Build R S
-  (idealr_closedB idealr_closed_subproof).
+HB.instance Definition _ := GRing.isAddClosed.Build R S
+  (idealr_closedD idealr_closed_subproof).
 HB.instance Definition _ := isProperIdeal.Build R S
   (idealr_closed_nontrivial idealr_closed_subproof).
 HB.end.
 
 Section IdealTheory.
-Variables (R : nzRingType) (idealrI : idealr R).
+Variables (R : ringType) (idealrI : idealr R).
 Local Notation I := (idealrI : pred R).
 
 Lemma idealr1 : (1 \in I) = false.
@@ -284,7 +396,7 @@ End IdealTheory.
 
 Section PrimeIdealTheory.
 
-Variables (R : comNzRingType) (pidealI : prime_idealr R).
+Variables (R : comRingType) (pidealI : prime_idealr R).
 Local Notation I := (pidealI : pred R).
 
 Lemma prime_idealrM u v : (u * v \in I) = (u \in I) || (v \in I).
@@ -294,38 +406,6 @@ exact: prime_idealr_closed_subproof.
 Qed.
 
 End PrimeIdealTheory.
-
-HB.mixin Record ZmodQuotient_isLmodQuotient (R : ringType) T eqT
-  (zeroT : T) (oppT : T -> T) (addT : T -> T -> T) (scaleT : R -> T -> T)
-  (Q : Type) & ZmodQuotient T eqT zeroT oppT addT Q & GRing.Lmodule R Q := {
-  pi_scaler : forall a, {morph \pi_Q : x / scaleT a x >-> a *: x}
-}.
-
-#[short(type="lmodQuotType")]
-HB.structure Definition LmodQuotient R T eqT zeroT oppT addT scaleT :=
-  {Q of ZmodQuotient_isLmodQuotient R T eqT zeroT oppT addT scaleT Q &
-   ZmodQuotient T eqT zeroT oppT addT Q & GRing.Lmodule R Q }.
-
-Section LModQuotient.
-Context {R : ringType} {T : Type} (eqT : rel T)
-  (zeroT : T) (oppT : T -> T) (addT : T -> T -> T) (scaleT : R -> T -> T).
-Implicit Type zqT : lmodQuotType eqT zeroT oppT addT scaleT.
-
-Canonical pi_scale_quot_morph zqT a :=
-  PiMorph1 (@pi_scaler _ _ _ _ _ _ _ zqT a).
-
-End LModQuotient.
-
-Section PiLinear.
-Context {R : ringType} {L : lmodType R} (equivL : rel L) (zeroL : L)
-  (Q : @lmodQuotType R L equivL zeroL -%R +%R *:%R).
-
-Local Fact pi_is_linear : linear \pi_Q.
-Proof. by move=> a x y /=; rewrite !piE. Qed.
-
-HB.instance Definition _ := GRing.isLinear.Build R L Q _ \pi_Q pi_is_linear.
-
-End PiLinear.
 
 Module Quotient.
 Section ZmodQuotient.
@@ -403,7 +483,7 @@ Notation "{ 'quot' I }" := (quot I) : type_scope.
 
 Section RingQuotient.
 
-Variables (R : comNzRingType) (idealI : idealr R).
+Variables (R : comRingType) (idealI : idealr R).
 Local Notation I := (idealI : pred R).
 
 Definition one : {quot idealI} := lift_cst {quot idealI} 1.
@@ -444,14 +524,14 @@ HB.instance Definition _ := GRing.Zmodule_isComNzRing.Build (quot idealI)
   mulqA mulqC mul1q mulq_addl nonzero1q.
 
 #[export]
-HB.instance Definition _ := @isNzRingQuotient.Build
-  R (equiv idealI) 0 -%R +%R 1%R *%R (quot idealI) (lock _) pi_mul.
+HB.instance Definition _ := NmodQuotient_isSemiRingQuotient.Build
+  R (equiv idealI) 1%R *%R (quot idealI) (lock _) pi_mul.
 
 End RingQuotient.
 
 Section IDomainQuotient.
 
-Variables (R : comNzRingType) (I : prime_idealr R).
+Variables (R : comRingType) (I : prime_idealr R).
 
 Lemma rquot_IdomainAxiom (x y : {quot I}): x * y = 0 -> (x == 0) || (y == 0).
 Proof.
@@ -497,9 +577,8 @@ HB.instance Definition _ := ZmodQuotient.on zmodquot.
 HB.instance Definition _ :=
   GRing.Zmodule_isLmodule.Build R zmodquot scalerA scale1r scalerDr scalerDl.
 #[export]
-HB.instance Definition _ :=
-  ZmodQuotient_isLmodQuotient.Build R L (equiv Pzmod) 0 -%R +%R *:%R zmodquot
-  pi_scale.
+HB.instance Definition _ := NmodQuotient_isLSemiModQuotient.Build
+  R L (equiv Pzmod) 0 +%R *:%R zmodquot pi_scale.
 
 End LmodQuotient.
 
