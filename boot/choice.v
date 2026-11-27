@@ -15,6 +15,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
 (*                  hasChoice.                                                *)
 (* subChoiceType == interface for types that are both subType and choiceType  *)
 (*                  The HB class is SubChoice.                                *)
+(*   pointedType == interface type for types equipped with a canonical        *)
+(*                  inhabitant. The HB class is Pointed.                      *)
 (*     countType == interface for countable types (implies choiceType)        *)
 (*                  The HB class is Countable.                                *)
 (*  subCountType == interface for types that are both subType and countType   *)
@@ -25,6 +27,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
 (*                  The choice depends only on the extent of P (in particular,*)
 (*                  it is independent of exP).                                *)
 (*   choose P x0 == if P x0, a standard x such that P x                       *)
+(*         point == canonical inhabitant of a pointedType                     *)
 (*      pickle x == a nat encoding the value x : T, where T is a countType    *)
 (*    unpickle n == a partial inverse to pickle: unpickle (pickle x) = Some x *)
 (*  pickle_inv n == a sharp partial inverse to pickle pickle_inv n = Some x   *)
@@ -501,6 +504,18 @@ Notation "[ 'Choice' 'of' T 'by' <: ]" := (Choice.copy T%type (sub_type T%type))
 
 HB.instance Definition _ (T : choiceType) (P : pred T) :=
   [Choice of {x | P x} by <:].
+
+HB.mixin Record isPointed T := { point : T }.
+
+#[short(type=pointedType)]
+HB.structure Definition Pointed := {T of isPointed T & Choice T}.
+
+HB.instance Definition _ := isPointed.Build unit tt.
+HB.instance Definition _ := isPointed.Build bool false.
+HB.instance Definition _ := isPointed.Build nat 0.
+HB.instance Definition _ (T T' : pointedType) :=
+  isPointed.Build (T * T')%type (point, point).
+HB.instance Definition _ (T : choiceType) := isPointed.Build (option T) None.
 
 HB.mixin Record Choice_isCountable (T : Type) : Type := {
     pickle : T -> nat;
