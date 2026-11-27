@@ -32,6 +32,9 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 (* a dependent family type, so the ssreflect tactic case/lastP: p => [|p' x]  *)
 (* will generate two subgoals in which p has been replaced by [::] and by     *)
 (* rcons p' x, respectively.                                                  *)
+(* The lemma last_undup states that removing duplicates preserves the last    *)
+(* element, including its default value for an empty sequence.                *)
+(*                                                                            *)
 (*  ** Factories:                                                             *)
 (*             nseq n x == a sequence of n x's.                               *)
 (*          ncons n x s == a sequence of n x's, followed by s.                *)
@@ -113,7 +116,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat.
 (*              rem x s == the subsequence of s, where the first occurrence   *)
 (*                         of x has been removed (compare filter (predC1 x) s *)
 (*                         where ALL occurrences of x are removed).           *)
-(*              undup s == the subsequence of s containing only the first     *)
+(*              undup s == the subsequence of s containing only the last      *)
 (*                         occurrence of each item in s, i.e., s with all     *)
 (*                         duplicates removed.                                *)
 (*             mask m s == the subsequence of s selected by m : bitseq, with  *)
@@ -1467,6 +1470,9 @@ Lemma undup_rcons s x : undup (rcons s x) = rcons [seq y <- undup s | y != x] x.
 Proof.
 by rewrite -!cats1 undup_cat; congr cat; apply: eq_filter => y; rewrite inE.
 Qed.
+
+Lemma last_undup x s : last x (undup s) = last x s.
+Proof. by case/lastP: s => [//|s y]; rewrite undup_rcons !last_rcons. Qed.
 
 Lemma count_undup s p : count p (undup s) <= count p s.
 Proof. by rewrite -!size_filter filter_undup size_undup. Qed.

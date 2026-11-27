@@ -40,6 +40,9 @@ From mathcomp Require Import div fintype tuple finfun.
 (*     bigops.                                                                *)
 (* A special section is dedicated to big operators on natural numbers.        *)
 (*                                                                            *)
+(* index_iota m n enumerates the natural numbers in [m, n). The lemma         *)
+(* index_iota_cat splits this sequence at any intermediate bound.             *)
+(*                                                                            *)
 (* Notations:                                                                 *)
 (* The general form for iterated operators is                                 *)
 (*         <bigop>_<range> <general_term>                                     *)
@@ -594,6 +597,13 @@ Definition index_iota m n := iota m (n - m).
 Lemma index_iotaS m n :
   m <= n -> index_iota m n.+1 = rcons (index_iota m n) n.
 Proof. by move=> ?; rewrite /index_iota subSn// iotaS subnKC. Qed.
+
+Lemma index_iota_cat m n p :
+  m <= n <= p -> index_iota m p = index_iota m n ++ index_iota n p.
+Proof.
+move=> /andP[mn np]; rewrite /index_iota -{2}(subnKC mn) -iotaD.
+by rewrite addnC addnBA // subnK.
+Qed.
 
 Lemma mem_index_iota m n i : (i \in index_iota m n) = (m <= i < n).
 Proof.
