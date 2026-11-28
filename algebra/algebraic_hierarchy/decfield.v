@@ -737,7 +737,7 @@ Section DecidableFieldTheory.
 Variable F : decFieldType.
 Implicit Type f : formula F.
 
-Fact sol_subproof n f :
+Local Fact sol_subproof n f :
   reflect (exists s, (size s == n) && sat s f)
           (sat [::] (foldr Exists f (iota 0 n))).
 Proof.

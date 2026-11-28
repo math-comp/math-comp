@@ -1298,7 +1298,7 @@ Definition qact_dom := 'N(rcosets H 'N(H) | to^*).
 Canonical qact_dom_group := [group of qact_dom].
 
 Local Notation subdom := (subact_dom (coset_range H)  to^*).
-Fact qact_subdomE : subdom = qact_dom.
+Local Fact qact_subdomE : subdom = qact_dom.
 Proof. by congr 'N(_|_); apply/setP=> Hx; rewrite !inE genGid. Qed.
 Lemma qact_proof : qact_dom \subset subdom.
 Proof. by rewrite qact_subdomE. Qed.

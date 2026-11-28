@@ -155,12 +155,12 @@ HB.factory Record isNumRing R & GRing.NzRing R & POrderZmodule R
 }.
 HB.builders Context R & isNumRing R.
 
-Fact ler_wD2l (x : R) : {homo +%R x : y z / y <= z}.
+Local Fact ler_wD2l (x : R) : {homo +%R x : y z / y <= z}.
 Proof. by move=> y z; rewrite !ler_def ![_ + z]addrC addrKA. Qed.
 
 HB.instance Definition _ := Add_isHomo.Build R ler_wD2l.
 
-Fact real_nmod_closed : nmod_closed (@Num.real R).
+Local Fact real_nmod_closed : nmod_closed (@Num.real R).
 Proof.
 split=> [|x y Rx Ry]; first by rewrite realE lexx.
 without loss{Rx} x_ge0: x y Ry / 0 <= x.
@@ -172,7 +172,7 @@ Qed.
 HB.instance Definition _ := GRing.isAddClosed.Build R Num.real
   real_nmod_closed.
 
-Fact comparabler_trans : transitive (Num.comparable : rel R).
+Local Fact comparabler_trans : transitive (Num.comparable : rel R).
 Proof.
 move=> y x z; rewrite !comparablerE => xBy_real yBz_real.
 by have := rpredD xBy_real yBz_real; rewrite addrA addrNK.
@@ -271,7 +271,7 @@ Qed.
 
 (* Closure properties of the real predicates. *)
 
-Fact pos_divr_closed : divr_closed (@pos R).
+Local Fact pos_divr_closed : divr_closed (@pos R).
 Proof.
 split=> [|x y x_gt0 y_gt0]; rewrite posrE ?ltr01 //.
 have [Uy|/invr_out->] := boolP (y \is a GRing.unit); last by rewrite pmulr_rgt0.
@@ -281,7 +281,7 @@ Qed.
 HB.instance Definition _ := GRing.isDivClosed.Build R pos_num_pred
   pos_divr_closed.
 
-Fact nneg_divr_closed : divr_closed (@nneg R).
+Local Fact nneg_divr_closed : divr_closed (@nneg R).
 Proof.
 split=> [|x y]; rewrite !nnegrE ?ler01 ?le0r // -!posrE.
 case/predU1P=> [-> _ | x_gt0]; first by rewrite mul0r eqxx.
@@ -291,7 +291,7 @@ Qed.
 HB.instance Definition _ := GRing.isDivClosed.Build R nneg_num_pred
   nneg_divr_closed.
 
-Fact real_divr_closed : divr_closed (@real R).
+Local Fact real_divr_closed : divr_closed (@real R).
 Proof.
 split=> [|x y Rx Ry]; first by rewrite realE ler01.
 without loss{Rx} x_ge0: x / 0 <= x.
@@ -2565,27 +2565,27 @@ HB.builders Context R & IntegralDomain_isLeReal R.
 
   Let le00 : 0 <= 0. Proof. by have:= le0_total 0; rewrite orbb. Qed.
 
-  Fact lt0_add x y : 0 < x -> 0 < y -> 0 < x + y.
+  Local Fact lt0_add x y : 0 < x -> 0 < y -> 0 < x + y.
   Proof.
   rewrite !lt_def => /andP [x_neq0 l0x] /andP [y_neq0 l0y]; rewrite le0_add //.
   rewrite andbT addr_eq0; apply: contraNneq x_neq0 => hxy.
   by rewrite [x](@le0_anti) // hxy -le0N opprK.
   Qed.
 
-  Fact eq0_norm x : `|x| = 0 -> x = 0.
+  Local Fact eq0_norm x : `|x| = 0 -> x = 0.
   Proof.
   case: (leN_total x) => /ge0_norm => [-> // | Dnx nx0].
   by rewrite -[x]opprK -Dnx normN nx0 oppr0.
   Qed.
 
-  Fact le_def x y : (x <= y) = (`|y - x| == y - x).
+  Local Fact le_def x y : (x <= y) = (`|y - x| == y - x).
   Proof.
   wlog ->: x y / x = 0 by move/(_ 0 (y - x)); rewrite subr0 sub_ge0 => ->.
   rewrite {x}subr0; apply/idP/eqP=> [/ge0_norm// | Dy].
   by have [//| ny_ge0] := leN_total y; rewrite -Dy -normN ge0_norm.
   Qed.
 
-  Fact normM : {morph norm : x y / x * y}.
+  Local Fact normM : {morph norm : x y / x * y}.
   Proof.
   move=> x y /=; wlog x_ge0 : x / 0 <= x.
     by move=> IHx; case: (leN_total x) => /IHx//; rewrite mulNr !normN.
@@ -2593,7 +2593,7 @@ HB.builders Context R & IntegralDomain_isLeReal R.
   by move=> IHy; case: (leN_total y) => /IHy//; rewrite mulrN !normN.
   Qed.
 
-  Fact le_normD x y : `|x + y| <= `|x| + `|y|.
+  Local Fact le_normD x y : `|x + y| <= `|x| + `|y|.
   Proof.
   wlog x_ge0 : x y / 0 <= x.
     by move=> IH; case: (leN_total x) => /IH// /(_ (- y)); rewrite -opprD !normN.
@@ -2604,7 +2604,7 @@ HB.builders Context R & IntegralDomain_isLeReal R.
   by rewrite -normN ge0_norm // opprK addrCA addrNK le0_add.
   Qed.
 
-  Fact le_total : total le.
+  Local Fact le_total : total le.
   Proof. by move=> x y; rewrite -sub_ge0 -opprB le0N orbC -sub_ge0 le0_total. Qed.
 
   HB.instance Definition _ := IntegralDomain_isNumRing.Build R
@@ -2636,7 +2636,7 @@ HB.builders Context R & IntegralDomain_isLtReal R.
   Local Notation "x <= y" := (le x y) : ring_scope.
   Local Notation "`| x |" := (norm x) : ring_scope.
 
-  Fact lt0N x : (- x < 0) = (0 < x).
+  Local Fact lt0N x : (- x < 0) = (0 < x).
   Proof. by rewrite -sub_gt0 add0r opprK. Qed.
   Let leN_total x : 0 <= x \/ 0 <= - x.
   Proof.
@@ -2646,22 +2646,22 @@ HB.builders Context R & IntegralDomain_isLtReal R.
 
   Let le00 : (0 <= 0). Proof. by rewrite le_def eqxx. Qed.
 
-  Fact sub_ge0 x y : (0 <= y - x) = (x <= y).
+  Local Fact sub_ge0 x y : (0 <= y - x) = (x <= y).
   Proof. by rewrite !le_def eq_sym subr_eq0 eq_sym sub_gt0. Qed.
 
-  Fact le0_add x y : 0 <= x -> 0 <= y -> 0 <= x + y.
+  Local Fact le0_add x y : 0 <= x -> 0 <= y -> 0 <= x + y.
   Proof.
   rewrite !le_def => /predU1P [<-|x_gt0]; first by rewrite add0r.
   by case/predU1P=> [<-|y_gt0]; rewrite ?addr0 ?x_gt0 ?lt0_add // orbT.
   Qed.
 
-  Fact le0_mul x y : 0 <= x -> 0 <= y -> 0 <= x * y.
+  Local Fact le0_mul x y : 0 <= x -> 0 <= y -> 0 <= x * y.
   Proof.
   rewrite !le_def => /predU1P [<-|x_gt0]; first by rewrite mul0r eqxx.
   by case/predU1P=> [<-|y_gt0]; rewrite ?mulr0 ?eqxx ?lt0_mul // orbT.
   Qed.
 
-  Fact normM : {morph norm : x y / x * y}.
+  Local Fact normM : {morph norm : x y / x * y}.
   Proof.
   move=> x y /=; wlog x_ge0 : x / 0 <= x.
     by move=> IHx; case: (leN_total x) => /IHx//; rewrite mulNr !normN.
@@ -2669,7 +2669,7 @@ HB.builders Context R & IntegralDomain_isLtReal R.
   by move=> IHy; case: (leN_total y) => /IHy//; rewrite mulrN !normN.
   Qed.
 
-  Fact le_normD x y : `|x + y| <= `|x| + `|y|.
+  Local Fact le_normD x y : `|x + y| <= `|x| + `|y|.
   Proof.
   wlog x_ge0 : x y / 0 <= x.
     by move=> IH; case: (leN_total x) => /IH// /(_ (- y)); rewrite -opprD !normN.
@@ -2680,26 +2680,26 @@ HB.builders Context R & IntegralDomain_isLtReal R.
   by rewrite -normN ge0_norm // opprK addrCA addrNK le0_add.
   Qed.
 
-  Fact eq0_norm x : `|x| = 0 -> x = 0.
+  Local Fact eq0_norm x : `|x| = 0 -> x = 0.
   Proof.
   case: (leN_total x) => /ge0_norm => [-> // | Dnx nx0].
   by rewrite -[x]opprK -Dnx normN nx0 oppr0.
   Qed.
 
-  Fact le_def' x y : (x <= y) = (`|y - x| == y - x).
+  Local Fact le_def' x y : (x <= y) = (`|y - x| == y - x).
   Proof.
   wlog ->: x y / x = 0 by move/(_ 0 (y - x)); rewrite subr0 sub_ge0 => ->.
   rewrite {x}subr0; apply/idP/eqP=> [/ge0_norm// | Dy].
   by have [//| ny_ge0] := leN_total y; rewrite -Dy -normN ge0_norm.
   Qed.
 
-  Fact lt_def x y : (x < y) = (y != x) && (x <= y).
+  Local Fact lt_def x y : (x < y) = (y != x) && (x <= y).
   Proof.
   rewrite le_def; case: eqVneq => //= ->; rewrite -sub_gt0 subrr.
   by apply/idP=> lt00; case/negP: (lt0_ngt0 lt00).
   Qed.
 
-  Fact le_total : total le.
+  Local Fact le_total : total le.
   Proof.
   move=> x y; rewrite !le_def; have [->|] //= := eqVneq; rewrite -subr_eq0.
   by move/lt0_total; rewrite -(sub_gt0 (x - y)) sub0r opprB !sub_gt0 orbC.

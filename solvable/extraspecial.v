@@ -73,7 +73,7 @@ by apply/morphicP=> /= [[i1 j1] [i2 j2] _ _]; rewrite !permE /= mulrDr addrACA.
 Qed.
 Definition groupAction := GroupAction gactP.
 
-Fact gtype_key : unit. Proof. by []. Qed.
+Definition gtype_key : unit. Proof. by []. Qed.
 Definition gtype := locked_with gtype_key (sdprod_groupType groupAction).
 
 Definition ngtype := ncprod [set: gtype].

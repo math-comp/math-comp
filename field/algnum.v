@@ -139,7 +139,7 @@ Qed.
 Definition in_Crat_span s x :=
   exists a : rat ^ size s, x = \sum_i QtoC (a i) * s`_i.
 
-Fact Crat_span_subproof s x : decidable (in_Crat_span s x).
+Local Fact Crat_span_subproof s x : decidable (in_Crat_span s x).
 Proof.
 have [Qxs [QxsC [[|x1 s1] // [<- <-] {x s} _]]] := num_field_exists (x :: s).
 apply: decP (x1 \in <<in_tuple s1>>%VS) _; rewrite /in_Crat_span size_map.
@@ -164,7 +164,7 @@ rewrite (bigD1_ord i0) //= ffunE eqxx // rmorph1 mul1r.
 by rewrite big1 ?addr0 // => i; rewrite ffunE rmorph_nat mulr_natl lift_eqF.
 Qed.
 
-Fact Crat_span_zmod_closed s : zmod_closed (Crat_span s).
+Local Fact Crat_span_zmod_closed s : zmod_closed (Crat_span s).
 Proof.
 split=> [|_ _ /Crat_spanP[x ->] /Crat_spanP[y ->]].
   apply/Crat_spanP; exists 0.
@@ -676,7 +676,7 @@ Delimit Scope algC_expanded_scope with Ax.
 Notation "e %| x" := (x \in dvdA e) : algC_expanded_scope.
 Notation "e %| x" := (@in_mem Algebraics.divisor x (mem (dvdA e))) : algC_scope.
 
-Fact dvdA_zmod_closed e : zmod_closed (dvdA e).
+Local Fact dvdA_zmod_closed e : zmod_closed (dvdA e).
 Proof.
 split=> [|x y]; first by rewrite unfold_in mul0r eqxx rpred0 ?if_same.
 rewrite ![(e %| _)%A]unfold_in.

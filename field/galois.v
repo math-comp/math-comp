@@ -202,10 +202,10 @@ Variables (K E : {subfield L}) (f : 'End(L)) (x y : L).
 
 Let kHomf z := (map_poly f (Fadjoin_poly E x z)).[y].
 
-Fact kHomExtend_zmod_morphism_subproof : zmod_morphism kHomf.
+Local Fact kHomExtend_zmod_morphism_subproof : zmod_morphism kHomf.
 Proof. by move=> a b; rewrite /kHomf 2!raddfB hornerD hornerN. Qed.
 
-Fact kHomExtend_scalable_subproof : scalable kHomf.
+Local Fact kHomExtend_scalable_subproof : scalable kHomf.
 Proof.
 move=> k a; rewrite /kHomf linearZ /= -[RHS]mulr_algl -hornerZ; congr _.[_].
 by apply/polyP => i; rewrite !(coefZ, coef_map) /= !mulr_algl linearZ.
@@ -415,7 +415,7 @@ HB.instance Definition _ := FieldExt_isSplittingField.Build F L
   (normal_field_splitting normal_field_splitting_axiom).
 HB.end.
 
-Fact regular_splittingAxiom (F : fieldType) : SplittingField.axiom F^o.
+Local Fact regular_splittingAxiom (F : fieldType) : SplittingField.axiom F^o.
 Proof.
 exists 1; first exact: rpred1.
 by exists [::]; [rewrite big_nil eqpxx | rewrite Fadjoin_nil regular_fullv].
@@ -444,7 +444,7 @@ apply: sig2_eqW; have [p F0p [rs splitLp genLrs]] := splittingFieldP.
 by exists (p, rs); rewrite // /factF F0p splitLp.
 Qed.
 
-Fact fieldOver_splitting E : SplittingField.axiom (fieldOver E).
+Local Fact fieldOver_splitting E : SplittingField.axiom (fieldOver E).
 Proof.
 have [p Fp [r Dp defL]] := splittingFieldP; exists p.
   apply/polyOverP=> j; rewrite trivial_fieldOver.
@@ -648,7 +648,7 @@ Variables (F : fieldType) (L : splittingFieldType F).
 Implicit Types (U V W : {vspace L}) (K M E : {subfield L}).
 
 Definition inAEnd f := SeqSub (svalP (enum_AEnd L) f).
-Fact inAEndK : cancel inAEnd val. Proof. by []. Qed.
+Local Fact inAEndK : cancel inAEnd val. Proof. by []. Qed.
 
 HB.instance Definition _ := Countable.copy 'AEnd(L) (can_type inAEndK).
 HB.instance Definition _ := isFinite.Build 'AEnd(L)
@@ -657,13 +657,13 @@ HB.instance Definition _ := isFinite.Build 'AEnd(L)
 (* the group operation is the categorical composition operation *)
 Definition comp_AEnd (f g : 'AEnd(L)) : 'AEnd(L) := (g \o f)%AF.
 
-Fact comp_AEndA : associative comp_AEnd.
+Local Fact comp_AEndA : associative comp_AEnd.
 Proof. by move=> f g h; apply: val_inj; symmetry; apply: comp_lfunA. Qed.
 
-Fact comp_AEnd1l : left_id \1%AF comp_AEnd.
+Local Fact comp_AEnd1l : left_id \1%AF comp_AEnd.
 Proof. by move=> f; apply/val_inj/comp_lfun1r. Qed.
 
-Fact comp_AEndK : left_inverse \1%AF (@inv_ahom _ L) comp_AEnd.
+Local Fact comp_AEndK : left_inverse \1%AF (@inv_ahom _ L) comp_AEnd.
 Proof.  by move=> f; apply/val_inj; rewrite /= lker0_compfV ?AEnd_lker0. Qed.
 
 HB.instance Definition _:= Finite_isGroup.Build 'AEnd(L)
@@ -733,7 +733,7 @@ Inductive gal_of := Gal of [subg kAEnd_group 1 <<V>> / kAEndf (agenv V)].
 Definition gal (f : 'AEnd(L)) := Gal (subg _ (coset _ f)).
 Definition gal_sgval x := let: Gal u := x in u.
 
-Fact gal_sgvalK : cancel gal_sgval Gal. Proof. by case. Qed.
+Local Fact gal_sgvalK : cancel gal_sgval Gal. Proof. by case. Qed.
 Let gal_sgval_inj := can_inj gal_sgvalK.
 
 HB.instance Definition _ := Countable.copy gal_of (can_type gal_sgvalK).
@@ -743,18 +743,18 @@ HB.instance Definition _ := isFinite.Build gal_of
 Definition gal_one := Gal 1%g.
 Definition gal_inv x := Gal (gal_sgval x)^-1.
 Definition gal_mul x y := Gal (gal_sgval x * gal_sgval y).
-Fact gal_oneP : left_id gal_one gal_mul.
+Local Fact gal_oneP : left_id gal_one gal_mul.
 Proof. by move=> x; apply/gal_sgval_inj/mul1g. Qed.
-Fact gal_invP : left_inverse gal_one gal_inv gal_mul.
+Local Fact gal_invP : left_inverse gal_one gal_inv gal_mul.
 Proof. by move=> x; apply/gal_sgval_inj/mulVg. Qed.
-Fact gal_mulP : associative gal_mul.
+Local Fact gal_mulP : associative gal_mul.
 Proof. by move=> x y z; apply/gal_sgval_inj/mulgA. Qed.
 
 HB.instance Definition _ := Finite_isGroup.Build gal_of gal_mulP gal_oneP gal_invP.
 
 Coercion gal_repr u : 'AEnd(L) := repr (sgval (gal_sgval u)).
 
-Fact gal_is_morphism : {in kAEnd 1 (agenv V) &, {morph gal : x y / x * y}%g}.
+Local Fact gal_is_morphism : {in kAEnd 1 (agenv V) &, {morph gal : x y / x * y}%g}.
 Proof.
 move=> f g /= autEa autEb; congr (Gal _).
 by rewrite !morphM ?mem_morphim // (subsetP (kAEnd_norm 1 _)).
@@ -923,7 +923,7 @@ Proof.
 by move=> fixAa; have [Ea _] := memv_capP fixAa; have:= fixedFieldP Ea fixAa.
 Qed.
 
-Fact fixedField_is_aspace E (A : {set gal_of E}) : is_aspace (fixedField A).
+Local Fact fixedField_is_aspace E (A : {set gal_of E}) : is_aspace (fixedField A).
 Proof.
 rewrite /fixedField; elim/big_rec: _ {1}E => [|x K _ IH_K] M.
   exact: (valP (M :&: _)%AS).
@@ -972,7 +972,7 @@ Section TraceAndNormMorphism.
 
 Variables U V : {vspace L}.
 
-Fact galTrace_is_zmod_morphism : zmod_morphism (galTrace U V).
+Local Fact galTrace_is_zmod_morphism : zmod_morphism (galTrace U V).
 Proof.
 by move=> a b /=; rewrite -sumrB; apply: eq_bigr => x _; rewrite rmorphB.
 Qed.

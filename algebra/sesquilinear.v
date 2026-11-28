@@ -522,7 +522,7 @@ Variable eps_theta : bool * {rmorphism R -> R}.
 
 Definition sesqui :=
   [qualify M : 'M_n | M == ((-1) ^+ eps_theta.1) *: M ^t eps_theta.2].
-Fact sesqui_key : pred_key sesqui. Proof. by []. Qed.
+Definition sesqui_key : pred_key sesqui. Proof. by []. Qed.
 
 Canonical sesqui_keyed := KeyedQualifier sesqui_key.
 
@@ -1507,7 +1507,7 @@ Variable theta : R -> R.
 
 Definition hermitianmx :=
   [qualify M : 'M_n | M == ((-1) ^+ eps) *: M ^t theta].
-Fact hermitianmx_key : pred_key hermitianmx. Proof. by []. Qed.
+Definition hermitianmx_key : pred_key hermitianmx. Proof. by []. Qed.
 Canonical hermitianmx_keyed := KeyedQualifier hermitianmx_key.
 
 Structure hermitian_matrix := HermitianMx {

@@ -79,7 +79,7 @@ Proof. exact: negPf (denq_neq0 _). Qed.
 Lemma coprime_num_den x : coprime `|numq x| `|denq x|.
 Proof. by rewrite /numq /denq; case: x=> [[a b] /= /andP []]. Qed.
 
-Fact RatK x P : @Rat (numq x, denq x) P = x.
+Local Fact RatK x P : @Rat (numq x, denq x) P = x.
 Proof. by move: x P => [[a b] P'] P; apply: val_inj. Qed.
 
 Definition fracq_subdef x :=
@@ -99,7 +99,7 @@ rewrite mulrA sgz_def mulrnAr -signr_addb addbb expr0.
 by have [->|] := eqVneq n 0; rewrite (mulr0, mul1r).
 Qed.
 
-Fact fracq_subproof x (y := fracq_opt_subdef x) :
+Local Fact fracq_subproof x (y := fracq_opt_subdef x) :
   (0 < y.2) && (coprime `|y.1| `|y.2|).
 Proof.
 rewrite {}/y fracq_opt_subdefE /=; have [] //= := eqVneq x.2 0.
@@ -223,12 +223,12 @@ Lemma den_fracq x : denq (fracq x) =
   if x.2 != 0 then (`|x.2| %/ gcdn `|x.1| `|x.2|)%:Z else 1.
 Proof. by rewrite /denq val_fracq/=; case: ifP. Qed.
 
-Fact ratz_frac n : ratz n = fracq (n, 1).
+Local Fact ratz_frac n : ratz n = fracq (n, 1).
 Proof.
 by apply: val_inj; rewrite val_fracq/= gcdn1 !divn1 abszE mulr_sign_norm.
 Qed.
 
-Fact valqK x : fracq (valq x) = x.
+Local Fact valqK x : fracq (valq x) = x.
 Proof.
 move: x => [[n d] /= Pnd]; apply: val_inj; rewrite ?val_fracq/=.
 move: Pnd; rewrite /coprime /fracq /= => /andP[] hd -/eqP hnd.
@@ -239,7 +239,7 @@ Definition scalq '(n, d) := sgr d * (gcdn `|n| `|d|)%:Z.
 Lemma scalq_def x : scalq x = sgr x.2 * (gcdn `|x.1| `|x.2|)%:Z.
 Proof. by case: x. Qed.
 
-Fact scalq_eq0 x : (scalq x == 0) = (x.2 == 0).
+Local Fact scalq_eq0 x : (scalq x == 0) = (x.2 == 0).
 Proof.
 case: x => n d; rewrite scalq_def /= mulf_eq0 sgr_eq0 /= eqz_nat.
 rewrite -[gcdn _ _ == 0]negbK -lt0n gcdn_gt0 ?absz_gt0 [X in ~~ X]orbC.
@@ -259,7 +259,7 @@ Lemma scalqE x :
   x.2 != 0 -> scalq x = (-1) ^+ (x.2 < 0)%R * (gcdn `|x.1| `|x.2|)%:Z.
 Proof. by rewrite scalq_def; case: sgrP. Qed.
 
-Fact valq_frac x :
+Local Fact valq_frac x :
   x.2 != 0 -> x = (scalq x * numq (fracq x), scalq x * denq (fracq x)).
 Proof.
 move=> x2_neq0; rewrite scalqE//; move: x2_neq0.
@@ -272,19 +272,19 @@ Qed.
 Definition zeroq := 0%Q.
 Definition oneq := 1%Q.
 
-Fact frac0q x : fracq (0, x) = zeroq.
+Local Fact frac0q x : fracq (0, x) = zeroq.
 Proof.
 apply: val_inj; rewrite //= val_fracq/= div0n !gcd0n !mulr0 !divnn.
 by have [//|x_neq0] := eqVneq; rewrite absz_gt0 x_neq0.
 Qed.
 
-Fact fracq0  x : fracq (x, 0) = zeroq. Proof. exact/eqP. Qed.
+Local Fact fracq0  x : fracq (x, 0) = zeroq. Proof. exact/eqP. Qed.
 
 Variant fracq_spec (x : int * int) : int * int -> rat -> Type :=
   | FracqSpecN of x.2 = 0 : fracq_spec x (x.1, 0) zeroq
   | FracqSpecP k fx of k != 0 : fracq_spec x (k * numq fx, k * denq fx) fx.
 
-Fact fracqP x : fracq_spec x x (fracq x).
+Local Fact fracqP x : fracq_spec x x (fracq x).
 Proof.
 case: x => n d /=; have [d_eq0 | d_neq0] := eqVneq d 0.
   by rewrite d_eq0 fracq0; constructor.
@@ -315,7 +315,7 @@ rewrite -(@Gauss_dvdr _ `|numq y|) 1?coprime_sym ?coprime_num_den //.
 by rewrite -!abszM hxy -{1}hxy !abszM !dvdn_mull ?dvdnn.
 Qed.
 
-Fact fracq_eq x y : x.2 != 0 -> y.2 != 0 ->
+Local Fact fracq_eq x y : x.2 != 0 -> y.2 != 0 ->
   (fracq x == fracq y) = (x.1 * y.2 == y.1 * x.2).
 Proof.
 case: fracqP=> //= u fx u_neq0 _; case: fracqP=> //= v fy v_neq0 _; symmetry.
@@ -323,14 +323,14 @@ rewrite [eqbRHS]mulrC mulrACA [eqbRHS]mulrACA.
 by rewrite [denq _ * _]mulrC (inj_eq (mulfI _)) ?mulf_neq0 // rat_eq.
 Qed.
 
-Fact fracq_eq0 x : (fracq x == zeroq) = (x.1 == 0) || (x.2 == 0).
+Local Fact fracq_eq0 x : (fracq x == zeroq) = (x.1 == 0) || (x.2 == 0).
 Proof.
 move: x=> [n d] /=; have [->|d0] := eqVneq d 0.
   by rewrite fracq0 eqxx orbT.
 by rewrite -[zeroq]valqK orbF fracq_eq ?d0 //= mulr1 mul0r.
 Qed.
 
-Fact fracqMM x n d : x != 0 -> fracq (x * n, x * d) = fracq (n, d).
+Local Fact fracqMM x n d : x != 0 -> fracq (x * n, x * d) = fracq (n, d).
 Proof.
 move=> x_neq0; apply/eqP.
 have [->|d_neq0] := eqVneq d 0; first by rewrite mulr0 !fracq0.
@@ -378,16 +378,16 @@ Definition oppq '(Rat x xP) := fracq (oppq_subdef x).
 Definition oppq_def x : oppq x = fracq (oppq_subdef (valq x)).
 Proof. by case: x. Qed.
 
-Fact addq_subdefC : commutative addq_subdef.
+Local Fact addq_subdefC : commutative addq_subdef.
 Proof. by move=> x y; rewrite !addq_subdefE addrC [x.2 * _]mulrC. Qed.
 
-Fact addq_subdefA : associative addq_subdef.
+Local Fact addq_subdefA : associative addq_subdef.
 Proof.
 move=> x y z; rewrite !addq_subdefE/=.
 by rewrite !mulrDl addrA !mulrA 2![_ * _ * x.2]mulrAC.
 Qed.
 
-Fact addq_frac x y : x.2 != 0 -> y.2 != 0 ->
+Local Fact addq_frac x y : x.2 != 0 -> y.2 != 0 ->
   (addq (fracq x) (fracq y)) = fracq (addq_subdef x y).
 Proof.
 case: fracqP => // u fx u_neq0 _; case: fracqP => // v fy v_neq0 _.
@@ -396,35 +396,35 @@ rewrite ![(_ * numq _) * _]mulrACA [(_ * denq _) * _]mulrACA.
 by rewrite [v * _]mulrC -mulrDr fracqMM ?mulf_neq0.
 Qed.
 
-Fact ratzD : {morph ratz : x y / x + y >-> addq x y}.
+Local Fact ratzD : {morph ratz : x y / x + y >-> addq x y}.
 Proof. by move=> x y; rewrite !ratz_frac addq_frac// addq_subdefE/= !mulr1. Qed.
 
-Fact oppq_frac x : oppq (fracq x) = fracq (oppq_subdef x).
+Local Fact oppq_frac x : oppq (fracq x) = fracq (oppq_subdef x).
 Proof.
 rewrite /oppq_subdef; case: fracqP => /= [|u fx u_neq0].
   by rewrite fracq0.
 by rewrite oppq_def -mulrN fracqMM.
 Qed.
 
-Fact ratzN : {morph ratz : x / - x >-> oppq x}.
+Local Fact ratzN : {morph ratz : x / - x >-> oppq x}.
 Proof. by move=> x /=; rewrite !ratz_frac // /add /= !mulr1. Qed.
 
-Fact addqC : commutative addq.
+Local Fact addqC : commutative addq.
 Proof. by move=> x y; rewrite !addq_def /= addq_subdefC. Qed.
 
-Fact addqA : associative addq.
+Local Fact addqA : associative addq.
 Proof.
 move=> x y z; rewrite -[x]valqK -[y]valqK -[z]valqK.
 by rewrite ?addq_frac ?addq_subdefA// ?addq_subdefE ?mulf_neq0 ?denq_neq0.
 Qed.
 
-Fact add0q : left_id zeroq addq.
+Local Fact add0q : left_id zeroq addq.
 Proof.
 move=> x; rewrite -[x]valqK -[zeroq]valqK addq_frac ?denq_neq0 // !addq_subdefE.
 by rewrite mul0r add0r mulr1 mul1r -surjective_pairing.
 Qed.
 
-Fact addNq : left_inverse (fracq (0, 1)) oppq addq.
+Local Fact addNq : left_inverse (fracq (0, 1)) oppq addq.
 Proof.
 move=> x; rewrite -[x]valqK !(addq_frac, oppq_frac) ?denq_neq0 //.
 rewrite !addq_subdefE /oppq_subdef //= mulNr addNr; apply/eqP.
@@ -451,10 +451,10 @@ Proof.
 by case: x y => [x1 [[|[|x2]]|x2]] [y1 [[|[|y2]]|y2]]/=; rewrite ?Monoid.simpm.
 Qed.
 
-Fact mulq_subdefC : commutative mulq_subdef.
+Local Fact mulq_subdefC : commutative mulq_subdef.
 Proof. by move=> x y; rewrite !mulq_subdefE mulrC [_ * x.2]mulrC. Qed.
 
-Fact mul_subdefA : associative mulq_subdef.
+Local Fact mul_subdefA : associative mulq_subdef.
 Proof. by move=> x y z; rewrite !mulq_subdefE !mulrA. Qed.
 
 Definition invq_subdef (x : int * int) := (x.2, x.1).
@@ -462,7 +462,7 @@ Definition invq '(Rat x xP) := fracq (invq_subdef x).
 Lemma invq_def x : invq x = fracq (invq_subdef (valq x)).
 Proof. by case: x. Qed.
 
-Fact mulq_frac x y : (mulq (fracq x) (fracq y)) = fracq (mulq_subdef x y).
+Local Fact mulq_frac x y : (mulq (fracq x) (fracq y)) = fracq (mulq_subdef x y).
 Proof.
 rewrite mulq_def !mulq_subdefE; case: (fracqP x) => /= [|u fx u_neq0].
   by rewrite !mul0r !mul1r fracq0 frac0q.
@@ -471,28 +471,28 @@ case: (fracqP y) => /= [|v fy v_neq0].
 by rewrite ![_ * (v * _)]mulrACA [RHS]fracqMM ?mulf_neq0.
 Qed.
 
-Fact ratzM : {morph ratz : x y / x * y >-> mulq x y}.
+Local Fact ratzM : {morph ratz : x y / x * y >-> mulq x y}.
 Proof. by move=> x y /=; rewrite !ratz_frac //= !mulr1. Qed.
 
-Fact invq_frac x :
+Local Fact invq_frac x :
   x.1 != 0 -> x.2 != 0 -> invq (fracq x) = fracq (invq_subdef x).
 Proof. by rewrite invq_def; case: (fracqP x) => // k ? k0; rewrite fracqMM. Qed.
 
-Fact mulqC : commutative mulq.
+Local Fact mulqC : commutative mulq.
 Proof. by move=> x y; rewrite !mulq_def mulq_subdefC. Qed.
 
-Fact mulqA : associative mulq.
+Local Fact mulqA : associative mulq.
 Proof.
 by move=> x y z; rewrite -[x]valqK -[y]valqK -[z]valqK !mulq_frac mul_subdefA.
 Qed.
 
-Fact mul1q : left_id oneq mulq.
+Local Fact mul1q : left_id oneq mulq.
 Proof.
 move=> x; rewrite -[x]valqK -[oneq]valqK; rewrite mulq_frac !mulq_subdefE.
 by rewrite !mul1r -surjective_pairing.
 Qed.
 
-Fact mulq_addl : left_distributive mulq addq.
+Local Fact mulq_addl : left_distributive mulq addq.
 Proof.
 move=> x y z; rewrite -[x]valqK -[y]valqK -[z]valqK /=.
 rewrite !(mulq_frac, addq_frac, mulq_subdefE, addq_subdefE) ?mulf_neq0 ?denq_neq0 //=.
@@ -500,19 +500,19 @@ apply/eqP; rewrite fracq_eq ?mulf_neq0 ?denq_neq0 //= !mulrDl; apply/eqP.
 by rewrite !mulrA ![_ * (valq z).1]mulrC !mulrA ![_ * (valq x).2]mulrC !mulrA.
 Qed.
 
-Fact nonzero1q : oneq != zeroq. Proof. by []. Qed.
+Local Fact nonzero1q : oneq != zeroq. Proof. by []. Qed.
 
 HB.instance Definition _ :=
   GRing.Zmodule_isComNzRing.Build rat mulqA mulqC mul1q mulq_addl nonzero1q.
 
-Fact mulVq x : x != 0 -> mulq (invq x) x = 1.
+Local Fact mulVq x : x != 0 -> mulq (invq x) x = 1.
 Proof.
 rewrite -[x]valqK -[0]valqK fracq_eq ?denq_neq0 //= mulr1 mul0r=> nx0.
 rewrite !(mulq_frac, invq_frac, mulq_subdefE) ?denq_neq0 // -[1]valqK.
 by apply/eqP; rewrite fracq_eq ?mulf_neq0 ?denq_neq0 //= mulr1 mul1r mulrC.
 Qed.
 
-Fact invq0 : invq 0 = 0. Proof. exact/eqP. Qed.
+Local Fact invq0 : invq 0 = 0. Proof. exact/eqP. Qed.
 
 HB.instance Definition _ := GRing.ComNzRing_isField.Build rat mulVq invq0.
 
@@ -567,7 +567,7 @@ by rewrite /coprime=> /eqP cab; rewrite gt_eqF // abszN cab divn1 gtz0_abs.
 Qed.
 
 (* Will be subsumed by pnatr_eq0 *)
-Fact intq_eq0 n : (n%:~R == 0 :> rat) = (n == 0)%N.
+Local Fact intq_eq0 n : (n%:~R == 0 :> rat) = (n == 0)%N.
 Proof. by rewrite -ratzE /ratz rat_eqE/= /numq /denq/= eqxx andbT. Qed.
 
 (* fracq should never appear, its canonical form is _%:Q / _%:Q *)
@@ -660,7 +660,7 @@ Proof. by rewrite le_ratE mul0r mulr1. Qed.
 Lemma le_rat0 x : le_rat x 0 = (numq x <= 0).
 Proof. by rewrite le_ratE mul0r mulr1. Qed.
 
-Fact le_rat0D x y : le_rat 0 x -> le_rat 0 y -> le_rat 0 (x + y).
+Local Fact le_rat0D x y : le_rat 0 x -> le_rat 0 y -> le_rat 0 (x + y).
 Proof.
 rewrite !ge_rat0 => hnx hny.
 have hxy: (0 <= numq x * denq y + numq y * denq x).
@@ -670,7 +670,7 @@ rewrite val_fracq/=; case: ifP => //=.
 by rewrite ?addq_subdefE !mulr_ge0// !le_gtF ?mulr_ge0 ?denq_ge0//=.
 Qed.
 
-Fact le_rat0M x y : le_rat 0 x -> le_rat 0 y -> le_rat 0 (x * y).
+Local Fact le_rat0M x y : le_rat 0 x -> le_rat 0 y -> le_rat 0 (x * y).
 Proof.
 rewrite !ge_rat0 => hnx hny.
 have hxy: (0 <= numq x * denq y + numq y * denq x).
@@ -680,7 +680,7 @@ rewrite val_fracq/=; case: ifP => //=.
 by rewrite ?mulq_subdefE !mulr_ge0// !le_gtF ?mulr_ge0 ?denq_ge0//=.
 Qed.
 
-Fact le_rat0_anti x : le_rat 0 x -> le_rat x 0 -> x = 0.
+Local Fact le_rat0_anti x : le_rat 0 x -> le_rat x 0 -> x = 0.
 Proof.
 by move=> hx hy; apply/eqP; rewrite -numq_eq0 eq_le -ge_rat0 -le_rat0 hx hy.
 Qed.
@@ -692,7 +692,7 @@ case: fracqP => [|k fx k_neq0] /=; first by rewrite mulr0.
 by rewrite !sgrM  mulrACA -expr2 sqr_sg k_neq0 sgr_denq mulr1 mul1r.
 Qed.
 
-Fact subq_ge0 x y : le_rat 0 (y - x) = le_rat x y.
+Local Fact subq_ge0 x y : le_rat 0 (y - x) = le_rat x y.
 Proof.
 symmetry; rewrite ge_rat0 !le_ratE -subr_ge0.
 case: ratP => nx dx cndx; case: ratP => ny dy cndy.
@@ -701,13 +701,13 @@ symmetry; rewrite !leNgt -sgr_cp0 sgr_numq_div mulrC gtr0_sg //.
 by rewrite mul1r sgr_cp0.
 Qed.
 
-Fact le_rat_total : total le_rat.
+Local Fact le_rat_total : total le_rat.
 Proof. by move=> x y; rewrite !le_ratE; apply: le_total. Qed.
 
-Fact numq_sign_mul (b : bool) x : numq ((-1) ^+ b * x) = (-1) ^+ b * numq x.
+Local Fact numq_sign_mul (b : bool) x : numq ((-1) ^+ b * x) = (-1) ^+ b * numq x.
 Proof. by case: b; rewrite ?(mul1r, mulN1r) // numqN. Qed.
 
-Fact numq_div_lt0 n d : n != 0 -> d != 0 ->
+Local Fact numq_div_lt0 n d : n != 0 -> d != 0 ->
   (numq (n%:~R / d%:~R) < 0)%R = (n < 0)%R (+) (d < 0)%R.
 Proof.
 move=> n0 d0; rewrite -sgr_cp0 sgr_numq_div !sgr_def n0 d0.
@@ -723,16 +723,16 @@ rewrite !intr_sign invr_sign -signr_addb numq_sign_mul -numq_div_lt0 //.
 by apply: (canRL (signrMK _)); rewrite mulz_sign_abs.
 Qed.
 
-Fact norm_ratN x : normq (- x) = normq x.
+Local Fact norm_ratN x : normq (- x) = normq x.
 Proof. by rewrite !normqE numqN denqN normrN. Qed.
 
-Fact ge_rat0_norm x : le_rat 0 x -> normq x = x.
+Local Fact ge_rat0_norm x : le_rat 0 x -> normq x = x.
 Proof.
 rewrite ge_rat0; case: ratP=> [] // n d cnd n_ge0.
 by rewrite normqE /= normr_num_div ?ger0_norm // divq_num_den.
 Qed.
 
-Fact lt_rat_def x y : (lt_rat x y) = (y != x) && (le_rat x y).
+Local Fact lt_rat_def x y : (lt_rat x y) = (y != x) && (le_rat x y).
 Proof. by rewrite lt_ratE le_ratE lt_def rat_eq. Qed.
 
 HB.instance Definition _ :=
@@ -781,29 +781,29 @@ Let is_int x := denq x == 1.
 
 Let is_nat x := (0 <= x) && (denq x == 1).
 
-Fact floorP x : (floor x)%:~R <= Num.to_real x < (floor x + 1)%:~R.
+Local Fact floorP x : (floor x)%:~R <= Num.to_real x < (floor x + 1)%:~R.
 Proof.
 rewrite to_realT ?num_real// /floor.
 case: (ratP x) => n d _ {x}; rewrite ler_pdivlMr//.
 by rewrite ltr_pdivrMr// -!intrM ler_int ltr_int lez_floor ?ltz_ceil.
 Qed.
 
-Fact ceilP x : ceil x = - floor (- x).
+Local Fact ceilP x : ceil x = - floor (- x).
 Proof. by rewrite /ceil /floor numqN denqN. Qed.
 
-Fact truncnP x : truncn x = if 0 <= x then `|floor x|%N else 0%N.
+Local Fact truncnP x : truncn x = if 0 <= x then `|floor x|%N else 0%N.
 Proof.
 rewrite /truncn /floor; case: (ratP x) => n d _ {x} /=.
 by rewrite !ler_pdivlMr// mul0r; case: n => n; rewrite ler0z//= mul1n.
 Qed.
 
-Fact intrP x : reflect (exists n, x = n%:~R) (is_int x).
+Local Fact intrP x : reflect (exists n, x = n%:~R) (is_int x).
 Proof.
 apply: (iffP idP) => [/eqP d1 | [i ->]]; [|by rewrite /is_int denq_int].
 by exists (numq x); case: (ratP x) d1 => n d _ ->; rewrite divr1.
 Qed.
 
-Fact natrP x : reflect (exists n, x = n%:R) (is_nat x).
+Local Fact natrP x : reflect (exists n, x = n%:R) (is_nat x).
 Proof.
 apply: (iffP idP) => [/andP[]/[swap]/intrP[i ->]|[n ->]].
   by rewrite ler0z; case: i => [n _|//]; exists n.
@@ -883,7 +883,7 @@ Section InPrealField.
 
 Variable F : numFieldType.
 
-Fact ratr_is_zmod_morphism : zmod_morphism (@ratr F).
+Local Fact ratr_is_zmod_morphism : zmod_morphism (@ratr F).
 Proof.
 have injZtoQ: @injective rat int intr by apply: intr_inj.
 have nz_den x: (denq x)%:~R != 0 :> F by rewrite intr_eq0 denq_eq0.
@@ -896,7 +896,7 @@ rewrite !(rmorphM, rmorphB) /= [_ - _]lock /= -lock !numqE.
 by rewrite (mulrAC y) -!mulrBl -mulrA mulrAC !mulrA.
 Qed.
 
-Fact ratr_is_monoid_morphism : monoid_morphism (@ratr F).
+Local Fact ratr_is_monoid_morphism : monoid_morphism (@ratr F).
 Proof.
 have injZtoQ: @injective rat int intr by apply: intr_inj.
 have nz_den x: (denq x)%:~R != 0 :> F by rewrite intr_eq0 denq_eq0.

@@ -137,7 +137,7 @@ Proof. by apply/lker0P; apply: fmorph_inj. Qed.
 
 Lemma AEnd_lker0 (f : 'AEnd(L)) : lker f == 0%VS. Proof. exact: AHom_lker0. Qed.
 
-Fact aimg_is_aspace (rT : falgType F0) (f : 'AHom(L, rT)) (E : {subfield L}) :
+Local Fact aimg_is_aspace (rT : falgType F0) (f : 'AHom(L, rT)) (E : {subfield L}) :
   is_aspace (f @: E).
 Proof.
 rewrite /is_aspace -aimgM limgS ?prodv_id // has_algid1 //.
@@ -180,7 +180,7 @@ Proof. by apply/(polyOverS (subvP (sub1v _)))/polyOver1P; exists p. Qed.
 Lemma sub_adjoin1v x E : (<<1; x>> <= E)%VS = (x \in E)%VS.
 Proof. by rewrite (sameP FadjoinP andP) sub1v. Qed.
 
-Fact vsval_monoid_morphism K : monoid_morphism (vsval : subvs_of K -> L).
+Local Fact vsval_monoid_morphism K : monoid_morphism (vsval : subvs_of K -> L).
 Proof. by split => //=; apply: algid1. Qed.
 HB.instance Definition _ (K : {subfield L}) :=
   GRing.isMonoidMorphism.Build (subvs_of K) L vsval (vsval_monoid_morphism K).
@@ -191,7 +191,7 @@ have [-> | Uv] := eqVneq w 0; first by rewrite !invr0.
 by apply: vsval_invr; rewrite unitfE.
 Qed.
 
-Fact aspace_divr_closed K : divr_closed K.
+Local Fact aspace_divr_closed K : divr_closed K.
 Proof. by split=> [|u v Ku Kv]; rewrite ?mem1v ?memvM ?memvV. Qed.
 HB.instance Definition _ K :=
   GRing.isDivClosed.Build L (pred_of_vspace K) (aspace_divr_closed K).
@@ -243,14 +243,14 @@ move=> _ _ /polyOver_subvs[p ->] /polyOver_subvs[q ->].
 by apply/polyOver_subvs; exists (gcdp p q); rewrite gcdp_map.
 Qed.
 
-Fact prodv_is_aspace E F : is_aspace (E * F).
+Local Fact prodv_is_aspace E F : is_aspace (E * F).
 Proof.
 rewrite /is_aspace prodvCA -!prodvA prodvA !prodv_id has_algid1 //=.
 by rewrite -[1]mulr1 memv_mul ?mem1v.
 Qed.
 Canonical prodv_aspace E F : {subfield L} := ASpace (prodv_is_aspace E F).
 
-Fact field_mem_algid E F : algid E \in F. Proof. by rewrite algid1 mem1v. Qed.
+Local Fact field_mem_algid E F : algid E \in F. Proof. by rewrite algid1 mem1v. Qed.
 Canonical capv_aspace E F : {subfield L} := aspace_cap (field_mem_algid E F).
 
 Lemma polyOverSv U V : (U <= V)%VS -> {subset polyOver U <= polyOver V}.
@@ -326,7 +326,7 @@ rewrite inordK //; have [-> | /mulfK-> //] := eqVneq (x ^+ i) 0.
 by rewrite mulr0 mul0r mem0v.
 Qed.
 
-Fact Fadjoin_poly_is_linear : linear_for (in_alg L \; *:%R) Fadjoin_poly.
+Local Fact Fadjoin_poly_is_linear : linear_for (in_alg L \; *:%R) Fadjoin_poly.
 Proof.
 move=> a u v; apply/polyP=> i; rewrite coefD coefZ !coef_poly.
 case: ifP => lti; last by rewrite mulr0 addr0.
@@ -540,7 +540,7 @@ Lemma fieldExt_hornerC b : fieldExt_horner b%:P = b%:A.
 Proof. exact: horner_morphC. Qed.
 Lemma fieldExt_hornerX : fieldExt_horner 'X = z.
 Proof. exact: horner_morphX. Qed.
-Fact fieldExt_hornerZ : scalable fieldExt_horner.
+Local Fact fieldExt_hornerZ : scalable fieldExt_horner.
 Proof.
 move=> a p; rewrite -mul_polyC rmorphM /= fieldExt_hornerC.
 by rewrite -scalerAl mul1r.
@@ -614,16 +614,16 @@ HB.instance Definition _ := GRing.Field.on L_F.
 Definition fieldOver_scale (a : K_F) (u : L_F) : L_F := vsval a * u.
 Local Infix "*F:" := fieldOver_scale (at level 40).
 
-Fact fieldOver_scaleA a b u : a *F: (b *F: u) = (a * b) *F: u.
+Local Fact fieldOver_scaleA a b u : a *F: (b *F: u) = (a * b) *F: u.
 Proof. exact: mulrA. Qed.
 
-Fact fieldOver_scale1 u : 1 *F: u = u.
+Local Fact fieldOver_scale1 u : 1 *F: u = u.
 Proof. by rewrite /(1 *F: u) /= algid1 mul1r. Qed.
 
-Fact fieldOver_scaleDr a u v : a *F: (u + v) = a *F: u + a *F: v.
+Local Fact fieldOver_scaleDr a u v : a *F: (u + v) = a *F: u + a *F: v.
 Proof. exact: mulrDr. Qed.
 
-Fact fieldOver_scaleDl v a b : (a + b) *F: v = a *F: v + b *F: v.
+Local Fact fieldOver_scaleDl v a b : (a + b) *F: v = a *F: v + b *F: v.
 Proof. exact: mulrDl. Qed.
 
 HB.instance Definition _ := GRing.Zmodule_isLmodule.Build _ L_F
@@ -632,13 +632,13 @@ HB.instance Definition _ := GRing.Zmodule_isLmodule.Build _ L_F
 Lemma fieldOver_scaleE a (u : L) : a *: (u : L_F) = vsval a * u.
 Proof. by []. Qed.
 
-Fact fieldOver_scaleAl a u v : a *F: (u * v) = (a *F: u) * v.
+Local Fact fieldOver_scaleAl a u v : a *F: (u * v) = (a *F: u) * v.
 Proof. exact: mulrA. Qed.
 
 HB.instance Definition _ :=
   GRing.LSemiModule_isComSemiAlgebra.Build _ L_F fieldOver_scaleAl.
 
-Fact fieldOver_vectMixin : Lmodule_hasFinDim K_F L_F.
+Local Fact fieldOver_vectMixin : Lmodule_hasFinDim K_F L_F.
 Proof.
 have [bL [_ nz_bL] [defL dxSbL]] := field_module_semisimple (subvf (F * _)).
 do [set n := \dim_F {:L} in bL nz_bL *; set SbL := (\sum_i _)%VS] in defL dxSbL.
@@ -693,7 +693,7 @@ Proof.
 by move=> sFE y; rewrite mem_vspaceOver field_module_eq ?sup_field_module.
 Qed.
 
-Fact aspaceOver_suproof E : is_aspace (vspaceOver E).
+Local Fact aspaceOver_suproof E : is_aspace (vspaceOver E).
 Proof.
 rewrite /is_aspace has_algid1; first by rewrite mem_vspaceOver (@mem1v _ L).
 by apply/prodvP=> u v; rewrite !mem_vspaceOver; apply: memvM.
@@ -762,16 +762,16 @@ HB.instance Definition _ := GRing.Field.on L0.
 Definition baseField_scale (a : F0) (u : L0) : L0 := in_alg F a *: u.
 Local Infix "*F0:" := baseField_scale (at level 40).
 
-Fact baseField_scaleA a b u : a *F0: (b *F0: u) = (a * b) *F0: u.
+Local Fact baseField_scaleA a b u : a *F0: (b *F0: u) = (a * b) *F0: u.
 Proof. by rewrite [_ *F0: _]scalerA -rmorphM. Qed.
 
-Fact baseField_scale1 u : 1 *F0: u = u.
+Local Fact baseField_scale1 u : 1 *F0: u = u.
 Proof. by rewrite /(1 *F0: u) rmorph1 scale1r. Qed.
 
-Fact baseField_scaleDr a u v : a *F0: (u + v) = a *F0: u + a *F0: v.
+Local Fact baseField_scaleDr a u v : a *F0: (u + v) = a *F0: u + a *F0: v.
 Proof. exact: scalerDr. Qed.
 
-Fact baseField_scaleDl v a b : (a + b) *F0: v = a *F0: v + b *F0: v.
+Local Fact baseField_scaleDl v a b : (a + b) *F0: v = a *F0: v + b *F0: v.
 Proof. by rewrite -scalerDl -rmorphD. Qed.
 
 HB.instance Definition _ := GRing.Zmodule_isLmodule.Build _ L0
@@ -780,7 +780,7 @@ HB.instance Definition _ := GRing.Zmodule_isLmodule.Build _ L0
 Lemma baseField_scaleE a (u : L) : a *: (u : L0) = a%:A *: u.
 Proof. by []. Qed.
 
-Fact baseField_scaleAl a (u v : L0) : a *F0: (u * v) = (a *F0: u) * v.
+Local Fact baseField_scaleAl a (u v : L0) : a *F0: (u * v) = (a *F0: u) * v.
 Proof. exact: scalerAl. Qed.
 
 HB.instance Definition _ := GRing.LSemiModule_isComSemiAlgebra.Build _ L0
@@ -790,7 +790,7 @@ Let n := \dim {:F}.
 Let bF : n.-tuple F := vbasis {:F}.
 Let coordF (x : F) := (coord_vbasis (memvf x)).
 
-Fact baseField_vectMixin : Lmodule_hasFinDim F0 L0.
+Local Fact baseField_vectMixin : Lmodule_hasFinDim F0 L0.
 Proof.
 pose bL := vbasis {:L}; set m := \dim {:L} in bL.
 pose v2r (x : L0) := mxvec (\matrix_(i, j) coord bF j (coord bL i x)).
@@ -848,7 +848,7 @@ rewrite pair_bigA (reindex _ (onW_bij _ (enum_val_bij _))); apply: etrans sb0.
 by apply: eq_bigr => k _; rewrite -{5 6}[k](enum_valK k); case/enum_val: k.
 Qed.
 
-Fact baseAspace_suproof (E : {subfield L}) : is_aspace (baseVspace E).
+Local Fact baseAspace_suproof (E : {subfield L}) : is_aspace (baseVspace E).
 Proof.
 rewrite /is_aspace has_algid1; first by rewrite mem_baseVspace (mem1v E).
 by apply/prodvP=> u v; rewrite !mem_baseVspace; apply: memvM.
@@ -980,7 +980,7 @@ Let iotaFz (x : 'rV[F]_n) := iotaPz (rVpoly x).
 
 Definition equiv_subfext x y := (iotaFz x == iotaFz y).
 
-Fact equiv_subfext_is_equiv : equiv_class_of equiv_subfext.
+Local Fact equiv_subfext_is_equiv : equiv_class_of equiv_subfext.
 Proof. by rewrite /equiv_subfext; split=> x // y w /eqP->. Qed.
 
 Canonical equiv_subfext_equiv := EquivRelPack equiv_subfext_is_equiv.
@@ -995,7 +995,7 @@ HB.instance Definition _ : EqQuotient 'M[F]_(1, n) equiv_subfext subFExtend :=
 
 Definition subfx_inj := lift_fun1 subFExtend iotaFz.
 
-Fact pi_subfx_inj : {mono \pi : x / iotaFz x >-> subfx_inj x}.
+Local Fact pi_subfx_inj : {mono \pi : x / iotaFz x >-> subfx_inj x}.
 Proof.
 unlock subfx_inj => x; apply/eqP; rewrite -/(equiv_subfext _ x).
 by rewrite -eqmodE reprK.
@@ -1009,7 +1009,7 @@ Definition subfext0 := lift_cst subFExtend 0.
 Canonical subfext0_morph := PiConst subfext0.
 
 Definition subfext_add := lift_op2 subFExtend +%R.
-Fact pi_subfext_add : {morph \pi : x y / x + y >-> subfext_add x y}.
+Local Fact pi_subfext_add : {morph \pi : x y / x + y >-> subfext_add x y}.
 Proof.
 unlock subfext_add => x y /=; apply/eqmodP/eqP.
 by rewrite /iotaFz !linearD /= !iotaPz_repr.
@@ -1017,23 +1017,23 @@ Qed.
 Canonical pi_subfx_add_morph := PiMorph2 pi_subfext_add.
 
 Definition subfext_opp := lift_op1 subFExtend -%R.
-Fact pi_subfext_opp : {morph \pi : x / - x >-> subfext_opp x}.
+Local Fact pi_subfext_opp : {morph \pi : x / - x >-> subfext_opp x}.
 Proof.
 unlock subfext_opp => y /=; apply/eqmodP/eqP.
 by rewrite /iotaFz !linearN /= !iotaPz_repr.
 Qed.
 Canonical pi_subfext_opp_morph := PiMorph1 pi_subfext_opp.
 
-Fact addfxA : associative subfext_add.
+Local Fact addfxA : associative subfext_add.
 Proof. by move=> x y t; rewrite -[x]reprK -[y]reprK -[t]reprK !piE addrA. Qed.
 
-Fact addfxC : commutative subfext_add.
+Local Fact addfxC : commutative subfext_add.
 Proof. by move=> x y; rewrite -[x]reprK -[y]reprK !piE addrC. Qed.
 
-Fact add0fx : left_id subfext0 subfext_add.
+Local Fact add0fx : left_id subfext0 subfext_add.
 Proof. by move=> x; rewrite -[x]reprK !piE add0r. Qed.
 
-Fact addfxN : left_inverse subfext0 subfext_opp subfext_add.
+Local Fact addfxN : left_inverse subfext0 subfext_opp subfext_add.
 Proof. by move=> x; rewrite -[x]reprK !piE addNr. Qed.
 
 HB.instance Definition _ := GRing.isZmodule.Build subFExtend
@@ -1052,7 +1052,7 @@ Definition subfx_mul_rep (x y : 'rV[F]_n) : 'rV[F]_n :=
   poly_rV ((rVpoly x) * (rVpoly y) %% p0).
 
 Definition subfext_mul := lift_op2 subFExtend subfx_mul_rep.
-Fact pi_subfext_mul :
+Local Fact pi_subfext_mul :
   {morph \pi : x y / subfx_mul_rep x y >-> subfext_mul x y}.
 Proof.
 unlock subfext_mul => x y /=; apply/eqmodP/eqP.
@@ -1063,30 +1063,30 @@ Canonical pi_subfext_mul_morph := PiMorph2 pi_subfext_mul.
 Definition subfext1 := lift_cst subFExtend (poly_rV 1).
 Canonical subfext1_morph := PiConst subfext1.
 
-Fact mulfxA : associative (subfext_mul).
+Local Fact mulfxA : associative (subfext_mul).
 Proof.
 elim/quotW=> x; elim/quotW=> y; elim/quotW=> w; rewrite !piE /subfx_mul_rep.
 by rewrite !poly_rV_modp_K [_ %% p0 * _]mulrC !modp_mul // mulrA mulrC.
 Qed.
 
-Fact mulfxC : commutative subfext_mul.
+Local Fact mulfxC : commutative subfext_mul.
 Proof.
 by elim/quotW=> x; elim/quotW=> y; rewrite !piE /subfx_mul_rep /= mulrC.
 Qed.
 
-Fact mul1fx : left_id subfext1 subfext_mul.
+Local Fact mul1fx : left_id subfext1 subfext_mul.
 Proof.
 elim/quotW=> x; rewrite !piE /subfx_mul_rep poly_rV_K ?size_poly1 // mul1r.
 by rewrite modp_small ?rVpolyK // (polySpred nz_p0) ltnS size_poly.
 Qed.
 
-Fact mulfx_addl : left_distributive subfext_mul subfext_add.
+Local Fact mulfx_addl : left_distributive subfext_mul subfext_add.
 Proof.
 elim/quotW=> x; elim/quotW=> y; elim/quotW=> w.
 by rewrite !piE /subfx_mul_rep linearD /= mulrDl modpD linearD.
 Qed.
 
-Fact nonzero1fx : subfext1 != subfext0.
+Local Fact nonzero1fx : subfext1 != subfext0.
 Proof.
 rewrite !piE /equiv_subfext /iotaFz !linear0.
 by rewrite poly_rV_K ?rmorph1 ?oner_eq0 // size_poly1.
@@ -1118,21 +1118,21 @@ Definition subfx_inv_rep (x : 'rV[F]_n) : 'rV[F]_n :=
   poly_rV (subfx_poly_inv (rVpoly x) %% p0).
 
 Definition subfext_inv := lift_op1 subFExtend subfx_inv_rep.
-Fact pi_subfext_inv : {morph \pi : x / subfx_inv_rep x >-> subfext_inv x}.
+Local Fact pi_subfext_inv : {morph \pi : x / subfx_inv_rep x >-> subfext_inv x}.
 Proof.
 unlock subfext_inv => x /=; apply/eqmodP/eqP; rewrite /iotaFz.
 by rewrite 2!{1}poly_rV_modp_K 2!{1}iotaPz_modp !subfx_poly_invE iotaPz_repr.
 Qed.
 Canonical pi_subfext_inv_morph := PiMorph1 pi_subfext_inv.
 
-Fact subfx_fieldAxiom : forall x, x != 0 -> subfext_inv x * x = 1.
+Local Fact subfx_fieldAxiom : forall x, x != 0 -> subfext_inv x * x = 1.
 Proof.
 elim/quotW=> x; apply: contraNeq; rewrite !piE /equiv_subfext /iotaFz !linear0.
 apply: contraR => nz_x; rewrite poly_rV_K ?size_poly1 // !poly_rV_modp_K.
 by rewrite iotaPz_modp rmorph1 rmorphM /= iotaPz_modp subfx_poly_invE mulVf.
 Qed.
 
-Fact subfx_inv0 : subfext_inv (0 : subFExtend) = (0 : subFExtend).
+Local Fact subfx_inv0 : subfext_inv (0 : subFExtend) = (0 : subFExtend).
 Proof.
 apply/eqP; rewrite !piE /equiv_subfext /iotaFz /subfx_inv_rep !linear0.
 by rewrite /subfx_poly_inv rmorph0 eqxx mod0p !linear0.
@@ -1141,12 +1141,12 @@ Qed.
 HB.instance Definition _ := GRing.ComNzRing_isField.Build subFExtend
   subfx_fieldAxiom subfx_inv0.
 
-Fact subfx_inj_is_zmod_morphism : zmod_morphism subfx_inj.
+Local Fact subfx_inj_is_zmod_morphism : zmod_morphism subfx_inj.
 Proof.
 by elim/quotW => x; elim/quotW => y; rewrite !piE /iotaFz linearB rmorphB.
 Qed.
 
-Fact subfx_inj_is_monoid_morphism : monoid_morphism subfx_inj.
+Local Fact subfx_inj_is_monoid_morphism : monoid_morphism subfx_inj.
 Proof.
 split; first by rewrite piE /iotaFz poly_rV_K ?rmorph1 ?size_poly1.
 elim/quotW=> x; elim/quotW=> y; rewrite !piE /subfx_mul_rep /iotaFz.
@@ -1189,25 +1189,25 @@ by rewrite /iotaFz poly_rV_modp_K iotaPz_modp.
 Qed.
 
 Definition subfx_scale a x := inj_subfx a * x.
-Fact subfx_scalerA a b x :
+Local Fact subfx_scalerA a b x :
   subfx_scale a (subfx_scale b x) = subfx_scale (a * b) x.
 Proof. by rewrite /subfx_scale rmorphM mulrA. Qed.
-Fact subfx_scaler1r : left_id 1 subfx_scale.
+Local Fact subfx_scaler1r : left_id 1 subfx_scale.
 Proof. by move=> x; rewrite /subfx_scale rmorph1 mul1r. Qed.
-Fact subfx_scalerDr : right_distributive subfx_scale +%R.
+Local Fact subfx_scalerDr : right_distributive subfx_scale +%R.
 Proof. by move=> a; apply: mulrDr. Qed.
-Fact subfx_scalerDl x : {morph subfx_scale^~ x : a b / a + b}.
+Local Fact subfx_scalerDl x : {morph subfx_scale^~ x : a b / a + b}.
 Proof. by move=> a b; rewrite /subfx_scale rmorphD mulrDl. Qed.
 
 HB.instance Definition _ := GRing.Zmodule_isLmodule.Build _ subFExtend
   subfx_scalerA subfx_scaler1r subfx_scalerDr subfx_scalerDl.
 
-Fact subfx_scaleAl a u v : subfx_scale a (u * v) = (subfx_scale a u) * v.
+Local Fact subfx_scaleAl a u v : subfx_scale a (u * v) = (subfx_scale a u) * v.
 Proof. exact: mulrA. Qed.
 HB.instance Definition _ :=
   GRing.LSemiModule_isComSemiAlgebra.Build _ subFExtend subfx_scaleAl.
 
-Fact subfx_evalZ : scalable subfx_eval.
+Local Fact subfx_evalZ : scalable subfx_eval.
 Proof. by move=> a q; rewrite -mul_polyC rmorphM. Qed.
 HB.instance Definition _ :=
   GRing.isScalable.Build F {poly F} subFExtend *:%R subfx_eval subfx_evalZ.

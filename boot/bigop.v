@@ -611,7 +611,7 @@ Qed.
 (* and such. Users wishing to test compliance should change the Defined in    *)
 (* index_enum_key to Qed, and comment out the filter_index_enum compatibility *)
 (* definition below.                                                          *)
-Fact index_enum_key : unit. Proof. split. Defined. (* Qed. *)
+Definition index_enum_key : unit. Proof. split. Defined. (* Qed. *)
 Definition index_enum (T : finType) :=
   locked_with index_enum_key (Finite.enum T).
 

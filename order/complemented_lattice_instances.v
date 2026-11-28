@@ -240,7 +240,7 @@ Import Order.Theory.
 (* Definition of prod_display *)
 (******************************)
 
-Fact prod_display_unit (_ _ : unit) : unit. Proof. exact: tt. Qed.
+Definition prod_display_unit (_ _ : unit) : unit. Proof. exact: tt. Qed.
 
 Definition prod_display (displ dispr : disp_t) : disp_t :=
   Disp (prod_display_unit (d1 displ) (d1 dispr))
@@ -445,15 +445,15 @@ Definition le x y := (x.1 <= y.1) && (x.2 <= y.2).
 
 Definition lt x y := (x.1 < y.1) && (x.2 <= y.2) || (x.1 <= y.1) && (x.2 < y.2).
 
-Fact lt_def x y : lt x y = le x y && ~~ le y x.
+Local Fact lt_def x y : lt x y = le x y && ~~ le y x.
 Proof.
 rewrite /lt /le !lt_leAnge -andbA -andb_orr.
 by rewrite [~~ _ && _]andbC -andb_orr andbA negb_and.
 Qed.
 
-Fact refl : reflexive le. Proof. by move=> ?; rewrite /le !lexx. Qed.
+Local Fact refl : reflexive le. Proof. by move=> ?; rewrite /le !lexx. Qed.
 
-Fact trans : transitive le.
+Local Fact trans : transitive le.
 Proof.
 rewrite /le => y x z /andP [] hxy ? /andP [] /(le_trans hxy) ->.
 by apply: le_trans.
@@ -501,7 +501,7 @@ Context (T1 : bPreorderType disp1) (T2 : bPreorderType disp2).
 Local Notation "T1 * T2" := (type (Disp tt tt) T1 T2) : type_scope.
 Implicit Types (x : T1 * T2).
 
-Fact le0x x : (\bot, \bot) <= x :> T1 * T2.
+Local Fact le0x x : (\bot, \bot) <= x :> T1 * T2.
 Proof. by rewrite leEprod !le0x. Qed.
 
 End BPreorder.
@@ -539,7 +539,7 @@ Section POrder.
 Context (disp1 disp2 : disp_t).
 Context (T1 : porderType disp1) (T2 : porderType disp2).
 
-Fact anti : antisymmetric (@le _ _ T1 T2).
+Local Fact anti : antisymmetric (@le _ _ T1 T2).
 Proof.
 by case=> [? ?] [? ?]; rewrite andbACA/= => /andP[] /le_anti-> /le_anti->.
 Qed.
@@ -578,7 +578,7 @@ Implicit Types (x y : T1 * T2).
 
 Let meet x y := (x.1 `&` y.1, x.2 `&` y.2).
 
-Fact lexI x y z : (x <= meet y z) = (x <= y) && (x <= z).
+Local Fact lexI x y z : (x <= meet y z) = (x <= y) && (x <= z).
 Proof. by rewrite leEprod !lexI andbACA. Qed.
 
 End MeetSemilattice.
@@ -678,7 +678,7 @@ Context (disp1 disp2 : disp_t).
 Context (T1 : distrLatticeType disp1) (T2 : distrLatticeType disp2).
 Local Notation "T1 * T2" := (type (Disp tt tt) T1 T2) : type_scope.
 
-Fact meetUl : @left_distributive (T1 * T2) _ Order.meet Order.join.
+Local Fact meetUl : @left_distributive (T1 * T2) _ Order.meet Order.join.
 Proof. by move=> ? ? ?; rewrite meetEprod !meetUl. Qed.
 
 End DistrLattice.
@@ -719,7 +719,7 @@ Implicit Types (x y z : T1 * T2).
 
 Let rcompl x y z := (rcompl x.1 y.1 z.1, rcompl x.2 y.2 z.2).
 
-Fact rcomplPmeet x y z : ((x `&` y) `|` z) `&` rcompl x y z = x `&` y.
+Local Fact rcomplPmeet x y z : ((x `&` y) `|` z) `&` rcompl x y z = x `&` y.
 Proof. by rewrite !(meetEprod, joinEprod) !rcomplPmeet. Qed.
 
 End CDistrLattice.
@@ -756,7 +756,7 @@ Implicit Types (x y : T1 * T2).
 
 Let diff x y := (diff x.1 y.1, diff x.2 y.2).
 
-Fact diffErcompl x y : diff x y = rcompl \bot x y.
+Local Fact diffErcompl x y : diff x y = rcompl \bot x y.
 Proof. by rewrite /diff !diffErcompl. Qed.
 
 End CBDistrLattice.
@@ -808,7 +808,7 @@ Implicit Types (x : T1 * T2).
 
 Let compl x := (~` x.1, ~` x.2).
 
-Fact complEdiff x : compl x = (\top : T1 * T2) `\` x.
+Local Fact complEdiff x : compl x = (\top : T1 * T2) `\` x.
 Proof. by rewrite /compl !complEdiff. Qed.
 
 End CTBDistrLattice.
@@ -1133,7 +1133,7 @@ Section BPreorder.
 Context (n : nat) (T : bPreorderType disp).
 Implicit Types (t : n.-tuple T).
 
-Fact le0x t : [tuple \bot | _ < n] <= t :> n.-tuple T.
+Local Fact le0x t : [tuple \bot | _ < n] <= t :> n.-tuple T.
 Proof. by rewrite leEtprod; apply/forallP => i; rewrite tnth_mktuple le0x. Qed.
 
 #[export] HB.instance Definition _ := hasBottom.Build _ (n.-tuple T) le0x.
@@ -1147,7 +1147,7 @@ Section TPreorder.
 Context (n : nat) (T : tPreorderType disp).
 Implicit Types (t : n.-tuple T).
 
-Fact lex1 t : t <= [tuple \top | _ < n] :> n.-tuple T.
+Local Fact lex1 t : t <= [tuple \top | _ < n] :> n.-tuple T.
 Proof. by rewrite leEtprod; apply/forallP => i; rewrite tnth_mktuple lex1. Qed.
 
 #[export] HB.instance Definition _ := hasTop.Build _ (n.-tuple T) lex1.
@@ -1166,7 +1166,7 @@ Implicit Types (t : n.-tuple T).
 
 Definition meet t1 t2 : n.-tuple T := [tuple tnth t1 i `&` tnth t2 i | i < n].
 
-Fact lexI t1 t2 t3 : (t1 <= meet t2 t3) = (t1 <= t2) && (t1 <= t3).
+Local Fact lexI t1 t2 t3 : (t1 <= meet t2 t3) = (t1 <= t2) && (t1 <= t3).
 Proof.
 rewrite !leEtprod; apply/forallP/andP => [H|[Ht12 Ht13] i]; last first.
   by rewrite tnth_mktuple lexI (forallP Ht12) (forallP Ht13).
@@ -1190,7 +1190,7 @@ Implicit Types (t : n.-tuple T).
 
 Definition join t1 t2 : n.-tuple T := [tuple tnth t1 i `|` tnth t2 i | i < n].
 
-Fact leUx t1 t2 t3 : (join t1 t2 <= t3) = (t1 <= t3) && (t2 <= t3).
+Local Fact leUx t1 t2 t3 : (join t1 t2 <= t3) = (t1 <= t3) && (t2 <= t3).
 Proof.
 rewrite !leEtprod; apply/forallP/andP => [H|[Ht13 Ht23] i]; last first.
   by rewrite tnth_mktuple leUx (forallP Ht13) (forallP Ht23).
@@ -1243,7 +1243,7 @@ Section DistrLattice.
 Context (n : nat) (T : distrLatticeType disp).
 Implicit Types (t : n.-tuple T).
 
-Fact meetUl : left_distributive (@meet n T) (@join n T).
+Local Fact meetUl : left_distributive (@meet n T) (@join n T).
 Proof.
 by move=> t1 t2 t3; apply: eq_from_tnth => i; rewrite !tnth_mktuple meetUl.
 Qed.
@@ -1269,10 +1269,10 @@ Implicit Types (t : n.-tuple T).
 Definition rcompl t1 t2 t3 :=
   [tuple rcompl (tnth t1 i) (tnth t2 i) (tnth t3 i) | i < n].
 
-Fact rcomplPmeet x y z : ((x `&` y) `|` z) `&` rcompl x y z = x `&` y.
+Local Fact rcomplPmeet x y z : ((x `&` y) `|` z) `&` rcompl x y z = x `&` y.
 Proof. by apply: eq_from_tnth => i; rewrite !tnth_mktuple rcomplPmeet. Qed.
 
-Fact rcomplPjoin x y z : ((y `|` x) `&` z) `|` rcompl x y z = y `|` x.
+Local Fact rcomplPjoin x y z : ((y `|` x) `&` z) `|` rcompl x y z = y `|` x.
 Proof. by apply: eq_from_tnth => i; rewrite !tnth_mktuple rcomplPjoin. Qed.
 
 #[export] HB.instance Definition _ :=
@@ -1297,7 +1297,7 @@ Implicit Types (t : n.-tuple T).
 
 Definition diff t1 t2 : n.-tuple T := [tuple tnth t1 i `\` tnth t2 i | i < n].
 
-Fact diffErcompl t1 t2 : diff t1 t2 = rcompl \bot t1 t2.
+Local Fact diffErcompl t1 t2 : diff t1 t2 = rcompl \bot t1 t2.
 Proof. by apply: eq_from_tnth => i; rewrite !tnth_mktuple diffErcompl. Qed.
 
 #[export] HB.instance Definition _ :=
@@ -1318,7 +1318,7 @@ Implicit Types (t : n.-tuple T).
 Definition codiff t1 t2 : n.-tuple T :=
   [tuple Order.codiff (tnth t1 i) (tnth t2 i) | i < n].
 
-Fact codiffErcompl t1 t2 : codiff t1 t2 = rcompl t1 \top t2.
+Local Fact codiffErcompl t1 t2 : codiff t1 t2 = rcompl t1 \top t2.
 Proof. by apply: eq_from_tnth => i; rewrite !tnth_mktuple codiffErcompl. Qed.
 
 #[export] HB.instance Definition _ :=
@@ -1341,12 +1341,12 @@ Implicit Types (t : n.-tuple T).
 
 Definition compl t : n.-tuple T := map_tuple compl t.
 
-Fact complEdiff t : compl t = (\top : n.-tuple T) `\` t.
+Local Fact complEdiff t : compl t = (\top : n.-tuple T) `\` t.
 Proof.
 by apply: eq_from_tnth => i; rewrite tnth_map !tnth_mktuple complEdiff.
 Qed.
 
-Fact complEcodiff t : compl t = codiff (\bot : n.-tuple T) t.
+Local Fact complEcodiff t : compl t = codiff (\bot : n.-tuple T) t.
 Proof.
 by apply: eq_from_tnth => i; rewrite tnth_map !tnth_mktuple complEcodiff.
 Qed.
@@ -1544,7 +1544,7 @@ End DefaultTupleProdOrder.
 Module SetSubsetOrder.
 Section SetSubsetOrder.
 
-Fact subset_display : disp_t. Proof. exact. Qed.
+Definition subset_display : disp_t. Proof. exact. Qed.
 
 Definition type (disp : disp_t) (T : finType) := {set T}.
 
@@ -1554,7 +1554,7 @@ Implicit Type (A B C : {subset T}).
 
 #[export] HB.instance Definition _ := Choice.on {subset T}.
 
-Fact le_anti : antisymmetric (fun A B => A \subset B).
+Local Fact le_anti : antisymmetric (fun A B => A \subset B).
 Proof. by move=> A B ABA; apply/eqP; rewrite eqEsubset. Qed.
 
 #[export] HB.instance Definition _ := Le_isPOrder.Build disp {subset T}

@@ -286,10 +286,10 @@ Definition L := tag Fundamental_Theorem_of_Algebraics.
 Definition conjL : {rmorphism L -> L} :=
   s2val (tagged Fundamental_Theorem_of_Algebraics).
 
-Fact conjL_K : involutive conjL.
+Local Fact conjL_K : involutive conjL.
 Proof. exact: s2valP (tagged Fundamental_Theorem_of_Algebraics). Qed.
 
-Fact conjL_nt : ~ conjL =1 id.
+Local Fact conjL_nt : ~ conjL =1 id.
 Proof. exact: s2valP' (tagged Fundamental_Theorem_of_Algebraics). Qed.
 
 Definition L' : Type := eta L.
@@ -308,7 +308,7 @@ Definition rootQtoL p_j :=
 
 Definition eq_root p_j q_k := rootQtoL p_j == rootQtoL q_k.
 
-Fact eq_root_is_equiv : equiv_class_of eq_root.
+Local Fact eq_root_is_equiv : equiv_class_of eq_root.
 Proof. by rewrite /eq_root; split=> [ ? | ? ? | ? ? ? ] // /eqP->. Qed.
 Canonical eq_root_equiv := EquivRelPack eq_root_is_equiv.
 
@@ -321,10 +321,10 @@ HB.instance Definition _ := isCountable.Build type
 
 Definition CtoL (u : type) := rootQtoL (repr u).
 
-Fact CtoL_inj : injective CtoL.
+Local Fact CtoL_inj : injective CtoL.
 Proof. by move=> u v /eqP eq_uv; rewrite -[u]reprK -[v]reprK; apply/eqmodP. Qed.
 
-Fact CtoL_P u : integralOver QtoL (CtoL u).
+Local Fact CtoL_P u : integralOver QtoL (CtoL u).
 Proof.
 rewrite /CtoL /rootQtoL; case: (repr u) => p j /=.
 case: (closed_field_poly_normal _) => r Dp /=.
@@ -334,7 +334,7 @@ apply/integral_algebraic; exists p; rewrite // Dp -mul_polyC rootM orbC.
 by rewrite root_prod_XsubC mem_nth.
 Qed.
 
-Fact LtoC_subproof z : integralOver QtoL z -> {u | CtoL u = z}.
+Local Fact LtoC_subproof z : integralOver QtoL z -> {u | CtoL u = z}.
 Proof.
 case/sig2_eqW=> p mon_p pz0; rewrite /CtoL.
 pose j := index z (sval (closed_field_poly_normal (pQtoL p))).
@@ -345,31 +345,31 @@ by rewrite Dp (monicP _) ?(monic_map QtoL) // scale1r root_prod_XsubC in pz0.
 Qed.
 
 Definition LtoC z Az := sval (@LtoC_subproof z Az).
-Fact LtoC_K z Az : CtoL (@LtoC z Az) = z.
+Local Fact LtoC_K z Az : CtoL (@LtoC z Az) = z.
 Proof. exact: (svalP (LtoC_subproof Az)). Qed.
 
-Fact CtoL_K u : LtoC (CtoL_P u) = u.
+Local Fact CtoL_K u : LtoC (CtoL_P u) = u.
 Proof. by apply: CtoL_inj; rewrite LtoC_K. Qed.
 
 Definition zero := LtoC (integral0 _).
 Definition add u v := LtoC (integral_add (CtoL_P u) (CtoL_P v)).
 Definition opp u := LtoC (integral_opp (CtoL_P u)).
 
-Fact addA : associative add.
+Local Fact addA : associative add.
 Proof. by move=> u v w; apply: CtoL_inj; rewrite !LtoC_K addrA. Qed.
 
-Fact addC : commutative add.
+Local Fact addC : commutative add.
 Proof. by move=> u v; apply: CtoL_inj; rewrite !LtoC_K addrC. Qed.
 
-Fact add0 : left_id zero add.
+Local Fact add0 : left_id zero add.
 Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K add0r. Qed.
 
-Fact addN : left_inverse zero opp add.
+Local Fact addN : left_inverse zero opp add.
 Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K addNr. Qed.
 
 HB.instance Definition _ := GRing.isZmodule.Build type addA addC add0 addN.
 
-Fact CtoL_is_zmod_morphism : zmod_morphism CtoL.
+Local Fact CtoL_is_zmod_morphism : zmod_morphism CtoL.
 Proof. by move=> u v; rewrite !LtoC_K. Qed.
 HB.instance Definition _ := GRing.isZmodMorphism.Build type L' CtoL
   CtoL_is_zmod_morphism.
@@ -378,40 +378,40 @@ Definition one := LtoC (integral1 _).
 Definition mul u v := LtoC (integral_mul (CtoL_P u) (CtoL_P v)).
 Definition inv u := LtoC (integral_inv (CtoL_P u)).
 
-Fact mulA : associative mul.
+Local Fact mulA : associative mul.
 Proof. by move=> u v w; apply: CtoL_inj; rewrite !LtoC_K mulrA. Qed.
 
-Fact mulC : commutative mul.
+Local Fact mulC : commutative mul.
 Proof. by move=> u v; apply: CtoL_inj; rewrite !LtoC_K mulrC. Qed.
 
-Fact mul1 : left_id one mul.
+Local Fact mul1 : left_id one mul.
 Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K mul1r. Qed.
 
-Fact mulD : left_distributive mul +%R.
+Local Fact mulD : left_distributive mul +%R.
 Proof. by move=> u v w; apply: CtoL_inj; rewrite !LtoC_K mulrDl. Qed.
 
-Fact one_nz : one != 0 :> type.
+Local Fact one_nz : one != 0 :> type.
 Proof. by rewrite -(inj_eq CtoL_inj) !LtoC_K oner_eq0. Qed.
 
 HB.instance Definition _ :=
   GRing.Zmodule_isComNzRing.Build type mulA mulC mul1 mulD one_nz.
 
-Fact CtoL_is_monoid_morphism : monoid_morphism CtoL.
+Local Fact CtoL_is_monoid_morphism : monoid_morphism CtoL.
 Proof. by split=> [|u v]; rewrite !LtoC_K. Qed.
 HB.instance Definition _ := GRing.isMonoidMorphism.Build type L' CtoL
   CtoL_is_monoid_morphism.
 
-Fact mulVf u :  u != 0 -> inv u * u = 1.
+Local Fact mulVf u :  u != 0 -> inv u * u = 1.
 Proof.
 rewrite -(inj_eq CtoL_inj) rmorph0 => nz_u.
 by apply: CtoL_inj; rewrite !LtoC_K mulVf.
 Qed.
 
-Fact inv0 : inv 0 = 0. Proof. by apply: CtoL_inj; rewrite !LtoC_K invr0. Qed.
+Local Fact inv0 : inv 0 = 0. Proof. by apply: CtoL_inj; rewrite !LtoC_K invr0. Qed.
 
 HB.instance Definition _ := GRing.ComNzRing_isField.Build type mulVf inv0.
 
-Fact closedFieldAxiom : GRing.closed_field_axiom type.
+Local Fact closedFieldAxiom : GRing.closed_field_axiom type.
 Proof.
 move=> n a n_gt0; pose p := 'X^n - \poly_(i < n) CtoL (a i).
 have Ap : {in p : seq L, integralRange QtoL}.
@@ -431,22 +431,22 @@ Qed.
 
 HB.instance Definition _ := Field_isAlgClosed.Build type closedFieldAxiom.
 
-Fact conj_subproof u : integralOver QtoL (conjL (CtoL u)).
+Local Fact conj_subproof u : integralOver QtoL (conjL (CtoL u)).
 Proof.
 have [p mon_p pu0] := CtoL_P u; exists p => //.
 rewrite -(fmorph_root conjL) conjL_K map_poly_id // => _ /(nthP 0)[j _ <-].
 by rewrite coef_map fmorph_rat.
 Qed.
 
-Fact conj_is_nmod_morphism : nmod_morphism (fun u => LtoC (conj_subproof u)).
+Local Fact conj_is_nmod_morphism : nmod_morphism (fun u => LtoC (conj_subproof u)).
 Proof.
 by split=> [|u v]; apply: CtoL_inj; rewrite LtoC_K ?raddf0// !rmorphD/= !LtoC_K.
 Qed.
 
-Fact conj_is_zmod_morphism : {morph (fun u => LtoC (conj_subproof u)) : x / - x}.
+Local Fact conj_is_zmod_morphism : {morph (fun u => LtoC (conj_subproof u)) : x / - x}.
 Proof. by move=> u; apply: CtoL_inj; rewrite LtoC_K !raddfN /= LtoC_K. Qed.
 
-Fact conj_is_monoid_morphism : monoid_morphism (fun u => LtoC (conj_subproof u)).
+Local Fact conj_is_monoid_morphism : monoid_morphism (fun u => LtoC (conj_subproof u)).
 Proof.
 split=> [|u v]; apply: CtoL_inj; first by rewrite !LtoC_K rmorph1.
 by rewrite LtoC_K 3!{1}rmorphM /= !LtoC_K.
@@ -461,7 +461,7 @@ Definition conj : {rmorphism type -> type} :=
 Lemma conjK : involutive conj.
 Proof. by move=> u; apply: CtoL_inj; rewrite !LtoC_K conjL_K. Qed.
 
-Fact conj_nt : ~ conj =1 id.
+Local Fact conj_nt : ~ conj =1 id.
 Proof.
 have [i i2]: exists i : type, i ^+ 2 = -1.
   have [i] := @solve_monicpoly _ 2%N (nth 0 [:: -1 : type]) isT.
@@ -483,7 +483,7 @@ rewrite -(fmorph_root CtoL) -map_poly_comp; congr (root _ _):pu0.
 by apply/esym/eq_map_poly; apply: fmorph_eq_rat.
 Qed.
 
-Fact archimedean : Num.archimedean_axiom type.
+Local Fact archimedean : Num.archimedean_axiom type.
 Proof. exact: rat_algebraic_archimedean algebraic. Qed.
 
 Definition isCountable := Countable.on type.
@@ -507,11 +507,12 @@ Local Notation algC := type.
 Local Notation QtoC := (ratr : rat -> algC).
 Local Notation pQtoC := (map_poly QtoC : {poly rat} -> {poly algC}).
 
-Fact algCi_subproof : {i : algC | i ^+ 2 = -1}.
+Local Fact algCi_subproof : {i : algC | i ^+ 2 = -1}.
 Proof. exact: GRing.imaginary_exists. Qed.
 
 Variant getCrat_spec : Type := GetCrat_spec CtoQ of cancel QtoC CtoQ.
 
+(* TODO: Local? *)
 Fact getCrat_subproof : getCrat_spec.
 Proof.
 have isQ := rat_algebraic_decidable algebraic.
@@ -520,6 +521,7 @@ case: (isQ _) => [Qa | []]; last by exists a.
 by case: (sig_eqW _) => b /= /fmorph_inj.
 Qed.
 
+(* TODO: Local? *)
 Fact minCpoly_subproof (x : algC) :
   {p : {poly rat} | p \is monic & forall q, root (pQtoC q) x = (p %| q)%R}.
 Proof.
@@ -835,7 +837,7 @@ Lemma Crat0 : 0 \in Crat. Proof. by apply/CratP; exists 0; rewrite rmorph0. Qed.
 Lemma Crat1 : 1 \in Crat. Proof. by apply/CratP; exists 1; rewrite rmorph1. Qed.
 #[local] Hint Resolve Crat0 Crat1 : core.
 
-Fact Crat_divring_closed : divring_closed Crat.
+Local Fact Crat_divring_closed : divring_closed Crat.
 Proof.
 split=> // _ _ /CratP[x ->] /CratP[y ->].
   by rewrite -rmorphB Crat_rat.
@@ -909,10 +911,10 @@ Proof. by move=> x; rewrite /algC_invaut; case: algC_invaut_subproof. Qed.
 Lemma algC_autK nu : cancel nu (algC_invaut nu).
 Proof. exact: inj_can_sym (algC_invautK nu) (fmorph_inj nu). Qed.
 
-Fact algC_invaut_is_zmod_morphism nu : zmod_morphism (algC_invaut nu).
+Local Fact algC_invaut_is_zmod_morphism nu : zmod_morphism (algC_invaut nu).
 Proof. exact: can2_zmod_morphism (algC_autK nu) (algC_invautK nu). Qed.
 
-Fact algC_invaut_is_monoid_morphism nu : monoid_morphism (algC_invaut nu).
+Local Fact algC_invaut_is_monoid_morphism nu : monoid_morphism (algC_invaut nu).
 Proof. exact: can2_monoid_morphism (algC_autK nu) (algC_invautK nu). Qed.
 
 HB.instance Definition _ (nu : {rmorphism algC -> algC}) :=

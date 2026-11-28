@@ -438,10 +438,10 @@ HB.factory Record ComNzRing_hasMulInverse R & ComNzRing R := {
 
 HB.builders Context R & ComNzRing_hasMulInverse R.
 
-Fact mulC_mulrV : {in unit, right_inverse 1 inv *%R}.
+Local Fact mulC_mulrV : {in unit, right_inverse 1 inv *%R}.
 Proof. by move=> x Ux /=; rewrite mulrC mulVx. Qed.
 
-Fact mulC_unitP x y : y * x = 1 /\ x * y = 1 -> unit x.
+Local Fact mulC_unitP x y : y * x = 1 /\ x * y = 1 -> unit x.
 Proof. by case=> yx _; apply: unitPl yx. Qed.
 
 HB.instance Definition _ :=
@@ -756,13 +756,13 @@ HB.factory Record ComNzRing_isField R & ComNzRing R := {
 
 HB.builders Context R & ComNzRing_isField R.
 
-Fact intro_unit (x y : R) : y * x = 1 -> x != 0.
+Local Fact intro_unit (x y : R) : y * x = 1 -> x != 0.
 Proof.
 move=> yx1; apply: contraNneq (@oner_neq0 R) => x0.
 by rewrite -yx1 x0 mulr0.
 Qed.
 
-Fact inv_out : {in predC (predC1 0), inv =1 id}.
+Local Fact inv_out : {in predC (predC1 0), inv =1 id}.
 Proof. by move=> x /negbNE/eqP->; exact: invr0. Qed.
 
 HB.instance Definition _ : ComNzRing_hasMulInverse R :=
@@ -1058,7 +1058,7 @@ End Div.
 Lemma divringClosedP (divS : divringClosed R) : divring_closed divS.
 Proof. split; [ exact: rpred1 | exact: rpredB | exact: rpred_div ]. Qed.
 
-Fact unitr_sdivr_closed : @sdivr_closed R unit.
+Local Fact unitr_sdivr_closed : @sdivr_closed R unit.
 Proof. by split=> [|x y Ux Uy]; rewrite ?unitrN1 // unitrMl ?unitrV. Qed.
 
 #[export]
@@ -1479,10 +1479,10 @@ HB.instance Definition _ (R : nzRingType) (A1 A2 : comUnitAlgType R) :=
 
 (* Algebraic structure of bool *)
 
-Fact mulVb (b : bool) : b != 0 -> b * b = 1.
+Local Fact mulVb (b : bool) : b != 0 -> b * b = 1.
 Proof. by case: b. Qed.
 
-Fact invb_out (x y : bool) : y * x = 1 -> x != 0.
+Local Fact invb_out (x y : bool) : y * x = 1 -> x != 0.
 Proof. by case: x; case: y. Qed.
 
 HB.instance Definition _ := ComNzRing_hasMulInverse.Build bool

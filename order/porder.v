@@ -768,10 +768,10 @@ Variables (disp' : disp_t) (T' : porderType disp') (f : T -> T').
 Section Pcan.
 Variables (f' : T' -> option T) (f_can : pcancel f f').
 
-Fact anti : antisymmetric (le f).
+Local Fact anti : antisymmetric (le f).
 Proof. by move=> ? ? /le_anti; apply: pcan_inj. Qed.
 
-Fact lt_def x y :
+Local Fact lt_def x y :
   lt f x y = (y != x) && le f x y.
 Proof. by rewrite /lt lt_def (inj_eq (pcan_inj f_can)). Qed.
 

@@ -428,7 +428,7 @@ Qed.
 
 Definition rcenter := [set g in G | is_scalar_mx (rG g)].
 
-Fact rcenter_group_set : group_set rcenter.
+Local Fact rcenter_group_set : group_set rcenter.
 Proof.
 apply/group_setP; split=> [|x y].
   by rewrite inE group1 repr_mx1 scalar_mx_is_scalar.
@@ -1942,7 +1942,7 @@ Qed.
 
 Section Components.
 
-Fact component_mx_key : unit. Proof. by []. Qed.
+Definition component_mx_key : unit. Proof. by []. Qed.
 Definition component_mx_expr (U : 'M[F]_n) :=
   (\sum_i cyclic_mx (row i (row_hom_mx (nz_row U))))%MS.
 Definition component_mx := locked_with component_mx_key component_mx_expr.
@@ -2148,7 +2148,7 @@ HB.instance Definition _ := [Choice of sG by <:].
 Lemma socleP (W W' : sG) : reflect (W = W') (W == W')%MS.
 Proof. by rewrite (sameP genmxP eqP) !{1}genmx_component; apply: (W =P _). Qed.
 
-Fact socle_can_subproof :
+Local Fact socle_can_subproof :
   cancel (fun W => SeqSub (socle_mem W)) (fun s => PackSocle (valP s)).
 Proof. by move=> W /=; apply: val_inj; rewrite /= PackSocleK. Qed.
 
@@ -3349,7 +3349,7 @@ rewrite PackSocleK; apply: Clifford_componentJ (subgP _).
 exact: socle_simple.
 Qed.
 
-Fact Clifford_is_action : is_action G Clifford_act.
+Local Fact Clifford_is_action : is_action G Clifford_act.
 Proof.
 split=> [x W W' eqWW' | W x y Gx Gy].
   pose Gx := subgP (subg G x); apply/socleP; apply/eqmxP.
@@ -3570,13 +3570,13 @@ Definition mx_composition_series V :=
   mx_subseries V /\ (forall i, i < size V -> max_submod (0 :: V)`_i V`_i).
 Local Notation mx_series := mx_composition_series.
 
-Fact mx_subseries_module V i : mx_subseries V -> mxmodule rG V`_i.
+Local Fact mx_subseries_module V i : mx_subseries V -> mxmodule rG V`_i.
 Proof.
 move=> modV; have [|leVi] := ltnP i (size V); first exact: all_nthP.
 by rewrite nth_default ?mxmodule0.
 Qed.
 
-Fact mx_subseries_module' V i : mx_subseries V -> mxmodule rG (0 :: V)`_i.
+Local Fact mx_subseries_module' V i : mx_subseries V -> mxmodule rG (0 :: V)`_i.
 Proof. by move=> modV; rewrite mx_subseries_module //= mxmodule0. Qed.
 
 Definition subseries_repr V i (modV : all modG V) :=
@@ -4077,7 +4077,7 @@ rewrite gring_opG ?gring_projE // eqxx big1 ?addr0 ?oner_eq0 // => x.
 by case/andP=> Gx nt_x; rewrite gring_opG // gring_projE // eq_sym (negPf nt_x).
 Qed.
 
-Fact principal_comp_key : unit. Proof. by []. Qed.
+Definition principal_comp_key : unit. Proof. by []. Qed.
 Definition principal_comp_def :=
   PackSocle (component_socle sG principal_comp_subproof).
 Definition principal_comp := locked_with principal_comp_key principal_comp_def.
