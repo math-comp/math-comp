@@ -5,7 +5,7 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq choice.
 From mathcomp Require Import div path fintype bigop ssrAC finset fingroup.
 From mathcomp Require Import nmodule preorder porder lattice total_order.
 From mathcomp Require Import interval rings_modules_and_algebras divalg.
-From mathcomp Require Import decfield poly orderedzmod numdomain.
+From mathcomp Require Import decfield poly orderedzmod orderedring numdomain.
 
 (******************************************************************************)
 (*                      Number structures (numfield.v)                        *)
@@ -70,7 +70,7 @@ Unset Printing Implicit Defensive.
 Local Open Scope ring_scope.
 
 Import Order.Theory GRing.Theory.
-Import orderedzmod.Num numdomain.Num.
+Import orderedzmod.Num orderedring.Num numdomain.Num.
 
 Module Num.
 

@@ -6,7 +6,8 @@ From mathcomp Require Import choice fintype tuple finfun bigop prime nmodule.
 From mathcomp Require Import preorder porder lattice total_order.
 From mathcomp Require Import rings_modules_and_algebras divalg countalg poly.
 From mathcomp Require Import polydiv zmodp matrix mxalgebra vector orderedzmod.
-From mathcomp Require Import numdomain numfield ssrint intdiv archimedean.
+From mathcomp Require Import orderedring numdomain numfield ssrint intdiv.
+From mathcomp Require Import archimedean.
 
 (******************************************************************************)
 (* This file defines a datatype for rational numbers and equips it with a     *)

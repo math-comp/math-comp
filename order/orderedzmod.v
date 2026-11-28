@@ -18,12 +18,22 @@ From mathcomp Require Import total_order total_order_instances.
 (*                      The HB class is called POrderNmodule.                 *)
 (*    porderZmodType == join of Order.POrder and GRing.Zmodule                *)
 (*                      The HB class is called POrderZmodule.                 *)
+(*     orderNmodType == join of Order.Total and GRing.Nmodule                 *)
+(*                      The HB class is called POrderNmodule.                 *)
+(*     orderZmodType == join of Order.Total and GRing.Zmodule                 *)
+(*                      The HB class is called POrderZmodule.                 *)
 (*  porderedNmodType == porderNmodType such that                              *)
 (*                      the order is translation invariant.                   *)
 (*                      The HB class is called POrderedNmodule.               *)
 (*  porderedZmodType == porderZmodType such that                              *)
 (*                      the order is translation invariant.                   *)
 (*                      The HB class is called POrderedZmodule.               *)
+(*   orderedNmodType == orderNmodType such that                               *)
+(*                      the order is translation invariant.                   *)
+(*                      The HB class is called OrderedNmodule.                *)
+(*   orderedZmodType == orderZmodType such that                               *)
+(*                      the order is translation invariant.                   *)
+(*                      The HB class is called OrderedZmodule.                *)
 (*       numZmodType == porderedZmodType such that                            *)
 (*                      the real line (i.e. the comparable to 0)              *)
 (*                      is totally ordered                                    *)
@@ -85,6 +95,24 @@ Bind Scope ring_scope with POrderZmodule.sort.
 End POrderZmoduleExports.
 HB.export POrderZmoduleExports.
 
+#[short(type="orderNmodType")]
+HB.structure Definition OrderNmodule :=
+  { R of Order.isOrder ring_display R & Algebra.Nmodule R }.
+
+Module OrderNmoduleExports.
+Bind Scope ring_scope with OrderNmodule.sort.
+End OrderNmoduleExports.
+HB.export OrderNmoduleExports.
+
+#[short(type="orderZmodType")]
+HB.structure Definition OrderZmodule :=
+  { R of Order.isOrder ring_display R & Algebra.Zmodule R }.
+
+Module OrderZmoduleExports.
+Bind Scope ring_scope with OrderZmodule.sort.
+End OrderZmoduleExports.
+HB.export OrderZmoduleExports.
+
 HB.mixin Record Add_isHomo R & POrderNmodule R := {
   ler_wD2l : forall x : R, {homo +%R x : y z / (y <= z)%O}
 }.
@@ -106,6 +134,24 @@ Module POrderedZmoduleExports.
 Bind Scope ring_scope with POrderedZmodule.sort.
 End POrderedZmoduleExports.
 HB.export POrderedZmoduleExports.
+
+#[short(type="orderedNmodType")]
+HB.structure Definition OrderedNmodule :=
+  { R of OrderNmodule R & Add_isHomo R}.
+
+Module OrderedNmoduleExports.
+Bind Scope ring_scope with OrderedNmodule.sort.
+End OrderedNmoduleExports.
+HB.export OrderedNmoduleExports.
+
+#[short(type="orderedZmodType")]
+HB.structure Definition OrderedZmodule :=
+  { R of Algebra.Zmodule R & OrderedNmodule R}.
+
+Module OrderedZmoduleExports.
+Bind Scope ring_scope with OrderedZmodule.sort.
+End OrderedZmoduleExports.
+HB.export OrderedZmoduleExports.
 
 HB.factory Record ZmodulePositiveCone R & Algebra.Zmodule R := {
   nonneg : {pred R};

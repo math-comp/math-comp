@@ -1,10 +1,11 @@
 Attributes deprecated(since="mathcomp 2.7.0",
   note="Use orderedzmod.v, numdomain.v, and numfield.v instead.").
 
-From mathcomp Require Export orderedzmod numdomain numfield.
+From mathcomp Require Export orderedzmod orderedring numdomain numfield.
 
 Module Num.
 Export orderedzmod.Num.
+Export orderedring.Num.
 Export numdomain.Num.
 Export numfield.Num.
 

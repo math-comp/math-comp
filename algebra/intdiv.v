@@ -5,7 +5,8 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq path.
 From mathcomp Require Import div choice fintype tuple bigop prime nmodule.
 From mathcomp Require Import preorder porder lattice total_order perm.
 From mathcomp Require Import rings_modules_and_algebras divalg poly polydiv.
-From mathcomp Require Import zmodp matrix orderedzmod numdomain ssrint.
+From mathcomp Require Import zmodp matrix orderedzmod orderedring numdomain.
+From mathcomp Require Import ssrint.
 
 (******************************************************************************)
 (* This file provides various results on divisibility of integers.            *)
