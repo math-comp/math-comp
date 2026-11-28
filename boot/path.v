@@ -65,6 +65,11 @@ From mathcomp Require Import ssreflect ssrfun ssrbool eqtype ssrnat seq.
 (*                 functorial mapping lemma map_path.                         *)
 (* fun_base f f' h b <-> the function h is a functor from function f to f',   *)
 (*                 except at the preimage of predicate b under h.             *)
+(* sorted_last relates every member to the last item of a sorted sequence.    *)
+(* sorted_subseq_nth_rev relates items at the same valid position counted     *)
+(* from the end of a sorted sequence and a subsequence. Both lemmas require   *)
+(* the sorting relation to be reflexive and transitive.                       *)
+(*                                                                            *)
 (* We also provide three segmenting dependently-typed lemmas (splitP, splitPl *)
 (* and splitPr) whose elimination split a path x0 :: p at an internal point x *)
 (* as follows:                                                                *)
@@ -618,12 +623,40 @@ move/(sorted_leq_nth leT_tr leT_refl x0 s_sorted).
 by rewrite ?nth_index ?[_ \in gtn _]index_mem //; apply.
 Qed.
 
+Lemma sorted_last x0 s x :
+  sorted s -> x \in s -> leT x (last x0 s).
+Proof.
+case: s => [//|a s] ss /(nthP x0) [i ilt <-].
+rewrite -nth_last.
+by apply: (sorted_leq_nth leT_tr leT_refl x0 ss); rewrite ?inE /= // -ltnS.
+Qed.
+
+Lemma sorted_subseq_nth_rev x0 s t n :
+  sorted s -> subseq t s -> n < size t ->
+  leT (nth x0 t (size t - n.+1)) (nth x0 s (size s - n.+1)).
+Proof.
+elim: s t => [|a s IHs] [|b t] s_sorted //=.
+case: eqP => [->|_] sub_ts n_lt.
+  move: n_lt; rewrite ltnS leq_eqVlt => /orP[/eqP ->|nt].
+    rewrite subSS subnn /=.
+    apply: (sorted_leq_nth leT_tr leT_refl x0 s_sorted 0) => //.
+    by rewrite inE ltn_subrL.
+  rewrite !nth_cons !subSS !subn_gt0 nt.
+  rewrite (leq_trans nt (size_subseq sub_ts)) -!subnS.
+  exact: IHs _ (path_sorted s_sorted) sub_ts nt.
+rewrite [in X in leT _ X]nth_cons !subSS subn_gt0.
+rewrite (leq_trans n_lt (size_subseq sub_ts)) -subnS.
+exact: IHs _ (path_sorted s_sorted) sub_ts n_lt.
+Qed.
+
 End EqSorted.
 
 Arguments sorted_ltn_index_in {T leT s} leT_tr s_sorted.
 Arguments sorted_leq_index_in {T leT s} leT_tr leT_refl s_sorted.
 Arguments sorted_ltn_index {T leT} leT_tr {s}.
 Arguments sorted_leq_index {T leT} leT_tr leT_refl {s}.
+Arguments sorted_last {T leT} leT_tr leT_refl x0 {s x}.
+Arguments sorted_subseq_nth_rev {T leT} leT_tr leT_refl x0 {s t n}.
 
 Section EqSorted_in.
 
