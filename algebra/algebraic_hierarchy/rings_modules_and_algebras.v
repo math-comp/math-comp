@@ -4442,24 +4442,22 @@ Notation "R ^o" := (regular R) : type_scope.
 
 (* Lifting Structure from the codomain of finfuns. *)
 
+(* TODO: Remove sum_ffunE and sum_ffun below. They are proved in nmodule.v. *)
 Section Sum.
 
 Variables (aT : finType) (rT : nmodType).
 Variables (I : Type) (r : seq I) (P : pred I) (F : I -> {ffun aT -> rT}).
 
 Lemma sum_ffunE x : (\sum_(i <- r | P i) F i) x = \sum_(i <- r | P i) F i x.
-Proof. by elim/big_rec2: _ => // [|i _ y _ <-]; rewrite !ffunE. Qed.
+Proof. exact: sum_ffunE. Qed.
 
 Lemma sum_ffun :
   \sum_(i <- r | P i) F i = [ffun x => \sum_(i <- r | P i) F i x].
-Proof. by apply/ffunP=> i; rewrite sum_ffunE ffunE. Qed.
+Proof. exact: sum_ffun. Qed.
 
 End Sum.
 
 Section FinFunSemiRing.
-
-(* As rings require 1 != 0 in order to lift a ring structure over finfuns     *)
-(* we need evidence that the domain is non-empty.                             *)
 
 Variable (aT : finType) (R : semiRingType).
 
@@ -4485,59 +4483,41 @@ Proof. by move=> f; apply/ffunP=> i; rewrite !ffunE mulr0. Qed.
 HB.instance Definition _ := Nmodule_isSemiRing.Build {ffun aT -> R}
   ffun_mulA ffun_mul_1l ffun_mul_1r ffun_mul_addl ffun_mul_addr
   ffun_mul_0l ffun_mul_0r.
+
+(* TODO: remove? *)
 Definition ffun_semiring : semiRingType := {ffun aT -> R}.
+
 End FinFunSemiRing.
 
-Section FinFunSemiRing.
+Section FinFunNzSemiRing.
+
+(* As non-zero (semi)rings require 1 != 0 in order to lift a ring structure   *)
+(* over finfuns we need evidence that the domain is non-empty.                *)
 
 Variable (aT : finType) (R : nzSemiRingType) (a : aT).
 
 Fact ffun1_nonzero : ffun_one aT R != 0.
 Proof. by apply/eqP => /ffunP/(_ a)/eqP; rewrite !ffunE oner_eq0. Qed.
 
-(* TODO_HB uncomment once ffun_ring below is fixed
 #[export]
 HB.instance Definition _ := SemiRing_isNonZero.Build {ffun aT -> R}
   ffun1_nonzero.
-*)
+Definition ffun_nzsemiring : nzSemiRingType := {ffun aT -> R}.
 
-End FinFunSemiRing.
+End FinFunNzSemiRing.
 
-HB.instance Definition _ (aT : finType) (R : ringType) :=
-  Zmodule_isRing.Build {ffun aT -> R}
-  (@ffun_mulA _ _) (@ffun_mul_1l _ _) (@ffun_mul_1r _ _)
-  (@ffun_mul_addl _ _) (@ffun_mul_addr _ _).
+Section FinFunComSemiRing.
 
-(* As nzRings require 1 != 0 in order to lift a ring structure over finfuns   *)
-(* we need evidence that the domain is non-empty.                             *)
-
-Section FinFunRing.
-
-Variable (aT : finType) (R : nzRingType) (a : aT).
-
-(* TODO_HB: doesn't work in combination with ffun_semiring above *)
-HB.instance Definition _ :=
-  SemiRing_isNonZero.Build {ffun aT -> R} (@ffun1_nonzero _ _ a).
-
-Definition ffun_ring : nzRingType := {ffun aT -> R}.
-
-End FinFunRing.
-
-(* TODO_HB do FinFunComSemiRing once above is fixed *)
-Section FinFunComRing.
-
-Variable (aT : finType) (R : comRingType) (a : aT).
+Variable (aT : finType) (R : comSemiRingType).
 
 Fact ffun_mulC : commutative (@ffun_mul aT R).
 Proof. by move=> f1 f2; apply/ffunP=> i; rewrite !ffunE mulrC. Qed.
 
-(* TODO_HB
 #[export]
 HB.instance Definition _ :=
-  SemiRing_hasCommutativeMul.Build (ffun_ring _ a) ffun_mulC.
-*)
+  SemiRing_hasCommutativeMul.Build {ffun aT -> R} ffun_mulC.
 
-End FinFunComRing.
+End FinFunComSemiRing.
 
 Section FinFunLSemiMod.
 
@@ -4565,11 +4545,94 @@ HB.instance Definition _ := Nmodule_isLSemiModule.Build R {ffun aT -> rT}
 
 End FinFunLSemiMod.
 
+Section FinFunLSemiAlg.
+
+Variable (R : semiRingType) (aT : finType) (rT : lSemiAlgType R).
+
+Implicit Types f g : {ffun aT -> rT}.
+
+Fact ffun_scaleAl k f g : k *: (f * g) = (k *: f) * g.
+Proof. by apply/ffunP => a; rewrite !ffunE scalerAl. Qed.
+
+#[export]
+HB.instance Definition _ := LSemiModule_isLSemiAlgebra.Build R {ffun aT -> rT}
+  ffun_scaleAl.
+
+End FinFunLSemiAlg.
+
+Section FinFunSemiAlg.
+
+Variable (R : semiRingType) (aT : finType) (rT : semiAlgType R).
+
+Implicit Types f g : {ffun aT -> rT}.
+
+Fact ffun_scaleAr k f g : k *: (f * g) = f * (k *: g).
+Proof. by apply/ffunP => a; rewrite !ffunE scalerAr. Qed.
+
+#[export]
+HB.instance Definition _ := LSemiAlgebra_isSemiAlgebra.Build R {ffun aT -> rT}
+  ffun_scaleAr.
+
+End FinFunSemiAlg.
+
+(* TODO: HB.saturate *)
+#[export]
+HB.instance Definition _ (aT : finType) (R : ringType) :=
+  SemiRing.on {ffun aT -> R}.
+#[export]
+HB.instance Definition _ (aT : finType) (R : comRingType) :=
+  SemiRing.on {ffun aT -> R}.
 #[export]
 HB.instance Definition _ (R : ringType) (aT : finType) (rT : lmodType R) :=
   LSemiModule.on {ffun aT -> rT}.
+#[export]
+HB.instance Definition _ (R : ringType) (aT : finType) (rT : lalgType R) :=
+  LSemiAlgebra.on {ffun aT -> rT}.
+#[export]
+HB.instance Definition _
+    (R : semiRingType) (aT : finType) (rT : comSemiAlgType R) :=
+  LSemiAlgebra.on {ffun aT -> rT}.
+#[export]
+HB.instance Definition _ (R : ringType) (aT : finType) (rT : algType R) :=
+  LSemiAlgebra.on {ffun aT -> rT}.
+#[export]
+HB.instance Definition _ (R : ringType) (aT : finType) (rT : comAlgType R) :=
+  LSemiAlgebra.on {ffun aT -> rT}.
 
-(* TODO: algebra over finfun? *)
+#[export]
+HB.instance Definition _ (aT : finType) (R : comNzSemiRingType) (a : aT) :=
+  SemiRing.copy {ffun aT -> R} (ffun_nzsemiring R a).
+#[export]
+HB.instance Definition _ (aT : finType) (R : nzRingType) (a : aT) :=
+  SemiRing.copy {ffun aT -> R} (ffun_nzsemiring R a).
+#[export]
+HB.instance Definition _ (aT : finType) (R : comNzRingType) (a : aT) :=
+  SemiRing.copy {ffun aT -> R} (ffun_nzsemiring R a).
+#[export]
+HB.instance Definition _
+    (R : nzSemiRingType) (aT : finType) (rT : nzLSemiAlgType R) (a : aT) :=
+  LSemiAlgebra.copy {ffun aT -> rT} (ffun_nzsemiring rT a).
+#[export]
+  HB.instance Definition _
+    (R : nzSemiRingType) (aT : finType) (rT : nzSemiAlgType R) (a : aT) :=
+  LSemiAlgebra.copy {ffun aT -> rT} (ffun_nzsemiring rT a).
+#[export]
+HB.instance Definition _
+    (R : nzSemiRingType) (aT : finType) (rT : comNzSemiAlgType R) (a : aT) :=
+  LSemiAlgebra.copy {ffun aT -> rT} (ffun_nzsemiring rT a).
+#[export]
+HB.instance Definition _
+    (R : nzRingType) (aT : finType) (rT : nzLalgType R) (a : aT) :=
+  LSemiAlgebra.copy {ffun aT -> rT} (ffun_nzsemiring rT a).
+#[export]
+HB.instance Definition _
+    (R : nzRingType) (aT : finType) (rT : nzAlgType R) (a : aT) :=
+  LSemiAlgebra.copy {ffun aT -> rT} (ffun_nzsemiring rT a).
+#[export]
+HB.instance Definition _
+    (R : nzRingType) (aT : finType) (rT : comNzAlgType R) (a : aT) :=
+  LSemiAlgebra.copy {ffun aT -> rT} (ffun_nzsemiring rT a).
+(* /TODO *)
 
 (* External direct product. *)
 
@@ -4640,20 +4703,6 @@ HB.instance Definition _ := SemiRing_hasCommutativeMul.Build (R1 * R2)%type
   pair_mulC.
 
 End PairComSemiRing.
-
-(* TODO: HB.saturate *)
-#[export]
-HB.instance Definition _ (R1 R2 : comNzSemiRingType) :=
-  NzSemiRing.on (R1 * R2)%type.
-#[export]
-HB.instance Definition _ (R1 R2 : ringType) := SemiRing.on (R1 * R2)%type.
-#[export]
-HB.instance Definition _ (R1 R2 : nzRingType) := NzSemiRing.on (R1 * R2)%type.
-#[export]
-HB.instance Definition _ (R1 R2 : comRingType) := Ring.on (R1 * R2)%type.
-#[export]
-HB.instance Definition _ (R1 R2 : comNzRingType) := NzRing.on (R1 * R2)%type.
-(* /TODO *)
 
 Section PairLSemiMod.
 
@@ -4726,6 +4775,17 @@ End PairSemiAlg.
 
 (* TODO: HB.saturate *)
 #[export]
+HB.instance Definition _ (R1 R2 : comNzSemiRingType) :=
+  NzSemiRing.on (R1 * R2)%type.
+#[export]
+HB.instance Definition _ (R1 R2 : ringType) := SemiRing.on (R1 * R2)%type.
+#[export]
+HB.instance Definition _ (R1 R2 : nzRingType) := NzSemiRing.on (R1 * R2)%type.
+#[export]
+HB.instance Definition _ (R1 R2 : comRingType) := Ring.on (R1 * R2)%type.
+#[export]
+HB.instance Definition _ (R1 R2 : comNzRingType) := NzRing.on (R1 * R2)%type.
+#[export]
 HB.instance Definition _ (R : semiRingType) (A1 A2 : comSemiAlgType R) :=
   SemiAlgebra.on (A1 * A2)%type.
 #[export]
@@ -4743,6 +4803,9 @@ HB.instance Definition _ (R : ringType) (A1 A2 : lalgType R) :=
 #[export]
 HB.instance Definition _ (R : nzRingType) (A1 A2 : nzLalgType R) :=
   NzLSemiAlgebra.on (A1 * A2)%type.
+#[export]
+HB.instance Definition _ (R : nzRingType) (A1 A2 : comNzSemiAlgType R) :=
+  NzSemiAlgebra.on (A1 * A2)%type.
 #[export]
 HB.instance Definition _ (R : ringType) (A1 A2 : algType R) :=
   SemiAlgebra.on (A1 * A2)%type.
